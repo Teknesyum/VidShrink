@@ -194,6 +194,9 @@ internal sealed class PanelHost : IDisposable
     /// (<c>PreviewSegment.Plan.Crf</c>), ham ondalık değer değil. Ondalık değeri basmak
     /// kullanıcıya kodlanandan farklı bir sayı gösterirdi. Kodlayıcının kalite ölçeği
     /// modellenmiyorsa sayı hiç gösterilmez.
+    ///
+    /// Kullanıcı 09-07: rozette yalnız "CRF x" yazar. Taraf adı (İŞLENMİŞ) panelin üstündeki
+    /// etiket satırında durduğu için rozette tekrarlanmaz; sayı yoksa rozet de yoktur.
     /// </summary>
     internal string? ApproximateBadge
     {
@@ -201,8 +204,7 @@ internal sealed class PanelHost : IDisposable
         {
             var clip = ActiveClip;
             if (clip is null || !clip.IsApproximate) return null;
-            var text = PlaybackText("playback.badge.processed");
-            return clip.Crf is { } crf ? $"{text} · CRF {crf}" : text;
+            return clip.Crf is { } crf ? $"CRF {crf}" : null;
         }
     }
 

@@ -47,7 +47,31 @@
         plan sızmasın. Kaynak yüklenmemişken perde saydamlaşır ve arkadaki anka panelin
         içinden görünür; iki fırça da temadan, opaklık kodda yazılmıyor.
       -->
+      <Grid RowDefinitions="Auto,*">
+
+      <!--
+        Kullanıcı 09-07: taraf adları görüntünün üstünde değil panelin üstünde durur —
+        ORİJİNAL solda, İŞLENMİŞ sağda. Görüntünün içinde yalnız CRF rozeti kalır.
+      -->
+      <Grid x:Name="LabelRow" Grid.Row="0">
+        <Border x:Name="LeftBadge"
+                Theme="{StaticResource PlaybackBadge}"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Margin="{StaticResource PlaybackBadgeMargin}">
+          <TextBlock x:Name="LeftBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
+        </Border>
+        <Border x:Name="RightBadge"
+                Theme="{StaticResource PlaybackBadge}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="{StaticResource PlaybackBadgeMargin}">
+          <TextBlock x:Name="RightBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
+        </Border>
+      </Grid>
+
       <Grid x:Name="Stage"
+            Grid.Row="1"
             Background="{StaticResource PlaybackStageFill}"
             ClipToBounds="True">
 
@@ -85,19 +109,9 @@
                      HorizontalAlignment="Center"/>
         </StackPanel>
 
-        <!-- Solda orijinal, sağda işlenmiş. Etiket yonganın içinde, çerçevesi neon. -->
-        <Border x:Name="LeftBadge"
-                Theme="{StaticResource PlaybackBadge}"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Margin="{StaticResource PlaybackBadgeMargin}">
-          <TextBlock x:Name="LeftBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
-        </Border>
-
         <!--
-          T49: sağ yarının iki işareti alt alta. Üstteki taraf etiketi, altındaki
-          yaklaşıklık rozeti — ikisi de sağ üstte, yani işaret ettikleri şey sağ yarı.
-          Rozet ikinci bir tasarım değil, yan etiketle aynı yonga.
+          T49: sağ üstte panel tuşları ve altında CRF rozeti; rozet sağ yarıyı işaret
+          eder. Rozet ikinci bir tasarım değil, taraf etiketiyle aynı yonga.
         -->
         <StackPanel x:Name="TopRight"
                     HorizontalAlignment="Right"
@@ -130,12 +144,6 @@
                     Stretch="Uniform"/>
             </Button>
           </StackPanel>
-
-          <Border x:Name="RightBadge"
-                  Theme="{StaticResource PlaybackBadge}"
-                  HorizontalAlignment="Right">
-            <TextBlock x:Name="RightBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
-          </Border>
 
           <!--
             T49/K3: rozet tıklanabilir değil. Fare olaylarına saydam olmazsa panelin
@@ -206,6 +214,7 @@
           </Grid>
         </Border>
 
+      </Grid>
       </Grid>
     </Border>
   </Grid>
