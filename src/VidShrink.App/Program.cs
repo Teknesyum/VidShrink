@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -152,7 +152,7 @@ internal static class Program
         using var instance = new SingleInstanceChannel(SingleInstanceChannel.DefaultChannel());
         var files = new Integration.ForwardedFiles();
         AcilisIzi.Yaz("tek-ornek");
-        if (path is not null) WarmPlayback();
+        if (path is not null) WarmStartupFile(path);
 
         if (!instance.IsOwner)
         {
@@ -186,6 +186,16 @@ internal static class Program
             catch (Exception) { }
             AcilisIzi.Yaz("libmpv-hazir");
         });
+
+    /// <summary>
+    /// Kabuktan gelen dosyayi pencere kurulurken acar. Kitaplik yuklendikten sonra
+    /// <c>mpv_create</c> ve <c>loadfile</c> arayuzu beklemez; pencere hazir oldugunda
+    /// motor cogu zaman dolu doner.
+    /// </summary>
+    private static void WarmStartupFile(string path)
+        => _ = WarmPlayback().ContinueWith(
+            _ => Playback.AcilisMotoru.Isit(path, () => new MpvEngine()),
+            TaskScheduler.Default);
 
     private static void AllowForeground()
     {

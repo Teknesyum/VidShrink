@@ -4,6 +4,7 @@
         xmlns:playback="using:VidShrink.App.Playback"
         xmlns:recorder="using:VidShrink.App.Recorder"
         xmlns:loc="using:VidShrink.App.Localization"
+        xmlns:izi="using:VidShrink.App"
         x:Class="VidShrink.App.MainWindow"
         Title="VidShrink"
         Width="1560" Height="1060" MinWidth="1136" MinHeight="720"
@@ -62,7 +63,7 @@
               BorderThickness="0,0,0,1"/>
 
 
-        <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
+        <TabControl x:Name="Tabs" izi:AcilisIsareti.Ad="xaml-sekmeler" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
         <TabControl.Tag>
         <StackPanel>
           <Border x:Name="AppliedNotice"
@@ -134,12 +135,12 @@
           </Border>
         </StackPanel>
         </TabControl.Tag>
-        <TabItem x:Name="TabPlayer" Header="{loc:Text main.tab.player}" Tag="{StaticResource IconPlayer}" Theme="{StaticResource NeonTabItem}">
+        <TabItem x:Name="TabPlayer" izi:AcilisIsareti.Ad="xaml-oynatici" Header="{loc:Text main.tab.player}" Tag="{StaticResource IconPlayer}" Theme="{StaticResource NeonTabItem}">
           <playback:PlayerView x:Name="Player"/>
         </TabItem>
 
 
-        <TabItem x:Name="TabShrink" Header="{loc:Text main.tab.shrink}" Tag="{StaticResource IconShrink}" Theme="{StaticResource NeonTabItem}">
+        <TabItem x:Name="TabShrink" izi:AcilisIsareti.Ad="xaml-kucultme" Header="{loc:Text main.tab.shrink}" Tag="{StaticResource IconShrink}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageShrink" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpaceMd}">
 
@@ -746,7 +747,7 @@
           </ScrollViewer>
         </TabItem>
 
-        <TabItem Header="{loc:Text main.tab.convert}" Tag="{StaticResource IconConvert}" Theme="{StaticResource NeonTabItem}">
+        <TabItem Header="{loc:Text main.tab.convert}" izi:AcilisIsareti.Ad="xaml-donusturme" Tag="{StaticResource IconConvert}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageConvert" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceXl}">
 
@@ -993,7 +994,7 @@
           </ScrollViewer>
         </TabItem>
 
-        <TabItem Header="{loc:Text main.tab.about}" Tag="{StaticResource IconAbout}" Theme="{StaticResource NeonTabItem}">
+        <TabItem Header="{loc:Text main.tab.about}" izi:AcilisIsareti.Ad="xaml-hakkinda" Tag="{StaticResource IconAbout}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageAbout" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Border Theme="{StaticResource Panel}" Margin="{StaticResource SectionMargin}">
               <StackPanel Spacing="{StaticResource SpaceMd}">
@@ -1019,13 +1020,12 @@
           </ScrollViewer>
         </TabItem>
 
-          <TabItem Header="{loc:Text main.tab.recorder}" x:Name="TabRecorder" Tag="{StaticResource IconRecorder}" Theme="{StaticResource NeonTabItem}">
+          <TabItem Header="{loc:Text main.tab.recorder}" izi:AcilisIsareti.Ad="xaml-kaydedici" x:Name="TabRecorder" Tag="{StaticResource IconRecorder}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageRecorder" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
-            <recorder:RecorderView x:Name="RecorderPane" Margin="{StaticResource SectionMargin}"/>
           </ScrollViewer>
         </TabItem>
 
-          <TabItem x:Name="TabAdvanced" IsVisible="False" Header="{loc:Text main.tab.advanced}" Tag="{StaticResource IconAdvanced}" Theme="{StaticResource NeonTabItem}">
+          <TabItem x:Name="TabAdvanced" izi:AcilisIsareti.Ad="xaml-gelismis" IsVisible="False" Header="{loc:Text main.tab.advanced}" Tag="{StaticResource IconAdvanced}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageAdvanced" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
@@ -1119,7 +1119,7 @@
           </ScrollViewer>
         </TabItem>
 
-        <TabItem Header="{loc:Text main.tab.settings}" x:Name="TabSettings" Tag="{StaticResource IconSettings}" Theme="{StaticResource NeonTabItem}">
+        <TabItem Header="{loc:Text main.tab.settings}" izi:AcilisIsareti.Ad="xaml-ayarlar" x:Name="TabSettings" Tag="{StaticResource IconSettings}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
@@ -1276,7 +1276,7 @@
 
       </TabControl>
 
-      <Border x:Name="TitleBarLayer"
+      <Border x:Name="TitleBarLayer" izi:AcilisIsareti.Ad="xaml-sekmeler-bitti"
               VerticalAlignment="Top"
               Height="{StaticResource TitleBarHeight}">
         <!--

@@ -7,6 +7,41 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-16
+
+### Added
+
+- A startup probe. An attached property, `AcilisIsareti.Ad`, can be placed on any XAML
+  element; when the element is constructed it writes a line into the startup trace. This
+  gives per-subtree costs inside `InitializeComponent` without touching the visual tree.
+  Nine marks now sit on the tab control and its children, and a pin keeps them in step
+  with the measurement script's step list.
+
+### Changed
+
+- The Recorder tab is built the first time it is selected instead of at startup. The view
+  was inline in `MainWindow.axaml`; it now moves into `MainWindow.TembelSekme.cs` and is
+  constructed on first selection, with its margin read from the `SectionMargin` token.
+  Visible behaviour: the first switch to the Recorder tab does the work that used to
+  happen during startup.
+- When a file arrives from the shell, the playback engine is opened while the window is
+  still being built. `AcilisMotoru` runs `mpv_create` and `loadfile` in the background as
+  soon as libmpv is warm; the player takes the ready engine over if it asks for the same
+  path, and an unclaimed engine is disposed.
+
+### Measured
+
+- Paired warm measurement against 0.6.0, 14 repetitions on an idle machine: shell clock
+  double-click to first frame 1239.8 ms to 1019.3 ms, paired median difference
+  -213.7 ms, 13 of 14 pairs in favour of the new build. The engine step
+  (`sekme` to `kare-kaynagi`) fell from 268.8 ms to 52.7 ms and the XAML step by
+  89.6 ms. The perception clock (`perde`) is 79.3 ms.
+- Hardware decoding (`hwdec=auto-copy`) was measured and reverted: it raised the engine
+  step from 272.8 ms to 297.0 ms, about +24 ms.
+- The probe retired a planned change: the 215 ms of `InitializeComponent` is not spread
+  evenly over the seven tabs. Six of them total about 50 ms; the Recorder view alone was
+  89.4 ms. Splitting every tab into its own `UserControl` would have bought nothing.
+
 ## [0.6.0] - 2026-09-16
 
 ### Added

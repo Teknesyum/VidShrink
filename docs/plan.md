@@ -277,3 +277,87 @@ karşılaştırılmaz, tam tablo ve okuma tuzakları
 Sırada **A2** (yedi sekmeyi ayrı `UserControl`lere bölmek) ve **B1-B4** (mpv seçenekleri,
 render yolu) var. Perde algı saatini hedefe getirdi; gerçek ilk kareyi 100 ms'e indirmek
 hâlâ bu iki dalgadan geçiyor.
+
+## D dalgası — Sondayla ölçülmüş gerçek kalemler (16 Eylül 2026)
+
+Fable'ın beş sorusu ([017](netlestirme/017-c-dalgasindan-sonra-cift-tik-ile-ilk-kar.md)) burada
+cevaplanıyor.
+
+1. **Hedef hangi saatte?** `perde` saatinde. Boşta koşan makinede `perde` **78,1 ms**;
+   100 ms hedefi orada tutuyor. `kabuk-ilk-kare` için hedef yok, yalnız "her dalgada daha
+   az" var: süreç doğumu + CLR + Avalonia çerçevesi tek başına ~320 ms ve bu taban
+   `PublishAot` yasakken inmiyor.
+2. **Hangi açılış senaryosu?** Çift tık senaryosu. Ölçüm zaten kabuktan dosya vererek
+   koşuyor; boş açılış ayrı ölçülmüyor.
+3. **Motor anahtarları nereye uygulanır?** Yalnız oynatıcının kendi motoruna
+   (`PlayerView.EngineFactory`). Karşılaştırma paneli ve önizleme sesi kendi
+   seçenekleriyle kuruluyor, bayt eşleme ölçüsü onlardan okunuyor.
+4. **Görünür davranış değişikliği?** Kullanıcı "dalga dalga iznimi isteme" dedi; yapılıyor
+   ve turun sonunda adıyla bildiriliyor. Bu dalgada bir tane var: oynatıcı çözmeyi
+   donanıma veriyor.
+5. **Kabul ölçüsü?** Eşleşik fark ortancası, 14 tekrar, aynı 6,2 MB klip. Mutlak sayı
+   oturumlar arası kıyaslanmıyor.
+
+### Sonda: `InitializeComponent`'in içi
+
+`AcilisIsareti` iliştirilmiş özelliği XAML ağacının içine iz noktası koyuyor; derlenmiş
+XAML'de öğe kurulurken yazıldığı için iki işaret arasındaki fark aradaki ağacın bedeli.
+8 tekrar, boşta makine, ortanca ms:
+
+| Aralık | Pay | Ne kuruluyor |
+| --- | --- | --- |
+| pencere-yapici → xaml-sekmeler | 50,0 | pencere kabuğu, başlık çubuğu |
+| xaml-oynatici → xaml-kucultme | 18,4 | oynatıcı sekmesi (`PlayerView`) |
+| xaml-kucultme → xaml-donusturme | 21,5 | küçültme sekmesi, 605 satır |
+| xaml-donusturme → xaml-hakkinda | 4,8 | dönüştürme sekmesi |
+| xaml-hakkinda → xaml-kaydedici | 1,4 | hakkında sekmesi |
+| **xaml-kaydedici → xaml-gelismis** | **89,4** | **kaydedici sekmesi (`RecorderView`)** |
+| xaml-gelismis → xaml-ayarlar | 1,2 | gelişmiş sekmesi |
+| xaml-ayarlar → xaml-sekmeler-bitti | 3,0 | ayarlar sekmesi |
+
+Yedi sekmeyi `UserControl`'lere bölmek (A2) **gereksiz**: altı sekmenin toplamı 50 ms,
+tek başına kaydedici 89,4 ms. Ölçü A2'yi kapattı.
+
+### Boşta makinede bugünkü tablo (8 tekrar, ortanca ms)
+
+| Adım | Birikimli | Pay |
+| --- | --- | --- |
+| baslatici | 45,2 | 45,2 |
+| perde | 78,1 | — |
+| main | 100,2 | 44,6 |
+| libmpv-hazir | 116,8 | 16,6 |
+| cerceve | 319,8 | 203,0 |
+| pencere-yapici | 361,4 | 37,5 |
+| xaml | 576,5 | 215,1 |
+| yapici-bitti | 647,4 | 70,9 |
+| pencere-kuruldu | 819,6 | 172,2 |
+| pencere-yuklendi | 921,0 | 101,4 |
+| sekme | 942,0 | 21,0 |
+| kare-kaynagi | 1214,8 | 272,8 |
+| ilk-kare | 1216,6 | 1,8 |
+
+### D1 — Kaydedici sekmesi tembel
+
+`RecorderView` XAML'den çıktı; sekme ilk seçildiğinde kuruluyor
+(`MainWindow.TembelSekme.cs`). Kenar payı `SectionMargin` belirtecinden okunuyor.
+
+### D2 — Donanım çözme: ölçüldü, geri alındı
+
+`hwdec=auto-copy` denendi. Eşleşik ölçümde motor adımı 272,8 ms yerine 297,0 ms oldu,
+yaklaşık +24 ms. Kazanç değil kayıp; `EngineFactory` yazılımsal çözmeye döndürüldü.
+Pim: `OynaticiYazilimsalCozuyor_DonanimOlculdu_GeriAlindi`.
+
+### D3 — Motor pencere kurulurken açılıyor
+
+`AcilisMotoru` (App/Playback): kabuktan dosya geldiğinde libmpv ısındıktan hemen sonra
+motoru açıp bekletiyor; `PlayerView.OpenAsync` aynı yolu isterse hazır motoru devralıyor,
+istemezse kendi motorunu kuruyor ve bekleyen motor `Birak` ile atılıyor.
+
+Ölçü: `sekme → kare-kaynagi` 268,8 ms → 52,7 ms; eşleşik `kabuk-ilk-kare` farkı
+−213,7 ms, 14 çiftin 13'ü lehine. Tablo
+[docs/olcumler/acilis-hizi.md](olcumler/acilis-hizi.md) D dalgası.
+
+### D dalgasından sonra kalanlar
+
+`cerceve` ~216 ms (Avalonia çerçeve kurulumu), `Show()` ~173 ms, `Loaded` ~99 ms.
+Üçü de çerçeve düzeyinde; kendi kodumuzda kesilecek büyük kalem kalmadı.

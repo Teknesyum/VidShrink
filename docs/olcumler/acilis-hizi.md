@@ -266,3 +266,54 @@ ReadyToRun önceden derlenmiş kodu pakete koyuyor; güncelleme indirmesi ~%8 b�
 | Plan ve kararlar | [docs/plan.md](../plan.md) C dalgası |
 | Fable'ın netleştirmesi | [016](../netlestirme/016-a-dalgasi-olculdu-cift-tik-ilk-kare-1796.md) |
 | Pimler | [HipersurusTests.cs](../../tests/VidShrink.Tests/HipersurusTests.cs) |
+
+## D dalgası — Tembel kaydedici ve önden ısıtılan motor (16 Eylül 2026)
+
+Eşleşik sıcak ölçüm, 14 tekrar, aynı klip, aynı makine. Taban **0.6.0** (C dalgası),
+karşı taraf **D**. Makine bu oturumda boştaydı; C dalgası ölçümündeki mutlak sayılarla
+karşılaştırılamaz, çift içindeki fark karşılaştırılır.
+
+| Sütun | 0.6.0 | D | Eşleşik fark ortancası | D lehine çift |
+| --- | --- | --- | --- | --- |
+| kabuk-ilk-kare | 1239,8 ms | 1019,3 ms | **−213,7 ms** | 13/14 |
+| motor-acildi | 1212,6 ms | 888,1 ms | −338,0 ms | 14/14 |
+| kare-kaynagi | 1217,6 ms | 920,1 ms | −311,1 ms | 13/14 |
+| xaml | 587,8 ms | 506,4 ms | −89,6 ms | 12/14 |
+
+İki kalem:
+
+**Kaydedici sekmesi tembel.** `RecorderView` XAML'den çıktı, sekme ilk seçildiğinde
+kuruluyor. Sonda ölçümü tek başına bu görünümü 89,4 ms göstermişti; `xaml` adımındaki
+−89,6 ms bire bir o.
+
+**Motor pencere kurulurken açılıyor.** Kabuktan dosya geldiğinde `AcilisMotoru`
+libmpv hazır olur olmaz `mpv_create` + `loadfile`'ı arka planda koşturuyor; oynatıcı
+sekmesi hazır motoru devralıyor. `sekme → kare-kaynagi` payı 268,8 ms'den 52,7 ms'ye
+indi.
+
+### Ölçülüp geri alınan
+
+`hwdec=auto-copy` motor adımını 272,8 ms'den 297,0 ms'ye çıkardı, yaklaşık **+24 ms**.
+Geri alındı; pim `OynaticiYazilimsalCozuyor_DonanimOlculdu_GeriAlindi`.
+
+### Sonda
+
+`AcilisIsareti.Ad` iliştirilmiş özelliği XAML öğelerine konunca öğe kurulurken ize
+satır yazıyor. `InitializeComponent`'in 215 ms'i yedi sekmeye eşit dağılmıyordu: altı
+sekme toplam ~50 ms, tek başına kaydedici 89,4 ms. Bu ölçü, planlanan "her sekmeyi
+`UserControl`'e böl" ameliyatını gereksiz kıldı.
+
+### Algı saati
+
+`perde` 79,3 ms. 100 ms hedefi bu saatte tutuyor; çift tık → ilk kare saatinde
+hedef 1 sn'nin biraz altında.
+
+### Kanıt
+
+| Ne | Nerede |
+| --- | --- |
+| Ham özet | [T-hipersurus-D-ozet.txt](T-hipersurus-D-ozet.txt) |
+| Ölçüm düzeneği | [tools/acilis-hizi/olcum.ps1](../../tools/acilis-hizi/olcum.ps1) |
+| Plan ve kararlar | [docs/plan.md](../plan.md) D dalgası |
+| Fable'ın netleştirmesi | [017](../netlestirme/017-c-dalgasindan-sonra-cift-tik-ile-ilk-kar.md) |
+| Pimler | [HipersurusTests.cs](../../tests/VidShrink.Tests/HipersurusTests.cs) |

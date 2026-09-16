@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using VidShrink.Core.Share;
@@ -65,8 +65,10 @@ public sealed class KayitTeslimTests
     public void AnaPencereIkiKapiyiAciyor()
     {
         var window = WindowCode();
-        Assert.Contains("RecorderPane.OpenInShrink = OpenInShrinkAsync;", window, System.StringComparison.Ordinal);
-        Assert.Contains("RecorderPane.OpenInPlayer = OpenInPlayerAsync;", window, System.StringComparison.Ordinal);
+        var tembel = Read("src", "VidShrink.App", "MainWindow.TembelSekme.cs");
+        Assert.Contains("_recorderPane.OpenInShrink = OpenInShrinkAsync;", tembel, System.StringComparison.Ordinal);
+        Assert.Contains("_recorderPane.OpenInPlayer = OpenInPlayerAsync;", tembel, System.StringComparison.Ordinal);
+        Assert.DoesNotContain("<recorder:RecorderView", Read("src", "VidShrink.App", "MainWindow.axaml"), System.StringComparison.Ordinal);
 
         var shrink = Regex.Match(window, @"OpenInShrinkAsync\(string path\)\s*\{(?<body>.*?)\n    \}", RegexOptions.Singleline);
         Assert.True(shrink.Success, "OpenInShrinkAsync gövdesi okunamadı.");

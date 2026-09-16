@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -542,7 +542,22 @@ internal partial class PlayerView : UserControl
     {
         Close();
         IPlaybackEngine? engine = null;
+        var onden = AcilisMotoru.Devral(path);
         try
+        {
+            if (onden is not null)
+            {
+                engine = await onden.ConfigureAwait(true);
+                engine.Faulted += OnFaulted;
+            }
+            else
+            {
+                engine = await Task.Run(EngineFactory).ConfigureAwait(true);
+                engine.Faulted += OnFaulted;
+                await engine.OpenAsync(path, ct).ConfigureAwait(true);
+            }
+        }
+        catch when (onden is not null && engine is null)
         {
             engine = await Task.Run(EngineFactory).ConfigureAwait(true);
             engine.Faulted += OnFaulted;

@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -160,8 +160,6 @@ public partial class MainWindow : Window
         Player.OpenSettings = () => Tabs.SelectedIndex = SettingsTabIndex;
         PlayerAdvancedPanel.Player = Player;
 
-        RecorderPane.OpenInShrink = OpenInShrinkAsync;
-        RecorderPane.OpenInPlayer = OpenInPlayerAsync;
         Player.HistoryPath = () => Path.Combine(
             Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
             "player-history.json");
@@ -190,7 +188,7 @@ public partial class MainWindow : Window
         AlignTabsToTitle();
         TrackChrome();
         SetupShellMenu();
-        Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
+        Tabs.SelectionChanged += (_, _) => { ApplyWindowFrame(); KaydediciSekmesiSecildi(); };
 
         if (OperatingSystem.IsMacOS())
         {
@@ -529,6 +527,7 @@ public partial class MainWindow : Window
         finally
         {
             AcilisPerdesi.Kapat();
+            Playback.AcilisMotoru.Birak();
         }
     }
 
