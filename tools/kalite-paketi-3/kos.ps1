@@ -1,5 +1,11 @@
 param(
-    [Parameter(Mandatory)][ValidateSet('kesit', 'whatsapp', 'handbrake', 'ceza', 'av1')][string]$Is,
+    [Parameter(Mandatory)][ValidateSet('kesit', 'whatsapp', 'handbrake', 'ceza', 'av1', 'hedefbant', 'oran')][string]$Is,
+    [string]$BenchE1 = '',
+    [string]$Uzun = '',
+    [string]$EkranUzun = '',
+    [int]$UzunSure = 120,
+    [string]$Hedefler = '50,100',
+    [string]$OranKbitler = '400,800,1600,3200,6400',
     [Parameter(Mandatory)][string]$Kaynak,
     [Parameter(Mandatory)][string]$Cikti,
     [Parameter(Mandatory)][string]$Bench,
@@ -255,7 +261,101 @@ function Av1 {
     ConvertTo-Json -Depth 4 -InputObject @($satirlar) | Set-Content (Join-Path $Cikti "av1-$Kesit.json")
 }
 
+function Kollar {
+    if (-not $BenchE1) { throw 'e1 kolu icin -BenchE1 gerekli.' }
+    [ordered]@{ 'e0' = $Bench; 'e1' = $BenchE1 }
+}
+
+function HedefBant {
+    if (-not $Kesit) { throw 'Hedef bant olcumu icin -Kesit gerekli.' }
+    $secim = (Get-Content (Join-Path $Cikti 'kesitler.json') -Raw | ConvertFrom-Json).Secim.$Kesit
+    $kaynakUzun = if ($Kesit -eq 'ekran') { $EkranUzun } else { $Uzun }
+    if (-not $kaynakUzun) { throw "uzun kaynak verilmedi: $Kesit" }
+    $kb = Probe $kaynakUzun
+    $bas = [int]$secim.Baslangic
+    $dongu = ($bas + $UzunSure) -gt $kb.Sure
+    if ($dongu) { $bas = 0 }
+    $girdi = Join-Path $Cikti "uzun-$Kesit.mkv"
+    $on = if ($dongu) { @('-stream_loop', '-1') } else { @() }
+    Ffmpeg ($on + @('-ss', "$bas", '-i', $kaynakUzun, '-t', "$UzunSure", '-an', '-sn', '-map', '0:v:0', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-pix_fmt', 'yuv420p', $girdi))
+    $gb = Probe $girdi
+    $kaynakMb = [math]::Round((Get-Item $girdi).Length / 1MB, 3)
+    $satirlar = @()
+    $kollar = Kollar
+    foreach ($hedef in @($Hedefler.Split(',') | ForEach-Object { [double]::Parse($_.Trim(), $Inv) })) {
+        foreach ($kol in $kollar.Keys) {
+            $ad = "hbant-$Kesit-$kol-$($hedef.ToString($Inv))"
+            $klasor = Join-Path $Cikti $ad
+            $log = Join-Path $Cikti "$ad.log"
+            $sure = [Diagnostics.Stopwatch]::StartNew()
+            & dotnet $kollar[$kol] shrink $girdi $hedef.ToString($Inv) --out $klasor --speed quality --no-measure --force-codec libsvtav1 --no-resolution-drop --no-fps-drop *>&1 | Out-File $log
+            $sure.Stop()
+            if ($LASTEXITCODE -ne 0) { throw "bench shrink basarisiz: $ad" }
+            $metin = Get-Content $log
+            $komut = $metin | Where-Object { $_ -like 'komut:*' } | Select-Object -First 1
+            $params = if ($komut -match '-svtav1-params\s+"?([^\s"]+)') { $Matches[1] } else { '' }
+            $denemeler = @(foreach ($l in $metin) {
+                if ($l -match '^\s*deneme (\d+): (.+), (\S+), (\d+)k, hedeflenen ([\d.]+) MB, cikan ([\d.]+) MB') {
+                    [pscustomobject]@{ no = [int]$Matches[1]; dal = $Matches[2]; mod = $Matches[3]; kbit = [int]$Matches[4]; hedeflenen_mb = [double]::Parse($Matches[5], $Inv); cikan_mb = [double]::Parse($Matches[6], $Inv) }
+                }
+            })
+            $sonuc = @(Get-Content (Join-Path $klasor 'results.json') -Raw | ConvertFrom-Json)[0]
+            $mp4 = Get-ChildItem $klasor -Filter '*.mp4' -ErrorAction SilentlyContinue | Select-Object -First 1
+            $teslimBayt = if ($mp4) { $mp4.Length } else { 0 }
+            $alt = $hedef * 0.972
+            $ilk = $denemeler | Where-Object { $_.no -eq 1 } | Select-Object -First 1
+            $satirlar += [pscustomobject][ordered]@{
+                kesit = $Kesit; kol = $kol; svtav1_params = $params; hedef_mb = $hedef; bant_alt_mb = [math]::Round($alt, 3)
+                kaynak_bas = $bas; kaynak_sure = $gb.Sure; kaynak_dongu = $dongu; kaynak_mb = $kaynakMb; geometri = "$($sonuc.Width)x$($sonuc.Height)@$($sonuc.Fps)"
+                ilk_kbit = $ilk.kbit; ilk_hedeflenen_mb = $ilk.hedeflenen_mb; ilk_cikan_mb = $ilk.cikan_mb
+                ilk_doluluk = [math]::Round($ilk.cikan_mb / $hedef * 100, 2); ilk_bantta = ($ilk.cikan_mb -ge $alt -and $ilk.cikan_mb -le $hedef); ilk_dal = $ilk.dal
+                deneme = $sonuc.Attempts; dallar = (($denemeler | ForEach-Object { "$($_.no):$($_.dal):$($_.kbit)k:$($_.cikan_mb)" }) -join ' | ')
+                teslim = [bool]$mp4; teslim_bayt = $teslimBayt; teslim_mb = [math]::Round($teslimBayt / 1MB, 4); son_mb = $sonuc.ActualMb
+                teslim_tasma = ($teslimBayt / 1MB -gt $hedef); bantta = $sonuc.InBand; kodlama_sn = [math]::Round($sure.Elapsed.TotalSeconds, 1)
+                komut = $komut
+            }
+            if ($mp4) { Remove-Item $mp4.FullName }
+            ConvertTo-Json -Depth 4 -InputObject @($satirlar) | Set-Content (Join-Path $Cikti "hedefbant-$Kesit.json")
+        }
+    }
+    Remove-Item $girdi -ErrorAction SilentlyContinue
+    ConvertTo-Json -Depth 4 -InputObject @($satirlar) | Set-Content (Join-Path $Cikti "hedefbant-$Kesit.json")
+}
+
+function Oran {
+    if (-not $Kesit) { throw 'Oran olcumu icin -Kesit gerekli.' }
+    $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"
+    $b = Probe $girdi
+    $e = Kollar
+    $kollar = [ordered]@{
+        'libx264' = @{ Kodlayici = 'libx264'; Preset = 'slow'; Psy = @(& dotnet $Bench psy-args libx264 | ConvertFrom-Json) }
+        'libx265' = @{ Kodlayici = 'libx265'; Preset = 'slow'; Psy = @(& dotnet $Bench psy-args libx265 | ConvertFrom-Json) }
+        'svtav1-e0' = @{ Kodlayici = 'libsvtav1'; Preset = '6'; Psy = @(& dotnet $e['e0'] psy-args libsvtav1 | ConvertFrom-Json) }
+        'svtav1-e1' = @{ Kodlayici = 'libsvtav1'; Preset = '6'; Psy = @(& dotnet $e['e1'] psy-args libsvtav1 | ConvertFrom-Json) }
+    }
+    $satirlar = @()
+    foreach ($kbit in @($OranKbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
+        foreach ($kol in $kollar.Keys) {
+            $k = $kollar[$kol]
+            $cikis = Join-Path $Cikti "oran-$Kesit-$kol-$kbit.mkv"
+            $pass = [IO.Path]::ChangeExtension($cikis, '.pass')
+            $ortak = @('-i', $girdi, '-an', '-c:v', $k.Kodlayici, '-preset', $k.Preset, '-g', '240', '-pix_fmt', 'yuv420p') + $k.Psy + @('-b:v', "${kbit}k")
+            $sure = [Diagnostics.Stopwatch]::StartNew()
+            Ffmpeg ($ortak + @('-pass', '1', '-passlogfile', $pass, '-f', 'null', 'NUL'))
+            Ffmpeg ($ortak + @('-pass', '2', '-passlogfile', $pass, $cikis))
+            $sure.Stop()
+            $o = Olc $girdi $cikis ([IO.Path]::ChangeExtension($cikis, '.json')) $b.FpsMetin
+            $satirlar += Satir $Kesit $kol $kbit $cikis $o @{ kodlayici = $k.Kodlayici; preset = $k.Preset; psy = ($k.Psy -join ' '); bayt = (Get-Item $cikis).Length; kodlama_sn = [math]::Round($sure.Elapsed.TotalSeconds, 1) }
+            Remove-Item $cikis -ErrorAction SilentlyContinue
+            ConvertTo-Json -Depth 4 -InputObject @($satirlar) | Set-Content (Join-Path $Cikti "oran-$Kesit.json")
+        }
+    }
+    ConvertTo-Json -Depth 4 -InputObject @($satirlar) | Set-Content (Join-Path $Cikti "oran-$Kesit.json")
+}
+
 switch ($Is) {
+    'hedefbant' { HedefBant }
+    'oran' { Oran }
     'av1' { Av1 }
     'kesit' { Kesitler }
     'whatsapp' { WhatsApp }
