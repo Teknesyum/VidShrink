@@ -49,6 +49,9 @@ public static class Program
 
     public static int Main(string[] args)
     {
+        Directory.CreateDirectory(Path.GetDirectoryName(SettingsFile)!);
+        Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", SettingsFile);
+
         var outDir = args.Length > 0
             ? Path.GetFullPath(args[0])
             : Path.Combine(RepoRoot(), "docs", "gorseller");
@@ -412,7 +415,8 @@ public static class Program
     /// </summary>
     private static void AutomaticRecorder(MainWindow window)
     {
-        var pane = Named(window, "RecorderPane");
+        var pane = (Visual)(typeof(MainWindow).GetProperty("RecorderPane", BindingFlags.Instance | BindingFlags.NonPublic)
+            ?? throw new MissingMemberException("MainWindow", "RecorderPane")).GetValue(window)!;
         var field = pane.GetType().GetField(
             "ChkManual",
             BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
