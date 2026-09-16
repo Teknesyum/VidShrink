@@ -51,7 +51,9 @@ public partial class MainWindow : Window
 
     // Şeridin kapatıldığı sürüm. Ayar dosyası değil, yanına konan bir
     // işaret dosyası; UpdateSettings'e ait olduğu için oraya yazılmaz.
-    private const string DismissedNoticeFileName = "dismissed-update.txt";
+    internal const string DismissedNoticeFileName = "dismissed-update.txt";
+    internal const string PlayerHistoryFileName = "player-history.json";
+    internal const string LayoutFileName = "layout.json";
 
     private static readonly ConversionPlan ConversionDefaults = new();
 
@@ -93,7 +95,7 @@ public partial class MainWindow : Window
     // döngü tek turda kapanır. İki bayrak var çünkü iki yön ayrı ayrı bastırılıyor.
     private bool _targetIsDerived;
     private bool _qualityIsDerived;
-    private TaskCompletionSource<bool>? _retryDecision;
+    private TaskCompletionSource<OvershootChoice>? _retryDecision;
     private RetryPrompt? _activeRetryPrompt;
     private bool _hardwareProbed;
     private bool _hardwareEncoderAvailable;
@@ -161,13 +163,13 @@ public partial class MainWindow : Window
 
         Player.HistoryPath = () => Path.Combine(
             Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
-            "player-history.json");
+            PlayerHistoryFileName);
 
-        RefreshOutputAndFfmpegChoiceLists();
-        BuildLanguageSwitch();
+       BuildLanguageSwitch();
         BuildThemeList();
         Strings.Changed += OnLanguageChanged;
         ShowSourceName();
+        RefreshPlatforms();
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
 
@@ -206,6 +208,10 @@ public partial class MainWindow : Window
         foreach (var check in new ToggleButton[] { ChkResolution, ChkFps, ChkFastGpu })
             Watch(check, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(ChkFastGpu, ToggleButton.IsCheckedProperty, OnFastGpuChanged);
+        foreach (var toggle in new ToggleButton[] { ChkResolution, ChkWhatsAppCompatible })
+            Watch(toggle, ToggleButton.IsCheckedProperty, RefreshFrameAndCodecLocks);
+        for (var i = 0; i < FixedResolutionCandidates.Count; i++)
+            FixedResolutionRadios()[i].Content = FixedResolutionCandidates[i].ToString(CultureInfo.InvariantCulture) + "p";
 
         Watch(PlanPanelRow, RowDefinition.HeightProperty, OnSplitterMoved);
 
@@ -229,13 +235,15 @@ public partial class MainWindow : Window
             Watch(field, TextBox.TextProperty, OnConvertChanged);
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
+        foreach (var radio in new[] { RbTrimEnd, RbTrimStart, RbTrimBoth })
+            Watch(radio, ToggleButton.IsCheckedProperty, RefreshTrimRange);
         Watch(TxtDefaultTargetMb, TextBox.TextProperty, OnDefaultTargetMbChanged);
         Watch(CmbLanguage, SelectingItemsControl.SelectedIndexProperty, OnLanguageChosen);
         Watch(CmbTheme, SelectingItemsControl.SelectedIndexProperty, OnThemeChosen);
-        Watch(CmbOutputFolderMode, SelectingItemsControl.SelectedIndexProperty, OnOutputFolderModeChanged);
+        Watch(RbOutputFixed, ToggleButton.IsCheckedProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
-        Watch(CmbFfmpegPathMode, SelectingItemsControl.SelectedIndexProperty, OnFfmpegPathModeChanged);
+        Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
         Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
@@ -912,11 +920,11 @@ public partial class MainWindow : Window
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
         RefreshSettingsTexts();
-        RefreshOutputAndFfmpegChoiceLists();
-        RelabelShellMenu();
+       RelabelShellMenu();
         RefreshShareTarget();
         RefreshAdvancedTexts();
         UpdateToolStatus();
+        RefreshPlatforms();
         if (!_performanceRunning) ShowPerformanceResult(_performanceShown);
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
         else RefreshQualityPanels();
@@ -932,26 +940,26 @@ public partial class MainWindow : Window
         BtnCancelResetSettings.Content = Strings.Get("settings.reset-cancel");
     }
 
-    private void RefreshOutputAndFfmpegChoiceLists()
+    /// <summary>Çıktı klasörü kipi: 0 kaynağın yanı, 1 sabit klasör. Kayıtlı ayarla aynı sayı.</summary>
+    internal int OutputFolderModeIndex
     {
-        var wasSyncing = _syncing;
-        _syncing = true;
-        var outputIndex = CmbOutputFolderMode.SelectedIndex;
-        CmbOutputFolderMode.ItemsSource = new[]
+        get => RbOutputFixed.IsChecked == true ? 1 : 0;
+        set
         {
-            Say("settings-tab.output-folder.beside-source"),
-            Say("settings-tab.output-folder.fixed")
-        };
-        CmbOutputFolderMode.SelectedIndex = outputIndex >= 0 ? outputIndex : 0;
+            RbOutputBesideSource.IsChecked = value != 1;
+            RbOutputFixed.IsChecked = value == 1;
+        }
+    }
 
-        var ffmpegIndex = CmbFfmpegPathMode.SelectedIndex;
-        CmbFfmpegPathMode.ItemsSource = new[]
+    /// <summary>ffmpeg yolu kipi: 0 otomatik, 1 elle. Kayıtlı ayarla aynı sayı.</summary>
+    internal int FfmpegPathModeIndex
+    {
+        get => RbFfmpegManual.IsChecked == true ? 1 : 0;
+        set
         {
-            Say("settings-tab.ffmpeg-path.auto"),
-            Say("settings-tab.ffmpeg-path.manual")
-        };
-        CmbFfmpegPathMode.SelectedIndex = ffmpegIndex >= 0 ? ffmpegIndex : 0;
-        _syncing = wasSyncing;
+            RbFfmpegAuto.IsChecked = value != 1;
+            RbFfmpegManual.IsChecked = value == 1;
+        }
     }
 
     internal static string ResolveLanguage(string? saved, string? operatingSystem)
@@ -1081,6 +1089,8 @@ public partial class MainWindow : Window
             _chipSizeCapped = settings.ChipSizeCapped;
             SetCodecIndex(settings.Codec);
             ChkResolution.IsChecked = settings.MayLowerResolution;
+            FixedResolutionIndex = settings.FixedResolution;
+            ChkWhatsAppCompatible.IsChecked = settings.WhatsAppCompatible;
             ChkFps.IsChecked = settings.MayLowerFps;
             ChkFastGpu.IsChecked = settings.FastGpu ?? false;
             SetFillIndex(settings.FillPolicy);
@@ -1108,6 +1118,7 @@ public partial class MainWindow : Window
             _updateUiSyncing = _syncing = _settingsSyncing = false;
         }
 
+        RefreshFrameAndCodecLocks();
         RefreshChipDerivation();
         RefreshSectionSummaries();
     }
@@ -1123,6 +1134,8 @@ public partial class MainWindow : Window
         ChipSizeCapped = _chipSizeCapped,
         Codec = CodecIndex,
         MayLowerResolution = ChkResolution.IsChecked == true,
+        FixedResolution = FixedResolutionIndex,
+        WhatsAppCompatible = ChkWhatsAppCompatible.IsChecked == true,
         MayLowerFps = ChkFps.IsChecked == true,
         FillPolicy = FillPolicyIndex,
         HdrPolicy = HdrPolicyIndex,
@@ -1176,7 +1189,9 @@ public partial class MainWindow : Window
     {
         try
         {
-            UpdateSettings.Delete(SettingsPathOverride);
+            var settingsFile = SettingsPathOverride ?? UpdateSettings.DefaultPath;
+            AppDataReset.Run(Path.GetDirectoryName(settingsFile), settingsFile);
+            if (File.Exists(DismissedNoticePath)) File.Delete(DismissedNoticePath);
             var defaults = new UpdateSettings();
             _settingsSyncing = true;
             UseLanguage(ResolveLanguage(null, CultureInfo.CurrentUICulture.Name));
@@ -1191,6 +1206,8 @@ public partial class MainWindow : Window
     }
 
     internal void RestoreSettingsForTest(UpdateSettings settings) => RestoreSettings(settings);
+
+    internal UpdateSettings CaptureSettingsForTest() => CaptureSettings();
     internal void ConfirmResetSettingsForTest() => OnConfirmResetSettings(null, new RoutedEventArgs());
     internal void RestoreAppSettingsForTest(AppSettings settings) => RestoreAppSettings(settings);
     internal AppSettings CaptureAppSettingsForTest() => CaptureAppSettings();
@@ -1243,10 +1260,10 @@ public partial class MainWindow : Window
             AdvMinFps = boxes[5].SelectedIndex,
             AdvEncoderPath = AdvEncoderPathIndex,
             AdvCodecLock = boxes[6].SelectedIndex,
-            OutputFolderMode = CmbOutputFolderMode.SelectedIndex,
+            OutputFolderMode = OutputFolderModeIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
-            FfmpegPathMode = CmbFfmpegPathMode.SelectedIndex,
+            FfmpegPathMode = FfmpegPathModeIndex,
             FfmpegPath = TxtFfmpegPath.Text ?? "",
             Theme = _theme
         };
@@ -1270,7 +1287,7 @@ public partial class MainWindow : Window
             for (var i = 0; i < boxes.Length; i++)
                 if (indices[i] >= 0 && indices[i] < boxes[i].ItemCount) boxes[i].SelectedIndex = indices[i];
 
-            CmbOutputFolderMode.SelectedIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
+            OutputFolderModeIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
             TxtOutputFolder.Text = settings.OutputFolder;
             OutputFolderPickerRow.IsVisible = settings.OutputFolderMode == 1;
 
@@ -1280,7 +1297,7 @@ public partial class MainWindow : Window
             ChkAdvancedDefaultOpen.IsChecked = settings.AdvancedDefaultOpen;
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
 
-            CmbFfmpegPathMode.SelectedIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
+            FfmpegPathModeIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
             TxtFfmpegPath.Text = settings.FfmpegPath;
             FfmpegPathPickerRow.IsVisible = settings.FfmpegPathMode == 1;
             ValidateFfmpegPath();
@@ -1303,13 +1320,13 @@ public partial class MainWindow : Window
 
     private void OnOutputFolderModeChanged()
     {
-        OutputFolderPickerRow.IsVisible = CmbOutputFolderMode.SelectedIndex == 1;
+        OutputFolderPickerRow.IsVisible = OutputFolderModeIndex == 1;
         SaveAppSettings();
     }
 
     private void OnFfmpegPathModeChanged()
     {
-        FfmpegPathPickerRow.IsVisible = CmbFfmpegPathMode.SelectedIndex == 1;
+        FfmpegPathPickerRow.IsVisible = FfmpegPathModeIndex == 1;
         ValidateFfmpegPath();
         SaveAppSettings();
     }
@@ -1322,7 +1339,7 @@ public partial class MainWindow : Window
 
     private void ValidateFfmpegPath()
     {
-        if (CmbFfmpegPathMode.SelectedIndex != 1)
+        if (FfmpegPathModeIndex != 1)
         {
             TxtFfmpegPathError.IsVisible = false;
             return;
@@ -1379,8 +1396,30 @@ public partial class MainWindow : Window
         finally { _updateUiSyncing = false; }
 
         RefreshUpdateTexts();
+        RefreshPlatforms();
         ReportAppliedUpdate();
     }
+
+    /// <summary>Hakkında'nın platform satırları: yayının kurduğu her hedef, bu kurulumun hedefi işaretli.</summary>
+    internal void RefreshPlatforms()
+    {
+        var current = UpdateCheck.Rid;
+        TxtPlatforms.Text = string.Join("\n", UpdateCheck.ReleasedRids.Select(rid =>
+            string.Equals(rid, current, StringComparison.OrdinalIgnoreCase)
+                ? $"{PlatformName(rid)}  ← {Say("main.about.platforms.current")}"
+                : PlatformName(rid)));
+    }
+
+    internal static string PlatformName(string rid) => rid switch
+    {
+        "win-x64" => "Windows x64",
+        "win-arm64" => "Windows ARM64",
+        "osx-arm64" => "macOS Apple Silicon (arm64)",
+        "osx-x64" => "macOS Intel (x64)",
+        "linux-x64" => "Linux x64",
+        "linux-arm64" => "Linux ARM64",
+        _ => rid
+    };
 
     /// <summary>
     /// Kendini güncelleyen uygulama yeniden başlar, bu yüzden "geçildi" bilgisi bellekte
@@ -1484,8 +1523,49 @@ public partial class MainWindow : Window
 
     internal IReadOnlyList<ToggleButton> ShrinkChoiceToggles() => new ToggleButton[]
     {
-        RbCodecAuto, RbCodecCompatible, RbCodecSmallest, RbHdrPreserve, RbHdrSdr, RbFillTarget, RbFillCeiling
+        RbCodecAuto, RbCodecCompatible, RbCodecSmallest, RbHdrPreserve, RbHdrSdr, RbFillTarget, RbFillCeiling,
+        ChkWhatsAppCompatible, RbFixedSource, RbFixed1080, RbFixed720, RbFixed480
     };
+
+    /// <summary>Sabit çözünürlük seçenekleri, kısa kenar. Sıra radyoların sırasıyla aynı; 0 kaynak boyu.</summary>
+    internal static readonly IReadOnlyList<int> FixedResolutionCandidates = new[] { 1080, 720, 480 };
+
+    private RadioButton[] FixedResolutionRadios() => new[] { RbFixed1080, RbFixed720, RbFixed480 };
+
+    /// <summary>0 kaynak boyu, 1.. <see cref="FixedResolutionCandidates"/> sırası.</summary>
+    internal int FixedResolutionIndex
+    {
+        get
+        {
+            var radios = FixedResolutionRadios();
+            for (var i = 0; i < radios.Length; i++)
+                if (radios[i].IsChecked == true) return i + 1;
+            return 0;
+        }
+        set
+        {
+            var radios = FixedResolutionRadios();
+            var index = value >= 1 && value <= radios.Length ? value : 0;
+            for (var i = 0; i < radios.Length; i++) radios[i].IsChecked = index == i + 1;
+            RbFixedSource.IsChecked = index == 0;
+        }
+    }
+
+    /// <summary>
+    /// Plana giden sabit boy. Dinamik çözünürlük kutusu işaretliyken ya da "Kaynak" seçiliyken
+    /// yoktur; motor kendi karar verir ya da kaynak boyunu korur.
+    /// </summary>
+    internal int? FixedResolutionShortSide
+        => ChkResolution.IsChecked == true || FixedResolutionIndex == 0 ? null : FixedResolutionCandidates[FixedResolutionIndex - 1];
+
+    private void RefreshFrameAndCodecLocks()
+    {
+        FixedResolutionRow.IsVisible = ChkResolution.IsChecked != true;
+        CodecChoiceRow.IsEnabled = ChkWhatsAppCompatible.IsChecked != true;
+    }
+
+    /// <summary>WhatsApp uyumu işaretliyse kodek seçimi ne olursa olsun uyumlu kol (H.264).</summary>
+    internal int EffectiveCodecIndex => ChkWhatsAppCompatible.IsChecked == true ? 1 : CodecIndex;
 
     internal int SelectedIntentIndex => (int)_intent;
 
@@ -1561,7 +1641,7 @@ public partial class MainWindow : Window
         RefreshSectionSummaries();
     }
 
-    private string CodecLabel() => CodecIndex switch
+    private string CodecLabel() => ChkWhatsAppCompatible.IsChecked == true ? Say("main.whatsapp-compatible") : CodecIndex switch
     {
         1 => Say("main.codec.compatible"),
         2 => Say("main.codec.smallest"),
@@ -1593,7 +1673,7 @@ public partial class MainWindow : Window
 
         var frame = new List<string>
         {
-            ChkResolution.IsChecked == true ? Say("main.allow.resolution") : Say("main.section.frame.resolution-locked"),
+            ChkResolution.IsChecked == true ? Say("main.allow.resolution") : FixedResolutionIndex > 0 ? FixedResolutionRadios()[FixedResolutionIndex - 1].Content as string ?? "" : Say("main.section.frame.resolution-locked"),
             ChkFps.IsChecked == true ? Say("main.allow.fps") : Say("main.section.frame.fps-locked")
         };
         TxtFrameSummary.Text = FrameBody.IsVisible ? "" : string.Join(" · ", frame);
@@ -1929,7 +2009,7 @@ public partial class MainWindow : Window
 
         // Açıkken güncellemeyi başlatıcı sessizce yapıyor, söylenecek bir şey yok.
         // Kapatıldığı anda haber verme görevi uygulamaya geçer.
-        if (UpdateCheck.AutoUpdateEnabled(settings)) UpdateNotice.IsVisible = false;
+        if (UpdateCheck.AutoUpdateEnabled(settings)) { if (!UpdateNoticeLocked) UpdateNotice.IsVisible = false; }
         else _ = CheckForUpdateAsync();
     }
 
@@ -1942,7 +2022,7 @@ public partial class MainWindow : Window
     /// saatli biçimi <see cref="UpdateBadge.Compose"/>'da, renk eşlemesi burada; ikisi de
     /// özel rafın güncelleme paneli ölçütünden. Rozet denetim başlayana kadar görünmez.
     /// </summary>
-    private void SetUpdateBadge(UpdateBadgeState state)
+    internal void SetUpdateBadge(UpdateBadgeState state)
     {
         _updateBadgeState = state;
         var govde = Say(state switch
@@ -2120,6 +2200,7 @@ public partial class MainWindow : Window
 
     private void OnDismissUpdateNotice(object? sender, RoutedEventArgs e)
     {
+        if (UpdateNoticeLocked) return;
         UpdateNotice.IsVisible = false;
         if (_noticeVersion is not null) WriteDismissedVersion(_noticeVersion);
     }
@@ -2515,7 +2596,7 @@ public partial class MainWindow : Window
 
     private string SplitterSettingsPath => Path.Combine(
         Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
-        "layout.json");
+        LayoutFileName);
 
     private void SaveSplitterSettings()
     {
@@ -2636,7 +2717,8 @@ public partial class MainWindow : Window
         {
             TargetMb = PlanTargetMb(),
             Intent = _intent,
-            Codec = CodecFromIndex(CodecIndex),
+            Codec = CodecFromIndex(EffectiveCodecIndex),
+            FixedResolution = FixedResolutionShortSide,
             AllowResolutionDrop = ChkResolution.IsChecked == true,
             AllowFpsDrop = ChkFps.IsChecked == true,
             HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
@@ -2644,6 +2726,7 @@ public partial class MainWindow : Window
             SpeedMode = ChkFastGpu.IsChecked == true ? SpeedMode.Fast : SpeedMode.Quality
         };
         ApplyAdvancedOptions(options);
+        if (ChkWhatsAppCompatible.IsChecked == true) options.LockedCodec = null;
         return options;
     }
 
@@ -3965,6 +4048,10 @@ public partial class MainWindow : Window
                 var saved = 100 - result.OutputMb / _info.FileSizeMb * 100;
                 TxtResult.Text = Say("main.run.done",
                     result.Attempts, Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"), Num(saved, "0.#"));
+                if (result.OverTarget)
+                    TxtResult.Text += " " + Say("main.run.accepted-larger", Num(result.OutputMb - targetMb, "0.00"), Num(targetMb, "0.##"));
+                if (result.Trim is { } trim)
+                    TxtResult.Text += " " + Say("main.run.trimmed", Num(trim.RemovedSeconds, "0.#"), Clock(trim.DurationSeconds), Clock(trim.KeptSeconds));
             }
             else if (result.CeilingExceeded)
             {
@@ -4002,9 +4089,9 @@ public partial class MainWindow : Window
 
     // The engine stops after an attempt that lands over the target and hands the decision here.
     // Nothing blocks: the panel is shown, the awaited task completes when a button is pressed.
-    private async Task<bool> AskBeforeRetryAsync(RetryPrompt prompt, CancellationToken ct)
+    private async Task<OvershootChoice> AskBeforeRetryAsync(RetryPrompt prompt, CancellationToken ct)
     {
-        var decision = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var decision = new TaskCompletionSource<OvershootChoice>(TaskCreationOptions.RunContinuationsAsynchronously);
         _retryDecision = decision;
 
         await Dispatcher.UIThread.InvokeAsync(() => ShowRetryAsk(prompt));
@@ -4038,6 +4125,22 @@ public partial class MainWindow : Window
         TxtRetryMeaning.Text = prompt.HasUnderBandFallback
             ? Say("main.retry.meaning-with-fallback", Num(prompt.FallbackMb, "0.0"))
             : Say("main.retry.meaning-without-fallback");
+        BtnRetryAgain.IsVisible = prompt.CanRetry;
+        BtnRetryAccept.Content = Say("main.retry.accept", Num(prompt.ActualMb, "0.0"));
+        var canTrim = prompt.Trims is { Count: > 0 };
+        BtnRetryTrim.IsVisible = canTrim;
+        if (canTrim)
+            BtnRetryTrim.Content = Say("main.retry.trim", Num(prompt.Trims!.Min(plan => plan.RemovedSeconds), "0.#"));
+        RbTrimEnd.IsEnabled = prompt.TrimFor(TrimSide.End) is not null;
+        RbTrimStart.IsEnabled = prompt.TrimFor(TrimSide.Start) is not null;
+        RbTrimBoth.IsEnabled = prompt.TrimFor(TrimSide.Both) is not null;
+        if (!RetryTrimPanel.IsVisible)
+        {
+            var first = new[] { RbTrimEnd, RbTrimStart, RbTrimBoth }.FirstOrDefault(radio => radio.IsEnabled);
+            if (first is not null) first.IsChecked = true;
+        }
+        RetryTrimPanel.IsVisible = canTrim && RetryTrimPanel.IsVisible;
+        RefreshTrimRange();
         RetryAskPanel.IsVisible = true;
         SetStage(TxtStage, Say("main.output.waiting"));
     }
@@ -4046,11 +4149,69 @@ public partial class MainWindow : Window
     {
         _activeRetryPrompt = null;
         RetryAskPanel.IsVisible = false;
+        RetryTrimPanel.IsVisible = false;
     }
 
-    private void OnRetryAgain(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(true);
+    private TrimSide SelectedTrimSide =>
+        RbTrimStart.IsChecked == true ? TrimSide.Start
+        : RbTrimBoth.IsChecked == true ? TrimSide.Both
+        : TrimSide.End;
 
-    private void OnRetryStop(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(false);
+    private void RefreshTrimRange()
+    {
+        if (_activeRetryPrompt?.TrimFor(SelectedTrimSide) is not { } plan)
+        {
+            TxtTrimRange.Text = "";
+            BtnTrimConfirm.IsEnabled = false;
+            return;
+        }
+
+        var removed = new List<string>();
+        if (plan.RemovedFromStart > 0) removed.Add($"{Clock(0)}–{Clock(plan.StartSeconds)}");
+        if (plan.RemovedFromEnd > 0) removed.Add($"{Clock(plan.EndSeconds)}–{Clock(plan.DurationSeconds)}");
+        TxtTrimRange.Text = Say("main.retry.trim.range",
+            Num(plan.RemovedSeconds, "0.#"),
+            Clock(plan.DurationSeconds),
+            Clock(plan.KeptSeconds),
+            string.Join(" · ", removed),
+            Num(plan.KeptBytes / 1024.0 / 1024.0, "0.00"));
+        BtnTrimConfirm.IsEnabled = true;
+    }
+
+    private static string Clock(double seconds)
+    {
+        var span = TimeSpan.FromSeconds(Math.Max(0, seconds));
+        return span.TotalHours >= 1
+            ? span.ToString(@"h\:mm\:ss\.f", CultureInfo.InvariantCulture)
+            : span.ToString(@"m\:ss\.f", CultureInfo.InvariantCulture);
+    }
+
+    internal Task<OvershootChoice> ShowRetryAskForTest(RetryPrompt prompt)
+    {
+        var decision = new TaskCompletionSource<OvershootChoice>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _retryDecision = decision;
+        ShowRetryAsk(prompt);
+        return decision.Task;
+    }
+
+    private void OnRetryAgain(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(OvershootChoice.Retry);
+
+    private void OnRetryStop(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(OvershootChoice.Leave);
+
+    private void OnRetryAccept(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(OvershootChoice.AcceptLarger);
+
+    private void OnRetryTrim(object? sender, RoutedEventArgs e)
+    {
+        RetryTrimPanel.IsVisible = !RetryTrimPanel.IsVisible;
+        RefreshTrimRange();
+    }
+
+    private void OnTrimConfirm(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(SelectedTrimSide switch
+    {
+        TrimSide.Start => OvershootChoice.TrimStart,
+        TrimSide.Both => OvershootChoice.TrimBoth,
+        _ => OvershootChoice.TrimEnd
+    });
 
     private ConversionPlan ReadConversionPlan()
     {

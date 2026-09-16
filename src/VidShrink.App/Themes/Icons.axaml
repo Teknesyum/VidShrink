@@ -10,7 +10,7 @@
   <StreamGeometry x:Key="IconRecorder">M 0,0 M 24,24 M 4,6 H 14 A 2,2 0 0,1 16,8 V 16 A 2,2 0 0,1 14,18 H 4 A 2,2 0 0,1 2,16 V 8 A 2,2 0 0,1 4,6 Z M 16,10 L 22,6 V 18 L 16,14</StreamGeometry>
   <StreamGeometry x:Key="IconAdvanced">M 0,0 M 24,24 M 21,4 H 14 M 10,4 H 3 M 21,12 H 12 M 8,12 H 3 M 21,20 H 16 M 12,20 H 3 M 14,2 V 6 M 8,10 V 14 M 16,18 V 22</StreamGeometry>
   <StreamGeometry x:Key="IconAbout">M 0,0 M 24,24 M 12,2 A 10,10 0 1,0 12,22 A 10,10 0 1,0 12,2 Z M 12,16 V 11 M 12,7.6 L 12.01,7.6</StreamGeometry>
-  <StreamGeometry x:Key="IconSettings">M 0,0 M 24,24 M 12,5.5 A 6.5,6.5 0 1,0 12,18.5 A 6.5,6.5 0 1,0 12,5.5 Z M 12,9.5 A 2.5,2.5 0 1,0 12,14.5 A 2.5,2.5 0 1,0 12,9.5 Z M 12,3 V 5.5 M 12,18.5 V 21 M 3,12 H 5.5 M 18.5,12 H 21 M 5.64,5.64 L 7.4,7.4 M 16.6,16.6 L 18.36,18.36 M 18.36,5.64 L 16.6,7.4 M 7.4,16.6 L 5.64,18.36</StreamGeometry>
+  <StreamGeometry x:Key="IconSettings">M 0,0 M 24,24 M 18.79,10.31 L 21.38,10.51 L 21.38,13.49 L 18.79,13.69 A 7,7 0 0,1 18.00,15.61 L 19.69,17.58 L 17.58,19.69 L 15.61,18.00 A 7,7 0 0,1 13.69,18.79 L 13.49,21.38 L 10.51,21.38 L 10.31,18.79 A 7,7 0 0,1 8.39,18.00 L 6.42,19.69 L 4.31,17.58 L 6.00,15.61 A 7,7 0 0,1 5.21,13.69 L 2.62,13.49 L 2.62,10.51 L 5.21,10.31 A 7,7 0 0,1 6.00,8.39 L 4.31,6.42 L 6.42,4.31 L 8.39,6.00 A 7,7 0 0,1 10.31,5.21 L 10.51,2.62 L 13.49,2.62 L 13.69,5.21 A 7,7 0 0,1 15.61,6.00 L 17.58,4.31 L 19.69,6.42 L 18.00,8.39 A 7,7 0 0,1 18.79,10.31 Z M 12,9 A 3,3 0 1,0 12,15 A 3,3 0 1,0 12,9 Z</StreamGeometry>
 
   <StreamGeometry x:Key="IconPlay">M 0,0 M 24,24 M 7,7 A 2,2 0 0,1 10,5.27 L 18,10.27 A 2,2 0 0,1 18,13.73 L 10,18.73 A 2,2 0 0,1 7,17 Z</StreamGeometry>
   <StreamGeometry x:Key="IconPause">M 0,0 M 24,24 M 9,5 V 19 M 15,5 V 19</StreamGeometry>

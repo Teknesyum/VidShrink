@@ -34,7 +34,7 @@
 
   "settings.update.title": "Atjauninājumi",
   "settings.update.auto": "Atjaunināt automātiski",
-  "settings.update.auto-effect": "Kad tas ir izslēgts, VidShrink pats neatjauninās: tas tikai paziņo, ka ir jauna versija, un parāda komandu, kas to instalē.",
+  "settings.update.auto-effect": "Pēc noklusējuma izslēgts: jauna versija tiek paziņota augšējā joslā un lejupielādēta un instalēta ar pogu. Ja ieslēgts, VidShrink atjaunina sevi klusi.",
   "settings.update.no-self-effect": "VidShrink šajā sistēmā pats neatjauninās: tas tikai paziņo, ka ir jauna versija, un parāda komandu, kas to instalē.",
 
   "settings.default-app.suggestion": "VidShrink nav noklusējuma programma video failiem. To var izvēlēties Windows lapā Noklusējuma lietotnes.",

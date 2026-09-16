@@ -141,7 +141,11 @@ public partial class MainWindow
             UpdateBadgeState.Ready => "main.update.ready",
             _ => "main.update.available"
         });
+        BtnNoticeDismiss.IsVisible = !UpdateNoticeLocked;
     }
+
+    /// <summary>İndirme ya da kurulum sürerken panel kapanmaz; × gizlenir, kapatma yolları bekler.</summary>
+    internal bool UpdateNoticeLocked => _updateBadgeState is UpdateBadgeState.Downloading or UpdateBadgeState.Installing;
 
     private void OnUpdateDownloadFinished(Task<bool?> task)
     {

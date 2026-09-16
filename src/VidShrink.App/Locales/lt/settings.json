@@ -34,7 +34,7 @@
 
   "settings.update.title": "Atnaujinimai",
   "settings.update.auto": "Atnaujinti automatiškai",
-  "settings.update.auto-effect": "Kai tai išjungta, VidShrink savęs neatnaujina: tik praneša, kad yra nauja versija, ir parodo ją įdiegiančią komandą.",
+  "settings.update.auto-effect": "Pagal numatytuosius nustatymus išjungta: nauja versija pranešama viršutinėje juostoje ir atsisiunčiama bei įdiegiama mygtuku. Kai įjungta, VidShrink atsinaujina pati tyliai.",
   "settings.update.no-self-effect": "Šioje sistemoje VidShrink savęs neatnaujina: tik praneša, kad yra nauja versija, ir parodo ją įdiegiančią komandą.",
 
   "settings.default-app.suggestion": "VidShrink nėra numatytoji vaizdo įrašų programa. Ją galite pasirinkti Windows numatytųjų programų puslapyje.",

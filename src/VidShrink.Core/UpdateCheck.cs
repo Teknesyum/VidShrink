@@ -158,6 +158,9 @@ public static class UpdateCheck
     /// tanımsız bir <c>_ =&gt; "x64"</c> dalıydı ve kurucu aynı durumu reddediyordu; artık ikisi
     /// de aynı kuralı okuyor, çünkü ayrıştıklarında biri kuruluyor öteki hiç güncelleme bulamıyor.
     /// </summary>
+    /// <summary>Yayın iş akışının paketlediği hedefler; <c>.github/workflows/release.yml</c> matrisiyle aynı.</summary>
+    public static readonly IReadOnlyList<string> ReleasedRids = new[] { "win-x64", "osx-arm64", "osx-x64", "linux-x64" };
+
     public static string Rid
     {
         get
@@ -407,10 +410,10 @@ public static class UpdateCheck
 public sealed class UpdateSettings
 {
     public const string FolderName = "VidShrink";
-    public const string FileName = "settings.json";
+    public static readonly string FileName = "settings.json";
 
-    /// <summary>Windows'ta varsayılan açık. Kapalıyken uygulama yalnız haber verir.</summary>
-    public bool AutoUpdate { get; set; } = true;
+    /// <summary>Varsayılan kapalı: güncelleme rozetteki düğmeyle indirilip kurulur. Açılırsa Windows'ta kendiliğinden kurulur. Dosyada yazılı değer korunur.</summary>
+    public bool AutoUpdate { get; set; }
 
     /// <summary>
     /// Hızlı düşür (GPU) kutusunun durumu. Alan yoksa karar henüz verilmemiştir; ilk
@@ -425,6 +428,10 @@ public sealed class UpdateSettings
     public bool ChipSizeCapped { get; set; } = true;
     public int Codec { get; set; }
     public bool MayLowerResolution { get; set; } = true;
+    /// <summary>Dinamik çözünürlük kapalıyken seçilen sabit boy: 0 kaynak, 1 1080p, 2 720p, 3 480p.</summary>
+    public int FixedResolution { get; set; }
+    /// <summary>WhatsApp uyumu: işaretliyse kodek H.264'e kilitlenir.</summary>
+    public bool WhatsAppCompatible { get; set; }
     public bool MayLowerFps { get; set; } = true;
     public int FillPolicy { get; set; }
     public int HdrPolicy { get; set; }
@@ -489,6 +496,8 @@ public sealed class UpdateSettings
             ReadBool(document.RootElement, "chipSizeCapped", value => settings.ChipSizeCapped = value);
             ReadInt(document.RootElement, "codec", value => settings.Codec = value);
             ReadBool(document.RootElement, "mayLowerResolution", value => settings.MayLowerResolution = value);
+            ReadInt(document.RootElement, "fixedResolution", value => settings.FixedResolution = value);
+            ReadBool(document.RootElement, "whatsAppCompatible", value => settings.WhatsAppCompatible = value);
             ReadBool(document.RootElement, "mayLowerFps", value => settings.MayLowerFps = value);
             ReadInt(document.RootElement, "fillPolicy", value => settings.FillPolicy = value);
             ReadInt(document.RootElement, "hdrPolicy", value => settings.HdrPolicy = value);
@@ -552,6 +561,8 @@ public sealed class UpdateSettings
         writer.WriteBoolean("chipSizeCapped", ChipSizeCapped);
         writer.WriteNumber("codec", Codec);
         writer.WriteBoolean("mayLowerResolution", MayLowerResolution);
+        writer.WriteNumber("fixedResolution", FixedResolution);
+        writer.WriteBoolean("whatsAppCompatible", WhatsAppCompatible);
         writer.WriteBoolean("mayLowerFps", MayLowerFps);
         writer.WriteNumber("fillPolicy", FillPolicy);
         writer.WriteNumber("hdrPolicy", HdrPolicy);

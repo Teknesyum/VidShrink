@@ -66,6 +66,13 @@ public sealed class PlanOptions
     public int? MinResolutionHeight { get; set; } = null;
 
     /// <summary>
+    /// Kullanıcı 09-04: dinamik çözünürlük kutusu kaldırılınca "1080p istiyorum" diyebilir.
+    /// Değer kısa kenardır (dikey videoda genişlik); plan bu boyda çıkar, rejimin tabanı
+    /// ona dokunmaz. Kaynaktan büyükse kaynak boyu kalır, yukarı ölçekleme yoktur.
+    /// </summary>
+    public int? FixedResolution { get; set; } = null;
+
+    /// <summary>
     /// Kullanicinin "en az bu kare hizi" olarak verdigi taban. <see cref="MinResolutionHeight"/>
     /// ile ayni kural: rejimin tabanini yalniz yukseltebilir.
     /// </summary>
@@ -427,6 +434,7 @@ public static class PlanCalculator
             AllowFpsDrop = options.AllowFpsDrop && CompressionStrategy.AllowsFpsDrop(regime),
             SpeedMode = options.SpeedMode,
             MinResolutionHeight = options.MinResolutionHeight,
+            FixedResolution = options.FixedResolution,
             MinFps = options.MinFps
         };
 
@@ -992,6 +1000,7 @@ public static class PlanCalculator
         LockedAudioKbps = options.LockedAudioKbps,
         AudioChannels = options.AudioChannels,
         MinResolutionHeight = options.MinResolutionHeight,
+        FixedResolution = options.FixedResolution,
         MinFps = options.MinFps,
         EncoderPath = options.EncoderPath
     };
@@ -1086,12 +1095,12 @@ public static class PlanCalculator
         var floors = EffectiveFloors(options, regime);
 
         foreach (var fps in FpsCandidates(info, options, regime))
-        foreach (var scale in ScaleCandidates(options, regime))
+        foreach (var scale in LayoutScales(info, options, regime))
         {
             if (scale < fallback.Scale - 1e-6) continue;
 
             var (width, height) = Dimensions(info, scale);
-            if (height < floors.MinHeight && height < info.Height) continue;
+            if (options.FixedResolution is null && height < floors.MinHeight && height < info.Height) continue;
             if (width < 2 || height < 2) continue;
 
             var effectiveScale = (double)height / Math.Max(1, info.Height);
@@ -1160,10 +1169,10 @@ public static class PlanCalculator
         var floors = EffectiveFloors(options, regime);
 
         foreach (var fps in FpsCandidates(info, options, regime))
-        foreach (var scale in ScaleCandidates(options, regime))
+        foreach (var scale in LayoutScales(info, options, regime))
         {
             var (width, height) = Dimensions(info, scale);
-            if (height < floors.MinHeight && height < info.Height) continue;
+            if (options.FixedResolution is null && height < floors.MinHeight && height < info.Height) continue;
             if (width < 2 || height < 2) continue;
 
             var effectiveScale = (double)height / Math.Max(1, info.Height);
@@ -1188,6 +1197,20 @@ public static class PlanCalculator
 
         var (fallbackWidth, fallbackHeight) = Dimensions(info, 1.0);
         return (new Layout(fallbackWidth, fallbackHeight, info.Fps, 1.0, 0), true);
+    }
+
+    /// <summary>
+    /// Aranacak ölçekler. Kullanıcı sabit çözünürlük verdiyse tek aday vardır: kısa kenarı o boya
+    /// indiren ölçek, kaynaktan büyükse 1. Yoksa rejimin ölçek merdiveni.
+    /// </summary>
+    private static IEnumerable<double> LayoutScales(MediaInfo info, PlanOptions options, CompressionRegime regime)
+    {
+        if (options.FixedResolution is int fixedShortSide && fixedShortSide > 0)
+        {
+            var shortSide = Math.Min(info.Width, info.Height);
+            return new[] { shortSide <= 0 ? 1.0 : Math.Min(1.0, (double)fixedShortSide / shortSide) };
+        }
+        return ScaleCandidates(options, regime);
     }
 
     public static IEnumerable<double> ScaleCandidates(PlanOptions options, CompressionRegime regime)

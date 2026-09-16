@@ -155,7 +155,7 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         Assert.True(clip.IsApproximate);
         var badge = host.ApproximateBadge;
         Assert.NotNull(badge);
-        Assert.Contains($"CRF {clip.Crf}", badge);
+        Assert.Equal($"CRF {clip.Crf}", badge);
         Assert.DoesNotContain(",", badge);
         Assert.DoesNotContain(".", badge);
         AppHost.Run(host.Dispose);
@@ -213,10 +213,9 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         var ingilizce = Rozet(panel)!;
         Record50($"T50 K1 rozet: parca=[{ingilizce}]");
 
-        // Dil degisince metin de degisir: birlesik dizgeyi panel kendi ceviremez.
         AppHost.Run(() => host.SetLanguage("tr"));
         Record50($"T50 K1 rozet: dil degisince=[{Rozet(panel)}]");
-        Assert.NotEqual(ingilizce, Rozet(panel));
+        Assert.Equal(ingilizce, Rozet(panel));
         Assert.Equal(host.ApproximateBadge, Rozet(panel));
 
         // Tam cikti: rozet kalkar.

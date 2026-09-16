@@ -34,7 +34,7 @@
 
   "settings.update.title": "Pembaruan",
   "settings.update.auto": "Perbarui otomatis",
-  "settings.update.auto-effect": "Saat ini mati, VidShrink tidak memperbarui diri: hanya memberi tahu ada versi baru dan menampilkan perintah untuk memasangnya.",
+  "settings.update.auto-effect": "Nonaktif secara default: versi baru diumumkan di bilah atas serta diunduh dan dipasang dengan satu tombol. Jika aktif, VidShrink memperbarui dirinya sendiri secara diam-diam.",
   "settings.update.no-self-effect": "VidShrink tidak memperbarui diri di sistem ini: hanya memberi tahu ada versi baru dan menampilkan perintah untuk memasangnya.",
 
   "settings.default-app.suggestion": "VidShrink bukan program bawaan untuk video. Anda dapat memilihnya di halaman Aplikasi default Windows.",
