@@ -7,7 +7,7 @@ on:
     inputs:
       kaynak_url:
         description: Acik kaynak video
-        default: https://download.blender.org/demo/movies/ToS/tears_of_steel_1080p.mov
+        default: https://download.blender.org/durian/movies/Sintel.2010.1080p.mkv
       kaynak_sha256:
         description: Bos birakilirsa yazdirilir, doluysa dogrulanir
         default: ''
@@ -34,9 +34,9 @@ jobs:
       - name: kaynak indir
         run: |
           $ErrorActionPreference = 'Stop'
-          $hedef = Join-Path $env:RUNNER_TEMP 'kaynak.mov'
-          try { Invoke-WebRequest -Uri '${{ inputs.kaynak_url || 'https://download.blender.org/demo/movies/ToS/tears_of_steel_1080p.mov' }}' -OutFile $hedef }
-          catch { Invoke-WebRequest -Uri 'http://ftp.nluug.nl/pub/graphics/blender/demo/movies/ToS/tears_of_steel_1080p.mov' -OutFile $hedef }
+          $ProgressPreference = 'SilentlyContinue'
+          $hedef = Join-Path $env:RUNNER_TEMP 'kaynak.mkv'
+          Invoke-WebRequest -Uri '${{ inputs.kaynak_url || 'https://download.blender.org/durian/movies/Sintel.2010.1080p.mkv' }}' -OutFile $hedef
           $sha = (Get-FileHash $hedef -Algorithm SHA256).Hash
           "kaynak sha256=$sha boy=$((Get-Item $hedef).Length)" | Tee-Object -FilePath (Join-Path $env:RUNNER_TEMP 'kaynak-sha256.txt')
           $beklenen = '${{ inputs.kaynak_sha256 }}'
@@ -45,7 +45,7 @@ jobs:
         run: dotnet build tools/VidShrink.Bench -c Release -m:2
       - name: kesitleri sec
         run: |
-          pwsh tools/kalite-paketi-3/kos.ps1 -Is kesit -Kaynak "$env:RUNNER_TEMP\kaynak.mov" -Cikti "$env:RUNNER_TEMP\olcum" -Bench $env:BENCH
+          pwsh tools/kalite-paketi-3/kos.ps1 -Is kesit -Kaynak "$env:RUNNER_TEMP\kaynak.mkv" -Cikti "$env:RUNNER_TEMP\olcum" -Bench $env:BENCH
           Copy-Item "$env:RUNNER_TEMP\kaynak-sha256.txt" "$env:RUNNER_TEMP\olcum\"
       - uses: actions/upload-artifact@v4
         with:
