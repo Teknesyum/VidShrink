@@ -39,6 +39,7 @@ internal partial class RecorderView : UserControl
         InitializeComponent();
         _settings = RecorderSettings.Load(RecorderSettings.FilePath);
         InitHedef();
+        InitSecici();
         InitGelismis();
         InitOtomatik();
         InitSes();
@@ -64,6 +65,7 @@ internal partial class RecorderView : UserControl
         Strings.Changed -= OnLanguageChanged;
         Strings.Changed += OnLanguageChanged;
         RefreshLanguage();
+        RefreshScreens();
         ActivateTray();
         ActivateHotkeys();
         _ = MeasureOnOpenAsync(Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime);
@@ -88,6 +90,7 @@ internal partial class RecorderView : UserControl
         => Quietly(() =>
         {
             RefreshTargetLabels();
+            RefreshSeciciLabels();
             RefreshAudioBoxes();
             RefreshCountdownLabels();
             RefreshAdvancedLabels();

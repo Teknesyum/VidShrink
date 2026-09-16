@@ -70,6 +70,8 @@ internal sealed class RecorderSettings
 
     internal int RegionHeight { get; set; } = DefaultRegionHeight;
 
+    internal string RegionAspect { get; set; } = RegionDraw.Free;
+
     /// <summary>
     /// Seçilen mikrofonun adı. Indeks değil ad saklanıyor: cihaz listesi iki açılış
     /// arasında sıra değiştirdiğinde indeks başka cihazı gösterirdi. Cihaz artık yoksa
@@ -216,6 +218,7 @@ internal sealed class RecorderSettings
             settings.RegionY = (int?)root["regionY"] ?? 0;
             if ((int?)root["regionWidth"] is { } width && width > 0) settings.RegionWidth = width;
             if ((int?)root["regionHeight"] is { } height && height > 0) settings.RegionHeight = height;
+            if ((string?)root["regionAspect"] is { } aspect && Array.IndexOf(RegionDraw.Aspects, aspect) >= 0) settings.RegionAspect = aspect;
             settings.MicrophoneName = (string?)root["microphoneName"];
             settings.SystemAudioName = (string?)root["systemAudioName"];
             if (Enum.TryParse<RecorderContainer>((string?)root["containerChoice"], true, out var choice)) settings.Container = choice;
@@ -258,8 +261,19 @@ internal sealed class RecorderSettings
             var folder = Path.GetDirectoryName(file);
             if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
             var temp = file + ".tmp";
-            using (var stream = File.Create(temp))
-            using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true }))
+            File.WriteAllBytes(temp, ToJson());
+            File.Move(temp, file, true);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    internal byte[] ToJson()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true }))
+        {
             {
                 writer.WriteStartObject();
                 if (OutputFolder is null) writer.WriteNull("outputFolder");
@@ -284,6 +298,7 @@ internal sealed class RecorderSettings
                 writer.WriteNumber("regionY", RegionY);
                 writer.WriteNumber("regionWidth", RegionWidth);
                 writer.WriteNumber("regionHeight", RegionHeight);
+                writer.WriteString("regionAspect", RegionAspect);
                 if (MicrophoneName is null) writer.WriteNull("microphoneName");
                 else writer.WriteString("microphoneName", MicrophoneName);
                 if (SystemAudioName is null) writer.WriteNull("systemAudioName");
@@ -315,11 +330,9 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("audioNoiseSuppression", AudioNoiseSuppression);
                 writer.WriteEndObject();
             }
-            File.Move(temp, file, true);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-        }
+
+        return stream.ToArray();
     }
 
     /// <summary>

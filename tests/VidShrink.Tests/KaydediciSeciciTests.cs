@@ -1,0 +1,254 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json.Nodes;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using VidShrink.App.Recorder;
+using VidShrink.Core;
+using Xunit;
+using static VidShrink.Tests.KaydediciAyarTests;
+
+namespace VidShrink.Tests;
+
+public sealed class KaydediciSeciciTests
+{
+    private static string Kanit
+    {
+        get
+        {
+            var yol = Path.Combine(GirdiKanit.Root, ".calisma", "paket-2");
+            Directory.CreateDirectory(yol);
+            return yol;
+        }
+    }
+
+    private static readonly PixelRect Masaustu = new(0, 0, 1024, 768);
+
+    private static string? Dosyada(string anahtar)
+        => JsonNode.Parse(File.ReadAllText(RecorderSettings.FilePath!))?[anahtar]?.ToJsonString();
+
+    [Fact]
+    public void SurukleSerbestteCiftBoyutaIner()
+    {
+        var ileri = RegionDraw.FromDrag(new PixelPoint(10, 20), new PixelPoint(651, 381), null, Masaustu);
+        var geri = RegionDraw.FromDrag(new PixelPoint(651, 381), new PixelPoint(10, 20), null, Masaustu);
+
+        Assert.Equal(new PixelRect(10, 20, 640, 360), ileri);
+        Assert.Equal(new PixelRect(11, 21, 640, 360), geri);
+        Assert.False(RegionDraw.Usable(RegionDraw.FromDrag(new PixelPoint(5, 5), new PixelPoint(6, 6), null, Masaustu)));
+    }
+
+    [Fact]
+    public void OranKilidiSurukleyiOranaUydururVeEkrandaTutar()
+    {
+        var oranli = RegionDraw.FromDrag(new PixelPoint(0, 0), new PixelPoint(640, 500), RegionDraw.Ratio("16:9"), Masaustu);
+        var serbest = RegionDraw.FromDrag(new PixelPoint(0, 0), new PixelPoint(640, 500), RegionDraw.Ratio("free"), Masaustu);
+        var tasan = RegionDraw.FromDrag(new PixelPoint(900, 0), new PixelPoint(2000, 100), RegionDraw.Ratio("1:1"), Masaustu);
+        var dikey = RegionDraw.FromDrag(new PixelPoint(0, 0), new PixelPoint(100, 700), RegionDraw.Ratio("9:16"), Masaustu);
+
+        Assert.Equal(new PixelRect(0, 0, 888, 500), oranli);
+        Assert.Equal(new PixelRect(0, 0, 640, 500), serbest);
+        Assert.Equal(new PixelRect(900, 0, 124, 124), tasan);
+        Assert.True(dikey.Bottom <= Masaustu.Bottom && dikey.Right <= Masaustu.Right);
+        Assert.InRange(dikey.Width / (double)dikey.Height, 9 / 16.0 - 0.01, 9 / 16.0 + 0.01);
+        Assert.Null(RegionDraw.Ratio("uydurma"));
+        Assert.Equal(new PixelRect(-1920, 0, 2944, 1080), RegionDraw.Desktop(new[] { Masaustu, new PixelRect(-1920, 0, 1920, 1080) }));
+    }
+
+    [Fact]
+    public void FareyleCizilenBolgeAyaraVeArgumanaGecer()
+    {
+        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        {
+            var istenenOran = new List<double?>();
+            var once = new RecorderView { SkipAutoMeasure = true };
+            Elle(once);
+            Bul<ComboBox>(once, "CmbAspect").SelectedIndex = Array.IndexOf(RegionDraw.Aspects, "16:9");
+            once.DrawRegion = oran =>
+            {
+                istenenOran.Add(oran);
+                return Task.FromResult<PixelRect?>(new PixelRect(100, 50, 641, 361));
+            };
+            var cizildi = once.DrawRegionAsync().GetAwaiter().GetResult();
+            var kutular = string.Join(",", new[] { "TxtRegionX", "TxtRegionY", "TxtRegionWidth", "TxtRegionHeight" }.Select(a => Bul<TextBox>(once, a).Text));
+            var dosya = (x: Dosyada("regionX"), w: Dosyada("regionWidth"), oran: Dosyada("regionAspect"), hedef: Dosyada("target"));
+
+            var vazgecen = new RecorderView { SkipAutoMeasure = true, DrawRegion = _ => Task.FromResult<PixelRect?>(null) };
+            var vazgecildi = vazgecen.DrawRegionAsync().GetAwaiter().GetResult();
+            var vazgecKutu = Bul<TextBox>(vazgecen, "TxtRegionWidth").Text;
+
+            var sonra = new RecorderView { SkipAutoMeasure = true };
+            var hazir = sonra.PrepareRecording()!.Value;
+            var args = RecorderArguments.Build(hazir.Request, hazir.Path);
+            return (cizildi, istenenOran, kutular, dosya, vazgecildi, vazgecKutu, aspect: Bul<ComboBox>(sonra, "CmbAspect").SelectedIndex,
+                x: Deger(args, "-offset_x"), y: Deger(args, "-offset_y"), boyut: Deger(args, "-video_size"));
+        }));
+
+        File.WriteAllLines(Path.Combine(Kanit, "bolge-cizme.txt"), new[]
+        {
+            $"cizildi={olcu.cizildi} oran={string.Join(";", olcu.istenenOran)} kutular={olcu.kutular}",
+            $"json regionX={olcu.dosya.x} regionWidth={olcu.dosya.w} regionAspect={olcu.dosya.oran} target={olcu.dosya.hedef}",
+            $"arguman -offset_x {olcu.x} -offset_y {olcu.y} -video_size {olcu.boyut}",
+            $"vazgec: sonuc={olcu.vazgecildi} genislik={olcu.vazgecKutu}"
+        });
+
+        Assert.True(olcu.cizildi);
+        Assert.Equal(16 / 9.0, olcu.istenenOran.Single()!.Value, 3);
+        Assert.Equal("100,50,640,360", olcu.kutular);
+        Assert.Equal(("100", "640", "\"16:9\"", "\"Region\""), olcu.dosya);
+        Assert.Equal(("100", "50", "640x360"), (olcu.x, olcu.y, olcu.boyut));
+        Assert.Equal(Array.IndexOf(RegionDraw.Aspects, "16:9"), olcu.aspect);
+        Assert.False(olcu.vazgecildi);
+        Assert.Equal("640", olcu.vazgecKutu);
+    }
+
+    [Fact]
+    public void CizimPenceresiMasaustunuKaplarVeEscVazgecer()
+    {
+        var olcu = AppHost.Run(() =>
+        {
+            var secici = new RecorderRegionPicker(null);
+            secici.Show();
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var masaustu = RegionDraw.Desktop(secici.Screens.All.Select(s => s.Bounds));
+            var konum = secici.Position;
+            var olcek = secici.Screens.Primary?.Scaling ?? 1;
+            var genislik = (int)Math.Round(secici.Width * olcek);
+            var ekran = secici.Screens.ScreenCount;
+            secici.RaiseEvent(new Avalonia.Input.KeyEventArgs { RoutedEvent = Avalonia.Input.InputElement.KeyDownEvent, Key = Avalonia.Input.Key.Escape });
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            return (masaustu, konum, genislik, ekran, bitti: secici.Result.IsCompleted, sonuc: secici.Result.IsCompleted ? secici.Result.Result : new PixelRect(1, 1, 1, 1), acik: secici.IsVisible);
+        });
+
+        File.WriteAllLines(Path.Combine(Kanit, "cizim-penceresi.txt"), new[] { $"ekran={olcu.ekran} masaustu={olcu.masaustu} konum={olcu.konum} genislik={olcu.genislik} esc: bitti={olcu.bitti} sonuc={olcu.sonuc} acik={olcu.acik}" });
+
+        Assert.True(olcu.ekran > 0);
+        Assert.Equal(olcu.masaustu.Position, olcu.konum);
+        Assert.Equal(olcu.masaustu.Width, olcu.genislik);
+        Assert.True(olcu.bitti);
+        Assert.Null(olcu.sonuc);
+        Assert.False(olcu.acik);
+    }
+
+    [Fact]
+    public void HazirBoyutBolgeKutularinaVeAyaraYazilir()
+    {
+        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        {
+            var view = new RecorderView { SkipAutoMeasure = true };
+            var kutu = Bul<ComboBox>(view, "CmbRegionSize");
+            var oncesi = Bul<TextBox>(view, "TxtRegionWidth").Text;
+            kutu.SelectedIndex = 1 + Array.IndexOf(RegionDraw.Sizes, (1080, 1920));
+            return (oncesi, w: Bul<TextBox>(view, "TxtRegionWidth").Text, h: Bul<TextBox>(view, "TxtRegionHeight").Text,
+                jw: Dosyada("regionWidth"), jh: Dosyada("regionHeight"), sayi: kutu.ItemCount);
+        }));
+
+        Assert.NotEqual("1080", olcu.oncesi);
+        Assert.Equal(("1080", "1920", "1080", "1920"), (olcu.w, olcu.h, olcu.jw, olcu.jh));
+        Assert.Equal(RegionDraw.Sizes.Length + 1, olcu.sayi);
+    }
+
+    [Fact]
+    public void PencereSeciciBasligiIstegeYazar()
+    {
+        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        {
+            var once = new RecorderView { SkipAutoMeasure = true, ListWindows = () => new[] { "Not Defteri", "Hesap Makinesi" } };
+            Elle(once);
+            Bul<ComboBox>(once, "CmbTarget").SelectedIndex = (int)RecorderTargetKind.Window;
+            var liste = Bul<ComboBox>(once, "CmbWindow");
+            var ogeler = liste.ItemsSource!.Cast<string>().ToArray();
+            liste.SelectedIndex = 1;
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var kutu = Bul<TextBox>(once, "TxtWindowTitle").Text;
+            var dosyada = Dosyada("windowTitle");
+
+            var sonra = new RecorderView { SkipAutoMeasure = true, ListWindows = () => new[] { "Hesap Makinesi" } };
+            sonra.RefreshWindowList();
+            var hazir = sonra.PrepareRecording()!.Value;
+            var args = RecorderArguments.Build(hazir.Request, hazir.Path);
+            return (ogeler, kutu, dosyada, secili: Bul<ComboBox>(sonra, "CmbWindow").SelectedItem as string,
+                girdi: Deger(args, "-i"));
+        }));
+
+        File.WriteAllLines(Path.Combine(Kanit, "pencere-secici.txt"), new[]
+        {
+            $"liste={string.Join(" | ", olcu.ogeler)} kutu={olcu.kutu} json={olcu.dosyada} yeniden={olcu.secili} -i {olcu.girdi}"
+        });
+
+        Assert.Equal(new[] { "Not Defteri", "Hesap Makinesi" }, olcu.ogeler);
+        Assert.Equal("Hesap Makinesi", olcu.kutu);
+        Assert.Equal("\"Hesap Makinesi\"", olcu.dosyada);
+        Assert.Equal("Hesap Makinesi", olcu.secili);
+        Assert.Equal("title=Hesap Makinesi", olcu.girdi);
+    }
+
+    [Fact]
+    public void PencereListesiGorunmeyeniKendiniVeBosuEler()
+    {
+        var pencereler = new[]
+        {
+            new WindowEntry("Tarayıcı", true, false, false, 10, false),
+            new WindowEntry("Gizli", false, false, false, 10, false),
+            new WindowEntry("Başka masaüstü", true, true, false, 10, false),
+            new WindowEntry("Araç", true, false, true, 10, false),
+            new WindowEntry("VidShrink", true, false, false, 99, false),
+            new WindowEntry("Simge", true, false, false, 10, true),
+            new WindowEntry("   ", true, false, false, 10, false),
+            new WindowEntry("Tarayıcı", true, false, false, 11, false)
+        };
+
+        Assert.Equal(new[] { "Tarayıcı" }, RecorderWindows.Pick(pencereler, 99));
+        Assert.Equal(2, RecorderWindows.Pick(pencereler, 1).Count);
+
+        var gercek = RecorderWindows.Titles();
+        Assert.All(gercek, t => Assert.False(string.IsNullOrWhiteSpace(t)));
+        Assert.Equal(gercek.Count, gercek.Distinct(StringComparer.Ordinal).Count());
+    }
+
+    [Fact]
+    public void EkranSecimiOfsetliBolgeyeCevrilir()
+    {
+        IReadOnlyList<ScreenBounds> Ekranlar() => new[] { new ScreenBounds(0, 0, 0, 1024, 768), new ScreenBounds(1, 1024, 0, 1920, 1080) };
+
+        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        {
+            var degismeyen = new RecorderView { SkipAutoMeasure = true, ScreenSource = Ekranlar };
+            Elle(degismeyen);
+            degismeyen.RefreshScreens();
+            var ilkHazir = degismeyen.PrepareRecording()!.Value;
+            var ilk = RecorderArguments.Build(ilkHazir.Request, ilkHazir.Path);
+
+            var once = new RecorderView { SkipAutoMeasure = true, ScreenSource = Ekranlar };
+            once.RefreshScreens();
+            var kutu = Bul<ComboBox>(once, "CmbScreen");
+            var etiketler = kutu.ItemsSource!.Cast<string>().ToArray();
+            kutu.SelectedIndex = 1;
+            var dosyada = Dosyada("screenIndex");
+
+            var sonra = new RecorderView { SkipAutoMeasure = true, ScreenSource = Ekranlar };
+            sonra.RefreshScreens();
+            var hazir = sonra.PrepareRecording()!.Value;
+            var args = RecorderArguments.Build(hazir.Request, hazir.Path);
+            return (etiketler, dosyada, secili: Bul<ComboBox>(sonra, "CmbScreen").SelectedIndex, gorunur: Bul<Control>(sonra, "RowScreen").IsVisible,
+                x: Deger(args, "-offset_x"), boyut: Deger(args, "-video_size"), ilkX: Deger(ilk, "-offset_x"));
+        }));
+
+        File.WriteAllLines(Path.Combine(Kanit, "ekran-secimi.txt"), new[]
+        {
+            $"etiketler={string.Join(" | ", olcu.etiketler)} json screenIndex={olcu.dosyada} yeniden={olcu.secili}",
+            $"arguman -offset_x {olcu.x} -video_size {olcu.boyut}; degismeyen -offset_x {olcu.ilkX}"
+        });
+
+        Assert.Equal(2, olcu.etiketler.Length);
+        Assert.Contains("1920", olcu.etiketler[1]);
+        Assert.Equal("1", olcu.dosyada);
+        Assert.Equal(1, olcu.secili);
+        Assert.True(olcu.gorunur);
+        Assert.Equal(("1024", "1920x1080"), (olcu.x, olcu.boyut));
+        Assert.Null(olcu.ilkX);
+    }
+}

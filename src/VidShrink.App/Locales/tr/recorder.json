@@ -131,5 +131,15 @@
   "recorder.budget.duration-only": "Kayıt {0} saniye sonra kendiliğinden durur.",
   "recorder.budget.size-only": "Kayıt {0} MB'a ulaşınca kendiliğinden durur.",
   "recorder.output.open-when-done": "Kayıt bitince klasörü aç",
-  "recorder.discarded": "Kayıt iptal edildi, dosya silindi."
+  "recorder.discarded": "Kayıt iptal edildi, dosya silindi.",
+  "recorder.target.screen-pick": "Ekran",
+  "recorder.target.screen-item": "{0}. ekran — {1} × {2}",
+  "recorder.target.window-pick": "Açık pencereler",
+  "recorder.target.window-refresh": "Yenile",
+  "recorder.target.region-draw": "Fareyle çiz",
+  "recorder.target.region-draw-hint": "Sürükleyerek bölgeyi seç; Esc vazgeçer.",
+  "recorder.target.aspect": "Oran",
+  "recorder.target.aspect-free": "Serbest",
+  "recorder.target.size": "Hazır boyut",
+  "recorder.target.size-none": "Elle"
 }

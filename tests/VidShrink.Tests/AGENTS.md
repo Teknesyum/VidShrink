@@ -54,6 +54,10 @@ sürümden (`x.0.0`) önce koşar.
   yalnız MB `-fs`), boyut sınırı parçalara kalanla bölünür, MP4/MOV'da boyut ölçütü Matroska'ya yakalanıp durunca
   `-c copy` ile teslim kabına çevrilir; "bitince klasörü aç" yalnız kutu açıkken, F10 iptal kaydı durdurup dosyayı
   siler. Canlı kollar `[KayitFact]`, 640x480 bölge ≤5 sn. Kanıt `.calisma/paket-2/`.
+- `KaydediciSeciciTests.cs` — paket 2, hedef seçiciler: sürükleme çift boyuta iner, oran kilidi ekranda kalır
+  (`RegionDraw`); sahte `DrawRegion` ile çizilen bölge kutulara, json'a ve `-offset_x/-video_size`'a geçer, Esc
+  vazgeçer; çizim penceresi gerçek açılıp masaüstünü kaplar. Hazır boyut, pencere seçici (sahte `ListWindows`,
+  `Pick` eleme negatifleri), ekran seçici (sahte `ScreenSource`, ikinci ekranın ofseti). Kanıt `.calisma/paket-2/`.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

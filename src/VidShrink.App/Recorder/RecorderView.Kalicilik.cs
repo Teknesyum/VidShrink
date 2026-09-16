@@ -29,13 +29,20 @@ internal partial class RecorderView
         foreach (var check in new[] { ChkCursor, ChkOpenFolder, ChkNoiseGate, ChkNoiseSuppression })
             check.IsCheckedChanged += (_, _) => PersistChoices();
 
+        _persisted = _settings.ToJson();
         _persistReady = true;
     }
+
+    private byte[] _persisted = Array.Empty<byte>();
 
     private void PersistChoices()
     {
         if (!_persistReady || _quiet > 0 || _fillingAdvanced || _session is not null) return;
-        StoreChoices();
+        CollectChoices();
+        var current = _settings.ToJson();
+        if (current.AsSpan().SequenceEqual(_persisted)) return;
+        _persisted = current;
+        _settings.Save(RecorderSettings.FilePath);
     }
 
     private void Quietly(Action refresh)

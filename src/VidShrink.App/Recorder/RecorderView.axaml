@@ -256,12 +256,56 @@
                       auto:AutomationProperties.Name="{loc:Text recorder.countdown.title}"/>
           </StackPanel>
 
+          <StackPanel x:Name="RowScreen" IsVisible="False">
+            <TextBlock Text="{loc:Text recorder.target.screen-pick}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbScreen"
+                      HorizontalAlignment="Stretch"
+                      auto:AutomationProperties.Name="{loc:Text recorder.target.screen-pick}"/>
+          </StackPanel>
+
           <StackPanel x:Name="RowWindow" IsVisible="False">
+            <TextBlock Text="{loc:Text recorder.target.window-pick}" Theme="{StaticResource Label}"/>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+              <ComboBox x:Name="CmbWindow"
+                        Grid.Column="0"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.target.window-pick}"/>
+              <Button x:Name="BtnWindowRefresh"
+                      Grid.Column="1"
+                      Theme="{StaticResource GhostButton}"
+                      Content="{loc:Text recorder.target.window-refresh}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.target.window-refresh}"/>
+            </Grid>
             <TextBlock Text="{loc:Text recorder.target.window-title}" Theme="{StaticResource Label}"/>
             <TextBox x:Name="TxtWindowTitle"
                      ToolTip.Tip="{loc:Text recorder.target.window-title-hint}"
                      auto:AutomationProperties.Name="{loc:Text recorder.target.window-title}"/>
           </StackPanel>
+
+          <Grid x:Name="RowRegionTools"
+                IsVisible="False"
+                ColumnDefinitions="Auto,*,*"
+                ColumnSpacing="{StaticResource SpaceSm}">
+            <Button x:Name="BtnDrawRegion"
+                    Grid.Column="0"
+                    VerticalAlignment="Bottom"
+                    Theme="{StaticResource PrimaryButton}"
+                    Content="{loc:Text recorder.target.region-draw}"
+                    ToolTip.Tip="{loc:Text recorder.target.region-draw-hint}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.target.region-draw}"/>
+            <StackPanel Grid.Column="1">
+              <TextBlock Text="{loc:Text recorder.target.aspect}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbAspect"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.target.aspect}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Text="{loc:Text recorder.target.size}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbRegionSize"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.target.size}"/>
+            </StackPanel>
+          </Grid>
 
           <Grid x:Name="RowRegion"
                 IsVisible="False"

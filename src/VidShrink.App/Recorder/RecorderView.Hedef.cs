@@ -109,6 +109,9 @@ internal partial class RecorderView
     {
         RowWindow.IsVisible = SelectedTarget == RecorderTargetKind.Window;
         RowRegion.IsVisible = SelectedTarget == RecorderTargetKind.Region;
+        RowRegionTools.IsVisible = RowRegion.IsVisible;
+        RowScreen.IsVisible = SelectedTarget == RecorderTargetKind.Screen;
+        if (RowWindow.IsVisible) RefreshWindowList();
     }
 
     /// <summary>
@@ -165,8 +168,8 @@ internal partial class RecorderView
             Region = region,
             Audio = audio,
             Container = _settings.Container,
-            ScreenIndex = _settings.ScreenIndex,
-            Screens = MonitorBounds(),
+            ScreenIndex = target == RecorderTargetKind.Screen ? ChosenScreen : 0,
+            Screens = Monitors(),
             Scale = _settings.Scale,
             KeyframeSeconds = _settings.KeyframeSeconds,
             Profile = string.IsNullOrWhiteSpace(_settings.Profile) ? null : _settings.Profile,
@@ -277,6 +280,8 @@ internal partial class RecorderView
     {
         ReadAdvanced(report: false);
         if (CmbTarget.SelectedIndex >= 0) _settings.Target = SelectedTarget;
+        if (CmbScreen.SelectedIndex >= 0) _settings.ScreenIndex = CmbScreen.SelectedIndex;
+        _settings.RegionAspect = SelectedAspect;
         _settings.Codec = CmbCodec.SelectedItem as string ?? _settings.Codec;
         _settings.Preset = CmbPreset.SelectedItem as string ?? _settings.Preset;
         _settings.ShowCursor = ChkCursor.IsChecked ?? false;

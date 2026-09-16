@@ -131,5 +131,15 @@
   "recorder.budget.duration-only": "Recording stops by itself after {0} seconds.",
   "recorder.budget.size-only": "Recording stops by itself when it reaches {0} MB.",
   "recorder.output.open-when-done": "Open the folder when recording ends",
-  "recorder.discarded": "Recording discarded; the file was deleted."
+  "recorder.discarded": "Recording discarded; the file was deleted.",
+  "recorder.target.screen-pick": "Screen",
+  "recorder.target.screen-item": "Screen {0} — {1} × {2}",
+  "recorder.target.window-pick": "Open windows",
+  "recorder.target.window-refresh": "Refresh",
+  "recorder.target.region-draw": "Draw with mouse",
+  "recorder.target.region-draw-hint": "Drag to select the area; Esc cancels.",
+  "recorder.target.aspect": "Aspect ratio",
+  "recorder.target.aspect-free": "Free",
+  "recorder.target.size": "Preset size",
+  "recorder.target.size-none": "Custom"
 }
