@@ -622,7 +622,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(31863, gezilen);
+        Assert.Equal(31906, gezilen);
         Assert.Empty(kayip);
     }
 
