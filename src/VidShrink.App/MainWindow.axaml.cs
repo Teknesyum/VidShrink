@@ -170,6 +170,7 @@ public partial class MainWindow : Window
         BuildThemeList();
         Strings.Changed += OnLanguageChanged;
         ShowSourceName();
+        RefreshPlatforms();
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
 

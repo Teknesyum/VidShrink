@@ -410,7 +410,7 @@ public static class UpdateCheck
 public sealed class UpdateSettings
 {
     public const string FolderName = "VidShrink";
-    public const string FileName = "settings.json";
+    public static readonly string FileName = "settings.json";
 
     /// <summary>Varsayılan kapalı: güncelleme rozetteki düğmeyle indirilip kurulur. Açılırsa Windows'ta kendiliğinden kurulur. Dosyada yazılı değer korunur.</summary>
     public bool AutoUpdate { get; set; }
