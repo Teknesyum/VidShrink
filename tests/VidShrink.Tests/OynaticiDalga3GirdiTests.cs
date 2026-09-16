@@ -79,14 +79,19 @@ public sealed class OynaticiDalga3GirdiTests
     private static Point Merkez(TopLevel top, Visual control)
         => control.TranslatePoint(new Point(control.Bounds.Width / 2, control.Bounds.Height / 2), top)!.Value;
 
-    private static PopupRoot? AcikMenu()
+    private static List<PopupRoot> Acilirlar()
     {
+        var sonuc = new List<PopupRoot>();
         var tur = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("Avalonia.Win32.WindowImpl")).FirstOrDefault(t => t is not null);
-        if (tur?.GetField("s_instances", Her)?.GetValue(null) is not System.Collections.IEnumerable impller) return null;
+        if (tur?.GetField("s_instances", Her)?.GetValue(null) is not System.Collections.IEnumerable impller) return sonuc;
         foreach (var impl in impller)
-            if (Giris(impl)?.Target is { } kaynak && kaynak.GetType().GetProperties(Her).Where(p => p.GetIndexParameters().Length == 0 && typeof(Visual).IsAssignableFrom(p.PropertyType)).Select(p => p.GetValue(kaynak)).OfType<PopupRoot>().FirstOrDefault() is { IsVisible: true } kok) return kok;
-        return null;
+            if (Giris(impl)?.Target is { } kaynak)
+                sonuc.AddRange(kaynak.GetType().GetProperties(Her).Where(p => p.GetIndexParameters().Length == 0 && typeof(Visual).IsAssignableFrom(p.PropertyType)).Select(p => p.GetValue(kaynak)).OfType<PopupRoot>().Where(k => k.IsVisible));
+        return sonuc;
     }
+
+    private static PopupRoot? AcikMenu(IReadOnlyCollection<PopupRoot> onceki, string baslik)
+        => Acilirlar().FirstOrDefault(k => !onceki.Contains(k) && k.GetVisualDescendants().OfType<MenuItem>().Any(m => Equals(m.Header, baslik)));
 
     private static string Kanit(string ad, string body)
     {
@@ -130,26 +135,33 @@ public sealed class OynaticiDalga3GirdiTests
             }
             typeof(TopLevel).GetField("_storageProvider", Her)!.SetValue(window, sahte);
 
+            var baslik = Strings.Get("player.view.screenshot-folder");
+            var onceki = Acilirlar();
+            body.AppendLine($"onceden acik acilir pencere {onceki.Count}");
             var yuzey = Merkez(window, view);
             Fareyle(window, RawPointerEventType.Move, yuzey, RawInputModifiers.None);
             Fareyle(window, RawPointerEventType.RightButtonDown, yuzey, RawInputModifiers.RightMouseButton);
             Fareyle(window, RawPointerEventType.RightButtonUp, yuzey, RawInputModifiers.None);
             PopupRoot? menu = null;
-            DenetimSurucu.Pump(view, () => (menu = AcikMenu()) is not null, 5);
+            DenetimSurucu.Pump(view, () => (menu = AcikMenu(onceki, baslik)) is not null, 5);
             body.AppendLine($"menu acildi: {menu is not null}, capa {view.MenuAnchor}");
             Assert.NotNull(menu);
             DenetimSurucu.Wait(view, 0.3);
 
-            var baslik = Strings.Get("player.view.screenshot-folder");
             var satir = menu!.GetVisualDescendants().OfType<MenuItem>().First(m => Equals(m.Header, baslik));
-            var orta = new Point(menu.Bounds.Width / 2, menu.Bounds.Height / 2);
-            for (var i = 0; i < 40 && Merkez(menu, satir).Y > menu.Bounds.Height - satir.Bounds.Height; i++)
+            bool Gorunur() => menu.InputHitTest(Merkez(menu, satir)) is Visual v && (ReferenceEquals(v, satir) || v.GetVisualAncestors().Contains(satir));
+            body.AppendLine($"kaydirma oncesi satir {Merkez(menu, satir)}, menu {menu.Bounds.Size}, gorunur {Gorunur()}");
+            var tur = 0;
+            for (; tur < 40 && !satir.IsSelected; tur++)
             {
-                Ham(menu, (RawInputEventArgs)Yeni(typeof(RawMouseWheelEventArgs), Fare, (ulong)Environment.TickCount64, Kok(menu), orta, new Vector(0, -1), RawInputModifiers.None));
-                DenetimSurucu.Wait(view, 0.05);
+                Tus(menu, Key.Up);
+                DenetimSurucu.Wait(view, 0.03);
             }
+            DenetimSurucu.Pump(view, Gorunur, 3);
             var nokta = Merkez(menu, satir);
-            body.AppendLine($"satir noktasi {nokta}, menu yuksekligi {menu.Bounds.Height}");
+            body.AppendLine($"satir noktasi {nokta}, menu yuksekligi {menu.Bounds.Height}, isabet satirda {Gorunur()}, yukari ok {tur}, secili {satir.IsSelected}");
+            satir.AddHandler(InputElement.PointerPressedEvent, (_, e) => body.AppendLine("satir basildi"), Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
+            satir.AddHandler(InputElement.PointerReleasedEvent, (_, e) => body.AppendLine("satir birakildi"), Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
             Fareyle(menu, RawPointerEventType.Move, nokta, RawInputModifiers.None);
             DenetimSurucu.Wait(view, 0.05);
             Fareyle(menu, RawPointerEventType.LeftButtonDown, nokta, RawInputModifiers.LeftMouseButton);
@@ -157,7 +169,7 @@ public sealed class OynaticiDalga3GirdiTests
             Fareyle(menu, RawPointerEventType.LeftButtonUp, nokta, RawInputModifiers.None);
             DenetimSurucu.Pump(view, () => secici.Cagri > 0 && view.Settings.ScreenshotFolder is not null, 3);
             DenetimSurucu.Wait(view, 0.2);
-            body.AppendLine($"secici cagrisi {secici.Cagri}, menu kapandi {AcikMenu() is null}");
+            body.AppendLine($"secici cagrisi {secici.Cagri}, menu kapandi {!Acilirlar().Contains(menu)}");
 
             var ayar = view.Settings.ScreenshotFolder;
             var ayarDosyasi = Path.Combine(ayarKlasoru, PlayerSettings.FileName);
@@ -186,7 +198,7 @@ public sealed class OynaticiDalga3GirdiTests
         var hedef = "secici-hedef";
         var sonuc = KlasorSec(true);
         Kanit("klasor-secici.txt", sonuc.rapor);
-        Assert.Equal(1, sonuc.cagri);
+        Assert.True(sonuc.cagri == 1, sonuc.rapor);
         Assert.NotNull(sonuc.ayar);
         Assert.Contains(hedef, Path.GetFileName(sonuc.ayar!));
         Assert.Equal(sonuc.ayar, sonuc.dosyada);
@@ -200,7 +212,7 @@ public sealed class OynaticiDalga3GirdiTests
     {
         var sonuc = KlasorSec(false);
         Kanit("klasor-secici-iptal.txt", sonuc.rapor);
-        Assert.Equal(1, sonuc.cagri);
+        Assert.True(sonuc.cagri == 1, sonuc.rapor);
         Assert.Null(sonuc.ayar);
         Assert.Null(sonuc.dosyada);
     }
