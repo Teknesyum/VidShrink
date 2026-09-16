@@ -294,6 +294,41 @@ public sealed class OynaticiMotorTests
         Assert.False(ayni, "arama bitti denildi ama gosterilen kare acilis karesiyle ayni");
     }
 
+    [Fact]
+    public async Task YuklemeOlayiRenderGuncellemesindenGecGelinceIlkKareKaybolmaz()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        var satirlar = new StringBuilder();
+        for (var tur = 0; tur < 3; tur++)
+        {
+            using var engine = new MpvEngine();
+            engine.SetProperty("ao", "null");
+            var geciken = 0;
+            engine.BeforeEvent = id =>
+            {
+                if (id != Native.MPV_EVENT_FILE_LOADED) return;
+                Interlocked.Increment(ref geciken);
+                Thread.Sleep(400);
+            };
+
+            var saat = Stopwatch.StartNew();
+            await engine.OpenAsync(clip);
+            long seen = 0;
+            var geldi = false;
+            while (!geldi && saat.Elapsed < TimeSpan.FromSeconds(5))
+            {
+                geldi = engine.TryCopyLatest(ref seen, (_, _, _, _) => { });
+                if (!geldi) await Task.Delay(10);
+            }
+
+            satirlar.AppendLine($"tur {tur}: geciktirilen FILE_LOADED {geciken}, ilk kare {(geldi ? $"{saat.ElapsedMilliseconds} ms" : "5 sn icinde gelmedi")}, render {engine.FramesRendered}");
+            Assert.True(geciken > 0, "FILE_LOADED olayi hic gelmedi; yaris kurulamadi");
+            Assert.True(geldi, $"duraklatilmis acilista ilk kare gelmedi ({satirlar})");
+        }
+
+        MotorKanit.Write("k3b-ilk-kare-yarisi.txt", satirlar.ToString());
+    }
+
     private static byte[] SonKare(MpvEngine engine)
     {
         long seen = 0;

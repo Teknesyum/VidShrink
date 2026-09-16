@@ -29,6 +29,7 @@ try
         "compare" => Compare(args),
         "panel" => await PanelAsync(args),
         "play" => await PlayAsync(args),
+        "bar-burst" => await CubukAtagi.RunAsync(args),
         _ => Unknown(args[0])
     };
 }
@@ -52,6 +53,7 @@ static void PrintUsage()
     Console.WriteLine("  bench peak-curve <kaynak> [--codec hevc_nvenc] [--ratios 3,5,8,12] [--peaks 1.02,1.1,1.25,1.5] [--out .calisma/tepe]");
     Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--codec-preference auto|compatible|maxcompression|fast] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
+    Console.WriteLine("  bench bar-burst [tekrar]");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
     Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p1b,k3,p2,p3,p5,p6,p8,p9,p10,p11,p12 [--seconds 10] [--fps 60] [--runs 3] [--target 20] [--matrix klip,...]");
 }
