@@ -43,7 +43,6 @@ public partial class MainWindow : Window
 {
     private const double WhatsAppTargetMb = 16;
     private const double MacTrafficLightInset = 80;
-    private const int CalibrationRounds = 2;
     private const uint ClientAreaAnimationQuery = 0x1042;
 
     // Ayar kapalıyken açılışta bir kez sorulur. Ağ yoksa bekleyen tek şey bu arka plan işi;
@@ -1810,6 +1809,8 @@ public partial class MainWindow : Window
         BtnShareDelete.IsEnabled = false;
     }
 
+    internal void ResetShareForTest(bool fileReady) => ResetShare(fileReady);
+
     private void SetSharing(bool sharing)
     {
         BtnShare.IsEnabled = !sharing;
@@ -2921,39 +2922,15 @@ public partial class MainWindow : Window
         RefreshConversion();
     }
 
-    public static async Task<ComplexityProfile> ProbeWithMeasuredQualityAsync(
+    public static Task<ComplexityProfile> ProbeWithMeasuredQualityAsync(
         MediaInfo info, SpeedMode speed, IQualityMeasurement? meter, CancellationToken ct)
-    {
-        var probed = await ComplexityProbe.RunDetailedAsync(info, speed, measureQuality: true, meter, ct);
-        var anchors = probed.QualityMeasurements
-            .Where(q => q is { Comparable: true, VmafNegMean: not null })
-            .Select(q => q.VmafNegMean!.Value)
-            .ToArray();
-        return anchors.Length > 0 ? probed.Profile.WithProbeQuality(anchors) : probed.Profile;
-    }
+        => ShrinkEngine.ProbeWithMeasuredQualityAsync(info, speed, meter, ct);
 
-    /// <summary>
-    /// Kalibrasyon yoklamasinin ornekleme penceresini yerlestirirken okudugu harita.
-    /// Tarama basarisiz olduysa <c>null</c> doner ve yoklama esit arali yedek yerlesimde
-    /// kalir.
-    /// </summary>
-    public static SceneMap? CalibrationScenes(SceneMapAttempt? attempt) => attempt?.Map;
+    public static SceneMap? CalibrationScenes(SceneMapAttempt? attempt) => ShrinkEngine.CalibrationScenes(attempt);
 
-    /// <summary>
-    /// Kalite olcumunun en kotu birimi ararken sahne sinirlarini okudugu harita. Tarama
-    /// basarisiz olduysa <c>null</c> doner ve olcum sabit iki saniyelik izgarada kalir.
-    /// </summary>
-    public static SceneMap? QualityScenes(SceneMapAttempt? attempt) => attempt?.Map;
+    public static SceneMap? QualityScenes(SceneMapAttempt? attempt) => ShrinkEngine.QualityScenes(attempt);
 
-    /// <summary>
-    /// Yoklamanin kalite olceri. Olcum govdesi tek yerde, <see cref="QualityMeasurement"/>
-    /// icinde; harita o govdenin opsiyonel alanidir. Harita geldiginde govde
-    /// <see cref="QualityMeter.MeasureWindowAsync(string, string, double, double, double, SceneMap?, CancellationToken)"/>
-    /// asiri yuklemesine gecer; gelmediginde <see cref="QualityMeasurement.Instance"/> ile
-    /// bugunku yolda kalir.
-    /// </summary>
-    public static IQualityMeasurement ProbeMeter(SceneMap? scenes)
-        => scenes is null ? QualityMeasurement.Instance : new QualityMeasurement(scenes);
+    public static IQualityMeasurement ProbeMeter(SceneMap? scenes) => ShrinkEngine.ProbeMeter(scenes);
 
     private async Task MeasureComplexityAsync(MediaInfo info)
     {
@@ -2970,32 +2947,14 @@ public partial class MainWindow : Window
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             Recalculate();
 
-            var profile = await ProbeWithMeasuredQualityAsync(info, speed, ProbeMeter(QualityScenes(_sceneMap)), cts.Token);
-            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
-            _profile = profile;
-            Recalculate();
-
-            TxtEstimateNote.Text = Say("main.estimate.calibrating");
-            var draft = PlanCalculator.BuildDetailed(info, CurrentOptions(), profile, _planEncoders).Plan;
-
-            // The calibration is keyed to the plan it measured, and feeding it back changes the plan,
-            // which would throw the measurement away. Measure again on the plan the calibration
-            // produced, until the two agree.
-            for (var round = 0; round < CalibrationRounds; round++)
+            await ShrinkEngine.CalibrateAsync(info, _sceneMap, speed, CurrentOptions, _planEncoders, (stage, profile) =>
             {
-                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token, CalibrationScenes(_sceneMap));
-                if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
-                _profile = calibrated;
+                if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return false;
+                _profile = profile;
                 Recalculate();
-
-                if (!calibrated.Calibrated) break;
-
-                var settled = PlanCalculator.BuildDetailed(info, CurrentOptions(), calibrated, _planEncoders).Plan;
-                if (calibrated.AppliesTo(settled.Codec, PlanScale(info, settled), settled.Fps)) break;
-
-                draft = settled;
-                profile = calibrated.WithoutCalibration();
-            }
+                if (stage == ShrinkMeasureStage.Probed) TxtEstimateNote.Text = Say("main.estimate.calibrating");
+                return true;
+            }, cts.Token);
         }
         catch (OperationCanceledException)
         {
@@ -3010,9 +2969,6 @@ public partial class MainWindow : Window
             cts.Dispose();
         }
     }
-
-    private static double PlanScale(MediaInfo info, EncodePlan plan)
-        => info.Height <= 0 ? 1.0 : (double)plan.Height / info.Height;
 
     private void ShowInfo(MediaInfo info)
     {
@@ -3342,8 +3298,7 @@ public partial class MainWindow : Window
     /// </summary>
     public static IReadOnlyList<string> DisplayedEncodeArguments(MediaInfo info, EncodePlan plan,
         string outputPath, IEncoderAvailability? availability, SceneMap? scenes = null)
-        => FfmpegArguments.Build(info, plan, outputPath,
-            plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null, availability, scenes);
+        => ShrinkEngine.DisplayedArguments(info, plan, outputPath, availability, scenes);
 
     private void RefreshEstimateView()
     {
@@ -3606,20 +3561,7 @@ public partial class MainWindow : Window
     }
 
     private static string BuildUniqueOutputPath(string inputPath, string suffix, string extension)
-    {
-        var dir = Path.GetDirectoryName(inputPath)!;
-        var name = Path.GetFileNameWithoutExtension(inputPath);
-        const int firstIndex = 2;
-        if (suffix == "shrunk" && name.EndsWith("_shrunk", StringComparison.OrdinalIgnoreCase))
-            name = name[..^"_shrunk".Length];
-        var candidate = Path.Combine(dir, $"{name}_{suffix}.{extension}");
-        for (var index = firstIndex; PathEquals(candidate, inputPath) || File.Exists(candidate); index++)
-            candidate = Path.Combine(dir, $"{name}_{suffix}_{index}.{extension}");
-        return candidate;
-    }
-
-    private static bool PathEquals(string left, string right)
-        => string.Equals(Path.GetFullPath(left), Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase);
+        => ShrinkEngine.UniqueOutputPath(inputPath, suffix, extension);
 
     private void OnTargetSliderChanged()
     {
@@ -4023,7 +3965,7 @@ public partial class MainWindow : Window
                 if (p.OutputMb > 0) TxtOutSize.Text = $"{Num(p.OutputMb, "0.0")} MB";
             });
 
-            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
+            var result = await ShrinkEngine.EncodeAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
             _lastOutput = result.OutputPath;
             RefreshPreviewSource();
 

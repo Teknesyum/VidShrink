@@ -1,3 +1,23 @@
+# HandBrake Dalga 1a — Başsız CLI
+
+Dal `t0/hb-1a-cli`. Kaynak: `.calisma/danisma/handbrake-yanit.md` karar 9.
+
+1. **Tek karar kaynağı.** Yeni `src/VidShrink.Ffmpeg/ShrinkEngine.cs`: yoklama + kalibrasyon
+   döngüsü (bugün `MainWindow.MeasureComplexityAsync` içinde), karar (`BuildDetailed`),
+   gösterilen komut, çıktı adı. `MainWindow` aynı fonksiyonları çağırır; eski statik
+   yardımcılar yönlendirici olarak kalır (kaynak pimleri bozulmaz, biri motora taşınır).
+2. **`src/VidShrink.Cli`** (yalnız Core + Ffmpeg): `kucult`, `plan`; `--hedef`/`--kalite`,
+   `--kodek auto|h264|hevc|av1`, `--cikti`, `--json`, `--olcumsuz`. İlerleme stderr, sonuç
+   stdout. Çıkış kodları: 0 bantta, 2 bant altı, 3 tavan aşımı, 1 hata, 64 kullanım, 130 iptal.
+   `izle` kaydedilmez (2c).
+3. **Dil:** `Locales/en.json` + `tr.json` gömülü, `CurrentUICulture` seçer.
+4. **Testler:** `CliTests` — GUI penceresinin komutu ile CLI komutu aynı girdide bayt bayt eşit
+   (üç kodek), negatif kontrol (farklı hedef/kodek farklı komut), ayrıştırma, çıkış kodu
+   eşlemesi, dil anahtarları; ffmpeg'li 2 sn'lik klip `plan --json` ve `kucult` süreç testi.
+5. **Paket:** `release.yml` CLI'ı aynı `publish/<rid>` klasörüne App'ten önce yayınlar
+   (macOS'ta `vidshrink-cli`, `VidShrink` ana ikilisiyle büyük/küçük harf çakışmasın);
+   `VidShrink.sln`; README'ye kısa CLI bölümü.
+
 # Hipersürüş — çift tıktan ilk kareye
 
 > "ister güncelleme olsun ister olmasın bir videoya tıklandığı oynatmaya geçme

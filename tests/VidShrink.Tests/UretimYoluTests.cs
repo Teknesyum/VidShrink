@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using VidShrink.App;
 using VidShrink.Core;
@@ -187,16 +187,21 @@ public sealed class UretimYoluTests
     /// T154 K1. Yukaridaki olcu dikis fonksiyonunu pimliyor, cagri yerini degil: T146
     /// denetcisi <c>CalibrationProbe.RunAsync</c>nin son argumanini <c>(SceneMap?)null</c>
     /// yapip derledi ve 44/44 yesil kaldi. Bu olcu cagri yerinin kendisini okur:
-    /// <c>MainWindow.axaml.cs</c> icindeki tek <c>CalibrationProbe.RunAsync(</c> cagrisinin
-    /// arguman listesini ayirir, altinci argumanin <c>&lt;kapi&gt;(_sceneMap)</c> seklinde
-    /// oldugunu arar, o kapiyi yansimayla dolu bir denemeyle cagirir ve donen haritanin
+    /// HandBrake 1a'dan beri cagri pencereden <c>ShrinkEngine.cs</c>'e tasindi; pencere yalniz
+    /// <c>ShrinkEngine.CalibrateAsync(info, _sceneMap, ...)</c> der. Olcu motordaki tek
+    /// <c>CalibrationProbe.RunAsync(</c> cagrisinin arguman listesini ayirir, altinci argumanin
+    /// <c>&lt;kapi&gt;(sceneMap)</c> seklinde oldugunu arar, o kapiyi yansimayla dolu bir denemeyle cagirir ve donen haritanin
     /// yerlesimi sabit izgaradan gercekten ayirdigini olcer. Arguman <c>null</c>lanirsa
     /// arguman metni artik bu sekle uymaz ve olcu duser.
     /// </summary>
     [Fact]
     public void KalibrasyonCagriYeriHaritayiYoklamayaGeciriyor()
     {
-        var kaynak = File.ReadAllText(TipSources.WindowCodePath);
+        var pencere = File.ReadAllText(TipSources.WindowCodePath);
+        Assert.Equal(0, Adet(pencere, "CalibrationProbe.RunAsync("));
+        Assert.Contains("ShrinkEngine.CalibrateAsync(info, _sceneMap,", pencere, StringComparison.Ordinal);
+
+        var kaynak = File.ReadAllText(MotorYolu);
         Assert.Equal(1, Adet(kaynak, "CalibrationProbe.RunAsync("));
 
         var parcalar = UstDuzeyArgumanlar(CagriArgumanMetni(kaynak, "CalibrationProbe.RunAsync("));
@@ -204,11 +209,11 @@ public sealed class UretimYoluTests
         Assert.Equal(6, parcalar.Length);
 
         var haritaArgumani = parcalar[5];
-        var eslesme = Regex.Match(haritaArgumani, @"^(\w+)\(\s*_sceneMap\s*\)$");
+        var eslesme = Regex.Match(haritaArgumani, @"^(\w+)\(\s*sceneMap\s*\)$");
         Assert.True(eslesme.Success,
             $"kalibrasyon cagri yeri _sceneMap'i gecirmiyor; gecirdigi arguman: {haritaArgumani}");
 
-        var kapi = typeof(MainWindow).GetMethod(
+        var kapi = typeof(ShrinkEngine).GetMethod(
             eslesme.Groups[1].Value, BindingFlags.Public | BindingFlags.Static);
         Assert.True(kapi is not null, $"cagri yerindeki kapi bulunamadi: {eslesme.Groups[1].Value}");
 
@@ -356,12 +361,18 @@ public sealed class UretimYoluTests
     {
         var kaynak = File.ReadAllText(TipSources.WindowCodePath);
         var haritaYeri = kaynak.IndexOf("_sceneMap = await EncodeRunner.TryBuildSceneMapAsync", StringComparison.Ordinal);
-        var olcumYeri = kaynak.IndexOf("await ProbeWithMeasuredQualityAsync(info, speed, ProbeMeter(", StringComparison.Ordinal);
+        var olcumYeri = kaynak.IndexOf("await ShrinkEngine.CalibrateAsync(info, _sceneMap,", StringComparison.Ordinal);
 
         Assert.True(haritaYeri > 0, "harita kurulumu bulunamadi");
         Assert.True(olcumYeri > 0, "kalite olcumu cagrisi bulunamadi");
         Assert.True(haritaYeri < olcumYeri, "harita kalite olcumundan sonra kuruluyor; olcere verilecek harita o noktada yok");
+
+        var motor = File.ReadAllText(MotorYolu);
+        Assert.Contains("await ProbeWithMeasuredQualityAsync(info, speed, ProbeMeter(QualityScenes(sceneMap)), ct);", motor);
     }
+
+    private static string MotorYolu =>
+        Path.Combine(Path.GetDirectoryName(TipSources.WindowCodePath)!, "..", "VidShrink.Ffmpeg", "ShrinkEngine.cs");
 
     /// <summary>
     /// K5. Harita gelmediginde kalibrasyon bugunku esit arali yerlesimde kaliyor: yedek

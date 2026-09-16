@@ -32,5 +32,6 @@
     <ProjectReference Include="..\..\tools\VidShrink.Bench\VidShrink.Bench.csproj" />
     <ProjectReference Include="..\..\tools\VidShrink.Ab\VidShrink.Ab.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Player\VidShrink.Player.csproj" />
+    <ProjectReference Include="..\..\src\VidShrink.Cli\VidShrink.Cli.csproj" />
   </ItemGroup>
 </Project>
