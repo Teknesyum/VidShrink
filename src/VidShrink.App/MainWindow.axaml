@@ -73,7 +73,7 @@
                   BorderBrush="{StaticResource NeonBlueBorder}"
                   BorderThickness="{StaticResource BorderThin}"
                   CornerRadius="{StaticResource RadiusControl}"
-                  BoxShadow="{StaticResource GlowBlue}"
+                  BoxShadow="{DynamicResource GlowBlue}"
                   Padding="{StaticResource ButtonPaddingSm}">
             <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
               <TextBlock Grid.Column="0"
@@ -104,7 +104,7 @@
                   BorderBrush="{StaticResource NeonPurpleBorder}"
                   BorderThickness="{StaticResource BorderThin}"
                   CornerRadius="{StaticResource RadiusControl}"
-                  BoxShadow="{StaticResource GlowPurple}"
+                  BoxShadow="{DynamicResource GlowPurple}"
                   Padding="{StaticResource ButtonPaddingSm}">
             <StackPanel Spacing="{StaticResource SpaceMd}">
               <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
