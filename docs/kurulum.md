@@ -4,6 +4,34 @@ The full detail. The one-line install commands are in the [README](../README.md)
 
 ## Install
 
+### Windows — VidShrink-Setup.exe
+
+Download [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
+from the latest release (0.8.3 and later) and run it. It installs the same layout, shortcuts,
+right-click entries and file associations as the script below, under the same registry keys,
+and a test compares the two key trees value by value. What it does differently:
+
+- It downloads the application archive, the launcher archive and the checksum list in
+  parallel and hashes each file while it is being written.
+- It unpacks both archives straight into the install root instead of a staging folder that
+  is then copied, and moves the previous install aside first, so a failed install puts the
+  old one back.
+- When `ffmpeg` and `ffprobe` are not found it does not call WinGet: it range-reads only
+  `ffmpeg.exe` and `ffprobe.exe` out of the pinned GyanD 9.0 archive and checks each against a
+  fixed SHA-256 digest.
+- It writes the registry and the shortcuts itself rather than through PowerShell cmdlets.
+
+The locked-folder handling is the script's: six attempts from 200 ms doubling, and after two
+rounds in which VidShrink still holds the folder it closes it and waits up to 120 seconds.
+
+```text
+VidShrink-Setup.exe                  install or update
+VidShrink-Setup.exe --uninstall      remove shortcuts, right-click entries, associations and the install
+VidShrink-Setup.exe --help           every switch
+```
+
+The release's `checksums-win-x64.txt` lists `VidShrink-Setup.exe` too.
+
 ### Windows — one line
 
 ```powershell

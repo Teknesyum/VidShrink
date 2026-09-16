@@ -1758,6 +1758,27 @@ public sealed class RemoteZip
 
     public async Task<byte[]> ExtractAsync(string entryPath, CancellationToken cancellationToken)
     {
+        var (entry, payload) = await PayloadAsync(entryPath, cancellationToken);
+        return Inflate(entry, payload);
+    }
+
+    public async Task ExtractToAsync(string entryPath, Stream destination, CancellationToken cancellationToken)
+    {
+        var (entry, payload) = await PayloadAsync(entryPath, cancellationToken);
+        if (entry.Method == 0)
+        {
+            await destination.WriteAsync(payload, cancellationToken);
+            return;
+        }
+        if (entry.Method != 8) throw new NotSupportedException($"Desteklenmeyen sıkıştırma: {entry.Method}");
+
+        using var compressed = new MemoryStream(payload);
+        await using var inflater = new DeflateStream(compressed, CompressionMode.Decompress);
+        await inflater.CopyToAsync(destination, 1024 * 1024, cancellationToken);
+    }
+
+    private async Task<(Entry Entry, byte[] Payload)> PayloadAsync(string entryPath, CancellationToken cancellationToken)
+    {
         if (!_entries.TryGetValue(entryPath, out var entry))
             throw new FileNotFoundException($"Arşivde bulunamadı: {entryPath}");
 
@@ -1775,7 +1796,7 @@ public sealed class RemoteZip
                 var extras = BinaryPrimitives.ReadUInt16LittleEndian(whole.AsSpan(28));
                 var body = 30 + names + extras;
                 if (body + entry.CompressedSize <= whole.Length)
-                    return Inflate(entry, whole.AsSpan(body, (int)entry.CompressedSize).ToArray());
+                    return (entry, whole.AsSpan(body, (int)entry.CompressedSize).ToArray());
             }
         }
 
@@ -1788,7 +1809,7 @@ public sealed class RemoteZip
         var payload = await _source.ReadAsync(dataOffset, (int)entry.CompressedSize, cancellationToken);
         if (payload.Length != entry.CompressedSize) throw new InvalidDataException("Dosya eksik indi.");
 
-        return Inflate(entry, payload);
+        return (entry, payload);
     }
 
     private static byte[] Inflate(Entry entry, byte[] payload)

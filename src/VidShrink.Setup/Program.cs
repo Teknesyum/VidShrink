@@ -1,0 +1,209 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
+using VidShrink.Core.Setup;
+
+namespace VidShrink.Setup;
+
+internal static partial class Program
+{
+    private const string Help = """
+        VidShrink-Setup - VidShrink'i kurar, günceller ya da kaldırır.
+
+        Kullanım: VidShrink-Setup.exe [seçenekler]
+
+          --uninstall             Kısayolları, sağ tık menüsünü, ilişkilendirmeyi ve kurulumu kaldırır.
+          --install-root <yol>    Kurulum klasörü (varsayılan %LOCALAPPDATA%\Programs\VidShrink).
+          --registry-root <kök>   Kayıt kökü (varsayılan HKCU:\Software\Classes).
+          --menu-language <dil>   auto, tr ya da en.
+          --skip-shortcuts        Kısayol, menü ve ilişkilendirme yazılmaz.
+          --no-launch             Kurulumdan sonra VidShrink açılmaz.
+          --shortcut-dir <klasör> Kısayollar Masaüstü ve Başlat yerine bu klasöre yazılır.
+          --tag <etiket>          Son yayın yerine bu etiket kurulur.
+          --asset-source <klasör> Yayın varlıkları bu klasörden okunur.
+          --download-ffmpeg       Yüklü FFmpeg olsa da sabitlenmiş FFmpeg indirilir.
+          --timings               Adım sürelerini yazar.
+        """;
+
+    private static int Main(string[] args)
+    {
+        Console.OutputEncoding = new UTF8Encoding(false);
+        var ownConsole = GetConsoleProcessList(new uint[2], 2) == 1;
+        try
+        {
+            var parsed = Parse(args);
+            if (parsed is null)
+            {
+                Console.WriteLine(Help);
+                return 0;
+            }
+            Run(parsed.Value.Options, parsed.Value.Uninstall, parsed.Value.Timings).GetAwaiter().GetResult();
+            return 0;
+        }
+        catch (Exception exception) when (exception is SetupException or IOException or UnauthorizedAccessException or HttpRequestException or ArgumentException)
+        {
+            Write(exception.Message, ConsoleColor.Red);
+            if (ownConsole)
+            {
+                Console.WriteLine("Kapatmak için Enter'a basın.");
+                Console.ReadLine();
+            }
+            return 1;
+        }
+    }
+
+    private static async Task Run(SetupOptions options, bool uninstall, bool timings)
+    {
+        var host = CreateHost();
+        var clock = Stopwatch.StartNew();
+        if (uninstall)
+        {
+            await SetupRunner.UninstallAsync(options, host, CancellationToken.None);
+        }
+        else
+        {
+            var result = await SetupRunner.InstallAsync(options, host, CancellationToken.None);
+            if (timings)
+            {
+                foreach (var step in result.Steps) Console.WriteLine($"sure {step.Name} {step.Milliseconds}");
+            }
+        }
+        if (timings) Console.WriteLine($"sure toplam {clock.ElapsedMilliseconds}");
+    }
+
+    private static (SetupOptions Options, bool Uninstall, bool Timings)? Parse(string[] args)
+    {
+        var localAppData = LocalAppData();
+        string? installRoot = null;
+        var registryRoot = @"HKCU:\Software\Classes";
+        var language = "auto";
+        bool skip = false, noLaunch = false, uninstall = false, timings = false, downloadFfmpeg = false;
+        string? tag = null, assetSource = null, shortcutDirectory = null;
+
+        for (var i = 0; i < args.Length; i++)
+        {
+            string Next() => i + 1 < args.Length ? args[++i] : throw new SetupException($"{args[i]} bir değer bekliyor.");
+            switch (args[i].ToLowerInvariant())
+            {
+                case "--help" or "-h" or "/?": return null;
+                case "--uninstall": uninstall = true; break;
+                case "--install-root": installRoot = Next(); break;
+                case "--registry-root": registryRoot = Next(); break;
+                case "--menu-language":
+                    language = Next();
+                    if (language is not ("auto" or "tr" or "en")) throw new SetupException($"Geçersiz menü dili: {language}");
+                    break;
+                case "--skip-shortcuts": skip = true; break;
+                case "--no-launch": noLaunch = true; break;
+                case "--shortcut-dir": shortcutDirectory = Path.GetFullPath(Next()); break;
+                case "--tag": tag = Next(); break;
+                case "--asset-source": assetSource = Path.GetFullPath(Next()); break;
+                case "--download-ffmpeg": downloadFfmpeg = true; break;
+                case "--timings": timings = true; break;
+                default: throw new SetupException($"Bilinmeyen seçenek: {args[i]}. Yardım için --help.");
+            }
+        }
+
+        var options = new SetupOptions
+        {
+            InstallRoot = installRoot ?? Path.Combine(localAppData, "Programs", "VidShrink"),
+            LocalAppData = localAppData,
+            WorkRoot = Path.GetTempPath(),
+            ClassesRoot = SetupOptions.NormalizeRegistryRoot(registryRoot),
+            MenuLanguage = language,
+            SkipShortcuts = skip,
+            NoLaunch = noLaunch,
+            Tag = tag,
+            AssetSource = assetSource,
+            ShortcutDirectory = shortcutDirectory,
+            ForceFfmpegDownload = downloadFfmpeg
+        };
+        return (options, uninstall, timings);
+    }
+
+    private static SetupHost CreateHost() => new()
+    {
+        Log = message => Write(message, ConsoleColor.Cyan),
+        FindHolders = LockedFolder.FindProcesses,
+        FindTool = FindTool,
+        Shortcuts = new ShellShortcuts(),
+        ShellPackage = new PowerShellPackage(),
+        Windows11 = Environment.OSVersion.Version.Build >= 22000,
+        UiLanguage = () => (GetUserDefaultUILanguage() & 0x3FF) == 0x1F ? "tr" : "en",
+        Launch = path => Process.Start(new ProcessStartInfo(path) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(path) })?.Dispose(),
+        AssociationChanged = ShellRegistration.NotifyAssociationChanged,
+        DesktopDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+        ProgramsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Programs)
+    };
+
+    private static string? FindTool(string name)
+    {
+        var file = name + ".exe";
+        foreach (var directory in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            try
+            {
+                var candidate = Path.Combine(directory.Trim('"'), file);
+                if (File.Exists(candidate)) return candidate;
+            }
+            catch (ArgumentException) { }
+        }
+        var link = Path.Combine(LocalAppData(), "Microsoft", "WinGet", "Links", file);
+        return File.Exists(link) ? link : null;
+    }
+
+    private static string LocalAppData() =>
+        Environment.GetEnvironmentVariable("LOCALAPPDATA") is { Length: > 0 } fromEnvironment
+            ? fromEnvironment
+            : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+    private static void Write(string message, ConsoleColor color)
+    {
+        var previous = Console.ForegroundColor;
+        Console.ForegroundColor = color;
+        Console.WriteLine(message);
+        Console.ForegroundColor = previous;
+    }
+
+    [DllImport("kernel32.dll")]
+    private static extern ushort GetUserDefaultUILanguage();
+
+    [DllImport("kernel32.dll")]
+    private static extern uint GetConsoleProcessList(uint[] processes, uint count);
+
+    private sealed class PowerShellPackage : IShellPackage
+    {
+        public bool Registered() => ShellRegistration.PackageRegistered();
+
+        public void Remove()
+        {
+            if (Invoke($"Get-AppxPackage -Name '{ShellRegistration.PackageName}' | Remove-AppxPackage -ErrorAction Stop") != 0)
+                throw new SetupException("Windows 11 kabuk paketi kaldırılamadı.");
+        }
+
+        public bool Register(string manifestPath, string externalLocation) =>
+            Invoke($"Add-AppxPackage -Register '{Quote(manifestPath)}' -ExternalLocation '{Quote(externalLocation)}' -ErrorAction Stop") == 0;
+
+        private static string Quote(string value) => value.Replace("'", "''");
+
+        private static int Invoke(string command)
+        {
+            var start = new ProcessStartInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), @"WindowsPowerShell\v1.0\powershell.exe"))
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            start.Environment.Remove("PSModulePath");
+            foreach (var argument in new[] { "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", command })
+                start.ArgumentList.Add(argument);
+            using var process = Process.Start(start) ?? throw new SetupException("powershell başlatılamadı.");
+            var output = process.StandardOutput.ReadToEndAsync();
+            var error = process.StandardError.ReadToEndAsync();
+            process.WaitForExit();
+            Task.WaitAll(output, error);
+            return process.ExitCode;
+        }
+    }
+}

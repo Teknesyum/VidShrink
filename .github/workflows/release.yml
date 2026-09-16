@@ -226,6 +226,20 @@ jobs:
             -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
             -o publish-launcher
 
+      - name: Publish the setup program
+        # Windows only. VidShrink-Setup.exe is a trimmed single-file console program that
+        # does what Install-VidShrink.ps1 does without starting PowerShell: it downloads the
+        # two archives in parallel, checks them against checksums-win-x64.txt and unpacks them
+        # straight into the install root. It is not listed in the manifest; the updater never
+        # replaces it, a user runs it once.
+        if: matrix.rid == 'win-x64'
+        run: |
+          dotnet publish src/VidShrink.Setup/VidShrink.Setup.csproj \
+            -c Release \
+            -p:Version=${{ needs.version.outputs.version }} \
+            -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
+            -o publish-setup
+
       - uses: actions/download-artifact@v4
         if: matrix.rid == 'win-x64'
         with:
@@ -314,6 +328,10 @@ jobs:
           if [ -d publish-launcher ]; then
             ( cd publish-launcher && zip -qr "$GITHUB_WORKSPACE/assets/vidshrink-launcher-${{ matrix.rid }}.zip" . )
             checksummed="$checksummed vidshrink-launcher-${{ matrix.rid }}.zip"
+          fi
+          if [ -f publish-setup/VidShrink-Setup.exe ]; then
+            cp publish-setup/VidShrink-Setup.exe assets/VidShrink-Setup.exe
+            checksummed="$checksummed VidShrink-Setup.exe"
           fi
           ( cd assets && sha256sum $checksummed > "checksums-${{ matrix.rid }}.txt" )
           cat assets/checksums-${{ matrix.rid }}.txt
