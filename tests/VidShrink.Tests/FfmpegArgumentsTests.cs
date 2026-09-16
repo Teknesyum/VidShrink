@@ -132,7 +132,7 @@ public sealed class FfmpegArgumentsTests
 
     [Theory]
     [InlineData("libx265", "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2", "keyint=300:min-keyint=30:scenecut=40")]
-    [InlineData("libsvtav1", "-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2", "keyint=300:scd=1")]
+    [InlineData("libsvtav1", "-svtav1-params", "tune=1:enable-variance-boost=0", "keyint=300:scd=1")]
     public void Yazilim_psy_bayragi_yalniz_olculen_destekte_uretilir(string codec, string option, string value, string keyframeParams)
     {
         var plan = Plan(codec);
@@ -460,7 +460,7 @@ public sealed class FfmpegArgumentsTests
 
         Assert.Equal(1, args.Count(a => a == "-svtav1-params"));
         var value = args[args.IndexOf("-svtav1-params") + 1];
-        Assert.Contains("tune=0:enable-variance-boost=1:variance-boost-strength=2", value);
+        Assert.Contains("tune=1:enable-variance-boost=0", value);
         Assert.Contains("fast-decode=1", value);
     }
 
