@@ -52,7 +52,9 @@ public partial class MainWindow : Window
 
     // Şeridin kapatıldığı sürüm. Ayar dosyası değil, yanına konan bir
     // işaret dosyası; UpdateSettings'e ait olduğu için oraya yazılmaz.
-    private const string DismissedNoticeFileName = "dismissed-update.txt";
+    internal const string DismissedNoticeFileName = "dismissed-update.txt";
+    internal const string PlayerHistoryFileName = "player-history.json";
+    internal const string LayoutFileName = "layout.json";
 
     private static readonly ConversionPlan ConversionDefaults = new();
 
@@ -162,7 +164,7 @@ public partial class MainWindow : Window
 
         Player.HistoryPath = () => Path.Combine(
             Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
-            "player-history.json");
+            PlayerHistoryFileName);
 
         RefreshOutputAndFfmpegChoiceLists();
         BuildLanguageSwitch();
@@ -1180,7 +1182,9 @@ public partial class MainWindow : Window
     {
         try
         {
-            UpdateSettings.Delete(SettingsPathOverride);
+            var settingsFile = SettingsPathOverride ?? UpdateSettings.DefaultPath;
+            AppDataReset.Run(Path.GetDirectoryName(settingsFile), settingsFile);
+            if (File.Exists(DismissedNoticePath)) File.Delete(DismissedNoticePath);
             var defaults = new UpdateSettings();
             _settingsSyncing = true;
             UseLanguage(ResolveLanguage(null, CultureInfo.CurrentUICulture.Name));
@@ -2540,7 +2544,7 @@ public partial class MainWindow : Window
 
     private string SplitterSettingsPath => Path.Combine(
         Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
-        "layout.json");
+        LayoutFileName);
 
     private void SaveSplitterSettings()
     {
