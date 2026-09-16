@@ -481,4 +481,5 @@ preset × CRF/kbit × film-grain × tune × keyint ızgarasıyla (`IZGARA` JSON)
 (en yüksek YDIF) ve `ekran` (Netflix "Debugging", CC BY 4.0). Ağır ızgara CI'da; yerelde yalnız kısa kontrol.
 Çağrı: etiket `olcum-kalite-handbrake+av1__karanlik+hareketli+ekran--N` ya da dispatch girdileri
 `isler`, `kesitler`, `kbitler`, `izgara`, `ekran_url`. Tablolar `docs/olcumler/handbrake-kesit-turu.md`,
-`docs/olcumler/av1-izgara.md`.
+`docs/olcumler/av1-izgara.md`. Adlı ızgara: etiket `olcum-kalite-av1__<kesitler>__<ad>--N`, dosya
+`tools/kalite-paketi-3/izgaralar/<ad>.json`; eş bayt koşumu `docs/olcumler/av1-esbayt.md`.
