@@ -586,3 +586,14 @@ Başarılı!  - Başarısız: 0, Başarılı: 1, Atlanan: 0, Toplam: 1
 **Ders: bu ölçü bandın kaybını değil, sayımın kaymasını da yakalıyor.** Kırmızı
 görünce önce satırın gerçekten silinip silinmediğine bakılır; duruyorsa kusur sayaçta,
 belgenin sayısında değil. Sayıyı 21'e çekmek iki gerçek bandı belgeden silmiş olurdu.
+
+## Sayım 0.8.3'te 23'ten 24'e çıktı: kurucunun açık programı kapatması
+
+0.8.3'ün main koşumu (`35142997863`) bu ölçüyle kırmızıya döndü:
+`saat turevi iddia sayisi 24, belge 23 diyor`. Yeni satır `UpdaterTests.cs:1467`:
+`TheDeletionStepClosesARunningVidShrinkInsteadOfGivingUp`, silme adımı bittikten sonra
+kurulum kökündeki açık süreç için `holder.WaitForExit(5000)` bekliyor.
+
+**Bant gerçek, sayım doğru.** Süreç silme adımında zaten öldürülmüş olmalı; 5 sn tavanı
+yalnız işletim sisteminin çıkışı bildirmesini bekliyor. Makine yavaşlarsa iddia gevşemez,
+tavan dolmadan çıkış gelir. Sayı 24'e çekildi.
