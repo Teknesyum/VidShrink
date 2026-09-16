@@ -7,6 +7,16 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-09-16
+
+### Changed
+
+- Opening a video from the shell reaches the first frame about 455 ms sooner (median of 14 paired runs, 14 of 14 in favour; see `docs/olcumler/acilis-hizi.md`).
+- On Windows the window icon loads from the ICO instead of decoding the 1254 px PNG.
+- The title-bar logo decodes in the background.
+- Language names are read without loading all 42 catalogues.
+- A file opened from the shell selects the player tab in the constructor, so the Shrink tab is no longer laid out first.
+
 ## [0.8.1] - 2026-09-16
 
 ### Fixed
