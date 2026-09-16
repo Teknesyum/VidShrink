@@ -61,6 +61,7 @@ internal partial class RecorderView
     {
         var advanced = AdvancedMode;
         PanelOptions.IsVisible = advanced;
+        PanelAdvanced.IsVisible = advanced;
         Grid.SetColumnSpan(PanelTarget, advanced ? 1 : 2);
     }
 

@@ -39,6 +39,7 @@ internal partial class RecorderView : UserControl
         InitializeComponent();
         _settings = RecorderSettings.Load(RecorderSettings.FilePath);
         InitHedef();
+        InitGelismis();
         InitOtomatik();
         InitSes();
         InitSerit();
@@ -86,6 +87,7 @@ internal partial class RecorderView : UserControl
         RefreshTargetLabels();
         RefreshAudioBoxes();
         RefreshCountdownLabels();
+        RefreshAdvancedLabels();
         RefreshSerit();
     }
 

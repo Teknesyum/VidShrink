@@ -884,6 +884,181 @@ public sealed class KaydediciArayuzTests
             Assert.Contains("{0}", Locales.Values(language).GetValueOrDefault("recorder.hotkey.taken") ?? string.Empty);
     }
 
+    private static T GelismisOlc<T>(Func<RecorderView, Func<string, Avalonia.Controls.Control>, T> olc)
+    {
+        var dosya = RecorderSettings.FilePath!;
+        var onceki = File.Exists(dosya) ? File.ReadAllBytes(dosya) : null;
+        try
+        {
+            return AppHost.Run<T>(() =>
+            {
+                var view = new RecorderView();
+                Avalonia.Controls.Control Bul(string ad) => Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Control>(view, ad)!;
+                ((Avalonia.Controls.RadioButton)Bul("RadAdvanced")).IsChecked = true;
+                ((Avalonia.Controls.RadioButton)Bul("RadManual")).IsChecked = true;
+                return olc(view, Bul);
+            });
+        }
+        finally
+        {
+            if (onceki is null) File.Delete(dosya);
+            else File.WriteAllBytes(dosya, onceki);
+        }
+    }
+
+    private static void Sec(Avalonia.Controls.Control kutu, string oge)
+    {
+        var combo = (Avalonia.Controls.ComboBox)kutu;
+        combo.SelectedIndex = combo.ItemsSource!.Cast<object>().Select(o => o.ToString()).ToList().IndexOf(oge);
+    }
+
+    [Fact]
+    public void GelismisPanelYalnizGelismisKipteGorunur()
+    {
+        var (gelismis, basit) = GelismisOlc((view, bul) =>
+        {
+            var g = bul("PanelAdvanced").IsVisible;
+            ((Avalonia.Controls.RadioButton)bul("RadSimple")).IsChecked = true;
+            return (g, bul("PanelAdvanced").IsVisible);
+        });
+
+        Assert.True(gelismis);
+        Assert.False(basit);
+    }
+
+    [Fact]
+    public void GelismisKollarIstegeVeAyaraGecer()
+    {
+        var (istek, ayar, hata) = GelismisOlc<(VidShrink.Core.RecorderRequest?, RecorderSettings, string)>((view, bul) =>
+        {
+            Sec(bul("CmbCodec"), "libx264");
+            Sec(bul("CmbContainer"), "MOV");
+            ((Avalonia.Controls.TextBox)bul("TxtScaleWidth")).Text = "1280";
+            ((Avalonia.Controls.TextBox)bul("TxtScaleHeight")).Text = "720";
+            ((Avalonia.Controls.TextBox)bul("TxtKeyframe")).Text = "4";
+            Sec(bul("CmbProfile"), "high");
+            Sec(bul("CmbTune"), "zerolatency");
+            ((Avalonia.Controls.ComboBox)bul("CmbRateControl")).SelectedIndex = (int)VidShrink.Core.RecorderRateControl.Bitrate;
+            ((Avalonia.Controls.TextBox)bul("TxtBitrate")).Text = "3000";
+            ((Avalonia.Controls.TextBox)bul("TxtMaxBitrate")).Text = "4000";
+            ((Avalonia.Controls.TextBox)bul("TxtBuffer")).Text = "8000";
+            Sec(bul("CmbPixelFormat"), "yuv444p");
+            Sec(bul("CmbColorSpace"), "bt709");
+            Sec(bul("CmbColorRange"), "pc");
+            ((Avalonia.Controls.TextBox)bul("TxtMaxDuration")).Text = "60";
+            ((Avalonia.Controls.TextBox)bul("TxtSplitSeconds")).Text = "30";
+            ((Avalonia.Controls.TextBox)bul("TxtSplitMegabytes")).Text = "";
+            ((Avalonia.Controls.ComboBox)bul("CmbAudioLayout")).SelectedIndex = (int)VidShrink.Core.AudioTrackLayout.SeparateTracks;
+            ((Avalonia.Controls.TextBox)bul("TxtAudioGain")).Text = "-3.5";
+            ((Avalonia.Controls.CheckBox)bul("ChkNoiseGate")).IsChecked = true;
+            ((Avalonia.Controls.CheckBox)bul("ChkNoiseSuppression")).IsChecked = true;
+            return (view.BuildRequest(applyAuto: false), view.Settings, view.ErrorText);
+        });
+
+        Assert.Equal(string.Empty, hata);
+        Assert.NotNull(istek);
+        Assert.Equal(VidShrink.Core.RecorderContainer.Mov, istek!.Container);
+        Assert.Equal(new VidShrink.Core.RecorderScale(1280, 720), istek.Scale);
+        Assert.Equal(4, istek.KeyframeSeconds);
+        Assert.Equal("high", istek.Profile);
+        Assert.Equal("zerolatency", istek.Tune);
+        Assert.Equal(VidShrink.Core.RecorderRateControl.Bitrate, istek.RateControl);
+        Assert.Equal(3000, istek.BitrateKbps);
+        Assert.Equal(4000, istek.MaxBitrateKbps);
+        Assert.Equal(8000, istek.BufferKbits);
+        Assert.Equal("yuv444p", istek.PixelFormat);
+        Assert.Equal("bt709", istek.ColorSpace);
+        Assert.Equal("pc", istek.ColorRange);
+        Assert.Equal(TimeSpan.FromSeconds(60), istek.MaxDuration);
+        Assert.Equal(TimeSpan.FromSeconds(30), istek.Split!.Duration);
+        Assert.Null(istek.Split.Megabytes);
+        Assert.Equal(VidShrink.Core.AudioTrackLayout.SeparateTracks, ayar.AudioLayout);
+        Assert.Equal(-3.5, ayar.AudioGainDb);
+        Assert.True(ayar.AudioNoiseGate);
+        Assert.True(ayar.AudioNoiseSuppression);
+    }
+
+    [Fact]
+    public void GelismisSayiOkunamazsaIstekKurulmaz()
+    {
+        var (istek, hata, etiket) = GelismisOlc((view, bul) =>
+        {
+            ((Avalonia.Controls.TextBox)bul("TxtKeyframe")).Text = "iki";
+            return (view.BuildRequest(applyAuto: false), view.ErrorText,
+                VidShrink.App.LanguageCatalog.Display(VidShrink.App.Localization.Strings.Get("recorder.advanced.keyframe")));
+        });
+
+        Assert.Null(istek);
+        Assert.Contains(etiket, hata);
+    }
+
+    [Fact]
+    public void KodlayiciDegisinceProfilVeBicimListesiYenilenir()
+    {
+        var (x264, vp9Profil, vp9Etkin, av1Bicimler, secilenBicim) = GelismisOlc((view, bul) =>
+        {
+            Sec(bul("CmbCodec"), "libx264");
+            var profiller = ((Avalonia.Controls.ComboBox)bul("CmbProfile")).ItemsSource!.Cast<object>().Select(o => o.ToString()!).ToList();
+            Sec(bul("CmbPixelFormat"), "yuv444p");
+            Sec(bul("CmbCodec"), "libvpx-vp9");
+            var profil = (Avalonia.Controls.ComboBox)bul("CmbProfile");
+            var vp9 = profil.ItemsSource!.Cast<object>().Count();
+            var etkin = profil.IsEnabled;
+            Sec(bul("CmbCodec"), "libsvtav1");
+            var bicim = (Avalonia.Controls.ComboBox)bul("CmbPixelFormat");
+            return (profiller, vp9, etkin, bicim.ItemsSource!.Cast<object>().Select(o => o.ToString()!).ToList(), bicim.SelectedItem as string);
+        });
+
+        Assert.Contains("high", x264);
+        Assert.Equal(1, vp9Profil);
+        Assert.False(vp9Etkin);
+        Assert.Equal(VidShrink.Core.RecorderArguments.PixelFormatsFor("libsvtav1"), av1Bicimler);
+        Assert.Equal(VidShrink.Core.RecorderArguments.DefaultPixelFormat, secilenBicim);
+    }
+
+    [Fact]
+    public void OtomatikKodlayiciyaUymayanKolDusurulur()
+    {
+        var istek = new VidShrink.Core.RecorderRequest
+        {
+            Platform = VidShrink.Core.RecorderPlatform.Windows,
+            Target = VidShrink.Core.RecorderTargetKind.Screen,
+            VideoCodec = "hevc_nvenc",
+            Profile = "high",
+            Tune = "zerolatency",
+            PixelFormat = "yuv422p"
+        };
+
+        var uyan = RecorderView.FitToCodec(istek);
+        var dokunulmayan = RecorderView.FitToCodec(istek with { VideoCodec = "libx264" });
+
+        Assert.Null(uyan.Profile);
+        Assert.Null(uyan.Tune);
+        Assert.Equal(VidShrink.Core.RecorderArguments.DefaultPixelFormat, uyan.PixelFormat);
+        Assert.Equal("high", dokunulmayan.Profile);
+        Assert.Equal("zerolatency", dokunulmayan.Tune);
+        Assert.Equal("yuv422p", dokunulmayan.PixelFormat);
+    }
+
+    [Fact]
+    public void GelismisAnahtarlariButunDillerde()
+    {
+        var kok = new DirectoryInfo(AppContext.BaseDirectory);
+        while (kok is not null && !File.Exists(Path.Combine(kok.FullName, "VidShrink.sln"))) kok = kok.Parent;
+        var xaml = File.ReadAllText(Path.Combine(kok!.FullName, "src", "VidShrink.App", "Recorder", "RecorderView.axaml"));
+        var kod = File.ReadAllText(Path.Combine(kok.FullName, "src", "VidShrink.App", "Recorder", "RecorderView.Gelismis.cs"));
+        var anahtarlar = System.Text.RegularExpressions.Regex.Matches(xaml + kod, @"recorder\.advanced\.[a-z-]+")
+            .Select(m => m.Value).Distinct().ToList();
+
+        Assert.True(anahtarlar.Count >= 25);
+        foreach (var language in Locales.Languages)
+        {
+            var values = Locales.Values(language);
+            foreach (var anahtar in anahtarlar)
+                Assert.False(string.IsNullOrWhiteSpace(values.GetValueOrDefault(anahtar)), language + " " + anahtar);
+        }
+    }
+
     [Fact]
     public void KareDugmesiOturumunKaresiniAlir()
     {

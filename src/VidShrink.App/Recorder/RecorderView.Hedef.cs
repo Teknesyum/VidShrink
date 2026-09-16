@@ -121,6 +121,9 @@ internal partial class RecorderView
     /// </para>
     /// </summary>
     internal RecorderRequest? BuildRequest(bool applyAuto = true)
+        => ReadAdvanced() && BuildChosen(applyAuto) is { } request ? FitToCodec(request) : null;
+
+    private RecorderRequest? BuildChosen(bool applyAuto)
     {
         if (!int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps))
         {

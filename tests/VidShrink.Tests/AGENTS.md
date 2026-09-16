@@ -43,7 +43,9 @@ sürümden (`x.0.0`) önce koşar.
   (boşta/kaydediyor/duraklatıldı) paletin üç ayrı fırçasından, simge Skia'da çizilip merkez pikseli okunur; ipucu
   süre ve diskteki anlık MB (`RecorderSession.WrittenMb`); sahte `IRecorderTrayHost`, TrayIcon kurulmaz. Genel kısayol: tanım tek yerde
   (`RecorderHotkeys`), sahte `IGlobalHotkeys` çakışmayı ve basışı taklit eder; başsızda `NoGlobalHotkeys`
-  seçilir, gerçek RegisterHotKey testte kaydedilmez. Geçici ayar dosyaları `.calisma/kap-olcu-*`, test siler.
+  seçilir, gerçek RegisterHotKey testte kaydedilmez. Gelişmiş panel: on kol denetimden
+  `BuildRequest`'e ve ayara geçer, kodlayıcı değişince profil/tune/piksel listesi yenilenir, otomatik kodlayıcıya
+  uymayan kol `FitToCodec` ile düşer. Geçici ayar dosyaları `.calisma/kap-olcu-*`, test siler.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.
