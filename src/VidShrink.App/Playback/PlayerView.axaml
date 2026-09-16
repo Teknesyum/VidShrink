@@ -159,9 +159,9 @@
                         TickFrequency="{StaticResource PlaybackVolumeTick}"
                         IsSnapToTickEnabled="True"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
-                <TextBlock x:Name="TxtSeritVolume"
-                           Theme="{StaticResource PlaybackTimeText}"
-                           VerticalAlignment="Center"/>
+                <Border Theme="{StaticResource PlaybackValueChip}">
+                  <TextBlock x:Name="TxtSeritVolume" Theme="{StaticResource PlaybackValueText}"/>
+                </Border>
               </StackPanel>
 
               <StackPanel Grid.Column="1"
@@ -206,9 +206,9 @@
                         TickFrequency="{StaticResource PlaybackSpeedTick}"
                         IsSnapToTickEnabled="True"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.faster}"/>
-                <TextBlock x:Name="TxtSeritSpeed"
-                           Theme="{StaticResource PlaybackTimeText}"
-                           VerticalAlignment="Center"/>
+                <Border Theme="{StaticResource PlaybackValueChip}">
+                  <TextBlock x:Name="TxtSeritSpeed" Theme="{StaticResource PlaybackValueText}"/>
+                </Border>
                 <Button x:Name="BtnSeritFullScreen" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.fullscreen}">
                   <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"

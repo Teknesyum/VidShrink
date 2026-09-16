@@ -112,7 +112,7 @@ public class PencereKabuguTests
     {
         var code = Code();
 
-        Assert.Contains("internal bool ChromeHidesItself => Tabs.SelectedIndex == PlayerTabIndex;", code);
+        Assert.Contains("internal bool ChromeHidesItself => Tabs.SelectedIndex == PlayerTabIndex && Player.LoadedPath is not null;", code);
         Assert.Contains("private void ApplyChromeMode() => ShowChrome(!ChromeHidesItself);", code);
         Assert.Contains("Tabs.SelectionChanged += (_, _) => ApplyChromeMode();", code);
         Assert.Contains("if (!ChromeHidesItself)", code);

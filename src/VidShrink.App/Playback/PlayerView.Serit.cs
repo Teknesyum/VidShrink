@@ -147,7 +147,7 @@ internal partial class PlayerView
         if (TxtSeritTime is null) return;
 
         GlyphSeritPlay.Data = Icon(_playing ? "IconPause" : "IconPlay");
-        GlyphSeritVolume.Data = Icon(_volume <= 0 ? "IconVolumeMute" : "IconVolume");
+        GlyphSeritVolume.Data = Icon(_muted || _volume <= 0 ? "IconVolumeMute" : "IconVolume");
 
         AutomationProperties.SetName(BtnSeritPlay,
             Strings.Get(_playing ? "playback.control.pause" : "playback.control.play"));
@@ -158,7 +158,7 @@ internal partial class PlayerView
 
         TxtSeritTime.Text = ClockPair(_seek.Target, _seek.Duration);
         TxtSeritVolume.Text = _volume.ToString("0", CultureInfo.InvariantCulture);
-        TxtSeritSpeed.Text = _speed.ToString("0.##", CultureInfo.InvariantCulture) + "x";
+        TxtSeritSpeed.Text = _speed.ToString("0.00", CultureInfo.InvariantCulture) + "×";
 
         _seritSliding = true;
         SliderSeritVolume.Maximum = VolumeCeiling();

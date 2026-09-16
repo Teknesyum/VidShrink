@@ -399,7 +399,7 @@ public sealed class OynaticiAracTests
         Assert.Equal(AracKanit.N(rapor.tavan), rapor.sesEtiketi);
         Assert.Equal(1.25, rapor.hizli, 3);
         Assert.Equal(1.0, rapor.normal, 3);
-        Assert.Equal("1x", rapor.hizEtiketi);
+        Assert.Equal("1.00×", rapor.hizEtiketi);
     }
 
     /// <summary>

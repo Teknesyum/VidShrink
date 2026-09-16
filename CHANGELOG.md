@@ -7,6 +7,21 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-09-16
+
+### Changed
+
+- The player strip sliders use the timeline look: blue track, blue fill and a square thumb, no pink fill.
+- Volume and speed readings sit in blue value chips; speed reads `1.00×` instead of `1x`.
+- Top tabs share the title-bar button face: no fill, blue label, pink hover.
+- The strip outline is drawn with the strong blue border, so its top edge no longer fades into the veil.
+- With no media loaded the title bar stays open on the player tab too.
+
+### Fixed
+
+- The mute icon now follows mute, not only a zero volume.
+- Raw pointer tests drive mute, volume, speed and play through the real input path in the main window.
+
 ## [0.7.1] - 2026-09-16
 
 ### Fixed

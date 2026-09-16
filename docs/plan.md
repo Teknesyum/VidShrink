@@ -361,3 +361,16 @@ istemezse kendi motorunu kuruyor ve bekleyen motor `Birak` ile atılıyor.
 
 `cerceve` ~216 ms (Avalonia çerçeve kurulumu), `Show()` ~173 ms, `Loaded` ~99 ms.
 Üçü de çerçeve düzeyinde; kendi kodumuzda kesilecek büyük kalem kalmadı.
+
+## E dalgası — Oynatıcı şeridi ve üst menü (16 Eylül 2026)
+
+Dal `t0/oynatici-serit`. Dokunulan dosyalar: `PlayerView.axaml`, `PlayerView.Serit.cs`,
+`Themes/Playback.axaml`, `Themes/Controls.axaml`, `MainWindow.axaml.cs`, iki test.
+
+1. Medya yokken üst şerit de açık: `ChromeHidesItself` oynatıcı sekmesi **ve** yüklü medya ister.
+2. Sessiz simgesi `_muted`'ı da okuyor (ham fare ölçüsünde bulundu: simge sessizde değişmiyordu).
+3. Ses/hız okuması düz metin değil: mavi çerçeveli değer çipi, `100%` ve `1.00×`.
+4. `PlaybackSlider` kendi şablonu: zaman çubuğunun yolu, dolgusu ve tutamacı — pembe dolgu yok.
+5. Üst sekmeler sağdaki başlık düğmeleriyle aynı yüz: dolgu yok, mavi yazı, pembe üzerine gelme.
+6. Şeridin üst anahattı güçlü mavi (`NeonBlueBorderStrong`), perde üst kenarda soluklaştırmasın.
+7. Doğrulama: `OynaticiGercekGirdiTests` ham fareyle mute/ses/hız/oynat; `PencereKabuguTests` pinleri güncellenir.

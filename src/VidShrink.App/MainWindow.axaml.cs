@@ -617,7 +617,7 @@ public partial class MainWindow : Window
         ApplyChromeMode();
     }
 
-    internal bool ChromeHidesItself => Tabs.SelectedIndex == PlayerTabIndex;
+    internal bool ChromeHidesItself => Tabs.SelectedIndex == PlayerTabIndex && Player.LoadedPath is not null;
 
     private void ApplyChromeMode() => ShowChrome(!ChromeHidesItself);
 
