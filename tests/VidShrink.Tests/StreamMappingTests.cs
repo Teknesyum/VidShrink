@@ -463,7 +463,7 @@ public sealed class StreamMappingTests
         Assert.Contains("matroska", output.FormatName);
         Assert.Equal(new[] { "eng", "tur" }, output.Of("audio").Select(track => track.Language));
         Assert.All(output.Of("audio"), track => Assert.True(track.Channels <= 2));
-        Assert.Equal(new[] { ("subrip", "tur"), ("hdmv_pgs_subtitle", "eng") }, output.Of("subtitle").Select(track => (track.Codec, track.Language)));
+        Assert.Equal(new[] { ("subrip", "tur"), ("hdmv_pgs_subtitle", "eng") }, output.Of("subtitle").Select(track => (track.Codec, track.Language ?? "")));
         Assert.Equal(2, output.Chapters);
         Assert.Equal("Deneme Basligi", output.Title);
     }
