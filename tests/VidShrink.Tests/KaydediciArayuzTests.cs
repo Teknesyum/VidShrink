@@ -784,6 +784,106 @@ public sealed class KaydediciArayuzTests
         }
     }
 
+    private sealed class SahteKisayol : IGlobalHotkeys
+    {
+        public HashSet<Avalonia.Input.Key> Dolu { get; } = new();
+
+        public int Kayit { get; private set; }
+
+        public int Birakma { get; private set; }
+
+        public Action<HotkeyAction>? Basildi { get; private set; }
+
+        public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed)
+        {
+            Kayit++;
+            Basildi = pressed;
+            return bindings.Where(b => Dolu.Contains(b.Key)).ToList();
+        }
+
+        public void Unregister() => Birakma++;
+    }
+
+    [Fact]
+    public void KisayolTanimiTekYerde()
+    {
+        Assert.Equal(HotkeyAction.Toggle, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F7, Avalonia.Input.KeyModifiers.None));
+        Assert.Equal(HotkeyAction.Stop, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F8, Avalonia.Input.KeyModifiers.None));
+        Assert.Equal(HotkeyAction.Frame, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F9, Avalonia.Input.KeyModifiers.None));
+        Assert.Null(RecorderHotkeys.ActionOf(Avalonia.Input.Key.F7, Avalonia.Input.KeyModifiers.Control));
+        Assert.Null(RecorderHotkeys.ActionOf(Avalonia.Input.Key.F6, Avalonia.Input.KeyModifiers.None));
+        Assert.Equal(3, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
+        Assert.Equal(Enum.GetValues<HotkeyAction>().Length, RecorderHotkeys.All.Select(b => b.Action).Distinct().Count());
+    }
+
+    [Fact]
+    public void TesteGercekKisayolKaydedilmez()
+    {
+        var tur = AppHost.Run<string>(() => new RecorderView().GlobalHotkeys.GetType().Name);
+
+        Assert.Equal(nameof(NoGlobalHotkeys), tur);
+    }
+
+    [Fact]
+    public void GenelKisayolCakismasiKullaniciyaSoylenir()
+    {
+        var (kayit, birakma, cakisma, hata, bekleyen) = AppHost.Run<(int, int, string, string, string)>(() =>
+        {
+            var view = new RecorderView();
+            var sahte = new SahteKisayol();
+            sahte.Dolu.Add(Avalonia.Input.Key.F8);
+            view.GlobalHotkeys = sahte;
+            view.ActivateHotkeys();
+            view.ActivateHotkeys();
+            var c = RecorderHotkeys.Names(view.HotkeyConflicts);
+            var h = view.ErrorText;
+            view.DeactivateHotkeys();
+            view.DeactivateHotkeys();
+            return (sahte.Kayit, sahte.Birakma, c, h,
+                VidShrink.App.LanguageCatalog.Display(VidShrink.App.Localization.Strings.Get("recorder.hotkey.taken")));
+        });
+
+        Assert.Equal(1, kayit);
+        Assert.Equal(1, birakma);
+        Assert.Equal("F8", cakisma);
+        Assert.Contains("F8", hata);
+        Assert.Contains("{0}", bekleyen);
+    }
+
+    [Fact]
+    public void GenelKisayolBasilincaEylemCalisir()
+    {
+        var (gizli, durdu, yenidenGorunur) = AppHost.Run<(bool, bool, bool)>(() =>
+        {
+            var view = new RecorderView();
+            var sahte = new SahteKisayol();
+            view.GlobalHotkeys = sahte;
+            view.ActivateHotkeys();
+            sahte.Basildi!(HotkeyAction.Frame);
+            var g = view.FrameHiddenByUser;
+            var d = view.RunHotkeyAsync(HotkeyAction.Stop).GetAwaiter().GetResult();
+            sahte.Basildi!(HotkeyAction.Frame);
+            return (g, d, !view.FrameHiddenByUser);
+        });
+
+        Assert.True(gizli);
+        Assert.False(durdu);
+        Assert.True(yenidenGorunur);
+    }
+
+    [Fact]
+    public void KisayolAnahtariButunDillerde()
+    {
+        var kok = new DirectoryInfo(AppContext.BaseDirectory);
+        while (kok is not null && !File.Exists(Path.Combine(kok.FullName, "VidShrink.sln"))) kok = kok.Parent;
+        var bag = File.ReadAllText(Path.Combine(kok!.FullName, "src", "VidShrink.App", "Recorder", "RecorderView.axaml.cs"));
+
+        Assert.Contains("ActivateHotkeys();", bag);
+        Assert.Contains("DeactivateHotkeys();", bag);
+        foreach (var language in Locales.Languages)
+            Assert.Contains("{0}", Locales.Values(language).GetValueOrDefault("recorder.hotkey.taken") ?? string.Empty);
+    }
+
     [Fact]
     public void KareDugmesiOturumunKaresiniAlir()
     {

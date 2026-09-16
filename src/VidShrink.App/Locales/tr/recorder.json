@@ -98,5 +98,6 @@
   "recorder.countdown.left": "Başlıyor: {0}",
   "recorder.countdown.cancel": "İptal",
   "recorder.tray.idle": "VidShrink kaydedici · {0}",
-  "recorder.tray.live": "VidShrink kaydedici · {0} · {1} · {2} MB"
+  "recorder.tray.live": "VidShrink kaydedici · {0} · {1} · {2} MB",
+  "recorder.hotkey.taken": "Genel kısayol başka bir uygulamada kayıtlı: {0}. Bu tuşlar yalnız VidShrink penceresi öndeyken çalışır."
 }

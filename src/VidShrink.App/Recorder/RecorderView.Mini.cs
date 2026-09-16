@@ -35,31 +35,11 @@ internal partial class RecorderView
         AddHandler(KeyDownEvent, OnHotkey, RoutingStrategies.Tunnel);
     }
 
-    /// <summary>
-    /// F7 başlat/duraklat, F8 durdur. Tuş ancak kaydedici görünürken dinleniyor: başka
-    /// sekmedeyken F7'ye basan kullanıcı kayıt başlatmak istemiyor.
-    /// </summary>
     private async void OnHotkey(object? sender, KeyEventArgs e)
     {
-        if (e.KeyModifiers != KeyModifiers.None) return;
-
-        switch (e.Key)
-        {
-            case Key.F7:
-                e.Handled = true;
-                await ToggleAsync();
-                break;
-
-            case Key.F8 when HasSession || CountingDown:
-                e.Handled = true;
-                await StopAsync();
-                break;
-
-            case Key.F9:
-                e.Handled = true;
-                ToggleFrame();
-                break;
-        }
+        if (RecorderHotkeys.ActionOf(e.Key, e.KeyModifiers) is not { } action || !CanRun(action)) return;
+        e.Handled = true;
+        await RunHotkeyAsync(action);
     }
 
     /// <summary>
