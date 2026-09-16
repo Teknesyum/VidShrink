@@ -206,6 +206,19 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Publish the command line
+        # The headless CLI ships beside the application in the same folder and archive, so it
+        # updates with it and never updates itself. It goes first: the application publish
+        # that follows overwrites the shared assemblies with its ReadyToRun builds. On macOS
+        # the executable is vidshrink-cli, because the bundle's VidShrink host would collide
+        # with vidshrink on a case-insensitive volume.
+        run: |
+          dotnet publish src/VidShrink.Cli/VidShrink.Cli.csproj \
+            -c Release -r ${{ matrix.rid }} --self-contained \
+            -p:Version=${{ needs.version.outputs.version }} \
+            -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
+            -o publish/${{ matrix.rid }}
+
       - name: Publish
         run: |
           dotnet publish src/VidShrink.App/VidShrink.App.csproj \
