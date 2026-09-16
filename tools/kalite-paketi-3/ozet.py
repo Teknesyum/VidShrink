@@ -175,8 +175,95 @@ def av1(kok, kesitler):
             sure = sum(s["kodlama_sn"] for s in v) / len(v)
             print(f"| {k} | {f(hedef,1)} | {a[1]} | {a[2]} | {a[3]} | {f(ara('vmafneg_ort'))} | {f(ara('xpsnr'))} | {f(ara('karanlik_psnr'))} | {f(sure,1)} |")
 
+def bul(kok, ad):
+    return yukle(next(Path(kok).rglob(ad)))
+
+
+def hedefbant(kok, kesitler):
+    print("| Kesit | Kol | svtav1-params | Kaynak | Hedef MB | Bant alt MB | 1. deneme kbit | 1. hedeflenen MB | 1. çıkan MB | 1. doluluk % | 1. bantta | 1. dal | Deneme | Teslim MB | Teslim taşma | Kodlama sn |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for k in kesitler:
+        for s in bul(kok, f"hedefbant-{k}.json"):
+            kaynak = f"{s['kaynak_bas']}+{f(s['kaynak_sure'],1)} sn{' döngü' if s['kaynak_dongu'] else ''}"
+            print(f"| {k} | {s['kol']} | `{s['svtav1_params']}` | {kaynak} | {f(s['hedef_mb'],0)} | {f(s['bant_alt_mb'],3)} | {s['ilk_kbit']} | {f(s['ilk_hedeflenen_mb'],3)} | {f(s['ilk_cikan_mb'],3)} | {f(s['ilk_doluluk'])} | {'evet' if s['ilk_bantta'] else 'hayır'} | {s['ilk_dal']} | {s['deneme']} | {f(s['teslim_mb'],3)} | {'VAR' if s['teslim_tasma'] else 'yok'} | {f(s['kodlama_sn'],1)} |")
+    print()
+    print("| Kesit | Kol | Hedef MB | Denemeler (no:dal:kbit:çıkan MB) |")
+    print("|---|---|---|---|")
+    for k in kesitler:
+        for s in bul(kok, f"hedefbant-{k}.json"):
+            print(f"| {k} | {s['kol']} | {f(s['hedef_mb'],0)} | {s['dallar']} |")
+
+
+def egri(satirlar, alan):
+    v = sorted(satirlar, key=lambda s: s["kbps"])
+    noktalar = []
+    for s in v:
+        if s[alan] is None:
+            continue
+        if noktalar and s[alan] <= noktalar[-1][0]:
+            continue
+        noktalar.append((s[alan], math.log(s["kbps"])))
+    return noktalar
+
+
+def logkbps(noktalar, q):
+    for (q0, l0), (q1, l1) in zip(noktalar, noktalar[1:]):
+        if q0 <= q <= q1:
+            return l0 + (q - q0) / (q1 - q0) * (l1 - l0)
+    return None
+
+
+def esoran(taban, test, adim=40):
+    if len(taban) < 2 or len(test) < 2:
+        return None, None, None
+    alt = max(taban[0][0], test[0][0])
+    ust = min(taban[-1][0], test[-1][0])
+    if alt >= ust:
+        return None, alt, ust
+    farklar = []
+    for i in range(adim + 1):
+        q = alt + (ust - alt) * i / adim
+        a, b = logkbps(taban, q), logkbps(test, q)
+        if a is not None and b is not None:
+            farklar.append(b - a)
+    return math.exp(sum(farklar) / len(farklar)), alt, ust
+
+
+def oran(kok, kesitler):
+    tum = []
+    for k in kesitler:
+        tum += bul(kok, f"oran-{k}.json")
+    print("| Kesit | Kol | İstenen kbit | kbps | VMAF-NEG ort | XPSNR | Karanlık PSNR | Kodlama sn |")
+    print("|---|---|---|---|---|---|---|---|")
+    for s in tum:
+        print(f"| {s['kesit']} | {s['kol']} | {s['istenen_kbit']} | {f(s['kbps'],1)} | {f(s['vmafneg_ort'])} | {f(s['xpsnr'])} | {f(s['karanlik_psnr'])} | {f(s['kodlama_sn'],1)} |")
+    kollar = []
+    for s in tum:
+        if s["kol"] not in kollar:
+            kollar.append(s["kol"])
+    print()
+    print("| Kesit | Ölçü | Kol | Eş kalitede kbps oranı (kol / libx264) | Ortak aralık | Kol / libx265 |")
+    print("|---|---|---|---|---|---|")
+    for k in kesitler:
+        for alan, ad in (("vmafneg_ort", "VMAF-NEG"), ("xpsnr", "XPSNR")):
+            taban = egri([s for s in tum if s["kesit"] == k and s["kol"] == "libx264"], alan)
+            x265 = egri([s for s in tum if s["kesit"] == k and s["kol"] == "libx265"], alan)
+            for kol in kollar:
+                if kol == "libx264":
+                    continue
+                test = egri([s for s in tum if s["kesit"] == k and s["kol"] == kol], alan)
+                r, alt, ust = esoran(taban, test)
+                r2, _, _ = esoran(x265, test) if kol != "libx265" else (None, None, None)
+                aralik = "—" if alt is None else f"{f(alt)} … {f(ust)}"
+                print(f"| {k} | {ad} | {kol} | {f(r,3)} | {aralik} | {f(r2,3)} |")
+
+
 if __name__ == "__main__":
-    if sys.argv[1] == "av1":
+    if sys.argv[1] == "hedefbant":
+        hedefbant(sys.argv[2], sys.argv[3].split(","))
+    elif sys.argv[1] == "oran":
+        oran(sys.argv[2], sys.argv[3].split(","))
+    elif sys.argv[1] == "av1":
         av1(sys.argv[2], sys.argv[3].split(","))
     elif sys.argv[1] == "handbrake":
         handbrake(sys.argv[2], sys.argv[3].split(","))
