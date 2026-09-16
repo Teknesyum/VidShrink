@@ -27,6 +27,8 @@ public sealed class SettingsTests
         yield return [nameof(UpdateSettings.Intent), 2];
         yield return [nameof(UpdateSettings.Codec), 1];
         yield return [nameof(UpdateSettings.MayLowerResolution), false];
+        yield return [nameof(UpdateSettings.FixedResolution), 2];
+        yield return [nameof(UpdateSettings.WhatsAppCompatible), true];
         yield return [nameof(UpdateSettings.MayLowerFps), false];
         yield return [nameof(UpdateSettings.FillPolicy), 1];
         yield return [nameof(UpdateSettings.HdrPolicy), 1];
@@ -121,6 +123,8 @@ public sealed class SettingsTests
         new("Intent", s => s.Intent = 2, w => w.SelectedIntentIndex, 1),
         new("Codec", s => s.Codec = 1, w => w.CodecIndex, 0),
         new("ChkResolution", s => s.MayLowerResolution = false, w => w.ChkResolution.IsChecked, true),
+        new("FixedResolution", s => s.FixedResolution = 1, w => w.FixedResolutionIndex, 0),
+        new("ChkWhatsAppCompatible", s => s.WhatsAppCompatible = true, w => w.ChkWhatsAppCompatible.IsChecked, false),
         new("ChkFps", s => s.MayLowerFps = false, w => w.ChkFps.IsChecked, true),
         new("ChkFastGpu", s => s.FastGpu = true, w => w.ChkFastGpu.IsChecked, false),
         new("FillPolicy", s => s.FillPolicy = 1, w => w.FillPolicyIndex, 0),
@@ -143,7 +147,7 @@ public sealed class SettingsTests
     ];
 
     /// <summary>
-    /// Sıfırlama yirmi dört denetimin hepsini varsayılana döndürür.
+    /// Sıfırlama yirmi altı denetimin hepsini varsayılana döndürür.
     ///
     /// <para>Önceki hali üçüne bakıyordu ve <c>ChkFastGpu</c> sıfırlanmadan geçiyordu:
     /// <c>RestoreSettings</c> içindeki <c>HasValue</c> kapısı boş ayarda kutuya hiç

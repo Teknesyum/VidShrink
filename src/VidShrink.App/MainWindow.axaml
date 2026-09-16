@@ -391,7 +391,9 @@
                         </Grid>
                       </Button>
                       <StackPanel x:Name="QualitySectionBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                        <!-- Kullanıcı 09-04: WhatsApp uyumu işaretlenirse eski kodek (H.264) kullanılır, kodek seçimi kilitlenir. -->
+                        <CheckBox x:Name="ChkWhatsAppCompatible" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.whatsapp-compatible}"/>
+                        <Grid x:Name="CodecChoiceRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                           <TextBlock Grid.Column="0" Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
                             <RadioButton x:Name="RbCodecAuto" GroupName="ShrinkCodec" IsChecked="True" Content="{loc:Text main.codec.automatic}"/>
@@ -474,6 +476,16 @@
                           <CheckBox x:Name="ChkResolution" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.resolution}"/>
                           <CheckBox x:Name="ChkFps" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.fps}"/>
                         </StackPanel>
+                        <!-- Kullanıcı 09-04: dinamik çözünürlük varsayılan; kutu kalkınca kullanıcı sabit boyu seçer. -->
+                        <Grid x:Name="FixedResolutionRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}" IsVisible="False">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.fixed-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                            <RadioButton x:Name="RbFixedSource" GroupName="ShrinkFixedResolution" IsChecked="True" Content="{loc:Text main.fixed-resolution.source}"/>
+                            <RadioButton x:Name="RbFixed1080" GroupName="ShrinkFixedResolution"/>
+                            <RadioButton x:Name="RbFixed720" GroupName="ShrinkFixedResolution"/>
+                            <RadioButton x:Name="RbFixed480" GroupName="ShrinkFixedResolution"/>
+                          </StackPanel>
+                        </Grid>
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                           <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">

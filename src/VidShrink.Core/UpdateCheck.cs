@@ -428,6 +428,10 @@ public sealed class UpdateSettings
     public bool ChipSizeCapped { get; set; } = true;
     public int Codec { get; set; }
     public bool MayLowerResolution { get; set; } = true;
+    /// <summary>Dinamik çözünürlük kapalıyken seçilen sabit boy: 0 kaynak, 1 1080p, 2 720p, 3 480p.</summary>
+    public int FixedResolution { get; set; }
+    /// <summary>WhatsApp uyumu: işaretliyse kodek H.264'e kilitlenir.</summary>
+    public bool WhatsAppCompatible { get; set; }
     public bool MayLowerFps { get; set; } = true;
     public int FillPolicy { get; set; }
     public int HdrPolicy { get; set; }
@@ -492,6 +496,8 @@ public sealed class UpdateSettings
             ReadBool(document.RootElement, "chipSizeCapped", value => settings.ChipSizeCapped = value);
             ReadInt(document.RootElement, "codec", value => settings.Codec = value);
             ReadBool(document.RootElement, "mayLowerResolution", value => settings.MayLowerResolution = value);
+            ReadInt(document.RootElement, "fixedResolution", value => settings.FixedResolution = value);
+            ReadBool(document.RootElement, "whatsAppCompatible", value => settings.WhatsAppCompatible = value);
             ReadBool(document.RootElement, "mayLowerFps", value => settings.MayLowerFps = value);
             ReadInt(document.RootElement, "fillPolicy", value => settings.FillPolicy = value);
             ReadInt(document.RootElement, "hdrPolicy", value => settings.HdrPolicy = value);
@@ -555,6 +561,8 @@ public sealed class UpdateSettings
         writer.WriteBoolean("chipSizeCapped", ChipSizeCapped);
         writer.WriteNumber("codec", Codec);
         writer.WriteBoolean("mayLowerResolution", MayLowerResolution);
+        writer.WriteNumber("fixedResolution", FixedResolution);
+        writer.WriteBoolean("whatsAppCompatible", WhatsAppCompatible);
         writer.WriteBoolean("mayLowerFps", MayLowerFps);
         writer.WriteNumber("fillPolicy", FillPolicy);
         writer.WriteNumber("hdrPolicy", HdrPolicy);

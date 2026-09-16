@@ -208,6 +208,10 @@ public partial class MainWindow : Window
         foreach (var check in new ToggleButton[] { ChkResolution, ChkFps, ChkFastGpu })
             Watch(check, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(ChkFastGpu, ToggleButton.IsCheckedProperty, OnFastGpuChanged);
+        foreach (var toggle in new ToggleButton[] { ChkResolution, ChkWhatsAppCompatible })
+            Watch(toggle, ToggleButton.IsCheckedProperty, RefreshFrameAndCodecLocks);
+        for (var i = 0; i < FixedResolutionCandidates.Count; i++)
+            FixedResolutionRadios()[i].Content = FixedResolutionCandidates[i].ToString(CultureInfo.InvariantCulture) + "p";
 
         Watch(PlanPanelRow, RowDefinition.HeightProperty, OnSplitterMoved);
 
@@ -1085,6 +1089,8 @@ public partial class MainWindow : Window
             _chipSizeCapped = settings.ChipSizeCapped;
             SetCodecIndex(settings.Codec);
             ChkResolution.IsChecked = settings.MayLowerResolution;
+            FixedResolutionIndex = settings.FixedResolution;
+            ChkWhatsAppCompatible.IsChecked = settings.WhatsAppCompatible;
             ChkFps.IsChecked = settings.MayLowerFps;
             ChkFastGpu.IsChecked = settings.FastGpu ?? false;
             SetFillIndex(settings.FillPolicy);
@@ -1112,6 +1118,7 @@ public partial class MainWindow : Window
             _updateUiSyncing = _syncing = _settingsSyncing = false;
         }
 
+        RefreshFrameAndCodecLocks();
         RefreshChipDerivation();
         RefreshSectionSummaries();
     }
@@ -1127,6 +1134,8 @@ public partial class MainWindow : Window
         ChipSizeCapped = _chipSizeCapped,
         Codec = CodecIndex,
         MayLowerResolution = ChkResolution.IsChecked == true,
+        FixedResolution = FixedResolutionIndex,
+        WhatsAppCompatible = ChkWhatsAppCompatible.IsChecked == true,
         MayLowerFps = ChkFps.IsChecked == true,
         FillPolicy = FillPolicyIndex,
         HdrPolicy = HdrPolicyIndex,
@@ -1197,6 +1206,8 @@ public partial class MainWindow : Window
     }
 
     internal void RestoreSettingsForTest(UpdateSettings settings) => RestoreSettings(settings);
+
+    internal UpdateSettings CaptureSettingsForTest() => CaptureSettings();
     internal void ConfirmResetSettingsForTest() => OnConfirmResetSettings(null, new RoutedEventArgs());
     internal void RestoreAppSettingsForTest(AppSettings settings) => RestoreAppSettings(settings);
     internal AppSettings CaptureAppSettingsForTest() => CaptureAppSettings();
@@ -1512,8 +1523,49 @@ public partial class MainWindow : Window
 
     internal IReadOnlyList<ToggleButton> ShrinkChoiceToggles() => new ToggleButton[]
     {
-        RbCodecAuto, RbCodecCompatible, RbCodecSmallest, RbHdrPreserve, RbHdrSdr, RbFillTarget, RbFillCeiling
+        RbCodecAuto, RbCodecCompatible, RbCodecSmallest, RbHdrPreserve, RbHdrSdr, RbFillTarget, RbFillCeiling,
+        ChkWhatsAppCompatible, RbFixedSource, RbFixed1080, RbFixed720, RbFixed480
     };
+
+    /// <summary>Sabit çözünürlük seçenekleri, kısa kenar. Sıra radyoların sırasıyla aynı; 0 kaynak boyu.</summary>
+    internal static readonly IReadOnlyList<int> FixedResolutionCandidates = new[] { 1080, 720, 480 };
+
+    private RadioButton[] FixedResolutionRadios() => new[] { RbFixed1080, RbFixed720, RbFixed480 };
+
+    /// <summary>0 kaynak boyu, 1.. <see cref="FixedResolutionCandidates"/> sırası.</summary>
+    internal int FixedResolutionIndex
+    {
+        get
+        {
+            var radios = FixedResolutionRadios();
+            for (var i = 0; i < radios.Length; i++)
+                if (radios[i].IsChecked == true) return i + 1;
+            return 0;
+        }
+        set
+        {
+            var radios = FixedResolutionRadios();
+            var index = value >= 1 && value <= radios.Length ? value : 0;
+            for (var i = 0; i < radios.Length; i++) radios[i].IsChecked = index == i + 1;
+            RbFixedSource.IsChecked = index == 0;
+        }
+    }
+
+    /// <summary>
+    /// Plana giden sabit boy. Dinamik çözünürlük kutusu işaretliyken ya da "Kaynak" seçiliyken
+    /// yoktur; motor kendi karar verir ya da kaynak boyunu korur.
+    /// </summary>
+    internal int? FixedResolutionShortSide
+        => ChkResolution.IsChecked == true || FixedResolutionIndex == 0 ? null : FixedResolutionCandidates[FixedResolutionIndex - 1];
+
+    private void RefreshFrameAndCodecLocks()
+    {
+        FixedResolutionRow.IsVisible = ChkResolution.IsChecked != true;
+        CodecChoiceRow.IsEnabled = ChkWhatsAppCompatible.IsChecked != true;
+    }
+
+    /// <summary>WhatsApp uyumu işaretliyse kodek seçimi ne olursa olsun uyumlu kol (H.264).</summary>
+    internal int EffectiveCodecIndex => ChkWhatsAppCompatible.IsChecked == true ? 1 : CodecIndex;
 
     internal int SelectedIntentIndex => (int)_intent;
 
@@ -1589,7 +1641,7 @@ public partial class MainWindow : Window
         RefreshSectionSummaries();
     }
 
-    private string CodecLabel() => CodecIndex switch
+    private string CodecLabel() => ChkWhatsAppCompatible.IsChecked == true ? Say("main.whatsapp-compatible") : CodecIndex switch
     {
         1 => Say("main.codec.compatible"),
         2 => Say("main.codec.smallest"),
@@ -1621,7 +1673,7 @@ public partial class MainWindow : Window
 
         var frame = new List<string>
         {
-            ChkResolution.IsChecked == true ? Say("main.allow.resolution") : Say("main.section.frame.resolution-locked"),
+            ChkResolution.IsChecked == true ? Say("main.allow.resolution") : FixedResolutionIndex > 0 ? FixedResolutionRadios()[FixedResolutionIndex - 1].Content as string ?? "" : Say("main.section.frame.resolution-locked"),
             ChkFps.IsChecked == true ? Say("main.allow.fps") : Say("main.section.frame.fps-locked")
         };
         TxtFrameSummary.Text = FrameBody.IsVisible ? "" : string.Join(" · ", frame);
@@ -2663,7 +2715,8 @@ public partial class MainWindow : Window
         {
             TargetMb = PlanTargetMb(),
             Intent = _intent,
-            Codec = CodecFromIndex(CodecIndex),
+            Codec = CodecFromIndex(EffectiveCodecIndex),
+            FixedResolution = FixedResolutionShortSide,
             AllowResolutionDrop = ChkResolution.IsChecked == true,
             AllowFpsDrop = ChkFps.IsChecked == true,
             HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
@@ -2671,6 +2724,7 @@ public partial class MainWindow : Window
             SpeedMode = ChkFastGpu.IsChecked == true ? SpeedMode.Fast : SpeedMode.Quality
         };
         ApplyAdvancedOptions(options);
+        if (ChkWhatsAppCompatible.IsChecked == true) options.LockedCodec = null;
         return options;
     }
 
