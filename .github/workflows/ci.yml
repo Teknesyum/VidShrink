@@ -141,5 +141,6 @@ jobs:
             .calisma/kosum-sonuc/**
             .calisma/oynatici-motor/**
             !.calisma/oynatici-motor/**/*.mp4
+            .calisma/oynatici-yol-haritasi/**
           if-no-files-found: ignore
           retention-days: 7

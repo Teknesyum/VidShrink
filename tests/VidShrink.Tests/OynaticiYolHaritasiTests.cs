@@ -705,62 +705,77 @@ public sealed class OynaticiYolHaritasiTests
     public void P26SeritFareyeYakinKisimdanYayilarakAcilir()
     {
         var body = new StringBuilder();
+        var sistem = HoverZone.MotionReduced;
         try
         {
         AppHost.Run(() =>
         {
-            var motor = new YolMotoru();
-            var view = Ac(motor, out var window);
-            var saat = new ElleSaat();
-            view.SeritZone.Clock = saat;
-            var serit = view.FindControl<Border>("StripBar")!;
-            var yuzey = view.FindControl<Panel>("Surface")!;
-            if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
-            Hareket(window, view, new Point(480, 100));
-            saat.Ates();
-            DenetimSurucu.Pump(view, () => serit.Opacity <= 0, 2);
-            body.AppendLine($"hareket azaltilmis {HoverZone.MotionReduced}, kapali serit saydamligi {YolKanit.N(serit.Opacity)}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms");
+            body.AppendLine($"sistemin hareket azaltma ayari {sistem}");
 
-            var seritSol = serit.TranslatePoint(new Point(0, 0), window)!.Value;
-            var fareX = seritSol.X + serit.Bounds.Width * 0.2;
-            var saatDuvar = Stopwatch.StartNew();
-            Hareket(window, view, new Point(fareX, yuzey.Bounds.Height - 4));
-            var ornekler = new List<(double Ms, double Yayilma, double Sol, double Sag)>();
-            while (saatDuvar.Elapsed.TotalMilliseconds < 400)
-            {
-                var maske = serit.OpacityMask as LinearGradientBrush;
-                var duraklar = maske?.GradientStops.Select(s => s.Offset).ToList();
-                ornekler.Add((saatDuvar.Elapsed.TotalMilliseconds, view.SeritSpread, duraklar?.First() ?? double.NaN, duraklar?.Last() ?? double.NaN));
-                Dispatcher.UIThread.RunJobs();
-                Thread.Sleep(3);
-            }
+            var acik = SeritAcilisi(false, body);
+            var azaltilmis = SeritAcilisi(true, body);
 
-            var oran = view.SeritPointerX / serit.Bounds.Width;
-            body.AppendLine($"fare serit uzerinde oran {YolKanit.N(oran)}, serit acik {view.SeritRevealed}");
-            foreach (var o in ornekler.Where((_, i) => i % 4 == 0))
-                body.AppendLine($"  {YolKanit.N(o.Ms)} ms: yayilma {YolKanit.N(o.Yayilma)}, maske [{YolKanit.N(o.Sol)} .. {YolKanit.N(o.Sag)}]");
+            Assert.True(acik.Acildi, "serit acilmadi");
+            Assert.Equal(0.2, acik.Oran, 1);
+            Assert.True(acik.Maskeli.Count > 0, "yayilma yok: serit bir anda acildi");
+            var ilk = acik.Maskeli[0];
+            Assert.True(ilk.Sol <= acik.Oran && ilk.Sag >= acik.Oran && ilk.Sag < 1, $"ilk gorunen kisim fareyi icermiyor ya da tamami acik: [{ilk.Sol} .. {ilk.Sag}]");
+            Assert.True(acik.MaskeKalkti, "yayilma bitmedi");
+            Assert.All(acik.Maskeli, o => Assert.True(o.Sol <= acik.Oran + 1e-6 && o.Sag >= acik.Oran - 1e-6));
 
-            var maskeli = ornekler.Where(o => !double.IsNaN(o.Sol)).ToList();
-            var ilk = maskeli.FirstOrDefault();
-            var bitis = ornekler.FirstOrDefault(o => o.Ms > 0 && double.IsNaN(o.Sol) && o.Yayilma >= 1 && maskeli.Count > 0 && o.Ms > maskeli[0].Ms);
-            body.AppendLine($"maskeli ornek {maskeli.Count}, ilk maske [{YolKanit.N(ilk.Sol)} .. {YolKanit.N(ilk.Sag)}] @ {YolKanit.N(ilk.Ms)} ms, maske kalkti @ {YolKanit.N(bitis.Ms)} ms");
-            window.Close();
-
-            Assert.True(view.SeritRevealed, "serit acilmadi");
-            Assert.Equal(0.2, oran, 1);
-            Assert.True(maskeli.Count > 0, "yayilma yok: serit bir anda acildi");
-            Assert.True(ilk.Sol <= oran && ilk.Sag >= oran && ilk.Sag < 1, $"ilk gorunen kisim fareyi icermiyor ya da tamami acik: [{ilk.Sol} .. {ilk.Sag}]");
-            Assert.True(bitis.Ms > 0, "yayilma bitmedi");
-            Assert.All(maskeli, o => Assert.True(o.Sol <= oran + 1e-6 && o.Sag >= oran - 1e-6));
+            Assert.True(azaltilmis.Acildi, "hareket azaltilmisken serit acilmadi");
+            Assert.Empty(azaltilmis.Maskeli);
             return 0;
         });
         }
         finally
         {
+            HoverZone.MotionReduced = sistem;
             YolKanit.Write("p26-yayilarak-acilma.txt", body.ToString());
         }
     }
 
+    private static (bool Acildi, double Oran, List<(double Ms, double Yayilma, double Sol, double Sag)> Maskeli, bool MaskeKalkti) SeritAcilisi(bool azalt, StringBuilder body)
+    {
+        HoverZone.MotionReduced = azalt;
+        var motor = new YolMotoru();
+        var view = Ac(motor, out var window);
+        var saat = new ElleSaat();
+        view.SeritZone.Clock = saat;
+        var serit = view.FindControl<Border>("StripBar")!;
+        var yuzey = view.FindControl<Panel>("Surface")!;
+        if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
+        Hareket(window, view, new Point(480, 100));
+        saat.Ates();
+        Dongu(() => serit.Opacity <= 0, 2);
+        body.AppendLine($"[hareket azaltilmis {azalt}] kapali serit saydamligi {YolKanit.N(serit.Opacity)}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms");
+
+        var seritSol = serit.TranslatePoint(new Point(0, 0), window)!.Value;
+        var fareX = seritSol.X + serit.Bounds.Width * 0.2;
+        var saatDuvar = Stopwatch.StartNew();
+        Hareket(window, view, new Point(fareX, yuzey.Bounds.Height - 4));
+        var oran = view.SeritPointerX / serit.Bounds.Width;
+        var ornekler = new List<(double Ms, double Yayilma, double Sol, double Sag)>();
+        while (saatDuvar.Elapsed.TotalMilliseconds < 400)
+        {
+            var maske = serit.OpacityMask as LinearGradientBrush;
+            var duraklar = maske?.GradientStops.Select(s => s.Offset).ToList();
+            ornekler.Add((saatDuvar.Elapsed.TotalMilliseconds, view.SeritSpread, duraklar?.First() ?? double.NaN, duraklar?.Last() ?? double.NaN));
+            using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+            Dispatcher.UIThread.MainLoop(dilim.Token);
+        }
+
+        body.AppendLine($"  fare serit uzerinde oran {YolKanit.N(oran)}, serit acik {view.SeritRevealed}, ornek {ornekler.Count}");
+        foreach (var o in ornekler.Where((_, i) => i % 8 == 0))
+            body.AppendLine($"  {YolKanit.N(o.Ms)} ms: yayilma {YolKanit.N(o.Yayilma)}, maske [{YolKanit.N(o.Sol)} .. {YolKanit.N(o.Sag)}]");
+
+        var maskeli = ornekler.Where(o => !double.IsNaN(o.Sol)).ToList();
+        var kalkti = maskeli.Count > 0 && ornekler.Any(o => o.Ms > maskeli[^1].Ms && double.IsNaN(o.Sol) && o.Yayilma >= 1);
+        body.AppendLine($"  maskeli ornek {maskeli.Count}, maske kalkti {kalkti}");
+        var acildi = view.SeritRevealed;
+        window.Close();
+        return (acildi, oran, maskeli, kalkti);
+    }
     [Fact]
     public void P28YanindakiAltyazilarKendiligindenYuklenir()
     {
