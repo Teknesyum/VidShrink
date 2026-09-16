@@ -96,5 +96,7 @@
   "recorder.countdown.off": "None",
   "recorder.countdown.seconds": "{0} s",
   "recorder.countdown.left": "Starting in {0}",
-  "recorder.countdown.cancel": "Cancel"
+  "recorder.countdown.cancel": "Cancel",
+  "recorder.tray.idle": "VidShrink recorder · {0}",
+  "recorder.tray.live": "VidShrink recorder · {0} · {1} · {2} MB"
 }

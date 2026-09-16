@@ -62,11 +62,13 @@ internal partial class RecorderView : UserControl
         Strings.Changed -= OnLanguageChanged;
         Strings.Changed += OnLanguageChanged;
         RefreshLanguage();
+        ActivateTray();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         Strings.Changed -= OnLanguageChanged;
+        DeactivateTray();
         base.OnDetachedFromVisualTree(e);
     }
 

@@ -149,6 +149,15 @@ public sealed class RecorderSession : IAsyncDisposable
     /// <summary>Bugune kadar acilan parca sayisi; duraklatma her seferinde bir tane daha acar.</summary>
     public int SegmentCount => _segments.Count;
 
+    public double WrittenMb
+    {
+        get
+        {
+            try { return _segments.ToArray().Sum(SizeMb); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException) { return 0; }
+        }
+    }
+
     /// <summary>
     /// Kaydi baslatir ve ilk ilerleme blogunu bekler. Surec o blogu uretmeden olurse
     /// sebep yutulmaz: ffmpeg'in son satirlariyla <see cref="InvalidOperationException"/>

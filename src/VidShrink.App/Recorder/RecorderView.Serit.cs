@@ -199,6 +199,7 @@ internal partial class RecorderView
         TxtFrames.Text = progress.Frames.ToString("N0", Strings.Culture);
         TxtDropped.Text = progress.DroppedFrames.ToString("N0", Strings.Culture);
         RefreshMini();
+        SyncTray();
     }
 
     /// <summary>
@@ -227,6 +228,7 @@ internal partial class RecorderView
             : Say("recorder.strip.idle");
 
         SyncFrame();
+        SyncTray();
         RefreshMini();
     }
 }

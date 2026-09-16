@@ -96,5 +96,7 @@
   "recorder.countdown.off": "Yok",
   "recorder.countdown.seconds": "{0} sn",
   "recorder.countdown.left": "Başlıyor: {0}",
-  "recorder.countdown.cancel": "İptal"
+  "recorder.countdown.cancel": "İptal",
+  "recorder.tray.idle": "VidShrink kaydedici · {0}",
+  "recorder.tray.live": "VidShrink kaydedici · {0} · {1} · {2} MB"
 }

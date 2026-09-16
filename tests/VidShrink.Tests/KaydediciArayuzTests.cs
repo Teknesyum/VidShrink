@@ -676,6 +676,114 @@ public sealed class KaydediciArayuzTests
         Assert.Contains("SyncFrame();", serit);
     }
 
+    [Theory]
+    [InlineData(false, VidShrink.Ffmpeg.RecorderState.Running, 0)]
+    [InlineData(false, VidShrink.Ffmpeg.RecorderState.Paused, 0)]
+    [InlineData(true, VidShrink.Ffmpeg.RecorderState.Running, 1)]
+    [InlineData(true, VidShrink.Ffmpeg.RecorderState.Paused, 2)]
+    [InlineData(true, VidShrink.Ffmpeg.RecorderState.Stopped, 0)]
+    public void TepsiDurumuOturumdanOkunur(bool oturum, VidShrink.Ffmpeg.RecorderState hal, int beklenen)
+        => Assert.Equal(beklenen, (int)RecorderTray.PhaseOf(oturum, hal));
+
+    [Fact]
+    public void TepsiUcDurumuPaletinUcAyriRengindenBoyar()
+    {
+        var anahtarlar = Enum.GetValues<TrayPhase>().Select(RecorderTray.BrushKey).ToList();
+        Assert.Equal(3, anahtarlar.Distinct(StringComparer.Ordinal).Count());
+
+        var renkler = AppHost.Run<List<Avalonia.Media.Color?>>(() => anahtarlar
+            .Select(k => Avalonia.Application.Current!.TryGetResource(k, null, out var v) && v is Avalonia.Media.ISolidColorBrush b
+                ? b.Color
+                : (Avalonia.Media.Color?)null)
+            .ToList());
+
+        Assert.All(renkler, r => Assert.NotNull(r));
+        Assert.Equal(3, renkler.Distinct().Count());
+    }
+
+    [Fact]
+    public void TepsiSimgesiVerilenRenkteCizilir()
+    {
+        var (orta, kose) = AppHost.Run<(uint, uint)>(() =>
+        {
+            var renk = Avalonia.Media.Color.FromRgb(0xF0, 0x71, 0x78);
+            var simge = RecorderTray.Render(renk);
+            using var akis = new MemoryStream();
+            simge.Save(akis);
+            akis.Position = 0;
+            using var resim = Avalonia.Media.Imaging.WriteableBitmap.Decode(akis);
+            using var kilit = resim.Lock();
+            uint Oku(int x, int y) => (uint)System.Runtime.InteropServices.Marshal.ReadInt32(kilit.Address + y * kilit.RowBytes + x * 4);
+            return (Oku(RecorderTray.IconPixels / 2, RecorderTray.IconPixels / 2), Oku(0, 0));
+        });
+
+        Assert.Equal(0xFFu, orta >> 24);
+        Assert.Equal(new[] { 0xF0u, 0x71u, 0x78u }.OrderBy(v => v), new[] { (orta >> 16) & 0xFF, (orta >> 8) & 0xFF, orta & 0xFF }.OrderBy(v => v));
+        Assert.Equal(0u, kose >> 24);
+    }
+
+    private sealed class SahteTepsi : IRecorderTrayHost
+    {
+        public List<(TrayPhase, Avalonia.Media.Color, string)> Guncellemeler { get; } = new();
+
+        public int Kaldirma { get; private set; }
+
+        public void Update(TrayPhase phase, Avalonia.Media.Color color, string tip) => Guncellemeler.Add((phase, color, tip));
+
+        public void Remove() => Kaldirma++;
+    }
+
+    [Fact]
+    public void TepsiEtkinlesinceBostaIpucuVeRengiYazilir()
+    {
+        var (once, guncellemeler, kaldirma, bosta, gri) = AppHost.Run<(int, List<(TrayPhase, Avalonia.Media.Color, string)>, int, string, Avalonia.Media.Color)>(() =>
+        {
+            var view = new RecorderView();
+            var sahte = new SahteTepsi();
+            view.TrayHost = sahte;
+            var ilk = sahte.Guncellemeler.Count;
+            view.ActivateTray();
+            view.DeactivateTray();
+            view.DeactivateTray();
+            Avalonia.Application.Current!.TryGetResource("TextDisabled", null, out var v);
+            return (ilk, sahte.Guncellemeler, sahte.Kaldirma,
+                VidShrink.App.LanguageCatalog.Display(VidShrink.App.Localization.Strings.Get("recorder.strip.idle")),
+                ((Avalonia.Media.ISolidColorBrush)v!).Color);
+        });
+
+        Assert.Equal(0, once);
+        Assert.Single(guncellemeler);
+        Assert.Equal(TrayPhase.Idle, guncellemeler[0].Item1);
+        Assert.Equal(gri, guncellemeler[0].Item2);
+        Assert.Contains(bosta, guncellemeler[0].Item3);
+        Assert.Equal(1, kaldirma);
+    }
+
+    [Fact]
+    public void TepsiIpucundaAnlikBoyutVeSureVar()
+    {
+        Assert.Equal("3,4", RecorderTray.Megabytes(3.44, new System.Globalization.CultureInfo("tr-TR")));
+        Assert.Equal("12.0", RecorderTray.Megabytes(12, System.Globalization.CultureInfo.InvariantCulture));
+        Assert.Equal("0.0", RecorderTray.Megabytes(-1, System.Globalization.CultureInfo.InvariantCulture));
+
+        var kok = new DirectoryInfo(AppContext.BaseDirectory);
+        while (kok is not null && !File.Exists(Path.Combine(kok.FullName, "VidShrink.sln"))) kok = kok.Parent;
+        var tepsi = File.ReadAllText(Path.Combine(kok!.FullName, "src", "VidShrink.App", "Recorder", "RecorderView.Tepsi.cs"));
+        var serit = File.ReadAllText(Path.Combine(kok.FullName, "src", "VidShrink.App", "Recorder", "RecorderView.Serit.cs"));
+        var tr = Locales.Values("tr");
+
+        Assert.Contains("_session?.WrittenMb", tepsi);
+        Assert.Contains("ElapsedText", tepsi);
+        Assert.Contains("{1}", tr["recorder.tray.live"]);
+        Assert.Contains("{2} MB", tr["recorder.tray.live"]);
+        Assert.Equal(2, System.Text.RegularExpressions.Regex.Matches(serit, @"SyncTray\(\);").Count);
+        foreach (var language in Locales.Languages)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(Locales.Values(language).GetValueOrDefault("recorder.tray.idle")));
+            Assert.False(string.IsNullOrWhiteSpace(Locales.Values(language).GetValueOrDefault("recorder.tray.live")));
+        }
+    }
+
     [Fact]
     public void KareDugmesiOturumunKaresiniAlir()
     {
