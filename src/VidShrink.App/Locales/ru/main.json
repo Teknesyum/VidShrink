@@ -34,6 +34,7 @@
   "main.update.downloading": "Загрузка…",
   "main.update.ready": "Готово к установке",
   "main.update.failed": "Не удалось загрузить обновление",
+  "main.update.cancelled": "Загрузка отменена",
   "main.update.log.manifest": "Получение списка версий",
   "main.update.log.found": "Версия {0}: файлов {1}",
   "main.update.log.current": "Уже актуально",

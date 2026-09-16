@@ -34,6 +34,7 @@
   "main.update.downloading": "ডাউনলোড হচ্ছে…",
   "main.update.ready": "ইনস্টলের জন্য প্রস্তুত",
   "main.update.failed": "আপডেট ডাউনলোড করা যায়নি",
+  "main.update.cancelled": "ডাউনলোড বাতিল হয়েছে",
   "main.update.log.manifest": "সংস্করণ তালিকা আনা হচ্ছে",
   "main.update.log.found": "সংস্করণ {0}: {1}টি ফাইল",
   "main.update.log.current": "ইতিমধ্যে হালনাগাদ",

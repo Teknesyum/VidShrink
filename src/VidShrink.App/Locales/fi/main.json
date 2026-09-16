@@ -34,6 +34,7 @@
   "main.update.downloading": "Ladataan…",
   "main.update.ready": "Valmis asennettavaksi",
   "main.update.failed": "Päivitystä ei voitu ladata",
+  "main.update.cancelled": "Lataus peruttiin",
   "main.update.log.manifest": "Haetaan versioluetteloa",
   "main.update.log.found": "Versio {0}: {1} tiedostoa",
   "main.update.log.current": "Jo ajan tasalla",

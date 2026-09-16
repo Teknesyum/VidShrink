@@ -34,6 +34,7 @@
   "main.update.downloading": "பதிவிறக்குகிறது…",
   "main.update.ready": "நிறுவத் தயார்",
   "main.update.failed": "புதுப்பிப்பைப் பதிவிறக்க முடியவில்லை",
+  "main.update.cancelled": "பதிவிறக்கம் ரத்துசெய்யப்பட்டது",
   "main.update.log.manifest": "பதிப்புப் பட்டியலைப் பெறுகிறது",
   "main.update.log.found": "பதிப்பு {0}: {1} கோப்புகள்",
   "main.update.log.current": "ஏற்கெனவே புதியது",

@@ -34,6 +34,7 @@
   "main.update.downloading": "Laster ned…",
   "main.update.ready": "Klar til installering",
   "main.update.failed": "Oppdateringen kunne ikke lastes ned",
+  "main.update.cancelled": "Nedlastingen ble avbrutt",
   "main.update.log.manifest": "Henter versjonslisten",
   "main.update.log.found": "Versjon {0}: {1} filer",
   "main.update.log.current": "Allerede oppdatert",

@@ -34,6 +34,7 @@
   "main.update.downloading": "מוריד…",
   "main.update.ready": "מוכן להתקנה",
   "main.update.failed": "לא ניתן היה להוריד את העדכון",
+  "main.update.cancelled": "ההורדה בוטלה",
   "main.update.log.manifest": "מאחזר את רשימת הגרסאות",
   "main.update.log.found": "גרסה {0}: {1} קבצים",
   "main.update.log.current": "כבר מעודכן",

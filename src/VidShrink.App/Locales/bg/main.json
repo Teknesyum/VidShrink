@@ -34,6 +34,7 @@
   "main.update.downloading": "Изтегляне…",
   "main.update.ready": "Готово за инсталиране",
   "main.update.failed": "Актуализацията не можа да бъде изтеглена",
+  "main.update.cancelled": "Изтеглянето е отменено",
   "main.update.log.manifest": "Извличане на списъка с версии",
   "main.update.log.found": "Версия {0}: {1} файла",
   "main.update.log.current": "Вече е актуално",

@@ -395,3 +395,17 @@ Kesilmeyen: güncelleme paneli ~0,2 ms, `UseLanguage` ~17 ms, `pencere-yapici �
 
 Sonuç: `kabuk-ilk-kare` 1230,1 → 803,5 ms, eşleşik fark **−455,2 ms**, 14/14. Tablo
 [docs/olcumler/acilis-hizi.md](olcumler/acilis-hizi.md) E dalgası.
+
+## Paket 1
+
+Dal `t0/paket-1`. Kaynak: `.calisma/eksikler/rapor.md` satır 1, 2, 3, 6, 7, 12, 13, 14, 15. Her kalem ayrı commit.
+
+1. Güncelleme indirmesi iptal: `MainWindow.Guncelleme.cs` iptal kaynağı, panelin birincil düğmesi inerken "İptal"; `UpdateStaging` yarım dosyayı `.part`tan siler.
+2. Oynatma sırasında indirme tavanı: tavansız/tavanlı kare düşümü ölçümü, `docs/olcumler/guncelleme-indirme-tavani.md`.
+3. Kurulum çubuğu açılış atağı: `InstallProgress` karelerinden ms ölçümü, `docs/olcumler/kurulum-cubugu-atagi.md`.
+4. `player-recent.json` test yolu: kayıt yolu ayar yolu değişkenine bağlanır.
+5. libmpv yedeği: `libmpv-mirror` yayın varlığı, CI/release/Install-VidShrink.ps1 yedek kaynak, sha256 aynı.
+6. Karşılaştırma paneli perdesi: şekil tema belirteçleriyle, önce/sonra PNG.
+7. T194: dar pencerede kaynak bilgi kutuları tek satır, kısaltma + ipucu, `BiciminTests` pinleri.
+8. `GlowBlue/Pink/Purple` palet değişiminde canlı.
+9. Anahtar kare atlama yarışı: yeniden üret, kök neden, düzelt, pimle.
