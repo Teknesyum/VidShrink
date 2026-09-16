@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Interactivity;
 using VidShrink.App.Localization;
@@ -177,9 +178,7 @@ internal partial class RecorderView
         _stopping = true;
         try
         {
-            var result = await session.StopAsync();
-            ExpandFromMini();
-            ShowResult(result);
+            Deliver(await session.StopAsync());
         }
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException)
         {
@@ -195,6 +194,55 @@ internal partial class RecorderView
     }
 
     private bool _stopping;
+
+    internal async Task<bool> DiscardAsync()
+    {
+        if (CountingDown)
+        {
+            CancelCountdown();
+            return true;
+        }
+
+        if (_session is null || _stopping) return false;
+
+        var session = _session;
+        _stopping = true;
+        try
+        {
+            var result = await session.StopAsync();
+            foreach (var file in (result.Files ?? Array.Empty<string>()).Append(result.OutputPath).Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                try { if (File.Exists(file)) File.Delete(file); }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+            }
+
+            ClearMessages();
+            ExpandFromMini();
+            ShowNotice(Say("recorder.discarded"));
+            return true;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException)
+        {
+            ShowError(Say("recorder.error.start", ex.Message));
+            return false;
+        }
+        finally
+        {
+            _session = null;
+            _frameRegion = null;
+            _stopping = false;
+            RefreshSerit();
+        }
+    }
+
+    internal Action<string> RevealFolder { get; set; } = VidShrink.App.Platform.Reveal;
+
+    internal void Deliver(RecordResult result)
+    {
+        ExpandFromMini();
+        ShowResult(result);
+        if (_settings.OpenFolderWhenDone && Delivered() is { } done) RevealFolder(done);
+    }
 
     internal async Task FollowEndAsync(Task ended, object session)
     {

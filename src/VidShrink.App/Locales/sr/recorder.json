@@ -127,5 +127,9 @@
   "recorder.advanced.audio-separate": "По једна стаза за сваки улаз",
   "recorder.advanced.audio-gain": "Појачање звука (dB)",
   "recorder.advanced.noise-gate": "Праг шума",
-  "recorder.advanced.noise-suppression": "Потискивање шума"
+  "recorder.advanced.noise-suppression": "Потискивање шума",
+  "recorder.budget.duration-only": "Recording stops by itself after {0} seconds.",
+  "recorder.budget.size-only": "Recording stops by itself when it reaches {0} MB.",
+  "recorder.output.open-when-done": "Open the folder when recording ends",
+  "recorder.discarded": "Recording discarded; the file was deleted."
 }

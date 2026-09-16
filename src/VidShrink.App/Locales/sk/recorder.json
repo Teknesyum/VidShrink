@@ -127,5 +127,9 @@
   "recorder.advanced.audio-separate": "Jedna stopa pre každý vstup",
   "recorder.advanced.audio-gain": "Zosilnenie zvuku (dB)",
   "recorder.advanced.noise-gate": "Noise gate",
-  "recorder.advanced.noise-suppression": "Potlačenie šumu"
+  "recorder.advanced.noise-suppression": "Potlačenie šumu",
+  "recorder.budget.duration-only": "Recording stops by itself after {0} seconds.",
+  "recorder.budget.size-only": "Recording stops by itself when it reaches {0} MB.",
+  "recorder.output.open-when-done": "Open the folder when recording ends",
+  "recorder.discarded": "Recording discarded; the file was deleted."
 }

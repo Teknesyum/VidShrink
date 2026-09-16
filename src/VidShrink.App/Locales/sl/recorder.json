@@ -127,5 +127,9 @@
   "recorder.advanced.audio-separate": "Ena sled na vhod",
   "recorder.advanced.audio-gain": "Ojačanje zvoka (dB)",
   "recorder.advanced.noise-gate": "Prag šuma",
-  "recorder.advanced.noise-suppression": "Odstranjevanje šuma"
+  "recorder.advanced.noise-suppression": "Odstranjevanje šuma",
+  "recorder.budget.duration-only": "Recording stops by itself after {0} seconds.",
+  "recorder.budget.size-only": "Recording stops by itself when it reaches {0} MB.",
+  "recorder.output.open-when-done": "Open the folder when recording ends",
+  "recorder.discarded": "Recording discarded; the file was deleted."
 }

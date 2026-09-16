@@ -183,6 +183,16 @@ public sealed class RecorderSession : IAsyncDisposable
                 progress)
             { _gifPath = outputPath };
         }
+        else if (RecorderArguments.SizeNeedsMatroska(request))
+        {
+            var errors = RecorderArguments.Validate(request, outputPath);
+            if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+            session = new RecorderSession(
+                request with { Container = RecorderContainer.Mkv },
+                RecorderArguments.SizeCapturePath(outputPath),
+                progress)
+            { _remuxExtension = Path.GetExtension(outputPath) };
+        }
         else
         {
             session = new RecorderSession(request, outputPath, progress);
@@ -264,7 +274,32 @@ public sealed class RecorderSession : IAsyncDisposable
         finally { _turn.Release(); }
 
         var result = await AssembleAsync(ct);
+        if (_remuxExtension is not null) return await RemuxAsync(result, ct);
         return _gifPath is null ? result : await ConvertToGifAsync(result, ct);
+    }
+
+    private string? _remuxExtension;
+
+    private async Task<RecordResult> RemuxAsync(RecordResult capture, CancellationToken ct)
+    {
+        var files = capture.Files ?? new[] { capture.OutputPath };
+        var delivered = new List<string>(files.Count);
+        foreach (var file in files)
+        {
+            if (!File.Exists(file)) continue;
+            var target = RecorderArguments.SizeDeliveryPath(file, _remuxExtension!);
+            var run = await FfmpegRunner.RunAsync(new[]
+            {
+                "-hide_banner", "-y", "-nostdin", "-i", file, "-map", "0", "-c", "copy", "-movflags", "+faststart", target
+            }, ct);
+            if (!run.Ok || !File.Exists(target))
+                return capture with { Ok = false, ExitCode = run.ExitCode, StandardError = run.StandardError };
+            TryDelete(file);
+            delivered.Add(target);
+        }
+
+        if (delivered.Count == 0) return capture;
+        return capture with { OutputPath = delivered[0], OutputMb = delivered.Sum(SizeMb), Files = delivered };
     }
 
     private async Task<RecordResult> ConvertToGifAsync(RecordResult capture, CancellationToken ct)
@@ -355,7 +390,7 @@ public sealed class RecorderSession : IAsyncDisposable
 
     private async Task StartSegmentAsync(CancellationToken ct)
     {
-        if (RecorderArguments.ForSegment(_request, _capturedBefore) is not { } segment)
+        if (RecorderArguments.ForSegment(_request, _capturedBefore, _segments.Count == 0 ? 0 : WrittenMb) is not { } segment)
         {
             State = RecorderState.Stopped;
             return;

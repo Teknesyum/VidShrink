@@ -38,7 +38,7 @@ internal partial class RecorderView
     }
 
     private bool CanRun(HotkeyAction action)
-        => action != HotkeyAction.Stop || HasSession || CountingDown;
+        => action is not (HotkeyAction.Stop or HotkeyAction.Discard) || HasSession || CountingDown;
 
     internal async Task<bool> RunHotkeyAsync(HotkeyAction action)
     {
@@ -49,6 +49,7 @@ internal partial class RecorderView
             case HotkeyAction.Toggle: await ToggleAsync(); break;
             case HotkeyAction.Stop: await StopAsync(); break;
             case HotkeyAction.Frame: ToggleFrame(); break;
+            case HotkeyAction.Discard: await DiscardAsync(); break;
         }
 
         return true;

@@ -50,6 +50,10 @@ sürümden (`x.0.0`) önce koşar.
   `recorder-settings.json`'a yazılır, yeni görünümün `PrepareRecording` argümanına geçer, lavfi çevirisiyle ffprobe'ta
   görünür; değiştirilmeyen görünüm negatif kontrol. Otomatik kip kabı korur, açılışta bir kez ölçer (başsızda ve elle
   kipte ölçmez, sahte `OpenMeasure`). Canlı kol 4,5 sn bölge kaydı. Kanıt `.calisma/paket-2/`.
+- `KaydediciHedefTests.cs` — paket 2, hedef ve bitiş: tek hedef kutusu kendi sınırına geçer (yalnız saniye `-t`,
+  yalnız MB `-fs`), boyut sınırı parçalara kalanla bölünür, MP4/MOV'da boyut ölçütü Matroska'ya yakalanıp durunca
+  `-c copy` ile teslim kabına çevrilir; "bitince klasörü aç" yalnız kutu açıkken, F10 iptal kaydı durdurup dosyayı
+  siler. Canlı kollar `[KayitFact]`, 640x480 bölge ≤5 sn. Kanıt `.calisma/paket-2/`.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

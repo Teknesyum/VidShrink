@@ -134,10 +134,21 @@ internal partial class RecorderView
             RecorderBudgetVerdict.Usable => Say("recorder.budget.result", budget.VideoKbps.ToString("N0", Strings.Culture)),
             RecorderBudgetVerdict.TooSmall => Say("recorder.budget.too-small", RecorderBudget.MinimumVideoKbps.ToString("N0", Strings.Culture)),
             RecorderBudgetVerdict.Invalid => Say("recorder.budget.invalid"),
-            _ => string.Empty
+            _ => SingleTargetNote()
         };
 
         TxtBudgetNote.IsVisible = TxtBudgetNote.Text.Length > 0;
+    }
+
+    private string SingleTargetNote()
+    {
+        var seconds = TargetSeconds;
+        var megabytes = TargetMegabytes;
+        if (seconds is null && megabytes is null) return string.Empty;
+        if (seconds is <= 0 || megabytes is <= 0) return Say("recorder.budget.invalid");
+        return seconds is { } sn
+            ? Say("recorder.budget.duration-only", sn.ToString("N0", Strings.Culture))
+            : Say("recorder.budget.size-only", megabytes!.Value.ToString("0.#", Strings.Culture));
     }
 
     /// <summary>

@@ -127,5 +127,9 @@
   "recorder.advanced.audio-separate": "Her girdi ayrı iz",
   "recorder.advanced.audio-gain": "Ses kazancı (dB)",
   "recorder.advanced.noise-gate": "Gürültü kapısı",
-  "recorder.advanced.noise-suppression": "Gürültü bastırma"
+  "recorder.advanced.noise-suppression": "Gürültü bastırma",
+  "recorder.budget.duration-only": "Kayıt {0} saniye sonra kendiliğinden durur.",
+  "recorder.budget.size-only": "Kayıt {0} MB'a ulaşınca kendiliğinden durur.",
+  "recorder.output.open-when-done": "Kayıt bitince klasörü aç",
+  "recorder.discarded": "Kayıt iptal edildi, dosya silindi."
 }

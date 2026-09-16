@@ -198,6 +198,8 @@ public sealed record RecorderRequest
     /// <summary>Kaydin kendiliginden duracagi sure (<c>-t</c>); bos birakilirsa sinir yok.</summary>
     public TimeSpan? MaxDuration { get; init; }
 
+    public double? MaxMegabytes { get; init; }
+
     /// <summary>
     /// Kendiliginden bolme olcutu. Arguman uretimine girmez — parcalari
     /// <c>VidShrink.Ffmpeg.RecorderSession</c> aciyor; burasi yalnizca olcutu dogruluyor.
@@ -384,6 +386,21 @@ public static class RecorderArguments
         return Path.Combine(
             Path.GetDirectoryName(outputPath) ?? string.Empty,
             Path.GetFileNameWithoutExtension(outputPath) + ".gif-kayit.mkv");
+    }
+
+    public static bool SizeNeedsMatroska(RecorderRequest request)
+        => request.Container is RecorderContainer.Mp4 or RecorderContainer.Mov
+           && (request.MaxMegabytes is not null || request.Split?.Megabytes is not null);
+
+    public static string SizeCapturePath(string outputPath)
+        => Path.Combine(Path.GetDirectoryName(outputPath) ?? string.Empty, Path.GetFileNameWithoutExtension(outputPath) + ".boyut.mkv");
+
+    public static string SizeDeliveryPath(string capturePath, string extension)
+    {
+        var stem = Path.GetFileNameWithoutExtension(capturePath);
+        var mark = stem.LastIndexOf(".boyut", StringComparison.Ordinal);
+        if (mark >= 0) stem = stem.Remove(mark, ".boyut".Length);
+        return Path.Combine(Path.GetDirectoryName(capturePath) ?? string.Empty, stem + extension);
     }
 
     public static RecorderRequest CaptureRequest(RecorderRequest request)
@@ -662,6 +679,8 @@ public static class RecorderArguments
     {
         if (request.MaxDuration is { } limit && limit <= TimeSpan.Zero)
             yield return "Recording time limit must be greater than zero.";
+        if (request.MaxMegabytes is { } cap && (cap <= 0 || double.IsNaN(cap) || double.IsInfinity(cap)))
+            yield return "Recording size limit must be greater than zero.";
 
         if (request.Split is not { } split) yield break;
 
@@ -683,6 +702,8 @@ public static class RecorderArguments
             yield return "A GIF has no audio track; turn the audio inputs off.";
         if (request.Split is not null)
             yield return "A GIF recording is converted as one file and cannot be split.";
+        if (request.MaxMegabytes is not null)
+            yield return "A GIF is converted after capture, so its size cannot be capped while recording.";
         if (request.Fps > GifPalette.MaxFps)
             yield return $"A GIF frame delay is counted in hundredths of a second; the frame rate must not exceed {GifPalette.MaxFps}.";
     }
@@ -747,6 +768,9 @@ public static class RecorderArguments
         if (request.MaxDuration is { } limit)
             a.AddRange(new[] { "-t", limit.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
 
+        if (request.MaxMegabytes is { } megabytes)
+            a.AddRange(new[] { "-fs", LimitBytes(megabytes).ToString(CultureInfo.InvariantCulture) });
+
         if (request.Container is RecorderContainer.Mp4 or RecorderContainer.Mov)
             a.AddRange(new[] { "-movflags", "+faststart" });
 
@@ -763,15 +787,29 @@ public static class RecorderArguments
     /// Kalan sure <c>-t</c>'nin yazilabildigi en kucuk adimdan (1 ms) kisaysa <c>null</c>
     /// doner ve yeni parca acilmaz.
     /// </summary>
-    public static RecorderRequest? ForSegment(RecorderRequest request, TimeSpan capturedBefore)
+    public static RecorderRequest? ForSegment(RecorderRequest request, TimeSpan capturedBefore, double writtenMbBefore = 0)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (capturedBefore <= TimeSpan.Zero || request.MaxDuration is not { } limit) return request;
+        var segment = request;
 
-        var remaining = limit - capturedBefore;
-        if (remaining < TimeSpan.FromMilliseconds(1)) return null;
-        return request with { MaxDuration = remaining, Split = null };
+        if (capturedBefore > TimeSpan.Zero && request.MaxDuration is { } limit)
+        {
+            var remaining = limit - capturedBefore;
+            if (remaining < TimeSpan.FromMilliseconds(1)) return null;
+            segment = segment with { MaxDuration = remaining, Split = null };
+        }
+
+        if (writtenMbBefore > 0 && request.MaxMegabytes is { } cap)
+        {
+            var left = cap - writtenMbBefore;
+            if (LimitBytes(left) < 1) return null;
+            segment = segment with { MaxMegabytes = left, Split = null };
+        }
+
+        return segment;
     }
+
+    public static long LimitBytes(double megabytes) => (long)Math.Floor(megabytes * 1024 * 1024);
 
     /// <summary>
     /// Kayit surerken alinan tek karelik ekran goruntusunun argumanlari. Ayni yakalama

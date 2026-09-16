@@ -64,6 +64,7 @@ internal partial class RecorderView
         TxtFps.Text = _settings.Fps.ToString(CultureInfo.InvariantCulture);
         TxtQuality.Text = _settings.Quality.ToString("0.##", CultureInfo.InvariantCulture);
         ChkCursor.IsChecked = _settings.ShowCursor;
+        ChkOpenFolder.IsChecked = _settings.OpenFolderWhenDone;
         TxtWindowTitle.Text = _settings.WindowTitle ?? string.Empty;
         TxtRegionX.Text = _settings.RegionX.ToString(CultureInfo.InvariantCulture);
         TxtRegionY.Text = _settings.RegionY.ToString(CultureInfo.InvariantCulture);
@@ -196,12 +197,21 @@ internal partial class RecorderView
             Fps = _settings.Container == RecorderContainer.Gif ? Math.Min(planned.Fps, GifPalette.MaxFps) : planned.Fps
         };
 
+        var cap = _settings.Container == RecorderContainer.Gif ? null : _settings.TargetMegabytes;
         var budget = Budget;
-        if (budget.Verdict != RecorderBudgetVerdict.Usable) return request;
+        if (budget.Verdict == RecorderBudgetVerdict.Usable)
+            return RecorderAutoPlan.ApplyBudget(request, budget) with
+            {
+                MaxDuration = TimeSpan.FromSeconds(_settings.TargetSeconds ?? 0),
+                MaxMegabytes = cap
+            };
 
-        return RecorderAutoPlan.ApplyBudget(request, budget) with
+        if (budget.Verdict != RecorderBudgetVerdict.NotRequested) return request;
+
+        return request with
         {
-            MaxDuration = TimeSpan.FromSeconds(_settings.TargetSeconds ?? 0)
+            MaxDuration = _settings.TargetSeconds is { } seconds ? TimeSpan.FromSeconds(seconds) : request.MaxDuration,
+            MaxMegabytes = cap ?? request.MaxMegabytes
         };
     }
 
@@ -270,6 +280,7 @@ internal partial class RecorderView
         _settings.Codec = CmbCodec.SelectedItem as string ?? _settings.Codec;
         _settings.Preset = CmbPreset.SelectedItem as string ?? _settings.Preset;
         _settings.ShowCursor = ChkCursor.IsChecked ?? false;
+        _settings.OpenFolderWhenDone = ChkOpenFolder.IsChecked ?? false;
         _settings.WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text;
         _settings.MicrophoneName = DeviceChoice(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
         _settings.SystemAudioName = DeviceChoice(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);

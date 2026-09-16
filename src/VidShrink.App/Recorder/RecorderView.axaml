@@ -384,6 +384,11 @@
                       Click="OnBrowse"/>
             </Grid>
           </StackPanel>
+
+          <CheckBox x:Name="ChkOpenFolder"
+                    Theme="{StaticResource CheckStyle}"
+                    Content="{loc:Text recorder.output.open-when-done}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.output.open-when-done}"/>
         </StackPanel>
       </Border>
     </Grid>

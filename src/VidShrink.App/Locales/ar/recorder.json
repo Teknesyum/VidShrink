@@ -127,5 +127,9 @@
   "recorder.advanced.audio-separate": "مسار واحد لكل مصدر",
   "recorder.advanced.audio-gain": "مكسب الصوت (dB)",
   "recorder.advanced.noise-gate": "بوابة الضوضاء",
-  "recorder.advanced.noise-suppression": "كبت الضوضاء"
+  "recorder.advanced.noise-suppression": "كبت الضوضاء",
+  "recorder.budget.duration-only": "Recording stops by itself after {0} seconds.",
+  "recorder.budget.size-only": "Recording stops by itself when it reaches {0} MB.",
+  "recorder.output.open-when-done": "Open the folder when recording ends",
+  "recorder.discarded": "Recording discarded; the file was deleted."
 }

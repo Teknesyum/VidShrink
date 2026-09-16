@@ -514,7 +514,7 @@ public sealed class KayitFfmpegKoluTests
     {
         var kaynak = File.ReadAllText(Path.Combine(KokDizin(), "src", "VidShrink.Ffmpeg", "RecorderSession.cs"));
 
-        Assert.Contains("RecorderArguments.ForSegment(_request, _capturedBefore)", kaynak);
+        Assert.Contains("RecorderArguments.ForSegment(_request, _capturedBefore, _segments.Count == 0 ? 0 : WrittenMb)", kaynak);
         Assert.DoesNotContain("RecorderArguments.Build(_request", kaynak);
     }
 

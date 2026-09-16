@@ -127,5 +127,9 @@
   "recorder.advanced.audio-separate": "প্রতি ইনপুটে একটি ট্র্যাক",
   "recorder.advanced.audio-gain": "অডিও গেইন (dB)",
   "recorder.advanced.noise-gate": "নয়েজ গেট",
-  "recorder.advanced.noise-suppression": "নয়েজ দমন"
+  "recorder.advanced.noise-suppression": "নয়েজ দমন",
+  "recorder.budget.duration-only": "Recording stops by itself after {0} seconds.",
+  "recorder.budget.size-only": "Recording stops by itself when it reaches {0} MB.",
+  "recorder.output.open-when-done": "Open the folder when recording ends",
+  "recorder.discarded": "Recording discarded; the file was deleted."
 }

@@ -56,6 +56,8 @@ internal sealed class RecorderSettings
 
     internal bool ShowCursor { get; set; } = true;
 
+    internal bool OpenFolderWhenDone { get; set; }
+
     internal RecorderTargetKind Target { get; set; } = RecorderTargetKind.Screen;
 
     internal string? WindowTitle { get; set; }
@@ -207,6 +209,7 @@ internal sealed class RecorderSettings
             if ((string?)root["preset"] is { Length: > 0 } preset) settings.Preset = preset;
             if ((double?)root["quality"] is { } quality) settings.Quality = quality;
             settings.ShowCursor = (bool?)root["showCursor"] ?? true;
+            settings.OpenFolderWhenDone = (bool?)root["openFolderWhenDone"] ?? false;
             if (Enum.TryParse<RecorderTargetKind>((string?)root["target"], true, out var target)) settings.Target = target;
             settings.WindowTitle = (string?)root["windowTitle"];
             settings.RegionX = (int?)root["regionX"] ?? 0;
@@ -273,6 +276,7 @@ internal sealed class RecorderSettings
                 writer.WriteString("preset", Preset);
                 writer.WriteNumber("quality", Quality);
                 writer.WriteBoolean("showCursor", ShowCursor);
+                writer.WriteBoolean("openFolderWhenDone", OpenFolderWhenDone);
                 writer.WriteString("target", Target.ToString());
                 if (WindowTitle is null) writer.WriteNull("windowTitle");
                 else writer.WriteString("windowTitle", WindowTitle);

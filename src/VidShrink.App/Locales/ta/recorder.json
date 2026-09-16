@@ -127,5 +127,9 @@
   "recorder.advanced.audio-separate": "ஒவ்வொரு உள்ளீட்டிற்கும் ஒரு தடம்",
   "recorder.advanced.audio-gain": "ஆடியோ ஆதாயம் (dB)",
   "recorder.advanced.noise-gate": "சத்தக் கதவு",
-  "recorder.advanced.noise-suppression": "சத்த ஒடுக்கம்"
+  "recorder.advanced.noise-suppression": "சத்த ஒடுக்கம்",
+  "recorder.budget.duration-only": "Recording stops by itself after {0} seconds.",
+  "recorder.budget.size-only": "Recording stops by itself when it reaches {0} MB.",
+  "recorder.output.open-when-done": "Open the folder when recording ends",
+  "recorder.discarded": "Recording discarded; the file was deleted."
 }

@@ -127,5 +127,9 @@
   "recorder.advanced.audio-separate": "Ét spor pr. input",
   "recorder.advanced.audio-gain": "Lydforstærkning (dB)",
   "recorder.advanced.noise-gate": "Noise gate",
-  "recorder.advanced.noise-suppression": "Støjreduktion"
+  "recorder.advanced.noise-suppression": "Støjreduktion",
+  "recorder.budget.duration-only": "Recording stops by itself after {0} seconds.",
+  "recorder.budget.size-only": "Recording stops by itself when it reaches {0} MB.",
+  "recorder.output.open-when-done": "Open the folder when recording ends",
+  "recorder.discarded": "Recording discarded; the file was deleted."
 }

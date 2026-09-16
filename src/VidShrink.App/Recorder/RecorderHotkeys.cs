@@ -13,7 +13,8 @@ internal enum HotkeyAction
 {
     Toggle,
     Stop,
-    Frame
+    Frame,
+    Discard
 }
 
 internal sealed record HotkeyBinding(HotkeyAction Action, Key Key, uint VirtualKey);
@@ -31,7 +32,8 @@ internal static class RecorderHotkeys
     [
         new(HotkeyAction.Toggle, Key.F7, 0x76),
         new(HotkeyAction.Stop, Key.F8, 0x77),
-        new(HotkeyAction.Frame, Key.F9, 0x78)
+        new(HotkeyAction.Frame, Key.F9, 0x78),
+        new(HotkeyAction.Discard, Key.F10, 0x79)
     ];
 
     internal static HotkeyAction? ActionOf(Key key, KeyModifiers modifiers)
