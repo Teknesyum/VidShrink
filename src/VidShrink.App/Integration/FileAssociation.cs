@@ -77,14 +77,18 @@ internal static class FileAssociation
     internal static IReadOnlyList<string> Register(string executablePath, string classesRoot = ClassesRoot)
     {
         var failed = new List<string>();
+        var allowed = WriteAllowed(Environment.ProcessPath, classesRoot);
         foreach (var (key, name, value) in Plan(executablePath, classesRoot))
         {
-            if (!Write(key, name, value)) failed.Add($"{key}|{name}");
+            if (!allowed || !Write(key, name, value)) failed.Add($"{key}|{name}");
         }
 
         if (failed.Count == 0) SHChangeNotify(0x08000000, 0x1000, IntPtr.Zero, IntPtr.Zero);
         return failed;
     }
+
+    internal static bool WriteAllowed(string? processPath, string classesRoot)
+        => !string.Equals(classesRoot, ClassesRoot, StringComparison.OrdinalIgnoreCase) || RegistryWriteGate.Allows(processPath);
 
     [SupportedOSPlatform("windows")]
     private static bool Write(string key, string name, string? value)

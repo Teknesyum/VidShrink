@@ -43,10 +43,26 @@ internal static class ShellMenu
     /// </summary>
     internal const string LabelKey = "Software\\Teknesyum\\VidShrink\\ShellLabels";
 
+    /// <summary>
+    /// Testlerin yazdığı kök; <c>HKEY_CURRENT_USER</c> altında görecelidir. Boşken yazma
+    /// yalnız kurulu uygulamanın sürecinden gerçek kayıt defterine gider: test konağı ya da
+    /// ölçüm aracı kullanıcının menüsünü kendi exe'sine çeviremez.
+    /// </summary>
+    internal static string? TestRoot { get; set; }
+
+    internal static string? WriteRoot(string? processPath, string? testRoot)
+        => testRoot is not null ? testRoot + "\\"
+            : Integration.RegistryWriteGate.Allows(processPath) ? string.Empty
+            : null;
+
+    private static string? Root => WriteRoot(Environment.ProcessPath, TestRoot);
+
+    private static string ReadRoot => TestRoot is null ? string.Empty : TestRoot + "\\";
+
     [SupportedOSPlatform("windows")]
     internal static bool Installed(string menu)
     {
-        using var key = Registry.CurrentUser.OpenSubKey(Branch(Extensions[0]) + "\\" + menu);
+        using var key = Registry.CurrentUser.OpenSubKey(ReadRoot + Branch(Extensions[0]) + "\\" + menu);
         return key is not null;
     }
 
@@ -57,13 +73,14 @@ internal static class ShellMenu
     [SupportedOSPlatform("windows")]
     internal static int InstallOpen(string executable, string label)
     {
-        RemoveOpen();
+        if (Root is not { } root) return 0;
+        Drop(MenuKey);
         WriteLabel("open", label);
 
         var written = 0;
         foreach (var extension in Extensions)
         {
-            using var open = Registry.CurrentUser.CreateSubKey(Branch(extension) + "\\" + MenuKey);
+            using var open = Registry.CurrentUser.CreateSubKey(root + Branch(extension) + "\\" + MenuKey);
             open.SetValue("MUIVerb", label, RegistryValueKind.String);
             open.SetValue("Icon", executable, RegistryValueKind.String);
             using var command = open.CreateSubKey("command");
@@ -78,13 +95,14 @@ internal static class ShellMenu
     [SupportedOSPlatform("windows")]
     internal static int InstallShrink(string executable, string label)
     {
+        if (Root is not { } root) return 0;
         RemoveShrink();
         WriteLabel("shrink", label);
 
         var written = 0;
         foreach (var extension in Extensions)
         {
-            using var verb = Registry.CurrentUser.CreateSubKey(Branch(extension) + "\\" + ShrinkMenuKey);
+            using var verb = Registry.CurrentUser.CreateSubKey(root + Branch(extension) + "\\" + ShrinkMenuKey);
             verb.SetValue("MUIVerb", label, RegistryValueKind.String);
             verb.SetValue("Icon", executable, RegistryValueKind.String);
             verb.SetValue("SubCommands", string.Empty, RegistryValueKind.String);
@@ -113,15 +131,43 @@ internal static class ShellMenu
     [SupportedOSPlatform("windows")]
     private static void WriteLabel(string name, string label)
     {
-        using var key = Registry.CurrentUser.CreateSubKey(LabelKey);
+        if (Root is not { } root) return;
+        using var key = Registry.CurrentUser.CreateSubKey(root + LabelKey);
         key.SetValue(name, label, RegistryValueKind.String);
+    }
+
+    [SupportedOSPlatform("windows")]
+    internal static int Relabel(string menu, string label)
+    {
+        if (Root is not { } root) return 0;
+        var name = menu == MenuKey ? "open" : "shrink";
+        var written = 0;
+        using (var labels = Registry.CurrentUser.OpenSubKey(root + LabelKey))
+        {
+            if (labels?.GetValue(name) as string != label)
+            {
+                WriteLabel(name, label);
+                written++;
+            }
+        }
+
+        foreach (var extension in Extensions)
+        {
+            using var verb = Registry.CurrentUser.OpenSubKey(root + Branch(extension) + "\\" + menu, writable: true);
+            if (verb is null || verb.GetValue("MUIVerb") as string == label) continue;
+            verb.SetValue("MUIVerb", label, RegistryValueKind.String);
+            written++;
+        }
+
+        return written;
     }
 
     [SupportedOSPlatform("windows")]
     internal static int RemoveOpen()
     {
+        if (Root is null) return 0;
         var removed = Drop(MenuKey);
-        RemovePackage();
+        if (TestRoot is null) RemovePackage();
         return removed;
     }
 
@@ -131,10 +177,11 @@ internal static class ShellMenu
     [SupportedOSPlatform("windows")]
     private static int Drop(string menu)
     {
+        if (Root is not { } root) return 0;
         var removed = 0;
         foreach (var extension in Extensions)
         {
-            var path = Branch(extension) + "\\" + menu;
+            var path = root + Branch(extension) + "\\" + menu;
             using var probe = Registry.CurrentUser.OpenSubKey(path);
             if (probe is null) continue;
             probe.Dispose();
