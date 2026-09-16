@@ -765,11 +765,15 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     private void RenderLoop()
     {
+        var due = false;
         while (!_stopping)
         {
             _update.WaitOne(100);
             if (_stopping) break;
-            if ((mpv_render_context_update(_render) & MPV_RENDER_UPDATE_FRAME) == 0) continue;
+            if ((mpv_render_context_update(_render) & MPV_RENDER_UPDATE_FRAME) != 0) due = true;
+            if (!due) continue;
+            if (Volatile.Read(ref _videoWidth) <= 0 || Volatile.Read(ref _videoHeight) <= 0) continue;
+            due = false;
             RenderFrame();
         }
     }

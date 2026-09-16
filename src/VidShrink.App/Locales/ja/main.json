@@ -34,6 +34,7 @@
   "main.update.downloading": "ダウンロード中…",
   "main.update.ready": "インストールの準備完了",
   "main.update.failed": "アップデートをダウンロードできませんでした",
+  "main.update.cancelled": "ダウンロードをキャンセルしました",
   "main.update.log.manifest": "バージョン一覧を取得中",
   "main.update.log.found": "バージョン {0}: {1} 個のファイル",
   "main.update.log.current": "すでに最新です",

@@ -34,6 +34,7 @@
   "main.update.downloading": "Laddar ned…",
   "main.update.ready": "Redo att installera",
   "main.update.failed": "Uppdateringen kunde inte laddas ned",
+  "main.update.cancelled": "Nedladdningen avbröts",
   "main.update.log.manifest": "Hämtar versionslistan",
   "main.update.log.found": "Version {0}: {1} filer",
   "main.update.log.current": "Redan uppdaterad",

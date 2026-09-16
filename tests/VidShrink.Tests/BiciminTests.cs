@@ -168,16 +168,19 @@ public sealed class KareYerlesimTests
 {
     /// <summary>
     /// Karenin cekildigi olcu. Pencerenin izin verdigi en dar olcu (1040x720,
-    /// <c>MainWindow.axaml</c>, <c>MinWidth="1040"</c>) burada <b>olculmuyor</b>: o olcude
-    /// <c>InfoGrid</c>'in dort sutunu hucreyi 67 px'e dusuruyor ve etiketler sigmiyor.
-    /// Dar pencerenin kabul edilen davranisi henuz karara baglanmadi, ayri sozlesmede.
+    /// <c>MainWindow.axaml</c>, <c>MinWidth="1040"</c>) de olculuyor: T194 karari tek satir,
+    /// sigmayan metin ucnoktayla kisalir ve tam hali balonda durur.
     /// </summary>
     public static readonly Size Genis = new(1600, 1000);
+
+    public static readonly Size Dar = new(1040, 720);
 
     public static TheoryData<string, double, double> IkiDilTekOlcu() => new()
     {
         { "tr", 1600, 1000 },
-        { "en", 1600, 1000 }
+        { "en", 1600, 1000 },
+        { "tr", 1040, 720 },
+        { "en", 1040, 720 }
     };
 
     private static T Read<T>(string dil, Func<MainWindow, T> read) => Read(dil, Genis, read);
@@ -240,49 +243,94 @@ public sealed class KareYerlesimTests
     [MemberData(nameof(IkiDilTekOlcu))]
     public void KaynakBilgiEtiketleriKendiHucresindeKalir(string dil, double genislik, double yukseklik)
     {
-        var tasan = Read(dil, new Size(genislik, yukseklik), window => Tasanlar(window, new Size(genislik, yukseklik), null));
+        var olcu = new Size(genislik, yukseklik);
+        var (tasan, satirlar) = Read(dil, olcu, window => Tasanlar(window, olcu, null, kirpmaKapali: false, balonKapali: false));
+
+        var klasor = Path.Combine(TipSources.Root, ".calisma", "t194");
+        Directory.CreateDirectory(klasor);
+        File.WriteAllLines(Path.Combine(klasor, $"infogrid-{dil}-{genislik:0}x{yukseklik:0}.txt"), satirlar);
 
         Assert.True(tasan.Count == 0, string.Join(Environment.NewLine, tasan));
+        if (olcu == Dar) Assert.Contains(satirlar, satir => satir.Contains("kisaldi", StringComparison.Ordinal));
     }
 
     /// <summary>
-    /// Olcunun mutasyon sinavi: hucreye sigmayacak kadar uzun bir etiket verildiginde
-    /// olcu <b>kirmizi</b> donmeli. Donmezse yukaridaki yesil bir sey soylemiyor demektir.
+    /// Olcunun mutasyon sinavi: hucreye sigmayacak kadar uzun bir etiketin kirpmasi ya da
+    /// balonu kaldirilinca olcu <b>kirmizi</b> donmeli. Donmezse yukaridaki yesil bir sey
+    /// soylemiyor demektir.
     /// </summary>
-    [Fact]
-    public void OlcuUzunEtiketiYakalar()
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void OlcuUzunEtiketiYakalar(bool kirpmaKapali, bool balonKapali)
     {
-        var tasan = Read("tr", Genis, window => Tasanlar(window, Genis, "Cok Uzun Bir Kaynak Bilgi Etiketi Ornegi"));
+        var (tasan, _) = Read("tr", Genis, window => Tasanlar(window, Genis, "Cok Uzun Bir Kaynak Bilgi Etiketi Ornegi Daha Da Uzun", kirpmaKapali, balonKapali));
 
         Assert.NotEmpty(tasan);
     }
 
     /// <summary>
-    /// Her hucrenin ilk metnini alir, sarmayi kapatir, yeniden yerlestirir ve metin
-    /// genisligini hucre genisligiyle karsilastirir. <paramref name="mutasyon"/> verilirse
-    /// ilk etiketin metni onunla degistirilir.
+    /// Her hucrenin metinlerini yeniden yerlestirir. Kural: tek gorsel satir, hucre
+    /// genisligini asmaz; dogal genisligi hucreyi asan metin ucnoktayla kisalir ve balonu
+    /// metnin tam halini tasir. <paramref name="mutasyon"/> verilirse ilk etiketin metni
+    /// onunla degistirilir.
     /// </summary>
-    private static List<string> Tasanlar(MainWindow window, Size olcu, string? mutasyon)
+    private static (List<string> Tasan, List<string> Satirlar) Tasanlar(MainWindow window, Size olcu, string? mutasyon, bool kirpmaKapali, bool balonKapali)
     {
         var grid = window.GetVisualDescendants().OfType<UniformGrid>()
             .Single(g => g.Name == "InfoGrid");
 
         var hucreler = grid.Children
             .OfType<StackPanel>()
-            .Select(cell => (cell, label: cell.Children.OfType<TextBlock>().First()))
+            .SelectMany(cell => cell.Children.OfType<TextBlock>().Select(text => (cell, text)))
             .ToList();
 
-        foreach (var (_, label) in hucreler) label.TextWrapping = TextWrapping.NoWrap;
-        if (mutasyon is not null) hucreler[0].label.Text = mutasyon;
+        foreach (var (_, text) in hucreler)
+            if (string.IsNullOrEmpty(text.Text)) text.Text = "hevc (Main 10) · 3840x2160";
+
+        if (mutasyon is not null)
+        {
+            var ilk = hucreler[0].text;
+            ilk.Text = mutasyon;
+            if (kirpmaKapali) ilk.TextTrimming = TextTrimming.None;
+            if (balonKapali) ToolTip.SetTip(ilk, null);
+        }
 
         window.Measure(olcu);
         window.Arrange(new Rect(olcu));
         window.UpdateLayout();
 
-        return hucreler
-            .Where(pair => pair.label.TextLayout.Width > pair.cell.Bounds.Width + 0.5)
-            .Select(pair => $"{pair.label.Text}: metin {pair.label.TextLayout.Width:0.#} px, hucre {pair.cell.Bounds.Width:0.#} px")
-            .ToList();
+        var tasan = new List<string>();
+        var satirlar = new List<string>();
+        foreach (var (cell, text) in hucreler)
+        {
+            var dogal = new TextBlock
+            {
+                Text = text.Text,
+                FontFamily = text.FontFamily,
+                FontSize = text.FontSize,
+                FontWeight = text.FontWeight,
+                FontStyle = text.FontStyle,
+                LetterSpacing = text.LetterSpacing,
+                TextWrapping = TextWrapping.NoWrap
+            };
+            dogal.Measure(Size.Infinity);
+            var dogalGenislik = dogal.DesiredSize.Width;
+            var hucre = cell.Bounds.Width;
+            var kisaldi = dogalGenislik > hucre + 0.5;
+            var satir = text.TextLayout.TextLines.Count;
+            var cizilen = text.TextLayout.Width;
+            var balon = ToolTip.GetTip(text) as string;
+
+            satirlar.Add($"{text.Text}: dogal {dogalGenislik:0.#} px, cizilen {cizilen:0.#} px, hucre {hucre:0.#} px, satir {satir}, {(kisaldi ? "kisaldi" : "sigdi")}, balon {(balon == text.Text ? "tam" : balon ?? "yok")}");
+
+            if (satir != 1) tasan.Add($"{text.Text}: {satir} satir");
+            if (cizilen > hucre + 0.5) tasan.Add($"{text.Text}: cizilen {cizilen:0.#} px, hucre {hucre:0.#} px");
+            if (kisaldi && text.TextTrimming == TextTrimming.None) tasan.Add($"{text.Text}: kisalmasi gerekiyor, kirpma yok");
+            if (kisaldi && balon != text.Text) tasan.Add($"{text.Text}: kisaldi ama balonda tam metin yok ({balon ?? "yok"})");
+        }
+
+        return (tasan, satirlar);
     }
 
     /// <summary>
@@ -574,7 +622,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(31863, gezilen);
+        Assert.Equal(31906, gezilen);
         Assert.Empty(kayip);
     }
 

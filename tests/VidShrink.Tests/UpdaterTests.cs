@@ -351,6 +351,52 @@ public sealed class UpdaterTests : IDisposable
     }
 
     [Fact]
+    public async Task ACancelledDownloadLeavesNoPartialFileAndStartsAgain()
+    {
+        var publish = Folder("publish");
+        var names = new[] { "VidShrink.App.dll", "a.dll", "runtimes/win-x64/native/b.dll" };
+        foreach (var name in names) WriteRandom(publish, name, 300_000);
+        var source = Folder("source");
+        ZipFile.CreateFromDirectory(publish, Path.Combine(source, UpdateCheck.ArchiveAssetName(UpdateCheck.Rid)));
+        var files = string.Join(",", names.Select(name =>
+        {
+            var file = Describe(publish, name);
+            return $$"""{ "path": "{{file.Path}}", "sha256": "{{file.Sha256}}", "size": {{file.Size}} }""";
+        }));
+        File.WriteAllText(Path.Combine(source, UpdateCheck.ManifestAssetName(UpdateCheck.Rid)),
+            $$"""{ "version": "9.9.9", "commit": "abc", "built": "2026-09-16T00:00:00Z", "rid": "{{UpdateCheck.Rid}}", "files": [{{files}}] }""");
+
+        var baseDirectory = Folder("install");
+        var app = Folder(Path.Combine("install", "app"));
+        foreach (var name in names) Write(app, name, "eski");
+        var stage = Path.Combine(baseDirectory, UpdateStaging.StageDirectoryName);
+
+        using var cancel = new CancellationTokenSource();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => UpdateStaging.StageAsync(
+            baseDirectory, app, source, 1, null, "test",
+            report => { if (report.Phase == UpdateStagePhase.Downloaded) cancel.Cancel(); },
+            cancel.Token));
+
+        var afterCancel = Directory.EnumerateFiles(stage, "*.dll", SearchOption.AllDirectories).ToList();
+        _output.WriteLine($"iptalden sonra sahnede {afterCancel.Count} dosya");
+        Assert.Single(afterCancel);
+
+        var leftover = UpdateCheck.LocalPath(stage, names[1]) + UpdateStaging.PartialSuffix;
+        File.WriteAllText(leftover, "yarım");
+        UpdateStaging.DiscardPartials(baseDirectory);
+        Assert.Empty(Directory.EnumerateFiles(stage, "*" + UpdateStaging.PartialSuffix, SearchOption.AllDirectories));
+
+        UpdateStagePhase? last = null;
+        var staged = await UpdateStaging.StageAsync(
+            baseDirectory, app, source, 1, null, "test", report => last = report.Phase, CancellationToken.None);
+
+        Assert.NotNull(staged);
+        Assert.Equal(UpdateStagePhase.Staged, last);
+        foreach (var name in names)
+            Assert.Equal(Describe(publish, name).Sha256, UpdateCheck.HashFile(UpdateCheck.LocalPath(stage, name)));
+    }
+
+    [Fact]
     public void TheSameVersionIsNotDownloadedASecondTime()
     {
         var app = Folder("app");

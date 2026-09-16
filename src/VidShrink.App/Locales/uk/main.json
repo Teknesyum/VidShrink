@@ -34,6 +34,7 @@
   "main.update.downloading": "Завантаження…",
   "main.update.ready": "Готово до встановлення",
   "main.update.failed": "Не вдалося завантажити оновлення",
+  "main.update.cancelled": "Завантаження скасовано",
   "main.update.log.manifest": "Отримання списку версій",
   "main.update.log.found": "Версія {0}: файлів {1}",
   "main.update.log.current": "Уже актуально",

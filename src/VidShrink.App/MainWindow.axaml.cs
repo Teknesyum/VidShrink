@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -2064,6 +2064,12 @@ public partial class MainWindow : Window
         if (launcher is null)
         {
             OpenExternal(UpdateCheck.ReleasesPageUrl);
+            return;
+        }
+
+        if (_updateBadgeState == UpdateBadgeState.Downloading)
+        {
+            CancelUpdateDownload();
             return;
         }
 

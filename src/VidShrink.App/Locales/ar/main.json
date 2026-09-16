@@ -34,6 +34,7 @@
   "main.update.downloading": "جارٍ التنزيل…",
   "main.update.ready": "جاهز للتثبيت",
   "main.update.failed": "تعذّر تنزيل التحديث",
+  "main.update.cancelled": "تم إلغاء التنزيل",
   "main.update.log.manifest": "جارٍ جلب قائمة الإصدارات",
   "main.update.log.found": "الإصدار {0}: {1} ملفات",
   "main.update.log.current": "محدَّث بالفعل",

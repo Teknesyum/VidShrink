@@ -34,6 +34,7 @@
   "main.update.downloading": "Baixando…",
   "main.update.ready": "Pronta para instalar",
   "main.update.failed": "Não foi possível baixar a atualização",
+  "main.update.cancelled": "Download cancelado",
   "main.update.log.manifest": "Obtendo a lista de versões",
   "main.update.log.found": "Versão {0}: {1} arquivos",
   "main.update.log.current": "Já está atualizado",

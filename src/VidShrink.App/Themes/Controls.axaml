@@ -267,7 +267,7 @@
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPurple}"/>
-          <Setter Property="BoxShadow" Value="{StaticResource GlowPurple}"/>
+          <Setter Property="BoxShadow" Value="{DynamicResource GlowPurple}"/>
         </Style>
         <Style Selector="^:pressed">
           <Setter Property="RenderTransform" Value="scale(0.98)"/>
@@ -317,7 +317,7 @@
                     BorderBrush="{TemplateBinding BorderBrush}"
                     BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="{TemplateBinding CornerRadius}"
-                    BoxShadow="{StaticResource GlowBlue}">
+                    BoxShadow="{DynamicResource GlowBlue}">
               <Border.Transitions>
                 <Transitions>
                   <BrushTransition Property="Background" Duration="{StaticResource MotionInstant}"/>

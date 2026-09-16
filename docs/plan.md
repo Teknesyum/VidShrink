@@ -413,3 +413,19 @@ sağ tık menüsünün kayıt değerleri her koşumdan önce ve sonra doğrulan�
    `KabukMenusuTests.EtiketYenilemesiGirdiyiYenidenKurmuyor`.
 
 Tablo [docs/olcumler/acilis-hizi.md](olcumler/acilis-hizi.md) F dalgası.
+
+## Paket 1
+
+Dal `t0/paket-1`. Kaynak: `.calisma/eksikler/rapor.md` satır 1, 2, 3, 6, 7, 12, 13, 14, 15. Her kalem ayrı commit.
+
+1. Güncelleme indirmesi iptal: `MainWindow.Guncelleme.cs` iptal kaynağı, panelin birincil düğmesi inerken "İptal"; `UpdateStaging` yarım dosyayı `.part`tan siler.
+2. Oynatma sırasında indirme tavanı: tavansız/tavanlı kare düşümü ölçümü, `docs/olcumler/guncelleme-indirme-tavani.md`.
+   **Kapandı, ölçülmedi:** kullanıcı makinesinde ölçülmez, CI/ayrı makine. Ölçüm libmpv'yi yük altında uzun süre koşturuyor; 16 Eylül'de bu makinede yük üreten koşumlar iki kez Kernel-Power 41 kapanmasına denk geldi. 4 MiB/s tavanı ölçülmüş sayı değil, docstring'i öyle kalır.
+3. Kurulum çubuğu açılış atağı: `InstallProgress` karelerinden ms ölçümü, `docs/olcumler/kurulum-cubugu-atagi.md`.
+4. `player-recent.json` test yolu: kayıt yolu ayar yolu değişkenine bağlanır.
+5. libmpv yedeği: `libmpv-mirror` yayın varlığı, CI/release/Install-VidShrink.ps1 yedek kaynak, sha256 aynı.
+6. Karşılaştırma paneli perdesi: şekil tema belirteçleriyle, önce/sonra PNG.
+   **Zaten yapılmış:** 29 Ağustos 23:51 isteği (`tmp/gecmis-8.md` satır 182) 36 dakika sonra T79 `2b5be0d7` ile karşılandı: şerit paravanı `PlaybackScrimVeil`, alttan yukarı son çeyreğinde (`PlaybackScrimEdge` 0,25) sönüyor. Rapor commit mesajındaki `Paravan sekillendi` satırını kaçırmış. Yeni biçim eklenmedi; Avalonia.Headless ile aynı `PlaybackStrip` teması iki zeminle çizildi: `docs/olcumler/gorseller/paravan-once-duz.png` (`PlaybackScrim`), `paravan-sonra-sonen.png` (`PlaybackScrimVeil`).
+7. T194: dar pencerede kaynak bilgi kutuları tek satır, kısaltma + ipucu, `BiciminTests` pinleri.
+8. `GlowBlue/Pink/Purple` palet değişiminde canlı.
+9. Anahtar kare atlama yarışı: yeniden üret, kök neden, düzelt, pimle.

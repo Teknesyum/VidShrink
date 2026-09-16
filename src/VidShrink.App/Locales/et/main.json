@@ -34,6 +34,7 @@
   "main.update.downloading": "Laadin alla…",
   "main.update.ready": "Valmis paigaldamiseks",
   "main.update.failed": "Uuendust ei õnnestunud alla laadida",
+  "main.update.cancelled": "Allalaadimine tühistati",
   "main.update.log.manifest": "Versioonide loendi toomine",
   "main.update.log.found": "Versioon {0}: {1} faili",
   "main.update.log.current": "Juba ajakohane",

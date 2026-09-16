@@ -34,6 +34,7 @@
   "main.update.downloading": "Sťahuje sa…",
   "main.update.ready": "Pripravené na inštaláciu",
   "main.update.failed": "Aktualizáciu sa nepodarilo stiahnuť",
+  "main.update.cancelled": "Sťahovanie zrušené",
   "main.update.log.manifest": "Načítava sa zoznam verzií",
   "main.update.log.found": "Verzia {0}: {1} súborov",
   "main.update.log.current": "Už aktuálne",

@@ -34,6 +34,7 @@
   "main.update.downloading": "Memuat turun…",
   "main.update.ready": "Sedia untuk dipasang",
   "main.update.failed": "Kemas kini tidak dapat dimuat turun",
+  "main.update.cancelled": "Muat turun dibatalkan",
   "main.update.log.manifest": "Mendapatkan senarai versi",
   "main.update.log.found": "Versi {0}: {1} fail",
   "main.update.log.current": "Sudah terkini",

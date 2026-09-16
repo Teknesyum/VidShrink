@@ -43,6 +43,7 @@ public partial class MainWindow
     private UpdateStagePhase? _updateLastPhase;
     private int _updateLinesShown;
     private bool _updateNoticeWatched;
+    private CancellationTokenSource? _updateCancel;
 
     /// <summary>
     /// İndirmeyi başlatır. Başlatıcısı olmayan kurulumda indirilecek yer yok; o zaman
@@ -65,6 +66,10 @@ public partial class MainWindow
         var throttle = new DownloadThrottle(PlaybackDownloadBytesPerSecond, () => player.IsPlaying);
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE");
         var reports = _updateReports;
+        _updateCancel?.Dispose();
+        var cancel = new CancellationTokenSource();
+        _updateCancel = cancel;
+        var token = cancel.Token;
 
         var work = LowPriorityWork.Run<bool?>(nameof(StartUpdateDownload), async () =>
         {
@@ -78,8 +83,13 @@ public partial class MainWindow
             {
                 var staged = await UpdateStaging.StageAsync(
                     baseDirectory, appDirectory, source, 1, throttle, nameof(VidShrink),
-                    reports.Enqueue, CancellationToken.None);
+                    reports.Enqueue, token);
                 return staged is not null;
+            }
+            catch (OperationCanceledException)
+            {
+                UpdateStaging.DiscardPartials(baseDirectory);
+                throw;
             }
             finally
             {
@@ -93,14 +103,38 @@ public partial class MainWindow
     }
 
     /// <summary>
+    /// İnen güncellemeyi durdurur. İş parçacığı yarım dosyaları siler ve mutex'i bırakır;
+    /// rozet "Güncelleme"ye döner, sonraki tık indirmeyi yeniden başlatır ve özeti tutan
+    /// dosyaları atlar.
+    /// </summary>
+    internal void CancelUpdateDownload()
+    {
+        if (_updateBadgeState != UpdateBadgeState.Downloading) return;
+        var cancel = _updateCancel;
+        if (cancel is null || cancel.IsCancellationRequested) return;
+        cancel.Cancel();
+        RefreshUpdateNoticeButton();
+    }
+
+    /// <summary>
     /// Panelin öncü cümlesi ve birincil düğmesi rozetin durumunu izler: inmemişken "İndir",
     /// inerken kapalı, indikten sonra "Yükle".
     /// </summary>
     private void RefreshUpdateNoticeButton()
     {
         var state = _updateBadgeState;
-        BtnNoticeInstall.Content = Say(state == UpdateBadgeState.Ready ? "main.action.install" : "main.action.download");
-        BtnNoticeInstall.IsEnabled = state is not (UpdateBadgeState.Downloading or UpdateBadgeState.Installing);
+        BtnNoticeInstall.Content = Say(state switch
+        {
+            UpdateBadgeState.Ready => "main.action.install",
+            UpdateBadgeState.Downloading => "main.action.cancel",
+            _ => "main.action.download"
+        });
+        BtnNoticeInstall.IsEnabled = state switch
+        {
+            UpdateBadgeState.Installing => false,
+            UpdateBadgeState.Downloading => _updateCancel is { IsCancellationRequested: false },
+            _ => true
+        };
         TxtNoticeLead.Text = Say(state switch
         {
             UpdateBadgeState.Downloading => "main.update.downloading",
@@ -120,6 +154,11 @@ public partial class MainWindow
         {
             progress.Finish(true, Say("main.update.ready"));
             SetUpdateBadge(UpdateBadgeState.Ready);
+        }
+        else if (task.IsCanceled)
+        {
+            progress.Finish(false, Say("main.update.cancelled"));
+            SetUpdateBadge(UpdateBadgeState.NewVersion);
         }
         else if (task.Status == TaskStatus.RanToCompletion && task.Result == false && _updateLastPhase == UpdateStagePhase.Current)
         {

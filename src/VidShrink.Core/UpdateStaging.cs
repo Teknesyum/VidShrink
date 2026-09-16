@@ -75,6 +75,9 @@ public static class UpdateStaging
     /// <summary>Başlatıcının indirme ve doğrulama şeridi sayısı.</summary>
     public const int LauncherLanes = 6;
 
+    /// <summary>Yazılırken dosyanın taşıdığı ek; yarıda kalan indirme tam dosya gibi durmaz.</summary>
+    public const string PartialSuffix = ".part";
+
     /// <summary>
     /// Sahneyi toplar. Kurulacak bir şey yoksa (liste yok, zaten güncel) null döner.
     /// <paramref name="lanes"/> 1 ise dosyalar sırayla iner ve her devam çağıranın
@@ -226,7 +229,37 @@ public static class UpdateStaging
 
         var folder = Path.GetDirectoryName(target);
         if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
-        await File.WriteAllBytesAsync(target, bytes, cancellationToken);
+        var partial = target + PartialSuffix;
+        try
+        {
+            await File.WriteAllBytesAsync(partial, bytes, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            File.Move(partial, target, overwrite: true);
+        }
+        catch
+        {
+            TryDelete(partial);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// İptal edilen indirmenin sahnede bıraktığı yarım dosyaları siler. Özeti tutan tam
+    /// dosyalar kalır; yeniden indirme onları atlar.
+    /// </summary>
+    public static void DiscardPartials(string baseDirectory)
+    {
+        var stage = Path.Combine(baseDirectory, StageDirectoryName);
+        if (!Directory.Exists(stage)) return;
+        foreach (var partial in Directory.EnumerateFiles(stage, "*" + PartialSuffix, SearchOption.AllDirectories))
+            TryDelete(partial);
+    }
+
+    private static void TryDelete(string path)
+    {
+        try { File.Delete(path); }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
     }
 
     private static async Task<string?> FetchManifestAsync(string rid, string? source, CancellationToken cancellationToken)

@@ -34,6 +34,7 @@
   "main.update.downloading": "กำลังดาวน์โหลด…",
   "main.update.ready": "พร้อมติดตั้ง",
   "main.update.failed": "ดาวน์โหลดอัปเดตไม่สำเร็จ",
+  "main.update.cancelled": "ยกเลิกการดาวน์โหลดแล้ว",
   "main.update.log.manifest": "กำลังดึงรายการเวอร์ชัน",
   "main.update.log.found": "เวอร์ชัน {0}: {1} ไฟล์",
   "main.update.log.current": "เป็นเวอร์ชันล่าสุดแล้ว",

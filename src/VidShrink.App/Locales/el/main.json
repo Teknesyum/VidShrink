@@ -34,6 +34,7 @@
   "main.update.downloading": "Λήψη…",
   "main.update.ready": "Έτοιμη για εγκατάσταση",
   "main.update.failed": "Δεν ήταν δυνατή η λήψη της ενημέρωσης",
+  "main.update.cancelled": "Η λήψη ακυρώθηκε",
   "main.update.log.manifest": "Λήψη λίστας εκδόσεων",
   "main.update.log.found": "Έκδοση {0}: {1} αρχεία",
   "main.update.log.current": "Ήδη ενημερωμένο",

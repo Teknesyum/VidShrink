@@ -34,6 +34,7 @@
   "main.update.downloading": "ڈاؤن لوڈ ہو رہا ہے…",
   "main.update.ready": "انسٹال کے لیے تیار",
   "main.update.failed": "اپ ڈیٹ ڈاؤن لوڈ نہیں ہو سکا",
+  "main.update.cancelled": "ڈاؤن لوڈ منسوخ کر دیا گیا",
   "main.update.log.manifest": "ورژن کی فہرست لائی جا رہی ہے",
   "main.update.log.found": "ورژن {0}: {1} فائلیں",
   "main.update.log.current": "پہلے سے تازہ ترین",

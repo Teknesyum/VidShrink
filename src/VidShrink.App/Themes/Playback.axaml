@@ -212,7 +212,7 @@
       </Transitions>
     </Setter>
     <Style Selector="^.lit">
-      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
     </Style>
   </ControlTheme>
 
@@ -234,7 +234,7 @@
     <Style Selector="^.lit">
       <Setter Property="Background" Value="{StaticResource NeonBlueHover}"/>
       <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
-      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
     </Style>
   </ControlTheme>
 
@@ -245,7 +245,7 @@
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
     <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
-    <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+    <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
   </ControlTheme>
 
   <!--
@@ -266,7 +266,7 @@
     <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
     <!-- Parıltı düğmenin kendisinde değil şablonunun gövdesinde: Button'da BoxShadow yok. -->
     <Style Selector="^ /template/ Border#Root">
-      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
     </Style>
     <Style Selector="^:disabled /template/ Border#Root">
       <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
@@ -310,7 +310,7 @@
     <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
     <Setter Property="Padding" Value="{StaticResource PlaybackStripPadding}"/>
     <Setter Property="Margin" Value="{StaticResource PlaybackStripMargin}"/>
-    <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+    <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
   </ControlTheme>
 
   <!-- Zaman çizgisi. Yol hep görünür; dolgu ve tutamaç süre bilinmiyorken gizlenir. -->
@@ -339,7 +339,7 @@
     <Setter Property="Height" Value="{StaticResource PlaybackTrackHeight}"/>
     <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
-    <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+    <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
   </ControlTheme>
 
   <ControlTheme x:Key="PlaybackThumb" TargetType="Border">
@@ -356,7 +356,7 @@
       </Transitions>
     </Setter>
     <Style Selector="^.lit">
-      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
     </Style>
   </ControlTheme>
 
@@ -367,7 +367,7 @@
   <ControlTheme x:Key="PlaybackEncodeCursor" TargetType="Border">
     <Setter Property="Width" Value="{StaticResource PlaybackCursorWidth}"/>
     <Setter Property="Background" Value="{StaticResource NeonPink}"/>
-    <Setter Property="BoxShadow" Value="{StaticResource GlowPink}"/>
+    <Setter Property="BoxShadow" Value="{DynamicResource GlowPink}"/>
   </ControlTheme>
 
   <!--
@@ -381,7 +381,7 @@
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
     <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
-    <Setter Property="BoxShadow" Value="{StaticResource GlowPink}"/>
+    <Setter Property="BoxShadow" Value="{DynamicResource GlowPink}"/>
   </ControlTheme>
 
   <ControlTheme x:Key="PlaybackEncodeText" TargetType="TextBlock">
@@ -451,10 +451,10 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pointerover /template/ Border#Knob">
-      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
     </Style>
     <Style Selector="^:pressed /template/ Border#Knob">
-      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
     </Style>
   </ControlTheme>
 
