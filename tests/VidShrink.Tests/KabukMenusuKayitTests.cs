@@ -85,4 +85,43 @@ public class KabukMenusuKayitTests
             Directory.Delete(install.Folder, recursive: true);
         }
     }
+
+    [Fact]
+    [SupportedOSPlatform("windows")]
+    public void EtiketYenilemesiYalnizMuiVerbYaziyor()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        WithTestRoot(root =>
+        {
+            const string target = @"C:\sahte\VidShrink.exe";
+            Assert.Equal(ShellMenu.Extensions.Length, ShellMenu.InstallOpen(target, "Ac"));
+
+            foreach (var extension in ShellMenu.Extensions)
+            {
+                using var command = Registry.CurrentUser.OpenSubKey(
+                    root + @"\Software\Classes\SystemFileAssociations\." + extension + @"\shell\" + ShellMenu.MenuKey + @"\command",
+                    writable: true);
+                command!.SetValue("Isaret", extension, RegistryValueKind.String);
+            }
+
+            Assert.Equal(ShellMenu.Extensions.Length + 1, ShellMenu.Relabel(ShellMenu.MenuKey, "Open"));
+
+            foreach (var extension in ShellMenu.Extensions)
+            {
+                var path = root + @"\Software\Classes\SystemFileAssociations\." + extension + @"\shell\" + ShellMenu.MenuKey;
+                using var verb = Registry.CurrentUser.OpenSubKey(path);
+                using var command = Registry.CurrentUser.OpenSubKey(path + @"\command");
+                Assert.Equal("Open", verb?.GetValue("MUIVerb"));
+                Assert.Equal(target, verb?.GetValue("Icon"));
+                Assert.Equal(extension, command?.GetValue("Isaret"));
+                Assert.Equal($"\"{target}\" \"%1\"", command?.GetValue(string.Empty));
+            }
+
+            using (var labels = Registry.CurrentUser.OpenSubKey(root + @"\" + ShellMenu.LabelKey))
+                Assert.Equal("Open", labels?.GetValue("open"));
+
+            Assert.Equal(0, ShellMenu.Relabel(ShellMenu.MenuKey, "Open"));
+        });
+    }
 }

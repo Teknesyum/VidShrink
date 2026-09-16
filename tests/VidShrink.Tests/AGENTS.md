@@ -64,7 +64,7 @@ sürümden (`x.0.0`) önce koşar.
   uzantı listesi ve hedef listesi birebir aynı; silme kolu Appx paketini de kaldırıyor; kutu Ayarlar sekmesinde;
   etiket arayüz dilini izliyor; sekiz yeni anahtar 42 dilde. Kayıt defterine yazmaz, kaynak metin okur.
 - `KabukMenusuKayitTests.cs` — aynı menünün davranışı, yalnız `ShellMenu.TestRoot` altında: kutunun komutu başlatıcıyı
-  (`VidShrink.exe`) gösteriyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
+  (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
 - `IkonKutusuTests.cs` — `Themes/Icons.axaml`'daki 26 yolun tasarım kutusu: hepsinin başında `M 0,0 M 24,24`
