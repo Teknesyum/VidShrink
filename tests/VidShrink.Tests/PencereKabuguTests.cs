@@ -6,16 +6,13 @@ using Xunit;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// Pencere kabuğunun iki kararı: üst şerit gizli duruyor ve işaretçi üste gidince beliriyor,
-/// oynatıcı sekmesindeyken kabuk kenarlığı çizilmiyor. Ölçülen şey çizim değil kaynağın
-/// kurduğu düzen: şeridin katman olması, eşiğin uydurulmaması, kenarlık kuralının tek yerde
-/// durması.
+/// Pencere kabuğunun düzeni: üst şerit içerikle aynı gözde bir katman, başlık düğmeleri
+/// içeriğin üstünde, gizleme sınıfı iki parçayı birden kapatıyor. Gizlenme kuralının ve
+/// anahattın davranışı <see cref="OynaticiYolHaritasiTests"/>'te gerçek pencereden ölçülür.
 /// </summary>
 public class PencereKabuguTests
 {
     private static string Xaml() => File.ReadAllText(TipSources.WindowXamlPath).Replace("\r\n", "\n");
-
-    private static string Code() => File.ReadAllText(TipSources.WindowCodePath);
 
     private static string Controls() => File.ReadAllText(
         Path.Combine(TipSources.Root, "src", "VidShrink.App", "Themes", "Controls.axaml"));
@@ -82,69 +79,5 @@ public class PencereKabuguTests
         Assert.Contains("Selector=\"Window.chrome-hidden Border#TitleBar\"", xaml);
         Assert.Contains("PART_ItemsPresenter", Regex.Match(
             xaml, @"Selector=""Window\.chrome-hidden TabControl#Tabs[^""]*""").Value);
-    }
-
-    /// <summary>
-    /// Belirme eşiği uydurulmuyor: işaretçinin y'si başlık çubuğunun kendi yüksekliğiyle
-    /// karşılaştırılıyor, kaynağa ikinci bir sayı yazılmıyor.
-    ///
-    /// <para>Pim önce <c>ShowChrome(false)</c> arıyordu, yani şerit her sekmede kendiliğinden
-    /// kayboluyordu. 13 Eylül 2026'da gizlenme yalnız oynatıcıya bağlandı: kaybolma artık
-    /// koşulsuz değil, <see cref="MainWindow.ChromeHidesItself"/>'in tersine bakıyor.
-    /// Değişen şey eşik değil, eşiğin uygulandığı yer — ölçünün eşik satırı aynı kaldı.</para>
-    /// </summary>
-    [Fact]
-    public void EsikBaslikYuksekligindenGeliyor()
-    {
-        var code = Code();
-
-        Assert.Contains("ShowChrome(e.GetPosition(this).Y <= TitleBar.Height)", code);
-        Assert.Contains("PointerExited += (_, _) => ShowChrome(!ChromeHidesItself);", code);
-    }
-
-    /// <summary>
-    /// Üst şerit yalnız oynatıcı sekmesinde kendiliğinden küçülüyor. Diğer sekmelerde
-    /// işaretçi nereye giderse gitsin şerit yerinde duruyor; gizlenme oynatıcının kendi
-    /// ihtiyacı, uygulamanın geneline dayatılan bir davranış değil.
-    /// </summary>
-    [Fact]
-    public void GizlenmeYalnizOynaticidaGecerli()
-    {
-        var code = Code();
-
-        Assert.Contains("internal bool ChromeHidesItself => Tabs.SelectedIndex == PlayerTabIndex && Player.LoadedPath is not null;", code);
-        Assert.Contains("private void ApplyChromeMode() => ShowChrome(!ChromeHidesItself);", code);
-        Assert.Contains("Tabs.SelectionChanged += (_, _) => ApplyChromeMode();", code);
-        Assert.Contains("if (!ChromeHidesItself)", code);
-    }
-
-    /// <summary>Kenarlık kuralı tek yerde: oynatıcı sekmesi tam ekranla aynı kolda.</summary>
-    [Fact]
-    public void OynaticiSekmesindeAnahatYok()
-    {
-        var code = Code();
-
-        Assert.Contains(
-            "WindowShell.BorderThickness = maximized || Tabs.SelectedIndex == PlayerTabIndex",
-            code);
-        Assert.Contains("Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();", code);
-    }
-
-    /// <summary>
-    /// Sahnenin kendisinde de anahat yok. Kabuk kenarlığı oynatıcı sekmesinde kalkıyor ama
-    /// <c>Stage</c> Panel temasından bir kenarlık daha alıyordu; görüntünün etrafında
-    /// çerçeve kalmıyor.
-    /// </summary>
-    [Fact]
-    public void SahneninEtrafindaAnahatYok()
-    {
-        var xaml = File.ReadAllText(
-            Path.Combine(TipSources.Root, "src", "VidShrink.App", "Playback", "PlayerView.axaml"));
-
-        var sahne = xaml[xaml.IndexOf("x:Name=\"Stage\"", StringComparison.Ordinal)..];
-        var kapanis = sahne.IndexOf(">", StringComparison.Ordinal);
-
-        Assert.Contains("BorderThickness=\"0\"", sahne[..kapanis]);
-        Assert.Contains("CornerRadius=\"0\"", sahne[..kapanis]);
     }
 }

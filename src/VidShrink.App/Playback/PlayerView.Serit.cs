@@ -35,6 +35,10 @@ internal partial class PlayerView
     private bool _pointerOnSerit;
     private bool _seritSliding;
     private double _seritOncekiHiz;
+    private bool _seritPlaying;
+    private double _seritPointerX = double.NaN;
+
+    internal event EventHandler? PlayingChanged;
 
     /// <summary>Seridin gorunurluk bolgesi. Olcum kendi saatini buraya takar.</summary>
     internal HoverZone SeritZone
@@ -102,6 +106,22 @@ internal partial class PlayerView
                 }
             };
 
+        Transitions = HoverZone.MotionReduced
+            ? null
+            : new Transitions
+            {
+                new DoubleTransition
+                {
+                    Property = SeritSpreadProperty,
+                    Duration = Span("MotionInstant"),
+                    Easing = new CubicEaseOut()
+                }
+            };
+        PropertyChanged += (_, e) =>
+        {
+            if (e.Property == SeritSpreadProperty) ApplySeritMask();
+        };
+
         StripBar.PointerEntered += (_, _) => { _pointerOnSerit = true; HoldSerit(); };
         StripBar.PointerExited += (_, _) => { _pointerOnSerit = false; HoldSerit(); };
         Surface.PointerMoved += OnSeritPointer;
@@ -124,7 +144,10 @@ internal partial class PlayerView
 
     /// <summary>Panodaki fare konumu. Alt bandin icindeyse serit belirir.</summary>
     private void OnSeritPointer(object? sender, PointerEventArgs e)
-        => _serit?.PointerAt(e.GetPosition(Surface).Y, Surface.Bounds.Height);
+    {
+        _seritPointerX = e.GetPosition(StripBar).X;
+        _serit?.PointerAt(e.GetPosition(Surface).Y, Surface.Bounds.Height);
+    }
 
     /// <summary>
     /// Seridi acik tutan sebepler: fare seridin uzerinde ya da oynatma duraklamis. Biri
@@ -143,8 +166,69 @@ internal partial class PlayerView
 
     private void RevealSerit(bool shown)
     {
+        if (shown && StripBar.Opacity <= 0) SpreadSerit();
         StripBar.Opacity = shown ? 1 : 0;
         StripBar.IsHitTestVisible = shown;
+    }
+
+    /// <summary>
+    /// P26: kapali serit acilirken once fareye yakin kismi gorunur, <c>MotionInstant</c>
+    /// icinde iki yana yayilarak tamami acilir. Maske yalniz yayilma surerken var; bitince
+    /// kalkar, gerisi masrafsiz. Hareket azaltilmissa yayilma yok, serit dogrudan acilir.
+    /// </summary>
+    internal static readonly StyledProperty<double> SeritSpreadProperty =
+        AvaloniaProperty.Register<PlayerView, double>(nameof(SeritSpread), 1);
+
+    internal double SeritSpread
+    {
+        get => GetValue(SeritSpreadProperty);
+        set => SetValue(SeritSpreadProperty, value);
+    }
+
+    internal double SeritPointerX => _seritPointerX;
+
+    private void SpreadSerit()
+    {
+        var transitions = Transitions;
+        if (transitions is null)
+        {
+            SeritSpread = 1;
+            return;
+        }
+
+        Transitions = null;
+        SeritSpread = 0;
+        Transitions = transitions;
+        SeritSpread = 1;
+    }
+
+    /// <summary>Yayilmanin o anki maskesi: fare konumundan iki yana acilan tam opak bant.</summary>
+    private void ApplySeritMask()
+    {
+        var spread = Math.Clamp(SeritSpread, 0, 1);
+        var width = StripBar.Bounds.Width;
+        if (spread >= 1 || width <= 0)
+        {
+            StripBar.OpacityMask = null;
+            return;
+        }
+
+        var centre = double.IsFinite(_seritPointerX) ? Math.Clamp(_seritPointerX / width, 0, 1) : 0.5;
+        var reach = Math.Max(centre, 1 - centre) * spread;
+        var left = Math.Clamp(centre - reach, 0, 1);
+        var right = Math.Clamp(centre + reach, 0, 1);
+        StripBar.OpacityMask = new LinearGradientBrush
+        {
+            StartPoint = new RelativePoint(0, 0.5, RelativeUnit.Relative),
+            EndPoint = new RelativePoint(1, 0.5, RelativeUnit.Relative),
+            GradientStops =
+            {
+                new GradientStop(Colors.Transparent, left),
+                new GradientStop(Colors.Black, left),
+                new GradientStop(Colors.Black, right),
+                new GradientStop(Colors.Transparent, right)
+            }
+        };
     }
 
     /// <summary>
@@ -155,6 +239,12 @@ internal partial class PlayerView
     private void RefreshSerit()
     {
         if (TxtSeritTime is null) return;
+
+        if (_seritPlaying != _playing)
+        {
+            _seritPlaying = _playing;
+            PlayingChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         GlyphSeritPlay.Data = Icon(_playing ? "IconPause" : "IconPlay");
         GlyphSeritVolume.Data = Icon(_muted || _volume <= 0 ? "IconVolumeMute" : "IconVolume");

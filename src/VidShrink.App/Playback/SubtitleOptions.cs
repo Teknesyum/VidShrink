@@ -30,6 +30,28 @@ internal sealed class SubtitleOptions
 
     internal static readonly IReadOnlyList<string> Extensions = new[] { "srt", "ass", "ssa", "vtt", "sub" };
 
+    /// <summary>
+    /// Videonun yanindaki altyazilar: ayni klasorde, adi videonun adiyla baslayan ve uzantisi
+    /// <see cref="Extensions"/>'ta olan dosyalar (<c>film.srt</c>, <c>film.tr.srt</c>). Birebir
+    /// ayni ad en sona konur; motor son ekleneni sectigi icin o secili kalir.
+    /// </summary>
+    internal static IReadOnlyList<string> Sidecars(string mediaPath)
+    {
+        var folder = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(mediaPath));
+        if (folder is null || !System.IO.Directory.Exists(folder)) return Array.Empty<string>();
+        var name = System.IO.Path.GetFileNameWithoutExtension(mediaPath);
+
+        return System.IO.Directory.EnumerateFiles(folder)
+            .Where(file => Extensions.Contains(System.IO.Path.GetExtension(file).TrimStart('.'), StringComparer.OrdinalIgnoreCase))
+            .Select(file => (File: file, Stem: System.IO.Path.GetFileNameWithoutExtension(file)))
+            .Where(x => x.Stem.StartsWith(name, StringComparison.OrdinalIgnoreCase)
+                        && (x.Stem.Length == name.Length || x.Stem[name.Length] is '.' or '-' or '_' or ' '))
+            .OrderBy(x => x.Stem.Length == name.Length)
+            .ThenBy(x => x.File, StringComparer.OrdinalIgnoreCase)
+            .Select(x => x.File)
+            .ToList();
+    }
+
     internal static readonly IReadOnlyList<SubtitleCodepage> Codepages = new SubtitleCodepage[]
     {
         new(AutoCodepage, "player.subtitle.encoding.auto", ""),

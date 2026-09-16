@@ -515,23 +515,29 @@ internal partial class PlayerView : UserControl
 
     /// <summary>
     /// Duraklatinca sahnenin ortasinda kisa bir duraklatma simgesi belirir: girisi ve
-    /// cikisi <c>MotionFast</c>, ekranda kalisi <c>PauseGlyphHold</c>. Oynatmada karsiligi
-    /// yok — orada goruntunun onune konan her sey icerigi kapatir.
+    /// cikisi <c>MotionFast</c>, ekranda toplam kalisi giris ve cikis dahil
+    /// <c>PauseGlyphHold</c> (tarif: 0,5 sn). Oynatmada karsiligi yok — orada goruntunun
+    /// onune konan her sey icerigi kapatir. Ust uste duraklatmada eski cikisin gizlemesi
+    /// yeni simgeyi kapatmasin diye her parlama bir sira numarasi tasir.
     /// </summary>
     private void FlashPause()
     {
         _pauseFlash ??= new DispatcherTimer();
         _pauseFlash.Stop();
+        _pauseFlashSira++;
 
         PauseGlyph.IsVisible = true;
         PauseGlyph.Opacity = PauseGlyphOpacity;
         PauseGlyph.RenderTransform = TransformOperations.Parse("scale(1)");
 
-        _pauseFlash.Interval = PauseGlyphHold;
+        var hold = PauseGlyphHold - MotionFast;
+        _pauseFlash.Interval = hold > TimeSpan.Zero ? hold : TimeSpan.Zero;
         _pauseFlash.Tick -= OnPauseFlashDone;
         _pauseFlash.Tick += OnPauseFlashDone;
         _pauseFlash.Start();
     }
+
+    private int _pauseFlashSira;
 
     private void OnPauseFlashDone(object? sender, EventArgs e)
     {
@@ -539,7 +545,12 @@ internal partial class PlayerView : UserControl
         PauseGlyph.Opacity = 0;
         PauseGlyph.RenderTransform = TransformOperations.Parse("scale(0.8)");
 
-        DispatcherTimer.RunOnce(() => PauseGlyph.IsVisible = false, MotionFast);
+        var sira = _pauseFlashSira;
+        DispatcherTimer.RunOnce(() =>
+        {
+            if (sira != _pauseFlashSira) return;
+            PauseGlyph.IsVisible = false;
+        }, MotionFast);
     }
 
     /// <summary>Çizim saatinin olağan adımı; ekranın kendi hızı.</summary>

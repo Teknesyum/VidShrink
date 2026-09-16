@@ -37,6 +37,20 @@ internal partial class PlayerView
         _subtitles.ResetDelays();
         _trackNotice = null;
         _subtitles.ApplyTo(engine);
+        LoadSidecarSubtitles(engine);
+    }
+
+    /// <summary>
+    /// GOM gibi: video acilinca yanindaki ayni adli altyazilar kendiliginden yuklenir.
+    /// Indirme yok; cevrimici kaynak hesap ve anahtar istiyor.
+    /// </summary>
+    private void LoadSidecarSubtitles(IPlaybackEngine engine)
+    {
+        if (_path is not { } path) return;
+        var loaded = 0;
+        foreach (var sidecar in SubtitleOptions.Sidecars(path))
+            if (engine.AddSubtitle(sidecar)) loaded++;
+        if (loaded > 0) _trace.Add("subauto -> " + loaded.ToString(CultureInfo.InvariantCulture));
     }
 
     private void CycleAudio()
