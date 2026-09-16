@@ -64,6 +64,12 @@ internal partial class RecorderView
     /// </summary>
     internal async System.Threading.Tasks.Task ToggleAsync()
     {
+        if (CountingDown)
+        {
+            CancelCountdown();
+            return;
+        }
+
         switch (State)
         {
             case RecorderState.Running when HasSession: await PauseAsync(); break;
@@ -131,5 +137,5 @@ internal partial class RecorderView
             ? new PixelRect(r.X, r.Y, r.Width, r.Height)
             : null;
 
-    private void RefreshMini() => _mini?.Follow(State, TxtElapsed.Text ?? string.Empty);
+    private void RefreshMini() => _mini?.Follow(State, TxtElapsed.Text ?? string.Empty, CountdownLeft);
 }

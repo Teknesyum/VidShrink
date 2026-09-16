@@ -36,6 +36,10 @@ internal sealed class RecorderSettings
 
     internal bool AdvancedMode { get; set; }
 
+    internal static readonly int[] CountdownChoices = { 0, 3, 5, 10 };
+
+    internal int CountdownSeconds { get; set; }
+
     /// <summary>Kullanıcının istediği tahmini süre; verilmediyse <c>null</c>.</summary>
     internal int? TargetSeconds { get; set; }
 
@@ -195,6 +199,7 @@ internal sealed class RecorderSettings
             settings.OutputFolder = (string?)root["outputFolder"];
             settings.ManualMode = (bool?)root["manualMode"] ?? !((bool?)root["autoMode"] ?? true);
             settings.AdvancedMode = (bool?)root["advancedMode"] ?? settings.ManualMode;
+            if ((int?)root["countdownSeconds"] is { } countdown && Array.IndexOf(CountdownChoices, countdown) >= 0) settings.CountdownSeconds = countdown;
             if ((int?)root["targetSeconds"] is { } targetSeconds && targetSeconds > 0) settings.TargetSeconds = targetSeconds;
             if ((double?)root["targetMegabytes"] is { } targetMegabytes && targetMegabytes > 0) settings.TargetMegabytes = targetMegabytes;
             if ((int?)root["fps"] is { } fps && fps > 0) settings.Fps = fps;
@@ -258,6 +263,7 @@ internal sealed class RecorderSettings
                 else writer.WriteString("outputFolder", OutputFolder);
                 writer.WriteBoolean("manualMode", ManualMode);
                 writer.WriteBoolean("advancedMode", AdvancedMode);
+                writer.WriteNumber("countdownSeconds", CountdownSeconds);
                 if (TargetSeconds is { } ts) writer.WriteNumber("targetSeconds", ts);
                 else writer.WriteNull("targetSeconds");
                 if (TargetMegabytes is { } tm) writer.WriteNumber("targetMegabytes", tm);

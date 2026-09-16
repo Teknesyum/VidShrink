@@ -90,5 +90,11 @@
   "recorder.level.advanced": "Advanced",
   "recorder.level.advanced-hint": "Every setting: target size, encoder, frame rate, output folder.",
   "recorder.auto.automatic": "Let the program pick the settings",
-  "recorder.auto.automatic-hint": "The program picks the encoder, frame rate and quality with a short trial on this machine."
+  "recorder.auto.automatic-hint": "The program picks the encoder, frame rate and quality with a short trial on this machine.",
+  "recorder.countdown.title": "Countdown",
+  "recorder.countdown.hint": "After you press Start the recording begins this many seconds later; the count shows on the strip and the compact bar.",
+  "recorder.countdown.off": "None",
+  "recorder.countdown.seconds": "{0} s",
+  "recorder.countdown.left": "Starting in {0}",
+  "recorder.countdown.cancel": "Cancel"
 }

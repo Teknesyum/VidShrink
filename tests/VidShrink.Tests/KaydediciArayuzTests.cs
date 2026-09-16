@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -399,6 +399,174 @@ public sealed class KaydediciArayuzTests
     [InlineData("recorder.auto.automatic")]
     [InlineData("recorder.auto.automatic-hint")]
     public void KipAnahtarlariButunDillerde(string key)
+    {
+        foreach (var language in Locales.Languages)
+            Assert.False(string.IsNullOrWhiteSpace(Locales.Values(language).GetValueOrDefault(key)), $"{language} dilinde {key} yok.");
+    }
+
+    [Fact]
+    public void GeriSayimSeritteSayilirVeSonundaBaslatir()
+    {
+        var olcu = AppHost.Run<(bool, List<int>, List<string>, List<bool>, List<bool>, bool, bool, int)>(() =>
+        {
+            var view = new RecorderView();
+            Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.ComboBox>(view, "CmbCountdown")!.SelectedIndex = 1;
+            var kalan = new List<int>();
+            var durum = new List<string>();
+            var baslatGorunur = new List<bool>();
+            var iptalGorunur = new List<bool>();
+            view.CountdownDelay = (sure, _) =>
+            {
+                Assert.Equal(TimeSpan.FromSeconds(1), sure);
+                kalan.Add(view.CountdownLeft);
+                durum.Add(view.StateText);
+                baslatGorunur.Add(Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Button>(view, "BtnStart")!.IsVisible);
+                iptalGorunur.Add(Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Button>(view, "BtnCountdownCancel")!.IsVisible);
+                return System.Threading.Tasks.Task.CompletedTask;
+            };
+            var bitti = view.CountdownAsync().GetAwaiter().GetResult();
+            return (bitti, kalan, durum, baslatGorunur, iptalGorunur, view.CountingDown,
+                Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Button>(view, "BtnStart")!.IsVisible, view.SelectedCountdown);
+        });
+
+        Assert.True(olcu.Item1);
+        Assert.Equal(new[] { 3, 2, 1 }, olcu.Item2);
+        Assert.All(olcu.Item3.Zip(olcu.Item2), c => Assert.Contains(c.Second.ToString(System.Globalization.CultureInfo.InvariantCulture), c.First));
+        Assert.All(olcu.Item4, b => Assert.False(b));
+        Assert.All(olcu.Item5, b => Assert.True(b));
+        Assert.False(olcu.Item6);
+        Assert.True(olcu.Item7);
+        Assert.Equal(3, olcu.Item8);
+    }
+
+    [Fact]
+    public void GeriSayimIptalDugmesiVeDurdurmaTusuylaKesilir()
+    {
+        var olcu = AppHost.Run<(bool, int, bool, int, bool, int, bool)>(() =>
+        {
+            var view = new RecorderView();
+            Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.ComboBox>(view, "CmbCountdown")!.SelectedIndex = 3;
+
+            var ilkAdim = 0;
+            view.CountdownDelay = (_, ct) =>
+            {
+                if (++ilkAdim == 2) Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Button>(view, "BtnCountdownCancel")!
+                    .RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+                return ct.IsCancellationRequested
+                    ? System.Threading.Tasks.Task.FromCanceled(ct)
+                    : System.Threading.Tasks.Task.CompletedTask;
+            };
+            var iptal = view.CountdownAsync().GetAwaiter().GetResult();
+
+            var ikinciAdim = 0;
+            view.CountdownDelay = (_, ct) =>
+            {
+                if (++ikinciAdim == 4) view.StopAsync().GetAwaiter().GetResult();
+                ct.ThrowIfCancellationRequested();
+                return System.Threading.Tasks.Task.CompletedTask;
+            };
+            var durdur = view.CountdownAsync().GetAwaiter().GetResult();
+
+            var ucuncuAdim = 0;
+            view.CountdownDelay = (_, ct) =>
+            {
+                if (++ucuncuAdim == 1) view.ToggleAsync().GetAwaiter().GetResult();
+                return System.Threading.Tasks.Task.CompletedTask;
+            };
+            var tus = view.CountdownAsync().GetAwaiter().GetResult();
+
+            return (iptal, ilkAdim, durdur, ikinciAdim, tus, ucuncuAdim, view.HasSession || view.CountingDown);
+        });
+
+        Assert.False(olcu.Item1);
+        Assert.Equal(2, olcu.Item2);
+        Assert.False(olcu.Item3);
+        Assert.Equal(4, olcu.Item4);
+        Assert.False(olcu.Item5);
+        Assert.Equal(1, olcu.Item6);
+        Assert.False(olcu.Item7);
+    }
+
+    [Fact]
+    public void GeriSayimYokkenBekletmez()
+    {
+        var (bitti, cagri) = AppHost.Run<(bool, int)>(() =>
+        {
+            var view = new RecorderView();
+            Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.ComboBox>(view, "CmbCountdown")!.SelectedIndex = 0;
+            var sayi = 0;
+            view.CountdownDelay = (_, _) => { sayi++; return System.Threading.Tasks.Task.CompletedTask; };
+            return (view.CountdownAsync().GetAwaiter().GetResult(), sayi);
+        });
+
+        Assert.True(bitti);
+        Assert.Equal(0, cagri);
+    }
+
+    [Fact]
+    public void MiniSeritGeriSayimiGosterirVeIptaleIzinVerir()
+    {
+        var (metin, durdur, ustte, bosMetin, bosDurdur) = AppHost.Run<(string, bool, bool, string, bool)>(() =>
+        {
+            var mini = new RecorderMini();
+            mini.Follow(VidShrink.Ffmpeg.RecorderState.Stopped, "00:00", 5);
+            var sayim = (mini.TxtElapsed.Text ?? string.Empty, mini.BtnStop.IsVisible, mini.Topmost);
+            mini.Follow(VidShrink.Ffmpeg.RecorderState.Stopped, "00:00");
+            return (sayim.Item1, sayim.Item2, sayim.Item3, mini.TxtElapsed.Text ?? string.Empty, mini.BtnStop.IsVisible);
+        });
+
+        Assert.Equal("5", metin);
+        Assert.True(durdur);
+        Assert.True(ustte);
+        Assert.Equal("00:00", bosMetin);
+        Assert.False(bosDurdur);
+    }
+
+    [Theory]
+    [InlineData("{\"countdownSeconds\":5}", 5)]
+    [InlineData("{\"countdownSeconds\":10}", 10)]
+    [InlineData("{\"countdownSeconds\":7}", 0)]
+    [InlineData("{\"countdownSeconds\":-3}", 0)]
+    [InlineData("{}", 0)]
+    public void GeriSayimAyariYalnizSecenekleriKabulEder(string json, int beklenen)
+    {
+        var klasor = CalismaKlasoru();
+        try
+        {
+            var dosya = Path.Combine(klasor, "recorder.json");
+            File.WriteAllText(dosya, json);
+            var okunan = RecorderSettings.Load(dosya);
+            Assert.Equal(beklenen, okunan.CountdownSeconds);
+            okunan.Save(dosya);
+            Assert.Equal(beklenen, RecorderSettings.Load(dosya).CountdownSeconds);
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
+    }
+
+    [Fact]
+    public void KayitGeriSayimBittiktenSonraBaslar()
+    {
+        var kok = new DirectoryInfo(AppContext.BaseDirectory);
+        while (kok is not null && !File.Exists(Path.Combine(kok.FullName, "VidShrink.sln"))) kok = kok.Parent;
+        var serit = File.ReadAllText(Path.Combine(kok!.FullName, "src", "VidShrink.App", "Recorder", "RecorderView.Serit.cs"));
+
+        var sayim = serit.IndexOf("await CountdownAsync()", StringComparison.Ordinal);
+        var dogrulama = serit.IndexOf("RecorderArguments.Validate(request, path)", StringComparison.Ordinal);
+        var oturum = serit.IndexOf("RecorderSession.StartAsync(", StringComparison.Ordinal);
+        Assert.True(dogrulama >= 0 && sayim > dogrulama && oturum > sayim);
+    }
+
+    [Theory]
+    [InlineData("recorder.countdown.title")]
+    [InlineData("recorder.countdown.hint")]
+    [InlineData("recorder.countdown.off")]
+    [InlineData("recorder.countdown.seconds")]
+    [InlineData("recorder.countdown.left")]
+    [InlineData("recorder.countdown.cancel")]
+    public void GeriSayimAnahtarlariButunDillerde(string key)
     {
         foreach (var language in Locales.Languages)
             Assert.False(string.IsNullOrWhiteSpace(Locales.Values(language).GetValueOrDefault(key)), $"{language} dilinde {key} yok.");

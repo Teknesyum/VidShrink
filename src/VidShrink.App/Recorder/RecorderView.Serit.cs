@@ -101,7 +101,7 @@ internal partial class RecorderView
     /// </summary>
     internal async Task StartAsync()
     {
-        if (_session is not null) return;
+        if (_session is not null || CountingDown) return;
 
         ClearMessages();
 
@@ -122,6 +122,8 @@ internal partial class RecorderView
             ShowError(Say("recorder.error.invalid", string.Join(" ", errors)));
             return;
         }
+
+        if (!await CountdownAsync() || _session is not null) return;
 
         try
         {
@@ -163,6 +165,12 @@ internal partial class RecorderView
     /// </summary>
     internal async Task StopAsync()
     {
+        if (CountingDown)
+        {
+            CancelCountdown();
+            return;
+        }
+
         if (_session is null) return;
 
         var session = _session;
@@ -201,14 +209,18 @@ internal partial class RecorderView
         var running = _session is not null && state == RecorderState.Running;
         var paused = _session is not null && state == RecorderState.Paused;
 
-        BtnStart.IsVisible = _session is null;
+        var counting = CountingDown;
+
+        BtnStart.IsVisible = _session is null && !counting;
+        BtnCountdownCancel.IsVisible = counting;
         BtnPause.IsVisible = running;
         BtnSnapshot.IsVisible = running;
         BtnResume.IsVisible = paused;
         BtnStop.IsVisible = running || paused;
 
         LiveDot.IsVisible = running;
-        TxtState.Text = running ? Say("recorder.strip.live")
+        TxtState.Text = counting ? Say("recorder.countdown.left", CountdownLeft)
+            : running ? Say("recorder.strip.live")
             : paused ? Say("recorder.strip.paused")
             : Say("recorder.strip.idle");
 

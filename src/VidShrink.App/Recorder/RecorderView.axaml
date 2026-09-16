@@ -80,6 +80,15 @@
                 auto:AutomationProperties.Name="{loc:Text recorder.strip.start}"
                 Click="OnStart"/>
 
+        <Button Grid.Column="3"
+                x:Name="BtnCountdownCancel"
+                Height="{StaticResource RecorderButtonSize}"
+                Theme="{StaticResource GhostButton}"
+                Content="{loc:Text recorder.countdown.cancel}"
+                IsVisible="False"
+                auto:AutomationProperties.Name="{loc:Text recorder.countdown.cancel}"
+                Click="OnCountdownCancel"/>
+
         <Button Grid.Column="4"
                 x:Name="BtnPause"
                 Height="{StaticResource RecorderButtonSize}"
@@ -237,6 +246,14 @@
             <ComboBox x:Name="CmbTarget"
                       HorizontalAlignment="Stretch"
                       auto:AutomationProperties.Name="{loc:Text recorder.target.what}"/>
+          </StackPanel>
+
+          <StackPanel>
+            <TextBlock Text="{loc:Text recorder.countdown.title}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbCountdown"
+                      HorizontalAlignment="Stretch"
+                      ToolTip.Tip="{loc:Text recorder.countdown.hint}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.countdown.title}"/>
           </StackPanel>
 
           <StackPanel x:Name="RowWindow" IsVisible="False">

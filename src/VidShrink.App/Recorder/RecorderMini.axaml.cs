@@ -37,18 +37,19 @@ internal partial class RecorderMini : Window
 
     internal event EventHandler? ExpandRequested;
 
-    public RecorderMini() => AvaloniaXamlLoader.Load(this);
+    public RecorderMini() => InitializeComponent();
 
     /// <summary>Şeridin yüzünü oturumun haline uyduruyor; hep üstte kalma da buradan sürülüyor.</summary>
-    internal void Follow(RecorderState state, string elapsed)
+    internal void Follow(RecorderState state, string elapsed, int countdown = 0)
     {
         var running = state == RecorderState.Running;
         var paused = state == RecorderState.Paused;
+        var counting = countdown > 0;
 
-        TxtElapsed.Text = elapsed;
+        TxtElapsed.Text = counting ? RecorderView.CountdownDigits(countdown) : elapsed;
         LiveDot.IsVisible = running;
 
-        BtnStop.IsVisible = running || paused;
+        BtnStop.IsVisible = running || paused || counting;
 
         if (this.FindResource(running ? "IconPause" : "IconPlay") is Geometry glyph)
             ToggleGlyph.Data = glyph;
@@ -58,7 +59,7 @@ internal partial class RecorderMini : Window
         ToolTip.SetTip(BtnToggle, label);
         AutomationProperties.SetName(BtnToggle, label);
 
-        Topmost = running || paused;
+        Topmost = running || paused || counting;
     }
 
     /// <summary>

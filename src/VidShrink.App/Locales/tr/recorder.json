@@ -90,5 +90,11 @@
   "recorder.level.advanced": "Gelişmiş",
   "recorder.level.advanced-hint": "Bütün ayarlar: hedef boyut, kodlayıcı, kare hızı, çıkış klasörü.",
   "recorder.auto.automatic": "Ayarları program seçsin",
-  "recorder.auto.automatic-hint": "Kodlayıcı, kare hızı ve kaliteyi bu makinede kısa bir denemeyle program seçer."
+  "recorder.auto.automatic-hint": "Kodlayıcı, kare hızı ve kaliteyi bu makinede kısa bir denemeyle program seçer.",
+  "recorder.countdown.title": "Geri sayım",
+  "recorder.countdown.hint": "Başlat'a basınca kayıt bu kadar saniye sonra başlar; sayım şeritte ve küçük şeritte görünür.",
+  "recorder.countdown.off": "Yok",
+  "recorder.countdown.seconds": "{0} sn",
+  "recorder.countdown.left": "Başlıyor: {0}",
+  "recorder.countdown.cancel": "İptal"
 }
