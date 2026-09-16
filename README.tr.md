@@ -99,6 +99,11 @@ Gelişmiş sekmesi var. Tam tur: [`docs/kullanim.tr.md`](docs/kullanim.tr.md).
 
 ## Kurulum
 
+Windows'ta [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
+dosyasını indirip çalıştırın (0.8.3'ten itibaren yayında). Kendi başına çalışan küçük bir
+program: PowerShell de yönetici hakkı da gerekmez, aşağıdaki betiğin yaklaşık yarı süresinde
+biter. Betik de çalışmaya devam ediyor ve aynı kurulumu yapıyor.
+
 ```powershell
 # Windows
 irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex

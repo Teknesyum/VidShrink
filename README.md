@@ -99,6 +99,12 @@ ffmpeg command. Full tour: [`docs/kullanim.md`](docs/kullanim.md).
 
 ## Install
 
+On Windows, download and run
+[`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
+(published from 0.8.3 on). It is a small self-contained program: no PowerShell, no
+administrator rights, and about half the time of the script below. The script still works
+and installs exactly the same thing.
+
 ```powershell
 # Windows
 irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
