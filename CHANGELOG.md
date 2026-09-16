@@ -7,6 +7,16 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-09-17
+
+### Added
+
+- `VidShrink-Setup.exe`: a native Windows installer that installs in about 6 s instead of 12 s, writes the right-click menu and file associations in about 0.1 s instead of 3.3 s, and closes a running VidShrink before replacing it. The PowerShell installer keeps working.
+
+### Changed
+
+- SVT-AV1 encodes run with variance boost off; at the same target size the measured quality no longer drops and the target band holds.
+
 ## [0.8.3] - 2026-09-16
 
 ### Fixed

@@ -33,7 +33,7 @@
   </Company_Info>
   <Program_Info>
     <Program_Name>VidShrink</Program_Name>
-    <Program_Version>0.8.3</Program_Version>
+    <Program_Version>0.8.4</Program_Version>
     <Program_Release_Month>09</Program_Release_Month>
     <Program_Release_Day>16</Program_Release_Day>
     <Program_Release_Year>2026</Program_Release_Year>
@@ -49,7 +49,7 @@
       <Filename_Versioned>vidshrink-win-x64.zip</Filename_Versioned>
       <Filename_Previous />
       <Filename_Generic>vidshrink-win-x64.zip</Filename_Generic>
-      <Filename_Long>VidShrink 0.8.3 for Windows x64</Filename_Long>
+      <Filename_Long>VidShrink 0.8.4 for Windows x64</Filename_Long>
       <File_Size_Bytes>47366028</File_Size_Bytes>
       <File_Size_K>46256</File_Size_K>
       <File_Size_MB>45.17</File_Size_MB>
@@ -63,7 +63,7 @@
       <Expire_Day />
       <Expire_Year />
     </Expire_Info>
-    <Program_Change_Info>Version 0.8.3 fixes the Windows installer when VidShrink is still open or an antivirus scan holds it, keeps the classic right-click menu when Windows 11 refuses the unsigned package, opens videos from the shell about a second sooner, and makes update downloads cancellable.</Program_Change_Info>
+    <Program_Change_Info>Version 0.8.4 adds VidShrink-Setup.exe, a native Windows installer about twice as fast as the script, and turns off SVT-AV1 variance boost so AV1 encodes keep quality at the target size.</Program_Change_Info>
     <Program_Specific_Category>Other VIDEO Tools</Program_Specific_Category>
     <Program_Categories>Multimedia::Video</Program_Categories>
     <Program_System_Requirements>Windows 10 or 11 x64. No administrator rights or .NET SDK required. The installer retrieves verified FFmpeg and libmpv dependencies.</Program_System_Requirements>
@@ -85,20 +85,20 @@
     <Application_URLs>
       <Application_Info_URL>https://github.com/Teknesyum/VidShrink</Application_Info_URL>
       <Application_Order_URL />
-      <Application_Screenshot_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/v0.8.3/docs/gorseller/T191-kucult-en.png</Application_Screenshot_URL>
-      <Application_Icon_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/v0.8.3/src/VidShrink.App/Assets/VidShrink.png</Application_Icon_URL>
+      <Application_Screenshot_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/v0.8.4/docs/gorseller/T191-kucult-en.png</Application_Screenshot_URL>
+      <Application_Icon_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/v0.8.4/src/VidShrink.App/Assets/VidShrink.png</Application_Icon_URL>
       <Application_XML_File_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/main/vidshrink-pad.xml</Application_XML_File_URL>
     </Application_URLs>
     <Download_URLs>
-      <Primary_Download_URL>https://github.com/Teknesyum/VidShrink/releases/download/v0.8.3/vidshrink-win-x64.zip</Primary_Download_URL>
-      <Secondary_Download_URL>https://github.com/Teknesyum/VidShrink/releases/tag/v0.8.3</Secondary_Download_URL>
+      <Primary_Download_URL>https://github.com/Teknesyum/VidShrink/releases/download/v0.8.4/vidshrink-win-x64.zip</Primary_Download_URL>
+      <Secondary_Download_URL>https://github.com/Teknesyum/VidShrink/releases/tag/v0.8.4</Secondary_Download_URL>
       <Additional_Download_URL_1 />
       <Additional_Download_URL_2 />
     </Download_URLs>
   </Web_Info>
   <Permissions>
     <Distribution_Permissions>VidShrink may be copied and redistributed under the GNU Affero General Public License version 3 or any later version. Distributors must preserve the license and corresponding source availability. FFmpeg and libmpv are separate programs and are not included in the VidShrink release archive.</Distribution_Permissions>
-    <EULA>https://github.com/Teknesyum/VidShrink/blob/v0.8.3/LICENSE</EULA>
+    <EULA>https://github.com/Teknesyum/VidShrink/blob/v0.8.4/LICENSE</EULA>
   </Permissions>
   <ASP>
     <ASP_Member>N</ASP_Member>
