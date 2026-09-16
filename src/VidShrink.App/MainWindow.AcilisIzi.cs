@@ -65,6 +65,23 @@ internal static class AcilisIzi
         {
         }
     }
+
+    internal const string CizimDegiskeni = "VIDSHRINK_CIZIM_OLCUMU";
+
+    internal static void Deger(string adim, double deger)
+    {
+        var yol = Environment.GetEnvironmentVariable(Degisken);
+        if (string.IsNullOrWhiteSpace(yol)) return;
+
+        try
+        {
+            File.AppendAllText(yol, string.Create(CultureInfo.InvariantCulture,
+                $"{adim}\t{deger:0.0}{Environment.NewLine}"));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
 }
 
 public partial class MainWindow
@@ -92,5 +109,64 @@ public partial class MainWindow
             Dispatcher.UIThread.Post(() => AcilisIzi.Yaz("ilk-kare"), DispatcherPriority.Render);
         };
         saat.Start();
+    }
+
+    private void IlkBoyayiBekle()
+    {
+        if (!AcilisIzi.Acik) return;
+
+        EventHandler? acildi = null;
+        acildi = (_, _) =>
+        {
+            Opened -= acildi;
+            RequestAnimationFrame(_ => RequestAnimationFrame(_ => AcilisIzi.Yaz("ilk-boya")));
+        };
+        Opened += acildi;
+    }
+
+    private async Task CizimiOlcAsync()
+    {
+        var kip = Environment.GetEnvironmentVariable(AcilisIzi.CizimDegiskeni);
+        if (!AcilisIzi.Acik || string.IsNullOrWhiteSpace(kip)) return;
+
+        var parca = kip.Split(':');
+        var panel = parca[0] == "panel";
+        var sure = parca.Length > 1 && int.TryParse(parca[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var s) ? s : 7;
+        if (panel)
+        {
+            if (Player.IsPlaying) Player.TogglePlay();
+            Tabs.SelectedIndex = ShrinkTabIndex;
+        }
+
+        Func<long> kare = panel ? () => _preview?.PresentedFrames ?? 0 : () => Player.DrawnFrames;
+        var bekleme = Stopwatch.StartNew();
+        while (kare() == 0 && bekleme.Elapsed < TimeSpan.FromSeconds(30)) await Task.Delay(50);
+        AcilisIzi.Yaz("cizim-basladi");
+        await Task.Delay(1000);
+
+        long tur = 0;
+        var suruyor = true;
+        void Tik(TimeSpan _)
+        {
+            if (!suruyor) return;
+            tur++;
+            RequestAnimationFrame(Tik);
+        }
+
+        using var surec = Process.GetCurrentProcess();
+        var cpu = surec.TotalProcessorTime;
+        var ilkKare = kare();
+        var olcu = Stopwatch.StartNew();
+        RequestAnimationFrame(Tik);
+        await Task.Delay(TimeSpan.FromSeconds(sure));
+        suruyor = false;
+        var gecen = olcu.Elapsed.TotalSeconds;
+        surec.Refresh();
+        AcilisIzi.Deger("cizim-sn", gecen);
+        AcilisIzi.Deger("cizim-cpu-yuzde", (surec.TotalProcessorTime - cpu).TotalSeconds / gecen / Environment.ProcessorCount * 100);
+        AcilisIzi.Deger("cizim-cpu-ms-sn", (surec.TotalProcessorTime - cpu).TotalMilliseconds / gecen);
+        AcilisIzi.Deger("cizim-tur-sn", tur / gecen);
+        AcilisIzi.Deger("cizim-kare-sn", (kare() - ilkKare) / gecen);
+        AcilisIzi.Yaz("cizim-bitti");
     }
 }

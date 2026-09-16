@@ -241,12 +241,19 @@ internal static class Program
     public static AppBuilder BuildAvaloniaApp() => Build(null, null);
 
     private static AppBuilder Build(string? startupFile, Integration.ForwardedFiles? files)
-        => AppBuilder.Configure(() => new App(startupFile, files))
+        => Cizim(AppBuilder.Configure(() => new App(startupFile, files))
             .UsePlatformDetect()
-            .LogToTrace();
+            .LogToTrace());
 
     private static AppBuilder BuildShrink(ShellShrinkStartup startup, ShrinkRequestQueue? queue)
-        => AppBuilder.Configure(() => new App(startup, queue))
+        => Cizim(AppBuilder.Configure(() => new App(startup, queue))
             .UsePlatformDetect()
-            .LogToTrace();
+            .LogToTrace());
+
+    internal const string CizimDegiskeni = "VIDSHRINK_CIZIM";
+
+    internal static AppBuilder Cizim(AppBuilder builder)
+        => string.Equals(Environment.GetEnvironmentVariable(CizimDegiskeni), "yazilim", StringComparison.Ordinal)
+            ? builder.With(new Win32PlatformOptions { RenderingMode = new[] { Win32RenderingMode.Software } })
+            : builder;
 }

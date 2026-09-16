@@ -264,6 +264,7 @@ public partial class MainWindow : Window
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
         if (_startupFile is not null) Tabs.SelectedIndex = PlayerTabIndex;
         Opened += OnWindowLoaded;
+        IlkBoyayiBekle();
         AcilisIzi.Yaz("yapici-bitti");
     }
 
@@ -2845,6 +2846,7 @@ public partial class MainWindow : Window
         AcilisIzi.Yaz("motor-acildi");
         await LoadAsync(path);
         AcilisIzi.Yaz("kucultme-yuklendi");
+        _ = CizimiOlcAsync();
     }
 
     internal static string TabHeaderText(TabItem tab) => tab.Header switch

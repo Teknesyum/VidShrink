@@ -33,6 +33,9 @@ internal partial class PlayerView : UserControl
     private DispatcherTimer? _render;
     private PlaybackHistory _history = new();
     private long _shown;
+    private long _drawn;
+
+    internal long DrawnFrames => _drawn;
     private string? _path;
     private bool _playing;
     private DispatcherTimer? _pauseFlash;
@@ -681,6 +684,7 @@ internal partial class PlayerView : UserControl
             Resize();
         }
         Frame.InvalidateVisual();
+        _drawn++;
         TxtEmpty.IsVisible = false;
         RefreshState();
     }

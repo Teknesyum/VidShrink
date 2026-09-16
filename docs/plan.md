@@ -414,6 +414,32 @@ sağ tık menüsünün kayıt değerleri her koşumdan önce ve sonra doğrulan�
 
 Tablo [docs/olcumler/acilis-hizi.md](olcumler/acilis-hizi.md) F dalgası.
 
+## Hipersürüş G Dalgası — Başlatıcısız Çift Tık (17 Eylül 2026)
+
+Dal `t0/hipersurus-g`. Kullanıcı: "1 sn'de açılmıyor, panel olmasın". Danışma
+`.calisma/danisma/hipersurus-g-yanit.md`. Her ikili ayrı ayar dosyası
+(`VIDSHRINK_SETTINGS_PATH`, `.calisma` altı) ve kayıt kalkanıyla (`KayitKalkani`) koşar.
+
+1. **G5** `EkranSaati`: `--klip -` boş açılış, `--bitis` bekleme işaretini gerçekten
+   seçer, `--giris-a/--giris-b baslatici|app` tarafı doğrudan `app\VidShrink.App.exe`
+   ile açabilir. Uygulamaya izle kapılı `ilk-boya` işareti (ilk çizilen pencere).
+2. **G4** Kusur: kaynağa göre önerilen hedef MB ve türetilen kalite ayar dosyasına
+   yazılıyordu (eski dosyada `qualityTarget` 60→78,3). Kaydedilen değerler yalnız
+   kullanıcının kendi girdisinden gelir.
+3. **G2** Dosya ilişkisinin `open` komutu `app\VidShrink.App.exe`'ye gider. Ortak
+   karar `ShellIntegration.OpenCommandTarget`; kurucu betiği, `ShellRegistration` ve
+   `FileAssociation.Plan` aynı değeri yazar. Simge, `Applications\VidShrink.exe`
+   anahtarı ve sağ tık menüleri başlatıcıda kalır. Bakım (onarım, sürüm işareti,
+   güncelleme denetimi, işleyici) uygulamanın doğurduğu `VidShrink.exe --bakim`
+   ile koşar; `ToolLocator` `app\` altından kökteki `tools\ffmpeg`'i bulur.
+4. **G3** Başlatıcı olağan yolda da `SplashGate`'i kurar; 400 ms eşiğini aşmayan
+   bakım panelsiz geçer, `ResumePending` de kapsanır. "Yükle"den sonra rozet
+   "Başlatıcı açılıyor…" yazmaz.
+5. **G1** Yazılım çizimi: oynatıcı ve karşılaştırma paneli için ≤10 sn 1080p
+   CPU/kare A/B; kötüleşirse uygulanmaz, sayı raporlanır.
+6. **G6** EkranSaati önce/sonra: pencere, ilk boya, ilk kare; ≤10 tekrar, sıralı.
+   Tablo [docs/olcumler/hipersurus-g.md](olcumler/hipersurus-g.md).
+
 ## Paket 1
 
 Dal `t0/paket-1`. Kaynak: `.calisma/eksikler/rapor.md` satır 1, 2, 3, 6, 7, 12, 13, 14, 15. Her kalem ayrı commit.
