@@ -37,7 +37,8 @@ internal static class FileAssociation
     /// </summary>
     internal static IReadOnlyList<(string Key, string Name, string? Value)> Plan(string executablePath, string classesRoot = ClassesRoot)
     {
-        var command = $"\"{ShellIntegration.OpenCommandTarget(executablePath)}\" \"%1\"";
+        var target = ShellIntegration.OpenCommandTarget(executablePath);
+        var command = $"\"{target}\" \"%1\"";
         var entries = new List<(string, string, string?)>
         {
             ($@"{classesRoot}\{ProgId}", "", DisplayName),
