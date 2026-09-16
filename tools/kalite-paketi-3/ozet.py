@@ -69,7 +69,31 @@ def ceza(kok, kesitler):
         print(f"| {k} | {a} | {len(v)} | {f(sum(v)/len(v))} |")
 
 
+def handbrake(kok, kesitler):
+    print("| Kesit | kbit | Kol | Kodlayıcı | Geometri | kbps | MB | VMAF-NEG ort | VMAF-NEG harm | XPSNR | Karanlık PSNR |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|")
+    farklar = []
+    for k in kesitler:
+        satirlar = yukle(Path(kok) / k / f"handbrake-{k}.json")
+        for s in satirlar:
+            print(f"| {k} | {s['istenen_kbit']} | {s['kol']} | {s.get('kodlayici','')} | {s.get('geometri','')} | {f(s['kbps'],1)} | {f(s['mb'],3)} | {f(s['vmafneg_ort'])} | {f(s['vmafneg_harm'])} | {f(s['xpsnr'])} | {f(s['karanlik_psnr'])} |")
+        for kbit in sorted({s["istenen_kbit"] for s in satirlar}):
+            hb = next(s for s in satirlar if s["istenen_kbit"] == kbit and s["kol"] == "handbrake")
+            for kol in ("urun-otomatik", "urun-x265", "urun-svtav1"):
+                u = next(s for s in satirlar if s["istenen_kbit"] == kbit and s["kol"] == kol)
+                farklar.append((k, kbit, kol, u["kbps"] - hb["kbps"], u["vmafneg_ort"] - hb["vmafneg_ort"], u["xpsnr"] - hb["xpsnr"], u["karanlik_psnr"] - hb["karanlik_psnr"]))
+            n = next(s for s in satirlar if s["istenen_kbit"] == kbit and s["kol"].startswith("negatif"))
+            farklar.append((k, kbit, "negatif (HB yarım bit − HB)", n["kbps"] - hb["kbps"], n["vmafneg_ort"] - hb["vmafneg_ort"], n["xpsnr"] - hb["xpsnr"], n["karanlik_psnr"] - hb["karanlik_psnr"]))
+    print()
+    print("| Kesit | kbit | Kol − HandBrake | Δ kbps | Δ VMAF-NEG ort | Δ XPSNR | Δ karanlık PSNR |")
+    print("|---|---|---|---|---|---|---|")
+    for k, kbit, kol, dk, dv, dx, dp in farklar:
+        print(f"| {k} | {kbit} | {kol} | {f(dk,1)} | {f(dv)} | {f(dx)} | {f(dp)} |")
+
+
 if __name__ == "__main__":
+    if sys.argv[1] == "handbrake":
+        handbrake(sys.argv[2], sys.argv[3].split(","))
     if sys.argv[1] == "whatsapp":
         whatsapp(sys.argv[2])
     elif sys.argv[1] == "ceza":
