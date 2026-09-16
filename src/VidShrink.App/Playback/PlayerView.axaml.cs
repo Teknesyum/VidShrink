@@ -125,6 +125,7 @@ internal partial class PlayerView : UserControl
                 break;
             case PlayerCommandKind.Zoom:
                 _zoom.Wheel(command.Amount, Surface.Bounds.Width / 2, Surface.Bounds.Height / 2);
+                Resize();
                 _trace.Add("zoom " + command.Amount.ToString("0.###") + " -> " + _zoom.PanelScale.ToString("0.###"));
                 break;
             case PlayerCommandKind.TogglePlay:
@@ -145,6 +146,7 @@ internal partial class PlayerView : UserControl
                 break;
             case PlayerCommandKind.ResetZoom:
                 _zoom.Reset();
+                Resize();
                 _trace.Add("zoomreset -> " + _zoom.PanelScale.ToString("0.###"));
                 break;
             case PlayerCommandKind.LeaveFullscreen:
@@ -735,15 +737,16 @@ internal partial class PlayerView : UserControl
     /// Goruntuyu panonun bugunku olcusune sigdirir. Olcu iki yerden degisir: yeni kare
     /// gelince ve pano yeniden boyutlanınca. Ikisi de buraya girer, boylece pencere
     /// buyudugunde duraklatilmis goruntu de buyur.
-    /// <c>ZoomGesture.Scale</c> band kademesinde <c>PanelScale</c>'i zaten iceriyor;
-    /// burada ikinci kez carpilmaz.
+    /// Oynaticida panel terfisi yok: Alt+teker her kademede goruntuyu buyutur, bu yuzden
+    /// olcu <c>ZoomGesture.Scale</c>'den degil sigdirma olcegi carpi panel olceginden gelir.
     /// </summary>
     private void Resize()
     {
         if (Frame.Source is null) return;
         _zoom.SetViewport(Surface.Bounds.Width, Surface.Bounds.Height);
-        Frame.Width = _zoom.ContentWidth;
-        Frame.Height = _zoom.ContentHeight;
+        var scale = _zoom.FitScale * _zoom.PanelScale;
+        Frame.Width = _zoom.SourceWidth * scale;
+        Frame.Height = _zoom.SourceHeight * scale;
         Frame.InvalidateVisual();
     }
 

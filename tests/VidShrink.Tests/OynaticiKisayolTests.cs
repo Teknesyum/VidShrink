@@ -222,7 +222,7 @@ public sealed class OynaticiKisayolTests
         "PgDn", "PgUp", "CtrlAltShiftF", "CtrlAltShiftB",
         "N", "B", "ShiftPgDn", "ShiftPgUp",
         "CtrlK", "CtrlShiftG", "CtrlM", "CtrlU",
-        "Teker", "CtrlTeker", "ShiftTeker", "CtrlShiftTeker", "SolTik", "CiftTik", "OrtaTik"
+        "Teker", "CtrlTeker", "ShiftTeker", "CtrlShiftTeker", "AltTeker", "SolTik", "SagTik", "CiftTik", "OrtaTik", "CtrlT"
     };
 
     [Theory]
@@ -508,9 +508,10 @@ public sealed class OynaticiKisayolTests
                 return once.Sol == "kirmizi" && kare.Sol == "mavi" && kare.Sag == "kirmizi" && o.Motor.Mirrored ? null : "ayna kareye yansimadi";
             }
             case "CtrlA":
+            case "CtrlT":
             {
                 var once = o.Window.Topmost;
-                o.Bas(Key.A, KeyModifiers.Control);
+                o.Bas(ad == "CtrlA" ? Key.A : Key.T, KeyModifiers.Control);
                 o.Not($"Topmost {once} -> {o.Window.Topmost}");
                 return !once && o.Window.Topmost ? null : "Topmost degismedi";
             }
@@ -642,6 +643,29 @@ public sealed class OynaticiKisayolTests
             case "CtrlTeker": return Teker(o, KeyModifiers.Control, 10);
             case "ShiftTeker": return Teker(o, KeyModifiers.Shift, 60);
             case "CtrlShiftTeker": return Teker(o, KeyModifiers.Control | KeyModifiers.Shift, 300);
+            case "AltTeker":
+            {
+                o.Bekle(0.3);
+                var once = (Olcek: o.View.ZoomScale, Genislik: o.View.Frame.Bounds.Width);
+                GirdiSurucu.Wheel(o.View, 1, KeyModifiers.Alt);
+                o.Bekle(() => o.View.Frame.Bounds.Width > once.Genislik + 1, 2);
+                var sonra = (Olcek: o.View.ZoomScale, Genislik: o.View.Frame.Bounds.Width);
+                o.Not($"alt teker: ZoomScale {F(once.Olcek)} -> {F(sonra.Olcek)}, kare genisligi {F(once.Genislik)} -> {F(sonra.Genislik)}");
+                for (var i = 0; i < 12; i++) GirdiSurucu.Wheel(o.View, 1, KeyModifiers.Alt);
+                o.Bekle(0.3);
+                var tavan = (Olcek: o.View.ZoomScale, Genislik: o.View.Frame.Bounds.Width);
+                o.Not($"13 centik: ZoomScale {F(tavan.Olcek)}, kare genisligi {F(tavan.Genislik)}, beklenen {F(once.Genislik * tavan.Olcek)}");
+                return sonra.Olcek > once.Olcek && sonra.Genislik > once.Genislik + 1
+                       && Math.Abs(tavan.Genislik - once.Genislik * tavan.Olcek) < 1 ? null : "kare olcekle buyumedi";
+            }
+            case "SagTik":
+            {
+                var once = o.View.MenuOpen;
+                GirdiSurucu.Press(o.View, PointerUpdateKind.RightButtonPressed, RawInputModifiers.RightMouseButton);
+                o.Bekle(0.3);
+                o.Not($"sag tik: menu acik {once} -> {o.View.MenuOpen}, dayanak {o.View.MenuAnchor}");
+                return !once && o.View.MenuOpen ? null : "menu acilmadi";
+            }
             case "SolTik":
             {
                 var once = o.Oku("pause");
