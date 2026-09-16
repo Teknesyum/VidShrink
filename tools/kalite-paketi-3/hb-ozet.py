@@ -43,13 +43,17 @@ def satirlar(kok):
 def hukum(u, h):
     if u.get("vmafneg_ort") is None or h.get("vmafneg_ort") is None or u.get("xpsnr") is None or h.get("xpsnr") is None:
         return "ölçülemedi"
-    if u.get("kbps") and h.get("kbps") and abs(h["kbps"] / u["kbps"] - 1) > KBPS_TOLERANS:
-        return "eş bayt değil"
     dv = u["vmafneg_ort"] - h["vmafneg_ort"]
     dx = u["xpsnr"] - h["xpsnr"]
-    if dv < -GURULTU_VMAF or dx < -GURULTU_XPSNR:
+    geride = dv < -GURULTU_VMAF or dx < -GURULTU_XPSNR
+    onde = dv > GURULTU_VMAF or dx > GURULTU_XPSNR
+    if u.get("kbps") and h.get("kbps") and abs(h["kbps"] / u["kbps"] - 1) > KBPS_TOLERANS:
+        if u["kbps"] < h["kbps"]:
+            return "geride (az bayt)" if geride else "önde (az bayt)" if onde else "bantta (az bayt)"
+        return "geride (çok bayt)" if geride else "eş bayt değil"
+    if geride:
         return "geride"
-    if dv > GURULTU_VMAF or dx > GURULTU_XPSNR:
+    if onde:
         return "önde"
     return "bantta"
 
@@ -93,7 +97,7 @@ def kiyas(sat, urun_kol, hb_kol, cambi_hukum=False):
 
         oran = None if not u.get("kodlama_sn") or not h.get("kodlama_sn") else u["kodlama_sn"] / h["kodlama_sn"]
         sapma = None if not u.get("kbps") or not h.get("kbps") else (h["kbps"] / u["kbps"] - 1) * 100
-        print(f"| {u.get('kesit')} | {u.get('istenen_kbit')} | {f(d('vmafneg_ort'))} | {f(d('vmafneg_harm'))} | {f(d('xpsnr'))} | {f(d('ssim'), 4)} | {f(d('cambi'), 3)} | {f(d('karanlik_psnr'))} | {f(oran)} | {f(sapma)} | {bant_hukum(u, h) if cambi_hukum else hukum(u, h)} |")
+        print(f"| {u.get('kesit')} | {u.get('istenen_kbit') or u.get('onayar')} | {f(d('vmafneg_ort'))} | {f(d('vmafneg_harm'))} | {f(d('xpsnr'))} | {f(d('ssim'), 4)} | {f(d('cambi'), 3)} | {f(d('karanlik_psnr'))} | {f(oran)} | {f(sapma)} | {bant_hukum(u, h) if cambi_hukum else hukum(u, h)} |")
     print()
 
 
