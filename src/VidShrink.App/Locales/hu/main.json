@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Előbeállítás / sebesség",
   "main.advanced.audio-kbps.label": "Hangcél (kbps)",
   "main.advanced.audio-channels.label": "Hangcsatornák",
+  "main.advanced.keep-tracks.label": "Minden sáv megtartása (MKV)",
   "main.advanced.audio-channels.stereo": "Sztereó",
   "main.advanced.audio-channels.mono": "Monó",
   "main.advanced.audio-channels.none": "Néma",

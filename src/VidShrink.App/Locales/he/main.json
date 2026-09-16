@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "פריסט / מהירות",
   "main.advanced.audio-kbps.label": "יעד שמע (kbps)",
   "main.advanced.audio-channels.label": "ערוצי שמע",
+  "main.advanced.keep-tracks.label": "שמירת כל הרצועות (MKV)",
   "main.advanced.audio-channels.stereo": "סטריאו",
   "main.advanced.audio-channels.mono": "מונו",
   "main.advanced.audio-channels.none": "שקט",

@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Preset / kecepatan",
   "main.advanced.audio-kbps.label": "Target audio (kbps)",
   "main.advanced.audio-channels.label": "Kanal audio",
+  "main.advanced.keep-tracks.label": "Pertahankan semua trek (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Senyap",

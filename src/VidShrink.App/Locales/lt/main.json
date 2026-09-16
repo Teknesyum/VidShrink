@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Šablonas / greitis",
   "main.advanced.audio-kbps.label": "Garso tikslas (kbps)",
   "main.advanced.audio-channels.label": "Garso kanalai",
+  "main.advanced.keep-tracks.label": "Išsaugoti visus takelius (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Be garso",

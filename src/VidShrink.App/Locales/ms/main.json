@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Praset / kelajuan",
   "main.advanced.audio-kbps.label": "Sasaran audio (kbps)",
   "main.advanced.audio-channels.label": "Saluran audio",
+  "main.advanced.keep-tracks.label": "Kekalkan semua trek (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Senyap",

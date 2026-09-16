@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Preset / Tempo",
   "main.advanced.audio-kbps.label": "Audio-Ziel (kbps)",
   "main.advanced.audio-channels.label": "Audiokanäle",
+  "main.advanced.keep-tracks.label": "Alle Spuren behalten (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Stumm",

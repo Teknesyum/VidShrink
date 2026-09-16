@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "प्रीसेट / गति",
   "main.advanced.audio-kbps.label": "ऑडियो लक्ष्य (kbps)",
   "main.advanced.audio-channels.label": "ऑडियो चैनल",
+  "main.advanced.keep-tracks.label": "सभी ट्रैक रखें (MKV)",
   "main.advanced.audio-channels.stereo": "स्टीरियो",
   "main.advanced.audio-channels.mono": "मोनो",
   "main.advanced.audio-channels.none": "मौन",

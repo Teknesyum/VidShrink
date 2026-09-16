@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Preset / szybkość",
   "main.advanced.audio-kbps.label": "Cel dźwięku (kbps)",
   "main.advanced.audio-channels.label": "Kanały dźwięku",
+  "main.advanced.keep-tracks.label": "Zachowaj wszystkie ścieżki (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Bez dźwięku",

@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "প্রিসেট / গতি",
   "main.advanced.audio-kbps.label": "অডিও লক্ষ্য (kbps)",
   "main.advanced.audio-channels.label": "অডিও চ্যানেল",
+  "main.advanced.keep-tracks.label": "সব ট্র্যাক রাখুন (MKV)",
   "main.advanced.audio-channels.stereo": "স্টেরিও",
   "main.advanced.audio-channels.mono": "মোনো",
   "main.advanced.audio-channels.none": "নীরব",

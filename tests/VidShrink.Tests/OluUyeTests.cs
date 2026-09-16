@@ -360,7 +360,7 @@ public sealed class OluUyeTests
     /// tuketicili uye acilirsa ya da var olan birine gercek bir tuketici gelirse burasi kirmizi
     /// olur.
     /// <para>
-    /// Kume bugun 34 satir: 29 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
+    /// Kume bugun 37 satir: 32 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
     /// (<c>Flagged = ZeroConsumer || Unused</c>). T163 kumeyi 51 satirdan 37'ye indirdi ve
     /// kalan bir satirin bicimini degistirdi. Dusen 19 satir T165'in <c>ReasonCode.Manual*</c>
     /// kodlariydi: T165 onlari uretmis ama okuyamamisti, cunku okuma tarafi
@@ -390,6 +390,9 @@ public sealed class OluUyeTests
     /// Kumeyi bir satir buyuten hedef boyut butcesi: <c>RecorderBudgetVerdict</c> dort uyeli
     /// acildi, ucu adiyla okunuyor, <c>NotRequested</c> olumsuz kol olarak kaliyor —
     /// <c>QualityTargetBound.Matched</c> ile ayni kalip, gosterilecek cumlesi olmayan hal.
+    /// Kumeyi 34'ten 37'ye cikaran dalga 1c, akis eslemesi: <c>StreamKind.Data</c>,
+    /// <c>StreamNote.LosslessAudioNotPassedThrough</c> ve <c>TrackAction.Encode</c> ucu de
+    /// kardesleri adiyla okunan turun varsayilan kolu.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
@@ -453,6 +456,12 @@ public sealed class OluUyeTests
             "Ayni bulgu: uc yerde uretiliyor, servis hatasini ayiran kol yok; kullanici genel hata cumlesini goruyor."),
         new("SpeedMode.Quality", "varsayilan-kol", Legitimate,
             "Iki degerli kipin olumsuz kolu ve varsayilani. On okuma yerinin hepsi 'speed == SpeedMode.Fast' kalibinda soruyor (dokuzu ==, CalibrationProbe.cs:148 !=); Quality o kosulun else'i."),
+        new("StreamKind.Data", "varsayilan-kol", Legitimate,
+            "Akis turunun 'video, ses, altyazi degil' hali. FfprobeClient.cs'in codec_type switch'i uc turu adlandirip '_ => StreamKind.Data' diyor; eslemede veri akislari hic secilmiyor."),
+        new("StreamNote.LosslessAudioNotPassedThrough", "varsayilan-kol", Legitimate,
+            "Plan notlarinin son kolu. PlanCalculator.AddStreamNotes yedi notu adiyla yaziyor, TrueHD/DTS cumlesi '_' kolunda; ayri bir kol ayni cumleyi verirdi."),
+        new("TrackAction.Encode", "varsayilan-kol", Legitimate,
+            "Iki degerli iz eyleminin varsayilani. Argumanlar 'action == TrackAction.Copy' diye soruyor; Encode o kosulun else'i."),
         new("WindowBiasSource.None", "varsayilan-kol", Legitimate,
             "Pencere sapmasinin 'kaynak yok' hali. ComplexityProfile.cs:128-132 Scan ve Packets'i adlandirip '_ => MeasuredBand' diyor; None olculmemis bandin ta kendisi, ayri bir kol ayni degeri verirdi."),
         new("FfmpegArguments.SceneMapRuleOfRecord", "yalniz-disarida", Debt,

@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "முன்னமைவு / வேகம்",
   "main.advanced.audio-kbps.label": "ஒலி இலக்கு (kbps)",
   "main.advanced.audio-channels.label": "ஒலி சேனல்கள்",
+  "main.advanced.keep-tracks.label": "எல்லா தடங்களையும் வைத்திரு (MKV)",
   "main.advanced.audio-channels.stereo": "ஸ்டீரியோ",
   "main.advanced.audio-channels.mono": "மோனோ",
   "main.advanced.audio-channels.none": "மௌனம்",

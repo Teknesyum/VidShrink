@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Predložak / brzina",
   "main.advanced.audio-kbps.label": "Cilj zvuka (kbps)",
   "main.advanced.audio-channels.label": "Zvučni kanali",
+  "main.advanced.keep-tracks.label": "Zadrži sve zapise (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Bez zvuka",

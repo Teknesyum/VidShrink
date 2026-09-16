@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Mpangilio / kasi",
   "main.advanced.audio-kbps.label": "Lengo la sauti (kbps)",
   "main.advanced.audio-channels.label": "Chaneli za sauti",
+  "main.advanced.keep-tracks.label": "Hifadhi nyimbo zote (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Kimya",

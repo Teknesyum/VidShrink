@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "プリセット / 速度",
   "main.advanced.audio-kbps.label": "音声目標(kbps)",
   "main.advanced.audio-channels.label": "音声チャンネル",
+  "main.advanced.keep-tracks.label": "すべてのトラックを保持 (MKV)",
   "main.advanced.audio-channels.stereo": "ステレオ",
   "main.advanced.audio-channels.mono": "モノラル",
   "main.advanced.audio-channels.none": "無音",

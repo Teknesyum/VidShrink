@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "پیش‌تنظیم / سرعت",
   "main.advanced.audio-kbps.label": "هدف صدا (kbps)",
   "main.advanced.audio-channels.label": "کانال‌های صدا",
+  "main.advanced.keep-tracks.label": "حفظ همه ترک‌ها (MKV)",
   "main.advanced.audio-channels.stereo": "استریو",
   "main.advanced.audio-channels.mono": "مونو",
   "main.advanced.audio-channels.none": "بی‌صدا",

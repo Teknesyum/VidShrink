@@ -123,6 +123,7 @@ public partial class MainWindow : Window
     private PanelHost? _preview;
     private Intent _intent = Intent.Sharing;
     private bool _chipSizeCapped = true;
+    private bool _platformChip;
     internal static readonly string[] AdvancedPresetCandidates =
     {
         "ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow",
@@ -204,7 +205,7 @@ public partial class MainWindow : Window
         Watch(TxtQualityTarget, TextBox.TextProperty, OnQualityTargetTextChanged);
         foreach (var toggle in ShrinkChoiceToggles())
             Watch(toggle, ToggleButton.IsCheckedProperty, OnOptionChanged);
-        foreach (var check in new ToggleButton[] { ChkResolution, ChkFps, ChkFastGpu })
+        foreach (var check in new ToggleButton[] { ChkResolution, ChkFps, ChkFastGpu, ChkAdvKeepTracks })
             Watch(check, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(ChkFastGpu, ToggleButton.IsCheckedProperty, OnFastGpuChanged);
 
@@ -1540,6 +1541,7 @@ public partial class MainWindow : Window
         var plan = ChipPlans().Single(candidate => candidate.Chip == chip);
         _intent = plan.Intent;
         _chipSizeCapped = plan.SizeCapped;
+        _platformChip = plan.TargetMb is not null;
         SetCodecIndex(plan.Codec switch
         {
             CodecPreference.Compatible => 1,
@@ -1637,6 +1639,10 @@ public partial class MainWindow : Window
             3 => AudioChannelOverride.None,
             _ => AudioChannelOverride.Auto
         };
+
+        options.KeepAllTracks = ChkAdvKeepTracks.IsChecked == true;
+        options.PlatformDelivery = _platformChip;
+        options.PreferredLanguage = Strings.Language;
 
         if (AdvancedText(CmbAdvMinResolution) is { } minResText
             && int.TryParse(minResText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var minRes))
@@ -3327,7 +3333,7 @@ public partial class MainWindow : Window
         RefreshDurationView();
         RefreshAdvancedHints();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments(_info, plan,
-            BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), _encoders, _sceneMap?.Map));
+            BuildUniqueOutputPath(_info.FilePath, "shrunk", plan.Streams?.Extension ?? "mp4"), _encoders, _sceneMap?.Map));
     }
 
     /// <summary>
@@ -3650,6 +3656,7 @@ public partial class MainWindow : Window
     private void RestoreSizeCap()
     {
         _chipSizeCapped = true;
+        _platformChip = false;
         RefreshChipDerivation();
         RefreshSectionSummaries();
     }
@@ -3986,7 +3993,7 @@ public partial class MainWindow : Window
     {
         if (_info is null || ActivePlan is null || _cts is not null) return;
 
-        var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4");
+        var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", ActivePlan.Streams?.Extension ?? "mp4");
         var targetMb = ParseTargetMb();
         if (DiskSpaceGuard.TryGetFreeBytes(output, out var freeBytes) && !DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb))
         {

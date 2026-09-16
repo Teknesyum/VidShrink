@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Esiasetus / nopeus",
   "main.advanced.audio-kbps.label": "Äänen kohde (kbps)",
   "main.advanced.audio-channels.label": "Äänikanavat",
+  "main.advanced.keep-tracks.label": "Säilytä kaikki raidat (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Äänetön",

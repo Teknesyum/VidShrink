@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Пресет / скорость",
   "main.advanced.audio-kbps.label": "Цель для звука (кбит/с)",
   "main.advanced.audio-channels.label": "Аудиоканалы",
+  "main.advanced.keep-tracks.label": "Сохранить все дорожки (MKV)",
   "main.advanced.audio-channels.stereo": "Стерео",
   "main.advanced.audio-channels.mono": "Моно",
   "main.advanced.audio-channels.none": "Без звука",

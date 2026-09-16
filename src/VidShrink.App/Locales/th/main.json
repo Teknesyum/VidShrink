@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "พรีเซ็ต / ความเร็ว",
   "main.advanced.audio-kbps.label": "เป้าหมายเสียง (kbps)",
   "main.advanced.audio-channels.label": "ช่องเสียง",
+  "main.advanced.keep-tracks.label": "เก็บทุกแทร็ก (MKV)",
   "main.advanced.audio-channels.stereo": "สเตอริโอ",
   "main.advanced.audio-channels.mono": "โมโน",
   "main.advanced.audio-channels.none": "ไม่มีเสียง",

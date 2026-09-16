@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Priekšiestatījums / ātrums",
   "main.advanced.audio-kbps.label": "Audio mērķis (kbps)",
   "main.advanced.audio-channels.label": "Audio kanāli",
+  "main.advanced.keep-tracks.label": "Saglabāt visus celiņus (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Bez skaņas",

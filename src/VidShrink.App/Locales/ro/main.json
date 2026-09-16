@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Preset / viteză",
   "main.advanced.audio-kbps.label": "Țintă audio (kbps)",
   "main.advanced.audio-channels.label": "Canale audio",
+  "main.advanced.keep-tracks.label": "Păstrează toate pistele (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Fără sunet",

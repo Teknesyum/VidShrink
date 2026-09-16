@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "프리셋 / 속도",
   "main.advanced.audio-kbps.label": "오디오 목표 (kbps)",
   "main.advanced.audio-channels.label": "오디오 채널",
+  "main.advanced.keep-tracks.label": "모든 트랙 유지 (MKV)",
   "main.advanced.audio-channels.stereo": "스테레오",
   "main.advanced.audio-channels.mono": "모노",
   "main.advanced.audio-channels.none": "무음",

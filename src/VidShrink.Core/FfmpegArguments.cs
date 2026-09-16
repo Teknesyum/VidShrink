@@ -428,25 +428,19 @@ public static class FfmpegArguments
         a.AddRange(psychovisualArgs);
         a.AddRange(plan.HdrColorArgs);
 
+        var streams = StreamMapping.ForOutput(info, plan, outputPath);
+
         if (pass == 1)
         {
             a.AddRange(plan.ExtraArgs);
-            a.AddRange(new[] { "-an", "-f", "null" });
+            a.AddRange(new[] { "-map", streams.VideoMap, "-an", "-sn", "-f", "null" });
             a.Add(OperatingSystem.IsWindows() ? "NUL" : "/dev/null");
             return MergeEncoderParams(a);
         }
 
-        if (plan.AudioCodec is null)
-            a.Add("-an");
-        else if (plan.AudioCodec == "copy")
-            a.AddRange(new[] { "-c:a", "copy" });
-        else
-        {
-            a.AddRange(new[] { "-c:a", plan.AudioCodec, "-b:a", $"{plan.AudioBitrateK}k" });
-            if (plan.AudioChannels is > 0) a.AddRange(new[] { "-ac", plan.AudioChannels.Value.ToString() });
-        }
-
-        a.AddRange(new[] { "-movflags", "+faststart" });
+        a.AddRange(streams.OutputArguments());
+        if (streams.Container == OutputContainer.Mp4)
+            a.AddRange(new[] { "-movflags", "+faststart" });
         a.AddRange(plan.ExtraArgs);
         a.Add(outputPath);
         return MergeEncoderParams(a);

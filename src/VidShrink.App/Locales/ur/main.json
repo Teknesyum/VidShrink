@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "پری سیٹ / رفتار",
   "main.advanced.audio-kbps.label": "آڈیو ہدف (kbps)",
   "main.advanced.audio-channels.label": "آڈیو چینل",
+  "main.advanced.keep-tracks.label": "تمام ٹریکس رکھیں (MKV)",
   "main.advanced.audio-channels.stereo": "سٹیریو",
   "main.advanced.audio-channels.mono": "مونو",
   "main.advanced.audio-channels.none": "خاموش",

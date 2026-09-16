@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Förval / hastighet",
   "main.advanced.audio-kbps.label": "Ljudmål (kbps)",
   "main.advanced.audio-channels.label": "Ljudkanaler",
+  "main.advanced.keep-tracks.label": "Behåll alla spår (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Tyst",

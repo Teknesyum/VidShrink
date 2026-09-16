@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "الإعداد المسبق / السرعة",
   "main.advanced.audio-kbps.label": "هدف الصوت (kbps)",
   "main.advanced.audio-channels.label": "قنوات الصوت",
+  "main.advanced.keep-tracks.label": "الاحتفاظ بكل المسارات (MKV)",
   "main.advanced.audio-channels.stereo": "ستيريو",
   "main.advanced.audio-channels.mono": "أحادي",
   "main.advanced.audio-channels.none": "صامت",

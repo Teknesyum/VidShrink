@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Ön ayar / hız",
   "main.advanced.audio-kbps.label": "Ses hedefi (kbps)",
   "main.advanced.audio-channels.label": "Ses kanalı",
+  "main.advanced.keep-tracks.label": "İzleri koru (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Sessiz",

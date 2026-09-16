@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Προεπιλογή / ταχύτητα",
   "main.advanced.audio-kbps.label": "Στόχος ήχου (kbps)",
   "main.advanced.audio-channels.label": "Κανάλια ήχου",
+  "main.advanced.keep-tracks.label": "Διατήρηση όλων των κομματιών (MKV)",
   "main.advanced.audio-channels.stereo": "Στερεοφωνικό",
   "main.advanced.audio-channels.mono": "Μονοφωνικό",
   "main.advanced.audio-channels.none": "Χωρίς ήχο",

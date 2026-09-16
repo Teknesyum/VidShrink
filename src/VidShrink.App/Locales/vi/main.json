@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Preset / tốc độ",
   "main.advanced.audio-kbps.label": "Mục tiêu âm thanh (kbps)",
   "main.advanced.audio-channels.label": "Kênh âm thanh",
+  "main.advanced.keep-tracks.label": "Giữ mọi rãnh (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Im lặng",

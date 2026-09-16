@@ -145,6 +145,7 @@
   "main.advanced.preset.label": "Eelseade / kiirus",
   "main.advanced.audio-kbps.label": "Heli siht (kbps)",
   "main.advanced.audio-channels.label": "Helikanalid",
+  "main.advanced.keep-tracks.label": "Säilita kõik rajad (MKV)",
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Hääletu",
