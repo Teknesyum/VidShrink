@@ -78,5 +78,5 @@ sürümden (`x.0.0`) önce koşar.
 - `StreamMappingTests.cs` — dalga 1c, akış eşleme: ffmpeg'in ürettiği 3 sn'lik mkv (2 ses, srt, elle yazılmış PGS, 2 bölüm,
   başlık/tarih) ve dönüş işaretli mp4. Varsayılan MP4 tek ses + mov_text, İzleri koru MKV tüm izler, platform tek iz;
   çıktılar ffprobe'la okunur. Negatif kontroller: eşlemesiz ffmpeg başka dili seçer ve tarihi düşürür, yan izleri
-  saymayan bütçe hedefi aşar. Kanıt `.calisma/hb-1c-test/`.
+  saymayan bütçe hedefi aşar. Her `StreamNote` ayrı bir `main.reason.stream.*` anahtarına düşer, anahtar 42 dilde çevrilidir ve pencerenin gerekçe satırında görünür. Kanıt `.calisma/hb-1c-test/`.
 - `KurucuExeTests.cs` — `VidShrink-Setup.exe` motoru (`Core/Setup`): betikle aynı kayıt ağacını yazıp siler (test anahtarında), kilitli klasör denemeleri, sahte yayınla çevrimdışı kurulum ve kaldırma, sağlama tutmazsa eski kuruluma dokunulmaması, yarım kurulumda geri koyma, sabitlerin betikle aynılığı. Gerçek kayıt köküne test konağı yazamaz. Çıktı `.calisma/test-ciktilari/kurucu-exe/`.

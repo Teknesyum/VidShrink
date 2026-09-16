@@ -236,6 +236,7 @@ public partial class MainWindow : Window
         Watch(CmbOutputFolderMode, SelectingItemsControl.SelectedIndexProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(CmbFfmpegPathMode, SelectingItemsControl.SelectedIndexProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
         Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
@@ -1195,6 +1196,7 @@ public partial class MainWindow : Window
     internal void ConfirmResetSettingsForTest() => OnConfirmResetSettings(null, new RoutedEventArgs());
     internal void RestoreAppSettingsForTest(AppSettings settings) => RestoreAppSettings(settings);
     internal AppSettings CaptureAppSettingsForTest() => CaptureAppSettings();
+    internal List<string> ReasonLinesForTest(EncodePlan plan) => ReasonLines(plan);
 
     private SelectingItemsControl[] AdvBoxes() => new SelectingItemsControl[]
     {
@@ -1244,6 +1246,7 @@ public partial class MainWindow : Window
             AdvMinFps = boxes[5].SelectedIndex,
             AdvEncoderPath = AdvEncoderPathIndex,
             AdvCodecLock = boxes[6].SelectedIndex,
+            AdvKeepTracks = ChkAdvKeepTracks.IsChecked == true,
             OutputFolderMode = CmbOutputFolderMode.SelectedIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
@@ -1270,6 +1273,7 @@ public partial class MainWindow : Window
             var boxes = AdvBoxes();
             for (var i = 0; i < boxes.Length; i++)
                 if (indices[i] >= 0 && indices[i] < boxes[i].ItemCount) boxes[i].SelectedIndex = indices[i];
+            ChkAdvKeepTracks.IsChecked = settings.AdvKeepTracks;
 
             CmbOutputFolderMode.SelectedIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
             TxtOutputFolder.Text = settings.OutputFolder;
@@ -3496,8 +3500,23 @@ public partial class MainWindow : Window
             if (text is not null) parts.Add(text);
         }
 
+        if (plan.Streams is { } streams)
+            foreach (var note in streams.Notes) parts.Add(Say(StreamNoteKey(note)));
+
         return parts;
     }
+
+    internal static string StreamNoteKey(StreamNote note) => note switch
+    {
+        StreamNote.AudioPassthrough => "main.reason.stream.audio-passthrough",
+        StreamNote.AudioDownmixedToStereo => "main.reason.stream.audio-downmixed",
+        StreamNote.ExtraAudioDropped => "main.reason.stream.extra-audio-dropped",
+        StreamNote.TextSubtitleConverted => "main.reason.stream.text-subtitle-converted",
+        StreamNote.ImageSubtitleDropped => "main.reason.stream.image-subtitle-dropped",
+        StreamNote.SubtitleDroppedForPlatform => "main.reason.stream.subtitle-dropped-platform",
+        StreamNote.KeepAllTracksOverriddenByPlatform => "main.reason.stream.keep-tracks-overridden",
+        _ => "main.reason.stream.lossless-not-passed"
+    };
 
     private List<string> StrategyLines()
     {

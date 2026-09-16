@@ -121,7 +121,8 @@ public sealed class AyarKaliciligiTests
                 AdvMinResolution = 2,
                 AdvMinFps = 1,
                 AdvEncoderPath = 2,
-                AdvCodecLock = 3
+                AdvCodecLock = 3,
+                AdvKeepTracks = true
             }.Save(file);
 
             var result = AppHost.Run(() =>
@@ -148,6 +149,72 @@ public sealed class AyarKaliciligiTests
             Assert.Equal(0, result.afterReset.AdvMinFps);
             Assert.Equal(0, result.afterReset.AdvEncoderPath);
             Assert.Equal(0, result.afterReset.AdvCodecLock);
+            Assert.True(result.beforeReset.AdvKeepTracks);
+            Assert.False(result.afterReset.AdvKeepTracks);
+        }
+        finally { if (File.Exists(file)) File.Delete(file); }
+    }
+
+    [Fact]
+    public void IzleriKoruKapanipAcilanPenceredeGeriGelir()
+    {
+        var file = SettingsFile();
+        var previous = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
+        Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", file);
+        try
+        {
+            var reading = AppHost.Run(() =>
+            {
+                var fresh = new MainWindow();
+                bool freshValue;
+                try
+                {
+                    fresh.RestoreAppSettingsForTest(AppSettings.Load());
+                    freshValue = fresh.ChkAdvKeepTracks.IsChecked == true;
+                }
+                finally { fresh.Close(); }
+
+                var first = new MainWindow();
+                try { first.ChkAdvKeepTracks.IsChecked = true; }
+                finally { first.Close(); }
+
+                var second = new MainWindow();
+                try
+                {
+                    second.RestoreAppSettingsForTest(AppSettings.Load());
+                    return (Fresh: freshValue, Reopened: second.ChkAdvKeepTracks.IsChecked == true);
+                }
+                finally { second.Close(); }
+            });
+
+            Assert.False(reading.Fresh);
+            Assert.True(File.Exists(file), "Ayar VIDSHRINK_SETTINGS_PATH'in gosterdigi dosyaya yazilmadi.");
+            Assert.Contains("\"advKeepTracks\": true", File.ReadAllText(file));
+            Assert.True(reading.Reopened, "Izleri koru acik kapanan pencere kapali acildi.");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", previous);
+            if (File.Exists(file)) File.Delete(file);
+        }
+    }
+
+    [Fact]
+    public void IzleriKoruYalnizGercekMantiksalDegerdenOkunur()
+    {
+        var file = SettingsFile();
+        try
+        {
+            File.WriteAllText(file, "{ \"advKeepTracks\": \"true\", \"advCrf\": 2 }");
+            var yazili = AppSettings.Load(file);
+            Assert.False(yazili.AdvKeepTracks);
+            Assert.Equal(2, yazili.AdvCrf);
+
+            File.WriteAllText(file, "{ \"advKeepTracks\": false }");
+            Assert.False(AppSettings.Load(file).AdvKeepTracks);
+
+            File.WriteAllText(file, "{ \"advKeepTracks\": true }");
+            Assert.True(AppSettings.Load(file).AdvKeepTracks);
         }
         finally { if (File.Exists(file)) File.Delete(file); }
     }

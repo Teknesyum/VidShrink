@@ -535,4 +535,60 @@ public sealed class StreamMappingTests
         Assert.True(result.OutputMb >= band.HardFloorMb, rapor);
         Assert.True(eskiIlk > target, rapor);
     }
+
+    [Fact]
+    public void HerIzNotununKirkIkiDildeCevrilmisGerekcesiVar()
+    {
+        var notes = Enum.GetValues<StreamNote>();
+        var keys = notes.Select(VidShrink.App.MainWindow.StreamNoteKey).ToList();
+        Assert.Equal(notes.Length, keys.Distinct().Count());
+
+        var english = Locales.Domain("en", "main");
+        var languages = Locales.Languages;
+        Assert.Equal(42, languages.Count);
+        var eksik = new List<string>();
+        foreach (var language in languages)
+        {
+            var values = Locales.Domain(language, "main");
+            foreach (var key in keys)
+            {
+                if (!values.TryGetValue(key, out var value) || string.IsNullOrWhiteSpace(value))
+                    eksik.Add($"{language}:{key} yok");
+                else if (language != "en" && value == english[key])
+                    eksik.Add($"{language}:{key} cevrilmemis");
+            }
+        }
+        Assert.True(eksik.Count == 0, string.Join(Environment.NewLine, eksik));
+
+        Assert.False(english.ContainsKey("main.reason.stream.uydurma-not"));
+        Assert.NotEqual(
+            Locales.Domain("tr", "main")["main.reason.stream.image-subtitle-dropped"],
+            english["main.reason.stream.image-subtitle-dropped"]);
+    }
+
+    [Fact]
+    public void IzNotuPlandanPencereninGerekceSatirinaCevrilir()
+    {
+        var info = Kaynak(Video,
+            new SourceStream(1, StreamKind.Audio, "aac", "tur", Channels: 2, BitrateBps: 128_000),
+            new SourceStream(2, StreamKind.Audio, "aac", "eng", Channels: 2, BitrateBps: 128_000));
+        var plan = PlanCalculator.Build(info, new PlanOptions { TargetMb = 50, LockedCodec = "libx264" });
+        Assert.Contains(StreamNote.ExtraAudioDropped, plan.Streams!.Notes);
+
+        var lines = AppHost.Run(() =>
+        {
+            var window = new VidShrink.App.MainWindow();
+            try
+            {
+                window.UseTurkish();
+                return window.ReasonLinesForTest(plan);
+            }
+            finally { window.Close(); }
+        });
+
+        var beklenen = Locales.Domain("tr", "main")["main.reason.stream.extra-audio-dropped"];
+        Assert.Contains(lines, line => string.Equals(line, beklenen, StringComparison.OrdinalIgnoreCase));
+        var goruntu = Locales.Domain("tr", "main")["main.reason.stream.image-subtitle-dropped"];
+        Assert.DoesNotContain(lines, line => string.Equals(line, goruntu, StringComparison.OrdinalIgnoreCase));
+    }
 }

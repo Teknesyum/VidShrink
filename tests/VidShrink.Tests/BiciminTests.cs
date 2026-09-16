@@ -549,9 +549,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1218, toplam);
-        Assert.Equal(139, dilBasina["en"]);
-        Assert.Equal(52, dilBasina["tr"]);
+        Assert.Equal(1260, toplam);
+        Assert.Equal(143, dilBasina["en"]);
+        Assert.Equal(56, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -595,7 +595,8 @@ public sealed class BaslikKapsamiTests
     /// dokuz recorder.budget.* / recorder.auto.manual anahtari ekledi, sahipsiz kalan recorder.auto.enable
     /// ve recorder.auto.hint dustu: 43 x 717 = 30831. Iki adimli guncelleme indirme dugmesini, rozet/durum ve dort gunluk satirini ekledi
     /// (main.action.download, main.update.badge/downloading/ready/failed, main.update.log.*): 43 x 732 = 31476'dan 43 x 741 = 31863'e.
-    /// HandBrake 1c dalgasi main.advanced.keep-tracks.label'i ekledi: 43 x 742 = 31906'dan 43 x 743 = 31949'a.</para>
+    /// HandBrake 1c dalgasi main.advanced.keep-tracks.label'i ekledi: 43 x 742 = 31906'dan 43 x 743 = 31949'a;
+    /// iz kararlarinin sekiz gerekce notu (main.reason.stream.*) 43 x 751 = 32293'e, kol degistiren toplami 1218'den 1260'a (en 139'dan 143'e, tr 52'den 56'ya).</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -623,7 +624,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(31949, gezilen);
+        Assert.Equal(32293, gezilen);
         Assert.Empty(kayip);
     }
 
