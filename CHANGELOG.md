@@ -7,6 +7,16 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-09-16
+
+### Fixed
+
+- Release 0.7.0 was tagged but never published: three source pins read attribute order in
+  `MainWindow.axaml` and the tab-selection hook in `MainWindow.axaml.cs`, and the startup
+  probe marks broke that order. The marks now sit after the pinned attributes and the
+  Recorder hook has its own subscription. Everything listed under 0.7.0 ships in this
+  release.
+
 ## [0.7.0] - 2026-09-16
 
 ### Added

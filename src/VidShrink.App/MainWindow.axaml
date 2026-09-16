@@ -63,7 +63,7 @@
               BorderThickness="0,0,0,1"/>
 
 
-        <TabControl x:Name="Tabs" izi:AcilisIsareti.Ad="xaml-sekmeler" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
+        <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="1" izi:AcilisIsareti.Ad="xaml-sekmeler">
         <TabControl.Tag>
         <StackPanel>
           <Border x:Name="AppliedNotice"
@@ -1025,7 +1025,7 @@
           </ScrollViewer>
         </TabItem>
 
-          <TabItem x:Name="TabAdvanced" izi:AcilisIsareti.Ad="xaml-gelismis" IsVisible="False" Header="{loc:Text main.tab.advanced}" Tag="{StaticResource IconAdvanced}" Theme="{StaticResource NeonTabItem}">
+          <TabItem x:Name="TabAdvanced" IsVisible="False" izi:AcilisIsareti.Ad="xaml-gelismis" Header="{loc:Text main.tab.advanced}" Tag="{StaticResource IconAdvanced}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageAdvanced" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 

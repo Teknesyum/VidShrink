@@ -188,7 +188,8 @@ public partial class MainWindow : Window
         AlignTabsToTitle();
         TrackChrome();
         SetupShellMenu();
-        Tabs.SelectionChanged += (_, _) => { ApplyWindowFrame(); KaydediciSekmesiSecildi(); };
+        Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
+        Tabs.SelectionChanged += (_, _) => KaydediciSekmesiSecildi();
 
         if (OperatingSystem.IsMacOS())
         {
