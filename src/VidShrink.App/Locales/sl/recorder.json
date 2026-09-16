@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "ločljivost ohranjena",
   "recorder.auto.note.halved": "ločljivost razpolovljena",
   "recorder.auto.note.container": "vsebnik mkv: prekinjen posnetek ostane predvajljiv",
-  "recorder.auto.note.preset": "prednastavitev iz lastnega besedišča kodirnika"
+  "recorder.auto.note.preset": "prednastavitev iz lastnega besedišča kodirnika",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

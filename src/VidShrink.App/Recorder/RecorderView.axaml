@@ -21,7 +21,7 @@
             Theme="{StaticResource Panel}"
             Padding="{StaticResource RecorderStripPadding}"
             auto:AutomationProperties.Name="{loc:Text recorder.strip.title}">
-      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto"
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto,Auto"
             ColumnSpacing="{StaticResource RecorderStripGap}">
 
         <Ellipse Grid.Column="0"
@@ -86,6 +86,15 @@
                 Click="OnResume"/>
 
         <Button Grid.Column="6"
+                x:Name="BtnSnapshot"
+                Height="{StaticResource RecorderButtonSize}"
+                Theme="{StaticResource GhostButton}"
+                Content="{loc:Text recorder.strip.snapshot}"
+                IsVisible="False"
+                auto:AutomationProperties.Name="{loc:Text recorder.strip.snapshot}"
+                Click="OnSnapshot"/>
+
+        <Button Grid.Column="7"
                 x:Name="BtnStop"
                 Height="{StaticResource RecorderButtonSize}"
                 Theme="{StaticResource PrimaryButton}"
@@ -95,7 +104,7 @@
                 Click="OnStop"/>
 
         <!-- Geçiş ayar kutusunda değil şeritte: bulunamayan bir kip hiç kullanılmıyor. -->
-        <Button Grid.Column="7"
+        <Button Grid.Column="8"
                 x:Name="BtnMini"
                 Width="{StaticResource RecorderButtonSize}"
                 Height="{StaticResource RecorderButtonSize}"
@@ -189,6 +198,11 @@
 
     <TextBlock x:Name="TxtError"
                Theme="{StaticResource StatusError}"
+               TextWrapping="Wrap"
+               IsVisible="False"/>
+
+    <TextBlock x:Name="TxtNotice"
+               Theme="{StaticResource StatusSuccess}"
                TextWrapping="Wrap"
                IsVisible="False"/>
 

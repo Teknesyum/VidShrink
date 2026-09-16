@@ -58,6 +58,42 @@ internal partial class RecorderView
 
     private async void OnStop(object? sender, RoutedEventArgs e) => await StopAsync();
 
+    private async void OnSnapshot(object? sender, RoutedEventArgs e)
+    {
+        if (_session is not { State: RecorderState.Running } session) return;
+        await SnapshotAsync(path => session.SnapshotAsync(path));
+    }
+
+    /// <summary>
+    /// Kayıt sürerken tek kare alır. Kare kaydı kesmiyor; dosya kaydın klasörüne
+    /// <see cref="RecorderSettings.SnapshotPath"/> adıyla yazılıyor ve yolu şeridin altında
+    /// gösteriliyor. Kareyi alan iş parametre: şerit onu oturumdan veriyor, ölçü süreç
+    /// açmadan kendi işini veriyor.
+    /// </summary>
+    internal async Task<bool> SnapshotAsync(Func<string, Task<bool>> take)
+    {
+        var path = _settings.SnapshotPath(DateTime.Now);
+        bool ok;
+        try { ok = await take(path); }
+        catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            ok = false;
+        }
+
+        if (ok)
+        {
+            TxtError.IsVisible = false;
+            ShowNotice(Say("recorder.snapshot.saved", path));
+        }
+        else
+        {
+            TxtNotice.IsVisible = false;
+            ShowError(Say("recorder.snapshot.failed"));
+        }
+
+        return ok;
+    }
+
     /// <summary>
     /// Kaydı başlatır. Başlamayan kaydın sebebi yutulmuyor: ffmpeg eksikse, istek
     /// doğrulamadan geçmiyorsa ya da ilk ilerleme bloğu gelmeden süreç ölüyorsa ekranda
@@ -167,6 +203,7 @@ internal partial class RecorderView
 
         BtnStart.IsVisible = _session is null;
         BtnPause.IsVisible = running;
+        BtnSnapshot.IsVisible = running;
         BtnResume.IsVisible = paused;
         BtnStop.IsVisible = running || paused;
 

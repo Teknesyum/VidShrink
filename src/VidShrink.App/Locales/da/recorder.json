@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "opløsning bevaret",
   "recorder.auto.note.halved": "opløsning halveret",
   "recorder.auto.note.container": "mkv-beholder: en afbrudt optagelse forbliver afspillelig",
-  "recorder.auto.note.preset": "forudindstilling fra enkoderens eget ordforråd"
+  "recorder.auto.note.preset": "forudindstilling fra enkoderens eget ordforråd",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

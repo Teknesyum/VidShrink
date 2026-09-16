@@ -149,4 +149,80 @@ public sealed class KaydediciArayuzTests
             Directory.Delete(folder, true);
         }
     }
+
+    [Fact]
+    public void KaydediciAyariAnaAyarinKlasorundeDurur()
+    {
+        var ana = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
+        var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VidShrink");
+
+        Assert.False(string.IsNullOrWhiteSpace(ana));
+        Assert.Equal(Path.GetDirectoryName(ana), RecorderSettings.Folder);
+        Assert.NotEqual(appData, RecorderSettings.Folder, StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void KareAlinincaYoluSeritteGorunur()
+    {
+        var (ok, alinan, bildirim, hata, gorunur) = AppHost.Run<(bool, string?, string, string, bool)>(() =>
+        {
+            var view = new RecorderView();
+            string? yol = null;
+            var sonuc = view.SnapshotAsync(p => { yol = p; return System.Threading.Tasks.Task.FromResult(true); })
+                .GetAwaiter().GetResult();
+            return (sonuc, yol, view.NoticeText, view.ErrorText, Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Button>(view, "BtnSnapshot")!.IsVisible);
+        });
+
+        Assert.True(ok);
+        Assert.NotNull(alinan);
+        Assert.StartsWith("kare_", Path.GetFileName(alinan));
+        Assert.EndsWith(".png", alinan);
+        Assert.Contains(alinan!, bildirim);
+        Assert.Equal(string.Empty, hata);
+        Assert.False(gorunur);
+    }
+
+    [Fact]
+    public void AlinamayanKareHataOlarakGorunur()
+    {
+        var (basarisiz, atilan, bildirim, hata) = AppHost.Run<(bool, bool, string, string)>(() =>
+        {
+            var view = new RecorderView();
+            var yanlis = view.SnapshotAsync(_ => System.Threading.Tasks.Task.FromResult(false)).GetAwaiter().GetResult();
+            var patlayan = view.SnapshotAsync(_ => throw new InvalidOperationException("yok")).GetAwaiter().GetResult();
+            return (yanlis, patlayan, view.NoticeText, view.ErrorText);
+        });
+
+        Assert.False(basarisiz);
+        Assert.False(atilan);
+        Assert.Equal(string.Empty, bildirim);
+        Assert.NotEqual(string.Empty, hata);
+    }
+
+    [Theory]
+    [InlineData("recorder.strip.snapshot")]
+    [InlineData("recorder.snapshot.saved")]
+    [InlineData("recorder.snapshot.failed")]
+    public void KareAnahtarlariButunDillerde(string key)
+    {
+        foreach (var language in Locales.Languages)
+        {
+            var values = Locales.Values(language);
+            Assert.True(values.ContainsKey(key), $"{language} dilinde {key} yok.");
+            Assert.False(string.IsNullOrWhiteSpace(values[key]), $"{language} dilinde {key} boş.");
+        }
+    }
+
+    [Fact]
+    public void KareDugmesiOturumunKaresiniAlir()
+    {
+        var kok = new DirectoryInfo(AppContext.BaseDirectory);
+        while (kok is not null && !File.Exists(Path.Combine(kok.FullName, "VidShrink.sln"))) kok = kok.Parent;
+        var serit = File.ReadAllText(Path.Combine(kok!.FullName, "src", "VidShrink.App", "Recorder", "RecorderView.Serit.cs"));
+        var xaml = File.ReadAllText(Path.Combine(kok.FullName, "src", "VidShrink.App", "Recorder", "RecorderView.axaml"));
+
+        Assert.Contains("session.SnapshotAsync(path)", serit);
+        Assert.Contains("BtnSnapshot.IsVisible = running;", serit);
+        Assert.Contains("Click=\"OnSnapshot\"", xaml);
+    }
 }

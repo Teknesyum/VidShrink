@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "resolusi dikekalkan",
   "recorder.auto.note.halved": "resolusi dibahagi dua",
   "recorder.auto.note.container": "bekas mkv: rakaman yang terhenti kekal boleh dimainkan",
-  "recorder.auto.note.preset": "praset daripada perbendaharaan kata penyulit sendiri"
+  "recorder.auto.note.preset": "praset daripada perbendaharaan kata penyulit sendiri",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

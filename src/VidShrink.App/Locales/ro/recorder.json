@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "rezoluție păstrată",
   "recorder.auto.note.halved": "rezoluție înjumătățită",
   "recorder.auto.note.container": "container mkv: o înregistrare întreruptă rămâne redabilă",
-  "recorder.auto.note.preset": "presetare din vocabularul propriu al codorului"
+  "recorder.auto.note.preset": "presetare din vocabularul propriu al codorului",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

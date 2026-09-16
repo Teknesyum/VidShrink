@@ -29,7 +29,9 @@ sürümden (`x.0.0`) önce koşar.
   avfoundation/pulse argümanları, iki girdide `amix`, uydurma cihaz adının negatif kontrolü. İki canlı kol gerçek
   cihaz ister. Kanıt `.calisma/dalga8c/`.
 - `KaydediciArayuzTests.cs` — 8b dalgası, Kaydedici sekmesi: kodlayıcı ve ön ayar listeleri motorun doğrulamasından
-  geçer, uydurma ad reddedilir, süre yazımı ve aynı saniyedeki ikinci kaydın ayrı dosyaya gitmesi. Kanıt `.calisma/dalga8b/`.
+  geçer, uydurma ad reddedilir, süre yazımı ve aynı saniyedeki ikinci kaydın ayrı dosyaya gitmesi. Kaydedici ayarının
+  `VIDSHRINK_SETTINGS_PATH` klasörüne gitmesi; "Kare al" düğmesi (sahte kare işiyle yolun görünmesi, başarısız ve atan
+  işin hata satırı, üç anahtarın 42 dilde olması). Kanıt `.calisma/dalga8b/`.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

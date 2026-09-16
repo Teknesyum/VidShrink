@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "eraldusvõime säilitatud",
   "recorder.auto.note.halved": "eraldusvõime poole võrra vähendatud",
   "recorder.auto.note.container": "mkv-konteiner: katkestatud salvestus jääb esitatavaks",
-  "recorder.auto.note.preset": "eelseadistus kodeerija enda sõnavarast"
+  "recorder.auto.note.preset": "eelseadistus kodeerija enda sõnavarast",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

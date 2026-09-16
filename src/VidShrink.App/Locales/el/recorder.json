@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "διατηρημένη ανάλυση",
   "recorder.auto.note.halved": "ανάλυση μειωμένη στο μισό",
   "recorder.auto.note.container": "περιέκτης mkv: μια διακοπείσα εγγραφή παραμένει αναπαραγώγιμη",
-  "recorder.auto.note.preset": "προεπιλογή από το λεξιλόγιο του ίδιου του κωδικοποιητή"
+  "recorder.auto.note.preset": "προεπιλογή από το λεξιλόγιο του ίδιου του κωδικοποιητή",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

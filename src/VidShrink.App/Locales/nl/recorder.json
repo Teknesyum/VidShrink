@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "resolutie behouden",
   "recorder.auto.note.halved": "resolutie gehalveerd",
   "recorder.auto.note.container": "mkv-container: een afgebroken opname blijft afspeelbaar",
-  "recorder.auto.note.preset": "voorinstelling uit het eigen vocabulaire van de encoder"
+  "recorder.auto.note.preset": "voorinstelling uit het eigen vocabulaire van de encoder",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

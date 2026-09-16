@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "роздільна здатність збережена",
   "recorder.auto.note.halved": "роздільна здатність зменшена вдвічі",
   "recorder.auto.note.container": "контейнер mkv: перерваний запис лишається придатним для відтворення",
-  "recorder.auto.note.preset": "пресет із власного словника кодера"
+  "recorder.auto.note.preset": "пресет із власного словника кодера",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

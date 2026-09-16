@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "הרזולוציה נשמרה",
   "recorder.auto.note.halved": "הרזולוציה הופחתה בחצי",
   "recorder.auto.note.container": "מארז mkv: הקלטה שנקטעה נשארת ניתנת לניגון",
-  "recorder.auto.note.preset": "הגדרה קבועה מראש מאוצר המילים של המקודד עצמו"
+  "recorder.auto.note.preset": "הגדרה קבועה מראש מאוצר המילים של המקודד עצמו",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

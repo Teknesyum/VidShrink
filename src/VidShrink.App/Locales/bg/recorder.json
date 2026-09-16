@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "запазена разделителна способност",
   "recorder.auto.note.halved": "наполовина намалена разделителна способност",
   "recorder.auto.note.container": "контейнер mkv: прекъснат запис остава възпроизводим",
-  "recorder.auto.note.preset": "предварителна настройка от собствения речник на кодера"
+  "recorder.auto.note.preset": "предварителна настройка от собствения речник на кодера",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

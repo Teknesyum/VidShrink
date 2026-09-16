@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "分辨率保持不变",
   "recorder.auto.note.halved": "分辨率减半",
   "recorder.auto.note.container": "mkv 容器：被中断的录制仍可播放",
-  "recorder.auto.note.preset": "取自编码器自身词汇表的预设"
+  "recorder.auto.note.preset": "取自编码器自身词汇表的预设",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

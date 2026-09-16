@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "resolución mantenida",
   "recorder.auto.note.halved": "resolución reducida a la mitad",
   "recorder.auto.note.container": "contenedor mkv: una grabación interrumpida sigue siendo reproducible",
-  "recorder.auto.note.preset": "preajuste tomado del propio vocabulario del codificador"
+  "recorder.auto.note.preset": "preajuste tomado del propio vocabulario del codificador",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

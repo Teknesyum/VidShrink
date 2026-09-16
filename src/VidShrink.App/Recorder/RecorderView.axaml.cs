@@ -94,6 +94,8 @@ internal partial class RecorderView : UserControl
     {
         TxtError.IsVisible = false;
         TxtError.Text = string.Empty;
+        TxtNotice.IsVisible = false;
+        TxtNotice.Text = string.Empty;
         ResultPanel.IsVisible = false;
         TxtWarning.IsVisible = false;
         _lastRecording = null;
@@ -104,6 +106,14 @@ internal partial class RecorderView : UserControl
     {
         TxtError.Text = message;
         TxtError.IsVisible = true;
+    }
+
+    internal string NoticeText => TxtNotice.IsVisible ? TxtNotice.Text ?? string.Empty : string.Empty;
+
+    private void ShowNotice(string message)
+    {
+        TxtNotice.Text = message;
+        TxtNotice.IsVisible = true;
     }
 
     /// <summary>

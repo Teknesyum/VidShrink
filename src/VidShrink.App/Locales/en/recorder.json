@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "resolution kept",
   "recorder.auto.note.halved": "resolution halved",
   "recorder.auto.note.container": "mkv container: a killed recording stays playable",
-  "recorder.auto.note.preset": "preset from the encoder's own vocabulary"
+  "recorder.auto.note.preset": "preset from the encoder's own vocabulary",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

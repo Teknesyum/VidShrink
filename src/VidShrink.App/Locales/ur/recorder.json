@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "ریزولوشن برقرار رکھا گیا",
   "recorder.auto.note.halved": "ریزولوشن آدھا کر دیا گیا",
   "recorder.auto.note.container": "mkv کنٹینر: روکی گئی ریکارڈنگ قابلِ چلاؤ رہتی ہے",
-  "recorder.auto.note.preset": "انکوڈر کی اپنی لغت سے پہلے سے طے شدہ ترتیب"
+  "recorder.auto.note.preset": "انکوڈر کی اپنی لغت سے پہلے سے طے شدہ ترتیب",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

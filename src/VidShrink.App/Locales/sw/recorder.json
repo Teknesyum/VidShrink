@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "ubora wa picha umehifadhiwa",
   "recorder.auto.note.halved": "ubora wa picha umepunguzwa nusu",
   "recorder.auto.note.container": "chombo cha mkv: rekodi iliyokatizwa bado inachezeka",
-  "recorder.auto.note.preset": "mpangilio uliowekwa tayari kutoka msamiati wa kisimbaji chenyewe"
+  "recorder.auto.note.preset": "mpangilio uliowekwa tayari kutoka msamiati wa kisimbaji chenyewe",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "தெளிவுத்திறன் பராமரிக்கப்பட்டது",
   "recorder.auto.note.halved": "தெளிவுத்திறன் பாதியாகக் குறைக்கப்பட்டது",
   "recorder.auto.note.container": "mkv கொள்கலன்: நிறுத்தப்பட்ட பதிவு இயக்கக்கூடியதாகவே இருக்கும்",
-  "recorder.auto.note.preset": "குறியாக்கியின் சொந்த சொல்லகராதியிலிருந்து முன்னமைவு"
+  "recorder.auto.note.preset": "குறியாக்கியின் சொந்த சொல்லகராதியிலிருந்து முன்னமைவு",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "çözünürlük korundu",
   "recorder.auto.note.halved": "çözünürlük yarıya indirildi",
   "recorder.auto.note.container": "kap mkv: öldürülen kayıt oynatılabilir kalıyor",
-  "recorder.auto.note.preset": "ön ayar kodlayıcının sözlüğünden"
+  "recorder.auto.note.preset": "ön ayar kodlayıcının sözlüğünden",
+  "recorder.strip.snapshot": "Kare al",
+  "recorder.snapshot.saved": "Kare kaydedildi: {0}",
+  "recorder.snapshot.failed": "Kare alınamadı."
 }

@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "razlučivost zadržana",
   "recorder.auto.note.halved": "razlučivost prepolovljena",
   "recorder.auto.note.container": "mkv spremnik: prekinuto snimanje ostaje reproducibilno",
-  "recorder.auto.note.preset": "predefinirana postavka iz vlastitog rječnika kodera"
+  "recorder.auto.note.preset": "predefinirana postavka iz vlastitog rječnika kodera",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

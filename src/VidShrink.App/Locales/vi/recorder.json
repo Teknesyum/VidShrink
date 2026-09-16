@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "giữ nguyên độ phân giải",
   "recorder.auto.note.halved": "giảm độ phân giải một nửa",
   "recorder.auto.note.container": "định dạng mkv: bản ghi bị ngắt vẫn phát được",
-  "recorder.auto.note.preset": "cấu hình dựng sẵn theo từ vựng riêng của bộ mã hóa"
+  "recorder.auto.note.preset": "cấu hình dựng sẵn theo từ vựng riêng của bộ mã hóa",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

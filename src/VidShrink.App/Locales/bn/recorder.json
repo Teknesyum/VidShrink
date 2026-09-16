@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "রেজোলিউশন অপরিবর্তিত রাখা হয়েছে",
   "recorder.auto.note.halved": "রেজোলিউশন অর্ধেক করা হয়েছে",
   "recorder.auto.note.container": "mkv কনটেইনার: থামানো রেকর্ডিং চালানোর যোগ্য থাকে",
-  "recorder.auto.note.preset": "এনকোডারের নিজস্ব শব্দভাণ্ডার থেকে প্রিসেট"
+  "recorder.auto.note.preset": "এনকোডারের নিজস্ব শব্দভাণ্ডার থেকে প্রিসেট",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

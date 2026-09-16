@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "tarkkuus säilytetty",
   "recorder.auto.note.halved": "tarkkuus puolitettu",
   "recorder.auto.note.container": "mkv-säiliö: keskeytetty tallenne pysyy toistettavana",
-  "recorder.auto.note.preset": "esiasetus koodaimen omasta sanastosta"
+  "recorder.auto.note.preset": "esiasetus koodaimen omasta sanastosta",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

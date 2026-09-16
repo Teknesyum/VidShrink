@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "Auflösung beibehalten",
   "recorder.auto.note.halved": "Auflösung halbiert",
   "recorder.auto.note.container": "MKV-Container: eine abgebrochene Aufnahme bleibt abspielbar",
-  "recorder.auto.note.preset": "Voreinstellung aus dem Vokabular des Encoders"
+  "recorder.auto.note.preset": "Voreinstellung aus dem Vokabular des Encoders",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

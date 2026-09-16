@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "raiška palikta nepakeista",
   "recorder.auto.note.halved": "raiška sumažinta perpus",
   "recorder.auto.note.container": "mkv konteineris: nutrauktas įrašas lieka atkuriamas",
-  "recorder.auto.note.preset": "išankstinis nustatymas iš paties koduoklio žodyno"
+  "recorder.auto.note.preset": "išankstinis nustatymas iš paties koduoklio žodyno",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

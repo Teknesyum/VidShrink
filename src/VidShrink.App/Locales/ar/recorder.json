@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "تم الإبقاء على الدقة",
   "recorder.auto.note.halved": "تم تخفيض الدقة إلى النصف",
   "recorder.auto.note.container": "حاوية mkv: يظل التسجيل المتوقَّف قابلاً للتشغيل",
-  "recorder.auto.note.preset": "إعداد مسبق من مفردات المُرمِّز نفسه"
+  "recorder.auto.note.preset": "إعداد مسبق من مفردات المُرمِّز نفسه",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

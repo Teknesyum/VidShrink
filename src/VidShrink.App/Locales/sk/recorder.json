@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "rozlíšenie zachované",
   "recorder.auto.note.halved": "rozlíšenie znížené na polovicu",
   "recorder.auto.note.container": "kontajner mkv: prerušený záznam zostáva prehrateľný",
-  "recorder.auto.note.preset": "predvoľba z vlastného slovníka enkodéra"
+  "recorder.auto.note.preset": "predvoľba z vlastného slovníka enkodéra",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

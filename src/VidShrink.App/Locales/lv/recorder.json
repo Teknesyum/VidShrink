@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "izšķirtspēja saglabāta",
   "recorder.auto.note.halved": "izšķirtspēja samazināta uz pusi",
   "recorder.auto.note.container": "mkv konteiners: pārtraukts ieraksts paliek atskaņojams",
-  "recorder.auto.note.preset": "sākotnējais iestatījums no kodētāja paša vārdnīcas"
+  "recorder.auto.note.preset": "sākotnējais iestatījums no kodētāja paša vārdnīcas",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

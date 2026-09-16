@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "해상도 유지",
   "recorder.auto.note.halved": "해상도 절반으로 축소",
   "recorder.auto.note.container": "mkv 컨테이너: 중단된 녹화도 재생 가능",
-  "recorder.auto.note.preset": "인코더 고유 어휘에서 가져온 프리셋"
+  "recorder.auto.note.preset": "인코더 고유 어휘에서 가져온 프리셋",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

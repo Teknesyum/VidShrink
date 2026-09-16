@@ -165,15 +165,18 @@ internal sealed class RecorderSettings
         MaxDurationSeconds > 0 ? TimeSpan.FromSeconds(MaxDurationSeconds) : null;
 
     /// <summary>
-    /// Ayarların durduğu klasör. Kaydedici ana pencereye bağlanmadığı için yolu kendisi
-    /// çözüyor; program başına tek yer.
+    /// Ayarların durduğu klasör: programın ana ayar dosyasının klasörü. Yol
+    /// <see cref="UpdateSettings.DefaultPath"/>'ten okunuyor, böylece
+    /// <c>VIDSHRINK_SETTINGS_PATH</c> ana ayarı nereye alıyorsa kaydedicinin ayarı da oraya
+    /// gidiyor ve test ya da ölçüm gerçek AppData'ya yazmıyor.
     /// </summary>
     internal static string? Folder
     {
         get
         {
-            var data = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return string.IsNullOrEmpty(data) ? null : Path.Combine(data, "VidShrink");
+            var main = UpdateSettings.DefaultPath;
+            var folder = Path.GetDirectoryName(main);
+            return string.IsNullOrEmpty(folder) || !Path.IsPathRooted(main) ? null : folder;
         }
     }
 

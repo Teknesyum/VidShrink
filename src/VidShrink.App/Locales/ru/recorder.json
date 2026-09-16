@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "разрешение сохранено",
   "recorder.auto.note.halved": "разрешение уменьшено вдвое",
   "recorder.auto.note.container": "контейнер mkv: прерванная запись остаётся воспроизводимой",
-  "recorder.auto.note.preset": "пресет из собственного словаря кодировщика"
+  "recorder.auto.note.preset": "пресет из собственного словаря кодировщика",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

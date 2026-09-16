@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "คงความละเอียดไว้",
   "recorder.auto.note.halved": "ลดความละเอียดลงครึ่งหนึ่ง",
   "recorder.auto.note.container": "คอนเทนเนอร์ mkv: การบันทึกที่ถูกหยุดกะทันหันยังคงเล่นได้",
-  "recorder.auto.note.preset": "ค่าที่ตั้งไว้ล่วงหน้าจากคำศัพท์เฉพาะของตัวเข้ารหัส"
+  "recorder.auto.note.preset": "ค่าที่ตั้งไว้ล่วงหน้าจากคำศัพท์เฉพาะของตัวเข้ารหัส",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }

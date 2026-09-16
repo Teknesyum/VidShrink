@@ -78,5 +78,8 @@
   "recorder.auto.note.kept": "upplösning bibehållen",
   "recorder.auto.note.halved": "upplösning halverad",
   "recorder.auto.note.container": "mkv-behållare: en avbruten inspelning går fortfarande att spela upp",
-  "recorder.auto.note.preset": "förinställning från kodarens eget vokabulär"
+  "recorder.auto.note.preset": "förinställning från kodarens eget vokabulär",
+  "recorder.strip.snapshot": "Snapshot",
+  "recorder.snapshot.saved": "Snapshot saved: {0}",
+  "recorder.snapshot.failed": "The snapshot could not be taken."
 }
