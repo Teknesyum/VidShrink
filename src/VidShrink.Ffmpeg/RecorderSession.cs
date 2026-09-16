@@ -301,12 +301,18 @@ public sealed class RecorderSession : IAsyncDisposable
 
     private async Task StartSegmentAsync(CancellationToken ct)
     {
+        if (RecorderArguments.ForSegment(_request, _capturedBefore) is not { } segment)
+        {
+            State = RecorderState.Stopped;
+            return;
+        }
+
         var path = SegmentPath(_segments.Count);
         var folder = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
 
         var args = new List<string> { "-progress", "pipe:1", "-nostats" };
-        args.AddRange(RecorderArguments.Build(_request, path));
+        args.AddRange(RecorderArguments.Build(segment, path));
 
         var startInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args);
         startInfo.RedirectStandardInput = true;

@@ -464,6 +464,67 @@ public sealed class KayitFfmpegKoluTests
         Assert.DoesNotContain("-t", RecorderArguments.Build(Istek(), @"C:\kayit\a.mp4"));
     }
 
+    [Theory]
+    [InlineData(0, "150")]
+    [InlineData(40, "110")]
+    [InlineData(149.5, "0.5")]
+    public void SonrakiParcayaKalanSureYazilir(double gecen, string beklenen)
+    {
+        var istek = Istek() with { MaxDuration = TimeSpan.FromSeconds(150) };
+
+        var parca = RecorderArguments.ForSegment(istek, TimeSpan.FromSeconds(gecen));
+
+        Assert.NotNull(parca);
+        Assert.Equal(beklenen, Deger(RecorderArguments.Build(parca!, @"C:\kayit\a.mp4"), "-t"));
+    }
+
+    [Theory]
+    [InlineData(150)]
+    [InlineData(151)]
+    [InlineData(149.9995)]
+    public void SuresiDolanKayitYeniParcaAcmaz(double gecen)
+        => Assert.Null(RecorderArguments.ForSegment(
+            Istek() with { MaxDuration = TimeSpan.FromSeconds(150) }, TimeSpan.FromSeconds(gecen)));
+
+    [Fact]
+    public void SinirsizKayittaParcaIstegiDegismez()
+    {
+        var istek = Istek() with { Split = new RecorderSplit(TimeSpan.FromMinutes(1)) };
+
+        Assert.Same(istek, RecorderArguments.ForSegment(istek, TimeSpan.FromMinutes(3)));
+    }
+
+    [Fact]
+    public void BolmeSuresiKalanSuredenUzunOlsaDaParcaKurulur()
+    {
+        var istek = Istek() with
+        {
+            MaxDuration = TimeSpan.FromSeconds(150),
+            Split = new RecorderSplit(TimeSpan.FromSeconds(60))
+        };
+
+        var parca = RecorderArguments.ForSegment(istek, TimeSpan.FromSeconds(120))!;
+
+        Assert.Equal("30", Deger(RecorderArguments.Build(parca, @"C:\kayit\a.mp4"), "-t"));
+        Assert.Equal(istek.Split, RecorderArguments.ForSegment(istek, TimeSpan.Zero)!.Split);
+    }
+
+    [Fact]
+    public void OturumHerParcayiKalanSureyleKurar()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(KokDizin(), "src", "VidShrink.Ffmpeg", "RecorderSession.cs"));
+
+        Assert.Contains("RecorderArguments.ForSegment(_request, _capturedBefore)", kaynak);
+        Assert.DoesNotContain("RecorderArguments.Build(_request", kaynak);
+    }
+
+    private static string KokDizin()
+    {
+        var dizin = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dizin is not null && !File.Exists(Path.Combine(dizin.FullName, "VidShrink.sln"))) dizin = dizin.Parent;
+        return dizin?.FullName ?? throw new DirectoryNotFoundException("VidShrink.sln bulunamadi.");
+    }
+
     /// <summary>
     /// Bolme olcutu arguman uretmiyor: parcalari <c>RecorderSession</c> aciyor. Olcut
     /// verilmis bir istek, verilmemis istegin argumaniyla birebir ayni kaliyor.

@@ -683,6 +683,25 @@ public static class RecorderArguments
     }
 
     /// <summary>
+    /// Bir parcanin istegi. Sure siniri kaydin toplamina ait, parcaya degil: duraklatip
+    /// surdurmek ve kendiliginden bolme yeni bir ffmpeg sureci aciyor ve her surec
+    /// <c>-t</c>'yi sifirdan sayiyor. Ilk parcadan sonra <c>-t</c>'ye kalan sure yaziliyor.
+    /// Bolme olcutu argumana girmedigi icin sonraki parcanin isteginde tasinmiyor; tasinsa
+    /// kalan sure bolme suresinden kisa kaldiginda dogrulama parcayi reddederdi.
+    /// Kalan sure <c>-t</c>'nin yazilabildigi en kucuk adimdan (1 ms) kisaysa <c>null</c>
+    /// doner ve yeni parca acilmaz.
+    /// </summary>
+    public static RecorderRequest? ForSegment(RecorderRequest request, TimeSpan capturedBefore)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (capturedBefore <= TimeSpan.Zero || request.MaxDuration is not { } limit) return request;
+
+        var remaining = limit - capturedBefore;
+        if (remaining < TimeSpan.FromMilliseconds(1)) return null;
+        return request with { MaxDuration = remaining, Split = null };
+    }
+
+    /// <summary>
     /// Kayit surerken alinan tek karelik ekran goruntusunun argumanlari. Ayni yakalama
     /// girdisinden okur — dosyadan kare kesen <c>FrameGrabber</c> burada kullanilamaz,
     /// cunku canli ekranin bir dosyasi yok. Kodlama kolu hic kurulmaz: bir kare, bir resim.
