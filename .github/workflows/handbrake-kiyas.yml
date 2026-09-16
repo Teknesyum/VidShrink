@@ -1,0 +1,296 @@
+name: handbrake-kiyas
+
+on:
+  push:
+    tags: ['olcum-hb-*']
+  workflow_dispatch:
+    inputs:
+      isler:
+        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
+        default: handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
+      kesitler:
+        description: handbrake isinin kesitleri
+        default: karanlik,parlak,hareketli,ekran
+      vt:
+        description: macos-15 uzerinde VideoToolbox kiyasi
+        type: boolean
+        default: true
+      urun_yolu:
+        description: bench ya da cli
+        default: bench
+      cli_proje:
+        description: urun_yolu=cli icin derlenecek proje
+        default: src/VidShrink.Cli
+      cli_sablon:
+        description: CLI arguman sablonu; {girdi} {mb} {klasor}
+        default: 'plan {girdi} {mb} --out {klasor}'
+      kbitler:
+        description: handbrake ve turbo bit hizlari
+        default: '600,2000'
+      ayrinti:
+        description: 'JSON; DusukKbitler, BantKbitler, HdrKbitler, VtKbitler, Hedefler, Onayarlar, VtKesitler'
+        default: '{}'
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+  BENCH: tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll
+  KAYNAK_URL: https://download.blender.org/durian/movies/Sintel.2010.1080p.mkv
+  EKRAN_URL: https://media.xiph.org/video/aomctc/test_set/b2_scc/Debugging_1920x1080_30fps_8bit_420.y4m
+  HDR_KOK: https://media.xiph.org/video/aomctc/test_set/hdr2_2k
+  HB_DMG: https://github.com/HandBrake/HandBrake/releases/download/1.11.2/HandBrakeCLI-1.11.2.dmg
+  HB_DMG_SHA256: 14463aa81038aaa3ce421dc6cee65fd6c82fdabda040931541ccca38939299fa
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matris: ${{ steps.m.outputs.matris }}
+      vt: ${{ steps.m.outputs.vt }}
+    steps:
+      - id: m
+        shell: pwsh
+        run: |
+          $isler = '${{ inputs.isler }}'
+          if (-not $isler) { $isler = 'handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant' }
+          if ('${{ github.ref_name }}' -match '^olcum-hb-([a-z+]+)--') { $isler = $Matches[1].Replace('+', ',') }
+          $hbKesit = '${{ inputs.kesitler }}'
+          if (-not $hbKesit) { $hbKesit = 'karanlik,parlak,hareketli,ekran' }
+          $harita = @{
+            handbrake = @($hbKesit.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+            dusuk = @('karanlik', 'parlak', 'hareketli')
+            social = @('karanlik', 'parlak', 'hareketli')
+            bantlasma = @('karanlik', 'rampa')
+            turbo = @('karanlik', 'hareketli')
+            hdr = @('CosmosCaterpillar', 'CosmosTreeTrunk')
+            ekranbant = @('ekran')
+          }
+          $liste = @()
+          foreach ($is in @($isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -ne 'vt' })) {
+            if (-not $harita.ContainsKey($is)) { throw "bilinmeyen is: $is" }
+            foreach ($k in $harita[$is]) { $liste += @{ is = $is; kesit = $k } }
+          }
+          $vt = if ('${{ github.event_name }}' -eq 'push') { ($isler -split ',') -contains 'vt' } else { '${{ inputs.vt }}' -eq 'true' }
+          $json = ConvertTo-Json -Compress -InputObject @{ include = $liste }
+          Write-Host $json
+          Write-Host "vt=$vt"
+          "matris=$json" | Add-Content $env:GITHUB_OUTPUT
+          "vt=$($vt.ToString().ToLowerInvariant())" | Add-Content $env:GITHUB_OUTPUT
+
+  kesit:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur
+        run: pwsh tools/kalite-paketi-3/kur.ps1
+      - name: kaynak indir
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          $hedef = Join-Path $env:RUNNER_TEMP 'kaynak.mkv'
+          Invoke-WebRequest -Uri $env:KAYNAK_URL -OutFile $hedef
+          "kaynak url=$env:KAYNAK_URL sha256=$((Get-FileHash $hedef -Algorithm SHA256).Hash) boy=$((Get-Item $hedef).Length)" | Tee-Object -FilePath (Join-Path $env:RUNNER_TEMP 'kaynak-sha256.txt')
+          $e = Join-Path $env:RUNNER_TEMP 'ekran.y4m'
+          Invoke-WebRequest -Uri $env:EKRAN_URL -OutFile $e
+          "ekran url=$env:EKRAN_URL sha256=$((Get-FileHash $e -Algorithm SHA256).Hash) boy=$((Get-Item $e).Length)" | Tee-Object -Append -FilePath (Join-Path $env:RUNNER_TEMP 'kaynak-sha256.txt')
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - name: kesitleri sec
+        run: |
+          pwsh tools/kalite-paketi-3/kos.ps1 -Is kesit -Kaynak "$env:RUNNER_TEMP\kaynak.mkv" -Cikti "$env:RUNNER_TEMP\olcum" -Bench $env:BENCH -EkranKaynak "$env:RUNNER_TEMP\ekran.y4m"
+          Copy-Item "$env:RUNNER_TEMP\kaynak-sha256.txt" "$env:RUNNER_TEMP\olcum\"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hb-kesitler
+          path: ${{ runner.temp }}/olcum
+          compression-level: 0
+          retention-days: 7
+
+  olcum:
+    needs: [plan, kesit]
+    if: needs.plan.outputs.matris != '{"include":[]}'
+    runs-on: windows-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matris) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg ve HandBrake kur
+        run: |
+          pwsh tools/kalite-paketi-3/kur.ps1 -HandBrake
+          ffmpeg -hide_banner -version | Select-Object -First 1
+          & $env:HANDBRAKE_CLI --version 2>&1 | Select-Object -First 3
+      - uses: actions/download-artifact@v4
+        with:
+          name: hb-kesitler
+          path: ${{ runner.temp }}/olcum
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - name: cli derle
+        if: inputs.urun_yolu == 'cli'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Test-Path '${{ inputs.cli_proje }}')) { throw 'CLI projesi bu commit''te yok: ${{ inputs.cli_proje }}' }
+          dotnet build '${{ inputs.cli_proje }}' -c Release -m:2
+          if ($LASTEXITCODE -ne 0) { throw 'CLI derlenemedi' }
+          $dll = Get-ChildItem '${{ inputs.cli_proje }}/bin/Release' -Recurse -Filter 'VidShrink.Cli.dll' | Select-Object -First 1
+          if (-not $dll) { throw 'VidShrink.Cli.dll bulunamadi' }
+          "URUN_CLI=$($dll.FullName)" | Add-Content $env:GITHUB_ENV
+      - name: e1 bench derle
+        if: matrix.is == 'bantlasma'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $d = Join-Path $env:RUNNER_TEMP 'e1'
+          git worktree add --detach $d HEAD
+          $f = Join-Path $d 'src/VidShrink.Core/FfmpegArguments.cs'
+          $eski = 'tune=1:enable-variance-boost=0'
+          $yeni = 'tune=0:enable-variance-boost=1:variance-boost-strength=2'
+          $t = [IO.File]::ReadAllText($f)
+          $n = ([regex]::Matches($t, [regex]::Escape($eski))).Count
+          if ($n -ne 2) { throw "e1 dizgesi $n yerde bulundu, 2 bekleniyordu" }
+          [IO.File]::WriteAllText($f, $t.Replace($eski, $yeni))
+          dotnet build (Join-Path $d 'tools/VidShrink.Bench') -c Release -m:2
+          if ($LASTEXITCODE -ne 0) { throw 'e1 bench derlenemedi' }
+          $dll = Join-Path $d 'tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll'
+          "BENCH_E1=$dll" | Add-Content $env:GITHUB_ENV
+          dotnet $dll psy-args libsvtav1
+          dotnet $env:BENCH psy-args libsvtav1
+      - name: turbo bench derle
+        if: matrix.is == 'turbo'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $d = Join-Path $env:RUNNER_TEMP 'turbo'
+          git worktree add --detach $d HEAD
+          $f = Join-Path $d 'tools/VidShrink.Bench/Program.cs'
+          $eski = 'plan.Mode = "2pass";'
+          $t = [IO.File]::ReadAllText($f)
+          $n = ([regex]::Matches($t, [regex]::Escape($eski))).Count
+          if ($n -ne 1) { throw "turbo dizgesi $n yerde bulundu, 1 bekleniyordu" }
+          [IO.File]::WriteAllText($f, $t.Replace($eski, 'plan.Mode = "2pass"; plan.TurboFirstPass = true;'))
+          dotnet build (Join-Path $d 'tools/VidShrink.Bench') -c Release -m:2
+          if ($LASTEXITCODE -ne 0) { throw 'turbo bench derlenemedi' }
+          "BENCH_TURBO=$(Join-Path $d 'tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll')" | Add-Content $env:GITHUB_ENV
+          Select-String -Path 'src/VidShrink.Core/CodecModel.cs' -Pattern '\["libx26[45]"\]' | ForEach-Object { $_.Line.Trim() }
+      - name: ekran kaynagi indir
+        if: matrix.is == 'ekranbant'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          $e = Join-Path $env:RUNNER_TEMP 'uzun-ekran.y4m'
+          Invoke-WebRequest -Uri $env:EKRAN_URL -OutFile $e
+          "UZUN_EKRAN=$e" | Add-Content $env:GITHUB_ENV
+          "ekran url=$env:EKRAN_URL sha256=$((Get-FileHash $e -Algorithm SHA256).Hash)" | Tee-Object -FilePath "$env:RUNNER_TEMP\olcum\ekranbant-kaynak.txt"
+      - name: hdr kaynagi indir
+        if: matrix.is == 'hdr'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          $md5 = @{ CosmosCaterpillar = '793c7f42b657ca2b5755a46c853ce4a8'; CosmosTreeTrunk = '7bc5d9a7c8b56ef62dd8ea9afcc50110' }
+          $ad = '${{ matrix.kesit }}_2048x858p24_hdr10.y4m'
+          $url = "$env:HDR_KOK/$ad"
+          $h = Join-Path $env:RUNNER_TEMP $ad
+          Invoke-WebRequest -Uri $url -OutFile $h
+          $m = (Get-FileHash $h -Algorithm MD5).Hash.ToLowerInvariant()
+          $s = (Get-FileHash $h -Algorithm SHA256).Hash
+          "hdr url=$url md5=$m sha256=$s boy=$((Get-Item $h).Length) lisans=CC BY 3.0 (Blender Foundation, HDR Netflix)" | Tee-Object -FilePath "$env:RUNNER_TEMP\olcum\hdr-kaynak-${{ matrix.kesit }}.txt"
+          if ($m -ne $md5['${{ matrix.kesit }}']) { throw "hdr md5 uyusmuyor: $m" }
+          $fs = [IO.File]::OpenRead($h); $buf = New-Object byte[] 160; [void]$fs.Read($buf, 0, 160); $fs.Close()
+          "y4m baslik=" + [Text.Encoding]::ASCII.GetString($buf).Split("`n")[0] | Tee-Object -Append -FilePath "$env:RUNNER_TEMP\olcum\hdr-kaynak-${{ matrix.kesit }}.txt"
+          "HDR_KAYNAK=$h" | Add-Content $env:GITHUB_ENV
+      - name: olc
+        env:
+          KBITLER: ${{ inputs.kbitler || '600,2000' }}
+        run: |
+          $a = @('-Is', '${{ matrix.is }}', '-Kesit', '${{ matrix.kesit }}', '-Cikti', "$env:RUNNER_TEMP\olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI, '-Kbitler', $env:KBITLER, '-UrunYolu', '${{ inputs.urun_yolu || 'bench' }}')
+          if ($env:URUN_CLI) { $a += @('-Cli', $env:URUN_CLI, '-CliSablon', '${{ inputs.cli_sablon }}') }
+          if ($env:BENCH_E1) { $a += @('-BenchE1', $env:BENCH_E1) }
+          if ($env:BENCH_TURBO) { $a += @('-BenchTurbo', $env:BENCH_TURBO) }
+          if ($env:UZUN_EKRAN) { $a += @('-EkranUzun', $env:UZUN_EKRAN) }
+          if ($env:HDR_KAYNAK) { $a += @('-HdrKaynak', $env:HDR_KAYNAK) }
+          $ayr = '${{ inputs.ayrinti || '{}' }}' | ConvertFrom-Json
+          foreach ($p in $ayr.PSObject.Properties) { if ($p.Name -ne 'VtKesitler') { $a += @("-$($p.Name)", "$($p.Value)") } }
+          Write-Host ($a -join ' ')
+          pwsh tools/kalite-paketi-3/hb.ps1 @a
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: sonuclari ayir
+        if: always()
+        run: |
+          $d = Join-Path $env:RUNNER_TEMP 'sonuc'
+          New-Item -ItemType Directory -Force $d | Out-Null
+          Get-ChildItem "$env:RUNNER_TEMP\olcum" -Recurse -Include *.json, *.log, *.txt |
+            ForEach-Object { Copy-Item $_.FullName (Join-Path $d (($_.FullName.Substring("$env:RUNNER_TEMP\olcum".Length + 1)) -replace '[\\/]', '__')) }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hb-sonuc-${{ matrix.is }}-${{ matrix.kesit }}
+          path: ${{ runner.temp }}/sonuc
+          retention-days: 30
+
+  vt:
+    needs: [plan, kesit]
+    if: needs.plan.outputs.vt == 'true'
+    runs-on: macos-15
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur
+        run: |
+          brew install ffmpeg
+          ffmpeg -hide_banner -version | head -n 1
+          ffmpeg -hide_banner -encoders | grep -i videotoolbox
+          ffmpeg -hide_banner -filters | grep -E 'libvmaf|xpsnr'
+      - name: HandBrakeCLI kur
+        run: |
+          set -euo pipefail
+          curl -sSL -o "$RUNNER_TEMP/hb.dmg" "$HB_DMG"
+          echo "$HB_DMG_SHA256  $RUNNER_TEMP/hb.dmg" | shasum -a 256 -c -
+          hdiutil attach -nobrowse -mountpoint "$RUNNER_TEMP/hbdmg" "$RUNNER_TEMP/hb.dmg"
+          cli=$(find "$RUNNER_TEMP/hbdmg" -name HandBrakeCLI -type f | head -n 1)
+          cp "$cli" "$RUNNER_TEMP/HandBrakeCLI"
+          chmod +x "$RUNNER_TEMP/HandBrakeCLI"
+          "$RUNNER_TEMP/HandBrakeCLI" --version 2>&1 | head -n 3
+          echo "HANDBRAKE_CLI=$RUNNER_TEMP/HandBrakeCLI" >> "$GITHUB_ENV"
+          sysctl -n machdep.cpu.brand_string
+      - uses: actions/download-artifact@v4
+        with:
+          name: hb-kesitler
+          path: ${{ runner.temp }}/olcum
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - name: olc
+        shell: pwsh
+        run: |
+          $a = @('-Is', 'vt', '-Kesitler', 'karanlik,parlak,hareketli,ekran', '-Cikti', "$env:RUNNER_TEMP/olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI)
+          $ayr = '${{ inputs.ayrinti || '{}' }}' | ConvertFrom-Json
+          foreach ($p in $ayr.PSObject.Properties) {
+            if ($p.Name -eq 'VtKesitler') { $a[3] = "$($p.Value)" } elseif ($p.Name -eq 'VtKbitler') { $a += @('-VtKbitler', "$($p.Value)") }
+          }
+          Write-Host ($a -join ' ')
+          pwsh tools/kalite-paketi-3/hb.ps1 @a
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: sonuclari ayir
+        if: always()
+        shell: pwsh
+        run: |
+          $k = Join-Path $env:RUNNER_TEMP 'olcum'
+          $d = Join-Path $env:RUNNER_TEMP 'sonuc'
+          New-Item -ItemType Directory -Force $d | Out-Null
+          Get-ChildItem $k -Recurse -Include *.json, *.log, *.txt |
+            ForEach-Object { Copy-Item $_.FullName (Join-Path $d (($_.FullName.Substring($k.Length + 1)) -replace '[\\/]', '__')) }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hb-sonuc-vt
+          path: ${{ runner.temp }}/sonuc
+          retention-days: 30
