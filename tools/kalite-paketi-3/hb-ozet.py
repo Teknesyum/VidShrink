@@ -54,6 +54,12 @@ def hukum(u, h):
     return "bantta"
 
 
+def bant_hukum(u, h):
+    if u.get("cambi") is None or h.get("cambi") is None:
+        return "ölçülemedi"
+    return "e0 kötü (eşik aşıldı)" if u["cambi"] - h["cambi"] > 1.0 else "eşik içinde"
+
+
 def tablo(sat, sutunlar):
     print("| " + " | ".join(b for b, _, _ in sutunlar) + " |")
     print("|" + "---|" * len(sutunlar))
@@ -71,7 +77,7 @@ ORTAK = [
 ]
 
 
-def kiyas(sat, urun_kol, hb_kol):
+def kiyas(sat, urun_kol, hb_kol, cambi_hukum=False):
     print("| Kesit | kbit | Δ VMAF-NEG ort | Δ VMAF-NEG harm | Δ XPSNR | Δ SSIM | Δ CAMBI (ürün−HB) | Δ karanlık PSNR | Ürün sn / HB sn | kbps sapma % | Hüküm |")
     print("|---|---|---|---|---|---|---|---|---|---|---|")
     for u in sat:
@@ -87,7 +93,7 @@ def kiyas(sat, urun_kol, hb_kol):
 
         oran = None if not u.get("kodlama_sn") or not h.get("kodlama_sn") else u["kodlama_sn"] / h["kodlama_sn"]
         sapma = None if not u.get("kbps") or not h.get("kbps") else (h["kbps"] / u["kbps"] - 1) * 100
-        print(f"| {u.get('kesit')} | {u.get('istenen_kbit')} | {f(d('vmafneg_ort'))} | {f(d('vmafneg_harm'))} | {f(d('xpsnr'))} | {f(d('ssim'), 4)} | {f(d('cambi'), 3)} | {f(d('karanlik_psnr'))} | {f(oran)} | {f(sapma)} | {hukum(u, h)} |")
+        print(f"| {u.get('kesit')} | {u.get('istenen_kbit')} | {f(d('vmafneg_ort'))} | {f(d('vmafneg_harm'))} | {f(d('xpsnr'))} | {f(d('ssim'), 4)} | {f(d('cambi'), 3)} | {f(d('karanlik_psnr'))} | {f(oran)} | {f(sapma)} | {bant_hukum(u, h) if cambi_hukum else hukum(u, h)} |")
     print()
 
 
@@ -111,16 +117,16 @@ def main():
             kiyas(sat, "urun-otomatik", "handbrake")
         if is_ == "dusuk":
             kiyas(sat, "urun-otomatik", "handbrake-1080p")
-            kiyas(sat, "urun-kaynak-cozunurluk", "handbrake-1080p")
+            kiyas(sat, "urun-dusurme-kapali", "handbrake-1080p")
         if is_ == "social":
             kiyas(sat, "urun-otomatik", "handbrake")
-            kiyas(sat, "urun-kaynak-cozunurluk", "handbrake")
+            kiyas(sat, "urun-dusurme-kapali", "handbrake")
         if is_ == "turbo":
             kiyas(sat, "urun-x265", "handbrake-x265")
             kiyas(sat, "urun-x265-turbo", "handbrake-x265-turbo")
             kiyas(sat, "urun-x265-turbo", "urun-x265")
         if is_ == "bantlasma":
-            kiyas(sat, "e0", "e1")
+            kiyas(sat, "e0", "e1", cambi_hukum=True)
         if is_ == "vt":
             kiyas(sat, "urun-vt", "handbrake-vt")
 

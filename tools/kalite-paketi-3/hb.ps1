@@ -12,7 +12,7 @@ param(
     [string]$CliSablon = '{girdi} {mb} --out {klasor} --speed quality --no-measure',
     [string]$Kbitler = '600,2000',
     [string]$DusukKbitler = '300,600',
-    [string]$BantKbitler = '300,1200',
+    [string]$BantKbitler = '100,300,1200',
     [string]$HdrKbitler = '1000,3000',
     [string]$VtKbitler = '2000,5500',
     [string]$HdrKaynak = '',
@@ -274,9 +274,9 @@ function Dusuk {
     foreach ($kbit in @($DusukKbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
         $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
         $script:urunKbps = $null
-        foreach ($kol in @('urun-otomatik', 'urun-kaynak-cozunurluk')) {
+        foreach ($kol in @('urun-otomatik', 'urun-dusurme-kapali')) {
             Dene $Kesit $kol $kbit {
-                $ek = if ($kol -eq 'urun-kaynak-cozunurluk') { @('--no-resolution-drop', '--no-fps-drop') } else { @() }
+                $ek = if ($kol -eq 'urun-dusurme-kapali') { @('--no-resolution-drop', '--no-fps-drop') } else { @() }
                 $u = Urun $girdi $mb "dusuk-$Kesit-$kbit-$kol" $ek
                 $o = Olc $girdi $u.Dosya $b.FpsMetin
                 if ($kol -eq 'urun-otomatik') { $script:urunKbps = $o.kbps }
@@ -308,11 +308,11 @@ function Social {
     $b = Probe $girdi
     $liste = & $HandBrake --preset-list 2>&1 | Out-String
     $liste | Set-Content (Join-Path $Cikti 'handbrake-preset-list.txt')
-    $onayarlar = [ordered]@{
+    $hbOnayar = [ordered]@{
         'Social 25 MB 30 Seconds 1080p60' = 30; 'Social 25 MB 1 Minute 720p60' = 60; 'Social 25 MB 2 Minutes 540p60' = 120; 'Social 25 MB 5 Minutes 360p60' = 300
         'Social 10 MB 30 Seconds 720p60' = 30; 'Social 10 MB 1 Minute 540p60' = 60; 'Social 10 MB 2 Minutes 360p60' = 120
     }
-    foreach ($ad in @($onayarlar.Keys | Where-Object { -not $Onayarlar -or ($Onayarlar.Split(',') -contains $_) })) {
+    foreach ($ad in @($hbOnayar.Keys | Where-Object { -not $Onayarlar -or ($Onayarlar.Split(',') -contains $_) })) {
         $kisa = ($ad -replace '[^A-Za-z0-9]+', '-').ToLowerInvariant()
         $script:hbMb = $null
         Dene $Kesit "hb:$ad" $null {
@@ -322,14 +322,14 @@ function Social {
             $o = Olc $girdi $c $b.FpsMetin
             $script:hbMb = (Get-Item $c).Length / 1MB
             $pb = [int]([regex]::Match($ad, '(\d+) MB').Groups[1].Value)
-            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'handbrake'; onayar = $ad; istenen_kbit = $null; kodlama_sn = $sn; toplam_sn = $sn; onayar_mb = $pb; onayar_sn = $onayarlar[$ad] }) $o $null
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'handbrake'; onayar = $ad; istenen_kbit = $null; kodlama_sn = $sn; toplam_sn = $sn; onayar_mb = $pb; onayar_sn = $hbOnayar[$ad] }) $o $null
             Remove-Item $c
         }
         if (-not $script:hbMb) { continue }
         $hedef = [math]::Round($script:hbMb, 4)
-        foreach ($kol in @('urun-otomatik', 'urun-kaynak-cozunurluk')) {
+        foreach ($kol in @('urun-otomatik', 'urun-dusurme-kapali')) {
             Dene $Kesit $kol $null {
-                $ek = if ($kol -eq 'urun-kaynak-cozunurluk') { @('--no-resolution-drop', '--no-fps-drop') } else { @() }
+                $ek = if ($kol -eq 'urun-dusurme-kapali') { @('--no-resolution-drop', '--no-fps-drop') } else { @() }
                 $u = Urun $girdi $hedef "social-$Kesit-$kisa-$kol" $ek
                 $o = Olc $girdi $u.Dosya $b.FpsMetin
                 Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; onayar = $ad; istenen_kbit = $null }) $o (UrunOrtak $u $hedef)
@@ -432,7 +432,10 @@ function Hdr {
     if (-not $HdrKaynak) { throw 'hdr icin -HdrKaynak gerekli.' }
     $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"
     $x265 = 'lossless=1:hdr10=1:repeat-headers=1:colorprim=bt2020:transfer=smpte2084:colormatrix=bt2020nc:range=limited:master-display=G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,50):max-cll=1000,400'
-    Ff @('-i', $HdrKaynak, '-an', '-c:v', 'libx265', '-preset', 'ultrafast', '-x265-params', $x265, '-pix_fmt', 'yuv420p10le', '-color_primaries', 'bt2020', '-color_trc', 'smpte2084', '-colorspace', 'bt2020nc', '-color_range', 'tv', $girdi)
+    $ham = Join-Path $Cikti "kesit-$Kesit-ham.mkv"
+    Ff @('-i', $HdrKaynak, '-an', '-c:v', 'libx265', '-preset', 'ultrafast', '-x265-params', $x265, '-pix_fmt', 'yuv420p10le', '-color_primaries', 'bt2020', '-color_trc', 'smpte2084', '-colorspace', 'bt2020nc', '-color_range', 'tv', $ham)
+    Ff @('-i', $ham, '-c', 'copy', '-color_primaries', 'bt2020', '-color_trc', 'smpte2084', '-colorspace', 'bt2020nc', '-color_range', 'tv', $girdi)
+    Remove-Item $ham
     $b = Probe $girdi
     $kaynakYan = YanVeri $girdi
     Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'kaynak-ara'; x265_params = $x265 }) $kaynakYan (EkOlcu $girdi $girdi '' -Pq)
