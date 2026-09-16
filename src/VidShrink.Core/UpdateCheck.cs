@@ -855,6 +855,46 @@ public static class LauncherUpdate
     /// </summary>
     public const string UpdateNowArgument = "--update-now";
 
+    /// <summary>
+    /// Uygulama çift tıkla doğrudan açıldığında başlatıcının bakım işini arkada yaptırdığı kip.
+    /// Bu argümanla açılan başlatıcı uygulamayı doğurmaz; onarım, sürüm işareti, arka plan
+    /// indirmesi ve bekleyen geçişin kurulması yapılır, çıkılır.
+    /// </summary>
+    public const string MaintenanceArgument = "--bakim";
+
+    /// <summary>
+    /// Başlatıcının doğurduğu uygulamaya geçirdiği işaret. Doluysa bakım o başlatıcıda
+    /// zaten koşuyor; uygulama ikinci bir bakım başlatmaz.
+    /// </summary>
+    public const string LaunchedVariable = "VIDSHRINK_BASLATICIDAN";
+
+    /// <summary>
+    /// Uygulamanın bakım için açacağı başlatıcı; açılmayacaksa null. Üç kapı: uygulama kurulu
+    /// düzenin <c>app</c> klasöründen koşuyor ve başlatıcı yanında duruyor, başlatıcı bu
+    /// uygulamayı doğurmamış, başlatıcının sürümü uygulamanınkinden eski değil. Sonuncusu
+    /// geçişin yarım kaldığı turu korur: <see cref="MaintenanceArgument"/>'i tanımayan eski
+    /// başlatıcı onu açılacak dosya sanmaz, uygulamayı ikinci kez doğurur.
+    /// </summary>
+    public static string? MaintenanceLauncher(
+        string appDirectory,
+        string? launchedMarker,
+        string appVersion,
+        Func<string, string?> launcherVersion)
+    {
+        if (!string.IsNullOrEmpty(launchedMarker)) return null;
+        var trimmed = appDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (!string.Equals(Path.GetFileName(trimmed), "app", StringComparison.OrdinalIgnoreCase)) return null;
+        var launcher = LocateLauncher(trimmed);
+        if (launcher is null) return null;
+        if (!Version.TryParse(NormalizeVersion(appVersion), out var app)) return null;
+        var found = launcherVersion(launcher);
+        if (found is null || !Version.TryParse(NormalizeVersion(found), out var installed)) return null;
+        return Comparable(installed) >= Comparable(app) ? launcher : null;
+    }
+
+    private static Version Comparable(Version version) =>
+        new(version.Major, version.Minor, Math.Max(version.Build, 0));
+
     public const string JournalName = ".launcher-pending.json";
 
     /// <summary>

@@ -94,6 +94,8 @@ public partial class MainWindow : Window
     // döngü tek turda kapanır. İki bayrak var çünkü iki yön ayrı ayrı bastırılıyor.
     private bool _targetIsDerived;
     private bool _qualityIsDerived;
+    private double _savedTargetMb = new UpdateSettings().TargetMb;
+    private double _savedQualityTarget = new UpdateSettings().QualityTarget;
     private TaskCompletionSource<bool>? _retryDecision;
     private RetryPrompt? _activeRetryPrompt;
     private bool _hardwareProbed;
@@ -1079,6 +1081,8 @@ public partial class MainWindow : Window
         {
             TxtTarget.Text = settings.TargetMb.ToString("0.##", CultureInfo.InvariantCulture);
             TxtQualityTarget.Text = settings.QualityTarget.ToString("0.##", CultureInfo.InvariantCulture);
+            _savedTargetMb = settings.TargetMb;
+            _savedQualityTarget = settings.QualityTarget;
             _intent = (Intent)Math.Clamp(settings.Intent, 0, 2);
             _chipSizeCapped = settings.ChipSizeCapped;
             SetCodecIndex(settings.Codec);
@@ -1119,8 +1123,8 @@ public partial class MainWindow : Window
         Language = Strings.Language,
         AutoUpdate = ChkAutoUpdate.IsChecked == true,
         FastGpu = ChkFastGpu.IsChecked == true,
-        TargetMb = ParseTargetMb(),
-        QualityTarget = ParseQualityTarget(),
+        TargetMb = _savedTargetMb,
+        QualityTarget = _savedQualityTarget,
         Intent = SelectedIntentIndex,
         ChipSizeCapped = _chipSizeCapped,
         Codec = CodecIndex,
@@ -2054,7 +2058,8 @@ public partial class MainWindow : Window
     /// tutan süreç odur. Bu yüzden başlatıcı elle yükleme kipinde açılır, bu süreç kapanır,
     /// başlatıcı çıkışı bekleyip güncellemeyi uygular ve uygulamayı yeni sürümle açar.
     /// Kendiliğinden güncelleme ayarına bakılmaz ve yazılmaz; elle bir yükleme tercihi
-    /// değiştirmez.
+    /// değiştirmez. Kapanmadan önce rozete ara metin yazılmaz: pencere o karede gidiyor,
+    /// bakım 400 ms'yi aşarsa ekrana yalnız başlatıcının paneli gelir.
     ///
     /// <para>Başlatıcısı olmayan kurulumda (Linux, düz macOS kopyası) yükleyecek bir şey
     /// yok; düğme o zaman yayın sayfasını açar. Panel kabuk komutu yazmıyor.</para>
@@ -2079,8 +2084,6 @@ public partial class MainWindow : Window
             StartUpdateDownload();
             return;
         }
-
-        SetUpdateBadge(UpdateBadgeState.Installing);
 
         try
         {
@@ -2841,12 +2844,13 @@ public partial class MainWindow : Window
         PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + TabHeaderText((TabItem)Tabs.Items[Tabs.SelectedIndex]!));
         AcilisIzi.Yaz("sekme");
         IlkKareyiBekle();
+        _ = CizimiOlcAsync(false);
         try { await Player.OpenAsync(path); }
         catch (Exception ex) { ReportPlayerOpenFailure(ex); }
         AcilisIzi.Yaz("motor-acildi");
         await LoadAsync(path);
         AcilisIzi.Yaz("kucultme-yuklendi");
-        _ = CizimiOlcAsync();
+        _ = CizimiOlcAsync(true);
     }
 
     internal static string TabHeaderText(TabItem tab) => tab.Header switch
@@ -3623,6 +3627,7 @@ public partial class MainWindow : Window
         _syncing = true;
         TxtTarget.Text = Math.Round(SliderTarget.Value, 1).ToString("0.##", CultureInfo.InvariantCulture);
         _syncing = false;
+        if (!_targetIsDerived) _savedTargetMb = ParseTargetMb();
         RestoreSizeCap();
         if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
@@ -3636,6 +3641,7 @@ public partial class MainWindow : Window
         if (mb > SliderTarget.Maximum) SliderTarget.Maximum = Math.Ceiling(mb);
         SliderTarget.Value = mb;
         _syncing = false;
+        if (!_targetIsDerived) _savedTargetMb = mb;
         RestoreSizeCap();
         if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
@@ -3662,6 +3668,7 @@ public partial class MainWindow : Window
         _qualityIsDerived = true;
         TxtQualityTarget.Text = Math.Round(SliderQualityTarget.Value).ToString("0.##", CultureInfo.InvariantCulture);
         _qualityIsDerived = false;
+        _savedQualityTarget = ParseQualityTarget();
         DeriveTargetFromQuality();
     }
 
@@ -3675,6 +3682,7 @@ public partial class MainWindow : Window
         _qualityIsDerived = true;
         SliderQualityTarget.Value = ParseQualityTarget();
         _qualityIsDerived = false;
+        _savedQualityTarget = ParseQualityTarget();
         DeriveTargetFromQuality();
     }
 

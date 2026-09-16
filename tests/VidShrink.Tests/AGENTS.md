@@ -63,6 +63,9 @@ sürümden (`x.0.0`) önce koşar.
 - `KabukMenusuTests.cs` — sağ tık menüsünün iki tarafı: `ShellMenu.cs` ile `Install-VidShrink.ps1`'in anahtar adları,
   uzantı listesi ve hedef listesi birebir aynı; silme kolu Appx paketini de kaldırıyor; kutu Ayarlar sekmesinde;
   etiket arayüz dilini izliyor; sekiz yeni anahtar 42 dilde. Kayıt defterine yazmaz, kaynak metin okur.
+- `BaslaticisizCiftTikTests.cs` — G2/G3: çift tık `app\VidShrink.App.exe`'yi açıyor; `--bakim` kapıları (başlatıcıdan
+  doğan uygulama, kurulu düzen dışı, eski başlatıcı), `app\` altından kökteki `tools\ffmpeg`, "Yükle"den sonra rozetin
+  ara metin yazmaması. Açma komutunun değeri `KabukEntegrasyonTests`, betik/motor eşitliği `KurucuExeTests`'te.
 - `KabukMenusuKayitTests.cs` — aynı menünün davranışı, yalnız `ShellMenu.TestRoot` altında: kutunun komutu başlatıcıyı
   (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı

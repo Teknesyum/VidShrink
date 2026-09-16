@@ -146,7 +146,7 @@ public sealed class DosyaIliskiTests : IDisposable
         var failed = FileAssociation.Register(_launcher, _testKey);
 
         Assert.Empty(failed);
-        Assert.Equal($"\"{_launcher}\" \"%1\"", Read($@"{FileAssociation.ProgId}\shell\open\command"));
+        Assert.Equal($"\"{Path.Combine(_installRoot, "app", "VidShrink.App.exe")}\" \"%1\"", Read($@"{FileAssociation.ProgId}\shell\open\command"));
         Assert.Equal($"{_launcher},0", Read($@"{FileAssociation.ProgId}\DefaultIcon"));
         Assert.Equal(Sorted(ShellIntegration.MediaExtensions), Sorted(ExtensionsListingUs()));
         AssertForeignEntriesSurvive();
@@ -180,9 +180,10 @@ public sealed class DosyaIliskiTests : IDisposable
         var run = WriteAll();
         Assert.True(run.Code == 0, run.Output);
 
-        var command = $"\"{_launcher}\" \"%1\"";
+        var command = $"\"{Path.Combine(_installRoot, "app", "VidShrink.App.exe")}\" \"%1\"";
         Assert.Equal(command, Read($@"{FileAssociation.ProgId}\shell\open\command"));
         Assert.Equal(command, Read(@"Applications\VidShrink.exe\shell\open\command"));
+        Assert.Equal($"{_launcher},0", Read($@"{FileAssociation.ProgId}\DefaultIcon"));
         Assert.Equal(Sorted(ShellIntegration.MediaExtensions), Sorted(ExtensionsListingUs()));
 
         using var associations = Open(@"Teknesyum\VidShrink\Capabilities\FileAssociations");

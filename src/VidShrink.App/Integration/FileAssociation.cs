@@ -37,13 +37,14 @@ internal static class FileAssociation
     /// </summary>
     internal static IReadOnlyList<(string Key, string Name, string? Value)> Plan(string executablePath, string classesRoot = ClassesRoot)
     {
+        var command = $"\"{ShellIntegration.OpenCommandTarget(executablePath)}\" \"%1\"";
         var entries = new List<(string, string, string?)>
         {
             ($@"{classesRoot}\{ProgId}", "", DisplayName),
             ($@"{classesRoot}\{ProgId}", "FriendlyTypeName", DisplayName),
             ($@"{classesRoot}\{ProgId}\DefaultIcon", "", $"{executablePath},0"),
-            ($@"{classesRoot}\{ProgId}\shell\open\command", "", $"\"{executablePath}\" \"%1\""),
-            ($@"{classesRoot}\Applications\{Path.GetFileName(executablePath)}\shell\open\command", "", $"\"{executablePath}\" \"%1\"")
+            ($@"{classesRoot}\{ProgId}\shell\open\command", "", command),
+            ($@"{classesRoot}\Applications\{Path.GetFileName(executablePath)}\shell\open\command", "", command)
         };
 
         foreach (var extension in ShellIntegration.MediaExtensions)

@@ -147,7 +147,7 @@ public static class ShellRegistration
         RequireWriteAllowed(classesRoot);
         var classes = classesRoot.TrimEnd('\\');
         var software = SoftwareRoot(classesRoot);
-        var command = $"\"{executable}\" \"%1\"";
+        var command = $"\"{ShellIntegration.OpenCommandTarget(executable)}\" \"%1\"";
         var progId = $@"{classes}\{ProgId}";
         var application = $@"{classes}\Applications\{Path.GetFileName(executable)}";
         var capabilities = $@"{software}\{CapabilitiesPath}";

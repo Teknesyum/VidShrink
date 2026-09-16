@@ -124,13 +124,14 @@ public partial class MainWindow
         Opened += acildi;
     }
 
-    private async Task CizimiOlcAsync()
+    private async Task CizimiOlcAsync(bool panelAsamasi)
     {
         var kip = Environment.GetEnvironmentVariable(AcilisIzi.CizimDegiskeni);
         if (!AcilisIzi.Acik || string.IsNullOrWhiteSpace(kip)) return;
 
         var parca = kip.Split(':');
         var panel = parca[0] == "panel";
+        if (panel != panelAsamasi) return;
         var sure = parca.Length > 1 && int.TryParse(parca[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var s) ? s : 7;
         if (panel)
         {

@@ -458,10 +458,15 @@ function Send-AssociationChanged([string]$Root) {
     catch { }
 }
 
+function Get-OpenCommandTarget([string]$Executable) {
+    if ([IO.Path]::GetFileName($Executable) -ine 'VidShrink.exe') { return $Executable }
+    return [IO.Path]::Combine([IO.Path]::GetDirectoryName($Executable), 'app\VidShrink.App.exe')
+}
+
 function Write-FileAssociation([string]$Root, [string]$Executable) {
     $classes = Get-CurrentUserSubKey $Root
     $software = Get-AssociationSoftwareRoot $Root
-    $command = '"{0}" "%1"' -f $Executable
+    $command = '"{0}" "%1"' -f (Get-OpenCommandTarget $Executable)
     $progId = "$classes\$fileAssociationProgId"
     $application = "$classes\Applications\$([IO.Path]::GetFileName($Executable))"
     $capabilities = "$software\$fileAssociationCapabilities"

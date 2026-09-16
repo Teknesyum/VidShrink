@@ -55,6 +55,9 @@ public sealed class KurucuExeTests : IDisposable
         var scriptTree = Dump(scriptRoot);
         Assert.True(scriptTree.Count > 700, scriptTree.Count.ToString());
         Assert.Equal(scriptTree, Dump(engineRoot));
+        var appCommand = $"\"{Path.Combine(install, "app", "VidShrink.App.exe")}\" \"%1\"";
+        Assert.Equal(appCommand, Value($@"{scriptRoot}\Teknesyum.VidShrink.Video\shell\open\command"));
+        Assert.Equal(appCommand, Value($@"{engineRoot}\Applications\VidShrink.exe\shell\open\command"));
 
         var removed = Script("-RemoveShellMenu", "-RemoveFileAssociation", "-RegistryRoot", $@"HKCU:\{scriptRoot}");
         Assert.True(removed.Code == 0, removed.Output);
@@ -188,7 +191,8 @@ public sealed class KurucuExeTests : IDisposable
         var exe = Path.Combine(root, "VidShrink.exe");
         Assert.Equal(new[] { exe, exe }, shortcuts.Targets.Values);
         Assert.Equal($"\"{exe}\" --kucult 100 \"%1\"", Value($@"{options.ClassesRoot}\SystemFileAssociations\.mp4\shell\VidShrinkKucult\shell\100\command"));
-        Assert.Equal($"\"{exe}\" \"%1\"", Value($@"{options.ClassesRoot}\Teknesyum.VidShrink.Video\shell\open\command"));
+        Assert.Equal($"\"{Path.Combine(root, "app", "VidShrink.App.exe")}\" \"%1\"", Value($@"{options.ClassesRoot}\Teknesyum.VidShrink.Video\shell\open\command"));
+        Assert.Equal($"{exe},0", Value($@"{options.ClassesRoot}\Teknesyum.VidShrink.Video\DefaultIcon"));
 
         var again = await SetupRunner.InstallAsync(options, host, CancellationToken.None);
         Assert.True(again.LibMpvReused);
