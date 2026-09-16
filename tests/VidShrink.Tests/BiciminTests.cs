@@ -595,7 +595,8 @@ public sealed class BaslikKapsamiTests
     /// dokuz recorder.budget.* / recorder.auto.manual anahtari ekledi, sahipsiz kalan recorder.auto.enable
     /// ve recorder.auto.hint dustu: 43 x 717 = 30831. Iki adimli guncelleme indirme dugmesini, rozet/durum ve dort gunluk satirini ekledi
     /// (main.action.download, main.update.badge/downloading/ready/failed, main.update.log.*): 43 x 732 = 31476'dan 43 x 741 = 31863'e.
-    /// Tasma karari dokuz main.retry.* / main.run.* anahtari ekledi (kabul, kesme seridi, iki sonuc satiri): 43 x 742 = 31906'dan 43 x 751 = 32293'e.</para>
+    /// Tasma karari dokuz main.retry.* / main.run.* anahtari ekledi (kabul, kesme seridi, iki sonuc satiri): 43 x 742 = 31906'dan 43 x 751 = 32293'e.
+    /// Hakkinda'nin platform satirlari iki main.about.platforms.* anahtari ekledi: 43 x 753 = 32379.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -623,7 +624,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(32293, gezilen);
+        Assert.Equal(32379, gezilen);
         Assert.Empty(kayip);
     }
 

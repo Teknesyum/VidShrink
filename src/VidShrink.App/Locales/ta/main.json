@@ -310,6 +310,8 @@
   "main.about.codecs.title": "கோடெக்குகள்",
   "main.about.codecs.body": "• H.264 மிகப் பரந்த இணக்கம் தரும்.\n• H.265 மிகத் திறமையாகச் சுருக்கும்.\n• VP9 வலுவான WebM தேர்வு.\n• AV1 அதிக CPU செலவில் நவீன சுருக்கத்தை அதிகப்படுத்தும்.\n• இலக்கு மூல ஸ்ட்ரீம்களை ஆதரித்தால் ஸ்ட்ரீம் நகல் மிக வேகமானதும் இழப்பற்றதும்.",
   "main.about.status.title": "அமைப்பு நிலை",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "பதிப்பு",
   "main.about.reading": "படிக்கிறது...",
   "main.about.unavailable": "கிடைக்கவில்லை",

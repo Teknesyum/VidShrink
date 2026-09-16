@@ -310,6 +310,8 @@
   "main.about.codecs.title": "কোডেক",
   "main.about.codecs.body": "• H.264 সবচেয়ে ব্যাপক সামঞ্জস্য দেয়।\n• H.265 আরও দক্ষভাবে সংকুচিত করে।\n• VP9 WebM-এর জন্য শক্তিশালী পছন্দ।\n• AV1 বেশি CPU খরচে আধুনিক সংকোচন সর্বোচ্চ করে।\n• গন্তব্য উৎস স্ট্রিম সমর্থন করলে স্ট্রিম কপি সবচেয়ে দ্রুত ও ক্ষতিহীন।",
   "main.about.status.title": "সিস্টেম অবস্থা",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "সংস্করণ",
   "main.about.reading": "পড়া হচ্ছে...",
   "main.about.unavailable": "অনুপলব্ধ",

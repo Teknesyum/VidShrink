@@ -920,6 +920,7 @@ public partial class MainWindow : Window
         RefreshShareTarget();
         RefreshAdvancedTexts();
         UpdateToolStatus();
+        RefreshPlatforms();
         if (!_performanceRunning) ShowPerformanceResult(_performanceShown);
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
         else RefreshQualityPanels();
@@ -1382,8 +1383,30 @@ public partial class MainWindow : Window
         finally { _updateUiSyncing = false; }
 
         RefreshUpdateTexts();
+        RefreshPlatforms();
         ReportAppliedUpdate();
     }
+
+    /// <summary>Hakkında'nın platform satırları: yayının kurduğu her hedef, bu kurulumun hedefi işaretli.</summary>
+    internal void RefreshPlatforms()
+    {
+        var current = UpdateCheck.Rid;
+        TxtPlatforms.Text = string.Join("\n", UpdateCheck.ReleasedRids.Select(rid =>
+            string.Equals(rid, current, StringComparison.OrdinalIgnoreCase)
+                ? $"{PlatformName(rid)}  ← {Say("main.about.platforms.current")}"
+                : PlatformName(rid)));
+    }
+
+    internal static string PlatformName(string rid) => rid switch
+    {
+        "win-x64" => "Windows x64",
+        "win-arm64" => "Windows ARM64",
+        "osx-arm64" => "macOS Apple Silicon (arm64)",
+        "osx-x64" => "macOS Intel (x64)",
+        "linux-x64" => "Linux x64",
+        "linux-arm64" => "Linux ARM64",
+        _ => rid
+    };
 
     /// <summary>
     /// Kendini güncelleyen uygulama yeniden başlar, bu yüzden "geçildi" bilgisi bellekte
@@ -1930,7 +1953,7 @@ public partial class MainWindow : Window
 
         // Açıkken güncellemeyi başlatıcı sessizce yapıyor, söylenecek bir şey yok.
         // Kapatıldığı anda haber verme görevi uygulamaya geçer.
-        if (UpdateCheck.AutoUpdateEnabled(settings)) UpdateNotice.IsVisible = false;
+        if (UpdateCheck.AutoUpdateEnabled(settings)) { if (!UpdateNoticeLocked) UpdateNotice.IsVisible = false; }
         else _ = CheckForUpdateAsync();
     }
 
@@ -1943,7 +1966,7 @@ public partial class MainWindow : Window
     /// saatli biçimi <see cref="UpdateBadge.Compose"/>'da, renk eşlemesi burada; ikisi de
     /// özel rafın güncelleme paneli ölçütünden. Rozet denetim başlayana kadar görünmez.
     /// </summary>
-    private void SetUpdateBadge(UpdateBadgeState state)
+    internal void SetUpdateBadge(UpdateBadgeState state)
     {
         _updateBadgeState = state;
         var govde = Say(state switch
@@ -2121,6 +2144,7 @@ public partial class MainWindow : Window
 
     private void OnDismissUpdateNotice(object? sender, RoutedEventArgs e)
     {
+        if (UpdateNoticeLocked) return;
         UpdateNotice.IsVisible = false;
         if (_noticeVersion is not null) WriteDismissedVersion(_noticeVersion);
     }

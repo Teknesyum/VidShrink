@@ -265,17 +265,34 @@ public sealed class UpdaterTests : IDisposable
     }
 
     [Fact]
-    public void AutoUpdateIsOnUntilTheUserTurnsItOff()
+    public void AutoUpdateIsOffUntilTheUserTurnsItOn()
     {
         var file = Path.Combine(_root, "settings.json");
 
+        Assert.False(UpdateSettings.Load(file).AutoUpdate);
+        Assert.False(UpdateCheck.AutoUpdateEnabled(UpdateSettings.Load(file)));
+
+        new UpdateSettings { AutoUpdate = true }.Save(file);
         Assert.True(UpdateSettings.Load(file).AutoUpdate);
 
         new UpdateSettings { AutoUpdate = false }.Save(file);
         Assert.False(UpdateSettings.Load(file).AutoUpdate);
+    }
 
-        new UpdateSettings { AutoUpdate = true }.Save(file);
+    [Fact]
+    public void AnExistingUsersSavedChoiceSurvivesTheNewDefault()
+    {
+        var file = Path.Combine(_root, "settings.json");
+
+        File.WriteAllText(file, "{\"autoUpdate\": true, \"language\": \"tr\", \"targetMb\": 25}");
+        var kept = UpdateSettings.Load(file);
+        Assert.True(kept.AutoUpdate);
+        kept.TargetMb = 30;
+        kept.Save(file);
         Assert.True(UpdateSettings.Load(file).AutoUpdate);
+
+        File.WriteAllText(file, "{\"language\": \"tr\", \"targetMb\": 25}");
+        Assert.False(UpdateSettings.Load(file).AutoUpdate);
     }
 
     [Fact]
@@ -283,7 +300,7 @@ public sealed class UpdaterTests : IDisposable
     {
         var file = Path.Combine(_root, "settings.json");
         File.WriteAllText(file, "{ bozuk");
-        Assert.True(UpdateSettings.Load(file).AutoUpdate);
+        Assert.False(UpdateSettings.Load(file).AutoUpdate);
     }
 
     [Fact]

@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Кодеки",
   "main.about.codecs.body": "• H.264 пропонує найширшу сумісність.\n• H.265 стискає ефективніше.\n• VP9 — сильний вибір для WebM.\n• AV1 максимізує сучасне стиснення ціною більшого навантаження на процесор.\n• Копіювання потоку найшвидше й безвтратне, коли призначення підтримує потоки джерела.",
   "main.about.status.title": "Стан системи",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Версія",
   "main.about.reading": "читання...",
   "main.about.unavailable": "недоступно",

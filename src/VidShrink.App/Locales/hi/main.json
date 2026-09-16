@@ -310,6 +310,8 @@
   "main.about.codecs.title": "कोडेक",
   "main.about.codecs.body": "• H.264 सबसे व्यापक संगतता देता है।\n• H.265 ज़्यादा कुशलता से संपीड़ित करता है।\n• VP9 WebM के लिए मज़बूत विकल्प है।\n• AV1 अधिक CPU लागत पर आधुनिक संपीड़न अधिकतम करता है।\n• स्ट्रीम कॉपी सबसे तेज़ और हानिरहित है जब गंतव्य स्रोत स्ट्रीम का समर्थन करे।",
   "main.about.status.title": "सिस्टम स्थिति",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "संस्करण",
   "main.about.reading": "पढ़ रहा है...",
   "main.about.unavailable": "अनुपलब्ध",

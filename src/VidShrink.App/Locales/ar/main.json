@@ -310,6 +310,8 @@
   "main.about.codecs.title": "الترميزات",
   "main.about.codecs.body": "• H.264 يقدم أوسع توافق.\n• H.265 يضغط بكفاءة أكبر.\n• VP9 خيار قوي لـ WebM.\n• AV1 يعظّم الضغط الحديث بكلفة معالج أعلى.\n• نسخ التدفق الأسرع وبلا فقد حين تدعم الوجهة تدفقات المصدر.",
   "main.about.status.title": "حالة النظام",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "الإصدار",
   "main.about.reading": "جارٍ القراءة...",
   "main.about.unavailable": "غير متاح",

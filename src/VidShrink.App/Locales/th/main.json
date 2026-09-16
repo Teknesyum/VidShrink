@@ -310,6 +310,8 @@
   "main.about.codecs.title": "โคเดก",
   "main.about.codecs.body": "• H.264 เข้ากันได้กว้างที่สุด\n• H.265 บีบอัดได้มีประสิทธิภาพกว่า\n• VP9 เป็นตัวเลือก WebM ที่ดี\n• AV1 บีบอัดสมัยใหม่ได้สูงสุดโดยใช้ CPU มากขึ้น\n• คัดลอกสตรีมเร็วที่สุดและไม่สูญเสียเมื่อปลายทางรองรับสตรีมต้นฉบับ",
   "main.about.status.title": "สถานะระบบ",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "เวอร์ชัน",
   "main.about.reading": "กำลังอ่าน...",
   "main.about.unavailable": "ไม่พร้อมใช้งาน",

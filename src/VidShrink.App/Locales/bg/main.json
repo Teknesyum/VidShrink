@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Кодеци",
   "main.about.codecs.body": "• H.264 предлага най-широка съвместимост.\n• H.265 компресира по-ефективно.\n• VP9 е силен избор за WebM.\n• AV1 максимизира модерната компресия при по-висока цена за процесора.\n• Копирането на потока е най-бързо и без загуби, когато целта поддържа изходните потоци.",
   "main.about.status.title": "Състояние на системата",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Версия",
   "main.about.reading": "четене...",
   "main.about.unavailable": "недостъпно",

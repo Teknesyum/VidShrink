@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Koodekid",
   "main.about.codecs.body": "• H.264 pakub laiimat ühilduvust.\n• H.265 tihendab tõhusamalt.\n• VP9 on tugev WebM-valik.\n• AV1 maksimeerib kaasaegse tihenduse suurema protsessorikuluga.\n• Voo koopia on kiireim ja kadudeta, kui sihtkoht toetab allika voogusid.",
   "main.about.status.title": "Süsteemi olek",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Versioon",
   "main.about.reading": "lugemine...",
   "main.about.unavailable": "pole saadaval",

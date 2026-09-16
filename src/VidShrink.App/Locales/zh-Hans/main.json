@@ -310,6 +310,8 @@
   "main.about.codecs.title": "编码格式",
   "main.about.codecs.body": "• H.264 兼容性最广。\n• H.265 压缩效率更高。\n• VP9 是 WebM 的有力选择。\n• AV1 以更高的 CPU 开销实现最强的现代压缩。\n• 目标支持源流时，流复制最快且无损。",
   "main.about.status.title": "系统状态",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "版本",
   "main.about.reading": "读取中...",
   "main.about.unavailable": "不可用",

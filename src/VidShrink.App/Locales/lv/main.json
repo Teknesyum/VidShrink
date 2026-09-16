@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Kodeki",
   "main.about.codecs.body": "• H.264 piedāvā plašāko saderību.\n• H.265 saspiež efektīvāk.\n• VP9 ir spēcīga WebM izvēle.\n• AV1 maksimizē moderno saspiešanu ar lielākām CPU izmaksām.\n• Straumes kopija ir ātrākā un bezzudumu, kad galamērķis atbalsta avota straumes.",
   "main.about.status.title": "Sistēmas stāvoklis",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Versija",
   "main.about.reading": "nolasa...",
   "main.about.unavailable": "nav pieejams",

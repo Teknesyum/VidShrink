@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Koodekit",
   "main.about.codecs.body": "• H.264 tarjoaa laajimman yhteensopivuuden.\n• H.265 pakkaa tehokkaammin.\n• VP9 on vahva WebM-valinta.\n• AV1 maksimoi modernin pakkauksen korkeammalla suoritinkustannuksella.\n• Virran kopiointi on nopein ja häviötön, kun kohde tukee lähteen virtoja.",
   "main.about.status.title": "Järjestelmän tila",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Versio",
   "main.about.reading": "luetaan...",
   "main.about.unavailable": "ei saatavilla",

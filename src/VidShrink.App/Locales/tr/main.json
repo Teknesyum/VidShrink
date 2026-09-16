@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Kodekler",
   "main.about.codecs.body": "• H.264 en geniş uyumluluğu sunar.\n• H.265 daha verimli sıkıştırır.\n• VP9, WebM için güçlü bir seçimdir.\n• AV1 daha yüksek işlemci maliyetiyle modern sıkıştırmayı en üst düzeye çıkarır.\n• Hedef kaynak akışlarını desteklediğinde akış kopyalama en hızlı ve kayıpsız seçenektir.",
   "main.about.status.title": "Sistem durumu",
+  "main.about.platforms.title": "Platformlar",
+  "main.about.platforms.current": "bu kurulum",
   "main.about.version": "Sürüm",
   "main.about.reading": "okunuyor...",
   "main.about.unavailable": "okunamadı",

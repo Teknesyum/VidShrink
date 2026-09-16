@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Kodeki",
   "main.about.codecs.body": "• H.264 hutoa utangamano mpana zaidi.\n• H.265 hufinyaza kwa ufanisi zaidi.\n• VP9 ni chaguo zuri la WebM.\n• AV1 huongeza ufinyazi wa kisasa kwa gharama ya juu ya CPU.\n• Nakala ya mtiririko ni ya haraka zaidi na bila hasara ikiwa lengwa linaunga mkono mitiririko ya chanzo.",
   "main.about.status.title": "Hali ya mfumo",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Toleo",
   "main.about.reading": "inasoma...",
   "main.about.unavailable": "haipatikani",

@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Kodekar",
   "main.about.codecs.body": "• H.264 ger bredast kompatibilitet.\n• H.265 komprimerar effektivare.\n• VP9 är ett starkt WebM-val.\n• AV1 maximerar modern komprimering till högre processorkostnad.\n• Strömkopiering är snabbast och förlustfri när målet stöder källströmmarna.",
   "main.about.status.title": "Systemstatus",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Version",
   "main.about.reading": "läser...",
   "main.about.unavailable": "ej tillgänglig",

@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Kodekek",
   "main.about.codecs.body": "• A H.264 nyújtja a legszélesebb kompatibilitást.\n• A H.265 hatékonyabban tömörít.\n• A VP9 erős WebM-választás.\n• Az AV1 a modern tömörítést maximalizálja nagyobb CPU-költséggel.\n• Az adatfolyam-másolás a leggyorsabb és veszteségmentes, ha a cél támogatja a forrás adatfolyamait.",
   "main.about.status.title": "Rendszerállapot",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Verzió",
   "main.about.reading": "olvasás...",
   "main.about.unavailable": "nem elérhető",

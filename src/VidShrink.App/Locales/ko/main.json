@@ -310,6 +310,8 @@
   "main.about.codecs.title": "코덱",
   "main.about.codecs.body": "• H.264는 가장 넓은 호환성을 제공합니다.\n• H.265는 더 효율적으로 압축합니다.\n• VP9은 WebM에 강력한 선택입니다.\n• AV1은 CPU 비용이 높은 대신 최신 압축을 극대화합니다.\n• 스트림 복사는 대상이 원본 스트림을 지원하면 가장 빠르고 무손실입니다.",
   "main.about.status.title": "시스템 상태",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "버전",
   "main.about.reading": "읽는 중...",
   "main.about.unavailable": "사용 불가",

@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Kodeci",
   "main.about.codecs.body": "• H.264 nudi najširu kompatibilnost.\n• H.265 sažima učinkovitije.\n• VP9 je dobar izbor za WebM.\n• AV1 maksimizira moderno sažimanje uz veći trošak procesora.\n• Kopiranje toka je najbrže i bez gubitaka kad odredište podržava izvorne tokove.",
   "main.about.status.title": "Stanje sustava",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Verzija",
   "main.about.reading": "čitanje...",
   "main.about.unavailable": "nedostupno",

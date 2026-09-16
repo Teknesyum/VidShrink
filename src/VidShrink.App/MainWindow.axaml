@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
@@ -1057,6 +1057,8 @@
                 <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}"/>
                 <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
                            Cursor="Hand" PointerPressed="OnSystemStatusTapped"/>
+                <TextBlock Text="{loc:Text main.about.platforms.title}" Theme="{StaticResource H3}"/>
+                <TextBlock x:Name="TxtPlatforms" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
               </StackPanel>
             </Border>
           </ScrollViewer>

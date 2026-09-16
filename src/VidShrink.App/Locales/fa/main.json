@@ -310,6 +310,8 @@
   "main.about.codecs.title": "کدک‌ها",
   "main.about.codecs.body": "• H.264 گسترده‌ترین سازگاری را دارد.\n• H.265 کارآمدتر فشرده می‌کند.\n• VP9 انتخاب قوی برای WebM است.\n• AV1 فشرده‌سازی مدرن را با هزینهٔ CPU بیشتر به بیشینه می‌رساند.\n• کپی جریان سریع‌ترین و بی‌افت است وقتی مقصد جریان‌های منبع را پشتیبانی کند.",
   "main.about.status.title": "وضعیت سیستم",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "نسخه",
   "main.about.reading": "در حال خواندن...",
   "main.about.unavailable": "در دسترس نیست",

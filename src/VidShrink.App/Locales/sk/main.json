@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Kodeky",
   "main.about.codecs.body": "• H.264 ponúka najširšiu kompatibilitu.\n• H.265 komprimuje účinnejšie.\n• VP9 je silná voľba pre WebM.\n• AV1 maximalizuje modernú kompresiu za cenu vyššej záťaže procesora.\n• Kópia streamu je najrýchlejšia a bezstratová, ak cieľ podporuje zdrojové streamy.",
   "main.about.status.title": "Stav systému",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Verzia",
   "main.about.reading": "načítava sa...",
   "main.about.unavailable": "nedostupné",

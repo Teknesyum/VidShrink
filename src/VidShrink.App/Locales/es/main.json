@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Códecs",
   "main.about.codecs.body": "• H.264 ofrece la compatibilidad más amplia.\n• H.265 comprime con más eficiencia.\n• VP9 es una buena opción para WebM.\n• AV1 maximiza la compresión moderna a mayor coste de CPU.\n• La copia de flujo es la más rápida y sin pérdida cuando el destino admite los flujos de la fuente.",
   "main.about.status.title": "Estado del sistema",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Versión",
   "main.about.reading": "leyendo...",
   "main.about.unavailable": "no disponible",

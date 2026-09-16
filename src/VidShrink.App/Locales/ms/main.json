@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Kodek",
   "main.about.codecs.body": "• H.264 menawarkan keserasian paling luas.\n• H.265 memampat dengan lebih cekap.\n• VP9 pilihan WebM yang kukuh.\n• AV1 memaksimumkan pemampatan moden dengan kos CPU lebih tinggi.\n• Salinan strim paling pantas dan tanpa kehilangan apabila destinasi menyokong strim sumber.",
   "main.about.status.title": "Status sistem",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Versi",
   "main.about.reading": "membaca...",
   "main.about.unavailable": "tidak tersedia",

@@ -19,7 +19,7 @@ public sealed class SettingsTests
 
     public static IEnumerable<object[]> PersistedValues()
     {
-        yield return [nameof(UpdateSettings.AutoUpdate), false];
+        yield return [nameof(UpdateSettings.AutoUpdate), true];
         yield return [nameof(UpdateSettings.FastGpu), true];
         yield return [nameof(UpdateSettings.Language), "tr"];
         yield return [nameof(UpdateSettings.TargetMb), 42.5];
@@ -97,7 +97,7 @@ public sealed class SettingsTests
 
             Assert.Equal(new UpdateSettings().TargetMb, settings.TargetMb);
             Assert.Equal(new UpdateSettings().Intent, settings.Intent);
-            Assert.True(settings.AutoUpdate);
+            Assert.False(settings.AutoUpdate);
             Assert.Null(settings.FastGpu);
         }
         finally { if (File.Exists(file)) File.Delete(file); }
@@ -139,7 +139,7 @@ public sealed class SettingsTests
         new("TxtTrimEnd", s => s.TrimEnd = "00:01:00", w => w.TxtTrimEnd.Text, ""),
         new("CmbShareTarget", s => s.ShareTarget = 1, w => w.CmbShareTarget.SelectedIndex, 0),
         new("CmbShareRetention", s => s.ShareRetention = 2, w => w.CmbShareRetention.SelectedIndex, 0),
-        new("ChkAutoUpdate", s => s.AutoUpdate = false, w => w.ChkAutoUpdate.IsChecked, true),
+        new("ChkAutoUpdate", s => s.AutoUpdate = true, w => w.ChkAutoUpdate.IsChecked, false),
     ];
 
     /// <summary>

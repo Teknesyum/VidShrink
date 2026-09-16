@@ -310,6 +310,8 @@
   "main.about.codecs.title": "קודקים",
   "main.about.codecs.body": "• H.264 מציע את התאימות הרחבה ביותר.\n• H.265 דוחס ביעילות רבה יותר.\n• VP9 הוא בחירה חזקה ל-WebM.\n• AV1 ממקסם דחיסה מודרנית בעלות מעבד גבוהה יותר.\n• העתקת זרם היא המהירה ביותר וללא הפסד כשהיעד תומך בזרמי המקור.",
   "main.about.status.title": "מצב המערכת",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "גרסה",
   "main.about.reading": "קורא...",
   "main.about.unavailable": "לא זמין",

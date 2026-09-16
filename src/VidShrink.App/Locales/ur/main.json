@@ -310,6 +310,8 @@
   "main.about.codecs.title": "کوڈیکس",
   "main.about.codecs.body": "• H.264 سب سے وسیع مطابقت دیتا ہے۔\n• H.265 زیادہ مؤثر کمپریس کرتا ہے۔\n• VP9 WebM کے لیے مضبوط انتخاب ہے۔\n• AV1 زیادہ CPU لاگت پر جدید کمپریشن زیادہ سے زیادہ کرتا ہے۔\n• سٹریم کاپی سب سے تیز اور بے نقصان ہے جب منزل ماخذ سٹریمز سپورٹ کرے۔",
   "main.about.status.title": "سسٹم حالت",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "ورژن",
   "main.about.reading": "پڑھا جا رہا ہے...",
   "main.about.unavailable": "دستیاب نہیں",

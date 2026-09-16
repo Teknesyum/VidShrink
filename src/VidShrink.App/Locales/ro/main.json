@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Codecuri",
   "main.about.codecs.body": "• H.264 oferă cea mai largă compatibilitate.\n• H.265 comprimă mai eficient.\n• VP9 este o alegere bună pentru WebM.\n• AV1 maximizează comprimarea modernă cu un cost CPU mai mare.\n• Copierea fluxului este cea mai rapidă și fără pierderi când destinația acceptă fluxurile sursei.",
   "main.about.status.title": "Stare sistem",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Versiune",
   "main.about.reading": "se citește...",
   "main.about.unavailable": "indisponibil",

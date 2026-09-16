@@ -158,6 +158,9 @@ public static class UpdateCheck
     /// tanımsız bir <c>_ =&gt; "x64"</c> dalıydı ve kurucu aynı durumu reddediyordu; artık ikisi
     /// de aynı kuralı okuyor, çünkü ayrıştıklarında biri kuruluyor öteki hiç güncelleme bulamıyor.
     /// </summary>
+    /// <summary>Yayın iş akışının paketlediği hedefler; <c>.github/workflows/release.yml</c> matrisiyle aynı.</summary>
+    public static readonly IReadOnlyList<string> ReleasedRids = new[] { "win-x64", "osx-arm64", "osx-x64", "linux-x64" };
+
     public static string Rid
     {
         get
@@ -409,8 +412,8 @@ public sealed class UpdateSettings
     public const string FolderName = "VidShrink";
     public const string FileName = "settings.json";
 
-    /// <summary>Windows'ta varsayılan açık. Kapalıyken uygulama yalnız haber verir.</summary>
-    public bool AutoUpdate { get; set; } = true;
+    /// <summary>Varsayılan kapalı: güncelleme rozetteki düğmeyle indirilip kurulur. Açılırsa Windows'ta kendiliğinden kurulur. Dosyada yazılı değer korunur.</summary>
+    public bool AutoUpdate { get; set; }
 
     /// <summary>
     /// Hızlı düşür (GPU) kutusunun durumu. Alan yoksa karar henüz verilmemiştir; ilk

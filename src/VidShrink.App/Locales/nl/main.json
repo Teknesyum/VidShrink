@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Codecs",
   "main.about.codecs.body": "• H.264 biedt de breedste compatibiliteit.\n• H.265 comprimeert efficiënter.\n• VP9 is een sterke WebM-keuze.\n• AV1 maximaliseert moderne compressie tegen hogere CPU-kosten.\n• Streamkopie is het snelst en verliesvrij als de bestemming de bronstreams ondersteunt.",
   "main.about.status.title": "Systeemstatus",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Versie",
   "main.about.reading": "lezen...",
   "main.about.unavailable": "niet beschikbaar",

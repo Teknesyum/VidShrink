@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Κωδικοποιητές",
   "main.about.codecs.body": "• Το H.264 προσφέρει την ευρύτερη συμβατότητα.\n• Το H.265 συμπιέζει πιο αποδοτικά.\n• Το VP9 είναι ισχυρή επιλογή για WebM.\n• Το AV1 μεγιστοποιεί τη σύγχρονη συμπίεση με υψηλότερο κόστος CPU.\n• Η αντιγραφή ροής είναι η ταχύτερη και χωρίς απώλειες όταν ο προορισμός υποστηρίζει τις ροές της πηγής.",
   "main.about.status.title": "Κατάσταση συστήματος",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Έκδοση",
   "main.about.reading": "ανάγνωση...",
   "main.about.unavailable": "μη διαθέσιμο",

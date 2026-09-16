@@ -310,6 +310,8 @@
   "main.about.codecs.title": "Kodekai",
   "main.about.codecs.body": "• H.264 siūlo plačiausią suderinamumą.\n• H.265 glaudina efektyviau.\n• VP9 yra stiprus WebM pasirinkimas.\n• AV1 maksimaliai išnaudoja modernų glaudinimą didesne CPU kaina.\n• Srauto kopija greičiausia ir be nuostolių, kai paskirtis palaiko šaltinio srautus.",
   "main.about.status.title": "Sistemos būsena",
+  "main.about.platforms.title": "Platforms",
+  "main.about.platforms.current": "this install",
   "main.about.version": "Versija",
   "main.about.reading": "skaitoma...",
   "main.about.unavailable": "nepasiekiama",
