@@ -392,3 +392,48 @@ boyudur. Geri alınan değişiklik yok; dört kalemin hepsi kendi aralığında 
 | Ölçüm düzeneği | [tools/acilis-hizi/olcum.ps1](../../tools/acilis-hizi/olcum.ps1) |
 | Plan | [docs/plan.md](../plan.md) "Hipersürüş E dalgası" |
 | Pimler | `LocalizationTests.DilAdiniKatalogYuklemedenOkumakTamYuklemeyleAyni`, `OynaticiGirdiTests.KabukYolununActigiSekmeOynaticidir` |
+
+## F dalgası — Olağan açılışta perde yok, etiket yenilemesi menüyü yeniden kurmuyor (16 Eylül 2026)
+
+Eşleşik sıcak ölçüm, 14 tekrar, aynı 6,2 MB klip, sıra her tekrarda döner. Taban **3ba42150**
+(origin/main, 0.8.2), karşı taraf **6619209f** (`t0/acilis-anlik`). Saat uygulamanın kendi
+izi; sıfır başlatıcının `Process.StartTime`'ı.
+
+| Sütun | 3ba42150 | F | Eşleşik fark ortancası | F lehine çift |
+| --- | --- | --- | --- | --- |
+| ilk-kare | 1623,0 ms | 611,9 ms | **−992,4 ms** | 14/14 |
+| yapici-bitti | 1517,8 ms | 497,1 ms | −999,9 ms | 14/14 |
+| xaml | 502,6 ms | 473,3 ms | −14,1 ms | 8/14 |
+| app-dogdu | 74,9 ms | 69,6 ms | +1,4 ms | 7/14 |
+
+Farkın tamamına yakını `xaml → yapici-bitti` aralığında: taban 1015 ms, F 24 ms. Bu, etiket
+yenilemesinin her açılışta sağ tık menüsünü (648 değer) baştan yazmasıydı; F yalnız farklı
+etiketi yazar. Perdenin payı (`app-dogdu → perde`, tabanda ~17 ms) aynı farkın içinde küçük.
+
+### Düzenek değişti
+
+Ölçüm bu dalgadan itibaren kullanıcının ekranına dokunmuyor: `EkranSaati` uygulamayı ayrı
+bir Win32 masaüstünde (`WinSta0\vidshrink-olcum`) doğurur, ekran okunmaz. Her sürece
+`KayitKalkani` başlangıç kancası yüklenir ve HKCU özel bir kovana yönlenir. Bu yüzden tabanın
+menü yazımı gerçek kayıt defteri yerine uygulama kovanına gider; ölçülen ~1 s o kovana
+yazımın bedelidir, gerçek HKCU'da önceki sondada ~867 ms görülmüştü. Sayılar önceki
+dalgaların ekran saatiyle doğrudan kıyaslanmaz.
+
+Her koşumdan önce ve sonra sağ tık menüsü, etiketler ve ilişkilendirme (654 değer)
+karşılaştırıldı: 28 koşumun hiçbirinde fark yok.
+
+### Makine notu
+
+Sistem yükü günlüğü koşum boyunca (17:07–17:19) cpu 15–80 arası; tepe 17:14:19'da 80,
+eşiği (>80) aşmadı, atılan tekrar yok. Quasimorph oyunu (pid 15216) açık ama boştaydı;
+kapatılmadı. İlk deneme 15:58'de cpu=93 örneğinde 6. tekrarda durdurulmuştu, o sayılar
+kullanılmadı.
+
+### Kanıt
+
+| Ne | Nerede |
+| --- | --- |
+| Özet ve eşleşik fark | [T-hipersurus-F-ozet.txt](T-hipersurus-F-ozet.txt) |
+| Her koşumun bütün adımları | [T-hipersurus-F-ham.jsonl](T-hipersurus-F-ham.jsonl) |
+| Ölçüm düzeneği | [tools/acilis-hizi/EkranSaati](../../tools/acilis-hizi/EkranSaati), [tools/acilis-hizi/KayitKalkani](../../tools/acilis-hizi/KayitKalkani) |
+| Plan | [docs/plan.md](../plan.md) "Hipersürüş F dalgası" |

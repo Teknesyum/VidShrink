@@ -1,0 +1,115 @@
+kip      : sicak
+klip     : C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ad00e1b2c29a0b4f9\.calisma\F\klip\macenta.mp4 (6.1 MB)
+tekrar   : 14
+makine   : DESKTOP-0J80KVV / Microsoft Windows NT 10.0.22631.0
+an       : 2026-09-16 17:15:04
+masaustu : WinSta0\vidshrink-olcum; kullanicinin ekranina pencere acilmaz, ekran okunmaz.
+saat     : ms, uygulamanin kendi izi. Sifir baslaticinin Process.StartTime'i; app satirlari
+           ayni tabana (VIDSHRINK_ACILIS_T0) yazar. Kabugun CreateProcess oncesi payi girmez.
+kayit    : her surece KayitKalkani baslangic kancasi; HKCU ozel kovana yonlenir. Her kosumdan
+           once ve sonra sag tik menusu, etiketler ve iliskilendirme degerleri karsilastirilir.
+taraf    : taban = C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ad00e1b2c29a0b4f9\.calisma\F\T ortam=
+taraf    : anlik = C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ad00e1b2c29a0b4f9\.calisma\F\Y ortam=
+
+== taban ==
+adim                                 n     en_az   ortanca       p95    en_cok
+createprocess                       14       1.1       1.4       2.7       2.7
+kalkan-surec                        14       2.0       2.0       2.0       2.0
+iz:baslatici                        14      51.1      67.8      93.1      93.1
+iz:app-dogdu                        14      57.0      74.9     102.1     102.1
+iz:perde                            14      72.4      91.4     129.0     129.0
+iz:main                             14     111.4     141.7     216.3     216.3
+iz:tek-ornek                        14     113.2     144.5     220.5     220.5
+iz:libmpv-hazir                     14     123.6     157.1     233.7     233.7
+iz:cerceve                          14     295.8     345.5     466.0     466.0
+iz:ayar-okundu                      14     298.9     348.5     469.3     469.3
+iz:palet                            14     299.2     348.7     469.7     469.7
+iz:pencere-yapici                   14     319.3     370.5     504.5     504.5
+iz:xaml-sekmeler                    14     362.0     416.6     568.5     568.5
+iz:xaml-oynatici                    14     386.3     447.8     600.5     600.5
+iz:gecici-temizlik                  14     386.6     444.5     570.4     570.4
+iz:xaml-kucultme                    14     403.2     464.6     625.6     625.6
+iz:xaml-donusturme                  14     425.5     489.1     657.3     657.3
+iz:xaml-hakkinda                    14     429.9     493.7     662.5     662.5
+iz:xaml-kaydedici                   14     431.3     495.3     664.3     664.3
+iz:xaml-gelismis                    14     431.5     495.7     664.6     664.6
+iz:xaml-ayarlar                     14     432.5     496.8     665.8     665.8
+iz:xaml-sekmeler-bitti              14     436.2     500.9     669.5     669.5
+iz:xaml                             14     437.5     502.6     672.0     672.0
+iz:yapici-bitti                     14    1394.7    1517.8    1775.4    1775.4
+iz:pencere-kuruldu                  14    1399.7    1524.0    1780.8    1780.8
+iz:pencere-yuklendi                 14    1450.7    1582.2    1851.4    1851.4
+iz:ayarlar                          14    1453.9    1585.7    1856.9    1856.9
+iz:giris-canlandirmasi              14    1454.1    1585.9    1857.2    1857.2
+iz:sekme                            14    1454.4    1586.2    1857.6    1857.6
+iz:motor-acildi                     14    1474.9    1607.0    1879.4    1879.4
+iz:kare-kaynagi                     14    1488.9    1622.7    1897.9    1897.9
+iz:ilk-kare                         14    1489.2    1623.0    1898.3    1898.3
+
+== anlik ==
+adim                                 n     en_az   ortanca       p95    en_cok
+createprocess                       14       0.9       1.2       1.9       1.9
+kalkan-surec                        14       2.0       2.0       2.0       2.0
+iz:baslatici                        14      53.0      64.5      92.8      92.8
+iz:app-dogdu                        14      58.4      69.6      98.6      98.6
+iz:main                             14     110.1     129.8     159.3     159.3
+iz:tek-ornek                        14     111.9     131.7     162.3     162.3
+iz:libmpv-hazir                     14     120.5     142.0     174.4     174.4
+iz:cerceve                          14     281.6     315.6     398.7     398.7
+iz:ayar-okundu                      14     284.1     318.5     402.9     402.9
+iz:palet                            14     284.3     318.8     403.4     403.4
+iz:pencere-yapici                   14     308.6     340.7     437.1     437.1
+iz:xaml-sekmeler                    14     353.7     386.3     497.4     497.4
+iz:xaml-oynatici                    14     378.4     414.9     531.6     531.6
+iz:gecici-temizlik                  14     377.6     412.0     520.6     520.6
+iz:xaml-kucultme                    14     394.8     433.2     557.3     557.3
+iz:xaml-donusturme                  14     416.6     459.6     597.4     597.4
+iz:xaml-hakkinda                    14     421.5     464.9     604.3     604.3
+iz:xaml-kaydedici                   14     422.9     466.6     606.7     606.7
+iz:xaml-gelismis                    14     423.1     466.9     607.1     607.1
+iz:xaml-ayarlar                     14     423.9     467.8     608.4     608.4
+iz:xaml-sekmeler-bitti              14     427.3     471.5     612.6     612.6
+iz:xaml                             14     428.5     473.3     614.3     614.3
+iz:yapici-bitti                     14     450.5     497.1     637.1     637.1
+iz:pencere-kuruldu                  14     454.9     502.4     643.2     643.2
+iz:pencere-yuklendi                 14     516.5     562.1     723.6     723.6
+iz:ayarlar                          14     520.5     566.6     727.5     727.5
+iz:giris-canlandirmasi              14     520.7     566.8     727.8     727.8
+iz:sekme                            14     521.0     567.1     728.0     728.0
+iz:motor-acildi                     14     534.9     594.7     752.2     752.2
+iz:kare-kaynagi                     14     551.4     611.7     772.8     772.8
+iz:ilk-kare                         14     551.6     611.9     773.0     773.0
+
+== eslesik fark (anlik eksi taban, eksi deger anlik lehine) ==
+adim                               cift   ortanca     en_az    en_cok  lehine
+createprocess                        14      -0.2      -1.6       0.8   10/14
+kalkan-surec                         14       0.0       0.0       0.0    0/14
+iz:baslatici                         14       3.1     -32.7      20.8    6/14
+iz:app-dogdu                         14       1.4     -38.8      19.6    7/14
+iz:main                              14      -2.6     -58.7      17.5    8/14
+iz:tek-ornek                         14      -2.8     -59.4      17.5    8/14
+iz:libmpv-hazir                      14      -4.0     -62.1      17.1    8/14
+iz:cerceve                           14     -14.2     -86.2      20.5    9/14
+iz:ayar-okundu                       14     -13.8     -86.7      20.1    9/14
+iz:palet                             14     -13.8     -86.7      20.1    9/14
+iz:pencere-yapici                    14     -14.0     -89.2      24.9    8/14
+iz:xaml-sekmeler                     14     -15.0     -95.4      38.9    9/14
+iz:xaml-oynatici                     14     -14.6    -101.1      46.2    8/14
+iz:gecici-temizlik                   14     -11.9     -91.2      35.8    8/14
+iz:xaml-kucultme                     14     -14.1    -105.2      53.5    8/14
+iz:xaml-donusturme                   14     -13.4    -115.6      67.7    8/14
+iz:xaml-hakkinda                     14     -13.4    -119.3      70.8    8/14
+iz:xaml-kaydedici                    14     -13.5    -120.7      71.4    8/14
+iz:xaml-gelismis                     14     -13.5    -120.7      71.5    8/14
+iz:xaml-ayarlar                      14     -13.6    -122.1      72.4    8/14
+iz:xaml-sekmeler-bitti               14     -14.3    -123.5      73.8    8/14
+iz:xaml                              14     -14.1    -124.9      75.1    8/14
+iz:yapici-bitti                      14    -999.9   -1244.7    -910.8   14/14
+iz:pencere-kuruldu                   14    -999.0   -1245.5    -910.4   14/14
+iz:pencere-yuklendi                  14    -998.2   -1262.6    -903.1   14/14
+iz:ayarlar                           14    -997.5   -1262.2    -902.6   14/14
+iz:giris-canlandirmasi               14    -997.5   -1262.2    -902.5   14/14
+iz:sekme                             14    -997.6   -1262.2    -902.6   14/14
+iz:motor-acildi                      14    -993.8   -1268.5    -895.2   14/14
+iz:kare-kaynagi                      14    -992.3   -1270.5    -891.8   14/14
+iz:ilk-kare                          14    -992.4   -1270.6    -891.9   14/14

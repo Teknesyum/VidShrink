@@ -48,11 +48,18 @@ internal static class Program
             if (sira.Count == 2 && i % 2 == 0) sira.Reverse();
             foreach (var taraf in sira)
             {
-                if (Yuk(yukGunlugu) is { } yuk && (yuk.Cpu > 60 || yuk.Gpu > 60))
+                var bekleme = Stopwatch.StartNew();
+                while (Yuk(yukGunlugu) is { } yuk && (yuk.Cpu > 60 || yuk.Gpu > 60))
                 {
-                    Console.Error.WriteLine($"SISTEM YUKU YUKSEK ({yuk.Satir}), kosum baslatilmadi");
-                    return 5;
+                    if (bekleme.Elapsed > TimeSpan.FromMinutes(10))
+                    {
+                        Console.Error.WriteLine($"SISTEM YUKU 10 DAKIKADIR YUKSEK ({yuk.Satir}), olcum durduruldu");
+                        return 5;
+                    }
+                    Console.WriteLine($"yuk yuksek, bekleniyor: {yuk.Satir}");
+                    Thread.Sleep(10000);
                 }
+                var yukBaslangic = DateTime.Now;
                 if (Denetle(koruma, "once") is int hata) return hata;
 
                 var kok = taraf.Kok;
@@ -69,6 +76,13 @@ internal static class Program
                 if (Directory.Exists(kosumDizini)) Sil(kosumDizini);
                 Directory.CreateDirectory(kosumDizini);
                 var sonuc = Kosum(taraf, kok, kosumDizini, klip, sinir, ayarSablonu, kalkan, masaustu);
+                Thread.Sleep(TimeSpan.FromSeconds(yukGunlugu is null ? 0 : 13));
+                if (EnYuksekCpu(yukGunlugu, yukBaslangic) is { } tepe && tepe.Cpu > 80)
+                {
+                    Console.Error.WriteLine($"OLCUM SIRASINDA CPU 80'I GECTI ({tepe.Satir}), tekrar {i} {taraf.Etiket} atildi, olcum durduruldu");
+                    if (Denetle(koruma, "sonra") is int h) return h;
+                    return 5;
+                }
                 sonuc["tekrar"] = i;
                 sonuc["etiket"] = taraf.Etiket;
                 kosumlar.Add(sonuc);
@@ -80,11 +94,6 @@ internal static class Program
                 {
                     Console.Error.WriteLine("KALKAN KURULMADI, olcum durduruldu");
                     return 6;
-                }
-                if (Yuk(yukGunlugu) is { } sonraki && sonraki.Cpu > 80)
-                {
-                    Console.Error.WriteLine($"OLCUM SIRASINDA CPU 80'I GECTI ({sonraki.Satir}), olcum durduruldu");
-                    return 5;
                 }
 
                 if (soguk is not null) Sil(soguk);
@@ -189,11 +198,30 @@ internal static class Program
 
     private sealed record YukSatiri(int Cpu, int Gpu, string Satir);
 
+    private static YukSatiri? EnYuksekCpu(string? gunluk, DateTime baslangic)
+    {
+        if (gunluk is null || !File.Exists(gunluk)) return null;
+        YukSatiri? tepe = null;
+        foreach (var satir in Satirlar(gunluk).Reverse().Take(60))
+        {
+            if (!TimeSpan.TryParse(satir.Split(' ')[0], CultureInfo.InvariantCulture, out var saat)) continue;
+            var an = DateTime.Today + saat;
+            if (an > DateTime.Now.AddMinutes(1)) an = an.AddDays(-1);
+            if (an < baslangic.AddSeconds(-1)) break;
+            if (YukCoz(satir) is { } y && (tepe is null || y.Cpu > tepe.Cpu)) tepe = y;
+        }
+        return tepe;
+    }
+
     private static YukSatiri? Yuk(string? gunluk)
     {
         if (gunluk is null || !File.Exists(gunluk)) return null;
         var son = Satirlar(gunluk).LastOrDefault();
-        if (son is null) return null;
+        return son is null ? null : YukCoz(son);
+    }
+
+    private static YukSatiri? YukCoz(string son)
+    {
         int Deger(string ad)
         {
             var i = son.IndexOf(ad + "=", StringComparison.Ordinal);
