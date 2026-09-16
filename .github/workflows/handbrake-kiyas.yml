@@ -145,8 +145,11 @@ jobs:
       - name: ffmpeg ve HandBrake kur
         run: |
           pwsh tools/kalite-paketi-3/kur.ps1 -HandBrake
+      - name: surumler
+        run: |
           ffmpeg -hide_banner -version | Select-Object -First 1
           & $env:HANDBRAKE_CLI --version 2>&1 | Select-Object -First 3
+          exit 0
       - uses: actions/download-artifact@v4
         with:
           name: hb-kesitler
@@ -244,7 +247,7 @@ jobs:
         run: |
           $d = Join-Path $env:RUNNER_TEMP 'sonuc'
           New-Item -ItemType Directory -Force $d | Out-Null
-          Get-ChildItem "$env:RUNNER_TEMP\olcum" -Recurse -Include *.json, *.log, *.txt |
+          Get-ChildItem "$env:RUNNER_TEMP\olcum" -Recurse -Include *.json, *.log, *.txt -ErrorAction SilentlyContinue |
             ForEach-Object { Copy-Item $_.FullName (Join-Path $d (($_.FullName.Substring("$env:RUNNER_TEMP\olcum".Length + 1)) -replace '[\\/]', '__')) }
       - uses: actions/upload-artifact@v4
         if: always()
@@ -305,7 +308,7 @@ jobs:
           $k = Join-Path $env:RUNNER_TEMP 'olcum'
           $d = Join-Path $env:RUNNER_TEMP 'sonuc'
           New-Item -ItemType Directory -Force $d | Out-Null
-          Get-ChildItem $k -Recurse -Include *.json, *.log, *.txt |
+          Get-ChildItem $k -Recurse -Include *.json, *.log, *.txt -ErrorAction SilentlyContinue |
             ForEach-Object { Copy-Item $_.FullName (Join-Path $d (($_.FullName.Substring($k.Length + 1)) -replace '[\\/]', '__')) }
       - uses: actions/upload-artifact@v4
         if: always()
