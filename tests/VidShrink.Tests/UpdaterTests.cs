@@ -1324,7 +1324,7 @@ exit $code
         var knobs = script.Split('\n')
             .Where(line => line.StartsWith("$script:Remove", StringComparison.Ordinal))
             .ToArray();
-        Assert.Equal(2, knobs.Length);
+        Assert.Equal(3, knobs.Length);
 
         var routine = string.Join("\n", knobs) + "\n\n"
             + InstallerBlock(script, "function Get-InstallRootHolder") + "\n\n"
@@ -1436,6 +1436,35 @@ exit $code
         Assert.Equal(0, code);
         Assert.Contains("BITTI", log, StringComparison.Ordinal);
         Assert.Contains("yeniden denenecek", log, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(installRoot), "kurulum kökü silinmedi");
+    }
+
+    [Fact]
+    public void TheDeletionStepClosesARunningVidShrinkInsteadOfGivingUp()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var (installRoot, _, probe, logPath) = LockedInstall("silme-acik-program");
+        var holderExe = Path.Combine(installRoot, LauncherUpdate.ExecutableName);
+        File.Copy(Path.Combine(Environment.SystemDirectory, "PING.EXE"), holderExe, overwrite: true);
+        using var holder = Process.Start(new ProcessStartInfo(holderExe, "-n 120 127.0.0.1")
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        })!;
+
+        var (code, log) = RunRemovalProbe(probe, installRoot, logPath);
+        var exited = holder.WaitForExit(5000);
+        if (!exited) holder.Kill();
+
+        _output.WriteLine($"açık program: çıkış {code}");
+        _output.WriteLine(log.Trim());
+
+        Assert.Equal(0, code);
+        Assert.Contains("BITTI", log, StringComparison.Ordinal);
+        Assert.Contains("kapanmayı bekliyor", log, StringComparison.Ordinal);
+        Assert.True(exited, "kurulum köküdeki açık VidShrink kapatılmadı");
         Assert.False(Directory.Exists(installRoot), "kurulum kökü silinmedi");
     }
 

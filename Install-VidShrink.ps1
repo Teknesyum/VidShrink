@@ -19,6 +19,7 @@ $repository = 'Teknesyum/VidShrink'
 
 $script:RemoveAttempts = 6
 $script:RemoveFirstDelayMilliseconds = 200
+$script:RemoveHolderWaitSeconds = 120
 
 function Refresh-ProcessPath {
     $machine = [Environment]::GetEnvironmentVariable('Path', 'Machine')
@@ -300,7 +301,13 @@ function Write-Windows11ShellMenu([string]$Root, [string]$InstallDirectory) {
     [IO.File]::WriteAllText($manifestPath, $template.Replace('__ITEM_TYPES__', ($verbs -join [Environment]::NewLine)), [Text.UTF8Encoding]::new($false))
 
     Remove-Windows11ShellMenu $Root | Out-Null
-    Add-AppxPackage -Register $manifestPath -ExternalLocation $InstallDirectory -ErrorAction Stop
+    try {
+        Add-AppxPackage -Register $manifestPath -ExternalLocation $InstallDirectory -ErrorAction Stop
+    }
+    catch {
+        Write-Host "Windows 11 birincil sağ tık menüsü eklenemedi (imzasız paket için geliştirici modu gerekiyor); klasik menü 'Daha fazla seçenek göster' altında çalışır." -ForegroundColor Yellow
+        return $false
+    }
     return $true
 }
 
@@ -564,7 +571,23 @@ function Remove-InstallRoot([string]$Root) {
         if ($holders.Count -gt 0) { $holderRounds++ } else { $holderRounds = 0 }
         if ($holderRounds -ge 2) {
             $names = ($holders | ForEach-Object { "$($_.ProcessName) (PID $($_.Id))" }) -join ', '
-            throw "Kurulum klasörü silinemedi: VidShrink hâlâ açık - $names. Programı kapatıp komutu yeniden çalıştırın. Klasör: $Root"
+            Write-Host "VidShrink kapanmayı bekliyor ($names); virüs taraması sürüyorsa en çok $script:RemoveHolderWaitSeconds sn beklenecek..." -ForegroundColor Yellow
+            $holders | Stop-Process -Force -ErrorAction SilentlyContinue
+            $holders | Wait-Process -Timeout $script:RemoveHolderWaitSeconds -ErrorAction SilentlyContinue
+            $still = @(Get-InstallRootHolder $Root)
+            if ($still.Count -gt 0) {
+                $names = ($still | ForEach-Object { "$($_.ProcessName) (PID $($_.Id))" }) -join ', '
+                throw ("Kurulum klasörü silinemedi: VidShrink $script:RemoveHolderWaitSeconds sn sonra hâlâ açık - $names. " +
+                    "Virüs programı dosyayı tarıyorsa taramanın bitmesini bekleyip komutu yeniden çalıştırın. Klasör: $Root")
+            }
+            $holderRounds = 0
+            try {
+                Remove-Item -LiteralPath $Root -Recurse -Force -ErrorAction Stop
+                return
+            }
+            catch {
+                $lastMessage = $_.Exception.Message
+            }
         }
 
         if ($attempt -lt $script:RemoveAttempts) {

@@ -198,6 +198,65 @@ public sealed class Windows11ShellMenuTests
         Assert.True(removeRoot > unregister);
     }
 
+    [Theory]
+    [InlineData(true, "False")]
+    [InlineData(false, "True")]
+    public void Unsigned_package_refusal_falls_back_to_the_classic_menu_instead_of_stopping_the_install(bool refuse, string expected)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var installer = Read("Install-VidShrink.ps1").Replace("\r\n", "\n", StringComparison.Ordinal);
+        var start = installer.IndexOf("function Write-Windows11ShellMenu", StringComparison.Ordinal);
+        Assert.True(start >= 0);
+        var depth = 0;
+        var end = -1;
+        for (var i = installer.IndexOf('{', start); i < installer.Length; i++)
+        {
+            if (installer[i] == '{') depth++;
+            else if (installer[i] == '}' && --depth == 0) { end = i + 1; break; }
+        }
+        Assert.True(end > start);
+
+        var work = Path.Combine(TipSources.Root, ".calisma", "appx-reddi", Guid.NewGuid().ToString("N"));
+        var shell = Path.Combine(work, "shell");
+        Directory.CreateDirectory(shell);
+        File.WriteAllText(Path.Combine(shell, "AppxManifest.template.xml"), "<x>__ITEM_TYPES__</x>");
+        File.WriteAllText(Path.Combine(shell, "VidShrink.ShellExtension.dll"), "");
+        var addBody = refuse
+            ? "throw 'Deployment failed with HRESULT: 0x80073CFF'"
+            : "'kayit' | Out-Null";
+        var script = string.Join("\n",
+            "$ErrorActionPreference = 'Stop'",
+            "$shellMenuExtensions = @('mp4')",
+            "$shellCommandClsid = '00000000-0000-0000-0000-000000000000'",
+            "function Write-Host { param([Parameter(Position = 0)]$Object, [string]$ForegroundColor) }",
+            "function Test-Windows11 { $true }",
+            "function Test-DefaultRegistryRoot([string]$Root) { $true }",
+            "function Remove-Windows11ShellMenu([string]$Root) { 0 }",
+            "function Add-AppxPackage { param([string]$Register, [string]$ExternalLocation, $ErrorAction) " + addBody + " }",
+            installer[start..end],
+            $"try {{ Write-Output (Write-Windows11ShellMenu 'HKCU:\\Software\\Classes' '{work}') }} catch {{ Write-Output 'DURDU' }}");
+        var probe = Path.Combine(work, "yokla.ps1");
+        File.WriteAllText(probe, script, new System.Text.UTF8Encoding(true));
+
+        var info = new System.Diagnostics.ProcessStartInfo("powershell.exe")
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var argument in new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", probe })
+            info.ArgumentList.Add(argument);
+        using var process = System.Diagnostics.Process.Start(info)!;
+        var output = process.StandardOutput.ReadToEnd().Trim();
+        var error = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+        Directory.Delete(work, recursive: true);
+
+        Assert.True(output == expected, $"çıktı: '{output}' hata: {error}");
+    }
+
     [Fact]
     public void Modern_manifest_gets_item_types_from_the_installer_extension_array()
     {

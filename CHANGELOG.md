@@ -7,6 +7,23 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-09-16
+
+### Fixed
+
+- The Windows installer no longer stops when VidShrink is still running: it closes the program and waits up to 120 s for an antivirus scan (for example Avast CyberCapture) to release it before giving up.
+- On Windows 11 without developer mode the unsigned primary right-click package is refused; the installer now keeps the classic menu and finishes instead of failing.
+- The right-click "Open with VidShrink" entry written from Settings points at the launcher, so updates and repair run.
+- A cancelled update download removes its partial `.part` file.
+- A loaded event arriving after the render update no longer loses the first frame.
+- Source info boxes stay on one line in a narrow window; glow shadows follow a palette change without a restart.
+
+### Changed
+
+- The launcher shows its maintenance panel only for a manual update, never on an ordinary start.
+- Opening a video from the shell reaches the first frame about 992 ms sooner than before the F wave (median of 14 paired runs, 14 of 14; `docs/olcumler/acilis-hizi.md`).
+- libmpv downloads fall back to a GitHub release copy.
+
 ## [0.8.2] - 2026-09-16
 
 ### Changed
