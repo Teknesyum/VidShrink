@@ -184,6 +184,51 @@ public sealed class PaletteApplyTests
     }
 
     [Fact]
+    public void DenetimTemasiVeSablondakiParlamaPaletleCanliDegisir()
+    {
+        var satirlar = AppHost.Run(() =>
+        {
+            var baslangic = PaletteCatalog.Use(PaletteCatalog.Default);
+            var dugme = new Button { Theme = (ControlTheme)Resource("PrimaryButton")!, Content = "x" };
+            var cip = new Border { Theme = (ControlTheme)Resource("PlaybackEncodeChip")!, Width = 40, Height = 20 };
+            var window = new Window { Width = 300, Height = 200, Content = new StackPanel { Children = { dugme, cip } } };
+            window.Show();
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var kok = Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(dugme).OfType<Border>().First(b => b.Name == "Root");
+            var yerler = new (string Ad, Border Kutu, string Anahtar)[] { ("PrimaryButton/Root", kok, "GlowBlue"), ("PlaybackEncodeChip", cip, "GlowPink") };
+
+            var once = yerler.Select(y => y.Kutu.BoxShadow.ToString()).ToArray();
+            var oteki = PaletteCatalog.Names.First(name => name != baslangic
+                && PaletteDegeri(name, "GlowBlue") != Resource("GlowBlue")?.ToString()
+                && PaletteDegeri(name, "GlowPink") != Resource("GlowPink")?.ToString());
+            PaletteCatalog.Use(oteki);
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var sonra = yerler.Select(y => y.Kutu.BoxShadow.ToString()).ToArray();
+            var beklenen = yerler.Select(y => PaletteDegeri(oteki, y.Anahtar) ?? "").ToArray();
+            PaletteCatalog.Use(baslangic);
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var geri = yerler.Select(y => y.Kutu.BoxShadow.ToString()).ToArray();
+            window.Close();
+
+            return yerler.Select((y, at) => (Yer: y.Ad, Palet: oteki, Once: once[at], Sonra: sonra[at], Beklenen: beklenen[at], Geri: geri[at])).ToList();
+        });
+
+        var dokum = new StringBuilder();
+        foreach (var (yer, palet, once, sonra, beklenen, geri) in satirlar)
+            dokum.AppendLine($"{yer,-20} {palet,-10} once={once} sonra={sonra} beklenen={beklenen} geri={geri}");
+        _cikti.WriteLine(dokum.ToString());
+        Kanit(dokum.ToString(), "parlama-tema.txt");
+
+        foreach (var (_, _, once, sonra, beklenen, geri) in satirlar)
+        {
+            Assert.NotEqual("none", once);
+            Assert.NotEqual(once, sonra);
+            Assert.Equal(beklenen, sonra);
+            Assert.Equal(once, geri);
+        }
+    }
+
+    [Fact]
     public void ParlamaGolgesiStatikKaynaklaBaglanmaz()
     {
         var kaynak = Path.Combine(TipSources.Root, "src", "VidShrink.App");

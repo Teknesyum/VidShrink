@@ -23,7 +23,7 @@ if ($Libmpv) {
     $arsiv = Join-Path $env:RUNNER_TEMP 'mpv-dev.7z'
     $sha = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
     $tamam = $false
-    foreach ($u in @('https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z', 'https://github.com/Teknesyum/VidShrink/releases/download/libmpv-mirror/mpv-dev-x86_64-20260903-git-69e63f425a.7z')) {
+    foreach ($u in @('https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z', 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z')) {
         try { Indir $u $arsiv $sha; $tamam = $true; break } catch { Write-Warning $_.Exception.Message }
     }
     if (-not $tamam) { throw 'libmpv indirilemedi' }
