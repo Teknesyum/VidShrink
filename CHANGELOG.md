@@ -7,6 +7,14 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-16
+
+### Added
+
+- Two-step updates: the title-bar badge turns yellow when a version is available (Download) and green once it is staged (Install). Installing is a separate click.
+- The download runs on one lowest-priority thread in 64 KB reads, one file at a time, capped at 4 MiB/s while the player is playing; the launcher reuses the staged files.
+- The update panel shows the app icon, a palette-coloured character rain behind the log lines, and a quick first stretch of the progress bar before the ceiling rule takes over.
+
 ## [0.7.3] - 2026-09-16
 
 ### Fixed
