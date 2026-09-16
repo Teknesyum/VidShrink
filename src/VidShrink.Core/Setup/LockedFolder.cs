@@ -11,7 +11,7 @@ public static class LockedFolder
 
     public static readonly TimeSpan HolderWait = TimeSpan.FromSeconds(120);
 
-    public static readonly string[] HolderProcessNames = { "VidShrink.App", "VidShrink" };
+    private static readonly string[] HolderProcessNames = { "VidShrink.App", "VidShrink" };
 
     public static bool Holds(string? processPath, string root) =>
         !string.IsNullOrEmpty(processPath) && processPath.StartsWith(root, StringComparison.OrdinalIgnoreCase);

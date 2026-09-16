@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -403,10 +403,8 @@ public sealed class OluUyeTests
     /// </summary>
     private static readonly PinnedFinding[] Pinned =
     {
-        new("ArchitectureOutcome.Assumed", "hic-okunmayan-tur", Debt,
-            "Iki uyeli turun hicbir uyesi uretimde okunmuyor: ArchitectureDecision.Outcome yaziliyor, kimse sormuyor. Turun docstring'i (UpdateCheck.cs:34) 'Kullaniciya ne soylenecegini bu ayiriyor' diyor; ayiran kol yok."),
-        new("ArchitectureOutcome.Read", "hic-okunmayan-tur", Debt,
-            "Ayni turun oteki uyesi, ayni bulgu. Turun tamami okunmadigi icin bu bir 'olumsuz kol' degil; docstring ile kod arasindaki fark olculmedi."),
+        new("ArchitectureOutcome.Assumed", "varsayilan-kol", Debt,
+            "Iki uyeli turun olumsuz kolu. VidShrink-Setup.exe motoru (SetupRunner.RuntimeIdentifier) Read kolunu soruyor; Assumed o kosulun else'i ve kullaniciya varsayim mesajini orada yaziyor. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; Read satirinin pimde isi kalmadi."),
         new("ComparisonSourceState.Duraklatildi", "varsayilan-kol", Debt,
             "Karsilastirma kaynaginin duraklatilmis durumu uretiliyor, hicbir kol duraklatilmisi ayirmiyor. Ayirmanin gerekip gerekmedigi olculmedi."),
         new("ConversionQualityMode.Bitrate", "varsayilan-kol", Legitimate,
