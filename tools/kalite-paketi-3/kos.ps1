@@ -1,10 +1,13 @@
 param(
-    [Parameter(Mandatory)][ValidateSet('kesit', 'whatsapp', 'handbrake', 'ceza')][string]$Is,
+    [Parameter(Mandatory)][ValidateSet('kesit', 'whatsapp', 'handbrake', 'ceza', 'av1')][string]$Is,
     [Parameter(Mandatory)][string]$Kaynak,
     [Parameter(Mandatory)][string]$Cikti,
     [Parameter(Mandatory)][string]$Bench,
     [string]$HandBrake = '',
-    [string]$Kesit = ''
+    [string]$Kesit = '',
+    [string]$EkranKaynak = '',
+    [string]$Kbitler = '600,2000',
+    [string]$Izgara = '{"preset":[4,6,8,10],"crf":[28,36,44],"kbit":[],"filmgrain":[0,8],"tune":[0,1],"keyint":[240]}'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -63,9 +66,11 @@ function Kesitler {
     Ffmpeg @('-i', $Kaynak, '-an', '-sn', '-vf', "fps=1,scale=160:-2,signalstats,metadata=print:file='$logFfmpeg'", '-f', 'null', '-')
     $degerler = @()
     $yayilim = @()
+    $hareket = @()
     $low = 0
     foreach ($l in Get-Content $log) {
         if ($l -match 'signalstats\.YAVG=([\d.]+)') { $degerler += [double]::Parse($Matches[1], $Inv) }
+        elseif ($l -match 'signalstats\.YDIF=([\d.]+)') { $hareket += [double]::Parse($Matches[1], $Inv) }
         elseif ($l -match 'signalstats\.YLOW=([\d.]+)') { $low = [double]::Parse($Matches[1], $Inv) }
         elseif ($l -match 'signalstats\.YHIGH=([\d.]+)') { $yayilim += [double]::Parse($Matches[1], $Inv) - $low }
     }
@@ -77,16 +82,22 @@ function Kesitler {
         $dilim = $degerler[$t..($t + $pencere - 1)]
         $ort = ($dilim | Measure-Object -Average).Average
         $yay = ($yayilim[$t..($t + $pencere - 1)] | Measure-Object -Minimum).Minimum
-        $adaylar += [pscustomobject]@{ Baslangic = $t; YavgOrt = [math]::Round($ort, 2); YayilimMin = [math]::Round($yay, 2) }
+        $hrk = ($hareket[$t..($t + $pencere - 1)] | Measure-Object -Average).Average
+        $adaylar += [pscustomobject]@{ Baslangic = $t; YavgOrt = [math]::Round($ort, 2); YayilimMin = [math]::Round($yay, 2); YdifOrt = [math]::Round($hrk, 2) }
     }
     $karanlik = $adaylar | Where-Object { $_.YayilimMin -ge 20 } | Sort-Object YavgOrt | Select-Object -First 1
     $parlak = $adaylar | Sort-Object YavgOrt -Descending | Select-Object -First 1
     $ortaT = [math]::Floor(($bas + $son) / 2 / 5) * 5
     $orta = $adaylar | Sort-Object { [math]::Abs($_.Baslangic - $ortaT) } | Select-Object -First 1
-    $secim = [ordered]@{ karanlik = $karanlik; parlak = $parlak; orta = $orta }
+    $hareketli = $adaylar | Where-Object { $_.Baslangic -notin @($karanlik.Baslangic, $parlak.Baslangic, $orta.Baslangic) } | Sort-Object YdifOrt -Descending | Select-Object -First 1
+    $secim = [ordered]@{ karanlik = $karanlik; parlak = $parlak; orta = $orta; hareketli = $hareketli }
     foreach ($ad in $secim.Keys) {
         $hedef = Join-Path $Cikti "kesit-$ad.mkv"
         Ffmpeg @('-ss', $secim[$ad].Baslangic.ToString($Inv), '-i', $Kaynak, '-t', '10', '-an', '-sn', '-map', '0:v:0', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', $hedef)
+    }
+    if ($EkranKaynak) {
+        Ffmpeg @('-ss', '5', '-i', $EkranKaynak, '-t', '10', '-an', '-sn', '-map', '0:v:0', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', (Join-Path $Cikti 'kesit-ekran.mkv'))
+        $secim['ekran'] = [pscustomobject]@{ Kaynak = (Split-Path $EkranKaynak -Leaf); Baslangic = 5 }
     }
     [pscustomobject]@{ Kaynak = (Split-Path $Kaynak -Leaf); Genislik = $bilgi.W; Yukseklik = $bilgi.H; Fps = $bilgi.FpsMetin; Sure = $bilgi.Sure; Secim = $secim; Adaylar = $adaylar } |
         ConvertTo-Json -Depth 5 | Set-Content (Join-Path $Cikti 'kesitler.json')
@@ -139,7 +150,7 @@ function HandBrakeKiyas {
     foreach ($ad in $adlar) {
         $girdi = Join-Path $Cikti "kesit-$ad.mkv"
         $b = Probe $girdi
-        foreach ($kbit in @(600, 2000)) {
+        foreach ($kbit in @($Kbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
             $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
             $mbMetin = $mb.ToString($Inv)
             $kollar = [ordered]@{
@@ -195,7 +206,43 @@ function Ceza {
     $satirlar | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $Cikti "ceza-$Kesit.json")
 }
 
+function Av1 {
+    if (-not $Kesit) { throw 'AV1 izgarasi icin -Kesit gerekli.' }
+    $g = $Izgara | ConvertFrom-Json
+    $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"
+    $b = Probe $girdi
+    $kontroller = @($g.crf | ForEach-Object { [pscustomobject]@{ Tur = 'crf'; Deger = [int]$_ } }) + @($g.kbit | ForEach-Object { [pscustomobject]@{ Tur = 'kbit'; Deger = [int]$_ } })
+    $satirlar = @()
+    foreach ($preset in $g.preset) {
+        foreach ($k in $kontroller) {
+            foreach ($grain in $g.filmgrain) {
+                foreach ($tune in $g.tune) {
+                    foreach ($keyint in $g.keyint) {
+                        $etiket = "p$preset-$($k.Tur)$($k.Deger)-fg$grain-t$tune-k$keyint"
+                        $cikis = Join-Path $Cikti "av1-$Kesit-$etiket.mkv"
+                        $ortak = @('-i', $girdi, '-an', '-c:v', 'libsvtav1', '-preset', "$preset", '-g', "$keyint", '-pix_fmt', 'yuv420p10le', '-svtav1-params', "tune=${tune}:film-grain=${grain}")
+                        $sure = [Diagnostics.Stopwatch]::StartNew()
+                        if ($k.Tur -eq 'crf') {
+                            Ffmpeg ($ortak + @('-crf', "$($k.Deger)", $cikis))
+                        } else {
+                            $pass = [IO.Path]::ChangeExtension($cikis, '.pass')
+                            Ffmpeg ($ortak + @('-b:v', "$($k.Deger)k", '-pass', '1', '-passlogfile', $pass, '-f', 'null', 'NUL'))
+                            Ffmpeg ($ortak + @('-b:v', "$($k.Deger)k", '-pass', '2', '-passlogfile', $pass, $cikis))
+                        }
+                        $sure.Stop()
+                        $o = Olc $girdi $cikis ([IO.Path]::ChangeExtension($cikis, '.json')) $b.FpsMetin
+                        $satirlar += Satir $Kesit $etiket $(if ($k.Tur -eq 'kbit') { $k.Deger } else { $null }) $cikis $o @{ preset = $preset; kontrol = $k.Tur; deger = $k.Deger; filmgrain = $grain; tune = $tune; keyint = $keyint; kodlama_sn = [math]::Round($sure.Elapsed.TotalSeconds, 1) }
+                        Remove-Item $cikis -ErrorAction SilentlyContinue
+                    }
+                }
+            }
+        }
+    }
+    $satirlar | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $Cikti "av1-$Kesit.json")
+}
+
 switch ($Is) {
+    'av1' { Av1 }
     'kesit' { Kesitler }
     'whatsapp' { WhatsApp }
     'handbrake' { HandBrakeKiyas }

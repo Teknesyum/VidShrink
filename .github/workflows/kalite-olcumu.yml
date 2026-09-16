@@ -11,9 +11,21 @@ on:
       kaynak_sha256:
         description: Bos birakilirsa yazdirilir, doluysa dogrulanir
         default: ''
+      ekran_url:
+        description: Ekran kaydi kaynagi; bos ise ekran kesiti yok
+        default: ''
       isler:
-        description: Virgullu; whatsapp,handbrake,ceza
+        description: Virgullu; whatsapp,handbrake,ceza,av1
         default: whatsapp,handbrake,ceza
+      kesitler:
+        description: Virgullu; karanlik,parlak,orta,hareketli,ekran
+        default: karanlik,parlak,orta
+      kbitler:
+        description: HandBrake kiyasinin bit hizlari
+        default: '600,2000'
+      izgara:
+        description: AV1 izgarasi JSON
+        default: '{"preset":[4,6,8,10],"crf":[28,36,44],"kbit":[],"filmgrain":[0,8],"tune":[0,1],"keyint":[240]}'
 
 env:
   DOTNET_NOLOGO: 'true'
@@ -21,6 +33,25 @@ env:
   BENCH: tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll
 
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matris: ${{ steps.m.outputs.matris }}
+    steps:
+      - id: m
+        shell: pwsh
+        run: |
+          $isler = '${{ inputs.isler || 'whatsapp,handbrake,ceza' }}'.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+          $kesitler = '${{ inputs.kesitler || 'karanlik,parlak,orta' }}'.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+          $liste = @()
+          foreach ($is in $isler) {
+            if ($is -eq 'whatsapp') { $liste += @{ is = $is; kesit = '' } }
+            else { foreach ($k in $kesitler) { $liste += @{ is = $is; kesit = $k } } }
+          }
+          $json = ConvertTo-Json -Compress -InputObject @{ include = $liste }
+          Write-Host $json
+          "matris=$json" | Add-Content $env:GITHUB_OUTPUT
+
   kesit:
     runs-on: windows-latest
     timeout-minutes: 60
@@ -41,11 +72,19 @@ jobs:
           "kaynak sha256=$sha boy=$((Get-Item $hedef).Length)" | Tee-Object -FilePath (Join-Path $env:RUNNER_TEMP 'kaynak-sha256.txt')
           $beklenen = '${{ inputs.kaynak_sha256 }}'
           if ($beklenen -and $beklenen.ToUpperInvariant() -ne $sha) { throw "kaynak sha256 uyusmuyor: $sha" }
+          $ekran = '${{ inputs.ekran_url }}'
+          if ($ekran) {
+            $e = Join-Path $env:RUNNER_TEMP 'ekran.mkv'
+            Invoke-WebRequest -Uri $ekran -OutFile $e
+            "ekran sha256=$((Get-FileHash $e -Algorithm SHA256).Hash)" | Tee-Object -Append -FilePath (Join-Path $env:RUNNER_TEMP 'kaynak-sha256.txt')
+          }
       - name: bench derle
         run: dotnet build tools/VidShrink.Bench -c Release -m:2
       - name: kesitleri sec
         run: |
-          pwsh tools/kalite-paketi-3/kos.ps1 -Is kesit -Kaynak "$env:RUNNER_TEMP\kaynak.mkv" -Cikti "$env:RUNNER_TEMP\olcum" -Bench $env:BENCH
+          $a = @('-Is', 'kesit', '-Kaynak', "$env:RUNNER_TEMP\kaynak.mkv", '-Cikti', "$env:RUNNER_TEMP\olcum", '-Bench', $env:BENCH)
+          if (Test-Path "$env:RUNNER_TEMP\ekran.mkv") { $a += @('-EkranKaynak', "$env:RUNNER_TEMP\ekran.mkv") }
+          pwsh tools/kalite-paketi-3/kos.ps1 @a
           Copy-Item "$env:RUNNER_TEMP\kaynak-sha256.txt" "$env:RUNNER_TEMP\olcum\"
       - uses: actions/upload-artifact@v4
         with:
@@ -55,58 +94,42 @@ jobs:
           retention-days: 7
 
   olcum:
-    needs: kesit
+    needs: [plan, kesit]
     runs-on: windows-latest
-    timeout-minutes: 300
+    timeout-minutes: 340
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - { is: whatsapp, kesit: '' }
-          - { is: handbrake, kesit: karanlik }
-          - { is: handbrake, kesit: parlak }
-          - { is: handbrake, kesit: orta }
-          - { is: ceza, kesit: karanlik }
-          - { is: ceza, kesit: parlak }
-          - { is: ceza, kesit: orta }
+      matrix: ${{ fromJSON(needs.plan.outputs.matris) }}
     steps:
-      - name: is secili mi
-        id: sec
-        run: |
-          $secili = '${{ inputs.isler || 'whatsapp,handbrake,ceza' }}'.Split(',') | ForEach-Object { $_.Trim() }
-          "calis=$($secili -contains '${{ matrix.is }}')" | Add-Content $env:GITHUB_OUTPUT
       - uses: actions/checkout@v4
-        if: steps.sec.outputs.calis == 'True'
       - uses: actions/setup-dotnet@v4
-        if: steps.sec.outputs.calis == 'True'
         with:
           dotnet-version: '8.0.x'
       - name: ffmpeg ve HandBrake kur
-        if: steps.sec.outputs.calis == 'True'
         run: pwsh tools/kalite-paketi-3/kur.ps1 -HandBrake
       - uses: actions/download-artifact@v4
-        if: steps.sec.outputs.calis == 'True'
         with:
           name: kesitler
           path: ${{ runner.temp }}/olcum
       - name: bench derle
-        if: steps.sec.outputs.calis == 'True'
         run: dotnet build tools/VidShrink.Bench -c Release -m:2
       - name: olc
-        if: steps.sec.outputs.calis == 'True'
+        env:
+          IZGARA: ${{ inputs.izgara || '{"preset":[4,6,8,10],"crf":[28,36,44],"kbit":[],"filmgrain":[0,8],"tune":[0,1],"keyint":[240]}' }}
+          KBITLER: ${{ inputs.kbitler || '600,2000' }}
         run: |
-          $a = @('-Is', '${{ matrix.is }}', '-Kaynak', 'kesitler', '-Cikti', "$env:RUNNER_TEMP\olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI)
+          $a = @('-Is', '${{ matrix.is }}', '-Kaynak', 'kesitler', '-Cikti', "$env:RUNNER_TEMP\olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI, '-Kbitler', $env:KBITLER, '-Izgara', $env:IZGARA)
           if ('${{ matrix.kesit }}') { $a += @('-Kesit', '${{ matrix.kesit }}') }
           pwsh tools/kalite-paketi-3/kos.ps1 @a
       - name: sonuclari ayir
-        if: always() && steps.sec.outputs.calis == 'True'
+        if: always()
         run: |
           $d = Join-Path $env:RUNNER_TEMP 'sonuc'
           New-Item -ItemType Directory -Force $d | Out-Null
-          Get-ChildItem "$env:RUNNER_TEMP\olcum" -Recurse -Include *.json, *.log, *.txt | Where-Object { $_.Name -ne 'kesitler.json' -or '${{ matrix.is }}' -eq 'whatsapp' } |
+          Get-ChildItem "$env:RUNNER_TEMP\olcum" -Recurse -Include *.json, *.log, *.txt |
             ForEach-Object { Copy-Item $_.FullName (Join-Path $d (($_.FullName.Substring("$env:RUNNER_TEMP\olcum".Length + 1)) -replace '[\\/]', '__')) }
       - uses: actions/upload-artifact@v4
-        if: always() && steps.sec.outputs.calis == 'True'
+        if: always()
         with:
           name: sonuc-${{ matrix.is }}-${{ matrix.kesit || 'hepsi' }}
           path: ${{ runner.temp }}/sonuc
