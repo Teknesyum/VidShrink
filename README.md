@@ -123,6 +123,27 @@ SHA-256 digests on Windows and prints your package manager's command elsewhere. 
 verification, the right-click entry, the self-update flow and the uninstall switches are
 all in [`docs/kurulum.md`](docs/kurulum.md).
 
+## Command Line
+
+The same package carries a headless CLI beside the app: `vidshrink` on Windows and Linux,
+`vidshrink-cli` on macOS. It calls the same decision engine as the window, so the same
+input gives the same ffmpeg arguments; a test holds the two against each other.
+
+```bash
+vidshrink kucult clip.mp4 --hedef 25MB              # shrink to a size
+vidshrink kucult clip.mp4 --kalite 80 --kodek av1   # shrink to a quality score
+vidshrink plan clip.mp4 --hedef 8MB --json          # plan and arguments only, no encode
+```
+
+Options: `--kodek auto|h264|hevc|av1`, `--cikti <path>`, `--json`, `--olcumsuz` (skip the
+probe encodes), `--vmaf` (measure the result when ffmpeg has libvmaf), `--hizli`. Progress
+goes to stderr; size, duration, attempts and VMAF go to stdout. Help follows the system
+language, Turkish or English.
+
+Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
+size ceiling exceeded, `1` error, `64` wrong usage, `130` cancelled. A watch-folder command
+(`izle`) is planned, not shipped.
+
 ## The Numbers
 
 Nothing here is a lookup table. Every step that says *measure* runs ffmpeg against your
