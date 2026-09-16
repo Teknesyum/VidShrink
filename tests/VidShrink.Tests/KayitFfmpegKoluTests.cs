@@ -359,6 +359,99 @@ public sealed class KayitFfmpegKoluTests
             Assert.Empty(RecorderArguments.Validate(Istek() with { PixelFormat = deger }, @"C:\kayit\a.mp4")));
     }
 
+    [Theory]
+    [InlineData("nv12")]
+    [InlineData("p010le")]
+    [InlineData("rgb24")]
+    [InlineData("bgr0")]
+    [InlineData("gbrp")]
+    public void SessizceCevrilenBicimlerKumeyeGirmez(string bicim)
+    {
+        var hatalar = RecorderArguments.Validate(Istek() with { PixelFormat = bicim }, @"C:\kayit\a.mp4");
+
+        Assert.Contains(hatalar, satir => satir.Contains(bicim));
+        Assert.DoesNotContain(bicim, RecorderArguments.PixelFormats);
+    }
+
+    [Theory]
+    [InlineData("nv12", "yuv420p")]
+    [InlineData("P010LE", "yuv420p10le")]
+    [InlineData("yuv444p", "yuv444p")]
+    [InlineData("rgb24", RecorderArguments.DefaultPixelFormat)]
+    [InlineData("yuv999p", RecorderArguments.DefaultPixelFormat)]
+    public void EskiAyardakiBicimKumeyeDoner(string eski, string beklenen)
+        => Assert.Equal(beklenen, RecorderArguments.StoredPixelFormat(eski));
+
+    [Fact]
+    public void KodlayicininAlmadigiBicimReddedilir()
+    {
+        var av1 = RecorderArguments.Validate(Istek() with { VideoCodec = "libsvtav1", PixelFormat = "yuv444p" }, @"C:\kayit\a.mp4");
+        var qsv = RecorderArguments.Validate(Istek() with { VideoCodec = "h264_qsv", PixelFormat = "yuv420p10le" }, @"C:\kayit\a.mp4");
+        var x264 = RecorderArguments.Validate(Istek() with { VideoCodec = "libx264", PixelFormat = "yuv444p" }, @"C:\kayit\a.mp4");
+
+        Assert.Contains(av1, satir => satir.Contains("libsvtav1") && satir.Contains("yuv444p"));
+        Assert.Contains(qsv, satir => satir.Contains("h264_qsv") && satir.Contains("yuv420p10le"));
+        Assert.DoesNotContain(x264, satir => satir.Contains("pixel format"));
+    }
+
+    [Theory]
+    [InlineData("h264_qsv", "yuv420p", "nv12")]
+    [InlineData("hevc_qsv", "yuv420p10le", "p010le")]
+    [InlineData("hevc_nvenc", "yuv420p10le", "p010le")]
+    [InlineData("hevc_amf", "yuv420p10le", "p010le")]
+    [InlineData("hevc_nvenc", "yuv420p", "yuv420p")]
+    [InlineData("libx264", "yuv420p10le", "yuv420p10le")]
+    [InlineData("libsvtav1", "yuv420p10le", "yuv420p10le")]
+    public void PaketliAdYalnizDuzlemselAdAlinmayincaYazilir(string kodlayici, string bicim, string yazilan)
+    {
+        var args = RecorderArguments.Build(Istek() with { VideoCodec = kodlayici, PixelFormat = bicim }, @"C:\kayit\a.mp4");
+
+        Assert.Equal(yazilan, Deger(args, "-pix_fmt"));
+    }
+
+    [Fact]
+    public void HerKodlayicininBicimleriFfmpeginBildirdigiKumede()
+    {
+        var kodlayicilar = new[]
+        {
+            "libx264", "libx265", "libsvtav1", "libvpx-vp9", "h264_nvenc", "hevc_nvenc", "av1_nvenc",
+            "h264_qsv", "hevc_qsv", "h264_amf", "hevc_amf"
+        };
+
+        foreach (var kodlayici in kodlayicilar)
+        {
+            var kume = RecorderArguments.PixelFormatsFor(kodlayici);
+            Assert.NotEmpty(kume);
+            var bildirilen = FfmpegBicimleri(kodlayici);
+            Assert.All(kume, bicim =>
+                Assert.Contains(RecorderArguments.PixelFormatArgument(kodlayici, bicim), bildirilen));
+        }
+
+        Assert.Empty(RecorderArguments.PixelFormatsFor("uydurma264"));
+    }
+
+    private static string[] FfmpegBicimleri(string kodlayici)
+    {
+        using var process = new System.Diagnostics.Process
+        {
+            StartInfo = new System.Diagnostics.ProcessStartInfo("ffmpeg", $"-hide_banner -h encoder={kodlayici}")
+            {
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+        process.Start();
+        var stderr = process.StandardError.ReadToEndAsync();
+        var stdout = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+        var satir = (stdout + "\n" + stderr.Result).Split('\n')
+            .FirstOrDefault(s => s.TrimStart().StartsWith("Supported pixel formats:", StringComparison.Ordinal));
+        Assert.True(satir is not null, $"{kodlayici} icin ffmpeg piksel bicimi bildirmedi.");
+        return satir!.Split(':', 2)[1].Split(new[] { ' ', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+    }
+
     // 6 — sure siniri ve bolme
 
     [Fact]

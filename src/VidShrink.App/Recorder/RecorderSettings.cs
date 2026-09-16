@@ -215,7 +215,7 @@ internal sealed class RecorderSettings
             settings.BitrateKbps = (int?)root["bitrateKbps"] ?? 0;
             settings.MaxBitrateKbps = (int?)root["maxBitrateKbps"] ?? 0;
             settings.BufferKbits = (int?)root["bufferKbits"] ?? 0;
-            if ((string?)root["pixelFormat"] is { Length: > 0 } pixelFormat) settings.PixelFormat = pixelFormat;
+            if ((string?)root["pixelFormat"] is { Length: > 0 } pixelFormat) settings.PixelFormat = RecorderArguments.StoredPixelFormat(pixelFormat);
             settings.ColorSpace = (string?)root["colorSpace"];
             settings.ColorRange = (string?)root["colorRange"];
             settings.MaxDurationSeconds = (double?)root["maxDurationSeconds"] ?? 0;

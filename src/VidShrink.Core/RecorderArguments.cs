@@ -281,13 +281,28 @@ public static class RecorderArguments
     /// Kabul edilen piksel bicimleri. Kapali kume: uydurma bir bicim ffmpeg'e hic
     /// gitmiyor, cunku SVT-AV1'de olculdugu gibi tanimadigi anahtari sessizce yutan bir
     /// kodlayici "kabul" donduruyor ve hata ancak ciktida goruluyor.
+    /// <para>
+    /// Kumede yalniz bit akisina ayni adla giren duzlemsel YUV bicimleri var. Eski kumedeki
+    /// <c>nv12</c>, <c>p010le</c>, <c>rgb24</c>, <c>bgr0</c> ve <c>gbrp</c> cikarildi:
+    /// libx264 onlari uyari vermeden <c>yuv420p</c>/<c>yuv444p</c>/<c>yuv420p10le</c>'ye
+    /// ceviriyordu, yani secilen ad ciktida durmuyordu. Paketli ad (<c>nv12</c>,
+    /// <c>p010le</c>) yalniz kodlayici duzlemsel adi hic almiyorsa motorca yaziliyor, bkz.
+    /// <see cref="PixelFormatArgument"/>.
+    /// </para>
     /// </summary>
     private static readonly string[] KnownPixelFormats =
     {
         "yuv420p", "yuv422p", "yuv444p",
-        "yuv420p10le", "yuv422p10le", "yuv444p10le",
-        "nv12", "p010le", "rgb24", "bgr0", "gbrp"
+        "yuv420p10le", "yuv422p10le", "yuv444p10le"
     };
+
+    private static readonly string[] AllPlanarFormats = KnownPixelFormats;
+
+    private static readonly string[] EightAndTenBit420 = { "yuv420p", "yuv420p10le" };
+
+    private static readonly string[] Only420 = { "yuv420p" };
+
+    private static readonly string[] NvencFormats = { "yuv420p", "yuv444p", "yuv420p10le" };
 
     private static readonly string[] KnownColorSpaces =
     {
@@ -371,8 +386,56 @@ public static class RecorderArguments
         _ => Array.Empty<string>()
     };
 
-    /// <summary>Kabul edilen piksel bicimleri.</summary>
+    /// <summary>Kabul edilen piksel bicimlerinin birlesimi; tek bir kodegin kumesi <see cref="PixelFormatsFor"/>.</summary>
     public static IReadOnlyList<string> PixelFormats => KnownPixelFormats;
+
+    /// <summary>
+    /// Kodegin kabul ettigi piksel bicimleri. Kaynak ffmpeg 9.0'in
+    /// <c>ffmpeg -h encoder=&lt;ad&gt;</c> ciktisindaki "Supported pixel formats" satiri,
+    /// <see cref="KnownPixelFormats"/> ile kesistirilmis; paketli ad (<c>nv12</c>,
+    /// <c>p010le</c>) ayni ornekleme ve bit derinligindeki duzlemsel adin yerine sayiliyor.
+    /// Ham satirlar <c>docs/olcumler/kaydedici-piksel-bicimleri.md</c>. Donanim kollarinin
+    /// kumesi ffmpeg'in bildirdigi kume; kartin gercekten kodlayabildigi olculmedi.
+    /// </summary>
+    public static IReadOnlyList<string> PixelFormatsFor(string codec) => (codec ?? string.Empty).ToLowerInvariant() switch
+    {
+        "libx264" or "libx265" or "libvpx-vp9" => AllPlanarFormats,
+        "libsvtav1" => EightAndTenBit420,
+        "h264_nvenc" or "hevc_nvenc" or "av1_nvenc" => NvencFormats,
+        "h264_qsv" => Only420,
+        "hevc_qsv" or "h264_amf" or "hevc_amf" => EightAndTenBit420,
+        _ => Array.Empty<string>()
+    };
+
+    /// <summary>
+    /// Eski ayar dosyasindaki piksel bicimi. Daraltmadan once yazilmis <c>nv12</c> ve
+    /// <c>p010le</c> ayni ornekleme ve derinlikteki duzlemsel ada, kumeden cikan ya da
+    /// uydurma ad varsayilana donuyor.
+    /// </summary>
+    public static string StoredPixelFormat(string? stored)
+    {
+        var f = (stored ?? string.Empty).Trim().ToLowerInvariant();
+        if (f == "nv12") return "yuv420p";
+        if (f == "p010le") return "yuv420p10le";
+        return KnownPixelFormats.Contains(f, StringComparer.Ordinal) ? f : DefaultPixelFormat;
+    }
+
+    /// <summary>
+    /// <c>-pix_fmt</c>'e yazilan ad. Kodlayici duzlemsel adi bildirmiyorsa ayni ornekleme ve
+    /// derinlikteki paketli ad yaziliyor; boylece ffmpeg arada sessiz bir donusum kurmuyor.
+    /// Quick Sync <c>yuv420p</c>'yi de, <c>yuv420p10le</c>'yi de bildirmiyor; NVENC ve AMF
+    /// <c>yuv420p</c>'yi bildiriyor ama 10 bit icin yalniz <c>p010le</c>'yi.
+    /// </summary>
+    public static string PixelFormatArgument(string codec, string pixelFormat)
+    {
+        var c = (codec ?? string.Empty).ToLowerInvariant();
+        var f = (pixelFormat ?? string.Empty).ToLowerInvariant();
+        var qsv = c is "h264_qsv" or "hevc_qsv";
+        var packed10 = qsv || c is "h264_nvenc" or "hevc_nvenc" or "av1_nvenc" or "h264_amf" or "hevc_amf";
+        if (qsv && f == "yuv420p") return "nv12";
+        if (packed10 && f == "yuv420p10le") return "p010le";
+        return pixelFormat ?? string.Empty;
+    }
 
     /// <summary>Kabul edilen renk uzaylari.</summary>
     public static IReadOnlyList<string> ColorSpaces => KnownColorSpaces;
@@ -525,6 +588,8 @@ public static class RecorderArguments
             yield return "Pixel format is required.";
         else if (!KnownPixelFormats.Contains(request.PixelFormat, StringComparer.OrdinalIgnoreCase))
             yield return $"The {request.PixelFormat} pixel format is not one of the recorder's pixel formats.";
+        else if (!PixelFormatsFor(request.VideoCodec).Contains(request.PixelFormat, StringComparer.OrdinalIgnoreCase))
+            yield return $"The {request.VideoCodec} encoder does not take the {request.PixelFormat} pixel format ({string.Join(", ", PixelFormatsFor(request.VideoCodec))}).";
 
         if (!string.IsNullOrWhiteSpace(request.ColorSpace)
             && !KnownColorSpaces.Contains(request.ColorSpace, StringComparer.OrdinalIgnoreCase))
@@ -668,7 +733,7 @@ public static class RecorderArguments
 
     private static IReadOnlyList<string> ColourArgs(RecorderRequest request)
     {
-        var a = new List<string> { "-pix_fmt", request.PixelFormat };
+        var a = new List<string> { "-pix_fmt", PixelFormatArgument(request.VideoCodec, request.PixelFormat) };
         if (!string.IsNullOrWhiteSpace(request.ColorSpace)) a.AddRange(new[] { "-colorspace", request.ColorSpace! });
         if (!string.IsNullOrWhiteSpace(request.ColorRange)) a.AddRange(new[] { "-color_range", request.ColorRange! });
         return a;

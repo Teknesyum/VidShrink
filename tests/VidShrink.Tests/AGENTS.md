@@ -39,7 +39,9 @@ sürümden (`x.0.0`) önce koşar.
   `-t` ve bölme ölçütünün argümana girmemesi, ayrı ses izleri (`-c:a:N`), ses filtreleri (karışımdan önce girdi
   başına), tek kare `BuildSnapshot`, çoklu monitörün ofsetli bölgeye çevrilmesi. Her kolun negatif kontrolü var;
   44 ölçünün 24'ü üretilen argüman dizisini okur, 20'si doğrulama hata listesini ya da
-  kapalı küme dönüşlerini. Süreç çalıştırmaz, kanıt dosyası bırakmaz.
+  kapalı küme dönüşlerini. Piksel biçimi kodlayıcı başına küme (`PixelFormatsFor`): libx264'ün sessizce çevirdiği beş
+  ad reddedilir, Quick Sync/NVENC/AMF'de paketli ad yazılır. Tek süreç `ffmpeg -h encoder=<ad>` (11 kısa çağrı), kümenin
+  ffmpeg'in bildirdiği biçimlerde olduğunu okur. Kanıt dosyası bırakmaz; tablo `docs/olcumler/kaydedici-piksel-bicimleri.md`.
 - `KayitOtomatikKipTests.cs` — 9d kolu, kaydedicinin otomatik kipi: aday merdiveni (`RecorderAutoPlan`) ve kazanma
   kuralı (`RecorderAutoProbe`). Kodlayıcı yeğlemesi nvenc/qsv/amf, donanım yokken x264, yeğlenmeyen ve uydurma adın
   negatif kontrolü, kare hızı merdiveni (75 Hz → 60), yarı boyutun çift olması, **her adayın
