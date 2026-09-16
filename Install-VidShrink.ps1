@@ -187,8 +187,8 @@ function Assert-Checksum([hashtable]$Table, [string]$Name, [string]$Path) {
     }
 }
 
-$libMpvUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
-$libMpvMirrorUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/libmpv-mirror/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+$libMpvUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+$libMpvFallbackUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
 $libMpvArchiveSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
 $libMpvDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
 $libMpvFileName = 'libmpv-2.dll'
@@ -213,7 +213,7 @@ function Install-LibMpv([string]$WorkRoot, [string]$Destination, [string]$Existi
     $ProgressPreference = 'SilentlyContinue'
     $actual = $null
     $failures = @()
-    foreach ($source in @($libMpvUrl, $libMpvMirrorUrl)) {
+    foreach ($source in @($libMpvUrl, $libMpvFallbackUrl)) {
         try {
             Invoke-WebRequest -UseBasicParsing -Uri $source -OutFile $archive
         }
