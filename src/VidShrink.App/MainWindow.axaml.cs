@@ -1804,6 +1804,8 @@ public partial class MainWindow : Window
         BtnShareDelete.IsEnabled = false;
     }
 
+    internal void ResetShareForTest(bool fileReady) => ResetShare(fileReady);
+
     private void SetSharing(bool sharing)
     {
         BtnShare.IsEnabled = !sharing;
