@@ -29,10 +29,16 @@ oldurulen sey de baslatici degil olcum klasorunden kosan uygulamadir. Kullanicin
 VidShrink'i ayni adi tasiyor; oldurmeden once yolun olcum klasorunun altinda oldugu
 dogrulanir.
 
-**Iki saat var.** `kabuk-ilk-kare` gercek videonun ilk karesine kadar gecen suredir;
-`perde` ise ekranda **bir sey gorunene** kadar gecen sure. Hipersurus C dalgasindan beri
-baslatici uygulamayi dogurdugu anda kendi panelini aciyor ve ilk kare gelince kaldiriyor.
-Hukum ikisinden birlikte okunur: `perde` algiyi, `kabuk-ilk-kare` gercek isi olcer.
+**Perde yok.** Hipersurus F dalgasindan beri olagan acilista panel cizilmiyor; kurulum
+paneli yalniz 400 ms'yi asan bakim isinde gorunur. `perde` adimi listeden cikti.
+
+**EkranSaati** (`EkranSaati/`) ayni isi kullanicinin ekranina dokunmadan yapar: ayri bir
+Win32 masaustu (`WinSta0\vidshrink-olcum`) acar, uygulamayi orada dogurur, iz saatini
+okur; ekran okunmaz. Her surece `KayitKalkani` baslangic kancasi yuklenir: HKCU ozel
+kovana yonlenir, hata olursa kanca sessizce 97 ile cikar (FailFast yok, hata kutusu yok).
+Her kosumdan once ve sonra sag tik menusu, etiketler ve iliskilendirme karsilastirilir;
+fark varsa geri yazar ve durur. `--yuk <sistem-izleme.log>`: cpu/gpu 60 ustuyse kosum
+baslamaz, kosum sonrasi cpu 80 ustuyse olcum durur.
 
 **Her kosum kendi tek ornek kanalini alir** (`VIDSHRINK_INSTANCE_CHANNEL`): yoksa ikinci
 acilis yolu kosan surece iletip cikar ve olcum bos doner.
