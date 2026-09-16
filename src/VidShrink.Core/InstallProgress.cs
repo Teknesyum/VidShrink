@@ -47,6 +47,18 @@ public sealed class InstallProgress
     /// <summary>İki kare arası; panelin yenileme aralığı.</summary>
     public const int FrameMilliseconds = 16;
 
+    /// <summary>
+    /// Açılış atağının kare cinsinden süresi. Panel açıldığı an çubuk kımıldamıyor gibi
+    /// durmasın diye ilk kareler daha hızlı koşar; sonra yasa olağan katsayılara döner.
+    /// </summary>
+    public const int BurstFrames = 24;
+
+    /// <summary>Atak süresince yüzdeye yaklaşma oranı.</summary>
+    public const double BurstApproach = 0.2;
+
+    /// <summary>Atak süresince tavana sürünme oranı; olağan yaklaşmanın oranı.</summary>
+    public const double BurstCreep = Approach;
+
     private readonly List<string> _log = new();
     private readonly object _gate = new();
 
@@ -54,6 +66,7 @@ public sealed class InstallProgress
     private double _percent;
     private double _ceiling;
     private double _bar;
+    private double _burstUsed;
     private string _sentence = string.Empty;
     private InstallState _state = InstallState.Running;
 
@@ -123,6 +136,10 @@ public sealed class InstallProgress
     /// Burada oran geçen süreden geliyor, katsayılar aynı kalıyor: bir karelik süre
     /// geçtiğinde sonuç <see cref="Advance()"/> ile birebir aynı.
     ///
+    /// <para>İlk <see cref="BurstFrames"/> kare atak: yaklaşma <see cref="BurstApproach"/>,
+    /// sürünme <see cref="BurstCreep"/> ile koşar. Sınır kare içinde düşerse kare bölünür,
+    /// iki yarım kare yine bir tam kare eder.</para>
+    ///
     /// <para>Yakalama <see cref="Approach"/>'ın zaman sabitiyle sınırlı; donmuş bir
     /// karenin ardından çubuk sıçramıyor, hızlanıyor.</para>
     /// </summary>
@@ -132,19 +149,30 @@ public sealed class InstallProgress
 
         lock (_gate)
         {
-            if (_bar < _percent)
-            {
-                var step = Math.Max(
-                    (_percent - _bar) * (1 - Math.Pow(1 - Approach, frames)),
-                    MinimumStep * frames);
-                _bar = Math.Min(_percent, _bar + step);
-            }
-            else if (_bar < _ceiling)
-            {
-                _bar = Math.Min(_ceiling, _bar + (_ceiling - _bar) * (1 - Math.Pow(1 - Creep, frames)));
-            }
-
+            var burst = Math.Min(frames, Math.Max(0, BurstFrames - _burstUsed));
+            _burstUsed += burst;
+            if (burst > 0) Move(burst, BurstApproach, BurstCreep);
+            if (frames - burst > 0) Move(frames - burst, Approach, Creep);
             return _bar;
+        }
+    }
+
+    /// <summary>
+    /// Yasanın tek uygulaması: çubuk yüzdenin altındaysa <paramref name="approach"/> ile
+    /// yaklaşır, yüzdedeyse <paramref name="creep"/> ile tavana sürünür; ikisini de geçmez.
+    /// </summary>
+    private void Move(double frames, double approach, double creep)
+    {
+        if (_bar < _percent)
+        {
+            var step = Math.Max(
+                (_percent - _bar) * (1 - Math.Pow(1 - approach, frames)),
+                MinimumStep * frames);
+            _bar = Math.Min(_percent, _bar + step);
+        }
+        else if (_bar < _ceiling)
+        {
+            _bar = Math.Min(_ceiling, _bar + (_ceiling - _bar) * (1 - Math.Pow(1 - creep, frames)));
         }
     }
 

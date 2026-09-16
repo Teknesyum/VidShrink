@@ -49,8 +49,8 @@ sürümden (`x.0.0`) önce koşar.
   hedef verilmeyince kalite kolunun korunması, bozuk/sıfır/negatif hedefin elenmesi, taban sınırının iki yakası
   (0,7 MB elenir — 0,8 MB geçer), `ApplyBudget`'in kalite kolunu tavanlı bit hızına çevirip `Validate`'ten geçmesi.
   Süreç çalıştırmaz, kanıt dosyası bırakmaz.
-- `KurulumIlerlemesiTests.cs` — kurulum panelinin tavan kuralı: çubuğun yüzdeye fark × 0,08 (en az 0,2) ile
-  yaklaşması, yüzde durunca tavana fark × 0,006 ile sürünüp tavanı geçmemesi, geriye yazan adımın yüzdeyi
+- `KurulumIlerlemesiTests.cs` — kurulum panelinin tavan kuralı: ilk 24 karelik açılış atağı (yaklaşma 0,2, sürünme 0,08),
+  sonra çubuğun yüzdeye fark × 0,08 (en az 0,2) ile yaklaşması, yüzde durunca tavana fark × 0,006 ile sürünüp tavanı geçmemesi, geriye yazan adımın yüzdeyi
   düşürmemesi, 0-100 kırpması, günlüğün ekranda dokuz satırda durup diske tamamının gitmesi, sonucun duyurulması.
   Çizim ölçmez; ölçtüğü şey köprünün kararı.
 - `KayitTeslimTests.cs` — kayıt bittikten sonraki teslim: sonuç panelindeki dört kapı (klasör, küçültme, oynatıcı,

@@ -30,11 +30,20 @@
   "main.update.current": "เป็นปัจจุบัน",
   "main.update.offline": "ออฟไลน์",
   "main.update.starting": "กำลังเปิดตัวติดตั้ง…",
+  "main.update.badge": "อัปเดต",
+  "main.update.downloading": "กำลังดาวน์โหลด…",
+  "main.update.ready": "พร้อมติดตั้ง",
+  "main.update.failed": "ดาวน์โหลดอัปเดตไม่สำเร็จ",
+  "main.update.log.manifest": "กำลังดึงรายการเวอร์ชัน",
+  "main.update.log.found": "เวอร์ชัน {0}: {1} ไฟล์",
+  "main.update.log.current": "เป็นเวอร์ชันล่าสุดแล้ว",
+  "main.update.log.unreachable": "เข้าถึงรายการเวอร์ชันไม่ได้",
 
   "main.action.copy": "คัดลอก",
 
 
   "main.action.install": "ติดตั้ง",
+  "main.action.download": "ดาวน์โหลด",
 
   "main.action.browse": "เรียกดู",
   "main.action.cancel": "ยกเลิก",

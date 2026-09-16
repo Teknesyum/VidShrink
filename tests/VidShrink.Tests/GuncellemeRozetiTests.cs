@@ -21,6 +21,8 @@ public sealed class GuncellemeRozetiTests
     [InlineData(UpdateBadgeState.Checking, false)]
     [InlineData(UpdateBadgeState.NewVersion, false)]
     [InlineData(UpdateBadgeState.Installing, false)]
+    [InlineData(UpdateBadgeState.Downloading, false)]
+    [InlineData(UpdateBadgeState.Ready, false)]
     public void SaatiYalnizSonucBildirenDurumlarTasir(UpdateBadgeState durum, bool bekleniyor)
         => Assert.Equal(bekleniyor, UpdateBadge.CarriesTime(durum));
 
@@ -92,7 +94,10 @@ public sealed class GuncellemeRozetiTests
         var anahtarlar = new[]
         {
             "main.update.checking", "main.update.current",
-            "main.update.offline", "main.update.starting"
+            "main.update.offline", "main.update.starting",
+            "main.update.badge", "main.update.downloading", "main.update.ready", "main.update.failed",
+            "main.update.log.manifest", "main.update.log.found", "main.update.log.current",
+            "main.update.log.unreachable", "main.action.download"
         };
 
         var diller = Directory.GetDirectories(kok);
@@ -110,5 +115,31 @@ public sealed class GuncellemeRozetiTests
                     $"{Path.GetFileName(dil)} dilinde {anahtar} boş");
             }
         }
+    }
+
+    /// <summary>
+    /// İndirme hızı yalnız oynatıcı oynarken sınırlanır: boşta bekleme sıfır, oynarken
+    /// okunan bayt saniyelik tavanı aşınca fark kadar bekler, oynatma durunca pencere sıfırlanır.
+    /// </summary>
+    [Fact]
+    public void IndirmeYalnizOynarkenYavaslar()
+    {
+        var oynuyor = false;
+        var saat = TimeSpan.Zero;
+        var fren = new DownloadThrottle(1000, () => oynuyor, () => saat);
+
+        Assert.Equal(TimeSpan.Zero, fren.Account(10_000));
+
+        oynuyor = true;
+        Assert.Equal(TimeSpan.FromSeconds(2), fren.Account(2000));
+        saat = TimeSpan.FromSeconds(1);
+        Assert.Equal(TimeSpan.FromSeconds(2), fren.Account(1000));
+        saat = TimeSpan.FromSeconds(10);
+        Assert.Equal(TimeSpan.Zero, fren.Account(1000));
+
+        oynuyor = false;
+        Assert.Equal(TimeSpan.Zero, fren.Account(50_000));
+        oynuyor = true;
+        Assert.Equal(TimeSpan.FromSeconds(1), fren.Account(1000));
     }
 }

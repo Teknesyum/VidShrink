@@ -30,11 +30,20 @@
   "main.update.current": "अद्यतित",
   "main.update.offline": "ऑफ़लाइन",
   "main.update.starting": "इंस्टॉलर खुल रहा है…",
+  "main.update.badge": "अपडेट",
+  "main.update.downloading": "डाउनलोड हो रहा है…",
+  "main.update.ready": "इंस्टॉल के लिए तैयार",
+  "main.update.failed": "अपडेट डाउनलोड नहीं हो सका",
+  "main.update.log.manifest": "संस्करण सूची लाई जा रही है",
+  "main.update.log.found": "संस्करण {0}: {1} फ़ाइलें",
+  "main.update.log.current": "पहले से अद्यतन",
+  "main.update.log.unreachable": "संस्करण सूची तक पहुंच नहीं हो सकी",
 
   "main.action.copy": "कॉपी",
 
 
   "main.action.install": "इंस्टॉल करें",
+  "main.action.download": "डाउनलोड",
 
   "main.action.browse": "ब्राउज़",
   "main.action.cancel": "रद्द करें",

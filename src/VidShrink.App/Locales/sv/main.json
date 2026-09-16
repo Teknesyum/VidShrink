@@ -30,11 +30,20 @@
   "main.update.current": "Uppdaterad",
   "main.update.offline": "Offline",
   "main.update.starting": "Öppnar installationsprogrammet…",
+  "main.update.badge": "Uppdatering",
+  "main.update.downloading": "Laddar ned…",
+  "main.update.ready": "Redo att installera",
+  "main.update.failed": "Uppdateringen kunde inte laddas ned",
+  "main.update.log.manifest": "Hämtar versionslistan",
+  "main.update.log.found": "Version {0}: {1} filer",
+  "main.update.log.current": "Redan uppdaterad",
+  "main.update.log.unreachable": "Versionslistan kunde inte nås",
 
   "main.action.copy": "Kopiera",
 
 
   "main.action.install": "Installera",
+  "main.action.download": "Ladda ned",
 
   "main.action.browse": "Bläddra",
   "main.action.cancel": "Avbryt",

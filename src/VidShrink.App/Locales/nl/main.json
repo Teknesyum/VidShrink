@@ -30,11 +30,20 @@
   "main.update.current": "Up-to-date",
   "main.update.offline": "Offline",
   "main.update.starting": "Installatieprogramma wordt geopend…",
+  "main.update.badge": "Update",
+  "main.update.downloading": "Downloaden…",
+  "main.update.ready": "Klaar om te installeren",
+  "main.update.failed": "De update kon niet worden gedownload",
+  "main.update.log.manifest": "Versielijst ophalen",
+  "main.update.log.found": "Versie {0}: {1} bestanden",
+  "main.update.log.current": "Al up-to-date",
+  "main.update.log.unreachable": "Versielijst niet bereikbaar",
 
   "main.action.copy": "Kopiëren",
 
 
   "main.action.install": "Installeren",
+  "main.action.download": "Downloaden",
 
   "main.action.browse": "Bladeren",
   "main.action.cancel": "Annuleren",

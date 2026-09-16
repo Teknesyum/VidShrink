@@ -23,7 +23,13 @@ public enum UpdateBadgeState
     Offline,
 
     /// <summary>Yükleme başlatıcıya devredildi, süreç kapanıyor.</summary>
-    Installing
+    Installing,
+
+    /// <summary>Yeni sürüm arka planda sahneye iniyor; kurulum henüz başlamadı.</summary>
+    Downloading,
+
+    /// <summary>Sahne indi ve doğrulandı; kullanıcı "Yükle"ye basınca kurulur.</summary>
+    Ready
 }
 
 /// <summary>

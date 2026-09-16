@@ -9,6 +9,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 using VidShrink.App;
+using VidShrink.Core;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -41,6 +42,29 @@ public sealed class GoruntuCekTests
             window.FindControl<TextBlock>("TxtNoticeVersion")!.Text = "0.4.3";
             window.FindControl<TabControl>("Tabs")!.SelectedIndex = 3;
             var kok = (Control)window.GetVisualChildren().Single();
+
+            var ilerleme = new InstallProgress();
+            window.ShowUpdateProgress(ilerleme);
+            ilerleme.Step(0, 10, "Sürüm listesi alınıyor");
+            ilerleme.Step(12, 20, "Sürüm 0.4.3: 6 dosya");
+            foreach (var (ad, sira) in new[] { "VidShrink.App.dll", "VidShrink.Core.dll", "Avalonia.Base.dll", "libmpv-2.dll" }.Select((a, i) => (a, i + 1)))
+                ilerleme.Step(20 + 70.0 * sira / 6, 20 + 70.0 * (sira + 1) / 6, ad + "  " + sira + "/6");
+            kok.Measure(new Size(1200, 800));
+            kok.Arrange(new Rect(0, 0, 1200, 800));
+            for (var i = 0; i < 90; i++) window.UpdateFrame(TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds));
+            Assert.Equal(6, window.FindControl<StackPanel>("UpdateLogLines")!.Children.Count);
+            Assert.True(window.FindControl<Border>("UpdateBarFill")!.Width > 0);
+            foreach (var satir in window.FindControl<StackPanel>("UpdateLogLines")!.Children)
+            {
+                satir.Transitions = null;
+                satir.Opacity = 1;
+                satir.RenderTransform = null;
+            }
+            foreach (var parca in kok.GetVisualDescendants().OfType<Layoutable>()) parca.InvalidateMeasure();
+            var perde = window.FindControl<MatrixRain>("UpdateRain")!;
+            kok.Measure(new Size(1200, 800));
+            kok.Arrange(new Rect(0, 0, 1200, 800));
+            for (var i = 0; i < 4; i++) perde.Step();
             Kaydet(kok, 1200, 800, 1, "guncelleme-paneli.png");
 
             var sayfa = new WrapPanel { Width = 700, Background = Brushes.Black };
@@ -65,5 +89,6 @@ public sealed class GoruntuCekTests
             return 0;
         });
         Assert.True(File.Exists(Path.Combine(Klasor, "ikonlar.png")));
+        Assert.True(File.Exists(Path.Combine(Klasor, "guncelleme-paneli.png")));
     }
 }

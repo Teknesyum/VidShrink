@@ -374,12 +374,12 @@ public sealed class UpdaterTests : IDisposable
     public void TheVersionGuardComesBeforeAnythingIsDownloaded()
     {
         var code = File.ReadAllText(
-            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
+            Path.Combine(TipSources.Root, "src", "VidShrink.Core", "UpdateStaging.cs"));
 
         var guard = code.IndexOf("UpdateCheck.AlreadyCurrent", StringComparison.Ordinal);
         var download = code.IndexOf("RemoteZip.OpenAsync", StringComparison.Ordinal);
 
-        Assert.True(guard >= 0, "sürüm kapısı Updater.cs içinde yok");
+        Assert.True(guard >= 0, "sürüm kapısı UpdateStaging.cs içinde yok");
         Assert.True(download > guard, "arşiv sürüm kapısından önce açılıyor");
         Assert.DoesNotContain("UpdateSchedule", code);
     }

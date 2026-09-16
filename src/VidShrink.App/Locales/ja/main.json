@@ -30,11 +30,20 @@
   "main.update.current": "最新",
   "main.update.offline": "オフライン",
   "main.update.starting": "インストーラーを開いています…",
+  "main.update.badge": "アップデート",
+  "main.update.downloading": "ダウンロード中…",
+  "main.update.ready": "インストールの準備完了",
+  "main.update.failed": "アップデートをダウンロードできませんでした",
+  "main.update.log.manifest": "バージョン一覧を取得中",
+  "main.update.log.found": "バージョン {0}: {1} 個のファイル",
+  "main.update.log.current": "すでに最新です",
+  "main.update.log.unreachable": "バージョン一覧に接続できません",
 
   "main.action.copy": "コピー",
 
 
   "main.action.install": "インストール",
+  "main.action.download": "ダウンロード",
 
   "main.action.browse": "参照",
   "main.action.cancel": "キャンセル",

@@ -24,6 +24,7 @@
   <SolidColorBrush x:Key="NeonPurpleBorder" Color="{StaticResource NeonPurpleBorderColor}"/>
   <SolidColorBrush x:Key="OnNeon" Color="{StaticResource OnNeonColor}"/>
   <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource NeonEmberColor}"/>
+  <SolidColorBrush x:Key="EmberBlaze" Color="{StaticResource EmberBlazeColor}"/>
 
   <x:Double x:Key="PhoenixOpacity">0.08</x:Double>
   <x:Double x:Key="PhoenixGlowInnerOpacity">0.34</x:Double>

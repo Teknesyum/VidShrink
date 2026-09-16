@@ -30,11 +30,20 @@
   "main.update.current": "Aktuálne",
   "main.update.offline": "Offline",
   "main.update.starting": "Otvára sa inštalátor…",
+  "main.update.badge": "Aktualizácia",
+  "main.update.downloading": "Sťahuje sa…",
+  "main.update.ready": "Pripravené na inštaláciu",
+  "main.update.failed": "Aktualizáciu sa nepodarilo stiahnuť",
+  "main.update.log.manifest": "Načítava sa zoznam verzií",
+  "main.update.log.found": "Verzia {0}: {1} súborov",
+  "main.update.log.current": "Už aktuálne",
+  "main.update.log.unreachable": "Zoznam verzií nie je dostupný",
 
   "main.action.copy": "Kopírovať",
 
 
   "main.action.install": "Nainštalovať",
+  "main.action.download": "Stiahnuť",
 
   "main.action.browse": "Prehľadávať",
   "main.action.cancel": "Zrušiť",

@@ -30,11 +30,20 @@
   "main.update.current": "Actualizat",
   "main.update.offline": "Offline",
   "main.update.starting": "Se deschide instalatorul…",
+  "main.update.badge": "Actualizare",
+  "main.update.downloading": "Se descarcă…",
+  "main.update.ready": "Gata de instalare",
+  "main.update.failed": "Actualizarea nu a putut fi descărcată",
+  "main.update.log.manifest": "Se preia lista de versiuni",
+  "main.update.log.found": "Versiunea {0}: {1} fișiere",
+  "main.update.log.current": "Deja actualizat",
+  "main.update.log.unreachable": "Lista de versiuni nu poate fi accesată",
 
   "main.action.copy": "Copiază",
 
 
   "main.action.install": "Instalează",
+  "main.action.download": "Descarcă",
 
   "main.action.browse": "Răsfoiește",
   "main.action.cancel": "Anulează",

@@ -30,11 +30,20 @@
   "main.update.current": "מעודכן",
   "main.update.offline": "לא מקוון",
   "main.update.starting": "פותח את המתקין…",
+  "main.update.badge": "עדכון",
+  "main.update.downloading": "מוריד…",
+  "main.update.ready": "מוכן להתקנה",
+  "main.update.failed": "לא ניתן היה להוריד את העדכון",
+  "main.update.log.manifest": "מאחזר את רשימת הגרסאות",
+  "main.update.log.found": "גרסה {0}: {1} קבצים",
+  "main.update.log.current": "כבר מעודכן",
+  "main.update.log.unreachable": "רשימת הגרסאות אינה זמינה",
 
   "main.action.copy": "העתק",
 
 
   "main.action.install": "התקן",
+  "main.action.download": "הורדה",
 
   "main.action.browse": "עיון",
   "main.action.cancel": "ביטול",

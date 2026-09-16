@@ -30,11 +30,20 @@
   "main.update.current": "Terkini",
   "main.update.offline": "Luar talian",
   "main.update.starting": "Membuka pemasang…",
+  "main.update.badge": "Kemas kini",
+  "main.update.downloading": "Memuat turun…",
+  "main.update.ready": "Sedia untuk dipasang",
+  "main.update.failed": "Kemas kini tidak dapat dimuat turun",
+  "main.update.log.manifest": "Mendapatkan senarai versi",
+  "main.update.log.found": "Versi {0}: {1} fail",
+  "main.update.log.current": "Sudah terkini",
+  "main.update.log.unreachable": "Senarai versi tidak dapat dicapai",
 
   "main.action.copy": "Salin",
 
 
   "main.action.install": "Pasang",
+  "main.action.download": "Muat turun",
 
   "main.action.browse": "Layari",
   "main.action.cancel": "Batal",

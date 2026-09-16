@@ -30,11 +30,20 @@
   "main.update.current": "Ya sasa",
   "main.update.offline": "Nje ya mtandao",
   "main.update.starting": "Inafungua kisakinishi…",
+  "main.update.badge": "Sasisho",
+  "main.update.downloading": "Inapakua…",
+  "main.update.ready": "Tayari kusakinishwa",
+  "main.update.failed": "Sasisho halikuweza kupakuliwa",
+  "main.update.log.manifest": "Inapata orodha ya matoleo",
+  "main.update.log.found": "Toleo {0}: faili {1}",
+  "main.update.log.current": "Tayari ni la sasa",
+  "main.update.log.unreachable": "Orodha ya matoleo haipatikani",
 
   "main.action.copy": "Nakili",
 
 
   "main.action.install": "Sakinisha",
+  "main.action.download": "Pakua",
 
   "main.action.browse": "Vinjari",
   "main.action.cancel": "Ghairi",

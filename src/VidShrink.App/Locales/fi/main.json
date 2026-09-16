@@ -30,11 +30,20 @@
   "main.update.current": "Ajan tasalla",
   "main.update.offline": "Ei yhteyttä",
   "main.update.starting": "Asennusohjelma avautuu…",
+  "main.update.badge": "Päivitys",
+  "main.update.downloading": "Ladataan…",
+  "main.update.ready": "Valmis asennettavaksi",
+  "main.update.failed": "Päivitystä ei voitu ladata",
+  "main.update.log.manifest": "Haetaan versioluetteloa",
+  "main.update.log.found": "Versio {0}: {1} tiedostoa",
+  "main.update.log.current": "Jo ajan tasalla",
+  "main.update.log.unreachable": "Versioluetteloa ei tavoitettu",
 
   "main.action.copy": "Kopioi",
 
 
   "main.action.install": "Asenna",
+  "main.action.download": "Lataa",
 
   "main.action.browse": "Selaa",
   "main.action.cancel": "Peruuta",

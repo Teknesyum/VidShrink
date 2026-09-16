@@ -30,11 +30,20 @@
   "main.update.current": "Ažurirano",
   "main.update.offline": "Van mreže",
   "main.update.starting": "Otvara se instalater…",
+  "main.update.badge": "Ажурирање",
+  "main.update.downloading": "Преузимање…",
+  "main.update.ready": "Спремно за инсталацију",
+  "main.update.failed": "Ажурирање није могуће преузети",
+  "main.update.log.manifest": "Преузимање списка верзија",
+  "main.update.log.found": "Верзија {0}: {1} датотека",
+  "main.update.log.current": "Већ ажурно",
+  "main.update.log.unreachable": "Списак верзија није доступан",
 
   "main.action.copy": "Kopiraj",
 
 
   "main.action.install": "Инсталирај",
+  "main.action.download": "Преузми",
 
   "main.action.browse": "Pregledaj",
   "main.action.cancel": "Otkaži",

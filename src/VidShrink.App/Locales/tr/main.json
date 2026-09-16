@@ -30,11 +30,20 @@
   "main.update.current": "Güncel",
   "main.update.offline": "Çevrimdışı",
   "main.update.starting": "Başlatıcı açılıyor…",
+  "main.update.badge": "Güncelleme",
+  "main.update.downloading": "İndiriliyor…",
+  "main.update.ready": "Yüklemeye hazır",
+  "main.update.failed": "Güncelleme indirilemedi",
+  "main.update.log.manifest": "Sürüm listesi alınıyor",
+  "main.update.log.found": "Sürüm {0}: {1} dosya",
+  "main.update.log.current": "Program zaten güncel",
+  "main.update.log.unreachable": "Sürüm listesine ulaşılamadı",
 
   "main.action.copy": "Kopyala",
 
 
   "main.action.install": "Yükle",
+  "main.action.download": "İndir",
 
   "main.action.browse": "Gözat",
   "main.action.cancel": "İptal",

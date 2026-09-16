@@ -476,7 +476,9 @@ public partial class MainWindow : Window
         {
             if (!this.TryFindResource("AppIconUri", out var uri) || uri is not string source) return;
             using var stream = AssetLoader.Open(new Uri(source));
-            AppLogo.Source = new Bitmap(stream);
+            var logo = new Bitmap(stream);
+            AppLogo.Source = logo;
+            UpdateNoticeIcon.Source = logo;
             AppLogo.IsVisible = true;
         }
         catch (Exception)
@@ -1410,7 +1412,10 @@ public partial class MainWindow : Window
     }
 
     private void RefreshUpdateTexts()
-        => TxtAutoUpdateEffect.Text = Say(UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
+    {
+        TxtAutoUpdateEffect.Text = Say(UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
+        RefreshUpdateNoticeButton();
+    }
 
     /// <summary>
     /// T163/K4: dokuz gelişmiş kalemin liste içerikleri. Kodek kilidi listesi
@@ -1950,7 +1955,9 @@ public partial class MainWindow : Window
         {
             UpdateBadgeState.Checking => "main.update.checking",
             UpdateBadgeState.UpToDate => "main.update.current",
-            UpdateBadgeState.NewVersion => "main.update.available",
+            UpdateBadgeState.NewVersion => "main.update.badge",
+            UpdateBadgeState.Downloading => "main.update.badge",
+            UpdateBadgeState.Ready => "main.update.badge",
             UpdateBadgeState.Installing => "main.update.starting",
             _ => "main.update.offline"
         });
@@ -1958,28 +1965,47 @@ public partial class MainWindow : Window
         var firca = state switch
         {
             UpdateBadgeState.UpToDate => "NeonSuccess",
-            UpdateBadgeState.NewVersion => "NeonPurple",
+            UpdateBadgeState.NewVersion => "EmberBlaze",
+            UpdateBadgeState.Downloading => "EmberBlaze",
+            UpdateBadgeState.Ready => "NeonSuccess",
             UpdateBadgeState.Installing => "NeonBlue",
             UpdateBadgeState.Offline => "NeonEmber",
             _ => "TextDisabled"
         };
 
         TxtUpdateBadge.Text = UpdateBadge.Compose(state, govde, DateTimeOffset.Now);
-        if (this.TryFindResource(firca, out var kaynak) && kaynak is IBrush brush) UpdateBadgeDot.Fill = brush;
-        ToolTip.SetTip(BtnUpdateBadge, TxtUpdateBadge.Text);
+        if (this.TryFindResource(firca, out var kaynak) && kaynak is IBrush brush)
+        {
+            UpdateBadgeDot.Fill = brush;
+            if (state is UpdateBadgeState.NewVersion or UpdateBadgeState.Downloading or UpdateBadgeState.Ready)
+                TxtUpdateBadge.Foreground = brush;
+            else TxtUpdateBadge.ClearValue(TextBlock.ForegroundProperty);
+        }
+        ToolTip.SetTip(BtnUpdateBadge, state is UpdateBadgeState.Ready ? Say("main.update.ready") : TxtUpdateBadge.Text);
         BtnUpdateBadge.IsVisible = true;
+        RefreshUpdateNoticeButton();
     }
 
     /// <summary>
     /// Rozete tıklamak denetimi hemen tekrarlar ve rozet anında <c>Denetleniyor…</c>'ya
     /// düşer. Denetim sürerken ikinci tık işlemez.
+    ///
+    /// <para>Yeni sürüm varken tık iki adımlı akışın ilk adımıdır: panel açılır ve indirme
+    /// arka planda başlar. İnerken ve indikten sonra tık yalnız paneli açar; kurulum
+    /// panelin "Yükle" düğmesini bekler.</para>
     /// </summary>
     private void OnUpdateBadgeClicked(object? sender, RoutedEventArgs e)
     {
         if (_updateBadgeState == UpdateBadgeState.Checking) return;
+        if (_updateBadgeState is UpdateBadgeState.Downloading or UpdateBadgeState.Ready or UpdateBadgeState.Installing)
+        {
+            UpdateNotice.IsVisible = true;
+            return;
+        }
         if (_updateBadgeState == UpdateBadgeState.NewVersion && _noticeVersion is not null)
         {
             UpdateNotice.IsVisible = true;
+            StartUpdateDownload();
             return;
         }
 
@@ -2015,18 +2041,22 @@ public partial class MainWindow : Window
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
+            if (_updateBadgeState is UpdateBadgeState.Downloading or UpdateBadgeState.Ready) return;
             SetUpdateBadge(yeniMi ? UpdateBadgeState.NewVersion : UpdateBadgeState.UpToDate);
-            if (!yeniMi || susturulmus) return;
+            if (!yeniMi) return;
 
             _noticeVersion = version;
             TxtNoticeVersion.Text = version;
+            if (susturulmus) return;
 
             UpdateNotice.IsVisible = true;
         });
     }
 
     /// <summary>
-    /// Yükle düğmesi — panelin tek eylemi. Güncellemeyi uygulama yapamaz: kendi dll'lerini
+    /// Panelin birincil düğmesi. Sahne inmediyse "İndir" olarak indirmeyi başlatır
+    /// (<see cref="StartUpdateDownload"/>); indikten sonra "Yükle" olur ve aşağıdaki kurulum
+    /// akışı yalnız o zaman koşar. Güncellemeyi uygulama yapamaz: kendi dll'lerini
     /// tutan süreç odur. Bu yüzden başlatıcı elle yükleme kipinde açılır, bu süreç kapanır,
     /// başlatıcı çıkışı bekleyip güncellemeyi uygular ve uygulamayı yeni sürümle açar.
     /// Kendiliğinden güncelleme ayarına bakılmaz ve yazılmaz; elle bir yükleme tercihi
@@ -2041,6 +2071,12 @@ public partial class MainWindow : Window
         if (launcher is null)
         {
             OpenExternal(UpdateCheck.ReleasesPageUrl);
+            return;
+        }
+
+        if (_updateBadgeState != UpdateBadgeState.Ready)
+        {
+            StartUpdateDownload();
             return;
         }
 

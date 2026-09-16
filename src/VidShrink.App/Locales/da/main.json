@@ -30,11 +30,20 @@
   "main.update.current": "Opdateret",
   "main.update.offline": "Offline",
   "main.update.starting": "Åbner installationsprogrammet…",
+  "main.update.badge": "Opdatering",
+  "main.update.downloading": "Henter…",
+  "main.update.ready": "Klar til installation",
+  "main.update.failed": "Opdateringen kunne ikke hentes",
+  "main.update.log.manifest": "Henter versionslisten",
+  "main.update.log.found": "Version {0}: {1} filer",
+  "main.update.log.current": "Allerede opdateret",
+  "main.update.log.unreachable": "Versionslisten kunne ikke nås",
 
   "main.action.copy": "Kopier",
 
 
   "main.action.install": "Installer",
+  "main.action.download": "Hent",
 
   "main.action.browse": "Gennemse",
   "main.action.cancel": "Annuller",

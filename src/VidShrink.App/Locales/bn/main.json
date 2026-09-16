@@ -30,11 +30,20 @@
   "main.update.current": "হালনাগাদ",
   "main.update.offline": "অফলাইন",
   "main.update.starting": "ইনস্টলার খুলছে…",
+  "main.update.badge": "আপডেট",
+  "main.update.downloading": "ডাউনলোড হচ্ছে…",
+  "main.update.ready": "ইনস্টলের জন্য প্রস্তুত",
+  "main.update.failed": "আপডেট ডাউনলোড করা যায়নি",
+  "main.update.log.manifest": "সংস্করণ তালিকা আনা হচ্ছে",
+  "main.update.log.found": "সংস্করণ {0}: {1}টি ফাইল",
+  "main.update.log.current": "ইতিমধ্যে হালনাগাদ",
+  "main.update.log.unreachable": "সংস্করণ তালিকায় পৌঁছানো যায়নি",
 
   "main.action.copy": "কপি",
 
 
   "main.action.install": "ইনস্টল করুন",
+  "main.action.download": "ডাউনলোড",
 
   "main.action.browse": "ব্রাউজ",
   "main.action.cancel": "বাতিল",
