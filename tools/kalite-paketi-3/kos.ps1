@@ -212,16 +212,26 @@ function Av1 {
     $g = $Izgara | ConvertFrom-Json
     $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"
     $b = Probe $girdi
-    $kontroller = @($g.crf | ForEach-Object { [pscustomobject]@{ Tur = 'crf'; Deger = [int]$_ } }) + @($g.kbit | ForEach-Object { [pscustomobject]@{ Tur = 'kbit'; Deger = [int]$_ } })
+    $kbitler = if ($g.kbit -is [pscustomobject]) { @($g.kbit.$Kesit) } else { @($g.kbit) }
+    $kontroller = @($g.crf | Where-Object { $null -ne $_ } | ForEach-Object { [pscustomobject]@{ Tur = 'crf'; Deger = [int]$_ } }) + @($kbitler | Where-Object { $null -ne $_ } | ForEach-Object { [pscustomobject]@{ Tur = 'kbit'; Deger = [int]$_ } })
+    $ekler = if ($g.PSObject.Properties['ek']) { @($g.ek) } else { @($null) }
+    $bicimler = if ($g.PSObject.Properties['pixfmt']) { @($g.pixfmt) } else { @($null) }
     $satirlar = @()
     foreach ($preset in $g.preset) {
         foreach ($k in $kontroller) {
             foreach ($grain in $g.filmgrain) {
                 foreach ($tune in $g.tune) {
                     foreach ($keyint in $g.keyint) {
+                    foreach ($ek in $ekler) {
+                    foreach ($bicim in $bicimler) {
                         $etiket = "p$preset-$($k.Tur)$($k.Deger)-fg$grain-t$tune-k$keyint"
+                        if ($null -ne $ek) { $etiket += "-e$([array]::IndexOf($ekler, $ek))" }
+                        if ($null -ne $bicim) { $etiket += "-$bicim" }
+                        $pix = if ($bicim) { $bicim } else { 'yuv420p10le' }
+                        $parametre = "tune=${tune}:film-grain=${grain}"
+                        if ($ek) { $parametre += ":$ek" }
                         $cikis = Join-Path $Cikti "av1-$Kesit-$etiket.mkv"
-                        $ortak = @('-i', $girdi, '-an', '-c:v', 'libsvtav1', '-preset', "$preset", '-g', "$keyint", '-pix_fmt', 'yuv420p10le', '-svtav1-params', "tune=${tune}:film-grain=${grain}")
+                        $ortak = @('-i', $girdi, '-an', '-c:v', 'libsvtav1', '-preset', "$preset", '-g', "$keyint", '-pix_fmt', $pix, '-svtav1-params', $parametre, '-fflags', '+bitexact', '-flags:v', '+bitexact')
                         $sure = [Diagnostics.Stopwatch]::StartNew()
                         if ($k.Tur -eq 'crf') {
                             Ffmpeg ($ortak + @('-crf', "$($k.Deger)", $cikis))
@@ -232,14 +242,17 @@ function Av1 {
                         }
                         $sure.Stop()
                         $o = Olc $girdi $cikis ([IO.Path]::ChangeExtension($cikis, '.json')) $b.FpsMetin
-                        $satirlar += Satir $Kesit $etiket $(if ($k.Tur -eq 'kbit') { $k.Deger } else { $null }) $cikis $o @{ preset = $preset; kontrol = $k.Tur; deger = $k.Deger; filmgrain = $grain; tune = $tune; keyint = $keyint; kodlama_sn = [math]::Round($sure.Elapsed.TotalSeconds, 1) }
+                        $satirlar += Satir $Kesit $etiket $(if ($k.Tur -eq 'kbit') { $k.Deger } else { $null }) $cikis $o @{ preset = $preset; kontrol = $k.Tur; deger = $k.Deger; filmgrain = $grain; tune = $tune; keyint = $keyint; ek = $(if ($ek) { $ek } else { '' }); pixfmt = $pix; bayt = (Get-Item $cikis).Length; sha256 = (Get-FileHash $cikis -Algorithm SHA256).Hash; kodlama_sn = [math]::Round($sure.Elapsed.TotalSeconds, 1) }
                         Remove-Item $cikis -ErrorAction SilentlyContinue
+                        ConvertTo-Json -Depth 4 -InputObject @($satirlar) | Set-Content (Join-Path $Cikti "av1-$Kesit.json")
+                    }
+                    }
                     }
                 }
             }
         }
     }
-    $satirlar | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $Cikti "av1-$Kesit.json")
+    ConvertTo-Json -Depth 4 -InputObject @($satirlar) | Set-Content (Join-Path $Cikti "av1-$Kesit.json")
 }
 
 switch ($Is) {

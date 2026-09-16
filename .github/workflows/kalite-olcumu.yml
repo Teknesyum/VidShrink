@@ -43,7 +43,7 @@ jobs:
         run: |
           $varsayilan = 'whatsapp,handbrake,ceza'
           $kesitVarsayilan = 'karanlik,parlak,orta'
-          if ('${{ github.ref_name }}' -match '^olcum-kalite-([a-z0-9+]+)(?:__([a-z0-9+]+))?--') {
+          if ('${{ github.ref_name }}' -match '^olcum-kalite-([a-z0-9+]+)(?:__([a-z0-9+]+))?(?:__[a-z0-9]+)?--') {
             $varsayilan = $Matches[1].Replace('+', ',')
             if ($Matches[2]) { $kesitVarsayilan = $Matches[2].Replace('+', ',') }
           }
@@ -130,6 +130,10 @@ jobs:
           IZGARA: ${{ inputs.izgara || '{"preset":[4,6,8,10],"crf":[28,36,44],"kbit":[],"filmgrain":[0,8],"tune":[0,1],"keyint":[240]}' }}
           KBITLER: ${{ inputs.kbitler || '600,2000' }}
         run: |
+          if (-not '${{ inputs.izgara }}' -and '${{ github.ref_name }}' -match '^olcum-kalite-[a-z0-9+]+__[a-z0-9+]+__([a-z0-9]+)--') {
+            $env:IZGARA = Get-Content "tools/kalite-paketi-3/izgaralar/$($Matches[1]).json" -Raw
+          }
+          Write-Host "izgara=$env:IZGARA"
           $a = @('-Is', '${{ matrix.is }}', '-Kaynak', 'kesitler', '-Cikti', "$env:RUNNER_TEMP\olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI, '-Kbitler', $env:KBITLER, '-Izgara', $env:IZGARA)
           if ('${{ matrix.kesit }}') { $a += @('-Kesit', '${{ matrix.kesit }}') }
           pwsh tools/kalite-paketi-3/kos.ps1 @a
