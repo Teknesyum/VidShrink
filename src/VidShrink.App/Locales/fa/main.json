@@ -30,11 +30,20 @@
   "main.update.current": "به‌روز",
   "main.update.offline": "آفلاین",
   "main.update.starting": "باز کردن نصب‌کننده…",
+  "main.update.badge": "به‌روزرسانی",
+  "main.update.downloading": "در حال دانلود…",
+  "main.update.ready": "آماده نصب",
+  "main.update.failed": "دانلود به‌روزرسانی ممکن نشد",
+  "main.update.log.manifest": "در حال دریافت فهرست نسخه‌ها",
+  "main.update.log.found": "نسخه {0}: {1} فایل",
+  "main.update.log.current": "از قبل به‌روز است",
+  "main.update.log.unreachable": "فهرست نسخه‌ها در دسترس نیست",
 
   "main.action.copy": "کپی",
 
 
   "main.action.install": "نصب",
+  "main.action.download": "دانلود",
 
   "main.action.browse": "انتخاب",
   "main.action.cancel": "لغو",

@@ -30,11 +30,20 @@
   "main.update.current": "Posodobljeno",
   "main.update.offline": "Brez povezave",
   "main.update.starting": "Odpiranje namestitvenega programa…",
+  "main.update.badge": "Posodobitev",
+  "main.update.downloading": "Prenašanje…",
+  "main.update.ready": "Pripravljeno za namestitev",
+  "main.update.failed": "Posodobitve ni bilo mogoče prenesti",
+  "main.update.log.manifest": "Pridobivanje seznama različic",
+  "main.update.log.found": "Različica {0}: {1} datotek",
+  "main.update.log.current": "Že posodobljeno",
+  "main.update.log.unreachable": "Seznam različic ni dosegljiv",
 
   "main.action.copy": "Kopiraj",
 
 
   "main.action.install": "Namesti",
+  "main.action.download": "Prenesi",
 
   "main.action.browse": "Prebrskaj",
   "main.action.cancel": "Prekliči",

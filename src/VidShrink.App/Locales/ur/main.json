@@ -30,11 +30,20 @@
   "main.update.current": "تازہ",
   "main.update.offline": "آف لائن",
   "main.update.starting": "انسٹالر کھل رہا ہے…",
+  "main.update.badge": "اپ ڈیٹ",
+  "main.update.downloading": "ڈاؤن لوڈ ہو رہا ہے…",
+  "main.update.ready": "انسٹال کے لیے تیار",
+  "main.update.failed": "اپ ڈیٹ ڈاؤن لوڈ نہیں ہو سکا",
+  "main.update.log.manifest": "ورژن کی فہرست لائی جا رہی ہے",
+  "main.update.log.found": "ورژن {0}: {1} فائلیں",
+  "main.update.log.current": "پہلے سے تازہ ترین",
+  "main.update.log.unreachable": "ورژن کی فہرست تک رسائی نہیں ہو سکی",
 
   "main.action.copy": "کاپی",
 
 
   "main.action.install": "انسٹال کریں",
+  "main.action.download": "ڈاؤن لوڈ",
 
   "main.action.browse": "براؤز",
   "main.action.cancel": "منسوخ",

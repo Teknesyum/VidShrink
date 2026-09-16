@@ -30,11 +30,20 @@
   "main.update.current": "Terbaru",
   "main.update.offline": "Offline",
   "main.update.starting": "Membuka penginstal…",
+  "main.update.badge": "Pembaruan",
+  "main.update.downloading": "Mengunduh…",
+  "main.update.ready": "Siap dipasang",
+  "main.update.failed": "Pembaruan tidak dapat diunduh",
+  "main.update.log.manifest": "Mengambil daftar versi",
+  "main.update.log.found": "Versi {0}: {1} berkas",
+  "main.update.log.current": "Sudah terbaru",
+  "main.update.log.unreachable": "Daftar versi tidak dapat dijangkau",
 
   "main.action.copy": "Salin",
 
 
   "main.action.install": "Pasang",
+  "main.action.download": "Unduh",
 
   "main.action.browse": "Telusuri",
   "main.action.cancel": "Batal",

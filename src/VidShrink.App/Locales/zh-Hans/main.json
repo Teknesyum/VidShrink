@@ -30,11 +30,20 @@
   "main.update.current": "已是最新",
   "main.update.offline": "离线",
   "main.update.starting": "正在打开安装程序…",
+  "main.update.badge": "更新",
+  "main.update.downloading": "正在下载…",
+  "main.update.ready": "可以安装",
+  "main.update.failed": "无法下载更新",
+  "main.update.log.manifest": "正在获取版本列表",
+  "main.update.log.found": "版本 {0}：{1} 个文件",
+  "main.update.log.current": "已是最新",
+  "main.update.log.unreachable": "无法访问版本列表",
 
   "main.action.copy": "复制",
 
 
   "main.action.install": "安装",
+  "main.action.download": "下载",
 
   "main.action.browse": "浏览",
   "main.action.cancel": "取消",

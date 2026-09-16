@@ -30,11 +30,20 @@
   "main.update.current": "Oppdatert",
   "main.update.offline": "Frakoblet",
   "main.update.starting": "Åpner installasjonsprogrammet…",
+  "main.update.badge": "Oppdatering",
+  "main.update.downloading": "Laster ned…",
+  "main.update.ready": "Klar til installering",
+  "main.update.failed": "Oppdateringen kunne ikke lastes ned",
+  "main.update.log.manifest": "Henter versjonslisten",
+  "main.update.log.found": "Versjon {0}: {1} filer",
+  "main.update.log.current": "Allerede oppdatert",
+  "main.update.log.unreachable": "Versjonslisten kunne ikke nås",
 
   "main.action.copy": "Kopier",
 
 
   "main.action.install": "Installer",
+  "main.action.download": "Last ned",
 
   "main.action.browse": "Bla gjennom",
   "main.action.cancel": "Avbryt",

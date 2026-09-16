@@ -30,11 +30,20 @@
   "main.update.current": "Актуально",
   "main.update.offline": "Офлайн",
   "main.update.starting": "Открытие установщика…",
+  "main.update.badge": "Обновление",
+  "main.update.downloading": "Загрузка…",
+  "main.update.ready": "Готово к установке",
+  "main.update.failed": "Не удалось загрузить обновление",
+  "main.update.log.manifest": "Получение списка версий",
+  "main.update.log.found": "Версия {0}: файлов {1}",
+  "main.update.log.current": "Уже актуально",
+  "main.update.log.unreachable": "Список версий недоступен",
 
   "main.action.copy": "Копировать",
 
 
   "main.action.install": "Установить",
+  "main.action.download": "Скачать",
 
   "main.action.browse": "Обзор",
   "main.action.cancel": "Отмена",

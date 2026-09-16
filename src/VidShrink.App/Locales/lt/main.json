@@ -30,11 +30,20 @@
   "main.update.current": "Atnaujinta",
   "main.update.offline": "Neprisijungta",
   "main.update.starting": "Atveriama diegimo programa…",
+  "main.update.badge": "Naujinys",
+  "main.update.downloading": "Atsisiunčiama…",
+  "main.update.ready": "Paruošta diegti",
+  "main.update.failed": "Naujinio atsisiųsti nepavyko",
+  "main.update.log.manifest": "Gaunamas versijų sąrašas",
+  "main.update.log.found": "Versija {0}: {1} failai",
+  "main.update.log.current": "Jau naujausia",
+  "main.update.log.unreachable": "Versijų sąrašas nepasiekiamas",
 
   "main.action.copy": "Kopijuoti",
 
 
   "main.action.install": "Įdiegti",
+  "main.action.download": "Atsisiųsti",
 
   "main.action.browse": "Naršyti",
   "main.action.cancel": "Atšaukti",

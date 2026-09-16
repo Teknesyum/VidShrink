@@ -501,8 +501,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1192, toplam);
-        Assert.Equal(134, dilBasina["en"]);
+        Assert.Equal(1217, toplam);
+        Assert.Equal(139, dilBasina["en"]);
         Assert.Equal(52, dilBasina["tr"]);
     }
 
@@ -545,7 +545,8 @@ public sealed class BaslikKapsamiTests
     /// (kutu, ipucu, olcum dugmesi, ozet ve sekiz gerekce satiri), 43 x 706 = 30358.
     /// Guncelleme rozeti dort main.update.* anahtari ekledi: 43 x 710 = 30530. Hedef boyut butcesi
     /// dokuz recorder.budget.* / recorder.auto.manual anahtari ekledi, sahipsiz kalan recorder.auto.enable
-    /// ve recorder.auto.hint dustu: 43 x 717 = 30831.</para>
+    /// ve recorder.auto.hint dustu: 43 x 717 = 30831. Iki adimli guncelleme indirme dugmesini, rozet/durum ve dort gunluk satirini ekledi
+    /// (main.action.download, main.update.badge/downloading/ready/failed, main.update.log.*): 43 x 732 = 31476'dan 43 x 741 = 31863'e.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -573,7 +574,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(31476, gezilen);
+        Assert.Equal(31863, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -30,11 +30,20 @@
   "main.update.current": "Up to date",
   "main.update.offline": "Offline",
   "main.update.starting": "Opening the installer…",
+  "main.update.badge": "Update",
+  "main.update.downloading": "Downloading…",
+  "main.update.ready": "Ready to install",
+  "main.update.failed": "The update could not be downloaded",
+  "main.update.log.manifest": "Fetching the release list",
+  "main.update.log.found": "Version {0}: {1} files",
+  "main.update.log.current": "Already up to date",
+  "main.update.log.unreachable": "The release list could not be reached",
 
   "main.action.copy": "Copy",
 
 
   "main.action.install": "Install",
+  "main.action.download": "Download",
 
   "main.action.browse": "Browse",
   "main.action.cancel": "Cancel",

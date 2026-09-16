@@ -30,11 +30,20 @@
   "main.update.current": "Đã cập nhật",
   "main.update.offline": "Ngoại tuyến",
   "main.update.starting": "Đang mở trình cài đặt…",
+  "main.update.badge": "Cập nhật",
+  "main.update.downloading": "Đang tải xuống…",
+  "main.update.ready": "Sẵn sàng cài đặt",
+  "main.update.failed": "Không thể tải bản cập nhật",
+  "main.update.log.manifest": "Đang lấy danh sách phiên bản",
+  "main.update.log.found": "Phiên bản {0}: {1} tệp",
+  "main.update.log.current": "Đã là bản mới nhất",
+  "main.update.log.unreachable": "Không truy cập được danh sách phiên bản",
 
   "main.action.copy": "Sao chép",
 
 
   "main.action.install": "Cài đặt",
+  "main.action.download": "Tải xuống",
 
   "main.action.browse": "Duyệt",
   "main.action.cancel": "Hủy",

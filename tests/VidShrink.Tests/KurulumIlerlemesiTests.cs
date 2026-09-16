@@ -17,17 +17,62 @@ namespace VidShrink.Tests;
 /// </summary>
 public class KurulumIlerlemesiTests
 {
-    /// <summary>Çubuk yüzdeye fark × 0,08 ile yaklaşıyor, en az 0,2 adımla.</summary>
+    /// <summary>
+    /// Çubuk yüzdeye yaklaşıyor: açılış atağında fark × 0,2, atak bitince fark × 0,08,
+    /// en az 0,2 adımla.
+    /// </summary>
     [Fact]
     public void CubukYuzdeyeYaklasiyor()
     {
         var p = new InstallProgress();
         p.Step(50, 60, "İndiriliyor");
 
-        Assert.Equal(50 * InstallProgress.Approach, p.Advance(), 6);
+        Assert.Equal(50 * InstallProgress.BurstApproach, p.Advance(), 6);
 
         var ikinci = p.Advance();
         Assert.True(ikinci > 4 && ikinci < 50);
+    }
+
+    /// <summary>
+    /// Açılış atağı: ilk <see cref="InstallProgress.BurstFrames"/> kare hızlı, sonra olağan
+    /// yasa. Atak da tavanı ve yüzdeyi geçmiyor, çubuk hiçbir karede geri gitmiyor. Sınır
+    /// kare içinde düşünce kare bölünüyor: yarım karelerle varılan yer aynı.
+    /// </summary>
+    [Fact]
+    public void AcilisAtagiKisaVeTavanliKosuyor()
+    {
+        var p = new InstallProgress();
+        p.Step(0, 30, "Sürüm listesi alınıyor");
+
+        var onceki = 0.0;
+        for (var i = 0; i < InstallProgress.BurstFrames; i++)
+        {
+            var bar = p.Advance();
+            Assert.True(bar >= onceki, "atak çubuğu geri götürdü");
+            Assert.True(bar <= 30, $"atak tavanı geçti: {bar}");
+            onceki = bar;
+        }
+        Assert.Equal(30 * (1 - Math.Pow(1 - InstallProgress.BurstCreep, InstallProgress.BurstFrames)), onceki, 6);
+
+        var q = new InstallProgress();
+        for (var i = 0; i < InstallProgress.BurstFrames; i++) q.Advance();
+        q.Step(100, 100, "x");
+        Assert.Equal(100 * InstallProgress.Approach, q.Advance(), 6);
+
+        var tek = new InstallProgress();
+        var yarim = new InstallProgress();
+        tek.Step(100, 100, "x");
+        yarim.Step(100, 100, "x");
+        var kare = TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds);
+        for (var i = 0; i < 3; i++) tek.Advance(kare * 10);
+        for (var i = 0; i < 60; i++) yarim.Advance(kare / 2);
+        Assert.Equal(tek.Bar, yarim.Bar, 6);
+
+        var yavas = new InstallProgress();
+        yavas.Step(100, 100, "x");
+        for (var i = 0; i < InstallProgress.BurstFrames; i++) yavas.Advance();
+        var olagan = 100 * (1 - Math.Pow(1 - InstallProgress.Approach, InstallProgress.BurstFrames));
+        Assert.True(yavas.Bar > olagan, "atak olağan yasadan hızlı koşmalı");
     }
 
     /// <summary>Fark küçülünce adım tabana oturuyor: çubuk hiçbir karede donmuyor.</summary>

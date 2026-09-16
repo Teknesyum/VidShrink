@@ -30,11 +30,20 @@
   "main.update.current": "Actualizado",
   "main.update.offline": "Sin conexión",
   "main.update.starting": "Abriendo el instalador…",
+  "main.update.badge": "Actualización",
+  "main.update.downloading": "Descargando…",
+  "main.update.ready": "Lista para instalar",
+  "main.update.failed": "No se pudo descargar la actualización",
+  "main.update.log.manifest": "Obteniendo la lista de versiones",
+  "main.update.log.found": "Versión {0}: {1} archivos",
+  "main.update.log.current": "Ya está actualizado",
+  "main.update.log.unreachable": "No se pudo acceder a la lista de versiones",
 
   "main.action.copy": "Copiar",
 
 
   "main.action.install": "Instalar",
+  "main.action.download": "Descargar",
 
   "main.action.browse": "Examinar",
   "main.action.cancel": "Cancelar",

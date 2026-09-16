@@ -30,11 +30,20 @@
   "main.update.current": "Ajakohane",
   "main.update.offline": "Võrguühenduseta",
   "main.update.starting": "Installija avamine…",
+  "main.update.badge": "Uuendus",
+  "main.update.downloading": "Laadin alla…",
+  "main.update.ready": "Valmis paigaldamiseks",
+  "main.update.failed": "Uuendust ei õnnestunud alla laadida",
+  "main.update.log.manifest": "Versioonide loendi toomine",
+  "main.update.log.found": "Versioon {0}: {1} faili",
+  "main.update.log.current": "Juba ajakohane",
+  "main.update.log.unreachable": "Versioonide loendit ei õnnestunud kätte saada",
 
   "main.action.copy": "Kopeeri",
 
 
   "main.action.install": "Paigalda",
+  "main.action.download": "Laadi alla",
 
   "main.action.browse": "Sirvi",
   "main.action.cancel": "Loobu",

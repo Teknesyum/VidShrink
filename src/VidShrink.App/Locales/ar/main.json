@@ -30,11 +30,20 @@
   "main.update.current": "محدَّث",
   "main.update.offline": "غير متصل",
   "main.update.starting": "يفتح المثبت…",
+  "main.update.badge": "تحديث",
+  "main.update.downloading": "جارٍ التنزيل…",
+  "main.update.ready": "جاهز للتثبيت",
+  "main.update.failed": "تعذّر تنزيل التحديث",
+  "main.update.log.manifest": "جارٍ جلب قائمة الإصدارات",
+  "main.update.log.found": "الإصدار {0}: {1} ملفات",
+  "main.update.log.current": "محدَّث بالفعل",
+  "main.update.log.unreachable": "تعذّر الوصول إلى قائمة الإصدارات",
 
   "main.action.copy": "نسخ",
 
 
   "main.action.install": "تثبيت",
+  "main.action.download": "تنزيل",
 
   "main.action.browse": "استعراض",
   "main.action.cancel": "إلغاء",

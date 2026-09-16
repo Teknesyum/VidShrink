@@ -30,11 +30,20 @@
   "main.update.current": "Atjaunināts",
   "main.update.offline": "Bezsaistē",
   "main.update.starting": "Tiek atvērts instalētājs…",
+  "main.update.badge": "Atjauninājums",
+  "main.update.downloading": "Lejupielādē…",
+  "main.update.ready": "Gatavs instalēšanai",
+  "main.update.failed": "Atjauninājumu neizdevās lejupielādēt",
+  "main.update.log.manifest": "Iegūst versiju sarakstu",
+  "main.update.log.found": "Versija {0}: {1} faili",
+  "main.update.log.current": "Jau atjaunināts",
+  "main.update.log.unreachable": "Versiju saraksts nav sasniedzams",
 
   "main.action.copy": "Kopēt",
 
 
   "main.action.install": "Instalēt",
+  "main.action.download": "Lejupielādēt",
 
   "main.action.browse": "Pārlūkot",
   "main.action.cancel": "Atcelt",

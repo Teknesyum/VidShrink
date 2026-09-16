@@ -30,11 +30,20 @@
   "main.update.current": "Naprakész",
   "main.update.offline": "Nincs kapcsolat",
   "main.update.starting": "A telepítő megnyitása…",
+  "main.update.badge": "Frissítés",
+  "main.update.downloading": "Letöltés…",
+  "main.update.ready": "Telepítésre kész",
+  "main.update.failed": "A frissítést nem sikerült letölteni",
+  "main.update.log.manifest": "Verziólista lekérése",
+  "main.update.log.found": "{0} verzió: {1} fájl",
+  "main.update.log.current": "Már naprakész",
+  "main.update.log.unreachable": "A verziólista nem érhető el",
 
   "main.action.copy": "Másolás",
 
 
   "main.action.install": "Telepítés",
+  "main.action.download": "Letöltés",
 
   "main.action.browse": "Tallózás",
   "main.action.cancel": "Mégse",
