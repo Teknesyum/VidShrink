@@ -407,6 +407,7 @@ Dal `t0/paket-1`. Kaynak: `.calisma/eksikler/rapor.md` satır 1, 2, 3, 6, 7, 12,
 4. `player-recent.json` test yolu: kayıt yolu ayar yolu değişkenine bağlanır.
 5. libmpv yedeği: `libmpv-mirror` yayın varlığı, CI/release/Install-VidShrink.ps1 yedek kaynak, sha256 aynı.
 6. Karşılaştırma paneli perdesi: şekil tema belirteçleriyle, önce/sonra PNG.
+   **Zaten yapılmış:** 29 Ağustos 23:51 isteği (`tmp/gecmis-8.md` satır 182) 36 dakika sonra T79 `2b5be0d7` ile karşılandı: şerit paravanı `PlaybackScrimVeil`, alttan yukarı son çeyreğinde (`PlaybackScrimEdge` 0,25) sönüyor. Rapor commit mesajındaki `Paravan sekillendi` satırını kaçırmış. Yeni biçim eklenmedi; Avalonia.Headless ile aynı `PlaybackStrip` teması iki zeminle çizildi: `docs/olcumler/gorseller/paravan-once-duz.png` (`PlaybackScrim`), `paravan-sonra-sonen.png` (`PlaybackScrimVeil`).
 7. T194: dar pencerede kaynak bilgi kutuları tek satır, kısaltma + ipucu, `BiciminTests` pinleri.
 8. `GlowBlue/Pink/Purple` palet değişiminde canlı.
 9. Anahtar kare atlama yarışı: yeniden üret, kök neden, düzelt, pimle.
