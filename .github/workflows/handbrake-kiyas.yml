@@ -47,15 +47,32 @@ jobs:
     outputs:
       matris: ${{ steps.m.outputs.matris }}
       vt: ${{ steps.m.outputs.vt }}
+      kbitler: ${{ steps.m.outputs.kbitler }}
+      ayrinti: ${{ steps.m.outputs.ayrinti }}
     steps:
       - id: m
         shell: pwsh
         run: |
           $isler = '${{ inputs.isler }}'
-          if (-not $isler) { $isler = 'handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant' }
-          if ('${{ github.ref_name }}' -match '^olcum-hb-([a-z+]+)--') { $isler = $Matches[1].Replace('+', ',') }
+          if (-not $isler) { $isler = 'handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,vt' }
           $hbKesit = '${{ inputs.kesitler }}'
           if (-not $hbKesit) { $hbKesit = 'karanlik,parlak,hareketli,ekran' }
+          $kbitler = '${{ inputs.kbitler }}'
+          if (-not $kbitler) { $kbitler = '600,2000' }
+          $ayrinti = '${{ inputs.ayrinti }}'
+          if (-not $ayrinti) { $ayrinti = '{}' }
+          if ('${{ github.ref_name }}' -match '^olcum-hb-([a-z+]+)(__duman)?--') {
+            $isler = $Matches[1].Replace('+', ',')
+            if ($Matches[2]) {
+              $hbKesit = 'karanlik'
+              $kbitler = '600'
+              $ayrinti = '{"DusukKbitler":"300","BantKbitler":"300","HdrKbitler":"1000","VtKbitler":"2000","Hedefler":"25","Onayarlar":"Social 10 MB 1 Minute 540p60","VtKesitler":"karanlik","Duman":"1"}'
+            }
+          }
+          $ayrinti = ConvertTo-Json -Compress -InputObject ($ayrinti | ConvertFrom-Json)
+          "kbitler=$kbitler" | Add-Content $env:GITHUB_OUTPUT
+          "ayrinti=$ayrinti" | Add-Content $env:GITHUB_OUTPUT
+          Write-Host "kbitler=$kbitler ayrinti=$ayrinti"
           $harita = @{
             handbrake = @($hbKesit.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ })
             dusuk = @('karanlik', 'parlak', 'hareketli')
@@ -68,7 +85,9 @@ jobs:
           $liste = @()
           foreach ($is in @($isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -ne 'vt' })) {
             if (-not $harita.ContainsKey($is)) { throw "bilinmeyen is: $is" }
-            foreach ($k in $harita[$is]) { $liste += @{ is = $is; kesit = $k } }
+            $ks = $harita[$is]
+            if ($ayrinti -match '"Duman"' -and $is -ne 'handbrake') { $ks = @($ks | Select-Object -Last 1) }
+            foreach ($k in $ks) { $liste += @{ is = $is; kesit = $k } }
           }
           $vt = if ('${{ github.event_name }}' -eq 'push') { ($isler -split ',') -contains 'vt' } else { '${{ inputs.vt }}' -eq 'true' }
           $json = ConvertTo-Json -Compress -InputObject @{ include = $liste }
@@ -207,7 +226,7 @@ jobs:
           "HDR_KAYNAK=$h" | Add-Content $env:GITHUB_ENV
       - name: olc
         env:
-          KBITLER: ${{ inputs.kbitler || '600,2000' }}
+          KBITLER: ${{ needs.plan.outputs.kbitler }}
         run: |
           $a = @('-Is', '${{ matrix.is }}', '-Kesit', '${{ matrix.kesit }}', '-Cikti', "$env:RUNNER_TEMP\olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI, '-Kbitler', $env:KBITLER, '-UrunYolu', '${{ inputs.urun_yolu || 'bench' }}')
           if ($env:URUN_CLI) { $a += @('-Cli', $env:URUN_CLI, '-CliSablon', '${{ inputs.cli_sablon }}') }
@@ -215,8 +234,8 @@ jobs:
           if ($env:BENCH_TURBO) { $a += @('-BenchTurbo', $env:BENCH_TURBO) }
           if ($env:UZUN_EKRAN) { $a += @('-EkranUzun', $env:UZUN_EKRAN) }
           if ($env:HDR_KAYNAK) { $a += @('-HdrKaynak', $env:HDR_KAYNAK) }
-          $ayr = '${{ inputs.ayrinti || '{}' }}' | ConvertFrom-Json
-          foreach ($p in $ayr.PSObject.Properties) { if ($p.Name -ne 'VtKesitler') { $a += @("-$($p.Name)", "$($p.Value)") } }
+          $ayr = '${{ needs.plan.outputs.ayrinti }}' | ConvertFrom-Json
+          foreach ($p in $ayr.PSObject.Properties) { if ($p.Name -notin @('VtKesitler', 'VtKbitler', 'Duman')) { $a += @("-$($p.Name)", "$($p.Value)") } }
           Write-Host ($a -join ' ')
           pwsh tools/kalite-paketi-3/hb.ps1 @a
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -272,7 +291,7 @@ jobs:
         shell: pwsh
         run: |
           $a = @('-Is', 'vt', '-Kesitler', 'karanlik,parlak,hareketli,ekran', '-Cikti', "$env:RUNNER_TEMP/olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI)
-          $ayr = '${{ inputs.ayrinti || '{}' }}' | ConvertFrom-Json
+          $ayr = '${{ needs.plan.outputs.ayrinti }}' | ConvertFrom-Json
           foreach ($p in $ayr.PSObject.Properties) {
             if ($p.Name -eq 'VtKesitler') { $a[3] = "$($p.Value)" } elseif ($p.Name -eq 'VtKbitler') { $a += @('-VtKbitler', "$($p.Value)") }
           }
