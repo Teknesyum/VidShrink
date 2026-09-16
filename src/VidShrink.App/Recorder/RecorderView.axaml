@@ -398,63 +398,6 @@
             <ComboBox x:Name="CmbContainer" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.container}"/>
           </StackPanel>
           <StackPanel Grid.Column="1">
-            <TextBlock Text="{loc:Text recorder.advanced.scale-width}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtScaleWidth" PlaceholderText="{loc:Text recorder.advanced.optional}" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-width}"/>
-          </StackPanel>
-          <StackPanel Grid.Column="2">
-            <TextBlock Text="{loc:Text recorder.advanced.scale-height}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtScaleHeight" PlaceholderText="{loc:Text recorder.advanced.optional}" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-height}"/>
-          </StackPanel>
-          <StackPanel Grid.Column="3">
-            <TextBlock Text="{loc:Text recorder.advanced.keyframe}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtKeyframe" auto:AutomationProperties.Name="{loc:Text recorder.advanced.keyframe}"/>
-          </StackPanel>
-        </Grid>
-
-        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="{StaticResource SpaceSm}">
-          <StackPanel Grid.Column="0">
-            <TextBlock Text="{loc:Text recorder.advanced.profile}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbProfile" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.profile}"/>
-          </StackPanel>
-          <StackPanel Grid.Column="1">
-            <TextBlock Text="{loc:Text recorder.advanced.tune}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbTune" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.tune}"/>
-          </StackPanel>
-          <StackPanel Grid.Column="2">
-            <TextBlock Text="{loc:Text recorder.advanced.pixel-format}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbPixelFormat" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.pixel-format}"/>
-          </StackPanel>
-          <StackPanel Grid.Column="3">
-            <TextBlock Text="{loc:Text recorder.advanced.rate}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbRateControl" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.rate}"/>
-          </StackPanel>
-        </Grid>
-
-        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="{StaticResource SpaceSm}">
-          <StackPanel Grid.Column="0">
-            <TextBlock Text="{loc:Text recorder.advanced.bitrate}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtBitrate" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.bitrate}"/>
-          </StackPanel>
-          <StackPanel Grid.Column="1">
-            <TextBlock Text="{loc:Text recorder.advanced.max-bitrate}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtMaxBitrate" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.max-bitrate}"/>
-          </StackPanel>
-          <StackPanel Grid.Column="2">
-            <TextBlock Text="{loc:Text recorder.advanced.buffer}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtBuffer" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.buffer}"/>
-          </StackPanel>
-          <StackPanel Grid.Column="3">
-            <TextBlock Text="{loc:Text recorder.advanced.color-space}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbColorSpace" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-space}"/>
-          </StackPanel>
-        </Grid>
-
-        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="{StaticResource SpaceSm}">
-          <StackPanel Grid.Column="0">
-            <TextBlock Text="{loc:Text recorder.advanced.color-range}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbColorRange" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-range}"/>
-          </StackPanel>
-          <StackPanel Grid.Column="1">
             <TextBlock Text="{loc:Text recorder.advanced.max-duration}" Theme="{StaticResource Label}"/>
             <TextBox x:Name="TxtMaxDuration" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.max-duration}"/>
           </StackPanel>
@@ -490,6 +433,65 @@
                     Content="{loc:Text recorder.advanced.noise-suppression}"
                     auto:AutomationProperties.Name="{loc:Text recorder.advanced.noise-suppression}"/>
         </Grid>
+
+        <StackPanel x:Name="PanelAdvancedEncoding" Spacing="{StaticResource SpaceMd}">
+          <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="{StaticResource SpaceSm}">
+            <StackPanel Grid.Column="0">
+              <TextBlock Text="{loc:Text recorder.advanced.scale-width}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtScaleWidth" PlaceholderText="{loc:Text recorder.advanced.optional}" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-width}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+              <TextBlock Text="{loc:Text recorder.advanced.scale-height}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtScaleHeight" PlaceholderText="{loc:Text recorder.advanced.optional}" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-height}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Text="{loc:Text recorder.advanced.keyframe}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtKeyframe" auto:AutomationProperties.Name="{loc:Text recorder.advanced.keyframe}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="3">
+              <TextBlock Text="{loc:Text recorder.advanced.pixel-format}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbPixelFormat" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.pixel-format}"/>
+            </StackPanel>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="{StaticResource SpaceSm}">
+            <StackPanel Grid.Column="0">
+              <TextBlock Text="{loc:Text recorder.advanced.profile}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbProfile" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.profile}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+              <TextBlock Text="{loc:Text recorder.advanced.tune}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbTune" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.tune}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Text="{loc:Text recorder.advanced.color-space}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbColorSpace" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-space}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="3">
+              <TextBlock Text="{loc:Text recorder.advanced.color-range}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbColorRange" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-range}"/>
+            </StackPanel>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="{StaticResource SpaceSm}">
+            <StackPanel Grid.Column="0">
+              <TextBlock Text="{loc:Text recorder.advanced.rate}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbRateControl" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.rate}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+              <TextBlock Text="{loc:Text recorder.advanced.bitrate}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtBitrate" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.bitrate}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Text="{loc:Text recorder.advanced.max-bitrate}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtMaxBitrate" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.max-bitrate}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="3">
+              <TextBlock Text="{loc:Text recorder.advanced.buffer}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtBuffer" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.buffer}"/>
+            </StackPanel>
+          </Grid>
+        </StackPanel>
       </StackPanel>
     </Border>
 

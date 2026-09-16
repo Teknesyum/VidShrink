@@ -46,6 +46,10 @@ sürümden (`x.0.0`) önce koşar.
   seçilir, gerçek RegisterHotKey testte kaydedilmez. Gelişmiş panel: on kol denetimden
   `BuildRequest`'e ve ayara geçer, kodlayıcı değişince profil/tune/piksel listesi yenilenir, otomatik kodlayıcıya
   uymayan kol `FitToCodec` ile düşer. Geçici ayar dosyaları `.calisma/kap-olcu-*`, test siler.
+- `KaydediciAyarTests.cs` — paket 2, her kaydedici ayarı uçtan uca: denetimde değişir, Başlat'a basmadan
+  `recorder-settings.json`'a yazılır, yeni görünümün `PrepareRecording` argümanına geçer, lavfi çevirisiyle ffprobe'ta
+  görünür; değiştirilmeyen görünüm negatif kontrol. Otomatik kip kabı korur, açılışta bir kez ölçer (başsızda ve elle
+  kipte ölçmez, sahte `OpenMeasure`). Canlı kol 4,5 sn bölge kaydı. Kanıt `.calisma/paket-2/`.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

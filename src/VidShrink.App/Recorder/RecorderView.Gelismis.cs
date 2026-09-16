@@ -174,60 +174,60 @@ internal partial class RecorderView
         TxtBuffer.IsEnabled = bitrate;
     }
 
-    private bool Whole(TextBox box, string labelKey, int fallback, out int value)
+    private bool Whole(TextBox box, string labelKey, int fallback, bool report, Action<int> store)
     {
-        value = fallback;
-        if (string.IsNullOrWhiteSpace(box.Text)) return true;
-        if (int.TryParse(box.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out value) && value >= 0) return true;
-        ShowError(Say("recorder.error.number", Say(labelKey)));
-        return false;
+        var value = fallback;
+        if (string.IsNullOrWhiteSpace(box.Text)
+            || (int.TryParse(box.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out value) && value >= 0))
+        {
+            store(value);
+            return true;
+        }
+
+        if (report) ShowError(Say("recorder.error.number", Say(labelKey)));
+        return !report;
     }
 
-    private bool Real(TextBox box, string labelKey, bool signed, out double value)
+    private bool Real(TextBox box, string labelKey, bool signed, bool report, Action<double> store)
     {
-        value = 0;
-        if (string.IsNullOrWhiteSpace(box.Text)) return true;
-        if ((double.TryParse(box.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out value)
-                || double.TryParse(box.Text, NumberStyles.Float, CultureInfo.CurrentCulture, out value))
-            && double.IsFinite(value) && (signed || value >= 0)) return true;
-        ShowError(Say("recorder.error.number", Say(labelKey)));
-        return false;
+        var value = 0d;
+        if (string.IsNullOrWhiteSpace(box.Text)
+            || ((double.TryParse(box.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out value)
+                    || double.TryParse(box.Text, NumberStyles.Float, CultureInfo.CurrentCulture, out value))
+                && double.IsFinite(value) && (signed || value >= 0)))
+        {
+            store(value);
+            return true;
+        }
+
+        if (report) ShowError(Say("recorder.error.number", Say(labelKey)));
+        return !report;
     }
 
-    internal bool ReadAdvanced()
+    internal bool ReadAdvanced(bool report = true)
     {
-        if (!AdvancedMode) return true;
+        if (report && !AdvancedMode) return true;
 
-        if (!Whole(TxtScaleWidth, "recorder.advanced.scale-width", 0, out var scaleWidth)
-            || !Whole(TxtScaleHeight, "recorder.advanced.scale-height", 0, out var scaleHeight)
-            || !Whole(TxtKeyframe, "recorder.advanced.keyframe", RecorderArguments.DefaultKeyframeSeconds, out var keyframe)
-            || !Whole(TxtBitrate, "recorder.advanced.bitrate", 0, out var bitrate)
-            || !Whole(TxtMaxBitrate, "recorder.advanced.max-bitrate", 0, out var maxBitrate)
-            || !Whole(TxtBuffer, "recorder.advanced.buffer", 0, out var buffer)
-            || !Real(TxtMaxDuration, "recorder.advanced.max-duration", false, out var maxDuration)
-            || !Real(TxtSplitSeconds, "recorder.advanced.split-seconds", false, out var splitSeconds)
-            || !Real(TxtSplitMegabytes, "recorder.advanced.split-megabytes", false, out var splitMegabytes)
-            || !Real(TxtAudioGain, "recorder.advanced.audio-gain", true, out var gain))
+        if (!Whole(TxtScaleWidth, "recorder.advanced.scale-width", 0, report, v => _settings.ScaleWidth = v)
+            || !Whole(TxtScaleHeight, "recorder.advanced.scale-height", 0, report, v => _settings.ScaleHeight = v)
+            || !Whole(TxtKeyframe, "recorder.advanced.keyframe", RecorderArguments.DefaultKeyframeSeconds, report, v => _settings.KeyframeSeconds = v)
+            || !Whole(TxtBitrate, "recorder.advanced.bitrate", 0, report, v => _settings.BitrateKbps = v)
+            || !Whole(TxtMaxBitrate, "recorder.advanced.max-bitrate", 0, report, v => _settings.MaxBitrateKbps = v)
+            || !Whole(TxtBuffer, "recorder.advanced.buffer", 0, report, v => _settings.BufferKbits = v)
+            || !Real(TxtMaxDuration, "recorder.advanced.max-duration", false, report, v => _settings.MaxDurationSeconds = v)
+            || !Real(TxtSplitSeconds, "recorder.advanced.split-seconds", false, report, v => _settings.SplitSeconds = v)
+            || !Real(TxtSplitMegabytes, "recorder.advanced.split-megabytes", false, report, v => _settings.SplitMegabytes = v)
+            || !Real(TxtAudioGain, "recorder.advanced.audio-gain", true, report, v => _settings.AudioGainDb = v))
             return false;
 
         _settings.Container = SelectedContainer;
-        _settings.ScaleWidth = scaleWidth;
-        _settings.ScaleHeight = scaleHeight;
-        _settings.KeyframeSeconds = keyframe;
         _settings.Profile = SelectedProfile;
         _settings.Tune = SelectedTune;
         _settings.RateControl = SelectedRateControl;
-        _settings.BitrateKbps = bitrate;
-        _settings.MaxBitrateKbps = maxBitrate;
-        _settings.BufferKbits = buffer;
         _settings.PixelFormat = SelectedPixelFormat;
         _settings.ColorSpace = SelectedColorSpace;
         _settings.ColorRange = SelectedColorRange;
-        _settings.MaxDurationSeconds = maxDuration;
-        _settings.SplitSeconds = splitSeconds;
-        _settings.SplitMegabytes = splitMegabytes;
         _settings.AudioLayout = SelectedAudioLayout;
-        _settings.AudioGainDb = gain;
         _settings.AudioNoiseGate = ChkNoiseGate.IsChecked ?? false;
         _settings.AudioNoiseSuppression = ChkNoiseSuppression.IsChecked ?? false;
         return true;

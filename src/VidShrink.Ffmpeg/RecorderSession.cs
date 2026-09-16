@@ -135,6 +135,8 @@ public sealed class RecorderSession : IAsyncDisposable
     private int _lastExitCode;
     private bool _partial;
     private string? _gifPath;
+    private bool _closing;
+    private readonly TaskCompletionSource _ended = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     private RecorderSession(RecorderRequest request, string outputPath, IProgress<RecordProgress>? progress)
     {
@@ -316,14 +318,21 @@ public sealed class RecorderSession : IAsyncDisposable
                 if (_partial)
                 {
                     State = RecorderState.Stopped;
+                    _ended.TrySetResult();
                     return;
                 }
 
                 await StartSegmentAsync(CancellationToken.None);
+                if (State == RecorderState.Stopped)
+                {
+                    _ended.TrySetResult();
+                    return;
+                }
             }
             catch (InvalidOperationException)
             {
                 State = RecorderState.Stopped;
+                _ended.TrySetResult();
                 return;
             }
             finally { _turn.Release(); }
@@ -381,6 +390,7 @@ public sealed class RecorderSession : IAsyncDisposable
         if (firstBlock.Task.IsCompletedSuccessfully && firstBlock.Task.Result)
         {
             State = RecorderState.Running;
+            _ = WatchExitAsync(process);
             return;
         }
 
@@ -434,7 +444,8 @@ public sealed class RecorderSession : IAsyncDisposable
         var process = _process;
         if (process is null) return;
 
-        FfmpegRunner.RequestGracefulStop(process);
+        _closing = true;
+        if (stopTimeoutMs > 0) FfmpegRunner.RequestGracefulStop(process);
 
         if (!await WaitForExitAsync(process, stopTimeoutMs, ct))
         {
@@ -458,6 +469,27 @@ public sealed class RecorderSession : IAsyncDisposable
         _process = null;
         _stdoutPump = null;
         _stderrPump = null;
+        _closing = false;
+    }
+
+    public Task Ended => _ended.Task;
+
+    private async Task WatchExitAsync(Process process)
+    {
+        try { await process.WaitForExitAsync(); }
+        catch (Exception ex) when (ex is InvalidOperationException or ObjectDisposedException) { return; }
+
+        if (_closing || !ReferenceEquals(_process, process)) return;
+        await _turn.WaitAsync();
+        try
+        {
+            if (!ReferenceEquals(_process, process)) return;
+            await FinishSegmentAsync(StopTimeoutMs, CancellationToken.None);
+            State = RecorderState.Stopped;
+        }
+        finally { _turn.Release(); }
+
+        _ended.TrySetResult();
     }
 
     private async Task<RecordResult> AssembleAsync(CancellationToken ct)

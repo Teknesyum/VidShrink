@@ -46,6 +46,7 @@ internal partial class RecorderView : UserControl
         InitGeriSayim();
         InitMini();
         RefreshSerit();
+        InitKalicilik();
     }
 
     /// <summary>Sayfadaki hata satırı. Ölçüm kendi gördüğünü okuyabilsin diye açık.</summary>
@@ -65,6 +66,7 @@ internal partial class RecorderView : UserControl
         RefreshLanguage();
         ActivateTray();
         ActivateHotkeys();
+        _ = MeasureOnOpenAsync(Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -83,13 +85,14 @@ internal partial class RecorderView : UserControl
 
     /// <summary>Kodla yazılan bütün metinleri yeniden üretir; seçimler korunuyor.</summary>
     private void RefreshLanguage()
-    {
-        RefreshTargetLabels();
-        RefreshAudioBoxes();
-        RefreshCountdownLabels();
-        RefreshAdvancedLabels();
-        RefreshSerit();
-    }
+        => Quietly(() =>
+        {
+            RefreshTargetLabels();
+            RefreshAudioBoxes();
+            RefreshCountdownLabels();
+            RefreshAdvancedLabels();
+            RefreshSerit();
+        });
 
     internal RecorderSettings Settings => _settings;
 

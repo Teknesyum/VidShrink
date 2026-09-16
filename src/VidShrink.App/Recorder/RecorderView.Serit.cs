@@ -111,10 +111,8 @@ internal partial class RecorderView
             return;
         }
 
-        if (BuildRequest() is not { } request) return;
-
-        StoreChoices();
-        var path = _settings.OutputPath(DateTime.Now);
+        if (PrepareRecording() is not { } prepared) return;
+        var (request, path) = prepared;
 
         var errors = RecorderArguments.Validate(request, path);
         if (errors.Count > 0)
@@ -131,6 +129,7 @@ internal partial class RecorderView
             _session = await RecorderSession.StartAsync(
                 request, path, new Progress<RecordProgress>(ShowProgress));
             _frameRegion = RegionOf(request);
+            _ = FollowEndAsync(_session.Ended, _session);
         }
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)
         {
@@ -172,9 +171,10 @@ internal partial class RecorderView
             return;
         }
 
-        if (_session is null) return;
+        if (_session is null || _stopping) return;
 
         var session = _session;
+        _stopping = true;
         try
         {
             var result = await session.StopAsync();
@@ -189,8 +189,23 @@ internal partial class RecorderView
         {
             _session = null;
             _frameRegion = null;
+            _stopping = false;
             RefreshSerit();
         }
+    }
+
+    private bool _stopping;
+
+    internal async Task FollowEndAsync(Task ended, object session)
+    {
+        await ended;
+        if (!Avalonia.Threading.Dispatcher.UIThread.CheckAccess())
+        {
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => FollowEndAsync(Task.CompletedTask, session));
+            return;
+        }
+
+        if (ReferenceEquals(_session, session)) await StopAsync();
     }
 
     private void ShowProgress(RecordProgress progress)

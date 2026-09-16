@@ -189,7 +189,12 @@ internal partial class RecorderView
 
         if (!applyAuto || !AutoMode) return request;
 
-        if (AutoChoice is { } choice) request = RecorderAutoPlan.Apply(request, choice);
+        var planned = RecorderAutoPlan.Apply(request, PlannedChoice);
+        request = planned with
+        {
+            Container = _settings.Container,
+            Fps = _settings.Container == RecorderContainer.Gif ? Math.Min(planned.Fps, GifPalette.MaxFps) : planned.Fps
+        };
 
         var budget = Budget;
         if (budget.Verdict != RecorderBudgetVerdict.Usable) return request;
@@ -245,16 +250,29 @@ internal partial class RecorderView
         return new RecorderRegion(read[0], read[1], read[2], read[3]);
     }
 
-    /// <summary>Seçimleri ayara yazar; bir sonraki açılış aynı yerden başlıyor.</summary>
+    internal (RecorderRequest Request, string Path)? PrepareRecording()
+    {
+        if (BuildRequest() is not { } request) return null;
+        StoreChoices();
+        return (request, _settings.OutputPath(DateTime.Now));
+    }
+
     private void StoreChoices()
     {
-        _settings.Target = SelectedTarget;
+        CollectChoices();
+        _settings.Save(RecorderSettings.FilePath);
+    }
+
+    private void CollectChoices()
+    {
+        ReadAdvanced(report: false);
+        if (CmbTarget.SelectedIndex >= 0) _settings.Target = SelectedTarget;
         _settings.Codec = CmbCodec.SelectedItem as string ?? _settings.Codec;
         _settings.Preset = CmbPreset.SelectedItem as string ?? _settings.Preset;
         _settings.ShowCursor = ChkCursor.IsChecked ?? false;
         _settings.WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text;
-        _settings.MicrophoneName = Chosen(AudioSourceRole.Microphone)?.Name;
-        _settings.SystemAudioName = Chosen(AudioSourceRole.SystemAudio)?.Name;
+        _settings.MicrophoneName = DeviceChoice(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
+        _settings.SystemAudioName = DeviceChoice(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);
 
         if (int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps)) _settings.Fps = fps;
         if (double.TryParse(TxtQuality.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var quality)) _settings.Quality = quality;
@@ -263,7 +281,14 @@ internal partial class RecorderView
         if (int.TryParse(TxtRegionWidth.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var w)) _settings.RegionWidth = w;
         if (int.TryParse(TxtRegionHeight.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var h)) _settings.RegionHeight = h;
         if (!string.IsNullOrWhiteSpace(TxtOutputFolder.Text)) _settings.OutputFolder = TxtOutputFolder.Text;
+    }
 
-        _settings.Save(RecorderSettings.FilePath);
+    private string? DeviceChoice(ComboBox box, AudioSourceRole role, string? remembered)
+    {
+        if (box.SelectedIndex > 0) return Chosen(role)?.Name ?? remembered;
+        if (box.SelectedIndex < 0 || remembered is null) return remembered;
+        return _devices.Any(d => d.Role == role && string.Equals(d.Name, remembered, StringComparison.OrdinalIgnoreCase))
+            ? null
+            : remembered;
     }
 }

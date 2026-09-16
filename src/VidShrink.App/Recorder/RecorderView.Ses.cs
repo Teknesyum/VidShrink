@@ -27,12 +27,12 @@ internal partial class RecorderView
     /// İki kutuyu o anki cihaz listesi ve o anki dille yeniden üretir. Seçim addan
     /// korunuyor — indeksten değil, çünkü liste yenilenince sıra kayabiliyor.
     /// </summary>
-    private void RefreshAudioBoxes()
+    private void RefreshAudioBoxes() => Quietly(() =>
     {
         _devices = CaptureDevices.Instance.Audio;
         FillAudioBox(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
         FillAudioBox(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);
-    }
+    });
 
     private void FillAudioBox(ComboBox box, AudioSourceRole role, string? remembered)
     {
