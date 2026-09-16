@@ -179,7 +179,7 @@ public sealed class OynaticiGercekGirdiTests
             using (var kare = new Avalonia.Media.Imaging.RenderTargetBitmap(boyut, new Vector(96, 96)))
             {
                 kare.Render(window);
-                kare.Save(Path.Combine(GirdiKanit.Root, ".calisma", "girdi", "serit-ana-pencere.png"));
+                kare.Save(Path.Combine(GirdiKanit.Root, ".calisma", "girdi", "serit-ana-pencere.png"), Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
             }
             window.Close();
             return body.ToString();

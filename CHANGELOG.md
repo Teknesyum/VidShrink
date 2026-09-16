@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.7.3] - 2026-09-16
+
+### Fixed
+
+- The player input test saves its evidence frame with the PNG encoder overload, so the `-warnaserror` build passes. `v0.7.2` failed CI on that warning and shipped no release; its changes ship here.
+
 ## [0.7.2] - 2026-09-16
 
 ### Changed
