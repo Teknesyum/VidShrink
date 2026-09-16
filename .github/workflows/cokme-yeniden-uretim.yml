@@ -1,6 +1,8 @@
 name: cokme-yeniden-uretim
 
 on:
+  push:
+    tags: ['olcum-cokme-*']
   workflow_dispatch:
     inputs:
       tur:
@@ -31,7 +33,7 @@ jobs:
         run: pwsh tools/kalite-paketi-3/kur.ps1 -Libmpv
       - run: dotnet build tests/VidShrink.Tests -c Release -m:2
       - name: esszamanli suit
-        run: pwsh tools/cokme-yeniden-uretim/kos.ps1 -Esszamanli ${{ matrix.esszamanli }} -Tur ${{ inputs.tur }} -Filtre '${{ inputs.filtre }}' -Cikti .calisma/cokme
+        run: pwsh tools/cokme-yeniden-uretim/kos.ps1 -Esszamanli ${{ matrix.esszamanli }} -Tur ${{ inputs.tur || '2' }} -Filtre '${{ inputs.filtre }}' -Cikti .calisma/cokme
       - uses: actions/upload-artifact@v4
         if: always()
         with:

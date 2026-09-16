@@ -1,6 +1,8 @@
 name: kalite-olcumu
 
 on:
+  push:
+    tags: ['olcum-kalite-*']
   workflow_dispatch:
     inputs:
       kaynak_url:
@@ -33,7 +35,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $hedef = Join-Path $env:RUNNER_TEMP 'kaynak.mov'
-          try { Invoke-WebRequest -Uri '${{ inputs.kaynak_url }}' -OutFile $hedef }
+          try { Invoke-WebRequest -Uri '${{ inputs.kaynak_url || 'https://download.blender.org/demo/movies/ToS/tears_of_steel_1080p.mov' }}' -OutFile $hedef }
           catch { Invoke-WebRequest -Uri 'http://ftp.nluug.nl/pub/graphics/blender/demo/movies/ToS/tears_of_steel_1080p.mov' -OutFile $hedef }
           $sha = (Get-FileHash $hedef -Algorithm SHA256).Hash
           "kaynak sha256=$sha boy=$((Get-Item $hedef).Length)" | Tee-Object -FilePath (Join-Path $env:RUNNER_TEMP 'kaynak-sha256.txt')
@@ -71,7 +73,7 @@ jobs:
       - name: is secili mi
         id: sec
         run: |
-          $secili = '${{ inputs.isler }}'.Split(',') | ForEach-Object { $_.Trim() }
+          $secili = '${{ inputs.isler || 'whatsapp,handbrake,ceza' }}'.Split(',') | ForEach-Object { $_.Trim() }
           "calis=$($secili -contains '${{ matrix.is }}')" | Add-Content $env:GITHUB_OUTPUT
       - uses: actions/checkout@v4
         if: steps.sec.outputs.calis == 'True'
