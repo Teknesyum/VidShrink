@@ -41,7 +41,11 @@ jobs:
       - id: m
         shell: pwsh
         run: |
-          $isler = '${{ inputs.isler || 'whatsapp,handbrake,ceza' }}'.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+          $varsayilan = 'whatsapp,handbrake,ceza'
+          if ('${{ github.ref_name }}' -match '^olcum-kalite-([a-z0-9+]+)--') { $varsayilan = $Matches[1].Replace('+', ',') }
+          $isler = '${{ inputs.isler }}'
+          if (-not $isler) { $isler = $varsayilan }
+          $isler = $isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
           $kesitler = '${{ inputs.kesitler || 'karanlik,parlak,orta' }}'.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
           $liste = @()
           foreach ($is in $isler) {

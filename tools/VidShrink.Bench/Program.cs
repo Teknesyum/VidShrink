@@ -712,7 +712,7 @@ static async Task<int> ShrinkAsync(string[] args)
         if (!string.IsNullOrWhiteSpace(forceCodec))
         {
             plan.Codec = forceCodec;
-            plan.Preset = "slow";
+            plan.Preset = forceCodec == "libsvtav1" ? "6" : "slow";
             plan.Mode = "2pass";
             plan.Crf = null;
             var hdr = HdrResolver.Resolve(info, options.HdrPolicy, plan.Codec, EncoderCapabilities.Instance);
