@@ -429,3 +429,38 @@ Dal `t0/paket-1`. Kaynak: `.calisma/eksikler/rapor.md` satır 1, 2, 3, 6, 7, 12,
 7. T194: dar pencerede kaynak bilgi kutuları tek satır, kısaltma + ipucu, `BiciminTests` pinleri.
 8. `GlowBlue/Pink/Purple` palet değişiminde canlı.
 9. Anahtar kare atlama yarışı: yeniden üret, kök neden, düzelt, pimle.
+
+## Paket 3
+
+Dal `t0/paket-3` (`origin/t0/birlesim` üstünden). Kaynak: `.calisma/eksikler/rapor.md` satır 8, 9, 23;
+`docs/YOL-HARITASI.md` iki açık kalemi; `trash/sonra-2026-09-16T12-09-24-402Z.md` WhatsApp satırı. Her kalem ayrı commit.
+
+**Ölçüm yeri:** kullanıcının makinesi tam yükte iki kez kapandı. Kalem başına onlarca kodlama ve VMAF geçişi
+gerekiyor, o yüzden ölçüm yerelde değil, `workflow_dispatch` iş akışında koşar ve sonuç artifact'tan alınır.
+Düzenek `GITHUB_ACTIONS` yokken koşmayı reddeder. Kaynak açık lisanslı Blender filmi, sha256 pinli; 10 sn'lik
+kesitler kaynağın kendi parlaklık taramasından seçilir (en karanlık pencere, en parlak/hareketli pencere).
+
+Önce bulunan ölçümler (`docs/olcumler` grep'i):
+
+- `handbrake-acigi.md` — 8,79 VMAF-NEG / 2,60 dB XPSNR farkı `av1_nvenc` eski çıktısıyla ölçüldü; x265'e
+  `psy-rd=2:psy-rdoq=1:aq-mode=2`, SVT-AV1'e variance boost sonradan girdi (`tepe-tavani-ve-psy.md`, T87).
+  Farkın bugünkü yazılım yolunda kalıp kalmadığı ölçülmedi.
+- `yerlesim-skoru.md` §11 — Faz 1'in iki sabiti (`ScalePenaltyScale`, `FpsPenaltyPerHalving`) T107'de
+  ölçüldü, değişmedi. Ölçülmeyen kalan: `ScalePenaltyExponent`, `PenaltyWeights(Extreme)` üçlüsü,
+  `LowFpsSurcharge`, `LowFpsThreshold`.
+- `suit-esszamanli-kosum.md` — çökme kök nedeni açık borç; F1 yük koşumu çökmeyi üretemedi.
+
+1. **WhatsApp karanlık video (satır 8).** WhatsApp çipi `Compatible` → `libx264`; x264'e hiçbir psy/AQ
+   argümanı gitmiyor. Düzenek en karanlık 10 sn'lik kesitte eşit bit hızında kolları kıyaslar: ürün,
+   `aq-mode=3`, `aq-mode=3:aq-strength=0.8`; negatif kontrol `aq-mode=0` ve ürünün tekrarı. Ölçü VMAF-NEG,
+   XPSNR ve karanlık bölge ölçüsü (kaynakta Y<64 piksellerde PSNR ve ayırt edilen ton sayısı). Kazanan kol
+   ölçüyle `FfmpegArguments.Psychovisual`'a girer, pimlenir; kazanmazsa kod değişmez. WhatsApp'ın kendi
+   yeniden kodlaması CI'da ölçülemez: "ölçülmedi". Tablo `docs/olcumler/whatsapp-karanlik.md`.
+2. **HandBrake algı farkı (satır 9).** Aynı kesitlerde gerçek `HandBrakeCLI` (H.265 MKV 1080p30, slow,
+   çoklu geçiş) ile ürünün yazılım yolu (`bench shrink --force-codec libx265` ve `libsvtav1`) eş boyutta.
+   Donanım yolu (`av1_nvenc`) CI'da yok: "ölçülmedi". Tablo `docs/olcumler/handbrake-acigi-yazilim.md`.
+3. **Ceza sabitleri Faz 1 ve çökme düzeneği (satır 23).** Aşırı rejim bit hızlarında ölçek × kare hızı
+   ızgarası (`tools/yerlesim-skoru/olc.sh`), ölçülmemiş beş sabitin uyumu; tutulan kesitte doğrulanmayan
+   uyum koda girmez. Çökme için `cokme-yeniden-uretim.yml`: iki süit aynı koşucuda eşzamanlı,
+   `--blame-crash --blame-hang`, döküm artifact'a. Tablolar `docs/olcumler/ceza-kalibrasyonu.md`,
+   `docs/olcumler/cokme-yeniden-uretim.md`.
