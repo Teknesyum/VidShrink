@@ -158,6 +158,7 @@ public partial class MainWindow : Window
         Player.CurrentTabIndex = () => Tabs.SelectedIndex;
         Player.SelectTab = index => Tabs.SelectedIndex = index;
         Player.OpenSettings = () => Tabs.SelectedIndex = SettingsTabIndex;
+        Player.AppSettingsItems = PlayerSettingsItems;
         PlayerAdvancedPanel.Player = Player;
 
         Player.HistoryPath = () => Path.Combine(
@@ -889,6 +890,35 @@ public partial class MainWindow : Window
     }
 
     private void UseLanguage(string language) => Strings.Use(language);
+
+    internal List<Control> PlayerSettingsItems()
+    {
+        return new List<Control>
+        {
+            ChoiceMenu(Strings.Get("settings-tab.language.label"), CmbLanguage),
+            ChoiceMenu(Strings.Get("settings-tab.theme.label"), CmbTheme)
+        };
+
+        static MenuItem ChoiceMenu(string header, ComboBox box)
+        {
+            var menu = new MenuItem { Header = header };
+            var at = 0;
+            foreach (var label in box.Items)
+            {
+                var index = at++;
+                var item = new MenuItem
+                {
+                    Header = label?.ToString() ?? "",
+                    ToggleType = MenuItemToggleType.Radio,
+                    IsChecked = index == box.SelectedIndex
+                };
+                item.Click += (_, _) => box.SelectedIndex = index;
+                menu.Items.Add(item);
+            }
+
+            return menu;
+        }
+    }
 
     /// <summary>
     /// Dil değişti. Biçimlemeden gelen metni bağlar kendisi tazeliyor; burada yalnız koddan

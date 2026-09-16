@@ -446,6 +446,7 @@
   "main.player.menu.fullscreen": "পূর্ণ পর্দা",
   "main.player.menu.reset": "জুম রিসেট",
   "main.player.menu.settings": "সেটিং",
+  "main.player.menu.settings-all": "সব সেটিংস…",
   "main.player.empty": "কোনো ফাইল লোড হয়নি",
   "main.player.playing": "চলছে",
   "main.player.paused": "বিরতিতে",

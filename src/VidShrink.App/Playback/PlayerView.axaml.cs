@@ -401,6 +401,13 @@ internal partial class PlayerView : UserControl
             group = action.MenuGroup;
 
             var item = new MenuItem { Header = Strings.Get(action.LabelKey), Tag = action };
+            if (ReferenceEquals(action, Keymap.Settings))
+            {
+                foreach (var child in SettingsItems()) item.Items.Add(child);
+                flyout.Items.Add(item);
+                continue;
+            }
+
             if (Keymap.FirstKeyRow(action) is { } row)
                 item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
             item.Click += OnMenuRow;
@@ -410,8 +417,28 @@ internal partial class PlayerView : UserControl
         AddTrackMenus(flyout);
         AppendWindowMenu(flyout);
         AppendToolsMenu(flyout);
-        AppendAdvancedMenu(flyout);
         return flyout;
+    }
+
+    internal List<Control> SettingsItems()
+    {
+        var items = new List<Control>();
+        if (AppSettingsItems?.Invoke() is { Count: > 0 } app)
+        {
+            items.AddRange(app);
+            items.Add(new Separator());
+        }
+
+        var folder = new MenuItem { Header = Strings.Get("player.view.screenshot-folder") };
+        folder.Click += OnPickScreenshotFolder;
+        items.Add(folder);
+        items.Add(AdvancedMenu());
+        items.Add(new Separator());
+
+        var all = new MenuItem { Header = Strings.Get("main.player.menu.settings-all"), Tag = Keymap.Settings };
+        all.Click += OnMenuRow;
+        items.Add(all);
+        return items;
     }
 
     private void OnMenuRow(object? sender, RoutedEventArgs e)

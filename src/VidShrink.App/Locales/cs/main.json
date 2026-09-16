@@ -446,6 +446,7 @@
   "main.player.menu.fullscreen": "Celá obrazovka",
   "main.player.menu.reset": "Obnovit zvětšení",
   "main.player.menu.settings": "Nastavení",
+  "main.player.menu.settings-all": "Všechna nastavení…",
   "main.player.empty": "Není načten žádný soubor",
   "main.player.playing": "přehrává se",
   "main.player.paused": "pozastaveno",

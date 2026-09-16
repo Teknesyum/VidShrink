@@ -446,6 +446,7 @@
   "main.player.menu.fullscreen": "ملء الشاشة",
   "main.player.menu.reset": "إعادة ضبط التكبير",
   "main.player.menu.settings": "الإعدادات",
+  "main.player.menu.settings-all": "كل الإعدادات…",
   "main.player.empty": "لا ملف محمّل",
   "main.player.playing": "قيد التشغيل",
   "main.player.paused": "متوقف مؤقتاً",

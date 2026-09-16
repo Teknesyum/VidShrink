@@ -446,6 +446,7 @@
   "main.player.menu.fullscreen": "전체 화면",
   "main.player.menu.reset": "확대 초기화",
   "main.player.menu.settings": "설정",
+  "main.player.menu.settings-all": "모든 설정…",
   "main.player.empty": "불러온 파일 없음",
   "main.player.playing": "재생 중",
   "main.player.paused": "일시정지",

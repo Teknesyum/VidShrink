@@ -446,6 +446,7 @@
   "main.player.menu.fullscreen": "Plein écran",
   "main.player.menu.reset": "Réinitialiser le zoom",
   "main.player.menu.settings": "Réglages",
+  "main.player.menu.settings-all": "Tous les paramètres…",
   "main.player.empty": "Aucun fichier chargé",
   "main.player.playing": "lecture",
   "main.player.paused": "pause",

@@ -446,6 +446,7 @@
   "main.player.menu.fullscreen": "Fuld skærm",
   "main.player.menu.reset": "Nulstil zoom",
   "main.player.menu.settings": "Indstillinger",
+  "main.player.menu.settings-all": "Alle indstillinger…",
   "main.player.empty": "Ingen fil indlæst",
   "main.player.playing": "afspiller",
   "main.player.paused": "pause",

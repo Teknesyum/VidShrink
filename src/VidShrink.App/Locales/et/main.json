@@ -446,6 +446,7 @@
   "main.player.menu.fullscreen": "Täisekraan",
   "main.player.menu.reset": "Lähtesta suum",
   "main.player.menu.settings": "Seaded",
+  "main.player.menu.settings-all": "Kõik seaded…",
   "main.player.empty": "Faili pole laaditud",
   "main.player.playing": "esitab",
   "main.player.paused": "pausil",
