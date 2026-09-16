@@ -34,7 +34,7 @@
 
   "settings.update.title": "Updates",
   "settings.update.auto": "Automatisch bijwerken",
-  "settings.update.auto-effect": "Als dit uit staat, werkt VidShrink zichzelf niet bij: het meldt alleen dat er een nieuwe versie is en toont de opdracht die haar installeert.",
+  "settings.update.auto-effect": "Standaard uit: een nieuwe versie wordt bovenin gemeld en met één knop gedownload en geïnstalleerd. Staat het aan, dan werkt VidShrink zichzelf stil bij.",
   "settings.update.no-self-effect": "VidShrink werkt zichzelf op dit systeem niet bij: het meldt alleen dat er een nieuwe versie is en toont de opdracht die haar installeert.",
 
   "settings.default-app.suggestion": "VidShrink is niet het standaardprogramma voor video's. U kunt het kiezen op de pagina Standaard-apps van Windows.",

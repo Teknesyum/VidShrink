@@ -14,8 +14,8 @@ public sealed record LibMpvPin(IReadOnlyList<string> Urls, string ArchiveSha256,
     public static LibMpvPin Default { get; } = new(
         new[]
         {
-            "https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z",
-            "https://github.com/Teknesyum/VidShrink/releases/download/libmpv-mirror/mpv-dev-x86_64-20260903-git-69e63f425a.7z"
+            "https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z",
+            "https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z"
         },
         "fac135c68a35b7639e39d72c0c365104edbaebdea39a0dfdd8c36e8c8e80faef",
         "libmpv-2.dll",

@@ -34,7 +34,7 @@
 
   "settings.update.title": "Aktualizace",
   "settings.update.auto": "Aktualizovat automaticky",
-  "settings.update.auto-effect": "Když je toto vypnuto, VidShrink se sám neaktualizuje: pouze oznámí, že existuje nová verze, a ukáže příkaz, který ji nainstaluje.",
+  "settings.update.auto-effect": "Ve výchozím stavu vypnuto: nová verze se oznámí v horní liště a stáhne a nainstaluje tlačítkem. Když je zapnuto, VidShrink se aktualizuje sám potichu.",
   "settings.update.no-self-effect": "VidShrink se na tomto systému sám neaktualizuje: pouze oznámí, že existuje nová verze, a ukáže příkaz, který ji nainstaluje.",
 
   "settings.default-app.suggestion": "VidShrink není výchozí program pro videa. Můžete jej vybrat na stránce Výchozí aplikace ve Windows.",

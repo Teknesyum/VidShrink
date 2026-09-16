@@ -34,7 +34,7 @@
 
   "settings.update.title": "Posodobitve",
   "settings.update.auto": "Samodejno posodabljaj",
-  "settings.update.auto-effect": "Ko je to izklopljeno, se VidShrink ne posodablja sam: le sporoči, da obstaja nova različica, in pokaže ukaz, ki jo namesti.",
+  "settings.update.auto-effect": "Privzeto izklopljeno: nova različica je naznanjena v zgornji vrstici ter prenesena in nameščena z gumbom. Ko je vklopljeno, se VidShrink tiho posodobi sam.",
   "settings.update.no-self-effect": "VidShrink se na tem sistemu ne posodablja sam: le sporoči, da obstaja nova različica, in pokaže ukaz, ki jo namesti.",
 
   "settings.default-app.suggestion": "VidShrink ni privzeti program za videe. Izberete ga lahko na strani Privzete aplikacije v sistemu Windows.",

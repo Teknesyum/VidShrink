@@ -308,6 +308,46 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Throws<SetupException>(() => SetupOptions.NormalizeRegistryRoot(@"HKLM:\Software\Classes"));
     }
 
+    [Fact]
+    public async Task LibmpvBirincilKaynakDusunceYedektenKurulur()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var release = Path.Combine(_work, "libmpv-kaynak");
+        Directory.CreateDirectory(release);
+        var good = Path.Combine(release, "mpv-dev.zip");
+        Zip(good, ("libmpv-2.dll", "libmpv ikilisi"));
+        var bad = Path.Combine(release, "bozuk.zip");
+        Zip(bad, ("libmpv-2.dll", "baska ikili"));
+        var missing = Path.Combine(release, "yok.zip");
+        var archiveSha = UpdateCheck.HashFile(good);
+        var dllSha = Sha("libmpv ikilisi");
+
+        async Task<(string Dll, List<string> Log)> Prepare(string name, params string[] urls)
+        {
+            var work = Path.Combine(_work, "libmpv-" + name);
+            Directory.CreateDirectory(work);
+            var log = new List<string>();
+            var result = await SetupDownloads.PrepareLibMpvAsync(new HttpClient(), new LibMpvPin(urls, archiveSha, "libmpv-2.dll", dllSha), null, work, log.Add, CancellationToken.None);
+            return (result.Path, log);
+        }
+
+        var primary = await Prepare("birincil", good, missing);
+        Assert.Empty(primary.Log);
+        Assert.Equal(dllSha, UpdateCheck.HashFile(primary.Dll));
+
+        var afterMissing = await Prepare("yok", missing, good);
+        Assert.Equal(new[] { $"libmpv indirilemedi, yedek kaynak deneniyor: {missing}" }, afterMissing.Log);
+        Assert.Equal(dllSha, UpdateCheck.HashFile(afterMissing.Dll));
+
+        var afterBad = await Prepare("bozuk", bad, good);
+        Assert.Equal(new[] { $"libmpv sağlaması tutmadı, yedek kaynak deneniyor: {bad}" }, afterBad.Log);
+        Assert.Equal(dllSha, UpdateCheck.HashFile(afterBad.Dll));
+
+        var none = await Assert.ThrowsAsync<SetupException>(() => Prepare("hicbiri", missing, bad));
+        Assert.Contains("sağlaması tutmuyor", none.Message);
+    }
+
     private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release)
     {
         var local = Path.Combine(_work, "local");

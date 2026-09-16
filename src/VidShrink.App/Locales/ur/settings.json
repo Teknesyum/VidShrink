@@ -34,7 +34,7 @@
 
   "settings.update.title": "اپ ڈیٹس",
   "settings.update.auto": "خودکار اپ ڈیٹ",
-  "settings.update.auto-effect": "یہ بند ہو تو VidShrink خود اپ ڈیٹ نہیں ہوتا: صرف بتاتا ہے کہ نیا ورژن موجود ہے اور اسے نصب کرنے والی کمانڈ دکھاتا ہے۔",
+  "settings.update.auto-effect": "پہلے سے بند: نیا ورژن اوپر کی پٹی میں بتایا جاتا ہے اور ایک بٹن سے ڈاؤن لوڈ اور انسٹال ہوتا ہے۔ آن ہونے پر VidShrink خود خاموشی سے اپ ڈیٹ ہو جاتا ہے۔",
   "settings.update.no-self-effect": "اس سسٹم پر VidShrink خود اپ ڈیٹ نہیں ہوتا: صرف بتاتا ہے کہ نیا ورژن موجود ہے اور اسے نصب کرنے والی کمانڈ دکھاتا ہے۔",
 
   "settings.default-app.suggestion": "VidShrink ویڈیوز کے لیے طے شدہ پروگرام نہیں ہے۔ آپ اسے Windows کے طے شدہ ایپس صفحے پر چن سکتے ہیں۔",

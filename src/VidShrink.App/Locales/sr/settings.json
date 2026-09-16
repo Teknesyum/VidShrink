@@ -34,7 +34,7 @@
 
   "settings.update.title": "Ažuriranja",
   "settings.update.auto": "Ažuriraj automatski",
-  "settings.update.auto-effect": "Kad je ovo isključeno, VidShrink se ne ažurira sam: samo javlja da postoji nova verzija i prikazuje komandu koja je instalira.",
+  "settings.update.auto-effect": "Podrazumevano isključeno: nova verzija se najavljuje u gornjoj traci i preuzima i instalira dugmetom. Kad je uključeno, VidShrink se sam tiho ažurira.",
   "settings.update.no-self-effect": "VidShrink se na ovom sistemu ne ažurira sam: samo javlja da postoji nova verzija i prikazuje komandu koja je instalira.",
 
   "settings.default-app.suggestion": "VidShrink nije podrazumevani program za video. Možete ga izabrati na Windows stranici Podrazumevane aplikacije.",

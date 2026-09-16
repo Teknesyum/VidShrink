@@ -34,7 +34,7 @@
 
   "settings.update.title": "Oppdateringer",
   "settings.update.auto": "Oppdater automatisk",
-  "settings.update.auto-effect": "Når dette er av, oppdaterer VidShrink seg ikke selv: det sier bare fra om at en ny versjon finnes og viser kommandoen som installerer den.",
+  "settings.update.auto-effect": "Av som standard: en ny versjon varsles i den øverste linjen og lastes ned og installeres med en knapp. Når den er på, oppdaterer VidShrink seg selv i stillhet.",
   "settings.update.no-self-effect": "VidShrink oppdaterer seg ikke selv på dette systemet: det sier bare fra om at en ny versjon finnes og viser kommandoen som installerer den.",
 
   "settings.default-app.suggestion": "VidShrink er ikke standardprogram for videoer. Du kan velge det på siden Standardapper i Windows.",

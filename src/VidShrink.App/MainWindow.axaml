@@ -391,7 +391,9 @@
                         </Grid>
                       </Button>
                       <StackPanel x:Name="QualitySectionBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                        <!-- Kullanıcı 09-04: WhatsApp uyumu işaretlenirse eski kodek (H.264) kullanılır, kodek seçimi kilitlenir. -->
+                        <CheckBox x:Name="ChkWhatsAppCompatible" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.whatsapp-compatible}"/>
+                        <Grid x:Name="CodecChoiceRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                           <TextBlock Grid.Column="0" Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
                             <RadioButton x:Name="RbCodecAuto" GroupName="ShrinkCodec" IsChecked="True" Content="{loc:Text main.codec.automatic}"/>
@@ -474,6 +476,16 @@
                           <CheckBox x:Name="ChkResolution" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.resolution}"/>
                           <CheckBox x:Name="ChkFps" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.fps}"/>
                         </StackPanel>
+                        <!-- Kullanıcı 09-04: dinamik çözünürlük varsayılan; kutu kalkınca kullanıcı sabit boyu seçer. -->
+                        <Grid x:Name="FixedResolutionRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}" IsVisible="False">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.fixed-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                            <RadioButton x:Name="RbFixedSource" GroupName="ShrinkFixedResolution" IsChecked="True" Content="{loc:Text main.fixed-resolution.source}"/>
+                            <RadioButton x:Name="RbFixed1080" GroupName="ShrinkFixedResolution"/>
+                            <RadioButton x:Name="RbFixed720" GroupName="ShrinkFixedResolution"/>
+                            <RadioButton x:Name="RbFixed480" GroupName="ShrinkFixedResolution"/>
+                          </StackPanel>
+                        </Grid>
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                           <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
@@ -719,11 +731,22 @@
                       <StackPanel Spacing="{StaticResource SpaceSm}">
                         <TextBlock Text="{loc:Text main.retry.title}" Theme="{StaticResource H3}"/>
                         <TextBlock x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
-                        <TextBlock x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
                         <WrapPanel>
                           <Button x:Name="BtnRetryAgain" Content="{loc:Text main.retry.again}" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
+                          <Button x:Name="BtnRetryTrim" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryTrim"/>
+                          <Button x:Name="BtnRetryAccept" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAccept"/>
                           <Button x:Name="BtnRetryStop" Content="{loc:Text main.retry.stop}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
                         </WrapPanel>
+                        <StackPanel x:Name="RetryTrimPanel" IsVisible="False" Spacing="{StaticResource SpaceSm}">
+                          <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                            <RadioButton x:Name="RbTrimEnd" GroupName="OvershootTrim" IsChecked="True" Content="{loc:Text main.retry.trim.end}"/>
+                            <RadioButton x:Name="RbTrimStart" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.start}"/>
+                            <RadioButton x:Name="RbTrimBoth" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.both}"/>
+                          </StackPanel>
+                          <TextBlock x:Name="TxtTrimRange" Theme="{StaticResource PlanFactValue}" TextWrapping="Wrap"/>
+                          <Button x:Name="BtnTrimConfirm" Content="{loc:Text main.retry.trim.confirm}" Theme="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnTrimConfirm"/>
+                        </StackPanel>
+                        <TextBlock x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
                       </StackPanel>
                     </Border>
                     <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -1046,6 +1069,8 @@
                 <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}"/>
                 <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
                            Cursor="Hand" PointerPressed="OnSystemStatusTapped"/>
+                <TextBlock Text="{loc:Text main.about.platforms.title}" Theme="{StaticResource H3}"/>
+                <TextBlock x:Name="TxtPlatforms" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
               </StackPanel>
             </Border>
           </ScrollViewer>
@@ -1158,27 +1183,43 @@
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text settings-tab.general.title}" Theme="{StaticResource H2}"/>
 
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.language.label}" Theme="{StaticResource Label}"/>
-                    <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.language.hint}"/>
-                  </StackPanel>
+                  <!--
+                    Kullanıcı 09-07: ayarlar derli toplu olsun, iki seçenekli açılır liste olmasın.
+                    Dil ve tema yan yana; çıktı klasörü ve ffmpeg yolu iki seçenekli radyo şeridi.
+                  -->
+                  <Grid x:Name="LanguageThemeRow" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
+                    <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceSm}">
+                      <TextBlock Text="{loc:Text settings-tab.language.label}" Theme="{StaticResource Label}"/>
+                      <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch"/>
+                      <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.language.hint}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
+                      <TextBlock Text="{loc:Text settings-tab.theme.label}" Theme="{StaticResource Label}"/>
+                      <ComboBox x:Name="CmbTheme" HorizontalAlignment="Stretch"/>
+                      <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.theme.hint}"/>
+                    </StackPanel>
+                  </Grid>
+
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
+                    <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceSm}">
+                      <TextBlock Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
+                      <TextBox x:Name="TxtDefaultTargetMb" Width="120" HorizontalAlignment="Left" MaxLines="1" TextAlignment="Center"/>
+                      <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
+                      <CheckBox x:Name="ChkAdvancedDefaultOpen" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings-tab.advanced-default-open.label}"/>
+                      <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.advanced-default-open.hint}"/>
+                    </StackPanel>
+                  </Grid>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.theme.label}" Theme="{StaticResource Label}"/>
-                    <ComboBox x:Name="CmbTheme" HorizontalAlignment="Stretch"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.theme.hint}"/>
-                  </StackPanel>
-
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
-                    <TextBox x:Name="TxtDefaultTargetMb" Width="120" HorizontalAlignment="Left" MaxLines="1" TextAlignment="Center"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
-                  </StackPanel>
-
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.output-folder.label}" Theme="{StaticResource Label}"/>
-                    <ComboBox x:Name="CmbOutputFolderMode" HorizontalAlignment="Stretch"/>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                      <TextBlock Grid.Column="0" Text="{loc:Text settings-tab.output-folder.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                        <RadioButton x:Name="RbOutputBesideSource" GroupName="OutputFolderMode" IsChecked="True" Content="{loc:Text settings-tab.output-folder.beside-source}"/>
+                        <RadioButton x:Name="RbOutputFixed" GroupName="OutputFolderMode" Content="{loc:Text settings-tab.output-folder.fixed}"/>
+                      </StackPanel>
+                    </Grid>
                     <StackPanel x:Name="OutputFolderPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
                       <TextBox x:Name="TxtOutputFolder" Width="360" MaxLines="1" IsReadOnly="True"/>
                       <Button x:Name="BtnBrowseOutputFolder" Content="{loc:Text settings-tab.output-folder.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseOutputFolder"/>
@@ -1187,15 +1228,13 @@
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <StackPanel Orientation="Horizontal">
-                      <CheckBox x:Name="ChkAdvancedDefaultOpen" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings-tab.advanced-default-open.label}"/>
-                    </StackPanel>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.advanced-default-open.hint}"/>
-                  </StackPanel>
-
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}"/>
-                    <ComboBox x:Name="CmbFfmpegPathMode" HorizontalAlignment="Stretch"/>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                      <TextBlock Grid.Column="0" Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                        <RadioButton x:Name="RbFfmpegAuto" GroupName="FfmpegPathMode" IsChecked="True" Content="{loc:Text settings-tab.ffmpeg-path.auto}"/>
+                        <RadioButton x:Name="RbFfmpegManual" GroupName="FfmpegPathMode" Content="{loc:Text settings-tab.ffmpeg-path.manual}"/>
+                      </StackPanel>
+                    </Grid>
                     <StackPanel x:Name="FfmpegPathPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
                       <TextBox x:Name="TxtFfmpegPath" Width="360" MaxLines="1"/>
                       <Button x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>

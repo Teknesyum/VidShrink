@@ -172,8 +172,8 @@ internal sealed class RecorderSettings
     {
         get
         {
-            var data = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return string.IsNullOrEmpty(data) ? null : Path.Combine(data, "VidShrink");
+            var folder = Path.GetDirectoryName(UpdateSettings.DefaultPath);
+            return string.IsNullOrEmpty(folder) ? null : folder;
         }
     }
 

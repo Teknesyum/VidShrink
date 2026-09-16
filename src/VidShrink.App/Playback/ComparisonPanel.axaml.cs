@@ -200,7 +200,7 @@ internal partial class ComparisonPanel : UserControl
     /// <summary>
     /// T49/K1: sağ yarının yaklaşıklık rozeti. Barındıran taraf metni çalışan dilde verir
     /// ve panel onu olduğu gibi gösterir — sayı burada üretilmez, çeviri ikinci kez
-    /// uygulanmaz (metin "Yaklaşık önizleme · CRF 21" gibi birleşik olduğu için sözlükte
+    /// uygulanmaz (metin "CRF 21" gibi sayı taşıdığı için sözlükte
     /// karşılığı yoktur). Boş bırakılınca rozet kalkar.
     ///
     /// Dil değiştiğinde metnin de değişmesi barındıran tarafın işidir: panel neyi
@@ -302,8 +302,8 @@ internal partial class ComparisonPanel : UserControl
     /// tümüyle örtüldüğünde o yarının etiketi söner, çünkü işaret ettiği görüntü ekranda
     /// kalmamıştır.
     ///
-    /// Sağ üstte tek yonga durur: birleşik metin (İŞLENMİŞ · CRF x) geldiyse o, gelmediyse
-    /// yalın taraf etiketi. İkisi birden görünmez.
+    /// Kullanıcı 09-07: taraf etiketleri panonun üstündeki satırda, CRF rozeti panonun sağ
+    /// üstünde. Rozet geldi diye İŞLENMİŞ etiketi sönmez; ikisi aynı anda görünür.
     /// </summary>
     private void RefreshBadgeFade()
     {
@@ -312,7 +312,7 @@ internal partial class ComparisonPanel : UserControl
         var rightShown = _split < 1 - SplitKeyStep;
 
         LeftBadge.IsVisible = live && leftShown;
-        RightBadge.IsVisible = live && rightShown && _rightNotice is null && _rightBadge is null;
+        RightBadge.IsVisible = live && rightShown && _rightNotice is null;
         ApproxBadge.IsVisible = live && rightShown && _rightNotice is null && _rightBadge is not null;
     }
 

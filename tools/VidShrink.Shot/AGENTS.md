@@ -60,3 +60,5 @@ yarım kare teslim edilmez.
 `.sln`e eklenmedi; CI'a Avalonia.Headless taşımaz. Sonucu: `dotnet build
 tools/VidShrink.Shot` hiçbir otomatik koşumda çalışmıyor, düzenek yalnız elle
 derleniyor.
+
+Ayar yolu: `Main` ilk iş `VIDSHRINK_SETTINGS_PATH`'i `.calisma/shot-ayar/settings.json`'a çeker; ayar, oynatıcı geçmişi, son dosyalar ve kaydedici ayarı oraya düşer, kullanıcının `%APPDATA%\VidShrink`'ine değil.

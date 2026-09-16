@@ -34,7 +34,7 @@
 
   "settings.update.title": "更新",
   "settings.update.auto": "自動で更新する",
-  "settings.update.auto-effect": "オフの場合、VidShrinkは自動更新を行いません。新しいバージョンの存在を知らせ、インストール用のコマンドを表示するだけです。",
+  "settings.update.auto-effect": "既定でオフ: 新しいバージョンは上部バーで通知され、ボタン一つでダウンロードとインストールが行われます。オンにすると、VidShrinkは静かに自動更新します。",
   "settings.update.no-self-effect": "このシステムではVidShrinkは自動更新を行いません。新しいバージョンの存在を知らせ、インストール用のコマンドを表示するだけです。",
 
   "settings.default-app.suggestion": "VidShrinkは動画の既定のプログラムではありません。Windowsの「既定のアプリ」ページで選択できます。",

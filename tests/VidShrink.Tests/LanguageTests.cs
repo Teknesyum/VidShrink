@@ -290,6 +290,7 @@ public sealed class LanguageTests : IDisposable
     private static readonly string[] CodeNamesThatStayInCode =
     {
         "Buy me a coffee", "Buy Me a Coffee",
+        "Windows ARM64", "macOS Apple Silicon (arm64)", "macOS Intel (x64)", "Linux ARM64",
         "GIF palette", "GIF encode",
         "no space left", "not enough space", "disk full", "insufficient disk space",
         "unknown encoder", "encoder not found", "does not support", "could not write header",
