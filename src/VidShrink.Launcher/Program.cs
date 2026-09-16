@@ -84,11 +84,7 @@ internal static class Program
         // ffmpeg'e ihtiyaç duyan sekmeler eksikliği kendileri bildiriyor.
         if (!updateNow && args.Length > 0 && File.Exists(args[0]))
         {
-            // C2: perde uygulamanin dogumuyla ayni anda aciliyor ve ilk kare gelene kadar
-            // duruyor. Bakim isleri arkasinda kosuyor; perde onlari degil uygulamanin
-            // isaretini bekliyor.
-            var perde = AcilisPerdesi.Ac();
-            StartApp(executable, appDirectory, baseDirectory, args, perde?.Ad);
+            StartApp(executable, appDirectory, baseDirectory, args);
             AcilisIzi.Yaz("app-dogdu");
 
             try { LauncherUpdate.Repair(baseDirectory, UpdateCheck.CurrentVersion()); }
@@ -107,7 +103,6 @@ internal static class Program
                 catch (Exception) { }
             }
 
-            perde?.BekleVeKapat();
             return 0;
         }
 
@@ -164,12 +159,8 @@ internal static class Program
             return 2;
         }
 
-        var olaganPerde = AcilisPerdesi.Ac();
-        StartApp(executable, appDirectory, baseDirectory, args, olaganPerde?.Ad);
+        StartApp(executable, appDirectory, baseDirectory, args);
         AcilisIzi.Yaz("app-dogdu");
-
-        // Perde indirmeden once kalkiyor: agin hizi perdeyi ekranda tutmamali.
-        olaganPerde?.BekleVeKapat();
 
         // İndirme uygulama ekrana geldikten sonra: açılış yolundaki bir ağ turu, hattın
         // hızına göre açılışı dakikalarca geciktirebilir. İnen sahne bir sonraki açılışta
@@ -195,7 +186,7 @@ internal static class Program
     /// Uygulamayı doğurur. Tek yer: hızlı tur da normal tur da buradan geçiyor, ikisi
     /// yalnız çağrı sırasında ayrılıyor. İz açıksa başlatıcının doğum anı çocuğa geçer.
     /// </summary>
-    private static void StartApp(string executable, string appDirectory, string baseDirectory, string[] args, string? perdeAdi = null)
+    private static void StartApp(string executable, string appDirectory, string baseDirectory, string[] args)
     {
         var start = new ProcessStartInfo
         {
@@ -207,7 +198,6 @@ internal static class Program
         start.Environment["PATH"] =
             Path.Combine(baseDirectory, "tools", "ffmpeg") + Path.PathSeparator + Environment.GetEnvironmentVariable("PATH");
         if (AcilisIzi.Acik) start.Environment[AcilisIzi.SifirDegiskeni] = AcilisIzi.SifirIsareti;
-        if (perdeAdi is not null) start.Environment[AcilisPerdesi.Degisken] = perdeAdi;
         foreach (var argument in args) start.ArgumentList.Add(argument);
         Process.Start(start);
     }

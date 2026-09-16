@@ -57,7 +57,7 @@ internal static class ShellMenu
     [SupportedOSPlatform("windows")]
     internal static int InstallOpen(string executable, string label)
     {
-        RemoveOpen();
+        Drop(MenuKey);
         WriteLabel("open", label);
 
         var written = 0;
@@ -115,6 +115,31 @@ internal static class ShellMenu
     {
         using var key = Registry.CurrentUser.CreateSubKey(LabelKey);
         key.SetValue(name, label, RegistryValueKind.String);
+    }
+
+    [SupportedOSPlatform("windows")]
+    internal static int Relabel(string menu, string label)
+    {
+        var name = menu == MenuKey ? "open" : "shrink";
+        var written = 0;
+        using (var labels = Registry.CurrentUser.OpenSubKey(LabelKey))
+        {
+            if (labels?.GetValue(name) as string != label)
+            {
+                WriteLabel(name, label);
+                written++;
+            }
+        }
+
+        foreach (var extension in Extensions)
+        {
+            using var verb = Registry.CurrentUser.OpenSubKey(Branch(extension) + "\\" + menu, writable: true);
+            if (verb is null || verb.GetValue("MUIVerb") as string == label) continue;
+            verb.SetValue("MUIVerb", label, RegistryValueKind.String);
+            written++;
+        }
+
+        return written;
     }
 
     [SupportedOSPlatform("windows")]

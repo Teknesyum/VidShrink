@@ -395,3 +395,21 @@ Kesilmeyen: güncelleme paneli ~0,2 ms, `UseLanguage` ~17 ms, `pencere-yapici �
 
 Sonuç: `kabuk-ilk-kare` 1230,1 → 803,5 ms, eşleşik fark **−455,2 ms**, 14/14. Tablo
 [docs/olcumler/acilis-hizi.md](olcumler/acilis-hizi.md) E dalgası.
+
+## Hipersürüş F dalgası — Perdesiz açılış ve kabuk menüsü (16 Eylül 2026)
+
+Dal `t0/acilis-anlik`. Kullanıcı açılışta "VidShrink açılıyor" panelini görüyor ve
+açılışı yavaş buluyor. Kabul: eşleşik A/B, taban `main`, en az 14 tekrar, ayrı Win32
+masaüstünde (`WinSta0\vidshrink-olcum`); kullanıcının ekranında pencere açılmaz,
+sağ tık menüsünün kayıt değerleri her koşumdan önce ve sonra doğrulanır.
+
+1. **F1** Perde kalkıyor: iki `AcilisPerdesi.cs` silinir, başlatıcı uygulamayı
+   beklemeden doğurur. Kurulum paneli 400 ms eşikli bakım kolunda kalır.
+2. **F2** `RelabelShellMenu` her açılışta girdileri silip yeniden kuruyordu; silme
+   kolu Appx paketi için eşzamanlı PowerShell başlatıyordu. Yenileme yalnız farklı
+   etiketi yazar. `InstallOpen` de paketi kaldırmaz; yalnız kutunun boşaltılması kaldırır.
+3. **F3** `tools/acilis-hizi/EkranSaati`: ayrı masaüstünde ölçer, kayıt defterine yazmaz.
+4. Pinler: `HipersurusTests.OlaganAcilistaPerdeYok`, `SplashTests`,
+   `KabukMenusuTests.EtiketYenilemesiGirdiyiYenidenKurmuyor`.
+
+Tablo [docs/olcumler/acilis-hizi.md](olcumler/acilis-hizi.md) F dalgası.

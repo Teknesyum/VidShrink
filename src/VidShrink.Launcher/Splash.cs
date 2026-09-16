@@ -55,16 +55,10 @@ internal sealed class SplashGate : IDisposable
     /// Sayacı kurar ve hemen döner. Panel ancak eşik dolarsa ve o ana kadar
     /// <see cref="Dispose"/> çağrılmadıysa oluşturulur.
     /// </summary>
-    public static SplashGate Arm(InstallProgress progress) => Arm(progress, Threshold);
-
-    /// <summary>
-    /// Eşiği çağıran belirler. Açılış perdesi sıfır veriyor: orada panel bir açıklama değil,
-    /// beklemenin kendisinin yerine geçen görüntü.
-    /// </summary>
-    public static SplashGate Arm(InstallProgress progress, TimeSpan gecikme)
+    public static SplashGate Arm(InstallProgress progress)
     {
         var gate = new SplashGate(progress);
-        gate._timer = new Timer(_ => gate.Show(), null, gecikme, Timeout.InfiniteTimeSpan);
+        gate._timer = new Timer(_ => gate.Show(), null, Threshold, Timeout.InfiniteTimeSpan);
         return gate;
     }
 
@@ -87,16 +81,10 @@ internal sealed class SplashGate : IDisposable
             using var window = SplashWindow.Create();
             var started = DateTime.UtcNow;
             var previous = started;
-            var ilk = true;
             do
             {
                 var now = DateTime.UtcNow;
                 window.Render(_progress, now - started, now - previous);
-                if (ilk)
-                {
-                    ilk = false;
-                    AcilisIzi.Yaz("perde");
-                }
                 previous = now;
             }
             while (!_closing.Wait(FrameInterval) && !Stalled() && !Settled());
@@ -125,23 +113,6 @@ internal sealed class SplashGate : IDisposable
     /// Paneli kapatır. İş bittiğinde de, yarıda kaldığında da aynı yol işler: panel
     /// kapanır ve uygulama açılır.
     /// </summary>
-    /// <summary>
-    /// Paneli bekletmeden kapatır. <see cref="Dispose"/> çubuğun yüzdeye varmasını bekliyor;
-    /// açılış perdesinde beklenecek bir çubuk yok, uygulamanın karesi ekranda ve perdenin bir
-    /// kare fazla durması gecikmenin kendisi olur.
-    /// </summary>
-    public void Kapat()
-    {
-        lock (_sync)
-        {
-            _timer?.Dispose();
-            _timer = null;
-        }
-
-        _closing.Set();
-        _thread?.Join(TimeSpan.FromSeconds(2));
-    }
-
     public void Dispose()
     {
         lock (_sync)

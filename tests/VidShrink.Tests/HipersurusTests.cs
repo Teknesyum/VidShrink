@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// Hipersürüş C dalgasının pimleri: yayın anahtarları, açılış perdesi ve paletin kısa
+/// Hipersürüş pinleri: yayın anahtarları, perdesiz açılış ve paletin kısa
 /// devresi. Üçü de ölçülmüş bir gecikmeye karşılık geliyor ve üçü de sessizce geri
 /// alınabilir — bir satır silinince kimse fark etmez, açılış yine uzar. Ölçümün kendisi
 /// <c>docs/olcumler/acilis-hizi.md</c>'de.
@@ -43,78 +43,23 @@ public sealed class HipersurusTests
     }
 
     /// <summary>
-    /// C2. Perde iki kolda da kuruluyor, adı çocuk sürece geçiyor ve <b>uygulama doğduktan
-    /// sonra</b> bekleniyor: önce beklenirse perde uygulamanın açılmasını geciktirir.
+    /// F1. Olağan açılışta perde yok: başlatıcı uygulamayı bekletmeden doğuruyor, uygulamada
+    /// perdeyi kaldıran yol da yok. Kurulum paneli yalnız 400 ms eşikli bakım kolunda kalıyor.
     /// </summary>
     [Fact]
-    public void PerdeIkiKoldaDaUygulamadanSonraBekleniyor()
+    public void OlaganAcilistaPerdeYok()
     {
-        var kod = Oku("src", "VidShrink.Launcher", "Program.cs");
+        var baslatici = Oku("src", "VidShrink.Launcher", "Program.cs");
+        var uygulama = Oku("src", "VidShrink.App", "MainWindow.axaml.cs");
 
-        var acmalar = System.Text.RegularExpressions.Regex.Matches(kod, @"AcilisPerdesi\.Ac\(\)");
-        var dogumlar = System.Text.RegularExpressions.Regex.Matches(kod, @"StartApp\(executable");
-        var beklemeler = System.Text.RegularExpressions.Regex.Matches(kod, @"BekleVeKapat\(\)");
-
-        Assert.Equal(2, acmalar.Count);
-        Assert.Equal(2, dogumlar.Count);
-        Assert.Equal(2, beklemeler.Count);
-
-        for (var at = 0; at < 2; at++)
-        {
-            Assert.True(acmalar[at].Index < dogumlar[at].Index, "perde uygulamadan sonra aciliyor");
-            Assert.True(dogumlar[at].Index < beklemeler[at].Index, "perde uygulama dogmadan bekleniyor");
-        }
-
-        Assert.Contains("start.Environment[AcilisPerdesi.Degisken] = perdeAdi;", kod, StringComparison.Ordinal);
-    }
-
-    /// <summary>
-    /// C2. Perdenin iki yakası aynı adı kullanıyor. Değişken adı bir tarafta değişirse perde
-    /// hiç kalkmaz ve kullanıcı tavan dolana kadar panele bakar.
-    /// </summary>
-    [Fact]
-    public void PerdeninIkiYakasiAyniDegiskeni_Kullaniyor()
-    {
-        const string degisken = "\"VIDSHRINK_ACILIS_PERDESI\"";
-        Assert.Contains(degisken, Oku("src", "VidShrink.Launcher", "AcilisPerdesi.cs"), StringComparison.Ordinal);
-        Assert.Contains(degisken, Oku("src", "VidShrink.App", "AcilisPerdesi.cs"), StringComparison.Ordinal);
-    }
-
-    /// <summary>
-    /// C2. Perde sıfır eşikle açılıyor ve kapanırken çubuğun dolmasını beklemiyor. Kurulum
-    /// paneli eski davranışında kalıyor: eşiği dolmadan çizilmiyor.
-    /// </summary>
-    [Fact]
-    public void PerdeSifirEsikle_AcilipBeklemedenKapaniyor()
-    {
-        var perde = Oku("src", "VidShrink.Launcher", "AcilisPerdesi.cs");
-        Assert.Contains("SplashGate.Arm(ilerleme, TimeSpan.Zero)", perde, StringComparison.Ordinal);
-        Assert.Contains("_kapi.Kapat()", perde, StringComparison.Ordinal);
-
-        var splash = Oku("src", "VidShrink.Launcher", "Splash.cs");
-        Assert.Contains("public static SplashGate Arm(InstallProgress progress) => Arm(progress, Threshold);", splash, StringComparison.Ordinal);
-        Assert.Contains("AcilisIzi.Yaz(\"perde\")", splash, StringComparison.Ordinal);
-
-        var kapat = splash.IndexOf("public void Kapat()", StringComparison.Ordinal);
-        var dispose = splash.IndexOf("public void Dispose()", StringComparison.Ordinal);
-        Assert.True(kapat > 0 && dispose > kapat, "Kapat, Dispose'dan once tanimli degil");
-        Assert.DoesNotContain("_settling = true;", splash[kapat..dispose], StringComparison.Ordinal);
-    }
-
-    /// <summary>
-    /// C2. Uygulama perdeyi ilk karede kaldırıyor; dosya hiç açılamazsa açılışın sonu onu
-    /// yine kaldırıyor. İkinci yol olmadan çökmüş bir açılış perdeyi ekranda bırakır.
-    /// </summary>
-    [Fact]
-    public void UygulamaPerdeyiIlkKaredeVeAcilisinSonundaKaldiriyor()
-    {
-        var kod = Oku("src", "VidShrink.App", "MainWindow.axaml.cs");
-        Assert.Contains("PerdeyiIzle();", kod, StringComparison.Ordinal);
-        Assert.Contains("if (Player.Frame.Source is null) return;", kod, StringComparison.Ordinal);
-        Assert.Contains("AcilisPerdesi.Kapat();", kod, StringComparison.Ordinal);
-
-        var izle = kod.IndexOf("private void PerdeyiIzle()", StringComparison.Ordinal);
-        Assert.True(izle > 0, "PerdeyiIzle yok");
+        Assert.False(File.Exists(Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "AcilisPerdesi.cs")));
+        Assert.False(File.Exists(Path.Combine(TipSources.Root, "src", "VidShrink.App", "AcilisPerdesi.cs")));
+        Assert.DoesNotContain("AcilisPerdesi", baslatici, StringComparison.Ordinal);
+        Assert.DoesNotContain("BekleVeKapat", baslatici, StringComparison.Ordinal);
+        Assert.DoesNotContain("AcilisPerdesi", uygulama, StringComparison.Ordinal);
+        Assert.DoesNotContain("PerdeyiIzle", uygulama, StringComparison.Ordinal);
+        Assert.Equal(2, System.Text.RegularExpressions.Regex.Matches(baslatici, @"StartApp\(executable").Count);
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(baslatici, @"SplashGate\.Arm\("));
     }
 
     /// <summary>

@@ -151,6 +151,45 @@ public class KabukMenusuTests
         Assert.Contains("RelabelShellMenu();", File.ReadAllText(TipSources.WindowCodePath));
     }
 
+    /// <summary>
+    /// Etiket yenilemesi her açılışta yapıcıda koşuyor. Eskiden girdileri silip yeniden kuruyordu:
+    /// silme kolu Appx paketini kaldırmak için PowerShell başlatıyordu (açılışta 867 ms) ve komut
+    /// yolu o an koşan exe'ye yeniden yazılıyordu. Yenileme yalnız farklı olan etiketi yazar.
+    /// Kurulan Windows 11 paketini yalnız kutunun boşaltılması kaldırır; açma girdisini yeniden
+    /// yazmak paketi kaldırmaz.
+    /// </summary>
+    [Fact]
+    public void EtiketYenilemesiGirdiyiYenidenKurmuyor()
+    {
+        var panel = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.KabukMenusu.cs"));
+        var relabel = panel[panel.IndexOf("private void RelabelShellMenu()", StringComparison.Ordinal)..];
+        relabel = relabel[..relabel.IndexOf("private void ShowShellMenuStatus", StringComparison.Ordinal)];
+
+        Assert.Contains("ShellMenu.Relabel(ShellMenu.MenuKey", relabel);
+        Assert.Contains("ShellMenu.Relabel(ShellMenu.ShrinkMenuKey", relabel);
+        Assert.DoesNotContain("Install", relabel);
+        Assert.DoesNotContain("ProcessPath", relabel);
+
+        var code = Code();
+        var body = code[code.IndexOf("internal static int Relabel(", StringComparison.Ordinal)..];
+        body = body[..body.IndexOf("internal static int RemoveOpen", StringComparison.Ordinal)];
+        Assert.DoesNotContain("RemovePackage", body);
+        Assert.DoesNotContain("Icon", body);
+        Assert.DoesNotContain("command", body);
+        Assert.Contains("== label) continue;", body);
+
+        var install = code[code.IndexOf("internal static int InstallOpen(", StringComparison.Ordinal)..];
+        install = install[..install.IndexOf("internal static int InstallShrink(", StringComparison.Ordinal)];
+        Assert.DoesNotContain("RemoveOpen()", install);
+        Assert.DoesNotContain("RemovePackage", install);
+        Assert.Contains("Drop(MenuKey);", install);
+
+        var removeOpen = code[code.IndexOf("internal static int RemoveOpen()", StringComparison.Ordinal)..];
+        removeOpen = removeOpen[..removeOpen.IndexOf("internal static int RemoveShrink()", StringComparison.Ordinal)];
+        Assert.Contains("RemovePackage();", removeOpen);
+    }
+
     /// <summary>Sekiz yeni anahtar 42 dilin hepsinde var.</summary>
     [Theory]
     [InlineData("settings-tab.shell-menu.title")]

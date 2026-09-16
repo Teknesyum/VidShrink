@@ -89,15 +89,12 @@ public partial class MainWindow
     {
         if (!OperatingSystem.IsWindows() || !ShellMenu.Supported) return;
 
-        var executable = Environment.ProcessPath;
-        if (string.IsNullOrWhiteSpace(executable)) return;
-
         try
         {
-            if (ChkShellMenuOpen.IsChecked == true && ShellMenuInstalled(ShellMenu.MenuKey))
-                ShellMenu.InstallOpen(executable, Say("shell.menu.open"));
-            if (ChkShellMenuShrink.IsChecked == true && ShellMenuInstalled(ShellMenu.ShrinkMenuKey))
-                ShellMenu.InstallShrink(executable, Say("shell.menu.shrink"));
+            if (ChkShellMenuOpen.IsChecked == true)
+                ShellMenu.Relabel(ShellMenu.MenuKey, Say("shell.menu.open"));
+            if (ChkShellMenuShrink.IsChecked == true)
+                ShellMenu.Relabel(ShellMenu.ShrinkMenuKey, Say("shell.menu.shrink"));
         }
         catch (Exception e) when (e is SecurityException or UnauthorizedAccessException)
         {
