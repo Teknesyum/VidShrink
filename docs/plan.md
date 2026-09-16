@@ -402,6 +402,7 @@ Dal `t0/paket-1`. Kaynak: `.calisma/eksikler/rapor.md` satır 1, 2, 3, 6, 7, 12,
 
 1. Güncelleme indirmesi iptal: `MainWindow.Guncelleme.cs` iptal kaynağı, panelin birincil düğmesi inerken "İptal"; `UpdateStaging` yarım dosyayı `.part`tan siler.
 2. Oynatma sırasında indirme tavanı: tavansız/tavanlı kare düşümü ölçümü, `docs/olcumler/guncelleme-indirme-tavani.md`.
+   **Kapandı, ölçülmedi:** kullanıcı makinesinde ölçülmez, CI/ayrı makine. Ölçüm libmpv'yi yük altında uzun süre koşturuyor; 16 Eylül'de bu makinede yük üreten koşumlar iki kez Kernel-Power 41 kapanmasına denk geldi. 4 MiB/s tavanı ölçülmüş sayı değil, docstring'i öyle kalır.
 3. Kurulum çubuğu açılış atağı: `InstallProgress` karelerinden ms ölçümü, `docs/olcumler/kurulum-cubugu-atagi.md`.
 4. `player-recent.json` test yolu: kayıt yolu ayar yolu değişkenine bağlanır.
 5. libmpv yedeği: `libmpv-mirror` yayın varlığı, CI/release/Install-VidShrink.ps1 yedek kaynak, sha256 aynı.
