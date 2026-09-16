@@ -334,7 +334,7 @@ public sealed class CliTests
             if (result.GetProperty("success").GetBoolean())
             {
                 Assert.True(File.Exists(output));
-                Assert.Equal(new FileInfo(output).Length / 1024.0 / 1024.0, result.GetProperty("outputMb").GetDouble(), 2);
+                Assert.InRange(result.GetProperty("outputMb").GetDouble() - new FileInfo(output).Length / 1024.0 / 1024.0, -0.0006, 0.0006);
             }
             Assert.Contains("%", stderr.ToString(), StringComparison.Ordinal);
             Assert.DoesNotContain("%", stdout.ToString(), StringComparison.Ordinal);
