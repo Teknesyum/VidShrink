@@ -1,0 +1,44 @@
+name: cokme-yeniden-uretim
+
+on:
+  push:
+    tags: ['olcum-cokme-*']
+  workflow_dispatch:
+    inputs:
+      tur:
+        description: Her koldaki tur sayisi
+        default: '2'
+      filtre:
+        description: Bos birakilirsa tam suit
+        default: ''
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+
+jobs:
+  kos:
+    runs-on: windows-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        esszamanli: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg ve libmpv kur
+        run: pwsh tools/kalite-paketi-3/kur.ps1 -Libmpv
+      - run: dotnet build tests/VidShrink.Tests -c Release -m:2
+      - name: esszamanli suit
+        run: pwsh tools/cokme-yeniden-uretim/kos.ps1 -Esszamanli ${{ matrix.esszamanli }} -Tur ${{ inputs.tur || '2' }} -Filtre '${{ inputs.filtre }}' -Cikti .calisma/cokme
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cokme-esszamanli-${{ matrix.esszamanli }}
+          path: |
+            .calisma/cokme/**
+          if-no-files-found: ignore
+          retention-days: 14

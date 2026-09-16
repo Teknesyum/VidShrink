@@ -7,7 +7,7 @@ Sıra kullanıcının. Biten madde silinmez, `[x]` ile işaretlenir ve nedeni sa
 - [x] 8. dalga — ekran kaydı motoru, ses girdisi, Kaydedici sekmesi (0.4.1)
 - [x] Güncelleme senkronunun yakınsaması — kurulu 0.3.0 kendi senkronuyla ilerleyebiliyor (0.4.2)
 - [x] Ekran kaydedici modülünün tamamlanması — ffmpeg kolu (9c) ve otomatik kip (9d) girdi
-- [ ] WhatsApp'a özel azami kalite — karanlık videoda törpüleme ölçümü, `.claude/sonra.md`
+- [x] WhatsApp'a özel azami kalite — Paket 3 ölçtü: `aq-mode=3` karanlık PSNR'ı 8 satırda −0,01 ile +0,07 dB oynattı, kod değişmedi (`docs/olcumler/whatsapp-karanlik.md`)
 - [x] Başlık çubuğu düğmelerinin keskin köşesi — Kesit E anahat dilini tek sözleşmeye bağladı (`RadiusSquare`, `HoverRing`)
 - [ ] Simge takımının dolgu diline geçmesi — `docs/arastirma/ikon-estetigi.md` ikinci tavsiyesi (Fluent), karar kullanıcının
 - [ ] **HandBrake algı tarafında da geçilecek** — bugün eşit boyutta (±%2) HandBrake'in x265 ön ayarı
@@ -15,6 +15,8 @@ Sıra kullanıcının. Biten madde silinmez, `[x]` ile işaretlenir ve nedeni sa
   oturtmayı biz kazanıyoruz; kalan açık psy-rd, psy-rdoq ve uyarlamalı niceleme anahtarlarının
   argümanlarımıza girmemesinden geliyor. Ölçüt: aynı düzenekte aynı kaynakta fark **0'a** insin,
   sonra artıya geçsin. Bu koşullarda ölçülmemiş bir kazanım rapora girmez.
+  Paket 3 (yazılım yolu, `docs/olcumler/handbrake-acigi-yazilim.md`): XPSNR'da 6/6 satır önde; VMAF-NEG'de
+  `karanlik` kesitinde SVT-AV1 −0,65 ve −0,61 geride. Donanım yolu ölçülmedi.
 
 ## Kararlar
 
