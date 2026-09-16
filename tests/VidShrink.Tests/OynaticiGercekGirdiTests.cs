@@ -44,6 +44,13 @@ public sealed class OynaticiGercekGirdiTests
         DenetimSurucu.Wait(view, 0.15);
     }
 
+    private static string Kanit(string ad)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "girdi");
+        Directory.CreateDirectory(klasor);
+        return Path.Combine(klasor, ad);
+    }
+
     private static void Surukle(Window window, PlayerView view, Point bas, Point son)
     {
         Gonder(window, RawPointerEventType.Move, bas, RawInputModifiers.None);
@@ -117,7 +124,7 @@ public sealed class OynaticiGercekGirdiTests
             return body.ToString();
         });
 
-        File.WriteAllText(Path.Combine(GirdiKanit.Root, ".calisma", "girdi", "serit-ham-fare.txt"), rapor, new UTF8Encoding(false));
+        File.WriteAllText(Kanit("serit-ham-fare.txt"), rapor, new UTF8Encoding(false));
         Assert.Contains("serit acik: True", rapor);
         Assert.Contains("mute no -> yes", rapor);
         Assert.DoesNotMatch(@"ses (\S+) -> \1 ", rapor);
@@ -179,13 +186,13 @@ public sealed class OynaticiGercekGirdiTests
             using (var kare = new Avalonia.Media.Imaging.RenderTargetBitmap(boyut, new Vector(96, 96)))
             {
                 kare.Render(window);
-                kare.Save(Path.Combine(GirdiKanit.Root, ".calisma", "girdi", "serit-ana-pencere.png"), Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
+                kare.Save(Kanit("serit-ana-pencere.png"), Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
             }
             window.Close();
             return body.ToString();
         });
 
-        File.WriteAllText(Path.Combine(GirdiKanit.Root, ".calisma", "girdi", "serit-ana-pencere.txt"), rapor, new UTF8Encoding(false));
+        File.WriteAllText(Kanit("serit-ana-pencere.txt"), rapor, new UTF8Encoding(false));
         Assert.Contains("serit acik: True", rapor);
         Assert.Contains("mute no -> yes", rapor);
         Assert.DoesNotContain("ses tik -> 100", rapor);

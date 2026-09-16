@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-09-16
+
+### Fixed
+
+- The raw pointer player tests create their evidence folder, so they pass on a clean CI checkout. `v0.7.3` and `v0.8.0` failed CI on that and shipped no release; their changes ship here.
+
 ## [0.8.0] - 2026-09-16
 
 ### Added
