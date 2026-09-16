@@ -273,6 +273,7 @@ function HedefBant {
     if (-not $kaynakUzun) { throw "uzun kaynak verilmedi: $Kesit" }
     $kb = Probe $kaynakUzun
     $bas = [int]$secim.Baslangic
+    if (($bas + $UzunSure) -gt $kb.Sure) { $bas = [int][math]::Max(0, [math]::Floor($kb.Sure - 180 - $UzunSure)) }
     $dongu = ($bas + $UzunSure) -gt $kb.Sure
     if ($dongu) { $bas = 0 }
     $girdi = Join-Path $Cikti "uzun-$Kesit.mkv"

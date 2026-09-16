@@ -26,6 +26,12 @@ on:
       izgara:
         description: AV1 izgarasi JSON
         default: '{"preset":[4,6,8,10],"crf":[28,36,44],"kbit":[],"filmgrain":[0,8],"tune":[0,1],"keyint":[240]}'
+      uzun_sure:
+        description: hedefbant kaynak suresi (sn)
+        default: '120'
+      hedefler:
+        description: hedefbant hedefleri (MB, virgullu)
+        default: '50,100'
 
 env:
   DOTNET_NOLOGO: 'true'
@@ -175,6 +181,7 @@ jobs:
           if ($env:BENCH_E1) { $a += @('-BenchE1', $env:BENCH_E1) }
           if ($env:UZUN) { $a += @('-Uzun', $env:UZUN) }
           if ($env:UZUN_EKRAN) { $a += @('-EkranUzun', $env:UZUN_EKRAN) }
+          if ('${{ matrix.is }}' -eq 'hedefbant') { $a += @('-UzunSure', '${{ inputs.uzun_sure || '120' }}', '-Hedefler', '${{ inputs.hedefler || '50,100' }}') }
           pwsh tools/kalite-paketi-3/kos.ps1 @a
       - name: sonuclari ayir
         if: always()
