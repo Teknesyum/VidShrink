@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       isler:
-        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
+        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,turboilk,socialkodek,vtara
         default: handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
       kesitler:
         description: handbrake isinin kesitleri
@@ -81,20 +81,26 @@ jobs:
             turbo = @('karanlik', 'hareketli')
             hdr = @('CosmosCaterpillar', 'CosmosTreeTrunk')
             ekranbant = @('ekran')
+            svtara = @('karanlik', 'rampa')
+            turboilk = @('karanlik', 'hareketli')
+            socialkodek = @('parlak', 'karanlik', 'hareketli')
           }
           $liste = @()
-          foreach ($is in @($isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -ne 'vt' })) {
+          foreach ($is in @($isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -notin @('vt', 'vtara') })) {
             if (-not $harita.ContainsKey($is)) { throw "bilinmeyen is: $is" }
             $ks = $harita[$is]
             if ($ayrinti -match '"Duman"' -and $is -ne 'handbrake') { $ks = @($ks | Select-Object -Last 1) }
             foreach ($k in $ks) { $liste += @{ is = $is; kesit = $k } }
           }
-          $vt = if ('${{ github.event_name }}' -eq 'push') { ($isler -split ',') -contains 'vt' } else { '${{ inputs.vt }}' -eq 'true' }
+          $vtIsler = @()
+          if (('${{ github.event_name }}' -eq 'push' -and ($isler -split ',') -contains 'vt') -or ('${{ github.event_name }}' -ne 'push' -and '${{ inputs.vt }}' -eq 'true')) { $vtIsler += 'vt' }
+          if (($isler -split ',') -contains 'vtara') { $vtIsler += 'vtara' }
+          $vt = ConvertTo-Json -Compress -InputObject @($vtIsler)
           $json = ConvertTo-Json -Compress -InputObject @{ include = $liste }
           Write-Host $json
           Write-Host "vt=$vt"
           "matris=$json" | Add-Content $env:GITHUB_OUTPUT
-          "vt=$($vt.ToString().ToLowerInvariant())" | Add-Content $env:GITHUB_OUTPUT
+          "vt=$vt" | Add-Content $env:GITHUB_OUTPUT
 
   kesit:
     runs-on: windows-latest
@@ -258,9 +264,13 @@ jobs:
 
   vt:
     needs: [plan, kesit]
-    if: needs.plan.outputs.vt == 'true'
+    if: needs.plan.outputs.vt != '[]'
     runs-on: macos-15
     timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        is: ${{ fromJSON(needs.plan.outputs.vt) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -293,7 +303,7 @@ jobs:
       - name: olc
         shell: pwsh
         run: |
-          $a = @('-Is', 'vt', '-Kesitler', 'karanlik,parlak,hareketli,ekran', '-Cikti', "$env:RUNNER_TEMP/olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI)
+          $a = @('-Is', '${{ matrix.is }}', '-Kesitler', 'karanlik,parlak,hareketli,ekran', '-Cikti', "$env:RUNNER_TEMP/olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI)
           $ayr = '${{ needs.plan.outputs.ayrinti }}' | ConvertFrom-Json
           foreach ($p in $ayr.PSObject.Properties) {
             if ($p.Name -eq 'VtKesitler') { $a[3] = "$($p.Value)" } elseif ($p.Name -eq 'VtKbitler') { $a += @('-VtKbitler', "$($p.Value)") }
@@ -313,6 +323,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: hb-sonuc-vt
+          name: hb-sonuc-${{ matrix.is }}
           path: ${{ runner.temp }}/sonuc
           retention-days: 30

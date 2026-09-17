@@ -98,14 +98,54 @@ public sealed class TurboFirstPassTests
     [InlineData("veryslow", "veryfast")]
     public void Ilk_gecis_merdiveni_tavanda_kesiliyor(string sonGecis, string beklenen)
     {
-        foreach (var kodek in CodecModel.TurboFirstPassCodecs)
-        {
-            Assert.Equal(beklenen, FfmpegArguments.FirstPassPreset(kodek, sonGecis, turbo: true));
+        Assert.Equal(beklenen, FfmpegArguments.FirstPassPreset("libx264", sonGecis, turbo: true));
 
-            var plan = Plan(kodek, sonGecis);
-            plan.TurboFirstPass = true;
-            Assert.Equal(beklenen, OnAyar(FfmpegArguments.Build(Kaynak(), plan, "cikti.mp4", 1, "gunluk")));
-        }
+        var plan = Plan("libx264", sonGecis);
+        plan.TurboFirstPass = true;
+        Assert.Equal(beklenen, OnAyar(FfmpegArguments.Build(Kaynak(), plan, "cikti.mp4", 1, "gunluk")));
+    }
+
+    private static string? X265Params(IReadOnlyList<string> args)
+    {
+        var yer = args.IndexOf("-x265-params");
+        return yer < 0 ? null : args[yer + 1];
+    }
+
+    [Theory]
+    [InlineData("veryfast")]
+    [InlineData("medium")]
+    [InlineData("slow")]
+    [InlineData("veryslow")]
+    public void X265_turbosu_on_ayari_dusurmez_slow_firstpass_0_ekler(string onAyar)
+    {
+        Assert.Equal(onAyar, FfmpegArguments.FirstPassPreset("libx265", onAyar, turbo: true));
+
+        var acik = Plan("libx265", onAyar);
+        acik.TurboFirstPass = true;
+        var kapali = Plan("libx265", onAyar);
+
+        var ilkAcik = FfmpegArguments.Build(Kaynak(), acik, "cikti.mp4", 1, "gunluk");
+        var ilkKapali = FfmpegArguments.Build(Kaynak(), kapali, "cikti.mp4", 1, "gunluk");
+
+        Assert.Equal(onAyar, OnAyar(ilkAcik));
+        Assert.Equal(1, ilkAcik.Count(a => a == "-x265-params"));
+        Assert.Contains("slow-firstpass=0", X265Params(ilkAcik)!.Split(':'));
+        Assert.Contains("keyint=", X265Params(ilkAcik));
+        Assert.DoesNotContain("slow-firstpass", X265Params(ilkKapali) ?? "");
+        Assert.DoesNotContain("slow-firstpass", X265Params(FfmpegArguments.Build(Kaynak(), acik, "cikti.mp4", 2, "gunluk")) ?? "");
+    }
+
+    [Fact]
+    public void X264_turbosu_slow_firstpass_anahtari_tasimaz()
+    {
+        var plan = Plan("libx264", "slow");
+        plan.TurboFirstPass = true;
+
+        var ilk = FfmpegArguments.Build(Kaynak(), plan, "cikti.mp4", 1, "gunluk");
+
+        Assert.Null(CodecModel.TurboFirstPassParams("libx264"));
+        Assert.Equal("slow-firstpass=0", CodecModel.TurboFirstPassParams("libx265"));
+        Assert.DoesNotContain(ilk, a => a.Contains("slow-firstpass"));
     }
 
     [Theory]

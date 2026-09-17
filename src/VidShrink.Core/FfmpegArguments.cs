@@ -354,7 +354,7 @@ public static class FfmpegArguments
     public static bool SupportsRateLimits(string codec)
         => !string.Equals(codec, "libsvtav1", StringComparison.OrdinalIgnoreCase);
 
-    public static bool NeedsTwoPasses(string codec) => !CodecModel.IsHardware(codec);
+    public static bool NeedsTwoPasses(string codec) => !CodecModel.SinglePassRateControl(codec);
 
     public static IReadOnlyList<string> PresetLadder(string codec)
         => Presets.TryGetValue(codec, out var ladder) ? ladder : Array.Empty<string>();
@@ -397,7 +397,8 @@ public static class FfmpegArguments
             a.AddRange(new[] { "-vf", string.Join(',', filters) });
 
         a.AddRange(new[] { "-c:v", plan.Codec });
-        a.AddRange(new[] { "-preset", pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset });
+        if (CodecModel.TakesPreset(plan.Codec))
+            a.AddRange(new[] { "-preset", pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset });
         var psychovisualArgs = CachedPsychovisualArgs(plan.Codec, availability);
 
         if (plan.ModeEnum == EncodeMode.Crf)
@@ -425,6 +426,8 @@ public static class FfmpegArguments
 
         a.AddRange(KeyframeArgs(plan.Codec, plan.Fps, scenes));
         a.AddRange(new[] { "-pix_fmt", plan.PixelFormat });
+        if (CodecModel.OutputProfile(plan.Codec, plan.PixelFormat) is string profile)
+            a.AddRange(new[] { "-profile:v", profile });
         a.AddRange(psychovisualArgs);
         a.AddRange(plan.HdrColorArgs);
 
@@ -432,6 +435,8 @@ public static class FfmpegArguments
 
         if (pass == 1)
         {
+            if (plan.TurboFirstPass && CodecModel.TurboFirstPassParams(plan.Codec) is string turboParams)
+                a.AddRange(new[] { "-x265-params", turboParams });
             a.AddRange(plan.ExtraArgs);
             a.AddRange(new[] { "-map", streams.VideoMap, "-an", "-sn", "-f", "null" });
             a.Add(OperatingSystem.IsWindows() ? "NUL" : "/dev/null");

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -499,7 +499,7 @@ public static class PlanCalculator
         else if (best.Fps < info.Fps - 0.01 && !sourceFpsViable)
         {
             notes.Add(AdviceCode.FrameRateCutForFloor);
-            reason.Add($"at {info.Fps:0.##} fps every frame would fall below the {complexity.FloorBppf(codec, info.Fps, info.Fps):0.0000} bits per pixel per frame that {codec} needs, so the frame rate was cut to {best.Fps:0.##} and the freed bits went to the frames that remain");
+            reason.Add($"at {info.Fps:0.##} fps even the smallest allowed size needs {SourceFpsRunnableK(info, effective, codec, regime)}k before {codec} runs at all, and the budget leaves {videoK:0}k for video, so the frame rate was cut to {best.Fps:0.##}; above that wall the frame rate is never cut automatically");
         }
 
         if (best.Width != info.Width || best.Height != info.Height)
@@ -754,6 +754,9 @@ public static class PlanCalculator
         plan.Reason = string.Join("; ", reason);
         plan.ReasonCodes = reasonCodes;
         plan.EffectiveTargetMb = effectiveTargetMb;
+        plan.LayoutStepMinHeight = effective.AllowResolutionDrop && options.FixedResolution is null
+            ? Math.Min(plan.Height, EffectiveFloors(effective, regime).MinHeight)
+            : null;
 
         var estimate = Estimate(plan, info, complexity);
         var advice = new StrategyAdvice(regime, ratio, PickCodec(suggestedPreference, availability), suggestedPreference, best.Score, notes);
@@ -770,9 +773,9 @@ public static class PlanCalculator
         Width = best.Width,
         Height = best.Height,
         Fps = best.Fps,
-        Preset = PickPreset(codec, options.Codec, options.SpeedMode),
+        Preset = PickPreset(codec, options.Codec, options.SpeedMode, options.Intent),
         TurboFirstPass = options.SpeedMode == SpeedMode.Fast && TurboFirstPassIsSafe(codec),
-        PixelFormat = hdr.PixelFormat,
+        PixelFormat = CodecModel.OutputPixelFormat(codec, hdr.PixelFormat),
         HdrVideoFilter = hdr.VideoFilter,
         HdrColorArgs = new List<string>(hdr.ColorArgs)
     };
@@ -899,13 +902,21 @@ public static class PlanCalculator
 
     public static double? MeasuredEncoderEfficiency(EncodePlan plan, double actualMb, double durationSeconds)
     {
+        var efficiency = RawEncoderYield(plan, actualMb, durationSeconds);
+        return efficiency is > Saturation.DeadYield and < 2.0 ? efficiency : null;
+    }
+
+    public static double? RawEncoderYield(EncodePlan plan, double actualMb, double durationSeconds)
+    {
         if (plan.ModeEnum != EncodeMode.TwoPass || plan.VideoBitrateK <= 0) return null;
         var requestedVideoMb = SizeMb(plan.VideoBitrateK, 0, durationSeconds);
-        var deliveredVideoMb = actualMb - SizeMb(0, plan.NonVideoK, durationSeconds);
-        if (requestedVideoMb <= 0.01 || deliveredVideoMb <= 0.01) return null;
-        var efficiency = deliveredVideoMb / requestedVideoMb;
-        return efficiency is > 0.5 and < 2.0 ? efficiency : null;
+        var deliveredVideoMb = Math.Max(actualMb - SizeMb(0, plan.NonVideoK, durationSeconds), 0.0);
+        if (requestedVideoMb <= 0.01) return null;
+        return deliveredVideoMb / requestedVideoMb;
     }
+
+    public static int VideoBudgetK(double targetMb, int audioK, double durationSeconds)
+        => (int)Math.Max(0.0, Math.Floor(targetMb * KbitPerMib * ContainerOverhead / Math.Max(durationSeconds, 0.1) - audioK));
 
     public static double EffectiveTargetMb(double targetMb, double sourceMb)
         => sourceMb > 0 ? Math.Min(targetMb, sourceMb * SourceSizeCap) : targetMb;
@@ -1118,7 +1129,7 @@ public static class PlanCalculator
         foreach (var fps in FpsCandidates(info, options, regime))
         foreach (var scale in LayoutScales(info, options, regime))
         {
-            if (scale < fallback.Scale - 1e-6) continue;
+            if (scale < fallback.Scale - 1e-6 || fps < fallback.Fps - 0.01) continue;
 
             var (width, height) = Dimensions(info, scale);
             if (options.FixedResolution is null && height < floors.MinHeight && height < info.Height) continue;
@@ -1188,10 +1199,13 @@ public static class PlanCalculator
         Layout? densest = null;
         var sourceFpsViable = false;
         var floors = EffectiveFloors(options, regime);
+        var sourceFps = info.Fps <= 0 ? 30 : info.Fps;
+        var sourceFpsRuns = SourceFpsRuns(info, options, codec, videoK, regime);
 
         foreach (var fps in FpsCandidates(info, options, regime))
         foreach (var scale in LayoutScales(info, options, regime))
         {
+            if (sourceFpsRuns && fps < sourceFps - 0.01) continue;
             var (width, height) = Dimensions(info, scale);
             if (options.FixedResolution is null && height < floors.MinHeight && height < info.Height) continue;
             if (width < 2 || height < 2) continue;
@@ -1218,6 +1232,24 @@ public static class PlanCalculator
 
         var (fallbackWidth, fallbackHeight) = Dimensions(info, 1.0);
         return (new Layout(fallbackWidth, fallbackHeight, info.Fps, 1.0, 0), true);
+    }
+
+    public static bool SourceFpsRuns(MediaInfo info, PlanOptions options, string codec, double videoK, CompressionRegime regime)
+        => videoK >= SourceFpsRunnableK(info, options, codec, regime);
+
+    public static int SourceFpsRunnableK(MediaInfo info, PlanOptions options, string codec, CompressionRegime regime)
+    {
+        var floors = EffectiveFloors(options, regime);
+        var fps = info.Fps <= 0 ? 30 : info.Fps;
+        var least = int.MaxValue;
+        foreach (var scale in LayoutScales(info, options, regime))
+        {
+            var (width, height) = Dimensions(info, scale);
+            if (options.FixedResolution is null && height < floors.MinHeight && height < info.Height) continue;
+            if (width < 2 || height < 2) continue;
+            least = Math.Min(least, Math.Max(RunnableVideoBitrateK(width, height, fps), CodecModel.UsableBitrateK(codec, width, height, fps)));
+        }
+        return least;
     }
 
     /// <summary>
@@ -1564,7 +1596,13 @@ public static class PlanCalculator
             });
     }
 
-    private static string PickPreset(string codec, CodecPreference pref, SpeedMode speed)
+    /// <summary>
+    /// SVT-AV1 Sosyal Medya niyetinde kalite kipinde <c>4</c> kosar, digerlerinde <c>6</c>. Olcum koşum
+    /// 35166699260, Social 25 MB 1080p60 HB ile es baytta: p6 parlak -0,61 / -0,42 bant disi, p4
+    /// -0,22 / -0,01 bantta, sure HB'nin 1,31-1,39 kati. <c>handbrake</c> 2000@24'te p6 onde oldugu icin
+    /// kapsam genisletilmedi; <c>docs/olcumler/handbrake-kiyas-b7-aciklar.md</c>.
+    /// </summary>
+    private static string PickPreset(string codec, CodecPreference pref, SpeedMode speed, Intent intent)
     {
         if (CodecModel.IsHardware(codec))
         {
@@ -1572,7 +1610,7 @@ public static class PlanCalculator
             if (speed == SpeedMode.Fast) preset = OneStepFaster(codec, preset);
             return FfmpegArguments.IsValidPreset(codec, preset) ? preset : FfmpegArguments.DefaultPreset(codec);
         }
-        if (codec == "libsvtav1") return "6";
+        if (codec == "libsvtav1") return intent == Intent.SocialMedia && speed != SpeedMode.Fast ? "4" : "6";
         return pref == CodecPreference.Fast ? "medium" : "slow";
     }
 

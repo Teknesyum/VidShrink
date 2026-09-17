@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant')][string]$Is,
+    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek')][string]$Is,
     [Parameter(Mandatory)][string]$Cikti,
     [Parameter(Mandatory)][string]$Bench,
     [string]$Kesit = '',
@@ -13,6 +13,7 @@ param(
     [string]$Kbitler = '600,2000',
     [string]$DusukKbitler = '300,600',
     [string]$BantKbitler = '100,300,1200',
+    [string]$RampaKbitler = '300,1200',
     [string]$HdrKbitler = '1000,3000',
     [string]$VtKbitler = '2000,5500',
     [string]$HdrKaynak = '',
@@ -32,6 +33,8 @@ $Inv = [Globalization.CultureInfo]::InvariantCulture
 New-Item -ItemType Directory -Force $Cikti | Out-Null
 $Satirlar = [Collections.Generic.List[object]]::new()
 $JsonAdi = if ($Kesit) { "$Is-$Kesit.json" } else { "$Is.json" }
+
+$script:FfSeviye = 'warning'
 
 function Ff([string[]]$Argumanlar) {
     & ffmpeg -hide_banner -nostdin -loglevel error -y @Argumanlar
@@ -364,12 +367,13 @@ function Bantlasma {
     $alti = Join-Path $Cikti "kesit-$Kesit-6bit.mkv"
     Ff @('-i', $girdi, '-vf', 'lutyuv=y=bitand(val\,252)', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', $alti)
     Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'negatif-kaynak-6bit' }) $null (EkOlcu $girdi $alti '')
-    $kollar = [ordered]@{ 'e0' = $Bench; 'e1' = $BenchE1 }
+    $kollar = [ordered]@{ 'e0' = $Bench; 'e1' = $BenchE1; 'e0-duzen' = $Bench }
     foreach ($kbit in @($BantKbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
         $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
         foreach ($kol in $kollar.Keys) {
             Dene $Kesit $kol $kbit {
-                $u = Urun $girdi $mb "bant-$Kesit-$kbit-$kol" @('--force-codec', 'libsvtav1', '--no-resolution-drop', '--no-fps-drop') $kollar[$kol]
+                $ek = if ($kol -eq 'e0-duzen') { @('--force-codec', 'libsvtav1', '--no-fps-drop') } else { @('--force-codec', 'libsvtav1', '--no-resolution-drop', '--no-fps-drop') }
+                $u = Urun $girdi $mb "bant-$Kesit-$kbit-$kol" $ek $kollar[$kol]
                 $o = Olc $girdi $u.Dosya $b.FpsMetin
                 Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; istenen_kbit = $kbit }) $o (UrunOrtak $u $mb)
                 Remove-Item $u.Dosya
@@ -484,6 +488,9 @@ function Vt {
     $enc | Set-Content (Join-Path $Cikti 'ffmpeg-encoders.txt')
     & $HandBrake --help 2>&1 | Out-String | Set-Content (Join-Path $Cikti 'handbrake-help.txt')
     $script:JsonAdi = 'vt.json'
+    $script:vtOnbitKaldi = @()
+    $neg = FfKos @('-f', 'lavfi', '-i', 'testsrc2=s=320x240:d=0.2', '-c:v', 'hevc_videotoolbox', '-foo', '1', '-f', 'null', $NullCikis)
+    Ekle ([ordered]@{ is = 'vt'; kesit = ''; kol = 'negatif-vt-uydurma-bayrak'; cikis_kodu = $neg.Kod; uyari = (Uyarilar $neg.Metin); hukum = $(if ($neg.Kod -ne 0) { 'gecti: uydurma bayrak reddedildi' } else { 'kaldi: uydurma bayrak kabul edildi' }) }) $null $null
     foreach ($k in @($Kesitler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
         $script:Kesit = $k
         $girdi = Join-Path $Cikti "kesit-$k.mkv"
@@ -511,6 +518,13 @@ function Vt {
                 $o = Olc $girdi $dosya $b.FpsMetin
                 $script:urunKbps = $o.kbps
                 $ek['urun_yolu_vt'] = $yol
+                $ok = IkiOkuma $girdi $dosya
+                foreach ($x in $ok.Keys) { $ek[$x] = $ok[$x] }
+                $pp = (& ffprobe -v error -select_streams v:0 -show_entries stream=pix_fmt,profile -of json $dosya | ConvertFrom-Json).streams[0]
+                $ek['cikis_pix'] = $pp.pix_fmt
+                $ek['cikis_profil'] = $pp.profile
+                $ek['onbit_hukmu'] = if ($pp.pix_fmt -eq 'yuv420p10le' -and $pp.profile -eq 'Main 10' -and $yol -like 'bench shrink*') { 'gecti' } else { 'kaldi' }
+                if ($ek['onbit_hukmu'] -ne 'gecti') { $script:vtOnbitKaldi += "$k $kbit $($pp.pix_fmt)/$($pp.profile)" }
                 Ekle ([ordered]@{ is = 'vt'; kesit = $k; kol = 'urun-vt'; istenen_kbit = $kbit }) $o $ek
                 Remove-Item $dosya
             }
@@ -521,7 +535,10 @@ function Vt {
                 $c = Join-Path $Cikti "vt-$k-$kbit-handbrake.mkv"
                 $h = HbEsBayt $girdi $c $hk $hbArg
                 $o = Olc $girdi $c $b.FpsMetin
-                Ekle ([ordered]@{ is = 'vt'; kesit = $k; kol = 'handbrake-vt'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 H.265 Apple VideoToolbox 1080p' }) $o (HbOrtak $h $hk)
+                $hx = HbOrtak $h $hk
+                $ok = IkiOkuma $girdi $c
+                foreach ($x in $ok.Keys) { $hx[$x] = $ok[$x] }
+                Ekle ([ordered]@{ is = 'vt'; kesit = $k; kol = 'handbrake-vt'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 H.265 Apple VideoToolbox 1080p' }) $o $hx
                 Remove-Item $c
             }
             Dene $k 'negatif-handbrake-yarim-bit' $kbit {
@@ -533,6 +550,7 @@ function Vt {
             }
         }
     }
+    if ($script:vtOnbitKaldi.Count -gt 0) { throw "VT urun ciktisi Main 10 degil: $($script:vtOnbitKaldi -join '; ')" }
 }
 
 function EkranBant {
@@ -563,7 +581,398 @@ function EkranBant {
     Remove-Item $girdi -ErrorAction SilentlyContinue
 }
 
+$NullCikis = if ($IsWindows) { 'NUL' } else { '/dev/null' }
+
+function FfKos([string[]]$A, [string]$Seviye = 'warning') {
+    $sw = [Diagnostics.Stopwatch]::StartNew()
+    $m = & ffmpeg -hide_banner -nostdin -loglevel $Seviye -y @A 2>&1 | Out-String
+    $kod = $LASTEXITCODE
+    $sw.Stop()
+    [pscustomobject]@{ Kod = $kod; Sn = [math]::Round($sw.Elapsed.TotalSeconds, 1); Metin = $m }
+}
+
+function Uyarilar([string]$Metin) {
+    ((($Metin -split "`n") | Where-Object { $_ -notmatch '^\s*Stream #' -and $_ -match 'unknown|Unknown|not used|not been used|different|first pass|Error parsing|Unrecognized|invalid|Invalid' } | ForEach-Object { $_.Trim() } | Select-Object -Unique -First 6) -join ' // ')
+}
+
+function AkisMd5([string]$Yol) {
+    $m = & ffmpeg -hide_banner -nostdin -loglevel error -i $Yol -map 0:v:0 -c copy -f md5 - 2>$null | Out-String
+    $m.Trim() -replace '^MD5=', ''
+}
+
+function SvtOnayar([string]$Metin) {
+    $m = [regex]::Match($Metin, 'SVT \[config\]:[^\r\n]*preset[^:\r\n]*:\s*(-?\d+|Pass 1)')
+    if (-not $m.Success) { $null } elseif ($m.Groups[1].Value -eq 'Pass 1') { 'Pass 1' } else { [int]$m.Groups[1].Value }
+}
+
+function Gecisli([string]$Girdi, [string]$Cikis, [string[]]$Kodek, [string[]]$Ilk, [string[]]$Iki) {
+    $p = Join-Path $Cikti ('pass-' + [guid]::NewGuid().ToString('N'))
+    $r1 = FfKos (@('-i', $Girdi, '-an') + $Kodek + $Ilk + @('-pass', '1', '-passlogfile', $p, '-f', 'null', $NullCikis)) $script:FfSeviye
+    $istat = @(Get-ChildItem -Path $Cikti -Filter ((Split-Path $p -Leaf) + '*') -ErrorAction SilentlyContinue).Count
+    if ($r1.Kod -ne 0) { throw "ilk gecis basarisiz ($($r1.Kod)): $(Uyarilar $r1.Metin) $($r1.Metin.Substring([math]::Max(0, $r1.Metin.Length - 300)))" }
+    $r2 = FfKos (@('-i', $Girdi, '-an') + $Kodek + $Iki + @('-pass', '2', '-passlogfile', $p, $Cikis)) $script:FfSeviye
+    Get-ChildItem -Path $Cikti -Filter ((Split-Path $p -Leaf) + '*') -ErrorAction SilentlyContinue | Remove-Item -ErrorAction SilentlyContinue
+    if ($r2.Kod -ne 0) { throw "ikinci gecis basarisiz ($($r2.Kod)): $(Uyarilar $r2.Metin) $($r2.Metin.Substring([math]::Max(0, $r2.Metin.Length - 300)))" }
+    [pscustomobject]@{ Sn1 = $r1.Sn; Sn2 = $r2.Sn; Sn = [math]::Round($r1.Sn + $r2.Sn, 1); IstatDosya = $istat; Uyari1 = (Uyarilar $r1.Metin); Uyari2 = (Uyarilar $r2.Metin); SvtOnayar1 = (SvtOnayar $r1.Metin); SvtOnayar2 = (SvtOnayar $r2.Metin) }
+}
+
+function HamEsBayt([string]$Cikis, [double]$HedefKbps, [int]$IlkB, [scriptblock]$Kodla) {
+    $hB = $IlkB
+    $hIz = @()
+    $hMd5 = $null
+    for ($hI = 1; $hI -le 3; $hI++) {
+        $hR = & $Kodla $hB $Cikis
+        $hK = Kbps $Cikis
+        if ($hI -eq 1) { $hMd5 = AkisMd5 $Cikis }
+        $hS = $hK / $HedefKbps - 1
+        $hIz += "${hB}k->$hK"
+        if ([math]::Abs($hS) -le 0.02 -or $hI -eq 3) {
+            return [pscustomobject]@{ R = $hR; Kbps = $hK; B = $hB; Deneme = $hI; Sapma = [math]::Round($hS * 100, 2); Iz = ($hIz -join ' | '); Md5Ilk = $hMd5 }
+        }
+        $hB = [int][math]::Round($hB * $HedefKbps / $hK)
+    }
+}
+
+function EsOrtak($h, [double]$HedefKbps) {
+    $s = [ordered]@{ ham_b = $h.B; ham_deneme = $h.Deneme; ham_iz = $h.Iz; hedef_kbps = $HedefKbps; bayt_sapma_yuzde = $h.Sapma; es_bayt = ([math]::Abs($h.Sapma) -le 2); md5_ilk = $h.Md5Ilk }
+    if ($h.R.PSObject.Properties['Sn1']) { $s.sn1 = $h.R.Sn1; $s.sn2 = $h.R.Sn2; $s.istat_dosya = $h.R.IstatDosya; $s.uyari1 = $h.R.Uyari1; $s.uyari2 = $h.R.Uyari2; $s.svt_onayar1 = $h.R.SvtOnayar1; $s.svt_onayar2 = $h.R.SvtOnayar2 }
+    $s.kodlama_sn = $h.R.Sn
+    $s
+}
+
+function IkiOkuma([string]$Ref, [string]$Test) {
+    $rb = Probe $Ref
+    $tb = Probe $Test
+    $s = [ordered]@{ test_pix = $tb.Pix; yol_ii = 'zscale dither=none' }
+    $cambi = "name=cambi\:enc_width=$($tb.W)\:enc_height=$($tb.H)"
+    $zs = "zscale=w=$($rb.W):h=$($rb.H):filter=lanczos:dither=none:matrixin=709:matrix=709:transferin=709:transfer=709:primariesin=709:primaries=709:rangein=limited:range=limited,format=yuv420p"
+    $okumalar = [ordered]@{
+        i = @("scale=w=$($rb.W):h=$($rb.H):flags=lanczos,format=yuv420p10le", 'format=yuv420p10le')
+        ii = @($zs, 'format=yuv420p')
+    }
+    foreach ($ad in $okumalar.Keys) {
+        $t = $okumalar[$ad][0]
+        $r = $okumalar[$ad][1]
+        $s["cambi_$ad"] = $null; $s["vmafneg_ort_$ad"] = $null; $s["vmafneg_harm_$ad"] = $null; $s["xpsnr_$ad"] = $null; $s["hata_$ad"] = $null
+        try {
+            $log = Join-Path $Cikti ('vmaf-' + [guid]::NewGuid().ToString('N') + '.json')
+            $g = "[0:v]$t,settb=AVTB,setpts=N[t];[1:v]$r,settb=AVTB,setpts=N[r];[t][r]libvmaf=model=version=vmaf_v0.6.1neg:feature='$cambi':log_fmt=json:log_path=$(Kacis $log):n_threads=4"
+            $cikis = & ffmpeg -hide_banner -nostdin -i $Test -i $Ref -lavfi $g -f null - 2>&1 | Out-String
+            if (-not (Test-Path $log) -and $ad -eq 'ii') {
+                $t = "scale=w=$($rb.W):h=$($rb.H):flags=lanczos:sws_dither=none,format=yuv420p"
+                $s.yol_ii = "swscale sws_dither=none (zscale kosmadi: $(Uyarilar $cikis))"
+                $g = "[0:v]$t,settb=AVTB,setpts=N[t];[1:v]$r,settb=AVTB,setpts=N[r];[t][r]libvmaf=model=version=vmaf_v0.6.1neg:feature='$cambi':log_fmt=json:log_path=$(Kacis $log):n_threads=4"
+                $cikis = & ffmpeg -hide_banner -nostdin -i $Test -i $Ref -lavfi $g -f null - 2>&1 | Out-String
+            }
+            if (-not (Test-Path $log)) { throw "libvmaf gunlugu yok: $($cikis.Substring([math]::Max(0, $cikis.Length - 400)))" }
+            $p = (Get-Content $log -Raw | ConvertFrom-Json).pooled_metrics
+            $c = $p.PSObject.Properties | Where-Object { $_.Name -like 'cambi*' } | Select-Object -First 1
+            if ($c) { $s["cambi_$ad"] = [math]::Round($c.Value.mean, 4) }
+            if ($p.vmaf) { $s["vmafneg_ort_$ad"] = [math]::Round($p.vmaf.mean, 4); $s["vmafneg_harm_$ad"] = [math]::Round($p.vmaf.harmonic_mean, 4) }
+            Remove-Item $log -ErrorAction SilentlyContinue
+            $gx = "[0:v]$t,settb=AVTB,setpts=N[t];[1:v]$r,settb=AVTB,setpts=N[r];[t][r]xpsnr"
+            $cx = & ffmpeg -hide_banner -nostdin -i $Test -i $Ref -lavfi $gx -f null - 2>&1 | Out-String
+            if ($cx -match 'XPSNR\s+y:\s*([\d.]+)\s*u:\s*([\d.]+)\s*v:\s*([\d.]+)') {
+                $s["xpsnr_$ad"] = [math]::Round((4 * (Sayi $Matches[1]) + (Sayi $Matches[2]) + (Sayi $Matches[3])) / 6, 4)
+            }
+        } catch { $s["hata_$ad"] = $_.Exception.Message }
+    }
+    $s
+}
+
+function Md5Hukmu([string]$Kol, [string]$Md5, [string]$AtaMd5, [bool]$EsBekle) {
+    if (-not $AtaMd5) { return 'ata yok' }
+    $es = ($Md5 -eq $AtaMd5)
+    if ($EsBekle) { if ($es) { 'gecti: uydurma anahtar bayt-es' } else { 'kaldi: uydurma anahtar ciktiyi degistirdi' } }
+    else { if ($es) { 'kol yutuldu: ata ile bayt-es, olculmedi say' } else { 'gecti: ata ile bayt-farkli' } }
+}
+
+function SvtAra {
+    if ($Kesit -eq 'rampa') { $girdi = Rampa; $kbitler = $RampaKbitler } else { $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"; $kbitler = $Kbitler }
+    & ffmpeg -hide_banner -h encoder=libsvtav1 2>&1 | Out-String | Set-Content (Join-Path $Cikti 'ffmpeg-h-libsvtav1.txt')
+    $sr = FfKos @('-f', 'lavfi', '-i', 'testsrc2=s=320x240:d=0.2', '-c:v', 'libsvtav1', '-f', 'null', $NullCikis) 'info'
+    $sr.Metin | Set-Content (Join-Path $Cikti 'svt-surum.txt')
+    $svtSurum = (($sr.Metin -split "`n") | Where-Object { $_ -match 'SVT' -and $_ -match 'v\d' } | ForEach-Object { $_.Trim() } | Select-Object -First 2) -join ' / '
+    $b = Probe $girdi
+    $k10 = Join-Path $Cikti "kesit-$Kesit-10bit.mkv"
+    Ff @('-i', $girdi, '-c:v', 'ffv1', '-pix_fmt', 'yuv420p10le', $k10)
+    Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'olcer-kaynak-kendisi'; svt_surum = $svtSurum }) $null (IkiOkuma $girdi $girdi)
+    Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'olcer-kaynak-10bit' }) $null (IkiOkuma $girdi $k10)
+    Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'olcer-kaynak-10bit-eski-olcer' }) $null (EkOlcu $girdi $k10 '')
+    $g = [int][math]::Round($b.Fps * 5)
+    $psy = 'tune=1:enable-variance-boost=0'
+    $kollar = [ordered]@{
+        'e0-8bit' = @{ Pix = 'yuv420p'; Psy = $psy; Ek = ''; Ata = ''; Es = $false }
+        'negatif-uydurma-anahtar' = @{ Pix = 'yuv420p'; Psy = $psy; Ek = 'vidshrinkuydurma=1'; Ata = 'e0-8bit'; Es = $true }
+        '10bit' = @{ Pix = 'yuv420p10le'; Psy = $psy; Ek = ''; Ata = 'e0-8bit'; Es = $false }
+        '10bit-qm' = @{ Pix = 'yuv420p10le'; Psy = $psy; Ek = 'enable-qm=1:qm-min=0:qm-max=15'; Ata = '10bit'; Es = $false }
+        '10bit-vb1' = @{ Pix = 'yuv420p10le'; Psy = 'tune=1:enable-variance-boost=1:variance-boost-strength=1'; Ek = ''; Ata = '10bit'; Es = $false }
+        '10bit-tf0' = @{ Pix = 'yuv420p10le'; Psy = $psy; Ek = 'enable-tf=0'; Ata = '10bit'; Es = $false }
+        '10bit-grain8' = @{ Pix = 'yuv420p10le'; Psy = $psy; Ek = 'film-grain=8:film-grain-denoise=0'; Ata = '10bit'; Es = $false }
+    }
+    foreach ($kbit in @($kbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
+        $script:araMd5 = @{}
+        $script:araTaban = $null
+        foreach ($kol in $kollar.Keys) {
+            Dene $Kesit $kol $kbit {
+                $t = $kollar[$kol]
+                $c = Join-Path $Cikti "svtara-$Kesit-$kbit-$kol.mkv"
+                $prm = "keyint=${g}:scd=1:$($t.Psy)"
+                if ($t.Ek) { $prm += ":$($t.Ek)" }
+                $hedef = if ($script:araTaban) { $script:araTaban } else { [double]$kbit }
+                $h = HamEsBayt $c $hedef $kbit { param($bb, $cc) Gecisli $girdi $cc @('-c:v', 'libsvtav1', '-preset', '6', '-b:v', "${bb}k", '-g', "$g", '-svtav1-params', $prm, '-pix_fmt', $t.Pix) @() @() }
+                if ($kol -eq 'e0-8bit') { $script:araTaban = $h.Kbps }
+                $script:araMd5[$kol] = $h.Md5Ilk
+                $o = [ordered]@{ bayt = (Get-Item $c).Length; kbps = $h.Kbps }
+                $ek = EsOrtak $h $hedef
+                $ek.svtav1_params = $prm
+                $ek.pix_fmt_istek = $t.Pix
+                $ek.ata = $t.Ata
+                $ek.md5_hukmu = Md5Hukmu $kol $h.Md5Ilk $script:araMd5[$t.Ata] $t.Es
+                $ok = IkiOkuma $girdi $c
+                foreach ($k in $ok.Keys) { $ek[$k] = $ok[$k] }
+                $eski = EkOlcu $girdi $c ''
+                $ek.eski_cambi = $eski.cambi
+                Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; istenen_kbit = $kbit }) $o $ek
+                Remove-Item $c
+            }
+        }
+        if (-not $script:araTaban) { continue }
+        Dene $Kesit 'handbrake-x265' $kbit {
+            $c = Join-Path $Cikti "svtara-$Kesit-$kbit-handbrake.mkv"
+            $h = HbEsBayt $girdi $c $script:araTaban (HbTemel $b)
+            $ek = HbOrtak $h $script:araTaban
+            $ok = IkiOkuma $girdi $c
+            foreach ($k in $ok.Keys) { $ek[$k] = $ok[$k] }
+            $ek.eski_cambi = (EkOlcu $girdi $c '').cambi
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'handbrake-x265'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 x265 slow 2 gecis turbo' }) ([ordered]@{ bayt = (Get-Item $c).Length; kbps = $h.Kbps }) $ek
+            Remove-Item $c
+        }
+    }
+    Remove-Item $k10 -ErrorAction SilentlyContinue
+}
+
+function TurboIlk {
+    $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"
+    $b = Probe $girdi
+    $g = [int][math]::Round($b.Fps * 5)
+    $m = [int][math]::Round($b.Fps)
+    $temel = "keyint=${g}:min-keyint=${m}:scenecut=40:psy-rd=2:psy-rdoq=1:aq-mode=2"
+    $kollar = [ordered]@{
+        'taban-slow' = @{ P1 = 'slow'; Ek = ''; Ata = ''; Es = $false }
+        'negatif-slow-firstpass1' = @{ P1 = 'slow'; Ek = 'slow-firstpass=1'; Ata = 'taban-slow'; Es = $true }
+        'ilk-veryfast' = @{ P1 = 'veryfast'; Ek = ''; Ata = 'taban-slow'; Es = $false }
+        'ilk-faster' = @{ P1 = 'faster'; Ek = ''; Ata = 'taban-slow'; Es = $false }
+        'ilk-fast' = @{ P1 = 'fast'; Ek = ''; Ata = 'taban-slow'; Es = $false }
+        'ilk-medium' = @{ P1 = 'medium'; Ek = ''; Ata = 'taban-slow'; Es = $false }
+        'slow-firstpass0' = @{ P1 = 'slow'; Ek = 'slow-firstpass=0'; Ata = 'taban-slow'; Es = $false }
+    }
+    foreach ($kbit in @($Kbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
+        $script:araMd5 = @{}
+        $script:araTaban = $null
+        foreach ($kol in $kollar.Keys) {
+            Dene $Kesit $kol $kbit {
+                $t = $kollar[$kol]
+                $c = Join-Path $Cikti "turboilk-$Kesit-$kbit-$kol.mkv"
+                $prm = $temel
+                if ($t.Ek) { $prm += ":$($t.Ek)" }
+                $hedef = if ($script:araTaban) { $script:araTaban } else { [double]$kbit }
+                $h = HamEsBayt $c $hedef $kbit { param($bb, $cc) Gecisli $girdi $cc @('-c:v', 'libx265', '-b:v', "${bb}k", '-g', "$g", '-x265-params', $prm, '-pix_fmt', 'yuv420p') @('-preset', $t.P1) @('-preset', 'slow') }
+                if ($kol -eq 'taban-slow') { $script:araTaban = $h.Kbps }
+                $script:araMd5[$kol] = $h.Md5Ilk
+                $o = Olc $girdi $c $b.FpsMetin -EkYok
+                $ek = EsOrtak $h $hedef
+                $ek.ilk_gecis_preset = $t.P1
+                $ek.x265_params = $prm
+                $ek.ata = $t.Ata
+                $ek.md5_hukmu = Md5Hukmu $kol $h.Md5Ilk $script:araMd5[$t.Ata] $t.Es
+                Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; istenen_kbit = $kbit }) $o $ek
+                Remove-Item $c
+            }
+        }
+        Dene $Kesit 'negatif-uydurma-foo' $kbit {
+            $c = Join-Path $Cikti "turboilk-$Kesit-$kbit-foo.mkv"
+            $hukum = $null
+            $iz = $null
+            try {
+                $r = Gecisli $girdi $c @('-c:v', 'libx265', '-b:v', "${kbit}k", '-g', "$g", '-x265-params', "${temel}:foo=1", '-pix_fmt', 'yuv420p') @('-preset', 'slow') @('-preset', 'slow')
+                $iz = "$($r.Uyari1) // $($r.Uyari2)"
+                $hukum = if ($iz -match 'foo') { 'gecti: kodlama bitti ama x265 foo anahtarini uyari ile reddetti' } else { 'kaldi: foo=1 ne dusurdu ne uyardi' }
+                Remove-Item $c -ErrorAction SilentlyContinue
+            } catch {
+                $iz = $_.Exception.Message
+                $hukum = 'gecti: foo=1 kodlamayi dusurdu'
+            }
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'negatif-uydurma-foo'; istenen_kbit = $kbit; negatif_hukum = $hukum; negatif_iz = $iz }) $null $null
+        }
+    }
+}
+
+function VtProfil([string]$Yol) {
+    $s = (& ffprobe -v error -select_streams v:0 -show_entries stream=profile,pix_fmt -of json $Yol | ConvertFrom-Json).streams[0]
+    [ordered]@{ cikti_profil = $s.profile; cikti_pix = $s.pix_fmt; on_bit = ($s.pix_fmt -match '10' -and $s.profile -match '10') }
+}
+
+function VtAra {
+    $yardim = & ffmpeg -hide_banner -h encoder=hevc_videotoolbox 2>&1 | Out-String
+    $yardim | Set-Content (Join-Path $Cikti 'ffmpeg-h-hevc_videotoolbox.txt')
+    $saq = $yardim -match 'spatial_aq'
+    $script:JsonAdi = 'vtara.json'
+    foreach ($k in @($Kesitler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
+        $script:Kesit = $k
+        $girdi = Join-Path $Cikti "kesit-$k.mkv"
+        if (-not (Test-Path $girdi)) { Write-Warning "kesit yok: $girdi"; continue }
+        $b = Probe $girdi
+        $g = [int][math]::Round($b.Fps * 5)
+        $ortak = @('-c:v', 'hevc_videotoolbox', '-allow_sw', '0', '-g', "$g", '-tag:v', 'hvc1')
+        Dene $k 'negatif-uydurma-foo' $null {
+            $r = FfKos (@('-t', '2', '-i', $girdi, '-an') + $ortak + @('-b:v', '2000k', '-foo', '1', (Join-Path $Cikti "vtara-$k-foo.mp4")))
+            $hukum = if ($r.Kod -ne 0) { "gecti: exit $($r.Kod)" } else { 'kaldi: -foo 1 kabul edildi' }
+            Ekle ([ordered]@{ is = $Is; kesit = $k; kol = 'negatif-uydurma-foo'; negatif_hukum = $hukum; negatif_iz = (Uyarilar $r.Metin) }) $null $null
+        }
+        Dene $k 'negatif-preset-olu' $null {
+            $r = FfKos (@('-t', '2', '-i', $girdi, '-an') + $ortak + @('-b:v', '2000k', '-preset', 'slow', '-pass', '1', (Join-Path $Cikti "vtara-$k-preset.mp4")))
+            $bulundu = $r.Metin -match 'not (been )?used'
+            $hukum = if ($bulundu) { 'gecti: -preset/-pass icin not used uyarisi var' } else { 'kaldi: not used uyarisi yok, preset olu iddiasi duser' }
+            Ekle ([ordered]@{ is = $Is; kesit = $k; kol = 'negatif-preset-olu'; negatif_hukum = $hukum; negatif_iz = (Uyarilar $r.Metin); cikis_kodu = $r.Kod }) $null $null
+        }
+        foreach ($kbit in @($VtKbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
+            $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
+            $script:vtUrun = $null
+            Dene $k 'urun-vt' $kbit {
+                $u = Urun $girdi $mb "vtara-$k-$kbit-urun" @('--force-codec', 'hevc_videotoolbox', '--no-resolution-drop', '--no-fps-drop')
+                $kb = Kbps $u.Dosya
+                $bv = if ($u.Komut -match '-b:v (\d+)k') { [int]$Matches[1] } else { $null }
+                $mr = if ($u.Komut -match '-maxrate (\d+)k') { [int]$Matches[1] } else { $null }
+                $bs = if ($u.Komut -match '-bufsize (\d+)k') { [int]$Matches[1] } else { $null }
+                $script:vtUrun = [pscustomobject]@{ Kbps = $kb; Tepe = $(if ($bv -and $mr) { $mr / $bv } else { 1.5 }); Tampon = $(if ($bv -and $bs) { $bs / $bv } else { 2.0 }) }
+                $ek = UrunOrtak $u $mb
+                $ek.tepe_orani = $script:vtUrun.Tepe
+                $ek.tampon_orani = $script:vtUrun.Tampon
+                $p = VtProfil $u.Dosya
+                foreach ($x in $p.Keys) { $ek[$x] = $p[$x] }
+                $ok = IkiOkuma $girdi $u.Dosya
+                foreach ($x in $ok.Keys) { $ek[$x] = $ok[$x] }
+                Ekle ([ordered]@{ is = $Is; kesit = $k; kol = 'urun-vt'; istenen_kbit = $kbit }) ([ordered]@{ bayt = (Get-Item $u.Dosya).Length; kbps = $kb }) $ek
+                Remove-Item $u.Dosya
+            }
+            if (-not $script:vtUrun) { continue }
+            $hk = $script:vtUrun.Kbps
+            $kollar = [ordered]@{
+                'vt-8bit-tek' = @{ Ek = @(); Sinir = $true }
+                'vt-10bit-tek' = @{ Ek = @('-profile:v', 'main10', '-pix_fmt', 'p010le'); Sinir = $true }
+                'vt-10bit-sinirsiz' = @{ Ek = @('-profile:v', 'main10', '-pix_fmt', 'p010le'); Sinir = $false }
+                'vt-10bit-prio0' = @{ Ek = @('-profile:v', 'main10', '-pix_fmt', 'p010le', '-prio_speed', '0'); Sinir = $true }
+            }
+            if ($saq) { $kollar['vt-10bit-saq'] = @{ Ek = @('-profile:v', 'main10', '-pix_fmt', 'p010le', '-spatial_aq', '1'); Sinir = $true } }
+            foreach ($kol in $kollar.Keys) {
+                Dene $k $kol $kbit {
+                    $t = $kollar[$kol]
+                    $c = Join-Path $Cikti "vtara-$k-$kbit-$kol.mp4"
+                    $h = HamEsBayt $c $hk ([int][math]::Round($hk)) {
+                        param($bb, $cc)
+                        $sinir = if ($t.Sinir) { @('-maxrate', "$([int]($bb * $script:vtUrun.Tepe))k", '-bufsize', "$([int]($bb * $script:vtUrun.Tampon))k") } else { @() }
+                        $r = FfKos (@('-i', $girdi, '-an') + $ortak + @('-b:v', "${bb}k") + $sinir + $t.Ek + @($cc))
+                        if ($r.Kod -ne 0) { throw "vt kolu basarisiz ($($r.Kod)): $(Uyarilar $r.Metin)" }
+                        $r
+                    }
+                    $ek = EsOrtak $h $hk
+                    $ek.vt_ek = ($t.Ek -join ' ')
+                    $ek.sinirli = $t.Sinir
+                    $p = VtProfil $c
+                    foreach ($x in $p.Keys) { $ek[$x] = $p[$x] }
+                    $ok = IkiOkuma $girdi $c
+                    foreach ($x in $ok.Keys) { $ek[$x] = $ok[$x] }
+                    Ekle ([ordered]@{ is = $Is; kesit = $k; kol = $kol; istenen_kbit = $kbit }) ([ordered]@{ bayt = (Get-Item $c).Length; kbps = $h.Kbps }) $ek
+                    Remove-Item $c
+                }
+            }
+            Dene $k 'handbrake-vt' $kbit {
+                $hbArg = @('-Z', 'H.265 Apple VideoToolbox 1080p', '-a', 'none', '--crop-mode', 'none', '--width', "$($b.W)", '--height', "$($b.H)", '-f', 'av_mkv')
+                $c = Join-Path $Cikti "vtara-$k-$kbit-handbrake.mkv"
+                $h = HbEsBayt $girdi $c $hk $hbArg
+                $ek = HbOrtak $h $hk
+                $hl = Get-Content (Join-Path $Cikti 'handbrake.log') -Tail 400
+                $ek.hb_kodlayici_satiri = (($hl | Where-Object { $_ -match 'vt_h26|VideoToolbox|10-bit|encoder' } | ForEach-Object { $_.Trim() } | Select-Object -Unique -Last 4) -join ' // ')
+                $p = VtProfil $c
+                foreach ($x in $p.Keys) { $ek[$x] = $p[$x] }
+                $ok = IkiOkuma $girdi $c
+                foreach ($x in $ok.Keys) { $ek[$x] = $ok[$x] }
+                Ekle ([ordered]@{ is = $Is; kesit = $k; kol = 'handbrake-vt'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 H.265 Apple VideoToolbox 1080p' }) ([ordered]@{ bayt = (Get-Item $c).Length; kbps = $h.Kbps }) $ek
+                Remove-Item $c
+            }
+        }
+    }
+}
+
+function SocialKodek {
+    $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"
+    $b = Probe $girdi
+    $ad = 'Social 25 MB 30 Seconds 1080p60'
+    $script:skHb = $null
+    Dene $Kesit "hb:$ad" $null {
+        $c = Join-Path $Cikti "socialkodek-$Kesit-hb.mp4"
+        $sn = HbKodla $girdi $c @('-Z', $ad, '-a', 'none')
+        $hb = Probe $c
+        $o = Olc $girdi $c $b.FpsMetin
+        $script:skHb = [pscustomobject]@{ Kbps = $o.kbps; Mb = [math]::Round((Get-Item $c).Length / 1MB, 4); W = $hb.W; H = $hb.H; Fps = $hb.Fps }
+        Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'handbrake'; onayar = $ad; kodlama_sn = $sn; hb_fps = $hb.Fps }) $o $null
+        Remove-Item $c
+    }
+    if (-not $script:skHb) { return }
+    $hk = $script:skHb.Kbps
+    foreach ($uKol in @('urun-otomatik', 'urun-sosyal')) {
+        Dene $Kesit $uKol $null {
+            $uEk = if ($uKol -eq 'urun-sosyal') { @('--intent', 'socialmedia') } else { @() }
+            $u = Urun $girdi $script:skHb.Mb "socialkodek-$Kesit-$uKol" $uEk
+            $o = Olc $girdi $u.Dosya $b.FpsMetin
+            $uo = UrunOrtak $u $script:skHb.Mb
+            $uo.komut_onayar = if ($u.Komut -match '-preset (\S+)') { $Matches[1] } else { $null }
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $uKol; onayar = $ad }) $o $uo
+            Remove-Item $u.Dosya
+        }
+    }
+    $vf = @()
+    $f = @()
+    if ($script:skHb.W -ne $b.W -or $script:skHb.H -ne $b.H) { $f += "scale=$($script:skHb.W):$($script:skHb.H):flags=lanczos" }
+    if ($script:skHb.Fps -lt $b.Fps - 0.01) { $f += "fps=$($script:skHb.Fps.ToString('0.###', $Inv))" }
+    if ($f.Count -gt 0) { $vf = @('-vf', ($f -join ',')) }
+    $fpsKod = [math]::Min($b.Fps, $script:skHb.Fps)
+    $g = [int][math]::Round($fpsKod * 5)
+    $m = [int][math]::Round($fpsKod)
+    $kollar = [ordered]@{
+        'svt-p6' = @{ K = @('-c:v', 'libsvtav1', '-preset', '6', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0", '-pix_fmt', 'yuv420p'); Ata = ''; Es = $false; Yarim = $false; Onayar = 6 }
+        'negatif-svt-p6-uydurma' = @{ K = @('-c:v', 'libsvtav1', '-preset', '6', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0:vidshrinkuydurma=1", '-pix_fmt', 'yuv420p'); Ata = 'svt-p6'; Es = $true; Yarim = $false; Onayar = 6 }
+        'svt-p4' = @{ K = @('-c:v', 'libsvtav1', '-preset', '4', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0", '-pix_fmt', 'yuv420p'); Ata = 'svt-p6'; Es = $false; Yarim = $false; Onayar = 4 }
+        'x265-slow' = @{ K = @('-c:v', 'libx265', '-preset', 'slow', '-x265-params', "keyint=${g}:min-keyint=${m}:scenecut=40:psy-rd=2:psy-rdoq=1:aq-mode=2", '-pix_fmt', 'yuv420p'); Ata = ''; Es = $false; Yarim = $false }
+        'negatif-svt-p6-yarim-bit' = @{ K = @('-c:v', 'libsvtav1', '-preset', '6', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0", '-pix_fmt', 'yuv420p'); Ata = ''; Es = $false; Yarim = $true; Onayar = 6 }
+    }
+    $script:araMd5 = @{}
+    $script:FfSeviye = 'info'
+    foreach ($kol in $kollar.Keys) {
+        Dene $Kesit $kol $null {
+            $t = $kollar[$kol]
+            $c = Join-Path $Cikti "socialkodek-$Kesit-$kol.mkv"
+            $hedef = if ($t.Yarim) { $hk / 2 } else { $hk }
+            $h = HamEsBayt $c $hedef ([int][math]::Round($hk)) { param($bb, $cc) Gecisli $girdi $cc (@('-b:v', "${bb}k") + $vf + $t.K + @('-g', "$g")) @() @() }
+            $script:araMd5[$kol] = $h.Md5Ilk
+            $o = Olc $girdi $c $b.FpsMetin
+            $ek = EsOrtak $h $hedef
+            $ek.komut_kodek = ($vf + $t.K) -join ' '
+            $ek.geometri = "$($script:skHb.W)x$($script:skHb.H)@$fpsKod"
+            $ek.md5_hukmu = Md5Hukmu $kol $h.Md5Ilk $script:araMd5[$t.Ata] $t.Es
+            if ($t.Onayar) { $ek.onayar_hukmu = if ($ek.svt_onayar1 -eq 'Pass 1' -and $ek.svt_onayar2 -eq $t.Onayar) { "gecti: ilk gecis SVT'nin kendi Pass 1 on ayari, ikinci geciste preset $($t.Onayar)" } else { "kaldi: beklenen $($t.Onayar), gecis1=$($ek.svt_onayar1) gecis2=$($ek.svt_onayar2)" } }
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; onayar = $ad }) $o $ek
+            Remove-Item $c
+        }
+    }
+}
+
 switch ($Is) {
+    'svtara' { SvtAra }
+    'turboilk' { TurboIlk }
+    'vtara' { VtAra }
+    'socialkodek' { SocialKodek }
     'handbrake' { Kiyas }
     'dusuk' { Dusuk }
     'social' { Social }
