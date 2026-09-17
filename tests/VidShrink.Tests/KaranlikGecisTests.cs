@@ -335,6 +335,67 @@ public sealed class KaranlikGecisTests
         finally { try { Directory.Delete(dir, true); } catch { } }
     }
 
+    private static async Task<string> KlipAsync(string dir, string source)
+    {
+        var clip = Path.Combine(dir, "clip.mp4");
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, new[] { "-y", "-f", "lavfi", "-i", source, "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p", clip }) };
+        process.Start();
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        var stderr = process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync();
+        await Task.WhenAll(stdout, stderr);
+        Assert.Equal(0, process.ExitCode);
+        return clip;
+    }
+
+    [FfmpegFact]
+    public async Task YarimBoyuOlmayanKucukKaynaktaAyriSondaLumayiOlcer()
+    {
+        var dir = Path.Combine(TestPaths.OutputRoot, "karanlik-gecis", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var clip = await KlipAsync(dir, "color=c=0x101010:size=100x100:rate=12:duration=8");
+            var info = await FfprobeClient.ProbeAsync(clip);
+
+            var pencere = await ComplexityProbe.SampleWindowAsync(clip, 1, null, "veryfast", SpeedMode.Quality, null, default);
+            Assert.True(pencere.FullFrames > 0);
+            Assert.Null(pencere.MeanLuma);
+
+            var profile = (await ComplexityProbe.RunDetailedAsync(info, SpeedMode.Quality)).Profile;
+
+            Assert.True(profile.Measured);
+            Assert.NotNull(profile.MeanLuma);
+            Assert.True(DarkContentSwitch.IsDark(profile.MeanLuma));
+        }
+        finally { try { Directory.Delete(dir, true); } catch { } }
+    }
+
+    [FfmpegFact]
+    public async Task BirlesikSondaLumasizDonerseAyriSondaDoldurur()
+    {
+        var dir = Path.Combine(TestPaths.OutputRoot, "karanlik-gecis", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var clip = await KlipAsync(dir, "color=c=0x101010:size=320x240:rate=12:duration=8");
+            var windows = new[] { 1.0, 5.0 };
+            var samples = new[]
+            {
+                new ComplexityProbe.WindowSample(1000, 24, 300, 24),
+                new ComplexityProbe.WindowSample(1000, 24, 300, 24, MeanLuma: 99.0)
+            };
+
+            var lumas = await ComplexityProbe.WindowLumasAsync(clip, windows, samples, default);
+
+            Assert.Equal(await ComplexityProbe.LumaSampleAsync(clip, 1.0, 2, default), lumas[0]);
+            Assert.NotNull(lumas[0]);
+            Assert.True(DarkContentSwitch.IsDark(lumas[0]));
+            Assert.Equal(99.0, lumas[1]);
+        }
+        finally { try { Directory.Delete(dir, true); } catch { } }
+    }
+
     [FfmpegTheory]
     [InlineData("color=c=0x101010:size=320x240:rate=12:duration=8", true)]
     [InlineData("color=c=0x808080:size=320x240:rate=12:duration=8", false)]

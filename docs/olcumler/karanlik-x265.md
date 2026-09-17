@@ -175,3 +175,8 @@ Luma değerleri bölüm 1 ile aynı, kodek hükmü 5/5 ve CAMBI(ii) hükmü 2/2 
 iki geçişli kodlama ekliyor (600'de 1,41×, 2000'de 2,10×). Negatif kesitlerde (hareketli, parlak) `negatif_hukmu`
 aynı nedenle kaldı: ürün bir deneme fazla koştu, e0 `460ecc89`'de bütçe doldurma yok. Bu bu dalın açığı değil;
 ayrı iş.
+
+**Yedek luma yolu.** Bölünmüş sonda luma döndürmezse (yarım boy <64 olan küçük kaynak, `half: null` tam sonda ya da
+başarısız bölünmüş sonda) ayrı süreç koşar (`WindowLumasAsync`). Testler `YarimBoyuOlmayanKucukKaynaktaAyriSondaLumayiOlcer`
+(100x100 kaynakta `RunDetailedAsync` MeanLuma dolu) ve `BirlesikSondaLumasizDonerseAyriSondaDoldurur`. `?? await LumaSampleAsync`
+silinince ikisi kırmızı (2 / 66), geri alınca 68/68 yeşil (`KaranlikGecisTests|ComplexityProbeTests`).

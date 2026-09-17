@@ -121,10 +121,7 @@ public static class ComplexityProbe
             var halfFpsBppf = MotionBppf(fullBppf, motion, windowSamples, motionIndex);
 
             var (bias, source) = await MeasureWindowBiasAsync(info, speed, ct);
-            var lumas = new double?[windowSamples.Length];
-            for (var i = 0; i < windowSamples.Length; i++)
-                lumas[i] = windowSamples[i].MeanLuma ?? await LumaSampleAsync(info.FilePath, windows[i], WindowSeconds, ct);
-            var meanLuma = MeanOf(lumas);
+            var meanLuma = MeanOf(await WindowLumasAsync(info.FilePath, windows, windowSamples, ct));
 
             return new ProbeResult(
                 ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source, halfFpsBppf) with { MeanLuma = meanLuma },
@@ -138,6 +135,14 @@ public static class ComplexityProbe
         {
             return new ProbeResult(ComplexityProfile.FromSourceBitrate(info), Array.Empty<WindowQualityMeasurement>());
         }
+    }
+
+    internal static async Task<double?[]> WindowLumasAsync(string path, IReadOnlyList<double> windows, IReadOnlyList<WindowSample> samples, CancellationToken ct)
+    {
+        var lumas = new double?[samples.Count];
+        for (var i = 0; i < samples.Count; i++)
+            lumas[i] = samples[i].MeanLuma ?? await LumaSampleAsync(path, windows[i], WindowSeconds, ct);
+        return lumas;
     }
 
     internal static string[] LumaArgs(string path, double start, double length)
