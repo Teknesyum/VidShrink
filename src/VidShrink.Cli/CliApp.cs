@@ -43,7 +43,7 @@ public static class CliApp
             return ExitCodes.Usage;
         }
 
-        var request = parsed.Request!;
+        var request = parsed.Request! with { PreferredLanguage = text.Language };
         switch (request.Command)
         {
             case CliCommand.Help:
@@ -119,7 +119,7 @@ public static class CliApp
 
         var options = request.ToPlanOptions(target);
         var result = ShrinkEngine.Decide(info, options, settled, availability);
-        var output = request.Output is { } path ? Path.GetFullPath(path) : ShrinkEngine.UniqueOutputPath(info.FilePath);
+        var output = request.Output is { } path ? Path.GetFullPath(path) : ShrinkEngine.UniqueOutputPath(info.FilePath, extension: result.Plan.Streams?.Extension ?? "mp4");
         var arguments = ShrinkEngine.DisplayedArguments(info, result.Plan, output, availability, scenes?.Map);
         return new CliDecision(info, options, result, settled, scenes, qualityTarget, output, arguments);
     }

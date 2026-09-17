@@ -129,6 +129,15 @@ internal sealed class PlaybackHistory
         return marks[0];
     }
 
+    internal double? PreviousBookmark(string media, double beforeSeconds)
+    {
+        var marks = Bookmarks(media);
+        if (marks.Count == 0) return null;
+        for (var i = marks.Count - 1; i >= 0; i--)
+            if (marks[i] < beforeSeconds - BookmarkMergeSeconds) return marks[i];
+        return marks[^1];
+    }
+
     private Entry Touch(string media)
     {
         var key = Normalize(media);

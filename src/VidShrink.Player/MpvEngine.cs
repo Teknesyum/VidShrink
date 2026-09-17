@@ -19,6 +19,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private const ulong SeekTag = 1UL << 40;
     private const string MirrorLabel = "vsmirror";
     private const string MirrorFilter = "@vsmirror:hflip";
+    private const string RotateLabel = "vsrotate";
     private static readonly TimeSpan ScreenshotTimeout = TimeSpan.FromSeconds(10);
     private const ulong EofId = 1;
     private const ulong TimeId = 2;
@@ -50,7 +51,6 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private long _restarts;
     private int _videoWidth;
     private int _videoHeight;
-    private int _rotation;
 
     private TaskCompletionSource? _open;
     private TaskCompletionSource<bool>? _shot;
@@ -350,7 +350,14 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     private static string TrackValue(long id) => id > 0 ? id.ToString(CultureInfo.InvariantCulture) : "no";
 
-    public int Rotation => int.TryParse(GetProperty("video-rotate"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var degrees) ? degrees : 0;
+    public int Rotation => Segment(GetProperty("vf") ?? "", RotateLabel) switch
+    {
+        null => 0,
+        var s when s.Contains("cclock", StringComparison.Ordinal) => 270,
+        var s when s.Contains("clock", StringComparison.Ordinal) => 90,
+        var s when s.Contains("vflip", StringComparison.Ordinal) => 180,
+        _ => 0
+    };
 
     public bool Mirrored => (GetProperty("vf") ?? "").Contains(MirrorLabel, StringComparison.Ordinal);
 
@@ -422,8 +429,13 @@ public sealed partial class MpvEngine : IPlaybackEngine
     public void SetRotation(int degrees)
     {
         var normal = ((degrees % 360) + 360) % 360;
-        TrySet("video-rotate", normal.ToString(CultureInfo.InvariantCulture));
-        Volatile.Write(ref _rotation, normal);
+        Swap(RotateLabel, normal switch
+        {
+            90 => "lavfi=[transpose=clock]",
+            180 => "lavfi=[hflip,vflip]",
+            270 => "lavfi=[transpose=cclock]",
+            _ => null
+        });
         _update.Set();
     }
 
@@ -787,10 +799,6 @@ public sealed partial class MpvEngine : IPlaybackEngine
         {
             width = _options.RenderWidth;
             height = _options.RenderHeight;
-        }
-        else if (Volatile.Read(ref _rotation) is 90 or 270)
-        {
-            (width, height) = (height, width);
         }
 
         var back = _back;

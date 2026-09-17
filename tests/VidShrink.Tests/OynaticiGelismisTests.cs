@@ -259,7 +259,7 @@ public sealed class OynaticiGelismisTests
     }
 
     [Fact]
-    public void GelismisAltMenusuSondaDurupKisayolSatiriUretmez()
+    public void GelismisAltMenusuAyarlarinIcindeDurupKisayolSatiriUretmez()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -272,7 +272,9 @@ public sealed class OynaticiGelismisTests
                 Strings.Use(dil);
                 Dispatcher.UIThread.RunJobs();
                 var ogeler = view.BuildMenu().Items.OfType<MenuItem>().ToList();
-                var son = ogeler[^1];
+                var ayarlar = ogeler.Single(item => ReferenceEquals(item.Tag, Keymap.Settings));
+                Assert.DoesNotContain(ogeler, item => (string?)item.Header == Strings.Get("player.advanced.menu"));
+                var son = ayarlar.Items.OfType<MenuItem>().Single(item => (string?)item.Header == Strings.Get("player.advanced.menu"));
                 body.AppendLine($"[{dil}] son satir: {son.Header} | alt oge {son.Items.Count}");
                 Assert.Equal(Strings.Get("player.advanced.menu"), son.Header);
                 Assert.Null(son.Tag);

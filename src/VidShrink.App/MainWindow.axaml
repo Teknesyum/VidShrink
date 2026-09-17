@@ -454,6 +454,7 @@
                             <TextBlock x:Name="TxtAdvAudioChannelsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </StackPanel>
                         </Grid>
+                        <CheckBox x:Name="ChkAdvKeepTracks" Theme="{StaticResource CheckStyle}" IsChecked="False" Content="{loc:Text main.advanced.keep-tracks.label}"/>
                       </StackPanel>
                     </StackPanel>
 

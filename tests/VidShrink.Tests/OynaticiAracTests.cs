@@ -850,8 +850,7 @@ public sealed class OynaticiAracTests
                 basliklar.Add((string)araclar.Header!);
                 body.AppendLine($"[{dil}] {araclar.Header}: {string.Join(" | ", satirlar.Select(s => s.Header))}");
                 Assert.Equal(4, satirlar.Count);
-                Assert.Equal(menu.Count - 2, menu.IndexOf(araclar));
-                Assert.Equal(menu.Count - 1, menu.FindIndex(item => (string?)item.Header == Strings.Get("player.advanced.menu")));
+                Assert.Equal(menu.Count - 1, menu.IndexOf(araclar));
                 Assert.All(satirlar, satir => Assert.NotNull(satir.Tag));
             }
 

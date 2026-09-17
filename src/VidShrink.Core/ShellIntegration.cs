@@ -30,6 +30,22 @@ public static class ShellIntegration
             ? $"{megabytes / 1024} GB"
             : $"{megabytes} MB";
 
+    /// <summary>Kurulum kökündeki başlatıcının açtığı uygulama, köke göre.</summary>
+    public const string AppExecutableRelativePath = @"app\VidShrink.App.exe";
+
+    /// <summary>
+    /// Dosya açma komutunun çalıştıracağı ikili. Başlatıcı verilirse yanındaki
+    /// <c>app\VidShrink.App.exe</c> döner: çift tık başlatıcının doğum turunu atlar, bakımı
+    /// uygulama arkada başlatıcıya yaptırır. Başka bir ikili verilirse olduğu gibi döner.
+    /// Diske bakmaz; kurucu betik, kurucu motoru ve uygulama aynı değeri yazsın diye saf.
+    /// Simge, uygulama anahtarının adı ve menüler başlatıcıda kalır.
+    /// </summary>
+    public static string OpenCommandTarget(string executable)
+    {
+        if (!string.Equals(Path.GetFileName(executable), "VidShrink.exe", StringComparison.OrdinalIgnoreCase)) return executable;
+        return Path.Combine(Path.GetDirectoryName(executable) ?? "", AppExecutableRelativePath);
+    }
+
     /// <summary>
     /// Argümanlardan var olan ilk dosya yolunu döndürür, bulamazsa <c>null</c>. Tırnağı
     /// kaybolmuş boşluklu yol birden çok parça olarak geldiği için her başlangıç

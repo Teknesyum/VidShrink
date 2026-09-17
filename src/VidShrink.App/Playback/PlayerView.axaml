@@ -170,9 +170,13 @@
                           VerticalAlignment="Center">
                 <Button x:Name="BtnSeritBack" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}">
-                  <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
-                        Data="{StaticResource IconRewind}" Stroke="{Binding $parent[Button].Foreground}"
-                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                  <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
+                    <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
+                          Data="{StaticResource IconRewind}" Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                    <TextBlock x:Name="TxtSeritBack" Theme="{StaticResource PlaybackValueText}"
+                               Foreground="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                  </StackPanel>
                 </Button>
                 <Button x:Name="BtnSeritPlay" Theme="{StaticResource PlaybackPlayButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.playpause}">
@@ -183,9 +187,13 @@
                 </Button>
                 <Button x:Name="BtnSeritForward" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}">
-                  <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
-                        Data="{StaticResource IconFastForward}" Stroke="{Binding $parent[Button].Foreground}"
-                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                  <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
+                    <TextBlock x:Name="TxtSeritForward" Theme="{StaticResource PlaybackValueText}"
+                               Foreground="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                    <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
+                          Data="{StaticResource IconFastForward}" Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                  </StackPanel>
                 </Button>
               </StackPanel>
 

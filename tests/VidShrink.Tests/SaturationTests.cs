@@ -64,6 +64,38 @@ public sealed class SaturationTests
     }
 
     [Fact]
+    public void AudioStepReachesThePlannedStreamsThatFfmpegReads()
+    {
+        var plan = Plan(minHeight: null, audioK: 128);
+        var encoded = new AudioTrack("0:1", TrackAction.Encode, "aac", 128, 2, "eng");
+        var copied = new AudioTrack("0:2", TrackAction.Copy, "ac3", 192, null, "tur");
+        plan.Streams = new StreamPlan(OutputContainer.Mkv, "0:0", new[] { encoded, copied }, Array.Empty<SubtitleTrack>(), Array.Empty<string>(), Array.Empty<StreamNote>(), 320, new StreamRequest(KeepAllTracks: true));
+
+        var stepped = Saturation.StepLayoutDown(plan, new SizeSample(98, 1.0, true), new SizeSample(29, 1.0, true), 0.1);
+
+        Assert.Equal(64, stepped!.Streams!.Audio[0].BitrateK);
+        Assert.Same(copied, stepped.Streams.Audio[1]);
+        Assert.Equal(256, stepped.NonVideoK);
+        Assert.Contains("64k", stepped.Streams.OutputArguments());
+        Assert.DoesNotContain("128k", stepped.Streams.OutputArguments());
+        Assert.Equal(128, plan.Streams.Audio[0].BitrateK);
+        Assert.Contains("128k", plan.Streams.OutputArguments());
+    }
+
+    [Fact]
+    public void DeadYieldBudgetLeavesRoomForEveryPlannedSideStream()
+    {
+        var plan = Plan(videoK: 116, audioK: 0);
+        plan.AudioCodec = null;
+        plan.Streams = new StreamPlan(OutputContainer.Mkv, "0:0", Array.Empty<AudioTrack>(), Array.Empty<SubtitleTrack>(), Array.Empty<string>(), Array.Empty<StreamNote>(), 200, StreamRequest.Default);
+        plan.VideoBitrateK = PlanCalculator.VideoBudgetK(0.5, 200, 10);
+        Assert.Null(Saturation.StepDeadYield(plan, 0.012, 0.5, 10, new[] { new SizeSample(plan.VideoBitrateK, 0.012, false) }));
+
+        plan.Streams = null;
+        Assert.NotNull(Saturation.StepDeadYield(plan, 0.012, 0.5, 10, new[] { new SizeSample(plan.VideoBitrateK, 0.012, false) }));
+    }
+
+    [Fact]
     public void FloorStepWithNothingLeftToDropReturnsNull()
     {
         var plan = Plan(minHeight: null, audioK: 24);

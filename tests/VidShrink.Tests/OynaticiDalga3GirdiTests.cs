@@ -142,8 +142,22 @@ public sealed class OynaticiDalga3GirdiTests
             Fareyle(window, RawPointerEventType.Move, yuzey, RawInputModifiers.None);
             Fareyle(window, RawPointerEventType.RightButtonDown, yuzey, RawInputModifiers.RightMouseButton);
             Fareyle(window, RawPointerEventType.RightButtonUp, yuzey, RawInputModifiers.None);
+            var ayarBaslik = Strings.Get("main.player.menu.settings");
+            PopupRoot? kok = null;
+            DenetimSurucu.Pump(view, () => (kok = AcikMenu(onceki, ayarBaslik)) is not null, 5);
+            body.AppendLine($"kok menu acildi: {kok is not null}");
+            Assert.NotNull(kok);
+            DenetimSurucu.Wait(view, 0.3);
+            var ayarSatiri = kok!.GetVisualDescendants().OfType<MenuItem>().First(m => Equals(m.Header, ayarBaslik));
+            var kokAcik = Acilirlar();
+            var ayarNoktasi = Merkez(kok, ayarSatiri);
+            Fareyle(kok, RawPointerEventType.Move, ayarNoktasi, RawInputModifiers.None);
+            DenetimSurucu.Wait(view, 0.05);
+            Fareyle(kok, RawPointerEventType.LeftButtonDown, ayarNoktasi, RawInputModifiers.LeftMouseButton);
+            DenetimSurucu.Wait(view, 0.05);
+            Fareyle(kok, RawPointerEventType.LeftButtonUp, ayarNoktasi, RawInputModifiers.None);
             PopupRoot? menu = null;
-            DenetimSurucu.Pump(view, () => (menu = AcikMenu(onceki, baslik)) is not null, 5);
+            DenetimSurucu.Pump(view, () => (menu = AcikMenu(kokAcik, baslik)) is not null, 5);
             body.AppendLine($"menu acildi: {menu is not null}, capa {view.MenuAnchor}");
             Assert.NotNull(menu);
             DenetimSurucu.Wait(view, 0.3);
@@ -152,7 +166,7 @@ public sealed class OynaticiDalga3GirdiTests
             bool Gorunur() => menu.InputHitTest(Merkez(menu, satir)) is Visual v && (ReferenceEquals(v, satir) || v.GetVisualAncestors().Contains(satir));
             body.AppendLine($"kaydirma oncesi satir {Merkez(menu, satir)}, menu {menu.Bounds.Size}, gorunur {Gorunur()}");
             var tur = 0;
-            for (; tur < 40 && !satir.IsSelected; tur++)
+            for (; tur < 40 && !satir.IsSelected && !Gorunur(); tur++)
             {
                 Tus(menu, Key.Up);
                 DenetimSurucu.Wait(view, 0.03);

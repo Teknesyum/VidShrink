@@ -163,8 +163,42 @@ internal static class Program
         }
 
         instance.StartListening(files.Receive);
+        StartLauncherMaintenance();
         return Build(path, files).StartWithClassicDesktopLifetime(args);
     }
+
+    /// <summary>
+    /// Çift tık uygulamayı doğrudan açtığında başlatıcının bakımını arkada başlatır. Karar
+    /// <see cref="LauncherUpdate.MaintenanceLauncher"/>'da; başlatıcının doğurduğu uygulamada,
+    /// kurulu düzen dışında ve eski başlatıcıda hiçbir şey açılmaz. Açılışı beklemez.
+    /// </summary>
+    internal static Task StartLauncherMaintenance()
+        => Task.Run(() =>
+        {
+            try
+            {
+                var launcher = LauncherUpdate.MaintenanceLauncher(
+                    AppContext.BaseDirectory,
+                    Environment.GetEnvironmentVariable(LauncherUpdate.LaunchedVariable),
+                    UpdateCheck.CurrentVersion(),
+                    FileVersionOf);
+                if (launcher is null) return;
+
+                var start = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = launcher,
+                    WorkingDirectory = Path.GetDirectoryName(launcher) ?? "",
+                    UseShellExecute = false
+                };
+                start.ArgumentList.Add(LauncherUpdate.MaintenanceArgument);
+                System.Diagnostics.Process.Start(start)?.Dispose();
+                AcilisIzi.Yaz("bakim-basladi");
+            }
+            catch (Exception) { }
+        });
+
+    private static string? FileVersionOf(string path)
+        => System.Diagnostics.FileVersionInfo.GetVersionInfo(path).ProductVersion;
 
     /// <summary>
     /// Oynaticinin yerel kitapligini arka planda yuklemeye baslar. Kitaplik 115 MB ve
@@ -241,12 +275,19 @@ internal static class Program
     public static AppBuilder BuildAvaloniaApp() => Build(null, null);
 
     private static AppBuilder Build(string? startupFile, Integration.ForwardedFiles? files)
-        => AppBuilder.Configure(() => new App(startupFile, files))
+        => Cizim(AppBuilder.Configure(() => new App(startupFile, files))
             .UsePlatformDetect()
-            .LogToTrace();
+            .LogToTrace());
 
     private static AppBuilder BuildShrink(ShellShrinkStartup startup, ShrinkRequestQueue? queue)
-        => AppBuilder.Configure(() => new App(startup, queue))
+        => Cizim(AppBuilder.Configure(() => new App(startup, queue))
             .UsePlatformDetect()
-            .LogToTrace();
+            .LogToTrace());
+
+    internal const string CizimDegiskeni = "VIDSHRINK_CIZIM";
+
+    internal static AppBuilder Cizim(AppBuilder builder)
+        => string.Equals(Environment.GetEnvironmentVariable(CizimDegiskeni), "yazilim", StringComparison.Ordinal)
+            ? builder.With(new Win32PlatformOptions { RenderingMode = new[] { Win32RenderingMode.Software } })
+            : builder;
 }

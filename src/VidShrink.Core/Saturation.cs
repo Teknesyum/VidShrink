@@ -48,6 +48,7 @@ public static class Saturation
             var audioK = Math.Max(FloorAudioK, plan.AudioBitrateK / 2);
             var stepped = plan.Clone();
             stepped.AudioBitrateK = audioK;
+            stepped.Streams = HalveEncodedAudio(plan.Streams);
             stepped.Reason = why + $"; the frame cannot step further down, so the audio budget halves from {plan.AudioBitrateK}k to {audioK}k";
             stepped.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: later.ActualMb, TargetMb: targetMb, Factor: (double)audioK / plan.AudioBitrateK) };
             return stepped;
@@ -66,7 +67,7 @@ public static class Saturation
     public static EncodePlan? StepDeadYield(EncodePlan plan, double actualMb, double targetMb, double durationSeconds, IEnumerable<SizeSample> samples)
     {
         var overK = samples.Where(s => s.OverCeiling && s.VideoBitrateK > plan.VideoBitrateK).Select(s => (int?)s.VideoBitrateK).Min();
-        var budgetK = PlanCalculator.VideoBudgetK(targetMb, plan.AudioBitrateK, durationSeconds);
+        var budgetK = PlanCalculator.VideoBudgetK(targetMb, (int)Math.Ceiling(plan.NonVideoK), durationSeconds);
         var nextK = UnderBandBitrateK(plan.VideoBitrateK, overK, budgetK);
         if (nextK <= plan.VideoBitrateK) return null;
         var yieldText = PlanCalculator.RawEncoderYield(plan, actualMb, durationSeconds) is double y ? y.ToString("0.###", CultureInfo.InvariantCulture) : "unknown";
@@ -82,6 +83,14 @@ public static class Saturation
     }
 
     public static bool FillIsSaturated(double deliveredMb, double targetMb) => targetMb > 0 && deliveredMb < targetMb * DeadYield;
+
+    private static StreamPlan? HalveEncodedAudio(StreamPlan? streams)
+    {
+        if (streams is null) return null;
+        var audio = streams.Audio.Select(track => track.Copies || track.BitrateK <= FloorAudioK ? track : track with { BitrateK = Math.Max(FloorAudioK, track.BitrateK / 2) }).ToList();
+        var freedK = streams.Audio.Sum(track => track.BitrateK) - audio.Sum(track => track.BitrateK);
+        return streams with { Audio = audio, SideK = Math.Max(0, streams.SideK - freedK) };
+    }
 
     private static int Even(double value) => Math.Max(2, (int)Math.Round(value / 2.0) * 2);
 }

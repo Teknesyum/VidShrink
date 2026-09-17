@@ -283,7 +283,7 @@ public sealed class OynaticiGirdiTests
                 body.AppendLine($"{dil}: {string.Join(" | ", basliklar)} || {string.Join(" | ", ekler)}");
                 Assert.Equal(Keymap.MenuActions.Count, basliklar.Count);
                 Assert.All(basliklar, baslik => Assert.False(string.IsNullOrWhiteSpace(baslik)));
-                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder"), Strings.Get("player.tools.menu"), Strings.Get("player.advanced.menu") }, ekler);
+                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.tools.menu") }, ekler);
             }
 
             Strings.Use("en");
@@ -465,8 +465,8 @@ public sealed class FfmpegAvailableFactAttribute : FactAttribute
 
 public sealed class OynaticiGirdiTestsMenuSatirlari
 {
-    private static MenuItem Satir(PlayerView view, int sira)
-        => view.BuildMenu().Items.OfType<MenuItem>().ElementAt(sira);
+    private static MenuItem Satir(PlayerView view, PlayerAction eylem)
+        => view.BuildMenu().Items.OfType<MenuItem>().First(item => ReferenceEquals(item.Tag, eylem));
 
     private static void Tikla(MenuItem item)
         => item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent) { Source = item });
@@ -480,10 +480,10 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var window = new Window { Width = 640, Height = 480, Content = view };
 
             var once = view.IsPlaying;
-            var item = Satir(view, 1);
+            var item = Satir(view, Keymap.PlayPause);
             Tikla(item);
             var sonra = view.IsPlaying;
-            Tikla(Satir(view, 1));
+            Tikla(Satir(view, Keymap.PlayPause));
             var geri = view.IsPlaying;
 
             var body = $"satir 1 basligi: {item.Header}{Environment.NewLine}"
@@ -515,10 +515,10 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var window = new Window { Width = 640, Height = 480, Content = view };
 
             var once = view.Fullscreen.IsFullscreen;
-            var item = Satir(view, 2);
+            var item = Satir(view, Keymap.Fullscreen);
             Tikla(item);
             var acik = view.Fullscreen.IsFullscreen;
-            Tikla(Satir(view, 2));
+            Tikla(Satir(view, Keymap.Fullscreen));
             var kapali = view.Fullscreen.IsFullscreen;
 
             var body = $"satir 2 basligi: {item.Header}{Environment.NewLine}"
@@ -548,7 +548,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
 
             GirdiSurucu.Wheel(view, 3, KeyModifiers.Alt);
             var buyutulmus = view.ZoomScale;
-            var item = Satir(view, 3);
+            var item = Satir(view, Keymap.ResetZoom);
             Tikla(item);
             var sifirlanmis = view.ZoomScale;
 
@@ -577,7 +577,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var ogeler = menu.Items.OfType<MenuItem>().ToList();
             var satirlar = ogeler.Where(item => item.Tag is PlayerAction).ToList();
             var ekler = ogeler.Where(item => item.Tag is not PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
-            Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder"), Strings.Get("player.tools.menu"), Strings.Get("player.advanced.menu") }, ekler);
+            Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.tools.menu") }, ekler);
             var parcaSatirlari = ogeler.Where(item => item.Tag is null)
                 .SelectMany(altMenu => altMenu.Items.OfType<MenuItem>())
                 .Where(item => item.Tag is PlayerAction)
@@ -594,7 +594,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             foreach (var (item, sira) in satirlar.Concat(parcaSatirlari).Select((item, sira) => (item, sira)))
             {
                 var oncekiIz = view.Trace.Count;
-                Tikla(item);
+                Tikla(item.Items.OfType<MenuItem>().FirstOrDefault(child => ReferenceEquals(child.Tag, item.Tag)) ?? item);
                 var uretilen = view.Trace.Skip(oncekiIz).ToList();
                 body.AppendLine($"satir {sira} '{item.Header}' -> {(uretilen.Count == 0 ? "ETKI YOK" : string.Join(" | ", uretilen))}");
                 Assert.NotEmpty(uretilen);
@@ -994,10 +994,11 @@ public sealed class OynaticiFareTests
             var acilan = 0;
             view.OpenSettings = () => acilan++;
 
-            var item = view.BuildMenu().Items.OfType<MenuItem>().First();
+            var ayarlar = view.BuildMenu().Items.OfType<MenuItem>().First();
+            var item = ayarlar.Items.OfType<MenuItem>().Single(child => ReferenceEquals(child.Tag, Keymap.Settings));
             item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent) { Source = item });
 
-            var body = $"satir 0 basligi: {item.Header}{Environment.NewLine}"
+            var body = $"satir 0 basligi: {ayarlar.Header} > {item.Header}{Environment.NewLine}"
                      + $"ayarlar cagrisi: {acilan}{Environment.NewLine}"
                      + $"iz: {view.Trace[^1]}{Environment.NewLine}";
 

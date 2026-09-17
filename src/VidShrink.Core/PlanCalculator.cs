@@ -84,6 +84,12 @@ public sealed class PlanOptions
     /// diyor — <see cref="LockedCodec"/> doluyken bu alan etkisizdir, cunku ad zaten yolu belirler.
     /// </summary>
     public EncoderPathOverride EncoderPath { get; set; } = EncoderPathOverride.Auto;
+
+    public bool KeepAllTracks { get; set; }
+
+    public bool PlatformDelivery { get; set; }
+
+    public string? PreferredLanguage { get; set; }
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -423,7 +429,21 @@ public static class PlanCalculator
             }
         }
 
-        var videoK = Math.Max(0.0, totalK * ContainerOverhead - audioK - DeliveryReserveK(codec));
+        if (options.KeepAllTracks && !options.PlatformDelivery && audioK > 0)
+        {
+            var audioTracks = info.Streams.Count(stream => stream.Kind == StreamKind.Audio);
+            if (audioTracks > 1)
+                audioK = Math.Max(StreamMapping.MinimumTrackK, Math.Min(audioK, (int)Math.Round(totalK * CompressionStrategy.AudioBudgetShare(regime) / audioTracks)));
+        }
+
+        var streamRequest = new StreamRequest(options.KeepAllTracks, options.PlatformDelivery, options.PreferredLanguage);
+        var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
+        var streams = StreamMapping.Decide(info, streamRequest, StreamMapping.ContainerFor(streamRequest), audioK, audioChannels,
+            info.HasAudio && audioK > 0 ? PickAudioCodec() : null, audioPassthrough, effectiveTargetMb);
+        var sideK = streams.SideK;
+        AddStreamNotes(streams, reason);
+
+        var videoK = Math.Max(0.0, totalK * ContainerOverhead - sideK - DeliveryReserveK(codec));
 
         var effective = new PlanOptions
         {
@@ -510,11 +530,11 @@ public static class PlanCalculator
         EncodePlan plan;
         var ceilingBppf = complexity.BppfAtCrf(codec, ceilingCrf, best.Scale, best.Fps, info.Fps);
         var ceilingVideoK = VideoBitrateK(ceilingBppf, best.Width, best.Height, best.Fps);
-        var ceilingSizeMb = SizeMb(ceilingVideoK, audioK, info.DurationSeconds);
+        var ceilingSizeMb = SizeMb(ceilingVideoK, sideK, info.DurationSeconds);
 
         if (budgetCrf <= ceilingCrf && ceilingSizeMb < band.LowerMb)
         {
-            var recovered = RecoverLayoutAtCeiling(info, effective, complexity, codec, best, ceilingCrf, audioK, band.LowerMb, videoK, regime);
+            var recovered = RecoverLayoutAtCeiling(info, effective, complexity, codec, best, ceilingCrf, sideK, band.LowerMb, videoK, regime);
             if (recovered.Scale > best.Scale + 1e-6 || recovered.Fps > best.Fps + 0.01)
             {
                 reason.Add($"the ceiling left budget unused, so resolution was restored to {recovered.Width}x{recovered.Height}@{recovered.Fps:0.##} — the largest layout that still fits the target at CRF {ceilingCrf:0}");
@@ -528,14 +548,14 @@ public static class PlanCalculator
                 if (best.Fps < info.Fps - 0.01) notes.Add(AdviceCode.FrameRateReduced);
                 ceilingBppf = complexity.BppfAtCrf(codec, ceilingCrf, best.Scale, best.Fps, info.Fps);
                 ceilingVideoK = VideoBitrateK(ceilingBppf, best.Width, best.Height, best.Fps);
-                ceilingSizeMb = SizeMb(ceilingVideoK, audioK, info.DurationSeconds);
+                ceilingSizeMb = SizeMb(ceilingVideoK, sideK, info.DurationSeconds);
             }
 
             notes.Add(AdviceCode.BudgetIsGenerous);
             notes.Add(AdviceCode.QualityCeilingReached);
             reason.Add($"the budget affords CRF {budgetCrf:0.#}, better than the CRF {ceilingCrf:0} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {ceilingSizeMb:0.0} MB instead of padding the file to {effectiveTargetMb:0.##} MB");
             reasonCodes.Add(new ReasonNote(ReasonCode.BudgetExceedsCeiling, BudgetCrf: budgetCrf, Crf: ceilingCrf, Mb: ceilingSizeMb, TargetMb: effectiveTargetMb));
-            plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
+            plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr, streams);
             plan.Mode = "crf";
             plan.Crf = (int)Math.Round(ceilingCrf);
             plan.VideoBitrateK = (int)Math.Round(Math.Max(ceilingVideoK, 0.0));
@@ -544,7 +564,7 @@ public static class PlanCalculator
             {
                 var (minCrf, _) = CodecModel.CrfRange(codec);
                 var totalBudgetK = aimMb * KbitPerMib * ContainerOverhead / Math.Max(info.DurationSeconds, 0.1);
-                var desiredVideoK = Math.Max(0.0, totalBudgetK - audioK - DeliveryReserveK(codec));
+                var desiredVideoK = Math.Max(0.0, totalBudgetK - sideK - DeliveryReserveK(codec));
                 var desiredBppf = BitsPerPixel(desiredVideoK, best.Width, best.Height, best.Fps);
                 var fillCrf = complexity.CrfForBppf(codec, desiredBppf, best.Scale, best.Fps, info.Fps);
                 var crfStep = complexity.CrfStepSizeEffect(codec, best.Scale, best.Fps);
@@ -576,7 +596,7 @@ public static class PlanCalculator
             notes.Add(AdviceCode.TargetEnforcedTwoPass);
             reason.Add($"the budget lands near CRF {budgetCrf:0.#}, short of the CRF {ceilingCrf:0} ceiling, so two-pass VBR spends {aimMb:0.##} MB, the band center of the {effectiveTargetMb:0.##} MB target");
             reasonCodes.Add(new ReasonNote(ReasonCode.BudgetBelowCeilingTwoPass, BudgetCrf: budgetCrf, Crf: ceilingCrf, TargetMb: effectiveTargetMb));
-            plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
+            plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr, streams);
             plan.Mode = "2pass";
             plan.VideoBitrateK = (int)Math.Round(Math.Max(videoK, 0.0));
             AddHardwareYieldNote(codec, complexity, best, reason, reasonCodes);
@@ -589,7 +609,7 @@ public static class PlanCalculator
             var deliverK = Math.Max(floorK, CodecModel.UsableBitrateK(codec, best.Width, best.Height, best.Fps));
             if (plan.VideoBitrateK < deliverK)
             {
-                var liftedMb = SizeMb(deliverK, audioK, info.DurationSeconds);
+                var liftedMb = SizeMb(deliverK, sideK, info.DurationSeconds);
                 if (liftedMb <= effectiveTargetMb)
                 {
                     reason.Add($"the search cleared {best.Width}x{best.Height}@{best.Fps:0.##} against the {floorBppf:0.0000} bits per pixel per frame floor, but the whole-kbit bitrate rounded to {plan.VideoBitrateK}k and landed under it, so it was raised to {deliverK}k, still inside the {effectiveTargetMb:0.##} MB target");
@@ -669,7 +689,7 @@ public static class PlanCalculator
             }
 
             reason.Add($"{(crfClamped ? $"plan kirpilmis CRF {plan.Crf} ile cikiyor" : $"kullanici CRF'i {plan.Crf} olarak sabitledi")}; hedef boyut artik zorlanmiyor, {plan.VideoBitrateK}k yalniz bir tahmin — motor {engineMode} kipinde {engineCrf} secmisti");
-            reasonCodes.Add(new ReasonNote(ReasonCode.ManualCrfOverride, Crf: clampedCrf, Mb: SizeMb(plan.VideoBitrateK, audioK, info.DurationSeconds), ManualOverrideValue: plan.Crf.ToString(), EngineWouldHaveChosen: engineCrf));
+            reasonCodes.Add(new ReasonNote(ReasonCode.ManualCrfOverride, Crf: clampedCrf, Mb: SizeMb(plan.VideoBitrateK, sideK, info.DurationSeconds), ManualOverrideValue: plan.Crf.ToString(), EngineWouldHaveChosen: engineCrf));
 
             if (options.LockedMode is EncodeMode supersededMode && supersededMode != EncodeMode.Crf)
             {
@@ -724,7 +744,7 @@ public static class PlanCalculator
             var runnableK = RunnableVideoBitrateK(plan.Width, plan.Height, plan.Fps);
             if (plan.VideoBitrateK < runnableK)
             {
-                var floorMb = SizeMb(runnableK, plan.AudioBitrateK, info.DurationSeconds);
+                var floorMb = SizeMb(runnableK, plan.NonVideoK, info.DurationSeconds);
                 if (!notes.Contains(AdviceCode.TargetBelowCodecFloor)) notes.Add(AdviceCode.TargetBelowCodecFloor);
                 reason.Add($"the budget left {plan.VideoBitrateK}k for video, under the {runnableK}k the encoder still opens a two-pass run at {plan.Width}x{plan.Height}@{plan.Fps:0.##}; the bitrate was raised to {runnableK}k, so the smallest file this source can deliver with its {plan.AudioBitrateK}k audio is about {floorMb:0.##} MB against the {effectiveTargetMb:0.##} MB target");
                 plan.VideoBitrateK = runnableK;
@@ -743,10 +763,11 @@ public static class PlanCalculator
         return new PlanResult(plan, estimate, best.Score, complexity, advice);
     }
 
-    private static EncodePlan NewPlan(string codec, PlanOptions options, MediaInfo info, Layout best, int audioK, int? audioChannels, HdrResolution hdr) => new()
+    private static EncodePlan NewPlan(string codec, PlanOptions options, MediaInfo info, Layout best, int audioK, int? audioChannels, HdrResolution hdr, StreamPlan streams) => new()
     {
         Codec = codec,
-        AudioCodec = info.HasAudio && audioK > 0 ? PickAudioCodec() : null,
+        Streams = streams,
+        AudioCodec = !info.HasAudio || audioK <= 0 ? null : streams.Audio.Count > 0 ? (streams.Audio[0].Copies ? "copy" : streams.Audio[0].Codec) : PickAudioCodec(),
         AudioBitrateK = audioK,
         AudioChannels = audioChannels,
         Width = best.Width,
@@ -866,7 +887,7 @@ public static class PlanCalculator
 
         if (plan.ModeEnum == EncodeMode.TwoPass)
         {
-            var expected = SizeMb(plan.VideoBitrateK, plan.AudioBitrateK, info.DurationSeconds);
+            var expected = SizeMb(plan.VideoBitrateK, plan.NonVideoK, info.DurationSeconds);
             var yield = HardwareBitrateYield(plan.Codec, complexity, scale, plan.Fps);
             var low = Math.Min(expected * (1 - TwoPassUncertainty), expected * yield);
             return new SizeEstimate(expected, low, expected * (1 + TwoPassUncertainty), complexity.Measured, true);
@@ -874,7 +895,7 @@ public static class PlanCalculator
 
         var bppf = complexity.BppfAtCrf(plan.Codec, plan.Crf ?? CodecModel.ReferenceCrf(plan.Codec), scale, plan.Fps, info.Fps);
         var videoK = VideoBitrateK(bppf, plan.Width, plan.Height, plan.Fps);
-        var expectedMb = SizeMb(videoK, plan.AudioBitrateK, info.DurationSeconds);
+        var expectedMb = SizeMb(videoK, plan.NonVideoK, info.DurationSeconds);
         var band = complexity.EstimateBandFor(plan.Codec, scale, plan.Fps);
         return new SizeEstimate(expectedMb, expectedMb * (1 - band), expectedMb * (1 + band), complexity.Measured, false);
     }
@@ -889,7 +910,7 @@ public static class PlanCalculator
     {
         if (plan.ModeEnum != EncodeMode.TwoPass || plan.VideoBitrateK <= 0) return null;
         var requestedVideoMb = SizeMb(plan.VideoBitrateK, 0, durationSeconds);
-        var deliveredVideoMb = Math.Max(actualMb - SizeMb(0, plan.AudioBitrateK, durationSeconds), 0.0);
+        var deliveredVideoMb = Math.Max(actualMb - SizeMb(0, plan.NonVideoK, durationSeconds), 0.0);
         if (requestedVideoMb <= 0.01) return null;
         return deliveredVideoMb / requestedVideoMb;
     }
@@ -1029,7 +1050,7 @@ public static class PlanCalculator
     {
         var corrected = plan.Clone();
         var band = FillBand.For(targetMb);
-        var audioMb = SizeMb(0, plan.AudioBitrateK, durationSeconds);
+        var audioMb = SizeMb(0, plan.NonVideoK, durationSeconds);
         var previousVideoK = plan.VideoBitrateK;
         var efficiency = MeasuredEncoderEfficiency(plan, actualMb, durationSeconds);
         var aimMb = RetryAimMb(targetMb, efficiency);
@@ -1055,7 +1076,7 @@ public static class PlanCalculator
     }
 
     public static double? EstimatedMb(EncodePlan plan, double durationSeconds)
-        => plan.ModeEnum == EncodeMode.Crf ? null : SizeMb(plan.VideoBitrateK, plan.AudioBitrateK, durationSeconds);
+        => plan.ModeEnum == EncodeMode.Crf ? null : SizeMb(plan.VideoBitrateK, plan.NonVideoK, durationSeconds);
 
     public static double BitsPerPixel(double videoK, int width, int height, double fps)
         => videoK * 1000.0 / Math.Max(1.0, (double)width * height * fps);
@@ -1100,7 +1121,7 @@ public static class PlanCalculator
         return floors with { MinHeight = minHeight, MinFps = minFps };
     }
 
-    private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, int audioK, double capMb, double budgetVideoK, CompressionRegime regime)
+    private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, double audioK, double capMb, double budgetVideoK, CompressionRegime regime)
     {
         Layout? best = null;
         var floors = EffectiveFloors(options, regime);
@@ -1558,6 +1579,22 @@ public static class PlanCalculator
     }
 
     private static string PickAudioCodec() => "aac";
+
+    private static void AddStreamNotes(StreamPlan streams, List<string> reason)
+    {
+        foreach (var note in streams.Notes)
+            reason.Add(note switch
+            {
+                StreamNote.AudioPassthrough => "the audio track is copied as it is: the container carries its codec, it is no larger than a re-encode and stays within 15% of the target",
+                StreamNote.AudioDownmixedToStereo => "a surround audio track is mixed down to stereo while it is re-encoded",
+                StreamNote.ExtraAudioDropped => "only one audio track is kept; turn on keep tracks to carry all of them in MKV",
+                StreamNote.TextSubtitleConverted => "text subtitles are carried as timed text; styling is lost",
+                StreamNote.ImageSubtitleDropped => "image subtitles (PGS/VobSub) cannot be carried in MP4 and are dropped; turn on keep tracks to carry them in MKV",
+                StreamNote.SubtitleDroppedForPlatform => "a platform target always delivers MP4 without subtitles",
+                StreamNote.KeepAllTracksOverriddenByPlatform => "keep tracks was ignored: a platform target always delivers MP4 with one audio track",
+                _ => "a lossless TrueHD/DTS track is never copied; it is re-encoded"
+            });
+    }
 
     /// <summary>
     /// SVT-AV1 Sosyal Medya niyetinde kalite kipinde <c>4</c> kosar, digerlerinde <c>6</c>. Olcum koşum

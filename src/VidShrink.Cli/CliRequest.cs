@@ -29,6 +29,7 @@ public sealed record CliRequest
     public bool SkipMeasurement { get; init; }
     public bool MeasureVmaf { get; init; }
     public bool Fast { get; init; }
+    public string? PreferredLanguage { get; init; }
 
     public PlanOptions ToPlanOptions(double targetMb)
     {
@@ -46,7 +47,8 @@ public sealed record CliRequest
             AllowFpsDrop = true,
             HdrPolicy = HdrPolicy.Preserve,
             FillPolicy = FillPolicy.FillTarget,
-            SpeedMode = Fast ? SpeedMode.Fast : SpeedMode.Quality
+            SpeedMode = Fast ? SpeedMode.Fast : SpeedMode.Quality,
+            PreferredLanguage = PreferredLanguage
         };
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
         return options;

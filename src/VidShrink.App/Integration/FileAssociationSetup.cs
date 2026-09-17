@@ -13,6 +13,10 @@ namespace VidShrink.App.Integration;
 /// <para>Yol değiştiğinde — taşınan kurulum, yeni sürüm başka klasöre kurulduğunda —
 /// kayıt bir kez daha yazılır; eski komut satırı artık olmayan bir dosyayı gösterdiği için
 /// bu tazeleme gereklidir.</para>
+///
+/// <para>Not düşülen yol açma komutunun hedefidir (<see cref="ShellIntegration.OpenCommandTarget"/>),
+/// başlatıcının kendisi değil. Başlatıcıyı not düşmüş eski kurulum bu yüzden bir kez yeniden
+/// yazılır ve çift tık doğrudan uygulamaya gider.</para>
 /// </summary>
 internal static class FileAssociationSetup
 {
@@ -44,13 +48,17 @@ internal static class FileAssociationSetup
     /// </summary>
     [SupportedOSPlatform("windows")]
     internal static bool Ensure(string executablePath, string? settingsPath = null)
-    {
-        if (!Needed(Recorded(settingsPath), executablePath)) return false;
+        => Ensure(executablePath, settingsPath, path => FileAssociation.Register(path));
 
-        var failed = FileAssociation.Register(executablePath);
+    internal static bool Ensure(string executablePath, string? settingsPath, Func<string, IReadOnlyList<string>> register)
+    {
+        var commandTarget = ShellIntegration.OpenCommandTarget(executablePath);
+        if (!Needed(Recorded(settingsPath), commandTarget)) return false;
+
+        var failed = register(executablePath);
         if (failed.Count > 0) return true;
 
-        Record(executablePath, settingsPath);
+        Record(commandTarget, settingsPath);
         return true;
     }
 }

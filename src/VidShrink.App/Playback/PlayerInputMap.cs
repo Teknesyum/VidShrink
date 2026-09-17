@@ -49,7 +49,9 @@ internal enum PlayerCommandKind
     ClipExport,
     GifExport,
     MiniMode,
-    OpenUrl
+    OpenUrl,
+    Stop,
+    GoToStart
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)

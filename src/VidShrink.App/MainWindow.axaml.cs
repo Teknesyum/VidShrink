@@ -95,6 +95,8 @@ public partial class MainWindow : Window
     // döngü tek turda kapanır. İki bayrak var çünkü iki yön ayrı ayrı bastırılıyor.
     private bool _targetIsDerived;
     private bool _qualityIsDerived;
+    private double _savedTargetMb = new UpdateSettings().TargetMb;
+    private double _savedQualityTarget = new UpdateSettings().QualityTarget;
     private TaskCompletionSource<OvershootChoice>? _retryDecision;
     private RetryPrompt? _activeRetryPrompt;
     private bool _hardwareProbed;
@@ -107,6 +109,7 @@ public partial class MainWindow : Window
     private const string ChromeHidden = "chrome-hidden";
 
     private bool _chromeShown = true;
+    private HoverZone? _chromeZone;
     private DropVisual _dropVisual = DropVisual.Idle;
     private DispatcherTimer? _recalculateTimer;
     private DateTime _lastEstimatePulse = DateTime.MinValue;
@@ -124,6 +127,7 @@ public partial class MainWindow : Window
     private PanelHost? _preview;
     private Intent _intent = Intent.Sharing;
     private bool _chipSizeCapped = true;
+    private bool _platformChip;
     internal static readonly string[] AdvancedPresetCandidates =
     {
         "ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow",
@@ -159,6 +163,7 @@ public partial class MainWindow : Window
         Player.CurrentTabIndex = () => Tabs.SelectedIndex;
         Player.SelectTab = index => Tabs.SelectedIndex = index;
         Player.OpenSettings = () => Tabs.SelectedIndex = SettingsTabIndex;
+        Player.AppSettingsItems = PlayerSettingsItems;
         PlayerAdvancedPanel.Player = Player;
 
         Player.HistoryPath = () => Path.Combine(
@@ -205,7 +210,7 @@ public partial class MainWindow : Window
         Watch(TxtQualityTarget, TextBox.TextProperty, OnQualityTargetTextChanged);
         foreach (var toggle in ShrinkChoiceToggles())
             Watch(toggle, ToggleButton.IsCheckedProperty, OnOptionChanged);
-        foreach (var check in new ToggleButton[] { ChkResolution, ChkFps, ChkFastGpu })
+        foreach (var check in new ToggleButton[] { ChkResolution, ChkFps, ChkFastGpu, ChkAdvKeepTracks })
             Watch(check, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(ChkFastGpu, ToggleButton.IsCheckedProperty, OnFastGpuChanged);
         foreach (var toggle in new ToggleButton[] { ChkResolution, ChkWhatsAppCompatible })
@@ -243,6 +248,7 @@ public partial class MainWindow : Window
         Watch(RbOutputFixed, ToggleButton.IsCheckedProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
         Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
@@ -271,6 +277,7 @@ public partial class MainWindow : Window
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
         if (_startupFile is not null) Tabs.SelectedIndex = PlayerTabIndex;
         Opened += OnWindowLoaded;
+        IlkBoyayiBekle();
         AcilisIzi.Yaz("yapici-bitti");
     }
 
@@ -604,8 +611,10 @@ public partial class MainWindow : Window
     /// <summary>
     /// Üst şerit yalnız <b>oynatıcı sekmesinde</b> kendiliğinden gizlenir: işaretçi
     /// pencerenin ilk <c>TitleBarHeight</c> pikseline girdiğinde belirir, şeridi terk
-    /// edince kaybolur. Şerit içeriğin üstünde bir katman olduğu için görünüp kaybolurken
-    /// hiçbir şey yer değiştirmiyor.
+    /// edince kaybolur. Kural alt şeritle aynı <see cref="HoverZone"/> ve aynı iki belirteç
+    /// (<c>PlaybackStripShowDelay</c> / <c>PlaybackStripHideDelay</c>): kaybolma gecikmeli,
+    /// duraklatılmışken şerit açık kalır. Şerit içeriğin üstünde bir katman olduğu için
+    /// görünüp kaybolurken hiçbir şey yer değiştirmiyor.
     ///
     /// <para>Diğer sekmelerde şerit sabit durur. Gizlenme oynatıcının kendi gereği —
     /// görüntünün üstünü kapatmasın diye; küçültme, dönüştürme, kaydedici ve ayarlar
@@ -614,24 +623,35 @@ public partial class MainWindow : Window
     private void TrackChrome()
     {
         AddHandler(PointerMovedEvent, OnChromePointerMoved, RoutingStrategies.Tunnel);
-        PointerExited += (_, _) => ShowChrome(!ChromeHidesItself);
+        PointerExited += (_, _) => ChromeZone.PointerGone();
         Tabs.SelectionChanged += (_, _) => ApplyChromeMode();
+        Player.PlayingChanged += (_, _) => ApplyChromeMode();
         ApplyChromeMode();
     }
 
     internal bool ChromeHidesItself => Tabs.SelectedIndex == PlayerTabIndex && Player.LoadedPath is not null;
 
-    private void ApplyChromeMode() => ShowChrome(!ChromeHidesItself);
+    internal bool ChromeShown => _chromeShown;
+
+    internal HoverZone ChromeZone
+    {
+        get
+        {
+            if (_chromeZone is not null) return _chromeZone;
+            _chromeZone = new HoverZone(0, () => ChromeDelay("PlaybackStripShowDelay"), () => ChromeDelay("PlaybackStripHideDelay"), ShowChrome);
+            _chromeZone.Reset(_chromeShown);
+            return _chromeZone;
+        }
+    }
+
+    private TimeSpan ChromeDelay(string key) => this.FindResource(key) is TimeSpan span ? span : TimeSpan.Zero;
+
+    private void ApplyChromeMode() => ChromeZone.Hold(!ChromeHidesItself || !Player.IsPlaying);
 
     private void OnChromePointerMoved(object? sender, PointerEventArgs e)
     {
-        if (!ChromeHidesItself)
-        {
-            ShowChrome(true);
-            return;
-        }
-
-        ShowChrome(e.GetPosition(this).Y <= TitleBar.Height);
+        ChromeZone.PointerWithin(e.GetPosition(this).Y <= TitleBar.Height);
+        ApplyChromeMode();
     }
 
     private void ShowChrome(bool show)
@@ -897,6 +917,35 @@ public partial class MainWindow : Window
 
     private void UseLanguage(string language) => Strings.Use(language);
 
+    internal List<Control> PlayerSettingsItems()
+    {
+        return new List<Control>
+        {
+            ChoiceMenu(Strings.Get("settings-tab.language.label"), CmbLanguage),
+            ChoiceMenu(Strings.Get("settings-tab.theme.label"), CmbTheme)
+        };
+
+        static MenuItem ChoiceMenu(string header, ComboBox box)
+        {
+            var menu = new MenuItem { Header = header };
+            var at = 0;
+            foreach (var label in box.Items)
+            {
+                var index = at++;
+                var item = new MenuItem
+                {
+                    Header = label?.ToString() ?? "",
+                    ToggleType = MenuItemToggleType.Radio,
+                    IsChecked = index == box.SelectedIndex
+                };
+                item.Click += (_, _) => box.SelectedIndex = index;
+                menu.Items.Add(item);
+            }
+
+            return menu;
+        }
+    }
+
     /// <summary>
     /// Dil değişti. Biçimlemeden gelen metni bağlar kendisi tazeliyor; burada yalnız koddan
     /// yazılan metinler yeniden kuruluyor.
@@ -1085,6 +1134,8 @@ public partial class MainWindow : Window
         {
             TxtTarget.Text = settings.TargetMb.ToString("0.##", CultureInfo.InvariantCulture);
             TxtQualityTarget.Text = settings.QualityTarget.ToString("0.##", CultureInfo.InvariantCulture);
+            _savedTargetMb = settings.TargetMb;
+            _savedQualityTarget = settings.QualityTarget;
             _intent = (Intent)Math.Clamp(settings.Intent, 0, 2);
             _chipSizeCapped = settings.ChipSizeCapped;
             SetCodecIndex(settings.Codec);
@@ -1128,8 +1179,8 @@ public partial class MainWindow : Window
         Language = Strings.Language,
         AutoUpdate = ChkAutoUpdate.IsChecked == true,
         FastGpu = ChkFastGpu.IsChecked == true,
-        TargetMb = ParseTargetMb(),
-        QualityTarget = ParseQualityTarget(),
+        TargetMb = _savedTargetMb,
+        QualityTarget = _savedQualityTarget,
         Intent = SelectedIntentIndex,
         ChipSizeCapped = _chipSizeCapped,
         Codec = CodecIndex,
@@ -1211,6 +1262,7 @@ public partial class MainWindow : Window
     internal void ConfirmResetSettingsForTest() => OnConfirmResetSettings(null, new RoutedEventArgs());
     internal void RestoreAppSettingsForTest(AppSettings settings) => RestoreAppSettings(settings);
     internal AppSettings CaptureAppSettingsForTest() => CaptureAppSettings();
+    internal List<string> ReasonLinesForTest(EncodePlan plan) => ReasonLines(plan);
 
     private SelectingItemsControl[] AdvBoxes() => new SelectingItemsControl[]
     {
@@ -1260,6 +1312,7 @@ public partial class MainWindow : Window
             AdvMinFps = boxes[5].SelectedIndex,
             AdvEncoderPath = AdvEncoderPathIndex,
             AdvCodecLock = boxes[6].SelectedIndex,
+            AdvKeepTracks = ChkAdvKeepTracks.IsChecked == true,
             OutputFolderMode = OutputFolderModeIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
@@ -1286,6 +1339,7 @@ public partial class MainWindow : Window
             var boxes = AdvBoxes();
             for (var i = 0; i < boxes.Length; i++)
                 if (indices[i] >= 0 && indices[i] < boxes[i].ItemCount) boxes[i].SelectedIndex = indices[i];
+            ChkAdvKeepTracks.IsChecked = settings.AdvKeepTracks;
 
             OutputFolderModeIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
             TxtOutputFolder.Text = settings.OutputFolder;
@@ -1619,6 +1673,7 @@ public partial class MainWindow : Window
         var plan = ChipPlans().Single(candidate => candidate.Chip == chip);
         _intent = plan.Intent;
         _chipSizeCapped = plan.SizeCapped;
+        _platformChip = plan.TargetMb is not null;
         SetCodecIndex(plan.Codec switch
         {
             CodecPreference.Compatible => 1,
@@ -1716,6 +1771,10 @@ public partial class MainWindow : Window
             3 => AudioChannelOverride.None,
             _ => AudioChannelOverride.Auto
         };
+
+        options.KeepAllTracks = ChkAdvKeepTracks.IsChecked == true;
+        options.PlatformDelivery = _platformChip;
+        options.PreferredLanguage = Strings.Language;
 
         if (AdvancedText(CmbAdvMinResolution) is { } minResText
             && int.TryParse(minResText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var minRes))
@@ -2134,7 +2193,8 @@ public partial class MainWindow : Window
     /// tutan süreç odur. Bu yüzden başlatıcı elle yükleme kipinde açılır, bu süreç kapanır,
     /// başlatıcı çıkışı bekleyip güncellemeyi uygular ve uygulamayı yeni sürümle açar.
     /// Kendiliğinden güncelleme ayarına bakılmaz ve yazılmaz; elle bir yükleme tercihi
-    /// değiştirmez.
+    /// değiştirmez. Kapanmadan önce rozete ara metin yazılmaz: pencere o karede gidiyor,
+    /// bakım 400 ms'yi aşarsa ekrana yalnız başlatıcının paneli gelir.
     ///
     /// <para>Başlatıcısı olmayan kurulumda (Linux, düz macOS kopyası) yükleyecek bir şey
     /// yok; düğme o zaman yayın sayfasını açar. Panel kabuk komutu yazmıyor.</para>
@@ -2159,8 +2219,6 @@ public partial class MainWindow : Window
             StartUpdateDownload();
             return;
         }
-
-        SetUpdateBadge(UpdateBadgeState.Installing);
 
         try
         {
@@ -2924,11 +2982,13 @@ public partial class MainWindow : Window
         PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + TabHeaderText((TabItem)Tabs.Items[Tabs.SelectedIndex]!));
         AcilisIzi.Yaz("sekme");
         IlkKareyiBekle();
+        _ = CizimiOlcAsync(false);
         try { await Player.OpenAsync(path); }
         catch (Exception ex) { ReportPlayerOpenFailure(ex); }
         AcilisIzi.Yaz("motor-acildi");
         await LoadAsync(path);
         AcilisIzi.Yaz("kucultme-yuklendi");
+        _ = CizimiOlcAsync(true);
     }
 
     internal static string TabHeaderText(TabItem tab) => tab.Header switch
@@ -3366,7 +3426,7 @@ public partial class MainWindow : Window
         RefreshDurationView();
         RefreshAdvancedHints();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments(_info, plan,
-            BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), _encoders, _sceneMap?.Map));
+            BuildUniqueOutputPath(_info.FilePath, "shrunk", plan.Streams?.Extension ?? "mp4"), _encoders, _sceneMap?.Map));
     }
 
     /// <summary>
@@ -3573,8 +3633,23 @@ public partial class MainWindow : Window
             if (text is not null) parts.Add(text);
         }
 
+        if (plan.Streams is { } streams)
+            foreach (var note in streams.Notes) parts.Add(Say(StreamNoteKey(note)));
+
         return parts;
     }
+
+    internal static string StreamNoteKey(StreamNote note) => note switch
+    {
+        StreamNote.AudioPassthrough => "main.reason.stream.audio-passthrough",
+        StreamNote.AudioDownmixedToStereo => "main.reason.stream.audio-downmixed",
+        StreamNote.ExtraAudioDropped => "main.reason.stream.extra-audio-dropped",
+        StreamNote.TextSubtitleConverted => "main.reason.stream.text-subtitle-converted",
+        StreamNote.ImageSubtitleDropped => "main.reason.stream.image-subtitle-dropped",
+        StreamNote.SubtitleDroppedForPlatform => "main.reason.stream.subtitle-dropped-platform",
+        StreamNote.KeepAllTracksOverriddenByPlatform => "main.reason.stream.keep-tracks-overridden",
+        _ => "main.reason.stream.lossless-not-passed"
+    };
 
     private List<string> StrategyLines()
     {
@@ -3646,6 +3721,7 @@ public partial class MainWindow : Window
         _syncing = true;
         TxtTarget.Text = Math.Round(SliderTarget.Value, 1).ToString("0.##", CultureInfo.InvariantCulture);
         _syncing = false;
+        if (!_targetIsDerived) _savedTargetMb = ParseTargetMb();
         RestoreSizeCap();
         if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
@@ -3659,6 +3735,7 @@ public partial class MainWindow : Window
         if (mb > SliderTarget.Maximum) SliderTarget.Maximum = Math.Ceiling(mb);
         SliderTarget.Value = mb;
         _syncing = false;
+        if (!_targetIsDerived) _savedTargetMb = mb;
         RestoreSizeCap();
         if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
@@ -3675,6 +3752,7 @@ public partial class MainWindow : Window
     private void RestoreSizeCap()
     {
         _chipSizeCapped = true;
+        _platformChip = false;
         RefreshChipDerivation();
         RefreshSectionSummaries();
     }
@@ -3685,6 +3763,7 @@ public partial class MainWindow : Window
         _qualityIsDerived = true;
         TxtQualityTarget.Text = Math.Round(SliderQualityTarget.Value).ToString("0.##", CultureInfo.InvariantCulture);
         _qualityIsDerived = false;
+        _savedQualityTarget = ParseQualityTarget();
         DeriveTargetFromQuality();
     }
 
@@ -3698,6 +3777,7 @@ public partial class MainWindow : Window
         _qualityIsDerived = true;
         SliderQualityTarget.Value = ParseQualityTarget();
         _qualityIsDerived = false;
+        _savedQualityTarget = ParseQualityTarget();
         DeriveTargetFromQuality();
     }
 
@@ -4011,7 +4091,7 @@ public partial class MainWindow : Window
     {
         if (_info is null || ActivePlan is null || _cts is not null) return;
 
-        var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4");
+        var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", ActivePlan.Streams?.Extension ?? "mp4");
         var targetMb = ParseTargetMb();
         if (DiskSpaceGuard.TryGetFreeBytes(output, out var freeBytes) && !DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb))
         {

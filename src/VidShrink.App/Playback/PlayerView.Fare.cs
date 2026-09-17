@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -20,6 +21,8 @@ internal partial class PlayerView
 
     /// <summary>Menunun sol tik ile acilan ayarlar satirinin cagirdigi yol.</summary>
     internal Action? OpenSettings { get; set; }
+
+    internal Func<List<Control>>? AppSettingsItems { get; set; }
 
     internal ClickArbiter Click => _click;
 
@@ -163,6 +166,29 @@ internal partial class PlayerView
         _click.Cancel();
         _dragMode = "";
         window.BeginMoveDrag(press);
+        SnapWindowToCenter(window);
+    }
+
+    internal static PixelPoint CenterSnap(PixelRect area, PixelSize size, PixelPoint position, int threshold)
+    {
+        var x = area.X + (area.Width - size.Width) / 2;
+        var y = area.Y + (area.Height - size.Height) / 2;
+        return new PixelPoint(
+            Math.Abs(position.X - x) <= threshold ? x : position.X,
+            Math.Abs(position.Y - y) <= threshold ? y : position.Y);
+    }
+
+    internal bool SnapWindowToCenter(Window window)
+    {
+        if (window.WindowState != WindowState.Normal || window.Screens.ScreenFromWindow(window) is not { } screen) return false;
+        var scale = screen.Scaling;
+        var size = PixelSize.FromSize(window.FrameSize ?? window.ClientSize, scale);
+        var threshold = (int)Math.Ceiling(SnapDip() * scale);
+        var target = CenterSnap(screen.WorkingArea, size, window.Position, threshold);
+        if (target == window.Position) return false;
+        window.Position = target;
+        _trace.Add(FormattableString.Invariant($"snap -> {target.X},{target.Y}"));
+        return true;
     }
 
     private void OnFarePointerReleased(object? sender, PointerReleasedEventArgs e)

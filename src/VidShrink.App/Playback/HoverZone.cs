@@ -97,7 +97,11 @@ internal sealed class HoverZone
     /// K5: azaltılmış hareket ayarını okuyan tek yer. Karşılaştırma paneli de buraya bağlı;
     /// ikinci kopya yok. Ayar oturum boyunca bir kez okunur.
     /// </summary>
-    internal static bool MotionReduced => _motionReduced ??= !AnimationsAllowed();
+    internal static bool MotionReduced
+    {
+        get => _motionReduced ??= !AnimationsAllowed();
+        set => _motionReduced = value;
+    }
 
     /// <summary>Bölgenin panel yüksekliğine oranı.</summary>
     internal double Share => _share;

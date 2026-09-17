@@ -295,9 +295,6 @@ internal partial class PlayerView
         }
 
         flyout.Items.Add(recent);
-        var folder = new MenuItem { Header = Strings.Get("player.view.screenshot-folder") };
-        folder.Click += OnPickScreenshotFolder;
-        flyout.Items.Add(folder);
     }
 
     private void OnRecentRow(object? sender, RoutedEventArgs e)

@@ -57,12 +57,21 @@ sürümden (`x.0.0`) önce koşar.
   paylaşım), yolun metin kutusundan değil alandan okunması, ana pencerenin iki kapısının sekmeyi değiştirip yükleyiciyi
   çağırması, paylaşımın `ShareFlow`/`Core/Share` üstünden gitmesi, hedef tablosunun yayın paketine girmesi ve iki yeni
   anahtarın 42 dilde bulunması. Kaynak metin okur, pencere açmaz.
-- `PencereKabuguTests.cs` — pencere kabuğunun iki kararı: üst şeridin içerikle aynı gözde durup katman olması (görünüp
-  kaybolurken içeriğin yer değiştirmemesi), belirme eşiğinin başlık çubuğunun kendi yüksekliğinden gelmesi, kenarlık
-  kuralının tek yerde durup oynatıcı sekmesini tam ekranla aynı kola koyması. Kaynak metin okur, pencere açmaz.
+- `PencereKabuguTests.cs` — pencere kabuğunun düzeni: üst şerit içerikle aynı gözde katman, başlık düğmeleri içeriğin üstünde,
+  gizleme sınıfı iki parçayı kapatıyor. Kaynak metin okur; gizlenme ve anahat davranışı `OynaticiYolHaritasiTests`'te.
+- `OynaticiKisayolTests.cs` — tarifteki her kısayol gerçek girdi olayıyla PlayerView'a verilir, etkisi motordan geri okunur;
+  döndürme karenin piksellerinden. Kanıt `.calisma/oynatici-kisayol/`.
+- `OynaticiOdakYoluTests.cs` — aynı tuşlar MainWindow'un odak yolundan: sekme değişimi, kaydırıcı/açılır kutu odakta, tam ekran.
+- `OynaticiYolHaritasiTests.cs` — yol haritası denetiminin oynatıcı maddeleri (P2 merkez mıknatısı, P3 menüde ayarlar, P12, P14 üst bar
+  gizlenmesi, P18, P19 duraklatma simgesi süresi, P20, P24 anahat pikselleri, P26 yayılma maskesi, P28 yandaki altyazı).
+  Zamanlayıcı bekleyen ölçüler `Dispatcher.UIThread.MainLoop` ile pompalar; `RunJobs` Win32 zamanlayıcısını tetiklemez.
+  Kanıt `.calisma/oynatici-yol-haritasi/`, negatif kontrol betiği aynı klasörde.
 - `KabukMenusuTests.cs` — sağ tık menüsünün iki tarafı: `ShellMenu.cs` ile `Install-VidShrink.ps1`'in anahtar adları,
   uzantı listesi ve hedef listesi birebir aynı; silme kolu Appx paketini de kaldırıyor; kutu Ayarlar sekmesinde;
   etiket arayüz dilini izliyor; sekiz yeni anahtar 42 dilde. Kayıt defterine yazmaz, kaynak metin okur.
+- `BaslaticisizCiftTikTests.cs` — G2/G3: çift tık `app\VidShrink.App.exe`'yi açıyor; `--bakim` kapıları (başlatıcıdan
+  doğan uygulama, kurulu düzen dışı, eski başlatıcı), `app\` altından kökteki `tools\ffmpeg`, "Yükle"den sonra rozetin
+  ara metin yazmaması. Açma komutunun değeri `KabukEntegrasyonTests`, betik/motor eşitliği `KurucuExeTests`'te.
 - `KabukMenusuKayitTests.cs` — aynı menünün davranışı, yalnız `ShellMenu.TestRoot` altında: kutunun komutu başlatıcıyı
   (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
@@ -75,6 +84,10 @@ sürümden (`x.0.0`) önce koşar.
   sıfırlanma, açıldıktan sonra baştan başlama; biçimlemede sekmenin gizli başladığının ve kapatma düğmesinin pimi.
 - `GoruntuCekTests.cs` — kanıt karesi üretir: `.calisma/kesit-ef/` altına güncelleme panelini ve 26 simgelik
   sayfayı PNG olarak yazar. Ölçmez, sınamaz; tarz kararlarının resmi buradan çıkar.
+- `StreamMappingTests.cs` — dalga 1c, akış eşleme: ffmpeg'in ürettiği 3 sn'lik mkv (2 ses, srt, elle yazılmış PGS, 2 bölüm,
+  başlık/tarih) ve dönüş işaretli mp4. Varsayılan MP4 tek ses + mov_text, İzleri koru MKV tüm izler, platform tek iz;
+  çıktılar ffprobe'la okunur. Negatif kontroller: eşlemesiz ffmpeg başka dili seçer ve tarihi düşürür, yan izleri
+  saymayan bütçe hedefi aşar. Her `StreamNote` ayrı bir `main.reason.stream.*` anahtarına düşer, anahtar 42 dilde çevrilidir ve pencerenin gerekçe satırında görünür. Kanıt `.calisma/hb-1c-test/`.
 - `KurucuExeTests.cs` — `VidShrink-Setup.exe` motoru (`Core/Setup`): betikle aynı kayıt ağacını yazıp siler (test anahtarında), kilitli klasör denemeleri, sahte yayınla çevrimdışı kurulum ve kaldırma, sağlama tutmazsa eski kuruluma dokunulmaması, yarım kurulumda geri koyma, sabitlerin betikle aynılığı. Gerçek kayıt köküne test konağı yazamaz. Çıktı `.calisma/test-ciktilari/kurucu-exe/`.
 - `TestAyarYoluTests.cs` — modül başlatıcısı `VIDSHRINK_SETTINGS_PATH`'i `.calisma/test-ciktilari/appdata/<pid>`'e alır; ana pencerede açılan dosyanın son dosyalar listesi ve kaydedici ayarı oraya yazılır, gerçek `%APPDATA%\VidShrink` dosyalarının boyut/zaman damgası değişmez (yalnız okunur). Kanıt `.calisma/ayar-yolu/`.
 - `OynaticiDalga3GirdiTests.cs` — 3. dalga platform girişinden: ham sağ tık, yeni açılan menü penceresinde ham yukarı ok (satırı kaydırıp görünür kılar) ve ham tık ile ekran görüntüsü klasörü (sahte `IStorageProvider`, iptal kolu), ham Ctrl+E o klasöre yazar; ham Space ile oynayan 1 sn'lik klipte gerçek dosya sonu `RepeatMode.All`'da sonrakini açar, `Off`'ta açmaz; ham `RawDragEvent` dosyayı açar, klasör ve silinen dosyayı açmaz. Kanıt `.calisma/girdi-dalga3/`.

@@ -13,7 +13,7 @@ Oynatıcı sekmesinin ve karşılaştırma panelinin motoru. `IPlaybackEngine` m
 - `PlaybackOptions`: `RenderWidth/Height`, `Audio=false` → `aid=no`, `Video=false` → `vid=no`, `Loop` → `loop-file=inf`.
   `TryCopyLatest(.., out frameSeconds)` karenin `time-pos` damgası. Varsayılan `hwdec=no`, `sid=no`. `loadfile` hedefi: uzak şema (http/https/rtsp/rtmp/srt/udp) olduğu gibi, yerel yol tam yola çevrilir.
 - Parçalar: `Tracks`, `aid`/`sid`, `sub-add`, gecikme, `sub-scale`/`sub-pos`; `sub-codepage` değişince dış
-  altyazılar `sub-reload` ile yeniden okunur. Görüntü: `video-rotate`, `vf @vsmirror:hflip`,
+  altyazılar `sub-reload` ile yeniden okunur. Görüntü: `vf @vsrotate:lavfi=[transpose=..]` (yazılım çiziminde `video-rotate` yok sayılıyor), `vf @vsmirror:hflip`,
   `video-aspect-override`; ekran görüntüsü `screenshot-to-file .. video`, bilgi `track-list` + `file-size`.
   Arayüze yalnız varsayılan gövdeli üyeler eklenir.
 - Gelişmiş (`MpvEngine.Advanced.cs`): renk, ton, keskinlik, kırpma, ekolayzer ve normalleştirme etiketli `vf`/`af`
