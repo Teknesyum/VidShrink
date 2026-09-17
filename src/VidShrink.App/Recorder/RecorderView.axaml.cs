@@ -140,6 +140,8 @@ internal partial class RecorderView : UserControl
         _lastRecording = result.OutputPath;
         TxtResultPath.Text = result.OutputPath;
         BtnToMp4.IsVisible = VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) == VidShrink.Core.RecorderContainer.Mkv;
+        BtnTrimIdle.IsVisible = result.Ok && !result.Partial
+                                && VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) != VidShrink.Core.RecorderContainer.Gif;
         ResetShare();
         TxtResult.Text = Say(
             "recorder.output.done",

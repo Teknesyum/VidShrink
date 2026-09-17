@@ -185,6 +185,13 @@
                   Content="{loc:Text recorder.output.to-mp4}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.to-mp4}"
                   Click="OnToMp4"/>
+          <Button x:Name="BtnTrimIdle"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsVisible="False"
+                  Content="{loc:Text recorder.output.trim-idle}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.trim-idle}"
+                  Click="OnTrimIdle"/>
           <Button x:Name="BtnRecShare"
                   Theme="{StaticResource PrimaryButton}"
                   Margin="{StaticResource WrapItemMargin}"

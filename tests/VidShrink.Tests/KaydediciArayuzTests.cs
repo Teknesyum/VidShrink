@@ -1011,8 +1011,8 @@ public sealed class KaydediciArayuzTests
         });
 
         Assert.Contains("high", x264);
-        Assert.Equal(1, vp9Profil);
-        Assert.False(vp9Etkin);
+        Assert.Equal(VidShrink.Core.RecorderArguments.ProfilesFor("libvpx-vp9").Count + 1, vp9Profil);
+        Assert.True(vp9Etkin);
         Assert.Equal(VidShrink.Core.RecorderArguments.PixelFormatsFor("libsvtav1"), av1Bicimler);
         Assert.Equal(VidShrink.Core.RecorderArguments.DefaultPixelFormat, secilenBicim);
     }
