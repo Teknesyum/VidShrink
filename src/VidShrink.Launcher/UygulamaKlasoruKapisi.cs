@@ -67,18 +67,16 @@ internal static class UygulamaKlasoruKapisi
         var kosanlar = new List<Process>();
         foreach (var surec in Process.GetProcessesByName(UygulamaSurecAdi))
         {
-            var bizim = surec.Id != Environment.ProcessId;
-            if (bizim)
+            var bizim = false;
+            if (surec.Id != Environment.ProcessId)
             {
                 try
                 {
-                    var dosya = surec.MainModule?.FileName;
-                    bizim = dosya is null || string.Equals(
-                        Path.GetDirectoryName(dosya), klasor, StringComparison.OrdinalIgnoreCase);
+                    bizim = KlasordenMi(surec.MainModule?.FileName, klasor);
                 }
                 catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
                 {
-                    bizim = true;
+                    bizim = false;
                 }
             }
 
@@ -87,6 +85,12 @@ internal static class UygulamaKlasoruKapisi
         }
         return kosanlar;
     }
+
+    internal static bool KlasordenMi(string? dosya, string klasor) =>
+        dosya is not null && string.Equals(
+            Path.GetDirectoryName(dosya),
+            klasor.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+            StringComparison.OrdinalIgnoreCase);
 
     internal static Mutex? BosalincaAl(string appDirectory, TimeSpan sure)
     {

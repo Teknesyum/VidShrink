@@ -202,6 +202,191 @@ public sealed class BaslaticiPanelsizTests
         }
     }
 
+    [Fact]
+    public void IkinciBekleyenIndirmezBeklemez()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+        using var kapi = KapiTutucu.Baslat(kurulum.App);
+
+        var indirme = 0;
+        StagedUpdate? Indir()
+        {
+            Interlocked.Increment(ref indirme);
+            return sahne;
+        }
+
+        var birinci = Arka.Baslat(
+            () => KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, false, kurulum.Kilit, Indir, false));
+        Assert.True(Bekle(() => Volatile.Read(ref indirme) == 1, 5000), "ilk bekleyen indirmedi");
+        Thread.Sleep(300);
+        Assert.False(birinci.Bitti, "ilk bekleyen kapıyı beklemedi");
+
+        var saat = Stopwatch.StartNew();
+        var ikinci = Arka.Baslat(
+            () => KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, false, kurulum.Kilit, Indir, false));
+        var ikinciHemenBitti = ikinci.Bekle(3000);
+        _cikti.WriteLine($"ikinci-bekleyen-ms\t{saat.ElapsedMilliseconds}\tbitti\t{ikinciHemenBitti}\tindirme\t{Volatile.Read(ref indirme)}");
+
+        kapi.Birak();
+        Assert.True(birinci.Bekle(20000), "ilk bekleyen kapı bırakılınca bitmedi");
+        Assert.True(ikinci.Bekle(20000));
+
+        Assert.True(ikinciHemenBitti, "ikinci açılış bekleyene katıldı");
+        Assert.False(ikinci.Sonuc);
+        Assert.Equal(1, indirme);
+        Assert.Equal("v2", File.ReadAllText(Path.Combine(kurulum.App, "a.txt")));
+        Assert.False(File.Exists(Path.Combine(kurulum.App, UygulamaKlasoruKapisi.HataIsareti)));
+    }
+
+    [Fact]
+    public void KurulmusSurumdeHataYazilmaz()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var isaret = Path.Combine(kurulum.App, UygulamaKlasoruKapisi.HataIsareti);
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+
+        KurulumBekleyeni.Kur(kurulum.Kok, kurulum.App, sahne, kurulum.Kilit, TimeSpan.FromSeconds(5));
+        Assert.Equal("v2", File.ReadAllText(Path.Combine(kurulum.App, "a.txt")));
+        Assert.False(Directory.Exists(sahne.Stage), "ilk kurulum sahneyi silmedi");
+        Assert.False(File.Exists(isaret));
+
+        Assert.False(KurulumBekleyeni.Kur(kurulum.Kok, kurulum.App, sahne, kurulum.Kilit, TimeSpan.FromSeconds(5)));
+        var ikinciSonra = File.Exists(isaret) ? File.ReadAllText(isaret) : null;
+        _cikti.WriteLine($"ikinci-kurulum-isareti\t{ikinciSonra}");
+        Assert.Null(ikinciSonra);
+
+        var bozuk = kurulum.Sahne("9.9.10", bozuk: true);
+        Assert.False(KurulumBekleyeni.Kur(kurulum.Kok, kurulum.App, bozuk, kurulum.Kilit, TimeSpan.FromSeconds(5)));
+        Assert.True(File.Exists(isaret), "kurulmamış sürümün gerçek hatası yutuldu");
+    }
+
+    [Fact]
+    public void ElleYukleBaskaKopyaAcikkenUzunBeklemez()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+        using var kapi = KapiTutucu.Baslat(kurulum.App);
+
+        var saat = Stopwatch.StartNew();
+        var elle = Arka.Baslat(
+            () => KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, true, kurulum.Kilit, () => sahne, false));
+        var sinir = KurulumBekleyeni.ElleBekleme + TimeSpan.FromSeconds(5);
+        var bitti = elle.Bekle(sinir);
+        _cikti.WriteLine($"elle-bekleme-ms\t{saat.ElapsedMilliseconds}\tbitti\t{bitti}");
+
+        kapi.Birak();
+        Assert.True(elle.Bekle(20000));
+        Assert.True(bitti, $"elle Yükle {sinir.TotalSeconds} sn içinde bırakmadı");
+        Assert.True(sinir < TimeSpan.FromMinutes(1));
+    }
+
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData("app", true)]
+    [InlineData("baska", false)]
+    public void OkunamayanSurecBizimSayilmaz(string? klasorAdi, bool beklenen)
+    {
+        var klasor = Path.Combine(Root, ".calisma", "yol-d", "app");
+        var dosya = klasorAdi is null ? null : Path.Combine(Root, ".calisma", "yol-d", klasorAdi, "VidShrink.App.exe");
+        Assert.Equal(beklenen, UygulamaKlasoruKapisi.KlasordenMi(dosya, klasor));
+    }
+
+    private sealed class Arka
+    {
+        private readonly Thread _is;
+        private volatile bool _bitti;
+
+        private Arka(Func<bool> is_)
+        {
+            _is = new Thread(() =>
+            {
+                Sonuc = is_();
+                _bitti = true;
+            }) { IsBackground = true };
+        }
+
+        internal bool Sonuc { get; private set; }
+
+        internal bool Bitti => _bitti;
+
+        internal static Arka Baslat(Func<bool> is_)
+        {
+            var arka = new Arka(is_);
+            arka._is.Start();
+            return arka;
+        }
+
+        internal bool Bekle(int ms) => _is.Join(ms);
+
+        internal bool Bekle(TimeSpan sure) => _is.Join(sure);
+    }
+
+    private sealed class KapiTutucu : IDisposable
+    {
+        private readonly ManualResetEventSlim _birak = new();
+        private readonly Thread _is;
+
+        private KapiTutucu(string app)
+        {
+            using var alindi = new ManualResetEventSlim();
+            var tuttu = false;
+            _is = new Thread(() =>
+            {
+                var kapi = UygulamaKlasoruKapisi.Al(app, TimeSpan.Zero);
+                tuttu = kapi is not null;
+                alindi.Set();
+                _birak.Wait();
+                UygulamaKlasoruKapisi.Birak(kapi);
+            }) { IsBackground = true };
+            _is.Start();
+            Assert.True(alindi.Wait(5000) && tuttu, "test kapıyı tutamadı");
+        }
+
+        internal static KapiTutucu Baslat(string app) => new(app);
+
+        internal void Birak()
+        {
+            _birak.Set();
+            _is.Join(5000);
+        }
+
+        public void Dispose()
+        {
+            Birak();
+            _birak.Dispose();
+        }
+    }
+
+    private sealed class BekleyenKlasoru : IDisposable
+    {
+        internal string Kok { get; } = Path.Combine(Root, ".calisma", "yol-d", "bekleyen-" + Guid.NewGuid().ToString("N")[..8]);
+        internal string App => Path.Combine(Kok, "app");
+        internal string Kilit { get; } = @"Local\Teknesyum.VidShrink.Test." + Guid.NewGuid().ToString("N");
+
+        internal BekleyenKlasoru()
+        {
+            Directory.CreateDirectory(App);
+            File.WriteAllText(Path.Combine(App, "a.txt"), "v1");
+        }
+
+        internal StagedUpdate Sahne(string surum, bool bozuk)
+        {
+            var sahne = Path.Combine(Kok, UpdateStaging.StageDirectoryName);
+            Directory.CreateDirectory(sahne);
+            var icerik = Encoding.UTF8.GetBytes("v2");
+            if (!bozuk) File.WriteAllBytes(Path.Combine(sahne, "a.txt"), icerik);
+            var dosyalar = new[] { new ManifestFile("a.txt", Convert.ToHexString(SHA256.HashData(icerik)), icerik.Length) };
+            var manifest = new ReleaseManifest(surum, "test", DateTimeOffset.UnixEpoch, UpdateCheck.Rid, dosyalar);
+            return new StagedUpdate(manifest, sahne, dosyalar, Array.Empty<ManifestFile>(), Array.Empty<ManifestFile>());
+        }
+
+        public void Dispose()
+        {
+            if (Directory.Exists(Kok)) Directory.Delete(Kok, true);
+        }
+    }
+
     private static bool Bekle(Func<bool> kosul, int ms)
     {
         var saat = Stopwatch.StartNew();

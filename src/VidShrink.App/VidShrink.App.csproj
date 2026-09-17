@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <Compile Include="..\VidShrink.Launcher\UygulamaKlasoruKapisi.cs" Link="UygulamaKlasoruKapisi.cs" />
+    <Compile Include="..\VidShrink.Launcher\KurulumBekleyeni.cs" Link="KurulumBekleyeni.cs" />
   </ItemGroup>
 
   <ItemGroup>

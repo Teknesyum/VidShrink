@@ -233,14 +233,18 @@ public class KurulumIlerlemesiTests
     /// <summary>
     /// Yol D: başlatıcının paneli kalktı, güncelleyici panele konuşmuyor. Yerine taşıma
     /// uygulama klasörü boşalınca başlıyor ve hatası uygulamanın paneline işaret bırakıyor.
-    /// Yarışın davranışı <c>BaslaticiPanelsizTests</c>'te gerçek süreçle.
+    /// Yarışın davranışı <c>BaslaticiPanelsizTests</c>'te gerçek süreçle. Taşıma adımı
+    /// <c>KurulumBekleyeni.cs</c>'e geçti; güncelleyici oraya devrediyor.
     /// </summary>
     [Fact]
     public void GuncelleyiciKlasorBosalincaKurar()
     {
-        var kaynak = File.ReadAllText(
-            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
+        var launcher = Path.Combine(TipSources.Root, "src", "VidShrink.Launcher");
+        var guncelleyici = File.ReadAllText(Path.Combine(launcher, "Updater.cs"));
+        var kaynak = File.ReadAllText(Path.Combine(launcher, "KurulumBekleyeni.cs"));
 
+        Assert.DoesNotContain("InstallProgress", guncelleyici);
+        Assert.Contains("KurulumBekleyeni.Calistir(", guncelleyici);
         Assert.DoesNotContain("InstallProgress", kaynak);
         var bosalinca = kaynak.IndexOf("UygulamaKlasoruKapisi.BosalincaAl(", StringComparison.Ordinal);
         var tasima = kaynak.IndexOf("UpdateRollout.Apply(", StringComparison.Ordinal);
@@ -255,11 +259,13 @@ public class KurulumIlerlemesiTests
     [Fact]
     public void ProvaKipiKurmuyor()
     {
-        var kaynak = File.ReadAllText(
-            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
+        var launcher = Path.Combine(TipSources.Root, "src", "VidShrink.Launcher");
+        var guncelleyici = File.ReadAllText(Path.Combine(launcher, "Updater.cs"));
+        var kaynak = File.ReadAllText(Path.Combine(launcher, "KurulumBekleyeni.cs"));
 
-        Assert.Contains("VIDSHRINK_UPDATE_PROVA", kaynak);
-        var prova = kaynak.IndexOf("if (Rehearsing)", StringComparison.Ordinal);
+        Assert.Contains("VIDSHRINK_UPDATE_PROVA", guncelleyici);
+        Assert.Contains("}, Rehearsing);", guncelleyici);
+        var prova = kaynak.IndexOf("if (prova) return false;", StringComparison.Ordinal);
         var kurulum = kaynak.IndexOf("LauncherUpdate.Stage(stage", StringComparison.Ordinal);
 
         Assert.True(prova > 0, "prova kolu yok");

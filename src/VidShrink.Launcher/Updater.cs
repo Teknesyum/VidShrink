@@ -24,6 +24,11 @@ namespace VidShrink.Launcher;
 /// saniyeydi; ölçülen 0.3.0 → 0.4.1 farkı 375 dosya ve 134,8 MB, yani o bütçede
 /// bitmesi mümkün değildi. Yarıda kalan sahne de silindiği için her açılış sıfırdan
 /// başlıyor, kurulum hiç yakınsamıyordu.
+///
+/// Bekleme ve kurulum <see cref="KurulumBekleyeni"/> içinde: klasör başına tek arka plan
+/// bekleyeni olur, ikinci açılış indirmez de beklemez. Sürüm zaten kuruluysa kurulum
+/// sessizce atlanır, hata işareti yazılmaz. Elle "Yükle" yolu başka kopya açıksa kısa
+/// bekler ve bırakır.
 /// </summary>
 internal static class Updater
 {
@@ -41,77 +46,25 @@ internal static class Updater
     /// </summary>
     private const int Lanes = UpdateStaging.LauncherLanes;
 
-    private const string StageDirectoryName = UpdateStaging.StageDirectoryName;
-
     private const string MutexName = UpdateStaging.MutexName;
-
-    private static readonly TimeSpan ForceWait = TimeSpan.FromMinutes(10);
-
-    private static readonly TimeSpan AppExitWait = TimeSpan.FromDays(7);
 
     public static bool Run(string baseDirectory, string appDirectory, bool force = false)
     {
         if (!force && !UpdateCheck.AutoUpdateEnabled()) return false;
         if (Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_DISABLED") == "1") return false;
 
-        StagedUpdate? staged;
-        using (var only = new Mutex(initiallyOwned: false, MutexName))
+        return KurulumBekleyeni.Calistir(baseDirectory, appDirectory, force, MutexName, () =>
         {
-            if (!Hold(only, force ? ForceWait : TimeSpan.Zero)) return false;
             using var cancellation = new CancellationTokenSource(Budget);
-            try
-            {
-                staged = UpdateStaging.StageAsync(
-                    baseDirectory, appDirectory, Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE"),
-                    Lanes, null, "VidShrink-Launcher", null, cancellation.Token).GetAwaiter().GetResult();
-            }
-            catch (Exception) { return false; }
-            finally { try { only.ReleaseMutex(); } catch (ApplicationException) { } }
-        }
-
-        if (staged is null) return false;
-        if (Rehearsing) return false;
-        return Install(baseDirectory, appDirectory, staged);
+            return UpdateStaging.StageAsync(
+                baseDirectory, appDirectory, Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE"),
+                Lanes, null, "VidShrink-Launcher", null, cancellation.Token).GetAwaiter().GetResult();
+        }, Rehearsing);
     }
 
     internal const string RehearsalVariable = "VIDSHRINK_UPDATE_PROVA";
 
     internal static bool Rehearsing =>
         Environment.GetEnvironmentVariable(RehearsalVariable) == "1";
-
-    private static bool Hold(Mutex mutex, TimeSpan wait)
-    {
-        try { return mutex.WaitOne(wait); }
-        catch (AbandonedMutexException) { return true; }
-    }
-
-    private static bool Install(string baseDirectory, string appDirectory, StagedUpdate staged)
-    {
-        var gate = UygulamaKlasoruKapisi.BosalincaAl(appDirectory, AppExitWait);
-        if (gate is null) return false;
-        try
-        {
-            using var only = new Mutex(initiallyOwned: false, MutexName);
-            if (!Hold(only, ForceWait)) return false;
-            try
-            {
-                var stage = Path.Combine(baseDirectory, StageDirectoryName);
-                LauncherUpdate.Stage(stage, baseDirectory, staged.Launcher);
-                var applied = UpdateRollout.Apply(stage, baseDirectory, appDirectory, staged.App, staged.Launcher, staged.Manifest, staged.Shell);
-                UygulamaKlasoruKapisi.HatayiSil(appDirectory);
-                return applied;
-            }
-            catch (Exception exception)
-            {
-                UygulamaKlasoruKapisi.HataYaz(appDirectory, exception.Message);
-                return false;
-            }
-            finally { try { only.ReleaseMutex(); } catch (ApplicationException) { } }
-        }
-        finally
-        {
-            UygulamaKlasoruKapisi.Birak(gate);
-        }
-    }
 }
 
