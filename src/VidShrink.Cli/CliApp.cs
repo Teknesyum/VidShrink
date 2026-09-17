@@ -167,7 +167,12 @@ public static class CliApp
             }
         }, ct);
 
-        return result == WatchRunResult.Cancelled ? ExitCodes.Cancelled : ExitCodes.InBand;
+        return result switch
+        {
+            WatchRunResult.Finished => ExitCodes.InBand,
+            WatchRunResult.Cancelled => ExitCodes.Cancelled,
+            _ => throw new ArgumentOutOfRangeException(nameof(result))
+        };
     }
 
     public static CliDecision Decide(CliRequest request, MediaInfo info, ComplexityProfile? profile,

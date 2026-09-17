@@ -25,13 +25,11 @@ public interface IWatchClock
 
 public readonly record struct WatchFileStamp(long Length, DateTime LastWriteUtc);
 
-public enum WatchFileStatus { Done, Failed }
-
 public sealed record WatchEntry
 {
     public string Name { get; init; } = "";
     public long Length { get; init; }
-    public WatchFileStatus Status { get; init; }
+    public bool Failed { get; init; }
     public int ExitCode { get; init; }
     public string? Output { get; init; }
     public string? Error { get; init; }
@@ -48,7 +46,7 @@ public sealed record WatchStateLoad(WatchState State, string? CorruptBackup);
 
 public sealed record WatchOutcome(int ExitCode, bool Success, string? Output, string? Error);
 
-public enum WatchEventKind { Waiting, Stable, Processing, Done, Failed, Stopped }
+public enum WatchEventKind { Waiting, Processing, Done, Failed, Stopped }
 
 public sealed record WatchEvent(WatchEventKind Kind, string Path, string? Detail = null);
 
@@ -68,7 +66,7 @@ public sealed class WatchFolder
     public const string StateFileName = ".vidshrink-izle.json";
     public const string OutputSuffix = "_shrunk";
 
-    public static readonly IReadOnlySet<string> VideoExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    private static readonly IReadOnlySet<string> VideoExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         ".mp4", ".mov", ".mkv", ".webm", ".avi", ".m4v", ".wmv", ".flv", ".mts", ".m2ts", ".ts", ".mpg", ".mpeg", ".3gp"
     };
@@ -164,7 +162,6 @@ public sealed class WatchFolder
             if (_fs.IsLocked(path)) continue;
 
             _pending.Remove(path);
-            log?.Invoke(new WatchEvent(WatchEventKind.Stable, path));
             ready.Add(path);
         }
 
@@ -182,7 +179,7 @@ public sealed class WatchFolder
             {
                 Name = name,
                 Length = length,
-                Status = outcome.Success ? WatchFileStatus.Done : WatchFileStatus.Failed,
+                Failed = !outcome.Success,
                 ExitCode = outcome.ExitCode,
                 Output = outcome.Output is null ? null : Path.GetFileName(outcome.Output),
                 Error = outcome.Error,

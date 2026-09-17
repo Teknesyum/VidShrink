@@ -227,7 +227,7 @@ public sealed class WatchFolderTests
         {
             var names = json.RootElement.GetProperty("processed").EnumerateArray().Select(e => e.GetProperty("name").GetString()).ToList();
             Assert.Equal(new[] { "a.mp4", "b.mp4" }, names);
-            Assert.Equal("done", json.RootElement.GetProperty("processed")[0].GetProperty("status").GetString());
+            Assert.False(json.RootElement.GetProperty("processed")[0].GetProperty("failed").GetBoolean());
         }
 
         calls.Clear();
@@ -290,10 +290,10 @@ public sealed class WatchFolderTests
         Assert.Equal(new[] { "c.mp4" }, calls);
         var load = WatchFolder.LoadState(fs, Path.Combine(Root, WatchFolder.StateFileName), T0);
         var a = load.State.Processed.Single(e => e.Name == "a.mp4");
-        Assert.Equal(WatchFileStatus.Failed, a.Status);
+        Assert.True(a.Failed);
         Assert.Equal("moov atom not found", a.Error);
-        Assert.Equal(WatchFileStatus.Failed, load.State.Processed.Single(e => e.Name == "b.mp4").Status);
-        Assert.Equal(WatchFileStatus.Done, load.State.Processed.Single(e => e.Name == "c.mp4").Status);
+        Assert.True(load.State.Processed.Single(e => e.Name == "b.mp4").Failed);
+        Assert.False(load.State.Processed.Single(e => e.Name == "c.mp4").Failed);
         Assert.Equal(2, events.Count(e => e.Kind == WatchEventKind.Failed));
 
         calls.Clear();
@@ -477,7 +477,7 @@ public sealed class WatchFolderTests
             Assert.Equal(new[] { "a.mp4", "b.mp4" }, probed);
             Assert.True(Directory.Exists(output));
             var load = WatchFolder.LoadState(PhysicalWatchFileSystem.Instance, Path.Combine(watch, WatchFolder.StateFileName), T0);
-            Assert.All(load.State.Processed, e => Assert.Equal(WatchFileStatus.Failed, e.Status));
+            Assert.All(load.State.Processed, e => Assert.True(e.Failed));
             Assert.Equal(2, load.State.Processed.Count);
             Assert.Contains("Failed, skipped and noted: a.mp4: bozuk kaynak", stderr.ToString(), StringComparison.Ordinal);
         }
@@ -515,7 +515,7 @@ public sealed class WatchFolderTests
             Assert.True(int.Parse(fields[1], CultureInfo.InvariantCulture) > 0);
             var state = WatchFolder.LoadState(PhysicalWatchFileSystem.Instance, Path.Combine(watch, WatchFolder.StateFileName), DateTime.UtcNow);
             var entry = Assert.Single(state.State.Processed);
-            Assert.Equal(("klip.mp4", WatchFileStatus.Done, "klip_shrunk.mp4"), (entry.Name, entry.Status, entry.Output));
+            Assert.Equal(("klip.mp4", false, "klip_shrunk.mp4"), (entry.Name, entry.Failed, entry.Output));
 
             var again = await RunAsync("dotnet", cli, "izle", watch, "--cikti", output, "--hedef", target, "--olcumsuz", "--bir-kez", "--aralik", "0.5");
             Assert.True(again.Exit == 0, again.Stderr);
