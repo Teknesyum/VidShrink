@@ -140,8 +140,9 @@ Pencere başına ayrı süreç ~78 ms, luma kolunun bölünmüş sürece ekledi�
 bölünmüş sonda da 52,2645125 okudu. Pim: `KaranlikGecisTests.BirlesikSondaAyriSondaylaAyniLumayiVeKareyiOkur`
 (iki pencerede `LumaSampleAsync` == `WindowSample.MeanLuma`, kare sayısı tek örnekle eş).
 
-Bu klipte kazanç HandBrake'e karşı 1,72× / 1,90× toplam farkını kapatacak büyüklükte değil; farkın gövdesi
-luma dışındaki sonda işleri (bias taraması, üç x264 pencere, hareket örneği) ve deneme kodlaması.
+Bu klipte kazanç HandBrake'e karşı 1,72× / 1,90× toplam farkını kapatacak büyüklükte değil. Bölüm 4'te ürünün
+toplamı ile kodlaması arasındaki 55,6 / 65,0 sn'nin ~35 / ~29 sn'si prob; geri kalan sonda işlerinin (bias
+taraması, üç x264 pencere, hareket örneği) payı ayrı ayrı ölçülmedi.
 
 **Öneri kodeği.** `StrategyAdvice.SuggestedCodec` geçişten sonra `libsvtav1` kalıyordu (plan `libx265`).
 Pencere kodlayıcı satırı `plan.Codec`'i, gerekçe satırı nottaki kodekleri yazdığı için ekranda yanlış kodek
@@ -155,3 +156,22 @@ görünmüyordu; yanlış olan çekirdeğin öneri kaydıydı. Artık öneri ayn
 `IsHdrSource` aktarım kıyası büyük/küçük harfe duyarlı → `HdrBayragiAktarimAdiOlmadanDaGecisiDurdurur` kırmızı;
 bölünmüş koldaki filtre `fps=5` → iki sonda testi kırmızı. 5 kırmızı / 26 yeşil; geri alınca 98/98 yeşil
 (`KaranlikGecisTests|ComplexityProbeTests|PlanCalculatorTests`).
+
+**CI (handbrake-kiyas koşum 35246664536, commit `fced8c89`, `hb.ps1 -Is karanlikgecis`).** Ham çıktı koşumun
+`hb-sonuc-karanlikgecis-*` eserleri. Bu dal main `0bc86188` üstünde; main'e bölüm 4'ten sonra bütçe doldurma
+(`t0/butce-doldur`) girdi, bu yüzden ürün kolu e0 ile artık eş değil ve temiz bir luma A/B'si değil.
+
+| Kesit | kbit | Kodek | luma | prob s (#13 → bu) | Deneme ürün/e0 | Kodlama sn ürün / HB | Toplam sn ürün |
+|---|---|---|---|---|---|---|---|
+| karanlik | 600 | libx265 | 28,73 | 35,0 → 34,5 | 2 / 1 | 78,4 / 55,6 (1,41×) | 134,5 |
+| karanlik | 2000 | libx265 | 28,73 | 29,4 → 28,2 | 2 / 1 | 155,6 / 74,1 (**2,10×**) | 218,5 |
+| hareketli | 2000 | libsvtav1 | 137,66 | 35,3 → 42,0 | 2 / 1 | 53,3 / – | 109,2 |
+| parlak | 2000 | libsvtav1 | 197,04 | 40,9 → 34,7 | 4 / 3 | 96,4 / – | 144,0 |
+| ekran | 2000 | libsvtav1 | 66,89 | 24,6 → 15,1 | 4 / 3 | 24,4 / – | 47,3 |
+
+Luma değerleri bölüm 1 ile aynı, kodek hükmü 5/5 ve CAMBI(ii) hükmü 2/2 geçti. Prob farkı −9,5…+6,7 sn, medyan
+−1,2 sn: koşucu gürültüsü içinde, luma kolunun CI kazancı bu koşumla ayırt edilemiyor. Süre hükmü 2000'de
+**kaldı**: ürünün son dalı "budget fill, the fuller result delivered", yani bütçe doldurma x265'te ikinci bir tam
+iki geçişli kodlama ekliyor (600'de 1,41×, 2000'de 2,10×). Negatif kesitlerde (hareketli, parlak) `negatif_hukmu`
+aynı nedenle kaldı: ürün bir deneme fazla koştu, e0 `460ecc89`'de bütçe doldurma yok. Bu bu dalın açığı değil;
+ayrı iş.
