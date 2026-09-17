@@ -55,6 +55,27 @@ public sealed class IkonKutusuTests
             Assert.StartsWith("M 0,0 M 24,24 ", (string)satir[1]);
     }
 
+    /// <summary>
+    /// Teknesyum bağlantısının simgesi <c>&lt;&gt;</c>: uygulamanın yüklediği kaynaktan okunan
+    /// geometri iki köşeli ayracın uçlarını kalemle kaplar, atom simgesinin çekirdeği olan
+    /// merkezi kaplamaz.
+    /// </summary>
+    [Fact]
+    public void TeknesyumSimgesiKoseliAyrac()
+    {
+        AppHost.Ensure();
+        var (uclar, merkez, kutu) = AppHost.Run(() =>
+        {
+            var geo = Avalonia.Application.Current!.TryGetResource("IconCode", null, out var kaynak) ? (Geometry)kaynak! : throw new InvalidOperationException("IconCode yok");
+            var kalem = new Pen(Brushes.Black, 1);
+            var noktalar = new[] { new Avalonia.Point(3, 12), new Avalonia.Point(21, 12), new Avalonia.Point(9, 6), new Avalonia.Point(15, 18) };
+            return (noktalar.All(n => geo.StrokeContains(kalem, n)), geo.StrokeContains(kalem, new Avalonia.Point(12, 12)), geo.Bounds);
+        });
+        _cikti.WriteLine($"IconCode uclar {uclar} merkez {merkez} kutu {kutu}");
+        Assert.True(uclar);
+        Assert.False(merkez);
+    }
+
     [Theory]
     [MemberData(nameof(Ikonlar))]
     public void MurekkepOrtada(string ad, string yol)
