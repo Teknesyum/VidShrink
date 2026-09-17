@@ -53,6 +53,9 @@ internal partial class PlayerView
 
     internal bool SeritRevealed => _serit?.IsVisible ?? false;
 
+    /// <summary>P14: alt şeridin açıldığı derinlik; üst bar aynı sayıyı kullanır.</summary>
+    internal double RevealBand => SeritZone.Band(Surface.Bounds.Height);
+
     internal string SeritTimeText => TxtSeritTime?.Text ?? "";
 
     internal string SeritVolumeText => TxtSeritVolume?.Text ?? "";

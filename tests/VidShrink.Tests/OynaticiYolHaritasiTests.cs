@@ -438,6 +438,78 @@ public sealed class OynaticiYolHaritasiTests
     }
 
     [Fact]
+    public void P14UstBarVeAltSeritAyniMesafedeAcilir()
+    {
+        var body = new StringBuilder();
+        try
+        {
+        AppHost.Run(() =>
+        {
+            var kok = Path.Combine(YolKanit.Folder, "p14-esik");
+            Directory.CreateDirectory(kok);
+            var klip = Path.Combine(kok, "sahte.mp4");
+            File.WriteAllBytes(klip, new byte[16]);
+            var motor = new YolMotoru();
+            var window = new MainWindow { SettingsPathOverride = Path.Combine(kok, "settings.json"), Width = 1280, Height = 800, WindowState = WindowState.Normal };
+            var view = window.PlayerTab;
+            view.EngineFactory = () => motor;
+            window.Show();
+            DenetimSurucu.Wait(view, 0.3);
+            var ac = window.OpenInPlayerAsync(klip);
+            DenetimSurucu.Pump(view, () => ac.IsCompleted, 10);
+            DenetimSurucu.Wait(view, 0.3);
+            if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
+
+            var ustSaat = new ElleSaat();
+            var altSaat = new ElleSaat();
+            window.ChromeZone.Clock = ustSaat;
+            view.SeritZone.Clock = altSaat;
+            var yuzey = view.FindControl<Panel>("Surface")!;
+            var alt = yuzey.TranslatePoint(new Point(0, yuzey.Bounds.Height), window)!.Value.Y;
+            var orta = new Point(640, alt / 2);
+            body.AppendLine($"yuzey yuksekligi {YolKanit.N(yuzey.Bounds.Height)}, alt kenar {YolKanit.N(alt)}, baslik {YolKanit.N(window.TitleBar.Height)}, bant {YolKanit.N(view.RevealBand)}");
+
+            int Esik(string ad, Func<int, Point> nokta, Func<bool> acik, ElleSaat saat)
+            {
+                bool Dene(int d)
+                {
+                    Hareket(window, view, nokta(1));
+                    Hareket(window, view, orta);
+                    saat.Ates();
+                    DenetimSurucu.Wait(view, 0.02);
+                    Assert.False(acik(), ad + " ortada kapanmadi");
+                    Hareket(window, view, nokta(d));
+                    DenetimSurucu.Wait(view, 0.02);
+                    return acik();
+                }
+
+                var d = 1;
+                Assert.True(Dene(d), ad + " kenarda acilmadi");
+                while (d < 400 && Dene(d + 8)) d += 8;
+                while (Dene(d + 1)) d++;
+                body.AppendLine($"{ad}: son acan mesafe {d} px");
+                return d;
+            }
+
+            var ust = Esik("ust bar", d => new Point(640, d), () => window.ChromeShown, ustSaat);
+            var altEsik = Esik("alt serit", d => new Point(640, alt - d), () => view.SeritRevealed, altSaat);
+            var bant = view.RevealBand;
+            var baslik = window.TitleBar.Height;
+            window.Close();
+
+            Assert.True(Math.Abs(ust - altEsik) <= 1, $"ust {ust} px, alt {altEsik} px" + Environment.NewLine + body);
+            Assert.True(Math.Abs(ust - bant) <= 1, $"ust {ust} px, bant {YolKanit.N(bant)}");
+            Assert.True(ust > baslik + 1, $"ust esik baslik yuksekliginde kaldi: {ust} <= {YolKanit.N(baslik)}");
+            return 0;
+        });
+        }
+        finally
+        {
+            YolKanit.Write("p14-acilma-esigi.txt", body.ToString());
+        }
+    }
+
+    [Fact]
     public void P18HizSimgesiBireVeSonHizaDoner()
     {
         var body = new StringBuilder();

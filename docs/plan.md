@@ -1,3 +1,18 @@
+# Yol B: Kabuk Kalemleri (P14, P3, S9, K4, S14, S20)
+
+Dal `t0/yol-b-kabuk`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 7. bölüm satır 3, 4, 5, 6, 13, 12.
+
+1. **P14.** Üst barın açılma bölgesi `TitleBar.Height` yerine alt şeridin bandı: `PlaybackHoverZoneShare` x oynatıcı
+   yüzeyi yüksekliği, pencerenin üst kenarından. `OynaticiYolHaritasiTests` ham fare hareketiyle iki eşiği ölçer.
+2. **P3.** Sağ tık Ayarlar alt menüsünde "Tüm ayarlar" sekmeye gitmez; yerine Ayarlar sekmesindeki oynatıcı
+   bölümü (Kısayollar) alt menü olur. Ham sağ tık + ok/Enter ile Gelişmiş ayar değişir, motordan okunur.
+3. **S9.** `MainWindow`'daki birim ve kısaltmalar (MB, /100, CRF, kbps, FPS) `Locales/*/main.json`'a, 42 dil;
+   `BiciminTests` sayım pinleri ve cümlesi.
+4. **K4.** Teknesyum imzası `IconCode` atom yerine `<>`, `IkonKutusuTests` kuralları içinde.
+5. **S14.** `CmbShareTarget` radyo şeridine (hedefler dosyadan, kodda kurulur); `AyarRadyoSeridiTests` bütün
+   Ayarlar sekmesini tarar, negatif kontrol iki seçenekli kutuyu yakalar.
+6. **S20.** Başsız pencerede TR ve EN açıkça seçilir, her sekmede metin ölçüsü > kutu taraması; bulunanlar düzeltilir.
+
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.

@@ -653,7 +653,7 @@ public partial class MainWindow : Window
 
     private void OnChromePointerMoved(object? sender, PointerEventArgs e)
     {
-        ChromeZone.PointerWithin(e.GetPosition(this).Y <= TitleBar.Height);
+        ChromeZone.PointerWithin(e.GetPosition(this).Y <= Math.Max(TitleBar.Height, Player.RevealBand));
         ApplyChromeMode();
     }
 
