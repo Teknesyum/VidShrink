@@ -220,7 +220,22 @@ CAMBI kapısı iki hücreden **yalnız birinde** (600) açıldı ve orada da pay
 7,46 ile tavanın 0,04 altında kaldı. Kapının açıldığı hücrede bile genişlemenin kendi süre ölçütü tutmuyor:
 x265 kolu libx264'ün **7,04 katı** kodluyor, ölçüt ≤2×. 2000'de oran 4,14×, aynı yönde. Yani x265 geçişi
 karanlıkta bandı gerçekten düzeltiyor (CAMBI 7,79 → 6,55 ve 7,46 → 6,65) ama Dengeli rejimde bu düzeltmenin
-bedeli ölçütün üç-dört katı süre.
+bedeli ölçütün **2,07 ile 3,52 katı** süre: ölçüt ≤2×, ölçülen 7,035× ve 4,138×, yani 7,035/2 = 3,52 ve
+4,138/2 = 2,07. Tablodaki 7,04 ve 4,14 ölçütün kendisiyle değil libx264 koluyla oranlanmış sayılar.
+
+### Bu Ölçünün Sınırları
+
+**Süre oranının payı Dengeli+x265 kolu değil.** `x265_bolu_dengeli_sure`'nin payı `$script:kgUrun.Sn`
+(hb.ps1:1387), yani `urun-otomatik` kolu — karanlık kesitte oran Extreme rejimine düştüğü için x265'i o kol
+kodluyor. Payda `urun-dengeli` kolunun süresi. Dolayısıyla oran **rejim + kodek** farkını birlikte taşıyor;
+"Dengeli rejimde x265'e geçmenin maliyeti" tek başına ölçülmedi. Bunun için Dengeli rejimi sabit tutup yalnız
+kodeği çeviren üçüncü bir kol gerekir, bu koşumda yok.
+
+**Negatif kontroller yapısal olarak erişilmez.** Danışmada önerilen negatif kontroller (CAMBI tavanını
+düşürüp kapının kapandığını, süre ölçütünü gevşetip hükmün döndüğünü görmek) bu düzenekte koşulamıyor:
+tavan `7.5` ve ölçüt `2.0` betiğe gömülü sabitler, parametre değil. İkisi de artık
+`HbOlcumDuzenegiTests.DengeliKolununZorladigiOranMotorunDengeliBandinaDusuyor`'da pimli — sayı sessizce
+değişemez ama bir koşumda değiştirilip etkisi ölçülemez de.
 
 600'deki süre oranı salt kodek farkı değil: o hücrede Dengeli 1344x572'ye ölçekledi, x265 kolu 1574x670'te
 kaldı ve bir deneme fazla koştu (bütçe doldurma). 2000'de iki kol da 1920x818 ve iki denemeli; oradaki

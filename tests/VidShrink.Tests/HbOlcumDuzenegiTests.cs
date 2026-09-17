@@ -139,6 +139,9 @@ public sealed class HbOlcumDuzenegiTests
         Assert.Contains("$ek.beklenen_kodek = 'libx264'", kol, StringComparison.Ordinal);
         Assert.Contains("$ek.genisleme_kapisi", kol, StringComparison.Ordinal);
         Assert.Contains("$ek.cambi_ii -gt 7.5", kol, StringComparison.Ordinal);
+        Assert.Contains("$ek.cambi_tavan = 7.5", kol, StringComparison.Ordinal);
+        Assert.Contains("$ek.x265_bolu_dengeli_sure -le 2.0", kol, StringComparison.Ordinal);
+        Assert.Contains("$u.Kodlayici -eq 'libx264' -and $u.Komut -like '*libx264*'", kol, StringComparison.Ordinal);
 
         var oranMetni = Regex.Match(Script, @"\[double\]\$DengeliOran = ([\d.]+)");
         Assert.True(oranMetni.Success, "hb.ps1 içinde $DengeliOran varsayılanı yok");
