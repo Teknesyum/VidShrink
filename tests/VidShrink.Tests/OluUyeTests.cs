@@ -414,8 +414,6 @@ public sealed class OluUyeTests
             "Karsilastirma kaynaginin duraklatilmis durumu uretiliyor, hicbir kol duraklatilmisi ayirmiyor. Ayirmanin gerekip gerekmedigi olculmedi."),
         new("ConversionQualityMode.Bitrate", "varsayilan-kol", Legitimate,
             "Iki degerli kipin olumsuz kolu. Tek okuyan ConversionArguments.cs:86 'QualityMode == ConversionQualityMode.Crf' diye soruyor; Bitrate o kosulun else'i, ayrica adlandirilmasi ayni dali ikiye bolerdi."),
-        new("EncoderVendor.Software", "varsayilan-kol", Legitimate,
-            "Vendor()'in son satiri; IsHardware olculmus uc saticiyi adiyla sayip '_ => false' diyor, QualityArgs son kolda -crf veriyor. Software'i ayrica adlandirmak ayni davranisi iki yere yazardi."),
         new("FillPolicy.QualityCeiling", "varsayilan-kol", Legitimate,
             "Iki degerli siyasetin olumsuz kolu. Uc okuyan da (PlanCalculator.cs:342, MainWindow.axaml.cs:2284, EncodeRunner.cs:140) 'fillPolicy == FillPolicy.FillTarget' soruyor; tavan kolu o kosulun else'i."),
         new("HardwareVerdictReason.BitrateFloorTooHigh", "varsayilan-kol", Debt,
