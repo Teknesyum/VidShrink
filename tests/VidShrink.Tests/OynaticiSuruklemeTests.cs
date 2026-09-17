@@ -13,13 +13,6 @@ using static VidShrink.Tests.OynaticiOdakYoluTests;
 
 namespace VidShrink.Tests;
 
-[CollectionDefinition(CiftTikKaynagi.Ad, DisableParallelization = true)]
-public sealed class CiftTikKaynagi
-{
-    public const string Ad = "cift-tik-kaynagi";
-}
-
-[Collection(CiftTikKaynagi.Ad)]
 public sealed class OynaticiCiftTikSuresiTests
 {
     [Fact]
@@ -82,7 +75,6 @@ public sealed class OynaticiCiftTikSuresiTests
 
         KisayolKanit.Write("hiz-cift-tik.txt", sonucu.Item1);
         if (OperatingSystem.IsWindows()) Assert.Equal(windows, sistem);
-        Assert.Equal(sistem, varsayilan);
         Assert.True(sonucu.Item2 is null, sonucu.Item2 + Environment.NewLine + sonucu.Item1);
     }
 }
@@ -177,6 +169,140 @@ public sealed class OynaticiSuruklemeTests
     }
 
     [Fact]
+    public void SuruklerkenGelenCiftTikBayatSuruklemeDurumunuSifirlar()
+    {
+        var body = new StringBuilder();
+        var hatalar = new List<string>();
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var view = new PlayerView { NativeMoveDrag = false };
+                var window = new Window { Width = 640, Height = 360, Content = view };
+                window.Show();
+                DenetimSurucu.Wait(view, 0.2);
+                window.Position = new PixelPoint(40, 30);
+                DenetimSurucu.Wait(view, 0.2);
+
+                var tutma = window.PointToScreen(new Point(view.Bounds.Width / 2, view.Bounds.Height / 2));
+                void Olay(RawPointerEventType tur, int dx, int dy, RawInputModifiers tus)
+                {
+                    HamFare(window, tur, window.PointToClient(new PixelPoint(tutma.X + dx, tutma.Y + dy)), tus);
+                    DenetimSurucu.Wait(view, 0.05);
+                }
+
+                DenetimSurucu.Wait(view, ClickArbiter.DoubleWindowMs / 1000 + 0.3);
+                Olay(RawPointerEventType.Move, 0, 0, RawInputModifiers.None);
+                Olay(RawPointerEventType.LeftButtonDown, 0, 0, RawInputModifiers.LeftMouseButton);
+                Olay(RawPointerEventType.Move, 30, 20, RawInputModifiers.LeftMouseButton);
+                var tasindi = window.Position;
+                body.AppendLine($"surukleme basladi: konum {tasindi}, surukleniyor {view.WindowDragging}");
+                if (!view.WindowDragging || tasindi != new PixelPoint(70, 50)) hatalar.Add("pozitif kontrol: surukleme baslamadi");
+
+                Olay(RawPointerEventType.LeftButtonDown, 30, 20, RawInputModifiers.LeftMouseButton);
+                var ciftTik = view.Fullscreen.IsFullscreen || !view.WindowDragging;
+                body.AppendLine($"ikinci basis: tam ekran {view.Fullscreen.IsFullscreen}, kip {view.DragMode}, surukleniyor {view.WindowDragging}");
+                if (view.WindowDragging) hatalar.Add("ikinci basis bayat surukleme durumunu sifirlamadi");
+
+                Olay(RawPointerEventType.Move, 90, 60, RawInputModifiers.LeftMouseButton);
+                Olay(RawPointerEventType.Move, 150, 100, RawInputModifiers.LeftMouseButton);
+                var son = window.Position;
+                body.AppendLine($"cift tikten sonra basili hareket: konum {son}, beklenen {tasindi} ya da tam ekranin kosesi, surukleniyor {view.WindowDragging}");
+                if (son != tasindi && son != new PixelPoint(0, 0)) hatalar.Add($"bayat surukleme pencereyi tasidi: {son}");
+                if (view.WindowDragging) hatalar.Add("cift tikten sonra surukleme surdu");
+                body.AppendLine($"cift tik gorundu mu: {ciftTik}");
+                Olay(RawPointerEventType.LeftButtonUp, 150, 100, RawInputModifiers.None);
+
+                body.AppendLine("iz: " + string.Join(" | ", view.Trace));
+                window.Close();
+                return 0;
+            });
+        }
+        finally
+        {
+            KisayolKanit.Write("surukleme-cift-tik.txt", body.ToString());
+        }
+
+        Assert.True(hatalar.Count == 0, body.ToString());
+    }
+
+    [Fact]
+    public void VarsayilanYolHamSurukleyiPlatformunTasimasinaVerir()
+    {
+        var body = new StringBuilder();
+        var hatalar = new List<string>();
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var view = new PlayerView();
+                var window = new Window { Width = 640, Height = 360, Content = view };
+                window.Show();
+                DenetimSurucu.Wait(view, 0.2);
+                window.Position = new PixelPoint(40, 30);
+                DenetimSurucu.Wait(view, 0.2);
+                body.AppendLine($"varsayilan yerel tasima {view.NativeMoveDrag}, WM_MOVING kancasi {view.MovingHookInstalled}, platform windows {OperatingSystem.IsWindows()}");
+                if (OperatingSystem.IsWindows())
+                {
+                    if (!view.NativeMoveDrag) hatalar.Add("Windows'ta varsayilan yerel tasima kapali");
+                    if (!view.MovingHookInstalled) hatalar.Add("Windows'ta WM_MOVING kancasi kurulu degil");
+                }
+                else
+                {
+                    if (view.NativeMoveDrag) hatalar.Add("Windows disinda varsayilan yerel tasima acik");
+                    if (view.MovingHookInstalled) hatalar.Add("Windows disinda WM_MOVING kancasi kurulu");
+                }
+
+                var tutma = window.PointToScreen(new Point(view.Bounds.Width / 2, view.Bounds.Height / 2));
+                void Olay(RawPointerEventType tur, int dx, int dy, RawInputModifiers tus)
+                {
+                    HamFare(window, tur, window.PointToClient(new PixelPoint(tutma.X + dx, tutma.Y + dy)), tus);
+                    DenetimSurucu.Wait(view, 0.05);
+                }
+
+                DenetimSurucu.Wait(view, ClickArbiter.DoubleWindowMs / 1000 + 0.3);
+                var oncesi = window.Position;
+                var oncesiYerel = oncesi;
+                if (OperatingSystem.IsWindows() && GetWindowRect(window.TryGetPlatformHandle()!.Handle, out var r0))
+                    oncesiYerel = new PixelPoint(r0.Left, r0.Top);
+                Olay(RawPointerEventType.Move, 0, 0, RawInputModifiers.None);
+                Olay(RawPointerEventType.LeftButtonDown, 0, 0, RawInputModifiers.LeftMouseButton);
+                Olay(RawPointerEventType.Move, 60, 40, RawInputModifiers.LeftMouseButton);
+                var sonrasi = window.Position;
+                var sonrasiYerel = sonrasi;
+                if (OperatingSystem.IsWindows() && GetWindowRect(window.TryGetPlatformHandle()!.Handle, out var r1))
+                    sonrasiYerel = new PixelPoint(r1.Left, r1.Top);
+                Olay(RawPointerEventType.LeftButtonUp, 60, 40, RawInputModifiers.None);
+
+                var yerel = view.Trace.Contains("movedrag -> native");
+                body.AppendLine($"ham surukleme: iz yerel {yerel}, kendi dongu {view.WindowDragging}, kip '{view.DragMode}'");
+                body.AppendLine($"GetWindowRect once {oncesiYerel}, sonra {sonrasiYerel}; Avalonia konumu once {oncesi}, sonra {sonrasi}");
+                body.AppendLine("iz: " + string.Join(" | ", view.Trace));
+                if (OperatingSystem.IsWindows())
+                {
+                    if (!yerel) hatalar.Add("varsayilan yol yerel tasimayi cagirmadi");
+                    if (view.WindowDragging) hatalar.Add("varsayilan yolda kendi dongu devreye girdi");
+                    if (sonrasiYerel != oncesiYerel) hatalar.Add($"yerel yolda pencere kendi dongumuzle tasindi: {oncesiYerel} -> {sonrasiYerel}");
+                }
+                else
+                {
+                    if (yerel) hatalar.Add("Windows disinda yerel tasima cagrildi");
+                    if (sonrasi == oncesi) hatalar.Add($"kendi dongu pencereyi tasimadi: {oncesi} -> {sonrasi}");
+                }
+
+                window.Close();
+                return 0;
+            });
+        }
+        finally
+        {
+            KisayolKanit.Write("surukleme-varsayilan.txt", body.ToString());
+        }
+
+        Assert.True(hatalar.Count == 0, body.ToString());
+    }
+
+    [Fact]
     public void WindowsYerelTasimaWmMovingDikdortgeniniMerkezeCeker()
     {
         if (!OperatingSystem.IsWindows()) return;
@@ -217,6 +343,7 @@ public sealed class OynaticiSuruklemeTests
                     if (rect.Left != beklenen.X || rect.Top != beklenen.Y || rect.Right - rect.Left != w || rect.Bottom - rect.Top != h) hatalar.Add(satir);
                 }
 
+                DenetimSurucu.Wait(view, ClickArbiter.DoubleWindowMs / 1000 + 0.3);
                 var tutma = new Point(window.ClientSize.Width / 2, window.ClientSize.Height / 2);
                 body.AppendLine($"gorunum {view.Bounds.Width}x{view.Bounds.Height}, istemci {window.ClientSize.Width}x{window.ClientSize.Height}, tutma {tutma}, durum {window.WindowState}, etkin {window.IsActive}");
                 var saat = Stopwatch.StartNew();
@@ -225,7 +352,7 @@ public sealed class OynaticiSuruklemeTests
                 HamFare(window, RawPointerEventType.Move, tutma + new Vector(40, 30), RawInputModifiers.LeftMouseButton);
                 DenetimSurucu.Wait(view, 0.1);
                 HamFare(window, RawPointerEventType.LeftButtonUp, tutma + new Vector(40, 30), RawInputModifiers.None);
-                var yerel = view.Trace.Contains("movedrag -> " + PlayerView.NativeMode);
+                var yerel = view.Trace.Contains("movedrag -> native");
                 body.AppendLine("iz: " + string.Join(" | ", view.Trace));
                 body.AppendLine($"ham surukleme: yerel tasima {yerel}, kendi dongu {view.WindowDragging}, {saat.ElapsedMilliseconds} ms");
                 if (!yerel || view.WindowDragging) hatalar.Add("ham surukleme yerel tasimaya gitmedi");

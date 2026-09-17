@@ -321,6 +321,16 @@ public sealed class LanguageTests : IDisposable
     private static readonly Regex CsLiteral = new("(?<interpolated>\\$)?\"(?<body>(?:[^\"\\\\\n]|\\\\.)*)\"", RegexOptions.Compiled);
     private static readonly Regex CsWord = new(@"\p{L}{3,}", RegexOptions.Compiled);
 
+    /// <summary>
+    /// <c>_trace.Add(...)</c> satırları taramanın dışında. İz dizgesi ekrana çıkmaz, çeviriye
+    /// girmez ve dili sabittir: testin okuduğu makine kaydı. Muafiyet <b>çağrıya</b> göre, ada
+    /// göre değil; iz metni bölünerek gizlenmesin diye açıkça burada duruyor. Taranan dosyada
+    /// başka bir yerdeki cümle etkilenmez.
+    /// </summary>
+    private static readonly Regex TraceCall = new(@"^[^\r\n]*_trace\.Add\([^\r\n]*\r?$", RegexOptions.Compiled | RegexOptions.Multiline);
+
+    private static string StripTraceCalls(string source) => TraceCall.Replace(source, string.Empty);
+
     public static TheoryData<string> ScannedCode()
     {
         var app = Path.Combine(TipSources.Root, "src", "VidShrink.App");
@@ -339,7 +349,7 @@ public sealed class LanguageTests : IDisposable
     {
         var app = Path.Combine(TipSources.Root, "src", "VidShrink.App");
         var relative = Path.GetRelativePath(app, path);
-        var source = StripInterpolations(Strip(File.ReadAllText(path)));
+        var source = StripInterpolations(StripTraceCalls(Strip(File.ReadAllText(path))));
         var stray = new List<string>();
 
         foreach (Match match in CsLiteral.Matches(source))
