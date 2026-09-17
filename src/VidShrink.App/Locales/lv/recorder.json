@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg beidza darbu ar kodu {0}.",
   "recorder.error.no-ffmpeg": "{0} netika atrasts.",
   "recorder.error.invalid": "Šie iestatījumi neļauj veikt ierakstīšanu: {0}",
+  "recorder.error.window-wayland": "Loga ierakstīšana Wayland sesijā netiek atbalstīta; izvēlieties ekrānu vai apgabalu vai piesakieties X11 sesijā.",
+  "recorder.error.window-missing": "Logs “{0}” netika atrasts; atsvaidziniet sarakstu un izvēlieties to vēlreiz.",
   "recorder.error.number": "{0} jābūt skaitlim.",
   "recorder.error.start": "Ierakstīšanu nevarēja sākt: {0}",
   "recorder.error.folder": "Mapi nevarēja izvēlēties: {0}",
