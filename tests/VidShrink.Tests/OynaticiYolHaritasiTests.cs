@@ -314,15 +314,16 @@ public sealed class OynaticiYolHaritasiTests
             cmbTema.SelectedIndex = once;
             DenetimSurucu.Wait(view, 0.2);
 
-            var tumu = cocuklar.Single(c => ReferenceEquals(c.Tag, Keymap.Settings));
-            tumu.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent) { Source = tumu });
-            DenetimSurucu.Wait(view, 0.2);
-            body.AppendLine($"tum ayarlar tiklandi: sekme ayarlar {ReferenceEquals(window.Tabs.SelectedItem, window.TabSettings)}");
-            var sekmeAcildi = ReferenceEquals(window.Tabs.SelectedItem, window.TabSettings);
+            var sekmeyeGiden = cocuklar.Count(c => ReferenceEquals(c.Tag, Keymap.Settings));
+            var kisayollar = cocuklar.SingleOrDefault(c => (string?)c.Header == Strings.Get("settings.player-shortcuts.title"));
+            var kisayolSatiri = kisayollar?.Items.OfType<MenuItem>().Count() ?? 0;
+            body.AppendLine($"sekmeye giden satir {sekmeyeGiden}; kisayollar alt menusu {kisayollar is not null}, satir {kisayolSatiri}, tablo {Keymap.Rows.Count(r => !ReferenceEquals(r.Action, Keymap.Settings))}");
 
             window.Close();
             Assert.True(temaTutti, "tema satiri ayarlar kutusunu degistirmedi");
-            Assert.True(sekmeAcildi, "tum ayarlar satiri ayarlar sekmesini acmadi");
+            Assert.Equal(0, sekmeyeGiden);
+            Assert.NotNull(kisayollar);
+            Assert.Equal(Keymap.Rows.Count(r => !ReferenceEquals(r.Action, Keymap.Settings)), kisayolSatiri);
             return 0;
         });
         }

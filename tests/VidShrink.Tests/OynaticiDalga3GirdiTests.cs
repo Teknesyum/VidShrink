@@ -221,6 +221,89 @@ public sealed class OynaticiDalga3GirdiTests
         Assert.True(File.Exists(sonuc.goruntu), sonuc.rapor);
     }
 
+    /// <summary>
+    /// P3: ham sağ tık menüyü açar, ham ok ve Enter Ayarlar › Gelişmiş › Görüntü ›
+    /// Taramalı görüntüyü düzelt satırına iner ve anahtarı çevirir; değer libmpv'den
+    /// okunur. Aynı alt menüde sekmeye götüren satır bulunmaz.
+    /// </summary>
+    [Fact]
+    public void P3HamSagTikVeOklarlaMenudenAyarDegisirMotordanOkunur()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        var body = new StringBuilder();
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var view = DenetimSurucu.Ac(clip, out var window);
+                window.Show();
+                DenetimSurucu.Wait(view, 0.3);
+                DenetimSurucu.Duraklat(view);
+                var motor = DenetimSurucu.Motor(view);
+                body.AppendLine($"once: deinterlace {motor.GetProperty("deinterlace")}, ayar {view.Advanced.Picture.Deinterlace}");
+
+                var onceki = Acilirlar();
+                var yuzey = Merkez(window, view);
+                Fareyle(window, RawPointerEventType.Move, yuzey, RawInputModifiers.None);
+                Fareyle(window, RawPointerEventType.RightButtonDown, yuzey, RawInputModifiers.RightMouseButton);
+                Fareyle(window, RawPointerEventType.RightButtonUp, yuzey, RawInputModifiers.None);
+
+                var bilinen = new List<PopupRoot>(onceki);
+                PopupRoot Inis(string baslik, Key ac)
+                {
+                    PopupRoot? kok = null;
+                    DenetimSurucu.Pump(view, () => (kok = AcikMenu(bilinen, baslik)) is not null, 5);
+                    Assert.True(kok is not null, baslik + " satiri tasiyan menu acilmadi" + Environment.NewLine + body);
+                    DenetimSurucu.Wait(view, 0.2);
+                    var satir = kok!.GetVisualDescendants().OfType<MenuItem>().First(m => Equals(m.Header, baslik));
+                    var tur = 0;
+                    for (; tur < 80 && !satir.IsSelected; tur++)
+                    {
+                        Tus(kok, Key.Down);
+                        DenetimSurucu.Wait(view, 0.02);
+                    }
+                    body.AppendLine($"'{baslik}': asagi ok {tur}, secili {satir.IsSelected}, tus {ac}");
+                    Assert.True(satir.IsSelected, baslik + " okla secilemedi" + Environment.NewLine + body);
+                    bilinen.Add(kok);
+                    var klavye = typeof(KeyboardDevice).GetProperty("Instance", Her)!.GetValue(null)!;
+                    foreach (var olay in new[] { RawKeyEventType.KeyDown, RawKeyEventType.KeyUp })
+                    {
+                        TopLevel hedef = typeof(TopLevel).GetProperty("PlatformImpl", Her)!.GetValue(kok) is null ? window : kok;
+                        Ham(hedef, (RawInputEventArgs)Yeni(typeof(RawKeyEventArgs), klavye, (ulong)Environment.TickCount64, Kok(hedef), olay, ac, RawInputModifiers.None, PhysicalKey.None, null, KeyDeviceType.Keyboard));
+                    }
+                    DenetimSurucu.Wait(view, 0.2);
+                    return kok;
+                }
+
+                Inis(Strings.Get("main.player.menu.settings"), Key.Right);
+                var ayarMenusu = Inis(Strings.Get("player.advanced.menu"), Key.Right);
+                var basliklar = ayarMenusu.GetVisualDescendants().OfType<MenuItem>().Select(m => m.Header as string).ToList();
+                body.AppendLine("ayarlar alt menusu: " + string.Join(" | ", basliklar));
+                Assert.Contains(Strings.Get("settings.player-shortcuts.title"), basliklar);
+                Assert.DoesNotContain(ayarMenusu.GetVisualDescendants().OfType<MenuItem>(), m => ReferenceEquals(m.Tag, Keymap.Settings));
+
+                Inis(Strings.Get("player.advanced.picture"), Key.Right);
+                Inis(Strings.Get("player.advanced.deinterlace"), Key.Enter);
+                DenetimSurucu.Pump(view, () => view.Advanced.Picture.Deinterlace, 3);
+                DenetimSurucu.Wait(view, 0.3);
+
+                var okunan = motor.GetProperty("deinterlace");
+                body.AppendLine($"sonra: deinterlace {okunan}, motor ayari {motor.Picture.Deinterlace}, gorunum {view.Advanced.Picture.Deinterlace}");
+                Assert.Equal("yes", okunan);
+                Assert.True(motor.Picture.Deinterlace);
+
+                view.ResetPicture();
+                view.Close();
+                window.Close();
+                return 0;
+            });
+        }
+        finally
+        {
+            Kanit("p3-ham-menu-ayar.txt", body.ToString());
+        }
+    }
+
     [Fact]
     public void GoruntuKlasoruSecimIptalindeAyarDegismez()
     {
