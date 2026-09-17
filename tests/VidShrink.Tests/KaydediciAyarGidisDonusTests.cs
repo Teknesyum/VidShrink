@@ -20,6 +20,7 @@ public sealed class KaydediciAyarGidisDonusTests
     private static readonly Dictionary<string, object> Kisitli = new()
     {
         ["CountdownSeconds"] = 5,
+        ["ReplaySeconds"] = 120,
         ["WebcamWidth"] = 480,
         ["RegionAspect"] = "4:3",
         ["PixelFormat"] = "yuv444p10le",

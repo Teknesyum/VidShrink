@@ -215,6 +215,8 @@ public sealed record RecorderRequest
     public AudioCapturePlan? Audio { get; init; }
 
     public RecorderWebcam? Webcam { get; init; }
+
+    public string? PreviewPath { get; init; }
 }
 
 public enum WebcamCorner
@@ -611,6 +613,7 @@ public static class RecorderArguments
         errors.AddRange(LimitErrors(request));
         errors.AddRange(GifErrors(request));
         errors.AddRange(WebcamErrors(request));
+        errors.AddRange(PreviewErrors(request));
 
         if (request.Target == RecorderTargetKind.Window)
             errors.AddRange(WindowErrors(request));
@@ -890,7 +893,36 @@ public static class RecorderArguments
             a.AddRange(new[] { "-movflags", "+faststart" });
 
         a.Add(outputPath);
+        a.AddRange(PreviewArgs(request));
         return a;
+    }
+
+    public const int PreviewWidth = 320;
+
+    public const int PreviewFps = 1;
+
+    public static IReadOnlyList<string> PreviewArgs(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (string.IsNullOrWhiteSpace(request.PreviewPath)) return Array.Empty<string>();
+
+        var filter = $"fps={PreviewFps},scale={PreviewWidth}:-2";
+        if (request is { Platform: RecorderPlatform.MacOs, Target: RecorderTargetKind.Region, Region: { } region })
+            filter = $"crop={Number(region.Width)}:{Number(region.Height)}:{Number(region.X)}:{Number(region.Y)}," + filter;
+        var a = new List<string> { "-map", "0:v", "-vf", filter, "-an" };
+        if (request.MaxDuration is { } limit)
+            a.AddRange(new[] { "-t", limit.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
+        a.AddRange(new[] { "-f", "image2", "-update", "1", "-q:v", "6", request.PreviewPath! });
+        return a;
+    }
+
+    private static IEnumerable<string> PreviewErrors(RecorderRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.PreviewPath)) yield break;
+        if (!string.Equals(Path.GetExtension(request.PreviewPath), ".jpg", StringComparison.OrdinalIgnoreCase))
+            yield return "The live preview image must be a .jpg file.";
+        if (request.MaxMegabytes is not null)
+            yield return "The live preview cannot run with a size limit: ffmpeg keeps the preview output open after -fs closes the recording.";
     }
 
     /// <summary>

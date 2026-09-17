@@ -67,6 +67,10 @@ internal sealed class RecorderSettings
 
     internal bool ShowMagnifier { get; set; }
 
+    internal bool LivePreview { get; set; }
+
+    internal int ReplaySeconds { get; set; } = ReplayBuffer.DefaultSeconds;
+
     internal RecorderTargetKind Target { get; set; } = RecorderTargetKind.Screen;
 
     internal string? WindowTitle { get; set; }
@@ -233,6 +237,8 @@ internal sealed class RecorderSettings
             settings.ClickSound = (bool?)root["clickSound"] ?? false;
             settings.ShowKeys = (bool?)root["showKeys"] ?? false;
             settings.ShowMagnifier = (bool?)root["showMagnifier"] ?? false;
+            settings.LivePreview = (bool?)root["livePreview"] ?? false;
+            if ((int?)root["replaySeconds"] is { } replay && Array.IndexOf(ReplayBuffer.SecondsChoices, replay) >= 0) settings.ReplaySeconds = replay;
             if (Enum.TryParse<RecorderTargetKind>((string?)root["target"], true, out var target)) settings.Target = target;
             settings.WindowTitle = (string?)root["windowTitle"];
             settings.RegionX = (int?)root["regionX"] ?? 0;
@@ -320,6 +326,8 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("clickSound", ClickSound);
                 writer.WriteBoolean("showKeys", ShowKeys);
                 writer.WriteBoolean("showMagnifier", ShowMagnifier);
+                writer.WriteBoolean("livePreview", LivePreview);
+                writer.WriteNumber("replaySeconds", ReplaySeconds);
                 writer.WriteString("target", Target.ToString());
                 if (WindowTitle is null) writer.WriteNull("windowTitle");
                 else writer.WriteString("windowTitle", WindowTitle);

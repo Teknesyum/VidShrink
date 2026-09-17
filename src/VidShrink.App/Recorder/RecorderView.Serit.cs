@@ -102,7 +102,7 @@ internal partial class RecorderView
     /// </summary>
     internal async Task StartAsync()
     {
-        if (_session is not null || CountingDown) return;
+        if (_session is not null || CountingDown || ReplayRunning) return;
 
         ClearMessages();
 
@@ -127,6 +127,7 @@ internal partial class RecorderView
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? _settings.ResolveFolder());
+            PreparePreview(request.PreviewPath);
             _session = await RecorderSession.StartAsync(
                 request, path, new Progress<RecordProgress>(ShowProgress));
             _frameRegion = RegionOf(request);
@@ -280,7 +281,8 @@ internal partial class RecorderView
 
         var counting = CountingDown;
 
-        BtnStart.IsVisible = _session is null && !counting;
+        BtnStart.IsVisible = _session is null && !counting && !ReplayRunning;
+        SyncReplayButtons(_session is null && !counting);
         BtnCountdownCancel.IsVisible = counting;
         BtnPause.IsVisible = running;
         BtnSnapshot.IsVisible = running;
@@ -294,6 +296,7 @@ internal partial class RecorderView
             : Say("recorder.strip.idle");
 
         SyncFrame();
+        SyncPreview(running);
         SyncInput(_session is not null);
         SyncTray();
         RefreshMini();

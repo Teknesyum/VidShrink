@@ -27,7 +27,7 @@ internal partial class RecorderView
                  })
             box.SelectionChanged += (_, _) => PersistChoices();
 
-        foreach (var check in new[] { ChkCursor, ChkOpenFolder, ChkShowClicks, ChkClickSound, ChkShowKeys, ChkMagnifier, ChkNoiseGate, ChkNoiseSuppression })
+        foreach (var check in new[] { ChkCursor, ChkOpenFolder, ChkShowClicks, ChkClickSound, ChkShowKeys, ChkMagnifier, ChkLivePreview, ChkNoiseGate, ChkNoiseSuppression })
             check.IsCheckedChanged += (_, _) => PersistChoices();
 
         _persisted = _settings.ToJson();

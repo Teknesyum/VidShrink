@@ -68,6 +68,13 @@ sürümden (`x.0.0`) önce koşar.
   ölçekle tek `-filter_complex`, dört köşe, geçersiz aygıt/genişlik/köşe reddi; sahte `CameraSource` ile kutu → json →
   istek. `[KameraFact]` OBS Virtual Camera varsa 3 sn kayıt, köşe parlaklığı karşı köşeyle kıyaslanır (CI'da atlanır).
   Büyüteç: saf yerleşim, gerçek pencere `Follow`, sahte `IMagnifier` ile yalnız kayıtta açılma. Kanıt `.calisma/paket-2/`.
+- Paket 2b kaydedici sınıfları, kanıt `.calisma/paket-2b/<konu>/`: `KayitOdakTakibiTests` (T7, "Kaydı izle" açıkken biten kayıt
+  küçültme ve oynatıcıya sekme değişmeden yüklenir; kapalıyken yüklenmez, `VIDSHRINK_LIBMPV` ister), `KaydediciAyarGidisDonusTests`
+  (yansımayla her `RecorderSettings` özelliği diske gidip aynı döner; kapalı kümeli ayar `Kisitli` tablosunda),
+  `KaydediciArkaPlanTests` (kamera arka planı `backgroundkey`/`chromakey`, lavfi bileşik karesinin pikseli),
+  `BoslukKirpmaTests` (`freezedetect` + `trim/concat`, 6 sn kayıt 3,8 sn olur, donuksuz kayda dokunulmaz),
+  `KaydediciOnizlemeTests` (ikinci çıkış `image2 -update 1` 320 px jpg, boyut sınırıyla red, bozuk kare eski resmi korur),
+  `KaydediciTamponTests` (2 sn `segment_wrap` parçaları, 4 sn tampon 9 sn döner, kaydedilen ≤6,5 sn; F11 sahte `IReplayBuffer`).
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

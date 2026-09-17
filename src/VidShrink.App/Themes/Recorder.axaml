@@ -36,6 +36,8 @@
                                  40 + 8 + 40 + 16 = 268, SpaceMd katına yuvarlanınca
                                  276. Yani kenar payı, nokta, sayaç, üç düğme ve
                                  aralarındaki SpaceSm boşluklar.
+      RecorderPreviewWidth    <- RecorderArguments.PreviewWidth (320). Canlı önizleme
+                                 karesi ffmpeg'in yazdığı boyutta, ölçeklenmeden çizilir.
   -->
 
   <Thickness x:Key="RecorderStripPadding">16,8</Thickness>
@@ -48,6 +50,7 @@
   <x:Double x:Key="RecorderMiniHeight">56</x:Double>
   <x:Double x:Key="RecorderMiniReadoutWidth">72</x:Double>
   <x:Double x:Key="RecorderMiniMinWidth">276</x:Double>
+  <x:Double x:Key="RecorderPreviewWidth">320</x:Double>
 
   <Thickness x:Key="RecorderFrameBorder">2</Thickness>
   <x:Double x:Key="RecorderFrameThickness">2</x:Double>
