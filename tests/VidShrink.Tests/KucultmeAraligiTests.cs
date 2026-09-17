@@ -163,7 +163,7 @@ public class KucultmeAraligiTests
         var seeks = args.Select((value, index) => (value, index)).Where(pair => pair.value == "-ss").Select(pair => pair.index).ToList();
 
         Assert.Equal(40, seeks.Sum(index => Value(args, index)), 3);
-        Assert.Single(seeks.Where(index => index > input));
+        Assert.Single(seeks, index => index > input);
         Assert.Equal(30, Value(args, args.IndexOf("-t")), 3);
         Assert.Equal("copy", args[args.IndexOf("-c") + 1]);
         Assert.Equal("-1", args[args.IndexOf("-map_chapters") + 1]);
