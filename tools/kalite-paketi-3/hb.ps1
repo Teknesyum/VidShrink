@@ -22,7 +22,8 @@ param(
     [string]$EkranUzun = '',
     [int]$UzunSure = 120,
     [string]$Hedefler = '10,25,50,100',
-    [string]$Onayarlar = ''
+    [string]$Onayarlar = '',
+    [double]$DengeliOran = 3.0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -1383,7 +1384,7 @@ function KaranlikGecis {
             $ok = IkiOkuma $girdi $u.Dosya
             foreach ($k in $ok.Keys) { $ek[$k] = $ok[$k] }
             if ($karanlik) { $ek.cambi_hukmu = if ($null -ne $ek.cambi_ii -and $ek.cambi_ii -le 7.5) { 'gecti' } else { 'kaldi' } }
-            $script:kgUrun = [pscustomobject]@{ Kbps = (Kbps $u.Dosya); Sn = $u.KodlamaSn; Toplam = $u.ToplamSn; Md5 = $ek.md5; Vmaf = $ek.vmafneg_ort_ii; Xpsnr = $ek.xpsnr_ii }
+            $script:kgUrun = [pscustomobject]@{ Kbps = (Kbps $u.Dosya); Sn = $u.KodlamaSn; Toplam = $u.ToplamSn; Md5 = $ek.md5; Vmaf = $ek.vmafneg_ort_ii; Xpsnr = $ek.xpsnr_ii; Cambi = $ek.cambi_ii; Kodlayici = $u.Kodlayici }
             Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'urun-otomatik'; istenen_kbit = $kbit }) ([ordered]@{ bayt = (Get-Item $u.Dosya).Length; kbps = $script:kgUrun.Kbps }) $ek
             Remove-Item $u.Dosya
         }
@@ -1420,6 +1421,35 @@ function KaranlikGecis {
             $ek.sure_hukmu = if ($sureOrani -le 1.5) { 'gecti' } else { 'kaldi' }
             Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'handbrake-x265'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 x265 slow 2 gecis turbo' }) ([ordered]@{ bayt = (Get-Item $c).Length; kbps = $h.Kbps }) $ek
             Remove-Item $c
+        }
+        Dene $Kesit 'urun-dengeli' $kbit {
+            $ad = "kg-$Kesit-$kbit-dengeli"
+            $kaynakMb = [math]::Round($mb * $DengeliOran, 4)
+            $u = Urun $girdi $mb $ad -Ek @('--source-mb', $kaynakMb.ToString('0.####', $Inv))
+            $ek = UrunOrtak $u $mb
+            foreach ($p in (KaynakBasligi (Join-Path $Cikti "$ad.log")).GetEnumerator()) { $ek[$p.Key] = $p.Value }
+            $ek.kaynak_mb = $kaynakMb
+            $ek.rejim_orani = $DengeliOran
+            $ek.beklenen_rejim = 'Balanced'
+            $ek.beklenen_kodek = 'libx264'
+            $ek.kodek_hukmu = if ($u.Kodlayici -eq 'libx264' -and $u.Komut -like '*libx264*') { 'gecti' } else { 'kaldi' }
+            $ek.md5 = AkisMd5 $u.Dosya
+            $ok = IkiOkuma $girdi $u.Dosya
+            foreach ($k in $ok.Keys) { $ek[$k] = $ok[$k] }
+            $ek.cambi_tavan = 7.5
+            $ek.genisleme_kapisi = if ($null -eq $ek.cambi_ii) { 'olculemedi' } elseif ($ek.cambi_ii -gt 7.5) { 'genislet' } else { 'kalsin' }
+            if ($script:kgUrun) {
+                $ek.x265_kodlayici = $script:kgUrun.Kodlayici
+                if ($null -ne $script:kgUrun.Cambi -and $null -ne $ek.cambi_ii) { $ek.x265_eksi_dengeli_cambi = [math]::Round($script:kgUrun.Cambi - $ek.cambi_ii, 4) }
+                if ($null -ne $script:kgUrun.Vmaf -and $null -ne $ek.vmafneg_ort_ii) { $ek.x265_eksi_dengeli_vmafneg = [math]::Round($script:kgUrun.Vmaf - $ek.vmafneg_ort_ii, 4) }
+                if ($null -ne $script:kgUrun.Xpsnr -and $null -ne $ek.xpsnr_ii) { $ek.x265_eksi_dengeli_xpsnr = [math]::Round($script:kgUrun.Xpsnr - $ek.xpsnr_ii, 4) }
+                if ($u.KodlamaSn) {
+                    $ek.x265_bolu_dengeli_sure = [math]::Round($script:kgUrun.Sn / $u.KodlamaSn, 3)
+                    $ek.genisleme_sure_hukmu = if ($ek.x265_bolu_dengeli_sure -le 2.0) { 'gecti' } else { 'kaldi' }
+                }
+            }
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'urun-dengeli'; istenen_kbit = $kbit }) ([ordered]@{ bayt = (Get-Item $u.Dosya).Length; kbps = (Kbps $u.Dosya) }) $ek
+            Remove-Item $u.Dosya
         }
     }
 }

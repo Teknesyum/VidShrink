@@ -11,6 +11,9 @@ on:
       kesitler:
         description: handbrake isinin kesitleri
         default: karanlik,parlak,hareketli,ekran
+      kesit_filtre:
+        description: Bos degilse tum islerin kesitleri bu listeyle kesisir
+        default: ''
       vt:
         description: macos-15 uzerinde VideoToolbox kiyasi
         type: boolean
@@ -99,6 +102,12 @@ jobs:
             $ks = $harita[$is]
             if ($ayrinti -match '"Duman"' -and $is -ne 'handbrake') { $ks = @($ks | Select-Object -Last 1) }
             foreach ($k in $ks) { $liste += @{ is = $is; kesit = $k } }
+          }
+          $filtre = @('${{ inputs.kesit_filtre }}'.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+          if ($filtre.Count -gt 0) {
+            $liste = @($liste | Where-Object { $_.kesit -in $filtre })
+            if ($liste.Count -eq 0) { throw "kesit_filtre hicbir kesitle eslesmedi: $($filtre -join ',')" }
+            Write-Host "kesit_filtre=$($filtre -join ',')"
           }
           $vtIsler = @()
           if (('${{ github.event_name }}' -eq 'push' -and ($isler -split ',') -contains 'vt') -or ('${{ github.event_name }}' -ne 'push' -and '${{ inputs.vt }}' -eq 'true')) { $vtIsler += 'vt' }
