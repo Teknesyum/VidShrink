@@ -36,7 +36,7 @@ release — that is the whole process.
 ## Four Tools, One Window
 
 **Shrink** — a target size in megabytes, and a video that lands just under it. Chips for
-the sizes people actually need (8 for Discord, 16 for WhatsApp, 25 for Gmail, 180 for
+the sizes people actually need (8 for strict e-mail gateways, 16 for WhatsApp, 25 for Gmail, 180 for
 WhatsApp Web) and a slider for everything else. Twelve encoders — software, NVENC, Quick
 Sync, AMF — each [probed on your own machine](docs/olcumler/kodek-matris.md) first.
 
@@ -155,8 +155,8 @@ required; it cannot be the watched folder. `--aralik <seconds>` sets the scan in
 (default 2), `--bir-kez` exits once nothing is left to wait for, and the other `kucult`
 options apply to each file. With `--json`, stdout is NDJSON: one compact JSON object per file.
 
-A file is taken only when its size and modification time stay the same over two consecutive
-scans and no writer holds it. If the source changes while it is being encoded, the output is
+A file is taken only when its size and modification time stay the same over two consecutive scan
+intervals - the third scan takes it - and no writer holds it. If the source changes while it is being encoded, the output is
 deleted and the file is picked up again once it settles.
 
 Progress is kept in `.vidshrink-izle.json` inside the watched folder, by name and size; a

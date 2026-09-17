@@ -1,6 +1,6 @@
 # A3 İzle Denetim Düzeltmesi
 
-Dal `t0/hb-a3-izle`. Kaynak: denetim notu (KRİTİK yardım tekrarı, ORTA 1-5, DÜŞÜK).
+Dal `t0/hb-a3-izle`. Kaynak: `docs/danisma/2026-09-17-a3-izle-denetim.md` (iki denetim turunun bulguları).
 
 1. `Cli/Locales/en.json`, `tr.json`: yardım tek kez; `CliTests` her satırı tam bir kez sayar. Çıkış kodu 4, `--cikti` klasör, NDJSON.
 2. `Core/WatchFolder.cs`: iki ardışık aralıkta sabit damga; kodlama başı/sonu damga kıyası, değişince çıktı silinir;
@@ -9,6 +9,19 @@ Dal `t0/hb-a3-izle`. Kaynak: denetim notu (KRİTİK yardım tekrarı, ORTA 1-5, 
 3. `Cli/CliApp.cs`, `CliRequest.cs`: durum yeri, `--bir-kez` hata kodu 4, yeni olay mesajları, satır başına JSON.
 4. `tests/WatchFolderTests.cs`: Ctrl+C 130, salt okunur iki koşu, büyüyen dosya, yeniden deneme, eleme günlüğü.
 5. `README.md`: izle belgesi.
+# Ön Ayar Kütüphanesi — HandBrake A2
+
+Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 42-45.
+
+1. **Tek tablo.** `src/VidShrink.Core/Presets/platformlar.json` gömülü kaynak; yonga planları (`MainWindow.ChipPlans`)
+   buradan okunur. Discord/Telegram/e-posta platformları ve cihaz profilleri aynı tabloya, her değerin kaynağı
+   `docs/olcumler/onayar-kaynaklari.md`.
+2. **Kullanıcı ön ayarı.** `PresetLibrary` şema sürümlü kaydet/içe/dışa aktar; ayar klasörü `VIDSHRINK_SETTINGS_PATH`
+   ile aynı yer. Hata kodu + 42 dilde `main.preset.error.*`.
+3. **HandBrake çevirisi.** `HandBrakePresetImport`: taşınan/yaklaşık/düşen alan notları, `main.preset.handbrake.*`.
+4. **Testler.** `OnAyarKutuphanesiTests`, `KullaniciOnAyarTests`, `HandBrakeOnAyarCeviriTests`; her kol negatif kontrol
+   ve mutasyon.
+
 # Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
 
 Dal `t0/yol-c-kaydedici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 2., 6., 7. bölüm (9-11).
@@ -51,6 +64,8 @@ Dal `t0/karanlik-x265`. Karar: `docs/danisma/2026-09-17-karanlik-x265-fable.md`.
 4. **CI kabulü.** `hb.ps1 -Is karanlikgecis`: urun-otomatik vs main bench vs HandBrake; CAMBI(ii) ≤7,5,
    süre ≤1,5× HB, karanlık dışı libsvtav1 ve main ile eş.
 5. **Belge.** `docs/kullanim.md` kodek ipucu.
+6. **Açıklar (dal `t0/karanlik-acik`).** Strateji önerisinin kodeği geçişi izler; HDR (PQ/HLG)
+   kaynakta geçiş yok; luma kolu bölünmüş sonda sürecine katıldı (ayrı üç ffmpeg süreci gitti).
 
 # HandBrake Dalga 2 — Ölçülen Açıklar
 

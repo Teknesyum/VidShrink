@@ -103,8 +103,11 @@ public sealed class WatchFolder
     public int PendingCount => _pending.Count;
     public int FailedCount { get; private set; }
 
+    public static StringComparison ComparisonFor(bool windows, bool mac)
+        => windows || mac ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+
     public static StringComparison PathComparison
-        => OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        => ComparisonFor(OperatingSystem.IsWindows(), OperatingSystem.IsMacOS());
 
     public static string? ValidateFolders(string watchDirectory, string outputDirectory, StringComparison? comparison = null)
     {

@@ -243,12 +243,42 @@ public sealed class WatchFolderTests
         Assert.Equal(rejected ? "error.watch-same-output" : null, WatchFolder.ValidateFolders(watch, output));
     }
 
-    [Fact]
-    public void KlasorKiyasiLinuxtaHarfDuyarli()
+    [Theory]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, true)]
+    [InlineData(false, false, false)]
+    public void HarfFarkliKlasorWindowsVeMacOstaAyniSayiliyorLinuxtaSayilmiyor(bool windows, bool mac, bool rejected)
     {
-        Assert.Null(WatchFolder.ValidateFolders(@"C:\izle\Gelen", @"C:\izle\gelen", StringComparison.Ordinal));
-        Assert.Equal("error.watch-same-output", WatchFolder.ValidateFolders(@"C:\izle\Gelen", @"C:\izle\gelen", StringComparison.OrdinalIgnoreCase));
-        Assert.Equal(OperatingSystem.IsLinux() ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase, WatchFolder.PathComparison);
+        var comparison = WatchFolder.ComparisonFor(windows, mac);
+        Assert.Equal(rejected ? "error.watch-same-output" : null,
+            WatchFolder.ValidateFolders(@"C:\izle\Gelen", @"C:\izle\gelen", comparison));
+        Assert.Null(WatchFolder.ValidateFolders(@"C:\izle\Gelen", @"C:\izle\giden", comparison));
+    }
+
+    [Fact]
+    public void VarsayilanKiyasBuIsletimSistemininKuraliniKullaniyor()
+    {
+        Assert.Equal(WatchFolder.ComparisonFor(OperatingSystem.IsWindows(), OperatingSystem.IsMacOS()), WatchFolder.PathComparison);
+        Assert.Equal(OperatingSystem.IsLinux() ? null : "error.watch-same-output",
+            WatchFolder.ValidateFolders(@"C:\izle\Gelen", @"C:\izle\gelen"));
+    }
+
+    [Fact]
+    public void DurumDosyasiGecicidenAtomikTasinmaylaDegisiyorGeciciGerideKalmiyor()
+    {
+        var dir = Path.Combine(TestPaths.OutputRoot, "hb-a3-izle", $"{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        var path = Path.Combine(dir, WatchFolder.StateFileName);
+        try
+        {
+            PhysicalWatchFileSystem.Instance.WriteAllTextAtomic(path, "eski");
+            PhysicalWatchFileSystem.Instance.WriteAllTextAtomic(path, "yeni");
+
+            Assert.Equal("yeni", File.ReadAllText(path));
+            Assert.Equal(new[] { path }, Directory.GetFiles(dir));
+            Assert.Empty(Directory.GetFiles(dir, "*.tmp"));
+        }
+        finally { Directory.Delete(dir, true); }
     }
 
     [Fact]
@@ -562,7 +592,8 @@ public sealed class WatchFolderTests
             Assert.Contains("izle", strings["help"], StringComparison.Ordinal);
             Assert.Contains("--bir-kez", strings["help"], StringComparison.Ordinal);
             Assert.Contains("NDJSON", strings["help"], StringComparison.Ordinal);
-            Assert.Contains("  4   izle --bir-kez", strings["help"], StringComparison.Ordinal);
+            Assert.Equal(4, ExitCodes.WatchFailures);
+            Assert.Contains($"  {ExitCodes.WatchFailures}   izle --bir-kez", strings["help"], StringComparison.Ordinal);
             Assert.Contains(WatchFolder.StateFileName, strings["help"], StringComparison.Ordinal);
         }
     }
@@ -614,7 +645,7 @@ public sealed class WatchFolderTests
         var exit = await CliApp.RunAsync(new[] { "izle", Root, "--cikti", Out, "--hedef", "1", "--olcumsuz", "--bir-kez" },
             new StringWriter(), stderr, CliText.ForLanguage("en"), FakeServices(fs, new FakeClock()), CancellationToken.None);
 
-        Assert.Equal(ExitCodes.WatchFailures, exit);
+        Assert.Equal(4, exit);
         var statePath = Path.Combine(Out, $".vidshrink-izle-{WatchFolder.StateKey(Root)}.json");
         Assert.Contains(CliText.ForLanguage("en").Format("watch.state-elsewhere", statePath), stderr.ToString(), StringComparison.Ordinal);
         var entry = Assert.Single(WatchFolder.LoadState(fs, statePath, T0).State.Processed);
@@ -675,7 +706,7 @@ public sealed class WatchFolderTests
             var exit = await CliApp.RunAsync(new[] { "izle", watch, "--cikti", output, "--hedef", "1", "--olcumsuz", "--bir-kez" },
                 new StringWriter(), stderr, CliText.ForLanguage("en"), services, CancellationToken.None);
 
-            Assert.Equal(ExitCodes.WatchFailures, exit);
+            Assert.Equal(4, exit);
             Assert.Equal(new[] { "a.mp4", "b.mp4" }, probed);
             Assert.True(Directory.Exists(output));
             var load = WatchFolder.LoadState(PhysicalWatchFileSystem.Instance, Path.Combine(watch, WatchFolder.StateFileName), T0);
