@@ -112,6 +112,8 @@ public sealed class EncodePlan
     [JsonPropertyName("reason")] public string Reason { get; set; } = "";
     [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();
     [JsonIgnore] public bool TurboFirstPass { get; set; }
+    [JsonIgnore] public StreamPlan? Streams { get; set; }
+    [JsonIgnore] public double NonVideoK => Streams?.SideK ?? AudioBitrateK;
 
     /// <summary>
     /// Plandaki kodlayıcı <b>ölçülmemiş</b> bir adaydan geldi: yoklama henüz cevap

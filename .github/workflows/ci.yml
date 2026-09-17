@@ -68,17 +68,17 @@ jobs:
             exit 1
           }
           Add-Content -Path $env:GITHUB_PATH -Value $bin
-      - name: libmpv kur (shinchiro mpv-winbuild-cmake 20260903, sabit sha256)
+      - name: libmpv kur (deps-libmpv-20260903 surumu, yedek shinchiro, sabit sha256)
         run: |
           $ErrorActionPreference = 'Stop'
-          $url = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+          $url = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
           $expectedSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
           $expectedDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
-          $mirrorUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/libmpv-mirror/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+          $fallbackUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
           $archive = Join-Path $env:RUNNER_TEMP 'mpv-dev.7z'
 
           $actual = $null
-          foreach ($source in @($url, $mirrorUrl)) {
+          foreach ($source in @($url, $fallbackUrl)) {
             try {
               Invoke-WebRequest -Uri $source -OutFile $archive
             } catch {
@@ -141,5 +141,6 @@ jobs:
             .calisma/kosum-sonuc/**
             .calisma/oynatici-motor/**
             !.calisma/oynatici-motor/**/*.mp4
+            .calisma/oynatici-yol-haritasi/**
           if-no-files-found: ignore
           retention-days: 7

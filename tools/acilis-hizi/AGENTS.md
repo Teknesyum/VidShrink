@@ -40,6 +40,15 @@ Her kosumdan once ve sonra sag tik menusu, etiketler ve iliskilendirme karsilast
 fark varsa geri yazar ve durur. `--yuk <sistem-izleme.log>`: cpu/gpu 60 ustuyse kosum
 baslamaz, kosum sonrasi cpu 80 ustuyse olcum durur.
 
+EkranSaati secenekleri (G dalgasi): `--klip -` dosyasiz bos acilis; `--bitis <isaret>`
+beklenecek iz satiri (varsayilan `ilk-kare`); `--giris-a/--giris-b baslatici|app` tarafi
+`VidShrink.exe` ya da dogrudan `app\VidShrink.App.exe` ile dogurur; `--kayit-a/--kayit-b`
+ayar sablonundaki `fileAssociationRegisteredFor` yolunu secer (varsayilan giris). Uygulama
+`ilk-boya` isaretini ilk cizilen karede yazar. Cizim A/B: `--ortam-b VIDSHRINK_CIZIM=yazilim`
+yazilim cizimini secer; `VIDSHRINK_CIZIM_OLCUMU=oynatici:7` ya da `panel:7` ilk kareden
+sonra 7 sn surec CPU'su, cizim turu ve kare sayisini `cizim-*` satirlarina yazar
+(`--bitis cizim-bitti`).
+
 **Her kosum kendi tek ornek kanalini alir** (`VIDSHRINK_INSTANCE_CHANNEL`): yoksa ikinci
 acilis yolu kosan surece iletip cikar ve olcum bos doner.
 

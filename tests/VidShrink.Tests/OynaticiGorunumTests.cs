@@ -589,12 +589,12 @@ public sealed class OynaticiGorunumTests
             string Kare() => frame.Source is Bitmap b ? $"{b.PixelSize.Width}x{b.PixelSize.Height}" : "-";
 
             var vfOnce = motor.GetProperty("vf") ?? "";
-            body.AppendLine($"once: video-rotate {motor.GetProperty("video-rotate")}, vf '{vfOnce}', kare {Kare()}");
+            body.AppendLine($"once: vf '{vfOnce}', Rotation {motor.Rotation}, kare {Kare()}");
 
             GirdiSurucu.Key(view, Key.S, KeyModifiers.Control | KeyModifiers.Shift);
             DenetimSurucu.Pump(view, () => Kare() == "180x320", 5);
-            var donme = (motor.GetProperty("video-rotate"), motor.Rotation, Kare());
-            body.AppendLine($"Ctrl+Shift+S: video-rotate {donme.Item1}, Rotation {donme.Rotation}, kare {donme.Item3}");
+            var donme = (motor.GetProperty("vf") ?? "", motor.Rotation, Kare());
+            body.AppendLine($"Ctrl+Shift+S: vf '{donme.Item1}', Rotation {donme.Rotation}, kare {donme.Item3}");
 
             GirdiSurucu.Key(view, Key.H, KeyModifiers.Control);
             var ayna = (motor.GetProperty("vf") ?? "", motor.Mirrored);
@@ -615,12 +615,15 @@ public sealed class OynaticiGorunumTests
 
         GorunumKanit.Write("dondur-aynala.txt", rapor.Item1);
         Assert.DoesNotContain("vsmirror", rapor.vfOnce);
-        Assert.Equal("90", rapor.donme.Item1);
+        Assert.DoesNotContain("vsrotate", rapor.vfOnce);
+        Assert.Contains("@vsrotate", rapor.donme.Item1);
         Assert.Equal(90, rapor.donme.Rotation);
         Assert.Equal("180x320", rapor.donme.Item3);
         Assert.Contains("vsmirror", rapor.ayna.Item1);
         Assert.True(rapor.ayna.Mirrored);
+        Assert.Contains("vsrotate", rapor.ayna.Item1);
         Assert.DoesNotContain("vsmirror", rapor.aynaKalkti.Item1);
+        Assert.Contains("vsrotate", rapor.aynaKalkti.Item1);
         Assert.False(rapor.aynaKalkti.Mirrored);
         Assert.InRange(rapor.oran.AspectOverride, 16.0 / 9 - 0.001, 16.0 / 9 + 0.001);
     }

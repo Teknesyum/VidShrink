@@ -34,7 +34,7 @@
 
   "settings.update.title": "التحديثات",
   "settings.update.auto": "التحديث تلقائياً",
-  "settings.update.auto-effect": "حين يكون هذا معطلاً، لا يحدّث VidShrink نفسه: يخبرك فقط بوجود إصدار جديد ويعرض الأمر الذي يثبته.",
+  "settings.update.auto-effect": "مطفأ افتراضيًا: يُعلَن عن الإصدار الجديد في الشريط العلوي ويُنزَّل ويُثبَّت بزر واحد. عند التفعيل، يحدّث VidShrink نفسه بصمت.",
   "settings.update.no-self-effect": "لا يحدّث VidShrink نفسه على هذا النظام: يخبرك فقط بوجود إصدار جديد ويعرض الأمر الذي يثبته.",
 
   "settings.default-app.suggestion": "VidShrink ليس البرنامج الافتراضي للفيديو. يمكنك اختياره في صفحة التطبيقات الافتراضية في Windows.",

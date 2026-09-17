@@ -24,6 +24,7 @@ public sealed class AppSettings
     public int AdvMinFps { get; set; }
     public int AdvEncoderPath { get; set; }
     public int AdvCodecLock { get; set; }
+    public bool AdvKeepTracks { get; set; }
 
     /// <summary>0 = kaynağın yanı, 1 = sabit klasör.</summary>
     public int OutputFolderMode { get; set; }
@@ -58,6 +59,7 @@ public sealed class AppSettings
             ReadInt(root, "advMinFps", value => settings.AdvMinFps = value);
             ReadInt(root, "advEncoderPath", value => settings.AdvEncoderPath = value);
             ReadInt(root, "advCodecLock", value => settings.AdvCodecLock = value);
+            ReadBool(root, "advKeepTracks", value => settings.AdvKeepTracks = value);
             ReadInt(root, "outputFolderMode", value => settings.OutputFolderMode = value);
             ReadString(root, "outputFolder", value => settings.OutputFolder = value);
             ReadString(root, "theme", value => settings.Theme = value);
@@ -118,6 +120,7 @@ public sealed class AppSettings
         root["advMinFps"] = AdvMinFps;
         root["advEncoderPath"] = AdvEncoderPath;
         root["advCodecLock"] = AdvCodecLock;
+        root["advKeepTracks"] = AdvKeepTracks;
         root["theme"] = Theme;
         root["outputFolderMode"] = OutputFolderMode;
         root["outputFolder"] = OutputFolder;

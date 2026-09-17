@@ -30,6 +30,8 @@ try
         "panel" => await PanelAsync(args),
         "play" => await PlayAsync(args),
         "bar-burst" => await CubukAtagi.RunAsync(args),
+        "psy-args" => PsyArgs(args),
+        "measure-pair" => await MeasurePairAsync(args),
         _ => Unknown(args[0])
     };
 }
@@ -54,6 +56,8 @@ static void PrintUsage()
     Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--codec-preference auto|compatible|maxcompression|fast] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench bar-burst [tekrar]");
+    Console.WriteLine("  bench psy-args <kodlayıcı>");
+    Console.WriteLine("  bench measure-pair <referans> <test> [--fps <kaynak-hızı>] [--out <json>]");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
     Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p1b,k3,p2,p3,p5,p6,p8,p9,p10,p11,p12 [--seconds 10] [--fps 60] [--runs 3] [--target 20] [--matrix klip,...]");
 }
@@ -708,7 +712,7 @@ static async Task<int> ShrinkAsync(string[] args)
         if (!string.IsNullOrWhiteSpace(forceCodec))
         {
             plan.Codec = forceCodec;
-            plan.Preset = "slow";
+            plan.Preset = forceCodec == "libsvtav1" ? "6" : "slow";
             plan.Mode = "2pass";
             plan.Crf = null;
             var hdr = HdrResolver.Resolve(info, options.HdrPolicy, plan.Codec, EncoderCapabilities.Instance);
@@ -797,6 +801,67 @@ static async Task<int> ShrinkAsync(string[] args)
     return 0;
 }
 
+static int PsyArgs(string[] args)
+{
+    if (args.Length < 2)
+    {
+        Console.Error.WriteLine("usage: bench psy-args <kodlayıcı>");
+        return 1;
+    }
+    Console.WriteLine(JsonSerializer.Serialize(FfmpegArguments.PsychovisualArgs(args[1], EncoderCapabilities.Instance)));
+    return 0;
+}
+
+static async Task<int> MeasurePairAsync(string[] args)
+{
+    if (args.Length < 3)
+    {
+        Console.Error.WriteLine("usage: bench measure-pair <referans> <test> [--out <json>]");
+        return 1;
+    }
+    string? outPath = null;
+    string? testFps = null;
+    for (var i = 3; i < args.Length; i++)
+    {
+        if (args[i] == "--out" && i + 1 < args.Length) outPath = args[++i];
+        else if (args[i] == "--fps" && i + 1 < args.Length) testFps = args[++i];
+    }
+
+    var reference = await FfprobeClient.ProbeAsync(args[1]);
+    var test = await FfprobeClient.ProbeAsync(args[2]);
+    var vmaf = await VmafNegAsync(args[1], args[2], reference.Width, reference.Height, testFps);
+    var planes = await XpsnrPlanesAsync(args[1], args[2], reference.Width, reference.Height, testFps);
+    var dark = await KaranlikOlcu.OlcAsync(args[1], args[2], reference.Width, reference.Height, CancellationToken.None, testFps);
+    var bytes = new FileInfo(args[2]).Length;
+    var result = new
+    {
+        Referans = Path.GetFileName(args[1]),
+        Test = Path.GetFileName(args[2]),
+        Bayt = bytes,
+        Mb = bytes / 1024.0 / 1024.0,
+        test.DurationSeconds,
+        Kbps = test.DurationSeconds > 0 ? bytes * 8 / 1000.0 / test.DurationSeconds : (double?)null,
+        test.Width,
+        test.Height,
+        VmafNegMean = vmaf.Mean,
+        VmafNegHarmonic = vmaf.Harmonic,
+        VmafNegP10 = vmaf.P10,
+        VmafNegMin = vmaf.Min,
+        Xpsnr = planes.Y is { } py && planes.U is { } pu && planes.V is { } pv ? (4 * py + pu + pv) / 6.0 : (double?)null,
+        XpsnrY = planes.Y,
+        Karanlik = dark
+    };
+    var json = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
+    Console.WriteLine(json);
+    if (outPath is not null)
+    {
+        var dir = Path.GetDirectoryName(Path.GetFullPath(outPath));
+        if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+        await File.WriteAllTextAsync(outPath, json);
+    }
+    return vmaf.Mean is null ? 2 : 0;
+}
+
 static async Task<string> WriteResultsAsync(List<BenchResult> results, string outDir, string? resultsPath)
 {
     var path = resultsPath ?? Path.Combine(outDir, "results.json");
@@ -806,14 +871,14 @@ static async Task<string> WriteResultsAsync(List<BenchResult> results, string ou
     return path;
 }
 
-static async Task<VmafPool> VmafNegAsync(string referencePath, string testPath, int width, int height)
+static async Task<VmafPool> VmafNegAsync(string referencePath, string testPath, int width, int height, string? testFps = null)
 {
     var logPath = Path.Combine(Path.GetTempPath(), "vidshrink_bench_vmaf_" + Guid.NewGuid().ToString("N") + ".json");
     try
     {
         var escaped = "'" + logPath.Replace("\\", "/").Replace(":", "\\:") + "'";
         await RunLavfiAsync(referencePath, testPath, width, height,
-            $"libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path={escaped}");
+            $"libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path={escaped}", testFps);
 
         if (!File.Exists(logPath)) return VmafPool.Empty;
 
@@ -837,7 +902,7 @@ static async Task<VmafPool> VmafNegAsync(string referencePath, string testPath, 
     }
 }
 
-static async Task<string> RunLavfiAsync(string referencePath, string testPath, int width, int height, string filterChain)
+static async Task<string> RunLavfiAsync(string referencePath, string testPath, int width, int height, string filterChain, string? testFps = null)
 {
     var psi = new ProcessStartInfo
     {
@@ -852,7 +917,7 @@ static async Task<string> RunLavfiAsync(string referencePath, string testPath, i
                  "-hide_banner", "-nostdin",
                  "-i", testPath,
                  "-i", referencePath,
-                 "-lavfi", BenchMeasureFilterGraph.Build(width, height, filterChain),
+                 "-lavfi", BenchMeasureFilterGraph.Build(width, height, filterChain, testFps),
                  "-f", "null", "-"
              })
         psi.ArgumentList.Add(arg);
@@ -867,9 +932,9 @@ static async Task<string> RunLavfiAsync(string referencePath, string testPath, i
     return stderr;
 }
 
-static async Task<(double? Y, double? U, double? V)> XpsnrPlanesAsync(string referencePath, string testPath, int width, int height)
+static async Task<(double? Y, double? U, double? V)> XpsnrPlanesAsync(string referencePath, string testPath, int width, int height, string? testFps = null)
 {
-    var stderr = await RunLavfiAsync(referencePath, testPath, width, height, "xpsnr");
+    var stderr = await RunLavfiAsync(referencePath, testPath, width, height, "xpsnr", testFps);
 
     var match = System.Text.RegularExpressions.Regex.Match(
         stderr, @"XPSNR\s+y:\s*([\d.]+)\s*u:\s*([\d.]+)\s*v:\s*([\d.]+)",
@@ -2546,14 +2611,16 @@ public static class VmafPooling
 
 public static class BenchMeasureFilterGraph
 {
-    public static string Build(int width, int height, string filterChain)
+    public static string Build(int width, int height, string filterChain, string? testFps = null)
     {
         if (string.IsNullOrWhiteSpace(filterChain))
             throw new ArgumentException("Karsilastirma filtresi bos olamaz.", nameof(filterChain));
         if (width <= 0 || height <= 0)
             throw new ArgumentOutOfRangeException(nameof(width), "Olcum cozunurlugu pozitif olmali.");
 
-        return MeasureFilterGraph.Build($"scale=w={width}:h={height}:flags=lanczos", "null", filterChain);
+        var testChain = $"scale=w={width}:h={height}:flags=lanczos";
+        if (!string.IsNullOrWhiteSpace(testFps)) testChain = $"fps={testFps},{testChain}";
+        return MeasureFilterGraph.Build(testChain, "null", filterChain);
     }
 }
 

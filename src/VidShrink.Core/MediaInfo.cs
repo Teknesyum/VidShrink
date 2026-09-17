@@ -24,6 +24,8 @@ public sealed record MediaInfo
     public string? MasteringDisplayMetadata { get; init; }
     public string? ContentLightLevel { get; init; }
     public bool IsInterlaced { get; init; }
+    public IReadOnlyList<SourceStream> Streams { get; init; } = Array.Empty<SourceStream>();
+    public int ChapterCount { get; init; }
 
     public double FileSizeMb => FileSizeBytes / 1024.0 / 1024.0;
     public long Pixels => (long)Width * Height;

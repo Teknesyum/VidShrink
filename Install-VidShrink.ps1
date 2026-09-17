@@ -19,6 +19,7 @@ $repository = 'Teknesyum/VidShrink'
 
 $script:RemoveAttempts = 6
 $script:RemoveFirstDelayMilliseconds = 200
+$script:RemoveHolderWaitSeconds = 120
 
 function Refresh-ProcessPath {
     $machine = [Environment]::GetEnvironmentVariable('Path', 'Machine')
@@ -186,8 +187,8 @@ function Assert-Checksum([hashtable]$Table, [string]$Name, [string]$Path) {
     }
 }
 
-$libMpvUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
-$libMpvMirrorUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/libmpv-mirror/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+$libMpvUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+$libMpvFallbackUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
 $libMpvArchiveSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
 $libMpvDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
 $libMpvFileName = 'libmpv-2.dll'
@@ -212,7 +213,7 @@ function Install-LibMpv([string]$WorkRoot, [string]$Destination, [string]$Existi
     $ProgressPreference = 'SilentlyContinue'
     $actual = $null
     $failures = @()
-    foreach ($source in @($libMpvUrl, $libMpvMirrorUrl)) {
+    foreach ($source in @($libMpvUrl, $libMpvFallbackUrl)) {
         try {
             Invoke-WebRequest -UseBasicParsing -Uri $source -OutFile $archive
         }
@@ -300,7 +301,13 @@ function Write-Windows11ShellMenu([string]$Root, [string]$InstallDirectory) {
     [IO.File]::WriteAllText($manifestPath, $template.Replace('__ITEM_TYPES__', ($verbs -join [Environment]::NewLine)), [Text.UTF8Encoding]::new($false))
 
     Remove-Windows11ShellMenu $Root | Out-Null
-    Add-AppxPackage -Register $manifestPath -ExternalLocation $InstallDirectory -ErrorAction Stop
+    try {
+        Add-AppxPackage -Register $manifestPath -ExternalLocation $InstallDirectory -ErrorAction Stop
+    }
+    catch {
+        Write-Host "Windows 11 birincil sağ tık menüsü eklenemedi (imzasız paket için geliştirici modu gerekiyor); klasik menü 'Daha fazla seçenek göster' altında çalışır." -ForegroundColor Yellow
+        return $false
+    }
     return $true
 }
 
@@ -451,10 +458,15 @@ function Send-AssociationChanged([string]$Root) {
     catch { }
 }
 
+function Get-OpenCommandTarget([string]$Executable) {
+    if ([IO.Path]::GetFileName($Executable) -ine 'VidShrink.exe') { return $Executable }
+    return [IO.Path]::Combine([IO.Path]::GetDirectoryName($Executable), 'app\VidShrink.App.exe')
+}
+
 function Write-FileAssociation([string]$Root, [string]$Executable) {
     $classes = Get-CurrentUserSubKey $Root
     $software = Get-AssociationSoftwareRoot $Root
-    $command = '"{0}" "%1"' -f $Executable
+    $command = '"{0}" "%1"' -f (Get-OpenCommandTarget $Executable)
     $progId = "$classes\$fileAssociationProgId"
     $application = "$classes\Applications\$([IO.Path]::GetFileName($Executable))"
     $capabilities = "$software\$fileAssociationCapabilities"
@@ -564,7 +576,23 @@ function Remove-InstallRoot([string]$Root) {
         if ($holders.Count -gt 0) { $holderRounds++ } else { $holderRounds = 0 }
         if ($holderRounds -ge 2) {
             $names = ($holders | ForEach-Object { "$($_.ProcessName) (PID $($_.Id))" }) -join ', '
-            throw "Kurulum klasörü silinemedi: VidShrink hâlâ açık - $names. Programı kapatıp komutu yeniden çalıştırın. Klasör: $Root"
+            Write-Host "VidShrink kapanmayı bekliyor ($names); virüs taraması sürüyorsa en çok $script:RemoveHolderWaitSeconds sn beklenecek..." -ForegroundColor Yellow
+            $holders | Stop-Process -Force -ErrorAction SilentlyContinue
+            $holders | Wait-Process -Timeout $script:RemoveHolderWaitSeconds -ErrorAction SilentlyContinue
+            $still = @(Get-InstallRootHolder $Root)
+            if ($still.Count -gt 0) {
+                $names = ($still | ForEach-Object { "$($_.ProcessName) (PID $($_.Id))" }) -join ', '
+                throw ("Kurulum klasörü silinemedi: VidShrink $script:RemoveHolderWaitSeconds sn sonra hâlâ açık - $names. " +
+                    "Virüs programı dosyayı tarıyorsa taramanın bitmesini bekleyip komutu yeniden çalıştırın. Klasör: $Root")
+            }
+            $holderRounds = 0
+            try {
+                Remove-Item -LiteralPath $Root -Recurse -Force -ErrorAction Stop
+                return
+            }
+            catch {
+                $lastMessage = $_.Exception.Message
+            }
         }
 
         if ($attempt -lt $script:RemoveAttempts) {

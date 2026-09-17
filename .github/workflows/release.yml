@@ -97,17 +97,17 @@ jobs:
             exit 1
           }
           Add-Content -Path $env:GITHUB_PATH -Value $bin
-      - name: libmpv kur (shinchiro mpv-winbuild-cmake 20260903, ci.yml ile ayni)
+      - name: libmpv kur (deps-libmpv-20260903 surumu, yedek shinchiro, ci.yml ile ayni)
         run: |
           $ErrorActionPreference = 'Stop'
-          $url = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+          $url = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
           $expectedSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
           $expectedDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
-          $mirrorUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/libmpv-mirror/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+          $fallbackUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
           $archive = Join-Path $env:RUNNER_TEMP 'mpv-dev.7z'
 
           $actual = $null
-          foreach ($source in @($url, $mirrorUrl)) {
+          foreach ($source in @($url, $fallbackUrl)) {
             try {
               Invoke-WebRequest -Uri $source -OutFile $archive
             } catch {
@@ -206,6 +206,19 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Publish the command line
+        # The headless CLI ships beside the application in the same folder and archive, so it
+        # updates with it and never updates itself. It goes first: the application publish
+        # that follows overwrites the shared assemblies with its ReadyToRun builds. On macOS
+        # the executable is vidshrink-cli, because the bundle's VidShrink host would collide
+        # with vidshrink on a case-insensitive volume.
+        run: |
+          dotnet publish src/VidShrink.Cli/VidShrink.Cli.csproj \
+            -c Release -r ${{ matrix.rid }} --self-contained \
+            -p:Version=${{ needs.version.outputs.version }} \
+            -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
+            -o publish/${{ matrix.rid }}
+
       - name: Publish
         run: |
           dotnet publish src/VidShrink.App/VidShrink.App.csproj \
@@ -225,6 +238,20 @@ jobs:
             -p:Version=${{ needs.version.outputs.version }} \
             -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
             -o publish-launcher
+
+      - name: Publish the setup program
+        # Windows only. VidShrink-Setup.exe is a trimmed single-file console program that
+        # does what Install-VidShrink.ps1 does without starting PowerShell: it downloads the
+        # two archives in parallel, checks them against checksums-win-x64.txt and unpacks them
+        # straight into the install root. It is not listed in the manifest; the updater never
+        # replaces it, a user runs it once.
+        if: matrix.rid == 'win-x64'
+        run: |
+          dotnet publish src/VidShrink.Setup/VidShrink.Setup.csproj \
+            -c Release \
+            -p:Version=${{ needs.version.outputs.version }} \
+            -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
+            -o publish-setup
 
       - uses: actions/download-artifact@v4
         if: matrix.rid == 'win-x64'
@@ -314,6 +341,10 @@ jobs:
           if [ -d publish-launcher ]; then
             ( cd publish-launcher && zip -qr "$GITHUB_WORKSPACE/assets/vidshrink-launcher-${{ matrix.rid }}.zip" . )
             checksummed="$checksummed vidshrink-launcher-${{ matrix.rid }}.zip"
+          fi
+          if [ -f publish-setup/VidShrink-Setup.exe ]; then
+            cp publish-setup/VidShrink-Setup.exe assets/VidShrink-Setup.exe
+            checksummed="$checksummed VidShrink-Setup.exe"
           fi
           ( cd assets && sha256sum $checksummed > "checksums-${{ matrix.rid }}.txt" )
           cat assets/checksums-${{ matrix.rid }}.txt

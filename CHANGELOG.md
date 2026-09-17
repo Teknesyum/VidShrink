@@ -7,6 +7,33 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-09-17
+
+### Added
+
+- `VidShrink-Setup.exe`: a native Windows installer that installs in about 6 s instead of 12 s, writes the right-click menu and file associations in about 0.1 s instead of 3.3 s, and closes a running VidShrink before replacing it. The PowerShell installer keeps working.
+
+### Changed
+
+- SVT-AV1 encodes run with variance boost off; at the same target size the measured quality no longer drops and the target band holds.
+
+## [0.8.3] - 2026-09-16
+
+### Fixed
+
+- The Windows installer no longer stops when VidShrink is still running: it closes the program and waits up to 120 s for an antivirus scan (for example Avast CyberCapture) to release it before giving up.
+- On Windows 11 without developer mode the unsigned primary right-click package is refused; the installer now keeps the classic menu and finishes instead of failing.
+- The right-click "Open with VidShrink" entry written from Settings points at the launcher, so updates and repair run.
+- A cancelled update download removes its partial `.part` file.
+- A loaded event arriving after the render update no longer loses the first frame.
+- Source info boxes stay on one line in a narrow window; glow shadows follow a palette change without a restart.
+
+### Changed
+
+- The launcher shows its maintenance panel only for a manual update, never on an ordinary start.
+- Opening a video from the shell reaches the first frame about 992 ms sooner than before the F wave (median of 14 paired runs, 14 of 14; `docs/olcumler/acilis-hizi.md`).
+- libmpv downloads fall back to a GitHub release copy.
+
 ## [0.8.2] - 2026-09-16
 
 ### Changed

@@ -177,7 +177,11 @@ public sealed class SplashTests
     /// kuruluyor. Eşiğin düşürülmesi ya da sayacın kaldırılması buradan görülür.
     ///
     /// <para>16 Eylül 2026'da açılış perdesi kaldırıldı ve eşik yeniden tek sabit oldu:
-    /// olağan açılışta panel yalnız bakım işleri eşiği aşarsa çiziliyor.</para>
+    /// olağan açılışta panel yalnız bakım işleri eşiği aşarsa çiziliyordu.</para>
+    ///
+    /// <para>Aynı gün bakım da sessizleşti: sayaç yalnız elle güncellemede kuruluyordu. 17 Eylül
+    /// 2026'da (G3) koşulsuz oldu: olağan açılışta da kuruluyor, bakım 400 ms'yi aşmazsa
+    /// panel çizilmiyor, aşarsa — bekleyen dosyaların taşınması gibi — çiziliyor.</para>
     /// </summary>
     [Fact]
     public void ThresholdIsFourHundredMillisecondsAndGuardsEveryDraw()
@@ -191,7 +195,8 @@ public sealed class SplashTests
         Assert.Single(Regex.Matches(source, @"SplashWindow\.Create\(\)"));
 
         var program = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Program.cs"));
-        Assert.Contains("using (SplashGate.Arm(", program);
+        Assert.Contains("using (SplashGate.Arm(progress))", program);
+        Assert.DoesNotContain("updateNow ? SplashGate", program);
         Assert.Single(Regex.Matches(program, @"SplashGate\.Arm\("));
     }
 

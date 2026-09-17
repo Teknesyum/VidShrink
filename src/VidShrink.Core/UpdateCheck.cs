@@ -158,6 +158,9 @@ public static class UpdateCheck
     /// tanımsız bir <c>_ =&gt; "x64"</c> dalıydı ve kurucu aynı durumu reddediyordu; artık ikisi
     /// de aynı kuralı okuyor, çünkü ayrıştıklarında biri kuruluyor öteki hiç güncelleme bulamıyor.
     /// </summary>
+    /// <summary>Yayın iş akışının paketlediği hedefler; <c>.github/workflows/release.yml</c> matrisiyle aynı.</summary>
+    public static readonly IReadOnlyList<string> ReleasedRids = new[] { "win-x64", "osx-arm64", "osx-x64", "linux-x64" };
+
     public static string Rid
     {
         get
@@ -407,10 +410,10 @@ public static class UpdateCheck
 public sealed class UpdateSettings
 {
     public const string FolderName = "VidShrink";
-    public const string FileName = "settings.json";
+    public static readonly string FileName = "settings.json";
 
-    /// <summary>Windows'ta varsayılan açık. Kapalıyken uygulama yalnız haber verir.</summary>
-    public bool AutoUpdate { get; set; } = true;
+    /// <summary>Varsayılan kapalı: güncelleme rozetteki düğmeyle indirilip kurulur. Açılırsa Windows'ta kendiliğinden kurulur. Dosyada yazılı değer korunur.</summary>
+    public bool AutoUpdate { get; set; }
 
     /// <summary>
     /// Hızlı düşür (GPU) kutusunun durumu. Alan yoksa karar henüz verilmemiştir; ilk
@@ -425,6 +428,10 @@ public sealed class UpdateSettings
     public bool ChipSizeCapped { get; set; } = true;
     public int Codec { get; set; }
     public bool MayLowerResolution { get; set; } = true;
+    /// <summary>Dinamik çözünürlük kapalıyken seçilen sabit boy: 0 kaynak, 1 1080p, 2 720p, 3 480p.</summary>
+    public int FixedResolution { get; set; }
+    /// <summary>WhatsApp uyumu: işaretliyse kodek H.264'e kilitlenir.</summary>
+    public bool WhatsAppCompatible { get; set; }
     public bool MayLowerFps { get; set; } = true;
     public int FillPolicy { get; set; }
     public int HdrPolicy { get; set; }
@@ -489,6 +496,8 @@ public sealed class UpdateSettings
             ReadBool(document.RootElement, "chipSizeCapped", value => settings.ChipSizeCapped = value);
             ReadInt(document.RootElement, "codec", value => settings.Codec = value);
             ReadBool(document.RootElement, "mayLowerResolution", value => settings.MayLowerResolution = value);
+            ReadInt(document.RootElement, "fixedResolution", value => settings.FixedResolution = value);
+            ReadBool(document.RootElement, "whatsAppCompatible", value => settings.WhatsAppCompatible = value);
             ReadBool(document.RootElement, "mayLowerFps", value => settings.MayLowerFps = value);
             ReadInt(document.RootElement, "fillPolicy", value => settings.FillPolicy = value);
             ReadInt(document.RootElement, "hdrPolicy", value => settings.HdrPolicy = value);
@@ -552,6 +561,8 @@ public sealed class UpdateSettings
         writer.WriteBoolean("chipSizeCapped", ChipSizeCapped);
         writer.WriteNumber("codec", Codec);
         writer.WriteBoolean("mayLowerResolution", MayLowerResolution);
+        writer.WriteNumber("fixedResolution", FixedResolution);
+        writer.WriteBoolean("whatsAppCompatible", WhatsAppCompatible);
         writer.WriteBoolean("mayLowerFps", MayLowerFps);
         writer.WriteNumber("fillPolicy", FillPolicy);
         writer.WriteNumber("hdrPolicy", HdrPolicy);
@@ -854,6 +865,46 @@ public static class LauncherUpdate
     /// okunmaz, yazılmaz: elle bir kez yüklemek kullanıcının tercihini değiştirmez.
     /// </summary>
     public const string UpdateNowArgument = "--update-now";
+
+    /// <summary>
+    /// Uygulama çift tıkla doğrudan açıldığında başlatıcının bakım işini arkada yaptırdığı kip.
+    /// Bu argümanla açılan başlatıcı uygulamayı doğurmaz; onarım, sürüm işareti, arka plan
+    /// indirmesi ve bekleyen geçişin kurulması yapılır, çıkılır.
+    /// </summary>
+    public const string MaintenanceArgument = "--bakim";
+
+    /// <summary>
+    /// Başlatıcının doğurduğu uygulamaya geçirdiği işaret. Doluysa bakım o başlatıcıda
+    /// zaten koşuyor; uygulama ikinci bir bakım başlatmaz.
+    /// </summary>
+    public const string LaunchedVariable = "VIDSHRINK_BASLATICIDAN";
+
+    /// <summary>
+    /// Uygulamanın bakım için açacağı başlatıcı; açılmayacaksa null. Üç kapı: uygulama kurulu
+    /// düzenin <c>app</c> klasöründen koşuyor ve başlatıcı yanında duruyor, başlatıcı bu
+    /// uygulamayı doğurmamış, başlatıcının sürümü uygulamanınkinden eski değil. Sonuncusu
+    /// geçişin yarım kaldığı turu korur: <see cref="MaintenanceArgument"/>'i tanımayan eski
+    /// başlatıcı onu açılacak dosya sanmaz, uygulamayı ikinci kez doğurur.
+    /// </summary>
+    public static string? MaintenanceLauncher(
+        string appDirectory,
+        string? launchedMarker,
+        string appVersion,
+        Func<string, string?> launcherVersion)
+    {
+        if (!string.IsNullOrEmpty(launchedMarker)) return null;
+        var trimmed = appDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (!string.Equals(Path.GetFileName(trimmed), "app", StringComparison.OrdinalIgnoreCase)) return null;
+        var launcher = LocateLauncher(trimmed);
+        if (launcher is null) return null;
+        if (!Version.TryParse(NormalizeVersion(appVersion), out var app)) return null;
+        var found = launcherVersion(launcher);
+        if (found is null || !Version.TryParse(NormalizeVersion(found), out var installed)) return null;
+        return Comparable(installed) >= Comparable(app) ? launcher : null;
+    }
+
+    private static Version Comparable(Version version) =>
+        new(version.Major, version.Minor, Math.Max(version.Build, 0));
 
     public const string JournalName = ".launcher-pending.json";
 
@@ -1758,6 +1809,27 @@ public sealed class RemoteZip
 
     public async Task<byte[]> ExtractAsync(string entryPath, CancellationToken cancellationToken)
     {
+        var (entry, payload) = await PayloadAsync(entryPath, cancellationToken);
+        return Inflate(entry, payload);
+    }
+
+    public async Task ExtractToAsync(string entryPath, Stream destination, CancellationToken cancellationToken)
+    {
+        var (entry, payload) = await PayloadAsync(entryPath, cancellationToken);
+        if (entry.Method == 0)
+        {
+            await destination.WriteAsync(payload, cancellationToken);
+            return;
+        }
+        if (entry.Method != 8) throw new NotSupportedException($"Desteklenmeyen sıkıştırma: {entry.Method}");
+
+        using var compressed = new MemoryStream(payload);
+        await using var inflater = new DeflateStream(compressed, CompressionMode.Decompress);
+        await inflater.CopyToAsync(destination, 1024 * 1024, cancellationToken);
+    }
+
+    private async Task<(Entry Entry, byte[] Payload)> PayloadAsync(string entryPath, CancellationToken cancellationToken)
+    {
         if (!_entries.TryGetValue(entryPath, out var entry))
             throw new FileNotFoundException($"Arşivde bulunamadı: {entryPath}");
 
@@ -1775,7 +1847,7 @@ public sealed class RemoteZip
                 var extras = BinaryPrimitives.ReadUInt16LittleEndian(whole.AsSpan(28));
                 var body = 30 + names + extras;
                 if (body + entry.CompressedSize <= whole.Length)
-                    return Inflate(entry, whole.AsSpan(body, (int)entry.CompressedSize).ToArray());
+                    return (entry, whole.AsSpan(body, (int)entry.CompressedSize).ToArray());
             }
         }
 
@@ -1788,7 +1860,7 @@ public sealed class RemoteZip
         var payload = await _source.ReadAsync(dataOffset, (int)entry.CompressedSize, cancellationToken);
         if (payload.Length != entry.CompressedSize) throw new InvalidDataException("Dosya eksik indi.");
 
-        return Inflate(entry, payload);
+        return (entry, payload);
     }
 
     private static byte[] Inflate(Entry entry, byte[] payload)

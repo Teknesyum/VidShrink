@@ -265,17 +265,34 @@ public sealed class UpdaterTests : IDisposable
     }
 
     [Fact]
-    public void AutoUpdateIsOnUntilTheUserTurnsItOff()
+    public void AutoUpdateIsOffUntilTheUserTurnsItOn()
     {
         var file = Path.Combine(_root, "settings.json");
 
+        Assert.False(UpdateSettings.Load(file).AutoUpdate);
+        Assert.False(UpdateCheck.AutoUpdateEnabled(UpdateSettings.Load(file)));
+
+        new UpdateSettings { AutoUpdate = true }.Save(file);
         Assert.True(UpdateSettings.Load(file).AutoUpdate);
 
         new UpdateSettings { AutoUpdate = false }.Save(file);
         Assert.False(UpdateSettings.Load(file).AutoUpdate);
+    }
 
-        new UpdateSettings { AutoUpdate = true }.Save(file);
+    [Fact]
+    public void AnExistingUsersSavedChoiceSurvivesTheNewDefault()
+    {
+        var file = Path.Combine(_root, "settings.json");
+
+        File.WriteAllText(file, "{\"autoUpdate\": true, \"language\": \"tr\", \"targetMb\": 25}");
+        var kept = UpdateSettings.Load(file);
+        Assert.True(kept.AutoUpdate);
+        kept.TargetMb = 30;
+        kept.Save(file);
         Assert.True(UpdateSettings.Load(file).AutoUpdate);
+
+        File.WriteAllText(file, "{\"language\": \"tr\", \"targetMb\": 25}");
+        Assert.False(UpdateSettings.Load(file).AutoUpdate);
     }
 
     [Fact]
@@ -283,7 +300,7 @@ public sealed class UpdaterTests : IDisposable
     {
         var file = Path.Combine(_root, "settings.json");
         File.WriteAllText(file, "{ bozuk");
-        Assert.True(UpdateSettings.Load(file).AutoUpdate);
+        Assert.False(UpdateSettings.Load(file).AutoUpdate);
     }
 
     [Fact]
@@ -1324,7 +1341,7 @@ exit $code
         var knobs = script.Split('\n')
             .Where(line => line.StartsWith("$script:Remove", StringComparison.Ordinal))
             .ToArray();
-        Assert.Equal(2, knobs.Length);
+        Assert.Equal(3, knobs.Length);
 
         var routine = string.Join("\n", knobs) + "\n\n"
             + InstallerBlock(script, "function Get-InstallRootHolder") + "\n\n"
@@ -1440,6 +1457,35 @@ exit $code
     }
 
     [Fact]
+    public void TheDeletionStepClosesARunningVidShrinkInsteadOfGivingUp()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var (installRoot, _, probe, logPath) = LockedInstall("silme-acik-program");
+        var holderExe = Path.Combine(installRoot, LauncherUpdate.ExecutableName);
+        File.Copy(Path.Combine(Environment.SystemDirectory, "PING.EXE"), holderExe, overwrite: true);
+        using var holder = Process.Start(new ProcessStartInfo(holderExe, "-n 120 127.0.0.1")
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        })!;
+
+        var (code, log) = RunRemovalProbe(probe, installRoot, logPath);
+        var exited = holder.WaitForExit(5000);
+        if (!exited) holder.Kill();
+
+        _output.WriteLine($"açık program: çıkış {code}");
+        _output.WriteLine(log.Trim());
+
+        Assert.Equal(0, code);
+        Assert.Contains("BITTI", log, StringComparison.Ordinal);
+        Assert.Contains("kapanmayı bekliyor", log, StringComparison.Ordinal);
+        Assert.True(exited, "kurulum köküdeki açık VidShrink kapatılmadı");
+        Assert.False(Directory.Exists(installRoot), "kurulum kökü silinmedi");
+    }
+
+    [Fact]
     public void TheDeletionStepGivesUpWithAMessageThatSaysWhatHappened()
     {
         if (!OperatingSystem.IsWindows()) return;
@@ -1471,6 +1517,10 @@ exit $code
     /// hızlı tur ve olağan tur. Ölçü ikisini de sayıyor — her kolda uygulama
     /// <c>StartApp</c> ile önce doğuyor, geçiş ancak ondan sonra ve kendi kapısının
     /// (<c>gecikmis</c> / <c>pendingSwap</c>) içinde kuruluyor.</para>
+    ///
+    /// <para>17 Eylül 2026'da (G2) hızlı turun bakımı <c>Maintain</c>'e taşındı; aynı yöntemi
+    /// uygulamanın açtığı <c>--bakim</c> kipi de çağırıyor. Sayı yine iki: olağan turun çağrısı
+    /// ve <c>Maintain</c>'deki. Hızlı turda <c>Maintain</c> <c>StartApp</c>'tan sonra geliyor.</para>
     /// </summary>
     [Fact]
     public void TheLauncherStartsTheCommitterOnTheWayOut()
@@ -1479,16 +1529,20 @@ exit $code
 
         var launches = Regex.Matches(code, @"StartApp\(executable");
         var calls = Regex.Matches(code, @"StartCommitter\(baseDirectory\);");
-        var gates = Regex.Matches(code, @"if \(pendingSwap\)|if \(gecikmis\)");
+        var gates = Regex.Matches(code, @"if \(pendingSwap\)");
 
         Assert.Equal(2, launches.Count);
         Assert.Equal(2, calls.Count);
         Assert.Equal(2, gates.Count);
+        var maintain = code.IndexOf("private static void Maintain(", StringComparison.Ordinal);
+        Assert.True(launches[1].Index < calls[0].Index, "gecis, uygulama baslatilmadan once kuruluyor");
+        Assert.True(maintain < calls[1].Index, "Maintain gecisi kurmuyor");
+        var fast = code.IndexOf("if (!updateNow && args.Length > 0 && File.Exists(args[0]))", StringComparison.Ordinal);
+        Assert.True(launches[0].Index > fast
+                    && launches[0].Index < code.IndexOf("Maintain(baseDirectory, appDirectory, previousVersion);", fast, StringComparison.Ordinal),
+            "hizli turda bakim uygulamadan once koşuyor");
         for (var i = 0; i < 2; i++)
-        {
-            Assert.True(launches[i].Index < calls[i].Index, "gecis, uygulama baslatilmadan once kuruluyor");
             Assert.True(gates[i].Index < calls[i].Index, "gecis cagrisi bekleyen gecis kapisinin icinde degil");
-        }
         Assert.Contains("private static void StartCommitter(string baseDirectory)", code, StringComparison.Ordinal);
         Assert.Contains("LauncherUpdate.Commit(baseDirectory, ParentProcessId(args))", code, StringComparison.Ordinal);
     }

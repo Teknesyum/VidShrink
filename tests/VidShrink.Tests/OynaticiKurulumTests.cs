@@ -95,17 +95,21 @@ public sealed class OynaticiKurulumTests
         var release = Oku(".github", "workflows", "release.yml");
 
         var url = Sabit(kurulum, "libMpvUrl");
-        var yedek = Sabit(kurulum, "libMpvMirrorUrl");
+        var yedek = Sabit(kurulum, "libMpvFallbackUrl");
         var arsiv = Sabit(kurulum, "libMpvArchiveSha256");
         var dll = Sabit(kurulum, "libMpvDllSha256");
-        Assert.StartsWith("https://github.com/Teknesyum/VidShrink/releases/download/libmpv-mirror/", yedek, StringComparison.Ordinal);
-        Assert.Equal(url[(url.LastIndexOf('/') + 1)..], yedek[(yedek.LastIndexOf('/') + 1)..]);
-        Assert.Contains("foreach ($source in @($libMpvUrl, $libMpvMirrorUrl))", kurulum, StringComparison.Ordinal);
+        var arsivAdi = url[(url.LastIndexOf('/') + 1)..];
+        var surum = Regex.Match(arsivAdi, @"^mpv-dev-x86_64-(\d{8})-").Groups[1].Value;
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-{surum}/{arsivAdi}", url);
+        Assert.StartsWith($"https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/{surum}/", yedek, StringComparison.Ordinal);
+        Assert.Equal(arsivAdi, yedek[(yedek.LastIndexOf('/') + 1)..]);
+        Assert.Contains("foreach ($source in @($libMpvUrl, $libMpvFallbackUrl))", kurulum, StringComparison.Ordinal);
+        Assert.Equal(new[] { url, yedek }, VidShrink.Core.Setup.LibMpvPin.Default.Urls);
         foreach (var (ad, metin) in new[] { ("ci.yml", ci), ("release.yml", release) })
         {
-            Assert.True(metin.Contains($"$url = '{url}'", StringComparison.Ordinal), $"{ad} libmpv adresi farkli");
-            Assert.True(metin.Contains($"$mirrorUrl = '{yedek}'", StringComparison.Ordinal), $"{ad} libmpv yedek adresi farkli");
-            Assert.True(metin.Contains("foreach ($source in @($url, $mirrorUrl))", StringComparison.Ordinal), $"{ad} yedek kaynaga dusmuyor");
+            Assert.True(metin.Contains($"$url = '{url}'", StringComparison.Ordinal), $"{ad} libmpv birincil adresi farkli");
+            Assert.True(metin.Contains($"$fallbackUrl = '{yedek}'", StringComparison.Ordinal), $"{ad} libmpv yedek adresi farkli");
+            Assert.True(metin.Contains("foreach ($source in @($url, $fallbackUrl))", StringComparison.Ordinal), $"{ad} once kendi surumumuzu denemiyor");
             Assert.True(metin.Contains($"$expectedSha256 = '{arsiv}'", StringComparison.Ordinal), $"{ad} libmpv arsiv sha256 farkli");
             Assert.True(metin.Contains($"$expectedDllSha256 = '{dll}'", StringComparison.Ordinal), $"{ad} libmpv-2.dll sha256 farkli");
         }

@@ -86,28 +86,20 @@ internal static class Program
         {
             StartApp(executable, appDirectory, baseDirectory, args);
             AcilisIzi.Yaz("app-dogdu");
-
-            try { LauncherUpdate.Repair(baseDirectory, UpdateCheck.CurrentVersion()); }
-            catch (Exception) { }
-            try { LauncherUpdate.SeedVersionMarker(baseDirectory, UpdateCheck.CurrentVersion()); }
-            catch (Exception) { }
-            try { RecordAppliedUpdate(appDirectory, previousVersion); }
-            catch (Exception) { }
-
-            var gecikmis = false;
-            try { gecikmis = Updater.Run(baseDirectory, appDirectory); }
-            catch (Exception) { }
-            if (gecikmis)
-            {
-                try { StartCommitter(baseDirectory); }
-                catch (Exception) { }
-            }
-
+            Maintain(baseDirectory, appDirectory, previousVersion);
             return 0;
         }
 
-        // Panel ancak eşik dolarsa çizilir; hızlı turda hiç oluşturulmaz. Bloktan çıkış
-        // tek yol: iş bitse de yarıda kalsa da panel kapanır ve uygulama açılır.
+        // Çift tık başlatıcıyı atlıyor: uygulama doğrudan açılıp bakımı bu kiple arkada
+        // yaptırıyor. Bekleyen dosyalar taşınmaz, uygulama o klasörden koşuyor.
+        if (!updateNow && args.Length > 0 && args[0] == LauncherUpdate.MaintenanceArgument)
+        {
+            Maintain(baseDirectory, appDirectory, previousVersion);
+            return 0;
+        }
+
+        // Bakım sessiz koşar; panel yalnız iş 400 ms'yi aşarsa çizilir. Eşik olağan açılışta
+        // da kurulu: bekleyen dosyaların taşınması yüzlerce MB olabilir ve boş ekranda geçmemeli.
         var pendingSwap = false;
         var progress = new InstallProgress();
         using (SplashGate.Arm(progress))
@@ -197,9 +189,35 @@ internal static class Program
         // ffmpeg kurulum kökünde duruyor, app klasöründe değil; uygulama onu PATH'ten bulur.
         start.Environment["PATH"] =
             Path.Combine(baseDirectory, "tools", "ffmpeg") + Path.PathSeparator + Environment.GetEnvironmentVariable("PATH");
+        start.Environment[LauncherUpdate.LaunchedVariable] = "1";
         if (AcilisIzi.Acik) start.Environment[AcilisIzi.SifirDegiskeni] = AcilisIzi.SifirIsareti;
         foreach (var argument in args) start.ArgumentList.Add(argument);
         Process.Start(start);
+    }
+
+    /// <summary>
+    /// Uygulama koşarken yapılabilen bakım: yarım geçişin toplanması, sürüm işareti, geçilen
+    /// sürümün notu, arka plan indirmesi ve bekleyen geçişin kurulması. Bekleyen dosyaları
+    /// taşımaz; uygulama o klasörden koşuyor. Dosyalı açılış ve <see cref="LauncherUpdate.MaintenanceArgument"/>
+    /// kipi buradan geçer. Hiçbir hata dışarı çıkmaz.
+    /// </summary>
+    private static void Maintain(string baseDirectory, string appDirectory, string? previousVersion)
+    {
+        try { LauncherUpdate.Repair(baseDirectory, UpdateCheck.CurrentVersion()); }
+        catch (Exception) { }
+        try { LauncherUpdate.SeedVersionMarker(baseDirectory, UpdateCheck.CurrentVersion()); }
+        catch (Exception) { }
+        try { RecordAppliedUpdate(appDirectory, previousVersion); }
+        catch (Exception) { }
+
+        var pendingSwap = false;
+        try { pendingSwap = Updater.Run(baseDirectory, appDirectory); }
+        catch (Exception) { }
+        if (pendingSwap)
+        {
+            try { StartCommitter(baseDirectory); }
+            catch (Exception) { }
+        }
     }
 
     /// <summary>

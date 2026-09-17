@@ -34,7 +34,7 @@
 
   "settings.update.title": "עדכונים",
   "settings.update.auto": "עדכן אוטומטית",
-  "settings.update.auto-effect": "כשזה כבוי, VidShrink אינו מעדכן את עצמו: הוא רק מודיע שקיימת גרסה חדשה ומציג את הפקודה שמתקינה אותה.",
+  "settings.update.auto-effect": "כבוי כברירת מחדל: גרסה חדשה מוכרזת בסרגל העליון, ומורדת ומותקנת בלחיצת כפתור. כשמופעל, VidShrink מתעדכן לבד בשקט.",
   "settings.update.no-self-effect": "VidShrink אינו מעדכן את עצמו במערכת זו: הוא רק מודיע שקיימת גרסה חדשה ומציג את הפקודה שמתקינה אותה.",
 
   "settings.default-app.suggestion": "VidShrink אינו התוכנית המוגדרת כברירת מחדל לווידאו. אפשר לבחור בו בעמוד יישומי ברירת המחדל של Windows.",

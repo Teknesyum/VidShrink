@@ -1208,4 +1208,33 @@ public sealed class ComparisonPanelTests
         Assert.True(cap > 0 && cap < half, $"tavan {cap:0.#}, sag yari {half:0.#}");
         Assert.True(badgeWidth <= cap + 0.5, $"rozet {badgeWidth:0.#} > tavan {cap:0.#}");
     }
+
+    /// <summary>
+    /// Kullanici 09-07: ORIJINAL ve ISLENMIS etiketleri panonun ustunde, solda ve sagda.
+    /// CRF rozeti geldiginde ISLENMIS etiketi sonmez, ikisi birlikte gorunur.
+    /// </summary>
+    [Fact]
+    public void Taraf_etiketleri_panonun_ustunde_solda_ve_sagda_durur()
+    {
+        var (sameParent, rowBottom, stageTop, leftX, rightX, half, rightWithCrf, crfShown) = Read((window, panel) =>
+        {
+            FakeFrame(panel);
+            panel.Split = 0.5;
+            panel.SetRightBadge("CRF 21");
+            Relayout(window);
+
+            return (ReferenceEquals(panel.LabelRow.Parent, panel.Stage.Parent),
+                panel.LabelRow.Bounds.Bottom, panel.Stage.Bounds.Top,
+                panel.LeftBadge.Bounds.X, panel.RightBadge.Bounds.X, panel.LabelRow.Bounds.Width / 2,
+                panel.RightBadge.IsVisible, panel.ApproxBadge.IsVisible);
+        });
+
+        Assert.True(sameParent, "etiket satiri panoyla ayni izgarada degil");
+        Assert.True(rightWithCrf, "CRF rozeti gelince ISLENMIS etiketi sondu");
+        Assert.True(crfShown, "CRF rozeti gorunmuyor");
+        Assert.True(rowBottom > 0, "etiket satiri olculmedi");
+        Assert.True(rowBottom <= stageTop + 0.5, $"etiket satirinin alti {rowBottom:0.#}, panonun ustu {stageTop:0.#}");
+        Assert.True(leftX < half, $"sol etiket {leftX:0.#}, orta {half:0.#}");
+        Assert.True(rightX > half, $"sag etiket {rightX:0.#}, orta {half:0.#}");
+    }
 }

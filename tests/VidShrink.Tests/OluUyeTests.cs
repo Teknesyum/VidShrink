@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -360,7 +360,7 @@ public sealed class OluUyeTests
     /// tuketicili uye acilirsa ya da var olan birine gercek bir tuketici gelirse burasi kirmizi
     /// olur.
     /// <para>
-    /// Kume bugun 34 satir: 29 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
+    /// Kume bugun 37 satir: 32 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
     /// (<c>Flagged = ZeroConsumer || Unused</c>). T163 kumeyi 51 satirdan 37'ye indirdi ve
     /// kalan bir satirin bicimini degistirdi. Dusen 19 satir T165'in <c>ReasonCode.Manual*</c>
     /// kodlariydi: T165 onlari uretmis ama okuyamamisti, cunku okuma tarafi
@@ -390,6 +390,9 @@ public sealed class OluUyeTests
     /// Kumeyi bir satir buyuten hedef boyut butcesi: <c>RecorderBudgetVerdict</c> dort uyeli
     /// acildi, ucu adiyla okunuyor, <c>NotRequested</c> olumsuz kol olarak kaliyor —
     /// <c>QualityTargetBound.Matched</c> ile ayni kalip, gosterilecek cumlesi olmayan hal.
+    /// Kumeyi 34'ten 37'ye cikaran dalga 1c, akis eslemesi: <c>StreamKind.Data</c>,
+    /// <c>StreamNote.LosslessAudioNotPassedThrough</c> ve <c>TrackAction.Encode</c> ucu de
+    /// kardesleri adiyla okunan turun varsayilan kolu.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
@@ -403,10 +406,8 @@ public sealed class OluUyeTests
     /// </summary>
     private static readonly PinnedFinding[] Pinned =
     {
-        new("ArchitectureOutcome.Assumed", "hic-okunmayan-tur", Debt,
-            "Iki uyeli turun hicbir uyesi uretimde okunmuyor: ArchitectureDecision.Outcome yaziliyor, kimse sormuyor. Turun docstring'i (UpdateCheck.cs:34) 'Kullaniciya ne soylenecegini bu ayiriyor' diyor; ayiran kol yok."),
-        new("ArchitectureOutcome.Read", "hic-okunmayan-tur", Debt,
-            "Ayni turun oteki uyesi, ayni bulgu. Turun tamami okunmadigi icin bu bir 'olumsuz kol' degil; docstring ile kod arasindaki fark olculmedi."),
+        new("ArchitectureOutcome.Assumed", "varsayilan-kol", Debt,
+            "Iki uyeli turun olumsuz kolu. VidShrink-Setup.exe motoru (SetupRunner.RuntimeIdentifier) Read kolunu soruyor; Assumed o kosulun else'i ve kullaniciya varsayim mesajini orada yaziyor. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; Read satirinin pimde isi kalmadi."),
         new("ComparisonSourceState.Duraklatildi", "varsayilan-kol", Debt,
             "Karsilastirma kaynaginin duraklatilmis durumu uretiliyor, hicbir kol duraklatilmisi ayirmiyor. Ayirmanin gerekip gerekmedigi olculmedi."),
         new("ConversionQualityMode.Bitrate", "varsayilan-kol", Legitimate,
@@ -455,6 +456,12 @@ public sealed class OluUyeTests
             "Ayni bulgu: uc yerde uretiliyor, servis hatasini ayiran kol yok; kullanici genel hata cumlesini goruyor."),
         new("SpeedMode.Quality", "varsayilan-kol", Legitimate,
             "Iki degerli kipin olumsuz kolu ve varsayilani. On okuma yerinin hepsi 'speed == SpeedMode.Fast' kalibinda soruyor (dokuzu ==, CalibrationProbe.cs:148 !=); Quality o kosulun else'i."),
+        new("StreamKind.Data", "varsayilan-kol", Legitimate,
+            "Akis turunun 'video, ses, altyazi degil' hali. FfprobeClient.cs'in codec_type switch'i uc turu adlandirip '_ => StreamKind.Data' diyor; eslemede veri akislari hic secilmiyor."),
+        new("StreamNote.LosslessAudioNotPassedThrough", "varsayilan-kol", Legitimate,
+            "Plan notlarinin son kolu. PlanCalculator.AddStreamNotes yedi notu adiyla yaziyor, TrueHD/DTS cumlesi '_' kolunda; ayri bir kol ayni cumleyi verirdi."),
+        new("TrackAction.Encode", "varsayilan-kol", Legitimate,
+            "Iki degerli iz eyleminin varsayilani. Argumanlar 'action == TrackAction.Copy' diye soruyor; Encode o kosulun else'i."),
         new("WindowBiasSource.None", "varsayilan-kol", Legitimate,
             "Pencere sapmasinin 'kaynak yok' hali. ComplexityProfile.cs:128-132 Scan ve Packets'i adlandirip '_ => MeasuredBand' diyor; None olculmemis bandin ta kendisi, ayri bir kol ayni degeri verirdi."),
         new("FfmpegArguments.SceneMapRuleOfRecord", "yalniz-disarida", Debt,

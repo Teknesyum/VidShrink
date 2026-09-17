@@ -34,7 +34,7 @@
 
   "settings.update.title": "Kemas kini",
   "settings.update.auto": "Kemas kini secara automatik",
-  "settings.update.auto-effect": "Apabila ini dimatikan, VidShrink tidak mengemas kini dirinya: ia hanya memberitahu versi baharu wujud dan menunjukkan perintah yang memasangnya.",
+  "settings.update.auto-effect": "Dimatikan secara lalai: versi baharu diumumkan pada bar atas serta dimuat turun dan dipasang dengan satu butang. Apabila dihidupkan, VidShrink mengemas kini dirinya sendiri secara senyap.",
   "settings.update.no-self-effect": "VidShrink tidak mengemas kini dirinya pada sistem ini: ia hanya memberitahu versi baharu wujud dan menunjukkan perintah yang memasangnya.",
 
   "settings.default-app.suggestion": "VidShrink bukan program lalai untuk video. Anda boleh memilihnya di halaman Aplikasi lalai Windows.",

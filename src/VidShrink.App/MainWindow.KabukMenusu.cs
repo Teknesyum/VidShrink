@@ -66,7 +66,7 @@ public partial class MainWindow
             {
                 var executable = Environment.ProcessPath;
                 if (string.IsNullOrWhiteSpace(executable)) throw new InvalidOperationException(nameof(Environment.ProcessPath));
-                var written = install(executable, Say(labelKey));
+                var written = InstallShellMenu(install, executable, Say(labelKey));
                 ShowShellMenuStatus(Say("settings-tab.shell-menu.done", written));
             }
             else
@@ -83,6 +83,9 @@ public partial class MainWindow
             _shellMenuBusy = false;
         }
     }
+
+    internal static int InstallShellMenu(Func<string, string, int> install, string processPath, string label)
+        => install(Integration.FileAssociation.LaunchTarget(processPath), label);
 
     /// <summary>Dil değişince kurulu olan girdilerin etiketleri yeni dile göre yeniden yazılır.</summary>
     private void RelabelShellMenu()

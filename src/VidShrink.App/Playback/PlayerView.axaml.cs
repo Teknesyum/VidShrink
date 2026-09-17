@@ -33,6 +33,11 @@ internal partial class PlayerView : UserControl
     private DispatcherTimer? _render;
     private PlaybackHistory _history = new();
     private long _shown;
+    private long _drawn;
+
+    internal long DrawnFrames => _drawn;
+
+    internal event Action? IlkKareCizildi;
     private string? _path;
     private bool _playing;
     private DispatcherTimer? _pauseFlash;
@@ -125,6 +130,7 @@ internal partial class PlayerView : UserControl
                 break;
             case PlayerCommandKind.Zoom:
                 _zoom.Wheel(command.Amount, Surface.Bounds.Width / 2, Surface.Bounds.Height / 2);
+                Resize();
                 _trace.Add("zoom " + command.Amount.ToString("0.###") + " -> " + _zoom.PanelScale.ToString("0.###"));
                 break;
             case PlayerCommandKind.TogglePlay:
@@ -145,6 +151,7 @@ internal partial class PlayerView : UserControl
                 break;
             case PlayerCommandKind.ResetZoom:
                 _zoom.Reset();
+                Resize();
                 _trace.Add("zoomreset -> " + _zoom.PanelScale.ToString("0.###"));
                 break;
             case PlayerCommandKind.LeaveFullscreen:
@@ -191,7 +198,16 @@ internal partial class PlayerView : UserControl
                 AddBookmark();
                 break;
             case PlayerCommandKind.BookmarkNext:
-                NextBookmark();
+                StepBookmark(command.Amount < 0);
+                break;
+            case PlayerCommandKind.Stop:
+                if (_playing) TogglePlay();
+                _seek.GoTo(0);
+                _trace.Add("stop -> " + _playing);
+                break;
+            case PlayerCommandKind.GoToStart:
+                _seek.GoTo(0);
+                _trace.Add("tostart");
                 break;
             case PlayerCommandKind.AudioCycle:
                 CycleAudio();
@@ -303,17 +319,22 @@ internal partial class PlayerView : UserControl
         _trace.Add("bookmarkadd -> " +at.ToString("0.###"));
     }
 
-    private void NextBookmark()
+    private void StepBookmark(bool backward)
     {
-        if (_path is not { } path || _history.NextBookmark(path, CurrentPosition()) is not { } next)
+        var name = backward ? "bookmarkprev -> " : "bookmarknext -> ";
+        var at = CurrentPosition();
+        var mark = _path is not { } path
+            ? null
+            : backward ? _history.PreviousBookmark(path, at) : _history.NextBookmark(path, at);
+        if (mark is not { } next)
         {
-            _trace.Add("bookmarknext -> no");
+            _trace.Add(name + "no");
             return;
         }
 
         _trackPaused = false;
         _seek.GoTo(next);
-        _trace.Add("bookmarknext -> " +next.ToString("0.###"));
+        _trace.Add(name + next.ToString("0.###"));
     }
 
     private void OnWheel(object? sender, PointerWheelEventArgs e)
@@ -373,6 +394,10 @@ internal partial class PlayerView : UserControl
 
     internal bool MenuAtPointer { get; set; }
 
+    private MenuFlyout? _menu;
+
+    internal bool MenuOpen => _menu?.IsOpen ?? false;
+
     internal MenuFlyout BuildMenu()
     {
         var flyout = new MenuFlyout();
@@ -383,6 +408,13 @@ internal partial class PlayerView : UserControl
             group = action.MenuGroup;
 
             var item = new MenuItem { Header = Strings.Get(action.LabelKey), Tag = action };
+            if (ReferenceEquals(action, Keymap.Settings))
+            {
+                foreach (var child in SettingsItems()) item.Items.Add(child);
+                flyout.Items.Add(item);
+                continue;
+            }
+
             if (Keymap.FirstKeyRow(action) is { } row)
                 item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
             item.Click += OnMenuRow;
@@ -392,8 +424,28 @@ internal partial class PlayerView : UserControl
         AddTrackMenus(flyout);
         AppendWindowMenu(flyout);
         AppendToolsMenu(flyout);
-        AppendAdvancedMenu(flyout);
         return flyout;
+    }
+
+    internal List<Control> SettingsItems()
+    {
+        var items = new List<Control>();
+        if (AppSettingsItems?.Invoke() is { Count: > 0 } app)
+        {
+            items.AddRange(app);
+            items.Add(new Separator());
+        }
+
+        var folder = new MenuItem { Header = Strings.Get("player.view.screenshot-folder") };
+        folder.Click += OnPickScreenshotFolder;
+        items.Add(folder);
+        items.Add(AdvancedMenu());
+        items.Add(new Separator());
+
+        var all = new MenuItem { Header = Strings.Get("main.player.menu.settings-all"), Tag = Keymap.Settings };
+        all.Click += OnMenuRow;
+        items.Add(all);
+        return items;
     }
 
     private void OnMenuRow(object? sender, RoutedEventArgs e)
@@ -405,6 +457,7 @@ internal partial class PlayerView : UserControl
     private void OpenMenu()
     {
         var flyout = BuildMenu();
+        _menu = flyout;
         MenuAnchor = MenuAtPointer ? "pointer" : "surface";
         try
         {
@@ -467,23 +520,29 @@ internal partial class PlayerView : UserControl
 
     /// <summary>
     /// Duraklatinca sahnenin ortasinda kisa bir duraklatma simgesi belirir: girisi ve
-    /// cikisi <c>MotionFast</c>, ekranda kalisi <c>PauseGlyphHold</c>. Oynatmada karsiligi
-    /// yok — orada goruntunun onune konan her sey icerigi kapatir.
+    /// cikisi <c>MotionFast</c>, ekranda toplam kalisi giris ve cikis dahil
+    /// <c>PauseGlyphHold</c> (tarif: 0,5 sn). Oynatmada karsiligi yok — orada goruntunun
+    /// onune konan her sey icerigi kapatir. Ust uste duraklatmada eski cikisin gizlemesi
+    /// yeni simgeyi kapatmasin diye her parlama bir sira numarasi tasir.
     /// </summary>
     private void FlashPause()
     {
         _pauseFlash ??= new DispatcherTimer();
         _pauseFlash.Stop();
+        _pauseFlashSira++;
 
         PauseGlyph.IsVisible = true;
         PauseGlyph.Opacity = PauseGlyphOpacity;
         PauseGlyph.RenderTransform = TransformOperations.Parse("scale(1)");
 
-        _pauseFlash.Interval = PauseGlyphHold;
+        var hold = PauseGlyphHold - MotionFast;
+        _pauseFlash.Interval = hold > TimeSpan.Zero ? hold : TimeSpan.Zero;
         _pauseFlash.Tick -= OnPauseFlashDone;
         _pauseFlash.Tick += OnPauseFlashDone;
         _pauseFlash.Start();
     }
+
+    private int _pauseFlashSira;
 
     private void OnPauseFlashDone(object? sender, EventArgs e)
     {
@@ -491,7 +550,12 @@ internal partial class PlayerView : UserControl
         PauseGlyph.Opacity = 0;
         PauseGlyph.RenderTransform = TransformOperations.Parse("scale(0.8)");
 
-        DispatcherTimer.RunOnce(() => PauseGlyph.IsVisible = false, MotionFast);
+        var sira = _pauseFlashSira;
+        DispatcherTimer.RunOnce(() =>
+        {
+            if (sira != _pauseFlashSira) return;
+            PauseGlyph.IsVisible = false;
+        }, MotionFast);
     }
 
     /// <summary>Çizim saatinin olağan adımı; ekranın kendi hızı.</summary>
@@ -681,6 +745,7 @@ internal partial class PlayerView : UserControl
             Resize();
         }
         Frame.InvalidateVisual();
+        if (_drawn++ == 0) IlkKareCizildi?.Invoke();
         TxtEmpty.IsVisible = false;
         RefreshState();
     }
@@ -689,15 +754,16 @@ internal partial class PlayerView : UserControl
     /// Goruntuyu panonun bugunku olcusune sigdirir. Olcu iki yerden degisir: yeni kare
     /// gelince ve pano yeniden boyutlanınca. Ikisi de buraya girer, boylece pencere
     /// buyudugunde duraklatilmis goruntu de buyur.
-    /// <c>ZoomGesture.Scale</c> band kademesinde <c>PanelScale</c>'i zaten iceriyor;
-    /// burada ikinci kez carpilmaz.
+    /// Oynaticida panel terfisi yok: Alt+teker her kademede goruntuyu buyutur, bu yuzden
+    /// olcu <c>ZoomGesture.Scale</c>'den degil sigdirma olcegi carpi panel olceginden gelir.
     /// </summary>
     private void Resize()
     {
         if (Frame.Source is null) return;
         _zoom.SetViewport(Surface.Bounds.Width, Surface.Bounds.Height);
-        Frame.Width = _zoom.ContentWidth;
-        Frame.Height = _zoom.ContentHeight;
+        var scale = _zoom.FitScale * _zoom.PanelScale;
+        Frame.Width = _zoom.SourceWidth * scale;
+        Frame.Height = _zoom.SourceHeight * scale;
         Frame.InvalidateVisual();
     }
 

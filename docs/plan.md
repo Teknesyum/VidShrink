@@ -1,3 +1,23 @@
+# HandBrake Dalga 1a — Başsız CLI
+
+Dal `t0/hb-1a-cli`. Kaynak: `.calisma/danisma/handbrake-yanit.md` karar 9.
+
+1. **Tek karar kaynağı.** Yeni `src/VidShrink.Ffmpeg/ShrinkEngine.cs`: yoklama + kalibrasyon
+   döngüsü (bugün `MainWindow.MeasureComplexityAsync` içinde), karar (`BuildDetailed`),
+   gösterilen komut, çıktı adı. `MainWindow` aynı fonksiyonları çağırır; eski statik
+   yardımcılar yönlendirici olarak kalır (kaynak pimleri bozulmaz, biri motora taşınır).
+2. **`src/VidShrink.Cli`** (yalnız Core + Ffmpeg): `kucult`, `plan`; `--hedef`/`--kalite`,
+   `--kodek auto|h264|hevc|av1`, `--cikti`, `--json`, `--olcumsuz`. İlerleme stderr, sonuç
+   stdout. Çıkış kodları: 0 bantta, 2 bant altı, 3 tavan aşımı, 1 hata, 64 kullanım, 130 iptal.
+   `izle` kaydedilmez (2c).
+3. **Dil:** `Locales/en.json` + `tr.json` gömülü, `CurrentUICulture` seçer.
+4. **Testler:** `CliTests` — GUI penceresinin komutu ile CLI komutu aynı girdide bayt bayt eşit
+   (üç kodek), negatif kontrol (farklı hedef/kodek farklı komut), ayrıştırma, çıkış kodu
+   eşlemesi, dil anahtarları; ffmpeg'li 2 sn'lik klip `plan --json` ve `kucult` süreç testi.
+5. **Paket:** `release.yml` CLI'ı aynı `publish/<rid>` klasörüne App'ten önce yayınlar
+   (macOS'ta `vidshrink-cli`, `VidShrink` ana ikilisiyle büyük/küçük harf çakışmasın);
+   `VidShrink.sln`; README'ye kısa CLI bölümü.
+
 # Hipersürüş — çift tıktan ilk kareye
 
 > "ister güncelleme olsun ister olmasın bir videoya tıklandığı oynatmaya geçme
@@ -414,6 +434,32 @@ sağ tık menüsünün kayıt değerleri her koşumdan önce ve sonra doğrulan�
 
 Tablo [docs/olcumler/acilis-hizi.md](olcumler/acilis-hizi.md) F dalgası.
 
+## Hipersürüş G Dalgası — Başlatıcısız Çift Tık (17 Eylül 2026)
+
+Dal `t0/hipersurus-g`. Kullanıcı: "1 sn'de açılmıyor, panel olmasın". Danışma
+`.calisma/danisma/hipersurus-g-yanit.md`. Her ikili ayrı ayar dosyası
+(`VIDSHRINK_SETTINGS_PATH`, `.calisma` altı) ve kayıt kalkanıyla (`KayitKalkani`) koşar.
+
+1. **G5** `EkranSaati`: `--klip -` boş açılış, `--bitis` bekleme işaretini gerçekten
+   seçer, `--giris-a/--giris-b baslatici|app` tarafı doğrudan `app\VidShrink.App.exe`
+   ile açabilir. Uygulamaya izle kapılı `ilk-boya` işareti (ilk çizilen pencere).
+2. **G4** Kusur: kaynağa göre önerilen hedef MB ve türetilen kalite ayar dosyasına
+   yazılıyordu (eski dosyada `qualityTarget` 60→78,3). Kaydedilen değerler yalnız
+   kullanıcının kendi girdisinden gelir.
+3. **G2** Dosya ilişkisinin `open` komutu `app\VidShrink.App.exe`'ye gider. Ortak
+   karar `ShellIntegration.OpenCommandTarget`; kurucu betiği, `ShellRegistration` ve
+   `FileAssociation.Plan` aynı değeri yazar. Simge, `Applications\VidShrink.exe`
+   anahtarı ve sağ tık menüleri başlatıcıda kalır. Bakım (onarım, sürüm işareti,
+   güncelleme denetimi, işleyici) uygulamanın doğurduğu `VidShrink.exe --bakim`
+   ile koşar; `ToolLocator` `app\` altından kökteki `tools\ffmpeg`'i bulur.
+4. **G3** Başlatıcı olağan yolda da `SplashGate`'i kurar; 400 ms eşiğini aşmayan
+   bakım panelsiz geçer, `ResumePending` de kapsanır. "Yükle"den sonra rozet
+   "Başlatıcı açılıyor…" yazmaz.
+5. **G1** Yazılım çizimi: oynatıcı ve karşılaştırma paneli için ≤10 sn 1080p
+   CPU/kare A/B; kötüleşirse uygulanmaz, sayı raporlanır.
+6. **G6** EkranSaati önce/sonra: pencere, ilk boya, ilk kare; ≤10 tekrar, sıralı.
+   Tablo [docs/olcumler/hipersurus-g.md](olcumler/hipersurus-g.md).
+
 ## Paket 1
 
 Dal `t0/paket-1`. Kaynak: `.calisma/eksikler/rapor.md` satır 1, 2, 3, 6, 7, 12, 13, 14, 15. Her kalem ayrı commit.
@@ -449,3 +495,95 @@ Dal `t0/paket-2` (`origin/t0/birlesim`'den). Kaynak: `.calisma/eksikler/rapor.md
 9. **Gelişmiş panelin on kolu ve çeviri** (satır 11): kap, ölçek, anahtar kare, profil, ayar, hız kontrolü, piksel/renk, süre sınırı, bölme, ses düzeni/kazanç/kapı/bastırma denetimleri; bu paketin bütün yeni anahtarları 42 dilde.
 
 Kurallar: yapay yük yok, `dotnet build -m:2`, test yalnız `--filter`, pencere açan test yok (testte Win32 arka ucu gerçek pencere açar), kayıt defterine ve gerçek `%APPDATA%`'ya yazılmaz — `RecorderSettings` de `VIDSHRINK_SETTINGS_PATH`'e uyar.
+
+## Paket 3
+
+Dal `t0/paket-3` (`origin/t0/birlesim` üstünden). Kaynak: `.calisma/eksikler/rapor.md` satır 8, 9, 23;
+`docs/YOL-HARITASI.md` iki açık kalemi; `trash/sonra-2026-09-16T12-09-24-402Z.md` WhatsApp satırı. Her kalem ayrı commit.
+
+**Ölçüm yeri:** kullanıcının makinesi tam yükte iki kez kapandı. Kalem başına onlarca kodlama ve VMAF geçişi
+gerekiyor, o yüzden ölçüm yerelde değil, `workflow_dispatch` iş akışında koşar ve sonuç artifact'tan alınır.
+Düzenek `GITHUB_ACTIONS` yokken koşmayı reddeder. Kaynak açık lisanslı Blender filmi, sha256 pinli; 10 sn'lik
+kesitler kaynağın kendi parlaklık taramasından seçilir (en karanlık pencere, en parlak/hareketli pencere).
+
+Önce bulunan ölçümler (`docs/olcumler` grep'i):
+
+- `handbrake-acigi.md` — 8,79 VMAF-NEG / 2,60 dB XPSNR farkı `av1_nvenc` eski çıktısıyla ölçüldü; x265'e
+  `psy-rd=2:psy-rdoq=1:aq-mode=2`, SVT-AV1'e variance boost sonradan girdi (`tepe-tavani-ve-psy.md`, T87).
+  Farkın bugünkü yazılım yolunda kalıp kalmadığı ölçülmedi.
+- `yerlesim-skoru.md` §11 — Faz 1'in iki sabiti (`ScalePenaltyScale`, `FpsPenaltyPerHalving`) T107'de
+  ölçüldü, değişmedi. Ölçülmeyen kalan: `ScalePenaltyExponent`, `PenaltyWeights(Extreme)` üçlüsü,
+  `LowFpsSurcharge`, `LowFpsThreshold`.
+- `suit-esszamanli-kosum.md` — çökme kök nedeni açık borç; F1 yük koşumu çökmeyi üretemedi.
+
+1. **WhatsApp karanlık video (satır 8).** WhatsApp çipi `Compatible` → `libx264`; x264'e hiçbir psy/AQ
+   argümanı gitmiyor. Düzenek en karanlık 10 sn'lik kesitte eşit bit hızında kolları kıyaslar: ürün,
+   `aq-mode=3`, `aq-mode=3:aq-strength=0.8`; negatif kontrol `aq-mode=0` ve ürünün tekrarı. Ölçü VMAF-NEG,
+   XPSNR ve karanlık bölge ölçüsü (kaynakta Y<64 piksellerde PSNR ve ayırt edilen ton sayısı). Kazanan kol
+   ölçüyle `FfmpegArguments.Psychovisual`'a girer, pimlenir; kazanmazsa kod değişmez. WhatsApp'ın kendi
+   yeniden kodlaması CI'da ölçülemez: "ölçülmedi". Tablo `docs/olcumler/whatsapp-karanlik.md`.
+2. **HandBrake algı farkı (satır 9).** Aynı kesitlerde gerçek `HandBrakeCLI` (H.265 MKV 1080p30, slow,
+   çoklu geçiş) ile ürünün yazılım yolu (`bench shrink --force-codec libx265` ve `libsvtav1`) eş boyutta.
+   Donanım yolu (`av1_nvenc`) CI'da yok: "ölçülmedi". Tablo `docs/olcumler/handbrake-acigi-yazilim.md`.
+3. **Ceza sabitleri Faz 1 ve çökme düzeneği (satır 23).** Aşırı rejim bit hızlarında ölçek × kare hızı
+   ızgarası (`tools/yerlesim-skoru/olc.sh`), ölçülmemiş beş sabitin uyumu; tutulan kesitte doğrulanmayan
+   uyum koda girmez. Çökme için `cokme-yeniden-uretim.yml`: iki süit aynı koşucuda eşzamanlı,
+   `--blame-crash --blame-hang`, döküm artifact'a. Tablolar `docs/olcumler/ceza-kalibrasyonu.md`,
+   `docs/olcumler/cokme-yeniden-uretim.md`.
+
+**Durum (ölçüm sonrası).** Ölçüm yeri sonradan değişti: `workflow_dispatch` varsayılan dalda olmayan iş akışında
+404 döndü, tetik etiket oldu (`olcum-kalite-<is+is>__<kesit+kesit>--N`, `olcum-cokme-N`). Kaynak Tears of Steel
+URL'si 404, yerine Sintel 1080p (sha256 pinli).
+
+1. WhatsApp: `aq-mode=3` kolları karanlık PSNR'ı 8 satırda −0,01 ile +0,07 dB oynattı; kod değişmedi (koşum 35111531254).
+2. HandBrake: yazılım yolunda XPSNR 6/6 önde, VMAF-NEG `karanlik`ta −0,65/−0,61 geride; kod değişmedi (koşum 35112822877).
+3. Ceza: sadeleştirilmiş model 9/9 grupta iyimser, tutulan kesit doğrulaması geçmedi; sabitler değişmedi.
+   Çökme: 12 süreçte 0 çökme, eşzamanlı 2–3'te 9 kararsız kalış (koşum 35109530525).
+
+## İş 13 — HandBrake Kesit Türüne Göre, AV1 Izgarası
+
+`kalite-olcumu.yml` ikinci iş için genişledi: `handbrake` işi kesit başına kbit listesiyle (`KBITLER`), `av1` işi
+preset × CRF/kbit × film-grain × tune × keyint ızgarasıyla (`IZGARA` JSON). Kesit türleri `karanlik`, `hareketli`
+(en yüksek YDIF) ve `ekran` (Netflix "Debugging", CC BY 4.0). Ağır ızgara CI'da; yerelde yalnız kısa kontrol.
+Çağrı: etiket `olcum-kalite-handbrake+av1__karanlik+hareketli+ekran--N` ya da dispatch girdileri
+`isler`, `kesitler`, `kbitler`, `izgara`, `ekran_url`. Tablolar `docs/olcumler/handbrake-kesit-turu.md`,
+`docs/olcumler/av1-izgara.md`. Adlı ızgara: etiket `olcum-kalite-av1__<kesitler>__<ad>--N`, dosya
+`tools/kalite-paketi-3/izgaralar/<ad>.json`; eş bayt koşumu `docs/olcumler/av1-esbayt.md`.
+
+## İş 14 — Küçült ve Kabuk Açıkları (`t0/kucult-kabuk-aciklari`)
+
+Kaynak: `.calisma/denetim/yol-haritasi-denetimi.md`, "Küçült, karşılaştırma, ayarlar" ve "Kabuk, güncelleme, açılış".
+
+1. Taşma kararı: `EncodeRunner` taşmada her denemede sorar (son deneme dahil). Seçenekler: tekrar dene, bırak,
+   büyüğü kabul et, sondan/baştan/ikisinden kes. Kesme yalnız taşma ≤ %3 iken önerilir; `Core/OvershootTrim`
+   paket boylarından kesim noktası seçer, `Ffmpeg/TrimRunner` akış kopyasıyla keser, ölçer, hedefe inene dek sıkar.
+2. Sıfırla: `App/AppDataReset` ayar klasöründeki on veri dosyasını ve bozuk paylaşım defteri kopyalarını siler;
+   güncelleme günlüğü ve yarım güncelleme kaydı kalır.
+3. Küçült: Kalite bölümünde `WhatsApp uyumlu (H.264)` kutusu, kodek şeridini kilitler. Kare bölümünde
+   "Çözünürlük düşürülebilir" dinamik kutudur; kalkınca Kaynak/1080p/720p/480p şeridi (`PlanOptions.FixedResolution`, kısa kenar).
+4. Ayarlar: çıktı klasörü ve ffmpeg yolu radyo şeridi, etiket ile tek satır; dil/tema ve hedef/gelişmiş yan yana.
+5. Karşılaştırma rozeti yalnız `CRF n`; ORİJİNAL/İŞLENMİŞ orta panelin üstünde solda/sağda.
+6. Opus: MP4'te WhatsApp/iOS uyumu bozuluyor → uygulanmaz, `.calisma/kucult-kabuk/soru-opus.md`.
+7. Güncelleme: `AutoUpdate` varsayılanı kapalı; indirme/kurulum sürerken panel kapanmaz; eski Ayarlar
+   simgesi (dişli); Hakkında'da platform satırı.
+
+# Dalga 1c — Akış Eşleme
+
+Kaynak: fable kararı 6 (`.calisma/danisma/handbrake-yanit.md`), analiz satırları 17, 20-23, 25-26.
+Dal `t0/hb-1c-akis`.
+
+1. `Core/StreamMapping.cs` (yeni): kaynak iz envanteri (`SourceStream`), istek (`StreamRequest`: izleri koru,
+   platform, dil), karar (`StreamPlan`: kap, ses/altyazı izleri, notlar) ve `-map` argümanları.
+   Varsayılan MP4 + tek ses (kullanıcı dili > varsayılan iz > ilk iz) + metin altyazı `mov_text`, resim
+   altyazı düşer. İzleri koru: MKV, tüm ses (Opus) + tüm altyazı + ekler. Passthru: kap taşıyor, iz ≤ hedefin
+   %15'i, kaynak bit hızı ≤ yeniden kodlama; TrueHD/DTS varsayılanda hiç. >2 kanal yeniden kodlanırken stereo.
+   Platform çipi: MP4, tek ses, altyazısız. `-map_metadata 0 -map_chapters 0` her yolda.
+2. `Ffmpeg/FfprobeClient.cs`: `-show_chapters`, iz envanteri, bayt (bit_rate / BPS / NUMBER_OF_BYTES; altyazıda
+   yoksa paket toplamı).
+3. `Core/MediaInfo.cs`, `Core/EncodePlan.cs`: `Streams`, `ChapterCount`; plana `Streams` ve `NonVideoK`.
+4. `Core/PlanCalculator.cs`: ses + altyazı baytı bütçeden düşülür (`SizeMb`, `Correct`, `Estimate` aynı sayıyı
+   okur); çok izde ses payı izlere bölünür; `PlanOptions.KeepAllTracks/PlatformDelivery/PreferredLanguage`.
+5. `Core/FfmpegArguments.cs`: çıktı kolunda açık `-map`, `faststart` yalnız MP4; birinci geçişte yalnız video.
+6. App: gelişmiş ses bölümünde "İzleri koru" kutusu (42 dil), çıktı uzantısı plandan, platform çipi bayrağı.
+7. Test `StreamMappingTests.cs`: ffmpeg ile 3 sn girdi (2 ses + srt + PGS + 2 bölüm + başlık/tarih; ayrıca
+   dönük MP4), çıktı ffprobe ile okunur; çok izli girdide hedef isabeti; her kolun negatif kontrolü.

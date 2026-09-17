@@ -8,7 +8,7 @@ using Microsoft.Win32;
 
 namespace EkranSaati;
 
-internal sealed record Taraf(string Etiket, string Kok, Dictionary<string, string> Ortam);
+internal sealed record Taraf(string Etiket, string Kok, Dictionary<string, string> Ortam, string Giris, string Kayit);
 
 internal static class Program
 {
@@ -20,7 +20,8 @@ internal static class Program
         var s = Secenek(args);
         var cikti = Path.GetFullPath(Al(s, "cikti"));
         Directory.CreateDirectory(cikti);
-        var klip = Path.GetFullPath(Al(s, "klip"));
+        var klip = Al(s, "klip") == "-" ? "-" : Path.GetFullPath(Al(s, "klip"));
+        var bitis = s.GetValueOrDefault("bitis", "ilk-kare");
         var kalkan = Path.GetFullPath(Al(s, "kalkan"));
         if (!File.Exists(kalkan)) throw new FileNotFoundException("kalkan", kalkan);
         var yukGunlugu = s.TryGetValue("yuk", out var yg) ? Path.GetFullPath(yg) : null;
@@ -29,9 +30,8 @@ internal static class Program
         var sinir = TimeSpan.FromSeconds(int.Parse(s.GetValueOrDefault("zaman-asimi", "60"), CultureInfo.InvariantCulture));
         var ayarSablonu = JsonNode.Parse(File.ReadAllText(Al(s, "ayar")))!.AsObject();
 
-        var taraflar = new List<Taraf> { new(s.GetValueOrDefault("etiket-a", "a"), Path.GetFullPath(Al(s, "a")), Ortam(s.GetValueOrDefault("ortam-a", ""))) };
-        if (s.TryGetValue("b", out var b))
-            taraflar.Add(new(s.GetValueOrDefault("etiket-b", "b"), Path.GetFullPath(b), Ortam(s.GetValueOrDefault("ortam-b", ""))));
+        var taraflar = new List<Taraf> { YeniTaraf(s, "a") };
+        if (s.ContainsKey("b")) taraflar.Add(YeniTaraf(s, "b"));
 
         var koruma = new KayitKorumasi();
         Console.WriteLine($"kayit korumasi: sag tik menusu {koruma.MenuSayisi} deger, toplam {koruma.Sayi}");
@@ -75,7 +75,7 @@ internal static class Program
                 var kosumDizini = Path.Combine(cikti, "kosum", $"{kip}-{taraf.Etiket}-{i}");
                 if (Directory.Exists(kosumDizini)) Sil(kosumDizini);
                 Directory.CreateDirectory(kosumDizini);
-                var sonuc = Kosum(taraf, kok, kosumDizini, klip, sinir, ayarSablonu, kalkan, masaustu);
+                var sonuc = Kosum(taraf, kok, kosumDizini, klip, bitis, sinir, ayarSablonu, kalkan, masaustu);
                 Thread.Sleep(TimeSpan.FromSeconds(yukGunlugu is null ? 0 : 13));
                 if (EnYuksekCpu(yukGunlugu, yukBaslangic) is { } tepe && tepe.Cpu > 80)
                 {
@@ -87,7 +87,7 @@ internal static class Program
                 sonuc["etiket"] = taraf.Etiket;
                 kosumlar.Add(sonuc);
                 File.AppendAllText(hamYol, JsonSerializer.Serialize(sonuc) + Environment.NewLine);
-                Console.WriteLine($"{i,3} {taraf.Etiket,-12} app={Yuvarla(sonuc.GetValueOrDefault("iz:app-dogdu"))} ilk-kare={Yuvarla(sonuc.GetValueOrDefault("iz:ilk-kare"))} kalkan={sonuc.GetValueOrDefault("kalkan")}");
+                Console.WriteLine($"{i,3} {taraf.Etiket,-12} app={Yuvarla(sonuc.GetValueOrDefault("iz:app-dogdu"))} ilk-boya={Yuvarla(sonuc.GetValueOrDefault("iz:ilk-boya"))} ilk-kare={Yuvarla(sonuc.GetValueOrDefault("iz:ilk-kare"))} {bitis}={Yuvarla(sonuc.GetValueOrDefault("iz:" + bitis))} asim={sonuc.GetValueOrDefault("zaman-asimi")} kalkan={sonuc.GetValueOrDefault("kalkan")}");
 
                 if (Denetle(koruma, "sonra") is int hata2) return hata2;
                 if (sonuc.GetValueOrDefault("kalkan") is not true)
@@ -118,14 +118,26 @@ internal static class Program
         return 3;
     }
 
-    private static Dictionary<string, object?> Kosum(Taraf taraf, string kok, string kosumDizini, string klip,
+    private static Taraf YeniTaraf(Dictionary<string, string> s, string ad)
+    {
+        var giris = s.GetValueOrDefault("giris-" + ad, "baslatici");
+        if (giris is not ("baslatici" or "app")) throw new ArgumentException("--giris-" + ad + " baslatici|app");
+        var kayit = s.GetValueOrDefault("kayit-" + ad, giris);
+        if (kayit is not ("baslatici" or "app")) throw new ArgumentException("--kayit-" + ad + " baslatici|app");
+        return new Taraf(s.GetValueOrDefault("etiket-" + ad, ad), Path.GetFullPath(Al(s, ad)), Ortam(s.GetValueOrDefault("ortam-" + ad, "")), giris, kayit);
+    }
+
+    private static string Giris(string kok, string tur)
+        => tur == "app" ? Path.Combine(kok, "app", "VidShrink.App.exe") : Path.Combine(kok, "VidShrink.exe");
+
+    private static Dictionary<string, object?> Kosum(Taraf taraf, string kok, string kosumDizini, string klip, string bitis,
         TimeSpan sinir, JsonObject ayarSablonu, string kalkan, Masaustu masaustu)
     {
         var sonuc = new Dictionary<string, object?>();
-        var baslatici = Path.Combine(kok, "VidShrink.exe");
+        var baslatici = Giris(kok, taraf.Giris);
 
         var ayar = (JsonObject)ayarSablonu.DeepClone();
-        ayar["fileAssociationRegisteredFor"] = baslatici;
+        ayar["fileAssociationRegisteredFor"] = Giris(kok, taraf.Kayit);
         var ayarYolu = Path.Combine(kosumDizini, "ayar", "settings.json");
         Directory.CreateDirectory(Path.GetDirectoryName(ayarYolu)!);
         File.WriteAllText(ayarYolu, ayar.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
@@ -148,13 +160,13 @@ internal static class Program
         try
         {
             var saat = Stopwatch.StartNew();
-            var surec = masaustu.Baslat($"\"{baslatici}\" \"{klip}\"", kok);
+            var surec = masaustu.Baslat(klip == "-" ? $"\"{baslatici}\"" : $"\"{baslatici}\" \"{klip}\"", kok);
             sonuc["createprocess"] = Math.Round(saat.Elapsed.TotalMilliseconds, 1);
             Yerel.CloseHandle(surec);
 
             while (saat.Elapsed < sinir)
             {
-                if (File.Exists(izYolu) && Satirlar(izYolu).Any(l => l.StartsWith("ilk-kare\t", StringComparison.Ordinal))) break;
+                if (File.Exists(izYolu) && Satirlar(izYolu).Any(l => l.StartsWith(bitis + "\t", StringComparison.Ordinal))) break;
                 Thread.Sleep(20);
             }
             sonuc["zaman-asimi"] = saat.Elapsed >= sinir;
@@ -285,7 +297,7 @@ internal static class Program
     {
         var sb = new StringBuilder();
         sb.AppendLine($"kip      : {kip}");
-        sb.AppendLine($"klip     : {klip} ({new FileInfo(klip).Length / 1048576.0:0.0} MB)");
+        sb.AppendLine(klip == "-" ? "klip     : yok, bos acilis" : $"klip     : {klip} ({new FileInfo(klip).Length / 1048576.0:0.0} MB)");
         sb.AppendLine($"tekrar   : {tekrar}");
         sb.AppendLine($"makine   : {Environment.MachineName} / {Environment.OSVersion.VersionString}");
         sb.AppendLine($"an       : {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
@@ -294,7 +306,7 @@ internal static class Program
         sb.AppendLine("           ayni tabana (VIDSHRINK_ACILIS_T0) yazar. Kabugun CreateProcess oncesi payi girmez.");
         sb.AppendLine("kayit    : her surece KayitKalkani baslangic kancasi; HKCU ozel kovana yonlenir. Her kosumdan");
         sb.AppendLine("           once ve sonra sag tik menusu, etiketler ve iliskilendirme degerleri karsilastirilir.");
-        foreach (var t in taraflar) sb.AppendLine($"taraf    : {t.Etiket} = {t.Kok} ortam={string.Join(";", t.Ortam.Select(o => o.Key + "=" + o.Value))}");
+        foreach (var t in taraflar) sb.AppendLine($"taraf    : {t.Etiket} = {t.Kok} giris={t.Giris} kayit={t.Kayit} ortam={string.Join(";", t.Ortam.Select(o => o.Key + "=" + o.Value))}");
         sb.AppendLine();
 
         var anahtarlar = kosumlar.SelectMany(k => k.Keys).Where(k => k is not "tekrar" and not "etiket").Distinct().ToList();
@@ -373,6 +385,8 @@ internal sealed class KayitKorumasi
     {
         @"Software\Teknesyum\VidShrink\ShellLabels",
         @"Software\Classes\Teknesyum.VidShrink.Video",
+        @"Software\Classes\Applications\VidShrink.exe",
+        @"Software\Classes\Applications\VidShrink.App.exe",
     };
 
     private readonly Dictionary<(string Anahtar, string Ad), (object Deger, RegistryValueKind Tur)> _ilk = Oku();

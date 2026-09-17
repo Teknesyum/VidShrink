@@ -40,11 +40,18 @@ public sealed class HipersurusTests
         }
 
         Assert.DoesNotContain("<PublishAot>true</PublishAot>", uygulama, StringComparison.Ordinal);
+        Assert.Contains("<PropertyGroup Condition=\"'$(RuntimeIdentifier)' == 'win-x64'\">\r\n    <PublishReadyToRunComposite>true</PublishReadyToRunComposite>", uygulama.ReplaceLineEndings("\r\n"), StringComparison.Ordinal);
     }
 
     /// <summary>
     /// F1. Olağan açılışta perde yok: başlatıcı uygulamayı bekletmeden doğuruyor, uygulamada
-    /// perdeyi kaldıran yol da yok. Kurulum paneli yalnız 400 ms eşikli bakım kolunda kalıyor.
+    /// perdeyi kaldıran yol da yok. Bakım sessiz koşuyor: dosyayla açılışta ve <c>--bakim</c>
+    /// kipinde panel hiç kurulmuyor. Uygulama doğmadan önceki yolda bekleme yok; tek bekleme
+    /// elle güncellemede eski sürecin kapanması.
+    ///
+    /// <para>G3 (17 Eylül 2026): olağan yolda da eşikli sayaç kuruluyor, koşulsuz. 400 ms'yi
+    /// aşmayan bakım panelsiz geçiyor; <c>ResumePending</c>'in yüzlerce MB'lık taşıması artık
+    /// boş ekranda geçmiyor.</para>
     /// </summary>
     [Fact]
     public void OlaganAcilistaPerdeYok()
@@ -60,6 +67,37 @@ public sealed class HipersurusTests
         Assert.DoesNotContain("PerdeyiIzle", uygulama, StringComparison.Ordinal);
         Assert.Equal(2, System.Text.RegularExpressions.Regex.Matches(baslatici, @"StartApp\(executable").Count);
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(baslatici, @"SplashGate\.Arm\("));
+        Assert.Contains("using (SplashGate.Arm(progress))", baslatici, StringComparison.Ordinal);
+        var kapi = baslatici.IndexOf("using (SplashGate.Arm(progress))", StringComparison.Ordinal);
+        Assert.True(kapi < baslatici.IndexOf("UpdateStage.ResumePending(appDirectory)", StringComparison.Ordinal));
+
+        foreach (var giris in new[] { "if (!updateNow && args.Length > 0 && File.Exists(args[0]))", "args[0] == LauncherUpdate.MaintenanceArgument" })
+        {
+            var kol = baslatici[baslatici.IndexOf(giris, StringComparison.Ordinal)..];
+            kol = kol[..kol.IndexOf("return 0;", StringComparison.Ordinal)];
+            Assert.DoesNotContain("SplashGate", kol, StringComparison.Ordinal);
+            Assert.DoesNotContain("InstallProgress", kol, StringComparison.Ordinal);
+            Assert.DoesNotContain("ResumePending", kol, StringComparison.Ordinal);
+            Assert.Contains("Maintain(baseDirectory, appDirectory, previousVersion);", kol, StringComparison.Ordinal);
+            Assert.True(baslatici.IndexOf(giris, StringComparison.Ordinal) < kapi);
+        }
+
+        var bakimKolu = baslatici[baslatici.IndexOf("args[0] == LauncherUpdate.MaintenanceArgument", StringComparison.Ordinal)..];
+        Assert.DoesNotContain("StartApp(", bakimKolu[..bakimKolu.IndexOf("return 0;", StringComparison.Ordinal)], StringComparison.Ordinal);
+        var bakim = baslatici[baslatici.IndexOf("private static void Maintain(", StringComparison.Ordinal)..];
+        bakim = bakim[..bakim.IndexOf("private static void StartCommitter(", StringComparison.Ordinal)];
+        Assert.Contains("StartCommitter(baseDirectory);", bakim, StringComparison.Ordinal);
+        Assert.DoesNotContain("ResumePending", bakim, StringComparison.Ordinal);
+        Assert.DoesNotContain("StartApp(", bakim, StringComparison.Ordinal);
+
+        var main = baslatici[baslatici.IndexOf("private static int Main(", StringComparison.Ordinal)..];
+        var dogumOncesi = main[..main.LastIndexOf("StartApp(executable", StringComparison.Ordinal)];
+        foreach (var bekleme in new[] { "Thread.Sleep", "Task.Delay", "SpinWait", ".Wait(", ".Join(" })
+            Assert.DoesNotContain(bekleme, dogumOncesi, StringComparison.Ordinal);
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(dogumOncesi, @"WaitForExit\("));
+        Assert.True(dogumOncesi.IndexOf("WaitForExit(", StringComparison.Ordinal)
+                    < dogumOncesi.IndexOf("if (!File.Exists(executable))", StringComparison.Ordinal));
+        Assert.Matches(@"if \(updateNow\)\s*\{\s*WaitForExit\(", dogumOncesi);
     }
 
     /// <summary>

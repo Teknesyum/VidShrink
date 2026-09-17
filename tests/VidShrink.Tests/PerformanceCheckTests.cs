@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using VidShrink.Core;
@@ -967,7 +967,7 @@ public sealed class PerformanceCheckTests
         }
     }
 
-    private const int SaatTureviIddiaSayisi = 23;
+    private const int SaatTureviIddiaSayisi = 24;
 
     private static readonly string[] SaatCekirdegi =
     {
