@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using VidShrink.Core;
@@ -34,6 +35,12 @@ internal sealed class RecorderSettings
     /// </summary>
     internal bool ManualMode { get; set; }
 
+    internal bool AdvancedMode { get; set; }
+
+    internal static readonly int[] CountdownChoices = { 0, 3, 5, 10 };
+
+    internal int CountdownSeconds { get; set; }
+
     /// <summary>Kullanıcının istediği tahmini süre; verilmediyse <c>null</c>.</summary>
     internal int? TargetSeconds { get; set; }
 
@@ -50,6 +57,16 @@ internal sealed class RecorderSettings
 
     internal bool ShowCursor { get; set; } = true;
 
+    internal bool OpenFolderWhenDone { get; set; }
+
+    internal bool ShowClicks { get; set; }
+
+    internal bool ClickSound { get; set; }
+
+    internal bool ShowKeys { get; set; }
+
+    internal bool ShowMagnifier { get; set; }
+
     internal RecorderTargetKind Target { get; set; } = RecorderTargetKind.Screen;
 
     internal string? WindowTitle { get; set; }
@@ -62,6 +79,8 @@ internal sealed class RecorderSettings
 
     internal int RegionHeight { get; set; } = DefaultRegionHeight;
 
+    internal string RegionAspect { get; set; } = RegionDraw.Free;
+
     /// <summary>
     /// Seçilen mikrofonun adı. Indeks değil ad saklanıyor: cihaz listesi iki açılış
     /// arasında sıra değiştirdiğinde indeks başka cihazı gösterirdi. Cihaz artık yoksa
@@ -72,8 +91,14 @@ internal sealed class RecorderSettings
     /// <summary>Seçilen sistem sesi cihazının adı.</summary>
     internal string? SystemAudioName { get; set; }
 
+    internal string? WebcamName { get; set; }
+
+    internal int WebcamWidth { get; set; } = 240;
+
+    internal WebcamCorner WebcamCorner { get; set; } = WebcamCorner.BottomRight;
+
     /// <summary>Kaydın yazıldığı kap; çıktı uzantısı bundan geliyor.</summary>
-    internal RecorderContainer Container { get; set; } = RecorderContainer.Mp4;
+    internal RecorderContainer Container { get; set; } = RecorderContainer.Mkv;
 
     /// <summary>
     /// Seçilen monitörün indeksi. Windows'ta sıfırdan farklı indeks monitör sınırlarından
@@ -165,15 +190,18 @@ internal sealed class RecorderSettings
         MaxDurationSeconds > 0 ? TimeSpan.FromSeconds(MaxDurationSeconds) : null;
 
     /// <summary>
-    /// Ayarların durduğu klasör. Kaydedici ana pencereye bağlanmadığı için yolu kendisi
-    /// çözüyor; program başına tek yer.
+    /// Ayarların durduğu klasör: programın ana ayar dosyasının klasörü. Yol
+    /// <see cref="UpdateSettings.DefaultPath"/>'ten okunuyor, böylece
+    /// <c>VIDSHRINK_SETTINGS_PATH</c> ana ayarı nereye alıyorsa kaydedicinin ayarı da oraya
+    /// gidiyor ve test ya da ölçüm gerçek AppData'ya yazmıyor.
     /// </summary>
     internal static string? Folder
     {
         get
         {
-            var folder = Path.GetDirectoryName(UpdateSettings.DefaultPath);
-            return string.IsNullOrEmpty(folder) ? null : folder;
+            var main = UpdateSettings.DefaultPath;
+            var folder = Path.GetDirectoryName(main);
+            return string.IsNullOrEmpty(folder) || !Path.IsPathRooted(main) ? null : folder;
         }
     }
 
@@ -189,6 +217,8 @@ internal sealed class RecorderSettings
             if (JsonNode.Parse(File.ReadAllText(file)) is not JsonObject root) return settings;
             settings.OutputFolder = (string?)root["outputFolder"];
             settings.ManualMode = (bool?)root["manualMode"] ?? !((bool?)root["autoMode"] ?? true);
+            settings.AdvancedMode = (bool?)root["advancedMode"] ?? settings.ManualMode;
+            if ((int?)root["countdownSeconds"] is { } countdown && Array.IndexOf(CountdownChoices, countdown) >= 0) settings.CountdownSeconds = countdown;
             if ((int?)root["targetSeconds"] is { } targetSeconds && targetSeconds > 0) settings.TargetSeconds = targetSeconds;
             if ((double?)root["targetMegabytes"] is { } targetMegabytes && targetMegabytes > 0) settings.TargetMegabytes = targetMegabytes;
             if ((int?)root["fps"] is { } fps && fps > 0) settings.Fps = fps;
@@ -196,15 +226,26 @@ internal sealed class RecorderSettings
             if ((string?)root["preset"] is { Length: > 0 } preset) settings.Preset = preset;
             if ((double?)root["quality"] is { } quality) settings.Quality = quality;
             settings.ShowCursor = (bool?)root["showCursor"] ?? true;
+            settings.OpenFolderWhenDone = (bool?)root["openFolderWhenDone"] ?? false;
+            settings.ShowClicks = (bool?)root["showClicks"] ?? false;
+            settings.ClickSound = (bool?)root["clickSound"] ?? false;
+            settings.ShowKeys = (bool?)root["showKeys"] ?? false;
+            settings.ShowMagnifier = (bool?)root["showMagnifier"] ?? false;
             if (Enum.TryParse<RecorderTargetKind>((string?)root["target"], true, out var target)) settings.Target = target;
             settings.WindowTitle = (string?)root["windowTitle"];
             settings.RegionX = (int?)root["regionX"] ?? 0;
             settings.RegionY = (int?)root["regionY"] ?? 0;
             if ((int?)root["regionWidth"] is { } width && width > 0) settings.RegionWidth = width;
             if ((int?)root["regionHeight"] is { } height && height > 0) settings.RegionHeight = height;
+            if ((string?)root["regionAspect"] is { } aspect && Array.IndexOf(RegionDraw.Aspects, aspect) >= 0) settings.RegionAspect = aspect;
             settings.MicrophoneName = (string?)root["microphoneName"];
             settings.SystemAudioName = (string?)root["systemAudioName"];
-            if (Enum.TryParse<RecorderContainer>((string?)root["container"], true, out var container)) settings.Container = container;
+            settings.WebcamName = (string?)root["webcamName"];
+            if ((int?)root["webcamWidth"] is { } camWidth && RecorderArguments.WebcamWidths.Contains(camWidth)) settings.WebcamWidth = camWidth;
+            if (Enum.TryParse<WebcamCorner>((string?)root["webcamCorner"], true, out var corner) && Enum.IsDefined(corner)) settings.WebcamCorner = corner;
+            if (Enum.TryParse<RecorderContainer>((string?)root["containerChoice"], true, out var choice)) settings.Container = choice;
+            else if (Enum.TryParse<RecorderContainer>((string?)root["container"], true, out var container) && container != RecorderContainer.Mp4)
+                settings.Container = container;
             settings.ScreenIndex = (int?)root["screenIndex"] ?? 0;
             settings.ScaleWidth = (int?)root["scaleWidth"] ?? 0;
             settings.ScaleHeight = (int?)root["scaleHeight"] ?? 0;
@@ -215,7 +256,7 @@ internal sealed class RecorderSettings
             settings.BitrateKbps = (int?)root["bitrateKbps"] ?? 0;
             settings.MaxBitrateKbps = (int?)root["maxBitrateKbps"] ?? 0;
             settings.BufferKbits = (int?)root["bufferKbits"] ?? 0;
-            if ((string?)root["pixelFormat"] is { Length: > 0 } pixelFormat) settings.PixelFormat = pixelFormat;
+            if ((string?)root["pixelFormat"] is { Length: > 0 } pixelFormat) settings.PixelFormat = RecorderArguments.StoredPixelFormat(pixelFormat);
             settings.ColorSpace = (string?)root["colorSpace"];
             settings.ColorRange = (string?)root["colorRange"];
             settings.MaxDurationSeconds = (double?)root["maxDurationSeconds"] ?? 0;
@@ -242,13 +283,26 @@ internal sealed class RecorderSettings
             var folder = Path.GetDirectoryName(file);
             if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
             var temp = file + ".tmp";
-            using (var stream = File.Create(temp))
-            using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true }))
+            File.WriteAllBytes(temp, ToJson());
+            File.Move(temp, file, true);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    internal byte[] ToJson()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true }))
+        {
             {
                 writer.WriteStartObject();
                 if (OutputFolder is null) writer.WriteNull("outputFolder");
                 else writer.WriteString("outputFolder", OutputFolder);
                 writer.WriteBoolean("manualMode", ManualMode);
+                writer.WriteBoolean("advancedMode", AdvancedMode);
+                writer.WriteNumber("countdownSeconds", CountdownSeconds);
                 if (TargetSeconds is { } ts) writer.WriteNumber("targetSeconds", ts);
                 else writer.WriteNull("targetSeconds");
                 if (TargetMegabytes is { } tm) writer.WriteNumber("targetMegabytes", tm);
@@ -258,6 +312,11 @@ internal sealed class RecorderSettings
                 writer.WriteString("preset", Preset);
                 writer.WriteNumber("quality", Quality);
                 writer.WriteBoolean("showCursor", ShowCursor);
+                writer.WriteBoolean("openFolderWhenDone", OpenFolderWhenDone);
+                writer.WriteBoolean("showClicks", ShowClicks);
+                writer.WriteBoolean("clickSound", ClickSound);
+                writer.WriteBoolean("showKeys", ShowKeys);
+                writer.WriteBoolean("showMagnifier", ShowMagnifier);
                 writer.WriteString("target", Target.ToString());
                 if (WindowTitle is null) writer.WriteNull("windowTitle");
                 else writer.WriteString("windowTitle", WindowTitle);
@@ -265,11 +324,16 @@ internal sealed class RecorderSettings
                 writer.WriteNumber("regionY", RegionY);
                 writer.WriteNumber("regionWidth", RegionWidth);
                 writer.WriteNumber("regionHeight", RegionHeight);
+                writer.WriteString("regionAspect", RegionAspect);
                 if (MicrophoneName is null) writer.WriteNull("microphoneName");
                 else writer.WriteString("microphoneName", MicrophoneName);
                 if (SystemAudioName is null) writer.WriteNull("systemAudioName");
                 else writer.WriteString("systemAudioName", SystemAudioName);
-                writer.WriteString("container", Container.ToString());
+                if (WebcamName is null) writer.WriteNull("webcamName");
+                else writer.WriteString("webcamName", WebcamName);
+                writer.WriteNumber("webcamWidth", WebcamWidth);
+                writer.WriteString("webcamCorner", WebcamCorner.ToString());
+                writer.WriteString("containerChoice", Container.ToString());
                 writer.WriteNumber("screenIndex", ScreenIndex);
                 writer.WriteNumber("scaleWidth", ScaleWidth);
                 writer.WriteNumber("scaleHeight", ScaleHeight);
@@ -296,11 +360,9 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("audioNoiseSuppression", AudioNoiseSuppression);
                 writer.WriteEndObject();
             }
-            File.Move(temp, file, true);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-        }
+
+        return stream.ToArray();
     }
 
     /// <summary>

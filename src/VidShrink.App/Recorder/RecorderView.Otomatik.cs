@@ -37,7 +37,33 @@ internal partial class RecorderView
     internal bool AutoMode => !ManualMode;
 
     /// <summary>Kullanıcı kodlama kolunu kendi mi yazıyor.</summary>
-    internal bool ManualMode => ChkManual.IsChecked ?? false;
+    internal bool ManualMode => AdvancedMode && (RadManual.IsChecked ?? false);
+
+    internal bool AdvancedMode => RadAdvanced.IsChecked ?? false;
+
+    private void InitLevel()
+    {
+        RadAdvanced.IsChecked = _settings.AdvancedMode;
+        RadSimple.IsChecked = !_settings.AdvancedMode;
+        RadAdvanced.IsCheckedChanged += OnLevelToggled;
+        ApplyLevel();
+    }
+
+    private void OnLevelToggled(object? sender, RoutedEventArgs e)
+    {
+        _settings.AdvancedMode = AdvancedMode;
+        _settings.Save(RecorderSettings.FilePath);
+        ApplyLevel();
+        ApplyAutoVisibility();
+    }
+
+    private void ApplyLevel()
+    {
+        var advanced = AdvancedMode;
+        PanelOptions.IsVisible = advanced;
+        PanelAdvanced.IsVisible = advanced;
+        Grid.SetColumnSpan(PanelTarget, advanced ? 1 : 2);
+    }
 
     /// <summary>Kullanıcının verdiği hedeften çıkan bütçe; hedef yoksa hükmü <c>NotRequested</c>.</summary>
     internal RecorderBudget Budget => RecorderBudget.From(TargetMegabytes, TargetSeconds, AudioTrackCount());
@@ -59,7 +85,15 @@ internal partial class RecorderView
         : 0;
 
     /// <summary>Yazılacak aday; ölçüm koşmadıysa merdivenin ilk adayı.</summary>
-    internal RecorderAutoChoice? AutoChoice => _autoChoice;
+    internal RecorderAutoChoice? AutoChoice
+    {
+        get => _autoChoice;
+        set => _autoChoice = value;
+    }
+
+    private RecorderAutoChoice? _guess;
+
+    internal RecorderAutoChoice PlannedChoice => _autoChoice ?? (_guess ??= RecorderAutoPlan.Candidates(Machine())[0]);
 
     /// <summary>Ölçümün kendisi; ölçüm koşmadıysa <c>null</c>.</summary>
     internal RecorderAutoResult? AutoResult => _autoResult;
@@ -68,10 +102,12 @@ internal partial class RecorderView
 
     private void InitOtomatik()
     {
-        ChkManual.IsChecked = _settings.ManualMode;
+        RadManual.IsChecked = _settings.ManualMode;
+        RadAuto.IsChecked = !_settings.ManualMode;
         TxtTargetSeconds.Text = _settings.TargetSeconds?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
         TxtTargetMegabytes.Text = _settings.TargetMegabytes?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
-        ChkManual.IsCheckedChanged += OnAutoToggled;
+        RadManual.IsCheckedChanged += OnAutoToggled;
+        InitLevel();
         TxtTargetSeconds.TextChanged += OnBudgetChanged;
         TxtTargetMegabytes.TextChanged += OnBudgetChanged;
         ApplyAutoVisibility();
@@ -98,10 +134,21 @@ internal partial class RecorderView
             RecorderBudgetVerdict.Usable => Say("recorder.budget.result", budget.VideoKbps.ToString("N0", Strings.Culture)),
             RecorderBudgetVerdict.TooSmall => Say("recorder.budget.too-small", RecorderBudget.MinimumVideoKbps.ToString("N0", Strings.Culture)),
             RecorderBudgetVerdict.Invalid => Say("recorder.budget.invalid"),
-            _ => string.Empty
+            _ => SingleTargetNote()
         };
 
         TxtBudgetNote.IsVisible = TxtBudgetNote.Text.Length > 0;
+    }
+
+    private string SingleTargetNote()
+    {
+        var seconds = TargetSeconds;
+        var megabytes = TargetMegabytes;
+        if (seconds is null && megabytes is null) return string.Empty;
+        if (seconds is <= 0 || megabytes is <= 0) return Say("recorder.budget.invalid");
+        return seconds is { } sn
+            ? Say("recorder.budget.duration-only", sn.ToString("N0", Strings.Culture))
+            : Say("recorder.budget.size-only", megabytes!.Value.ToString("0.#", Strings.Culture));
     }
 
     /// <summary>
@@ -110,7 +157,7 @@ internal partial class RecorderView
     /// </summary>
     private async void OnAutoToggled(object? sender, RoutedEventArgs e)
     {
-        _settings.ManualMode = ManualMode;
+        _settings.ManualMode = RadManual.IsChecked ?? false;
         _settings.Save(RecorderSettings.FilePath);
         ApplyAutoVisibility();
 
@@ -122,8 +169,22 @@ internal partial class RecorderView
             return;
         }
 
+        if (SkipAutoMeasure) return;
         await MeasureAsync();
     }
+
+    internal bool SkipAutoMeasure { get; set; }
+
+    internal bool MeasuredOnOpen { get; private set; }
+
+    internal async Task MeasureOnOpenAsync(bool desktop)
+    {
+        if (MeasuredOnOpen || SkipAutoMeasure || !desktop || !AutoMode || _autoChoice is not null || _session is not null) return;
+        MeasuredOnOpen = true;
+        await (OpenMeasure ?? MeasureAsync)();
+    }
+
+    internal Func<Task>? OpenMeasure { get; set; }
 
     private async void OnAutoMeasure(object? sender, RoutedEventArgs e) => await MeasureAsync();
 
@@ -131,6 +192,7 @@ internal partial class RecorderView
     {
         var auto = AutoMode;
         PanelManualOptions.IsVisible = !auto;
+        PanelAdvancedEncoding.IsVisible = !auto;
         PanelAutoResult.IsVisible = auto;
         BtnAutoMeasure.IsVisible = auto;
         TxtTargetSeconds.IsEnabled = auto;

@@ -359,6 +359,99 @@ public sealed class KayitFfmpegKoluTests
             Assert.Empty(RecorderArguments.Validate(Istek() with { PixelFormat = deger }, @"C:\kayit\a.mp4")));
     }
 
+    [Theory]
+    [InlineData("nv12")]
+    [InlineData("p010le")]
+    [InlineData("rgb24")]
+    [InlineData("bgr0")]
+    [InlineData("gbrp")]
+    public void SessizceCevrilenBicimlerKumeyeGirmez(string bicim)
+    {
+        var hatalar = RecorderArguments.Validate(Istek() with { PixelFormat = bicim }, @"C:\kayit\a.mp4");
+
+        Assert.Contains(hatalar, satir => satir.Contains(bicim));
+        Assert.DoesNotContain(bicim, RecorderArguments.PixelFormats);
+    }
+
+    [Theory]
+    [InlineData("nv12", "yuv420p")]
+    [InlineData("P010LE", "yuv420p10le")]
+    [InlineData("yuv444p", "yuv444p")]
+    [InlineData("rgb24", RecorderArguments.DefaultPixelFormat)]
+    [InlineData("yuv999p", RecorderArguments.DefaultPixelFormat)]
+    public void EskiAyardakiBicimKumeyeDoner(string eski, string beklenen)
+        => Assert.Equal(beklenen, RecorderArguments.StoredPixelFormat(eski));
+
+    [Fact]
+    public void KodlayicininAlmadigiBicimReddedilir()
+    {
+        var av1 = RecorderArguments.Validate(Istek() with { VideoCodec = "libsvtav1", PixelFormat = "yuv444p" }, @"C:\kayit\a.mp4");
+        var qsv = RecorderArguments.Validate(Istek() with { VideoCodec = "h264_qsv", PixelFormat = "yuv420p10le" }, @"C:\kayit\a.mp4");
+        var x264 = RecorderArguments.Validate(Istek() with { VideoCodec = "libx264", PixelFormat = "yuv444p" }, @"C:\kayit\a.mp4");
+
+        Assert.Contains(av1, satir => satir.Contains("libsvtav1") && satir.Contains("yuv444p"));
+        Assert.Contains(qsv, satir => satir.Contains("h264_qsv") && satir.Contains("yuv420p10le"));
+        Assert.DoesNotContain(x264, satir => satir.Contains("pixel format"));
+    }
+
+    [Theory]
+    [InlineData("h264_qsv", "yuv420p", "nv12")]
+    [InlineData("hevc_qsv", "yuv420p10le", "p010le")]
+    [InlineData("hevc_nvenc", "yuv420p10le", "p010le")]
+    [InlineData("hevc_amf", "yuv420p10le", "p010le")]
+    [InlineData("hevc_nvenc", "yuv420p", "yuv420p")]
+    [InlineData("libx264", "yuv420p10le", "yuv420p10le")]
+    [InlineData("libsvtav1", "yuv420p10le", "yuv420p10le")]
+    public void PaketliAdYalnizDuzlemselAdAlinmayincaYazilir(string kodlayici, string bicim, string yazilan)
+    {
+        var args = RecorderArguments.Build(Istek() with { VideoCodec = kodlayici, PixelFormat = bicim }, @"C:\kayit\a.mp4");
+
+        Assert.Equal(yazilan, Deger(args, "-pix_fmt"));
+    }
+
+    [Fact]
+    public void HerKodlayicininBicimleriFfmpeginBildirdigiKumede()
+    {
+        var kodlayicilar = new[]
+        {
+            "libx264", "libx265", "libsvtav1", "libvpx-vp9", "h264_nvenc", "hevc_nvenc", "av1_nvenc",
+            "h264_qsv", "hevc_qsv", "h264_amf", "hevc_amf"
+        };
+
+        foreach (var kodlayici in kodlayicilar)
+        {
+            var kume = RecorderArguments.PixelFormatsFor(kodlayici);
+            Assert.NotEmpty(kume);
+            var bildirilen = FfmpegBicimleri(kodlayici);
+            Assert.All(kume, bicim =>
+                Assert.Contains(RecorderArguments.PixelFormatArgument(kodlayici, bicim), bildirilen));
+        }
+
+        Assert.Empty(RecorderArguments.PixelFormatsFor("uydurma264"));
+    }
+
+    private static string[] FfmpegBicimleri(string kodlayici)
+    {
+        using var process = new System.Diagnostics.Process
+        {
+            StartInfo = new System.Diagnostics.ProcessStartInfo("ffmpeg", $"-hide_banner -h encoder={kodlayici}")
+            {
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+        process.Start();
+        var stderr = process.StandardError.ReadToEndAsync();
+        var stdout = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+        var satir = (stdout + "\n" + stderr.Result).Split('\n')
+            .FirstOrDefault(s => s.TrimStart().StartsWith("Supported pixel formats:", StringComparison.Ordinal));
+        Assert.True(satir is not null, $"{kodlayici} icin ffmpeg piksel bicimi bildirmedi.");
+        return satir!.Split(':', 2)[1].Split(new[] { ' ', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+    }
+
     // 6 — sure siniri ve bolme
 
     [Fact]
@@ -369,6 +462,67 @@ public sealed class KayitFfmpegKoluTests
 
         Assert.Equal("150", Deger(args, "-t"));
         Assert.DoesNotContain("-t", RecorderArguments.Build(Istek(), @"C:\kayit\a.mp4"));
+    }
+
+    [Theory]
+    [InlineData(0, "150")]
+    [InlineData(40, "110")]
+    [InlineData(149.5, "0.5")]
+    public void SonrakiParcayaKalanSureYazilir(double gecen, string beklenen)
+    {
+        var istek = Istek() with { MaxDuration = TimeSpan.FromSeconds(150) };
+
+        var parca = RecorderArguments.ForSegment(istek, TimeSpan.FromSeconds(gecen));
+
+        Assert.NotNull(parca);
+        Assert.Equal(beklenen, Deger(RecorderArguments.Build(parca!, @"C:\kayit\a.mp4"), "-t"));
+    }
+
+    [Theory]
+    [InlineData(150)]
+    [InlineData(151)]
+    [InlineData(149.9995)]
+    public void SuresiDolanKayitYeniParcaAcmaz(double gecen)
+        => Assert.Null(RecorderArguments.ForSegment(
+            Istek() with { MaxDuration = TimeSpan.FromSeconds(150) }, TimeSpan.FromSeconds(gecen)));
+
+    [Fact]
+    public void SinirsizKayittaParcaIstegiDegismez()
+    {
+        var istek = Istek() with { Split = new RecorderSplit(TimeSpan.FromMinutes(1)) };
+
+        Assert.Same(istek, RecorderArguments.ForSegment(istek, TimeSpan.FromMinutes(3)));
+    }
+
+    [Fact]
+    public void BolmeSuresiKalanSuredenUzunOlsaDaParcaKurulur()
+    {
+        var istek = Istek() with
+        {
+            MaxDuration = TimeSpan.FromSeconds(150),
+            Split = new RecorderSplit(TimeSpan.FromSeconds(60))
+        };
+
+        var parca = RecorderArguments.ForSegment(istek, TimeSpan.FromSeconds(120))!;
+
+        Assert.Equal("30", Deger(RecorderArguments.Build(parca, @"C:\kayit\a.mp4"), "-t"));
+        Assert.Equal(istek.Split, RecorderArguments.ForSegment(istek, TimeSpan.Zero)!.Split);
+    }
+
+    [Fact]
+    public void OturumHerParcayiKalanSureyleKurar()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(KokDizin(), "src", "VidShrink.Ffmpeg", "RecorderSession.cs"));
+
+        Assert.Contains("RecorderArguments.ForSegment(_request, _capturedBefore, _segments.Count == 0 ? 0 : WrittenMb)", kaynak);
+        Assert.DoesNotContain("RecorderArguments.Build(_request", kaynak);
+    }
+
+    private static string KokDizin()
+    {
+        var dizin = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dizin is not null && !File.Exists(Path.Combine(dizin.FullName, "VidShrink.sln"))) dizin = dizin.Parent;
+        return dizin?.FullName ?? throw new DirectoryNotFoundException("VidShrink.sln bulunamadi.");
     }
 
     /// <summary>
@@ -736,5 +890,114 @@ public sealed class KayitFfmpegKoluTests
             Metin(args).IndexOf("-i desktop", StringComparison.Ordinal)
             < Metin(args).IndexOf("-c:v", StringComparison.Ordinal),
             "kodlama kolu girdiden sonra gelmeli");
+    }
+
+    [Fact]
+    public void Mp4KaydiYenidenKodlamadanKurulur()
+    {
+        var args = RecorderArguments.BuildRemuxToMp4(@"C:\kayit\a.mkv", @"C:\kayit\a.mp4");
+
+        Assert.Equal(@"C:\kayit\a.mkv", Deger(args, "-i"));
+        Assert.Equal("copy", Deger(args, "-c"));
+        Assert.Equal("0", Deger(args, "-map"));
+        Assert.Equal("+faststart", Deger(args, "-movflags"));
+        Assert.DoesNotContain("-c:v", args);
+        Assert.Equal(@"C:\kayit\a.mp4", args[^1]);
+        Assert.Throws<ArgumentException>(() => RecorderArguments.BuildRemuxToMp4(@"C:\kayit\a.mkv", @"C:\kayit\a.mov"));
+
+        var mevcut = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { @"C:\kayit\a.mp4", @"C:\kayit\a_2.mp4" };
+        Assert.Equal(@"C:\kayit\a_3.mp4", RecorderArguments.RemuxTarget(@"C:\kayit\a.mkv", mevcut.Contains));
+        Assert.Equal(@"C:\kayit\b.mp4", RecorderArguments.RemuxTarget(@"C:\kayit\b.mkv", mevcut.Contains));
+    }
+
+    [Fact]
+    public void GifKabiUzantisiniVerirVeMatroskayaYakalar()
+    {
+        Assert.Equal("gif", RecorderArguments.Extension(RecorderContainer.Gif));
+        Assert.Equal(RecorderContainer.Gif, RecorderArguments.ContainerOf(@"C:\kayit\a.gif"));
+        Assert.Equal(RecorderContainer.Mkv, RecorderArguments.CaptureContainer(RecorderContainer.Gif));
+        Assert.Equal(RecorderContainer.Mp4, RecorderArguments.CaptureContainer(RecorderContainer.Mp4));
+        Assert.Equal(@"C:\kayit\a.gif-kayit.mkv", RecorderArguments.CapturePath(@"C:\kayit\a.gif", RecorderContainer.Gif));
+        Assert.Equal(@"C:\kayit\a.mp4", RecorderArguments.CapturePath(@"C:\kayit\a.mp4", RecorderContainer.Mp4));
+
+        var args = RecorderArguments.Build(Istek() with { Container = RecorderContainer.Gif, Fps = 15 }, @"C:\kayit\a.gif");
+
+        Assert.Equal(@"C:\kayit\a.gif-kayit.mkv", args[^1]);
+        Assert.DoesNotContain("-movflags", args);
+        Assert.DoesNotContain("palettegen", Metin(args));
+    }
+
+    [Fact]
+    public void GifIstegiSesBolmeVeYuksekKareHiziniReddeder()
+    {
+        var gif = Istek() with { Container = RecorderContainer.Gif };
+        const string yol = @"C:\kayit\a.gif";
+
+        Assert.Empty(RecorderArguments.Validate(gif with { Fps = GifPalette.MaxFps }, yol));
+        Assert.Contains(RecorderArguments.Validate(gif with { Fps = GifPalette.MaxFps + 1 }, yol),
+            satir => satir.Contains("hundredths of a second"));
+        Assert.Contains(RecorderArguments.Validate(gif with { Audio = Plan(AudioTrackLayout.MixedSingleTrack) }, yol),
+            satir => satir.Contains("no audio track"));
+        Assert.Contains(RecorderArguments.Validate(gif with { Split = new RecorderSplit(TimeSpan.FromMinutes(1)) }, yol),
+            satir => satir.Contains("cannot be split"));
+        Assert.Empty(RecorderArguments.Validate(
+            Istek() with { Container = RecorderContainer.Mkv, Fps = 60, Audio = Plan(AudioTrackLayout.MixedSingleTrack) },
+            @"C:\kayit\a.mkv"));
+        Assert.Contains(RecorderArguments.Validate(gif, @"C:\kayit\a.mkv"), satir => satir.Contains("selected container is gif"));
+    }
+
+    [Fact]
+    public void GifPaletiKlipVeKaydaAyniFiltreyiVerir()
+    {
+        Assert.Equal(
+            "fps=12,scale=480:-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse",
+            VidShrink.App.Playback.ClipExport.Filter(12, 480));
+        Assert.Equal("fps=15,split[a][b];[a]palettegen[p];[b][p]paletteuse", GifPalette.Filter(15, null));
+
+        var args = GifPalette.Build(@"C:\kayit\a.gif-kayit.mkv", @"C:\kayit\a.gif", 15);
+        Assert.Equal(@"C:\kayit\a.gif-kayit.mkv", Deger(args, "-i"));
+        Assert.Equal("0", Deger(args, "-loop"));
+        Assert.Contains("-nostdin", args);
+        Assert.Equal(@"C:\kayit\a.gif", args[^1]);
+        Assert.Throws<ArgumentException>(() => GifPalette.Build(" ", @"C:\kayit\a.gif", 15));
+    }
+
+    [Fact]
+    public void OturumGifiDurunkaYakalamadanCevirir()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(KokDizin(), "src", "VidShrink.Ffmpeg", "RecorderSession.cs"));
+
+        Assert.Contains("RecorderArguments.CaptureRequest(request)", kaynak);
+        Assert.Contains("GifPalette.Build(capture.OutputPath, _gifPath, _request.Fps)", kaynak);
+        Assert.Contains("return _gifPath is null ? result : await ConvertToGifAsync(result, ct);", kaynak);
+    }
+
+    [Fact]
+    public async Task KisaMatroskaGifeCevrilir()
+    {
+        var klasor = Path.Combine(KokDizin(), ".calisma", "gif-olcu-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        try
+        {
+            var mkv = Path.Combine(klasor, "a.gif-kayit.mkv");
+            var gif = Path.Combine(klasor, "a.gif");
+            var uret = await VidShrink.Ffmpeg.FfmpegRunner.RunAsync(new[]
+            {
+                "-hide_banner", "-y", "-nostdin", "-f", "lavfi", "-i", "testsrc=size=64x48:rate=10:duration=1",
+                "-c:v", "libx264", "-pix_fmt", "yuv420p", mkv
+            });
+            Assert.True(uret.Ok, uret.StandardError);
+
+            var cevir = await VidShrink.Ffmpeg.FfmpegRunner.RunAsync(GifPalette.Build(mkv, gif, 10));
+            Assert.True(cevir.Ok, cevir.StandardError);
+
+            var bas = new byte[6];
+            using (var dosya = File.OpenRead(gif)) Assert.Equal(6, dosya.Read(bas, 0, 6));
+            Assert.Equal("GIF89a", System.Text.Encoding.ASCII.GetString(bas));
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
     }
 }

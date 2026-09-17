@@ -64,6 +64,11 @@ internal partial class RecorderView
         TxtFps.Text = _settings.Fps.ToString(CultureInfo.InvariantCulture);
         TxtQuality.Text = _settings.Quality.ToString("0.##", CultureInfo.InvariantCulture);
         ChkCursor.IsChecked = _settings.ShowCursor;
+        ChkOpenFolder.IsChecked = _settings.OpenFolderWhenDone;
+        ChkShowClicks.IsChecked = _settings.ShowClicks;
+        ChkClickSound.IsChecked = _settings.ClickSound;
+        ChkShowKeys.IsChecked = _settings.ShowKeys;
+        ChkMagnifier.IsChecked = _settings.ShowMagnifier;
         TxtWindowTitle.Text = _settings.WindowTitle ?? string.Empty;
         TxtRegionX.Text = _settings.RegionX.ToString(CultureInfo.InvariantCulture);
         TxtRegionY.Text = _settings.RegionY.ToString(CultureInfo.InvariantCulture);
@@ -108,6 +113,9 @@ internal partial class RecorderView
     {
         RowWindow.IsVisible = SelectedTarget == RecorderTargetKind.Window;
         RowRegion.IsVisible = SelectedTarget == RecorderTargetKind.Region;
+        RowRegionTools.IsVisible = RowRegion.IsVisible;
+        RowScreen.IsVisible = SelectedTarget == RecorderTargetKind.Screen;
+        if (RowWindow.IsVisible) RefreshWindowList();
     }
 
     /// <summary>
@@ -121,6 +129,9 @@ internal partial class RecorderView
     /// </para>
     /// </summary>
     internal RecorderRequest? BuildRequest(bool applyAuto = true)
+        => ReadAdvanced() && BuildChosen(applyAuto) is { } request ? FitToCodec(request) : null;
+
+    private RecorderRequest? BuildChosen(bool applyAuto)
     {
         if (!int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps))
         {
@@ -160,9 +171,10 @@ internal partial class RecorderView
         {
             Region = region,
             Audio = audio,
+            Webcam = ChosenWebcam(),
             Container = _settings.Container,
-            ScreenIndex = _settings.ScreenIndex,
-            Screens = MonitorBounds(),
+            ScreenIndex = target == RecorderTargetKind.Screen ? ChosenScreen : 0,
+            Screens = Monitors(),
             Scale = _settings.Scale,
             KeyframeSeconds = _settings.KeyframeSeconds,
             Profile = string.IsNullOrWhiteSpace(_settings.Profile) ? null : _settings.Profile,
@@ -186,14 +198,28 @@ internal partial class RecorderView
 
         if (!applyAuto || !AutoMode) return request;
 
-        if (AutoChoice is { } choice) request = RecorderAutoPlan.Apply(request, choice);
-
-        var budget = Budget;
-        if (budget.Verdict != RecorderBudgetVerdict.Usable) return request;
-
-        return RecorderAutoPlan.ApplyBudget(request, budget) with
+        var planned = RecorderAutoPlan.Apply(request, PlannedChoice);
+        request = planned with
         {
-            MaxDuration = TimeSpan.FromSeconds(_settings.TargetSeconds ?? 0)
+            Container = _settings.Container,
+            Fps = _settings.Container == RecorderContainer.Gif ? Math.Min(planned.Fps, GifPalette.MaxFps) : planned.Fps
+        };
+
+        var cap = _settings.Container == RecorderContainer.Gif ? null : _settings.TargetMegabytes;
+        var budget = Budget;
+        if (budget.Verdict == RecorderBudgetVerdict.Usable)
+            return RecorderAutoPlan.ApplyBudget(request, budget) with
+            {
+                MaxDuration = TimeSpan.FromSeconds(_settings.TargetSeconds ?? 0),
+                MaxMegabytes = cap
+            };
+
+        if (budget.Verdict != RecorderBudgetVerdict.NotRequested) return request;
+
+        return request with
+        {
+            MaxDuration = _settings.TargetSeconds is { } seconds ? TimeSpan.FromSeconds(seconds) : request.MaxDuration,
+            MaxMegabytes = cap ?? request.MaxMegabytes
         };
     }
 
@@ -242,16 +268,37 @@ internal partial class RecorderView
         return new RecorderRegion(read[0], read[1], read[2], read[3]);
     }
 
-    /// <summary>Seçimleri ayara yazar; bir sonraki açılış aynı yerden başlıyor.</summary>
+    internal (RecorderRequest Request, string Path)? PrepareRecording()
+    {
+        if (BuildRequest() is not { } request) return null;
+        StoreChoices();
+        return (request, _settings.OutputPath(DateTime.Now));
+    }
+
     private void StoreChoices()
     {
-        _settings.Target = SelectedTarget;
+        CollectChoices();
+        _settings.Save(RecorderSettings.FilePath);
+    }
+
+    private void CollectChoices()
+    {
+        ReadAdvanced(report: false);
+        if (CmbTarget.SelectedIndex >= 0) _settings.Target = SelectedTarget;
+        if (CmbScreen.SelectedIndex >= 0) _settings.ScreenIndex = CmbScreen.SelectedIndex;
+        _settings.RegionAspect = SelectedAspect;
         _settings.Codec = CmbCodec.SelectedItem as string ?? _settings.Codec;
         _settings.Preset = CmbPreset.SelectedItem as string ?? _settings.Preset;
         _settings.ShowCursor = ChkCursor.IsChecked ?? false;
+        _settings.OpenFolderWhenDone = ChkOpenFolder.IsChecked ?? false;
+        _settings.ShowClicks = ChkShowClicks.IsChecked ?? false;
+        _settings.ClickSound = ChkClickSound.IsChecked ?? false;
+        _settings.ShowKeys = ChkShowKeys.IsChecked ?? false;
+        _settings.ShowMagnifier = ChkMagnifier.IsChecked ?? false;
         _settings.WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text;
-        _settings.MicrophoneName = Chosen(AudioSourceRole.Microphone)?.Name;
-        _settings.SystemAudioName = Chosen(AudioSourceRole.SystemAudio)?.Name;
+        _settings.MicrophoneName = DeviceChoice(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
+        _settings.SystemAudioName = DeviceChoice(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);
+        CollectWebcam();
 
         if (int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps)) _settings.Fps = fps;
         if (double.TryParse(TxtQuality.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var quality)) _settings.Quality = quality;
@@ -260,7 +307,14 @@ internal partial class RecorderView
         if (int.TryParse(TxtRegionWidth.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var w)) _settings.RegionWidth = w;
         if (int.TryParse(TxtRegionHeight.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var h)) _settings.RegionHeight = h;
         if (!string.IsNullOrWhiteSpace(TxtOutputFolder.Text)) _settings.OutputFolder = TxtOutputFolder.Text;
+    }
 
-        _settings.Save(RecorderSettings.FilePath);
+    private string? DeviceChoice(ComboBox box, AudioSourceRole role, string? remembered)
+    {
+        if (box.SelectedIndex > 0) return Chosen(role)?.Name ?? remembered;
+        if (box.SelectedIndex < 0 || remembered is null) return remembered;
+        return _devices.Any(d => d.Role == role && string.Equals(d.Name, remembered, StringComparison.OrdinalIgnoreCase))
+            ? null
+            : remembered;
     }
 }

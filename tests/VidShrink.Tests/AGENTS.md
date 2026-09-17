@@ -29,7 +29,45 @@ sürümden (`x.0.0`) önce koşar.
   avfoundation/pulse argümanları, iki girdide `amix`, uydurma cihaz adının negatif kontrolü. İki canlı kol gerçek
   cihaz ister. Kanıt `.calisma/dalga8c/`.
 - `KaydediciArayuzTests.cs` — 8b dalgası, Kaydedici sekmesi: kodlayıcı ve ön ayar listeleri motorun doğrulamasından
-  geçer, uydurma ad reddedilir, süre yazımı ve aynı saniyedeki ikinci kaydın ayrı dosyaya gitmesi. Kanıt `.calisma/dalga8b/`.
+  geçer, uydurma ad reddedilir, süre yazımı ve aynı saniyedeki ikinci kaydın ayrı dosyaya gitmesi. Kaydedici ayarının
+  `VIDSHRINK_SETTINGS_PATH` klasörüne gitmesi; "Kare al" düğmesi (sahte kare işiyle yolun görünmesi, başarısız ve atan
+  işin hata satırı, üç anahtarın 42 dilde olması). Varsayılan kap Matroska: eski `container: Mp4` varsayılana döner,
+  seçim `containerChoice`'a yazılır; sonuç panelinde "MP4 olarak kaydet" yalnız mkv'de görünür, `-c copy` ile
+  sahte süreçten geçer. Basit/Gelişmiş kip: Basit'te seçenek paneli gizli, hedef iki sütuna yayılır ve elle kip
+  kapalı sayılır; eski `manualMode: true` Gelişmiş açılır; altı anahtar 42 dilde. Geri sayım
+  (0/3/5/10): sahte bekleme işiyle 3-2-1 şeritte sayılır, iptal düğmesi, F8 ve F7 keser; mini şerit sayıyı gösterir
+  (mini pencere artık `InitializeComponent` ile kuruluyor, adlı alanlar boş kalmıyordu); sayım doğrulamadan sonra,
+  oturumdan önce koşar (kaynak pimi). Kayıt çerçevesi: bölgenin dışına çizilir (`Outer`, ölçekte yukarı yuvarlanan
+  kenar), ekrana sığmazsa bölgenin içine (`Placement`), WS_EX stili saf fonksiyonla, oturumda ve F9 ile gizlenmemişken
+  istenir; sahte `IRecorderFrameHost` ile. KaydediciCerceveTests: üç hedefte bölge (ekran, `WindowRect`, bölge); tam
+  ekran çerçevesi affinity 0x11 ile kayda girmez (2x2 gdigrab pikseli, negatif kontrol affinity'siz). Tepsi: üç durum
+  (boşta/kaydediyor/duraklatıldı) paletin üç ayrı fırçasından, simge Skia'da çizilip merkez pikseli okunur; ipucu
+  süre ve diskteki anlık MB (`RecorderSession.WrittenMb`); sahte `IRecorderTrayHost`, TrayIcon kurulmaz. Genel kısayol: tanım tek yerde
+  (`RecorderHotkeys`), sahte `IGlobalHotkeys` çakışmayı ve basışı taklit eder; başsızda `NoGlobalHotkeys`
+  seçilir, gerçek RegisterHotKey testte kaydedilmez. Gelişmiş panel: on kol denetimden
+  `BuildRequest`'e ve ayara geçer, kodlayıcı değişince profil/tune/piksel listesi yenilenir, otomatik kodlayıcıya
+  uymayan kol `FitToCodec` ile düşer. Geçici ayar dosyaları `.calisma/kap-olcu-*`, test siler.
+- `KaydediciAyarTests.cs` — paket 2, her kaydedici ayarı uçtan uca: denetimde değişir, Başlat'a basmadan
+  `recorder-settings.json`'a yazılır, yeni görünümün `PrepareRecording` argümanına geçer, lavfi çevirisiyle ffprobe'ta
+  görünür; değiştirilmeyen görünüm negatif kontrol. Otomatik kip kabı korur, açılışta bir kez ölçer (başsızda ve elle
+  kipte ölçmez, sahte `OpenMeasure`). Canlı kol 4,5 sn bölge kaydı. Kanıt `.calisma/paket-2/`.
+- `KaydediciHedefTests.cs` — paket 2, hedef ve bitiş: tek hedef kutusu kendi sınırına geçer (yalnız saniye `-t`,
+  yalnız MB `-fs`), boyut sınırı parçalara kalanla bölünür, MP4/MOV'da boyut ölçütü Matroska'ya yakalanıp durunca
+  `-c copy` ile teslim kabına çevrilir; "bitince klasörü aç" yalnız kutu açıkken, F10 iptal kaydı durdurup dosyayı
+  siler. Canlı kollar `[KayitFact]`, 640x480 bölge ≤5 sn. Kanıt `.calisma/paket-2/`.
+- `KaydediciSeciciTests.cs` — paket 2, hedef seçiciler: sürükleme çift boyuta iner, oran kilidi ekranda kalır
+  (`RegionDraw`); sahte `DrawRegion` ile çizilen bölge kutulara, json'a ve `-offset_x/-video_size`'a geçer, Esc
+  vazgeçer; çizim penceresi gerçek açılıp masaüstünü kaplar. Hazır boyut, pencere seçici (sahte `ListWindows`,
+  `Pick` eleme negatifleri), ekran seçici (sahte `ScreenSource`, ikinci ekranın ofseti). Kanıt `.calisma/paket-2/`.
+- `KaydediciCerceveTests.cs` — paket 2, çerçeve her hedefte: ekran/pencere/bölge dikdörtgeni, ekrana sığmayan çerçeve
+  içe, gerçek pencerenin istemci alanı, affinity 0x11 gerçek pencerede (negatif kontrol affinity'siz).
+- `KaydediciGirdiTests.cs` — paket 2, tıklama halkası, tıklama sesi, tuş gösterimi: `KeyText`/`KeyTracker`, bellek
+  WAV'ı, bindirme yeri; sahte `IInputHooks`/`IInputOverlay`/`IClickSound` ile kutu → json → kanca, kapalı kutu kanca
+  kurmaz; gerçek halka ve tuş penceresi açılıp süresinde kapanır. Gerçek düşük seviye kanca testte kurulmaz.
+- `KaydediciKameraTests.cs` — paket 2, webcam bindirmesi ve imleç büyüteci: dshow girdisi, `overlay` grafiği ses ve
+  ölçekle tek `-filter_complex`, dört köşe, geçersiz aygıt/genişlik/köşe reddi; sahte `CameraSource` ile kutu → json →
+  istek. `[KameraFact]` OBS Virtual Camera varsa 3 sn kayıt, köşe parlaklığı karşı köşeyle kıyaslanır (CI'da atlanır).
+  Büyüteç: saf yerleşim, gerçek pencere `Follow`, sahte `IMagnifier` ile yalnız kayıtta açılma. Kanıt `.calisma/paket-2/`.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.
@@ -39,7 +77,11 @@ sürümden (`x.0.0`) önce koşar.
   `-t` ve bölme ölçütünün argümana girmemesi, ayrı ses izleri (`-c:a:N`), ses filtreleri (karışımdan önce girdi
   başına), tek kare `BuildSnapshot`, çoklu monitörün ofsetli bölgeye çevrilmesi. Her kolun negatif kontrolü var;
   44 ölçünün 24'ü üretilen argüman dizisini okur, 20'si doğrulama hata listesini ya da
-  kapalı küme dönüşlerini. Süreç çalıştırmaz, kanıt dosyası bırakmaz.
+  kapalı küme dönüşlerini. Piksel biçimi kodlayıcı başına küme (`PixelFormatsFor`): libx264'ün sessizce çevirdiği beş
+  ad reddedilir, Quick Sync/NVENC/AMF'de paketli ad yazılır. Tek süreç `ffmpeg -h encoder=<ad>` (11 kısa çağrı), kümenin
+  ffmpeg'in bildirdiği biçimlerde olduğunu okur. Kanıt dosyası bırakmaz; tablo `docs/olcumler/kaydedici-piksel-bicimleri.md`.
+  GIF kabı: yakalama `.gif-kayit.mkv`'ye, durunca `GifPalette` (klip dışa aktarımıyla aynı filtre) ile GIF'e; ses, bölme
+  ve 50'yi aşan kare hızı reddedilir. Tek kısa lavfi çevirisi (1 sn, 64x48) `GIF89a` başlığını okur, `.calisma/`'yı temizler.
 - `KayitOtomatikKipTests.cs` — 9d kolu, kaydedicinin otomatik kipi: aday merdiveni (`RecorderAutoPlan`) ve kazanma
   kuralı (`RecorderAutoProbe`). Kodlayıcı yeğlemesi nvenc/qsv/amf, donanım yokken x264, yeğlenmeyen ve uydurma adın
   negatif kontrolü, kare hızı merdiveni (75 Hz → 60), yarı boyutun çift olması, **her adayın

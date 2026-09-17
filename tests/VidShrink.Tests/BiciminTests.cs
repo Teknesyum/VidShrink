@@ -549,9 +549,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1295, toplam);
-        Assert.Equal(152, dilBasina["en"]);
-        Assert.Equal(58, dilBasina["tr"]);
+        Assert.Equal(1406, toplam);
+        Assert.Equal(160, dilBasina["en"]);
+        Assert.Equal(59, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -599,7 +599,8 @@ public sealed class BaslikKapsamiTests
     /// Hakkinda'nin platform satirlari iki main.about.platforms.* anahtari ekledi: 43 x 753 = 32379.
     /// Oynatici kisayollari dort main.player.menu.* anahtari ekledi (settings-all, bookmarkprev, stop, tostart): 43 x 757 = 32551.
     /// HandBrake 1c dalgasi main.advanced.keep-tracks.label'i ekledi: 43 x 742 = 31906'dan 43 x 743 = 31949'a;
-    /// iz kararlarinin sekiz gerekce notu (main.reason.stream.*) 43 x 751 = 32293'e, kol degistiren toplami 1218'den 1260'a (en 139'dan 143'e, tr 52'den 56'ya). Birlesik: gezilen 33067, toplam 1295 (en 152, tr 58).</para>
+    /// iz kararlarinin sekiz gerekce notu (main.reason.stream.*) 43 x 751 = 32293'e, kol degistiren toplami 1218'den 1260'a (en 139'dan 143'e, tr 52'den 56'ya). Birlesik: gezilen 33067, toplam 1295 (en 152, tr 58).
+    /// Paket 2 kaydedicisi 80 recorder.* anahtari ekledi (Basit/Gelismis, geri sayim, cerceve, tepsi, kisayol, girdi gosterimi, webcam, buyutec ve gelismis panelin on kolu): 43 x 80 = 3440, gezilen 36507; kol degistiren toplami 1406 (en 160, tr 59).</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -627,7 +628,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(33067, gezilen);
+        Assert.Equal(36507, gezilen);
         Assert.Empty(kayip);
     }
 

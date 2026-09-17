@@ -35,26 +35,11 @@ internal partial class RecorderView
         AddHandler(KeyDownEvent, OnHotkey, RoutingStrategies.Tunnel);
     }
 
-    /// <summary>
-    /// F7 başlat/duraklat, F8 durdur. Tuş ancak kaydedici görünürken dinleniyor: başka
-    /// sekmedeyken F7'ye basan kullanıcı kayıt başlatmak istemiyor.
-    /// </summary>
     private async void OnHotkey(object? sender, KeyEventArgs e)
     {
-        if (e.KeyModifiers != KeyModifiers.None) return;
-
-        switch (e.Key)
-        {
-            case Key.F7:
-                e.Handled = true;
-                await ToggleAsync();
-                break;
-
-            case Key.F8 when HasSession:
-                e.Handled = true;
-                await StopAsync();
-                break;
-        }
+        if (RecorderHotkeys.ActionOf(e.Key, e.KeyModifiers) is not { } action || !CanRun(action)) return;
+        e.Handled = true;
+        await RunHotkeyAsync(action);
     }
 
     /// <summary>
@@ -64,6 +49,12 @@ internal partial class RecorderView
     /// </summary>
     internal async System.Threading.Tasks.Task ToggleAsync()
     {
+        if (CountingDown)
+        {
+            CancelCountdown();
+            return;
+        }
+
         switch (State)
         {
             case RecorderState.Running when HasSession: await PauseAsync(); break;
@@ -88,6 +79,7 @@ internal partial class RecorderView
         _mini.ToggleRequested += async (_, _) => await ToggleAsync();
         _mini.StopRequested += async (_, _) => await StopAsync();
         _mini.ExpandRequested += (_, _) => ExpandFromMini();
+        _mini.OptionChanged += (_, option) => ApplyMiniOption(option);
         _mini.Closed += (_, _) => ExpandFromMini();
         _mini.AddHandler(KeyDownEvent, OnHotkey, RoutingStrategies.Tunnel);
 
@@ -131,5 +123,51 @@ internal partial class RecorderView
             ? new PixelRect(r.X, r.Y, r.Width, r.Height)
             : null;
 
-    private void RefreshMini() => _mini?.Follow(State, TxtElapsed.Text ?? string.Empty);
+    private void RefreshMini()
+    {
+        if (_mini is null) return;
+        _mini.Follow(State, TxtElapsed.Text ?? string.Empty, CountdownLeft);
+        _mini.ShowOptions(
+            ChkShowClicks.IsChecked ?? false,
+            ChkClickSound.IsChecked ?? false,
+            ChkShowKeys.IsChecked ?? false,
+            ChkOpenFolder.IsChecked ?? false,
+            ChkCursor.IsChecked ?? false,
+            _session is not null || CountingDown,
+            ChkMagnifier.IsChecked ?? false);
+    }
+
+    internal RecorderMini? Mini => _mini;
+
+    internal void ApplyMiniOption(MiniOption option)
+    {
+        var recording = _session is not null || CountingDown;
+        if (option.Kind == MiniOptionKind.Cursor && recording)
+        {
+            RefreshMini();
+            return;
+        }
+
+        switch (option.Kind)
+        {
+            case MiniOptionKind.ShowClicks: ChkShowClicks.IsChecked = option.Value; _settings.ShowClicks = option.Value; break;
+            case MiniOptionKind.ClickSound: ChkClickSound.IsChecked = option.Value; _settings.ClickSound = option.Value; break;
+            case MiniOptionKind.ShowKeys: ChkShowKeys.IsChecked = option.Value; _settings.ShowKeys = option.Value; break;
+            case MiniOptionKind.Magnifier: ChkMagnifier.IsChecked = option.Value; _settings.ShowMagnifier = option.Value; break;
+            case MiniOptionKind.OpenFolder: ChkOpenFolder.IsChecked = option.Value; _settings.OpenFolderWhenDone = option.Value; break;
+            case MiniOptionKind.Cursor: ChkCursor.IsChecked = option.Value; break;
+        }
+
+        if (_session is not null)
+        {
+            var current = _settings.ToJson();
+            if (!current.AsSpan().SequenceEqual(_persisted))
+            {
+                _persisted = current;
+                _settings.Save(RecorderSettings.FilePath);
+            }
+        }
+
+        SyncInput(_session is not null);
+    }
 }

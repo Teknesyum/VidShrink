@@ -52,7 +52,9 @@ public enum RecorderContainer
     Mkv,
 
     /// <summary><c>.mov</c> — mp4 ile ayni muxer ailesi, ayni kirilganlik.</summary>
-    Mov
+    Mov,
+
+    Gif
 }
 
 /// <summary>
@@ -196,6 +198,8 @@ public sealed record RecorderRequest
     /// <summary>Kaydin kendiliginden duracagi sure (<c>-t</c>); bos birakilirsa sinir yok.</summary>
     public TimeSpan? MaxDuration { get; init; }
 
+    public double? MaxMegabytes { get; init; }
+
     /// <summary>
     /// Kendiliginden bolme olcutu. Arguman uretimine girmez — parcalari
     /// <c>VidShrink.Ffmpeg.RecorderSession</c> aciyor; burasi yalnizca olcutu dogruluyor.
@@ -209,7 +213,19 @@ public sealed record RecorderRequest
     /// <c>-an</c> yazilir. Birden fazla esleme varsa her ize kendi <c>-c:a:N</c>'i yazilir.
     /// </summary>
     public AudioCapturePlan? Audio { get; init; }
+
+    public RecorderWebcam? Webcam { get; init; }
 }
+
+public enum WebcamCorner
+{
+    BottomRight,
+    BottomLeft,
+    TopRight,
+    TopLeft
+}
+
+public sealed record RecorderWebcam(string Device, int Width, WebcamCorner Corner = WebcamCorner.BottomRight);
 
 /// <summary>
 /// Ekran kaydi argumanlarini uretir. Kosturmaz — surec surmeyi
@@ -243,7 +259,14 @@ public static class RecorderArguments
     /// </summary>
     public const int DefaultKeyframeSeconds = 2;
 
-    /// <summary>Kabul edilen en uzun anahtar kare araligi, saniye.</summary>
+    /// <summary>
+    /// Kabul edilen en uzun anahtar kare araligi, saniye. <b>Olculmus bir sayi degil</b>:
+    /// ffmpeg'in boyle bir siniri yok, sayi yalniz yazim hatasini (kare sayisini saniye
+    /// yerine yazmak gibi) yakalamak icin konan bir korkuluk. Bir dakikadan seyrek anahtar
+    /// kare, ekran kaydinda aramayi bir dakikaya kadar bekletir; bundan uzununu isteyen bir
+    /// kullanim bilinmiyor. Kanitlanmis bir alt ya da ust sinir gerekirse olculup
+    /// degistirilmeli.
+    /// </summary>
     public const int MaxKeyframeSeconds = 60;
 
     /// <summary>Varsayilan piksel bicimi.</summary>
@@ -281,13 +304,28 @@ public static class RecorderArguments
     /// Kabul edilen piksel bicimleri. Kapali kume: uydurma bir bicim ffmpeg'e hic
     /// gitmiyor, cunku SVT-AV1'de olculdugu gibi tanimadigi anahtari sessizce yutan bir
     /// kodlayici "kabul" donduruyor ve hata ancak ciktida goruluyor.
+    /// <para>
+    /// Kumede yalniz bit akisina ayni adla giren duzlemsel YUV bicimleri var. Eski kumedeki
+    /// <c>nv12</c>, <c>p010le</c>, <c>rgb24</c>, <c>bgr0</c> ve <c>gbrp</c> cikarildi:
+    /// libx264 onlari uyari vermeden <c>yuv420p</c>/<c>yuv444p</c>/<c>yuv420p10le</c>'ye
+    /// ceviriyordu, yani secilen ad ciktida durmuyordu. Paketli ad (<c>nv12</c>,
+    /// <c>p010le</c>) yalniz kodlayici duzlemsel adi hic almiyorsa motorca yaziliyor, bkz.
+    /// <see cref="PixelFormatArgument"/>.
+    /// </para>
     /// </summary>
     private static readonly string[] KnownPixelFormats =
     {
         "yuv420p", "yuv422p", "yuv444p",
-        "yuv420p10le", "yuv422p10le", "yuv444p10le",
-        "nv12", "p010le", "rgb24", "bgr0", "gbrp"
+        "yuv420p10le", "yuv422p10le", "yuv444p10le"
     };
+
+    private static readonly string[] AllPlanarFormats = KnownPixelFormats;
+
+    private static readonly string[] EightAndTenBit420 = { "yuv420p", "yuv420p10le" };
+
+    private static readonly string[] Only420 = { "yuv420p" };
+
+    private static readonly string[] NvencFormats = { "yuv420p", "yuv444p", "yuv420p10le" };
 
     private static readonly string[] KnownColorSpaces =
     {
@@ -320,8 +358,70 @@ public static class RecorderArguments
     {
         RecorderContainer.Mkv => "mkv",
         RecorderContainer.Mov => "mov",
+        RecorderContainer.Gif => "gif",
         _ => "mp4"
     };
+
+    public static IReadOnlyList<string> BuildRemuxToMp4(string source, string target)
+    {
+        if (string.IsNullOrWhiteSpace(source)) throw new ArgumentException("Source path is required.", nameof(source));
+        if (ContainerOf(target ?? string.Empty) != RecorderContainer.Mp4)
+            throw new ArgumentException("The remux target must be an .mp4 file.", nameof(target));
+        return new[]
+        {
+            "-hide_banner", "-y", "-nostdin",
+            "-i", source,
+            "-map", "0",
+            "-c", "copy",
+            "-movflags", "+faststart",
+            target!
+        };
+    }
+
+    public static string RemuxTarget(string source, Func<string, bool> exists)
+    {
+        ArgumentNullException.ThrowIfNull(exists);
+        var folder = Path.GetDirectoryName(source) ?? string.Empty;
+        var stem = Path.GetFileNameWithoutExtension(source);
+        var candidate = Path.Combine(folder, stem + ".mp4");
+        for (var index = 2; exists(candidate); index++)
+            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + ".mp4");
+        return candidate;
+    }
+
+    public static RecorderContainer CaptureContainer(RecorderContainer container)
+        => container == RecorderContainer.Gif ? RecorderContainer.Mkv : container;
+
+    public static string CapturePath(string outputPath, RecorderContainer container)
+    {
+        if (container != RecorderContainer.Gif || string.IsNullOrWhiteSpace(outputPath)) return outputPath;
+        return Path.Combine(
+            Path.GetDirectoryName(outputPath) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(outputPath) + ".gif-kayit.mkv");
+    }
+
+    public static bool SizeNeedsMatroska(RecorderRequest request)
+        => request.Container is RecorderContainer.Mp4 or RecorderContainer.Mov
+           && (request.MaxMegabytes is not null || request.Split?.Megabytes is not null);
+
+    public static string SizeCapturePath(string outputPath)
+        => Path.Combine(Path.GetDirectoryName(outputPath) ?? string.Empty, Path.GetFileNameWithoutExtension(outputPath) + ".boyut.mkv");
+
+    public static string SizeDeliveryPath(string capturePath, string extension)
+    {
+        var stem = Path.GetFileNameWithoutExtension(capturePath);
+        var mark = stem.LastIndexOf(".boyut", StringComparison.Ordinal);
+        if (mark >= 0) stem = stem.Remove(mark, ".boyut".Length);
+        return Path.Combine(Path.GetDirectoryName(capturePath) ?? string.Empty, stem + extension);
+    }
+
+    public static RecorderRequest CaptureRequest(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return request.Container == RecorderContainer.Gif
+            ? request with { Container = CaptureContainer(request.Container) }
+            : request;
+    }
 
     /// <summary>
     /// Kabin adindan kap. Tanimadigi uzantida <c>null</c> doner; cagiran sessizce mp4'e
@@ -338,6 +438,7 @@ public static class RecorderArguments
             "mp4" => RecorderContainer.Mp4,
             "mkv" => RecorderContainer.Mkv,
             "mov" => RecorderContainer.Mov,
+            "gif" => RecorderContainer.Gif,
             _ => null
         };
     }
@@ -371,8 +472,56 @@ public static class RecorderArguments
         _ => Array.Empty<string>()
     };
 
-    /// <summary>Kabul edilen piksel bicimleri.</summary>
+    /// <summary>Kabul edilen piksel bicimlerinin birlesimi; tek bir kodegin kumesi <see cref="PixelFormatsFor"/>.</summary>
     public static IReadOnlyList<string> PixelFormats => KnownPixelFormats;
+
+    /// <summary>
+    /// Kodegin kabul ettigi piksel bicimleri. Kaynak ffmpeg 9.0'in
+    /// <c>ffmpeg -h encoder=&lt;ad&gt;</c> ciktisindaki "Supported pixel formats" satiri,
+    /// <see cref="KnownPixelFormats"/> ile kesistirilmis; paketli ad (<c>nv12</c>,
+    /// <c>p010le</c>) ayni ornekleme ve bit derinligindeki duzlemsel adin yerine sayiliyor.
+    /// Ham satirlar <c>docs/olcumler/kaydedici-piksel-bicimleri.md</c>. Donanim kollarinin
+    /// kumesi ffmpeg'in bildirdigi kume; kartin gercekten kodlayabildigi olculmedi.
+    /// </summary>
+    public static IReadOnlyList<string> PixelFormatsFor(string codec) => (codec ?? string.Empty).ToLowerInvariant() switch
+    {
+        "libx264" or "libx265" or "libvpx-vp9" => AllPlanarFormats,
+        "libsvtav1" => EightAndTenBit420,
+        "h264_nvenc" or "hevc_nvenc" or "av1_nvenc" => NvencFormats,
+        "h264_qsv" => Only420,
+        "hevc_qsv" or "h264_amf" or "hevc_amf" => EightAndTenBit420,
+        _ => Array.Empty<string>()
+    };
+
+    /// <summary>
+    /// Eski ayar dosyasindaki piksel bicimi. Daraltmadan once yazilmis <c>nv12</c> ve
+    /// <c>p010le</c> ayni ornekleme ve derinlikteki duzlemsel ada, kumeden cikan ya da
+    /// uydurma ad varsayilana donuyor.
+    /// </summary>
+    public static string StoredPixelFormat(string? stored)
+    {
+        var f = (stored ?? string.Empty).Trim().ToLowerInvariant();
+        if (f == "nv12") return "yuv420p";
+        if (f == "p010le") return "yuv420p10le";
+        return KnownPixelFormats.Contains(f, StringComparer.Ordinal) ? f : DefaultPixelFormat;
+    }
+
+    /// <summary>
+    /// <c>-pix_fmt</c>'e yazilan ad. Kodlayici duzlemsel adi bildirmiyorsa ayni ornekleme ve
+    /// derinlikteki paketli ad yaziliyor; boylece ffmpeg arada sessiz bir donusum kurmuyor.
+    /// Quick Sync <c>yuv420p</c>'yi de, <c>yuv420p10le</c>'yi de bildirmiyor; NVENC ve AMF
+    /// <c>yuv420p</c>'yi bildiriyor ama 10 bit icin yalniz <c>p010le</c>'yi.
+    /// </summary>
+    public static string PixelFormatArgument(string codec, string pixelFormat)
+    {
+        var c = (codec ?? string.Empty).ToLowerInvariant();
+        var f = (pixelFormat ?? string.Empty).ToLowerInvariant();
+        var qsv = c is "h264_qsv" or "hevc_qsv";
+        var packed10 = qsv || c is "h264_nvenc" or "hevc_nvenc" or "av1_nvenc" or "h264_amf" or "hevc_amf";
+        if (qsv && f == "yuv420p") return "nv12";
+        if (packed10 && f == "yuv420p10le") return "p010le";
+        return pixelFormat ?? string.Empty;
+    }
 
     /// <summary>Kabul edilen renk uzaylari.</summary>
     public static IReadOnlyList<string> ColorSpaces => KnownColorSpaces;
@@ -414,7 +563,7 @@ public static class RecorderArguments
 
         if (string.IsNullOrWhiteSpace(outputPath)) errors.Add("Output path is required.");
         else if (ContainerOf(outputPath) is not { } written)
-            errors.Add($"The {Path.GetExtension(outputPath)} output extension is not one of the recorder's containers (mp4, mkv, mov).");
+            errors.Add($"The {Path.GetExtension(outputPath)} output extension is not one of the recorder's containers (mp4, mkv, mov, gif).");
         else if (written != request.Container)
             errors.Add($"The output extension says {Extension(written)} but the selected container is {Extension(request.Container)}.");
 
@@ -431,6 +580,8 @@ public static class RecorderArguments
         errors.AddRange(StreamShapeErrors(request));
         errors.AddRange(ColourErrors(request));
         errors.AddRange(LimitErrors(request));
+        errors.AddRange(GifErrors(request));
+        errors.AddRange(WebcamErrors(request));
 
         if (request.Target == RecorderTargetKind.Window)
             errors.AddRange(WindowErrors(request));
@@ -525,6 +676,8 @@ public static class RecorderArguments
             yield return "Pixel format is required.";
         else if (!KnownPixelFormats.Contains(request.PixelFormat, StringComparer.OrdinalIgnoreCase))
             yield return $"The {request.PixelFormat} pixel format is not one of the recorder's pixel formats.";
+        else if (!PixelFormatsFor(request.VideoCodec).Contains(request.PixelFormat, StringComparer.OrdinalIgnoreCase))
+            yield return $"The {request.VideoCodec} encoder does not take the {request.PixelFormat} pixel format ({string.Join(", ", PixelFormatsFor(request.VideoCodec))}).";
 
         if (!string.IsNullOrWhiteSpace(request.ColorSpace)
             && !KnownColorSpaces.Contains(request.ColorSpace, StringComparer.OrdinalIgnoreCase))
@@ -539,6 +692,8 @@ public static class RecorderArguments
     {
         if (request.MaxDuration is { } limit && limit <= TimeSpan.Zero)
             yield return "Recording time limit must be greater than zero.";
+        if (request.MaxMegabytes is { } cap && (cap <= 0 || double.IsNaN(cap) || double.IsInfinity(cap)))
+            yield return "Recording size limit must be greater than zero.";
 
         if (request.Split is not { } split) yield break;
 
@@ -550,6 +705,73 @@ public static class RecorderArguments
             yield return "Split size must be greater than zero.";
         if (request.MaxDuration is { } max && split.Duration is { } every && every > max)
             yield return "Split duration cannot be longer than the recording time limit.";
+    }
+
+    private static IEnumerable<string> GifErrors(RecorderRequest request)
+    {
+        if (request.Container != RecorderContainer.Gif) yield break;
+
+        if (request.Audio is { InputCount: > 0 })
+            yield return "A GIF has no audio track; turn the audio inputs off.";
+        if (request.Split is not null)
+            yield return "A GIF recording is converted as one file and cannot be split.";
+        if (request.MaxMegabytes is not null)
+            yield return "A GIF is converted after capture, so its size cannot be capped while recording.";
+        if (request.Fps > GifPalette.MaxFps)
+            yield return $"A GIF frame delay is counted in hundredths of a second; the frame rate must not exceed {GifPalette.MaxFps}.";
+    }
+
+    public const int WebcamMargin = 16;
+
+    public const int MinWebcamWidth = 64;
+
+    public const int MaxWebcamWidth = 1920;
+
+    public const string WebcamBufferSize = "256M";
+
+    public static IReadOnlyList<int> WebcamWidths { get; } = new[] { 160, 240, 320, 480 };
+
+    private static IEnumerable<string> WebcamErrors(RecorderRequest request)
+    {
+        if (request.Webcam is not { } cam) yield break;
+        if (request.Platform != RecorderPlatform.Windows)
+            yield return "The webcam overlay reads the camera through DirectShow and is only available on Windows.";
+        if (string.IsNullOrWhiteSpace(cam.Device))
+            yield return "The webcam overlay needs a camera device.";
+        else if (cam.Device.Contains('"', StringComparison.Ordinal))
+            yield return "A camera device name cannot contain a quotation mark.";
+        if (cam.Width < MinWebcamWidth || cam.Width > MaxWebcamWidth || cam.Width % 2 != 0)
+            yield return $"The webcam width must be an even number between {MinWebcamWidth} and {MaxWebcamWidth} pixels.";
+        if (!Enum.IsDefined(cam.Corner))
+            yield return "The webcam corner is not one of the four corners.";
+    }
+
+    public static string WebcamPosition(WebcamCorner corner)
+    {
+        var margin = Number(WebcamMargin);
+        var left = margin;
+        var right = $"main_w-overlay_w-{margin}";
+        var top = margin;
+        var bottom = $"main_h-overlay_h-{margin}";
+        return corner switch
+        {
+            WebcamCorner.TopLeft => $"{left}:{top}",
+            WebcamCorner.TopRight => $"{right}:{top}",
+            WebcamCorner.BottomLeft => $"{left}:{bottom}",
+            _ => $"{right}:{bottom}"
+        };
+    }
+
+    public const string WebcamOutputLabel = "vout";
+
+    public static string? WebcamGraph(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.Webcam is not { } cam) return null;
+        var index = Number(AudioFirstInputIndex + (request.Audio?.InputCount ?? 0));
+        return $"[0:v]{VideoFilter(request) ?? "null"}[base];"
+               + $"[{index}:v]scale={Number(cam.Width)}:-2[cam];"
+               + $"[base][cam]overlay={WebcamPosition(cam.Corner)}:eof_action=repeat[{WebcamOutputLabel}]";
     }
 
     private static IEnumerable<string> ScreenSelectionErrors(RecorderRequest request)
@@ -589,6 +811,8 @@ public static class RecorderArguments
         ArgumentNullException.ThrowIfNull(request);
         var errors = Validate(request, outputPath);
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+        if (request.Container == RecorderContainer.Gif)
+            return Build(CaptureRequest(request), CapturePath(outputPath, request.Container));
 
         var a = new List<string> { "-hide_banner", "-y" };
         a.AddRange(Input(request));
@@ -596,19 +820,27 @@ public static class RecorderArguments
         var audio = request.Audio is { InputCount: > 0 } plan ? plan : null;
         if (audio is not null) a.AddRange(audio.Inputs);
 
-        if (VideoFilter(request) is { } filter) a.AddRange(new[] { "-vf", filter });
+        var webcam = WebcamGraph(request with { Audio = audio });
+        if (request.Webcam is { } cam)
+            a.AddRange(new[] { "-f", "dshow", "-rtbufsize", WebcamBufferSize, "-i", "video=" + cam.Device });
 
-        if (audio?.FilterComplex is { Length: > 0 } graph)
-            a.AddRange(new[] { "-filter_complex", graph });
+        if (webcam is null && VideoFilter(request) is { } filter) a.AddRange(new[] { "-vf", filter });
+
+        var graphs = new[] { webcam, audio?.FilterComplex }.Where(g => !string.IsNullOrEmpty(g)).ToArray();
+        if (graphs.Length > 0)
+            a.AddRange(new[] { "-filter_complex", string.Join(";", graphs) });
 
         a.AddRange(new[] { "-c:v", request.VideoCodec, "-preset", request.Preset });
         a.AddRange(RateControlArgs(request));
         a.AddRange(StreamShapeArgs(request));
         a.AddRange(ColourArgs(request));
-        a.AddRange(AudioOutputArgs(audio));
+        a.AddRange(AudioOutputArgs(audio, webcam is null ? "0:v" : $"[{WebcamOutputLabel}]"));
 
         if (request.MaxDuration is { } limit)
             a.AddRange(new[] { "-t", limit.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
+
+        if (request.MaxMegabytes is { } megabytes)
+            a.AddRange(new[] { "-fs", LimitBytes(megabytes).ToString(CultureInfo.InvariantCulture) });
 
         if (request.Container is RecorderContainer.Mp4 or RecorderContainer.Mov)
             a.AddRange(new[] { "-movflags", "+faststart" });
@@ -616,6 +848,39 @@ public static class RecorderArguments
         a.Add(outputPath);
         return a;
     }
+
+    /// <summary>
+    /// Bir parcanin istegi. Sure siniri kaydin toplamina ait, parcaya degil: duraklatip
+    /// surdurmek ve kendiliginden bolme yeni bir ffmpeg sureci aciyor ve her surec
+    /// <c>-t</c>'yi sifirdan sayiyor. Ilk parcadan sonra <c>-t</c>'ye kalan sure yaziliyor.
+    /// Bolme olcutu argumana girmedigi icin sonraki parcanin isteginde tasinmiyor; tasinsa
+    /// kalan sure bolme suresinden kisa kaldiginda dogrulama parcayi reddederdi.
+    /// Kalan sure <c>-t</c>'nin yazilabildigi en kucuk adimdan (1 ms) kisaysa <c>null</c>
+    /// doner ve yeni parca acilmaz.
+    /// </summary>
+    public static RecorderRequest? ForSegment(RecorderRequest request, TimeSpan capturedBefore, double writtenMbBefore = 0)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var segment = request;
+
+        if (capturedBefore > TimeSpan.Zero && request.MaxDuration is { } limit)
+        {
+            var remaining = limit - capturedBefore;
+            if (remaining < TimeSpan.FromMilliseconds(1)) return null;
+            segment = segment with { MaxDuration = remaining, Split = null };
+        }
+
+        if (writtenMbBefore > 0 && request.MaxMegabytes is { } cap)
+        {
+            var left = cap - writtenMbBefore;
+            if (LimitBytes(left) < 1) return null;
+            segment = segment with { MaxMegabytes = left, Split = null };
+        }
+
+        return segment;
+    }
+
+    public static long LimitBytes(double megabytes) => (long)Math.Floor(megabytes * 1024 * 1024);
 
     /// <summary>
     /// Kayit surerken alinan tek karelik ekran goruntusunun argumanlari. Ayni yakalama
@@ -631,6 +896,7 @@ public static class RecorderArguments
         {
             Container = RecorderContainer.Mp4,
             Audio = null,
+            Webcam = null,
             MaxDuration = null,
             Split = null
         };
@@ -668,7 +934,7 @@ public static class RecorderArguments
 
     private static IReadOnlyList<string> ColourArgs(RecorderRequest request)
     {
-        var a = new List<string> { "-pix_fmt", request.PixelFormat };
+        var a = new List<string> { "-pix_fmt", PixelFormatArgument(request.VideoCodec, request.PixelFormat) };
         if (!string.IsNullOrWhiteSpace(request.ColorSpace)) a.AddRange(new[] { "-colorspace", request.ColorSpace! });
         if (!string.IsNullOrWhiteSpace(request.ColorRange)) a.AddRange(new[] { "-color_range", request.ColorRange! });
         return a;
@@ -680,11 +946,12 @@ public static class RecorderArguments
     /// cunku izler ayri kaldiginda hangisinin hangi kodlayiciya gittigi argumandan
     /// okunabilmeli.
     /// </summary>
-    private static IReadOnlyList<string> AudioOutputArgs(AudioCapturePlan? audio)
+    private static IReadOnlyList<string> AudioOutputArgs(AudioCapturePlan? audio, string videoMap)
     {
-        if (audio is null) return new[] { "-an" };
+        if (audio is null)
+            return videoMap == "0:v" ? new[] { "-an" } : new[] { "-map", videoMap, "-an" };
 
-        var a = new List<string> { "-map", "0:v" };
+        var a = new List<string> { "-map", videoMap };
         foreach (var map in audio.Maps) a.AddRange(new[] { "-map", map });
 
         if (audio.Maps.Count <= 1)

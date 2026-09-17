@@ -403,6 +403,28 @@ public sealed class KayitMotoruTests
     /// devam yeni parca aciyor, durdurma parcalari yeniden kodlamadan birlestiriyor.
     /// </summary>
     [KayitFact]
+    public async Task SureSiniriDoluncaOturumKendiBiterVeElleDurdurmaBitisSayilmaz()
+    {
+        var cikti = KayitKanit.Path_("sure-siniri.mp4");
+        var oturum = await RecorderSession.StartAsync(BolgeIstegi() with { MaxDuration = TimeSpan.FromSeconds(2) }, cikti);
+
+        var bitti = await Task.WhenAny(oturum.Ended, Task.Delay(8000)) == oturum.Ended;
+        var durum = oturum.State;
+        var sonuc = await oturum.StopAsync();
+
+        var elle = await RecorderSession.StartAsync(BolgeIstegi(), KayitKanit.Path_("elle-durdurulan.mp4"));
+        await Task.Delay(1500);
+        await elle.StopAsync();
+        await Task.Delay(300);
+
+        KayitKanit.Log("sure-siniri.txt", new[] { $"ended={bitti} state={durum} ok={sonuc.Ok} mb={sonuc.OutputMb:0.000} elleEnded={elle.Ended.IsCompleted}" });
+        Assert.True(bitti, "-t dolunca oturum Ended'i isaretlemeli");
+        Assert.Equal(RecorderState.Stopped, durum);
+        Assert.True(sonuc.Ok, $"kendiliginden biten kayit temiz kapanmali; stderr: {sonuc.StandardError}");
+        Assert.False(elle.Ended.IsCompleted, "elle durdurulan oturum kendiliginden bitti sayilmaz");
+    }
+
+    [KayitFact]
     public async Task DuraklatilanKayitIkiParcayiBirlestirir()
     {
         var cikti = KayitKanit.Path_("duraklatilan.mp4");

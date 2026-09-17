@@ -501,6 +501,26 @@ Dal `t0/paket-1`. Kaynak: `.calisma/eksikler/rapor.md` satır 1, 2, 3, 6, 7, 12,
 8. `GlowBlue/Pink/Purple` palet değişiminde canlı.
 9. Anahtar kare atlama yarışı: yeniden üret, kök neden, düzelt, pimle.
 
+## Paket 2
+
+Dal `t0/paket-2` (`origin/t0/birlesim`'den). Kaynak: `.calisma/eksikler/rapor.md` satır 10, 11, 18, 20, 21; plan `docs/plan-kaydedici-dalgalari.md`. Her kalem ayrı commit.
+
+1. **9c borçları** (satır 10), dört commit:
+   - `PixelFormats` kodek başına daraltılır: kullanıcıya görünen küme yalnız bit akışına giren düzlemsel YUV adları, paketli ad (`nv12`, `p010le`) kodlayıcı istediğinde motorca yazılır. Kaynak `ffmpeg -h encoder=<ad>` (9.0) çıktısı, `docs/olcumler/kaydedici-piksel-bicimleri.md`.
+   - `-t` parça başına değil kayıt başına: kalan süre `_capturedBefore`'dan hesaplanır, sıfıra inince yeni parça açılmaz.
+   - `SnapshotAsync` şeride bağlanır ("Kare al"), `SnapshotPath` onu kullanır.
+   - `MaxKeyframeSeconds`, `MinGainDb`, `MaxGainDb`, `SplitPollMs` docstring'ine "ölçülmüş sayı değil" ve gerekçesi.
+2. **GIF çıktısı** (satır 18, B1): `RecorderContainer.Gif`. Canlı yakalama mkv ara dosyaya yazılır, durunca `palettegen/paletteuse` ile GIF'e çevrilir; filtre zinciri oynatıcının klip kolu (`ClipExport`) ile ortak `Core/GifPalette`.
+3. **D3 mkv varsayılanı** (satır 20): ayarın varsayılan kabı mkv; sonuç panelinde "MP4 olarak kaydet" (`-c copy` yeniden sarma).
+4. **D1/D2 Basit/Gelişmiş** (satır 20): sekmenin üstünde iki kip. Basit: kaynak, ses, başlat. Gelişmiş: otomatik/elle seçimi iki seçenek olarak, bugünkü her şey.
+5. **Geri sayım** (satır 21-7): 0/3/5/10 sn, şeritte ve mini kipte sayılır, iptal edilebilir.
+6. **Kayıt çerçevesi** (satır 21-6): bölgenin dışına çizilen, üstte kalan, tıklamayı geçiren pencere; kısayolla gizlenir.
+7. **Tepsi simgesi** (satır 21-3): üç durum (boşta/kaydediyor/duraklatıldı) palet renginden; ipucunda süre ve dosyanın o anki MB'ı.
+8. **Genel kısayol** (satır 21-2): `RegisterHotKey`, `IGlobalHotkeys` arkasında; tanım tek yerde (`RecorderHotkeys`), çakışma kullanıcıya söylenir. Testte sahte kayıtçı.
+9. **Gelişmiş panelin on kolu ve çeviri** (satır 11): kap, ölçek, anahtar kare, profil, ayar, hız kontrolü, piksel/renk, süre sınırı, bölme, ses düzeni/kazanç/kapı/bastırma denetimleri; bu paketin bütün yeni anahtarları 42 dilde.
+
+Kurallar: yapay yük yok, `dotnet build -m:2`, test yalnız `--filter`, pencere açan test yok (testte Win32 arka ucu gerçek pencere açar), kayıt defterine ve gerçek `%APPDATA%`'ya yazılmaz — `RecorderSettings` de `VIDSHRINK_SETTINGS_PATH`'e uyar.
+
 ## Paket 3
 
 Dal `t0/paket-3` (`origin/t0/birlesim` üstünden). Kaynak: `.calisma/eksikler/rapor.md` satır 8, 9, 23;

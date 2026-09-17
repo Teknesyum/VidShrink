@@ -102,6 +102,13 @@ public sealed class RecorderSession : IAsyncDisposable
     /// Bolme olcutunun ne siklikta yoklandigi. Yoklama ilerleme borusundan degil ayri bir
     /// gorevden yapiliyor: bolme o anki parcayi kapatip yenisini aciyor, kapatma ise
     /// ilerleme borusunu okuyan gorevi bekliyor — ayni gorevden cagrilsa kilitlenirdi.
+    /// <para>
+    /// 250 ms <b>olculmus bir sayi degil</b>. Ust siniri <c>-progress</c> akisi koyuyor:
+    /// ffmpeg ilerleme blogunu varsayilan olarak yarim saniyede bir yaziyor, yani bolme
+    /// olcutunun okudugu sure ve boyut o siklikta tazeleniyor; yarim saniyenin yarisinda
+    /// yoklamak her blogu en gec bir yoklama gecikmesiyle gormeye yetiyor, daha sik yoklamak
+    /// yeni bilgi getirmiyor. Bolmenin olcutu kac milisaniye astigi olculmedi.
+    /// </para>
     /// </summary>
     public const int SplitPollMs = 250;
 
@@ -127,6 +134,9 @@ public sealed class RecorderSession : IAsyncDisposable
     private TimeSpan _capturedNow;
     private int _lastExitCode;
     private bool _partial;
+    private string? _gifPath;
+    private bool _closing;
+    private readonly TaskCompletionSource _ended = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     private RecorderSession(RecorderRequest request, string outputPath, IProgress<RecordProgress>? progress)
     {
@@ -141,6 +151,15 @@ public sealed class RecorderSession : IAsyncDisposable
     /// <summary>Bugune kadar acilan parca sayisi; duraklatma her seferinde bir tane daha acar.</summary>
     public int SegmentCount => _segments.Count;
 
+    public double WrittenMb
+    {
+        get
+        {
+            try { return _segments.ToArray().Sum(SizeMb); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException) { return 0; }
+        }
+    }
+
     /// <summary>
     /// Kaydi baslatir ve ilk ilerleme blogunu bekler. Surec o blogu uretmeden olurse
     /// sebep yutulmaz: ffmpeg'in son satirlariyla <see cref="InvalidOperationException"/>
@@ -153,7 +172,32 @@ public sealed class RecorderSession : IAsyncDisposable
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(outputPath)) throw new ArgumentException("Output path is required.", nameof(outputPath));
 
-        var session = new RecorderSession(request, outputPath, progress);
+        RecorderSession session;
+        if (request.Container == RecorderContainer.Gif)
+        {
+            var errors = RecorderArguments.Validate(request, outputPath);
+            if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+            session = new RecorderSession(
+                RecorderArguments.CaptureRequest(request),
+                RecorderArguments.CapturePath(outputPath, request.Container),
+                progress)
+            { _gifPath = outputPath };
+        }
+        else if (RecorderArguments.SizeNeedsMatroska(request))
+        {
+            var errors = RecorderArguments.Validate(request, outputPath);
+            if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+            session = new RecorderSession(
+                request with { Container = RecorderContainer.Mkv },
+                RecorderArguments.SizeCapturePath(outputPath),
+                progress)
+            { _remuxExtension = Path.GetExtension(outputPath) };
+        }
+        else
+        {
+            session = new RecorderSession(request, outputPath, progress);
+        }
+
         await session.StartSegmentAsync(ct);
 
         if (request.Split is { IsSet: true })
@@ -229,7 +273,45 @@ public sealed class RecorderSession : IAsyncDisposable
         }
         finally { _turn.Release(); }
 
-        return await AssembleAsync(ct);
+        var result = await AssembleAsync(ct);
+        if (_remuxExtension is not null) return await RemuxAsync(result, ct);
+        return _gifPath is null ? result : await ConvertToGifAsync(result, ct);
+    }
+
+    private string? _remuxExtension;
+
+    private async Task<RecordResult> RemuxAsync(RecordResult capture, CancellationToken ct)
+    {
+        var files = capture.Files ?? new[] { capture.OutputPath };
+        var delivered = new List<string>(files.Count);
+        foreach (var file in files)
+        {
+            if (!File.Exists(file)) continue;
+            var target = RecorderArguments.SizeDeliveryPath(file, _remuxExtension!);
+            var run = await FfmpegRunner.RunAsync(new[]
+            {
+                "-hide_banner", "-y", "-nostdin", "-i", file, "-map", "0", "-c", "copy", "-movflags", "+faststart", target
+            }, ct);
+            if (!run.Ok || !File.Exists(target))
+                return capture with { Ok = false, ExitCode = run.ExitCode, StandardError = run.StandardError };
+            TryDelete(file);
+            delivered.Add(target);
+        }
+
+        if (delivered.Count == 0) return capture;
+        return capture with { OutputPath = delivered[0], OutputMb = delivered.Sum(SizeMb), Files = delivered };
+    }
+
+    private async Task<RecordResult> ConvertToGifAsync(RecordResult capture, CancellationToken ct)
+    {
+        if (!capture.Ok || _gifPath is null || !File.Exists(capture.OutputPath)) return capture;
+
+        var run = await FfmpegRunner.RunAsync(GifPalette.Build(capture.OutputPath, _gifPath, _request.Fps), ct);
+        if (!run.Ok || !File.Exists(_gifPath))
+            return capture with { Ok = false, ExitCode = run.ExitCode, StandardError = run.StandardError };
+
+        TryDelete(capture.OutputPath);
+        return capture with { OutputPath = _gifPath, OutputMb = SizeMb(_gifPath), Files = new[] { _gifPath } };
     }
 
     /// <summary>Yarida kalan bir oturum makinede ffmpeg birakmaz.</summary>
@@ -271,14 +353,21 @@ public sealed class RecorderSession : IAsyncDisposable
                 if (_partial)
                 {
                     State = RecorderState.Stopped;
+                    _ended.TrySetResult();
                     return;
                 }
 
                 await StartSegmentAsync(CancellationToken.None);
+                if (State == RecorderState.Stopped)
+                {
+                    _ended.TrySetResult();
+                    return;
+                }
             }
             catch (InvalidOperationException)
             {
                 State = RecorderState.Stopped;
+                _ended.TrySetResult();
                 return;
             }
             finally { _turn.Release(); }
@@ -301,12 +390,18 @@ public sealed class RecorderSession : IAsyncDisposable
 
     private async Task StartSegmentAsync(CancellationToken ct)
     {
+        if (RecorderArguments.ForSegment(_request, _capturedBefore, _segments.Count == 0 ? 0 : WrittenMb) is not { } segment)
+        {
+            State = RecorderState.Stopped;
+            return;
+        }
+
         var path = SegmentPath(_segments.Count);
         var folder = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
 
         var args = new List<string> { "-progress", "pipe:1", "-nostats" };
-        args.AddRange(RecorderArguments.Build(_request, path));
+        args.AddRange(RecorderArguments.Build(segment, path));
 
         var startInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args);
         startInfo.RedirectStandardInput = true;
@@ -330,6 +425,7 @@ public sealed class RecorderSession : IAsyncDisposable
         if (firstBlock.Task.IsCompletedSuccessfully && firstBlock.Task.Result)
         {
             State = RecorderState.Running;
+            _ = WatchExitAsync(process);
             return;
         }
 
@@ -383,7 +479,8 @@ public sealed class RecorderSession : IAsyncDisposable
         var process = _process;
         if (process is null) return;
 
-        FfmpegRunner.RequestGracefulStop(process);
+        _closing = true;
+        if (stopTimeoutMs > 0) FfmpegRunner.RequestGracefulStop(process);
 
         if (!await WaitForExitAsync(process, stopTimeoutMs, ct))
         {
@@ -407,6 +504,27 @@ public sealed class RecorderSession : IAsyncDisposable
         _process = null;
         _stdoutPump = null;
         _stderrPump = null;
+        _closing = false;
+    }
+
+    public Task Ended => _ended.Task;
+
+    private async Task WatchExitAsync(Process process)
+    {
+        try { await process.WaitForExitAsync(); }
+        catch (Exception ex) when (ex is InvalidOperationException or ObjectDisposedException) { return; }
+
+        if (_closing || !ReferenceEquals(_process, process)) return;
+        await _turn.WaitAsync();
+        try
+        {
+            if (!ReferenceEquals(_process, process)) return;
+            await FinishSegmentAsync(StopTimeoutMs, CancellationToken.None);
+            State = RecorderState.Stopped;
+        }
+        finally { _turn.Release(); }
+
+        _ended.TrySetResult();
     }
 
     private async Task<RecordResult> AssembleAsync(CancellationToken ct)

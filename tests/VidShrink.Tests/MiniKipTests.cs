@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -34,13 +34,14 @@ public class MiniKipTests
         Assert.Contains("x:Name=\"BtnToggle\"", mini);
         Assert.Contains("x:Name=\"BtnStop\"", mini);
         Assert.Contains("x:Name=\"BtnExpand\"", mini);
+        Assert.Contains("x:Name=\"BtnOptions\"", mini);
 
         Assert.DoesNotContain("TxtFrames", mini);
         Assert.DoesNotContain("TxtDropped", mini);
         Assert.DoesNotContain("CmbTarget", mini);
         Assert.DoesNotContain("ResultPanel", mini);
 
-        Assert.Equal(3, mini.Split("x:Name=\"Btn").Length - 1);
+        Assert.Equal(4, mini.Split("x:Name=\"Btn").Length - 1);
     }
 
     /// <summary>Üç ölçü de belirteçten okunuyor; XAML'a sayı yazılmıyor.</summary>
@@ -68,7 +69,7 @@ public class MiniKipTests
     {
         var kod = Oku("src", "VidShrink.App", "Recorder", "RecorderMini.axaml.cs");
 
-        Assert.Contains("Topmost = running || paused;", kod);
+        Assert.Contains("Topmost = running || paused || counting;", kod);
         Assert.DoesNotContain("Topmost=\"True\"", Oku("src", "VidShrink.App", "Recorder", "RecorderMini.axaml"));
     }
 
@@ -126,9 +127,13 @@ public class MiniKipTests
     public void SicakTuslarTekYerde()
     {
         var bag = Oku("src", "VidShrink.App", "Recorder", "RecorderView.Mini.cs");
+        var tanim = Oku("src", "VidShrink.App", "Recorder", "RecorderHotkeys.cs");
 
-        Assert.Contains("case Key.F7:", bag);
-        Assert.Contains("case Key.F8 when HasSession:", bag);
+        Assert.Contains("new(HotkeyAction.Toggle, Key.F7, 0x76)", tanim);
+        Assert.Contains("new(HotkeyAction.Stop, Key.F8, 0x77)", tanim);
+        Assert.Contains("new(HotkeyAction.Frame, Key.F9, 0x78)", tanim);
+        Assert.Contains("RecorderHotkeys.ActionOf(e.Key, e.KeyModifiers)", bag);
+        Assert.DoesNotContain("case Key.", bag);
         Assert.Contains("_mini.AddHandler(KeyDownEvent, OnHotkey", bag);
     }
 

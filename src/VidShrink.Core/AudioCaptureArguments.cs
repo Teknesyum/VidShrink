@@ -133,10 +133,20 @@ public static class AudioCaptureArguments
     /// <summary>Gurultu bastirmanin filtre adi.</summary>
     public const string NoiseSuppressionFilterName = "afftdn";
 
-    /// <summary>Kabul edilen en dusuk kazanc, desibel.</summary>
+    /// <summary>
+    /// Kabul edilen en dusuk kazanc, desibel. <b>Olculmus bir sayi degil</b>: ffmpeg'in
+    /// <c>volume</c> filtresi daha dusugunu de aliyor. -60 dB genligi binde bire indiriyor,
+    /// 16 bitlik seste isareti gurultu tabanina yaklastiriyor; daha asagisi pratikte sessizlik
+    /// ve kullaniciya sesi kapatmanin yolu kaynagi secmemek. Sinir yazim hatasina karsi.
+    /// </summary>
     public const double MinGainDb = -60;
 
-    /// <summary>Kabul edilen en yuksek kazanc, desibel.</summary>
+    /// <summary>
+    /// Kabul edilen en yuksek kazanc, desibel. <b>Olculmus bir sayi degil</b>: +30 dB genligi
+    /// yaklasik otuz iki kat buyutuyor ve olagan bir mikrofon kaydini kirpmaya goturuyor;
+    /// daha yukarisi ancak yazim hatasi olabilir. Kirpmanin hangi kazancta basladigi
+    /// kaynaga gore degisiyor ve olculmedi.
+    /// </summary>
     public const double MaxGainDb = 30;
 
     /// <summary>

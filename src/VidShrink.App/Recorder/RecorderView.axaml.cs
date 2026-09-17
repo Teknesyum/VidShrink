@@ -39,11 +39,15 @@ internal partial class RecorderView : UserControl
         InitializeComponent();
         _settings = RecorderSettings.Load(RecorderSettings.FilePath);
         InitHedef();
+        InitSecici();
+        InitGelismis();
         InitOtomatik();
         InitSes();
         InitSerit();
+        InitGeriSayim();
         InitMini();
         RefreshSerit();
+        InitKalicilik();
     }
 
     /// <summary>Sayfadaki hata satırı. Ölçüm kendi gördüğünü okuyabilsin diye açık.</summary>
@@ -61,11 +65,17 @@ internal partial class RecorderView : UserControl
         Strings.Changed -= OnLanguageChanged;
         Strings.Changed += OnLanguageChanged;
         RefreshLanguage();
+        RefreshScreens();
+        ActivateTray();
+        ActivateHotkeys();
+        _ = MeasureOnOpenAsync(Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         Strings.Changed -= OnLanguageChanged;
+        DeactivateTray();
+        DeactivateHotkeys();
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -77,11 +87,15 @@ internal partial class RecorderView : UserControl
 
     /// <summary>Kodla yazılan bütün metinleri yeniden üretir; seçimler korunuyor.</summary>
     private void RefreshLanguage()
-    {
-        RefreshTargetLabels();
-        RefreshAudioBoxes();
-        RefreshSerit();
-    }
+        => Quietly(() =>
+        {
+            RefreshTargetLabels();
+            RefreshSeciciLabels();
+            RefreshAudioBoxes();
+            RefreshCountdownLabels();
+            RefreshAdvancedLabels();
+            RefreshSerit();
+        });
 
     internal RecorderSettings Settings => _settings;
 
@@ -94,6 +108,8 @@ internal partial class RecorderView : UserControl
     {
         TxtError.IsVisible = false;
         TxtError.Text = string.Empty;
+        TxtNotice.IsVisible = false;
+        TxtNotice.Text = string.Empty;
         ResultPanel.IsVisible = false;
         TxtWarning.IsVisible = false;
         _lastRecording = null;
@@ -106,15 +122,24 @@ internal partial class RecorderView : UserControl
         TxtError.IsVisible = true;
     }
 
+    internal string NoticeText => TxtNotice.IsVisible ? TxtNotice.Text ?? string.Empty : string.Empty;
+
+    private void ShowNotice(string message)
+    {
+        TxtNotice.Text = message;
+        TxtNotice.IsVisible = true;
+    }
+
     /// <summary>
     /// Biten kaydın teslimi. Yol her koşulda görünür oluyor — yarım dosyada bile — çünkü
     /// kullanıcının aradığı ilk şey dosyanın nereye yazıldığı.
     /// </summary>
-    private void ShowResult(RecordResult result)
+    internal void ShowResult(RecordResult result)
     {
         ResultPanel.IsVisible = true;
         _lastRecording = result.OutputPath;
         TxtResultPath.Text = result.OutputPath;
+        BtnToMp4.IsVisible = VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) == VidShrink.Core.RecorderContainer.Mkv;
         ResetShare();
         TxtResult.Text = Say(
             "recorder.output.done",
@@ -153,6 +178,35 @@ internal partial class RecorderView : UserControl
     private async void OnToPlayer(object? sender, RoutedEventArgs e)
     {
         if (Delivered() is { } path && OpenInPlayer is { } gate) await gate(path);
+    }
+
+    internal bool Mp4Visible => BtnToMp4.IsVisible;
+
+    private async void OnToMp4(object? sender, RoutedEventArgs e)
+        => await SaveAsMp4Async(async args => (await FfmpegRunner.RunAsync(args)).Ok);
+
+    internal async Task<string?> SaveAsMp4Async(Func<System.Collections.Generic.IReadOnlyList<string>, Task<bool>> run)
+    {
+        if (Delivered() is not { } source) return null;
+
+        var target = VidShrink.Core.RecorderArguments.RemuxTarget(source, File.Exists);
+        bool ok;
+        try { ok = await run(VidShrink.Core.RecorderArguments.BuildRemuxToMp4(source, target)); }
+        catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            ok = false;
+        }
+
+        if (ok)
+        {
+            TxtError.IsVisible = false;
+            ShowNotice(Say("recorder.output.mp4-saved", target));
+            return target;
+        }
+
+        TxtNotice.IsVisible = false;
+        ShowError(Say("recorder.output.mp4-failed"));
+        return null;
     }
 
     /// <summary>
