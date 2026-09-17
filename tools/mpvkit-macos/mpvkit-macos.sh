@@ -96,16 +96,18 @@ frameworks=(AppKit Foundation CoreFoundation CoreGraphics CoreText CoreServices 
 fwflags=()
 for f in "${frameworks[@]}"; do fwflags+=(-framework "$f"); done
 
+swiftlib="$(dirname "$(xcrun -f swiftc)")/../lib/swift/macosx"
 set +e
 clang -dynamiclib -arch arm64 -arch x86_64 -mmacosx-version-min="$target" \
   -o "$out/libmpv.2.dylib" -install_name @rpath/libmpv.2.dylib \
   -Wl,-force_load,"$libmpv" "${others[@]}" \
   -Wl,-exported_symbols_list,"$work/exports.txt" -Wl,-dead_strip \
-  "${fwflags[@]}" -lbz2 -liconv -lexpat -lresolv -lxml2 -lz -lc++ 2> "$out/link.log"
+  "${fwflags[@]}" -L"$swiftlib" -L/usr/lib/swift -Wl,-rpath,/usr/lib/swift \
+  -lbz2 -liconv -lexpat -lresolv -lxml2 -lz -lc++ 2> "$out/link.log"
 rc=$?
 set -e
 echo "link rc=$rc warnings=$(grep -c 'warning' "$out/link.log" || true) newer-than-target=$(grep -c 'built for newer' "$out/link.log" || true)"
-head -n 60 "$out/link.log"
+grep -v 'auto-linked' "$out/link.log" | head -n 80
 [ "$rc" -eq 0 ] || exit 1
 
 d="$out/libmpv.2.dylib"
