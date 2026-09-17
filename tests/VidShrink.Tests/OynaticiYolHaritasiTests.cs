@@ -212,7 +212,7 @@ public sealed class OynaticiYolHaritasiTests
         {
         AppHost.Run(() =>
         {
-            var view = new PlayerView();
+            var view = new PlayerView { NativeMoveDrag = false };
             var window = new Window { Width = 640, Height = 360, Content = view };
             window.Show();
             DenetimSurucu.Wait(view, 0.2);
@@ -227,18 +227,18 @@ public sealed class OynaticiYolHaritasiTests
             var pencereBas = new PixelPoint(100, 100);
             var imlecBas = new PixelPoint(400, 300);
             PixelPoint Imlec(PixelPoint serbest) => new(serbest.X - pencereBas.X + imlecBas.X, serbest.Y - pencereBas.Y + imlecBas.Y);
-            PixelPoint Konum(PixelPoint serbest) => PlayerView.DragPosition(pencereBas, imlecBas, Imlec(serbest), cerceveDip, ekranlar, esikDip);
+            PixelPoint Konum(PixelPoint serbest, double olcek) => PlayerView.DragPosition(pencereBas, imlecBas, Imlec(serbest), cerceveDip, olcek, ekranlar, esikDip);
 
             var sagEsik = (int)Math.Ceiling(esikDip * 1.5);
             var solEsik = (int)Math.Ceiling(esikDip);
             var sagMerkez = new PixelPoint(1920 + (3840 - 960) / 2, -200 + (2110 - 540) / 2);
             var solMerkez = new PixelPoint((1920 - 640) / 2, (1040 - 360) / 2);
-            var sagYakin = Konum(new PixelPoint(sagMerkez.X + sagEsik, sagMerkez.Y - sagEsik));
-            var sagOlcekli = Konum(new PixelPoint(sagMerkez.X + solEsik + 1, sagMerkez.Y));
-            var sagUzak = Konum(new PixelPoint(sagMerkez.X + sagEsik + 1, sagMerkez.Y - sagEsik - 1));
-            var solYakin = Konum(new PixelPoint(solMerkez.X - solEsik, solMerkez.Y + solEsik));
-            var solUzak = Konum(new PixelPoint(solMerkez.X + solEsik + 1, solMerkez.Y));
-            var tekEksen = Konum(new PixelPoint(solMerkez.X + 1, solMerkez.Y + 200));
+            var sagYakin = Konum(new PixelPoint(sagMerkez.X + sagEsik, sagMerkez.Y - sagEsik), 1.5);
+            var sagOlcekli = Konum(new PixelPoint(sagMerkez.X + solEsik + 1, sagMerkez.Y), 1.5);
+            var sagUzak = Konum(new PixelPoint(sagMerkez.X + sagEsik + 1, sagMerkez.Y - sagEsik - 1), 1.5);
+            var solYakin = Konum(new PixelPoint(solMerkez.X - solEsik, solMerkez.Y + solEsik), 1.0);
+            var solUzak = Konum(new PixelPoint(solMerkez.X + solEsik + 1, solMerkez.Y), 1.0);
+            var tekEksen = Konum(new PixelPoint(solMerkez.X + 1, solMerkez.Y + 200), 1.0);
             body.AppendLine($"saf: esik {YolKanit.N(esikDip)} dip, sol esik {solEsik} px (1,0), sag esik {sagEsik} px (1,5)");
             body.AppendLine($"  sag merkez {sagMerkez}: yakin {sagYakin}, olcekli ({solEsik + 1} px) {sagOlcekli}, uzak {sagUzak}");
             body.AppendLine($"  sol merkez {solMerkez}: yakin {solYakin}, uzak {solUzak}, tek eksen {tekEksen}");
@@ -248,6 +248,14 @@ public sealed class OynaticiYolHaritasiTests
             Assert.Equal(solMerkez, solYakin);
             Assert.Equal(new PixelPoint(solMerkez.X + solEsik + 1, solMerkez.Y), solUzak);
             Assert.Equal(new PixelPoint(solMerkez.X, solMerkez.Y + 200), tekEksen);
+
+            var karmaMerkez = new PixelPoint(1920 + (3840 - 640) / 2, -200 + (2110 - 360) / 2);
+            var karma = Konum(new PixelPoint(karmaMerkez.X + solEsik + 1, karmaMerkez.Y), 1.0);
+            var sinirImlec = new PixelPoint(1400 + 600, solMerkez.Y + solEsik + 180);
+            var sinir = PlayerView.DragPosition(pencereBas, new PixelPoint(pencereBas.X + 600, pencereBas.Y + 180), sinirImlec, cerceveDip, 1.0, ekranlar, esikDip);
+            body.AppendLine($"  karma olcek (pencere 1,0 sag ekranda) merkez {karmaMerkez}: {karma}; sinir (imlec {sinirImlec} sag ekranda, pencere merkezi solda): {sinir}");
+            Assert.Equal(karmaMerkez, karma);
+            Assert.Equal(new PixelPoint(1400, solMerkez.Y), sinir);
 
             var ekran = window.Screens.ScreenFromWindow(window);
             Assert.NotNull(ekran);

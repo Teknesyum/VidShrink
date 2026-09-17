@@ -19,9 +19,9 @@ namespace VidShrink.Tests;
 
 public sealed class OynaticiOdakYoluTests
 {
-    private const BindingFlags Her = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+    internal const BindingFlags Her = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
-    private static object Klavye()
+    internal static object Klavye()
     {
         var tur = typeof(KeyboardDevice);
         return tur.GetProperty("Instance", Her)?.GetValue(null)
@@ -39,7 +39,7 @@ public sealed class OynaticiOdakYoluTests
         giris((RawInputEventArgs)args);
     }
 
-    private static readonly object Fare = Activator.CreateInstance(typeof(MouseDevice), Her, null, new object[] { new Avalonia.Input.Pointer(Avalonia.Input.Pointer.GetNextFreeId(), PointerType.Mouse, true) }, null)!;
+    internal static readonly object Fare = Activator.CreateInstance(typeof(MouseDevice), Her, null, new object[] { new Avalonia.Input.Pointer(Avalonia.Input.Pointer.GetNextFreeId(), PointerType.Mouse, true) }, null)!;
 
     private static void Tikla(Window window, PlayerView view, Control hedef)
     {
@@ -78,7 +78,7 @@ public sealed class OynaticiOdakYoluTests
         };
     }
 
-    private static string F(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+    internal static string F(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 
     [Fact]
     public void AnaPencereOdakYolundanTuslarMotoraUlasir()
@@ -192,20 +192,20 @@ public sealed class OynaticiOdakYoluTests
         Assert.True(hatalar.Count == 0, kayit);
     }
 
-    private static Action<RawInputEventArgs>? Giris(object impl)
+    internal static Action<RawInputEventArgs>? Giris(object impl)
         => (Action<RawInputEventArgs>?)impl.GetType().GetInterfaces()
             .Select(i => i.GetProperty("Input", Her)).First(p => p is not null)!.GetValue(impl);
 
-    private static void Ham(TopLevel top, RawInputEventArgs args)
+    internal static void Ham(TopLevel top, RawInputEventArgs args)
         => Giris(typeof(TopLevel).GetProperty("PlatformImpl", Her)!.GetValue(top)!)!(args);
 
-    private static IInputRoot Kok(TopLevel top) => (IInputRoot)typeof(TopLevel).GetProperty("InputRoot", Her)!.GetValue(top)!;
+    internal static IInputRoot Kok(TopLevel top) => (IInputRoot)typeof(TopLevel).GetProperty("InputRoot", Her)!.GetValue(top)!;
 
-    private static void HamFare(TopLevel top, RawPointerEventType tur, Point nokta, RawInputModifiers tuslar)
+    internal static void HamFare(TopLevel top, RawPointerEventType tur, Point nokta, RawInputModifiers tuslar)
         => Ham(top, (RawInputEventArgs)Activator.CreateInstance(typeof(RawPointerEventArgs), Her, null,
             new object[] { Fare, (ulong)Environment.TickCount64, Kok(top), tur, nokta, tuslar }, null)!);
 
-    private static void HamTus(TopLevel top, Key key, RawInputModifiers mods, string? symbol)
+    internal static void HamTus(TopLevel top, Key key, RawInputModifiers mods, string? symbol)
     {
         foreach (var tur in new[] { RawKeyEventType.KeyDown, RawKeyEventType.KeyUp })
         {
@@ -215,10 +215,10 @@ public sealed class OynaticiOdakYoluTests
         }
     }
 
-    private static Point Orta(TopLevel top, Visual control)
+    internal static Point Orta(TopLevel top, Visual control)
         => control.TranslatePoint(new Point(control.Bounds.Width / 2, control.Bounds.Height / 2), top)!.Value;
 
-    private static void Dongu(Func<bool> bitti, double saniye)
+    internal static void Dongu(Func<bool> bitti, double saniye)
     {
         var saat = Stopwatch.StartNew();
         while (!bitti() && saat.Elapsed.TotalSeconds < saniye)
@@ -311,69 +311,5 @@ public sealed class OynaticiOdakYoluTests
 
         KisayolKanit.Write("dondur-bulunur.txt", kayit);
         Assert.True(hata is null, hata + Environment.NewLine + kayit);
-    }
-
-    [Fact]
-    public void HizAdimiVeCiftTikSuresiHamGirdiyle()
-    {
-        var sistem = SystemDoubleClick.Milliseconds();
-        var windows = SystemDoubleClick.WindowsValue();
-        var eski = ClickArbiter.Source;
-        var varsayilan = ClickArbiter.DoubleWindowMs;
-        (string, string?) sonucu;
-        try
-        {
-            ClickArbiter.Source = () => 900;
-            sonucu = AppHost.Run(() =>
-            {
-                var o = KisayolOrtam.Ac(KisayolKanit.Uzun, "hiz-cift-tik");
-                string? sonuc = null;
-                try
-                {
-                    o.Not($"sistem cift tik {F(sistem)} ms, GetDoubleClickTime {F(windows)} ms, arbiter varsayilani {F(varsayilan)} ms, testte 900 ms");
-                    var hizlar = new List<string> { F(o.Sayi("speed")) };
-                    foreach (var (key, sembol, beklenen) in new[] { (Key.C, "c", 1.05), (Key.C, "c", 1.1), (Key.X, "x", 1.05), (Key.X, "x", 1.0), (Key.X, "x", 0.95) })
-                    {
-                        HamTus(o.Window, key, RawInputModifiers.None, sembol);
-                        o.Bekle(() => Math.Abs(o.Sayi("speed") - beklenen) < 1e-6, 2);
-                        hizlar.Add(F(o.Sayi("speed")));
-                        if (Math.Abs(o.Sayi("speed") - beklenen) >= 1e-6) sonuc ??= $"{key} sonrasi speed {F(o.Sayi("speed"))}, beklenen {F(beklenen)}";
-                    }
-                    o.Not("ham C,C,X,X,X motor speed: " + string.Join(" -> ", hizlar));
-
-                    o.View.Apply(new PlayerCommand(PlayerCommandKind.SpeedReset, 0));
-                    o.Bekle(() => o.Oku("pause") == "yes", 2);
-                    var nokta = Orta(o.Window, o.View);
-                    HamFare(o.Window, RawPointerEventType.Move, nokta, RawInputModifiers.None);
-                    DenetimSurucu.Wait(o.View, 0.05);
-                    HamFare(o.Window, RawPointerEventType.LeftButtonDown, nokta, RawInputModifiers.LeftMouseButton);
-                    HamFare(o.Window, RawPointerEventType.LeftButtonUp, nokta, RawInputModifiers.None);
-                    var saat = Stopwatch.StartNew();
-                    Dongu(() => saat.ElapsedMilliseconds >= 600, 2);
-                    var erken = o.Oku("pause");
-                    var erkenMs = saat.ElapsedMilliseconds;
-                    Dongu(() => o.Oku("pause") == "no", 3);
-                    var gec = o.Oku("pause");
-                    var gecMs = saat.ElapsedMilliseconds;
-                    o.Not($"ham sol tik: {erkenMs} ms'de pause {erken}, {gecMs} ms'de pause {gec}");
-                    if (erken != "yes") sonuc ??= $"tek tik {erkenMs} ms'de islendi, 900 ms beklenmedi";
-                    if (gec != "no" || gecMs < 880) sonuc ??= $"tek tik {gecMs} ms'de pause {gec}";
-                    return (o.Kayit.ToString(), sonuc);
-                }
-                finally
-                {
-                    o.Kapat();
-                }
-            });
-        }
-        finally
-        {
-            ClickArbiter.Source = eski;
-        }
-
-        KisayolKanit.Write("hiz-cift-tik.txt", sonucu.Item1);
-        if (OperatingSystem.IsWindows()) Assert.Equal(windows, sistem);
-        Assert.Equal(sistem, varsayilan);
-        Assert.True(sonucu.Item2 is null, sonucu.Item2 + Environment.NewLine + sonucu.Item1);
     }
 }
