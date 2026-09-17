@@ -207,7 +207,7 @@ internal sealed class PanelHost : IDisposable
         {
             var clip = ActiveClip;
             if (clip is null || !clip.IsApproximate) return null;
-            return clip.Crf is { } crf ? $"CRF {crf}" : null;
+            return clip.Crf is { } crf ? Strings.Get("main.plan.mode.crf-value", crf) : null;
         }
     }
 

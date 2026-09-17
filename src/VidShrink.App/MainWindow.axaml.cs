@@ -253,7 +253,7 @@ public partial class MainWindow : Window
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
-        Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
+        BuildShareTargetStrip();
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
         foreach (var control in new SelectingItemsControl[]
                  {
@@ -653,7 +653,7 @@ public partial class MainWindow : Window
 
     private void OnChromePointerMoved(object? sender, PointerEventArgs e)
     {
-        ChromeZone.PointerWithin(e.GetPosition(this).Y <= TitleBar.Height);
+        ChromeZone.PointerWithin(e.GetPosition(this).Y <= Math.Max(TitleBar.Height, Player.RevealBand));
         ApplyChromeMode();
     }
 
@@ -1161,7 +1161,7 @@ public partial class MainWindow : Window
             TxtAudioBitrate.Text = settings.AudioBitrate;
             TxtTrimStart.Text = settings.TrimStart;
             TxtTrimEnd.Text = settings.TrimEnd;
-            CmbShareTarget.SelectedIndex = settings.ShareTarget;
+            ShareTargetIndex = settings.ShareTarget;
             RefreshShareTarget();
             if (CmbShareRetention.ItemCount > 0)
                 CmbShareRetention.SelectedIndex = Math.Clamp(settings.ShareRetention, 0, CmbShareRetention.ItemCount - 1);
@@ -1205,7 +1205,7 @@ public partial class MainWindow : Window
         AudioBitrate = TxtAudioBitrate.Text ?? "",
         TrimStart = TxtTrimStart.Text ?? "",
         TrimEnd = TxtTrimEnd.Text ?? "",
-        ShareTarget = CmbShareTarget.SelectedIndex,
+        ShareTarget = ShareTargetIndex,
         ShareRetention = CmbShareRetention.SelectedIndex
     };
 
@@ -1830,14 +1830,46 @@ public partial class MainWindow : Window
     {
         _shareTargets = ShareTargetTable.Load();
 
-        var wasSyncing = _syncing;
-        _syncing = true;
-        CmbShareTarget.ItemsSource = _shareTargets.Targets.Select(target => target.DisplayName).ToList();
-        CmbShareTarget.SelectedIndex = Math.Max(0, IndexOfTarget(_shareTargets.Default));
-        _syncing = wasSyncing;
-
+        BuildShareTargetStrip();
         RefreshShareTarget();
     }
+
+    private readonly List<RadioButton> _shareTargetRadios = [];
+
+    private void BuildShareTargetStrip()
+    {
+        var wasSyncing = _syncing;
+        _syncing = true;
+        ShareTargetStrip.Children.Clear();
+        _shareTargetRadios.Clear();
+        foreach (var target in _shareTargets.Targets)
+        {
+            var radio = new RadioButton { GroupName = "ShareTarget", Content = target.DisplayName };
+            var index = _shareTargetRadios.Count;
+            radio.IsCheckedChanged += (_, _) =>
+            {
+                if (radio.IsChecked != true) return;
+                ShareTargetIndex = index;
+                OnShareTargetChanged();
+            };
+            _shareTargetRadios.Add(radio);
+            ShareTargetStrip.Children.Add(radio);
+        }
+        ShareTargetIndex = Math.Max(0, IndexOfTarget(_shareTargets.Default));
+        _syncing = wasSyncing;
+    }
+
+    internal int ShareTargetIndex
+    {
+        get => _shareTargetRadios.FindIndex(radio => radio.IsChecked == true);
+        set
+        {
+            for (var index = 0; index < _shareTargetRadios.Count; index++)
+                _shareTargetRadios[index].IsChecked = index == value;
+        }
+    }
+
+    internal IReadOnlyList<RadioButton> ShareTargetRadios => _shareTargetRadios;
 
     private int IndexOfTarget(ShareTarget target)
     {
@@ -1855,7 +1887,7 @@ public partial class MainWindow : Window
 
     private ShareTarget SelectedShareTarget()
     {
-        var index = CmbShareTarget.SelectedIndex;
+        var index = ShareTargetIndex;
         return index >= 0 && index < _shareTargets.Targets.Count
             ? _shareTargets.Targets[index]
             : _shareTargets.Default;
@@ -3113,12 +3145,12 @@ public partial class MainWindow : Window
     {
         Fade(InfoGrid, true);
         TxtDuration.Text = TimeSpan.FromSeconds(info.DurationSeconds).ToString(@"hh\:mm\:ss");
-        TxtSize.Text = $"{Num(info.FileSizeMb, "0.0")} MB";
+        TxtSize.Text = Say("main.unit.mb-value", Num(info.FileSizeMb, "0.0"));
         TxtResolution.Text = $"{info.Width}x{info.Height}";
         TxtFps.Text = Num(info.Fps, "0.##");
         TxtVideoCodec.Text = info.VideoCodec;
-        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : Say("main.info.none");
-        TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
+        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {Say("main.unit.k-value", info.AudioBitrateBps / 1000)}" : Say("main.info.none");
+        TxtBitrate.Text = Say("main.unit.kbps-value", info.TotalBitrateBps / 1000);
         TxtHdr.Text = info.IsHdr ? Say("main.info.yes") : Say("main.info.no");
         Fade(HdrPolicyPanel, info.IsHdr);
         SecAudio.IsVisible = info.HasAudio;
@@ -3327,8 +3359,8 @@ public partial class MainWindow : Window
             MaxWidth = Scalar("TooltipMaxWidth", 460)
         };
 
-        AddQualityRow(grid, Say("main.quality.target"), $"{Num(target, "0.##")} MB");
-        AddQualityRow(grid, Say("main.quality.predicted"), $"{Num(score, "0.#")}/100");
+        AddQualityRow(grid, Say("main.quality.target"), Say("main.unit.mb-value", Num(target, "0.##")));
+        AddQualityRow(grid, Say("main.quality.predicted"), Say("main.unit.score-value", Num(score, "0.#")));
         AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.loss-points", Num(hint.LossPoints, "0.#")));
         AddQualityRow(grid, Say("main.quality.basis"), basis);
         return grid;
@@ -3401,19 +3433,19 @@ public partial class MainWindow : Window
         TxtPlanEmpty.IsVisible = false;
 
         var channels = plan.AudioChannels == 1 ? $" {Say("main.plan.audio.mono")}" : "";
-        AddPlanFact(Say("main.plan.fact.plan"), _aiPlan is null ? Say("main.plan.automatic") : "AI");
+        AddPlanFact(Say("main.plan.fact.plan"), _aiPlan is null ? Say("main.plan.automatic") : Say("main.plan.ai"));
         AddPlanFact(Say("main.plan.fact.encoder"), plan.Codec);
         AddPlanFact(Say("main.plan.fact.mode"), plan.ModeEnum switch
         {
-            EncodeMode.Crf => $"CRF {plan.Crf}",
+            EncodeMode.Crf => Say("main.plan.mode.crf-value", plan.Crf),
             EncodeMode.PassThrough => Say("main.plan.mode.copy"),
-            _ => $"{plan.VideoBitrateK}k · {Say("main.plan.mode.two-pass")}"
+            _ => $"{Say("main.unit.k-value", plan.VideoBitrateK)} · {Say("main.plan.mode.two-pass")}"
         });
         AddPlanFact(Say("main.plan.fact.resolution"), $"{plan.Width}x{plan.Height}");
-        AddPlanFact(Say("main.plan.fact.frame-rate"), $"{Num(plan.Fps, "0.##")} FPS");
-        AddPlanFact(Say("main.plan.fact.audio"), plan.AudioCodec is null ? Say("main.info.none") : $"{plan.AudioCodec} {plan.AudioBitrateK}k{channels}");
+        AddPlanFact(Say("main.plan.fact.frame-rate"), Say("main.unit.fps-value", Num(plan.Fps, "0.##")));
+        AddPlanFact(Say("main.plan.fact.audio"), plan.AudioCodec is null ? Say("main.info.none") : $"{plan.AudioCodec} {Say("main.unit.k-value", plan.AudioBitrateK)}{channels}");
         AddPlanFact(Say("main.plan.fact.preset"), plan.Preset);
-        AddPlanFact(Say("main.plan.fact.estimated-size"), _estimate is { } size ? $"{Num(size.ExpectedMb, "0.0")} MB" : "-");
+        AddPlanFact(Say("main.plan.fact.estimated-size"), _estimate is { } size ? Say("main.unit.mb-value", Num(size.ExpectedMb, "0.0")) : "-");
 
         foreach (var line in StrategyLines()) AddPlanReason(line);
         foreach (var line in ReasonLines(plan)) AddPlanReason(line);
@@ -3449,11 +3481,11 @@ public partial class MainWindow : Window
             return;
         }
 
-        var reading = $"{Num(estimate.ExpectedMb, "0.0")} MB";
+        var reading = Say("main.unit.mb-value", Num(estimate.ExpectedMb, "0.0"));
         if (TxtEstimateValue.Text != reading) Pulse(TxtEstimateValue, true);
         TxtEstimateValue.Text = reading;
         TxtEstimateRange.Text =
-            $"{Num(estimate.LowMb, "0.0")} - {Num(estimate.HighMb, "0.0")} MB · {Say("main.estimate.of-source")} "
+            $"{Say("main.unit.mb-range", Num(estimate.LowMb, "0.0"), Num(estimate.HighMb, "0.0"))} · {Say("main.estimate.of-source")} "
             + Percent(estimate.ExpectedMb / Math.Max(_info.FileSizeMb, 0.01));
 
         var basis = estimate.Measured
@@ -3462,7 +3494,7 @@ public partial class MainWindow : Window
         var mode = estimate.Enforced
             ? Say("main.estimate.mode.enforced")
             : Say("main.estimate.mode.ceiling");
-        TxtEstimateNote.Text = $"{basis} · {mode} · {Say("main.estimate.predicted-quality")} {Num(_predictedQuality, "0.#")}/100";
+        TxtEstimateNote.Text = $"{basis} · {mode} · {Say("main.estimate.predicted-quality")} {Say("main.unit.score-value", Num(_predictedQuality, "0.#"))}";
     }
 
     private void RefreshDurationView()
@@ -4119,7 +4151,7 @@ public partial class MainWindow : Window
                 Progress.Value = p.Fraction;
                 SetStage(TxtStage, LocalizeStage(p.Stage));
                 TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-";
-                if (p.OutputMb > 0) TxtOutSize.Text = $"{Num(p.OutputMb, "0.0")} MB";
+                if (p.OutputMb > 0) TxtOutSize.Text = Say("main.unit.mb-value", Num(p.OutputMb, "0.0"));
             });
 
             var result = await ShrinkEngine.EncodeAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
@@ -4128,7 +4160,7 @@ public partial class MainWindow : Window
 
             if (result.Success)
             {
-                TxtOutSize.Text = $"{Num(result.OutputMb, "0.0")} MB";
+                TxtOutSize.Text = Say("main.unit.mb-value", Num(result.OutputMb, "0.0"));
                 var saved = 100 - result.OutputMb / _info.FileSizeMb * 100;
                 TxtResult.Text = Say("main.run.done",
                     result.Attempts, Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"), Num(saved, "0.#"));
@@ -4195,7 +4227,7 @@ public partial class MainWindow : Window
     private void ShowRetryAsk(RetryPrompt prompt)
     {
         _activeRetryPrompt = prompt;
-        TxtOutSize.Text = $"{Num(prompt.ActualMb, "0.0")} MB";
+        TxtOutSize.Text = Say("main.unit.mb-value", Num(prompt.ActualMb, "0.0"));
 
         TxtRetryOutcome.Text = Say("main.retry.outcome",
             prompt.Attempt,

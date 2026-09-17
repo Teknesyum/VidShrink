@@ -1,3 +1,41 @@
+# Yol B: Kabuk Kalemleri (P14, P3, S9, K4, S14, S20)
+
+Dal `t0/yol-b-kabuk`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 7. bölüm satır 3, 4, 5, 6, 13, 12.
+
+1. **P14.** Üst barın açılma bölgesi `TitleBar.Height` yerine alt şeridin bandı: `PlaybackHoverZoneShare` x oynatıcı
+   yüzeyi yüksekliği, pencerenin üst kenarından. `OynaticiYolHaritasiTests` ham fare hareketiyle iki eşiği ölçer.
+2. **P3.** Sağ tık Ayarlar alt menüsünde "Tüm ayarlar" sekmeye gitmez; yerine Ayarlar sekmesindeki oynatıcı
+   bölümü (Kısayollar) alt menü olur. Ham sağ tık + ok/Enter ile Gelişmiş ayar değişir, motordan okunur.
+3. **S9.** `MainWindow`'daki birim ve kısaltmalar (MB, /100, CRF, kbps, FPS) `Locales/*/main.json`'a, 42 dil;
+   `BaslikKapsamiTests` sayım pinleri ve cümlesi (dosya `BiciminTests.cs`, sınıf `BaslikKapsamiTests`;
+   `KareYerlesimTests.BirimlerDilDosyasindanGelir` kolları ayrı sınıfta).
+4. **K4.** Teknesyum imzası `IconCode` atom yerine `<>`, `IkonKutusuTests` kuralları içinde.
+5. **S14.** `CmbShareTarget` radyo şeridine (hedefler dosyadan, kodda kurulur); `AyarRadyoSeridiTests` bütün
+   Ayarlar sekmesini tarar, negatif kontrol iki seçenekli kutuyu yakalar.
+6. **S20.** Başsız pencerede TR ve EN açıkça seçilir, her sekmede metin ölçüsü > kutu taraması; bulunanlar düzeltilir.
+
+### Denetim borçları (denetçi hükmü KALDI, 2026-09-17)
+
+7. **KRİTİK.** `RevealSerit` kapısı `Opacity <= 0` kalmıştı; `2f53535f` yalnız testin ön koşulunu
+   gevşetmişti, üretim toleransı dalda yoktu. `origin/main` birleşmesi `16572f03`'ü getirdi; P26
+   kalıntı saydamlık zorlanmış halde koşulup pimlendi.
+8. **ORTA 1.** Sayım pinlerinin sınıf etiketi: pinler `BaslikKapsamiTests`'te, belgelerde
+   `BiciminTests` deniyordu. Filtrenin ne koşturduğu ölçülüp etiket düzeltildi.
+9. **ORTA 2.** `AdVeBirimYazimiCumleOrtasindaDaKorunur` docstring'inin son adımı kurguydu
+   (main'le birleşme iddiası). Gerçek türetmeyle değiştirildi.
+10. **ORTA 3.** `S20` sarmalanan metni atlıyordu (`TextWrapping=Wrap` taramadan çıkıyor).
+    Taşma ve gerçek yükseklik ölçümleri çürüdü (kap içerikle büyüyor, hiçbir atada `ClipToBounds`
+    yok); ölçülen davranış **sıkışma**. `DilTara`'ya yuvasında tek olan sarmalanan blok için
+    sıkışma kolu eklendi (taban 84 blok, 0 sıkışma); `Width=60` mutasyonu 12 kolun 6'sını kırmızıya
+    çevirdi, eskiden 0'ını çeviriyordu.
+11. **ORTA 4.** Denetçinin bildirdiği kök neden ölçümle çürüdü (`.mov` kolu yerelde 15/15 ve 12/12
+    yeşil). Ölçümde aynı ailede gerçek kusur bulundu: oturum açıkken ana panelde değişen ayar
+    sessizce yutuluyordu, mini panel bunu kendi beş kutusu için yinelenmiş dalla telafi ediyordu.
+    İki yol tek `SaveChoicesIfChanged`'e indi, `PersistChoices` kapısından `_session` çıktı,
+    `OturumSurerkenDegisenAyarDiskeYazilir` pimledi; `Sec` yardımcısı artık `Yaz` gibi boşaltıyor.
+12. **ORTA 5.** `origin/main` dala birleşti; 42 dil katalogu birleşim, anahtar kaybı yok.
+13. **DÜŞÜK.** `BirimlerDilDosyasindanGelir` sabit `"/100"` yerine katalogdan okur.
+
 # macOS 13-14 — MPVKit Denemesi
 
 Dal `t0/macos-mpvkit`. Karar: fable 2026-09-17 soru 5. Kod (`src/`) değişmez.

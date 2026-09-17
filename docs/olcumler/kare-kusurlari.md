@@ -24,7 +24,7 @@ kirmizilarin adlari yazildi. Tur 3'un ham ciktilari `.calisma/T192-tur3/` altind
 Birincisi olcunun kendisiydi: yer tutucu/rakam duzeltmesini hicbir test tutmuyordu, cunku
 `LanguageTests.cs:1110` uretimin biraktigi yuklemi kullaniyordu - test duzeltildi ve
 mutasyon artik kirmizi. Ikincisi bir sayi: "44" aslinda **49**; dokumu ureten
-`BiciminTests.TumCiktiDokulur` `ReplaceLineEndings` cagirmadigi icin cok satirli degerlerin
+`BaslikKapsamiTests.TumCiktiDokulur` `ReplaceLineEndings` cagirmadigi icin cok satirli degerlerin
 yalniz ilk satiri sayiliyordu. Ayrica iki cumle kapsamina cekildi (rakam kaynakli alti
 kalem, `.title`/`.label` ile biten alti kalem). Tur 4'un ham ciktilari
 `.calisma/T192-tur4/` altinda.
@@ -297,7 +297,7 @@ sayiyi** da satir basi sayiyor (`char.IsLetterOrDigit`); `â€¢ 128 Kompakt` -> `â
 kalemlerinin kaynagi rakam, yer tutucu degil.
 
 Bu tablo tur 3'te **44** diyordu ve yanlisti. Sayim degil, sayimi besleyen dokum bozuktu:
-`BiciminTests.TumCiktiDokulur` `ReplaceLineEndings` cagirmiyordu, cok satirli her degerin
+`BaslikKapsamiTests.TumCiktiDokulur` `ReplaceLineEndings` cagirmiyordu, cok satirli her degerin
 yalniz **ilk satiri** dosyaya dusuyordu; devam satirlarindaki bes degisiklik farkta hic
 gorunmedi. Ayni kusur `KolDegistirenAnahtarlarSayilir`de zaten duzeltilmisti, dokumde
 duruyordu. Dokum duzeltildi (`BiciminTests.cs:557`), fark yeniden alindi.

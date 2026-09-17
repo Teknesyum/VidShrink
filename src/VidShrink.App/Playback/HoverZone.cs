@@ -110,7 +110,13 @@ internal sealed class HoverZone
 
     /// <summary>Verilen nokta panelin alt bölgesinin içinde mi.</summary>
     internal bool Covers(double y, double panelHeight)
-        => panelHeight > 0 && y >= panelHeight * (1 - _share) && y <= panelHeight;
+        => panelHeight > 0 && y >= panelHeight - Band(panelHeight) && y <= panelHeight;
+
+    /// <summary>
+    /// P14: bölgenin piksel derinliği. Alt şerit bunu panelin alt kenarından, üst bar
+    /// pencerenin üst kenarından ölçer; iki bar aynı mesafede açılır.
+    /// </summary>
+    internal double Band(double panelHeight) => panelHeight > 0 ? panelHeight * _share : 0;
 
     internal void PointerAt(double y, double panelHeight) => SetPointer(Covers(y, panelHeight));
 
