@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg สิ้นสุดด้วยรหัส {0}",
   "recorder.error.no-ffmpeg": "ไม่พบ {0}",
   "recorder.error.invalid": "การตั้งค่าเหล่านี้ไม่อนุญาตให้บันทึก: {0}",
+  "recorder.error.window-wayland": "ไม่รองรับการบันทึกหน้าต่างในเซสชัน Wayland เลือกหน้าจอหรือพื้นที่ หรือลงชื่อเข้าใช้เซสชัน X11",
+  "recorder.error.window-missing": "ไม่พบหน้าต่าง \"{0}\" รีเฟรชรายการแล้วเลือกอีกครั้ง",
   "recorder.error.number": "{0} ต้องเป็นตัวเลข",
   "recorder.error.start": "ไม่สามารถเริ่มการบันทึกได้: {0}",
   "recorder.error.folder": "ไม่สามารถเลือกโฟลเดอร์ได้: {0}",

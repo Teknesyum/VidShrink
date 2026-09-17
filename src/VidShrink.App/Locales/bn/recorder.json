@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg কোড {0} নিয়ে শেষ হয়েছে।",
   "recorder.error.no-ffmpeg": "{0} খুঁজে পাওয়া যায়নি।",
   "recorder.error.invalid": "এই সেটিংসে রেকর্ডিং সম্ভব নয়: {0}",
+  "recorder.error.window-wayland": "Wayland সেশনে উইন্ডো ক্যাপচার সমর্থিত নয়; স্ক্রিন বা অঞ্চল বেছে নিন, অথবা X11 সেশনে সাইন ইন করুন।",
+  "recorder.error.window-missing": "\"{0}\" উইন্ডোটি পাওয়া যায়নি; তালিকা রিফ্রেশ করে আবার বেছে নিন।",
   "recorder.error.number": "{0} একটি সংখ্যা হতে হবে।",
   "recorder.error.start": "রেকর্ডিং শুরু করা যায়নি: {0}",
   "recorder.error.folder": "ফোল্ডারটি বেছে নেওয়া যায়নি: {0}",

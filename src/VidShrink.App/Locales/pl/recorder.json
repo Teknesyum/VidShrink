@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg zakończył działanie z kodem {0}.",
   "recorder.error.no-ffmpeg": "Nie można znaleźć {0}.",
   "recorder.error.invalid": "Te ustawienia nie pozwalają na nagrywanie: {0}",
+  "recorder.error.window-wayland": "Nagrywanie okna nie jest obsługiwane w sesji Wayland; wybierz ekran lub obszar albo zaloguj się do sesji X11.",
+  "recorder.error.window-missing": "Nie znaleziono okna „{0}”; odśwież listę i wybierz je ponownie.",
   "recorder.error.number": "{0} musi być liczbą.",
   "recorder.error.start": "Nie udało się rozpocząć nagrywania: {0}",
   "recorder.error.folder": "Nie udało się wybrać folderu: {0}",

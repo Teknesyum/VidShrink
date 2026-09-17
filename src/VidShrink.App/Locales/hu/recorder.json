@@ -52,6 +52,8 @@
   "recorder.output.failed": "Az ffmpeg {0} kóddal fejeződött be.",
   "recorder.error.no-ffmpeg": "{0} nem található.",
   "recorder.error.invalid": "Ezek a beállítások nem teszik lehetővé a felvételt: {0}",
+  "recorder.error.window-wayland": "Az ablakrögzítés Wayland-munkamenetben nem támogatott; válassz képernyőt vagy területet, vagy jelentkezz be X11-munkamenetbe.",
+  "recorder.error.window-missing": "A(z) „{0}” ablak nem található; frissítsd a listát, és válaszd ki újra.",
   "recorder.error.number": "{0} számnak kell lennie.",
   "recorder.error.start": "A felvétel nem indítható el: {0}",
   "recorder.error.folder": "A mappa nem választható ki: {0}",

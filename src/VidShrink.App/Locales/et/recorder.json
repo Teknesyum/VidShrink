@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg lõpetas koodiga {0}.",
   "recorder.error.no-ffmpeg": "{0} ei leitud.",
   "recorder.error.invalid": "Need seaded ei võimalda salvestust: {0}",
+  "recorder.error.window-wayland": "Akna salvestamist Waylandi seansis ei toetata; vali ekraan või ala või logi sisse X11 seanssi.",
+  "recorder.error.window-missing": "Akent „{0}“ ei leitud; värskenda loendit ja vali see uuesti.",
   "recorder.error.number": "{0} peab olema arv.",
   "recorder.error.start": "Salvestust ei õnnestunud alustada: {0}",
   "recorder.error.folder": "Kausta ei õnnestunud valida: {0}",

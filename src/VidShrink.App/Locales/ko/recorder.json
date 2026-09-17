@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg가 코드 {0}로 종료되었습니다.",
   "recorder.error.no-ffmpeg": "{0}을(를) 찾을 수 없습니다.",
   "recorder.error.invalid": "이 설정으로는 녹화할 수 없습니다: {0}",
+  "recorder.error.window-wayland": "Wayland 세션에서는 창 녹화를 지원하지 않습니다. 화면이나 영역을 선택하거나 X11 세션으로 로그인하세요.",
+  "recorder.error.window-missing": "\"{0}\" 창을 찾을 수 없습니다. 목록을 새로 고치고 다시 선택하세요.",
   "recorder.error.number": "{0}은(는) 숫자여야 합니다.",
   "recorder.error.start": "녹화를 시작할 수 없습니다: {0}",
   "recorder.error.folder": "폴더를 선택할 수 없습니다: {0}",

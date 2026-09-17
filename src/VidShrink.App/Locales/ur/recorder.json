@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg کوڈ {0} کے ساتھ ختم ہوا۔",
   "recorder.error.no-ffmpeg": "{0} نہیں مل سکا۔",
   "recorder.error.invalid": "یہ ترتیبات ریکارڈنگ کی اجازت نہیں دیتیں: {0}",
+  "recorder.error.window-wayland": "Wayland سیشن میں ونڈو کی ریکارڈنگ معاون نہیں؛ اسکرین یا حصہ منتخب کریں، یا X11 سیشن میں سائن ان کریں۔",
+  "recorder.error.window-missing": "ونڈو \"{0}\" نہیں ملی؛ فہرست ریفریش کر کے اسے دوبارہ منتخب کریں۔",
   "recorder.error.number": "{0} ایک عدد ہونا چاہیے۔",
   "recorder.error.start": "ریکارڈنگ شروع نہیں ہو سکی: {0}",
   "recorder.error.folder": "فولڈر منتخب نہیں ہو سکا: {0}",

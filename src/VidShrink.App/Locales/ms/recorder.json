@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg tamat dengan kod {0}.",
   "recorder.error.no-ffmpeg": "{0} tidak dapat dijumpai.",
   "recorder.error.invalid": "Tetapan ini tidak membenarkan rakaman: {0}",
+  "recorder.error.window-wayland": "Rakaman tetingkap tidak disokong dalam sesi Wayland; pilih skrin atau kawasan, atau log masuk ke sesi X11.",
+  "recorder.error.window-missing": "Tetingkap \"{0}\" tidak ditemui; muat semula senarai dan pilih sekali lagi.",
   "recorder.error.number": "{0} mesti nombor.",
   "recorder.error.start": "Rakaman tidak dapat dimulakan: {0}",
   "recorder.error.folder": "Folder tidak dapat dipilih: {0}",
