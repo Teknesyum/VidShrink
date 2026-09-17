@@ -11,7 +11,7 @@ public sealed record PinnedEntry(string EntryPath, string FileName, string Sha25
 
 public sealed record LibMpvPin(IReadOnlyList<string> Urls, string ArchiveSha256, string FileName, string DllSha256)
 {
-    public static LibMpvPin Default { get; } = new(
+    public static LibMpvPin X64 { get; } = new(
         new[]
         {
             "https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z",
@@ -20,11 +20,32 @@ public sealed record LibMpvPin(IReadOnlyList<string> Urls, string ArchiveSha256,
         "fac135c68a35b7639e39d72c0c365104edbaebdea39a0dfdd8c36e8c8e80faef",
         "libmpv-2.dll",
         "673e6397920ab64a9c5b3a618f7f16d38854efe72b58665f1f84e4e873b763a4");
+
+    public static LibMpvPin Arm64 { get; } = new(
+        new[]
+        {
+            "https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-aarch64-20260903-git-69e63f425a.7z",
+            "https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-aarch64-20260903-git-69e63f425a.7z"
+        },
+        "9d4e0cf7370fd1dd9a91a9d8139f24a88ece9e58b00f5a9ca50b391d03114f2f",
+        "libmpv-2.dll",
+        "3bfc5a042cc6ebe45ace74992dbc135ee84e3e1b33afac070f8902a2d64a22e9");
+
+    public static LibMpvPin Default => X64;
+
+    public static LibMpvPin For(string architecture) =>
+        string.Equals(architecture, "arm64", StringComparison.OrdinalIgnoreCase) ? Arm64 : X64;
 }
 
+/// <summary>
+/// ffmpeg arm64'te başka bir kaynaktan geliyor: GyanD yalnız x86_64 derliyor. BtbN'in
+/// winarm64 GPL derlemesi kullanılıyor ama kayan <c>latest</c> etiketinden değil —
+/// o etiket her gün üstüne yazılıyor ve sabitleme anlamını yitiriyor. Ay sonu autobuild
+/// etiketleri kalıcı: 2024-10-31'den bugüne duruyorlar, gün içi etiketler ise budanıyor.
+/// </summary>
 public sealed record FfmpegPin(string Url, IReadOnlyList<PinnedEntry> Entries)
 {
-    public static FfmpegPin Default { get; } = new(
+    public static FfmpegPin X64 { get; } = new(
         "https://github.com/GyanD/codexffmpeg/releases/download/9.0/ffmpeg-9.0-full_build.zip",
         new[]
         {
@@ -33,6 +54,21 @@ public sealed record FfmpegPin(string Url, IReadOnlyList<PinnedEntry> Entries)
             new PinnedEntry("ffmpeg-9.0-full_build/bin/ffprobe.exe", "ffprobe.exe",
                 "51e0780cd881f83749b029ed716cbb841c2eac6289f418050f2f2961b158896b")
         });
+
+    public static FfmpegPin Arm64 { get; } = new(
+        "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-08-31-13-27/ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0.zip",
+        new[]
+        {
+            new PinnedEntry("ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0/bin/ffmpeg.exe", "ffmpeg.exe",
+                "a169b9d26b2380be66211022525c9ac16affc923ba05b561024e57c5ed4281f9"),
+            new PinnedEntry("ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0/bin/ffprobe.exe", "ffprobe.exe",
+                "6b0b738a2df0186811f240a7036cd1279c0a08991981adecceefe6a2c2b2236c")
+        });
+
+    public static FfmpegPin Default => X64;
+
+    public static FfmpegPin For(string architecture) =>
+        string.Equals(architecture, "arm64", StringComparison.OrdinalIgnoreCase) ? Arm64 : X64;
 }
 
 public sealed record SetupOptions
@@ -63,9 +99,9 @@ public sealed record SetupOptions
 
     public bool ForceFfmpegDownload { get; init; }
 
-    public LibMpvPin LibMpv { get; init; } = LibMpvPin.Default;
+    public LibMpvPin? LibMpv { get; init; }
 
-    public FfmpegPin Ffmpeg { get; init; } = FfmpegPin.Default;
+    public FfmpegPin? Ffmpeg { get; init; }
 
     public bool DefaultRegistry => IsDefaultClassesRoot(ClassesRoot);
 

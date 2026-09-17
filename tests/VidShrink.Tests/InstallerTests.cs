@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
+using VidShrink.Core.Setup;
 
 namespace VidShrink.Tests;
 
@@ -137,16 +138,108 @@ public sealed class InstallerTests
     }
 
     /// <summary>
-    /// Yayında yalnız dört hedef var. Betikler desteklenmeyen mimaride yanlış arşivi
-    /// kurmak yerine duruyor; durmazlarsa kurulum çalışır ama güncelleme hiç bulunmaz.
+    /// A4: yayın altı hedef taşıyor, arm64 de içinde. Betikler desteklenmeyen mimaride
+    /// yanlış arşivi kurmak yerine duruyor; durmazlarsa kurulum çalışır ama güncelleme
+    /// hiç bulunmaz. Yayımlanan mimarilerin adı betiklerde geçmek zorunda.
     /// </summary>
     [Fact]
     public void AnUnsupportedArchitectureStopsTheInstallation()
     {
         Assert.Contains("Bu mimari için yayın yok", WindowsInstaller, StringComparison.Ordinal);
         Assert.Contains("Bu mimari için yayın yok", UnixInstaller, StringComparison.Ordinal);
-        Assert.DoesNotContain("win-arm64", WindowsInstaller, StringComparison.Ordinal);
-        Assert.DoesNotContain("linux-arm", UnixInstaller, StringComparison.Ordinal);
+        Assert.Contains("win-arm64", WindowsInstaller, StringComparison.Ordinal);
+        Assert.Contains("linux-arm64", UnixInstaller, StringComparison.Ordinal);
+        Assert.DoesNotContain("win-x86", WindowsInstaller, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A4: arm64 makinede güncelleyici arm64 paketini seçmeli. Karar, RID ve varlık adı
+    /// tek zincir: mimari okuması <c>ARM64</c> olduğunda manifest ve arşiv adları arm64
+    /// yayınını gösteriyor ve o RID yayın matrisinde bulunuyor. Zincirin herhangi bir
+    /// halkası x64'e düşerse arm64 makine x64 paketini indirir ve emülasyonda koşar.
+    /// </summary>
+    [Theory]
+    [InlineData("windows", "win-arm64")]
+    [InlineData("linux", "linux-arm64")]
+    [InlineData("macos", "osx-arm64")]
+    public void AnArm64MachineChoosesTheArm64Package(string platform, string beklenenRid)
+    {
+        var karar = ArchitectureChoice.Decide("ARM64", null, null, true);
+        Assert.Equal("arm64", karar.Architecture);
+        Assert.Equal(ArchitectureOutcome.Read, karar.Outcome);
+
+        var rid = UpdateCheck.RidFor(platform, karar.Architecture);
+        Assert.Equal(beklenenRid, rid);
+        Assert.Contains(rid, UpdateCheck.ReleasedRids);
+        Assert.Equal($"manifest-{beklenenRid}.json", UpdateCheck.ManifestAssetName(rid));
+        Assert.Equal($"vidshrink-{beklenenRid}.zip", UpdateCheck.ArchiveAssetName(rid));
+    }
+
+    /// <summary>
+    /// Aynı zincirin x64 ucu: arm64 eklenirken x64 makinelerin arm64 paketine kaymadığı
+    /// da ölçülüyor.
+    /// </summary>
+    [Fact]
+    public void AnX64MachineStillChoosesTheX64Package()
+    {
+        var karar = ArchitectureChoice.Decide("X64", null, null, true);
+        Assert.Equal("x64", karar.Architecture);
+        Assert.Equal("win-x64", UpdateCheck.RidFor("windows", karar.Architecture));
+        Assert.Equal("linux-x64", UpdateCheck.RidFor("linux", karar.Architecture));
+    }
+
+    /// <summary>
+    /// A4: kurucu exe'si arm64'te de arm64 RID'ini seçiyor, desteklenmeyen mimaride
+    /// duruyor. Setup exe'si x64 kalıp emülasyonla koştuğu için karar
+    /// <see cref="ArchitectureChoice"/> okumasından geliyor, kendi mimarisinden değil.
+    /// </summary>
+    [Fact]
+    public void TheSetupExeChoosesTheArm64RuntimeIdentifierOnArm64()
+    {
+        var gunluk = new List<string>();
+        Assert.Equal("win-arm64", SetupRunner.RuntimeIdentifier(
+            ArchitectureChoice.Decide("ARM64", null, null, true), gunluk.Add));
+        Assert.Equal("win-x64", SetupRunner.RuntimeIdentifier(
+            ArchitectureChoice.Decide("X64", null, null, true), gunluk.Add));
+        Assert.Contains("arm64", SetupRunner.WindowsArchitectures);
+
+        var hata = Assert.Throws<SetupException>(() => SetupRunner.RuntimeIdentifier(
+            ArchitectureChoice.Decide("X86", null, null, true), gunluk.Add));
+        Assert.Contains("Bu mimari için yayın yok", hata.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A4: kurucu arm64'te arm64 bağımlılıklarını çekiyor. x64 pinleri aarch64 dosyasına
+    /// eşit olmamalı; olursa arm64 makineye x64 libmpv/ffmpeg iner ve oynatıcı hiç açılmaz.
+    /// </summary>
+    [Fact]
+    public void TheDependencyPinsFollowTheArchitecture()
+    {
+        Assert.Equal(LibMpvPin.Arm64, LibMpvPin.For("arm64"));
+        Assert.Equal(LibMpvPin.Arm64, LibMpvPin.For("ARM64"));
+        Assert.Equal(LibMpvPin.X64, LibMpvPin.For("x64"));
+        Assert.Equal(FfmpegPin.Arm64, FfmpegPin.For("arm64"));
+        Assert.Equal(FfmpegPin.X64, FfmpegPin.For("x64"));
+
+        Assert.NotEqual(LibMpvPin.X64.DllSha256, LibMpvPin.Arm64.DllSha256);
+        Assert.NotEqual(LibMpvPin.X64.ArchiveSha256, LibMpvPin.Arm64.ArchiveSha256);
+        Assert.NotEqual(FfmpegPin.X64.Url, FfmpegPin.Arm64.Url);
+        Assert.Contains("aarch64", LibMpvPin.Arm64.Urls[0], StringComparison.Ordinal);
+        Assert.Contains("winarm64", FfmpegPin.Arm64.Url, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// BtbN'in <c>latest</c> etiketi her gün üstüne yazılıyor: o etiketten sabitlemek
+    /// sabitleme değil. Pin tarihli bir autobuild etiketinde durmalı.
+    /// </summary>
+    [Fact]
+    public void TheArm64FfmpegPinDoesNotUseAFloatingTag()
+    {
+        Assert.DoesNotContain("/download/latest/", FfmpegPin.Arm64.Url, StringComparison.Ordinal);
+        Assert.Matches(@"/download/autobuild-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}/", FfmpegPin.Arm64.Url);
+        Assert.Equal(2, FfmpegPin.Arm64.Entries.Count);
+        foreach (var entry in FfmpegPin.Arm64.Entries)
+            Assert.Matches("^[0-9a-f]{64}$", entry.Sha256);
     }
 
     /// <summary>

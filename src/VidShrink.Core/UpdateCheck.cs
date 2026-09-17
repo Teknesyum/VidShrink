@@ -159,18 +159,24 @@ public static class UpdateCheck
     /// de aynı kuralı okuyor, çünkü ayrıştıklarında biri kuruluyor öteki hiç güncelleme bulamıyor.
     /// </summary>
     /// <summary>Yayın iş akışının paketlediği hedefler; <c>.github/workflows/release.yml</c> matrisiyle aynı.</summary>
-    public static readonly IReadOnlyList<string> ReleasedRids = new[] { "win-x64", "osx-arm64", "osx-x64", "linux-x64" };
+    public static readonly IReadOnlyList<string> ReleasedRids = new[] { "win-x64", "win-arm64", "osx-arm64", "osx-x64", "linux-x64", "linux-arm64" };
 
-    public static string Rid
+    /// <summary>
+    /// Platform ve mimariden yayın kimliği. Kararın kendisinden ayrı duruyor ki arm64
+    /// makinenin arm64 paketini seçtiği bu makinede de ölçülebilsin: <see cref="Rid"/>
+    /// yalnız koştuğu makineyi söyler, bu ise kuralı söyler.
+    /// </summary>
+    public static string RidFor(string platform, string architecture) => platform switch
     {
-        get
-        {
-            var arch = ArchitectureChoice.Decide().Architecture;
-            if (OperatingSystem.IsWindows()) return "win-" + arch;
-            if (OperatingSystem.IsMacOS()) return "osx-" + arch;
-            return "linux-" + arch;
-        }
-    }
+        "windows" => "win-" + architecture,
+        "macos" => "osx-" + architecture,
+        _ => "linux-" + architecture
+    };
+
+    public static string CurrentPlatform =>
+        OperatingSystem.IsWindows() ? "windows" : OperatingSystem.IsMacOS() ? "macos" : "linux";
+
+    public static string Rid => RidFor(CurrentPlatform, ArchitectureChoice.Decide().Architecture);
 
     public static string ManifestAssetName(string rid) => $"manifest-{rid}.json";
 

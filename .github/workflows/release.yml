@@ -1,6 +1,6 @@
 name: release
 
-# Runs when a version tag is pushed. Publishes VidShrink self-contained for the four
+# Runs when a version tag is pushed. Publishes VidShrink self-contained for the six
 # supported targets, writes a per-file manifest next to each archive, and collects
 # everything into a GitHub Release, published as latest once every asset is uploaded.
 # win-x64 additionally carries the launcher as
@@ -198,10 +198,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Self-contained publish needs no target machine: all four are produced on the
+        # Self-contained publish needs no target machine: all six are produced on the
         # Linux runner. zip is used rather than actions/upload-artifact's own packing
         # because it keeps the executable bit on the macOS and Linux binaries.
-        rid: [win-x64, osx-arm64, osx-x64, linux-x64]
+        rid: [win-x64, win-arm64, osx-arm64, osx-x64, linux-x64, linux-arm64]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -230,13 +230,14 @@ jobs:
             -o publish/${{ matrix.rid }}
 
       - name: Publish the launcher
-        # Windows only. The launcher is what the shortcuts point at and what applies an
-        # update before the application is loaded; without it in the release the installer
-        # has nowhere to get it from. Its runtime identifier is fixed in the csproj.
-        if: matrix.rid == 'win-x64'
+        # Windows only, both architectures. The launcher is what the shortcuts point at and
+        # what applies an update before the application is loaded; without it in the release
+        # the installer has nowhere to get it from. The csproj pins win-x64; -r overrides it,
+        # so win-arm64 gets its own native launcher rather than an emulated one.
+        if: startsWith(matrix.rid, 'win-')
         run: |
           dotnet publish src/VidShrink.Launcher/VidShrink.Launcher.csproj \
-            -c Release \
+            -c Release -r ${{ matrix.rid }} \
             -p:Version=${{ needs.version.outputs.version }} \
             -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
             -o publish-launcher
@@ -246,7 +247,10 @@ jobs:
         # does what Install-VidShrink.ps1 does without starting PowerShell: it downloads the
         # two archives in parallel, checks them against checksums-win-x64.txt and unpacks them
         # straight into the install root. It is not listed in the manifest; the updater never
-        # replaces it, a user runs it once.
+        # replaces it, a user runs it once. It stays x64 and is published once: Windows on ARM
+        # runs an x64 console program under emulation, and the program reads the machine's own
+        # architecture (RuntimeInformation.OSArchitecture is Arm64 even under emulation), so a
+        # single VidShrink-Setup.exe installs the win-arm64 release on an arm64 machine.
         if: matrix.rid == 'win-x64'
         run: |
           dotnet publish src/VidShrink.Setup/VidShrink.Setup.csproj \
@@ -255,6 +259,10 @@ jobs:
             -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
             -o publish-setup
 
+      # The Windows 11 shell extension is a native COM DLL and is built for x64 only, so it
+      # travels in the win-x64 launcher archive alone. On win-arm64 the launcher archive
+      # carries no shell/ folder and the manifest's "shell" array comes out empty; the
+      # classic context menu (ShellMenu.cs) still works there.
       - uses: actions/download-artifact@v4
         if: matrix.rid == 'win-x64'
         with:
@@ -393,14 +401,14 @@ jobs:
           set -euo pipefail
           tag="${{ needs.version.outputs.tag }}"
           gh release edit "$tag" --draft=false --latest
-          for rid in win-x64 linux-x64 osx-x64 osx-arm64; do
+          for rid in win-x64 win-arm64 linux-x64 linux-arm64 osx-x64 osx-arm64; do
             gh release view "$tag" --json assets --jq ".assets[].name" | grep -qx "manifest-$rid.json"
           done
           test "$(gh release view "$tag" --json isDraft --jq .isDraft)" = "false"
 
-  # arm64 dogrulamasi: yalniz elle tetiklenir, etiket ve yayin olusturmaz. Paket adimlari
-  # publish isinin aynisi, ayni Linux kosucusunda capraz. Etiket matrisine henuz girmiyor:
-  # UpdateCheck.ReleasedRids (Core) ile matris birebir pinli.
+  # arm64 dogrulamasi: yalniz elle tetiklenir, etiket ve yayin olusturmaz. arm64 artik etiket
+  # matrisinde de var (publish isi); bu is surum kesmeden ayni paketi uretip gercek arm64
+  # kosucusunda actirmak icin duruyor.
   arm64-publish:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -519,6 +527,54 @@ jobs:
           ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc2=size=640x360:rate=30 -t 3 -pix_fmt yuv420p -c:v libx264 kaynak.mp4
           app/vidshrink plan kaynak.mp4 --hedef 1 --olcumsuz --json > plan.json
           grep -E '"(codec|videoBitrateK|targetMb)"' plan.json
+
+  # Kurucunun arm64 bagimlilik kolu gercek bir arm64 kosucusunda kosuyor: ffmpeg ve libmpv
+  # pinli adreslerden inip sha256'lari dogrulaniyor, ffmpeg kendi mimarisini basiyor, libmpv
+  # surece yukleniyor. Negatif kontrol ayni komutu bozuk bir sha256 ile kosuyor: dogrulama
+  # durdurmazsa kol yesil kalirdi ve pin bir sey olcmuyor olurdu.
+  arm64-deps:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: windows-11-arm
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Kurucunun bagimlilik kolu (ffmpeg + libmpv, sha256)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          "kosucu mimarisi: $env:PROCESSOR_ARCHITECTURE $([Runtime.InteropServices.RuntimeInformation]::OSArchitecture)"
+          & ./Install-VidShrink.ps1 -DepsOnly "$env:RUNNER_TEMP/deps"
+
+          $ffmpeg = Join-Path $env:RUNNER_TEMP 'deps/ffmpeg/ffmpeg.exe'
+          $dll = Join-Path $env:RUNNER_TEMP 'deps/libmpv/libmpv-2.dll'
+          foreach ($pe in @($ffmpeg, $dll)) {
+            $b = [IO.File]::ReadAllBytes((Resolve-Path $pe).Path)
+            $off = [BitConverter]::ToInt32($b, 0x3C)
+            $machine = [BitConverter]::ToUInt16($b, $off + 4)
+            "PE makine $pe = 0x{0:X4}" -f $machine
+            if ($machine -ne 0xAA64) { throw "$pe arm64 degil" }
+          }
+
+          $version = (& $ffmpeg -hide_banner -version) -join "`n"
+          if ($LASTEXITCODE -ne 0) { throw "ffmpeg -version cikis $LASTEXITCODE" }
+          ($version -split "`n")[0]
+          $handle = [Runtime.InteropServices.NativeLibrary]::Load((Resolve-Path $dll).Path)
+          "libmpv yuklendi: 0x{0:X}" -f [int64]$handle
+
+      - name: "Negatif kontrol: bozuk sha256 kurulumu durduruyor"
+        shell: pwsh
+        run: |
+          $hata = $null
+          try {
+            & ./Install-VidShrink.ps1 -DepsOnly "$env:RUNNER_TEMP/deps-bozuk" -DepsSha256Override ('0' * 64)
+          }
+          catch {
+            $hata = $_.Exception.Message
+          }
+          if (-not $hata) { throw 'bozuk sha256 ile kol yesil dondu' }
+          if ($hata -notmatch 'tutmuyor') { throw "beklenen sha256 hatasi degil: $hata" }
+          "negatif kontrol ayirdi: $hata"
 
   # A tag whose release run goes red publishes nothing, and nothing says so: installed
   # copies keep following releases/latest and sit on the previous version. That is what

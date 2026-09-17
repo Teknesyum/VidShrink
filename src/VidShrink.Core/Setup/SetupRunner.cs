@@ -16,16 +16,19 @@ public static class SetupRunner
 
     public const string AsideSuffix = ".eski-";
 
+    /// <summary>Windows tarafında yayımlanan mimariler; <see cref="UpdateCheck.ReleasedRids"/> ile aynı küme.</summary>
+    public static readonly IReadOnlyList<string> WindowsArchitectures = new[] { "x64", "arm64" };
+
     public static string RuntimeIdentifier(ArchitectureDecision decision, Action<string> log)
     {
-        if (decision.Architecture != "x64")
+        if (!WindowsArchitectures.Contains(decision.Architecture))
         {
             if (decision.Outcome == ArchitectureOutcome.Read)
-                throw new SetupException($"Bu mimari için yayın yok: {decision.Architecture}. VidShrink Windows'ta şu an yalnız win-x64 için yayımlanıyor.");
-            throw new SetupException("Mimari okunamadı ve işletim sistemi 32 bit görünüyor: win-x64 yayını bu makinede çalışmaz. VidShrink Windows'ta şu an yalnız win-x64 için yayımlanıyor.");
+                throw new SetupException($"Bu mimari için yayın yok: {decision.Architecture}. VidShrink Windows'ta şu an yalnız win-x64 ve win-arm64 için yayımlanıyor.");
+            throw new SetupException("Mimari okunamadı ve işletim sistemi 32 bit görünüyor: win-x64 yayını bu makinede çalışmaz. VidShrink Windows'ta şu an yalnız win-x64 ve win-arm64 için yayımlanıyor.");
         }
         if (!string.IsNullOrEmpty(decision.Note)) log(decision.Note);
-        return "win-x64";
+        return UpdateCheck.RidFor("windows", decision.Architecture);
     }
 
     public static bool UnderPrograms(string root, string localAppData)
@@ -46,7 +49,10 @@ public static class SetupRunner
         }
 
         host.Log("VidShrink kurulumu hazırlanıyor...");
-        var rid = RuntimeIdentifier(host.Architecture(), host.Log);
+        var decision = host.Architecture();
+        var rid = RuntimeIdentifier(decision, host.Log);
+        var libMpvPin = options.LibMpv ?? LibMpvPin.For(decision.Architecture);
+        var ffmpegPin = options.Ffmpeg ?? FfmpegPin.For(decision.Architecture);
         var root = Path.GetFullPath(options.InstallRoot).TrimEnd(Path.DirectorySeparatorChar);
         if (!UnderPrograms(root, options.LocalAppData))
             throw new SetupException($"Güvenlik nedeniyle kurulum yolu LocalAppData\\Programs altında olmalıdır: {root}");
@@ -64,10 +70,10 @@ public static class SetupRunner
             var launcherName = UpdateCheck.LauncherArchiveAssetName(rid);
             var checksumsName = $"checksums-{rid}.txt";
 
-            var existingLibMpv = Path.Combine(root, "tools", "libmpv", options.LibMpv.FileName);
-            var libMpvTask = Task.Run(() => SetupDownloads.PrepareLibMpvAsync(client, options.LibMpv, existingLibMpv, work, host.Log, cancellationToken), cancellationToken);
+            var existingLibMpv = Path.Combine(root, "tools", "libmpv", libMpvPin.FileName);
+            var libMpvTask = Task.Run(() => SetupDownloads.PrepareLibMpvAsync(client, libMpvPin, existingLibMpv, work, host.Log, cancellationToken), cancellationToken);
             var ffmpegTask = ffmpeg is null || ffprobe is null
-                ? Task.Run(() => SetupDownloads.FetchFfmpegAsync(options.Ffmpeg, work, cancellationToken), cancellationToken)
+                ? Task.Run(() => SetupDownloads.FetchFfmpegAsync(ffmpegPin, work, cancellationToken), cancellationToken)
                 : null;
             if (ffmpegTask is not null) host.Log("FFmpeg ve FFprobe indiriliyor...");
 
@@ -129,9 +135,9 @@ public static class SetupRunner
                 var toolsLibMpv = Path.Combine(root, "tools", "libmpv");
                 Directory.CreateDirectory(toolsLibMpv);
                 var libMpvSource = libMpv.Reused && aside is not null
-                    ? Path.Combine(aside, "tools", "libmpv", options.LibMpv.FileName)
+                    ? Path.Combine(aside, "tools", "libmpv", libMpvPin.FileName)
                     : libMpv.Path;
-                Place(libMpvSource, Path.Combine(toolsLibMpv, options.LibMpv.FileName), move: true);
+                Place(libMpvSource, Path.Combine(toolsLibMpv, libMpvPin.FileName), move: true);
 
                 if (!File.Exists(Path.Combine(root, LauncherUpdate.ExecutableName))) throw new SetupException("Kurulan VidShrink.exe bulunamadı.");
                 if (!File.Exists(Path.Combine(appDirectory, AppExecutable))) throw new SetupException("Kurulan app\\VidShrink.App.exe bulunamadı.");

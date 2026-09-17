@@ -8,7 +8,13 @@ param(
     [switch]$Uninstall,
     [ValidateSet('auto', 'tr', 'en')]
     [string]$MenuLanguage = 'auto',
-    [string]$RegistryRoot = 'HKCU:\Software\Classes'
+    [string]$RegistryRoot = 'HKCU:\Software\Classes',
+    # Yalnız bağımlılık kolu: ffmpeg ve libmpv verilen klasöre indirilip sha256'ları
+    # doğrulanır, kurulum yapılmaz. CI bu kolu gerçek bir arm64 koşucusunda koşuyor.
+    [string]$DepsOnly,
+    # Yalnız negatif kontrol için: beklenen sha256'yı bilerek bozar, doğrulamanın
+    # gerçekten durdurduğunu gösterir.
+    [string]$DepsSha256Override
 )
 
 $ErrorActionPreference = 'Stop'
@@ -122,24 +128,24 @@ function Resolve-Architecture {
     }
 }
 
-# Windows tarafında yayımlanan tek hedef win-x64; arm64 ve x86 için Windows yayını yok. Yayının
-# kendisi dört hedef taşıyor (osx-arm64, osx-x64, linux-x64 de var) ama onlar bu betiğin
-# işi değil. arm64 ya da x86 olduğu KESİN anlaşılırsa burada duruluyor:
+# Windows tarafında iki hedef yayımlanıyor: win-x64 ve win-arm64. x86 için yayın yok. Yayının
+# kendisi altı hedef taşıyor (osx-arm64, osx-x64, linux-x64, linux-arm64 da var) ama onlar bu
+# betiğin işi değil. Desteklenmeyen bir mimari KESİN okunursa burada duruluyor:
 # x64 arşivini oraya sessizce kurmak çalışan ama güncellenmeyen bir kurulum bırakır, çünkü
 # güncelleyici kendi mimarisinin adını arar (UpdateCheck.Rid) ve o varlık yayında yoktur.
 # Mimari okunamadıysa durulmuyor — bilinmeyen ile desteklenmeyen aynı şey değil.
 function Get-RuntimeIdentifier {
     $decision = Resolve-Architecture
 
-    if ($decision.Architecture -ne 'x64') {
+    if (@('x64', 'arm64') -notcontains $decision.Architecture) {
         if ($decision.Outcome -eq 'Read') {
-            throw "Bu mimari için yayın yok: $($decision.Architecture). VidShrink Windows'ta şu an yalnız win-x64 için yayımlanıyor."
+            throw "Bu mimari için yayın yok: $($decision.Architecture). VidShrink Windows'ta şu an yalnız win-x64 ve win-arm64 için yayımlanıyor."
         }
-        throw 'Mimari okunamadı ve işletim sistemi 32 bit görünüyor: win-x64 yayını bu makinede çalışmaz. VidShrink Windows''ta şu an yalnız win-x64 için yayımlanıyor.'
+        throw 'Mimari okunamadı ve işletim sistemi 32 bit görünüyor: win-x64 yayını bu makinede çalışmaz. VidShrink Windows''ta şu an yalnız win-x64 ve win-arm64 için yayımlanıyor.'
     }
 
     if ($decision.Note) { Write-Host $decision.Note -ForegroundColor Yellow }
-    return 'win-x64'
+    return "win-$($decision.Architecture)"
 }
 
 function Find-Tool([string]$Name) {
@@ -193,8 +199,70 @@ $libMpvArchiveSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C
 $libMpvDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
 $libMpvFileName = 'libmpv-2.dll'
 
+# arm64 kolunun pinleri. libmpv'nin aarch64 derlemesi aynı shinchiro sürümünden, kendi
+# yayınımıza aynadan kopyalanmış hâliyle; ffmpeg ise BtbN'den, çünkü GyanD yalnız x86_64
+# derliyor. BtbN'in kayan `latest` etiketi her gün üstüne yazıldığı için sabitleme olmaz;
+# ay sonu autobuild etiketleri kalıcı (2024-10-31'den bugüne duruyor), gün içi olanlar
+# budanıyor. Sayılar SetupModel.cs'deki FfmpegPin.Arm64 ve LibMpvPin.Arm64 ile aynı.
+$libMpvArm64Url = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-aarch64-20260903-git-69e63f425a.7z'
+$libMpvArm64FallbackUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-aarch64-20260903-git-69e63f425a.7z'
+$libMpvArm64ArchiveSha256 = '9D4E0CF7370FD1DD9A91A9D8139F24A88ECE9E58B00F5A9CA50B391D03114F2F'
+$libMpvArm64DllSha256 = '3BFC5A042CC6EBE45ACE74992DBC135EE84E3E1B33AFAC070F8902A2D64A22E9'
+
+$ffmpegArm64Url = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-08-31-13-27/ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0.zip'
+$ffmpegArm64Entries = @(
+    @{ Entry = 'ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0/bin/ffmpeg.exe'; Name = 'ffmpeg.exe'; Sha256 = 'A169B9D26B2380BE66211022525C9AC16AFFC923BA05B561024E57C5ED4281F9' },
+    @{ Entry = 'ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0/bin/ffprobe.exe'; Name = 'ffprobe.exe'; Sha256 = '6B0B738A2DF0186811F240A7036CD1279C0A08991981ADECCEEFE6A2C2B2236C' }
+)
+
+function Use-Arm64Pins {
+    $script:libMpvUrl = $libMpvArm64Url
+    $script:libMpvFallbackUrl = $libMpvArm64FallbackUrl
+    $script:libMpvArchiveSha256 = $libMpvArm64ArchiveSha256
+    $script:libMpvDllSha256 = $libMpvArm64DllSha256
+}
+
 function Get-FileSha256([string]$Path) {
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+}
+
+# winget'in Gyan.FFmpeg paketi arm64 kurucusu sunmuyor; sunduğu x64 ikilisi emülasyonla
+# koşar ve kodlama hızını düşürür. arm64'te ffmpeg pinli arşivden, sha256'sı dosya dosya
+# doğrulanarak alınıyor.
+function Install-FfmpegArm64([string]$WorkRoot, [string]$Destination) {
+    New-Item -ItemType Directory -Path $Destination, $WorkRoot -Force | Out-Null
+    $zip = Join-Path $WorkRoot 'ffmpeg-winarm64.zip'
+    Write-Host 'FFmpeg ve FFprobe indiriliyor (winarm64)...' -ForegroundColor Cyan
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri $ffmpegArm64Url -OutFile $zip
+    }
+    catch {
+        throw "ffmpeg indirilemedi: $ffmpegArm64Url"
+    }
+
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $archive = [IO.Compression.ZipFile]::OpenRead($zip)
+    try {
+        foreach ($item in $ffmpegArm64Entries) {
+            $entry = $archive.GetEntry($item.Entry)
+            if (-not $entry) { throw "ffmpeg arşivinde $($item.Entry) yok." }
+            $target = Join-Path $Destination $item.Name
+            [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $target, $true)
+            $expected = if ($DepsSha256Override) { $DepsSha256Override.ToUpperInvariant() } else { $item.Sha256 }
+            $actual = Get-FileSha256 $target
+            if ($actual -ne $expected) {
+                throw "$($item.Name) sağlaması tutmuyor. Beklenen $expected, bulunan $actual. Kurulum durduruldu."
+            }
+        }
+    }
+    finally {
+        $archive.Dispose()
+    }
+
+    return @{
+        ffmpeg  = (Join-Path $Destination 'ffmpeg.exe')
+        ffprobe = (Join-Path $Destination 'ffprobe.exe')
+    }
 }
 
 function Install-LibMpv([string]$WorkRoot, [string]$Destination, [string]$Existing) {
@@ -670,14 +738,44 @@ if ($ShellMenuOnly) {
 Write-Host 'VidShrink kurulumu hazırlanıyor...' -ForegroundColor Cyan
 
 $runtimeIdentifier = Get-RuntimeIdentifier
+$isArm64 = $runtimeIdentifier -eq 'win-arm64'
+if ($isArm64) { Use-Arm64Pins }
+
+if ($DepsOnly) {
+    $depsRoot = [IO.Path]::GetFullPath($DepsOnly)
+    $depsWork = Join-Path $depsRoot 'is'
+    New-Item -ItemType Directory -Path $depsRoot, $depsWork -Force | Out-Null
+    Write-Host "Bağımlılık kolu: $runtimeIdentifier" -ForegroundColor Cyan
+
+    if ($isArm64) {
+        $depsFfmpeg = Install-FfmpegArm64 $depsWork (Join-Path $depsRoot 'ffmpeg')
+        Write-Host "ffmpeg hazır (sha256 doğrulandı): $($depsFfmpeg.ffmpeg)" -ForegroundColor Green
+    }
+    else {
+        Write-Host 'x64 kolunda ffmpeg winget ile geliyor; bağımlılık kolu yalnız libmpv indirir.' -ForegroundColor Yellow
+    }
+
+    $depsLibMpv = Join-Path $depsRoot 'libmpv'
+    Install-LibMpv $depsWork $depsLibMpv '' | Out-Null
+    Write-Host "libmpv hazır (sha256 doğrulandı): $(Join-Path $depsLibMpv $libMpvFileName)" -ForegroundColor Green
+    return
+}
 
 $ffmpeg = Find-Tool 'ffmpeg'
 $ffprobe = Find-Tool 'ffprobe'
 if (-not $ffmpeg -or -not $ffprobe) {
-    Write-Host 'FFmpeg ve FFprobe yükleniyor...' -ForegroundColor Cyan
-    Install-WinGetPackage 'Gyan.FFmpeg'
-    $ffmpeg = Find-Tool 'ffmpeg'
-    $ffprobe = Find-Tool 'ffprobe'
+    if ($isArm64) {
+        $ffmpegWork = Join-Path ([IO.Path]::GetTempPath()) ("vidshrink-ffmpeg-" + [Guid]::NewGuid().ToString('N'))
+        $fetchedFfmpeg = Install-FfmpegArm64 $ffmpegWork (Join-Path $ffmpegWork 'bin')
+        $ffmpeg = $fetchedFfmpeg.ffmpeg
+        $ffprobe = $fetchedFfmpeg.ffprobe
+    }
+    else {
+        Write-Host 'FFmpeg ve FFprobe yükleniyor...' -ForegroundColor Cyan
+        Install-WinGetPackage 'Gyan.FFmpeg'
+        $ffmpeg = Find-Tool 'ffmpeg'
+        $ffprobe = Find-Tool 'ffprobe'
+    }
 }
 if (-not $ffmpeg -or -not $ffprobe) { throw 'FFmpeg veya FFprobe kurulumdan sonra bulunamadı.' }
 
