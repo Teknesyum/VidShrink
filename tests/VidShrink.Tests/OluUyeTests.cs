@@ -589,21 +589,17 @@ public sealed class OluUyeTests
     }
 
     /// <summary>
-    /// K5'in siniri: kapi yalniz <c>hevc_videotoolbox</c> icin, yalniz <c>VideoToolboxAllowed</c>
-    /// uzerinden acik (macOS, yoklama Working, crf reddi; <c>docs/olcumler/videotoolbox-hizli.md</c>).
-    /// Genel kodek listesi ve onizleme parcasi VT'yi hala tanimiyor.
+    /// K5'in siniri: kol yazildi, kapi acilmadi. Kapinin kendi olcusu
+    /// <c>PlanParserTests.ParserStillRejectsVideoToolboxEncoders</c>; burada yalniz kapinin
+    /// listesi okunuyor, cunku K5'in gerekcesi "buraya uretimden ulasan yok" cumlesine dayaniyor.
     /// </summary>
     [Fact]
-    public void TheGateOpensOnlyThroughVideoToolboxAllowed()
+    public void TheGateStaysClosed()
     {
         var parser = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Core", "PlanParser.cs"));
         var preview = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Core", "PreviewSegment.cs"));
-        var allowedList = parser[parser.IndexOf("AllowedCodecs", StringComparison.Ordinal)..];
-        allowedList = allowedList[..allowedList.IndexOf('}')];
 
-        Assert.DoesNotContain("videotoolbox", allowedList, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("h264_videotoolbox", parser, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("private static bool VideoToolboxAllowed(", parser, StringComparison.Ordinal);
+        Assert.DoesNotContain("videotoolbox", parser, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("videotoolbox", preview, StringComparison.OrdinalIgnoreCase);
     }
 

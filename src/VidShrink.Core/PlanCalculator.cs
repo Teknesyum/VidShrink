@@ -242,23 +242,12 @@ public static class PlanCalculator
         "av1_nvenc", "hevc_nvenc", "av1_qsv", "hevc_qsv", "av1_amf", "hevc_amf", "h264_nvenc"
     };
 
-    private static readonly string[] MacFastHardwareOrder = new[] { "hevc_videotoolbox" }.Concat(FastHardwareOrder).ToArray();
-
-    /// <summary>
-    /// Hizli kipin aday sirasi. <c>hevc_videotoolbox</c> yalniz macOS'ta ve basta; kapi
-    /// <c>docs/olcumler/videotoolbox-hizli.md</c>.
-    /// </summary>
-    public static IReadOnlyList<string> FastHardwareOrderFor(bool macOS) => macOS ? MacFastHardwareOrder : FastHardwareOrder;
-
     public static EncodePlan Build(MediaInfo info, PlanOptions options, IEncoderAvailability? availability = null)
         => BuildDetailed(info, options, null, availability).Plan;
 
     public static PlanResult BuildDetailed(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability = null)
-        => BuildDetailed(info, options, profile, availability, OperatingSystem.IsMacOS());
-
-    public static PlanResult BuildDetailed(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability, bool macOS)
     {
-        var probe = new ProbeState { FastOrder = FastHardwareOrderFor(macOS) };
+        var probe = new ProbeState();
         var result = BuildDetailedCore(info, options, profile, availability, probe);
         result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
         return probe.NotMeasured ? result with { HardwareNotMeasured = true } : result;
@@ -291,8 +280,6 @@ public static class PlanCalculator
         /// hic sorulmaz, o yuzden <see cref="PreferredCodecState"/> ile ayri tasiniyor.
         /// </summary>
         internal bool PreferredCodecInBuild = true;
-
-        internal IReadOnlyList<string> FastOrder = Array.Empty<string>();
     }
 
     private static PlanResult BuildDetailedCore(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability, ProbeState probe)
@@ -315,7 +302,7 @@ public static class PlanCalculator
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
 
         if (lockedCodec is not null && options.EncoderPath != EncoderPathOverride.Auto
-            && CodecModel.IsFastHardware(codec) != (options.EncoderPath == EncoderPathOverride.Hardware))
+            && CodecModel.IsHardware(codec) != (options.EncoderPath == EncoderPathOverride.Hardware))
         {
             reason.Add($"kullanici kodlayici yolunu {options.EncoderPath} olarak sabitledi ama ayni anda kodegi {lockedCodec} olarak kilitledi; kodek kilidi onceliklidir, yol istegi uygulanmadi ve kullanilan {codec}");
             reasonCodes.Add(new ReasonNote(ReasonCode.ManualEncoderPathSupersededByCodec,
@@ -326,12 +313,12 @@ public static class PlanCalculator
         {
             var engineCodec = codec;
             var wantsHardware = options.EncoderPath == EncoderPathOverride.Hardware;
-            if (!wantsHardware && CodecModel.IsFastHardware(codec))
+            if (!wantsHardware && CodecModel.IsHardware(codec))
                 codec = LockedFallbackCodecFor(codec);
-            else if (wantsHardware && !CodecModel.IsFastHardware(codec))
+            else if (wantsHardware && !CodecModel.IsHardware(codec))
                 codec = PickFastCodec(preference, availability, probe);
 
-            if (CodecModel.IsFastHardware(codec) != wantsHardware)
+            if (CodecModel.IsHardware(codec) != wantsHardware)
             {
                 reason.Add($"kullanici kodlayici yolunu {options.EncoderPath} olarak sabitledi ama bu makinede o yolda kullanilabilir kodlayici yok; istek karsilanmadi ve {codec} ile devam ediliyor");
                 reasonCodes.Add(new ReasonNote(ReasonCode.ManualEncoderPathUnmet, ManualOverrideValue: options.EncoderPath.ToString(), EngineWouldHaveChosen: engineCodec, FallbackCodec: codec));
@@ -376,7 +363,7 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.HdrTonemapped));
         }
 
-        var preferredCodec = darkSwitch ? codec : lockedCodec ?? (fast ? probe.FastOrder[0] : PreferredCodecFor(preference));
+        var preferredCodec = darkSwitch ? codec : lockedCodec ?? (fast ? FastHardwareOrder[0] : PreferredCodecFor(preference));
         if (codec != preferredCodec)
         {
             var fallbackCause = EncoderFallbackCauseFor(probe);
@@ -762,13 +749,6 @@ public static class PlanCalculator
                         ManualOverrideValue: manualPreset, EngineWouldHaveChosen: firstPassPreset));
                 }
             }
-        }
-
-        if (CodecModel.Vendor(codec) == EncoderVendor.VideoToolbox && plan.ModeEnum == EncodeMode.Crf)
-        {
-            plan.Mode = "2pass";
-            plan.Crf = null;
-            reason.Add($"{codec} does not take CRF, so the {plan.VideoBitrateK}k estimate is encoded as a single-pass bitrate");
         }
 
         if (plan.ModeEnum == EncodeMode.TwoPass)
@@ -1590,14 +1570,13 @@ public static class PlanCalculator
     /// </summary>
     private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState probe)
     {
-        var order = probe.FastOrder;
-        if (availability is null) return order[0];
-        probe.PreferredCodecInBuild = availability.HasEncoder(order[0]);
+        if (availability is null) return FastHardwareOrder[0];
+        probe.PreferredCodecInBuild = availability.HasEncoder(FastHardwareOrder[0]);
         string? unmeasured = null;
-        foreach (var candidate in order)
+        foreach (var candidate in FastHardwareOrder)
         {
             var state = availability.KnownState(candidate);
-            if (candidate == order[0]) probe.PreferredCodecState = state;
+            if (candidate == FastHardwareOrder[0]) probe.PreferredCodecState = state;
             if (state == EncoderProbeState.Unmeasured)
             {
                 unmeasured ??= candidate;

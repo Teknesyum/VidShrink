@@ -13,6 +13,8 @@ Dal `t0/vt-hizli`. Karar: `fable-kararlar-2026-09-17.md` soru 1. Kapı önce `do
 4. **Testler** `VideoToolboxHizliTests`, `PlanParserTests`; her kol mutasyonla.
 5. **Ölçüm** `tools/kalite-paketi-3/hb.ps1` `vthizli` işi, `handbrake-kiyas.yml` macos-15. Kalırsa plan yolu geri alınır.
 
+**Sonuç:** koşum 35249123754 kapıdan kaldı (K2 2/8, K4 5/8); 2-4. adımlar geri alındı, ölçüm düzeneği kaldı.
+
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.

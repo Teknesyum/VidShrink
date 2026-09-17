@@ -166,13 +166,6 @@ public static class CodecModel
         _ => false
     };
 
-    /// <summary>
-    /// Hizli kipin donanim yolu: <see cref="IsHardware"/> ve <c>hevc_videotoolbox</c>. Kapi
-    /// <c>docs/olcumler/videotoolbox-hizli.md</c>; <see cref="IsHardware"/>'in arkasindaki olculer VT'ye tasinmaz.
-    /// </summary>
-    public static bool IsFastHardware(string codec)
-        => IsHardware(codec) || codec.Equals("hevc_videotoolbox", StringComparison.OrdinalIgnoreCase);
-
     public static bool SinglePassRateControl(string codec)
         => IsHardware(codec) || Vendor(codec) == EncoderVendor.VideoToolbox;
 
@@ -270,9 +263,9 @@ public static class CodecModel
     /// VideoToolbox o kola dusemez: <c>-crf</c> kabul etmiyor, kendi olcegi <c>-q:v</c> ise bu
     /// depoda olculmedi — <c>docs/olcumler/videotoolbox.md</c> bir Apple M1'de kol basina tek
     /// bir bit hizi veriyor, bir olcek cikarmaya yetmiyor. Olculmemis bir olcek yazmak yerine
-    /// kol acikca patliyor. Hizli kipte plan yoluna giren <c>hevc_videotoolbox</c> buraya
-    /// ulasmaz: <c>PlanCalculator</c> CRF planini tek gecis bit hizina cevirir, <c>PlanParser</c>
-    /// VT'de crf kipini reddeder.
+    /// kol acikca patliyor: bugun <c>PlanParser.AllowedCodecs</c> videotoolbox kodeklerini
+    /// gecirmedigi icin buraya ulasan yok, ama kapiyi acan sozlesme sessiz bir gecersiz bayrak
+    /// yerine bu istisnayi gorur.
     /// </para>
     /// </summary>
     public static IReadOnlyList<string> QualityArgs(string codec, double quality)

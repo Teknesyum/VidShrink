@@ -115,7 +115,7 @@ public sealed record HardwareVerdict(
     {
         var codec = probe.Codec;
 
-        if (!CodecModel.IsFastHardware(codec))
+        if (!CodecModel.IsHardware(codec))
             return new HardwareVerdict(false, HardwareVerdictReason.NoHardwareEncoder, codec, probe.ElapsedMs, requestedBitrateK, 0);
 
         // K3: ölçülemeyen yoklama da yazılıma düşer. Asimetri ölçüldü — yanlış donanım

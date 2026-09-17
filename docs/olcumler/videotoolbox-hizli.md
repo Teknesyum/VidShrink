@@ -37,3 +37,41 @@ XPSNR(ii) tabloya girer, hükme girmez. Bir ölçüt kalırsa: plan yolu bağlan
 çıkar), sonuç burada yazılır.
 
 K2 notu: T0'ın görev tanımı "yazılım yoluna göre, eş hedef"; karar 1 (c) "HB VT'ye karşı". İkisi de hükme girer.
+
+## Sonuç — Kapıdan Kaldı
+
+Koşum **35249123754** (`handbrake-kiyas`, `isler=vthizli`, `vt=false`), `macos-15`, commit `4e65f579`. Ham çıktı
+artefakt `hb-sonuc-vthizli` (`vthizli.json`, `vthizli-hukum.json`). ffmpeg listesinde `hevc_videotoolbox` var.
+
+| Hücre | VMAF-NEG vt-hizli | yazılım (kodek) | HB VT | K2 fark | K5 fark | vt sn / HB sn | Bant (kbps) | XPSNR fark yaz. / HB |
+|---|---|---|---|---|---|---|---|---|
+| karanlık 2000 | 91,70 | 95,97 (x265) | 88,60 | **−4,27** | +3,10 | 3,7 / 6,0 = 0,62 | evet (1953) | −1,33 / −0,09 |
+| karanlık 5500 | 99,06 | 99,36 (x265) | 98,71 | **−0,300** (−0,30026) | +0,35 | 6,4 / 7,1 = 0,90 | evet (5351) | −0,69 / −0,12 |
+| parlak 2000 | 87,11 | 91,59 (svt-av1) | 85,83 | **−4,48** | +1,28 | 7,0 / 6,4 = 1,09 | evet (1923) | −1,47 / −0,25 |
+| parlak 5500 | 94,86 | 94,99 (svt-av1) | 94,11 | −0,13 | +0,75 | 6,8 / 5,7 = 1,19 | **hayır** (4792) | −0,05 / −0,07 |
+| hareketli 2000 | 94,32 | 97,50 (svt-av1) | 91,74 | **−3,17** | +2,58 | 3,5 / 7,1 = 0,49 | evet (1948) | −1,31 / +0,07 |
+| hareketli 5500 | 99,27 | 99,48 (svt-av1) | 99,10 | −0,22 | +0,17 | 4,3 / 6,9 = 0,62 | evet (5305) | +0,18 / −0,16 |
+| ekran 2000 | 92,67 | 97,26 (svt-av1) | 84,99 | **−4,59** | +7,68 | 2,5 / 3,9 = 0,64 | **hayır** (1276) | −17,57 / +7,99 |
+| ekran 5500 | 93,59 | 97,32 (svt-av1) | 84,86 | **−3,73** | +8,74 | 3,0 / 3,7 = 0,81 | **hayır** (1330) | −18,21 / +9,24 |
+
+| # | Sonuç | Hüküm |
+|---|---|---|
+| K1 | 8/8 `hevc_videotoolbox` | geçti |
+| K2 | 2/8 ≥ −0,3 (en kötü −4,59) | **kaldı** |
+| K3 | 8/8 ≤ 1,5 (en yüksek 1,19) | geçti |
+| K4 | 5/8 bantta, tavan aşımı 0 | **kaldı** |
+| K5 | 8/8 ≥ −0,3 (en düşük +0,17) | geçti |
+| N1 | `-foo 1` çıkış 8, `Unrecognized option 'foo'` | geçti |
+
+VT, HandBrake'in VT'sinden her hücrede iyi ve ondan hızlı; ama bugünkü yazılım yoluna göre düşük bit hızında 3-4,6
+VMAF-NEG geride ve üç hücrede banttan düşüyor. Ekran kesitinde kodlayıcı 5,4 Mbit isteğine ~1,3 Mbit veriyor
+(`the encoder did not answer the bitrate`, doygun). Yazılım kolunun çıplak kodlama süresi 23-152 sn.
+
+**Geri alındı:** plan yolu bağlantısı (`PlanCalculator` mac aday sırası ve CRF→tek geçiş, `CodecModel.IsFastHardware`,
+`HardwareVerdict`, `PlanParser` VT kapısı, `MainWindow.HardwareAvailableFrom` tek satırı, `VideoToolboxHizliTests`)
+`4c161f31` haline döndü. `PlanParserTests.ParserStillRejectsVideoToolboxEncoders` ve `OluUyeTests.TheGateStaysClosed`
+yeniden kapının kapalı olduğunu pimliyor. Ölçüm düzeneği kalıyor: `hb.ps1 -Is vthizli`.
+
+Bağlantı açıkken birim testleri ve mutasyonlar (13 mutasyonun 13'ü en az bir testi kırmızı yaptı, hepsi geri alındı)
+`4e65f579` commit'inde duruyor. Yan gözlem: bench komutunda VT için `-pass 2 -passlogfile` yazılıyor; VT tek geçiş,
+bayrak sonucu değiştirmedi ama argüman üretiminde temizlenmesi ayrı iş.
