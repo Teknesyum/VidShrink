@@ -132,6 +132,24 @@ public sealed class EncodeRunner
         var usedFloorStep = false;
         var usedDeadYieldStep = false;
         var lastSampleAttempt = 0;
+        var overPath = PartialPathFor(outputPath);
+        var overMb = 0.0;
+        EncodePlan? overPlan = null;
+        IReadOnlyList<string> overDropped = Array.Empty<string>();
+
+        void KeepSmallestOver(string path, double mb, EncodePlan used, IReadOnlyList<string> droppedOptions)
+        {
+            if (overPlan is not null && overMb <= mb && File.Exists(overPath))
+            {
+                TryDelete(path);
+                return;
+            }
+            TryDelete(overPath);
+            File.Move(path, overPath, overwrite: true);
+            overMb = mb;
+            overPlan = used;
+            overDropped = droppedOptions;
+        }
 
         void KeepFallback(string path, double mb, EncodePlan used, IReadOnlyList<string> droppedOptions)
         {
@@ -247,11 +265,14 @@ public sealed class EncodeRunner
                         attemptLimit = MaxAttempts + Saturation.ExtraAttemptsAtFloor;
                     }
 
-                    // Ending the run — whether the attempt ceiling was hit or the user chose to stop —
-                    // never hands back the oversized file. The last under-band result is delivered if
-                    // there is one; otherwise no file is written and the reason is reported.
-                    EncodeResult EndRun()
+                    var hasFallback = fallbackPlan is not null && File.Exists(fallbackPath);
+                    var guardStep = floorStep is null && !usedDeadYieldStep && !hasFallback && attempt + 1 == attemptLimit
+                        ? CeilingGuard.Plan(current, samples, effectiveTargetMb, info.DurationSeconds)
+                        : null;
+
+                    EncodeResult EndRun(bool deliverSmallestOver)
                     {
+                        if (deliverSmallestOver && File.Exists(partialPath)) KeepSmallestOver(partialPath, actualMb, current, dropped);
                         TryDelete(partialPath);
 
                         if (fallbackPlan is not null && File.Exists(fallbackPath))
@@ -262,6 +283,13 @@ public sealed class EncodeRunner
                                 Saturated: usedDeadYieldStep || Saturation.FillIsSaturated(fallbackMb, effectiveTargetMb));
                         }
 
+                        if (deliverSmallestOver && overPlan is not null && File.Exists(overPath))
+                        {
+                            trace.Add(new EncodeAttempt(attempt, "no attempt fit under the target, the smallest result delivered", aimMb, overMb, overPlan.VideoBitrateK, overPlan.Mode));
+                            File.Move(overPath, outputPath, overwrite: true);
+                            return new EncodeResult(true, outputPath, overMb, overPlan, attempt, null, UnderBand: false, CeilingExceeded: true, Trace: trace, DroppedOptions: overDropped, OverTarget: true);
+                        }
+
                         return new EncodeResult(false, outputPath, actualMb, current, attempt,
                             $"Stayed over the {effectiveTargetMb:0.##} MB target after {attempt} attempts (last result: {actualMb:0.0} MB); no file was written.",
                             UnderBand: false, CeilingExceeded: true, Trace: trace, DroppedOptions: dropped);
@@ -269,9 +297,11 @@ public sealed class EncodeRunner
 
                     if (askBeforeRetry is null)
                     {
-                        if (attempt >= attemptLimit || usedDeadYieldStep) return EndRun();
+                        if (attempt >= attemptLimit || usedDeadYieldStep) return EndRun(deliverSmallestOver: true);
+                        KeepSmallestOver(partialPath, actualMb, current, dropped);
                         if (floorStep is not null) trace.Add(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
-                        current = floorStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
+                        if (guardStep is not null) trace.Add(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
+                        current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
                         continue;
                     }
 
@@ -320,17 +350,18 @@ public sealed class EncodeRunner
                             return new EncodeResult(true, outputPath, trimmedMb, current, attempt, null, Trace: trace, DroppedOptions: dropped, Trim: trimmed.Plan);
                         }
                         trace.Add(new EncodeAttempt(attempt, "trim did not land under the target", aimMb, actualMb, current.VideoBitrateK, current.Mode));
-                        return EndRun();
+                        return EndRun(deliverSmallestOver: false);
                     }
 
                     if (choice != OvershootChoice.Retry || attempt >= attemptLimit)
                     {
                         trace.Add(new EncodeAttempt(attempt, "stopped at the user's request", aimMb, actualMb, current.VideoBitrateK, current.Mode));
-                        return EndRun();
+                        return EndRun(deliverSmallestOver: false);
                     }
 
                     if (floorStep is not null) trace.Add(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
-                    current = floorStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
+                    if (guardStep is not null) trace.Add(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
+                    current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
                     continue;
                 }
 
@@ -355,6 +386,7 @@ public sealed class EncodeRunner
         finally
         {
             TryDelete(fallbackPath);
+            TryDelete(overPath);
             CleanupPassLogs(passLogPrefix);
         }
     }

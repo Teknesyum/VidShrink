@@ -423,7 +423,9 @@ public static class FfmpegArguments
         else
         {
             a.AddRange(new[] { "-b:v", $"{plan.VideoBitrateK}k" });
-            if (SupportsRateLimits(plan.Codec))
+            if (SupportsRateLimits(plan.Codec) && plan.PeakEqualsRate)
+                a.AddRange(new[] { "-maxrate", $"{plan.VideoBitrateK}k", "-bufsize", $"{plan.VideoBitrateK}k" });
+            else if (SupportsRateLimits(plan.Codec))
             {
                 var peak = PeakRateFactor(plan.Codec, plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
                 a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * peak)}k", "-bufsize", $"{(int)(plan.VideoBitrateK * BufferFactor(peak))}k" });

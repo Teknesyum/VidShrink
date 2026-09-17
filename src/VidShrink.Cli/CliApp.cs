@@ -224,7 +224,10 @@ public static class CliApp
             : text["result.vmaf-none"]);
         builder.AppendLine(text.Format("result.predicted", Num(decision.Result.PredictedQuality, "0.0"), Basis(decision.Result.Estimate.Measured, text)));
         if (result.Success && result.UnderBand) builder.AppendLine(text["result.under-band"]);
-        if (result.CeilingExceeded) builder.AppendLine(text.Format("result.ceiling", result.Attempts));
+        if (result.CeilingExceeded)
+            builder.AppendLine(result.Success
+                ? text.Format("result.ceiling-kept", result.Attempts, Num(result.OutputMb, "0.000"))
+                : text.Format("result.ceiling", result.Attempts));
         return builder.ToString();
     }
 
@@ -243,6 +246,7 @@ public static class CliApp
             writer.WriteNumber("attempts", result.Attempts);
             writer.WriteBoolean("underBand", result.UnderBand);
             writer.WriteBoolean("ceilingExceeded", result.CeilingExceeded);
+            writer.WriteBoolean("overTarget", result.OverTarget);
             if (result.Error is null) writer.WriteNull("error"); else writer.WriteString("error", result.Error);
             if (vmaf?.VmafNegMean is { } score) writer.WriteNumber("vmaf", Math.Round(score, 2)); else writer.WriteNull("vmaf");
             writer.WriteStartArray("trace");

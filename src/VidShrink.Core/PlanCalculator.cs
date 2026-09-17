@@ -1065,6 +1065,7 @@ public static class PlanCalculator
 
         corrected.Mode = "2pass";
         corrected.Crf = null;
+        corrected.PeakEqualsRate = false;
         corrected.BitrateBias = HardwareDeliveryBias(efficiency);
         corrected.VideoBitrateK = Math.Max(RunnableVideoBitrateK(corrected.Width, corrected.Height, corrected.Fps), (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
 

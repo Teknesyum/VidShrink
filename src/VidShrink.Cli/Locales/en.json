@@ -29,6 +29,7 @@
   "result.predicted": "Predicted: {0} ({1})",
   "result.under-band": "Under the band: quality was saturated and the smaller file was kept.",
   "result.ceiling": "The size ceiling was exceeded after {0} attempts; nothing was delivered.",
+  "result.ceiling-kept": "The size ceiling was exceeded after {0} attempts; the smallest result ({1} MB) was delivered anyway.",
   "result.cancelled": "Cancelled.",
   "plan.input": "Input:     {0}",
   "plan.source": "Source:    {0}x{1} {2} fps, {3} MB, {4}",

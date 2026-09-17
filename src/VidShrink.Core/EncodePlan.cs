@@ -124,6 +124,7 @@ public sealed class EncodePlan
     [JsonIgnore] public double BitrateBias { get; set; } = 1.0;
     [JsonIgnore] public double? EffectiveTargetMb { get; set; }
     [JsonIgnore] public int? LayoutStepMinHeight { get; set; }
+    [JsonIgnore] public bool PeakEqualsRate { get; set; }
 
     private static readonly ReasonCode[] FillNotes =
     {
