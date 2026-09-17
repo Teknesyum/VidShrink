@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       isler:
-        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,turboilk,socialkodek,vtara
+        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,tavanbekci,svtbant,turboilk,socialkodek,vtara
         default: handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
       kesitler:
         description: handbrake isinin kesitleri
@@ -82,6 +82,9 @@ jobs:
             hdr = @('CosmosCaterpillar', 'CosmosTreeTrunk')
             ekranbant = @('ekran')
             svtara = @('karanlik', 'rampa')
+            svtbekci = @('rampa', 'karanlik')
+            tavanbekci = @('rampa', 'hareketli')
+            svtbant = @('karanlik', 'parlak', 'hareketli', 'ekran')
             turboilk = @('karanlik', 'hareketli')
             socialkodek = @('parlak', 'karanlik', 'hareketli')
           }
@@ -191,6 +194,21 @@ jobs:
           "BENCH_E1=$dll" | Add-Content $env:GITHUB_ENV
           dotnet $dll psy-args libsvtav1
           dotnet $env:BENCH psy-args libsvtav1
+      - name: negatif bench derle
+        if: matrix.is == 'tavanbekci'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $d = Join-Path $env:RUNNER_TEMP 'neg'
+          git worktree add --detach $d HEAD
+          $f = Join-Path $d 'src/VidShrink.Core/FfmpegArguments.cs'
+          $eski = 'plan.PeakEqualsRate)'
+          $t = [IO.File]::ReadAllText($f)
+          $n = ([regex]::Matches($t, [regex]::Escape($eski))).Count
+          if ($n -ne 1) { throw "negatif dizgesi $n yerde bulundu, 1 bekleniyordu" }
+          [IO.File]::WriteAllText($f, $t.Replace($eski, 'plan.PeakEqualsRate && false)'))
+          dotnet build (Join-Path $d 'tools/VidShrink.Bench') -c Release -m:2
+          if ($LASTEXITCODE -ne 0) { throw 'negatif bench derlenemedi' }
+          "BENCH_NEG=$(Join-Path $d 'tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll')" | Add-Content $env:GITHUB_ENV
       - name: turbo bench derle
         if: matrix.is == 'turbo'
         run: |
@@ -241,6 +259,7 @@ jobs:
           if ($env:URUN_CLI) { $a += @('-Cli', $env:URUN_CLI, '-CliSablon', '${{ inputs.cli_sablon }}') }
           if ($env:BENCH_E1) { $a += @('-BenchE1', $env:BENCH_E1) }
           if ($env:BENCH_TURBO) { $a += @('-BenchTurbo', $env:BENCH_TURBO) }
+          if ($env:BENCH_NEG) { $a += @('-BenchNeg', $env:BENCH_NEG) }
           if ($env:UZUN_EKRAN) { $a += @('-EkranUzun', $env:UZUN_EKRAN) }
           if ($env:HDR_KAYNAK) { $a += @('-HdrKaynak', $env:HDR_KAYNAK) }
           $ayr = '${{ needs.plan.outputs.ayrinti }}' | ConvertFrom-Json

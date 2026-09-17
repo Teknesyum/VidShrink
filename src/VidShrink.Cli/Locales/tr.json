@@ -29,6 +29,7 @@
   "result.predicted": "Öngörü:    {0} ({1})",
   "result.under-band": "Bandın altında: kalite doydu, küçük dosya tutuldu.",
   "result.ceiling": "{0} denemeden sonra boyut tavanı aşıldı; dosya teslim edilmedi.",
+  "result.ceiling-kept": "{0} denemeden sonra boyut tavanı aşıldı; en küçük sonuç ({1} MB) yine de teslim edildi.",
   "result.cancelled": "İptal edildi.",
   "plan.input": "Girdi:     {0}",
   "plan.source": "Kaynak:    {0}x{1} {2} fps, {3} MB, {4}",

@@ -1,0 +1,7 @@
+Hüküm: koşullu evet — donanım tavanı 5 sn → 10 sn (-g = 10·fps; 24p 240, 30p 300, 60p 600), üç NVENC kodeğinde birden.
+Kanıt: nvenc-2 yeni_tepe2 g240 89,08/85,49 vs g120 88,81/83,79 (+0,27/+1,70). T133 av1_nvenc dört kaynak (anahtar-kare-tavani.md:697-699): 5→10 sn bedeli p10 −1,42/−1,42/+0,03; K5 "tavanı yükseltmek kapılı karar" (636-648), bugün o kapı.
+Tutarsızlık: nvenc-2'nin yeni kolları ve geometri rampası g240 ile uyduruldu (nvenc-2.md:138), ürün g120 teslim ediyor.
+HandBrake: ffmpeg tabanlı kodlayıcılarda gop_size = 10 sn (encavcodec.c). Ürün yazılım yolu KeyframeCeilingMaxSeconds = 10; donanım tek istisna.
+Arama bedeli: donanımda gerçekleşen aralık = tavan; geri mesafe 2,5→5 sn. MpvEngine.cs:528 absolute+exact; en kötü 240-600 kare, RTX'te ~50-150 ms. WhatsApp yeniden kodlar. Bu bedel HB kullanıcısının bugün ödediği.
+Kapı (karar kuralı önce yazılır): nvenc-2 düzeneği, ürün geometrisi, 2x/2x tepe, AQ kapalı; 3 kesit × 3 kodek × {1000,2000} × {g120,g240} = 36 kodlama + tutulmuş orta 3 kodek × 2000 × 2 = 6. Geçiş: 9 hücrenin ≥7'sinde ort ≥ 0, hiçbir hücrede p10 < −0,20; hevc adil hücrelerde HB açığı kapanmalı. Ek: SeekAsync.LatencyMs ile 24 hedefte 5 vs 10 sn hevc 1080p p50 (kapı değil). 60 fps'te bir hücre (-g 600) kabul kontrolü.
+Dokunulacak: src/VidShrink.Core/FfmpegArguments.cs:296 (HardwareKeyframeCeilingSeconds 5.0→10.0) ve gerekçe 261-266; tests/VidShrink.Tests/FfmpegArgumentsTests.cs:926-939 ("300"→"600", 5.0→10.0, docstring); docs/olcumler/nvenc-2.md:27,108; anahtar-kare-tavani.md K5 "açıldı" notu. RecorderArguments.cs:663 dokunulmaz.

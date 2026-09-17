@@ -746,9 +746,13 @@ public sealed class OynaticiYolHaritasiTests
         var yuzey = view.FindControl<Panel>("Surface")!;
         if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
         Hareket(window, view, new Point(480, 100));
-        saat.Ates();
-        Dongu(() => serit.Opacity <= 0, 2);
+        Dongu(() =>
+        {
+            if (serit.Opacity > 0) saat.Ates();
+            return serit.Opacity <= 0;
+        }, 10);
         body.AppendLine($"[hareket azaltilmis {azalt}] kapali serit saydamligi {YolKanit.N(serit.Opacity)}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms");
+        Assert.True(serit.Opacity <= 0, $"on kosul: serit kapanmadi, saydamlik {serit.Opacity}");
 
         var seritSol = serit.TranslatePoint(new Point(0, 0), window)!.Value;
         var fareX = seritSol.X + serit.Bounds.Width * 0.2;

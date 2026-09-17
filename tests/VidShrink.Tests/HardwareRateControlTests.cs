@@ -102,6 +102,12 @@ public sealed class HardwareRateControlTests
         Assert.Equal(1.10, FfmpegArguments.HardwarePeakCeiling, 4);
         Assert.Equal(6.0, FfmpegArguments.PeakOpensAtFloorRatio, 4);
         Assert.Equal(11.4, FfmpegArguments.PeakWidestAtFloorRatio, 4);
+        Assert.Equal(2.0, FfmpegArguments.NvencPeakFactor, 4);
+        Assert.Equal(2.0, FfmpegArguments.NvencBufferFactor, 4);
+        Assert.Equal(2.5, CodecModel.NvencH264LayoutPenaltyWeight, 4);
+        Assert.Equal(4.5, CodecModel.NvencHevcAv1LayoutPenaltyWeight, 4);
+        Assert.Equal(1.0, CodecModel.NvencLayoutWeightRampStart, 4);
+        Assert.Equal(1.86, CodecModel.NvencLayoutWeightRampEnd, 4);
         Assert.Equal(0.00429, CodecModel.HardwareMinBitratePerPixelFrame, 6);
         Assert.Equal(0.0756, CodecModel.HardwareMinBitratePerPixelSecond, 6);
         Assert.Equal(1.15, CodecModel.HardwareMinBitrateMargin, 4);
@@ -111,8 +117,8 @@ public sealed class HardwareRateControlTests
     }
 
     [Theory]
-    [InlineData("av1_nvenc")]
-    [InlineData("hevc_nvenc")]
+    [InlineData("av1_qsv")]
+    [InlineData("h264_amf")]
     [InlineData("av1_amf")]
     [InlineData("hevc_qsv")]
     public void ThePeakFactorOpensWithTheHeadroomOverTheEncoderFloor(string codec)
@@ -127,18 +133,23 @@ public sealed class HardwareRateControlTests
     }
 
     /// <summary>
-    /// The peak at the shapes and bitrates that were measured live. 1918k at 882x496@60 is the
-    /// 100 MB plan for the contract's source: at 1.02 it delivered 0.973 of the request and fell
-    /// out of the band, at 1.10 it delivered 1.008 and landed inside it.
+    /// The shapes and bitrates the curve was measured at live on av1_nvenc. 1918k at 882x496@60
+    /// is the 100 MB plan for that contract's source: at 1.02 it delivered 0.973 of the request,
+    /// at 1.10 1.008. NVENC no longer reads the curve: docs/olcumler/nvenc-2.md measured the tight
+    /// peak as the largest loss of the old arguments (parlak hevc 2000 kbit, AQ off, 1.094 against
+    /// no peak: VMAF-NEG p10 71.81 against 83.86) and 2x/2x level with no peak at -g 240
+    /// (89.08/85.49 against 89.09/85.67). So NVENC gets 2.0 at every shape, and QSV and AMF keep the curve unmeasured.
     /// </summary>
     [Fact]
     public void ThePeakIsPinnedAtTheShapesThatWereMeasuredLive()
     {
-        Assert.Equal(1.10, FfmpegArguments.PeakRateFactor("av1_nvenc", 1918, 882, 496, 60), 3);
-        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_nvenc", 890, 882, 496, 60), 3);
-        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_nvenc", 1930, 1266, 712, 60), 3);
-        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_nvenc", 437, 614, 346, 60), 3);
-        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_nvenc", 125, 422, 238, 60), 3);
+        Assert.Equal(1.10, FfmpegArguments.PeakRateFactor("av1_qsv", 1918, 882, 496, 60), 3);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_qsv", 890, 882, 496, 60), 3);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_qsv", 1930, 1266, 712, 60), 3);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_qsv", 437, 614, 346, 60), 3);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_qsv", 125, 422, 238, 60), 3);
+        foreach (var (bitrateK, width, height) in new[] { (1918, 882, 496), (890, 882, 496), (1930, 1266, 712), (437, 614, 346), (125, 422, 238) })
+            Assert.Equal(2.0, FfmpegArguments.PeakRateFactor("av1_nvenc", bitrateK, width, height, 60), 3);
     }
 
     [Theory]
@@ -157,6 +168,79 @@ public sealed class HardwareRateControlTests
         Assert.Equal(2.0, FfmpegArguments.BufferFactor(1.5), 4);
         Assert.Equal(1.4, FfmpegArguments.BufferFactor(1.2), 4);
         Assert.Equal(1.04, FfmpegArguments.BufferFactor(1.02), 4);
+        Assert.Equal(1.04, FfmpegArguments.BufferFactor("hevc_qsv", 1.02), 4);
+    }
+
+    /// <summary>
+    /// NVENC weighs the scale and frame rate penalties by codec: h264 2.5x, hevc and av1 4.5x.
+    /// docs/olcumler/nvenc-2.md: with the old weight the plan shrank hevc_nvenc to 0.42-0.60 of
+    /// the height at 1000-2000 kbit, where full resolution measured up to 3.9 VMAF-NEG higher, and
+    /// h264_nvenc to 0.34-0.60 where 0.67 was best on karanlik and hareketli. The weights were fitted with plan-only runs
+    /// on karanlik and hareketli until the picked scale sat on the measured plateau. QSV and AMF
+    /// keep the old weight. The weight is full here because 1000 kbit at 1920x818@24 sits 3.1x
+    /// above the hardware floor.
+    /// </summary>
+    [Theory]
+    [InlineData("h264_nvenc", "h264_qsv", 2.5)]
+    [InlineData("hevc_nvenc", "hevc_qsv", 4.5)]
+    [InlineData("av1_nvenc", "av1_qsv", 4.5)]
+    public void NvencWeighsTheLayoutPenaltiesByCodec(string nvenc, string other, double weight)
+    {
+        var profile = ComplexityProfile.FromProbe(0.05, 0.03, 6, 288);
+        var nvencHalf = PlanCalculator.ScoreLayout(profile, nvenc, 1000, 960, 408, 12, 24, 818, CompressionRegime.Balanced);
+        var otherHalf = PlanCalculator.ScoreLayout(profile, other, 1000, 960, 408, 12, 24, 818, CompressionRegime.Balanced);
+
+        Assert.True(otherHalf.ScalePenalty > 0);
+        Assert.Equal(otherHalf.ScalePenalty * weight, nvencHalf.ScalePenalty, 6);
+        Assert.Equal(otherHalf.FpsPenalty * weight, nvencHalf.FpsPenalty, 6);
+    }
+
+    /// <summary>
+    /// The NVENC weight follows the budget at the full source frame measured against the hardware
+    /// floor. At 1.0x the av1_nvenc 800k 1080p60 grid rose as the frame shrank (31.8 to 40.0
+    /// VMAF-NEG), so the weight is 1; at 1.86x, the 600 kbit cell of docs/olcumler/nvenc-2.md, the
+    /// full weight holds. Between them the line is straight, fable's call recorded in
+    /// docs/danisma/2026-09-17-nvenc2-fable.md.
+    /// </summary>
+    [Theory]
+    [InlineData("hevc_nvenc", 800, 1920, 1080, 60, 1080, 1.0)]
+    [InlineData("av1_nvenc", 780, 1600, 900, 60, 1080, 1.0)]
+    [InlineData("h264_nvenc", 1000, 1382, 588, 24, 818, 2.5)]
+    [InlineData("av1_nvenc", 700, 1536, 654, 24, 818, 4.5)]
+    public void NvencLayoutWeightFollowsTheSourceFloorRatio(string codec, int videoK, int width, int height, double fps, int sourceHeight, double expected)
+    {
+        var profile = ComplexityProfile.FromProbe(0.05, 0.03, 6, 288);
+        var other = codec.Replace("nvenc", "qsv");
+        var nvenc = PlanCalculator.ScoreLayout(profile, codec, videoK, width, height, fps, fps, sourceHeight, CompressionRegime.Balanced);
+        var qsv = PlanCalculator.ScoreLayout(profile, other, videoK, width, height, fps, fps, sourceHeight, CompressionRegime.Balanced);
+
+        if (qsv.ScalePenalty > 0)
+            Assert.Equal(qsv.ScalePenalty * expected, nvenc.ScalePenalty, 6);
+        Assert.Equal(1.0, CodecModel.LayoutPenaltyWeight(codec, 1.0), 9);
+        Assert.Equal(1.0 + (CodecModel.LayoutPenaltyWeight(codec, 1.86) - 1.0) / 2, CodecModel.LayoutPenaltyWeight(codec, 1.43), 9);
+        Assert.Equal(CodecModel.LayoutPenaltyWeight(codec, 1.86), CodecModel.LayoutPenaltyWeight(codec, 9.0), 9);
+        Assert.True(CodecModel.LayoutPenaltyWeight(codec, 1.86) > 1.0);
+    }
+
+    /// <summary>
+    /// NVENC writes maxrate and bufsize both at twice the request. The buffer does not follow the
+    /// 1 + 2 * (peak - 1) line, which would give 3x; 2x/2x is the arm measured in
+    /// docs/olcumler/nvenc-2.md.
+    /// </summary>
+    [Theory]
+    [InlineData("h264_nvenc")]
+    [InlineData("hevc_nvenc")]
+    [InlineData("av1_nvenc")]
+    public void NvencWritesTwiceTheRequestAsPeakAndBuffer(string codec)
+    {
+        var plan = new EncodePlan { Codec = codec, Mode = "2pass", VideoBitrateK = 1945, Width = 1882, Height = 802, Fps = 24, Preset = "p4", PixelFormat = "yuv420p" };
+        var info = new MediaInfo { FilePath = "in.mkv", FileSizeBytes = 100000000, TotalBitrateBps = 80000000, Width = 1920, Height = 818, Fps = 24, DurationSeconds = 10, VideoCodec = "ffv1" };
+
+        var args = FfmpegArguments.Build(info, plan, "out.mp4", 0, null, null);
+
+        Assert.Equal("3890k", args[args.IndexOf("-maxrate") + 1]);
+        Assert.Equal("3890k", args[args.IndexOf("-bufsize") + 1]);
+        Assert.Equal(2.0, FfmpegArguments.BufferFactor(codec, FfmpegArguments.NvencPeakFactor), 4);
     }
 
     /// <summary>
@@ -295,14 +379,18 @@ public sealed class HardwareRateControlTests
         Assert.Equal(11, processorTotalK - hardwareTotalK);
     }
 
+    /// <summary>
+    /// The peak curve on a QSV encoder: tight at a small target, open at a large one. NVENC left the
+    /// curve in docs/olcumler/nvenc-2.md and writes a flat 2.0.
+    /// </summary>
     [Fact]
     public void ASmallHardwareTargetGetsATighterPeakThanALargeOne()
     {
         var info = SourceInfo();
         const int BigK = 12000;
         const int SmallK = 2088;
-        var big = FfmpegArguments.Build(info, BitratePlan("av1_nvenc", BigK), "out.mp4", 0, null);
-        var small = FfmpegArguments.Build(info, BitratePlan("av1_nvenc", SmallK), "out.mp4", 0, null);
+        var big = FfmpegArguments.Build(info, BitratePlan("av1_qsv", BigK), "out.mp4", 0, null);
+        var small = FfmpegArguments.Build(info, BitratePlan("av1_qsv", SmallK), "out.mp4", 0, null);
 
         var bigShare = FlagValueK(big, "-maxrate") / (double)BigK;
         var smallShare = FlagValueK(small, "-maxrate") / (double)SmallK;

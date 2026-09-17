@@ -126,7 +126,9 @@ public sealed class RetryPromptTests
 
             Assert.Equal(3, result.Attempts);
             Assert.True(result.CeilingExceeded);
-            Assert.False(File.Exists(outputPath));
+            Assert.True(result.Success);
+            Assert.True(result.OverTarget);
+            Assert.True(File.Exists(outputPath));
         }
         finally { Cleanup(dir); }
     }

@@ -1065,6 +1065,7 @@ public static class PlanCalculator
 
         corrected.Mode = "2pass";
         corrected.Crf = null;
+        corrected.PeakEqualsRate = false;
         corrected.BitrateBias = HardwareDeliveryBias(efficiency);
         corrected.VideoBitrateK = Math.Max(RunnableVideoBitrateK(corrected.Width, corrected.Height, corrected.Fps), (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
 
@@ -1178,8 +1179,10 @@ public static class PlanCalculator
         var rateProvided = onSourceGrid ? provided * scale * scale : provided;
         var rate = level.AtReference - level.PerHalving * Math.Log2(Math.Max(rateRequired, 1e-9) / Math.Max(rateProvided, 1e-9));
         rate = Math.Min(rate, CodecModel.QualityLimit(codec));
-        var scalePenalty = ScalePenalty(scale, weights);
-        var fpsPenalty = FpsPenalty(fps, sourceFps, weights);
+        var sourceFloorRatio = provided * scale * scale * fps / Math.Max(sourceFps, 1e-9) / CodecModel.HardwareFloorBppf(sourceFps);
+        var layoutWeight = CodecModel.LayoutPenaltyWeight(codec, sourceFloorRatio);
+        var scalePenalty = ScalePenalty(scale, weights) * layoutWeight;
+        var fpsPenalty = FpsPenalty(fps, sourceFps, weights) * layoutWeight;
         return new LayoutScoreParts(required, provided, rate, scalePenalty, fpsPenalty, 0, rate - scalePenalty - fpsPenalty);
     }
 
