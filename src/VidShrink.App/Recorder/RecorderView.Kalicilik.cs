@@ -23,7 +23,7 @@ internal partial class RecorderView
                  {
                      CmbTarget, CmbCodec, CmbPreset, CmbContainer, CmbProfile, CmbTune, CmbPixelFormat, CmbRateControl,
                      CmbColorSpace, CmbColorRange, CmbAudioLayout, CmbMicrophone, CmbSystemAudio,
-                     CmbWebcam, CmbWebcamSize, CmbWebcamCorner
+                     CmbWebcam, CmbWebcamSize, CmbWebcamCorner, CmbWebcamBackground
                  })
             box.SelectionChanged += (_, _) => PersistChoices();
 

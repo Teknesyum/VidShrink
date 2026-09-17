@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Trên bên phải",
   "recorder.webcam.top-left": "Trên bên trái",
   "recorder.webcam.hint": "Hình ảnh camera được đặt ở góc đã chọn của bản ghi. Danh sách làm mới cùng với danh sách âm thanh.",
+  "recorder.webcam.background.label": "Nền camera",
+  "recorder.webcam.background.keep": "Giữ nguyên",
+  "recorder.webcam.background.static": "Xóa nền tĩnh",
+  "recorder.webcam.background.green": "Xóa phông xanh",
+  "recorder.webcam.background.hint": "Xóa nền hoạt động với nền tĩnh hoặc phông xanh; hãy bước ra khỏi khung hình trước khi bắt đầu ghi để khung hình đầu tiên thấy nền trống.",
   "recorder.option.magnifier": "Kính lúp con trỏ"
 }

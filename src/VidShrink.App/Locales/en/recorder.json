@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Top right",
   "recorder.webcam.top-left": "Top left",
   "recorder.webcam.hint": "The camera picture is placed in the chosen corner of the recording. The list refreshes together with the audio list.",
+  "recorder.webcam.background.label": "Camera background",
+  "recorder.webcam.background.keep": "Keep",
+  "recorder.webcam.background.static": "Remove static background",
+  "recorder.webcam.background.green": "Remove green screen",
+  "recorder.webcam.background.hint": "Background removal works with a static background or a green screen; step out of the frame before recording starts so the first frame sees the empty background.",
   "recorder.option.magnifier": "Cursor magnifier"
 }

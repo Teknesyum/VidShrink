@@ -24,3 +24,20 @@ Sonuç: `-profile:v` 0..3 tamsayı; profil biçimden çıkar (`RecorderArguments
 ## Renk Aralığı Adları
 
 `ffmpeg -h full` ilk `-color_range` bloğu: `unknown`, `tv`, `pc`, `unspecified`, `mpeg`, `jpeg`, `limited`, `full`. Kaydedici kümesi `unknown`/`unspecified` dışındaki altı ad; eşitlik `KayitFfmpegKoluTests.RenkAraligiKumesiFfmpeginAdlariylaAyni` ile her koşumda ffmpeg'den okunur.
+
+## Kamera Arka Planı: Anahtar Eşiği
+
+Ölçü `KaydediciArkaPlanTests.AnahtarlananKameraKaresiPikseldeArkaPlaniBirakir`: 320x240 kırmızı
+taban, 160x120 yeşil kamera, 0,5 sn'de beliren mavi kutu, 0,9 sn karesinin pikselleri (ffmpeg 9.0).
+
+| Kip | Kutu | Kamera arka planı | Kamera dışı |
+|---|---|---|---|
+| Keep | mavi | yeşil | kırmızı |
+| Static (backgroundkey 0,8), küçük kutu | mavi | kırmızı | kırmızı |
+| Green (chromakey 0x00FF00, 0,15) | mavi | kırmızı | kırmızı |
+| Static 0,8, kameranın dörtte üçü | mavi | kırmızı | kırmızı |
+| Static 0,08 (ffmpeg varsayılanı), dörtte üç | kırmızı | kırmızı | kırmızı |
+| Static 0,5, dörtte üç | kırmızı | kırmızı | kırmızı |
+
+`backgroundkey`'in `threshold`'u sahne değişimi eşiği: aşılınca o kare yeni arka plan olur ve
+beliren nesne de silinir. Kadraja giren kişi büyük alan kapladığı için 0,8 seçildi.

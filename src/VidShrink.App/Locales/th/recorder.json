@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "บนขวา",
   "recorder.webcam.top-left": "บนซ้าย",
   "recorder.webcam.hint": "ภาพจากกล้องจะถูกวางไว้ที่มุมที่เลือกของการบันทึก รายการจะรีเฟรชพร้อมกับรายการเสียง",
+  "recorder.webcam.background.label": "พื้นหลังกล้อง",
+  "recorder.webcam.background.keep": "คงไว้",
+  "recorder.webcam.background.static": "ลบพื้นหลังที่นิ่ง",
+  "recorder.webcam.background.green": "ลบฉากเขียว",
+  "recorder.webcam.background.hint": "การลบพื้นหลังใช้ได้กับพื้นหลังที่นิ่งหรือฉากเขียว ออกจากกรอบภาพก่อนเริ่มบันทึกเพื่อให้เฟรมแรกเห็นพื้นหลังที่ว่าง",
   "recorder.option.magnifier": "แว่นขยายเคอร์เซอร์"
 }

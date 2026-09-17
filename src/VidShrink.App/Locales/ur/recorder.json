@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "اوپر دائیں",
   "recorder.webcam.top-left": "اوپر بائیں",
   "recorder.webcam.hint": "کیمرے کی تصویر ریکارڈنگ کے منتخب کونے میں رکھی جاتی ہے۔ فہرست آڈیو فہرست کے ساتھ تازہ ہوتی ہے۔",
+  "recorder.webcam.background.label": "کیمرے کا پس منظر",
+  "recorder.webcam.background.keep": "رکھیں",
+  "recorder.webcam.background.static": "ساکن پس منظر ہٹائیں",
+  "recorder.webcam.background.green": "سبز پردہ ہٹائیں",
+  "recorder.webcam.background.hint": "پس منظر ہٹانا ساکن پس منظر یا سبز پردے کے ساتھ کام کرتا ہے؛ ریکارڈنگ شروع ہونے سے پہلے فریم سے ہٹ جائیں تاکہ پہلا فریم خالی پس منظر دیکھے۔",
   "recorder.option.magnifier": "کرسر میگنیفائر"
 }

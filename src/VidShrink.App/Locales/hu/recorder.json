@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Jobbra fent",
   "recorder.webcam.top-left": "Balra fent",
   "recorder.webcam.hint": "A kamera képe a felvétel kiválasztott sarkába kerül. A lista az audiolistával együtt frissül.",
+  "recorder.webcam.background.label": "Kamera háttere",
+  "recorder.webcam.background.keep": "Megtartás",
+  "recorder.webcam.background.static": "Álló háttér eltávolítása",
+  "recorder.webcam.background.green": "Zöld háttér eltávolítása",
+  "recorder.webcam.background.hint": "A háttér eltávolítása álló háttérrel vagy zöld háttérrel működik; a felvétel indítása előtt lépjen ki a képből, hogy az első képkocka az üres hátteret lássa.",
   "recorder.option.magnifier": "Kurzornagyító"
 }

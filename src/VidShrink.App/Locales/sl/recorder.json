@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Zgoraj desno",
   "recorder.webcam.top-left": "Zgoraj levo",
   "recorder.webcam.hint": "Slika kamere je postavljena v izbrani kot posnetka. Seznam se osveži skupaj s seznamom zvoka.",
+  "recorder.webcam.background.label": "Ozadje kamere",
+  "recorder.webcam.background.keep": "Ohrani",
+  "recorder.webcam.background.static": "Odstrani statično ozadje",
+  "recorder.webcam.background.green": "Odstrani zeleno platno",
+  "recorder.webcam.background.hint": "Odstranjevanje ozadja deluje s statičnim ozadjem ali zelenim platnom; pred začetkom snemanja stopite iz kadra, da prva sličica vidi prazno ozadje.",
   "recorder.option.magnifier": "Lupa kazalca"
 }

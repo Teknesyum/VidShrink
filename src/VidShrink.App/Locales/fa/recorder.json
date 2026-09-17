@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "بالا راست",
   "recorder.webcam.top-left": "بالا چپ",
   "recorder.webcam.hint": "تصویر دوربین در گوشه انتخاب‌شده ضبط قرار می‌گیرد. فهرست همراه با فهرست صدا تازه‌سازی می‌شود.",
+  "recorder.webcam.background.label": "پس‌زمینه دوربین",
+  "recorder.webcam.background.keep": "نگه داشتن",
+  "recorder.webcam.background.static": "حذف پس‌زمینه ثابت",
+  "recorder.webcam.background.green": "حذف پرده سبز",
+  "recorder.webcam.background.hint": "حذف پس‌زمینه با پس‌زمینه ثابت یا پرده سبز کار می‌کند؛ پیش از شروع ضبط از کادر بیرون بروید تا نخستین فریم پس‌زمینه خالی را ببیند.",
   "recorder.option.magnifier": "ذره‌بین نشانگر"
 }

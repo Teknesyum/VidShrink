@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Sus dreapta",
   "recorder.webcam.top-left": "Sus stânga",
   "recorder.webcam.hint": "Imaginea camerei este plasată în colțul ales al înregistrării. Lista se reîmprospătează împreună cu lista audio.",
+  "recorder.webcam.background.label": "Fundalul camerei",
+  "recorder.webcam.background.keep": "Păstrează",
+  "recorder.webcam.background.static": "Elimină fundalul static",
+  "recorder.webcam.background.green": "Elimină ecranul verde",
+  "recorder.webcam.background.hint": "Eliminarea fundalului funcționează cu un fundal static sau un ecran verde; ieșiți din cadru înainte de începerea înregistrării, ca primul cadru să vadă fundalul gol.",
   "recorder.option.magnifier": "Lupa cursorului"
 }

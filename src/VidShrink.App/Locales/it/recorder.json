@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "In alto a destra",
   "recorder.webcam.top-left": "In alto a sinistra",
   "recorder.webcam.hint": "L'immagine della fotocamera viene collocata nell'angolo scelto della registrazione. L'elenco si aggiorna insieme all'elenco audio.",
+  "recorder.webcam.background.label": "Sfondo della videocamera",
+  "recorder.webcam.background.keep": "Mantieni",
+  "recorder.webcam.background.static": "Rimuovi sfondo statico",
+  "recorder.webcam.background.green": "Rimuovi green screen",
+  "recorder.webcam.background.hint": "La rimozione dello sfondo funziona con uno sfondo statico o un green screen; esci dall'inquadratura prima di avviare la registrazione, così il primo fotogramma vede lo sfondo vuoto.",
   "recorder.option.magnifier": "Lente del cursore"
 }

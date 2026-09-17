@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Juu kulia",
   "recorder.webcam.top-left": "Juu kushoto",
   "recorder.webcam.hint": "Picha ya kamera huwekwa kwenye kona iliyochaguliwa ya rekodi. Orodha huonyeshwa upya pamoja na orodha ya sauti.",
+  "recorder.webcam.background.label": "Mandharinyuma ya kamera",
+  "recorder.webcam.background.keep": "Hifadhi",
+  "recorder.webcam.background.static": "Ondoa mandharinyuma tuli",
+  "recorder.webcam.background.green": "Ondoa skrini ya kijani",
+  "recorder.webcam.background.hint": "Kuondoa mandharinyuma hufanya kazi na mandharinyuma tuli au skrini ya kijani; toka kwenye fremu kabla ya kuanza kurekodi ili fremu ya kwanza ione mandharinyuma tupu.",
   "recorder.option.magnifier": "Kikuza mshale"
 }

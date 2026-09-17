@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Gore desno",
   "recorder.webcam.top-left": "Gore lijevo",
   "recorder.webcam.hint": "Slika kamere postavlja se u odabrani kut snimke. Popis se osvježava zajedno s popisom zvuka.",
+  "recorder.webcam.background.label": "Pozadina kamere",
+  "recorder.webcam.background.keep": "Zadrži",
+  "recorder.webcam.background.static": "Ukloni statičnu pozadinu",
+  "recorder.webcam.background.green": "Ukloni zeleni zaslon",
+  "recorder.webcam.background.hint": "Uklanjanje pozadine radi sa statičnom pozadinom ili zelenim zaslonom; izađite iz kadra prije početka snimanja kako bi prvi kadar vidio praznu pozadinu.",
   "recorder.option.magnifier": "Lupa pokazivača"
 }

@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Övre höger",
   "recorder.webcam.top-left": "Övre vänster",
   "recorder.webcam.hint": "Kamerabilden placeras i det valda hörnet av inspelningen. Listan uppdateras tillsammans med ljudlistan.",
+  "recorder.webcam.background.label": "Kamerabakgrund",
+  "recorder.webcam.background.keep": "Behåll",
+  "recorder.webcam.background.static": "Ta bort statisk bakgrund",
+  "recorder.webcam.background.green": "Ta bort greenscreen",
+  "recorder.webcam.background.hint": "Borttagning av bakgrund fungerar med en statisk bakgrund eller en greenscreen; kliv ut ur bilden innan inspelningen startar så att första bildrutan ser den tomma bakgrunden.",
   "recorder.option.magnifier": "Markörförstoring"
 }

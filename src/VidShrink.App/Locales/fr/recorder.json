@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "En haut à droite",
   "recorder.webcam.top-left": "En haut à gauche",
   "recorder.webcam.hint": "L'image de la caméra est placée dans le coin choisi de l'enregistrement. La liste se rafraîchit en même temps que la liste audio.",
+  "recorder.webcam.background.label": "Arrière-plan de la caméra",
+  "recorder.webcam.background.keep": "Conserver",
+  "recorder.webcam.background.static": "Retirer l'arrière-plan fixe",
+  "recorder.webcam.background.green": "Retirer le fond vert",
+  "recorder.webcam.background.hint": "La suppression de l'arrière-plan fonctionne avec un arrière-plan fixe ou un fond vert ; sortez du cadre avant le début de l'enregistrement pour que la première image voie l'arrière-plan vide.",
   "recorder.option.magnifier": "Loupe du curseur"
 }

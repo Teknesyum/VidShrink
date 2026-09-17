@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Øverst til høyre",
   "recorder.webcam.top-left": "Øverst til venstre",
   "recorder.webcam.hint": "Kamerabildet plasseres i det valgte hjørnet av opptaket. Listen oppdateres sammen med lydlisten.",
+  "recorder.webcam.background.label": "Kamerabakgrunn",
+  "recorder.webcam.background.keep": "Behold",
+  "recorder.webcam.background.static": "Fjern statisk bakgrunn",
+  "recorder.webcam.background.green": "Fjern grønnskjerm",
+  "recorder.webcam.background.hint": "Fjerning av bakgrunn fungerer med en statisk bakgrunn eller en grønnskjerm; gå ut av bildet før opptaket starter, så det første bildet ser den tomme bakgrunnen.",
   "recorder.option.magnifier": "Markørforstørrelse"
 }

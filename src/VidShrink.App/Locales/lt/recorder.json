@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Viršuje dešinėje",
   "recorder.webcam.top-left": "Viršuje kairėje",
   "recorder.webcam.hint": "Kameros vaizdas patalpinamas pasirinktame įrašo kampe. Sąrašas atnaujinamas kartu su garso sąrašu.",
+  "recorder.webcam.background.label": "Kameros fonas",
+  "recorder.webcam.background.keep": "Palikti",
+  "recorder.webcam.background.static": "Pašalinti statišką foną",
+  "recorder.webcam.background.green": "Pašalinti žalią ekraną",
+  "recorder.webcam.background.hint": "Fono šalinimas veikia su statišku fonu arba žaliu ekranu; prieš pradėdami įrašymą išeikite iš kadro, kad pirmasis kadras matytų tuščią foną.",
   "recorder.option.magnifier": "Žymeklio didinamasis stiklas"
 }

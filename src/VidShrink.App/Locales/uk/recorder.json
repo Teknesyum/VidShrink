@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Вгорі праворуч",
   "recorder.webcam.top-left": "Вгорі ліворуч",
   "recorder.webcam.hint": "Зображення з камери розміщується у вибраному куті запису. Список оновлюється разом зі списком аудіо.",
+  "recorder.webcam.background.label": "Тло камери",
+  "recorder.webcam.background.keep": "Залишити",
+  "recorder.webcam.background.static": "Прибрати нерухоме тло",
+  "recorder.webcam.background.green": "Прибрати зелений екран",
+  "recorder.webcam.background.hint": "Видалення тла працює з нерухомим тлом або зеленим екраном; вийдіть із кадру до початку запису, щоб перший кадр побачив порожнє тло.",
   "recorder.option.magnifier": "Лупа курсора"
 }

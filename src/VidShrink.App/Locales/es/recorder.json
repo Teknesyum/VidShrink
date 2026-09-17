@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Arriba a la derecha",
   "recorder.webcam.top-left": "Arriba a la izquierda",
   "recorder.webcam.hint": "La imagen de la cámara se coloca en la esquina elegida de la grabación. La lista se actualiza junto con la lista de audio.",
+  "recorder.webcam.background.label": "Fondo de la cámara",
+  "recorder.webcam.background.keep": "Conservar",
+  "recorder.webcam.background.static": "Quitar fondo estático",
+  "recorder.webcam.background.green": "Quitar pantalla verde",
+  "recorder.webcam.background.hint": "La eliminación del fondo funciona con un fondo estático o una pantalla verde; sal del encuadre antes de empezar a grabar para que el primer fotograma vea el fondo vacío.",
   "recorder.option.magnifier": "Lupa del cursor"
 }

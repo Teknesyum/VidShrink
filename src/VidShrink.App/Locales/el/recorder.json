@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Πάνω δεξιά",
   "recorder.webcam.top-left": "Πάνω αριστερά",
   "recorder.webcam.hint": "Η εικόνα της κάμερας τοποθετείται στην επιλεγμένη γωνία της εγγραφής. Η λίστα ανανεώνεται μαζί με τη λίστα ήχου.",
+  "recorder.webcam.background.label": "Φόντο κάμερας",
+  "recorder.webcam.background.keep": "Διατήρηση",
+  "recorder.webcam.background.static": "Αφαίρεση στατικού φόντου",
+  "recorder.webcam.background.green": "Αφαίρεση πράσινης οθόνης",
+  "recorder.webcam.background.hint": "Η αφαίρεση φόντου λειτουργεί με στατικό φόντο ή πράσινη οθόνη· βγείτε από το κάδρο πριν ξεκινήσει η εγγραφή, ώστε το πρώτο καρέ να δει το άδειο φόντο.",
   "recorder.option.magnifier": "Μεγεθυντικός φακός δρομέα"
 }

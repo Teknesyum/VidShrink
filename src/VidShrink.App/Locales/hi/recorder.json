@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "ऊपर दाएं",
   "recorder.webcam.top-left": "ऊपर बाएं",
   "recorder.webcam.hint": "कैमरे की तस्वीर रिकॉर्डिंग के चुने गए कोने में रखी जाती है। सूची ऑडियो सूची के साथ ताज़ा होती है।",
+  "recorder.webcam.background.label": "कैमरा पृष्ठभूमि",
+  "recorder.webcam.background.keep": "रखें",
+  "recorder.webcam.background.static": "स्थिर पृष्ठभूमि हटाएँ",
+  "recorder.webcam.background.green": "हरी स्क्रीन हटाएँ",
+  "recorder.webcam.background.hint": "पृष्ठभूमि हटाना स्थिर पृष्ठभूमि या हरी स्क्रीन के साथ काम करता है; रिकॉर्डिंग शुरू होने से पहले फ़्रेम से हट जाएँ ताकि पहला फ़्रेम खाली पृष्ठभूमि देखे।",
   "recorder.option.magnifier": "कर्सर मैग्निफायर"
 }

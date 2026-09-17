@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Vpravo hore",
   "recorder.webcam.top-left": "Vľavo hore",
   "recorder.webcam.hint": "Obraz z kamery sa umiestni do zvoleného rohu nahrávky. Zoznam sa obnovuje spolu so zoznamom zvuku.",
+  "recorder.webcam.background.label": "Pozadie kamery",
+  "recorder.webcam.background.keep": "Ponechať",
+  "recorder.webcam.background.static": "Odstrániť statické pozadie",
+  "recorder.webcam.background.green": "Odstrániť zelené plátno",
+  "recorder.webcam.background.hint": "Odstránenie pozadia funguje so statickým pozadím alebo zeleným plátnom; pred začiatkom záznamu vystúpte zo záberu, aby prvá snímka zachytila prázdne pozadie.",
   "recorder.option.magnifier": "Lupa kurzora"
 }

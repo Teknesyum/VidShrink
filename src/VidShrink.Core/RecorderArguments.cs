@@ -225,7 +225,18 @@ public enum WebcamCorner
     TopLeft
 }
 
-public sealed record RecorderWebcam(string Device, int Width, WebcamCorner Corner = WebcamCorner.BottomRight);
+public enum WebcamBackground
+{
+    Keep,
+    Static,
+    Green
+}
+
+public sealed record RecorderWebcam(
+    string Device,
+    int Width,
+    WebcamCorner Corner = WebcamCorner.BottomRight,
+    WebcamBackground Background = WebcamBackground.Keep);
 
 /// <summary>
 /// Ekran kaydi argumanlarini uretir. Kosturmaz — surec surmeyi
@@ -764,6 +775,8 @@ public static class RecorderArguments
             yield return $"The webcam width must be an even number between {MinWebcamWidth} and {MaxWebcamWidth} pixels.";
         if (!Enum.IsDefined(cam.Corner))
             yield return "The webcam corner is not one of the four corners.";
+        if (!Enum.IsDefined(cam.Background))
+            yield return "The webcam background mode is not one of keep, static or green.";
     }
 
     public static string WebcamPosition(WebcamCorner corner)
@@ -784,13 +797,24 @@ public static class RecorderArguments
 
     public const string WebcamOutputLabel = "vout";
 
+    public const string StaticBackgroundKey = "backgroundkey=threshold=0.8:similarity=0.1:blend=0";
+
+    public const string GreenScreenKey = "chromakey=color=0x00FF00:similarity=0.15:blend=0.05";
+
+    public static string WebcamKey(WebcamBackground background) => background switch
+    {
+        WebcamBackground.Static => ",format=yuva420p," + StaticBackgroundKey,
+        WebcamBackground.Green => ",format=yuva420p," + GreenScreenKey,
+        _ => string.Empty
+    };
+
     public static string? WebcamGraph(RecorderRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         if (request.Webcam is not { } cam) return null;
         var index = Number(AudioFirstInputIndex + (request.Audio?.InputCount ?? 0));
         return $"[0:v]{VideoFilter(request) ?? "null"}[base];"
-               + $"[{index}:v]scale={Number(cam.Width)}:-2[cam];"
+               + $"[{index}:v]scale={Number(cam.Width)}:-2{WebcamKey(cam.Background)}[cam];"
                + $"[base][cam]overlay={WebcamPosition(cam.Corner)}:eof_action=repeat[{WebcamOutputLabel}]";
     }
 

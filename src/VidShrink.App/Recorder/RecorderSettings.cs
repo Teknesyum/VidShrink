@@ -97,6 +97,8 @@ internal sealed class RecorderSettings
 
     internal WebcamCorner WebcamCorner { get; set; } = WebcamCorner.BottomRight;
 
+    internal WebcamBackground WebcamBackground { get; set; } = WebcamBackground.Keep;
+
     /// <summary>Kaydın yazıldığı kap; çıktı uzantısı bundan geliyor.</summary>
     internal RecorderContainer Container { get; set; } = RecorderContainer.Mkv;
 
@@ -243,6 +245,7 @@ internal sealed class RecorderSettings
             settings.WebcamName = (string?)root["webcamName"];
             if ((int?)root["webcamWidth"] is { } camWidth && RecorderArguments.WebcamWidths.Contains(camWidth)) settings.WebcamWidth = camWidth;
             if (Enum.TryParse<WebcamCorner>((string?)root["webcamCorner"], true, out var corner) && Enum.IsDefined(corner)) settings.WebcamCorner = corner;
+            if (Enum.TryParse<WebcamBackground>((string?)root["webcamBackground"], true, out var background) && Enum.IsDefined(background)) settings.WebcamBackground = background;
             if (Enum.TryParse<RecorderContainer>((string?)root["containerChoice"], true, out var choice)) settings.Container = choice;
             else if (Enum.TryParse<RecorderContainer>((string?)root["container"], true, out var container) && container != RecorderContainer.Mp4)
                 settings.Container = container;
@@ -333,6 +336,7 @@ internal sealed class RecorderSettings
                 else writer.WriteString("webcamName", WebcamName);
                 writer.WriteNumber("webcamWidth", WebcamWidth);
                 writer.WriteString("webcamCorner", WebcamCorner.ToString());
+                writer.WriteString("webcamBackground", WebcamBackground.ToString());
                 writer.WriteString("containerChoice", Container.ToString());
                 writer.WriteNumber("screenIndex", ScreenIndex);
                 writer.WriteNumber("scaleWidth", ScaleWidth);

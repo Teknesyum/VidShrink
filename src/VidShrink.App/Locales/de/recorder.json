@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Oben rechts",
   "recorder.webcam.top-left": "Oben links",
   "recorder.webcam.hint": "Das Kamerabild wird in der gewählten Ecke der Aufnahme platziert. Die Liste wird zusammen mit der Audioliste aktualisiert.",
+  "recorder.webcam.background.label": "Kamerahintergrund",
+  "recorder.webcam.background.keep": "Beibehalten",
+  "recorder.webcam.background.static": "Statischen Hintergrund entfernen",
+  "recorder.webcam.background.green": "Greenscreen entfernen",
+  "recorder.webcam.background.hint": "Das Entfernen des Hintergrunds funktioniert mit einem statischen Hintergrund oder einem Greenscreen; treten Sie vor Aufnahmebeginn aus dem Bild, damit das erste Bild den leeren Hintergrund sieht.",
   "recorder.option.magnifier": "Cursor-Lupe"
 }

@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Augšā pa labi",
   "recorder.webcam.top-left": "Augšā pa kreisi",
   "recorder.webcam.hint": "Kameras attēls tiek novietots izvēlētajā ieraksta stūrī. Saraksts tiek atsvaidzināts kopā ar audio sarakstu.",
+  "recorder.webcam.background.label": "Kameras fons",
+  "recorder.webcam.background.keep": "Saglabāt",
+  "recorder.webcam.background.static": "Noņemt statisku fonu",
+  "recorder.webcam.background.green": "Noņemt zaļo ekrānu",
+  "recorder.webcam.background.hint": "Fona noņemšana darbojas ar statisku fonu vai zaļo ekrānu; pirms ieraksta sākuma izejiet no kadra, lai pirmais kadrs redzētu tukšu fonu.",
   "recorder.option.magnifier": "Kursora palielinātājs"
 }

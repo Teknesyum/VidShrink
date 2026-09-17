@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "أعلى اليمين",
   "recorder.webcam.top-left": "أعلى اليسار",
   "recorder.webcam.hint": "توضع صورة الكاميرا في الزاوية المختارة من التسجيل. تتحدّث القائمة مع قائمة الصوت معًا.",
+  "recorder.webcam.background.label": "خلفية الكاميرا",
+  "recorder.webcam.background.keep": "إبقاء",
+  "recorder.webcam.background.static": "إزالة الخلفية الثابتة",
+  "recorder.webcam.background.green": "إزالة الشاشة الخضراء",
+  "recorder.webcam.background.hint": "تعمل إزالة الخلفية مع خلفية ثابتة أو شاشة خضراء؛ ابتعد عن الإطار قبل بدء التسجيل ليرى الإطار الأول الخلفية فارغة.",
   "recorder.option.magnifier": "عدسة مكبرة للمؤشر"
 }

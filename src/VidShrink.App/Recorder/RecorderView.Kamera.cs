@@ -23,6 +23,19 @@ internal partial class RecorderView
         _ => "recorder.webcam.bottom-right"
     };
 
+    internal static readonly WebcamBackground[] WebcamBackgrounds =
+        { WebcamBackground.Keep, WebcamBackground.Static, WebcamBackground.Green };
+
+    private static string BackgroundKey(WebcamBackground background) => background switch
+    {
+        WebcamBackground.Static => "recorder.webcam.background.static",
+        WebcamBackground.Green => "recorder.webcam.background.green",
+        _ => "recorder.webcam.background.keep"
+    };
+
+    private WebcamBackground ChosenBackground
+        => CmbWebcamBackground.SelectedIndex >= 0 ? WebcamBackgrounds[CmbWebcamBackground.SelectedIndex] : _settings.WebcamBackground;
+
     private Func<IReadOnlyList<string>> _cameraSource = () => CaptureDevices.Instance.Video;
 
     internal Func<IReadOnlyList<string>> CameraSource
@@ -54,6 +67,10 @@ internal partial class RecorderView
         var corner = CmbWebcamCorner.SelectedIndex >= 0 ? WebcamCorners[CmbWebcamCorner.SelectedIndex] : _settings.WebcamCorner;
         CmbWebcamCorner.ItemsSource = WebcamCorners.Select(c => Say(CornerKey(c))).ToList();
         CmbWebcamCorner.SelectedIndex = Array.IndexOf(WebcamCorners, corner);
+
+        var background = ChosenBackground;
+        CmbWebcamBackground.ItemsSource = WebcamBackgrounds.Select(b => Say(BackgroundKey(b))).ToList();
+        CmbWebcamBackground.SelectedIndex = Array.IndexOf(WebcamBackgrounds, background);
     }
 
     private static int IndexOf(IReadOnlyList<int> list, int value)
@@ -68,7 +85,7 @@ internal partial class RecorderView
         if (CmbWebcam.SelectedIndex <= 0 || CmbWebcam.SelectedItem is not string device) return null;
         var width = CmbWebcamSize.SelectedIndex >= 0 ? RecorderArguments.WebcamWidths[CmbWebcamSize.SelectedIndex] : _settings.WebcamWidth;
         var corner = CmbWebcamCorner.SelectedIndex >= 0 ? WebcamCorners[CmbWebcamCorner.SelectedIndex] : _settings.WebcamCorner;
-        return new RecorderWebcam(device, width, corner);
+        return new RecorderWebcam(device, width, corner, ChosenBackground);
     }
 
     private void CollectWebcam()
@@ -78,5 +95,6 @@ internal partial class RecorderView
             _settings.WebcamName = null;
         if (CmbWebcamSize.SelectedIndex >= 0) _settings.WebcamWidth = RecorderArguments.WebcamWidths[CmbWebcamSize.SelectedIndex];
         if (CmbWebcamCorner.SelectedIndex >= 0) _settings.WebcamCorner = WebcamCorners[CmbWebcamCorner.SelectedIndex];
+        if (CmbWebcamBackground.SelectedIndex >= 0) _settings.WebcamBackground = WebcamBackgrounds[CmbWebcamBackground.SelectedIndex];
     }
 }

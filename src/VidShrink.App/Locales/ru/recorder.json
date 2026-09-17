@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Вверху справа",
   "recorder.webcam.top-left": "Вверху слева",
   "recorder.webcam.hint": "Изображение с камеры размещается в выбранном углу записи. Список обновляется вместе со списком аудио.",
+  "recorder.webcam.background.label": "Фон камеры",
+  "recorder.webcam.background.keep": "Оставить",
+  "recorder.webcam.background.static": "Убрать неподвижный фон",
+  "recorder.webcam.background.green": "Убрать зелёный экран",
+  "recorder.webcam.background.hint": "Удаление фона работает с неподвижным фоном или зелёным экраном; выйдите из кадра до начала записи, чтобы первый кадр увидел пустой фон.",
   "recorder.option.magnifier": "Лупа курсора"
 }

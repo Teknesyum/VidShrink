@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "오른쪽 위",
   "recorder.webcam.top-left": "왼쪽 위",
   "recorder.webcam.hint": "카메라 화면은 녹화의 선택한 모서리에 배치됩니다. 목록은 오디오 목록과 함께 새로고침됩니다.",
+  "recorder.webcam.background.label": "카메라 배경",
+  "recorder.webcam.background.keep": "유지",
+  "recorder.webcam.background.static": "고정 배경 제거",
+  "recorder.webcam.background.green": "그린 스크린 제거",
+  "recorder.webcam.background.hint": "배경 제거는 고정 배경이나 그린 스크린에서 작동합니다. 첫 프레임이 빈 배경을 담도록 녹화를 시작하기 전에 화면 밖으로 나가세요.",
   "recorder.option.magnifier": "커서 돋보기"
 }

@@ -623,6 +623,14 @@
         </Grid>
 
         <TextBlock Text="{loc:Text recorder.webcam.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+
+        <StackPanel>
+          <TextBlock Text="{loc:Text recorder.webcam.background.label}" Theme="{StaticResource Label}"/>
+          <ComboBox x:Name="CmbWebcamBackground"
+                    auto:AutomationProperties.Name="{loc:Text recorder.webcam.background.label}"/>
+        </StackPanel>
+
+        <TextBlock Text="{loc:Text recorder.webcam.background.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
       </StackPanel>
     </Border>
   </StackPanel>

@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Sağ üst",
   "recorder.webcam.top-left": "Sol üst",
   "recorder.webcam.hint": "Kamera görüntüsü kaydın seçilen köşesine yerleşir. Liste, ses listesiyle birlikte yenilenir.",
+  "recorder.webcam.background.label": "Kamera arka planı",
+  "recorder.webcam.background.keep": "Koru",
+  "recorder.webcam.background.static": "Sabit arka planı kaldır",
+  "recorder.webcam.background.green": "Yeşil perdeyi kaldır",
+  "recorder.webcam.background.hint": "Arka plan kaldırma sabit arka plan veya yeşil perde ile çalışır; kayda başlamadan kadrajdan çekilin ki ilk kare boş arka planı görsün.",
   "recorder.option.magnifier": "İmleç büyüteci"
 }

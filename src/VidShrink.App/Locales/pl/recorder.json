@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Prawy górny róg",
   "recorder.webcam.top-left": "Lewy górny róg",
   "recorder.webcam.hint": "Obraz z kamery jest umieszczany w wybranym rogu nagrania. Lista odświeża się razem z listą audio.",
+  "recorder.webcam.background.label": "Tło kamery",
+  "recorder.webcam.background.keep": "Zachowaj",
+  "recorder.webcam.background.static": "Usuń statyczne tło",
+  "recorder.webcam.background.green": "Usuń zielony ekran",
+  "recorder.webcam.background.hint": "Usuwanie tła działa ze statycznym tłem lub zielonym ekranem; przed rozpoczęciem nagrywania wyjdź z kadru, aby pierwsza klatka zobaczyła puste tło.",
   "recorder.option.magnifier": "Lupa kursora"
 }

@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "மேல் வலது",
   "recorder.webcam.top-left": "மேல் இடது",
   "recorder.webcam.hint": "கேமரா படம் பதிவின் தேர்ந்தெடுக்கப்பட்ட மூலையில் வைக்கப்படும். பட்டியல் ஆடியோ பட்டியலுடன் சேர்ந்து புதுப்பிக்கப்படும்.",
+  "recorder.webcam.background.label": "கேமரா பின்னணி",
+  "recorder.webcam.background.keep": "வைத்திரு",
+  "recorder.webcam.background.static": "நிலையான பின்னணியை அகற்று",
+  "recorder.webcam.background.green": "பச்சைத் திரையை அகற்று",
+  "recorder.webcam.background.hint": "பின்னணி அகற்றல் நிலையான பின்னணி அல்லது பச்சைத் திரையுடன் வேலை செய்யும்; முதல் சட்டகம் வெற்றுப் பின்னணியைக் காண பதிவு தொடங்கும் முன் சட்டகத்திலிருந்து விலகுங்கள்.",
   "recorder.option.magnifier": "கர்சர் பெரிதாக்கி"
 }

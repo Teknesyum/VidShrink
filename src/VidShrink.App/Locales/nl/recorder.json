@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Rechtsboven",
   "recorder.webcam.top-left": "Linksboven",
   "recorder.webcam.hint": "Het camerabeeld wordt in de gekozen hoek van de opname geplaatst. De lijst wordt samen met de audiolijst vernieuwd.",
+  "recorder.webcam.background.label": "Camera-achtergrond",
+  "recorder.webcam.background.keep": "Behouden",
+  "recorder.webcam.background.static": "Statische achtergrond verwijderen",
+  "recorder.webcam.background.green": "Greenscreen verwijderen",
+  "recorder.webcam.background.hint": "Achtergrond verwijderen werkt met een statische achtergrond of een greenscreen; stap uit beeld voordat de opname begint, zodat het eerste beeld de lege achtergrond ziet.",
   "recorder.option.magnifier": "Cursorvergrootglas"
 }

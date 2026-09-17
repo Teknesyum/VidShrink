@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Atas kanan",
   "recorder.webcam.top-left": "Atas kiri",
   "recorder.webcam.hint": "Gambar kamera diletakkan di sudut rakaman yang dipilih. Senarai disegarkan bersama senarai audio.",
+  "recorder.webcam.background.label": "Latar kamera",
+  "recorder.webcam.background.keep": "Kekalkan",
+  "recorder.webcam.background.static": "Buang latar statik",
+  "recorder.webcam.background.green": "Buang skrin hijau",
+  "recorder.webcam.background.hint": "Pembuangan latar berfungsi dengan latar statik atau skrin hijau; keluar dari bingkai sebelum rakaman bermula supaya bingkai pertama melihat latar yang kosong.",
   "recorder.option.magnifier": "Kanta pembesar kursor"
 }

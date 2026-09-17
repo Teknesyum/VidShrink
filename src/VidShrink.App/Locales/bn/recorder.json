@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "উপরে ডানে",
   "recorder.webcam.top-left": "উপরে বামে",
   "recorder.webcam.hint": "ক্যামেরার ছবি রেকর্ডিং-এর নির্বাচিত কোণে বসানো হয়। তালিকাটি অডিও তালিকার সাথে একসঙ্গে রিফ্রেশ হয়।",
+  "recorder.webcam.background.label": "ক্যামেরার পটভূমি",
+  "recorder.webcam.background.keep": "রাখুন",
+  "recorder.webcam.background.static": "স্থির পটভূমি সরান",
+  "recorder.webcam.background.green": "সবুজ পর্দা সরান",
+  "recorder.webcam.background.hint": "পটভূমি সরানো স্থির পটভূমি বা সবুজ পর্দার সাথে কাজ করে; রেকর্ডিং শুরুর আগে ফ্রেম থেকে সরে যান যাতে প্রথম ফ্রেম খালি পটভূমি দেখে।",
   "recorder.option.magnifier": "কার্সার ম্যাগনিফায়ার"
 }

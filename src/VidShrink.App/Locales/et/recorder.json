@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Üleval paremal",
   "recorder.webcam.top-left": "Üleval vasakul",
   "recorder.webcam.hint": "Kaamerapilt paigutatakse salvestuse valitud nurka. Loend värskendatakse koos helinimekirjaga.",
+  "recorder.webcam.background.label": "Kaamera taust",
+  "recorder.webcam.background.keep": "Säilita",
+  "recorder.webcam.background.static": "Eemalda staatiline taust",
+  "recorder.webcam.background.green": "Eemalda roheline ekraan",
+  "recorder.webcam.background.hint": "Tausta eemaldamine töötab staatilise tausta või rohelise ekraaniga; astu enne salvestuse algust kaadrist välja, et esimene kaader näeks tühja tausta.",
   "recorder.option.magnifier": "Kursori luup"
 }

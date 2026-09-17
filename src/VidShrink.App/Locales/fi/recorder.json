@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "Oikea ylä",
   "recorder.webcam.top-left": "Vasen ylä",
   "recorder.webcam.hint": "Kamerakuva sijoitetaan tallenteen valittuun kulmaan. Luettelo päivittyy yhdessä ääniluettelon kanssa.",
+  "recorder.webcam.background.label": "Kameran tausta",
+  "recorder.webcam.background.keep": "Säilytä",
+  "recorder.webcam.background.static": "Poista staattinen tausta",
+  "recorder.webcam.background.green": "Poista viherkangas",
+  "recorder.webcam.background.hint": "Taustan poisto toimii staattisen taustan tai viherkankaan kanssa; siirry pois kuvasta ennen tallennuksen alkua, jotta ensimmäinen kuva näkee tyhjän taustan.",
   "recorder.option.magnifier": "Kohdistimen suurennuslasi"
 }

@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "למעלה מימין",
   "recorder.webcam.top-left": "למעלה משמאל",
   "recorder.webcam.hint": "תמונת המצלמה ממוקמת בפינה הנבחרת של ההקלטה. הרשימה מתרעננת יחד עם רשימת השמע.",
+  "recorder.webcam.background.label": "רקע המצלמה",
+  "recorder.webcam.background.keep": "שמור",
+  "recorder.webcam.background.static": "הסר רקע קבוע",
+  "recorder.webcam.background.green": "הסר מסך ירוק",
+  "recorder.webcam.background.hint": "הסרת רקע עובדת עם רקע קבוע או מסך ירוק; צאו מהפריים לפני תחילת ההקלטה כדי שהפריים הראשון יראה את הרקע הריק.",
   "recorder.option.magnifier": "זכוכית מגדלת לסמן"
 }

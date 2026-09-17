@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "右上",
   "recorder.webcam.top-left": "左上",
   "recorder.webcam.hint": "カメラ映像は録画の選択した隅に配置されます。リストは音声リストと一緒に更新されます。",
+  "recorder.webcam.background.label": "カメラの背景",
+  "recorder.webcam.background.keep": "そのまま",
+  "recorder.webcam.background.static": "静止した背景を除去",
+  "recorder.webcam.background.green": "グリーンバックを除去",
+  "recorder.webcam.background.hint": "背景除去は静止した背景かグリーンバックで機能します。最初のフレームが空の背景を捉えるよう、録画開始前にフレームの外へ出てください。",
   "recorder.option.magnifier": "カーソル拡大鏡"
 }

@@ -158,5 +158,10 @@
   "recorder.webcam.top-right": "右上",
   "recorder.webcam.top-left": "左上",
   "recorder.webcam.hint": "摄像头画面会放置在录制的选定角落。列表会与音频列表一起刷新。",
+  "recorder.webcam.background.label": "摄像头背景",
+  "recorder.webcam.background.keep": "保留",
+  "recorder.webcam.background.static": "移除静态背景",
+  "recorder.webcam.background.green": "移除绿幕",
+  "recorder.webcam.background.hint": "背景移除适用于静态背景或绿幕；开始录制前请离开画面，让第一帧看到空背景。",
   "recorder.option.magnifier": "光标放大镜"
 }
