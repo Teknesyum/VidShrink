@@ -15,6 +15,10 @@ Dal `t0/hb-a1-filtre`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 3
    çalışır ve testli, ama üretimde tüketicisi yok: kırpma varsayılan kapalı, yoklama sonucu yalnız öneri.
    Öneriyi gösteren ve tek tıkla uygulayan yüzey C1'in işi — **motor hazır, kullanıcı yolu C1'de.** Ölü yüzey
    `OluUyeTests` içindeki `OzellikScan` ölçüsünde gerekçeli borç satırlarıyla pimli.
+7. **Kalan tek kol (borç).** B9 doğrulama koşumu 35265321818'de `parlak`/`acik` kolu süre eşiğini 0,05 puan
+   aştı (+%5,05); kural gevşetilmedi. Sebep `parlak` kesitinin bütçe döngüsünün 3-4 deneme arası oynaması,
+   çözüm ölçüm düzeneğinde (deneme sayısını sabitlemek ya da tekrar sayısını artırıp medyan almak).
+   Ayrıntı `docs/olcumler/handbrake-filtre.md`.
 
 # Ön Ayar Kütüphanesi — HandBrake A2
 

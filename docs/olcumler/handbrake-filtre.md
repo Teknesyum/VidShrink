@@ -126,6 +126,60 @@ zincirin kurulması ayrıca süreyi düşürdü (deneme başına 14,00 → 12,75
 kolda koşmaz**, kararı ffprobe verir. Yoklamanın kendisi aşağıdaki belirsiz alan kolunda
 ölçülür.
 
+## Belirsiz `field_order` Kolu (Koşum 35265321818, sha f38586f1)
+
+DV ara dosya (720x576 PAL, `-c:v dvvideo`) ffprobe'ta `field_order=unknown` döndü, yani
+üründe `IsInterlaced=false` ve alan sırası belirsiz — `NeedsInterlaceProbe`'un tam koşulu.
+Yoklamanın koştuğu bench günlüğünün `yoklama:` satırından okunuyor:
+
+```
+belirsiz-kapali    yoklama: idet=kosmadi alan=- taramali=False
+belirsiz-otomatik  yoklama: idet=kostu alan=- taramali=False tff=140 bff=0 progressive=110 belirsiz=0 toplam=250
+```
+
+| kol | zincir | deneme | VMAF-NEG ort | hüküm |
+| --- | --- | --- | --- | --- |
+| belirsiz-kapali | yok | 4 | 62,69 | — |
+| belirsiz-otomatik | `idet,bwdif=mode=send_frame:parity=auto:deint=interlaced` | 2 | 90,80 | geçti |
+
+ΔVMAF-NEG = +28,11 (eşik 1,0); `alan_belirsiz=true`, `idet_kostu=true`, bwdif yalnız
+otomatik komutta. idet 250 karede 140 tff / 0 bff saydı: parite baskın (`IdetParityDominance=10`),
+taramalı payı 140/250 = 0,56 > `IdetDominantShare=0,25`, karar `Deinterlace=On`.
+
+**İlk koşumun hatası (35261244666) ve düzeltmesi.** Bu kol ilk kurulduğunda hüküm `kaldi`
+çıktı: Δ yalnız +0,76 idi. Neden filtre değil, düzenekti — referans çift kareler kaynağın
+kendi kare hızından türetiliyordu, DV ara dosya ise 25 fps PAL'e oturuyor; iki taraf
+zamanda kaymış olduğu için VMAF ikisini de düşük puanlıyordu (bwdif'li 1,32 / bwdif'siz
+2,08). `hb.ps1`'de DV ara dosya ve referans artık aynı `fps=50` tabanından kuruluyor
+(commit `f38586f1`). Eşik gevşetilmedi, ölçüm düzeltildi; yerelde ≤3 sn'lik lavfi denemesi
+düzeltmeden sonra bwdif'li 95,99 / bwdif'siz 66,34 verdi, CI koşumu da +28,11 ile aynı yöne
+çıktı.
+
+## Doğrulama Koşumu 35265321818 — Progressive Kollar
+
+Aynı koşumda progressive kollar yeni ölçütle ikinci kez ölçüldü (kodlama_sn/deneme):
+
+| kesit | kol | ΔVMAF-NEG | kapali (sn/deneme) | kol (sn/deneme) | süre farkı | hüküm |
+| --- | --- | --- | --- | --- | --- | --- |
+| karanlik | otomatik | +0,0029 | 66,75 | 66,65 | −0,15 % | geçti |
+| karanlik | acik | +0,0015 | 66,75 | 66,85 | +0,15 % | geçti |
+| parlak | otomatik | +0,0752 | 21,80 | 22,52 | +3,33 % | geçti |
+| parlak | acik | +0,0459 | 21,80 | 22,90 | **+5,05 %** | **kaldı** |
+| hareketli | otomatik | +0,0117 | 18,55 | 18,50 | −0,27 % | geçti |
+| hareketli | acik | +0,0196 | 18,55 | 18,60 | +0,27 % | geçti |
+| hareketli | taramali-otomatik | +74,88 | — | — | — | geçti |
+| hareketli | belirsiz-otomatik | +28,11 | — | — | — | geçti |
+
+`parlak` / `acik` kolu eşiğin 0,05 puan üstünde kaldı ve **kural gevşetilmedi.** Aynı kol
+35254572887 ham verisinde +1,61 %, bu koşumda +5,05 %; ikisinde de sorun ölçütün kendisi
+değil `parlak` kesitinin bütçe döngüsü — bu kesit tek kesit olarak deneme sayısını 3 ile 4
+arasında oynatıyor ve "kol başına iki tekrarın en küçüğü" kuralı `kapali` için 3 denemelik
+tekrarı (21,80), `acik` için 4 denemelik tekrarı (22,90) seçiyor. Deneme başına süre
+karşılaştırması bunu tamamen sıfırlamıyor: 3 denemeli koşum bütçe döngüsünün ısınma
+payını daha az taşıyor. Tek koldaki bu kalan açık borç olarak duruyor; çözümü ya kesit
+başına deneme sayısını sabitlemek (bench'te `--no-budget-fill`) ya da tekrar sayısını
+artırıp medyan almak — ikisi de ölçüm düzeneği değişikliği, kural değişikliği değil.
+
 ## Mutasyonla Kırmızıya Dönme Kaydı
 
 Düzenek `.calisma/a1/mutasyon.py`: her mutant kaynağa tek metin değişikliği olarak uygulanır,
