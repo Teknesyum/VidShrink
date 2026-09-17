@@ -165,6 +165,24 @@ public sealed class OynaticiKurulumTests
     }
 
     [Fact]
+    public void MacosKurucusuOnceBrewuYokluyorVeBelgeAyniSiraiAnlatiyor()
+    {
+        var kurulum = Oku("install-vidshrink.sh");
+        var govde = kurulum[kurulum.IndexOf("require_libmpv() {", StringComparison.Ordinal)..];
+        var brew = govde.IndexOf("if has_libmpv; then", StringComparison.Ordinal);
+        var indirme = govde.IndexOf("download_mac_libmpv", StringComparison.Ordinal);
+        Assert.True(brew >= 0 && indirme > brew, $"kurucu once brew'u yoklamiyor: has_libmpv {brew}, download_mac_libmpv {indirme}");
+
+        var ingilizce = Oku(Path.Combine("docs", "kurulum.md"));
+        var turkce = Oku(Path.Combine("docs", "kurulum.tr.md"));
+        Assert.Contains("first looks for a Homebrew libmpv", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("Homebrew `mpv` when already installed", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("önce Homebrew libmpv'sine bakar", turkce, StringComparison.Ordinal);
+        Assert.DoesNotContain("On macOS it downloads libmpv itself", ingilizce, StringComparison.Ordinal);
+        Assert.DoesNotContain("macOS'ta libmpv'yi kurucu kendisi indirir", turkce, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void KurucuYayinSorgusundaJetonuIsteneSeKullanir()
     {
         var kurulum = Oku("install-vidshrink.sh");

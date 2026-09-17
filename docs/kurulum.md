@@ -83,7 +83,7 @@ the whole of it.
 FFmpeg and libmpv are the two things this installer will not put on your machine. If
 `ffmpeg` or `ffprobe` is missing it prints your package manager's command —
 `brew install ffmpeg`, `sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops
-before downloading anything else. On macOS it downloads libmpv itself: one pinned universal
+before downloading anything else. On macOS it first looks for a Homebrew libmpv and uses it when present; otherwise it downloads one pinned universal
 `libmpv.2.dylib` (MPVKit 1.0.0, LGPL build) from the `deps-libmpv-macos-mpvkit-1.0.0`
 release, SHA-256 checked, into the bundle's `tools/libmpv`. If that download or check fails
 the file is deleted and, without a Homebrew libmpv, it prints `brew install mpv` and stops.
@@ -182,7 +182,7 @@ command again.
 | Right-click menu | yes | no | no |
 | Self-update | file-level, via the launcher | whole-bundle swap | notice only |
 | FFmpeg comes from | WinGet `Gyan.FFmpeg` | your `brew` | your `apt` or `dnf` |
-| libmpv comes from | pinned shinchiro build, SHA-256 checked | pinned MPVKit 1.0.0 build, SHA-256 checked; `brew` (`mpv`) as fallback | your `apt` (`libmpv2`) or `dnf` (`mpv-libs`) |
+| libmpv comes from | pinned shinchiro build, SHA-256 checked | Homebrew `mpv` when already installed, else pinned MPVKit 1.0.0 build, SHA-256 checked | your `apt` (`libmpv2`) or `dnf` (`mpv-libs`) |
 
 ![VidShrink open on macOS, running from its own application bundle with the Dock below it; window shown in Turkish](gorseller/macos-paket-uygulama.png)
 

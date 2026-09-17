@@ -67,7 +67,8 @@ FFmpeg, bu kurucunun makinenize koymayacağı tek şey. `ffmpeg` ya da `ffprobe`
 yöneticinizin komutunu yazar — `brew install ffmpeg`, `sudo apt install ffmpeg`,
 `sudo dnf install ffmpeg` — ve başka hiçbir şey indirmeden durur.
 
-macOS'ta libmpv'yi kurucu kendisi indirir: `deps-libmpv-macos-mpvkit-1.0.0` sürümünden pinlenmiş
+macOS'ta kurucu önce Homebrew libmpv'sine bakar, varsa onu kullanır ve hiçbir şey indirmez; yoksa
+`deps-libmpv-macos-mpvkit-1.0.0` sürümünden pinlenmiş
 tek bir evrensel `libmpv.2.dylib` (MPVKit 1.0.0, LGPL yapı), SHA-256 doğrulamasıyla paketin
 `tools/libmpv` klasörüne. İndirme ya da doğrulama tutmazsa dosya silinir; Homebrew'da libmpv
 yoksa `brew install mpv` komutunu yazıp durur. Dylib ad-hoc imzalı, noterleme yok.
