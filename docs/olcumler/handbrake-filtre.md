@@ -22,7 +22,8 @@ Hüküm, kesit başına, `otomatik` ve `acik` kollarının her biri için `kapal
 2. Süre: kol başına iki tekrarın en küçük toplam süresi (`toplam_sn`); (kol − kapali) / kapali < **%5**
 
 **Taramalı sentetik negatif kontrol.** `hareketli` kesitinden `tinterlace=mode=interleave_top,setfield=tff`
-ile taramalı ara dosya (`-flags +ilme+ildct -top 1`, ffprobe `field_order=tt`), referans aynı kesitin çift
+ile taramalı ara dosya (`-flags +ilme+ildct`; ffmpeg 8+ `-top` seçeneğini reddettiği için ilk koşum
+35248878850'de düşürüldü, ffprobe `field_order` progressive olmayan bir değer, satırda kayıtlı), referans aynı kesitin çift
 kareleri (`select=not(mod(n\,2))`). Kollar `kapali` ve `otomatik`, birer tekrar. Hüküm:
 
 1. `otomatik` komutunda `bwdif` var, `kapali` komutunda yok
