@@ -37,7 +37,9 @@ archives=()
 while read -r name sha url; do
   [ -z "$name" ] && continue
   z="$work/zip/$name.zip"
-  curl -fsSL --retry 3 -o "$z" "$url"
+  if [ ! -f "$z" ] || [ "$(shasum -a 256 "$z" | awk '{print $1}')" != "$sha" ]; then
+    curl -fsSL --retry 3 -o "$z" "$url"
+  fi
   got=$(shasum -a 256 "$z" | awk '{print $1}')
   if [ "$got" != "$sha" ]; then
     echo "sha256 MISMATCH $name expected=$sha got=$got"
@@ -120,7 +122,7 @@ for a in arm64 x86_64; do
 done
 echo "bytes=$(stat -f %z "$d") sha256=$(shasum -a 256 "$d" | awk '{print $1}')"
 otool -L "$d"
-foreign=$(otool -L "$d" | tail -n +2 | grep -vcE '^\s*(/usr/lib/|/System/Library/|@rpath/libmpv)' || true)
+foreign=$(otool -arch all -L "$d" | grep -E '^[[:space:]]' | grep -vcE '^\s*(/usr/lib/|/System/Library/|@rpath/libmpv)' || true)
 echo "non-system-refs=$foreign"
 dm=$(for a in arm64 x86_64; do vtool -arch "$a" -show-build "$d" | awk '$1=="minos"{print $2}'; done | sort -V | tail -n1)
 echo "output-minos-max=$dm"
