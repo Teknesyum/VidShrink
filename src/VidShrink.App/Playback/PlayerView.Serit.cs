@@ -37,6 +37,7 @@ internal partial class PlayerView
     private double _seritOncekiHiz;
     private bool _seritPlaying;
     private double _seritPointerX = double.NaN;
+    private double _seritSpreadCentre = 0.5;
 
     internal event EventHandler? PlayingChanged;
 
@@ -196,6 +197,8 @@ internal partial class PlayerView
             return;
         }
 
+        var width = StripBar.Bounds.Width;
+        _seritSpreadCentre = double.IsFinite(_seritPointerX) && width > 0 ? Math.Clamp(_seritPointerX / width, 0, 1) : 0.5;
         Transitions = null;
         SeritSpread = 0;
         Transitions = transitions;
@@ -213,7 +216,7 @@ internal partial class PlayerView
             return;
         }
 
-        var centre = double.IsFinite(_seritPointerX) ? Math.Clamp(_seritPointerX / width, 0, 1) : 0.5;
+        var centre = _seritSpreadCentre;
         var reach = Math.Max(centre, 1 - centre) * spread;
         var left = Math.Clamp(centre - reach, 0, 1);
         var right = Math.Clamp(centre + reach, 0, 1);

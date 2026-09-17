@@ -771,6 +771,7 @@ public sealed class OynaticiYolHaritasiTests
         view.PropertyChanged += Yayildi;
         Hareket(window, view, new Point(fareX, yuzey.Bounds.Height - 4));
         var oran = view.SeritPointerX / serit.Bounds.Width;
+        Hareket(window, view, new Point(seritSol.X + serit.Bounds.Width * 0.8, yuzey.Bounds.Height - 4));
         while (saatDuvar.Elapsed.TotalMilliseconds < 400)
         {
             Ornekle();
