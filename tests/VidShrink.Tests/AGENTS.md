@@ -74,7 +74,8 @@ sürümden (`x.0.0`) önce koşar.
   `KaydediciArkaPlanTests` (kamera arka planı `backgroundkey`/`chromakey`, lavfi bileşik karesinin pikseli),
   `BoslukKirpmaTests` (`freezedetect` + `trim/concat`, 6 sn kayıt 3,8 sn olur, donuksuz kayda dokunulmaz),
   `KaydediciOnizlemeTests` (ikinci çıkış `image2 -update 1` 320 px jpg, boyut sınırıyla red, bozuk kare eski resmi korur),
-  `KaydediciTamponTests` (2 sn `segment_wrap` parçaları, 4 sn tampon 9 sn döner, kaydedilen ≤6,5 sn; F11 sahte `IReplayBuffer`).
+  `KaydediciTamponTests` (2 sn `segment_wrap` parçaları, 4 sn tampon 9 sn döner, kaydedilen ≤6,5 sn; F11 sahte `IReplayBuffer`),
+  `KayitBolmeTests` (`[KayitFact]`, gdigrab 5 sn sınır + 2 sn bölme ≥2 parça toplamı 5 sn, bölmesiz tek parça, 1 ms kapanış `_partial`).
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.
