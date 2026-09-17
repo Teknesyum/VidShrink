@@ -741,16 +741,22 @@ public sealed class OynaticiYolHaritasiTests
         var motor = new YolMotoru();
         var view = Ac(motor, out var window);
         var saat = new ElleSaat();
-        view.SeritZone.Clock = saat;
         var serit = view.FindControl<Border>("StripBar")!;
         var yuzey = view.FindControl<Panel>("Surface")!;
         Dongu(() => yuzey.Bounds.Height > 0, 5);
         if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
         Dongu(() => view.IsPlaying, 5);
+        view.SeritZone.Clock = saat;
         Hareket(window, view, new Point(480, 100));
         Dongu(() =>
         {
-            if (serit.Opacity > 0) saat.Ates();
+            if (serit.Opacity <= 0) return true;
+            if (saat.Bekleyen is null)
+            {
+                Hareket(window, view, new Point(480, yuzey.Bounds.Height - 4));
+                Hareket(window, view, new Point(480, 100));
+            }
+            saat.Ates();
             return serit.Opacity <= 0;
         }, 10);
         string Alan(string ad) => typeof(HoverZone).GetField(ad, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(view.SeritZone)!.ToString()!;
