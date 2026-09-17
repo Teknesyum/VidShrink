@@ -1,0 +1,45 @@
+{
+    "PresetList": [
+        {
+            "Folder": true,
+            "PresetName": "Sentetik Klasor",
+            "Type": 1,
+            "ChildrenArray": [
+                {
+                    "PresetName": "Sentetik Sosyal 10 MB 720p",
+                    "PresetDescription": "VidShrink test verisi; degerler elle secildi.",
+                    "Type": 1,
+                    "Folder": false,
+                    "Default": false,
+                    "ChildrenArray": [],
+                    "FileFormat": "av_mp4",
+                    "Optimize": false,
+                    "PictureWidth": 1280,
+                    "PictureHeight": 720,
+                    "PictureKeepRatio": true,
+                    "PictureDenoiseFilter": "off",
+                    "PictureSharpenFilter": "off",
+                    "SubtitleBurnBehavior": "none",
+                    "SubtitleTrackSelectionBehavior": "none",
+                    "AudioTrackSelectionBehavior": "first",
+                    "AudioList": [
+                        {
+                            "AudioEncoder": "av_aac",
+                            "AudioBitrate": 128,
+                            "AudioMixdown": "stereo"
+                        }
+                    ],
+                    "VideoEncoder": "x264",
+                    "VideoQualityType": 1,
+                    "VideoAvgBitrate": 2100,
+                    "VideoQualitySlider": 23.0,
+                    "VideoFramerate": "30",
+                    "VideoFramerateMode": "cfr",
+                    "VideoPreset": "medium",
+                    "VideoMultiPass": false,
+                    "VideoTurboMultiPass": false
+                }
+            ]
+        }
+    ]
+}
