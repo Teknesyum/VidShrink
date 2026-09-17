@@ -185,6 +185,39 @@ public sealed class KaranlikGecisTests
         Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Aggressive, "libsvtav1", Ekran));
     }
 
+    [Fact]
+    public void GerekceNotuPencereninSatirinaVeKirkIkiDileCevrilir()
+    {
+        var plan = Plan(40, Karanlik);
+        Assert.Contains(plan.ReasonCodes, n => n.Code == ReasonCode.DarkContentHevc);
+
+        var lines = AppHost.Run(() =>
+        {
+            var window = new VidShrink.App.MainWindow();
+            try
+            {
+                window.UseTurkish();
+                return window.ReasonLinesForTest(plan);
+            }
+            finally { window.Close(); }
+        });
+
+        Assert.Contains(lines, line => line.StartsWith("kaynak karanlık", StringComparison.OrdinalIgnoreCase)
+                                       && line.Contains("libsvtav1") && line.Contains("libx265") && line.Contains("28"));
+
+        const string key = "main.reason.dark-content-hevc";
+        var english = Locales.Domain("en", "main")[key];
+        Assert.Equal(42, Locales.Languages.Count);
+        foreach (var language in Locales.Languages)
+        {
+            var value = Locales.Domain(language, "main")[key];
+            Assert.Contains("{0}", value);
+            Assert.Contains("{1}", value);
+            Assert.Contains("{2}", value);
+            if (language != "en") Assert.NotEqual(english, value);
+        }
+    }
+
     [FfmpegTheory]
     [InlineData("color=c=0x101010:size=320x240:rate=12:duration=8", true)]
     [InlineData("color=c=0x808080:size=320x240:rate=12:duration=8", false)]

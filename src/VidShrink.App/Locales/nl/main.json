@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "de preset was vastgezet op {0}; de motor zou {1} hebben gekozen",
   "main.reason.manual-preset-first-pass-relaxed": "de turbo-eerste doorgang draait met een andere preset; de vaste {0} geldt alleen voor de tweede doorgang die de uitvoer maakt (eerste doorgang: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "de vaste {0} kon niet worden toegepast op het kopieerpad; wat in plaats daarvan geldt is {1}",
+  "main.reason.dark-content-hevc": "de bron is donker (gemiddelde luminantie {0}); {1} geeft banding in de schaduwen, dus Automatisch gebruikt {2} met een turbo eerste pass",
 
   "main.advice.budget-generous": "Het doel is ruim voor deze bron, dus de motor haalt het zonder moeite.",
   "main.advice.codec-upgrade": "Bij deze druk geeft H.265 een zichtbaar beter resultaat bij dezelfde grootte; overweeg het compressiealgoritme op automatisch of H.265 te zetten.",

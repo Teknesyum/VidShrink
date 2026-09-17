@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "forvalget blev fastsat til {0}; motoren ville have valgt {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo første gennemløb kører med et andet forvalg; det fastsatte {0} gælder kun for det andet gennemløb, der producerer outputtet (første gennemløb: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "det fastsatte {0} kunne ikke anvendes på kopistien; det, der gælder i stedet, er {1}",
+  "main.reason.dark-content-hevc": "kilden er mørk (gennemsnitlig luminans {0}); {1} giver banding i skyggerne, så Automatisk bruger {2} med turbo første gennemløb",
 
   "main.advice.budget-generous": "Målet er rummeligt for denne kilde, så motoren når det uden anstrengelse.",
   "main.advice.codec-upgrade": "Ved dette pres giver H.265 et synligt bedre resultat ved samme størrelse; overvej at sætte komprimeringsalgoritmen til automatisk eller H.265.",

@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "eelseade fikseeriti {0}-le; mootor oleks valinud {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo esimene käik jookseb teise eelseadega; fikseeritud {0} kehtib ainult teisele käigule, mis väljundi loob (esimene käik: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "fikseeritud {0} ei saanud koopiateel rakenduda; selle asemel kehtib {1}",
+  "main.reason.dark-content-hevc": "allikas on tume (keskmine heledus {0}); {1} tekitab varjudes triipe, seega Automaatne kasutab {2} turbo esimese läbimisega",
 
   "main.advice.budget-generous": "Siht on selle allika jaoks helde, seega täidab mootor selle pingutuseta.",
   "main.advice.codec-upgrade": "Sellise surve juures annab H.265 sama suurusega nähtavalt parema tulemuse; kaalu tihendusalgoritmi lülitamist automaatsele või H.265-le.",

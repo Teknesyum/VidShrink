@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "förvalet låstes till {0}; motorn hade valt {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo-första passet körs med ett annat förval; det låsta {0} gäller bara det andra passet som skapar utdatan (första passet: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "det låsta {0} kunde inte tillämpas på kopieringsvägen; det som gäller i stället är {1}",
+  "main.reason.dark-content-hevc": "källan är mörk (genomsnittlig luminans {0}); {1} ger banding i skuggorna, så Automatiskt använder {2} med turbo första pass",
 
   "main.advice.budget-generous": "Målet är generöst för den här källan, så motorn når det utan ansträngning.",
   "main.advice.codec-upgrade": "Vid det här trycket ger H.265 ett synbart bättre resultat vid samma storlek; överväg att sätta komprimeringsalgoritmen till automatisk eller H.265.",
