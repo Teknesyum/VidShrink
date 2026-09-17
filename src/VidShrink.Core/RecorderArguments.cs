@@ -460,7 +460,10 @@ public static class RecorderArguments
 
     /// <summary>
     /// Nazik olmayan durdurmada dosyayi oynatilabilir birakan kaplar. Bugun yalniz
-    /// Matroska: mp4/mov muxer'i <c>moov</c> atomunu kapanista yaziyor.
+    /// Matroska: mp4/mov muxer'i <c>moov</c> atomunu kapanista yaziyor. Matroska da ancak
+    /// <c>-flush_packets 1</c> ile: bayraksiz 640x480 gdigrab kaydi 7 sn sonra olduruldugunde
+    /// ffmpeg 79 KiB bildirirken dosya 0 bayt kaldi, bayrakla 80 KiB ve 76 okunur paket
+    /// (<c>KayitBolmeTests</c>).
     /// </summary>
     public static bool SurvivesKill(RecorderContainer container) => container == RecorderContainer.Mkv;
 
@@ -891,6 +894,8 @@ public static class RecorderArguments
 
         if (request.Container is RecorderContainer.Mp4 or RecorderContainer.Mov)
             a.AddRange(new[] { "-movflags", "+faststart" });
+        else if (request.Container == RecorderContainer.Mkv)
+            a.AddRange(new[] { "-flush_packets", "1" });
 
         a.Add(outputPath);
         a.AddRange(PreviewArgs(request));

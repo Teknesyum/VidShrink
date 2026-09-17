@@ -15,7 +15,9 @@ namespace VidShrink.Tests;
 /// numaralı parça verir, parçaların toplamı 5 sn'yi aşmaz; bölmesiz aynı kayıt tek parça (negatif kontrol).
 /// Ölçülen: 2 sn bölmede parçalar 3,2 + 1,8 sn — yoklama, ffmpeg'in ilerleme aralığı ve nazik kapanış birinci
 /// parçayı ~1,2 sn uzatıyor, kalan süre ikinciden düşüyor; üst sınır bu yüzden 3,5 sn.
-/// Kapanma süresi 1 ms verilen kayıt öldürülür ve yarım işaretlenir. Kanıt <c>.calisma/paket-2b/bolme/</c>.
+/// Kapanma süresi 1 ms verilen kayıt öldürülür ve yarım işaretlenir; öldürülen Matroska ffprobe'la okunur paket verir,
+/// öldürülen mp4 vermez — <see cref="RecorderArguments.SurvivesKill"/> tablosu davranışla ölçülür. Ölçülen:
+/// <c>-flush_packets 1</c> olmadan 7 sn'lik Matroska öldürülünce 0 bayt kalıyordu. Kanıt <c>.calisma/paket-2b/bolme/</c>.
 /// </summary>
 public sealed class KayitBolmeTests
 {
@@ -43,6 +45,18 @@ public sealed class KayitBolmeTests
     private static double Sure(string dosya)
         => double.Parse(KaydediciOnizlemeTests.Probe(dosya, "format=duration"), CultureInfo.InvariantCulture);
 
+    private static int Oynar(string dosya)
+        => File.Exists(dosya)
+            ? KaydediciOnizlemeTests.Probe(dosya, "packet=flags").Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Count(s => s.StartsWith('K') || s.StartsWith('_'))
+            : 0;
+
+    private static async Task<RecordResult> Oldur(RecorderContainer kap, string cikti)
+    {
+        var oturum = await RecorderSession.StartAsync(Istek() with { MaxDuration = null, Container = kap, Region = new RecorderRegion(0, 0, 640, 480) }, cikti);
+        await Task.Delay(7000);
+        return await oturum.StopAsync(1);
+    }
+
     private static async Task<RecordResult> Kaydet(RecorderRequest istek, string cikti)
     {
         var oturum = await RecorderSession.StartAsync(istek, cikti);
@@ -60,15 +74,15 @@ public sealed class KayitBolmeTests
         var parcaSureleri = (bolunmus.Files ?? Array.Empty<string>()).Select(Sure).ToList();
         var tek = await Kaydet(Istek(), Path.Combine(Kanit, "tek.mkv"));
 
-        var yarimOturum = await RecorderSession.StartAsync(Istek() with { MaxDuration = null }, Path.Combine(Kanit, "yarim.mkv"));
-        await Task.Delay(1500);
-        var yarim = await yarimOturum.StopAsync(1);
+        var yarim = await Oldur(RecorderContainer.Mkv, Path.Combine(Kanit, "yarim.mkv"));
+        var yarimMp4 = await Oldur(RecorderContainer.Mp4, Path.Combine(Kanit, "yarim.mp4"));
 
         File.WriteAllLines(Path.Combine(Kanit, "olcu.txt"), new[]
         {
             $"bolunmus ok={bolunmus.Ok} partial={bolunmus.Partial} parca={bolunmus.Segments} sureler={string.Join(' ', parcaSureleri.Select(s => s.ToString("0.###", CultureInfo.InvariantCulture)))} toplam={parcaSureleri.Sum().ToString("0.###", CultureInfo.InvariantCulture)}",
             $"tek ok={tek.Ok} parca={tek.Segments} sure={(File.Exists(tek.OutputPath) ? Sure(tek.OutputPath) : double.NaN).ToString("0.###", CultureInfo.InvariantCulture)}",
-            $"yarim ok={yarim.Ok} partial={yarim.Partial} cikis={yarim.ExitCode} dosya={File.Exists(yarim.OutputPath)}"
+            $"yarim ok={yarim.Ok} partial={yarim.Partial} cikis={yarim.ExitCode} dosya={File.Exists(yarim.OutputPath)} paket={Oynar(yarim.OutputPath)}",
+            $"yarim mp4 ok={yarimMp4.Ok} partial={yarimMp4.Partial} cikis={yarimMp4.ExitCode} dosya={File.Exists(yarimMp4.OutputPath)} paket={Oynar(yarimMp4.OutputPath)}"
         });
 
         Assert.True(bolunmus.Ok, bolunmus.StandardError);
@@ -84,5 +98,10 @@ public sealed class KayitBolmeTests
 
         Assert.True(yarim.Partial);
         Assert.False(yarim.Ok);
+        Assert.True(Oynar(yarim.OutputPath) > 15, "oldurulen mkv oynamiyor");
+        Assert.True(yarimMp4.Partial);
+        Assert.Equal(0, Oynar(yarimMp4.OutputPath));
+        Assert.Equal(Oynar(yarim.OutputPath) > 0, RecorderArguments.SurvivesKill(RecorderContainer.Mkv));
+        Assert.Equal(Oynar(yarimMp4.OutputPath) > 0, RecorderArguments.SurvivesKill(RecorderContainer.Mp4));
     }
 }
