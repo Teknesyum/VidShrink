@@ -66,3 +66,49 @@ main `460ecc89` ile dal sırayla, beş tur. Düzenek `.calisma/sonda/olc.ps1`.
 Dalda luma 126,08, kodek iki tarafta libsvtav1. Sonda duvar süresinde fark ölçüm gürültüsünün içinde:
 YAVG pencereleri diğer sonda işleriyle paralel koşuyor. Tek başına koşulan üç pencere 111 / 83 / 139 ms
 (toplam 333 ms, sıralı); paralelde duvar süresine eklenen kısım bu klipte ayırt edilemedi.
+
+## 4. CI: Ürün Otomatik, main e0 ve HandBrake x265
+
+handbrake-kiyas koşum #13 (id 35190861711, commit `961795fc`), `hb.ps1 -Is karanlikgecis`.
+e0 = main `460ecc89` bench'i aynı koşucuda. HB = HandBrakeCLI 1.11.2 x265 slow, 2 geçiş turbo, ürünün kbps'ine eş bayt.
+Kalite yolu (ii) `zscale dither=none`. Ham çıktı: koşumun `hb-sonuc-karanlikgecis-*` eserleri.
+
+### Karanlik
+
+| kbit | Kol | Kodek | Geometri | kbps | CAMBI(ii) | VMAF-NEG | XPSNR | Kodlama sn | Toplam sn |
+|---|---|---|---|---|---|---|---|---|---|
+| 600 | ürün | libx265 | 1574x670 | 588,6 | **6,74** | 77,93 | 35,83 | 39,9 | 95,5 |
+| 600 | e0 | libsvtav1 | 1920x818 | 603,9 | 9,21 | 81,22 | 36,68 | 25,0 | 66,9 |
+| 600 | HB x265 | x265 | 1920x818 | 589,9 | 6,52 | 76,83 | 35,43 | 55,7 | 55,7 |
+| 2000 | ürün | libx265 | 1920x818 | 1942,5 | **6,61** | 95,68 | 39,67 | 73,2 | 138,2 |
+| 2000 | e0 | libsvtav1 | 1920x818 | 1981,0 | 9,27 | 96,08 | 39,90 | 25,7 | 75,6 |
+| 2000 | HB x265 | x265 | 1920x818 | 1925,0 | 6,56 | 95,18 | 39,48 | 72,6 | 72,6 |
+
+Hükümler: kodek libx265 (günlük ve komut) 2/2 geçti; CAMBI(ii) ≤7,5 2/2 geçti.
+Süre, betiğin ölçtüğü kodlama süresiyle ürün/HB 0,716× ve 1,008× → geçti.
+Toplam süreyle (sonda, deneme, iki geçiş dahil) 1,715× ve 1,904× → **1,5×'i aşıyor**; HB'nin toplamında sonda yok, bu yüzden betik kodlama süresini kıyaslar.
+Ürün e0'a göre: VMAF-NEG −3,29 / −0,40, XPSNR −0,86 / −0,23; toplam süre 1,60× / 2,85× (kararın bilinen bedeli).
+600'de ürün x265 kolu 1574x670'e ölçekledi, e0 SVT tam boyda kaldı.
+
+### Negatif: Karanlık Olmayan Kesitler, 2000 kbit
+
+| Kesit | luma | Ürün kodek | md5 eş | ΔVMAF-NEG (ürün−e0) | ΔXPSNR | Hüküm |
+|---|---|---|---|---|---|---|
+| ekran | 66,89 | libsvtav1 | hayır | +0,0003 | +0,0004 | geçti |
+| hareketli | 137,66 | libsvtav1 | hayır | −0,0147 | +0,0073 | geçti |
+| parlak | 197,04 | libsvtav1 | hayır | −0,0102 | −0,0137 | geçti |
+
+Son komut satırları e0 ile aynı (yol dışında), bayt farkı SVT-AV1'in çok iş parçacıklı kodlamasından; tolerans |ΔVMAF| ≤0,05, |ΔXPSNR| ≤0,02.
+
+### Sondanın CI Maliyeti
+
+| Koşum | e0 prob s | ürün prob s | fark |
+|---|---|---|---|
+| ekran 2000 | 17,6 | 24,6 | +7,0 |
+| hareketli 2000 | 28,3 | 35,3 | +7,0 |
+| parlak 2000 | 29,2 | 40,9 | +11,7 |
+| karanlik 600 | 28,2 | 35,0 | +6,8 |
+| karanlik 2000 | 36,3 | 29,4 | −6,9 |
+
+Medyan +7,0 sn, dağılım −6,9…+11,7. Her çiftte ürün önce koştu (sıra dengelenmedi); 2 çekirdekli koşucuda ffv1 1080p kaynakta
+luma pencereleri diğer sonda işleriyle yarışıyor. Yereldeki gürültü içi sonuç CI'da tekrarlanmadı; açık boşluk.
