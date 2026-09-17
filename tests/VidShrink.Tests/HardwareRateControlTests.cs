@@ -369,7 +369,7 @@ public sealed class HardwareRateControlTests
         var info = SourceInfo();
         var options = new PlanOptions { TargetMb = 8, FillPolicy = FillPolicy.FillTarget, SpeedMode = SpeedMode.Fast };
 
-        var hardware = PlanCalculator.BuildDetailed(info, options, null, new FixedAvailability("av1_qsv")).Plan;
+        var hardware = PlanCalculator.BuildDetailed(info, options, null, new FixedAvailability("av1_nvenc")).Plan;
         var processor = PlanCalculator.BuildDetailed(info, options, null, new FixedAvailability("libx264")).Plan;
 
         var hardwareTotalK = hardware.VideoBitrateK + hardware.AudioBitrateK;
