@@ -90,6 +90,10 @@ public sealed class PlanOptions
     public bool PlatformDelivery { get; set; }
 
     public string? PreferredLanguage { get; set; }
+
+    public VideoFilterOptions Filters { get; set; } = VideoFilterOptions.Default;
+
+    public CropRect? DetectedCrop { get; set; }
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -248,8 +252,11 @@ public static class PlanCalculator
     public static PlanResult BuildDetailed(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability = null)
     {
         var probe = new ProbeState();
-        var result = BuildDetailedCore(info, options, profile, availability, probe);
+        var filters = options.Filters ?? VideoFilterOptions.Default;
+        var result = BuildDetailedCore(VideoFilterChain.PlannedSource(info, filters), options, profile, availability, probe);
         result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
+        result.Plan.Filters = filters;
+        result.Plan.SuggestedCrop = filters.Crop is null ? options.DetectedCrop : null;
         return probe.NotMeasured ? result with { HardwareNotMeasured = true } : result;
     }
 
@@ -826,6 +833,7 @@ public static class PlanCalculator
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {
         if (HasReencodeOverride(options)) return false;
+        if ((options.Filters ?? VideoFilterOptions.Default).ChangesPictureFor(info)) return false;
         if (info.FileSizeMb <= 0 || info.FileSizeMb > options.TargetMb) return false;
         if (hdr.PolicyChanged) return false;
         if (options.Codec == CodecPreference.Auto) return true;

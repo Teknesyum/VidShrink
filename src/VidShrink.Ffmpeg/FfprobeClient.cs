@@ -83,6 +83,7 @@ public static class FfprobeClient
             MasteringDisplayMetadata = ParseMasteringDisplay(v),
             ContentLightLevel = ParseContentLightLevel(v),
             IsInterlaced = fieldOrder is not null and not "progressive" and not "unknown",
+            FieldOrder = fieldOrder,
             AudioCodec = audio is null ? null : GetString(audio.Value, "codec_name"),
             AudioBitrateBps = audio is null ? 0 : ParseLong(audio.Value, "bit_rate") ?? 128_000,
             AudioChannels = audio is null ? 0 : GetInt(audio.Value, "channels") ?? 2,
