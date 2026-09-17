@@ -16,7 +16,7 @@ public static class FfprobeClient
         {
             "-hide_banner", "-v", "error",
             "-print_format", "json",
-            "-show_format", "-show_streams",
+            "-show_format", "-show_streams", "-show_chapters",
             filePath
         };
 
@@ -39,7 +39,7 @@ public static class FfprobeClient
         {
             var type = s.TryGetProperty("codec_type", out var t) ? t.GetString() : null;
             if (type == "video" && video is null && !IsAttachedPicture(s)) video = s;
-            else if (type == "audio" && audio is null) audio = s;
+            else if (type == "audio" && (audio is null || (!Disposition(audio.Value, "default") && Disposition(s, "default")))) audio = s;
         }
 
         if (video is null)
@@ -50,6 +50,13 @@ public static class FfprobeClient
         var duration = ParseDouble(format, "duration") ?? ParseDouble(v, "duration") ?? 0;
         if (duration <= 0)
             throw new InvalidOperationException("Duration could not be determined; the file may be corrupt.");
+
+        var inventory = Inventory(streams, duration);
+        if (inventory.Any(stream => stream.Kind == StreamKind.Subtitle && stream.Bytes <= 0))
+            inventory = await MeasureSubtitleBytesAsync(filePath, inventory, ct);
+        var chapters = root.TryGetProperty("chapters", out var chapterList) && chapterList.ValueKind == JsonValueKind.Array
+            ? chapterList.GetArrayLength()
+            : 0;
 
         var pixFmt = GetString(v, "pix_fmt");
         var colorTransfer = GetString(v, "color_transfer");
@@ -78,8 +85,106 @@ public static class FfprobeClient
             IsInterlaced = fieldOrder is not null and not "progressive" and not "unknown",
             AudioCodec = audio is null ? null : GetString(audio.Value, "codec_name"),
             AudioBitrateBps = audio is null ? 0 : ParseLong(audio.Value, "bit_rate") ?? 128_000,
-            AudioChannels = audio is null ? 0 : GetInt(audio.Value, "channels") ?? 2
+            AudioChannels = audio is null ? 0 : GetInt(audio.Value, "channels") ?? 2,
+            Streams = inventory,
+            ChapterCount = chapters
         };
+    }
+
+    internal static List<SourceStream> Inventory(JsonElement streams, double duration)
+    {
+        var list = new List<SourceStream>();
+        foreach (var s in streams.EnumerateArray())
+        {
+            var kind = GetString(s, "codec_type") switch
+            {
+                "video" => StreamKind.Video,
+                "audio" => StreamKind.Audio,
+                "subtitle" => StreamKind.Subtitle,
+                "attachment" => StreamKind.Attachment,
+                _ => StreamKind.Data
+            };
+            var index = GetInt(s, "index") ?? list.Count;
+            var tags = s.TryGetProperty("tags", out var t) && t.ValueKind == JsonValueKind.Object ? t : (JsonElement?)null;
+            var bitrate = ParseLong(s, "bit_rate") ?? TagLong(tags, "BPS") ?? 0;
+            var bytes = TagLong(tags, "NUMBER_OF_BYTES") ?? 0;
+            if (kind == StreamKind.Attachment) bytes = GetInt(s, "extradata_size") ?? bytes;
+            if (bytes <= 0 && bitrate > 0 && duration > 0) bytes = (long)(bitrate * duration / 8);
+            if (bitrate <= 0 && bytes > 0 && duration > 0) bitrate = (long)(bytes * 8 / duration);
+
+            list.Add(new SourceStream(
+                index,
+                kind,
+                GetString(s, "codec_name") ?? "unknown",
+                tags is { } tagValues ? GetString(tagValues, "language") : null,
+                Disposition(s, "default"),
+                Disposition(s, "forced"),
+                GetInt(s, "channels") ?? 0,
+                bitrate,
+                bytes,
+                kind == StreamKind.Video && IsAttachedPicture(s)));
+        }
+        return list;
+    }
+
+    private static async Task<List<SourceStream>> MeasureSubtitleBytesAsync(string filePath, List<SourceStream> inventory, CancellationToken ct)
+    {
+        var args = new[]
+        {
+            "-hide_banner", "-v", "error", "-select_streams", "s",
+            "-show_entries", "packet=stream_index,size", "-of", "csv=p=0",
+            filePath
+        };
+
+        try
+        {
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, args) };
+            process.Start();
+            var stderrTask = process.StandardError.ReadToEndAsync(ct);
+            var stdout = await process.StandardOutput.ReadToEndAsync(ct);
+            await stderrTask;
+            await process.WaitForExitAsync(ct);
+            if (process.ExitCode != 0) return inventory;
+
+            var totals = new Dictionary<int, long>();
+            foreach (var line in stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                var parts = line.Split(',');
+                if (parts.Length < 2) continue;
+                if (!int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var index)) continue;
+                if (!long.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var size)) continue;
+                totals[index] = totals.GetValueOrDefault(index) + size;
+            }
+
+            return inventory
+                .Select(stream => stream.Kind == StreamKind.Subtitle && stream.Bytes <= 0 && totals.TryGetValue(stream.Index, out var total)
+                    ? stream with { Bytes = total }
+                    : stream)
+                .ToList();
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return inventory;
+        }
+    }
+
+    private static bool Disposition(JsonElement stream, string name)
+        => stream.TryGetProperty("disposition", out var d)
+           && d.TryGetProperty(name, out var value)
+           && value.ValueKind == JsonValueKind.Number
+           && value.GetInt32() == 1;
+
+    private static long? TagLong(JsonElement? tags, string name)
+    {
+        if (tags is not { } values) return null;
+        foreach (var property in values.EnumerateObject())
+        {
+            if (!property.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && !property.Name.StartsWith(name + "-", StringComparison.OrdinalIgnoreCase)) continue;
+            if (property.Value.ValueKind == JsonValueKind.String
+                && long.TryParse(property.Value.GetString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
+                return parsed;
+        }
+        return null;
     }
 
     private static int BitDepthFromPixFmt(string? pixFmt)
