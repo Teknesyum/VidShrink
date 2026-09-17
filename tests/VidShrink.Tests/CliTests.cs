@@ -68,7 +68,8 @@ public sealed class CliTests
             TargetMb = targetMb,
             Quality = quality,
             Codec = codec,
-            SkipMeasurement = true
+            SkipMeasurement = true,
+            PreferredLanguage = "en"
         }, info, null, null, null);
 
     [Theory]
@@ -179,6 +180,8 @@ public sealed class CliTests
         var options = request.ToPlanOptions(10);
         Assert.Equal("libx265", options.LockedCodec);
         Assert.Equal(SpeedMode.Fast, options.SpeedMode);
+        Assert.Null(options.PreferredLanguage);
+        Assert.Equal("tr", (request with { PreferredLanguage = "tr" }).ToPlanOptions(10).PreferredLanguage);
     }
 
     [Theory]

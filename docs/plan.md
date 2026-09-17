@@ -546,3 +546,24 @@ Kaynak: `.calisma/denetim/yol-haritasi-denetimi.md`, "Küçült, karşılaştır
 6. Opus: MP4'te WhatsApp/iOS uyumu bozuluyor → uygulanmaz, `.calisma/kucult-kabuk/soru-opus.md`.
 7. Güncelleme: `AutoUpdate` varsayılanı kapalı; indirme/kurulum sürerken panel kapanmaz; eski Ayarlar
    simgesi (dişli); Hakkında'da platform satırı.
+
+# Dalga 1c — Akış Eşleme
+
+Kaynak: fable kararı 6 (`.calisma/danisma/handbrake-yanit.md`), analiz satırları 17, 20-23, 25-26.
+Dal `t0/hb-1c-akis`.
+
+1. `Core/StreamMapping.cs` (yeni): kaynak iz envanteri (`SourceStream`), istek (`StreamRequest`: izleri koru,
+   platform, dil), karar (`StreamPlan`: kap, ses/altyazı izleri, notlar) ve `-map` argümanları.
+   Varsayılan MP4 + tek ses (kullanıcı dili > varsayılan iz > ilk iz) + metin altyazı `mov_text`, resim
+   altyazı düşer. İzleri koru: MKV, tüm ses (Opus) + tüm altyazı + ekler. Passthru: kap taşıyor, iz ≤ hedefin
+   %15'i, kaynak bit hızı ≤ yeniden kodlama; TrueHD/DTS varsayılanda hiç. >2 kanal yeniden kodlanırken stereo.
+   Platform çipi: MP4, tek ses, altyazısız. `-map_metadata 0 -map_chapters 0` her yolda.
+2. `Ffmpeg/FfprobeClient.cs`: `-show_chapters`, iz envanteri, bayt (bit_rate / BPS / NUMBER_OF_BYTES; altyazıda
+   yoksa paket toplamı).
+3. `Core/MediaInfo.cs`, `Core/EncodePlan.cs`: `Streams`, `ChapterCount`; plana `Streams` ve `NonVideoK`.
+4. `Core/PlanCalculator.cs`: ses + altyazı baytı bütçeden düşülür (`SizeMb`, `Correct`, `Estimate` aynı sayıyı
+   okur); çok izde ses payı izlere bölünür; `PlanOptions.KeepAllTracks/PlatformDelivery/PreferredLanguage`.
+5. `Core/FfmpegArguments.cs`: çıktı kolunda açık `-map`, `faststart` yalnız MP4; birinci geçişte yalnız video.
+6. App: gelişmiş ses bölümünde "İzleri koru" kutusu (42 dil), çıktı uzantısı plandan, platform çipi bayrağı.
+7. Test `StreamMappingTests.cs`: ffmpeg ile 3 sn girdi (2 ses + srt + PGS + 2 bölüm + başlık/tarih; ayrıca
+   dönük MP4), çıktı ffprobe ile okunur; çok izli girdide hedef isabeti; her kolun negatif kontrolü.

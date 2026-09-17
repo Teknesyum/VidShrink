@@ -84,6 +84,10 @@ sürümden (`x.0.0`) önce koşar.
   sıfırlanma, açıldıktan sonra baştan başlama; biçimlemede sekmenin gizli başladığının ve kapatma düğmesinin pimi.
 - `GoruntuCekTests.cs` — kanıt karesi üretir: `.calisma/kesit-ef/` altına güncelleme panelini ve 26 simgelik
   sayfayı PNG olarak yazar. Ölçmez, sınamaz; tarz kararlarının resmi buradan çıkar.
+- `StreamMappingTests.cs` — dalga 1c, akış eşleme: ffmpeg'in ürettiği 3 sn'lik mkv (2 ses, srt, elle yazılmış PGS, 2 bölüm,
+  başlık/tarih) ve dönüş işaretli mp4. Varsayılan MP4 tek ses + mov_text, İzleri koru MKV tüm izler, platform tek iz;
+  çıktılar ffprobe'la okunur. Negatif kontroller: eşlemesiz ffmpeg başka dili seçer ve tarihi düşürür, yan izleri
+  saymayan bütçe hedefi aşar. Her `StreamNote` ayrı bir `main.reason.stream.*` anahtarına düşer, anahtar 42 dilde çevrilidir ve pencerenin gerekçe satırında görünür. Kanıt `.calisma/hb-1c-test/`.
 - `KurucuExeTests.cs` — `VidShrink-Setup.exe` motoru (`Core/Setup`): betikle aynı kayıt ağacını yazıp siler (test anahtarında), kilitli klasör denemeleri, sahte yayınla çevrimdışı kurulum ve kaldırma, sağlama tutmazsa eski kuruluma dokunulmaması, yarım kurulumda geri koyma, sabitlerin betikle aynılığı. Gerçek kayıt köküne test konağı yazamaz. Çıktı `.calisma/test-ciktilari/kurucu-exe/`.
 - `HipersurusHTests.cs` — H dalgası: `--bakim` açılış görüntüsünden önce başlamıyor (yedek bekleme, başlatıcı hatası), sinyal boş açılışta boyaya, dosyayla ilk kareye bağlı; panelin ölçüm aşaması erteleme pimi. Davranışı `PlaybackResumeTests` (ilk parça 1 ms, `Probed` planı ekrandaki parçayı iptal etmiyor), composite pimi `HipersurusTests`. Ölçüm `docs/olcumler/hipersurus-h.md`.
 - `TestAyarYoluTests.cs` — modül başlatıcısı `VIDSHRINK_SETTINGS_PATH`'i `.calisma/test-ciktilari/appdata/<pid>`'e alır; ana pencerede açılan dosyanın son dosyalar listesi ve kaydedici ayarı oraya yazılır, gerçek `%APPDATA%\VidShrink` dosyalarının boyut/zaman damgası değişmez (yalnız okunur). Kanıt `.calisma/ayar-yolu/`.
