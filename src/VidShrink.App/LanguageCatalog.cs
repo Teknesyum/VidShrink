@@ -8,6 +8,7 @@ using VidShrink.App.Localization;
 // metin ham metin değil, Title() geçidinden çıkmış hâli — büyük harf daha geniştir.
 // Ölçüm o geçidi yeniden yazmak yerine buradakini çağırsın diye test projesi içeri alındı.
 [assembly: InternalsVisibleTo("VidShrink.Tests")]
+[assembly: InternalsVisibleTo("VidShrink.KaydediciPiksel")]
 
 namespace VidShrink.App;
 
