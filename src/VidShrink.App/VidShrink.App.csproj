@@ -19,6 +19,10 @@
     <PublishReadyToRunComposite>false</PublishReadyToRunComposite>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+    <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\VidShrink.Core\VidShrink.Core.csproj" />
     <ProjectReference Include="..\VidShrink.Ffmpeg\VidShrink.Ffmpeg.csproj" />

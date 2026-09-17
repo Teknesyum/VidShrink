@@ -278,6 +278,7 @@ public partial class MainWindow : Window
         if (_startupFile is not null) Tabs.SelectedIndex = PlayerTabIndex;
         Opened += OnWindowLoaded;
         IlkBoyayiBekle();
+        AcilisGoruntusunuBildir();
         AcilisIzi.Yaz("yapici-bitti");
     }
 
@@ -3081,6 +3082,7 @@ public partial class MainWindow : Window
         {
             var speed = CurrentOptions().SpeedMode;
             _sceneMap = await EncodeRunner.TryBuildSceneMapAsync(info, ct: cts.Token);
+            AcilisIzi.Yaz("sahne-haritasi");
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             Recalculate();
 
@@ -3088,7 +3090,10 @@ public partial class MainWindow : Window
             {
                 if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return false;
                 _profile = profile;
-                Recalculate();
+                if (_preview is not null) { _preview.AraOlcum = stage == ShrinkMeasureStage.Probed; _preview.OlcumPlani = true; }
+                try { Recalculate(); }
+                finally { if (_preview is not null) { _preview.AraOlcum = false; _preview.OlcumPlani = false; } }
+                AcilisIzi.Yaz("olcum-" + stage);
                 if (stage == ShrinkMeasureStage.Probed) TxtEstimateNote.Text = Say("main.estimate.calibrating");
                 return true;
             }, cts.Token);
@@ -3104,6 +3109,7 @@ public partial class MainWindow : Window
         {
             if (ReferenceEquals(_probeCts, cts)) _probeCts = null;
             cts.Dispose();
+            if (ReferenceEquals(_info, info)) _preview?.ErtelenenPlaniUygula();
         }
     }
 

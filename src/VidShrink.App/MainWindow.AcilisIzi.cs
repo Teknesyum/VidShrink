@@ -124,6 +124,35 @@ public partial class MainWindow
         Opened += acildi;
     }
 
+    internal Action AcilisGoruntusu { get; set; } = Program.AcilisGoruntusuGeldi;
+
+    internal Action<Action>? BoyaSonrasi { get; set; }
+
+    private void IkiCerceveSonra(Action sonra) => RequestAnimationFrame(_ => RequestAnimationFrame(_ => sonra()));
+
+    internal void AcilisGoruntusunuBildir()
+    {
+        if (_startupFile is not null)
+        {
+            Action? ilk = null;
+            ilk = () =>
+            {
+                Player.IlkKareCizildi -= ilk;
+                AcilisGoruntusu();
+            };
+            Player.IlkKareCizildi += ilk;
+            return;
+        }
+
+        EventHandler? acildi = null;
+        acildi = (_, _) =>
+        {
+            Opened -= acildi;
+            (BoyaSonrasi ?? IkiCerceveSonra)(() => AcilisGoruntusu());
+        };
+        Opened += acildi;
+    }
+
     private async Task CizimiOlcAsync(bool panelAsamasi)
     {
         var kip = Environment.GetEnvironmentVariable(AcilisIzi.CizimDegiskeni);
