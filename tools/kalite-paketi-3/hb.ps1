@@ -465,6 +465,27 @@ function TavanBekci {
                 Remove-Item $u.Dosya
             }
         }
+        $sinirMb = [math]::Round($kbit * 1000 * ($b.Sure + 1) / 8 / 1MB, 4)
+        $ortaMb = [math]::Round($kbit * 1000 * $b.Sure / 8 / 1MB, 4)
+        foreach ($kodek in @('libx264', 'libx265')) {
+            foreach ($tepe in @($true, $false)) {
+                $kol = if ($tepe) { "ham-$kodek-tepe-esit" } else { "negatif-ham-$kodek-tepe-serbest" }
+                Dene $Kesit $kol $kbit {
+                    $c = Join-Path $Cikti "tavanbekci-$Kesit-$kbit-$kol.mp4"
+                    $a = @('-c:v', $kodek, '-preset', 'slow', '-b:v', "${kbit}k", '-pix_fmt', 'yuv420p')
+                    if ($tepe) { $a += @('-maxrate', "${kbit}k", '-bufsize', "${kbit}k") }
+                    if ($kodek -eq 'libx265') { $a += @('-x265-params', 'log-level=error') }
+                    $r = Gecisli $girdi $c $a @() @('-movflags', '+faststart')
+                    $mbD = [math]::Round((Get-Item $c).Length / 1MB, 4)
+                    $vk = & ffprobe -v error -select_streams v:0 -show_entries stream=bit_rate -of csv=p=0 $c
+                    $vKbps = if ($vk -match '^\d+') { [math]::Round([double]$Matches[0] / 1000, 1) } else { $null }
+                    $s = [ordered]@{ kodek = $kodek; tepe_esit = $tepe; mb = $mbD; ortalama_mb = $ortaMb; sinir_mb = $sinirMb; video_kbps_ffprobe = $vKbps; oran = [math]::Round($mbD / $ortaMb, 4); kodlama_sn = $r.Sn; uyari = $r.Uyari2 }
+                    $s.kabul = if ($tepe) { if ($mbD -le $sinirMb) { 'gecti: K x (T+1) icinde' } else { "kaldi: $mbD > $sinirMb" } } else { if ($mbD -gt $sinirMb) { "negatif gosterdi: $mbD > $sinirMb" } else { 'negatif sinirda kaldi: bu icerikte tepe serbest de tasmiyor' } }
+                    Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; istenen_kbit = $kbit }) $null $s
+                    Remove-Item $c
+                }
+            }
+        }
     }
 }
 

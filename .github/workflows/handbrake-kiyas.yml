@@ -83,7 +83,7 @@ jobs:
             ekranbant = @('ekran')
             svtara = @('karanlik', 'rampa')
             svtbekci = @('rampa', 'karanlik')
-            tavanbekci = @('rampa')
+            tavanbekci = @('rampa', 'hareketli')
             svtbant = @('karanlik', 'parlak', 'hareketli', 'ekran')
             turboilk = @('karanlik', 'hareketli')
             socialkodek = @('parlak', 'karanlik', 'hareketli')
