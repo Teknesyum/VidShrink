@@ -40,6 +40,7 @@ public sealed class HipersurusTests
         }
 
         Assert.DoesNotContain("<PublishAot>true</PublishAot>", uygulama, StringComparison.Ordinal);
+        Assert.Contains("<PropertyGroup Condition=\"'$(RuntimeIdentifier)' == 'win-x64'\">\r\n    <PublishReadyToRunComposite>true</PublishReadyToRunComposite>", uygulama.ReplaceLineEndings("\r\n"), StringComparison.Ordinal);
     }
 
     /// <summary>

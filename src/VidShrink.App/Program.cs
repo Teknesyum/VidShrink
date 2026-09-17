@@ -170,32 +170,51 @@ internal static class Program
     /// <summary>
     /// Çift tık uygulamayı doğrudan açtığında başlatıcının bakımını arkada başlatır. Karar
     /// <see cref="LauncherUpdate.MaintenanceLauncher"/>'da; başlatıcının doğurduğu uygulamada,
-    /// kurulu düzen dışında ve eski başlatıcıda hiçbir şey açılmaz. Açılışı beklemez.
+    /// kurulu düzen dışında ve eski başlatıcıda hiçbir şey açılmaz. Açılışı bekletmez; ilk
+    /// görüntüyü bekler, sonra düşük öncelikle doğar.
     /// </summary>
     internal static Task StartLauncherMaintenance()
-        => Task.Run(() =>
-        {
-            try
-            {
-                var launcher = LauncherUpdate.MaintenanceLauncher(
-                    AppContext.BaseDirectory,
-                    Environment.GetEnvironmentVariable(LauncherUpdate.LaunchedVariable),
-                    UpdateCheck.CurrentVersion(),
-                    FileVersionOf);
-                if (launcher is null) return;
+        => BakimiErteleAsync(AcilisBitti.Task, BakimYedekBeklemesi, BaslaticiyiBakimIcinAc);
 
-                var start = new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = launcher,
-                    WorkingDirectory = Path.GetDirectoryName(launcher) ?? "",
-                    UseShellExecute = false
-                };
-                start.ArgumentList.Add(LauncherUpdate.MaintenanceArgument);
-                System.Diagnostics.Process.Start(start)?.Dispose();
-                AcilisIzi.Yaz("bakim-basladi");
-            }
-            catch (Exception) { }
-        });
+    internal static readonly TaskCompletionSource AcilisBitti = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    internal static readonly TimeSpan BakimYedekBeklemesi = TimeSpan.FromSeconds(5);
+
+    internal static void AcilisGoruntusuGeldi() => AcilisBitti.TrySetResult();
+
+    internal static async Task<bool> BakimiErteleAsync(Task acilis, TimeSpan yedek, Func<bool> baslat)
+    {
+        await Task.WhenAny(acilis, Task.Delay(yedek)).ConfigureAwait(false);
+        return await Task.Run(() =>
+        {
+            try { return baslat(); }
+            catch (Exception) { return false; }
+        }).ConfigureAwait(false);
+    }
+
+    private static bool BaslaticiyiBakimIcinAc()
+    {
+        var launcher = LauncherUpdate.MaintenanceLauncher(
+            AppContext.BaseDirectory,
+            Environment.GetEnvironmentVariable(LauncherUpdate.LaunchedVariable),
+            UpdateCheck.CurrentVersion(),
+            FileVersionOf);
+        if (launcher is null) return false;
+
+        var start = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = launcher,
+            WorkingDirectory = Path.GetDirectoryName(launcher) ?? "",
+            UseShellExecute = false
+        };
+        start.ArgumentList.Add(LauncherUpdate.MaintenanceArgument);
+        using var surec = System.Diagnostics.Process.Start(start);
+        if (surec is null) return false;
+        try { surec.PriorityClass = System.Diagnostics.ProcessPriorityClass.BelowNormal; }
+        catch (Exception) { }
+        AcilisIzi.Yaz("bakim-basladi");
+        return true;
+    }
 
     private static string? FileVersionOf(string path)
         => System.Diagnostics.FileVersionInfo.GetVersionInfo(path).ProductVersion;

@@ -36,6 +36,8 @@ internal partial class PlayerView : UserControl
     private long _drawn;
 
     internal long DrawnFrames => _drawn;
+
+    internal event Action? IlkKareCizildi;
     private string? _path;
     private bool _playing;
     private DispatcherTimer? _pauseFlash;
@@ -743,7 +745,7 @@ internal partial class PlayerView : UserControl
             Resize();
         }
         Frame.InvalidateVisual();
-        _drawn++;
+        if (_drawn++ == 0) IlkKareCizildi?.Invoke();
         TxtEmpty.IsVisible = false;
         RefreshState();
     }
