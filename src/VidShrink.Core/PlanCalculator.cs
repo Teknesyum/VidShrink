@@ -330,7 +330,7 @@ public static class PlanCalculator
             }
         }
 
-        var darkSwitch = DarkContentSwitch.Applies(options.Codec, lockedCodec, regime, codec, complexity.MeanLuma)
+        var darkSwitch = DarkContentSwitch.Applies(options.Codec, lockedCodec, regime, codec, complexity.MeanLuma, DarkContentSwitch.IsHdrSource(info))
                          && DarkCodecUsable(availability, probe);
         if (darkSwitch)
         {
@@ -771,7 +771,7 @@ public static class PlanCalculator
             : null;
 
         var estimate = Estimate(plan, info, complexity);
-        var advice = new StrategyAdvice(regime, ratio, PickCodec(suggestedPreference, availability), suggestedPreference, best.Score, notes);
+        var advice = new StrategyAdvice(regime, ratio, SuggestedCodec(info, regime, suggestedPreference, availability, complexity.MeanLuma), suggestedPreference, best.Score, notes);
         return new PlanResult(plan, estimate, best.Score, complexity, advice);
     }
 
@@ -862,7 +862,7 @@ public static class PlanCalculator
 
         notes.Add(AdviceCode.BudgetIsGenerous);
         var estimate = new SizeEstimate(info.FileSizeMb, info.FileSizeMb, info.FileSizeMb, complexity.Measured, true);
-        var advice = new StrategyAdvice(regime, ratio, PickCodec(suggestedPreference, availability), suggestedPreference, SourceQualityScore, notes);
+        var advice = new StrategyAdvice(regime, ratio, SuggestedCodec(info, regime, suggestedPreference, availability, complexity.MeanLuma), suggestedPreference, SourceQualityScore, notes);
         return new PlanResult(plan, estimate, SourceQualityScore, complexity, advice);
     }
 
@@ -1502,6 +1502,15 @@ public static class PlanCalculator
 
     private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability)
         => PickCodec(pref, availability, null);
+
+    private static string SuggestedCodec(MediaInfo info, CompressionRegime regime, CodecPreference suggestedPreference, IEncoderAvailability? availability, double? meanLuma)
+    {
+        var suggested = PickCodec(suggestedPreference, availability);
+        return DarkContentSwitch.Applies(CodecPreference.Auto, null, regime, suggested, meanLuma, DarkContentSwitch.IsHdrSource(info))
+               && DarkCodecUsable(availability, new ProbeState())
+            ? DarkContentSwitch.Codec
+            : suggested;
+    }
 
     private static bool DarkCodecUsable(IEncoderAvailability? availability, ProbeState probe)
     {

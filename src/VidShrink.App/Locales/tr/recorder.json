@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg {0} koduyla bitti.",
   "recorder.error.no-ffmpeg": "{0} bulunamadı.",
   "recorder.error.invalid": "Bu ayarlar kayda izin vermiyor: {0}",
+  "recorder.error.window-wayland": "Wayland oturumunda pencere kaydı desteklenmiyor; ekran ya da bölge seç veya X11 oturumuyla giriş yap.",
+  "recorder.error.window-missing": "\"{0}\" penceresi bulunamadı; listeyi yenileyip yeniden seç.",
   "recorder.error.number": "{0} bir sayı olmalı.",
   "recorder.error.start": "Kayıt başlatılamadı: {0}",
   "recorder.error.folder": "Klasör seçilemedi: {0}",
