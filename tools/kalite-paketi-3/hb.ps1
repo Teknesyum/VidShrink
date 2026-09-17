@@ -1422,10 +1422,10 @@ function Filtre {
 
     $dv = Join-Path $Cikti 'filtre-belirsiz.dv'
     $dref = Join-Path $Cikti 'filtre-belirsiz-ref.mkv'
-    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', 'scale=720:576,setsar=1,tinterlace=mode=interleave_top,setfield=tff,format=yuv420p', '-c:v', 'dvvideo', '-pix_fmt', 'yuv420p', $dv)
+    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', 'scale=720:576,setsar=1,fps=50,tinterlace=mode=interleave_top,setfield=tff,format=yuv420p', '-c:v', 'dvvideo', '-pix_fmt', 'yuv420p', $dv)
     $dalan = (& ffprobe -v error -select_streams v:0 -show_entries stream=field_order -of csv=p=0 $dv | Out-String).Trim()
     $db = Probe $dv
-    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', "scale=720:576,setsar=1,select=not(mod(n\,2)),fps=$($db.FpsMetin)", '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-pix_fmt', 'yuv420p', $dref)
+    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', 'scale=720:576,setsar=1,fps=50,select=not(mod(n\,2)),fps=25', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-pix_fmt', 'yuv420p', $dref)
     $dmb = [math]::Round($kbit * $db.Sure / 8 / 1024, 4)
     foreach ($kol in @('kapali', 'otomatik')) {
         Dene $Kesit "belirsiz-$kol" $kbit { FiltreSatir "belirsiz-$kol" 1 $dv $dref $dmb $kbit $kollar[$kol] }
