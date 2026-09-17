@@ -511,5 +511,15 @@
   "main.player.speed": "வேகம் {0}×",
   "main.player.loopstate": "A-B {0} - {1} வி",
   "main.player.loopoff": "A-B முடக்கம்",
-  "main.player.bookmarkcount": "புத்தகக்குறிகள் {0}"
+  "main.player.bookmarkcount": "புத்தகக்குறிகள் {0}",
+  "main.unit.mb": "MB",
+  "main.unit.mb-value": "{0} MB",
+  "main.unit.mb-range": "{0} - {1} MB",
+  "main.unit.kbps-value": "{0} kbps",
+  "main.unit.fps-value": "{0} FPS",
+  "main.unit.k-value": "{0}k",
+  "main.unit.score-suffix": "/100",
+  "main.unit.score-value": "{0}/100",
+  "main.plan.ai": "AI",
+  "main.plan.mode.crf-value": "CRF {0}"
 }

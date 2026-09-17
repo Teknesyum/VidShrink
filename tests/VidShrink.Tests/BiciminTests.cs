@@ -447,6 +447,63 @@ public sealed class KareYerlesimTests
         Assert.DoesNotContain(yabanci, satir);
     }
 
+    /// <summary>
+    /// S9: birim ve kısaltmalar (MB, /100, CRF, AI, FPS, kbps) dil dosyasından gelir. Fransızca
+    /// "Mo" ve "IA", Rusça "МБ" ve "ИИ" yazar; gerçek yükleme yolundan okunur, İngilizce
+    /// sabit ("MB", "AI") o dillerde görünmez.
+    /// </summary>
+    [Theory]
+    [InlineData("en", "MB", "AI")]
+    [InlineData("fr", "Mo", "IA")]
+    [InlineData("ru", "МБ", "ИИ")]
+    public void BirimlerDilDosyasindanGelir(string dil, string mb, string ai)
+    {
+        var okunan = Yuklu(dil, window =>
+        {
+            var hedef = Named<TextBox>(window, "TxtTarget");
+            var hedefIzgara = ((Grid)hedef.Parent!).Children;
+            var hedefBirimi = (hedefIzgara[hedefIzgara.IndexOf(hedef) + 1] as TextBlock)?.Text ?? "";
+            var kalite = Named<TextBox>(window, "TxtQualityTarget");
+            var kaliteIzgara = ((Grid)kalite.Parent!).Children;
+            var kaliteBirimi = (kaliteIzgara[kaliteIzgara.IndexOf(kalite) + 1] as TextBlock)?.Text ?? "";
+            var kip = (window.FindControl<ComboBox>("CmbQualityMode")!.Items[0] as ComboBoxItem)?.Content?.ToString() ?? "";
+            var plan = string.Join(" | ", window.FindControl<Grid>("PlanFacts")!.Children.OfType<TextBlock>().Select(t => t.Text));
+            return (hedefBirimi, kaliteBirimi, kip,
+                boyut: Named<TextBlock>(window, "TxtSize").Text ?? "",
+                hiz: Named<TextBlock>(window, "TxtBitrate").Text ?? "",
+                aralik: Named<TextBlock>(window, "TxtEstimateRange").Text ?? "",
+                not: Named<TextBlock>(window, "TxtEstimateNote").Text ?? "",
+                plan);
+        });
+
+        Strings.Use(dil);
+        try
+        {
+            var kanit = Path.Combine(GirdiKanit.Root, ".calisma", "s9-birimler");
+            Directory.CreateDirectory(kanit);
+            File.WriteAllText(Path.Combine(kanit, dil + ".txt"), okunan.ToString());
+
+            Assert.Equal(ai, Strings.Get("main.plan.ai"));
+            Assert.Equal(mb, okunan.hedefBirimi);
+            Assert.EndsWith(" " + mb, okunan.boyut);
+            Assert.EndsWith(" " + mb, okunan.aralik.Split(" · ")[0]);
+            Assert.Equal(Strings.Get("main.unit.score-suffix"), okunan.kaliteBirimi);
+            Assert.EndsWith("/100", okunan.not);
+            Assert.Equal(Strings.Get("main.advanced.mode.crf"), okunan.kip);
+            Assert.Equal(Strings.Get("main.unit.kbps-value", okunan.hiz.Split(' ')[0]), okunan.hiz);
+            Assert.Contains(Strings.Get("main.unit.fps-value", ""), okunan.plan);
+            if (dil != "en")
+            {
+                Assert.DoesNotContain(" MB", okunan.boyut + okunan.aralik + okunan.plan);
+                Assert.NotEqual("MB", okunan.hedefBirimi);
+            }
+        }
+        finally
+        {
+            Strings.Use("en");
+        }
+    }
+
     [Fact]
     public void TuretmeSatiriHedefKutusunuIzler()
     {
@@ -549,7 +606,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1440, toplam);
+        Assert.Equal(1442, toplam);
         Assert.Equal(166, dilBasina["en"]);
         Assert.Equal(59, dilBasina["tr"]);
     }
@@ -601,7 +658,7 @@ public sealed class BaslikKapsamiTests
     /// HandBrake 1c dalgasi main.advanced.keep-tracks.label'i ekledi: 43 x 742 = 31906'dan 43 x 743 = 31949'a;
     /// iz kararlarinin sekiz gerekce notu (main.reason.stream.*) 43 x 751 = 32293'e, kol degistiren toplami 1218'den 1260'a (en 139'dan 143'e, tr 52'den 56'ya). Birlesik: gezilen 33067, toplam 1295 (en 152, tr 58).
     /// Paket 2 kaydedicisi 80 recorder.* anahtari ekledi (Basit/Gelismis, geri sayim, cerceve, tepsi, kisayol, girdi gosterimi, webcam, buyutec ve gelismis panelin on kolu): 43 x 80 = 3440, gezilen 36507; kol degistiren toplami 1406 (en 160, tr 59).
-    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). P3 menunun sekmeye goturen satirini kaldirinca main.player.menu.settings-all dustu: 43 x 1 = 43, gezilen 37496; kol degistiren toplami 1440 (pt settings-all gitti; en 166, tr 59).</para>
+    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). P3 menunun sekmeye goturen satirini kaldirinca main.player.menu.settings-all dustu: 43 x 1 = 43, gezilen 37496; kol degistiren toplami 1440 (pt settings-all gitti; en 166, tr 59). S9 on birim anahtari ekledi (main.unit.*, main.plan.ai, main.plan.mode.crf-value): 43 x 10 = 430, gezilen 37926; kol degistiren toplami 1442 (de ve nb main.plan.ai KI; en 166, tr 59).</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -629,7 +686,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(37496, gezilen);
+        Assert.Equal(37926, gezilen);
         Assert.Empty(kayip);
     }
 

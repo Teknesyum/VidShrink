@@ -511,5 +511,15 @@
   "main.player.speed": "швидкість {0}×",
   "main.player.loopstate": "A-B {0} - {1} с",
   "main.player.loopoff": "A-B вимкнено",
-  "main.player.bookmarkcount": "закладки {0}"
+  "main.player.bookmarkcount": "закладки {0}",
+  "main.unit.mb": "МБ",
+  "main.unit.mb-value": "{0} МБ",
+  "main.unit.mb-range": "{0} - {1} МБ",
+  "main.unit.kbps-value": "{0} kbps",
+  "main.unit.fps-value": "{0} FPS",
+  "main.unit.k-value": "{0}k",
+  "main.unit.score-suffix": "/100",
+  "main.unit.score-value": "{0}/100",
+  "main.plan.ai": "ШІ",
+  "main.plan.mode.crf-value": "CRF {0}"
 }

@@ -511,5 +511,15 @@
   "main.player.speed": "السرعة {0}×",
   "main.player.loopstate": "A-B {0} - {1} ث",
   "main.player.loopoff": "A-B معطل",
-  "main.player.bookmarkcount": "العلامات {0}"
+  "main.player.bookmarkcount": "العلامات {0}",
+  "main.unit.mb": "م.ب",
+  "main.unit.mb-value": "{0} م.ب",
+  "main.unit.mb-range": "{0} - {1} م.ب",
+  "main.unit.kbps-value": "{0} kbps",
+  "main.unit.fps-value": "{0} FPS",
+  "main.unit.k-value": "{0}k",
+  "main.unit.score-suffix": "/100",
+  "main.unit.score-value": "{0}/100",
+  "main.plan.ai": "الذكاء الاصطناعي",
+  "main.plan.mode.crf-value": "CRF {0}"
 }

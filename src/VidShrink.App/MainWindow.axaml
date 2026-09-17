@@ -283,7 +283,7 @@
                           ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceMd}">
                       <Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="16" VerticalAlignment="Center"/>
                       <TextBox x:Name="TxtTarget" Grid.Column="1" Text="16" Width="96" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
-                      <TextBlock Grid.Column="2" Text="MB" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="2" Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     <!--
                       T46/K1: yonga yalnız sayıyı gösterir. Açıklamanın tek yeri balondur ve
                       balonun ilk satırı yonganın eski etiketidir — etiket ekrandan kalktı,
@@ -366,7 +366,7 @@
                       <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
                       <Slider x:Name="SliderQualityTarget" Grid.Row="3" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
                       <TextBox x:Name="TxtQualityTarget" Grid.Row="3" Grid.Column="1" Text="60" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
-                      <TextBlock Grid.Row="3" Grid.Column="2" Text="/100" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Row="3" Grid.Column="2" Text="{loc:Text main.unit.score-suffix}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       <TextBlock x:Name="TxtQualityTargetNotice" Grid.Row="4" Grid.ColumnSpan="3" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </Grid>
                     <Border Theme="{StaticResource PanelRule}"/>
@@ -864,7 +864,7 @@
                         </Button>
                       </StackPanel>
                       <ComboBox x:Name="CmbQualityMode" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="CRF"/>
+                        <ComboBoxItem Content="{loc:Text main.advanced.mode.crf}"/>
                         <ComboBoxItem Content="{loc:Text main.convert.fixed-bitrate}"/>
                       </ComboBox>
                     </StackPanel>
