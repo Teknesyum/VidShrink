@@ -46,8 +46,9 @@ Düzenek: `tools/butce-doldur/kos.ps1`; `VidShrink.Bench shrink <kesit> <mb> --s
 
 ## Aday 1 Sonucu: Kapı Kaldı
 
-Tüm kodek yolları, 32 hücre (26 NVENC + 6 yazılım), toplam kodlama 578,9 sn. Önce kolu nvenc-2 sayılarını yeniden üretti
-(ör. hareketli av1 1000 −11,07 / 3 deneme / 87,81).
+Tüm kodek yolları, 32 hücre (26 NVENC + 6 yazılım), toplam kodlama 578,9 sn. Önce kolu nvenc-2 ortalamalarını yeniden üretti
+(ör. hareketli av1 1000 −11,07 / 3 deneme / 87,81). Tavan bekçisi yolundan geçen üç derin-alt hücre (hareketli hevc 1000,
+parlak av1 1000, parlak hevc 1000) nvenc-2 değerlerini tek tek yeniden üretmedi; bu hücrelerde sapma 1-4 puan daha derin ölçüldü.
 
 | Küme | n | K1 ≥ %97 (önce → sonra) | K2 en büyük sapma | K3 Δdeneme | K4 ΔVMAF-NEG ort / p10 | Ort sapma önce → sonra |
 |---|---|---|---|---|---|---|

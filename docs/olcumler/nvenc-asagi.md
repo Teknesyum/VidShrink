@@ -1,6 +1,6 @@
 # NVENC Aşağı Deneme: Yüksek İlk Nişan, Aşınca Bir Aşağı
 
-Dal: `t0/nvenc-asagi` (`origin/main` 0bc86188 üstü). Karar: `fable-kararlar-2026-09-17.md` soru 2, aday 3.
+Dal: `t0/nvenc-asagi` (`origin/main` 0bc86188 üstü). Karar: `docs/danisma/2026-09-17-fable-kararlar.md` soru 2, aday 3.
 Önceki iş: `butce-doldur.md` (aday 1 kaldı, aday 2 yalnız yazılımda kaldı), hücreler `nvenc-2.md`.
 
 ## Kural (Ölçümden Önce Yazıldı)
@@ -18,9 +18,9 @@ sırayla, makinede her an tek ffmpeg. Düzenek `tools/butce-doldur/kos.ps1`.
 
 | Kapı | Küme | Koşul |
 |---|---|---|
-| K1 dolum | 26 hücre | sonra kolunda ortalama teslim/hedef sapması ≥ −%2,5 (nvenc-2'de −%4,8) |
+| K1 dolum | 26 hücre | sonra kolunda ortalama teslim/hedef sapması ≥ −%2,5 (bu 26 hücrede önce kolu −%6,47; nvenc-2'nin 38 hücre ortalaması −%4,8) |
 | K2 taşma | 26 + tutma | sonra kolunda hiçbir teslim hedefi aşmaz |
-| K3 deneme | 26 hücre | sonra kolunda ortalama deneme ≤ 2,0 |
+| K3 deneme | 26 hücre | sonra kolunda ortalama deneme ≤ 2,0. Ölçülen 2,04, yani iki hücrelik (51 → 53 deneme) fark; tek başına gürültü genişliğinde, hüküm K1/K4/K5'e dayanıyor |
 | K4 kalite | 26 + tutma | hiçbir hücrede sonra VMAF-NEG ort − önce VMAF-NEG ort < −0,3 değil |
 | K5 tutma dolum | tutma | sonra ortalama sapma ≥ önce ortalama sapma |
 | K6 negatif | yazılım | libx264 `parlak` 1000 ve libx265 `orta` 2000 çıktıları önce/sonra md5 aynı |
