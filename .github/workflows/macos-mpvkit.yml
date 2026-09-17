@@ -1,0 +1,85 @@
+name: macOS MPVKit libmpv
+
+on:
+  push:
+    branches: [t0/macos-mpvkit]
+  workflow_dispatch:
+
+jobs:
+  mpvkit:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            rid: osx-arm64
+          - os: macos-14
+            rid: osx-arm64
+          - os: macos-15-intel
+            rid: osx-x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: '1'
+      HOMEBREW_NO_INSTALL_CLEANUP: '1'
+      HOMEBREW_NO_ENV_HINTS: '1'
+      DOTNET_NOLOGO: '1'
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Runner
+        run: |
+          sw_vers
+          uname -m
+          xcrun --show-sdk-version
+          clang --version | head -n1
+
+      - name: MPVKit download, minos/lipo, link
+        run: bash tools/mpvkit-macos/mpvkit-macos.sh tools/mpvkit-macos/mpvkit-1.0.0.lock "$RUNNER_TEMP/mpvkit" out
+
+      - name: License evidence
+        run: |
+          set -euo pipefail
+          strings out/libmpv.2.dylib | grep -E -- '-Dgpl=|--enable-gpl|--enable-version3|--enable-nonfree' | head -n 5 || echo "(no configure string)"
+          strings out/libmpv.2.dylib | grep -oE 'mpv v?[0-9]+\.[0-9]+\.[0-9][^ ]*' | head -n 2 || true
+
+      - name: ffmpeg for test clips
+        run: brew install ffmpeg
+
+      - name: Smoke with the MPVKit libmpv
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc2=size=640x360:rate=30 -t 3 -c:v libx264 -pix_fmt yuv420p -y clip.mp4
+          dotnet publish tools/VidShrink.MpvSmoke/VidShrink.MpvSmoke.csproj -c Release -r ${{ matrix.rid }} --self-contained -o smoke
+          DYLD_PRINT_LIBRARIES=1 ./smoke/VidShrink.MpvSmoke --lib out/libmpv.2.dylib --file clip.mp4 --timeout 30 > out/smoke.txt 2> out/dyld.txt || true
+          cat out/smoke.txt
+          echo "dyld images from-homebrew=$(grep -cE '/opt/homebrew|/usr/local' out/dyld.txt || true) libmpv=$(grep -c 'out/libmpv.2.dylib' out/dyld.txt || true)"
+          grep -q 'smoke: PASS' out/smoke.txt
+
+      - name: Player engine tests with the MPVKit libmpv
+        run: |
+          set -euo pipefail
+          export VIDSHRINK_LIBMPV="$GITHUB_WORKSPACE/out/libmpv.2.dylib"
+          dotnet build tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release -m:2
+          dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --no-build \
+            --filter "FullyQualifiedName~OynaticiMotorTests.BassizOrtamdaKareCozulur|FullyQualifiedName~OynaticiMotorTests.BozukDosyaAcilistaHataVerir" \
+            --logger "console;verbosity=normal" | tee out/test.txt
+          grep -E 'Passed!|Failed!' out/test.txt
+          find . -path '*MotorKanit*' -name 'k1-bassiz-kare.txt' -exec cat {} \; 2>/dev/null || find . -name 'k1-bassiz-kare.txt' -exec cat {} \;
+
+      - name: Verdict
+        run: |
+          cat out/verdict.txt
+          grep -q 'fail=0' out/verdict.txt
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mpvkit-${{ matrix.os }}
+          path: out/
+          if-no-files-found: ignore
