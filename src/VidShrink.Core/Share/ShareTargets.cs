@@ -1,4 +1,5 @@
-using System.Text.Json;
+﻿using System.Text.Json;
+using VidShrink.Core;
 using System.Text.Json.Serialization;
 
 namespace VidShrink.Core.Share;
@@ -110,7 +111,7 @@ public sealed record ShareTargetTable
             .FirstOrDefault();
 
     public static ShareTargetTable Parse(string json) =>
-        JsonSerializer.Deserialize<ShareTargetTable>(json, Options) ?? new ShareTargetTable();
+        JsonSerializer.Deserialize(json, GevsekJson.Default.ShareTargetTable) ?? new ShareTargetTable();
 
     /// <summary>
     /// Tabloyu diskten okur. Yol verilmezse <see cref="Locate"/> ile aranır.

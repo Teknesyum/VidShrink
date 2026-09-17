@@ -817,3 +817,36 @@ Dal `t0/hb-1c-akis`.
 6. App: gelişmiş ses bölümünde "İzleri koru" kutusu (42 dil), çıktı uzantısı plandan, platform çipi bayrağı.
 7. Test `StreamMappingTests.cs`: ffmpeg ile 3 sn girdi (2 ses + srt + PGS + 2 bölüm + başlık/tarih; ayrıca
    dönük MP4), çıktı ffprobe ile okunur; çok izli girdide hedef isabeti; her kolun negatif kontrolü.
+
+# AOT Dalgası — Üç Engel
+
+Dal `t0/aot-dalga`, taban `a721f6c0` (hipersürüş H birleşmiş; dosyayla ilk kare ≈595 ms,
+`docs/olcumler/hipersurus-h.md`). Teorik sınır ≈200 ms; H4 üç AOT engelini ad ve satırla
+listeledi, bu dalga onları ölçüp kaldırıyor. Ölçüm düzeneği değişmiyor:
+`tools/acilis-hizi/EkranSaati`, eşleşik sıcak kip, HKCU `KayitKalkani` ile kovana yönlü.
+
+1. **JSON kaynak üretimi.** Yansımalı serileştirme yedi çağrıda (`PlanParser`,
+   `PresignedUploadProvider`, `ShareResult` ×2, `ShareTargets`, `SingleInstanceChannel` ×2,
+   `WatchFolder`, `PresetLibrary`) ve uygulamada `Strings.cs:347` ile `Cli/CliText.cs:39`.
+   Açılış yolunda olan ikisi: dil kataloğu (`Dictionary<string,string>`) ve tek örnek
+   kanalı (`string[]`). `JsonSerializerContext` kısmi sınıfları Core ve App'e girer,
+   çağrılar üretilen `JsonTypeInfo`'yu alır. Ayar dosyaları `JsonNode` okuyor, onlar
+   yansımasız; dokunulmuyor.
+2. **Yansımalı bağlama.** `Localization/Text.cs:56` ve
+   `Integration/DefaultAppSuggestionBar.cs:91` `new Binding("Value")` kuruyor; XAML'de
+   `loc:Text` 493 yerde. Her bağ kurulurken `LocalizedText` üzerinde özellik yansımayla
+   aranıyor. `LocalizedText` doğrudan `IBinding` olur ve `InstancedBinding.OneWay` ile
+   kendi gözlenebilirini verir; yansıma kalmaz. `AvaloniaUseCompiledBindingsByDefault`
+   zaten açık, kalan tek yansımalı yol burası.
+3. **Palet ve kaynak yükleme.** `App.axaml` açılışta beş `ResourceInclude` birleştiriyor:
+   Palette/Neon, Theme, Icons, Playback, Recorder. `PaletteCatalog.Use` C3'ten beri
+   yürürlükteki palet istenince hiç iş yapmıyor, yani varsayılan temada çalışma anı palet
+   ayrıştırması yok; ölçülecek olan bu beş sözlüğün açılış payı. Kaydedici görünümü E'den
+   beri tembel olduğu halde `Recorder.axaml` açılışta okunuyor — ilk aday.
+
+Trim/AOT anahtarları **ölçerek** karar verilir, tahminle değil: `InvariantGlobalization`
+Türkçe sayı biçimini ve 42 dilin katalog sıralamasını etkiler, `PublishTrimmed` Avalonia
+yansımasıyla çakışabilir. Tam NativeAOT için `DOTNET_STARTUP_HOOKS` yokluğu ölçüm
+düzeneğini de bozuyor (H4); fizibilite fable'a sorulur.
+
+Her adımdan sonra eşleşik ölçüm tekrarlanır; kazancı ölçülmeyen değişiklik dalda kalmaz.

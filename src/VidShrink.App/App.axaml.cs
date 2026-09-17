@@ -39,7 +39,17 @@ public partial class App : Application
         _queue = queue;
     }
 
-    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+    /// <summary>
+    /// <c>App.axaml</c>'ı açar: kaynak sözlükleri, FluentTheme ve <c>Controls.axaml</c>.
+    /// İşaret <c>cerceve</c>'den önce düşüyor, yani Avalonia'nın kendi kuruluşuyla
+    /// biçimlemenin payı ayrı okunabiliyor; taban ölçümünde ikisi tek aralıktaydı.
+    /// </summary>
+    public override void Initialize()
+    {
+        AcilisIzi.Yaz("app-init");
+        AvaloniaXamlLoader.Load(this);
+        AcilisIzi.Yaz("app-xaml");
+    }
 
     public override void OnFrameworkInitializationCompleted()
     {

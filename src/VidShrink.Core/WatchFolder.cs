@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -158,7 +158,7 @@ public sealed class WatchFolder
         if (!fs.FileExists(statePath)) return new WatchStateLoad(new WatchState(), null);
         try
         {
-            var state = JsonSerializer.Deserialize<WatchState>(fs.ReadAllText(statePath), JsonOptions);
+            var state = JsonSerializer.Deserialize(fs.ReadAllText(statePath), IzlemeJson.Default.WatchState);
             if (state?.Processed is null || state.Processed.Any(e => e is null || string.IsNullOrWhiteSpace(e.Name)))
                 throw new JsonException("invalid state");
             return new WatchStateLoad(state, null);
@@ -172,7 +172,7 @@ public sealed class WatchFolder
         }
     }
 
-    public static string Serialize(WatchState state) => JsonSerializer.Serialize(state, JsonOptions);
+    public static string Serialize(WatchState state) => JsonSerializer.Serialize(state, IzlemeJson.Default.WatchState);
 
     public bool IsProcessed(string path, long length)
     {

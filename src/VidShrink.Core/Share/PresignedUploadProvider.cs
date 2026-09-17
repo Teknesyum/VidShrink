@@ -1,6 +1,7 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace VidShrink.Core.Share;
 
@@ -68,7 +69,7 @@ public sealed class PresignedUploadProvider : IShareProvider
             var days = ClampRetention(retentionDays);
 
             step = "init";
-            var initBody = new Dictionary<string, object>
+            var initBody = new JsonObject
             {
                 ["filename"] = name,
                 ["size"] = size,
@@ -106,7 +107,7 @@ public sealed class PresignedUploadProvider : IShareProvider
             }
 
             step = "confirm";
-            var confirmBody = new Dictionary<string, object>
+            var confirmBody = new JsonObject
             {
                 ["r2_key"] = key,
                 ["filename"] = name,
@@ -195,11 +196,17 @@ public sealed class PresignedUploadProvider : IShareProvider
         return options.Count == 0 || options.Contains(days) ? days : fallback;
     }
 
-    private static HttpRequestMessage Json(HttpMethod method, string url, object body)
+    /// <summary>
+    /// Gövde <see cref="JsonObject"/> olarak kuruluyor: <c>Dictionary&lt;string, object&gt;</c>
+    /// serileştirilirken her değerin çalışma anı tipi yansımayla çözülüyordu ve AOT
+    /// çözümlemesi bunu IL2026/IL3050 ile işaretliyordu. Düğüm ağacı değerin tipini
+    /// zaten taşıyor; yazılan bayt aynı, anahtar sırası ekleme sırası.
+    /// </summary>
+    private static HttpRequestMessage Json(HttpMethod method, string url, JsonObject body)
     {
         var request = new HttpRequestMessage(method, url)
         {
-            Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json")
+            Content = new StringContent(body.ToJsonString(), Encoding.UTF8, "application/json")
         };
         request.Headers.TryAddWithoutValidation("Accept", "application/json");
         return ShareIdentity.Stamp(request);

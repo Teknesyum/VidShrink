@@ -344,7 +344,7 @@ public static class Strings
     {
         try
         {
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(stream)
+            return JsonSerializer.Deserialize(stream, CatalogJson.Default.DictionaryStringString)
                    ?? new Dictionary<string, string>(StringComparer.Ordinal);
         }
         catch (JsonException)

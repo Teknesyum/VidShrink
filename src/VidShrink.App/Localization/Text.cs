@@ -14,17 +14,34 @@ public sealed class LocalizedText : INotifyPropertyChanged
 {
     private static readonly Dictionary<string, LocalizedText> Known = new(StringComparer.Ordinal);
 
+    /// <summary>
+    /// <c>Value</c>'ya giden yol, tek bir kez kuruluyor. <see cref="CompiledBinding.Create{TIn,TOut}"/>
+    /// bir lambda ifadesini gezip yolu çıkarır; her bağ için ayrı kurulsa bu iş 493 kez
+    /// yapılırdı. Yol bir değer gibi taşınabildiği için kaynak bağ başına değişiyor, yol
+    /// değişmiyor.
+    /// </summary>
+    private static readonly CompiledBindingPath ValuePath =
+        CompiledBinding.Create<LocalizedText, string>(text => text.Value).Path!;
+
     private readonly string _key;
 
     private LocalizedText(string key)
     {
         _key = key;
         Strings.Changed += (_, _) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+        Binding = new CompiledBinding(ValuePath) { Source = this, Mode = BindingMode.OneWay };
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public string Value => LanguageCatalog.Display(Strings.Get(_key));
+
+    /// <summary>
+    /// Anahtarın bağı. <see cref="BindingBase"/> hedef başına kendi anlatımını kurduğu için
+    /// aynı nesne kaç öğeye verilirse verilsin yeter; anahtar başına bir tane tutulur ve
+    /// biçimleme aynı nesneyi kaç kez isterse alır.
+    /// </summary>
+    internal CompiledBinding Binding { get; }
 
     public static LocalizedText For(string key)
     {
@@ -41,6 +58,11 @@ public sealed class LocalizedText : INotifyPropertyChanged
 /// <summary>
 /// Biçimlemedeki <c>{loc:Text anahtar}</c>. Bir bağ döndürür, dolayısıyla dil değişince
 /// metin kendiliğinden yenilenir ve kimsenin görsel ağacı gezmesi gerekmez.
+///
+/// <para>Bağ derlenmiş bağdır, yansımalı değil: <c>new Binding("Value")</c> yol dizgesini
+/// çalışma anında ayrıştırıp özelliği yansımayla arıyordu ve biçimlemede 493 yerde
+/// kuruluyordu. AOT çözümlemesi bu çağrıyı IL2026/IL3050 ile işaretliyor
+/// (<c>docs/olcumler/hipersurus-h.md</c> H4).</para>
 /// </summary>
 public sealed class TextExtension
 {
@@ -52,12 +74,7 @@ public sealed class TextExtension
 
     public string Key { get; set; } = string.Empty;
 
-    public Binding ProvideValue(IServiceProvider provider)
-        => new(nameof(LocalizedText.Value))
-        {
-            Source = LocalizedText.For(Key),
-            Mode = BindingMode.OneWay
-        };
+    public BindingBase ProvideValue(IServiceProvider provider) => LocalizedText.For(Key).Binding;
 }
 
 /// <summary>

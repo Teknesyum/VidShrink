@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace VidShrink.Core;
@@ -32,7 +32,7 @@ public static class PlanParser
         EncodePlan? plan;
         try
         {
-            plan = JsonSerializer.Deserialize<EncodePlan>(json, JsonOptions);
+            plan = JsonSerializer.Deserialize(json, GevsekJson.Default.EncodePlan);
         }
         catch (JsonException ex)
         {
