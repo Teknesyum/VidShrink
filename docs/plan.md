@@ -19,6 +19,24 @@ Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 4
 3. **HandBrake çevirisi.** `HandBrakePresetImport`: taşınan/yaklaşık/düşen alan notları, `main.preset.handbrake.*`.
 4. **Testler.** `OnAyarKutuphanesiTests`, `KullaniciOnAyarTests`, `HandBrakeOnAyarCeviriTests`; her kol negatif kontrol
    ve mutasyon.
+# VideoToolbox Hızlı Kip — Plan Yolu
+
+Dal `t0/vt-hizli`. Karar: `fable-kararlar-2026-09-17.md` soru 1. Kapı önce `docs/olcumler/videotoolbox-hizli.md`.
+
+1. **Kapı belgesi** ölçümden önce commit'lenir.
+2. **Core.** `PlanCalculator`: Hızlı kip aday sırası macOS'ta `hevc_videotoolbox` ile başlar, başka platformda
+   listede yok; platform `BuildDetailed`'in açık bir aşırı yüklemesiyle verilir (varsayılan `OperatingSystem.IsMacOS()`).
+   VT `-crf` almadığı için planın `crf` kipi VT'de `2pass` (tek geçiş bit hızı) olur. `CodecModel.IsFastHardware`:
+   donanım yolu seçimi (IsHardware + hevc_videotoolbox); `IsHardware` VT'yi dışarıda tutmaya devam eder.
+   `HardwareVerdict.Decide` ve kodlayıcı yolu sabitlemesi yeni üyeyi okur. `PlanParser` VT'yi yalnız macOS'ta ve
+   yoklama `Working` derken kabul eder.
+3. **Arayüz.** `MainWindow.HardwareAvailableFrom` tek satır: Hızlı kutusu macOS'ta VT ile açılabilsin.
+4. **Testler** `VideoToolboxHizliTests`, `PlanParserTests`; her kol mutasyonla.
+5. **Ölçüm** `tools/kalite-paketi-3/hb.ps1` `vthizli` işi, `handbrake-kiyas.yml` macos-15. Kalırsa plan yolu geri alınır.
+
+**Sonuç:** koşum 35249123754 kapıdan kaldı (K2 2/8, K4 5/8); 2-4. adımlar geri alındı, ölçüm düzeneği kaldı.
+**Denetim borçları:** kapı karşılaştırması ham değere çekildi (K2 yine 2/8), `KomutSatiri` bench günlüğünü
+gerçek komuta bağladı, `VtHizli` kapı kalınca fırlatıyor.
 
 # Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
 
