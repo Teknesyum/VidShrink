@@ -18,6 +18,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -28,6 +29,7 @@ env:
 
 jobs:
   version:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.read.outputs.tag }}
@@ -395,6 +397,128 @@ jobs:
             gh release view "$tag" --json assets --jq ".assets[].name" | grep -qx "manifest-$rid.json"
           done
           test "$(gh release view "$tag" --json isDraft --jq .isDraft)" = "false"
+
+  # arm64 dogrulamasi: yalniz elle tetiklenir, etiket ve yayin olusturmaz. Paket adimlari
+  # publish isinin aynisi, ayni Linux kosucusunda capraz. Etiket matrisine henuz girmiyor:
+  # UpdateCheck.ReleasedRids (Core) ile matris birebir pinli.
+  arm64-publish:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [win-arm64, linux-arm64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - id: read
+        run: |
+          set -euo pipefail
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props | head -1)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "commit=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+          echo "built=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: Publish the command line and the application
+        run: |
+          set -euo pipefail
+          for project in src/VidShrink.Cli/VidShrink.Cli.csproj src/VidShrink.App/VidShrink.App.csproj; do
+            dotnet publish "$project" \
+              -c Release -r ${{ matrix.arm }} --self-contained \
+              -p:Version=${{ steps.read.outputs.version }} \
+              -p:SourceRevisionId=${{ steps.read.outputs.commit }} \
+              -o publish/${{ matrix.arm }}
+          done
+          find publish -name '*.pdb' -type f -delete
+
+      - name: Write manifest.json, archive, checksum
+        run: |
+          set -euo pipefail
+          dotnet build tools/VidShrink.Manifest/VidShrink.Manifest.csproj -c Release
+          dotnet tools/VidShrink.Manifest/bin/Release/net8.0/vidshrink-manifest.dll write \
+            publish/${{ matrix.arm }} \
+            --version ${{ steps.read.outputs.version }} \
+            --rid ${{ matrix.arm }} \
+            --commit ${{ steps.read.outputs.commit }} \
+            --built ${{ steps.read.outputs.built }}
+          mkdir -p assets
+          ( cd publish/${{ matrix.arm }} && zip -qr "$GITHUB_WORKSPACE/assets/vidshrink-${{ matrix.arm }}.zip" . )
+          cp publish/${{ matrix.arm }}/manifest.json assets/manifest-${{ matrix.arm }}.json
+          ( cd assets && sha256sum vidshrink-${{ matrix.arm }}.zip manifest-${{ matrix.arm }}.json > "checksums-${{ matrix.arm }}.txt" )
+          cat assets/checksums-${{ matrix.arm }}.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arm64-assets-${{ matrix.arm }}
+          path: assets/
+          if-no-files-found: error
+          retention-days: 7
+
+  arm64-verify:
+    needs: arm64-publish
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arm: win-arm64
+            os: windows-11-arm
+          - arm: linux-arm64
+            os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: arm64-assets-${{ matrix.arm }}
+          path: assets
+
+      - name: Checksum, unpack, start headless (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-Location assets
+          foreach ($line in Get-Content "checksums-${{ matrix.arm }}.txt") {
+            $sha, $name = $line -split '\s+', 2
+            $actual = (Get-FileHash $name.TrimStart('*') -Algorithm SHA256).Hash
+            if ($actual -ne $sha.ToUpperInvariant()) { throw "sha256 uyusmuyor: $name" }
+          }
+          Expand-Archive "vidshrink-${{ matrix.arm }}.zip" -DestinationPath app
+          "kosucu mimarisi: $env:PROCESSOR_ARCHITECTURE $([Runtime.InteropServices.RuntimeInformation]::OSArchitecture)"
+          foreach ($pe in @('app/vidshrink.exe', 'app/VidShrink.App.exe', 'app/libSkiaSharp.dll')) {
+            if (-not (Test-Path $pe)) { Write-Host "$pe yok"; continue }
+            $b = [IO.File]::ReadAllBytes($pe)
+            $off = [BitConverter]::ToInt32($b, 0x3C)
+            $machine = [BitConverter]::ToUInt16($b, $off + 4)
+            "PE makine $pe = 0x{0:X4}" -f $machine
+            if ($machine -ne 0xAA64) { throw "$pe arm64 degil" }
+          }
+          $v = & app/vidshrink.exe --version
+          if ($LASTEXITCODE -ne 0) { throw "vidshrink --version cikis $LASTEXITCODE" }
+          "vidshrink --version: $v"
+
+      - name: Checksum, unpack, start headless (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          cd assets
+          sha256sum -c "checksums-${{ matrix.arm }}.txt"
+          unzip -q "vidshrink-${{ matrix.arm }}.zip" -d app
+          echo "kosucu mimarisi: $(uname -m)"
+          file app/vidshrink app/VidShrink.App app/libSkiaSharp.so
+          file app/vidshrink | grep -q aarch64
+          chmod +x app/vidshrink app/VidShrink.App
+          echo "vidshrink --version: $(app/vidshrink --version)"
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg > /dev/null
+          ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc2=size=640x360:rate=30 -t 3 -pix_fmt yuv420p -c:v libx264 kaynak.mp4
+          app/vidshrink plan kaynak.mp4 --hedef 1 --olcumsuz --json > plan.json
+          grep -E '"(codec|videoBitrateK|targetMb)"' plan.json
 
   # A tag whose release run goes red publishes nothing, and nothing says so: installed
   # copies keep following releases/latest and sit on the previous version. That is what
