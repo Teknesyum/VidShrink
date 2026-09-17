@@ -1,3 +1,18 @@
+# VideoToolbox Hızlı Kip — Plan Yolu
+
+Dal `t0/vt-hizli`. Karar: `fable-kararlar-2026-09-17.md` soru 1. Kapı önce `docs/olcumler/videotoolbox-hizli.md`.
+
+1. **Kapı belgesi** ölçümden önce commit'lenir.
+2. **Core.** `PlanCalculator`: Hızlı kip aday sırası macOS'ta `hevc_videotoolbox` ile başlar, başka platformda
+   listede yok; platform `BuildDetailed`'in açık bir aşırı yüklemesiyle verilir (varsayılan `OperatingSystem.IsMacOS()`).
+   VT `-crf` almadığı için planın `crf` kipi VT'de `2pass` (tek geçiş bit hızı) olur. `CodecModel.IsFastHardware`:
+   donanım yolu seçimi (IsHardware + hevc_videotoolbox); `IsHardware` VT'yi dışarıda tutmaya devam eder.
+   `HardwareVerdict.Decide` ve kodlayıcı yolu sabitlemesi yeni üyeyi okur. `PlanParser` VT'yi yalnız macOS'ta ve
+   yoklama `Working` derken kabul eder.
+3. **Arayüz.** `MainWindow.HardwareAvailableFrom` tek satır: Hızlı kutusu macOS'ta VT ile açılabilsin.
+4. **Testler** `VideoToolboxHizliTests`, `PlanParserTests`; her kol mutasyonla.
+5. **Ölçüm** `tools/kalite-paketi-3/hb.ps1` `vthizli` işi, `handbrake-kiyas.yml` macos-15. Kalırsa plan yolu geri alınır.
+
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.
