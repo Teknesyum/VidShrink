@@ -39,6 +39,26 @@ Dal `t0/vt-hizli`. Karar: `fable-kararlar-2026-09-17.md` soru 1. Kapı önce `do
 **Denetim borçları:** kapı karşılaştırması ham değere çekildi (K2 yine 2/8), `KomutSatiri` bench günlüğünü
 gerçek komuta bağladı, `VtHizli` kapı kalınca fırlatıyor.
 
+# A4 — arm64 Yayın ve Kurucu Bağımlılıkları
+
+Dal `t0/hb-a45-arm-kiyas`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` 4. bölüm A4, satır 56.
+
+1. **Yayın matrisi.** `release.yml` `publish` matrisine `win-arm64` ve `linux-arm64`; başlatıcı adımı
+   `startsWith(matrix.rid, 'win-')` ile arm64'te de koşar. `UpdateCheck.ReleasedRids` altı hedefe çıkar,
+   `KabukAciklariTests` pini birlikte. Kurucu exe ve kabuk uzantısı x64'te kalır (COM DLL arm64 değil).
+2. **RID seçimi.** `UpdateCheck.RidFor(platform, arch)` ayrılır, `Rid` onu çağırır; test arm64 makinenin
+   `win-arm64`/`linux-arm64` varlığını seçtiğini ve varlığın yayın listesinde olduğunu ölçer.
+3. **Kurucu kaynakları.** `SetupModel` pinleri mimari başına: `FfmpegPin.For`, `LibMpvPin.For`.
+   ffmpeg win-arm64 BtbN'in ay sonu `autobuild-2026-08-31-13-27` etiketinden (kayan `latest` değil),
+   libmpv aarch64 kendi `deps-libmpv-20260903` yayınımızdan, yedek shinchiro. `SetupRunner.RuntimeIdentifier`
+   arm64'ü kabul eder.
+4. **Betikler.** `Install-VidShrink.ps1` arm64 kolu (pinli ffmpeg zip + aarch64 libmpv, `-DepsOnly` ile
+   yalnız bağımlılık kolu), `install-vidshrink.sh` `aarch64` kolu (paket yöneticisi önerisi).
+5. **CI.** `release.yml` workflow_dispatch'te `windows-11-arm`: `-DepsOnly` gerçekten koşar, `ffmpeg -version`,
+   `NativeLibrary.Load` ile libmpv duman testi, bozuk sha256 negatif kontrolü.
+6. **Ölçüm düzeltmesi.** `hb.ps1` SVT kolunun HandBrake preset eşlemesi (x265 adı → SVT sayısı),
+   yalnız SVT hücreleri yeniden koşulur, `docs/olcumler/handbrake-kiyas-cli.md` eski satırı geçersiz işaretler.
+
 # Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
 
 Dal `t0/yol-c-kaydedici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 2., 6., 7. bölüm (9-11).

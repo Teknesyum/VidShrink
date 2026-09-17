@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       isler:
-        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,tavanbekci,svtbant,turboilk,socialkodek,vtara,vthizli,yavg,karanlikgecis
+        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,tavanbekci,svtbant,turboilk,socialkodek,vtara,vthizli,yavg,karanlikgecis,handbrakecli,handbrakecli-svt
         default: handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
       kesitler:
         description: handbrake isinin kesitleri
@@ -89,6 +89,8 @@ jobs:
             socialkodek = @('parlak', 'karanlik', 'hareketli')
             yavg = @('dort')
             karanlikgecis = @('karanlik', 'parlak', 'hareketli', 'ekran')
+            handbrakecli = @('karanlik', 'parlak', 'hareketli', 'ekran')
+            'handbrakecli-svt' = @('karanlik', 'parlak', 'hareketli', 'ekran')
           }
           $liste = @()
           foreach ($is in @($isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -notin @('vt', 'vtara', 'vthizli') })) {
@@ -169,14 +171,14 @@ jobs:
       - name: bench derle
         run: dotnet build tools/VidShrink.Bench -c Release -m:2
       - name: cli derle
-        if: inputs.urun_yolu == 'cli'
+        if: inputs.urun_yolu == 'cli' || startsWith(matrix.is, 'handbrakecli')
         run: |
           $ErrorActionPreference = 'Stop'
           if (-not (Test-Path '${{ inputs.cli_proje }}')) { throw 'CLI projesi bu commit''te yok: ${{ inputs.cli_proje }}' }
           dotnet build '${{ inputs.cli_proje }}' -c Release -m:2
           if ($LASTEXITCODE -ne 0) { throw 'CLI derlenemedi' }
-          $dll = Get-ChildItem '${{ inputs.cli_proje }}/bin/Release' -Recurse -Filter 'VidShrink.Cli.dll' | Select-Object -First 1
-          if (-not $dll) { throw 'VidShrink.Cli.dll bulunamadi' }
+          $dll = Get-ChildItem '${{ inputs.cli_proje }}/bin/Release' -Recurse -Filter 'vidshrink.dll' | Select-Object -First 1
+          if (-not $dll) { throw 'vidshrink.dll bulunamadi' }
           "URUN_CLI=$($dll.FullName)" | Add-Content $env:GITHUB_ENV
       - name: e1 bench derle
         if: matrix.is == 'bantlasma'
