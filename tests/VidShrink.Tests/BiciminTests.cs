@@ -450,9 +450,14 @@ public sealed class KareYerlesimTests
     }
 
     /// <summary>
-    /// S9: birim ve kısaltmalar (MB, /100, CRF, AI, FPS, kbps) dil dosyasından gelir. Fransızca
-    /// "Mo" ve "IA", Rusça "МБ" ve "ИИ" yazar; gerçek yükleme yolundan okunur, İngilizce
-    /// sabit ("MB", "AI") o dillerde görünmez.
+    /// S9: dile göre <b>değişen</b> birimler (MB, AI, <c>score-suffix</c>,
+    /// <c>score-value</c>, <c>advanced.mode.crf</c>) gerçek yükleme yolundan okunur.
+    /// Fransızca "Mo" ve "IA", Rusça "МБ" ve "ИИ" yazar; İngilizce sabit ("MB", "AI")
+    /// o dillerde görünmez. <c>kbps-value</c>, <c>fps-value</c>, <c>k-value</c> ve
+    /// <c>plan.mode.crf-value</c> şablonları 42 dilde bayt bayt aynı, bu yüzden dil kolu
+    /// onları ayirt edemez; burada yalnız metnin biriminde bittiği pimlenir, şablonun dil
+    /// dosyasından geldiği <c>HizKareKbitVeCrfBirimleriDilDosyasindanGelir</c>'de enjeksiyonla
+    /// ölçülür.
     /// </summary>
     [Theory]
     [InlineData("en", "MB", "AI")]
@@ -492,8 +497,8 @@ public sealed class KareYerlesimTests
             Assert.Equal(Strings.Get("main.unit.score-suffix"), okunan.kaliteBirimi);
             Assert.EndsWith(Strings.Get("main.unit.score-value", ""), okunan.not);
             Assert.Equal(Strings.Get("main.advanced.mode.crf"), okunan.kip);
-            Assert.Equal(Strings.Get("main.unit.kbps-value", okunan.hiz.Split(' ')[0]), okunan.hiz);
-            Assert.Contains(Strings.Get("main.unit.fps-value", ""), okunan.plan);
+            Assert.Equal("18800 kbps", okunan.hiz);
+            Assert.Contains(" FPS", okunan.plan);
             if (dil != "en")
             {
                 Assert.DoesNotContain(" MB", okunan.boyut + okunan.aralik + okunan.plan);
@@ -507,15 +512,14 @@ public sealed class KareYerlesimTests
     }
 
     /// <summary>
-    /// S9 borcu: kalite yongasının balonundaki "tahmini kalite" satırı <c>/100</c>'ü koddan
-    /// yazıyordu. Dil dosyasının kopyasında <c>main.unit.score-value</c> başka bir biçime
-    /// çevrilir; yüklenen pencerenin balon ızgarasında o biçim okunur, <c>/100</c> okunmaz.
+    /// Dil dosyalarinin tamamini <c>.calisma</c> altina kopyalar ve Ingilizce katalogda
+    /// verilen sablonlari degistirir. Sablonu koddan yazan bir mutasyon bu enjeksiyondan
+    /// etkilenmez, dolayisiyla olcum sablonun gercekten dil dosyasindan okundugunu tutar.
     /// </summary>
-    [Fact]
-    public void KaliteBalonundakiPuanDilDosyasindanGelir()
+    private static string Kopya(string ad, Dictionary<string, string> degisim)
     {
         var kaynak = Path.Combine(AppContext.BaseDirectory, "Locales");
-        var kopya = Path.Combine(GirdiKanit.Root, ".calisma", "s9-puan", "Locales");
+        var kopya = Path.Combine(GirdiKanit.Root, ".calisma", ad, "Locales");
         foreach (var dosya in Directory.GetFiles(kaynak, "*", SearchOption.AllDirectories))
         {
             var hedef = Path.Combine(kopya, Path.GetRelativePath(kaynak, dosya));
@@ -524,7 +528,29 @@ public sealed class KareYerlesimTests
         }
 
         var enAna = Path.Combine(kopya, "en", "main.json");
-        File.WriteAllText(enAna, File.ReadAllText(enAna).Replace("\"main.unit.score-value\": \"{0}/100\"", "\"main.unit.score-value\": \"{0} of 100 pts\""));
+        var metin = File.ReadAllText(enAna);
+        foreach (var (arama, yazi) in degisim)
+        {
+            Assert.Contains(arama, metin);
+            metin = metin.Replace(arama, yazi);
+        }
+
+        File.WriteAllText(enAna, metin);
+        return kopya;
+    }
+
+    /// <summary>
+    /// S9 borcu: kalite yongasının balonundaki "tahmini kalite" satırı <c>/100</c>'ü koddan
+    /// yazıyordu. Dil dosyasının kopyasında <c>main.unit.score-value</c> başka bir biçime
+    /// çevrilir; yüklenen pencerenin balon ızgarasında o biçim okunur, <c>/100</c> okunmaz.
+    /// </summary>
+    [Fact]
+    public void KaliteBalonundakiPuanDilDosyasindanGelir()
+    {
+        var kopya = Kopya("s9-puan", new Dictionary<string, string>
+        {
+            ["\"main.unit.score-value\": \"{0}/100\""] = "\"main.unit.score-value\": \"{0} of 100 pts\""
+        });
 
         List<string> satirlar;
         AppHost.Run(() => Strings.UseRoot(kopya));
@@ -544,6 +570,66 @@ public sealed class KareYerlesimTests
 
         Assert.True(satirlar.Any(s => s.EndsWith(" of 100 pts", StringComparison.Ordinal)), string.Join(" | ", satirlar));
         Assert.DoesNotContain(satirlar, s => s.EndsWith("/100", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// O2: <c>main.unit.kbps-value</c>, <c>main.unit.fps-value</c>, <c>main.unit.k-value</c>
+    /// ve <c>main.plan.mode.crf-value</c> sablonlari 42 dilde bayt bayt ayni, bu yuzden dil
+    /// kollari onlari ayirt edemiyor; sabiti koda geri yazan iki mutasyon dil kollarindan
+    /// sag kaliyordu. Burada dil dosyasinin kopyasinda dordu de baska bir bicime cevrilir;
+    /// yuklenen pencerenin hiz satiri, ses satiri ve plan izgarasi o bicimleri okur,
+    /// Ingilizce sabitler hicbirinde gorunmez.
+    /// </summary>
+    [Fact]
+    public void HizKareKbitVeCrfBirimleriDilDosyasindanGelir()
+    {
+        var kopya = Kopya("s9-birim", new Dictionary<string, string>
+        {
+            ["\"main.unit.kbps-value\": \"{0} kbps\""] = "\"main.unit.kbps-value\": \"{0} kilobit/s\"",
+            ["\"main.unit.fps-value\": \"{0} FPS\""] = "\"main.unit.fps-value\": \"{0} kare/s\"",
+            ["\"main.unit.k-value\": \"{0}k\""] = "\"main.unit.k-value\": \"{0} kbit\"",
+            ["\"main.plan.mode.crf-value\": \"CRF {0}\""] = "\"main.plan.mode.crf-value\": \"kalite carpani {0}\""
+        });
+
+        List<string> satirlar;
+        AppHost.Run(() => Strings.UseRoot(kopya));
+        try
+        {
+            satirlar = Yuklu("en", window =>
+            {
+                var okunan = new List<string>
+                {
+                    Named<TextBlock>(window, "TxtBitrate").Text ?? "",
+                    Named<TextBlock>(window, "TxtAudio").Text ?? ""
+                };
+                okunan.AddRange(window.FindControl<Grid>("PlanFacts")!.Children.OfType<TextBlock>().Select(t => t.Text ?? ""));
+                window.AdvModeIndex = 1;
+                window.RecalculateForTest();
+                window.UpdateLayout();
+                okunan.AddRange(window.FindControl<Grid>("PlanFacts")!.Children.OfType<TextBlock>().Select(t => t.Text ?? ""));
+                return okunan;
+            });
+        }
+        finally
+        {
+            AppHost.Run(() => Strings.UseRoot(null));
+        }
+
+        var govde = string.Join(" | ", satirlar);
+        var kanit = Path.Combine(GirdiKanit.Root, ".calisma", "s9-birim");
+        Directory.CreateDirectory(kanit);
+        File.WriteAllText(Path.Combine(kanit, "okunan.txt"), govde);
+
+        Assert.EndsWith(" kilobit/s", satirlar[0], StringComparison.OrdinalIgnoreCase);
+        Assert.EndsWith(" kbit", satirlar[1], StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(" kare/s", govde, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("kalite carpani ", govde, StringComparison.OrdinalIgnoreCase);
+        var kucuk = govde.ToLowerInvariant();
+        Assert.Equal(4, kucuk.Split(" kbit", StringSplitOptions.None).Length - 1);
+        Assert.Equal(2, kucuk.Split(" kare/s", StringSplitOptions.None).Length - 1);
+        Assert.DoesNotContain("kbps", govde, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("fps", govde, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("crf ", govde, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
