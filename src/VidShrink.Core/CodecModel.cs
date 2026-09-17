@@ -11,6 +11,10 @@ public static class CodecModel
     public const double DetailConcentrationExponent = 0.25;
     public const double ScalePenaltyScale = 10.0;
     public const double ScalePenaltyExponent = 1.1;
+    public const double NvencH264LayoutPenaltyWeight = 2.5;
+    public const double NvencHevcAv1LayoutPenaltyWeight = 4.5;
+    public const double NvencLayoutWeightRampStart = 1.0;
+    public const double NvencLayoutWeightRampEnd = 1.86;
     public const double FpsPenaltyPerHalving = 5.0;
     public const double SoftwareQualityCeiling = 99.0;
     public const double HardwareQualityCeiling = 96.0;
@@ -122,6 +126,19 @@ public static class CodecModel
         return codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase)
             ? HardwareAv1QualityCeiling
             : HardwareQualityCeiling;
+    }
+
+    public static double HardwareFloorBppf(double fps)
+        => (HardwareMinBitratePerPixelFrame + HardwareMinBitratePerPixelSecond / Math.Max(fps, 1.0)) * HardwareMinBitrateMargin;
+
+    public static double LayoutPenaltyWeight(string codec, double sourceFloorRatio)
+    {
+        if (Vendor(codec) != EncoderVendor.Nvenc) return 1.0;
+        var full = codec.StartsWith("h264", StringComparison.OrdinalIgnoreCase)
+            ? NvencH264LayoutPenaltyWeight
+            : NvencHevcAv1LayoutPenaltyWeight;
+        var t = Math.Clamp((sourceFloorRatio - NvencLayoutWeightRampStart) / (NvencLayoutWeightRampEnd - NvencLayoutWeightRampStart), 0.0, 1.0);
+        return 1.0 + (full - 1.0) * t;
     }
 
     public static EncoderVendor Vendor(string codec)

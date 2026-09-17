@@ -151,15 +151,22 @@ public static class FfmpegArguments
     public const double PeakOpensAtFloorRatio = 6.0;
     public const double PeakWidestAtFloorRatio = 11.4;
 
+    public const double NvencPeakFactor = 2.0;
+    public const double NvencBufferFactor = 2.0;
+
     public static double PeakRateFactor(string codec, int videoBitrateK, int width, int height, double fps)
     {
         if (!CodecModel.IsHardware(codec)) return WidePeakFactor;
+        if (CodecModel.Vendor(codec) == EncoderVendor.Nvenc) return NvencPeakFactor;
         var floorK = CodecModel.MinBitrateK(codec, width, height, fps);
         var opening = ((double)videoBitrateK / floorK - PeakOpensAtFloorRatio) / (PeakWidestAtFloorRatio - PeakOpensAtFloorRatio);
         return Math.Clamp(TightPeakFactor + (HardwarePeakCeiling - TightPeakFactor) * opening, TightPeakFactor, HardwarePeakCeiling);
     }
 
     public static double BufferFactor(double peakFactor) => 1.0 + 2.0 * (peakFactor - 1.0);
+
+    public static double BufferFactor(string codec, double peakFactor)
+        => CodecModel.Vendor(codec) == EncoderVendor.Nvenc ? NvencBufferFactor : BufferFactor(peakFactor);
 
     // Keyframe interval. This used to be a single number, -g = 2 s, written on every encode. A
     // fixed short interval forces I-frames where no scene starts, and the software encoders
@@ -428,7 +435,7 @@ public static class FfmpegArguments
             else if (SupportsRateLimits(plan.Codec))
             {
                 var peak = PeakRateFactor(plan.Codec, plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
-                a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * peak)}k", "-bufsize", $"{(int)(plan.VideoBitrateK * BufferFactor(peak))}k" });
+                a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * peak)}k", "-bufsize", $"{(int)(plan.VideoBitrateK * BufferFactor(plan.Codec, peak))}k" });
             }
             if (CodecModel.IsHardware(plan.Codec))
                 a.AddRange(CodecModel.BitrateRateControlArgs(plan.Codec));
@@ -545,13 +552,6 @@ public static class FfmpegArguments
         else if (codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase)
                  && Supported("-svtav1-params", "tune=1:enable-variance-boost=0"))
             args.AddRange(new[] { "-svtav1-params", "tune=1:enable-variance-boost=0" });
-        else if (codec.Contains("nvenc", StringComparison.OrdinalIgnoreCase))
-        {
-            if (Supported("-spatial-aq", "1"))
-                args.AddRange(new[] { "-spatial-aq", "1" });
-            if (Supported("-temporal-aq", "1"))
-                args.AddRange(new[] { "-temporal-aq", "1" });
-        }
         return args;
     }
 
