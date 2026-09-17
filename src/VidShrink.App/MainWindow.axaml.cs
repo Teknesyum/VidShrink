@@ -4652,7 +4652,7 @@ internal sealed record ShareTargetTable(string DefaultId, IReadOnlyList<ShareTar
         new[]
         {
             new ShareTarget("storage.to", "storage.to", StorageToMaxBytes,
-                new[] { 1, 2, 3, 4, 5, 6, 7 }, 3, null, true, true),
+                new[] { 1, 2, 3, 4, 5, 6, 7 }, 1, null, true, true),
             new ShareTarget("uguu.se", "uguu.se", UguuMaxBytes,
                 Array.Empty<int>(), 0, 3, false, true)
         });
