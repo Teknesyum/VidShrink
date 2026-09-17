@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       isler:
-        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,tavanbekci,svtbant,turboilk,socialkodek,vtara,yavg,karanlikgecis
+        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,tavanbekci,svtbant,turboilk,socialkodek,vtara,vthizli,yavg,karanlikgecis
         default: handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
       kesitler:
         description: handbrake isinin kesitleri
@@ -91,7 +91,7 @@ jobs:
             karanlikgecis = @('karanlik', 'parlak', 'hareketli', 'ekran')
           }
           $liste = @()
-          foreach ($is in @($isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -notin @('vt', 'vtara') })) {
+          foreach ($is in @($isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -notin @('vt', 'vtara', 'vthizli') })) {
             if (-not $harita.ContainsKey($is)) { throw "bilinmeyen is: $is" }
             $ks = $harita[$is]
             if ($ayrinti -match '"Duman"' -and $is -ne 'handbrake') { $ks = @($ks | Select-Object -Last 1) }
@@ -100,6 +100,7 @@ jobs:
           $vtIsler = @()
           if (('${{ github.event_name }}' -eq 'push' -and ($isler -split ',') -contains 'vt') -or ('${{ github.event_name }}' -ne 'push' -and '${{ inputs.vt }}' -eq 'true')) { $vtIsler += 'vt' }
           if (($isler -split ',') -contains 'vtara') { $vtIsler += 'vtara' }
+          if (($isler -split ',') -contains 'vthizli') { $vtIsler += 'vthizli' }
           $vt = ConvertTo-Json -Compress -InputObject @($vtIsler)
           $json = ConvertTo-Json -Compress -InputObject @{ include = $liste }
           Write-Host $json

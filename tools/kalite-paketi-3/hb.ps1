@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci', 'tavanbekci', 'svtbant', 'yavg', 'karanlikgecis')][string]$Is,
+    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci', 'tavanbekci', 'svtbant', 'yavg', 'karanlikgecis', 'vthizli')][string]$Is,
     [Parameter(Mandatory)][string]$Cikti,
     [Parameter(Mandatory)][string]$Bench,
     [string]$Kesit = '',
@@ -659,6 +659,76 @@ function Vt {
         }
     }
     if ($script:vtOnbitKaldi.Count -gt 0) { throw "VT urun ciktisi Main 10 degil: $($script:vtOnbitKaldi -join '; ')" }
+}
+
+function VtHizli {
+    $enc = & ffmpeg -hide_banner -encoders 2>&1 | Out-String
+    $enc | Set-Content (Join-Path $Cikti 'ffmpeg-encoders.txt')
+    $script:JsonAdi = 'vthizli.json'
+    $hucreler = [Collections.Generic.List[object]]::new()
+    $neg = FfKos @('-f', 'lavfi', '-i', 'testsrc2=s=320x240:d=0.2', '-c:v', 'hevc_videotoolbox', '-foo', '1', '-f', 'null', $NullCikis)
+    $n1 = ($neg.Kod -ne 0)
+    Ekle ([ordered]@{ is = 'vthizli'; kesit = ''; kol = 'negatif-vt-uydurma-bayrak'; cikis_kodu = $neg.Kod; uyari = (Uyarilar $neg.Metin); hukum = $(if ($n1) { 'gecti: uydurma bayrak reddedildi' } else { 'kaldi: uydurma bayrak kabul edildi' }) }) $null $null
+    $drop = @('--no-resolution-drop', '--no-fps-drop')
+    foreach ($k in @($Kesitler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
+        $script:Kesit = $k
+        $girdi = Join-Path $Cikti "kesit-$k.mkv"
+        if (-not (Test-Path $girdi)) { Write-Warning "kesit yok: $girdi"; continue }
+        $b = Probe $girdi
+        foreach ($kbit in @($VtKbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
+            $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
+            $h = [ordered]@{ kesit = $k; kbit = $kbit; hedef_mb = $mb; vt_kodlayici = $null; vt_vmaf = $null; vt_xpsnr = $null; vt_sn = $null; vt_kbps = $null; vt_bantta = $null; vt_tavan = $null; yz_kodlayici = $null; yz_vmaf = $null; yz_xpsnr = $null; hb_vmaf = $null; hb_xpsnr = $null; hb_sn = $null; hb_es_bayt = $null }
+            Dene $k 'vt-hizli' $kbit {
+                $u = Urun $girdi $mb "vth-$k-$kbit-hizli" (@('--speed', 'fast') + $drop)
+                $o = Olc $girdi $u.Dosya $b.FpsMetin
+                $ek = UrunOrtak $u $mb
+                $h.vt_kodlayici = $u.Kodlayici; $h.vt_vmaf = $o.vmafneg_ort; $h.vt_xpsnr = $o.xpsnr; $h.vt_sn = $u.KodlamaSn; $h.vt_kbps = $o.kbps; $h.vt_bantta = $u.Bantta; $h.vt_tavan = $u.TavanAsildi
+                Ekle ([ordered]@{ is = 'vthizli'; kesit = $k; kol = 'vt-hizli'; istenen_kbit = $kbit }) $o $ek
+                Remove-Item $u.Dosya
+            }
+            Dene $k 'yazilim' $kbit {
+                $u = Urun $girdi $mb "vth-$k-$kbit-yazilim" $drop
+                $o = Olc $girdi $u.Dosya $b.FpsMetin
+                $ek = UrunOrtak $u $mb
+                $h.yz_kodlayici = $u.Kodlayici; $h.yz_vmaf = $o.vmafneg_ort; $h.yz_xpsnr = $o.xpsnr
+                Ekle ([ordered]@{ is = 'vthizli'; kesit = $k; kol = 'yazilim'; istenen_kbit = $kbit }) $o $ek
+                Remove-Item $u.Dosya
+            }
+            if ($h.vt_kbps) {
+                $hbArg = @('-Z', 'H.265 Apple VideoToolbox 1080p', '-a', 'none', '--crop-mode', 'none', '--width', "$($b.W)", '--height', "$($b.H)", '-f', 'av_mkv')
+                Dene $k 'handbrake-vt' $kbit {
+                    $c = Join-Path $Cikti "vth-$k-$kbit-handbrake.mkv"
+                    $hb = HbEsBayt $girdi $c $h.vt_kbps $hbArg
+                    $o = Olc $girdi $c $b.FpsMetin
+                    $hx = HbOrtak $hb $h.vt_kbps
+                    $h.hb_vmaf = $o.vmafneg_ort; $h.hb_xpsnr = $o.xpsnr; $h.hb_sn = $hb.Sn; $h.hb_es_bayt = $hx.es_bayt
+                    Ekle ([ordered]@{ is = 'vthizli'; kesit = $k; kol = 'handbrake-vt'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 H.265 Apple VideoToolbox 1080p' }) $o $hx
+                    Remove-Item $c
+                }
+            }
+            $h['k2_fark'] = if ($null -ne $h.vt_vmaf -and $null -ne $h.yz_vmaf) { [math]::Round($h.vt_vmaf - $h.yz_vmaf, 3) } else { $null }
+            $h['k3_oran'] = if ($h.vt_sn -and $h.hb_sn) { [math]::Round($h.vt_sn / $h.hb_sn, 3) } else { $null }
+            $h['k5_fark'] = if ($null -ne $h.vt_vmaf -and $null -ne $h.hb_vmaf) { [math]::Round($h.vt_vmaf - $h.hb_vmaf, 3) } else { $null }
+            $h['xpsnr_fark_yazilim'] = if ($null -ne $h.vt_xpsnr -and $null -ne $h.yz_xpsnr) { [math]::Round($h.vt_xpsnr - $h.yz_xpsnr, 3) } else { $null }
+            $h['xpsnr_fark_hb'] = if ($null -ne $h.vt_xpsnr -and $null -ne $h.hb_xpsnr) { [math]::Round($h.vt_xpsnr - $h.hb_xpsnr, 3) } else { $null }
+            $hucreler.Add([pscustomobject]$h)
+        }
+    }
+    $beklenen = @($Kesitler.Split(',') | Where-Object { $_.Trim() }).Count * @($VtKbitler.Split(',') | Where-Object { $_.Trim() }).Count
+    $tam = ($hucreler.Count -eq $beklenen)
+    $k1 = $tam -and @($hucreler | Where-Object { $_.vt_kodlayici -ne 'hevc_videotoolbox' }).Count -eq 0
+    $k2 = $tam -and @($hucreler | Where-Object { $null -eq $_.k2_fark -or $_.k2_fark -lt -0.3 }).Count -eq 0
+    $k3 = $tam -and @($hucreler | Where-Object { $null -eq $_.k3_oran -or $_.k3_oran -gt 1.5 }).Count -eq 0
+    $k4 = $tam -and @($hucreler | Where-Object { $_.vt_bantta -ne $true -or $_.vt_tavan -eq $true }).Count -eq 0
+    $k5 = $tam -and @($hucreler | Where-Object { $null -eq $_.k5_fark -or $_.k5_fark -lt -0.3 }).Count -eq 0
+    $hukum = [ordered]@{
+        hucre = $hucreler.Count; beklenen = $beklenen
+        K1_kodlayici = $k1; K2_yazilima_gore = $k2; K3_hiz = $k3; K4_bant_tavan = $k4; K5_hb_vt_ye_gore = $k5; N1_uydurma_bayrak = $n1
+        gecti = ($k1 -and $k2 -and $k3 -and $k4 -and $k5 -and $n1)
+        hucreler = @($hucreler)
+    }
+    ConvertTo-Json -Depth 6 -InputObject $hukum | Set-Content (Join-Path $Cikti 'vthizli-hukum.json')
+    Write-Host (ConvertTo-Json -Depth 6 -InputObject $hukum)
 }
 
 function EkranBant {
@@ -1364,6 +1434,7 @@ switch ($Is) {
     'turbo' { Turbo }
     'hdr' { Hdr }
     'vt' { Vt }
+    'vthizli' { VtHizli }
     'ekranbant' { EkranBant }
 }
 Yaz

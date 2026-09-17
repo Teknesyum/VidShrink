@@ -2601,7 +2601,7 @@ public partial class MainWindow : Window
     /// yoklamayla doğrulanır; ölçülmüş bir seçim yeniden sınanmaz.
     /// </summary>
     internal static bool HardwareAvailableFrom(EncodePlan plan, EncoderProbeResult probe)
-        => CodecModel.IsHardware(plan.Codec)
+        => CodecModel.IsFastHardware(plan.Codec)
            && (!plan.CodecNotMeasured || (probe.Measured && probe.Succeeded));
 
     /// <summary>Ölçü için: yoklamanın arayüze taşıdığı donanım cevabı.</summary>

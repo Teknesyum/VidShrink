@@ -20,7 +20,17 @@ public static class PlanParser
         AllowTrailingCommas = true
     };
 
-    public static PlanParseResult Parse(string raw, MediaInfo info, PlanOptions options)
+    /// <summary>
+    /// <c>hevc_videotoolbox</c> yalniz macOS'ta ve yoklama calisiyor derken gecer; kapi
+    /// <c>docs/olcumler/videotoolbox-hizli.md</c>.
+    /// </summary>
+    private static bool VideoToolboxAllowed(string? codec, IEncoderAvailability? availability, bool macOS)
+        => macOS
+           && availability is not null
+           && string.Equals(codec, "hevc_videotoolbox", StringComparison.OrdinalIgnoreCase)
+           && availability.KnownState("hevc_videotoolbox") == EncoderProbeState.Working;
+
+    public static PlanParseResult Parse(string raw, MediaInfo info, PlanOptions options, IEncoderAvailability? availability = null, bool? macOS = null)
     {
         var errors = new List<string>();
         var warnings = new List<string>();
@@ -42,8 +52,11 @@ public static class PlanParser
         if (plan is null)
             return new PlanParseResult(null, new[] { "JSON parsed to nothing." }, warnings);
 
-        if (!AllowedCodecs.Contains(plan.Codec, StringComparer.OrdinalIgnoreCase))
+        var videoToolbox = VideoToolboxAllowed(plan.Codec, availability, macOS ?? OperatingSystem.IsMacOS());
+        if (!videoToolbox && !AllowedCodecs.Contains(plan.Codec, StringComparer.OrdinalIgnoreCase))
             errors.Add($"Unsupported codec: {plan.Codec}");
+        if (videoToolbox && plan.Mode.Equals("crf", StringComparison.OrdinalIgnoreCase))
+            errors.Add($"{plan.Codec} does not take CRF; use 2pass with a bitrate.");
 
         if (!plan.Mode.Equals("crf", StringComparison.OrdinalIgnoreCase) && !plan.Mode.Equals("2pass", StringComparison.OrdinalIgnoreCase))
             errors.Add($"Unsupported mode: {plan.Mode}");
@@ -114,7 +127,7 @@ public static class PlanParser
         }
 
         if (string.IsNullOrWhiteSpace(plan.Preset)) plan.Preset = FfmpegArguments.DefaultPreset(plan.Codec);
-        if (!FfmpegArguments.IsValidPreset(plan.Codec, plan.Preset))
+        if (CodecModel.TakesPreset(plan.Codec) && !FfmpegArguments.IsValidPreset(plan.Codec, plan.Preset))
             errors.Add($"Preset '{plan.Preset}' is invalid for codec '{plan.Codec}'.");
 
         if (plan.ModeEnum == EncodeMode.TwoPass && errors.Count == 0)

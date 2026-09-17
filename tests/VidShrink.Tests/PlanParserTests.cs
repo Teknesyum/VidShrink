@@ -72,7 +72,38 @@ public sealed class PlanParserTests
             && error.Contains(codec, StringComparison.Ordinal));
     }
 
-    private static string ValidPlan(string[] extraArgs, int width = 1920, int height = 1080, double fps = 30, string codec = "libx264")
+    private sealed class VtAvailability(EncoderProbeState state) : IEncoderAvailability
+    {
+        public bool HasEncoder(string name) => name == "hevc_videotoolbox";
+        public bool WorksAsEncoder(string codec) => HasEncoder(codec) && state == EncoderProbeState.Working;
+        public EncoderProbeState EncoderState(string codec) => HasEncoder(codec) ? state : EncoderProbeState.NotWorking;
+    }
+
+    [Fact]
+    public void ParserAcceptsHevcVideoToolboxOnlyOnMacWhenProbeWorks()
+    {
+        var json = ValidPlan(Array.Empty<string>(), codec: "hevc_videotoolbox", preset: "");
+
+        var kabul = PlanParser.Parse(json, Source, new PlanOptions(), new VtAvailability(EncoderProbeState.Working), macOS: true);
+        Assert.True(kabul.Ok, string.Join(" | ", kabul.Errors));
+        Assert.False(PlanParser.Parse(json, Source, new PlanOptions(), new VtAvailability(EncoderProbeState.Working), macOS: false).Ok);
+        Assert.False(PlanParser.Parse(json, Source, new PlanOptions(), new VtAvailability(EncoderProbeState.NotWorking), macOS: true).Ok);
+        Assert.False(PlanParser.Parse(json, Source, new PlanOptions(), null, macOS: true).Ok);
+        Assert.False(PlanParser.Parse(ValidPlan(Array.Empty<string>(), codec: "h264_videotoolbox", preset: ""), Source, new PlanOptions(), new VtAvailability(EncoderProbeState.Working), macOS: true).Ok);
+    }
+
+    [Fact]
+    public void ParserRejectsCrfForHevcVideoToolbox()
+    {
+        var json = ValidPlan(Array.Empty<string>(), codec: "hevc_videotoolbox", preset: "").Replace("\"2pass\"", "\"crf\"").Replace("\"videoBitrateK\"", "\"crf\":24,\"videoBitrateK\"");
+
+        var result = PlanParser.Parse(json, Source, new PlanOptions(), new VtAvailability(EncoderProbeState.Working), macOS: true);
+
+        Assert.False(result.Ok);
+        Assert.Contains(result.Errors, e => e.Contains("does not take CRF", StringComparison.Ordinal));
+    }
+
+    private static string ValidPlan(string[] extraArgs, int width = 1920, int height = 1080, double fps = 30, string codec = "libx264", string preset = "slow")
         => JsonSerializer.Serialize(new
         {
             codec,
@@ -84,7 +115,7 @@ public sealed class PlanParserTests
             width,
             height,
             fps,
-            preset = "slow",
+            preset,
             extraArgs,
             reason = "test"
         });
