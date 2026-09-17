@@ -406,13 +406,7 @@ public static class FfmpegArguments
         a.AddRange(HardwareDecodeArgs(info.VideoCodec));
         a.AddRange(new[] { "-i", info.FilePath });
 
-        var filters = new List<string>();
-        if (plan.Width != info.Width || plan.Height != info.Height)
-            filters.Add($"scale={plan.Width}:{plan.Height}:flags=lanczos");
-        if (!string.IsNullOrEmpty(plan.HdrVideoFilter))
-            filters.Add(plan.HdrVideoFilter);
-        if (plan.Fps < info.Fps - 0.01)
-            filters.Add($"fps={plan.Fps.ToString("0.###", CultureInfo.InvariantCulture)}");
+        var filters = VideoFilterChain.Filters(info, plan);
         if (filters.Count > 0)
             a.AddRange(new[] { "-vf", string.Join(',', filters) });
 
@@ -452,6 +446,7 @@ public static class FfmpegArguments
             a.AddRange(new[] { "-profile:v", profile });
         a.AddRange(psychovisualArgs);
         a.AddRange(plan.HdrColorArgs);
+        a.AddRange(VideoFilterChain.ColorArgs(plan));
 
         var streams = StreamMapping.ForOutput(info, plan, outputPath);
 

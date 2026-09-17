@@ -588,6 +588,7 @@ static async Task<int> ShrinkAsync(string[] args)
     var measuredQuality = false;
     (int Width, int Height)? sourceSize = null;
     double? sourceMb = null;
+    var filters = VideoFilterOptions.Default;
     for (var i = 3; i < args.Length; i++)
     {
         switch (args[i])
@@ -641,6 +642,14 @@ static async Task<int> ShrinkAsync(string[] args)
                 break;
             case "--no-psy":
                 noPsy = true;
+                break;
+            case "--filters" when i + 1 < args.Length:
+                try { filters = VideoFilterChain.Parse(args[++i]); }
+                catch (ArgumentException ex)
+                {
+                    Console.Error.WriteLine(ex.Message);
+                    return 1;
+                }
                 break;
             case "--measured-quality":
                 measuredQuality = true;
@@ -697,7 +706,8 @@ static async Task<int> ShrinkAsync(string[] args)
             Intent = intent,
             AllowResolutionDrop = allowResolutionDrop,
             AllowFpsDrop = allowFpsDrop,
-            LockedCodec = lockCodec
+            LockedCodec = lockCodec,
+            Filters = filters
         };
         var planWatch = Stopwatch.StartNew();
         var profile = complexity;
@@ -747,6 +757,8 @@ static async Task<int> ShrinkAsync(string[] args)
         var band = FillBand.For(targetMb);
 
         var outputPath = Path.Combine(outDir, $"{label}_{targetMb.ToString("0.#", CultureInfo.InvariantCulture)}mb.mp4");
+        plan.Filters = await InterlaceProbe.ResolveAsync(info, plan.Filters);
+        Console.WriteLine($"filtre: deinterlace={plan.Filters.Deinterlace} zincir={string.Join(',', VideoFilterChain.Filters(info, plan))}");
         var commandPass = plan.ModeEnum == EncodeMode.TwoPass && !CodecModel.IsHardware(plan.Codec) ? 2 : 0;
         Console.WriteLine("komut: " + FfmpegArguments.ToCommandLine(EncodeRunner.EncodeArguments(info, plan, outputPath, commandPass, commandPass > 0 ? Path.Combine(outDir, "pass") : null, EncoderCapabilities.Instance)));
         if (planOnly) continue;

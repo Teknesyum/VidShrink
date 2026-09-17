@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci', 'tavanbekci', 'svtbant', 'yavg', 'karanlikgecis')][string]$Is,
+    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci', 'tavanbekci', 'svtbant', 'yavg', 'karanlikgecis', 'filtre')][string]$Is,
     [Parameter(Mandatory)][string]$Cikti,
     [Parameter(Mandatory)][string]$Bench,
     [string]$Kesit = '',
@@ -1347,7 +1347,73 @@ function KaranlikGecis {
     }
 }
 
+function FiltreSatir([string]$Kol, [int]$Tekrar, [string]$Girdi, [string]$Ref, [double]$Mb, [int]$Kbit, [string[]]$Ek) {
+    $ad = "filtre-$Kesit-$Kol-$Tekrar"
+    $u = Urun $Girdi $Mb $ad (@('--no-resolution-drop', '--no-fps-drop') + $Ek)
+    $rb = Probe $Ref
+    $o = Olc $Ref $u.Dosya $rb.FpsMetin -EkYok
+    $e = UrunOrtak $u $Mb
+    $e.tekrar = $Tekrar
+    $e.filtre = @(Get-Content (Join-Path $Cikti "$ad.log") | Where-Object { $_ -like 'filtre:*' } | Select-Object -Last 1) -join ''
+    $e.bwdif = [bool]($u.Komut -like '*bwdif*')
+    Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $Kol; istenen_kbit = $Kbit }) $o $e
+    Remove-Item $u.Dosya
+}
+
+function Filtre {
+    $ffv1 = Join-Path $Cikti "kesit-$Kesit.mkv"
+    $kbit = 2000
+    $ara = Join-Path $Cikti "filtre-$Kesit-h264.mkv"
+    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-pix_fmt', 'yuv420p', $ara)
+    $b = Probe $ara
+    $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
+    $kollar = @{ kapali = @('--filters', 'deinterlace=off'); otomatik = @(); acik = @('--filters', 'deinterlace=on') }
+    $sira = @(@(1, @('kapali', 'otomatik', 'acik')), @(2, @('acik', 'otomatik', 'kapali')))
+    foreach ($s in $sira) {
+        foreach ($kol in $s[1]) {
+            Dene $Kesit $kol $kbit { FiltreSatir $kol $s[0] $ara $ara $mb $kbit $kollar[$kol] }
+        }
+    }
+    $ozet = [ordered]@{ is = $Is; kesit = $Kesit; kol = 'hukum-progressive'; istenen_kbit = $kbit }
+    $satir = @($Satirlar | Where-Object { $_.kesit -eq $Kesit -and $_.kol -in @('kapali', 'otomatik', 'acik') -and -not $_.PSObject.Properties['hata'] })
+    $k = @($satir | Where-Object { $_.kol -eq 'kapali' })
+    foreach ($kol in @('otomatik', 'acik')) {
+        $a = @($satir | Where-Object { $_.kol -eq $kol })
+        if ($k.Count -lt 2 -or $a.Count -lt 2) { $ozet["${kol}_hukum"] = 'eksik'; continue }
+        $dv = [math]::Round((($a | Measure-Object vmafneg_ort -Average).Average) - (($k | Measure-Object vmafneg_ort -Average).Average), 4)
+        $ks = ($k | Measure-Object toplam_sn -Minimum).Minimum
+        $as = ($a | Measure-Object toplam_sn -Minimum).Minimum
+        $ds = [math]::Round(($as - $ks) / $ks * 100, 2)
+        $ozet["${kol}_delta_vmafneg"] = $dv
+        $ozet["${kol}_sure_yuzde"] = $ds
+        $ozet["${kol}_hukum"] = if ([math]::Abs($dv) -lt 0.1 -and $ds -lt 5) { 'gecti' } else { 'kaldi' }
+    }
+    Ekle $ozet $null $null
+    Remove-Item $ara -ErrorAction SilentlyContinue
+
+    if ($Kesit -ne 'hareketli') { return }
+    $tar = Join-Path $Cikti 'filtre-taramali.mkv'
+    $ref = Join-Path $Cikti 'filtre-taramali-ref.mkv'
+    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', 'tinterlace=mode=interleave_top,setfield=tff', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-flags', '+ilme+ildct', '-top', '1', '-pix_fmt', 'yuv420p', $tar)
+    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', "select=not(mod(n\,2)),fps=$((Probe $tar).FpsMetin)", '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-pix_fmt', 'yuv420p', $ref)
+    $alan = (& ffprobe -v error -select_streams v:0 -show_entries stream=field_order -of csv=p=0 $tar | Out-String).Trim()
+    $tb = Probe $tar
+    $tmb = [math]::Round($kbit * $tb.Sure / 8 / 1024, 4)
+    foreach ($kol in @('kapali', 'otomatik')) {
+        Dene $Kesit "taramali-$kol" $kbit { FiltreSatir "taramali-$kol" 1 $tar $ref $tmb $kbit $kollar[$kol] }
+    }
+    $n = [ordered]@{ is = $Is; kesit = $Kesit; kol = 'hukum-taramali'; istenen_kbit = $kbit; field_order = $alan }
+    $tk = @($Satirlar | Where-Object { $_.kol -eq 'taramali-kapali' -and -not $_.PSObject.Properties['hata'] }) | Select-Object -First 1
+    $ta = @($Satirlar | Where-Object { $_.kol -eq 'taramali-otomatik' -and -not $_.PSObject.Properties['hata'] }) | Select-Object -First 1
+    if ($tk -and $ta) {
+        $n.delta_vmafneg = [math]::Round($ta.vmafneg_ort - $tk.vmafneg_ort, 4)
+        $n.hukum = if ($ta.bwdif -and -not $tk.bwdif -and $n.delta_vmafneg -ge 1.0) { 'gecti' } else { 'kaldi' }
+    } else { $n.hukum = 'eksik' }
+    Ekle $n $null $null
+}
+
 switch ($Is) {
+    'filtre' { Filtre }
     'karanlikgecis' { KaranlikGecis }
     'yavg' { Yavg }
     'svtbekci' { SvtBekci }

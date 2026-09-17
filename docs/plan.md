@@ -1,3 +1,17 @@
+# HandBrake A1 — Filtre Zinciri
+
+Dal `t0/hb-a1-filtre`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 31-39, 63; fable K7, K8, B9.
+
+1. **Core.** Yeni `src/VidShrink.Core/VideoFilterChain.cs`: `VideoFilterOptions` (varsayılan: deinterlace koşullu,
+   kırpma ve diğer her filtre kapalı), zincir sırası, idet kararı, `PlannedSource` (kırpma/döndürme/detelecine
+   boyutu). `FfmpegArguments.Build` filtre yeri tek çağrıya iner. `PlanOptions.Filters` → `EncodePlan.Filters`;
+   filtre açıkken passthrough yok. `MediaInfo.FieldOrder` ffprobe'dan.
+2. **Ffmpeg.** `InterlaceProbe.cs` (belirsiz field_order + h264/mpeg2/dv → idet), `CropProbe.cs` (10 nokta,
+   limit=24, mod birleştirme; `siyah-kenar.md`). `EncodeRunner` Auto kararı koşudan önce çözer.
+3. **Bench.** `shrink --filters <tanım>`; CLI başka ajanın alanı, dokunulmaz.
+4. **Testler.** `VideoFilterChainTests` (argüman + negatif kontrol), `FiltreYoklamaTests` (gerçek ffmpeg, ≤3 sn).
+5. **B9.** `hb.ps1 -Is filtre` + `handbrake-kiyas.yml` haritası; kural önce `docs/olcumler/handbrake-filtre.md`.
+
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.

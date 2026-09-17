@@ -113,6 +113,12 @@ public sealed class EncodeRunner
         if (plan.ModeEnum == EncodeMode.PassThrough)
             return PassThrough(info, plan, outputPath);
 
+        if (VideoFilterChain.NeedsInterlaceProbe(info, plan.Filters))
+        {
+            plan = plan.Clone();
+            plan.Filters = await InterlaceProbe.ResolveAsync(info, plan.Filters, ct);
+        }
+
         var effectiveTargetMb = Math.Min(targetMb, plan.EffectiveTargetMb ?? targetMb);
         var band = FillBand.For(effectiveTargetMb);
         var current = plan;

@@ -109,6 +109,8 @@ public sealed class EncodePlan
     [JsonPropertyName("pixelFormat")] public string PixelFormat { get; set; } = "yuv420p";
     [JsonIgnore] public string? HdrVideoFilter { get; set; }
     [JsonIgnore] public List<string> HdrColorArgs { get; set; } = new();
+    [JsonIgnore] public VideoFilterOptions Filters { get; set; } = VideoFilterOptions.Default;
+    [JsonIgnore] public CropRect? SuggestedCrop { get; set; }
     [JsonPropertyName("extraArgs")] public List<string> ExtraArgs { get; set; } = new();
     [JsonPropertyName("reason")] public string Reason { get; set; } = "";
     [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();
