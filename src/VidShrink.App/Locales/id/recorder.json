@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg berakhir dengan kode {0}.",
   "recorder.error.no-ffmpeg": "{0} tidak ditemukan.",
   "recorder.error.invalid": "Pengaturan ini tidak mengizinkan perekaman: {0}",
+  "recorder.error.window-wayland": "Perekaman jendela tidak didukung dalam sesi Wayland; pilih layar atau area, atau masuk ke sesi X11.",
+  "recorder.error.window-missing": "Jendela \"{0}\" tidak ditemukan; segarkan daftar dan pilih lagi.",
   "recorder.error.number": "{0} harus berupa angka.",
   "recorder.error.start": "Perekaman tidak dapat dimulai: {0}",
   "recorder.error.folder": "Folder tidak dapat dipilih: {0}",

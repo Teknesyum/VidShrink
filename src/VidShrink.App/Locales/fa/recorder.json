@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg با کد {0} پایان یافت.",
   "recorder.error.no-ffmpeg": "{0} یافت نشد.",
   "recorder.error.invalid": "این تنظیمات اجازهٔ ضبط را نمی‌دهند: {0}",
+  "recorder.error.window-wayland": "ضبط پنجره در نشست Wayland پشتیبانی نمی‌شود؛ صفحه یا ناحیه را انتخاب کنید یا وارد نشست X11 شوید.",
+  "recorder.error.window-missing": "پنجرهٔ «{0}» پیدا نشد؛ فهرست را تازه کنید و دوباره انتخابش کنید.",
   "recorder.error.number": "{0} باید یک عدد باشد.",
   "recorder.error.start": "ضبط آغاز نشد: {0}",
   "recorder.error.folder": "پوشه انتخاب نشد: {0}",

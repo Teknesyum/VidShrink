@@ -52,6 +52,8 @@
   "recorder.output.failed": "Το ffmpeg τερματίστηκε με κωδικό {0}.",
   "recorder.error.no-ffmpeg": "Το {0} δεν βρέθηκε.",
   "recorder.error.invalid": "Αυτές οι ρυθμίσεις δεν επιτρέπουν εγγραφή: {0}",
+  "recorder.error.window-wayland": "Η λήψη παραθύρου δεν υποστηρίζεται σε συνεδρία Wayland· επιλέξτε οθόνη ή περιοχή ή συνδεθείτε σε συνεδρία X11.",
+  "recorder.error.window-missing": "Το παράθυρο «{0}» δεν βρέθηκε· ανανεώστε τη λίστα και επιλέξτε το ξανά.",
   "recorder.error.number": "Το {0} πρέπει να είναι αριθμός.",
   "recorder.error.start": "Η εγγραφή δεν ήταν δυνατό να ξεκινήσει: {0}",
   "recorder.error.folder": "Ο φάκελος δεν ήταν δυνατό να επιλεγεί: {0}",
