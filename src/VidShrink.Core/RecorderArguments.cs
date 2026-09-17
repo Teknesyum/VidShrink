@@ -213,7 +213,19 @@ public sealed record RecorderRequest
     /// <c>-an</c> yazilir. Birden fazla esleme varsa her ize kendi <c>-c:a:N</c>'i yazilir.
     /// </summary>
     public AudioCapturePlan? Audio { get; init; }
+
+    public RecorderWebcam? Webcam { get; init; }
 }
+
+public enum WebcamCorner
+{
+    BottomRight,
+    BottomLeft,
+    TopRight,
+    TopLeft
+}
+
+public sealed record RecorderWebcam(string Device, int Width, WebcamCorner Corner = WebcamCorner.BottomRight);
 
 /// <summary>
 /// Ekran kaydi argumanlarini uretir. Kosturmaz — surec surmeyi
@@ -569,6 +581,7 @@ public static class RecorderArguments
         errors.AddRange(ColourErrors(request));
         errors.AddRange(LimitErrors(request));
         errors.AddRange(GifErrors(request));
+        errors.AddRange(WebcamErrors(request));
 
         if (request.Target == RecorderTargetKind.Window)
             errors.AddRange(WindowErrors(request));
@@ -708,6 +721,59 @@ public static class RecorderArguments
             yield return $"A GIF frame delay is counted in hundredths of a second; the frame rate must not exceed {GifPalette.MaxFps}.";
     }
 
+    public const int WebcamMargin = 16;
+
+    public const int MinWebcamWidth = 64;
+
+    public const int MaxWebcamWidth = 1920;
+
+    public const string WebcamBufferSize = "256M";
+
+    public static IReadOnlyList<int> WebcamWidths { get; } = new[] { 160, 240, 320, 480 };
+
+    private static IEnumerable<string> WebcamErrors(RecorderRequest request)
+    {
+        if (request.Webcam is not { } cam) yield break;
+        if (request.Platform != RecorderPlatform.Windows)
+            yield return "The webcam overlay reads the camera through DirectShow and is only available on Windows.";
+        if (string.IsNullOrWhiteSpace(cam.Device))
+            yield return "The webcam overlay needs a camera device.";
+        else if (cam.Device.Contains('"', StringComparison.Ordinal))
+            yield return "A camera device name cannot contain a quotation mark.";
+        if (cam.Width < MinWebcamWidth || cam.Width > MaxWebcamWidth || cam.Width % 2 != 0)
+            yield return $"The webcam width must be an even number between {MinWebcamWidth} and {MaxWebcamWidth} pixels.";
+        if (!Enum.IsDefined(cam.Corner))
+            yield return "The webcam corner is not one of the four corners.";
+    }
+
+    public static string WebcamPosition(WebcamCorner corner)
+    {
+        var margin = Number(WebcamMargin);
+        var left = margin;
+        var right = $"main_w-overlay_w-{margin}";
+        var top = margin;
+        var bottom = $"main_h-overlay_h-{margin}";
+        return corner switch
+        {
+            WebcamCorner.TopLeft => $"{left}:{top}",
+            WebcamCorner.TopRight => $"{right}:{top}",
+            WebcamCorner.BottomLeft => $"{left}:{bottom}",
+            _ => $"{right}:{bottom}"
+        };
+    }
+
+    public const string WebcamOutputLabel = "vout";
+
+    public static string? WebcamGraph(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.Webcam is not { } cam) return null;
+        var index = Number(AudioFirstInputIndex + (request.Audio?.InputCount ?? 0));
+        return $"[0:v]{VideoFilter(request) ?? "null"}[base];"
+               + $"[{index}:v]scale={Number(cam.Width)}:-2[cam];"
+               + $"[base][cam]overlay={WebcamPosition(cam.Corner)}:eof_action=repeat[{WebcamOutputLabel}]";
+    }
+
     private static IEnumerable<string> ScreenSelectionErrors(RecorderRequest request)
     {
         if (request.Platform != RecorderPlatform.Windows || request.ScreenIndex == 0) yield break;
@@ -754,16 +820,21 @@ public static class RecorderArguments
         var audio = request.Audio is { InputCount: > 0 } plan ? plan : null;
         if (audio is not null) a.AddRange(audio.Inputs);
 
-        if (VideoFilter(request) is { } filter) a.AddRange(new[] { "-vf", filter });
+        var webcam = WebcamGraph(request with { Audio = audio });
+        if (request.Webcam is { } cam)
+            a.AddRange(new[] { "-f", "dshow", "-rtbufsize", WebcamBufferSize, "-i", "video=" + cam.Device });
 
-        if (audio?.FilterComplex is { Length: > 0 } graph)
-            a.AddRange(new[] { "-filter_complex", graph });
+        if (webcam is null && VideoFilter(request) is { } filter) a.AddRange(new[] { "-vf", filter });
+
+        var graphs = new[] { webcam, audio?.FilterComplex }.Where(g => !string.IsNullOrEmpty(g)).ToArray();
+        if (graphs.Length > 0)
+            a.AddRange(new[] { "-filter_complex", string.Join(";", graphs) });
 
         a.AddRange(new[] { "-c:v", request.VideoCodec, "-preset", request.Preset });
         a.AddRange(RateControlArgs(request));
         a.AddRange(StreamShapeArgs(request));
         a.AddRange(ColourArgs(request));
-        a.AddRange(AudioOutputArgs(audio));
+        a.AddRange(AudioOutputArgs(audio, webcam is null ? "0:v" : $"[{WebcamOutputLabel}]"));
 
         if (request.MaxDuration is { } limit)
             a.AddRange(new[] { "-t", limit.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
@@ -825,6 +896,7 @@ public static class RecorderArguments
         {
             Container = RecorderContainer.Mp4,
             Audio = null,
+            Webcam = null,
             MaxDuration = null,
             Split = null
         };
@@ -874,11 +946,12 @@ public static class RecorderArguments
     /// cunku izler ayri kaldiginda hangisinin hangi kodlayiciya gittigi argumandan
     /// okunabilmeli.
     /// </summary>
-    private static IReadOnlyList<string> AudioOutputArgs(AudioCapturePlan? audio)
+    private static IReadOnlyList<string> AudioOutputArgs(AudioCapturePlan? audio, string videoMap)
     {
-        if (audio is null) return new[] { "-an" };
+        if (audio is null)
+            return videoMap == "0:v" ? new[] { "-an" } : new[] { "-map", videoMap, "-an" };
 
-        var a = new List<string> { "-map", "0:v" };
+        var a = new List<string> { "-map", videoMap };
         foreach (var map in audio.Maps) a.AddRange(new[] { "-map", map });
 
         if (audio.Maps.Count <= 1)

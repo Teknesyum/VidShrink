@@ -427,6 +427,10 @@
                       Theme="{StaticResource CheckStyle}"
                       Content="{loc:Text recorder.option.show-keys}"
                       auto:AutomationProperties.Name="{loc:Text recorder.option.show-keys}"/>
+            <CheckBox x:Name="ChkMagnifier"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.option.magnifier}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.option.magnifier}"/>
           </WrapPanel>
 
           <StackPanel>
@@ -590,6 +594,35 @@
         </Grid>
 
         <TextBlock Text="{loc:Text recorder.audio.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+      </StackPanel>
+    </Border>
+
+    <Border x:Name="PanelWebcam" Theme="{StaticResource Panel}">
+      <StackPanel Spacing="{StaticResource SpaceMd}">
+        <TextBlock Text="{loc:Text recorder.webcam.title}" Theme="{StaticResource H3}"/>
+
+        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+          <StackPanel Grid.Column="0">
+            <TextBlock Text="{loc:Text recorder.webcam.device}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbWebcam"
+                      HorizontalAlignment="Stretch"
+                      auto:AutomationProperties.Name="{loc:Text recorder.webcam.device}"/>
+          </StackPanel>
+
+          <StackPanel Grid.Column="1">
+            <TextBlock Text="{loc:Text recorder.webcam.size}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbWebcamSize"
+                      auto:AutomationProperties.Name="{loc:Text recorder.webcam.size}"/>
+          </StackPanel>
+
+          <StackPanel Grid.Column="2">
+            <TextBlock Text="{loc:Text recorder.webcam.corner}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbWebcamCorner"
+                      auto:AutomationProperties.Name="{loc:Text recorder.webcam.corner}"/>
+          </StackPanel>
+        </Grid>
+
+        <TextBlock Text="{loc:Text recorder.webcam.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
       </StackPanel>
     </Border>
   </StackPanel>

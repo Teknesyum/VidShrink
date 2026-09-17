@@ -128,6 +128,7 @@ public static class RecorderAutoProbe
         var request = RecorderAutoPlan.Apply(baseRequest, candidate) with
         {
             Audio = null,
+            Webcam = null,
             Split = null,
             MaxDuration = TimeSpan.FromSeconds(trialSeconds)
         };

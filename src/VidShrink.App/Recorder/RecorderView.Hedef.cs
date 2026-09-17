@@ -68,6 +68,7 @@ internal partial class RecorderView
         ChkShowClicks.IsChecked = _settings.ShowClicks;
         ChkClickSound.IsChecked = _settings.ClickSound;
         ChkShowKeys.IsChecked = _settings.ShowKeys;
+        ChkMagnifier.IsChecked = _settings.ShowMagnifier;
         TxtWindowTitle.Text = _settings.WindowTitle ?? string.Empty;
         TxtRegionX.Text = _settings.RegionX.ToString(CultureInfo.InvariantCulture);
         TxtRegionY.Text = _settings.RegionY.ToString(CultureInfo.InvariantCulture);
@@ -170,6 +171,7 @@ internal partial class RecorderView
         {
             Region = region,
             Audio = audio,
+            Webcam = ChosenWebcam(),
             Container = _settings.Container,
             ScreenIndex = target == RecorderTargetKind.Screen ? ChosenScreen : 0,
             Screens = Monitors(),
@@ -292,9 +294,11 @@ internal partial class RecorderView
         _settings.ShowClicks = ChkShowClicks.IsChecked ?? false;
         _settings.ClickSound = ChkClickSound.IsChecked ?? false;
         _settings.ShowKeys = ChkShowKeys.IsChecked ?? false;
+        _settings.ShowMagnifier = ChkMagnifier.IsChecked ?? false;
         _settings.WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text;
         _settings.MicrophoneName = DeviceChoice(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
         _settings.SystemAudioName = DeviceChoice(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);
+        CollectWebcam();
 
         if (int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps)) _settings.Fps = fps;
         if (double.TryParse(TxtQuality.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var quality)) _settings.Quality = quality;

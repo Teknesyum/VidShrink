@@ -133,7 +133,8 @@ internal partial class RecorderView
             ChkShowKeys.IsChecked ?? false,
             ChkOpenFolder.IsChecked ?? false,
             ChkCursor.IsChecked ?? false,
-            _session is not null || CountingDown);
+            _session is not null || CountingDown,
+            ChkMagnifier.IsChecked ?? false);
     }
 
     internal RecorderMini? Mini => _mini;
@@ -152,6 +153,7 @@ internal partial class RecorderView
             case MiniOptionKind.ShowClicks: ChkShowClicks.IsChecked = option.Value; _settings.ShowClicks = option.Value; break;
             case MiniOptionKind.ClickSound: ChkClickSound.IsChecked = option.Value; _settings.ClickSound = option.Value; break;
             case MiniOptionKind.ShowKeys: ChkShowKeys.IsChecked = option.Value; _settings.ShowKeys = option.Value; break;
+            case MiniOptionKind.Magnifier: ChkMagnifier.IsChecked = option.Value; _settings.ShowMagnifier = option.Value; break;
             case MiniOptionKind.OpenFolder: ChkOpenFolder.IsChecked = option.Value; _settings.OpenFolderWhenDone = option.Value; break;
             case MiniOptionKind.Cursor: ChkCursor.IsChecked = option.Value; break;
         }

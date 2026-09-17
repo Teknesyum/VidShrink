@@ -32,6 +32,7 @@ internal partial class RecorderView
         _devices = CaptureDevices.Instance.Audio;
         FillAudioBox(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
         FillAudioBox(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);
+        RefreshWebcamBoxes();
     });
 
     private void FillAudioBox(ComboBox box, AudioSourceRole role, string? remembered)

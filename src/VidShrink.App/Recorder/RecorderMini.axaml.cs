@@ -16,6 +16,7 @@ internal enum MiniOptionKind
     ShowClicks,
     ClickSound,
     ShowKeys,
+    Magnifier,
     OpenFolder,
     Cursor
 }
@@ -67,11 +68,12 @@ internal partial class RecorderMini : Window
         (ChkShowClicks, new MiniOption(MiniOptionKind.ShowClicks, false)),
         (ChkClickSound, new MiniOption(MiniOptionKind.ClickSound, false)),
         (ChkShowKeys, new MiniOption(MiniOptionKind.ShowKeys, false)),
+        (ChkMagnifier, new MiniOption(MiniOptionKind.Magnifier, false)),
         (ChkOpenFolder, new MiniOption(MiniOptionKind.OpenFolder, false)),
         (ChkCursor, new MiniOption(MiniOptionKind.Cursor, false))
     };
 
-    internal void ShowOptions(bool showClicks, bool clickSound, bool showKeys, bool openFolder, bool cursor, bool recording)
+    internal void ShowOptions(bool showClicks, bool clickSound, bool showKeys, bool openFolder, bool cursor, bool recording, bool magnifier = false)
     {
         _showingOptions = true;
         try
@@ -79,6 +81,7 @@ internal partial class RecorderMini : Window
             ChkShowClicks.IsChecked = showClicks;
             ChkClickSound.IsChecked = clickSound;
             ChkShowKeys.IsChecked = showKeys;
+            ChkMagnifier.IsChecked = magnifier;
             ChkOpenFolder.IsChecked = openFolder;
             ChkCursor.IsChecked = cursor;
             ChkCursor.IsEnabled = !recording;

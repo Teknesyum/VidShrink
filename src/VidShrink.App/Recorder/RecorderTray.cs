@@ -60,7 +60,7 @@ internal static class RecorderTray
         }
 
         using var stream = new MemoryStream();
-        bitmap.Save(stream);
+        bitmap.Save(stream, PngBitmapEncoderOptions.Default);
         stream.Position = 0;
         return new WindowIcon(stream);
     }

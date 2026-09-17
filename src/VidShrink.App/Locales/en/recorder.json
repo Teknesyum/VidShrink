@@ -146,5 +146,17 @@
   "recorder.option.click-sound": "Click sound",
   "recorder.option.show-keys": "Show pressed keys",
   "recorder.mini.options": "Recording options",
-  "recorder.mini.options-locked": "Can't be changed while recording"
+  "recorder.mini.options-locked": "Can't be changed while recording",
+  "recorder.webcam.title": "Webcam",
+  "recorder.webcam.device": "Camera device",
+  "recorder.webcam.none": "No webcam",
+  "recorder.webcam.size": "Width",
+  "recorder.webcam.width": "{0} px",
+  "recorder.webcam.corner": "Corner",
+  "recorder.webcam.bottom-right": "Bottom right",
+  "recorder.webcam.bottom-left": "Bottom left",
+  "recorder.webcam.top-right": "Top right",
+  "recorder.webcam.top-left": "Top left",
+  "recorder.webcam.hint": "The camera picture is placed in the chosen corner of the recording. The list refreshes together with the audio list.",
+  "recorder.option.magnifier": "Cursor magnifier"
 }

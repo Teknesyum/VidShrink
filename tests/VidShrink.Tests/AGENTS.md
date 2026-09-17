@@ -64,6 +64,10 @@ sürümden (`x.0.0`) önce koşar.
 - `KaydediciGirdiTests.cs` — paket 2, tıklama halkası, tıklama sesi, tuş gösterimi: `KeyText`/`KeyTracker`, bellek
   WAV'ı, bindirme yeri; sahte `IInputHooks`/`IInputOverlay`/`IClickSound` ile kutu → json → kanca, kapalı kutu kanca
   kurmaz; gerçek halka ve tuş penceresi açılıp süresinde kapanır. Gerçek düşük seviye kanca testte kurulmaz.
+- `KaydediciKameraTests.cs` — paket 2, webcam bindirmesi ve imleç büyüteci: dshow girdisi, `overlay` grafiği ses ve
+  ölçekle tek `-filter_complex`, dört köşe, geçersiz aygıt/genişlik/köşe reddi; sahte `CameraSource` ile kutu → json →
+  istek. `[KameraFact]` OBS Virtual Camera varsa 3 sn kayıt, köşe parlaklığı karşı köşeyle kıyaslanır (CI'da atlanır).
+  Büyüteç: saf yerleşim, gerçek pencere `Follow`, sahte `IMagnifier` ile yalnız kayıtta açılma. Kanıt `.calisma/paket-2/`.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

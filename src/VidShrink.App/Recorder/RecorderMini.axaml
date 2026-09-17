@@ -68,6 +68,10 @@
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.option.show-keys}"
                         auto:AutomationProperties.Name="{loc:Text recorder.option.show-keys}"/>
+              <CheckBox x:Name="ChkMagnifier"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.magnifier}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.magnifier}"/>
               <CheckBox x:Name="ChkOpenFolder"
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.output.open-when-done}"

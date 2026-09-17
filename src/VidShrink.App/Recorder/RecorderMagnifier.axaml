@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="VidShrink.App.Recorder.RecorderMagnifier"
+        Title="VidShrink"
+        WindowDecorations="None"
+        CanResize="False"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        Focusable="False"
+        IsHitTestVisible="False"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        Width="{StaticResource RecorderMagnifierSize}"
+        Height="{StaticResource RecorderMagnifierSize}">
+  <Border BorderBrush="{StaticResource NeonEmber}"
+          BorderThickness="{StaticResource RecorderFrameBorder}"
+          IsHitTestVisible="False">
+    <Image x:Name="Lens"
+           Stretch="Fill"
+           RenderOptions.BitmapInterpolationMode="None"
+           IsHitTestVisible="False"/>
+  </Border>
+</Window>

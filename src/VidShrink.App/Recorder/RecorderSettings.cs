@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using VidShrink.Core;
@@ -64,6 +65,8 @@ internal sealed class RecorderSettings
 
     internal bool ShowKeys { get; set; }
 
+    internal bool ShowMagnifier { get; set; }
+
     internal RecorderTargetKind Target { get; set; } = RecorderTargetKind.Screen;
 
     internal string? WindowTitle { get; set; }
@@ -87,6 +90,12 @@ internal sealed class RecorderSettings
 
     /// <summary>Seçilen sistem sesi cihazının adı.</summary>
     internal string? SystemAudioName { get; set; }
+
+    internal string? WebcamName { get; set; }
+
+    internal int WebcamWidth { get; set; } = 240;
+
+    internal WebcamCorner WebcamCorner { get; set; } = WebcamCorner.BottomRight;
 
     /// <summary>Kaydın yazıldığı kap; çıktı uzantısı bundan geliyor.</summary>
     internal RecorderContainer Container { get; set; } = RecorderContainer.Mkv;
@@ -221,6 +230,7 @@ internal sealed class RecorderSettings
             settings.ShowClicks = (bool?)root["showClicks"] ?? false;
             settings.ClickSound = (bool?)root["clickSound"] ?? false;
             settings.ShowKeys = (bool?)root["showKeys"] ?? false;
+            settings.ShowMagnifier = (bool?)root["showMagnifier"] ?? false;
             if (Enum.TryParse<RecorderTargetKind>((string?)root["target"], true, out var target)) settings.Target = target;
             settings.WindowTitle = (string?)root["windowTitle"];
             settings.RegionX = (int?)root["regionX"] ?? 0;
@@ -230,6 +240,9 @@ internal sealed class RecorderSettings
             if ((string?)root["regionAspect"] is { } aspect && Array.IndexOf(RegionDraw.Aspects, aspect) >= 0) settings.RegionAspect = aspect;
             settings.MicrophoneName = (string?)root["microphoneName"];
             settings.SystemAudioName = (string?)root["systemAudioName"];
+            settings.WebcamName = (string?)root["webcamName"];
+            if ((int?)root["webcamWidth"] is { } camWidth && RecorderArguments.WebcamWidths.Contains(camWidth)) settings.WebcamWidth = camWidth;
+            if (Enum.TryParse<WebcamCorner>((string?)root["webcamCorner"], true, out var corner) && Enum.IsDefined(corner)) settings.WebcamCorner = corner;
             if (Enum.TryParse<RecorderContainer>((string?)root["containerChoice"], true, out var choice)) settings.Container = choice;
             else if (Enum.TryParse<RecorderContainer>((string?)root["container"], true, out var container) && container != RecorderContainer.Mp4)
                 settings.Container = container;
@@ -303,6 +316,7 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("showClicks", ShowClicks);
                 writer.WriteBoolean("clickSound", ClickSound);
                 writer.WriteBoolean("showKeys", ShowKeys);
+                writer.WriteBoolean("showMagnifier", ShowMagnifier);
                 writer.WriteString("target", Target.ToString());
                 if (WindowTitle is null) writer.WriteNull("windowTitle");
                 else writer.WriteString("windowTitle", WindowTitle);
@@ -315,6 +329,10 @@ internal sealed class RecorderSettings
                 else writer.WriteString("microphoneName", MicrophoneName);
                 if (SystemAudioName is null) writer.WriteNull("systemAudioName");
                 else writer.WriteString("systemAudioName", SystemAudioName);
+                if (WebcamName is null) writer.WriteNull("webcamName");
+                else writer.WriteString("webcamName", WebcamName);
+                writer.WriteNumber("webcamWidth", WebcamWidth);
+                writer.WriteString("webcamCorner", WebcamCorner.ToString());
                 writer.WriteString("containerChoice", Container.ToString());
                 writer.WriteNumber("screenIndex", ScreenIndex);
                 writer.WriteNumber("scaleWidth", ScaleWidth);

@@ -33,8 +33,20 @@ internal partial class RecorderView
 
     private bool WantsClicks => _settings.ShowClicks || _settings.ClickSound;
 
+    private IMagnifier? _magnifier;
+
+    internal IMagnifier Magnifier
+    {
+        get => _magnifier ??= RealDesktop ? new RecorderMagnifierHost() : new NoMagnifier();
+        set => _magnifier = value;
+    }
+
     internal void SyncInput(bool recording)
     {
+        var lens = recording && _settings.ShowMagnifier;
+        if (lens && !Magnifier.Running) Magnifier.Start();
+        else if (!lens && Magnifier.Running) Magnifier.Stop();
+
         var wanted = recording && (WantsClicks || _settings.ShowKeys);
         var mode = (WantsClicks, _settings.ShowKeys);
         if (wanted == InputActive && (!wanted || mode == _inputMode)) return;

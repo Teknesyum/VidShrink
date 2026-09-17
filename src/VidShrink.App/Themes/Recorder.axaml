@@ -58,5 +58,9 @@
   <sys:TimeSpan x:Key="RecorderClickRingHold">00:00:00.3600000</sys:TimeSpan>
   <sys:TimeSpan x:Key="RecorderKeyCaptionHold">00:00:01.5000000</sys:TimeSpan>
   <x:Double x:Key="RecorderKeyCaptionGap">24</x:Double>
+  <x:Double x:Key="RecorderMagnifierSize">144</x:Double>
+  <x:Double x:Key="RecorderMagnifierZoom">2</x:Double>
+  <x:Double x:Key="RecorderMagnifierGap">24</x:Double>
+  <sys:TimeSpan x:Key="RecorderMagnifierInterval">00:00:00.0333333</sys:TimeSpan>
 
 </ResourceDictionary>

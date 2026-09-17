@@ -146,5 +146,17 @@
   "recorder.option.click-sound": "Tıklama sesi",
   "recorder.option.show-keys": "Basılan tuşları göster",
   "recorder.mini.options": "Kayıt ayarları",
-  "recorder.mini.options-locked": "Kayıt sürerken değiştirilemez"
+  "recorder.mini.options-locked": "Kayıt sürerken değiştirilemez",
+  "recorder.webcam.title": "Kamera",
+  "recorder.webcam.device": "Kamera aygıtı",
+  "recorder.webcam.none": "Kamera yok",
+  "recorder.webcam.size": "Genişlik",
+  "recorder.webcam.width": "{0} piksel",
+  "recorder.webcam.corner": "Köşe",
+  "recorder.webcam.bottom-right": "Sağ alt",
+  "recorder.webcam.bottom-left": "Sol alt",
+  "recorder.webcam.top-right": "Sağ üst",
+  "recorder.webcam.top-left": "Sol üst",
+  "recorder.webcam.hint": "Kamera görüntüsü kaydın seçilen köşesine yerleşir. Liste, ses listesiyle birlikte yenilenir.",
+  "recorder.option.magnifier": "İmleç büyüteci"
 }
