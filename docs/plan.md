@@ -19,6 +19,7 @@ Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 4
 3. **HandBrake çevirisi.** `HandBrakePresetImport`: taşınan/yaklaşık/düşen alan notları, `main.preset.handbrake.*`.
 4. **Testler.** `OnAyarKutuphanesiTests`, `KullaniciOnAyarTests`, `HandBrakeOnAyarCeviriTests`; her kol negatif kontrol
    ve mutasyon.
+
 # VideoToolbox Hızlı Kip — Plan Yolu
 
 Dal `t0/vt-hizli`. Karar: `fable-kararlar-2026-09-17.md` soru 1. Kapı önce `docs/olcumler/videotoolbox-hizli.md`.
