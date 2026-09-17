@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using VidShrink.Core;
 
 namespace VidShrink.App.Recorder;
 
@@ -48,11 +49,16 @@ internal partial class RecorderRegionPicker : Window
 
     private void Cover()
     {
+        var placements = Screens.All
+            .Select(s => new ScreenPlacement(new ScreenBounds(0, s.Bounds.X, s.Bounds.Y, s.Bounds.Width, s.Bounds.Height), s.Scaling))
+            .ToList();
+
         _desktop = RegionDraw.Desktop(Screens.All.Select(s => s.Bounds));
-        var scaling = Screens.Primary?.Scaling ?? 1;
-        Position = _desktop.Position;
-        Width = _desktop.Width / scaling;
-        Height = _desktop.Height / scaling;
+        if (RecorderLayout.Cover(placements) is not { } cover) return;
+
+        Position = new PixelPoint(cover.X, cover.Y);
+        Width = cover.Width;
+        Height = cover.Height;
         Scrim.Width = Width;
         Scrim.Height = Height;
     }

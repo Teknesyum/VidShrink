@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -240,7 +240,7 @@ public sealed class KaydediciSeciciTests
         File.WriteAllLines(Path.Combine(Kanit, "ekran-secimi.txt"), new[]
         {
             $"etiketler={string.Join(" | ", olcu.etiketler)} json screenIndex={olcu.dosyada} yeniden={olcu.secili}",
-            $"arguman -offset_x {olcu.x} -video_size {olcu.boyut}; degismeyen -offset_x {olcu.ilkX}"
+            $"arguman -offset_x {olcu.x} -video_size {olcu.boyut}; ilk ekran -offset_x {olcu.ilkX} (iki monitorlu masaustunde ilk ekran da ofsetleniyor)"
         });
 
         Assert.Equal(2, olcu.etiketler.Length);
@@ -249,6 +249,6 @@ public sealed class KaydediciSeciciTests
         Assert.Equal(1, olcu.secili);
         Assert.True(olcu.gorunur);
         Assert.Equal(("1024", "1920x1080"), (olcu.x, olcu.boyut));
-        Assert.Null(olcu.ilkX);
+        Assert.Equal("0", olcu.ilkX);
     }
 }

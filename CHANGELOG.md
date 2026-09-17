@@ -7,6 +7,27 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Fixed
+
+- Screen capture on a multi-monitor desktop no longer records the whole virtual desktop when
+  the first monitor is selected. `gdigrab` takes no screen index, so every monitor - index 0
+  included - is now converted to an offset region; a single-monitor machine keeps the
+  offset-free `-i desktop` arguments.
+- A capture region on a monitor placed left of or above the primary one is accepted. The blanket
+  "region offsets cannot be negative" rule closed region capture on those monitors outright; the
+  rule now asks whether the enumerated monitors cover the rectangle instead of looking at the
+  sign. On macOS, where a region is a crop inside the captured frame, negative offsets stay
+  rejected.
+- A region that falls into the gap between monitors, or past the edge of the desktop, is
+  rejected with a named error instead of being recorded as black.
+- The region-drawing overlay covers the desktop on a mixed-DPI setup. It divided the desktop
+  size by the primary monitor's scale while the window itself was born on - and scaled by - the
+  monitor holding the desktop's top-left corner; with a 1.0 primary next to a 1.5 monitor at
+  negative X the overlay covered 7200x2430 px instead of 4800x1620 px.
+
+Measurements: `docs/olcumler/kaydedici-coklu-ekran.md`, harness `tools/kaydedici-yerlesim`.
+
+
 ## [0.8.4] - 2026-09-17
 
 ### Added
