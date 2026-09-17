@@ -47,6 +47,8 @@ public static class ComplexityProbe
     private const int PacketWindowIntervalSeconds = 3;
 
     private static readonly TimeSpan SampleTimeout = TimeSpan.FromSeconds(90);
+    internal const string LumaFilter = "fps=4,scale=160:-2,format=yuv420p,signalstats,metadata=print:key=lavfi.signalstats.YAVG";
+    private static readonly Regex LumaLine = new(@"lavfi\.signalstats\.YAVG=(\d+(?:\.\d+)?)", RegexOptions.CultureInvariant);
     private static readonly TimeSpan PacketReadTimeout = TimeSpan.FromSeconds(120);
 
     public static Task<ComplexityProfile> RunAsync(MediaInfo info, SpeedMode speed, CancellationToken ct = default)
@@ -81,6 +83,7 @@ public static class ComplexityProbe
             var motionIndex = windows.Length / 2;
             var motionTask = MotionSampleAsync(info, windows, motionIndex, preset, speed, ct);
 
+            var lumaTasks = windows.Select(start => LumaSampleAsync(info.FilePath, start, WindowSeconds, ct)).ToArray();
             var pending = windows
                 .Select(start => SampleWindowAsync(info.FilePath, start, canProbeHalf ? (halfWidth, halfHeight) : null, preset, speed, meter, ct))
                 .ToArray();
@@ -119,9 +122,10 @@ public static class ComplexityProbe
             var halfFpsBppf = MotionBppf(fullBppf, motion, windowSamples, motionIndex);
 
             var (bias, source) = await MeasureWindowBiasAsync(info, speed, ct);
+            var meanLuma = MeanOf(await Task.WhenAll(lumaTasks));
 
             return new ProbeResult(
-                ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source, halfFpsBppf),
+                ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source, halfFpsBppf) with { MeanLuma = meanLuma },
                 qualities);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -131,6 +135,63 @@ public static class ComplexityProbe
         catch
         {
             return new ProbeResult(ComplexityProfile.FromSourceBitrate(info), Array.Empty<WindowQualityMeasurement>());
+        }
+    }
+
+    internal static string[] LumaArgs(string path, double start, double length)
+        => new[]
+        {
+            "-hide_banner", "-nostdin",
+            "-ss", start.ToString("0.###", CultureInfo.InvariantCulture),
+            "-t", length.ToString("0.###", CultureInfo.InvariantCulture),
+            "-i", path,
+            "-an", "-sn", "-dn",
+            "-vf", LumaFilter,
+            "-f", "null", "-"
+        };
+
+    public static double? ParseMeanLuma(string stderr)
+    {
+        if (string.IsNullOrEmpty(stderr)) return null;
+        double sum = 0;
+        var count = 0;
+        foreach (Match m in LumaLine.Matches(stderr))
+        {
+            if (!double.TryParse(m.Groups[1].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var v) || !double.IsFinite(v)) continue;
+            sum += v;
+            count++;
+        }
+        return count > 0 ? sum / count : null;
+    }
+
+    internal static double? MeanOf(IReadOnlyList<double?> values)
+    {
+        var used = values.Where(v => v is double d && double.IsFinite(d)).Select(v => v!.Value).ToArray();
+        return used.Length > 0 ? used.Average() : null;
+    }
+
+    private static async Task<double?> LumaSampleAsync(string path, double start, double length, CancellationToken ct)
+    {
+        try
+        {
+            using var deadline = Deadline(ct, SampleTimeout);
+            var token = deadline.Token;
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, LumaArgs(path, start, length)) };
+            process.Start();
+            using var cancellationRegistration = token.Register(() => TryKill(process));
+            var stdoutTask = process.StandardOutput.ReadToEndAsync(token);
+            var stderrTask = process.StandardError.ReadToEndAsync(token);
+            await Task.WhenAll(stdoutTask, stderrTask);
+            await process.WaitForExitAsync(token);
+            return process.ExitCode == 0 ? ParseMeanLuma(await stderrTask) : null;
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch
+        {
+            return null;
         }
     }
 

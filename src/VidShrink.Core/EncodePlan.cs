@@ -67,7 +67,8 @@ public enum ReasonCode
     ManualEncoderPathOverride,
     ManualEncoderPathUnmet,
     ManualEncoderPathSupersededByCodec,
-    ManualOverrideDroppedOnPassThrough
+    ManualOverrideDroppedOnPassThrough,
+    DarkContentHevc
 }
 
 public sealed record ReasonNote(

@@ -1,3 +1,18 @@
+# Karanlık İçerikte x265 Geçişi
+
+Dal `t0/karanlik-x265`. Karar: `docs/danisma/2026-09-17-karanlik-x265-fable.md`. Ölçüm:
+`docs/olcumler/karanlik-x265.md`. Ağır kodlama yalnız CI'da (`handbrake-kiyas.yml`).
+
+1. **YAVG ölçümü.** `hb.ps1 -Is yavg`: dört kesitte ürün sondasının penceresiyle YAVG; ayrım <2× ise dur.
+2. **Sonda.** `ComplexityProbe` pencerelerde signalstats YAVG okur (`LumaArgs`, `ParseMeanLuma`);
+   `ComplexityProfile.MeanLuma`. Ayrıştırıcı testi sabit satırı pimler.
+3. **Karar.** `DarkContentSwitch` (Core, saf): Auto + kilitsiz + Aggressive/Extreme + motor libsvtav1
+   + MeanLuma < eşik → libx265, turbo ilk geçiş; `ReasonCode.DarkContentHevc`. Beş test kolu, her kola
+   mutasyon.
+4. **CI kabulü.** `hb.ps1 -Is karanlikgecis`: urun-otomatik vs main bench vs HandBrake; CAMBI(ii) ≤7,5,
+   süre ≤1,5× HB, karanlık dışı libsvtav1 ve main ile eş.
+5. **Belge.** `docs/kullanim.md` kodek ipucu.
+
 # HandBrake Dalga 2 — Ölçülen Açıklar
 
 Dal `t0/hb-2-aciklar`. Kaynak: dalga 1b ölçümü (koşum 35158725446,

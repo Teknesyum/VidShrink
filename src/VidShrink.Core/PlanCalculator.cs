@@ -330,6 +330,16 @@ public static class PlanCalculator
             }
         }
 
+        var darkSwitch = DarkContentSwitch.Applies(options.Codec, lockedCodec, regime, codec, complexity.MeanLuma)
+                         && DarkCodecUsable(availability, probe);
+        if (darkSwitch)
+        {
+            reason.Add($"the probe measured a dark source (mean luma {complexity.MeanLuma:0.#}, below {DarkContentSwitch.MeanLumaThreshold:0.#}), where {codec} bands in gradients, so Automatic uses {DarkContentSwitch.Codec} with a turbo first pass");
+            reasonCodes.Add(new ReasonNote(ReasonCode.DarkContentHevc, Score: complexity.MeanLuma ?? 0,
+                RequestedCodec: codec, FallbackCodec: DarkContentSwitch.Codec, EngineWouldHaveChosen: codec));
+            codec = DarkContentSwitch.Codec;
+        }
+
         var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
         if (hdr.NotMeasured) probe.NotMeasured = true;
 
@@ -353,7 +363,7 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.HdrTonemapped));
         }
 
-        var preferredCodec = lockedCodec ?? (fast ? FastHardwareOrder[0] : PreferredCodecFor(preference));
+        var preferredCodec = darkSwitch ? codec : lockedCodec ?? (fast ? FastHardwareOrder[0] : PreferredCodecFor(preference));
         if (codec != preferredCodec)
         {
             var fallbackCause = EncoderFallbackCauseFor(probe);
@@ -556,6 +566,7 @@ public static class PlanCalculator
             reason.Add($"the budget affords CRF {budgetCrf:0.#}, better than the CRF {ceilingCrf:0} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {ceilingSizeMb:0.0} MB instead of padding the file to {effectiveTargetMb:0.##} MB");
             reasonCodes.Add(new ReasonNote(ReasonCode.BudgetExceedsCeiling, BudgetCrf: budgetCrf, Crf: ceilingCrf, Mb: ceilingSizeMb, TargetMb: effectiveTargetMb));
             plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr, streams);
+            plan.TurboFirstPass |= darkSwitch;
             plan.Mode = "crf";
             plan.Crf = (int)Math.Round(ceilingCrf);
             plan.VideoBitrateK = (int)Math.Round(Math.Max(ceilingVideoK, 0.0));
@@ -597,6 +608,7 @@ public static class PlanCalculator
             reason.Add($"the budget lands near CRF {budgetCrf:0.#}, short of the CRF {ceilingCrf:0} ceiling, so two-pass VBR spends {aimMb:0.##} MB, the band center of the {effectiveTargetMb:0.##} MB target");
             reasonCodes.Add(new ReasonNote(ReasonCode.BudgetBelowCeilingTwoPass, BudgetCrf: budgetCrf, Crf: ceilingCrf, TargetMb: effectiveTargetMb));
             plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr, streams);
+            plan.TurboFirstPass |= darkSwitch;
             plan.Mode = "2pass";
             plan.VideoBitrateK = (int)Math.Round(Math.Max(videoK, 0.0));
             AddHardwareYieldNote(codec, complexity, best, reason, reasonCodes);
@@ -1482,6 +1494,20 @@ public static class PlanCalculator
 
     private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability)
         => PickCodec(pref, availability, null);
+
+    private static bool DarkCodecUsable(IEncoderAvailability? availability, ProbeState probe)
+    {
+        if (availability is null) return true;
+        if (!availability.HasEncoder(DarkContentSwitch.Codec)) return false;
+        var state = availability.KnownState(DarkContentSwitch.Codec);
+        if (state == EncoderProbeState.Unmeasured)
+        {
+            probe.NotMeasured = true;
+            probe.CodecNotMeasured = true;
+            return true;
+        }
+        return state == EncoderProbeState.Working;
+    }
 
     /// <summary>
     /// Tercih edileni <b>gercekten kodluyor mu</b> diye secer, derleme listesinde
