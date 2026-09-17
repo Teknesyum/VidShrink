@@ -184,18 +184,18 @@
                    TextWrapping="Wrap"
                    IsVisible="False"/>
         <WrapPanel>
-          <Button x:Name="BtnReveal"
-                  Theme="{StaticResource PrimaryButton}"
-                  Margin="{StaticResource WrapItemMargin}"
-                  Content="{loc:Text recorder.output.reveal}"
-                  auto:AutomationProperties.Name="{loc:Text recorder.output.reveal}"
-                  Click="OnReveal"/>
           <Button x:Name="BtnToShrink"
-                  Theme="{StaticResource GhostButton}"
+                  Theme="{StaticResource PrimaryButton}"
                   Margin="{StaticResource WrapItemMargin}"
                   Content="{loc:Text recorder.output.to-shrink}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.to-shrink}"
                   Click="OnToShrink"/>
+          <Button x:Name="BtnReveal"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  Content="{loc:Text recorder.output.reveal}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.reveal}"
+                  Click="OnReveal"/>
           <Button x:Name="BtnToPlayer"
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"
@@ -217,7 +217,7 @@
                   auto:AutomationProperties.Name="{loc:Text recorder.output.trim-idle}"
                   Click="OnTrimIdle"/>
           <Button x:Name="BtnRecShare"
-                  Theme="{StaticResource PrimaryButton}"
+                  Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"
                   Content="{loc:Text main.action.share}"
                   auto:AutomationProperties.Name="{loc:Text main.action.share}"
