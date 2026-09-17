@@ -29,16 +29,21 @@ public static class ToolLocator
         return line?.Replace("ffmpeg version ", "", StringComparison.OrdinalIgnoreCase) ?? "unknown";
     }
 
-    internal static string Locate(string name, string? searchPath = null)
+    internal static string Locate(string name, string? searchPath = null, string? baseDirectory = null)
     {
         var exe = OperatingSystem.IsWindows() ? name + ".exe" : name;
-        var baseDir = AppContext.BaseDirectory;
+        var baseDir = baseDirectory ?? AppContext.BaseDirectory;
 
-        var candidates = new[]
+        var candidates = new List<string>
         {
             Path.Combine(baseDir, "tools", "ffmpeg", exe),
             Path.Combine(baseDir, exe)
         };
+
+        var trimmed = baseDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (string.Equals(Path.GetFileName(trimmed), "app", StringComparison.OrdinalIgnoreCase) &&
+            Path.GetDirectoryName(trimmed) is { Length: > 0 } installRoot)
+            candidates.Add(Path.Combine(installRoot, "tools", "ffmpeg", exe));
 
         foreach (var candidate in candidates)
             if (File.Exists(candidate)) return candidate;

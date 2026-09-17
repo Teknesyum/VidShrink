@@ -62,13 +62,64 @@ public sealed class KabukEntegrasyonTests
             Assert.DoesNotContain(extension, new[] { "mp3", "wav", "flac", "aac", "ogg", "m4a", "jpg", "png" }));
     }
 
+    /// <summary>
+    /// G2: çift tık başlatıcıyı atlıyor. ProgID komutu ve <c>Applications\VidShrink.exe</c>
+    /// komutu yanındaki <c>app\VidShrink.App.exe</c>'yi çalıştırıyor; anahtarın adı başlatıcıda
+    /// kalıyor. Negatif kontrol: başlatıcı olmayan ikili kendi yolunu yazıyor.
+    /// </summary>
     [Fact]
     public void ProgIdKomutuSecilenDosyayiUygulamayaVeriyor()
     {
+        const string App = @"C:\Programs\VidShrink\app\VidShrink.App.exe";
         var command = Plan().Single(entry =>
             entry.Key == $@"Software\Classes\{FileAssociation.ProgId}\shell\open\command" && entry.Name.Length == 0);
+        var application = Plan().Single(entry =>
+            entry.Key == @"Software\Classes\Applications\VidShrink.exe\shell\open\command");
 
-        Assert.Equal($"\"{Executable}\" \"%1\"", command.Value);
+        Assert.Equal($"\"{App}\" \"%1\"", command.Value);
+        Assert.Equal($"\"{App}\" \"%1\"", application.Value);
+
+        const string Loose = @"D:\Tasinabilir\VidShrink.App.exe";
+        var looseCommand = FileAssociation.Plan(Loose).Single(entry =>
+            entry.Key == $@"Software\Classes\{FileAssociation.ProgId}\shell\open\command");
+        Assert.Equal($"\"{Loose}\" \"%1\"", looseCommand.Value);
+    }
+
+    [Fact]
+    public void AcmaKomutununHedefiYalnizBaslaticidaDegisiyor()
+    {
+        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrink.App.exe", ShellIntegration.OpenCommandTarget(Executable));
+        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrink.App.exe", ShellIntegration.OpenCommandTarget(@"C:\Programs\VidShrink\vidshrink.EXE"));
+        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrink.App.exe", ShellIntegration.OpenCommandTarget(@"C:\Programs\VidShrink\app\VidShrink.App.exe"));
+        Assert.Equal(@"C:\Programs\VidShrink\VidShrinkX.exe", ShellIntegration.OpenCommandTarget(@"C:\Programs\VidShrink\VidShrinkX.exe"));
+    }
+
+    /// <summary>
+    /// G2: not düşülen yol açma komutunun hedefi. Başlatıcıyı not düşmüş 0.8.4 kurulumu bir
+    /// kez yeniden yazılıyor, sonra yazılmıyor. Negatif kontrol: yazma başarısızsa not düşülmüyor.
+    /// </summary>
+    [Fact]
+    public void EskiBaslaticiNotuBirKezYenidenYaziliyor()
+    {
+        var folder = Path.Combine(TestPaths.OutputRoot, "g2", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+        var file = Path.Combine(folder, "settings.json");
+        FileAssociationSetup.Record(Executable, file);
+        var yazilan = new List<string>();
+
+        Assert.True(FileAssociationSetup.Ensure(Executable, file, path => { yazilan.Add(path); return Array.Empty<string>(); }));
+        Assert.Equal(new[] { Executable }, yazilan);
+        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrink.App.exe", FileAssociationSetup.Recorded(file));
+
+        Assert.False(FileAssociationSetup.Ensure(Executable, file, path => { yazilan.Add(path); return Array.Empty<string>(); }));
+        Assert.Single(yazilan);
+
+        var bozuk = Path.Combine(folder, "bozuk.json");
+        FileAssociationSetup.Record(Executable, bozuk);
+        Assert.True(FileAssociationSetup.Ensure(Executable, bozuk, _ => new[] { "anahtar|" }));
+        Assert.Equal(Executable, FileAssociationSetup.Recorded(bozuk));
+
+        Directory.Delete(folder, recursive: true);
     }
 
     [Fact]

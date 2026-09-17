@@ -222,4 +222,88 @@ public sealed class AyarKaliciligiTests
         }
         finally { if (File.Exists(file)) File.Delete(file); }
     }
+
+    private static MediaInfo BuyukKaynak() => new()
+    {
+        FilePath = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv",
+        FileSizeBytes = 420L * 1024 * 1024,
+        DurationSeconds = 187.5,
+        Width = 3840,
+        Height = 2160,
+        Fps = 59.94,
+        VideoCodec = "hevc",
+        TotalBitrateBps = 18_800_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 192_000,
+        AudioChannels = 2,
+        PixelFormat = "yuv420p"
+    };
+
+    /// <summary>
+    /// Hipersürüş G: 60 kaliteyle kaydedilmiş ayar dosyası bir video açılıp dil
+    /// değiştirilince 78,3 olarak geri yazılıyordu. Kaynağın önerdiği hedef ve ondan
+    /// türeyen kalite ekranda kalır, dosyaya kullanıcının kendi sayıları gider.
+    /// </summary>
+    [Fact]
+    public void KaynakYuklemekKayitliHedefVeKaliteyiDegistirmez()
+    {
+        var file = SettingsFile();
+        try
+        {
+            var (ekranHedef, ekranKalite, saved) = AppHost.Run(() =>
+            {
+                var window = new MainWindow { SettingsPathOverride = file };
+                try
+                {
+                    window.RestoreSettingsForTest(new UpdateSettings { TargetMb = 24, QualityTarget = 60 });
+                    var info = BuyukKaynak();
+                    window.LoadWithoutProbing(info.FilePath, info);
+                    window.UseTurkish();
+                    return (window.TxtTarget.Text ?? "", window.TxtQualityTarget.Text ?? "", UpdateSettings.Load(file));
+                }
+                finally { window.Close(); }
+            });
+
+            Assert.Equal("16", ekranHedef);
+            Assert.NotEqual("60", ekranKalite);
+            Assert.True(File.Exists(file), "Dil değişimi ayar dosyasını yazmadı; ölçü boşa koştu.");
+            Assert.Equal(24, saved.TargetMb);
+            Assert.Equal(60, saved.QualityTarget);
+        }
+        finally { if (File.Exists(file)) File.Delete(file); }
+    }
+
+    /// <summary>
+    /// Negatif kontrol: kullanıcının kendi yazdığı kalite ve hedef dosyaya gider. Kaliteden
+    /// türeyen hedef ve hedeften türeyen kalite ise gitmez.
+    /// </summary>
+    [Fact]
+    public void ElleYazilanHedefVeKaliteKaydediliyor()
+    {
+        var file = SettingsFile();
+        try
+        {
+            var (kalite, hedef) = AppHost.Run(() =>
+            {
+                var window = new MainWindow { SettingsPathOverride = file };
+                try
+                {
+                    window.RestoreSettingsForTest(new UpdateSettings { TargetMb = 24, QualityTarget = 60 });
+                    var info = BuyukKaynak();
+                    window.LoadWithoutProbing(info.FilePath, info);
+                    window.TxtQualityTarget.Text = "73";
+                    var birinci = UpdateSettings.Load(file);
+                    window.TxtTarget.Text = "30";
+                    return (birinci, UpdateSettings.Load(file));
+                }
+                finally { window.Close(); }
+            });
+
+            Assert.Equal(73, kalite.QualityTarget);
+            Assert.Equal(24, kalite.TargetMb);
+            Assert.Equal(30, hedef.TargetMb);
+            Assert.Equal(73, hedef.QualityTarget);
+        }
+        finally { if (File.Exists(file)) File.Delete(file); }
+    }
 }
