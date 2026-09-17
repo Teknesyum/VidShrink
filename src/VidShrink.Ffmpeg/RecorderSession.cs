@@ -107,7 +107,9 @@ public sealed class RecorderSession : IAsyncDisposable
     /// ffmpeg ilerleme blogunu varsayilan olarak yarim saniyede bir yaziyor, yani bolme
     /// olcutunun okudugu sure ve boyut o siklikta tazeleniyor; yarim saniyenin yarisinda
     /// yoklamak her blogu en gec bir yoklama gecikmesiyle gormeye yetiyor, daha sik yoklamak
-    /// yeni bilgi getirmiyor. Bolmenin olcutu kac milisaniye astigi olculmedi.
+    /// yeni bilgi getirmiyor. Olculen asim: 2 sn bolmede ilk parca 3,134 sn, ikincisi 1,867 sn
+    /// (toplam 5,001 sn sinirda); asimi yoklama degil ilerleme blogu ve nazik kapanis tasiyor
+    /// (<c>KayitBolmeTests</c>).
     /// </para>
     /// </summary>
     public const int SplitPollMs = 250;
