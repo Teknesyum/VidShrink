@@ -68,6 +68,19 @@ Dal `t0/yol-d-panel`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md`
 | Yeni (bu dal) | 0 | — | 107 ms |
 
 
+# Yol A — Oynatıcı: Döndürme Tuşu, Sürüklerken Mıknatıs, Hız Adımı, Çift Tık Süresi
+
+Dal `t0/yol-a-oynatici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` (1. bölüm, P1, P17, 7/1-7-8).
+
+1. **Döndürme bulunur.** Tuş GOM'daki gibi Ctrl+Shift+S kalır. Kısayolu olan her menü satırının ipucu
+   "ad (tuş)". Test ham sağ tık (satır görünür, tuş metni ve ipucu), ham Ctrl+Shift+S, kare pikselleri
+   (`OynaticiOdakYoluTests`).
+2. **P2 mıknatıs sürüklerken.** Windows'ta yerel `BeginMoveDrag` kalır (Aero Snap), mıknatıs WM_MOVING'de
+   dikdörtgene uygulanır; öbür platformlarda kendi taşıma döngüsü, yakalama kaybı ve tuşsuz hareket onu bitirir.
+   Konum saf `DragPosition`/`SnapRect`, boyut pencerenin ekranının ölçeğiyle. Test ham fare ve gerçek WM_MOVING.
+3. **P17/P1.** `Keymap.SpeedStep` 0,05; `ClickArbiter.DoubleWindowMs` sistemden (Windows `GetDoubleClickTime`,
+   öbürlerinde Avalonia platform ayarı), sahte kaynakla gerçek zamanlayıcı ölçülür.
+
 # Ön Ayar Kütüphanesi — HandBrake A2
 
 Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 42-45.
@@ -134,6 +147,7 @@ Dal `t0/yol-c-kaydedici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17
    İki yeni anahtar 42 dilde, `BiciminTests` sayımı.
 5. **CI.** `ci.yml`'e ubuntu işi: Xvfb + xlogo, `_NET_CLIENT_LIST` elle, filtreli test x11grab 2 sn + ffprobe.
 6. **Belge.** `docs/plan-kaydedici-dalgalari.md` durum sütunu kanıt testleriyle.
+
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.

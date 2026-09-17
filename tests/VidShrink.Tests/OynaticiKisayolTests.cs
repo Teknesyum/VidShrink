@@ -417,11 +417,11 @@ public sealed class OynaticiKisayolTests
                 o.Not($"mute {once} -> {bir} -> {o.Oku("mute")}");
                 return once == "no" && bir == "yes" && o.Oku("mute") == "no" ? null : "mute gecisi yok";
             }
-            case "C": return Hiz(o, Key.C, KeyModifiers.None, 1.1);
-            case "X": return Hiz(o, Key.X, KeyModifiers.None, 0.9);
+            case "C": return Hiz(o, Key.C, KeyModifiers.None, 1.05);
+            case "X": return Hiz(o, Key.X, KeyModifiers.None, 0.95);
             case "Z": return Hiz(o, Key.Z, KeyModifiers.None, 1, 1.5);
-            case "CtrlShiftF": return Hiz(o, Key.F, KeyModifiers.Control | KeyModifiers.Shift, 1.1);
-            case "CtrlShiftB": return Hiz(o, Key.B, KeyModifiers.Control | KeyModifiers.Shift, 0.9);
+            case "CtrlShiftF": return Hiz(o, Key.F, KeyModifiers.Control | KeyModifiers.Shift, 1.05);
+            case "CtrlShiftB": return Hiz(o, Key.B, KeyModifiers.Control | KeyModifiers.Shift, 0.95);
             case "CtrlShiftN": return Hiz(o, Key.N, KeyModifiers.Control | KeyModifiers.Shift, 1, 1.5);
             case "F": return Kare(o, Key.F, KeyModifiers.None, 1, "f");
             case "ShiftF": return Kare(o, Key.F, KeyModifiers.Shift, -1, "F");

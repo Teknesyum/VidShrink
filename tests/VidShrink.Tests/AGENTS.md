@@ -114,8 +114,9 @@ sürümden (`x.0.0`) önce koşar.
   gizleme sınıfı iki parçayı kapatıyor. Kaynak metin okur; gizlenme ve anahat davranışı `OynaticiYolHaritasiTests`'te.
 - `OynaticiKisayolTests.cs` — tarifteki her kısayol gerçek girdi olayıyla PlayerView'a verilir, etkisi motordan geri okunur;
   döndürme karenin piksellerinden. Kanıt `.calisma/oynatici-kisayol/`.
-- `OynaticiOdakYoluTests.cs` — aynı tuşlar MainWindow'un odak yolundan: sekme değişimi, kaydırıcı/açılır kutu odakta, tam ekran.
-- `OynaticiYolHaritasiTests.cs` — yol haritası denetiminin oynatıcı maddeleri (P2 merkez mıknatısı, P3 menüde ayarlar, P12, P14 üst bar
+- `OynaticiOdakYoluTests.cs` — aynı tuşlar MainWindow'un odak yolundan: sekme değişimi, kaydırıcı/açılır kutu odakta, tam ekran; ham sağ tıkla menüde döndürme satırı, tuş adı ve ipucu, ham Ctrl+Shift+S kare pikseli; hız adımı ve çift tık `OynaticiSuruklemeTests.cs`te.
+- `OynaticiSuruklemeTests.cs` — `OynaticiCiftTikSuresiTests`: ham C/X ile 0.05 hız adımı motordan, çift tık süresi sistemden (`ClickArbiter.Source`). `OynaticiSuruklemeTests`: kendi döngüde tuşsuz hareket ve yakalama kaybı pencereyi taşımaz, sürüklerken gelen çift tık bayat durumu sıfırlar; varsayılan yol platforma göre (Windows yerel `BeginMoveDrag` + `GetWindowRect` ile kendi döngünün karışmadığı), gerçek `SendMessage(WM_MOVING)` dikdörtgeni merkeze çeker. Her ham bölüm çift tık penceresi kadar bekler — bekleme olmadan önceki testin basışı çift tık sayılıyor. Kanıt `.calisma/oynatici-kisayol/`.
+- `OynaticiYolHaritasiTests.cs` — yol haritası denetiminin oynatıcı maddeleri (P2 sürüklerken ham fareyle merkez mıknatısı ve çok ekran/DPI saf hesabı, P3 menüde ayarlar, P12, P14 üst bar
   gizlenmesi, P18, P19 duraklatma simgesi süresi, P20, P24 anahat pikselleri, P26 yayılma maskesi, P28 yandaki altyazı).
   Zamanlayıcı bekleyen ölçüler `Dispatcher.UIThread.MainLoop` ile pompalar; `RunJobs` Win32 zamanlayıcısını tetiklemez.
   Kanıt `.calisma/oynatici-yol-haritasi/`, negatif kontrol betiği aynı klasörde.

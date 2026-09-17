@@ -50,7 +50,7 @@ internal sealed record KeymapRow(PlayerInput Input, PlayerAction Action);
 internal static class Keymap
 {
     internal const double VolumeStep = 5;
-    internal const double SpeedStep = 0.1;
+    internal const double SpeedStep = 0.05;
     internal const double MinimumSpeed = 0.25;
     internal const double MaximumSpeed = 4;
     internal const double SeekSmall = 10;
