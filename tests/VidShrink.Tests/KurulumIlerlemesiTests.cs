@@ -231,26 +231,21 @@ public class KurulumIlerlemesiTests
     }
 
     /// <summary>
-    /// Elle yükleme artık kullanıcıya sessiz gelmiyor: güncelleyici panele bağlanıyor ve
-    /// her aşama — sürüm listesi, bulunan sürüm, inen her dosya adı, yerine taşıma — bir
-    /// cümleyle günlüğe düşüyor. Eskiden bütün indirme tek bir "Güncelleme uygulanıyor"
-    /// satırıydı; kullanıcı ne olduğunu göremiyordu.
+    /// Yol D: başlatıcının paneli kalktı, güncelleyici panele konuşmuyor. Yerine taşıma
+    /// uygulama klasörü boşalınca başlıyor ve hatası uygulamanın paneline işaret bırakıyor.
+    /// Yarışın davranışı <c>BaslaticiPanelsizTests</c>'te gerçek süreçle.
     /// </summary>
     [Fact]
-    public void GuncelleyiciPaneleKonusuyor()
+    public void GuncelleyiciKlasorBosalincaKurar()
     {
         var kaynak = File.ReadAllText(
             Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
-        var program = File.ReadAllText(
-            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Program.cs"));
 
-        Assert.Contains("InstallProgress? progress = null", kaynak);
-        Assert.Contains("progress?.Step(", kaynak);
-        Assert.Contains("\"Sürüm listesi alınıyor\"", kaynak);
-        Assert.Contains("indi (\" + sira + \"/\" + total + \")\"", kaynak);
-        Assert.Contains("\"Dosyalar yerine taşınıyor\"", kaynak);
-        Assert.Contains("progress: progress", program);
-        Assert.Contains("progress.WriteLog(", program);
+        Assert.DoesNotContain("InstallProgress", kaynak);
+        var bosalinca = kaynak.IndexOf("UygulamaKlasoruKapisi.BosalincaAl(", StringComparison.Ordinal);
+        var tasima = kaynak.IndexOf("UpdateRollout.Apply(", StringComparison.Ordinal);
+        Assert.True(bosalinca > 0 && bosalinca < tasima, "taşıma klasör boşalmadan başlıyor");
+        Assert.Contains("UygulamaKlasoruKapisi.HataYaz(", kaynak);
     }
 
     /// <summary>

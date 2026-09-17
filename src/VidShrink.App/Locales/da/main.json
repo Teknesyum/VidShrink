@@ -34,6 +34,7 @@
   "main.update.downloading": "Henter…",
   "main.update.ready": "Klar til installation",
   "main.update.failed": "Opdateringen kunne ikke hentes",
+  "main.update.maintenance-failed": "Opdateringen kunne ikke installeres, der prøves igen ved næste start",
   "main.update.cancelled": "Hentningen blev annulleret",
   "main.update.log.manifest": "Henter versionslisten",
   "main.update.log.found": "Version {0}: {1} filer",

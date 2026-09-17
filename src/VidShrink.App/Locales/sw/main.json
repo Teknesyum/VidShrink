@@ -34,6 +34,7 @@
   "main.update.downloading": "Inapakua…",
   "main.update.ready": "Tayari kusakinishwa",
   "main.update.failed": "Sasisho halikuweza kupakuliwa",
+  "main.update.maintenance-failed": "Sasisho halikuweza kusakinishwa, litajaribiwa tena wakati ujao wa kuanzisha",
   "main.update.cancelled": "Upakuaji umeghairiwa",
   "main.update.log.manifest": "Inapata orodha ya matoleo",
   "main.update.log.found": "Toleo {0}: faili {1}",

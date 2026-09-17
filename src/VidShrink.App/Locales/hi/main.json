@@ -34,6 +34,7 @@
   "main.update.downloading": "डाउनलोड हो रहा है…",
   "main.update.ready": "इंस्टॉल के लिए तैयार",
   "main.update.failed": "अपडेट डाउनलोड नहीं हो सका",
+  "main.update.maintenance-failed": "अपडेट इंस्टॉल नहीं हो सका, अगली बार शुरू करने पर फिर से कोशिश होगी",
   "main.update.cancelled": "डाउनलोड रद्द किया गया",
   "main.update.log.manifest": "संस्करण सूची लाई जा रही है",
   "main.update.log.found": "संस्करण {0}: {1} फ़ाइलें",

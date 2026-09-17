@@ -229,6 +229,32 @@ public partial class MainWindow
         StartUpdateFrames();
     }
 
+    internal string BakimKlasoru { get; set; } = AppContext.BaseDirectory;
+
+    private void BakimHatasiniBekle()
+    {
+        EventHandler? acildi = null;
+        acildi = (_, _) =>
+        {
+            Opened -= acildi;
+            BakimHatasiniGoster();
+        };
+        Opened += acildi;
+    }
+
+    internal bool BakimHatasiniGoster()
+    {
+        var klasor = BakimKlasoru;
+        if (!File.Exists(Path.Combine(klasor, global::VidShrink.Launcher.UygulamaKlasoruKapisi.HataIsareti))) return false;
+        global::VidShrink.Launcher.UygulamaKlasoruKapisi.HatayiSil(klasor);
+        if (UpdateNoticeLocked) return false;
+
+        var progress = new InstallProgress();
+        ShowUpdateProgress(progress);
+        progress.Finish(false, Say("main.update.maintenance-failed"));
+        return true;
+    }
+
     private void StartUpdateFrames()
     {
         if (_updateFrame is null)

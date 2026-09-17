@@ -123,6 +123,9 @@ sürümden (`x.0.0`) önce koşar.
 - `BaslaticisizCiftTikTests.cs` — G2/G3: çift tık `app\VidShrink.App.exe`'yi açıyor; `--bakim` kapıları (başlatıcıdan
   doğan uygulama, kurulu düzen dışı, eski başlatıcı), `app\` altından kökteki `tools\ffmpeg`, "Yükle"den sonra rozetin
   ara metin yazmaması. Açma komutunun değeri `KabukEntegrasyonTests`, betik/motor eşitliği `KurucuExeTests`'te.
+- `BaslaticiPanelsizTests.cs` — Yol D: `.calisma/yol-d/kurulum-*` sahte kurulumda gerçek başlatıcı ve `tools/VidShrink.SahteUygulama`.
+  Yavaş bakım kancasında (`VIDSHRINK_BAKIM_GECIKMESI_MS`) başlatıcının görünür penceresi yok (EnumWindows), uygulama hemen doğar;
+  kapı tutulurken doğrudan açılan uygulama başlatıcıya devreder; koşan uygulama kapanmadan kopya başlamaz; `.bakim-hatasi` panelde görünür.
 - `KabukMenusuKayitTests.cs` — aynı menünün davranışı, yalnız `ShellMenu.TestRoot` altında: kutunun komutu başlatıcıyı
   (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı

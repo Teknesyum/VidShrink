@@ -34,6 +34,7 @@
   "main.update.downloading": "Lejupielādē…",
   "main.update.ready": "Gatavs instalēšanai",
   "main.update.failed": "Atjauninājumu neizdevās lejupielādēt",
+  "main.update.maintenance-failed": "Atjauninājumu neizdevās instalēt, nākamajā palaišanas reizē tiks mēģināts vēlreiz",
   "main.update.cancelled": "Lejupielāde atcelta",
   "main.update.log.manifest": "Iegūst versiju sarakstu",
   "main.update.log.found": "Versija {0}: {1} faili",

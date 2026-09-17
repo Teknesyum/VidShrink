@@ -20,7 +20,7 @@ namespace VidShrink.Launcher;
 /// yapar; döndürülen değer o çağrının gerekip gerekmediğidir.
 ///
 /// Bu çağrı açılış yolunda değil: uygulama ekrana geldikten sonra koşar
-/// (<c>Program.cs</c>). Eskiden açılış kapısının içindeydi ve bu yüzden bütçesi 90
+/// (<c>Program.cs</c>). İndirme hemen, kurulum klasörden koşan uygulama kapanınca. Eskiden açılış kapısının içindeydi ve bu yüzden bütçesi 90
 /// saniyeydi; ölçülen 0.3.0 → 0.4.1 farkı 375 dosya ve 134,8 MB, yani o bütçede
 /// bitmesi mümkün değildi. Yarıda kalan sahne de silindiği için her açılış sıfırdan
 /// başlıyor, kurulum hiç yakınsamıyordu.
@@ -45,106 +45,73 @@ internal static class Updater
 
     private const string MutexName = UpdateStaging.MutexName;
 
-    /// <param name="force">
-    /// Kullanıcı "Yükle" düğmesine bastı: kendiliğinden güncelleme ayarı okunmaz. Ayar yine
-    /// yazılmaz, yani elle bir kez yüklemek tercihi değiştirmez.
-    /// </param>
-    /// <param name="progress">
-    /// Paneli besleyen köprü. Verilmezse güncelleme sessiz koşar (açılıştan sonraki tur);
-    /// verilirse her aşama kullanıcıya bir cümleyle görünür — indirilen dosya adı dahil.
-    /// Kullanıcı elle "Yükle"ye bastığında ne olduğunu adım adım izlemesi bunun üstünden.
-    /// </param>
-    /// <param name="floor">Panelde bu işin başladığı yüzde.</param>
-    /// <param name="ceiling">Panelde bu işin bitiş tavanı.</param>
-    public static bool Run(
-        string baseDirectory,
-        string appDirectory,
-        bool force = false,
-        InstallProgress? progress = null,
-        double floor = 0,
-        double ceiling = 100)
+    private static readonly TimeSpan ForceWait = TimeSpan.FromMinutes(10);
+
+    private static readonly TimeSpan AppExitWait = TimeSpan.FromDays(7);
+
+    public static bool Run(string baseDirectory, string appDirectory, bool force = false)
     {
-        // Ayar kapalıyken manifest bile çekilmez: kapatan kullanıcı ağ turunu da istemiyor.
         if (!force && !UpdateCheck.AutoUpdateEnabled()) return false;
         if (Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_DISABLED") == "1") return false;
 
-        using var only = new Mutex(initiallyOwned: false, MutexName);
-        var held = false;
-        try { held = only.WaitOne(TimeSpan.Zero); }
-        catch (AbandonedMutexException) { held = true; }
-        if (!held) return false;
+        StagedUpdate? staged;
+        using (var only = new Mutex(initiallyOwned: false, MutexName))
+        {
+            if (!Hold(only, force ? ForceWait : TimeSpan.Zero)) return false;
+            using var cancellation = new CancellationTokenSource(Budget);
+            try
+            {
+                staged = UpdateStaging.StageAsync(
+                    baseDirectory, appDirectory, Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE"),
+                    Lanes, null, "VidShrink-Launcher", null, cancellation.Token).GetAwaiter().GetResult();
+            }
+            catch (Exception) { return false; }
+            finally { try { only.ReleaseMutex(); } catch (ApplicationException) { } }
+        }
 
-        using var cancellation = new CancellationTokenSource(Budget);
-        try { return RunAsync(baseDirectory, appDirectory, progress, floor, ceiling, cancellation.Token).GetAwaiter().GetResult(); }
-        catch (Exception) { return false; }
-        finally { try { only.ReleaseMutex(); } catch (ApplicationException) { } }
+        if (staged is null) return false;
+        if (Rehearsing) return false;
+        return Install(baseDirectory, appDirectory, staged);
     }
 
-    /// <summary>Prova kipi: panel birebir aynı koşar ama inen sahne yerine taşınmaz.</summary>
     internal const string RehearsalVariable = "VIDSHRINK_UPDATE_PROVA";
 
     internal static bool Rehearsing =>
         Environment.GetEnvironmentVariable(RehearsalVariable) == "1";
 
-    private static async Task<bool> RunAsync(
-        string baseDirectory,
-        string appDirectory,
-        InstallProgress? progress,
-        double floor,
-        double ceiling,
-        CancellationToken cancellationToken)
+    private static bool Hold(Mutex mutex, TimeSpan wait)
     {
-        void Step(double part, double roof, string sentence) =>
-            progress?.Step(floor + (ceiling - floor) * part, floor + (ceiling - floor) * roof, sentence);
+        try { return mutex.WaitOne(wait); }
+        catch (AbandonedMutexException) { return true; }
+    }
 
-        var stage = Path.Combine(baseDirectory, StageDirectoryName);
-        var source = Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE");
-
-        void Report(UpdateStageReport report)
+    private static bool Install(string baseDirectory, string appDirectory, StagedUpdate staged)
+    {
+        var gate = UygulamaKlasoruKapisi.BosalincaAl(appDirectory, AppExitWait);
+        if (gate is null) return false;
+        try
         {
-            switch (report.Phase)
+            using var only = new Mutex(initiallyOwned: false, MutexName);
+            if (!Hold(only, ForceWait)) return false;
+            try
             {
-                case UpdateStagePhase.Manifest:
-                    Step(report.Part, report.Roof, "Sürüm listesi alınıyor");
-                    break;
-                case UpdateStagePhase.Unreachable:
-                    Step(report.Part, report.Roof, "Sürüm listesine ulaşılamadı, güncelleme atlandı");
-                    break;
-                case UpdateStagePhase.Current:
-                    Step(report.Part, report.Roof, "Program zaten güncel");
-                    break;
-                case UpdateStagePhase.Found:
-                    Step(report.Part, report.Roof, "Sürüm " + report.Version + " bulundu, " + report.Total + " dosya yenilenecek");
-                    break;
-                case UpdateStagePhase.Downloaded:
-                    var sira = report.Done;
-                    var total = report.Total;
-                    Step(report.Part, report.Roof, Path.GetFileName(report.File) + " indi (" + sira + "/" + total + ")");
-                    break;
+                var stage = Path.Combine(baseDirectory, StageDirectoryName);
+                LauncherUpdate.Stage(stage, baseDirectory, staged.Launcher);
+                var applied = UpdateRollout.Apply(stage, baseDirectory, appDirectory, staged.App, staged.Launcher, staged.Manifest, staged.Shell);
+                UygulamaKlasoruKapisi.HatayiSil(appDirectory);
+                return applied;
             }
+            catch (Exception exception)
+            {
+                UygulamaKlasoruKapisi.HataYaz(appDirectory, exception.Message);
+                return false;
+            }
+            finally { try { only.ReleaseMutex(); } catch (ApplicationException) { } }
         }
-
-        var staged = await UpdateStaging.StageAsync(
-            baseDirectory, appDirectory, source, Lanes, null, "VidShrink-Launcher", Report, cancellationToken);
-        if (staged is null) return false;
-
-        var manifest = staged.Manifest;
-        var changed = staged.App;
-        var launcherChanged = staged.Launcher;
-        var shellChanged = staged.Shell;
-
-        if (Rehearsing)
+        finally
         {
-            Step(1, 1, "Prova kipi: " + staged.Total + " dosya indirildi, kurulum yapılmadı");
-            return false;
+            UygulamaKlasoruKapisi.Birak(gate);
         }
-
-        // Başlatıcı yan klasörden çıkarılıyor: bir alttaki Apply yan klasörü siliyor.
-        LauncherUpdate.Stage(stage, baseDirectory, launcherChanged);
-
-        Step(0.92, 1, "Dosyalar yerine taşınıyor");
-        var applied = UpdateRollout.Apply(stage, baseDirectory, appDirectory, changed, launcherChanged, manifest, shellChanged);
-        Step(1, 1, "Sürüm " + manifest.Version + " kuruldu");
-        return applied;
     }
 }
+

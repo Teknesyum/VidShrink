@@ -34,6 +34,7 @@
   "main.update.downloading": "Pobieranie…",
   "main.update.ready": "Gotowa do instalacji",
   "main.update.failed": "Nie udało się pobrać aktualizacji",
+  "main.update.maintenance-failed": "Nie udało się zainstalować aktualizacji, ponowna próba nastąpi przy następnym uruchomieniu",
   "main.update.cancelled": "Pobieranie anulowane",
   "main.update.log.manifest": "Pobieranie listy wersji",
   "main.update.log.found": "Wersja {0}: {1} plików",

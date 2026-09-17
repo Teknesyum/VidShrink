@@ -1521,6 +1521,10 @@ exit $code
     /// <para>17 Eylül 2026'da (G2) hızlı turun bakımı <c>Maintain</c>'e taşındı; aynı yöntemi
     /// uygulamanın açtığı <c>--bakim</c> kipi de çağırıyor. Sayı yine iki: olağan turun çağrısı
     /// ve <c>Maintain</c>'deki. Hızlı turda <c>Maintain</c> <c>StartApp</c>'tan sonra geliyor.</para>
+    ///
+    /// <para>Yol D'de olağan tur da bakımı <c>Maintain</c>'e bıraktı; geçiş çağrısı artık tek,
+    /// <c>Maintain</c>'in içinde. Üç kol (<c>--bakim</c>, hızlı, olağan) onu çağırıyor, iki doğum
+    /// kolunda <c>StartApp</c>'tan sonra.</para>
     /// </summary>
     [Fact]
     public void TheLauncherStartsTheCommitterOnTheWayOut()
@@ -1532,17 +1536,18 @@ exit $code
         var gates = Regex.Matches(code, @"if \(pendingSwap\)");
 
         Assert.Equal(2, launches.Count);
-        Assert.Equal(2, calls.Count);
-        Assert.Equal(2, gates.Count);
+        Assert.Single(calls);
+        Assert.Single(gates);
         var maintain = code.IndexOf("private static void Maintain(", StringComparison.Ordinal);
-        Assert.True(launches[1].Index < calls[0].Index, "gecis, uygulama baslatilmadan once kuruluyor");
-        Assert.True(maintain < calls[1].Index, "Maintain gecisi kurmuyor");
-        var fast = code.IndexOf("if (!updateNow && args.Length > 0 && File.Exists(args[0]))", StringComparison.Ordinal);
-        Assert.True(launches[0].Index > fast
-                    && launches[0].Index < code.IndexOf("Maintain(baseDirectory, appDirectory, previousVersion);", fast, StringComparison.Ordinal),
+        Assert.True(maintain < calls[0].Index, "Maintain gecisi kurmuyor");
+        Assert.True(gates[0].Index < calls[0].Index, "gecis cagrisi bekleyen gecis kapisinin icinde degil");
+        var main = code[..maintain];
+        var bakimCagrilari = Regex.Matches(main, @"\n\s+Maintain\(baseDirectory, appDirectory, previousVersion, ");
+        Assert.Equal(3, bakimCagrilari.Count);
+        var fast = code.IndexOf("if (!updateNow && !pending && args.Length > 0 && File.Exists(args[0]))", StringComparison.Ordinal);
+        Assert.True(launches[0].Index > fast && launches[0].Index < bakimCagrilari[1].Index,
             "hizli turda bakim uygulamadan once koşuyor");
-        for (var i = 0; i < 2; i++)
-            Assert.True(gates[i].Index < calls[i].Index, "gecis cagrisi bekleyen gecis kapisinin icinde degil");
+        Assert.True(launches[1].Index < bakimCagrilari[2].Index, "olagan turda bakim uygulamadan once koşuyor");
         Assert.Contains("private static void StartCommitter(string baseDirectory)", code, StringComparison.Ordinal);
         Assert.Contains("LauncherUpdate.Commit(baseDirectory, ParentProcessId(args))", code, StringComparison.Ordinal);
     }

@@ -1,3 +1,28 @@
+# Yol D — Açılış Paneli Hiçbir Yolda Yok
+
+Dal `t0/yol-d-panel`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` §7 satır 2, K14.
+
+1. **Panel kalkar.** `Launcher/Splash.cs`, `tools/VidShrink.SplashGen`, `SplashTests.cs` `trash/`'e;
+   csproj görüntü hedefi ve sln satırı düşer. Başlatıcının ilerleme parametreleri ve tavanları gider.
+2. **Bakım arkada.** Başlatıcı uygulamayı önce doğurur; onarım, sürüm işareti, indirme ve kurulum
+   arkasından. Yalnız yarım kalmış kopya günlüğü (çökme artığı) açılıştan önce, sessiz tamamlanır.
+3. **Yarış kapısı.** `Launcher/UygulamaKlasoruKapisi.cs` (App'e bağlı): app klasörüne yazan kapıyı
+   (klasöre özgü adlı mutex) tutar ve klasörden koşan uygulama süreçleri bitmeden yazmaz; kapı tutulurken
+   ya da günlük dururken doğrudan açılan uygulama başlatıcıya devredip çıkar. Otomatik kurulum uygulama
+   kapanınca uygulanır.
+4. **Hata bildirimi.** Kurulum/taşıma düşerse `app\.bakim-hatasi` yazılır; uygulama açılınca güncelleme
+   panelinde `main.update.maintenance-failed` ile söyler, işareti siler. Anahtar 42 dilde.
+5. **Kanıt.** `tools/VidShrink.SahteUygulama` (AssemblyName VidShrink.App) ile `.calisma` altında sahte
+   kurulum: gecikme kancası `VIDSHRINK_BAKIM_GECIKMESI_MS`, `EnumWindows` ile pencere yok, uygulama
+   kanca bitmeden doğdu; iki yarış senaryosu, her biri mutasyonla kırmızı. Negatif kontrol eski kodla.
+
+**Ölçülen (17 Eylül 2026, 4000 ms kanca, 3700 ms boyunca 20 ms'de bir EnumWindows):**
+
+| Başlatıcı | Görünür pencere sınıfı | İlk pencere | Uygulama doğumu |
+|---|---|---|---|
+| Eski (0bc86188, kanca SplashGate içinde) | 1 — `VidShrinkSplash` | 519 ms | 3700 ms içinde yok |
+| Yeni (bu dal) | 0 | — | 107 ms |
+
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.

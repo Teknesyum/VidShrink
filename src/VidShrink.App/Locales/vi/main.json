@@ -34,6 +34,7 @@
   "main.update.downloading": "Đang tải xuống…",
   "main.update.ready": "Sẵn sàng cài đặt",
   "main.update.failed": "Không thể tải bản cập nhật",
+  "main.update.maintenance-failed": "Không thể cài đặt bản cập nhật, sẽ thử lại ở lần khởi động tiếp theo",
   "main.update.cancelled": "Đã hủy tải xuống",
   "main.update.log.manifest": "Đang lấy danh sách phiên bản",
   "main.update.log.found": "Phiên bản {0}: {1} tệp",

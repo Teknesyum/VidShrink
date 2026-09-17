@@ -34,6 +34,7 @@
   "main.update.downloading": "Letöltés…",
   "main.update.ready": "Telepítésre kész",
   "main.update.failed": "A frissítést nem sikerült letölteni",
+  "main.update.maintenance-failed": "A frissítést nem sikerült telepíteni, a következő indításkor újra megpróbálja",
   "main.update.cancelled": "Letöltés megszakítva",
   "main.update.log.manifest": "Verziólista lekérése",
   "main.update.log.found": "{0} verzió: {1} fájl",
