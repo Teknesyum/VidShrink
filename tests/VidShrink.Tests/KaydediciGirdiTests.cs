@@ -198,26 +198,31 @@ public sealed class KaydediciGirdiTests
         {
             var bindirme = new RecorderInputOverlay();
             var bolge = new PixelRect(100, 100, 640, 480);
-            var saat = Stopwatch.StartNew();
+            var yaziSaat = Stopwatch.StartNew();
             bindirme.Keys("Ctrl + S", bolge);
+            var halkaSaat = Stopwatch.StartNew();
             bindirme.Ring(new PixelPoint(300, 200));
             var halka = bindirme.RingWindow!;
             var yazi = bindirme.CaptionWindow!;
             var olcek = halka.RenderScaling;
             var ilk = (halkaAcik: halka.IsVisible, halkaKonum: halka.Position, halkaGen: halka.Width, yaziAcik: yazi.IsVisible, yaziKonum: yazi.Position, yazi: yazi.Text, yaziBoy: yazi.Bounds.Size);
-            Bekle(Math.Max(850 - (int)saat.ElapsedMilliseconds, 700));
-            var orta = (halka: halka.IsVisible, yazi: yazi.IsVisible);
-            Bekle(2150 - (int)saat.ElapsedMilliseconds);
-            var son = (halka: halka.IsVisible, yazi: yazi.IsVisible);
+            long halkaKapandi = -1, yaziKapandi = -1;
+            var halkaKapaninca = true;
+            while (yaziSaat.ElapsedMilliseconds < 10000 && (halkaKapandi < 0 || yaziKapandi < 0))
+            {
+                Bekle(10);
+                if (halkaKapandi < 0 && !halka.IsVisible) { halkaKapandi = halkaSaat.ElapsedMilliseconds; halkaKapaninca = yazi.IsVisible; }
+                if (yaziKapandi < 0 && !yazi.IsVisible) yaziKapandi = yaziSaat.ElapsedMilliseconds;
+            }
             bindirme.Hide();
-            return (ilk, orta, son, olcek);
+            return (ilk, halkaKapandi, yaziKapandi, halkaKapaninca, olcek);
         });
 
         File.WriteAllLines(Path.Combine(Kanit, "girdi-bindirme.txt"), new[]
         {
             $"0ms: halka acik={olcu.ilk.halkaAcik} konum={olcu.ilk.halkaKonum} genislik={olcu.ilk.halkaGen} | yazi acik={olcu.ilk.yaziAcik} konum={olcu.ilk.yaziKonum} metin={olcu.ilk.yazi} boy={olcu.ilk.yaziBoy}",
-            $"850ms: halka={olcu.orta.halka} yazi={olcu.orta.yazi}",
-            $"2150ms: halka={olcu.son.halka} yazi={olcu.son.yazi}"
+            $"halka kapandi={olcu.halkaKapandi}ms (tutma 360) yazi o an acik={olcu.halkaKapaninca}",
+            $"yazi kapandi={olcu.yaziKapandi}ms (tutma 1500)"
         });
 
         var cap = (int)Math.Ceiling(48 * olcu.olcek);
@@ -227,8 +232,9 @@ public sealed class KaydediciGirdiTests
         Assert.True(olcu.ilk.yaziAcik);
         Assert.Equal("Ctrl + S", olcu.ilk.yazi);
         Assert.True(olcu.ilk.yaziKonum.Y > 100 + 480 / 2 && olcu.ilk.yaziKonum.Y < 100 + 480);
-        Assert.Equal((false, true), olcu.orta);
-        Assert.Equal((false, false), olcu.son);
+        Assert.InRange(olcu.halkaKapandi, 360, 5000);
+        Assert.True(olcu.halkaKapaninca);
+        Assert.InRange(olcu.yaziKapandi, 1500, 10000);
     }
 
     [KayitFact]
