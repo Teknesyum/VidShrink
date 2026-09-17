@@ -1,5 +1,6 @@
-using System.Globalization;
+﻿using System.Globalization;
 using VidShrink.Core;
+using VidShrink.Ffmpeg;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -153,6 +154,93 @@ public class KucultmeAraligiTests
     [Fact]
     public void TumVideoKesitSayilmaz()
         => Assert.Null(TrimWindow.Of(null, 600, 600));
+
+    [Fact]
+    public void PassthroughKopyasiKesitiTasir()
+    {
+        var args = FfmpegArguments.BuildTrimCopy(Kaynak(), new TrimWindow(40, 70), "cikti.mp4");
+        var input = args.IndexOf("-i");
+        var seeks = args.Select((value, index) => (value, index)).Where(pair => pair.value == "-ss").Select(pair => pair.index).ToList();
+
+        Assert.Equal(40, seeks.Sum(index => Value(args, index)), 3);
+        Assert.Single(seeks.Where(index => index > input));
+        Assert.Equal(30, Value(args, args.IndexOf("-t")), 3);
+        Assert.Equal("copy", args[args.IndexOf("-c") + 1]);
+        Assert.Equal("-1", args[args.IndexOf("-map_chapters") + 1]);
+        Assert.DoesNotContain("-crf", args);
+    }
+}
+
+/// <summary>
+/// Kesit passthrough'a dustugunde motorun kaynagi <b>kopyalamamasi</b> gerekir; kopya
+/// araligi kaybettirir ve iki ayri pencere ayni dosyayi verir. Pim tam bunu olcer: iki
+/// pencere, iki ayri sure. Dosya kopyasina donen bir mutasyon ikisini de kaynak suresine
+/// esitler ve kirilir.
+/// </summary>
+public class KucultmeAraligiPassthroughTests
+{
+    [Fact]
+    public async Task KesitPassthroughtaKopyalanmaz_PencereSureyiBelirler()
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+
+        var klasor = Path.Combine(".calisma", "kesit-passthrough", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        try
+        {
+            var kaynakYolu = Path.Combine(klasor, "kaynak.mp4");
+            await Uret(kaynakYolu);
+            var kaynak = await FfprobeClient.ProbeAsync(kaynakYolu);
+
+            var kisa = await Teslim(kaynak, new TrimWindow(1, 3), Path.Combine(klasor, "kisa.mp4"));
+            var uzun = await Teslim(kaynak, new TrimWindow(1, 5), Path.Combine(klasor, "uzun.mp4"));
+
+            Assert.Equal(EncodeMode.PassThrough, kisa.PlanUsed.ModeEnum);
+            Assert.Equal(EncodeMode.PassThrough, uzun.PlanUsed.ModeEnum);
+
+            var kisaSure = (await FfprobeClient.ProbeAsync(kisa.OutputPath!)).DurationSeconds;
+            var uzunSure = (await FfprobeClient.ProbeAsync(uzun.OutputPath!)).DurationSeconds;
+
+            Assert.True(kisaSure < uzunSure, $"kisa {kisaSure} uzun {uzunSure} degil");
+            Assert.True(uzunSure < kaynak.DurationSeconds, $"uzun {uzunSure} kaynak {kaynak.DurationSeconds}");
+            Assert.Equal(2, uzunSure - kisaSure, 0);
+        }
+        finally
+        {
+            try { Directory.Delete(klasor, recursive: true); } catch { }
+        }
+    }
+
+    private static async Task<EncodeResult> Teslim(MediaInfo kaynak, TrimWindow kesit, string cikti)
+    {
+        var plan = PlanCalculator.Build(kaynak, new PlanOptions { TargetMb = 50, Trim = kesit });
+        return await new EncodeRunner().RunAsync(kaynak, plan, cikti, 50, null, CancellationToken.None);
+    }
+
+    private static async Task Uret(string yol)
+    {
+        var baslangic = new System.Diagnostics.ProcessStartInfo(ToolLocator.Ffmpeg)
+        {
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        };
+        foreach (var arg in new[]
+                 {
+                     "-hide_banner", "-loglevel", "error", "-y",
+                     "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=15:duration=8",
+                     "-c:v", "libx264", "-preset", "ultrafast", "-g", "15", "-pix_fmt", "yuv420p",
+                     "-an", yol
+                 })
+            baslangic.ArgumentList.Add(arg);
+
+        using var surec = System.Diagnostics.Process.Start(baslangic)!;
+        var hata = surec.StandardError.ReadToEndAsync();
+        var cikti = surec.StandardOutput.ReadToEndAsync();
+        await surec.WaitForExitAsync();
+        await Task.WhenAll(hata, cikti);
+        Assert.True(File.Exists(yol), await hata);
+    }
 }
 
 public class KucultmeAraligiCliTests

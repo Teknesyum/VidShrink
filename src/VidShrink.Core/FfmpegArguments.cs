@@ -399,6 +399,25 @@ public static class FfmpegArguments
 
     private static string Seconds(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 
+    /// <summary>
+    /// Kesit passthrough'a dustugunde kaynagi oldugu gibi kopyalamak araligi kaybettirir;
+    /// pencere akis kopyasiyla yeniden paketlenir. Arama ayni melez duzen
+    /// (<c>docs/danisma/2026-09-18-fable-kucultmede-aralik.md</c> S1), kodlama yok.
+    /// </summary>
+    public static IReadOnlyList<string> BuildTrimCopy(MediaInfo info, TrimWindow trim, string outputPath)
+    {
+        var a = new List<string> { "-hide_banner", "-y" };
+        if (trim.LeadSeconds > 0) a.AddRange(new[] { "-ss", Seconds(trim.LeadSeconds) });
+        a.AddRange(new[] { "-i", info.FilePath });
+        a.AddRange(new[] { "-ss", Seconds(trim.RemainderSeconds) });
+        a.AddRange(new[] { "-t", Seconds(trim.DurationSeconds) });
+        a.AddRange(new[] { "-map", "0", "-c", "copy", "-map_metadata", "0", "-map_chapters", "-1" });
+        if (Path.GetExtension(outputPath).Equals(".mp4", StringComparison.OrdinalIgnoreCase))
+            a.AddRange(new[] { "-movflags", "+faststart" });
+        a.Add(outputPath);
+        return a;
+    }
+
     public static IReadOnlyList<string> HardwareDecodeArgs(string? videoCodec)
         => BenefitsFromHardwareDecode(videoCodec) ? new[] { "-hwaccel", "auto" } : Array.Empty<string>();
 

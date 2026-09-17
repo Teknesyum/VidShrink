@@ -111,7 +111,7 @@ public sealed class EncodeRunner
         SceneMap? scenes = null)
     {
         if (plan.ModeEnum == EncodeMode.PassThrough)
-            return PassThrough(info, plan, outputPath);
+            return await PassThroughAsync(info, plan, outputPath, progress, ct);
 
         if (VideoFilterChain.NeedsInterlaceProbe(info, plan.Filters))
         {
@@ -463,15 +463,26 @@ public sealed class EncodeRunner
         }
     }
 
-    private static EncodeResult PassThrough(MediaInfo info, EncodePlan plan, string outputPath)
+    private static async Task<EncodeResult> PassThroughAsync(
+        MediaInfo info, EncodePlan plan, string outputPath, IProgress<EncodeProgress>? progress, CancellationToken ct)
     {
         var sourceExtension = Path.GetExtension(info.FilePath);
         var deliveredPath = string.IsNullOrEmpty(sourceExtension) || sourceExtension.Equals(Path.GetExtension(outputPath), StringComparison.OrdinalIgnoreCase)
             ? outputPath
             : Path.ChangeExtension(outputPath, sourceExtension);
 
-        if (!string.Equals(Path.GetFullPath(info.FilePath), Path.GetFullPath(deliveredPath), StringComparison.OrdinalIgnoreCase))
+        if (plan.Trim is { } trim)
+        {
+            var outcome = await RunCommandAsync(
+                FfmpegArguments.BuildTrimCopy(info, trim, deliveredPath),
+                trim.DurationSeconds, progress, "pass-through trim", 0, 1, ct);
+            if (outcome.ExitCode != 0)
+                throw new InvalidOperationException("Kesit akis kopyasiyla paketlenemedi: " + string.Join(Environment.NewLine, outcome.Tail));
+        }
+        else if (!string.Equals(Path.GetFullPath(info.FilePath), Path.GetFullPath(deliveredPath), StringComparison.OrdinalIgnoreCase))
+        {
             File.Copy(info.FilePath, deliveredPath, overwrite: true);
+        }
 
         var mb = new FileInfo(deliveredPath).Length / 1024.0 / 1024.0;
         var trace = new List<EncodeAttempt> { new(1, "pass-through", mb, mb, plan.VideoBitrateK, plan.Mode) };
