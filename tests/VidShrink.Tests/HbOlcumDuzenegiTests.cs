@@ -216,4 +216,48 @@ public sealed class HbOlcumDuzenegiTests
         Assert.Contains("$iz = IzSureleri $j.result.trace", urun, StringComparison.Ordinal);
         Assert.Contains("IlkDenemeSn = $iz.Ilk", urun, StringComparison.Ordinal);
     }
+
+    private static string Ozetleyici => File.ReadAllText(
+        Path.Combine(TipSources.Root, "tools", "kalite-paketi-3", "butce-ozet.py"));
+
+    /// <summary>
+    /// <c>butce-ozet.py</c> "ilk deneme bandı tuttu mu" kararını kendi bant
+    /// kademesinden veriyor; o kademe motorun <see cref="FillBand.For"/>
+    /// kademesinden kopunca tablo yanlış hücreyi "bantta" diye işaretler. Burada
+    /// betiğin okuduğu çarpanlar motorun kendi çıktısına karşı ölçülüyor: her
+    /// kademeden bir hedefte <c>FillBand.For</c> ile aynı kenarı vermek zorunda.
+    /// </summary>
+    [Fact]
+    public void OzetleyicininBantKademesiMotorunFillBandiylaAyniKenariVeriyor()
+    {
+        var m = Regex.Match(Ozetleyici, @"BANT_KADEME = \((.*?)\)\r?\n", RegexOptions.Singleline);
+        Assert.True(m.Success, "BANT_KADEME bulunamadi.");
+        var kademe = Regex.Matches(m.Groups[1].Value, @"\(([\d.]+), ([\d.]+), ([\d.]+)\)")
+            .Select(x => (
+                Esik: double.Parse(x.Groups[1].Value, CultureInfo.InvariantCulture),
+                Alt: double.Parse(x.Groups[2].Value, CultureInfo.InvariantCulture),
+                Taban: double.Parse(x.Groups[3].Value, CultureInfo.InvariantCulture)))
+            .ToList();
+        Assert.Equal(3, kademe.Count);
+
+        foreach (var hedef in new[] { 1.0, 4.88, 9.99, 10.0, 25.0, 49.9, 50.0, 120.0 })
+        {
+            var (_, alt, taban) = kademe.First(k => hedef >= k.Esik);
+            var motor = FillBand.For(hedef);
+            Assert.Equal(hedef * alt, motor.LowerMb, 6);
+            Assert.Equal(hedef * taban, motor.HardFloorMb, 6);
+            Assert.Equal(hedef, motor.UpperMb, 6);
+        }
+
+        Assert.DoesNotContain("BANT_ALT", Ozetleyici, StringComparison.Ordinal);
+        Assert.Equal(BudgetFill.Floor, OzetSabiti("DOLDUR_ESIK"), 6);
+        Assert.Equal(BudgetFill.Aim, OzetSabiti("DOLDUR_HEDEF"), 6);
+    }
+
+    private static double OzetSabiti(string ad)
+    {
+        var m = Regex.Match(Ozetleyici, $@"^{ad} = ([\d.]+)$", RegexOptions.Multiline);
+        Assert.True(m.Success, $"{ad} bulunamadi.");
+        return double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
+    }
 }
