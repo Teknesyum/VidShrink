@@ -280,7 +280,10 @@ public partial class ShrinkJobWindow : Window
                 _outputs.Add(result.OutputPath);
                 State = ShrinkJobState.Bitti;
                 Progress.Value = 1;
-                TxtMessage.Text = result.OutputPath;
+                TxtMessage.Text = result.OverTarget
+                    ? result.OutputPath + " " + Say("main.run.accepted-larger",
+                        (result.OutputMb - request.TargetMegabytes).ToString("0.00", CultureInfo.InvariantCulture), request.TargetMegabytes)
+                    : result.OutputPath;
                 BtnReveal.IsVisible = true;
                 ResetShare(true);
             }

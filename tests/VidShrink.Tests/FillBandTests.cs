@@ -1,4 +1,4 @@
-﻿using Xunit.Abstractions;
+using Xunit.Abstractions;
 
 using Xunit.Sdk;
 using VidShrink.Core;
@@ -433,7 +433,7 @@ public sealed class FillBandTests
     }
 
     [Fact]
-    public async Task EncodeRunnerWritesNoFileWhenStillOverTheCeilingAfterMaxAttempts()
+    public async Task EncodeRunnerDeliversTheSmallestResultWhenStillOverTheCeilingAfterMaxAttempts()
     {
         if (!ToolLocator.IsAvailable(out _)) return;
 
@@ -490,9 +490,10 @@ public sealed class FillBandTests
 
             var result = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb: 0.001, progress: null, ct: CancellationToken.None, fillPolicy: FillPolicy.QualityCeiling);
 
-            Assert.False(result.Success);
+            Assert.True(result.Success);
             Assert.True(result.CeilingExceeded);
-            Assert.False(File.Exists(outputPath), "A file larger than the target must never be handed back.");
+            Assert.True(result.OverTarget);
+            Assert.True(File.Exists(outputPath), "With no one to ask, the run must still hand back a file.");
             Assert.Equal(3, result.Attempts);
         }
         finally { try { Directory.Delete(dir, recursive: true); } catch { } }

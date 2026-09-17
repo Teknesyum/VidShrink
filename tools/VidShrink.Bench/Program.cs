@@ -794,13 +794,14 @@ static async Task<int> ShrinkAsync(string[] args)
             planes.Y,
             planes.U,
             planes.V,
-            encodeResult.Saturated);
+            encodeResult.Saturated,
+            encodeResult.CeilingExceeded);
         results.Add(result);
 
         Console.WriteLine(
             $"{result.TargetMb:0.##} MB -> {result.ActualMb:0.##} MB ({result.FillPercent:0.#}%), " +
             $"bant={(result.InBand ? "ic" : "dis")} tasma={(result.OverTarget ? "VAR" : "yok")} taban={(result.BelowHardFloor ? "IHLAL" : "ok")}, " +
-            $"{result.Width}x{result.Height}@{result.Fps:0.##}, {result.Codec}/{result.Mode}, {result.CrfOrBitrate}, deneme={result.Attempts}{(result.Saturated ? " DOYGUN" : "")}, " +
+            $"{result.Width}x{result.Height}@{result.Fps:0.##}, {result.Codec}/{result.Mode}, {result.CrfOrBitrate}, deneme={result.Attempts}{(result.Saturated ? " DOYGUN" : "")}{(result.CeilingExceeded ? " TAVAN-ASILDI" : "")}, " +
             $"kalibre={(result.Calibrated ? "evet" : "hayir")}, plan={result.PlanSeconds:0.#}s, sure={result.EncodeSeconds:0.#}s, " +
             $"VMAF-NEG mean={Fmt(result.VmafNegMean)} harm={Fmt(result.VmafNegHarmonic)}{HarmonicWarning(result.VmafNegFloorFrames)} p10={Fmt(result.VmafNegP10)} min={Fmt(result.VmafNegMin)}, XPSNR={Fmt(result.Xpsnr)} (y={Fmt(result.XpsnrY)} u={Fmt(result.XpsnrU)} v={Fmt(result.XpsnrV)})");
 
@@ -2566,7 +2567,8 @@ sealed record BenchResult(
     double? XpsnrY,
     double? XpsnrU,
     double? XpsnrV,
-    bool Saturated = false);
+    bool Saturated = false,
+    bool CeilingExceeded = false);
 
 public sealed record VmafPool(
     int Count,

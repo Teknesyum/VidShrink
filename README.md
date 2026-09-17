@@ -141,7 +141,7 @@ goes to stderr; size, duration, attempts and VMAF go to stdout. Help follows the
 language, Turkish or English.
 
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
-size ceiling exceeded, `1` error, `64` wrong usage, `130` cancelled. A watch-folder command
+size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled. A watch-folder command
 (`izle`) is planned, not shipped.
 
 ## The Numbers
