@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg s'est terminé avec le code {0}.",
   "recorder.error.no-ffmpeg": "{0} est introuvable.",
   "recorder.error.invalid": "Ces paramètres ne permettent pas un enregistrement : {0}",
+  "recorder.error.window-wayland": "La capture de fenêtre n’est pas prise en charge dans une session Wayland ; choisissez l’écran ou une zone, ou ouvrez une session X11.",
+  "recorder.error.window-missing": "La fenêtre « {0} » est introuvable ; actualisez la liste et choisissez-la de nouveau.",
   "recorder.error.number": "{0} doit être un nombre.",
   "recorder.error.start": "L'enregistrement n'a pas pu démarrer : {0}",
   "recorder.error.folder": "Le dossier n'a pas pu être choisi : {0}",

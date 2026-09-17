@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg s-a încheiat cu codul {0}.",
   "recorder.error.no-ffmpeg": "{0} nu a putut fi găsit.",
   "recorder.error.invalid": "Aceste setări nu permit o înregistrare: {0}",
+  "recorder.error.window-wayland": "Înregistrarea ferestrei nu este acceptată într-o sesiune Wayland; alege ecranul sau o zonă ori conectează-te la o sesiune X11.",
+  "recorder.error.window-missing": "Fereastra „{0}” nu a fost găsită; reîmprospătează lista și alege-o din nou.",
   "recorder.error.number": "{0} trebuie să fie un număr.",
   "recorder.error.start": "Înregistrarea nu a putut începe: {0}",
   "recorder.error.folder": "Dosarul nu a putut fi ales: {0}",

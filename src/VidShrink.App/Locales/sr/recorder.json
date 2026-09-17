@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg je završio sa kodom {0}.",
   "recorder.error.no-ffmpeg": "{0} nije pronađen.",
   "recorder.error.invalid": "Ova podešavanja ne dozvoljavaju snimanje: {0}",
+  "recorder.error.window-wayland": "Snimanje prozora nije podržano u Wayland sesiji; izaberite ekran ili oblast ili se prijavite u X11 sesiju.",
+  "recorder.error.window-missing": "Prozor „{0}” nije pronađen; osvežite listu i ponovo ga izaberite.",
   "recorder.error.number": "{0} mora biti broj.",
   "recorder.error.start": "Snimanje nije moglo da se pokrene: {0}",
   "recorder.error.folder": "Folder nije mogao da se izabere: {0}",
