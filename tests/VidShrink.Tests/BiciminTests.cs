@@ -549,9 +549,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1471, toplam);
-        Assert.Equal(169, dilBasina["en"]);
-        Assert.Equal(60, dilBasina["tr"]);
+        Assert.Equal(1480, toplam);
+        Assert.Equal(170, dilBasina["en"]);
+        Assert.Equal(61, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -567,7 +567,7 @@ public sealed class BaslikKapsamiTests
     /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778, oynatici 1. dalga anahtarlariyla 844, 3. dalga anahtarlariyla 898, 2. dalga parca anahtarlariyla 950, 4. dalga arac ve gelismis anahtarlariyla 985, 8b kaydedici anahtarlariyla 1078, 8d ses anahtarlariyla 1090, sr'nin yedi ses satiri Kiril'den dosyanin geri kalaniyla ayni Latin yazimina dondurulunce 1091, Kesit A main.language.settings'i dusurunce 1086, Kesit B main.player.title ve main.player.menu'yu dusurunce 1084, Kesit D kaydedicinin otomatik kipine 16 recorder.auto.* anahtari ekleyince 1125, guncelleme rozetinin dort anahtari ve kaydedicinin hedef butcesi eklenince 1135, oynatici kisayollarinin dort menu anahtari 1217'den 1221'e: en bookmarkprev ve tostart, pl bookmarkprev, pt settings-all)
     /// ilk sozcuk disindaki <c>ffmpeg</c>
     /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
-    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 30358 kalem)
+    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 38313 kalem, sayim BaslikKapsamiTests'te)
     /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
     /// <para>Sayim yansimanin gordugu 43 dil uzerinden: 42 dil klasoru ve gomulu kaynak
     /// adindan gelen bir dil daha, her biri 692 anahtar. 5. dalga ffmpeg oynatma borusunu
@@ -601,7 +601,7 @@ public sealed class BaslikKapsamiTests
     /// HandBrake 1c dalgasi main.advanced.keep-tracks.label'i ekledi: 43 x 742 = 31906'dan 43 x 743 = 31949'a;
     /// iz kararlarinin sekiz gerekce notu (main.reason.stream.*) 43 x 751 = 32293'e, kol degistiren toplami 1218'den 1260'a (en 139'dan 143'e, tr 52'den 56'ya). Birlesik: gezilen 33067, toplam 1295 (en 152, tr 58).
     /// Paket 2 kaydedicisi 80 recorder.* anahtari ekledi (Basit/Gelismis, geri sayim, cerceve, tepsi, kisayol, girdi gosterimi, webcam, buyutec ve gelismis panelin on kolu): 43 x 80 = 3440, gezilen 36507; kol degistiren toplami 1406 (en 160, tr 59).
-    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). Kaydedici pencere secicisi iki recorder.error.* anahtari ekledi (window-wayland, window-missing): 43 x 2 = 86, gezilen 37625; kol degistiren toplami degismedi. HandBrake A2 on ayar kutuphanesi 15 main.preset.* anahtari ekledi: 43 x 15 = 645, gezilen 38270; kol degistiren toplami 1471 (en 169, tr 60).</para>
+    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). Kaydedici pencere secicisi iki recorder.error.* anahtari ekledi (window-wayland, window-missing): 43 x 2 = 86, gezilen 37625; kol degistiren toplami degismedi. HandBrake A2 on ayar kutuphanesi 15 main.preset.* anahtari ekledi: 43 x 15 = 645, gezilen 38270; kol degistiren toplami 1471 (en 169, tr 60). Yol D main.update.maintenance-failed bakim hatasi cumlesini ekledi: 43 x 1 = 43, gezilen 38313; kol degistiren toplami 1480 (en 170, tr 61; cs, es, hu, nl, pt, ro, sk birer).</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -629,7 +629,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(38270, gezilen);
+        Assert.Equal(38313, gezilen);
         Assert.Empty(kayip);
     }
 

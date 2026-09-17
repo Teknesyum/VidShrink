@@ -231,26 +231,25 @@ public class KurulumIlerlemesiTests
     }
 
     /// <summary>
-    /// Elle yükleme artık kullanıcıya sessiz gelmiyor: güncelleyici panele bağlanıyor ve
-    /// her aşama — sürüm listesi, bulunan sürüm, inen her dosya adı, yerine taşıma — bir
-    /// cümleyle günlüğe düşüyor. Eskiden bütün indirme tek bir "Güncelleme uygulanıyor"
-    /// satırıydı; kullanıcı ne olduğunu göremiyordu.
+    /// Yol D: başlatıcının paneli kalktı, güncelleyici panele konuşmuyor. Yerine taşıma
+    /// uygulama klasörü boşalınca başlıyor ve hatası uygulamanın paneline işaret bırakıyor.
+    /// Yarışın davranışı <c>BaslaticiPanelsizTests</c>'te gerçek süreçle. Taşıma adımı
+    /// <c>KurulumBekleyeni.cs</c>'e geçti; güncelleyici oraya devrediyor.
     /// </summary>
     [Fact]
-    public void GuncelleyiciPaneleKonusuyor()
+    public void GuncelleyiciKlasorBosalincaKurar()
     {
-        var kaynak = File.ReadAllText(
-            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
-        var program = File.ReadAllText(
-            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Program.cs"));
+        var launcher = Path.Combine(TipSources.Root, "src", "VidShrink.Launcher");
+        var guncelleyici = File.ReadAllText(Path.Combine(launcher, "Updater.cs"));
+        var kaynak = File.ReadAllText(Path.Combine(launcher, "KurulumBekleyeni.cs"));
 
-        Assert.Contains("InstallProgress? progress = null", kaynak);
-        Assert.Contains("progress?.Step(", kaynak);
-        Assert.Contains("\"Sürüm listesi alınıyor\"", kaynak);
-        Assert.Contains("indi (\" + sira + \"/\" + total + \")\"", kaynak);
-        Assert.Contains("\"Dosyalar yerine taşınıyor\"", kaynak);
-        Assert.Contains("progress: progress", program);
-        Assert.Contains("progress.WriteLog(", program);
+        Assert.DoesNotContain("InstallProgress", guncelleyici);
+        Assert.Contains("KurulumBekleyeni.Calistir(", guncelleyici);
+        Assert.DoesNotContain("InstallProgress", kaynak);
+        var bosalinca = kaynak.IndexOf("UygulamaKlasoruKapisi.BosalincaAl(", StringComparison.Ordinal);
+        var tasima = kaynak.IndexOf("UpdateRollout.Apply(", StringComparison.Ordinal);
+        Assert.True(bosalinca > 0 && bosalinca < tasima, "taşıma klasör boşalmadan başlıyor");
+        Assert.Contains("UygulamaKlasoruKapisi.HataYaz(", kaynak);
     }
 
     /// <summary>
@@ -260,11 +259,13 @@ public class KurulumIlerlemesiTests
     [Fact]
     public void ProvaKipiKurmuyor()
     {
-        var kaynak = File.ReadAllText(
-            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
+        var launcher = Path.Combine(TipSources.Root, "src", "VidShrink.Launcher");
+        var guncelleyici = File.ReadAllText(Path.Combine(launcher, "Updater.cs"));
+        var kaynak = File.ReadAllText(Path.Combine(launcher, "KurulumBekleyeni.cs"));
 
-        Assert.Contains("VIDSHRINK_UPDATE_PROVA", kaynak);
-        var prova = kaynak.IndexOf("if (Rehearsing)", StringComparison.Ordinal);
+        Assert.Contains("VIDSHRINK_UPDATE_PROVA", guncelleyici);
+        Assert.Contains("}, Rehearsing);", guncelleyici);
+        var prova = kaynak.IndexOf("if (prova) return false;", StringComparison.Ordinal);
         var kurulum = kaynak.IndexOf("LauncherUpdate.Stage(stage", StringComparison.Ordinal);
 
         Assert.True(prova > 0, "prova kolu yok");

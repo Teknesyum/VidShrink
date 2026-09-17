@@ -34,6 +34,7 @@
   "main.update.downloading": "Stahování…",
   "main.update.ready": "Připraveno k instalaci",
   "main.update.failed": "Aktualizaci se nepodařilo stáhnout",
+  "main.update.maintenance-failed": "Aktualizaci se nepodařilo nainstalovat, při příštím spuštění se to zkusí znovu",
   "main.update.cancelled": "Stahování zrušeno",
   "main.update.log.manifest": "Načítání seznamu verzí",
   "main.update.log.found": "Verze {0}: {1} souborů",

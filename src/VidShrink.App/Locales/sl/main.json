@@ -34,6 +34,7 @@
   "main.update.downloading": "Prenašanje…",
   "main.update.ready": "Pripravljeno za namestitev",
   "main.update.failed": "Posodobitve ni bilo mogoče prenesti",
+  "main.update.maintenance-failed": "Posodobitve ni bilo mogoče namestiti, ob naslednjem zagonu bo poskus ponovljen",
   "main.update.cancelled": "Prenos preklican",
   "main.update.log.manifest": "Pridobivanje seznama različic",
   "main.update.log.found": "Različica {0}: {1} datotek",

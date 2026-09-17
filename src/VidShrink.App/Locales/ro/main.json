@@ -34,6 +34,7 @@
   "main.update.downloading": "Se descarcă…",
   "main.update.ready": "Gata de instalare",
   "main.update.failed": "Actualizarea nu a putut fi descărcată",
+  "main.update.maintenance-failed": "Actualizarea nu a putut fi instalată, se va reîncerca la următoarea pornire",
   "main.update.cancelled": "Descărcare anulată",
   "main.update.log.manifest": "Se preia lista de versiuni",
   "main.update.log.found": "Versiunea {0}: {1} fișiere",

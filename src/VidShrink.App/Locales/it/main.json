@@ -34,6 +34,7 @@
   "main.update.downloading": "Download in corso…",
   "main.update.ready": "Pronto da installare",
   "main.update.failed": "Impossibile scaricare l'aggiornamento",
+  "main.update.maintenance-failed": "Impossibile installare l'aggiornamento, verrà ritentato al prossimo avvio",
   "main.update.cancelled": "Download annullato",
   "main.update.log.manifest": "Recupero dell'elenco versioni",
   "main.update.log.found": "Versione {0}: {1} file",

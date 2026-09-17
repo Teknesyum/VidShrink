@@ -132,6 +132,7 @@ public partial class MainWindow
 
     internal void AcilisGoruntusunuBildir()
     {
+        BakimHatasiniBekle();
         if (_startupFile is not null)
         {
             Action? ilk = null;
