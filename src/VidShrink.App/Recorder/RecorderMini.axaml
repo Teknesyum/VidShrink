@@ -19,14 +19,13 @@
 
     Şeritte yalnız kayıt sürerken anlamı olan şeyler var. Kare ve düşen kare okumaları,
     hedef seçimi, kodek, ön ayar, ses aygıtı ve sonuç paneli büyük pencerede kalıyor:
-    hepsi kayıt öncesi kararlar ve kayıt başladıktan sonra zaten değişemiyorlar.
-  -->
+    hepsi kayıt öncesi kararlar ve kayıt başladıktan sonra zaten değişemiyorlar.  -->
   <Border x:Name="MiniStrip"
           Theme="{StaticResource Panel}"
           Padding="{StaticResource RecorderStripPadding}"
           MinWidth="{StaticResource RecorderMiniMinWidth}"
           Height="{StaticResource RecorderMiniHeight}">
-    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto"
+    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto"
           ColumnSpacing="{StaticResource RecorderStripGap}">
 
       <Ellipse Grid.Column="0"
@@ -48,6 +47,50 @@
                  ToolTip.Tip="{loc:Text recorder.mini.drag-hint}"/>
 
       <Button Grid.Column="3"
+              x:Name="BtnOptions"
+              Width="{StaticResource RecorderButtonSize}"
+              Height="{StaticResource RecorderButtonSize}"
+              Theme="{StaticResource GhostButton}"
+              auto:AutomationProperties.Name="{loc:Text recorder.mini.options}"
+              ToolTip.Tip="{loc:Text recorder.mini.options}">
+        <Button.Flyout>
+          <Flyout Placement="Top">
+            <StackPanel x:Name="PanelOptions" Spacing="{StaticResource SpaceSm}">
+              <CheckBox x:Name="ChkShowClicks"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.show-clicks}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.show-clicks}"/>
+              <CheckBox x:Name="ChkClickSound"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.click-sound}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.click-sound}"/>
+              <CheckBox x:Name="ChkShowKeys"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.show-keys}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.show-keys}"/>
+              <CheckBox x:Name="ChkOpenFolder"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.output.open-when-done}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.output.open-when-done}"/>
+              <CheckBox x:Name="ChkCursor"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.cursor}"
+                        ToolTip.Tip="{loc:Text recorder.mini.options-locked}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.cursor}"/>
+            </StackPanel>
+          </Flyout>
+        </Button.Flyout>
+        <Path Width="{StaticResource IconSizeLg}"
+              Height="{StaticResource IconSizeLg}"
+              Stretch="Uniform"
+              Data="{StaticResource IconSettings}"
+              Stroke="{StaticResource TextBody}"
+              StrokeThickness="{StaticResource IconStroke}"
+              StrokeLineCap="Round"
+              StrokeJoin="Round"/>
+      </Button>
+
+      <Button Grid.Column="4"
               x:Name="BtnToggle"
               Width="{StaticResource RecorderButtonSize}"
               Height="{StaticResource RecorderButtonSize}"
@@ -66,7 +109,7 @@
               StrokeJoin="Round"/>
       </Button>
 
-      <Button Grid.Column="4"
+      <Button Grid.Column="5"
               x:Name="BtnStop"
               Width="{StaticResource RecorderButtonSize}"
               Height="{StaticResource RecorderButtonSize}"

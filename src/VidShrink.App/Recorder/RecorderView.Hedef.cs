@@ -65,6 +65,9 @@ internal partial class RecorderView
         TxtQuality.Text = _settings.Quality.ToString("0.##", CultureInfo.InvariantCulture);
         ChkCursor.IsChecked = _settings.ShowCursor;
         ChkOpenFolder.IsChecked = _settings.OpenFolderWhenDone;
+        ChkShowClicks.IsChecked = _settings.ShowClicks;
+        ChkClickSound.IsChecked = _settings.ClickSound;
+        ChkShowKeys.IsChecked = _settings.ShowKeys;
         TxtWindowTitle.Text = _settings.WindowTitle ?? string.Empty;
         TxtRegionX.Text = _settings.RegionX.ToString(CultureInfo.InvariantCulture);
         TxtRegionY.Text = _settings.RegionY.ToString(CultureInfo.InvariantCulture);
@@ -286,6 +289,9 @@ internal partial class RecorderView
         _settings.Preset = CmbPreset.SelectedItem as string ?? _settings.Preset;
         _settings.ShowCursor = ChkCursor.IsChecked ?? false;
         _settings.OpenFolderWhenDone = ChkOpenFolder.IsChecked ?? false;
+        _settings.ShowClicks = ChkShowClicks.IsChecked ?? false;
+        _settings.ClickSound = ChkClickSound.IsChecked ?? false;
+        _settings.ShowKeys = ChkShowKeys.IsChecked ?? false;
         _settings.WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text;
         _settings.MicrophoneName = DeviceChoice(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
         _settings.SystemAudioName = DeviceChoice(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);

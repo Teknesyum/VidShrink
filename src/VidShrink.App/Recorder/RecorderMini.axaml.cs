@@ -11,6 +11,17 @@ using VidShrink.Ffmpeg;
 
 namespace VidShrink.App.Recorder;
 
+internal enum MiniOptionKind
+{
+    ShowClicks,
+    ClickSound,
+    ShowKeys,
+    OpenFolder,
+    Cursor
+}
+
+internal readonly record struct MiniOption(MiniOptionKind Kind, bool Value);
+
 /// <summary>
 /// TinyTask ölçüsünde kayıt şeridi. Saha taramasında ölçülen 22 kompakt yüzeyin
 /// hepsinde üç şey ortak: durdurma düğmesi, tek düğmeye indirilmiş duraklat/sürdür ve
@@ -37,7 +48,46 @@ internal partial class RecorderMini : Window
 
     internal event EventHandler? ExpandRequested;
 
-    public RecorderMini() => InitializeComponent();
+    internal event EventHandler<MiniOption>? OptionChanged;
+
+    private bool _showingOptions;
+
+    public RecorderMini()
+    {
+        InitializeComponent();
+        foreach (var (box, option) in OptionBoxes())
+            box.IsCheckedChanged += (_, _) =>
+            {
+                if (!_showingOptions) OptionChanged?.Invoke(this, option with { Value = box.IsChecked ?? false });
+            };
+    }
+
+    private (CheckBox Box, MiniOption Option)[] OptionBoxes() => new[]
+    {
+        (ChkShowClicks, new MiniOption(MiniOptionKind.ShowClicks, false)),
+        (ChkClickSound, new MiniOption(MiniOptionKind.ClickSound, false)),
+        (ChkShowKeys, new MiniOption(MiniOptionKind.ShowKeys, false)),
+        (ChkOpenFolder, new MiniOption(MiniOptionKind.OpenFolder, false)),
+        (ChkCursor, new MiniOption(MiniOptionKind.Cursor, false))
+    };
+
+    internal void ShowOptions(bool showClicks, bool clickSound, bool showKeys, bool openFolder, bool cursor, bool recording)
+    {
+        _showingOptions = true;
+        try
+        {
+            ChkShowClicks.IsChecked = showClicks;
+            ChkClickSound.IsChecked = clickSound;
+            ChkShowKeys.IsChecked = showKeys;
+            ChkOpenFolder.IsChecked = openFolder;
+            ChkCursor.IsChecked = cursor;
+            ChkCursor.IsEnabled = !recording;
+        }
+        finally
+        {
+            _showingOptions = false;
+        }
+    }
 
     /// <summary>Şeridin yüzünü oturumun haline uyduruyor; hep üstte kalma da buradan sürülüyor.</summary>
     internal void Follow(RecorderState state, string elapsed, int countdown = 0)

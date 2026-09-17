@@ -38,8 +38,9 @@ sürümden (`x.0.0`) önce koşar.
   (0/3/5/10): sahte bekleme işiyle 3-2-1 şeritte sayılır, iptal düğmesi, F8 ve F7 keser; mini şerit sayıyı gösterir
   (mini pencere artık `InitializeComponent` ile kuruluyor, adlı alanlar boş kalmıyordu); sayım doğrulamadan sonra,
   oturumdan önce koşar (kaynak pimi). Kayıt çerçevesi: bölgenin dışına çizilir (`Outer`, ölçekte yukarı yuvarlanan
-  kenar), tıklamayı geçiren WS_EX stili saf fonksiyonla, yalnız bölge kaydında ve F9 ile gizlenmemişken istenir;
-  pencere sahte `IRecorderFrameHost` ile, gerçek pencere gösterilmeden. Tepsi: üç durum
+  kenar), ekrana sığmazsa bölgenin içine (`Placement`), WS_EX stili saf fonksiyonla, oturumda ve F9 ile gizlenmemişken
+  istenir; sahte `IRecorderFrameHost` ile. KaydediciCerceveTests: üç hedefte bölge (ekran, `WindowRect`, bölge); tam
+  ekran çerçevesi affinity 0x11 ile kayda girmez (2x2 gdigrab pikseli, negatif kontrol affinity'siz). Tepsi: üç durum
   (boşta/kaydediyor/duraklatıldı) paletin üç ayrı fırçasından, simge Skia'da çizilip merkez pikseli okunur; ipucu
   süre ve diskteki anlık MB (`RecorderSession.WrittenMb`); sahte `IRecorderTrayHost`, TrayIcon kurulmaz. Genel kısayol: tanım tek yerde
   (`RecorderHotkeys`), sahte `IGlobalHotkeys` çakışmayı ve basışı taklit eder; başsızda `NoGlobalHotkeys`
@@ -58,6 +59,11 @@ sürümden (`x.0.0`) önce koşar.
   (`RegionDraw`); sahte `DrawRegion` ile çizilen bölge kutulara, json'a ve `-offset_x/-video_size`'a geçer, Esc
   vazgeçer; çizim penceresi gerçek açılıp masaüstünü kaplar. Hazır boyut, pencere seçici (sahte `ListWindows`,
   `Pick` eleme negatifleri), ekran seçici (sahte `ScreenSource`, ikinci ekranın ofseti). Kanıt `.calisma/paket-2/`.
+- `KaydediciCerceveTests.cs` — paket 2, çerçeve her hedefte: ekran/pencere/bölge dikdörtgeni, ekrana sığmayan çerçeve
+  içe, gerçek pencerenin istemci alanı, affinity 0x11 gerçek pencerede (negatif kontrol affinity'siz).
+- `KaydediciGirdiTests.cs` — paket 2, tıklama halkası, tıklama sesi, tuş gösterimi: `KeyText`/`KeyTracker`, bellek
+  WAV'ı, bindirme yeri; sahte `IInputHooks`/`IInputOverlay`/`IClickSound` ile kutu → json → kanca, kapalı kutu kanca
+  kurmaz; gerçek halka ve tuş penceresi açılıp süresinde kapanır. Gerçek düşük seviye kanca testte kurulmaz.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

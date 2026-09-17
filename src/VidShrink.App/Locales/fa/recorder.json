@@ -141,5 +141,10 @@
   "recorder.target.aspect": "Aspect ratio",
   "recorder.target.aspect-free": "Free",
   "recorder.target.size": "Preset size",
-  "recorder.target.size-none": "Custom"
+  "recorder.target.size-none": "Custom",
+  "recorder.option.show-clicks": "Show clicks with a ring",
+  "recorder.option.click-sound": "Click sound",
+  "recorder.option.show-keys": "Show pressed keys",
+  "recorder.mini.options": "Recording options",
+  "recorder.mini.options-locked": "Can't be changed while recording"
 }

@@ -58,6 +58,12 @@ internal sealed class RecorderSettings
 
     internal bool OpenFolderWhenDone { get; set; }
 
+    internal bool ShowClicks { get; set; }
+
+    internal bool ClickSound { get; set; }
+
+    internal bool ShowKeys { get; set; }
+
     internal RecorderTargetKind Target { get; set; } = RecorderTargetKind.Screen;
 
     internal string? WindowTitle { get; set; }
@@ -212,6 +218,9 @@ internal sealed class RecorderSettings
             if ((double?)root["quality"] is { } quality) settings.Quality = quality;
             settings.ShowCursor = (bool?)root["showCursor"] ?? true;
             settings.OpenFolderWhenDone = (bool?)root["openFolderWhenDone"] ?? false;
+            settings.ShowClicks = (bool?)root["showClicks"] ?? false;
+            settings.ClickSound = (bool?)root["clickSound"] ?? false;
+            settings.ShowKeys = (bool?)root["showKeys"] ?? false;
             if (Enum.TryParse<RecorderTargetKind>((string?)root["target"], true, out var target)) settings.Target = target;
             settings.WindowTitle = (string?)root["windowTitle"];
             settings.RegionX = (int?)root["regionX"] ?? 0;
@@ -291,6 +300,9 @@ internal sealed class RecorderSettings
                 writer.WriteNumber("quality", Quality);
                 writer.WriteBoolean("showCursor", ShowCursor);
                 writer.WriteBoolean("openFolderWhenDone", OpenFolderWhenDone);
+                writer.WriteBoolean("showClicks", ShowClicks);
+                writer.WriteBoolean("clickSound", ClickSound);
+                writer.WriteBoolean("showKeys", ShowKeys);
                 writer.WriteString("target", Target.ToString());
                 if (WindowTitle is null) writer.WriteNull("windowTitle");
                 else writer.WriteString("windowTitle", WindowTitle);

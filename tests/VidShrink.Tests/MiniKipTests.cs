@@ -34,13 +34,14 @@ public class MiniKipTests
         Assert.Contains("x:Name=\"BtnToggle\"", mini);
         Assert.Contains("x:Name=\"BtnStop\"", mini);
         Assert.Contains("x:Name=\"BtnExpand\"", mini);
+        Assert.Contains("x:Name=\"BtnOptions\"", mini);
 
         Assert.DoesNotContain("TxtFrames", mini);
         Assert.DoesNotContain("TxtDropped", mini);
         Assert.DoesNotContain("CmbTarget", mini);
         Assert.DoesNotContain("ResultPanel", mini);
 
-        Assert.Equal(3, mini.Split("x:Name=\"Btn").Length - 1);
+        Assert.Equal(4, mini.Split("x:Name=\"Btn").Length - 1);
     }
 
     /// <summary>Üç ölçü de belirteçten okunuyor; XAML'a sayı yazılmıyor.</summary>

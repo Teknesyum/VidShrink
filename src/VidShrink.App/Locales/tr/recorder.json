@@ -141,5 +141,10 @@
   "recorder.target.aspect": "Oran",
   "recorder.target.aspect-free": "Serbest",
   "recorder.target.size": "Hazır boyut",
-  "recorder.target.size-none": "Elle"
+  "recorder.target.size-none": "Elle",
+  "recorder.option.show-clicks": "Tıklamaları halkayla göster",
+  "recorder.option.click-sound": "Tıklama sesi",
+  "recorder.option.show-keys": "Basılan tuşları göster",
+  "recorder.mini.options": "Kayıt ayarları",
+  "recorder.mini.options-locked": "Kayıt sürerken değiştirilemez"
 }

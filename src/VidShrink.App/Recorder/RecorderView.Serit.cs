@@ -291,6 +291,7 @@ internal partial class RecorderView
             : Say("recorder.strip.idle");
 
         SyncFrame();
+        SyncInput(_session is not null);
         SyncTray();
         RefreshMini();
     }

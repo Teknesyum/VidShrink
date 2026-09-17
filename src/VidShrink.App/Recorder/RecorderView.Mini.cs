@@ -79,6 +79,7 @@ internal partial class RecorderView
         _mini.ToggleRequested += async (_, _) => await ToggleAsync();
         _mini.StopRequested += async (_, _) => await StopAsync();
         _mini.ExpandRequested += (_, _) => ExpandFromMini();
+        _mini.OptionChanged += (_, option) => ApplyMiniOption(option);
         _mini.Closed += (_, _) => ExpandFromMini();
         _mini.AddHandler(KeyDownEvent, OnHotkey, RoutingStrategies.Tunnel);
 
@@ -122,5 +123,49 @@ internal partial class RecorderView
             ? new PixelRect(r.X, r.Y, r.Width, r.Height)
             : null;
 
-    private void RefreshMini() => _mini?.Follow(State, TxtElapsed.Text ?? string.Empty, CountdownLeft);
+    private void RefreshMini()
+    {
+        if (_mini is null) return;
+        _mini.Follow(State, TxtElapsed.Text ?? string.Empty, CountdownLeft);
+        _mini.ShowOptions(
+            ChkShowClicks.IsChecked ?? false,
+            ChkClickSound.IsChecked ?? false,
+            ChkShowKeys.IsChecked ?? false,
+            ChkOpenFolder.IsChecked ?? false,
+            ChkCursor.IsChecked ?? false,
+            _session is not null || CountingDown);
+    }
+
+    internal RecorderMini? Mini => _mini;
+
+    internal void ApplyMiniOption(MiniOption option)
+    {
+        var recording = _session is not null || CountingDown;
+        if (option.Kind == MiniOptionKind.Cursor && recording)
+        {
+            RefreshMini();
+            return;
+        }
+
+        switch (option.Kind)
+        {
+            case MiniOptionKind.ShowClicks: ChkShowClicks.IsChecked = option.Value; _settings.ShowClicks = option.Value; break;
+            case MiniOptionKind.ClickSound: ChkClickSound.IsChecked = option.Value; _settings.ClickSound = option.Value; break;
+            case MiniOptionKind.ShowKeys: ChkShowKeys.IsChecked = option.Value; _settings.ShowKeys = option.Value; break;
+            case MiniOptionKind.OpenFolder: ChkOpenFolder.IsChecked = option.Value; _settings.OpenFolderWhenDone = option.Value; break;
+            case MiniOptionKind.Cursor: ChkCursor.IsChecked = option.Value; break;
+        }
+
+        if (_session is not null)
+        {
+            var current = _settings.ToJson();
+            if (!current.AsSpan().SequenceEqual(_persisted))
+            {
+                _persisted = current;
+                _settings.Save(RecorderSettings.FilePath);
+            }
+        }
+
+        SyncInput(_session is not null);
+    }
 }

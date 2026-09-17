@@ -414,6 +414,21 @@
                     Content="{loc:Text recorder.option.cursor}"
                     auto:AutomationProperties.Name="{loc:Text recorder.option.cursor}"/>
 
+          <WrapPanel ItemSpacing="{StaticResource SpaceMd}">
+            <CheckBox x:Name="ChkShowClicks"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.option.show-clicks}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.option.show-clicks}"/>
+            <CheckBox x:Name="ChkClickSound"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.option.click-sound}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.option.click-sound}"/>
+            <CheckBox x:Name="ChkShowKeys"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.option.show-keys}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.option.show-keys}"/>
+          </WrapPanel>
+
           <StackPanel>
             <TextBlock Text="{loc:Text recorder.output.title}" Theme="{StaticResource Label}"/>
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
