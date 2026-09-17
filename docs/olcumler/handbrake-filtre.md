@@ -34,4 +34,30 @@ Kural sayıları bu commit'te sabitlenmiştir; sonuç tablosu aşağıya ölçü
 
 ## Sonuç
 
-Henüz ölçülmedi.
+Koşum 35254572887 (`handbrake-kiyas`, `isler=filtre`, `vt=false`), windows koşucusu, 2000 kbit.
+
+Progressive kesitler (kapali'ya karşı, iki tekrar):
+
+| kesit | kol | ΔVMAF-NEG | süre farkı | hüküm |
+| --- | --- | --- | --- | --- |
+| karanlik | otomatik | +0,0026 | +0,34 % | geçti |
+| karanlik | acik | +0,0008 | +0,40 % | geçti |
+| parlak | otomatik | −0,0124 | +0,98 % | geçti |
+| parlak | acik | +0,0571 | +22,62 % | **kaldı** |
+| hareketli | otomatik | −0,0098 | −1,74 % | geçti |
+| hareketli | acik | +0,0112 | −1,52 % | geçti |
+
+Otomatik kip üç kesitte de geçti: bayraksız koşumda zincir boş kaldı (`deinterlace=Auto zincir=`),
+kalite ve süre kapali koluyla aynı. `acik` kolu kaliteyi bozmuyor ama `parlak` kesitinde elle
+açılan `idet,bwdif` zinciri kodlamayı %22,6 yavaşlattı (kapali en küçük 81,8 sn, acik 100,3 sn);
+varsayılan Auto olduğu için bu maliyet yalnız elle açana düşer.
+
+Taramalı sentetik negatif kontrol (`hareketli`, ffprobe `field_order=tb`):
+
+| kol | zincir | VMAF-NEG ort | hüküm |
+| --- | --- | --- | --- |
+| taramali-kapali | yok | 23,87 | — |
+| taramali-otomatik | `idet,bwdif=mode=send_frame:parity=auto:deint=interlaced` | 98,78 | geçti |
+
+ΔVMAF-NEG = +74,92 (eşik 1,0); bwdif yalnız otomatik kolun komutunda. Taramalı kaynakta
+zincirin kurulması ayrıca süreyi düşürdü (60,4 → 57,8 sn).
