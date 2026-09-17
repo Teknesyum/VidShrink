@@ -1394,8 +1394,8 @@ function Filtre {
     if ($Kesit -ne 'hareketli') { return }
     $tar = Join-Path $Cikti 'filtre-taramali.mkv'
     $ref = Join-Path $Cikti 'filtre-taramali-ref.mkv'
-    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', 'tinterlace=mode=interleave_top,setfield=tff', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-flags', '+ilme+ildct', '-pix_fmt', 'yuv420p', $tar)
-    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', "select=not(mod(n\,2)),fps=$((Probe $tar).FpsMetin)", '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-pix_fmt', 'yuv420p', $ref)
+    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', 'crop=iw:trunc(ih/4)*4:0:0,tinterlace=mode=interleave_top,setfield=tff', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-flags', '+ilme+ildct', '-pix_fmt', 'yuv420p', $tar)
+    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', "crop=iw:trunc(ih/4)*4:0:0,select=not(mod(n\,2)),fps=$((Probe $tar).FpsMetin)", '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-pix_fmt', 'yuv420p', $ref)
     $alan = (& ffprobe -v error -select_streams v:0 -show_entries stream=field_order -of csv=p=0 $tar | Out-String).Trim()
     $tb = Probe $tar
     $tmb = [math]::Round($kbit * $tb.Sure / 8 / 1024, 4)

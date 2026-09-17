@@ -23,7 +23,8 @@ Hüküm, kesit başına, `otomatik` ve `acik` kollarının her biri için `kapal
 
 **Taramalı sentetik negatif kontrol.** `hareketli` kesitinden `tinterlace=mode=interleave_top,setfield=tff`
 ile taramalı ara dosya (`-flags +ilme+ildct`; ffmpeg 8+ `-top` seçeneğini reddettiği için ilk koşum
-35248878850'de düşürüldü, ffprobe `field_order` progressive olmayan bir değer, satırda kayıtlı), referans aynı kesitin çift
+35248878850'de düşürüldü, ffprobe `field_order` progressive olmayan bir değer, satırda kayıtlı; taramalı 4:2:0 x264 yüksekliğin 4'e bölünmesini istediği için 35252046279'da 1920x818
+kodlanamadı, ara dosya ve referans `crop=iw:trunc(ih/4)*4:0:0` ile 1920x816'ya kırpılır), referans aynı kesitin çift
 kareleri (`select=not(mod(n\,2))`). Kollar `kapali` ve `otomatik`, birer tekrar. Hüküm:
 
 1. `otomatik` komutunda `bwdif` var, `kapali` komutunda yok
