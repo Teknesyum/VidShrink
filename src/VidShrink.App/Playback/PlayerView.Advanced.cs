@@ -309,21 +309,20 @@ internal partial class PlayerView
     }
 
     /// <summary>
-    /// Sag tik menusunun **sonuna** eklenir; basligi duz metin ve <c>Tag</c>'i bos oldugu
-    /// icin menu olculeri onu kisayol satiri saymaz.
+    /// Sag tik menusundeki Ayarlar alt menusune eklenir; basligi duz metin ve <c>Tag</c>'i bos
+    /// oldugu icin menu olculeri onu kisayol satiri saymaz.
     /// </summary>
-    private void AppendAdvancedMenu(MenuFlyout flyout)
+    internal MenuItem AdvancedMenu()
     {
         EnsureAdvanced();
-        flyout.Items.Add(new Separator());
-        flyout.Items.Add(Submenu(Strings.Get("player.advanced.menu"), new List<Control>
+        return Submenu(Strings.Get("player.advanced.menu"), new List<Control>
         {
             Submenu(Strings.Get("player.advanced.picture"), PictureItems()),
             Submenu(Strings.Get("player.advanced.sound"), SoundItems()),
             Submenu(Strings.Get("player.advanced.subtitle"), SubtitleStyleItems()),
             new Separator(),
             Plain(Strings.Get("player.advanced.reset"), ResetAdvanced)
-        }));
+        });
     }
 
     internal List<Control> PictureItems()

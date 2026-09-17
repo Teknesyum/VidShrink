@@ -109,6 +109,7 @@ public partial class MainWindow : Window
     private const string ChromeHidden = "chrome-hidden";
 
     private bool _chromeShown = true;
+    private HoverZone? _chromeZone;
     private DropVisual _dropVisual = DropVisual.Idle;
     private DispatcherTimer? _recalculateTimer;
     private DateTime _lastEstimatePulse = DateTime.MinValue;
@@ -161,6 +162,7 @@ public partial class MainWindow : Window
         Player.CurrentTabIndex = () => Tabs.SelectedIndex;
         Player.SelectTab = index => Tabs.SelectedIndex = index;
         Player.OpenSettings = () => Tabs.SelectedIndex = SettingsTabIndex;
+        Player.AppSettingsItems = PlayerSettingsItems;
         PlayerAdvancedPanel.Player = Player;
 
         Player.HistoryPath = () => Path.Combine(
@@ -607,8 +609,10 @@ public partial class MainWindow : Window
     /// <summary>
     /// Üst şerit yalnız <b>oynatıcı sekmesinde</b> kendiliğinden gizlenir: işaretçi
     /// pencerenin ilk <c>TitleBarHeight</c> pikseline girdiğinde belirir, şeridi terk
-    /// edince kaybolur. Şerit içeriğin üstünde bir katman olduğu için görünüp kaybolurken
-    /// hiçbir şey yer değiştirmiyor.
+    /// edince kaybolur. Kural alt şeritle aynı <see cref="HoverZone"/> ve aynı iki belirteç
+    /// (<c>PlaybackStripShowDelay</c> / <c>PlaybackStripHideDelay</c>): kaybolma gecikmeli,
+    /// duraklatılmışken şerit açık kalır. Şerit içeriğin üstünde bir katman olduğu için
+    /// görünüp kaybolurken hiçbir şey yer değiştirmiyor.
     ///
     /// <para>Diğer sekmelerde şerit sabit durur. Gizlenme oynatıcının kendi gereği —
     /// görüntünün üstünü kapatmasın diye; küçültme, dönüştürme, kaydedici ve ayarlar
@@ -617,24 +621,35 @@ public partial class MainWindow : Window
     private void TrackChrome()
     {
         AddHandler(PointerMovedEvent, OnChromePointerMoved, RoutingStrategies.Tunnel);
-        PointerExited += (_, _) => ShowChrome(!ChromeHidesItself);
+        PointerExited += (_, _) => ChromeZone.PointerGone();
         Tabs.SelectionChanged += (_, _) => ApplyChromeMode();
+        Player.PlayingChanged += (_, _) => ApplyChromeMode();
         ApplyChromeMode();
     }
 
     internal bool ChromeHidesItself => Tabs.SelectedIndex == PlayerTabIndex && Player.LoadedPath is not null;
 
-    private void ApplyChromeMode() => ShowChrome(!ChromeHidesItself);
+    internal bool ChromeShown => _chromeShown;
+
+    internal HoverZone ChromeZone
+    {
+        get
+        {
+            if (_chromeZone is not null) return _chromeZone;
+            _chromeZone = new HoverZone(0, () => ChromeDelay("PlaybackStripShowDelay"), () => ChromeDelay("PlaybackStripHideDelay"), ShowChrome);
+            _chromeZone.Reset(_chromeShown);
+            return _chromeZone;
+        }
+    }
+
+    private TimeSpan ChromeDelay(string key) => this.FindResource(key) is TimeSpan span ? span : TimeSpan.Zero;
+
+    private void ApplyChromeMode() => ChromeZone.Hold(!ChromeHidesItself || !Player.IsPlaying);
 
     private void OnChromePointerMoved(object? sender, PointerEventArgs e)
     {
-        if (!ChromeHidesItself)
-        {
-            ShowChrome(true);
-            return;
-        }
-
-        ShowChrome(e.GetPosition(this).Y <= TitleBar.Height);
+        ChromeZone.PointerWithin(e.GetPosition(this).Y <= TitleBar.Height);
+        ApplyChromeMode();
     }
 
     private void ShowChrome(bool show)
@@ -899,6 +914,35 @@ public partial class MainWindow : Window
     }
 
     private void UseLanguage(string language) => Strings.Use(language);
+
+    internal List<Control> PlayerSettingsItems()
+    {
+        return new List<Control>
+        {
+            ChoiceMenu(Strings.Get("settings-tab.language.label"), CmbLanguage),
+            ChoiceMenu(Strings.Get("settings-tab.theme.label"), CmbTheme)
+        };
+
+        static MenuItem ChoiceMenu(string header, ComboBox box)
+        {
+            var menu = new MenuItem { Header = header };
+            var at = 0;
+            foreach (var label in box.Items)
+            {
+                var index = at++;
+                var item = new MenuItem
+                {
+                    Header = label?.ToString() ?? "",
+                    ToggleType = MenuItemToggleType.Radio,
+                    IsChecked = index == box.SelectedIndex
+                };
+                item.Click += (_, _) => box.SelectedIndex = index;
+                menu.Items.Add(item);
+            }
+
+            return menu;
+        }
+    }
 
     /// <summary>
     /// Dil değişti. Biçimlemeden gelen metni bağlar kendisi tazeliyor; burada yalnız koddan

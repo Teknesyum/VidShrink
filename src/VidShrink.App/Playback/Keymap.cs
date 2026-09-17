@@ -25,8 +25,8 @@ internal readonly record struct PlayerInput(
     internal static PlayerInput OnKey(Key key, KeyModifiers modifiers = KeyModifiers.None)
         => new(PlayerInputKind.Key, key, null, PlayerButton.Left, modifiers);
 
-    internal static PlayerInput OnSymbol(string symbol, Key fallback)
-        => new(PlayerInputKind.Key, fallback, symbol, PlayerButton.Left, KeyModifiers.None);
+    internal static PlayerInput OnSymbol(string symbol, Key fallback, KeyModifiers modifiers = KeyModifiers.None)
+        => new(PlayerInputKind.Key, fallback, symbol, PlayerButton.Left, modifiers);
 
     internal static PlayerInput OnWheel(KeyModifiers modifiers = KeyModifiers.None)
         => new(PlayerInputKind.Wheel, Key.None, null, PlayerButton.Left, modifiers);
@@ -60,6 +60,8 @@ internal static class Keymap
 
     internal static readonly PlayerAction Settings = new(PlayerCommandKind.OpenSettings, 0, "main.player.menu.settings", 1);
     internal static readonly PlayerAction PlayPause = new(PlayerCommandKind.TogglePlay, 0, "main.player.menu.playpause", 1);
+    internal static readonly PlayerAction Stop = new(PlayerCommandKind.Stop, 0, "main.player.menu.stop", 1);
+    internal static readonly PlayerAction GoToStart = new(PlayerCommandKind.GoToStart, 0, "main.player.menu.tostart", 1);
     internal static readonly PlayerAction Fullscreen = new(PlayerCommandKind.ToggleFullscreen, 0, "main.player.menu.fullscreen", 1);
     internal static readonly PlayerAction ResetZoom = new(PlayerCommandKind.ResetZoom, 0, "main.player.menu.reset", 1);
     internal static readonly PlayerAction AspectCycle = new(PlayerCommandKind.AspectCycle, 0, "player.view.aspect", 7);
@@ -82,7 +84,8 @@ internal static class Keymap
     internal static readonly PlayerAction LoopEnd = new(PlayerCommandKind.LoopEnd, 0, "main.player.menu.loopend", 5);
     internal static readonly PlayerAction LoopClear = new(PlayerCommandKind.LoopClear, 0, "main.player.menu.loopclear", 5);
     internal static readonly PlayerAction BookmarkAdd = new(PlayerCommandKind.BookmarkAdd, 0, "main.player.menu.bookmarkadd", 6);
-    internal static readonly PlayerAction BookmarkNext = new(PlayerCommandKind.BookmarkNext, 0, "main.player.menu.bookmarknext", 6);
+    internal static readonly PlayerAction BookmarkNext = new(PlayerCommandKind.BookmarkNext, 1, "main.player.menu.bookmarknext", 6);
+    internal static readonly PlayerAction BookmarkPrevious = new(PlayerCommandKind.BookmarkNext, -1, "main.player.menu.bookmarkprev", 6);
     internal static readonly PlayerAction OpenMenu = new(PlayerCommandKind.ContextMenu, 0, "main.player.menu.open", 0);
     internal static readonly PlayerAction LeaveFullscreen = new(PlayerCommandKind.LeaveFullscreen, 0, "main.player.menu.leavefullscreen", 0);
     internal static readonly PlayerAction Zoom = new(PlayerCommandKind.Zoom, 1, "main.player.menu.zoom", 0);
@@ -103,7 +106,11 @@ internal static class Keymap
         new(PlayerInput.OnDoubleClick(), Fullscreen),
         new(PlayerInput.OnPress(PlayerButton.Right), OpenMenu),
         new(PlayerInput.OnKey(Key.Space), PlayPause),
+        new(PlayerInput.OnKey(Key.P, KeyModifiers.Control), PlayPause),
+        new(PlayerInput.OnKey(Key.Space, KeyModifiers.Control), Stop),
+        new(PlayerInput.OnKey(Key.Back), GoToStart),
         new(PlayerInput.OnKey(Key.Enter), Fullscreen),
+        new(PlayerInput.OnKey(Key.Enter, KeyModifiers.Alt), Fullscreen),
         new(PlayerInput.OnKey(Key.Escape), LeaveFullscreen),
         new(PlayerInput.OnKey(Key.Apps), OpenMenu),
         new(PlayerInput.OnKey(Key.Right), Seek(SeekSmall)),
@@ -120,8 +127,13 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.C), Faster),
         new(PlayerInput.OnKey(Key.X), Slower),
         new(PlayerInput.OnKey(Key.Z), NormalSpeed),
+        new(PlayerInput.OnKey(Key.F, KeyModifiers.Control | KeyModifiers.Shift), Faster),
+        new(PlayerInput.OnKey(Key.B, KeyModifiers.Control | KeyModifiers.Shift), Slower),
+        new(PlayerInput.OnKey(Key.N, KeyModifiers.Control | KeyModifiers.Shift), NormalSpeed),
         new(PlayerInput.OnKey(Key.F), NextFrame),
         new(PlayerInput.OnKey(Key.F, KeyModifiers.Shift), PreviousFrame),
+        new(PlayerInput.OnSymbol(">", Key.OemPeriod, KeyModifiers.Control | KeyModifiers.Shift), NextFrame),
+        new(PlayerInput.OnSymbol("<", Key.OemComma, KeyModifiers.Control | KeyModifiers.Shift), PreviousFrame),
         new(PlayerInput.OnSymbol("[", Key.OemOpenBrackets), LoopStart),
         new(PlayerInput.OnSymbol("]", Key.OemCloseBrackets), LoopEnd),
         new(PlayerInput.OnSymbol("/", Key.Oem2), LoopClear),
@@ -129,6 +141,7 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.S, KeyModifiers.Control | KeyModifiers.Shift), Rotate),
         new(PlayerInput.OnKey(Key.H, KeyModifiers.Control), Mirror),
         new(PlayerInput.OnKey(Key.A, KeyModifiers.Control), Topmost),
+        new(PlayerInput.OnKey(Key.T, KeyModifiers.Control), Topmost),
         new(PlayerInput.OnKey(Key.F1, KeyModifiers.Control), Info),
         new(PlayerInput.OnKey(Key.E, KeyModifiers.Control), Screenshot),
         new(PlayerInput.OnKey(Key.PageUp), PreviousFile),
@@ -137,10 +150,12 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.B, KeyModifiers.Control | KeyModifiers.Alt | KeyModifiers.Shift), RepeatCycle),
         new(PlayerInput.OnKey(Key.N), BookmarkAdd),
         new(PlayerInput.OnKey(Key.B), BookmarkNext),
+        new(PlayerInput.OnKey(Key.PageDown, KeyModifiers.Shift), BookmarkNext),
+        new(PlayerInput.OnKey(Key.PageUp, KeyModifiers.Shift), BookmarkPrevious),
         new(PlayerInput.OnKey(Key.A), SubtitleOptions.AudioCycle),
         new(PlayerInput.OnKey(Key.S), SubtitleOptions.SubtitleCycle),
-        new(PlayerInput.OnSymbol(">", Key.OemPeriod), SubtitleOptions.SubtitleLater),
-        new(PlayerInput.OnSymbol("<", Key.OemComma), SubtitleOptions.SubtitleEarlier),
+        new(PlayerInput.OnSymbol(">", Key.OemPeriod, KeyModifiers.Shift), SubtitleOptions.SubtitleLater),
+        new(PlayerInput.OnSymbol("<", Key.OemComma, KeyModifiers.Shift), SubtitleOptions.SubtitleEarlier),
         new(PlayerInput.OnKey(Key.OemPeriod, KeyModifiers.Control), SubtitleOptions.AudioLater),
         new(PlayerInput.OnKey(Key.OemComma, KeyModifiers.Control), SubtitleOptions.AudioEarlier),
         new(PlayerInput.OnKey(Key.K, KeyModifiers.Control), ToolsOptions.Clip),
@@ -151,14 +166,14 @@ internal static class Keymap
 
     internal static readonly IReadOnlyList<PlayerAction> MenuActions = new[]
     {
-        Settings, PlayPause, Fullscreen, ResetZoom,
+        Settings, PlayPause, Stop, GoToStart, Fullscreen, ResetZoom,
         Mute,
         Faster, Slower, NormalSpeed,
         NextFrame, PreviousFrame,
         AspectCycle, Rotate, Mirror, Topmost, Info, Screenshot,
         PreviousFile, NextFile, Shuffle, RepeatCycle,
         LoopStart, LoopEnd, LoopClear,
-        BookmarkAdd, BookmarkNext
+        BookmarkAdd, BookmarkNext, BookmarkPrevious
     };
 
     internal static PlayerCommand ForWheel(double notches, KeyModifiers modifiers)
@@ -176,15 +191,20 @@ internal static class Keymap
 
     internal static PlayerCommand ForKey(Key key, KeyModifiers modifiers, string? symbol)
     {
+        var clean = Clean(modifiers);
         if (!string.IsNullOrEmpty(symbol))
         {
-            var bySymbol = Rows.FirstOrDefault(r => r.Input.Kind == PlayerInputKind.Key && r.Input.Symbol == symbol);
+            var control = Commanding(clean);
+            var bySymbol = Rows.FirstOrDefault(r => r.Input.Kind == PlayerInputKind.Key && r.Input.Symbol == symbol && Commanding(r.Input.Modifiers) == control);
             if (bySymbol is not null) return bySymbol.Action.ToCommand();
+            return Find(r => r.Input.Kind == PlayerInputKind.Key && r.Input.Symbol is null && r.Input.Key == key && r.Input.Modifiers == clean);
         }
 
-        var clean = Clean(modifiers);
         return Find(r => r.Input.Kind == PlayerInputKind.Key && r.Input.Key == key && r.Input.Modifiers == clean);
     }
+
+    internal static bool Commanding(KeyModifiers modifiers)
+        => (modifiers & KeyModifiers.Control) != 0 && (modifiers & KeyModifiers.Alt) == 0;
 
     internal static KeymapRow? FirstKeyRow(PlayerAction action)
         => Rows.FirstOrDefault(r => r.Input.Kind == PlayerInputKind.Key && ReferenceEquals(r.Action, action));
@@ -193,7 +213,7 @@ internal static class Keymap
     {
         var parts = new List<string>();
         if ((input.Modifiers & KeyModifiers.Control) != 0) parts.Add("Ctrl");
-        if ((input.Modifiers & KeyModifiers.Shift) != 0) parts.Add("Shift");
+        if ((input.Modifiers & KeyModifiers.Shift) != 0 && input.Symbol is null) parts.Add("Shift");
         if ((input.Modifiers & KeyModifiers.Alt) != 0) parts.Add("Alt");
         parts.Add(input.Kind switch
         {
@@ -232,6 +252,7 @@ internal static class Keymap
             Key.Space => Strings.Get("main.player.input.space"),
             Key.Enter => Strings.Get("main.player.input.enter"),
             Key.Escape => Strings.Get("main.player.input.esc"),
+            Key.Back => "Backspace",
             Key.Apps => Strings.Get("main.player.input.menu"),
             Key.Left => "←",
             Key.Right => "→",

@@ -549,8 +549,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1248, toplam);
-        Assert.Equal(146, dilBasina["en"]);
+        Assert.Equal(1252, toplam);
+        Assert.Equal(148, dilBasina["en"]);
         Assert.Equal(54, dilBasina["tr"]);
     }
 
@@ -564,7 +564,7 @@ public sealed class BaslikKapsamiTests
     ///
     /// <para>Tur 2'de <c>Names</c> gecidi yalniz <c>CapitaliseWord</c> icindeydi ve
     /// <c>Sentence</c> onu sadece satir basi sozcugu icin cagiriyordu. Sonuc: baslik
-    /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778, oynatici 1. dalga anahtarlariyla 844, 3. dalga anahtarlariyla 898, 2. dalga parca anahtarlariyla 950, 4. dalga arac ve gelismis anahtarlariyla 985, 8b kaydedici anahtarlariyla 1078, 8d ses anahtarlariyla 1090, sr'nin yedi ses satiri Kiril'den dosyanin geri kalaniyla ayni Latin yazimina dondurulunce 1091, Kesit A main.language.settings'i dusurunce 1086, Kesit B main.player.title ve main.player.menu'yu dusurunce 1084, Kesit D kaydedicinin otomatik kipine 16 recorder.auto.* anahtari ekleyince 1125, guncelleme rozetinin dort anahtari ve kaydedicinin hedef butcesi eklenince 1135)
+    /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778, oynatici 1. dalga anahtarlariyla 844, 3. dalga anahtarlariyla 898, 2. dalga parca anahtarlariyla 950, 4. dalga arac ve gelismis anahtarlariyla 985, 8b kaydedici anahtarlariyla 1078, 8d ses anahtarlariyla 1090, sr'nin yedi ses satiri Kiril'den dosyanin geri kalaniyla ayni Latin yazimina dondurulunce 1091, Kesit A main.language.settings'i dusurunce 1086, Kesit B main.player.title ve main.player.menu'yu dusurunce 1084, Kesit D kaydedicinin otomatik kipine 16 recorder.auto.* anahtari ekleyince 1125, guncelleme rozetinin dort anahtari ve kaydedicinin hedef butcesi eklenince 1135, oynatici kisayollarinin dort menu anahtari 1217'den 1221'e: en bookmarkprev ve tostart, pl bookmarkprev, pt settings-all)
     /// ilk sozcuk disindaki <c>ffmpeg</c>
     /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
     /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 30358 kalem)
@@ -596,7 +596,8 @@ public sealed class BaslikKapsamiTests
     /// ve recorder.auto.hint dustu: 43 x 717 = 30831. Iki adimli guncelleme indirme dugmesini, rozet/durum ve dort gunluk satirini ekledi
     /// (main.action.download, main.update.badge/downloading/ready/failed, main.update.log.*): 43 x 732 = 31476'dan 43 x 741 = 31863'e.
     /// Tasma karari dokuz main.retry.* / main.run.* anahtari ekledi (kabul, kesme seridi, iki sonuc satiri): 43 x 742 = 31906'dan 43 x 751 = 32293'e.
-    /// Hakkinda'nin platform satirlari iki main.about.platforms.* anahtari ekledi: 43 x 753 = 32379.</para>
+    /// Hakkinda'nin platform satirlari iki main.about.platforms.* anahtari ekledi: 43 x 753 = 32379.
+    /// Oynatici kisayollari dort main.player.menu.* anahtari ekledi (settings-all, bookmarkprev, stop, tostart): 43 x 757 = 32551.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -624,7 +625,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(32508, gezilen);
+        Assert.Equal(32680, gezilen);
         Assert.Empty(kayip);
     }
 

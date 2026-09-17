@@ -66,7 +66,7 @@ internal static class ClipExport
         {
             "-y", "-hide_banner", "-nostdin",
             "-ss", start, "-i", request.Source, "-t", duration,
-            "-map", "0", "-c", "copy", "-avoid_negative_ts", "make_zero",
+            "-map", "0:v?", "-map", "0:a?", "-c", "copy", "-avoid_negative_ts", "make_zero",
             request.Target
         };
     }

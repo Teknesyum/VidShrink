@@ -57,9 +57,15 @@ sürümden (`x.0.0`) önce koşar.
   paylaşım), yolun metin kutusundan değil alandan okunması, ana pencerenin iki kapısının sekmeyi değiştirip yükleyiciyi
   çağırması, paylaşımın `ShareFlow`/`Core/Share` üstünden gitmesi, hedef tablosunun yayın paketine girmesi ve iki yeni
   anahtarın 42 dilde bulunması. Kaynak metin okur, pencere açmaz.
-- `PencereKabuguTests.cs` — pencere kabuğunun iki kararı: üst şeridin içerikle aynı gözde durup katman olması (görünüp
-  kaybolurken içeriğin yer değiştirmemesi), belirme eşiğinin başlık çubuğunun kendi yüksekliğinden gelmesi, kenarlık
-  kuralının tek yerde durup oynatıcı sekmesini tam ekranla aynı kola koyması. Kaynak metin okur, pencere açmaz.
+- `PencereKabuguTests.cs` — pencere kabuğunun düzeni: üst şerit içerikle aynı gözde katman, başlık düğmeleri içeriğin üstünde,
+  gizleme sınıfı iki parçayı kapatıyor. Kaynak metin okur; gizlenme ve anahat davranışı `OynaticiYolHaritasiTests`'te.
+- `OynaticiKisayolTests.cs` — tarifteki her kısayol gerçek girdi olayıyla PlayerView'a verilir, etkisi motordan geri okunur;
+  döndürme karenin piksellerinden. Kanıt `.calisma/oynatici-kisayol/`.
+- `OynaticiOdakYoluTests.cs` — aynı tuşlar MainWindow'un odak yolundan: sekme değişimi, kaydırıcı/açılır kutu odakta, tam ekran.
+- `OynaticiYolHaritasiTests.cs` — yol haritası denetiminin oynatıcı maddeleri (P2 merkez mıknatısı, P3 menüde ayarlar, P12, P14 üst bar
+  gizlenmesi, P18, P19 duraklatma simgesi süresi, P20, P24 anahat pikselleri, P26 yayılma maskesi, P28 yandaki altyazı).
+  Zamanlayıcı bekleyen ölçüler `Dispatcher.UIThread.MainLoop` ile pompalar; `RunJobs` Win32 zamanlayıcısını tetiklemez.
+  Kanıt `.calisma/oynatici-yol-haritasi/`, negatif kontrol betiği aynı klasörde.
 - `KabukMenusuTests.cs` — sağ tık menüsünün iki tarafı: `ShellMenu.cs` ile `Install-VidShrink.ps1`'in anahtar adları,
   uzantı listesi ve hedef listesi birebir aynı; silme kolu Appx paketini de kaldırıyor; kutu Ayarlar sekmesinde;
   etiket arayüz dilini izliyor; sekiz yeni anahtar 42 dilde. Kayıt defterine yazmaz, kaynak metin okur.

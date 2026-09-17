@@ -122,7 +122,7 @@ public sealed class OynaticiYerlesimTests
             var view = pencere.FindControl<PlayerView>("Player")!;
 
             return new[] { "BtnSeritBack", "BtnSeritForward", "BtnSeritPlay", "BtnSeritMute" }
-                .Select(ad => Bul<Button>(view, ad).Content is Avalonia.Controls.Shapes.Path)
+                .Select(ad => Bul<Button>(view, ad).Content switch { Avalonia.Controls.Shapes.Path => true, Panel panel => panel.Children.OfType<Avalonia.Controls.Shapes.Path>().Any(p => p.IsVisible), _ => false })
                 .ToList();
         });
 
