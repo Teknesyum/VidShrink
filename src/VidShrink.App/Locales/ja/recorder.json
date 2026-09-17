@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpegはコード{0}で終了しました。",
   "recorder.error.no-ffmpeg": "{0} が見つかりませんでした。",
   "recorder.error.invalid": "この設定では録画できません: {0}",
+  "recorder.error.window-wayland": "Wayland セッションではウィンドウの録画に対応していません。画面か領域を選ぶか、X11 セッションでサインインしてください。",
+  "recorder.error.window-missing": "ウィンドウ「{0}」が見つかりません。一覧を更新してもう一度選んでください。",
   "recorder.error.number": "{0} は数値である必要があります。",
   "recorder.error.start": "録画を開始できませんでした: {0}",
   "recorder.error.folder": "フォルダーを選択できませんでした: {0}",

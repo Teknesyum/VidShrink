@@ -159,7 +159,7 @@ internal partial class RecorderView
 
         var request = new RecorderRequest
         {
-            Platform = HostPlatform,
+            Platform = CapturePlatform,
             Target = target,
             Fps = fps,
             Quality = quality,
@@ -196,6 +196,8 @@ internal partial class RecorderView
             MaxDuration = _settings.MaxDuration,
             Split = _settings.Split
         };
+
+        if (!ResolveWindow(ref request)) return null;
 
         if (!applyAuto || !AutoMode) return request;
 

@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg päättyi koodilla {0}.",
   "recorder.error.no-ffmpeg": "{0} ei löytynyt.",
   "recorder.error.invalid": "Nämä asetukset eivät salli tallennusta: {0}",
+  "recorder.error.window-wayland": "Ikkunan tallennusta ei tueta Wayland-istunnossa; valitse näyttö tai alue tai kirjaudu X11-istuntoon.",
+  "recorder.error.window-missing": "Ikkunaa ”{0}” ei löytynyt; päivitä luettelo ja valitse se uudelleen.",
   "recorder.error.number": "{0} on oltava luku.",
   "recorder.error.start": "Tallennusta ei voitu aloittaa: {0}",
   "recorder.error.folder": "Kansiota ei voitu valita: {0}",
