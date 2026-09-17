@@ -95,3 +95,8 @@ Negatif kol: aday 2 Bench'i `--fill qualityceiling`, `parlak` libx264 2000: 1 de
 
 K3 tutma kümesinde tam +1,00: her tetiklenen hücre bir deneme ekliyor, kural bunu izin veriyor ama pay yok. Donanımdaki
 %4,8 boş bütçe açık: NVENC'in basamaklı hız yanıtı tek denemelik pencereye sığmıyor.
+## Aday 3 Sonucu: Donanımın Basamaklı Yanıtı, Kapalı
+
+Donanımda ilk nişan %98,5 + aşağı deneme (`nvenc-asagi.md`) kapıdan kaldı: 26 hücrede ort sapma −6,47 → −5,41 (kapı
+≥ −2,5), deneme 1,96 → 2,04, parlak h264 1000 VMAF-NEG −1,32; tutma hücrelerinde dolum −1,73 → −4,24. Kod geri alındı.
+Donanımdaki boş bütçe NVENC'in basamaklı hız yanıtından geliyor; bütçe konusu **kapandı**, bir daha açılmaz.
