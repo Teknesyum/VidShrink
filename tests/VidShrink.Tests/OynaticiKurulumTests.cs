@@ -121,6 +121,27 @@ public sealed class OynaticiKurulumTests
     }
 
     [Fact]
+    public void MacosKurulumuSabitlenmisMpvkitLibmpvyiToolsAltinaKoyar()
+    {
+        var kurulum = Oku("install-vidshrink.sh");
+        var kilit = Oku("tools", "mpvkit-macos", "mpvkit-1.0.0.lock");
+
+        var cikti = Regex.Match(kilit, @"^# output (\S+) ([0-9a-f]{64}) (\S+)$", RegexOptions.Multiline);
+        Assert.True(cikti.Success, "kilit dosyasinda # output satiri yok");
+        var ad = cikti.Groups[1].Value;
+        var sha = cikti.Groups[2].Value;
+        var url = cikti.Groups[3].Value;
+
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-macos-mpvkit-1.0.0/{ad}", url);
+        Assert.Contains($"mac_libmpv_url='{url}'", kurulum, StringComparison.Ordinal);
+        Assert.Contains($"mac_libmpv_sha256='{sha}'", kurulum, StringComparison.Ordinal);
+        Assert.Contains("\"$stage_root/tools/libmpv/libmpv.2.dylib\"", kurulum, StringComparison.Ordinal);
+        Assert.Contains("cp -R \"$payload/.\" \"$bundle/Contents/MacOS/\"", Oku("macos-app-bundle.sh"), StringComparison.Ordinal);
+        var macos = Path.Combine(KurulumKoku("macos-paket"), "VidShrink.app", "Contents", "MacOS");
+        Assert.Contains(Path.Combine(macos, "tools", "libmpv"), LibMpvLocator.AppDirectories(macos));
+    }
+
+    [Fact]
     public void UnixKurulumuLibmpvYoksaKomutuSoyleyipDurur()
     {
         var kurulum = Oku("install-vidshrink.sh");

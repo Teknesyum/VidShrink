@@ -1,3 +1,4 @@
+# output libmpv.2-macos-universal-mpvkit-1.0.0.dylib 4b2f896d93dbb82df7b8228597b2dfc3c8ac62e2b933455e6facbe4fdb069b11 https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-macos-mpvkit-1.0.0/libmpv.2-macos-universal-mpvkit-1.0.0.dylib
 Libcrypto 593283be2a90f7fd66f6e6ed331b2f099cf403e0926fe3b4ac09a7062b793965 https://github.com/mpvkit/openssl-build/releases/download/3.3.5/Libcrypto.xcframework.zip
 Libssl ff5ffd43d015d7285fd37e4a3145b25cbd8d2842740bd629a711c299a20e226a https://github.com/mpvkit/openssl-build/releases/download/3.3.5/Libssl.xcframework.zip
 gmp ad33c7a08f4cdcb9924c8f0e6d9a054dad33d7794b97667bf8b6fb2b236ae585 https://github.com/mpvkit/gnutls-build/releases/download/3.8.11/gmp.xcframework.zip

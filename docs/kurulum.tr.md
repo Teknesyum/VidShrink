@@ -67,9 +67,14 @@ FFmpeg, bu kurucunun makinenize koymayacağı tek şey. `ffmpeg` ya da `ffprobe`
 yöneticinizin komutunu yazar — `brew install ffmpeg`, `sudo apt install ffmpeg`,
 `sudo dnf install ffmpeg` — ve başka hiçbir şey indirmeden durur.
 
+macOS'ta libmpv'yi kurucu kendisi indirir: `deps-libmpv-macos-mpvkit-1.0.0` sürümünden pinlenmiş
+tek bir evrensel `libmpv.2.dylib` (MPVKit 1.0.0, LGPL yapı), SHA-256 doğrulamasıyla paketin
+`tools/libmpv` klasörüne. İndirme ya da doğrulama tutmazsa dosya silinir; Homebrew'da libmpv
+yoksa `brew install mpv` komutunu yazıp durur. Dylib ad-hoc imzalı, noterleme yok.
+
 ### Gerekenler
 
-- Windows 10 ya da 11, macOS 15 ve üstü (oynatıcı sekmesinin libmpv dylib’leri `minos=15.0` taşıyor), ya da X11/Wayland koşan bir Linux masaüstü
+- Windows 10 ya da 11, macOS 14 ve üstü (macOS 14 ve 15'te sınandı; libmpv'nin yükleme komutları 13.0 diyor ama macOS 13'te koşulmadı), ya da X11/Wayland koşan bir Linux masaüstü
 - Uygulamanın yanındaki `tools/ffmpeg` klasöründe ya da `PATH` üzerinde `ffmpeg` ve `ffprobe`
 - .NET çalışma zamanı ve SDK gerekmez. Sürümler kendi kendine yeterli
 
@@ -169,6 +174,8 @@ hazırlayan biri, lisansı bu paragrafa güvenerek değil o yapı için baştan 
 
 Oynatıcı sekmesinin motoru libmpv de aynı biçimde ele alınır: VidShrink onu yeniden
 dağıtmaz. Windows'ta kurucu [shinchiro/mpv-winbuild-cmake](https://github.com/shinchiro/mpv-winbuild-cmake)
-üzerinden pinlenmiş tek bir yapıyı doğrudan makinenize indirir; macOS ve Linux'ta paket
+üzerinden pinlenmiş tek bir yapıyı doğrudan makinenize indirir. macOS'ta
+[MPVKit](https://github.com/mpvkit/MPVKit) 1.0.0'ın LGPL statik kitaplıklarından (`-Dgpl=false`)
+bağlanmış tek bir evrensel yapıyı indirir; ad-hoc imzalı, noterlenmemiş. Linux'ta paket
 yöneticinizden gelir. VidShrink onu çalışma anında C arayüzünden yükler, kütüphanenin kendi
 lisansı altında.

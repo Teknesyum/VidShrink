@@ -35,7 +35,7 @@ without_build() {
 fail=0
 archives=()
 while read -r name sha url; do
-  [ -z "$name" ] && continue
+  case "$name" in ''|\#*) continue ;; esac
   z="$work/zip/$name.zip"
   if [ ! -f "$z" ] || [ "$(shasum -a 256 "$z" | awk '{print $1}')" != "$sha" ]; then
     curl -fsSL --retry 3 -o "$z" "$url"

@@ -293,7 +293,35 @@ has_libmpv() {
     return 1
 }
 
+mac_libmpv_url='https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-macos-mpvkit-1.0.0/libmpv.2-macos-universal-mpvkit-1.0.0.dylib'
+mac_libmpv_sha256='4b2f896d93dbb82df7b8228597b2dfc3c8ac62e2b933455e6facbe4fdb069b11'
+mac_libmpv_file=''
+
+download_mac_libmpv() {
+    mac_libmpv_work=$(mktemp -d 2>/dev/null || mktemp -d -t vidshrink-libmpv)
+    candidate="$mac_libmpv_work/libmpv.2.dylib"
+    say 'libmpv indiriliyor (MPVKit 1.0.0, macOS 14+)...'
+    if ! curl -fsSL "$mac_libmpv_url" -o "$candidate"; then
+        rm -rf "$mac_libmpv_work"
+        note 'libmpv indirilemedi.'
+        return 1
+    fi
+    actual=$(sha256_of "$candidate")
+    if [ "$actual" != "$mac_libmpv_sha256" ]; then
+        rm -rf "$mac_libmpv_work"
+        note "libmpv sağlaması tutmuyor. Beklenen $mac_libmpv_sha256, bulunan $actual. Dosya silindi."
+        return 1
+    fi
+    mac_libmpv_file=$candidate
+    say 'libmpv hazır (sha256 doğrulandı).'
+    return 0
+}
+
 require_libmpv() {
+    if [ "$(uname -s)" = 'Darwin' ] && download_mac_libmpv; then
+        return 0
+    fi
+
     if has_libmpv; then
         return 0
     fi
@@ -352,7 +380,7 @@ require_ffmpeg
 require_libmpv
 
 work_root=$(mktemp -d 2>/dev/null || mktemp -d -t vidshrink-install)
-trap 'rm -rf "$work_root"' EXIT INT TERM
+trap 'rm -rf "$work_root" ${mac_libmpv_work:+"$mac_libmpv_work"}' EXIT INT TERM
 
 stage_root="$work_root/stage"
 mkdir -p "$stage_root"
@@ -384,6 +412,11 @@ say 'İndirilenler doğrulanıyor...'
 assert_checksum "$archive_name" "$archive_file"
 
 unzip -qo "$archive_file" -d "$stage_root"
+
+if [ -n "$mac_libmpv_file" ]; then
+    mkdir -p "$stage_root/tools/libmpv"
+    cp "$mac_libmpv_file" "$stage_root/tools/libmpv/libmpv.2.dylib"
+fi
 
 # Kurulan sürümün işareti. Windows'ta güncelleyici bunu okuyup arşivin tamamını yeniden
 # indirmekten kurtuluyor; burada uygulamanın kurulu sürümü bildirmesi için duruyor.

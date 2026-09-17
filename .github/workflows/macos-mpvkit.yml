@@ -98,3 +98,84 @@ jobs:
           name: mpvkit-${{ matrix.os }}
           path: out/
           if-no-files-found: ignore
+
+  installer:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: '1'
+      HOMEBREW_NO_INSTALL_CLEANUP: '1'
+      HOMEBREW_NO_ENV_HINTS: '1'
+      DOTNET_NOLOGO: '1'
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: ffmpeg for the installer check and test clips
+        run: |
+          brew install ffmpeg
+          sw_vers
+          uname -m
+          echo "homebrew libmpv present: $(ls /opt/homebrew/lib/libmpv.2.dylib /usr/local/lib/libmpv.2.dylib 2>/dev/null | wc -l | tr -d ' ')"
+
+      - name: Installer downloads libmpv
+        run: |
+          set -euo pipefail
+          mkdir -p logs
+          home="$RUNNER_TEMP/home-ok"
+          mkdir -p "$home"
+          HOME="$home" sh install-vidshrink.sh 2>&1 | tee logs/install-ok.txt
+          lib=$(find "$home" -path '*tools/libmpv/libmpv.2.dylib' | head -n1)
+          test -n "$lib"
+          sha=$(shasum -a 256 "$lib" | awk '{print $1}')
+          echo "installed libmpv: $lib"
+          echo "sha256: $sha"
+          lipo -info "$lib"
+          grep -q "mac_libmpv_sha256='$sha'" install-vidshrink.sh
+          echo "LIB=$lib" >> "$GITHUB_ENV"
+
+      - name: Headless frame test with the installed libmpv
+        run: |
+          set -euo pipefail
+          export VIDSHRINK_LIBMPV="$LIB"
+          dotnet build tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release -m:2
+          dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --no-build \
+            --filter "FullyQualifiedName~OynaticiMotorTests.BassizOrtamdaKareCozulur" \
+            --logger "console;verbosity=normal" | tee logs/test.txt
+          grep -E 'Test Run Successful' logs/test.txt
+          find . -name 'k1-bassiz-kare.txt' -exec cat {} + | tee logs/k1.txt
+          grep -q "libmpv: $LIB" logs/k1.txt
+
+      - name: Negative control, wrong sha256
+        run: |
+          set -uo pipefail
+          home="$RUNNER_TEMP/home-bad"
+          mkdir -p "$home"
+          sed "s/^mac_libmpv_sha256='[0-9a-f]*'/mac_libmpv_sha256='0000000000000000000000000000000000000000000000000000000000000000'/" install-vidshrink.sh > "$RUNNER_TEMP/install-bad.sh"
+          grep -c "^mac_libmpv_sha256='0000" "$RUNNER_TEMP/install-bad.sh"
+          rc=0
+          before=$(find "${TMPDIR:-/tmp}" -name 'libmpv.2.dylib' 2>/dev/null | wc -l | tr -d ' ')
+          HOME="$home" sh "$RUNNER_TEMP/install-bad.sh" > logs/install-bad.txt 2>&1 || rc=$?
+          cat logs/install-bad.txt
+          after=$(find "${TMPDIR:-/tmp}" -name 'libmpv.2.dylib' 2>/dev/null | wc -l | tr -d ' ')
+          left=$(find "$home" -name 'libmpv.2.dylib' | wc -l | tr -d ' ')
+          echo "neg rc=$rc tmp-dylibs-before=$before after=$after installed-dylibs=$left"
+          [ "$rc" -ne 0 ] || { echo "NEG installer did not stop"; exit 1; }
+          grep -q 'sağlaması tutmuyor' logs/install-bad.txt || { echo "NEG no checksum message"; exit 1; }
+          grep -q 'brew install mpv' logs/install-bad.txt || { echo "NEG no brew fallback"; exit 1; }
+          [ "$left" -eq 0 ] && [ "$after" -eq "$before" ] || { echo "NEG file left behind"; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: installer-${{ matrix.os }}
+          path: logs/
+          if-no-files-found: ignore

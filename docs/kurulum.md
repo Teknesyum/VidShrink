@@ -83,15 +83,18 @@ the whole of it.
 FFmpeg and libmpv are the two things this installer will not put on your machine. If
 `ffmpeg` or `ffprobe` is missing it prints your package manager's command —
 `brew install ffmpeg`, `sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops
-before downloading anything else. It does the same when libmpv is missing:
-`brew install mpv`, `sudo apt install libmpv2`, `sudo dnf install mpv-libs`.
+before downloading anything else. On macOS it downloads libmpv itself: one pinned universal
+`libmpv.2.dylib` (MPVKit 1.0.0, LGPL build) from the `deps-libmpv-macos-mpvkit-1.0.0`
+release, SHA-256 checked, into the bundle's `tools/libmpv`. If that download or check fails
+the file is deleted and, without a Homebrew libmpv, it prints `brew install mpv` and stops.
+On Linux it stops when libmpv is missing: `sudo apt install libmpv2`, `sudo dnf install mpv-libs`.
 
 ### Requirements
 
-- Windows 10 or 11, macOS 15 or newer (the player tab’s libmpv dylibs carry `minos=15.0`), or a Linux desktop on X11 or Wayland
+- Windows 10 or 11, macOS 14 or newer (tested on macOS 14 and 15; the libmpv load commands say 13.0, but no macOS 13 machine was run), or a Linux desktop on X11 or Wayland
 - `ffmpeg` and `ffprobe` in a `tools/ffmpeg` folder beside the application, or on `PATH`
 - libmpv for the player tab: in `tools/libmpv` on Windows (the installer puts it there),
-  Homebrew's `lib` folder on macOS, the system library on Linux, or the file or folder
+  in the bundle's `tools/libmpv` or Homebrew's `lib` folder on macOS, the system library on Linux, or the file or folder
   named by `VIDSHRINK_LIBMPV`
 - No .NET runtime and no .NET SDK. Releases are self-contained
 
@@ -179,7 +182,7 @@ command again.
 | Right-click menu | yes | no | no |
 | Self-update | file-level, via the launcher | whole-bundle swap | notice only |
 | FFmpeg comes from | WinGet `Gyan.FFmpeg` | your `brew` | your `apt` or `dnf` |
-| libmpv comes from | pinned shinchiro build, SHA-256 checked | your `brew` (`mpv`) | your `apt` (`libmpv2`) or `dnf` (`mpv-libs`) |
+| libmpv comes from | pinned shinchiro build, SHA-256 checked | pinned MPVKit 1.0.0 build, SHA-256 checked; `brew` (`mpv`) as fallback | your `apt` (`libmpv2`) or `dnf` (`mpv-libs`) |
 
 ![VidShrink open on macOS, running from its own application bundle with the Dock below it; window shown in Turkish](gorseller/macos-paket-uygulama.png)
 
@@ -196,7 +199,9 @@ application.
 libmpv, the player tab's engine, is handled the same way: VidShrink does not redistribute
 it. On Windows the installer downloads one pinned build from
 [shinchiro/mpv-winbuild-cmake](https://github.com/shinchiro/mpv-winbuild-cmake) straight
-onto your machine; on macOS and Linux it comes from your package manager. VidShrink loads
+onto your machine. On macOS it downloads one universal build linked from the
+[MPVKit](https://github.com/mpvkit/MPVKit) 1.0.0 LGPL static libraries (mpv built with
+`-Dgpl=false`), ad-hoc signed and not notarized. On Linux it comes from your package manager. VidShrink loads
 it at run time through its C API, under the library's own licence.
 
 Releases do not carry FFmpeg, and the reason is size rather than licensing: FFmpeg and
