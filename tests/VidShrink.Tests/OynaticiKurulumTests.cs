@@ -165,6 +165,20 @@ public sealed class OynaticiKurulumTests
     }
 
     [Fact]
+    public void KurucuYayinSorgusundaJetonuIsteneSeKullanir()
+    {
+        var kurulum = Oku("install-vidshrink.sh");
+
+        Assert.Contains("github_token=${GITHUB_TOKEN:-${GH_TOKEN:-}}", kurulum, StringComparison.Ordinal);
+        Assert.Contains("${github_token:+-H \"Authorization: Bearer $github_token\"}", kurulum, StringComparison.Ordinal);
+
+        var jeton = kurulum.IndexOf("Authorization: Bearer", StringComparison.Ordinal);
+        var api = kurulum.IndexOf("https://api.github.com/repos/$repository/releases/latest", StringComparison.Ordinal);
+        Assert.True(jeton > 0 && api > jeton && api - jeton < 200, $"jeton basligi api cagrisina bagli degil: jeton {jeton}, api {api}");
+        Assert.DoesNotContain("Authorization: Bearer $github_token\" \\\n    \"https://github.com", kurulum, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void GuncellemeDenetimiYayinListesiNumaralandirmaz()
     {
         var kaynaklar = Directory.GetFiles(Path.Combine(Root, "src"), "*.cs", SearchOption.AllDirectories);

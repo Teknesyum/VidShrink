@@ -127,6 +127,8 @@ jobs:
           echo "homebrew libmpv present: $(ls /opt/homebrew/lib/libmpv.2.dylib /usr/local/lib/libmpv.2.dylib 2>/dev/null | wc -l | tr -d ' ')"
 
       - name: Installer downloads libmpv
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p logs

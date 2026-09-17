@@ -392,9 +392,11 @@ mkdir -p "$stage_root"
 
 say 'Son yayın aranıyor...'
 release_json="$work_root/release.json"
+github_token=${GITHUB_TOKEN:-${GH_TOKEN:-}}
 curl -fsSL -H 'Accept: application/vnd.github+json' -H 'User-Agent: VidShrink-Installer' \
+    ${github_token:+-H "Authorization: Bearer $github_token"} \
     "https://api.github.com/repos/$repository/releases/latest" -o "$release_json" || \
-    fail 'Yayın bilgisi alınamadı.'
+    fail 'Yayın bilgisi alınamadı. GitHub API saatlik sınırı dolduysa birkaç dakika sonra deneyin.'
 
 tag=$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$release_json" | head -n 1)
 [ -n "$tag" ] || fail 'Yayın bilgisi okunamadı: etiket adı yok.'
