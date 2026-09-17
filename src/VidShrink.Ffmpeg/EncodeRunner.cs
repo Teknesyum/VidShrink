@@ -373,13 +373,13 @@ public sealed class EncodeRunner
                         KeepSmallestOver(partialPath, actualMb, current, dropped);
                         if (floorStep is not null) trace.Add(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
                         if (guardStep is not null) trace.Add(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
-                        current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
+                        current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, current.EffectiveDurationSeconds(info.DurationSeconds));
                         continue;
                     }
 
                     var targetBytes = (long)Math.Floor(effectiveTargetMb * 1024 * 1024);
                     IReadOnlyList<TrimPlan> trims = Array.Empty<TrimPlan>();
-                    if (OvershootTrim.Offered(actualMb, effectiveTargetMb))
+                    if (current.Trim is null && OvershootTrim.Offered(actualMb, effectiveTargetMb))
                     {
                         var map = await OvershootTrimmer.ReadAsync(partialPath, ct);
                         if (map is not null) trims = OvershootTrimmer.PlanAll(map, targetBytes);
