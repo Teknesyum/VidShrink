@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci')][string]$Is,
+    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci', 'tavanbekci', 'svtbant')][string]$Is,
     [Parameter(Mandatory)][string]$Cikti,
     [Parameter(Mandatory)][string]$Bench,
     [string]$Kesit = '',
@@ -7,6 +7,8 @@ param(
     [string]$HandBrake = '',
     [string]$BenchE1 = '',
     [string]$BenchTurbo = '',
+    [string]$BenchNeg = '',
+    [string]$BekciKbitler = '1200,300,100',
     [ValidateSet('bench', 'cli')][string]$UrunYolu = 'bench',
     [string]$Cli = '',
     [string]$CliSablon = '{girdi} {mb} --out {klasor} --speed quality --no-measure',
@@ -178,6 +180,11 @@ function Urun([string]$Girdi, [double]$Mb, [string]$Ad, [string[]]$Ek = @(), [st
         Deneme = if ($r) { $r.Attempts } else { $null }
         Bantta = if ($r) { $r.InBand } else { $null }
         Tasma = if ($r) { $r.OverTarget } else { $null }
+        TavanAsildi = if ($r) { $r.CeilingExceeded } else { $null }
+        Doygun = if ($r) { $r.Saturated } else { $null }
+        Bekci = [bool]@($denemeler | Where-Object { $_.dal -like 'ceiling guard*' }).Count
+        Yanitsiz = [bool]@($metin | Where-Object { $_ -like '*did not answer*' }).Count
+        TabanAdimi = [bool]@($denemeler | Where-Object { $_.dal -like 'encoder floor*' }).Count
         Denemeler = $denemeler
         Komut = $komut
     }
@@ -186,7 +193,7 @@ function Urun([string]$Girdi, [double]$Mb, [string]$Ad, [string[]]$Ek = @(), [st
 function UrunOrtak($u, [double]$HedefMb) {
     [ordered]@{
         urun_yolu = $UrunYolu; hedef_mb = $HedefMb; kodlayici = $u.Kodlayici; geometri = $u.Geometri; kodlama_sn = $u.KodlamaSn; toplam_sn = $u.ToplamSn
-        deneme = $u.Deneme; bantta = $u.Bantta; tasma = $u.Tasma
+        deneme = $u.Deneme; bantta = $u.Bantta; tasma = $u.Tasma; tavan_asildi = $u.TavanAsildi; doygun = $u.Doygun; bekci = $u.Bekci; yanitsiz = $u.Yanitsiz; taban_adimi = $u.TabanAdimi
         dallar = (($u.Denemeler | ForEach-Object { "$($_.no):$($_.dal):$($_.kbit)k:$($_.hedeflenen_mb)->$($_.cikan_mb)" }) -join ' | ')
         komut = $u.Komut
     }
@@ -371,11 +378,90 @@ function Bantlasma {
     foreach ($kbit in @($BantKbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
         $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
         foreach ($kol in $kollar.Keys) {
+            $tekrarlar = if ($Kesit -eq 'rampa' -and $kol -eq 'e0-duzen' -and $kbit -eq 1200) { 3 } else { 1 }
+            for ($tekrar = 1; $tekrar -le $tekrarlar; $tekrar++) {
+                Dene $Kesit $kol $kbit {
+                    $ek = if ($kol -eq 'e0-duzen') { @('--force-codec', 'libsvtav1', '--no-fps-drop') } else { @('--force-codec', 'libsvtav1', '--no-resolution-drop', '--no-fps-drop') }
+                    $u = Urun $girdi $mb "bant-$Kesit-$kbit-$kol-$tekrar" $ek $kollar[$kol]
+                    $o = Olc $girdi $u.Dosya $b.FpsMetin
+                    $ortak = UrunOrtak $u $mb
+                    $ortak.tekrar = $tekrar
+                    $ortak.kabul = BantKabul $kol $kbit $mb $u $o
+                    Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; istenen_kbit = $kbit }) $o $ortak
+                    Remove-Item $u.Dosya
+                }
+            }
+        }
+    }
+}
+
+function BantKabul([string]$Kol, [int]$Kbit, [double]$TavanMb, $u, $o) {
+    $yukseklik = [int](($o.geometri_cikti -split 'x')[1])
+    $neden = @()
+    if ($Kesit -eq 'rampa' -and $Kol -eq 'e0-duzen' -and $Kbit -eq 1200) {
+        if ($o.mb -lt 0.703) { $neden += "mb $($o.mb) < 0,703" }
+        if ($u.Deneme -ne 3) { $neden += "deneme $($u.Deneme) != 3" }
+        if (-not $u.Bekci) { $neden += 'izde ceiling guard yok' }
+        if ($u.Doygun) { $neden += 'doygun' }
+        if ($u.Yanitsiz) { $neden += 'did not answer' }
+        if ($neden.Count) { return 'kaldi: ' + ($neden -join '; ') }
+        if ($o.mb -gt $TavanMb) { return "olasiliksal: tavan ustu $($o.mb) > $TavanMb, en kucuk teslim" }
+        return 'gecti'
+    }
+    if ($Kesit -eq 'karanlik' -and $Kbit -eq 100 -and $Kol -eq 'e0-duzen') {
+        if ($o.mb -lt 0.1123 -or $o.mb -gt 0.1221) { $neden += "mb $($o.mb) 0,1123-0,1221 disinda" }
+        if ($u.Deneme -ne 1) { $neden += "deneme $($u.Deneme) != 1" }
+        if ($yukseklik -ge 818) { $neden += "yukseklik $yukseklik >= 818" }
+    } elseif ($Kesit -eq 'karanlik' -and $Kbit -eq 100 -and $Kol -eq 'e0') {
+        if ($o.mb -gt 0.140) { $neden += "mb $($o.mb) > 0,140" }
+        if (-not $u.Tasma) { $neden += 'OverTarget yok' }
+        if (-not $u.TavanAsildi) { $neden += 'CeilingExceeded yok' }
+        if ($u.Deneme -ne 3) { $neden += "deneme $($u.Deneme) != 3" }
+        if ($u.TabanAdimi) { $neden += 'encoder floor satiri var' }
+    } else {
+        return $null
+    }
+    if ($neden.Count) { 'kaldi: ' + ($neden -join '; ') } else { 'gecti' }
+}
+
+function TavanBekci {
+    if (-not $BenchNeg) { throw 'tavanbekci icin -BenchNeg gerekli.' }
+    $girdi = if ($Kesit -eq 'rampa') { Rampa } else { Join-Path $Cikti "kesit-$Kesit.mkv" }
+    $b = Probe $girdi
+    foreach ($kbit in @($BekciKbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
+        $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
+        $script:bekciMd5 = $null
+        $script:bekciKostu = $false
+        foreach ($kol in @('x264-bekci', 'negatif-x264-tepe-serbest')) {
             Dene $Kesit $kol $kbit {
-                $ek = if ($kol -eq 'e0-duzen') { @('--force-codec', 'libsvtav1', '--no-fps-drop') } else { @('--force-codec', 'libsvtav1', '--no-resolution-drop', '--no-fps-drop') }
-                $u = Urun $girdi $mb "bant-$Kesit-$kbit-$kol" $ek $kollar[$kol]
-                $o = Olc $girdi $u.Dosya $b.FpsMetin
-                Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; istenen_kbit = $kbit }) $o (UrunOrtak $u $mb)
+                $by = if ($kol -eq 'x264-bekci') { $Bench } else { $BenchNeg }
+                $u = Urun $girdi $mb "tavanbekci-$Kesit-$kbit-$kol" @('--force-codec', 'libx264', '--no-fps-drop') $by
+                $md5 = AkisMd5 $u.Dosya
+                $dosyaMb = [math]::Round((Get-Item $u.Dosya).Length / 1MB, 4)
+                $vk = & ffprobe -v error -select_streams v:0 -show_entries stream=bit_rate -of csv=p=0 $u.Dosya
+                $videoKbps = if ($vk -match '^\d+') { [math]::Round([double]$Matches[0] / 1000, 1) } else { $null }
+                $bekciK = @($u.Denemeler | Where-Object { $_.dal -like 'ceiling guard*' } | Select-Object -Last 1 | ForEach-Object { $_.kbit })
+                $son = $u.Denemeler | Select-Object -Last 1
+                $ortak = UrunOrtak $u $mb
+                $ortak.mb = $dosyaMb
+                $ortak.tavan_alti = ($dosyaMb -le $mb)
+                $ortak.md5 = $md5
+                $ortak.video_kbps_ffprobe = $videoKbps
+                $ortak.bekci_k = if ($bekciK.Count) { $bekciK[0] } else { $null }
+                $ortak.teslim_bekci_denemesi = ($u.Bekci -and $son -and [math]::Abs($son.cikan_mb - $dosyaMb) -lt 0.002)
+                if ($kol -eq 'x264-bekci') {
+                    $script:bekciMd5 = $md5
+                    $script:bekciKostu = $u.Bekci
+                    $ortak.kabul = if (-not $u.Bekci) { 'bekci kosmadi' }
+                        elseif (-not $ortak.teslim_bekci_denemesi) { "kaldi: teslim bekci denemesi degil (tavan ustu en kucuk $dosyaMb MB)" }
+                        elseif ($videoKbps -le $ortak.bekci_k -and $ortak.tavan_alti) { 'gecti' }
+                        else { "kaldi: video $videoKbps kbps, K $($ortak.bekci_k), dosya $dosyaMb / $mb MB" }
+                } else {
+                    $ortak.kabul = if (-not $script:bekciKostu -or -not $u.Bekci) { 'bekci kosmadi' }
+                        elseif ($md5 -eq $script:bekciMd5) { 'kaldi: tepe bayragi etkisiz, md5 ayni' }
+                        else { "gecti: md5 farkli, tavan_alti=$($ortak.tavan_alti)" }
+                }
+                Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; istenen_kbit = $kbit }) $null $ortak
                 Remove-Item $u.Dosya
             }
         }
@@ -613,7 +699,7 @@ function Gecisli([string]$Girdi, [string]$Cikis, [string[]]$Kodek, [string[]]$Il
     $r2 = FfKos (@('-i', $Girdi, '-an') + $Kodek + $Iki + @('-pass', '2', '-passlogfile', $p, $Cikis)) $script:FfSeviye
     Get-ChildItem -Path $Cikti -Filter ((Split-Path $p -Leaf) + '*') -ErrorAction SilentlyContinue | Remove-Item -ErrorAction SilentlyContinue
     if ($r2.Kod -ne 0) { throw "ikinci gecis basarisiz ($($r2.Kod)): $(Uyarilar $r2.Metin) $($r2.Metin.Substring([math]::Max(0, $r2.Metin.Length - 300)))" }
-    [pscustomobject]@{ Sn1 = $r1.Sn; Sn2 = $r2.Sn; Sn = [math]::Round($r1.Sn + $r2.Sn, 1); IstatDosya = $istat; Uyari1 = (Uyarilar $r1.Metin); Uyari2 = (Uyarilar $r2.Metin); SvtOnayar1 = (SvtOnayar $r1.Metin); SvtOnayar2 = (SvtOnayar $r2.Metin) }
+    [pscustomobject]@{ Sn1 = $r1.Sn; Sn2 = $r2.Sn; Sn = [math]::Round($r1.Sn + $r2.Sn, 1); IstatDosya = $istat; Uyari1 = (Uyarilar $r1.Metin); Uyari2 = (Uyarilar $r2.Metin); SvtOnayar1 = (SvtOnayar $r1.Metin); SvtOnayar2 = (SvtOnayar $r2.Metin); Metin = ($r1.Metin + "`n" + $r2.Metin) }
 }
 
 function HamEsBayt([string]$Cikis, [double]$HedefKbps, [int]$IlkB, [scriptblock]$Kodla) {
@@ -640,7 +726,7 @@ function EsOrtak($h, [double]$HedefKbps) {
     $s
 }
 
-function IkiOkuma([string]$Ref, [string]$Test) {
+function IkiOkuma([string]$Ref, [string]$Test, [switch]$Ucuncu, [string[]]$TestGirdiArg = @()) {
     $rb = Probe $Ref
     $tb = Probe $Test
     $s = [ordered]@{ test_pix = $tb.Pix; yol_ii = 'zscale dither=none' }
@@ -650,6 +736,7 @@ function IkiOkuma([string]$Ref, [string]$Test) {
         i = @("scale=w=$($rb.W):h=$($rb.H):flags=lanczos,format=yuv420p10le", 'format=yuv420p10le')
         ii = @($zs, 'format=yuv420p')
     }
+    if ($Ucuncu) { $okumalar.iii = @($zs.Replace('dither=none', 'dither=ordered'), 'format=yuv420p') }
     foreach ($ad in $okumalar.Keys) {
         $t = $okumalar[$ad][0]
         $r = $okumalar[$ad][1]
@@ -657,12 +744,12 @@ function IkiOkuma([string]$Ref, [string]$Test) {
         try {
             $log = Join-Path $Cikti ('vmaf-' + [guid]::NewGuid().ToString('N') + '.json')
             $g = "[0:v]$t,settb=AVTB,setpts=N[t];[1:v]$r,settb=AVTB,setpts=N[r];[t][r]libvmaf=model=version=vmaf_v0.6.1neg:feature='$cambi':log_fmt=json:log_path=$(Kacis $log):n_threads=4"
-            $cikis = & ffmpeg -hide_banner -nostdin -i $Test -i $Ref -lavfi $g -f null - 2>&1 | Out-String
+            $cikis = & ffmpeg -hide_banner -nostdin @TestGirdiArg -i $Test -i $Ref -lavfi $g -f null - 2>&1 | Out-String
             if (-not (Test-Path $log) -and $ad -eq 'ii') {
                 $t = "scale=w=$($rb.W):h=$($rb.H):flags=lanczos:sws_dither=none,format=yuv420p"
                 $s.yol_ii = "swscale sws_dither=none (zscale kosmadi: $(Uyarilar $cikis))"
                 $g = "[0:v]$t,settb=AVTB,setpts=N[t];[1:v]$r,settb=AVTB,setpts=N[r];[t][r]libvmaf=model=version=vmaf_v0.6.1neg:feature='$cambi':log_fmt=json:log_path=$(Kacis $log):n_threads=4"
-                $cikis = & ffmpeg -hide_banner -nostdin -i $Test -i $Ref -lavfi $g -f null - 2>&1 | Out-String
+                $cikis = & ffmpeg -hide_banner -nostdin @TestGirdiArg -i $Test -i $Ref -lavfi $g -f null - 2>&1 | Out-String
             }
             if (-not (Test-Path $log)) { throw "libvmaf gunlugu yok: $($cikis.Substring([math]::Max(0, $cikis.Length - 400)))" }
             $p = (Get-Content $log -Raw | ConvertFrom-Json).pooled_metrics
@@ -671,7 +758,7 @@ function IkiOkuma([string]$Ref, [string]$Test) {
             if ($p.vmaf) { $s["vmafneg_ort_$ad"] = [math]::Round($p.vmaf.mean, 4); $s["vmafneg_harm_$ad"] = [math]::Round($p.vmaf.harmonic_mean, 4) }
             Remove-Item $log -ErrorAction SilentlyContinue
             $gx = "[0:v]$t,settb=AVTB,setpts=N[t];[1:v]$r,settb=AVTB,setpts=N[r];[t][r]xpsnr"
-            $cx = & ffmpeg -hide_banner -nostdin -i $Test -i $Ref -lavfi $gx -f null - 2>&1 | Out-String
+            $cx = & ffmpeg -hide_banner -nostdin @TestGirdiArg -i $Test -i $Ref -lavfi $gx -f null - 2>&1 | Out-String
             if ($cx -match 'XPSNR\s+y:\s*([\d.]+)\s*u:\s*([\d.]+)\s*v:\s*([\d.]+)') {
                 $s["xpsnr_$ad"] = [math]::Round((4 * (Sayi $Matches[1]) + (Sayi $Matches[2]) + (Sayi $Matches[3])) / 6, 4)
             }
@@ -968,6 +1055,97 @@ function SocialKodek {
     }
 }
 
+function SvtAnahtarSatirlari([string]$Metin) {
+    ((($Metin -split "`n") | Where-Object { $_ -match '(?i)luminance|variance|compress|tune|grain|Error parsing' } | ForEach-Object { ($_ -replace '^\s*\[[^\]]*\]\s*', '').Trim() } | Select-Object -Unique -First 12) -join ' // ')
+}
+
+function SvtBant {
+    $script:FfSeviye = 'info'
+    $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"
+    $b = Probe $girdi
+    $kbitler = if ($Kesit -eq 'karanlik') { @($Kbitler.Split(',') | ForEach-Object { [int]$_.Trim() }) } else { @([int]($Kbitler.Split(',')[-1].Trim())) }
+    $sr = FfKos @('-f', 'lavfi', '-i', 'testsrc2=s=320x240:d=0.2', '-c:v', 'libsvtav1', '-f', 'null', $NullCikis) 'info'
+    $svtSurum = (($sr.Metin -split "`n") | Where-Object { $_ -match 'SVT' -and $_ -match 'v\d' } | ForEach-Object { $_.Trim() } | Select-Object -First 2) -join ' / '
+    Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'olcer-kaynak-kendisi'; svt_surum = $svtSurum }) $null (IkiOkuma $girdi $girdi -Ucuncu)
+    if ($Kesit -eq 'karanlik') {
+        $k10 = Join-Path $Cikti "kesit-$Kesit-10bit.mkv"
+        Ff @('-i', $girdi, '-c:v', 'ffv1', '-pix_fmt', 'yuv420p10le', $k10)
+        Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'olcer-iii-kaynak-10bit' }) $null (IkiOkuma $girdi $k10 -Ucuncu)
+        Remove-Item $k10
+        $alti = Join-Path $Cikti "kesit-$Kesit-6bit.mkv"
+        Ff @('-i', $girdi, '-vf', 'lutyuv=y=bitand(val\,252)', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', $alti)
+        Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'olcer-iii-kaynak-6bit' }) $null (IkiOkuma $girdi $alti -Ucuncu)
+        Remove-Item $alti
+        $gr = Join-Path $Cikti 'olcer-gradients-10bit.mkv'
+        Ff @('-f', 'lavfi', '-i', "gradients=s=$($b.W)x$($b.H):c0=0x000000:c1=0x303030:x0=0:y0=0:x1=$($b.W - 1):y1=0:speed=0:r=24:d=2", '-vf', 'format=yuv420p10le', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p10le', $gr)
+        $gr8 = Join-Path $Cikti 'olcer-gradients-8bit-ref.mkv'
+        Ff @('-i', $gr, '-vf', 'format=yuv420p', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', $gr8)
+        Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'olcer-iii-gradients-10bit-gurultusuz' }) $null (IkiOkuma $gr8 $gr -Ucuncu)
+        Remove-Item $gr, $gr8
+    }
+    $g = [int][math]::Round($b.Fps * 5)
+    $psy = 'tune=1:enable-variance-boost=0'
+    $kollar = [ordered]@{
+        'e0-8bit' = @{ Psy = $psy; Ek = '' }
+        'negatif-uydurma-anahtar' = @{ Psy = $psy; Ek = 'vidshrinkuydurma=1' }
+        'lqb20' = @{ Psy = $psy; Ek = 'luminance-qp-bias=20' }
+        'lqb40' = @{ Psy = $psy; Ek = 'luminance-qp-bias=40' }
+        'lqb60' = @{ Psy = $psy; Ek = 'luminance-qp-bias=60' }
+        'vb3' = @{ Psy = 'tune=1:enable-variance-boost=1:variance-boost-strength=3'; Ek = '' }
+        'qsc2' = @{ Psy = $psy; Ek = 'qp-scale-compress-strength=2' }
+        'tune0' = @{ Psy = 'tune=0:enable-variance-boost=0'; Ek = '' }
+        'ortu-fg4' = @{ Psy = $psy; Ek = 'film-grain=4:film-grain-denoise=0' }
+    }
+    foreach ($kbit in $kbitler) {
+        $script:bantTaban = $null
+        foreach ($kol in $kollar.Keys) {
+            Dene $Kesit $kol $kbit {
+                $t = $kollar[$kol]
+                $c = Join-Path $Cikti "svtbant-$Kesit-$kbit-$kol.mkv"
+                $prm = "keyint=${g}:scd=1:$($t.Psy)"
+                if ($t.Ek) { $prm += ":$($t.Ek)" }
+                $hedef = if ($script:bantTaban) { $script:bantTaban } else { [double]$kbit }
+                $h = HamEsBayt $c $hedef $kbit { param($bb, $cc) Gecisli $girdi $cc @('-c:v', 'libsvtav1', '-preset', '6', '-b:v', "${bb}k", '-g', "$g", '-svtav1-params', $prm, '-pix_fmt', 'yuv420p') @() @() }
+                if ($kol -eq 'e0-8bit') { $script:bantTaban = $h.Kbps }
+                $o = [ordered]@{ bayt = (Get-Item $c).Length; kbps = $h.Kbps }
+                $ek = EsOrtak $h $hedef
+                $ek.svtav1_params = $prm
+                $ek.anahtar_satirlari = SvtAnahtarSatirlari $h.R.Metin
+                $ek.anahtar_reddedildi = ($h.R.Metin -match 'Error parsing')
+                $ok = IkiOkuma $girdi $c -Ucuncu
+                foreach ($k in $ok.Keys) { $ek[$k] = $ok[$k] }
+                if ($kol -like 'ortu-*') {
+                    $gs = IkiOkuma $girdi $c -TestGirdiArg @('-export_side_data', 'film_grain')
+                    $ek.grainsiz_cambi_ii = $gs.cambi_ii
+                    $ek.grainsiz_hata_ii = $gs.hata_ii
+                }
+                Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; istenen_kbit = $kbit }) $o $ek
+                Remove-Item $c
+            }
+        }
+        if (-not $script:bantTaban) { continue }
+        Dene $Kesit 'urun-x265' $kbit {
+            $mb = [math]::Round($script:bantTaban * $b.Sure / 8 / 1024, 4)
+            $u = Urun $girdi $mb "svtbant-$Kesit-$kbit-urun-x265" @('--force-codec', 'libx265', '--no-resolution-drop', '--no-fps-drop')
+            $ek = UrunOrtak $u $mb
+            $ok = IkiOkuma $girdi $u.Dosya -Ucuncu
+            foreach ($k in $ok.Keys) { $ek[$k] = $ok[$k] }
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'urun-x265'; istenen_kbit = $kbit }) ([ordered]@{ bayt = (Get-Item $u.Dosya).Length; kbps = (Kbps $u.Dosya) }) $ek
+            Remove-Item $u.Dosya
+        }
+        if ($Kesit -ne 'karanlik') { continue }
+        Dene $Kesit 'handbrake-x265' $kbit {
+            $c = Join-Path $Cikti "svtbant-$Kesit-$kbit-handbrake.mkv"
+            $h = HbEsBayt $girdi $c $script:bantTaban (HbTemel $b)
+            $ek = HbOrtak $h $script:bantTaban
+            $ok = IkiOkuma $girdi $c -Ucuncu
+            foreach ($k in $ok.Keys) { $ek[$k] = $ok[$k] }
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'handbrake-x265'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 x265 slow 2 gecis turbo' }) ([ordered]@{ bayt = (Get-Item $c).Length; kbps = $h.Kbps }) $ek
+            Remove-Item $c
+        }
+    }
+}
+
 function SvtSatirlari([string]$Metin) {
     ((($Metin -split "`n") | Where-Object { $_ -match 'BRC mode|pred struct|Svt\[warn\]|Svt\[error\]|Error parsing' } | ForEach-Object { $_.Trim() } | Select-Object -Unique -First 8) -join ' // ')
 }
@@ -1026,6 +1204,8 @@ function SvtBekci {
 
 switch ($Is) {
     'svtbekci' { SvtBekci }
+    'tavanbekci' { TavanBekci }
+    'svtbant' { SvtBant }
     'svtara' { SvtAra }
     'turboilk' { TurboIlk }
     'vtara' { VtAra }
