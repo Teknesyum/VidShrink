@@ -88,6 +88,7 @@ Bağlantı açıkken birim testleri ve mutasyonlar (13 mutasyonun 13'ü en az bi
   sayılmadığı için günlüğe `-pass 2 -passlogfile` yazılıyordu, gerçek kodlama tek geçişti. Karar `KomutSatiri`
   (`tools/VidShrink.Bench/KomutSatiri.cs`) içine alındı ve koşucunun ölçütüne (`FfmpegArguments.NeedsTwoPasses`,
   yani `!CodecModel.SinglePassRateControl`) bağlandı. Yanlış yer bildirilmişti: sapma Core'un argüman üretiminde
-  değil, Bench'in kendi günlük satırındaydı.
+  değil, Bench'in kendi günlük satırındaydı. Aynı ölçüt `tools/VidShrink.Ab/Competitors.cs`'de de vardı (üstelik
+  ısınmayan `FfmpegArguments.Build` ile); o da koşucunun yolundan geçiyor artık.
 - **Kapı kalınca iş yeşil dönüyordu.** `VtHizli` artık kardeşi `Vt` gibi fırlatıyor (hüküm JSON'u yazıldıktan
   sonra); artefakt adımları `if: always()` olduğu için kanıt yine yükleniyor.

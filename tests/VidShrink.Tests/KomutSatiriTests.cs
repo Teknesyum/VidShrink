@@ -71,6 +71,16 @@ public sealed class KomutSatiriTests
     }
 
     [Fact]
+    public void Ab_gunlugu_de_gecis_sayisini_kodlayici_bit_hizi_denetiminden_okur()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(TipSources.Root, "tools", "VidShrink.Ab", "Competitors.cs"));
+
+        Assert.Contains("FfmpegArguments.NeedsTwoPasses(plan.Codec)", kaynak);
+        Assert.Contains("EncodeRunner.EncodeArguments(", kaynak);
+        Assert.DoesNotContain("!CodecModel.IsHardware(plan.Codec)", kaynak);
+    }
+
+    [Fact]
     public void Videotoolbox_komutunda_pass_ve_passlogfile_yok()
     {
         var kabiliyet = new HepsiVar();
