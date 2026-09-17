@@ -257,13 +257,17 @@ internal sealed class PanelHost : IDisposable
     /// </summary>
     internal bool AraOlcum { get; set; }
 
+    internal bool OlcumPlani { get; set; }
+
     internal bool AraPlanErtelendi => _araPlanErtelendi;
 
     internal void ErtelenenPlaniUygula()
     {
         if (!_araPlanErtelendi) return;
         _araPlanErtelendi = false;
-        SetPlan(_info, _plan, _profile);
+        OlcumPlani = true;
+        try { SetPlan(_info, _plan, _profile); }
+        finally { OlcumPlani = false; }
     }
 
     internal static readonly TimeSpan IlkParcaGecikmesi = TimeSpan.FromMilliseconds(1);
@@ -588,7 +592,7 @@ internal sealed class PanelHost : IDisposable
         _pendingSignature = _info is { } media && _plan is { } current ? ClipSignature(media, current, _clipStart) : null;
         _scheduled++;
         _segmentDelay.Stop();
-        _segmentDelay.Interval = _clip is null && _clipSignature is null && !_clipRunning
+        _segmentDelay.Interval = OlcumPlani || (_clip is null && _clipSignature is null && !_clipRunning)
             ? IlkParcaGecikmesi
             : TimeSpan.FromMilliseconds(SegmentEncoder.DebounceMilliseconds);
         _segmentDelay.Start();

@@ -403,6 +403,13 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
             host.SetPlan(info, BaskaPlan(), null);
             return (host.ClipScheduled, host.ClipDelay);
         });
+        var olcumGecikme = AppHost.Run(() =>
+        {
+            host.OlcumPlani = true;
+            try { host.SetPlan(info, TwoPassPlan(), null); }
+            finally { host.OlcumPlani = false; }
+            return host.ClipDelay;
+        });
         AppHost.Run(host.Dispose);
 
         Record($"H3 ilk parca gecikmesi {ilkGecikme.TotalMilliseconds} ms, parca varken {sonrakiGecikme.TotalMilliseconds} ms");
@@ -410,6 +417,7 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
         Assert.Equal(PanelHost.IlkParcaGecikmesi, ilkGecikme);
         Assert.True(sonrakiKuruldu);
         Assert.Equal(TimeSpan.FromMilliseconds(SegmentEncoder.DebounceMilliseconds), sonrakiGecikme);
+        Assert.Equal(PanelHost.IlkParcaGecikmesi, olcumGecikme);
     }
 
     [FfmpegFact]
@@ -445,7 +453,7 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
         var (sonSira, sonKuruldu, sonErtelendi) = AppHost.Run(() =>
         {
             host.ErtelenenPlaniUygula();
-            return (host.ScheduledEncodes, host.ClipScheduled, host.AraPlanErtelendi);
+            return (host.ScheduledEncodes, host.ClipScheduled && host.ClipDelay == PanelHost.IlkParcaGecikmesi && !host.OlcumPlani, host.AraPlanErtelendi);
         });
         var ikinciUygula = AppHost.Run(() => { host.ErtelenenPlaniUygula(); return host.ScheduledEncodes; });
         AppHost.Run(host.Dispose);

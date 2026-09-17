@@ -3080,9 +3080,9 @@ public partial class MainWindow : Window
             {
                 if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return false;
                 _profile = profile;
-                if (_preview is not null) _preview.AraOlcum = stage == ShrinkMeasureStage.Probed;
+                if (_preview is not null) { _preview.AraOlcum = stage == ShrinkMeasureStage.Probed; _preview.OlcumPlani = true; }
                 try { Recalculate(); }
-                finally { if (_preview is not null) _preview.AraOlcum = false; }
+                finally { if (_preview is not null) { _preview.AraOlcum = false; _preview.OlcumPlani = false; } }
                 AcilisIzi.Yaz("olcum-" + stage);
                 if (stage == ShrinkMeasureStage.Probed) TxtEstimateNote.Text = Say("main.estimate.calibrating");
                 return true;

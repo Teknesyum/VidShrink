@@ -71,8 +71,8 @@ public sealed class HipersurusHTests
     public void OlcumAraAsamasiPaneliErteliyorBitinceUyguluyor()
     {
         var yapici = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.axaml.cs"));
-        Assert.Contains("_preview.AraOlcum = stage == ShrinkMeasureStage.Probed;", yapici, StringComparison.Ordinal);
-        Assert.Contains("finally { if (_preview is not null) _preview.AraOlcum = false; }", yapici, StringComparison.Ordinal);
+        Assert.Contains("_preview.AraOlcum = stage == ShrinkMeasureStage.Probed; _preview.OlcumPlani = true;", yapici, StringComparison.Ordinal);
+        Assert.Contains("finally { if (_preview is not null) { _preview.AraOlcum = false; _preview.OlcumPlani = false; } }", yapici, StringComparison.Ordinal);
         Assert.Contains("if (ReferenceEquals(_info, info)) _preview?.ErtelenenPlaniUygula();", yapici, StringComparison.Ordinal);
     }
 
