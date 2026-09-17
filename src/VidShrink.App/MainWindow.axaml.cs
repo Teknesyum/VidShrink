@@ -253,7 +253,7 @@ public partial class MainWindow : Window
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
-        Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
+        BuildShareTargetStrip();
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
         foreach (var control in new SelectingItemsControl[]
                  {
@@ -1161,7 +1161,7 @@ public partial class MainWindow : Window
             TxtAudioBitrate.Text = settings.AudioBitrate;
             TxtTrimStart.Text = settings.TrimStart;
             TxtTrimEnd.Text = settings.TrimEnd;
-            CmbShareTarget.SelectedIndex = settings.ShareTarget;
+            ShareTargetIndex = settings.ShareTarget;
             RefreshShareTarget();
             if (CmbShareRetention.ItemCount > 0)
                 CmbShareRetention.SelectedIndex = Math.Clamp(settings.ShareRetention, 0, CmbShareRetention.ItemCount - 1);
@@ -1205,7 +1205,7 @@ public partial class MainWindow : Window
         AudioBitrate = TxtAudioBitrate.Text ?? "",
         TrimStart = TxtTrimStart.Text ?? "",
         TrimEnd = TxtTrimEnd.Text ?? "",
-        ShareTarget = CmbShareTarget.SelectedIndex,
+        ShareTarget = ShareTargetIndex,
         ShareRetention = CmbShareRetention.SelectedIndex
     };
 
@@ -1838,14 +1838,46 @@ public partial class MainWindow : Window
     {
         _shareTargets = ShareTargetTable.Load();
 
-        var wasSyncing = _syncing;
-        _syncing = true;
-        CmbShareTarget.ItemsSource = _shareTargets.Targets.Select(target => target.DisplayName).ToList();
-        CmbShareTarget.SelectedIndex = Math.Max(0, IndexOfTarget(_shareTargets.Default));
-        _syncing = wasSyncing;
-
+        BuildShareTargetStrip();
         RefreshShareTarget();
     }
+
+    private readonly List<RadioButton> _shareTargetRadios = [];
+
+    private void BuildShareTargetStrip()
+    {
+        var wasSyncing = _syncing;
+        _syncing = true;
+        ShareTargetStrip.Children.Clear();
+        _shareTargetRadios.Clear();
+        foreach (var target in _shareTargets.Targets)
+        {
+            var radio = new RadioButton { GroupName = "ShareTarget", Content = target.DisplayName };
+            var index = _shareTargetRadios.Count;
+            radio.IsCheckedChanged += (_, _) =>
+            {
+                if (radio.IsChecked != true) return;
+                ShareTargetIndex = index;
+                OnShareTargetChanged();
+            };
+            _shareTargetRadios.Add(radio);
+            ShareTargetStrip.Children.Add(radio);
+        }
+        ShareTargetIndex = Math.Max(0, IndexOfTarget(_shareTargets.Default));
+        _syncing = wasSyncing;
+    }
+
+    internal int ShareTargetIndex
+    {
+        get => _shareTargetRadios.FindIndex(radio => radio.IsChecked == true);
+        set
+        {
+            for (var index = 0; index < _shareTargetRadios.Count; index++)
+                _shareTargetRadios[index].IsChecked = index == value;
+        }
+    }
+
+    internal IReadOnlyList<RadioButton> ShareTargetRadios => _shareTargetRadios;
 
     private int IndexOfTarget(ShareTarget target)
     {
@@ -1863,7 +1895,7 @@ public partial class MainWindow : Window
 
     private ShareTarget SelectedShareTarget()
     {
-        var index = CmbShareTarget.SelectedIndex;
+        var index = ShareTargetIndex;
         return index >= 0 && index < _shareTargets.Targets.Count
             ? _shareTargets.Targets[index]
             : _shareTargets.Default;

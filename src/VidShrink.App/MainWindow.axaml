@@ -1275,7 +1275,7 @@
                     </Button>
                   </StackPanel>
 
-                  <ComboBox x:Name="CmbShareTarget" HorizontalAlignment="Stretch"/>
+                  <WrapPanel x:Name="ShareTargetStrip" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}"/>
 
                   <Grid ColumnDefinitions="Auto,*"
                         RowDefinitions="Auto,Auto,Auto"
