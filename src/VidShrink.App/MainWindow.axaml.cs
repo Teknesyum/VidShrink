@@ -1661,17 +1661,9 @@ public partial class MainWindow : Window
     internal readonly record struct ChipPlan(
         string Chip, double? TargetMb, bool SizeCapped, Intent Intent, CodecPreference Codec, FillPolicy Fill);
 
-    internal static IReadOnlyList<ChipPlan> ChipPlans() => new ChipPlan[]
-    {
-        new("ChipArchive", null, false, Intent.Archive, CodecPreference.MaxCompression, FillPolicy.QualityCeiling),
-        new("Chip8", 8, true, Intent.SocialMedia, CodecPreference.Compatible, FillPolicy.FillTarget),
-        new("ChipWhatsApp", 16, true, Intent.Sharing, CodecPreference.Compatible, FillPolicy.FillTarget),
-        new("Chip25", 25, true, Intent.Sharing, CodecPreference.Compatible, FillPolicy.FillTarget),
-        new("Chip100", 100, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
-        new("Chip128", 128, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
-        new("Chip180", 180, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
-        new("ChipHalf", null, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.QualityCeiling)
-    };
+    internal static IReadOnlyList<ChipPlan> ChipPlans() => PresetLibrary.BuiltIn.Chips()
+        .Select(preset => new ChipPlan(preset.Chip!, preset.TargetMb, preset.SizeCapped, preset.Intent, preset.Codec, preset.Fill))
+        .ToList();
 
     private void ApplyChipPlan(string chip)
     {

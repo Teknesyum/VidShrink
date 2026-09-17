@@ -13,9 +13,9 @@ Each target chip is a real limit somewhere, and its `?` badge says which.
 
 | Chip | Why that number |
 |---|---|
-| **8** | Discord without Nitro, older forums, strict e-mail gateways |
+| **8** | Older forums, strict e-mail gateways |
 | **16** *(WhatsApp recommended)* | WhatsApp re-encodes in-chat video with its own weak encoder; under 16 MB it usually passes yours through instead |
-| **25** | Gmail attachments, Discord Nitro Basic, most ticket systems |
+| **25** | Gmail attachments, most ticket systems |
 | **100** | Archiving and uploads where quality matters more than transfer time |
 | **128** *(sharing maximum)* | The measured ceiling of uguu.se, the narrower of the two anonymous share targets |
 | **180** *(WhatsApp Web maximum)* | WhatsApp Web takes 180 MB per file, a user-reported number rather than a published one |

@@ -13,9 +13,9 @@ Her hedef yongası bir yerde gerçek bir sınırdır; `?` rozeti hangisi olduğu
 
 | Yonga | O sayı neden |
 |---|---|
-| **8** | Nitro'suz Discord, eski forumlar, katı e-posta ağ geçitleri |
+| **8** | Eski forumlar, katı e-posta ağ geçitleri |
 | **16** *(WhatsApp için önerilen)* | WhatsApp sohbetteki videoyu kendi zayıf kodlayıcısıyla yeniden kodlar; 16 MB altında sizinkini genelde olduğu gibi geçirir |
-| **25** | Gmail ekleri, Discord Nitro Basic, çoğu talep sistemi |
+| **25** | Gmail ekleri, çoğu talep sistemi |
 | **100** | Kalitenin aktarım süresinden önemli olduğu arşiv ve yüklemeler |
 | **128** *(paylaşım için en fazla)* | İki anonim paylaşım hedefinin dar olanı uguu.se'nin ölçülmüş tavanı |
 | **180** *(WhatsApp Web için en fazla)* | WhatsApp Web dosya başına 180 MB alıyor; sayı kullanıcı bildirimi, WhatsApp yayımlamıyor |

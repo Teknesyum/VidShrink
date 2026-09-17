@@ -1,3 +1,16 @@
+# Ön Ayar Kütüphanesi — HandBrake A2
+
+Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 42-45.
+
+1. **Tek tablo.** `src/VidShrink.Core/Presets/platformlar.json` gömülü kaynak; yonga planları (`MainWindow.ChipPlans`)
+   buradan okunur. Discord/Telegram/e-posta platformları ve cihaz profilleri aynı tabloya, her değerin kaynağı
+   `docs/olcumler/onayar-kaynaklari.md`.
+2. **Kullanıcı ön ayarı.** `PresetLibrary` şema sürümlü kaydet/içe/dışa aktar; ayar klasörü `VIDSHRINK_SETTINGS_PATH`
+   ile aynı yer. Hata kodu + 42 dilde `main.preset.error.*`.
+3. **HandBrake çevirisi.** `HandBrakePresetImport`: taşınan/yaklaşık/düşen alan notları, `main.preset.handbrake.*`.
+4. **Testler.** `OnAyarKutuphanesiTests`, `KullaniciOnAyarTests`, `HandBrakeOnAyarCeviriTests`; her kol negatif kontrol
+   ve mutasyon.
+
 # Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
 
 Dal `t0/yol-c-kaydedici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 2., 6., 7. bölüm (9-11).
