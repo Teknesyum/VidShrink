@@ -180,3 +180,100 @@ ayrı iş.
 başarısız bölünmüş sonda) ayrı süreç koşar (`WindowLumasAsync`). Testler `YarimBoyuOlmayanKucukKaynaktaAyriSondaLumayiOlcer`
 (100x100 kaynakta `RunDetailedAsync` MeanLuma dolu) ve `BirlesikSondaLumasizDonerseAyriSondaDoldurur`. `?? await LumaSampleAsync`
 silinince ikisi kırmızı (2 / 66), geri alınca 68/68 yeşil (`KaranlikGecisTests|ComplexityProbeTests`).
+
+## 6. Dengeli Kolu (K4 Kapısı)
+
+Karar: `docs/danisma/2026-09-17-fable-kararlar.md` bölüm 4. Kapı şöyle yazılmıştı: karanlik × {600, 2000}
+Dengeli kolunun CAMBI(ii)'si ölçülür, **> 7,5** ise `DarkContentSwitch` rejim kümesine `Balanced` eklenir,
+**≤ 7,5** ise kapsam bugünkü gibi kalır. Genişleme ayrıca "süre ≤ 2× libx264 kolu" ölçütüne bağlıydı.
+
+Düzenek: `hb.ps1 -Is karanlikgecis` içine `urun-dengeli` kolu. Rejim kaynak/hedef oranından türediği için
+(`CompressionStrategy.RegimeFor`) kol oranı `--source-mb` ile hedefin **3,0 katına** sabitliyor: 1,5 ≤ 3,0 < 6,0,
+yani bandın ortası. Dal `t0/karanlik-dengeli` (`22bb3840`), CI koşumu **35273973330**, kesit ve kaynak
+bölüm 4 ile aynı (Sintel sha256 `97F1DBC6…`). Kalite yolu (ii) `zscale dither=none`.
+
+### Karanlik, Dört Kol
+
+| kbit | Kol | Kodek | Geometri | kbps | CAMBI(ii) | VMAF-NEG(ii) | XPSNR(ii) | Kodlama sn | Toplam sn | Deneme |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 600 | ürün (Auto→Extreme) | libx265 | 1574x670 | 601,4 | 6,55 | 78,36 | 35,86 | 79,5 | 139,4 | 2 |
+| 600 | e0 `460ecc89` | libsvtav1 | 1920x818 | 603,4 | 9,24 | 81,20 | 36,68 | 25,2 | 67,4 | 1 |
+| 600 | HB x265 | x265 | 1920x818 | 600,8 | 6,45 | 77,28 | 35,49 | 70,7 | 70,7 | – |
+| 600 | **Dengeli** | **libx264** | 1344x572 | 598,5 | **7,79** | 66,42 | 34,92 | 11,3 | 45,5 | 1 |
+| 2000 | ürün (Auto→Extreme) | libx265 | 1920x818 | 2003,0 | 6,65 | 95,93 | 39,77 | 141,1 | 204,4 | 2 |
+| 2000 | e0 `460ecc89` | libsvtav1 | 1920x818 | 1979,5 | 9,29 | 96,05 | 39,89 | 26,0 | 67,7 | 1 |
+| 2000 | HB x265 | x265 | 1920x818 | 1974,3 | 6,50 | 95,37 | 39,57 | 74,0 | 74,0 | – |
+| 2000 | **Dengeli** | **libx264** | 1920x818 | 2018,0 | **7,46** | 90,27 | 39,17 | 34,1 | 72,2 | 2 |
+
+Dengeli kolunda luma iki hücrede de 28,73 (bölüm 1 ile aynı), kodek hükmü (beklenen `libx264`) **2/2 geçti**:
+eşik 44'ün altındaki bir kaynakta bile Balanced rejimi x265'e geçmiyor, yani bugünkü kapsam koda uygun.
+
+### Kapı
+
+| kbit | Dengeli CAMBI(ii) | Tavan | Kapı | x265 − Dengeli CAMBI | x265 ÷ Dengeli kodlama süresi | Genişleme süre ölçütü (≤2×) |
+|---|---|---|---|---|---|---|
+| 600 | 7,7867 | 7,5 | **genislet** | −1,2361 | **7,035×** | kaldı |
+| 2000 | 7,4646 | 7,5 | **kalsin** | −0,8176 | **4,138×** | kaldı |
+
+**Hüküm: kapsam değişmiyor, `Balanced` rejim kümesine eklenmiyor.** İki gerekçe, ikisi de tablodan:
+CAMBI kapısı iki hücreden **yalnız birinde** (600) açıldı ve orada da payı 0,29 (7,79 karşı 7,5); 2000'de
+7,46 ile tavanın 0,04 altında kaldı. Kapının açıldığı hücrede bile genişlemenin kendi süre ölçütü tutmuyor:
+x265 kolu libx264'ün **7,04 katı** kodluyor, ölçüt ≤2×. 2000'de oran 4,14×, aynı yönde. Yani x265 geçişi
+karanlıkta bandı gerçekten düzeltiyor (CAMBI 7,79 → 6,55 ve 7,46 → 6,65) ama Dengeli rejimde bu düzeltmenin
+bedeli ölçütün **2,07 ile 3,52 katı** süre: ölçüt ≤2×, ölçülen 7,035× ve 4,138×, yani 7,035/2 = 3,52 ve
+4,138/2 = 2,07. Tablodaki 7,04 ve 4,14 ölçütün kendisiyle değil libx264 koluyla oranlanmış sayılar.
+
+### Bu Ölçünün Sınırları
+
+**Süre oranının payı Dengeli+x265 kolu değil.** `x265_bolu_dengeli_sure`'nin payı `$script:kgUrun.Sn`
+(hb.ps1:1387), yani `urun-otomatik` kolu — karanlık kesitte oran Extreme rejimine düştüğü için x265'i o kol
+kodluyor. Payda `urun-dengeli` kolunun süresi. Dolayısıyla oran **rejim + kodek** farkını birlikte taşıyor;
+"Dengeli rejimde x265'e geçmenin maliyeti" tek başına ölçülmedi. Bunun için Dengeli rejimi sabit tutup yalnız
+kodeği çeviren üçüncü bir kol gerekir, bu koşumda yok.
+
+**Negatif kontroller yapısal olarak erişilmez.** Danışmada önerilen negatif kontroller (CAMBI tavanını
+düşürüp kapının kapandığını, süre ölçütünü gevşetip hükmün döndüğünü görmek) bu düzenekte koşulamıyor:
+tavan `7.5` ve ölçüt `2.0` betiğe gömülü sabitler, parametre değil. İkisi de artık
+`HbOlcumDuzenegiTests.DengeliKolununZorladigiOranMotorunDengeliBandinaDusuyor`'da pimli — sayı sessizce
+değişemez ama bir koşumda değiştirilip etkisi ölçülemez de.
+
+600'deki süre oranı salt kodek farkı değil: o hücrede Dengeli 1344x572'ye ölçekledi, x265 kolu 1574x670'te
+kaldı ve bir deneme fazla koştu (bütçe doldurma). 2000'de iki kol da 1920x818 ve iki denemeli; oradaki
+**4,138×** daha temiz sayı.
+
+### Dengeli Kolu HandBrake'i Geçiyor Mu
+
+Aynı kbps'te HandBrake x265 (slow, 2 geçiş turbo) ile karşılaştırma; Dengeli eksi HB:
+
+| kbit | ΔCAMBI(ii) | ΔVMAF-NEG(ii) | ΔXPSNR(ii) | Dengeli ÷ HB kodlama süresi |
+|---|---|---|---|---|
+| 600 | +1,3351 | −10,8640 | −0,5670 | 0,160× |
+| 2000 | +0,9653 | −5,1067 | −0,3982 | 0,461× |
+
+**Dengeli kolu karanlık sahnede HandBrake'i geçmiyor: iki hücrenin ikisinde de üç kalite ölçüsünün üçü de
+HB'nin gerisinde** (CAMBI'de yüksek = kötü, VMAF-NEG ve XPSNR'de düşük = kötü). Kaldığı hücre bir tanesi
+değil, hepsi. Kazandığı tek sütun süre: HB'nin 0,160 ve 0,461 katı kodluyor.
+
+600'deki −10,86 VMAF-NEG farkı yalnız kodek farkı değil; Dengeli o hedefte 1344x572'ye ölçekliyor, HB
+kaynağın 1920x818'inde kodluyor. 2000'de iki kol aynı geometride ve fark −5,11.
+
+### Yan Okumalar
+
+Ürünün x265 kolu ile HB arasındaki süre hükmü bu koşumda **1/2**: 600'de 1,124× (geçti), 2000'de 1,907×
+(kaldı, ölçüt ≤1,5×). Bölüm 5'te 1,41× / 2,10× ölçülmüştü; neden aynı, bütçe doldurmanın x265'te eklediği
+ikinci tam kodlama. Defterde ayrı iş olarak duruyor.
+
+CAMBI(ii) hükmü (x265 kolu ≤7,5) yine **2/2 geçti**: 6,55 ve 6,65.
+
+### Düzeneğin Yerel Doğrulaması
+
+`--source-mb` gerçekten rejimi çeviriyor mu: 3 sn 640x360 karanlık testsrc2 klibi (luma 11,29), aynı hedef
+(0,7324 MB), yalnız `--source-mb` değişiyor.
+
+| `--source-mb` | Oran | Rejim | Seçilen kodek |
+|---|---|---|---|
+| 2,1972 | 3,0 | Balanced | libx264 |
+| 30 | 41,0 | Extreme | libx265 |
+
+Pim: `HbOlcumDuzenegiTests.DengeliKolununZorladigiOranMotorunDengeliBandinaDusuyor` betikteki `$DengeliOran`
+varsayılanını okuyup motora soruyor; 3,0 → 8,0 mutasyonunda test kırmızı (1/4), geri alınca 4/4 yeşil.

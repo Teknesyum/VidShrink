@@ -292,6 +292,68 @@ public sealed class WatchFolderTests
             WatchFolder.ValidateFolders(@"C:\izle\Gelen", @"C:\izle\gelen"));
     }
 
+    /// <summary>
+    /// Kural cümlesinin pimi. <c>PathComparison</c> yalnız iki yeri yönetiyor (klasör
+    /// kıyası ve kendi çıktısının adı); dosya adının geri kalan kullanımları her platformda
+    /// koşulsuz <c>OrdinalIgnoreCase</c>. Belge bunu söylemek zorunda, yoksa Linux okuruna
+    /// "sende bu sorun yok" demiş oluyor.
+    /// </summary>
+    [Fact]
+    public void HarfDuyarsizAdTablosuIkiBelgedeDeYaziyor()
+    {
+        var ingilizce = Belge("README.md");
+        Assert.Contains("Exactly two comparisons follow the rule of the running system", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("`Ordinal` on Linux and `OrdinalIgnoreCase` on Windows and macOS.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("default APFS volume, which is case-insensitive but\ncase-preserving", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("Every other use of a file's name ignores case **on every platform, Linux included**", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("`Klip.mp4` and `klip.mp4` in one watched folder collide even where the filesystem keeps\nthem apart as two separate files.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("one is taken and the other counts as already processed, so it is never shrunk.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("each scan resets the other's stability counter, the run\nnever confirms either file, and neither is ever processed.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("the pending table never empties, so `--bir-kez` does not exit", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("Neither regime is measured; both are read from the code.", ingilizce, StringComparison.Ordinal);
+
+        var turkce = Belge("README.tr.md");
+        Assert.Contains("Koşan sistemin kuralına uyan tam iki kıyas var", turkce, StringComparison.Ordinal);
+        Assert.Contains("Linux'ta\n`Ordinal`, Windows ile macOS'ta `OrdinalIgnoreCase`.", turkce, StringComparison.Ordinal);
+        Assert.Contains("o bölüm harf duyarsız ama harf\nkoruyordur", turkce, StringComparison.Ordinal);
+        Assert.Contains("**her platformda, Linux dahil** harfi yok sayıyor", turkce, StringComparison.Ordinal);
+        Assert.Contains("dosya sistemi ikisini iki ayrı dosya\nolarak tutsa bile çakışıyor.", turkce, StringComparison.Ordinal);
+        Assert.Contains("biri alınıyor,\nöbürü işlenmiş sayılıyor ve hiç küçültülmüyor.", turkce, StringComparison.Ordinal);
+        Assert.Contains("her tarama\nöbürünün kararlılık sayacını sıfırlıyor", turkce, StringComparison.Ordinal);
+        Assert.Contains("bekleyenler tablosu hiç boşalmadığı için `--bir-kez` çıkmıyor", turkce, StringComparison.Ordinal);
+        Assert.Contains("İki kip de ölçülmedi; ikisi de kod okumasından.", turkce, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Belgedeki durum dosyası adı ve çıkış kodları sabitlerden pimleniyor: sabit değişince
+    /// belge de değişmek zorunda. Denetim bu üçünün pimsiz olduğunu ölçtü.
+    /// </summary>
+    [Fact]
+    public void IzleBelgesiDurumDosyasiVeCikisKodlariniSabitlerdenPimliyor()
+    {
+        foreach (var ad in new[] { "README.md", "README.tr.md" })
+        {
+            var belge = Belge(ad);
+            Assert.Contains($"`{WatchFolder.StateFileName}`", belge, StringComparison.Ordinal);
+            Assert.Contains($"`.vidshrink-izle-", belge, StringComparison.Ordinal);
+        }
+
+        var ingilizce = Belge("README.md");
+        Assert.Contains($"`{ExitCodes.InBand}` in band, `{ExitCodes.UnderBand}` under the band", ingilizce, StringComparison.Ordinal);
+        Assert.Contains($"`{ExitCodes.CeilingExceeded}`\nsize ceiling exceeded", ingilizce, StringComparison.Ordinal);
+        Assert.Contains($"`{ExitCodes.Error}` error, `{ExitCodes.Usage}` wrong usage, `{ExitCodes.Cancelled}` cancelled.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains($"Exit codes: `{ExitCodes.InBand}` finished, `{ExitCodes.WatchFailures}` `--bir-kez` finished but at least one file failed, `{ExitCodes.Error}` error,\n`{ExitCodes.Usage}` wrong usage, `{ExitCodes.Cancelled}` stopped with Ctrl+C.", ingilizce, StringComparison.Ordinal);
+
+        var turkce = Belge("README.tr.md");
+        Assert.Contains($"bantta `{ExitCodes.InBand}`, bandın altında `{ExitCodes.UnderBand}`", turkce, StringComparison.Ordinal);
+        Assert.Contains($"boy tavanı aşıldığında `{ExitCodes.CeilingExceeded}`", turkce, StringComparison.Ordinal);
+        Assert.Contains($"hatada `{ExitCodes.Error}`, yanlış kullanımda `{ExitCodes.Usage}`, iptalde `{ExitCodes.Cancelled}`.", turkce, StringComparison.Ordinal);
+        Assert.Contains($"Çıkış kodları: bittiğinde `{ExitCodes.InBand}`, `--bir-kez` bitip en az bir dosya başarısız olduğunda `{ExitCodes.WatchFailures}`,\nhatada `{ExitCodes.Error}`, yanlış kullanımda `{ExitCodes.Usage}`, Ctrl+C ile durdurulduğunda `{ExitCodes.Cancelled}`.", turkce, StringComparison.Ordinal);
+    }
+
+    private static string Belge(string ad) =>
+        File.ReadAllText(Path.Combine(TipSources.Root, ad)).Replace("\r\n", "\n", StringComparison.Ordinal);
+
     [Fact]
     public void DurumDosyasiGecicidenAtomikTasinmaylaDegisiyorGeciciGerideKalmiyor()
     {
