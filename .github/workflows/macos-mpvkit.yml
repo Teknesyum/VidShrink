@@ -45,8 +45,8 @@ jobs:
       - name: License evidence
         run: |
           set -euo pipefail
-          strings out/libmpv.2.dylib | grep -E -- '-Dgpl=|--enable-gpl|--enable-version3|--enable-nonfree' | head -n 5 || echo "(no configure string)"
-          strings out/libmpv.2.dylib | grep -oE 'mpv v?[0-9]+\.[0-9]+\.[0-9][^ ]*' | head -n 2 || true
+          strings out/libmpv.2.dylib | grep -E -- '-Dgpl=|--enable-gpl|--enable-version3|--enable-nonfree' || echo "(no configure string)"
+          strings out/libmpv.2.dylib | grep -oE 'mpv v?[0-9]+\.[0-9]+\.[0-9][^ ]*' | sort -u || true
 
       - name: ffmpeg for test clips
         run: brew install ffmpeg

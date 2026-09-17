@@ -115,7 +115,7 @@ curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vi
 ```
 
 Yönetici hakkı yok, .NET SDK yok. Her sürüm tek bir sürüm numarasından dört hedef üretiyor:
-`win-x64`, `osx-arm64`, `osx-x64`, `linux-x64`. Gerekenler: Windows 10 ya da 11, macOS 15 ve
+`win-x64`, `osx-arm64`, `osx-x64`, `linux-x64`. Gerekenler: Windows 10 ya da 11, macOS 14 ve
 üstü, ya da X11/Wayland koşan bir Linux masaüstü, artı `ffmpeg` ve `ffprobe`. FFmpeg ve
 libmpv sürümle birlikte gelmiyor; kurucu bunları Windows'ta pinlenmiş SHA-256 özetlerine
 karşı indiriyor, diğerlerinde paket yöneticinizin komutunu yazıyor. Sağlama doğrulaması,

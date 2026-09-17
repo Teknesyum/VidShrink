@@ -299,30 +299,32 @@ mac_libmpv_file=''
 
 download_mac_libmpv() {
     mac_libmpv_work=$(mktemp -d 2>/dev/null || mktemp -d -t vidshrink-libmpv)
-    candidate="$mac_libmpv_work/libmpv.2.dylib"
+    mac_libmpv_candidate="$mac_libmpv_work/libmpv.2.dylib"
     say 'libmpv indiriliyor (MPVKit 1.0.0, macOS 14+)...'
-    if ! curl -fsSL "$mac_libmpv_url" -o "$candidate"; then
+    if ! curl -fsSL "$mac_libmpv_url" -o "$mac_libmpv_candidate"; then
         rm -rf "$mac_libmpv_work"
+        mac_libmpv_work=''
         note 'libmpv indirilemedi.'
         return 1
     fi
-    actual=$(sha256_of "$candidate")
-    if [ "$actual" != "$mac_libmpv_sha256" ]; then
+    mac_libmpv_actual=$(sha256_of "$mac_libmpv_candidate")
+    if [ "$mac_libmpv_actual" != "$mac_libmpv_sha256" ]; then
         rm -rf "$mac_libmpv_work"
-        note "libmpv sağlaması tutmuyor. Beklenen $mac_libmpv_sha256, bulunan $actual. Dosya silindi."
+        mac_libmpv_work=''
+        note "libmpv sağlaması tutmuyor. Beklenen $mac_libmpv_sha256, bulunan $mac_libmpv_actual. Dosya silindi."
         return 1
     fi
-    mac_libmpv_file=$candidate
+    mac_libmpv_file=$mac_libmpv_candidate
     say 'libmpv hazır (sha256 doğrulandı).'
     return 0
 }
 
 require_libmpv() {
-    if [ "$(uname -s)" = 'Darwin' ] && download_mac_libmpv; then
+    if has_libmpv; then
         return 0
     fi
 
-    if has_libmpv; then
+    if [ "$(uname -s)" = 'Darwin' ] && download_mac_libmpv; then
         return 0
     fi
 
@@ -376,11 +378,14 @@ archive_name="vidshrink-$runtime.zip"
 checksums_name="checksums-$runtime.txt"
 
 say 'VidShrink kurulumu hazırlanıyor...'
+: "${work_root:=}"
+: "${mac_libmpv_work:=}"
+trap 'rm -rf ${work_root:+"$work_root"} ${mac_libmpv_work:+"$mac_libmpv_work"}' EXIT INT TERM
+
 require_ffmpeg
 require_libmpv
 
 work_root=$(mktemp -d 2>/dev/null || mktemp -d -t vidshrink-install)
-trap 'rm -rf "$work_root" ${mac_libmpv_work:+"$mac_libmpv_work"}' EXIT INT TERM
 
 stage_root="$work_root/stage"
 mkdir -p "$stage_root"

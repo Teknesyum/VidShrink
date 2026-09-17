@@ -117,7 +117,7 @@ curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vi
 
 No administrator rights, no .NET SDK. Every release publishes four targets — `win-x64`,
 `osx-arm64`, `osx-x64`, `linux-x64` — from one version number. Requirements: Windows 10 or
-11, macOS 15 or newer, or a Linux desktop on X11 or Wayland, plus `ffmpeg` and `ffprobe`.
+11, macOS 14 or newer, or a Linux desktop on X11 or Wayland, plus `ffmpeg` and `ffprobe`.
 FFmpeg and libmpv never travel in a release; the installer fetches them against pinned
 SHA-256 digests on Windows and prints your package manager's command elsewhere. Checksum
 verification, the right-click entry, the self-update flow and the uninstall switches are

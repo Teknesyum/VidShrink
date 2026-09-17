@@ -142,6 +142,48 @@ public sealed class OynaticiKurulumTests
     }
 
     [Fact]
+    public void MacosAltSurumuDortBelgedeOnDortDiyor()
+    {
+        var beklenen = new (string Dosya, string Dize)[]
+        {
+            ("README.md", "macOS 14 or newer"),
+            ("README.tr.md", "macOS 14 ve"),
+            (Path.Combine("docs", "kurulum.md"), "macOS 14 or newer"),
+            (Path.Combine("docs", "kurulum.tr.md"), "macOS 14 ve üstü"),
+            (Path.Combine("docs", "YOL-HARITASI.md"), "macOS alt sürümü: 14"),
+        };
+
+        foreach (var (dosya, dize) in beklenen)
+        {
+            var metin = Oku(dosya);
+            Assert.Contains(dize, metin, StringComparison.Ordinal);
+            var eski = Regex.Matches(metin, @"macOS 15 (or newer|ve üstü|ve\b)|macOS alt sürümü: 15");
+            Assert.True(eski.Count == 0, $"{dosya} hala macOS 15 tabani soyluyor: {string.Join(" | ", eski.Select(m => m.Value))}");
+        }
+
+        Assert.Contains("MPVKit yolu denendi ve tuttu", Oku(Path.Combine("docs", "YOL-HARITASI.md")), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GuncellemeDenetimiYayinListesiNumaralandirmaz()
+    {
+        var kaynaklar = Directory.GetFiles(Path.Combine(Root, "src"), "*.cs", SearchOption.AllDirectories);
+        Assert.True(kaynaklar.Length > 50, $"src altinda {kaynaklar.Length} kaynak bulundu");
+
+        foreach (var yol in kaynaklar)
+        {
+            var metin = File.ReadAllText(yol);
+            var ad = Path.GetRelativePath(Root, yol);
+            Assert.False(metin.Contains("per_page", StringComparison.Ordinal), $"{ad} sayfali yayin listesi cagiriyor (per_page)");
+            foreach (var m in Regex.Matches(metin, @"/releases(?<son>/latest|/tag/|/download/|)").Cast<Match>())
+                Assert.True(m.Groups["son"].Value.Length > 0, $"{ad} yayin listesini numaralandiriyor: {metin.Substring(Math.Max(0, m.Index - 40), Math.Min(80, metin.Length - Math.Max(0, m.Index - 40)))}");
+        }
+
+        var denetim = Oku("src", "VidShrink.Core", "UpdateCheck.cs");
+        Assert.Contains("releases/latest", denetim, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void UnixKurulumuLibmpvYoksaKomutuSoyleyipDurur()
     {
         var kurulum = Oku("install-vidshrink.sh");

@@ -183,7 +183,9 @@ dropping them.
 Decision: fable 2026-09-17, question 5. Workflow `.github/workflows/macos-mpvkit.yml`, script
 `tools/mpvkit-macos/mpvkit-macos.sh`, pinned inputs `tools/mpvkit-macos/mpvkit-1.0.0.lock`
 (29 zips, sha256 = the SwiftPM checksums in MPVKit 1.0.0 `Package.swift`, product `MPVKit`,
-not `MPVKit-GPL`). Runs 35249035289 and 35249612688 (macos-15, macos-14, macos-15-intel).
+not `MPVKit-GPL`). Runs: 35249035289 (**red** — the script counted `otool -L`'s header line as a
+non-system reference on the arm runners), 35249612688 and 35252708138 (green, three runners),
+and 35257629883 on the branch head, green with the installer job included.
 
 **What MPVKit ships.** Static archives only (`ar archive` inside every framework, fat
 `x86_64 arm64`), no dylibs. A loadable `libmpv.2.dylib` therefore needs one link step on a
@@ -207,7 +209,9 @@ Every archive member carries a build-version load command (0 without, both archs
 
 Engine tests: `OynaticiMotorTests.BassizOrtamdaKareCozulur` (320x180, 8163 colours, loaded
 from `out/libmpv.2.dylib` via `VIDSHRINK_LIBMPV`) and `BozukDosyaAcilistaHataVerir`. dyld
-loaded 0 images from Homebrew. mpv v0.41.0, ffmpeg n8.1.2, client API 2.5.
+loaded 0 images from Homebrew. The library reports itself as `mpv v0.41.0-dirty` (MPVKit
+applies three patches to the v0.41.0 tree, so mpv's own build stamps it `-dirty`; the tag is
+v0.41.0), ffmpeg n8.1.2, client API 2.5.
 
 Negative controls (macos-15): the same inputs with limit `12.0` give `verdict fail=1`
 (output minos 13.0); `VIDSHRINK_LIBMPV` pointing at a text file turns the headless test red.
@@ -223,9 +227,49 @@ fallback. One macos-15 attempt failed before that on an anonymous
 `api.github.com/releases/latest` 403 (runner rate limit, not the libmpv branch) and passed
 on rerun.
 
-**License.** mpv configured `-Dgpl=false` (LGPL-2.1-or-later); FFmpeg from the non-GPL
-assets. Dependencies: OpenSSL Apache-2.0, gnutls/nettle/gmp LGPL, rest permissive. All
-compatible with AGPL-3.0; distribution still owes license texts and source offer.
+**License, component by component.** The 29 pinned inputs, their upstream project (from
+MPVKit's own `Sources/BuildScripts/XCFrameworkBuild/main.swift`, which names the build repo
+behind each xcframework) and the licence that project states. The three copyleft-heavy rows
+that a category summary hides are marked ●.
+
+| # | Input | Upstream project | Licence |
+|---|---|---|---|
+| 1 | Libcrypto | openssl/openssl | Apache-2.0 |
+| 2 | Libssl | openssl/openssl | Apache-2.0 |
+| 3 | gmp | gmplib.org | LGPL-3.0-or-later **or** GPL-2.0-or-later (dual) |
+| 4 | nettle | git.lysator.liu.se/nettle | LGPL-3.0-or-later **or** GPL-2.0-or-later (dual) |
+| 5 | hogweed | nettle (same tree) | LGPL-3.0-or-later **or** GPL-2.0-or-later (dual) |
+| 6 | gnutls | gitlab.com/gnutls/gnutls | LGPL-2.1-or-later (library; the tools are GPL-3.0-or-later and are not linked) |
+| 7 | Libunibreak | adah1972/libunibreak | Zlib |
+| 8 | Libfreetype | freetype/freetype | FTL (BSD-style) **or** GPL-2.0-or-later (dual) |
+| 9 | Libfribidi | fribidi/fribidi | LGPL-2.1-or-later |
+| 10 | Libharfbuzz | harfbuzz/harfbuzz | "Old MIT" |
+| 11 | Libass | libass/libass | ISC |
+| 12 | Libbluray ● | code.videolan.org/videolan/libbluray | LGPL-2.1-or-later |
+| 13 | Libuavs3d | uavs3/uavs3d | BSD-3-Clause |
+| 14 | Libdovi | quietvoid/dovi_tool | MIT |
+| 15 | MoltenVK | KhronosGroup/MoltenVK | Apache-2.0 |
+| 16 | Libshaderc_combined | google/shaderc | Apache-2.0 |
+| 17 | lcms2 | mm2/Little-CMS | MIT |
+| 18 | Libplacebo ● | haasn/libplacebo | LGPL-2.1-or-later |
+| 19 | Libdav1d | videolan/dav1d | BSD-2-Clause |
+| 20 | Libavcodec | FFmpeg n8.1.2, non-GPL assets | LGPL-2.1-or-later |
+| 21 | Libavdevice | FFmpeg n8.1.2 | LGPL-2.1-or-later |
+| 22 | Libavformat | FFmpeg n8.1.2 | LGPL-2.1-or-later |
+| 23 | Libavfilter | FFmpeg n8.1.2 | LGPL-2.1-or-later |
+| 24 | Libavutil | FFmpeg n8.1.2 | LGPL-2.1-or-later |
+| 25 | Libswresample | FFmpeg n8.1.2 | LGPL-2.1-or-later |
+| 26 | Libswscale | FFmpeg n8.1.2 | LGPL-2.1-or-later |
+| 27 | Libuchardet ● | gitlab.freedesktop.org/uchardet | MPL-1.1 **or** GPL-2.0-or-later **or** LGPL-2.1-or-later (tri) |
+| 28 | Libluajit | LuaJIT/LuaJIT | MIT |
+| 29 | Libmpv | mpv-player/mpv v0.41.0, `-Dgpl=false` | LGPL-2.1-or-later |
+
+No GPL-only component: every copyleft row is LGPL or offers an LGPL/permissive arm, so the
+dylib stays loadable from the AGPL-3.0 application. Distribution still owes the licence
+texts, the written source offer for the LGPL parts, and the relinking right (satisfied here
+because libmpv is a separate dylib loaded at run time, not statically linked into VidShrink).
+Sources: each project's own COPYING/LICENSE (read 17 Sept 2026); the GPL-postfixed MPVKit
+product (`MPVKit-GPL`) is **not** used.
 
 **Not measured.** No macOS 13 runner exists any more, so 13.0 is the load-command floor,
 not a run. Link output is not byte-reproducible (three macos-15 runs: `4b2f896d…`,
