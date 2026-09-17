@@ -126,7 +126,7 @@ public sealed class OynaticiKurulumTests
         var kurulum = Oku("install-vidshrink.sh");
         var kilit = Oku("tools", "mpvkit-macos", "mpvkit-1.0.0.lock");
 
-        var cikti = Regex.Match(kilit, @"^# output (\S+) ([0-9a-f]{64}) (\S+)$", RegexOptions.Multiline);
+        var cikti = Regex.Match(kilit, @"^# output (\S+) ([0-9a-f]{64}) (\S+)[ \t]*\r?$", RegexOptions.Multiline);
         Assert.True(cikti.Success, "kilit dosyasinda # output satiri yok");
         var ad = cikti.Groups[1].Value;
         var sha = cikti.Groups[2].Value;
