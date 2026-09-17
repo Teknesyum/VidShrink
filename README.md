@@ -165,6 +165,16 @@ output folder as `.vidshrink-izle-<hash>.json`, and failing that to the settings
 file that failed is retried once on the next start. To process everything again, delete the
 state file.
 
+Folder and file names are compared by the rule of the running system: `Ordinal` on Linux,
+`OrdinalIgnoreCase` on Windows and macOS. The macOS side of that rule assumes the default
+APFS volume, which is case-insensitive but case-preserving.
+
+APFS can also be formatted case-sensitive, and on such a volume the rule falls the wrong
+way: two case variants of one name, `Klip.mp4` and `klip.mp4`, count as a single file, so
+one of the two is never processed, and the watched folder is rejected as the output folder
+even when the two paths differ only in case. The same applies to a case-sensitive external
+volume mounted on a default machine. This case is not measured.
+
 Exit codes: `0` finished, `4` `--bir-kez` finished but at least one file failed, `1` error,
 `64` wrong usage, `130` stopped with Ctrl+C.
 

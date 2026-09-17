@@ -293,6 +293,25 @@ public sealed class WatchFolderTests
     }
 
     [Fact]
+    public void HarfDuyarliApfsSiniriBelgedeYaziyor()
+    {
+        var ingilizce = Belge("README.md");
+        Assert.Contains("`Ordinal` on Linux,\n`OrdinalIgnoreCase` on Windows and macOS.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("APFS volume, which is case-insensitive but case-preserving.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("APFS can also be formatted case-sensitive, and on such a volume the rule falls the wrong\nway: two case variants of one name, `Klip.mp4` and `klip.mp4`, count as a single file, so\none of the two is never processed", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("This case is not measured.", ingilizce, StringComparison.Ordinal);
+
+        var turkce = Belge("README.tr.md");
+        Assert.Contains("Linux'ta `Ordinal`,\nWindows ile macOS'ta `OrdinalIgnoreCase`.", turkce, StringComparison.Ordinal);
+        Assert.Contains("o bölüm harf duyarsız ama harf koruyordur.", turkce, StringComparison.Ordinal);
+        Assert.Contains("APFS harf DUYARLI da biçimlendirilebilir ve böyle bir bölümde kural yanlış tarafa düşüyor:\naynı adın iki harf varyantı, `Klip.mp4` ile `klip.mp4`, tek dosya sayılıyor, yani ikisinden\nbiri hiç işlenmiyor", turkce, StringComparison.Ordinal);
+        Assert.Contains("Bu durum ölçülmedi.", turkce, StringComparison.Ordinal);
+    }
+
+    private static string Belge(string ad) =>
+        File.ReadAllText(Path.Combine(TipSources.Root, ad)).Replace("\r\n", "\n", StringComparison.Ordinal);
+
+    [Fact]
     public void DurumDosyasiGecicidenAtomikTasinmaylaDegisiyorGeciciGerideKalmiyor()
     {
         var dir = Path.Combine(TestPaths.OutputRoot, "hb-a3-izle", $"{Guid.NewGuid():N}");

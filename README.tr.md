@@ -122,6 +122,64 @@ karşı indiriyor, diğerlerinde paket yöneticinizin komutunu yazıyor. Sağlam
 sağ tık girdisi, kendi kendini güncelleme akışı ve kaldırma anahtarları
 [`docs/kurulum.tr.md`](docs/kurulum.tr.md) içinde.
 
+## Komut satırı
+
+Aynı paket, pencerenin yanında başsız bir komut satırı aracı da taşıyor: Windows ve
+Linux'ta `vidshrink`, macOS'ta `vidshrink-cli`. Pencerenin çağırdığı karar motorunu
+çağırıyor, yani aynı girdi aynı ffmpeg argümanlarını veriyor; bir test ikisini
+karşılaştırıyor.
+
+```bash
+vidshrink kucult clip.mp4 --hedef 25MB              # boyuta küçült
+vidshrink kucult clip.mp4 --kalite 80 --kodek av1   # kalite puanına küçült
+vidshrink plan clip.mp4 --hedef 8MB --json          # yalnız plan ve argümanlar, kodlama yok
+```
+
+Anahtarlar: `--kodek auto|h264|hevc|av1`, `--cikti <yol>`, `--json`, `--olcumsuz` (yoklama
+kodlamalarını atlar), `--vmaf` (ffmpeg'de libvmaf varsa sonucu ölçer), `--hizli`. İlerleme
+stderr'e, boyut, süre, deneme sayısı ve VMAF stdout'a gidiyor. Yardım metni sistem dilini
+izliyor, Türkçe ya da İngilizce.
+
+Çıkış kodları: bantta `0`, bandın altında `2` (kalite doyduğu için daha küçük dosya
+saklandı), boy tavanı aşıldığında `3` (en küçük sonuç yine yazılıyor; JSON `output` ve
+`overTarget: true` taşıyor), hatada `1`, yanlış kullanımda `64`, iptalde `130`.
+
+### İzlenen klasör
+
+```bash
+vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB             # Ctrl+C'ye kadar koşar
+vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB --bir-kez   # klasörü boşaltır, çıkar
+```
+
+`izle`, klasöre düşen her videoyu küçültüyor. `--cikti` çıktı klasörüdür ve zorunludur;
+izlenen klasörün kendisi olamaz. `--aralik <saniye>` tarama aralığını belirliyor
+(varsayılan 2), `--bir-kez` beklenecek bir şey kalmayınca çıkıyor, `kucult`'un öbür
+anahtarları her dosyaya uygulanıyor. `--json` ile stdout NDJSON oluyor: dosya başına tek
+satır JSON nesnesi.
+
+Bir dosya, boyu ve değişiklik saati üst üste iki tarama aralığı boyunca aynı kaldığında ve
+onu tutan bir yazıcı olmadığında alınıyor — üçüncü tarama alıyor. Kodlanırken kaynak
+değişirse çıktı siliniyor ve dosya durulunca yeniden ele alınıyor.
+
+İlerleme, izlenen klasörün içindeki `.vidshrink-izle.json` dosyasında ada ve boya göre
+tutuluyor; adı ya da boyu değişen dosya yeni sayılıyor. O klasör salt okunursa durum çıktı
+klasörüne `.vidshrink-izle-<ozet>.json` olarak, o da tutmazsa ayar klasörüne yazılıyor.
+Başarısız olan dosya, bir sonraki açılışta bir kez yeniden denenir. Her şeyi yeniden
+işlemek için durum dosyasını silin.
+
+Klasör ve dosya adları koşan sistemin kuralıyla karşılaştırılıyor: Linux'ta `Ordinal`,
+Windows ile macOS'ta `OrdinalIgnoreCase`. Kuralın macOS tarafı varsayılan APFS bölümünü
+varsayıyor; o bölüm harf duyarsız ama harf koruyordur.
+
+APFS harf DUYARLI da biçimlendirilebilir ve böyle bir bölümde kural yanlış tarafa düşüyor:
+aynı adın iki harf varyantı, `Klip.mp4` ile `klip.mp4`, tek dosya sayılıyor, yani ikisinden
+biri hiç işlenmiyor; iki yol yalnız harf durumunda ayrılsa bile izlenen klasör çıktı
+klasörü olarak reddediliyor. Varsayılan bir makineye bağlanan harf duyarlı dış bölüm için
+de aynısı geçerli. Bu durum ölçülmedi.
+
+Çıkış kodları: bittiğinde `0`, `--bir-kez` bitip en az bir dosya başarısız olduğunda `4`,
+hatada `1`, yanlış kullanımda `64`, Ctrl+C ile durdurulduğunda `130`.
+
 ## Sayılar
 
 Burada arama tablosu yok. *Ölç* diyen her adım, karar verilmeden önce ffmpeg'i gerçek
