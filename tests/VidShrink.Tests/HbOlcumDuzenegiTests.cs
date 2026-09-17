@@ -256,7 +256,7 @@ public sealed class HbOlcumDuzenegiTests
 
     private static double OzetSabiti(string ad)
     {
-        var m = Regex.Match(Ozetleyici, $@"^{ad} = ([\d.]+)$", RegexOptions.Multiline);
+        var m = Regex.Match(Ozetleyici, $@"^{ad} = ([\d.]+)\s*$", RegexOptions.Multiline);
         Assert.True(m.Success, $"{ad} bulunamadi.");
         return double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
     }
