@@ -13,6 +13,20 @@ Dal `t0/yol-b-kabuk`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md`
    Ayarlar sekmesini tarar, negatif kontrol iki seçenekli kutuyu yakalar.
 6. **S20.** Başsız pencerede TR ve EN açıkça seçilir, her sekmede metin ölçüsü > kutu taraması; bulunanlar düzeltilir.
 
+# Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
+
+Dal `t0/yol-c-kaydedici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 2., 6., 7. bölüm (9-11).
+
+1. **R10/R14.** `RecorderView.axaml` sonuç paneli: "Küçült'e gönder" ilk sırada `PrimaryButton`, "Klasörü göster"
+   ve "Paylaş" `GhostButton`. Test: başsız çizimden düğme pikseli, palet fırçası `NeonBlue` ile kıyas; negatif kontrol eşit tema.
+2. **R15.** Paylaş düğmesine ham fare tıkı, sahte sağlayıcıyla `ShareFlow`'dan geçen yol ve ekrandaki bağlantı geri okunur.
+3. **R2 Core.** `RecorderRequest.WindowRegion` + `RecorderArguments.WindowCrop`: macOS pencere dikdörtgeni avfoundation
+   ekranından `crop`; dikdörtgensiz macOS pencere isteği yine reddedilir.
+4. **R2 App.** `RecorderWindowsX11.cs` (`xwininfo -root -tree` ayrıştırıcı, yoksa libX11 `_NET_CLIENT_LIST`; Wayland reddi),
+   `RecorderWindowsMac.cs` (CGWindowList). `RecorderView` başlığı kimliğe/dikdörtgene çözer, Linux'ta `DISPLAY`'i geçirir.
+   İki yeni anahtar 42 dilde, `BiciminTests` sayımı.
+5. **CI.** `ci.yml`'e ubuntu işi: Xvfb + xlogo, `_NET_CLIENT_LIST` elle, filtreli test x11grab 2 sn + ffprobe.
+6. **Belge.** `docs/plan-kaydedici-dalgalari.md` durum sütunu kanıt testleriyle.
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.

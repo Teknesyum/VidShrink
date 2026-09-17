@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using VidShrink.Core;
 
 namespace VidShrink.App.Recorder;
 
@@ -23,7 +24,39 @@ internal static class RecorderWindows
             .ToList();
 
     internal static IReadOnlyList<string> Titles()
-        => OperatingSystem.IsWindows() ? Pick(Enumerate(), Environment.ProcessId) : Array.Empty<string>();
+        => OperatingSystem.IsWindows()
+            ? Pick(Enumerate(), Environment.ProcessId)
+            : Desktop().Select(w => w.Title).Distinct(StringComparer.Ordinal).ToList();
+
+    internal static IReadOnlyList<DesktopWindow> Desktop()
+        => OperatingSystem.IsMacOS() ? RecorderWindowsMac.List()
+            : OperatingSystem.IsLinux() && !RecorderWindowsX11.IsWayland(Environment.GetEnvironmentVariable) ? RecorderWindowsX11.List()
+            : Array.Empty<DesktopWindow>();
+
+    internal static DesktopWindow? Find(string title)
+        => Desktop().FirstOrDefault(w => string.Equals(w.Title, title, StringComparison.Ordinal));
+
+    /// <summary>
+    /// macOS: pencerenin nokta dikdörtgenini en çok örtüştüğü ekranın piksel karesine çevirir.
+    /// Ekranlar piksel sınırı ve ölçeğiyle verilir; dönen indeks o ekranın <c>avfoundation</c> sırası.
+    /// </summary>
+    internal static (int Screen, RecorderRegion Crop)? MacCrop(DesktopWindow window, IReadOnlyList<(ScreenBounds Bounds, double Scale)> screens)
+    {
+        (int, RecorderRegion)? best = null;
+        var bestArea = 0L;
+        for (var i = 0; i < screens.Count; i++)
+        {
+            var (b, scale) = screens[i];
+            if (!(scale > 0)) continue;
+            var crop = RecorderArguments.WindowCrop(window.X, window.Y, window.Width, window.Height,
+                b.X / scale, b.Y / scale, b.Width / scale, b.Height / scale, scale);
+            if (crop is null || (long)crop.Width * crop.Height <= bestArea) continue;
+            bestArea = (long)crop.Width * crop.Height;
+            best = (i, crop);
+        }
+
+        return best;
+    }
 
     private static List<WindowEntry> Enumerate()
     {

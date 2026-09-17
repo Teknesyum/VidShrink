@@ -659,7 +659,7 @@ public sealed class BaslikKapsamiTests
     /// HandBrake 1c dalgasi main.advanced.keep-tracks.label'i ekledi: 43 x 742 = 31906'dan 43 x 743 = 31949'a;
     /// iz kararlarinin sekiz gerekce notu (main.reason.stream.*) 43 x 751 = 32293'e, kol degistiren toplami 1218'den 1260'a (en 139'dan 143'e, tr 52'den 56'ya). Birlesik: gezilen 33067, toplam 1295 (en 152, tr 58).
     /// Paket 2 kaydedicisi 80 recorder.* anahtari ekledi (Basit/Gelismis, geri sayim, cerceve, tepsi, kisayol, girdi gosterimi, webcam, buyutec ve gelismis panelin on kolu): 43 x 80 = 3440, gezilen 36507; kol degistiren toplami 1406 (en 160, tr 59).
-    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). P3 menunun sekmeye goturen satirini kaldirinca main.player.menu.settings-all dustu: 43 x 1 = 43, gezilen 37496; kol degistiren toplami 1440 (pt settings-all gitti; en 166, tr 59). S9 on birim anahtari ekledi (main.unit.*, main.plan.ai, main.plan.mode.crf-value): 43 x 10 = 430, gezilen 37926; kol degistiren toplami 1442 (de ve nb main.plan.ai KI; en 166, tr 59).</para>
+    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). P3 menunun sekmeye goturen satirini kaldirinca main.player.menu.settings-all dustu: 43 x 1 = 43, gezilen 37496; kol degistiren toplami 1440 (pt settings-all gitti; en 166, tr 59). S9 on birim anahtari ekledi (main.unit.*, main.plan.ai, main.plan.mode.crf-value): 43 x 10 = 430, gezilen 37926; kol degistiren toplami 1442 (de ve nb main.plan.ai KI; en 166, tr 59). Main'le birlesince kaydedici pencere secicisinin iki recorder.error.* anahtari (window-wayland, window-missing) geldi: 43 x 2 = 86, gezilen 38012; kol degistiren toplami 1442'de kaldi (en 166, tr 59).</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -687,7 +687,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(37926, gezilen);
+        Assert.Equal(38012, gezilen);
         Assert.Empty(kayip);
     }
 

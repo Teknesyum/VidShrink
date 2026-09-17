@@ -54,7 +54,9 @@ internal partial class RecorderView
         return _shareTargets.DefaultTarget;
     }
 
-    private ShareFlow Share() => _shareFlow ??= new ShareFlow(target =>
+    internal Func<ShareFlow>? CreateShareFlow { get; set; }
+
+    private ShareFlow Share() => _shareFlow ??= CreateShareFlow?.Invoke() ?? new ShareFlow(target =>
         CoreShare.ShareProviderFactory.Create(
             target,
             _shareTransport ??= new CoreShare.HttpClientTransport(),
