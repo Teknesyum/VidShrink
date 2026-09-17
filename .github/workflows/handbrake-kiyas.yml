@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       isler:
-        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,tavanbekci,svtbant,turboilk,socialkodek,vtara,vthizli,yavg,karanlikgecis,handbrakecli,handbrakecli-svt,filtre
+        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,tavanbekci,svtbant,turboilk,socialkodek,vtara,vthizli,yavg,karanlikgecis,handbrakecli,handbrakecli-svt,filtre,butceilk
         default: handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
       kesitler:
         description: handbrake isinin kesitleri
@@ -94,6 +94,7 @@ jobs:
             karanlikgecis = @('karanlik', 'parlak', 'hareketli', 'ekran')
             handbrakecli = @('karanlik', 'parlak', 'hareketli', 'ekran')
             'handbrakecli-svt' = @('karanlik', 'parlak', 'hareketli', 'ekran')
+            butceilk = @('karanlik', 'parlak', 'hareketli', 'ekran')
             filtre = @('karanlik', 'parlak', 'hareketli')
           }
           $liste = @()
@@ -181,7 +182,7 @@ jobs:
       - name: bench derle
         run: dotnet build tools/VidShrink.Bench -c Release -m:2
       - name: cli derle
-        if: inputs.urun_yolu == 'cli' || startsWith(matrix.is, 'handbrakecli')
+        if: inputs.urun_yolu == 'cli' || startsWith(matrix.is, 'handbrakecli') || matrix.is == 'butceilk'
         run: |
           $ErrorActionPreference = 'Stop'
           if (-not (Test-Path '${{ inputs.cli_proje }}')) { throw 'CLI projesi bu commit''te yok: ${{ inputs.cli_proje }}' }

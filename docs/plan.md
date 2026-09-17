@@ -1,3 +1,22 @@
+# Bütçe Doldurmanın İkinci Tam Kodlaması ve B5 İlk-Deneme Ölçümü
+
+Dal `t0/butce-ikinci-kodlama`. Soru iki başlıkta aynı kökten: ürünün bütçe arama
+döngüsü kaç tam kodlama koşuyor ve B5 hız oranının ne kadarı bu döngüden geliyor.
+
+Mevcut ölçüm bunu yanıtlayamıyor: `EncodeAttempt` deneme başına süre tutmuyor,
+CLI JSON izinde yalnız dal, kbit ve MB var. Ölçülecek sayı henüz üretilmiyor.
+
+1. **Deneme süresi.** `EncodeRunner`: `EncodeAttempt`'e `Seconds`; döngüde zaten
+   duran `attemptClock` her iz satırına yazılır, bütçe doldurma kolunun kendi saati olur.
+2. **JSON.** `CliApp`: izde `seconds` alanı.
+3. **Düzenek.** `hb.ps1`: `UrunCli` izden `IlkDenemeSn`, `DenemeSnToplami`,
+   `OlcumDisiSn` türetir. Yeni `butceilk` kolu her kesit ve kbit için ürün
+   `--kodek x265`, ürün `--kodek h264` ve eş baytlı HandBrake x265 koşar;
+   kapı satırında toplam oran ile ilk-deneme oranı yan yana. Kalite ölçülmez.
+4. **CI.** `handbrake-kiyas.yml`'de `butceilk` işi.
+5. **Pim.** `HbOlcumDuzenegiTests`: kolun sabitleri ve kapı oranı.
+6. **Belge.** `docs/olcumler/butce-ikinci-kodlama.md`. Hüküm sayı geldikten sonra yazılır.
+
 # macOS 13-14 — MPVKit Denemesi
 
 Dal `t0/macos-mpvkit`. Karar: fable 2026-09-17 soru 5. Kod (`src/`) değişmez.

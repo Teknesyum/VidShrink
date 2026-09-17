@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci', 'tavanbekci', 'svtbant', 'yavg', 'karanlikgecis', 'vthizli', 'handbrakecli', 'handbrakecli-svt', 'filtre')][string]$Is,
+    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci', 'tavanbekci', 'svtbant', 'yavg', 'karanlikgecis', 'vthizli', 'handbrakecli', 'handbrakecli-svt', 'filtre', 'butceilk')][string]$Is,
     [Parameter(Mandatory)][string]$Cikti,
     [Parameter(Mandatory)][string]$Bench,
     [string]$Kesit = '',
@@ -1456,14 +1456,14 @@ function KaranlikGecis {
 
 $script:CliKapi = [ordered]@{ vmafneg_bant = -0.3; xpsnr_bant = -0.2; karanlik_psnr_taban = -0.5; cambi_tavan = 1.0; bayt_sapma_yuzde = 2.0; hiz_orani_tavan = 1.0 }
 
-function UrunCli([string]$Girdi, [double]$Mb, [string]$Ad) {
+function UrunCli([string]$Girdi, [double]$Mb, [string]$Ad, [string[]]$Ek = @()) {
     if (-not $Cli) { throw 'handbrakecli icin -Cli gerekli.' }
     $klasor = Join-Path $Cikti $Ad
     New-Item -ItemType Directory -Force $klasor | Out-Null
     $cikis = Join-Path $klasor 'cikti.mp4'
     $json = Join-Path $Cikti "$Ad.json.txt"
     $log = Join-Path $Cikti "$Ad.log"
-    $a = @('kucult', $Girdi, '--hedef', $Mb.ToString('0.####', $Inv), '--cikti', $cikis, '--json')
+    $a = @('kucult', $Girdi, '--hedef', $Mb.ToString('0.####', $Inv), '--cikti', $cikis, '--json') + $Ek
     "cli: $Cli $($a -join ' ')" | Out-File $log
     $sure = [Diagnostics.Stopwatch]::StartNew()
     if ($Cli.EndsWith('.dll')) { & dotnet $Cli @a 2>> $log > $json } else { & $Cli @a 2>> $log > $json }
@@ -1478,6 +1478,7 @@ function UrunCli([string]$Girdi, [double]$Mb, [string]$Ad) {
         if ($args2[$i] -eq '-preset') { $preset = $args2[$i + 1] }
         if ($args2[$i] -eq '-pix_fmt') { $pix = $args2[$i + 1] }
     }
+    $iz = IzSureleri $j.result.trace ([double]$j.result.elapsedSeconds)
     [pscustomobject]@{
         Dosya = $j.result.output; CikisKodu = $cikisKodu
         ToplamSn = [math]::Round($sure.Elapsed.TotalSeconds, 1); KodlamaSn = [math]::Round([double]$j.result.elapsedSeconds, 1)
@@ -1486,7 +1487,23 @@ function UrunCli([string]$Girdi, [double]$Mb, [string]$Ad) {
         Deneme = $j.result.attempts; AltBant = $j.result.underBand; TavanAsildi = $j.result.ceilingExceeded; Tasma = $j.result.overTarget
         Olculdu = $j.measured
         Dallar = ((@($j.result.trace) | ForEach-Object { "$($_.number):$($_.branch):$($_.videoBitrateK)k:$($_.aimMb)->$($_.actualMb)" }) -join ' | ')
+        IlkDenemeSn = $iz.Ilk; DenemeSnToplami = $iz.Toplam; OlcumDisiSn = $iz.Disi; DenemeSureleri = $iz.Metin; DenemeSnEksik = $iz.Eksik
         Komut = $j.commandLine
+    }
+}
+
+function IzSureleri($Trace, [double]$KodlamaSn) {
+    $ler = @($Trace)
+    $sn = @($ler | ForEach-Object { if ($null -eq $_.seconds) { $null } else { [double]$_.seconds } })
+    $eksik = ($ler.Count -eq 0) -or (@($sn | Where-Object { $null -eq $_ }).Count -gt 0)
+    if ($eksik) { return [pscustomobject]@{ Ilk = $null; Toplam = $null; Disi = $null; Metin = $null; Eksik = $true } }
+    $toplam = ($sn | Measure-Object -Sum).Sum
+    [pscustomobject]@{
+        Ilk = [math]::Round($sn[0], 1)
+        Toplam = [math]::Round($toplam, 1)
+        Disi = [math]::Round($KodlamaSn - $toplam, 1)
+        Metin = (($ler | ForEach-Object { "$($_.number):$([math]::Round([double]$_.seconds, 1))sn" }) -join ' | ')
+        Eksik = $false
     }
 }
 
@@ -1510,6 +1527,78 @@ function HbSvtArg($b, [string]$Preset, [string]$Pix) {
 }
 
 function Fark($a, $b) { if ($null -eq $a -or $null -eq $b) { $null } else { [math]::Round([double]$a - [double]$b, 4) } }
+
+$script:ButceKodekleri = [ordered]@{ x265 = 'libx265'; h264 = 'libx264' }
+
+function ButceIlk {
+    $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"
+    $b = Probe $girdi
+    foreach ($kbit in @($Kbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
+        $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
+        $script:bu = @{}
+        foreach ($ad in $script:ButceKodekleri.Keys) {
+            $beklenen = $script:ButceKodekleri[$ad]
+            Dene $Kesit "urun-$ad" $kbit {
+                $u = UrunCli $girdi $mb "butce-$Kesit-$kbit-$ad" @('--kodek', $ad)
+                $kbps = Kbps $u.Dosya
+                $script:bu[$ad] = [pscustomobject]@{ U = $u; Kbps = $kbps }
+                Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = "urun-$ad"; istenen_kbit = $kbit }) $null ([ordered]@{
+                    urun_yolu = 'cli'; hedef_mb = $mb; cli_cikis = $u.CikisKodu; zorlanan_kodek = $ad; beklenen_kodek = $beklenen
+                    kodlayici = $u.Kodlayici; kodek_tuttu = ($u.Kodlayici -eq $beklenen); preset = $u.Preset; mod = $u.Mod
+                    geometri = $u.Geometri; cikti_kbps = $kbps; kodlama_sn = $u.KodlamaSn; toplam_sn = $u.ToplamSn
+                    deneme = $u.Deneme; deneme_sureleri = $u.DenemeSureleri; deneme_sn_eksik = $u.DenemeSnEksik
+                    ilk_deneme_sn = $u.IlkDenemeSn; deneme_sn_toplami = $u.DenemeSnToplami; olcum_disi_sn = $u.OlcumDisiSn
+                    alt_bant = $u.AltBant; tavan_asildi = $u.TavanAsildi; tasma = $u.Tasma; olculdu = $u.Olculdu
+                    dallar = $u.Dallar; komut = $u.Komut })
+                Remove-Item $u.Dosya
+            }
+        }
+        if (-not $script:bu['x265']) { continue }
+        $hk = $script:bu['x265'].Kbps
+        $script:bhx = $null
+        Dene $Kesit 'handbrake' $kbit {
+            $c = Join-Path $Cikti "butce-$Kesit-$kbit-handbrake.mkv"
+            $h = HbEsBayt $girdi $c $hk (HbTemel $b)
+            $script:bhx = $h
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'handbrake'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 x265 slow 2 gecis turbo' }) $null (HbOrtak $h $hk)
+            Remove-Item $c
+        }
+        if (-not $script:bhx) { continue }
+        $k = $script:CliKapi
+        $s = [ordered]@{ is = $Is; kesit = $Kesit; kol = 'kapi'; istenen_kbit = $kbit; kapi = "hiz_orani_tavan=$($k.hiz_orani_tavan) bayt_sapma_yuzde=$($k.bayt_sapma_yuzde)" }
+        $s.hb_sn = $script:bhx.Sn
+        $s.hb_bayt_sapma_yuzde = $script:bhx.Sapma
+        $s.es_bayt = [math]::Abs($script:bhx.Sapma) -le $k.bayt_sapma_yuzde
+        foreach ($ad in $script:ButceKodekleri.Keys) {
+            $r = $script:bu[$ad]
+            if (-not $r) { continue }
+            $u = $r.U
+            $s["${ad}_kodlayici"] = $u.Kodlayici
+            $s["${ad}_deneme"] = $u.Deneme
+            $s["${ad}_deneme_sureleri"] = $u.DenemeSureleri
+            $s["${ad}_kodlama_sn"] = $u.KodlamaSn
+            $s["${ad}_toplam_sn"] = $u.ToplamSn
+            $s["${ad}_ilk_deneme_sn"] = $u.IlkDenemeSn
+            $s["${ad}_deneme_sn_toplami"] = $u.DenemeSnToplami
+            $s["${ad}_olcum_disi_sn"] = $u.OlcumDisiSn
+            $s["${ad}_oran_toplam"] = [math]::Round($u.ToplamSn / $script:bhx.Sn, 3)
+            $s["${ad}_oran_kodlama"] = [math]::Round($u.KodlamaSn / $script:bhx.Sn, 3)
+            $s["${ad}_b5_toplam"] = $s["${ad}_oran_toplam"] -le $k.hiz_orani_tavan
+            if ($null -ne $u.IlkDenemeSn) {
+                $s["${ad}_oran_ilk_deneme"] = [math]::Round($u.IlkDenemeSn / $script:bhx.Sn, 3)
+                $s["${ad}_b5_ilk_deneme"] = $s["${ad}_oran_ilk_deneme"] -le $k.hiz_orani_tavan
+                if ($u.Deneme -gt 1 -and $u.DenemeSnToplami -gt 0) {
+                    $s["${ad}_ek_deneme_sn"] = [math]::Round($u.DenemeSnToplami - $u.IlkDenemeSn, 1)
+                    $s["${ad}_ek_deneme_payi_yuzde"] = [math]::Round(($u.DenemeSnToplami - $u.IlkDenemeSn) / $u.ToplamSn * 100, 1)
+                } else {
+                    $s["${ad}_ek_deneme_sn"] = 0.0
+                    $s["${ad}_ek_deneme_payi_yuzde"] = 0.0
+                }
+            }
+        }
+        Ekle $s $null $null
+    }
+}
 
 function HandbrakeCli {
     $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"
@@ -1572,6 +1661,15 @@ function HandbrakeCli {
             $s.hiz_orani_x265_toplam = [math]::Round($script:cu.ToplamSn / $script:hx.Sn, 3)
             $s.hiz_orani_x265_kodlama = [math]::Round($script:cu.KodlamaSn / $script:hx.Sn, 3)
             $s.b5_x265 = $s.hiz_orani_x265_toplam -le $k.hiz_orani_tavan
+            $s.deneme = $script:cu.Deneme
+            $s.deneme_sureleri = $script:cu.DenemeSureleri
+            $s.ilk_deneme_sn = $script:cu.IlkDenemeSn
+            $s.deneme_sn_toplami = $script:cu.DenemeSnToplami
+            $s.olcum_disi_sn = $script:cu.OlcumDisiSn
+            if ($null -ne $script:cu.IlkDenemeSn) {
+                $s.hiz_orani_x265_ilk_deneme = [math]::Round($script:cu.IlkDenemeSn / $script:hx.Sn, 3)
+                $s.b5_x265_ilk_deneme = $s.hiz_orani_x265_ilk_deneme -le $k.hiz_orani_tavan
+            }
             if ($script:no) { $s.negatif_ayirdi = ($script:hxo.vmafneg_ort - $script:no.vmafneg_ort) -gt [math]::Abs($k.vmafneg_bant) }
         }
         if ($script:hs) {
@@ -1729,6 +1827,7 @@ function Filtre {
 }
 
 switch ($Is) {
+    'butceilk' { ButceIlk }
     'handbrakecli' { HandbrakeCli }
     'handbrakecli-svt' { HandbrakeCliSvt }
     'filtre' { Filtre }

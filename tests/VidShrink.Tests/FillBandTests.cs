@@ -428,6 +428,13 @@ public sealed class FillBandTests
                 Assert.NotNull(underBandRetries[1].MeasuredEfficiency);
             Assert.DoesNotContain(result.Trace ?? Array.Empty<EncodeAttempt>(), a => a.Branch == "over ceiling");
             Assert.True(result.OutputMb <= 5, $"The hard ceiling must hold, got {result.OutputMb:0.00} MB.");
+
+            var iz = (result.Trace ?? Array.Empty<EncodeAttempt>()).ToList();
+            Assert.True(iz.Count > 1, $"Expected more than one trace entry, got {iz.Count}.");
+            Assert.All(iz, a => Assert.True(a.Seconds > 0.0,
+                $"attempt {a.Number} ({a.Branch}) carries no duration: {a.Seconds}"));
+            Assert.True(iz.Sum(a => a.Seconds) > iz[0].Seconds,
+                "The later attempts did not add to the measured attempt time.");
         }
         finally { try { Directory.Delete(dir, recursive: true); } catch { } }
     }
