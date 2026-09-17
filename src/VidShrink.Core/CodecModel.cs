@@ -149,6 +149,11 @@ public static class CodecModel
         _ => false
     };
 
+    public static bool SinglePassRateControl(string codec)
+        => IsHardware(codec) || Vendor(codec) == EncoderVendor.VideoToolbox;
+
+    public static bool TakesPreset(string codec) => Vendor(codec) != EncoderVendor.VideoToolbox;
+
     private readonly record struct TurboFirstPassEntry(string Ceiling, bool Safe, string? FirstPassParams = null);
 
     /// <summary>

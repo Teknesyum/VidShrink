@@ -28,11 +28,56 @@ public sealed class CodecModelTests
         Assert.Equal(CodecModel.MinBitrateK(softwareTwin, 1920, 1080, 60), CodecModel.MinBitrateK(codec, 1920, 1080, 60));
         Assert.NotEqual(CodecModel.MinBitrateK(hardwareTwin, 1920, 1080, 60), CodecModel.MinBitrateK(codec, 1920, 1080, 60));
 
-        Assert.Equal(FfmpegArguments.NeedsTwoPasses(softwareTwin), FfmpegArguments.NeedsTwoPasses(codec));
-        Assert.NotEqual(FfmpegArguments.NeedsTwoPasses(hardwareTwin), FfmpegArguments.NeedsTwoPasses(codec));
+        Assert.NotEqual(FfmpegArguments.NeedsTwoPasses(softwareTwin), FfmpegArguments.NeedsTwoPasses(codec));
+        Assert.Equal(FfmpegArguments.NeedsTwoPasses(hardwareTwin), FfmpegArguments.NeedsTwoPasses(codec));
 
         Assert.Equal(CodecModel.CostsQualityInHardware(softwareTwin), CodecModel.CostsQualityInHardware(codec));
         Assert.NotEqual(CodecModel.CostsQualityInHardware(hardwareTwin), CodecModel.CostsQualityInHardware(codec));
+    }
+
+    private static MediaInfo Source() => new()
+    {
+        FilePath = "in.mp4",
+        FileSizeBytes = 40_000_000,
+        DurationSeconds = 60,
+        Width = 1920,
+        Height = 1080,
+        Fps = 30,
+        VideoCodec = "h264",
+        TotalBitrateBps = 5_000_000
+    };
+
+    private static EncodePlan TwoPassPlan(string codec) => new()
+    {
+        Codec = codec,
+        Mode = "2pass",
+        VideoBitrateK = 2000,
+        Width = 1920,
+        Height = 1080,
+        Fps = 30,
+        Preset = "slow",
+        PixelFormat = "yuv420p",
+        AudioCodec = "aac",
+        AudioBitrateK = 128
+    };
+
+    [Theory]
+    [InlineData("hevc_videotoolbox", true)]
+    [InlineData("h264_videotoolbox", true)]
+    [InlineData("libx265", false)]
+    [InlineData("libx264", false)]
+    [InlineData("libsvtav1", false)]
+    public void VideoToolboxRunsOnceWithoutPresetOrPassFlags(string codec, bool videoToolbox)
+    {
+        var single = FfmpegArguments.Build(Source(), TwoPassPlan(codec), "out.mp4", 0, null);
+
+        Assert.Equal(videoToolbox, CodecModel.SinglePassRateControl(codec));
+        Assert.Equal(!videoToolbox, FfmpegArguments.NeedsTwoPasses(codec));
+        Assert.Equal(!videoToolbox, CodecModel.TakesPreset(codec));
+        Assert.Equal(!videoToolbox, single.Contains("-preset"));
+        Assert.DoesNotContain("-pass", single);
+        Assert.Contains("-b:v", single);
+        Assert.False(CodecModel.IsHardware(codec));
     }
 
     [Theory]
