@@ -53,7 +53,7 @@ static void PrintUsage()
     Console.WriteLine("  bench container-unit <kaynak,...> [--start 5] [--fps 12,24,30,60] [--out .calisma/kap]");
     Console.WriteLine("  bench search-cost [--runs 5]");
     Console.WriteLine("  bench peak-curve <kaynak> [--codec hevc_nvenc] [--ratios 3,5,8,12] [--peaks 1.02,1.1,1.25,1.5] [--out .calisma/tepe]");
-    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--codec-preference auto|compatible|maxcompression|fast] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
+    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--lock-codec hevc_nvenc] [--codec-preference auto|compatible|maxcompression|fast] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench bar-burst [tekrar]");
     Console.WriteLine("  bench psy-args <kodlayıcı>");
@@ -578,6 +578,7 @@ static async Task<int> ShrinkAsync(string[] args)
     var allowResolutionDrop = true;
     var allowFpsDrop = true;
     string? forceCodec = null;
+    string? lockCodec = null;
     var codecPreference = CodecPreference.Auto;
     var widePeak = false;
     var planOnly = false;
@@ -607,6 +608,9 @@ static async Task<int> ShrinkAsync(string[] args)
                 break;
             case "--no-fps-drop":
                 allowFpsDrop = false;
+                break;
+            case "--lock-codec" when i + 1 < args.Length:
+                lockCodec = args[++i];
                 break;
             case "--force-codec" when i + 1 < args.Length:
                 forceCodec = args[++i];
@@ -683,7 +687,8 @@ static async Task<int> ShrinkAsync(string[] args)
             FillPolicy = fillPolicy,
             SpeedMode = speedMode,
             AllowResolutionDrop = allowResolutionDrop,
-            AllowFpsDrop = allowFpsDrop
+            AllowFpsDrop = allowFpsDrop,
+            LockedCodec = lockCodec
         };
         var planWatch = Stopwatch.StartNew();
         var profile = complexity;

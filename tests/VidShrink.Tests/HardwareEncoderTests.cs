@@ -119,6 +119,38 @@ public sealed class HardwareEncoderTests
         Assert.True(hwaccel < args.IndexOf("-i"));
     }
 
+    [Theory]
+    [InlineData("ffv1")]
+    [InlineData("prores")]
+    [InlineData("utvideo")]
+    public void IntraOnlySourceIsDecodedWithoutHardwareAcceleration(string sourceCodec)
+    {
+        var info = SampleInfo() with { VideoCodec = sourceCodec };
+
+        foreach (var codec in new[] { "hevc_nvenc", "libx264" })
+        {
+            var args = FfmpegArguments.Build(info, TwoPassPlan(codec), "out.mp4", 0, null);
+
+            Assert.DoesNotContain("-hwaccel", args);
+            Assert.Equal(info.FilePath, args[args.IndexOf("-i") + 1]);
+        }
+    }
+
+    [Theory]
+    [InlineData("h264")]
+    [InlineData("hevc")]
+    [InlineData("av1")]
+    [InlineData("vp9")]
+    public void DeliverySourceKeepsHardwareDecode(string sourceCodec)
+    {
+        var args = FfmpegArguments.Build(SampleInfo() with { VideoCodec = sourceCodec }, TwoPassPlan("hevc_nvenc"), "out.mp4", 0, null);
+
+        var hwaccel = args.IndexOf("-hwaccel");
+        Assert.True(hwaccel >= 0);
+        Assert.Equal("auto", args[hwaccel + 1]);
+        Assert.Equal(hwaccel + 2, args.IndexOf("-i"));
+    }
+
     [Fact]
     public void NeedsTwoPassesSeparatesHardwareFromSoftware()
     {

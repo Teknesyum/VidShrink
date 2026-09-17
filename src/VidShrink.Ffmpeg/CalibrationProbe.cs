@@ -231,7 +231,7 @@ public static class CalibrationProbe
     private static async Task<Sample> SampleAsync(MediaInfo info, EncodePlan draft, SampleWindow window, double crf, SpeedMode speed, CancellationToken ct)
     {
         var args = new List<string> { "-hide_banner", "-nostdin" };
-        if (speed == SpeedMode.Fast) args.AddRange(new[] { "-hwaccel", "auto" });
+        if (speed == SpeedMode.Fast) args.AddRange(FfmpegArguments.HardwareDecodeArgs(info.VideoCodec));
         args.AddRange(TrimArgs(window));
         args.AddRange(new[] { "-i", info.FilePath, "-an", "-sn", "-dn" });
 

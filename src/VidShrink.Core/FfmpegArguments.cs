@@ -382,9 +382,22 @@ public static class FfmpegArguments
     public static bool IsValidPreset(string codec, string preset)
         => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
 
+    private static readonly HashSet<string> HardwareDecodedCodecs = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "h264", "hevc", "av1", "vp9", "vp8", "mpeg1video", "mpeg2video", "mpeg4", "vc1", "wmv3"
+    };
+
+    public static bool BenefitsFromHardwareDecode(string? videoCodec)
+        => videoCodec is not null && HardwareDecodedCodecs.Contains(videoCodec);
+
+    public static IReadOnlyList<string> HardwareDecodeArgs(string? videoCodec)
+        => BenefitsFromHardwareDecode(videoCodec) ? new[] { "-hwaccel", "auto" } : Array.Empty<string>();
+
     public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix, IEncoderAvailability? availability = null, SceneMap? scenes = null)
     {
-        var a = new List<string> { "-hide_banner", "-y", "-hwaccel", "auto", "-i", info.FilePath };
+        var a = new List<string> { "-hide_banner", "-y" };
+        a.AddRange(HardwareDecodeArgs(info.VideoCodec));
+        a.AddRange(new[] { "-i", info.FilePath });
 
         var filters = new List<string>();
         if (plan.Width != info.Width || plan.Height != info.Height)
