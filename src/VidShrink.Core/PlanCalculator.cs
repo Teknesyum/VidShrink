@@ -354,7 +354,7 @@ public static class PlanCalculator
         }
 
         var band = FillBand.For(effectiveTargetMb);
-        var aimMb = RetryAimMb(effectiveTargetMb, null);
+        var aimMb = FirstAimMb(effectiveTargetMb, codec);
 
         if (hdr.PolicyChanged)
         {
@@ -1048,6 +1048,11 @@ public static class PlanCalculator
         MinFps = options.MinFps,
         EncoderPath = options.EncoderPath
     };
+
+    public static double FirstAimMb(double targetMb, string codec)
+        => CodecModel.Vendor(codec) == EncoderVendor.Nvenc
+            ? BudgetFill.Aim * targetMb
+            : RetryAimMb(targetMb, null);
 
     public static double RetryAimMb(double targetMb, double? measuredEfficiency)
     {

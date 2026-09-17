@@ -162,7 +162,7 @@ public sealed class SpeedModeTests
     [Fact]
     public void UncalibratedHardwarePlanRaisesTheTwoPassTargetAndExplainsIt()
     {
-        var availability = new FakeAvailability("libx264", "av1_nvenc");
+        var availability = new FakeAvailability("libx264", "av1_qsv");
         var info = SampleInfo();
         var options = new PlanOptions
         {
