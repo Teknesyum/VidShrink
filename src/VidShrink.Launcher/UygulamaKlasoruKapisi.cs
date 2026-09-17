@@ -67,23 +67,20 @@ internal static class UygulamaKlasoruKapisi
         var kosanlar = new List<Process>();
         foreach (var surec in Process.GetProcessesByName(UygulamaSurecAdi))
         {
-            var bizim = false;
-            if (surec.Id != Environment.ProcessId)
-            {
-                try
-                {
-                    bizim = KlasordenMi(surec.MainModule?.FileName, klasor);
-                }
-                catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
-                {
-                    bizim = false;
-                }
-            }
-
-            if (bizim) kosanlar.Add(surec);
+            if (Bizim(surec.Id, () => surec.MainModule?.FileName, klasor)) kosanlar.Add(surec);
             else surec.Dispose();
         }
         return kosanlar;
+    }
+
+    internal static bool Bizim(int pid, Func<string?> yolu, string klasor)
+    {
+        if (pid == Environment.ProcessId) return false;
+        try { return KlasordenMi(yolu(), klasor); }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
+        {
+            return false;
+        }
     }
 
     internal static bool KlasordenMi(string? dosya, string klasor) =>

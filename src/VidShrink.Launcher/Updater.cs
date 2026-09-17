@@ -27,8 +27,11 @@ namespace VidShrink.Launcher;
 ///
 /// Bekleme ve kurulum <see cref="KurulumBekleyeni"/> içinde: klasör başına tek arka plan
 /// bekleyeni olur, ikinci açılış indirmez de beklemez. Sürüm zaten kuruluysa kurulum
-/// sessizce atlanır, hata işareti yazılmaz. Elle "Yükle" yolu başka kopya açıksa kısa
-/// bekler ve bırakır.
+/// sessizce atlanır, hata işareti yazılmaz: kurulu sürüm sahnenin sürümüne eşit ya da
+/// ondan yeniyse tur eskiye düşürmez. Elle "Yükle" yolu da aynı yuvayı yokluyor ve her
+/// beklemesi kısa: yuva 3 sn, kilitler 20 sn, klasörün boşalması 10 sn, indirme
+/// <see cref="ElleButcesi"/>. Arka plan turu inerken elle yol dakikalarca bloke olup
+/// uygulamanın açılışını geciktiremez; vazgeçer, uygulama açılır, iş arka plan turuna kalır.
 /// </summary>
 internal static class Updater
 {
@@ -46,6 +49,14 @@ internal static class Updater
     /// </summary>
     private const int Lanes = UpdateStaging.LauncherLanes;
 
+    /// <summary>
+    /// Elle "Yükle" yolunun indirme bütçesi. Bu çağrı uygulamayı doğurmadan önce koşuyor;
+    /// uygulama ekrana gelmeden geçen süre buradan gelir. Sahne uygulamanın indirme
+    /// adımından zaten kalmış olduğu için bu tur çoğunlukla yalnız doğrulama yapar, yarım
+    /// kalırsa uygulama açıldıktan sonraki arka plan turu geniş bütçesiyle sürdürür.
+    /// </summary>
+    internal static readonly TimeSpan ElleButcesi = TimeSpan.FromSeconds(60);
+
     private const string MutexName = UpdateStaging.MutexName;
 
     public static bool Run(string baseDirectory, string appDirectory, bool force = false)
@@ -55,7 +66,7 @@ internal static class Updater
 
         return KurulumBekleyeni.Calistir(baseDirectory, appDirectory, force, MutexName, () =>
         {
-            using var cancellation = new CancellationTokenSource(Budget);
+            using var cancellation = new CancellationTokenSource(force ? ElleButcesi : Budget);
             return UpdateStaging.StageAsync(
                 baseDirectory, appDirectory, Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE"),
                 Lanes, null, "VidShrink-Launcher", null, cancellation.Token).GetAwaiter().GetResult();

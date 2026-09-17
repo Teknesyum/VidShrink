@@ -128,7 +128,11 @@ sürümden (`x.0.0`) önce koşar.
 - `BaslaticiPanelsizTests.cs` — Yol D: `.calisma/yol-d/kurulum-*` sahte kurulumda gerçek başlatıcı ve `tools/VidShrink.SahteUygulama`.
   Yavaş bakım kancasında (`VIDSHRINK_BAKIM_GECIKMESI_MS`) başlatıcının görünür penceresi yok (EnumWindows), uygulama hemen doğar;
   kapı tutulurken doğrudan açılan uygulama başlatıcıya devreder; koşan uygulama kapanmadan kopya başlamaz; `.bakim-hatasi` panelde görünür. `KurulumBekleyeni` süreç içinde: klasör başına tek bekleyen
-  (ikinci açılış indirmez, beklemez), kurulu sürümde hata yazılmaz (bozuk sahne negatif kontrol), elle Yükle kısa bekler, yolu okunamayan süreç sayılmaz.
+  (ikinci açılış indirmez, beklemez), kurulu sürümde hata yazılmaz (bozuk sahne negatif kontrol), daha yeni sürüm eskiye
+  düşürülmez, `Kur` dışarıdan verilen beklemeyi aşmaz, elle Yükle 20 sn'lik dış sınırın içinde bırakır, prova kipi kurmaz
+  (kapalı kipi negatif kontrol), `MainModule` fırlatan süreç bizim sayılmaz. Gerçek süreçle: yerel sahte yayından
+  (`VIDSHRINK_UPDATE_SOURCE`, manifest + zip) yuva tutulurken koşan başlatıcı kurmaz, yuva boşken v2 kurar; elle Yükle
+  (`--update-now`) yuva ve güncelleme kilidi dışarıdan tutulurken uygulamayı 15 sn'nin altında açar.
 - `KabukMenusuKayitTests.cs` — aynı menünün davranışı, yalnız `ShellMenu.TestRoot` altında: kutunun komutu başlatıcıyı
   (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı

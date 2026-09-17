@@ -268,17 +268,140 @@ public sealed class BaslaticiPanelsizTests
         var sahne = kurulum.Sahne("9.9.9", bozuk: false);
         using var kapi = KapiTutucu.Baslat(kurulum.App);
 
+        var sinir = TimeSpan.FromSeconds(20);
         var saat = Stopwatch.StartNew();
         var elle = Arka.Baslat(
             () => KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, true, kurulum.Kilit, () => sahne, false));
-        var sinir = KurulumBekleyeni.ElleBekleme + TimeSpan.FromSeconds(5);
         var bitti = elle.Bekle(sinir);
         _cikti.WriteLine($"elle-bekleme-ms\t{saat.ElapsedMilliseconds}\tbitti\t{bitti}");
 
         kapi.Birak();
         Assert.True(elle.Bekle(20000));
         Assert.True(bitti, $"elle Yükle {sinir.TotalSeconds} sn içinde bırakmadı");
-        Assert.True(sinir < TimeSpan.FromMinutes(1));
+        Assert.Equal("v1", File.ReadAllText(Path.Combine(kurulum.App, "a.txt")));
+    }
+
+    [Fact]
+    public void KurKendiBeklemeParametresiniAsmaz()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+        using var kapi = KapiTutucu.Baslat(kurulum.App);
+
+        var saat = Stopwatch.StartNew();
+        var kurma = Arka.Baslat(
+            () => KurulumBekleyeni.Kur(kurulum.Kok, kurulum.App, sahne, kurulum.Kilit, TimeSpan.FromSeconds(2)));
+        var bitti = kurma.Bekle(TimeSpan.FromSeconds(8));
+        _cikti.WriteLine($"kur-bekleme-ms\t{saat.ElapsedMilliseconds}\tbitti\t{bitti}");
+
+        kapi.Birak();
+        Assert.True(kurma.Bekle(20000));
+        Assert.True(bitti, "Kur dışarıdan verilen beklemeyi aştı");
+        Assert.False(kurma.Sonuc);
+        Assert.Equal("v1", File.ReadAllText(Path.Combine(kurulum.App, "a.txt")));
+    }
+
+    [Fact]
+    public void ElleBeklemeKurmaParametresineGidiyor()
+    {
+        Assert.Equal(KurulumBekleyeni.ElleBekleme, KurulumBekleyeni.KurulumBeklemesi(elle: true));
+        Assert.Equal(KurulumBekleyeni.ArkaPlanBeklemesi, KurulumBekleyeni.KurulumBeklemesi(elle: false));
+        Assert.True(KurulumBekleyeni.ElleBekleme <= TimeSpan.FromSeconds(15), "elle bekleme dakikalara çıktı");
+        Assert.True(KurulumBekleyeni.ElleYuvaBeklemesi <= TimeSpan.FromSeconds(5));
+        Assert.True(KurulumBekleyeni.ElleKilitBeklemesi <= TimeSpan.FromSeconds(30));
+
+        var guncelleyici = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Updater.cs"));
+        Assert.Contains("ElleButcesi = TimeSpan.FromSeconds(60)", guncelleyici, StringComparison.Ordinal);
+        Assert.Contains("force ? ElleButcesi : Budget", guncelleyici, StringComparison.Ordinal);
+
+        var kaynak = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "KurulumBekleyeni.cs"));
+        Assert.Contains("KurulumBeklemesi(elle), KurulumKilidi(elle)", kaynak, StringComparison.Ordinal);
+        Assert.Contains("Tut(bekleyen, YuvaBeklemesi(elle))", kaynak, StringComparison.Ordinal);
+        Assert.Contains("Tut(kilit, IndirmeKilidi(elle))", kaynak, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DahaYeniSurumEskiyeDusurulmez()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+        UpdateCheck.WriteVersionMarker(kurulum.App, "9.9.11");
+
+        Assert.False(KurulumBekleyeni.Kur(kurulum.Kok, kurulum.App, sahne, kurulum.Kilit, TimeSpan.FromSeconds(5)));
+        _cikti.WriteLine($"a.txt\t{File.ReadAllText(Path.Combine(kurulum.App, "a.txt"))}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
+        Assert.Equal("v1", File.ReadAllText(Path.Combine(kurulum.App, "a.txt")));
+        Assert.Equal("9.9.11", UpdateCheck.ReadVersionMarker(kurulum.App));
+        Assert.False(File.Exists(Path.Combine(kurulum.App, UygulamaKlasoruKapisi.HataIsareti)));
+
+        Assert.True(KurulumBekleyeni.Kurulmus("9.9.9", "9.9.9"));
+        Assert.True(KurulumBekleyeni.Kurulmus("9.9.11", "9.9.9"));
+        Assert.False(KurulumBekleyeni.Kurulmus("9.9.8", "9.9.9"));
+        Assert.False(KurulumBekleyeni.Kurulmus(null, "9.9.9"));
+    }
+
+    [Fact]
+    public void ProvaKipiKurmaz()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+        var a = Path.Combine(kurulum.App, "a.txt");
+
+        Assert.False(KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, false, kurulum.Kilit, () => sahne, true));
+        _cikti.WriteLine($"prova-sonrasi\t{File.ReadAllText(a)}\tsahne\t{Directory.Exists(sahne.Stage)}");
+        Assert.Equal("v1", File.ReadAllText(a));
+        Assert.True(Directory.Exists(sahne.Stage), "prova sahneyi tüketti");
+        Assert.Null(UpdateCheck.ReadVersionMarker(kurulum.App));
+
+        KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, false, kurulum.Kilit, () => sahne, false);
+        _cikti.WriteLine($"prova-kapaliyken\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
+        Assert.Equal("v2", File.ReadAllText(a));
+        Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(kurulum.App));
+    }
+
+    [SahteKurulumFact]
+    public void ElleYukleArkaPlanIndirirkenAcilisiGeciktirmez()
+    {
+        using var kurulum = new SahteKurulum();
+        var kaynak = kurulum.SahteYayin("9.9.9");
+        using var yuva = MutexTutucu.Baslat(KurulumBekleyeni.Ad(kurulum.App));
+        using var kilit = MutexTutucu.Baslat(UpdateStaging.MutexName);
+
+        var saat = Stopwatch.StartNew();
+        using var baslatici = kurulum.Baslatici(
+            gecikme: 0, omur: 1500, kaynak: kaynak, args: new[] { LauncherUpdate.UpdateNowArgument, "999999" });
+        var dogdu = Bekle(() => kurulum.Olaylar().Any(o => o.Olay == "acildi"), 25000);
+        var ms = saat.ElapsedMilliseconds;
+        _cikti.WriteLine($"elle-yukle-app-dogumu-ms\t{ms}\tdogdu\t{dogdu}");
+
+        Assert.True(dogdu, "elle Yükle yolunda uygulama hiç açılmadı");
+        Assert.True(ms < 15000, $"uygulama {ms} ms'de açıldı; elle yol arka plan turunu bekledi");
+        kurulum.HepsiniBekle(60000);
+    }
+
+    [SahteKurulumFact]
+    public void IkinciBaslaticiSurecindeYuvaAlinmaz()
+    {
+        using var kurulum = new SahteKurulum();
+        var kaynak = kurulum.SahteYayin("9.9.9");
+        var ayar = kurulum.AyarDosyasi();
+        var a = Path.Combine(kurulum.App, "a.txt");
+
+        using (MutexTutucu.Baslat(KurulumBekleyeni.Ad(kurulum.App)))
+        {
+            using var ilk = kurulum.Baslatici(gecikme: 0, omur: 1200, kaynak: kaynak, ayar: ayar);
+            Assert.True(ilk.WaitForExit(60000), "yuva tutulurken başlatıcı çıkmadı");
+            kurulum.HepsiniBekle(60000);
+            _cikti.WriteLine($"yuva-tutulurken\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
+            Assert.Equal("v1", File.ReadAllText(a));
+            Assert.Null(UpdateCheck.ReadVersionMarker(kurulum.App));
+        }
+
+        using var ikinci = kurulum.Baslatici(gecikme: 0, omur: 1200, kaynak: kaynak, ayar: ayar);
+        Assert.True(ikinci.WaitForExit(60000), "yuva boşken başlatıcı çıkmadı");
+        kurulum.HepsiniBekle(60000);
+        _cikti.WriteLine($"yuva-bosken\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
+        Assert.Equal("v2", File.ReadAllText(a));
+        Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(kurulum.App));
     }
 
     [Theory]
@@ -290,6 +413,26 @@ public sealed class BaslaticiPanelsizTests
         var klasor = Path.Combine(Root, ".calisma", "yol-d", "app");
         var dosya = klasorAdi is null ? null : Path.Combine(Root, ".calisma", "yol-d", klasorAdi, "VidShrink.App.exe");
         Assert.Equal(beklenen, UygulamaKlasoruKapisi.KlasordenMi(dosya, klasor));
+    }
+
+    [Fact]
+    public void YoluFirlatanSurecBizimSayilmaz()
+    {
+        var klasor = Path.Combine(Root, ".calisma", "yol-d", "app");
+        var dosya = Path.Combine(klasor, "VidShrink.App.exe");
+        var baska = Environment.ProcessId + 1;
+
+        Assert.True(UygulamaKlasoruKapisi.Bizim(baska, () => dosya, klasor));
+        Assert.False(UygulamaKlasoruKapisi.Bizim(Environment.ProcessId, () => dosya, klasor));
+        foreach (var hata in new Exception[]
+                 {
+                     new InvalidOperationException("çıkmış süreç"),
+                     new System.ComponentModel.Win32Exception(5),
+                     new NotSupportedException()
+                 })
+        {
+            Assert.False(UygulamaKlasoruKapisi.Bizim(baska, () => throw hata, klasor), hata.GetType().Name);
+        }
     }
 
     private sealed class Arka
@@ -354,6 +497,42 @@ public sealed class BaslaticiPanelsizTests
         public void Dispose()
         {
             Birak();
+            _birak.Dispose();
+        }
+    }
+
+    private sealed class MutexTutucu : IDisposable
+    {
+        private readonly ManualResetEventSlim _birak = new();
+        private readonly Thread _is;
+
+        private MutexTutucu(string ad)
+        {
+            using var alindi = new ManualResetEventSlim();
+            var tuttu = false;
+            _is = new Thread(() =>
+            {
+                using var mutex = new Mutex(initiallyOwned: false, ad);
+                try { tuttu = mutex.WaitOne(TimeSpan.Zero); }
+                catch (AbandonedMutexException) { tuttu = true; }
+                alindi.Set();
+                _birak.Wait();
+                if (tuttu)
+                {
+                    try { mutex.ReleaseMutex(); }
+                    catch (ApplicationException) { }
+                }
+            }) { IsBackground = true };
+            _is.Start();
+            Assert.True(alindi.Wait(5000) && tuttu, $"test {ad} kilidini tutamadı");
+        }
+
+        internal static MutexTutucu Baslat(string ad) => new(ad);
+
+        public void Dispose()
+        {
+            _birak.Set();
+            _is.Join(5000);
             _birak.Dispose();
         }
     }
@@ -476,16 +655,56 @@ public sealed class BaslaticiPanelsizTests
             Assert.False(File.Exists(Path.Combine(App, UygulamaKlasoruKapisi.HataIsareti)));
         }
 
-        internal Process Baslatici(int gecikme, int omur)
-            => Baslat(Path.Combine(Kok, "VidShrink.exe"), gecikme, omur, baslaticidan: false);
+        /// <summary>
+        /// Yerel sahte yayın: manifestin saydığı tek dosya <c>a.txt</c>, arşiv onun v2 halini
+        /// taşıyor. <c>VIDSHRINK_UPDATE_SOURCE</c> bu klasörü gösterince gerçek başlatıcı
+        /// gerçek indirme yolundan geçer, ağ olmadan.
+        /// </summary>
+        internal string SahteYayin(string surum)
+        {
+            var kaynak = Path.Combine(Kok, "yayin");
+            var icerik = Path.Combine(Kok, "yayin-icerik");
+            Directory.CreateDirectory(kaynak);
+            Directory.CreateDirectory(icerik);
+            var bayt = Encoding.UTF8.GetBytes("v2");
+            File.WriteAllBytes(Path.Combine(icerik, "a.txt"), bayt);
+            var zip = Path.Combine(kaynak, UpdateCheck.ArchiveAssetName(UpdateCheck.Rid));
+            if (File.Exists(zip)) File.Delete(zip);
+            System.IO.Compression.ZipFile.CreateFromDirectory(icerik, zip);
+            var ozet = Convert.ToHexString(SHA256.HashData(bayt));
+            File.WriteAllText(Path.Combine(kaynak, UpdateCheck.ManifestAssetName(UpdateCheck.Rid)),
+                $"{{\"version\":\"{surum}\",\"commit\":\"test\",\"built\":\"2026-09-16T00:00:00Z\"," +
+                $"\"rid\":\"{UpdateCheck.Rid}\",\"files\":[{{\"path\":\"a.txt\",\"sha256\":\"{ozet}\",\"size\":{bayt.Length}}}]}}");
+            return kaynak;
+        }
+
+        internal string AyarDosyasi()
+        {
+            var yol = Path.Combine(Kok, "ayar.json");
+            File.WriteAllText(yol, "{\"autoUpdate\":true}");
+            return yol;
+        }
+
+        internal Process Baslatici(int gecikme, int omur, string? kaynak = null, string? ayar = null, string[]? args = null)
+            => Baslat(Path.Combine(Kok, "VidShrink.exe"), gecikme, omur, baslaticidan: false, kaynak, ayar, args);
 
         internal Process UygulamaDogrudan(bool baslaticidan, int omur)
             => Baslat(Path.Combine(App, "VidShrink.App.exe"), 0, omur, baslaticidan);
 
-        private Process Baslat(string dosya, int gecikme, int omur, bool baslaticidan)
+        private Process Baslat(
+            string dosya, int gecikme, int omur, bool baslaticidan,
+            string? kaynak = null, string? ayar = null, string[]? args = null)
         {
             var start = new ProcessStartInfo { FileName = dosya, WorkingDirectory = Path.GetDirectoryName(dosya)!, UseShellExecute = false };
             start.Environment["VIDSHRINK_UPDATE_DISABLED"] = "1";
+            start.Environment.Remove("VIDSHRINK_UPDATE_PROVA");
+            if (kaynak is not null)
+            {
+                start.Environment.Remove("VIDSHRINK_UPDATE_DISABLED");
+                start.Environment["VIDSHRINK_UPDATE_SOURCE"] = kaynak;
+            }
+            if (ayar is not null) start.Environment["VIDSHRINK_SETTINGS_PATH"] = ayar;
+            foreach (var arguman in args ?? Array.Empty<string>()) start.ArgumentList.Add(arguman);
             start.Environment["VIDSHRINK_SAHTE_ISARET"] = Isaret;
             start.Environment["VIDSHRINK_SAHTE_OMUR_MS"] = omur.ToString(System.Globalization.CultureInfo.InvariantCulture);
             start.Environment[UygulamaKlasoruKapisi.GecikmeDegiskeni] = gecikme.ToString(System.Globalization.CultureInfo.InvariantCulture);
