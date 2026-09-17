@@ -191,6 +191,11 @@ public sealed class KaydediciGirdiTests
         }
     }
 
+    /// <summary>
+    /// Alt sınır tutma süresi (360 ms), üst sınır yalnız "kendiliğinden kapanır" demek: dağıtıcı zamanlayıcısı
+    /// yüklü koşucuda gecikiyor. Yerelde 379 ms; t0/paket-2b CI koşumu 35191568301'de canlı ffmpeg testleriyle
+    /// aynı anda 6304 ms ölçüldü ve eski 5000 ms sınırı düştü. Üst sınır bekleme döngüsünün 10 sn tavanının altında.
+    /// </summary>
     [Fact]
     public void GercekHalkaVeTusYazisiYerindeAcilipKendiligindenKapanir()
     {
@@ -232,7 +237,7 @@ public sealed class KaydediciGirdiTests
         Assert.True(olcu.ilk.yaziAcik);
         Assert.Equal("Ctrl + S", olcu.ilk.yazi);
         Assert.True(olcu.ilk.yaziKonum.Y > 100 + 480 / 2 && olcu.ilk.yaziKonum.Y < 100 + 480);
-        Assert.InRange(olcu.halkaKapandi, 360, 5000);
+        Assert.InRange(olcu.halkaKapandi, 360, 9500);
         Assert.InRange(olcu.yaziKapandi, 1500, 10000);
     }
 
