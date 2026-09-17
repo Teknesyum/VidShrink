@@ -14,6 +14,14 @@ internal partial class RecorderView
         RecorderContainer.Mkv, RecorderContainer.Mp4, RecorderContainer.Mov, RecorderContainer.Gif
     };
 
+    private static string ContainerLabel(RecorderContainer container) => container switch
+    {
+        RecorderContainer.Mkv => "MKV",
+        RecorderContainer.Mov => "MOV",
+        RecorderContainer.Gif => "GIF",
+        _ => "MP4"
+    };
+
     private bool _fillingAdvanced;
 
     private IReadOnlyList<string> _profileItems = [];
@@ -101,7 +109,7 @@ internal partial class RecorderView
             var space = SelectedColorSpace;
             var range = SelectedColorRange;
 
-            CmbContainer.ItemsSource = Containers.Select(c => RecorderArguments.Extension(c).ToUpperInvariant()).ToList();
+            CmbContainer.ItemsSource = Containers.Select(ContainerLabel).ToList();
             CmbContainer.SelectedIndex = Array.IndexOf(Containers, container);
 
             CmbRateControl.ItemsSource = new List<string> { Say("recorder.advanced.rate-quality"), Say("recorder.advanced.rate-bitrate") };

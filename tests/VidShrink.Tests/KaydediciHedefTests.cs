@@ -218,8 +218,10 @@ public sealed class KaydediciHedefTests
         var yakalama = RecorderArguments.SizeCapturePath(cikti);
         var (kod, metin) = KayitKanit.Ffprobe(cikti, "boyut-siniri.ffprobe.txt");
         var baslik = File.Exists(cikti) ? System.Text.Encoding.ASCII.GetString(File.ReadAllBytes(cikti), 4, 4) : string.Empty;
+        var (paketBayt, sonKume) = Paketler(cikti);
+        var sinir = (long)(0.05 * 1024 * 1024);
 
-        File.WriteAllLines(Path.Combine(Kanit, "boyut-siniri.txt"), new[] { $"ended={bitti} sn={sure:0.00} ok={sonuc.Ok} teslim={sonuc.OutputPath} bayt={bayt} yakalamaKaldi={File.Exists(yakalama)} probe={kod}" });
+        File.WriteAllLines(Path.Combine(Kanit, "boyut-siniri.txt"), new[] { $"ended={bitti} sn={sure:0.00} ok={sonuc.Ok} teslim={sonuc.OutputPath} bayt={bayt} paket={paketBayt} sonIkiAnahtarKumesi={sonKume} sinir={sinir} yakalamaKaldi={File.Exists(yakalama)} probe={kod}" });
         if (File.Exists(cikti)) File.Delete(cikti);
 
         Assert.True(bitti, "0,05 MB siniri dolunca oturum kendiliginden bitmeli");
@@ -229,6 +231,37 @@ public sealed class KaydediciHedefTests
         Assert.Equal(0, kod);
         Assert.Equal("ftyp", baslik);
         Assert.Contains("codec_type=video", metin);
-        Assert.InRange(bayt, 1, (long)(0.05 * 1.5 * 1024 * 1024));
+        Assert.InRange(sonKume, 1, paketBayt);
+        Assert.InRange(paketBayt - sonKume, 0, sinir);
+    }
+
+    private static (long Toplam, long SonKume) Paketler(string dosya)
+    {
+        if (!File.Exists(dosya)) return (0, 0);
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = ToolLocator.Ffprobe,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var arg in new[] { "-hide_banner", "-v", "error", "-select_streams", "v:0", "-show_entries", "packet=size,flags", "-of", "csv=p=0", dosya })
+            psi.ArgumentList.Add(arg);
+        using var surec = System.Diagnostics.Process.Start(psi)!;
+        var hata = surec.StandardError.ReadToEndAsync();
+        var satirlar = surec.StandardOutput.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        surec.WaitForExit(20_000);
+        _ = hata.Result;
+
+        var kumeler = new List<long>();
+        foreach (var satir in satirlar)
+        {
+            var parca = satir.Split(',');
+            if (!long.TryParse(parca[0], out var boy)) continue;
+            if (kumeler.Count == 0 || (parca.Length > 1 && parca[1].StartsWith('K'))) kumeler.Add(0);
+            kumeler[^1] += boy;
+        }
+        return (kumeler.Sum(), kumeler.TakeLast(2).Sum());
     }
 }

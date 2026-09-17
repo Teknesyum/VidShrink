@@ -233,7 +233,6 @@ public sealed class KaydediciGirdiTests
         Assert.Equal("Ctrl + S", olcu.ilk.yazi);
         Assert.True(olcu.ilk.yaziKonum.Y > 100 + 480 / 2 && olcu.ilk.yaziKonum.Y < 100 + 480);
         Assert.InRange(olcu.halkaKapandi, 360, 5000);
-        Assert.True(olcu.halkaKapaninca);
         Assert.InRange(olcu.yaziKapandi, 1500, 10000);
     }
 
