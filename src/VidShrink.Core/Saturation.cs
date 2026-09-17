@@ -9,6 +9,7 @@ public static class Saturation
     public const double DeadYield = 0.5;
     public const double FloorRequestDrop = 0.80;
     public const double FloorBytesHeld = 0.95;
+    public const double FloorBytesRise = 1.01;
     public const double FloorLayoutAim = 0.9;
     public const int FloorAudioK = 24;
     public const int ExtraAttemptsAtFloor = 1;
@@ -16,7 +17,8 @@ public static class Saturation
     public static bool AtEncoderFloor(SizeSample earlier, SizeSample later)
         => earlier.OverCeiling && later.OverCeiling
            && later.VideoBitrateK <= earlier.VideoBitrateK * FloorRequestDrop
-           && later.ActualMb >= earlier.ActualMb * FloorBytesHeld;
+           && later.ActualMb >= earlier.ActualMb * FloorBytesHeld
+           && later.ActualMb <= earlier.ActualMb * FloorBytesRise;
 
     public static SizeSample? FloorReference(IEnumerable<SizeSample> earlier, SizeSample later)
         => earlier.FirstOrDefault(sample => AtEncoderFloor(sample, later));

@@ -34,6 +34,15 @@ public sealed class SaturationTests
     }
 
     [Fact]
+    public void BytesThatRiseWhileTheRequestFallsAreRateControlNoiseNotTheFloor()
+    {
+        Assert.False(Saturation.AtEncoderFloor(new SizeSample(1174, 1.931, true), new SizeSample(855, 2.005, true)));
+        Assert.True(Saturation.AtEncoderFloor(new SizeSample(98, 0.392, true), new SizeSample(29, 0.395, true)));
+        Assert.False(Saturation.AtEncoderFloor(new SizeSample(98, 0.392, true), new SizeSample(29, 0.397, true)));
+        Assert.Null(Saturation.FloorReference(new[] { new SizeSample(1174, 1.931, true) }, new SizeSample(855, 2.005, true)));
+    }
+
+    [Fact]
     public void FloorIsFoundAcrossSmallCorrectStepsFromTheEarliestSample()
     {
         var first = new SizeSample(98, 0.137, true);
