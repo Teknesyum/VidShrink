@@ -41,7 +41,7 @@ public sealed class ShareProviderTests
         var storage = table.Find("storage.to")!;
         Assert.Equal(26_843_545_600L, storage.MaxBytes);
         Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7 }, storage.RetentionDays);
-        Assert.Equal(3, storage.DefaultRetentionDays);
+        Assert.Equal(1, storage.DefaultRetentionDays);
         Assert.True(storage.CanDelete);
         Assert.True(storage.PlaysInBrowser);
         Assert.False(storage.HasFixedRetention);
@@ -177,11 +177,15 @@ public sealed class ShareProviderTests
         using var clip = new TempFile(64);
         var transport = FakeTransport.StorageToSuccess();
         var provider = new PresignedUploadProvider(RealTable().Find("storage.to")!, transport, "vt-test");
+        var otherDefault = FakeTransport.StorageToSuccess();
+        var shifted = new PresignedUploadProvider(RealTable().Find("storage.to")! with { DefaultRetentionDays = 5 }, otherDefault, "vt-test");
 
         await provider.UploadAsync(clip.Path, retentionDays: 99);
+        await shifted.UploadAsync(clip.Path, retentionDays: 99);
 
         var body = JsonDocument.Parse(transport.Requests[0].Body).RootElement;
-        Assert.Equal(3, body.GetProperty("expiry_days").GetInt32());
+        Assert.Equal(1, body.GetProperty("expiry_days").GetInt32());
+        Assert.Equal(5, JsonDocument.Parse(otherDefault.Requests[0].Body).RootElement.GetProperty("expiry_days").GetInt32());
     }
 
     [Fact]

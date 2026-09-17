@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "esiasetus lukittiin arvoon {0}; moottori olisi valinnut {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo-ensimmäinen vaihe ajetaan eri esiasetuksella; lukittu {0} koskee vain toista, tulosteen tuottavaa vaihetta (ensimmäinen vaihe: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "lukittua {0} ei voitu soveltaa kopiointipolulla; sen sijaan sovelletaan {1}",
+  "main.reason.dark-content-hevc": "lähde on tumma (keskimääräinen luminanssi {0}); {1} raidoittaa varjoja, joten Automaattinen käyttää {2}:ta turbo-ensikierroksella",
 
   "main.advice.budget-generous": "Kohde on tälle lähteelle avokätinen, joten moottori täyttää sen vaivatta.",
   "main.advice.codec-upgrade": "Tällä paineella H.265 antaa näkyvästi paremman tuloksen samassa koossa; harkitse pakkausalgoritmin vaihtoa automaattiseen tai H.265:een.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Kiinteä kansio lähettää jokaisen tulosteen samaan paikkaan lähdetiedoston viereen sijasta.",
   "settings-tab.advanced-default-open.label": "Näytä lisäasetukset oletuksena avattuina",
   "settings-tab.advanced-default-open.hint": "Avaa lisäasetusosion automaattisesti joka käynnistyksellä.",
+  "settings-tab.follow-recording.label": "Seuraa tallennetta kaikissa välilehdissä",
+  "settings-tab.follow-recording.hint": "Kun tallennus pysähtyy, Pienennä ja Soitin lataavat sen vaihtamatta välilehteä. Soittimessa avattu tiedosto latautuu myös Pienennä-välilehteen.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-polku",
   "settings-tab.ffmpeg-path.auto": "Automaattinen",
   "settings-tab.ffmpeg-path.manual": "Manuaalinen",

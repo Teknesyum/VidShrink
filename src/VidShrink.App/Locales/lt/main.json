@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "šablonas fiksuotas į {0}; variklis būtų rinkęsis {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo pirmas etapas vyksta su kitu šablonu; fiksuotas {0} taikomas tik antram etapui, kuris gamina išvestį (pirmas etapas: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "fiksuotas {0} negalėjo būti taikomas kopijos kelyje; vietoj jo taikomas {1}",
+  "main.reason.dark-content-hevc": "šaltinis tamsus (vidutinis šviesumas {0}); {1} šešėliuose sukuria juostas, todėl Automatiškai naudoja {2} su turbo pirmuoju perėjimu",
 
   "main.advice.budget-generous": "Tikslas šiam šaltiniui dosnus, todėl variklis jį pasiekia be įtampos.",
   "main.advice.codec-upgrade": "Esant tokiam spaudimui H.265 duoda matomai geresnį rezultatą tokio pat dydžio; apsvarstykite glaudinimo algoritmo perjungimą į automatinį arba H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Fiksuotas aplankas siunčia visas išvestis į tą pačią vietą, o ne šalia šaltinio failo.",
   "settings-tab.advanced-default-open.label": "Išplėstines parinktis rodyti išskleistas pagal numatymą",
   "settings-tab.advanced-default-open.hint": "Automatiškai atidaro išplėstinę dalį kiekvieną kartą paleidus programą.",
+  "settings-tab.follow-recording.label": "Sekti įrašą visuose skirtukuose",
+  "settings-tab.follow-recording.hint": "Sustabdžius įrašymą, Sumažinti ir Grotuvas jį įkelia nekeičiant skirtuko. Grotuve atidarytas failas įkeliamas ir į Sumažinti.",
   "settings-tab.ffmpeg-path.label": "ffmpeg kelias",
   "settings-tab.ffmpeg-path.auto": "Automatinis",
   "settings-tab.ffmpeg-path.manual": "Rankinis",

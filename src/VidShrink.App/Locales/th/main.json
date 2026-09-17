@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "พรีเซ็ตถูกกำหนดเป็น {0}; เอนจินจะเลือก {1}",
   "main.reason.manual-preset-first-pass-relaxed": "รอบแรกแบบเทอร์โบใช้พรีเซ็ตต่างออกไป {0} ที่กำหนดใช้เฉพาะรอบสองที่สร้างผลลัพธ์ (รอบแรก: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} ที่กำหนดใช้บนเส้นทางคัดลอกไม่ได้ สิ่งที่ใช้แทนคือ {1}",
+  "main.reason.dark-content-hevc": "ต้นฉบับมืด (ความสว่างเฉลี่ย {0}) {1} ทำให้เกิดแถบในเงามืด อัตโนมัติจึงใช้ {2} พร้อมรอบแรกแบบเทอร์โบ",
 
   "main.advice.budget-generous": "เป้าหมายกว้างขวางสำหรับต้นฉบับนี้ เอนจินจึงทำได้โดยไม่ต้องฝืน",
   "main.advice.codec-upgrade": "ที่แรงกดดันระดับนี้ H.265 ให้ผลดีกว่าเห็นได้ชัดที่ขนาดเท่ากัน ลองเปลี่ยนอัลกอริทึมบีบอัดเป็นอัตโนมัติหรือ H.265",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "โฟลเดอร์ตายตัวส่งผลลัพธ์ทั้งหมดไปที่เดียวกันแทนข้างไฟล์ต้นฉบับ",
   "settings-tab.advanced-default-open.label": "แสดงตัวเลือกขั้นสูงแบบขยายเป็นค่าเริ่มต้น",
   "settings-tab.advanced-default-open.hint": "เปิดส่วนขั้นสูงอัตโนมัติทุกครั้งที่แอปเริ่ม",
+  "settings-tab.follow-recording.label": "ติดตามการบันทึกในทุกแท็บ",
+  "settings-tab.follow-recording.hint": "เมื่อหยุดบันทึก แท็บย่อขนาดและเครื่องเล่นจะโหลดไฟล์โดยไม่สลับแท็บ ไฟล์ที่เปิดในเครื่องเล่นก็จะโหลดเข้าแท็บย่อขนาดด้วย",
   "settings-tab.ffmpeg-path.label": "เส้นทาง ffmpeg",
   "settings-tab.ffmpeg-path.auto": "อัตโนมัติ",
   "settings-tab.ffmpeg-path.manual": "กำหนดเอง",

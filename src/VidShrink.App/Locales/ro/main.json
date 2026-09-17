@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "presetul a fost fixat la {0}; motorul ar fi ales {1}",
   "main.reason.manual-preset-first-pass-relaxed": "prima trecere turbo rulează cu alt preset; {0} fixat se aplică doar celei de-a doua treceri, care produce rezultatul (prima trecere: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} fixat nu s-a putut aplica pe calea de copiere; ce se aplică în schimb este {1}",
+  "main.reason.dark-content-hevc": "sursa este întunecată (luminanță medie {0}); {1} produce benzi în umbre, așa că Automat folosește {2} cu prima trecere turbo",
 
   "main.advice.budget-generous": "Ținta este generoasă pentru această sursă, deci motorul o atinge fără efort.",
   "main.advice.codec-upgrade": "La această presiune H.265 dă un rezultat vizibil mai bun la aceeași mărime; ia în calcul trecerea algoritmului de comprimare la automat sau H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Dosarul fix trimite fiecare rezultat în același loc, nu lângă fișierul sursă.",
   "settings-tab.advanced-default-open.label": "Arată opțiunile avansate extinse implicit",
   "settings-tab.advanced-default-open.hint": "Deschide automat secțiunea avansată la fiecare pornire a aplicației.",
+  "settings-tab.follow-recording.label": "Urmărește înregistrarea în toate filele",
+  "settings-tab.follow-recording.hint": "Când o înregistrare se oprește, Micșorare și Player o încarcă fără a schimba fila. Un fișier deschis în Player se încarcă și în Micșorare.",
   "settings-tab.ffmpeg-path.label": "Cale ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automat",
   "settings-tab.ffmpeg-path.manual": "Manual",

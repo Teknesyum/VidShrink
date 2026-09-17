@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "ön ayar {0} olarak sabitlendi; motor {1} seçmişti",
   "main.reason.manual-preset-first-pass-relaxed": "turbo ilk geçiş farklı bir ön ayarla çalışıyor; sabitlenen {0} yalnız çıktının üretildiği ikinci geçişte geçerli (ilk geçiş: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "sabitlenen {0} kopyalama yolunda uygulanamadı; geçerli olan {1}",
+  "main.reason.dark-content-hevc": "kaynak karanlık (ortalama parlaklık {0}); {1} gölgelerde bantlaşıyor, bu yüzden Otomatik turbo ilk geçişli {2} kullanıyor",
 
   "main.advice.budget-generous": "Hedef bu kaynak için bol; motor bütçeyi zorlanmadan karşılıyor.",
   "main.advice.codec-upgrade": "Bu sıkışıklıkta H.265 aynı boyutta gözle görülür şekilde daha iyi sonuç verir; sıkıştırma algoritmasını otomatik veya H.265 yapmayı düşün.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Sabit klasör her çıktıyı kaynağın yanı yerine hep aynı yere gönderir.",
   "settings-tab.advanced-default-open.label": "Gelişmiş seçenekleri varsayılan olarak açık göster",
   "settings-tab.advanced-default-open.hint": "Gelişmiş bölümü uygulama her açıldığında otomatik olarak açar.",
+  "settings-tab.follow-recording.label": "Kaydı bütün sekmelerde izle",
+  "settings-tab.follow-recording.hint": "Kayıt durunca dosya Küçült ve Oynatıcı sekmelerine yüklenir, açık sekme değişmez. Oynatıcıda açılan dosya da Küçült'e geçer.",
   "settings-tab.ffmpeg-path.label": "ffmpeg yolu",
   "settings-tab.ffmpeg-path.auto": "Otomatik",
   "settings-tab.ffmpeg-path.manual": "Elle",

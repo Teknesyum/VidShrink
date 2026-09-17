@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "প্রিসেট {0}-এ নির্দিষ্ট ছিল; ইঞ্জিন {1} বাছত",
   "main.reason.manual-preset-first-pass-relaxed": "টার্বো প্রথম পাস ভিন্ন প্রিসেটে চলে; নির্দিষ্ট {0} কেবল আউটপুট তৈরি করা দ্বিতীয় পাসে প্রযোজ্য (প্রথম পাস: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "নির্দিষ্ট {0} কপি পথে প্রয়োগ করা যায়নি; বদলে যা প্রযোজ্য তা {1}",
+  "main.reason.dark-content-hevc": "উৎসটি অন্ধকার (গড় উজ্জ্বলতা {0}); {1} ছায়ায় ব্যান্ডিং করে, তাই স্বয়ংক্রিয় টার্বো প্রথম পাসসহ {2} ব্যবহার করে",
 
   "main.advice.budget-generous": "এই উৎসের জন্য লক্ষ্য উদার, তাই ইঞ্জিন চাপ ছাড়াই তা পূরণ করে।",
   "main.advice.codec-upgrade": "এই চাপে H.265 একই আকারে দৃশ্যত ভালো ফল দেয়; সংকোচন অ্যালগরিদম স্বয়ংক্রিয় বা H.265-এ বদলানোর কথা ভাবুন।",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "নির্দিষ্ট ফোল্ডার প্রতিটি আউটপুট উৎসের পাশে না রেখে একই জায়গায় পাঠায়।",
   "settings-tab.advanced-default-open.label": "উন্নত বিকল্প ডিফল্টে খোলা দেখান",
   "settings-tab.advanced-default-open.hint": "অ্যাপ চালু হলে প্রতিবার উন্নত অংশ নিজে থেকে খোলে।",
+  "settings-tab.follow-recording.label": "সব ট্যাবে রেকর্ডিং অনুসরণ করুন",
+  "settings-tab.follow-recording.hint": "রেকর্ডিং থামলে ট্যাব না বদলে সংকোচন ও প্লেয়ার ট্যাবে সেটি লোড হয়। প্লেয়ারে খোলা ফাইলও সংকোচনে লোড হয়।",
   "settings-tab.ffmpeg-path.label": "ffmpeg পথ",
   "settings-tab.ffmpeg-path.auto": "স্বয়ংক্রিয়",
   "settings-tab.ffmpeg-path.manual": "হাতে",

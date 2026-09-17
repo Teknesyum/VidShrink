@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "predvoľba bola pevne daná na {0}; motor by vybral {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo prvý prechod beží s inou predvoľbou; pevná {0} platí len pre druhý prechod, ktorý tvorí výstup (prvý prechod: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "pevné {0} sa na ceste kópie nedalo použiť; namiesto toho platí {1}",
+  "main.reason.dark-content-hevc": "zdroj je tmavý (priemerný jas {0}); {1} v tieňoch vytvára pruhy, preto Automaticky použije {2} s turbo prvým prechodom",
 
   "main.advice.budget-generous": "Cieľ je pre tento zdroj veľkorysý, takže motor ho splní bez námahy.",
   "main.advice.codec-upgrade": "Pri tomto tlaku dáva H.265 viditeľne lepší výsledok pri rovnakej veľkosti; zvážte prepnutie kompresného algoritmu na automatiku alebo H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Pevný priečinok posiela každý výstup na rovnaké miesto namiesto vedľa zdrojového súboru.",
   "settings-tab.advanced-default-open.label": "Zobrazovať rozšírené voľby predvolene rozbalené",
   "settings-tab.advanced-default-open.hint": "Otvorí rozšírenú sekciu automaticky pri každom spustení aplikácie.",
+  "settings-tab.follow-recording.label": "Sledovať záznam vo všetkých kartách",
+  "settings-tab.follow-recording.hint": "Po zastavení záznamu ho karty Zmenšiť a Prehrávač načítajú bez prepnutia karty. Súbor otvorený v prehrávači sa načíta aj do karty Zmenšiť.",
   "settings-tab.ffmpeg-path.label": "Cesta k ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automaticky",
   "settings-tab.ffmpeg-path.manual": "Ručne",

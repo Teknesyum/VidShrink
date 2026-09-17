@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "predložak je fiksiran na {0}; motor bi odabrao {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo prvi prolaz radi s drugim predloškom; fiksni {0} vrijedi samo za drugi prolaz koji proizvodi izlaz (prvi prolaz: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "fiksni {0} nije se mogao primijeniti na putu kopiranja; umjesto toga vrijedi {1}",
+  "main.reason.dark-content-hevc": "izvor je taman (prosječna svjetlina {0}); {1} stvara pruge u sjenama, pa Automatski koristi {2} s turbo prvim prolazom",
 
   "main.advice.budget-generous": "Cilj je velikodušan za ovaj izvornik, pa ga motor ispunjava bez napora.",
   "main.advice.codec-upgrade": "Pri ovom pritisku H.265 daje vidljivo bolji rezultat pri istoj veličini; razmislite o prebacivanju algoritma sažimanja na automatski ili H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Fiksna mapa šalje svaki izlaz na isto mjesto umjesto pored izvorne datoteke.",
   "settings-tab.advanced-default-open.label": "Prikaži napredne opcije proširene po zadanom",
   "settings-tab.advanced-default-open.hint": "Automatski otvara napredni odjeljak pri svakom pokretanju aplikacije.",
+  "settings-tab.follow-recording.label": "Prati snimku u svim karticama",
+  "settings-tab.follow-recording.hint": "Kad snimanje stane, Smanji i Reproduktor učitaju snimku bez promjene kartice. Datoteka otvorena u reproduktoru učitava se i u Smanji.",
   "settings-tab.ffmpeg-path.label": "Putanja ffmpeg-a",
   "settings-tab.ffmpeg-path.auto": "Automatski",
   "settings-tab.ffmpeg-path.manual": "Ručno",

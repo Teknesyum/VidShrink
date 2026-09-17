@@ -96,7 +96,7 @@ public sealed class SettingsTabTests
         var storage = table.Targets[0];
         Assert.Equal(26_843_545_600L, storage.MaxBytes);
         Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7 }, storage.RetentionDays);
-        Assert.Equal(3, storage.DefaultRetentionDays);
+        Assert.Equal(1, storage.DefaultRetentionDays);
         Assert.True(storage.CanDelete);
 
         var uguu = table.Targets[1];

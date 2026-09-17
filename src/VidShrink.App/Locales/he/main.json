@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "הפריסט נקבע ל-{0}; המנוע היה בוחר {1}",
   "main.reason.manual-preset-first-pass-relaxed": "מעבר ראשון טורבו רץ עם פריסט אחר; {0} הקבוע חל רק על המעבר השני שמפיק את הפלט (מעבר ראשון: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} הקבוע לא יכול לחול בנתיב ההעתקה; במקומו חל {1}",
+  "main.reason.dark-content-hevc": "המקור כהה (בהירות ממוצעת {0}); {1} יוצר פסים בצללים, לכן אוטומטי משתמש ב-{2} עם מעבר ראשון מהיר",
 
   "main.advice.budget-generous": "היעד נדיב למקור זה, ולכן המנוע עומד בו ללא מאמץ.",
   "main.advice.codec-upgrade": "בלחץ זה H.265 נותן תוצאה טובה יותר באופן נראה באותו גודל; שקול להעביר את אלגוריתם הדחיסה לאוטומטי או ל-H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "תיקייה קבועה שולחת כל פלט לאותו מקום במקום ליד קובץ המקור.",
   "settings-tab.advanced-default-open.label": "הצג אפשרויות מתקדמות פתוחות כברירת מחדל",
   "settings-tab.advanced-default-open.hint": "פותח את הקטע המתקדם אוטומטית בכל הפעלה של היישום.",
+  "settings-tab.follow-recording.label": "לעקוב אחר ההקלטה בכל הלשוניות",
+  "settings-tab.follow-recording.hint": "כשהקלטה נעצרת, הלשוניות כיווץ ונגן טוענות אותה בלי להחליף לשונית. קובץ שנפתח בנגן נטען גם בכיווץ.",
   "settings-tab.ffmpeg-path.label": "נתיב ffmpeg",
   "settings-tab.ffmpeg-path.auto": "אוטומטי",
   "settings-tab.ffmpeg-path.manual": "ידני",

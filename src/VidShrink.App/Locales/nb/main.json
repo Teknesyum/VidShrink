@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "forvalget ble låst til {0}; motoren ville valgt {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo første pass kjører med et annet forvalg; det låste {0} gjelder bare andre pass som lager utdata (første pass: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "det låste {0} kunne ikke brukes på kopibanen; det som gjelder i stedet er {1}",
+  "main.reason.dark-content-hevc": "kilden er mørk (gjennomsnittlig luminans {0}); {1} gir banding i skyggene, så Automatisk bruker {2} med turbo første pass",
 
   "main.advice.budget-generous": "Målet er romslig for denne kilden, så motoren når det uten anstrengelse.",
   "main.advice.codec-upgrade": "Ved dette presset gir H.265 et synlig bedre resultat i samme størrelse; vurder å sette komprimeringsalgoritmen til automatisk eller H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Fast mappe sender alle utdata til samme sted i stedet for ved siden av kildefilen.",
   "settings-tab.advanced-default-open.label": "Vis avanserte valg utvidet som standard",
   "settings-tab.advanced-default-open.hint": "Åpner den avanserte delen automatisk hver gang appen starter.",
+  "settings-tab.follow-recording.label": "Følg opptaket i alle faner",
+  "settings-tab.follow-recording.hint": "Når et opptak stopper, lastes det inn i Krymp og Spiller uten å bytte fane. En fil åpnet i spilleren lastes også inn i Krymp.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-bane",
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuell",

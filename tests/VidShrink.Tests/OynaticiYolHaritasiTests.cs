@@ -744,15 +744,19 @@ public sealed class OynaticiYolHaritasiTests
         view.SeritZone.Clock = saat;
         var serit = view.FindControl<Border>("StripBar")!;
         var yuzey = view.FindControl<Panel>("Surface")!;
+        Dongu(() => yuzey.Bounds.Height > 0, 5);
         if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
+        Dongu(() => view.IsPlaying, 5);
         Hareket(window, view, new Point(480, 100));
         Dongu(() =>
         {
             if (serit.Opacity > 0) saat.Ates();
             return serit.Opacity <= 0;
         }, 10);
-        body.AppendLine($"[hareket azaltilmis {azalt}] kapali serit saydamligi {YolKanit.N(serit.Opacity)}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms");
-        Assert.True(serit.Opacity <= 0, $"on kosul: serit kapanmadi, saydamlik {serit.Opacity}");
+        string Alan(string ad) => typeof(HoverZone).GetField(ad, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(view.SeritZone)!.ToString()!;
+        var neden = $"oynuyor {view.IsPlaying}, fare icinde {Alan("_pointerInside")}, tutuluyor {Alan("_held")}, gorunur {Alan("_visible")}, yuzey {YolKanit.N(yuzey.Bounds.Height)}";
+        body.AppendLine($"[hareket azaltilmis {azalt}] kapali serit saydamligi {YolKanit.N(serit.Opacity)}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms, {neden}");
+        Assert.True(serit.Opacity <= 0, $"on kosul: serit kapanmadi, saydamlik {serit.Opacity}, {neden}");
 
         var seritSol = serit.TranslatePoint(new Point(0, 0), window)!.Value;
         var fareX = seritSol.X + serit.Bounds.Width * 0.2;
@@ -771,6 +775,7 @@ public sealed class OynaticiYolHaritasiTests
         view.PropertyChanged += Yayildi;
         Hareket(window, view, new Point(fareX, yuzey.Bounds.Height - 4));
         var oran = view.SeritPointerX / serit.Bounds.Width;
+        Hareket(window, view, new Point(seritSol.X + serit.Bounds.Width * 0.8, yuzey.Bounds.Height - 4));
         while (saatDuvar.Elapsed.TotalMilliseconds < 400)
         {
             Ornekle();

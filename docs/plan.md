@@ -11,6 +11,22 @@ Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe
 3. **Testler.** `tests/VidShrink.Tests/BudgetFillTests.cs`, her kol için negatif kontrol.
 4. **Ölçüm.** `tools/butce-doldur/kos.ps1`: nvenc-2'nin |sapma| > %3 hücreleri + libx264/libx265 6 hücre,
    önce/sonra Bench, VMAF-NEG. Sonuç `docs/olcumler/butce-doldur.md`.
+
+# Karanlık İçerikte x265 Geçişi
+
+Dal `t0/karanlik-x265`. Karar: `docs/danisma/2026-09-17-karanlik-x265-fable.md`. Ölçüm:
+`docs/olcumler/karanlik-x265.md`. Ağır kodlama yalnız CI'da (`handbrake-kiyas.yml`).
+
+1. **YAVG ölçümü.** `hb.ps1 -Is yavg`: dört kesitte ürün sondasının penceresiyle YAVG; ayrım <2× ise dur.
+2. **Sonda.** `ComplexityProbe` pencerelerde signalstats YAVG okur (`LumaArgs`, `ParseMeanLuma`);
+   `ComplexityProfile.MeanLuma`. Ayrıştırıcı testi sabit satırı pimler.
+3. **Karar.** `DarkContentSwitch` (Core, saf): Auto + kilitsiz + Aggressive/Extreme + motor libsvtav1
+   + MeanLuma < eşik → libx265, turbo ilk geçiş; `ReasonCode.DarkContentHevc`. Beş test kolu, her kola
+   mutasyon.
+4. **CI kabulü.** `hb.ps1 -Is karanlikgecis`: urun-otomatik vs main bench vs HandBrake; CAMBI(ii) ≤7,5,
+   süre ≤1,5× HB, karanlık dışı libsvtav1 ve main ile eş.
+5. **Belge.** `docs/kullanim.md` kodek ipucu.
+
 # HandBrake Dalga 2 — Ölçülen Açıklar
 
 Dal `t0/hb-2-aciklar`. Kaynak: dalga 1b ölçümü (koşum 35158725446,
@@ -533,6 +549,30 @@ Dal `t0/paket-2` (`origin/t0/birlesim`'den). Kaynak: `.calisma/eksikler/rapor.md
 9. **Gelişmiş panelin on kolu ve çeviri** (satır 11): kap, ölçek, anahtar kare, profil, ayar, hız kontrolü, piksel/renk, süre sınırı, bölme, ses düzeni/kazanç/kapı/bastırma denetimleri; bu paketin bütün yeni anahtarları 42 dilde.
 
 Kurallar: yapay yük yok, `dotnet build -m:2`, test yalnız `--filter`, pencere açan test yok (testte Win32 arka ucu gerçek pencere açar), kayıt defterine ve gerçek `%APPDATA%`'ya yazılmaz — `RecorderSettings` de `VIDSHRINK_SETTINGS_PATH`'e uyar.
+
+## Paket 2b
+
+Dal `t0/paket-2b` (`origin/main` 8c1ef48f). Kaynak: kaydedici tarifinin kalan T7 ve T13 maddeleri, Paket 2'nin ölçemediği
+pikseller, `.claude/acik.md` kaydedici borçları. Danışma `docs/danisma/2026-09-17-paket2b-fable.md`. Her kalem ayrı commit.
+
+1. **T7 odak.** Çatal 1 kararı (`plan-duzenleyici.md`): varsayılan düğmeyle (sonuç panelinde bugün var), kendiliğinden
+   Ayarlar'da bir seçenek. `AppSettings.FollowRecording` (kapalı): açıkken biten kayıt küçültme sekmesine yüklenir ve
+   oynatıcıda açılır, seçili sekme değişmez.
+2. **Boşluk kırpma.** `Core/IdleTrim`: `freezedetect` çıktısından donuk aralıklar, her aralık sınıra kısaltılır,
+   `select/aselect` ile yeniden kodlanır. Sonuç panelinde "Boşlukları kırp".
+3. **Arka plan ayırma.** Fable: modelsiz. `RecorderWebcam.Background` = yok / sabit arka plan (`backgroundkey`) /
+   yeşil perde (`chromakey`); webcam grafiğinde `overlay`'den önce.
+4. **Canlı önizleme.** Kayıt argümanına ikinci çıktı: yakalama girdisinden saniyede bir küçük JPEG (`-update 1`),
+   şeridin altında görüntü her saniye tazelenir.
+5. **Kayıt tamponu.** `Core/ReplayBuffer`: yakalama `-f segment -segment_wrap` ile döner parçalara yazılır, F11 son N
+   saniyeyi kapsayan parçaları `concat -c copy` ile çıkış klasörüne yazar. Tampon düğmesi şeritte.
+6. **Yükleme.** Fable: otomatik yükleme yok, "Paylaş" düğmesi kalır; storage.to varsayılan saklaması 3 günden 1 güne.
+7. **Piksel doğrulaması.** gdigrab bu makinede masaüstünü siyah veriyor (YAVG 16), `gfxcapture` desenli pencereyi
+   görüyor (YAVG 81). `tools/kaydedici-piksel`: çerçeve, halka ve büyüteç gerçek pencerelerle açılır, `gfxcapture`
+   kareleri piksel ölçülür; tıklama sesi `PlaySoundW` dönüşü ve ses çıkış yoklamasıyla. Tablo `docs/olcumler/kaydedici-piksel.md`.
+8. **Borçlar.** vp9 `-profile:v 0..3`, renk aralığı `mpeg`/`jpeg` takma adları, `RecorderSettings` JSON gidiş-dönüşü;
+   geri kalan satırlar Paket 2'de kapanmış, kanıtı raporda.
+9. **Çeviri ve pinler.** Yeni anahtarlar 43 dilde; `BiciminTests` sayım pinleri ve açıklama cümlesi yerel dökümden.
 
 ## Paket 3
 

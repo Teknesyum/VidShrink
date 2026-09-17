@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "preset ustalono na {0}; silnik wybrałby {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo pierwszy przebieg działa z innym presetem; ustalony {0} dotyczy tylko drugiego przebiegu, który tworzy wynik (pierwszy przebieg: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "ustalony {0} nie mógł zadziałać na ścieżce kopii; zamiast tego obowiązuje {1}",
+  "main.reason.dark-content-hevc": "źródło jest ciemne (średnia luminancja {0}); {1} tworzy pasma w cieniach, więc Automatycznie używa {2} z pierwszym przebiegiem turbo",
 
   "main.advice.budget-generous": "Cel jest hojny dla tego źródła, więc silnik spełnia go bez wysiłku.",
   "main.advice.codec-upgrade": "Przy tym nacisku H.265 daje wyraźnie lepszy wynik przy tym samym rozmiarze; rozważ przełączenie algorytmu kompresji na automatyczny lub H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Stały folder kieruje każdy wynik w to samo miejsce zamiast obok pliku źródłowego.",
   "settings-tab.advanced-default-open.label": "Domyślnie pokazuj opcje zaawansowane rozwinięte",
   "settings-tab.advanced-default-open.hint": "Otwiera sekcję zaawansowaną automatycznie przy każdym uruchomieniu aplikacji.",
+  "settings-tab.follow-recording.label": "Śledź nagranie we wszystkich kartach",
+  "settings-tab.follow-recording.hint": "Po zatrzymaniu nagrania karty Zmniejsz i Odtwarzacz wczytują je bez przełączania karty. Plik otwarty w odtwarzaczu trafia też do karty Zmniejsz.",
   "settings-tab.ffmpeg-path.label": "Ścieżka ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automatycznie",
   "settings-tab.ffmpeg-path.manual": "Ręcznie",

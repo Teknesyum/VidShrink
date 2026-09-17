@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "پیش‌تنظیم به {0} ثابت شد؛ موتور {1} را انتخاب می‌کرد",
   "main.reason.manual-preset-first-pass-relaxed": "گذر اول توربو با پیش‌تنظیم دیگری اجرا می‌شود؛ {0} ثابت فقط بر گذر دومی اعمال می‌شود که خروجی را می‌سازد (گذر اول: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} ثابت در مسیر کپی اعمال نشد؛ آنچه به‌جایش اعمال می‌شود {1} است",
+  "main.reason.dark-content-hevc": "منبع تاریک است (میانگین روشنایی {0})؛ {1} در سایه‌ها نوار می‌اندازد، پس خودکار از {2} با گذر اول توربو استفاده می‌کند",
 
   "main.advice.budget-generous": "هدف برای این منبع سخاوتمندانه است، پس موتور بدون فشار به آن می‌رسد.",
   "main.advice.codec-upgrade": "در این فشار H.265 در همان اندازه نتیجهٔ به‌وضوح بهتری می‌دهد؛ الگوریتم فشرده‌سازی را روی خودکار یا H.265 بگذارید.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "پوشهٔ ثابت هر خروجی را به‌جای کنار فایل منبع به یک جا می‌فرستد.",
   "settings-tab.advanced-default-open.label": "گزینه‌های پیشرفته به‌طور پیش‌فرض باز باشند",
   "settings-tab.advanced-default-open.hint": "بخش پیشرفته را در هر بار اجرای برنامه خودکار باز می‌کند.",
+  "settings-tab.follow-recording.label": "دنبال کردن ضبط در همه زبانه‌ها",
+  "settings-tab.follow-recording.hint": "وقتی ضبط متوقف شود، زبانه‌های کوچک‌سازی و پخش‌کننده آن را بدون تغییر زبانه بارگذاری می‌کنند. فایلی که در پخش‌کننده باز شود در کوچک‌سازی هم بارگذاری می‌شود.",
   "settings-tab.ffmpeg-path.label": "مسیر ffmpeg",
   "settings-tab.ffmpeg-path.auto": "خودکار",
   "settings-tab.ffmpeg-path.manual": "دستی",

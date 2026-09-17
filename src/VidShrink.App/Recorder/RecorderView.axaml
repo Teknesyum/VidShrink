@@ -90,6 +90,23 @@
                 Click="OnCountdownCancel"/>
 
         <Button Grid.Column="4"
+                x:Name="BtnReplay"
+                Height="{StaticResource RecorderButtonSize}"
+                Theme="{StaticResource GhostButton}"
+                Content="{loc:Text recorder.replay.start}"
+                ToolTip.Tip="{loc:Text recorder.replay.hint}"
+                IsVisible="False"
+                auto:AutomationProperties.Name="{loc:Text recorder.replay.start}"
+                Click="OnReplayToggle"/>
+
+        <Button Grid.Column="5"
+                x:Name="BtnReplaySave"
+                Height="{StaticResource RecorderButtonSize}"
+                Theme="{StaticResource GhostButton}"
+                IsVisible="False"
+                Click="OnReplaySave"/>
+
+        <Button Grid.Column="4"
                 x:Name="BtnPause"
                 Height="{StaticResource RecorderButtonSize}"
                 Theme="{StaticResource GhostButton}"
@@ -145,6 +162,13 @@
       </Grid>
     </Border>
 
+    <Image x:Name="ImgPreview"
+           Width="{StaticResource RecorderPreviewWidth}"
+           Stretch="Uniform"
+           HorizontalAlignment="Left"
+           IsVisible="False"
+           auto:AutomationProperties.Name="{loc:Text recorder.strip.preview}"/>
+
     <!-- Kayıt bittiğinde teslim edilen dosya. Yol her zaman görünür; yarım dosya da
          gizlenmiyor, kendi satırıyla bildiriliyor. -->
     <Border x:Name="ResultPanel" Theme="{StaticResource Panel}" IsVisible="False">
@@ -185,6 +209,13 @@
                   Content="{loc:Text recorder.output.to-mp4}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.to-mp4}"
                   Click="OnToMp4"/>
+          <Button x:Name="BtnTrimIdle"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsVisible="False"
+                  Content="{loc:Text recorder.output.trim-idle}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.trim-idle}"
+                  Click="OnTrimIdle"/>
           <Button x:Name="BtnRecShare"
                   Theme="{StaticResource PrimaryButton}"
                   Margin="{StaticResource WrapItemMargin}"
@@ -254,6 +285,14 @@
                       HorizontalAlignment="Stretch"
                       ToolTip.Tip="{loc:Text recorder.countdown.hint}"
                       auto:AutomationProperties.Name="{loc:Text recorder.countdown.title}"/>
+          </StackPanel>
+
+          <StackPanel>
+            <TextBlock Text="{loc:Text recorder.replay.label}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbReplaySeconds"
+                      HorizontalAlignment="Stretch"
+                      ToolTip.Tip="{loc:Text recorder.replay.hint}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.replay.label}"/>
           </StackPanel>
 
           <StackPanel x:Name="RowScreen" IsVisible="False">
@@ -431,6 +470,11 @@
                       Theme="{StaticResource CheckStyle}"
                       Content="{loc:Text recorder.option.magnifier}"
                       auto:AutomationProperties.Name="{loc:Text recorder.option.magnifier}"/>
+            <CheckBox x:Name="ChkLivePreview"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.option.live-preview}"
+                      ToolTip.Tip="{loc:Text recorder.option.live-preview-hint}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.option.live-preview}"/>
           </WrapPanel>
 
           <StackPanel>
@@ -623,6 +667,14 @@
         </Grid>
 
         <TextBlock Text="{loc:Text recorder.webcam.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+
+        <StackPanel>
+          <TextBlock Text="{loc:Text recorder.webcam.background.label}" Theme="{StaticResource Label}"/>
+          <ComboBox x:Name="CmbWebcamBackground"
+                    auto:AutomationProperties.Name="{loc:Text recorder.webcam.background.label}"/>
+        </StackPanel>
+
+        <TextBlock Text="{loc:Text recorder.webcam.background.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
       </StackPanel>
     </Border>
   </StackPanel>

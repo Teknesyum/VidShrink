@@ -248,6 +248,8 @@ public partial class MainWindow : Window
         Watch(RbOutputFixed, ToggleButton.IsCheckedProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Player.Opened += OnPlayerOpened;
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
@@ -1317,6 +1319,7 @@ public partial class MainWindow : Window
             OutputFolderMode = OutputFolderModeIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
+            FollowRecording = ChkFollowRecording.IsChecked == true,
             FfmpegPathMode = FfmpegPathModeIndex,
             FfmpegPath = TxtFfmpegPath.Text ?? "",
             Theme = _theme
@@ -1351,6 +1354,7 @@ public partial class MainWindow : Window
 
             ChkAdvancedDefaultOpen.IsChecked = settings.AdvancedDefaultOpen;
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
+            ChkFollowRecording.IsChecked = settings.FollowRecording;
 
             FfmpegPathModeIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
             TxtFfmpegPath.Text = settings.FfmpegPath;
@@ -3634,6 +3638,8 @@ public partial class MainWindow : Window
                     note.ManualOverrideValue, note.EngineWouldHaveChosen),
                 ReasonCode.ManualOverrideDroppedOnPassThrough => Say("main.reason.manual-override-dropped-on-pass-through",
                     note.ManualOverrideValue, note.EngineWouldHaveChosen),
+                ReasonCode.DarkContentHevc => Say("main.reason.dark-content-hevc",
+                    Num(note.Score, "0.#"), note.RequestedCodec, note.FallbackCodec),
                 _ => null
             };
             if (text is not null) parts.Add(text);
@@ -4652,7 +4658,7 @@ internal sealed record ShareTargetTable(string DefaultId, IReadOnlyList<ShareTar
         new[]
         {
             new ShareTarget("storage.to", "storage.to", StorageToMaxBytes,
-                new[] { 1, 2, 3, 4, 5, 6, 7 }, 3, null, true, true),
+                new[] { 1, 2, 3, 4, 5, 6, 7 }, 1, null, true, true),
             new ShareTarget("uguu.se", "uguu.se", UguuMaxBytes,
                 Array.Empty<int>(), 0, 3, false, true)
         });

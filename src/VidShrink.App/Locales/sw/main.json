@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "mpangilio ulithibitishwa kuwa {0}; injini ingechagua {1}",
   "main.reason.manual-preset-first-pass-relaxed": "hatua ya kwanza ya turbo huendeshwa kwa mpangilio tofauti; {0} thabiti hutumika tu kwenye hatua ya pili inayotoa matokeo (hatua ya kwanza: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} thabiti haikuweza kutumika kwenye njia ya nakala; kinachotumika badala yake ni {1}",
+  "main.reason.dark-content-hevc": "chanzo ni cheusi (wastani wa mwangaza {0}); {1} huleta mikanda kwenye vivuli, kwa hivyo Otomatiki hutumia {2} na mzunguko wa kwanza wa turbo",
 
   "main.advice.budget-generous": "Lengo ni kubwa kwa chanzo hiki, kwa hiyo injini hulifikia bila shida.",
   "main.advice.codec-upgrade": "Kwa shinikizo hili H.265 hutoa matokeo bora zaidi ya kuonekana kwa ukubwa ule ule; fikiria kubadilisha algoriti ya ufinyazi kuwa otomatiki au H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Folda thabiti hupeleka kila matokeo mahali pamoja badala ya kando ya faili ya chanzo.",
   "settings-tab.advanced-default-open.label": "Onyesha chaguo za kina zikiwa zimepanuliwa kwa chaguomsingi",
   "settings-tab.advanced-default-open.hint": "Hufungua sehemu ya kina kiotomatiki kila programu inapoanza.",
+  "settings-tab.follow-recording.label": "Fuata rekodi katika vichupo vyote",
+  "settings-tab.follow-recording.hint": "Rekodi inaposimama, Punguza na Kicheza huipakia bila kubadilisha kichupo. Faili iliyofunguliwa kwenye Kicheza pia hupakiwa kwenye Punguza.",
   "settings-tab.ffmpeg-path.label": "Njia ya ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Otomatiki",
   "settings-tab.ffmpeg-path.manual": "Kwa mkono",

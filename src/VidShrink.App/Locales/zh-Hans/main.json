@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "预设固定为 {0}；引擎本会选择 {1}",
   "main.reason.manual-preset-first-pass-relaxed": "快速第一遍使用不同的预设；固定的 {0} 只应用于产生输出的第二遍（第一遍：{1}）",
   "main.reason.manual-override-dropped-on-pass-through": "固定的 {0} 无法应用于复制路径；实际应用的是 {1}",
+  "main.reason.dark-content-hevc": "源视频较暗（平均亮度 {0}），{1} 会在暗部产生色带，因此自动模式使用带涡轮首遍的 {2}",
 
   "main.advice.budget-generous": "对此源来说目标很宽裕，引擎可以轻松达到。",
   "main.advice.codec-upgrade": "在此压力下，H.265 在相同大小下效果明显更好；请考虑将压缩算法切换为自动或 H.265。",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "固定文件夹会把所有输出放到同一位置，而不是源文件旁边。",
   "settings-tab.advanced-default-open.label": "默认展开高级选项",
   "settings-tab.advanced-default-open.hint": "每次启动应用时自动展开高级部分。",
+  "settings-tab.follow-recording.label": "在所有标签页中跟随录制",
+  "settings-tab.follow-recording.hint": "录制停止后，压缩和播放器标签页会加载该文件，不会切换标签页。在播放器中打开的文件也会加载到压缩标签页。",
   "settings-tab.ffmpeg-path.label": "ffmpeg 路径",
   "settings-tab.ffmpeg-path.auto": "自动",
   "settings-tab.ffmpeg-path.manual": "手动",

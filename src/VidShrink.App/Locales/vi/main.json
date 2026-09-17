@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "preset được cố định là {0}; bộ máy lẽ ra chọn {1}",
   "main.reason.manual-preset-first-pass-relaxed": "lượt đầu turbo chạy với preset khác; {0} cố định chỉ áp dụng cho lượt hai tạo đầu ra (lượt đầu: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} cố định không áp dụng được trên đường sao chép; thay vào đó áp dụng {1}",
+  "main.reason.dark-content-hevc": "nguồn tối (độ sáng trung bình {0}); {1} tạo dải màu ở vùng tối, nên Tự động dùng {2} với lượt đầu turbo",
 
   "main.advice.budget-generous": "Mục tiêu rộng rãi với nguồn này, nên bộ máy đạt được mà không gắng sức.",
   "main.advice.codec-upgrade": "Ở áp lực này H.265 cho kết quả rõ ràng tốt hơn với cùng dung lượng; cân nhắc chuyển thuật toán nén sang tự động hoặc H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Thư mục cố định gửi mọi đầu ra về cùng một nơi thay vì cạnh tệp nguồn.",
   "settings-tab.advanced-default-open.label": "Mặc định mở rộng tùy chọn nâng cao",
   "settings-tab.advanced-default-open.hint": "Tự mở phần nâng cao mỗi khi ứng dụng khởi động.",
+  "settings-tab.follow-recording.label": "Theo dõi bản ghi ở mọi thẻ",
+  "settings-tab.follow-recording.hint": "Khi dừng ghi, thẻ Thu nhỏ và Trình phát tải bản ghi mà không đổi thẻ. Tệp mở trong Trình phát cũng được tải vào Thu nhỏ.",
   "settings-tab.ffmpeg-path.label": "Đường dẫn ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Tự động",
   "settings-tab.ffmpeg-path.manual": "Thủ công",

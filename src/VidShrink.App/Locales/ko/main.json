@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "프리셋이 {0}(으)로 고정됨. 엔진은 {1}을(를) 골랐을 것",
   "main.reason.manual-preset-first-pass-relaxed": "터보 1패스는 다른 프리셋으로 실행됨. 고정된 {0}은 출력을 만드는 2패스에만 적용 (1패스: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "고정된 {0}은 복사 경로에 적용될 수 없음. 대신 적용되는 것은 {1}",
+  "main.reason.dark-content-hevc": "소스가 어두움(평균 밝기 {0}). {1}은 어두운 부분에 밴딩이 생기므로 자동은 터보 첫 패스와 함께 {2}를 사용",
 
   "main.advice.budget-generous": "이 원본에 목표가 넉넉하여 엔진이 무리 없이 맞춥니다.",
   "main.advice.codec-upgrade": "이 압박에서는 H.265가 같은 크기에서 눈에 띄게 나은 결과를 냅니다. 압축 알고리즘을 자동이나 H.265로 바꾸는 것을 고려하세요.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "고정 폴더는 모든 출력을 원본 옆이 아닌 같은 곳으로 보냅니다.",
   "settings-tab.advanced-default-open.label": "고급 옵션을 기본으로 펼쳐서 표시",
   "settings-tab.advanced-default-open.hint": "앱을 시작할 때마다 고급 섹션을 자동으로 엽니다.",
+  "settings-tab.follow-recording.label": "모든 탭에서 녹화 따라가기",
+  "settings-tab.follow-recording.hint": "녹화가 멈추면 탭을 바꾸지 않고 축소와 플레이어에 불러옵니다. 플레이어에서 연 파일도 축소 탭에 불러옵니다.",
   "settings-tab.ffmpeg-path.label": "ffmpeg 경로",
   "settings-tab.ffmpeg-path.auto": "자동",
   "settings-tab.ffmpeg-path.manual": "수동",

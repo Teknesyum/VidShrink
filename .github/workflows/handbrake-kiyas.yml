@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       isler:
-        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,tavanbekci,svtbant,turboilk,socialkodek,vtara
+        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,tavanbekci,svtbant,turboilk,socialkodek,vtara,yavg,karanlikgecis
         default: handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
       kesitler:
         description: handbrake isinin kesitleri
@@ -87,6 +87,8 @@ jobs:
             svtbant = @('karanlik', 'parlak', 'hareketli', 'ekran')
             turboilk = @('karanlik', 'hareketli')
             socialkodek = @('parlak', 'karanlik', 'hareketli')
+            yavg = @('dort')
+            karanlikgecis = @('karanlik', 'parlak', 'hareketli', 'ekran')
           }
           $liste = @()
           foreach ($is in @($isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -notin @('vt', 'vtara') })) {
@@ -208,6 +210,18 @@ jobs:
           [IO.File]::WriteAllText($f, $t.Replace($eski, 'plan.PeakEqualsRate && false)'))
           dotnet build (Join-Path $d 'tools/VidShrink.Bench') -c Release -m:2
           if ($LASTEXITCODE -ne 0) { throw 'negatif bench derlenemedi' }
+          "BENCH_NEG=$(Join-Path $d 'tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll')" | Add-Content $env:GITHUB_ENV
+      - name: e0 main bench derle
+        if: matrix.is == 'karanlikgecis'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $sha = '460ecc89d4da1d22e0c297118271a84f844063c6'
+          git fetch --depth 1 origin $sha
+          $d = Join-Path $env:RUNNER_TEMP 'e0'
+          git worktree add --detach $d $sha
+          if ((git -C $d rev-parse HEAD) -ne $sha) { throw 'e0 worktree yanlis commit' }
+          dotnet build (Join-Path $d 'tools/VidShrink.Bench') -c Release -m:2
+          if ($LASTEXITCODE -ne 0) { throw 'e0 bench derlenemedi' }
           "BENCH_NEG=$(Join-Path $d 'tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll')" | Add-Content $env:GITHUB_ENV
       - name: turbo bench derle
         if: matrix.is == 'turbo'

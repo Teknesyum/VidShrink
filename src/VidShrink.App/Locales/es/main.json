@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "el preajuste se fijó en {0}; el motor habría elegido {1}",
   "main.reason.manual-preset-first-pass-relaxed": "la primera pasada turbo corre con otro preajuste; el {0} fijo solo se aplica a la segunda pasada que produce la salida (primera pasada: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "el {0} fijo no pudo aplicarse en la ruta de copia; lo que se aplica en su lugar es {1}",
+  "main.reason.dark-content-hevc": "la fuente es oscura (luminancia media {0}); {1} genera bandas en las sombras, así que Automático usa {2} con primera pasada turbo",
 
   "main.advice.budget-generous": "El destino es generoso para esta fuente, así que el motor lo cumple sin esfuerzo.",
   "main.advice.codec-upgrade": "A esta presión H.265 da un resultado visiblemente mejor al mismo tamaño; considera pasar el algoritmo de compresión a automático o H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Carpeta fija envía cada salida al mismo sitio en vez de junto al archivo fuente.",
   "settings-tab.advanced-default-open.label": "Mostrar opciones avanzadas desplegadas por defecto",
   "settings-tab.advanced-default-open.hint": "Abre la sección avanzada automáticamente cada vez que arranca la app.",
+  "settings-tab.follow-recording.label": "Seguir la grabación en todas las pestañas",
+  "settings-tab.follow-recording.hint": "Al detener una grabación, Reducir y Reproductor la cargan sin cambiar de pestaña. Un archivo abierto en el Reproductor también se carga en Reducir.",
   "settings-tab.ffmpeg-path.label": "Ruta de ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automática",
   "settings-tab.ffmpeg-path.manual": "Manual",

@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "az előbeállítás {0}-ra volt rögzítve; a motor {1}-t választott volna",
   "main.reason.manual-preset-first-pass-relaxed": "a turbó első menet más előbeállítással fut; a rögzített {0} csak a kimenetet adó második menetre vonatkozik (első menet: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "a rögzített {0} nem érvényesülhetett a másolási úton; helyette ez érvényes: {1}",
+  "main.reason.dark-content-hevc": "a forrás sötét (átlagos fénysűrűség {0}); a {1} sávosodik az árnyékokban, ezért az Automatikus a {2}-t használja turbó első menettel",
 
   "main.advice.budget-generous": "A cél bőséges ehhez a forráshoz, ezért a motor erőlködés nélkül teljesíti.",
   "main.advice.codec-upgrade": "Ekkora nyomásnál a H.265 láthatóan jobb eredményt ad ugyanazon méretnél; fontolja meg a tömörítési algoritmus automatikusra vagy H.265-re váltását.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "A rögzített mappa minden kimenetet ugyanoda küld a forrásfájl melletti hely helyett.",
   "settings-tab.advanced-default-open.label": "Haladó beállítások alapból kibontva",
   "settings-tab.advanced-default-open.hint": "Minden indításkor automatikusan kinyitja a haladó szakaszt.",
+  "settings-tab.follow-recording.label": "A felvétel követése minden lapon",
+  "settings-tab.follow-recording.hint": "A felvétel leállításakor a Tömörítés és a Lejátszó lap betölti azt lapváltás nélkül. A lejátszóban megnyitott fájl a Tömörítés lapra is betöltődik.",
   "settings-tab.ffmpeg-path.label": "ffmpeg útvonal",
   "settings-tab.ffmpeg-path.auto": "Automatikus",
   "settings-tab.ffmpeg-path.manual": "Kézi",

@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "priekšiestatījums tika fiksēts uz {0}; dzinējs būtu izvēlējies {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo pirmā gaita darbojas ar citu priekšiestatījumu; fiksētais {0} attiecas tikai uz otro gaitu, kas veido izvadi (pirmā gaita: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "fiksēto {0} nevarēja piemērot kopijas ceļā; tā vietā tiek piemērots {1}",
+  "main.reason.dark-content-hevc": "avots ir tumšs (vidējais spilgtums {0}); {1} ēnās rada joslas, tāpēc Automātiski izmanto {2} ar turbo pirmo gājienu",
 
   "main.advice.budget-generous": "Mērķis šim avotam ir dāsns, tāpēc dzinējs to sasniedz bez piepūles.",
   "main.advice.codec-upgrade": "Pie šāda spiediena H.265 dod redzami labāku rezultātu tajā pašā izmērā; apsveriet saspiešanas algoritma pārslēgšanu uz automātisko vai H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Fiksēta mape sūta katru izvadi uz vienu vietu, nevis blakus avota failam.",
   "settings-tab.advanced-default-open.label": "Rādīt papildu opcijas izvērstas pēc noklusējuma",
   "settings-tab.advanced-default-open.hint": "Automātiski atver papildu sadaļu katrā lietotnes palaišanā.",
+  "settings-tab.follow-recording.label": "Sekot ierakstam visās cilnēs",
+  "settings-tab.follow-recording.hint": "Kad ieraksts apstājas, Samazināt un Atskaņotājs to ielādē, nemainot cilni. Atskaņotājā atvērts fails tiek ielādēts arī cilnē Samazināt.",
   "settings-tab.ffmpeg-path.label": "ffmpeg ceļš",
   "settings-tab.ffmpeg-path.auto": "Automātiski",
   "settings-tab.ffmpeg-path.manual": "Manuāli",

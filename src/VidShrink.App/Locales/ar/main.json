@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "ثُبّت الإعداد المسبق على {0}؛ كان المحرك سيختار {1}",
   "main.reason.manual-preset-first-pass-relaxed": "التمريرة الأولى التوربو تعمل بإعداد مسبق مختلف؛ {0} المثبّت ينطبق فقط على التمريرة الثانية التي تنتج الناتج (التمريرة الأولى: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "تعذر تطبيق {0} المثبّت على مسار النسخ؛ ما يُطبَّق بدله هو {1}",
+  "main.reason.dark-content-hevc": "المصدر داكن (متوسط السطوع {0})؛ يُحدث {1} تدرجات شريطية في الظلال، لذا يستخدم الوضع التلقائي {2} مع تمريرة أولى سريعة",
 
   "main.advice.budget-generous": "الهدف سخي لهذا المصدر، فيلبيه المحرك بلا عناء.",
   "main.advice.codec-upgrade": "عند هذا الضغط يعطي H.265 نتيجة أفضل بوضوح بالحجم نفسه؛ فكّر في تبديل خوارزمية الضغط إلى تلقائي أو H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "المجلد الثابت يرسل كل ناتج إلى المكان نفسه بدل جانب ملف المصدر.",
   "settings-tab.advanced-default-open.label": "إظهار الخيارات المتقدمة موسّعة افتراضياً",
   "settings-tab.advanced-default-open.hint": "يفتح القسم المتقدم تلقائياً في كل مرة يبدأ فيها التطبيق.",
+  "settings-tab.follow-recording.label": "تتبّع التسجيل في كل التبويبات",
+  "settings-tab.follow-recording.hint": "عند إيقاف التسجيل يُحمَّل في تبويبَي التصغير والمشغّل دون تبديل التبويب. والملف المفتوح في المشغّل يُحمَّل أيضًا في التصغير.",
   "settings-tab.ffmpeg-path.label": "مسار ffmpeg",
   "settings-tab.ffmpeg-path.auto": "تلقائي",
   "settings-tab.ffmpeg-path.manual": "يدوي",

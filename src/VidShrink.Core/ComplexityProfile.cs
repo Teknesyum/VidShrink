@@ -118,6 +118,7 @@ public sealed record ComplexityProfile
     public WindowBiasSource BiasSource { get; init; } = WindowBiasSource.None;
     public QualityAnchor? QualityAnchor { get; init; }
     public bool SampleContainerBiasRemoved { get; init; }
+    public double? MeanLuma { get; init; }
 
     public bool Calibrated => Calibration is not null && LevelFactor > 0 && HalvingStep > 0;
 

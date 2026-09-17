@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "o preset foi fixado em {0}; o motor teria escolhido {1}",
   "main.reason.manual-preset-first-pass-relaxed": "a primeira passagem turbo roda com outro preset; o {0} fixo só se aplica à segunda passagem que produz a saída (primeira passagem: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "o {0} fixo não pôde se aplicar na via de cópia; o que se aplica no lugar é {1}",
+  "main.reason.dark-content-hevc": "a origem é escura (luminância média {0}); {1} cria faixas nas sombras, então o Automático usa {2} com primeira passagem turbo",
 
   "main.advice.budget-generous": "O alvo é generoso para esta fonte, então o motor o atinge sem esforço.",
   "main.advice.codec-upgrade": "Nesta pressão o H.265 dá um resultado visivelmente melhor no mesmo tamanho; considere mudar o algoritmo de compressão para automático ou H.265.",
@@ -457,6 +458,8 @@
   "settings-tab.output-folder.hint": "Pasta fixa envia toda saída para o mesmo lugar em vez de ao lado do arquivo de origem.",
   "settings-tab.advanced-default-open.label": "Mostrar opções avançadas expandidas por padrão",
   "settings-tab.advanced-default-open.hint": "Abre a seção avançada automaticamente sempre que o app inicia.",
+  "settings-tab.follow-recording.label": "Seguir a gravação em todas as abas",
+  "settings-tab.follow-recording.hint": "Quando uma gravação para, Reduzir e Player a carregam sem trocar de aba. Um arquivo aberto no Player também é carregado em Reduzir.",
   "settings-tab.ffmpeg-path.label": "Caminho do ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automático",
   "settings-tab.ffmpeg-path.manual": "Manual",

@@ -101,7 +101,7 @@ candidate is never labelled unusable.
 VideoToolbox is recognized as a vendor in `CodecModel` but is not in the shrink path's
 allowed list today. VP9 lives on the Convert tab.
 
-![The codec tooltip in English, explaining that H.264 is universal and never re-encoded by WhatsApp, that H.265 needs roughly a third fewer bits but is refused by older phones and some web players, that Automatic picks between them by how tight the target is, and that speed is chosen with the Fast Shrink GPU switch instead](gorseller/t27-kodek-en.png)
+![The codec tooltip in English, explaining that H.264 is universal and never re-encoded by WhatsApp, that H.265 needs roughly a third fewer bits but is refused by older phones and some web players, and that speed is chosen with the Fast Shrink GPU switch instead](gorseller/t27-kodek-en.png)
 
 - **H.264** plays on essentially every device ever made and is what WhatsApp expects.
 - **H.265** needs roughly a third fewer bits for the same picture; every phone since about
@@ -109,6 +109,11 @@ allowed list today. VP9 lives on the Convert tab.
 - **VP9** is a browser and WebM format.
 - **AV1** compresses best and encodes slowest; only recent phones decode it.
 - **Stream copy** is instant and lossless when the destination accepts the source streams.
+- **Automatic** keeps H.264 while the target leaves room (less than about six times smaller
+  than the source) and moves to AV1 when it is tighter. One exception: when the probe
+  measures a dark source (mean luma below 44 on the 16–235 scale), where AV1 bands in the
+  shadows, a tight target goes to H.265 with a fast first pass instead. A codec you pick
+  yourself, or lock, is never changed.
 
 ### The right-click menu
 

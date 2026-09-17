@@ -393,6 +393,8 @@ public sealed class OluUyeTests
     /// Kumeyi 34'ten 37'ye cikaran dalga 1c, akis eslemesi: <c>StreamKind.Data</c>,
     /// <c>StreamNote.LosslessAudioNotPassedThrough</c> ve <c>TrackAction.Encode</c> ucu de
     /// kardesleri adiyla okunan turun varsayilan kolu.
+    /// Kumeyi 35'ten 36'ya cikaran Paket 2b, kamera arka plani: <c>WebcamBackground.Keep</c>
+    /// <c>RecorderArguments.WebcamKey</c> ve <c>RecorderView.BackgroundKey</c>'de '_' kolu, iki kardesi adiyla okunuyor.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
@@ -458,6 +460,8 @@ public sealed class OluUyeTests
             "Plan notlarinin son kolu. PlanCalculator.AddStreamNotes yedi notu adiyla yaziyor, TrueHD/DTS cumlesi '_' kolunda; ayri bir kol ayni cumleyi verirdi."),
         new("TrackAction.Encode", "varsayilan-kol", Legitimate,
             "Iki degerli iz eyleminin varsayilani. Argumanlar 'action == TrackAction.Copy' diye soruyor; Encode o kosulun else'i."),
+        new("WebcamBackground.Keep", "varsayilan-kol", Legitimate,
+            "Kamera arka planinin varsayilani. RecorderArguments ve RecorderView.BackgroundKey Static ile Green'i adiyla yazip '_' koluna dokunulmamis goruntuyu veriyor; ayri bir kol ayni degeri verirdi."),
         new("WebcamCorner.BottomRight", "varsayilan-kol", Legitimate,
             "Kamera kosesinin varsayilani. RecorderArguments.WebcamPosition ve RecorderView.CornerKey uc koseyi adlandirip '_' koluna sag-alti yaziyor; ayri bir kol ayni degeri verirdi."),
         new("WindowBiasSource.None", "varsayilan-kol", Legitimate,
