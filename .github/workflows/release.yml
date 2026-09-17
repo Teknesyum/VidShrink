@@ -492,7 +492,7 @@ jobs:
           "kosucu mimarisi: $env:PROCESSOR_ARCHITECTURE $([Runtime.InteropServices.RuntimeInformation]::OSArchitecture)"
           foreach ($pe in @('app/vidshrink.exe', 'app/VidShrink.App.exe', 'app/libSkiaSharp.dll')) {
             if (-not (Test-Path $pe)) { Write-Host "$pe yok"; continue }
-            $b = [IO.File]::ReadAllBytes($pe)
+            $b = [IO.File]::ReadAllBytes((Resolve-Path $pe).Path)
             $off = [BitConverter]::ToInt32($b, 0x3C)
             $machine = [BitConverter]::ToUInt16($b, $off + 4)
             "PE makine $pe = 0x{0:X4}" -f $machine
