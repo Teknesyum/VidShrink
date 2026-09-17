@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg đã kết thúc với mã {0}.",
   "recorder.error.no-ffmpeg": "Không thể tìm thấy {0}.",
   "recorder.error.invalid": "Các cài đặt này không cho phép ghi hình: {0}",
+  "recorder.error.window-wayland": "Không hỗ trợ ghi cửa sổ trong phiên Wayland; hãy chọn màn hình hoặc vùng, hoặc đăng nhập vào phiên X11.",
+  "recorder.error.window-missing": "Không tìm thấy cửa sổ \"{0}\"; hãy làm mới danh sách và chọn lại.",
   "recorder.error.number": "{0} phải là một số.",
   "recorder.error.start": "Không thể bắt đầu ghi hình: {0}",
   "recorder.error.folder": "Không thể chọn thư mục: {0}",

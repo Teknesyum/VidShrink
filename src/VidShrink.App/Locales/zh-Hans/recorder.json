@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg 以代码 {0} 结束。",
   "recorder.error.no-ffmpeg": "找不到 {0}。",
   "recorder.error.invalid": "当前设置不允许录制：{0}",
+  "recorder.error.window-wayland": "Wayland 会话不支持录制窗口；请选择屏幕或区域，或登录 X11 会话。",
+  "recorder.error.window-missing": "找不到窗口“{0}”；请刷新列表后重新选择。",
   "recorder.error.number": "{0} 必须是一个数字。",
   "recorder.error.start": "无法开始录制：{0}",
   "recorder.error.folder": "无法选择文件夹：{0}",

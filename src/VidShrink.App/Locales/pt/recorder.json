@@ -52,6 +52,8 @@
   "recorder.output.failed": "O ffmpeg terminou com o código {0}.",
   "recorder.error.no-ffmpeg": "{0} não pôde ser encontrado.",
   "recorder.error.invalid": "Essas configurações não permitem uma gravação: {0}",
+  "recorder.error.window-wayland": "A gravação de janela não é suportada numa sessão Wayland; escolha ecrã ou região, ou inicie uma sessão X11.",
+  "recorder.error.window-missing": "A janela \"{0}\" não foi encontrada; atualize a lista e escolha-a novamente.",
   "recorder.error.number": "{0} precisa ser um número.",
   "recorder.error.start": "A gravação não pôde ser iniciada: {0}",
   "recorder.error.folder": "A pasta não pôde ser escolhida: {0}",

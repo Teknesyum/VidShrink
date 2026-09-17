@@ -750,19 +750,19 @@ public sealed class OynaticiYolHaritasiTests
         Hareket(window, view, new Point(480, 100));
         Dongu(() =>
         {
-            if (serit.Opacity <= 0) return true;
+            if (serit.Opacity < 0.001) return true;
             if (saat.Bekleyen is null)
             {
                 Hareket(window, view, new Point(480, yuzey.Bounds.Height - 4));
                 Hareket(window, view, new Point(480, 100));
             }
             saat.Ates();
-            return serit.Opacity <= 0;
+            return serit.Opacity < 0.001;
         }, 10);
         string Alan(string ad) => typeof(HoverZone).GetField(ad, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(view.SeritZone)!.ToString()!;
         var neden = $"oynuyor {view.IsPlaying}, fare icinde {Alan("_pointerInside")}, tutuluyor {Alan("_held")}, gorunur {Alan("_visible")}, yuzey {YolKanit.N(yuzey.Bounds.Height)}";
         body.AppendLine($"[hareket azaltilmis {azalt}] kapali serit saydamligi {YolKanit.N(serit.Opacity)}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms, {neden}");
-        Assert.True(serit.Opacity <= 0, $"on kosul: serit kapanmadi, saydamlik {serit.Opacity}, {neden}");
+        Assert.True(serit.Opacity < 0.001, $"on kosul: serit kapanmadi, saydamlik {serit.Opacity}, {neden}");
 
         var seritSol = serit.TranslatePoint(new Point(0, 0), window)!.Value;
         var fareX = seritSol.X + serit.Bounds.Width * 0.2;

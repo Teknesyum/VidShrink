@@ -13,9 +13,9 @@ Her hedef yongası bir yerde gerçek bir sınırdır; `?` rozeti hangisi olduğu
 
 | Yonga | O sayı neden |
 |---|---|
-| **8** | Nitro'suz Discord, eski forumlar, katı e-posta ağ geçitleri |
+| **8** | Eski forumlar, katı e-posta ağ geçitleri |
 | **16** *(WhatsApp için önerilen)* | WhatsApp sohbetteki videoyu kendi zayıf kodlayıcısıyla yeniden kodlar; 16 MB altında sizinkini genelde olduğu gibi geçirir |
-| **25** | Gmail ekleri, Discord Nitro Basic, çoğu talep sistemi |
+| **25** | Gmail ekleri, çoğu talep sistemi |
 | **100** | Kalitenin aktarım süresinden önemli olduğu arşiv ve yüklemeler |
 | **128** *(paylaşım için en fazla)* | İki anonim paylaşım hedefinin dar olanı uguu.se'nin ölçülmüş tavanı |
 | **180** *(WhatsApp Web için en fazla)* | WhatsApp Web dosya başına 180 MB alıyor; sayı kullanıcı bildirimi, WhatsApp yayımlamıyor |
@@ -99,7 +99,7 @@ makinenizde denenir, deneme başarısız olursa sıradakine geçilir ve denenmem
 VideoToolbox `CodecModel` içinde bir sağlayıcı olarak tanınıyor ama bugün küçültme yolunun
 izin listesinde değil. VP9 Dönüştür sekmesinde.
 
-![Türkçe kodek ipucu: H.264'ün son on beş yılın her telefonunda çalıştığını ve WhatsApp'ın onu yeniden kodlamadığını, H.265'in aynı resim için üçte bir daha az bit istediğini ama bazı eski Android telefonların ve web oynatıcıların onu reddettiğini, Otomatik'in hafif hedeflerde H.264'ü sıkı hedeflerde H.265'i seçtiğini ve hızın artık burada değil Hızlı Küçültme (GPU) ile seçildiğini anlatıyor](gorseller/t27-kodek-tr.png)
+![Eski (Ağustos 2026) Türkçe kodek ipucu: H.264'ün son on beş yılın her telefonunda çalıştığını ve WhatsApp'ın onu yeniden kodlamadığını, H.265'in aynı resim için üçte bir daha az bit istediğini ama bazı eski Android telefonların ve web oynatıcıların onu reddettiğini, Otomatik'in hafif hedeflerde H.264'ü sıkı hedeflerde H.265'i seçtiğini ve hızın Hızlı Düşür (GPU) ile seçildiğini anlatıyor. Otomatik bugün sıkı hedefte AV1'e geçiyor; güncel davranış aşağıdaki listede](gorseller/t27-kodek-tr.png)
 
 - **H.264** neredeyse yapılmış her aygıtta oynar ve WhatsApp'ın beklediği kodektir.
 - **H.265** aynı resim için kabaca üçte bir daha az bit ister; 2016 sonrası her telefon onu
@@ -107,6 +107,13 @@ izin listesinde değil. VP9 Dönüştür sekmesinde.
 - **VP9** bir tarayıcı ve WebM biçimidir.
 - **AV1** en iyi sıkıştırır, en yavaş kodlar; yalnız yeni telefonlar çözer.
 - **Akış kopyası** hedef kaynağın akışlarını kabul ettiğinde anlıktır ve kayıpsızdır.
+- **Otomatik** hedef rahatken (kaynaktan kabaca altı kattan az küçük) H.264'te kalır, daha
+  sıkıysa AV1'e geçer. Tek istisna: sonda karanlık bir kaynak ölçerse (16–235 ölçeğinde
+  ortalama parlaklık 44'ün altı), AV1 gölgelerde bantlaştığı için sıkı hedef hızlı ilk geçişli
+  H.265'e gider. Plan panelinin kodlayıcı satırı ve gerekçe satırı gerçekten kodlanan kodeği
+  yazar. HDR kaynak (PQ `smpte2084` ya da HLG `arib-std-b67`) bu istisnaya girmez; parlaklığı
+  eşiğin ölçüldüğü SDR ölçeğinde değildir. Elle seçtiğiniz ya da kilitlediğiniz kodek
+  değişmez.
 
 ### Sağ tık menüsü
 

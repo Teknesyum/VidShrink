@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg avslutades med kod {0}.",
   "recorder.error.no-ffmpeg": "{0} kunde inte hittas.",
   "recorder.error.invalid": "Dessa inställningar tillåter inte en inspelning: {0}",
+  "recorder.error.window-wayland": "Fönsterinspelning stöds inte i en Wayland-session; välj skärm eller område, eller logga in i en X11-session.",
+  "recorder.error.window-missing": "Fönstret ”{0}” hittades inte; uppdatera listan och välj det igen.",
   "recorder.error.number": "{0} måste vara ett tal.",
   "recorder.error.start": "Inspelningen kunde inte starta: {0}",
   "recorder.error.folder": "Mappen kunde inte väljas: {0}",
