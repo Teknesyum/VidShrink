@@ -13,6 +13,7 @@ public static class ExitCodes
     public const int Error = 1;
     public const int UnderBand = 2;
     public const int CeilingExceeded = 3;
+    public const int WatchFailures = 4;
     public const int Usage = 64;
     public const int Cancelled = 130;
 }
@@ -29,6 +30,7 @@ public sealed record CliRequest
     public double? PollSeconds { get; init; }
     public bool Once { get; init; }
     public bool Json { get; init; }
+    public bool JsonLines { get; init; }
     public bool SkipMeasurement { get; init; }
     public bool MeasureVmaf { get; init; }
     public bool Fast { get; init; }

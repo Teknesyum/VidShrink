@@ -16,6 +16,7 @@ public sealed class CliServices
     public Func<IEncoderAvailability?> Availability { get; init; } = () => EncoderCapabilities.Instance;
     public IWatchFileSystem WatchFileSystem { get; init; } = PhysicalWatchFileSystem.Instance;
     public IWatchClock WatchClock { get; init; } = SystemWatchClock.Instance;
+    public Func<string?> WatchStateFallbackDirectory { get; init; } = () => Path.GetDirectoryName(UpdateSettings.DefaultPath) is { } settings ? Path.Combine(settings, "izle") : null;
 }
 
 public sealed record CliDecision(
@@ -134,14 +135,19 @@ public static class CliApp
         }
         fs.CreateDirectory(outputDirectory);
 
-        var load = WatchFolder.LoadState(fs, Path.Combine(watchDirectory, WatchFolder.StateFileName), clock.UtcNow);
+        var location = WatchFolder.OpenState(fs, watchDirectory, outputDirectory, services.WatchStateFallbackDirectory(), clock.UtcNow);
+        var load = location.Load;
         if (load.CorruptBackup is { } backup) stderr.WriteLine(text.Format("watch.corrupt-state", backup));
+        if (!location.Writable) stderr.WriteLine(text.Format("watch.state-not-saved", location.Path, "-"));
+        else if (!string.Equals(location.Path, Path.Combine(watchDirectory, WatchFolder.StateFileName), WatchFolder.PathComparison))
+            stderr.WriteLine(text.Format("watch.state-elsewhere", location.Path));
 
         var interval = TimeSpan.FromSeconds(request.PollSeconds ?? 2);
         var watcher = new WatchFolder(new WatchOptions
         {
             WatchDirectory = watchDirectory,
             OutputDirectory = outputDirectory,
+            StatePath = location.Path,
             PollInterval = interval,
             StableFor = interval,
             Once = request.Once
@@ -150,7 +156,7 @@ public static class CliApp
         stderr.WriteLine(text.Format("watch.started", watchDirectory, outputDirectory));
         var result = await watcher.RunAsync(async (path, token) =>
         {
-            var fileRequest = request with { Command = CliCommand.Shrink, Input = path, Output = null, OutputDirectory = outputDirectory };
+            var fileRequest = request with { Command = CliCommand.Shrink, Input = path, Output = null, OutputDirectory = outputDirectory, JsonLines = request.Json };
             var run = await ProcessFileAsync(fileRequest, services, stdout, stderr, text, token);
             return new WatchOutcome(run.ExitCode, run.ExitCode is ExitCodes.InBand or ExitCodes.UnderBand or ExitCodes.CeilingExceeded,
                 run.Output, run.Error);
@@ -163,13 +169,16 @@ public static class CliApp
                 case WatchEventKind.Processing: stderr.WriteLine(text.Format("watch.processing", name)); break;
                 case WatchEventKind.Done: stderr.WriteLine(text.Format("watch.done", name, e.Detail is null ? "-" : Path.GetFileName(e.Detail))); break;
                 case WatchEventKind.Failed: stderr.WriteLine(text.Format("watch.failed", name, e.Detail)); break;
+                case WatchEventKind.Skipped: stderr.WriteLine(text.Format("watch.skipped", name)); break;
+                case WatchEventKind.Changed: stderr.WriteLine(text.Format("watch.changed", name)); break;
+                case WatchEventKind.StateNotSaved: stderr.WriteLine(text.Format("watch.state-not-saved", e.Path, e.Detail)); break;
                 case WatchEventKind.Stopped: stderr.WriteLine(text["watch.stopped"]); break;
             }
         }, ct);
 
         return result switch
         {
-            WatchRunResult.Finished => ExitCodes.InBand,
+            WatchRunResult.Finished => watcher.FailedCount > 0 ? ExitCodes.WatchFailures : ExitCodes.InBand,
             WatchRunResult.Cancelled => ExitCodes.Cancelled,
             _ => throw new ArgumentOutOfRangeException(nameof(result))
         };
@@ -282,7 +291,7 @@ public static class CliApp
     }
 
     public static string PlanJson(CliRequest request, CliDecision decision)
-        => Json(writer =>
+        => Json(!request.JsonLines, writer =>
         {
             writer.WriteString("command", "plan");
             WriteDecision(writer, request, decision);
@@ -309,7 +318,7 @@ public static class CliApp
 
     private static string ShrinkJson(CliRequest request, CliDecision decision, EncodeResult result, TimeSpan elapsed,
         QualityScore? vmaf, int exit)
-        => Json(writer =>
+        => Json(!request.JsonLines, writer =>
         {
             writer.WriteString("command", "kucult");
             WriteDecision(writer, request, decision);
@@ -392,10 +401,10 @@ public static class CliApp
         writer.WriteString("commandLine", FfmpegArguments.ToCommandLine(decision.Arguments));
     }
 
-    private static string Json(Action<Utf8JsonWriter> body)
+    private static string Json(bool indented, Action<Utf8JsonWriter> body)
     {
         using var stream = new MemoryStream();
-        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
+        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = indented, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
         {
             writer.WriteStartObject();
             body(writer);

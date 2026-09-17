@@ -11,6 +11,7 @@ public sealed class WatchFolderTests
 {
     private const string Root = @"C:\izle\gelen";
     private const string Out = @"C:\izle\giden";
+    private const string Settings = @"C:\izle\ayar";
     private static readonly DateTime T0 = new(2026, 9, 17, 10, 0, 0, DateTimeKind.Utc);
 
     private sealed class FakeFile
@@ -24,11 +25,17 @@ public sealed class WatchFolderTests
     private sealed class FakeFs : IWatchFileSystem
     {
         public readonly Dictionary<string, FakeFile> Files = new(StringComparer.OrdinalIgnoreCase);
+        public readonly HashSet<string> ReadOnly = new(StringComparer.OrdinalIgnoreCase);
 
         public void Put(string name, long length, DateTime? lastWrite = null, bool locked = false)
             => Files[Path.Combine(Root, name)] = new FakeFile { Length = length, LastWrite = lastWrite ?? T0, Locked = locked };
 
         public FakeFile Get(string name) => Files[Path.Combine(Root, name)];
+
+        private void Guard(string path)
+        {
+            if (ReadOnly.Contains(Path.GetDirectoryName(path)!)) throw new UnauthorizedAccessException("salt okunur: " + path);
+        }
 
         public bool DirectoryExists(string path) => true;
         public void CreateDirectory(string path) { }
@@ -39,11 +46,21 @@ public sealed class WatchFolderTests
         public bool FileExists(string path) => Files.ContainsKey(path);
         public string ReadAllText(string path) => Files[path].Text;
         public void WriteAllTextAtomic(string path, string content)
-            => Files[path] = new FakeFile { Text = content, Length = content.Length, LastWrite = T0 };
+        {
+            Guard(path);
+            Files[path] = new FakeFile { Text = content, Length = content.Length, LastWrite = T0 };
+        }
         public void Move(string source, string destination)
         {
+            Guard(source);
+            Guard(destination);
             Files[destination] = Files[source];
             Files.Remove(source);
+        }
+        public void Delete(string path)
+        {
+            Guard(path);
+            Files.Remove(path);
         }
     }
 
@@ -64,11 +81,12 @@ public sealed class WatchFolderTests
         }
     }
 
-    private static WatchFolder Watcher(FakeFs fs, FakeClock clock, bool once = true, WatchState? state = null)
+    private static WatchFolder Watcher(FakeFs fs, FakeClock clock, bool once = true, WatchState? state = null, string? statePath = null)
         => new(new WatchOptions
         {
             WatchDirectory = Root,
             OutputDirectory = Out,
+            StatePath = statePath,
             PollInterval = TimeSpan.FromSeconds(2),
             StableFor = TimeSpan.FromSeconds(2),
             Once = once
@@ -82,7 +100,7 @@ public sealed class WatchFolderTests
         };
 
     [Fact]
-    public void YazimSurerkenAlinmiyorBoyutIkiYoklamadaSabitleninceAliniyor()
+    public void YazimSurerkenAlinmiyorBoyutIkiArdisikAraliktaSabitleninceAliniyor()
     {
         var fs = new FakeFs();
         var clock = new FakeClock();
@@ -92,6 +110,8 @@ public sealed class WatchFolderTests
         Assert.Empty(watcher.Poll());
         clock.UtcNow += TimeSpan.FromSeconds(2);
         fs.Get("a.mp4").Length = 250;
+        Assert.Empty(watcher.Poll());
+        clock.UtcNow += TimeSpan.FromSeconds(2);
         Assert.Empty(watcher.Poll());
         clock.UtcNow += TimeSpan.FromSeconds(2);
         Assert.Equal(new[] { Path.Combine(Root, "a.mp4") }, watcher.Poll());
@@ -107,7 +127,11 @@ public sealed class WatchFolderTests
         fs.Put("a.mp4", 100);
         Assert.Empty(watcher.Poll());
         clock.UtcNow += TimeSpan.FromSeconds(2);
+        Assert.Empty(watcher.Poll());
         fs.Get("a.mp4").LastWrite = T0.AddSeconds(2);
+        clock.UtcNow += TimeSpan.FromSeconds(2);
+        Assert.Empty(watcher.Poll());
+        clock.UtcNow += TimeSpan.FromSeconds(2);
         Assert.Empty(watcher.Poll());
         clock.UtcNow += TimeSpan.FromSeconds(2);
         Assert.Single(watcher.Poll());
@@ -122,7 +146,9 @@ public sealed class WatchFolderTests
 
         fs.Put("a.mp4", 100);
         Assert.Empty(watcher.Poll());
-        clock.UtcNow += TimeSpan.FromSeconds(1.9);
+        clock.UtcNow += TimeSpan.FromSeconds(1);
+        Assert.Empty(watcher.Poll());
+        clock.UtcNow += TimeSpan.FromSeconds(0.9);
         Assert.Empty(watcher.Poll());
         clock.UtcNow += TimeSpan.FromSeconds(0.1);
         Assert.Single(watcher.Poll());
@@ -165,20 +191,26 @@ public sealed class WatchFolderTests
     }
 
     [Fact]
-    public void KendiCiktisiDurumDosyasiVeVideoOlmayanDosyaIslenmiyor()
+    public void YalnizBuIzleminCiktisiAtlaniyorAtlananGunlugeBirKezYaziliyor()
     {
         var fs = new FakeFs();
         var clock = new FakeClock();
-        var watcher = Watcher(fs, clock);
-        foreach (var name in new[] { "a_shrunk.mp4", "a_SHRUNK_2.mkv", WatchFolder.StateFileName, WatchFolder.StateFileName + ".tmp", "not.txt", "b.mp4" })
+        var state = new WatchState { Processed = { new WatchEntry { Name = "a.mp4", Length = 50, Output = "a_shrunk.mp4" } } };
+        var watcher = Watcher(fs, clock, state: state);
+        foreach (var name in new[] { "a_shrunk.mp4", "x_shrunk.mp4", WatchFolder.StateFileName, WatchFolder.StateFileName + ".tmp", "not.txt", "b.mp4" })
             fs.Put(name, 100);
+        var events = new List<WatchEvent>();
 
-        watcher.Poll();
+        watcher.Poll(events.Add);
+        clock.UtcNow += TimeSpan.FromSeconds(2);
+        watcher.Poll(events.Add);
         clock.UtcNow += TimeSpan.FromSeconds(2);
 
-        Assert.Equal(new[] { Path.Combine(Root, "b.mp4") }, watcher.Poll());
-        Assert.True(WatchFolder.IsCandidate(@"C:\x\shrunk_video.mp4"));
-        Assert.True(WatchFolder.IsCandidate(@"C:\x\a_shrunk_final.mp4"));
+        Assert.Equal(new[] { Path.Combine(Root, "b.mp4"), Path.Combine(Root, "x_shrunk.mp4") }, watcher.Poll(events.Add));
+        var skipped = Assert.Single(events, e => e.Kind == WatchEventKind.Skipped);
+        Assert.Equal(Path.Combine(Root, "a_shrunk.mp4"), skipped.Path);
+        Assert.False(WatchFolder.IsCandidate(@"C:\x\.gizli.mp4"));
+        Assert.True(WatchFolder.IsCandidate(@"C:\x\a_shrunk.mp4"));
     }
 
     [Fact]
@@ -209,6 +241,14 @@ public sealed class WatchFolderTests
     public void CiktiKlasoruIzlenenleAyniOlamaz(string watch, string output, bool rejected)
     {
         Assert.Equal(rejected ? "error.watch-same-output" : null, WatchFolder.ValidateFolders(watch, output));
+    }
+
+    [Fact]
+    public void KlasorKiyasiLinuxtaHarfDuyarli()
+    {
+        Assert.Null(WatchFolder.ValidateFolders(@"C:\izle\Gelen", @"C:\izle\gelen", StringComparison.Ordinal));
+        Assert.Equal("error.watch-same-output", WatchFolder.ValidateFolders(@"C:\izle\Gelen", @"C:\izle\gelen", StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(OperatingSystem.IsLinux() ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase, WatchFolder.PathComparison);
     }
 
     [Fact]
@@ -269,36 +309,141 @@ public sealed class WatchFolderTests
     }
 
     [Fact]
-    public async Task HataVerenDosyaSureciOldurmuyorNotEdiliyorVeTekrarDenenmiyor()
+    public async Task HataVerenDosyaSureciOldurmuyorSonrakiBaslatmadaBirKezYenidenDeneniyor()
     {
         var fs = new FakeFs();
         var calls = new List<string>();
+        var attempts = new List<string>();
         fs.Put("a.mp4", 100);
         fs.Put("b.mp4", 100);
         fs.Put("c.mp4", 100);
         var events = new List<WatchEvent>();
-
-        var result = await Watcher(fs, new FakeClock()).RunAsync((path, ct) =>
+        Func<string, CancellationToken, Task<WatchOutcome>> failing = (path, ct) =>
         {
             var name = Path.GetFileName(path);
+            attempts.Add(name);
             if (name == "a.mp4") throw new InvalidDataException("moov atom not found");
             if (name == "b.mp4") return Task.FromResult(new WatchOutcome(1, false, null, "ffmpeg failed"));
             return Succeed(calls)(path, ct);
-        }, events.Add, CancellationToken.None);
+        };
+        var statePath = Path.Combine(Root, WatchFolder.StateFileName);
 
-        Assert.Equal(WatchRunResult.Finished, result);
+        var clock = new FakeClock();
+        var first = Watcher(fs, clock, once: false);
+        using (var cts = new CancellationTokenSource())
+        {
+            clock.OnDelay = () => { if (clock.Delays == 6) cts.Cancel(); };
+            var result = await first.RunAsync(failing, events.Add, cts.Token);
+            Assert.Equal(WatchRunResult.Cancelled, result);
+        }
+
+        Assert.Equal(new[] { "a.mp4", "b.mp4", "c.mp4" }, attempts);
         Assert.Equal(new[] { "c.mp4" }, calls);
-        var load = WatchFolder.LoadState(fs, Path.Combine(Root, WatchFolder.StateFileName), T0);
+        Assert.Equal(2, first.FailedCount);
+        var load = WatchFolder.LoadState(fs, statePath, T0);
         var a = load.State.Processed.Single(e => e.Name == "a.mp4");
         Assert.True(a.Failed);
+        Assert.False(a.Retried);
         Assert.Equal("moov atom not found", a.Error);
         Assert.True(load.State.Processed.Single(e => e.Name == "b.mp4").Failed);
         Assert.False(load.State.Processed.Single(e => e.Name == "c.mp4").Failed);
         Assert.Equal(2, events.Count(e => e.Kind == WatchEventKind.Failed));
 
+        attempts.Clear();
+        await Watcher(fs, new FakeClock(), state: load.State).RunAsync(failing, null, CancellationToken.None);
+        Assert.Equal(new[] { "a.mp4", "b.mp4" }, attempts);
+        load = WatchFolder.LoadState(fs, statePath, T0);
+        Assert.All(load.State.Processed.Where(e => e.Failed), e => Assert.True(e.Retried));
+
+        attempts.Clear();
+        await Watcher(fs, new FakeClock(), state: load.State).RunAsync(failing, null, CancellationToken.None);
+        Assert.Empty(attempts);
+    }
+
+    [Fact]
+    public async Task KodlamaSirasindaBuyuyenDosyaIslendiSayilmiyorCiktiSilinipYenidenDeneniyor()
+    {
+        var fs = new FakeFs();
+        var clock = new FakeClock();
+        fs.Put("a.mp4", 100);
+        var events = new List<WatchEvent>();
+        var outputs = new List<string>();
+        var lengths = new List<long>();
+
+        var result = await Watcher(fs, clock).RunAsync((path, _) =>
+        {
+            lengths.Add(fs.Stat(path)!.Value.Length);
+            var output = Path.Combine(Out, $"a_shrunk_{lengths.Count}.mp4");
+            fs.Files[output] = new FakeFile { Length = 10, LastWrite = T0 };
+            outputs.Add(output);
+            if (lengths.Count == 1)
+            {
+                var file = fs.Get("a.mp4");
+                file.Length = 180;
+                file.LastWrite = T0.AddSeconds(1);
+                Assert.Empty(WatchFolder.LoadState(fs, Path.Combine(Root, WatchFolder.StateFileName), T0).State.Processed);
+            }
+            return Task.FromResult(new WatchOutcome(0, true, output, null));
+        }, events.Add, CancellationToken.None);
+
+        Assert.Equal(WatchRunResult.Finished, result);
+        Assert.Equal(new long[] { 100, 180 }, lengths);
+        Assert.False(fs.FileExists(outputs[0]));
+        Assert.True(fs.FileExists(outputs[1]));
+        Assert.Single(events, e => e.Kind == WatchEventKind.Changed);
+        var entry = Assert.Single(WatchFolder.LoadState(fs, Path.Combine(Root, WatchFolder.StateFileName), T0).State.Processed);
+        Assert.Equal((180L, "a_shrunk_2.mp4"), (entry.Length, entry.Output));
+    }
+
+    [Fact]
+    public async Task SaltOkunurKlasordeDurumCiktiKlasorundeTutuluyorIkinciKosuYenidenKodlamiyor()
+    {
+        var fs = new FakeFs();
+        fs.ReadOnly.Add(Root);
+        fs.Put("a.mp4", 100);
+        var calls = new List<string>();
+
+        var location = WatchFolder.OpenState(fs, Root, Out, Settings, T0);
+        Assert.True(location.Writable);
+        Assert.Equal(Path.Combine(Out, $".vidshrink-izle-{WatchFolder.StateKey(Root)}.json"), location.Path);
+        var events = new List<WatchEvent>();
+        await Watcher(fs, new FakeClock(), state: location.Load.State, statePath: location.Path).RunAsync(Succeed(calls), events.Add, CancellationToken.None);
+        Assert.Equal(new[] { "a.mp4" }, calls);
+        Assert.True(fs.FileExists(location.Path));
+        Assert.DoesNotContain(events, e => e.Kind == WatchEventKind.StateNotSaved);
+        Assert.False(fs.FileExists(Path.Combine(Root, WatchFolder.StateFileName)));
+
         calls.Clear();
-        await Watcher(fs, new FakeClock(), state: load.State).RunAsync(Succeed(calls), null, CancellationToken.None);
+        var again = WatchFolder.OpenState(fs, Root, Out, Settings, T0.AddHours(1));
+        Assert.Equal(location.Path, again.Path);
+        await Watcher(fs, new FakeClock(), state: again.Load.State, statePath: again.Path).RunAsync(Succeed(calls), null, CancellationToken.None);
         Assert.Empty(calls);
+
+        fs.ReadOnly.Add(Out);
+        var third = WatchFolder.OpenState(fs, Root, Out, Settings, T0);
+        Assert.Equal(Path.Combine(Settings, $"izle-{WatchFolder.StateKey(Root)}.json"), third.Path);
+        Assert.Single(third.Load.State.Processed);
+    }
+
+    [Fact]
+    public async Task DurumHicYazilamazsaIzlemeDurmuyor()
+    {
+        var fs = new FakeFs();
+        fs.ReadOnly.UnionWith(new[] { Root, Out, Settings });
+        fs.Put("a.mp4", 100);
+        fs.Put("b.mp4", 100);
+        var calls = new List<string>();
+        var events = new List<WatchEvent>();
+
+        var location = WatchFolder.OpenState(fs, Root, Out, Settings, T0);
+        Assert.False(location.Writable);
+        var result = await Watcher(fs, new FakeClock(), state: location.Load.State, statePath: location.Path)
+            .RunAsync(Succeed(calls), events.Add, CancellationToken.None);
+
+        Assert.Equal(WatchRunResult.Finished, result);
+        Assert.Equal(new[] { "a.mp4", "b.mp4" }, calls);
+        Assert.Equal(2, events.Count(e => e.Kind == WatchEventKind.StateNotSaved));
+        Assert.Equal(2, events.Count(e => e.Kind == WatchEventKind.Done));
     }
 
     [Fact]
@@ -375,7 +520,7 @@ public sealed class WatchFolderTests
 
         Assert.Equal(WatchRunResult.Finished, result);
         Assert.Equal(new[] { "a.mp4" }, calls);
-        Assert.Equal(3, clock.Delays);
+        Assert.Equal(4, clock.Delays);
         Assert.Equal(30, WatchFolder.LoadState(fs, Path.Combine(Root, WatchFolder.StateFileName), T0).State.Processed.Single().Length);
     }
 
@@ -411,12 +556,69 @@ public sealed class WatchFolderTests
         {
             var strings = CliText.Load(language);
             foreach (var key in new[] { "watch.started", "watch.corrupt-state", "watch.waiting", "watch.processing", "watch.done", "watch.failed",
-                         "watch.stopped", "error.watch-missing", "error.watch-same-output", "error.watch-no-output", "error.watch-no-folder", "error.bad-interval" })
+                         "watch.stopped", "watch.skipped", "watch.changed", "watch.state-elsewhere", "watch.state-not-saved",
+                         "error.watch-missing", "error.watch-same-output", "error.watch-no-output", "error.watch-no-folder", "error.bad-interval" })
                 Assert.True(strings.ContainsKey(key), $"{language}: {key}");
             Assert.Contains("izle", strings["help"], StringComparison.Ordinal);
             Assert.Contains("--bir-kez", strings["help"], StringComparison.Ordinal);
+            Assert.Contains("NDJSON", strings["help"], StringComparison.Ordinal);
+            Assert.Contains("  4   izle --bir-kez", strings["help"], StringComparison.Ordinal);
             Assert.Contains(WatchFolder.StateFileName, strings["help"], StringComparison.Ordinal);
         }
+    }
+
+    private static CliServices FakeServices(FakeFs fs, FakeClock clock) => new()
+    {
+        MissingTool = () => null,
+        Probe = (_, _) => throw new InvalidDataException("bozuk kaynak"),
+        Availability = () => null,
+        WatchFileSystem = fs,
+        WatchClock = clock,
+        WatchStateFallbackDirectory = () => Settings
+    };
+
+    [Fact]
+    public async Task CliCtrlCIle130Donuyor()
+    {
+        var fs = new FakeFs();
+        var clock = new FakeClock();
+        using var cts = new CancellationTokenSource();
+        clock.OnDelay = () => { if (clock.Delays == 2) cts.Cancel(); };
+        var stderr = new StringWriter();
+
+        var exit = await CliApp.RunAsync(new[] { "izle", Root, "--cikti", Out, "--hedef", "1" },
+            new StringWriter(), stderr, CliText.ForLanguage("en"), FakeServices(fs, clock), cts.Token);
+
+        Assert.Equal(ExitCodes.Cancelled, exit);
+        Assert.Equal(2, clock.Delays);
+        Assert.Contains(CliText.ForLanguage("en")["watch.stopped"], stderr.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CliBirKezHatasizBosKlasordeSifirDoner()
+    {
+        var exit = await CliApp.RunAsync(new[] { "izle", Root, "--cikti", Out, "--hedef", "1", "--bir-kez" },
+            new StringWriter(), new StringWriter(), CliText.ForLanguage("en"), FakeServices(new FakeFs(), new FakeClock()), CancellationToken.None);
+
+        Assert.Equal(ExitCodes.InBand, exit);
+    }
+
+    [Fact]
+    public async Task CliSaltOkunurKlasordeDurumuCiktiKlasorundeTutuyorHatadaDortDoner()
+    {
+        var fs = new FakeFs();
+        fs.ReadOnly.Add(Root);
+        fs.Put("yok.mp4", 100);
+        var stderr = new StringWriter();
+
+        var exit = await CliApp.RunAsync(new[] { "izle", Root, "--cikti", Out, "--hedef", "1", "--olcumsuz", "--bir-kez" },
+            new StringWriter(), stderr, CliText.ForLanguage("en"), FakeServices(fs, new FakeClock()), CancellationToken.None);
+
+        Assert.Equal(ExitCodes.WatchFailures, exit);
+        var statePath = Path.Combine(Out, $".vidshrink-izle-{WatchFolder.StateKey(Root)}.json");
+        Assert.Contains(CliText.ForLanguage("en").Format("watch.state-elsewhere", statePath), stderr.ToString(), StringComparison.Ordinal);
+        var entry = Assert.Single(WatchFolder.LoadState(fs, statePath, T0).State.Processed);
+        Assert.True(entry.Failed);
     }
 
     [Fact]
@@ -446,7 +648,7 @@ public sealed class WatchFolderTests
     }
 
     [Fact]
-    public async Task CliProbeHatasindaDosyayiAtlayipDigerineGeciyor()
+    public async Task CliProbeHatasindaDosyayiAtlayipDigerineGeciyorBirKezDortDoner()
     {
         var dir = Path.Combine(TestPaths.OutputRoot, "hb-a3-izle", $"{Guid.NewGuid():N}");
         var watch = Path.Combine(dir, "gelen");
@@ -473,13 +675,13 @@ public sealed class WatchFolderTests
             var exit = await CliApp.RunAsync(new[] { "izle", watch, "--cikti", output, "--hedef", "1", "--olcumsuz", "--bir-kez" },
                 new StringWriter(), stderr, CliText.ForLanguage("en"), services, CancellationToken.None);
 
-            Assert.Equal(ExitCodes.InBand, exit);
+            Assert.Equal(ExitCodes.WatchFailures, exit);
             Assert.Equal(new[] { "a.mp4", "b.mp4" }, probed);
             Assert.True(Directory.Exists(output));
             var load = WatchFolder.LoadState(PhysicalWatchFileSystem.Instance, Path.Combine(watch, WatchFolder.StateFileName), T0);
             Assert.All(load.State.Processed, e => Assert.True(e.Failed));
             Assert.Equal(2, load.State.Processed.Count);
-            Assert.Contains("Failed, skipped and noted: a.mp4: bozuk kaynak", stderr.ToString(), StringComparison.Ordinal);
+            Assert.Contains("Failed and noted: a.mp4: bozuk kaynak", stderr.ToString(), StringComparison.Ordinal);
         }
         finally { Directory.Delete(dir, true); }
     }
@@ -501,9 +703,13 @@ public sealed class WatchFolderTests
 
             var cli = Path.Combine(AppContext.BaseDirectory, "vidshrink.dll");
             Assert.True(File.Exists(cli), cli);
-            var run = await RunAsync("dotnet", cli, "izle", watch, "--cikti", output, "--hedef", target, "--kodek", "h264", "--olcumsuz", "--bir-kez", "--aralik", "0.5");
+            var run = await RunAsync("dotnet", cli, "izle", watch, "--cikti", output, "--hedef", target, "--kodek", "h264", "--olcumsuz", "--bir-kez", "--aralik", "0.5", "--json");
 
             Assert.True(run.Exit == 0, run.Stderr);
+            var lines = run.Stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var line = Assert.Single(lines);
+            using (var json = JsonDocument.Parse(line))
+                Assert.Equal("kucult", json.RootElement.GetProperty("command").GetString());
             var produced = Path.Combine(output, "klip_shrunk.mp4");
             Assert.True(File.Exists(produced), run.Stderr);
             Assert.Empty(Directory.GetFiles(watch, "*_shrunk*"));

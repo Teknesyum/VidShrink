@@ -1,6 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 
 namespace VidShrink.Core;
 
@@ -15,6 +15,7 @@ public interface IWatchFileSystem
     string ReadAllText(string path);
     void WriteAllTextAtomic(string path, string content);
     void Move(string source, string destination);
+    void Delete(string path);
 }
 
 public interface IWatchClock
@@ -30,6 +31,7 @@ public sealed record WatchEntry
     public string Name { get; init; } = "";
     public long Length { get; init; }
     public bool Failed { get; init; }
+    public bool Retried { get; init; }
     public int ExitCode { get; init; }
     public string? Output { get; init; }
     public string? Error { get; init; }
@@ -44,9 +46,11 @@ public sealed record WatchState
 
 public sealed record WatchStateLoad(WatchState State, string? CorruptBackup);
 
+public sealed record WatchStateLocation(string Path, bool Writable, WatchStateLoad Load);
+
 public sealed record WatchOutcome(int ExitCode, bool Success, string? Output, string? Error);
 
-public enum WatchEventKind { Waiting, Processing, Done, Failed, Stopped }
+public enum WatchEventKind { Waiting, Processing, Done, Failed, Skipped, Changed, StateNotSaved, Stopped }
 
 public sealed record WatchEvent(WatchEventKind Kind, string Path, string? Detail = null);
 
@@ -54,6 +58,7 @@ public sealed record WatchOptions
 {
     public required string WatchDirectory { get; init; }
     public required string OutputDirectory { get; init; }
+    public string? StatePath { get; init; }
     public TimeSpan PollInterval { get; init; } = TimeSpan.FromSeconds(2);
     public TimeSpan StableFor { get; init; } = TimeSpan.FromSeconds(2);
     public bool Once { get; init; }
@@ -64,25 +69,24 @@ public enum WatchRunResult { Finished, Cancelled }
 public sealed class WatchFolder
 {
     public const string StateFileName = ".vidshrink-izle.json";
-    public const string OutputSuffix = "_shrunk";
+    public const int StableConfirmations = 2;
 
     private static readonly IReadOnlySet<string> VideoExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         ".mp4", ".mov", ".mkv", ".webm", ".avi", ".m4v", ".wmv", ".flv", ".mts", ".m2ts", ".ts", ".mpg", ".mpeg", ".3gp"
     };
 
-    private static readonly Regex OwnOutputName = new(@"_shrunk(_\d+)?$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
     private readonly IWatchFileSystem _fs;
     private readonly IWatchClock _clock;
     private readonly Dictionary<string, Observation> _pending = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _retryable = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _skipLogged = new(StringComparer.OrdinalIgnoreCase);
 
     public WatchFolder(WatchOptions options, IWatchFileSystem fs, IWatchClock clock, WatchState? state = null)
     {
@@ -90,30 +94,61 @@ public sealed class WatchFolder
         _fs = fs;
         _clock = clock;
         State = state ?? new WatchState();
+        foreach (var entry in State.Processed.Where(e => e.Failed && !e.Retried)) _retryable.Add(entry.Name);
     }
 
     public WatchOptions Options { get; }
     public WatchState State { get; private set; }
-    public string StatePath => Path.Combine(Options.WatchDirectory, StateFileName);
+    public string StatePath => Options.StatePath ?? Path.Combine(Options.WatchDirectory, StateFileName);
     public int PendingCount => _pending.Count;
+    public int FailedCount { get; private set; }
 
-    public static string? ValidateFolders(string watchDirectory, string outputDirectory)
+    public static StringComparison PathComparison
+        => OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+
+    public static string? ValidateFolders(string watchDirectory, string outputDirectory, StringComparison? comparison = null)
     {
         var watch = Normalize(watchDirectory);
         var output = Normalize(outputDirectory);
-        if (string.Equals(watch, output, StringComparison.OrdinalIgnoreCase)) return "error.watch-same-output";
+        if (string.Equals(watch, output, comparison ?? PathComparison)) return "error.watch-same-output";
         return null;
     }
-
-    public static bool IsOwnOutput(string path)
-        => OwnOutputName.IsMatch(Path.GetFileNameWithoutExtension(path));
 
     public static bool IsCandidate(string path)
     {
         var name = Path.GetFileName(path);
         if (name.StartsWith('.')) return false;
-        if (!VideoExtensions.Contains(Path.GetExtension(name))) return false;
-        return !IsOwnOutput(path);
+        return VideoExtensions.Contains(Path.GetExtension(name));
+    }
+
+    public static string StateKey(string watchDirectory)
+    {
+        var normalized = Normalize(watchDirectory);
+        if (PathComparison == StringComparison.OrdinalIgnoreCase) normalized = normalized.ToUpperInvariant();
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(normalized)))[..16].ToLowerInvariant();
+    }
+
+    public static IReadOnlyList<string> StateCandidates(string watchDirectory, string outputDirectory, string? fallbackDirectory)
+    {
+        var key = StateKey(watchDirectory);
+        var list = new List<string>
+        {
+            Path.Combine(watchDirectory, StateFileName),
+            Path.Combine(outputDirectory, $".vidshrink-izle-{key}.json")
+        };
+        if (!string.IsNullOrWhiteSpace(fallbackDirectory)) list.Add(Path.Combine(fallbackDirectory, $"izle-{key}.json"));
+        return list;
+    }
+
+    public static WatchStateLocation OpenState(IWatchFileSystem fs, string watchDirectory, string outputDirectory,
+        string? fallbackDirectory, DateTime nowUtc)
+    {
+        var candidates = StateCandidates(watchDirectory, outputDirectory, fallbackDirectory);
+        var writable = candidates.FirstOrDefault(c => CanWrite(fs, c));
+        var path = writable ?? candidates[0];
+        var source = fs.FileExists(path) ? path : candidates.FirstOrDefault(fs.FileExists);
+        var load = source is null ? new WatchStateLoad(new WatchState(), null) : LoadState(fs, source, nowUtc);
+        return new WatchStateLocation(path, writable is not null, load);
     }
 
     public static WatchStateLoad LoadState(IWatchFileSystem fs, string statePath, DateTime nowUtc)
@@ -129,7 +164,8 @@ public sealed class WatchFolder
         catch (JsonException)
         {
             var backup = $"{statePath}.bozuk-{nowUtc:yyyyMMdd-HHmmss}";
-            fs.Move(statePath, backup);
+            try { fs.Move(statePath, backup); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return new WatchStateLoad(new WatchState(), statePath); }
             return new WatchStateLoad(new WatchState(), backup);
         }
     }
@@ -137,7 +173,18 @@ public sealed class WatchFolder
     public static string Serialize(WatchState state) => JsonSerializer.Serialize(state, JsonOptions);
 
     public bool IsProcessed(string path, long length)
-        => State.Processed.Any(e => string.Equals(e.Name, Path.GetFileName(path), StringComparison.OrdinalIgnoreCase) && e.Length == length);
+    {
+        var name = Path.GetFileName(path);
+        var entry = State.Processed.LastOrDefault(e => string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (entry is null || entry.Length != length) return false;
+        return !(entry.Failed && _retryable.Contains(entry.Name));
+    }
+
+    public bool IsOwnOutput(string path)
+    {
+        var name = Path.GetFileName(path);
+        return State.Processed.Any(e => e.Output is { } output && string.Equals(output, name, PathComparison));
+    }
 
     public IReadOnlyList<string> Poll(Action<WatchEvent>? log = null)
     {
@@ -147,6 +194,11 @@ public sealed class WatchFolder
         foreach (var path in _fs.EnumerateFiles(Options.WatchDirectory).OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
         {
             if (!IsCandidate(path)) continue;
+            if (IsOwnOutput(path))
+            {
+                if (_skipLogged.Add(path)) log?.Invoke(new WatchEvent(WatchEventKind.Skipped, path));
+                continue;
+            }
             if (_fs.Stat(path) is not { } stamp) continue;
             if (IsProcessed(path, stamp.Length)) continue;
             seen.Add(path);
@@ -154,11 +206,13 @@ public sealed class WatchFolder
             if (!_pending.TryGetValue(path, out var previous) || previous.Stamp != stamp)
             {
                 if (previous is null) log?.Invoke(new WatchEvent(WatchEventKind.Waiting, path));
-                _pending[path] = new Observation(stamp, now);
+                _pending[path] = new Observation(stamp, now, 0);
                 continue;
             }
 
-            if (stamp.Length <= 0 || now - previous.Since < Options.StableFor) continue;
+            var observation = previous with { Confirmations = previous.Confirmations + 1 };
+            _pending[path] = observation;
+            if (stamp.Length <= 0 || observation.Confirmations < StableConfirmations || now - observation.Since < Options.StableFor) continue;
             if (_fs.IsLocked(path)) continue;
 
             _pending.Remove(path);
@@ -167,27 +221,6 @@ public sealed class WatchFolder
 
         foreach (var gone in _pending.Keys.Where(k => !seen.Contains(k)).ToList()) _pending.Remove(gone);
         return ready;
-    }
-
-    public void Record(string path, WatchOutcome outcome)
-    {
-        var length = _fs.Stat(path)?.Length ?? 0;
-        var name = Path.GetFileName(path);
-        var entries = State.Processed
-            .Where(e => !string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase))
-            .Append(new WatchEntry
-            {
-                Name = name,
-                Length = length,
-                Failed = !outcome.Success,
-                ExitCode = outcome.ExitCode,
-                Output = outcome.Output is null ? null : Path.GetFileName(outcome.Output),
-                Error = outcome.Error,
-                ProcessedUtc = _clock.UtcNow
-            })
-            .ToList();
-        State = State with { Processed = entries };
-        _fs.WriteAllTextAtomic(StatePath, Serialize(State));
     }
 
     public async Task<WatchRunResult> RunAsync(Func<string, CancellationToken, Task<WatchOutcome>> process,
@@ -201,6 +234,7 @@ public sealed class WatchFolder
                 foreach (var path in Poll(log))
                 {
                     ct.ThrowIfCancellationRequested();
+                    if (_fs.Stat(path) is not { } before) continue;
                     log?.Invoke(new WatchEvent(WatchEventKind.Processing, path));
                     WatchOutcome outcome;
                     try
@@ -216,12 +250,22 @@ public sealed class WatchFolder
                         outcome = new WatchOutcome(1, false, null, ex.Message);
                     }
                     if (!outcome.Success) ct.ThrowIfCancellationRequested();
-                    Record(path, outcome);
+
+                    if (_fs.Stat(path) is not { } after || after != before)
+                    {
+                        DiscardOutput(outcome.Output);
+                        if (_fs.Stat(path) is { } changed) _pending[path] = new Observation(changed, _clock.UtcNow, 0);
+                        log?.Invoke(new WatchEvent(WatchEventKind.Changed, path));
+                        continue;
+                    }
+
+                    Record(path, before, outcome, log);
                     log?.Invoke(new WatchEvent(outcome.Success ? WatchEventKind.Done : WatchEventKind.Failed, path,
                         outcome.Success ? outcome.Output : outcome.Error));
                 }
 
-                if (Options.Once && _pending.Count == 0) return WatchRunResult.Finished;
+                if (Options.Once && _pending.Count == 0)
+                    return WatchRunResult.Finished;
                 await _clock.Delay(Options.PollInterval, ct);
             }
         }
@@ -232,10 +276,67 @@ public sealed class WatchFolder
         }
     }
 
+
+    private void DiscardOutput(string? output)
+    {
+        if (output is null) return;
+        try
+        {
+            if (_fs.FileExists(output)) _fs.Delete(output);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+    }
+
+    private void Record(string path, WatchFileStamp stamp, WatchOutcome outcome, Action<WatchEvent>? log)
+    {
+        var name = Path.GetFileName(path);
+        var retried = _retryable.Remove(name);
+        if (!outcome.Success) FailedCount++;
+        var entries = State.Processed
+            .Where(e => !string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase))
+            .Append(new WatchEntry
+            {
+                Name = name,
+                Length = stamp.Length,
+                Failed = !outcome.Success,
+                Retried = !outcome.Success && retried,
+                ExitCode = outcome.ExitCode,
+                Output = outcome.Output is null ? null : Path.GetFileName(outcome.Output),
+                Error = outcome.Error,
+                ProcessedUtc = _clock.UtcNow
+            })
+            .ToList();
+        State = State with { Processed = entries };
+        try
+        {
+            _fs.WriteAllTextAtomic(StatePath, Serialize(State));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            log?.Invoke(new WatchEvent(WatchEventKind.StateNotSaved, StatePath, ex.Message));
+        }
+    }
+
+    private static bool CanWrite(IWatchFileSystem fs, string statePath)
+    {
+        var probe = statePath + ".yoklama";
+        try
+        {
+            fs.CreateDirectory(Path.GetDirectoryName(statePath)!);
+            fs.WriteAllTextAtomic(probe, "");
+            fs.Delete(probe);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
     private static string Normalize(string path)
         => Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
 
-    private sealed record Observation(WatchFileStamp Stamp, DateTime Since);
+    private sealed record Observation(WatchFileStamp Stamp, DateTime Since, int Confirmations);
 }
 
 public sealed class PhysicalWatchFileSystem : IWatchFileSystem
@@ -282,11 +383,17 @@ public sealed class PhysicalWatchFileSystem : IWatchFileSystem
     public void WriteAllTextAtomic(string path, string content)
     {
         var temp = path + ".tmp";
-        File.WriteAllText(temp, content);
+        using (var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            stream.Write(new UTF8Encoding(false).GetBytes(content));
+            stream.Flush(true);
+        }
         File.Move(temp, path, true);
     }
 
     public void Move(string source, string destination) => File.Move(source, destination, true);
+
+    public void Delete(string path) => File.Delete(path);
 }
 
 public sealed class SystemWatchClock : IWatchClock

@@ -253,8 +253,27 @@ public sealed class CliTests
         Assert.Equal(language, text.Language);
         Assert.Contains(marker, stdout.ToString(), StringComparison.Ordinal);
         Assert.Contains("izle", stdout.ToString(), StringComparison.Ordinal);
-        foreach (var code in new[] { "0 ", "1 ", "2 ", "3 ", "64 ", "130 " })
+        foreach (var code in new[] { "0 ", "1 ", "2 ", "3 ", "4 ", "64 ", "130 " })
             Assert.Contains(code, stdout.ToString(), StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public async Task YardimdakiHerSatirTamBirKezGeciyor(string language)
+    {
+        var stdout = new StringWriter();
+
+        await CliApp.RunAsync(new[] { "--help" }, stdout, new StringWriter(), CliText.ForLanguage(language), Unreachable(), CancellationToken.None);
+
+        var lines = stdout.ToString().Split('\n').Select(line => line.TrimEnd('\r')).Where(line => line.Trim().Length > 0).ToList();
+        Assert.True(lines.Count > 20, $"{language}: {lines.Count}");
+        var repeated = lines.GroupBy(line => line, StringComparer.Ordinal).Where(group => group.Count() != 1)
+            .Select(group => $"{group.Count()}x {group.Key}").ToList();
+        Assert.Empty(repeated);
+        Assert.Single(lines, line => line.Contains("vidshrink izle ", StringComparison.Ordinal));
+        Assert.Single(lines, line => line.Contains("--bir-kez", StringComparison.Ordinal) && !line.Contains("izle --bir-kez", StringComparison.Ordinal));
+        Assert.Single(lines, line => line.TrimStart().StartsWith("--aralik", StringComparison.Ordinal));
     }
 
     [Fact]
