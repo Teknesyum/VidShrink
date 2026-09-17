@@ -739,7 +739,9 @@ public sealed class OluUyeTests
         "UnknownCaptureDeviceException.DeviceName  yalniz-disarida",
         "UploadProgress.BytesSent  hic-gorunmeyen",
         "UploadProgress.TotalBytes  hic-gorunmeyen",
-        "VideoFilterOptions.ChangesPicture  yalniz-disarida"
+        "VideoFilterOptions.ChangesPicture  yalniz-disarida",
+        "WatchEntry.ProcessedUtc  yalniz-disarida",
+        "WatchFileStamp.LastWriteUtc  yalniz-disarida"
     };
 
     /// <summary>
@@ -758,6 +760,10 @@ public sealed class OluUyeTests
             "Idet sayacinin progressive kolonu: karar kurali yalniz Tff, Bff ve Total okuyor, bu kolon ayristiriliyor ama hicbir kol uzerine dallanmiyor. Olcum gunlugu yaziyor, enterpolasyonlu dizgi icinde oldugu icin tarama gormuyor."),
         new("IdetCounts.Undetermined", "hic-gorunmeyen", Debt,
             "Ayni bulgu: belirsiz kare sayisi ayristiriliyor, karar kuralinda yeri yok. Esigin belirsiz kareye de bakmasi gerekip gerekmedigi henuz olculmedi; olcum gunlugunde yalniz kanit olarak yaziliyor."),
+        new("WatchEntry.ProcessedUtc", "yalniz-disarida", Debt,
+            "A3: izle durumunun zaman damgasi. Uretim yaziyor, okuyan kod yok cunku teslim yolu JSON: WatchFolder.Serialize alani .vidshrink-izle.json'a koyuyor, kullanici ve destek oradan okuyor. Tarama serilestirmeyi gormuyor; degerin gercekten yazildigini WatchFolderTests okuyor."),
+        new("WatchFileStamp.LastWriteUtc", "yalniz-disarida", Debt,
+            "A3: kararlilik olcusunun zaman kolonu. record struct esitligiyle okunuyor (iki ardisik taramanin damgasi ==  ile kiyaslaniyor), nokta ile erisim uretimde yok; olcunun bilinen kor noktasi. Kolonun gercek degerini WatchFolderTests Stat uzerinden pimliyor."),
         new("VideoFilterOptions.ChangesPicture", "yalniz-disarida", Debt,
             "Nitelenmeden okunuyor: ChangesPictureFor kendi turunun icinden soruyor, tarama ise nokta ile erisimi ariyor. Nitelenmis gorunumler testlerde; olcunun bilinen kor noktasi.")
     };

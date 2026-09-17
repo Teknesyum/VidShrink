@@ -29,6 +29,18 @@ Dal `t0/hb-a1-filtre`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 3
    çözüm ölçüm düzeneğinde (deneme sayısını sabitlemek ya da tekrar sayısını artırıp medyan almak).
    Ayrıntı `docs/olcumler/handbrake-filtre.md`.
 
+
+# A3 İzle Denetim Düzeltmesi
+
+Dal `t0/hb-a3-izle`. Kaynak: `docs/danisma/2026-09-17-a3-izle-denetim.md` (iki denetim turunun bulguları).
+
+1. `Cli/Locales/en.json`, `tr.json`: yardım tek kez; `CliTests` her satırı tam bir kez sayar. Çıkış kodu 4, `--cikti` klasör, NDJSON.
+2. `Core/WatchFolder.cs`: iki ardışık aralıkta sabit damga; kodlama başı/sonu damga kıyası, değişince çıktı silinir;
+   durum yeri adayları (izlenen, çıktı, ayar klasörü, yol özeti); yazım hatası izlemeyi durdurmaz; hata kaydı sonraki
+   başlatmada bir kez yeniden denenir; `_shrunk` eleme yalnız durumdaki çıktı adlarına; Linux'ta harf duyarlı kıyas; Flush(true).
+3. `Cli/CliApp.cs`, `CliRequest.cs`: durum yeri, `--bir-kez` hata kodu 4, yeni olay mesajları, satır başına JSON.
+4. `tests/WatchFolderTests.cs`: Ctrl+C 130, salt okunur iki koşu, büyüyen dosya, yeniden deneme, eleme günlüğü.
+5. `README.md`: izle belgesi.
 # Ön Ayar Kütüphanesi — HandBrake A2
 
 Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 42-45.

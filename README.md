@@ -141,8 +141,32 @@ goes to stderr; size, duration, attempts and VMAF go to stdout. Help follows the
 language, Turkish or English.
 
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
-size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled. A watch-folder command
-(`izle`) is planned, not shipped.
+size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled.
+
+### Watch Folder
+
+```bash
+vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB             # run until Ctrl+C
+vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB --bir-kez   # drain the folder, then exit
+```
+
+`izle` shrinks every video that lands in the folder. `--cikti` is the output folder and is
+required; it cannot be the watched folder. `--aralik <seconds>` sets the scan interval
+(default 2), `--bir-kez` exits once nothing is left to wait for, and the other `kucult`
+options apply to each file. With `--json`, stdout is NDJSON: one compact JSON object per file.
+
+A file is taken only when its size and modification time stay the same over two consecutive scan
+intervals - the third scan takes it - and no writer holds it. If the source changes while it is being encoded, the output is
+deleted and the file is picked up again once it settles.
+
+Progress is kept in `.vidshrink-izle.json` inside the watched folder, by name and size; a
+renamed or resized file counts as new. If that folder is read-only the state goes to the
+output folder as `.vidshrink-izle-<hash>.json`, and failing that to the settings folder. A
+file that failed is retried once on the next start. To process everything again, delete the
+state file.
+
+Exit codes: `0` finished, `4` `--bir-kez` finished but at least one file failed, `1` error,
+`64` wrong usage, `130` stopped with Ctrl+C.
 
 ## The Numbers
 
