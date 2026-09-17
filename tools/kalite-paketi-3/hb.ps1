@@ -518,6 +518,8 @@ function Vt {
                 $o = Olc $girdi $dosya $b.FpsMetin
                 $script:urunKbps = $o.kbps
                 $ek['urun_yolu_vt'] = $yol
+                $ok = IkiOkuma $girdi $dosya
+                foreach ($x in $ok.Keys) { $ek[$x] = $ok[$x] }
                 $pp = (& ffprobe -v error -select_streams v:0 -show_entries stream=pix_fmt,profile -of json $dosya | ConvertFrom-Json).streams[0]
                 $ek['cikis_pix'] = $pp.pix_fmt
                 $ek['cikis_profil'] = $pp.profile
@@ -533,7 +535,10 @@ function Vt {
                 $c = Join-Path $Cikti "vt-$k-$kbit-handbrake.mkv"
                 $h = HbEsBayt $girdi $c $hk $hbArg
                 $o = Olc $girdi $c $b.FpsMetin
-                Ekle ([ordered]@{ is = 'vt'; kesit = $k; kol = 'handbrake-vt'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 H.265 Apple VideoToolbox 1080p' }) $o (HbOrtak $h $hk)
+                $hx = HbOrtak $h $hk
+                $ok = IkiOkuma $girdi $c
+                foreach ($x in $ok.Keys) { $hx[$x] = $ok[$x] }
+                Ekle ([ordered]@{ is = 'vt'; kesit = $k; kol = 'handbrake-vt'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 H.265 Apple VideoToolbox 1080p' }) $o $hx
                 Remove-Item $c
             }
             Dene $k 'negatif-handbrake-yarim-bit' $kbit {
