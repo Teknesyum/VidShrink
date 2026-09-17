@@ -62,7 +62,7 @@ geri alındı.
 
 ## Aday 2: Yalnız Yazılım Kodlayıcı (Aday 1'den Sonra, Ölçümden Önce Yazıldı)
 
-Aynı karar, `CodecModel.IsHardware(codec)` ise yukarı deneme kurulmaz; donanım yolu 34231f4d ile aynı kalır (birim testle
+Aynı karar, `CodecModel.Vendor(codec)` `Software` değilse (NVENC, QSV, AMF, ölçülmemiş VideoToolbox) yukarı deneme kurulmaz; donanım yolu 34231f4d ile aynı kalır (birim testle
 pimli). Aday 1'in 6 yazılım hücresi aday 2'yle aynı kod yolundan geçti, geçerli sayılır. Uyum şüphesine karşı **yeni 6
 tutma hücresi**: libx264 `orta` 2000, `karanlik` 3500, `hareketli` 1000, `parlak` 2000; libx265 `orta` 2000,
 `karanlik` 3500.
