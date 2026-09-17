@@ -684,7 +684,7 @@ static async Task<int> ShrinkAsync(string[] args)
     probeWatch.Stop();
     var results = new List<BenchResult>();
     var label = Path.GetFileNameWithoutExtension(source);
-    Console.WriteLine($"kaynak {label} | fill={fillPolicy} | codec-tercihi={codecPreference} | prob {probeWatch.Elapsed.TotalSeconds:0.#}s | kalibre={complexity.Calibrated} | olculen kalite={(complexity.QualityMeasured ? string.Join("/", anchors.Select(a => a.ToString("0.##", CultureInfo.InvariantCulture))) : "yok")}");
+    Console.WriteLine($"kaynak {label} | fill={fillPolicy} | codec-tercihi={codecPreference} | prob {probeWatch.Elapsed.TotalSeconds:0.#}s | prob-ms {probeWatch.Elapsed.TotalMilliseconds:0} | luma {(complexity.MeanLuma is double luma ? luma.ToString("0.##", CultureInfo.InvariantCulture) : "yok")} | kalibre={complexity.Calibrated} | olculen kalite={(complexity.QualityMeasured ? string.Join("/", anchors.Select(a => a.ToString("0.##", CultureInfo.InvariantCulture))) : "yok")}");
 
     foreach (var targetMb in targets)
     {

@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "predvoľba bola pevne daná na {0}; motor by vybral {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo prvý prechod beží s inou predvoľbou; pevná {0} platí len pre druhý prechod, ktorý tvorí výstup (prvý prechod: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "pevné {0} sa na ceste kópie nedalo použiť; namiesto toho platí {1}",
+  "main.reason.dark-content-hevc": "zdroj je tmavý (priemerný jas {0}); {1} v tieňoch vytvára pruhy, preto Automaticky použije {2} s turbo prvým prechodom",
 
   "main.advice.budget-generous": "Cieľ je pre tento zdroj veľkorysý, takže motor ho splní bez námahy.",
   "main.advice.codec-upgrade": "Pri tomto tlaku dáva H.265 viditeľne lepší výsledok pri rovnakej veľkosti; zvážte prepnutie kompresného algoritmu na automatiku alebo H.265.",

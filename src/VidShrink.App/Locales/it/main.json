@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "il preset era fissato a {0}; il motore avrebbe scelto {1}",
   "main.reason.manual-preset-first-pass-relaxed": "il primo passaggio turbo usa un preset diverso; il {0} fisso si applica solo al secondo passaggio che produce l'output (primo passaggio: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "il {0} fisso non si è potuto applicare sul percorso di copia; al suo posto si applica {1}",
+  "main.reason.dark-content-hevc": "la sorgente è scura (luminanza media {0}); {1} crea bande nelle ombre, quindi Automatico usa {2} con prima passata turbo",
 
   "main.advice.budget-generous": "L'obiettivo è generoso per questa sorgente, quindi il motore lo raggiunge senza sforzo.",
   "main.advice.codec-upgrade": "A questa pressione H.265 dà un risultato visibilmente migliore a parità di dimensione; valuta di passare l'algoritmo di compressione ad automatico o H.265.",

@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "prednastavitev je bila fiksirana na {0}; motor bi izbral {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo prvi prehod teče z drugo prednastavitvijo; fiksna {0} velja le za drugi prehod, ki ustvari izhod (prvi prehod: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "fiksne {0} ni bilo mogoče uveljaviti na poti kopiranja; namesto tega velja {1}",
+  "main.reason.dark-content-hevc": "vir je temen (povprečna svetlost {0}); {1} v sencah ustvarja pasove, zato Samodejno uporabi {2} s turbo prvim prehodom",
 
   "main.advice.budget-generous": "Cilj je za ta vir radodaren, zato ga motor doseže brez napora.",
   "main.advice.codec-upgrade": "Pri tem pritisku H.265 da vidno boljši rezultat pri enaki velikosti; razmislite o preklopu algoritma stiskanja na samodejno ali H.265.",

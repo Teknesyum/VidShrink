@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "preset được cố định là {0}; bộ máy lẽ ra chọn {1}",
   "main.reason.manual-preset-first-pass-relaxed": "lượt đầu turbo chạy với preset khác; {0} cố định chỉ áp dụng cho lượt hai tạo đầu ra (lượt đầu: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} cố định không áp dụng được trên đường sao chép; thay vào đó áp dụng {1}",
+  "main.reason.dark-content-hevc": "nguồn tối (độ sáng trung bình {0}); {1} tạo dải màu ở vùng tối, nên Tự động dùng {2} với lượt đầu turbo",
 
   "main.advice.budget-generous": "Mục tiêu rộng rãi với nguồn này, nên bộ máy đạt được mà không gắng sức.",
   "main.advice.codec-upgrade": "Ở áp lực này H.265 cho kết quả rõ ràng tốt hơn với cùng dung lượng; cân nhắc chuyển thuật toán nén sang tự động hoặc H.265.",

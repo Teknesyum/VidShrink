@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "the preset was fixed to {0}; the engine would have picked {1}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo first pass runs with a different preset; the fixed {0} only applies to the second pass that produces the output (first pass: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "the fixed {0} could not apply on the copy path; what applies instead is {1}",
+  "main.reason.dark-content-hevc": "the source is dark (mean luma {0}), where {1} bands in the shadows, so Automatic uses {2} with a turbo first pass",
 
   "main.advice.budget-generous": "The target is generous for this source, so the engine meets it without strain.",
   "main.advice.codec-upgrade": "At this pressure H.265 gives a visibly better result at the same size; consider switching the compression algorithm to automatic or H.265.",

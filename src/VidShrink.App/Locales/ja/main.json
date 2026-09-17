@@ -390,6 +390,7 @@
   "main.reason.manual-preset-override": "プリセットは{0}に固定されました。エンジンは{1}を選んだはずです",
   "main.reason.manual-preset-first-pass-relaxed": "高速な1パス目は別のプリセットで実行されます。固定された{0}は出力を生成する2パス目にのみ適用されます(1パス目: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "固定された{0}はコピー経路には適用できません。代わりに適用されるのは{1}です",
+  "main.reason.dark-content-hevc": "ソースが暗い（平均輝度 {0}）ため、{1}では暗部にバンディングが出ます。自動はターボ初回パス付きの{2}を使います",
 
   "main.advice.budget-generous": "このソースに対して目標は余裕があるため、エンジンは無理なく達成します。",
   "main.advice.codec-upgrade": "この圧力ではH.265が同じサイズで目に見えて良い結果を出します。圧縮アルゴリズムを自動またはH.265に切り替えることを検討してください。",

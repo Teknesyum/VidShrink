@@ -3634,6 +3634,8 @@ public partial class MainWindow : Window
                     note.ManualOverrideValue, note.EngineWouldHaveChosen),
                 ReasonCode.ManualOverrideDroppedOnPassThrough => Say("main.reason.manual-override-dropped-on-pass-through",
                     note.ManualOverrideValue, note.EngineWouldHaveChosen),
+                ReasonCode.DarkContentHevc => Say("main.reason.dark-content-hevc",
+                    Num(note.Score, "0.#"), note.RequestedCodec, note.FallbackCodec),
                 _ => null
             };
             if (text is not null) parts.Add(text);
