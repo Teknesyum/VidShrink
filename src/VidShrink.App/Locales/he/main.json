@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "תיקייה קבועה שולחת כל פלט לאותו מקום במקום ליד קובץ המקור.",
   "settings-tab.advanced-default-open.label": "הצג אפשרויות מתקדמות פתוחות כברירת מחדל",
   "settings-tab.advanced-default-open.hint": "פותח את הקטע המתקדם אוטומטית בכל הפעלה של היישום.",
+  "settings-tab.follow-recording.label": "לעקוב אחר ההקלטה בכל הלשוניות",
+  "settings-tab.follow-recording.hint": "כשהקלטה נעצרת, הלשוניות כיווץ ונגן טוענות אותה בלי להחליף לשונית. קובץ שנפתח בנגן נטען גם בכיווץ.",
   "settings-tab.ffmpeg-path.label": "נתיב ffmpeg",
   "settings-tab.ffmpeg-path.auto": "אוטומטי",
   "settings-tab.ffmpeg-path.manual": "ידני",

@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Vaste map stuurt elke uitvoer naar dezelfde plek in plaats van naast het bronbestand.",
   "settings-tab.advanced-default-open.label": "Geavanceerde opties standaard uitgeklapt tonen",
   "settings-tab.advanced-default-open.hint": "Opent de geavanceerde sectie automatisch bij elke start van de app.",
+  "settings-tab.follow-recording.label": "Opname volgen in alle tabbladen",
+  "settings-tab.follow-recording.hint": "Als een opname stopt, laden Verkleinen en Speler die zonder van tabblad te wisselen. Een bestand dat in de speler wordt geopend, laadt ook in Verkleinen.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-pad",
   "settings-tab.ffmpeg-path.auto": "Automatisch",
   "settings-tab.ffmpeg-path.manual": "Handmatig",

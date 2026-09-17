@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Fiksna fascikla šalje svaki izlaz na isto mesto umesto pored izvornog fajla.",
   "settings-tab.advanced-default-open.label": "Prikaži napredne opcije raširene podrazumevano",
   "settings-tab.advanced-default-open.hint": "Automatski otvara napredni odeljak pri svakom pokretanju aplikacije.",
+  "settings-tab.follow-recording.label": "Прати снимак у свим картицама",
+  "settings-tab.follow-recording.hint": "Када снимање стане, Смањи и Плејер га учитавају без промене картице. Датотека отворена у плејеру учитава се и у Смањи.",
   "settings-tab.ffmpeg-path.label": "ffmpeg putanja",
   "settings-tab.ffmpeg-path.auto": "Automatski",
   "settings-tab.ffmpeg-path.manual": "Ručno",

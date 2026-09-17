@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Фиксированная папка отправляет каждый результат в одно место, а не рядом с исходным файлом.",
   "settings-tab.advanced-default-open.label": "Показывать дополнительные параметры развёрнутыми",
   "settings-tab.advanced-default-open.hint": "Открывает дополнительный раздел автоматически при каждом запуске.",
+  "settings-tab.follow-recording.label": "Следовать за записью во всех вкладках",
+  "settings-tab.follow-recording.hint": "Когда запись останавливается, «Сжатие» и «Плеер» загружают её, не переключая вкладку. Файл, открытый в плеере, тоже загружается в «Сжатие».",
   "settings-tab.ffmpeg-path.label": "Путь к ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Автоматически",
   "settings-tab.ffmpeg-path.manual": "Вручную",

@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Fester Ordner legt jede Ausgabe am selben Ort ab statt neben der Quelldatei.",
   "settings-tab.advanced-default-open.label": "Erweiterte Optionen standardmäßig ausgeklappt zeigen",
   "settings-tab.advanced-default-open.hint": "Öffnet den erweiterten Bereich bei jedem Start der App automatisch.",
+  "settings-tab.follow-recording.label": "Aufnahme in allen Tabs übernehmen",
+  "settings-tab.follow-recording.hint": "Wenn eine Aufnahme endet, laden Verkleinern und Player sie, ohne den Tab zu wechseln. Eine im Player geöffnete Datei wird auch in Verkleinern geladen.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-Pfad",
   "settings-tab.ffmpeg-path.auto": "Automatisch",
   "settings-tab.ffmpeg-path.manual": "Manuell",

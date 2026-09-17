@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Fiksna mapa šalje svaki izlaz na isto mjesto umjesto pored izvorne datoteke.",
   "settings-tab.advanced-default-open.label": "Prikaži napredne opcije proširene po zadanom",
   "settings-tab.advanced-default-open.hint": "Automatski otvara napredni odjeljak pri svakom pokretanju aplikacije.",
+  "settings-tab.follow-recording.label": "Prati snimku u svim karticama",
+  "settings-tab.follow-recording.hint": "Kad snimanje stane, Smanji i Reproduktor učitaju snimku bez promjene kartice. Datoteka otvorena u reproduktoru učitava se i u Smanji.",
   "settings-tab.ffmpeg-path.label": "Putanja ffmpeg-a",
   "settings-tab.ffmpeg-path.auto": "Automatski",
   "settings-tab.ffmpeg-path.manual": "Ručno",

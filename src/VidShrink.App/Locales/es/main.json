@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Carpeta fija envía cada salida al mismo sitio en vez de junto al archivo fuente.",
   "settings-tab.advanced-default-open.label": "Mostrar opciones avanzadas desplegadas por defecto",
   "settings-tab.advanced-default-open.hint": "Abre la sección avanzada automáticamente cada vez que arranca la app.",
+  "settings-tab.follow-recording.label": "Seguir la grabación en todas las pestañas",
+  "settings-tab.follow-recording.hint": "Al detener una grabación, Reducir y Reproductor la cargan sin cambiar de pestaña. Un archivo abierto en el Reproductor también se carga en Reducir.",
   "settings-tab.ffmpeg-path.label": "Ruta de ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automática",
   "settings-tab.ffmpeg-path.manual": "Manual",

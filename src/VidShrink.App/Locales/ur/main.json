@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "مقرر فولڈر ہر نتیجہ ماخذ فائل کے ساتھ کے بجائے ایک ہی جگہ بھیجتا ہے۔",
   "settings-tab.advanced-default-open.label": "اعلیٰ اختیارات طے شدہ طور پر کھلے دکھائیں",
   "settings-tab.advanced-default-open.hint": "ایپ کے ہر آغاز پر اعلیٰ حصہ خود کھولتا ہے۔",
+  "settings-tab.follow-recording.label": "تمام ٹیبز میں ریکارڈنگ کی پیروی کریں",
+  "settings-tab.follow-recording.hint": "ریکارڈنگ رکنے پر چھوٹا کریں اور پلیئر ٹیب بدلے بغیر اسے لوڈ کرتے ہیں۔ پلیئر میں کھولی گئی فائل بھی چھوٹا کریں میں لوڈ ہوتی ہے۔",
   "settings-tab.ffmpeg-path.label": "ffmpeg راستہ",
   "settings-tab.ffmpeg-path.auto": "خودکار",
   "settings-tab.ffmpeg-path.manual": "دستی",

@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "निश्चित फ़ोल्डर हर आउटपुट को स्रोत फ़ाइल के पास के बजाय एक ही जगह भेजता है।",
   "settings-tab.advanced-default-open.label": "उन्नत विकल्प डिफ़ॉल्ट रूप से खुले दिखाएँ",
   "settings-tab.advanced-default-open.hint": "ऐप हर बार शुरू होने पर उन्नत अनुभाग अपने आप खोलता है।",
+  "settings-tab.follow-recording.label": "हर टैब में रिकॉर्डिंग का अनुसरण करें",
+  "settings-tab.follow-recording.hint": "रिकॉर्डिंग रुकने पर छोटा करें और प्लेयर टैब बदले बिना उसे लोड करते हैं। प्लेयर में खोली गई फ़ाइल भी छोटा करें में लोड होती है।",
   "settings-tab.ffmpeg-path.label": "ffmpeg पथ",
   "settings-tab.ffmpeg-path.auto": "स्वचालित",
   "settings-tab.ffmpeg-path.manual": "मैनुअल",

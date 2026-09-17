@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "A rögzített mappa minden kimenetet ugyanoda küld a forrásfájl melletti hely helyett.",
   "settings-tab.advanced-default-open.label": "Haladó beállítások alapból kibontva",
   "settings-tab.advanced-default-open.hint": "Minden indításkor automatikusan kinyitja a haladó szakaszt.",
+  "settings-tab.follow-recording.label": "A felvétel követése minden lapon",
+  "settings-tab.follow-recording.hint": "A felvétel leállításakor a Tömörítés és a Lejátszó lap betölti azt lapváltás nélkül. A lejátszóban megnyitott fájl a Tömörítés lapra is betöltődik.",
   "settings-tab.ffmpeg-path.label": "ffmpeg útvonal",
   "settings-tab.ffmpeg-path.auto": "Automatikus",
   "settings-tab.ffmpeg-path.manual": "Kézi",

@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "固定フォルダーは、すべての出力をソースファイルの隣ではなく同じ場所に送ります。",
   "settings-tab.advanced-default-open.label": "詳細オプションを既定で展開表示",
   "settings-tab.advanced-default-open.hint": "アプリ起動時に毎回、詳細セクションを自動で開きます。",
+  "settings-tab.follow-recording.label": "録画をすべてのタブで追従する",
+  "settings-tab.follow-recording.hint": "録画を停止すると、タブを切り替えずに縮小タブとプレーヤーに読み込みます。プレーヤーで開いたファイルも縮小タブに読み込みます。",
   "settings-tab.ffmpeg-path.label": "ffmpegのパス",
   "settings-tab.ffmpeg-path.auto": "自動",
   "settings-tab.ffmpeg-path.manual": "手動",

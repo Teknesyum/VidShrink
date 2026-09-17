@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Dosarul fix trimite fiecare rezultat în același loc, nu lângă fișierul sursă.",
   "settings-tab.advanced-default-open.label": "Arată opțiunile avansate extinse implicit",
   "settings-tab.advanced-default-open.hint": "Deschide automat secțiunea avansată la fiecare pornire a aplicației.",
+  "settings-tab.follow-recording.label": "Urmărește înregistrarea în toate filele",
+  "settings-tab.follow-recording.hint": "Când o înregistrare se oprește, Micșorare și Player o încarcă fără a schimba fila. Un fișier deschis în Player se încarcă și în Micșorare.",
   "settings-tab.ffmpeg-path.label": "Cale ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automat",
   "settings-tab.ffmpeg-path.manual": "Manual",

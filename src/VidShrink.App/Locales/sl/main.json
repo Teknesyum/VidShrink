@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Fiksna mapa pošlje vsak izhod na isto mesto namesto ob izvorno datoteko.",
   "settings-tab.advanced-default-open.label": "Napredne možnosti privzeto razširjene",
   "settings-tab.advanced-default-open.hint": "Ob vsakem zagonu aplikacije samodejno odpre napredni razdelek.",
+  "settings-tab.follow-recording.label": "Sledi posnetku v vseh zavihkih",
+  "settings-tab.follow-recording.hint": "Ko se snemanje ustavi, ga Pomanjšaj in Predvajalnik naložita brez menjave zavihka. Datoteka, odprta v predvajalniku, se naloži tudi v Pomanjšaj.",
   "settings-tab.ffmpeg-path.label": "Pot do ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Samodejno",
   "settings-tab.ffmpeg-path.manual": "Ročno",

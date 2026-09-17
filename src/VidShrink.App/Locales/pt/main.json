@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Pasta fixa envia toda saída para o mesmo lugar em vez de ao lado do arquivo de origem.",
   "settings-tab.advanced-default-open.label": "Mostrar opções avançadas expandidas por padrão",
   "settings-tab.advanced-default-open.hint": "Abre a seção avançada automaticamente sempre que o app inicia.",
+  "settings-tab.follow-recording.label": "Seguir a gravação em todas as abas",
+  "settings-tab.follow-recording.hint": "Quando uma gravação para, Reduzir e Player a carregam sem trocar de aba. Um arquivo aberto no Player também é carregado em Reduzir.",
   "settings-tab.ffmpeg-path.label": "Caminho do ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automático",
   "settings-tab.ffmpeg-path.manual": "Manual",

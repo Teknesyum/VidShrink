@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Fast mappe sender alle utdata til samme sted i stedet for ved siden av kildefilen.",
   "settings-tab.advanced-default-open.label": "Vis avanserte valg utvidet som standard",
   "settings-tab.advanced-default-open.hint": "Åpner den avanserte delen automatisk hver gang appen starter.",
+  "settings-tab.follow-recording.label": "Følg opptaket i alle faner",
+  "settings-tab.follow-recording.hint": "Når et opptak stopper, lastes det inn i Krymp og Spiller uten å bytte fane. En fil åpnet i spilleren lastes også inn i Krymp.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-bane",
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuell",

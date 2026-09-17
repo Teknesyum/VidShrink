@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Stały folder kieruje każdy wynik w to samo miejsce zamiast obok pliku źródłowego.",
   "settings-tab.advanced-default-open.label": "Domyślnie pokazuj opcje zaawansowane rozwinięte",
   "settings-tab.advanced-default-open.hint": "Otwiera sekcję zaawansowaną automatycznie przy każdym uruchomieniu aplikacji.",
+  "settings-tab.follow-recording.label": "Śledź nagranie we wszystkich kartach",
+  "settings-tab.follow-recording.hint": "Po zatrzymaniu nagrania karty Zmniejsz i Odtwarzacz wczytują je bez przełączania karty. Plik otwarty w odtwarzaczu trafia też do karty Zmniejsz.",
   "settings-tab.ffmpeg-path.label": "Ścieżka ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automatycznie",
   "settings-tab.ffmpeg-path.manual": "Ręcznie",

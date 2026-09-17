@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "پوشهٔ ثابت هر خروجی را به‌جای کنار فایل منبع به یک جا می‌فرستد.",
   "settings-tab.advanced-default-open.label": "گزینه‌های پیشرفته به‌طور پیش‌فرض باز باشند",
   "settings-tab.advanced-default-open.hint": "بخش پیشرفته را در هر بار اجرای برنامه خودکار باز می‌کند.",
+  "settings-tab.follow-recording.label": "دنبال کردن ضبط در همه زبانه‌ها",
+  "settings-tab.follow-recording.hint": "وقتی ضبط متوقف شود، زبانه‌های کوچک‌سازی و پخش‌کننده آن را بدون تغییر زبانه بارگذاری می‌کنند. فایلی که در پخش‌کننده باز شود در کوچک‌سازی هم بارگذاری می‌شود.",
   "settings-tab.ffmpeg-path.label": "مسیر ffmpeg",
   "settings-tab.ffmpeg-path.auto": "خودکار",
   "settings-tab.ffmpeg-path.manual": "دستی",

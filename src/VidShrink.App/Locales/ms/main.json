@@ -457,6 +457,8 @@
   "settings-tab.output-folder.hint": "Folder tetap menghantar setiap output ke tempat yang sama dan bukan di sebelah fail sumber.",
   "settings-tab.advanced-default-open.label": "Tunjuk pilihan lanjutan terbuka secara lalai",
   "settings-tab.advanced-default-open.hint": "Membuka bahagian lanjutan secara automatik setiap kali aplikasi dimulakan.",
+  "settings-tab.follow-recording.label": "Ikut rakaman dalam semua tab",
+  "settings-tab.follow-recording.hint": "Apabila rakaman berhenti, Kecilkan dan Pemain memuatkannya tanpa menukar tab. Fail yang dibuka dalam Pemain turut dimuatkan ke Kecilkan.",
   "settings-tab.ffmpeg-path.label": "Laluan ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automatik",
   "settings-tab.ffmpeg-path.manual": "Manual",
