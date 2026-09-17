@@ -11,6 +11,10 @@ Dal `t0/hb-a1-filtre`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 3
 3. **Bench.** `shrink --filters <tanım>`; CLI başka ajanın alanı, dokunulmaz.
 4. **Testler.** `VideoFilterChainTests` (argüman + negatif kontrol), `FiltreYoklamaTests` (gerçek ffmpeg, ≤3 sn).
 5. **B9.** `hb.ps1 -Is filtre` + `handbrake-kiyas.yml` haritası; kural önce `docs/olcumler/handbrake-filtre.md`.
+6. **K8 bu turda kullanıcıya teslim edilmedi.** `CropProbe`, `EncodePlan.SuggestedCrop` ve `PlanOptions.DetectedCrop`
+   çalışır ve testli, ama üretimde tüketicisi yok: kırpma varsayılan kapalı, yoklama sonucu yalnız öneri.
+   Öneriyi gösteren ve tek tıkla uygulayan yüzey C1'in işi — **motor hazır, kullanıcı yolu C1'de.** Ölü yüzey
+   `OluUyeTests` içindeki `OzellikScan` ölçüsünde gerekçeli borç satırlarıyla pimli.
 
 # Ön Ayar Kütüphanesi — HandBrake A2
 

@@ -259,6 +259,11 @@ public sealed class VideoFilterChainTests
         var gri = PlanCalculator.Build(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto, Filters = new VideoFilterOptions { Grayscale = true } });
         Assert.NotEqual(EncodeMode.PassThrough, gri.ModeEnum);
         Assert.True(gri.Filters.Grayscale);
+
+        var kirpma = new VideoFilterOptions { Crop = new CropRect(1280, 640, 0, 40) };
+        Assert.True(kirpma.ChangesPicture);
+        var kirpik = PlanCalculator.Build(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto, Filters = kirpma });
+        Assert.NotEqual(EncodeMode.PassThrough, kirpik.ModeEnum);
     }
 
     [Fact]
@@ -355,6 +360,9 @@ public sealed class VideoFilterChainTests
         Assert.Equal(new CropRect(640, 360, 0, 60),
             CropProbe.ParseLast("[Parsed_cropdetect_0 @ 0] x1:0 x2:639 y1:58 y2:421 w:640 h:364 x:0 y:58 pts:0 t:0 crop=640:364:0:58\n[Parsed_cropdetect_0 @ 0] crop=640:360:0:60"));
         Assert.Null(CropProbe.ParseLast("frame=2"));
+        var kirpmaArg = CropProbe.Arguments("C:/a.mp4", 12.5).ToList();
+        Assert.Equal("2", kirpmaArg[kirpmaArg.IndexOf("-frames:v") + 1]);
+        Assert.Equal("12.5", kirpmaArg[kirpmaArg.IndexOf("-ss") + 1]);
         var args = InterlaceProbe.Arguments(Kaynak() with { DurationSeconds = 100 });
         Assert.Equal("10", args[args.ToList().IndexOf("-ss") + 1]);
         Assert.DoesNotContain("-ss", InterlaceProbe.Arguments(Kaynak() with { DurationSeconds = 5 }));
