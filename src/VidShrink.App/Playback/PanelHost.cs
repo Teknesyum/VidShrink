@@ -100,6 +100,7 @@ internal sealed class PanelHost : IDisposable
     private string? _clipSignature;
     private string? _pendingSignature;
     private int _scheduled;
+    private bool _araPlanErtelendi;
     private IComparisonFrameSource? _standby;
     private PreviewClip? _standbyClip;
     private bool _standbyOpening;
@@ -156,6 +157,8 @@ internal sealed class PanelHost : IDisposable
 
     /// <summary>Kodlama gecikmesi kurulu mu — <see cref="ScheduleClip"/>'in çıktısı.</summary>
     internal bool ClipScheduled => _segmentDelay.IsEnabled;
+
+    internal TimeSpan ClipDelay => _segmentDelay.Interval;
 
     /// <summary>Panel açık mı. Kapalıyken ayakta hiçbir ffmpeg süreci yoktur.</summary>
     internal bool IsOpen => _open;
@@ -229,6 +232,9 @@ internal sealed class PanelHost : IDisposable
         // Tam çıktı varken parça üretilmez: sağ yarı zaten gerçek çıktıyı gösteriyor.
         if (_right is not null) { _segmentDelay.Stop(); _segments.Cancel(); return; }
 
+        if (AraOlcum && (_clip is not null || _clipRunning)) { _araPlanErtelendi = true; return; }
+        _araPlanErtelendi = false;
+
         // T50/K3: plan da pencere de aynıysa kodlama başlatılmaz. Dil düğmesi de, hedef
         // tuşu da Recalculate üzerinden buraya düşüyor ve çoğu zaman planı değiştirmiyor;
         // eskiden her çağrı iki dosyalık kodlama ve boru yeniden kurulumu ödetiyordu.
@@ -249,6 +255,19 @@ internal sealed class PanelHost : IDisposable
     /// Çıktı yolu iki tarafta da aynı yer tutucudur, yani karşılaştırmaya girmez. Pencere
     /// kaynağın dışına düşerse <c>null</c> döner ve çağıran "değişti" varsayar.
     /// </summary>
+    internal bool AraOlcum { get; set; }
+
+    internal bool AraPlanErtelendi => _araPlanErtelendi;
+
+    internal void ErtelenenPlaniUygula()
+    {
+        if (!_araPlanErtelendi) return;
+        _araPlanErtelendi = false;
+        SetPlan(_info, _plan, _profile);
+    }
+
+    internal static readonly TimeSpan IlkParcaGecikmesi = TimeSpan.FromMilliseconds(1);
+
     private string? ClipSignature(MediaInfo info, EncodePlan plan, double startSeconds)
     {
         try
@@ -569,6 +588,9 @@ internal sealed class PanelHost : IDisposable
         _pendingSignature = _info is { } media && _plan is { } current ? ClipSignature(media, current, _clipStart) : null;
         _scheduled++;
         _segmentDelay.Stop();
+        _segmentDelay.Interval = _clip is null && _clipSignature is null && !_clipRunning
+            ? IlkParcaGecikmesi
+            : TimeSpan.FromMilliseconds(SegmentEncoder.DebounceMilliseconds);
         _segmentDelay.Start();
     }
 
@@ -590,10 +612,13 @@ internal sealed class PanelHost : IDisposable
         _clipRunning = true;
         try
         {
-            var clip = await _segments.RequestAsync(info, plan, startSeconds, _profile);
+            AcilisIzi.Yaz("panel-parca-istek");
+            var olcu = _profile;
+            var clip = await _segments.RequestAsync(info, plan, startSeconds, olcu);
             if (_disposed || _right is not null) return;
             if (clip is null)
             {
+                AcilisIzi.Yaz("panel-parca-iptal");
                 // İptal edilen istek hata değildir; yerine yenisi zaten koşuyor.
                 if (_segments.LastFailure is not { } failure) return;
                 _clipFailure = failure;
@@ -608,6 +633,8 @@ internal sealed class PanelHost : IDisposable
             _clipStart = clip.StartSeconds;
             _clipSignature = ClipSignature(info, plan, clip.StartSeconds);
             _pendingSignature = null;
+            AcilisIzi.Yaz("panel-parca");
+            if (olcu is { Calibrated: true }) AcilisIzi.Yaz("panel-parca-kalibre");
             if (_open) { RefreshRight(); Restart(); }
         }
         catch (Exception ex)

@@ -3072,6 +3072,7 @@ public partial class MainWindow : Window
         {
             var speed = CurrentOptions().SpeedMode;
             _sceneMap = await EncodeRunner.TryBuildSceneMapAsync(info, ct: cts.Token);
+            AcilisIzi.Yaz("sahne-haritasi");
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             Recalculate();
 
@@ -3079,7 +3080,10 @@ public partial class MainWindow : Window
             {
                 if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return false;
                 _profile = profile;
-                Recalculate();
+                if (_preview is not null) _preview.AraOlcum = stage == ShrinkMeasureStage.Probed;
+                try { Recalculate(); }
+                finally { if (_preview is not null) _preview.AraOlcum = false; }
+                AcilisIzi.Yaz("olcum-" + stage);
                 if (stage == ShrinkMeasureStage.Probed) TxtEstimateNote.Text = Say("main.estimate.calibrating");
                 return true;
             }, cts.Token);
@@ -3095,6 +3099,7 @@ public partial class MainWindow : Window
         {
             if (ReferenceEquals(_probeCts, cts)) _probeCts = null;
             cts.Dispose();
+            if (ReferenceEquals(_info, info)) _preview?.ErtelenenPlaniUygula();
         }
     }
 

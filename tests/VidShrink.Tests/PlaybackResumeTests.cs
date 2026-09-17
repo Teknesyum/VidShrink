@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Threading;
@@ -376,6 +376,89 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
         Assert.True(encoder.StartedEncodes > oncekiKodlama, "yeni plan icin kodlama kosmadi");
         Assert.True(sayac > oncekiFabrika, "plan degisince Restart kosmadi");
         AppHost.Run(host.Dispose);
+    }
+
+    [FfmpegFact]
+    public async Task Ilk_parca_beklemesiz_sonraki_plan_gecikmeyle_siraya_girer()
+    {
+        Assert.True(_clips.Ready);
+        using var encoder = new SegmentEncoder(Temp());
+        var info = Source(_clips.Kaynak);
+
+        var bosPanel = AppHost.Run(() => new ComparisonPanel());
+        using var bosKodlayici = new SegmentEncoder(Temp());
+        var bos = AppHost.Run(() => new PanelHost(bosPanel, () => new SessizKaynak(), bosKodlayici));
+        var (ilkKuruldu, ilkGecikme) = AppHost.Run(() =>
+        {
+            Yerlestir(bosPanel);
+            bos.SetFiles(_clips.Kaynak, null, 16.0 / 9, TimeSpan.FromSeconds(12), 30);
+            bos.SetPlan(info, TwoPassPlan(), null);
+            return (bos.ClipScheduled, bos.ClipDelay);
+        });
+        AppHost.Run(bos.Dispose);
+
+        var (_, host, _) = await Hazirla(encoder, info);
+        var (sonrakiKuruldu, sonrakiGecikme) = AppHost.Run(() =>
+        {
+            host.SetPlan(info, BaskaPlan(), null);
+            return (host.ClipScheduled, host.ClipDelay);
+        });
+        AppHost.Run(host.Dispose);
+
+        Record($"H3 ilk parca gecikmesi {ilkGecikme.TotalMilliseconds} ms, parca varken {sonrakiGecikme.TotalMilliseconds} ms");
+        Assert.True(ilkKuruldu);
+        Assert.Equal(PanelHost.IlkParcaGecikmesi, ilkGecikme);
+        Assert.True(sonrakiKuruldu);
+        Assert.Equal(TimeSpan.FromMilliseconds(SegmentEncoder.DebounceMilliseconds), sonrakiGecikme);
+    }
+
+    [FfmpegFact]
+    public async Task Ara_olcum_plani_ekrandaki_parcayi_iptal_etmez_olcum_bitince_uygulanir()
+    {
+        Assert.True(_clips.Ready);
+        using var encoder = new SegmentEncoder(Temp());
+        var info = Source(_clips.Kaynak);
+
+        var bosPanel = AppHost.Run(() => new ComparisonPanel());
+        using var bosKodlayici = new SegmentEncoder(Temp());
+        var bos = AppHost.Run(() => new PanelHost(bosPanel, () => new SessizKaynak(), bosKodlayici));
+        var parcasizKuruldu = AppHost.Run(() =>
+        {
+            Yerlestir(bosPanel);
+            bos.SetFiles(_clips.Kaynak, null, 16.0 / 9, TimeSpan.FromSeconds(12), 30);
+            bos.AraOlcum = true;
+            bos.SetPlan(info, TwoPassPlan(), null);
+            return bos.ClipScheduled && !bos.AraPlanErtelendi;
+        });
+        AppHost.Run(bos.Dispose);
+
+        var (_, host, _) = await Hazirla(encoder, info);
+        var oncekiSira = host.ScheduledEncodes;
+        var oncekiKodlama = encoder.StartedEncodes;
+        var (araSira, araKuruldu, ertelendi) = AppHost.Run(() =>
+        {
+            host.AraOlcum = true;
+            host.SetPlan(info, BaskaPlan(), null);
+            host.AraOlcum = false;
+            return (host.ScheduledEncodes, host.ClipScheduled, host.AraPlanErtelendi);
+        });
+        var (sonSira, sonKuruldu, sonErtelendi) = AppHost.Run(() =>
+        {
+            host.ErtelenenPlaniUygula();
+            return (host.ScheduledEncodes, host.ClipScheduled, host.AraPlanErtelendi);
+        });
+        var ikinciUygula = AppHost.Run(() => { host.ErtelenenPlaniUygula(); return host.ScheduledEncodes; });
+        AppHost.Run(host.Dispose);
+
+        Record($"H3 ara olcum: sira {oncekiSira} -> ara {araSira} -> uygula {sonSira}, kodlama {oncekiKodlama}");
+        Assert.True(parcasizKuruldu, "parca yokken ara olcum ilk parcayi da durdurdu");
+        Assert.Equal(oncekiSira, araSira);
+        Assert.False(araKuruldu);
+        Assert.True(ertelendi);
+        Assert.Equal(oncekiSira + 1, sonSira);
+        Assert.True(sonKuruldu);
+        Assert.False(sonErtelendi);
+        Assert.Equal(sonSira, ikinciUygula);
     }
 
     /// <summary>
