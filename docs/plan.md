@@ -14,6 +14,8 @@ Dal `t0/vt-hizli`. Karar: `fable-kararlar-2026-09-17.md` soru 1. Kapı önce `do
 5. **Ölçüm** `tools/kalite-paketi-3/hb.ps1` `vthizli` işi, `handbrake-kiyas.yml` macos-15. Kalırsa plan yolu geri alınır.
 
 **Sonuç:** koşum 35249123754 kapıdan kaldı (K2 2/8, K4 5/8); 2-4. adımlar geri alındı, ölçüm düzeneği kaldı.
+**Denetim borçları:** kapı karşılaştırması ham değere çekildi (K2 yine 2/8), `KomutSatiri` bench günlüğünü
+gerçek komuta bağladı, `VtHizli` kapı kalınca fırlatıyor.
 
 # Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
 

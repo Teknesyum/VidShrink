@@ -706,9 +706,12 @@ function VtHizli {
                     Remove-Item $c
                 }
             }
-            $h['k2_fark'] = if ($null -ne $h.vt_vmaf -and $null -ne $h.yz_vmaf) { [math]::Round($h.vt_vmaf - $h.yz_vmaf, 3) } else { $null }
-            $h['k3_oran'] = if ($h.vt_sn -and $h.hb_sn) { [math]::Round($h.vt_sn / $h.hb_sn, 3) } else { $null }
-            $h['k5_fark'] = if ($null -ne $h.vt_vmaf -and $null -ne $h.hb_vmaf) { [math]::Round($h.vt_vmaf - $h.hb_vmaf, 3) } else { $null }
+            $h['k2_ham'] = if ($null -ne $h.vt_vmaf -and $null -ne $h.yz_vmaf) { $h.vt_vmaf - $h.yz_vmaf } else { $null }
+            $h['k3_ham'] = if ($h.vt_sn -and $h.hb_sn) { $h.vt_sn / $h.hb_sn } else { $null }
+            $h['k5_ham'] = if ($null -ne $h.vt_vmaf -and $null -ne $h.hb_vmaf) { $h.vt_vmaf - $h.hb_vmaf } else { $null }
+            $h['k2_fark'] = if ($null -ne $h.k2_ham) { [math]::Round($h.k2_ham, 6) } else { $null }
+            $h['k3_oran'] = if ($null -ne $h.k3_ham) { [math]::Round($h.k3_ham, 6) } else { $null }
+            $h['k5_fark'] = if ($null -ne $h.k5_ham) { [math]::Round($h.k5_ham, 6) } else { $null }
             $h['xpsnr_fark_yazilim'] = if ($null -ne $h.vt_xpsnr -and $null -ne $h.yz_xpsnr) { [math]::Round($h.vt_xpsnr - $h.yz_xpsnr, 3) } else { $null }
             $h['xpsnr_fark_hb'] = if ($null -ne $h.vt_xpsnr -and $null -ne $h.hb_xpsnr) { [math]::Round($h.vt_xpsnr - $h.hb_xpsnr, 3) } else { $null }
             $hucreler.Add([pscustomobject]$h)
@@ -717,10 +720,10 @@ function VtHizli {
     $beklenen = @($Kesitler.Split(',') | Where-Object { $_.Trim() }).Count * @($VtKbitler.Split(',') | Where-Object { $_.Trim() }).Count
     $tam = ($hucreler.Count -eq $beklenen)
     $k1 = $tam -and @($hucreler | Where-Object { $_.vt_kodlayici -ne 'hevc_videotoolbox' }).Count -eq 0
-    $k2 = $tam -and @($hucreler | Where-Object { $null -eq $_.k2_fark -or $_.k2_fark -lt -0.3 }).Count -eq 0
-    $k3 = $tam -and @($hucreler | Where-Object { $null -eq $_.k3_oran -or $_.k3_oran -gt 1.5 }).Count -eq 0
+    $k2 = $tam -and @($hucreler | Where-Object { $null -eq $_.k2_ham -or $_.k2_ham -lt -0.3 }).Count -eq 0
+    $k3 = $tam -and @($hucreler | Where-Object { $null -eq $_.k3_ham -or $_.k3_ham -gt 1.5 }).Count -eq 0
     $k4 = $tam -and @($hucreler | Where-Object { $_.vt_bantta -ne $true -or $_.vt_tavan -eq $true }).Count -eq 0
-    $k5 = $tam -and @($hucreler | Where-Object { $null -eq $_.k5_fark -or $_.k5_fark -lt -0.3 }).Count -eq 0
+    $k5 = $tam -and @($hucreler | Where-Object { $null -eq $_.k5_ham -or $_.k5_ham -lt -0.3 }).Count -eq 0
     $hukum = [ordered]@{
         hucre = $hucreler.Count; beklenen = $beklenen
         K1_kodlayici = $k1; K2_yazilima_gore = $k2; K3_hiz = $k3; K4_bant_tavan = $k4; K5_hb_vt_ye_gore = $k5; N1_uydurma_bayrak = $n1
@@ -729,6 +732,9 @@ function VtHizli {
     }
     ConvertTo-Json -Depth 6 -InputObject $hukum | Set-Content (Join-Path $Cikti 'vthizli-hukum.json')
     Write-Host (ConvertTo-Json -Depth 6 -InputObject $hukum)
+    if (-not $hukum.gecti) {
+        throw "VT hizli kapisi kaldi: hucre $($hucreler.Count)/$beklenen, K1=$k1 K2=$k2 K3=$k3 K4=$k4 K5=$k5 N1=$n1 (vthizli-hukum.json)"
+    }
 }
 
 function EkranBant {
@@ -1408,9 +1414,10 @@ function KaranlikGecis {
             foreach ($k in $ok.Keys) { $ek[$k] = $ok[$k] }
             $ek.urun_kodlama_sn = $script:kgUrun.Sn
             $ek.urun_toplam_sn = $script:kgUrun.Toplam
-            $ek.urun_bolu_hb_sure = [math]::Round($script:kgUrun.Sn / $h.Sn, 3)
+            $sureOrani = $script:kgUrun.Sn / $h.Sn
+            $ek.urun_bolu_hb_sure = [math]::Round($sureOrani, 3)
             $ek.urun_toplam_bolu_hb_sure = [math]::Round($script:kgUrun.Toplam / $h.Sn, 3)
-            $ek.sure_hukmu = if ($ek.urun_bolu_hb_sure -le 1.5) { 'gecti' } else { 'kaldi' }
+            $ek.sure_hukmu = if ($sureOrani -le 1.5) { 'gecti' } else { 'kaldi' }
             Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'handbrake-x265'; istenen_kbit = $kbit; kodlayici = 'HandBrakeCLI 1.11.2 x265 slow 2 gecis turbo' }) ([ordered]@{ bayt = (Get-Item $c).Length; kbps = $h.Kbps }) $ek
             Remove-Item $c
         }

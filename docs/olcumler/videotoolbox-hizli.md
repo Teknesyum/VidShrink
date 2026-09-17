@@ -73,5 +73,21 @@ VMAF-NEG geride ve üç hücrede banttan düşüyor. Ekran kesitinde kodlayıcı
 yeniden kapının kapalı olduğunu pimliyor. Ölçüm düzeneği kalıyor: `hb.ps1 -Is vthizli`.
 
 Bağlantı açıkken birim testleri ve mutasyonlar (13 mutasyonun 13'ü en az bir testi kırmızı yaptı, hepsi geri alındı)
-`4e65f579` commit'inde duruyor. Yan gözlem: bench komutunda VT için `-pass 2 -passlogfile` yazılıyor; VT tek geçiş,
-bayrak sonucu değiştirmedi ama argüman üretiminde temizlenmesi ayrı iş.
+`4e65f579` commit'inde duruyor.
+
+## Denetim Borçları (kapatıldı)
+
+- **Kapı yuvarlanmış değerle karşılaştırılıyordu.** `hb.ps1` K2/K3/K5'i `Round(...,3)` sonucuyla ölçüyordu; karanlık
+  5500'ün −0,300259'u −0,300 olup "geçti" sayılıyordu, yani betik örtük olarak K2'yi 3/8 sayıyordu. Karşılaştırma
+  artık ham değerle (`k2_ham`/`k3_ham`/`k5_ham`), yuvarlama yalnız rapor alanlarında ve 6 hane. Aynı ham veriyle
+  (koşum 35249123754 `vthizli-hukum.json`) yeniden sayım: **K2 2/8** (belgedeki sayı doğru kalıyor), K3 8/8,
+  K5 8/8, K1 8/8, K4 5/8 — hüküm değişmedi, kapı yine kaldı. Aynı sınıftan ikinci yer: `karanlikgecis` süre kapısı
+  `urun_bolu_hb_sure` (Round 3 vs ≤1,5); o da ham orana çevrildi. CAMBI ≤7,5 ve ±0,05/±0,02 negatif kontrolleri
+  4 haneden karşılaştırıyor (çevirme penceresi 5×10⁻⁵), hüküm çevirmiyor, dokunulmadı.
+- **Bench'in yazdığı komut gerçek komuttan sapıyordu.** `commandPass` ölçütü `IsHardware` idi; VT donanım
+  sayılmadığı için günlüğe `-pass 2 -passlogfile` yazılıyordu, gerçek kodlama tek geçişti. Karar `KomutSatiri`
+  (`tools/VidShrink.Bench/KomutSatiri.cs`) içine alındı ve koşucunun ölçütüne (`FfmpegArguments.NeedsTwoPasses`,
+  yani `!CodecModel.SinglePassRateControl`) bağlandı. Yanlış yer bildirilmişti: sapma Core'un argüman üretiminde
+  değil, Bench'in kendi günlük satırındaydı.
+- **Kapı kalınca iş yeşil dönüyordu.** `VtHizli` artık kardeşi `Vt` gibi fırlatıyor (hüküm JSON'u yazıldıktan
+  sonra); artefakt adımları `if: always()` olduğu için kanıt yine yükleniyor.
