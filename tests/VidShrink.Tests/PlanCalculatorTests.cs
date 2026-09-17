@@ -383,8 +383,9 @@ public sealed class PlanCalculatorTests
 
             if (result.Advice.Notes.Contains(AdviceCode.FrameRateCutForFloor))
             {
-                var atSourceFps = result.Profile.FloorBppf(plan.Codec, info.Fps, info.Fps);
-                Assert.Contains(atSourceFps.ToString("0.0000"), plan.Reason);
+                var wall = System.Text.RegularExpressions.Regex.Match(plan.Reason, @"needs (\d+)k before \S+ runs at all, and the budget leaves (\d+)k for video");
+                Assert.True(wall.Success, plan.Reason);
+                Assert.True(int.Parse(wall.Groups[1].Value) > int.Parse(wall.Groups[2].Value), plan.Reason);
                 quoted++;
             }
         }

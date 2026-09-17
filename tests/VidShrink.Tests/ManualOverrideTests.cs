@@ -70,13 +70,17 @@ public sealed class ManualOverrideTests
     // video butcesi ona gore dustu. Golden T172 turu 2'de (K9) yeni dogru davranisla
     // guncellendi; olcusu docs/olcumler/ses-tabani.md'de.
     //
+    // Ayni kol HB dalga 2'de bir kez daha guncellendi: otomatik plan kaynak fps'te kodlayici
+    // calisabiliyorken kare dusurmuyor (hareketli 300 kbit'te dusurme 16,77 VMAF-NEG kaybettirdi,
+    // kosum 35158725446), 614x346@15 yerine 576x324@30.
+    //
     // Varsayilan davranisi degistiren her mutasyon bu kollari dusurur.
 
     [Theory]
     [InlineData(1920, 1080, 30, 120, 25.0, "libsvtav1", "2pass", 1567, -1, 1920, 1080, 30.0, 128, -1, "6")]
     [InlineData(1280, 720, 24, 300, 8.0, "libsvtav1", "2pass", 188, -1, 1202, 676, 24.0, 26, 1, "6")]
     [InlineData(3840, 2160, 60, 45, 50.0, "libsvtav1", "2pass", 9016, -1, 3840, 2160, 60.0, 128, -1, "6")]
-    [InlineData(1920, 1080, 30, 600, 6.0, "libsvtav1", "2pass", 56, -1, 614, 346, 15.0, 24, 1, "6")]
+    [InlineData(1920, 1080, 30, 600, 6.0, "libsvtav1", "2pass", 56, -1, 576, 324, 30.0, 24, 1, "6")]
     [InlineData(1280, 720, 30, 30, 100.0, "libx264", "2pass", 27305, -1, 1280, 720, 30.0, 128, -1, "slow")]
     public void K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni(
         int srcW, int srcH, double srcFps, double durationSeconds, double targetMb,

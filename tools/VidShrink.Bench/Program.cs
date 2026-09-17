@@ -752,6 +752,7 @@ static async Task<int> ShrinkAsync(string[] args)
             : (double?)null;
 
         var actual = encodeResult.OutputMb;
+        var delivered = TeslimOzeti.Of(encodeResult);
         var result = new BenchResult(
             label,
             fillPolicy.ToString(),
@@ -763,12 +764,12 @@ static async Task<int> ShrinkAsync(string[] args)
             actual <= targetMb && actual >= band.LowerMb,
             actual > targetMb,
             actual < band.HardFloorMb,
-            plan.Width,
-            plan.Height,
-            plan.Fps,
-            plan.Codec,
-            plan.Mode,
-            plan.ModeEnum == EncodeMode.Crf ? $"crf {plan.Crf}" : $"{plan.VideoBitrateK}k",
+            delivered.Width,
+            delivered.Height,
+            delivered.Fps,
+            delivered.Codec,
+            delivered.Mode,
+            delivered.CrfOrBitrate,
             encodeResult.Attempts,
             stopwatch.Elapsed.TotalSeconds,
             planWatch.Elapsed.TotalSeconds,

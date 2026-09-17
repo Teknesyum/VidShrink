@@ -79,7 +79,7 @@ public sealed class ExtremeCompressionTests
     }
 
     [Fact]
-    public void HighMotionCutsResolutionWhileLowMotionCutsFrames()
+    public void NeitherMotionLevelCutsFramesWhileTheSourceFrameRateRuns()
     {
         var info = GameCapture();
         var options = new PlanOptions { TargetMb = 3.0 };
@@ -90,10 +90,9 @@ public sealed class ExtremeCompressionTests
         _output.WriteLine($"low motion  -> {lowMotion.Plan.Width}x{lowMotion.Plan.Height}@{lowMotion.Plan.Fps:0.##}");
         _output.WriteLine($"high motion -> {highMotion.Plan.Width}x{highMotion.Plan.Height}@{highMotion.Plan.Fps:0.##}");
 
-        Assert.True(highMotion.Plan.Fps > lowMotion.Plan.Fps,
-            $"High motion kept {highMotion.Plan.Fps:0.##} fps, low motion {lowMotion.Plan.Fps:0.##} fps.");
-        Assert.True(highMotion.Plan.Height < lowMotion.Plan.Height,
-            $"High motion kept {highMotion.Plan.Height}p, low motion {lowMotion.Plan.Height}p.");
+        Assert.Equal(SourceFps, lowMotion.Plan.Fps, 2);
+        Assert.Equal(SourceFps, highMotion.Plan.Fps, 2);
+        Assert.True(highMotion.Plan.Height < info.Height, $"High motion kept {highMotion.Plan.Height}p at a 3 MB target.");
         Assert.Contains(AdviceCode.MotionCutIsExpensive, highMotion.Advice.Notes);
         Assert.Contains(AdviceCode.MotionCutIsCheap, lowMotion.Advice.Notes);
     }
