@@ -655,9 +655,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1472, toplam);
-        Assert.Equal(169, dilBasina["en"]);
-        Assert.Equal(60, dilBasina["tr"]);
+        Assert.Equal(1481, toplam);
+        Assert.Equal(170, dilBasina["en"]);
+        Assert.Equal(61, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -673,7 +673,7 @@ public sealed class BaslikKapsamiTests
     /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778, oynatici 1. dalga anahtarlariyla 844, 3. dalga anahtarlariyla 898, 2. dalga parca anahtarlariyla 950, 4. dalga arac ve gelismis anahtarlariyla 985, 8b kaydedici anahtarlariyla 1078, 8d ses anahtarlariyla 1090, sr'nin yedi ses satiri Kiril'den dosyanin geri kalaniyla ayni Latin yazimina dondurulunce 1091, Kesit A main.language.settings'i dusurunce 1086, Kesit B main.player.title ve main.player.menu'yu dusurunce 1084, Kesit D kaydedicinin otomatik kipine 16 recorder.auto.* anahtari ekleyince 1125, guncelleme rozetinin dort anahtari ve kaydedicinin hedef butcesi eklenince 1135, oynatici kisayollarinin dort menu anahtari 1217'den 1221'e: en bookmarkprev ve tostart, pl bookmarkprev, pt settings-all)
     /// ilk sozcuk disindaki <c>ffmpeg</c>
     /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
-    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 30358 kalem)
+    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 38313 kalem, sayim BaslikKapsamiTests'te)
     /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
     /// <para>Sayim yansimanin gordugu 43 dil uzerinden: 42 dil klasoru ve gomulu kaynak
     /// adindan gelen bir dil daha, her biri 692 anahtar. 5. dalga ffmpeg oynatma borusunu
@@ -707,20 +707,21 @@ public sealed class BaslikKapsamiTests
     /// HandBrake 1c dalgasi main.advanced.keep-tracks.label'i ekledi: 43 x 742 = 31906'dan 43 x 743 = 31949'a;
     /// iz kararlarinin sekiz gerekce notu (main.reason.stream.*) 43 x 751 = 32293'e, kol degistiren toplami 1218'den 1260'a (en 139'dan 143'e, tr 52'den 56'ya). Birlesik: gezilen 33067, toplam 1295 (en 152, tr 58).
     /// Paket 2 kaydedicisi 80 recorder.* anahtari ekledi (Basit/Gelismis, geri sayim, cerceve, tepsi, kisayol, girdi gosterimi, webcam, buyutec ve gelismis panelin on kolu): 43 x 80 = 3440, gezilen 36507; kol degistiren toplami 1406 (en 160, tr 59).
-    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). Kaydedici pencere secicisi iki recorder.error.* anahtari ekledi (window-wayland, window-missing): 43 x 2 = 86, gezilen 37625; kol degistiren toplami degismedi. HandBrake A2 on ayar kutuphanesi 15 main.preset.* anahtari ekledi: 43 x 15 = 645, gezilen 38270; kol degistiren toplami 1471 (en 169, tr 60).</para>
-    /// <para>Bu daldaki (<c>t0/yol-b-kabuk</c>) son adim, <c>origin/main</c> dala birlesince olculdu.
-    /// Birlesme tabani <c>main.json</c>'u 476 anahtarli; dal S9'un on anahtarini ekledi
-    /// (<c>main.unit.mb</c>, <c>mb-value</c>, <c>mb-range</c>, <c>kbps-value</c>, <c>fps-value</c>,
-    /// <c>k-value</c>, <c>score-suffix</c>, <c>score-value</c>, <c>main.plan.ai</c>,
-    /// <c>main.plan.mode.crf-value</c>) ve P3 <c>main.player.menu.settings-all</c>'i dusurdu: 485.
-    /// <c>origin/main</c> HandBrake A2'nin 15 <c>main.preset.*</c> anahtarini ekledi: 491. Birlesik
-    /// katalog 500; 42 dil dosyasinin hepsi 500'de esit, tek anahtar dusmedi. <c>origin/main</c>'in
-    /// pinine gore fark dil basina 500 - 491 = 9 anahtar: 43 x 9 = 387, gezilen 38270 + 387 = 38657.
-    /// Kol degistiren toplam: <c>origin/main</c>'in 1471'i uzerine dalin iki kolu eklenir
-    /// (<c>de</c> ve <c>nb</c> <c>main.plan.ai</c> = "KI", dokumde olculdu) ve dusen
-    /// <c>pt main.player.menu.settings-all</c> ("Todas as configuracoes...") bir kol goturur;
-    /// anahtar geri konularak olculdu: <c>pt</c> 206 -> 207, toplam 1472 -> 1473. 1471 + 2 - 1 = 1472.
-    /// Diller 43, dil dosyasi klasoru 42: <c>zh-Hans</c> ve <c>zh_Hans</c> ayni dosyayi iki adla gezer.</para>
+    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). Kaydedici pencere secicisi iki recorder.error.* anahtari ekledi (window-wayland, window-missing): 43 x 2 = 86, gezilen 37625; kol degistiren toplami degismedi. HandBrake A2 on ayar kutuphanesi 15 main.preset.* anahtari ekledi: 43 x 15 = 645, gezilen 38270; kol degistiren toplami 1471 (en 169, tr 60). Yol D main.update.maintenance-failed bakim hatasi cumlesini ekledi: 43 x 1 = 43, gezilen 38313; kol degistiren toplami 1480 (en 170, tr 61; cs, es, hu, nl, pt, ro, sk birer).</para>
+    /// <para>Bu daldaki (<c>t0/yol-b-kabuk</c>) son adim, <c>origin/main</c> (<c>9c4b9907</c>) dala
+    /// birlesince olculdu. Dal S9'un on anahtarini ekledi (<c>main.unit.mb</c>, <c>mb-value</c>,
+    /// <c>mb-range</c>, <c>kbps-value</c>, <c>fps-value</c>, <c>k-value</c>, <c>score-suffix</c>,
+    /// <c>score-value</c>, <c>main.plan.ai</c>, <c>main.plan.mode.crf-value</c>) ve P3
+    /// <c>main.player.menu.settings-all</c>'i dusurdu; dalin tepesinde (<c>006c8702</c>)
+    /// <c>main.json</c> 500 anahtarli. <c>origin/main</c>'de 492 (HandBrake A2'nin 15
+    /// <c>main.preset.*</c> anahtari ve Yol D'nin <c>main.update.maintenance-failed</c>'i dahil).
+    /// Birlesik katalog 501; 42 dil dosyasinin hepsi 501'de esit, tek anahtar dusmedi.
+    /// <c>origin/main</c>'in pinine gore fark dil basina 501 - 492 = 9 anahtar:
+    /// 43 x 9 = 387, gezilen 38313 + 387 = 38700. Kol degistiren toplam: <c>origin/main</c>'in
+    /// 1480'i uzerine dalin iki kolu eklenir (<c>de</c> ve <c>nb</c> <c>main.plan.ai</c> = "KI",
+    /// dokumde olculdu) ve dusen <c>pt main.player.menu.settings-all</c> bir kol goturur:
+    /// 1480 + 2 - 1 = 1481. Diller 43, dil dosyasi klasoru 42: <c>zh-Hans</c> ve <c>zh_Hans</c>
+    /// ayni dosyayi iki adla gezer.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -748,7 +749,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(38657, gezilen);
+        Assert.Equal(38700, gezilen);
         Assert.Empty(kayip);
     }
 

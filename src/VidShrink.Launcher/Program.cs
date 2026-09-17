@@ -6,10 +6,9 @@ using VidShrink.Core;
 namespace VidShrink.Launcher;
 
 /// <summary>
-/// Kısayolun gösterdiği program. Windows'ta çalışan bir exe ve yüklü dll'ler üzerine
-/// yazılamadığı için güncelleme, uygulama yüklenmeden önce burada uygulanır. Sabit bir
-/// sözleşme yürütülür: yarım kalan başlatıcı değişimini topla, manifesti çek, farkı app
-/// klasörüne uygula, gerekiyorsa başlatıcının kendisini değiştir, uygulamayı başlat, çık.
+/// Kısayolun gösterdiği program. Uygulamayı önce doğurur, bakımı arkasından yapar. Windows
+/// çalışan exe ve yüklü dll'ler üzerine yazdırmadığı için app klasörüne yazma
+/// <see cref="UygulamaKlasoruKapisi"/>'ndan geçer: klasörden koşan uygulama kalmadan yazılmaz.
 ///
 /// Başlatıcı kendini de günceller ama kendi dosyasını kendisi değiştirmez: çalışırken o adı
 /// tutan süreç odur. Yeni ikili yan ada iner, günlük yazılır, uygulama başlatılır ve geçişi
@@ -22,27 +21,7 @@ internal static class Program
     private const string AppExecutableName = "VidShrink.App.exe";
     private const string Caption = "VidShrink";
 
-    /// <summary>İndirilenlerin toplandığı klasör; Updater ile aynı ad.</summary>
-    private const string StageDirectoryName = "update-stage";
-
-    /// <summary>Panelde dokuz satır duruyor; tamamı buraya yazılır.</summary>
-    private const string UpdateLogName = "update-log.txt";
-
-    /// <summary>
-    /// Adımların tavanları. Her adım "en fazla buraya kadar" der ve çubuk o adım uzarsa
-    /// tavana sürünür; sayılar süre tahmini değil, adımların ekranda kapladığı pay.
-    /// Sıralama tek yönlü: bir adımın tabanı bir öncekinin tavanıdır.
-    /// </summary>
-    private const double RepairCeiling = 10;
-
-    /// <inheritdoc cref="RepairCeiling"/>
-    private const double MarkerCeiling = 18;
-
-    /// <inheritdoc cref="RepairCeiling"/>
-    private const double ResumeCeiling = 35;
-
-    /// <inheritdoc cref="RepairCeiling"/>
-    private const double DownloadCeiling = 92;
+    private static readonly TimeSpan KapiBeklemesi = TimeSpan.FromMinutes(2);
 
     [STAThread]
     private static int Main(string[] args)
@@ -51,12 +30,9 @@ internal static class Program
         var appDirectory = Path.Combine(baseDirectory, "app");
         var executable = Path.Combine(appDirectory, AppExecutableName);
 
-        // Geçiş kipi: bu süreç yerine geçecek ikilinin kendisidir, uygulamayı açmaz.
         if (args.Length > 0 && args[0] == LauncherUpdate.CommitArgument)
             return LauncherUpdate.Commit(baseDirectory, ParentProcessId(args)) ? 0 : 3;
 
-        // Elle yükleme kipi: düğmeye basan uygulama kendini kapatıyor, dosyalarını bırakması
-        // beklenir. Argüman uygulamaya geçirilmez.
         var updateNow = args.Length > 0 && args[0] == LauncherUpdate.UpdateNowArgument;
         if (updateNow)
         {
@@ -74,70 +50,29 @@ internal static class Program
         AcilisIzi.Yaz("baslatici");
         var previousVersion = UpdateCheck.ReadVersionMarker(appDirectory);
 
-        // Hipersürüş A1: argümanda açılacak bir dosya varsa kullanıcı video bekliyor,
-        // güncelleme beklemiyor. Uygulama önce doğar, bakım işleri arkasına düşer. Bekleyen
-        // dosyaların yerine taşınması bu turda hiç yapılmaz: taşıma uygulama klasörüne
-        // yazmak demek ve uygulama o klasörden yeni açılmış olur. Bir sonraki normal
-        // açılışta milisaniyelerde tamamlanır.
-        //
-        // ffmpeg varlık sınaması da bu turda atlanıyor: oynatma libmpv ile yapılıyor,
-        // ffmpeg'e ihtiyaç duyan sekmeler eksikliği kendileri bildiriyor.
-        if (!updateNow && args.Length > 0 && File.Exists(args[0]))
-        {
-            StartApp(executable, appDirectory, baseDirectory, args);
-            AcilisIzi.Yaz("app-dogdu");
-            Maintain(baseDirectory, appDirectory, previousVersion);
-            return 0;
-        }
-
-        // Çift tık başlatıcıyı atlıyor: uygulama doğrudan açılıp bakımı bu kiple arkada
-        // yaptırıyor. Bekleyen dosyalar taşınmaz, uygulama o klasörden koşuyor.
         if (!updateNow && args.Length > 0 && args[0] == LauncherUpdate.MaintenanceArgument)
         {
-            Maintain(baseDirectory, appDirectory, previousVersion);
+            Maintain(baseDirectory, appDirectory, previousVersion, download: true, pendingSwap: false);
             return 0;
         }
 
-        // Bakım sessiz koşar; panel yalnız iş 400 ms'yi aşarsa çizilir. Eşik olağan açılışta
-        // da kurulu: bekleyen dosyaların taşınması yüzlerce MB olabilir ve boş ekranda geçmemeli.
-        var pendingSwap = false;
-        var progress = new InstallProgress();
-        using (SplashGate.Arm(progress))
+        var pending = UpdateStage.HasPending(appDirectory);
+        if (!updateNow && !pending && args.Length > 0 && File.Exists(args[0]))
         {
-            // Başlatıcının kendi değişimi yarım kaldıysa önce o okunur: ayar kapalı olsa
-            // bile, çünkü burada eksik kalan şey kısayolun gösterdiği dosyanın kendisi.
-            // Bu çağrı hedef dosyaya dokunmaz, artıkları siler ve bekleyeni bildirir.
-            progress.Step(2, RepairCeiling, "Yarım kalan başlatıcı değişimi toplanıyor");
-            try { pendingSwap = LauncherUpdate.Repair(baseDirectory, UpdateCheck.CurrentVersion()); }
+            UygulamaKlasoruKapisi.Bekle(appDirectory, KapiBeklemesi);
+            StartApp(executable, appDirectory, baseDirectory, args);
+            AcilisIzi.Yaz("app-dogdu");
+            Maintain(baseDirectory, appDirectory, previousVersion, download: true, pendingSwap: false);
+            return 0;
+        }
+
+        if (pending) ResumePending(appDirectory);
+
+        var swap = false;
+        if (updateNow)
+        {
+            try { swap = Updater.Run(baseDirectory, appDirectory, force: true); }
             catch (Exception) { }
-
-            // Kurulumdan sonraki ilk açılış: kurulu başlatıcının sürümü çalışan ikiliden
-            // okunur, sonraki turlarda işareti değişimin kendisi yazar.
-            progress.Step(RepairCeiling, MarkerCeiling, "Kurulu sürüm işareti yazılıyor");
-            try { LauncherUpdate.SeedVersionMarker(baseDirectory, UpdateCheck.CurrentVersion()); }
-            catch (Exception) { }
-
-            // Önceki açılışta kopyalama yarım kaldıysa iş burada tamamlanır.
-            progress.Step(MarkerCeiling, ResumeCeiling, "Bekleyen dosyalar yerine taşınıyor");
-            try { UpdateStage.ResumePending(appDirectory); }
-            catch (Exception) { }
-
-            // Elle yüklemede indirme panelin içinde, açılıştan önce koşar: kullanıcı düğmeye
-            // bastığı turda yeni sürümü görmeli. Kendiliğinden güncellemede tersi geçerli,
-            // aşağıda; ayara da dokunulmaz.
-            if (updateNow)
-            {
-                try
-                {
-                    pendingSwap |= Updater.Run(
-                        baseDirectory, appDirectory, force: true,
-                        progress: progress, floor: ResumeCeiling, ceiling: DownloadCeiling);
-                }
-                catch (Exception) { }
-            }
-
-            progress.Finish(true, Updater.Rehearsing ? "Prova bitti, uygulama açılıyor" : "Uygulama açılıyor");
-            progress.WriteLog(Path.Combine(baseDirectory, UpdateLogName));
         }
 
         try { RecordAppliedUpdate(appDirectory, previousVersion); }
@@ -151,27 +86,63 @@ internal static class Program
             return 2;
         }
 
+        UygulamaKlasoruKapisi.Bekle(appDirectory, KapiBeklemesi);
         StartApp(executable, appDirectory, baseDirectory, args);
         AcilisIzi.Yaz("app-dogdu");
 
-        // İndirme uygulama ekrana geldikten sonra: açılış yolundaki bir ağ turu, hattın
-        // hızına göre açılışı dakikalarca geciktirebilir. İnen sahne bir sonraki açılışta
-        // milisaniyelerde yerine geçer (yukarıdaki ResumePending). Ağ yok, manifest bozuk,
-        // disk dolu: hepsinde sessizce vazgeçilir, yarım sahne silinmez.
-        if (!updateNow)
+        Maintain(baseDirectory, appDirectory, previousVersion, download: !updateNow, pendingSwap: swap);
+        return 0;
+    }
+
+    private static void ResumePending(string appDirectory)
+    {
+        UygulamaKlasoruKapisi.Bekle(appDirectory, KapiBeklemesi);
+        if (!UpdateStage.HasPending(appDirectory)) return;
+
+        var kapi = UygulamaKlasoruKapisi.BosalincaAl(appDirectory, KapiBeklemesi);
+        if (kapi is null)
+        {
+            UygulamaKlasoruKapisi.HataYaz(appDirectory, "uygulama klasörü boşalmadı");
+            return;
+        }
+
+        try
+        {
+            UygulamaKlasoruKapisi.Gecikme();
+            UpdateStage.ResumePending(appDirectory);
+            if (!UpdateStage.HasPending(appDirectory)) UygulamaKlasoruKapisi.HatayiSil(appDirectory);
+        }
+        catch (Exception exception)
+        {
+            UygulamaKlasoruKapisi.HataYaz(appDirectory, exception.Message);
+        }
+        finally
+        {
+            UygulamaKlasoruKapisi.Birak(kapi);
+        }
+    }
+
+    private static void Maintain(string baseDirectory, string appDirectory, string? previousVersion, bool download, bool pendingSwap)
+    {
+        UygulamaKlasoruKapisi.Gecikme();
+        try { pendingSwap |= LauncherUpdate.Repair(baseDirectory, UpdateCheck.CurrentVersion()); }
+        catch (Exception) { }
+        try { LauncherUpdate.SeedVersionMarker(baseDirectory, UpdateCheck.CurrentVersion()); }
+        catch (Exception) { }
+        try { RecordAppliedUpdate(appDirectory, previousVersion); }
+        catch (Exception) { }
+
+        if (download)
         {
             try { pendingSwap |= Updater.Run(baseDirectory, appDirectory); }
             catch (Exception) { }
         }
 
-        // Geçiş en sonda kurulur, çünkü bu sürecin çıkmasını bekliyor.
         if (pendingSwap)
         {
             try { StartCommitter(baseDirectory); }
             catch (Exception) { }
         }
-
-        return 0;
     }
 
     /// <summary>
@@ -195,30 +166,6 @@ internal static class Program
         Process.Start(start);
     }
 
-    /// <summary>
-    /// Uygulama koşarken yapılabilen bakım: yarım geçişin toplanması, sürüm işareti, geçilen
-    /// sürümün notu, arka plan indirmesi ve bekleyen geçişin kurulması. Bekleyen dosyaları
-    /// taşımaz; uygulama o klasörden koşuyor. Dosyalı açılış ve <see cref="LauncherUpdate.MaintenanceArgument"/>
-    /// kipi buradan geçer. Hiçbir hata dışarı çıkmaz.
-    /// </summary>
-    private static void Maintain(string baseDirectory, string appDirectory, string? previousVersion)
-    {
-        try { LauncherUpdate.Repair(baseDirectory, UpdateCheck.CurrentVersion()); }
-        catch (Exception) { }
-        try { LauncherUpdate.SeedVersionMarker(baseDirectory, UpdateCheck.CurrentVersion()); }
-        catch (Exception) { }
-        try { RecordAppliedUpdate(appDirectory, previousVersion); }
-        catch (Exception) { }
-
-        var pendingSwap = false;
-        try { pendingSwap = Updater.Run(baseDirectory, appDirectory); }
-        catch (Exception) { }
-        if (pendingSwap)
-        {
-            try { StartCommitter(baseDirectory); }
-            catch (Exception) { }
-        }
-    }
 
     /// <summary>
     /// Bekleyen başlatıcı geçişini yapacak süreci açar. Açılan dosya geçirilecek ikilinin

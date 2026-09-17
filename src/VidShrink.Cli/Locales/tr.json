@@ -1,5 +1,5 @@
 {
-  "help": "VidShrink {0}: videoyu pencere açmadan bir boyuta ya da kaliteye küçültür.\n\nKullanım:\n  vidshrink kucult <girdi> --hedef 25MB | --kalite N [seçenekler]\n  vidshrink plan <girdi> --hedef 25MB | --kalite N [seçenekler]\n\nKomutlar:\n  kucult            Girdiyi kodlar. İlerleme stderr'e, sonuç stdout'a gider.\n  plan              Planı ve ffmpeg argümanlarını yazar. Kodlama yapmaz.\n\nSeçenekler:\n  --hedef BOYUT             Hedef boyut: 25MB, 25, 1.5GB.\n  --kalite N                Hedef kalite skoru, 1-100. Boyut ondan türetilir.\n  --kodek K                 auto | h264 | hevc | av1. Varsayılan auto.\n  --cikti YOL               Çıktı dosyası. Varsayılan girdinin yanında <girdi>_shrunk.mp4.\n  --json                    Sonucu stdout'a JSON olarak yazar.\n  --olcumsuz                Deneme kodlamalarını atlar; plan kaynak bit hızından kurulur.\n  --vmaf                    ffmpeg'de libvmaf varsa biten dosyanın VMAF'ını ölçer.\n  --hizli                   Penceredeki GPU kutusu gibi hızlı donanım yolunu yeğler.\n\nÇıkış kodları:\n  0   Bitti, boyut bandın içinde (ya da kaynak zaten yeterince küçüktü).\n  2   Bitti ama bandın altında: kalite doydu, küçük dosya tutuldu.\n  3   Hedef tutturulamadı: boyut tavanı aşıldı.\n  1   Hata: ffmpeg yok, girdi okunamadı, kodlama başarısız.\n  64  Yanlış kullanım.  130  Ctrl+C ile iptal.",
+  "help": "VidShrink {0}: videoyu pencere açmadan bir boyuta ya da kaliteye küçültür.\n\nKullanım:\n  vidshrink kucult <girdi> --hedef 25MB | --kalite N [seçenekler]\n  vidshrink plan <girdi> --hedef 25MB | --kalite N [seçenekler]\n  vidshrink izle <klasör> --cikti <klasör> --hedef 25MB | --kalite N [seçenekler]\n\nKomutlar:\n  kucult            Girdiyi kodlar. İlerleme stderr'e, sonuç stdout'a gider.\n  plan              Planı ve ffmpeg argümanlarını yazar. Kodlama yapmaz.\n  izle              Klasöre gelen her yeni videoyu çıktı klasörüne küçültür. Dosya, boyutu ve\n                    zamanı art arda iki tarama aralığında değişmeyince (üçüncü tarama alır) ve yazma kilidi yoksa alınır.\n                    Küçültülürken değişen dosya yeniden denenir. İşlenenler\n                    .vidshrink-izle.json'a yazılır, yeniden başlatınca tekrar işlenmez; klasör\n                    salt okunursa not çıktı klasörüne düşer. Hata veren dosya sonraki başlatmada\n                    bir kez daha denenir; hepsini yeniden yapmak için durum dosyasını silin.\n                    Ctrl+C temiz durdurur.\n\nSeçenekler:\n  --hedef BOYUT             Hedef boyut: 25MB, 25, 1.5GB.\n  --kalite N                Hedef kalite skoru, 1-100. Boyut ondan türetilir.\n  --kodek K                 auto | h264 | hevc | av1. Varsayılan auto.\n  --cikti YOL               Çıktı dosyası. Varsayılan girdinin yanında <girdi>_shrunk.mp4.\n                            izle: çıktı klasörü, zorunlu.\n  --json                    Sonucu stdout'a JSON olarak yazar. izle: satır başına bir nesne (NDJSON).\n  --olcumsuz                Deneme kodlamalarını atlar; plan kaynak bit hızından kurulur.\n  --vmaf                    ffmpeg'de libvmaf varsa biten dosyanın VMAF'ını ölçer.\n  --hizli                   Penceredeki GPU kutusu gibi hızlı donanım yolunu yeğler.\n  --aralik SN               izle: taramalar arası saniye, oturma süresi de bu. Varsayılan 2.\n  --bir-kez                 izle: mevcut dosyalar bitince durur.\n\nÇıkış kodları:\n  0   Bitti, boyut bandın içinde (ya da kaynak zaten yeterince küçüktü).\n  2   Bitti ama bandın altında: kalite doydu, küçük dosya tutuldu.\n  3   Hedef tutturulamadı: boyut tavanı aşıldı.\n  4   izle --bir-kez: en az bir dosya başarısız oldu.\n  1   Hata: ffmpeg yok, girdi okunamadı, kodlama başarısız.\n  64  Yanlış kullanım.  130  Ctrl+C ile iptal.",
   "usage.hint": "Kullanım için 'vidshrink --help' yazın.",
   "error.unknown-command": "Bilinmeyen komut: {0}",
   "error.missing-value": "{0} bir değer ister.",
@@ -43,5 +43,21 @@
   "plan.output": "Çıktı:     {0}",
   "plan.command": "Komut:",
   "basis.measured": "ölçüldü",
-  "basis.estimated": "tahmin"
+  "basis.estimated": "tahmin",
+  "error.bad-interval": "Aralık pozitif bir saniye sayısı olmalı: {0}",
+  "error.watch-no-folder": "İzlenecek klasör verilmedi.",
+  "error.watch-no-output": "izle bir çıktı klasörü ister: --cikti KLASÖR.",
+  "error.watch-missing": "İzlenecek klasör yok: {0}",
+  "error.watch-same-output": "Çıktı klasörü izlenen klasörden farklı olmalı; yoksa çıktılar yeniden küçültülür.",
+  "watch.started": "İzleniyor: {0} -> {1}. Durdurmak için Ctrl+C.",
+  "watch.corrupt-state": "Durum dosyası okunamadı; {0} olarak saklandı, liste boş başlıyor.",
+  "watch.waiting": "Yazımın bitmesi bekleniyor: {0}",
+  "watch.processing": "Küçültülüyor: {0}",
+  "watch.done": "Bitti: {0} -> {1}",
+  "watch.failed": "Başarısız, not edildi: {0}: {1}. Sonraki başlatmada bir kez daha denenir.",
+  "watch.stopped": "İzleme durdu; durum dosyası kaydedildi.",
+  "watch.skipped": "Atlandı, bu izlemenin çıktısı: {0}",
+  "watch.changed": "Dosya küçültülürken değişti; çıktı silindi, yeniden denenecek: {0}",
+  "watch.state-elsewhere": "İzlenen klasöre yazılamıyor; durum dosyası {0}",
+  "watch.state-not-saved": "Durum dosyası yazılamadı: {0}: {1}. İzleme sürüyor."
 }

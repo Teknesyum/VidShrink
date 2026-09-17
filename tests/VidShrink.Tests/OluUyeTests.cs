@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
+using VidShrink.Ffmpeg;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -335,6 +336,67 @@ internal static class MemberScan
 }
 
 /// <summary>
+/// Ikinci olcu: model <b>ozellikleri</b>. Enum ve <c>public static readonly</c> taramasi
+/// K8'in olu yuzeyini goremedi — <c>EncodePlan.SuggestedCrop</c> ile
+/// <c>PlanOptions.DetectedCrop</c> ozellik, tur uyesi degil. Kume yine turden cikar:
+/// <c>VidShrink.Core</c> ve <c>VidShrink.Ffmpeg</c> derlemelerindeki public turlerin
+/// public ornek ozellikleri. Gorunum <c>.Ad</c> erisimleriyle sayilir; bildirim ve nesne
+/// baslaticisi nokta tasimadigi icin kendiliginden sayimin disinda kalir. <c>= </c> takip
+/// ediyorsa yazma (uretim), etmiyorsa okuma (tuketim).
+/// </summary>
+internal static class OzellikScan
+{
+    internal static IReadOnlyList<TypeMember> Members()
+    {
+        var members = new List<TypeMember>();
+        foreach (var assembly in new[] { typeof(CodecModel).Assembly, typeof(FfprobeClient).Assembly })
+        foreach (var type in assembly.GetTypes().OrderBy(t => t.FullName, StringComparer.Ordinal))
+        {
+            if (!type.IsPublic || type.IsEnum || type.Namespace is null) continue;
+            if (!type.Namespace.StartsWith("VidShrink.Core", StringComparison.Ordinal)
+                && !type.Namespace.StartsWith("VidShrink.Ffmpeg", StringComparison.Ordinal)) continue;
+            if (type.IsDefined(typeof(CompilerGeneratedAttribute), false)) continue;
+
+            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            {
+                if (property.GetIndexParameters().Length > 0) continue;
+                if (property.GetMethod is null || !property.GetMethod.IsPublic) continue;
+                members.Add(new TypeMember(type.Name, property.Name, "ozellik"));
+            }
+        }
+        return members;
+    }
+
+    private static readonly Regex Write = new(@"^\s*(=[^=]|\+=|-=)", RegexOptions.Compiled);
+
+    internal static IReadOnlyList<MemberVerdict> Scan()
+    {
+        var files = MemberScan.SourceFiles();
+        var stripped = files.ToDictionary(f => f, f => MemberScan.Strip(File.ReadAllText(f)), StringComparer.Ordinal);
+        var outside = MemberScan.OutsideFiles().Select(f => MemberScan.Strip(File.ReadAllText(f))).ToList();
+
+        var verdicts = new List<MemberVerdict>();
+        foreach (var member in Members())
+        {
+            var pattern = new Regex($@"\.\s*{Regex.Escape(member.Name)}\b", RegexOptions.Compiled);
+            var uses = new List<MemberUse>();
+            foreach (var file in files)
+            {
+                var text = stripped[file];
+                foreach (Match match in pattern.Matches(text))
+                {
+                    var after = text[(match.Index + match.Length)..Math.Min(text.Length, match.Index + match.Length + 8)];
+                    uses.Add(new MemberUse(MemberScan.Relative(file), 0, !Write.IsMatch(after), "ozellik", string.Empty));
+                }
+            }
+            var outsideUses = outside.Sum(text => pattern.Matches(text).Count);
+            verdicts.Add(new MemberVerdict(member, uses, Array.Empty<string>(), outsideUses, false));
+        }
+        return verdicts;
+    }
+}
+
+/// <summary>
 /// Olcunun pimi. Her satir bir bulguyu tasir: hangi uye, hangi bicim, karar ne ve <b>neden</b>.
 /// <para>
 /// <c>Verdict</c> iki degerden birini alir. <c>mesru</c>: uyenin okuma tarafinda
@@ -516,6 +578,242 @@ public sealed class OluUyeTests
         foreach (var line in found) _output.WriteLine(line);
 
         Assert.Equal(expected, found);
+    }
+
+    /// <summary>
+    /// Ozellik olcusunun zarfi: kume 912 ozellikten cikiyor, bugun 152'si isaretli. Bu liste
+    /// ad + bicim tasir, gerekce tasimaz — gerekce zorunlulugu <see cref="OzellikBorclari"/>
+    /// satirlarinda, yani A1'in actigi yuzeyde. Yeni bir olu ozellik acilirsa ya da var olan
+    /// birine uretimde okuyucu gelirse burasi kirmizi olur.
+    ///
+    /// Olcunun bilinen kor noktasi: tarama ad esliyor, tur esliyemiyor. Bir baska turun ayni
+    /// adli uyesi uretimde okununca olu uye canli gorunuyor — RecordProgress.Captured bu yuzden
+    /// listeden dustu, uretimde okunan Pointer.Captured'di. Satiri silmeden once okuyanin
+    /// gercekten o tur oldugunu dogrula.
+    /// </summary>
+    private static readonly string[] PinnedOzellik =
+    {
+        "AppliedUpdateNotice.IsPending  yalniz-disarida",
+        "AudioCaptureDevice.Alternative  yalniz-disarida",
+        "ComparisonFrameRequest.FrameWidth  hic-gorunmeyen",
+        "ComparisonFrameRequest.Realtime  hic-gorunmeyen",
+        "ComparisonSourceStatus.FeedFps  hic-gorunmeyen",
+        "ComparisonSourceStatus.PoolAllocations  hic-gorunmeyen",
+        "ComparisonSourceStatus.ReadErrors  yalniz-disarida",
+        "ComplexityProfile.BiasSource  yalniz-disarida",
+        "ComplexityProfile.Calibration  yalniz-disarida",
+        "ComplexityProfile.EstimateBand  yalniz-disarida",
+        "ComplexityProfile.FloorAdaptation  hic-gorunmeyen",
+        "ComplexityProfile.HalvingStep  yalniz-disarida",
+        "ComplexityProfile.LevelFactor  yalniz-disarida",
+        "ComplexityProfile.ProbeBppf  yalniz-disarida",
+        "ComplexityProfile.QualityMeasured  yalniz-disarida",
+        "ComplexityProfile.SampleContainerBiasRemoved  hic-gorunmeyen",
+        "ComplexityProfile.SampledFrames  hic-gorunmeyen",
+        "ComplexityProfile.SampledSeconds  hic-gorunmeyen",
+        "ComplexityProfile.WindowBias  yalniz-disarida",
+        "ComplexityProfile.WindowBiasKnown  yalniz-disarida",
+        "CropDetection.Rect  yalniz-disarida",
+        "CropDetection.Samples  yalniz-disarida",
+        "EncodeAttempt.MeasuredEfficiency  yalniz-disarida",
+        "EncodePlan.BitrateBias  hic-okunmayan-tur",
+        "EncodePlan.SuggestedCrop  hic-okunmayan-tur",
+        "EncodeResult.DroppedAnOption  yalniz-disarida",
+        "EncoderCost.ReportedCpuParallelism  hic-gorunmeyen",
+        "EncoderCost.VideoMs  hic-gorunmeyen",
+        "FfmpegRun.DroppedAnOption  yalniz-disarida",
+        "FrameGrabber.CacheByteCeiling  yalniz-disarida",
+        "FrameGrabber.CacheBytes  yalniz-disarida",
+        "FrameGrabber.CacheCount  yalniz-disarida",
+        "FrameGrabber.LastDelivered  hic-gorunmeyen",
+        "FrameGrabber.ProcessesStarted  yalniz-disarida",
+        "FramePair.RotationMismatch  yalniz-disarida",
+        "FramePair.SourceHdrOutputSdr  yalniz-disarida",
+        "FramePool.Available  hic-gorunmeyen",
+        "FramePool.Rented  hic-gorunmeyen",
+        "GrabbedFrame.ActualSeconds  yalniz-disarida",
+        "GrabbedFrame.AppliedRotation  yalniz-disarida",
+        "GrabbedFrame.Bgra  hic-gorunmeyen",
+        "GrabbedFrame.RequestedSeconds  yalniz-disarida",
+        "GrabbedFrame.SourceIsHdr  yalniz-disarida",
+        "GrabbedFrame.ToneMapped  yalniz-disarida",
+        "GrabbedFrame.WidthCappedBySource  yalniz-disarida",
+        "HandBrakeTranslation.PresetName  yalniz-disarida",
+        "HardwareVerdict.EnableFastMode  yalniz-disarida",
+        "HardwareVerdict.HeadroomRatio  yalniz-disarida",
+        "HashCache.Hits  yalniz-disarida",
+        "HashCache.Misses  yalniz-disarida",
+        "IdetCounts.Progressive  hic-gorunmeyen",
+        "InstallProgress.Bar  yalniz-disarida",
+        "InstallProgress.Sentence  yalniz-disarida",
+        "IdetCounts.Undetermined  hic-gorunmeyen",
+        "KeyframeIndex.AverageGapSeconds  hic-gorunmeyen",
+        "KeyframeIndex.BuildTime  hic-gorunmeyen",
+        "KeyframeIndex.Stamps  yalniz-disarida",
+        "KeyframeRange.FromSceneMap  yalniz-disarida",
+        "LauncherSkew.Mismatched  hic-gorunmeyen",
+        "LayoutScoreParts.FpsPenalty  yalniz-disarida",
+        "LayoutScoreParts.Hysteresis  yalniz-disarida",
+        "LayoutScoreParts.Provided  yalniz-disarida",
+        "LayoutScoreParts.Required  yalniz-disarida",
+        "LayoutScoreParts.ScalePenalty  yalniz-disarida",
+        "MediaInfo.BitDepth  hic-gorunmeyen",
+        "MediaInfo.ChapterCount  hic-gorunmeyen",
+        "MediaInfo.FileSizeBytes  hic-gorunmeyen",
+        "PerformanceCheckResult.CpuAccountingFactor  hic-gorunmeyen",
+        "PerformanceCheckResult.CpuAccountingTrustworthy  yalniz-disarida",
+        "PerformanceCheckResult.HardwareMeasured  yalniz-disarida",
+        "PerformanceCheckResult.Impact  yalniz-disarida",
+        "PerformanceCheckResult.SoftwareMeasured  yalniz-disarida",
+        "PlaybackFrame.RightPresentation  yalniz-disarida",
+        "PlaybackFrame.Sequence  yalniz-disarida",
+        "PlaybackFrame.SplitX  yalniz-disarida",
+        "PresetFieldNote.LocaleKey  yalniz-disarida",
+        "PresetFileException.LocaleKey  yalniz-disarida",
+        "PresetLibrary.Profiles  yalniz-disarida",
+        "PresetSource.Checked  yalniz-disarida",
+        "PresignedUploadProvider.VisitorToken  hic-gorunmeyen",
+        "PreviewSegment.DroppedSecondPass  yalniz-disarida",
+        "PreviewSegment.RequestedDurationSeconds  yalniz-disarida",
+        "PreviewSegment.WasClamped  yalniz-disarida",
+        "PreviewTimeline.FpsWasReduced  yalniz-disarida",
+        "PreviewTimeline.OutputDurationSeconds  yalniz-disarida",
+        "PreviewTimeline.OutputFps  hic-gorunmeyen",
+        "PreviewTimeline.OutputFrameCount  yalniz-disarida",
+        "PreviewTimeline.SourceDurationSeconds  yalniz-disarida",
+        "PreviewTimeline.SourceFps  yalniz-disarida",
+        "PreviewTimeline.SourceStartSeconds  hic-gorunmeyen",
+        "PreviewTimeline.SourceTotalSeconds  hic-gorunmeyen",
+        "PreviewTimeline.WasTrimmed  yalniz-disarida",
+        "ProbeResult.HasQuality  yalniz-disarida",
+        "QualityAnchor.Points  hic-gorunmeyen",
+        "QualityAnchor.SpreadHalvings  hic-gorunmeyen",
+        "QualityLevel.SlopeMeasured  yalniz-disarida",
+        "QualityMeasurementFailedException.PartialScore  yalniz-disarida",
+        "QualityScore.Alignment  yalniz-disarida",
+        "QualityScore.ColorNormalization  yalniz-disarida",
+        "QualityScore.Ssim  yalniz-disarida",
+        "QualityScore.TonemappedReference  yalniz-disarida",
+        "QualityScore.Xpsnr  yalniz-disarida",
+        "QualityTargetResult.Evaluations  yalniz-disarida",
+        "QualityTargetResult.QualityError  yalniz-disarida",
+        "RecordResult.DroppedAnOption  yalniz-disarida",
+        "RecordResult.WasSplit  hic-gorunmeyen",
+        "RecorderMachine.CpuCores  hic-gorunmeyen",
+        "RecorderSession.SegmentCount  hic-gorunmeyen",
+        "ReleaseManifest.Built  hic-gorunmeyen",
+        "RemoteZip.Paths  hic-gorunmeyen",
+        "ReplayRecorder.Folder  yalniz-disarida",
+        "ReplaySaveResult.Parts  yalniz-disarida",
+        "Scene.Bits  yalniz-disarida",
+        "Scene.Complexity  yalniz-disarida",
+        "SceneMap.Rule  yalniz-disarida",
+        "SceneMap.Threshold  yalniz-disarida",
+        "SetupResult.FfmpegDownloaded  yalniz-disarida",
+        "SetupResult.LibMpvReused  yalniz-disarida",
+        "SetupResult.ModernMenu  hic-gorunmeyen",
+        "ShareLink.SharedAt  hic-gorunmeyen",
+        "ShareLink.TargetId  yalniz-disarida",
+        "ShareTarget.Endpoints  hic-gorunmeyen",
+        "ShareTarget.HasFixedRetention  yalniz-disarida",
+        "ShareTarget.PlaysInBrowser  yalniz-disarida",
+        "ShrinkRequestQueue.PipeName  yalniz-disarida",
+        "SingleInstanceChannel.PipeName  yalniz-disarida",
+        "SizeEstimate.SpreadRatio  hic-gorunmeyen",
+        "SourceStream.IsForced  hic-gorunmeyen",
+        "StrategyAdvice.SuggestedCodec  yalniz-disarida",
+        "StrategyAdvice.SuggestedPreference  yalniz-disarida",
+        "StreamPlan.Attachments  hic-gorunmeyen",
+        "StreamPlan.Subtitles  yalniz-disarida",
+        "SubtitleTrack.Image  hic-gorunmeyen",
+        "ThresholdRule.Slope  hic-gorunmeyen",
+        "TimeEstimate.ExpectedSeconds  yalniz-disarida",
+        "TimeEstimate.HighSeconds  yalniz-disarida",
+        "TimeEstimate.LowSeconds  yalniz-disarida",
+        "TimelinePoint.DriftExceedsSourceFrame  yalniz-disarida",
+        "TimelinePoint.DriftSeconds  yalniz-disarida",
+        "TimelinePoint.OutputFrame  yalniz-disarida",
+        "TimelinePoint.OutputSeconds  yalniz-disarida",
+        "TimelinePoint.SourceSeconds  yalniz-disarida",
+        "TimestampAlignment.FrameDurationSeconds  hic-gorunmeyen",
+        "TimestampAlignment.ReferenceOffsetSeconds  hic-gorunmeyen",
+        "TimestampAlignment.ShiftFrames  yalniz-disarida",
+        "TimestampAlignment.ShiftSeconds  yalniz-disarida",
+        "TimestampAlignment.Shifted  yalniz-disarida",
+        "TimestampAlignment.TestOffsetSeconds  hic-gorunmeyen",
+        "TrimOutcome.Rounds  yalniz-disarida",
+        "UnknownCaptureDeviceException.DeviceName  yalniz-disarida",
+        "UploadProgress.BytesSent  hic-gorunmeyen",
+        "UploadProgress.TotalBytes  hic-gorunmeyen",
+        "VideoFilterOptions.ChangesPicture  yalniz-disarida",
+        "WatchEntry.ProcessedUtc  yalniz-disarida",
+        "WatchFileStamp.LastWriteUtc  yalniz-disarida"
+    };
+
+    /// <summary>
+    /// K8'in olu yuzeyi: kirpma yoklamasi motorda hazir, kullaniciya teslim edilmedi.
+    /// Her satir borc, cunku dusurmek de baglamak da C1'in (arayuz) isi.
+    /// </summary>
+    private static readonly PinnedFinding[] OzellikBorclari =
+    {
+        new("EncodePlan.SuggestedCrop", "hic-okunmayan-tur", Debt,
+            "K8: PlanCalculator oneriyi plana yaziyor, uretimde okuyan yok. Tek tik kirpma dugmesi C1'de; motor hazir, kullanici yolu yok. Oneri ile uygulamayi VideoFilterChainTests ayri ayri okuyor."),
+        new("CropDetection.Rect", "yalniz-disarida", Debt,
+            "K8: CropProbe sonucunun dikdortgeni. Uretimde hicbir cagri CropProbe'u calistirmiyor, yoklamayi yalniz testler ve olcum duzenegi kosturuyor; baglayan yuzey C1'de."),
+        new("CropDetection.Samples", "yalniz-disarida", Debt,
+            "K8: on ornegin ham listesi, mod kararinin kaniti. Uretimde okuyan yok; orneklerin modunu alan test ve canli cropdetect olcusu okuyor."),
+        new("IdetCounts.Progressive", "hic-gorunmeyen", Debt,
+            "Idet sayacinin progressive kolonu: karar kurali yalniz Tff, Bff ve Total okuyor, bu kolon ayristiriliyor ama hicbir kol uzerine dallanmiyor. Olcum gunlugu yaziyor, enterpolasyonlu dizgi icinde oldugu icin tarama gormuyor."),
+        new("IdetCounts.Undetermined", "hic-gorunmeyen", Debt,
+            "Ayni bulgu: belirsiz kare sayisi ayristiriliyor, karar kuralinda yeri yok. Esigin belirsiz kareye de bakmasi gerekip gerekmedigi henuz olculmedi; olcum gunlugunde yalniz kanit olarak yaziliyor."),
+        new("InstallProgress.Bar", "yalniz-disarida", Debt,
+            "Panel kalkinca olu kaldi: uretim cubugu Advance()'in donusunden ciziyor, bu ozellik ayni hesabin kalici hali. Tavanin gecilmedigini ve bitiste sicrama olmadigini KurulumIlerlemesiTests buradan okuyor; baglayan yuzey guncelleme duyurusunda Advance uzerinden."),
+        new("InstallProgress.Sentence", "yalniz-disarida", Debt,
+            "Ayni kok: acilis paneli tek cumleyi ekranda gosteriyordu, panel silindi. Guncelleme duyurusu artik History'yi satir satir yaziyor, tek cumleyi okumuyor; son adimin cumlesinin dogru kuruldugunu KurulumIlerlemesiTests okuyor."),
+        new("WatchEntry.ProcessedUtc", "yalniz-disarida", Debt,
+            "A3: izle durumunun zaman damgasi. Uretim yaziyor, okuyan kod yok cunku teslim yolu JSON: WatchFolder.Serialize alani .vidshrink-izle.json'a koyuyor, kullanici ve destek oradan okuyor. Tarama serilestirmeyi gormuyor; degerin gercekten yazildigini WatchFolderTests okuyor."),
+        new("WatchFileStamp.LastWriteUtc", "yalniz-disarida", Debt,
+            "A3: kararlilik olcusunun zaman kolonu. record struct esitligiyle okunuyor (iki ardisik taramanin damgasi ==  ile kiyaslaniyor), nokta ile erisim uretimde yok; olcunun bilinen kor noktasi. Kolonun gercek degerini WatchFolderTests Stat uzerinden pimliyor."),
+        new("VideoFilterOptions.ChangesPicture", "yalniz-disarida", Debt,
+            "Nitelenmeden okunuyor: ChangesPictureFor kendi turunun icinden soruyor, tarama ise nokta ile erisimi ariyor. Nitelenmis gorunumler testlerde; olcunun bilinen kor noktasi.")
+    };
+
+    /// <summary>
+    /// K3'un ikinci olcusu: ozellik yuzeyi. Enum taramasi K8'in olu yuzeyini goremiyordu.
+    /// </summary>
+    [Fact]
+    public void OluOzellikYuzeyiPimlenenKume()
+    {
+        var scan = OzellikScan.Scan();
+        var found = scan
+            .Where(v => v.Flagged)
+            .Select(v => $"{v.Member}  {v.Shape}")
+            .OrderBy(s => s, StringComparer.Ordinal)
+            .ToList();
+
+        foreach (var line in found) _output.WriteLine(line);
+        _output.WriteLine($"ozellik: {scan.Count}  isaretli: {found.Count}");
+
+        Assert.Equal(PinnedOzellik.OrderBy(s => s, StringComparer.Ordinal).ToList(), found);
+    }
+
+    /// <summary>
+    /// K8'in borc satirlari olculen kumede duruyor ve her biri gerekce tasiyor.
+    /// </summary>
+    [Fact]
+    public void K8OluYuzeyiGerekceliBorcOlarakDuruyor()
+    {
+        var found = OzellikScan.Scan()
+            .Where(v => v.Flagged)
+            .ToDictionary(v => v.Member.ToString(), v => v.Shape, StringComparer.Ordinal);
+
+        foreach (var borc in OzellikBorclari)
+        {
+            Assert.True(found.ContainsKey(borc.Member), $"{borc.Member}: olculen kumede yok");
+            Assert.Equal(borc.Shape, found[borc.Member]);
+            Assert.Equal(Debt, borc.Verdict);
+            Assert.True(borc.Reason.Length >= 60, $"{borc.Member}: gerekce yok ya da tek kelimelik");
+        }
     }
 
     /// <summary>

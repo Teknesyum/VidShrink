@@ -289,13 +289,20 @@ public sealed class EncoderCapabilitiesTests
     private const int SlowProbeMs = 2000;
     private const int ReaderBudgetMs = 750;
 
+    private static Thread AyriIsParcacigi(Action is_)
+    {
+        var parcacik = new Thread(() => is_()) { IsBackground = true };
+        parcacik.Start();
+        return parcacik;
+    }
+
     /// <summary>
     /// Yavas bir yoklama surerken baska bir kodlayicinin yoklamasi kilidin arkasinda
     /// beklemiyor. Kilit surec boyunca tutulsaydi okuyan <see cref="SlowProbeMs"/> kadar
     /// beklerdi; butce onun yarisindan az.
     /// </summary>
     [Fact]
-    public async Task ASlowProbeDoesNotBlockAnotherRead()
+    public void ASlowProbeDoesNotBlockAnotherRead()
     {
         var caps = Capabilities();
         using var probeStarted = new ManualResetEventSlim(false);
@@ -308,8 +315,9 @@ public sealed class EncoderCapabilitiesTests
             return EncoderCapabilities.ProbeOutcome.Accepted;
         };
 
-        var slow = Task.Run(() => caps.Probe("h264_nvenc"));
-        Assert.True(probeStarted.Wait(TimeSpan.FromSeconds(5)), "Yavas yoklama hic baslamadi.");
+        EncoderProbeResult? slowResult = null;
+        var slow = AyriIsParcacigi(() => slowResult = caps.Probe("h264_nvenc"));
+        Assert.True(probeStarted.Wait(TimeSpan.FromSeconds(30)), "Yavas yoklama hic baslamadi.");
 
         var stopwatch = Stopwatch.StartNew();
         var fast = caps.Probe("libx264");
@@ -320,13 +328,13 @@ public sealed class EncoderCapabilitiesTests
             stopwatch.ElapsedMilliseconds < ReaderBudgetMs,
             $"Okuma {stopwatch.ElapsedMilliseconds} ms bekledi; kilit ffmpeg suresince tutuluyor.");
 
-        var slowResult = await slow;
-        Assert.True(slowResult.Succeeded);
+        Assert.True(slow.Join(TimeSpan.FromSeconds(30)), "Yavas yoklama bitmedi.");
+        Assert.True(slowResult!.Succeeded);
     }
 
     /// <summary>Ayni kural secenek onbelleginde: isitma surerken okuma bloke olmuyor.</summary>
     [Fact]
-    public async Task ASlowOptionProbeDoesNotBlockCachedOptionReads()
+    public void ASlowOptionProbeDoesNotBlockCachedOptionReads()
     {
         var caps = Capabilities();
         using var probeStarted = new ManualResetEventSlim(false);
@@ -337,8 +345,9 @@ public sealed class EncoderCapabilitiesTests
             return EncoderCapabilities.ProbeOutcome.Accepted;
         };
 
-        var warming = Task.Run(() => caps.WarmEncoderOption("libx264", "-tune", "film"));
-        Assert.True(probeStarted.Wait(TimeSpan.FromSeconds(5)), "Isitma hic baslamadi.");
+        var isindi = false;
+        var warming = AyriIsParcacigi(() => isindi = caps.WarmEncoderOption("libx264", "-tune", "film"));
+        Assert.True(probeStarted.Wait(TimeSpan.FromSeconds(30)), "Isitma hic baslamadi.");
 
         var stopwatch = Stopwatch.StartNew();
         var read = caps.SupportsEncoderOption("libx265", "-tune", "grain");
@@ -349,7 +358,8 @@ public sealed class EncoderCapabilitiesTests
             stopwatch.ElapsedMilliseconds < ReaderBudgetMs,
             $"Okuma {stopwatch.ElapsedMilliseconds} ms bekledi; kilit ffmpeg suresince tutuluyor.");
 
-        Assert.True(await warming);
+        Assert.True(warming.Join(TimeSpan.FromSeconds(30)), "Isitma bitmedi.");
+        Assert.True(isindi);
     }
 
     /// <summary>

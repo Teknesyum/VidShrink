@@ -254,20 +254,24 @@ internal enum ReleaseOutcome
 /// Iki esik var, ikisi de uydurulmadi:
 ///   <see cref="DragThresholdDip"/> — Windows'un kendi surukleme esigi (SM_CXDRAG/SM_CYDRAG
 ///   varsayilani 4 piksel). Bu kadar oynamayan bir basis kullanicinin niyetinde tiklamadir.
-///   <see cref="DoubleWindowMs"/> — Windows'un cift tik penceresi (GetDoubleClickTime
-///   varsayilani 500 ms). Tek tikin isi bu pencere dolmadan yapilmaz; yapilsaydi her cift
-///   tik once duraklatir, sonra tam ekrana gecerdi.
+///   <see cref="DoubleWindowMs"/> — sistemin cift tik penceresi (<see cref="SystemDoubleClick"/>:
+///   Windows'ta GetDoubleClickTime, obur platformlarda Avalonia'nin platform ayari). Tek tikin
+///   isi bu pencere dolmadan yapilmaz; yapilsaydi her cift tik once duraklatir, sonra tam ekrana
+///   gecerdi.
 ///
-/// Sinif bilerek saf: hicbir Avalonia turu kullanmiyor, saati disaridan aliyor. Bu yuzden
-/// olcum pencere acmayi da 500 ms beklemeyi de gerektirmiyor.
+/// Sinif bilerek saf: saati disaridan aliyor, pencere suresini <see cref="Source"/>'tan okuyor.
+/// Bu yuzden olcum pencere acmayi da sistem suresini beklemeyi de gerektirmiyor.
 /// </summary>
 internal sealed class ClickArbiter
 {
     /// <summary>Windows SM_CXDRAG/SM_CYDRAG varsayilani. Bunun altindaki oynama tiklamadir.</summary>
     internal const double DragThresholdDip = 4;
 
-    /// <summary>Windows GetDoubleClickTime varsayilani. Tek tik bu kadar beklenir.</summary>
-    internal const double DoubleWindowMs = 500;
+    /// <summary>Cift tik penceresinin kaynagi. Varsayilan sistem ayari; test sahte sure verir.</summary>
+    internal static Func<double> Source { get; set; } = SystemDoubleClick.Milliseconds;
+
+    /// <summary>Tek tik bu kadar beklenir.</summary>
+    internal static double DoubleWindowMs => Source();
 
     private double _originX;
     private double _originY;
@@ -412,4 +416,31 @@ internal sealed class SurfacePan
 
     private static double Clamp(double value, double low, double high)
         => value < low ? low : value > high ? high : value;
+}
+
+internal static class SystemDoubleClick
+{
+    internal const double FallbackMs = 500;
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern uint GetDoubleClickTime();
+
+    internal static double Milliseconds()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            try
+            {
+                var ms = GetDoubleClickTime();
+                if (ms > 0) return ms;
+            }
+            catch (DllNotFoundException) { }
+            catch (EntryPointNotFoundException) { }
+        }
+
+        var platform = Avalonia.Application.Current?.PlatformSettings?.GetDoubleTapTime(Avalonia.Input.PointerType.Mouse).TotalMilliseconds;
+        return platform is > 0 ? platform.Value : FallbackMs;
+    }
+
+    internal static double WindowsValue() => OperatingSystem.IsWindows() ? GetDoubleClickTime() : double.NaN;
 }

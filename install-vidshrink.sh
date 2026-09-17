@@ -184,14 +184,15 @@ case "${1:-}" in
     *) fail "Bilinmeyen seçenek: $1. Kaldırmak için --uninstall kullanın." ;;
 esac
 
-# Yayında dört hedef var: win-x64, osx-arm64, osx-x64, linux-x64. Başka bir mimaride
-# yanlış arşivi sessizce kurmak yerine burada duruluyor.
+# Yayında altı hedef var: win-x64, win-arm64, osx-arm64, osx-x64, linux-x64, linux-arm64.
+# Başka bir mimaride yanlış arşivi sessizce kurmak yerine burada duruluyor.
 #
 # Boş okuma bundan ayrı bir durum. uname boş dönerse eski hâli boş değeri
 # "desteklenmeyen mimari" sayıp reddediyordu — Windows kurucusunu düşüren tuzağın aynısı.
-# Boş bir değer artık kullanıcıya basılmıyor, okunamadığı söyleniyor. Linux'ta yayın tek:
-# okunamayan mimaride durmak yerine linux-x64 varsayılıp varsayıldığı söyleniyor. macOS'ta
-# iki yayın var, arm64 ile x64 arasında varsayım yapılamaz; orada kurulum duruyor.
+# Boş bir değer artık kullanıcıya basılmıyor, okunamadığı söyleniyor. Linux'ta artık iki yayın
+# var ama okunamayan mimaride durmak yerine linux-x64 varsayılmaya devam ediyor: bu betiği
+# koşturan Linux kurulumlarının ezici çoğunluğu x86_64 ve varsayım yüksek sesle söyleniyor.
+# macOS'ta iki yayın var, arm64 ile x64 arasında varsayım yapılamaz; orada kurulum duruyor.
 runtime_identifier() {
     system=$(uname -s 2>/dev/null || true)
     machine=$(uname -m 2>/dev/null || true)
@@ -211,11 +212,12 @@ runtime_identifier() {
         Linux)
             case "$machine" in
                 x86_64|amd64) printf 'linux-x64\n' ;;
+                aarch64|arm64) printf 'linux-arm64\n' ;;
                 "")
-                    note 'Mimari okunamadı; Linux tarafında yalnız linux-x64 yayımlandığı için linux-x64 varsayıldı.'
+                    note 'Mimari okunamadı; 64 bit Linux kurulumlarının ezici çoğunluğu x86_64 olduğu için linux-x64 varsayıldı. Makine aarch64 ise linux-arm64 arşivini https://github.com/Teknesyum/VidShrink/releases adresinden elle indirin.'
                     printf 'linux-x64\n'
                     ;;
-                *) fail "Bu mimari için yayın yok: $machine. Linux'ta yalnız linux-x64 yayımlanıyor." ;;
+                *) fail "Bu mimari için yayın yok: $machine. Linux'ta yalnız linux-x64 ve linux-arm64 yayımlanıyor." ;;
             esac
             ;;
         "")

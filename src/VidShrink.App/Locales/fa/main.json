@@ -34,6 +34,7 @@
   "main.update.downloading": "در حال دانلود…",
   "main.update.ready": "آماده نصب",
   "main.update.failed": "دانلود به‌روزرسانی ممکن نشد",
+  "main.update.maintenance-failed": "نصب به‌روزرسانی ممکن نشد، در اجرای بعدی دوباره تلاش می‌شود",
   "main.update.cancelled": "دانلود لغو شد",
   "main.update.log.manifest": "در حال دریافت فهرست نسخه‌ها",
   "main.update.log.found": "نسخه {0}: {1} فایل",

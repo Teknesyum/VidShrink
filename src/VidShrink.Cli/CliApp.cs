@@ -14,6 +14,9 @@ public sealed class CliServices
     public Func<string?> MissingTool { get; init; } = () => ToolLocator.IsAvailable(out var missing) ? null : missing;
     public Func<string, CancellationToken, Task<MediaInfo>> Probe { get; init; } = FfprobeClient.ProbeAsync;
     public Func<IEncoderAvailability?> Availability { get; init; } = () => EncoderCapabilities.Instance;
+    public IWatchFileSystem WatchFileSystem { get; init; } = PhysicalWatchFileSystem.Instance;
+    public IWatchClock WatchClock { get; init; } = SystemWatchClock.Instance;
+    public Func<string?> WatchStateFallbackDirectory { get; init; } = () => Path.GetDirectoryName(UpdateSettings.DefaultPath) is { } settings ? Path.Combine(settings, "izle") : null;
 }
 
 public sealed record CliDecision(
@@ -62,33 +65,10 @@ public static class CliApp
                 return ExitCodes.Error;
             }
 
-            var input = Path.GetFullPath(request.Input!);
-            if (!File.Exists(input))
-            {
-                stderr.WriteLine(text.Format("error.input-missing", input));
-                return ExitCodes.Error;
-            }
+            if (request.Command == CliCommand.Watch)
+                return await WatchAsync(request, services, stdout, stderr, text, ct);
 
-            stderr.WriteLine(text["progress.probe"]);
-            var info = await services.Probe(input, ct);
-            var availability = services.Availability();
-            var decision = request.SkipMeasurement
-                ? Decide(request, info, null, null, availability)
-                : await MeasureAndDecideAsync(request, info, availability, stderr, text, ct);
-
-            if (PathEquals(decision.OutputPath, info.FilePath))
-            {
-                stderr.WriteLine(text["error.same-output"]);
-                return ExitCodes.Usage;
-            }
-
-            if (request.Command == CliCommand.Plan)
-            {
-                stdout.Write(request.Json ? PlanJson(request, decision) : PlanText(request, decision, text));
-                return ExitCodes.InBand;
-            }
-
-            return await ShrinkAsync(request, decision, stdout, stderr, text, ct);
+            return (await ProcessFileAsync(request, services, stdout, stderr, text, ct)).ExitCode;
         }
         catch (OperationCanceledException)
         {
@@ -100,6 +80,108 @@ public static class CliApp
             stderr.WriteLine(text.Format("error.failed", ex.Message));
             return ExitCodes.Error;
         }
+    }
+
+    private sealed record FileRun(int ExitCode, string? Output, string? Error);
+
+    private static async Task<FileRun> ProcessFileAsync(CliRequest request, CliServices services, TextWriter stdout,
+        TextWriter stderr, CliText text, CancellationToken ct)
+    {
+        var input = Path.GetFullPath(request.Input!);
+        if (!File.Exists(input))
+        {
+            stderr.WriteLine(text.Format("error.input-missing", input));
+            return new FileRun(ExitCodes.Error, null, text.Format("error.input-missing", input));
+        }
+
+        stderr.WriteLine(text["progress.probe"]);
+        var info = await services.Probe(input, ct);
+        var availability = services.Availability();
+        var decision = request.SkipMeasurement
+            ? Decide(request, info, null, null, availability)
+            : await MeasureAndDecideAsync(request, info, availability, stderr, text, ct);
+
+        if (PathEquals(decision.OutputPath, info.FilePath))
+        {
+            stderr.WriteLine(text["error.same-output"]);
+            return new FileRun(ExitCodes.Usage, null, text["error.same-output"]);
+        }
+
+        if (request.Command == CliCommand.Plan)
+        {
+            stdout.Write(request.Json ? PlanJson(request, decision) : PlanText(request, decision, text));
+            return new FileRun(ExitCodes.InBand, null, null);
+        }
+
+        return await ShrinkAsync(request, decision, stdout, stderr, text, ct);
+    }
+
+    private static async Task<int> WatchAsync(CliRequest request, CliServices services, TextWriter stdout,
+        TextWriter stderr, CliText text, CancellationToken ct)
+    {
+        var fs = services.WatchFileSystem;
+        var clock = services.WatchClock;
+        var watchDirectory = Path.GetFullPath(request.Input!);
+        var outputDirectory = Path.GetFullPath(request.Output!);
+        if (!fs.DirectoryExists(watchDirectory))
+        {
+            stderr.WriteLine(text.Format("error.watch-missing", watchDirectory));
+            return ExitCodes.Error;
+        }
+        if (WatchFolder.ValidateFolders(watchDirectory, outputDirectory) is { } folderError)
+        {
+            stderr.WriteLine(text[folderError]);
+            return ExitCodes.Usage;
+        }
+        fs.CreateDirectory(outputDirectory);
+
+        var location = WatchFolder.OpenState(fs, watchDirectory, outputDirectory, services.WatchStateFallbackDirectory(), clock.UtcNow);
+        var load = location.Load;
+        if (load.CorruptBackup is { } backup) stderr.WriteLine(text.Format("watch.corrupt-state", backup));
+        if (!location.Writable) stderr.WriteLine(text.Format("watch.state-not-saved", location.Path, "-"));
+        else if (!string.Equals(location.Path, Path.Combine(watchDirectory, WatchFolder.StateFileName), WatchFolder.PathComparison))
+            stderr.WriteLine(text.Format("watch.state-elsewhere", location.Path));
+
+        var interval = TimeSpan.FromSeconds(request.PollSeconds ?? 2);
+        var watcher = new WatchFolder(new WatchOptions
+        {
+            WatchDirectory = watchDirectory,
+            OutputDirectory = outputDirectory,
+            StatePath = location.Path,
+            PollInterval = interval,
+            StableFor = interval,
+            Once = request.Once
+        }, fs, clock, load.State);
+
+        stderr.WriteLine(text.Format("watch.started", watchDirectory, outputDirectory));
+        var result = await watcher.RunAsync(async (path, token) =>
+        {
+            var fileRequest = request with { Command = CliCommand.Shrink, Input = path, Output = null, OutputDirectory = outputDirectory, JsonLines = request.Json };
+            var run = await ProcessFileAsync(fileRequest, services, stdout, stderr, text, token);
+            return new WatchOutcome(run.ExitCode, run.ExitCode is ExitCodes.InBand or ExitCodes.UnderBand or ExitCodes.CeilingExceeded,
+                run.Output, run.Error);
+        }, e =>
+        {
+            var name = Path.GetFileName(e.Path);
+            switch (e.Kind)
+            {
+                case WatchEventKind.Waiting: stderr.WriteLine(text.Format("watch.waiting", name)); break;
+                case WatchEventKind.Processing: stderr.WriteLine(text.Format("watch.processing", name)); break;
+                case WatchEventKind.Done: stderr.WriteLine(text.Format("watch.done", name, e.Detail is null ? "-" : Path.GetFileName(e.Detail))); break;
+                case WatchEventKind.Failed: stderr.WriteLine(text.Format("watch.failed", name, e.Detail)); break;
+                case WatchEventKind.Skipped: stderr.WriteLine(text.Format("watch.skipped", name)); break;
+                case WatchEventKind.Changed: stderr.WriteLine(text.Format("watch.changed", name)); break;
+                case WatchEventKind.StateNotSaved: stderr.WriteLine(text.Format("watch.state-not-saved", e.Path, e.Detail)); break;
+                case WatchEventKind.Stopped: stderr.WriteLine(text["watch.stopped"]); break;
+            }
+        }, ct);
+
+        return result switch
+        {
+            WatchRunResult.Finished => watcher.FailedCount > 0 ? ExitCodes.WatchFailures : ExitCodes.InBand,
+            WatchRunResult.Cancelled => ExitCodes.Cancelled,
+            _ => throw new ArgumentOutOfRangeException(nameof(result))
+        };
     }
 
     public static CliDecision Decide(CliRequest request, MediaInfo info, ComplexityProfile? profile,
@@ -119,7 +201,10 @@ public static class CliApp
 
         var options = request.ToPlanOptions(target);
         var result = ShrinkEngine.Decide(info, options, settled, availability);
-        var output = request.Output is { } path ? Path.GetFullPath(path) : ShrinkEngine.UniqueOutputPath(info.FilePath, extension: result.Plan.Streams?.Extension ?? "mp4");
+        var extension = result.Plan.Streams?.Extension ?? "mp4";
+        var output = request.Output is { } path ? Path.GetFullPath(path)
+            : request.OutputDirectory is { } directory ? ShrinkEngine.UniqueOutputPath(Path.Combine(Path.GetFullPath(directory), Path.GetFileName(info.FilePath)), extension: extension)
+            : ShrinkEngine.UniqueOutputPath(info.FilePath, extension: extension);
         var arguments = ShrinkEngine.DisplayedArguments(info, result.Plan, output, availability, scenes?.Map);
         return new CliDecision(info, options, result, settled, scenes, qualityTarget, output, arguments);
     }
@@ -149,14 +234,14 @@ public static class CliApp
             : result.UnderBand ? ExitCodes.UnderBand
             : ExitCodes.InBand;
 
-    private static async Task<int> ShrinkAsync(CliRequest request, CliDecision decision, TextWriter stdout,
+    private static async Task<FileRun> ShrinkAsync(CliRequest request, CliDecision decision, TextWriter stdout,
         TextWriter stderr, CliText text, CancellationToken ct)
     {
         var targetMb = decision.TargetMb;
         if (DiskSpaceGuard.TryGetFreeBytes(decision.OutputPath, out var freeBytes) && !DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb))
         {
             stderr.WriteLine(text.Format("error.no-space", Num(DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0, "0")));
-            return ExitCodes.Error;
+            return new FileRun(ExitCodes.Error, null, text.Format("error.no-space", Num(DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0, "0")));
         }
 
         var clock = Stopwatch.StartNew();
@@ -177,7 +262,7 @@ public static class CliApp
             : ShrinkText(decision, result, clock.Elapsed, vmaf, text));
         if (!result.Success && !result.CeilingExceeded && result.Error is { } error)
             stderr.WriteLine(text.Format("error.failed", error));
-        return exit;
+        return new FileRun(exit, result.Success ? result.OutputPath : null, result.Success ? null : result.Error);
     }
 
     public static string PlanText(CliRequest request, CliDecision decision, CliText text)
@@ -206,7 +291,7 @@ public static class CliApp
     }
 
     public static string PlanJson(CliRequest request, CliDecision decision)
-        => Json(writer =>
+        => Json(!request.JsonLines, writer =>
         {
             writer.WriteString("command", "plan");
             WriteDecision(writer, request, decision);
@@ -233,7 +318,7 @@ public static class CliApp
 
     private static string ShrinkJson(CliRequest request, CliDecision decision, EncodeResult result, TimeSpan elapsed,
         QualityScore? vmaf, int exit)
-        => Json(writer =>
+        => Json(!request.JsonLines, writer =>
         {
             writer.WriteString("command", "kucult");
             WriteDecision(writer, request, decision);
@@ -316,10 +401,10 @@ public static class CliApp
         writer.WriteString("commandLine", FfmpegArguments.ToCommandLine(decision.Arguments));
     }
 
-    private static string Json(Action<Utf8JsonWriter> body)
+    private static string Json(bool indented, Action<Utf8JsonWriter> body)
     {
         using var stream = new MemoryStream();
-        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
+        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = indented, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
         {
             writer.WriteStartObject();
             body(writer);

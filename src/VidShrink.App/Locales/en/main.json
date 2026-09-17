@@ -34,6 +34,7 @@
   "main.update.downloading": "Downloading…",
   "main.update.ready": "Ready to install",
   "main.update.failed": "The update could not be downloaded",
+  "main.update.maintenance-failed": "The update could not be installed, it will be retried on the next start",
   "main.update.cancelled": "Download cancelled",
   "main.update.log.manifest": "Fetching the release list",
   "main.update.log.found": "Version {0}: {1} files",

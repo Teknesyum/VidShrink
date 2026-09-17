@@ -45,6 +45,80 @@ Dal `t0/macos-mpvkit`. Karar: fable 2026-09-17 soru 5. Kod (`src/`) değişmez.
 3. **CI.** `macos-mpvkit.yml`: macos-15, macos-14, macos-15-intel; duman + `OynaticiMotorTests` iki test; negatif kontroller.
 4. **Belge.** `docs/olcumler/libmpv-macos-gomme.md` yeni bölüm. Kurucu/release bağlantısı ayrı karar (deps sürümü gerekir).
 
+# HandBrake A1 — Filtre Zinciri
+
+Dal `t0/hb-a1-filtre`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 31-39, 63; fable K7, K8, B9.
+
+1. **Core.** Yeni `src/VidShrink.Core/VideoFilterChain.cs`: `VideoFilterOptions` (varsayılan: deinterlace koşullu,
+   kırpma ve diğer her filtre kapalı), zincir sırası, idet kararı, `PlannedSource` (kırpma/döndürme/detelecine
+   boyutu). `FfmpegArguments.Build` filtre yeri tek çağrıya iner. `PlanOptions.Filters` → `EncodePlan.Filters`;
+   filtre açıkken passthrough yok. `MediaInfo.FieldOrder` ffprobe'dan.
+2. **Ffmpeg.** `InterlaceProbe.cs` (belirsiz field_order + h264/mpeg2/dv → idet), `CropProbe.cs` (10 nokta,
+   limit=24, mod birleştirme; `siyah-kenar.md`). `EncodeRunner` Auto kararı koşudan önce çözer.
+3. **Bench.** `shrink --filters <tanım>`; CLI başka ajanın alanı, dokunulmaz.
+4. **Testler.** `VideoFilterChainTests` (argüman + negatif kontrol), `FiltreYoklamaTests` (gerçek ffmpeg, ≤3 sn).
+5. **B9.** `hb.ps1 -Is filtre` + `handbrake-kiyas.yml` haritası; kural önce `docs/olcumler/handbrake-filtre.md`.
+6. **K8 bu turda kullanıcıya teslim edilmedi.** `CropProbe`, `EncodePlan.SuggestedCrop` ve `PlanOptions.DetectedCrop`
+   çalışır ve testli, ama üretimde tüketicisi yok: kırpma varsayılan kapalı, yoklama sonucu yalnız öneri.
+   Öneriyi gösteren ve tek tıkla uygulayan yüzey C1'in işi — **motor hazır, kullanıcı yolu C1'de.** Ölü yüzey
+   `OluUyeTests` içindeki `OzellikScan` ölçüsünde gerekçeli borç satırlarıyla pimli.
+7. **Kalan tek kol (borç).** B9 doğrulama koşumu 35265321818'de `parlak`/`acik` kolu süre eşiğini 0,05 puan
+   aştı (+%5,05); kural gevşetilmedi. Sebep `parlak` kesitinin bütçe döngüsünün 3-4 deneme arası oynaması,
+   çözüm ölçüm düzeneğinde (deneme sayısını sabitlemek ya da tekrar sayısını artırıp medyan almak).
+   Ayrıntı `docs/olcumler/handbrake-filtre.md`.
+
+
+# A3 İzle Denetim Düzeltmesi
+
+Dal `t0/hb-a3-izle`. Kaynak: `docs/danisma/2026-09-17-a3-izle-denetim.md` (iki denetim turunun bulguları).
+
+1. `Cli/Locales/en.json`, `tr.json`: yardım tek kez; `CliTests` her satırı tam bir kez sayar. Çıkış kodu 4, `--cikti` klasör, NDJSON.
+2. `Core/WatchFolder.cs`: iki ardışık aralıkta sabit damga; kodlama başı/sonu damga kıyası, değişince çıktı silinir;
+   durum yeri adayları (izlenen, çıktı, ayar klasörü, yol özeti); yazım hatası izlemeyi durdurmaz; hata kaydı sonraki
+   başlatmada bir kez yeniden denenir; `_shrunk` eleme yalnız durumdaki çıktı adlarına; Linux'ta harf duyarlı kıyas; Flush(true).
+3. `Cli/CliApp.cs`, `CliRequest.cs`: durum yeri, `--bir-kez` hata kodu 4, yeni olay mesajları, satır başına JSON.
+4. `tests/WatchFolderTests.cs`: Ctrl+C 130, salt okunur iki koşu, büyüyen dosya, yeniden deneme, eleme günlüğü.
+5. `README.md`: izle belgesi.
+
+# Yol D — Açılış Paneli Hiçbir Yolda Yok
+
+Dal `t0/yol-d-panel`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` §7 satır 2, K14.
+
+1. **Panel kalkar.** `Launcher/Splash.cs`, `tools/VidShrink.SplashGen`, `SplashTests.cs` `trash/`'e;
+   csproj görüntü hedefi ve sln satırı düşer. Başlatıcının ilerleme parametreleri ve tavanları gider.
+2. **Bakım arkada.** Başlatıcı uygulamayı önce doğurur; onarım, sürüm işareti, indirme ve kurulum
+   arkasından. Yalnız yarım kalmış kopya günlüğü (çökme artığı) açılıştan önce, sessiz tamamlanır.
+3. **Yarış kapısı.** `Launcher/UygulamaKlasoruKapisi.cs` (App'e bağlı): app klasörüne yazan kapıyı
+   (klasöre özgü adlı mutex) tutar ve klasörden koşan uygulama süreçleri bitmeden yazmaz; kapı tutulurken
+   ya da günlük dururken doğrudan açılan uygulama başlatıcıya devredip çıkar. Otomatik kurulum uygulama
+   kapanınca uygulanır.
+4. **Hata bildirimi.** Kurulum/taşıma düşerse `app\.bakim-hatasi` yazılır; uygulama açılınca güncelleme
+   panelinde `main.update.maintenance-failed` ile söyler, işareti siler. Anahtar 42 dilde.
+5. **Kanıt.** `tools/VidShrink.SahteUygulama` (AssemblyName VidShrink.App) ile `.calisma` altında sahte
+   kurulum: gecikme kancası `VIDSHRINK_BAKIM_GECIKMESI_MS`, `EnumWindows` ile pencere yok, uygulama
+   kanca bitmeden doğdu; iki yarış senaryosu, her biri mutasyonla kırmızı. Negatif kontrol eski kodla.
+
+**Ölçülen (17 Eylül 2026, 4000 ms kanca, 3700 ms boyunca 20 ms'de bir EnumWindows):**
+
+| Başlatıcı | Görünür pencere sınıfı | İlk pencere | Uygulama doğumu |
+|---|---|---|---|
+| Eski (0bc86188, kanca SplashGate içinde) | 1 — `VidShrinkSplash` | 519 ms | 3700 ms içinde yok |
+| Yeni (bu dal) | 0 | — | 107 ms |
+
+
+# Yol A — Oynatıcı: Döndürme Tuşu, Sürüklerken Mıknatıs, Hız Adımı, Çift Tık Süresi
+
+Dal `t0/yol-a-oynatici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` (1. bölüm, P1, P17, 7/1-7-8).
+
+1. **Döndürme bulunur.** Tuş GOM'daki gibi Ctrl+Shift+S kalır. Kısayolu olan her menü satırının ipucu
+   "ad (tuş)". Test ham sağ tık (satır görünür, tuş metni ve ipucu), ham Ctrl+Shift+S, kare pikselleri
+   (`OynaticiOdakYoluTests`).
+2. **P2 mıknatıs sürüklerken.** Windows'ta yerel `BeginMoveDrag` kalır (Aero Snap), mıknatıs WM_MOVING'de
+   dikdörtgene uygulanır; öbür platformlarda kendi taşıma döngüsü, yakalama kaybı ve tuşsuz hareket onu bitirir.
+   Konum saf `DragPosition`/`SnapRect`, boyut pencerenin ekranının ölçeğiyle. Test ham fare ve gerçek WM_MOVING.
+3. **P17/P1.** `Keymap.SpeedStep` 0,05; `ClickArbiter.DoubleWindowMs` sistemden (Windows `GetDoubleClickTime`,
+   öbürlerinde Avalonia platform ayarı), sahte kaynakla gerçek zamanlayıcı ölçülür.
+
 # Ön Ayar Kütüphanesi — HandBrake A2
 
 Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 42-45.
@@ -77,6 +151,26 @@ Dal `t0/vt-hizli`. Karar: `fable-kararlar-2026-09-17.md` soru 1. Kapı önce `do
 **Denetim borçları:** kapı karşılaştırması ham değere çekildi (K2 yine 2/8), `KomutSatiri` bench günlüğünü
 gerçek komuta bağladı, `VtHizli` kapı kalınca fırlatıyor.
 
+# A4 — arm64 Yayın ve Kurucu Bağımlılıkları
+
+Dal `t0/hb-a45-arm-kiyas`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` 4. bölüm A4, satır 56.
+
+1. **Yayın matrisi.** `release.yml` `publish` matrisine `win-arm64` ve `linux-arm64`; başlatıcı adımı
+   `startsWith(matrix.rid, 'win-')` ile arm64'te de koşar. `UpdateCheck.ReleasedRids` altı hedefe çıkar,
+   `KabukAciklariTests` pini birlikte. Kurucu exe ve kabuk uzantısı x64'te kalır (COM DLL arm64 değil).
+2. **RID seçimi.** `UpdateCheck.RidFor(platform, arch)` ayrılır, `Rid` onu çağırır; test arm64 makinenin
+   `win-arm64`/`linux-arm64` varlığını seçtiğini ve varlığın yayın listesinde olduğunu ölçer.
+3. **Kurucu kaynakları.** `SetupModel` pinleri mimari başına: `FfmpegPin.For`, `LibMpvPin.For`.
+   ffmpeg win-arm64 BtbN'in ay sonu `autobuild-2026-08-31-13-27` etiketinden (kayan `latest` değil),
+   libmpv aarch64 kendi `deps-libmpv-20260903` yayınımızdan, yedek shinchiro. `SetupRunner.RuntimeIdentifier`
+   arm64'ü kabul eder.
+4. **Betikler.** `Install-VidShrink.ps1` arm64 kolu (pinli ffmpeg zip + aarch64 libmpv, `-DepsOnly` ile
+   yalnız bağımlılık kolu), `install-vidshrink.sh` `aarch64` kolu (paket yöneticisi önerisi).
+5. **CI.** `release.yml` workflow_dispatch'te `windows-11-arm`: `-DepsOnly` gerçekten koşar, `ffmpeg -version`,
+   `NativeLibrary.Load` ile libmpv duman testi, bozuk sha256 negatif kontrolü.
+6. **Ölçüm düzeltmesi.** `hb.ps1` SVT kolunun HandBrake preset eşlemesi (x265 adı → SVT sayısı),
+   yalnız SVT hücreleri yeniden koşulur, `docs/olcumler/handbrake-kiyas-cli.md` eski satırı geçersiz işaretler.
+
 # Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
 
 Dal `t0/yol-c-kaydedici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 2., 6., 7. bölüm (9-11).
@@ -91,6 +185,7 @@ Dal `t0/yol-c-kaydedici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17
    İki yeni anahtar 42 dilde, `BiciminTests` sayımı.
 5. **CI.** `ci.yml`'e ubuntu işi: Xvfb + xlogo, `_NET_CLIENT_LIST` elle, filtreli test x11grab 2 sn + ffprobe.
 6. **Belge.** `docs/plan-kaydedici-dalgalari.md` durum sütunu kanıt testleriyle.
+
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.

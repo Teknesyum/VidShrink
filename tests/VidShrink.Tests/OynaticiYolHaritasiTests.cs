@@ -212,55 +212,102 @@ public sealed class OynaticiYolHaritasiTests
         {
         AppHost.Run(() =>
         {
-            var view = new PlayerView();
+            var view = new PlayerView { NativeMoveDrag = false };
             var window = new Window { Width = 640, Height = 360, Content = view };
             window.Show();
             DenetimSurucu.Wait(view, 0.2);
 
-            var esik = (int)Math.Ceiling(view.FindResource("PlaybackBadgeMargin") is Thickness m ? m.Left : 0);
-            Assert.True(esik > 0, "esik belirteci okunamadi");
-            var alan = new PixelRect(100, 50, 1920, 1040);
-            var boyut = new PixelSize(640, 360);
-            var merkez = new PixelPoint(alan.X + (alan.Width - boyut.Width) / 2, alan.Y + (alan.Height - boyut.Height) / 2);
+            var esikDip = view.FindResource("PlaybackBadgeMargin") is Thickness m ? m.Left : 0;
+            Assert.True(esikDip >= 2, "esik belirteci okunamadi");
 
-            var yakin = PlayerView.CenterSnap(alan, boyut, new PixelPoint(merkez.X + esik, merkez.Y - esik), esik);
-            var uzak = PlayerView.CenterSnap(alan, boyut, new PixelPoint(merkez.X + esik + 1, merkez.Y - esik - 1), esik);
-            var tekEksen = PlayerView.CenterSnap(alan, boyut, new PixelPoint(merkez.X + 3, merkez.Y + 200), esik);
-            body.AppendLine($"esik {esik}, merkez {merkez}");
-            body.AppendLine($"yakin ({merkez.X + esik},{merkez.Y - esik}) -> {yakin}");
-            body.AppendLine($"uzak ({merkez.X + esik + 1},{merkez.Y - esik - 1}) -> {uzak}");
-            body.AppendLine($"tek eksen ({merkez.X + 3},{merkez.Y + 200}) -> {tekEksen}");
-            Assert.Equal(merkez, yakin);
-            Assert.Equal(new PixelPoint(merkez.X + esik + 1, merkez.Y - esik - 1), uzak);
-            Assert.Equal(new PixelPoint(merkez.X, merkez.Y + 200), tekEksen);
+            var sol = new PlayerView.ScreenArea(new PixelRect(0, 0, 1920, 1080), new PixelRect(0, 0, 1920, 1040), 1.0);
+            var sag = new PlayerView.ScreenArea(new PixelRect(1920, -200, 3840, 2160), new PixelRect(1920, -200, 3840, 2110), 1.5);
+            var ekranlar = new[] { sol, sag };
+            var cerceveDip = new Size(640, 360);
+            var pencereBas = new PixelPoint(100, 100);
+            var imlecBas = new PixelPoint(400, 300);
+            PixelPoint Imlec(PixelPoint serbest) => new(serbest.X - pencereBas.X + imlecBas.X, serbest.Y - pencereBas.Y + imlecBas.Y);
+            PixelPoint Konum(PixelPoint serbest, double olcek) => PlayerView.DragPosition(pencereBas, imlecBas, Imlec(serbest), cerceveDip, olcek, ekranlar, esikDip);
 
-            if (window.Screens.ScreenFromWindow(window) is { } ekran)
+            var sagEsik = (int)Math.Ceiling(esikDip * 1.5);
+            var solEsik = (int)Math.Ceiling(esikDip);
+            var sagMerkez = new PixelPoint(1920 + (3840 - 960) / 2, -200 + (2110 - 540) / 2);
+            var solMerkez = new PixelPoint((1920 - 640) / 2, (1040 - 360) / 2);
+            var sagYakin = Konum(new PixelPoint(sagMerkez.X + sagEsik, sagMerkez.Y - sagEsik), 1.5);
+            var sagOlcekli = Konum(new PixelPoint(sagMerkez.X + solEsik + 1, sagMerkez.Y), 1.5);
+            var sagUzak = Konum(new PixelPoint(sagMerkez.X + sagEsik + 1, sagMerkez.Y - sagEsik - 1), 1.5);
+            var solYakin = Konum(new PixelPoint(solMerkez.X - solEsik, solMerkez.Y + solEsik), 1.0);
+            var solUzak = Konum(new PixelPoint(solMerkez.X + solEsik + 1, solMerkez.Y), 1.0);
+            var tekEksen = Konum(new PixelPoint(solMerkez.X + 1, solMerkez.Y + 200), 1.0);
+            body.AppendLine($"saf: esik {YolKanit.N(esikDip)} dip, sol esik {solEsik} px (1,0), sag esik {sagEsik} px (1,5)");
+            body.AppendLine($"  sag merkez {sagMerkez}: yakin {sagYakin}, olcekli ({solEsik + 1} px) {sagOlcekli}, uzak {sagUzak}");
+            body.AppendLine($"  sol merkez {solMerkez}: yakin {solYakin}, uzak {solUzak}, tek eksen {tekEksen}");
+            Assert.Equal(sagMerkez, sagYakin);
+            Assert.Equal(sagMerkez, sagOlcekli);
+            Assert.Equal(new PixelPoint(sagMerkez.X + sagEsik + 1, sagMerkez.Y - sagEsik - 1), sagUzak);
+            Assert.Equal(solMerkez, solYakin);
+            Assert.Equal(new PixelPoint(solMerkez.X + solEsik + 1, solMerkez.Y), solUzak);
+            Assert.Equal(new PixelPoint(solMerkez.X, solMerkez.Y + 200), tekEksen);
+
+            var karmaMerkez = new PixelPoint(1920 + (3840 - 640) / 2, -200 + (2110 - 360) / 2);
+            var karma = Konum(new PixelPoint(karmaMerkez.X + solEsik + 1, karmaMerkez.Y), 1.0);
+            var sinirImlec = new PixelPoint(1400 + 600, solMerkez.Y + solEsik + 180);
+            var sinir = PlayerView.DragPosition(pencereBas, new PixelPoint(pencereBas.X + 600, pencereBas.Y + 180), sinirImlec, cerceveDip, 1.0, ekranlar, esikDip);
+            body.AppendLine($"  karma olcek (pencere 1,0 sag ekranda) merkez {karmaMerkez}: {karma}; sinir (imlec {sinirImlec} sag ekranda, pencere merkezi solda): {sinir}");
+            Assert.Equal(karmaMerkez, karma);
+            Assert.Equal(new PixelPoint(1400, solMerkez.Y), sinir);
+
+            var ekran = window.Screens.ScreenFromWindow(window);
+            Assert.NotNull(ekran);
+            var olcek = ekran!.Scaling;
+            var esikPx = (int)Math.Ceiling(esikDip * olcek);
+            var cerceve = PixelSize.FromSize(window.FrameSize ?? window.ClientSize, olcek);
+            var merkez = new PixelPoint(
+                ekran.WorkingArea.X + (ekran.WorkingArea.Width - cerceve.Width) / 2,
+                ekran.WorkingArea.Y + (ekran.WorkingArea.Height - cerceve.Height) / 2);
+            window.Position = new PixelPoint(merkez.X - 150, merkez.Y - 120);
+            DenetimSurucu.Wait(view, 0.2);
+            var baslangic = window.Position;
+
+            var impl = typeof(TopLevel).GetProperty("PlatformImpl", Her)!.GetValue(window)!;
+            var kok = (IInputRoot)typeof(TopLevel).GetProperty("InputRoot", Her)!.GetValue(window)!;
+            var giris = (Action<RawInputEventArgs>)impl.GetType().GetInterfaces()
+                .Select(i => i.GetProperty("Input", Her)).First(p => p is not null)!.GetValue(impl)!;
+            void Olay(RawPointerEventType tur, PixelPoint ekranda, RawInputModifiers tuslar)
             {
-                var olcek = ekran.Scaling;
-                var cerceve = PixelSize.FromSize(window.FrameSize ?? window.ClientSize, olcek);
-                var gercekMerkez = new PixelPoint(
-                    ekran.WorkingArea.X + (ekran.WorkingArea.Width - cerceve.Width) / 2,
-                    ekran.WorkingArea.Y + (ekran.WorkingArea.Height - cerceve.Height) / 2);
-                window.Position = new PixelPoint(gercekMerkez.X + 2, gercekMerkez.Y - 2);
-                DenetimSurucu.Wait(view, 0.1);
-                var yapisti = view.SnapWindowToCenter(window);
-                DenetimSurucu.Wait(view, 0.1);
-                body.AppendLine($"gercek pencere: calisma alani {ekran.WorkingArea}, olcek {YolKanit.N(olcek)}, merkez {gercekMerkez}, yapisti {yapisti}, konum {window.Position}");
-                Assert.True(yapisti);
-                Assert.Equal(gercekMerkez, window.Position);
+                var istemci = window.PointToClient(ekranda);
+                giris((RawInputEventArgs)Activator.CreateInstance(typeof(RawPointerEventArgs), Her, null,
+                    new object[] { Fare, (ulong)Environment.TickCount64, kok, tur, istemci, tuslar }, null)!);
+                DenetimSurucu.Wait(view, 0.05);
+            }
 
-                var uzakKonum = new PixelPoint(gercekMerkez.X - 200, gercekMerkez.Y + 150);
-                window.Position = uzakKonum;
-                DenetimSurucu.Wait(view, 0.1);
-                var uzakYapisti = view.SnapWindowToCenter(window);
-                body.AppendLine($"uzak pencere: yapisti {uzakYapisti}, konum {window.Position}");
-                Assert.False(uzakYapisti);
-                Assert.Equal(uzakKonum, window.Position);
-            }
-            else
+            var tutma = window.PointToScreen(new Point(view.Bounds.Width / 2, view.Bounds.Height / 2));
+            PixelPoint Tut(PixelPoint serbest) => new(tutma.X + serbest.X - baslangic.X, tutma.Y + serbest.Y - baslangic.Y);
+            Olay(RawPointerEventType.Move, tutma, RawInputModifiers.None);
+            Olay(RawPointerEventType.LeftButtonDown, tutma, RawInputModifiers.LeftMouseButton);
+
+            var adimlar = new (string ad, PixelPoint serbest, PixelPoint beklenen)[]
             {
-                body.AppendLine("gercek pencere: bu arka uçta ekran yok, yalniz kural olculdu");
+                ("ilk-adim", new PixelPoint(baslangic.X + 20, baslangic.Y + 10), new PixelPoint(baslangic.X + 20, baslangic.Y + 10)),
+                ("yaklasirken", new PixelPoint(merkez.X - esikPx - 30, merkez.Y - 40), new PixelPoint(merkez.X - esikPx - 30, merkez.Y - 40)),
+                ("bolgede", new PixelPoint(merkez.X + esikPx, merkez.Y - esikPx), merkez),
+                ("bolge-disi", new PixelPoint(merkez.X + esikPx + 1, merkez.Y - esikPx - 1), new PixelPoint(merkez.X + esikPx + 1, merkez.Y - esikPx - 1)),
+                ("geri-bolgede", new PixelPoint(merkez.X - 1, merkez.Y + 2), merkez)
+            };
+            var hatalar = new List<string>();
+            foreach (var (ad, serbest, beklenen) in adimlar)
+            {
+                Olay(RawPointerEventType.Move, Tut(serbest), RawInputModifiers.LeftMouseButton);
+                var konum = window.Position;
+                body.AppendLine($"surukleme {ad}: serbest {serbest}, konum {konum}, beklenen {beklenen}, surukleniyor {view.WindowDragging}");
+                if (konum != beklenen || !view.WindowDragging) hatalar.Add(ad);
             }
+
+            Olay(RawPointerEventType.LeftButtonUp, Tut(adimlar[^1].serbest), RawInputModifiers.None);
+            body.AppendLine($"birakis: konum {window.Position}, surukleniyor {view.WindowDragging}; ekran {ekran.WorkingArea} olcek {YolKanit.N(olcek)} merkez {merkez} esik {esikPx} px");
+            body.AppendLine("iz: " + string.Join(" | ", view.Trace.Where(s => s.StartsWith("snap", StringComparison.Ordinal) || s.StartsWith("move", StringComparison.Ordinal) || s.StartsWith("drag", StringComparison.Ordinal))));
+            Assert.False(view.WindowDragging);
+            Assert.True(hatalar.Count == 0, body.ToString());
 
             window.Close();
             return 0;

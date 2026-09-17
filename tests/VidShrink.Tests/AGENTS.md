@@ -7,6 +7,10 @@ teslimde. Tam süit yerelde koşulmaz — 35 dakika sürüyor ve CI'da zaten par
 itmeden sonra `gh run list` yeşili teslimin şartı. `tools/kosum-kapisi` yalnız majör
 sürümden (`x.0.0`) önce koşar.
 
+**Derleme CI'nın bayraklarıyla:** teslimden önce `dotnet build VidShrink.sln -c Release
+-warnaserror -m:2`. Debug derlemesi yetmez — xUnit analizörleri Debug'ta uyarı, CI'da
+hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
+
 - Zamanlama ölçen testleri yük altında okuma; yerelde filtreli koş, tam süit CI'da.
 - Çıktı ve kanıt dosyaları `.calisma/` altına (`GirdiKanit`, `MotorKanit`).
 - `OynaticiMotorTests.cs` — libmpv motoru: başsız kare, bozuk dosya, exact/keyframe inişi, geç işlenen SEEK olayı
@@ -114,8 +118,9 @@ sürümden (`x.0.0`) önce koşar.
   gizleme sınıfı iki parçayı kapatıyor. Kaynak metin okur; gizlenme ve anahat davranışı `OynaticiYolHaritasiTests`'te.
 - `OynaticiKisayolTests.cs` — tarifteki her kısayol gerçek girdi olayıyla PlayerView'a verilir, etkisi motordan geri okunur;
   döndürme karenin piksellerinden. Kanıt `.calisma/oynatici-kisayol/`.
-- `OynaticiOdakYoluTests.cs` — aynı tuşlar MainWindow'un odak yolundan: sekme değişimi, kaydırıcı/açılır kutu odakta, tam ekran.
-- `OynaticiYolHaritasiTests.cs` — yol haritası denetiminin oynatıcı maddeleri (P2 merkez mıknatısı, P3 menüde ayarlar, P12, P14 üst bar
+- `OynaticiOdakYoluTests.cs` — aynı tuşlar MainWindow'un odak yolundan: sekme değişimi, kaydırıcı/açılır kutu odakta, tam ekran; ham sağ tıkla menüde döndürme satırı, tuş adı ve ipucu, ham Ctrl+Shift+S kare pikseli; hız adımı ve çift tık `OynaticiSuruklemeTests.cs`te.
+- `OynaticiSuruklemeTests.cs` — `OynaticiCiftTikSuresiTests`: ham C/X ile 0.05 hız adımı motordan, çift tık süresi sistemden (`ClickArbiter.Source`). `OynaticiSuruklemeTests`: kendi döngüde tuşsuz hareket ve yakalama kaybı pencereyi taşımaz, sürüklerken gelen çift tık bayat durumu sıfırlar; varsayılan yol platforma göre (Windows yerel `BeginMoveDrag` + `GetWindowRect` ile kendi döngünün karışmadığı), gerçek `SendMessage(WM_MOVING)` dikdörtgeni merkeze çeker. Her ham bölüm çift tık penceresi kadar bekler — bekleme olmadan önceki testin basışı çift tık sayılıyor. Kanıt `.calisma/oynatici-kisayol/`.
+- `OynaticiYolHaritasiTests.cs` — yol haritası denetiminin oynatıcı maddeleri (P2 sürüklerken ham fareyle merkez mıknatısı ve çok ekran/DPI saf hesabı, P3 menüde ayarlar, P12, P14 üst bar
   gizlenmesi, P18, P19 duraklatma simgesi süresi, P20, P24 anahat pikselleri, P26 yayılma maskesi, P28 yandaki altyazı).
   Zamanlayıcı bekleyen ölçüler `Dispatcher.UIThread.MainLoop` ile pompalar; `RunJobs` Win32 zamanlayıcısını tetiklemez.
   Kanıt `.calisma/oynatici-yol-haritasi/`, negatif kontrol betiği aynı klasörde.
@@ -125,6 +130,14 @@ sürümden (`x.0.0`) önce koşar.
 - `BaslaticisizCiftTikTests.cs` — G2/G3: çift tık `app\VidShrink.App.exe`'yi açıyor; `--bakim` kapıları (başlatıcıdan
   doğan uygulama, kurulu düzen dışı, eski başlatıcı), `app\` altından kökteki `tools\ffmpeg`, "Yükle"den sonra rozetin
   ara metin yazmaması. Açma komutunun değeri `KabukEntegrasyonTests`, betik/motor eşitliği `KurucuExeTests`'te.
+- `BaslaticiPanelsizTests.cs` — Yol D: `.calisma/yol-d/kurulum-*` sahte kurulumda gerçek başlatıcı ve `tools/VidShrink.SahteUygulama`.
+  Yavaş bakım kancasında (`VIDSHRINK_BAKIM_GECIKMESI_MS`) başlatıcının görünür penceresi yok (EnumWindows), uygulama hemen doğar;
+  kapı tutulurken doğrudan açılan uygulama başlatıcıya devreder; koşan uygulama kapanmadan kopya başlamaz; `.bakim-hatasi` panelde görünür. `KurulumBekleyeni` süreç içinde: klasör başına tek bekleyen
+  (ikinci açılış indirmez, beklemez), kurulu sürümde hata yazılmaz (bozuk sahne negatif kontrol), daha yeni sürüm eskiye
+  düşürülmez, `Kur` dışarıdan verilen beklemeyi aşmaz, elle Yükle 20 sn'lik dış sınırın içinde bırakır, prova kipi kurmaz
+  (kapalı kipi negatif kontrol), `MainModule` fırlatan süreç bizim sayılmaz. Gerçek süreçle: yerel sahte yayından
+  (`VIDSHRINK_UPDATE_SOURCE`, manifest + zip) yuva tutulurken koşan başlatıcı kurmaz, yuva boşken v2 kurar; elle Yükle
+  (`--update-now`) yuva ve güncelleme kilidi dışarıdan tutulurken uygulamayı 15 sn'nin altında açar.
 - `KabukMenusuKayitTests.cs` — aynı menünün davranışı, yalnız `ShellMenu.TestRoot` altında: kutunun komutu başlatıcıyı
   (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
@@ -150,3 +163,5 @@ sürümden (`x.0.0`) önce koşar.
   aktar `VIDSHRINK_SETTINGS_PATH` klasöründe, bilinmeyen alan yok sayılır, her hata kolu, 15 anahtar 42 dilde),
   `HandBrakeOnAyarCeviriTests` (HandBrake şemasıyla elle yazılmış sentetik "Sentetik Sosyal 10 MB 720p", `Veri/handbrake/`; taşınan/düşen alan notları).
 - `BudgetFillTests.cs` — bütçe doldurma: hedefin %97'sinin altındaki teslim bir yukarı deneme ister, %97 ve üstü istemez; tavanı aşan ya da küçülen yukarı deneme teslim edilmez; deneme bütçesi koşu sınırı + 1; tavan üstü örnek isteği aradeğerle sınırlar; donanım ve VideoToolbox'ta plan yok (yazılım negatif kontrol). Süreç çalıştırmaz. Ölçüm `docs/olcumler/butce-doldur.md`.
+- `VideoFilterChainTests.cs` / `FiltreYoklamaTests.cs` — HB A1 filtre zinciri: her filtrenin `-vf` metni ve negatif kontrolü, sıra, `Parse`/`Validate`, idet parite kuralı, cropdetect modu, passthrough engeli. Canlı kol ≤3 sn 640x360 lavfi: tinterlace taramalı okunur, progressive okunmaz; bwdif fps korur; pad bantlı kaynakta `crop=640:360:0:60`; zincir çıktısı ffprobe boyutu. Kanıt `.calisma/a1/filtre/`. Ölçüm `docs/olcumler/handbrake-filtre.md`.
+- `WatchFolderTests.cs` — A3, `izle` (`Core/WatchFolder.cs`): sahte dosya sistemi ve saatle kararlılık (boyut/zaman iki ardışık aralıkta sabit, oturma süresi, kilit), kodlama sırasında büyüyen dosya (çıktı silinir, yeniden denenir), yalnız durumdaki çıktı adlarının atlanması, aynı klasör reddi ve üç işletim sistemi kolunun harf duyarlılığı (`ComparisonFor` dikişi), durum dosyasının atomik yer değiştirmesi, `.vidshrink-izle.json` yeniden başlatma, bozuk dosya yedeği, salt okunur klasörde çıktı/ayar klasörüne düşen durum, hatalı dosyanın bir kez yeniden denenmesi, Ctrl+C. CLI kolları 130/0/4 çıkışları. Uçtan uca kol 2 sn 320x240 lavfi klibi `dotnet vidshrink.dll izle --bir-kez --json` ile küçültür, NDJSON ve ffprobe okur. Kanıt `.calisma/test-ciktilari/hb-a3-izle/`, test siler.

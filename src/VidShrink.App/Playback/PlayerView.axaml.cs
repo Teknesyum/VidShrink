@@ -416,7 +416,10 @@ internal partial class PlayerView : UserControl
             }
 
             if (Keymap.FirstKeyRow(action) is { } row)
+            {
                 item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
+                ToolTip.SetTip(item, Strings.Get(action.LabelKey) + " (" + Keymap.Gesture(row.Input) + ")");
+            }
             item.Click += OnMenuRow;
             flyout.Items.Add(item);
         }

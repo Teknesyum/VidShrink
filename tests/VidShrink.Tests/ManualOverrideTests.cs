@@ -1063,7 +1063,11 @@ public sealed class ManualOverrideTests
     {
         "TargetMb", "Intent", "Codec", "AllowResolutionDrop", "AllowFpsDrop", "HdrPolicy", "FillPolicy", "SpeedMode",
         "LockedCodec", "LockedMode", "LockedCrf", "LockedPreset", "LockedAudioKbps", "AudioChannels",
-        "MinResolutionHeight", "FixedResolution", "MinFps", "EncoderPath", "KeepAllTracks", "PlatformDelivery", "PreferredLanguage"
+        "MinResolutionHeight", "FixedResolution", "MinFps", "EncoderPath", "KeepAllTracks", "PlatformDelivery", "PreferredLanguage",
+        // A1: Filters kullanicinin filtre secimi (deinterlace, denoise, transpose ...), DetectedCrop
+        // ise cropdetect yoklamasinin sonucu. Ikisi de istek modelinin yuzeyinde durmali: biri
+        // kullanicidan gelir, oteki yoklamadan gelip plana onerilir. Kapali sabit degiller.
+        "Filters", "DetectedCrop"
     };
 
     [Fact]

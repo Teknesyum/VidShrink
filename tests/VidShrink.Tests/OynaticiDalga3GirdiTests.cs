@@ -309,7 +309,7 @@ public sealed class OynaticiDalga3GirdiTests
     /// <summary>
     /// P3: Kısayollar alt menüsü tabloyu göstermekle kalmaz, satırı da çalıştırır. Ham sağ tık
     /// menüyü açar, oklar Ayarlar › Kısayollar'a iner, Yavaşlat satırına ham fare tıklaması
-    /// gider; hız libmpv'nin speed özelliğinden okunur, 1'den 0,9'a düşer.
+    /// gider; hız libmpv'nin speed özelliğinden okunur, tablonun 0,05 adımıyla 1'den 0,95'e düşer.
     /// </summary>
     [Fact]
     public void P3KisayollarSatirinaHamTikEylemiOynaticidaUygular()
@@ -379,8 +379,8 @@ public sealed class OynaticiDalga3GirdiTests
                 body.AppendLine("iz: " + string.Join(" | ", view.Trace));
 
                 Assert.InRange(onceHiz, 0.995, 1.005);
-                Assert.InRange(sonraHiz, 0.895, 0.905);
-                Assert.InRange(view.SpeedFactor, 0.895, 0.905);
+                Assert.InRange(sonraHiz, 0.945, 0.955);
+                Assert.InRange(view.SpeedFactor, 0.945, 0.955);
                 Assert.Contains("satir basildi", body.ToString());
 
                 view.Close();

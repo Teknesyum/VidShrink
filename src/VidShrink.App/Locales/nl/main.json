@@ -34,6 +34,7 @@
   "main.update.downloading": "Downloaden…",
   "main.update.ready": "Klaar om te installeren",
   "main.update.failed": "De update kon niet worden gedownload",
+  "main.update.maintenance-failed": "De update kon niet worden geïnstalleerd, bij de volgende start wordt het opnieuw geprobeerd",
   "main.update.cancelled": "Downloaden geannuleerd",
   "main.update.log.manifest": "Versielijst ophalen",
   "main.update.log.found": "Versie {0}: {1} bestanden",

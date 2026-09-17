@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>VidShrink.App</AssemblyName>
+    <RootNamespace>VidShrink.SahteUygulama</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VidShrink.Core\VidShrink.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\VidShrink.Launcher\UygulamaKlasoruKapisi.cs" Link="UygulamaKlasoruKapisi.cs" />
+  </ItemGroup>
+
+</Project>

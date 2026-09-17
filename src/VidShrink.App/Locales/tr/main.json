@@ -34,6 +34,7 @@
   "main.update.downloading": "İndiriliyor…",
   "main.update.ready": "Yüklemeye hazır",
   "main.update.failed": "Güncelleme indirilemedi",
+  "main.update.maintenance-failed": "Güncelleme kurulamadı, bir sonraki açılışta yeniden denenecek",
   "main.update.cancelled": "İndirme iptal edildi",
   "main.update.log.manifest": "Sürüm listesi alınıyor",
   "main.update.log.found": "Sürüm {0}: {1} dosya",

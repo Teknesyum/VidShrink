@@ -552,7 +552,7 @@ public sealed class OynaticiDenetimMotorTests
         var rapor = AppHost.Run(() =>
         {
             var view = DenetimSurucu.Ac(clip, out var window);
-            for (var i = 0; i < 10; i++) GirdiSurucu.Key(view, Key.C);
+            for (var i = 0; i < 20; i++) GirdiSurucu.Key(view, Key.C);
             var motorHizi = DenetimSurucu.Motor(view).Speed;
 
             DenetimSurucu.Wait(view, 0.5);
@@ -571,7 +571,7 @@ public sealed class OynaticiDenetimMotorTests
 
         var ilerleme = (rapor.p1 - rapor.p0) * 2.0 / rapor.duvar;
         DenetimKanit.Write("hiz.txt",
-            $"C x10 -> gorunum hizi {DenetimKanit.N(rapor.Item1)}, mpv speed {DenetimKanit.N(rapor.motorHizi)}{Environment.NewLine}"
+            $"C x20 -> gorunum hizi {DenetimKanit.N(rapor.Item1)}, mpv speed {DenetimKanit.N(rapor.motorHizi)}{Environment.NewLine}"
             + $"time-pos {DenetimKanit.N(rapor.p0)} -> {DenetimKanit.N(rapor.p1)} / duvar {DenetimKanit.N(rapor.duvar)} sn{Environment.NewLine}"
             + $"2 sn duvara olceklenmis ilerleme: {DenetimKanit.N(ilerleme)} sn (hedef 4 +-%5){Environment.NewLine}"
             + $"Z -> mpv speed {DenetimKanit.N(rapor.sifir)}{Environment.NewLine}");

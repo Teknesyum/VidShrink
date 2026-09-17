@@ -34,6 +34,7 @@
   "main.update.downloading": "Atsisiunčiama…",
   "main.update.ready": "Paruošta diegti",
   "main.update.failed": "Naujinio atsisiųsti nepavyko",
+  "main.update.maintenance-failed": "Naujinio įdiegti nepavyko, bus bandoma dar kartą kito paleidimo metu",
   "main.update.cancelled": "Atsisiuntimas atšauktas",
   "main.update.log.manifest": "Gaunamas versijų sąrašas",
   "main.update.log.found": "Versija {0}: {1} failai",

@@ -234,8 +234,9 @@ public sealed class KurucuExeTests : IDisposable
 
         var release = FakeRelease();
         var (options, host, _) = Setup(release);
-        var entries = options.Ffmpeg.Entries.Select(e => e.FileName == "ffprobe.exe" ? e with { Sha256 = new string('1', 64) } : e).ToArray();
-        options = options with { Ffmpeg = options.Ffmpeg with { Entries = entries } };
+        var ffmpeg = options.Ffmpeg!;
+        var entries = ffmpeg.Entries.Select(e => e.FileName == "ffprobe.exe" ? e with { Sha256 = new string('1', 64) } : e).ToArray();
+        options = options with { Ffmpeg = ffmpeg with { Entries = entries } };
         Directory.CreateDirectory(options.InstallRoot);
         File.WriteAllText(Path.Combine(options.InstallRoot, "eski.txt"), "eski");
 
@@ -290,6 +291,29 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Contains($"$script:RemoveHolderWaitSeconds = {(int)LockedFolder.HolderWait.TotalSeconds}", script);
         Assert.Contains($"'{ShellRegistration.CommandClsid}'", script);
         Assert.Contains($"'{ShellRegistration.PackageName}'", script);
+    }
+
+    /// <summary>
+    /// A4: arm64 pinleri iki yerde yaşıyor — Core ve betik. Ayrı düşerlerse arm64
+    /// makinede biri x64 dosyasını, öteki aarch64 dosyasını indirir ve sağlama tutmaz.
+    /// </summary>
+    [Fact]
+    public void Arm64SabitleriBetikleAyni()
+    {
+        var script = File.ReadAllText(InstallerScript);
+        var libMpv = LibMpvPin.Arm64;
+        var ffmpeg = FfmpegPin.Arm64;
+
+        Assert.Contains($"$libMpvArm64Url = '{libMpv.Urls[0]}'", script);
+        Assert.Contains($"$libMpvArm64FallbackUrl = '{libMpv.Urls[1]}'", script);
+        Assert.Contains($"$libMpvArm64ArchiveSha256 = '{libMpv.ArchiveSha256.ToUpperInvariant()}'", script);
+        Assert.Contains($"$libMpvArm64DllSha256 = '{libMpv.DllSha256.ToUpperInvariant()}'", script);
+        Assert.Contains($"$ffmpegArm64Url = '{ffmpeg.Url}'", script);
+        foreach (var entry in ffmpeg.Entries)
+        {
+            Assert.Contains($"Entry = '{entry.EntryPath}'", script);
+            Assert.Contains($"Sha256 = '{entry.Sha256.ToUpperInvariant()}'", script);
+        }
     }
 
     [Fact]

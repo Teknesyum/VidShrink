@@ -30,6 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\VidShrink.Launcher\UygulamaKlasoruKapisi.cs" Link="UygulamaKlasoruKapisi.cs" />
+    <Compile Include="..\VidShrink.Launcher\KurulumBekleyeni.cs" Link="KurulumBekleyeni.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <AvaloniaResource Include="Assets\VidShrink.png" />
     <AvaloniaResource Include="Assets\VidShrink.ico" />
     <AvaloniaResource Include="Fonts\AtkinsonHyperlegibleNext-Regular.ttf" />
