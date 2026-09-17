@@ -101,29 +101,35 @@ def main():
 
     print("\n## Tablo 1 — Deneme sayisi, sure dagilimi, HandBrake orani\n")
     print("| Kesit | kbit | Zorlanan | Kodlayici | Deneme | Deneme sureleri | Ilk deneme sn | "
-          "Deneme toplami sn | Olcum disi sn | Toplam sn | HB sn | Oran toplam | Oran ilk deneme | "
-          "B5 toplam | B5 ilk deneme |")
-    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+          "Deneme toplami sn | Kodlama disi sn | Toplam sn | HB sn | Oran toplam | Oran ilk deneme | "
+          "Tek deneme toplami sn | Oran tek deneme | B5 toplam | B5 ilk deneme | B5 tek deneme |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for s in urun:
         h = hb.get((s["kesit"], s["istenen_kbit"]))
         hbsn = h.get("kodlama_sn") if h else None
+        ilk = s.get("ilk_deneme_sn")
+        dis = (s["toplam_sn"] - s["kodlama_sn"]) if (s.get("toplam_sn") and s.get("kodlama_sn")) else None
+        tek = (dis + ilk) if (dis is not None and ilk is not None) else None
         ot = s.get("toplam_sn") / hbsn if hbsn else None
-        oi = (s.get("ilk_deneme_sn") / hbsn) if (hbsn and s.get("ilk_deneme_sn") is not None) else None
+        oi = (ilk / hbsn) if (hbsn and ilk is not None) else None
+        ok = (tek / hbsn) if (hbsn and tek is not None) else None
         print(f"| {s['kesit']} | {s['istenen_kbit']} | {s.get('zorlanan_kodek')} | "
               f"{s.get('kodlayici')}{'' if s.get('kodek_tuttu') else ' (TUTMADI)'} | {s.get('deneme')} | "
-              f"{v(s.get('deneme_sureleri'))} | {v(s.get('ilk_deneme_sn'), 1)} | "
-              f"{v(s.get('deneme_sn_toplami'), 1)} | {v(s.get('olcum_disi_sn'), 1)} | "
+              f"{v(s.get('deneme_sureleri'))} | {v(ilk, 1)} | "
+              f"{v(s.get('deneme_sn_toplami'), 1)} | {v(dis, 1)} | "
               f"{v(s.get('toplam_sn'), 1)} | {v(hbsn, 1)} | {v(ot, 2)} | {v(oi, 2)} | "
+              f"{v(tek, 1)} | {v(ok, 2)} | "
               f"{'kaldi' if (ot is not None and ot > 1.0) else 'gecti' if ot is not None else '—'} | "
-              f"{'kaldi' if (oi is not None and oi > 1.0) else 'gecti' if oi is not None else '—'} |")
+              f"{'kaldi' if (oi is not None and oi > 1.0) else 'gecti' if oi is not None else '—'} | "
+              f"{'kaldi' if (ok is not None and ok > 1.0) else 'gecti' if ok is not None else '—'} |")
 
     print("\n## Tablo 2 — Ikinci tam kodlamanin sebebi ve tahmin hatasi\n")
     print("Bant kenarlari FillBand.For kademelerinden; ust kenar hedefin kendisi. "
           "Butce doldurma esigi 0,97*hedef, nisani 0,985*hedef.\n")
     print("| Kesit | kbit | Zorlanan | Hedef MB | Bant alt MB | Ilk cikan MB | Ilk sapma % | "
-          "Ilk bantta | Ilk esigin ustunde | 2. deneme dali | 2. cikan MB | 2. sapma % | "
-          "Ek deneme sn | Ek denemenin toplamdaki payi % |")
-    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+          "Ilk bantta | Ilk esigin ustunde | 1. kbit | Lineer duzeltme kbit | 2. deneme kbit | "
+          "2. deneme dali | 2. cikan MB | 2. sapma % | Ek deneme sn | Ek denemenin toplamdaki payi % |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for s in urun:
         hedef = s.get("hedef_mb")
         d = denemeler(s.get("dallar"))
@@ -139,12 +145,39 @@ def main():
         iki_sapma = (iki["cikan_mb"] - hedef) / hedef * 100 if iki else None
         ek_sn = sum(x for k, x in sn.items() if k >= 2) if sn else None
         pay = (ek_sn / s["toplam_sn"] * 100) if (ek_sn is not None and s.get("toplam_sn")) else None
+        lineer = ilk["kbit"] * hedef / ilk["cikan_mb"] if ilk["cikan_mb"] else None
         print(f"| {s['kesit']} | {s['istenen_kbit']} | {s.get('zorlanan_kodek')} | {v(hedef, 3)} | "
               f"{v(bant_alt, 3)} | {v(ilk['cikan_mb'], 3)} | {v(ilk_sapma, 2)} | "
-              f"{v(ilk_bantta)} | {v(ilk_esik_ustu)} | {iki['dal'] if iki else '—'} | "
+              f"{v(ilk_bantta)} | {v(ilk_esik_ustu)} | {ilk['kbit']} | {v(lineer, 0)} | "
+              f"{iki['kbit'] if iki else '—'} | {iki['dal'] if iki else '—'} | "
               f"{v(iki['cikan_mb'], 3) if iki else '—'} | {v(iki_sapma, 2)} | {v(ek_sn, 1)} | {v(pay, 1)} |")
 
-    print("\n## Tablo 3 — x265 ve x264 ayni kesitte\n")
+    print("\n## Tablo 3 — Lineer duzeltmenin olculmus karsiligi\n")
+    print("Ilk denemenin kbit'inden hedefe lineer gidilse istenecek kbit; yanina ayni "
+          "kosumda o kbit'e en yakin OLCULMUS deneme ve onun cikan boyutu. Kbit farki "
+          "kucukse satir olculmus sayilir, buyukse lineer degerde olcum yok.\n")
+    print("| Kesit | kbit | Zorlanan | Hedef MB | Lineer kbit | En yakin olculmus kbit | "
+          "Kbit farki % | O denemenin cikani MB | Sapma % | Bantta | Esigin ustunde |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|")
+    for s in urun:
+        hedef = s.get("hedef_mb")
+        d = denemeler(s.get("dallar"))
+        if not d or not hedef:
+            continue
+        ilk = d[0]
+        if not ilk["cikan_mb"]:
+            continue
+        lineer = ilk["kbit"] * hedef / ilk["cikan_mb"]
+        yakin = min(d, key=lambda x: abs(x["kbit"] - lineer))
+        fark = (yakin["kbit"] - lineer) / lineer * 100
+        sapma = (yakin["cikan_mb"] - hedef) / hedef * 100
+        bant_alt, _ = bant(hedef)
+        print(f"| {s['kesit']} | {s['istenen_kbit']} | {s.get('zorlanan_kodek')} | {v(hedef, 3)} | "
+              f"{v(lineer, 0)} | {yakin['kbit']} | {v(fark, 1)} | {v(yakin['cikan_mb'], 3)} | "
+              f"{v(sapma, 2)} | {v(bant_alt <= yakin['cikan_mb'] <= hedef)} | "
+              f"{v(yakin['cikan_mb'] >= DOLDUR_ESIK * hedef)} |")
+
+    print("\n## Tablo 4 — x265 ve x264 ayni kesitte\n")
     print("| Kesit | kbit | x265 deneme | x264 deneme | x265 toplam sn | x264 toplam sn | "
           "x265 ilk sn | x264 ilk sn | x265/x264 toplam | x265 oran (HB) | x264 oran (HB) |")
     print("|---|---|---|---|---|---|---|---|---|---|---|")

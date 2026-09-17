@@ -17,6 +17,12 @@ CLI JSON izinde yalnız dal, kbit ve MB var. Ölçülecek sayı henüz üretilmi
 5. **Pim.** `HbOlcumDuzenegiTests`: kolun sabitleri ve kapı oranı.
 6. **Belge.** `docs/olcumler/butce-ikinci-kodlama.md`. Hüküm sayı geldikten sonra yazılır.
 
+Altı madde de kapandı; ızgara koşumu 35282699847 yeşil, hüküm belgede. Ölçümden
+çıkan açık madde: yeniden deneme nişanı (`RetryAimMb`, bandın ortası = 0,96·T)
+bütçe doldurma tabanının (0,97) altında, bu yüzden isabetli deneme fazladan tam
+kodlama doğuruyor — 16 hücrenin 9'unda ölçüldü. Nişanı 0,985·T'ye çekmenin sonucu
+ölçülmedi, ayrı iş.
+
 # macOS 13-14 — MPVKit Denemesi
 
 Dal `t0/macos-mpvkit`. Karar: fable 2026-09-17 soru 5. Kod (`src/`) değişmez.
