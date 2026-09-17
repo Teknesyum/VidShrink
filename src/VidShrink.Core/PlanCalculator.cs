@@ -833,7 +833,7 @@ public static class PlanCalculator
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {
         if (HasReencodeOverride(options)) return false;
-        if (options.Filters?.ChangesPicture == true) return false;
+        if ((options.Filters ?? VideoFilterOptions.Default).ChangesPictureFor(info)) return false;
         if (info.FileSizeMb <= 0 || info.FileSizeMb > options.TargetMb) return false;
         if (hdr.PolicyChanged) return false;
         if (options.Codec == CodecPreference.Auto) return true;

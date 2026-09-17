@@ -262,6 +262,27 @@ public sealed class VideoFilterChainTests
     }
 
     [Fact]
+    public void TaramaliKaynakOtomatiktePassthroughaDusmezProgressiveDuser()
+    {
+        var duz = Kaynak(1280, 720, alan: "progressive") with { FileSizeBytes = 5L * 1024 * 1024, DurationSeconds = 10, TotalBitrateBps = 4_000_000 };
+        var duzPlan = PlanCalculator.Build(duz, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto });
+        Assert.Equal(EncodeMode.PassThrough, duzPlan.ModeEnum);
+
+        var taramali = duz with { IsInterlaced = true, FieldOrder = "tt" };
+        var taramaliPlan = PlanCalculator.Build(taramali, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto });
+        Assert.NotEqual(EncodeMode.PassThrough, taramaliPlan.ModeEnum);
+        Assert.Contains("idet,bwdif=mode=send_frame:parity=auto:deint=interlaced", VideoFilterChain.Filters(taramali, taramaliPlan));
+
+        var elleKapali = PlanCalculator.Build(taramali, new PlanOptions
+        {
+            TargetMb = 25,
+            Codec = CodecPreference.Auto,
+            Filters = VideoFilterOptions.Default with { Deinterlace = DeinterlaceMode.Off }
+        });
+        Assert.Equal(EncodeMode.PassThrough, elleKapali.ModeEnum);
+    }
+
+    [Fact]
     public void PlanKirpmaOnerisiniTasirAmaKirpmayiUygulamaz()
     {
         var info = Kaynak();

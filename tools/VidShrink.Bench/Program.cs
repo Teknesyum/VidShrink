@@ -757,7 +757,11 @@ static async Task<int> ShrinkAsync(string[] args)
         var band = FillBand.For(targetMb);
 
         var outputPath = Path.Combine(outDir, $"{label}_{targetMb.ToString("0.#", CultureInfo.InvariantCulture)}mb.mp4");
-        plan.Filters = await InterlaceProbe.ResolveAsync(info, plan.Filters);
+        var yoklamaGerekli = VideoFilterChain.NeedsInterlaceProbe(info, plan.Filters);
+        var idet = yoklamaGerekli ? await InterlaceProbe.RunAsync(info) : null;
+        plan.Filters = VideoFilterChain.ResolveInterlace(plan.Filters, info, idet);
+        Console.WriteLine($"yoklama: idet={(yoklamaGerekli ? "kostu" : "kosmadi")} alan={info.FieldOrder ?? "-"} taramali={info.IsInterlaced}"
+            + (idet is { } sayac ? $" tff={sayac.Tff} bff={sayac.Bff} progressive={sayac.Progressive} belirsiz={sayac.Undetermined} toplam={sayac.Total}" : string.Empty));
         Console.WriteLine($"filtre: deinterlace={plan.Filters.Deinterlace} zincir={string.Join(',', VideoFilterChain.Filters(info, plan))}");
         var commandPass = plan.ModeEnum == EncodeMode.TwoPass && !CodecModel.IsHardware(plan.Codec) ? 2 : 0;
         Console.WriteLine("komut: " + FfmpegArguments.ToCommandLine(EncodeRunner.EncodeArguments(info, plan, outputPath, commandPass, commandPass > 0 ? Path.Combine(outDir, "pass") : null, EncoderCapabilities.Instance)));

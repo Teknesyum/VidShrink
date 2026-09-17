@@ -77,6 +77,8 @@ public sealed record VideoFilterOptions
         || Deband
         || Crop is not null;
 
+    public bool ChangesPictureFor(MediaInfo info) => ChangesPicture || VideoFilterChain.Deinterlaces(info, this);
+
     public VideoFilterOptions WithCrop(CropRect? detected) => this with { Crop = detected };
 }
 

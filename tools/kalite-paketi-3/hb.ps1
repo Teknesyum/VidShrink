@@ -1355,6 +1355,7 @@ function FiltreSatir([string]$Kol, [int]$Tekrar, [string]$Girdi, [string]$Ref, [
     $e = UrunOrtak $u $Mb
     $e.tekrar = $Tekrar
     $e.filtre = @(Get-Content (Join-Path $Cikti "$ad.log") | Where-Object { $_ -like 'filtre:*' } | Select-Object -Last 1) -join ''
+    $e.yoklama = @(Get-Content (Join-Path $Cikti "$ad.log") | Where-Object { $_ -like 'yoklama:*' } | Select-Object -Last 1) -join ''
     $e.bwdif = [bool]($u.Komut -like '*bwdif*')
     Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $Kol; istenen_kbit = $Kbit }) $o $e
     Remove-Item $u.Dosya
@@ -1377,17 +1378,22 @@ function Filtre {
     $ozet = [ordered]@{ is = $Is; kesit = $Kesit; kol = 'hukum-progressive'; istenen_kbit = $kbit }
     $satir = @($Satirlar | Where-Object { $_.kesit -eq $Kesit -and $_.kol -in @('kapali', 'otomatik', 'acik') -and -not $_.PSObject.Properties['hata'] })
     $k = @($satir | Where-Object { $_.kol -eq 'kapali' })
+    $ozet.kapali_deneme = (($k | ForEach-Object { $_.deneme }) -join '+')
+    $kb = ($k | ForEach-Object { $_.kodlama_sn / $_.deneme } | Measure-Object -Minimum).Minimum
     foreach ($kol in @('otomatik', 'acik')) {
         $a = @($satir | Where-Object { $_.kol -eq $kol })
+        $ozet["${kol}_deneme"] = (($a | ForEach-Object { $_.deneme }) -join '+')
         if ($k.Count -lt 2 -or $a.Count -lt 2) { $ozet["${kol}_hukum"] = 'eksik'; continue }
         $dv = [math]::Round((($a | Measure-Object vmafneg_ort -Average).Average) - (($k | Measure-Object vmafneg_ort -Average).Average), 4)
-        $ks = ($k | Measure-Object toplam_sn -Minimum).Minimum
-        $as = ($a | Measure-Object toplam_sn -Minimum).Minimum
-        $ds = [math]::Round(($as - $ks) / $ks * 100, 2)
-        $ozet["${kol}_delta_vmafneg"] = $dv
+        $ab = ($a | ForEach-Object { $_.kodlama_sn / $_.deneme } | Measure-Object -Minimum).Minimum
+        $ds = [math]::Round(($ab - $kb) / $kb * 100, 2)
+        $ozet["${kol}_kodlama_sn_deneme_basi"] = [math]::Round($ab, 2)
         $ozet["${kol}_sure_yuzde"] = $ds
         $ozet["${kol}_hukum"] = if ([math]::Abs($dv) -lt 0.1 -and $ds -lt 5) { 'gecti' } else { 'kaldi' }
+        $ozet["${kol}_delta_vmafneg"] = $dv
     }
+    $ozet.kapali_kodlama_sn_deneme_basi = [math]::Round($kb, 2)
+    $ozet.sure_olcutu = 'kodlama_sn/deneme, deneme sayisindan bagimsiz'
     Ekle $ozet $null $null
     Remove-Item $ara -ErrorAction SilentlyContinue
 
@@ -1403,13 +1409,40 @@ function Filtre {
         Dene $Kesit "taramali-$kol" $kbit { FiltreSatir "taramali-$kol" 1 $tar $ref $tmb $kbit $kollar[$kol] }
     }
     $n = [ordered]@{ is = $Is; kesit = $Kesit; kol = 'hukum-taramali'; istenen_kbit = $kbit; field_order = $alan }
+    $n.alan_progressive_degil = ($alan -and $alan -notlike 'progressive*')
     $tk = @($Satirlar | Where-Object { $_.kol -eq 'taramali-kapali' -and -not $_.PSObject.Properties['hata'] }) | Select-Object -First 1
     $ta = @($Satirlar | Where-Object { $_.kol -eq 'taramali-otomatik' -and -not $_.PSObject.Properties['hata'] }) | Select-Object -First 1
     if ($tk -and $ta) {
+        $n.yoklama = $ta.yoklama
         $n.delta_vmafneg = [math]::Round($ta.vmafneg_ort - $tk.vmafneg_ort, 4)
-        $n.hukum = if ($ta.bwdif -and -not $tk.bwdif -and $n.delta_vmafneg -ge 1.0) { 'gecti' } else { 'kaldi' }
+        $n.hukum = if ($n.alan_progressive_degil -and $ta.bwdif -and -not $tk.bwdif -and $n.delta_vmafneg -ge 1.0) { 'gecti' } else { 'kaldi' }
     } else { $n.hukum = 'eksik' }
     Ekle $n $null $null
+    Remove-Item $tar, $ref -ErrorAction SilentlyContinue
+
+    $dv = Join-Path $Cikti 'filtre-belirsiz.dv'
+    $dref = Join-Path $Cikti 'filtre-belirsiz-ref.mkv'
+    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', 'scale=720:576,setsar=1,tinterlace=mode=interleave_top,setfield=tff,format=yuv420p', '-c:v', 'dvvideo', '-pix_fmt', 'yuv420p', $dv)
+    $dalan = (& ffprobe -v error -select_streams v:0 -show_entries stream=field_order -of csv=p=0 $dv | Out-String).Trim()
+    $db = Probe $dv
+    Ff @('-i', $ffv1, '-an', '-sn', '-map', '0:v:0', '-vf', "scale=720:576,setsar=1,select=not(mod(n\,2)),fps=$($db.FpsMetin)", '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '4', '-pix_fmt', 'yuv420p', $dref)
+    $dmb = [math]::Round($kbit * $db.Sure / 8 / 1024, 4)
+    foreach ($kol in @('kapali', 'otomatik')) {
+        Dene $Kesit "belirsiz-$kol" $kbit { FiltreSatir "belirsiz-$kol" 1 $dv $dref $dmb $kbit $kollar[$kol] }
+    }
+    $y = [ordered]@{ is = $Is; kesit = $Kesit; kol = 'hukum-belirsiz-alan'; istenen_kbit = $kbit; field_order = $dalan }
+    $y.alan_belirsiz = ($dalan -eq '' -or $dalan -eq 'unknown')
+    $bk = @($Satirlar | Where-Object { $_.kol -eq 'belirsiz-kapali' -and -not $_.PSObject.Properties['hata'] }) | Select-Object -First 1
+    $ba = @($Satirlar | Where-Object { $_.kol -eq 'belirsiz-otomatik' -and -not $_.PSObject.Properties['hata'] }) | Select-Object -First 1
+    if ($bk -and $ba) {
+        $y.yoklama_kapali = $bk.yoklama
+        $y.yoklama_otomatik = $ba.yoklama
+        $y.idet_kostu = [bool]($ba.yoklama -like '*idet=kostu*')
+        $y.delta_vmafneg = [math]::Round($ba.vmafneg_ort - $bk.vmafneg_ort, 4)
+        $y.hukum = if ($y.alan_belirsiz -and $y.idet_kostu -and $ba.bwdif -and -not $bk.bwdif -and $y.delta_vmafneg -ge 1.0) { 'gecti' } else { 'kaldi' }
+    } else { $y.hukum = 'eksik' }
+    Ekle $y $null $null
+    Remove-Item $dv, $dref -ErrorAction SilentlyContinue
 }
 
 switch ($Is) {
