@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg ended with code {0}.",
   "recorder.error.no-ffmpeg": "{0} could not be found.",
   "recorder.error.invalid": "These settings do not allow a recording: {0}",
+  "recorder.error.window-wayland": "Window capture is not supported in a Wayland session; choose screen or region, or sign in to an X11 session.",
+  "recorder.error.window-missing": "The window \"{0}\" was not found; refresh the list and choose it again.",
   "recorder.error.number": "{0} has to be a number.",
   "recorder.error.start": "The recording could not start: {0}",
   "recorder.error.folder": "The folder could not be chosen: {0}",

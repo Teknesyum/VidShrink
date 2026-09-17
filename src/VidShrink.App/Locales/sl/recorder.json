@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg se je končal s kodo {0}.",
   "recorder.error.no-ffmpeg": "{0} ni bilo mogoče najti.",
   "recorder.error.invalid": "Te nastavitve ne dovoljujejo snemanja: {0}",
+  "recorder.error.window-wayland": "Snemanje okna v seji Wayland ni podprto; izberite zaslon ali območje ali se prijavite v sejo X11.",
+  "recorder.error.window-missing": "Okna »{0}« ni mogoče najti; osvežite seznam in ga znova izberite.",
   "recorder.error.number": "{0} mora biti število.",
   "recorder.error.start": "Snemanja ni bilo mogoče začeti: {0}",
   "recorder.error.folder": "Mape ni bilo mogoče izbrati: {0}",

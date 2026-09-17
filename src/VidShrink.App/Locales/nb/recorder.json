@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg avsluttet med kode {0}.",
   "recorder.error.no-ffmpeg": "Fant ikke {0}.",
   "recorder.error.invalid": "Disse innstillingene tillater ikke et opptak: {0}",
+  "recorder.error.window-wayland": "Opptak av vindu støttes ikke i en Wayland-økt; velg skjerm eller område, eller logg på en X11-økt.",
+  "recorder.error.window-missing": "Fant ikke vinduet «{0}»; oppdater listen og velg det på nytt.",
   "recorder.error.number": "{0} må være et tall.",
   "recorder.error.start": "Opptaket kunne ikke starte: {0}",
   "recorder.error.folder": "Mappen kunne ikke velges: {0}",

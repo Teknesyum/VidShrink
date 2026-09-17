@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg imemaliza kwa msimbo {0}.",
   "recorder.error.no-ffmpeg": "{0} haikuweza kupatikana.",
   "recorder.error.invalid": "Mipangilio hii hairuhusu kurekodi: {0}",
+  "recorder.error.window-wayland": "Kurekodi dirisha hakutumiki katika kipindi cha Wayland; chagua skrini au eneo, au ingia kwenye kipindi cha X11.",
+  "recorder.error.window-missing": "Dirisha \"{0}\" halikupatikana; onyesha upya orodha na ulichague tena.",
   "recorder.error.number": "{0} lazima iwe namba.",
   "recorder.error.start": "Kurekodi hakukuweza kuanza: {0}",
   "recorder.error.folder": "Folda haikuweza kuchaguliwa: {0}",
