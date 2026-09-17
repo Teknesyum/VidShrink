@@ -7,6 +7,10 @@ teslimde. Tam süit yerelde koşulmaz — 35 dakika sürüyor ve CI'da zaten par
 itmeden sonra `gh run list` yeşili teslimin şartı. `tools/kosum-kapisi` yalnız majör
 sürümden (`x.0.0`) önce koşar.
 
+**Derleme CI'nın bayraklarıyla:** teslimden önce `dotnet build VidShrink.sln -c Release
+-warnaserror -m:2`. Debug derlemesi yetmez — xUnit analizörleri Debug'ta uyarı, CI'da
+hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
+
 - Zamanlama ölçen testleri yük altında okuma; yerelde filtreli koş, tam süit CI'da.
 - Çıktı ve kanıt dosyaları `.calisma/` altına (`GirdiKanit`, `MotorKanit`).
 - `OynaticiMotorTests.cs` — libmpv motoru: başsız kare, bozuk dosya, exact/keyframe inişi, geç işlenen SEEK olayı
