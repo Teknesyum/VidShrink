@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.RegularExpressions;
+using VidShrink.Core;
 
 namespace VidShrink.Tests;
 
@@ -120,5 +122,33 @@ public sealed class HbOlcumDuzenegiTests
         var kapi = Kes(@"\$script:CliKapi = \[ordered\]@\{.*?\r?\n");
         Assert.Contains("bayt_sapma_yuzde = 2.0", kapi, StringComparison.Ordinal);
         Assert.Contains("hiz_orani_tavan = 1.0", kapi, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// K4 kapısı: karanlık kesitte Dengeli kolu ölçülmeli. Rejim kaynak/hedef oranından
+    /// türediği için düzenek rejimi <c>--source-mb</c> ile zorlar; betikteki
+    /// <c>$DengeliOran</c> varsayılanı motorun Dengeli bandının içinde olmazsa kol
+    /// başka bir rejimi ölçer ve hüküm kayar. Oran buradan okunup motora sorulur.
+    /// </summary>
+    [Fact]
+    public void DengeliKolununZorladigiOranMotorunDengeliBandinaDusuyor()
+    {
+        var kol = Kes(@"Dene \$Kesit 'urun-dengeli' \$kbit \{.*?\r?\n        \}");
+        Assert.Contains("'--source-mb'", kol, StringComparison.Ordinal);
+        Assert.Contains("$mb * $DengeliOran", kol, StringComparison.Ordinal);
+        Assert.Contains("$ek.beklenen_kodek = 'libx264'", kol, StringComparison.Ordinal);
+        Assert.Contains("$ek.genisleme_kapisi", kol, StringComparison.Ordinal);
+        Assert.Contains("$ek.cambi_ii -gt 7.5", kol, StringComparison.Ordinal);
+
+        var oranMetni = Regex.Match(Script, @"\[double\]\$DengeliOran = ([\d.]+)");
+        Assert.True(oranMetni.Success, "hb.ps1 içinde $DengeliOran varsayılanı yok");
+        var oran = double.Parse(oranMetni.Groups[1].Value, CultureInfo.InvariantCulture);
+
+        foreach (var hedefMb in new[] { 0.7324, 2.4414 })
+        {
+            Assert.Equal(CompressionRegime.Balanced, CompressionStrategy.RegimeFor(hedefMb * oran, hedefMb));
+            Assert.Equal(oran, CompressionStrategy.Ratio(hedefMb * oran, hedefMb), 3);
+            Assert.Equal(CodecPreference.Compatible, CompressionStrategy.AutoPreference(CompressionStrategy.RegimeFor(hedefMb * oran, hedefMb)));
+        }
     }
 }
