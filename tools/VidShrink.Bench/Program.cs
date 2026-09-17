@@ -690,6 +690,7 @@ static async Task<int> ShrinkAsync(string[] args)
             Codec = codecPreference,
             FillPolicy = fillPolicy,
             SpeedMode = speedMode,
+            Intent = intent,
             AllowResolutionDrop = allowResolutionDrop,
             AllowFpsDrop = allowFpsDrop
         };

@@ -34,6 +34,26 @@ public sealed class SaturationTests
     }
 
     [Fact]
+    public void FloorIsFoundAcrossSmallCorrectStepsFromTheEarliestSample()
+    {
+        var first = new SizeSample(98, 0.137, true);
+        var second = new SizeSample(84, 0.134, true);
+        var third = new SizeSample(74, 0.134, true);
+
+        Assert.False(Saturation.AtEncoderFloor(second, third));
+        Assert.Null(Saturation.FloorReference(new[] { first }, second));
+        Assert.Same(first, Saturation.FloorReference(new[] { first, second }, third));
+    }
+
+    [Fact]
+    public void BytesThatFollowTheRequestAcrossTheRunHaveNoFloorReference()
+    {
+        var run = new[] { new SizeSample(98, 0.137, true), new SizeSample(84, 0.118, true) };
+        Assert.Null(Saturation.FloorReference(run, new SizeSample(74, 0.104, true)));
+        Assert.Null(Saturation.FloorReference(Array.Empty<SizeSample>(), new SizeSample(74, 0.134, true)));
+    }
+
+    [Fact]
     public void FloorStepScalesTheFrameBySquareRootOfTheMiss()
     {
         var plan = Plan();

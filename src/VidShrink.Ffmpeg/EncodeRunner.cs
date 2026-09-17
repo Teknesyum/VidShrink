@@ -127,6 +127,7 @@ public sealed class EncodeRunner
         EncodePlan? fallbackPlan = null;
         IReadOnlyList<string> fallbackDropped = Array.Empty<string>();
         var samples = new List<SizeSample>();
+        var floorRun = new List<SizeSample>();
         var attemptLimit = MaxAttempts;
         var usedFloorStep = false;
         var usedDeadYieldStep = false;
@@ -176,10 +177,12 @@ public sealed class EncodeRunner
                 var informedByYield = efficiency is not null;
                 var sample = new SizeSample(current.VideoBitrateK, actualMb, over);
                 var comparable = current.ModeEnum == EncodeMode.TwoPass;
-                var previous = comparable && lastSampleAttempt == attempt - 1 && samples.Count > 0 ? samples[^1] : null;
+                if (comparable && lastSampleAttempt != attempt - 1) floorRun.Clear();
+                var floorReference = comparable ? Saturation.FloorReference(floorRun, sample) : null;
                 if (comparable)
                 {
                     samples.Add(sample);
+                    floorRun.Add(sample);
                     lastSampleAttempt = attempt;
                 }
                 var deadYield = underBand && Saturation.YieldIsDead(PlanCalculator.RawEncoderYield(current, actualMb, info.DurationSeconds));
@@ -235,8 +238,8 @@ public sealed class EncodeRunner
                 {
                     trace.Add(new EncodeAttempt(attempt, "over ceiling", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
 
-                    var floorStep = !usedFloorStep && previous is not null && Saturation.AtEncoderFloor(previous, sample)
-                        ? Saturation.StepLayoutDown(current, previous, sample, effectiveTargetMb)
+                    var floorStep = !usedFloorStep && floorReference is not null
+                        ? Saturation.StepLayoutDown(current, floorReference, sample, effectiveTargetMb)
                         : null;
                     if (floorStep is not null)
                     {

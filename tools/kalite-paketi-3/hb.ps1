@@ -367,12 +367,13 @@ function Bantlasma {
     $alti = Join-Path $Cikti "kesit-$Kesit-6bit.mkv"
     Ff @('-i', $girdi, '-vf', 'lutyuv=y=bitand(val\,252)', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', $alti)
     Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'negatif-kaynak-6bit' }) $null (EkOlcu $girdi $alti '')
-    $kollar = [ordered]@{ 'e0' = $Bench; 'e1' = $BenchE1 }
+    $kollar = [ordered]@{ 'e0' = $Bench; 'e1' = $BenchE1; 'e0-duzen' = $Bench }
     foreach ($kbit in @($BantKbitler.Split(',') | ForEach-Object { [int]$_.Trim() })) {
         $mb = [math]::Round($kbit * $b.Sure / 8 / 1024, 4)
         foreach ($kol in $kollar.Keys) {
             Dene $Kesit $kol $kbit {
-                $u = Urun $girdi $mb "bant-$Kesit-$kbit-$kol" @('--force-codec', 'libsvtav1', '--no-resolution-drop', '--no-fps-drop') $kollar[$kol]
+                $ek = if ($kol -eq 'e0-duzen') { @('--force-codec', 'libsvtav1', '--no-fps-drop') } else { @('--force-codec', 'libsvtav1', '--no-resolution-drop', '--no-fps-drop') }
+                $u = Urun $girdi $mb "bant-$Kesit-$kbit-$kol" $ek $kollar[$kol]
                 $o = Olc $girdi $u.Dosya $b.FpsMetin
                 Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; istenen_kbit = $kbit }) $o (UrunOrtak $u $mb)
                 Remove-Item $u.Dosya
@@ -586,7 +587,7 @@ function FfKos([string[]]$A, [string]$Seviye = 'warning') {
 }
 
 function Uyarilar([string]$Metin) {
-    ((($Metin -split "`n") | Where-Object { $_ -match 'unknown|Unknown|not used|not been used|different|first pass|Error parsing|Unrecognized|invalid|Invalid' } | ForEach-Object { $_.Trim() } | Select-Object -Unique -First 6) -join ' // ')
+    ((($Metin -split "`n") | Where-Object { $_ -notmatch '^\s*Stream #' -and $_ -match 'unknown|Unknown|not used|not been used|different|first pass|Error parsing|Unrecognized|invalid|Invalid' } | ForEach-Object { $_.Trim() } | Select-Object -Unique -First 6) -join ' // ')
 }
 
 function AkisMd5([string]$Yol) {
@@ -595,8 +596,8 @@ function AkisMd5([string]$Yol) {
 }
 
 function SvtOnayar([string]$Metin) {
-    $m = [regex]::Match($Metin, 'SVT \[config\]:[^\r\n]*preset[^:\r\n]*:\s*(-?\d+)')
-    if ($m.Success) { [int]$m.Groups[1].Value } else { $null }
+    $m = [regex]::Match($Metin, 'SVT \[config\]:[^\r\n]*preset[^:\r\n]*:\s*(-?\d+|Pass 1)')
+    if (-not $m.Success) { $null } elseif ($m.Groups[1].Value -eq 'Pass 1') { 'Pass 1' } else { [int]$m.Groups[1].Value }
 }
 
 function Gecisli([string]$Girdi, [string]$Cikis, [string[]]$Kodek, [string[]]$Ilk, [string[]]$Iki) {
@@ -955,7 +956,7 @@ function SocialKodek {
             $ek.komut_kodek = ($vf + $t.K) -join ' '
             $ek.geometri = "$($script:skHb.W)x$($script:skHb.H)@$fpsKod"
             $ek.md5_hukmu = Md5Hukmu $kol $h.Md5Ilk $script:araMd5[$t.Ata] $t.Es
-            if ($t.Onayar) { $ek.onayar_hukmu = if ($ek.svt_onayar1 -eq $t.Onayar -and $ek.svt_onayar2 -eq $t.Onayar) { "gecti: iki geciste preset $($t.Onayar)" } else { "kaldi: beklenen $($t.Onayar), gecis1=$($ek.svt_onayar1) gecis2=$($ek.svt_onayar2)" } }
+            if ($t.Onayar) { $ek.onayar_hukmu = if ($ek.svt_onayar1 -eq 'Pass 1' -and $ek.svt_onayar2 -eq $t.Onayar) { "gecti: ilk gecis SVT'nin kendi Pass 1 on ayari, ikinci geciste preset $($t.Onayar)" } else { "kaldi: beklenen $($t.Onayar), gecis1=$($ek.svt_onayar1) gecis2=$($ek.svt_onayar2)" } }
             Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; onayar = $ad }) $o $ek
             Remove-Item $c
         }

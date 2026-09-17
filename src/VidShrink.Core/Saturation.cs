@@ -18,6 +18,9 @@ public static class Saturation
            && later.VideoBitrateK <= earlier.VideoBitrateK * FloorRequestDrop
            && later.ActualMb >= earlier.ActualMb * FloorBytesHeld;
 
+    public static SizeSample? FloorReference(IEnumerable<SizeSample> earlier, SizeSample later)
+        => earlier.FirstOrDefault(sample => AtEncoderFloor(sample, later));
+
     public static bool YieldIsDead(double? rawYield) => rawYield is double y && y < DeadYield;
 
     public static EncodePlan? StepLayoutDown(EncodePlan plan, SizeSample earlier, SizeSample later, double targetMb)
