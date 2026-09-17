@@ -971,7 +971,7 @@ public sealed class ManualOverrideTests
     }
 
     [Fact]
-    public void H1_TurboIlkGecisteOnAyarinGevsedigiYaziliyor()
+    public void H1_X265TurboIlkGecisteSabitOnAyarKorunurSlowFirstpassEklenir()
     {
         var info = Info();
         var options = new PlanOptions
@@ -994,11 +994,11 @@ public sealed class ManualOverrideTests
 
         Assert.True(result.Plan.TurboFirstPass, "turbo ilk gecis kapaliysa bu senaryo bir sey olcmez");
         Assert.Equal("2pass", result.Plan.Mode);
-        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualPresetFirstPassRelaxed);
-        Assert.Equal("veryslow", not.ManualOverrideValue);
-        Assert.Equal("veryfast", not.EngineWouldHaveChosen);
-        Assert.Contains("-preset veryfast", ilkGecis);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualPresetFirstPassRelaxed);
+        Assert.Contains("-preset veryslow", ilkGecis);
+        Assert.Contains("slow-firstpass=0", ilkGecis);
         Assert.Contains("-preset veryslow", ikinciGecis);
+        Assert.DoesNotContain("slow-firstpass", ikinciGecis);
     }
 
     /// <summary>

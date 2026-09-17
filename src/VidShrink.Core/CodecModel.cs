@@ -149,7 +149,7 @@ public static class CodecModel
         _ => false
     };
 
-    private readonly record struct TurboFirstPassEntry(string Ceiling, bool Safe);
+    private readonly record struct TurboFirstPassEntry(string Ceiling, bool Safe, string? FirstPassParams = null);
 
     /// <summary>
     /// Ilk gecisin inebilecegi en hizli on ayar, kodek basina. Tavanin varligi turbonun
@@ -175,13 +175,22 @@ public static class CodecModel
     /// parca icin gecerli; kazanc parca basina %0,58 - %4,44 arasinda degisiyor, tek yonlu
     /// bir genelleme kurulamaz. Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
     /// </para>
+    /// <para>
+    /// <c>libx265</c> ilk gecisi on ayar dusurmez: <c>veryfast</c>, <c>faster</c> ve <c>fast</c>
+    /// ilk gecis 600 kbit hucrelerinde VMAF-NEG'den 0,87 - 2,04 puan goturdu. Turbo x265'in kendi
+    /// <c>slow-firstpass=0</c> anahtaridir; dort hucrede kayip en cok 0,04 XPSNR, toplam sure
+    /// %29 - %33 kisa. Olcum: <c>docs/olcumler/handbrake-kiyas-b7-aciklar.md</c>.
+    /// </para>
     /// </summary>
     private static readonly IReadOnlyDictionary<string, TurboFirstPassEntry> TurboFirstPassCeilings =
         new Dictionary<string, TurboFirstPassEntry>(StringComparer.OrdinalIgnoreCase)
         {
             ["libx264"] = new("veryfast", Safe: false),
-            ["libx265"] = new("veryfast", Safe: true)
+            ["libx265"] = new("veryslow", Safe: true, FirstPassParams: "slow-firstpass=0")
         };
+
+    public static string? TurboFirstPassParams(string codec)
+        => TurboFirstPassCeilings.TryGetValue(codec, out var entry) ? entry.FirstPassParams : null;
 
     /// <summary>
     /// Tabloda tavani olan kodekler. Hepsi turboya acilabilir demek <b>degildir</b> —

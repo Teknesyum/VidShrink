@@ -430,6 +430,8 @@ public static class FfmpegArguments
 
         if (pass == 1)
         {
+            if (plan.TurboFirstPass && CodecModel.TurboFirstPassParams(plan.Codec) is string turboParams)
+                a.AddRange(new[] { "-x265-params", turboParams });
             a.AddRange(plan.ExtraArgs);
             a.AddRange(new[] { "-an", "-f", "null" });
             a.Add(OperatingSystem.IsWindows() ? "NUL" : "/dev/null");
