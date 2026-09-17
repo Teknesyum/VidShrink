@@ -24,9 +24,11 @@ indirme ve kurulum kilitleri o kolda hiç koşmuyordu.
 
 ## Düzenek
 
-`tests/VidShrink.Tests/BaslaticiPanelsizTests.cs`. Her ölçü ilgili mutex'i testin kendi
-iş parçacığında tutuyor (`MutexTutucu`), üretim çağrısını ayrı bir iş parçacığında
-başlatıyor (`Arka`) ve **vazgeçme süresini** duvar saatiyle sayıyor. Hangi kolun koştuğunu
+`tests/VidShrink.Tests/BaslaticiPanelsizTests.cs`. Her ölçü ilgili mutex'i **kendine
+ayrılmış bir iş parçacığında** tutuyor (`MutexTutucu:680-694`; mutex sahipliği iş
+parçacığına bağlı olduğu için testin kendi parçacığında tutulamaz, `_birak` bırakılana
+kadar o parçacık bekliyor), üretim çağrısını üçüncü bir parçacıkta başlatıyor (`Arka`) ve
+**vazgeçme süresini** duvar saatiyle sayıyor. Hangi kolun koştuğunu
 ölçünün kendisi kanıtlıyor: bekleme boyunca indirme sayacı 0'da, `app\a.txt` `v1`'de,
 sürüm işareti boşta kalıyor; aynı çağrı kilit boşken indirmeyi 1'e çıkarıp `a.txt`'yi
 `v2`, işareti `9.9.9` yapıyor.
@@ -50,14 +52,36 @@ Elle "Yükle" yolunun uygulamayı doğurma süresi (`ElleYukleArkaPlanIndirirken
 gerçek başlatıcı süreci, yuva başka kopyada tutuluyor):
 
 ```
-3110  3115  3129  3138  3142  3155  3178   ms
-n=7, ortanca 3138 ms, aralık 3110-3178 ms
-son üç koşum zorla temiz derlenmiş ikili üzerinde
+yapici  3110  3115  3129  3138  3142  3155  3178   (n=7, ilk dordu artimli ikilide)
+denetci 3166  3173  3308                           (n=3, zorla temiz derleme)
+T0      3098  3121  3124  3129  3133                (n=5, zorla temiz derleme)
+n=15, ortanca 3133 ms, olculen aralik 3098-3308 ms
 ```
 
 Bu sayı daha önce hiçbir belgede yazılı değildi; `Updater.cs` docstring'inde tek örnek
-olarak "3128 ms" geçiyordu. Yeniden ölçüldü: 3128 ms bu aralığın içinde, tek koşumun
-değeri olarak doğru ama ortanca 3138 ms.
+olarak "3128 ms" geçiyordu.
+
+**Aralık iddiası bir kez yanlışlandı, o yüzden üç kaynaktan yazılı.** Yapıcının ilk
+yazdığı `3110-3178 ms` aralığı iki uçtan da tutmuyor: denetçi bağımsız koşumda 3308 ms
+ölçtü, T0 3098 ms. Ortanca üç kaynakta da yakın (3138 / 3173 / 3129) ama tek bir koşumun
+üst sınırı bu makinede güvenilir değil — paylaşımlı yükte kuyruk uzuyor. Yapıcının ilk
+dört koşumu artımlı derlenmiş ikili üzerinde alındı; bayat dll tuzağı bu belgenin kendi
+"Artımlı Derleme Tuzağı" bölümünde anlatılıyor, o dört sayı onun altında. Ham çıktı
+saklanmadı, bu yüzden yeniden üretilebilir olan yalnız son sekiz sayı.
+
+**Bu sayının pimi yok; tavanı var.** Testin tek `Assert`'i `ms < 15000`
+(`BaslaticiPanelsizTests.cs:544`), yani ortanca 3133 ms'in iki katına çıkması bile kırmızı
+üretmez. Tavan bilinçli gevşek: sayı gerçek başlatıcı sürecini ve disk turunu içerdiği için
+paylaşımlı yükte kuyruğa giriyor, dar pim CI'da yalancı kırmızı verir. Dolayısıyla 3133 ms
+belgelenmiş bir ölçüm, pimlenmiş bir sözleşme değil — sessizce 8 sn'ye çıkabilir.
+
+Ölçüm komutu (sayı yalnız ayrıntılı kayıtçıda görünür, `Assert` geçerken bastırılır):
+
+```
+dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --no-build ^
+  --filter "FullyQualifiedName~ElleYukleArkaPlanIndirirkenAcilisiGeciktirmez" ^
+  --logger "console;verbosity=detailed"
+```
 
 ## Mutasyon Tablosu
 
@@ -97,8 +121,9 @@ devresini sayıyor ve indirme ile kurulum kilitleri o kolda hiç koşmuyor. Her 
 kendisini üreten testle birlikte yazılı.
 
 **ORTA-C ("3 sn pompa bütçesi" gerekçesi).** Böyle bir gerekçe hiçbir yerde yazılı değil:
-`pompa bütçe`, `pump budget`, `3 saniyelik pompa`, `3 sn'lik pompa` desenleri repo genelinde
-sıfır sonuç veriyor. `PlaybackStripShowDelay` gerçekten `00:00:00`
+`pompa bütçe`, `pump budget`, `3 saniyelik pompa`, `3 sn'lik pompa` desenleri kodda ve
+belgelerde sıfır sonuç veriyor — dördü yalnız bu satırda, yani aramayı yazan cümlenin
+kendisinde eşleşiyor. `PlaybackStripShowDelay` gerçekten `00:00:00`
 (`src/VidShrink.App/Themes/Playback.axaml:121`) ama yanındaki gerekçe zaten doğru:
 `:43` "ölçü değil: şerit beklemeden belirir (T70/K5)", ve pim
 `tests/VidShrink.Tests/ComparisonPanelTests.cs:691` `Assert.Equal(TimeSpan.Zero, stripShow)`.

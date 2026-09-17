@@ -42,8 +42,9 @@ namespace VidShrink.Launcher;
 /// (<c>ArkaPlanKurulumKilidiKisaTutmadaVazgecmez</c>). Hangi kolun koştuğunu ölçünün
 /// kendisi kanıtlıyor: indirme sayacı ve klasörün içeriği bekleme boyunca yerinde
 /// duruyor, kilit boşken aynı çağrı yeni sürümü kuruyor. Elle Yükle'nin uygulamayı
-/// doğurma süresinin ortancası 3138 ms
-/// (<c>ElleYukleArkaPlanIndirirkenAcilisiGeciktirmez</c>, n=7, 3110-3178 ms).
+/// doğurma süresinin ortancası 3133 ms
+/// (<c>ElleYukleArkaPlanIndirirkenAcilisiGeciktirmez</c>, n=15, üç ayrı ölçenden;
+/// ölçülen aralık 3098-3308 ms, üst uç paylaşımlı yükte uzuyor ve pimli değil).
 /// Sayılar ve mutasyon tablosu <c>docs/olcumler/bekleme-butceleri.md</c>.
 /// </summary>
 internal static class Updater
