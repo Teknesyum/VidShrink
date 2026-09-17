@@ -183,7 +183,7 @@ dropping them.
 Decision: fable 2026-09-17, question 5. Workflow `.github/workflows/macos-mpvkit.yml`, script
 `tools/mpvkit-macos/mpvkit-macos.sh`, pinned inputs `tools/mpvkit-macos/mpvkit-1.0.0.lock`
 (29 zips, sha256 = the SwiftPM checksums in MPVKit 1.0.0 `Package.swift`, product `MPVKit`,
-not `MPVKit-GPL`). Run 35249035289 (macos-15, macos-14, macos-15-intel).
+not `MPVKit-GPL`). Runs 35249035289 and 35249612688 (macos-15, macos-14, macos-15-intel).
 
 **What MPVKit ships.** Static archives only (`ar archive` inside every framework, fat
 `x86_64 arm64`), no dylibs. A loadable `libmpv.2.dylib` therefore needs one link step on a
@@ -217,6 +217,6 @@ assets. Dependencies: OpenSSL Apache-2.0, gnutls/nettle/gmp LGPL, rest permissiv
 compatible with AGPL-3.0; distribution still owes license texts and source offer.
 
 **Not measured.** No macOS 13 runner exists any more, so 13.0 is the load-command floor,
-not a run. Link output is not byte-reproducible (two macos-15 runs: `4b2f896d…`,
-`9b5f011e…`), so a release must ship one pinned build, not relink per release. Size is
+not a run. Link output is not byte-reproducible (three macos-15 runs: `4b2f896d…`,
+`9b5f011e…`, `4b2f896d…`), so a release must ship one pinned build, not relink per release. Size is
 one 76 MB file uncompressed. Signing and notarization were not tried.
