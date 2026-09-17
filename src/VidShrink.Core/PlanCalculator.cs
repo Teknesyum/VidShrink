@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -734,6 +734,9 @@ public static class PlanCalculator
         plan.Reason = string.Join("; ", reason);
         plan.ReasonCodes = reasonCodes;
         plan.EffectiveTargetMb = effectiveTargetMb;
+        plan.LayoutStepMinHeight = effective.AllowResolutionDrop && options.FixedResolution is null
+            ? Math.Min(plan.Height, EffectiveFloors(effective, regime).MinHeight)
+            : null;
 
         var estimate = Estimate(plan, info, complexity);
         var advice = new StrategyAdvice(regime, ratio, PickCodec(suggestedPreference, availability), suggestedPreference, best.Score, notes);
@@ -878,13 +881,21 @@ public static class PlanCalculator
 
     public static double? MeasuredEncoderEfficiency(EncodePlan plan, double actualMb, double durationSeconds)
     {
+        var efficiency = RawEncoderYield(plan, actualMb, durationSeconds);
+        return efficiency is > Saturation.DeadYield and < 2.0 ? efficiency : null;
+    }
+
+    public static double? RawEncoderYield(EncodePlan plan, double actualMb, double durationSeconds)
+    {
         if (plan.ModeEnum != EncodeMode.TwoPass || plan.VideoBitrateK <= 0) return null;
         var requestedVideoMb = SizeMb(plan.VideoBitrateK, 0, durationSeconds);
-        var deliveredVideoMb = actualMb - SizeMb(0, plan.AudioBitrateK, durationSeconds);
-        if (requestedVideoMb <= 0.01 || deliveredVideoMb <= 0.01) return null;
-        var efficiency = deliveredVideoMb / requestedVideoMb;
-        return efficiency is > 0.5 and < 2.0 ? efficiency : null;
+        var deliveredVideoMb = Math.Max(actualMb - SizeMb(0, plan.AudioBitrateK, durationSeconds), 0.0);
+        if (requestedVideoMb <= 0.01) return null;
+        return deliveredVideoMb / requestedVideoMb;
     }
+
+    public static int VideoBudgetK(double targetMb, int audioK, double durationSeconds)
+        => (int)Math.Max(0.0, Math.Floor(targetMb * KbitPerMib * ContainerOverhead / Math.Max(durationSeconds, 0.1) - audioK));
 
     public static double EffectiveTargetMb(double targetMb, double sourceMb)
         => sourceMb > 0 ? Math.Min(targetMb, sourceMb * SourceSizeCap) : targetMb;

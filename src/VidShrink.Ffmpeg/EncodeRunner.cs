@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Concurrent;
 using VidShrink.Core;
@@ -15,7 +15,7 @@ public sealed record EncodeAttempt(int Number, string Branch, double AimMb, doub
 /// ayarlarin tamamini tasimiyorsa cagiran bunu buradan ogrenir. Dolu olmasi
 /// <see cref="Success"/> degerini dusurmez.
 /// </summary>
-public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null, IReadOnlyList<string>? DroppedOptions = null, bool OverTarget = false, TrimPlan? Trim = null)
+public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null, IReadOnlyList<string>? DroppedOptions = null, bool OverTarget = false, TrimPlan? Trim = null, bool Saturated = false)
 {
     /// <summary>Teslim edilen kodlamada motorun verdigi ayarlardan en az biri dusurulmus.</summary>
     public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
@@ -126,10 +126,29 @@ public sealed class EncodeRunner
         var fallbackMb = 0.0;
         EncodePlan? fallbackPlan = null;
         IReadOnlyList<string> fallbackDropped = Array.Empty<string>();
+        var samples = new List<SizeSample>();
+        var attemptLimit = MaxAttempts;
+        var usedFloorStep = false;
+        var usedDeadYieldStep = false;
+        var lastSampleAttempt = 0;
+
+        void KeepFallback(string path, double mb, EncodePlan used, IReadOnlyList<string> droppedOptions)
+        {
+            if (fallbackPlan is not null && fallbackMb >= mb && File.Exists(fallbackPath))
+            {
+                TryDelete(path);
+                return;
+            }
+            TryDelete(fallbackPath);
+            File.Move(path, fallbackPath, overwrite: true);
+            fallbackMb = mb;
+            fallbackPlan = used;
+            fallbackDropped = droppedOptions;
+        }
 
         try
         {
-            while (attempt < MaxAttempts)
+            while (attempt < attemptLimit)
             {
                 attempt++;
                 var twoPass = current.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(current.Codec);
@@ -155,7 +174,16 @@ public sealed class EncodeRunner
                 var stoppedOnPurpose = belowBand && actualMb >= band.HardFloorMb && current.StopsShortOfBandOnPurpose;
                 var underBand = belowBand && !stoppedOnPurpose;
                 var informedByYield = efficiency is not null;
-                var retryUnderBand = underBand && attempt < MaxAttempts
+                var sample = new SizeSample(current.VideoBitrateK, actualMb, over);
+                var comparable = current.ModeEnum == EncodeMode.TwoPass;
+                var previous = comparable && lastSampleAttempt == attempt - 1 && samples.Count > 0 ? samples[^1] : null;
+                if (comparable)
+                {
+                    samples.Add(sample);
+                    lastSampleAttempt = attempt;
+                }
+                var deadYield = underBand && Saturation.YieldIsDead(PlanCalculator.RawEncoderYield(current, actualMb, info.DurationSeconds));
+                var retryUnderBand = underBand && !deadYield && !usedDeadYieldStep && attempt < attemptLimit
                     && (!usedUnderBandRetry || (informedByYield && !usedMeasuredUnderBandRetry));
 
                 if (!over && !underBand)
@@ -165,16 +193,40 @@ public sealed class EncodeRunner
                     return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: false, Trace: trace, DroppedOptions: dropped);
                 }
 
+                if (underBand && (deadYield || usedDeadYieldStep))
+                {
+                    var deadStep = !usedDeadYieldStep && attempt < attemptLimit
+                        ? Saturation.StepDeadYield(current, actualMb, effectiveTargetMb, info.DurationSeconds, samples)
+                        : null;
+                    if (deadStep is not null)
+                    {
+                        trace.Add(new EncodeAttempt(attempt, "under band, the encoder did not answer the bitrate", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+                        usedDeadYieldStep = true;
+                        usedUnderBandRetry = true;
+                        KeepFallback(partialPath, actualMb, current, dropped);
+                        current = deadStep;
+                        continue;
+                    }
+
+                    if (fallbackPlan is not null && fallbackMb > actualMb && File.Exists(fallbackPath))
+                    {
+                        TryDelete(partialPath);
+                        trace.Add(new EncodeAttempt(attempt, "saturated, the fuller under-band result delivered", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode, efficiency));
+                        File.Move(fallbackPath, outputPath, overwrite: true);
+                        return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: fallbackDropped, Saturated: true);
+                    }
+
+                    trace.Add(new EncodeAttempt(attempt, "saturated, under band delivered", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+                    File.Move(partialPath, outputPath, overwrite: true);
+                    return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: dropped, Saturated: true);
+                }
+
                 if (retryUnderBand)
                 {
                     trace.Add(new EncodeAttempt(attempt, "under band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                     usedUnderBandRetry = true;
                     usedMeasuredUnderBandRetry |= informedByYield;
-                    TryDelete(fallbackPath);
-                    File.Move(partialPath, fallbackPath, overwrite: true);
-                    fallbackMb = actualMb;
-                    fallbackPlan = current;
-                    fallbackDropped = dropped;
+                    KeepFallback(partialPath, actualMb, current, dropped);
                     current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds, fillUnderBand: true);
                     continue;
                 }
@@ -182,6 +234,15 @@ public sealed class EncodeRunner
                 if (over)
                 {
                     trace.Add(new EncodeAttempt(attempt, "over ceiling", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+
+                    var floorStep = !usedFloorStep && previous is not null && Saturation.AtEncoderFloor(previous, sample)
+                        ? Saturation.StepLayoutDown(current, previous, sample, effectiveTargetMb)
+                        : null;
+                    if (floorStep is not null)
+                    {
+                        usedFloorStep = true;
+                        attemptLimit = MaxAttempts + Saturation.ExtraAttemptsAtFloor;
+                    }
 
                     // Ending the run — whether the attempt ceiling was hit or the user chose to stop —
                     // never hands back the oversized file. The last under-band result is delivered if
@@ -194,7 +255,8 @@ public sealed class EncodeRunner
                         {
                             trace.Add(new EncodeAttempt(attempt, "fallback to the last under-band result", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode));
                             File.Move(fallbackPath, outputPath, overwrite: true);
-                            return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: fallbackDropped);
+                            return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: fallbackDropped,
+                                Saturated: usedDeadYieldStep || Saturation.FillIsSaturated(fallbackMb, effectiveTargetMb));
                         }
 
                         return new EncodeResult(false, outputPath, actualMb, current, attempt,
@@ -204,8 +266,9 @@ public sealed class EncodeRunner
 
                     if (askBeforeRetry is null)
                     {
-                        if (attempt >= MaxAttempts) return EndRun();
-                        current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
+                        if (attempt >= attemptLimit || usedDeadYieldStep) return EndRun();
+                        if (floorStep is not null) trace.Add(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
+                        current = floorStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
                         continue;
                     }
 
@@ -219,7 +282,7 @@ public sealed class EncodeRunner
 
                     var prompt = new RetryPrompt(
                         attempt,
-                        MaxAttempts,
+                        attemptLimit,
                         effectiveTargetMb,
                         actualMb,
                         attemptClock.Elapsed,
@@ -257,19 +320,21 @@ public sealed class EncodeRunner
                         return EndRun();
                     }
 
-                    if (choice != OvershootChoice.Retry || attempt >= MaxAttempts)
+                    if (choice != OvershootChoice.Retry || attempt >= attemptLimit)
                     {
                         trace.Add(new EncodeAttempt(attempt, "stopped at the user's request", aimMb, actualMb, current.VideoBitrateK, current.Mode));
                         return EndRun();
                     }
 
-                    current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
+                    if (floorStep is not null) trace.Add(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
+                    current = floorStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
                     continue;
                 }
 
                 trace.Add(new EncodeAttempt(attempt, "under band accepted", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                 File.Move(partialPath, outputPath, overwrite: true);
-                return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: dropped);
+                return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: dropped,
+                    Saturated: Saturation.FillIsSaturated(actualMb, effectiveTargetMb));
             }
 
             return new EncodeResult(false, outputPath, 0, current, attempt, "Encoding loop ended unexpectedly.", Trace: trace);
