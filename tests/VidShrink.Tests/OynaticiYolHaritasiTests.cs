@@ -364,13 +364,14 @@ public sealed class OynaticiYolHaritasiTests
             var sekmeyeGiden = cocuklar.Count(c => ReferenceEquals(c.Tag, Keymap.Settings));
             var kisayollar = cocuklar.SingleOrDefault(c => (string?)c.Header == Strings.Get("settings.player-shortcuts.title"));
             var kisayolSatiri = kisayollar?.Items.OfType<MenuItem>().Count() ?? 0;
-            body.AppendLine($"sekmeye giden satir {sekmeyeGiden}; kisayollar alt menusu {kisayollar is not null}, satir {kisayolSatiri}, tablo {Keymap.Rows.Count(r => !ReferenceEquals(r.Action, Keymap.Settings))}");
+            body.AppendLine($"sekmeye giden satir {sekmeyeGiden}; kisayollar alt menusu {kisayollar is not null}, satir {kisayolSatiri}, tablo {Keymap.Rows.Count}");
 
             window.Close();
             Assert.True(temaTutti, "tema satiri ayarlar kutusunu degistirmedi");
             Assert.Equal(0, sekmeyeGiden);
             Assert.NotNull(kisayollar);
-            Assert.Equal(Keymap.Rows.Count(r => !ReferenceEquals(r.Action, Keymap.Settings)), kisayolSatiri);
+            Assert.Equal(Keymap.Rows.Count, kisayolSatiri);
+            Assert.DoesNotContain(Keymap.Rows, r => ReferenceEquals(r.Action, Keymap.Settings));
             return 0;
         });
         }
@@ -485,6 +486,12 @@ public sealed class OynaticiYolHaritasiTests
         }
     }
 
+    /// <summary>
+    /// O1: iki barin birbirine esitligi mutasyona olu — <c>HoverZone.Band</c> yariya
+    /// indirilirse iki esik de ayni oranda kuculur ve esitlik korunur. Bu yuzden esik
+    /// mutlak olarak da pimlendi: bant yuzey yuksekliginin dortte biri
+    /// (<c>PlaybackHoverZoneShare</c> = 0,25), iki esik de o sayinin 1 px komsulugunda.
+    /// </summary>
     [Fact]
     public void P14UstBarVeAltSeritAyniMesafedeAcilir()
     {
@@ -542,12 +549,16 @@ public sealed class OynaticiYolHaritasiTests
             var ust = Esik("ust bar", d => new Point(640, d), () => window.ChromeShown, ustSaat);
             var altEsik = Esik("alt serit", d => new Point(640, alt - d), () => view.SeritRevealed, altSaat);
             var bant = view.RevealBand;
+            var yuzeyYuksekligi = yuzey.Bounds.Height;
             var baslik = window.TitleBar.Height;
             window.Close();
 
             Assert.True(Math.Abs(ust - altEsik) <= 1, $"ust {ust} px, alt {altEsik} px" + Environment.NewLine + body);
             Assert.True(Math.Abs(ust - bant) <= 1, $"ust {ust} px, bant {YolKanit.N(bant)}");
             Assert.True(ust > baslik + 1, $"ust esik baslik yuksekliginde kaldi: {ust} <= {YolKanit.N(baslik)}");
+            Assert.Equal(yuzeyYuksekligi * 0.25, bant, 1);
+            Assert.InRange(ust, yuzeyYuksekligi * 0.25 - 1, yuzeyYuksekligi * 0.25 + 1);
+            Assert.InRange(altEsik, yuzeyYuksekligi * 0.25 - 1, yuzeyYuksekligi * 0.25 + 1);
             return 0;
         });
         }

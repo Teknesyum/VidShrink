@@ -346,7 +346,7 @@ public sealed class OynaticiDalga3GirdiTests
                 DenetimSurucu.Wait(view, 0.2);
 
                 var satirlar = kisayollar!.GetVisualDescendants().OfType<MenuItem>().ToList();
-                body.AppendLine($"kisayol satiri {satirlar.Count}, tablo {Keymap.Rows.Count(r => !ReferenceEquals(r.Action, Keymap.Settings))}");
+                body.AppendLine($"kisayol satiri {satirlar.Count}, tablo {Keymap.Rows.Count}");
                 var satir = satirlar.First(m => Equals(m.Header, baslik));
                 var tur = 0;
                 for (; tur < 90 && !satir.IsSelected; tur++)

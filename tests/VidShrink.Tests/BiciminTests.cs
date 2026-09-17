@@ -338,6 +338,10 @@ public sealed class KareYerlesimTests
     /// <summary>
     /// Uzun bir ozet metni panelin disina tasmaz. Metin dogrudan yaziliyor cunku olculen
     /// sey ozetin icerigi degil, satirin uzun metni nasil tasidigi.
+    ///
+    /// <para>O3: satirin icinde kalmak tek basina sarmayi olcmuyor — <c>TextWrapping="Wrap"</c>
+    /// yerine kirpma konsa metin yine satirin icinde kalirdi. Bu yuzden sarma niteligi kendi
+    /// pimini aldi: uzun metin birden fazla satira boluniyor ve blokta kirpma yok.</para>
     /// </summary>
     [Theory]
     [InlineData("TxtFrameSummary")]
@@ -346,7 +350,7 @@ public sealed class KareYerlesimTests
     [InlineData("TxtAdvancedSummary")]
     public void KatlanmisBolumOzetiSatirinIcindeKalir(string ad)
     {
-        var (ozetSagi, satirGenisligi) = Read("tr", window =>
+        var okunan = Read("tr", window =>
         {
             var ozet = Named<TextBlock>(window, ad);
             ozet.Text = "Çözünürlük Düşürülebilir · Kare Hızı Düşürülebilir · Ses Yeniden Kodlanabilir";
@@ -356,11 +360,14 @@ public sealed class KareYerlesimTests
             window.UpdateLayout();
 
             var satir = (Layoutable)ozet.GetVisualParent()!;
-            return (ozet.Bounds.Left + ozet.TextLayout.Width, satir.Bounds.Width);
+            return (sag: ozet.Bounds.Left + ozet.TextLayout.Width, genislik: satir.Bounds.Width,
+                metinSatiri: ozet.TextLayout.TextLines.Count, kirpma: ozet.TextTrimming);
         });
 
-        Assert.True(ozetSagi <= satirGenisligi + 0.5,
-            $"ozet metni {ozetSagi:0.#} px'te bitiyor, satir {satirGenisligi:0.#} px");
+        Assert.True(okunan.sag <= okunan.genislik + 0.5,
+            $"ozet metni {okunan.sag:0.#} px'te bitiyor, satir {okunan.genislik:0.#} px");
+        Assert.True(okunan.metinSatiri > 1, $"{ad} sarmadi: {okunan.metinSatiri} satir");
+        Assert.Equal(TextTrimming.None, okunan.kirpma);
     }
 
     private const string OrnekYol = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv";

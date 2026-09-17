@@ -449,14 +449,15 @@ internal partial class PlayerView : UserControl
 
     /// <summary>
     /// P3: Ayarlar sekmesindeki oynatıcı kısayolları bölümü menüde alt menü. Satır tablodan
-    /// (<see cref="Keymap.Rows"/>) gelir; sekmeye götüren satır menüde yok.
+    /// (<see cref="Keymap.Rows"/>) gelir; sekmeye götüren <see cref="Keymap.Settings"/> eylemi
+    /// tabloda değil yalnız <see cref="Keymap.MenuActions"/>'da olduğu için menüde kendiliğinden
+    /// yok — D1'de bu satırları süzen ölü koşul kaldırıldı.
     /// </summary>
     internal MenuItem ShortcutsMenu()
     {
         var menu = new MenuItem { Header = Strings.Get("settings.player-shortcuts.title") };
         foreach (var row in Keymap.Rows)
         {
-            if (ReferenceEquals(row.Action, Keymap.Settings)) continue;
             var item = new MenuItem { Tag = row.Action };
             if (row.Input.Kind == PlayerInputKind.Key)
             {
