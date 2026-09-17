@@ -36,7 +36,7 @@ release — that is the whole process.
 ## Four Tools, One Window
 
 **Shrink** — a target size in megabytes, and a video that lands just under it. Chips for
-the sizes people actually need (8 for Discord, 16 for WhatsApp, 25 for Gmail, 180 for
+the sizes people actually need (8 for strict e-mail gateways, 16 for WhatsApp, 25 for Gmail, 180 for
 WhatsApp Web) and a slider for everything else. Twelve encoders — software, NVENC, Quick
 Sync, AMF — each [probed on your own machine](docs/olcumler/kodek-matris.md) first.
 

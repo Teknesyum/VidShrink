@@ -142,7 +142,7 @@ public sealed class ComplexityProbeTests
     private static IEnumerable<string> OutputMuxers(IReadOnlyList<string> args)
     {
         for (var i = 0; i + 1 < args.Count; i++)
-            if (args[i] == "-f") yield return args[i + 1];
+            if (args[i] == "-f" && !(i + 2 < args.Count && args[i + 1] == "null" && args[i + 2] == "-")) yield return args[i + 1];
     }
 
     [FfmpegTheory]

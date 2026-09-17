@@ -22,7 +22,7 @@ sürümden (`x.0.0`) önce koşar.
 - `OynaticiGorunumTests.cs` — 3. dalga, `.calisma/dalga3/gecici`; `OynaticiAracTests.cs` — 4b dalga: küçük resim ≤300 ms (medyan/p95, gösterim sahte motorla CI'da da), klip/GIF, mini mod, yerel sunucudan adres; `.calisma/dalga4b/`.
 - `OynaticiGelismisTests.cs` — 4a dalga: her gelişmiş ayar motora yazılır, **motordan** okunur, sıfırlanır; negatif kontrol kareden. `.calisma/dalga4a/`.
 - `KayitMotoruTests.cs` — 8a dalgası, ekran kaydı motoru: üç platformun yakalama argümanı (gdigrab/avfoundation/x11grab),
-  `-nostdin` verilmediğinin pimi, negatif kontroller (uydurma kodek, macOS pencere, tek sayılı bölge). Canlı kol
+  `-nostdin` verilmediğinin pimi, negatif kontroller (uydurma kodek, kırpmasız macOS pencere, tek sayılı bölge). Canlı kol
   `[KayitFact]` ile gdigrab'a bağlı: 5 sn'lik gerçek kayıt, `q` ile kapanan dosya ffprobe'ta okunur, zaman aşımında
   öldürülen dosya bozuk çıkar, duraklatılan kayıt iki parçadan birleşir. Kanıt `.calisma/dalga8a/`.
 - `SesGirisiTests.cs` — 8c dalgası, ses girişi: pimli ffmpeg çıktısı üzerinden cihaz listesi ayrıştırması, dshow/
@@ -108,6 +108,8 @@ sürümden (`x.0.0`) önce koşar.
   paylaşım), yolun metin kutusundan değil alandan okunması, ana pencerenin iki kapısının sekmeyi değiştirip yükleyiciyi
   çağırması, paylaşımın `ShareFlow`/`Core/Share` üstünden gitmesi, hedef tablosunun yayın paketine girmesi ve iki yeni
   anahtarın 42 dilde bulunması. Kaynak metin okur, pencere açmaz.
+- `KayitSonucVurguTests.cs` — sonuç paneli: "Küçült'e gönder" ilk ve birincil, klasör/paylaş ikincil; düğme zemin pikseli paletin birincil fırçasıyla oranlanır (negatif kontrol aynı fırça). Paylaş ham tıkla sahte sağlayıcıdan geçip bağlantıyı gösterir (`CreateShareFlow`). Kanıt `.calisma/kayit-sonuc-vurgu/`.
+- `KaydediciPencereTests.cs` — pencere seçici macOS/Linux: `WindowCrop` ölçek/ekran sınırı/çift boy, `xwininfo -root -tree` ayrıştırması, Wayland ayrımı, seçiciden Linux `-window_id` ve macOS `crop` argümanı, bulunamayan pencere hatası. `[X11KayitFact]` canlı kol yalnız CI `kaydedici-x11` işinde (Xvfb + xlogo, xwininfo ve `_NET_CLIENT_LIST` aynı pencereyi verir, 2 sn x11grab ffprobe'ta okunur). macOS canlı kolu yok, yalnız argüman. Kanıt `.calisma/kaydedici-pencere/`.
 - `PencereKabuguTests.cs` — pencere kabuğunun düzeni: üst şerit içerikle aynı gözde katman, başlık düğmeleri içeriğin üstünde,
   gizleme sınıfı iki parçayı kapatıyor. Kaynak metin okur; gizlenme ve anahat davranışı `OynaticiYolHaritasiTests`'te.
 - `OynaticiKisayolTests.cs` — tarifteki her kısayol gerçek girdi olayıyla PlayerView'a verilir, etkisi motordan geri okunur;
@@ -147,4 +149,8 @@ sürümden (`x.0.0`) önce koşar.
 - `HipersurusHTests.cs` — H dalgası: `--bakim` açılış görüntüsünden önce başlamıyor (yedek bekleme, başlatıcı hatası), sinyal boş açılışta boyaya, dosyayla ilk kareye bağlı; panelin ölçüm aşaması erteleme pimi. Davranışı `PlaybackResumeTests` (ilk parça 1 ms, `Probed` planı ekrandaki parçayı iptal etmiyor), composite pimi `HipersurusTests`. Ölçüm `docs/olcumler/hipersurus-h.md`.
 - `TestAyarYoluTests.cs` — modül başlatıcısı `VIDSHRINK_SETTINGS_PATH`'i `.calisma/test-ciktilari/appdata/<pid>`'e alır; ana pencerede açılan dosyanın son dosyalar listesi ve kaydedici ayarı oraya yazılır, gerçek `%APPDATA%\VidShrink` dosyalarının boyut/zaman damgası değişmez (yalnız okunur). Kanıt `.calisma/ayar-yolu/`.
 - `OynaticiDalga3GirdiTests.cs` — 3. dalga platform girişinden: ham sağ tık, yeni açılan menü penceresinde ham yukarı ok (satırı kaydırıp görünür kılar) ve ham tık ile ekran görüntüsü klasörü (sahte `IStorageProvider`, iptal kolu), ham Ctrl+E o klasöre yazar; ham Space ile oynayan 1 sn'lik klipte gerçek dosya sonu `RepeatMode.All`'da sonrakini açar, `Off`'ta açmaz; ham `RawDragEvent` dosyayı açar, klasör ve silinen dosyayı açmaz. Kanıt `.calisma/girdi-dalga3/`.
+- Ön ayar kütüphanesi (`Core/PresetLibrary.cs`, gömülü `Presets/platformlar.json`): `OnAyarKutuphanesiTests` (yongalar tablodan okunur,
+  platform/cihaz değerleri, `docs/olcumler/onayar-kaynaklari.md` satırlarının veriyle eşitliği), `KullaniciOnAyarTests` (kaydet/içe/dışa
+  aktar `VIDSHRINK_SETTINGS_PATH` klasöründe, bilinmeyen alan yok sayılır, her hata kolu, 15 anahtar 42 dilde),
+  `HandBrakeOnAyarCeviriTests` (HandBrake şemasıyla elle yazılmış sentetik "Sentetik Sosyal 10 MB 720p", `Veri/handbrake/`; taşınan/düşen alan notları).
 - `BudgetFillTests.cs` — bütçe doldurma: hedefin %97'sinin altındaki teslim bir yukarı deneme ister, %97 ve üstü istemez; tavanı aşan ya da küçülen yukarı deneme teslim edilmez; deneme bütçesi koşu sınırı + 1; tavan üstü örnek isteği aradeğerle sınırlar; donanım ve VideoToolbox'ta plan yok (yazılım negatif kontrol). Süreç çalıştırmaz. Ölçüm `docs/olcumler/butce-doldur.md`.

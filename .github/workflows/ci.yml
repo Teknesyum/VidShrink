@@ -144,3 +144,47 @@ jobs:
             .calisma/oynatici-yol-haritasi/**
           if-no-files-found: ignore
           retention-days: 7
+
+  # Kaydedicinin Linux pencere kolu: Xvfb uzerinde gercek bir X penceresi (xlogo) acilir,
+  # pencere listesi hem xwininfo'dan hem libX11 _NET_CLIENT_LIST'ten okunur ve x11grab
+  # -window_id ile 2 sn kaydedilen dosya ffprobe'ta okunur. Pencere yoneticisi olmadigi
+  # icin _NET_CLIENT_LIST kokte elle yazilir. macOS kolu burada yok: CI'da ekran kaydi izni
+  # verilemiyor, orada yalniz arguman testleri kosar.
+  kaydedici-x11:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg, Xvfb ve X araclari
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg xvfb x11-apps x11-utils
+      - name: Xvfb ve xlogo penceresi
+        run: |
+          Xvfb :99 -screen 0 1280x720x24 &
+          for i in $(seq 1 30); do xdpyinfo -display :99 >/dev/null 2>&1 && break; sleep 1; done
+          export DISPLAY=:99
+          xlogo -geometry 320x240+40+30 &
+          for i in $(seq 1 30); do xwininfo -name xlogo >/dev/null 2>&1 && break; sleep 1; done
+          id=$(xwininfo -name xlogo | awk '/Window id:/ {print $4}')
+          xprop -root -f _NET_CLIENT_LIST 32c -set _NET_CLIENT_LIST "$((id))"
+          xprop -root _NET_CLIENT_LIST
+          xwininfo -root -tree | grep xlogo
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+      - name: Pencere testleri (canli X11 kolu dahil)
+        env:
+          VIDSHRINK_X11_CANLI: '1'
+        run: dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --filter "FullyQualifiedName~KaydediciPencereTests" --logger "console;verbosity=normal"
+      - name: Pencere kaniti
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kaydedici-x11
+          path: |
+            .calisma/kaydedici-pencere/**
+            .calisma/dalga8a/**
+          if-no-files-found: ignore
+          retention-days: 7

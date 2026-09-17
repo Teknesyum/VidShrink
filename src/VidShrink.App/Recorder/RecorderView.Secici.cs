@@ -17,6 +17,69 @@ internal partial class RecorderView
 
     internal Func<IReadOnlyList<ScreenBounds>>? ScreenSource { get; set; }
 
+    internal Func<string, DesktopWindow?> FindWindow { get; set; } = RecorderWindows.Find;
+
+    internal Func<string, string?> ReadEnvironment { get; set; } = Environment.GetEnvironmentVariable;
+
+    internal Func<IReadOnlyList<(ScreenBounds Bounds, double Scale)>>? ScaledScreens { get; set; }
+
+    internal RecorderPlatform CapturePlatform { get; set; } = HostPlatform;
+
+    private IReadOnlyList<(ScreenBounds Bounds, double Scale)> MonitorScales()
+    {
+        if (ScaledScreens is not null) return ScaledScreens();
+        var screens = TopLevel.GetTopLevel(this)?.Screens;
+        if (screens is null) return Array.Empty<(ScreenBounds, double)>();
+        return screens.All
+            .Select((s, i) => (new ScreenBounds(i, s.Bounds.X, s.Bounds.Y, s.Bounds.Width, s.Bounds.Height), s.Scaling))
+            .ToList();
+    }
+
+    /// <summary>
+    /// Windows dışında seçilen başlık motorun istediğine çevrilir: Linux'ta pencere kimliği ve
+    /// <c>DISPLAY</c>, macOS'ta ekran indeksi ve kırpma. Wayland ve kapanmış pencere hata satırına düşer.
+    /// </summary>
+    private bool ResolveWindow(ref RecorderRequest request)
+    {
+        if (request.Target != RecorderTargetKind.Window || CapturePlatform == RecorderPlatform.Windows) return true;
+        if (CapturePlatform == RecorderPlatform.Linux && RecorderWindowsX11.IsWayland(ReadEnvironment))
+        {
+            ShowError(Say("recorder.error.window-wayland"));
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(request.WindowTitle)) return true;
+
+        DesktopWindow? window;
+        try { window = FindWindow(request.WindowTitle); }
+        catch (Exception ex) when (ex is InvalidOperationException or DllNotFoundException or EntryPointNotFoundException)
+        {
+            window = null;
+        }
+
+        if (window is null)
+        {
+            ShowError(Say("recorder.error.window-missing", request.WindowTitle));
+            return false;
+        }
+
+        if (CapturePlatform == RecorderPlatform.Linux)
+        {
+            var display = ReadEnvironment("DISPLAY");
+            request = request with { WindowId = window.Id, Display = string.IsNullOrWhiteSpace(display) ? null : display };
+            return true;
+        }
+
+        if (RecorderWindows.MacCrop(window, MonitorScales()) is not { } placed)
+        {
+            ShowError(Say("recorder.error.window-missing", request.WindowTitle));
+            return false;
+        }
+
+        request = request with { ScreenIndex = placed.Screen, WindowRegion = placed.Crop };
+        return true;
+    }
+
     private void InitSecici()
     {
         CmbAspect.ItemsSource = AspectLabels();

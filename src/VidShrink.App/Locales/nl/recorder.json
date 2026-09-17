@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg is gestopt met code {0}.",
   "recorder.error.no-ffmpeg": "{0} kon niet worden gevonden.",
   "recorder.error.invalid": "Deze instellingen staan geen opname toe: {0}",
+  "recorder.error.window-wayland": "Vensteropname wordt niet ondersteund in een Wayland-sessie; kies scherm of gebied, of meld je aan bij een X11-sessie.",
+  "recorder.error.window-missing": "Het venster \"{0}\" is niet gevonden; vernieuw de lijst en kies het opnieuw.",
   "recorder.error.number": "{0} moet een getal zijn.",
   "recorder.error.start": "De opname kon niet starten: {0}",
   "recorder.error.folder": "De map kon niet worden gekozen: {0}",

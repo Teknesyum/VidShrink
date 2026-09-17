@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg baigė darbą su kodu {0}.",
   "recorder.error.no-ffmpeg": "{0} nerasta.",
   "recorder.error.invalid": "Šie nustatymai neleidžia įrašyti: {0}",
+  "recorder.error.window-wayland": "Lango įrašymas Wayland seanse nepalaikomas; pasirinkite ekraną ar sritį arba prisijunkite prie X11 seanso.",
+  "recorder.error.window-missing": "Langas „{0}“ nerastas; atnaujinkite sąrašą ir pasirinkite jį dar kartą.",
   "recorder.error.number": "{0} turi būti skaičius.",
   "recorder.error.start": "Įrašymo nepavyko pradėti: {0}",
   "recorder.error.folder": "Nepavyko pasirinkti aplanko: {0}",

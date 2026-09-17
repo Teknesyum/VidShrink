@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg завърши с код {0}.",
   "recorder.error.no-ffmpeg": "{0} не беше намерен.",
   "recorder.error.invalid": "Тези настройки не позволяват запис: {0}",
+  "recorder.error.window-wayland": "Заснемането на прозорец не се поддържа в сесия на Wayland; изберете екран или област или влезте в сесия на X11.",
+  "recorder.error.window-missing": "Прозорецът „{0}“ не е намерен; обновете списъка и го изберете отново.",
   "recorder.error.number": "{0} трябва да е число.",
   "recorder.error.start": "Записът не можа да започне: {0}",
   "recorder.error.folder": "Папката не можа да бъде избрана: {0}",
