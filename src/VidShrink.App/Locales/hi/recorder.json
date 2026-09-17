@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg कोड {0} के साथ समाप्त हुआ।",
   "recorder.error.no-ffmpeg": "{0} नहीं मिला।",
   "recorder.error.invalid": "ये सेटिंग्स रिकॉर्डिंग की अनुमति नहीं देतीं: {0}",
+  "recorder.error.window-wayland": "Wayland सत्र में विंडो कैप्चर समर्थित नहीं है; स्क्रीन या क्षेत्र चुनें, या X11 सत्र में साइन इन करें।",
+  "recorder.error.window-missing": "विंडो \"{0}\" नहीं मिली; सूची रीफ़्रेश करें और उसे फिर से चुनें।",
   "recorder.error.number": "{0} एक संख्या होनी चाहिए।",
   "recorder.error.start": "रिकॉर्डिंग शुरू नहीं हो सकी: {0}",
   "recorder.error.folder": "फ़ोल्डर चुना नहीं जा सका: {0}",

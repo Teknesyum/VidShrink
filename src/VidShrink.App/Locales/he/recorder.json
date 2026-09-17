@@ -52,6 +52,8 @@
   "recorder.output.failed": "ffmpeg הסתיים עם קוד {0}.",
   "recorder.error.no-ffmpeg": "{0} לא נמצא.",
   "recorder.error.invalid": "ההגדרות הללו אינן מאפשרות הקלטה: {0}",
+  "recorder.error.window-wayland": "לכידת חלון אינה נתמכת בהפעלת Wayland; בחרו מסך או אזור, או היכנסו להפעלת X11.",
+  "recorder.error.window-missing": "החלון \"{0}\" לא נמצא; רעננו את הרשימה ובחרו אותו שוב.",
   "recorder.error.number": "{0} חייב להיות מספר.",
   "recorder.error.start": "ההקלטה לא הצליחה להתחיל: {0}",
   "recorder.error.folder": "לא ניתן היה לבחור את התיקייה: {0}",

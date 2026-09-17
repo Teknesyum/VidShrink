@@ -52,6 +52,8 @@
   "recorder.output.failed": "انتهى ffmpeg بالرمز {0}.",
   "recorder.error.no-ffmpeg": "تعذّر العثور على {0}.",
   "recorder.error.invalid": "لا تسمح هذه الإعدادات بالتسجيل: {0}",
+  "recorder.error.window-wayland": "التقاط النافذة غير مدعوم في جلسة Wayland؛ اختر الشاشة أو منطقة، أو سجّل الدخول إلى جلسة X11.",
+  "recorder.error.window-missing": "لم يتم العثور على النافذة \"{0}\"؛ حدّث القائمة واخترها مرة أخرى.",
   "recorder.error.number": "يجب أن يكون {0} رقمًا.",
   "recorder.error.start": "تعذّر بدء التسجيل: {0}",
   "recorder.error.folder": "تعذّر اختيار المجلد: {0}",

@@ -7,6 +7,33 @@ Dal `t0/macos-mpvkit`. Karar: fable 2026-09-17 soru 5. Kod (`src/`) değişmez.
 3. **CI.** `macos-mpvkit.yml`: macos-15, macos-14, macos-15-intel; duman + `OynaticiMotorTests` iki test; negatif kontroller.
 4. **Belge.** `docs/olcumler/libmpv-macos-gomme.md` yeni bölüm. Kurucu/release bağlantısı ayrı karar (deps sürümü gerekir).
 
+# Ön Ayar Kütüphanesi — HandBrake A2
+
+Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 42-45.
+
+1. **Tek tablo.** `src/VidShrink.Core/Presets/platformlar.json` gömülü kaynak; yonga planları (`MainWindow.ChipPlans`)
+   buradan okunur. Discord/Telegram/e-posta platformları ve cihaz profilleri aynı tabloya, her değerin kaynağı
+   `docs/olcumler/onayar-kaynaklari.md`.
+2. **Kullanıcı ön ayarı.** `PresetLibrary` şema sürümlü kaydet/içe/dışa aktar; ayar klasörü `VIDSHRINK_SETTINGS_PATH`
+   ile aynı yer. Hata kodu + 42 dilde `main.preset.error.*`.
+3. **HandBrake çevirisi.** `HandBrakePresetImport`: taşınan/yaklaşık/düşen alan notları, `main.preset.handbrake.*`.
+4. **Testler.** `OnAyarKutuphanesiTests`, `KullaniciOnAyarTests`, `HandBrakeOnAyarCeviriTests`; her kol negatif kontrol
+   ve mutasyon.
+
+# Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
+
+Dal `t0/yol-c-kaydedici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 2., 6., 7. bölüm (9-11).
+
+1. **R10/R14.** `RecorderView.axaml` sonuç paneli: "Küçült'e gönder" ilk sırada `PrimaryButton`, "Klasörü göster"
+   ve "Paylaş" `GhostButton`. Test: başsız çizimden düğme pikseli, palet fırçası `NeonBlue` ile kıyas; negatif kontrol eşit tema.
+2. **R15.** Paylaş düğmesine ham fare tıkı, sahte sağlayıcıyla `ShareFlow`'dan geçen yol ve ekrandaki bağlantı geri okunur.
+3. **R2 Core.** `RecorderRequest.WindowRegion` + `RecorderArguments.WindowCrop`: macOS pencere dikdörtgeni avfoundation
+   ekranından `crop`; dikdörtgensiz macOS pencere isteği yine reddedilir.
+4. **R2 App.** `RecorderWindowsX11.cs` (`xwininfo -root -tree` ayrıştırıcı, yoksa libX11 `_NET_CLIENT_LIST`; Wayland reddi),
+   `RecorderWindowsMac.cs` (CGWindowList). `RecorderView` başlığı kimliğe/dikdörtgene çözer, Linux'ta `DISPLAY`'i geçirir.
+   İki yeni anahtar 42 dilde, `BiciminTests` sayımı.
+5. **CI.** `ci.yml`'e ubuntu işi: Xvfb + xlogo, `_NET_CLIENT_LIST` elle, filtreli test x11grab 2 sn + ffprobe.
+6. **Belge.** `docs/plan-kaydedici-dalgalari.md` durum sütunu kanıt testleriyle.
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.
@@ -35,6 +62,8 @@ Dal `t0/karanlik-x265`. Karar: `docs/danisma/2026-09-17-karanlik-x265-fable.md`.
 4. **CI kabulü.** `hb.ps1 -Is karanlikgecis`: urun-otomatik vs main bench vs HandBrake; CAMBI(ii) ≤7,5,
    süre ≤1,5× HB, karanlık dışı libsvtav1 ve main ile eş.
 5. **Belge.** `docs/kullanim.md` kodek ipucu.
+6. **Açıklar (dal `t0/karanlik-acik`).** Strateji önerisinin kodeği geçişi izler; HDR (PQ/HLG)
+   kaynakta geçiş yok; luma kolu bölünmüş sonda sürecine katıldı (ayrı üç ffmpeg süreci gitti).
 
 # HandBrake Dalga 2 — Ölçülen Açıklar
 

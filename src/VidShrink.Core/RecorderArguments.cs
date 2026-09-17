@@ -139,6 +139,12 @@ public sealed record RecorderRequest
     /// <summary>Linux'ta pencere kimligi (<c>-window_id</c>).</summary>
     public string? WindowId { get; init; }
 
+    /// <summary>
+    /// macOS'ta pencerenin yakalanan ekran karesindeki piksel dikdortgeni. <c>avfoundation</c>
+    /// tek pencere vermiyor; pencere ekran karesinden kirpilir (<see cref="RecorderArguments.WindowCrop"/>).
+    /// </summary>
+    public RecorderRegion? WindowRegion { get; init; }
+
     /// <summary>Bolge kaydinda dikdortgen.</summary>
     public RecorderRegion? Region { get; init; }
 
@@ -844,11 +850,56 @@ public static class RecorderArguments
         RecorderPlatform.Linux => string.IsNullOrWhiteSpace(request.WindowId)
             ? new[] { "Window capture on x11grab needs the window id." }
             : Array.Empty<string>(),
-        RecorderPlatform.MacOs => new[]
-        {
-            "avfoundation exposes screens and devices, not single windows; capture a region of the screen instead."
-        },
+        RecorderPlatform.MacOs => MacWindowErrors(request),
         _ => Array.Empty<string>()
+    };
+
+    private static IEnumerable<string> MacWindowErrors(RecorderRequest request)
+    {
+        if (request.WindowRegion is not { } region)
+        {
+            yield return "avfoundation exposes screens and devices, not single windows; the window rectangle must be resolved to a screen crop first.";
+            yield break;
+        }
+
+        if (region.Width <= 0 || region.Height <= 0)
+            yield return "Window crop dimensions must be positive.";
+        else if (region.Width % 2 != 0 || region.Height % 2 != 0)
+            yield return "Window crop dimensions must be even for the selected pixel format.";
+
+        if (region.X < 0 || region.Y < 0)
+            yield return "Window crop offsets cannot be negative.";
+    }
+
+    /// <summary>
+    /// Pencerenin nokta cinsinden dikdortgenini, yakalanan ekranin piksel karesindeki kirpmaya cevirir:
+    /// ekranla kesisim alinir, olcekle carpilir, boyut cift sayiya iner. Pencere ekranda degilse null.
+    /// </summary>
+    public static RecorderRegion? WindowCrop(
+        double windowX, double windowY, double windowWidth, double windowHeight,
+        double screenX, double screenY, double screenWidth, double screenHeight, double scale)
+    {
+        if (!(scale > 0)) return null;
+        var left = Math.Max(windowX, screenX);
+        var top = Math.Max(windowY, screenY);
+        var right = Math.Min(windowX + windowWidth, screenX + screenWidth);
+        var bottom = Math.Min(windowY + windowHeight, screenY + screenHeight);
+        if (!(right > left && bottom > top)) return null;
+
+        var x = (int)Math.Round((left - screenX) * scale);
+        var y = (int)Math.Round((top - screenY) * scale);
+        var w = Math.Min((int)Math.Floor((right - left) * scale), (int)Math.Floor(screenWidth * scale) - x);
+        var h = Math.Min((int)Math.Floor((bottom - top) * scale), (int)Math.Floor(screenHeight * scale) - y);
+        w -= w % 2;
+        h -= h % 2;
+        return w < 2 || h < 2 ? null : new RecorderRegion(x, y, w, h);
+    }
+
+    private static RecorderRegion? MacCrop(RecorderRequest request) => request switch
+    {
+        { Platform: RecorderPlatform.MacOs, Target: RecorderTargetKind.Region, Region: { } region } => region,
+        { Platform: RecorderPlatform.MacOs, Target: RecorderTargetKind.Window, WindowRegion: { } window } => window,
+        _ => null
     };
 
     /// <summary>
@@ -912,8 +963,8 @@ public static class RecorderArguments
         if (string.IsNullOrWhiteSpace(request.PreviewPath)) return Array.Empty<string>();
 
         var filter = $"fps={PreviewFps},scale={PreviewWidth}:-2";
-        if (request is { Platform: RecorderPlatform.MacOs, Target: RecorderTargetKind.Region, Region: { } region })
-            filter = $"crop={Number(region.Width)}:{Number(region.Height)}:{Number(region.X)}:{Number(region.Y)}," + filter;
+        if (MacCrop(request) is { } region)
+            filter =$"crop={Number(region.Width)}:{Number(region.Height)}:{Number(region.X)}:{Number(region.Y)}," + filter;
         var a = new List<string> { "-map", "0:v", "-vf", filter, "-an" };
         if (request.MaxDuration is { } limit)
             a.AddRange(new[] { "-t", limit.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
@@ -1127,7 +1178,7 @@ public static class RecorderArguments
     {
         var links = new List<string>();
 
-        if (request is { Platform: RecorderPlatform.MacOs, Target: RecorderTargetKind.Region, Region: { } region })
+        if (MacCrop(request) is { } region)
             links.Add($"crop={Number(region.Width)}:{Number(region.Height)}:{Number(region.X)}:{Number(region.Y)}");
 
         if (request.Scale is { } scale)

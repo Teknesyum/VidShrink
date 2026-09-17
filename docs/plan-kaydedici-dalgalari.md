@@ -109,14 +109,15 @@ Hepsi kayıt **öncesi** kararlar; kayıt başladıktan sonra zaten değişemiyo
 
 Saha raporu §3: bu şeyler yoksa ürün eksik sayılıyor.
 
-| Yetenek | Durum |
-|---|---|
-| Bölge seçimi | var |
-| Mikrofon + sistem sesi ayrı | var (`amix`, ayrı izler) |
-| Çoklu kap/kodek | var |
-| Sıcak tuşla başlat/durdur | yok — **A6** |
-| GIF çıktısı | yok — **B1** |
-| Pencerenin kendini gizlemesi | yok — **A dalgası** |
+| Yetenek | Durum | Kanıt testi |
+|---|---|---|
+| Bölge seçimi | var | `KaydediciSeciciTests.FareyleCizilenBolgeAyaraVeArgumanaGecer` |
+| Pencere seçimi | var — Windows başlık, Linux `-window_id` (Wayland açıkça reddedilir), macOS pencere dikdörtgeni ekran kırpmasına çevrilir | `KaydediciPencereTests.SeciciLinuxtaKimlikVeEkranMacteKirpmaYazarWaylandiReddeder`; Linux canlı kol `X11PenceresiListedenBulunupIkiSaniyeKaydedilir` (CI Xvfb); macOS yalnız argüman testi |
+| Mikrofon + sistem sesi ayrı | var (`amix`, ayrı izler) | `SesliKayitTests.IkiCihazSecilinceGrafikVeEslemArgumandaDurur`, `KayitFfmpegKoluTests.AyriIzlerAmixYerineIkiMapVerir` |
+| Çoklu kap/kodek | var | `KayitFfmpegKoluTests` |
+| Sıcak tuşla başlat/durdur | var — **A6** | `KaydediciArayuzTests.GenelKisayolBasilincaEylemCalisir` |
+| GIF çıktısı | var — **B1** | `KayitFfmpegKoluTests.GifKabiUzantisiniVerirVeMatroskayaYakalar` |
+| Pencerenin kendini gizlemesi | var — mini kip ana pencereyi gizler, çerçeve kayda girmez | `KaydediciCerceveTests.TamEkranCercevesiKaydaGirmez`, `MiniKipTests.KadrajinDisinaKonumlaniyor` |
 
 ### B1. GIF çıktısı
 
