@@ -107,7 +107,7 @@ clang -dynamiclib -arch arm64 -arch x86_64 -mmacosx-version-min="$target" \
 rc=$?
 set -e
 echo "link rc=$rc warnings=$(grep -c 'warning' "$out/link.log" || true) newer-than-target=$(grep -c 'built for newer' "$out/link.log" || true)"
-grep -v 'auto-linked' "$out/link.log" | head -n 80
+grep -v 'auto-linked' "$out/link.log" | head -n 80 || true
 [ "$rc" -eq 0 ] || exit 1
 
 d="$out/libmpv.2.dylib"
