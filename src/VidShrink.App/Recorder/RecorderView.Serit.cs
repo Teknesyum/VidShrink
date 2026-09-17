@@ -242,7 +242,10 @@ internal partial class RecorderView
         ExpandFromMini();
         ShowResult(result);
         if (_settings.OpenFolderWhenDone && Delivered() is { } done) RevealFolder(done);
+        if (result.Ok && !result.Partial && Delivered() is { } finished && RecordingDelivered is { } follow) _ = follow(finished);
     }
+
+    internal Func<string, Task>? RecordingDelivered { get; set; }
 
     internal async Task FollowEndAsync(Task ended, object session)
     {

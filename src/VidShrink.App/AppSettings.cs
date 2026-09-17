@@ -32,6 +32,8 @@ public sealed class AppSettings
 
     public bool AdvancedDefaultOpen { get; set; }
 
+    public bool FollowRecording { get; set; }
+
     /// <summary>Yürürlükteki paletin adı; boş kalırsa varsayılan palet açılır.</summary>
     public string Theme { get; set; } = "";
 
@@ -64,6 +66,7 @@ public sealed class AppSettings
             ReadString(root, "outputFolder", value => settings.OutputFolder = value);
             ReadString(root, "theme", value => settings.Theme = value);
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
+            ReadBool(root, "followRecording", value => settings.FollowRecording = value);
             ReadInt(root, "ffmpegPathMode", value => settings.FfmpegPathMode = value);
             ReadString(root, "ffmpegPath", value => settings.FfmpegPath = value);
         }
@@ -125,6 +128,7 @@ public sealed class AppSettings
         root["outputFolderMode"] = OutputFolderMode;
         root["outputFolder"] = OutputFolder;
         root["advancedDefaultOpen"] = AdvancedDefaultOpen;
+        root["followRecording"] = FollowRecording;
         root["ffmpegPathMode"] = FfmpegPathMode;
         root["ffmpegPath"] = FfmpegPath;
 
