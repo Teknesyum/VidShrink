@@ -13,8 +13,8 @@ namespace VidShrink.Tests;
 /// Paket 2b borcu: <see cref="RecorderSession"/>'ın kendiliğinden bölme yoklaması, süre sınırının parçalara
 /// kalanla dağıtılması ve <c>_partial</c> yolu gerçek gdigrab kaydında. 5 sn sınır ve 2 sn bölme en az iki
 /// numaralı parça verir, parçaların toplamı 5 sn'yi aşmaz; bölmesiz aynı kayıt tek parça (negatif kontrol).
-/// Ölçülen: 2 sn bölmede parçalar 3,2 + 1,8 sn — yoklama, ffmpeg'in ilerleme aralığı ve nazik kapanış birinci
-/// parçayı ~1,2 sn uzatıyor, kalan süre ikinciden düşüyor; üst sınır bu yüzden 3,5 sn.
+/// Ölçülen: 2 sn bölmede parçalar 3,134 + 1,867 sn; birinci parça ~1,1 sn uzuyor, kalan süre ikinciden
+/// düşüyor (aşımın yoklama, ilerleme bloğu ve nazik kapanış arasında payı ayrılmadı); üst sınır bu yüzden 3,5 sn.
 /// Kapanma süresi 1 ms verilen kayıt öldürülür ve yarım işaretlenir; öldürülen Matroska ffprobe'la okunur paket verir,
 /// öldürülen mp4 vermez — <see cref="RecorderArguments.SurvivesKill"/> tablosu davranışla ölçülür. Ölçülen:
 /// <c>-flush_packets 1</c> olmadan 7 sn'lik Matroska öldürülünce 0 bayt kalıyordu. Kanıt <c>.calisma/paket-2b/bolme/</c>.
