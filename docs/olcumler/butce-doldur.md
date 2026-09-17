@@ -36,10 +36,37 @@ Dördü de geçerse değişiklik kalır; biri kalırsa kod geri alınır ve sonu
 
 ## Hücreler
 
-- NVENC: `nvenc-2.md` tablosunda \|yeni sapma\| > %3 olan 25 hücre (kesit × kodek × kbit).
+- NVENC: `nvenc-2.md` tablosunda \|yeni sapma\| > %3 olan 26 hücre (kesit × kodek × kbit).
 - Yazılım (bant yazılımda da geçerli, `FillBand.For` kodek ayırmıyor): libx264 ve libx265 × `karanlik` 1000, `parlak` 1000,
   `hareketli` 2000 = 6 hücre.
 - Negatif kol: sonra Bench'i `--fill qualityceiling` ile bir hücrede; yukarı deneme izde görünmemeli.
 
 Düzenek: `tools/butce-doldur/kos.ps1`; `VidShrink.Bench shrink <kesit> <mb> --speed quality --no-measure --lock-codec <kodek>`,
 ölçü `VidShrink.Bench measure-pair` (VMAF-NEG ort/p10). Kodlamalar sırayla, makinede tek ffmpeg.
+
+## Aday 1 Sonucu: Kapı Kaldı
+
+Tüm kodek yolları, 32 hücre (26 NVENC + 6 yazılım), toplam kodlama 578,9 sn. Önce kolu nvenc-2 sayılarını yeniden üretti
+(ör. hareketli av1 1000 −11,07 / 3 deneme / 87,81).
+
+| Küme | n | K1 ≥ %97 (önce → sonra) | K2 en büyük sapma | K3 Δdeneme | K4 ΔVMAF-NEG ort / p10 | Ort sapma önce → sonra |
+|---|---|---|---|---|---|---|
+| Tümü | 32 | 0 → 16 (%50) **kaldı** | −0,29 geçti | +0,97 geçti | +0,292 / +0,462 geçti | −6,22 → −3,36 |
+| NVENC | 26 | 0 → 10 (%38) | −0,29 | +1,00 | +0,229 / +0,392 | −6,47 → −3,76 |
+| Yazılım | 6 | 0 → 6 (%100) | −0,60 | +0,83 | +0,562 / +0,765 | −5,16 → −1,60 |
+
+NVENC'te 26 yukarı denemenin 9'u tavanı aştı (önceki teslim kaldı), 4'ü aynı ya da daha küçük çıktı: istek +%2,7 iken
+boyut +%4,8 (orta h264 2000, 1768k → 2,341 MB, 1815k → 2,453 MB), istek +%2,6 iken boyut değişmedi (hareketli h264 1000,
+891k/914k → 1,171 MB). Tek denemelik %3 genişliğindeki pencere donanımın deneme başı sapmasından dar. Aday 1 kural gereği
+geri alındı.
+
+## Aday 2: Yalnız Yazılım Kodlayıcı (Aday 1'den Sonra, Ölçümden Önce Yazıldı)
+
+Aynı karar, `CodecModel.IsHardware(codec)` ise yukarı deneme kurulmaz; donanım yolu 34231f4d ile aynı kalır (birim testle
+pimli). Aday 1'in 6 yazılım hücresi aday 2'yle aynı kod yolundan geçti, geçerli sayılır. Uyum şüphesine karşı **yeni 6
+tutma hücresi**: libx264 `orta` 2000, `karanlik` 3500, `hareketli` 1000, `parlak` 2000; libx265 `orta` 2000,
+`karanlik` 3500.
+
+Kapı: K1-K4 aynı eşiklerle hem 6 tutma hücresinde ayrı ayrı hem 12 yazılım hücresinin toplamında geçmeli. Biri kalırsa
+aday 2 de geri alınır. NVENC hücreleri kapıya girmez; donanım davranışı değişmediği için "donanımda %4,8 boş bütçe"
+açık kalır.
