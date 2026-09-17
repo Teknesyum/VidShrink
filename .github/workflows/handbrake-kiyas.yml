@@ -175,8 +175,8 @@ jobs:
           if (-not (Test-Path '${{ inputs.cli_proje }}')) { throw 'CLI projesi bu commit''te yok: ${{ inputs.cli_proje }}' }
           dotnet build '${{ inputs.cli_proje }}' -c Release -m:2
           if ($LASTEXITCODE -ne 0) { throw 'CLI derlenemedi' }
-          $dll = Get-ChildItem '${{ inputs.cli_proje }}/bin/Release' -Recurse -Filter 'VidShrink.Cli.dll' | Select-Object -First 1
-          if (-not $dll) { throw 'VidShrink.Cli.dll bulunamadi' }
+          $dll = Get-ChildItem '${{ inputs.cli_proje }}/bin/Release' -Recurse -Filter 'vidshrink.dll' | Select-Object -First 1
+          if (-not $dll) { throw 'vidshrink.dll bulunamadi' }
           "URUN_CLI=$($dll.FullName)" | Add-Content $env:GITHUB_ENV
       - name: e1 bench derle
         if: matrix.is == 'bantlasma'
