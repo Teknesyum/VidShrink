@@ -165,15 +165,27 @@ output folder as `.vidshrink-izle-<hash>.json`, and failing that to the settings
 file that failed is retried once on the next start. To process everything again, delete the
 state file.
 
-Folder and file names are compared by the rule of the running system: `Ordinal` on Linux,
-`OrdinalIgnoreCase` on Windows and macOS. The macOS side of that rule assumes the default
-APFS volume, which is case-insensitive but case-preserving.
+Exactly two comparisons follow the rule of the running system: the watched folder against
+the output folder, and a candidate against the output names this run has written. Those are
+`Ordinal` on Linux and `OrdinalIgnoreCase` on Windows and macOS.
 
-APFS can also be formatted case-sensitive, and on such a volume the rule falls the wrong
-way: two case variants of one name, `Klip.mp4` and `klip.mp4`, count as a single file, so
-one of the two is never processed, and the watched folder is rejected as the output folder
-even when the two paths differ only in case. The same applies to a case-sensitive external
-volume mounted on a default machine. This case is not measured.
+The macOS half of that rule assumes the default APFS volume, which is case-insensitive but
+case-preserving. APFS can also be formatted case-sensitive, and on such a volume — or on a
+case-sensitive external volume — the assumption does not hold.
+
+Every other use of a file's name ignores case **on every platform, Linux included**: the
+pending, retry and skip tables, the scan order, and the record of what has been processed.
+So `Klip.mp4` and `klip.mp4` in one watched folder collide even where the filesystem keeps
+them apart as two separate files.
+
+What the collision costs depends on the two files. If their size and modification time
+match, one is taken and the other counts as already processed, so it is never shrunk. If
+they differ — the ordinary case — each scan resets the other's stability counter, the run
+never confirms either file, and neither is ever processed.
+
+In that second regime the pending table never empties, so `--bir-kez` does not exit and the
+run waits forever. A separate `--cikti` does not help: the collision is in the name tables,
+not on disk. Neither regime is measured; both are read from the code.
 
 Exit codes: `0` finished, `4` `--bir-kez` finished but at least one file failed, `1` error,
 `64` wrong usage, `130` stopped with Ctrl+C.

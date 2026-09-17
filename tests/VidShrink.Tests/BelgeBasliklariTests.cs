@@ -19,8 +19,21 @@ public sealed class BelgeBasliklariTests
 
         Assert.DoesNotContain("Windows", ingilizce.Select(b => b.Metin));
         Assert.DoesNotContain("macOS / Linux", ingilizce.Select(b => b.Metin));
-        Assert.Contains("Command Line", ingilizce.Select(b => b.Metin));
-        Assert.Contains("Watch Folder", ingilizce.Select(b => b.Metin));
+    }
+
+    /// <summary>
+    /// Düzey dizisi başlığın adını görmüyor: denetim "### İzlenen klasör" başlığını
+    /// "### Bambaska Bir Baslik" yapan mutasyonun sağ kaldığını ölçtü. Metin de pimli.
+    /// </summary>
+    [Theory]
+    [InlineData("README.md", "Command Line", "Watch Folder")]
+    [InlineData("README.tr.md", "Komut satırı", "İzlenen klasör")]
+    public void KomutSatiriBasliklariAdiylaPimli(string ad, string bolum, string altBolum)
+    {
+        var basliklar = Basliklar(ad);
+
+        Assert.Contains((2, bolum), basliklar);
+        Assert.Contains((3, altBolum), basliklar);
     }
 
     private static string Duzen(IReadOnlyList<(int Duzey, string Metin)> basliklar) =>

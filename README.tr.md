@@ -152,10 +152,11 @@ vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB --bir-kez   # klasörü boş
 ```
 
 `izle`, klasöre düşen her videoyu küçültüyor. `--cikti` çıktı klasörüdür ve zorunludur;
-izlenen klasörün kendisi olamaz. `--aralik <saniye>` tarama aralığını belirliyor
-(varsayılan 2), `--bir-kez` beklenecek bir şey kalmayınca çıkıyor, `kucult`'un öbür
-anahtarları her dosyaya uygulanıyor. `--json` ile stdout NDJSON oluyor: dosya başına tek
-satır JSON nesnesi.
+izlenen klasörün kendisi olamaz.
+
+`--aralik <saniye>` tarama aralığını belirliyor (varsayılan 2), `--bir-kez` beklenecek bir
+şey kalmayınca çıkıyor, `kucult`'un öbür anahtarları her dosyaya uygulanıyor. `--json` ile
+stdout NDJSON oluyor: dosya başına tek satır JSON nesnesi.
 
 Bir dosya, boyu ve değişiklik saati üst üste iki tarama aralığı boyunca aynı kaldığında ve
 onu tutan bir yazıcı olmadığında alınıyor — üçüncü tarama alıyor. Kodlanırken kaynak
@@ -164,18 +165,31 @@ değişirse çıktı siliniyor ve dosya durulunca yeniden ele alınıyor.
 İlerleme, izlenen klasörün içindeki `.vidshrink-izle.json` dosyasında ada ve boya göre
 tutuluyor; adı ya da boyu değişen dosya yeni sayılıyor. O klasör salt okunursa durum çıktı
 klasörüne `.vidshrink-izle-<ozet>.json` olarak, o da tutmazsa ayar klasörüne yazılıyor.
+
 Başarısız olan dosya, bir sonraki açılışta bir kez yeniden denenir. Her şeyi yeniden
 işlemek için durum dosyasını silin.
 
-Klasör ve dosya adları koşan sistemin kuralıyla karşılaştırılıyor: Linux'ta `Ordinal`,
-Windows ile macOS'ta `OrdinalIgnoreCase`. Kuralın macOS tarafı varsayılan APFS bölümünü
-varsayıyor; o bölüm harf duyarsız ama harf koruyordur.
+Koşan sistemin kuralına uyan tam iki kıyas var: izlenen klasörün çıktı klasörüyle
+kıyası, ve bir adayın bu koşumun yazdığı çıktı adlarıyla kıyası. Bu ikisi Linux'ta
+`Ordinal`, Windows ile macOS'ta `OrdinalIgnoreCase`.
 
-APFS harf DUYARLI da biçimlendirilebilir ve böyle bir bölümde kural yanlış tarafa düşüyor:
-aynı adın iki harf varyantı, `Klip.mp4` ile `klip.mp4`, tek dosya sayılıyor, yani ikisinden
-biri hiç işlenmiyor; iki yol yalnız harf durumunda ayrılsa bile izlenen klasör çıktı
-klasörü olarak reddediliyor. Varsayılan bir makineye bağlanan harf duyarlı dış bölüm için
-de aynısı geçerli. Bu durum ölçülmedi.
+Kuralın macOS yarısı varsayılan APFS bölümünü varsayıyor; o bölüm harf duyarsız ama harf
+koruyordur. APFS harf DUYARLI da biçimlendirilebilir ve böyle bir bölümde — ya da harf
+duyarlı bir dış bölümde — bu varsayım tutmuyor.
+
+Dosya adının geri kalan her kullanımı **her platformda, Linux dahil** harfi yok sayıyor:
+bekleyen, yeniden denenecek ve atlanan tabloları, tarama sırası ve işlenenlerin kaydı. Yani
+`Klip.mp4` ile `klip.mp4` aynı izlenen klasörde, dosya sistemi ikisini iki ayrı dosya
+olarak tutsa bile çakışıyor.
+
+Çakışmanın bedeli iki dosyaya bağlı. Boyları ve değişiklik saatleri aynıysa biri alınıyor,
+öbürü işlenmiş sayılıyor ve hiç küçültülmüyor. Farklıysa — olağan durum — her tarama
+öbürünün kararlılık sayacını sıfırlıyor, koşum ikisini de doğrulayamıyor ve hiçbiri
+işlenmiyor.
+
+Bu ikinci kipte bekleyenler tablosu hiç boşalmadığı için `--bir-kez` çıkmıyor, koşum
+sonsuza kadar bekliyor. Ayrı bir `--cikti` de kurtarmıyor: çakışma diskte değil, ad
+tablolarında. İki kip de ölçülmedi; ikisi de kod okumasından.
 
 Çıkış kodları: bittiğinde `0`, `--bir-kez` bitip en az bir dosya başarısız olduğunda `4`,
 hatada `1`, yanlış kullanımda `64`, Ctrl+C ile durdurulduğunda `130`.
