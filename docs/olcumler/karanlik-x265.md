@@ -112,3 +112,46 @@ Son komut satırları e0 ile aynı (yol dışında), bayt farkı SVT-AV1'in çok
 
 Medyan +7,0 sn, dağılım −6,9…+11,7. Her çiftte ürün önce koştu (sıra dengelenmedi); 2 çekirdekli koşucuda ffv1 1080p kaynakta
 luma pencereleri diğer sonda işleriyle yarışıyor. Yereldeki gürültü içi sonuç CI'da tekrarlanmadı; açık boşluk.
+
+## 5. Açıklar: Öneri Kodeği, HDR, Luma Kolunun Maliyeti
+
+Dal `t0/karanlik-acik`.
+
+**Luma kolunun maliyeti (koddan).** Üretim planı `SamplingPlan.Fixed`, üç pencere (`MaxWindows`), pencere 2 sn.
+Önceki hâlde her pencere için **ayrı bir ffmpeg süreci** (`LumaArgs`) kaynağı tam çözünürlükte yeniden çözüp
+`fps=4,scale=160:-2,format=yuv420p,signalstats` koşuyordu: bölünmüş sondanın zaten çözdüğü aynı 2 sn, üç
+ek çözüm ve üç süreç açılışı; paralel koştuğu için 2 çekirdekli koşucuda diğer sonda işleriyle yarışıyordu
+(bölüm 4: medyan +7,0 sn prob). Şimdi luma, bölünmüş sondanın `filter_complex`'ine üçüncü kol
+(`split=3 … [lraw]<LumaFilter>[luma]`, `-map [luma] -f null -`). Ayrı süreç yalnız bölünmüş sonda
+başarısız olursa yedek olarak koşar.
+
+**Yerel süre (tek süreç, sırayla).** 8 sn 1080p30 testsrc2 (`eq=brightness=-0.3`), pencere `-ss 2 -t 2`,
+veryfast, ffmpeg 9.0. Düzenek `.calisma/karanlik-acik/sure.ps1` (silindi), üç tur:
+
+| Tur | eski bölünmüş (split=2) ms | ayrı luma süreci ms | yeni bölünmüş (split=3) ms |
+|---|---|---|---|
+| 1 | 269 | 76 | 240 |
+| 2 | 225 | 79 | 225 |
+| 3 | 221 | 78 | 228 |
+
+Pencere başına ayrı süreç ~78 ms, luma kolunun bölünmüş sürece eklediği ≤7 ms (gürültü içinde); üç pencerede
+~230 ms tek çekirdek işi ve üç süreç gitti. Sonuç değişmedi: luma 52,2645125 üç yolda aynı (8 değer),
+`frame=60` aynı, full/half bayt 1399196 / 189003 eski ve yeni bölünmüşte aynı. `-hwaccel auto`'lu (Hızlı kip)
+bölünmüş sonda da 52,2645125 okudu. Pim: `KaranlikGecisTests.BirlesikSondaAyriSondaylaAyniLumayiVeKareyiOkur`
+(iki pencerede `LumaSampleAsync` == `WindowSample.MeanLuma`, kare sayısı tek örnekle eş).
+
+Bu klipte kazanç HandBrake'e karşı 1,72× / 1,90× toplam farkını kapatacak büyüklükte değil; farkın gövdesi
+luma dışındaki sonda işleri (bias taraması, üç x264 pencere, hareket örneği) ve deneme kodlaması.
+
+**Öneri kodeği.** `StrategyAdvice.SuggestedCodec` geçişten sonra `libsvtav1` kalıyordu (plan `libx265`).
+Pencere kodlayıcı satırı `plan.Codec`'i, gerekçe satırı nottaki kodekleri yazdığı için ekranda yanlış kodek
+görünmüyordu; yanlış olan çekirdeğin öneri kaydıydı. Artık öneri aynı kararı (`DarkContentSwitch.Applies`
++ x265 kullanılabilir) uygular.
+
+**HDR.** `DarkContentSwitch.IsHdrSource`: `IsHdr` ya da aktarım `smpte2084` / `arib-std-b67` → geçiş yok.
+
+**Negatif kontroller.** Düzeltmeden önce yeni testler 8 kırmızı (öneri 2, HDR 4, bölünmüş sonda 2). Mutasyonlar
+(tek derlemede, birbirinden ayrık testler): öneri helper'ı hep `suggested` döner → iki öneri testi kırmızı;
+`IsHdrSource` aktarım kıyası büyük/küçük harfe duyarlı → `HdrBayragiAktarimAdiOlmadanDaGecisiDurdurur` kırmızı;
+bölünmüş koldaki filtre `fps=5` → iki sonda testi kırmızı. 5 kırmızı / 26 yeşil; geri alınca 98/98 yeşil
+(`KaranlikGecisTests|ComplexityProbeTests|PlanCalculatorTests`).

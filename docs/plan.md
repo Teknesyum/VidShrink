@@ -26,6 +26,8 @@ Dal `t0/karanlik-x265`. Karar: `docs/danisma/2026-09-17-karanlik-x265-fable.md`.
 4. **CI kabulü.** `hb.ps1 -Is karanlikgecis`: urun-otomatik vs main bench vs HandBrake; CAMBI(ii) ≤7,5,
    süre ≤1,5× HB, karanlık dışı libsvtav1 ve main ile eş.
 5. **Belge.** `docs/kullanim.md` kodek ipucu.
+6. **Açıklar (dal `t0/karanlik-acik`).** Strateji önerisinin kodeği geçişi izler; HDR (PQ/HLG)
+   kaynakta geçiş yok; luma kolu bölünmüş sonda sürecine katıldı (ayrı üç ffmpeg süreci gitti).
 
 # HandBrake Dalga 2 — Ölçülen Açıklar
 

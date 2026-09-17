@@ -45,11 +45,80 @@ public sealed class KaranlikGecisTests
     };
 
     private static EncodePlan Plan(double targetMb, double? luma, CodecPreference codec = CodecPreference.Auto, string? locked = null, SpeedMode speed = SpeedMode.Quality, FakeAvailability? availability = null)
+        => Result(targetMb, luma, codec, locked, speed, availability).Plan;
+
+    private static PlanResult Result(double targetMb, double? luma, CodecPreference codec = CodecPreference.Auto, string? locked = null, SpeedMode speed = SpeedMode.Quality, FakeAvailability? availability = null, MediaInfo? source = null)
     {
-        var info = Info();
+        var info = source ?? Info();
         var profile = ComplexityProfile.FromSourceBitrate(info) with { MeanLuma = luma };
         var options = new PlanOptions { TargetMb = targetMb, Codec = codec, LockedCodec = locked, SpeedMode = speed };
-        return PlanCalculator.BuildDetailed(info, options, profile, availability ?? Available()).Plan;
+        return PlanCalculator.BuildDetailed(info, options, profile, availability ?? Available());
+    }
+
+    private static MediaInfo HdrInfo(string? transfer) => Info() with
+    {
+        IsHdr = transfer is "smpte2084" or "arib-std-b67",
+        ColorTransfer = transfer,
+        ColorPrimaries = transfer is null ? null : "bt2020",
+        PixelFormat = "yuv420p10le",
+        BitDepth = 10
+    };
+
+    [Theory]
+    [InlineData(Karanlik, "libx265")]
+    [InlineData(Ekran, "libsvtav1")]
+    [InlineData(null, "libsvtav1")]
+    public void StratejiOnerisiKodlananKodegiSoyler(double? luma, string expected)
+    {
+        var result = Result(40, luma);
+
+        Assert.Equal(expected, result.Plan.Codec);
+        Assert.Equal(result.Plan.Codec, result.Advice.SuggestedCodec);
+    }
+
+    [Fact]
+    public void StratejiOnerisiElleSecilenUyumlulukteOtomatiginKaranlikKodeginiSoyler()
+    {
+        var result = Result(40, Karanlik, CodecPreference.Compatible);
+
+        Assert.Equal("libx264", result.Plan.Codec);
+        Assert.Equal(CodecPreference.MaxCompression, result.Advice.SuggestedPreference);
+        Assert.Equal("libx265", result.Advice.SuggestedCodec);
+        Assert.Equal("libsvtav1", Result(40, Ekran, CodecPreference.Compatible).Advice.SuggestedCodec);
+    }
+
+    [Theory]
+    [InlineData("smpte2084")]
+    [InlineData("arib-std-b67")]
+    public void HdrKaynaktaKaranlikGecisiKosmaz(string transfer)
+    {
+        var result = Result(40, Karanlik, source: HdrInfo(transfer));
+
+        Assert.Equal("libsvtav1", result.Plan.Codec);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.DarkContentHevc);
+        Assert.Equal("libsvtav1", result.Advice.SuggestedCodec);
+    }
+
+    [Theory]
+    [InlineData("bt709")]
+    [InlineData(null)]
+    public void SdrAktarimliOnBitKaranlikKaynakGecer(string? transfer)
+    {
+        var result = Result(40, Karanlik, source: HdrInfo(transfer));
+
+        Assert.Equal("libx265", result.Plan.Codec);
+        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.DarkContentHevc);
+    }
+
+    [Fact]
+    public void HdrBayragiAktarimAdiOlmadanDaGecisiDurdurur()
+    {
+        var info = Info() with { IsHdr = true };
+
+        Assert.True(DarkContentSwitch.IsHdrSource(info));
+        Assert.False(DarkContentSwitch.IsHdrSource(Info()));
+        Assert.True(DarkContentSwitch.IsHdrSource(Info() with { ColorTransfer = "SMPTE2084" }));
+        Assert.Equal("libsvtav1", Result(40, Karanlik, source: info).Plan.Codec);
     }
 
     [Theory]
@@ -175,14 +244,15 @@ public sealed class KaranlikGecisTests
     [Fact]
     public void SafKararHerKoluAyriTutar()
     {
-        Assert.True(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Aggressive, "libsvtav1", Karanlik));
-        Assert.True(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Extreme, "libsvtav1", Karanlik));
-        Assert.False(DarkContentSwitch.Applies(CodecPreference.MaxCompression, null, CompressionRegime.Aggressive, "libsvtav1", Karanlik));
-        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, "libsvtav1", CompressionRegime.Aggressive, "libsvtav1", Karanlik));
-        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Balanced, "libsvtav1", Karanlik));
-        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Light, "libsvtav1", Karanlik));
-        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Aggressive, "av1_nvenc", Karanlik));
-        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Aggressive, "libsvtav1", Ekran));
+        Assert.True(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Aggressive, "libsvtav1", Karanlik, false));
+        Assert.True(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Extreme, "libsvtav1", Karanlik, false));
+        Assert.False(DarkContentSwitch.Applies(CodecPreference.MaxCompression, null, CompressionRegime.Aggressive, "libsvtav1", Karanlik, false));
+        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, "libsvtav1", CompressionRegime.Aggressive, "libsvtav1", Karanlik, false));
+        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Balanced, "libsvtav1", Karanlik, false));
+        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Light, "libsvtav1", Karanlik, false));
+        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Aggressive, "av1_nvenc", Karanlik, false));
+        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Aggressive, "libsvtav1", Ekran, false));
+        Assert.False(DarkContentSwitch.Applies(CodecPreference.Auto, null, CompressionRegime.Aggressive, "libsvtav1", Karanlik, true));
     }
 
     [Fact]
@@ -216,6 +286,53 @@ public sealed class KaranlikGecisTests
             Assert.Contains("{2}", value);
             if (language != "en") Assert.NotEqual(english, value);
         }
+    }
+
+    [Fact]
+    public void BolunmusSondaLumaKolunuAyriSondaninFiltresiyleTasir()
+    {
+        var args = ComplexityProbe.SplitArgs("in.mkv", 2, (320, 180), "veryfast", SpeedMode.Quality, "full.mkv", "half.mkv");
+
+        var graph = args[Array.IndexOf(args, "-filter_complex") + 1];
+        Assert.Equal($"[0:v]split=3[full][raw][lraw];[raw]scale=320:180[small];[lraw]{ComplexityProbe.LumaFilter}[luma]", graph);
+        Assert.Equal(new[] { "-map", "[luma]", "-f", "null", "-" }, args[^5..]);
+        Assert.Equal("[full]", args[Array.IndexOf(args, "-map") + 1]);
+
+        var luma = ComplexityProbe.LumaArgs("in.mkv", 2, 2);
+        Assert.Equal(luma[..8], new[] { "-hide_banner", "-nostdin" }.Concat(args[3..9]).ToArray());
+    }
+
+    [FfmpegFact]
+    public async Task BirlesikSondaAyriSondaylaAyniLumayiVeKareyiOkur()
+    {
+        var dir = Path.Combine(TestPaths.OutputRoot, "karanlik-gecis", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var clip = Path.Combine(dir, "clip.mp4");
+            using (var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, new[] { "-y", "-f", "lavfi", "-i", "testsrc2=size=640x360:rate=24:duration=8,eq=brightness=-0.3", "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p", clip }) })
+            {
+                process.Start();
+                var stdout = process.StandardOutput.ReadToEndAsync();
+                var stderr = process.StandardError.ReadToEndAsync();
+                await process.WaitForExitAsync();
+                await Task.WhenAll(stdout, stderr);
+                Assert.Equal(0, process.ExitCode);
+            }
+
+            foreach (var start in new[] { 1.0, 5.0 })
+            {
+                var ayri = await ComplexityProbe.LumaSampleAsync(clip, start, 2, default);
+                var pencere = await ComplexityProbe.SampleWindowAsync(clip, start, (320, 180), "veryfast", SpeedMode.Quality, null, default);
+                var (_, tekKare) = await ComplexityProbe.SampleAsync(clip, start, 2, null, "veryfast", SpeedMode.Quality, default);
+
+                Assert.NotNull(ayri);
+                Assert.Equal(ayri, pencere.MeanLuma);
+                Assert.Equal(tekKare, pencere.FullFrames);
+                Assert.Equal(tekKare, pencere.HalfFrames);
+            }
+        }
+        finally { try { Directory.Delete(dir, true); } catch { } }
     }
 
     [FfmpegTheory]

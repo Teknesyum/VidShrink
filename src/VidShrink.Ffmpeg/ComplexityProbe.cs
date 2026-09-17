@@ -83,7 +83,6 @@ public static class ComplexityProbe
             var motionIndex = windows.Length / 2;
             var motionTask = MotionSampleAsync(info, windows, motionIndex, preset, speed, ct);
 
-            var lumaTasks = windows.Select(start => LumaSampleAsync(info.FilePath, start, WindowSeconds, ct)).ToArray();
             var pending = windows
                 .Select(start => SampleWindowAsync(info.FilePath, start, canProbeHalf ? (halfWidth, halfHeight) : null, preset, speed, meter, ct))
                 .ToArray();
@@ -122,7 +121,10 @@ public static class ComplexityProbe
             var halfFpsBppf = MotionBppf(fullBppf, motion, windowSamples, motionIndex);
 
             var (bias, source) = await MeasureWindowBiasAsync(info, speed, ct);
-            var meanLuma = MeanOf(await Task.WhenAll(lumaTasks));
+            var lumas = new double?[windowSamples.Length];
+            for (var i = 0; i < windowSamples.Length; i++)
+                lumas[i] = windowSamples[i].MeanLuma ?? await LumaSampleAsync(info.FilePath, windows[i], WindowSeconds, ct);
+            var meanLuma = MeanOf(lumas);
 
             return new ProbeResult(
                 ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source, halfFpsBppf) with { MeanLuma = meanLuma },
@@ -170,7 +172,7 @@ public static class ComplexityProbe
         return used.Length > 0 ? used.Average() : null;
     }
 
-    private static async Task<double?> LumaSampleAsync(string path, double start, double length, CancellationToken ct)
+    internal static async Task<double?> LumaSampleAsync(string path, double start, double length, CancellationToken ct)
     {
         try
         {
@@ -791,7 +793,7 @@ public static class ComplexityProbe
 
     private static int EvenDown(int value) => value % 2 == 0 ? value : value - 1;
 
-    internal readonly record struct WindowSample(long FullBytes, long FullFrames, long HalfBytes, long HalfFrames, WindowQualityMeasurement? Quality = null);
+    internal readonly record struct WindowSample(long FullBytes, long FullFrames, long HalfBytes, long HalfFrames, WindowQualityMeasurement? Quality = null, double? MeanLuma = null);
 
     internal static async Task<WindowSample> SampleWindowAsync(string path, double start, (int Width, int Height)? half, string preset, SpeedMode speed, IQualityMeasurement? qualityMeasurement, CancellationToken ct)
     {
@@ -873,7 +875,7 @@ public static class ComplexityProbe
                 catch { quality = null; }
             }
 
-            return new WindowSample(fullBytes, frames, halfBytes, frames, quality);
+            return new WindowSample(fullBytes, frames, halfBytes, frames, quality, ParseMeanLuma(stderr));
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -966,7 +968,7 @@ public static class ComplexityProbe
             "-t", WindowSeconds.ToString("0.###", CultureInfo.InvariantCulture),
             "-i", path,
             "-an", "-sn", "-dn",
-            "-filter_complex", $"[0:v]split=2[full][raw];[raw]scale={half.Width}:{half.Height}[small]"
+            "-filter_complex", $"[0:v]split=3[full][raw][lraw];[raw]scale={half.Width}:{half.Height}[small];[lraw]{LumaFilter}[luma]"
         });
 
         foreach (var (label, target) in new[] { ("[full]", fullTarget), ("[small]", halfTarget) })
@@ -976,6 +978,7 @@ public static class ComplexityProbe
             args.AddRange(EncodeTo(preset, target));
         }
 
+        args.AddRange(new[] { "-map", "[luma]", "-f", "null", "-" });
         return args.ToArray();
     }
 
