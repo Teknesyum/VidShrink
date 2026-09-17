@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using VidShrink.App;
@@ -503,6 +504,46 @@ public sealed class KareYerlesimTests
         {
             Strings.Use("en");
         }
+    }
+
+    /// <summary>
+    /// S9 borcu: kalite yongasının balonundaki "tahmini kalite" satırı <c>/100</c>'ü koddan
+    /// yazıyordu. Dil dosyasının kopyasında <c>main.unit.score-value</c> başka bir biçime
+    /// çevrilir; yüklenen pencerenin balon ızgarasında o biçim okunur, <c>/100</c> okunmaz.
+    /// </summary>
+    [Fact]
+    public void KaliteBalonundakiPuanDilDosyasindanGelir()
+    {
+        var kaynak = Path.Combine(AppContext.BaseDirectory, "Locales");
+        var kopya = Path.Combine(GirdiKanit.Root, ".calisma", "s9-puan", "Locales");
+        foreach (var dosya in Directory.GetFiles(kaynak, "*", SearchOption.AllDirectories))
+        {
+            var hedef = Path.Combine(kopya, Path.GetRelativePath(kaynak, dosya));
+            Directory.CreateDirectory(Path.GetDirectoryName(hedef)!);
+            File.Copy(dosya, hedef, overwrite: true);
+        }
+
+        var enAna = Path.Combine(kopya, "en", "main.json");
+        File.WriteAllText(enAna, File.ReadAllText(enAna).Replace("\"main.unit.score-value\": \"{0}/100\"", "\"main.unit.score-value\": \"{0} of 100 pts\""));
+
+        List<string> satirlar;
+        AppHost.Run(() => Strings.UseRoot(kopya));
+        try
+        {
+            satirlar = Yuklu("en", window =>
+            {
+                var cip = Named<Button>(window, "Chip25");
+                var balon = (StackPanel)ToolTip.GetTip(cip)!;
+                return balon.GetLogicalDescendants().OfType<TextBlock>().Select(t => t.Text ?? "").ToList();
+            });
+        }
+        finally
+        {
+            AppHost.Run(() => Strings.UseRoot(null));
+        }
+
+        Assert.True(satirlar.Any(s => s.EndsWith(" of 100 pts", StringComparison.Ordinal)), string.Join(" | ", satirlar));
+        Assert.DoesNotContain(satirlar, s => s.EndsWith("/100", StringComparison.Ordinal));
     }
 
     [Fact]

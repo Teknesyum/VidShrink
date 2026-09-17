@@ -3368,7 +3368,7 @@ public partial class MainWindow : Window
         };
 
         AddQualityRow(grid, Say("main.quality.target"), Say("main.unit.mb-value", Num(target, "0.##")));
-        AddQualityRow(grid, Say("main.quality.predicted"), $"{Num(score, "0.#")}/100");
+        AddQualityRow(grid, Say("main.quality.predicted"), Say("main.unit.score-value", Num(score, "0.#")));
         AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.loss-points", Num(hint.LossPoints, "0.#")));
         AddQualityRow(grid, Say("main.quality.basis"), basis);
         return grid;

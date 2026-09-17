@@ -720,7 +720,7 @@ public sealed class WindowLayoutTests
     /// Tutan sütun değişirse ölçüm kırmızıya düşer ve tabela yenilenir.</para>
     ///
     /// <para>S20: katlanmış bölüm özetleri başlığın altında kendi satırına indi. Dolu sayfada
-    /// sol sütun 866'dan 906'ya çıktı ve orta sütunla (906) eşitlendi; tabela bu yüzden
+    /// sol sütun 830'dan 906'ya çıktı (Türkçe ölçüm) ve orta sütunla (906) eşitlendi; tabela bu yüzden
     /// beklenen sütunun <b>en uzunlardan biri</b> olmasını sınıyor, eşitlikte ikisi de tutuyor.</para>
     /// </summary>
     [Theory]
@@ -1449,7 +1449,7 @@ public sealed class WindowLayoutTests
             return (IReadOnlyList<BoxLabel>)labels;
         });
 
-    private readonly record struct DilTaramasi(IReadOnlyList<string> Kesik, IReadOnlyList<string> Bosluk, int Blok, string Kayit);
+    private readonly record struct DilTaramasi(IReadOnlyList<string> Kesik, IReadOnlyList<string> Bosluk, int Blok, double Toplam, string Kayit);
 
     private static DilTaramasi DilTara(string dil, Size size, bool loaded) =>
         Fresh(window =>
@@ -1458,51 +1458,57 @@ public sealed class WindowLayoutTests
             VidShrink.App.Localization.Strings.Use(dil);
             try
             {
-            if (loaded)
-            {
-                window.LoadWithoutProbing(SamplePath, Sample());
-                window.SettleFades();
-            }
-
-            LayOutAt(window, size);
-            var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
-            var kesik = new List<string>();
-            var bosluk = new List<string>();
-            var kayit = new System.Text.StringBuilder();
-            var blok = 0;
-
-            for (var index = 0; index < tabs.ItemCount; index++)
-            {
-                if (tabs.ContainerFromIndex(index) is not TabItem { IsVisible: true } item) continue;
-                tabs.SelectedIndex = index;
-                RelayoutAt(window, size);
-                WarmTextShaping(window);
-                RelayoutAt(window, size);
-                ClearEntranceTransforms(window);
-                var baslik = MainWindow.TabHeaderText(item);
-
-                if (item.Content is not Control host || !host.IsShown()) throw new InvalidOperationException($"{baslik} sayfasi gorunmuyor");
-                foreach (var block in host.GetVisualDescendants().OfType<TextBlock>()
-                             .Where(b => b.IsShown() && b.Bounds.Width > 0 && !string.IsNullOrWhiteSpace(b.Text) && !b.Text!.Contains('\n')))
+                if (loaded)
                 {
-                    if (block.TextWrapping != TextWrapping.NoWrap && block.TextTrimming == TextTrimming.None) continue;
-                    blok++;
-                    var gereken = NeededWidth(block, block.Text!);
-                    var yer = block.Bounds.Width - block.Padding.Left - block.Padding.Right;
-                    if (gereken - yer > 0.5 && !(block.TextTrimming != TextTrimming.None && ToolTip.GetTip(block) as string == block.Text))
-                        kesik.Add($"{dil} {baslik} · {block.Name ?? block.GetVisualAncestors().OfType<Control>().FirstOrDefault(c => !string.IsNullOrEmpty(c.Name))?.Name} [{block.Text}]: gereken {gereken:0.#}, yer {yer:0.#}");
+                    window.LoadWithoutProbing(SamplePath, Sample());
+                    window.SettleFades();
                 }
 
+                LayOutAt(window, size);
+                var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
                 window.TryFindResource("Panel", out var panelTema);
-                var ilk = host is not ScrollViewer ? double.NaN : host.GetVisualDescendants().OfType<Control>().Where(b => b.IsShown() && b.Bounds.Height > 0 && (b is TextBlock || (b is Border && ReferenceEquals(b.Theme, panelTema))))
-                    .Select(b => b.TranslatePoint(default, window)?.Y).Where(y => y is not null).Select(y => y!.Value).DefaultIfEmpty(double.NaN).Min();
-                var alt = item.TranslatePoint(new Point(0, item.Bounds.Height), window)!.Value.Y;
-                if (double.IsNaN(ilk)) continue;
-                kayit.AppendLine($"{dil} {size.Width:0}x{size.Height:0} {baslik}: serit alti {alt:0.#}, ilk panel {ilk:0.#}, bosluk {ilk - alt:0.#}");
-                bosluk.Add($"{baslik}={ilk - alt:0.#}");
-            }
+                var kesik = new List<string>();
+                var bosluk = new List<string>();
+                var kayit = new System.Text.StringBuilder();
+                var blok = 0;
+                var toplam = 0.0;
 
-            return new DilTaramasi(kesik, bosluk, blok, kayit.ToString());
+                for (var index = 0; index < tabs.ItemCount; index++)
+                {
+                    if (tabs.ContainerFromIndex(index) is not TabItem { IsVisible: true } item) continue;
+                    tabs.SelectedIndex = index;
+                    RelayoutAt(window, size);
+                    WarmTextShaping(window);
+                    RelayoutAt(window, size);
+                    ClearEntranceTransforms(window);
+                    var baslik = MainWindow.TabHeaderText(item);
+
+                    if (item.Content is not Control host || !host.IsShown()) throw new InvalidOperationException($"{baslik} sayfasi gorunmuyor");
+                    foreach (var block in host.GetVisualDescendants().OfType<TextBlock>()
+                                 .Where(b => b.IsShown() && b.Bounds.Width > 0 && !string.IsNullOrWhiteSpace(b.Text) && !b.Text!.Contains('\n')))
+                    {
+                        var gereken = NeededWidth(block, block.Text!);
+                        toplam += gereken;
+                        if (block.TextWrapping != TextWrapping.NoWrap && block.TextTrimming == TextTrimming.None) continue;
+                        blok++;
+                        var yer = block.Bounds.Width - block.Padding.Left - block.Padding.Right;
+                        var balonda = block.TextTrimming != TextTrimming.None && ToolTip.GetTip(block) as string == block.Text;
+                        if (gereken - yer > 0.5 && !balonda)
+                            kesik.Add($"{dil} {baslik} · {block.Name ?? block.GetVisualAncestors().OfType<Control>().FirstOrDefault(c => !string.IsNullOrEmpty(c.Name))?.Name} [{block.Text}]: gereken {gereken:0.#}, yer {yer:0.#}");
+                    }
+
+                    if (host is not ScrollViewer) continue;
+                    var ilk = host.GetVisualDescendants().OfType<Control>()
+                        .Where(b => b.IsShown() && b.Bounds.Height > 0 && (b is TextBlock || (b is Border && ReferenceEquals(b.Theme, panelTema))))
+                        .Select(b => b.TranslatePoint(default, window)?.Y).Where(y => y is not null).Select(y => y!.Value)
+                        .DefaultIfEmpty(double.NaN).Min();
+                    if (double.IsNaN(ilk)) continue;
+                    var alt = item.TranslatePoint(new Point(0, item.Bounds.Height), window)!.Value.Y;
+                    kayit.AppendLine($"{dil} {size.Width:0}x{size.Height:0} {baslik}: serit alti {alt:0.#}, ilk panel {ilk:0.#}, bosluk {ilk - alt:0.#}");
+                    bosluk.Add($"{baslik}={ilk - alt:0.#}");
+                }
+
+                return new DilTaramasi(kesik, bosluk, blok, toplam, kayit.ToString());
             }
             finally
             {
@@ -1511,32 +1517,43 @@ public sealed class WindowLayoutTests
         });
 
     /// <summary>
-    /// S20: dil açıkça seçilerek (Türkçe ve İngilizce) tasarım ve taban boyunda her görünür
-    /// sekmenin kendi sayfası dolaşılır. Tek satırlık her metin doğal genişliğiyle kendi
-    /// yeri karşılaştırılır; sığmayıp kesilen metin kırmızıdır. T194 kararı gereği üçnoktayla
-    /// kısalıp tam halini balonda taşıyan metin kesik sayılmaz. İlk tarama katlanmış bölüm
-    /// özetlerini buldu (dar pencerede 10 px'e inen "Automatic · Fill Target"); özetler başlığın
-    /// altındaki satıra indi. Sekme şeridinin altından sayfanın ilk paneline ya da metnine
-    /// kadar olan boşluk kaydırılan her sayfada tek değerdir; tam ekran oynatıcı ölçülmez.
+    /// S20: dil açıkça seçilerek (Türkçe, İngilizce ve ölçülen en uzun dil) tasarım ve taban
+    /// boyunda, boş ve dolu sayfayla her görünür sekmenin kendi sayfası dolaşılır. Tek satırlık
+    /// her metin doğal genişliğiyle kendi yeri karşılaştırılır; sığmayıp kesilen metin
+    /// kırmızıdır. T194 kararı gereği üçnoktayla kısalıp tam halini balonda taşıyan metin
+    /// kesik sayılmaz. İlk tarama katlanmış bölüm özetlerini buldu (dar pencerede 10 px'e inen
+    /// "Automatic · Fill Target"); özetler başlığın altındaki satıra indi. Sekme şeridinin
+    /// altından sayfanın ilk paneline ya da metnine kadar olan boşluk kaydırılan her sayfada
+    /// tek değerdir; tam ekran oynatıcı ölçülmez. En uzun dil ölçüldü: dolu tasarım sayfasında bütün
+    /// metinlerin doğal genişlik toplamı de 40309, ar 37019, tr 33344, en 32978 piksel; de taraması
+    /// dar pencerede balonsuz kısalan dosya adını buldu, <c>TxtFileName</c> tam adı balonda taşıyor.
     /// Döküm <c>.calisma/s20/</c>.
     /// </summary>
     [Theory]
-    [InlineData("tr", false)]
-    [InlineData("tr", true)]
-    [InlineData("en", false)]
-    [InlineData("en", true)]
-    public void S20DildeKesikMetinYokSekmePanelBoslukTek(string dil, bool narrow)
+    [MemberData(nameof(S20Kollari))]
+    public void S20DildeKesikMetinYokSekmePanelBoslukTek(string dil, bool narrow, bool loaded)
     {
         var size = narrow ? MinimumSize() : DesignSize();
-        var tarama = DilTara(dil, size, loaded: true);
+        var tarama = DilTara(dil, size, loaded);
         var klasor = Path.Combine(TipSources.Root, ".calisma", "s20");
         Directory.CreateDirectory(klasor);
-        File.WriteAllText(Path.Combine(klasor, $"{dil}-{(narrow ? "dar" : "tasarim")}.txt"),
-            tarama.Kayit + string.Join(Environment.NewLine, tarama.Kesik) + Environment.NewLine + $"blok {tarama.Blok}");
+        File.WriteAllText(Path.Combine(klasor, $"{dil}-{(narrow ? "dar" : "tasarim")}-{(loaded ? "dolu" : "bos")}.txt"),
+            tarama.Kayit + string.Join(Environment.NewLine, tarama.Kesik) + Environment.NewLine + $"blok {tarama.Blok}" + Environment.NewLine + $"toplam {tarama.Toplam:0}");
         _output.WriteLine(tarama.Kayit);
         _output.WriteLine(string.Join(Environment.NewLine, tarama.Kesik));
 
         Assert.True(tarama.Blok > 50, $"yalniz {tarama.Blok} blok olculdu");
         Assert.True(tarama.Kesik.Count == 0, string.Join(Environment.NewLine, tarama.Kesik));
         Assert.Single(tarama.Bosluk.Select(b => b.Split('=')[1]).Distinct());
-    }}
+    }
+
+    public static TheoryData<string, bool, bool> S20Kollari()
+    {
+        var kollar = new TheoryData<string, bool, bool>();
+        foreach (var dil in new[] { "tr", "en", "de" })
+            foreach (var narrow in new[] { false, true })
+                foreach (var loaded in new[] { true, false })
+                    kollar.Add(dil, narrow, loaded);
+        return kollar;
+    }
+}

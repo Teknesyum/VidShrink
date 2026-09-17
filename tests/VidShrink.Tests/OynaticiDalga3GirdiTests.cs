@@ -93,6 +93,34 @@ public sealed class OynaticiDalga3GirdiTests
     private static PopupRoot? AcikMenu(IReadOnlyCollection<PopupRoot> onceki, string baslik)
         => Acilirlar().FirstOrDefault(k => !onceki.Contains(k) && k.GetVisualDescendants().OfType<MenuItem>().Any(m => Equals(m.Header, baslik)));
 
+    private static PopupRoot Inis(PlayerView view, Window window, List<PopupRoot> bilinen, StringBuilder body, string baslik, Key ac)
+    {
+        PopupRoot? kok = null;
+        DenetimSurucu.Pump(view, () => (kok = AcikMenu(bilinen, baslik)) is not null, 5);
+        Assert.True(kok is not null, baslik + " satiri tasiyan menu acilmadi" + Environment.NewLine + body);
+        DenetimSurucu.Wait(view, 0.2);
+        var satir = kok!.GetVisualDescendants().OfType<MenuItem>().First(m => Equals(m.Header, baslik));
+        var tur = 0;
+        for (; tur < 80 && !satir.IsSelected; tur++)
+        {
+            Tus(kok, Key.Down);
+            DenetimSurucu.Wait(view, 0.02);
+        }
+
+        body.AppendLine($"'{baslik}': asagi ok {tur}, secili {satir.IsSelected}, tus {ac}");
+        Assert.True(satir.IsSelected, baslik + " okla secilemedi" + Environment.NewLine + body);
+        bilinen.Add(kok);
+        var klavye = typeof(KeyboardDevice).GetProperty("Instance", Her)!.GetValue(null)!;
+        foreach (var olay in new[] { RawKeyEventType.KeyDown, RawKeyEventType.KeyUp })
+        {
+            TopLevel hedef = typeof(TopLevel).GetProperty("PlatformImpl", Her)!.GetValue(kok) is null ? window : kok;
+            Ham(hedef, (RawInputEventArgs)Yeni(typeof(RawKeyEventArgs), klavye, (ulong)Environment.TickCount64, Kok(hedef), olay, ac, RawInputModifiers.None, PhysicalKey.None, null, KeyDeviceType.Keyboard));
+        }
+
+        DenetimSurucu.Wait(view, 0.2);
+        return kok;
+    }
+
     private static string Kanit(string ad, string body)
     {
         var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "girdi-dalga3");
@@ -249,41 +277,15 @@ public sealed class OynaticiDalga3GirdiTests
                 Fareyle(window, RawPointerEventType.RightButtonUp, yuzey, RawInputModifiers.None);
 
                 var bilinen = new List<PopupRoot>(onceki);
-                PopupRoot Inis(string baslik, Key ac)
-                {
-                    PopupRoot? kok = null;
-                    DenetimSurucu.Pump(view, () => (kok = AcikMenu(bilinen, baslik)) is not null, 5);
-                    Assert.True(kok is not null, baslik + " satiri tasiyan menu acilmadi" + Environment.NewLine + body);
-                    DenetimSurucu.Wait(view, 0.2);
-                    var satir = kok!.GetVisualDescendants().OfType<MenuItem>().First(m => Equals(m.Header, baslik));
-                    var tur = 0;
-                    for (; tur < 80 && !satir.IsSelected; tur++)
-                    {
-                        Tus(kok, Key.Down);
-                        DenetimSurucu.Wait(view, 0.02);
-                    }
-                    body.AppendLine($"'{baslik}': asagi ok {tur}, secili {satir.IsSelected}, tus {ac}");
-                    Assert.True(satir.IsSelected, baslik + " okla secilemedi" + Environment.NewLine + body);
-                    bilinen.Add(kok);
-                    var klavye = typeof(KeyboardDevice).GetProperty("Instance", Her)!.GetValue(null)!;
-                    foreach (var olay in new[] { RawKeyEventType.KeyDown, RawKeyEventType.KeyUp })
-                    {
-                        TopLevel hedef = typeof(TopLevel).GetProperty("PlatformImpl", Her)!.GetValue(kok) is null ? window : kok;
-                        Ham(hedef, (RawInputEventArgs)Yeni(typeof(RawKeyEventArgs), klavye, (ulong)Environment.TickCount64, Kok(hedef), olay, ac, RawInputModifiers.None, PhysicalKey.None, null, KeyDeviceType.Keyboard));
-                    }
-                    DenetimSurucu.Wait(view, 0.2);
-                    return kok;
-                }
-
-                Inis(Strings.Get("main.player.menu.settings"), Key.Right);
-                var ayarMenusu = Inis(Strings.Get("player.advanced.menu"), Key.Right);
+                Inis(view, window, bilinen, body, Strings.Get("main.player.menu.settings"), Key.Right);
+                var ayarMenusu = Inis(view, window, bilinen, body, Strings.Get("player.advanced.menu"), Key.Right);
                 var basliklar = ayarMenusu.GetVisualDescendants().OfType<MenuItem>().Select(m => m.Header as string).ToList();
                 body.AppendLine("ayarlar alt menusu: " + string.Join(" | ", basliklar));
                 Assert.Contains(Strings.Get("settings.player-shortcuts.title"), basliklar);
                 Assert.DoesNotContain(ayarMenusu.GetVisualDescendants().OfType<MenuItem>(), m => ReferenceEquals(m.Tag, Keymap.Settings));
 
-                Inis(Strings.Get("player.advanced.picture"), Key.Right);
-                Inis(Strings.Get("player.advanced.deinterlace"), Key.Enter);
+                Inis(view, window, bilinen, body, Strings.Get("player.advanced.picture"), Key.Right);
+                Inis(view, window, bilinen, body, Strings.Get("player.advanced.deinterlace"), Key.Enter);
                 DenetimSurucu.Pump(view, () => view.Advanced.Picture.Deinterlace, 3);
                 DenetimSurucu.Wait(view, 0.3);
 
@@ -301,6 +303,94 @@ public sealed class OynaticiDalga3GirdiTests
         finally
         {
             Kanit("p3-ham-menu-ayar.txt", body.ToString());
+        }
+    }
+
+    /// <summary>
+    /// P3: Kısayollar alt menüsü tabloyu göstermekle kalmaz, satırı da çalıştırır. Ham sağ tık
+    /// menüyü açar, oklar Ayarlar › Kısayollar'a iner, Yavaşlat satırına ham fare tıklaması
+    /// gider; hız libmpv'nin speed özelliğinden okunur, 1'den 0,9'a düşer.
+    /// </summary>
+    [Fact]
+    public void P3KisayollarSatirinaHamTikEylemiOynaticidaUygular()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        var body = new StringBuilder();
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var view = DenetimSurucu.Ac(clip, out var window);
+                window.Show();
+                DenetimSurucu.Wait(view, 0.3);
+                DenetimSurucu.Duraklat(view);
+                var motor = DenetimSurucu.Motor(view);
+                var onceHiz = MotorKanit.ReadDouble(motor, "speed");
+                body.AppendLine($"once: speed {onceHiz}, gorunum {view.SpeedFactor}");
+
+                var onceki = Acilirlar();
+                var yuzey = Merkez(window, view);
+                Fareyle(window, RawPointerEventType.Move, yuzey, RawInputModifiers.None);
+                Fareyle(window, RawPointerEventType.RightButtonDown, yuzey, RawInputModifiers.RightMouseButton);
+                Fareyle(window, RawPointerEventType.RightButtonUp, yuzey, RawInputModifiers.None);
+
+                var bilinen = new List<PopupRoot>(onceki);
+                Inis(view, window, bilinen, body, Strings.Get("main.player.menu.settings"), Key.Right);
+                Inis(view, window, bilinen, body, Strings.Get("settings.player-shortcuts.title"), Key.Right);
+
+                var hedef = Keymap.Rows.First(r => ReferenceEquals(r.Action, Keymap.Slower) && r.Input.Kind == PlayerInputKind.Key);
+                var baslik = Keymap.Label(hedef);
+                PopupRoot? kisayollar = null;
+                DenetimSurucu.Pump(view, () => (kisayollar = AcikMenu(bilinen, baslik)) is not null, 5);
+                Assert.True(kisayollar is not null, "kisayollar alt menusu acilmadi" + Environment.NewLine + body);
+                DenetimSurucu.Wait(view, 0.2);
+
+                var satirlar = kisayollar!.GetVisualDescendants().OfType<MenuItem>().ToList();
+                body.AppendLine($"kisayol satiri {satirlar.Count}, tablo {Keymap.Rows.Count(r => !ReferenceEquals(r.Action, Keymap.Settings))}");
+                var satir = satirlar.First(m => Equals(m.Header, baslik));
+                var tur = 0;
+                for (; tur < 90 && !satir.IsSelected; tur++)
+                {
+                    Tus(kisayollar, Key.Down);
+                    DenetimSurucu.Wait(view, 0.02);
+                }
+
+                bool Isabet(Point p) => kisayollar.InputHitTest(p) is Visual v && (ReferenceEquals(v, satir) || v.GetVisualAncestors().Contains(satir));
+                DenetimSurucu.Pump(view, () => Isabet(Merkez(kisayollar, satir)), 3);
+                var nokta = Merkez(kisayollar, satir);
+                body.AppendLine($"'{baslik}': asagi ok {tur}, secili {satir.IsSelected}, nokta {nokta}, isabet {Isabet(nokta)}, menu {kisayollar.Bounds.Size}");
+                Assert.True(satir.IsSelected, baslik + " satiri secilemedi" + Environment.NewLine + body);
+                satir.AddHandler(InputElement.PointerPressedEvent, (_, _) => body.AppendLine("satir basildi"), Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
+                satir.AddHandler(InputElement.PointerReleasedEvent, (_, _) => body.AppendLine("satir birakildi"), Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
+                Fareyle(kisayollar, RawPointerEventType.Move, nokta, RawInputModifiers.None);
+                DenetimSurucu.Wait(view, 0.05);
+                DenetimSurucu.Pump(view, () => Isabet(Merkez(kisayollar, satir)), 3);
+                nokta = Merkez(kisayollar, satir);
+                body.AppendLine($"tiklama noktasi {nokta}, isabet {Isabet(nokta)}");
+                Assert.True(Isabet(nokta), baslik + " satiri noktada degil" + Environment.NewLine + body);
+                Fareyle(kisayollar, RawPointerEventType.LeftButtonDown, nokta, RawInputModifiers.LeftMouseButton);
+                DenetimSurucu.Wait(view, 0.05);
+                Fareyle(kisayollar, RawPointerEventType.LeftButtonUp, nokta, RawInputModifiers.None);
+                DenetimSurucu.Pump(view, () => view.SpeedFactor < 1, 3);
+                DenetimSurucu.Wait(view, 0.3);
+
+                var sonraHiz = MotorKanit.ReadDouble(motor, "speed");
+                body.AppendLine($"sonra: speed {sonraHiz}, gorunum {view.SpeedFactor}, menu kapandi {!Acilirlar().Contains(kisayollar)}");
+                body.AppendLine("iz: " + string.Join(" | ", view.Trace));
+
+                Assert.InRange(onceHiz, 0.995, 1.005);
+                Assert.InRange(sonraHiz, 0.895, 0.905);
+                Assert.InRange(view.SpeedFactor, 0.895, 0.905);
+                Assert.Contains("satir basildi", body.ToString());
+
+                view.Close();
+                window.Close();
+                return 0;
+            });
+        }
+        finally
+        {
+            Kanit("p3-kisayol-ham-tik.txt", body.ToString());
         }
     }
 

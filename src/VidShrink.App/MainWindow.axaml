@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
@@ -227,7 +227,7 @@
                     </Panel>
 
                     <Grid x:Name="SourceCard" IsVisible="False" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock x:Name="TxtFileName" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                      <TextBlock x:Name="TxtFileName" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding $self.Text}"/>
                       <Button Grid.Column="1" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
                     </Grid>
 
