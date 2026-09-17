@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci', 'tavanbekci', 'svtbant')][string]$Is,
+    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci', 'tavanbekci', 'svtbant', 'yavg')][string]$Is,
     [Parameter(Mandatory)][string]$Cikti,
     [Parameter(Mandatory)][string]$Bench,
     [string]$Kesit = '',
@@ -1224,7 +1224,61 @@ function SvtBekci {
     }
 }
 
+function LumaPencereleri([double]$Sure) {
+    if ($Sure -le 3) { return @(0.0) }
+    $kullanilir = [math]::Max(0.0, $Sure - 2)
+    $adet = if ($Sure -lt 12) { 2 } else { 3 }
+    @(for ($i = 0; $i -lt $adet; $i++) { $kullanilir * ($i + 0.5) / $adet })
+}
+
+function LumaOku([string]$Girdi, [double]$Bas, [double]$Uzunluk) {
+    $sw = [Diagnostics.Stopwatch]::StartNew()
+    $a = @('-hide_banner', '-nostdin', '-ss', $Bas.ToString('0.###', $Inv), '-t', $Uzunluk.ToString('0.###', $Inv), '-i', $Girdi, '-an', '-sn', '-dn', '-vf', 'fps=4,scale=160:-2,format=yuv420p,signalstats,metadata=print:key=lavfi.signalstats.YAVG', '-f', 'null', $NullCikis)
+    $m = & ffmpeg @a 2>&1 | Out-String
+    $sw.Stop()
+    if ($LASTEXITCODE -ne 0) { throw "signalstats basarisiz: $Girdi" }
+    $d = @([regex]::Matches($m, 'lavfi\.signalstats\.YAVG=([\d.]+)') | ForEach-Object { [double]::Parse($_.Groups[1].Value, $Inv) })
+    [pscustomobject]@{ Kare = $d.Count; Ort = if ($d.Count) { [math]::Round(($d | Measure-Object -Average).Average, 2) } else { $null }; Ms = $sw.ElapsedMilliseconds; Komut = ($a -join ' ') }
+}
+
+function Yavg {
+    $secim = $null
+    $kj = Join-Path $Cikti 'kesitler.json'
+    if (Test-Path $kj) { $secim = (Get-Content $kj -Raw | ConvertFrom-Json).Secim }
+    foreach ($k in @('siyah', 'beyaz')) {
+        Dene $k 'olcer-sentetik' $null {
+            $renk = if ($k -eq 'siyah') { 'black' } else { 'white' }
+            $c = Join-Path $Cikti "yavg-$k.mkv"
+            Ff @('-f', 'lavfi', '-i', "color=c=${renk}:s=1920x1080:r=24:d=4", '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', $c)
+            $p = LumaOku $c 1 2
+            Ekle ([ordered]@{ is = $Is; kesit = $k; kol = 'olcer-sentetik' }) $null ([ordered]@{ yavg_pencere_ort = $p.Ort; kare = $p.Kare })
+            Remove-Item $c
+        }
+    }
+    foreach ($k in @($Kesitler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
+        Dene $k 'yavg' $null {
+            $girdi = Join-Path $Cikti "kesit-$k.mkv"
+            $b = Probe $girdi
+            $pencereler = @(LumaPencereleri $b.Sure)
+            $okumalar = @($pencereler | ForEach-Object { LumaOku $girdi $_ 2 })
+            $tam = LumaOku $girdi 0 $b.Sure
+            $ek = [ordered]@{
+                sure = $b.Sure; geometri = "$($b.W)x$($b.H)"
+                pencere_baslari = (($pencereler | ForEach-Object { $_.ToString('0.###', $Inv) }) -join ',')
+                pencere_yavg = (($okumalar | ForEach-Object { $_.Ort }) -join ',')
+                yavg_pencere_ort = [math]::Round(($okumalar | Measure-Object -Property Ort -Average).Average, 2)
+                yavg_tam_kesit = $tam.Ort
+                kesit_secimi_yavg = if ($secim -and $secim.$k -and $secim.$k.PSObject.Properties['YavgOrt']) { $secim.$k.YavgOrt } else { $null }
+                pencere_ms = (($okumalar | ForEach-Object { $_.Ms }) -join ',')
+                komut = $okumalar[0].Komut
+            }
+            Ekle ([ordered]@{ is = $Is; kesit = $k; kol = 'yavg' }) $null $ek
+        }
+    }
+}
+
 switch ($Is) {
+    'yavg' { Yavg }
     'svtbekci' { SvtBekci }
     'tavanbekci' { TavanBekci }
     'svtbant' { SvtBant }
