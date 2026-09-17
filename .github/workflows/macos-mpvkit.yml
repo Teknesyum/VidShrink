@@ -76,14 +76,14 @@ jobs:
         if: matrix.os == 'macos-15'
         run: |
           set -uo pipefail
+          rc=0
           MPVKIT_MINOS_LIMIT=12.0 bash tools/mpvkit-macos/mpvkit-macos.sh tools/mpvkit-macos/mpvkit-1.0.0.lock "$RUNNER_TEMP/mpvkit" out-neg > out/neg-minos.txt 2>&1
           grep -E 'inputs-criteria|output-minos-max|verdict' out/neg-minos.txt
           grep -q 'verdict fail=1' out/neg-minos.txt || { echo "NEG minos limit 12.0 did not fail"; exit 1; }
           echo "not a dylib" > out/bogus.dylib
           VIDSHRINK_LIBMPV="$GITHUB_WORKSPACE/out/bogus.dylib" dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --no-build \
-            --filter "FullyQualifiedName~OynaticiMotorTests.BassizOrtamdaKareCozulur" > out/neg-test.txt 2>&1
-          rc=$?
-          grep -E 'Test Run|Passed:|Failed:' out/neg-test.txt
+            --filter "FullyQualifiedName~OynaticiMotorTests.BassizOrtamdaKareCozulur" > out/neg-test.txt 2>&1 || rc=$?
+          grep -E 'Test Run|Passed:|Failed:|libmpv' out/neg-test.txt | head -n 8 || true
           echo "neg-test rc=$rc"
           [ "$rc" -ne 0 ] || { echo "NEG bogus libmpv did not fail"; exit 1; }
 

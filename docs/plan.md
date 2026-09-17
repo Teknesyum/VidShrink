@@ -1,3 +1,12 @@
+# macOS 13-14 — MPVKit Denemesi
+
+Dal `t0/macos-mpvkit`. Karar: fable 2026-09-17 soru 5. Kod (`src/`) değişmez.
+
+1. **Pin.** `tools/mpvkit-macos/mpvkit-1.0.0.lock`: MPVKit 1.0.0 LGPL ürününün 29 zip'i, sha256.
+2. **Ölçüm ve bağlama.** `mpvkit-macos.sh`: minos/lipo tablosu, evrensel `libmpv.2.dylib` bağlama.
+3. **CI.** `macos-mpvkit.yml`: macos-15, macos-14, macos-15-intel; duman + `OynaticiMotorTests` iki test; negatif kontroller.
+4. **Belge.** `docs/olcumler/libmpv-macos-gomme.md` yeni bölüm. Kurucu/release bağlantısı ayrı karar (deps sürümü gerekir).
+
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.

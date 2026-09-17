@@ -177,3 +177,46 @@ dropping them.
   VidShrink.App itself does not load libmpv yet, and no `.app` bundle
   (`Contents/Frameworks`) layout was tested; `@loader_path` holds in either layout as long
   as the dylibs stay together.
+
+## MPVKit 1.0.0 Trial (2026-09-17)
+
+Decision: fable 2026-09-17, question 5. Workflow `.github/workflows/macos-mpvkit.yml`, script
+`tools/mpvkit-macos/mpvkit-macos.sh`, pinned inputs `tools/mpvkit-macos/mpvkit-1.0.0.lock`
+(29 zips, sha256 = the SwiftPM checksums in MPVKit 1.0.0 `Package.swift`, product `MPVKit`,
+not `MPVKit-GPL`). Run 35249035289 (macos-15, macos-14, macos-15-intel).
+
+**What MPVKit ships.** Static archives only (`ar archive` inside every framework, fat
+`x86_64 arm64`), no dylibs. A loadable `libmpv.2.dylib` therefore needs one link step on a
+macOS runner: `clang -dynamiclib -arch arm64 -arch x86_64 -mmacosx-version-min=13.0`,
+`-force_load` Libmpv, the other 28 archives, system frameworks, `/usr/lib/swift` runtime,
+exports `_mpv_*`. Nothing is compiled from source.
+
+| Input (29) | Kind | Archs | minos arm64 | minos x86_64 |
+|---|---|---|---|---|
+| Libmpv, Libavcodec/device/filter/format/util, Libswresample, Libswscale, Libuavs3d, MoltenVK | ar | x86_64 arm64 | 12.0 | 12.0 |
+| Libdovi | ar | x86_64 arm64 | 11.0 | 10.12 |
+| other 18 (openssl, gnutls set, libass set, libplacebo, shaderc, lcms2, dav1d, bluray, uchardet, luajit) | ar | x86_64 arm64 | 11.0 | 11.0 |
+
+Every archive member carries a build-version load command (0 without, both archs).
+
+| Runner | Output dylib | minos | Non-system refs | Smoke | Engine tests |
+|---|---|---|---|---|---|
+| macos-15 (15.7.9, arm64) | universal, 76,174,240 B | 13.0 / 13.0 | 0 | PASS, 3 frames, 230400/230400 px | 2/2 |
+| macos-14 (14.8.9, arm64) | universal, 76,192,752 B | 13.0 / 13.0 | 0 | PASS | 2/2 |
+| macos-15-intel (15.7.9, x86_64) | universal, 76,174,240 B | 13.0 / 13.0 | 0 | PASS | 2/2 |
+
+Engine tests: `OynaticiMotorTests.BassizOrtamdaKareCozulur` (320x180, 8163 colours, loaded
+from `out/libmpv.2.dylib` via `VIDSHRINK_LIBMPV`) and `BozukDosyaAcilistaHataVerir`. dyld
+loaded 0 images from Homebrew. mpv v0.41.0, ffmpeg n8.1.2, client API 2.5.
+
+Negative controls (macos-15): the same inputs with limit `12.0` give `verdict fail=1`
+(output minos 13.0); `VIDSHRINK_LIBMPV` pointing at a text file turns the headless test red.
+
+**License.** mpv configured `-Dgpl=false` (LGPL-2.1-or-later); FFmpeg from the non-GPL
+assets. Dependencies: OpenSSL Apache-2.0, gnutls/nettle/gmp LGPL, rest permissive. All
+compatible with AGPL-3.0; distribution still owes license texts and source offer.
+
+**Not measured.** No macOS 13 runner exists any more, so 13.0 is the load-command floor,
+not a run. Link output is not byte-reproducible (two macos-15 runs: `4b2f896d…`,
+`9b5f011e…`), so a release must ship one pinned build, not relink per release. Size is
+one 76 MB file uncompressed. Signing and notarization were not tried.
