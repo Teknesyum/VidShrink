@@ -194,7 +194,8 @@ public sealed class CliTests
     [InlineData("error.missing-value", "plan", "a.mp4", "--hedef")]
     [InlineData("error.no-input", "plan", "--hedef", "25")]
     [InlineData("error.extra-input", "plan", "a.mp4", "b.mp4", "--hedef", "25")]
-    [InlineData("error.unknown-command", "izle", "a.mp4")]
+    [InlineData("error.unknown-command", "sil", "a.mp4")]
+    [InlineData("error.watch-no-output", "izle", "a.mp4")]
     public void YanlisKullanimAdiylaReddediliyor(string key, params string[] args)
     {
         var parsed = CliParser.Parse(args);
@@ -251,7 +252,7 @@ public sealed class CliTests
         Assert.Equal(0, exit);
         Assert.Equal(language, text.Language);
         Assert.Contains(marker, stdout.ToString(), StringComparison.Ordinal);
-        Assert.DoesNotContain("izle", stdout.ToString(), StringComparison.Ordinal);
+        Assert.Contains("izle", stdout.ToString(), StringComparison.Ordinal);
         foreach (var code in new[] { "0 ", "1 ", "2 ", "3 ", "64 ", "130 " })
             Assert.Contains(code, stdout.ToString(), StringComparison.Ordinal);
     }

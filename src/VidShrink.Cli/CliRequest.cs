@@ -3,7 +3,7 @@ using VidShrink.Core;
 
 namespace VidShrink.Cli;
 
-public enum CliCommand { Help, Version, Shrink, Plan }
+public enum CliCommand { Help, Version, Shrink, Plan, Watch }
 
 public enum CliCodec { Auto, H264, Hevc, Av1 }
 
@@ -25,6 +25,9 @@ public sealed record CliRequest
     public double? Quality { get; init; }
     public CliCodec Codec { get; init; } = CliCodec.Auto;
     public string? Output { get; init; }
+    public string? OutputDirectory { get; init; }
+    public double? PollSeconds { get; init; }
+    public bool Once { get; init; }
     public bool Json { get; init; }
     public bool SkipMeasurement { get; init; }
     public bool MeasureVmaf { get; init; }
@@ -79,6 +82,7 @@ public static class CliParser
         {
             "kucult" or "shrink" => CliCommand.Shrink,
             "plan" => CliCommand.Plan,
+            "izle" or "watch" => CliCommand.Watch,
             _ => (CliCommand?)null
         };
         if (command is null) return Fail("error.unknown-command", head);
@@ -111,6 +115,14 @@ public static class CliParser
                     if (!TryValue(args, ref i, out var output)) return Fail("error.missing-value", arg);
                     request = request with { Output = output };
                     break;
+                case "--aralik" or "--interval" when command == CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var interval)) return Fail("error.missing-value", arg);
+                    if (!TryParseNumber(interval, out var seconds) || seconds <= 0 || seconds > 86400) return Fail("error.bad-interval", interval);
+                    request = request with { PollSeconds = seconds };
+                    break;
+                case "--bir-kez" or "--once" when command == CliCommand.Watch:
+                    request = request with { Once = true };
+                    break;
                 case "--json":
                     request = request with { Json = true };
                     break;
@@ -131,7 +143,8 @@ public static class CliParser
             }
         }
 
-        if (request.Input is null) return Fail("error.no-input", null);
+        if (request.Input is null) return Fail(command == CliCommand.Watch ? "error.watch-no-folder" : "error.no-input", null);
+        if (command == CliCommand.Watch && request.Output is null) return Fail("error.watch-no-output", null);
         if (request.TargetMb is null == request.Quality is null) return Fail("error.target-or-quality", null);
         return Success(request);
     }
