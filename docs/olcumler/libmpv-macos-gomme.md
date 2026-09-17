@@ -212,6 +212,17 @@ loaded 0 images from Homebrew. mpv v0.41.0, ffmpeg n8.1.2, client API 2.5.
 Negative controls (macos-15): the same inputs with limit `12.0` give `verdict fail=1`
 (output minos 13.0); `VIDSHRINK_LIBMPV` pointing at a text file turns the headless test red.
 
+**Installer branch.** Run 35254386124, job `installer` on macos-14, macos-15 and
+macos-15-intel: `install-vidshrink.sh` downloads the pinned dylib from
+`deps-libmpv-macos-mpvkit-1.0.0` into the bundle's
+`Contents/MacOS/tools/libmpv/libmpv.2.dylib`, sha256 `4b2f896d…` matching the script's pin,
+`lipo` `x86_64 arm64`, and the headless frame test passes with that exact file. Negative
+control with the pin zeroed: `neg rc=1 tmp-dylibs-before=0 after=0 installed-dylibs=0`,
+message `libmpv sağlaması tutmuyor. … Dosya silindi.` followed by the `brew install mpv`
+fallback. One macos-15 attempt failed before that on an anonymous
+`api.github.com/releases/latest` 403 (runner rate limit, not the libmpv branch) and passed
+on rerun.
+
 **License.** mpv configured `-Dgpl=false` (LGPL-2.1-or-later); FFmpeg from the non-GPL
 assets. Dependencies: OpenSSL Apache-2.0, gnutls/nettle/gmp LGPL, rest permissive. All
 compatible with AGPL-3.0; distribution still owes license texts and source offer.
