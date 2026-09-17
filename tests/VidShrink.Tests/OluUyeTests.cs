@@ -585,6 +585,11 @@ public sealed class OluUyeTests
     /// ad + bicim tasir, gerekce tasimaz — gerekce zorunlulugu <see cref="OzellikBorclari"/>
     /// satirlarinda, yani A1'in actigi yuzeyde. Yeni bir olu ozellik acilirsa ya da var olan
     /// birine uretimde okuyucu gelirse burasi kirmizi olur.
+    ///
+    /// Olcunun bilinen kor noktasi: tarama ad esliyor, tur esliyemiyor. Bir baska turun ayni
+    /// adli uyesi uretimde okununca olu uye canli gorunuyor — RecordProgress.Captured bu yuzden
+    /// listeden dustu, uretimde okunan Pointer.Captured'di. Satiri silmeden once okuyanin
+    /// gercekten o tur oldugunu dogrula.
     /// </summary>
     private static readonly string[] PinnedOzellik =
     {
@@ -639,6 +644,8 @@ public sealed class OluUyeTests
         "HashCache.Hits  yalniz-disarida",
         "HashCache.Misses  yalniz-disarida",
         "IdetCounts.Progressive  hic-gorunmeyen",
+        "InstallProgress.Bar  yalniz-disarida",
+        "InstallProgress.Sentence  yalniz-disarida",
         "IdetCounts.Undetermined  hic-gorunmeyen",
         "KeyframeIndex.AverageGapSeconds  hic-gorunmeyen",
         "KeyframeIndex.BuildTime  hic-gorunmeyen",
@@ -690,7 +697,6 @@ public sealed class OluUyeTests
         "QualityScore.Xpsnr  yalniz-disarida",
         "QualityTargetResult.Evaluations  yalniz-disarida",
         "QualityTargetResult.QualityError  yalniz-disarida",
-        "RecordProgress.Captured  hic-gorunmeyen",
         "RecordResult.DroppedAnOption  yalniz-disarida",
         "RecordResult.WasSplit  hic-gorunmeyen",
         "RecorderMachine.CpuCores  hic-gorunmeyen",
@@ -760,6 +766,10 @@ public sealed class OluUyeTests
             "Idet sayacinin progressive kolonu: karar kurali yalniz Tff, Bff ve Total okuyor, bu kolon ayristiriliyor ama hicbir kol uzerine dallanmiyor. Olcum gunlugu yaziyor, enterpolasyonlu dizgi icinde oldugu icin tarama gormuyor."),
         new("IdetCounts.Undetermined", "hic-gorunmeyen", Debt,
             "Ayni bulgu: belirsiz kare sayisi ayristiriliyor, karar kuralinda yeri yok. Esigin belirsiz kareye de bakmasi gerekip gerekmedigi henuz olculmedi; olcum gunlugunde yalniz kanit olarak yaziliyor."),
+        new("InstallProgress.Bar", "yalniz-disarida", Debt,
+            "Panel kalkinca olu kaldi: uretim cubugu Advance()'in donusunden ciziyor, bu ozellik ayni hesabin kalici hali. Tavanin gecilmedigini ve bitiste sicrama olmadigini KurulumIlerlemesiTests buradan okuyor; baglayan yuzey guncelleme duyurusunda Advance uzerinden."),
+        new("InstallProgress.Sentence", "yalniz-disarida", Debt,
+            "Ayni kok: acilis paneli tek cumleyi ekranda gosteriyordu, panel silindi. Guncelleme duyurusu artik History'yi satir satir yaziyor, tek cumleyi okumuyor; son adimin cumlesinin dogru kuruldugunu KurulumIlerlemesiTests okuyor."),
         new("WatchEntry.ProcessedUtc", "yalniz-disarida", Debt,
             "A3: izle durumunun zaman damgasi. Uretim yaziyor, okuyan kod yok cunku teslim yolu JSON: WatchFolder.Serialize alani .vidshrink-izle.json'a koyuyor, kullanici ve destek oradan okuyor. Tarama serilestirmeyi gormuyor; degerin gercekten yazildigini WatchFolderTests okuyor."),
         new("WatchFileStamp.LastWriteUtc", "yalniz-disarida", Debt,
