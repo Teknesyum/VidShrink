@@ -457,8 +457,6 @@ public sealed class OluUyeTests
             "Pencere sapmasinin 'kaynak yok' hali. ComplexityProfile.cs:128-132 Scan ve Packets'i adlandirip '_ => MeasuredBand' diyor; None olculmemis bandin ta kendisi, ayri bir kol ayni degeri verirdi."),
         new("FfmpegArguments.SceneMapRuleOfRecord", "yalniz-disarida", Debt,
             "Uretimde sifir gorunum, testlerde ve araclarda bes. Bu sinifin en saf hali: alani ayakta tutan tek taraf olcum tarafi. Dusurmek olcum duzenegini kirar, karar ayri sozlesme."),
-        new("Intent.SocialMedia", "varsayilan-kol", Debt,
-            "T177'ye kadar hicbir yerde gorunmuyordu. T177 yonga seridine niyeti tasidi: MainWindow.axaml.cs ChipPlans() icinde 8 MB yongasinin niyeti bu uye, yani uye artik uretimde uretiliyor. Tuketen kol hala yok — okuma tarafi niyeti adiyla ayirmiyor — o yuzden bicim hic-gorunmeyen'den varsayilan-kol'a dondu ve borc olarak duruyor."),
         new("AudioSourceRole.SystemAudio", "varsayilan-kol", Legitimate,
             "Iki degerli rolun olumsuz kolu. 8d ses girdisini motora baglayip secim yuzeyini acinca kardes uye tuketiciye kavustu: RecorderView.Ses.cs:62 'role == AudioSourceRole.Microphone ? CmbMicrophone : CmbSystemAudio' diye soruyor, sistem sesi o kosulun else'i. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; sistem sesini ayrica adlandirmak ayni kutuyu iki yere yazardi."),
         new("DeveloperUnlock.Window", "yalniz-disarida", Legitimate,

@@ -83,7 +83,7 @@ jobs:
             ekranbant = @('ekran')
             svtara = @('karanlik', 'rampa')
             turboilk = @('karanlik', 'hareketli')
-            socialkodek = @('parlak', 'karanlik')
+            socialkodek = @('parlak', 'karanlik', 'hareketli')
           }
           $liste = @()
           foreach ($is in @($isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -notin @('vt', 'vtara') })) {

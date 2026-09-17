@@ -426,6 +426,8 @@ public static class FfmpegArguments
 
         a.AddRange(KeyframeArgs(plan.Codec, plan.Fps, scenes));
         a.AddRange(new[] { "-pix_fmt", plan.PixelFormat });
+        if (CodecModel.OutputProfile(plan.Codec, plan.PixelFormat) is string profile)
+            a.AddRange(new[] { "-profile:v", profile });
         a.AddRange(psychovisualArgs);
         a.AddRange(plan.HdrColorArgs);
 

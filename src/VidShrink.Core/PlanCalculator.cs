@@ -752,9 +752,9 @@ public static class PlanCalculator
         Width = best.Width,
         Height = best.Height,
         Fps = best.Fps,
-        Preset = PickPreset(codec, options.Codec, options.SpeedMode),
+        Preset = PickPreset(codec, options.Codec, options.SpeedMode, options.Intent),
         TurboFirstPass = options.SpeedMode == SpeedMode.Fast && TurboFirstPassIsSafe(codec),
-        PixelFormat = hdr.PixelFormat,
+        PixelFormat = CodecModel.OutputPixelFormat(codec, hdr.PixelFormat),
         HdrVideoFilter = hdr.VideoFilter,
         HdrColorArgs = new List<string>(hdr.ColorArgs)
     };
@@ -1559,7 +1559,13 @@ public static class PlanCalculator
 
     private static string PickAudioCodec() => "aac";
 
-    private static string PickPreset(string codec, CodecPreference pref, SpeedMode speed)
+    /// <summary>
+    /// SVT-AV1 Sosyal Medya niyetinde kalite kipinde <c>4</c> kosar, digerlerinde <c>6</c>. Olcum koşum
+    /// 35166699260, Social 25 MB 1080p60 HB ile es baytta: p6 parlak -0,61 / -0,42 bant disi, p4
+    /// -0,22 / -0,01 bantta, sure HB'nin 1,31-1,39 kati. <c>handbrake</c> 2000@24'te p6 onde oldugu icin
+    /// kapsam genisletilmedi; <c>docs/olcumler/handbrake-kiyas-b7-aciklar.md</c>.
+    /// </summary>
+    private static string PickPreset(string codec, CodecPreference pref, SpeedMode speed, Intent intent)
     {
         if (CodecModel.IsHardware(codec))
         {
@@ -1567,7 +1573,7 @@ public static class PlanCalculator
             if (speed == SpeedMode.Fast) preset = OneStepFaster(codec, preset);
             return FfmpegArguments.IsValidPreset(codec, preset) ? preset : FfmpegArguments.DefaultPreset(codec);
         }
-        if (codec == "libsvtav1") return "6";
+        if (codec == "libsvtav1") return intent == Intent.SocialMedia && speed != SpeedMode.Fast ? "4" : "6";
         return pref == CodecPreference.Fast ? "medium" : "slow";
     }
 

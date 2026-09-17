@@ -154,6 +154,18 @@ public static class CodecModel
 
     public static bool TakesPreset(string codec) => Vendor(codec) != EncoderVendor.VideoToolbox;
 
+    /// <summary>
+    /// hevc_videotoolbox SDR'de de 10 bit (<c>p010le</c>, Main 10) kodlar. Olcum koşum 35166699260
+    /// (<c>docs/olcumler/handbrake-kiyas-b7-aciklar.md</c>): 8 bit urune gore alti film hucresinde
+    /// VMAF-NEG / XPSNR gerilemesi bant icinde, parlak 2000'de +1,11 / +0,30. h264_videotoolbox
+    /// 10 bit tasimaz, degismez.
+    /// </summary>
+    public static string OutputPixelFormat(string codec, string resolved)
+        => resolved == "yuv420p" && codec.Equals("hevc_videotoolbox", StringComparison.OrdinalIgnoreCase) ? "p010le" : resolved;
+
+    public static string? OutputProfile(string codec, string pixelFormat)
+        => codec.Equals("hevc_videotoolbox", StringComparison.OrdinalIgnoreCase) && pixelFormat == "p010le" ? "main10" : null;
+
     private readonly record struct TurboFirstPassEntry(string Ceiling, bool Safe, string? FirstPassParams = null);
 
     /// <summary>

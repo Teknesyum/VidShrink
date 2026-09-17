@@ -81,6 +81,36 @@ public sealed class CodecModelTests
     }
 
     [Theory]
+    [InlineData("hevc_videotoolbox", "p010le", "main10")]
+    [InlineData("h264_videotoolbox", "yuv420p", null)]
+    [InlineData("libx265", "yuv420p", null)]
+    [InlineData("libsvtav1", "yuv420p", null)]
+    public void HevcVideoToolboxEncodesSdrInMain10(string codec, string pixelFormat, string? profile)
+    {
+        var hdr = HdrResolver.Resolve(Source(), HdrPolicy.Preserve, codec, null);
+        var plan = TwoPassPlan(codec);
+        plan.PixelFormat = CodecModel.OutputPixelFormat(codec, hdr.PixelFormat);
+
+        Assert.Equal(pixelFormat, plan.PixelFormat);
+
+        var args = FfmpegArguments.Build(Source(), plan, "out.mp4", 0, null);
+        Assert.Equal(pixelFormat, args[args.IndexOf("-pix_fmt") + 1]);
+        if (profile is null) Assert.DoesNotContain("-profile:v", args);
+        else Assert.Equal(profile, args[args.IndexOf("-profile:v") + 1]);
+        if (codec.Contains("videotoolbox")) Assert.Contains("-maxrate", args);
+    }
+
+    [Fact]
+    public void TenBitSoftwarePixelFormatGetsNoProfile()
+    {
+        Assert.Equal("yuv420p10le", CodecModel.OutputPixelFormat("libx265", "yuv420p10le"));
+        Assert.Null(CodecModel.OutputProfile("libx265", "yuv420p10le"));
+        Assert.Null(CodecModel.OutputProfile("libx265", "p010le"));
+        Assert.Equal("p010le", CodecModel.OutputPixelFormat("hevc_videotoolbox", "p010le"));
+        Assert.Equal("main10", CodecModel.OutputProfile("hevc_videotoolbox", "p010le"));
+    }
+
+    [Theory]
     [InlineData("hevc_videotoolbox")]
     [InlineData("h264_videotoolbox")]
     public void VideoToolboxHasNoRowInTheBitrateNeedTable(string codec)

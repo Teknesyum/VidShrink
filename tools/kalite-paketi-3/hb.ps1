@@ -34,6 +34,8 @@ New-Item -ItemType Directory -Force $Cikti | Out-Null
 $Satirlar = [Collections.Generic.List[object]]::new()
 $JsonAdi = if ($Kesit) { "$Is-$Kesit.json" } else { "$Is.json" }
 
+$script:FfSeviye = 'warning'
+
 function Ff([string[]]$Argumanlar) {
     & ffmpeg -hide_banner -nostdin -loglevel error -y @Argumanlar
     if ($LASTEXITCODE -ne 0) { throw "ffmpeg basarisiz: $($Argumanlar -join ' ')" }
@@ -485,6 +487,9 @@ function Vt {
     $enc | Set-Content (Join-Path $Cikti 'ffmpeg-encoders.txt')
     & $HandBrake --help 2>&1 | Out-String | Set-Content (Join-Path $Cikti 'handbrake-help.txt')
     $script:JsonAdi = 'vt.json'
+    $script:vtOnbitKaldi = @()
+    $neg = FfKos @('-f', 'lavfi', '-i', 'testsrc2=s=320x240:d=0.2', '-c:v', 'hevc_videotoolbox', '-foo', '1', '-f', 'null', $NullCikis)
+    Ekle ([ordered]@{ is = 'vt'; kesit = ''; kol = 'negatif-vt-uydurma-bayrak'; cikis_kodu = $neg.Kod; uyari = (Uyarilar $neg.Metin); hukum = $(if ($neg.Kod -ne 0) { 'gecti: uydurma bayrak reddedildi' } else { 'kaldi: uydurma bayrak kabul edildi' }) }) $null $null
     foreach ($k in @($Kesitler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
         $script:Kesit = $k
         $girdi = Join-Path $Cikti "kesit-$k.mkv"
@@ -512,6 +517,11 @@ function Vt {
                 $o = Olc $girdi $dosya $b.FpsMetin
                 $script:urunKbps = $o.kbps
                 $ek['urun_yolu_vt'] = $yol
+                $pp = (& ffprobe -v error -select_streams v:0 -show_entries stream=pix_fmt,profile -of json $dosya | ConvertFrom-Json).streams[0]
+                $ek['cikis_pix'] = $pp.pix_fmt
+                $ek['cikis_profil'] = $pp.profile
+                $ek['onbit_hukmu'] = if ($pp.pix_fmt -eq 'yuv420p10le' -and $pp.profile -eq 'Main 10' -and $yol -like 'bench shrink*') { 'gecti' } else { 'kaldi' }
+                if ($ek['onbit_hukmu'] -ne 'gecti') { $script:vtOnbitKaldi += "$k $kbit $($pp.pix_fmt)/$($pp.profile)" }
                 Ekle ([ordered]@{ is = 'vt'; kesit = $k; kol = 'urun-vt'; istenen_kbit = $kbit }) $o $ek
                 Remove-Item $dosya
             }
@@ -534,6 +544,7 @@ function Vt {
             }
         }
     }
+    if ($script:vtOnbitKaldi.Count -gt 0) { throw "VT urun ciktisi Main 10 degil: $($script:vtOnbitKaldi -join '; ')" }
 }
 
 function EkranBant {
@@ -583,15 +594,20 @@ function AkisMd5([string]$Yol) {
     $m.Trim() -replace '^MD5=', ''
 }
 
+function SvtOnayar([string]$Metin) {
+    $m = [regex]::Match($Metin, 'SVT \[config\]:[^\r\n]*preset[^:\r\n]*:\s*(-?\d+)')
+    if ($m.Success) { [int]$m.Groups[1].Value } else { $null }
+}
+
 function Gecisli([string]$Girdi, [string]$Cikis, [string[]]$Kodek, [string[]]$Ilk, [string[]]$Iki) {
     $p = Join-Path $Cikti ('pass-' + [guid]::NewGuid().ToString('N'))
-    $r1 = FfKos (@('-i', $Girdi, '-an') + $Kodek + $Ilk + @('-pass', '1', '-passlogfile', $p, '-f', 'null', $NullCikis))
+    $r1 = FfKos (@('-i', $Girdi, '-an') + $Kodek + $Ilk + @('-pass', '1', '-passlogfile', $p, '-f', 'null', $NullCikis)) $script:FfSeviye
     $istat = @(Get-ChildItem -Path $Cikti -Filter ((Split-Path $p -Leaf) + '*') -ErrorAction SilentlyContinue).Count
     if ($r1.Kod -ne 0) { throw "ilk gecis basarisiz ($($r1.Kod)): $(Uyarilar $r1.Metin) $($r1.Metin.Substring([math]::Max(0, $r1.Metin.Length - 300)))" }
-    $r2 = FfKos (@('-i', $Girdi, '-an') + $Kodek + $Iki + @('-pass', '2', '-passlogfile', $p, $Cikis))
+    $r2 = FfKos (@('-i', $Girdi, '-an') + $Kodek + $Iki + @('-pass', '2', '-passlogfile', $p, $Cikis)) $script:FfSeviye
     Get-ChildItem -Path $Cikti -Filter ((Split-Path $p -Leaf) + '*') -ErrorAction SilentlyContinue | Remove-Item -ErrorAction SilentlyContinue
     if ($r2.Kod -ne 0) { throw "ikinci gecis basarisiz ($($r2.Kod)): $(Uyarilar $r2.Metin) $($r2.Metin.Substring([math]::Max(0, $r2.Metin.Length - 300)))" }
-    [pscustomobject]@{ Sn1 = $r1.Sn; Sn2 = $r2.Sn; Sn = [math]::Round($r1.Sn + $r2.Sn, 1); IstatDosya = $istat; Uyari1 = (Uyarilar $r1.Metin); Uyari2 = (Uyarilar $r2.Metin) }
+    [pscustomobject]@{ Sn1 = $r1.Sn; Sn2 = $r2.Sn; Sn = [math]::Round($r1.Sn + $r2.Sn, 1); IstatDosya = $istat; Uyari1 = (Uyarilar $r1.Metin); Uyari2 = (Uyarilar $r2.Metin); SvtOnayar1 = (SvtOnayar $r1.Metin); SvtOnayar2 = (SvtOnayar $r2.Metin) }
 }
 
 function HamEsBayt([string]$Cikis, [double]$HedefKbps, [int]$IlkB, [scriptblock]$Kodla) {
@@ -613,7 +629,7 @@ function HamEsBayt([string]$Cikis, [double]$HedefKbps, [int]$IlkB, [scriptblock]
 
 function EsOrtak($h, [double]$HedefKbps) {
     $s = [ordered]@{ ham_b = $h.B; ham_deneme = $h.Deneme; ham_iz = $h.Iz; hedef_kbps = $HedefKbps; bayt_sapma_yuzde = $h.Sapma; es_bayt = ([math]::Abs($h.Sapma) -le 2); md5_ilk = $h.Md5Ilk }
-    if ($h.R.PSObject.Properties['Sn1']) { $s.sn1 = $h.R.Sn1; $s.sn2 = $h.R.Sn2; $s.istat_dosya = $h.R.IstatDosya; $s.uyari1 = $h.R.Uyari1; $s.uyari2 = $h.R.Uyari2 }
+    if ($h.R.PSObject.Properties['Sn1']) { $s.sn1 = $h.R.Sn1; $s.sn2 = $h.R.Sn2; $s.istat_dosya = $h.R.IstatDosya; $s.uyari1 = $h.R.Uyari1; $s.uyari2 = $h.R.Uyari2; $s.svt_onayar1 = $h.R.SvtOnayar1; $s.svt_onayar2 = $h.R.SvtOnayar2 }
     $s.kodlama_sn = $h.R.Sn
     $s
 }
@@ -899,11 +915,16 @@ function SocialKodek {
     }
     if (-not $script:skHb) { return }
     $hk = $script:skHb.Kbps
-    Dene $Kesit 'urun-otomatik' $null {
-        $u = Urun $girdi $script:skHb.Mb "socialkodek-$Kesit-urun"
-        $o = Olc $girdi $u.Dosya $b.FpsMetin
-        Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = 'urun-otomatik'; onayar = $ad }) $o (UrunOrtak $u $script:skHb.Mb)
-        Remove-Item $u.Dosya
+    foreach ($uKol in @('urun-otomatik', 'urun-sosyal')) {
+        Dene $Kesit $uKol $null {
+            $uEk = if ($uKol -eq 'urun-sosyal') { @('--intent', 'socialmedia') } else { @() }
+            $u = Urun $girdi $script:skHb.Mb "socialkodek-$Kesit-$uKol" $uEk
+            $o = Olc $girdi $u.Dosya $b.FpsMetin
+            $uo = UrunOrtak $u $script:skHb.Mb
+            $uo.komut_onayar = if ($u.Komut -match '-preset (\S+)') { $Matches[1] } else { $null }
+            Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $uKol; onayar = $ad }) $o $uo
+            Remove-Item $u.Dosya
+        }
     }
     $vf = @()
     $f = @()
@@ -914,13 +935,14 @@ function SocialKodek {
     $g = [int][math]::Round($fpsKod * 5)
     $m = [int][math]::Round($fpsKod)
     $kollar = [ordered]@{
-        'svt-p6' = @{ K = @('-c:v', 'libsvtav1', '-preset', '6', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0", '-pix_fmt', 'yuv420p'); Ata = ''; Es = $false; Yarim = $false }
-        'negatif-svt-p6-uydurma' = @{ K = @('-c:v', 'libsvtav1', '-preset', '6', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0:vidshrinkuydurma=1", '-pix_fmt', 'yuv420p'); Ata = 'svt-p6'; Es = $true; Yarim = $false }
-        'svt-p4' = @{ K = @('-c:v', 'libsvtav1', '-preset', '4', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0", '-pix_fmt', 'yuv420p'); Ata = 'svt-p6'; Es = $false; Yarim = $false }
+        'svt-p6' = @{ K = @('-c:v', 'libsvtav1', '-preset', '6', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0", '-pix_fmt', 'yuv420p'); Ata = ''; Es = $false; Yarim = $false; Onayar = 6 }
+        'negatif-svt-p6-uydurma' = @{ K = @('-c:v', 'libsvtav1', '-preset', '6', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0:vidshrinkuydurma=1", '-pix_fmt', 'yuv420p'); Ata = 'svt-p6'; Es = $true; Yarim = $false; Onayar = 6 }
+        'svt-p4' = @{ K = @('-c:v', 'libsvtav1', '-preset', '4', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0", '-pix_fmt', 'yuv420p'); Ata = 'svt-p6'; Es = $false; Yarim = $false; Onayar = 4 }
         'x265-slow' = @{ K = @('-c:v', 'libx265', '-preset', 'slow', '-x265-params', "keyint=${g}:min-keyint=${m}:scenecut=40:psy-rd=2:psy-rdoq=1:aq-mode=2", '-pix_fmt', 'yuv420p'); Ata = ''; Es = $false; Yarim = $false }
-        'negatif-svt-p6-yarim-bit' = @{ K = @('-c:v', 'libsvtav1', '-preset', '6', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0", '-pix_fmt', 'yuv420p'); Ata = ''; Es = $false; Yarim = $true }
+        'negatif-svt-p6-yarim-bit' = @{ K = @('-c:v', 'libsvtav1', '-preset', '6', '-svtav1-params', "keyint=${g}:scd=1:tune=1:enable-variance-boost=0", '-pix_fmt', 'yuv420p'); Ata = ''; Es = $false; Yarim = $true; Onayar = 6 }
     }
     $script:araMd5 = @{}
+    $script:FfSeviye = 'info'
     foreach ($kol in $kollar.Keys) {
         Dene $Kesit $kol $null {
             $t = $kollar[$kol]
@@ -933,6 +955,7 @@ function SocialKodek {
             $ek.komut_kodek = ($vf + $t.K) -join ' '
             $ek.geometri = "$($script:skHb.W)x$($script:skHb.H)@$fpsKod"
             $ek.md5_hukmu = Md5Hukmu $kol $h.Md5Ilk $script:araMd5[$t.Ata] $t.Es
+            if ($t.Onayar) { $ek.onayar_hukmu = if ($ek.svt_onayar1 -eq $t.Onayar -and $ek.svt_onayar2 -eq $t.Onayar) { "gecti: iki geciste preset $($t.Onayar)" } else { "kaldi: beklenen $($t.Onayar), gecis1=$($ek.svt_onayar1) gecis2=$($ek.svt_onayar2)" } }
             Ekle ([ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; onayar = $ad }) $o $ek
             Remove-Item $c
         }
