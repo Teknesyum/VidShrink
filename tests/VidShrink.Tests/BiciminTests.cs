@@ -157,8 +157,9 @@ public sealed class BiciminTests : IDisposable
 /// <para><b>Katlanmis bolum ozeti.</b> Baslik satiri yatay bir <see cref="StackPanel"/>
 /// idi; yatay yigin cocuguna sonsuz genislik verir, dolayisiyla ozet kendi istedigi
 /// genislikte olculur ve panel kenarinda dumduz kesilirdi ("Kare Hızı D…" degil,
-/// harfin ortasindan). Satir <see cref="Grid"/>'e cevrildi ve ozet yildiz sutunda
-/// ucnoktayla kisaliyor.</para>
+/// harfin ortasindan). Satir <see cref="Grid"/>'e cevrildi; S20 taramasi ucnoktali ozetin
+/// dar pencerede 10 px'e indigini gosterdi, ozet artik basligin altinda kendi satirinda
+/// sariliyor ve bossa gizleniyor.</para>
 ///
 /// <para><b>Turetme satiri.</b> Satir <c>TxtTarget.Text</c>'i okur ama yalnizca boyut
 /// tavani kapaliyken yenileniyordu; kutuda 24 yazarken satir "Hedef 16 MB" diye
