@@ -148,16 +148,25 @@ public sealed class FfmpegArgumentsTests
         Assert.Equal(keyframeParams, disabled[disabled.IndexOf(option) + 1]);
     }
 
-    [Fact]
-    public void Nvenc_aq_bayraklari_bagimsiz_olculur()
+    /// <summary>
+    /// NVENC'e AQ yazilmaz, kodlayici destekledigini soylese de. docs/olcumler/nvenc-2.md: urun
+    /// geometrisinde 2000 kbit'te AQ acik kol dokuz hucrenin dokuzunda AQ kapali koldan kotu
+    /// (VMAF-NEG ort -0,3..-2,3). Karar metrige gore verildi; goz testi yapilmadi.
+    /// </summary>
+    [Theory]
+    [InlineData("av1_nvenc")]
+    [InlineData("hevc_nvenc")]
+    [InlineData("h264_nvenc")]
+    public void Nvenc_aq_bayraklari_destek_olsa_da_yazilmaz(string codec)
     {
-        var plan = Plan("av1_nvenc");
-        var onlySpatial = new OptionAvailability(("av1_nvenc", "-spatial-aq"));
+        var plan = Plan(codec);
+        var both = new OptionAvailability((codec, "-spatial-aq"), (codec, "-temporal-aq"));
 
-        var args = FfmpegArguments.Build(Source(), plan, "out.mp4", 0, null, onlySpatial);
+        var args = FfmpegArguments.Build(Source(), plan, "out.mp4", 0, null, both);
 
-        Assert.Contains("-spatial-aq", args);
+        Assert.DoesNotContain("-spatial-aq", args);
         Assert.DoesNotContain("-temporal-aq", args);
+        Assert.Empty(FfmpegArguments.PsychovisualArgs(codec, both));
     }
 
     [Fact]
@@ -182,31 +191,28 @@ public sealed class FfmpegArgumentsTests
     public void Parca_tam_kodlamayla_ayni_psy_kabiliyetini_kullanir()
     {
         var info = Source();
-        var plan = Plan("av1_nvenc");
-        var availability = new OptionAvailability(("av1_nvenc", "-spatial-aq"), ("av1_nvenc", "-temporal-aq"));
+        var plan = Plan("libsvtav1");
+        var availability = new OptionAvailability(("libsvtav1", "-svtav1-params"));
 
         var full = FfmpegArguments.Build(info, plan, "out.mp4", 0, null, availability);
         var segment = FfmpegArguments.BuildSegment(info, plan, 1, 2, "part.mp4", availability);
 
-        Assert.Contains("-spatial-aq", segment);
-        Assert.Contains("-temporal-aq", segment);
-        Assert.Equal(full.Contains("-spatial-aq"), segment.Contains("-spatial-aq"));
-        Assert.Equal(full.Contains("-temporal-aq"), segment.Contains("-temporal-aq"));
+        Assert.Contains("-svtav1-params", segment);
+        Assert.Equal(full[full.IndexOf("-svtav1-params") + 1], segment[segment.IndexOf("-svtav1-params") + 1]);
     }
 
     [Fact]
     public void Arayuzde_gosterilen_komut_kosucunun_argumanlariyla_aynidir()
     {
         var info = Source();
-        var plan = Plan("av1_nvenc");
-        var availability = new OptionAvailability(("av1_nvenc", "-spatial-aq"), ("av1_nvenc", "-temporal-aq"));
+        var plan = Plan("libx265");
+        var availability = new OptionAvailability(("libx265", "-x265-params"));
 
         var displayed = VidShrink.App.MainWindow.DisplayedEncodeArguments(info, plan, "out.mp4", availability);
         var executed = FfmpegArguments.Build(info, plan, "out.mp4", 2, null, availability);
 
         Assert.Equal(executed, displayed);
-        Assert.Contains("-spatial-aq", displayed);
-        Assert.Contains("-temporal-aq", displayed);
+        Assert.Contains("-x265-params", displayed);
         var windowSource = File.ReadAllText(TipSources.WindowCodePath);
         Assert.Contains("TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments", windowSource);
     }
@@ -218,16 +224,20 @@ public sealed class FfmpegArgumentsTests
     /// Onceki surum burada carpani <c>TightPeakFactor</c> ile <c>HardwarePeakCeiling</c>
     /// arasinda sayan bir aralik iddiasi tutuyordu; <c>PeakRateFactor</c> tam o iki sinira
     /// <c>Clamp</c>lendigi icin iddia tanim geregi dogruydu ve formul tumden bozulsa da
-    /// yesil kaliyordu.
+    /// yesil kaliyordu. Egri artik yalniz QSV ve AMF'de: NVENC her oranda 2,0 alir
+    /// (docs/olcumler/nvenc-2.md), bu yuzden NVENC satirlari 2,0 bekler.
     /// </summary>
     [Theory]
-    [InlineData("av1_nvenc", 64, 64, 1, 1.0, 1.02)]
-    [InlineData("av1_nvenc", 1280, 720, 60, 2.92, 1.02)]
-    [InlineData("av1_nvenc", 1280, 720, 60, 6.0, 1.02)]
-    [InlineData("av1_nvenc", 1280, 720, 60, 8.7, 1.06)]
-    [InlineData("av1_nvenc", 1280, 720, 60, 11.4, 1.10)]
+    [InlineData("av1_qsv", 64, 64, 1, 1.0, 1.02)]
+    [InlineData("av1_qsv", 1280, 720, 60, 2.92, 1.02)]
+    [InlineData("av1_qsv", 1280, 720, 60, 6.0, 1.02)]
+    [InlineData("av1_qsv", 1280, 720, 60, 8.7, 1.06)]
+    [InlineData("av1_qsv", 1280, 720, 60, 11.4, 1.10)]
     [InlineData("hevc_qsv", 3840, 2160, 120, 8.7, 1.06)]
     [InlineData("hevc_qsv", 3840, 2160, 120, 30.0, 1.10)]
+    [InlineData("av1_nvenc", 1280, 720, 60, 2.92, 2.0)]
+    [InlineData("av1_nvenc", 1280, 720, 60, 11.4, 2.0)]
+    [InlineData("hevc_nvenc", 3840, 2160, 120, 30.0, 2.0)]
     public void Donanim_tepe_carpani_taban_oraninda_beklenen_degeri_uretir(
         string codec, int width, int height, double fps, double floorRatio, double expected)
     {
@@ -278,17 +288,16 @@ public sealed class FfmpegArgumentsTests
     public void Isitilan_secenek_sonraki_arguman_uretiminde_onbellekten_okunur()
     {
         var recorder = new WarmingAvailability();
-        var plan = Plan("av1_nvenc");
+        var plan = Plan("libsvtav1");
 
         var cold = FfmpegArguments.Build(Source(), plan, "out.mp4", 2, "log", recorder);
-        Assert.DoesNotContain("-spatial-aq", cold);
+        Assert.DoesNotContain(cold, a => a.Contains("enable-variance-boost"));
 
-        FfmpegArguments.PsychovisualArgs("av1_nvenc", recorder);
-        Assert.Contains(("av1_nvenc", "-spatial-aq"), recorder.Warmed);
+        FfmpegArguments.PsychovisualArgs("libsvtav1", recorder);
+        Assert.Contains(("libsvtav1", "-svtav1-params"), recorder.Warmed);
 
         var warmed = FfmpegArguments.Build(Source(), plan, "out.mp4", 2, "log", recorder);
-        Assert.Contains("-spatial-aq", warmed);
-        Assert.Contains("-temporal-aq", warmed);
+        Assert.Contains(warmed, a => a.Contains("enable-variance-boost"));
     }
 
     private static MediaInfo PreviewSource() => new()
@@ -306,22 +315,21 @@ public sealed class FfmpegArgumentsTests
     [Fact]
     public void Onizleme_parcasi_verilen_psy_kabiliyetini_argumana_tasir()
     {
-        var plan = Plan("av1_nvenc");
-        var availability = new OptionAvailability(("av1_nvenc", "-spatial-aq"), ("av1_nvenc", "-temporal-aq"));
+        var plan = Plan("libsvtav1");
+        var availability = new OptionAvailability(("libsvtav1", "-svtav1-params"));
 
         var withFlags = PreviewSegment.For(PreviewSource(), plan, 1, "part.mp4", 2, availability: availability);
         var without = PreviewSegment.For(PreviewSource(), plan, 1, "part.mp4", 2);
 
-        Assert.Contains("-spatial-aq", withFlags.Arguments);
-        Assert.Contains("-temporal-aq", withFlags.Arguments);
-        Assert.DoesNotContain("-spatial-aq", without.Arguments);
+        Assert.Contains(withFlags.Arguments, a => a.Contains("enable-variance-boost"));
+        Assert.DoesNotContain(without.Arguments, a => a.Contains("enable-variance-boost"));
     }
 
     [Fact]
     public void Onizleme_kodlayicisi_kendi_kabiliyetini_parcaya_gecirir()
     {
-        var plan = Plan("av1_nvenc");
-        var availability = new OptionAvailability(("av1_nvenc", "-spatial-aq"), ("av1_nvenc", "-temporal-aq"));
+        var plan = Plan("libsvtav1");
+        var availability = new OptionAvailability(("libsvtav1", "-svtav1-params"));
         using var encoder = new VidShrink.App.Playback.SegmentEncoder(Path.GetTempPath())
         {
             Availability = availability
@@ -329,8 +337,7 @@ public sealed class FfmpegArgumentsTests
 
         var segment = encoder.Describe(PreviewSource(), plan, 1, "part.mp4", null);
 
-        Assert.Contains("-spatial-aq", segment.Arguments);
-        Assert.Contains("-temporal-aq", segment.Arguments);
+        Assert.Contains("-svtav1-params", segment.Arguments);
         var panelSource = File.ReadAllText(
             Path.Combine(TipSources.Root, "src", "VidShrink.App", "Playback", "PanelHost.cs"));
         Assert.Contains("_segments.Describe(info, plan, Math.Max(0, startSeconds), SignatureOutput, _profile)", panelSource);
@@ -345,9 +352,7 @@ public sealed class FfmpegArgumentsTests
 
         Assert.Contains(("libx265", "-x265-params"), recorder.Warmed);
         Assert.Contains(("libsvtav1", "-svtav1-params"), recorder.Warmed);
-        Assert.Contains(("av1_nvenc", "-spatial-aq"), recorder.Warmed);
-        Assert.Contains(("av1_nvenc", "-temporal-aq"), recorder.Warmed);
-        Assert.Contains(("hevc_nvenc", "-spatial-aq"), recorder.Warmed);
+        Assert.DoesNotContain(recorder.Warmed, w => w.Codec.Contains("nvenc"));
     }
 
     /// <summary>
@@ -357,8 +362,7 @@ public sealed class FfmpegArgumentsTests
     /// bayraklari sessizce kaybederdi. Kabiliyet burada hic isitilmamis veriliyor.
     /// </summary>
     [Theory]
-    [InlineData("av1_nvenc", "-spatial-aq")]
-    [InlineData("av1_nvenc", "-temporal-aq")]
+    [InlineData("libsvtav1", "-svtav1-params")]
     [InlineData("libx265", "-x265-params")]
     public void Kosucunun_arguman_uretimi_isitilmamis_kabiliyette_psy_bayragini_dusurmez(string codec, string flag)
     {
@@ -476,10 +480,14 @@ public sealed class FfmpegArgumentsTests
         return FfmpegArguments.PeakRateFactor(codec, bitrateK, width, height, fps);
     }
 
+    /// <summary>
+    /// Egri av1_nvenc'te olculdu. docs/olcumler/nvenc-2.md'den beri NVENC sabit 2,0 tepe yazar;
+    /// egri QSV ve AMF'de kaldi, bu yuzden sekil av1_qsv uzerinden pinlenir.
+    /// </summary>
     public static TheoryData<string, int, int, double> OlculenYerlesimler() => new()
     {
-        { "av1_nvenc", 1280, 720, 60 },
-        { "av1_nvenc", 1920, 1080, 30 }
+        { "av1_qsv", 1280, 720, 60 },
+        { "av1_qsv", 1920, 1080, 30 }
     };
 
     /// <summary>
