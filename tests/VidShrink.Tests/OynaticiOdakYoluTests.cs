@@ -1,13 +1,16 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using VidShrink.App;
+using VidShrink.App.Localization;
 using VidShrink.App.Playback;
 using VidShrink.Player;
 using Xunit;
@@ -187,5 +190,190 @@ public sealed class OynaticiOdakYoluTests
 
         KisayolKanit.Write("odak-yolu.txt", kayit);
         Assert.True(hatalar.Count == 0, kayit);
+    }
+
+    private static Action<RawInputEventArgs>? Giris(object impl)
+        => (Action<RawInputEventArgs>?)impl.GetType().GetInterfaces()
+            .Select(i => i.GetProperty("Input", Her)).First(p => p is not null)!.GetValue(impl);
+
+    private static void Ham(TopLevel top, RawInputEventArgs args)
+        => Giris(typeof(TopLevel).GetProperty("PlatformImpl", Her)!.GetValue(top)!)!(args);
+
+    private static IInputRoot Kok(TopLevel top) => (IInputRoot)typeof(TopLevel).GetProperty("InputRoot", Her)!.GetValue(top)!;
+
+    private static void HamFare(TopLevel top, RawPointerEventType tur, Point nokta, RawInputModifiers tuslar)
+        => Ham(top, (RawInputEventArgs)Activator.CreateInstance(typeof(RawPointerEventArgs), Her, null,
+            new object[] { Fare, (ulong)Environment.TickCount64, Kok(top), tur, nokta, tuslar }, null)!);
+
+    private static void HamTus(TopLevel top, Key key, RawInputModifiers mods, string? symbol)
+    {
+        foreach (var tur in new[] { RawKeyEventType.KeyDown, RawKeyEventType.KeyUp })
+        {
+            if (typeof(TopLevel).GetProperty("PlatformImpl", Her)!.GetValue(top) is null) return;
+            Ham(top, (RawInputEventArgs)Activator.CreateInstance(typeof(RawKeyEventArgs), Her, null,
+                new object?[] { Klavye(), (ulong)Environment.TickCount64, Kok(top), tur, key, mods, PhysicalKey.None, symbol, KeyDeviceType.Keyboard }, null)!);
+        }
+    }
+
+    private static Point Orta(TopLevel top, Visual control)
+        => control.TranslatePoint(new Point(control.Bounds.Width / 2, control.Bounds.Height / 2), top)!.Value;
+
+    private static void Dongu(Func<bool> bitti, double saniye)
+    {
+        var saat = Stopwatch.StartNew();
+        while (!bitti() && saat.Elapsed.TotalSeconds < saniye)
+        {
+            using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+            Dispatcher.UIThread.MainLoop(dilim.Token);
+        }
+    }
+    private static List<PopupRoot> Acilirlar()
+    {
+        var sonuc = new List<PopupRoot>();
+        var tur = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("Avalonia.Win32.WindowImpl")).FirstOrDefault(t => t is not null);
+        if (tur?.GetField("s_instances", Her)?.GetValue(null) is not System.Collections.IEnumerable impller) return sonuc;
+        foreach (var impl in impller)
+            if (Giris(impl)?.Target is { } kaynak)
+                sonuc.AddRange(kaynak.GetType().GetProperties(Her).Where(p => p.GetIndexParameters().Length == 0 && typeof(Visual).IsAssignableFrom(p.PropertyType)).Select(p => p.GetValue(kaynak)).OfType<PopupRoot>().Where(k => k.IsVisible));
+        return sonuc;
+    }
+
+    [Fact]
+    public void DondurmeTusuMenudeGorunurVeHamKlavyeyleKareyiDondurur()
+    {
+        var (kayit, hata) = AppHost.Run(() =>
+        {
+            var o = KisayolOrtam.Ac(KisayolKanit.Ikinci, "dondur-bulunur");
+            string? sonuc = null;
+            try
+            {
+                var gesture = Keymap.Gesture(Keymap.FirstKeyRow(Keymap.Rotate)!.Input);
+                var baslik = Strings.Get("player.view.rotate");
+                o.Not($"tus adi {gesture}, baslik {baslik}");
+
+                var onceki = Acilirlar();
+                var yuzey = Orta(o.Window, o.View);
+                HamFare(o.Window, RawPointerEventType.Move, yuzey, RawInputModifiers.None);
+                HamFare(o.Window, RawPointerEventType.RightButtonDown, yuzey, RawInputModifiers.RightMouseButton);
+                HamFare(o.Window, RawPointerEventType.RightButtonUp, yuzey, RawInputModifiers.None);
+                PopupRoot? menu = null;
+                MenuItem? satir = null;
+                o.Bekle(() => (menu = Acilirlar().FirstOrDefault(k => !onceki.Contains(k))) is not null
+                              && (satir = menu.GetVisualDescendants().OfType<MenuItem>().FirstOrDefault(m => ReferenceEquals(m.Tag, Keymap.Rotate))) is not null, 5);
+                o.Bekle(0.3);
+                if (menu is null || satir is null) return (o.Kayit.ToString(), "menude dondurme satiri yok");
+
+                o.Not($"menu acik {o.View.MenuOpen}, capa {o.View.MenuAnchor}, kok giris {(menu.PlatformImpl is { } pi && Giris(pi) is not null)}");
+                var isabet = menu.InputHitTest(Orta(menu, satir)) is Visual v && (ReferenceEquals(v, satir) || v.GetVisualAncestors().Contains(satir));
+                var tusMetni = satir.GetVisualDescendants().OfType<TextBlock>().Where(b => b.IsEffectivelyVisible && b.Bounds.Width > 0).Select(b => b.Text).ToList();
+                var ipucu = ToolTip.GetTip(satir) as string;
+                o.Not($"menu satiri: baslik '{satir.Header}', gorunur {isabet}, metinler [{string.Join(" | ", tusMetni)}], ipucu '{ipucu}'");
+                if (!Equals(satir.Header, baslik) || !isabet) sonuc ??= "dondurme satiri gorunmuyor";
+                if (!tusMetni.Contains(gesture)) sonuc ??= "satirda tus adi yazmiyor";
+                if (ipucu is null || !ipucu.Contains(baslik, StringComparison.Ordinal) || !ipucu.Contains(gesture, StringComparison.Ordinal)) sonuc ??= "ipucunda tus adi yok";
+
+                HamTus(menu.PlatformImpl is { } mi && Giris(mi) is not null ? menu : o.Window, Key.Escape, RawInputModifiers.None, null);
+                o.Bekle(() => !o.View.MenuOpen, 3);
+                o.Not($"menu kapandi {!o.View.MenuOpen}");
+
+                var ctrlS = char.ConvertFromUtf32(19);
+                var beklenen = new[]
+                {
+                    (90, 180, 320, "kirmizi", "mavi", (string?)null),
+                    (180, 320, 180, "mavi", "kirmizi", (string?)null),
+                    (270, 180, 320, "mavi", "kirmizi", ctrlS),
+                    (0, 320, 180, "kirmizi", "mavi", ctrlS)
+                };
+                o.Not($"once kare {KisayolKanit.Kare(o.View)}");
+                foreach (var (aci, w, h, ilk, ikinci, sembol) in beklenen)
+                {
+                    HamTus(o.Window, Key.S, RawInputModifiers.Control | RawInputModifiers.Shift, sembol);
+                    o.Bekle(() => KisayolKanit.Kare(o.View) is var k && k.W == w && k.H == h, 3);
+                    o.Bekle(0.3);
+                    var kare = KisayolKanit.Kare(o.View);
+                    o.Not($"ham Ctrl+Shift+S (sembol {(sembol is null ? "yok" : "U+0013")}): kare {kare}");
+                    var konum = aci is 90 or 270 ? (kare.Ust, kare.Alt) : (kare.Sol, kare.Sag);
+                    if (kare.W != w || kare.H != h || konum != (ilk, ikinci))
+                        sonuc ??= $"{aci} derecede kare {kare}";
+                }
+
+                return (o.Kayit.ToString(), sonuc);
+            }
+            catch (Exception ex)
+            {
+                return (o.Kayit + ex.ToString(), "istisna");
+            }
+            finally
+            {
+                o.Kapat();
+            }
+        });
+
+        KisayolKanit.Write("dondur-bulunur.txt", kayit);
+        Assert.True(hata is null, hata + Environment.NewLine + kayit);
+    }
+
+    [Fact]
+    public void HizAdimiVeCiftTikSuresiHamGirdiyle()
+    {
+        var sistem = SystemDoubleClick.Milliseconds();
+        var windows = SystemDoubleClick.WindowsValue();
+        var eski = ClickArbiter.Source;
+        var varsayilan = ClickArbiter.DoubleWindowMs;
+        (string, string?) sonucu;
+        try
+        {
+            ClickArbiter.Source = () => 900;
+            sonucu = AppHost.Run(() =>
+            {
+                var o = KisayolOrtam.Ac(KisayolKanit.Uzun, "hiz-cift-tik");
+                string? sonuc = null;
+                try
+                {
+                    o.Not($"sistem cift tik {F(sistem)} ms, GetDoubleClickTime {F(windows)} ms, arbiter varsayilani {F(varsayilan)} ms, testte 900 ms");
+                    var hizlar = new List<string> { F(o.Sayi("speed")) };
+                    foreach (var (key, sembol, beklenen) in new[] { (Key.C, "c", 1.05), (Key.C, "c", 1.1), (Key.X, "x", 1.05), (Key.X, "x", 1.0), (Key.X, "x", 0.95) })
+                    {
+                        HamTus(o.Window, key, RawInputModifiers.None, sembol);
+                        o.Bekle(() => Math.Abs(o.Sayi("speed") - beklenen) < 1e-6, 2);
+                        hizlar.Add(F(o.Sayi("speed")));
+                        if (Math.Abs(o.Sayi("speed") - beklenen) >= 1e-6) sonuc ??= $"{key} sonrasi speed {F(o.Sayi("speed"))}, beklenen {F(beklenen)}";
+                    }
+                    o.Not("ham C,C,X,X,X motor speed: " + string.Join(" -> ", hizlar));
+
+                    o.View.Apply(new PlayerCommand(PlayerCommandKind.SpeedReset, 0));
+                    o.Bekle(() => o.Oku("pause") == "yes", 2);
+                    var nokta = Orta(o.Window, o.View);
+                    HamFare(o.Window, RawPointerEventType.Move, nokta, RawInputModifiers.None);
+                    DenetimSurucu.Wait(o.View, 0.05);
+                    HamFare(o.Window, RawPointerEventType.LeftButtonDown, nokta, RawInputModifiers.LeftMouseButton);
+                    HamFare(o.Window, RawPointerEventType.LeftButtonUp, nokta, RawInputModifiers.None);
+                    var saat = Stopwatch.StartNew();
+                    Dongu(() => saat.ElapsedMilliseconds >= 600, 2);
+                    var erken = o.Oku("pause");
+                    var erkenMs = saat.ElapsedMilliseconds;
+                    Dongu(() => o.Oku("pause") == "no", 3);
+                    var gec = o.Oku("pause");
+                    var gecMs = saat.ElapsedMilliseconds;
+                    o.Not($"ham sol tik: {erkenMs} ms'de pause {erken}, {gecMs} ms'de pause {gec}");
+                    if (erken != "yes") sonuc ??= $"tek tik {erkenMs} ms'de islendi, 900 ms beklenmedi";
+                    if (gec != "no" || gecMs < 880) sonuc ??= $"tek tik {gecMs} ms'de pause {gec}";
+                    return (o.Kayit.ToString(), sonuc);
+                }
+                finally
+                {
+                    o.Kapat();
+                }
+            });
+        }
+        finally
+        {
+            ClickArbiter.Source = eski;
+        }
+
+        KisayolKanit.Write("hiz-cift-tik.txt", sonucu.Item1);
+        if (OperatingSystem.IsWindows()) Assert.Equal(windows, sistem);
+        Assert.Equal(sistem, varsayilan);
+        Assert.True(sonucu.Item2 is null, sonucu.Item2 + Environment.NewLine + sonucu.Item1);
     }
 }

@@ -13,7 +13,6 @@ internal partial class PlayerView
     private readonly ClickArbiter _click = new();
 
     private SurfacePan? _pan;
-    private PointerPressedEventArgs? _pressArgs;
     private DispatcherTimer? _clickTimer;
     private TranslateTransform? _shift;
     private Point _lastDrag;
@@ -45,7 +44,6 @@ internal partial class PlayerView
     /// </summary>
     internal bool FarePress(PointerPressedEventArgs e, double x, double y)
     {
-        _pressArgs = e;
         return FarePress(e.ClickCount, x, y);
     }
 
@@ -144,6 +142,7 @@ internal partial class PlayerView
     {
         _clickTimer ??= NewClickTimer();
         _clickTimer.Stop();
+        _clickTimer.Interval = TimeSpan.FromMilliseconds(ClickArbiter.DoubleWindowMs);
         _clickTimer.Start();
     }
 
@@ -160,14 +159,33 @@ internal partial class PlayerView
     {
         if (_seekDragging || IsSeekBarSource(e.Source)) return;
         var point = e.GetPosition(this);
+        if (_windowDrag)
+        {
+            if (TopLevel.GetTopLevel(this) is Window dragged) DragWindow(dragged, this.PointToScreen(point));
+            e.Handled = true;
+            return;
+        }
+
+        var grab = _lastDrag;
         if (FareMove(point.X, point.Y) != "window") return;
-        if (TopLevel.GetTopLevel(this) is not Window window || _pressArgs is not { } press) return;
+        if (TopLevel.GetTopLevel(this) is not Window window) return;
 
         _click.Cancel();
-        _dragMode = "";
-        window.BeginMoveDrag(press);
-        SnapWindowToCenter(window);
+        _dragMode = "window";
+        _windowDrag = true;
+        _dragWindowStart = window.Position;
+        _dragPointerStart = this.PointToScreen(grab);
+        DragWindow(window, this.PointToScreen(point));
+        e.Handled = true;
     }
+
+    private bool _windowDrag;
+    private PixelPoint _dragWindowStart;
+    private PixelPoint _dragPointerStart;
+
+    internal bool WindowDragging => _windowDrag;
+
+    internal readonly record struct ScreenArea(PixelRect Bounds, PixelRect WorkingArea, double Scaling);
 
     internal static PixelPoint CenterSnap(PixelRect area, PixelSize size, PixelPoint position, int threshold)
     {
@@ -178,22 +196,51 @@ internal partial class PlayerView
             Math.Abs(position.Y - y) <= threshold ? y : position.Y);
     }
 
-    internal bool SnapWindowToCenter(Window window)
+    internal static PixelPoint DragPosition(PixelPoint windowStart, PixelPoint pointerStart, PixelPoint pointerNow, Size frameDip, IReadOnlyList<ScreenArea> screens, double snapDip)
     {
-        if (window.WindowState != WindowState.Normal || window.Screens.ScreenFromWindow(window) is not { } screen) return false;
-        var scale = screen.Scaling;
-        var size = PixelSize.FromSize(window.FrameSize ?? window.ClientSize, scale);
-        var threshold = (int)Math.Ceiling(SnapDip() * scale);
-        var target = CenterSnap(screen.WorkingArea, size, window.Position, threshold);
-        if (target == window.Position) return false;
+        var position = new PixelPoint(windowStart.X + pointerNow.X - pointerStart.X, windowStart.Y + pointerNow.Y - pointerStart.Y);
+        if (screens.Count == 0) return position;
+
+        var screen = screens[0];
+        var best = long.MaxValue;
+        foreach (var candidate in screens)
+        {
+            var b = candidate.Bounds;
+            var dx = pointerNow.X < b.X ? (long)b.X - pointerNow.X : pointerNow.X >= b.Right ? (long)pointerNow.X - b.Right + 1 : 0;
+            var dy = pointerNow.Y < b.Y ? (long)b.Y - pointerNow.Y : pointerNow.Y >= b.Bottom ? (long)pointerNow.Y - b.Bottom + 1 : 0;
+            var distance = dx * dx + dy * dy;
+            if (distance >= best) continue;
+            best = distance;
+            screen = candidate;
+        }
+
+        var size = PixelSize.FromSize(frameDip, screen.Scaling);
+        var threshold = (int)Math.Ceiling(snapDip * screen.Scaling);
+        return CenterSnap(screen.WorkingArea, size, position, threshold);
+    }
+
+    private void DragWindow(Window window, PixelPoint pointer)
+    {
+        var screens = new List<ScreenArea>();
+        foreach (var screen in window.Screens.All)
+            screens.Add(new ScreenArea(screen.Bounds, screen.WorkingArea, screen.Scaling));
+        var target = DragPosition(_dragWindowStart, _dragPointerStart, pointer, window.FrameSize ?? window.ClientSize, screens, SnapDip());
+        if (target == window.Position) return;
         window.Position = target;
-        _trace.Add(FormattableString.Invariant($"snap -> {target.X},{target.Y}"));
-        return true;
+        var free = new PixelPoint(_dragWindowStart.X + pointer.X - _dragPointerStart.X, _dragWindowStart.Y + pointer.Y - _dragPointerStart.Y);
+        _trace.Add((target == free ? "move -> " : "snap -> ") + FormattableString.Invariant($"{target.X},{target.Y}"));
     }
 
     private void OnFarePointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (e.InitialPressMouseButton != MouseButton.Left) return;
+        if (_windowDrag)
+        {
+            _windowDrag = false;
+            _dragMode = "";
+            e.Handled = true;
+        }
+
         if (IsSeekBarSource(e.Source)) return;
         FareRelease(Environment.TickCount64);
     }

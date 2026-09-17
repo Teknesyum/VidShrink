@@ -1,3 +1,15 @@
+# Yol A — Oynatıcı: Döndürme Tuşu, Sürüklerken Mıknatıs, Hız Adımı, Çift Tık Süresi
+
+Dal `t0/yol-a-oynatici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` (1. bölüm, P1, P17, 7/1-7-8).
+
+1. **Döndürme bulunur.** Tuş GOM'daki gibi Ctrl+Shift+S kalır. Kısayolu olan her menü satırının ipucu
+   "ad (tuş)". Test ham sağ tık (satır görünür, tuş metni ve ipucu), ham Ctrl+Shift+S, kare pikselleri
+   (`OynaticiOdakYoluTests`).
+2. **P2 mıknatıs sürüklerken.** `BeginMoveDrag` yerine kendi taşıma döngüsü; konum saf `DragPosition`
+   (imlecin ekranı, o ekranın ölçeği ve çalışma alanı). Test ham fare olaylarıyla, bölge dışı negatif kontrol.
+3. **P17/P1.** `Keymap.SpeedStep` 0,05; `ClickArbiter.DoubleWindowMs` sistemden (Windows `GetDoubleClickTime`,
+   öbürlerinde Avalonia platform ayarı), sahte kaynakla gerçek zamanlayıcı ölçülür.
+
 # Bütçe Doldurma — Yukarı Deneme
 
 Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.
