@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Фиксираната папка праща всеки изход на едно място вместо до изходния файл.",
   "settings-tab.advanced-default-open.label": "Показвай разширените опции разгънати по подразбиране",
   "settings-tab.advanced-default-open.hint": "Отваря разширения раздел автоматично при всяко стартиране.",
+  "settings-tab.follow-recording.label": "Следвай записа във всички раздели",
+  "settings-tab.follow-recording.hint": "Когато записът спре, „Смаляване“ и „Плейър“ го зареждат, без да се сменя разделът. Файл, отворен в плейъра, се зарежда и в „Смаляване“.",
   "settings-tab.ffmpeg-path.label": "Път до ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Автоматично",
   "settings-tab.ffmpeg-path.manual": "Ръчно",

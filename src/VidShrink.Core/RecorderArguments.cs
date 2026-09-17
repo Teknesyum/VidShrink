@@ -215,6 +215,8 @@ public sealed record RecorderRequest
     public AudioCapturePlan? Audio { get; init; }
 
     public RecorderWebcam? Webcam { get; init; }
+
+    public string? PreviewPath { get; init; }
 }
 
 public enum WebcamCorner
@@ -225,7 +227,18 @@ public enum WebcamCorner
     TopLeft
 }
 
-public sealed record RecorderWebcam(string Device, int Width, WebcamCorner Corner = WebcamCorner.BottomRight);
+public enum WebcamBackground
+{
+    Keep,
+    Static,
+    Green
+}
+
+public sealed record RecorderWebcam(
+    string Device,
+    int Width,
+    WebcamCorner Corner = WebcamCorner.BottomRight,
+    WebcamBackground Background = WebcamBackground.Keep);
 
 /// <summary>
 /// Ekran kaydi argumanlarini uretir. Kosturmaz — surec surmeyi
@@ -332,7 +345,7 @@ public static class RecorderArguments
         "bt709", "bt470bg", "smpte170m", "smpte240m", "bt2020nc", "bt2020c"
     };
 
-    private static readonly string[] KnownColorRanges = { "tv", "pc", "limited", "full" };
+    private static readonly string[] KnownColorRanges = { "tv", "pc", "limited", "full", "mpeg", "jpeg" };
 
     private static readonly string[] H264Profiles =
     {
@@ -340,6 +353,8 @@ public static class RecorderArguments
     };
 
     private static readonly string[] HevcProfiles = { "main", "main10", "rext" };
+
+    private static readonly string[] Vp9Profiles = { "0", "1", "2", "3" };
 
     private static readonly string[] X264Tunes =
     {
@@ -445,7 +460,10 @@ public static class RecorderArguments
 
     /// <summary>
     /// Nazik olmayan durdurmada dosyayi oynatilabilir birakan kaplar. Bugun yalniz
-    /// Matroska: mp4/mov muxer'i <c>moov</c> atomunu kapanista yaziyor.
+    /// Matroska: mp4/mov muxer'i <c>moov</c> atomunu kapanista yaziyor. Matroska da ancak
+    /// <c>-flush_packets 1</c> ile: bayraksiz 640x480 gdigrab kaydi 7 sn sonra olduruldugunde
+    /// ffmpeg 79 KiB bildirirken dosya 0 bayt kaldi, bayrakla 80 KiB ve 76 okunur paket
+    /// (<c>KayitBolmeTests</c>).
     /// </summary>
     public static bool SurvivesKill(RecorderContainer container) => container == RecorderContainer.Mkv;
 
@@ -457,11 +475,27 @@ public static class RecorderArguments
     {
         var c = (codec ?? string.Empty).ToLowerInvariant();
         if (c.Contains("av1", StringComparison.Ordinal)) return Array.Empty<string>();
+        if (c == "libvpx-vp9") return Vp9Profiles;
         if (c.Contains("vp9", StringComparison.Ordinal)) return Array.Empty<string>();
         if (c.Contains("265", StringComparison.Ordinal) || c.Contains("hevc", StringComparison.Ordinal)) return HevcProfiles;
         if (c.Contains("264", StringComparison.Ordinal)) return H264Profiles;
         return Array.Empty<string>();
     }
+
+    /// <summary>
+    /// libvpx-vp9'un piksel bicimine bagli profili: 0 sekiz bit 4:2:0, 1 sekiz bit 4:2:2/4:4:4,
+    /// 2 on bit 4:2:0, 3 on bit 4:2:2/4:4:4. ffmpeg 9.0'da uyusmayan cift (profil 1 + yuv420p,
+    /// profil 0 + yuv444p) "Error encoding frame: Invalid parameter", profil 2/3 + yuv420p acilista
+    /// -22 ile duser; olcum <c>docs/olcumler/kaydedici-piksel.md</c>.
+    /// </summary>
+    public static string? Vp9ProfileFor(string? pixelFormat) => (pixelFormat ?? string.Empty).ToLowerInvariant() switch
+    {
+        "yuv420p" => "0",
+        "yuv422p" or "yuv444p" => "1",
+        "yuv420p10le" => "2",
+        "yuv422p10le" or "yuv444p10le" => "3",
+        _ => null
+    };
 
     /// <summary>Kodegin tanidigi <c>-tune</c> degerleri; bos liste ayari reddeder.</summary>
     public static IReadOnlyList<string> TunesFor(string codec) => (codec ?? string.Empty).ToLowerInvariant() switch
@@ -582,6 +616,7 @@ public static class RecorderArguments
         errors.AddRange(LimitErrors(request));
         errors.AddRange(GifErrors(request));
         errors.AddRange(WebcamErrors(request));
+        errors.AddRange(PreviewErrors(request));
 
         if (request.Target == RecorderTargetKind.Window)
             errors.AddRange(WindowErrors(request));
@@ -659,6 +694,8 @@ public static class RecorderArguments
                 yield return $"The {request.VideoCodec} encoder takes no -profile:v in the recorder arm.";
             else if (!allowed.Contains(request.Profile, StringComparer.OrdinalIgnoreCase))
                 yield return $"The {request.Profile} profile is not one of the {request.VideoCodec} profiles ({string.Join(", ", allowed)}).";
+            else if (allowed == Vp9Profiles && Vp9ProfileFor(request.PixelFormat) is { } needed && needed != request.Profile)
+                yield return $"The libvpx-vp9 profile {request.Profile} cannot carry the {request.PixelFormat} pixel format; that format needs profile {needed}.";
         }
 
         if (string.IsNullOrWhiteSpace(request.Tune)) yield break;
@@ -744,6 +781,8 @@ public static class RecorderArguments
             yield return $"The webcam width must be an even number between {MinWebcamWidth} and {MaxWebcamWidth} pixels.";
         if (!Enum.IsDefined(cam.Corner))
             yield return "The webcam corner is not one of the four corners.";
+        if (!Enum.IsDefined(cam.Background))
+            yield return "The webcam background mode is not one of keep, static or green.";
     }
 
     public static string WebcamPosition(WebcamCorner corner)
@@ -764,13 +803,24 @@ public static class RecorderArguments
 
     public const string WebcamOutputLabel = "vout";
 
+    public const string StaticBackgroundKey = "backgroundkey=threshold=0.8:similarity=0.1:blend=0";
+
+    public const string GreenScreenKey = "chromakey=color=0x00FF00:similarity=0.15:blend=0.05";
+
+    public static string WebcamKey(WebcamBackground background) => background switch
+    {
+        WebcamBackground.Static => ",format=yuva420p," + StaticBackgroundKey,
+        WebcamBackground.Green => ",format=yuva420p," + GreenScreenKey,
+        _ => string.Empty
+    };
+
     public static string? WebcamGraph(RecorderRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         if (request.Webcam is not { } cam) return null;
         var index = Number(AudioFirstInputIndex + (request.Audio?.InputCount ?? 0));
         return $"[0:v]{VideoFilter(request) ?? "null"}[base];"
-               + $"[{index}:v]scale={Number(cam.Width)}:-2[cam];"
+               + $"[{index}:v]scale={Number(cam.Width)}:-2{WebcamKey(cam.Background)}[cam];"
                + $"[base][cam]overlay={WebcamPosition(cam.Corner)}:eof_action=repeat[{WebcamOutputLabel}]";
     }
 
@@ -844,9 +894,40 @@ public static class RecorderArguments
 
         if (request.Container is RecorderContainer.Mp4 or RecorderContainer.Mov)
             a.AddRange(new[] { "-movflags", "+faststart" });
+        else if (request.Container == RecorderContainer.Mkv)
+            a.AddRange(new[] { "-flush_packets", "1" });
 
         a.Add(outputPath);
+        a.AddRange(PreviewArgs(request));
         return a;
+    }
+
+    public const int PreviewWidth = 320;
+
+    public const int PreviewFps = 1;
+
+    public static IReadOnlyList<string> PreviewArgs(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (string.IsNullOrWhiteSpace(request.PreviewPath)) return Array.Empty<string>();
+
+        var filter = $"fps={PreviewFps},scale={PreviewWidth}:-2";
+        if (request is { Platform: RecorderPlatform.MacOs, Target: RecorderTargetKind.Region, Region: { } region })
+            filter = $"crop={Number(region.Width)}:{Number(region.Height)}:{Number(region.X)}:{Number(region.Y)}," + filter;
+        var a = new List<string> { "-map", "0:v", "-vf", filter, "-an" };
+        if (request.MaxDuration is { } limit)
+            a.AddRange(new[] { "-t", limit.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
+        a.AddRange(new[] { "-f", "image2", "-update", "1", "-q:v", "6", request.PreviewPath! });
+        return a;
+    }
+
+    private static IEnumerable<string> PreviewErrors(RecorderRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.PreviewPath)) yield break;
+        if (!string.Equals(Path.GetExtension(request.PreviewPath), ".jpg", StringComparison.OrdinalIgnoreCase))
+            yield return "The live preview image must be a .jpg file.";
+        if (request.MaxMegabytes is not null)
+            yield return "The live preview cannot run with a size limit: ffmpeg keeps the preview output open after -fs closes the recording.";
     }
 
     /// <summary>

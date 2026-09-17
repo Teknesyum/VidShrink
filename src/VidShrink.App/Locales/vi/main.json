@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Thư mục cố định gửi mọi đầu ra về cùng một nơi thay vì cạnh tệp nguồn.",
   "settings-tab.advanced-default-open.label": "Mặc định mở rộng tùy chọn nâng cao",
   "settings-tab.advanced-default-open.hint": "Tự mở phần nâng cao mỗi khi ứng dụng khởi động.",
+  "settings-tab.follow-recording.label": "Theo dõi bản ghi ở mọi thẻ",
+  "settings-tab.follow-recording.hint": "Khi dừng ghi, thẻ Thu nhỏ và Trình phát tải bản ghi mà không đổi thẻ. Tệp mở trong Trình phát cũng được tải vào Thu nhỏ.",
   "settings-tab.ffmpeg-path.label": "Đường dẫn ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Tự động",
   "settings-tab.ffmpeg-path.manual": "Thủ công",

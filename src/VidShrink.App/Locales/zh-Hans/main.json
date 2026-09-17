@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "固定文件夹会把所有输出放到同一位置，而不是源文件旁边。",
   "settings-tab.advanced-default-open.label": "默认展开高级选项",
   "settings-tab.advanced-default-open.hint": "每次启动应用时自动展开高级部分。",
+  "settings-tab.follow-recording.label": "在所有标签页中跟随录制",
+  "settings-tab.follow-recording.hint": "录制停止后，压缩和播放器标签页会加载该文件，不会切换标签页。在播放器中打开的文件也会加载到压缩标签页。",
   "settings-tab.ffmpeg-path.label": "ffmpeg 路径",
   "settings-tab.ffmpeg-path.auto": "自动",
   "settings-tab.ffmpeg-path.manual": "手动",

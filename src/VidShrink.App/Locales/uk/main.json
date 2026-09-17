@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Фіксована тека надсилає кожен результат в одне місце замість теки поруч із джерелом.",
   "settings-tab.advanced-default-open.label": "Показувати розширені параметри розгорнутими",
   "settings-tab.advanced-default-open.hint": "Відкриває розширений розділ автоматично при кожному запуску програми.",
+  "settings-tab.follow-recording.label": "Стежити за записом у всіх вкладках",
+  "settings-tab.follow-recording.hint": "Коли запис зупиняється, «Стиснення» і «Плеєр» завантажують його без перемикання вкладки. Файл, відкритий у плеєрі, теж завантажується в «Стиснення».",
   "settings-tab.ffmpeg-path.label": "Шлях до ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Автоматично",
   "settings-tab.ffmpeg-path.manual": "Вручну",

@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Fixed folder sends every output to the same place instead of next to the source file.",
   "settings-tab.advanced-default-open.label": "Show advanced options expanded by default",
   "settings-tab.advanced-default-open.hint": "Opens the advanced section automatically every time the app starts.",
+  "settings-tab.follow-recording.label": "Follow the recording in every tab",
+  "settings-tab.follow-recording.hint": "When a recording stops, Shrink and Player load it without switching tabs. A file opened in the Player also loads into Shrink.",
   "settings-tab.ffmpeg-path.label": "ffmpeg path",
   "settings-tab.ffmpeg-path.auto": "Automatic",
   "settings-tab.ffmpeg-path.manual": "Manual",

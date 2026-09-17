@@ -148,7 +148,7 @@ public sealed class KaydediciHedefTests
 
         Assert.False(olcu);
         Assert.Equal(HotkeyAction.Discard, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F10, Avalonia.Input.KeyModifiers.None));
-        Assert.Equal(4, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
+        Assert.Equal(5, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
     }
 
     private static void Pompala(Task gorev, int sinirMs)

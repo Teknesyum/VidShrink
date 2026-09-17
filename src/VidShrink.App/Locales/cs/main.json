@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Pevná složka posílá každý výstup na stejné místo místo vedle zdrojového souboru.",
   "settings-tab.advanced-default-open.label": "Zobrazovat pokročilé volby rozbalené ve výchozím stavu",
   "settings-tab.advanced-default-open.hint": "Otevře pokročilou sekci automaticky při každém spuštění aplikace.",
+  "settings-tab.follow-recording.label": "Sledovat záznam ve všech kartách",
+  "settings-tab.follow-recording.hint": "Po zastavení záznamu jej karty Zmenšit a Přehrávač načtou bez přepnutí karty. Soubor otevřený v přehrávači se načte i do karty Zmenšit.",
   "settings-tab.ffmpeg-path.label": "Cesta k ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automaticky",
   "settings-tab.ffmpeg-path.manual": "Ručně",

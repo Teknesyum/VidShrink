@@ -23,11 +23,11 @@ internal partial class RecorderView
                  {
                      CmbTarget, CmbCodec, CmbPreset, CmbContainer, CmbProfile, CmbTune, CmbPixelFormat, CmbRateControl,
                      CmbColorSpace, CmbColorRange, CmbAudioLayout, CmbMicrophone, CmbSystemAudio,
-                     CmbWebcam, CmbWebcamSize, CmbWebcamCorner
+                     CmbWebcam, CmbWebcamSize, CmbWebcamCorner, CmbWebcamBackground
                  })
             box.SelectionChanged += (_, _) => PersistChoices();
 
-        foreach (var check in new[] { ChkCursor, ChkOpenFolder, ChkShowClicks, ChkClickSound, ChkShowKeys, ChkMagnifier, ChkNoiseGate, ChkNoiseSuppression })
+        foreach (var check in new[] { ChkCursor, ChkOpenFolder, ChkShowClicks, ChkClickSound, ChkShowKeys, ChkMagnifier, ChkLivePreview, ChkNoiseGate, ChkNoiseSuppression })
             check.IsCheckedChanged += (_, _) => PersistChoices();
 
         _persisted = _settings.ToJson();

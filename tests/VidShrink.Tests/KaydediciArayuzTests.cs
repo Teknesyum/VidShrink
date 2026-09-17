@@ -811,9 +811,10 @@ public sealed class KaydediciArayuzTests
         Assert.Equal(HotkeyAction.Stop, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F8, Avalonia.Input.KeyModifiers.None));
         Assert.Equal(HotkeyAction.Frame, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F9, Avalonia.Input.KeyModifiers.None));
         Assert.Equal(HotkeyAction.Discard, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F10, Avalonia.Input.KeyModifiers.None));
+        Assert.Equal(HotkeyAction.ReplaySave, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F11, Avalonia.Input.KeyModifiers.None));
         Assert.Null(RecorderHotkeys.ActionOf(Avalonia.Input.Key.F7, Avalonia.Input.KeyModifiers.Control));
         Assert.Null(RecorderHotkeys.ActionOf(Avalonia.Input.Key.F6, Avalonia.Input.KeyModifiers.None));
-        Assert.Equal(4, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
+        Assert.Equal(5, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
         Assert.Equal(Enum.GetValues<HotkeyAction>().Length, RecorderHotkeys.All.Select(b => b.Action).Distinct().Count());
     }
 
@@ -1011,8 +1012,8 @@ public sealed class KaydediciArayuzTests
         });
 
         Assert.Contains("high", x264);
-        Assert.Equal(1, vp9Profil);
-        Assert.False(vp9Etkin);
+        Assert.Equal(VidShrink.Core.RecorderArguments.ProfilesFor("libvpx-vp9").Count + 1, vp9Profil);
+        Assert.True(vp9Etkin);
         Assert.Equal(VidShrink.Core.RecorderArguments.PixelFormatsFor("libsvtav1"), av1Bicimler);
         Assert.Equal(VidShrink.Core.RecorderArguments.DefaultPixelFormat, secilenBicim);
     }

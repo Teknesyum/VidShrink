@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "고정 폴더는 모든 출력을 원본 옆이 아닌 같은 곳으로 보냅니다.",
   "settings-tab.advanced-default-open.label": "고급 옵션을 기본으로 펼쳐서 표시",
   "settings-tab.advanced-default-open.hint": "앱을 시작할 때마다 고급 섹션을 자동으로 엽니다.",
+  "settings-tab.follow-recording.label": "모든 탭에서 녹화 따라가기",
+  "settings-tab.follow-recording.hint": "녹화가 멈추면 탭을 바꾸지 않고 축소와 플레이어에 불러옵니다. 플레이어에서 연 파일도 축소 탭에 불러옵니다.",
   "settings-tab.ffmpeg-path.label": "ffmpeg 경로",
   "settings-tab.ffmpeg-path.auto": "자동",
   "settings-tab.ffmpeg-path.manual": "수동",

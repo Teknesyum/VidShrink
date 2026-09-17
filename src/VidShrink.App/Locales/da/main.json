@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Fast mappe sender alt output til samme sted i stedet for ved siden af kildefilen.",
   "settings-tab.advanced-default-open.label": "Vis avancerede valg udfoldet som standard",
   "settings-tab.advanced-default-open.hint": "Åbner det avancerede afsnit automatisk, hver gang appen starter.",
+  "settings-tab.follow-recording.label": "Følg optagelsen i alle faner",
+  "settings-tab.follow-recording.hint": "Når en optagelse stopper, indlæses den i Formindsk og Afspiller uden at skifte fane. En fil åbnet i afspilleren indlæses også i Formindsk.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-sti",
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuel",

@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Kiinteä kansio lähettää jokaisen tulosteen samaan paikkaan lähdetiedoston viereen sijasta.",
   "settings-tab.advanced-default-open.label": "Näytä lisäasetukset oletuksena avattuina",
   "settings-tab.advanced-default-open.hint": "Avaa lisäasetusosion automaattisesti joka käynnistyksellä.",
+  "settings-tab.follow-recording.label": "Seuraa tallennetta kaikissa välilehdissä",
+  "settings-tab.follow-recording.hint": "Kun tallennus pysähtyy, Pienennä ja Soitin lataavat sen vaihtamatta välilehteä. Soittimessa avattu tiedosto latautuu myös Pienennä-välilehteen.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-polku",
   "settings-tab.ffmpeg-path.auto": "Automaattinen",
   "settings-tab.ffmpeg-path.manual": "Manuaalinen",

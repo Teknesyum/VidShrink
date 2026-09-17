@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Dossier fixe envoie chaque sortie au même endroit plutôt qu'à côté du fichier source.",
   "settings-tab.advanced-default-open.label": "Afficher les options avancées dépliées par défaut",
   "settings-tab.advanced-default-open.hint": "Ouvre automatiquement la section avancée à chaque démarrage de l'application.",
+  "settings-tab.follow-recording.label": "Suivre l'enregistrement dans tous les onglets",
+  "settings-tab.follow-recording.hint": "À l'arrêt d'un enregistrement, Réduire et Lecteur le chargent sans changer d'onglet. Un fichier ouvert dans le Lecteur est aussi chargé dans Réduire.",
   "settings-tab.ffmpeg-path.label": "Chemin de ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automatique",
   "settings-tab.ffmpeg-path.manual": "Manuel",

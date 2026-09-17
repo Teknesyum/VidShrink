@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "المجلد الثابت يرسل كل ناتج إلى المكان نفسه بدل جانب ملف المصدر.",
   "settings-tab.advanced-default-open.label": "إظهار الخيارات المتقدمة موسّعة افتراضياً",
   "settings-tab.advanced-default-open.hint": "يفتح القسم المتقدم تلقائياً في كل مرة يبدأ فيها التطبيق.",
+  "settings-tab.follow-recording.label": "تتبّع التسجيل في كل التبويبات",
+  "settings-tab.follow-recording.hint": "عند إيقاف التسجيل يُحمَّل في تبويبَي التصغير والمشغّل دون تبديل التبويب. والملف المفتوح في المشغّل يُحمَّل أيضًا في التصغير.",
   "settings-tab.ffmpeg-path.label": "مسار ffmpeg",
   "settings-tab.ffmpeg-path.auto": "تلقائي",
   "settings-tab.ffmpeg-path.manual": "يدوي",

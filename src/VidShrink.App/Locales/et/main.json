@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Kindel kaust saadab iga väljundi samasse kohta, mitte lähtefaili kõrvale.",
   "settings-tab.advanced-default-open.label": "Näita täpsemaid valikuid vaikimisi avatuna",
   "settings-tab.advanced-default-open.hint": "Avab täpsema jaotise automaatselt igal rakenduse käivitusel.",
+  "settings-tab.follow-recording.label": "Järgi salvestust kõigil vahekaartidel",
+  "settings-tab.follow-recording.hint": "Kui salvestus peatub, laadivad Vähenda ja Pleier selle ilma vahekaarti vahetamata. Pleieris avatud fail laaditakse ka vahekaardile Vähenda.",
   "settings-tab.ffmpeg-path.label": "ffmpegi tee",
   "settings-tab.ffmpeg-path.auto": "Automaatne",
   "settings-tab.ffmpeg-path.manual": "Käsitsi",

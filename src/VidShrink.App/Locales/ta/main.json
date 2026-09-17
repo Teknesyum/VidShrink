@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "நிலையான கோப்புறை ஒவ்வொரு வெளியீட்டையும் மூலக் கோப்பின் அருகில் அல்ல, ஒரே இடத்திற்கு அனுப்பும்.",
   "settings-tab.advanced-default-open.label": "மேம்பட்ட விருப்பங்களை இயல்பாக விரித்துக் காட்டு",
   "settings-tab.advanced-default-open.hint": "பயன்பாடு தொடங்கும் ஒவ்வொரு முறையும் மேம்பட்ட பகுதியைத் தானாகத் திறக்கும்.",
+  "settings-tab.follow-recording.label": "எல்லா தாவல்களிலும் பதிவைப் பின்தொடர்",
+  "settings-tab.follow-recording.hint": "பதிவு நின்றதும் தாவலை மாற்றாமல் சுருக்கு மற்றும் இயக்கி தாவல்கள் அதை ஏற்றும். இயக்கியில் திறந்த கோப்பும் சுருக்கு தாவலில் ஏறும்.",
   "settings-tab.ffmpeg-path.label": "ffmpeg பாதை",
   "settings-tab.ffmpeg-path.auto": "தானியங்கி",
   "settings-tab.ffmpeg-path.manual": "கையேடு",

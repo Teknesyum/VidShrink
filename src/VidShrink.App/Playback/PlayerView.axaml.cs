@@ -659,7 +659,10 @@ internal partial class PlayerView : UserControl
         if (!_playing) TogglePlay();
         AfterOpen(path, engine);
         RefreshState();
+        Opened?.Invoke(path);
     }
+
+    internal event Action<string>? Opened;
 
     private void SaveHistory(bool finished)
     {

@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Fiksuotas aplankas siunčia visas išvestis į tą pačią vietą, o ne šalia šaltinio failo.",
   "settings-tab.advanced-default-open.label": "Išplėstines parinktis rodyti išskleistas pagal numatymą",
   "settings-tab.advanced-default-open.hint": "Automatiškai atidaro išplėstinę dalį kiekvieną kartą paleidus programą.",
+  "settings-tab.follow-recording.label": "Sekti įrašą visuose skirtukuose",
+  "settings-tab.follow-recording.hint": "Sustabdžius įrašymą, Sumažinti ir Grotuvas jį įkelia nekeičiant skirtuko. Grotuve atidarytas failas įkeliamas ir į Sumažinti.",
   "settings-tab.ffmpeg-path.label": "ffmpeg kelias",
   "settings-tab.ffmpeg-path.auto": "Automatinis",
   "settings-tab.ffmpeg-path.manual": "Rankinis",

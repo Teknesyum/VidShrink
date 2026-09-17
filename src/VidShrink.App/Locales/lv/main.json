@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Fiksēta mape sūta katru izvadi uz vienu vietu, nevis blakus avota failam.",
   "settings-tab.advanced-default-open.label": "Rādīt papildu opcijas izvērstas pēc noklusējuma",
   "settings-tab.advanced-default-open.hint": "Automātiski atver papildu sadaļu katrā lietotnes palaišanā.",
+  "settings-tab.follow-recording.label": "Sekot ierakstam visās cilnēs",
+  "settings-tab.follow-recording.hint": "Kad ieraksts apstājas, Samazināt un Atskaņotājs to ielādē, nemainot cilni. Atskaņotājā atvērts fails tiek ielādēts arī cilnē Samazināt.",
   "settings-tab.ffmpeg-path.label": "ffmpeg ceļš",
   "settings-tab.ffmpeg-path.auto": "Automātiski",
   "settings-tab.ffmpeg-path.manual": "Manuāli",

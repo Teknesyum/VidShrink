@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "โฟลเดอร์ตายตัวส่งผลลัพธ์ทั้งหมดไปที่เดียวกันแทนข้างไฟล์ต้นฉบับ",
   "settings-tab.advanced-default-open.label": "แสดงตัวเลือกขั้นสูงแบบขยายเป็นค่าเริ่มต้น",
   "settings-tab.advanced-default-open.hint": "เปิดส่วนขั้นสูงอัตโนมัติทุกครั้งที่แอปเริ่ม",
+  "settings-tab.follow-recording.label": "ติดตามการบันทึกในทุกแท็บ",
+  "settings-tab.follow-recording.hint": "เมื่อหยุดบันทึก แท็บย่อขนาดและเครื่องเล่นจะโหลดไฟล์โดยไม่สลับแท็บ ไฟล์ที่เปิดในเครื่องเล่นก็จะโหลดเข้าแท็บย่อขนาดด้วย",
   "settings-tab.ffmpeg-path.label": "เส้นทาง ffmpeg",
   "settings-tab.ffmpeg-path.auto": "อัตโนมัติ",
   "settings-tab.ffmpeg-path.manual": "กำหนดเอง",

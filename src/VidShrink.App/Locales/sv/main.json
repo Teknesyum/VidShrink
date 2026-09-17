@@ -458,6 +458,8 @@
   "settings-tab.output-folder.hint": "Fast mapp skickar all utdata till samma plats i stället för bredvid källfilen.",
   "settings-tab.advanced-default-open.label": "Visa avancerade val utfällda som standard",
   "settings-tab.advanced-default-open.hint": "Öppnar den avancerade sektionen automatiskt varje gång appen startar.",
+  "settings-tab.follow-recording.label": "Följ inspelningen i alla flikar",
+  "settings-tab.follow-recording.hint": "När en inspelning stoppas läser Förminska och Spelare in den utan att byta flik. En fil som öppnas i spelaren läses också in i Förminska.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-sökväg",
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuell",

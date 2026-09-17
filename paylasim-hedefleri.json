@@ -7,7 +7,7 @@
       "displayName": "storage.to",
       "maxBytes": 26843545600,
       "retentionDays": [1, 2, 3, 4, 5, 6, 7],
-      "defaultRetentionDays": 3,
+      "defaultRetentionDays": 1,
       "canDelete": true,
       "playsInBrowser": true,
       "endpoints": {
