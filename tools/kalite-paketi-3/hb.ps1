@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek')][string]$Is,
+    [Parameter(Mandatory)][ValidateSet('handbrake', 'dusuk', 'social', 'bantlasma', 'turbo', 'hdr', 'vt', 'ekranbant', 'svtara', 'turboilk', 'vtara', 'socialkodek', 'svtbekci')][string]$Is,
     [Parameter(Mandatory)][string]$Cikti,
     [Parameter(Mandatory)][string]$Bench,
     [string]$Kesit = '',
@@ -968,7 +968,64 @@ function SocialKodek {
     }
 }
 
+function SvtSatirlari([string]$Metin) {
+    ((($Metin -split "`n") | Where-Object { $_ -match 'BRC mode|pred struct|Svt\[warn\]|Svt\[error\]|Error parsing' } | ForEach-Object { $_.Trim() } | Select-Object -Unique -First 8) -join ' // ')
+}
+
+function SvtBekci {
+    if ($Kesit -eq 'rampa') { $girdi = Rampa; $r = 1174; $tavanKbit = 1200 } else { $girdi = Join-Path $Cikti "kesit-$Kesit.mkv"; $r = 580; $tavanKbit = 600 }
+    $b = Probe $girdi
+    $tavanMb = [math]::Round($tavanKbit * $b.Sure / 8 / 1024, 4)
+    $g = [int][math]::Round($b.Fps * 5)
+    $psy = "keyint=${g}:scd=1:tune=1:enable-variance-boost=0"
+    $t = [int][math]::Round($r * 0.9)
+    $kollar = [ordered]@{
+        'vbr2' = @{ Iki = $true; K = @('-b:v', "${r}k"); P = '' }
+        'negatif-uydurma' = @{ Iki = $true; K = @('-b:v', "${r}k"); P = 'vidshrinkuydurma=1' }
+        'vbr1' = @{ Iki = $false; K = @('-b:v', "${r}k"); P = '' }
+        'cbr1' = @{ Iki = $false; K = @('-b:v', "${r}k", '-maxrate', "${r}k", '-bufsize', "${r}k"); P = '' }
+        'cbr2' = @{ Iki = $true; K = @('-b:v', "${r}k", '-maxrate', "${r}k", '-bufsize', "${r}k"); P = '' }
+        'vbr2-tepe' = @{ Iki = $true; K = @('-b:v', "${t}k", '-maxrate', "${r}k", '-bufsize', "${r}k"); P = '' }
+        'capcrf' = @{ Iki = $false; K = @('-crf', '40', '-maxrate', "${r}k", '-bufsize', "$(2 * $r)k"); P = '' }
+        'vbr2-gop' = @{ Iki = $true; K = @('-b:v', "${r}k"); P = 'gop-constraint-rc=1' }
+        'vbr2-os0' = @{ Iki = $true; K = @('-b:v', "${r}k"); P = 'overshoot-pct=0' }
+        'vbr2-recode' = @{ Iki = $true; K = @('-b:v', "${r}k"); P = 'recode-loop=4' }
+    }
+    foreach ($kol in $kollar.Keys) {
+        for ($tekrar = 1; $tekrar -le 3; $tekrar++) {
+            Dene $Kesit $kol $r {
+                $k = $kollar[$kol]
+                $prm = $psy
+                if ($k.P) { $prm += ":$($k.P)" }
+                $kodek = @('-c:v', 'libsvtav1', '-preset', '6') + $k.K + @('-g', "$g", '-svtav1-params', $prm, '-pix_fmt', 'yuv420p')
+                $c = Join-Path $Cikti "bekci-$Kesit-$kol-$tekrar.mp4"
+                if ($k.Iki) {
+                    $p = Join-Path $Cikti ('pass-' + [guid]::NewGuid().ToString('N'))
+                    $r1 = FfKos (@('-i', $girdi, '-an') + $kodek + @('-pass', '1', '-passlogfile', $p, '-f', 'null', $NullCikis)) 'info'
+                    $r2 = FfKos (@('-i', $girdi, '-an') + $kodek + @('-pass', '2', '-passlogfile', $p, '-movflags', '+faststart', $c)) 'info'
+                    Get-ChildItem -Path $Cikti -Filter ((Split-Path $p -Leaf) + '*') -ErrorAction SilentlyContinue | Remove-Item -ErrorAction SilentlyContinue
+                    $kod = [math]::Max($r1.Kod, $r2.Kod); $sn = [math]::Round($r1.Sn + $r2.Sn, 1); $metin = $r2.Metin
+                } else {
+                    $r2 = FfKos (@('-i', $girdi, '-an') + $kodek + @('-movflags', '+faststart', $c)) 'info'
+                    $kod = $r2.Kod; $sn = $r2.Sn; $metin = $r2.Metin
+                }
+                $satir = [ordered]@{ is = $Is; kesit = $Kesit; kol = $kol; tekrar = $tekrar; istek_kbit = $r; tavan_mb = $tavanMb; cikis_kodu = $kod; kodlama_sn = $sn; komut_kodek = ($kodek -join ' '); svt = (SvtSatirlari $metin); uyari = (Uyarilar $metin) }
+                if ($kod -eq 0 -and (Test-Path $c)) {
+                    $mb = (Get-Item $c).Length / 1MB
+                    $satir.mb = [math]::Round($mb, 4)
+                    $satir.tavan_orani = [math]::Round($mb / $tavanMb, 4)
+                    $satir.tavan_alti = ($mb -le $tavanMb)
+                    $satir.md5 = AkisMd5 $c
+                    Remove-Item $c
+                }
+                Ekle $satir $null $null
+            }
+        }
+    }
+}
+
 switch ($Is) {
+    'svtbekci' { SvtBekci }
     'svtara' { SvtAra }
     'turboilk' { TurboIlk }
     'vtara' { VtAra }

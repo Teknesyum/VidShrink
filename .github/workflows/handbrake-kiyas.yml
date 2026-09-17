@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       isler:
-        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,turboilk,socialkodek,vtara
+        description: Virgullu; handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant,svtara,svtbekci,turboilk,socialkodek,vtara
         default: handbrake,dusuk,social,bantlasma,turbo,hdr,ekranbant
       kesitler:
         description: handbrake isinin kesitleri
@@ -82,6 +82,7 @@ jobs:
             hdr = @('CosmosCaterpillar', 'CosmosTreeTrunk')
             ekranbant = @('ekran')
             svtara = @('karanlik', 'rampa')
+            svtbekci = @('rampa', 'karanlik')
             turboilk = @('karanlik', 'hareketli')
             socialkodek = @('parlak', 'karanlik', 'hareketli')
           }
