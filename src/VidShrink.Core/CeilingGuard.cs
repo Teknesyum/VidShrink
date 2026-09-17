@@ -10,7 +10,7 @@ public static class CeilingGuard
     public const double VbvWindowSeconds = 1.0;
 
     public static bool CapsPeakAtRate(string codec)
-        => FfmpegArguments.SupportsRateLimits(codec) && !CodecModel.IsHardware(codec);
+        => string.Equals(codec, "libx264", StringComparison.OrdinalIgnoreCase);
 
     public static double WorstYield(EncodePlan last, IEnumerable<SizeSample> samples, double durationSeconds)
     {

@@ -56,6 +56,19 @@ public sealed class CeilingGuardTests
     }
 
     [Fact]
+    public void X265BekcisiTepeyiSerbestBirakirCunkuTepeEsitlemesiTasmayiBuyuttu()
+    {
+        var info = new MediaInfo { FilePath = "kaynak.mp4", DurationSeconds = 10, Width = 1920, Height = 1080, Fps = 24, VideoCodec = "h264", FileSizeBytes = 10_000_000, TotalBitrateBps = 8_000_000 };
+        var plan = CeilingGuard.Plan(Son("libx265"), RampaIzi, 1.4648, 10);
+
+        Assert.NotNull(plan);
+        Assert.False(plan!.PeakEqualsRate);
+        var args = FfmpegArguments.Build(info, plan, "o.mp4", 2, "gunluk").ToList();
+        var tepe = args.IndexOf("-maxrate");
+        Assert.True(tepe < 0 || args[tepe + 1] != $"{plan.VideoBitrateK}k", string.Join(' ', args));
+    }
+
+    [Fact]
     public void VerimBirinAltindaysaBirSayilirVeBekciButceyiAsmaz()
     {
         var izler = new[] { new SizeSample(1000, Mb(1000, 0.98), true), new SizeSample(990, Mb(990, 0.99), true) };
@@ -134,7 +147,7 @@ public sealed class CeilingGuardTests
         var kaynak = await KaynakYapAsync(klasor);
         var cikti = Path.Combine(klasor, "bekci.mp4");
 
-        var sonuc = await new EncodeRunner().RunAsync(Bilgi(kaynak), KucukPlan(), cikti, targetMb: 0.004, progress: null,
+        var sonuc = await new EncodeRunner().RunAsync(Bilgi(kaynak), KucukPlan(), cikti, targetMb: 0.020, progress: null,
             fillPolicy: FillPolicy.FillTarget);
 
         var iz = string.Join(" | ", sonuc.Trace!.Select(a => $"{a.Number}:{a.Branch}:{a.VideoBitrateK}k:{a.ActualMb:0.#####}"));
@@ -161,7 +174,7 @@ public sealed class CeilingGuardTests
         var kaynak = await KaynakYapAsync(klasor);
         var cikti = Path.Combine(klasor, "birak.mp4");
 
-        var sonuc = await new EncodeRunner().RunAsync(Bilgi(kaynak), KucukPlan(), cikti, targetMb: 0.004, progress: null,
+        var sonuc = await new EncodeRunner().RunAsync(Bilgi(kaynak), KucukPlan(), cikti, targetMb: 0.020, progress: null,
             fillPolicy: FillPolicy.FillTarget,
             askBeforeRetry: (s, _) => Task.FromResult(s.CanRetry ? OvershootChoice.Retry : OvershootChoice.Leave));
 
@@ -228,6 +241,6 @@ public sealed class CeilingGuardTests
         Height = 240,
         Fps = 10,
         Preset = "ultrafast",
-        ExtraArgs = new List<string> { "-threads", "1" }
+        ExtraArgs = new List<string> { "-threads", "1", "-metadata", "comment=" + new string('x', 20000) }
     };
 }

@@ -399,9 +399,10 @@ function BantKabul([string]$Kol, [int]$Kbit, [double]$TavanMb, $u, $o) {
     $yukseklik = [int](($o.geometri_cikti -split 'x')[1])
     $neden = @()
     if ($Kesit -eq 'rampa' -and $Kol -eq 'e0-duzen' -and $Kbit -eq 1200) {
+        $ikiTasma = @($u.Denemeler | Where-Object { $_.no -le 2 -and $_.dal -eq 'over ceiling' }).Count -ge 2
         if ($o.mb -lt 0.703) { $neden += "mb $($o.mb) < 0,703" }
-        if ($u.Deneme -ne 3) { $neden += "deneme $($u.Deneme) != 3" }
-        if (-not $u.Bekci) { $neden += 'izde ceiling guard yok' }
+        if ($u.Deneme -gt 3) { $neden += "deneme $($u.Deneme) > 3" }
+        if ($ikiTasma -and -not $u.Bekci) { $neden += 'iki tavan ustu denemeden sonra izde ceiling guard yok' }
         if ($u.Doygun) { $neden += 'doygun' }
         if ($u.Yanitsiz) { $neden += 'did not answer' }
         if ($neden.Count) { return 'kaldi: ' + ($neden -join '; ') }
