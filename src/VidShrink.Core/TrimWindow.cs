@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -61,7 +61,4 @@ public sealed record TrimWindow(double StartSeconds, double EndSeconds)
             FileSizeBytes = Math.Max(1, (long)Math.Round(info.FileSizeBytes * share)),
         };
     }
-
-    public string Describe()
-        => $"{StartSeconds.ToString("0.###", CultureInfo.InvariantCulture)}-{EndSeconds.ToString("0.###", CultureInfo.InvariantCulture)} sn";
 }

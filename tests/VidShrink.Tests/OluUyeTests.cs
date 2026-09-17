@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -659,7 +659,6 @@ public sealed class OluUyeTests
         "LayoutScoreParts.ScalePenalty  yalniz-disarida",
         "MediaInfo.BitDepth  hic-gorunmeyen",
         "MediaInfo.ChapterCount  hic-gorunmeyen",
-        "MediaInfo.FileSizeBytes  hic-gorunmeyen",
         "PerformanceCheckResult.CpuAccountingFactor  hic-gorunmeyen",
         "PerformanceCheckResult.CpuAccountingTrustworthy  yalniz-disarida",
         "PerformanceCheckResult.HardwareMeasured  yalniz-disarida",
