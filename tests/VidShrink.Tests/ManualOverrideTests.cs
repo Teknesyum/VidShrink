@@ -1063,7 +1063,8 @@ public sealed class ManualOverrideTests
     {
         "TargetMb", "Intent", "Codec", "AllowResolutionDrop", "AllowFpsDrop", "HdrPolicy", "FillPolicy", "SpeedMode",
         "LockedCodec", "LockedMode", "LockedCrf", "LockedPreset", "LockedAudioKbps", "AudioChannels",
-        "MinResolutionHeight", "FixedResolution", "MinFps", "EncoderPath", "KeepAllTracks", "PlatformDelivery", "PreferredLanguage"
+        "MinResolutionHeight", "FixedResolution", "MinFps", "EncoderPath", "KeepAllTracks", "PlatformDelivery", "PreferredLanguage",
+        "Filters", "DetectedCrop"
     };
 
     [Fact]
