@@ -217,14 +217,16 @@ public sealed class OynaticiSuruklemeTests
                     if (rect.Left != beklenen.X || rect.Top != beklenen.Y || rect.Right - rect.Left != w || rect.Bottom - rect.Top != h) hatalar.Add(satir);
                 }
 
-                var tutma = new Point(view.Bounds.Width / 2, view.Bounds.Height / 2);
+                var tutma = new Point(window.ClientSize.Width / 2, window.ClientSize.Height / 2);
+                body.AppendLine($"gorunum {view.Bounds.Width}x{view.Bounds.Height}, istemci {window.ClientSize.Width}x{window.ClientSize.Height}, tutma {tutma}, durum {window.WindowState}, etkin {window.IsActive}");
                 var saat = Stopwatch.StartNew();
                 HamFare(window, RawPointerEventType.Move, tutma, RawInputModifiers.None);
                 HamFare(window, RawPointerEventType.LeftButtonDown, tutma, RawInputModifiers.LeftMouseButton);
                 HamFare(window, RawPointerEventType.Move, tutma + new Vector(40, 30), RawInputModifiers.LeftMouseButton);
                 DenetimSurucu.Wait(view, 0.1);
                 HamFare(window, RawPointerEventType.LeftButtonUp, tutma + new Vector(40, 30), RawInputModifiers.None);
-                var yerel = view.Trace.Contains("movedrag -> native");
+                var yerel = view.Trace.Contains("movedrag -> " + PlayerView.NativeMode);
+                body.AppendLine("iz: " + string.Join(" | ", view.Trace));
                 body.AppendLine($"ham surukleme: yerel tasima {yerel}, kendi dongu {view.WindowDragging}, {saat.ElapsedMilliseconds} ms");
                 if (!yerel || view.WindowDragging) hatalar.Add("ham surukleme yerel tasimaya gitmedi");
 

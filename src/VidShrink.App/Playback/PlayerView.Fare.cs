@@ -150,6 +150,9 @@ internal partial class PlayerView
         Frame.RenderTransform = _shift;
     }
 
+    internal const string NativeMode = "native";
+    internal const string NoPressMode = "nopress";
+
     private double SnapDip()
         => this.TryFindResource("PlaybackBadgeMargin", out var value) && value is Thickness edge ? edge.Left : 0;
 
@@ -205,8 +208,13 @@ internal partial class PlayerView
         if (NativeMoveDrag)
         {
             _dragMode = "";
-            if (_pressArgs is not { } press) return;
-            _trace.Add("movedrag -> native");
+            if (_pressArgs is not { } press)
+            {
+                _trace.Add("movedrag -> " + NoPressMode);
+                return;
+            }
+
+            _trace.Add("movedrag -> " + NativeMode);
             window.BeginMoveDrag(press);
             return;
         }
@@ -328,7 +336,7 @@ internal partial class PlayerView
         var snapped = SnapRect(rect, ScreenAreas(top), SnapDip());
         if (snapped == rect) return IntPtr.Zero;
         Marshal.StructureToPtr(new NativeRect { Left = snapped.X, Top = snapped.Y, Right = snapped.Right, Bottom = snapped.Bottom }, lParam, false);
-        _trace.Add(FormattableString.Invariant($"moving snap -> {snapped.X},{snapped.Y}"));
+        _trace.Add(FormattableString.Invariant($"movingsnap -> {snapped.X},{snapped.Y}"));
         handled = true;
         return new IntPtr(1);
     }
