@@ -820,7 +820,7 @@ Dal `t0/hb-1c-akis`.
 
 # Plan — Küçültmede Aralık (HandBrake Açığı, Madde 54)
 
-Dal: `t0/hb-acik-kalan`, taban `a721f6c0`. Karar kaynağı:
+Dal: `t0/hb-acik-kalan`, taban `e962538e`. Karar kaynağı:
 `docs/danisma/2026-09-18-fable-kucultmede-aralik.md` (S1–S6).
 
 ## Sorun
