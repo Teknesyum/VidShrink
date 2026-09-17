@@ -1,3 +1,16 @@
+# Bütçe Doldurma — Yukarı Deneme
+
+Dal `t0/butce-doldur`. Kaynak: `docs/olcumler/nvenc-2.md` (ort %4,8 boş bütçe). Kural önce `docs/olcumler/butce-doldur.md`.
+
+1. **Karar Core'da.** Yeni `src/VidShrink.Core/BudgetFill.cs`: teslim hedefin %97'sinin altındaysa bir yukarı
+   deneme planı (ölçülen noktadan ölçek, tavan üstü örnek varsa aradeğerle sınır), yukarı denemenin tutulup
+   tutulmayacağı ve deneme bütçesi (sınır + 1). `PlanCalculator`'a boyut↔kbit için iki açık yardımcı.
+2. **Koşucu.** `EncodeRunner` üç teslim noktasında (bantta, son denemede tavan aşımı sonrası dolu yedek,
+   bant altı kabul) yukarı denemeyi bir kez koşar; tavanı aşarsa önceki sonuç teslim edilir. Bilerek durma,
+   doygunluk, ölü verim, kullanıcı kararı ve tavan bekçisi yolları dokunulmaz.
+3. **Testler.** `tests/VidShrink.Tests/BudgetFillTests.cs`, her kol için negatif kontrol.
+4. **Ölçüm.** `tools/butce-doldur/kos.ps1`: nvenc-2'nin |sapma| > %3 hücreleri + libx264/libx265 6 hücre,
+   önce/sonra Bench, VMAF-NEG. Sonuç `docs/olcumler/butce-doldur.md`.
 # HandBrake Dalga 2 — Ölçülen Açıklar
 
 Dal `t0/hb-2-aciklar`. Kaynak: dalga 1b ölçümü (koşum 35158725446,
