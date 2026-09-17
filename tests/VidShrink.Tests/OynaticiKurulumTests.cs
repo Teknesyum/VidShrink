@@ -121,6 +121,101 @@ public sealed class OynaticiKurulumTests
     }
 
     [Fact]
+    public void MacosKurulumuSabitlenmisMpvkitLibmpvyiToolsAltinaKoyar()
+    {
+        var kurulum = Oku("install-vidshrink.sh");
+        var kilit = Oku("tools", "mpvkit-macos", "mpvkit-1.0.0.lock");
+
+        var cikti = Regex.Match(kilit, @"^# output (\S+) ([0-9a-f]{64}) (\S+)[ \t]*\r?$", RegexOptions.Multiline);
+        Assert.True(cikti.Success, "kilit dosyasinda # output satiri yok");
+        var ad = cikti.Groups[1].Value;
+        var sha = cikti.Groups[2].Value;
+        var url = cikti.Groups[3].Value;
+
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-macos-mpvkit-1.0.0/{ad}", url);
+        Assert.Contains($"mac_libmpv_url='{url}'", kurulum, StringComparison.Ordinal);
+        Assert.Contains($"mac_libmpv_sha256='{sha}'", kurulum, StringComparison.Ordinal);
+        Assert.Contains("\"$stage_root/tools/libmpv/libmpv.2.dylib\"", kurulum, StringComparison.Ordinal);
+        Assert.Contains("cp -R \"$payload/.\" \"$bundle/Contents/MacOS/\"", Oku("macos-app-bundle.sh"), StringComparison.Ordinal);
+        var macos = Path.Combine(KurulumKoku("macos-paket"), "VidShrink.app", "Contents", "MacOS");
+        Assert.Contains(Path.Combine(macos, "tools", "libmpv"), LibMpvLocator.AppDirectories(macos));
+    }
+
+    [Fact]
+    public void MacosAltSurumuDortBelgedeOnDortDiyor()
+    {
+        var beklenen = new (string Dosya, string Dize)[]
+        {
+            ("README.md", "macOS 14 or newer"),
+            ("README.tr.md", "macOS 14 ve"),
+            (Path.Combine("docs", "kurulum.md"), "macOS 14 or newer"),
+            (Path.Combine("docs", "kurulum.tr.md"), "macOS 14 ve üstü"),
+            (Path.Combine("docs", "YOL-HARITASI.md"), "macOS alt sürümü: 14"),
+        };
+
+        foreach (var (dosya, dize) in beklenen)
+        {
+            var metin = Oku(dosya);
+            Assert.Contains(dize, metin, StringComparison.Ordinal);
+            var eski = Regex.Matches(metin, @"macOS 15 (or newer|ve üstü|ve\b)|macOS alt sürümü: 15");
+            Assert.True(eski.Count == 0, $"{dosya} hala macOS 15 tabani soyluyor: {string.Join(" | ", eski.Select(m => m.Value))}");
+        }
+
+        Assert.Contains("MPVKit yolu denendi ve tuttu", Oku(Path.Combine("docs", "YOL-HARITASI.md")), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MacosKurucusuOnceBrewuYokluyorVeBelgeAyniSiraiAnlatiyor()
+    {
+        var kurulum = Oku("install-vidshrink.sh");
+        var govde = kurulum[kurulum.IndexOf("require_libmpv() {", StringComparison.Ordinal)..];
+        var brew = govde.IndexOf("if has_libmpv; then", StringComparison.Ordinal);
+        var indirme = govde.IndexOf("download_mac_libmpv", StringComparison.Ordinal);
+        Assert.True(brew >= 0 && indirme > brew, $"kurucu once brew'u yoklamiyor: has_libmpv {brew}, download_mac_libmpv {indirme}");
+
+        var ingilizce = Oku(Path.Combine("docs", "kurulum.md"));
+        var turkce = Oku(Path.Combine("docs", "kurulum.tr.md"));
+        Assert.Contains("first looks for a Homebrew libmpv", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("Homebrew `mpv` when already installed", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("önce Homebrew libmpv'sine bakar", turkce, StringComparison.Ordinal);
+        Assert.DoesNotContain("On macOS it downloads libmpv itself", ingilizce, StringComparison.Ordinal);
+        Assert.DoesNotContain("macOS'ta libmpv'yi kurucu kendisi indirir", turkce, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void KurucuYayinSorgusundaJetonuIsteneSeKullanir()
+    {
+        var kurulum = Oku("install-vidshrink.sh");
+
+        Assert.Contains("github_token=${GITHUB_TOKEN:-${GH_TOKEN:-}}", kurulum, StringComparison.Ordinal);
+        Assert.Contains("${github_token:+-H \"Authorization: Bearer $github_token\"}", kurulum, StringComparison.Ordinal);
+
+        var jeton = kurulum.IndexOf("Authorization: Bearer", StringComparison.Ordinal);
+        var api = kurulum.IndexOf("https://api.github.com/repos/$repository/releases/latest", StringComparison.Ordinal);
+        Assert.True(jeton > 0 && api > jeton && api - jeton < 200, $"jeton basligi api cagrisina bagli degil: jeton {jeton}, api {api}");
+        Assert.DoesNotContain("Authorization: Bearer $github_token\" \\\n    \"https://github.com", kurulum, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GuncellemeDenetimiYayinListesiNumaralandirmaz()
+    {
+        var kaynaklar = Directory.GetFiles(Path.Combine(Root, "src"), "*.cs", SearchOption.AllDirectories);
+        Assert.True(kaynaklar.Length > 50, $"src altinda {kaynaklar.Length} kaynak bulundu");
+
+        foreach (var yol in kaynaklar)
+        {
+            var metin = File.ReadAllText(yol);
+            var ad = Path.GetRelativePath(Root, yol);
+            Assert.False(metin.Contains("per_page", StringComparison.Ordinal), $"{ad} sayfali yayin listesi cagiriyor (per_page)");
+            foreach (var m in Regex.Matches(metin, @"/releases(?<son>/latest|/tag/|/download/|)").Cast<Match>())
+                Assert.True(m.Groups["son"].Value.Length > 0, $"{ad} yayin listesini numaralandiriyor: {metin.Substring(Math.Max(0, m.Index - 40), Math.Min(80, metin.Length - Math.Max(0, m.Index - 40)))}");
+        }
+
+        var denetim = Oku("src", "VidShrink.Core", "UpdateCheck.cs");
+        Assert.Contains("releases/latest", denetim, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void UnixKurulumuLibmpvYoksaKomutuSoyleyipDurur()
     {
         var kurulum = Oku("install-vidshrink.sh");

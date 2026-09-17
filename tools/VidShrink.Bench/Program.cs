@@ -747,8 +747,7 @@ static async Task<int> ShrinkAsync(string[] args)
         var band = FillBand.For(targetMb);
 
         var outputPath = Path.Combine(outDir, $"{label}_{targetMb.ToString("0.#", CultureInfo.InvariantCulture)}mb.mp4");
-        var commandPass = plan.ModeEnum == EncodeMode.TwoPass && !CodecModel.IsHardware(plan.Codec) ? 2 : 0;
-        Console.WriteLine("komut: " + FfmpegArguments.ToCommandLine(EncodeRunner.EncodeArguments(info, plan, outputPath, commandPass, commandPass > 0 ? Path.Combine(outDir, "pass") : null, EncoderCapabilities.Instance)));
+        Console.WriteLine(KomutSatiri.Yaz(info, plan, outputPath, outDir, EncoderCapabilities.Instance));
         if (planOnly) continue;
         var stopwatch = Stopwatch.StartNew();
         var encodeResult = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None, fillPolicy);

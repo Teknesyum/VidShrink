@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "kind": "vidshrink-presets",
+  "presets": [
+    { "id": "archive", "kind": "General", "chip": "ChipArchive", "targetMb": null, "sizeCapped": false, "intent": "Archive", "codec": "MaxCompression", "fill": "QualityCeiling", "source": { "status": "Code" } },
+    { "id": "size-8", "kind": "General", "chip": "Chip8", "targetMb": 8, "sizeCapped": true, "intent": "SocialMedia", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Code" } },
+    { "id": "whatsapp-chat", "kind": "Platform", "chip": "ChipWhatsApp", "targetMb": 16, "sizeCapped": true, "intent": "Sharing", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Code", "url": "https://faq.whatsapp.com/164676891531296/" } },
+    { "id": "size-25", "kind": "General", "chip": "Chip25", "targetMb": 25, "sizeCapped": true, "intent": "Sharing", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Code" } },
+    { "id": "size-100", "kind": "General", "chip": "Chip100", "targetMb": 100, "sizeCapped": true, "intent": "Sharing", "codec": "Auto", "fill": "FillTarget", "source": { "status": "Code" } },
+    { "id": "share-uguu", "kind": "Platform", "chip": "Chip128", "targetMb": 128, "sizeCapped": true, "intent": "Sharing", "codec": "Auto", "fill": "FillTarget", "source": { "status": "Code" } },
+    { "id": "whatsapp-web", "kind": "Platform", "chip": "Chip180", "targetMb": 180, "sizeCapped": true, "intent": "Sharing", "codec": "Auto", "fill": "FillTarget", "source": { "status": "Code" } },
+    { "id": "half", "kind": "General", "chip": "ChipHalf", "targetMb": null, "sizeCapped": true, "intent": "Sharing", "codec": "Auto", "fill": "QualityCeiling", "source": { "status": "Code" } },
+    { "id": "discord-free", "kind": "Platform", "targetMb": 20, "sizeCapped": true, "intent": "SocialMedia", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Official", "url": "https://support.discord.com/hc/en-us/articles/25444343291031-File-Attachments-FAQ", "checked": "2026-09-17" } },
+    { "id": "discord-nitro-basic", "kind": "Platform", "targetMb": 50, "sizeCapped": true, "intent": "SocialMedia", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Official", "url": "https://support.discord.com/hc/en-us/articles/25444343291031-File-Attachments-FAQ", "checked": "2026-09-17" } },
+    { "id": "discord-nitro", "kind": "Platform", "targetMb": 500, "sizeCapped": true, "intent": "SocialMedia", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Official", "url": "https://support.discord.com/hc/en-us/articles/25444343291031-File-Attachments-FAQ", "checked": "2026-09-17" } },
+    { "id": "telegram", "kind": "Platform", "targetMb": 2000, "sizeCapped": true, "intent": "Sharing", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Official", "url": "https://telegram.org/faq", "checked": "2026-09-17" } },
+    { "id": "email-gmail", "kind": "Platform", "targetMb": 25, "sizeCapped": true, "intent": "Sharing", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Official", "url": "https://support.google.com/mail/answer/6584", "checked": "2026-09-17" } },
+    { "id": "email-outlook", "kind": "Platform", "targetMb": 20, "sizeCapped": true, "intent": "Sharing", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Official", "url": "https://support.microsoft.com/en-us/office/reduce-attachment-size-to-send-large-files-with-outlook-8c698842-b462-4a4c-8d53-5c5dd04f77ef", "checked": "2026-09-17" } },
+    { "id": "device-chromecast-gen1-2", "kind": "Device", "targetMb": null, "sizeCapped": false, "intent": "Sharing", "codec": "Compatible", "fill": "QualityCeiling", "maxShortEdge": 720, "container": "Mp4", "source": { "status": "Official", "url": "https://developers.google.com/cast/docs/media", "checked": "2026-09-17" } },
+    { "id": "device-chromecast-gen3", "kind": "Device", "targetMb": null, "sizeCapped": false, "intent": "Sharing", "codec": "Compatible", "fill": "QualityCeiling", "maxShortEdge": 1080, "container": "Mp4", "source": { "status": "Official", "url": "https://developers.google.com/cast/docs/media", "checked": "2026-09-17" } },
+    { "id": "device-nest-hub", "kind": "Device", "targetMb": null, "sizeCapped": false, "intent": "Sharing", "codec": "Compatible", "fill": "QualityCeiling", "maxShortEdge": 720, "container": "Mp4", "source": { "status": "Official", "url": "https://developers.google.com/cast/docs/media", "checked": "2026-09-17" } },
+    { "id": "device-apple-tv-hd", "kind": "Device", "targetMb": null, "sizeCapped": false, "intent": "Sharing", "codec": "Compatible", "fill": "QualityCeiling", "maxShortEdge": 1080, "container": "Mp4", "source": { "status": "Official", "url": "https://support.apple.com/en-us/111928", "checked": "2026-09-17" } }
+  ]
+}

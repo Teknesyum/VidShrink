@@ -59,13 +59,16 @@ Windows, macOS ve Linux ayrı sürüm numarası taşımaz. `Directory.Build.prop
 `osx-arm64` ve `linux-x64` üretir. Bir platformda bir iş eksik kalıyorsa sürüm numarası
 değil o işin kendisi geride kalır.
 
-### macOS alt sürümü: 15 (12 Eylül 2026)
+### macOS alt sürümü: 14 (17 Eylül 2026)
 
-osx-arm64 paketinin libmpv'si Homebrew şişelerinden geliyor ve 48 dylib'in 47'si
-`minos=15.0` taşıyor (`docs/olcumler/libmpv-macos-gomme.md:160`, librubberband 11.0). Alt sürümü 13'e indirmek libmpv'yi kendimiz
-derlemek ya da MPVKit'e geçmek demek; ikisi de kendi yayın zincirini getiriyor. Oynatıcı
-libmpv'ye bağlı olduğu için alt sürüm macOS 15 ilan edilir. Daha düşük bir taban istenirse
-iş `.claude/sonra.md`'deki libmpv derleme maddesinden açılır.
+İlk karar 15'ti: osx-arm64 paketinin libmpv'si Homebrew şişelerinden geliyordu ve 48
+dylib'in 47'si `minos=15.0` taşıyordu (`docs/olcumler/libmpv-macos-gomme.md`, librubberband
+11.0). MPVKit yolu denendi ve tuttu: MPVKit 1.0.0'ın LGPL statik arşivlerinden bağlanan
+evrensel `libmpv.2.dylib` `minos=13.0` taşıyor, kurucu onu `deps-libmpv-macos-mpvkit-1.0.0`
+önsürümünden sha256 doğrulamalı indiriyor, Homebrew yalnız yedek. macos-14 ve macos-15
+koşucularında başsız kare testi geçtiği için alt sürüm **macOS 14** ilan edilir; 13
+koşucusu artık yok, o yüzden 13.0 yalnız yükleme komutlarının tabanı, koşulmuş bir sürüm
+değil.
 
 ### Kaydedicinin kullanışlılık sırası araştırmadan gelir (13 Eylül 2026)
 

@@ -1449,7 +1449,7 @@ public sealed class WindowLayoutTests
             return (IReadOnlyList<BoxLabel>)labels;
         });
 
-    private readonly record struct DilTaramasi(IReadOnlyList<string> Kesik, IReadOnlyList<string> Bosluk, int Blok, double Toplam, string Kayit);
+    private readonly record struct DilTaramasi(IReadOnlyList<string> Kesik, IReadOnlyList<string> Sikisma, IReadOnlyList<string> Bosluk, int Blok, int Sarmalanan, double Toplam, string Kayit);
 
     private static DilTaramasi DilTara(string dil, Size size, bool loaded) =>
         Fresh(window =>
@@ -1468,9 +1468,11 @@ public sealed class WindowLayoutTests
                 var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
                 window.TryFindResource("Panel", out var panelTema);
                 var kesik = new List<string>();
+                var sikisma = new List<string>();
                 var bosluk = new List<string>();
                 var kayit = new System.Text.StringBuilder();
                 var blok = 0;
+                var sarmalanan = 0;
                 var toplam = 0.0;
 
                 for (var index = 0; index < tabs.ItemCount; index++)
@@ -1489,7 +1491,24 @@ public sealed class WindowLayoutTests
                     {
                         var gereken = NeededWidth(block, block.Text!);
                         toplam += gereken;
-                        if (block.TextWrapping != TextWrapping.NoWrap && block.TextTrimming == TextTrimming.None) continue;
+                        if (block.TextWrapping != TextWrapping.NoWrap && block.TextTrimming == TextTrimming.None)
+                        {
+                            var sarmalYer = block.Bounds.Width - block.Padding.Left - block.Padding.Right;
+                            if (sarmalYer <= 0) continue;
+                            if (block.GetVisualParent() is not Panel kap) continue;
+                            var kardes = kap.Children.OfType<Control>().Count(c => c.IsShown());
+                            if (kardes != 1 && kap is not StackPanel { Orientation: Avalonia.Layout.Orientation.Vertical }) continue;
+                            sarmalanan++;
+                            var kapYeri = kap.Bounds.Width - block.Margin.Left - block.Margin.Right;
+                            if (kapYeri <= sarmalYer + 0.5) continue;
+                            var kendiSatir = Math.Ceiling(gereken / sarmalYer);
+                            var mumkunSatir = Math.Ceiling(gereken / kapYeri);
+                            if (kendiSatir <= mumkunSatir) continue;
+                            sikisma.Add($"{dil} {baslik} · {block.Name ?? "(adsiz)"} [{block.Text}]: yer {sarmalYer:0.#}, "
+                                        + $"kap {kap.GetType().Name} {kapYeri:0.#}, satir {kendiSatir:0} > {mumkunSatir:0}");
+                            continue;
+                        }
+
                         blok++;
                         var yer = block.Bounds.Width - block.Padding.Left - block.Padding.Right;
                         var balonda = block.TextTrimming != TextTrimming.None && ToolTip.GetTip(block) as string == block.Text;
@@ -1508,7 +1527,7 @@ public sealed class WindowLayoutTests
                     bosluk.Add($"{baslik}={ilk - alt:0.#}");
                 }
 
-                return new DilTaramasi(kesik, bosluk, blok, toplam, kayit.ToString());
+                return new DilTaramasi(kesik, sikisma, bosluk, blok, sarmalanan, toplam, kayit.ToString());
             }
             finally
             {
@@ -1517,7 +1536,7 @@ public sealed class WindowLayoutTests
         });
 
     /// <summary>
-    /// S20: dil açıkça seçilerek (Türkçe, İngilizce ve ölçülen en uzun dil) tasarım ve taban
+    /// <para>S20: dil açıkça seçilerek (Türkçe, İngilizce ve ölçülen en uzun dil) tasarım ve taban
     /// boyunda, boş ve dolu sayfayla her görünür sekmenin kendi sayfası dolaşılır. Tek satırlık
     /// her metin doğal genişliğiyle kendi yeri karşılaştırılır; sığmayıp kesilen metin
     /// kırmızıdır. T194 kararı gereği üçnoktayla kısalıp tam halini balonda taşıyan metin
@@ -1528,6 +1547,20 @@ public sealed class WindowLayoutTests
     /// metinlerin doğal genişlik toplamı de 40309, ar 37019, tr 33344, en 32978 piksel; de taraması
     /// dar pencerede balonsuz kısalan dosya adını buldu, <c>TxtFileName</c> tam adı balonda taşıyor.
     /// Döküm <c>.calisma/s20/</c>.
+    /// </para>
+    ///
+    /// <para>Sarmalanan metnin kör noktası: tarama <c>TextWrapping != NoWrap</c> bloklarını atlıyordu,
+    /// bu yüzden <c>TxtDropHint</c>'e <c>Width="60"</c> vermek on iki kolun hepsinde sağ kalıyordu.
+    /// İki ölçüm denendi ve ikisi de çürüdü: kapsayıcı taşması (278 sarmalanan blok, mutasyonlu ağaçta
+    /// bile 0 taşma — <c>DropZone</c> içerikle birlikte büyüyor, hiçbir atada <c>ClipToBounds</c> açık
+    /// değil) ve gerçek yüksekliğin kaba sığması (blok yüksekliği otomatik, satır artınca kap da
+    /// artıyor). Ölçülen davranış kesilme değil <b>sıkışma</b>: blok kabının verdiği yerden dar
+    /// kalıp gereğinden çok satıra iniyor. Kural yalnız <b>yuvasında tek</b> bloğa uygulanır (kabın tek
+    /// görünür çocuğu ya da dikey <c>StackPanel</c>); kardeşle genişlik paylaşan blokta kabın genişliği
+    /// bloğun yeri değildir — ilk deneme bu yüzden <c>LblDuration</c> (yer 115, kap 145) ve
+    /// <c>TxtFrameSummary</c> (yer 244, kap 268) üstünde temiz ağaçta iki yanlış pozitif verdi.
+    /// Taban: 84 sarmalanan blok, 0 sıkışma. <c>Width="60"</c> mutasyonu iki boyda da kırmızı:
+    /// <c>TxtDropHint kap StackPanel yer 60, kap-yeri 204, satir 4 &gt; 1</c>.</para>
     /// </summary>
     [Theory]
     [MemberData(nameof(S20Kollari))]
@@ -1538,14 +1571,20 @@ public sealed class WindowLayoutTests
         var klasor = Path.Combine(TipSources.Root, ".calisma", "s20");
         Directory.CreateDirectory(klasor);
         File.WriteAllText(Path.Combine(klasor, $"{dil}-{(narrow ? "dar" : "tasarim")}-{(loaded ? "dolu" : "bos")}.txt"),
-            tarama.Kayit + string.Join(Environment.NewLine, tarama.Kesik) + Environment.NewLine + $"blok {tarama.Blok}" + Environment.NewLine + $"toplam {tarama.Toplam:0}");
+            tarama.Kayit + string.Join(Environment.NewLine, tarama.Kesik) + Environment.NewLine
+            + string.Join(Environment.NewLine, tarama.Sikisma) + Environment.NewLine + $"blok {tarama.Blok}"
+            + Environment.NewLine + $"sarmalanan {tarama.Sarmalanan}" + Environment.NewLine + $"toplam {tarama.Toplam:0}");
         _output.WriteLine(tarama.Kayit);
         _output.WriteLine(string.Join(Environment.NewLine, tarama.Kesik));
+        _output.WriteLine(string.Join(Environment.NewLine, tarama.Sikisma));
 
         Assert.True(tarama.Blok > 50, $"yalniz {tarama.Blok} blok olculdu");
+        Assert.True(tarama.Sarmalanan > 20, $"yalniz {tarama.Sarmalanan} sarmalanan blok olculdu");
         Assert.True(tarama.Kesik.Count == 0, string.Join(Environment.NewLine, tarama.Kesik));
+        Assert.True(tarama.Sikisma.Count == 0, string.Join(Environment.NewLine, tarama.Sikisma));
         Assert.Single(tarama.Bosluk.Select(b => b.Split('=')[1]).Distinct());
     }
+
 
     public static TheoryData<string, bool, bool> S20Kollari()
     {

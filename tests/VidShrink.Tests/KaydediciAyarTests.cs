@@ -44,12 +44,51 @@ public sealed class KaydediciAyarTests
         var index = kutu.ItemsSource!.Cast<object>().Select(o => o.ToString()).ToList().IndexOf(oge);
         Assert.True(index >= 0, $"{ad} kutusunda {oge} yok");
         kutu.SelectedIndex = index;
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
     }
 
     internal static void Elle(RecorderView view)
     {
         Bul<RadioButton>(view, "RadAdvanced").IsChecked = true;
         Bul<RadioButton>(view, "RadManual").IsChecked = true;
+    }
+
+    /// <summary>
+    /// <para>Kayit oturumu acikken ana panelde degistirilen ayar diske yazilir. Kusur olculdu:
+    /// <c>PersistChoices</c> kapisi <c>_session is not null</c> ile geri donuyordu, ama oturum
+    /// boyunca ana panelin ayar denetimleri devre disi birakilmiyor (<c>RefreshSerit</c> yalniz
+    /// dugmeleri suruyor, <c>CmbContainer</c>'in kosullu etkinlik bagi yok). Gelismis kipte kayit
+    /// surerken degistirilen kap sessizce yutuluyordu; mini panel bunu yalniz kendi bes kutusu icin
+    /// <c>ApplyMiniOption</c> icindeki yinelenmis kaydetme daliyla telafi ediyordu. Iki yol tek
+    /// <c>SaveChoicesIfChanged</c>'e indirildi, kapidan <c>_session</c> cikti.</para>
+    /// </summary>
+    [Fact]
+    public void OturumSurerkenDegisenAyarDiskeYazilir()
+    {
+        var (oturumsuz, oturumlu) = AyarDosyasiyla(() => AppHost.Run(() =>
+        {
+            var view = new RecorderView();
+            Elle(view);
+            Sec(view, "CmbContainer", "MP4");
+            var once = DosyadakiDeger("containerChoice");
+
+            var alan = typeof(RecorderView).GetField("_session",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+            alan.SetValue(view, System.Runtime.CompilerServices.RuntimeHelpers
+                .GetUninitializedObject(typeof(VidShrink.Ffmpeg.RecorderSession)));
+            try
+            {
+                Sec(view, "CmbContainer", "MOV");
+                return (once, DosyadakiDeger("containerChoice"));
+            }
+            finally
+            {
+                alan.SetValue(view, null);
+            }
+        }));
+
+        Assert.Equal("\"Mp4\"", oturumsuz);
+        Assert.Equal("\"Mov\"", oturumlu);
     }
 
     internal static string? Deger(IReadOnlyList<string> args, string bayrak)

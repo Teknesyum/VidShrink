@@ -170,7 +170,7 @@ internal partial class PlayerView
 
     private void RevealSerit(bool shown)
     {
-        if (shown && StripBar.Opacity <= 0) SpreadSerit();
+        if (shown && StripBar.Opacity < 0.001) SpreadSerit();
         StripBar.Opacity = shown ? 1 : 0;
         StripBar.IsHitTestVisible = shown;
     }

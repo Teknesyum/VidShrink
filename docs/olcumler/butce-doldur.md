@@ -46,8 +46,9 @@ Düzenek: `tools/butce-doldur/kos.ps1`; `VidShrink.Bench shrink <kesit> <mb> --s
 
 ## Aday 1 Sonucu: Kapı Kaldı
 
-Tüm kodek yolları, 32 hücre (26 NVENC + 6 yazılım), toplam kodlama 578,9 sn. Önce kolu nvenc-2 sayılarını yeniden üretti
-(ör. hareketli av1 1000 −11,07 / 3 deneme / 87,81).
+Tüm kodek yolları, 32 hücre (26 NVENC + 6 yazılım), toplam kodlama 578,9 sn. Önce kolu nvenc-2 ortalamalarını yeniden üretti
+(ör. hareketli av1 1000 −11,07 / 3 deneme / 87,81). Tavan bekçisi yolundan geçen üç derin-alt hücre (hareketli hevc 1000,
+parlak av1 1000, parlak hevc 1000) nvenc-2 değerlerini tek tek yeniden üretmedi; bu hücrelerde sapma 1-4 puan daha derin ölçüldü.
 
 | Küme | n | K1 ≥ %97 (önce → sonra) | K2 en büyük sapma | K3 Δdeneme | K4 ΔVMAF-NEG ort / p10 | Ort sapma önce → sonra |
 |---|---|---|---|---|---|---|
@@ -95,3 +96,8 @@ Negatif kol: aday 2 Bench'i `--fill qualityceiling`, `parlak` libx264 2000: 1 de
 
 K3 tutma kümesinde tam +1,00: her tetiklenen hücre bir deneme ekliyor, kural bunu izin veriyor ama pay yok. Donanımdaki
 %4,8 boş bütçe açık: NVENC'in basamaklı hız yanıtı tek denemelik pencereye sığmıyor.
+## Aday 3 Sonucu: Donanımın Basamaklı Yanıtı, Kapalı
+
+Donanımda ilk nişan %98,5 + aşağı deneme (`nvenc-asagi.md`) kapıdan kaldı: 26 hücrede ort sapma −6,47 → −5,41 (kapı
+≥ −2,5), deneme 1,96 → 2,04, parlak h264 1000 VMAF-NEG −1,32; tutma hücrelerinde dolum −1,73 → −4,24. Kod geri alındı.
+Donanımdaki boş bütçe NVENC'in basamaklı hız yanıtından geliyor; bütçe konusu **kapandı**, bir daha açılmaz.

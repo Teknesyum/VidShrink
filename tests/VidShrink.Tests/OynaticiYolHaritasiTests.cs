@@ -774,6 +774,22 @@ public sealed class OynaticiYolHaritasiTests
         }
     }
 
+    /// <summary>
+    /// <para>P26 kapısı kalıntı saydamlıkla ölçülür. Dalın <c>2f53535f</c> commit'i yalnız bu testin
+    /// ön koşulunu <c>Opacity &lt;= 0</c>'dan <c>&lt; 0.001</c>'e gevşetmişti; üretimdeki
+    /// <c>RevealSerit</c> kapısı <c>&lt;= 0</c> kalmıştı, yani gevşetme yerelde hiçbir şey ölçmüyordu.
+    /// Üretim toleransı <c>main</c>'in <c>16572f03</c>'ünden birleşmeyle geldi.</para>
+    ///
+    /// <para>Yerelde kapanış geçişi tam 0'a iniyor, bu yüzden kusur görünmüyordu: CI koşumu
+    /// 35257391781 kalıntıyı <c>9.18867375793824E-89</c> olarak ölçtü. Kalıntı geçişten
+    /// üretilemiyor — <c>DoubleTransition</c> hedefe <c>from + (to-from)*1</c> ile varıp tam 0
+    /// yazıyor. Bu yüzden <c>SeritAcilisi</c> kapanıştan sonra şeridin saydamlık geçişini kapatıp
+    /// kalıntıyı doğrudan yazar; ölçüm artık kayan nokta kuyruğunun rastlantısına bağlı değil.
+    /// A/B ölçüldü: kapı <c>&lt; 0.001</c> iken yeşil (<c>maskeli ornek 8, maske kalkti True</c>),
+    /// kapı <c>&lt;= 0</c>'a döndürülünce kırmızı (<c>yayilma yok: serit bir anda acildi</c>,
+    /// <c>maskeli ornek 0</c>). Gevşetilmiş ön koşul kalır: kalıntı zorlandığı için tek doğru
+    /// biçim odur, <c>&lt;= 0</c> ön koşulu artık testin kendi girdisini reddeder.</para>
+    /// </summary>
     [Fact]
     public void P26SeritFareyeYakinKisimdanYayilarakAcilir()
     {
@@ -832,9 +848,11 @@ public sealed class OynaticiYolHaritasiTests
             saat.Ates();
             return serit.Opacity < 0.001;
         }, 10);
+        serit.Transitions = null;
+        serit.Opacity = 9.18867375793824e-89;
         string Alan(string ad) => typeof(HoverZone).GetField(ad, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(view.SeritZone)!.ToString()!;
         var neden = $"oynuyor {view.IsPlaying}, fare icinde {Alan("_pointerInside")}, tutuluyor {Alan("_held")}, gorunur {Alan("_visible")}, yuzey {YolKanit.N(yuzey.Bounds.Height)}";
-        body.AppendLine($"[hareket azaltilmis {azalt}] kapali serit saydamligi {YolKanit.N(serit.Opacity)}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms, {neden}");
+        body.AppendLine($"[hareket azaltilmis {azalt}] kapali serit saydamligi {serit.Opacity:E3}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms, {neden}");
         Assert.True(serit.Opacity < 0.001, $"on kosul: serit kapanmadi, saydamlik {serit.Opacity}, {neden}");
 
         var seritSol = serit.TranslatePoint(new Point(0, 0), window)!.Value;

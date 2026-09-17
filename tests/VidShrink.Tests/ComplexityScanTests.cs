@@ -405,10 +405,13 @@ public sealed class ComplexityScanTests
     public void TheBenchPrintsTheCommandThroughTheWarmingPath()
     {
         var program = BenchSourceFactAttribute.ProgramPath!;
-        var printLine = File.ReadLines(program).FirstOrDefault(line => line.Contains("\"komut: \""));
+        var komutSatiri = Path.Combine(Path.GetDirectoryName(program)!, "KomutSatiri.cs");
+        var printLine = File.ReadLines(komutSatiri).FirstOrDefault(line => line.Contains("\"komut: \""));
         Assert.NotNull(printLine);
-        Assert.Contains("EncodeRunner.EncodeArguments", printLine);
-        Assert.DoesNotContain("FfmpegArguments.Build", printLine);
+        Assert.Contains("EncodeRunner.EncodeArguments", File.ReadAllText(komutSatiri));
+        Assert.DoesNotContain("FfmpegArguments.Build", File.ReadAllText(komutSatiri));
+        Assert.Contains("KomutSatiri.Yaz(", File.ReadAllText(program));
+        Assert.DoesNotContain("\"komut: \"", File.ReadAllText(program));
     }
 
 }

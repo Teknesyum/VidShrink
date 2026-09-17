@@ -490,7 +490,7 @@ public sealed class KareYerlesimTests
             Assert.EndsWith(" " + mb, okunan.boyut);
             Assert.EndsWith(" " + mb, okunan.aralik.Split(" · ")[0]);
             Assert.Equal(Strings.Get("main.unit.score-suffix"), okunan.kaliteBirimi);
-            Assert.EndsWith("/100", okunan.not);
+            Assert.EndsWith(Strings.Get("main.unit.score-value", ""), okunan.not);
             Assert.Equal(Strings.Get("main.advanced.mode.crf"), okunan.kip);
             Assert.Equal(Strings.Get("main.unit.kbps-value", okunan.hiz.Split(' ')[0]), okunan.hiz);
             Assert.Contains(Strings.Get("main.unit.fps-value", ""), okunan.plan);
@@ -624,6 +624,13 @@ public sealed class BaslikKapsamiTests
         return (govde, null);
     }
 
+    /// <summary>
+    /// <para>Sinif <c>BaslikKapsamiTests</c>, dosya <c>BiciminTests.cs</c> (dosya uc sinif tasiyor:
+    /// <c>BiciminTests</c>, <c>KareYerlesimTests</c>, <c>BaslikKapsamiTests</c>). Filtre sinif adiyla
+    /// eslesir, dosya adiyla eslesmez: <c>--filter "FullyQualifiedName~VidShrink.Tests.BiciminTests"</c>
+    /// yalniz 19 test kosturur (25 ms) ve bu sayimlara hic girmez. Bu pinleri kosturan filtre
+    /// <c>--filter "FullyQualifiedName~VidShrink.Tests.BaslikKapsamiTests"</c>.</para>
+    /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
     {
@@ -648,9 +655,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1442, toplam);
-        Assert.Equal(166, dilBasina["en"]);
-        Assert.Equal(59, dilBasina["tr"]);
+        Assert.Equal(1472, toplam);
+        Assert.Equal(169, dilBasina["en"]);
+        Assert.Equal(60, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -700,7 +707,20 @@ public sealed class BaslikKapsamiTests
     /// HandBrake 1c dalgasi main.advanced.keep-tracks.label'i ekledi: 43 x 742 = 31906'dan 43 x 743 = 31949'a;
     /// iz kararlarinin sekiz gerekce notu (main.reason.stream.*) 43 x 751 = 32293'e, kol degistiren toplami 1218'den 1260'a (en 139'dan 143'e, tr 52'den 56'ya). Birlesik: gezilen 33067, toplam 1295 (en 152, tr 58).
     /// Paket 2 kaydedicisi 80 recorder.* anahtari ekledi (Basit/Gelismis, geri sayim, cerceve, tepsi, kisayol, girdi gosterimi, webcam, buyutec ve gelismis panelin on kolu): 43 x 80 = 3440, gezilen 36507; kol degistiren toplami 1406 (en 160, tr 59).
-    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). P3 menunun sekmeye goturen satirini kaldirinca main.player.menu.settings-all dustu: 43 x 1 = 43, gezilen 37496; kol degistiren toplami 1440 (pt settings-all gitti; en 166, tr 59). S9 on birim anahtari ekledi (main.unit.*, main.plan.ai, main.plan.mode.crf-value): 43 x 10 = 430, gezilen 37926; kol degistiren toplami 1442 (de ve nb main.plan.ai KI; en 166, tr 59). Main'le birlesince kaydedici pencere secicisinin iki recorder.error.* anahtari (window-wayland, window-missing) geldi: 43 x 2 = 86, gezilen 38012; kol degistiren toplami 1442'de kaldi (en 166, tr 59).</para>
+    /// Paket 2b 23 anahtar ekledi (kayit odagi, bosluk kirpma, canli onizleme, kayit tamponu: iki main.*, yirmi bir recorder.*): 43 x 23 = 989, gezilen 37496; kol degistiren toplami 1440 (en 165, tr 59). Karanlik gecis main.reason.dark-content-hevc gerekce notunu ekledi: 43 x 1 = 43, gezilen 37539; kol degistiren toplami 1441 (en 166, tr 59). Kaydedici pencere secicisi iki recorder.error.* anahtari ekledi (window-wayland, window-missing): 43 x 2 = 86, gezilen 37625; kol degistiren toplami degismedi. HandBrake A2 on ayar kutuphanesi 15 main.preset.* anahtari ekledi: 43 x 15 = 645, gezilen 38270; kol degistiren toplami 1471 (en 169, tr 60).</para>
+    /// <para>Bu daldaki (<c>t0/yol-b-kabuk</c>) son adim, <c>origin/main</c> dala birlesince olculdu.
+    /// Birlesme tabani <c>main.json</c>'u 476 anahtarli; dal S9'un on anahtarini ekledi
+    /// (<c>main.unit.mb</c>, <c>mb-value</c>, <c>mb-range</c>, <c>kbps-value</c>, <c>fps-value</c>,
+    /// <c>k-value</c>, <c>score-suffix</c>, <c>score-value</c>, <c>main.plan.ai</c>,
+    /// <c>main.plan.mode.crf-value</c>) ve P3 <c>main.player.menu.settings-all</c>'i dusurdu: 485.
+    /// <c>origin/main</c> HandBrake A2'nin 15 <c>main.preset.*</c> anahtarini ekledi: 491. Birlesik
+    /// katalog 500; 42 dil dosyasinin hepsi 500'de esit, tek anahtar dusmedi. <c>origin/main</c>'in
+    /// pinine gore fark dil basina 500 - 491 = 9 anahtar: 43 x 9 = 387, gezilen 38270 + 387 = 38657.
+    /// Kol degistiren toplam: <c>origin/main</c>'in 1471'i uzerine dalin iki kolu eklenir
+    /// (<c>de</c> ve <c>nb</c> <c>main.plan.ai</c> = "KI", dokumde olculdu) ve dusen
+    /// <c>pt main.player.menu.settings-all</c> ("Todas as configuracoes...") bir kol goturur;
+    /// anahtar geri konularak olculdu: <c>pt</c> 206 -> 207, toplam 1472 -> 1473. 1471 + 2 - 1 = 1472.
+    /// Diller 43, dil dosyasi klasoru 42: <c>zh-Hans</c> ve <c>zh_Hans</c> ayni dosyayi iki adla gezer.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -728,7 +748,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(38012, gezilen);
+        Assert.Equal(38657, gezilen);
         Assert.Empty(kayip);
     }
 

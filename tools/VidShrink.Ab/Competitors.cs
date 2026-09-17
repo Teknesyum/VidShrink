@@ -139,8 +139,8 @@ public sealed class VidShrinkCompetitor : ICompetitor
         }
 
         var plan = planResult.Plan;
-        var commandPass = plan.ModeEnum == EncodeMode.TwoPass && !CodecModel.IsHardware(plan.Codec) ? 2 : 0;
-        var commandLine = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(
+        var commandPass = plan.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(plan.Codec) ? 2 : 0;
+        var commandLine = FfmpegArguments.ToCommandLine(EncodeRunner.EncodeArguments(
             reference, plan, outputPath, commandPass,
             commandPass > 0 ? Path.Combine(outputDirectory, "pass") : null,
             EncoderCapabilities.Instance));

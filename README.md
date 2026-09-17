@@ -36,7 +36,7 @@ release — that is the whole process.
 ## Four Tools, One Window
 
 **Shrink** — a target size in megabytes, and a video that lands just under it. Chips for
-the sizes people actually need (8 for Discord, 16 for WhatsApp, 25 for Gmail, 180 for
+the sizes people actually need (8 for strict e-mail gateways, 16 for WhatsApp, 25 for Gmail, 180 for
 WhatsApp Web) and a slider for everything else. Twelve encoders — software, NVENC, Quick
 Sync, AMF — each [probed on your own machine](docs/olcumler/kodek-matris.md) first.
 
@@ -117,7 +117,7 @@ curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vi
 
 No administrator rights, no .NET SDK. Every release publishes four targets — `win-x64`,
 `osx-arm64`, `osx-x64`, `linux-x64` — from one version number. Requirements: Windows 10 or
-11, macOS 15 or newer, or a Linux desktop on X11 or Wayland, plus `ffmpeg` and `ffprobe`.
+11, macOS 14 or newer, or a Linux desktop on X11 or Wayland, plus `ffmpeg` and `ffprobe`.
 FFmpeg and libmpv never travel in a release; the installer fetches them against pinned
 SHA-256 digests on Windows and prints your package manager's command elsewhere. Checksum
 verification, the right-click entry, the self-update flow and the uninstall switches are

@@ -7,11 +7,75 @@ Dal `t0/yol-b-kabuk`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md`
 2. **P3.** Sağ tık Ayarlar alt menüsünde "Tüm ayarlar" sekmeye gitmez; yerine Ayarlar sekmesindeki oynatıcı
    bölümü (Kısayollar) alt menü olur. Ham sağ tık + ok/Enter ile Gelişmiş ayar değişir, motordan okunur.
 3. **S9.** `MainWindow`'daki birim ve kısaltmalar (MB, /100, CRF, kbps, FPS) `Locales/*/main.json`'a, 42 dil;
-   `BiciminTests` sayım pinleri ve cümlesi.
+   `BaslikKapsamiTests` sayım pinleri ve cümlesi (dosya `BiciminTests.cs`, sınıf `BaslikKapsamiTests`;
+   `KareYerlesimTests.BirimlerDilDosyasindanGelir` kolları ayrı sınıfta).
 4. **K4.** Teknesyum imzası `IconCode` atom yerine `<>`, `IkonKutusuTests` kuralları içinde.
 5. **S14.** `CmbShareTarget` radyo şeridine (hedefler dosyadan, kodda kurulur); `AyarRadyoSeridiTests` bütün
    Ayarlar sekmesini tarar, negatif kontrol iki seçenekli kutuyu yakalar.
 6. **S20.** Başsız pencerede TR ve EN açıkça seçilir, her sekmede metin ölçüsü > kutu taraması; bulunanlar düzeltilir.
+
+### Denetim borçları (denetçi hükmü KALDI, 2026-09-17)
+
+7. **KRİTİK.** `RevealSerit` kapısı `Opacity <= 0` kalmıştı; `2f53535f` yalnız testin ön koşulunu
+   gevşetmişti, üretim toleransı dalda yoktu. `origin/main` birleşmesi `16572f03`'ü getirdi; P26
+   kalıntı saydamlık zorlanmış halde koşulup pimlendi.
+8. **ORTA 1.** Sayım pinlerinin sınıf etiketi: pinler `BaslikKapsamiTests`'te, belgelerde
+   `BiciminTests` deniyordu. Filtrenin ne koşturduğu ölçülüp etiket düzeltildi.
+9. **ORTA 2.** `AdVeBirimYazimiCumleOrtasindaDaKorunur` docstring'inin son adımı kurguydu
+   (main'le birleşme iddiası). Gerçek türetmeyle değiştirildi.
+10. **ORTA 3.** `S20` sarmalanan metni atlıyordu (`TextWrapping=Wrap` taramadan çıkıyor).
+    Taşma ve gerçek yükseklik ölçümleri çürüdü (kap içerikle büyüyor, hiçbir atada `ClipToBounds`
+    yok); ölçülen davranış **sıkışma**. `DilTara`'ya yuvasında tek olan sarmalanan blok için
+    sıkışma kolu eklendi (taban 84 blok, 0 sıkışma); `Width=60` mutasyonu 12 kolun 6'sını kırmızıya
+    çevirdi, eskiden 0'ını çeviriyordu.
+11. **ORTA 4.** Denetçinin bildirdiği kök neden ölçümle çürüdü (`.mov` kolu yerelde 15/15 ve 12/12
+    yeşil). Ölçümde aynı ailede gerçek kusur bulundu: oturum açıkken ana panelde değişen ayar
+    sessizce yutuluyordu, mini panel bunu kendi beş kutusu için yinelenmiş dalla telafi ediyordu.
+    İki yol tek `SaveChoicesIfChanged`'e indi, `PersistChoices` kapısından `_session` çıktı,
+    `OturumSurerkenDegisenAyarDiskeYazilir` pimledi; `Sec` yardımcısı artık `Yaz` gibi boşaltıyor.
+12. **ORTA 5.** `origin/main` dala birleşti; 42 dil katalogu birleşim, anahtar kaybı yok.
+13. **DÜŞÜK.** `BirimlerDilDosyasindanGelir` sabit `"/100"` yerine katalogdan okur.
+
+# macOS 13-14 — MPVKit Denemesi
+
+Dal `t0/macos-mpvkit`. Karar: fable 2026-09-17 soru 5. Kod (`src/`) değişmez.
+
+1. **Pin.** `tools/mpvkit-macos/mpvkit-1.0.0.lock`: MPVKit 1.0.0 LGPL ürününün 29 zip'i, sha256.
+2. **Ölçüm ve bağlama.** `mpvkit-macos.sh`: minos/lipo tablosu, evrensel `libmpv.2.dylib` bağlama.
+3. **CI.** `macos-mpvkit.yml`: macos-15, macos-14, macos-15-intel; duman + `OynaticiMotorTests` iki test; negatif kontroller.
+4. **Belge.** `docs/olcumler/libmpv-macos-gomme.md` yeni bölüm. Kurucu/release bağlantısı ayrı karar (deps sürümü gerekir).
+
+# Ön Ayar Kütüphanesi — HandBrake A2
+
+Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 42-45.
+
+1. **Tek tablo.** `src/VidShrink.Core/Presets/platformlar.json` gömülü kaynak; yonga planları (`MainWindow.ChipPlans`)
+   buradan okunur. Discord/Telegram/e-posta platformları ve cihaz profilleri aynı tabloya, her değerin kaynağı
+   `docs/olcumler/onayar-kaynaklari.md`.
+2. **Kullanıcı ön ayarı.** `PresetLibrary` şema sürümlü kaydet/içe/dışa aktar; ayar klasörü `VIDSHRINK_SETTINGS_PATH`
+   ile aynı yer. Hata kodu + 42 dilde `main.preset.error.*`.
+3. **HandBrake çevirisi.** `HandBrakePresetImport`: taşınan/yaklaşık/düşen alan notları, `main.preset.handbrake.*`.
+4. **Testler.** `OnAyarKutuphanesiTests`, `KullaniciOnAyarTests`, `HandBrakeOnAyarCeviriTests`; her kol negatif kontrol
+   ve mutasyon.
+
+# VideoToolbox Hızlı Kip — Plan Yolu
+
+Dal `t0/vt-hizli`. Karar: `fable-kararlar-2026-09-17.md` soru 1. Kapı önce `docs/olcumler/videotoolbox-hizli.md`.
+
+1. **Kapı belgesi** ölçümden önce commit'lenir.
+2. **Core.** `PlanCalculator`: Hızlı kip aday sırası macOS'ta `hevc_videotoolbox` ile başlar, başka platformda
+   listede yok; platform `BuildDetailed`'in açık bir aşırı yüklemesiyle verilir (varsayılan `OperatingSystem.IsMacOS()`).
+   VT `-crf` almadığı için planın `crf` kipi VT'de `2pass` (tek geçiş bit hızı) olur. `CodecModel.IsFastHardware`:
+   donanım yolu seçimi (IsHardware + hevc_videotoolbox); `IsHardware` VT'yi dışarıda tutmaya devam eder.
+   `HardwareVerdict.Decide` ve kodlayıcı yolu sabitlemesi yeni üyeyi okur. `PlanParser` VT'yi yalnız macOS'ta ve
+   yoklama `Working` derken kabul eder.
+3. **Arayüz.** `MainWindow.HardwareAvailableFrom` tek satır: Hızlı kutusu macOS'ta VT ile açılabilsin.
+4. **Testler** `VideoToolboxHizliTests`, `PlanParserTests`; her kol mutasyonla.
+5. **Ölçüm** `tools/kalite-paketi-3/hb.ps1` `vthizli` işi, `handbrake-kiyas.yml` macos-15. Kalırsa plan yolu geri alınır.
+
+**Sonuç:** koşum 35249123754 kapıdan kaldı (K2 2/8, K4 5/8); 2-4. adımlar geri alındı, ölçüm düzeneği kaldı.
+**Denetim borçları:** kapı karşılaştırması ham değere çekildi (K2 yine 2/8), `KomutSatiri` bench günlüğünü
+gerçek komuta bağladı, `VtHizli` kapı kalınca fırlatıyor.
 
 # Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
 
@@ -55,6 +119,8 @@ Dal `t0/karanlik-x265`. Karar: `docs/danisma/2026-09-17-karanlik-x265-fable.md`.
 4. **CI kabulü.** `hb.ps1 -Is karanlikgecis`: urun-otomatik vs main bench vs HandBrake; CAMBI(ii) ≤7,5,
    süre ≤1,5× HB, karanlık dışı libsvtav1 ve main ile eş.
 5. **Belge.** `docs/kullanim.md` kodek ipucu.
+6. **Açıklar (dal `t0/karanlik-acik`).** Strateji önerisinin kodeği geçişi izler; HDR (PQ/HLG)
+   kaynakta geçiş yok; luma kolu bölünmüş sonda sürecine katıldı (ayrı üç ffmpeg süreci gitti).
 
 # HandBrake Dalga 2 — Ölçülen Açıklar
 
