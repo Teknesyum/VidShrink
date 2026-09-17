@@ -332,7 +332,7 @@ public static class RecorderArguments
         "bt709", "bt470bg", "smpte170m", "smpte240m", "bt2020nc", "bt2020c"
     };
 
-    private static readonly string[] KnownColorRanges = { "tv", "pc", "limited", "full" };
+    private static readonly string[] KnownColorRanges = { "tv", "pc", "limited", "full", "mpeg", "jpeg" };
 
     private static readonly string[] H264Profiles =
     {
@@ -340,6 +340,8 @@ public static class RecorderArguments
     };
 
     private static readonly string[] HevcProfiles = { "main", "main10", "rext" };
+
+    private static readonly string[] Vp9Profiles = { "0", "1", "2", "3" };
 
     private static readonly string[] X264Tunes =
     {
@@ -457,11 +459,27 @@ public static class RecorderArguments
     {
         var c = (codec ?? string.Empty).ToLowerInvariant();
         if (c.Contains("av1", StringComparison.Ordinal)) return Array.Empty<string>();
+        if (c == "libvpx-vp9") return Vp9Profiles;
         if (c.Contains("vp9", StringComparison.Ordinal)) return Array.Empty<string>();
         if (c.Contains("265", StringComparison.Ordinal) || c.Contains("hevc", StringComparison.Ordinal)) return HevcProfiles;
         if (c.Contains("264", StringComparison.Ordinal)) return H264Profiles;
         return Array.Empty<string>();
     }
+
+    /// <summary>
+    /// libvpx-vp9'un piksel bicimine bagli profili: 0 sekiz bit 4:2:0, 1 sekiz bit 4:2:2/4:4:4,
+    /// 2 on bit 4:2:0, 3 on bit 4:2:2/4:4:4. ffmpeg 9.0'da uyusmayan cift (profil 1 + yuv420p,
+    /// profil 0 + yuv444p) "Error encoding frame: Invalid parameter", profil 2/3 + yuv420p acilista
+    /// -22 ile duser; olcum <c>docs/olcumler/kaydedici-piksel.md</c>.
+    /// </summary>
+    public static string? Vp9ProfileFor(string? pixelFormat) => (pixelFormat ?? string.Empty).ToLowerInvariant() switch
+    {
+        "yuv420p" => "0",
+        "yuv422p" or "yuv444p" => "1",
+        "yuv420p10le" => "2",
+        "yuv422p10le" or "yuv444p10le" => "3",
+        _ => null
+    };
 
     /// <summary>Kodegin tanidigi <c>-tune</c> degerleri; bos liste ayari reddeder.</summary>
     public static IReadOnlyList<string> TunesFor(string codec) => (codec ?? string.Empty).ToLowerInvariant() switch
@@ -659,6 +677,8 @@ public static class RecorderArguments
                 yield return $"The {request.VideoCodec} encoder takes no -profile:v in the recorder arm.";
             else if (!allowed.Contains(request.Profile, StringComparer.OrdinalIgnoreCase))
                 yield return $"The {request.Profile} profile is not one of the {request.VideoCodec} profiles ({string.Join(", ", allowed)}).";
+            else if (allowed == Vp9Profiles && Vp9ProfileFor(request.PixelFormat) is { } needed && needed != request.Profile)
+                yield return $"The libvpx-vp9 profile {request.Profile} cannot carry the {request.PixelFormat} pixel format; that format needs profile {needed}.";
         }
 
         if (string.IsNullOrWhiteSpace(request.Tune)) yield break;

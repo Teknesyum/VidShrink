@@ -430,6 +430,110 @@ public sealed class KayitFfmpegKoluTests
         Assert.Empty(RecorderArguments.PixelFormatsFor("uydurma264"));
     }
 
+    [Theory]
+    [InlineData("yuv420p", "0")]
+    [InlineData("yuv444p", "1")]
+    [InlineData("yuv420p10le", "2")]
+    [InlineData("yuv444p10le", "3")]
+    public void Vp9ProfiliBicimleEslesinceKabulEdilir(string bicim, string profil)
+    {
+        var istek = Istek() with { VideoCodec = "libvpx-vp9", PixelFormat = bicim, Profile = profil };
+
+        Assert.Equal(new[] { "0", "1", "2", "3" }, RecorderArguments.ProfilesFor("libvpx-vp9"));
+        Assert.DoesNotContain(RecorderArguments.Validate(istek, @"C:\kayit\a.mp4"), satir => satir.Contains("profile"));
+        Assert.Equal(profil, Deger(RecorderArguments.Build(istek, @"C:\kayit\a.mp4"), "-profile:v"));
+    }
+
+    [Theory]
+    [InlineData("yuv420p", "0", 0)]
+    [InlineData("yuv444p", "1", 0)]
+    [InlineData("yuv420p", "1", 1)]
+    [InlineData("yuv444p", "0", 1)]
+    [InlineData("yuv420p", "2", 1)]
+    public void Vp9ProfilUyusmazligiFfmpegdeDeDuser(string bicim, string profil, int beklenenHata)
+    {
+        var hatalar = RecorderArguments.Validate(
+            Istek() with { VideoCodec = "libvpx-vp9", PixelFormat = bicim, Profile = profil }, @"C:\kayit\a.mp4");
+        var klasor = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", ".calisma", "paket-2b", "vp9");
+        Directory.CreateDirectory(klasor);
+        var cikti = Path.Combine(klasor, $"{bicim}-{profil}.webm");
+        File.Delete(cikti);
+
+        var kod = KisaFfmpeg($"-hide_banner -y -f lavfi -i testsrc2=s=64x64:r=5:d=1 -c:v libvpx-vp9 -deadline realtime -cpu-used 8 -threads 1 -pix_fmt {bicim} -profile:v {profil} \"{cikti}\"");
+        var okunur = kod == 0 && File.Exists(cikti) && new FileInfo(cikti).Length > 0;
+        File.Delete(cikti);
+
+        Assert.Equal(beklenenHata, hatalar.Count(satir => satir.Contains("libvpx-vp9 profile")));
+        Assert.Equal(beklenenHata == 0, okunur);
+    }
+
+    [Theory]
+    [InlineData("mpeg")]
+    [InlineData("jpeg")]
+    [InlineData("limited")]
+    [InlineData("full")]
+    public void RenkAraligiTakmaAdlariKabulEdilir(string aralik)
+    {
+        var istek = Istek() with { ColorRange = aralik };
+
+        Assert.Empty(RecorderArguments.Validate(istek, @"C:\kayit\a.mp4"));
+        Assert.Equal(aralik, Deger(RecorderArguments.Build(istek, @"C:\kayit\a.mp4"), "-color_range"));
+    }
+
+    [Fact]
+    public async Task RenkAraligiKumesiFfmpeginAdlariylaAyni()
+    {
+        using var process = new System.Diagnostics.Process
+        {
+            StartInfo = new System.Diagnostics.ProcessStartInfo("ffmpeg", "-hide_banner -h full")
+            {
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+        process.Start();
+        var stderr = process.StandardError.ReadToEndAsync();
+        var satirlar = process.StandardOutput.ReadToEnd().Split('\n');
+        process.WaitForExit();
+        await stderr;
+        var bas = Array.FindIndex(satirlar, s => s.TrimStart().StartsWith("-color_range ", StringComparison.Ordinal));
+        Assert.True(bas >= 0, "ffmpeg -h full -color_range bildirmedi.");
+        var adlar = satirlar.Skip(bas + 1)
+            .TakeWhile(s => !s.TrimStart().StartsWith("-", StringComparison.Ordinal))
+            .Select(s => s.Trim().Split(' ', 2)[0])
+            .Where(s => s.Length > 0 && s is not "unknown" and not "unspecified")
+            .ToHashSet();
+
+        Assert.Equal(adlar.OrderBy(s => s), RecorderArguments.ColorRanges.OrderBy(s => s));
+    }
+
+    private static int KisaFfmpeg(string argumanlar)
+    {
+        using var process = new System.Diagnostics.Process
+        {
+            StartInfo = new System.Diagnostics.ProcessStartInfo("ffmpeg", argumanlar)
+            {
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+        process.Start();
+        var stderr = process.StandardError.ReadToEndAsync();
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        if (!process.WaitForExit(30000))
+        {
+            process.Kill(true);
+            return -1;
+        }
+        process.WaitForExit();
+        _ = stderr.Result + stdout.Result;
+        return process.ExitCode;
+    }
+
     private static string[] FfmpegBicimleri(string kodlayici)
     {
         using var process = new System.Diagnostics.Process
