@@ -58,7 +58,7 @@ Tüm kodek yolları, 32 hücre (26 NVENC + 6 yazılım), toplam kodlama 578,9 sn
 NVENC'te 26 yukarı denemenin 9'u tavanı aştı (önceki teslim kaldı), 4'ü aynı ya da daha küçük çıktı: istek +%2,7 iken
 boyut +%4,8 (orta h264 2000, 1768k → 2,341 MB, 1815k → 2,453 MB), istek +%2,6 iken boyut değişmedi (hareketli h264 1000,
 891k/914k → 1,171 MB). Tek denemelik %3 genişliğindeki pencere donanımın deneme başı sapmasından dar. Aday 1 kural gereği
-geri alındı.
+geri alındı: donanım yolu aday 2 bekçisiyle 34231f4d davranışına döndü.
 
 ## Aday 2: Yalnız Yazılım Kodlayıcı (Aday 1'den Sonra, Ölçümden Önce Yazıldı)
 
@@ -70,3 +70,28 @@ tutma hücresi**: libx264 `orta` 2000, `karanlik` 3500, `hareketli` 1000, `parla
 Kapı: K1-K4 aynı eşiklerle hem 6 tutma hücresinde ayrı ayrı hem 12 yazılım hücresinin toplamında geçmeli. Biri kalırsa
 aday 2 de geri alınır. NVENC hücreleri kapıya girmez; donanım davranışı değişmediği için "donanımda %4,8 boş bütçe"
 açık kalır.
+
+## Aday 2 Sonucu: Kapı Geçti
+
+Önce `bench-once` (34231f4d), sonra aday 2 Bench'i; aynı oturum, aynı ölçer, sırayla tek ffmpeg. Ham satırlar ve deneme
+izleri `.calisma/butce/aday2.json`'dan buraya taşındı. Bu turun toplam yerel kodlaması 849,8 sn (aday 1 dahil).
+
+| Tutma hücresi | Bayt sapma önce → sonra | Deneme | VMAF-NEG ort | p10 |
+|---|---|---|---|---|
+| orta libx264 2000 | −4,55 → −0,24 | 2 → 3 | 93,17 → 93,39 | 90,83 → 90,94 |
+| karanlik libx264 3500 | −4,15 → −1,57 | 1 → 2 | 95,97 → 96,16 | 91,06 → 91,44 |
+| hareketli libx264 1000 | −4,14 → −1,54 | 1 → 2 | 75,05 → 75,91 | 62,98 → 64,80 |
+| parlak libx264 2000 | −7,00 → −1,78 | 1 → 2 | 87,00 → 87,56 | 84,50 → 85,29 |
+| orta libx265 2000 | −7,08 → −1,60 | 1 → 2 | 95,79 → 95,87 | 94,03 → 94,29 |
+| karanlik libx265 3500 | −6,22 → −1,58 | 1 → 2 | 98,49 → 98,62 | 95,34 → 95,73 |
+
+| Küme | n | K1 | K2 en büyük sapma | K3 Δdeneme | K4 ΔVMAF-NEG ort / p10 | Ort sapma önce → sonra |
+|---|---|---|---|---|---|---|
+| Tutma | 6 | 6/6 geçti | −0,24 geçti | +1,00 geçti (sınırda) | +0,340 / +0,625 geçti | −5,52 → −1,39 |
+| Yazılım toplam | 12 | 12/12 geçti | −0,24 geçti | +0,92 geçti | +0,451 / +0,695 geçti | −5,34 → −1,49 |
+
+Negatif kol: aday 2 Bench'i `--fill qualityceiling`, `parlak` libx264 2000: 1 deneme, iz yalnız "deneme 1: in band,
+1956k, 2,276 MB" (−6,75); yukarı deneme kurulmadı.
+
+K3 tutma kümesinde tam +1,00: her tetiklenen hücre bir deneme ekliyor, kural bunu izin veriyor ama pay yok. Donanımdaki
+%4,8 boş bütçe açık: NVENC'in basamaklı hız yanıtı tek denemelik pencereye sığmıyor.

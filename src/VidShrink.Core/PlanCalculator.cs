@@ -1092,6 +1092,12 @@ public static class PlanCalculator
     private static double SizeMb(double videoK, double audioK, double durationSeconds)
         => (videoK + audioK) * durationSeconds / KbitPerMib / ContainerOverhead;
 
+    public static double NonVideoMb(double nonVideoK, double durationSeconds)
+        => SizeMb(0, nonVideoK, durationSeconds);
+
+    public static double VideoKbitFor(double videoMb, double durationSeconds)
+        => durationSeconds <= 0 ? 0 : videoMb * KbitPerMib * ContainerOverhead / durationSeconds;
+
     private sealed record Layout(int Width, int Height, double Fps, double Scale, double Score, double Bppf = 0, bool MeetsFloor = true, bool Deliverable = true);
 
     /// <summary>

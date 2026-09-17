@@ -131,6 +131,7 @@ public sealed class EncodeRunner
         var attemptLimit = MaxAttempts;
         var usedFloorStep = false;
         var usedDeadYieldStep = false;
+        var usedBudgetFill = false;
         var lastSampleAttempt = 0;
         var overPath = PartialPathFor(outputPath);
         var overMb = 0.0;
@@ -163,6 +164,71 @@ public sealed class EncodeRunner
             fallbackMb = mb;
             fallbackPlan = used;
             fallbackDropped = droppedOptions;
+        }
+
+        async Task<EncodeResult> FillUpAsync(EncodeResult delivered)
+        {
+            if (fillPolicy != FillPolicy.FillTarget || !delivered.Success || delivered.OverTarget || delivered.CeilingExceeded
+                || delivered.Saturated || delivered.Trim is not null || usedDeadYieldStep || delivered.PlanUsed.StopsShortOfBandOnPurpose)
+                return delivered;
+            if (!BudgetFill.Wants(delivered.OutputMb, effectiveTargetMb, attempt, attemptLimit, usedBudgetFill)) return delivered;
+            var step = BudgetFill.Plan(delivered.PlanUsed, delivered.OutputMb, samples, effectiveTargetMb, info.DurationSeconds);
+            if (step is null) return delivered;
+
+            usedBudgetFill = true;
+            attempt++;
+            var upPath = PartialPathFor(outputPath);
+            var upDropped = new List<string>();
+            var fillAimMb = BudgetFill.Aim * effectiveTargetMb;
+            try
+            {
+                if (step.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(step.Codec))
+                {
+                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, scenes, ct)).DroppedOptions);
+                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, scenes, ct)).DroppedOptions);
+                }
+                else
+                {
+                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, scenes, ct)).DroppedOptions);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                TryDelete(upPath);
+                TryDelete(outputPath);
+                throw;
+            }
+            catch
+            {
+                TryDelete(upPath);
+                trace.Add(new EncodeAttempt(attempt, "budget fill failed, the previous result delivered", fillAimMb, delivered.OutputMb, step.VideoBitrateK, step.Mode));
+                return delivered with { Attempts = attempt, Trace = trace };
+            }
+
+            var upMb = new FileInfo(upPath).Length / 1024.0 / 1024.0;
+            var upEfficiency = PlanCalculator.MeasuredEncoderEfficiency(step, upMb, info.DurationSeconds);
+            if (!BudgetFill.Keeps(delivered.OutputMb, upMb, effectiveTargetMb))
+            {
+                TryDelete(upPath);
+                var branch = upMb > effectiveTargetMb
+                    ? "budget fill over the target, the previous result delivered"
+                    : "budget fill came out smaller, the previous result delivered";
+                trace.Add(new EncodeAttempt(attempt, branch, fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
+                return delivered with { Attempts = attempt, Trace = trace };
+            }
+
+            trace.Add(new EncodeAttempt(attempt, "budget fill, the fuller result delivered", fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
+            File.Move(upPath, outputPath, overwrite: true);
+            return delivered with
+            {
+                OutputMb = upMb,
+                PlanUsed = step,
+                Attempts = attempt,
+                Trace = trace,
+                DroppedOptions = upDropped,
+                UnderBand = upMb < band.LowerMb,
+                Saturated = false
+            };
         }
 
         try
@@ -211,7 +277,7 @@ public sealed class EncodeRunner
                 {
                     trace.Add(new EncodeAttempt(attempt, stoppedOnPurpose ? "below band, the plan stopped there on purpose" : "in band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                     File.Move(partialPath, outputPath, overwrite: true);
-                    return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: false, Trace: trace, DroppedOptions: dropped);
+                    return await FillUpAsync(new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: false, Trace: trace, DroppedOptions: dropped));
                 }
 
                 if (underBand && (deadYield || usedDeadYieldStep))
@@ -297,7 +363,7 @@ public sealed class EncodeRunner
 
                     if (askBeforeRetry is null)
                     {
-                        if (attempt >= attemptLimit || usedDeadYieldStep) return EndRun(deliverSmallestOver: true);
+                        if (attempt >= attemptLimit || usedDeadYieldStep) return await FillUpAsync(EndRun(deliverSmallestOver: true));
                         KeepSmallestOver(partialPath, actualMb, current, dropped);
                         if (floorStep is not null) trace.Add(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
                         if (guardStep is not null) trace.Add(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
@@ -367,8 +433,8 @@ public sealed class EncodeRunner
 
                 trace.Add(new EncodeAttempt(attempt, "under band accepted", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                 File.Move(partialPath, outputPath, overwrite: true);
-                return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: dropped,
-                    Saturated: Saturation.FillIsSaturated(actualMb, effectiveTargetMb));
+                return await FillUpAsync(new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: dropped,
+                    Saturated: Saturation.FillIsSaturated(actualMb, effectiveTargetMb)));
             }
 
             return new EncodeResult(false, outputPath, 0, current, attempt, "Encoding loop ended unexpectedly.", Trace: trace);
