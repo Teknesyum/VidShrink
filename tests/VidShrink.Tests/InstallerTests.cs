@@ -201,7 +201,6 @@ public sealed class InstallerTests
             ArchitectureChoice.Decide("ARM64", null, null, true), gunluk.Add));
         Assert.Equal("win-x64", SetupRunner.RuntimeIdentifier(
             ArchitectureChoice.Decide("X64", null, null, true), gunluk.Add));
-        Assert.Contains("arm64", SetupRunner.WindowsArchitectures);
 
         var hata = Assert.Throws<SetupException>(() => SetupRunner.RuntimeIdentifier(
             ArchitectureChoice.Decide("X86", null, null, true), gunluk.Add));

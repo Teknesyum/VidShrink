@@ -32,15 +32,47 @@
 | ekran | 600 | libsvtav1 6 | 598,4 | 593,3 | −0,85 | +11,94 | +12,90 | +13,60 | −4,723 | geçti | 3,73 (1,24) | **kaldı** | 1,09 | 2,40 (0,80) | **kaldı** |
 | ekran | 2000 | libsvtav1 6 | 1823,0 | 1814,1 | −0,49 | +4,82 | +22,13 | +24,74 | −0,784 | geçti | 3,68 (1,76) | **kaldı** | −9,39 | 3,24 (1,55) | **kaldı**† |
 
+Son iki sütun ("SVT bayt sapma %", "SVT oran") ve "B5 SVT" hükmü **geçersiz: preset eşleme hatası** — aşağıya bakın.
+
 **B1: 8/8 geçti.** Dört alt kapının hepsi her hücrede geçti; eş bayt 8/8 sağlandı.
 
 **B5 (x265): 8/8 kaldı.** Toplam süre oranı 1,64–3,73. Yalnız kodlama süresi alınsa bile 4 hücre ≤1 (parlak 600, hareketli 600 ve 2000) ve 4 hücre >1 kalıyor. Farkın büyüğü ürünün ölçümlü deneme turlarından (1–4 deneme) geliyor.
 
-**B5 (SVT): 2/8 geçti, 6/8 kaldı.** Kod değişikliği yapılmadı, yalnız raporlandı.
+**B5 (SVT): geçersiz — preset eşleme hatası.** Yukarıdaki iki SVT sütunu (SVT bayt sapma %, SVT oran) ve
+"B5 SVT" hükmü geçerli değil: kol, ürünün x265 preset **adını** ("slow") HandBrake'in `svt_av1` kodlayıcısına
+`--encoder-preset` olarak geçirdi. HandBrake orada sayı bekliyor; ad verildiğinde kendi varsayılanına düşüyor.
+Geçerli sonuç aşağıdaki "B5 SVT (düzeltilmiş düzenek)" bölümünde.
+
+## B5 SVT (düzeltilmiş düzenek)
+
+- Koşum: `handbrake-kiyas.yml` 35257923394, `isler=handbrakecli-svt`, dal `t0/hb-a45-arm-kiyas`, commit `2c07ba77`.
+- Düzeltme: `hb.ps1` içinde `HbSvtPresetNo` ürünün x265 preset adını SVT sayısına çeviriyor
+  (veryslow→4, slower→5, slow→6, medium→8, fast→9, faster→10, veryfast→11, ultrafast→12; sayı geldiyse olduğu gibi).
+  Ürün zaten `libsvtav1 6` seçtiği hücrelerde geçen değer değişmedi; karanlıkta `slow` → `6` oldu.
+- Kapılar değişmedi: aynı `$script:CliKapi` (eş bayt ±%2, hız oranı tavanı 1,0).
+- Yalnız SVT hücreleri koştu: `handbrakecli-svt` kolu ürün CLI + HB SVT + kapı satırı üretiyor, x265 ve negatif kolları yok.
+
+| Kesit | kbit | Ürün kodlayıcı/preset | HB `--encoder-preset` | Ürün kbps | HB SVT kbps | Bayt sapma % | Eş bayt | Ürün kodlama/toplam sn | HB SVT sn | Oran toplam (kodlama) | B5 SVT | Δ VMAF-NEG | Δ XPSNR |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| karanlık | 600 | libx265 slow | 6 | 601,7 | 602,6 | +0,15 | evet | 77,6 / 144,4 | 28,6 | 5,05 (2,71) | **kaldı** | −2,03 | −0,82 |
+| karanlık | 2000 | libx265 slow | 6 | 2003,0 | 2040,3 | +1,86 | evet | 146,6 / 224,1 | 30,2 | 7,42 (4,85) | **kaldı** | +0,01 | −0,25 |
+| parlak | 600 | libsvtav1 6 | 6 | 600,1 | 604,6 | +0,75 | evet | 24,9 / 86,7 | 33,8 | 2,57 (0,74) | **kaldı** | +0,32 | −0,09 |
+| parlak | 2000 | libsvtav1 6 | 6 | 2019,2 | 2000,9 | −0,91 | evet | 93,6 / 147,8 | 33,6 | 4,40 (2,79) | **kaldı** | +0,79 | +0,15 |
+| hareketli | 600 | libsvtav1 6 | 6 | 604,6 | 607,9 | +0,55 | evet | 51,4 / 121,6 | 30,1 | 4,04 (1,71) | **kaldı** | +0,69 | +0,11 |
+| hareketli | 2000 | libsvtav1 6 | 6 | 2010,2 | 2006,8 | −0,17 | evet | 52,3 / 114,9 | 29,9 | 3,84 (1,75) | **kaldı** | +0,22 | +0,28 |
+| ekran | 600 | libsvtav1 6 | 6 | 598,4 | 605,1 | +1,12 | evet | 21,7 / 68,1 | 30,3 | 2,25 (0,72) | **kaldı** | +3,03 | +8,91 |
+| ekran | 2000 | libsvtav1 6 | 6 | 1823,6 | 1657,7 | −9,10 | **hayır** | 41,7 / 83,8 | 29,2 | 2,87 (1,43) | **kaldı**‡ | +4,06 | +21,47 |
+
+**B5 (SVT), düzeltilmiş: 0/8 geçti.** Toplam süre oranı 2,25–7,42. Yalnız kodlama süresi alınsa 3 hücre ≤1
+(parlak 600, ekran 600, karanlık yok), 5 hücre >1. Eski tablodaki karanlık hücrelerinin "geçti" görünmesi
+düzenek hatasıydı: HB o hücrelerde 405–433 sn kodluyordu, doğru preset ile 28,6 ve 30,2 sn.
+
+Kod değişikliği yapılmadı, sonuç olduğu gibi raporlanıyor.
 
 ## Notlar
 
-- \* Karanlık kesitte ürün x265 seçti ve kol ürünün preset'ini ("slow") HandBrake'in `svt_av1`'ine geçirdi. HB SVT süresi 405–433 sn çıktı; bu iki hücrenin SVT oranı hız kıyası olarak anlamlı değil.
+- \* Karanlık kesitte ürün x265 seçti ve kol ürünün preset'ini ("slow") HandBrake'in `svt_av1`'ine geçirdi. HB SVT süresi 405–433 sn çıktı; bu iki hücrenin SVT oranı hız kıyası olarak anlamlı değil. Düzenek 2c07ba77'de düzeltildi, geçerli sonuç "B5 SVT (düzeltilmiş düzenek)" bölümünde.
 - † Ekran 2000'de HB SVT eş bayta oturmadı (−%9,39, 1651,8 kbps). Bu hücrenin SVT oranı ve kalite farkı eş bayt dışında.
+- ‡ Düzeltilmiş koşumda da ekran 2000'de HB SVT eş bayta oturmadı (−%9,10, 1657,7 kbps): HandBrake'in bit hızı arayışı bu kesitte ürünün baytına yaklaşamıyor, iki bağımsız koşumda aynı yerde durdu.
 - Ham ürün süreleri (kodlama/toplam sn): karanlık 46,0/85,3 ve 75,9/122,8; parlak 31,4/103,3 ve 92,7/146,2; hareketli 50,2/116,7 ve 53,7/133,1; ekran 21,0/63,1 ve 39,7/83,2. HB x265: 31,9; 40,8; 57,0; 79,3; 60,9; 81,4; 16,9; 22,6.
 - Negatif kontrol: yarım bitli HB x265 her hücrede ürünün altında kaldı (`negatif_ayirdi=True` 8/8). Ölçer kaliteyi ayırıyor.

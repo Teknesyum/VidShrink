@@ -17,7 +17,7 @@ public static class SetupRunner
     public const string AsideSuffix = ".eski-";
 
     /// <summary>Windows tarafında yayımlanan mimariler; <see cref="UpdateCheck.ReleasedRids"/> ile aynı küme.</summary>
-    public static readonly IReadOnlyList<string> WindowsArchitectures = new[] { "x64", "arm64" };
+    private static readonly string[] WindowsArchitectures = { "x64", "arm64" };
 
     public static string RuntimeIdentifier(ArchitectureDecision decision, Action<string> log)
     {
