@@ -167,7 +167,6 @@ public class KurulumIlerlemesiTests
         p.Finish(true, "Guncelleme uygulandi");
         Assert.Equal(InstallState.Done, p.State);
         Assert.Equal(100, p.Percent);
-        Assert.Equal("100%", p.PercentText);
 
         Assert.True(p.Bar < 100, "bitis cubugu sicratmiyor");
         for (var i = 0; i < 400; i++) p.Advance();
@@ -181,25 +180,6 @@ public class KurulumIlerlemesiTests
         Assert.Equal(30, q.Percent);
         for (var i = 0; i < 400; i++) q.Advance();
         Assert.Equal(30, q.Bar);
-    }
-
-    /// <summary>
-    /// Adim yazildiginda sessizlik saati sifirlaniyor: panel bu ana bakip ilerleyen isi
-    /// ekranda tutuyor, donan isi birakiyor.
-    /// </summary>
-    [Fact]
-    public void AdimSessizlikSaatiniSifirliyor()
-    {
-        var p = new InstallProgress();
-        var once = p.LastStep;
-        Thread.Sleep(20);
-        p.Step(10, 50, "Yazilir");
-        Assert.True(p.LastStep > once, "adim son adim anini ileri tasimali");
-
-        var sonra = p.LastStep;
-        Thread.Sleep(20);
-        p.Finish(true, "Bitti");
-        Assert.True(p.LastStep > sonra, "bitis de son adim anini ileri tasimali");
     }
 
     /// <summary>

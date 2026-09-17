@@ -62,7 +62,6 @@ public sealed class InstallProgress
     private readonly List<string> _log = new();
     private readonly object _gate = new();
 
-    private DateTime _lastStep = DateTime.UtcNow;
     private double _percent;
     private double _ceiling;
     private double _bar;
@@ -76,7 +75,12 @@ public sealed class InstallProgress
     /// <summary>Son adımın bildirdiği tavan; çubuk bunu geçmez.</summary>
     public double Ceiling { get { lock (_gate) return _ceiling; } }
 
-    /// <summary>Çizilecek çubuk değeri.</summary>
+    /// <summary>
+    /// Çizilecek çubuk değeri: <see cref="Advance"/>'in yumuşattığı hal. Üretim çubuğu
+    /// <see cref="Advance"/>'in dönüşünden çiziyor, bu özelliği okumuyor; değer aynı
+    /// hesabın kalıcı halidir ve ilerlemenin tavanı geçmediğini, bitişte sıçramadığını
+    /// KurulumIlerlemesiTests buradan ölçüyor.
+    /// </summary>
     public double Bar { get { lock (_gate) return _bar; } }
 
     /// <summary>Ne yapıldığını söyleyen tam cümle.</summary>
@@ -84,12 +88,6 @@ public sealed class InstallProgress
 
     /// <summary>Panelin durumu.</summary>
     public InstallState State { get { lock (_gate) return _state; } }
-
-    /// <summary>
-    /// Son adımın yazıldığı an. Panel buna bakıp ilerleyen işi ekranda tutuyor, donan işi
-    /// bırakıyor: sınır geçen süre değil, sessiz geçen süredir.
-    /// </summary>
-    public DateTime LastStep { get { lock (_gate) return _lastStep; } }
 
     /// <summary>Ekranda duran son <see cref="LogLines"/> satır, eskiden yeniye.</summary>
     public IReadOnlyList<string> Log
@@ -118,7 +116,6 @@ public sealed class InstallProgress
             _percent = Math.Max(_percent, Clamp(percent));
             _ceiling = Math.Max(_percent, Clamp(ceiling));
             _sentence = sentence ?? string.Empty;
-            _lastStep = DateTime.UtcNow;
             _log.Add(_sentence);
         }
     }
@@ -189,7 +186,6 @@ public sealed class InstallProgress
             _percent = succeeded ? 100 : _percent;
             _ceiling = _percent;
             _sentence = sentence ?? string.Empty;
-            _lastStep = DateTime.UtcNow;
             _log.Add(_sentence);
         }
     }
@@ -213,9 +209,6 @@ public sealed class InstallProgress
             return false;
         }
     }
-
-    /// <summary>Yüzdenin ekrandaki yazımı; sarmayan tek satır için.</summary>
-    public string PercentText => Math.Round(Percent).ToString("0", CultureInfo.InvariantCulture) + "%";
 
     private static double Clamp(double value)
         => double.IsNaN(value) ? 0 : Math.Clamp(value, 0, 100);
