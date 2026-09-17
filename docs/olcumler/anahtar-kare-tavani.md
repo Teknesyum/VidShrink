@@ -647,6 +647,11 @@ ikiye katlar (`av1_nvenc`de gerceklesen aralik = tavan, K2'nin yazilim
 tablosundaki gibi icerige bagli degil). Bu bedel puanda gorunmez; uygulama
 sozlesmesi kararini bu iki sayiya birlikte bakarak verir.
 
+**Kapı olculdu, acilmadi (2026-09-17, `nvenc-gop10.md`).** 42 kodlamalik NVENC
+izgarasinda 10 sn tavan 9 hucrenin 8'inde ort >= 0, hicbir hucrede p10 < -0,20
+yok; ama hevc adil hucrelerde HandBrake acigi ort'ta kapanmadi (-0,222). Sabit
+5,0'da kaldi. Arama p50 hevc 1920x818'de 5 sn 45 ms, 10 sn 92-95 ms.
+
 ### Degistirilmeyecekler
 
 - `KeyframeFloorSeconds = 1.0` (satir 281). Izgara alt ucu 2 sn; 2 sn'nin 10

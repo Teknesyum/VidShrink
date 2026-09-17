@@ -24,7 +24,7 @@ Makine: RTX 5070 Ti. ffmpeg 9.0 (winget), HandBrakeCLI 1.11.2. Tarih: 2026-09-17
 | b_ref_mode | Değişmedi | middle 88,82/83,86 = temel; each tam karede +0,18 ort ama −%3,6 bayt. |
 | tune uhq | Değişmedi | 88,50/82,72 < temel. |
 | preset p5-p7 | Değişmedi (p4, av1 p6) | p7 hevc +0,29 ort ama +%2,2 bayt; av1 p5/p7 +%3,8 bayt, ayrışmıyor. |
-| -g 120 → 240 | Değişmedi | g240 +0,27 ort / +1,70 p10 (parlak hevc) ama 5 sn anahtar kare tavanı ürünün arama bütçesi sabiti; açık hücre. |
+| -g 120 → 240 | Değişmedi | g240 +0,27 ort / +1,70 p10 (parlak hevc) ama 5 sn anahtar kare tavanı ürünün arama bütçesi sabiti. 42 kodlamalık kapı `nvenc-gop10.md`'de ölçüldü: 8/9 hücre ort ≥ 0, ama hevc adil HB açığı ort'ta kapanmadı (−0,22); kapı kaldı. |
 | Küçültme eşiği | NVENC ölçek/fps cezası h264 2,5x, hevc/av1 4,5x; ağırlık tam karedeki taban oranıyla 1,0x→1,86x arasında 1'den tam değere doğrusal | Geometri taraması (aşağıda) ve 800k 1080p60 av1_nvenc ızgarası; rampa fable'ın kararı (`docs/danisma/2026-09-17-nvenc2-fable.md`, ikinci danışma). |
 
 ## Önce / Sonra / HandBrake
@@ -105,7 +105,7 @@ Kodlayıcı tabana yakın bit hızını izlemiyor (1920x818'de 440k→394, 490k�
 
 ## Açık Hücreler
 
-- hevc adil hücrelerde HandBrake'in 0,2/0,45 altında. Aday neden `-g 120` (HB 10 sn; tek hücrede g240 +0,27/+1,70). Anahtar kare tavanı arama bütçesi sabiti; değiştirmek ayrı karar.
+- hevc adil hücrelerde HandBrake'in 0,2/0,45 altında. Aday neden `-g 120` (HB 10 sn; tek hücrede g240 +0,27/+1,70). Anahtar kare tavanı arama bütçesi sabiti. `nvenc-gop10.md`: g240 bu açığı −0,335/−0,37'den −0,222/+0,057'ye daraltıyor, ort'ta kapatmıyor; tavan 5 sn'de kaldı.
 - parlak hevc/av1 1000 ve hareketli hevc/av1 1000: ilk deneme +%27..+42 aşıyor, üç denemede %8,7-14,8 altında bitiyor. 2x tepenin ilk deneme aşımı; önden küçültme katsayısı 400 sn dosyada ölçülmedi.
 - Ürün ortalama %4,8 bütçe bırakıyor; HB ürünün baytına oturtulduğu için kıyas eş baytta, ama bırakılan bayt kaliteye dönmedi.
 - \|HB sapma\| > %2 olan 13 hücre adil değil; özet tabloda ayrı.
