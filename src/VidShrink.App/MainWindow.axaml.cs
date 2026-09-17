@@ -276,6 +276,7 @@ public partial class MainWindow : Window
         if (_startupFile is not null) Tabs.SelectedIndex = PlayerTabIndex;
         Opened += OnWindowLoaded;
         IlkBoyayiBekle();
+        AcilisGoruntusunuBildir();
         AcilisIzi.Yaz("yapici-bitti");
     }
 
