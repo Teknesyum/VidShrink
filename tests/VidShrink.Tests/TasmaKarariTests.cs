@@ -105,7 +105,8 @@ public sealed class TasmaKarariTests
                 return Task.FromResult(s.CanRetry ? OvershootChoice.Retry : OvershootChoice.AcceptLarger);
             });
 
-        Assert.Equal(new[] { (1, true), (2, true), (3, false) }, sorulan);
+        Assert.Equal(new[] { (1, true), (2, true), (3, true), (4, false) }, sorulan);
+        Assert.Contains(sonuc.Trace!, a => a.Branch == "encoder floor, the layout steps down");
         Assert.True(sonuc.Success);
         Assert.True(sonuc.OverTarget);
         Assert.False(sonuc.CeilingExceeded);

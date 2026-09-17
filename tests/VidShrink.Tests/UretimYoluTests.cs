@@ -252,23 +252,32 @@ public sealed class UretimYoluTests
     }
 
     /// <summary>
-    /// K1(c) / K4. Hizli kipte uretilen planin ilk gecisi son gecisin on ayarini
-    /// kosmamali. Kiyas iki ffmpeg argumani arasindadir; plandaki bayrak okunmuyor.
+    /// K1(c) / K4. Hizli kipte uretilen x265 planinin ilk gecisi on ayari dusurmeden
+    /// <c>slow-firstpass=0</c> ile kosar; kalite kipinde anahtar yoktur. Kiyas ffmpeg
+    /// argumanlari arasindadir; plandaki bayrak okunmuyor.
     /// </summary>
     [Fact]
     public void HizliKipteIlkGecisSonGecistenHizliKosuyor()
     {
         var kaynak = Kaynak();
         var plan = PlanCalculator.Build(kaynak, Secenekler(SpeedMode.Fast), new DonanimsizMakine());
+        var kalite = PlanCalculator.Build(kaynak, Secenekler(SpeedMode.Quality), new DonanimsizMakine());
 
         Assert.Equal("libx265", plan.Codec);
         Assert.Equal(EncodeMode.TwoPass, plan.ModeEnum);
 
         var (ilk, son) = GecisOnAyarlari(kaynak, plan);
+        var ilkArg = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(kaynak, plan, "cikti.mp4", 1, "gunluk"));
+        var sonArg = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(kaynak, plan, "cikti.mp4", 2, "gunluk"));
+        var kaliteIlk = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(kaynak, kalite, "cikti.mp4", 1, "gunluk"));
         _cikti.WriteLine($"kodek={plan.Codec} kip={plan.Mode} ilk={ilk} son={son}");
+        _cikti.WriteLine(ilkArg);
 
         Assert.Equal("slow", son);
-        Assert.NotEqual(son, ilk);
+        Assert.Equal(son, ilk);
+        Assert.Contains("slow-firstpass=0", ilkArg);
+        Assert.DoesNotContain("slow-firstpass", sonArg);
+        Assert.DoesNotContain("slow-firstpass", kaliteIlk);
     }
 
     /// <summary>
@@ -474,8 +483,10 @@ public sealed class UretimYoluTests
         foreach (var (ad, kip, tercih, makine) in satirlar)
         {
             var plan = PlanCalculator.Build(kaynak, Secenekler(kip, kodek: tercih), makine);
-            var eski = FfmpegArguments.FirstPassPreset(plan.Codec, plan.Preset, false);
-            var yeni = FfmpegArguments.FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass);
+            var kapali = plan.Clone();
+            kapali.TurboFirstPass = false;
+            var eski = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(kaynak, kapali, "cikti.mp4", 1, "gunluk"));
+            var yeni = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(kaynak, plan, "cikti.mp4", 1, "gunluk"));
             var ayni = eski == yeni;
             if (!ayni) degisen++;
             _cikti.WriteLine($"{ad,-25} | {plan.Codec,-11} {plan.Mode,-11} son={plan.Preset,-6} | eski ilk={eski,-9} | yeni ilk={yeni,-9} | {(ayni ? "AYNI" : "DEGISTI")}");

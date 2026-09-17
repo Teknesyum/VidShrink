@@ -184,7 +184,9 @@ public sealed class QualityTargetTests
                 var here = result.Plan!.Plan;
                 report.AppendLine(FormattableString.Invariant(
                     $"  basamak: {stepMb:0.####} MB {below.Width}x{below.Height}@{below.Fps:0.##} -> {result.TargetMb:0.####} MB {here.Width}x{here.Height}@{here.Fps:0.##}"));
-                if (below.Width == here.Width && below.Height == here.Height && Math.Abs(below.Fps - here.Fps) < 0.01)
+                var restoredBelow = below.ReasonCodes.Any(n => n.Code == ReasonCode.ResolutionRestoredAtCeiling);
+                var restoredHere = here.ReasonCodes.Any(n => n.Code == ReasonCode.ResolutionRestoredAtCeiling);
+                if (below.Width == here.Width && below.Height == here.Height && Math.Abs(below.Fps - here.Fps) < 0.01 && restoredBelow == restoredHere)
                     unexplained.Add(FormattableString.Invariant(
                         $"{Path.GetFileName(info.FilePath)} {intent} istenen {quality:0.0}: sapma {error:0.###} ama yerlesim {here.Width}x{here.Height}@{here.Fps:0.##} degismedi"));
             }
@@ -241,7 +243,15 @@ public sealed class QualityTargetTests
         // ladder steps 84k -> 85k there, video drops 383k -> 382k, and the winner flips back from
         // 818x460@30 (79,915) to 818x460@25 (78,995) for about 0,12 MB before flipping again.
         // That island belongs to PickAudio, not to the floor, and is left to its own contract.
-        Assert.True(worst <= 3.5, $"En kotu sapma {worst:0.###} puan: {worstCase}");
+        //
+        // HB dalga 2 took the frame rate cut out of the automatic plan (it lost 16,77 VMAF-NEG on
+        // hareketli at 300 kbit, run 35158725446). The @6 layouts that filled the step above are
+        // gone, so the step is taller and sits where the ceiling recovery flips: capture.mkv
+        // Archive, request 20, lands at 44,2121 MB / 25,431, 5,431 points out; at 44,20 MB the
+        // search picks 306x172@30 and recovery restores 358x202@30 (23,82), at 44,24 MB the search
+        // picks 358x202@30 itself (25,439). The unexplained check above counts a recovery flip as
+        // a ladder step for that reason.
+        Assert.True(worst <= 5.5, $"En kotu sapma {worst:0.###} puan: {worstCase}");
     }
 
     [Fact]

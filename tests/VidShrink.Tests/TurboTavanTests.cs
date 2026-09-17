@@ -15,9 +15,9 @@ namespace VidShrink.Tests;
 /// <para>
 /// Sifir bayt duvari asilabilir — iki gecise ayni <c>weightp</c> yazmak yetiyor — ve x264
 /// yine acilmadi: esitlenmis turbo uretim borusunda %0,58 - %4,44 kazandirip VMAF'tan
-/// 0,35 - 0,83 puan goturuyor, <c>libx265</c> ayni olcumde %29,6 - %33,5 kazandirip VMAF'i
-/// dusurmuyor. Bu olculer o karari pimler; kararla birlikte dusmeleri beklenir.
-/// Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
+/// 0,35 - 0,83 puan goturuyor. Bu olculer o karari pimler; kararla birlikte dusmeleri beklenir.
+/// Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>. <c>libx265</c> turbosu on ayar dusurmez,
+/// <c>slow-firstpass=0</c> kosar: <c>docs/olcumler/handbrake-kiyas-b7-aciklar.md</c>.
 /// </para>
 /// </summary>
 public sealed class TurboTavanTests

@@ -1,3 +1,28 @@
+# HandBrake Dalga 2 — Ölçülen Açıklar
+
+Dal `t0/hb-2-aciklar`. Kaynak: dalga 1b ölçümü (koşum 35158725446,
+`docs/olcumler/handbrake-kiyas-b1..b6*.md`). Danışma: `.calisma/danisma/hb2-soru.md` / `hb2-yanit.md`.
+Ağır kodlama yalnız CI'da; yerelde ≤3 sn klip ve filtreli test.
+
+1. **Bench özeti (açık 6).** `tools/VidShrink.Bench/Program.cs` özet satırı teslim edilen
+   denemenin kipini `encodeResult.PlanUsed`'dan yazar.
+2. **FPS düşürme otomatik plandan çıkar (açık 3).** `PlanCalculator.SearchLayout`/`FpsCandidates`
+   kaynak fps'in altına yalnız kaynak fps'te hiçbir ölçek `RunnableVideoBitrateK`'yı geçmediğinde
+   iner. Test: hareketli benzeri Aggressive vaka kaynak fps'te kalır; negatif kontrol: bütçe
+   çalışabilir tabanın altındaysa fps yine düşer.
+3. **Düşük hedef teslimi (açık 5).** `EncodeRunner` + `PlanCalculator.Correct`: verim < 0.5 →
+   yeniden deneme yok, doygun teslim; bitrate düşüşü boyutu küçültmüyorsa sonraki deneme
+   çözünürlük basamağı iner; bant doluluğu çöküşü (ör. %3,3) kabul yerine yeniden deneme.
+4. **Bütçe doldurma (açık 7).** Verim ölçülmüş 2pass yazılım denemesinde hedef bant merkezi yerine
+   üst yarıya kayar; social işiyle ölçülür.
+5. **VT yolu (açık 1).** VT yazılım gibi planlanmaz: tek geçiş, `-preset` yok, CI ölçümüyle
+   seçilen 10 bit / hız bayrakları. NVENC sabitleri taşınmaz (T149). Testler bilerek güncellenir.
+6. **SVT-AV1 karanlık bantlaşma (açık 2) ve x265 turbo ilk geçişi (açık 4).** Önce
+   `tools/kalite-paketi-3/hb.ps1` + `handbrake-kiyas.yml`'e eşit baytlı araştırma kolları (svt,
+   turbo, vt) ve uydurma anahtar negatif kontrolü; seçilen parametre koda girer, ürün yeniden ölçülür.
+7. **Belgeler.** `docs/olcumler/handbrake-kiyas-b7-aciklar.md` önce/sonra; duvar saati iddiası
+   sayısı değişirse `duvar-saati-iddialari.md`.
+
 # HandBrake Dalga 1a — Başsız CLI
 
 Dal `t0/hb-1a-cli`. Kaynak: `.calisma/danisma/handbrake-yanit.md` karar 9.

@@ -53,7 +53,7 @@ static void PrintUsage()
     Console.WriteLine("  bench container-unit <kaynak,...> [--start 5] [--fps 12,24,30,60] [--out .calisma/kap]");
     Console.WriteLine("  bench search-cost [--runs 5]");
     Console.WriteLine("  bench peak-curve <kaynak> [--codec hevc_nvenc] [--ratios 3,5,8,12] [--peaks 1.02,1.1,1.25,1.5] [--out .calisma/tepe]");
-    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--codec-preference auto|compatible|maxcompression|fast] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
+    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--intent archive|sharing|socialmedia] [--codec-preference auto|compatible|maxcompression|fast] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench bar-burst [tekrar]");
     Console.WriteLine("  bench psy-args <kodlayıcı>");
@@ -578,6 +578,7 @@ static async Task<int> ShrinkAsync(string[] args)
     var allowResolutionDrop = true;
     var allowFpsDrop = true;
     string? forceCodec = null;
+    var intent = Intent.Sharing;
     var codecPreference = CodecPreference.Auto;
     var widePeak = false;
     var planOnly = false;
@@ -607,6 +608,13 @@ static async Task<int> ShrinkAsync(string[] args)
                 break;
             case "--no-fps-drop":
                 allowFpsDrop = false;
+                break;
+            case "--intent" when i + 1 < args.Length:
+                if (!Enum.TryParse(args[++i], ignoreCase: true, out intent))
+                {
+                    Console.Error.WriteLine($"bilinmeyen --intent: {args[i]} (Archive|Sharing|SocialMedia)");
+                    return 1;
+                }
                 break;
             case "--force-codec" when i + 1 < args.Length:
                 forceCodec = args[++i];
@@ -682,6 +690,7 @@ static async Task<int> ShrinkAsync(string[] args)
             Codec = codecPreference,
             FillPolicy = fillPolicy,
             SpeedMode = speedMode,
+            Intent = intent,
             AllowResolutionDrop = allowResolutionDrop,
             AllowFpsDrop = allowFpsDrop
         };
@@ -716,7 +725,7 @@ static async Task<int> ShrinkAsync(string[] args)
             plan.Mode = "2pass";
             plan.Crf = null;
             var hdr = HdrResolver.Resolve(info, options.HdrPolicy, plan.Codec, EncoderCapabilities.Instance);
-            plan.PixelFormat = hdr.PixelFormat;
+            plan.PixelFormat = CodecModel.OutputPixelFormat(plan.Codec, hdr.PixelFormat);
             plan.HdrVideoFilter = hdr.VideoFilter;
             plan.HdrColorArgs = hdr.ColorArgs.ToList();
         }
@@ -752,6 +761,7 @@ static async Task<int> ShrinkAsync(string[] args)
             : (double?)null;
 
         var actual = encodeResult.OutputMb;
+        var delivered = TeslimOzeti.Of(encodeResult);
         var result = new BenchResult(
             label,
             fillPolicy.ToString(),
@@ -763,12 +773,12 @@ static async Task<int> ShrinkAsync(string[] args)
             actual <= targetMb && actual >= band.LowerMb,
             actual > targetMb,
             actual < band.HardFloorMb,
-            plan.Width,
-            plan.Height,
-            plan.Fps,
-            plan.Codec,
-            plan.Mode,
-            plan.ModeEnum == EncodeMode.Crf ? $"crf {plan.Crf}" : $"{plan.VideoBitrateK}k",
+            delivered.Width,
+            delivered.Height,
+            delivered.Fps,
+            delivered.Codec,
+            delivered.Mode,
+            delivered.CrfOrBitrate,
             encodeResult.Attempts,
             stopwatch.Elapsed.TotalSeconds,
             planWatch.Elapsed.TotalSeconds,
@@ -783,13 +793,14 @@ static async Task<int> ShrinkAsync(string[] args)
             xpsnr,
             planes.Y,
             planes.U,
-            planes.V);
+            planes.V,
+            encodeResult.Saturated);
         results.Add(result);
 
         Console.WriteLine(
             $"{result.TargetMb:0.##} MB -> {result.ActualMb:0.##} MB ({result.FillPercent:0.#}%), " +
             $"bant={(result.InBand ? "ic" : "dis")} tasma={(result.OverTarget ? "VAR" : "yok")} taban={(result.BelowHardFloor ? "IHLAL" : "ok")}, " +
-            $"{result.Width}x{result.Height}@{result.Fps:0.##}, {result.Codec}/{result.Mode}, {result.CrfOrBitrate}, deneme={result.Attempts}, " +
+            $"{result.Width}x{result.Height}@{result.Fps:0.##}, {result.Codec}/{result.Mode}, {result.CrfOrBitrate}, deneme={result.Attempts}{(result.Saturated ? " DOYGUN" : "")}, " +
             $"kalibre={(result.Calibrated ? "evet" : "hayir")}, plan={result.PlanSeconds:0.#}s, sure={result.EncodeSeconds:0.#}s, " +
             $"VMAF-NEG mean={Fmt(result.VmafNegMean)} harm={Fmt(result.VmafNegHarmonic)}{HarmonicWarning(result.VmafNegFloorFrames)} p10={Fmt(result.VmafNegP10)} min={Fmt(result.VmafNegMin)}, XPSNR={Fmt(result.Xpsnr)} (y={Fmt(result.XpsnrY)} u={Fmt(result.XpsnrU)} v={Fmt(result.XpsnrV)})");
 
@@ -2554,7 +2565,8 @@ sealed record BenchResult(
     double? Xpsnr,
     double? XpsnrY,
     double? XpsnrU,
-    double? XpsnrV);
+    double? XpsnrV,
+    bool Saturated = false);
 
 public sealed record VmafPool(
     int Count,

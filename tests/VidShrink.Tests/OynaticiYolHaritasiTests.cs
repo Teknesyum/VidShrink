@@ -752,18 +752,28 @@ public sealed class OynaticiYolHaritasiTests
 
         var seritSol = serit.TranslatePoint(new Point(0, 0), window)!.Value;
         var fareX = seritSol.X + serit.Bounds.Width * 0.2;
-        var saatDuvar = Stopwatch.StartNew();
-        Hareket(window, view, new Point(fareX, yuzey.Bounds.Height - 4));
-        var oran = view.SeritPointerX / serit.Bounds.Width;
         var ornekler = new List<(double Ms, double Yayilma, double Sol, double Sag)>();
-        while (saatDuvar.Elapsed.TotalMilliseconds < 400)
+        var saatDuvar = Stopwatch.StartNew();
+        void Ornekle()
         {
             var maske = serit.OpacityMask as LinearGradientBrush;
             var duraklar = maske?.GradientStops.Select(s => s.Offset).ToList();
             ornekler.Add((saatDuvar.Elapsed.TotalMilliseconds, view.SeritSpread, duraklar?.First() ?? double.NaN, duraklar?.Last() ?? double.NaN));
+        }
+        void Yayildi(object? _, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property == PlayerView.SeritSpreadProperty) Ornekle();
+        }
+        view.PropertyChanged += Yayildi;
+        Hareket(window, view, new Point(fareX, yuzey.Bounds.Height - 4));
+        var oran = view.SeritPointerX / serit.Bounds.Width;
+        while (saatDuvar.Elapsed.TotalMilliseconds < 400)
+        {
+            Ornekle();
             using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
             Dispatcher.UIThread.MainLoop(dilim.Token);
         }
+        view.PropertyChanged -= Yayildi;
 
         body.AppendLine($"  fare serit uzerinde oran {YolKanit.N(oran)}, serit acik {view.SeritRevealed}, ornek {ornekler.Count}");
         foreach (var o in ornekler.Where((_, i) => i % 8 == 0))
