@@ -379,7 +379,7 @@ public sealed class EncodeRunner
 
                     var targetBytes = (long)Math.Floor(effectiveTargetMb * 1024 * 1024);
                     IReadOnlyList<TrimPlan> trims = Array.Empty<TrimPlan>();
-                    if (current.Trim is null && OvershootTrim.Offered(actualMb, effectiveTargetMb))
+                    if (OvershootTrim.Offered(current, actualMb, effectiveTargetMb))
                     {
                         var map = await OvershootTrimmer.ReadAsync(partialPath, ct);
                         if (map is not null) trims = OvershootTrimmer.PlanAll(map, targetBytes);

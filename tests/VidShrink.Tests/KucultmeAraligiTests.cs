@@ -46,10 +46,47 @@ public class KucultmeAraligiTests
         var after = seeks.Where(index => index > input).ToList();
 
         Assert.Single(after);
-        Assert.Equal(start > TrimWindow.SeekLeadSeconds ? 1 : 0, before.Count);
         var total = seeks.Sum(index => Value(args, index));
         Assert.Equal(start, total, 3);
-        if (before.Count == 1) Assert.True(Value(args, after[0]) <= TrimWindow.SeekLeadSeconds);
+    }
+
+    [Theory]
+    [InlineData(40.0, 30.0, 10.0)]
+    [InlineData(123.456, 113.456, 10.0)]
+    [InlineData(200.0, 190.0, 10.0)]
+    [InlineData(10.0, 0.0, 10.0)]
+    [InlineData(6.0, 0.0, 6.0)]
+    [InlineData(0.0, 0.0, 0.0)]
+    public void AramaBolusumu_HizliKisimKareyeKadarOlaniBirakir(double start, double hizli, double kare)
+    {
+        var trim = new TrimWindow(start, start + 30);
+        var args = FfmpegArguments.Build(Kaynak(), Plan(trim), "cikti.mp4", 0, null);
+        var input = args.IndexOf("-i");
+        var seeks = args.Select((value, index) => (value, index)).Where(pair => pair.value == "-ss").Select(pair => pair.index).ToList();
+
+        var onceki = seeks.Where(index => index < input).Sum(index => Value(args, index));
+        var sonraki = seeks.Where(index => index > input).Sum(index => Value(args, index));
+
+        Assert.Equal(hizli, onceki, 3);
+        Assert.Equal(kare, sonraki, 3);
+    }
+
+    [Fact]
+    public void AramaBolusumu_BaslangicKayinca_YalnizHizliKisimBuyur()
+    {
+        double Sonraki(double start)
+        {
+            var args = FfmpegArguments.Build(Kaynak(), Plan(new TrimWindow(start, start + 30)), "cikti.mp4", 0, null);
+            var input = args.IndexOf("-i");
+            return args.Select((value, index) => (value, index))
+                .Where(pair => pair.value == "-ss" && pair.index > input)
+                .Sum(pair => Value(args, pair.index));
+        }
+
+        var yakin = Sonraki(60);
+        var uzak = Sonraki(360);
+        Assert.Equal(yakin, uzak, 3);
+        Assert.True(uzak >= 5, $"kare hassas kalan {uzak} saniye, anahtar kare araligini karsilamiyor");
     }
 
     [Theory]
@@ -169,6 +206,48 @@ public class KucultmeAraligiTests
         Assert.Equal("-1", args[args.IndexOf("-map_chapters") + 1]);
         Assert.DoesNotContain("-crf", args);
     }
+
+    [Theory]
+    [InlineData(6.0)]
+    [InlineData(30.0)]
+    [InlineData(120.0)]
+    public void DuzeltmeKesitSuresiyleHesaplanir(double kesitSuresi)
+    {
+        var kaynak = Kaynak();
+        var kesitli = Plan(new TrimWindow(20, 20 + kesitSuresi));
+        var tam = PlanCalculator.Build(kaynak, new PlanOptions { TargetMb = 25 });
+
+        var args = FfmpegArguments.Build(kaynak, kesitli, "cikti.mp4", 0, null);
+        Assert.Equal(Value(args, args.IndexOf("-t")), kesitli.EffectiveDurationSeconds(kaynak.DurationSeconds), 3);
+        Assert.Equal(kaynak.DurationSeconds, tam.EffectiveDurationSeconds(kaynak.DurationSeconds), 3);
+
+        var kesitDuzeltme = PlanCalculator.Correct(kesitli, 30, 25, kesitli.EffectiveDurationSeconds(kaynak.DurationSeconds));
+        var kaynakSuresiyle = PlanCalculator.Correct(kesitli, 30, 25, kaynak.DurationSeconds);
+        Assert.True(kesitDuzeltme.VideoBitrateK > kaynakSuresiyle.VideoBitrateK,
+            $"kesit duzeltmesi {kesitDuzeltme.VideoBitrateK}k, kaynak suresiyle {kaynakSuresiyle.VideoBitrateK}k");
+    }
+
+    [Theory]
+    [InlineData(25.5, 25.0)]
+    [InlineData(10.2, 10.0)]
+    public void KullaniciKesitiVarken_TasmaKirpmasiOnerilmez(double gerceklesen, double hedef)
+    {
+        var kesitli = Plan(new TrimWindow(20, 80), hedef);
+        var tam = PlanCalculator.Build(Kaynak(), new PlanOptions { TargetMb = hedef });
+
+        Assert.True(OvershootTrim.Offered(tam, gerceklesen, hedef));
+        Assert.False(OvershootTrim.Offered(kesitli, gerceklesen, hedef));
+    }
+
+    [Theory]
+    [InlineData(9999.0)]
+    [InlineData(601.0)]
+    public void KaynagiAsanSonUcKaynagaKirpilir(double end)
+    {
+        var kirpilan = TrimWindow.Of(10, end, 600)!;
+        Assert.Equal(TrimWindow.Of(10, 600, 600)!.DurationSeconds, kirpilan.DurationSeconds, 3);
+        Assert.Equal(590, kirpilan.DurationSeconds, 3);
+    }
 }
 
 /// <summary>
@@ -179,11 +258,9 @@ public class KucultmeAraligiTests
 /// </summary>
 public class KucultmeAraligiPassthroughTests
 {
-    [Fact]
+    [FfmpegFact]
     public async Task KesitPassthroughtaKopyalanmaz_PencereSureyiBelirler()
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
-
         var klasor = Path.Combine(".calisma", "kesit-passthrough", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(klasor);
         try
@@ -287,4 +364,17 @@ public class KucultmeAraligiCliTests
     [Fact]
     public void KesVerilmezseKesitYok()
         => Assert.Null(Parse("kucult", "a.mp4", "--hedef", "25MB").ToPlanOptions(25, 600).Trim);
+
+    [Theory]
+    [InlineData("--kes")]
+    [InlineData("--cut")]
+    public void IzleKesitiKabulEtmez(string bayrak)
+    {
+        var result = VidShrink.Cli.CliParser.Parse(new[] { "izle", "klasor", "--cikti", "hedef", "--hedef", "25MB", bayrak, "10-40" });
+        Assert.False(result.Ok);
+        Assert.Equal("error.unknown-option", result.ErrorKey);
+
+        var kucult = VidShrink.Cli.CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25MB", bayrak, "10-40" });
+        Assert.True(kucult.Ok, kucult.ErrorKey);
+    }
 }
