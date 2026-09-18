@@ -1071,3 +1071,37 @@ kullanıcı iletisi yalnız API anahtarından söz ediyor. Rapor bunu açıkça 
 8. **Ayarlar**: API anahtarı alanının altına kullanıcı adı + parola kutusu, "Giriş yap" /
    "Çıkış" düğmesi ve durum satırı. Kullanıcı adı `settings.json`a yazılır (gizli değil),
    parola hiçbir yere. Dokuz yeni metin 43 katalogda.
+
+## K19 D0 — Ortak Odak Nesnesi (`CurrentMedia`)
+
+Sözleşme: `docs/danisma/2026-09-17-fable-kararlar.md` 8. bölüm. Bu turda yalnız D0;
+D1-D5 ve şerit yok.
+
+**Yerinde bulunan.** "Kim değiştirir" ayarı T7'de kurulmuş: `AppSettings.FollowRecording`,
+`MainWindow.axaml` içindeki `ChkFollowRecording`, `MainWindow.OdakTakibi.cs`'in
+`FollowRecordingAsync`/`OnPlayerOpened` kolları ve 42 katalogdaki
+`settings-tab.follow-recording.{label,hint}` metinleri. Metnin gövdesi ("oynatıcıda açılan
+dosya küçültmeye de yüklenir") D0'ın semantiğini zaten söylüyor. **Yeni kullanıcı metni
+gerekmiyor**; katalog dokunulmaz.
+
+**Eksik olan.** Ortak nesne yok: yol ve `MediaInfo` `MainWindow._info` içinde saklı, oynatıcı
+kendi `_path`ini tutuyor, aynı dosya iki kez `FfprobeClient.ProbeAsync`'ten geçiyor. Çift
+yoklamanın yolu: oynatıcı dosyayı açar → `Opened` → `OnPlayerOpened` → `LoadAsync` (1. yoklama),
+ardından Küçült'e geçiş aynı yolu ikinci kez `LoadAsync`'e verir (2. yoklama).
+
+**Kurulacak.**
+1. `src/VidShrink.App/CurrentMedia.cs` — yeni. Yol, `MediaInfo`, süre, kaynak fps, son bilinen
+   konum, sahip (`MediaFocusOwner`). Tazelik damgası dosyanın uzunluğu + son yazma anı;
+   dosya değişmişse önbellek düşer. Yol eşitliği `Path.GetFullPath` + `OrdinalIgnoreCase`.
+2. `MainWindow.OdakTakibi.cs` — `Media` özelliği, yoklama dikişi
+   (`Prober`, öntanımlı `FfprobeClient.ProbeAsync`) ve uçuştaki yoklamanın paylaşımı.
+   Ayar kapalıyken ortak nesneye oynatıcı/kaydedici **yazmaz**; Küçült kendi dosyasında kalır.
+3. `MainWindow.axaml.cs` — `LoadAsync` yoklamayı doğrudan çağırmaz, dikişten geçer;
+   başarıda `Media.Publish`, hatada uçuş temizlenir.
+4. `tests/VidShrink.Tests/OrtakOdakTests.cs` — sayaçlı sahte yoklayıcı. İki kabul ölçütü,
+   her birinin negatif kontrolüyle.
+5. `docs/olcumler/` — mutasyon dökümü.
+
+**Kabul ölçütü.** (a) Oynatıcıdan Küçült'e geçişte ffprobe bir kez. Negatif kontrol: iki ayrı
+dosya iki yoklama; dosya diskte değişirse yeniden yoklanır. (b) Ayar kapalıyken Küçült'ün
+dosyası kayıt bitince değişmez, açıkken değişir — ikisi aynı testin iki kolu.

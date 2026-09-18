@@ -165,5 +165,9 @@ geçerli video olur ve bütün sekmeler ona döner. Aynı anahtar oynatıcıda a
 geçerli: seçenek kapalıyken küçültme sekmesi kendi dosyasında kalır.
 
 D0 bu yüzden iki şey taşıyor: ortak `CurrentMedia` nesnesi ve onu **kimin** değiştirebildiğini
-söyleyen tek bir ayar. Ayarın adı ve yeri D0 başlarken belirteçlerle birlikte kararlaştırılır;
-metin uydurmuyorum.
+söyleyen tek bir ayar. **Kuruldu.** Ayar T7'de yerleşen `ChkFollowRecording`
+(`settings.json`'da `followRecording`, metinler `settings-tab.follow-recording.{label,hint}`);
+yeni kullanıcı metni gerekmedi. Nesne `src/VidShrink.App/CurrentMedia.cs`: yol, `MediaInfo`,
+süre, kaynak fps, son bilinen konum, sahip. Çift yoklama
+`MainWindow.OdakTakibi.cs`'in `Prober` dikişi ve uçuş paylaşımıyla bire indi; ölçü
+`docs/olcumler/k19-d0-ortak-odak.md`.

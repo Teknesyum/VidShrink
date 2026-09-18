@@ -198,6 +198,7 @@ public partial class MainWindow : Window
         SetupShellMenu();
         Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
         Tabs.SelectionChanged += (_, _) => KaydediciSekmesiSecildi();
+        Tabs.SelectionChanged += (_, _) => OdakKonumunuAnimsa();
 
         if (OperatingSystem.IsMacOS())
         {
@@ -3021,7 +3022,7 @@ public partial class MainWindow : Window
         ClearSourceError();
 
         MediaInfo probed;
-        try { probed = await FfprobeClient.ProbeAsync(path); }
+        try { probed = await YoklaAsync(path); }
         catch (Exception ex)
         {
             _info = null;
@@ -3036,6 +3037,7 @@ public partial class MainWindow : Window
             return;
         }
 
+        Media.Publish(path, probed, MediaFocusOwner.Shrink);
         ApplyLoaded(path, probed);
         await MeasureComplexityAsync(probed);
     }
@@ -3122,6 +3124,7 @@ public partial class MainWindow : Window
         ShowSourceName();
         Fade(SourceCard, true);
         ClearSourceError();
+        Media.Publish(path, info, MediaFocusOwner.Shrink);
         ApplyLoaded(path, info);
     }
 
