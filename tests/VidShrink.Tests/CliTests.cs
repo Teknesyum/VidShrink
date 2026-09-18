@@ -473,7 +473,7 @@ public sealed class CliTests
         Availability = () => throw new InvalidOperationException("availability must not run")
     };
 
-    private const int BeklenenTakmaAdSayisi = 10;
+    private const int BeklenenTakmaAdSayisi = 11;
 
     /// <summary>
     /// <para>Ingilizce takma adlar iki READMEde de yaziliydi diye degil, <b>kaynaktan
@@ -524,15 +524,25 @@ public sealed class CliTests
         var basi = kaynak.IndexOf("switch (arg)", StringComparison.Ordinal);
         Assert.True(basi > 0, "CliRequest.cs icinde 'switch (arg)' bulunamadi");
 
+        var basKollari = Regex.Matches(kaynak[..basi], @"head\s+is\s+(""[^""]+""(?:\s+or\s+""[^""]+"")*)");
+        Assert.True(
+            basKollari.Count > 0,
+            "CliRequest.cs'te 'switch (arg)' oncesinde hicbir 'head is' kolu bulunamadi; tarama bas kollarini kacirir");
+
         var ciftler = new List<(string, string)>();
         var tekiller = new List<string>();
         var rapor = new StringBuilder();
-        foreach (Match kol in Regex.Matches(kaynak[basi..], @"case\s+(""[^""]+""(?:\s+or\s+""[^""]+"")*)"))
+        var kollar = basKollari
+            .Select(k => (Ad: "head is", Yazimlar: k.Groups[1].Value))
+            .Concat(Regex.Matches(kaynak[basi..], @"case\s+(""[^""]+""(?:\s+or\s+""[^""]+"")*)")
+                .Select(k => (Ad: "case", Yazimlar: k.Groups[1].Value)));
+
+        foreach (var kol in kollar)
         {
-            var yazimlar = Regex.Matches(kol.Groups[1].Value, @"""([^""]+)""")
+            var yazimlar = Regex.Matches(kol.Yazimlar, @"""([^""]+)""")
                 .Select(e => e.Groups[1].Value).ToList();
             var uzun = yazimlar.Where(a => a.StartsWith("--", StringComparison.Ordinal)).ToList();
-            var ad = $"case {string.Join(" or ", yazimlar.Select(a => $"\"{a}\""))}";
+            var ad = $"{kol.Ad} {string.Join(" or ", yazimlar.Select(a => $"\"{a}\""))}";
 
             if (uzun.Count == 0)
             {
@@ -542,13 +552,19 @@ public sealed class CliTests
 
             if (uzun.Count == 1)
             {
-                tekiller.Add(uzun[0]);
+                if (!tekiller.Contains(uzun[0])) tekiller.Add(uzun[0]);
                 rapor.AppendLine($"  elendi  {ad} — tek uzun yazim ({uzun[0]}), takma adi yok");
                 continue;
             }
 
             foreach (var takma in uzun.Skip(1))
             {
+                if (ciftler.Contains((uzun[0], takma)))
+                {
+                    rapor.AppendLine($"  yinelendi {uzun[0]} -> {takma}");
+                    continue;
+                }
+
                 ciftler.Add((uzun[0], takma));
                 rapor.AppendLine($"  cift    {uzun[0]} -> {takma}");
             }

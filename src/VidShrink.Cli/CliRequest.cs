@@ -82,9 +82,9 @@ public static class CliParser
         if (args.Count == 0) return Success(new CliRequest { Command = CliCommand.Help });
 
         var head = args[0];
-        if (head is "-h" or "--help" or "help" or "yardim" or "--yardim")
+        if (head is "-h" or "--yardim" or "help" or "yardim" or "--help")
             return Success(new CliRequest { Command = CliCommand.Help });
-        if (head is "--version" or "-v" or "version" or "surum" or "--surum")
+        if (head is "-v" or "--surum" or "version" or "surum" or "--version")
             return Success(new CliRequest { Command = CliCommand.Version });
 
         var command = head switch
