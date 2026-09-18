@@ -44,12 +44,19 @@ public sealed class CurrentMedia
     public MediaInfo? InfoFor(string path)
         => Holds(path) && Info is { } info && Fresh(path) ? info : null;
 
-    /// <summary>Odağı yola taşır; çözümleme henüz yok.</summary>
+    /// <summary>
+    /// Odağı yola taşır; çözümleme henüz yok. Yol zaten odaktaysa yalnız sahip yazılır ve
+    /// <see cref="Changed"/> sahip <b>gerçekten değiştiyse</b> yayılır: sessiz yazma aboneyi
+    /// bayat bırakıyordu, koşulsuz yayım da her çağrıda gereksiz bir tur açardı.
+    /// </summary>
     public void Focus(string path, MediaFocusOwner owner)
     {
         if (Holds(path))
         {
+            if (Owner == owner) return;
+
             Owner = owner;
+            Changed?.Invoke(this);
             return;
         }
 

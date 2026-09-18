@@ -310,4 +310,39 @@ public sealed class OrtakOdakTests
 
         Kapat("konum-odak.mkv", "konum-baska.mkv");
     }
+
+    /// <summary>
+    /// Aynı yolda sahip değişince <c>Changed</c> yayılıyor. <c>Focus</c>'un erken dönüş kolu
+    /// sahibi sessizce yazıyordu: kaydediciden küçültmeye geçen aynı dosyada abone hiçbir şey
+    /// görmüyor, <c>Owner</c>'a bakan kol bayat kalıyordu. Sahip aynıysa olay yayılmaz
+    /// (olumsuz kontrol) — yoksa her <c>Focus</c> çağrısı gereksiz bir tur açardı.
+    /// </summary>
+    [Fact]
+    public void AyniYoldaSahipDegisinceOlayYayiliyor()
+    {
+        var dosya = Dosya("sahip-degisimi.mkv", 4096);
+        var media = new CurrentMedia();
+
+        var sahipler = new List<MediaFocusOwner>();
+        media.Changed += m => sahipler.Add(m.Owner);
+
+        media.Publish(dosya, Ornek(dosya), MediaFocusOwner.Recorder);
+        var yayindan = sahipler.Count;
+
+        media.Focus(dosya, MediaFocusOwner.Shrink);
+        var degisince = sahipler.Count;
+
+        media.Focus(dosya, MediaFocusOwner.Shrink);
+        var ayniyken = sahipler.Count;
+
+        Assert.Equal(1, yayindan);
+        Assert.Equal(2, degisince);
+        Assert.Equal(2, ayniyken);
+        Assert.Equal(
+            new[] { MediaFocusOwner.Recorder, MediaFocusOwner.Shrink },
+            sahipler);
+        Assert.Equal(MediaFocusOwner.Shrink, media.Owner);
+
+        Kapat("sahip-degisimi.mkv");
+    }
 }
