@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automatski",
   "main.codec.compatible": "H.264 (kompatibilan)",
   "main.codec.smallest": "AV1 (najmanji)",
+  "main.codec.tip": "• H.264 radi na gotovo svakom uređaju i to WhatsApp očekuje; odaberite ga kad datoteka jednostavno mora raditi.\n• AV1 najbolje sažima i najsporije se kodira, a dekodiraju ga samo noviji telefoni.",
 
   "main.allow.resolution": "Smije smanjiti razlučivost",
   "main.whatsapp-compatible": "Kompatibilno s WhatsAppom (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "izvor je taman (prosječna svjetlina {0}); {1} stvara pruge u sjenama, pa Automatski koristi {2} s turbo prvim prolazom",
 
   "main.advice.budget-generous": "Cilj je velikodušan za ovaj izvornik, pa ga motor ispunjava bez napora.",
-  "main.advice.codec-upgrade": "Pri ovom pritisku H.265 daje vidljivo bolji rezultat pri istoj veličini; razmislite o prebacivanju algoritma sažimanja na automatski ili H.265.",
+  "main.advice.codec-upgrade": "Pri ovom pritisku AV1 daje vidljivo bolji rezultat pri istoj veličini; razmislite o prebacivanju algoritma sažimanja na automatski ili AV1.",
   "main.advice.hardware-costs-quality": "Hardverski koder je brz, ali pri ovako tijesnom cilju gubi primjetnu kvalitetu po megabajtu; rezultat izgleda bolje s isključenim brzim smanjivanjem (GPU).",
   "main.advice.extreme-ratio": "Ekstremno sažimanje: gubitak je neizbježan, pa ga motor gura tamo gdje je najmanje primjetan.",
   "main.advice.below-codec-floor": "Ovaj cilj je zaista premali za ovaj izvornik: nijedan raspored ne doseže bitove po pikselu koje koder treba za smislenu sliku. Uzet je najgušći raspored, ali rezultat će izgledati vidljivo pokvareno; povećanje cilja jedini je pravi popravak.",

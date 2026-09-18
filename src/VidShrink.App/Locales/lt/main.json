@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automatinis",
   "main.codec.compatible": "H.264 (suderinamas)",
   "main.codec.smallest": "AV1 (mažiausias)",
+  "main.codec.tip": "• H.264 grojamas beveik kiekviename įrenginyje ir jo tikisi WhatsApp; rinkitės jį, kai failas tiesiog turi veikti.\n• AV1 glaudina geriausiai ir koduojamas lėčiausiai, dekoduoja tik naujausi telefonai.",
 
   "main.allow.resolution": "Gali mažinti raišką",
   "main.whatsapp-compatible": "Suderinama su WhatsApp (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "šaltinis tamsus (vidutinis šviesumas {0}); {1} šešėliuose sukuria juostas, todėl Automatiškai naudoja {2} su turbo pirmuoju perėjimu",
 
   "main.advice.budget-generous": "Tikslas šiam šaltiniui dosnus, todėl variklis jį pasiekia be įtampos.",
-  "main.advice.codec-upgrade": "Esant tokiam spaudimui H.265 duoda matomai geresnį rezultatą tokio pat dydžio; apsvarstykite glaudinimo algoritmo perjungimą į automatinį arba H.265.",
+  "main.advice.codec-upgrade": "Esant tokiam spaudimui AV1 duoda matomai geresnį rezultatą tokio pat dydžio; apsvarstykite glaudinimo algoritmo perjungimą į automatinį arba AV1.",
   "main.advice.hardware-costs-quality": "Aparatinis koduotuvas greitas, bet prie tokio griežto tikslo praranda pastebimai kokybės kiekvienam megabaitui; rezultatas atrodo geriau išjungus greitą mažinimą (GPU).",
   "main.advice.extreme-ratio": "Ekstremalus glaudinimas: nuostolis neišvengiamas, todėl variklis stumia jį ten, kur mažiausiai pastebimas.",
   "main.advice.below-codec-floor": "Šis tikslas šiam šaltiniui tikrai per mažas: joks išdėstymas nepasiekia bitų vienam pikseliui, kurių koduotuvui reikia prasmingam vaizdui. Paimtas tankiausias išdėstymas, bet rezultatas atrodys matomai sugadintas; vienintelis tikras sprendimas — padidinti tikslą.",

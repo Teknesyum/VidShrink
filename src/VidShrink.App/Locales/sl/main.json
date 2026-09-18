@@ -113,6 +113,7 @@
   "main.codec.automatic": "Samodejno",
   "main.codec.compatible": "H.264 (združljiv)",
   "main.codec.smallest": "AV1 (najmanjši)",
+  "main.codec.tip": "• H.264 se predvaja na skoraj vsaki napravi in ga WhatsApp pričakuje; izberite ga, ko mora datoteka preprosto delovati.\n• AV1 stiska najbolje in se kodira najpočasneje, dekodirajo pa ga le novejši telefoni.",
 
   "main.allow.resolution": "Sme znižati ločljivost",
   "main.whatsapp-compatible": "Združljivo z WhatsApp (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "vir je temen (povprečna svetlost {0}); {1} v sencah ustvarja pasove, zato Samodejno uporabi {2} s turbo prvim prehodom",
 
   "main.advice.budget-generous": "Cilj je za ta vir radodaren, zato ga motor doseže brez napora.",
-  "main.advice.codec-upgrade": "Pri tem pritisku H.265 da vidno boljši rezultat pri enaki velikosti; razmislite o preklopu algoritma stiskanja na samodejno ali H.265.",
+  "main.advice.codec-upgrade": "Pri tem pritisku AV1 da vidno boljši rezultat pri enaki velikosti; razmislite o preklopu algoritma stiskanja na samodejno ali AV1.",
   "main.advice.hardware-costs-quality": "Strojni kodirnik je hiter, a pri tako tesnem cilju izgubi opazno kakovost na megabajt; rezultat je videti bolje z izklopljenim hitrim krčenjem (GPU).",
   "main.advice.extreme-ratio": "Skrajno stiskanje: izguba je neizogibna, zato jo motor potisne tja, kjer je najmanj opazna.",
   "main.advice.below-codec-floor": "Ta cilj je za ta vir resnično premajhen: nobena postavitev ne doseže bitov na piksel, ki jih kodirnik potrebuje za smiselno sliko. Vzeta je bila najgostejša postavitev, a rezultat bo videti vidno pokvarjen; edina prava rešitev je zvišanje cilja.",

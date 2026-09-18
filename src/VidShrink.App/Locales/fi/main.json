@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automaattinen",
   "main.codec.compatible": "H.264 (yhteensopiva)",
   "main.codec.smallest": "AV1 (pienin)",
+  "main.codec.tip": "• H.264 toimii lähes kaikilla laitteilla ja on se, mitä WhatsApp odottaa; valitse se, kun tiedoston on vain toimittava.\n• AV1 pakkaa parhaiten ja koodaa hitaimmin, ja vain uudet puhelimet purkavat sen.",
 
   "main.allow.resolution": "Saa laskea tarkkuutta",
   "main.whatsapp-compatible": "WhatsApp-yhteensopiva (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "lähde on tumma (keskimääräinen luminanssi {0}); {1} raidoittaa varjoja, joten Automaattinen käyttää {2}:ta turbo-ensikierroksella",
 
   "main.advice.budget-generous": "Kohde on tälle lähteelle avokätinen, joten moottori täyttää sen vaivatta.",
-  "main.advice.codec-upgrade": "Tällä paineella H.265 antaa näkyvästi paremman tuloksen samassa koossa; harkitse pakkausalgoritmin vaihtoa automaattiseen tai H.265:een.",
+  "main.advice.codec-upgrade": "Tällä paineella AV1 antaa näkyvästi paremman tuloksen samassa koossa; harkitse pakkausalgoritmin vaihtoa automaattiseen tai AV1:een.",
   "main.advice.hardware-costs-quality": "Laitteistokooderi on nopea, mutta menettää huomattavasti laatua megatavua kohti näin tiukalla kohteella; tulos näyttää paremmalta, kun nopea pakkaus (GPU) on pois päältä.",
   "main.advice.extreme-ratio": "Äärimmäinen pakkaus: häviö on väistämätön, joten moottori sijoittaa sen sinne, missä se huomataan vähiten.",
   "main.advice.below-codec-floor": "Tämä kohde on aidosti liian pieni tälle lähteelle: mikään asettelu ei saavuta bittejä pikseliä kohti, joita kooderi tarvitsee mielekkääseen kuvaan. Tihein asettelu valittiin, mutta tulos näyttää näkyvästi rikkinäiseltä; kohteen nostaminen on ainoa todellinen korjaus.",

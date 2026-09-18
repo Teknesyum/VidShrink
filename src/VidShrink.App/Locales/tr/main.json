@@ -113,6 +113,7 @@
   "main.codec.automatic": "Otomatik",
   "main.codec.compatible": "H.264 (uyumlu)",
   "main.codec.smallest": "AV1 (en küçük)",
+  "main.codec.tip": "• H.264 üretilmiş hemen her cihazda oynar ve WhatsApp'ın beklediği biçimdir; dosyanın sorunsuz çalışması gerekiyorsa bunu seçin.\n• AV1 en iyi sıkıştıranıdır ve en yavaş kodlanandır, yalnızca yeni telefonlar çözer.",
 
   "main.allow.resolution": "Çözünürlük düşürülebilir",
   "main.whatsapp-compatible": "WhatsApp uyumlu (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "kaynak karanlık (ortalama parlaklık {0}); {1} gölgelerde bantlaşıyor, bu yüzden Otomatik turbo ilk geçişli {2} kullanıyor",
 
   "main.advice.budget-generous": "Hedef bu kaynak için bol; motor bütçeyi zorlanmadan karşılıyor.",
-  "main.advice.codec-upgrade": "Bu sıkışıklıkta H.265 aynı boyutta gözle görülür şekilde daha iyi sonuç verir; sıkıştırma algoritmasını otomatik veya H.265 yapmayı düşün.",
+  "main.advice.codec-upgrade": "Bu sıkışıklıkta AV1 aynı boyutta gözle görülür şekilde daha iyi sonuç verir; sıkıştırma algoritmasını otomatik veya AV1 yapmayı düşün.",
   "main.advice.hardware-costs-quality": "Donanım kodlayıcısı hızlıdır ama bu kadar sıkışık bir hedefte megabayt başına belirgin kalite kaybettirir; hızlı düşür (GPU) kapalıyken sonuç daha iyi görünür.",
   "main.advice.extreme-ratio": "Uç sıkıştırma: kayıp kaçınılmaz, motor kaybı en az hissedilecek yere yığıyor.",
   "main.advice.below-codec-floor": "Bu hedef bu kaynak için gerçekten çok küçük: hiçbir düzen kodlayıcının anlamlı bir görüntü için gereken piksel başına bit yoğunluğuna ulaşmıyor. En yoğun düzen seçildi ama sonuç belirgin şekilde bozuk çıkacak; hedefi büyütmek tek gerçek çare.",

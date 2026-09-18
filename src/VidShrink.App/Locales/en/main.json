@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automatic",
   "main.codec.compatible": "H.264 (compatible)",
   "main.codec.smallest": "AV1 (smallest)",
+  "main.codec.tip": "• H.264 plays on nearly every device and is what WhatsApp expects; pick it when the file must just work.\n• AV1 compresses best and is the slowest to encode, and only recent phones decode it.",
 
   "main.allow.resolution": "May lower resolution",
   "main.whatsapp-compatible": "WhatsApp compatible (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "the source is dark (mean luma {0}), where {1} bands in the shadows, so Automatic uses {2} with a turbo first pass",
 
   "main.advice.budget-generous": "The target is generous for this source, so the engine meets it without strain.",
-  "main.advice.codec-upgrade": "At this pressure H.265 gives a visibly better result at the same size; consider switching the compression algorithm to automatic or H.265.",
+  "main.advice.codec-upgrade": "At this pressure AV1 gives a visibly better result at the same size; consider switching the compression algorithm to automatic or AV1.",
   "main.advice.hardware-costs-quality": "The hardware encoder is fast but loses noticeable quality per megabyte at a target this tight; the result looks better with fast shrink (GPU) turned off.",
   "main.advice.extreme-ratio": "Extreme compression: loss is unavoidable, so the engine pushes it where it is least noticeable.",
   "main.advice.below-codec-floor": "This target is genuinely too small for this source: no layout reaches the bits per pixel the encoder needs for a meaningful picture. The densest layout was taken, but the result will look visibly broken; raising the target is the only real fix.",

@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automātiski",
   "main.codec.compatible": "H.264 (saderīgs)",
   "main.codec.smallest": "AV1 (mazākais)",
+  "main.codec.tip": "• H.264 atskaņojas gandrīz katrā ierīcē un ir tas, ko WhatsApp sagaida; izvēlieties, kad failam vienkārši jādarbojas.\n• AV1 saspiež vislabāk un kodējas vislēnāk, un to dekodē tikai jaunākie tālruņi.",
 
   "main.allow.resolution": "Drīkst pazemināt izšķirtspēju",
   "main.whatsapp-compatible": "Saderīgs ar WhatsApp (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "avots ir tumšs (vidējais spilgtums {0}); {1} ēnās rada joslas, tāpēc Automātiski izmanto {2} ar turbo pirmo gājienu",
 
   "main.advice.budget-generous": "Mērķis šim avotam ir dāsns, tāpēc dzinējs to sasniedz bez piepūles.",
-  "main.advice.codec-upgrade": "Pie šāda spiediena H.265 dod redzami labāku rezultātu tajā pašā izmērā; apsveriet saspiešanas algoritma pārslēgšanu uz automātisko vai H.265.",
+  "main.advice.codec-upgrade": "Pie šāda spiediena AV1 dod redzami labāku rezultātu tajā pašā izmērā; apsveriet saspiešanas algoritma pārslēgšanu uz automātisko vai AV1.",
   "main.advice.hardware-costs-quality": "Aparatūras kodētājs ir ātrs, bet pie tik stingra mērķa zaudē manāmu kvalitāti uz megabaitu; rezultāts izskatās labāk ar izslēgtu ātro saspiešanu (GPU).",
   "main.advice.extreme-ratio": "Ekstrēma saspiešana: zudums ir neizbēgams, tāpēc dzinējs to novirza tur, kur tas vismazāk pamanāms.",
   "main.advice.below-codec-floor": "Šis mērķis šim avotam patiesi ir pārāk mazs: neviens izkārtojums nesasniedz bitus uz pikseli, kas kodētājam vajadzīgi jēgpilnam attēlam. Tika ņemts blīvākais izkārtojums, bet rezultāts izskatīsies redzami salauzts; mērķa paaugstināšana ir vienīgais īstais risinājums.",

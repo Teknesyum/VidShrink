@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automaatne",
   "main.codec.compatible": "H.264 (ühilduv)",
   "main.codec.smallest": "AV1 (väikseim)",
+  "main.codec.tip": "• H.264 mängib peaaegu igas seadmes ja seda WhatsApp ootab; vali see, kui fail peab lihtsalt töötama.\n• AV1 tihendab kõige paremini ja kodeerib kõige aeglasemalt, seda dekodeerivad ainult uuemad telefonid.",
 
   "main.allow.resolution": "Võib eraldusvõimet vähendada",
   "main.whatsapp-compatible": "WhatsAppiga ühilduv (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "allikas on tume (keskmine heledus {0}); {1} tekitab varjudes triipe, seega Automaatne kasutab {2} turbo esimese läbimisega",
 
   "main.advice.budget-generous": "Siht on selle allika jaoks helde, seega täidab mootor selle pingutuseta.",
-  "main.advice.codec-upgrade": "Sellise surve juures annab H.265 sama suurusega nähtavalt parema tulemuse; kaalu tihendusalgoritmi lülitamist automaatsele või H.265-le.",
+  "main.advice.codec-upgrade": "Sellise surve juures annab AV1 sama suurusega nähtavalt parema tulemuse; kaalu tihendusalgoritmi lülitamist automaatsele või AV1-le.",
   "main.advice.hardware-costs-quality": "Riistvarakodeerija on kiire, kuid kaotab nii pingul sihi juures megabaidi kohta märgatavalt kvaliteeti; tulemus näeb parem välja, kui kiire tihendus (GPU) on välja lülitatud.",
   "main.advice.extreme-ratio": "Äärmuslik tihendus: kadu on vältimatu, seega surub mootor selle sinna, kus see on kõige vähem märgatav.",
   "main.advice.below-codec-floor": "See siht on selle allika jaoks tõesti liiga väike: ükski paigutus ei jõua bittideni piksli kohta, mida kodeerija mõistliku pildi jaoks vajab. Võeti tiheim paigutus, kuid tulemus näeb nähtavalt katki välja; ainus tõeline lahendus on sihi tõstmine.",

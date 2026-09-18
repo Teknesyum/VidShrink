@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automatik",
   "main.codec.compatible": "H.264 (serasi)",
   "main.codec.smallest": "AV1 (terkecil)",
+  "main.codec.tip": "• H.264 dimainkan pada hampir setiap peranti dan itulah yang WhatsApp jangkakan; pilih ia apabila fail mesti berfungsi.\n• AV1 memampat paling baik dan paling perlahan dikodkan, dan hanya telefon terkini menyahkodnya.",
 
   "main.allow.resolution": "Boleh turunkan resolusi",
   "main.whatsapp-compatible": "Serasi dengan WhatsApp (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "sumbernya gelap (luma purata {0}); {1} menghasilkan jalur dalam bayang, jadi Automatik menggunakan {2} dengan laluan pertama turbo",
 
   "main.advice.budget-generous": "Sasaran ini longgar untuk sumber ini, jadi enjin memenuhinya tanpa tekanan.",
-  "main.advice.codec-upgrade": "Pada tekanan ini H.265 memberi hasil yang lebih baik dengan ketara pada saiz yang sama; pertimbangkan menukar algoritma pemampatan ke automatik atau H.265.",
+  "main.advice.codec-upgrade": "Pada tekanan ini AV1 memberi hasil yang lebih baik dengan ketara pada saiz yang sama; pertimbangkan menukar algoritma pemampatan ke automatik atau AV1.",
   "main.advice.hardware-costs-quality": "Pengekod perkakasan pantas tetapi kehilangan kualiti yang ketara setiap megabait pada sasaran seketat ini; hasil kelihatan lebih baik dengan kecilkan pantas (GPU) dimatikan.",
   "main.advice.extreme-ratio": "Pemampatan melampau: kehilangan tidak dapat dielakkan, jadi enjin menolaknya ke tempat yang paling kurang ketara.",
   "main.advice.below-codec-floor": "Sasaran ini benar-benar terlalu kecil untuk sumber ini: tiada susun atur mencapai bit setiap piksel yang pengekod perlukan untuk gambar bermakna. Susun atur paling padat diambil, tetapi hasil akan kelihatan rosak; menaikkan sasaran ialah satu-satunya pembetulan sebenar.",

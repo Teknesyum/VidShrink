@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automatycznie",
   "main.codec.compatible": "H.264 (zgodny)",
   "main.codec.smallest": "AV1 (najmniejszy)",
+  "main.codec.tip": "• H.264 gra na niemal każdym urządzeniu i tego oczekuje WhatsApp; wybierz go, gdy plik ma po prostu działać.\n• AV1 kompresuje najlepiej i koduje najwolniej, a dekodują go tylko nowe telefony.",
 
   "main.allow.resolution": "Może obniżyć rozdzielczość",
   "main.whatsapp-compatible": "Zgodny z WhatsApp (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "źródło jest ciemne (średnia luminancja {0}); {1} tworzy pasma w cieniach, więc Automatycznie używa {2} z pierwszym przebiegiem turbo",
 
   "main.advice.budget-generous": "Cel jest hojny dla tego źródła, więc silnik spełnia go bez wysiłku.",
-  "main.advice.codec-upgrade": "Przy tym nacisku H.265 daje wyraźnie lepszy wynik przy tym samym rozmiarze; rozważ przełączenie algorytmu kompresji na automatyczny lub H.265.",
+  "main.advice.codec-upgrade": "Przy tym nacisku AV1 daje wyraźnie lepszy wynik przy tym samym rozmiarze; rozważ przełączenie algorytmu kompresji na automatyczny lub AV1.",
   "main.advice.hardware-costs-quality": "Koder sprzętowy jest szybki, ale przy tak ciasnym celu traci zauważalnie jakości na megabajt; wynik wygląda lepiej z wyłączonym szybkim zmniejszaniem (GPU).",
   "main.advice.extreme-ratio": "Kompresja ekstremalna: strata jest nieunikniona, więc silnik lokuje ją tam, gdzie jest najmniej zauważalna.",
   "main.advice.below-codec-floor": "Ten cel jest naprawdę za mały dla tego źródła: żaden układ nie osiąga bitów na piksel, których koder potrzebuje do sensownego obrazu. Wzięto najgęstszy układ, ale wynik będzie wyglądał na wyraźnie zepsuty; jedyną prawdziwą poprawką jest podniesienie celu.",

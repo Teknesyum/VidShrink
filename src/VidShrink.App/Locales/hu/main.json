@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automatikus",
   "main.codec.compatible": "H.264 (kompatibilis)",
   "main.codec.smallest": "AV1 (legkisebb)",
+  "main.codec.tip": "• A H.264 szinte minden eszközön lejátszódik, és ezt várja a WhatsApp; válassza, ha a fájlnak egyszerűen működnie kell.\n• Az AV1 tömörít a legjobban és kódol a leglassabban, és csak a legújabb telefonok dekódolják.",
 
   "main.allow.resolution": "Csökkentheti a felbontást",
   "main.whatsapp-compatible": "WhatsApp-kompatibilis (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "a forrás sötét (átlagos fénysűrűség {0}); a {1} sávosodik az árnyékokban, ezért az Automatikus a {2}-t használja turbó első menettel",
 
   "main.advice.budget-generous": "A cél bőséges ehhez a forráshoz, ezért a motor erőlködés nélkül teljesíti.",
-  "main.advice.codec-upgrade": "Ekkora nyomásnál a H.265 láthatóan jobb eredményt ad ugyanazon méretnél; fontolja meg a tömörítési algoritmus automatikusra vagy H.265-re váltását.",
+  "main.advice.codec-upgrade": "Ekkora nyomásnál a AV1 láthatóan jobb eredményt ad ugyanazon méretnél; fontolja meg a tömörítési algoritmus automatikusra vagy AV1-re váltását.",
   "main.advice.hardware-costs-quality": "A hardveres kódoló gyors, de ilyen szűk célnál megabájtonként észrevehető minőséget veszít; az eredmény jobban néz ki kikapcsolt gyors tömörítéssel (GPU).",
   "main.advice.extreme-ratio": "Szélsőséges tömörítés: a veszteség elkerülhetetlen, ezért a motor oda tolja, ahol a legkevésbé feltűnő.",
   "main.advice.below-codec-floor": "Ez a cél valóban túl kicsi ehhez a forráshoz: egyetlen elrendezés sem éri el a kódolónak értelmes képhez szükséges pixelenkénti bitszámot. A legsűrűbb elrendezést vettük, de az eredmény láthatóan törött lesz; a cél emelése az egyetlen valódi megoldás.",

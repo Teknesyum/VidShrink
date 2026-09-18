@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automático",
   "main.codec.compatible": "H.264 (compatible)",
   "main.codec.smallest": "AV1 (más pequeño)",
+  "main.codec.tip": "• H.264 se reproduce en casi cualquier dispositivo y es lo que WhatsApp espera; elígelo cuando el archivo simplemente tenga que funcionar.\n• AV1 comprime mejor y es el más lento de codificar, y solo los teléfonos recientes lo decodifican.",
 
   "main.allow.resolution": "Puede bajar la resolución",
   "main.whatsapp-compatible": "Compatible con WhatsApp (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "la fuente es oscura (luminancia media {0}); {1} genera bandas en las sombras, así que Automático usa {2} con primera pasada turbo",
 
   "main.advice.budget-generous": "El destino es generoso para esta fuente, así que el motor lo cumple sin esfuerzo.",
-  "main.advice.codec-upgrade": "A esta presión H.265 da un resultado visiblemente mejor al mismo tamaño; considera pasar el algoritmo de compresión a automático o H.265.",
+  "main.advice.codec-upgrade": "A esta presión AV1 da un resultado visiblemente mejor al mismo tamaño; considera pasar el algoritmo de compresión a automático o AV1.",
   "main.advice.hardware-costs-quality": "El codificador por hardware es rápido pero pierde calidad notable por megabyte con un destino tan ajustado; el resultado se ve mejor con la reducción rápida (GPU) apagada.",
   "main.advice.extreme-ratio": "Compresión extrema: la pérdida es inevitable, así que el motor la empuja a donde menos se nota.",
   "main.advice.below-codec-floor": "Este destino es realmente demasiado pequeño para esta fuente: ninguna disposición alcanza los bits por píxel que el codificador necesita para una imagen con sentido. Se tomó la disposición más densa, pero el resultado se verá visiblemente roto; subir el destino es el único arreglo real.",

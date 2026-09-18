@@ -113,6 +113,7 @@
   "main.codec.automatic": "Tự động",
   "main.codec.compatible": "H.264 (tương thích)",
   "main.codec.smallest": "AV1 (nhỏ nhất)",
+  "main.codec.tip": "• H.264 phát trên gần như mọi thiết bị và là thứ WhatsApp mong đợi; chọn nó khi tệp chỉ cần chạy được.\n• AV1 nén tốt nhất và mã hóa chậm nhất, chỉ điện thoại đời mới giải mã được.",
 
   "main.allow.resolution": "Cho phép hạ độ phân giải",
   "main.whatsapp-compatible": "Tương thích WhatsApp (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "nguồn tối (độ sáng trung bình {0}); {1} tạo dải màu ở vùng tối, nên Tự động dùng {2} với lượt đầu turbo",
 
   "main.advice.budget-generous": "Mục tiêu rộng rãi với nguồn này, nên bộ máy đạt được mà không gắng sức.",
-  "main.advice.codec-upgrade": "Ở áp lực này H.265 cho kết quả rõ ràng tốt hơn với cùng dung lượng; cân nhắc chuyển thuật toán nén sang tự động hoặc H.265.",
+  "main.advice.codec-upgrade": "Ở áp lực này AV1 cho kết quả rõ ràng tốt hơn với cùng dung lượng; cân nhắc chuyển thuật toán nén sang tự động hoặc AV1.",
   "main.advice.hardware-costs-quality": "Bộ mã hóa phần cứng nhanh nhưng mất chất lượng đáng kể trên mỗi megabyte ở mục tiêu chặt thế này; kết quả đẹp hơn khi tắt nén nhanh (GPU).",
   "main.advice.extreme-ratio": "Nén cực đoan: mất mát là không tránh khỏi, nên bộ máy đẩy nó về nơi ít nhận ra nhất.",
   "main.advice.below-codec-floor": "Mục tiêu này thực sự quá nhỏ với nguồn: không bố cục nào đạt số bit mỗi pixel bộ mã hóa cần cho hình ảnh có nghĩa. Đã lấy bố cục dày nhất, nhưng kết quả sẽ trông vỡ rõ; nâng mục tiêu là cách sửa thực sự duy nhất.",

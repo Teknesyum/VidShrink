@@ -113,6 +113,7 @@
   "main.codec.automatic": "Automatisk",
   "main.codec.compatible": "H.264 (kompatibel)",
   "main.codec.smallest": "AV1 (minst)",
+  "main.codec.tip": "• H.264 spilles på nesten alle enheter og er det WhatsApp forventer; velg det når filen bare må virke.\n• AV1 komprimerer best og er tregest å kode, og bare nyere telefoner dekoder det.",
 
   "main.allow.resolution": "Kan senke oppløsning",
   "main.whatsapp-compatible": "WhatsApp-kompatibel (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "kilden er mørk (gjennomsnittlig luminans {0}); {1} gir banding i skyggene, så Automatisk bruker {2} med turbo første pass",
 
   "main.advice.budget-generous": "Målet er romslig for denne kilden, så motoren når det uten anstrengelse.",
-  "main.advice.codec-upgrade": "Ved dette presset gir H.265 et synlig bedre resultat i samme størrelse; vurder å sette komprimeringsalgoritmen til automatisk eller H.265.",
+  "main.advice.codec-upgrade": "Ved dette presset gir AV1 et synlig bedre resultat i samme størrelse; vurder å sette komprimeringsalgoritmen til automatisk eller AV1.",
   "main.advice.hardware-costs-quality": "Maskinvarekoderen er rask, men taper merkbar kvalitet per megabyte ved et så stramt mål; resultatet ser bedre ut med rask krymping (GPU) slått av.",
   "main.advice.extreme-ratio": "Ekstrem komprimering: tap er uunngåelig, så motoren legger det der det merkes minst.",
   "main.advice.below-codec-floor": "Dette målet er virkelig for lite for denne kilden: ingen oppsett når de bits per piksel koderen trenger for et meningsfullt bilde. Det tetteste oppsettet ble valgt, men resultatet vil se synlig ødelagt ut; å heve målet er den eneste reelle løsningen.",

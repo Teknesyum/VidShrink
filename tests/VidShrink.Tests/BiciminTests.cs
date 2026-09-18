@@ -1,5 +1,7 @@
+using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
@@ -664,15 +666,27 @@ public sealed class KareYerlesimTests
     /// zincirinden (<c>CodecFromIndex</c> -> <c>PreferredCodecFor</c>) okuyup ikisini
     /// karsilastiriyor. <c>RbCodecSmallest</c>'in <c>loc:Text</c> anahtarini degistiren bir
     /// mutasyon etiketi baska bir ailenin adina cevirir ve olcu kirmizi doner.</para>
+    ///
+    /// <para><b>Dil, pencere kuruldaktan sonra sabitlenir.</b> <c>Read("en", ...)</c>'in
+    /// basindaki <c>Strings.Use</c> yetmiyor: <c>MainWindow</c> yapicisi kayitli arayuz
+    /// dilini geri yukleyip uzerine yaziyor, dolayisiyla olcu kendi basina kosunca Turkce
+    /// etiketi okuyordu ve <c>Locales/en/main.json</c>'a yapilan mutasyon <b>yesil</b>
+    /// kaliyordu. Geri cagirmanin govdesindeki <c>Strings.Use("en")</c> bunu kapatir;
+    /// <c>loc:Text</c> bir <c>LocalizedText</c> bagi verdigi icin kurulmus icerik de
+    /// tazelenir.</para>
     /// </summary>
     [Fact]
     public void KodekEtiketiSecilenKodlayiciyiSoyler()
     {
-        var etiket = Read("en", window => new[]
+        var etiket = Read("en", window =>
         {
-            Named<RadioButton>(window, "RbCodecAuto").Content?.ToString() ?? "",
-            Named<RadioButton>(window, "RbCodecCompatible").Content?.ToString() ?? "",
-            Named<RadioButton>(window, "RbCodecSmallest").Content?.ToString() ?? ""
+            Strings.Use("en");
+            return new[]
+            {
+                Named<RadioButton>(window, "RbCodecAuto").Content?.ToString() ?? "",
+                Named<RadioButton>(window, "RbCodecCompatible").Content?.ToString() ?? "",
+                Named<RadioButton>(window, "RbCodecSmallest").Content?.ToString() ?? ""
+            };
         });
 
         var aile = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -754,6 +768,50 @@ public sealed class KareYerlesimTests
         Assert.StartsWith(" Belge kolundan gonder", okunan.Onalti, StringComparison.Ordinal);
         Assert.DoesNotContain("Send this on WhatsApp", okunan.Onalti, StringComparison.Ordinal);
         Assert.Equal("", okunan.Yuz);
+    }
+
+    /// <summary>
+    /// <para>Kucultme seridi artik <c>AV1</c> diyor ve AV1 eski cihazlarda cozulmez; secimin
+    /// bedelini soyleyen bir yer yoktu. Donusum sekmesinin kodek ipucu bu bilgiyi 42 dilde
+    /// zaten tasiyordu, <c>main.codec.tip</c> onun H.264 ve AV1 maddelerinden uretildi.</para>
+    ///
+    /// <para>Olcu ipucunun <b>varligini</b> degil kaynagini tutuyor: dil agacinin kopyasinda
+    /// <c>en</c> degeri degistirilip <c>Strings.UseRoot</c> ile enjekte ediliyor, ekrandaki
+    /// balon o degeri gostermezse kirmizi doner. Metin koda sabitlenirse olcu duser.</para>
+    /// </summary>
+    [Fact]
+    public void KodekSeridiIpucuDilDosyasindanGelir()
+    {
+        var kopya = Kopya("s-kodek-ipucu", new Dictionary<string, string>
+        {
+            ["\"main.codec.tip\": \"• H.264"] = "\"main.codec.tip\": \"• Balon kolundan H.264"
+        });
+
+        string okunan;
+        AppHost.Run(() => Strings.UseRoot(kopya));
+        try
+        {
+            okunan = Read("en", window =>
+            {
+                Strings.Use("en");
+                var satir = Named<Grid>(window, "CodecChoiceRow");
+                var balon = ToolTip.GetTip(satir) as StackPanel;
+                Assert.NotNull(balon);
+                var metin = balon!.Children.OfType<TextBlock>().First();
+                return string.Concat(metin.Inlines?.OfType<Run>().Select(kosu => kosu.Text) ?? Array.Empty<string?>());
+            });
+        }
+        finally
+        {
+            AppHost.Run(() => Strings.UseRoot(null));
+        }
+
+        var dizin = Path.Combine(GirdiKanit.Root, ".calisma", "s-kodek-ipucu");
+        Directory.CreateDirectory(dizin);
+        File.WriteAllText(Path.Combine(dizin, "okunan.txt"), okunan);
+
+        Assert.Contains("Balon kolundan H.264", okunan, StringComparison.Ordinal);
+        Assert.Contains("AV1", okunan, StringComparison.Ordinal);
     }
 }
 
@@ -927,6 +985,13 @@ public sealed class BaslikKapsamiTests
     /// <c>AV1</c> zaten <c>LanguageCatalog.Names</c>'de bildirildigi icin <c>kayip</c> 0
     /// kaldi. Kol degistiren toplam da degismedi (1481, en 170, tr 61): eklenen cumleler
     /// nokta tasidigi icin eski kurala gore zaten govde sayiliyor.</para>
+    /// <para>Ayni dalin denetim borclari <b>ikinci</b> anahtari ekledi:
+    /// <c>main.codec.tip</c>, kucultme seridine asilan uyumluluk balonu. Metni uydurulmadi,
+    /// 42 dilde <c>main.convert.video-codec.tip</c>'in H.264 ve AV1 maddelerinden kesildi.
+    /// Yine 42 dosyanin hepsine girdi, dusen yok: 38743 + 43 x 1 = 38786. Ayni borc
+    /// <c>main.advice.codec-upgrade</c>'in iki <c>H.265</c> gecisini <c>AV1</c>'e cevirdi —
+    /// anahtar sayisini degistirmez, <c>kayip</c> 0 kalir, kol degistiren toplam 1481 /
+    /// en 170 / tr 61 yerinde durur.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -954,8 +1019,61 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(38743, gezilen);
+        Assert.Equal(38786, gezilen);
         Assert.Empty(kayip);
+    }
+
+    /// <summary>
+    /// <para>Kodek adi bir metinde gecerken kapali listeyle aranmaz; bicimden cikarilir:
+    /// <c>H.264</c>/<c>H.265</c> gibi <c>H.</c> + uc rakam, <c>AV1</c>/<c>VP9</c> gibi iki
+    /// harf + rakam. Boylece yarin eklenen bir kodek listeyi guncellemeyi unuttugumuz icin
+    /// sessizce gozden kacmaz.</para>
+    ///
+    /// <para>Olcunun kurali: <c>main.advice.codec-upgrade</c> tavsiyesi kullaniciyi kodek
+    /// seridinde bir secenege yolluyor, dolayisiyla andigi her kodek adi seridin uc
+    /// etiketinden birinde gecmek zorunda. Tavsiye 42 dilde yillarca <c>H.265</c> diyordu;
+    /// serit <c>AV1</c>'e cekilince tavsiye var olmayan bir secenegi gosterir oldu. Her dil
+    /// ayri gezilir, adsiz kalan dil de kirmizi doner.</para>
+    /// </summary>
+    [Fact]
+    public void TavsiyeninGosterdigiKodekSeritteBulunur()
+    {
+        var desen = new Regex(@"H\.\d{3}|[A-Z]{2}\d", RegexOptions.CultureInvariant);
+        var etiketAnahtarlari = new[] { "main.codec.automatic", "main.codec.compatible", "main.codec.smallest" };
+
+        var eksik = new List<string>();
+        var gezilen = 0;
+
+        foreach (var dil in Strings.Languages.OrderBy(d => d, StringComparer.Ordinal))
+        {
+            var seritte = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var anahtar in etiketAnahtarlari)
+                foreach (Match esleme in desen.Matches(Strings.GetIn(dil, anahtar)))
+                    seritte.Add(esleme.Value);
+
+            var tavsiyede = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (Match esleme in desen.Matches(Strings.GetIn(dil, "main.advice.codec-upgrade")))
+                tavsiyede.Add(esleme.Value);
+
+            gezilen++;
+            _cikti.WriteLine($"SERIT\t{dil}\t{string.Join(",", seritte)}\ttavsiye\t{string.Join(",", tavsiyede)}");
+
+            if (tavsiyede.Count == 0)
+            {
+                eksik.Add($"{dil}\ttavsiye hicbir kodek adi anmiyor");
+                continue;
+            }
+
+            foreach (var ad in tavsiyede)
+                if (!seritte.Contains(ad))
+                    eksik.Add($"{dil}\t{ad}\tseritte yok: {string.Join(",", seritte)}");
+        }
+
+        foreach (var satir in eksik) _cikti.WriteLine("EKSIK\t" + satir);
+        _cikti.WriteLine($"SAYIM\tdil\t{gezilen}");
+
+        Assert.Equal(Strings.Languages.Count(), gezilen);
+        Assert.Empty(eksik);
     }
 
     [Fact]

@@ -113,6 +113,7 @@
   "main.codec.automatic": "자동",
   "main.codec.compatible": "H.264 (호환)",
   "main.codec.smallest": "AV1 (최소)",
+  "main.codec.tip": "• H.264는 거의 모든 기기에서 재생되며 WhatsApp이 기대하는 형식입니다. 파일이 무조건 작동해야 하면 고르세요.\n• AV1은 압축률이 가장 좋고 인코딩이 가장 느리며 최신 휴대폰만 디코딩합니다.",
 
   "main.allow.resolution": "해상도 낮춤 허용",
   "main.whatsapp-compatible": "WhatsApp 호환 (H.264)",
@@ -395,7 +396,7 @@
   "main.reason.dark-content-hevc": "소스가 어두움(평균 밝기 {0}). {1}은 어두운 부분에 밴딩이 생기므로 자동은 터보 첫 패스와 함께 {2}를 사용",
 
   "main.advice.budget-generous": "이 원본에 목표가 넉넉하여 엔진이 무리 없이 맞춥니다.",
-  "main.advice.codec-upgrade": "이 압박에서는 H.265가 같은 크기에서 눈에 띄게 나은 결과를 냅니다. 압축 알고리즘을 자동이나 H.265로 바꾸는 것을 고려하세요.",
+  "main.advice.codec-upgrade": "이 압박에서는 AV1가 같은 크기에서 눈에 띄게 나은 결과를 냅니다. 압축 알고리즘을 자동이나 AV1로 바꾸는 것을 고려하세요.",
   "main.advice.hardware-costs-quality": "하드웨어 인코더는 빠르지만 이렇게 빠듯한 목표에서는 메가바이트당 품질을 눈에 띄게 잃습니다. 빠른 축소(GPU)를 끄면 결과가 더 좋아 보입니다.",
   "main.advice.extreme-ratio": "극단적 압축: 손실을 피할 수 없어 엔진은 가장 눈에 띄지 않는 곳으로 밀어냅니다.",
   "main.advice.below-codec-floor": "이 목표는 이 원본에 정말 너무 작습니다. 어떤 배치도 인코더가 의미 있는 화면에 필요로 하는 픽셀당 비트에 이르지 못합니다. 가장 조밀한 배치를 택했지만 결과는 눈에 띄게 깨져 보일 것입니다. 목표를 올리는 것이 유일한 해결책입니다.",
