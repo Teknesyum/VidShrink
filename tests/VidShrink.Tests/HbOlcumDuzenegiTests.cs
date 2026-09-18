@@ -7,6 +7,19 @@ using VidShrink.Core;
 namespace VidShrink.Tests;
 
 /// <summary>
+/// Kabuk yoksa olcum kosulmaz; o durumda test sessizce yesil donmesin diye
+/// gerekceli <c>Skip</c> yaziyor.
+/// </summary>
+public sealed class PowerShellFactAttribute : FactAttribute
+{
+    public PowerShellFactAttribute()
+    {
+        if (HbOlcumDuzenegiTests.PowerShellYolu() is null)
+            Skip = "pwsh/powershell bulunamadi, betigin kendi fonksiyonunu kosturan olcum yapilmadi.";
+    }
+}
+
+/// <summary>
 /// B5 SVT kolunda HandBrake'e ürünün x265 preset adı ("slow") <c>--encoder-preset</c>
 /// olarak geçirilmişti. HandBrake'in svt_av1 kodlayıcısı orada sayı bekliyor; ad
 /// verildiğinde kendi varsayılanına düşüyor ve iki karanlık hücrede 400 sn'nin üzerinde
@@ -18,7 +31,7 @@ public sealed class HbOlcumDuzenegiTests
 {
     private static string Script => File.ReadAllText(Path.Combine(TipSources.Root, "tools", "kalite-paketi-3", "hb.ps1"));
 
-    private static string? PowerShell()
+    internal static string? PowerShellYolu()
     {
         foreach (var name in new[] { "pwsh", "powershell" })
         {
@@ -47,11 +60,10 @@ public sealed class HbOlcumDuzenegiTests
         return match.Value;
     }
 
-    [Fact]
+    [PowerShellFact]
     public void SvtKolununPresetEslemesiUrununAdiniSayiyaCeviriyor()
     {
-        var shell = PowerShell();
-        if (shell is null) return;
+        var shell = PowerShellYolu()!;
 
         var girdiler = new[] { "veryslow", "slower", "slow", "medium", "fast", "faster", "veryfast", "ultrafast", "6", "", "bilinmeyen" };
         var beklenen = new[] { "4", "5", "6", "8", "9", "10", "11", "12", "6", "8", "8" };

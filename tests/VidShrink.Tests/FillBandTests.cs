@@ -224,19 +224,34 @@ public sealed class FillBandTests
     private const double MeasuredLibx264Yield = 0.9815;
 
     [Theory]
-    [InlineData(180.0)]
-    [InlineData(25.0)]
-    [InlineData(8.0)]
-    public void RetryAimTargetsTheBandCenterWhenTheYieldIsMeasured(double targetMb)
+    [InlineData(180.0, 177.48, 174.96)]
+    [InlineData(25.0, 24.375, 23.75)]
+    [InlineData(8.0, 7.68, 7.36)]
+    public void RetryAimTargetsTheBandCenterWhenTheYieldIsMeasured(double targetMb, double expectedAimMb, double expectedLowerMb)
     {
-        var band = FillBand.For(targetMb);
-        var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
-
         var aim = PlanCalculator.RetryAimMb(targetMb, MeasuredLibx264Yield);
 
-        Assert.Equal(bandCenterMb, aim, 6);
-        Assert.True(aim >= band.LowerMb && aim <= band.UpperMb,
-            $"A measured yield must let the retry aim at the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {aim:0.0} MB.");
+        Assert.Equal(expectedAimMb, aim, 6);
+        Assert.True(aim >= expectedLowerMb && aim <= targetMb,
+            $"A measured yield must let the retry aim at the {expectedLowerMb:0.00}-{targetMb:0.00} MB band, got {aim:0.00} MB.");
+    }
+
+    [Theory]
+    [InlineData(8.0, 7.68, 7.76)]
+    [InlineData(1.0, 0.96, 0.97)]
+    [InlineData(4.88, 4.6848, 4.7336)]
+    public void RetryAimStaysUnderTheBudgetFillFloorSoAnOnAimAttemptTriggersOneMoreEncode(
+        double targetMb, double expectedAimMb, double expectedFloorMb)
+    {
+        var aim = PlanCalculator.RetryAimMb(targetMb, MeasuredLibx264Yield);
+        var floorMb = BudgetFill.Floor * targetMb;
+
+        Assert.Equal(expectedAimMb, aim, 6);
+        Assert.Equal(expectedFloorMb, floorMb, 6);
+        Assert.True(aim < floorMb,
+            $"The retry aim {aim:0.0000} MB is no longer under the budget fill floor {floorMb:0.0000} MB.");
+        Assert.True(BudgetFill.Wants(aim, targetMb, attemptsUsed: 2, attemptLimit: 3, alreadyUsed: false),
+            "An attempt that lands exactly on the retry aim must still ask for one more full encode.");
     }
 
     [Theory]

@@ -50,6 +50,19 @@ public sealed class BudgetFillTests
         Assert.Null(BudgetFill.Plan(Teslim(), teslimMb, Array.Empty<SizeSample>(), Hedef, Sure));
     }
 
+    [Theory]
+    [InlineData(0.9650, true)]
+    [InlineData(0.9699, true)]
+    [InlineData(0.9750, false)]
+    [InlineData(0.9800, false)]
+    public void EsigiAsagiYaDaYukariKaydiranMutasyonTeslimKararindaGoruluyor(double oran, bool bekleniyor)
+    {
+        var teslimMb = oran * Hedef;
+
+        Assert.Equal(bekleniyor, BudgetFill.Wants(teslimMb, Hedef, 1, 3, false));
+        Assert.Equal(bekleniyor, BudgetFill.Plan(Teslim(), teslimMb, Array.Empty<SizeSample>(), Hedef, Sure) is not null);
+    }
+
     [Fact]
     public void TavaniAsanYukariDenemeTeslimEdilmezOncekiSonucKalir()
     {

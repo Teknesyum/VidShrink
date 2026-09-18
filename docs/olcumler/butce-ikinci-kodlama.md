@@ -209,8 +209,15 @@ Ilk denemenin kbit'inden hedefe lineer gidilse istenecek kbit; yanina ayni kosum
 - h264: 0,18 – 0,24, 8/8 geçiyor.
 
 Ama B5 kapısı `x265_oran_toplam`'a bakıyor, yani sürecin toplam duvar saatine.
+Koşumun gerçek toplam oranı (Tablo 1, "Oran toplam" = toplam sn / HandBrake sn):
+
+- x265: 3,15 – 6,45 → **0/8 geçiyor**.
+- h264: 1,09 – 2,77 → **0/8 geçiyor** (en küçüğü karanlık/600 1,09).
+
 Deneme sayısı bire düşse bile toplam, **kodlama dışı** süreyi taşımaya devam eder.
-Bunu ölçtük (Tablo 1, "Oran tek deneme" = (kodlama dışı + ilk deneme) / HandBrake):
+Bunu ayrıca ölçtük (Tablo 1, "Oran tek deneme" = (kodlama dışı + ilk deneme) /
+HandBrake); bu sütun ölçülmüş değil **kurgusal** bir toplamdır, koşumun kendi
+toplamı değildir:
 
 - x265: 2,15 – 3,17 → **8/8 kalıyor**.
 - h264: 0,87 – 1,97 → 4 hücre geçiyor (karanlık/2000 0,90; parlak/600 0,97;
@@ -222,8 +229,10 @@ düşmeyen bu pay, kendi başına B5'i x265'te kapatmaya yetiyor.
 
 **Cevap:** hayır. Deneme sayısı bire indirilse bile B5 x265'te açılmaz; ölçülen
 tek-deneme oranı 2,15'in altına inmiyor. İddianın "farkın çoğu deneme sayısından"
-kısmı x265'te **yanlış**: ek denemeler toplamın %15,7 – %55,0'i (tek denemede biten
-karanlık/600/h264 hariç), geri kalanı kodlayıcının kendi hızı ile kodlama dışı iş.
+kısmı x265'te **yanlış**: x265'te ek denemeler toplamın %29,5 – %55,0'i (31,5 /
+40,3 / 49,8 / 55,0 / 29,5 / 32,0 / 31,1 / 52,2), yani yarısından azı; geri kalanı
+kodlayıcının kendi hızı ile kodlama dışı iş. h264'te aynı pay %15,7 – %29,1
+(tek denemede biten karanlık/600/h264 hariç); %15,7 hareketli/600/h264'tür.
 
 Bu kolda kodlama dışı sürenin nereye gittiği (yoklama, karmaşıklık örneklemesi,
 ses, paketleme) **ölçülmedi**; ayrım için deneme dışı adımların da saati yok.
@@ -238,10 +247,24 @@ Tablo 2, "Ilk bantta" sütunu: karanlık 4/4, parlak h264 2/2, hareketli 4/4 —
 toplam 10 hücrede ilk deneme teslim bandının içinde, sapma −%2,65 ile −%5,79.
 Bunların 9'unda yine de ikinci tam kodlama koştu ve dalın adı
 `budget fill, the fuller result delivered`. Yani **teslim edilebilir bir sonucun
-üstüne son %1–4'ü almak için** tam bir kodlama daha koşuldu: ikinci denemenin
-sapması −%0,67 ile −%2,27'ye iniyor. Bunun bedeli 55,4 sn (karanlık/600/x265,
-toplamın %31,5'i), 116,1 sn (karanlık/2000/x265, %40,3), 106,4 sn
-(hareketli/2000/x265, %32,0).
+üstüne biraz daha doluluk almak için** tam bir kodlama daha koşuldu. Ölçülen
+kazanç: ilk denemenin sapması ikinci denemede **2,05 – 5,08 puan** düzeliyor
+(−%2,65..−%5,79 → −%0,67..−%2,27).
+
+Bu dokuz hücrenin ek deneme bedeli, Tablo 2 "Ek deneme sn" sütunundan:
+
+| Hücre | Ek deneme sn | Toplamdaki payı % |
+| --- | --- | --- |
+| karanlik/600/x265 | 55,4 | 31,5 |
+| karanlik/2000/h264 | 17,2 | 20,3 |
+| karanlik/2000/x265 | 116,1 | 40,3 |
+| parlak/600/h264 | 12,4 | 17,3 |
+| parlak/2000/h264 | 18,8 | 21,6 |
+| hareketli/600/h264 | 11,6 | 15,7 |
+| hareketli/600/x265 | 57,1 | 29,5 |
+| hareketli/2000/h264 | 19,6 | 20,7 |
+| hareketli/2000/x265 | 106,4 | 32,0 |
+| **toplam** | **414,6** | — |
 
 ### (b) Bu ikinci kodlama tesadüf değil, nişan noktası onu garanti ediyor
 
@@ -298,12 +321,15 @@ düzeltme denemesi her hâlükârda gerekir.
 ## Hüküm
 
 1. **İkinci tam kodlama azaltılabilir.** 16 hücrenin 9'unda o kodlama zaten bantta
-   olan bir sonucun üstüne %1–4 doluluk almak için koşuyor, doğruluk için değil.
+   olan bir sonucun üstüne 2,05 – 5,08 puanlık sapma kazancı için koşuyor,
+   doğruluk için değil; bu dokuz hücrenin faturası 414,6 sn.
    Kökü yapısal: yeniden deneme nişanı 0,96·T, doldurma tabanı 0,97 — isabetli
    deneme kendi kendine bir kodlama daha doğuruyor.
 2. **Düzeltme gereken 6 hücrede de tek deneme ölçülmüş olarak yetiyor**; lineer
    düzeltmenin vardığı kbit'in yanında ölçülmüş sapma −%2,65 ile +%1,45.
-3. **Ama bu B5'i açmıyor.** x265'te tek-deneme oranı 2,15 – 3,17; kapı 1,0.
+3. **Ama bu B5'i açmıyor.** Koşumun ölçülen toplam oranı x265'te 3,15 – 6,45,
+   h264'te 1,09 – 2,77; ikisi de 0/8. Denemeler bire indirilse bile kurgusal
+   tek-deneme oranı x265'te 2,15 – 3,17; kapı 1,0.
    Kodlama dışı süre tek başına HandBrake'in 0,63 – 2,51 katı. B5'in x265'teki
    8/8 kalışı deneme sayısıyla kapanmaz; kodlayıcının kendi hızı ve kodlama dışı
    iş ayrı bir madde.
@@ -316,6 +342,75 @@ düzeltme denemesi her hâlükârda gerekir.
 dalındaki nişanı bandın ortasından `BudgetFill.Aim`'e (0,985·T) çekmek. Bu
 değişikliğin sonucu ölçülmedi; ölçülen, mevcut nişanın doldurma eşiğinin altında
 kaldığı ve bunun 9 hücrede fazladan tam kodlama ürettiğidir.
+
+## Denetim sonrası kapatılan pim borçları
+
+Denetim dört pim borcu buldu; dördü de kapatıldı, üçünün mutasyon kanıtı aşağıda.
+Mutasyonların hepsi **0 derleme hatasıyla** derlendi, sonra geri alındı.
+
+**1. `RetryAimTargetsTheBandCenterWhenTheYieldIsMeasured` totolojikti.** Beklenen
+değeri de ölçüleni de `FillBand.For` üretiyordu; `For`daki 0,92 kaysa iki taraf
+birlikte kayardı. Beklenen artık literal: 180 → 177,48; 25 → 24,375; 8 → 7,68.
+Mutasyon `lowerFactor = 0.92` → `0.90`:
+
+```
+Assert.Equal() Failure: Values are not within 6 decimal places
+Başarısız! - Başarısız:     1, Başarılı:     2, Atlanan:     0, Toplam:     3
+```
+
+**2. `BudgetFillTests` eşiğin aşağısına kördü.** `InlineData(0.97)` Floor 0,96
+olsa da `false` kalıyordu. Yeni kol
+`EsigiAsagiYaDaYukariKaydiranMutasyonTeslimKararindaGoruluyor` eşiğin iki yakasını
+davranıştan okuyor: 0,9650 ve 0,9699 → ister, 0,9750 ve 0,9800 → istemez; hem
+`Wants` hem `Plan` için. Mutasyon `Floor = 0.97` → `0.96`:
+
+```
+BudgetFillTests.EsigiAsagiYaDaYukariKaydiranMutasyonTeslimKararindaGoruluyor(oran: 0,965, bekleniyor: True) [FAIL]
+BudgetFillTests.EsigiAsagiYaDaYukariKaydiranMutasyonTeslimKararindaGoruluyor(oran: 0,9699, bekleniyor: True) [FAIL]
+Başarısız! - Başarısız:     2, Başarılı:    30, Atlanan:     0, Toplam:    32
+```
+
+**3. Hükmün merkezî ilişkisi pimsizdi.** `RetryAimMb(T, ölçülmüş verim) <
+BudgetFill.Floor · T` (T < 10 MB) hiçbir testte sınanmıyordu. Yeni kol
+`RetryAimStaysUnderTheBudgetFillFloorSoAnOnAimAttemptTriggersOneMoreEncode`:
+nişan ve eşik literal (8 → 7,68 / 7,76; 1 → 0,96 / 0,97; 4,88 → 4,6848 / 4,7336),
+ardından `BudgetFill.Wants(nişan, T, 2, 3, false)` **doğru** olmalı — yani nişanını
+tam tutturan deneme bir tam kodlama daha istemeli. Mutasyon olarak **belgenin
+önerdiği düzeltme** uygulandı (`return band.CenterMb` → `return BudgetFill.Aim *
+targetMb`):
+
+```
+Başarısız! - Başarısız:     3, Başarılı:     0, Atlanan:     0, Toplam:     3
+```
+
+Yani bu pim ilişkiyi iki yönde de tutuyor: bozulursa da düzeltilirse de kırmızı
+olur. Öneri uygulandığında **bu testin beklentisi de değişmeli**; pim, düzeltmenin
+sessizce girmesini engelliyor.
+
+**4. `HbOlcumDuzenegiTests`in sessiz geçen kolu.** `var shell = PowerShell(); if
+(shell is null) return;` kabuk yokken hiçbir şey sınamadan yeşil dönüyordu. Kol
+`[PowerShellFact]`e çevrildi (`LiveSourceFactAttribute` deseni). Kabuksuz durum
+yerelde üretilemediği için koşul geçici olarak `|| true` yapılıp raporlama ölçüldü:
+
+```
+Atlandı VidShrink.Tests.HbOlcumDuzenegiTests.SvtKolununPresetEslemesiUrununAdiniSayiyaCeviriyor [1 ms]
+Atlandı!   - Başarısız: 0, Başarılı: 0, Atlanan: 1, Toplam: 1
+```
+
+Koşul geri alındı. **Kabuksuz makinede gerçek koşum ölçülmedi**; ölçülen, `Skip`
+gerekçesinin atlanmış olarak raporlandığıdır.
+
+Kapılar (mutasyonlar geri alınmış hâlde):
+
+```
+dotnet build VidShrink.sln -c Release -warnaserror -m:2   → 0 Uyarı, 0 Hata
+--filter FullyQualifiedName~FillBandTests          → 31 başarılı, 1 atlanan, 32 toplam
+--filter FullyQualifiedName~BudgetFillTests        → 32 başarılı, 0 atlanan, 32 toplam
+--filter FullyQualifiedName~HbOlcumDuzenegiTests   → 7 başarılı, 0 atlanan, 7 toplam
+```
+
+`FillBandTests`teki 1 atlanan `LiveFillTargetRunStaysInsideTheBand`; gerekçesini
+`LiveSourceTheoryAttribute` yazıyor.
 
 ## Ham çıktı
 
@@ -331,4 +426,4 @@ gh run list --branch t0/butce-ikinci-kodlama
 35282699847 handbrake-kiyas 9642686d completed success
 ```
 
-`00dd1ba8` kirmizisi olcumun degil pimin kusuruydu: `OzetSabiti` capasi `$` idi, CI'da dosya CRLF geldiginde satir sonundaki tasiyici donuse takilip "DOLDUR_ESIK bulunamadi" dedi. Capa `\s*$` oldu, betik depoda CRLF'e cevrildi; `8918b542` yesil: 3253 test, 0 basarisiz, 26 atlandi.
+`00dd1ba8` kirmizisi olcumun degil pimin kusuruydu: `OzetSabiti` capasi `$` idi, CI'da dosya CRLF geldiginde satir sonundaki tasiyici donuse takilip "DOLDUR_ESIK bulunamadi" dedi. Capa `\s*$` oldu, betik depoda CRLF'e cevrildi; `8918b542` yesil: kosumun kendi kutugu `Failed: 0, Passed: 3226, Skipped: 27, Total: 3253`.
