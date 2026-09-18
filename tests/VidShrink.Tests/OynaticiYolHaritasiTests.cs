@@ -316,6 +316,7 @@ public sealed class OynaticiYolHaritasiTests
             Assert.False(view.WindowDragging);
             Assert.True(hatalar.Count == 0, body.ToString());
 
+            view.Close();
             window.Close();
             return 0;
         });
@@ -375,6 +376,7 @@ public sealed class OynaticiYolHaritasiTests
             var kisayolSatiri = kisayollar?.Items.OfType<MenuItem>().Count() ?? 0;
             body.AppendLine($"sekmeye giden satir {sekmeyeGiden}; kisayollar alt menusu {kisayollar is not null}, satir {kisayolSatiri}, tablo {Keymap.Rows.Count}");
 
+            view.Close();
             window.Close();
             Assert.True(temaTutti, "tema satiri ayarlar kutusunu degistirmedi");
             Assert.Equal(0, sekmeyeGiden);
@@ -424,6 +426,7 @@ public sealed class OynaticiYolHaritasiTests
                 Assert.Equal(sayi, sonra - once, 3);
             }
 
+            view.Close();
             window.Close();
             return 0;
         });
@@ -490,6 +493,7 @@ public sealed class OynaticiYolHaritasiTests
             Adim("11 ayarlar sekmesi", () => window.Tabs.SelectedItem = window.TabSettings, true, false);
             Adim("12 ayarlar sekmesinde fare asagida", () => { Hareket(window, view, new Point(600, 520)); saat.Ates(); }, true, false);
 
+            view.Close();
             window.Close();
             Assert.Equal(seritGecikme, gecikme);
             Assert.True(hatalar.Count == 0, "kalan adimlar: " + string.Join(", ", hatalar) + Environment.NewLine + body);
@@ -569,6 +573,7 @@ public sealed class OynaticiYolHaritasiTests
             var bant = view.RevealBand;
             var yuzeyYuksekligi = yuzey.Bounds.Height;
             var baslik = window.TitleBar.Height;
+            view.Close();
             window.Close();
 
             Assert.True(Math.Abs(ust - altEsik) <= 1, $"ust {ust} px, alt {altEsik} px" + Environment.NewLine + body);
@@ -624,6 +629,7 @@ public sealed class OynaticiYolHaritasiTests
             Tikla(dugme);
             Oku("tik");
 
+            view.Close();
             window.Close();
             Assert.Equal(new[] { "1/1", "1/1", "1.5/1.5", "1/1", "1.5/1.5", "1.75/1.75", "1/1", "1.75/1.75" }, okumalar);
             return 0;
@@ -704,6 +710,7 @@ public sealed class OynaticiYolHaritasiTests
 
             var enKisa = sureler.Min();
             body.AppendLine($"en kisa {YolKanit.N(enKisa)} ms, giriste ara saydamlik {girisAra}, cikista ara saydamlik {cikisAra}");
+            view.Close();
             window.Close();
 
             Assert.InRange(enKisa, tutma.TotalMilliseconds - 30, tutma.TotalMilliseconds + 90);
@@ -751,6 +758,7 @@ public sealed class OynaticiYolHaritasiTests
                 body.AppendLine($"{ad}: pencere {window.WindowState}, kabuk anahatti {kabuk.BorderThickness}, sahne anahatti {sahne.BorderThickness}");
             }
 
+            view.Close();
             window.Close();
             Assert.True(ince != default, "BorderThin okunamadi");
             Assert.Equal(ince, olcum[0].Kabuk);
@@ -837,7 +845,8 @@ public sealed class OynaticiYolHaritasiTests
                 var ic = Fark(anahat, icte);
                 sonuc[ad] = (anahat, ust);
                 body.AppendLine($"{ad}: serit y {y}, ustte {ustte}, anahat {anahat}, icte {icte}, anahat-ust fark {YolKanit.N(ust)}, anahat-ic fark {YolKanit.N(ic)}");
-                window.Close();
+                view.Close();
+            window.Close();
             }
 
             var taban = sonuc["medyasiz"];
@@ -1000,6 +1009,7 @@ public sealed class OynaticiYolHaritasiTests
             var view = Ac(motor, out var window, film);
             var eklenen = motor.Eklenen.Select(Path.GetFileName).ToList();
             body.AppendLine($"sahte motor: eklenen {string.Join(" | ", eklenen)}; iz {string.Join(" | ", view.Trace.Where(t => t.StartsWith("subauto", StringComparison.Ordinal)))}");
+            view.Close();
             window.Close();
             Assert.Equal(new[] { "film-en.ass", "film.tr.srt", "film.srt" }, eklenen);
 

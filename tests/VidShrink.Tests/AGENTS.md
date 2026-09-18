@@ -130,6 +130,8 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   gizlenmesi, P18, P19 duraklatma simgesi süresi, P20, P24 anahat pikselleri, P26 yayılma maskesi, P28 yandaki altyazı).
   Zamanlayıcı bekleyen ölçüler `Dispatcher.UIThread.MainLoop` ile pompalar; `RunJobs` Win32 zamanlayıcısını tetiklemez.
   Kanıt `.calisma/oynatici-yol-haritasi/`, negatif kontrol betiği aynı klasörde.
+  Pencere kapatılmadan önce `view.Close()` çağrılır: `window.Close()` tek başına görsel ağaçtan ayrılmayı
+  ertelediği için `player-history.json` `Kapat`'tan sonra doğuyordu (2026-09-18 ölçümü).
 - `KabukMenusuTests.cs` — sağ tık menüsünün iki tarafı: `ShellMenu.cs` ile `Install-VidShrink.ps1`'in anahtar adları,
   uzantı listesi ve hedef listesi birebir aynı; silme kolu Appx paketini de kaldırıyor; kutu Ayarlar sekmesinde;
   etiket arayüz dilini izliyor; sekiz yeni anahtar 42 dilde. Kayıt defterine yazmaz, kaynak metin okur.

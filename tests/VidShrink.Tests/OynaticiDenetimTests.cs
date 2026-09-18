@@ -726,7 +726,7 @@ public sealed class OynaticiDenetimMotorTests
 
         Assert.InRange(rapor.kapanis, 12.2, 12.4);
         Assert.InRange(rapor.acilis, rapor.kapanis - 1, rapor.kapanis + 1);
-        DenetimKanit.Kapat("devam.txt", "gecmis-devam.json");
+        DenetimKanit.Kapat("devam.txt", "gecmis-devam.json", RecentFiles.FileName);
     }
 
     [Fact]
@@ -773,7 +773,7 @@ public sealed class OynaticiDenetimMotorTests
         Assert.InRange(rapor.gidilen[1], 14.9, 15.1);
         Assert.InRange(rapor.gidilen[2], 7.9, 8.1);
         Assert.Equal(2, rapor.kalan.Count);
-        DenetimKanit.Kapat("yer-imi.txt", "gecmis-yerimi.json");
+        DenetimKanit.Kapat("yer-imi.txt", "gecmis-yerimi.json", RecentFiles.FileName);
     }
 
     [Fact]
