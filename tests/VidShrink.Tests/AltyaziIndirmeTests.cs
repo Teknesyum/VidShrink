@@ -63,6 +63,18 @@ internal sealed class SahteAg : IHttpTransport
         return this;
     }
 
+    /// <summary>Cevabi basliklarini duzenleyerek kuyruga koyar (Retry-After gibi).</summary>
+    internal SahteAg SonraBasliklayan(HttpStatusCode kod, string govde, Action<HttpResponseMessage> duzen)
+    {
+        _cevaplar.Enqueue(_ =>
+        {
+            var yanit = new HttpResponseMessage(kod) { Content = new StringContent(govde, Encoding.UTF8, "application/json") };
+            duzen(yanit);
+            return yanit;
+        });
+        return this;
+    }
+
     internal SahteAg SonraBayt(byte[] bayt)
     {
         _cevaplar.Enqueue(_ => new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(bayt) });
@@ -102,7 +114,26 @@ internal sealed class SahteSaglayici : ISubtitleProvider
     /// <summary>Kurulursa arama burada bekler; arama sürerken ekranda ne yazdığı okunabilir.</summary>
     internal TaskCompletionSource? AramaKapisi { get; set; }
 
+    internal SubtitleSession? Oturum { get; set; }
+
+    /// <summary>Oturum var mi; olculerin cogu "var" varsayar, yoklugu ayri olcude surulur.</summary>
+    internal bool OturumVar { get; set; } = true;
+
+    internal List<string> Girisler { get; } = new();
+
     public bool IsConfigured => Kurulu;
+
+    public bool HasSession => OturumVar;
+
+    public Task<SubtitleLoginResult> LoginAsync(string username, string password, CancellationToken cancellationToken)
+    {
+        Girisler.Add(username);
+        return Task.FromResult(Oturum is null
+            ? SubtitleLoginResult.Failed(SubtitleOutcome.BadLogin)
+            : new SubtitleLoginResult(SubtitleOutcome.Ok, Oturum));
+    }
+
+    public void SignOut() => Oturum = null;
 
     public Task<SubtitleSearchResult> SearchAsync(SubtitleQuery query, CancellationToken cancellationToken)
     {
@@ -530,6 +561,48 @@ public class AltyaziIndirmeTests
 
     // ---------- oynatıcı ----------
 
+    /// <summary>
+    /// Oturum yokken arama isteği hiç gönderilmez: indirme zaten <c>Authorization</c>
+    /// olmadan düşecek, boşuna bir istek kotayı ve saniyelik sınırı yer. Kullanıcıya
+    /// hesap girişi gerektiği söylenir. Oturum varken aynı yol aramaya kadar gider.
+    /// </summary>
+    [Fact]
+    public void OturumsuzIndirmeAgaCikmadanHesapIster()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var kok = AltyaziKanit.Temiz("oturumsuz");
+            var film = Path.Combine(kok, "film.mp4");
+            File.WriteAllBytes(film, new byte[16]);
+
+            var saglayici = new SahteSaglayici { OturumVar = false };
+            var view = Ac(new YolMotoru(), out var pencere, film);
+            view.SubtitleProviderSource = () => saglayici;
+
+            var is_ = view.DownloadSubtitleAsync();
+            DenetimSurucu.Pump(view, () => is_.IsCompleted, 10);
+            is_.GetAwaiter().GetResult();
+            var oturumsuz = (Bildirim: view.TrackNotice, Sorgu: saglayici.Sorgular.Count);
+
+            saglayici.OturumVar = true;
+            var is2 = view.DownloadSubtitleAsync();
+            DenetimSurucu.Pump(view, () => is2.IsCompleted, 10);
+            is2.GetAwaiter().GetResult();
+            var oturumlu = (Bildirim: view.TrackNotice, Sorgu: saglayici.Sorgular.Count);
+
+            pencere.Close();
+            return (Oturumsuz: oturumsuz, Oturumlu: oturumlu);
+        });
+
+        AltyaziKanit.Yaz("oturumsuz.txt",
+            "oturumsuz " + rapor.Oturumsuz.Bildirim + " sorgu " + rapor.Oturumsuz.Sorgu
+            + "\noturumlu " + rapor.Oturumlu.Bildirim + " sorgu " + rapor.Oturumlu.Sorgu);
+
+        Assert.Equal("player.subtitle.download.needaccount", rapor.Oturumsuz.Bildirim);
+        Assert.Equal(0, rapor.Oturumsuz.Sorgu);
+        Assert.Equal(1, rapor.Oturumlu.Sorgu);
+    }
+
     private static PlayerView Ac(YolMotoru motor, out Window pencere, string yol)
     {
         var view = new PlayerView { EngineFactory = () => motor };
@@ -665,14 +738,13 @@ public class AltyaziIndirmeTests
     }
 
     /// <summary>
-    /// İndirme bu sürümde arayüzde sunulmuyor. Şartname <c>/download</c> için anahtarın
-    /// yanında <c>/login</c>den gelen <c>Authorization</c> başlığını da zorunlu tutuyor;
-    /// giriş kolu P29'da geldiği için indirme satırı menüye çizilse hiç kimsede
-    /// çalışmayan bir düğme olurdu. Anahtar girilmişken de girilmemişken de menüde yok;
-    /// menünün kendisinin çizildiği, dokunulmamış altyazı satırlarıyla pimli.
+    /// İndirme satırı menüde. Anahtar girilmemişken satır "anahtar nasıl alınır" yüzünü
+    /// gösterir, girilmişken indirme yüzünü; iki yüz aynı anda görünmez. Menünün kendisinin
+    /// çizildiği, dokunulmamış iki altyazı satırıyla pimli — menü boş dönseydi yalnız
+    /// yokluğa bakan bir ölçü de geçerdi.
     /// </summary>
     [Fact]
-    public void IndirmeSatiriBuSurumdeMenudeYok()
+    public void IndirmeSatiriMenudeGorunur()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -694,12 +766,14 @@ public class AltyaziIndirmeTests
 
         AltyaziKanit.Yaz("oynatici-menu.txt", $"kapali {string.Join(" | ", rapor.Kapali)}\nacik {string.Join(" | ", rapor.Acik)}");
 
+        Assert.Contains(Strings.Get("player.subtitle.download.getkey"), rapor.Kapali);
+        Assert.DoesNotContain(Strings.Get("player.subtitle.download"), rapor.Kapali);
+
+        Assert.Contains(Strings.Get("player.subtitle.download"), rapor.Acik);
+        Assert.DoesNotContain(Strings.Get("player.subtitle.download.getkey"), rapor.Acik);
+
         foreach (var liste in new[] { rapor.Kapali, rapor.Acik })
         {
-            Assert.DoesNotContain(Strings.Get("player.subtitle.download"), liste);
-            Assert.DoesNotContain(Strings.Get("player.subtitle.download.getkey"), liste);
-
-            // Menü boş dönseydi yukarıdaki iki ölçü de geçerdi; çizildiğini göster.
             Assert.Contains(Strings.Get("player.subtitle.off"), liste);
             Assert.Contains(Strings.Get("player.subtitle.load"), liste);
         }
@@ -928,29 +1002,45 @@ public class AltyaziIndirmeTests
     }
 
     /// <summary>
-    /// P28 dil dosyalarına on beş anahtar ekledi (dalın tabanı <c>d0aea4d2</c> dil başına 900,
-    /// dalın tepesi 915, düşen yok). Bu ölçü onların üretimde okunan on üçünü tutuyor; kalan
-    /// ikisi menü satırınındı, indirme bu sürümde arayüzde sunulmadığı için
-    /// <see cref="MenuMetinleriPYirmiDokuzaBekliyor"/> ile adıyla sayılıyorlar. Listenin son
-    /// iki satırı P28'in eklediği değil, P28'in dokunduğu eski anahtar
-    /// (<c>player.subtitle.loadfailed</c>, <c>settings.player-shortcuts.hint</c>); toplam on beş satır.
+    /// P28 dil dosyalarına dil başına yirmi sekiz anahtar ekledi: dalın tabanı
+    /// <c>d0aea4d2</c> dil başına 900, dalın tepesi 928, düşen yok. On beşi ilk turda
+    /// (menü, ilerleme, hata kolları, ayar alanı), on üçü Yol A ile (oturum alanları ve
+    /// oturuma bağlı iki yeni hata kolu) girdi. Bu ölçü <b>hepsini</b> tutuyor: Yol A
+    /// indirme satırını menüye geri koyduğu için artık üretimde okunmayan P28 anahtarı yok.
+    /// Listenin son iki satırı P28'in eklediği değil, P28'in dokunduğu eski anahtar
+    /// (<c>player.subtitle.loadfailed</c>, <c>settings.player-shortcuts.hint</c>); toplam otuz satır.
     /// Her satır üretim kaynağında (kod ya da axaml) geçiyor ve 42 dilin hepsinde boş olmayan,
     /// anahtarın kendisi olmayan bir karşılığı var. Okunmayan anahtar dile girer, ekrana hiç çıkmaz.
     /// </summary>
     [Theory]
+    [InlineData("player.subtitle.download")]
+    [InlineData("player.subtitle.download.getkey")]
     [InlineData("player.subtitle.download.working")]
     [InlineData("player.subtitle.download.done")]
     [InlineData("player.subtitle.download.nokey")]
     [InlineData("player.subtitle.download.badkey")]
+    [InlineData("player.subtitle.download.badlogin")]
     [InlineData("player.subtitle.download.needaccount")]
     [InlineData("player.subtitle.download.noresult")]
     [InlineData("player.subtitle.download.quota")]
     [InlineData("player.subtitle.download.toofast")]
+    [InlineData("player.subtitle.download.toofast.wait")]
+    [InlineData("player.subtitle.download.expired")]
     [InlineData("player.subtitle.download.offline")]
     [InlineData("player.subtitle.download.writefail")]
     [InlineData("settings-tab.opensubtitles.label")]
     [InlineData("settings-tab.opensubtitles.get")]
     [InlineData("settings-tab.opensubtitles.hint")]
+    [InlineData("settings-tab.opensubtitles.account")]
+    [InlineData("settings-tab.opensubtitles.user")]
+    [InlineData("settings-tab.opensubtitles.password")]
+    [InlineData("settings-tab.opensubtitles.signin")]
+    [InlineData("settings-tab.opensubtitles.signout")]
+    [InlineData("settings-tab.opensubtitles.signingin")]
+    [InlineData("settings-tab.opensubtitles.signedin")]
+    [InlineData("settings-tab.opensubtitles.signedout")]
+    [InlineData("settings-tab.opensubtitles.signinfailed")]
+    [InlineData("settings-tab.opensubtitles.accounthint")]
     [InlineData("player.subtitle.loadfailed")]
     [InlineData("settings.player-shortcuts.hint")]
     public void EklenenMetinKaynaktaOkunurVeKirkIkiDildeVar(string anahtar)
@@ -978,33 +1068,6 @@ public class AltyaziIndirmeTests
         Assert.Equal(42, klasorler.Length);
         Assert.Empty(eksik);
         Assert.All(klasorler, dil => Assert.Contains(dil, Strings.Languages, StringComparer.OrdinalIgnoreCase));
-    }
-
-    /// <summary>
-    /// İndirme menü satırının iki metni 42 dilde hazır duruyor ama bu sürümde hiçbir yerde
-    /// okunmuyor: satır menüye çizilmiyor. Bu ölçü borcu görünür tutuyor — anahtarlar adıyla
-    /// sayılıyor, sessizce ölü kalmıyorlar. P29 indirme satırını geri koyunca bu ölçü kırmızı
-    /// olur ve ikisi yukarıdaki okunanlar listesine taşınır.
-    /// </summary>
-    [Fact]
-    public void MenuMetinleriPYirmiDokuzaBekliyor()
-    {
-        string[] bekleyen = { "player.subtitle.download", "player.subtitle.download.getkey" };
-
-        var okunanlar = bekleyen.Where(KaynaktaGeciyor).ToArray();
-        var cevirisiz = bekleyen
-            .SelectMany(anahtar => Strings.Languages.Select(dil => (Dil: dil, Anahtar: anahtar)))
-            .Where(satir => string.IsNullOrWhiteSpace(Strings.GetIn(satir.Dil, satir.Anahtar))
-                            || string.Equals(Strings.GetIn(satir.Dil, satir.Anahtar), satir.Anahtar, StringComparison.Ordinal))
-            .ToArray();
-
-        AltyaziKanit.Yaz("p29-bekleyen.txt",
-            "bekleyen: " + string.Join(", ", bekleyen)
-            + "\nkaynakta okunan: " + (okunanlar.Length == 0 ? "(yok)" : string.Join(", ", okunanlar))
-            + "\ncevirisiz: " + cevirisiz.Length);
-
-        Assert.Empty(okunanlar);
-        Assert.Empty(cevirisiz);
     }
 
     /// <summary>

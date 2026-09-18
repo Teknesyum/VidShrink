@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "سهمیه روزانه دریافت زیرنویس تمام شده است",
   "player.subtitle.download.offline": "امکان دسترسی به OpenSubtitles نبود",
   "player.subtitle.download.writefail": "زیرنویس در کنار ویدیو ذخیره نشد",
-  "player.subtitle.download.toofast": "درخواست‌های بیش از حد به OpenSubtitles — کمی بعد دوباره تلاش کنید"
+  "player.subtitle.download.toofast": "درخواست‌های بیش از حد به OpenSubtitles — کمی بعد دوباره تلاش کنید",
+  "player.subtitle.download.badlogin": "OpenSubtitles ورود را نپذیرفت",
+  "player.subtitle.download.expired": "پیوند دانلود منقضی شده است — دوباره تلاش کنید",
+  "player.subtitle.download.toofast.wait": "درخواست‌های بیش از حد به OpenSubtitles — پس از {0} ثانیه دوباره تلاش کنید"
 }

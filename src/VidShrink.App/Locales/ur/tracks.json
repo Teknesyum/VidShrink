@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "سب ٹائٹل ڈاؤن لوڈ کا روزانہ کوٹا پورا ہو گیا ہے",
   "player.subtitle.download.offline": "OpenSubtitles تک رسائی ممکن نہ ہوئی",
   "player.subtitle.download.writefail": "سب ٹائٹل ویڈیو کے پاس محفوظ نہیں کیا جا سکا",
-  "player.subtitle.download.toofast": "OpenSubtitles کو بہت زیادہ درخواستیں بھیجی گئیں — تھوڑی دیر میں دوبارہ کوشش کریں"
+  "player.subtitle.download.toofast": "OpenSubtitles کو بہت زیادہ درخواستیں بھیجی گئیں — تھوڑی دیر میں دوبارہ کوشش کریں",
+  "player.subtitle.download.badlogin": "OpenSubtitles نے سائن ان قبول نہیں کیا",
+  "player.subtitle.download.expired": "ڈاؤن لوڈ لنک کی مدت ختم ہو گئی — دوبارہ کوشش کریں",
+  "player.subtitle.download.toofast.wait": "OpenSubtitles کو بہت زیادہ درخواستیں بھیجی گئیں — {0} سیکنڈ بعد دوبارہ کوشش کریں"
 }

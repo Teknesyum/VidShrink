@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Fila playerului, meniul său și această listă citesc din același tabel.",
   "settings-tab.opensubtitles.label": "Cheie API OpenSubtitles",
   "settings-tab.opensubtitles.get": "Obține o cheie",
-  "settings-tab.opensubtitles.hint": "Descărcarea subtitrărilor din player folosește propria dvs. cheie. Creați un cont gratuit pe opensubtitles.com, apoi lipiți cheia aici. Fără o cheie, funcția rămâne dezactivată."
+  "settings-tab.opensubtitles.hint": "Descărcarea subtitrărilor din player folosește propria dvs. cheie. Creați un cont gratuit pe opensubtitles.com, apoi lipiți cheia aici. Fără o cheie, funcția rămâne dezactivată.",
+  "settings-tab.opensubtitles.account": "Cont OpenSubtitles (necesar pentru descărcări)",
+  "settings-tab.opensubtitles.user": "Nume de utilizator",
+  "settings-tab.opensubtitles.password": "Parolă",
+  "settings-tab.opensubtitles.signin": "Conectare",
+  "settings-tab.opensubtitles.signout": "Deconectare",
+  "settings-tab.opensubtitles.signingin": "Se conectează…",
+  "settings-tab.opensubtitles.signedin": "Conectat ca {0}",
+  "settings-tab.opensubtitles.signedout": "Neconectat — descărcarea subtitrărilor necesită un cont",
+  "settings-tab.opensubtitles.signinfailed": "Conectarea a eșuat. Verificați numele de utilizator, parola și cheia API.",
+  "settings-tab.opensubtitles.accounthint": "Parola este trimisă către OpenSubtitles doar pentru conectare și nu este niciodată salvată. Este stocat doar token-ul de sesiune primit înapoi, protejat de Windows; pe alte sisteme sesiunea durează până închideți VidShrink."
 }

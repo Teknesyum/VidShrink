@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Het dagelijkse downloadquotum voor ondertitels is bereikt",
   "player.subtitle.download.offline": "OpenSubtitles was niet bereikbaar",
   "player.subtitle.download.writefail": "De ondertitel kon niet naast de video worden opgeslagen",
-  "player.subtitle.download.toofast": "Te veel verzoeken naar OpenSubtitles — probeer het straks opnieuw"
+  "player.subtitle.download.toofast": "Te veel verzoeken naar OpenSubtitles — probeer het straks opnieuw",
+  "player.subtitle.download.badlogin": "OpenSubtitles heeft het aanmelden niet geaccepteerd",
+  "player.subtitle.download.expired": "De downloadlink is verlopen — probeer het opnieuw",
+  "player.subtitle.download.toofast.wait": "Te veel verzoeken naar OpenSubtitles — probeer het over {0} s opnieuw"
 }

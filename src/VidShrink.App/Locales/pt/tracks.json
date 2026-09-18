@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "A cota diária de download de legendas está esgotada",
   "player.subtitle.download.offline": "Não foi possível conectar ao OpenSubtitles",
   "player.subtitle.download.writefail": "Não foi possível salvar a legenda junto ao vídeo",
-  "player.subtitle.download.toofast": "Muitas solicitações para o OpenSubtitles — tente novamente em um instante"
+  "player.subtitle.download.toofast": "Muitas solicitações para o OpenSubtitles — tente novamente em um instante",
+  "player.subtitle.download.badlogin": "O OpenSubtitles não aceitou o login",
+  "player.subtitle.download.expired": "O link de download expirou — tente novamente",
+  "player.subtitle.download.toofast.wait": "Muitas solicitações para o OpenSubtitles — tente novamente em {0} s"
 }

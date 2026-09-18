@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "تبويب المشغّل وقائمته وهذه القائمة كلها تقرأ من الجدول نفسه.",
   "settings-tab.opensubtitles.label": "مفتاح API الخاص بـ OpenSubtitles",
   "settings-tab.opensubtitles.get": "الحصول على مفتاح",
-  "settings-tab.opensubtitles.hint": "تنزيل الترجمات في المشغل يستخدم مفتاحك الخاص. أنشئ حساب مستخدم مجاني على opensubtitles.com، ثم الصق المفتاح هنا. بدون مفتاح تبقى الميزة معطلة."
+  "settings-tab.opensubtitles.hint": "تنزيل الترجمات في المشغل يستخدم مفتاحك الخاص. أنشئ حساب مستخدم مجاني على opensubtitles.com، ثم الصق المفتاح هنا. بدون مفتاح تبقى الميزة معطلة.",
+  "settings-tab.opensubtitles.account": "حساب OpenSubtitles (مطلوب للتنزيلات)",
+  "settings-tab.opensubtitles.user": "اسم المستخدم",
+  "settings-tab.opensubtitles.password": "كلمة المرور",
+  "settings-tab.opensubtitles.signin": "تسجيل الدخول",
+  "settings-tab.opensubtitles.signout": "تسجيل الخروج",
+  "settings-tab.opensubtitles.signingin": "جارٍ تسجيل الدخول…",
+  "settings-tab.opensubtitles.signedin": "تم تسجيل الدخول بصفة {0}",
+  "settings-tab.opensubtitles.signedout": "لم يتم تسجيل الدخول — تنزيل الترجمات يتطلب حسابًا",
+  "settings-tab.opensubtitles.signinfailed": "فشل تسجيل الدخول. تحقق من اسم المستخدم وكلمة المرور ومفتاح API.",
+  "settings-tab.opensubtitles.accounthint": "تُرسَل كلمة المرور فقط إلى OpenSubtitles لتسجيل الدخول ولا تُحفظ أبدًا. الشيء الوحيد الذي يُحفظ هو رمز الجلسة العائد، محميًا بواسطة Windows؛ وعلى الأنظمة الأخرى تستمر الجلسة حتى تُغلق VidShrink."
 }

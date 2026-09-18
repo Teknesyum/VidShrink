@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Oynatıcı sekmesi, menüsü ve bu liste aynı tablodan okur.",
   "settings-tab.opensubtitles.label": "OpenSubtitles API anahtarı",
   "settings-tab.opensubtitles.get": "Anahtar al",
-  "settings-tab.opensubtitles.hint": "Oynatıcıdaki altyazı indirme kendi anahtarınızı kullanır. opensubtitles.com'da ücretsiz bir tüketici hesabı oluşturun, ardından anahtarı buraya yapıştırın. Anahtar yoksa özellik kapalı kalır."
+  "settings-tab.opensubtitles.hint": "Oynatıcıdaki altyazı indirme kendi anahtarınızı kullanır. opensubtitles.com'da ücretsiz bir tüketici hesabı oluşturun, ardından anahtarı buraya yapıştırın. Anahtar yoksa özellik kapalı kalır.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles hesabı (indirme için gerekli)",
+  "settings-tab.opensubtitles.user": "Kullanıcı adı",
+  "settings-tab.opensubtitles.password": "Parola",
+  "settings-tab.opensubtitles.signin": "Giriş yap",
+  "settings-tab.opensubtitles.signout": "Çıkış",
+  "settings-tab.opensubtitles.signingin": "Giriş yapılıyor…",
+  "settings-tab.opensubtitles.signedin": "{0} olarak girildi",
+  "settings-tab.opensubtitles.signedout": "Giriş yapılmadı — altyazı indirmek hesap ister",
+  "settings-tab.opensubtitles.signinfailed": "Giriş olmadı. Kullanıcı adını, parolayı ve API anahtarını denetleyin.",
+  "settings-tab.opensubtitles.accounthint": "Parola yalnız giriş için OpenSubtitles’a gönderilir, hiçbir yere kaydedilmez. Saklanan tek şey dönen oturum belirtecidir; Windows onu korur, başka sistemlerde oturum VidShrink kapanınca biter."
 }

@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Дневната квота за изтегляне на субтитри е изчерпана",
   "player.subtitle.download.offline": "OpenSubtitles не беше достигнат",
   "player.subtitle.download.writefail": "Субтитрите не можаха да бъдат запазени до видеото",
-  "player.subtitle.download.toofast": "Твърде много заявки към OpenSubtitles — опитайте отново след малко"
+  "player.subtitle.download.toofast": "Твърде много заявки към OpenSubtitles — опитайте отново след малко",
+  "player.subtitle.download.badlogin": "OpenSubtitles не прие входа",
+  "player.subtitle.download.expired": "Връзката за изтегляне е изтекла — опитайте отново",
+  "player.subtitle.download.toofast.wait": "Твърде много заявки към OpenSubtitles — опитайте отново след {0} с"
 }

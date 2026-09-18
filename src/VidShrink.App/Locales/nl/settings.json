@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Het spelertabblad, zijn menu en deze lijst lezen allemaal dezelfde tabel.",
   "settings-tab.opensubtitles.label": "OpenSubtitles-API-sleutel",
   "settings-tab.opensubtitles.get": "Sleutel aanvragen",
-  "settings-tab.opensubtitles.hint": "Het downloaden van ondertitels in de player gebruikt uw eigen sleutel. Maak een gratis account aan op opensubtitles.com en plak de sleutel hier. Zonder sleutel blijft de functie uitgeschakeld."
+  "settings-tab.opensubtitles.hint": "Het downloaden van ondertitels in de player gebruikt uw eigen sleutel. Maak een gratis account aan op opensubtitles.com en plak de sleutel hier. Zonder sleutel blijft de functie uitgeschakeld.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles-account (nodig voor downloads)",
+  "settings-tab.opensubtitles.user": "Gebruikersnaam",
+  "settings-tab.opensubtitles.password": "Wachtwoord",
+  "settings-tab.opensubtitles.signin": "Aanmelden",
+  "settings-tab.opensubtitles.signout": "Afmelden",
+  "settings-tab.opensubtitles.signingin": "Bezig met aanmelden…",
+  "settings-tab.opensubtitles.signedin": "Aangemeld als {0}",
+  "settings-tab.opensubtitles.signedout": "Niet aangemeld — voor het downloaden van ondertitels is een account nodig",
+  "settings-tab.opensubtitles.signinfailed": "Aanmelden mislukt. Controleer gebruikersnaam, wachtwoord en API-sleutel.",
+  "settings-tab.opensubtitles.accounthint": "Het wachtwoord wordt alleen naar OpenSubtitles gestuurd om aan te melden en wordt nooit opgeslagen. Alleen het teruggekomen sessietoken wordt opgeslagen, beveiligd door Windows; op andere systemen duurt de sessie totdat u VidShrink sluit."
 }

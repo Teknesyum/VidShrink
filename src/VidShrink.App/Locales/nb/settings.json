@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Avspillerfanen, menyen og denne listen leser alle den samme tabellen.",
   "settings-tab.opensubtitles.label": "OpenSubtitles-API-nøkkel",
   "settings-tab.opensubtitles.get": "Hent en nøkkel",
-  "settings-tab.opensubtitles.hint": "Nedlasting av undertekster i spilleren bruker din egen nøkkel. Opprett en gratis konto på opensubtitles.com, og lim inn nøkkelen her. Uten nøkkel forblir funksjonen av."
+  "settings-tab.opensubtitles.hint": "Nedlasting av undertekster i spilleren bruker din egen nøkkel. Opprett en gratis konto på opensubtitles.com, og lim inn nøkkelen her. Uten nøkkel forblir funksjonen av.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles-konto (nødvendig for nedlastinger)",
+  "settings-tab.opensubtitles.user": "Brukernavn",
+  "settings-tab.opensubtitles.password": "Passord",
+  "settings-tab.opensubtitles.signin": "Logg inn",
+  "settings-tab.opensubtitles.signout": "Logg ut",
+  "settings-tab.opensubtitles.signingin": "Logger inn…",
+  "settings-tab.opensubtitles.signedin": "Logget inn som {0}",
+  "settings-tab.opensubtitles.signedout": "Ikke logget inn — nedlasting av undertekster krever en konto",
+  "settings-tab.opensubtitles.signinfailed": "Innlogging mislyktes. Kontroller brukernavn, passord og API-nøkkel.",
+  "settings-tab.opensubtitles.accounthint": "Passordet sendes bare til OpenSubtitles for innlogging og lagres aldri. Det som lagres er kun sesjonstoken som kommer tilbake, beskyttet av Windows; på andre systemer varer sesjonen til du lukker VidShrink."
 }

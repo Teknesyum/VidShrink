@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Dienas subtitru lejupielādes kvota ir pilna",
   "player.subtitle.download.offline": "Nebija iespējams sasniegt OpenSubtitles",
   "player.subtitle.download.writefail": "Subtitrus nevarēja saglabāt līdzās videoklipam",
-  "player.subtitle.download.toofast": "Uz OpenSubtitles nosūtīts pārāk daudz pieprasījumu — pēc brīža pamēģiniet vēlreiz"
+  "player.subtitle.download.toofast": "Uz OpenSubtitles nosūtīts pārāk daudz pieprasījumu — pēc brīža pamēģiniet vēlreiz",
+  "player.subtitle.download.badlogin": "OpenSubtitles nepieņēma pieteikšanos",
+  "player.subtitle.download.expired": "Lejupielādes saite ir beigusies — mēģiniet vēlreiz",
+  "player.subtitle.download.toofast.wait": "Uz OpenSubtitles nosūtīts pārāk daudz pieprasījumu — pēc {0} s mēģiniet vēlreiz"
 }

@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Zavihek predvajalnika, njegov meni in ta seznam berejo isto tabelo.",
   "settings-tab.opensubtitles.label": "API-ključ OpenSubtitles",
   "settings-tab.opensubtitles.get": "Pridobi ključ",
-  "settings-tab.opensubtitles.hint": "Prenos podnapisov v predvajalniku uporablja vaš lastni ključ. Ustvarite brezplačen račun na opensubtitles.com in nato ključ vstavite tukaj. Brez ključa funkcija ostane izklopljena."
+  "settings-tab.opensubtitles.hint": "Prenos podnapisov v predvajalniku uporablja vaš lastni ključ. Ustvarite brezplačen račun na opensubtitles.com in nato ključ vstavite tukaj. Brez ključa funkcija ostane izklopljena.",
+  "settings-tab.opensubtitles.account": "Račun OpenSubtitles (potreben za prenose)",
+  "settings-tab.opensubtitles.user": "Uporabniško ime",
+  "settings-tab.opensubtitles.password": "Geslo",
+  "settings-tab.opensubtitles.signin": "Prijava",
+  "settings-tab.opensubtitles.signout": "Odjava",
+  "settings-tab.opensubtitles.signingin": "Prijavljanje…",
+  "settings-tab.opensubtitles.signedin": "Prijavljeni kot {0}",
+  "settings-tab.opensubtitles.signedout": "Ni prijavljeno — za prenos podnapisov je potreben račun",
+  "settings-tab.opensubtitles.signinfailed": "Prijava ni uspela. Preverite uporabniško ime, geslo in API-ključ.",
+  "settings-tab.opensubtitles.accounthint": "Geslo se pošlje OpenSubtitlesu samo za prijavo in se nikoli ne shrani. Shrani se le vrnjeni token seje, zaščiten z Windows; na drugih sistemih seja traja, dokler ne zaprete VidShrink."
 }

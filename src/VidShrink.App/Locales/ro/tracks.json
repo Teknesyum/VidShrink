@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Cota zilnică de descărcare a subtitrărilor este epuizată",
   "player.subtitle.download.offline": "OpenSubtitles nu a putut fi contactat",
   "player.subtitle.download.writefail": "Subtitrarea nu a putut fi salvată alături de videoclip",
-  "player.subtitle.download.toofast": "Prea multe cereri către OpenSubtitles — încercați din nou într-o clipă"
+  "player.subtitle.download.toofast": "Prea multe cereri către OpenSubtitles — încercați din nou într-o clipă",
+  "player.subtitle.download.badlogin": "OpenSubtitles nu a acceptat conectarea",
+  "player.subtitle.download.expired": "Linkul de descărcare a expirat — încercați din nou",
+  "player.subtitle.download.toofast.wait": "Prea multe cereri către OpenSubtitles — încercați din nou în {0} s"
 }

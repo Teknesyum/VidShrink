@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "प्लेयर टैब, इसका मेनू और यह सूची सभी एक ही टेबल से पढ़ते हैं।",
   "settings-tab.opensubtitles.label": "OpenSubtitles API कुंजी",
   "settings-tab.opensubtitles.get": "कुंजी प्राप्त करें",
-  "settings-tab.opensubtitles.hint": "प्लेयर में सबटाइटल डाउनलोड आपकी अपनी कुंजी का उपयोग करता है। opensubtitles.com पर एक मुफ़्त खाता बनाएं, फिर कुंजी यहां चिपकाएं। कुंजी के बिना यह सुविधा बंद रहती है।"
+  "settings-tab.opensubtitles.hint": "प्लेयर में सबटाइटल डाउनलोड आपकी अपनी कुंजी का उपयोग करता है। opensubtitles.com पर एक मुफ़्त खाता बनाएं, फिर कुंजी यहां चिपकाएं। कुंजी के बिना यह सुविधा बंद रहती है।",
+  "settings-tab.opensubtitles.account": "OpenSubtitles खाता (डाउनलोड के लिए आवश्यक)",
+  "settings-tab.opensubtitles.user": "उपयोगकर्ता नाम",
+  "settings-tab.opensubtitles.password": "पासवर्ड",
+  "settings-tab.opensubtitles.signin": "साइन इन करें",
+  "settings-tab.opensubtitles.signout": "साइन आउट करें",
+  "settings-tab.opensubtitles.signingin": "साइन इन हो रहा है…",
+  "settings-tab.opensubtitles.signedin": "{0} के रूप में साइन इन किया गया",
+  "settings-tab.opensubtitles.signedout": "साइन इन नहीं है — सबटाइटल डाउनलोड के लिए खाता ज़रूरी है",
+  "settings-tab.opensubtitles.signinfailed": "साइन इन नहीं हो सका। उपयोगकर्ता नाम, पासवर्ड और API कुंजी जांचें।",
+  "settings-tab.opensubtitles.accounthint": "पासवर्ड केवल साइन इन के लिए OpenSubtitles को भेजा जाता है और कभी सहेजा नहीं जाता। केवल वापस मिला सेशन टोकन सहेजा जाता है, जो Windows द्वारा सुरक्षित रहता है; अन्य सिस्टम पर सेशन तब तक चलता है जब तक आप VidShrink बंद नहीं करते।"
 }

@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Kiwango cha kila siku cha kupakua manukuu kimejaa",
   "player.subtitle.download.offline": "Haikuwezekana kufikia OpenSubtitles",
   "player.subtitle.download.writefail": "Manukuu hayakuweza kuhifadhiwa kando ya video",
-  "player.subtitle.download.toofast": "Maombi mengi sana kwa OpenSubtitles — jaribu tena baada ya muda mfupi"
+  "player.subtitle.download.toofast": "Maombi mengi sana kwa OpenSubtitles — jaribu tena baada ya muda mfupi",
+  "player.subtitle.download.badlogin": "OpenSubtitles haikukubali kuingia",
+  "player.subtitle.download.expired": "Kiungo cha kupakua kimeisha muda wake — jaribu tena",
+  "player.subtitle.download.toofast.wait": "Maombi mengi sana kwa OpenSubtitles — jaribu tena baada ya sekunde {0}"
 }

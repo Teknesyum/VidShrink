@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "پلیئر ٹیب، اس کا مینو، اور یہ فہرست سب ایک ہی جدول سے پڑھتے ہیں۔",
   "settings-tab.opensubtitles.label": "OpenSubtitles API کلید",
   "settings-tab.opensubtitles.get": "کلید حاصل کریں",
-  "settings-tab.opensubtitles.hint": "پلیئر میں سب ٹائٹل ڈاؤن لوڈ آپ کی اپنی کلید استعمال کرتا ہے۔ opensubtitles.com پر ایک مفت اکاؤنٹ بنائیں، پھر کلید یہاں چسپاں کریں۔ کلید کے بغیر یہ خصوصیت بند رہتی ہے۔"
+  "settings-tab.opensubtitles.hint": "پلیئر میں سب ٹائٹل ڈاؤن لوڈ آپ کی اپنی کلید استعمال کرتا ہے۔ opensubtitles.com پر ایک مفت اکاؤنٹ بنائیں، پھر کلید یہاں چسپاں کریں۔ کلید کے بغیر یہ خصوصیت بند رہتی ہے۔",
+  "settings-tab.opensubtitles.account": "OpenSubtitles اکاؤنٹ (ڈاؤن لوڈز کے لیے ضروری)",
+  "settings-tab.opensubtitles.user": "صارف نام",
+  "settings-tab.opensubtitles.password": "پاس ورڈ",
+  "settings-tab.opensubtitles.signin": "سائن ان کریں",
+  "settings-tab.opensubtitles.signout": "سائن آؤٹ کریں",
+  "settings-tab.opensubtitles.signingin": "سائن ان ہو رہا ہے…",
+  "settings-tab.opensubtitles.signedin": "{0} کے طور پر سائن ان ہے",
+  "settings-tab.opensubtitles.signedout": "سائن ان نہیں ہے — سب ٹائٹل ڈاؤن لوڈ کے لیے اکاؤنٹ ضروری ہے",
+  "settings-tab.opensubtitles.signinfailed": "سائن ان ناکام ہوگیا۔ صارف نام، پاس ورڈ اور API کلید چیک کریں۔",
+  "settings-tab.opensubtitles.accounthint": "پاس ورڈ صرف سائن ان کے لیے OpenSubtitles کو بھیجا جاتا ہے اور کبھی محفوظ نہیں کیا جاتا۔ صرف واپس آنے والا سیشن ٹوکن محفوظ کیا جاتا ہے، جو Windows کے ذریعے محفوظ رہتا ہے؛ دیگر سسٹمز پر سیشن اس وقت تک جاری رہتا ہے جب تک آپ VidShrink بند نہ کریں۔"
 }

@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "A napi feliratletöltési kvóta betelt",
   "player.subtitle.download.offline": "Az OpenSubtitles nem volt elérhető",
   "player.subtitle.download.writefail": "A feliratot nem lehetett elmenteni a videó mellé",
-  "player.subtitle.download.toofast": "Túl sok kérés érkezett az OpenSubtitles felé — próbálja újra egy pillanat múlva"
+  "player.subtitle.download.toofast": "Túl sok kérés érkezett az OpenSubtitles felé — próbálja újra egy pillanat múlva",
+  "player.subtitle.download.badlogin": "Az OpenSubtitles nem fogadta el a bejelentkezést",
+  "player.subtitle.download.expired": "A letöltési link lejárt — próbálja újra",
+  "player.subtitle.download.toofast.wait": "Túl sok kérés érkezett az OpenSubtitles felé — próbálja újra {0} mp múlva"
 }

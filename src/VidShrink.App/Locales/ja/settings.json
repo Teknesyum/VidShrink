@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "プレーヤータブ、そのメニュー、このリストはすべて同じ表を参照します。",
   "settings-tab.opensubtitles.label": "OpenSubtitles APIキー",
   "settings-tab.opensubtitles.get": "キーを取得",
-  "settings-tab.opensubtitles.hint": "プレーヤーの字幕ダウンロードはご自身のキーを使用します。opensubtitles.comで無料のアカウントを作成し、キーをここに貼り付けてください。キーがない場合、この機能はオフのままです。"
+  "settings-tab.opensubtitles.hint": "プレーヤーの字幕ダウンロードはご自身のキーを使用します。opensubtitles.comで無料のアカウントを作成し、キーをここに貼り付けてください。キーがない場合、この機能はオフのままです。",
+  "settings-tab.opensubtitles.account": "OpenSubtitlesアカウント（ダウンロードに必要）",
+  "settings-tab.opensubtitles.user": "ユーザー名",
+  "settings-tab.opensubtitles.password": "パスワード",
+  "settings-tab.opensubtitles.signin": "サインイン",
+  "settings-tab.opensubtitles.signout": "サインアウト",
+  "settings-tab.opensubtitles.signingin": "サインインしています…",
+  "settings-tab.opensubtitles.signedin": "{0} としてサインイン中",
+  "settings-tab.opensubtitles.signedout": "サインインしていません — 字幕のダウンロードにはアカウントが必要です",
+  "settings-tab.opensubtitles.signinfailed": "サインインに失敗しました。ユーザー名、パスワード、APIキーを確認してください。",
+  "settings-tab.opensubtitles.accounthint": "パスワードはサインインのためにOpenSubtitlesへ送信されるだけで、保存されることはありません。保存されるのは返ってきたセッショントークンのみで、Windowsによって保護されます。他のシステムではVidShrinkを終了するまでセッションが続きます。"
 }

@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "A aba do player, seu menu e esta lista leem a mesma tabela.",
   "settings-tab.opensubtitles.label": "Chave de API do OpenSubtitles",
   "settings-tab.opensubtitles.get": "Obter uma chave",
-  "settings-tab.opensubtitles.hint": "O download de legendas no player usa sua própria chave. Crie uma conta gratuita em opensubtitles.com e cole a chave aqui. Sem chave, o recurso permanece desativado."
+  "settings-tab.opensubtitles.hint": "O download de legendas no player usa sua própria chave. Crie uma conta gratuita em opensubtitles.com e cole a chave aqui. Sem chave, o recurso permanece desativado.",
+  "settings-tab.opensubtitles.account": "Conta do OpenSubtitles (necessária para downloads)",
+  "settings-tab.opensubtitles.user": "Nome de usuário",
+  "settings-tab.opensubtitles.password": "Senha",
+  "settings-tab.opensubtitles.signin": "Entrar",
+  "settings-tab.opensubtitles.signout": "Sair",
+  "settings-tab.opensubtitles.signingin": "Entrando…",
+  "settings-tab.opensubtitles.signedin": "Conectado como {0}",
+  "settings-tab.opensubtitles.signedout": "Não conectado — o download de legendas exige uma conta",
+  "settings-tab.opensubtitles.signinfailed": "Falha ao entrar. Verifique o nome de usuário, a senha e a chave de API.",
+  "settings-tab.opensubtitles.accounthint": "A senha é enviada apenas ao OpenSubtitles para entrar e nunca é salva. Só o token de sessão retornado é armazenado, protegido pelo Windows; em outros sistemas a sessão dura até você fechar o VidShrink."
 }

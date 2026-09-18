@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "מכסת ההורדות היומית של כתוביות מלאה",
   "player.subtitle.download.offline": "לא ניתן היה להתחבר ל-OpenSubtitles",
   "player.subtitle.download.writefail": "לא ניתן היה לשמור את הכתוביות לצד הסרטון",
-  "player.subtitle.download.toofast": "יותר מדי בקשות ל-OpenSubtitles — נסה שוב בעוד רגע"
+  "player.subtitle.download.toofast": "יותר מדי בקשות ל-OpenSubtitles — נסה שוב בעוד רגע",
+  "player.subtitle.download.badlogin": "OpenSubtitles לא קיבל את ההתחברות",
+  "player.subtitle.download.expired": "תוקף קישור ההורדה פג — נסה שוב",
+  "player.subtitle.download.toofast.wait": "יותר מדי בקשות ל-OpenSubtitles — נסה שוב בעוד {0} שנ'"
 }

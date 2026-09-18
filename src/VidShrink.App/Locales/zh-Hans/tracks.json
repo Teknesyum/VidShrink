@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "每日字幕下载配额已用完",
   "player.subtitle.download.offline": "无法连接到 OpenSubtitles",
   "player.subtitle.download.writefail": "无法将字幕保存在视频旁边",
-  "player.subtitle.download.toofast": "向 OpenSubtitles 发送的请求过多 — 请稍后再试"
+  "player.subtitle.download.toofast": "向 OpenSubtitles 发送的请求过多 — 请稍后再试",
+  "player.subtitle.download.badlogin": "OpenSubtitles 未接受此次登录",
+  "player.subtitle.download.expired": "下载链接已过期 — 请重试",
+  "player.subtitle.download.toofast.wait": "向 OpenSubtitles 发送的请求过多 — 请在 {0} 秒后重试"
 }

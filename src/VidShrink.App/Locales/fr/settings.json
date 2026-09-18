@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "L'onglet du lecteur, son menu et cette liste lisent tous la même table.",
   "settings-tab.opensubtitles.label": "Clé API OpenSubtitles",
   "settings-tab.opensubtitles.get": "Obtenir une clé",
-  "settings-tab.opensubtitles.hint": "Le téléchargement de sous-titres dans le lecteur utilise votre propre clé. Créez un compte gratuit sur opensubtitles.com, puis collez la clé ici. Sans clé, la fonction reste désactivée."
+  "settings-tab.opensubtitles.hint": "Le téléchargement de sous-titres dans le lecteur utilise votre propre clé. Créez un compte gratuit sur opensubtitles.com, puis collez la clé ici. Sans clé, la fonction reste désactivée.",
+  "settings-tab.opensubtitles.account": "Compte OpenSubtitles (nécessaire pour les téléchargements)",
+  "settings-tab.opensubtitles.user": "Nom d'utilisateur",
+  "settings-tab.opensubtitles.password": "Mot de passe",
+  "settings-tab.opensubtitles.signin": "Se connecter",
+  "settings-tab.opensubtitles.signout": "Se déconnecter",
+  "settings-tab.opensubtitles.signingin": "Connexion en cours…",
+  "settings-tab.opensubtitles.signedin": "Connecté en tant que {0}",
+  "settings-tab.opensubtitles.signedout": "Non connecté — le téléchargement de sous-titres nécessite un compte",
+  "settings-tab.opensubtitles.signinfailed": "Échec de la connexion. Vérifiez le nom d'utilisateur, le mot de passe et la clé API.",
+  "settings-tab.opensubtitles.accounthint": "Le mot de passe est envoyé uniquement à OpenSubtitles pour la connexion et n'est jamais enregistré. Seul le jeton de session renvoyé est stocké, protégé par Windows ; sur les autres systèmes, la session dure jusqu'à la fermeture de VidShrink."
 }

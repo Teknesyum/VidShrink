@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "La quota giornaliera di download dei sottotitoli è esaurita",
   "player.subtitle.download.offline": "Impossibile raggiungere OpenSubtitles",
   "player.subtitle.download.writefail": "Il sottotitolo non può essere salvato accanto al video",
-  "player.subtitle.download.toofast": "Troppe richieste a OpenSubtitles — riprova tra un momento"
+  "player.subtitle.download.toofast": "Troppe richieste a OpenSubtitles — riprova tra un momento",
+  "player.subtitle.download.badlogin": "OpenSubtitles non ha accettato l'accesso",
+  "player.subtitle.download.expired": "Il link di download è scaduto — riprova",
+  "player.subtitle.download.toofast.wait": "Troppe richieste a OpenSubtitles — riprova tra {0} s"
 }

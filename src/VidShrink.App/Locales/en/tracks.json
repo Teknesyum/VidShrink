@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "The daily subtitle download quota is full",
   "player.subtitle.download.offline": "OpenSubtitles could not be reached",
   "player.subtitle.download.writefail": "The subtitle could not be saved next to the video",
-  "player.subtitle.download.toofast": "Too many requests to OpenSubtitles — try again in a moment"
+  "player.subtitle.download.toofast": "Too many requests to OpenSubtitles — try again in a moment",
+  "player.subtitle.download.badlogin": "OpenSubtitles did not accept the sign-in",
+  "player.subtitle.download.expired": "The download link expired — try again",
+  "player.subtitle.download.toofast.wait": "Too many requests to OpenSubtitles — try again in {0} s"
 }

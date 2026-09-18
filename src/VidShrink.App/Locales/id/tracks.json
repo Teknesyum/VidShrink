@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Kuota unduhan subtitle harian sudah penuh",
   "player.subtitle.download.offline": "OpenSubtitles tidak dapat dihubungi",
   "player.subtitle.download.writefail": "Subtitle tidak dapat disimpan di samping video",
-  "player.subtitle.download.toofast": "Terlalu banyak permintaan ke OpenSubtitles — coba lagi sesaat lagi"
+  "player.subtitle.download.toofast": "Terlalu banyak permintaan ke OpenSubtitles — coba lagi sesaat lagi",
+  "player.subtitle.download.badlogin": "OpenSubtitles tidak menerima proses masuk",
+  "player.subtitle.download.expired": "Tautan unduhan telah kedaluwarsa — coba lagi",
+  "player.subtitle.download.toofast.wait": "Terlalu banyak permintaan ke OpenSubtitles — coba lagi dalam {0} dtk"
 }

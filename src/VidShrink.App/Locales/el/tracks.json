@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Η ημερήσια ποσόστωση λήψης υποτίτλων έχει εξαντληθεί",
   "player.subtitle.download.offline": "Δεν ήταν δυνατή η επικοινωνία με το OpenSubtitles",
   "player.subtitle.download.writefail": "Ο υπότιτλος δεν ήταν δυνατό να αποθηκευτεί δίπλα στο βίντεο",
-  "player.subtitle.download.toofast": "Πολλά αιτήματα προς το OpenSubtitles — δοκιμάστε ξανά σε λίγο"
+  "player.subtitle.download.toofast": "Πολλά αιτήματα προς το OpenSubtitles — δοκιμάστε ξανά σε λίγο",
+  "player.subtitle.download.badlogin": "Το OpenSubtitles δεν δέχτηκε τη σύνδεση",
+  "player.subtitle.download.expired": "Ο σύνδεσμος λήψης έληξε — δοκιμάστε ξανά",
+  "player.subtitle.download.toofast.wait": "Πολλά αιτήματα προς το OpenSubtitles — δοκιμάστε ξανά σε {0} δ"
 }

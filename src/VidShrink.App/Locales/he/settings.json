@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "לשונית הנגן, התפריט שלה ורשימה זו כולם קוראים מאותה טבלה.",
   "settings-tab.opensubtitles.label": "מפתח API של OpenSubtitles",
   "settings-tab.opensubtitles.get": "קבלת מפתח",
-  "settings-tab.opensubtitles.hint": "הורדת כתוביות בנגן משתמשת במפתח שלך. צור חשבון משתמש חינמי באתר opensubtitles.com, ולאחר מכן הדבק את המפתח כאן. בלי מפתח, התכונה נשארת כבויה."
+  "settings-tab.opensubtitles.hint": "הורדת כתוביות בנגן משתמשת במפתח שלך. צור חשבון משתמש חינמי באתר opensubtitles.com, ולאחר מכן הדבק את המפתח כאן. בלי מפתח, התכונה נשארת כבויה.",
+  "settings-tab.opensubtitles.account": "חשבון OpenSubtitles (נדרש להורדות)",
+  "settings-tab.opensubtitles.user": "שם משתמש",
+  "settings-tab.opensubtitles.password": "סיסמה",
+  "settings-tab.opensubtitles.signin": "התחברות",
+  "settings-tab.opensubtitles.signout": "התנתקות",
+  "settings-tab.opensubtitles.signingin": "מתחבר…",
+  "settings-tab.opensubtitles.signedin": "מחובר בשם {0}",
+  "settings-tab.opensubtitles.signedout": "לא מחובר — הורדת כתוביות מחייבת חשבון",
+  "settings-tab.opensubtitles.signinfailed": "ההתחברות נכשלה. בדוק את שם המשתמש, הסיסמה ומפתח ה-API.",
+  "settings-tab.opensubtitles.accounthint": "הסיסמה נשלחת ל-OpenSubtitles רק לצורך ההתחברות ואינה נשמרת לעולם. נשמר רק אסימון ההפעלה שמתקבל בחזרה, המוגן על ידי Windows; במערכות אחרות ההפעלה נמשכת עד שתסגור את VidShrink."
 }

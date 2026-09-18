@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using VidShrink.App.Localization;
 using VidShrink.Core.Share;
 using VidShrink.Core.Subtitles;
+using VidShrink.App.Subtitles;
 
 namespace VidShrink.App.Playback;
 
@@ -34,7 +35,10 @@ internal partial class PlayerView
     private ISubtitleProvider Provider()
     {
         if (SubtitleProviderSource is { } source) return source();
-        return new OpenSubtitlesProvider(new HttpClientTransport(), AppSettings.Load().OpenSubtitlesApiKey);
+        return new OpenSubtitlesProvider(
+            new HttpClientTransport(),
+            AppSettings.Load().OpenSubtitlesApiKey,
+            sessions: new SessionStore());
     }
 
     /// <summary>Kullanıcının anahtarı alacağı sayfa.</summary>
@@ -79,6 +83,12 @@ internal partial class PlayerView
             return;
         }
 
+        if (!provider.HasSession)
+        {
+            Report(SubtitleOutcome.NeedAccount);
+            return;
+        }
+
         _subtitleDownloadRunning = true;
         try
         {
@@ -104,7 +114,7 @@ internal partial class PlayerView
             var got = await provider.DownloadAsync(pick, path, cancellationToken).ConfigureAwait(true);
             if (got.Outcome != SubtitleOutcome.Ok || got.Path is not { } file)
             {
-                Report(got.Outcome);
+                Report(got);
                 return;
             }
 
@@ -130,11 +140,13 @@ internal partial class PlayerView
     {
         SubtitleOutcome.NoKey => "player.subtitle.download.nokey",
         SubtitleOutcome.BadKey => "player.subtitle.download.badkey",
+        SubtitleOutcome.BadLogin => "player.subtitle.download.badlogin",
         SubtitleOutcome.NeedAccount => "player.subtitle.download.needaccount",
         SubtitleOutcome.NoResult => "player.subtitle.download.noresult",
         SubtitleOutcome.QuotaExceeded => "player.subtitle.download.quota",
         SubtitleOutcome.RateLimited => "player.subtitle.download.toofast",
         SubtitleOutcome.NetworkError => "player.subtitle.download.offline",
+        SubtitleOutcome.LinkExpired => "player.subtitle.download.expired",
         SubtitleOutcome.WriteError => "player.subtitle.download.writefail",
         _ => "player.subtitle.download.offline"
     };
@@ -143,6 +155,23 @@ internal partial class PlayerView
     {
         Notice(NoticeKeyFor(outcome));
         _trace.Add("subdl -> " + outcome.ToString().ToLowerInvariant());
+    }
+
+    /// <summary>
+    /// Indirmenin kolu. 429'da saglayici bekleme suresini bildirmisse kullaniciya kac saniye
+    /// bekleyecegi soylenir; bildirmediyse suresiz metne dusulur.
+    /// </summary>
+    private void Report(SubtitleDownloadResult result)
+    {
+        if (result.Outcome is SubtitleOutcome.RateLimited && result.RetryAfterSeconds > 0)
+        {
+            Notice("player.subtitle.download.toofast.wait",
+                result.RetryAfterSeconds.ToString(CultureInfo.InvariantCulture));
+            _trace.Add("subdl -> ratelimited " + result.RetryAfterSeconds.ToString(CultureInfo.InvariantCulture));
+            return;
+        }
+
+        Report(result.Outcome);
     }
 
     private void Notice(string key, params object?[] args)

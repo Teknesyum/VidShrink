@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Dnevna kvota za preuzimanje titlova je popunjena",
   "player.subtitle.download.offline": "OpenSubtitles nije bilo moguće dosegnuti",
   "player.subtitle.download.writefail": "Titl nije moguće spremiti pored videa",
-  "player.subtitle.download.toofast": "Previše zahtjeva prema OpenSubtitles — pokušajte ponovno za trenutak"
+  "player.subtitle.download.toofast": "Previše zahtjeva prema OpenSubtitles — pokušajte ponovno za trenutak",
+  "player.subtitle.download.badlogin": "OpenSubtitles nije prihvatio prijavu",
+  "player.subtitle.download.expired": "Veza za preuzimanje je istekla — pokušajte ponovno",
+  "player.subtitle.download.toofast.wait": "Previše zahtjeva prema OpenSubtitles — pokušajte ponovno za {0} s"
 }

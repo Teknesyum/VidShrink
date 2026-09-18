@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "播放器标签页、其菜单和此列表都读取同一个表。",
   "settings-tab.opensubtitles.label": "OpenSubtitles API 密钥",
   "settings-tab.opensubtitles.get": "获取密钥",
-  "settings-tab.opensubtitles.hint": "播放器中的字幕下载使用您自己的密钥。请在 opensubtitles.com 上创建一个免费账户，然后将密钥粘贴到此处。没有密钥时，该功能将保持关闭。"
+  "settings-tab.opensubtitles.hint": "播放器中的字幕下载使用您自己的密钥。请在 opensubtitles.com 上创建一个免费账户，然后将密钥粘贴到此处。没有密钥时，该功能将保持关闭。",
+  "settings-tab.opensubtitles.account": "OpenSubtitles 账户（下载需要）",
+  "settings-tab.opensubtitles.user": "用户名",
+  "settings-tab.opensubtitles.password": "密码",
+  "settings-tab.opensubtitles.signin": "登录",
+  "settings-tab.opensubtitles.signout": "登出",
+  "settings-tab.opensubtitles.signingin": "正在登录…",
+  "settings-tab.opensubtitles.signedin": "已登录为 {0}",
+  "settings-tab.opensubtitles.signedout": "未登录 — 下载字幕需要账户",
+  "settings-tab.opensubtitles.signinfailed": "登录失败。请检查用户名、密码和 API 密钥。",
+  "settings-tab.opensubtitles.accounthint": "密码仅用于登录 OpenSubtitles，发送后不会被保存。保存的只是返回的会话令牌，由 Windows 保护；在其他系统上，会话会持续到您关闭 VidShrink 为止。"
 }

@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Tab pemutar, menunya, dan daftar ini semua membaca tabel yang sama.",
   "settings-tab.opensubtitles.label": "Kunci API OpenSubtitles",
   "settings-tab.opensubtitles.get": "Dapatkan kunci",
-  "settings-tab.opensubtitles.hint": "Unduhan subtitle di pemutar menggunakan kunci Anda sendiri. Buat akun gratis di opensubtitles.com, lalu tempel kuncinya di sini. Tanpa kunci, fitur ini tetap nonaktif."
+  "settings-tab.opensubtitles.hint": "Unduhan subtitle di pemutar menggunakan kunci Anda sendiri. Buat akun gratis di opensubtitles.com, lalu tempel kuncinya di sini. Tanpa kunci, fitur ini tetap nonaktif.",
+  "settings-tab.opensubtitles.account": "Akun OpenSubtitles (diperlukan untuk unduhan)",
+  "settings-tab.opensubtitles.user": "Nama pengguna",
+  "settings-tab.opensubtitles.password": "Kata sandi",
+  "settings-tab.opensubtitles.signin": "Masuk",
+  "settings-tab.opensubtitles.signout": "Keluar",
+  "settings-tab.opensubtitles.signingin": "Sedang masuk…",
+  "settings-tab.opensubtitles.signedin": "Masuk sebagai {0}",
+  "settings-tab.opensubtitles.signedout": "Belum masuk — unduhan subtitle memerlukan akun",
+  "settings-tab.opensubtitles.signinfailed": "Gagal masuk. Periksa nama pengguna, kata sandi, dan kunci API.",
+  "settings-tab.opensubtitles.accounthint": "Kata sandi hanya dikirim ke OpenSubtitles untuk masuk dan tidak pernah disimpan. Yang disimpan hanya token sesi yang dikembalikan, dilindungi oleh Windows; pada sistem lain, sesi berlangsung hingga Anda menutup VidShrink."
 }

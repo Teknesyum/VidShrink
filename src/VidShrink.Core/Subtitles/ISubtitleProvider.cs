@@ -15,6 +15,9 @@ public enum SubtitleOutcome
     /// <summary>Sağlayıcı anahtarı tanımadı ya da reddetti.</summary>
     BadKey,
 
+    /// <summary>Kullanıcı adı ya da parola sağlayıcıda tutmadı.</summary>
+    BadLogin,
+
     /// <summary>
     /// Anahtar geçerli ama indirme için kullanıcı oturumu gerekiyor. Şartname
     /// <c>/download</c> için <c>Api-Key</c> yanında <c>Authorization</c> başlığını da
@@ -36,6 +39,12 @@ public enum SubtitleOutcome
 
     /// <summary>Ağa çıkılamadı ya da sağlayıcı beklenmedik cevap verdi.</summary>
     NetworkError,
+
+    /// <summary>
+    /// İmzalı indirme bağlantısı geçersiz. Sağlayıcı bağlantıyı üç saatten uzun
+    /// kullandırmıyor; arama yenilenip yeniden indirilmeli.
+    /// </summary>
+    LinkExpired,
 
     /// <summary>İndirilen dosya videonun yanına yazılamadı.</summary>
     WriteError
@@ -70,6 +79,12 @@ public sealed record SubtitleSearchResult(SubtitleOutcome Outcome, IReadOnlyList
 /// <param name="Remaining">Sağlayıcının bildirdiği kalan günlük hak; bilinmiyorsa -1.</param>
 public sealed record SubtitleDownloadResult(SubtitleOutcome Outcome, string? Path, int Remaining)
 {
+    /// <summary>
+    /// 429'da sağlayıcının <c>Retry-After</c> başlığıyla bildirdiği saniye; bildirmediyse 0.
+    /// Arayüz kullanıcıya ne kadar bekleyeceğini bununla söyler.
+    /// </summary>
+    public int RetryAfterSeconds { get; init; }
+
     /// <summary>Dosyasız bir kol.</summary>
     public static SubtitleDownloadResult Failed(SubtitleOutcome outcome, int remaining = -1)
         => new(outcome, null, remaining);
@@ -83,6 +98,18 @@ public interface ISubtitleProvider
 {
     /// <summary>Anahtar var mı; yoksa arayüz özelliği kapalı gösterir.</summary>
     bool IsConfigured { get; }
+
+    /// <summary>Geçerli bir kullanıcı oturumu var mı; indirme buna bakar.</summary>
+    bool HasSession { get; }
+
+    /// <summary>
+    /// Kullanıcı adı ve parolayla oturum açar. Parola yalnız bu çağrının gövdesinde geçer;
+    /// saklanan tek şey dönen belirteçtir.
+    /// </summary>
+    Task<SubtitleLoginResult> LoginAsync(string username, string password, CancellationToken cancellationToken);
+
+    /// <summary>Saklanan oturumu siler.</summary>
+    void SignOut();
 
     /// <summary>Önce moviehash, tutmazsa ad ile arar.</summary>
     Task<SubtitleSearchResult> SearchAsync(SubtitleQuery query, CancellationToken cancellationToken);

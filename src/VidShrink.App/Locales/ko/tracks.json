@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "일일 자막 다운로드 할당량이 모두 사용되었습니다",
   "player.subtitle.download.offline": "OpenSubtitles에 연결할 수 없습니다",
   "player.subtitle.download.writefail": "자막을 동영상 옆에 저장할 수 없습니다",
-  "player.subtitle.download.toofast": "OpenSubtitles에 너무 많은 요청을 보냈습니다 — 잠시 후 다시 시도하세요"
+  "player.subtitle.download.toofast": "OpenSubtitles에 너무 많은 요청을 보냈습니다 — 잠시 후 다시 시도하세요",
+  "player.subtitle.download.badlogin": "OpenSubtitles가 로그인을 받아들이지 않았습니다",
+  "player.subtitle.download.expired": "다운로드 링크가 만료되었습니다 — 다시 시도하세요",
+  "player.subtitle.download.toofast.wait": "OpenSubtitles에 너무 많은 요청을 보냈습니다 — {0}초 후에 다시 시도하세요"
 }

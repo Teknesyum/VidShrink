@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Dienos subtitrų atsisiuntimo kvota išnaudota",
   "player.subtitle.download.offline": "Nepavyko prisijungti prie OpenSubtitles",
   "player.subtitle.download.writefail": "Subtitrų nepavyko įrašyti šalia vaizdo įrašo",
-  "player.subtitle.download.toofast": "Pateikta per daug užklausų OpenSubtitles — bandykite dar kartą po kelių sekundžių"
+  "player.subtitle.download.toofast": "Pateikta per daug užklausų OpenSubtitles — bandykite dar kartą po kelių sekundžių",
+  "player.subtitle.download.badlogin": "OpenSubtitles nepriėmė prisijungimo",
+  "player.subtitle.download.expired": "Atsisiuntimo nuoroda nustojo veikti — bandykite dar kartą",
+  "player.subtitle.download.toofast.wait": "Pateikta per daug užklausų OpenSubtitles — bandykite dar kartą po {0} s"
 }

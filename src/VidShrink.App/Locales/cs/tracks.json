@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Denní limit stahování titulků je vyčerpán",
   "player.subtitle.download.offline": "OpenSubtitles se nepodařilo kontaktovat",
   "player.subtitle.download.writefail": "Titulky se nepodařilo uložit ke videu",
-  "player.subtitle.download.toofast": "Příliš mnoho požadavků na OpenSubtitles — zkuste to za chvíli znovu"
+  "player.subtitle.download.toofast": "Příliš mnoho požadavků na OpenSubtitles — zkuste to za chvíli znovu",
+  "player.subtitle.download.badlogin": "OpenSubtitles přihlášení nepřijalo",
+  "player.subtitle.download.expired": "Platnost odkazu ke stažení vypršela — zkuste to znovu",
+  "player.subtitle.download.toofast.wait": "Příliš mnoho požadavků na OpenSubtitles — zkuste to znovu za {0} s"
 }

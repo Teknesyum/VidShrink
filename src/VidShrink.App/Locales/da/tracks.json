@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Den daglige kvote for download af undertekster er brugt",
   "player.subtitle.download.offline": "Kunne ikke få forbindelse til OpenSubtitles",
   "player.subtitle.download.writefail": "Underteksten kunne ikke gemmes ved siden af videoen",
-  "player.subtitle.download.toofast": "For mange anmodninger til OpenSubtitles — prøv igen om lidt"
+  "player.subtitle.download.toofast": "For mange anmodninger til OpenSubtitles — prøv igen om lidt",
+  "player.subtitle.download.badlogin": "OpenSubtitles accepterede ikke login",
+  "player.subtitle.download.expired": "Downloadlinket er udløbet — prøv igen",
+  "player.subtitle.download.toofast.wait": "For mange anmodninger til OpenSubtitles — prøv igen om {0} s"
 }

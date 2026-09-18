@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Суточная квота на скачивание субтитров исчерпана",
   "player.subtitle.download.offline": "Не удалось связаться с OpenSubtitles",
   "player.subtitle.download.writefail": "Не удалось сохранить субтитры рядом с видео",
-  "player.subtitle.download.toofast": "Слишком много запросов к OpenSubtitles — повторите попытку через минуту"
+  "player.subtitle.download.toofast": "Слишком много запросов к OpenSubtitles — повторите попытку через минуту",
+  "player.subtitle.download.badlogin": "OpenSubtitles не принял вход",
+  "player.subtitle.download.expired": "Ссылка для скачивания истекла — попробуйте снова",
+  "player.subtitle.download.toofast.wait": "Слишком много запросов к OpenSubtitles — повторите попытку через {0} с"
 }

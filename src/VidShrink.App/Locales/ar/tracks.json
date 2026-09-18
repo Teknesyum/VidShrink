@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "حصة تنزيل الترجمات اليومية مكتملة",
   "player.subtitle.download.offline": "تعذر الوصول إلى OpenSubtitles",
   "player.subtitle.download.writefail": "تعذر حفظ الترجمة بجانب الفيديو",
-  "player.subtitle.download.toofast": "عدد كبير جدًا من الطلبات إلى OpenSubtitles — حاول مرة أخرى بعد لحظة"
+  "player.subtitle.download.toofast": "عدد كبير جدًا من الطلبات إلى OpenSubtitles — حاول مرة أخرى بعد لحظة",
+  "player.subtitle.download.badlogin": "لم يقبل OpenSubtitles تسجيل الدخول",
+  "player.subtitle.download.expired": "انتهت صلاحية رابط التنزيل — حاول مرة أخرى",
+  "player.subtitle.download.toofast.wait": "عدد كبير جدًا من الطلبات إلى OpenSubtitles — حاول مرة أخرى بعد {0} ثانية"
 }

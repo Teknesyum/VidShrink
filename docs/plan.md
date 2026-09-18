@@ -948,3 +948,51 @@ kapanış şartı, kullanıcının kendi hesabıyla girip gerçek bir altyazı i
   ad alanı bunu "üretimde tüketiliyor" gösteriyordu. Tarayıcı düzeltildi (`Strip` artık
   `using`/`namespace` yönergelerini boşluğa çeviriyor) ve `MainWindow.axaml.cs`teki tam
   nitelenmiş `VidShrink.Core.Subtitles.OpenSubtitlesProvider` kısaltıldı; satır pimde kaldı.
+
+### Yol A — `/login` P28'e giriyor, indirme satırı geri geliyor
+
+Yukarıdaki **Yol B** bölümü geçersizdir; ne yapıldığının kaydı olarak duruyor. Hüküm
+T0'ın iş ortası yönlendirmesiyle döndü: oturum kolu P29'a bırakılmıyor, P28'e giriyor.
+
+**İki gerekçe, biri teknik biri hükmî.** Teknik olan bağımsız ve ölçülebilir: Yol B iki
+metni (`player.subtitle.download`, `player.subtitle.download.getkey`) 43 katalogda bırakıp
+üretimdeki tek okuyucularını sildi. `LocalizationTests.KatalogdaBirikenOluCeviriListesiBuyumuyor`
+sıfır dişli bir cırcırdır — `KnownDead` boş dizidir ve borç kabul etmez — dolayısıyla Yol B
+CI'da (koşum 35294997400) kırmızıydı. Hükmî olan: T0, kullanıcının uygulamada kullanıcı
+adı/parola gireceğini bildirdi. **Bu ikinci gerekçe bu dalda doğrulanmadı;** elimdeki tek
+kullanıcı iletisi yalnız API anahtarından söz ediyor. Rapor bunu açıkça taşır.
+
+1. `Core/Subtitles/SubtitleSession.cs`: `SubtitleSession(Token, Host, Expires)`,
+   `SubtitleLoginResult`, `ISubtitleSessionStore`, `JwtClaims.Expiry` (base64url gövdeden
+   `exp`), `Secrets.Mask` (parolayı ve JWT'yi metinden siler).
+2. `OpenSubtitlesProvider.LoginAsync(kullanıcı, parola)`: `POST /login`, gövde yalnız bu iki
+   alan. 200 → `token` + `base_url`; ömür JWT `exp`inden, `exp` yoksa 12 sa (bazarr'ın
+   değeri). 401/403 → `BadLogin`, 429 → `RateLimited`, kalanı `NetworkError`.
+3. **`Authorization` ne zaman gider:** `/download`'a her zaman (şartname iki başlığı da
+   zorunlu tutuyor), diğer uçlara yalnız `base_url` `vip-api.opensubtitles.com` iken.
+   Bunu doğru yapan tek istemci bazarr; kanıt `.calisma/p28-arastirma/istemci-kutuphaneleri.md` §1.
+   Taban adres artık oturumun `Host`undan türüyor.
+4. **Parola saklanmaz, JWT saklanır.** Parola yalnız `LoginAsync`in gövdesinde geçer;
+   ayara, günlüğe, hata iletisine girmez — `Secrets.Mask` ve `ParolaHataIletisineSizmaz`
+   pimi bunu ölçer. JWT `App/Subtitles/DpapiSessionStore.cs` ile
+   `settings.json`ın **yanındaki** `opensubtitles-session.dat`a yazılır; yol
+   `VIDSHRINK_SETTINGS_PATH`ten türer, `%APPDATA%` sabitlenmez. Windows'ta gövde DPAPI
+   (`CryptProtectData`, `CurrentUser`) ile sarılır; **Windows dışında belirteç diske hiç
+   yazılmaz**, oturum süreç ömrü kadar yaşar. Gerekçe: taşınabilir bir "şifreleme" görüntüsü
+   vermek, korumasız yazmaktan daha kötüdür. DPAPI `crypt32.dll` P/Invoke ile çağrılır;
+   yeni NuGet bağımlılığı yok.
+5. **Kendiliğinden yeniden giriş yok, çünkü parola yok.** T0'ın "401 → belirteci sıfırla,
+   bir kez yeniden giriş" maddesinden sapma: parolayı saklamayınca yeniden giriş için elde
+   bir şey kalmıyor. Bunun yerine belirteç kullanılmadan **önce** `exp`e bakılır; 401 gelirse
+   belirteç silinir ve `NeedAccount` döner. İkisinden birini seçmek gerekiyordu; saklanmayan
+   parola daha sağlam olanı.
+6. **Hata kolları:** 401/403 indirmede → belirteci sil, `NeedAccount`; gövdede kota alanı
+   varsa `QuotaExceeded`. 406 → `QuotaExceeded`, kalan hak gövdeden. 410 → `LinkExpired`
+   (yeni kol; imzalı bağlantı üç saatlik). 429 → `RateLimited` + `Retry-After` saniyesi
+   `SubtitleDownloadResult.RetryAfterSeconds` ile arayüze taşınır.
+7. **İndirme satırı menüde geri.** `AltyaziIndirmeTests.IndirmeSatiriBuSurumdeMenudeYok`
+   pimi tersine çevrilir (`IndirmeSatiriMenudeGorunur`); gerekçe commit iletisine yazılır.
+   İki yetim metin yeniden okunur, `KnownDead` boş kalır.
+8. **Ayarlar**: API anahtarı alanının altına kullanıcı adı + parola kutusu, "Giriş yap" /
+   "Çıkış" düğmesi ve durum satırı. Kullanıcı adı `settings.json`a yazılır (gizli değil),
+   parola hiçbir yere. Dokuz yeni metin 43 katalogda.

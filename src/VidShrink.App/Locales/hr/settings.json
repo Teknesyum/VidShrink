@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Kartica preglednika, njezin izbornik i ovaj popis svi čitaju istu tablicu.",
   "settings-tab.opensubtitles.label": "OpenSubtitles API ključ",
   "settings-tab.opensubtitles.get": "Nabavi ključ",
-  "settings-tab.opensubtitles.hint": "Preuzimanje titlova u playeru koristi vaš vlastiti ključ. Otvorite besplatni korisnički račun na opensubtitles.com, zatim zalijepite ključ ovdje. Bez ključa značajka ostaje isključena."
+  "settings-tab.opensubtitles.hint": "Preuzimanje titlova u playeru koristi vaš vlastiti ključ. Otvorite besplatni korisnički račun na opensubtitles.com, zatim zalijepite ključ ovdje. Bez ključa značajka ostaje isključena.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles račun (potreban za preuzimanja)",
+  "settings-tab.opensubtitles.user": "Korisničko ime",
+  "settings-tab.opensubtitles.password": "Lozinka",
+  "settings-tab.opensubtitles.signin": "Prijava",
+  "settings-tab.opensubtitles.signout": "Odjava",
+  "settings-tab.opensubtitles.signingin": "Prijavljivanje…",
+  "settings-tab.opensubtitles.signedin": "Prijavljeni kao {0}",
+  "settings-tab.opensubtitles.signedout": "Nije prijavljeno — preuzimanje titlova zahtijeva račun",
+  "settings-tab.opensubtitles.signinfailed": "Prijava nije uspjela. Provjerite korisničko ime, lozinku i API ključ.",
+  "settings-tab.opensubtitles.accounthint": "Lozinka se šalje OpenSubtitlesu samo radi prijave i nikada se ne pohranjuje. Pohranjuje se samo vraćeni token sesije, zaštićen Windowsom; na drugim sustavima sesija traje dok ne zatvorite VidShrink."
 }

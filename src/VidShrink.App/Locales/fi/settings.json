@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Soitin-välilehti, sen valikko ja tämä luettelo lukevat kaikki samaa taulukkoa.",
   "settings-tab.opensubtitles.label": "OpenSubtitles-API-avain",
   "settings-tab.opensubtitles.get": "Hanki avain",
-  "settings-tab.opensubtitles.hint": "Soittimen tekstityslataus käyttää omaa avaintasi. Luo ilmainen käyttäjätili osoitteessa opensubtitles.com ja liitä avain tähän. Ilman avainta ominaisuus pysyy pois käytöstä."
+  "settings-tab.opensubtitles.hint": "Soittimen tekstityslataus käyttää omaa avaintasi. Luo ilmainen käyttäjätili osoitteessa opensubtitles.com ja liitä avain tähän. Ilman avainta ominaisuus pysyy pois käytöstä.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles-tili (tarvitaan latauksia varten)",
+  "settings-tab.opensubtitles.user": "Käyttäjätunnus",
+  "settings-tab.opensubtitles.password": "Salasana",
+  "settings-tab.opensubtitles.signin": "Kirjaudu sisään",
+  "settings-tab.opensubtitles.signout": "Kirjaudu ulos",
+  "settings-tab.opensubtitles.signingin": "Kirjaudutaan sisään…",
+  "settings-tab.opensubtitles.signedin": "Kirjautuneena käyttäjänä {0}",
+  "settings-tab.opensubtitles.signedout": "Ei kirjautunut sisään — tekstitysten lataaminen vaatii tilin",
+  "settings-tab.opensubtitles.signinfailed": "Kirjautuminen epäonnistui. Tarkista käyttäjätunnus, salasana ja API-avain.",
+  "settings-tab.opensubtitles.accounthint": "Salasana lähetetään OpenSubtitlesille vain kirjautumista varten, eikä sitä tallenneta koskaan. Ainoa tallennettava tieto on palautuva istuntotunnus, jonka Windows suojaa; muissa järjestelmissä istunto kestää, kunnes suljet VidShrinkin."
 }

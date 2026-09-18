@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Dnevna kvota za prenos podnapisov je izpolnjena",
   "player.subtitle.download.offline": "OpenSubtitles ni bilo mogoče doseči",
   "player.subtitle.download.writefail": "Podnapisa ni bilo mogoče shraniti poleg videoposnetka",
-  "player.subtitle.download.toofast": "Preveč zahtev za OpenSubtitles — poskusite znova čez trenutek"
+  "player.subtitle.download.toofast": "Preveč zahtev za OpenSubtitles — poskusite znova čez trenutek",
+  "player.subtitle.download.badlogin": "OpenSubtitles ni sprejel prijave",
+  "player.subtitle.download.expired": "Povezava za prenos je potekla — poskusite znova",
+  "player.subtitle.download.toofast.wait": "Preveč zahtev za OpenSubtitles — poskusite znova čez {0} s"
 }

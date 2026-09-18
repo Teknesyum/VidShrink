@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "A lejátszó lap, annak menüje és ez a lista mind ugyanazt a táblát olvassa.",
   "settings-tab.opensubtitles.label": "OpenSubtitles API-kulcs",
   "settings-tab.opensubtitles.get": "Kulcs beszerzése",
-  "settings-tab.opensubtitles.hint": "A lejátszóban a feliratletöltés a saját kulcsát használja. Hozzon létre egy ingyenes fiókot az opensubtitles.com oldalon, majd illessze be a kulcsot ide. Kulcs nélkül ez a funkció kikapcsolva marad."
+  "settings-tab.opensubtitles.hint": "A lejátszóban a feliratletöltés a saját kulcsát használja. Hozzon létre egy ingyenes fiókot az opensubtitles.com oldalon, majd illessze be a kulcsot ide. Kulcs nélkül ez a funkció kikapcsolva marad.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles-fiók (a letöltésekhez szükséges)",
+  "settings-tab.opensubtitles.user": "Felhasználónév",
+  "settings-tab.opensubtitles.password": "Jelszó",
+  "settings-tab.opensubtitles.signin": "Bejelentkezés",
+  "settings-tab.opensubtitles.signout": "Kijelentkezés",
+  "settings-tab.opensubtitles.signingin": "Bejelentkezés…",
+  "settings-tab.opensubtitles.signedin": "Bejelentkezve mint {0}",
+  "settings-tab.opensubtitles.signedout": "Nincs bejelentkezve — a felirat letöltéséhez fiók szükséges",
+  "settings-tab.opensubtitles.signinfailed": "A bejelentkezés sikertelen. Ellenőrizze a felhasználónevet, a jelszót és az API-kulcsot.",
+  "settings-tab.opensubtitles.accounthint": "A jelszó csak a bejelentkezéshez kerül elküldésre az OpenSubtitles felé, és soha nem kerül mentésre. Csak a visszaérkező munkamenet-token kerül tárolásra, amelyet a Windows véd; más rendszereken a munkamenet a VidShrink bezárásáig tart."
 }

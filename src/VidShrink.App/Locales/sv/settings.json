@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Spelarfliken, dess meny och den här listan läser alla samma tabell.",
   "settings-tab.opensubtitles.label": "OpenSubtitles-API-nyckel",
   "settings-tab.opensubtitles.get": "Skaffa en nyckel",
-  "settings-tab.opensubtitles.hint": "Hämtning av undertexter i spelaren använder din egen nyckel. Skapa ett kostnadsfritt konto på opensubtitles.com och klistra in nyckeln här. Utan nyckel förblir funktionen avstängd."
+  "settings-tab.opensubtitles.hint": "Hämtning av undertexter i spelaren använder din egen nyckel. Skapa ett kostnadsfritt konto på opensubtitles.com och klistra in nyckeln här. Utan nyckel förblir funktionen avstängd.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles-konto (krävs för nedladdningar)",
+  "settings-tab.opensubtitles.user": "Användarnamn",
+  "settings-tab.opensubtitles.password": "Lösenord",
+  "settings-tab.opensubtitles.signin": "Logga in",
+  "settings-tab.opensubtitles.signout": "Logga ut",
+  "settings-tab.opensubtitles.signingin": "Loggar in…",
+  "settings-tab.opensubtitles.signedin": "Inloggad som {0}",
+  "settings-tab.opensubtitles.signedout": "Inte inloggad — nedladdning av undertexter kräver ett konto",
+  "settings-tab.opensubtitles.signinfailed": "Inloggningen misslyckades. Kontrollera användarnamn, lösenord och API-nyckel.",
+  "settings-tab.opensubtitles.accounthint": "Lösenordet skickas bara till OpenSubtitles för inloggning och sparas aldrig. Det enda som lagras är sessionstoken som kommer tillbaka, skyddad av Windows; på andra system varar sessionen tills du stänger VidShrink."
 }

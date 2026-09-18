@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Dzienny limit pobierania napisów został wykorzystany",
   "player.subtitle.download.offline": "Nie udało się połączyć z OpenSubtitles",
   "player.subtitle.download.writefail": "Nie udało się zapisać napisów przy pliku wideo",
-  "player.subtitle.download.toofast": "Zbyt wiele żądań do OpenSubtitles — spróbuj ponownie za chwilę"
+  "player.subtitle.download.toofast": "Zbyt wiele żądań do OpenSubtitles — spróbuj ponownie za chwilę",
+  "player.subtitle.download.badlogin": "OpenSubtitles nie zaakceptowało logowania",
+  "player.subtitle.download.expired": "Link do pobierania wygasł — spróbuj ponownie",
+  "player.subtitle.download.toofast.wait": "Zbyt wiele żądań do OpenSubtitles — spróbuj ponownie za {0} s"
 }

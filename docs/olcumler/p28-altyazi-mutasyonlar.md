@@ -534,3 +534,170 @@ Expected: [···, "StrategyAdvice.SuggestedPreference  yalniz-disarid"···, "
 Actual:   [···, "StrategyAdvice.SuggestedPreference  yalniz-disarid"···, "StreamPlan.Attachments  hic-gorunmeyen", "SubtitleTrack.Image  hic-gorunmeyen", "ThresholdRule.Slope  hic-gorunmeyen", "TimeEstimate.ExpectedSeconds  yalniz-disarida", ···]
 Başarısız! - Başarısız:     1, Başarılı:    14, Atlanan:     0, Toplam:    15, Süre: 6 s - VidShrink.Tests.dll (net8.0)
 ```
+
+## Yol A mutasyonlari (oturum, 2026-09-18)
+
+Her satir: uretim kaynagina tek degisiklik, `dotnet build VidShrink.sln -c Release
+-warnaserror -m:2 --no-incremental`, ardindan filtre. Kaynak bellekten geri yazildi
+(`git checkout` kullanilmadi); kalinti taramasi temiz.
+
+### M1 jwt-exp-okunmaz
+dosya: src/VidShrink.Core/Subtitles/SubtitleSession.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.DuzgunBelirtectenOmurOkunur [< 1 ms]
+  Başarısız VidShrink.Tests.AltyaziOturumTests.BelirtecinOmruJwtExpindenGelir [1 ms]
+   Assert.Equal() Failure: Values differ
+Expected: 1789758780
+Actual:   1789776000
+Başarısız! - Başarısız:     2, Başarılı:    24, Atlanan:     0, Toplam:    26, Süre: 51 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M2 varsayilan-omur-bir-saat
+dosya: src/VidShrink.Core/Subtitles/OpenSubtitlesProvider.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.ExpsizBelirtecOnIkiSaatYasar [1 ms]
+   Assert.Equal() Failure: Values differ
+Expected: 1767366245
+Actual:   1767326645
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 46 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M3 maske-kapali
+dosya: src/VidShrink.Core/Subtitles/SubtitleSession.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.ParolaVeBelirtecHataIletisineSizmaz [1 ms]
+   Assert.DoesNotContain() Failure: Sub-string found
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 52 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M4 belirtec-her-istege
+dosya: src/VidShrink.Core/Subtitles/OpenSubtitlesProvider.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.AramayaBelirtecYalnizVipKonaktaGider(konak: "api.opensubtitles.com", beklenen: False) [1 ms]
+   Assert.Equal() Failure: Values differ
+Expected: False
+Actual:   True
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 50 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M5 indirmeye-belirtec-yok
+dosya: src/VidShrink.Core/Subtitles/OpenSubtitlesProvider.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.IndirmeIstegiHerKonaktaBelirtecTasir [10 ms]
+   Assert.Contains() Failure: Sub-string not found
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 60 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M6 omur-bakilmaz
+dosya: src/VidShrink.Core/Subtitles/SubtitleSession.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.SuresiDolanBelirtecGonderilmezVeSilinir [< 1 ms]
+   Assert.False() Failure
+Expected: False
+Actual:   True
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 61 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M7 bayat-oturum-silinmez
+dosya: src/VidShrink.Core/Subtitles/OpenSubtitlesProvider.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.SuresiDolanBelirtecGonderilmezVeSilinir [8 ms]
+   Assert.Null() Failure: Value is not null
+Expected: null
+Actual:   SubtitleSession { Token = eski-belirtec, Host = api.opensubtitles.com, Expires = 5.05.2026 05:04:05 +00:00, Vip = False, BaseUrl = https://api.opensubtitles.com/api/v1 }
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 49 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M8 taban-adres-sabit
+dosya: src/VidShrink.Core/Subtitles/SubtitleSession.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.TabanAdresOturumunKonagindanTurer [1 ms]
+   Assert.StartsWith() Failure: String start does not match
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 72 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M9 dortyuzbir-oturumu-silmez
+dosya: src/VidShrink.Core/Subtitles/OpenSubtitlesProvider.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.IndirmeninDortYuzBiriBelirteciSiler [4 ms]
+   Assert.Null() Failure: Value is not null
+Expected: null
+Actual:   SubtitleSession { Token = yanacak, Host = api.opensubtitles.com, Expires = 18.09.2026 04:27:53 +00:00, Vip = False, BaseUrl = https://api.opensubtitles.com/api/v1 }
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 60 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M10 gone-kolu-yok
+dosya: src/VidShrink.Core/Subtitles/OpenSubtitlesProvider.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.SuresiGecenBaglantiLinkExpiredOlur [1 ms]
+   Assert.Equal() Failure: Values differ
+Expected: LinkExpired
+Actual:   NetworkError
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 59 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M11 retry-after-okunmaz
+dosya: src/VidShrink.Core/Subtitles/OpenSubtitlesProvider.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.IstekSiniriRetryAfterSaniyesiniTasir [2 ms]
+   Assert.Equal() Failure: Values differ
+Expected: 37
+Actual:   0
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 60 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M12 oturum-dosyasi-ayardan-kopuk
+dosya: src/VidShrink.App/Subtitles/SessionStore.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.OturumDosyasiAyarDosyasininYanindadir [1 ms]
+   Assert.Equal() Failure: Strings differ
+Expected: ···"ink\\.calisma\\wt-p28\\.calisma\\p28-altyazi\\"···
+Actual:   ···"ink\\.calisma\\wt-p28\\tests\\VidShrink.Tests"···
+  Başarısız VidShrink.Tests.AltyaziOturumTests.OturumYoluAyarDegiskeniniIzler [< 1 ms]
+   Assert.Equal() Failure: Strings differ
+Expected: ···"ink\\.calisma\\wt-p28\\.calisma\\p28-altyazi\\"···
+Actual:   ···"ink\\.calisma\\wt-p28\\tests\\VidShrink.Tests"···
+Başarısız! - Başarısız:     2, Başarılı:    24, Atlanan:     0, Toplam:    26, Süre: 61 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M13 belirtec-duz-diske
+dosya: src/VidShrink.App/Subtitles/SessionStore.cs
+filtre: FullyQualifiedName~AltyaziOturumTests
+```
+  Başarısız VidShrink.Tests.AltyaziOturumTests.BelirtecDiskeDuzYazilmaz [6 ms]
+Başarısız! - Başarısız:     1, Başarılı:    25, Atlanan:     0, Toplam:    26, Süre: 62 ms - VidShrink.Tests.dll (net8.0)
+```
+
+### M14 oturum-kapisi-yok
+dosya: src/VidShrink.App/Playback/PlayerView.Subtitles.cs
+filtre: FullyQualifiedName~AltyaziIndirmeTests
+```
+  Başarısız VidShrink.Tests.AltyaziIndirmeTests.OturumsuzIndirmeAgaCikmadanHesapIster [257 ms]
+   Assert.Equal() Failure: Strings differ
+Expected: "player.subtitle.download.needaccount"
+Actual:   "player.subtitle.download.noresult"
+Başarısız! - Başarısız:     1, Başarılı:    64, Atlanan:     0, Toplam:    65, Süre: 4 s - VidShrink.Tests.dll (net8.0)
+```
+
+### M15 menu-satiri-hep-indirme
+dosya: src/VidShrink.App/Playback/PlayerView.Tracks.cs
+filtre: FullyQualifiedName~AltyaziIndirmeTests
+```
+  Başarısız VidShrink.Tests.AltyaziIndirmeTests.EklenenMetinKaynaktaOkunurVeKirkIkiDildeVar(anahtar: "player.subtitle.download.getkey") [12 ms]
+  Başarısız VidShrink.Tests.AltyaziIndirmeTests.IndirmeSatiriMenudeGorunur [279 ms]
+   Assert.Contains() Failure: Item not found in collection
+Başarısız! - Başarısız:     2, Başarılı:    63, Atlanan:     0, Toplam:    65, Süre: 3 s - VidShrink.Tests.dll (net8.0)
+```
+

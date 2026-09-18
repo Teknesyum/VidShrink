@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Tekstitysten päivittäinen latauskiintiö on täynnä",
   "player.subtitle.download.offline": "OpenSubtitlesiin ei saatu yhteyttä",
   "player.subtitle.download.writefail": "Tekstitystä ei voitu tallentaa videon viereen",
-  "player.subtitle.download.toofast": "Liian monta pyyntöä OpenSubtitlesille — yritä uudelleen hetken kuluttua"
+  "player.subtitle.download.toofast": "Liian monta pyyntöä OpenSubtitlesille — yritä uudelleen hetken kuluttua",
+  "player.subtitle.download.badlogin": "OpenSubtitles ei hyväksynyt kirjautumista",
+  "player.subtitle.download.expired": "Latauslinkin voimassaolo päättyi — yritä uudelleen",
+  "player.subtitle.download.toofast.wait": "Liian monta pyyntöä OpenSubtitlesille — yritä uudelleen {0} s kuluttua"
 }

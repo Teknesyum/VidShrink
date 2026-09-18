@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "โควตาการดาวน์โหลดคำบรรยายรายวันเต็มแล้ว",
   "player.subtitle.download.offline": "ไม่สามารถเชื่อมต่อกับ OpenSubtitles ได้",
   "player.subtitle.download.writefail": "ไม่สามารถบันทึกคำบรรยายไว้ข้างวิดีโอได้",
-  "player.subtitle.download.toofast": "ส่งคำขอไปยัง OpenSubtitles มากเกินไป — โปรดลองใหม่อีกครั้งในอีกสักครู่"
+  "player.subtitle.download.toofast": "ส่งคำขอไปยัง OpenSubtitles มากเกินไป — โปรดลองใหม่อีกครั้งในอีกสักครู่",
+  "player.subtitle.download.badlogin": "OpenSubtitles ไม่ยอมรับการลงชื่อเข้าใช้",
+  "player.subtitle.download.expired": "ลิงก์ดาวน์โหลดหมดอายุแล้ว — โปรดลองใหม่",
+  "player.subtitle.download.toofast.wait": "ส่งคำขอไปยัง OpenSubtitles มากเกินไป — โปรดลองใหม่อีกครั้งในอีก {0} วิ"
 }

@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Subtiitrite igapäevane allalaadimiskvoot on täis",
   "player.subtitle.download.offline": "OpenSubtitlesiga ei saanud ühendust",
   "player.subtitle.download.writefail": "Subtiitreid ei saanud video kõrvale salvestada",
-  "player.subtitle.download.toofast": "OpenSubtitlesile saadetud liiga palju päringuid — proovige veidi hiljem uuesti"
+  "player.subtitle.download.toofast": "OpenSubtitlesile saadetud liiga palju päringuid — proovige veidi hiljem uuesti",
+  "player.subtitle.download.badlogin": "OpenSubtitles ei võtnud sisselogimist vastu",
+  "player.subtitle.download.expired": "Allalaadimislink aegus — proovige uuesti",
+  "player.subtitle.download.toofast.wait": "OpenSubtitlesile saadetud liiga palju päringuid — proovige uuesti {0} s pärast"
 }

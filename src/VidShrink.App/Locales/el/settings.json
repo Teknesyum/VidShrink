@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Η καρτέλα αναπαραγωγής, το μενού της και αυτή η λίστα διαβάζουν όλα από τον ίδιο πίνακα.",
   "settings-tab.opensubtitles.label": "Κλειδί API OpenSubtitles",
   "settings-tab.opensubtitles.get": "Απόκτηση κλειδιού",
-  "settings-tab.opensubtitles.hint": "Η λήψη υποτίτλων στον player χρησιμοποιεί το δικό σας κλειδί. Δημιουργήστε δωρεάν λογαριασμό στο opensubtitles.com και επικολλήστε το κλειδί εδώ. Χωρίς κλειδί, η λειτουργία παραμένει ανενεργή."
+  "settings-tab.opensubtitles.hint": "Η λήψη υποτίτλων στον player χρησιμοποιεί το δικό σας κλειδί. Δημιουργήστε δωρεάν λογαριασμό στο opensubtitles.com και επικολλήστε το κλειδί εδώ. Χωρίς κλειδί, η λειτουργία παραμένει ανενεργή.",
+  "settings-tab.opensubtitles.account": "Λογαριασμός OpenSubtitles (απαραίτητος για λήψεις)",
+  "settings-tab.opensubtitles.user": "Όνομα χρήστη",
+  "settings-tab.opensubtitles.password": "Κωδικός πρόσβασης",
+  "settings-tab.opensubtitles.signin": "Σύνδεση",
+  "settings-tab.opensubtitles.signout": "Αποσύνδεση",
+  "settings-tab.opensubtitles.signingin": "Γίνεται σύνδεση…",
+  "settings-tab.opensubtitles.signedin": "Συνδεδεμένος ως {0}",
+  "settings-tab.opensubtitles.signedout": "Δεν έχετε συνδεθεί — η λήψη υποτίτλων απαιτεί λογαριασμό",
+  "settings-tab.opensubtitles.signinfailed": "Η σύνδεση απέτυχε. Ελέγξτε το όνομα χρήστη, τον κωδικό πρόσβασης και το κλειδί API.",
+  "settings-tab.opensubtitles.accounthint": "Ο κωδικός πρόσβασης αποστέλλεται στο OpenSubtitles μόνο για τη σύνδεση και δεν αποθηκεύεται ποτέ. Αποθηκεύεται μόνο το token συνεδρίας που επιστρέφει, προστατευμένο από τα Windows· σε άλλα συστήματα η συνεδρία διαρκεί έως ότου κλείσετε το VidShrink."
 }

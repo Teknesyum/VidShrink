@@ -284,6 +284,9 @@ internal partial class PlayerView
         }
 
         items.Add(new Separator());
+        items.Add(SubtitleDownloadReady
+            ? Plain(Strings.Get("player.subtitle.download"), () => _ = DownloadSubtitleAsync())
+            : Plain(Strings.Get("player.subtitle.download.getkey"), OpenSubtitleKeyPage));
         items.Add(Plain(Strings.Get("player.subtitle.load"), () => _ = PickSubtitleAsync()));
         items.Add(Bound(SubtitleOptions.SubtitleCycle));
         items.Add(new Separator());

@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Kuota muat turun sari kata harian sudah penuh",
   "player.subtitle.download.offline": "OpenSubtitles tidak dapat dihubungi",
   "player.subtitle.download.writefail": "Sari kata tidak dapat disimpan di sebelah video",
-  "player.subtitle.download.toofast": "Terlalu banyak permintaan ke OpenSubtitles — cuba lagi sebentar lagi"
+  "player.subtitle.download.toofast": "Terlalu banyak permintaan ke OpenSubtitles — cuba lagi sebentar lagi",
+  "player.subtitle.download.badlogin": "OpenSubtitles tidak menerima log masuk",
+  "player.subtitle.download.expired": "Pautan muat turun telah tamat tempoh — cuba lagi",
+  "player.subtitle.download.toofast.wait": "Terlalu banyak permintaan ke OpenSubtitles — cuba lagi dalam {0} s"
 }

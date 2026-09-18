@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Das tägliche Download-Kontingent für Untertitel ist ausgeschöpft",
   "player.subtitle.download.offline": "OpenSubtitles konnte nicht erreicht werden",
   "player.subtitle.download.writefail": "Der Untertitel konnte nicht neben dem Video gespeichert werden",
-  "player.subtitle.download.toofast": "Zu viele Anfragen an OpenSubtitles — versuchen Sie es in einem Moment erneut"
+  "player.subtitle.download.toofast": "Zu viele Anfragen an OpenSubtitles — versuchen Sie es in einem Moment erneut",
+  "player.subtitle.download.badlogin": "OpenSubtitles hat die Anmeldung nicht akzeptiert",
+  "player.subtitle.download.expired": "Der Download-Link ist abgelaufen — versuchen Sie es erneut",
+  "player.subtitle.download.toofast.wait": "Zu viele Anfragen an OpenSubtitles — versuchen Sie es in {0} s erneut"
 }

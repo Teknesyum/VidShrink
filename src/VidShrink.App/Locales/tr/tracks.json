@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Günlük altyazı indirme kotası doldu",
   "player.subtitle.download.offline": "OpenSubtitles'a erişilemedi",
   "player.subtitle.download.writefail": "Altyazı videonun yanına kaydedilemedi",
-  "player.subtitle.download.toofast": "OpenSubtitles'a çok fazla istek gönderildi — birazdan tekrar deneyin"
+  "player.subtitle.download.toofast": "OpenSubtitles'a çok fazla istek gönderildi — birazdan tekrar deneyin",
+  "player.subtitle.download.badlogin": "OpenSubtitles girişi kabul etmedi",
+  "player.subtitle.download.expired": "İndirme bağlantısının süresi doldu — yeniden deneyin",
+  "player.subtitle.download.toofast.wait": "OpenSubtitles’a çok istek gitti — {0} sn sonra yeniden deneyin"
 }

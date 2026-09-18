@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "La scheda del lettore, il suo menu e questo elenco leggono tutti la stessa tabella.",
   "settings-tab.opensubtitles.label": "Chiave API di OpenSubtitles",
   "settings-tab.opensubtitles.get": "Ottieni una chiave",
-  "settings-tab.opensubtitles.hint": "Il download dei sottotitoli nel lettore usa la tua chiave personale. Crea un account gratuito su opensubtitles.com, poi incolla qui la chiave. Senza chiave la funzione resta disattivata."
+  "settings-tab.opensubtitles.hint": "Il download dei sottotitoli nel lettore usa la tua chiave personale. Crea un account gratuito su opensubtitles.com, poi incolla qui la chiave. Senza chiave la funzione resta disattivata.",
+  "settings-tab.opensubtitles.account": "Account OpenSubtitles (necessario per i download)",
+  "settings-tab.opensubtitles.user": "Nome utente",
+  "settings-tab.opensubtitles.password": "Password",
+  "settings-tab.opensubtitles.signin": "Accedi",
+  "settings-tab.opensubtitles.signout": "Esci",
+  "settings-tab.opensubtitles.signingin": "Accesso in corso…",
+  "settings-tab.opensubtitles.signedin": "Accesso effettuato come {0}",
+  "settings-tab.opensubtitles.signedout": "Non hai eseguito l'accesso — per scaricare i sottotitoli serve un account",
+  "settings-tab.opensubtitles.signinfailed": "Accesso non riuscito. Controlla nome utente, password e chiave API.",
+  "settings-tab.opensubtitles.accounthint": "La password viene inviata a OpenSubtitles solo per l'accesso e non viene mai salvata. Viene salvato solo il token di sessione ricevuto, protetto da Windows; su altri sistemi la sessione dura finché non chiudi VidShrink."
 }

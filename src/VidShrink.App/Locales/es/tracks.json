@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "Se ha agotado la cuota diaria de descarga de subtítulos",
   "player.subtitle.download.offline": "No se pudo contactar con OpenSubtitles",
   "player.subtitle.download.writefail": "El subtítulo no se pudo guardar junto al video",
-  "player.subtitle.download.toofast": "Demasiadas solicitudes a OpenSubtitles — vuelve a intentarlo en un momento"
+  "player.subtitle.download.toofast": "Demasiadas solicitudes a OpenSubtitles — vuelve a intentarlo en un momento",
+  "player.subtitle.download.badlogin": "OpenSubtitles no aceptó el inicio de sesión",
+  "player.subtitle.download.expired": "El enlace de descarga caducó — inténtalo de nuevo",
+  "player.subtitle.download.toofast.wait": "Demasiadas solicitudes a OpenSubtitles — vuelve a intentarlo en {0} s"
 }

@@ -48,5 +48,8 @@
   "player.subtitle.download.quota": "字幕ダウンロードの1日の上限に達しました",
   "player.subtitle.download.offline": "OpenSubtitlesに接続できませんでした",
   "player.subtitle.download.writefail": "字幕を動画の隣に保存できませんでした",
-  "player.subtitle.download.toofast": "OpenSubtitlesへのリクエストが多すぎます — 少し待ってから再試行してください"
+  "player.subtitle.download.toofast": "OpenSubtitlesへのリクエストが多すぎます — 少し待ってから再試行してください",
+  "player.subtitle.download.badlogin": "OpenSubtitlesがサインインを受け付けませんでした",
+  "player.subtitle.download.expired": "ダウンロードリンクの有効期限が切れました — もう一度お試しください",
+  "player.subtitle.download.toofast.wait": "OpenSubtitlesへのリクエストが多すぎます — {0}秒後に再試行してください"
 }

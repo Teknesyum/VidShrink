@@ -44,5 +44,15 @@
   "settings.player-shortcuts.hint": "Atskaņotāja cilne, tās izvēlne un šis saraksts visi lasa vienu un to pašu tabulu.",
   "settings-tab.opensubtitles.label": "OpenSubtitles API atslēga",
   "settings-tab.opensubtitles.get": "Iegūt atslēgu",
-  "settings-tab.opensubtitles.hint": "Subtitru lejupielāde atskaņotājā izmanto jūsu pašu atslēgu. Izveidojiet bezmaksas kontu opensubtitles.com, pēc tam ielīmējiet atslēgu šeit. Bez atslēgas šī funkcija paliek izslēgta."
+  "settings-tab.opensubtitles.hint": "Subtitru lejupielāde atskaņotājā izmanto jūsu pašu atslēgu. Izveidojiet bezmaksas kontu opensubtitles.com, pēc tam ielīmējiet atslēgu šeit. Bez atslēgas šī funkcija paliek izslēgta.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles konts (nepieciešams lejupielādēm)",
+  "settings-tab.opensubtitles.user": "Lietotājvārds",
+  "settings-tab.opensubtitles.password": "Parole",
+  "settings-tab.opensubtitles.signin": "Pieteikties",
+  "settings-tab.opensubtitles.signout": "Izrakstīties",
+  "settings-tab.opensubtitles.signingin": "Notiek pieteikšanās…",
+  "settings-tab.opensubtitles.signedin": "Pieteicies kā {0}",
+  "settings-tab.opensubtitles.signedout": "Nav pieteicies — subtitru lejupielādei nepieciešams konts",
+  "settings-tab.opensubtitles.signinfailed": "Pieteikšanās neizdevās. Pārbaudiet lietotājvārdu, paroli un API atslēgu.",
+  "settings-tab.opensubtitles.accounthint": "Parole tiek nosūtīta uz OpenSubtitles tikai pieteikšanās vajadzībām un nekad netiek saglabāta. Tiek glabāts tikai atpakaļ saņemtais sesijas tokens, ko aizsargā Windows; citās sistēmās sesija turpinās, līdz aizverat VidShrink."
 }

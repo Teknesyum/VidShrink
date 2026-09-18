@@ -24,16 +24,124 @@ public sealed class OpenSubtitlesProvider : ISubtitleProvider
 
     private readonly IHttpTransport _transport;
     private readonly string _apiKey;
-    private readonly string _baseUrl;
+    private readonly string? _fixedBaseUrl;
+    private readonly ISubtitleSessionStore _sessions;
+    private readonly Func<DateTimeOffset> _clock;
 
-    public OpenSubtitlesProvider(IHttpTransport transport, string? apiKey, string? baseUrl = null)
+    public OpenSubtitlesProvider(
+        IHttpTransport transport,
+        string? apiKey,
+        string? baseUrl = null,
+        ISubtitleSessionStore? sessions = null,
+        Func<DateTimeOffset>? clock = null)
     {
         _transport = transport;
         _apiKey = (apiKey ?? "").Trim();
-        _baseUrl = (baseUrl ?? DefaultBaseUrl).TrimEnd('/');
+        _fixedBaseUrl = string.IsNullOrWhiteSpace(baseUrl) ? null : baseUrl.TrimEnd('/');
+        _sessions = sessions ?? new MemorySessionStore();
+        _clock = clock ?? (() => DateTimeOffset.UtcNow);
     }
 
     public bool IsConfigured => _apiKey.Length > 0;
+
+    public bool HasSession => Live is not null;
+
+    /// <summary>Suresi dolmamis oturum; yoksa <c>null</c>. Sure bitmisse kayit da silinir.</summary>
+    private SubtitleSession? Live
+    {
+        get
+        {
+            var stored = _sessions.Read();
+            if (stored is null) return null;
+            if (stored.Valid(_clock())) return stored;
+            _sessions.Clear();
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Taban adres. Cagiran acikca bir adres verdiyse o kazanir; vermediyse oturumun
+    /// <c>base_url</c>u izlenir, o da yoksa varsayilan konak kullanilir.
+    /// </summary>
+    private string Base => _fixedBaseUrl ?? Live?.BaseUrl ?? DefaultBaseUrl;
+
+    /// <summary>
+    /// Kullanici adi ve parolayla oturum acar; basariliysa belirtec saklanir.
+    /// </summary>
+    /// <remarks>
+    /// Parola yalniz bu govdede gecer, hicbir yere yazilmaz. Saglayicinin hata govdesi
+    /// gonderileni yankilayabildigi icin donen aciklama <see cref="Secrets.Mask"/>ten
+    /// gecirilir; parola ve belirtec kullanicinin ekranina cikmaz.
+    /// </remarks>
+    public async Task<SubtitleLoginResult> LoginAsync(string username, string password, CancellationToken cancellationToken)
+    {
+        if (!IsConfigured) return SubtitleLoginResult.Failed(SubtitleOutcome.NoKey);
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrEmpty(password))
+            return SubtitleLoginResult.Failed(SubtitleOutcome.BadLogin);
+
+        using var request = Stamp(new HttpRequestMessage(HttpMethod.Post, Base + "/login"), false);
+        request.Content = new StringContent(
+            JsonSerializer.Serialize(new Dictionary<string, string>
+            {
+                ["username"] = username.Trim(),
+                ["password"] = password
+            }),
+            Encoding.UTF8,
+            "application/json");
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await _transport.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException or IOException)
+        {
+            return SubtitleLoginResult.Failed(SubtitleOutcome.NetworkError);
+        }
+
+        using (response)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            if (Trouble(response.StatusCode) is { } trouble)
+            {
+                var kol = trouble is SubtitleOutcome.BadKey ? SubtitleOutcome.BadLogin : trouble;
+                return SubtitleLoginResult.Failed(kol, Secrets.Mask(body, password, username));
+            }
+
+            string token;
+            string host;
+            try
+            {
+                using var document = JsonDocument.Parse(body);
+                token = Text(document.RootElement, "token");
+                host = Text(document.RootElement, "base_url");
+            }
+            catch (JsonException)
+            {
+                return SubtitleLoginResult.Failed(SubtitleOutcome.NetworkError);
+            }
+
+            if (token.Length == 0)
+                return SubtitleLoginResult.Failed(SubtitleOutcome.BadLogin, Secrets.Mask(body, password, username));
+
+            var session = new SubtitleSession(
+                token,
+                host.Length == 0 ? SubtitleSession.DefaultHost : host,
+                JwtClaims.Expiry(token) ?? _clock() + DefaultLifetime);
+
+            _sessions.Write(session);
+            return new SubtitleLoginResult(SubtitleOutcome.Ok, session);
+        }
+    }
+
+    /// <summary>
+    /// JWT <c>exp</c> tasimadiginda kullanilan omur. bazarr'in degeri; sartname bir sure
+    /// bildirmiyor ve suresi dolmus belirtecle gidilen istek 401 ile geri donuyor.
+    /// </summary>
+    private static readonly TimeSpan DefaultLifetime = TimeSpan.FromHours(12);
+
+    /// <summary>Saklanan oturumu siler.</summary>
+    public void SignOut() => _sessions.Clear();
 
     public async Task<SubtitleSearchResult> SearchAsync(SubtitleQuery query, CancellationToken cancellationToken)
     {
@@ -78,7 +186,7 @@ public sealed class OpenSubtitlesProvider : ISubtitleProvider
 
     private async Task<SubtitleSearchResult> Ask(string queryString, SubtitleQuery query, CancellationToken cancellationToken)
     {
-        using var request = Stamp(new HttpRequestMessage(HttpMethod.Get, _baseUrl + "/subtitles?" + queryString));
+        using var request = Stamp(new HttpRequestMessage(HttpMethod.Get, Base + "/subtitles?" + queryString), Live?.Vip == true);
 
         HttpResponseMessage response;
         try
@@ -172,7 +280,7 @@ public sealed class OpenSubtitlesProvider : ISubtitleProvider
 
         string link;
         var remaining = -1;
-        using (var request = Stamp(new HttpRequestMessage(HttpMethod.Post, _baseUrl + "/download")))
+        using (var request = Stamp(new HttpRequestMessage(HttpMethod.Post, Base + "/download"), true))
         {
             request.Content = new StringContent(
                 "{\"file_id\":" + candidate.FileId.ToString(CultureInfo.InvariantCulture) + ",\"sub_format\":\"srt\"}",
@@ -193,7 +301,11 @@ public sealed class OpenSubtitlesProvider : ISubtitleProvider
             {
                 var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 if (Trouble(response.StatusCode) is { } trouble)
-                    return SubtitleDownloadResult.Failed(Sharpen(trouble, body), Quota(body));
+                {
+                    var kol = Sharpen(trouble, body);
+                    if (kol is SubtitleOutcome.NeedAccount) _sessions.Clear();
+                    return SubtitleDownloadResult.Failed(kol, Quota(body)) with { RetryAfterSeconds = Wait(response) };
+                }
 
                 try
                 {
@@ -230,7 +342,8 @@ public sealed class OpenSubtitlesProvider : ISubtitleProvider
 
             using (response)
             {
-                if (Trouble(response.StatusCode) is { } trouble) return SubtitleDownloadResult.Failed(trouble, remaining);
+                if (Trouble(response.StatusCode) is { } trouble)
+                    return SubtitleDownloadResult.Failed(trouble, remaining) with { RetryAfterSeconds = Wait(response) };
                 if (!response.IsSuccessStatusCode) return SubtitleDownloadResult.Failed(SubtitleOutcome.NetworkError, remaining);
                 bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
             }
@@ -281,6 +394,7 @@ public sealed class OpenSubtitlesProvider : ISubtitleProvider
         HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => SubtitleOutcome.BadKey,
         HttpStatusCode.NotAcceptable => SubtitleOutcome.QuotaExceeded,
         HttpStatusCode.TooManyRequests => SubtitleOutcome.RateLimited,
+        HttpStatusCode.Gone => SubtitleOutcome.LinkExpired,
         _ when (int)status >= 400 => SubtitleOutcome.NetworkError,
         _ => null
     };
@@ -303,6 +417,24 @@ public sealed class OpenSubtitlesProvider : ISubtitleProvider
         // "anahtarın yanlış" demek onu doğru anahtarı yeniden girmeye iter; eksik olan
         // hesap girişidir.
         return SubtitleOutcome.NeedAccount;
+    }
+
+    /// <summary>
+    /// 429'un <c>Retry-After</c>i. Saniye olarak da tarih olarak da gelebiliyor; ikisi de
+    /// saniyeye cevrilir. Baslik yoksa ya da gecmisi gosteriyorsa 0.
+    /// </summary>
+    private int Wait(HttpResponseMessage response)
+    {
+        var after = response.Headers.RetryAfter;
+        if (after is null) return 0;
+        if (after.Delta is { } delta) return delta.TotalSeconds <= 0 ? 0 : (int)Math.Ceiling(delta.TotalSeconds);
+        if (after.Date is { } date)
+        {
+            var left = (date - _clock()).TotalSeconds;
+            return left <= 0 ? 0 : (int)Math.Ceiling(left);
+        }
+
+        return 0;
     }
 
     private static int Quota(string body)
@@ -340,11 +472,19 @@ public sealed class OpenSubtitlesProvider : ISubtitleProvider
               version.Build.ToString(CultureInfo.InvariantCulture);
     }
 
-    private HttpRequestMessage Stamp(HttpRequestMessage request)
+    /// <summary>
+    /// Ortak basliklar. <c>Authorization</c> yalniz <paramref name="authorize"/> istendiginde
+    /// ve elde gecerli oturum varken eklenir: <c>/download</c> sartname geregi iki basligi
+    /// birden ister, diger uclarda ise belirtec yalniz <c>base_url</c> VIP konagi gosterdiginde
+    /// gider. Varsayilan konakta gereksiz gonderilen belirtec 4xx'e yol acabiliyor.
+    /// </summary>
+    private HttpRequestMessage Stamp(HttpRequestMessage request, bool authorize)
     {
         request.Headers.TryAddWithoutValidation("Api-Key", _apiKey);
         request.Headers.TryAddWithoutValidation("Accept", "*/*");
         request.Headers.TryAddWithoutValidation("User-Agent", UserAgent);
+        if (authorize && Live is { } session)
+            request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + session.Token);
         return request;
     }
 }

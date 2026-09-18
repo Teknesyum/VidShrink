@@ -1256,6 +1256,16 @@
                       <Button x:Name="BtnOpenSubtitlesKey" Content="{loc:Text settings-tab.opensubtitles.get}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesKeyPage"/>
                     </StackPanel>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.hint}"/>
+
+                    <TextBlock Text="{loc:Text settings-tab.opensubtitles.account}" Theme="{StaticResource Label}" Margin="0"/>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                      <TextBox x:Name="TxtOpenSubtitlesUser" Width="180" MaxLines="1" PlaceholderText="{loc:Text settings-tab.opensubtitles.user}"/>
+                      <TextBox x:Name="TxtOpenSubtitlesPassword" Width="180" MaxLines="1" PasswordChar="*" PlaceholderText="{loc:Text settings-tab.opensubtitles.password}"/>
+                      <Button x:Name="BtnOpenSubtitlesSignIn" Content="{loc:Text settings-tab.opensubtitles.signin}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignIn"/>
+                      <Button x:Name="BtnOpenSubtitlesSignOut" Content="{loc:Text settings-tab.opensubtitles.signout}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignOut"/>
+                    </StackPanel>
+                    <TextBlock x:Name="LblOpenSubtitlesStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.accounthint}"/>
                   </StackPanel>
                 </StackPanel>
               </Border>
