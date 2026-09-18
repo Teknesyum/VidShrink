@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -282,33 +284,51 @@ public sealed class OrtakOdakTests
         Kapat("ustuste.mkv");
     }
 
+    /// <summary>
+    /// Başka dosyaya odaklanınca çözümleme düşüyor, sahip yeni sahibe geçiyor.
+    /// </summary>
     [Fact]
-    public void OdakKonumuYalnizOdaktakiDosyayaYazilir()
+    public void BaskaDosyayaOdaklanincaCozumlemeDusuyor()
     {
         var odak = Dosya("konum-odak.mkv", 4096);
         var baska = Dosya("konum-baska.mkv", 4096);
         var media = new CurrentMedia();
 
         media.Publish(odak, Ornek(odak), MediaFocusOwner.Player);
-        media.Remember(odak, 7.5);
-        var odaktaki = media.LastPositionSeconds;
-
-        media.Remember(baska, 99);
-        var yabanci = media.LastPositionSeconds;
-
-        media.Remember(odak, -3);
-        var eksi = media.LastPositionSeconds;
+        Assert.NotNull(media.Info);
 
         media.Focus(baska, MediaFocusOwner.Shrink);
 
-        Assert.Equal(7.5, odaktaki);
-        Assert.Equal(7.5, yabanci);
-        Assert.Equal(7.5, eksi);
-        Assert.Equal(0, media.LastPositionSeconds);
         Assert.Null(media.Info);
         Assert.Equal(MediaFocusOwner.Shrink, media.Owner);
+        Assert.True(media.Holds(baska));
 
         Kapat("konum-odak.mkv", "konum-baska.mkv");
+    }
+
+    /// <summary>
+    /// <b>Tek konum deposu.</b> Konum yalnız <c>PlaybackHistory</c>'de tutulur;
+    /// <c>CurrentMedia</c> ikinci bir kopya taşımaz. Eskiden <c>LastPositionSeconds</c>
+    /// alanı vardı: sekme değişiminde yazılıyor ama üretimde hiçbir yerde okunmuyordu —
+    /// iki depo, biri ölü. Yüzey yansımayla pimli, çünkü alanın geri gelmesi derlemeyi
+    /// kırmaz, sessizce ikinci depoyu geri getirir. Desenin kör olmadığı, gerçekten
+    /// duran üyelerle olumlu kontrollü.
+    /// </summary>
+    [Fact]
+    public void KonumDeposuCurrentMediaDaYok()
+    {
+        var uyeler = typeof(CurrentMedia)
+            .GetMembers(BindingFlags.Public | BindingFlags.NonPublic |
+                        BindingFlags.Instance | BindingFlags.Static)
+            .Select(u => u.Name)
+            .ToArray();
+
+        Assert.DoesNotContain("LastPositionSeconds", uyeler);
+        Assert.DoesNotContain("Remember", uyeler);
+
+        Assert.Contains("Publish", uyeler);
+        Assert.Contains("Focus", uyeler);
+        Assert.Contains("InfoFor", uyeler);
     }
 
     /// <summary>

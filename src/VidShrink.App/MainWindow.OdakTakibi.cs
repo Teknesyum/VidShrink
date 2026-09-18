@@ -40,12 +40,6 @@ public partial class MainWindow
         return yeni;
     }
 
-    /// <summary>Oynatıcı sekmesinden ayrılırken odaktaki dosyanın konumu saklanır.</summary>
-    private void OdakKonumunuAnimsa()
-    {
-        if (Player.LoadedPath is { } yol) _media.Remember(yol, Player.CurrentPosition());
-    }
-
     internal Func<string, Task>? FollowShrinkLoader { get; set; }
 
     internal Func<string, Task>? FollowPlayerOpener { get; set; }

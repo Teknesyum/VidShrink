@@ -203,7 +203,6 @@ public partial class MainWindow : Window
         SetupShellMenu();
         Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
         Tabs.SelectionChanged += (_, _) => KaydediciSekmesiSecildi();
-        Tabs.SelectionChanged += (_, _) => OdakKonumunuAnimsa();
 
         if (OperatingSystem.IsMacOS())
         {

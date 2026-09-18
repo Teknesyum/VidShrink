@@ -14,7 +14,7 @@ public enum MediaFocusOwner
 
 /// <summary>
 /// Sekmelerin ortak odağı: hangi video "geçerli video". Yol, çözümlenmiş
-/// <see cref="MediaInfo"/>, süre, kaynak fps ve son bilinen oynatma konumu tek yerde durur;
+/// <see cref="MediaInfo"/>, süre ve kaynak fps tek yerde durur;
 /// böylece oynatıcıda açılan dosya küçültmeye geçerken ikinci kez ffprobe'lanmaz.
 /// Önbellek dosyanın uzunluğu ve son yazma anıyla damgalanır: dosya diskte değiştiyse
 /// <see cref="InfoFor"/> boş döner ve çağıran yeniden yoklar.
@@ -31,8 +31,6 @@ public sealed class CurrentMedia
     public double DurationSeconds { get; private set; }
 
     public double SourceFps { get; private set; }
-
-    public double LastPositionSeconds { get; private set; }
 
     public MediaFocusOwner Owner { get; private set; } = MediaFocusOwner.None;
 
@@ -64,7 +62,6 @@ public sealed class CurrentMedia
         Info = null;
         DurationSeconds = 0;
         SourceFps = 0;
-        LastPositionSeconds = 0;
         Owner = owner;
         _stampLength = -1;
         _stampTicks = -1;
@@ -74,8 +71,6 @@ public sealed class CurrentMedia
     /// <summary>Odağı çözümlemeyle birlikte yazar ve dosyayı damgalar.</summary>
     public void Publish(string path, MediaInfo info, MediaFocusOwner owner)
     {
-        if (!Holds(path)) LastPositionSeconds = 0;
-
         Path = path;
         Info = info;
         DurationSeconds = info.DurationSeconds;
@@ -83,13 +78,6 @@ public sealed class CurrentMedia
         Owner = owner;
         Stamp(path);
         Changed?.Invoke(this);
-    }
-
-    /// <summary>Odaktaki dosyanın son bilinen konumu. Başka dosyanın konumu yazılmaz.</summary>
-    public void Remember(string path, double seconds)
-    {
-        if (!Holds(path) || double.IsNaN(seconds) || seconds < 0) return;
-        LastPositionSeconds = seconds;
     }
 
     public static bool SamePath(string? left, string? right)
