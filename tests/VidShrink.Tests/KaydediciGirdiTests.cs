@@ -31,6 +31,9 @@ public sealed class KaydediciGirdiTests
     private static string? Dosyada(string dosya, string anahtar)
         => File.Exists(dosya) ? JsonNode.Parse(File.ReadAllText(dosya))?[anahtar]?.ToJsonString() : null;
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private sealed class SahteKanca : IInputHooks
     {
         public List<string> Cagrilar { get; } = new();
@@ -179,6 +182,8 @@ public sealed class KaydediciGirdiTests
         Assert.Equal(new[] { "basla fare=True klavye=False", "dur" }, olcu.sesKanca);
         Assert.Equal(new[] { "gizle" }, olcu.sesBindirme);
         Assert.Equal(1, olcu.sesSayac);
+
+        Kapat("girdi-gosterimi.txt");
     }
 
     private const int Tavan = 30000;
@@ -254,6 +259,8 @@ public sealed class KaydediciGirdiTests
         Assert.True(olcu.yaziKapandi >= 0, $"Tuş yazısı {Tavan} ms içinde kendiliğinden kapanmadı.");
         Assert.True(olcu.halkaKapandi >= 360, $"Halka tutma süresinden önce kapandı: {olcu.halkaKapandi} ms < 360 ms.");
         Assert.True(olcu.yaziKapandi >= 1500, $"Tuş yazısı tutma süresinden önce kapandı: {olcu.yaziKapandi} ms < 1500 ms.");
+
+        Kapat("girdi-bindirme.txt");
     }
 
     [KayitFact]
@@ -302,6 +309,8 @@ public sealed class KaydediciGirdiTests
         Assert.Equal("basla fare=True klavye=False | dur", olcu.sonra);
         Assert.Equal("halka 100,100 | gizle", olcu.bindirme);
         Assert.False(olcu.aktif);
+
+        Kapat("girdi-canli.txt");
     }
 
     [Fact]
@@ -342,6 +351,8 @@ public sealed class KaydediciGirdiTests
         Assert.Equal((true, (bool?)true), olcu.yankisiz);
         Assert.Equal(((bool?)true, (bool?)true, (bool?)false), olcu.ana);
         Assert.Equal(("true", "true", "false"), olcu.dosya);
+
+        Kapat("mini-ayar.txt");
     }
 
     [KayitFact]
@@ -404,5 +415,7 @@ public sealed class KaydediciGirdiTests
         Assert.Equal("gizle | tus Ctrl + C | gizle", olcu.bindirme);
         Assert.Equal(((bool?)true, (bool?)true), olcu.imlec);
         Assert.Equal("true", olcu.dosya);
+
+        Kapat("mini-canli.txt");
     }
 }

@@ -31,6 +31,9 @@ public sealed class KaydediciOnizlemeTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static RecorderRequest Istek() => new()
     {
         Platform = RecorderPlatform.Windows,
@@ -138,6 +141,8 @@ public sealed class KaydediciOnizlemeTests
         Assert.InRange(double.Parse(kayitSure, CultureInfo.InvariantCulture), 2.5, 3.5);
         Assert.Single(Directory.GetFiles(Kanit, "*.jpg"));
         Assert.True(File.Exists(bos));
+
+        Kapat("args.txt", "olcu.txt", "onizleme.jpg", "kayit.mkv", "bos.mkv");
     }
 
     [Fact]
@@ -183,5 +188,7 @@ public sealed class KaydediciOnizlemeTests
         Assert.True(olcu.gorunur);
         Assert.False(olcu.bozuk);
         Assert.True(olcu.ayni);
+
+        Kapat("kaynak.jpg", "arayuz.jpg");
     }
 }

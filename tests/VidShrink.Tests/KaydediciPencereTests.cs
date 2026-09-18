@@ -50,6 +50,9 @@ public sealed class KaydediciPencereTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static RecorderRequest Mac(RecorderRegion? pencere) => new()
     {
         Platform = RecorderPlatform.MacOs,
@@ -80,6 +83,8 @@ public sealed class KaydediciPencereTests
         Assert.Contains(tek, s => s.Contains("even"));
         Assert.Contains(eksi, s => s.Contains("negative"));
         Assert.DoesNotContain("-vf", RecorderArguments.Build(Mac(null) with { Target = RecorderTargetKind.Screen }, "/tmp/e.mov"));
+
+        Kapat("mac-pencere.txt");
     }
 
     [Fact]
@@ -213,6 +218,8 @@ public sealed class KaydediciPencereTests
         Assert.Equal(new RecorderRegion(200, 100, 640, 480), olcu.macIstek!.WindowRegion);
         Assert.Equal("crop=640:480:200:100", Deger(olcu.macArgs, "-vf"));
         Assert.Equal("0:none", Deger(olcu.macArgs, "-i"));
+
+        Kapat("secici.txt");
     }
 
     [X11KayitFact]
@@ -262,5 +269,8 @@ public sealed class KaydediciPencereTests
         Assert.Contains($"width={(int)xlogo.Width - (int)xlogo.Width % 2}", metin);
         Assert.Contains($"height={(int)xlogo.Height - (int)xlogo.Height % 2}", metin);
         Assert.InRange(KayitKanit.Duration(metin) ?? 0, 1.2, 4.0);
+
+        Kapat("x11-liste.txt");
+        KayitKanit.Kapat("x11-pencere.mkv", "x11-pencere.ffprobe.txt", "x11-olmayan.mkv");
     }
 }

@@ -31,6 +31,9 @@ public sealed class KayitBolmeTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static RecorderRequest Istek() => new()
     {
         Platform = RecorderPlatform.Windows,
@@ -103,5 +106,8 @@ public sealed class KayitBolmeTests
         Assert.Equal(0, Oynar(yarimMp4.OutputPath));
         Assert.Equal(Oynar(yarim.OutputPath) > 0, RecorderArguments.SurvivesKill(RecorderContainer.Mkv));
         Assert.Equal(Oynar(yarimMp4.OutputPath) > 0, RecorderArguments.SurvivesKill(RecorderContainer.Mp4));
+
+        Kapat((bolunmus.Files ?? Array.Empty<string>()).Select(Path.GetFileName)
+            .Concat(new[] { "olcu.txt", "bolunmus.mkv", "tek.mkv", "yarim.mkv", "yarim.mp4" }).ToArray()!);
     }
 }

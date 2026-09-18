@@ -23,6 +23,9 @@ public sealed class KayitOdakTakibiTests
     private static readonly string Kanit = Path.GetFullPath(Path.Combine(
         AppContext.BaseDirectory, "..", "..", "..", "..", "..", ".calisma", "paket-2b", "odak"));
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static void Dongu(Func<bool> bitti, double saniye)
     {
         var saat = Stopwatch.StartNew();
@@ -78,6 +81,8 @@ public sealed class KayitOdakTakibiTests
         Assert.Equal(0, olcu.Item1);
         Assert.Equal(0, olcu.Item2);
         Assert.Equal(olcu.once, olcu.sonra);
+
+        Kapat("kapali.mkv");
     }
 
     [Fact]
@@ -104,6 +109,8 @@ public sealed class KayitOdakTakibiTests
 
         Assert.Equal(1, olcu.acikSayi);
         Assert.Equal(1, olcu.kapaliSonra);
+
+        Kapat("oynatici.mkv");
     }
 
     [Fact]
@@ -132,6 +139,8 @@ public sealed class KayitOdakTakibiTests
 
         Assert.Equal(new[] { dosya }, olcu.gelen);
         Assert.True(olcu.kurulu, "Ana pencere kaydedicinin teslim kapisini kurmadi.");
+
+        Kapat("teslim.mkv");
     }
 
     [Fact]
@@ -167,5 +176,7 @@ public sealed class KayitOdakTakibiTests
         Assert.Equal(dosya, olcu.oynatici);
         Assert.False(olcu.oynuyor);
         Assert.Equal(olcu.kayitSekmesi, olcu.sekme);
+
+        Kapat("acik.mkv", "acik.txt");
     }
 }

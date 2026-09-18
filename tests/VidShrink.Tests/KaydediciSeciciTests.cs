@@ -25,6 +25,9 @@ public sealed class KaydediciSeciciTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static readonly PixelRect Masaustu = new(0, 0, 1024, 768);
 
     private static string? Dosyada(string dosya, string anahtar)
@@ -103,6 +106,8 @@ public sealed class KaydediciSeciciTests
         Assert.Equal(Array.IndexOf(RegionDraw.Aspects, "16:9"), olcu.aspect);
         Assert.False(olcu.vazgecildi);
         Assert.Equal("640", olcu.vazgecKutu);
+
+        Kapat("bolge-cizme.txt");
     }
 
     [Fact]
@@ -131,6 +136,8 @@ public sealed class KaydediciSeciciTests
         Assert.True(olcu.bitti);
         Assert.Null(olcu.sonuc);
         Assert.False(olcu.acik);
+
+        Kapat("cizim-penceresi.txt");
     }
 
     [Fact]
@@ -184,6 +191,8 @@ public sealed class KaydediciSeciciTests
         Assert.Equal("\"Hesap Makinesi\"", olcu.dosyada);
         Assert.Equal("Hesap Makinesi", olcu.secili);
         Assert.Equal("title=Hesap Makinesi", olcu.girdi);
+
+        Kapat("pencere-secici.txt");
     }
 
     [Fact]
@@ -250,5 +259,7 @@ public sealed class KaydediciSeciciTests
         Assert.True(olcu.gorunur);
         Assert.Equal(("1024", "1920x1080"), (olcu.x, olcu.boyut));
         Assert.Equal("0", olcu.ilkX);
+
+        Kapat("ekran-secimi.txt");
     }
 }

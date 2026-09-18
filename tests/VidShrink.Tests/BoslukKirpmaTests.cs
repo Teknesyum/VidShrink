@@ -30,6 +30,9 @@ public sealed class BoslukKirpmaTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private const string OrnekCikti = """
         [freezedetect @ 000001] lavfi.freezedetect.freeze_start: 2.1
         [freezedetect @ 000001] lavfi.freezedetect.freeze_duration: 2.9
@@ -159,6 +162,8 @@ public sealed class BoslukKirpmaTests
         Assert.True(bos.Ok, bos.Error);
         Assert.Null(bos.Target);
         Assert.Single(Directory.GetFiles(Kanit, "*-trimmed*.mkv"));
+
+        Kapat("olcu.txt", "donuklu.mkv", "donuksuz.mkv", Path.GetFileName(sonuc.Target!));
     }
 
     [Fact]
@@ -199,5 +204,7 @@ public sealed class BoslukKirpmaTests
         Assert.DoesNotContain("x-trimmed.mkv", olcu.yok);
         Assert.NotEmpty(olcu.yok);
         Assert.True(olcu.hataGorunur);
+
+        Kapat("panel.mkv", "panel.gif");
     }
 }
