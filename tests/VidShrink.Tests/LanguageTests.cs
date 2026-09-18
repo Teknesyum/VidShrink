@@ -530,12 +530,15 @@ public sealed class LanguageTests : IDisposable
     /// çevrilmez; teknik terimin Türkçesi İngilizcesiyle aynı yazılıyorsa (<c>CRF</c> ffmpeg
     /// kısaltması, <c>Stereo</c> ve <c>Mono</c> TDK'nın da yazdığı hâlleriyle) uydurma
     /// karşılık yazmaktansa aynı bırakılır. T163 gelişmiş ayarlar paneliyle son üçünü getirdi.
+    /// S9 birim kalıplarını getirdi (<c>MB</c>, <c>kbps</c>, <c>FPS</c>, <c>/100</c>, <c>AI</c>, <c>CRF {0}</c>):
+    /// Türkçe arayüz de bunları İngilizcesiyle aynı yazar; başka dil kendi birimini yazar (fr <c>Mo</c>, ru <c>МБ</c>).
     /// </summary>
     private static readonly string[] SameInEveryLanguage =
     {
         "VidShrink", "FFmpeg", ".NET",
         "CRF", "Stereo", "Mono",
-        "{0} ms"
+        "{0} ms",
+        "MB", "{0} MB", "{0} - {1} MB", "{0} kbps", "{0} FPS", "{0}k", "/100", "{0}/100", "AI", "CRF {0}"
     };
 
     [Fact]

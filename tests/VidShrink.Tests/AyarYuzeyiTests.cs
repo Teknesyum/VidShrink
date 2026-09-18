@@ -218,6 +218,10 @@ public sealed class AyarYuzeyiTests
     /// <para><b>720 pikselde sığma T180'e bağlı:</b> taşmayı orta sütunun taban boyu
     /// (<c>PlanPanelMinHeight</c>) tutuyor ve onu küçültmek karşılaştırma alanının yeniden
     /// tasarımı demek.</para>
+    ///
+    /// <para>S20: katlanmış bölüm özetleri üçnoktayla dar pencerede 10 piksele iniyordu; başlığın
+    /// altında kendi satırına indiler ve sarılıyorlar. Ayar sütunu 975'e uzadı, içerik 915 → 991,
+    /// <b>taşma 297</b>; aralık 292-302, genişliği yine ±5 piksel.</para>
     /// </summary>
     [Fact]
     public void TabanYukseklikteKucultSekmesininTasmasiBuyumuyor()
@@ -276,7 +280,7 @@ public sealed class AyarYuzeyiTests
             $"Plan sütunu ({withoutSettings:0}) artık görüş alanına ({reading.Item3:0}) sığıyor; "
             + "taşmanın kaynağı ayar sütununa döndü, pim yeniden temellendirilmeli.");
 
-        Assert.InRange(reading.Item2 - reading.Item3, 216d, 226d);
+        Assert.InRange(reading.Item2 - reading.Item3, 292d, 302d);
     }
 
     /// <summary>

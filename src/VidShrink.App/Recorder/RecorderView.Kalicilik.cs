@@ -38,8 +38,13 @@ internal partial class RecorderView
 
     private void PersistChoices()
     {
-        if (!_persistReady || _quiet > 0 || _fillingAdvanced || _session is not null) return;
+        if (!_persistReady || _quiet > 0 || _fillingAdvanced) return;
         CollectChoices();
+        SaveChoicesIfChanged();
+    }
+
+    private void SaveChoicesIfChanged()
+    {
         var current = _settings.ToJson();
         if (current.AsSpan().SequenceEqual(_persisted)) return;
         _persisted = current;

@@ -141,7 +141,7 @@ public sealed class SettingsTests
         new("TxtAudioBitrate", s => s.AudioBitrate = "192", w => w.TxtAudioBitrate.Text, "128"),
         new("TxtTrimStart", s => s.TrimStart = "00:00:03", w => w.TxtTrimStart.Text, ""),
         new("TxtTrimEnd", s => s.TrimEnd = "00:01:00", w => w.TxtTrimEnd.Text, ""),
-        new("CmbShareTarget", s => s.ShareTarget = 1, w => w.CmbShareTarget.SelectedIndex, 0),
+        new("ShareTarget", s => s.ShareTarget = 1, w => w.ShareTargetIndex, 0),
         new("CmbShareRetention", s => s.ShareRetention = 2, w => w.CmbShareRetention.SelectedIndex, 0),
         new("ChkAutoUpdate", s => s.AutoUpdate = true, w => w.ChkAutoUpdate.IsChecked, false),
     ];

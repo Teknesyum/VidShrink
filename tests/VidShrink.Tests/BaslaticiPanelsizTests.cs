@@ -328,6 +328,166 @@ public sealed class BaslaticiPanelsizTests
     }
 
     [Fact]
+    public void YuvaButcesiVazgecmeSuresiniBelirler()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+        var a = Path.Combine(kurulum.App, "a.txt");
+
+        var indirme = 0;
+        StagedUpdate? Indir()
+        {
+            Interlocked.Increment(ref indirme);
+            return sahne;
+        }
+
+        long arkaMs;
+        long elleMs;
+        using (MutexTutucu.Baslat(KurulumBekleyeni.Ad(kurulum.App)))
+        {
+            var arkaSaat = Stopwatch.StartNew();
+            var arka = Arka.Baslat(
+                () => KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, false, kurulum.Kilit, Indir, false));
+            var arkaBitti = arka.Bekle(2000);
+            arkaMs = arkaSaat.ElapsedMilliseconds;
+
+            var elleSaat = Stopwatch.StartNew();
+            var elle = Arka.Baslat(
+                () => KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, true, kurulum.Kilit, Indir, false));
+            var elleBitti = elle.Bekle(12000);
+            elleMs = elleSaat.ElapsedMilliseconds;
+
+            _cikti.WriteLine($"yuva-arka-ms\t{arkaMs}\tyuva-elle-ms\t{elleMs}\tindirme\t{Volatile.Read(ref indirme)}");
+            Assert.True(arkaBitti, $"arka plan turu yuva tutuluyorken {arkaMs} ms sonra hâlâ bekliyordu");
+            Assert.True(elleBitti, $"elle yol yuva bütçesini aştı, {elleMs} ms sonra hâlâ bekliyordu");
+            Assert.False(arka.Sonuc);
+            Assert.False(elle.Sonuc);
+            Assert.Equal(0, Volatile.Read(ref indirme));
+            Assert.Equal("v1", File.ReadAllText(a));
+        }
+
+        Assert.True(arkaMs < 900, $"arka plan turu yuva için {arkaMs} ms bekledi; bütçesi sıfır değil");
+        Assert.InRange(elleMs, 2000, 9000);
+
+        var serbest = KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, true, kurulum.Kilit, Indir, false);
+        _cikti.WriteLine($"yuva-bosken\tsonuc\t{serbest}\tindirme\t{Volatile.Read(ref indirme)}\ta.txt\t{File.ReadAllText(a)}\tisaret\t{Isaret(kurulum.App)}");
+        Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(kurulum.App));
+        Assert.Equal(1, Volatile.Read(ref indirme));
+        Assert.Equal("v2", File.ReadAllText(a));
+    }
+
+    [Fact]
+    public void IndirmeKilidiButcesiVazgecmeSuresiniBelirler()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+        var a = Path.Combine(kurulum.App, "a.txt");
+
+        var indirme = 0;
+        StagedUpdate? Indir()
+        {
+            Interlocked.Increment(ref indirme);
+            return sahne;
+        }
+
+        long arkaMs;
+        long elleMs;
+        using (MutexTutucu.Baslat(kurulum.Kilit))
+        {
+            var arkaSaat = Stopwatch.StartNew();
+            var arka = Arka.Baslat(
+                () => KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, false, kurulum.Kilit, Indir, false));
+            var arkaBitti = arka.Bekle(2000);
+            arkaMs = arkaSaat.ElapsedMilliseconds;
+
+            var elleSaat = Stopwatch.StartNew();
+            var elle = Arka.Baslat(
+                () => KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, true, kurulum.Kilit, Indir, false));
+            var elleBitti = elle.Bekle(35000);
+            elleMs = elleSaat.ElapsedMilliseconds;
+
+            _cikti.WriteLine($"indirme-kilidi-arka-ms\t{arkaMs}\tindirme-kilidi-elle-ms\t{elleMs}\tindirme\t{Volatile.Read(ref indirme)}");
+            Assert.True(arkaBitti, $"arka plan turu indirme kilidini {arkaMs} ms boyunca bekledi");
+            Assert.True(elleBitti, $"elle yol indirme kilidi bütçesini aştı, {elleMs} ms sonra hâlâ bekliyordu");
+            Assert.False(arka.Sonuc);
+            Assert.False(elle.Sonuc);
+            Assert.Equal(0, Volatile.Read(ref indirme));
+            Assert.Equal("v1", File.ReadAllText(a));
+        }
+
+        Assert.True(arkaMs < 900, $"arka plan turu indirme kilidi için {arkaMs} ms bekledi; bütçesi sıfır değil");
+        Assert.InRange(elleMs, 15000, 27000);
+
+        var serbest = KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, true, kurulum.Kilit, Indir, false);
+        _cikti.WriteLine($"indirme-kilidi-bosken\tsonuc\t{serbest}\tindirme\t{Volatile.Read(ref indirme)}\ta.txt\t{File.ReadAllText(a)}\tisaret\t{Isaret(kurulum.App)}");
+        Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(kurulum.App));
+        Assert.Equal(1, Volatile.Read(ref indirme));
+        Assert.Equal("v2", File.ReadAllText(a));
+    }
+
+    [Fact]
+    public void ElleKurulumKilidiButcesiVazgecmeSuresiniBelirler()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+        var a = Path.Combine(kurulum.App, "a.txt");
+
+        bool Kur() => KurulumBekleyeni.Kur(
+            kurulum.Kok, kurulum.App, sahne, kurulum.Kilit,
+            KurulumBekleyeni.KurulumBeklemesi(elle: true), KurulumBekleyeni.KurulumKilidi(elle: true));
+
+        long ms;
+        using (MutexTutucu.Baslat(kurulum.Kilit))
+        {
+            var saat = Stopwatch.StartNew();
+            var kurma = Arka.Baslat(Kur);
+            var bitti = kurma.Bekle(35000);
+            ms = saat.ElapsedMilliseconds;
+
+            _cikti.WriteLine($"kurulum-kilidi-elle-ms\t{ms}\tbitti\t{bitti}\ta.txt\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
+            Assert.True(bitti, $"elle kurulum kilidi bütçesini aştı, {ms} ms sonra hâlâ bekliyordu");
+            Assert.False(kurma.Sonuc);
+            Assert.Equal("v1", File.ReadAllText(a));
+            Assert.Null(UpdateCheck.ReadVersionMarker(kurulum.App));
+            Assert.Null(Isaret(kurulum.App));
+        }
+
+        Assert.InRange(ms, 15000, 27000);
+
+        var serbest = Kur();
+        _cikti.WriteLine($"kurulum-kilidi-bosken\tsonuc\t{serbest}\ta.txt\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
+        Assert.Equal("v2", File.ReadAllText(a));
+        Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(kurulum.App));
+    }
+
+    [Fact]
+    public void ArkaPlanKurulumKilidiKisaTutmadaVazgecmez()
+    {
+        using var kurulum = new BekleyenKlasoru();
+        var sahne = kurulum.Sahne("9.9.9", bozuk: false);
+        var a = Path.Combine(kurulum.App, "a.txt");
+
+        var saat = Stopwatch.StartNew();
+        Arka kurma;
+        using (MutexTutucu.Baslat(kurulum.Kilit))
+        {
+            kurma = Arka.Baslat(() => KurulumBekleyeni.Kur(
+                kurulum.Kok, kurulum.App, sahne, kurulum.Kilit,
+                KurulumBekleyeni.KurulumBeklemesi(elle: false), KurulumBekleyeni.KurulumKilidi(elle: false)));
+            Assert.False(kurma.Bekle(6000), "arka plan kurulumu kilidi beklemeden vazgeçti");
+            Assert.Equal("v1", File.ReadAllText(a));
+        }
+
+        Assert.True(kurma.Bekle(25000), "kilit bırakılınca arka plan kurulumu bitmedi");
+        var ms = saat.ElapsedMilliseconds;
+        _cikti.WriteLine($"arka-kurulum-kilidi-ms\t{ms}\ta.txt\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
+        Assert.InRange(ms, 6000, 25000);
+        Assert.Equal("v2", File.ReadAllText(a));
+        Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(kurulum.App));
+    }
+
+
+    [Fact]
     public void DahaYeniSurumEskiyeDusurulmez()
     {
         using var kurulum = new BekleyenKlasoru();
@@ -513,14 +673,14 @@ public sealed class BaslaticiPanelsizTests
         private readonly ManualResetEventSlim _birak = new();
         private readonly Thread _is;
 
-        private MutexTutucu(string ad)
+        private MutexTutucu(string ad, TimeSpan bekleme)
         {
             using var alindi = new ManualResetEventSlim();
             var tuttu = false;
             _is = new Thread(() =>
             {
                 using var mutex = new Mutex(initiallyOwned: false, ad);
-                try { tuttu = mutex.WaitOne(TimeSpan.Zero); }
+                try { tuttu = mutex.WaitOne(bekleme); }
                 catch (AbandonedMutexException) { tuttu = true; }
                 alindi.Set();
                 _birak.Wait();
@@ -531,10 +691,12 @@ public sealed class BaslaticiPanelsizTests
                 }
             }) { IsBackground = true };
             _is.Start();
-            Assert.True(alindi.Wait(5000) && tuttu, $"test {ad} kilidini tutamadı");
+            Assert.True(alindi.Wait(bekleme + TimeSpan.FromSeconds(5)) && tuttu, $"test {ad} kilidini tutamadı");
         }
 
-        internal static MutexTutucu Baslat(string ad) => new(ad);
+        internal static MutexTutucu Baslat(string ad) => new(ad, TimeSpan.Zero);
+
+        internal static MutexTutucu Baslat(string ad, TimeSpan bekleme) => new(ad, bekleme);
 
         public void Dispose()
         {
@@ -571,6 +733,12 @@ public sealed class BaslaticiPanelsizTests
         {
             if (Directory.Exists(Kok)) Directory.Delete(Kok, true);
         }
+    }
+
+    private static string? Isaret(string app)
+    {
+        var yol = Path.Combine(app, UygulamaKlasoruKapisi.HataIsareti);
+        return File.Exists(yol) ? File.ReadAllText(yol) : null;
     }
 
     private static bool Bekle(Func<bool> kosul, int ms)

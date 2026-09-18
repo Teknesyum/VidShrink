@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Concurrent;
 using VidShrink.Core;
@@ -111,7 +111,7 @@ public sealed class EncodeRunner
         SceneMap? scenes = null)
     {
         if (plan.ModeEnum == EncodeMode.PassThrough)
-            return PassThrough(info, plan, outputPath);
+            return await PassThroughAsync(info, plan, outputPath, progress, ct);
 
         if (VideoFilterChain.NeedsInterlaceProbe(info, plan.Filters))
         {
@@ -381,13 +381,13 @@ public sealed class EncodeRunner
                         KeepSmallestOver(partialPath, actualMb, current, dropped);
                         if (floorStep is not null) Iz(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
                         if (guardStep is not null) Iz(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
-                        current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
+                        current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, current.EffectiveDurationSeconds(info.DurationSeconds));
                         continue;
                     }
 
                     var targetBytes = (long)Math.Floor(effectiveTargetMb * 1024 * 1024);
                     IReadOnlyList<TrimPlan> trims = Array.Empty<TrimPlan>();
-                    if (OvershootTrim.Offered(actualMb, effectiveTargetMb))
+                    if (OvershootTrim.Offered(current, actualMb, effectiveTargetMb))
                     {
                         var map = await OvershootTrimmer.ReadAsync(partialPath, ct);
                         if (map is not null) trims = OvershootTrimmer.PlanAll(map, targetBytes);
@@ -471,15 +471,26 @@ public sealed class EncodeRunner
         }
     }
 
-    private static EncodeResult PassThrough(MediaInfo info, EncodePlan plan, string outputPath)
+    private static async Task<EncodeResult> PassThroughAsync(
+        MediaInfo info, EncodePlan plan, string outputPath, IProgress<EncodeProgress>? progress, CancellationToken ct)
     {
         var sourceExtension = Path.GetExtension(info.FilePath);
         var deliveredPath = string.IsNullOrEmpty(sourceExtension) || sourceExtension.Equals(Path.GetExtension(outputPath), StringComparison.OrdinalIgnoreCase)
             ? outputPath
             : Path.ChangeExtension(outputPath, sourceExtension);
 
-        if (!string.Equals(Path.GetFullPath(info.FilePath), Path.GetFullPath(deliveredPath), StringComparison.OrdinalIgnoreCase))
+        if (plan.Trim is { } trim)
+        {
+            var outcome = await RunCommandAsync(
+                FfmpegArguments.BuildTrimCopy(info, trim, deliveredPath),
+                trim.DurationSeconds, progress, "pass-through trim", 0, 1, ct);
+            if (outcome.ExitCode != 0)
+                throw new InvalidOperationException("Kesit akis kopyasiyla paketlenemedi: " + string.Join(Environment.NewLine, outcome.Tail));
+        }
+        else if (!string.Equals(Path.GetFullPath(info.FilePath), Path.GetFullPath(deliveredPath), StringComparison.OrdinalIgnoreCase))
+        {
             File.Copy(info.FilePath, deliveredPath, overwrite: true);
+        }
 
         var mb = new FileInfo(deliveredPath).Length / 1024.0 / 1024.0;
         var trace = new List<EncodeAttempt> { new(1, "pass-through", mb, mb, plan.VideoBitrateK, plan.Mode) };

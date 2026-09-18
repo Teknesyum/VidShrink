@@ -443,12 +443,37 @@ internal partial class PlayerView : UserControl
         folder.Click += OnPickScreenshotFolder;
         items.Add(folder);
         items.Add(AdvancedMenu());
-        items.Add(new Separator());
-
-        var all = new MenuItem { Header = Strings.Get("main.player.menu.settings-all"), Tag = Keymap.Settings };
-        all.Click += OnMenuRow;
-        items.Add(all);
+        items.Add(ShortcutsMenu());
         return items;
+    }
+
+    /// <summary>
+    /// P3: Ayarlar sekmesindeki oynatıcı kısayolları bölümü menüde alt menü. Satır tablodan
+    /// (<see cref="Keymap.Rows"/>) gelir; sekmeye götüren <see cref="Keymap.Settings"/> eylemi
+    /// tabloda değil yalnız <see cref="Keymap.MenuActions"/>'da olduğu için menüde kendiliğinden
+    /// yok — D1'de bu satırları süzen ölü koşul kaldırıldı.
+    /// </summary>
+    internal MenuItem ShortcutsMenu()
+    {
+        var menu = new MenuItem { Header = Strings.Get("settings.player-shortcuts.title") };
+        foreach (var row in Keymap.Rows)
+        {
+            var item = new MenuItem { Tag = row.Action };
+            if (row.Input.Kind == PlayerInputKind.Key)
+            {
+                item.Header = Keymap.Label(row);
+                item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
+            }
+            else
+            {
+                item.Header = Keymap.Label(row) + " (" + Keymap.Gesture(row.Input) + ")";
+            }
+
+            item.Click += OnMenuRow;
+            menu.Items.Add(item);
+        }
+
+        return menu;
     }
 
     private void OnMenuRow(object? sender, RoutedEventArgs e)

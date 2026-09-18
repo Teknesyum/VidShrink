@@ -1,3 +1,41 @@
+# Yol B: Kabuk Kalemleri (P14, P3, S9, K4, S14, S20)
+
+Dal `t0/yol-b-kabuk`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 7. bölüm satır 3, 4, 5, 6, 13, 12.
+
+1. **P14.** Üst barın açılma bölgesi `TitleBar.Height` yerine alt şeridin bandı: `PlaybackHoverZoneShare` x oynatıcı
+   yüzeyi yüksekliği, pencerenin üst kenarından. `OynaticiYolHaritasiTests` ham fare hareketiyle iki eşiği ölçer.
+2. **P3.** Sağ tık Ayarlar alt menüsünde "Tüm ayarlar" sekmeye gitmez; yerine Ayarlar sekmesindeki oynatıcı
+   bölümü (Kısayollar) alt menü olur. Ham sağ tık + ok/Enter ile Gelişmiş ayar değişir, motordan okunur.
+3. **S9.** `MainWindow`'daki birim ve kısaltmalar (MB, /100, CRF, kbps, FPS) `Locales/*/main.json`'a, 42 dil;
+   `BaslikKapsamiTests` sayım pinleri ve cümlesi (dosya `BiciminTests.cs`, sınıf `BaslikKapsamiTests`;
+   `KareYerlesimTests.BirimlerDilDosyasindanGelir` kolları ayrı sınıfta).
+4. **K4.** Teknesyum imzası `IconCode` atom yerine `<>`, `IkonKutusuTests` kuralları içinde.
+5. **S14.** `CmbShareTarget` radyo şeridine (hedefler dosyadan, kodda kurulur); `AyarRadyoSeridiTests` bütün
+   Ayarlar sekmesini tarar, negatif kontrol iki seçenekli kutuyu yakalar.
+6. **S20.** Başsız pencerede TR ve EN açıkça seçilir, her sekmede metin ölçüsü > kutu taraması; bulunanlar düzeltilir.
+
+### Denetim borçları (denetçi hükmü KALDI, 2026-09-17)
+
+7. **KRİTİK.** `RevealSerit` kapısı `Opacity <= 0` kalmıştı; `2f53535f` yalnız testin ön koşulunu
+   gevşetmişti, üretim toleransı dalda yoktu. `origin/main` birleşmesi `16572f03`'ü getirdi; P26
+   kalıntı saydamlık zorlanmış halde koşulup pimlendi.
+8. **ORTA 1.** Sayım pinlerinin sınıf etiketi: pinler `BaslikKapsamiTests`'te, belgelerde
+   `BiciminTests` deniyordu. Filtrenin ne koşturduğu ölçülüp etiket düzeltildi.
+9. **ORTA 2.** `AdVeBirimYazimiCumleOrtasindaDaKorunur` docstring'inin son adımı kurguydu
+   (main'le birleşme iddiası). Gerçek türetmeyle değiştirildi.
+10. **ORTA 3.** `S20` sarmalanan metni atlıyordu (`TextWrapping=Wrap` taramadan çıkıyor).
+    Taşma ve gerçek yükseklik ölçümleri çürüdü (kap içerikle büyüyor, hiçbir atada `ClipToBounds`
+    yok); ölçülen davranış **sıkışma**. `DilTara`'ya yuvasında tek olan sarmalanan blok için
+    sıkışma kolu eklendi (taban 84 blok, 0 sıkışma); `Width=60` mutasyonu 12 kolun 6'sını kırmızıya
+    çevirdi, eskiden 0'ını çeviriyordu.
+11. **ORTA 4.** Denetçinin bildirdiği kök neden ölçümle çürüdü (`.mov` kolu yerelde 15/15 ve 12/12
+    yeşil). Ölçümde aynı ailede gerçek kusur bulundu: oturum açıkken ana panelde değişen ayar
+    sessizce yutuluyordu, mini panel bunu kendi beş kutusu için yinelenmiş dalla telafi ediyordu.
+    İki yol tek `SaveChoicesIfChanged`'e indi, `PersistChoices` kapısından `_session` çıktı,
+    `OturumSurerkenDegisenAyarDiskeYazilir` pimledi; `Sec` yardımcısı artık `Yaz` gibi boşaltıyor.
+12. **ORTA 5.** `origin/main` dala birleşti; 42 dil katalogu birleşim, anahtar kaybı yok.
+13. **DÜŞÜK.** `BirimlerDilDosyasindanGelir` sabit `"/100"` yerine katalogdan okur.
+
 # Bütçe Doldurmanın İkinci Tam Kodlaması ve B5 İlk-Deneme Ölçümü
 
 Dal `t0/butce-ikinci-kodlama`. Soru iki başlıkta aynı kökten: ürünün bütçe arama
@@ -842,3 +880,45 @@ Dal `t0/hb-1c-akis`.
 6. App: gelişmiş ses bölümünde "İzleri koru" kutusu (42 dil), çıktı uzantısı plandan, platform çipi bayrağı.
 7. Test `StreamMappingTests.cs`: ffmpeg ile 3 sn girdi (2 ses + srt + PGS + 2 bölüm + başlık/tarih; ayrıca
    dönük MP4), çıktı ffprobe ile okunur; çok izli girdide hedef isabeti; her kolun negatif kontrolü.
+
+# Plan — Küçültmede Aralık (HandBrake Açığı, Madde 54)
+
+Dal: `t0/hb-acik-kalan`, taban `e962538e`. Karar kaynağı:
+`docs/danisma/2026-09-18-fable-kucultmede-aralik.md` (S1–S6).
+
+## Sorun
+
+HandBrake `--start-at`/`--stop-at` ile kesit küçültüyor. VidShrink'in küçültme yolunda
+aralık **hiç yok**: `EncodePlan`'de Start/End/Trim alanı bulunmuyor, `-ss` yalnız
+`FfmpegArguments.BuildSegment`'te (ölçüm parçası) var ve üretimde çağıran yok.
+`ConversionPlan.Start/End` dönüştürücü yolunda; hedef boyut hesabı yapmıyor.
+Sonuç: kullanıcı bir kesiti hedef boyuta sıkıştıramıyor.
+
+## Adımlar
+
+1. `src/VidShrink.Core/TrimWindow.cs` (yeni) — `TrimWindow(double StartSeconds, double
+   EndSeconds)`; `DurationSeconds`, melez arama bölüşümü (`LeadSeconds`/`RemainderSeconds`,
+   `SeekLeadSeconds = 10.0`), `Apply(MediaInfo)` süreyi ve kaynak baytını süre oranıyla
+   ölçekler (S2).
+2. `EncodePlan.cs` — `Trim` alanı + `Clone()`.
+3. `PlanCalculator.cs` — `PlanOptions.Trim`; `BuildDetailed` hesabı `Trim.Apply(info)`
+   üstünden kurar, böylece rejim/oran/karmaşıklık/bütçe kesit süresinden türer (S2).
+4. `FfmpegArguments.cs` — aralık varken `-ss lead` girdiden **önce**, `-ss remainder` ve
+   `-t duration` girdiden **sonra** (S1, S3).
+5. `StreamMapping.cs` — aralık varken `-map_chapters -1` (S4).
+6. `EncodeRunner.cs` — `OvershootTrim` aralıklı planda devre dışı; `PlanCalculator.Correct`
+   kesit süresini alır (S5).
+7. `src/VidShrink.Cli` — `--kes <bas>-<son>` bayrağı, `kucult` ve `plan` komutlarında.
+8. `tests/VidShrink.Tests/KucultmeAraligiTests.cs` — S6'nın üç ilişki pimi:
+   konum+toplam eşitliği, `-t == End − Start`, bit hızının kesit süresiyle ters oranı.
+
+## Ölçüm
+
+Yerelde kısa sıralı doğrulama: 20 sn kaynaktan 6 sn kesit, hedef boyut tutuyor mu,
+çıktı süresi ve başlangıç karesi doğru mu. Izgara yok, CI hücresi gerekmiyor.
+
+## Borç
+
+S1'in geri gitme payı (10 sn) üretim `-g` tavanından türetildi; gerçek kaynak I-kare
+aralığı ölçülmedi (fable "ölçülmeli" dedi). S2'nin süre-oranı sezgisinin VBR kaynakta
+kaç fazladan deneme turu yediği ölçülmedi.

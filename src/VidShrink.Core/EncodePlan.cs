@@ -119,6 +119,17 @@ public sealed class EncodePlan
     [JsonIgnore] public double NonVideoK => Streams?.SideK ?? AudioBitrateK;
 
     /// <summary>
+    /// Kullanicinin kucultmek istedigi kesit; <c>null</c> "tum video" demektir. Doluysa
+    /// hedef boyut kesitin ciktisina uygulanir, bit hizi kesit suresinden hesaplanir ve
+    /// <see cref="OvershootTrim"/> devre disi kalir (fable 2026-09-18, S2 ve S5).
+    /// </summary>
+    [JsonIgnore] public TrimWindow? Trim { get; set; }
+
+    /// <summary>Kesit suresi; kesit yoksa <paramref name="sourceDurationSeconds"/>.</summary>
+    public double EffectiveDurationSeconds(double sourceDurationSeconds)
+        => Trim?.DurationSeconds ?? sourceDurationSeconds;
+
+    /// <summary>
     /// Plandaki kodlayıcı <b>ölçülmemiş</b> bir adaydan geldi: yoklama henüz cevap
     /// vermediği için aday elenmeden geçirildi ve seçim geçicidir. Bu plana bakıp
     /// "bu makinede donanım kodlayıcı var" denemez; ölçüm gelince hesap yenilenir.

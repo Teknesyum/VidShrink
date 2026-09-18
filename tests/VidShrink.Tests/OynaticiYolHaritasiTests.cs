@@ -361,15 +361,17 @@ public sealed class OynaticiYolHaritasiTests
             cmbTema.SelectedIndex = once;
             DenetimSurucu.Wait(view, 0.2);
 
-            var tumu = cocuklar.Single(c => ReferenceEquals(c.Tag, Keymap.Settings));
-            tumu.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent) { Source = tumu });
-            DenetimSurucu.Wait(view, 0.2);
-            body.AppendLine($"tum ayarlar tiklandi: sekme ayarlar {ReferenceEquals(window.Tabs.SelectedItem, window.TabSettings)}");
-            var sekmeAcildi = ReferenceEquals(window.Tabs.SelectedItem, window.TabSettings);
+            var sekmeyeGiden = cocuklar.Count(c => ReferenceEquals(c.Tag, Keymap.Settings));
+            var kisayollar = cocuklar.SingleOrDefault(c => (string?)c.Header == Strings.Get("settings.player-shortcuts.title"));
+            var kisayolSatiri = kisayollar?.Items.OfType<MenuItem>().Count() ?? 0;
+            body.AppendLine($"sekmeye giden satir {sekmeyeGiden}; kisayollar alt menusu {kisayollar is not null}, satir {kisayolSatiri}, tablo {Keymap.Rows.Count}");
 
             window.Close();
             Assert.True(temaTutti, "tema satiri ayarlar kutusunu degistirmedi");
-            Assert.True(sekmeAcildi, "tum ayarlar satiri ayarlar sekmesini acmadi");
+            Assert.Equal(0, sekmeyeGiden);
+            Assert.NotNull(kisayollar);
+            Assert.Equal(Keymap.Rows.Count, kisayolSatiri);
+            Assert.DoesNotContain(Keymap.Rows, r => ReferenceEquals(r.Action, Keymap.Settings));
             return 0;
         });
         }
@@ -481,6 +483,88 @@ public sealed class OynaticiYolHaritasiTests
         finally
         {
             YolKanit.Write("p14-ust-bar-gizlenme.txt", body.ToString());
+        }
+    }
+
+    /// <summary>
+    /// O1: iki barin birbirine esitligi mutasyona olu — <c>HoverZone.Band</c> yariya
+    /// indirilirse iki esik de ayni oranda kuculur ve esitlik korunur. Bu yuzden esik
+    /// mutlak olarak da pimlendi: bant yuzey yuksekliginin dortte biri
+    /// (<c>PlaybackHoverZoneShare</c> = 0,25), iki esik de o sayinin 1 px komsulugunda.
+    /// </summary>
+    [Fact]
+    public void P14UstBarVeAltSeritAyniMesafedeAcilir()
+    {
+        var body = new StringBuilder();
+        try
+        {
+        AppHost.Run(() =>
+        {
+            var kok = Path.Combine(YolKanit.Folder, "p14-esik");
+            Directory.CreateDirectory(kok);
+            var klip = Path.Combine(kok, "sahte.mp4");
+            File.WriteAllBytes(klip, new byte[16]);
+            var motor = new YolMotoru();
+            var window = new MainWindow { SettingsPathOverride = Path.Combine(kok, "settings.json"), Width = 1280, Height = 800, WindowState = WindowState.Normal };
+            var view = window.PlayerTab;
+            view.EngineFactory = () => motor;
+            window.Show();
+            DenetimSurucu.Wait(view, 0.3);
+            var ac = window.OpenInPlayerAsync(klip);
+            DenetimSurucu.Pump(view, () => ac.IsCompleted, 10);
+            DenetimSurucu.Wait(view, 0.3);
+            if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
+
+            var ustSaat = new ElleSaat();
+            var altSaat = new ElleSaat();
+            window.ChromeZone.Clock = ustSaat;
+            view.SeritZone.Clock = altSaat;
+            var yuzey = view.FindControl<Panel>("Surface")!;
+            var alt = yuzey.TranslatePoint(new Point(0, yuzey.Bounds.Height), window)!.Value.Y;
+            var orta = new Point(640, alt / 2);
+            body.AppendLine($"yuzey yuksekligi {YolKanit.N(yuzey.Bounds.Height)}, alt kenar {YolKanit.N(alt)}, baslik {YolKanit.N(window.TitleBar.Height)}, bant {YolKanit.N(view.RevealBand)}");
+
+            int Esik(string ad, Func<int, Point> nokta, Func<bool> acik, ElleSaat saat)
+            {
+                bool Dene(int d)
+                {
+                    Hareket(window, view, nokta(1));
+                    Hareket(window, view, orta);
+                    saat.Ates();
+                    DenetimSurucu.Wait(view, 0.02);
+                    Assert.False(acik(), ad + " ortada kapanmadi");
+                    Hareket(window, view, nokta(d));
+                    DenetimSurucu.Wait(view, 0.02);
+                    return acik();
+                }
+
+                var d = 1;
+                Assert.True(Dene(d), ad + " kenarda acilmadi");
+                while (d < 400 && Dene(d + 8)) d += 8;
+                while (Dene(d + 1)) d++;
+                body.AppendLine($"{ad}: son acan mesafe {d} px");
+                return d;
+            }
+
+            var ust = Esik("ust bar", d => new Point(640, d), () => window.ChromeShown, ustSaat);
+            var altEsik = Esik("alt serit", d => new Point(640, alt - d), () => view.SeritRevealed, altSaat);
+            var bant = view.RevealBand;
+            var yuzeyYuksekligi = yuzey.Bounds.Height;
+            var baslik = window.TitleBar.Height;
+            window.Close();
+
+            Assert.True(Math.Abs(ust - altEsik) <= 1, $"ust {ust} px, alt {altEsik} px" + Environment.NewLine + body);
+            Assert.True(Math.Abs(ust - bant) <= 1, $"ust {ust} px, bant {YolKanit.N(bant)}");
+            Assert.True(ust > baslik + 1, $"ust esik baslik yuksekliginde kaldi: {ust} <= {YolKanit.N(baslik)}");
+            Assert.Equal(yuzeyYuksekligi * 0.25, bant, 1);
+            Assert.InRange(ust, yuzeyYuksekligi * 0.25 - 1, yuzeyYuksekligi * 0.25 + 1);
+            Assert.InRange(altEsik, yuzeyYuksekligi * 0.25 - 1, yuzeyYuksekligi * 0.25 + 1);
+            return 0;
+        });
+        }
+        finally
+        {
+            YolKanit.Write("p14-acilma-esigi.txt", body.ToString());
         }
     }
 
@@ -748,6 +832,22 @@ public sealed class OynaticiYolHaritasiTests
         }
     }
 
+    /// <summary>
+    /// <para>P26 kapısı kalıntı saydamlıkla ölçülür. Dalın <c>2f53535f</c> commit'i yalnız bu testin
+    /// ön koşulunu <c>Opacity &lt;= 0</c>'dan <c>&lt; 0.001</c>'e gevşetmişti; üretimdeki
+    /// <c>RevealSerit</c> kapısı <c>&lt;= 0</c> kalmıştı, yani gevşetme yerelde hiçbir şey ölçmüyordu.
+    /// Üretim toleransı <c>main</c>'in <c>16572f03</c>'ünden birleşmeyle geldi.</para>
+    ///
+    /// <para>Yerelde kapanış geçişi tam 0'a iniyor, bu yüzden kusur görünmüyordu: CI koşumu
+    /// 35257391781 kalıntıyı <c>9.18867375793824E-89</c> olarak ölçtü. Kalıntı geçişten
+    /// üretilemiyor — <c>DoubleTransition</c> hedefe <c>from + (to-from)*1</c> ile varıp tam 0
+    /// yazıyor. Bu yüzden <c>SeritAcilisi</c> kapanıştan sonra şeridin saydamlık geçişini kapatıp
+    /// kalıntıyı doğrudan yazar; ölçüm artık kayan nokta kuyruğunun rastlantısına bağlı değil.
+    /// A/B ölçüldü: kapı <c>&lt; 0.001</c> iken yeşil (<c>maskeli ornek 8, maske kalkti True</c>),
+    /// kapı <c>&lt;= 0</c>'a döndürülünce kırmızı (<c>yayilma yok: serit bir anda acildi</c>,
+    /// <c>maskeli ornek 0</c>). Gevşetilmiş ön koşul kalır: kalıntı zorlandığı için tek doğru
+    /// biçim odur, <c>&lt;= 0</c> ön koşulu artık testin kendi girdisini reddeder.</para>
+    /// </summary>
     [Fact]
     public void P26SeritFareyeYakinKisimdanYayilarakAcilir()
     {
@@ -806,9 +906,11 @@ public sealed class OynaticiYolHaritasiTests
             saat.Ates();
             return serit.Opacity < 0.001;
         }, 10);
+        serit.Transitions = null;
+        serit.Opacity = 9.18867375793824e-89;
         string Alan(string ad) => typeof(HoverZone).GetField(ad, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(view.SeritZone)!.ToString()!;
         var neden = $"oynuyor {view.IsPlaying}, fare icinde {Alan("_pointerInside")}, tutuluyor {Alan("_held")}, gorunur {Alan("_visible")}, yuzey {YolKanit.N(yuzey.Bounds.Height)}";
-        body.AppendLine($"[hareket azaltilmis {azalt}] kapali serit saydamligi {YolKanit.N(serit.Opacity)}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms, {neden}");
+        body.AppendLine($"[hareket azaltilmis {azalt}] kapali serit saydamligi {serit.Opacity:E3}, MotionInstant {Sure(view, "MotionInstant").TotalMilliseconds} ms, {neden}");
         Assert.True(serit.Opacity < 0.001, $"on kosul: serit kapanmadi, saydamlik {serit.Opacity}, {neden}");
 
         var seritSol = serit.TranslatePoint(new Point(0, 0), window)!.Value;

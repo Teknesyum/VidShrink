@@ -397,6 +397,27 @@ public static class FfmpegArguments
     public static bool BenefitsFromHardwareDecode(string? videoCodec)
         => videoCodec is not null && HardwareDecodedCodecs.Contains(videoCodec);
 
+    private static string Seconds(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Kesit passthrough'a dustugunde kaynagi oldugu gibi kopyalamak araligi kaybettirir;
+    /// pencere akis kopyasiyla yeniden paketlenir. Arama ayni melez duzen
+    /// (<c>docs/danisma/2026-09-18-fable-kucultmede-aralik.md</c> S1), kodlama yok.
+    /// </summary>
+    public static IReadOnlyList<string> BuildTrimCopy(MediaInfo info, TrimWindow trim, string outputPath)
+    {
+        var a = new List<string> { "-hide_banner", "-y" };
+        if (trim.LeadSeconds > 0) a.AddRange(new[] { "-ss", Seconds(trim.LeadSeconds) });
+        a.AddRange(new[] { "-i", info.FilePath });
+        a.AddRange(new[] { "-ss", Seconds(trim.RemainderSeconds) });
+        a.AddRange(new[] { "-t", Seconds(trim.DurationSeconds) });
+        a.AddRange(new[] { "-map", "0", "-c", "copy", "-map_metadata", "0", "-map_chapters", "-1" });
+        if (Path.GetExtension(outputPath).Equals(".mp4", StringComparison.OrdinalIgnoreCase))
+            a.AddRange(new[] { "-movflags", "+faststart" });
+        a.Add(outputPath);
+        return a;
+    }
+
     public static IReadOnlyList<string> HardwareDecodeArgs(string? videoCodec)
         => BenefitsFromHardwareDecode(videoCodec) ? new[] { "-hwaccel", "auto" } : Array.Empty<string>();
 
@@ -404,7 +425,17 @@ public static class FfmpegArguments
     {
         var a = new List<string> { "-hide_banner", "-y" };
         a.AddRange(HardwareDecodeArgs(info.VideoCodec));
-        a.AddRange(new[] { "-i", info.FilePath });
+        if (plan.Trim is { } trim)
+        {
+            if (trim.LeadSeconds > 0) a.AddRange(new[] { "-ss", Seconds(trim.LeadSeconds) });
+            a.AddRange(new[] { "-i", info.FilePath });
+            a.AddRange(new[] { "-ss", Seconds(trim.RemainderSeconds) });
+            a.AddRange(new[] { "-t", Seconds(trim.DurationSeconds) });
+        }
+        else
+        {
+            a.AddRange(new[] { "-i", info.FilePath });
+        }
 
         var filters = VideoFilterChain.Filters(info, plan);
         if (filters.Count > 0)
@@ -460,7 +491,7 @@ public static class FfmpegArguments
             return MergeEncoderParams(a);
         }
 
-        a.AddRange(streams.OutputArguments());
+        a.AddRange(streams.OutputArguments(dropChapters: plan.Trim is not null));
         if (streams.Container == OutputContainer.Mp4)
             a.AddRange(new[] { "-movflags", "+faststart" });
         a.AddRange(plan.ExtraArgs);
@@ -564,6 +595,13 @@ public static class FfmpegArguments
     /// </summary>
     public static IReadOnlyList<string> BuildSegment(MediaInfo info, EncodePlan plan, double startSeconds, double durationSeconds, string outputPath, IEncoderAvailability? availability = null, SceneMap? scenes = null)
     {
+        if (plan.Trim is { } window)
+        {
+            var flat = plan.Clone();
+            flat.Trim = null;
+            return BuildSegment(info, flat, window.StartSeconds + startSeconds, durationSeconds, outputPath, availability, scenes);
+        }
+
         var a = new List<string>(Build(info, plan, outputPath, 0, null, availability, scenes));
         var input = a.IndexOf("-i");
         if (input < 0) throw new InvalidOperationException("Arguman dizisinde girdi bayragi yok.");

@@ -30,10 +30,22 @@ namespace VidShrink.Launcher;
 /// sessizce atlanır, hata işareti yazılmaz: kurulu sürüm sahnenin sürümüne eşit ya da
 /// ondan yeniyse tur eskiye düşürmez. Elle "Yükle" yolu da aynı yuvayı yokluyor ve her
 /// beklemesi kısa: yuva 3 sn, kilitler 20 sn, klasörün boşalması 10 sn, indirme
-/// <see cref="ElleButcesi"/>. Olculen kol yuvanin kisa devresi: yuva baska kopyada
-/// tutuluyorken elle yol 3 sn'de vazgeciyor, uygulama aciliyor, is arka plan turuna
-/// kaliyor (BaslaticiPanelsizTests, 3128 ms). Yuva bostayken kilitlerin ve butcelerin
-/// en kotu toplami olculmedi; bu satir onu garanti etmiyor.
+/// <see cref="ElleButcesi"/>. Üç bekleme bütçesinin her biri ayrı ölçülü ve ölçü
+/// vazgeçme süresini sayıyor: yuva başka kopyada tutuluyorken elle yol 3030 ms'de
+/// vazgeçiyor ve indirmeye hiç girmiyor (<c>YuvaButcesiVazgecmeSuresiniBelirler</c>),
+/// indirme kilidi tutuluyorken 20000 ms'de vazgeçiyor
+/// (<c>IndirmeKilidiButcesiVazgecmeSuresiniBelirler</c>), kurulum kilidi tutuluyorken
+/// 20011 ms'de vazgeçip klasörü eski sürümde bırakıyor
+/// (<c>ElleKurulumKilidiButcesiVazgecmeSuresiniBelirler</c>). Arka plan turunun yuva ve
+/// indirme bütçesi sıfır: aynı düzenekte 0 ms'de vazgeçiyor. Kurulum kilidini ise
+/// kısa tutmada beklemeyi sürdürüyor, kilit bırakılınca kuruyor
+/// (<c>ArkaPlanKurulumKilidiKisaTutmadaVazgecmez</c>). Hangi kolun koştuğunu ölçünün
+/// kendisi kanıtlıyor: indirme sayacı ve klasörün içeriği bekleme boyunca yerinde
+/// duruyor, kilit boşken aynı çağrı yeni sürümü kuruyor. Elle Yükle'nin uygulamayı
+/// doğurma süresinin ortancası 3133 ms
+/// (<c>ElleYukleArkaPlanIndirirkenAcilisiGeciktirmez</c>, n=15, üç ayrı ölçenden;
+/// ölçülen aralık 3098-3308 ms, üst uç paylaşımlı yükte uzuyor ve pimli değil).
+/// Sayılar ve mutasyon tablosu <c>docs/olcumler/bekleme-butceleri.md</c>.
 /// </summary>
 internal static class Updater
 {

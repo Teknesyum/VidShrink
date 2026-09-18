@@ -27,6 +27,14 @@ public static class OvershootTrim
         return Math.Round((actualMb - targetMb) / targetMb * 100.0, 6) <= ThresholdPercent;
     }
 
+    /// <summary>
+    /// Kullanicinin kendi sectigi bir kesit varsa tasma kirpmasi onerilmez: pencerenin
+    /// ucundan sessizce saniye kesmek istegin kendisini bozar
+    /// (docs/danisma/2026-09-18-fable-kucultmede-aralik.md S5).
+    /// </summary>
+    public static bool Offered(EncodePlan plan, double actualMb, double targetMb)
+        => plan.Trim is null && Offered(actualMb, targetMb);
+
     public static TrimPlan? Plan(IReadOnlyList<MediaPacket> packets, long fileBytes, long targetBytes, double durationSeconds, TrimSide side, long extraBytes = 0)
     {
         if (packets.Count == 0 || targetBytes <= 0 || durationSeconds <= 0) return null;

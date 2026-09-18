@@ -1,0 +1,444 @@
+
+$ ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1280x720:rate=30:duration=20 -f lavfi -i sine=frequency=440:duration=20 -c:v libx264 -preset veryfast -b:v 4000k -pix_fmt yuv420p -c:a aac -b:a 128k -shortest kaynak.mp4
+Input #0, lavfi, from 'testsrc2=size=1280x720:rate=30:duration=20':
+  Duration: N/A, start: 0.000000, bitrate: N/A
+  Stream #0:0: Video: wrapped_avframe, yuv420p, 1280x720 [SAR 1:1 DAR 16:9], 30 fps, 30 tbr, 30 tbn
+Input #1, lavfi, from 'sine=frequency=440:duration=20':
+  Duration: N/A, start: 0.000000, bitrate: 705 kb/s
+  Stream #1:0: Audio: pcm_s16le, 44100 Hz, mono, s16, 705 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (wrapped_avframe (native) -> h264 (libx264))
+  Stream #1:0 -> #0:1 (pcm_s16le (native) -> aac (native))
+Press [q] to stop, [?] for help
+[libx264 @ 000001fc586d29c0] using SAR=1/1
+[libx264 @ 000001fc586d29c0] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2 AVX512
+[libx264 @ 000001fc586d29c0] profile High, level 3.1, 4:2:0, 8-bit
+[libx264 @ 000001fc586d29c0] 264 - core 165 r3223 0480cb0 - H.264/MPEG-4 AVC codec - Copyleft 2003-2025 - http://www.videolan.org/x264.html - options: cabac=1 ref=1 deblock=1:0:0 analyse=0x3:0x113 me=hex subme=2 psy=1 psy_rd=1.00:0.00 mixed_ref=0 me_range=16 chroma_me=1 trellis=0 8x8dct=1 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=0 threads=22 lookahead_threads=5 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=3 b_pyramid=2 b_adapt=1 b_bias=0 direct=1 weightb=1 open_gop=0 weightp=1 keyint=250 keyint_min=25 scenecut=40 intra_refresh=0 rc_lookahead=10 rc=abr mbtree=1 bitrate=4000 ratetol=1.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=1:1.00
+Output #0, mp4, to '.calisma/kesit-olcum/kaynak.mp4':
+  Metadata:
+    encoder         : Lavf63.1.100
+  Stream #0:0: Video: h264 (avc1 / 0x31637661), yuv420p(tv, progressive), 1280x720 [SAR 1:1 DAR 16:9], q=2-31, 4000 kb/s, 30 fps, 15360 tbn
+    Metadata:
+      encoder         : Lavc63.1.100 libx264
+    Side data:
+      CPB properties: bitrate max/min/avg: 0/0/4000000 buffer size: 0 vbv_delay: N/A
+  Stream #0:1: Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, mono, fltp, 128 kb/s
+    Metadata:
+      encoder         : Lavc63.1.100 aac
+frame=  269 fps=0.0 q=25.0 size=    4352KiB time=00:00:10.14 bitrate=3513.5kbits/s speed=19.8x elapsed=0:00:00.51    [out#0/mp4 @ 000001fc586b0400] video:9831KiB audio:312KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.216463%
+frame=  600 fps=0.0 q=-1.0 Lsize=   10165KiB time=00:00:20.00 bitrate=4163.6kbits/s speed=24.9x elapsed=0:00:00.80    
+[libx264 @ 000001fc586d29c0] frame I:3     Avg QP: 5.77  size: 32593
+[libx264 @ 000001fc586d29c0] frame P:240   Avg QP:12.44  size: 21371
+[libx264 @ 000001fc586d29c0] frame B:357   Avg QP:23.09  size: 13556
+[libx264 @ 000001fc586d29c0] consecutive B-frames:  2.8% 40.0% 40.5% 16.7%
+[libx264 @ 000001fc586d29c0] mb I  I16..4: 87.9%  0.9% 11.2%
+[libx264 @ 000001fc586d29c0] mb P  I16..4: 11.0%  0.8%  2.4%  P16..4:  3.4%  3.0%  2.2%  0.0%  0.0%    skip:77.2%
+[libx264 @ 000001fc586d29c0] mb B  I16..4:  0.5%  0.0%  0.0%  B16..8:  6.5%  3.7%  1.3%  direct: 1.9%  skip:86.1%  L0:37.9% L1:35.1% BI:27.0%
+[libx264 @ 000001fc586d29c0] final ratefactor: 18.97
+[libx264 @ 000001fc586d29c0] 8x8 transform intra:5.5% inter:9.8%
+[libx264 @ 000001fc586d29c0] coded y,uvDC,uvAC intra: 17.3% 26.3% 24.5% inter: 4.2% 7.4% 6.7%
+[libx264 @ 000001fc586d29c0] i16 v,h,dc,p: 91%  7%  2%  0%
+[libx264 @ 000001fc586d29c0] i8 v,h,dc,ddl,ddr,vr,hd,vl,hu: 12% 23% 38%  9%  2%  2%  3%  5%  5%
+[libx264 @ 000001fc586d29c0] i4 v,h,dc,ddl,ddr,vr,hd,vl,hu: 23% 21% 30%  6%  3%  3%  4%  4%  5%
+[libx264 @ 000001fc586d29c0] i8c dc,h,v,p: 74% 10% 13%  3%
+[libx264 @ 000001fc586d29c0] Weighted P-Frames: Y:0.0% UV:0.0%
+[libx264 @ 000001fc586d29c0] kb/s:4026.54
+[aac @ 000001fc586d8b40] Qavg: 2114.992
+
+$ ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 kaynak.mp4
+duration=20.000000
+size=10409036
+
+$ vidshrink kucult kaynak.mp4 --hedef 3MB --kes 8-14 --cikti kesit3.mp4 --json
+Kaynak okunuyor...
+Sahneler çıkarılıyor...
+Karmaşıklık ölçülüyor...
+Plan kalibre ediliyor...
+100%  pass-through trim  00:00 kaldı
+{
+  "command": "kucult",
+  "input": "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kaynak.mp4",
+  "output": "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kesit3.mp4",
+  "measured": true,
+  "targetMb": 3,
+  "requestedQuality": null,
+  "qualityBound": null,
+  "source": {
+    "sizeMb": 9.927,
+    "durationSeconds": 20,
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "videoCodec": "h264"
+  },
+  "plan": {
+    "codec": "h264",
+    "mode": "passthrough",
+    "videoBitrateK": 4036,
+    "crf": null,
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "preset": "copy",
+    "audioCodec": "aac",
+    "audioBitrateK": 128,
+    "reasonCodes": [
+      "SourceAlreadyUnderTarget"
+    ]
+  },
+  "estimate": {
+    "expectedMb": 2.978,
+    "lowMb": 2.978,
+    "highMb": 2.978,
+    "predictedQuality": 100,
+    "basis": "measured"
+  },
+  "arguments": [
+    "-hide_banner",
+    "-y",
+    "-hwaccel",
+    "auto",
+    "-i",
+    "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kaynak.mp4",
+    "-ss",
+    "8",
+    "-t",
+    "6",
+    "-c:v",
+    "h264",
+    "-preset",
+    "copy",
+    "-b:v",
+    "4036k",
+    "-maxrate",
+    "6054k",
+    "-bufsize",
+    "8072k",
+    "-g",
+    "300",
+    "-keyint_min",
+    "30",
+    "-pix_fmt",
+    "yuv420p",
+    "-map",
+    "0:0",
+    "-map",
+    "0:1",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "128k",
+    "-disposition:a:0",
+    "default",
+    "-map_metadata",
+    "0",
+    "-map_chapters",
+    "-1",
+    "-movflags",
+    "+faststart",
+    "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kesit3.mp4"
+  ],
+  "commandLine": "ffmpeg -hide_banner -y -hwaccel auto -i C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kaynak.mp4 -ss 8 -t 6 -c:v h264 -preset copy -b:v 4036k -maxrate 6054k -bufsize 8072k -g 300 -keyint_min 30 -pix_fmt yuv420p -map 0:0 -map 0:1 -c:a aac -b:a 128k -disposition:a:0 default -map_metadata 0 -map_chapters -1 -movflags +faststart C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kesit3.mp4",
+  "result": {
+    "exitCode": 0,
+    "success": true,
+    "output": "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kesit3.mp4",
+    "outputMb": 2.784,
+    "elapsedSeconds": 0.03,
+    "attempts": 1,
+    "underBand": false,
+    "ceilingExceeded": false,
+    "overTarget": false,
+    "error": null,
+    "vmaf": null,
+    "trace": [
+      {
+        "label": "deneme 1",
+        "number": 1,
+        "branch": "pass-through",
+        "aimMb": 2.784,
+        "actualMb": 2.784,
+        "videoBitrateK": 4036,
+        "mode": "passthrough"
+      }
+    ],
+    "droppedOptions": []
+  }
+}
+
+$ ffprobe -v error -show_entries format=duration,size -show_entries stream=codec_name -of default=noprint_wrappers=1 kesit3.mp4
+codec_name=h264
+codec_name=aac
+duration=6.055782
+size=2919051
+
+$ vidshrink kucult kaynak.mp4 --hedef 1MB --kes 8-14 --cikti kesit1.mp4 --json
+Kaynak okunuyor...
+Sahneler çıkarılıyor...
+Karmaşıklık ölçülüyor...
+Plan kalibre ediliyor...
+ 14%  pass 1/2 (attempt 1)  00:03 kaldı
+ 50%  pass 1/2 (attempt 1)  00:00 kaldı
+ 62%  pass 2/2 (attempt 1)  00:00 kaldı
+ 65%  pass 2/2 (attempt 1)  00:00 kaldı
+100%  pass 2/2 (attempt 1)  00:00 kaldı
+ 14%  pass 1/2 (attempt 2)  00:02 kaldı
+ 50%  pass 1/2 (attempt 2)  00:00 kaldı
+ 61%  pass 2/2 (attempt 2)  00:00 kaldı
+ 65%  pass 2/2 (attempt 2)  00:00 kaldı
+100%  pass 2/2 (attempt 2)  00:00 kaldı
+{
+  "command": "kucult",
+  "input": "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kaynak.mp4",
+  "output": "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kesit1.mp4",
+  "measured": true,
+  "targetMb": 1,
+  "requestedQuality": null,
+  "qualityBound": null,
+  "source": {
+    "sizeMb": 9.927,
+    "durationSeconds": 20,
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "videoCodec": "h264"
+  },
+  "plan": {
+    "codec": "libx264",
+    "mode": "2pass",
+    "videoBitrateK": 1239,
+    "crf": null,
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "preset": "slow",
+    "audioCodec": "aac",
+    "audioBitrateK": 96,
+    "reasonCodes": [
+      "BudgetBelowCeilingTwoPass",
+      "PredictedQualityMeasured"
+    ]
+  },
+  "estimate": {
+    "expectedMb": 0.96,
+    "lowMb": 0.948,
+    "highMb": 0.971,
+    "predictedQuality": 89.38,
+    "basis": "measured"
+  },
+  "arguments": [
+    "-hide_banner",
+    "-y",
+    "-hwaccel",
+    "auto",
+    "-i",
+    "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kaynak.mp4",
+    "-ss",
+    "8",
+    "-t",
+    "6",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "slow",
+    "-b:v",
+    "1239k",
+    "-maxrate",
+    "1858k",
+    "-bufsize",
+    "2478k",
+    "-pass",
+    "2",
+    "-g",
+    "300",
+    "-keyint_min",
+    "30",
+    "-pix_fmt",
+    "yuv420p",
+    "-map",
+    "0:0",
+    "-map",
+    "0:1",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "96k",
+    "-disposition:a:0",
+    "default",
+    "-map_metadata",
+    "0",
+    "-map_chapters",
+    "-1",
+    "-movflags",
+    "+faststart",
+    "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kesit1.mp4"
+  ],
+  "commandLine": "ffmpeg -hide_banner -y -hwaccel auto -i C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kaynak.mp4 -ss 8 -t 6 -c:v libx264 -preset slow -b:v 1239k -maxrate 1858k -bufsize 2478k -pass 2 -g 300 -keyint_min 30 -pix_fmt yuv420p -map 0:0 -map 0:1 -c:a aac -b:a 96k -disposition:a:0 default -map_metadata 0 -map_chapters -1 -movflags +faststart C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kesit1.mp4",
+  "result": {
+    "exitCode": 0,
+    "success": true,
+    "output": "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kesit1.mp4",
+    "outputMb": 0.982,
+    "elapsedSeconds": 2.59,
+    "attempts": 2,
+    "underBand": false,
+    "ceilingExceeded": false,
+    "overTarget": false,
+    "error": null,
+    "vmaf": null,
+    "trace": [
+      {
+        "label": "deneme 1",
+        "number": 1,
+        "branch": "in band",
+        "aimMb": 0.96,
+        "actualMb": 0.959,
+        "videoBitrateK": 1239,
+        "mode": "2pass"
+      },
+      {
+        "label": "deneme 2",
+        "number": 2,
+        "branch": "budget fill, the fuller result delivered",
+        "aimMb": 0.985,
+        "actualMb": 0.982,
+        "videoBitrateK": 1283,
+        "mode": "2pass"
+      }
+    ],
+    "droppedOptions": []
+  }
+}
+
+$ ffprobe -v error -show_entries format=duration,size -show_entries stream=codec_name -of default=noprint_wrappers=1 kesit1.mp4
+codec_name=h264
+codec_name=aac
+duration=6.000000
+size=1030069
+
+$ vidshrink kucult kaynak.mp4 --hedef 1MB --cikti tam1.mp4 --json
+Kaynak okunuyor...
+Sahneler çıkarılıyor...
+Karmaşıklık ölçülüyor...
+Plan kalibre ediliyor...
+ 24%  pass 1/2 (attempt 1)  00:02 kaldı
+ 49%  pass 1/2 (attempt 1)  00:01 kaldı
+ 50%  pass 1/2 (attempt 1)  00:00 kaldı
+ 55%  pass 2/2 (attempt 1)  00:00 kaldı
+ 68%  pass 2/2 (attempt 1)  00:00 kaldı
+ 79%  pass 2/2 (attempt 1)  00:00 kaldı
+ 93%  pass 2/2 (attempt 1)  00:00 kaldı
+100%  pass 2/2 (attempt 1)  00:00 kaldı
+{
+  "command": "kucult",
+  "input": "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kaynak.mp4",
+  "output": "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\tam1.mp4",
+  "measured": true,
+  "targetMb": 1,
+  "requestedQuality": null,
+  "qualityBound": null,
+  "source": {
+    "sizeMb": 9.927,
+    "durationSeconds": 20,
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "videoCodec": "h264"
+  },
+  "plan": {
+    "codec": "libsvtav1",
+    "mode": "2pass",
+    "videoBitrateK": 329,
+    "crf": null,
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "preset": "6",
+    "audioCodec": "aac",
+    "audioBitrateK": 72,
+    "reasonCodes": [
+      "BudgetBelowCeilingTwoPass",
+      "PredictedQualityMeasured"
+    ]
+  },
+  "estimate": {
+    "expectedMb": 0.961,
+    "lowMb": 0.949,
+    "highMb": 0.972,
+    "predictedQuality": 83.07,
+    "basis": "measured"
+  },
+  "arguments": [
+    "-hide_banner",
+    "-y",
+    "-hwaccel",
+    "auto",
+    "-i",
+    "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kaynak.mp4",
+    "-c:v",
+    "libsvtav1",
+    "-preset",
+    "6",
+    "-b:v",
+    "329k",
+    "-pass",
+    "2",
+    "-g",
+    "300",
+    "-svtav1-params",
+    "keyint=300:scd=1:tune=1:enable-variance-boost=0",
+    "-pix_fmt",
+    "yuv420p",
+    "-map",
+    "0:0",
+    "-map",
+    "0:1",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "72k",
+    "-disposition:a:0",
+    "default",
+    "-map_metadata",
+    "0",
+    "-map_chapters",
+    "0",
+    "-movflags",
+    "+faststart",
+    "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\tam1.mp4"
+  ],
+  "commandLine": "ffmpeg -hide_banner -y -hwaccel auto -i C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\kaynak.mp4 -c:v libsvtav1 -preset 6 -b:v 329k -pass 2 -g 300 -svtav1-params keyint=300:scd=1:tune=1:enable-variance-boost=0 -pix_fmt yuv420p -map 0:0 -map 0:1 -c:a aac -b:a 72k -disposition:a:0 default -map_metadata 0 -map_chapters 0 -movflags +faststart C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\tam1.mp4",
+  "result": {
+    "exitCode": 0,
+    "success": true,
+    "output": "C:\\Users\\Administrator\\Desktop\\Projeler\\VidShrink\\.claude\\worktrees\\hb-acik-kalan\\.calisma\\kesit-olcum\\tam1.mp4",
+    "outputMb": 0.979,
+    "elapsedSeconds": 3.55,
+    "attempts": 1,
+    "underBand": false,
+    "ceilingExceeded": false,
+    "overTarget": false,
+    "error": null,
+    "vmaf": null,
+    "trace": [
+      {
+        "label": "deneme 1",
+        "number": 1,
+        "branch": "in band",
+        "aimMb": 0.96,
+        "actualMb": 0.979,
+        "videoBitrateK": 329,
+        "mode": "2pass"
+      }
+    ],
+    "droppedOptions": []
+  }
+}
+
+$ ffprobe -v error -show_entries format=duration,size -show_entries stream=codec_name -of default=noprint_wrappers=1 tam1.mp4
+codec_name=av1
+codec_name=aac
+duration=20.000000
+size=1026857
+
+BITTI

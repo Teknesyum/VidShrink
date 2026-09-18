@@ -594,6 +594,14 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             foreach (var (item, sira) in satirlar.Concat(parcaSatirlari).Select((item, sira) => (item, sira)))
             {
                 var oncekiIz = view.Trace.Count;
+                if (ReferenceEquals(item.Tag, Keymap.Settings))
+                {
+                    var altlar = item.Items.OfType<MenuItem>().Select(child => child.Header?.ToString()).ToList();
+                    body.AppendLine($"satir {sira} '{item.Header}' -> alt menu: {string.Join(" | ", altlar)}");
+                    Assert.Contains(Strings.Get("settings.player-shortcuts.title"), altlar);
+                    continue;
+                }
+
                 Tikla(item.Items.OfType<MenuItem>().FirstOrDefault(child => ReferenceEquals(child.Tag, item.Tag)) ?? item);
                 var uretilen = view.Trace.Skip(oncekiIz).ToList();
                 body.AppendLine($"satir {sira} '{item.Header}' -> {(uretilen.Count == 0 ? "ETKI YOK" : string.Join(" | ", uretilen))}");
@@ -986,7 +994,7 @@ public sealed class OynaticiFareTests
     }
 
     [Fact]
-    public void AyarlarSatiriAyarlarSekmesiniAcar()
+    public void AyarlarAltMenusuSekmeyeGoturmezKisayolSekmeyiAcar()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -995,13 +1003,16 @@ public sealed class OynaticiFareTests
             view.OpenSettings = () => acilan++;
 
             var ayarlar = view.BuildMenu().Items.OfType<MenuItem>().First();
-            var item = ayarlar.Items.OfType<MenuItem>().Single(child => ReferenceEquals(child.Tag, Keymap.Settings));
-            item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent) { Source = item });
+            IEnumerable<MenuItem> Hepsi(MenuItem m) => m.Items.OfType<MenuItem>().SelectMany(c => Hepsi(c).Prepend(c));
+            var sekmeyeGiden = Hepsi(ayarlar).Count(child => ReferenceEquals(child.Tag, Keymap.Settings));
+            view.Apply(Keymap.Settings.ToCommand());
 
-            var body = $"satir 0 basligi: {ayarlar.Header} > {item.Header}{Environment.NewLine}"
+            var body = $"satir 0 basligi: {ayarlar.Header}{Environment.NewLine}"
+                     + $"sekmeye giden satir {sekmeyeGiden}{Environment.NewLine}"
                      + $"ayarlar cagrisi: {acilan}{Environment.NewLine}"
                      + $"iz: {view.Trace[^1]}{Environment.NewLine}";
 
+            Assert.Equal(0, sekmeyeGiden);
             Assert.Equal(1, acilan);
             Assert.Equal("settings -> open", view.Trace[^1]);
 

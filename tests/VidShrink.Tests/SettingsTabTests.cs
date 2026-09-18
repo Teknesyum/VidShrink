@@ -55,7 +55,7 @@ public sealed class SettingsTabTests
     }
 
     /// <summary>
-    /// K: hedef listesi XAML'e sabit yazılmayacak. Açılır kutunun içinde tek bir
+    /// K: hedef listesi XAML'e sabit yazılmayacak. Hedef şeridinin içinde tek bir
     /// <c>ComboBoxItem</c> bulunursa liste dosyadan gelmiyor demektir.
     /// </summary>
     [Fact]
@@ -63,14 +63,14 @@ public sealed class SettingsTabTests
     {
         var settings = Tab("main.tab.settings");
 
-        Assert.Contains("x:Name=\"CmbShareTarget\"", settings, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"ShareTargetStrip\"", settings, StringComparison.Ordinal);
         Assert.DoesNotContain("ComboBoxItem", settings, StringComparison.Ordinal);
         Assert.DoesNotContain("storage.to", settings.Replace(
             "• storage.to carries up to 25 GiB and lets VidShrink delete the file again, so a link can be closed early.",
             "",
             StringComparison.Ordinal),
             StringComparison.Ordinal);
-        Assert.Contains("CmbShareTarget.ItemsSource", WindowCode(), StringComparison.Ordinal);
+        Assert.Contains("foreach (var target in _shareTargets.Targets)", WindowCode(), StringComparison.Ordinal);
     }
 
     /// <summary>Depo kökündeki gerçek <c>paylasim-hedefleri.json</c>.</summary>

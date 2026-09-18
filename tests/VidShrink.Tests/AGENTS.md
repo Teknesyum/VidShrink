@@ -134,7 +134,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   Yavaş bakım kancasında (`VIDSHRINK_BAKIM_GECIKMESI_MS`) başlatıcının görünür penceresi yok (EnumWindows), uygulama hemen doğar;
   kapı tutulurken doğrudan açılan uygulama başlatıcıya devreder; koşan uygulama kapanmadan kopya başlamaz; `.bakim-hatasi` panelde görünür. `KurulumBekleyeni` süreç içinde: klasör başına tek bekleyen
   (ikinci açılış indirmez, beklemez), kurulu sürümde hata yazılmaz (bozuk sahne negatif kontrol), daha yeni sürüm eskiye
-  düşürülmez, `Kur` dışarıdan verilen beklemeyi aşmaz, elle Yükle 20 sn'lik dış sınırın içinde bırakır, prova kipi kurmaz
+  düşürülmez, `Kur` dışarıdan verilen beklemeyi aşmaz, üç bekleme bütçesi vazgeçme süresiyle pimli (yuva 3030 ms, indirme kilidi 20000 ms, kurulum kilidi 20011 ms; arka plan yuva/indirme 0 ms, kurulum kilidini sürdürür), elle Yükle'nin uygulamayı doğurması ortanca 3133 ms (n=15, aralık 3098-3308, üst uç pimli değil) — `docs/olcumler/bekleme-butceleri.md`, prova kipi kurmaz
   (kapalı kipi negatif kontrol), `MainModule` fırlatan süreç bizim sayılmaz. Gerçek süreçle: yerel sahte yayından
   (`VIDSHRINK_UPDATE_SOURCE`, manifest + zip) yuva tutulurken koşan başlatıcı kurmaz, yuva boşken v2 kurar; elle Yükle
   (`--update-now`) yuva ve güncelleme kilidi dışarıdan tutulurken uygulamayı 15 sn'nin altında açar.

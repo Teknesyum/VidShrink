@@ -1,4 +1,5 @@
 using VidShrink.App;
+using VidShrink.App.Localization;
 using VidShrink.App.Playback;
 using VidShrink.Core;
 using VidShrink.Core.Playback;
@@ -155,7 +156,7 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         Assert.True(clip.IsApproximate);
         var badge = host.ApproximateBadge;
         Assert.NotNull(badge);
-        Assert.Equal($"CRF {clip.Crf}", badge);
+        Assert.Equal(Strings.Get("main.plan.mode.crf-value", clip.Crf), badge);
         Assert.DoesNotContain(",", badge);
         Assert.DoesNotContain(".", badge);
         AppHost.Run(host.Dispose);

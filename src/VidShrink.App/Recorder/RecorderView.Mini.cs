@@ -158,16 +158,7 @@ internal partial class RecorderView
             case MiniOptionKind.Cursor: ChkCursor.IsChecked = option.Value; break;
         }
 
-        if (_session is not null)
-        {
-            var current = _settings.ToJson();
-            if (!current.AsSpan().SequenceEqual(_persisted))
-            {
-                _persisted = current;
-                _settings.Save(RecorderSettings.FilePath);
-            }
-        }
-
+        SaveChoicesIfChanged();
         SyncInput(_session is not null);
     }
 }
