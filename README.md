@@ -142,11 +142,16 @@ language, Turkish or English. `--dil en` (`--lang en`) overrides it for one run;
 known codes are `en` and `tr`, and an unknown code is a usage error rather than a silent
 fall back to English.
 
+`--crf N` and `--on-ayar NAME` lock what the Advanced panel locks in the window: the
+quality value (0-63) and the encoder preset. The preset name has to belong to the codec
+the plan picks — `slow` for x264/x265, `p5` for NVENC, `8` for SVT-AV1 — and a name that
+does not belong is dropped with a line in the plan reason, not an error.
+
 `--kes <start>-<end>` trims before the encode, so the target size is spent on the part you
 keep: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, or `--kes 90-` to the end.
 
 The long options below each answer to an English alias; the two spellings are the same
-option, and a script may use either. `--json` and `--vmaf` are the exceptions: they have a
+option, and a script may use either. `--crf` and `--json` and `--vmaf` are the exceptions: they have a
 single spelling.
 
 | Turkish | English |
@@ -156,6 +161,7 @@ single spelling.
 | `--hedef` | `--target` |
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |
+| `--on-ayar` | `--preset` |
 | `--cikti` | `--output` |
 | `--kes` | `--cut` |
 | `--aralik` | `--interval` |

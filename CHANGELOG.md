@@ -9,6 +9,12 @@ ship as part of it.
 
 ### Added
 
+- The CLI locks quality and preset like the window does: `--crf N` (0-63) and
+  `--on-ayar NAME` (`--preset`) reach the same locks the Advanced panel writes. A preset
+  name that does not belong to the codec the plan picks is dropped with a line in the plan
+  reason instead of throwing, which also fixes the same crash in the window when the codec
+  was changed after a preset had been chosen.
+
 - Track names and subtitle flags survive the shrink. A track's title is carried over as it is,
   and a subtitle's default/forced flag is written out explicitly instead of being left to the
   muxer. In MP4 the title lands in the `name` atom; the `default` flag there is ffmpeg's own

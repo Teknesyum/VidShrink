@@ -750,10 +750,11 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.ManualModeOverride, ManualOverrideValue: requestedMode.ToString(), EngineWouldHaveChosen: engineMode));
         }
 
-        if (options.LockedPreset is string manualPreset)
+        if (options.LockedPreset is string dropped && !FfmpegArguments.IsValidPreset(codec, dropped))
+            reason.Add($"sabitlenen on ayar {dropped} {codec} merdiveninde yok; plan motorun sectigi {plan.Preset} ile kosuyor");
+
+        if (options.LockedPreset is string manualPreset && FfmpegArguments.IsValidPreset(codec, manualPreset))
         {
-            if (!FfmpegArguments.IsValidPreset(codec, manualPreset))
-                throw new ArgumentException($"{codec} icin bilinmeyen on ayar: {manualPreset}", nameof(PlanOptions.LockedPreset));
             var enginePreset = plan.Preset;
             plan.Preset = manualPreset;
             reason.Add($"kullanici on ayari {manualPreset} olarak sabitledi; motor {enginePreset} secmisti");

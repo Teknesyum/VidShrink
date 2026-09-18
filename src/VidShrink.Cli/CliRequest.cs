@@ -37,6 +37,8 @@ public sealed record CliRequest
     public string? PreferredLanguage { get; init; }
     public double? TrimStartSeconds { get; init; }
     public double? TrimEndSeconds { get; init; }
+    public double? Crf { get; init; }
+    public string? Preset { get; init; }
 
     /// <summary>
     /// <paramref name="sourceDurationSeconds"/> kesitin acik ucunu kapatir (<c>--kes 10-</c>);
@@ -62,6 +64,8 @@ public sealed record CliRequest
             PreferredLanguage = PreferredLanguage
         };
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
+        options.LockedCrf = Crf;
+        options.LockedPreset = Preset;
         options.Trim = TrimWindow.Of(TrimStartSeconds, TrimEndSeconds, sourceDurationSeconds);
         return options;
     }
@@ -76,6 +80,8 @@ public static class CliParser
 {
     public const double MinQuality = 1;
     public const double MaxQuality = 100;
+    public const double MinCrf = 0;
+    public const double MaxCrf = 63;
 
     public static CliParseResult Parse(IReadOnlyList<string> args)
     {
@@ -119,6 +125,17 @@ public static class CliParser
                     if (!TryValue(args, ref i, out var codec)) return Fail("error.missing-value", arg);
                     if (!TryParseCodec(codec, out var parsed)) return Fail("error.bad-codec", codec);
                     request = request with { Codec = parsed };
+                    break;
+                case "--crf" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var crf)) return Fail("error.missing-value", arg);
+                    if (!TryParseNumber(crf, out var crfValue) || crfValue < MinCrf || crfValue > MaxCrf)
+                        return Fail("error.bad-crf", crf);
+                    request = request with { Crf = crfValue };
+                    break;
+                case "--on-ayar" or "--preset" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var preset)) return Fail("error.missing-value", arg);
+                    if (!FfmpegArguments.IsKnownPreset(preset)) return Fail("error.bad-preset", preset);
+                    request = request with { Preset = preset };
                     break;
                 case "--cikti" or "--output" or "-o":
                     if (!TryValue(args, ref i, out var output)) return Fail("error.missing-value", arg);

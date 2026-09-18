@@ -142,11 +142,16 @@ izliyor, Türkçe ya da İngilizce. `--dil en` (`--lang en`) tek koşumluk olara
 bilinen kodlar `en` ve `tr`, tanınmayan kod sessizce İngilizce'ye düşmek yerine kullanım hatası
 veriyor.
 
+`--crf N` ve `--on-ayar AD`, pencerede Gelişmiş panelinin kilitlediğini kilitliyor: kalite
+değeri (0-63) ve kodlayıcı ön ayarı. Ön ayar adı planın seçtiği kodeğe ait olmalı —
+x264/x265 için `slow`, NVENC için `p5`, SVT-AV1 için `8` — ait olmayan ad hata vermiyor,
+plan gerekçesine bir satır düşülerek düşüyor.
+
 `--kes <baslangic>-<bitis>` kodlamadan önce kesiyor, böylece hedef boyut elde kalan parçaya
 harcanıyor: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, sona kadar `--kes 90-`.
 
 Aşağıdaki uzun anahtarların her birinin bir de İngilizce takma adı var; iki yazım aynı
-anahtar, betik hangisini isterse onu kullanabiliyor. Tek istisna `--json` ve `--vmaf`:
+anahtar, betik hangisini isterse onu kullanabiliyor. Tek istisna `--crf` ve `--json` ve `--vmaf`:
 bunların tek yazımı var.
 
 | Türkçe | İngilizce |
@@ -156,6 +161,7 @@ bunların tek yazımı var.
 | `--hedef` | `--target` |
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |
+| `--on-ayar` | `--preset` |
 | `--cikti` | `--output` |
 | `--kes` | `--cut` |
 | `--aralik` | `--interval` |

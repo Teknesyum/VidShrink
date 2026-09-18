@@ -389,6 +389,14 @@ public static class FfmpegArguments
     public static bool IsValidPreset(string codec, string preset)
         => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Kodek secilmeden once yapilabilen tek denetim: ad herhangi bir kodegin merdiveninde
+    /// geciyor mu. Kodege uymayan ad plan kurulurken <see cref="IsValidPreset"/> ile duser —
+    /// arayuzdeki acilir kutu da ayni sirayi izliyor.
+    /// </summary>
+    public static bool IsKnownPreset(string preset)
+        => Presets.Values.Any(values => values.Contains(preset, StringComparer.OrdinalIgnoreCase));
+
     private static readonly HashSet<string> HardwareDecodedCodecs = new(StringComparer.OrdinalIgnoreCase)
     {
         "h264", "hevc", "av1", "vp9", "vp8", "mpeg1video", "mpeg2video", "mpeg4", "vc1", "wmv3"
