@@ -497,7 +497,8 @@ public sealed class KareYerlesimTests
         {
             var kanit = Path.Combine(GirdiKanit.Root, ".calisma", "s9-birimler");
             Directory.CreateDirectory(kanit);
-            File.WriteAllText(Path.Combine(kanit, dil + ".txt"), okunan.ToString());
+            var dosya = Path.Combine(kanit, dil + ".txt");
+            File.WriteAllText(dosya, okunan.ToString());
 
             Assert.Equal(ai, Strings.Get("main.plan.ai"));
             Assert.Equal(mb, okunan.hedefBirimi);
@@ -513,6 +514,9 @@ public sealed class KareYerlesimTests
                 Assert.DoesNotContain(" MB", okunan.boyut + okunan.aralik + okunan.plan);
                 Assert.NotEqual("MB", okunan.hedefBirimi);
             }
+
+            File.Delete(dosya);
+            if (Directory.GetFileSystemEntries(kanit).Length == 0) Directory.Delete(kanit);
         }
         finally
         {
