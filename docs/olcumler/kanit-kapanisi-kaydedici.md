@@ -5,8 +5,10 @@ siler; kırmızı koşum kanıtını korur, çünkü düşen asert o satıra gel
 gider. Ortak gövde `tests/VidShrink.Tests/KanitKapanisi.cs`, her kanıt yardımcısında tek satırlık
 `Kapat` sarmalayıcısı.
 
-Dal: `t0/kanit-kaydedici`. Makine: Windows 11, gdigrab var, OBS Virtual Camera yok (kamera kolu
-atlanmadı, sahte kaynakla koştu), X11 kolu Windows'ta atlandı.
+Dal: `t0/kanit-kaydedici`. Makine: Windows 11, gdigrab var, **OBS Virtual Camera var** — `[KameraFact]`
+kolu gerçek aygıtla koştu (`ffmpeg -list_devices` çıktısında `"OBS Virtual Camera" (video)`), atlanan
+tek ölçü X11 kolu. Denetim düzeltmesi: bu satır önce "aygıt yok, sahte kaynakla koştu" diyordu;
+koşumun kendi `Atlanan: 1` sayısı bunu yalanlıyor, aygıt atlansaydı 2 olurdu.
 
 Ortam: `VIDSHRINK_LIBMPV=C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper\taban\tools\libmpv\libmpv-2.dll`
 (worktree'de `tools/libmpv` yok; `KayitOdakTakibiTests` oynatıcıyı bu kütüphaneyle yüklüyor).
