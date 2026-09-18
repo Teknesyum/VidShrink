@@ -916,39 +916,55 @@ public class AltyaziIndirmeTests
         }
     }
 
-    /// <summary>Depoda anahtar yok: kaynak ağacında OpenSubtitles anahtarına benzeyen sabit bulunmuyor.</summary>
+    /// <summary>
+    /// Depoda anahtar yok. Tarama <b>butun depo</b>: kaynak kadar belge, test, ayar ve
+    /// arayuz dosyasi da. Yalniz <c>src/**/*.cs</c> tarandigi surumde gercek bir ucuncu
+    /// taraf anahtari <c>docs/arastirma/</c> altina dusup 65/65 yesil kalmisti.
+    /// </summary>
     [Fact]
     public void DepodaGomuluAnahtarYok()
     {
-        var kaynak = Path.Combine(GirdiKanit.Root, "src");
+        string[] uzantilar = [".cs", ".md", ".json", ".axaml", ".xaml", ".yml", ".yaml", ".ps1", ".sh", ".txt"];
+        string[] atlanan = [".git", ".calisma", "trash", "bin", "obj", "node_modules", "packages"];
         var suclular = new List<string>();
-        foreach (var dosya in Directory.GetFiles(kaynak, "*.cs", SearchOption.AllDirectories))
+        foreach (var dosya in Directory.EnumerateFiles(GirdiKanit.Root, "*", SearchOption.AllDirectories))
         {
+            var bagil = Path.GetRelativePath(GirdiKanit.Root, dosya);
+            if (bagil.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Any(atlanan.Contains)) continue;
+            if (!uzantilar.Contains(Path.GetExtension(dosya), StringComparer.OrdinalIgnoreCase)) continue;
             foreach (var satir in File.ReadAllLines(dosya))
             {
-                if (AnahtarKokuyor(satir)) suclular.Add(Path.GetFileName(dosya) + ": " + satir.Trim());
+                if (AnahtarKokuyor(satir)) suclular.Add(bagil + ": " + satir.Trim());
             }
         }
 
         // Pozitif kontrol: tarayici gercek bicimli bir anahtari yakaliyor mu. Yakalamasaydi
-        // bos liste "temiz" degil "kor" demek olurdu.
-        const string gomulu = "        request.Headers.TryAddWithoutValidation(\"Api-Key\", \"9fK2mQ7xTz4LpW8dRb1VnH5cJ6yEaG0s\");";
+        // bos liste "temiz" degil "kor" demek olurdu. Iki bicim de sinanir: tirnakli kod
+        // sabiti ve belgelerdeki tirnaksiz tel kaydi satiri. Ikisi de kaynakta iki parcaya
+        // bolunmus yazilir, yoksa tarama kendi pozitif kontrolunu suclu sayardi.
+        const string gomulu = "        request.Headers.TryAddWithoutValidation(\"Api-Key\", \"9fK2mQ7xTz4LpW8dRb1"
+            + "VnH5cJ6yEaG0s\");";
+        const string telKaydi = "Api-Key: mij33pjc3kOlup1"
+            + "qOKxnWWxvle2kFbMH";
         const string alan = "        root[\"openSubtitlesApiKey\"] = OpenSubtitlesApiKey;";
 
         AltyaziKanit.Yaz("anahtar-taramasi.txt",
             (suclular.Count == 0 ? "temiz" : string.Join("\n", suclular))
             + "\npozitif kontrol: " + AnahtarKokuyor(gomulu)
+            + "\ntel kaydi: " + AnahtarKokuyor(telKaydi)
             + "\nayar alani: " + AnahtarKokuyor(alan));
 
         Assert.True(AnahtarKokuyor(gomulu), "tarayici gomulu anahtari kaciriyor");
+        Assert.True(AnahtarKokuyor(telKaydi), "tarayici tirnaksiz tel kaydi anahtarini kaciriyor");
         Assert.False(AnahtarKokuyor(alan), "tarayici ayar alan adini anahtar saniyor");
         Assert.Empty(suclular);
     }
 
     /// <summary>
     /// Anahtar satiri: <c>Api-Key</c>/<c>apiKey</c> gecen bir satirda, en az 24 karakterlik,
-    /// hem harf hem rakam tasiyan bir sabit. Alan adlari ("openSubtitlesApiKey") rakamsizdir,
-    /// bu yuzden elenir.
+    /// hem harf hem rakam tasiyan bir dizi. Tirnak sart degil — belgelerdeki tel kaydi
+    /// (<c>Api-Key: &lt;deger&gt;</c>) tirnaksizdir ve tirnak arayan surum onu kaciriyordu.
+    /// Alan adlari ("openSubtitlesApiKey") rakamsizdir, bu yuzden elenir.
     /// </summary>
     private static bool AnahtarKokuyor(string satir)
     {
@@ -956,9 +972,9 @@ public class AltyaziIndirmeTests
             && !satir.Contains("apiKey", StringComparison.OrdinalIgnoreCase)) return false;
 
         foreach (System.Text.RegularExpressions.Match sabit in
-                 System.Text.RegularExpressions.Regex.Matches(satir, "\"([A-Za-z0-9]{24,})\""))
+                 System.Text.RegularExpressions.Regex.Matches(satir, "[A-Za-z0-9]{24,}"))
         {
-            var deger = sabit.Groups[1].Value;
+            var deger = sabit.Value;
             if (deger.Any(char.IsDigit) && deger.Any(char.IsLetter)) return true;
         }
 

@@ -60,7 +60,7 @@ Gerçek tel kaydı (subliminal kaseti, POST /download):
 ```
 Accept: */*
 Accept-Encoding: gzip, deflate
-Api-Key: mij33pjc3kOlup1qOKxnWWxvle2kFbMH
+Api-Key: <subliminal-anahtari-maskelendi>
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9....
 Content-Type: application/json
 User-Agent: Subliminal v2.2
