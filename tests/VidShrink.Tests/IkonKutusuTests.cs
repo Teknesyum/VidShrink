@@ -18,10 +18,21 @@ namespace VidShrink.Tests;
 /// <para>Takim Fluent UI System Icons'in 24 px Filled surumune gecince dil kalemden
 /// dolguya dondu: sabitleyicinin onune <c>F1</c> (NonZero) geldi, cunku Avalonia'nin
 /// varsayilani EvenOdd ve delikli her simge (cerceve, halka, mercek) yanlis dolardi.
-/// Kenar payi toleransi 1e-3'ten 0.01'e acildi: Fluent'in canli alani tam olarak 2-22,
-/// ama Bezier duzlestirmesi 1.996 ile 2.003 arasinda oynuyor; eski slop olcuyu
-/// geometriye degil duzlestiriciye bagliyordu. Fluent'in kendi cizimindeki uc kayma
-/// <see cref="Istisna"/> tablosunda tek tek pimli.</para>
+/// Fluent'in kendi cizimindeki uc kayma <see cref="Istisna"/> tablosunda tek tek pimli.</para>
+///
+/// <para><b>Kenar payi toleransi gercekten gevsetildi</b>: 1e-3'ten 0.01'e, on kat. Merkez
+/// kurali (<see cref="Tolerance"/> = 0.55) gevsetilmedi, gevseyen yalniz <see cref="Margin"/>.
+/// Gerekcesi olculu — 18 Eylul 2026'da 1e-3 ile 25 simgenin 4'u dusuyor, hepsi Fluent'in
+/// 2-22 canli alanini Bezier duzlestirmesi yuzunden kil payi asan govdeler:</para>
+/// <list type="bullet">
+/// <item><c>IconShrink</c> — sol 1.9961, alt 22.0091 (en buyuk sapma).</item>
+/// <item><c>IconAbout</c> — ust 1.9990, sag 22.0031, alt 22.0021.</item>
+/// <item><c>IconConvert</c> — ust 1.9980.</item>
+/// <item><c>IconRecorder</c> — sag 22.0017.</item>
+/// </list>
+/// <para>Gereken en kucuk tolerans 0.0091; 0.01 onun hemen ustu, daha sikisi (0.005)
+/// <c>IconShrink</c>'i dusurur. Yani bu sayi seçilmedi, olculdu. Gevseyen tolerans bir
+/// gövdeyi kimliginden etmez: sekil kimligini <see cref="IkonImzaTests"/> ayri olcer.</para>
 /// </summary>
 public sealed class IkonKutusuTests
 {
@@ -40,9 +51,11 @@ public sealed class IkonKutusuTests
     private static readonly string[] OptikKaydirilan = ["IconPlay"];
 
     /// <summary>
-    /// Genel kurala girmeyen iki Fluent cizimi. Kural gevsetilmiyor: ikisi de kendi
-    /// olculen sinir kutusuyla 0.02 icinde pimleniyor, yani kaydirilan ya da baska bir
-    /// dosyadan gelen bir gövde bu ikisinde de kirmizi doner.
+    /// Genel kurala girmeyen iki Fluent cizimi. Bu iki ad icin kural gevsetilmiyor,
+    /// <b>sikilastiriliyor</b>: ikisi de kendi olculen sinir kutusuyla 0.02 icinde pimleniyor,
+    /// yani kaydirilan ya da baska bir dosyadan gelen bir govde bu ikisinde de kirmizi doner.
+    /// Cumle yalniz bu tabloyu anlatir; genel kenar payi kuralinin toleransi ayri bir konu ve
+    /// o gercekten gevsedi — sinif aciklamasindaki olcume bak.
     /// <list type="bullet">
     /// <item><c>IconSpeed</c> — gosterge kutlesi merkezin ustunde (cy 11.00).</item>
     /// <item><c>IconCoffee</c> — kulp sagda 2 birimlik kenar payini tasiyor (sag kenar 23.00).</item>
@@ -121,7 +134,7 @@ public sealed class IkonKutusuTests
         var govde = yol[Sabitleyici.Length..];
         AppHost.Ensure();
         var kutu = AppHost.Run(() => Geometry.Parse(govde).Bounds);
-        _cikti.WriteLine($"IKON\t{ad}\tx {kutu.X:0.00}-{kutu.Right:0.00}\ty {kutu.Y:0.00}-{kutu.Bottom:0.00}\tcx {kutu.Center.X:0.00}\tcy {kutu.Center.Y:0.00}");
+        _cikti.WriteLine($"IKON\t{ad}\tx {kutu.X:0.0000}-{kutu.Right:0.0000}\ty {kutu.Y:0.0000}-{kutu.Bottom:0.0000}\tcx {kutu.Center.X:0.0000}\tcy {kutu.Center.Y:0.0000}");
 
         if (Istisna.TryGetValue(ad, out var pim))
         {
