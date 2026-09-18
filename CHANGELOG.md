@@ -126,6 +126,13 @@ ship as part of it.
 
 ### Fixed
 
+- Opening Settings no longer crashes. The `-tune` box was added to the Advanced panel as the
+  third control, but the settings round trip still read the boxes by position over a
+  seven-element array, so restoring threw `IndexOutOfRangeException` and every mapping after
+  the tune box was scrambled in both directions. The boxes are now matched by name, and the
+  tune lock is persisted as `advTune` - it was not written to the settings file at all
+  (`MainWindow.axaml.cs`, `AppSettings.cs`).
+
 - `izle --bir-kez` exits on a case-variant pair. `Klip.mp4` and `klip.mp4` in one watched
   folder used to reset each other's stability counter forever, so neither was shrunk and the
   run never ended. The scan now settles the collision: the ordinally smallest name wins and is

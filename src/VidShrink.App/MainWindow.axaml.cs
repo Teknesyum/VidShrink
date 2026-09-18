@@ -1318,14 +1318,15 @@ public partial class MainWindow : Window
         return new AppSettings
         {
             AdvMode = AdvModeIndex,
-            AdvCrf = boxes[0].SelectedIndex,
-            AdvPreset = boxes[1].SelectedIndex,
-            AdvAudioKbps = boxes[2].SelectedIndex,
-            AdvAudioChannels = boxes[3].SelectedIndex,
-            AdvMinResolution = boxes[4].SelectedIndex,
-            AdvMinFps = boxes[5].SelectedIndex,
+            AdvCrf = CmbAdvCrf.SelectedIndex,
+            AdvPreset = CmbAdvPreset.SelectedIndex,
+            AdvTune = CmbAdvTune.SelectedIndex,
+            AdvAudioKbps = CmbAdvAudioKbps.SelectedIndex,
+            AdvAudioChannels = CmbAdvAudioChannels.SelectedIndex,
+            AdvMinResolution = CmbAdvMinResolution.SelectedIndex,
+            AdvMinFps = CmbAdvMinFps.SelectedIndex,
             AdvEncoderPath = AdvEncoderPathIndex,
-            AdvCodecLock = boxes[6].SelectedIndex,
+            AdvCodecLock = CmbAdvCodecLock.SelectedIndex,
             AdvKeepTracks = ChkAdvKeepTracks.IsChecked == true,
             OutputFolderMode = OutputFolderModeIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
@@ -1347,15 +1348,19 @@ public partial class MainWindow : Window
         {
             AdvModeIndex = settings.AdvMode;
             AdvEncoderPathIndex = settings.AdvEncoderPath;
-            var indices = new[]
+            var restore = new (SelectingItemsControl Box, int Index)[]
             {
-                settings.AdvCrf, settings.AdvPreset, settings.AdvAudioKbps,
-                settings.AdvAudioChannels, settings.AdvMinResolution, settings.AdvMinFps,
-                settings.AdvCodecLock
+                (CmbAdvCrf, settings.AdvCrf),
+                (CmbAdvPreset, settings.AdvPreset),
+                (CmbAdvTune, settings.AdvTune),
+                (CmbAdvAudioKbps, settings.AdvAudioKbps),
+                (CmbAdvAudioChannels, settings.AdvAudioChannels),
+                (CmbAdvMinResolution, settings.AdvMinResolution),
+                (CmbAdvMinFps, settings.AdvMinFps),
+                (CmbAdvCodecLock, settings.AdvCodecLock)
             };
-            var boxes = AdvBoxes();
-            for (var i = 0; i < boxes.Length; i++)
-                if (indices[i] >= 0 && indices[i] < boxes[i].ItemCount) boxes[i].SelectedIndex = indices[i];
+            foreach (var (box, index) in restore)
+                if (index >= 0 && index < box.ItemCount) box.SelectedIndex = index;
             ChkAdvKeepTracks.IsChecked = settings.AdvKeepTracks;
 
             OutputFolderModeIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);

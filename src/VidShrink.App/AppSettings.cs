@@ -18,6 +18,7 @@ public sealed class AppSettings
     public int AdvMode { get; set; }
     public int AdvCrf { get; set; }
     public int AdvPreset { get; set; }
+    public int AdvTune { get; set; }
     public int AdvAudioKbps { get; set; }
     public int AdvAudioChannels { get; set; }
     public int AdvMinResolution { get; set; }
@@ -68,6 +69,7 @@ public sealed class AppSettings
             ReadInt(root, "advMode", value => settings.AdvMode = value);
             ReadInt(root, "advCrf", value => settings.AdvCrf = value);
             ReadInt(root, "advPreset", value => settings.AdvPreset = value);
+            ReadInt(root, "advTune", value => settings.AdvTune = value);
             ReadInt(root, "advAudioKbps", value => settings.AdvAudioKbps = value);
             ReadInt(root, "advAudioChannels", value => settings.AdvAudioChannels = value);
             ReadInt(root, "advMinResolution", value => settings.AdvMinResolution = value);
@@ -132,6 +134,7 @@ public sealed class AppSettings
         root["advMode"] = AdvMode;
         root["advCrf"] = AdvCrf;
         root["advPreset"] = AdvPreset;
+        root["advTune"] = AdvTune;
         root["advAudioKbps"] = AdvAudioKbps;
         root["advAudioChannels"] = AdvAudioChannels;
         root["advMinResolution"] = AdvMinResolution;

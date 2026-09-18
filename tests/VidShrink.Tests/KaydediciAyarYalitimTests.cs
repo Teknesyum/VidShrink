@@ -60,9 +60,57 @@ public sealed class KaydediciAyarYalitimTests
         }
         finally
         {
+            AppHost.Run(() =>
+            {
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                return 0;
+            });
+
             if (onceki is not null) File.WriteAllBytes(paylasilan, onceki);
             else if (File.Exists(paylasilan)) File.Delete(paylasilan);
         }
+    }
+
+    /// <summary>
+    /// <b>Kapinin kendisi pimli.</b> <see cref="PaylasilaniKorurken"/>'in "geri koy ya da sil"
+    /// garantisi ertelenmis yazmayla deliniyordu: kirletici govdenin bekleyen
+    /// <c>PersistChoices</c>'i <c>finally</c> dosyayi geri koyduktan <b>sonra</b>, yani bir
+    /// sonraki sinifin olcumu sirasinda bosaliyordu. Cok sinifli kosumda paylasilan dosya
+    /// Gif + <c>livePreview:true</c> ile geride kaliyordu, 2/2 tekrarlandi.
+    ///
+    /// <para>Olcu kirletir, kapiyi kapatir, sonra <b>bir kez daha</b> is parcacigini
+    /// bosaltir: kapi bekleyen yazmayi kendisi bosaltmazsa dosya o anda yeniden kirlenir
+    /// ve bu olcu kirmizi olur.</para>
+    /// </summary>
+    [Fact]
+    public void KapiKapandiktanSonraBekleyenYazmaDosyayiKirletmiyor()
+    {
+        var paylasilan = RecorderSettings.FilePath!;
+
+        PaylasilaniKorurken(_ => AppHost.Run(() =>
+        {
+            var kirletici = new RecorderView();
+            KaydediciAyarTests.Elle(kirletici);
+            SecKap(kirletici, "GIF");
+            KaydediciAyarTests.Bul<CheckBox>(kirletici, "ChkLivePreview").IsChecked = true;
+            return kirletici.PrepareRecording() is not null;
+        }));
+
+        var kapandiktanSonra = File.Exists(paylasilan) ? File.ReadAllBytes(paylasilan) : null;
+
+        AppHost.Run(() =>
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            return 0;
+        });
+
+        var bosaltmadanSonra = File.Exists(paylasilan) ? File.ReadAllBytes(paylasilan) : null;
+
+        Assert.Equal(kapandiktanSonra is null, bosaltmadanSonra is null);
+        if (kapandiktanSonra is not null)
+            Assert.True(
+                kapandiktanSonra.AsSpan().SequenceEqual(bosaltmadanSonra),
+                "Kapi kapandiktan sonra bekleyen bir yazma paylasilan dosyayi degistirdi.");
     }
 
     private static void SecKap(RecorderView view, string kap)
