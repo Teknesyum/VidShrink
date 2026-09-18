@@ -892,10 +892,7 @@
                         Stretch="Uniform"
                         VerticalAlignment="Center"
                         Data="{TemplateBinding Tag}"
-                        Stroke="{TemplateBinding Foreground}"
-                        StrokeThickness="{StaticResource IconStroke}"
-                        StrokeLineCap="Round"
-                        StrokeJoin="Round"/>
+                        Fill="{TemplateBinding Foreground}"/>
                   <ContentPresenter Name="PART_ContentPresenter"
                                     Content="{TemplateBinding Header}"
                                     ContentTemplate="{TemplateBinding HeaderTemplate}"

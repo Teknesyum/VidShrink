@@ -39,10 +39,7 @@
                 Height="{StaticResource PauseGlyphSize}"
                 Stretch="Uniform"
                 Data="{StaticResource IconPause}"
-                Stroke="{StaticResource TextBody}"
-                StrokeThickness="{StaticResource IconStroke}"
-                StrokeLineCap="Round"
-                StrokeJoin="Round"/>
+                Fill="{StaticResource TextBody}"/>
         </Border>
         <TextBlock x:Name="TxtEmpty"
                    Text="{loc:Text main.player.empty}"
@@ -149,8 +146,7 @@
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.mute}">
                   <Path x:Name="GlyphSeritVolume"
                         Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
-                        Data="{StaticResource IconVolume}" Stroke="{Binding $parent[Button].Foreground}"
-                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                        Data="{StaticResource IconVolume}" Fill="{Binding $parent[Button].Foreground}"/>
                 </Button>
                 <Slider x:Name="SliderSeritVolume"
                         Theme="{StaticResource PlaybackSlider}"
@@ -172,8 +168,7 @@
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}">
                   <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
                     <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
-                          Data="{StaticResource IconRewind}" Stroke="{Binding $parent[Button].Foreground}"
-                          StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                          Data="{StaticResource IconRewind}" Fill="{Binding $parent[Button].Foreground}"/>
                     <TextBlock x:Name="TxtSeritBack" Theme="{StaticResource PlaybackValueText}"
                                Foreground="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                   </StackPanel>
@@ -182,8 +177,7 @@
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.playpause}">
                   <Path x:Name="GlyphSeritPlay"
                         Width="{StaticResource IconSizeLg}" Height="{StaticResource IconSizeLg}" Stretch="Uniform"
-                        Data="{StaticResource IconPlay}" Stroke="{Binding $parent[Button].Foreground}"
-                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                        Data="{StaticResource IconPlay}" Fill="{Binding $parent[Button].Foreground}"/>
                 </Button>
                 <Button x:Name="BtnSeritForward" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}">
@@ -191,8 +185,7 @@
                     <TextBlock x:Name="TxtSeritForward" Theme="{StaticResource PlaybackValueText}"
                                Foreground="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                     <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
-                          Data="{StaticResource IconFastForward}" Stroke="{Binding $parent[Button].Foreground}"
-                          StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                          Data="{StaticResource IconFastForward}" Fill="{Binding $parent[Button].Foreground}"/>
                   </StackPanel>
                 </Button>
               </StackPanel>
@@ -206,8 +199,7 @@
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.normalspeed}">
                   <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
                         VerticalAlignment="Center"
-                        Data="{StaticResource IconSpeed}" Stroke="{Binding $parent[Button].Foreground}"
-                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                        Data="{StaticResource IconSpeed}" Fill="{Binding $parent[Button].Foreground}"/>
                 </Button>
                 <Slider x:Name="SliderSeritSpeed"
                         Theme="{StaticResource PlaybackSlider}"
@@ -220,8 +212,7 @@
                 <Button x:Name="BtnSeritFullScreen" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.fullscreen}">
                   <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
-                        Data="{StaticResource IconFullScreen}" Stroke="{Binding $parent[Button].Foreground}"
-                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                        Data="{StaticResource IconFullScreen}" Fill="{Binding $parent[Button].Foreground}"/>
                 </Button>
               </StackPanel>
             </Grid>

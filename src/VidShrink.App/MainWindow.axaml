@@ -385,7 +385,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.quality}">
                         <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                          <Path x:Name="GlyphQuality" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphQuality" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
@@ -434,7 +434,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.audio}">
                         <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                          <Path x:Name="GlyphAudio" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphAudio" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
@@ -467,7 +467,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.frame}">
                         <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                          <Path x:Name="GlyphFrame" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphFrame" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
@@ -513,7 +513,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
                         <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                          <Path x:Name="GlyphAdvanced" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphAdvanced" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
@@ -639,7 +639,7 @@
                                 VerticalAlignment="Center"
                                 auto:AutomationProperties.Name="{loc:Text main.plan.reasons}"
                                 Click="OnTogglePlanReasons">
-                                  <Path x:Name="GlyphPlanReasons" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                                  <Path x:Name="GlyphPlanReasons" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                                 </Button>
                       </Grid>
                       <StackPanel x:Name="PlanReasons" Spacing="{StaticResource SpaceSm}" IsVisible="False"/>
@@ -1101,7 +1101,7 @@
                             VerticalAlignment="Center"
                             auto:AutomationProperties.Name="{loc:Text main.command.title}"
                             Click="OnToggleCommand">
-                              <Path x:Name="GlyphCommand" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                              <Path x:Name="GlyphCommand" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                             </Button>
                   </Grid>
                   <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinLines="1" MaxLines="1"/>
@@ -1128,7 +1128,7 @@
                             VerticalAlignment="Center"
                             auto:AutomationProperties.Name="{loc:Text main.ai.title}"
                             Click="OnToggleAiDetails">
-                              <Path x:Name="GlyphAiDetails" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                              <Path x:Name="GlyphAiDetails" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                             </Button>
                   </Grid>
                   <StackPanel x:Name="AiDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
@@ -1154,7 +1154,7 @@
                             VerticalAlignment="Center"
                             auto:AutomationProperties.Name="{loc:Text performance.title}"
                             Click="OnTogglePerformance">
-                              <Path x:Name="GlyphPerformance" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                              <Path x:Name="GlyphPerformance" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                             </Button>
                   </Grid>
                   <StackPanel x:Name="PerformanceDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
@@ -1382,16 +1382,14 @@
             <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
-                      Data="{StaticResource IconCoffee}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                      Data="{StaticResource IconCoffee}" Fill="{Binding $parent[Button].Foreground}"/>
                 <TextBlock x:Name="TxtSponsor" Text="Buy Me a Coffee" VerticalAlignment="Center"/>
               </StackPanel>
             </Button>
             <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="Teknesyum" Click="OnOpenGitHub">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
-                      Data="{StaticResource IconCode}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                      Data="{StaticResource IconCode}" Fill="{Binding $parent[Button].Foreground}"/>
                 <TextBlock x:Name="TxtGitHub" Text="Teknesyum" VerticalAlignment="Center"/>
               </StackPanel>
             </Button>
@@ -1403,18 +1401,15 @@
                         Margin="{StaticResource WindowButtonMargin}">
               <Button x:Name="BtnMinimize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.minimize}" auto:AutomationProperties.Name="{loc:Text main.window.minimize}" Click="OnMinimize">
                 <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconMinimize}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                      Data="{StaticResource IconMinimize}" Fill="{Binding $parent[Button].Foreground}"/>
               </Button>
               <Button x:Name="BtnMaximize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.maximize}" auto:AutomationProperties.Name="{loc:Text main.window.maximize}" Click="OnMaximizeRestore">
                 <Path x:Name="MaximizeGlyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconMaximize}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                      Data="{StaticResource IconMaximize}" Fill="{Binding $parent[Button].Foreground}"/>
               </Button>
               <Button x:Name="BtnClose" Theme="{StaticResource CloseWindowButton}" ToolTip.Tip="{loc:Text main.window.close}" auto:AutomationProperties.Name="{loc:Text main.window.close}" Click="OnClose">
                 <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconClose}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                      Data="{StaticResource IconClose}" Fill="{Binding $parent[Button].Foreground}"/>
               </Button>
             </StackPanel>
           </StackPanel>

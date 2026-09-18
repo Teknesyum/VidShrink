@@ -26,7 +26,7 @@
               Padding="{StaticResource ButtonPaddingSm}"
               auto:AutomationProperties.Name="{loc:Text player.advanced.title}">
         <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-          <Path x:Name="Glyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
+          <Path x:Name="Glyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
           <TextBlock Grid.Column="1" Text="{loc:Text player.advanced.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
           <TextBlock Grid.Column="2" x:Name="TxtSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
         </Grid>
