@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VidShrink.Cli", "src\VidShr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VidShrink.SahteUygulama", "tools\VidShrink.SahteUygulama\VidShrink.SahteUygulama.csproj", "{ABDDF5B8-E62D-4605-913F-49A4B2FFE4FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VidShrink.KaydediciYerlesim", "tools\kaydedici-yerlesim\VidShrink.KaydediciYerlesim.csproj", "{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -227,6 +229,18 @@ Global
 		{ABDDF5B8-E62D-4605-913F-49A4B2FFE4FC}.Release|x64.Build.0 = Release|Any CPU
 		{ABDDF5B8-E62D-4605-913F-49A4B2FFE4FC}.Release|x86.ActiveCfg = Release|Any CPU
 		{ABDDF5B8-E62D-4605-913F-49A4B2FFE4FC}.Release|x86.Build.0 = Release|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Debug|x64.Build.0 = Debug|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Debug|x86.Build.0 = Debug|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Release|x64.ActiveCfg = Release|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Release|x64.Build.0 = Release|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Release|x86.ActiveCfg = Release|Any CPU
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -245,5 +259,6 @@ Global
 		{691B3D3D-4877-43D9-B75D-34F4FA61BFB2} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{F0726ABB-7FE7-4897-98CA-9C23D6851FD1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{ABDDF5B8-E62D-4605-913F-49A4B2FFE4FC} = {4589BB40-0033-4B6B-829D-5D80541CF2F1}
+		{7C4F2A61-9D3E-4A18-B5C7-2E6F0D91A4B3} = {4589BB40-0033-4B6B-829D-5D80541CF2F1}
 	EndGlobalSection
 EndGlobal

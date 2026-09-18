@@ -887,23 +887,32 @@ public sealed class KayitFfmpegKoluTests
     };
 
     /// <summary>
-    /// <c>gdigrab</c> ekran indeksi almiyor: ikinci monitor, masaustu koordinatlarindaki
-    /// ofsete ve boyuta cevriliyor. Ayni istek indeks 0'da ofsetsiz masaustunu aliyor.
+    /// <c>gdigrab</c> ekran indeksi almiyor: her monitor masaustu koordinatlarindaki ofsete
+    /// ve boyuta cevriliyor. <b>Indeks 0 da dahil</b> — <c>-i desktop</c> ofsetsiz birakilirsa
+    /// butun sanal masaustu kaydediliyor, iki monitorlu makinede "Ekran 1" iki monitoru
+    /// birden aliyordu. Ofsetsiz kol yalniz monitorun masaustunun tamami oldugu tek ekranli
+    /// makinede kaliyor.
     /// </summary>
     [Fact]
-    public void IkinciMonitorOfsetliBolgeyeCevrilir()
+    public void HerMonitorOfsetliBolgeyeCevrilir()
     {
         var ilk = RecorderArguments.Build(Istek() with { Screens = IkiMonitor }, @"C:\kayit\a.mp4");
         var ikinci = RecorderArguments.Build(
             Istek() with { ScreenIndex = 1, Screens = IkiMonitor }, @"C:\kayit\a.mp4");
+        var tek = RecorderArguments.Build(
+            Istek() with { Screens = new[] { IkiMonitor[0] } }, @"C:\kayit\a.mp4");
 
-        Assert.DoesNotContain("-offset_x", ilk);
+        Assert.Equal("0", Deger(ilk, "-offset_x"));
+        Assert.Equal("1920x1080", Deger(ilk, "-video_size"));
         Assert.Contains("-i desktop", Metin(ilk));
 
         Assert.Equal("1920", Deger(ikinci, "-offset_x"));
         Assert.Equal("0", Deger(ikinci, "-offset_y"));
         Assert.Equal("2560x1440", Deger(ikinci, "-video_size"));
         Assert.Contains("-i desktop", Metin(ikinci));
+
+        Assert.DoesNotContain("-offset_x", tek);
+        Assert.Contains("-i desktop", Metin(tek));
     }
 
     /// <summary>Tek sayili monitor olcusu <c>yuv420p</c> icin asagi ciftleniyor.</summary>

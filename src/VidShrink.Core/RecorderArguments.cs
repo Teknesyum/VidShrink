@@ -593,6 +593,28 @@ public static class RecorderArguments
     }
 
     /// <summary>
+    /// <c>gdigrab</c>'a yazilacak yakalama bolgesi, ekran hedefi icin. <c>-i desktop</c>
+    /// butun sanal masaustunu veriyor: <b>tek monitor degil</b>. Bu yuzden secilen monitor
+    /// masaustunun tamami degilse indeks sifir olsa da ofsete cevriliyor — aksi halde iki
+    /// monitorlu bir makinede "Ekran 1" iki monitoru birden kaydediyor.
+    /// <para>
+    /// Monitor masaustunun tamamiysa <c>null</c> doner ve <c>-i desktop</c> ofsetsiz kalir;
+    /// tek ekranli makinenin argumani degismiyor. Liste bossa da <c>null</c>: yakalanacak
+    /// yerin ne oldugunu motor uydurmuyor.
+    /// </para>
+    /// </summary>
+    public static RecorderRegion? ScreenCapture(IReadOnlyList<ScreenBounds> screens, int index)
+    {
+        if (screens is null || screens.Count == 0) return null;
+        if (RegionForScreen(screens, index) is not { } region) return null;
+        if (RecorderLayout.Union(screens) is { } union
+            && union.X == region.X && union.Y == region.Y
+            && union.Width == region.Width && union.Height == region.Height)
+            return null;
+        return region;
+    }
+
+    /// <summary>
     /// Istegin kabul edilemez taraflari. Bos liste "kosturulabilir" demektir; uydurma bir
     /// kodek adi ya da eksik pencere secimi sessizce yutulmaz.
     /// </summary>
@@ -648,7 +670,30 @@ public static class RecorderArguments
             yield return "Region dimensions must be even for the selected pixel format.";
 
         if (request.Region.X < 0 || request.Region.Y < 0)
-            yield return "Region offsets cannot be negative.";
+            foreach (var error in NegativeOffsetErrors(request)) yield return error;
+    }
+
+    /// <summary>
+    /// Negatif bolge ofseti her zaman hata degil. Windows ve Linux'ta birincil monitorun
+    /// soluna ya da ustune yerlestirilen ikinci monitor <b>negatif</b> masaustu
+    /// koordinatlarinda oturuyor ve <c>gdigrab</c> ile <c>x11grab</c> oraya bakabiliyor;
+    /// blanket bir "negatif olamaz" kurali o monitorde bolge kaydini tumden kapatiyor.
+    /// <para>
+    /// Kural sayiya degil <b>kapsamaya</b> bakiyor: monitor listesi dikdortgeni kapsiyorsa
+    /// negatif ofset gecerli. Liste bossa masaustunun sola uzandigina dair kanit yok ve
+    /// eski kural duruyor. macOS'ta bolge girdi degil kirpma filtresi: kare icinde negatif
+    /// koordinat yok, orada kural her zaman geciyor.
+    /// </para>
+    /// </summary>
+    private static IEnumerable<string> NegativeOffsetErrors(RecorderRequest request)
+    {
+        if (request.Platform != RecorderPlatform.MacOs
+            && request.Screens.Count > 0
+            && request.Region is { } region
+            && RecorderLayout.Covered(request.Screens, region))
+            yield break;
+
+        yield return "Region offsets cannot be negative.";
     }
 
     private static IEnumerable<string> ScaleErrors(RecorderRequest request)
@@ -832,14 +877,50 @@ public static class RecorderArguments
 
     private static IEnumerable<string> ScreenSelectionErrors(RecorderRequest request)
     {
-        if (request.Platform != RecorderPlatform.Windows || request.ScreenIndex == 0) yield break;
+        if (request.Platform != RecorderPlatform.Windows) yield break;
 
         if (request.Target != RecorderTargetKind.Screen)
-            yield return "A screen index only selects a monitor for whole-screen capture; window and region capture ignore it.";
-        else if (RegionForScreen(request.Screens, request.ScreenIndex) is null)
-            yield return "gdigrab captures the whole desktop and does not take a screen index; monitor "
-                         + request.ScreenIndex.ToString(CultureInfo.InvariantCulture)
-                         + " is not in the enumerated monitor bounds, so no region offset could be derived.";
+        {
+            if (request.ScreenIndex != 0)
+                yield return "A screen index only selects a monitor for whole-screen capture; window and region capture ignore it.";
+
+            foreach (var error in RegionCoverageErrors(request)) yield return error;
+            yield break;
+        }
+
+        if (request.Screens.Count == 0)
+        {
+            if (request.ScreenIndex != 0)
+                yield return MissingMonitor(request.ScreenIndex);
+            yield break;
+        }
+
+        if (RegionForScreen(request.Screens, request.ScreenIndex) is null)
+            yield return MissingMonitor(request.ScreenIndex);
+    }
+
+    private static string MissingMonitor(int index)
+        => "gdigrab captures the whole desktop and does not take a screen index; monitor "
+           + index.ToString(CultureInfo.InvariantCulture)
+           + " is not in the enumerated monitor bounds, so no region offset could be derived.";
+
+    /// <summary>
+    /// Bolgenin monitorlerin disina tasan taraflari. <c>gdigrab</c> masaustunde monitor
+    /// olmayan yeri siyah veriyor; iki monitor arasindaki bosluga ya da masaustunun disina
+    /// dusen dikdortgen sessizce siyah bant olarak kaydedilmesin diye burada duruyor.
+    /// </summary>
+    private static IEnumerable<string> RegionCoverageErrors(RecorderRequest request)
+    {
+        if (request.Target != RecorderTargetKind.Region) yield break;
+        if (request.Screens.Count == 0 || request.Region is not { } region) yield break;
+        if (RecorderLayout.Covered(request.Screens, region)) yield break;
+
+        yield return "The capture region "
+                     + region.Width.ToString(CultureInfo.InvariantCulture) + "x"
+                     + region.Height.ToString(CultureInfo.InvariantCulture) + " at "
+                     + region.X.ToString(CultureInfo.InvariantCulture) + ","
+                     + region.Y.ToString(CultureInfo.InvariantCulture)
+                     + " is not fully covered by the enumerated monitors; gdigrab records the uncovered part as black.";
     }
 
     private static IEnumerable<string> WindowErrors(RecorderRequest request) => request.Platform switch
@@ -1115,8 +1196,8 @@ public static class RecorderArguments
 
         var region = request.Target == RecorderTargetKind.Region
             ? request.Region
-            : request.Target == RecorderTargetKind.Screen && request.ScreenIndex != 0
-                ? RegionForScreen(request.Screens, request.ScreenIndex)
+            : request.Target == RecorderTargetKind.Screen
+                ? ScreenCapture(request.Screens, request.ScreenIndex)
                 : null;
 
         if (region is { } rectangle)

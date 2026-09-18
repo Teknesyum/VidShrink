@@ -326,11 +326,8 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void BasitVeGelismisKipSecenekPaneliniSurer()
     {
-        var dosya = RecorderSettings.FilePath!;
-        var onceki = File.Exists(dosya) ? File.ReadAllBytes(dosya) : null;
-        try
-        {
-            var olcu = AppHost.Run<(bool, bool, int, bool, bool, int, bool, bool, bool, bool)>(() =>
+        var olcu = KaydediciAyarTests.AyarDosyasiyla(
+            () => AppHost.Run<(bool, bool, int, bool, bool, int, bool, bool, bool, bool)>(() =>
             {
                 var view = new RecorderView();
                 T Bul<T>(string ad) where T : Avalonia.Controls.Control
@@ -351,24 +348,18 @@ public sealed class KaydediciArayuzTests
                 Bul<Avalonia.Controls.RadioButton>("RadSimple").IsChecked = true;
                 return (basitGelismis, basitPanel, basitYayilim, gelismisPanel, gelismisElle, gelismisYayilim,
                     elleKaydi, view.ManualMode, view.AutoMode, view.Settings.ManualMode);
-            });
+            }));
 
-            Assert.False(olcu.Item1);
-            Assert.False(olcu.Item2);
-            Assert.Equal(2, olcu.Item3);
-            Assert.True(olcu.Item4);
-            Assert.True(olcu.Item5);
-            Assert.Equal(1, olcu.Item6);
-            Assert.True(olcu.Item7);
-            Assert.False(olcu.Item8);
-            Assert.True(olcu.Item9);
-            Assert.True(olcu.Item10);
-        }
-        finally
-        {
-            if (onceki is null) File.Delete(dosya);
-            else File.WriteAllBytes(dosya, onceki);
-        }
+        Assert.False(olcu.Item1);
+        Assert.False(olcu.Item2);
+        Assert.Equal(2, olcu.Item3);
+        Assert.True(olcu.Item4);
+        Assert.True(olcu.Item5);
+        Assert.Equal(1, olcu.Item6);
+        Assert.True(olcu.Item7);
+        Assert.False(olcu.Item8);
+        Assert.True(olcu.Item9);
+        Assert.True(olcu.Item10);
     }
 
     [Theory]
@@ -888,24 +879,14 @@ public sealed class KaydediciArayuzTests
 
     private static T GelismisOlc<T>(Func<RecorderView, Func<string, Avalonia.Controls.Control>, T> olc)
     {
-        var dosya = RecorderSettings.FilePath!;
-        var onceki = File.Exists(dosya) ? File.ReadAllBytes(dosya) : null;
-        try
+        return KaydediciAyarTests.AyarDosyasiyla(() => AppHost.Run<T>(() =>
         {
-            return AppHost.Run<T>(() =>
-            {
-                var view = new RecorderView();
-                Avalonia.Controls.Control Bul(string ad) => Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Control>(view, ad)!;
-                ((Avalonia.Controls.RadioButton)Bul("RadAdvanced")).IsChecked = true;
-                ((Avalonia.Controls.RadioButton)Bul("RadManual")).IsChecked = true;
-                return olc(view, Bul);
-            });
-        }
-        finally
-        {
-            if (onceki is null) File.Delete(dosya);
-            else File.WriteAllBytes(dosya, onceki);
-        }
+            var view = new RecorderView();
+            Avalonia.Controls.Control Bul(string ad) => Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Control>(view, ad)!;
+            ((Avalonia.Controls.RadioButton)Bul("RadAdvanced")).IsChecked = true;
+            ((Avalonia.Controls.RadioButton)Bul("RadManual")).IsChecked = true;
+            return olc(view, Bul);
+        }));
     }
 
     private static void Sec(Avalonia.Controls.Control kutu, string oge)

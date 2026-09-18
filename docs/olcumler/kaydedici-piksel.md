@@ -77,8 +77,7 @@ görüyor (gdigrab'ın siyah masaüstünden farklı olarak).
 
 Ölçülmeyen: affinity'li çerçevenin ekranda göründüğü (tanımı gereği yakalamada görünmez; aynı kodun
 affinity'siz kolu çizildiğini gösteriyor). Büyüteç `RecorderMagnifierHost` üzerinden değil, `Follow`
-sabit noktayla çağrılarak ölçüldü (kullanıcının imleci oynatılmadı). Tek ekran, ölçek 1; çoklu ekran ve
-ölçek ≠ 1 ölçülmedi.
+sabit noktayla çağrılarak ölçüldü (kullanıcının imleci oynatılmadı). Tek ekran, ölçek 1; bu tablonun bindirme pikselleri çoklu ekranda ve ölçek ≠ 1'de ölçülmedi. Yakalama dikdörtgeninin çoklu ekran ve ölçek ≠ 1 hesabı ayrı ölçüldü: `kaydedici-coklu-ekran.md`.
 
 ## Tıklama Sesi
 

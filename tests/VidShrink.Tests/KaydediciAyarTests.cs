@@ -97,19 +97,31 @@ public sealed class KaydediciAyarTests
         return i >= 0 && i + 1 < args.Count ? args[i + 1] : null;
     }
 
+    private static readonly object AyarKapisi = new();
+
+    /// <summary>
+    /// Ayar dosyasini bosaltip olcumu kosar, sonra dosyayi oldugu gibi geri koyar. Dosya
+    /// surec basina tek oldugu icin bosaltma-kosum-gerikoyma ucusu <see cref="AyarKapisi"/>
+    /// ile boluenemez yapiliyor: xUnit sinif duzeyinde paralel kostugundan, kilitsiz
+    /// surumde bir sinifin yazdigi secim baska bir sinifin "dosya bos" beklentisine
+    /// karisiyordu. Kilit ayni is parcaciginda yeniden girilebilir, ic ice kullanim guvenli.
+    /// </summary>
     internal static T AyarDosyasiyla<T>(Func<T> olc)
     {
-        var dosya = RecorderSettings.FilePath!;
-        var onceki = File.Exists(dosya) ? File.ReadAllBytes(dosya) : null;
-        try
+        lock (AyarKapisi)
         {
-            if (File.Exists(dosya)) File.Delete(dosya);
-            return olc();
-        }
-        finally
-        {
-            if (onceki is null) File.Delete(dosya);
-            else File.WriteAllBytes(dosya, onceki);
+            var dosya = RecorderSettings.FilePath!;
+            var onceki = File.Exists(dosya) ? File.ReadAllBytes(dosya) : null;
+            try
+            {
+                if (File.Exists(dosya)) File.Delete(dosya);
+                return olc();
+            }
+            finally
+            {
+                if (onceki is null) File.Delete(dosya);
+                else File.WriteAllBytes(dosya, onceki);
+            }
         }
     }
 
