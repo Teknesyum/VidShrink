@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -472,7 +472,7 @@ public sealed class OynaticiYolHaritasiTests
             var ac = window.OpenInPlayerAsync(klip);
             DenetimSurucu.Pump(view, () => ac.IsCompleted, 10);
             DenetimSurucu.Wait(view, 0.3);
-            if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
+            if (view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
 
             var saat = new ElleSaat();
             window.ChromeZone.Clock = saat;
@@ -491,15 +491,18 @@ public sealed class OynaticiYolHaritasiTests
                 if (!ok) hatalar.Add(ad);
             }
 
-            Adim("1 fare ustte", () => Hareket(window, view, new Point(640, 2)), true, false);
-            Adim("2 fare asagida, gecikme bekliyor", () => Hareket(window, view, new Point(640, 420)), true, true);
-            Adim("3 gecikme doldu", () => saat.Ates(), false, false);
-            Adim("4 duraklatildi, fare asagida", () => view.Apply(Keymap.PlayPause.ToCommand()), true, false);
-            Adim("5 duraklatilmisken fare kipirdadi", () => Hareket(window, view, new Point(600, 500)), true, false);
-            Adim("6 oynatma surdu", () => view.Apply(Keymap.PlayPause.ToCommand()), true, true);
-            Adim("7 gecikme doldu", () => saat.Ates(), false, false);
-            Adim("8 ayarlar sekmesi", () => window.Tabs.SelectedItem = window.TabSettings, true, false);
-            Adim("9 ayarlar sekmesinde fare asagida", () => { Hareket(window, view, new Point(600, 520)); saat.Ates(); }, true, false);
+            Adim("1 oynatma basladi, gecikme bekliyor", () => view.Apply(Keymap.PlayPause.ToCommand()), true, true);
+            Adim("2 gecikme doldu", () => saat.Ates(), false, false);
+            Adim("3 fare ustte, bar geri geldi", () => Hareket(window, view, new Point(640, 2)), true, false);
+            Adim("4 fare asagida, gecikme bekliyor", () => Hareket(window, view, new Point(640, 420)), true, true);
+            Adim("5 gecikme doldu", () => saat.Ates(), false, false);
+            Adim("6 duraklatildi, fare asagida", () => view.Apply(Keymap.PlayPause.ToCommand()), true, false);
+            Adim("7 duraklatilmisken fare ust banda girdi", () => Hareket(window, view, new Point(600, 2)), true, false);
+            Adim("8 duraklatilmisken fare banttan cikti", () => Hareket(window, view, new Point(600, 500)), true, false);
+            Adim("9 oynatma surdu", () => view.Apply(Keymap.PlayPause.ToCommand()), true, true);
+            Adim("10 gecikme doldu", () => saat.Ates(), false, false);
+            Adim("11 ayarlar sekmesi", () => window.Tabs.SelectedItem = window.TabSettings, true, false);
+            Adim("12 ayarlar sekmesinde fare asagida", () => { Hareket(window, view, new Point(600, 520)); saat.Ates(); }, true, false);
 
             window.Close();
             Assert.Equal(seritGecikme, gecikme);
