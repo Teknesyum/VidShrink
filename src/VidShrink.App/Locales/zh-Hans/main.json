@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "图像字幕（PGS/VobSub）无法放入 MP4，已被丢弃；打开“保留所有轨道”可在 MKV 中保留",
   "main.reason.stream.subtitle-dropped-platform": "平台目标始终输出不带字幕的 MP4",
   "main.reason.stream.keep-tracks-overridden": "已忽略“保留所有轨道”：平台目标始终输出只有一条音频轨道的 MP4",
+  "main.reason.stream.audio-codec-not-in-container": "源音频编码格式无法在此容器中传输，因此该音轨将重新编码",
   "main.reason.stream.lossless-not-passed": "无损 TrueHD/DTS 轨道从不复制，而是重新编码",
   "main.reason.fill-crf-lowered": "填满目标策略将 CRF 降至 {0}，而不是停在透明上限，落在 {2}-{3} MB 区间内 {1} MB 的区间中心附近",
   "main.reason.fill-band-center": "在到达填充区间之前已达到 CRF 下限 {0}，因此两遍 VBR 直接以 {1} MB 区间中心为目标",

@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "slikovni titlovi (PGS/VobSub) ne mogu u MP4 i odbacuju se; uključite 'Zadrži sve zapise' da se prenesu u MKV",
   "main.reason.stream.subtitle-dropped-platform": "cilj platforme uvijek daje MP4 bez titlova",
   "main.reason.stream.keep-tracks-overridden": "'Zadrži sve zapise' zanemareno je: cilj platforme uvijek daje MP4 s jednim audiozapisom",
+  "main.reason.stream.audio-codec-not-in-container": "izvorni audio kodek ne može se prenijeti u ovom kontejneru, pa se zapis ponovno kodira",
   "main.reason.stream.lossless-not-passed": "TrueHD/DTS zapis bez gubitaka nikad se ne kopira; ponovno se kodira",
   "main.reason.fill-crf-lowered": "pravilo popunjavanja cilja spustilo je CRF na {0} umjesto zaustavljanja na granici prozirnosti, slijećući blizu središta pojasa od {1} MB unutar pojasa {2}-{3} MB",
   "main.reason.fill-band-center": "donja granica CRF {0} dosegnuta je prije pojasa popunjavanja, pa dvoprolazni VBR izravno cilja središte pojasa od {1} MB",

@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "manukuu ya picha (PGS/VobSub) hayawezi kuwa ndani ya MP4 na yanaondolewa; washa 'Hifadhi nyimbo zote' ili kuyabeba katika MKV",
   "main.reason.stream.subtitle-dropped-platform": "lengo la jukwaa hutoa MP4 bila manukuu kila wakati",
   "main.reason.stream.keep-tracks-overridden": "'Hifadhi nyimbo zote' imepuuzwa: lengo la jukwaa hutoa MP4 yenye wimbo mmoja wa sauti kila wakati",
+  "main.reason.stream.audio-codec-not-in-container": "kodeki ya sauti ya chanzo haiwezi kubebwa kwenye kontena hili, hivyo wimbo unasimbwa upya",
   "main.reason.stream.lossless-not-passed": "wimbo wa TrueHD/DTS usiopoteza ubora haunakiliwi kamwe; unasimbwa upya",
   "main.reason.fill-crf-lowered": "sera ya kujaza lengo ilipunguza CRF hadi {0} badala ya kusimama kwenye kikomo cha uwazi, ikifika karibu na kitovu cha bendi cha MB {1} ndani ya bendi ya MB {2}-{3}",
   "main.reason.fill-band-center": "sakafu ya CRF {0} ilifikiwa kabla ya bendi ya kujaza, kwa hiyo VBR ya hatua mbili hulenga kitovu cha bendi cha MB {1} moja kwa moja",

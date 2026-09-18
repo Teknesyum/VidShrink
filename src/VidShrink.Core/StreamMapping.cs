@@ -4,7 +4,7 @@ namespace VidShrink.Core;
 
 public enum StreamKind { Video, Audio, Subtitle, Attachment, Data }
 
-public enum OutputContainer { Mp4, Mkv, WebM }
+public enum OutputContainer { Mp4, Mkv, WebM, Mov }
 
 public enum TrackAction { Encode, Copy }
 
@@ -17,7 +17,8 @@ public enum StreamNote
     ImageSubtitleDropped,
     SubtitleDroppedForPlatform,
     KeepAllTracksOverriddenByPlatform,
-    LosslessAudioNotPassedThrough
+    LosslessAudioNotPassedThrough,
+    AudioCodecNotInContainer
 }
 
 public sealed record SourceStream(
@@ -109,7 +110,8 @@ public static class StreamMapping
     {
         [OutputContainer.Mp4] = new[] { "aac", "ac3", "eac3", "opus", "mp3", "flac" },
         [OutputContainer.Mkv] = new[] { "aac", "ac3", "eac3", "opus", "mp3", "flac", "vorbis" },
-        [OutputContainer.WebM] = new[] { "opus", "vorbis" }
+        [OutputContainer.WebM] = new[] { "opus", "vorbis" },
+        [OutputContainer.Mov] = new[] { "aac", "ac3", "eac3", "mp3", "alac" }
     };
 
     private static readonly IReadOnlyDictionary<string, string[]> LanguageCodes = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
@@ -127,6 +129,14 @@ public static class StreamMapping
         ["vi"] = new[] { "vie" }, ["zh"] = new[] { "zho", "chi" }
     };
 
+    /// <summary>
+    /// MOV, MP4'un muxer soyundan: <c>+faststart</c>, <c>mov_text</c> altyazi ve tek iz
+    /// kurali ikisinde de ayni. Ayrildiklari tek yer ses kopyalama listesi
+    /// (<c>docs/netlestirme/022-mov-kabi-kucultmede.md</c>).
+    /// </summary>
+    public static bool IsMp4Family(OutputContainer container)
+        => container is OutputContainer.Mp4 or OutputContainer.Mov;
+
     public static OutputContainer ContainerFor(StreamRequest request)
         => request.KeepAllTracks && !request.PlatformDelivery ? OutputContainer.Mkv : OutputContainer.Mp4;
 
@@ -134,6 +144,7 @@ public static class StreamMapping
     {
         ".mkv" => OutputContainer.Mkv,
         ".webm" => OutputContainer.WebM,
+        ".mov" => OutputContainer.Mov,
         _ => OutputContainer.Mp4
     };
 
@@ -141,6 +152,7 @@ public static class StreamMapping
     {
         OutputContainer.Mkv => "mkv",
         OutputContainer.WebM => "webm",
+        OutputContainer.Mov => "mov",
         _ => "mp4"
     };
 
@@ -181,7 +193,7 @@ public static class StreamMapping
 
         if (request.KeepAllTracks && request.PlatformDelivery)
             notes.Add(StreamNote.KeepAllTracksOverriddenByPlatform);
-        var keepAll = request.KeepAllTracks && !request.PlatformDelivery && container != OutputContainer.Mp4;
+        var keepAll = request.KeepAllTracks && !request.PlatformDelivery && !IsMp4Family(container);
 
         var video = info.Streams.FirstOrDefault(stream => stream.Kind == StreamKind.Video && !stream.IsAttachedPicture);
         var videoMap = video is null ? "0:v:0" : Map(video);
@@ -228,6 +240,11 @@ public static class StreamMapping
                     continue;
                 }
 
+                if (allowPassthrough && inventory && !lossless
+                    && !CopyableAudio[container].Contains(source.Codec, StringComparer.OrdinalIgnoreCase)
+                    && CopyableAudio.Values.Any(list => list.Contains(source.Codec, StringComparer.OrdinalIgnoreCase)))
+                    notes.Add(StreamNote.AudioCodecNotInContainer);
+
                 var channels = audioChannels;
                 if (channels is null && source.Channels > 2)
                 {
@@ -235,7 +252,7 @@ public static class StreamMapping
                     notes.Add(StreamNote.AudioDownmixedToStereo);
                 }
                 var codec = audioCodec;
-                if (container != OutputContainer.Mp4 && codec == "aac") codec = "libopus";
+                if (!IsMp4Family(container) && codec == "aac") codec = "libopus";
                 audio.Add(new AudioTrack(map, TrackAction.Encode, codec, audioK, channels, source.Language));
             }
         }
@@ -251,7 +268,7 @@ public static class StreamMapping
 
             var text = IsTextSubtitle(source.Codec);
             var image = IsImageSubtitle(source.Codec);
-            if (container == OutputContainer.Mp4)
+            if (IsMp4Family(container))
             {
                 if (text)
                 {

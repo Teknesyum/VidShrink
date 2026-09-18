@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "subtitle gambar (PGS/VobSub) tidak bisa dimuat dalam MP4 dan dibuang; nyalakan 'Pertahankan semua trek' untuk membawanya dalam MKV",
   "main.reason.stream.subtitle-dropped-platform": "target platform selalu menghasilkan MP4 tanpa subtitle",
   "main.reason.stream.keep-tracks-overridden": "'Pertahankan semua trek' diabaikan: target platform selalu menghasilkan MP4 dengan satu trek audio",
+  "main.reason.stream.audio-codec-not-in-container": "codec audio sumber tidak dapat dibawa dalam wadah ini, sehingga trek dienkode ulang",
   "main.reason.stream.lossless-not-passed": "trek TrueHD/DTS lossless tidak pernah disalin; trek itu dienkode ulang",
   "main.reason.fill-crf-lowered": "kebijakan isi target menurunkan CRF ke {0} alih-alih berhenti di batas transparansi, mendarat dekat pusat pita {1} MB di dalam pita {2}-{3} MB",
   "main.reason.fill-band-center": "batas bawah CRF {0} tercapai sebelum pita isi, jadi VBR dua lintasan langsung menargetkan pusat pita {1} MB",

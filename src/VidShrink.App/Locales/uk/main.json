@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "графічні субтитри (PGS/VobSub) не вміщуються в MP4 і відкидаються; увімкніть 'Зберегти всі доріжки', щоб перенести їх у MKV",
   "main.reason.stream.subtitle-dropped-platform": "ціль для платформи завжди дає MP4 без субтитрів",
   "main.reason.stream.keep-tracks-overridden": "'Зберегти всі доріжки' проігноровано: ціль для платформи завжди дає MP4 з однією звуковою доріжкою",
+  "main.reason.stream.audio-codec-not-in-container": "вихідний аудіокодек не може передаватися в цьому контейнері, тому доріжка перекодовується",
   "main.reason.stream.lossless-not-passed": "доріжка TrueHD/DTS без втрат ніколи не копіюється; вона перекодовується",
   "main.reason.fill-crf-lowered": "політика заповнення цілі знизила CRF до {0} замість зупинки на стелі прозорості, ляглo біля центру смуги {1} МБ у межах {2}-{3} МБ",
   "main.reason.fill-band-center": "поріг CRF {0} досягнуто до смуги заповнення, тож двопрохідний VBR цілиться прямо в центр смуги {1} МБ",

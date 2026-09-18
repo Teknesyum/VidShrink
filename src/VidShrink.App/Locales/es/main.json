@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "los subtítulos de imagen (PGS/VobSub) no caben en MP4 y se descartan; active 'Conservar todas las pistas' para llevarlos en MKV",
   "main.reason.stream.subtitle-dropped-platform": "un objetivo de plataforma siempre entrega MP4 sin subtítulos",
   "main.reason.stream.keep-tracks-overridden": "se ignoró 'Conservar todas las pistas': un objetivo de plataforma siempre entrega MP4 con una sola pista de audio",
+  "main.reason.stream.audio-codec-not-in-container": "el códec de audio de origen no puede viajar en este contenedor, así que la pista se recodifica",
   "main.reason.stream.lossless-not-passed": "una pista TrueHD/DTS sin pérdida nunca se copia; se recodifica",
   "main.reason.fill-crf-lowered": "la política de llenar el destino bajó el CRF a {0} en vez de detenerse en el techo de transparencia, cayendo cerca del centro de banda de {1} MB dentro de la banda {2}-{3} MB",
   "main.reason.fill-band-center": "el mínimo CRF {0} se alcanzó antes de la banda de llenado, así que el VBR a dos pasadas apunta directamente al centro de banda de {1} MB",

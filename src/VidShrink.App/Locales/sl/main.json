@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "slikovni podnapisi (PGS/VobSub) ne gredo v MP4 in se zavržejo; vklopite 'Ohrani vse sledi', da se prenesejo v MKV",
   "main.reason.stream.subtitle-dropped-platform": "cilj platforme vedno da MP4 brez podnapisov",
   "main.reason.stream.keep-tracks-overridden": "'Ohrani vse sledi' je bilo prezrto: cilj platforme vedno da MP4 z eno zvočno sledjo",
+  "main.reason.stream.audio-codec-not-in-container": "izvorni avdio kodek ne more potovati v tem vsebniku, zato se sled ponovno kodira",
   "main.reason.stream.lossless-not-passed": "brezizgubna sled TrueHD/DTS se nikoli ne kopira; ponovno se kodira",
   "main.reason.fill-crf-lowered": "politika zapolnitve cilja je znižala CRF na {0}, namesto da bi se ustavila na meji prosojnosti, in pristala blizu središča pasu {1} MB znotraj pasu {2}–{3} MB",
   "main.reason.fill-band-center": "spodnja meja CRF {0} je bila dosežena pred pasom zapolnitve, zato dvoprehodni VBR neposredno cilja na središče pasu {1} MB",

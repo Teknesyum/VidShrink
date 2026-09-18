@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "لا يمكن نقل ترجمات الصور (PGS/VobSub) في MP4 فتُحذف؛ فعّل 'الاحتفاظ بكل المسارات' لنقلها في MKV",
   "main.reason.stream.subtitle-dropped-platform": "هدف المنصة يسلّم دائمًا MP4 بلا ترجمات",
   "main.reason.stream.keep-tracks-overridden": "تم تجاهل 'الاحتفاظ بكل المسارات': هدف المنصة يسلّم دائمًا MP4 بمسار صوت واحد",
+  "main.reason.stream.audio-codec-not-in-container": "ترميز الصوت المصدر (codec) لا يمكن نقله داخل هذا الحاوية، لذلك يُعاد ترميز المقطع",
   "main.reason.stream.lossless-not-passed": "مسار TrueHD/DTS بلا فقد لا يُنسخ أبدًا؛ بل يُعاد ترميزه",
   "main.reason.fill-crf-lowered": "سياسة ملء الهدف خفضت CRF إلى {0} بدل التوقف عند سقف الشفافية، لتقع قرب مركز النطاق {1} م.ب داخل نطاق {2}-{3} م.ب",
   "main.reason.fill-band-center": "بُلغ الحد الأدنى CRF {0} قبل نطاق الملء، فتستهدف تمريرتا VBR مركز النطاق {1} م.ب مباشرة",

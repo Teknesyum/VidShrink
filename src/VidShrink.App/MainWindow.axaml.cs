@@ -3759,6 +3759,7 @@ public partial class MainWindow : Window
         StreamNote.ImageSubtitleDropped => "main.reason.stream.image-subtitle-dropped",
         StreamNote.SubtitleDroppedForPlatform => "main.reason.stream.subtitle-dropped-platform",
         StreamNote.KeepAllTracksOverriddenByPlatform => "main.reason.stream.keep-tracks-overridden",
+        StreamNote.AudioCodecNotInContainer => "main.reason.stream.audio-codec-not-in-container",
         _ => "main.reason.stream.lossless-not-passed"
     };
 

@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "pildisubtiitrid (PGS/VobSub) ei mahu MP4-sse ja jäetakse välja; lülita sisse 'Säilita kõik rajad', et need MKV-s kaasa võtta",
   "main.reason.stream.subtitle-dropped-platform": "platvormi siht annab alati subtiitriteta MP4",
   "main.reason.stream.keep-tracks-overridden": "'Säilita kõik rajad' jäeti arvestamata: platvormi siht annab alati ühe helirajaga MP4",
+  "main.reason.stream.audio-codec-not-in-container": "lähteaudio kodekit ei saa selles konteineris kasutada, seetõttu kodeeritakse rada ümber",
   "main.reason.stream.lossless-not-passed": "kadudeta TrueHD/DTS-rada ei kopeerita kunagi; see kodeeritakse ümber",
   "main.reason.fill-crf-lowered": "täitmissihi poliitika langetas CRF-i {0}-le, selle asemel et läbipaistvuse ülempiiril peatuda, maandudes {1} MB riba keskme lähedal {2}-{3} MB ribas",
   "main.reason.fill-band-center": "CRF alampiir {0} saavutati enne täiteriba, seega sihib kahekäiguline VBR otse {1} MB riba keset",

@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "이미지 자막(PGS/VobSub)은 MP4에 담을 수 없어 제외됩니다; MKV로 옮기려면 '모든 트랙 유지'를 켜세요",
   "main.reason.stream.subtitle-dropped-platform": "플랫폼 목표는 항상 자막 없는 MP4를 만듭니다",
   "main.reason.stream.keep-tracks-overridden": "'모든 트랙 유지'가 무시되었습니다: 플랫폼 목표는 항상 오디오 트랙 하나인 MP4를 만듭니다",
+  "main.reason.stream.audio-codec-not-in-container": "원본 오디오 코덱은 이 컨테이너에서 사용할 수 없어 트랙을 다시 인코딩합니다",
   "main.reason.stream.lossless-not-passed": "무손실 TrueHD/DTS 트랙은 절대 복사되지 않고 재인코딩됩니다",
   "main.reason.fill-crf-lowered": "채우기 목표 정책이 투명 상한에서 멈추는 대신 CRF를 {0}으로 낮춰 {2}-{3} MB 대역 안의 중심 {1} MB 근처에 도달",
   "main.reason.fill-band-center": "채우기 대역 전에 CRF 하한 {0}에 이르러 2패스 VBR이 대역 중심 {1} MB를 직접 목표로 함",

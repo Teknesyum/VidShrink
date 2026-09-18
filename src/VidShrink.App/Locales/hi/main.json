@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "इमेज सबटाइटल (PGS/VobSub) MP4 में नहीं जा सकते और हटा दिए जाते हैं; उन्हें MKV में ले जाने के लिए 'सभी ट्रैक रखें' चालू करें",
   "main.reason.stream.subtitle-dropped-platform": "प्लेटफ़ॉर्म लक्ष्य हमेशा बिना सबटाइटल का MP4 देता है",
   "main.reason.stream.keep-tracks-overridden": "'सभी ट्रैक रखें' अनदेखा किया गया: प्लेटफ़ॉर्म लक्ष्य हमेशा एक ऑडियो ट्रैक वाला MP4 देता है",
+  "main.reason.stream.audio-codec-not-in-container": "स्रोत ऑडियो कोडेक इस कंटेनर में नहीं चल सकता, इसलिए ट्रैक को फिर से एन्कोड किया गया",
   "main.reason.stream.lossless-not-passed": "लॉसलेस TrueHD/DTS ट्रैक कभी कॉपी नहीं होता; उसे दोबारा एन्कोड किया जाता है",
   "main.reason.fill-crf-lowered": "लक्ष्य भरने की नीति ने पारदर्शिता सीमा पर रुकने के बजाय CRF को {0} पर घटाया, {2}-{3} MB बैंड के भीतर {1} MB बैंड केंद्र के पास उतरते हुए",
   "main.reason.fill-band-center": "CRF न्यूनतम {0} भरण बैंड से पहले पहुँच गया, इसलिए दो-पास VBR सीधे {1} MB बैंड केंद्र को लक्ष्य बनाता है",

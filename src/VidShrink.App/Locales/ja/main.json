@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "画像字幕(PGS/VobSub)はMP4に入らないため削除されます。MKVで残すには「すべてのトラックを保持」をオンにしてください",
   "main.reason.stream.subtitle-dropped-platform": "プラットフォーム向けの目標は常に字幕なしのMP4を出力します",
   "main.reason.stream.keep-tracks-overridden": "「すべてのトラックを保持」は無視されました。プラットフォーム向けの目標は常に音声トラック1つのMP4を出力します",
+  "main.reason.stream.audio-codec-not-in-container": "元の音声コーデックはこのコンテナ形式では扱えないため、トラックは再エンコードされます",
   "main.reason.stream.lossless-not-passed": "ロスレスのTrueHD/DTSトラックはコピーされず、再エンコードされます",
   "main.reason.fill-crf-lowered": "目標まで使うポリシーにより、透明性上限で止めずCRFを{0}に下げ、{2}-{3} MBの帯域内の中心{1} MB付近に収めました",
   "main.reason.fill-band-center": "帯域に達する前にCRF下限{0}に到達したため、2パスVBRが帯域中心{1} MBを直接狙います",

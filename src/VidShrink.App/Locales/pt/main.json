@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "legendas de imagem (PGS/VobSub) não cabem em MP4 e são descartadas; ative 'Manter todas as faixas' para levá-las em MKV",
   "main.reason.stream.subtitle-dropped-platform": "um alvo de plataforma sempre entrega MP4 sem legendas",
   "main.reason.stream.keep-tracks-overridden": "'Manter todas as faixas' foi ignorado: um alvo de plataforma sempre entrega MP4 com uma faixa de áudio",
+  "main.reason.stream.audio-codec-not-in-container": "o codec de áudio de origem não pode ser transportado neste contêiner, então a faixa é recodificada",
   "main.reason.stream.lossless-not-passed": "uma faixa TrueHD/DTS sem perdas nunca é copiada; ela é recodificada",
   "main.reason.fill-crf-lowered": "a política de preencher o alvo baixou o CRF para {0} em vez de parar no teto de transparência, ficando perto do centro de {1} MB dentro da faixa de {2}-{3} MB",
   "main.reason.fill-band-center": "o piso de CRF {0} foi alcançado antes da faixa de preenchimento, então o VBR em duas passagens mira diretamente o centro de {1} MB",

@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "Bilduntertitel (PGS/VobSub) passen nicht in MP4 und werden verworfen; aktivieren Sie 'Alle Spuren behalten', um sie in MKV zu übernehmen",
   "main.reason.stream.subtitle-dropped-platform": "ein Plattformziel liefert immer MP4 ohne Untertitel",
   "main.reason.stream.keep-tracks-overridden": "'Alle Spuren behalten' wurde ignoriert: ein Plattformziel liefert immer MP4 mit einer Tonspur",
+  "main.reason.stream.audio-codec-not-in-container": "der Quell-Audiocodec kann in diesem Container nicht transportiert werden, daher wird die Spur neu kodiert",
   "main.reason.stream.lossless-not-passed": "eine verlustfreie TrueHD/DTS-Spur wird nie kopiert; sie wird neu kodiert",
   "main.reason.fill-crf-lowered": "die Ausfüll-Regel senkte CRF auf {0}, statt an der Transparenz-Obergrenze zu halten, und landet nahe der Bandmitte {1} MB im Band {2}-{3} MB",
   "main.reason.fill-band-center": "die CRF-Untergrenze {0} wurde vor dem Ausfüllband erreicht, VBR mit zwei Durchgängen zielt daher direkt auf die Bandmitte {1} MB",

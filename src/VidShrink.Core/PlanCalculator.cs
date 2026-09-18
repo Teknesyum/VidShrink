@@ -1657,6 +1657,7 @@ public static class PlanCalculator
                 StreamNote.ImageSubtitleDropped => "image subtitles (PGS/VobSub) cannot be carried in MP4 and are dropped; turn on keep tracks to carry them in MKV",
                 StreamNote.SubtitleDroppedForPlatform => "a platform target always delivers MP4 without subtitles",
                 StreamNote.KeepAllTracksOverriddenByPlatform => "keep tracks was ignored: a platform target always delivers MP4 with one audio track",
+                StreamNote.AudioCodecNotInContainer => "the source audio codec cannot travel in this container, so the track is re-encoded",
                 _ => "a lossless TrueHD/DTS track is never copied; it is re-encoded"
             });
     }

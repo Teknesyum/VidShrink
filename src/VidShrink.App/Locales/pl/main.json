@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "napisy obrazkowe (PGS/VobSub) nie mieszczą się w MP4 i są pomijane; włącz 'Zachowaj wszystkie ścieżki', aby przenieść je w MKV",
   "main.reason.stream.subtitle-dropped-platform": "cel platformy zawsze daje MP4 bez napisów",
   "main.reason.stream.keep-tracks-overridden": "pominięto 'Zachowaj wszystkie ścieżki': cel platformy zawsze daje MP4 z jedną ścieżką dźwiękową",
+  "main.reason.stream.audio-codec-not-in-container": "źródłowy kodek audio nie może być przenoszony w tym kontenerze, więc ścieżka jest ponownie kodowana",
   "main.reason.stream.lossless-not-passed": "bezstratna ścieżka TrueHD/DTS nigdy nie jest kopiowana; jest kodowana ponownie",
   "main.reason.fill-crf-lowered": "polityka wypełniania celu obniżyła CRF do {0} zamiast zatrzymać się na pułapie przezroczystości, lądując blisko środka pasma {1} MB w paśmie {2}-{3} MB",
   "main.reason.fill-band-center": "próg CRF {0} osiągnięto przed pasmem wypełnienia, więc dwuprzebiegowy VBR celuje wprost w środek pasma {1} MB",

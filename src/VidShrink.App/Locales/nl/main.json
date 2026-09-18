@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "beeldondertitels (PGS/VobSub) passen niet in MP4 en vallen weg; zet 'Alle sporen behouden' aan om ze in MKV mee te nemen",
   "main.reason.stream.subtitle-dropped-platform": "een platformdoel levert altijd MP4 zonder ondertitels",
   "main.reason.stream.keep-tracks-overridden": "'Alle sporen behouden' is genegeerd: een platformdoel levert altijd MP4 met één audiospoor",
+  "main.reason.stream.audio-codec-not-in-container": "de bron-audiocodec kan niet in deze container worden getransporteerd, dus het spoor wordt opnieuw gecodeerd",
   "main.reason.stream.lossless-not-passed": "een lossless TrueHD/DTS-spoor wordt nooit gekopieerd; het wordt opnieuw gecodeerd",
   "main.reason.fill-crf-lowered": "het vulbeleid verlaagde CRF naar {0} in plaats van bij de transparantielimiet te stoppen, en landt bij het bandcentrum van {1} MB binnen de band van {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-ondergrens {0} is bereikt vóór de vulband, dus VBR met twee doorgangen mikt direct op het bandcentrum van {1} MB",

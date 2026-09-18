@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "obrazové titulky (PGS/VobSub) se do MP4 nevejdou a zahazují se; zapněte 'Zachovat všechny stopy', aby se přenesly v MKV",
   "main.reason.stream.subtitle-dropped-platform": "cíl platformy vždy dodá MP4 bez titulků",
   "main.reason.stream.keep-tracks-overridden": "'Zachovat všechny stopy' bylo ignorováno: cíl platformy vždy dodá MP4 s jednou zvukovou stopou",
+  "main.reason.stream.audio-codec-not-in-container": "zdrojový audio kodek nelze v tomto kontejneru přenášet, proto je stopa překódována",
   "main.reason.stream.lossless-not-passed": "bezeztrátová stopa TrueHD/DTS se nikdy nekopíruje; překóduje se",
   "main.reason.fill-crf-lowered": "politika naplnění cíle snížila CRF na {0} místo zastavení na stropu průhlednosti a přistává blízko středu pásma {1} MB uvnitř pásma {2}–{3} MB",
   "main.reason.fill-band-center": "spodní mez CRF {0} byla dosažena před pásmem naplnění, dvouprůchodové VBR tedy cílí přímo na střed pásma {1} MB",

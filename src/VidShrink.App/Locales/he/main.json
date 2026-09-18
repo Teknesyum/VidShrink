@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "כתוביות תמונה (PGS/VobSub) אינן נכנסות ל-MP4 ומושמטות; הפעילו את 'שמירת כל הרצועות' כדי להעביר אותן ב-MKV",
   "main.reason.stream.subtitle-dropped-platform": "יעד פלטפורמה מספק תמיד MP4 ללא כתוביות",
   "main.reason.stream.keep-tracks-overridden": "'שמירת כל הרצועות' לא נלקחה בחשבון: יעד פלטפורמה מספק תמיד MP4 עם רצועת שמע אחת",
+  "main.reason.stream.audio-codec-not-in-container": "מקודד השמע המקורי אינו יכול לעבור במכל הזה, לכן הפס מקודד מחדש",
   "main.reason.stream.lossless-not-passed": "רצועת TrueHD/DTS ללא אובדן לעולם אינה מועתקת; היא מקודדת מחדש",
   "main.reason.fill-crf-lowered": "מדיניות מילוי היעד הורידה את CRF ל-{0} במקום לעצור בתקרת השקיפות, ונחתה ליד מרכז הרצועה {1} MB בתוך רצועת {2}-{3} MB",
   "main.reason.fill-band-center": "רצפת CRF {0} הושגה לפני רצועת המילוי, ולכן VBR בשני מעברים מכוון ישירות למרכז הרצועה {1} MB",

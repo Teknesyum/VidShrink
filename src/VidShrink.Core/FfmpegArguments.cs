@@ -492,7 +492,7 @@ public static class FfmpegArguments
         }
 
         a.AddRange(streams.OutputArguments(dropChapters: plan.Trim is not null));
-        if (streams.Container == OutputContainer.Mp4)
+        if (StreamMapping.IsMp4Family(streams.Container))
             a.AddRange(new[] { "-movflags", "+faststart" });
         a.AddRange(plan.ExtraArgs);
         a.Add(outputPath);

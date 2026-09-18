@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "คำบรรยายแบบภาพ (PGS/VobSub) ใส่ใน MP4 ไม่ได้จึงถูกตัดออก เปิด 'เก็บทุกแทร็ก' เพื่อนำไปใน MKV",
   "main.reason.stream.subtitle-dropped-platform": "เป้าหมายแพลตฟอร์มให้ MP4 ที่ไม่มีคำบรรยายเสมอ",
   "main.reason.stream.keep-tracks-overridden": "ไม่สนใจ 'เก็บทุกแทร็ก': เป้าหมายแพลตฟอร์มให้ MP4 ที่มีแทร็กเสียงเดียวเสมอ",
+  "main.reason.stream.audio-codec-not-in-container": "โคเดกเสียงต้นฉบับไม่สามารถส่งผ่านคอนเทนเนอร์นี้ได้ จึงต้องเข้ารหัสแทร็กใหม่",
   "main.reason.stream.lossless-not-passed": "แทร็ก TrueHD/DTS แบบไม่สูญเสียจะไม่ถูกคัดลอก แต่จะเข้ารหัสใหม่",
   "main.reason.fill-crf-lowered": "นโยบายเติมให้ถึงเป้าหมายลด CRF เป็น {0} แทนการหยุดที่เพดานความโปร่งใส ตกใกล้กลางแถบ {1} MB ภายในแถบ {2}-{3} MB",
   "main.reason.fill-band-center": "ถึงพื้น CRF {0} ก่อนถึงแถบเติม สองรอบ VBR จึงเล็งกลางแถบ {1} MB โดยตรง",

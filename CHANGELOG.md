@@ -9,6 +9,11 @@ ship as part of it.
 
 ### Added
 
+- MOV is a shrink-path container. Name the output `.mov` and the file is muxed as MOV instead of
+  being silently treated as MP4: `+faststart` and `mov_text` subtitles carry over from the MP4
+  family, and HandBrake's `av_mov` presets import. MOV cannot carry opus or flac, so such a track
+  is re-encoded to aac and the plan says so on the reason line
+  (`StreamMapping.cs`, `docs/netlestirme/022-mov-kabi-kucultmede.md`).
 - Save the current settings as your own preset: the "+" chip at the end of the chip strip asks
   for a name only, your presets sit between a separator and that button, clicking one applies it
   and "×" deletes it with an undo line — no confirmation dialog (`MainWindow.OnAyar.cs`).

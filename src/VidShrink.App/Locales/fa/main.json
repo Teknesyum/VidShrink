@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "زیرنویس‌های تصویری (PGS/VobSub) در MP4 جا نمی‌شوند و حذف می‌شوند؛ برای انتقال آن‌ها در MKV گزینه 'حفظ همه ترک‌ها' را روشن کنید",
   "main.reason.stream.subtitle-dropped-platform": "هدف پلتفرم همیشه MP4 بدون زیرنویس تحویل می‌دهد",
   "main.reason.stream.keep-tracks-overridden": "'حفظ همه ترک‌ها' نادیده گرفته شد: هدف پلتفرم همیشه MP4 با یک ترک صدا تحویل می‌دهد",
+  "main.reason.stream.audio-codec-not-in-container": "کدک صدای منبع نمی‌تواند در این قالب حمل شود، بنابراین ترک دوباره کدگذاری می‌شود",
   "main.reason.stream.lossless-not-passed": "ترک بی‌اتلاف TrueHD/DTS هرگز کپی نمی‌شود؛ دوباره کدگذاری می‌شود",
   "main.reason.fill-crf-lowered": "سیاست پر کردن هدف به‌جای ایستادن در سقف شفافیت CRF را به {0} پایین آورد و نزدیک مرکز باند {1} MB در باند {2}-{3} MB نشست",
   "main.reason.fill-band-center": "کف CRF {0} پیش از باند پر کردن رسید، پس VBR دوگذره مستقیماً مرکز باند {1} MB را هدف می‌گیرد",

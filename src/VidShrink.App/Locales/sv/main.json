@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "bildundertexter (PGS/VobSub) kan inte ligga i MP4 och tas bort; slå på 'Behåll alla spår' för att ta med dem i MKV",
   "main.reason.stream.subtitle-dropped-platform": "ett plattformsmål levererar alltid MP4 utan undertexter",
   "main.reason.stream.keep-tracks-overridden": "'Behåll alla spår' ignorerades: ett plattformsmål levererar alltid MP4 med ett ljudspår",
+  "main.reason.stream.audio-codec-not-in-container": "källjudkodeken kan inte transporteras i den här behållaren, så spåret kodas om",
   "main.reason.stream.lossless-not-passed": "ett förlustfritt TrueHD/DTS-spår kopieras aldrig; det kodas om",
   "main.reason.fill-crf-lowered": "fyllmålspolicyn sänkte CRF till {0} i stället för att stanna vid transparenstaket och landade nära bandmitten {1} MB inom bandet {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-golvet {0} nåddes före fyllbandet, så tvåpass-VBR siktar direkt på bandmitten {1} MB",

@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "sari kata imej (PGS/VobSub) tidak boleh dimuatkan dalam MP4 dan dibuang; hidupkan 'Kekalkan semua trek' untuk membawanya dalam MKV",
   "main.reason.stream.subtitle-dropped-platform": "sasaran platform sentiasa menghasilkan MP4 tanpa sari kata",
   "main.reason.stream.keep-tracks-overridden": "'Kekalkan semua trek' diabaikan: sasaran platform sentiasa menghasilkan MP4 dengan satu trek audio",
+  "main.reason.stream.audio-codec-not-in-container": "codec audio sumber tidak boleh dibawa dalam bekas ini, jadi trek dikodkan semula",
   "main.reason.stream.lossless-not-passed": "trek TrueHD/DTS tanpa kehilangan tidak pernah disalin; ia dikod semula",
   "main.reason.fill-crf-lowered": "dasar penuhi sasaran menurunkan CRF ke {0} dan bukan berhenti pada had ketelusan, mendarat berhampiran pusat jalur {1} MB di dalam jalur {2}-{3} MB",
   "main.reason.fill-band-center": "lantai CRF {0} dicapai sebelum jalur penuhi, jadi VBR dua laluan menyasarkan pusat jalur {1} MB secara terus",

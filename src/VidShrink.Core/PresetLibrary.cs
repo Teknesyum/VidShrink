@@ -431,6 +431,7 @@ public static class HandBrakePresetImport
                         "mp4" or "av_mp4" => OutputContainer.Mp4,
                         "mkv" or "av_mkv" => OutputContainer.Mkv,
                         "webm" or "av_webm" => OutputContainer.WebM,
+                        "mov" or "av_mov" => OutputContainer.Mov,
                         _ => null
                     };
                     notes.Add(container is null

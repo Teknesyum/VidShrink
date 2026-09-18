@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "تصویری ذیلی عنوانات (PGS/VobSub) MP4 میں نہیں جا سکتے اور ہٹا دیے جاتے ہیں؛ انہیں MKV میں لے جانے کے لیے 'تمام ٹریکس رکھیں' آن کریں",
   "main.reason.stream.subtitle-dropped-platform": "پلیٹ فارم ہدف ہمیشہ ذیلی عنوانات کے بغیر MP4 دیتا ہے",
   "main.reason.stream.keep-tracks-overridden": "'تمام ٹریکس رکھیں' نظر انداز ہوا: پلیٹ فارم ہدف ہمیشہ ایک آڈیو ٹریک والا MP4 دیتا ہے",
+  "main.reason.stream.audio-codec-not-in-container": "ماخذ آڈیو کوڈیک اس کنٹینر میں منتقل نہیں ہو سکتا، اس لیے ٹریک دوبارہ انکوڈ کیا گیا ہے",
   "main.reason.stream.lossless-not-passed": "بغیر نقصان والا TrueHD/DTS ٹریک کبھی کاپی نہیں ہوتا؛ اسے دوبارہ انکوڈ کیا جاتا ہے",
   "main.reason.fill-crf-lowered": "ہدف بھرنے کی پالیسی نے شفافیت حد پر رکنے کے بجائے CRF {0} تک گھٹایا، جو {2}-{3} MB بینڈ کے اندر {1} MB مرکز کے قریب اترتا ہے",
   "main.reason.fill-band-center": "بھرنے کے بینڈ سے پہلے CRF کم از کم {0} پہنچ گئی، اس لیے دو پاس VBR سیدھا {1} MB بینڈ مرکز کا ہدف رکھتا ہے",

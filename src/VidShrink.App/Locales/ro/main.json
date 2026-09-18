@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "subtitrările imagine (PGS/VobSub) nu încap în MP4 și sunt eliminate; activați 'Păstrează toate pistele' pentru a le duce în MKV",
   "main.reason.stream.subtitle-dropped-platform": "o țintă de platformă livrează mereu MP4 fără subtitrări",
   "main.reason.stream.keep-tracks-overridden": "'Păstrează toate pistele' a fost ignorat: o țintă de platformă livrează mereu MP4 cu o singură pistă audio",
+  "main.reason.stream.audio-codec-not-in-container": "codecul audio sursă nu poate fi transportat în acest container, așa că pista este recodificată",
   "main.reason.stream.lossless-not-passed": "o pistă TrueHD/DTS fără pierderi nu este copiată niciodată; este recodată",
   "main.reason.fill-crf-lowered": "politica de umplere a țintei a coborât CRF la {0} în loc să se oprească la plafonul de transparență, ajungând aproape de centrul benzii de {1} MB din banda {2}-{3} MB",
   "main.reason.fill-band-center": "pragul CRF {0} a fost atins înainte de banda de umplere, deci VBR cu două treceri țintește direct centrul benzii de {1} MB",

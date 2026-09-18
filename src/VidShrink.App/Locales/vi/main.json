@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "phụ đề hình ảnh (PGS/VobSub) không thể nằm trong MP4 nên bị bỏ; bật 'Giữ mọi rãnh' để mang chúng trong MKV",
   "main.reason.stream.subtitle-dropped-platform": "mục tiêu nền tảng luôn cho MP4 không có phụ đề",
   "main.reason.stream.keep-tracks-overridden": "'Giữ mọi rãnh' đã bị bỏ qua: mục tiêu nền tảng luôn cho MP4 với một rãnh âm thanh",
+  "main.reason.stream.audio-codec-not-in-container": "codec âm thanh nguồn không thể truyền trong container này, nên track được mã hóa lại",
   "main.reason.stream.lossless-not-passed": "rãnh TrueHD/DTS không mất dữ liệu không bao giờ được sao chép; nó được mã hóa lại",
   "main.reason.fill-crf-lowered": "chính sách lấp đầy mục tiêu hạ CRF xuống {0} thay vì dừng ở trần trong suốt, rơi gần tâm dải {1} MB trong dải {2}-{3} MB",
   "main.reason.fill-band-center": "sàn CRF {0} đạt trước dải lấp đầy, nên VBR hai lượt nhắm thẳng tâm dải {1} MB",

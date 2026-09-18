@@ -366,6 +366,7 @@
   "main.reason.stream.image-subtitle-dropped": "image subtitles (PGS/VobSub) cannot be carried in MP4 and are dropped; turn on 'Keep all tracks' to carry them in MKV",
   "main.reason.stream.subtitle-dropped-platform": "a platform target always delivers MP4 without subtitles",
   "main.reason.stream.keep-tracks-overridden": "'Keep all tracks' was ignored: a platform target always delivers MP4 with one audio track",
+  "main.reason.stream.audio-codec-not-in-container": "the source audio codec cannot travel in this container, so the track is re-encoded",
   "main.reason.stream.lossless-not-passed": "a lossless TrueHD/DTS track is never copied; it is re-encoded",
   "main.reason.fill-crf-lowered": "the fill target policy lowered CRF to {0} instead of stopping at the transparency ceiling, landing near the {1} MB band center inside the {2}-{3} MB band",
   "main.reason.fill-band-center": "CRF floor {0} was reached before the fill band, so two-pass VBR targets the {1} MB band center directly",
