@@ -63,8 +63,13 @@ açıkça "bu kod kalkacak" diyor.
     ayrımını kaybettirirdi.
 12. `OluUyeTests.cs:543-544` — `FfmpegArguments.SceneMapRuleOfRecord` üretimde sıfır,
     ölçüm tarafında beş görünüm.
-13. `OluUyeTests.cs:775-778` — `IdetCounts.Progressive` / `.Undetermined` ayrıştırılıyor,
-    karar kuralı okumuyor.
+13. ~~`IdetCounts.Progressive` / `.Undetermined` ayrıştırılıyor, karar kuralı okumuyor.~~
+    **Borç değil, üçüncü kör nokta:** karar kuralı `counts.Total`'ı okuyor,
+    `Total => Tff + Bff + Progressive + Undetermined` ise iki kolonu da **nitelenmeden**
+    topluyor. Özellik tarayıcısı da yalnız `.Üye` görünümünü arıyordu; aynı kural ona da
+    verildi. Ölçü **elli** pimi kümeden düşürdü (altısı elle doğrulandı, hepsi gerçekten
+    okunuyordu) ve tek satır bile yeni gelmedi. `OzellikteNitelenmemisOkumaGoruluyor`;
+    okuma önekleri listesini boşaltmak 1 kırmızı.
 14. `OluUyeTests.cs:485-494` — `ArchitectureOutcome.Assumed` ve
     `HardwareVerdictReason.BitrateFloorTooHigh` hiçbir kolda ayrılmıyor.
 15. `OluUyeTests.cs:487-488` — `ComparisonSourceState.Duraklatildi` hesaplanıp atılıyor.
