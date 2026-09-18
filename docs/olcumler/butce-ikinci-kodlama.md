@@ -421,9 +421,15 @@ Ham satırların tamamı `docs/olcumler/butce-ikinci-kodlama-ham.md` dosyasında
 
 ```
 gh run list --branch t0/butce-ikinci-kodlama
+35291636284 ci af10255d completed success
 35287674916 ci 8918b542 completed success
 35285341684 ci 00dd1ba8 completed failure
 35282699847 handbrake-kiyas 9642686d completed success
 ```
 
 `00dd1ba8` kirmizisi olcumun degil pimin kusuruydu: `OzetSabiti` capasi `$` idi, CI'da dosya CRLF geldiginde satir sonundaki tasiyici donuse takilip "DOLDUR_ESIK bulunamadi" dedi. Capa `\s*$` oldu, betik depoda CRLF'e cevrildi; `8918b542` yesil: kosumun kendi kutugu `Failed: 0, Passed: 3226, Skipped: 27, Total: 3253`.
+
+Denetim duzeltmelerinin kosumu `35291636284` yesil; kosumun kendi kutugu
+`Failed: 0, Passed: 3233, Skipped: 27, Total: 3260` ve `KOSUM KAPISI GECTI:
+basarisiz=0 toplam=3260 atlanan=27`. Toplam 3253'ten 3260'a cikti: FillBandTests
++3, BudgetFillTests +4.
