@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -69,20 +69,7 @@ internal static class GorunumKanit
     /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// </summary>
-    internal static void Kapat(params string[] adlar)
-    {
-        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "dalga3");
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-        }
-
-        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
-        {
-            Directory.Delete(klasor);
-        }
-    }
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Path.Combine(GirdiKanit.Root, ".calisma", "dalga3"), adlar);
 
     internal static string Gecici(string ad)
     {
@@ -194,20 +181,7 @@ internal static class SeritKanit
     /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// </summary>
-    internal static void Kapat(params string[] adlar)
-    {
-        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "dalga7b");
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-        }
-
-        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
-        {
-            Directory.Delete(klasor);
-        }
-    }
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Path.Combine(GirdiKanit.Root, ".calisma", "dalga7b"), adlar);
 
     internal static void LayOutAt(Window window, Size size)
     {

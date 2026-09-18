@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
@@ -816,17 +816,7 @@ public sealed class KareYerlesimTests
     /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// </summary>
-    private static void Kapat(string klasor, params string[] adlar)
-    {
-        if (!Directory.Exists(klasor)) return;
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-        }
-
-        if (Directory.GetFileSystemEntries(klasor).Length == 0) Directory.Delete(klasor);
-    }
+    private static void Kapat(string klasor, params string[] adlar) => KanitKapanisi.Kapat(klasor, adlar);
 
     /// <summary>
     /// <para>WhatsApp sohbetteki videoyu kendi dusuk bit hizli kodlayicisiyla yeniden

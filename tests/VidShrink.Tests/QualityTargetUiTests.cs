@@ -182,18 +182,7 @@ public sealed class QualityTargetUiTests
     /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// </summary>
-    private static void Kapat(params string[] adlar)
-    {
-        if (!Directory.Exists(MeasurementDirectory)) return;
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(MeasurementDirectory, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-        }
-
-        if (Directory.GetFileSystemEntries(MeasurementDirectory).Length == 0)
-            Directory.Delete(MeasurementDirectory);
-    }
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(MeasurementDirectory, adlar);
 
     /// <summary>
     /// K3: iki sınır da ekranda yazılı. 1 tabanın altında, 100 kaynağın tavanının üstünde;

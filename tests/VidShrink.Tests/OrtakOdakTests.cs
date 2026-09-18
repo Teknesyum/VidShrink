@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -44,19 +44,7 @@ public sealed class OrtakOdakTests
     /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// </summary>
-    private static void Kapat(params string[] adlar)
-    {
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(Kanit, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-        }
-
-        if (Directory.Exists(Kanit) && Directory.GetFileSystemEntries(Kanit).Length == 0)
-        {
-            Directory.Delete(Kanit);
-        }
-    }
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
 
     private static MediaInfo Ornek(string yol) => new()
     {

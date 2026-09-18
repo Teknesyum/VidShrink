@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -47,21 +47,7 @@ internal static class KisayolKanit
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// Ad bir klasörse (testin geçici kökü) ağacıyla birlikte gider.
     /// </summary>
-    internal static void Kapat(params string[] adlar)
-    {
-        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-kisayol");
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-            else if (Directory.Exists(yol)) Directory.Delete(yol, true);
-        }
-
-        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
-        {
-            Directory.Delete(klasor);
-        }
-    }
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-kisayol"), adlar);
 
     private static string Uret(string path, params string[] args)
     {

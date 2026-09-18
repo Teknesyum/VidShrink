@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -30,20 +30,7 @@ internal static class MotorKanit
     /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// </summary>
-    internal static void Kapat(params string[] adlar)
-    {
-        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-motor");
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-        }
-
-        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
-        {
-            Directory.Delete(klasor);
-        }
-    }
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-motor"), adlar);
 
     internal static string Ms(double value) => value.ToString("0.0", CultureInfo.InvariantCulture);
 

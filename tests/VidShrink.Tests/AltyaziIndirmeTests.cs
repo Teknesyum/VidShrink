@@ -1,4 +1,4 @@
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Globalization;
 using System.Net;
 using System.Text;
@@ -42,20 +42,7 @@ internal static class AltyaziKanit
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// <paramref name="adlar"/> dosya adı ya da <see cref="Temiz"/>'in bıraktığı klasör adı olabilir.
     /// </summary>
-    internal static void Kapat(params string[] adlar)
-    {
-        if (!Directory.Exists(Kok)) return;
-        foreach (var ad in adlar)
-        {
-            foreach (var yol in Directory.GetFileSystemEntries(Kok, ad))
-            {
-                if (Directory.Exists(yol)) Directory.Delete(yol, true);
-                else File.Delete(yol);
-            }
-        }
-
-        if (Directory.GetFileSystemEntries(Kok).Length == 0) Directory.Delete(Kok);
-    }
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kok, adlar);
 }
 
 /// <summary>
