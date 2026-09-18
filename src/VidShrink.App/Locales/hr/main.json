@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Datoteka predložaka nije valjani JSON.",
   "main.preset.error.not-preset-file": "Ova datoteka nije datoteka predložaka VidShrink.",
-  "main.preset.error.hand-brake-file": "Ovo je datoteka predložaka HandBrake; koristite uvoz iz HandBrakea.",
+  "main.preset.error.hand-brake-file": "Ovo je datoteka predložaka HandBrake. Uvoz predložaka iz HandBrakea još nije dostupan.",
   "main.preset.error.schema-missing": "Datoteka predložaka nema verziju sheme.",
   "main.preset.error.schema-too-new": "Datoteku predložaka zapisala je novija verzija VidShrinka.",
   "main.preset.error.invalid-value": "Datoteka predložaka sadrži nevaljanu vrijednost: {0}",

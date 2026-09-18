@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "प्रीसेट फ़ाइल मान्य JSON नहीं है।",
   "main.preset.error.not-preset-file": "यह फ़ाइल VidShrink प्रीसेट फ़ाइल नहीं है।",
-  "main.preset.error.hand-brake-file": "यह HandBrake प्रीसेट फ़ाइल है; HandBrake इम्पोर्ट का उपयोग करें।",
+  "main.preset.error.hand-brake-file": "यह HandBrake प्रीसेट फ़ाइल है। HandBrake प्रीसेट इम्पोर्ट करना अभी उपलब्ध नहीं है।",
   "main.preset.error.schema-missing": "प्रीसेट फ़ाइल में स्कीमा संस्करण नहीं है।",
   "main.preset.error.schema-too-new": "प्रीसेट फ़ाइल VidShrink के नए संस्करण ने लिखी है।",
   "main.preset.error.invalid-value": "प्रीसेट फ़ाइल में अमान्य मान है: {0}",

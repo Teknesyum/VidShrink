@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "El archivo de ajustes preestablecidos no es un JSON válido.",
   "main.preset.error.not-preset-file": "Este archivo no es un archivo de ajustes preestablecidos de VidShrink.",
-  "main.preset.error.hand-brake-file": "Es un archivo de ajustes preestablecidos de HandBrake; use la importación de HandBrake.",
+  "main.preset.error.hand-brake-file": "Es un archivo de ajustes preestablecidos de HandBrake. La importación de ajustes preestablecidos de HandBrake aún no está disponible.",
   "main.preset.error.schema-missing": "El archivo de ajustes preestablecidos no tiene versión de esquema.",
   "main.preset.error.schema-too-new": "El archivo de ajustes preestablecidos lo escribió una versión más reciente de VidShrink.",
   "main.preset.error.invalid-value": "El archivo de ajustes preestablecidos contiene un valor no válido: {0}",

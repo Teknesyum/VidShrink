@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Išankstinių nustatymų failas nėra tinkamas JSON.",
   "main.preset.error.not-preset-file": "Šis failas nėra VidShrink išankstinių nustatymų failas.",
-  "main.preset.error.hand-brake-file": "Tai HandBrake išankstinių nustatymų failas; naudokite HandBrake importą.",
+  "main.preset.error.hand-brake-file": "Tai HandBrake išankstinių nustatymų failas. HandBrake išankstinių nustatymų importas dar negalimas.",
   "main.preset.error.schema-missing": "Išankstinių nustatymų faile nėra schemos versijos.",
   "main.preset.error.schema-too-new": "Išankstinių nustatymų failą įrašė naujesnė VidShrink versija.",
   "main.preset.error.invalid-value": "Išankstinių nustatymų faile yra netinkama reikšmė: {0}",

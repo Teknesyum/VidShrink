@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Eelseadistuste fail ei ole kehtiv JSON.",
   "main.preset.error.not-preset-file": "See fail ei ole VidShrinki eelseadistuste fail.",
-  "main.preset.error.hand-brake-file": "See on HandBrake'i eelseadistuste fail; kasutage HandBrake'i importi.",
+  "main.preset.error.hand-brake-file": "See on HandBrake'i eelseadistuste fail. HandBrake'i eelseadistuste importimine ei ole veel saadaval.",
   "main.preset.error.schema-missing": "Eelseadistuste failil puudub skeemi versioon.",
   "main.preset.error.schema-too-new": "Eelseadistuste faili kirjutas VidShrinki uuem versioon.",
   "main.preset.error.invalid-value": "Eelseadistuste failis on vigane väärtus: {0}",

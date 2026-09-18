@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "ไฟล์พรีเซ็ตไม่ใช่ JSON ที่ถูกต้อง",
   "main.preset.error.not-preset-file": "ไฟล์นี้ไม่ใช่ไฟล์พรีเซ็ตของ VidShrink",
-  "main.preset.error.hand-brake-file": "นี่คือไฟล์พรีเซ็ตของ HandBrake โปรดใช้การนำเข้าจาก HandBrake",
+  "main.preset.error.hand-brake-file": "นี่คือไฟล์พรีเซ็ตของ HandBrake การนำเข้าพรีเซ็ตของ HandBrake ยังไม่พร้อมใช้งาน",
   "main.preset.error.schema-missing": "ไฟล์พรีเซ็ตไม่มีเวอร์ชันสคีมา",
   "main.preset.error.schema-too-new": "ไฟล์พรีเซ็ตถูกเขียนโดย VidShrink เวอร์ชันที่ใหม่กว่า",
   "main.preset.error.invalid-value": "ไฟล์พรีเซ็ตมีค่าที่ไม่ถูกต้อง: {0}",

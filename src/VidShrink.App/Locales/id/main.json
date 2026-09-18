@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Berkas preset bukan JSON yang valid.",
   "main.preset.error.not-preset-file": "Berkas ini bukan berkas preset VidShrink.",
-  "main.preset.error.hand-brake-file": "Ini berkas preset HandBrake; gunakan impor HandBrake.",
+  "main.preset.error.hand-brake-file": "Ini berkas preset HandBrake. Impor preset HandBrake belum tersedia.",
   "main.preset.error.schema-missing": "Berkas preset tidak memiliki versi skema.",
   "main.preset.error.schema-too-new": "Berkas preset ditulis oleh versi VidShrink yang lebih baru.",
   "main.preset.error.invalid-value": "Berkas preset berisi nilai yang tidak valid: {0}",

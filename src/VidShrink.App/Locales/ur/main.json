@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "پری سیٹ فائل درست JSON نہیں ہے۔",
   "main.preset.error.not-preset-file": "یہ فائل VidShrink کی پری سیٹ فائل نہیں ہے۔",
-  "main.preset.error.hand-brake-file": "یہ HandBrake کی پری سیٹ فائل ہے؛ HandBrake امپورٹ استعمال کریں۔",
+  "main.preset.error.hand-brake-file": "یہ HandBrake کی پری سیٹ فائل ہے۔ HandBrake پری سیٹ امپورٹ کرنا ابھی دستیاب نہیں ہے۔",
   "main.preset.error.schema-missing": "پری سیٹ فائل میں اسکیما ورژن نہیں ہے۔",
   "main.preset.error.schema-too-new": "پری سیٹ فائل VidShrink کے نئے ورژن نے لکھی ہے۔",
   "main.preset.error.invalid-value": "پری سیٹ فائل میں غلط قدر ہے: {0}",

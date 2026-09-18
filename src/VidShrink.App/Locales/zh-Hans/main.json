@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "预设文件不是有效的 JSON。",
   "main.preset.error.not-preset-file": "此文件不是 VidShrink 预设文件。",
-  "main.preset.error.hand-brake-file": "这是 HandBrake 预设文件；请使用 HandBrake 导入。",
+  "main.preset.error.hand-brake-file": "这是 HandBrake 预设文件。导入 HandBrake 预设的功能尚不可用。",
   "main.preset.error.schema-missing": "预设文件没有架构版本。",
   "main.preset.error.schema-too-new": "预设文件由更新版本的 VidShrink 写入。",
   "main.preset.error.invalid-value": "预设文件包含无效值：{0}",

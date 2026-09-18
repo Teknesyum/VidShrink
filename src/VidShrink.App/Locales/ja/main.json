@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "プリセットファイルは有効な JSON ではありません。",
   "main.preset.error.not-preset-file": "このファイルは VidShrink のプリセットファイルではありません。",
-  "main.preset.error.hand-brake-file": "これは HandBrake のプリセットファイルです。HandBrake インポートを使用してください。",
+  "main.preset.error.hand-brake-file": "これは HandBrake のプリセットファイルです。HandBrake プリセットのインポートはまだ利用できません。",
   "main.preset.error.schema-missing": "プリセットファイルにスキーマのバージョンがありません。",
   "main.preset.error.schema-too-new": "プリセットファイルは新しいバージョンの VidShrink で書き込まれています。",
   "main.preset.error.invalid-value": "プリセットファイルに無効な値があります: {0}",

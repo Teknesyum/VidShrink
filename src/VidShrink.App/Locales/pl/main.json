@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Plik ustawień wstępnych nie jest prawidłowym JSON-em.",
   "main.preset.error.not-preset-file": "Ten plik nie jest plikiem ustawień wstępnych VidShrink.",
-  "main.preset.error.hand-brake-file": "To jest plik ustawień wstępnych HandBrake; użyj importu HandBrake.",
+  "main.preset.error.hand-brake-file": "To jest plik ustawień wstępnych HandBrake. Importowanie ustawień wstępnych HandBrake nie jest jeszcze dostępne.",
   "main.preset.error.schema-missing": "Plik ustawień wstępnych nie ma wersji schematu.",
   "main.preset.error.schema-too-new": "Plik ustawień wstępnych zapisała nowsza wersja VidShrink.",
   "main.preset.error.invalid-value": "Plik ustawień wstępnych zawiera nieprawidłową wartość: {0}",

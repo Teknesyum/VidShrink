@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Soubor předvoleb není platný JSON.",
   "main.preset.error.not-preset-file": "Tento soubor není souborem předvoleb VidShrink.",
-  "main.preset.error.hand-brake-file": "Toto je soubor předvoleb HandBrake; použijte import z HandBrake.",
+  "main.preset.error.hand-brake-file": "Toto je soubor předvoleb HandBrake. Import předvoleb z HandBrake zatím není k dispozici.",
   "main.preset.error.schema-missing": "Soubor předvoleb nemá verzi schématu.",
   "main.preset.error.schema-too-new": "Soubor předvoleb zapsala novější verze VidShrink.",
   "main.preset.error.invalid-value": "Soubor předvoleb obsahuje neplatnou hodnotu: {0}",

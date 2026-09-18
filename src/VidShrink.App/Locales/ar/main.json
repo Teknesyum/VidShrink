@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "ملف الإعدادات المسبقة ليس JSON صالحًا.",
   "main.preset.error.not-preset-file": "هذا الملف ليس ملف إعدادات مسبقة لـ VidShrink.",
-  "main.preset.error.hand-brake-file": "هذا ملف إعدادات مسبقة من HandBrake؛ استخدم الاستيراد من HandBrake.",
+  "main.preset.error.hand-brake-file": "هذا ملف إعدادات مسبقة من HandBrake. استيراد إعدادات HandBrake المسبقة غير متاح بعد.",
   "main.preset.error.schema-missing": "لا يحتوي ملف الإعدادات المسبقة على إصدار مخطط.",
   "main.preset.error.schema-too-new": "كُتب ملف الإعدادات المسبقة بإصدار أحدث من VidShrink.",
   "main.preset.error.invalid-value": "يحتوي ملف الإعدادات المسبقة على قيمة غير صالحة: {0}",

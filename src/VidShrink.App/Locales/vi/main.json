@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Tệp cài đặt sẵn không phải JSON hợp lệ.",
   "main.preset.error.not-preset-file": "Tệp này không phải tệp cài đặt sẵn của VidShrink.",
-  "main.preset.error.hand-brake-file": "Đây là tệp cài đặt sẵn của HandBrake; hãy dùng chức năng nhập từ HandBrake.",
+  "main.preset.error.hand-brake-file": "Đây là tệp cài đặt sẵn của HandBrake. Chức năng nhập cài đặt sẵn từ HandBrake hiện chưa có.",
   "main.preset.error.schema-missing": "Tệp cài đặt sẵn không có phiên bản lược đồ.",
   "main.preset.error.schema-too-new": "Tệp cài đặt sẵn được ghi bởi phiên bản VidShrink mới hơn.",
   "main.preset.error.invalid-value": "Tệp cài đặt sẵn chứa giá trị không hợp lệ: {0}",

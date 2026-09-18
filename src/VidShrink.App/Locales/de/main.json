@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Die Voreinstellungsdatei ist kein gültiges JSON.",
   "main.preset.error.not-preset-file": "Diese Datei ist keine VidShrink-Voreinstellungsdatei.",
-  "main.preset.error.hand-brake-file": "Dies ist eine HandBrake-Voreinstellungsdatei; verwenden Sie den HandBrake-Import.",
+  "main.preset.error.hand-brake-file": "Dies ist eine HandBrake-Voreinstellungsdatei. Der Import von HandBrake-Voreinstellungen ist noch nicht verfügbar.",
   "main.preset.error.schema-missing": "Die Voreinstellungsdatei hat keine Schemaversion.",
   "main.preset.error.schema-too-new": "Die Voreinstellungsdatei wurde von einer neueren VidShrink-Version geschrieben.",
   "main.preset.error.invalid-value": "Die Voreinstellungsdatei enthält einen ungültigen Wert: {0}",

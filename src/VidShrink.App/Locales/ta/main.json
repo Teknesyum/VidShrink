@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "முன்னமைவு கோப்பு சரியான JSON அல்ல.",
   "main.preset.error.not-preset-file": "இந்தக் கோப்பு VidShrink முன்னமைவு கோப்பு அல்ல.",
-  "main.preset.error.hand-brake-file": "இது HandBrake முன்னமைவு கோப்பு; HandBrake இறக்குமதியைப் பயன்படுத்தவும்.",
+  "main.preset.error.hand-brake-file": "இது HandBrake முன்னமைவு கோப்பு. HandBrake முன்னமைவுகளை இறக்குமதி செய்யும் வசதி இன்னும் இல்லை.",
   "main.preset.error.schema-missing": "முன்னமைவு கோப்பில் திட்டப் பதிப்பு இல்லை.",
   "main.preset.error.schema-too-new": "முன்னமைவு கோப்பு VidShrink-இன் புதிய பதிப்பால் எழுதப்பட்டது.",
   "main.preset.error.invalid-value": "முன்னமைவு கோப்பில் தவறான மதிப்பு உள்ளது: {0}",

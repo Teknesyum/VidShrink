@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Datoteka podešavanja nije ispravan JSON.",
   "main.preset.error.not-preset-file": "Ova datoteka nije datoteka podešavanja za VidShrink.",
-  "main.preset.error.hand-brake-file": "Ovo je datoteka podešavanja iz HandBrake-a; koristite uvoz iz HandBrake-a.",
+  "main.preset.error.hand-brake-file": "Ovo je datoteka podešavanja iz HandBrake-a. Uvoz podešavanja iz HandBrake-a još nije dostupan.",
   "main.preset.error.schema-missing": "Datoteka podešavanja nema verziju šeme.",
   "main.preset.error.schema-too-new": "Datoteku podešavanja je zapisala novija verzija VidShrink-a.",
   "main.preset.error.invalid-value": "Datoteka podešavanja sadrži neispravnu vrednost: {0}",

@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Az előbeállítás-fájl nem érvényes JSON.",
   "main.preset.error.not-preset-file": "Ez a fájl nem VidShrink előbeállítás-fájl.",
-  "main.preset.error.hand-brake-file": "Ez egy HandBrake előbeállítás-fájl; használja a HandBrake-importálást.",
+  "main.preset.error.hand-brake-file": "Ez egy HandBrake előbeállítás-fájl. A HandBrake-előbeállítások importálása még nem érhető el.",
   "main.preset.error.schema-missing": "Az előbeállítás-fájlban nincs sémaverzió.",
   "main.preset.error.schema-too-new": "Az előbeállítás-fájlt a VidShrink egy újabb verziója írta.",
   "main.preset.error.invalid-value": "Az előbeállítás-fájl érvénytelen értéket tartalmaz: {0}",

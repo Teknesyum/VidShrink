@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "প্রিসেট ফাইলটি বৈধ JSON নয়।",
   "main.preset.error.not-preset-file": "এই ফাইলটি VidShrink প্রিসেট ফাইল নয়।",
-  "main.preset.error.hand-brake-file": "এটি একটি HandBrake প্রিসেট ফাইল; HandBrake ইমপোর্ট ব্যবহার করুন।",
+  "main.preset.error.hand-brake-file": "এটি একটি HandBrake প্রিসেট ফাইল। HandBrake প্রিসেট ইমপোর্ট করার সুবিধা এখনো নেই।",
   "main.preset.error.schema-missing": "প্রিসেট ফাইলে স্কিমা সংস্করণ নেই।",
   "main.preset.error.schema-too-new": "প্রিসেট ফাইলটি VidShrink-এর নতুন সংস্করণে লেখা।",
   "main.preset.error.invalid-value": "প্রিসেট ফাইলে একটি অবৈধ মান আছে: {0}",

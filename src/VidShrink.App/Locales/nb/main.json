@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Forhåndsinnstillingsfilen er ikke gyldig JSON.",
   "main.preset.error.not-preset-file": "Denne filen er ikke en forhåndsinnstillingsfil for VidShrink.",
-  "main.preset.error.hand-brake-file": "Dette er en forhåndsinnstillingsfil fra HandBrake; bruk HandBrake-import.",
+  "main.preset.error.hand-brake-file": "Dette er en forhåndsinnstillingsfil fra HandBrake. Import av HandBrake-forhåndsinnstillinger er ikke tilgjengelig ennå.",
   "main.preset.error.schema-missing": "Forhåndsinnstillingsfilen mangler skjemaversjon.",
   "main.preset.error.schema-too-new": "Forhåndsinnstillingsfilen ble skrevet av en nyere VidShrink-versjon.",
   "main.preset.error.invalid-value": "Forhåndsinnstillingsfilen inneholder en ugyldig verdi: {0}",

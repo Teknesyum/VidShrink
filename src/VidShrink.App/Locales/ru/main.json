@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Файл предустановок не является корректным JSON.",
   "main.preset.error.not-preset-file": "Этот файл не является файлом предустановок VidShrink.",
-  "main.preset.error.hand-brake-file": "Это файл предустановок HandBrake; используйте импорт из HandBrake.",
+  "main.preset.error.hand-brake-file": "Это файл предустановок HandBrake. Импорт предустановок HandBrake пока недоступен.",
   "main.preset.error.schema-missing": "В файле предустановок нет версии схемы.",
   "main.preset.error.schema-too-new": "Файл предустановок записан более новой версией VidShrink.",
   "main.preset.error.invalid-value": "Файл предустановок содержит недопустимое значение: {0}",

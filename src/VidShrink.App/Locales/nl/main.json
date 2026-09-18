@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Het voorinstellingenbestand is geen geldige JSON.",
   "main.preset.error.not-preset-file": "Dit bestand is geen VidShrink-voorinstellingenbestand.",
-  "main.preset.error.hand-brake-file": "Dit is een HandBrake-voorinstellingenbestand; gebruik de HandBrake-import.",
+  "main.preset.error.hand-brake-file": "Dit is een HandBrake-voorinstellingenbestand. Het importeren van HandBrake-voorinstellingen is nog niet beschikbaar.",
   "main.preset.error.schema-missing": "Het voorinstellingenbestand heeft geen schemaversie.",
   "main.preset.error.schema-too-new": "Het voorinstellingenbestand is geschreven door een nieuwere VidShrink-versie.",
   "main.preset.error.invalid-value": "Het voorinstellingenbestand bevat een ongeldige waarde: {0}",

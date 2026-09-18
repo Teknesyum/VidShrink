@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "The preset file is not valid JSON.",
   "main.preset.error.not-preset-file": "This file is not a VidShrink preset file.",
-  "main.preset.error.hand-brake-file": "This is a HandBrake preset file; use HandBrake import.",
+  "main.preset.error.hand-brake-file": "This is a HandBrake preset file. Importing HandBrake presets is not available yet.",
   "main.preset.error.schema-missing": "The preset file has no schema version.",
   "main.preset.error.schema-too-new": "The preset file was written by a newer VidShrink version.",
   "main.preset.error.invalid-value": "The preset file contains an invalid value: {0}",

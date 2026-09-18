@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Το αρχείο προρυθμίσεων δεν είναι έγκυρο JSON.",
   "main.preset.error.not-preset-file": "Αυτό το αρχείο δεν είναι αρχείο προρυθμίσεων του VidShrink.",
-  "main.preset.error.hand-brake-file": "Αυτό είναι αρχείο προρυθμίσεων του HandBrake· χρησιμοποιήστε την εισαγωγή HandBrake.",
+  "main.preset.error.hand-brake-file": "Αυτό είναι αρχείο προρυθμίσεων του HandBrake. Η εισαγωγή προρυθμίσεων HandBrake δεν είναι ακόμη διαθέσιμη.",
   "main.preset.error.schema-missing": "Το αρχείο προρυθμίσεων δεν έχει έκδοση σχήματος.",
   "main.preset.error.schema-too-new": "Το αρχείο προρυθμίσεων γράφτηκε από νεότερη έκδοση του VidShrink.",
   "main.preset.error.invalid-value": "Το αρχείο προρυθμίσεων περιέχει μη έγκυρη τιμή: {0}",

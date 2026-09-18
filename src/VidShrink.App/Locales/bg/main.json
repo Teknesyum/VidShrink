@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Файлът с настройки не е валиден JSON.",
   "main.preset.error.not-preset-file": "Този файл не е файл с настройки на VidShrink.",
-  "main.preset.error.hand-brake-file": "Това е файл с настройки на HandBrake; използвайте импорта от HandBrake.",
+  "main.preset.error.hand-brake-file": "Това е файл с настройки на HandBrake. Импортирането на настройки от HandBrake още не е налично.",
   "main.preset.error.schema-missing": "Файлът с настройки няма версия на схемата.",
   "main.preset.error.schema-too-new": "Файлът с настройки е записан от по-нова версия на VidShrink.",
   "main.preset.error.invalid-value": "Файлът с настройки съдържа невалидна стойност: {0}",

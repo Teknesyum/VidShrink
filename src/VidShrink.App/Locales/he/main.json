@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "קובץ ההגדרות המוכנות אינו JSON תקין.",
   "main.preset.error.not-preset-file": "קובץ זה אינו קובץ הגדרות מוכנות של VidShrink.",
-  "main.preset.error.hand-brake-file": "זהו קובץ הגדרות מוכנות של HandBrake; השתמשו בייבוא מ-HandBrake.",
+  "main.preset.error.hand-brake-file": "זהו קובץ הגדרות מוכנות של HandBrake. ייבוא הגדרות מוכנות מ-HandBrake עדיין אינו זמין.",
   "main.preset.error.schema-missing": "לקובץ ההגדרות המוכנות אין גרסת סכימה.",
   "main.preset.error.schema-too-new": "קובץ ההגדרות המוכנות נכתב בגרסה חדשה יותר של VidShrink.",
   "main.preset.error.invalid-value": "קובץ ההגדרות המוכנות מכיל ערך לא תקין: {0}",

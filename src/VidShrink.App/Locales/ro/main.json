@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Fișierul de presetări nu este JSON valid.",
   "main.preset.error.not-preset-file": "Acest fișier nu este un fișier de presetări VidShrink.",
-  "main.preset.error.hand-brake-file": "Acesta este un fișier de presetări HandBrake; folosiți importul HandBrake.",
+  "main.preset.error.hand-brake-file": "Acesta este un fișier de presetări HandBrake. Importul presetărilor HandBrake nu este încă disponibil.",
   "main.preset.error.schema-missing": "Fișierul de presetări nu are versiune de schemă.",
   "main.preset.error.schema-too-new": "Fișierul de presetări a fost scris de o versiune mai nouă de VidShrink.",
   "main.preset.error.invalid-value": "Fișierul de presetări conține o valoare nevalidă: {0}",

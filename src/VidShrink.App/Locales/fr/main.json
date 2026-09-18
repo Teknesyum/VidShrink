@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Le fichier de préréglages n'est pas un JSON valide.",
   "main.preset.error.not-preset-file": "Ce fichier n'est pas un fichier de préréglages VidShrink.",
-  "main.preset.error.hand-brake-file": "Ceci est un fichier de préréglages HandBrake ; utilisez l'import HandBrake.",
+  "main.preset.error.hand-brake-file": "Ceci est un fichier de préréglages HandBrake. L'import des préréglages HandBrake n'est pas encore disponible.",
   "main.preset.error.schema-missing": "Le fichier de préréglages n'a pas de version de schéma.",
   "main.preset.error.schema-too-new": "Le fichier de préréglages a été écrit par une version plus récente de VidShrink.",
   "main.preset.error.invalid-value": "Le fichier de préréglages contient une valeur non valide : {0}",

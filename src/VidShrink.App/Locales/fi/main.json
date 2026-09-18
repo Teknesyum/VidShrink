@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Esiasetustiedosto ei ole kelvollista JSONia.",
   "main.preset.error.not-preset-file": "Tämä tiedosto ei ole VidShrinkin esiasetustiedosto.",
-  "main.preset.error.hand-brake-file": "Tämä on HandBraken esiasetustiedosto; käytä HandBrake-tuontia.",
+  "main.preset.error.hand-brake-file": "Tämä on HandBraken esiasetustiedosto. HandBraken esiasetusten tuonti ei ole vielä käytettävissä.",
   "main.preset.error.schema-missing": "Esiasetustiedostossa ei ole skeemaversiota.",
   "main.preset.error.schema-too-new": "Esiasetustiedosto on kirjoitettu uudemmalla VidShrink-versiolla.",
   "main.preset.error.invalid-value": "Esiasetustiedostossa on virheellinen arvo: {0}",

@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Faili la mipangilio awali si JSON halali.",
   "main.preset.error.not-preset-file": "Faili hili si faili la mipangilio awali la VidShrink.",
-  "main.preset.error.hand-brake-file": "Hili ni faili la mipangilio awali la HandBrake; tumia uingizaji wa HandBrake.",
+  "main.preset.error.hand-brake-file": "Hili ni faili la mipangilio awali la HandBrake. Uingizaji wa mipangilio awali ya HandBrake bado haupatikani.",
   "main.preset.error.schema-missing": "Faili la mipangilio awali halina toleo la muundo.",
   "main.preset.error.schema-too-new": "Faili la mipangilio awali liliandikwa na toleo jipya zaidi la VidShrink.",
   "main.preset.error.invalid-value": "Faili la mipangilio awali lina thamani batili: {0}",

@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Fail pratetap bukan JSON yang sah.",
   "main.preset.error.not-preset-file": "Fail ini bukan fail pratetap VidShrink.",
-  "main.preset.error.hand-brake-file": "Ini ialah fail pratetap HandBrake; gunakan import HandBrake.",
+  "main.preset.error.hand-brake-file": "Ini ialah fail pratetap HandBrake. Import pratetap HandBrake belum tersedia.",
   "main.preset.error.schema-missing": "Fail pratetap tiada versi skema.",
   "main.preset.error.schema-too-new": "Fail pratetap ditulis oleh versi VidShrink yang lebih baharu.",
   "main.preset.error.invalid-value": "Fail pratetap mengandungi nilai yang tidak sah: {0}",

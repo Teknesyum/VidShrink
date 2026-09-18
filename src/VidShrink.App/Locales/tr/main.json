@@ -527,7 +527,7 @@
   "main.plan.mode.crf-value": "CRF {0}",
   "main.preset.error.not-json": "Ön ayar dosyası geçerli bir JSON değil.",
   "main.preset.error.not-preset-file": "Bu dosya bir VidShrink ön ayar dosyası değil.",
-  "main.preset.error.hand-brake-file": "Bu bir HandBrake ön ayar dosyası; HandBrake içe aktarmayı kullanın.",
+  "main.preset.error.hand-brake-file": "Bu bir HandBrake ön ayar dosyası. HandBrake ön ayarlarını içe aktarma henüz yok.",
   "main.preset.error.schema-missing": "Ön ayar dosyasında şema sürümü yok.",
   "main.preset.error.schema-too-new": "Ön ayar dosyası daha yeni bir VidShrink sürümüyle yazılmış.",
   "main.preset.error.invalid-value": "Ön ayar dosyasında geçersiz bir değer var: {0}",
