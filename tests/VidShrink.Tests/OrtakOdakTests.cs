@@ -40,6 +40,24 @@ public sealed class OrtakOdakTests
         return yol;
     }
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    private static void Kapat(params string[] adlar)
+    {
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(Kanit, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(Kanit) && Directory.GetFileSystemEntries(Kanit).Length == 0)
+        {
+            Directory.Delete(Kanit);
+        }
+    }
+
     private static MediaInfo Ornek(string yol) => new()
     {
         FilePath = yol,
@@ -113,6 +131,8 @@ public sealed class OrtakOdakTests
         Assert.Equal(dosya, olcu.Kucultme);
         Assert.Equal(12.5, olcu.Sure);
         Assert.Equal(30, olcu.Fps);
+
+        Kapat("gecis.mkv", "gecis.txt");
     }
 
     /// <summary>
@@ -128,6 +148,8 @@ public sealed class OrtakOdakTests
         Assert.Equal(2, olcu.Kez);
         Assert.Equal(new[] { bir, iki }, olcu.Yoklanan);
         Assert.Equal(iki, olcu.Kucultme);
+
+        Kapat("iki-bir.mkv", "iki-iki.mkv");
     }
 
     /// <summary>
@@ -164,6 +186,8 @@ public sealed class OrtakOdakTests
         Assert.True(olcu.tazeYok, "Dosya degistigi halde onbellek taze sayildi.");
         Assert.Equal(1, olcu.once);
         Assert.Equal(2, olcu.sonra);
+
+        Kapat("damga.mkv");
     }
 
     /// <summary>
@@ -213,6 +237,8 @@ public sealed class OrtakOdakTests
         Assert.Equal(0, olcu.kapaliYoklama);
         Assert.Equal(kayit, olcu.acikYol);
         Assert.Equal(1, olcu.acikYoklama);
+
+        Kapat("ayar-onceki.mkv", "ayar-kayit.mkv", "ayar.txt");
     }
 
     /// <summary>
@@ -264,6 +290,8 @@ public sealed class OrtakOdakTests
         Assert.Equal(1, olcu.ucustaki);
         Assert.Equal(1, olcu.sonra);
         Assert.Equal(dosya, olcu.yol);
+
+        Kapat("ustuste.mkv");
     }
 
     [Fact]
@@ -291,5 +319,7 @@ public sealed class OrtakOdakTests
         Assert.Equal(0, media.LastPositionSeconds);
         Assert.Null(media.Info);
         Assert.Equal(MediaFocusOwner.Shrink, media.Owner);
+
+        Kapat("konum-odak.mkv", "konum-baska.mkv");
     }
 }

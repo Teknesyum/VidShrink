@@ -69,12 +69,58 @@ geri yazıldı (`git checkout` kullanılmadı).
 | M2 | `CurrentMedia.Fresh` her zaman `true` | `CurrentMedia.cs` | 1 kırmızı — `DosyaDiskteDegisirseYenidenYoklanir` |
 | M3 | `FollowRecordingAsync`'teki ayar kapısı silindi | `MainWindow.OdakTakibi.cs` | 1 kırmızı — `AyarKucultmeninDosyasiniBelirler` |
 | M4 | `CurrentMedia.Remember`'daki yol kapısı silindi | `CurrentMedia.cs` | 1 kırmızı — `OdakKonumuYalnizOdaktakiDosyayaYazilir` |
+| M5 | `Publish` süre/fps taşımıyor (`= 0`) | `CurrentMedia.cs` | 1 kırmızı — 12,5 → 0 |
+| M6 | Küçült kendi yoklamasına döndü (`Prober(path, …)`) | `MainWindow.OdakTakibi.cs` | 3 kırmızı |
+| M7 | Doğru sayı, yanlış yol (`Prober(path.ToUpperInvariant(), …)`) | `MainWindow.OdakTakibi.cs` | 4 kırmızı, sayı değişmeden |
+
+M5-M7 bağımsız denetçinin mutasyonları (18 Eylül 2026). M7 ikinci commit'in eklediği
+`Yollar` piminin ölü olmadığını gösteriyor: sayaç aynı kalıyor, yalnız yol büyük harfe
+dönüyor ve ölçü bunu görüyor:
+
+```
+  Başarısız OrtakOdakTests.OynaticidanKucultmeyeGecisteYoklamaBirKez
+   Assert.Equal() Failure: Collections differ
+   Expected: ["C:\\Users\\Administrator\\Desktop\\Projeler\\VidSh"···]
+   Actual:   ["C:\\USERS\\ADMINISTRATOR\\DESKTOP\\PROJELER\\VIDSH"···]
+Başarısız! - Başarısız: 4, Başarılı: 2, Toplam: 6
+```
+
+M5, `sure`/`fps`'in sabit karşılaştırması değil üretim yolundan geçen değer olduğunu pimler.
 
 M1a ilk taramada **sağ kaldı**: sahte yoklayıcı eşzamanlı (`Task.FromResult`) döndüğü için iki
 yükleme hiç üstüste binmiyordu, önbellek tek başına yetiyordu. Gerçek açılış sırasında ffprobe
 asenkron döner ve iki kol gerçekten binişir; `GecikmeliSayac`'lı
 `UstusteBinenIkiYuklemeTekYoklama` eklendikten sonra M1a kırmızı verdi. Beş mutasyonun beşi
 kırılıyor.
+
+## Kanıt Klasörünün Kapanışı
+
+Dalın tabanı `f2ef2bfd` kuralı koymuştu: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+kanıtını korur. D0 ilk teslimde bu kuralı uygulamamıştı; `Kapat` yardımcısı altı testin de
+son asertinden **sonra** çağrılıyor, düşen asert oraya hiç varmıyor. Klasör boşalınca o da
+siliniyor. İki yönde ölçüldü.
+
+Yeşil:
+
+```
+Başarılı!  - Başarısız:     0, Başarılı:     6, Atlanan:     0, Toplam:     6, Süre: 2 s
+--- klasor:
+yok
+```
+
+Kırmızı (`Assert.Equal(30, olcu.Fps)` → `31`):
+
+```
+Başarısız! - Başarısız:     1, Başarılı:     5, Atlanan:     0, Toplam:     6
+--- klasor:
+gecis.mkv
+gecis.txt
+```
+
+Yalnız düşen testin dosyaları kalıyor; diğer beş test kendi bıraktığını yine siliyor.
+Geri yazmada `Copy-Item`'ın LastWriteTime'ı koruduğu tuzağa düşüldü: kaynak `30` okurken
+ölçü hâlâ `Expected: 31` diyordu, çünkü MSBuild dll'i taze sayıp derlemeyi atlıyordu.
+`(Get-Item <yol>).LastWriteTime = Get-Date` sonrası derleme gerçekleşti ve 6/6 yeşil döndü.
 
 ## Kapatılamayan
 
