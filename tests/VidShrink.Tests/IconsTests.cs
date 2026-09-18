@@ -19,8 +19,8 @@ namespace VidShrink.Tests;
 /// <summary>
 /// K9 ölçüsü: simge takımı Fluent UI System Icons'ın 24 px <b>Filled</b> sürümünden gelir.
 ///
-/// <para><b>Sayı elle yazılmıyor.</b> Sözleşme "26" diyordu, depodaki gerçek sayı 27
-/// (<c>IconRestore</c> ölçüm gününden sonra eklenmiş). Bu yüzden ölçü sayıyı iki
+/// <para><b>Sayı elle yazılmıyor.</b> Sözleşme "26" diyordu, o 13 Eylül ölçümünün sayısı;
+/// aradan <c>IconRestore</c> eklendi, kullanılmayan iki geometri düştü. Bu yüzden ölçü sayıyı iki
 /// <b>bağımsız</b> kaynaktan okuyor ve karşılaştırıyor: <c>Themes/Icons.axaml</c> ile
 /// <c>docs/tasarim/fluent-simge-eslemesi.md</c> eşleme tablosu. Bir geometri silinirse
 /// ya da tabloya girmeyen bir anahtar eklenirse iki küme ayrışır ve ölçü kırmızı döner;
