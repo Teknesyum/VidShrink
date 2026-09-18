@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "kodemodusen ble også låst til {0}, men et eksplisitt CRF-tall vinner; modusen ble crf, og kravet om {0} ble ikke brukt",
   "main.reason.manual-mode-override": "kodemodusen ble låst til {0}; motoren ville valgt {1}",
   "main.reason.manual-preset-override": "forvalget ble låst til {0}; motoren ville valgt {1}",
+  "main.reason.manual-tune-override": "Finjusteringen ble låst til {0}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo første pass kjører med et annet forvalg; det låste {0} gjelder bare andre pass som lager utdata (første pass: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "det låste {0} kunne ikke brukes på kopibanen; det som gjelder i stedet er {1}",
   "main.reason.dark-content-hevc": "kilden er mørk (gjennomsnittlig luminans {0}); {1} gir banding i skyggene, så Automatisk bruker {2} med turbo første pass",

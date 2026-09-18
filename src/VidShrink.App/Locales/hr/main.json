@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "način kodiranja također je fiksiran na {0}, ali izričit CRF broj pobjeđuje; način je ispao crf i zahtjev {0} nije primijenjen",
   "main.reason.manual-mode-override": "način kodiranja fiksiran je na {0}; motor bi odabrao {1}",
   "main.reason.manual-preset-override": "predložak je fiksiran na {0}; motor bi odabrao {1}",
+  "main.reason.manual-tune-override": "Fino ugadžanje fiksirano je na {0}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo prvi prolaz radi s drugim predloškom; fiksni {0} vrijedi samo za drugi prolaz koji proizvodi izlaz (prvi prolaz: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "fiksni {0} nije se mogao primijeniti na putu kopiranja; umjesto toga vrijedi {1}",
   "main.reason.dark-content-hevc": "izvor je taman (prosječna svjetlina {0}); {1} stvara pruge u sjenama, pa Automatski koristi {2} s turbo prvim prolazom",

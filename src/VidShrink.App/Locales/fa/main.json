@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "حالت رمزگذاری هم به {0} ثابت شد اما عدد صریح CRF برنده است؛ حالت crf شد و درخواست {0} اعمال نشد",
   "main.reason.manual-mode-override": "حالت رمزگذاری به {0} ثابت شد؛ موتور {1} را انتخاب می‌کرد",
   "main.reason.manual-preset-override": "پیش‌تنظیم به {0} ثابت شد؛ موتور {1} را انتخاب می‌کرد",
+  "main.reason.manual-tune-override": "تنظیم دقیق روی {0} ثابت شد",
   "main.reason.manual-preset-first-pass-relaxed": "گذر اول توربو با پیش‌تنظیم دیگری اجرا می‌شود؛ {0} ثابت فقط بر گذر دومی اعمال می‌شود که خروجی را می‌سازد (گذر اول: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} ثابت در مسیر کپی اعمال نشد؛ آنچه به‌جایش اعمال می‌شود {1} است",
   "main.reason.dark-content-hevc": "منبع تاریک است (میانگین روشنایی {0})؛ {1} در سایه‌ها نوار می‌اندازد، پس خودکار از {2} با گذر اول توربو استفاده می‌کند",

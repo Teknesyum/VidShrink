@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "エンコードモードも{0}に固定されましたが、明示的なCRF値が優先されます。モードはcrfになり、{0}の要求は適用されませんでした",
   "main.reason.manual-mode-override": "エンコードモードは{0}に固定されました。エンジンは{1}を選んだはずです",
   "main.reason.manual-preset-override": "プリセットは{0}に固定されました。エンジンは{1}を選んだはずです",
+  "main.reason.manual-tune-override": "チューニングを {0} に固定しました",
   "main.reason.manual-preset-first-pass-relaxed": "高速な1パス目は別のプリセットで実行されます。固定された{0}は出力を生成する2パス目にのみ適用されます(1パス目: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "固定された{0}はコピー経路には適用できません。代わりに適用されるのは{1}です",
   "main.reason.dark-content-hevc": "ソースが暗い（平均輝度 {0}）ため、{1}では暗部にバンディングが出ます。自動はターボ初回パス付きの{2}を使います",

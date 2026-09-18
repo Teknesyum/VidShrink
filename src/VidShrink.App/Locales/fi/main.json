@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "myös koodaustila lukittiin arvoon {0}, mutta nimenomainen CRF-luku voittaa; tilaksi tuli crf eikä {0}-pyyntöä sovellettu",
   "main.reason.manual-mode-override": "koodaustila lukittiin arvoon {0}; moottori olisi valinnut {1}",
   "main.reason.manual-preset-override": "esiasetus lukittiin arvoon {0}; moottori olisi valinnut {1}",
+  "main.reason.manual-tune-override": "hienosäätö lukittiin arvoon {0}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo-ensimmäinen vaihe ajetaan eri esiasetuksella; lukittu {0} koskee vain toista, tulosteen tuottavaa vaihetta (ensimmäinen vaihe: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "lukittua {0} ei voitu soveltaa kopiointipolulla; sen sijaan sovelletaan {1}",
   "main.reason.dark-content-hevc": "lähde on tumma (keskimääräinen luminanssi {0}); {1} raidoittaa varjoja, joten Automaattinen käyttää {2}:ta turbo-ensikierroksella",

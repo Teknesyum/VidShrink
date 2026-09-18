@@ -3745,6 +3745,8 @@ public partial class MainWindow : Window
                     note.ManualOverrideValue, note.EngineWouldHaveChosen),
                 ReasonCode.ManualPresetOverride => Say("main.reason.manual-preset-override",
                     note.ManualOverrideValue, note.EngineWouldHaveChosen),
+                ReasonCode.ManualTuneOverride => Say("main.reason.manual-tune-override",
+                    note.ManualOverrideValue),
                 ReasonCode.ManualPresetFirstPassRelaxed => Say("main.reason.manual-preset-first-pass-relaxed",
                     note.ManualOverrideValue, note.EngineWouldHaveChosen),
                 ReasonCode.ManualOverrideDroppedOnPassThrough => Say("main.reason.manual-override-dropped-on-pass-through",

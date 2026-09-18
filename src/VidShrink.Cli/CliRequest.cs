@@ -41,6 +41,47 @@ public sealed record CliRequest
     public string? Preset { get; init; }
 
     /// <summary>
+    /// <c>--kes</c>'in kare yazimi (<c>300f-900f</c>). Kare saniyeye ayristirmada degil
+    /// <see cref="Resolved"/>'da cevrilir: donusum kaynagin kare hizini ister, ayristirici
+    /// dosyayi hic gormez. Iki uc bagimsiz — bir ucu kare, obur ucu saat olabilir.
+    /// </summary>
+    public double? TrimStartFrame { get; init; }
+    public double? TrimEndFrame { get; init; }
+
+    /// <summary>HandBrake'in <c>-c 1-3</c> karsiligi; tek bolum verilirse iki alan da ayni.</summary>
+    public int? ChapterFrom { get; init; }
+    public int? ChapterTo { get; init; }
+
+    /// <summary>
+    /// Kare ve bolum kollarini kaynaktan cozup kesit pencerisini saniyeye indirir. Donen
+    /// metin hata anahtaridir; <c>null</c> ise <paramref name="resolved"/> kullanilabilir.
+    /// </summary>
+    public string? Resolved(MediaInfo info, out CliRequest resolved)
+    {
+        resolved = this;
+        if (ChapterFrom is int from)
+        {
+            var to = ChapterTo ?? from;
+            if (info.Chapters.Count == 0) return "error.no-chapters";
+            if (from < 1 || to > info.Chapters.Count) return "error.bad-chapter";
+            resolved = this with
+            {
+                TrimStartSeconds = info.Chapters[from - 1].StartSeconds,
+                TrimEndSeconds = info.Chapters[to - 1].EndSeconds
+            };
+            return null;
+        }
+
+        if (TrimStartFrame is null && TrimEndFrame is null) return null;
+        if (!double.IsFinite(info.Fps) || info.Fps <= 0) return "error.no-fps";
+        var start = TrimStartFrame is double sf ? sf / info.Fps : TrimStartSeconds;
+        var end = TrimEndFrame is double ef ? ef / info.Fps : TrimEndSeconds;
+        if (start is double a && end is double b && b <= a) return "error.bad-range";
+        resolved = this with { TrimStartSeconds = start, TrimEndSeconds = end };
+        return null;
+    }
+
+    /// <summary>
     /// <paramref name="sourceDurationSeconds"/> kesitin acik ucunu kapatir (<c>--kes 10-</c>);
     /// 0 verilirse kesit yalnizca acikca verilen iki ucla kurulur.
     /// </summary>
@@ -143,8 +184,22 @@ public static class CliParser
                     break;
                 case "--kes" or "--cut" when command != CliCommand.Watch:
                     if (!TryValue(args, ref i, out var cut)) return Fail("error.missing-value", arg);
-                    if (!TryParseRange(cut, out var cutStart, out var cutEnd)) return Fail("error.bad-range", cut);
-                    request = request with { TrimStartSeconds = cutStart, TrimEndSeconds = cutEnd };
+                    if (request.ChapterFrom is not null) return Fail("error.chapter-and-cut", cut);
+                    if (!TryParseRange(cut, out var cutStart, out var cutEnd, out var cutStartFrame, out var cutEndFrame))
+                        return Fail("error.bad-range", cut);
+                    request = request with
+                    {
+                        TrimStartSeconds = cutStart, TrimEndSeconds = cutEnd,
+                        TrimStartFrame = cutStartFrame, TrimEndFrame = cutEndFrame
+                    };
+                    break;
+                case "--bolum" or "--chapters" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var chapter)) return Fail("error.missing-value", arg);
+                    if (request.TrimStartSeconds is not null || request.TrimStartFrame is not null)
+                        return Fail("error.chapter-and-cut", chapter);
+                    if (!TryParseChapters(chapter, out var chapterFrom, out var chapterTo))
+                        return Fail("error.bad-chapter", chapter);
+                    request = request with { ChapterFrom = chapterFrom, ChapterTo = chapterTo };
                     break;
                 case "--aralik" or "--interval" when command == CliCommand.Watch:
                     if (!TryValue(args, ref i, out var interval)) return Fail("error.missing-value", arg);
@@ -213,21 +268,56 @@ public static class CliParser
     /// <c>BAS-SON</c> kesiti. Uclar saniye (<c>12.5</c>) ya da saat gosterimi (<c>1:23</c>,
     /// <c>1:02:03</c>) olabilir; son uc bos birakilirsa (<c>10-</c>) kaynagin sonuna kadar.
     /// </summary>
-    private static bool TryParseRange(string text, out double? start, out double? end)
+    private static bool TryParseRange(string text, out double? start, out double? end,
+        out double? startFrame, out double? endFrame)
     {
         start = null;
         end = null;
+        startFrame = null;
+        endFrame = null;
         var parts = text.Split('-');
         if (parts.Length != 2) return false;
-        if (!TryParseClock(parts[0], out var from)) return false;
+
+        if (TryParseFrame(parts[0], out var fromFrame)) startFrame = fromFrame;
+        else if (TryParseClock(parts[0], out var from)) { if (from < 0) return false; start = from; }
+        else return false;
+
         if (parts[1].Length > 0)
         {
-            if (!TryParseClock(parts[1], out var to)) return false;
-            if (to <= from) return false;
-            end = to;
+            if (TryParseFrame(parts[1], out var toFrame)) endFrame = toFrame;
+            else if (TryParseClock(parts[1], out var to)) end = to;
+            else return false;
         }
-        if (from < 0) return false;
-        start = from;
+
+        if (start is double a && end is double b && b <= a) return false;
+        if (startFrame is double c && endFrame is double d && d <= c) return false;
+        return true;
+    }
+
+    /// <summary>
+    /// <c>300f</c> yazimi. Ek yoksa kare degil; eski saniye yazimi hic degismedi.
+    /// Kesirli kare kabul edilmez — kare sayilir, olculmez.
+    /// </summary>
+    private static bool TryParseFrame(string text, out double frame)
+    {
+        frame = 0;
+        if (text.Length < 2 || (text[^1] != 'f' && text[^1] != 'F')) return false;
+        var body = text[..^1];
+        if (!int.TryParse(body, NumberStyles.None, CultureInfo.InvariantCulture, out var value) || value < 0) return false;
+        frame = value;
+        return true;
+    }
+
+    /// <summary>HandBrake'in <c>-c</c> yazimi: <c>2</c> ya da <c>2-4</c>.</summary>
+    private static bool TryParseChapters(string text, out int from, out int to)
+    {
+        from = 0;
+        to = 0;
+        var parts = text.Split('-');
+        if (parts.Length > 2) return false;
+        if (!int.TryParse(parts[0], NumberStyles.None, CultureInfo.InvariantCulture, out from) || from < 1) return false;
+        if (parts.Length == 1) { to = from; return true; }
+        if (!int.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out to) || to < from) return false;
         return true;
     }
 

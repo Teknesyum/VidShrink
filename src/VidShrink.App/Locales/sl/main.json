@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "način kodiranja je bil hkrati fiksiran na {0}, a izrecna številka CRF prevlada; način je izšel kot crf in zahteva {0} ni bila uveljavljena",
   "main.reason.manual-mode-override": "način kodiranja je bil fiksiran na {0}; motor bi izbral {1}",
   "main.reason.manual-preset-override": "prednastavitev je bila fiksirana na {0}; motor bi izbral {1}",
+  "main.reason.manual-tune-override": "Fino uglasitev je fiksirana na {0}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo prvi prehod teče z drugo prednastavitvijo; fiksna {0} velja le za drugi prehod, ki ustvari izhod (prvi prehod: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "fiksne {0} ni bilo mogoče uveljaviti na poti kopiranja; namesto tega velja {1}",
   "main.reason.dark-content-hevc": "vir je temen (povprečna svetlost {0}); {1} v sencah ustvarja pasove, zato Samodejno uporabi {2} s turbo prvim prehodom",

@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "kodeerimisrežiim fikseeriti samuti {0}-le, kuid selgesõnaline CRF-number võidab; režiimiks tuli crf ja {0} soovi ei rakendatud",
   "main.reason.manual-mode-override": "kodeerimisrežiim fikseeriti {0}-le; mootor oleks valinud {1}",
   "main.reason.manual-preset-override": "eelseade fikseeriti {0}-le; mootor oleks valinud {1}",
+  "main.reason.manual-tune-override": "peenhäälestus lukustati väärtusele {0}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo esimene käik jookseb teise eelseadega; fikseeritud {0} kehtib ainult teisele käigule, mis väljundi loob (esimene käik: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "fikseeritud {0} ei saanud koopiateel rakenduda; selle asemel kehtib {1}",
   "main.reason.dark-content-hevc": "allikas on tume (keskmine heledus {0}); {1} tekitab varjudes triipe, seega Automaatne kasutab {2} turbo esimese läbimisega",

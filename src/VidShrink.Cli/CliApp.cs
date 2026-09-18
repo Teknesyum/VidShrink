@@ -107,6 +107,14 @@ public static class CliApp
 
         stderr.WriteLine(text["progress.probe"]);
         var info = await services.Probe(input, ct);
+        if (request.Resolved(info, out request) is { } trimError)
+        {
+            var trimMessage = text.Format(trimError, request.ChapterTo is int son && son != request.ChapterFrom
+                ? $"{request.ChapterFrom}-{son}"
+                : request.ChapterFrom?.ToString());
+            stderr.WriteLine(trimMessage);
+            return new FileRun(ExitCodes.Usage, null, trimMessage);
+        }
         var availability = services.Availability();
         var decision = request.SkipMeasurement
             ? Decide(request, info, null, null, availability)

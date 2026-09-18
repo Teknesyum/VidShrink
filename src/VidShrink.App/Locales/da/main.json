@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "kodningstilstanden blev også fastsat til {0}, men et eksplicit CRF-tal vinder; tilstanden blev crf, og kravet om {0} blev ikke anvendt",
   "main.reason.manual-mode-override": "kodningstilstanden blev fastsat til {0}; motoren ville have valgt {1}",
   "main.reason.manual-preset-override": "forvalget blev fastsat til {0}; motoren ville have valgt {1}",
+  "main.reason.manual-tune-override": "Finjusteringen blev låst til {0}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo første gennemløb kører med et andet forvalg; det fastsatte {0} gælder kun for det andet gennemløb, der producerer outputtet (første gennemløb: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "det fastsatte {0} kunne ikke anvendes på kopistien; det, der gælder i stedet, er {1}",
   "main.reason.dark-content-hevc": "kilden er mørk (gennemsnitlig luminans {0}); {1} giver banding i skyggerne, så Automatisk bruger {2} med turbo første gennemløb",

@@ -55,8 +55,8 @@ public static class FfprobeClient
         if (inventory.Any(stream => stream.Kind == StreamKind.Subtitle && stream.Bytes <= 0))
             inventory = await MeasureSubtitleBytesAsync(filePath, inventory, ct);
         var chapters = root.TryGetProperty("chapters", out var chapterList) && chapterList.ValueKind == JsonValueKind.Array
-            ? chapterList.GetArrayLength()
-            : 0;
+            ? ChapterMarks(chapterList)
+            : (IReadOnlyList<ChapterMark>)Array.Empty<ChapterMark>();
 
         var pixFmt = GetString(v, "pix_fmt");
         var colorTransfer = GetString(v, "color_transfer");
@@ -88,8 +88,29 @@ public static class FfprobeClient
             AudioBitrateBps = audio is null ? 0 : ParseLong(audio.Value, "bit_rate") ?? 128_000,
             AudioChannels = audio is null ? 0 : GetInt(audio.Value, "channels") ?? 2,
             Streams = inventory,
-            ChapterCount = chapters
+            Chapters = chapters
         };
+    }
+
+    /// <summary>
+    /// ffprobe'un bolum dizisi. Baslik <c>tags.title</c>'dan gelir, yoksa <c>null</c>;
+    /// numara dosyadaki sirayla 1'den baslar, ffprobe'un kendi <c>id</c>'sinden degil —
+    /// id her kapta 0'dan baslamiyor.
+    /// </summary>
+    private static List<ChapterMark> ChapterMarks(JsonElement chapters)
+    {
+        var list = new List<ChapterMark>();
+        foreach (var c in chapters.EnumerateArray())
+        {
+            var start = ParseDouble(c, "start_time");
+            var end = ParseDouble(c, "end_time");
+            if (start is null || end is null) continue;
+            string? title = null;
+            if (c.TryGetProperty("tags", out var tags) && tags.ValueKind == JsonValueKind.Object)
+                title = GetString(tags, "title");
+            list.Add(new ChapterMark(list.Count + 1, start.Value, end.Value, title));
+        }
+        return list;
     }
 
     internal static List<SourceStream> Inventory(JsonElement streams, double duration)

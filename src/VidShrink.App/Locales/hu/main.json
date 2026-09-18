@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "a kódolási mód is {0}-ra volt rögzítve, de a kifejezett CRF-szám nyer; a mód crf lett, és a(z) {0} kérés nem érvényesült",
   "main.reason.manual-mode-override": "a kódolási mód {0}-ra volt rögzítve; a motor {1}-t választott volna",
   "main.reason.manual-preset-override": "az előbeállítás {0}-ra volt rögzítve; a motor {1}-t választott volna",
+  "main.reason.manual-tune-override": "A finomhangolás {0} értékre lett rögzítve",
   "main.reason.manual-preset-first-pass-relaxed": "a turbó első menet más előbeállítással fut; a rögzített {0} csak a kimenetet adó második menetre vonatkozik (első menet: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "a rögzített {0} nem érvényesülhetett a másolási úton; helyette ez érvényes: {1}",
   "main.reason.dark-content-hevc": "a forrás sötét (átlagos fénysűrűség {0}); a {1} sávosodik az árnyékokban, ezért az Automatikus a {2}-t használja turbó első menettel",

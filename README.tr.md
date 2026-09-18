@@ -150,6 +150,10 @@ plan gerekçesine bir satır düşülerek düşüyor.
 `--kes <baslangic>-<bitis>` kodlamadan önce kesiyor, böylece hedef boyut elde kalan parçaya
 harcanıyor: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, sona kadar `--kes 90-`.
 
+Uçlardan biri saat yerine kare numarası olabilir: `--kes 300f-900f` 300. kareden 900. kareye,
+çevirim kaynağın kare hızıyla. `--bolum 2` ve `--bolum 2-4` aynı pencereyi kaynağın bölüm
+işaretlerinden kurar; iki seçenek birlikte verilemez.
+
 Aşağıdaki uzun anahtarların her birinin bir de İngilizce takma adı var; iki yazım aynı
 anahtar, betik hangisini isterse onu kullanabiliyor. Tek istisna `--crf` ve `--json` ve `--vmaf`:
 bunların tek yazımı var.
@@ -162,6 +166,7 @@ bunların tek yazımı var.
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |
 | `--on-ayar` | `--preset` |
+| `--bolum` | `--chapters` |
 | `--cikti` | `--output` |
 | `--kes` | `--cut` |
 | `--aralik` | `--interval` |

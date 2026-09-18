@@ -731,7 +731,6 @@ public sealed class OluUyeTests
         "ShrinkRequestQueue.PipeName  yalniz-disarida",
         "SingleInstanceChannel.PipeName  yalniz-disarida",
         "SizeEstimate.SpreadRatio  hic-gorunmeyen",
-        "SourceStream.IsForced  hic-gorunmeyen",
         "StrategyAdvice.SuggestedCodec  yalniz-disarida",
         "StrategyAdvice.SuggestedPreference  yalniz-disarida",
         "StreamPlan.Attachments  hic-gorunmeyen",

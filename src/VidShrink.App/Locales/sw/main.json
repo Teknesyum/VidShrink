@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "hali ya usimbaji pia ilithibitishwa kuwa {0} lakini nambari wazi ya CRF hushinda; hali ilitoka crf na ombi la {0} halikutumika",
   "main.reason.manual-mode-override": "hali ya usimbaji ilithibitishwa kuwa {0}; injini ingechagua {1}",
   "main.reason.manual-preset-override": "mpangilio ulithibitishwa kuwa {0}; injini ingechagua {1}",
+  "main.reason.manual-tune-override": "urekebishaji laini umewekwa kuwa {0}",
   "main.reason.manual-preset-first-pass-relaxed": "hatua ya kwanza ya turbo huendeshwa kwa mpangilio tofauti; {0} thabiti hutumika tu kwenye hatua ya pili inayotoa matokeo (hatua ya kwanza: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} thabiti haikuweza kutumika kwenye njia ya nakala; kinachotumika badala yake ni {1}",
   "main.reason.dark-content-hevc": "chanzo ni cheusi (wastani wa mwangaza {0}); {1} huleta mikanda kwenye vivuli, kwa hivyo Otomatiki hutumia {2} na mzunguko wa kwanza wa turbo",

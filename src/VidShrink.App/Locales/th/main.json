@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "โหมดเข้ารหัสก็ถูกกำหนดเป็น {0} แต่ตัวเลข CRF ที่ระบุชัดชนะ โหมดออกมาเป็น crf และคำขอ {0} ไม่ถูกใช้",
   "main.reason.manual-mode-override": "โหมดเข้ารหัสถูกกำหนดเป็น {0}; เอนจินจะเลือก {1}",
   "main.reason.manual-preset-override": "พรีเซ็ตถูกกำหนดเป็น {0}; เอนจินจะเลือก {1}",
+  "main.reason.manual-tune-override": "การปรับจูนถูกตรึงไว้ที่ {0}",
   "main.reason.manual-preset-first-pass-relaxed": "รอบแรกแบบเทอร์โบใช้พรีเซ็ตต่างออกไป {0} ที่กำหนดใช้เฉพาะรอบสองที่สร้างผลลัพธ์ (รอบแรก: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} ที่กำหนดใช้บนเส้นทางคัดลอกไม่ได้ สิ่งที่ใช้แทนคือ {1}",
   "main.reason.dark-content-hevc": "ต้นฉบับมืด (ความสว่างเฉลี่ย {0}) {1} ทำให้เกิดแถบในเงามืด อัตโนมัติจึงใช้ {2} พร้อมรอบแรกแบบเทอร์โบ",

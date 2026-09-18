@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "modul de codare a fost fixat și el la {0}, dar un număr CRF explicit câștigă; modul a ieșit crf și cererea {0} nu a fost aplicată",
   "main.reason.manual-mode-override": "modul de codare a fost fixat la {0}; motorul ar fi ales {1}",
   "main.reason.manual-preset-override": "presetul a fost fixat la {0}; motorul ar fi ales {1}",
+  "main.reason.manual-tune-override": "reglajul fin a fost fixat la {0}",
   "main.reason.manual-preset-first-pass-relaxed": "prima trecere turbo rulează cu alt preset; {0} fixat se aplică doar celei de-a doua treceri, care produce rezultatul (prima trecere: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} fixat nu s-a putut aplica pe calea de copiere; ce se aplică în schimb este {1}",
   "main.reason.dark-content-hevc": "sursa este întunecată (luminanță medie {0}); {1} produce benzi în umbre, așa că Automat folosește {2} cu prima trecere turbo",

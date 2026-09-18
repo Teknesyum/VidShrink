@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "انکوڈ موڈ بھی {0} پر مقرر تھا مگر واضح CRF نمبر جیتتا ہے؛ موڈ crf نکلا اور {0} درخواست لاگو نہ ہوئی",
   "main.reason.manual-mode-override": "انکوڈ موڈ {0} پر مقرر تھا؛ انجن {1} چنتا",
   "main.reason.manual-preset-override": "پری سیٹ {0} پر مقرر تھا؛ انجن {1} چنتا",
+  "main.reason.manual-tune-override": "باریک ٹیوننگ {0} پر مقرر کی گئی",
   "main.reason.manual-preset-first-pass-relaxed": "ٹربو پہلا پاس مختلف پری سیٹ سے چلتا ہے؛ مقرر {0} صرف نتیجہ بنانے والے دوسرے پاس پر لاگو ہوتا ہے (پہلا پاس: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "مقرر {0} کاپی راستے پر لاگو نہ ہو سکا؛ اس کی جگہ {1} لاگو ہوتا ہے",
   "main.reason.dark-content-hevc": "ماخذ تاریک ہے (اوسط روشنی {0})؛ {1} سایوں میں پٹیاں بناتا ہے، اس لیے خودکار {2} کو ٹربو پہلے پاس کے ساتھ استعمال کرتا ہے",

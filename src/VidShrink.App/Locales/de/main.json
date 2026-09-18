@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "der Encode-Modus war zugleich auf {0} fixiert, aber eine explizite CRF-Zahl gewinnt; der Modus wurde crf und die Vorgabe {0} wurde nicht angewendet",
   "main.reason.manual-mode-override": "der Encode-Modus war auf {0} fixiert; die Engine hätte {1} gewählt",
   "main.reason.manual-preset-override": "das Preset war auf {0} fixiert; die Engine hätte {1} gewählt",
+  "main.reason.manual-tune-override": "Die Feinabstimmung wurde auf {0} festgelegt",
   "main.reason.manual-preset-first-pass-relaxed": "der Turbo-Erstdurchgang läuft mit einem anderen Preset; das fixierte {0} gilt nur für den zweiten Durchgang, der die Ausgabe erzeugt (erster Durchgang: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "das fixierte {0} konnte auf dem Kopierpfad nicht angewendet werden; stattdessen gilt {1}",
   "main.reason.dark-content-hevc": "die Quelle ist dunkel (mittlere Helligkeit {0}); {1} erzeugt in den Schatten Banding, daher nutzt Automatisch {2} mit Turbo-Erstdurchlauf",

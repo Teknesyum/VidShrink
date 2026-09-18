@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "mod pengekodan juga ditetapkan ke {0} tetapi nombor CRF eksplisit menang; mod terhasil crf dan permintaan {0} tidak digunakan",
   "main.reason.manual-mode-override": "mod pengekodan ditetapkan ke {0}; enjin akan memilih {1}",
   "main.reason.manual-preset-override": "praset ditetapkan ke {0}; enjin akan memilih {1}",
+  "main.reason.manual-tune-override": "penalaan halus ditetapkan kepada {0}",
   "main.reason.manual-preset-first-pass-relaxed": "laluan pertama turbo berjalan dengan praset berbeza; {0} yang ditetapkan hanya digunakan pada laluan kedua yang menghasilkan output (laluan pertama: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} yang ditetapkan tidak dapat digunakan pada laluan salin; yang digunakan sebagai ganti ialah {1}",
   "main.reason.dark-content-hevc": "sumbernya gelap (luma purata {0}); {1} menghasilkan jalur dalam bayang, jadi Automatik menggunakan {2} dengan laluan pertama turbo",

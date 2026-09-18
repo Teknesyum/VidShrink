@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "এনকোড মোডও {0}-এ নির্দিষ্ট ছিল কিন্তু স্পষ্ট CRF সংখ্যা জেতে; মোড crf হয়েছে এবং {0} অনুরোধ প্রয়োগ হয়নি",
   "main.reason.manual-mode-override": "এনকোড মোড {0}-এ নির্দিষ্ট ছিল; ইঞ্জিন {1} বাছত",
   "main.reason.manual-preset-override": "প্রিসেট {0}-এ নির্দিষ্ট ছিল; ইঞ্জিন {1} বাছত",
+  "main.reason.manual-tune-override": "সূক্ষ্ম সেটিং {0} এ স্থির করা হয়েছে",
   "main.reason.manual-preset-first-pass-relaxed": "টার্বো প্রথম পাস ভিন্ন প্রিসেটে চলে; নির্দিষ্ট {0} কেবল আউটপুট তৈরি করা দ্বিতীয় পাসে প্রযোজ্য (প্রথম পাস: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "নির্দিষ্ট {0} কপি পথে প্রয়োগ করা যায়নি; বদলে যা প্রযোজ্য তা {1}",
   "main.reason.dark-content-hevc": "উৎসটি অন্ধকার (গড় উজ্জ্বলতা {0}); {1} ছায়ায় ব্যান্ডিং করে, তাই স্বয়ংক্রিয় টার্বো প্রথম পাসসহ {2} ব্যবহার করে",

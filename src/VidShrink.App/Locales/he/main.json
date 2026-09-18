@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "מצב הקידוד נקבע גם ל-{0} אבל מספר CRF מפורש גובר; המצב יצא crf ובקשת {0} לא הוחלה",
   "main.reason.manual-mode-override": "מצב הקידוד נקבע ל-{0}; המנוע היה בוחר {1}",
   "main.reason.manual-preset-override": "הפריסט נקבע ל-{0}; המנוע היה בוחר {1}",
+  "main.reason.manual-tune-override": "כוונון העדין נקבע ל-{0}",
   "main.reason.manual-preset-first-pass-relaxed": "מעבר ראשון טורבו רץ עם פריסט אחר; {0} הקבוע חל רק על המעבר השני שמפיק את הפלט (מעבר ראשון: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "{0} הקבוע לא יכול לחול בנתיב ההעתקה; במקומו חל {1}",
   "main.reason.dark-content-hevc": "המקור כהה (בהירות ממוצעת {0}); {1} יוצר פסים בצללים, לכן אוטומטי משתמש ב-{2} עם מעבר ראשון מהיר",

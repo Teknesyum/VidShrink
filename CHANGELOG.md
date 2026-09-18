@@ -9,6 +9,12 @@ ship as part of it.
 
 ### Added
 
+- `--kes` now takes frames as well as seconds and timestamps: `--kes 300f-900f`. The two ends
+  are independent, so `0:10-900f` is valid. A number without the `f` suffix is still seconds.
+  A new `--bolum` (`--chapters`) builds the cut window from the source's own chapter marks:
+  `--bolum 2` or `--bolum 2-4`. The two options cannot be given together, since both set the
+  same window. This closes the last two `--cut` gaps against HandBrake 1.11.2.
+
 - The Advanced panel takes a `-tune`. The ladder is per encoder and measured, not copied from
   the recorder: x264 takes `film|animation|grain`, x265 has no `film`, and SVT-AV1 takes `0|1|2`
   written into `-svtav1-params` — its `tune=3` cannot open the encoder for ordinary encodes.

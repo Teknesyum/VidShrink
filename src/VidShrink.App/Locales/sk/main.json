@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "režim kódovania bol tiež pevne daný na {0}, ale výslovné číslo CRF vyhráva; režim vyšiel crf a požiadavka {0} sa nepoužila",
   "main.reason.manual-mode-override": "režim kódovania bol pevne daný na {0}; motor by vybral {1}",
   "main.reason.manual-preset-override": "predvoľba bola pevne daná na {0}; motor by vybral {1}",
+  "main.reason.manual-tune-override": "Jemné ladenie bolo nastavené na {0}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo prvý prechod beží s inou predvoľbou; pevná {0} platí len pre druhý prechod, ktorý tvorí výstup (prvý prechod: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "pevné {0} sa na ceste kópie nedalo použiť; namiesto toho platí {1}",
   "main.reason.dark-content-hevc": "zdroj je tmavý (priemerný jas {0}); {1} v tieňoch vytvára pruhy, preto Automaticky použije {2} s turbo prvým prechodom",

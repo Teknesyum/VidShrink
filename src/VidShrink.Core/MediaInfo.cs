@@ -26,8 +26,24 @@ public sealed record MediaInfo
     public bool IsInterlaced { get; init; }
     public string? FieldOrder { get; init; }
     public IReadOnlyList<SourceStream> Streams { get; init; } = Array.Empty<SourceStream>();
-    public int ChapterCount { get; init; }
+
+    /// <summary>
+    /// Kaynagin bolum isaretleri, dosyadaki sirayla. Bos liste "bolum yok" demektir;
+    /// <see cref="ChapterCount"/> bu listeden turer, ayri beslenmez.
+    /// </summary>
+    public IReadOnlyList<ChapterMark> Chapters { get; init; } = Array.Empty<ChapterMark>();
+
+    public int ChapterCount => Chapters.Count;
 
     public double FileSizeMb => FileSizeBytes / 1024.0 / 1024.0;
     public long Pixels => (long)Width * Height;
+}
+
+/// <summary>
+/// Tek bir bolum isareti. <paramref name="Number"/> kullanicinin yazdigi numaradir:
+/// HandBrake gibi 1'den baslar, dosyadaki dizinden bir fazladir.
+/// </summary>
+public sealed record ChapterMark(int Number, double StartSeconds, double EndSeconds, string? Title)
+{
+    public double DurationSeconds => Math.Max(0, EndSeconds - StartSeconds);
 }

@@ -150,6 +150,10 @@ does not belong is dropped with a line in the plan reason, not an error.
 `--kes <start>-<end>` trims before the encode, so the target size is spent on the part you
 keep: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, or `--kes 90-` to the end.
 
+Either end may be a frame number instead of a clock: `--kes 300f-900f` is frames 300 to 900,
+converted with the source frame rate. `--bolum 2` and `--bolum 2-4` build the same window from the
+source's chapter marks; the two options cannot be given together.
+
 The long options below each answer to an English alias; the two spellings are the same
 option, and a script may use either. `--crf` and `--json` and `--vmaf` are the exceptions: they have a
 single spelling.
@@ -162,6 +166,7 @@ single spelling.
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |
 | `--on-ayar` | `--preset` |
+| `--bolum` | `--chapters` |
 | `--cikti` | `--output` |
 | `--kes` | `--cut` |
 | `--aralik` | `--interval` |

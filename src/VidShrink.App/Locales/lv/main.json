@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "kodēšanas režīms arī tika fiksēts uz {0}, bet skaidrs CRF skaitlis uzvar; režīms iznāca crf, un {0} pieprasījums netika piemērots",
   "main.reason.manual-mode-override": "kodēšanas režīms tika fiksēts uz {0}; dzinējs būtu izvēlējies {1}",
   "main.reason.manual-preset-override": "priekšiestatījums tika fiksēts uz {0}; dzinējs būtu izvēlējies {1}",
+  "main.reason.manual-tune-override": "Precizais pielāgojums fiksēts uz {0}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo pirmā gaita darbojas ar citu priekšiestatījumu; fiksētais {0} attiecas tikai uz otro gaitu, kas veido izvadi (pirmā gaita: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "fiksēto {0} nevarēja piemērot kopijas ceļā; tā vietā tiek piemērots {1}",
   "main.reason.dark-content-hevc": "avots ir tumšs (vidējais spilgtums {0}); {1} ēnās rada joslas, tāpēc Automātiski izmanto {2} ar turbo pirmo gājienu",

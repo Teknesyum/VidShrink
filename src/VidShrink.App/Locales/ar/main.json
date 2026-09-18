@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "ثُبّت وضع الترميز أيضاً على {0} لكن رقم CRF الصريح يغلب؛ خرج الوضع crf ولم يُطبَّق طلب {0}",
   "main.reason.manual-mode-override": "ثُبّت وضع الترميز على {0}؛ كان المحرك سيختار {1}",
   "main.reason.manual-preset-override": "ثُبّت الإعداد المسبق على {0}؛ كان المحرك سيختار {1}",
+  "main.reason.manual-tune-override": "تم تثبيت الضبط الدقيق على {0}",
   "main.reason.manual-preset-first-pass-relaxed": "التمريرة الأولى التوربو تعمل بإعداد مسبق مختلف؛ {0} المثبّت ينطبق فقط على التمريرة الثانية التي تنتج الناتج (التمريرة الأولى: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "تعذر تطبيق {0} المثبّت على مسار النسخ؛ ما يُطبَّق بدله هو {1}",
   "main.reason.dark-content-hevc": "المصدر داكن (متوسط السطوع {0})؛ يُحدث {1} تدرجات شريطية في الظلال، لذا يستخدم الوضع التلقائي {2} مع تمريرة أولى سريعة",

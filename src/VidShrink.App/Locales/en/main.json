@@ -393,6 +393,7 @@
   "main.reason.manual-mode-superseded-by-crf": "the encode mode was also fixed to {0} but an explicit CRF number wins; the mode came out crf and the {0} request was not applied",
   "main.reason.manual-mode-override": "the encode mode was fixed to {0}; the engine would have picked {1}",
   "main.reason.manual-preset-override": "the preset was fixed to {0}; the engine would have picked {1}",
+  "main.reason.manual-tune-override": "the tune was fixed to {0}",
   "main.reason.manual-preset-first-pass-relaxed": "turbo first pass runs with a different preset; the fixed {0} only applies to the second pass that produces the output (first pass: {1})",
   "main.reason.manual-override-dropped-on-pass-through": "the fixed {0} could not apply on the copy path; what applies instead is {1}",
   "main.reason.dark-content-hevc": "the source is dark (mean luma {0}), where {1} bands in the shadows, so Automatic uses {2} with a turbo first pass",
