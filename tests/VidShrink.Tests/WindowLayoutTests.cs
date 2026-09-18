@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
@@ -1593,17 +1593,7 @@ public sealed class WindowLayoutTests
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider —
     /// her kol kendi dosyasını siler, klasörü son biten kol kaldırır.
     /// </summary>
-    private static void Kapat(string klasor, params string[] adlar)
-    {
-        if (!Directory.Exists(klasor)) return;
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-        }
-
-        if (Directory.GetFileSystemEntries(klasor).Length == 0) Directory.Delete(klasor);
-    }
+    private static void Kapat(string klasor, params string[] adlar) => KanitKapanisi.Kapat(klasor, adlar);
 
 
     public static TheoryData<string, bool, bool> S20Kollari()

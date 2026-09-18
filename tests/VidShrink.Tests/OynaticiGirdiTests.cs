@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Avalonia;
@@ -43,20 +43,7 @@ internal static class GirdiKanit
     /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// </summary>
-    internal static void Kapat(params string[] adlar)
-    {
-        var klasor = Path.Combine(Root, ".calisma", "T176");
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-        }
-
-        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
-        {
-            Directory.Delete(klasor);
-        }
-    }
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Path.Combine(Root, ".calisma", "T176"), adlar);
 }
 
 internal static class GirdiSurucu
@@ -393,6 +380,7 @@ public sealed class PlayerTabTests
 
         GirdiKanit.Write("k1-sekme.txt", rapor);
         Assert.Contains("oynatici sirasi:", rapor);
+        GirdiKanit.Kapat("k1-sekme.txt");
     }
 }
 
@@ -475,6 +463,7 @@ public sealed class OynaticiGirdiTestsKlipUretimi
         Assert.True(
             saat.Elapsed.TotalSeconds < 30,
             $"klip uretimi {saat.Elapsed.TotalSeconds:0.#} sn surdu");
+        GirdiKanit.Kapat("k4-klip-uretimi.txt", "kalip-kanit-20sn.mkv");
     }
 }
 
@@ -524,6 +513,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         });
 
         GirdiKanit.Write("k9-menu-oynat.txt", rapor);
+        GirdiKanit.Kapat("k9-menu-oynat.txt");
     }
 
     [Fact]
@@ -560,6 +550,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         });
 
         GirdiKanit.Write("k9-menu-tam-ekran.txt", rapor);
+        GirdiKanit.Kapat("k9-menu-tam-ekran.txt");
     }
 
     [Fact]
@@ -588,6 +579,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         });
 
         GirdiKanit.Write("k9-menu-sifirla.txt", rapor);
+        GirdiKanit.Kapat("k9-menu-sifirla.txt");
     }
 
     [Fact]
@@ -642,6 +634,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
 
         GirdiKanit.Write("k9-menu-satirlari.txt", rapor);
         Assert.Contains($"satir sayisi: {Keymap.MenuActions.Count}", rapor);
+        GirdiKanit.Kapat("k9-menu-satirlari.txt");
     }
 
     [Fact]
@@ -667,6 +660,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
 
         Assert.Equal(new[] { "DEBUG" }, kosullar);
         Assert.DoesNotContain("OpenedMenu", alanlar);
+        GirdiKanit.Kapat("k13-olcum-kancasi.txt");
     }
 }
 
@@ -715,6 +709,7 @@ public sealed class OynaticiGirdiTestsPencereYazma
 
         GirdiKanit.Write("k16-pencere-geri-yazma.txt", rapor);
         Assert.Contains("geri     ", rapor);
+        GirdiKanit.Kapat("k16-pencere-geri-yazma.txt");
     }
 }
 
@@ -757,6 +752,7 @@ public sealed class OynaticiGirdiTestsKabukHatasi
         });
 
         GirdiKanit.Write("k12-acilis-hatasi.txt", rapor);
+        GirdiKanit.Kapat("k12-acilis-hatasi.txt", "bozuk-ornek.mp4");
     }
 
     private static int DilAboneSayisi()
@@ -825,6 +821,12 @@ internal static class FareKanit
 
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
+
+    /// <summary>
+    /// Son asertten sonra cagrilir: yesil kosum kendi biraktigini siler, kirmizi kosum
+    /// kanitini korur cunku dusen asert buraya hic gelmez. Klasor bosalinca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Folder, adlar);
 }
 
 public sealed class OynaticiFareTests
@@ -874,6 +876,7 @@ public sealed class OynaticiFareTests
 
         FareKanit.Write("f1-tik-ayrimi.txt", rapor);
         Assert.Contains("fullscreen -> True", rapor);
+        FareKanit.Kapat("f1-tik-ayrimi.txt");
     }
 
     [Fact]
@@ -914,6 +917,7 @@ public sealed class OynaticiFareTests
 
         FareKanit.Write("f2-surukleme-esigi.txt", rapor);
         Assert.Contains("esik ustu", rapor);
+        FareKanit.Kapat("f2-surukleme-esigi.txt");
     }
 
     [Fact]
@@ -945,6 +949,7 @@ public sealed class OynaticiFareTests
 
         FareKanit.Write("f3-tasima-kipi.txt", rapor);
         Assert.Contains("[pan]", rapor);
+        FareKanit.Kapat("f3-tasima-kipi.txt");
     }
 
     [Fact]
@@ -975,6 +980,7 @@ public sealed class OynaticiFareTests
         Assert.Equal(pan.LimitY, pan.Y);
 
         FareKanit.Write("f4-miknatis.txt", body.ToString());
+        FareKanit.Kapat("f4-miknatis.txt");
     }
 
     /// <summary>
@@ -1015,6 +1021,7 @@ public sealed class OynaticiFareTests
 
         FareKanit.Write("f5-menu-konumu.txt", rapor);
         Assert.Contains("pointer", rapor);
+        FareKanit.Kapat("f5-menu-konumu.txt");
     }
 
     [Fact]
@@ -1046,5 +1053,6 @@ public sealed class OynaticiFareTests
 
         FareKanit.Write("f6-ayarlar-satiri.txt", rapor);
         Assert.Contains("ayarlar cagrisi: 1", rapor);
+        FareKanit.Kapat("f6-ayarlar-satiri.txt");
     }
 }

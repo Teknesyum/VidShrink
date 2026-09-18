@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -23,23 +23,7 @@ public sealed class FiltreYoklamaTests
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider —
     /// <c>.calisma/a1</c> da filtre klasörüyle birlikte boşalırsa kalkar.
     /// </summary>
-    private static void Kapat(params string[] adlar)
-    {
-        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "a1", "filtre");
-        if (!Directory.Exists(klasor)) return;
-
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-        }
-
-        if (Directory.GetFileSystemEntries(klasor).Length != 0) return;
-        Directory.Delete(klasor);
-
-        var ust = Path.Combine(GirdiKanit.Root, ".calisma", "a1");
-        if (Directory.Exists(ust) && Directory.GetFileSystemEntries(ust).Length == 0) Directory.Delete(ust);
-    }
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Path.Combine(GirdiKanit.Root, ".calisma", "a1", "filtre"), adlar);
 
     private static async Task Ffmpeg(params string[] args)
     {

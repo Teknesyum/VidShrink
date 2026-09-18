@@ -40,21 +40,7 @@ internal static class YolKanit
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// Ad bir klasörse (testin geçici kökü) ağacıyla birlikte gider.
     /// </summary>
-    internal static void Kapat(params string[] adlar)
-    {
-        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-yol-haritasi");
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-            else if (Directory.Exists(yol)) Directory.Delete(yol, true);
-        }
-
-        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
-        {
-            Directory.Delete(klasor);
-        }
-    }
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-yol-haritasi"), adlar);
 
     internal static string N(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 }
