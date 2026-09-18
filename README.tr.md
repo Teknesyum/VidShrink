@@ -138,7 +138,9 @@ vidshrink plan clip.mp4 --hedef 8MB --json          # yalnız plan ve argümanla
 Anahtarlar: `--kodek auto|h264|hevc|av1`, `--cikti <yol>`, `--json`, `--olcumsuz` (yoklama
 kodlamalarını atlar), `--vmaf` (ffmpeg'de libvmaf varsa sonucu ölçer), `--hizli`. İlerleme
 stderr'e, boyut, süre, deneme sayısı ve VMAF stdout'a gidiyor. Yardım metni sistem dilini
-izliyor, Türkçe ya da İngilizce.
+izliyor, Türkçe ya da İngilizce. `--dil en` (`--lang en`) tek koşumluk olarak bunu eziyor;
+bilinen kodlar `en` ve `tr`, tanınmayan kod sessizce İngilizce'ye düşmek yerine kullanım hatası
+veriyor.
 
 `--kes <baslangic>-<bitis>` kodlamadan önce kesiyor, böylece hedef boyut elde kalan parçaya
 harcanıyor: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, sona kadar `--kes 90-`.
@@ -160,6 +162,7 @@ bunların tek yazımı var.
 | `--bir-kez` | `--once` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
+| `--dil` | `--lang` |
 
 Çıkış kodları: bantta `0`, bandın altında `2` (kalite doyduğu için daha küçük dosya
 saklandı), boy tavanı aşıldığında `3` (en küçük sonuç yine yazılıyor; JSON `output` ve

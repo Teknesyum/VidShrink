@@ -38,6 +38,17 @@ public static class CliApp
     public static async Task<int> RunAsync(IReadOnlyList<string> args, TextWriter stdout, TextWriter stderr,
         CliText text, CliServices services, CancellationToken ct)
     {
+        var selection = CliText.SplitLanguage(args);
+        if (selection.Invalid is { } badLanguage)
+        {
+            stderr.WriteLine(text.Format("error.bad-language", badLanguage, string.Join(", ", CliText.Languages)));
+            stderr.WriteLine(text["usage.hint"]);
+            return ExitCodes.Usage;
+        }
+
+        if (selection.Language is { } chosen) text = CliText.ForLanguage(chosen);
+        args = selection.Rest;
+
         var parsed = CliParser.Parse(args);
         if (!parsed.Ok)
         {

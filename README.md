@@ -138,7 +138,9 @@ vidshrink plan clip.mp4 --hedef 8MB --json          # plan and arguments only, n
 Options: `--kodek auto|h264|hevc|av1`, `--cikti <path>`, `--json`, `--olcumsuz` (skip the
 probe encodes), `--vmaf` (measure the result when ffmpeg has libvmaf), `--hizli`. Progress
 goes to stderr; size, duration, attempts and VMAF go to stdout. Help follows the system
-language, Turkish or English.
+language, Turkish or English. `--dil en` (`--lang en`) overrides it for one run; the
+known codes are `en` and `tr`, and an unknown code is a usage error rather than a silent
+fall back to English.
 
 `--kes <start>-<end>` trims before the encode, so the target size is spent on the part you
 keep: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, or `--kes 90-` to the end.
@@ -160,6 +162,7 @@ single spelling.
 | `--bir-kez` | `--once` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
+| `--dil` | `--lang` |
 
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
 size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled.

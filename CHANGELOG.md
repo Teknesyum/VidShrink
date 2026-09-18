@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- `--dil` / `--lang` on the command line: the help and the messages follow the flag instead of
+  the system language for that run. `en` and `tr` are known, `tr-TR` and `TR` normalise, and an
+  unknown code is a usage error (`CliText.cs`, `CliApp.cs`).
 - A screen recorder tab. Pick a screen, a window or drag a region with an aspect-ratio lock
   and preset sizes; start after an optional 3/5/10 s countdown; F7-F11 work as global hotkeys
   even when the window is not focused (`RecorderHotkeys.cs:32-39`).
