@@ -86,7 +86,6 @@ internal partial class PlayerView
             _trace.Add("subdl -> working");
 
             var query = new SubtitleQuery(
-                path,
                 MovieHash.Compute(path),
                 System.IO.Path.GetFileNameWithoutExtension(path),
                 SubtitleLanguages(Strings.Language));

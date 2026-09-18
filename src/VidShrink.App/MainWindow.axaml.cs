@@ -28,6 +28,7 @@ using Avalonia.Threading;
 using Avalonia.Controls.Presenters;
 using Avalonia.VisualTree;
 using VidShrink.App.Localization;
+using VidShrink.Core.Subtitles;
 using VidShrink.App.Themes;
 using VidShrink.App.Performance;
 using VidShrink.App.Playback;
@@ -1435,7 +1436,7 @@ public partial class MainWindow : Window
     /// kendi anahtarını alıp yandaki kutuya yapıştırır.
     /// </summary>
     private void OnOpenSubtitlesKeyPage(object? sender, RoutedEventArgs e)
-        => OpenExternal(VidShrink.Core.Subtitles.OpenSubtitlesProvider.KeyPageUrl);
+        => OpenExternal(OpenSubtitlesProvider.KeyPageUrl);
 
     private async void OnBrowseFfmpegPath(object? sender, RoutedEventArgs e)
     {

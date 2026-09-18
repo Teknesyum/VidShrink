@@ -42,11 +42,10 @@ public enum SubtitleOutcome
 }
 
 /// <summary>Bir arama isteği.</summary>
-/// <param name="MediaPath">Videonun tam yolu. İndirilen dosya bunun yanına yazılır.</param>
 /// <param name="MovieHash">Varsa moviehash; tam eşleşme araması bununla yapılır.</param>
 /// <param name="Name">Hash tutmazsa kullanılan ad araması.</param>
 /// <param name="Languages">Yeğleme sırasıyla dil kodları (arayüz dili, sonra İngilizce).</param>
-public sealed record SubtitleQuery(string MediaPath, string? MovieHash, string Name, IReadOnlyList<string> Languages);
+public sealed record SubtitleQuery(string? MovieHash, string Name, IReadOnlyList<string> Languages);
 
 /// <summary>Arama sonucundaki tek bir altyazı dosyası.</summary>
 public sealed record SubtitleCandidate(

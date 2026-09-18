@@ -284,8 +284,8 @@ public class AltyaziIndirmeTests
         return govde.ToString();
     }
 
-    private static SubtitleQuery Sorgu(string yol = "C:\\film\\Film Adi.mkv", string? hash = "abc123def4567890")
-        => new(yol, hash, "Film Adi", new[] { "tr", "en" });
+    private static SubtitleQuery Sorgu(string? hash = "abc123def4567890")
+        => new(hash, "Film Adi", new[] { "tr", "en" });
 
     [Fact]
     public async Task AramaIstegiHashVeDiliTasir()
@@ -665,11 +665,14 @@ public class AltyaziIndirmeTests
     }
 
     /// <summary>
-    /// Anahtar yokken menüde indirme satırı değil "anahtar al" satırı görünür; özellik
-    /// hata vermeden kendini kapatır.
+    /// İndirme bu sürümde arayüzde sunulmuyor. Şartname <c>/download</c> için anahtarın
+    /// yanında <c>/login</c>den gelen <c>Authorization</c> başlığını da zorunlu tutuyor;
+    /// giriş kolu P29'da geldiği için indirme satırı menüye çizilse hiç kimsede
+    /// çalışmayan bir düğme olurdu. Anahtar girilmişken de girilmemişken de menüde yok;
+    /// menünün kendisinin çizildiği, dokunulmamış altyazı satırlarıyla pimli.
     /// </summary>
     [Fact]
-    public void AnahtarYokkenMenuAnahtarAlSatiriniGosterir()
+    public void IndirmeSatiriBuSurumdeMenudeYok()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -691,10 +694,15 @@ public class AltyaziIndirmeTests
 
         AltyaziKanit.Yaz("oynatici-menu.txt", $"kapali {string.Join(" | ", rapor.Kapali)}\nacik {string.Join(" | ", rapor.Acik)}");
 
-        Assert.Contains(Strings.Get("player.subtitle.download.getkey"), rapor.Kapali);
-        Assert.DoesNotContain(Strings.Get("player.subtitle.download"), rapor.Kapali);
-        Assert.Contains(Strings.Get("player.subtitle.download"), rapor.Acik);
-        Assert.DoesNotContain(Strings.Get("player.subtitle.download.getkey"), rapor.Acik);
+        foreach (var liste in new[] { rapor.Kapali, rapor.Acik })
+        {
+            Assert.DoesNotContain(Strings.Get("player.subtitle.download"), liste);
+            Assert.DoesNotContain(Strings.Get("player.subtitle.download.getkey"), liste);
+
+            // Menü boş dönseydi yukarıdaki iki ölçü de geçerdi; çizildiğini göster.
+            Assert.Contains(Strings.Get("player.subtitle.off"), liste);
+            Assert.Contains(Strings.Get("player.subtitle.load"), liste);
+        }
     }
 
     /// <summary>Arayüz dili önce, İngilizce sonra; İngilizce arayüzde liste tek elemanlı.</summary>
@@ -920,13 +928,16 @@ public class AltyaziIndirmeTests
     }
 
     /// <summary>
-    /// P28 ile 42 dile giren 14 metnin tamamı okunuyor: her biri üretim kaynağında (kod ya
-    /// da axaml) geçiyor ve 42 dilin hepsinde boş olmayan, anahtarın kendisi olmayan bir
-    /// karşılığı var. Okunmayan anahtar dile girer, ekrana hiç çıkmaz.
+    /// P28 dil dosyalarına on beş anahtar ekledi (dalın tabanı <c>d0aea4d2</c> dil başına 900,
+    /// dalın tepesi 915, düşen yok). Bu ölçü onların üretimde okunan on üçünü tutuyor; kalan
+    /// ikisi menü satırınındı, indirme bu sürümde arayüzde sunulmadığı için
+    /// <see cref="MenuMetinleriPYirmiDokuzaBekliyor"/> ile adıyla sayılıyorlar. Listenin son
+    /// iki satırı P28'in eklediği değil, P28'in dokunduğu eski anahtar
+    /// (<c>player.subtitle.loadfailed</c>, <c>settings.player-shortcuts.hint</c>); toplam on beş satır.
+    /// Her satır üretim kaynağında (kod ya da axaml) geçiyor ve 42 dilin hepsinde boş olmayan,
+    /// anahtarın kendisi olmayan bir karşılığı var. Okunmayan anahtar dile girer, ekrana hiç çıkmaz.
     /// </summary>
     [Theory]
-    [InlineData("player.subtitle.download")]
-    [InlineData("player.subtitle.download.getkey")]
     [InlineData("player.subtitle.download.working")]
     [InlineData("player.subtitle.download.done")]
     [InlineData("player.subtitle.download.nokey")]
@@ -940,6 +951,8 @@ public class AltyaziIndirmeTests
     [InlineData("settings-tab.opensubtitles.label")]
     [InlineData("settings-tab.opensubtitles.get")]
     [InlineData("settings-tab.opensubtitles.hint")]
+    [InlineData("player.subtitle.loadfailed")]
+    [InlineData("settings.player-shortcuts.hint")]
     public void EklenenMetinKaynaktaOkunurVeKirkIkiDildeVar(string anahtar)
     {
         Assert.True(KaynaktaGeciyor(anahtar), anahtar + " uretim kaynaginda hic okunmuyor");
@@ -965,6 +978,33 @@ public class AltyaziIndirmeTests
         Assert.Equal(42, klasorler.Length);
         Assert.Empty(eksik);
         Assert.All(klasorler, dil => Assert.Contains(dil, Strings.Languages, StringComparer.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// İndirme menü satırının iki metni 42 dilde hazır duruyor ama bu sürümde hiçbir yerde
+    /// okunmuyor: satır menüye çizilmiyor. Bu ölçü borcu görünür tutuyor — anahtarlar adıyla
+    /// sayılıyor, sessizce ölü kalmıyorlar. P29 indirme satırını geri koyunca bu ölçü kırmızı
+    /// olur ve ikisi yukarıdaki okunanlar listesine taşınır.
+    /// </summary>
+    [Fact]
+    public void MenuMetinleriPYirmiDokuzaBekliyor()
+    {
+        string[] bekleyen = { "player.subtitle.download", "player.subtitle.download.getkey" };
+
+        var okunanlar = bekleyen.Where(KaynaktaGeciyor).ToArray();
+        var cevirisiz = bekleyen
+            .SelectMany(anahtar => Strings.Languages.Select(dil => (Dil: dil, Anahtar: anahtar)))
+            .Where(satir => string.IsNullOrWhiteSpace(Strings.GetIn(satir.Dil, satir.Anahtar))
+                            || string.Equals(Strings.GetIn(satir.Dil, satir.Anahtar), satir.Anahtar, StringComparison.Ordinal))
+            .ToArray();
+
+        AltyaziKanit.Yaz("p29-bekleyen.txt",
+            "bekleyen: " + string.Join(", ", bekleyen)
+            + "\nkaynakta okunan: " + (okunanlar.Length == 0 ? "(yok)" : string.Join(", ", okunanlar))
+            + "\ncevirisiz: " + cevirisiz.Length);
+
+        Assert.Empty(okunanlar);
+        Assert.Empty(cevirisiz);
     }
 
     /// <summary>

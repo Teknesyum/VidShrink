@@ -908,3 +908,43 @@ kullanma, `settings.json`dan **ayrı** bir dosyada, Windows'ta DPAPI ile sarıl�
 kendiliğinden yeniden giriş yok. Unix kolu `ubuntu-latest`te ölçülebilir, macOS koşulamıyor;
 o kol sürüm notunda "ölçülmedi" diye yazılır. P29'un kodtan önceki ilk adımı: yalnız Api-Key
 ile tek canlı `/download` çağrısı, anonim kota sorusunu kapatmak için.
+
+**Yol B: indirme satırı bu sürümde arayüzde yok.** Yukarıdaki 6. madde menüye "Altyazı
+indir…" satırını koyuyordu; fable'ın bu iş sırasında verdiği ikinci hüküm bu satırı geri
+aldı. Gerekçe şartnamenin kendisi: `/download` `Authorization` başlığını zorunlu tutuyor,
+oturum kolu P29'da geldiği için satır çizilseydi **hiç kimsede çalışmayan bir düğme**
+olurdu. Motor kodu (`Core/Subtitles`, `PlayerView.Subtitles.cs`) ve on beş metin 42 dilde
+yerinde duruyor; P29 yalnız satırı geri koyup oturumu bağlayacak. Sürüm P29 birleşmeden
+kesilmez.
+
+Pim karşılığı: `AltyaziIndirmeTests.IndirmeSatiriBuSurumdeMenudeYok` (anahtar girilmişken de
+girilmemişken de menüde yok, dokunulmamış iki satırla olumlu kontrollü) ve
+`MenuMetinleriPYirmiDokuzaBekliyor` (iki yetim anahtar adıyla görünür kalır, kaynakta
+okunmadığı ve 42 dilde çevrili olduğu ayrı ayrı ölçülür).
+
+**Kimlik saklama kararı değişti.** fable'ın önceki "parola hiçbir yerde saklanmaz"
+konumu bu iş sırasında geri alındı: kimlik bilgisi işletim sisteminin kendi kasasında
+durur (Windows DPAPI CurrentUser, Unix ayrı `0600` dosya), `settings.json`a asla girmez.
+401'de belirteç silinir, giriş **bir kez** yeniden denenir, o da düşerse "oturum açılamadı,
+ayarlardan kontrol et" denir. `/login` istek sınırı saniyede 1. `/login` cevabındaki
+`base_url` izlenir ve `Authorization` yalnız `vip-api.opensubtitles.com` için eklenir.
+
+**P29 insan doğrulaması olmadan mühürlenemez.** İndirme kolu T0'ın ölçebileceği bir şey
+değil: sahte `/login` cevabı kodu pimler ama canlı doğrulamanın yerine geçmez. P29'un
+kapanış şartı, kullanıcının kendi hesabıyla girip gerçek bir altyazı indirmesi.
+
+**P28'in kaydırdığı üç pim.** Dal dışı üç ölçü P28 yüzünden kırmızıya döndü, CI koşumu
+35291801874 bunu gösterdi; üçü de gerekçesiyle güncellendi:
+
+- `BaslikKapsamiTests.AdVeBirimYazimiCumleOrtasindaDaKorunur` 38700 → 39345. Taban
+  `d0aea4d2` dil başına 900 anahtar, dal 915, düşen yok: 43 × 15 = 645.
+- `BaslikKapsamiTests.KolDegistirenAnahtarlarSayilir` 1481 → 1548 (en 170 → 181,
+  tr 61 → 63). On beş anahtarın `Title` altında kol değiştiren kısmı dökümden dil başına
+  sayıldı, toplamı 67.
+- `OluUyeTests.OluOzellikYuzeyiPimlenenKume`: `SubtitleQuery.MediaPath` hiçbir yerde
+  okunmuyordu — borç olarak pimlenmek yerine **kaldırıldı**; indirilecek yolu
+  `DownloadAsync` zaten ayrı parametre olarak alıyor. Aynı ölçü `StreamPlan.Subtitles`ı
+  sessizce düşürüyordu: tarayıcının deseni `\.\s*Ad\b`, ve yeni `VidShrink.Core.Subtitles`
+  ad alanı bunu "üretimde tüketiliyor" gösteriyordu. Tarayıcı düzeltildi (`Strip` artık
+  `using`/`namespace` yönergelerini boşluğa çeviriyor) ve `MainWindow.axaml.cs`teki tam
+  nitelenmiş `VidShrink.Core.Subtitles.OpenSubtitlesProvider` kısaltıldı; satır pimde kaldı.
