@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -188,18 +188,18 @@ public static class CliApp
         SceneMapAttempt? scenes, IEncoderAvailability? availability)
     {
         var baseTarget = request.TargetMb ?? new PlanOptions().TargetMb;
-        var settled = ShrinkEngine.SettledProfile(info, request.ToPlanOptions(baseTarget), profile, availability);
+        var settled = ShrinkEngine.SettledProfile(info, request.ToPlanOptions(baseTarget, info.DurationSeconds), profile, availability);
 
         QualityTargetResult? qualityTarget = null;
         var target = baseTarget;
         if (request.Quality is { } quality)
         {
-            qualityTarget = ShrinkEngine.TargetForQuality(info, request.ToPlanOptions(baseTarget), quality, settled, availability);
+            qualityTarget = ShrinkEngine.TargetForQuality(info, request.ToPlanOptions(baseTarget, info.DurationSeconds), quality, settled, availability);
             var rounded = ShrinkEngine.RoundedTargetMb(qualityTarget);
             target = rounded > 0 ? rounded : qualityTarget.TargetMb;
         }
 
-        var options = request.ToPlanOptions(target);
+        var options = request.ToPlanOptions(target, info.DurationSeconds);
         var result = ShrinkEngine.Decide(info, options, settled, availability);
         var extension = result.Plan.Streams?.Extension ?? "mp4";
         var output = request.Output is { } path ? Path.GetFullPath(path)
@@ -218,7 +218,7 @@ public static class CliApp
 
         stderr.WriteLine(text["progress.measure"]);
         var profile = await ShrinkEngine.CalibrateAsync(info, scenes, draft.Options.SpeedMode,
-            () => request.ToPlanOptions(draft.TargetMb), availability,
+            () => request.ToPlanOptions(draft.TargetMb, info.DurationSeconds), availability,
             (stage, _) =>
             {
                 if (stage == ShrinkMeasureStage.Probed) stderr.WriteLine(text["progress.calibrate"]);

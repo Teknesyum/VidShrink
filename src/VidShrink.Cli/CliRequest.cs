@@ -35,8 +35,14 @@ public sealed record CliRequest
     public bool MeasureVmaf { get; init; }
     public bool Fast { get; init; }
     public string? PreferredLanguage { get; init; }
+    public double? TrimStartSeconds { get; init; }
+    public double? TrimEndSeconds { get; init; }
 
-    public PlanOptions ToPlanOptions(double targetMb)
+    /// <summary>
+    /// <paramref name="sourceDurationSeconds"/> kesitin acik ucunu kapatir (<c>--kes 10-</c>);
+    /// 0 verilirse kesit yalnizca acikca verilen iki ucla kurulur.
+    /// </summary>
+    public PlanOptions ToPlanOptions(double targetMb, double sourceDurationSeconds = 0)
     {
         var options = new PlanOptions
         {
@@ -56,6 +62,7 @@ public sealed record CliRequest
             PreferredLanguage = PreferredLanguage
         };
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
+        options.Trim = TrimWindow.Of(TrimStartSeconds, TrimEndSeconds, sourceDurationSeconds);
         return options;
     }
 }
@@ -116,6 +123,11 @@ public static class CliParser
                 case "--cikti" or "--output" or "-o":
                     if (!TryValue(args, ref i, out var output)) return Fail("error.missing-value", arg);
                     request = request with { Output = output };
+                    break;
+                case "--kes" or "--cut" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var cut)) return Fail("error.missing-value", arg);
+                    if (!TryParseRange(cut, out var cutStart, out var cutEnd)) return Fail("error.bad-range", cut);
+                    request = request with { TrimStartSeconds = cutStart, TrimEndSeconds = cutEnd };
                     break;
                 case "--aralik" or "--interval" when command == CliCommand.Watch:
                     if (!TryValue(args, ref i, out var interval)) return Fail("error.missing-value", arg);
@@ -179,6 +191,45 @@ public static class CliParser
     private static bool TryParseNumber(string text, out double value)
         => double.TryParse(text.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value)
            && double.IsFinite(value);
+
+    /// <summary>
+    /// <c>BAS-SON</c> kesiti. Uclar saniye (<c>12.5</c>) ya da saat gosterimi (<c>1:23</c>,
+    /// <c>1:02:03</c>) olabilir; son uc bos birakilirsa (<c>10-</c>) kaynagin sonuna kadar.
+    /// </summary>
+    private static bool TryParseRange(string text, out double? start, out double? end)
+    {
+        start = null;
+        end = null;
+        var parts = text.Split('-');
+        if (parts.Length != 2) return false;
+        if (!TryParseClock(parts[0], out var from)) return false;
+        if (parts[1].Length > 0)
+        {
+            if (!TryParseClock(parts[1], out var to)) return false;
+            if (to <= from) return false;
+            end = to;
+        }
+        if (from < 0) return false;
+        start = from;
+        return true;
+    }
+
+    private static bool TryParseClock(string text, out double seconds)
+    {
+        seconds = 0;
+        if (text.Length == 0) return false;
+        var fields = text.Split(':');
+        if (fields.Length > 3) return false;
+        var total = 0.0;
+        for (var i = 0; i < fields.Length; i++)
+        {
+            if (!TryParseNumber(fields[i], out var field) || field < 0) return false;
+            if (fields.Length > 1 && i > 0 && field >= 60) return false;
+            total = total * 60 + field;
+        }
+        seconds = total;
+        return true;
+    }
 
     private static bool TryValue(IReadOnlyList<string> args, ref int index, out string value)
     {

@@ -30,6 +30,14 @@ public sealed class PlanOptions
     public string? LockedCodec { get; set; } = null;
 
     /// <summary>
+    /// Kucultmenin uygulanacagi zaman penceresi; <c>null</c> "tum video" demektir.
+    /// Karar kaynagi <c>docs/danisma/2026-09-18-fable-kucultmede-aralik.md</c> S2: kesit
+    /// yalnizca bir kirpma bayragi degil, butcenin girdisi — rejim, oran, karmasiklik ve
+    /// bit hizi kesit suresinden turer.
+    /// </summary>
+    public TrimWindow? Trim { get; set; } = null;
+
+    /// <summary>
     /// Kullanicinin acikca sectigi kodlama kipi. <c>null</c> "secim yok" demektir; motor
     /// bugunku gibi butce/tavan karsilastirmasiyla crf/2pass arasinda kendi secer. Doluysa
     /// nihai kip zorlanir, kalan her sey (cozunurluk, fps, ses, bitrate tahmini) yine
@@ -253,7 +261,9 @@ public static class PlanCalculator
     {
         var probe = new ProbeState();
         var filters = options.Filters ?? VideoFilterOptions.Default;
-        var result = BuildDetailedCore(VideoFilterChain.PlannedSource(info, filters), options, profile, availability, probe);
+        var trimmed = options.Trim is { } trim ? trim.Apply(info) : info;
+        var result = BuildDetailedCore(VideoFilterChain.PlannedSource(trimmed, filters), options, profile, availability, probe);
+        result.Plan.Trim = options.Trim;
         result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
         result.Plan.Filters = filters;
         result.Plan.SuggestedCrop = filters.Crop is null ? options.DetectedCrop : null;

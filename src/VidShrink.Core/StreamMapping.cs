@@ -56,7 +56,7 @@ public sealed record StreamPlan(
 {
     public string Extension => StreamMapping.ExtensionOf(Container);
 
-    public IReadOnlyList<string> OutputArguments()
+    public IReadOnlyList<string> OutputArguments(bool dropChapters = false)
     {
         var a = new List<string> { "-map", VideoMap };
         foreach (var track in Audio) a.AddRange(new[] { "-map", track.Map });
@@ -82,7 +82,7 @@ public sealed record StreamPlan(
 
         if (Attachments.Count > 0) a.AddRange(new[] { "-c:t", "copy" });
         if (!Request.KeepAllTracks && Audio.Count == 1) a.AddRange(new[] { "-disposition:a:0", "default" });
-        a.AddRange(new[] { "-map_metadata", "0", "-map_chapters", "0" });
+        a.AddRange(new[] { "-map_metadata", "0", "-map_chapters", dropChapters ? "-1" : "0" });
         return a;
     }
 
