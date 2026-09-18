@@ -102,7 +102,7 @@ public static class CliParser
             var arg = args[i];
             switch (arg)
             {
-                case "-h" or "--help" or "--yardim":
+                case "-h" or "--yardim" or "--help":
                     return Success(new CliRequest { Command = CliCommand.Help });
                 case "--hedef" or "--target":
                     if (!TryValue(args, ref i, out var target)) return Fail("error.missing-value", arg);

@@ -140,6 +140,26 @@ probe encodes), `--vmaf` (measure the result when ffmpeg has libvmaf), `--hizli`
 goes to stderr; size, duration, attempts and VMAF go to stdout. Help follows the system
 language, Turkish or English.
 
+`--kes <start>-<end>` trims before the encode, so the target size is spent on the part you
+keep: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, or `--kes 90-` to the end.
+
+The long options below each answer to an English alias; the two spellings are the same
+option, and a script may use either. `--json` and `--vmaf` are the exceptions: they have a
+single spelling.
+
+| Turkish | English |
+|---|---|
+| `--yardim` | `--help` |
+| `--hedef` | `--target` |
+| `--kalite` | `--quality` |
+| `--kodek` | `--codec` |
+| `--cikti` | `--output` |
+| `--kes` | `--cut` |
+| `--aralik` | `--interval` |
+| `--bir-kez` | `--once` |
+| `--olcumsuz` | `--no-measure` |
+| `--hizli` | `--fast` |
+
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
 size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled.
 
@@ -161,9 +181,15 @@ deleted and the file is picked up again once it settles.
 
 Progress is kept in `.vidshrink-izle.json` inside the watched folder, by name and size; a
 renamed or resized file counts as new. If that folder is read-only the state goes to the
-output folder as `.vidshrink-izle-<hash>.json`, and failing that to the settings folder. A
-file that failed is retried once on the next start. To process everything again, delete the
-state file.
+output folder as `.vidshrink-izle-<hash>.json`, and failing that to the settings folder as
+`izle-<hash>.json`. A file that failed is retried once on the next start. To process
+everything again, delete the state file.
+
+`<hash>` is the first 16 hex characters, lowercase, of the SHA-256 of the watched folder's
+path. The path enters the hash under the same rule as the two comparisons below: upper-cased
+first where the running system ignores case (Windows and macOS), taken as it stands on
+Linux. So `/gelen` and `/Gelen` get one shared state file on Windows and macOS and two
+separate ones on Linux, and the same folder always produces the same name.
 
 Exactly two comparisons follow the rule of the running system: the watched folder against
 the output folder, and a candidate against the output names this run has written. Those are

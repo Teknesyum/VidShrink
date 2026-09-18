@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using VidShrink.App;
 using VidShrink.Cli;
@@ -196,12 +198,54 @@ public sealed class CliTests
     [InlineData("error.extra-input", "plan", "a.mp4", "b.mp4", "--hedef", "25")]
     [InlineData("error.unknown-command", "sil", "a.mp4")]
     [InlineData("error.watch-no-output", "izle", "a.mp4")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "10")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "10-20-30")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "40-20")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "0:70-0:90")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "-20")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--cut", "abc-def")]
     public void YanlisKullanimAdiylaReddediliyor(string key, params string[] args)
     {
         var parsed = CliParser.Parse(args);
 
         Assert.False(parsed.Ok);
         Assert.Equal(key, parsed.ErrorKey);
+    }
+
+    /// <summary>
+    /// <c>error.bad-range</c>'i hicbir test okumuyordu (denetim bulgusu): anahtari bozan
+    /// bir mutasyon sessizce geciyordu. Burada hem reddedilen degerin anahtari hem de
+    /// anahtarin iki dil dosyasindaki karsiligi okunur; kabul edilen kesitler ise ayni
+    /// yolun <b>kirmizi olmadigini</b> gosterir, boylece "her sey bad-range" mutasyonu da
+    /// kirilir.
+    /// </summary>
+    [Theory]
+    [InlineData("10-40", 10.0, 40.0)]
+    [InlineData("0:10-0:40", 10.0, 40.0)]
+    [InlineData("90-", 90.0, null)]
+    [InlineData("1:02:03-1:02:04", 3723.0, 3724.0)]
+    public void KabulEdilenKesitBadRangeVermez(string kesit, double start, double? end)
+    {
+        var parsed = CliParser.Parse(new[] { "plan", "a.mp4", "--hedef", "25", "--kes", kesit });
+
+        Assert.True(parsed.Ok, parsed.ErrorKey);
+        Assert.Equal(start, parsed.Request!.TrimStartSeconds);
+        Assert.Equal(end, parsed.Request!.TrimEndSeconds);
+    }
+
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void BadRangeCumlesiDilDosyasindanGeliyorVeDegeriTasiyor(string dil)
+    {
+        var parsed = CliParser.Parse(new[] { "plan", "a.mp4", "--hedef", "25", "--kes", "40-20" });
+
+        Assert.Equal("error.bad-range", parsed.ErrorKey);
+        Assert.Equal("40-20", parsed.ErrorArgument);
+
+        var cumle = CliText.ForLanguage(dil).Format(parsed.ErrorKey!, parsed.ErrorArgument!);
+        Assert.Contains("40-20", cumle, StringComparison.Ordinal);
+        Assert.Contains("0:10-0:40", cumle, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -428,4 +472,91 @@ public sealed class CliTests
         Probe = (_, _) => throw new InvalidOperationException("probe must not run"),
         Availability = () => throw new InvalidOperationException("availability must not run")
     };
+
+    private const int BeklenenTakmaAdSayisi = 10;
+
+    /// <summary>
+    /// <para>Ingilizce takma adlar iki READMEde de yaziliydi diye degil, <b>kaynaktan
+    /// sayilarak</b> pimleniyor: liste testte tekrarlanmaz, <c>CliParser.Parse</c>'in switch
+    /// kollarindan cikarilir.</para>
+    /// <para><b>Turetme kurali istisnasiz</b>: bir kolun <i>uzun</i> yazimlari (<c>--</c> ile
+    /// baslayanlar) sirayla alinir; ilki kanonik, kalan her uzun yazim onun takma adidir. Kisa
+    /// yazimlar (<c>-h</c>, <c>-o</c>) kolun neresinde durursa dursun sayima girmez, dolayisiyla
+    /// bir kola kisa bayrak eklemek sayimi degistirmez — onceki kural "ilk yazim uzun olmali"
+    /// dedigi icin <c>-h</c> ile baslayan yardim kolu disarda kaliyor, <c>--hedef</c> koluna
+    /// <c>-t</c> eklenince sayim sessizce dusuyordu.</para>
+    /// <para>Sayinin kendisi de pimli (<see cref="BeklenenTakmaAdSayisi"/>), boylece kaynaga
+    /// eklenen yeni bir takma ad belgesiz kalamaz. Sayim tutmazsa hata iletisi <b>her kolu ve
+    /// elenme sebebini</b> yazar.</para>
+    /// <para>READMElerin "hepsi" demesi de veriyle pimli: takma adi olmayan uzun anahtarlar
+    /// (<c>--json</c>, <c>--vmaf</c>) kaynaktan cikarilip cumlede istisna olarak araniyor.</para>
+    /// </summary>
+    [Fact]
+    public void IngilizceTakmaAdlarIkiBelgedeDeYaziyor()
+    {
+        var (adlar, tekiller, rapor) = TakmaAdKollari();
+        Assert.True(
+            adlar.Count == BeklenenTakmaAdSayisi,
+            $"CliRequest.cs'te {adlar.Count} takma ad cifti bulundu, beklenen {BeklenenTakmaAdSayisi}.\nKol dokumu:\n{rapor}");
+
+        var ingilizce = Belge("README.md");
+        var turkce = Belge("README.tr.md");
+
+        foreach (var (kanonik, takma) in adlar)
+        {
+            Assert.Contains($"| `{kanonik}` | `{takma}` |", ingilizce, StringComparison.Ordinal);
+            Assert.Contains($"| `{kanonik}` | `{takma}` |", turkce, StringComparison.Ordinal);
+        }
+
+        Assert.Contains(
+            MetinPimi.Duz($"{string.Join(" and ", tekiller.Select(a => $"`{a}`"))} are the exceptions: they have a single spelling."),
+            MetinPimi.Duz(ingilizce),
+            StringComparison.Ordinal);
+        Assert.Contains(
+            MetinPimi.Duz($"Tek istisna {string.Join(" ve ", tekiller.Select(a => $"`{a}`"))}: bunların tek yazımı var."),
+            MetinPimi.Duz(turkce),
+            StringComparison.Ordinal);
+    }
+
+    private static (IReadOnlyList<(string Kanonik, string Takma)> Ciftler, IReadOnlyList<string> Tekiller, string Rapor) TakmaAdKollari()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Cli", "CliRequest.cs"));
+        var basi = kaynak.IndexOf("switch (arg)", StringComparison.Ordinal);
+        Assert.True(basi > 0, "CliRequest.cs icinde 'switch (arg)' bulunamadi");
+
+        var ciftler = new List<(string, string)>();
+        var tekiller = new List<string>();
+        var rapor = new StringBuilder();
+        foreach (Match kol in Regex.Matches(kaynak[basi..], @"case\s+(""[^""]+""(?:\s+or\s+""[^""]+"")*)"))
+        {
+            var yazimlar = Regex.Matches(kol.Groups[1].Value, @"""([^""]+)""")
+                .Select(e => e.Groups[1].Value).ToList();
+            var uzun = yazimlar.Where(a => a.StartsWith("--", StringComparison.Ordinal)).ToList();
+            var ad = $"case {string.Join(" or ", yazimlar.Select(a => $"\"{a}\""))}";
+
+            if (uzun.Count == 0)
+            {
+                rapor.AppendLine($"  elendi  {ad} — uzun yazimi yok");
+                continue;
+            }
+
+            if (uzun.Count == 1)
+            {
+                tekiller.Add(uzun[0]);
+                rapor.AppendLine($"  elendi  {ad} — tek uzun yazim ({uzun[0]}), takma adi yok");
+                continue;
+            }
+
+            foreach (var takma in uzun.Skip(1))
+            {
+                ciftler.Add((uzun[0], takma));
+                rapor.AppendLine($"  cift    {uzun[0]} -> {takma}");
+            }
+        }
+
+        return (ciftler, tekiller, rapor.ToString());
+    }
+
+    private static string Belge(string ad) =>
+        File.ReadAllText(Path.Combine(TipSources.Root, ad)).Replace("\r\n", "\n", StringComparison.Ordinal);
 }

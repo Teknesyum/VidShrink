@@ -71,22 +71,45 @@ public class KucultmeAraligiTests
         Assert.Equal(kare, sonraki, 3);
     }
 
+    /// <summary>
+    /// <para>Ikinci iddia once <c>TrimWindow.SeekLeadSeconds</c> ile karsilastiriyordu; sabiti
+    /// degistiren bir mutasyon iddianin iki yanini birlikte kaydirdigi icin o satir hicbir zaman
+    /// kirmizi olamazdi. Sabitin degerini zaten ustteki <c>Assert.Equal(10.0, ...)</c> pimliyor.</para>
+    /// <para>Yerine gelen iddia bagimsiz bir ozellik olcuyor: girdiden <b>once</b> ve <b>sonra</b>
+    /// gelen <c>-ss</c> degerlerinin toplami baslangic saniyesine esit, yani melez bolusum kayipsiz.
+    /// Bu, kalan kismi sabitleyip onceki kismi bozan bir mutasyonda kirilir ve sabitin degerinden
+    /// bagimsizdir.</para>
+    /// </summary>
     [Fact]
     public void AramaBolusumu_BaslangicKayinca_YalnizHizliKisimBuyur()
     {
+        IReadOnlyList<string> Args(double start)
+            => FfmpegArguments.Build(Kaynak(), Plan(new TrimWindow(start, start + 30)), "cikti.mp4", 0, null);
+
         double Sonraki(double start)
         {
-            var args = FfmpegArguments.Build(Kaynak(), Plan(new TrimWindow(start, start + 30)), "cikti.mp4", 0, null);
+            var args = Args(start);
             var input = args.IndexOf("-i");
             return args.Select((value, index) => (value, index))
                 .Where(pair => pair.value == "-ss" && pair.index > input)
                 .Sum(pair => Value(args, pair.index));
         }
 
+        double Toplam(double start)
+        {
+            var args = Args(start);
+            return args.Select((value, index) => (value, index))
+                .Where(pair => pair.value == "-ss")
+                .Sum(pair => Value(args, pair.index));
+        }
+
         var yakin = Sonraki(60);
         var uzak = Sonraki(360);
         Assert.Equal(yakin, uzak, 3);
-        Assert.True(uzak >= 5, $"kare hassas kalan {uzak} saniye, anahtar kare araligini karsilamiyor");
+        Assert.Equal(10.0, uzak, 3);
+
+        Assert.Equal(60.0, Toplam(60), 3);
+        Assert.Equal(360.0, Toplam(360), 3);
     }
 
     [Theory]
@@ -242,11 +265,28 @@ public class KucultmeAraligiTests
     [Theory]
     [InlineData(9999.0)]
     [InlineData(601.0)]
+    [InlineData(600.0)]
     public void KaynagiAsanSonUcKaynagaKirpilir(double end)
     {
         var kirpilan = TrimWindow.Of(10, end, 600)!;
-        Assert.Equal(TrimWindow.Of(10, 600, 600)!.DurationSeconds, kirpilan.DurationSeconds, 3);
-        Assert.Equal(590, kirpilan.DurationSeconds, 3);
+
+        Assert.Equal(10.0, kirpilan.StartSeconds, 3);
+        Assert.Equal(600.0, kirpilan.EndSeconds, 3);
+        Assert.Equal(590.0, kirpilan.DurationSeconds, 3);
+    }
+
+    /// <summary>
+    /// Kirpma yalniz <b>asan</b> uca dokunur: kaynagin icinde kalan bir son oldugu gibi
+    /// durur. Ust siniri kaynak suresine sabitleyen bir mutasyon burada kirilir.
+    /// </summary>
+    [Fact]
+    public void KaynaginIcindekiSonKirpilmaz()
+    {
+        var pencere = TrimWindow.Of(10, 200, 600)!;
+
+        Assert.Equal(10.0, pencere.StartSeconds, 3);
+        Assert.Equal(200.0, pencere.EndSeconds, 3);
+        Assert.Equal(190.0, pencere.DurationSeconds, 3);
     }
 }
 
