@@ -34,6 +34,11 @@ public sealed class KaydediciOnizlemeTests
     /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
     private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
 
+    private static void Onceki(params string[] adlar) => KanitKapanisi.Onceki(Kanit, adlar);
+
+    private static string[] YeniJpg(HashSet<string> onceki) =>
+        Directory.GetFiles(Kanit, "*.jpg").Where(y => !onceki.Contains(y)).OrderBy(y => y, StringComparer.Ordinal).ToArray();
+
     private static RecorderRequest Istek() => new()
     {
         Platform = RecorderPlatform.Windows,
@@ -115,7 +120,8 @@ public sealed class KaydediciOnizlemeTests
     [Fact]
     public void CanliKayitOnizlemeKaresiniYazarOnizlemesizYazmaz()
     {
-        foreach (var eski in Directory.GetFiles(Kanit)) File.Delete(eski);
+        Onceki("args.txt", "olcu.txt", "onizleme.jpg", "kayit.mkv", "bos.mkv");
+        var oncekiJpg = new HashSet<string>(Directory.GetFiles(Kanit, "*.jpg"), StringComparer.OrdinalIgnoreCase);
         var jpg = Path.Combine(Kanit, "onizleme.jpg");
         var kayit = Path.Combine(Kanit, "kayit.mkv");
         var bos = Path.Combine(Kanit, "bos.mkv");
@@ -134,12 +140,12 @@ public sealed class KaydediciOnizlemeTests
         {
             $"onizleme genislik={genislik} bayt={(File.Exists(jpg) ? new FileInfo(jpg).Length : 0)}",
             $"kayit sure={kayitSure}",
-            $"onizlemesiz jpg sayisi={Directory.GetFiles(Kanit, "*.jpg").Length - (File.Exists(jpg) ? 1 : 0)}"
+            $"bu kosumun yazdigi jpg={string.Join(' ', YeniJpg(oncekiJpg).Select(Path.GetFileName))}"
         });
 
         Assert.Equal("320", genislik);
         Assert.InRange(double.Parse(kayitSure, CultureInfo.InvariantCulture), 2.5, 3.5);
-        Assert.Single(Directory.GetFiles(Kanit, "*.jpg"));
+        Assert.Equal(new[] { jpg }, YeniJpg(oncekiJpg));
         Assert.True(File.Exists(bos));
 
         Kapat("args.txt", "olcu.txt", "onizleme.jpg", "kayit.mkv", "bos.mkv");

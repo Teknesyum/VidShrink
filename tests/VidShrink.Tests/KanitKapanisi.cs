@@ -10,6 +10,21 @@ namespace VidShrink.Tests;
 /// </summary>
 internal static class KanitKapanisi
 {
+    /// <summary>
+    /// Bir testin <b>kendi</b> yazdığı adları koşum başında temizler. Klasörü süpürmez:
+    /// kardeş ölçünün kırmızı koşumdan kalan kanıtı yerinde durur.
+    /// </summary>
+    internal static void Onceki(string klasor, params string[] adlar)
+    {
+        if (!Directory.Exists(klasor)) return;
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+            else if (Directory.Exists(yol)) Directory.Delete(yol, true);
+        }
+    }
+
     internal static void Kapat(string klasor, params string[] adlar)
     {
         foreach (var ad in adlar)

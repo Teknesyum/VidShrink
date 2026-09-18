@@ -33,6 +33,8 @@ public sealed class BoslukKirpmaTests
     /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
     private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
 
+    private static void Onceki(params string[] adlar) => KanitKapanisi.Onceki(Kanit, adlar);
+
     private const string OrnekCikti = """
         [freezedetect @ 000001] lavfi.freezedetect.freeze_start: 2.1
         [freezedetect @ 000001] lavfi.freezedetect.freeze_duration: 2.9
@@ -129,7 +131,8 @@ public sealed class BoslukKirpmaTests
     [Fact]
     public async Task CanliKayittaDonukAralikKisalirDonuksuzKayitDokunulmaz()
     {
-        foreach (var eski in Directory.GetFiles(Kanit, "*.mkv")) File.Delete(eski);
+        Onceki("donuklu.mkv", "donuksuz.mkv");
+        foreach (var eski in Directory.GetFiles(Kanit, "donu*-trimmed*.mkv")) File.Delete(eski);
 
         var donuklu = Path.Combine(Kanit, "donuklu.mkv");
         Ffmpeg("-hide_banner", "-y",
@@ -161,7 +164,7 @@ public sealed class BoslukKirpmaTests
         Assert.InRange(yeniSure, 3.4, 4.1);
         Assert.True(bos.Ok, bos.Error);
         Assert.Null(bos.Target);
-        Assert.Single(Directory.GetFiles(Kanit, "*-trimmed*.mkv"));
+        Assert.Single(Directory.GetFiles(Kanit, "donu*-trimmed*.mkv"));
 
         Kapat("olcu.txt", "donuklu.mkv", "donuksuz.mkv", Path.GetFileName(sonuc.Target!));
     }

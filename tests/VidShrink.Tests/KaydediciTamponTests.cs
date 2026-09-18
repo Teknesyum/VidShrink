@@ -36,6 +36,8 @@ public sealed class KaydediciTamponTests
     /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
     private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
 
+    private static void Onceki(params string[] adlar) => KanitKapanisi.Onceki(Kanit, adlar);
+
     private static RecorderRequest Istek() => new()
     {
         Platform = RecorderPlatform.Windows,
@@ -111,7 +113,7 @@ public sealed class KaydediciTamponTests
     public async Task CanliTamponSonSaniyeleriKaydederEskiParcalarSarilir()
     {
         var kok = Kanit;
-        foreach (var eski in Directory.GetFiles(kok)) File.Delete(eski);
+        Onceki("args.txt", "olcu.txt", "son-saniyeler.mkv", "parcalar");
         var parcalar = Path.Combine(kok, "parcalar");
         var hedef = Path.Combine(kok, "son-saniyeler.mkv");
         const int saniye = 4;

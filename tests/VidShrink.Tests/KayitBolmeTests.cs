@@ -34,6 +34,8 @@ public sealed class KayitBolmeTests
     /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
     private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
 
+    private static void Onceki(params string[] adlar) => KanitKapanisi.Onceki(Kanit, adlar);
+
     private static RecorderRequest Istek() => new()
     {
         Platform = RecorderPlatform.Windows,
@@ -71,7 +73,8 @@ public sealed class KayitBolmeTests
     [KayitFact]
     public async Task BolmeSureSiniriniParcalaraDagitirYarimKayitIsaretlenir()
     {
-        foreach (var eski in Directory.GetFiles(Kanit)) File.Delete(eski);
+        Onceki("olcu.txt", "tek.mkv", "yarim.mkv", "yarim.mp4");
+        foreach (var eski in Directory.GetFiles(Kanit, "bolunmus*")) File.Delete(eski);
 
         var bolunmus = await Kaydet(Istek() with { Split = new RecorderSplit(TimeSpan.FromSeconds(2)) }, Path.Combine(Kanit, "bolunmus.mkv"));
         var parcaSureleri = (bolunmus.Files ?? Array.Empty<string>()).Select(Sure).ToList();
