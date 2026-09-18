@@ -2215,6 +2215,7 @@ public partial class MainWindow : Window
             else TxtUpdateBadge.ClearValue(TextBlock.ForegroundProperty);
         }
         ToolTip.SetTip(BtnUpdateBadge, state is UpdateBadgeState.Ready ? Say("main.update.ready") : TxtUpdateBadge.Text);
+        AutomationProperties.SetName(BtnUpdateBadge, TxtUpdateBadge.Text);
         BtnUpdateBadge.IsVisible = true;
         RefreshUpdateNoticeButton();
     }

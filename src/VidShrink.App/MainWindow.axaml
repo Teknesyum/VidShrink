@@ -1264,10 +1264,18 @@
 
                     <TextBlock Text="{loc:Text settings-tab.opensubtitles.account}" Theme="{StaticResource Label}" Margin="0"/>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtOpenSubtitlesUser" Width="180" MaxLines="1" PlaceholderText="{loc:Text settings-tab.opensubtitles.user}"/>
-                      <TextBox x:Name="TxtOpenSubtitlesPassword" Width="180" MaxLines="1" PasswordChar="*" PlaceholderText="{loc:Text settings-tab.opensubtitles.password}"/>
-                      <Button x:Name="BtnOpenSubtitlesSignIn" Content="{loc:Text settings-tab.opensubtitles.signin}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignIn"/>
-                      <Button x:Name="BtnOpenSubtitlesSignOut" Content="{loc:Text settings-tab.opensubtitles.signout}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignOut"/>
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
+                        <TextBlock Text="{loc:Text settings-tab.opensubtitles.user}" Theme="{StaticResource Label}" Margin="0"/>
+                        <TextBox x:Name="TxtOpenSubtitlesUser" Width="180" MaxLines="1"
+                                 auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.user}"/>
+                      </StackPanel>
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
+                        <TextBlock Text="{loc:Text settings-tab.opensubtitles.password}" Theme="{StaticResource Label}" Margin="0"/>
+                        <TextBox x:Name="TxtOpenSubtitlesPassword" Width="180" MaxLines="1" PasswordChar="*"
+                                 auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.password}"/>
+                      </StackPanel>
+                      <Button x:Name="BtnOpenSubtitlesSignIn" Content="{loc:Text settings-tab.opensubtitles.signin}" Theme="{StaticResource GhostButton}" VerticalAlignment="Bottom" Click="OnOpenSubtitlesSignIn"/>
+                      <Button x:Name="BtnOpenSubtitlesSignOut" Content="{loc:Text settings-tab.opensubtitles.signout}" Theme="{StaticResource GhostButton}" VerticalAlignment="Bottom" Click="OnOpenSubtitlesSignOut"/>
                     </StackPanel>
                     <TextBlock x:Name="LblOpenSubtitlesStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.signedout}"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.accounthint}"/>

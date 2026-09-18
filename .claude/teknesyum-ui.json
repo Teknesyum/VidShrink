@@ -3,8 +3,7 @@
     {
       "rule": "forms/no-ui-string-literal",
       "file": "src/VidShrink.App/MainWindow.axaml",
-      "line": 74,
-      "reason": "\"Buy Me a Coffee\" marka adıdır, çevrilmez; yazımı BrandSpellingTests pimliyor."
+      "reason": "\"Buy Me a Coffee\" marka adıdır, çevrilmez; LanguageTests marka listesinde ve SettingsTabTests hem yazımını hem sözlükte olmamasını pimliyor. Satır numarası yazılmıyor: başlık çubuğu bloğu düzenlendikçe kayıyor (74 iken 1410 oldu)."
     },
     {
       "rule": "forms/unmeasured-label",
@@ -16,6 +15,64 @@
       "file": "docs/netlestirme/012-teknesyum-ui-taramasinin-kapanmayan-18-b-girdi.md",
       "line": 92,
       "reason": "Danışma girdisi, yukarıdaki CHANGELOG satırını alıntılıyor; kayıt belgesi sonradan düzenlenmez."
+    },
+    {
+      "rule": "forms/unmeasured-label",
+      "file": "README.md",
+      "line": 176,
+      "reason": "\"(default 2)\" `--aralik` bayrağının program varsayılanı, ölçüm iddiası değil; CliApp.cs:145 `request.PollSeconds ?? 2` ile birebir aynı."
+    },
+    {
+      "rule": "forms/unmeasured-label",
+      "file": "docs/arastirma/kaydedici-bolge-ve-cerceve.md",
+      "line": 47,
+      "reason": "Satır ShareX'in kip adlarını sayıyor; \"Default\" bir kip adı, yanındaki sayı madde numarası. Araştırma notu, kendi ölçümümüz değil."
+    },
+    {
+      "rule": "forms/no-theme-library",
+      "file": "tests/VidShrink.Tests/KabukStandardiTests.cs",
+      "reason": "\"MahApps\" ve \"Wpf.Ui\" GorselTemaKitapligiYok testinin yasak listesinde; yasağı ihlal eden değil uygulayan satırlar. Kuralın kendi muafiyeti yalnız licenses.md'yi tanıyor."
+    },
+    {
+      "rule": "states/unnamed-interactive",
+      "file": "src/VidShrink.App/MainWindow.axaml",
+      "line": 742,
+      "reason": "BtnRetryTrim'in Content'i MainWindow.axaml.cs:4331'de Say(\"main.retry.trim\") ile atanıyor; Avalonia'da düğmenin erişilebilir adı Content'ten gelir. Tarayıcı kod tarafındaki atamayı görmüyor."
+    },
+    {
+      "rule": "states/unnamed-interactive",
+      "file": "src/VidShrink.App/MainWindow.axaml",
+      "line": 743,
+      "reason": "BtnRetryAccept.Content MainWindow.axaml.cs:4327'de, panel görünür olmadan önce çalışan aynı metotta atanıyor."
+    },
+    {
+      "rule": "states/unnamed-interactive",
+      "file": "src/VidShrink.App/MainWindow.axaml",
+      "line": 1403,
+      "reason": "BtnUpdateBadge'in adı rozetin metniyle birlikte değişiyor; MainWindow.axaml.cs AutomationProperties.SetName ile TxtUpdateBadge.Text'i yazıyor. Sabit bir axaml adı durum değişince yalan söylerdi. Satır numarası pimli: dosya genelinde muaf tutmak yeni adsız düğmeleri de örterdi."
+    },
+    {
+      "rule": "states/unnamed-interactive",
+      "file": "src/VidShrink.App/Recorder/RecorderView.axaml",
+      "line": 102,
+      "reason": "RecorderView.Tampon.cs:81-82 hem BtnReplaySave.Content'i hem AutomationProperties.SetName'i düğmeyi görünür yapan metotta atıyor."
+    },
+    {
+      "rule": "states/unnamed-interactive",
+      "file": "src/VidShrink.App/Themes/Playback.axaml",
+      "line": 475,
+      "reason": "PART_DecreaseButton Slider şablonunun iç parçası; Focusable=\"False\" PlaybackSliderFill temasında setter olarak duruyor. Ekran okuyucuya ad vermek yanlış olurdu — parça erişilebilirlik ağacında görünmemeli."
+    },
+    {
+      "rule": "states/unnamed-interactive",
+      "file": "src/VidShrink.App/Themes/Playback.axaml",
+      "line": 478,
+      "reason": "PART_IncreaseButton için aynısı; Focusable=\"False\" PlaybackSliderRest temasında."
+    },
+    {
+      "rule": "forms/no-placeholder",
+      "file": "src/VidShrink.App/Recorder/RecorderView.axaml",
+      "reason": "On alanın hepsinde görünür Label ve auto:AutomationProperties.Name var; placeholder etiket yerine geçmiyor, boş alanın ne anlama geldiğini söylüyor (\"Boş: kapalı\", \"isteğe bağlı\"). Alan doldurulunca kaybolması bilgi kaybı değil. Satır numarası yazılmıyor: gelişmiş panel büyüdükçe onu da kayıyor."
     }
   ]
 }
