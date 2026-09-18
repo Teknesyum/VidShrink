@@ -3055,7 +3055,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        Media.Publish(path, probed, MediaFocusOwner.Shrink);
+        Media.Publish(path, probed);
         ApplyLoaded(path, probed);
         await MeasureComplexityAsync(probed);
     }
@@ -3142,7 +3142,7 @@ public partial class MainWindow : Window
         ShowSourceName();
         Fade(SourceCard, true);
         ClearSourceError();
-        Media.Publish(path, info, MediaFocusOwner.Shrink);
+        Media.Publish(path, info);
         ApplyLoaded(path, info);
     }
 

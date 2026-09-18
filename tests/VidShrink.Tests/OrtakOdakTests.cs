@@ -99,7 +99,7 @@ public sealed class OrtakOdakTests
                 }
 
                 return (sayac.Kez, sayac.Yollar, window.ShrinkLoadedPath,
-                    window.Media.DurationSeconds, window.Media.SourceFps);
+                    window.Media.Info?.DurationSeconds ?? 0, window.Media.Info?.Fps ?? 0);
             }
             finally { window.Close(); }
         });
@@ -284,9 +284,7 @@ public sealed class OrtakOdakTests
         Kapat("ustuste.mkv");
     }
 
-    /// <summary>
-    /// Başka dosyaya odaklanınca çözümleme düşüyor, sahip yeni sahibe geçiyor.
-    /// </summary>
+    /// <summary>Başka dosyaya odaklanınca çözümleme düşüyor, odak yeni yola geçiyor.</summary>
     [Fact]
     public void BaskaDosyayaOdaklanincaCozumlemeDusuyor()
     {
@@ -294,14 +292,15 @@ public sealed class OrtakOdakTests
         var baska = Dosya("konum-baska.mkv", 4096);
         var media = new CurrentMedia();
 
-        media.Publish(odak, Ornek(odak), MediaFocusOwner.Player);
+        media.Publish(odak, Ornek(odak));
         Assert.NotNull(media.Info);
+        Assert.True(media.Holds(odak));
 
-        media.Focus(baska, MediaFocusOwner.Shrink);
+        media.Focus(baska);
 
         Assert.Null(media.Info);
-        Assert.Equal(MediaFocusOwner.Shrink, media.Owner);
         Assert.True(media.Holds(baska));
+        Assert.False(media.Holds(odak));
 
         Kapat("konum-odak.mkv", "konum-baska.mkv");
     }
@@ -332,37 +331,33 @@ public sealed class OrtakOdakTests
     }
 
     /// <summary>
-    /// Aynı yolda sahip değişince <c>Changed</c> yayılıyor. <c>Focus</c>'un erken dönüş kolu
-    /// sahibi sessizce yazıyordu: kaydediciden küçültmeye geçen aynı dosyada abone hiçbir şey
-    /// görmüyor, <c>Owner</c>'a bakan kol bayat kalıyordu. Sahip aynıysa olay yayılmaz
-    /// (olumsuz kontrol) — yoksa her <c>Focus</c> çağrısı gereksiz bir tur açardı.
+    /// <b>Yüzey dar tutuluyor.</b> Nesne üretimde yalnız ffprobe önbelleği olarak okunuyordu:
+    /// <c>Owner</c> (ve <c>MediaFocusOwner</c>), <c>Changed</c> olayı, <c>DurationSeconds</c>
+    /// ve <c>SourceFps</c> yazılıp hiçbir yerde okunmuyordu. Süre ve fps zaten
+    /// <c>Info</c>'nun izdüşümü, "kim değiştirir" kapısı da <c>ChkFollowRecording</c> onay
+    /// kutusu (<c>docs/plan-duzenleyici.md:167-173</c>); hepsi kaldırıldı.
+    ///
+    /// <para>Ölçü yansımayla, çünkü geri gelmeleri derlemeyi kırmaz — sessizce ölü yüzeyi
+    /// geri getirir. Desenin kör olmadığı duran üyelerle olumlu kontrollü.</para>
     /// </summary>
     [Fact]
-    public void AyniYoldaSahipDegisinceOlayYayiliyor()
+    public void OluOdakYuzeyiGeriGelmiyor()
     {
-        var dosya = Dosya("sahip-degisimi.mkv", 4096);
-        var media = new CurrentMedia();
+        var uyeler = typeof(CurrentMedia)
+            .GetMembers(BindingFlags.Public | BindingFlags.NonPublic |
+                        BindingFlags.Instance | BindingFlags.Static)
+            .Select(u => u.Name)
+            .ToArray();
 
-        var sahipler = new List<MediaFocusOwner>();
-        media.Changed += m => sahipler.Add(m.Owner);
+        Assert.DoesNotContain("Owner", uyeler);
+        Assert.DoesNotContain("Changed", uyeler);
+        Assert.DoesNotContain("DurationSeconds", uyeler);
+        Assert.DoesNotContain("SourceFps", uyeler);
 
-        media.Publish(dosya, Ornek(dosya), MediaFocusOwner.Recorder);
-        var yayindan = sahipler.Count;
+        Assert.Contains("Holds", uyeler);
+        Assert.Contains("SamePath", uyeler);
 
-        media.Focus(dosya, MediaFocusOwner.Shrink);
-        var degisince = sahipler.Count;
-
-        media.Focus(dosya, MediaFocusOwner.Shrink);
-        var ayniyken = sahipler.Count;
-
-        Assert.Equal(1, yayindan);
-        Assert.Equal(2, degisince);
-        Assert.Equal(2, ayniyken);
-        Assert.Equal(
-            new[] { MediaFocusOwner.Recorder, MediaFocusOwner.Shrink },
-            sahipler);
-        Assert.Equal(MediaFocusOwner.Shrink, media.Owner);
-
-        Kapat("sahip-degisimi.mkv");
+        Assert.Null(typeof(CurrentMedia).Assembly.GetType("VidShrink.App.MediaFocusOwner"));
+        Assert.NotNull(typeof(CurrentMedia).Assembly.GetType("VidShrink.App.CurrentMedia"));
     }
 }

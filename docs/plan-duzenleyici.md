@@ -67,7 +67,7 @@ kullanıcıdan saklamak yerine arayüzde söyleyeceğiz.
 Kullanıcının ikinci cümlesinin tamamı bu madde: *"oynatıcı shrink editor vb hepsi aynı
 videoya odaklanmış olacak"*.
 
-`CurrentMedia` diye tek bir nesne: yol, `MediaInfo`, süre, kaynak fps, son bilinen konum.
+`CurrentMedia` diye tek bir nesne: yol ve `MediaInfo`.
 Sekmeler ondan okur, ona yazar. Kaydedici bittiğinde odak kendiliğinden kaydedilen dosyaya
 geçer ([RecorderView.axaml.cs:117](../src/VidShrink.App/Recorder/RecorderView.axaml.cs:117)
 zaten yolu elinde tutuyor).
@@ -167,7 +167,10 @@ geçerli: seçenek kapalıyken küçültme sekmesi kendi dosyasında kalır.
 D0 bu yüzden iki şey taşıyor: ortak `CurrentMedia` nesnesi ve onu **kimin** değiştirebildiğini
 söyleyen tek bir ayar. **Kuruldu.** Ayar T7'de yerleşen `ChkFollowRecording`
 (`settings.json`'da `followRecording`, metinler `settings-tab.follow-recording.{label,hint}`);
-yeni kullanıcı metni gerekmedi. Nesne `src/VidShrink.App/CurrentMedia.cs`: yol, `MediaInfo`,
-süre, kaynak fps, son bilinen konum, sahip. Çift yoklama
+yeni kullanıcı metni gerekmedi. Nesne `src/VidShrink.App/CurrentMedia.cs`: yol ve
+`MediaInfo`. Başlangıçtaki süre / kaynak fps / son konum / sahip alanları 18 Eylül 2026'da
+kaldırıldı — üçü `MediaInfo`'nun ya da `PlaybackHistory`'nin izdüşümüydü, sahip ise hiç
+okunmuyordu ve "kim değiştirir" kapısı zaten bu onay kutusu
+(`docs/danisma/2026-09-18-fable-currentmedia-olu-yuzey.md`). Çift yoklama
 `MainWindow.OdakTakibi.cs`'in `Prober` dikişi ve uçuş paylaşımıyla bire indi; ölçü
 `docs/olcumler/k19-d0-ortak-odak.md`.

@@ -57,7 +57,7 @@ public partial class MainWindow
         _following = true;
         try
         {
-            _media.Focus(path, MediaFocusOwner.Recorder);
+            _media.Focus(path);
             if (!SamePath(ShrinkLoadedPath, path)) await (FollowShrinkLoader ?? LoadAsync)(path);
             if (SamePath(Player.LoadedPath, path)) return;
 
@@ -83,7 +83,7 @@ public partial class MainWindow
     {
         if (_following || ChkFollowRecording.IsChecked != true) return;
         if (!File.Exists(path)) return;
-        _media.Focus(path, MediaFocusOwner.Player);
+        _media.Focus(path);
         if (SamePath(ShrinkLoadedPath, path)) return;
         _ = (FollowShrinkLoader ?? LoadAsync)(path);
     }

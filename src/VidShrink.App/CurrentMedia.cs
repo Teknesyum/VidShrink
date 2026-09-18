@@ -4,20 +4,16 @@ using VidShrink.Core;
 
 namespace VidShrink.App;
 
-public enum MediaFocusOwner
-{
-    None,
-    Player,
-    Shrink,
-    Recorder
-}
-
 /// <summary>
-/// Sekmelerin ortak odağı: hangi video "geçerli video". Yol, çözümlenmiş
-/// <see cref="MediaInfo"/>, süre ve kaynak fps tek yerde durur;
-/// böylece oynatıcıda açılan dosya küçültmeye geçerken ikinci kez ffprobe'lanmaz.
+/// Sekmelerin ortak odağı: hangi video "geçerli video". Yol ve çözümlenmiş
+/// <see cref="MediaInfo"/> tek yerde durur; böylece oynatıcıda açılan dosya küçültmeye
+/// geçerken ikinci kez ffprobe'lanmaz.
 /// Önbellek dosyanın uzunluğu ve son yazma anıyla damgalanır: dosya diskte değiştiyse
 /// <see cref="InfoFor"/> boş döner ve çağıran yeniden yoklar.
+///
+/// <para>Yüzey bilerek dar: "kim değiştirir" kapısı bu nesne değil, Ayarlar'daki
+/// <c>ChkFollowRecording</c> onay kutusu (<c>docs/plan-duzenleyici.md:167-173</c>). Süre ve
+/// kaynak fps de burada tutulmaz — ikisi de <see cref="Info"/>'nun izdüşümü.</para>
 /// </summary>
 public sealed class CurrentMedia
 {
@@ -28,56 +24,29 @@ public sealed class CurrentMedia
 
     public MediaInfo? Info { get; private set; }
 
-    public double DurationSeconds { get; private set; }
-
-    public double SourceFps { get; private set; }
-
-    public MediaFocusOwner Owner { get; private set; } = MediaFocusOwner.None;
-
-    public event Action<CurrentMedia>? Changed;
-
     public bool Holds(string? path) => SamePath(Path, path);
 
     /// <summary>Yol odaktaysa ve dosya damgalandığı günden beri değişmediyse bilinen çözümleme.</summary>
     public MediaInfo? InfoFor(string path)
         => Holds(path) && Info is { } info && Fresh(path) ? info : null;
 
-    /// <summary>
-    /// Odağı yola taşır; çözümleme henüz yok. Yol zaten odaktaysa yalnız sahip yazılır ve
-    /// <see cref="Changed"/> sahip <b>gerçekten değiştiyse</b> yayılır: sessiz yazma aboneyi
-    /// bayat bırakıyordu, koşulsuz yayım da her çağrıda gereksiz bir tur açardı.
-    /// </summary>
-    public void Focus(string path, MediaFocusOwner owner)
+    /// <summary>Odağı yola taşır; çözümleme henüz yok.</summary>
+    public void Focus(string path)
     {
-        if (Holds(path))
-        {
-            if (Owner == owner) return;
-
-            Owner = owner;
-            Changed?.Invoke(this);
-            return;
-        }
+        if (Holds(path)) return;
 
         Path = path;
         Info = null;
-        DurationSeconds = 0;
-        SourceFps = 0;
-        Owner = owner;
         _stampLength = -1;
         _stampTicks = -1;
-        Changed?.Invoke(this);
     }
 
     /// <summary>Odağı çözümlemeyle birlikte yazar ve dosyayı damgalar.</summary>
-    public void Publish(string path, MediaInfo info, MediaFocusOwner owner)
+    public void Publish(string path, MediaInfo info)
     {
         Path = path;
         Info = info;
-        DurationSeconds = info.DurationSeconds;
-        SourceFps = info.Fps;
-        Owner = owner;
         Stamp(path);
-        Changed?.Invoke(this);
     }
 
     public static bool SamePath(string? left, string? right)
