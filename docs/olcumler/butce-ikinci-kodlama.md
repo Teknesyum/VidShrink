@@ -331,6 +331,4 @@ gh run list --branch t0/butce-ikinci-kodlama
 35282699847 handbrake-kiyas 9642686d completed success
 ```
 
-`00dd1ba8` kirmizisi olcumun degil pimin kusuruydu: `OzetSabiti` capasi `$`,
-CI'da dosya CRLF geldiginde ``'a takilip "DOLDUR_ESIK bulunamadi" dedi. Capa
-`\s*$` oldu, betik depoda CRLF'e cevrildi, `8918b542` yesil (3253 test).
+`00dd1ba8` kirmizisi olcumun degil pimin kusuruydu: `OzetSabiti` capasi `$` idi, CI'da dosya CRLF geldiginde satir sonundaki tasiyici donuse takilip "DOLDUR_ESIK bulunamadi" dedi. Capa `\s*$` oldu, betik depoda CRLF'e cevrildi; `8918b542` yesil: 3253 test, 0 basarisiz, 26 atlandi.
