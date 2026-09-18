@@ -22,3 +22,9 @@ Uygulama tarifi:
 
 Plan `docs/plan.md`. 3. adım (42 dil dosyasındaki metin eki) renk boşluğundan ayrı bir iş
 olarak deftere yazıldı; 1, 2 ve 4. adımlar bu turda uygulanıyor.
+
+## Düzeltme: 3. adım yanlıştı
+
+3. adımın önerdiği metin "dosya duruyor, oynatılabilir" diyordu. Ölçüm bunu yalnız
+Matroska için doğruluyor; mp4/mov'da öldürülen dosya `moov` atomu yazılmadan kalıyor ve
+açılmıyor. Metin kararı `019-yarim-kayit-metni.md` ile yenilendi: kaba göre iki ayrı metin.

@@ -162,8 +162,9 @@ internal partial class RecorderView
 
     /// <summary>
     /// Kaydı bitirir ve teslim edilen dosyayı gösterir. Yarım dosya da gösteriliyor:
-    /// <see cref="RecordResult.Partial"/> doğruyken yol yine görünür, yanına da oynatılabilir
-    /// sayılmadığı yazılır.
+    /// <see cref="RecordResult.Partial"/> doğruyken yol yine görünür, yanına da dosyanın
+    /// açılıp açılamayacağı yazılır — ayrım kaba bağlı, Matroska öldürülmeye dayanıyor,
+    /// mp4/mov dayanmıyor (<c>docs/netlestirme/019-yarim-kayit-metni.md</c>).
     /// </summary>
     internal async Task StopAsync()
     {

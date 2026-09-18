@@ -17,11 +17,11 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class KaydediciUyariTests
 {
-    private static RecordSahne Sahne(bool yarim) => AppHost.Run(() =>
+    private static RecordSahne Sahne(bool yarim, string uzanti = ".mkv") => AppHost.Run(() =>
     {
         using var ayar = new KaydediciAyarTests.OzelAyar();
         var klasor = Path.GetTempPath();
-        var mkv = Path.Combine(klasor, "uyari-olcu.mkv");
+        var mkv = Path.Combine(klasor, "uyari-olcu" + uzanti);
 
         var gorunum = new RecorderView(ayar.Yol);
         gorunum.ShowResult(new VidShrink.Ffmpeg.RecordResult(
@@ -43,7 +43,10 @@ public sealed class KaydediciUyariTests
             (metin.Theme as ControlTheme)?.ToString() ?? string.Empty,
             Firca(gorunum, "StatusError"),
             Firca(gorunum, "StatusWarning"),
-            metin.Theme);
+            metin.Theme,
+            metin.Text ?? string.Empty,
+            gorunum.FindControl<Button>("BtnToPlayer")!.IsEnabled,
+            gorunum.FindControl<Button>("BtnToShrink")!.IsEnabled);
     });
 
     private static IBrush? Firca(Control kok, string anahtar)
@@ -65,7 +68,10 @@ public sealed class KaydediciUyariTests
         string TemaAdi,
         IBrush? HataFircasi,
         IBrush? UyariFircasi,
-        ControlTheme? Tema);
+        ControlTheme? Tema,
+        string Metin,
+        bool OynaticiEtkin,
+        bool KucultEtkin);
 
     [Fact]
     public void YarimKayitUyariGibiCizilir()
@@ -87,6 +93,46 @@ public sealed class KaydediciUyariTests
         Assert.False(sahne.SimgeGorunur);
         Assert.Same(TemaFircasi(sahne.Tema!), sahne.HataFircasi);
     }
+
+    /// <summary>
+    /// Oldurulen Matroska okunur paket birakiyor: metin dosyanin durdugunu ve oynatilabildigini
+    /// soyler, teslim dugmeleri acik kalir. Karar
+    /// <c>docs/netlestirme/019-yarim-kayit-metni.md</c>, olgu <c>KayitBolmeTests</c>.
+    /// </summary>
+    [Fact]
+    public void YarimMatroskaOynatilabilirDiyor()
+    {
+        var sahne = Sahne(yarim: true, ".mkv");
+
+        Assert.Equal(Metin("recorder.output.partial"), sahne.Metin);
+        Assert.True(sahne.OynaticiEtkin);
+        Assert.True(sahne.KucultEtkin);
+    }
+
+    /// <summary>
+    /// Oldurulen mp4'te <c>moov</c> atomu yazilmamis olur; dosya acilmaz. Metin bunu soyler ve
+    /// tiklandiginda kesin hata verecek iki dugme pasif kalir — kullanici bos yere tiklamasin.
+    /// </summary>
+    [Fact]
+    public void YarimMp4OynatilamazDiyor()
+    {
+        var sahne = Sahne(yarim: true, ".mp4");
+
+        Assert.Equal(Metin("recorder.output.partial-broken"), sahne.Metin);
+        Assert.False(sahne.OynaticiEtkin);
+        Assert.False(sahne.KucultEtkin);
+    }
+
+    /// <summary>
+    /// Iki metnin gercekten ayri olmasi yukaridaki iki olcunun on sarti: ayni metne
+    /// baglansalardi ikisi de gecerdi ve ayrim kagit uzerinde kalirdi.
+    /// </summary>
+    [Fact]
+    public void IkiYarimMetniAyri()
+        => Assert.NotEqual(Metin("recorder.output.partial"), Metin("recorder.output.partial-broken"));
+
+    private static string Metin(string anahtar)
+        => VidShrink.App.LanguageCatalog.Display(VidShrink.App.Localization.Strings.Get(anahtar));
 
     /// <summary>
     /// Iki fircanin gercekten ayri olmasi olcunun on sarti: ayni fircaya baglansalardi

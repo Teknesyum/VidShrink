@@ -168,9 +168,13 @@ internal partial class RecorderView : UserControl
             result.OutputMb.ToString("0.0", Strings.Culture),
             result.Segments.ToString(CultureInfo.InvariantCulture));
 
+        var acilir = OldurulmeyeDayanir(result.OutputPath);
+        BtnToPlayer.IsEnabled = !result.Partial || acilir;
+        BtnToShrink.IsEnabled = !result.Partial || acilir;
+
         if (result.Partial)
         {
-            TxtWarning.Text = Say("recorder.output.partial");
+            TxtWarning.Text = Say(acilir ? "recorder.output.partial" : "recorder.output.partial-broken");
             DurumuGoster(uyari: true);
         }
         else if (!result.Ok)
@@ -179,6 +183,18 @@ internal partial class RecorderView : UserControl
             DurumuGoster(uyari: false);
         }
     }
+
+    /// <summary>
+    /// Oldurulen kaydin dosyasi her kapta diskte durur, ama <b>acilabilir</b> olmasi kaba
+    /// bagli: Matroska <c>-flush_packets 1</c> ile okunur paket birakiyor, mp4/mov ise
+    /// <c>moov</c> atomunu kapanista yazdigi icin acilmaz dosya birakiyor. Ayrimi motor
+    /// <see cref="VidShrink.Core.RecorderArguments.SurvivesKill"/> ile tutuyor; arayuz o
+    /// karari tekrar etmiyor, ayni yerden okuyor.
+    /// Karar <c>docs/netlestirme/019-yarim-kayit-metni.md</c>.
+    /// </summary>
+    private static bool OldurulmeyeDayanir(string yol)
+        => VidShrink.Core.RecorderArguments.ContainerOf(yol) is { } kap
+           && VidShrink.Core.RecorderArguments.SurvivesKill(kap);
 
     /// <summary>
     /// Yarim kayit uyaridir, basarisiz kayit hatadir. Ayrimi renk tek basina tasimaz:
