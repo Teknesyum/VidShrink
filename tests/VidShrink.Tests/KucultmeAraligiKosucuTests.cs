@@ -87,6 +87,65 @@ public sealed class KucultmeAraligiKosucuTests
     }
 
     /// <summary>
+    /// Ayni hesap kullanicinin "yeniden dene" dedigi kolda da kesit suresinden gitmeli.
+    /// Yukaridaki olcu <c>askBeforeRetry</c> verilmeyen kolu yuruyor; bu kol istemi acip
+    /// <see cref="OvershootChoice.Retry"/> donuyor, boylece ayri bir <c>Correct</c> cagrisi
+    /// kosuyor. Eskiden o cagri kaynak suresini okuyordu ve hicbir olcu gormuyordu.
+    /// </summary>
+    [FfmpegFact]
+    public async Task YenidenDeneKolununDuzeltmesiDeKesitSuresinden()
+    {
+        await KlipleAsync(async (info, klasor) =>
+        {
+            var plan = Plan(Kesit);
+            var dogal = await DogalMbAsync(info, plan, klasor, "yeniden-yoklama.mp4");
+
+            var sonuc = await new EncodeRunner().RunAsync(
+                info, Plan(Kesit), Path.Combine(klasor, "yeniden.mp4"), dogal / 1.4,
+                progress: null, ct: CancellationToken.None, fillPolicy: FillPolicy.QualityCeiling,
+                profile: null,
+                askBeforeRetry: (_, _) => Task.FromResult(OvershootChoice.Retry));
+
+            var not = (sonuc.PlanUsed.ReasonCodes ?? new List<ReasonNote>())
+                .FirstOrDefault(n => n.Code == ReasonCode.RetryScaled);
+            Assert.NotNull(not);
+
+            var kesitPayi = SesPayiMb(plan, Kesit.DurationSeconds);
+            var kaynakPayi = SesPayiMb(plan, KaynakSaniye);
+            _cikti.WriteLine($"yeniden dene\tnot {not!.AudioMb:0.#####}\tkesit {kesitPayi:0.#####}\tkaynak {kaynakPayi:0.#####}");
+
+            Assert.Equal(kesitPayi, not.AudioMb, 5);
+            Assert.NotEqual(kaynakPayi, not.AudioMb, 5);
+        });
+    }
+
+    /// <summary>
+    /// Ilerleme paydasi da kesit suresi. Kesitli kodlamada ffmpeg'in saati sifirdan kesit
+    /// suresine kadar sayar; payda kaynak suresi olursa cubuk kesitin oranina takilip kalir
+    /// (burada yarisinda). Olcu bitmis kosumun en yuksek oranini okuyor, kesitsiz kol negatif
+    /// kontrol degil kiyas: ikisi de sona ulasmali.
+    /// </summary>
+    [FfmpegFact]
+    public async Task KesitliKosumdaIlerlemeSonaUlasir()
+    {
+        await KlipleAsync(async (info, klasor) =>
+        {
+            var enYuksek = 0.0;
+            var izci = new Progress<EncodeProgress>(p => enYuksek = Math.Max(enYuksek, p.Fraction));
+
+            var sonuc = await new EncodeRunner().RunAsync(
+                info, Plan(Kesit), Path.Combine(klasor, "ilerleme.mp4"), targetMb: 1000,
+                progress: izci, ct: CancellationToken.None, fillPolicy: FillPolicy.QualityCeiling);
+
+            await Task.Delay(200);
+            _cikti.WriteLine($"kesit {Kesit.DurationSeconds} sn / kaynak {KaynakSaniye} sn\ten yuksek oran {enYuksek:0.###}");
+
+            Assert.True(sonuc.Success);
+            Assert.True(enYuksek > 0.9, $"ilerleme {enYuksek:0.###} oraninda kaldi");
+        });
+    }
+
+    /// <summary>
     /// <c>Correct</c>'in ayirdigi ses payi. Bicim sabitleri testte tekrarlanmaz: video
     /// hizi sifirlanmis bir planin <see cref="PlanCalculator.EstimatedMb"/> degeri tam
     /// olarak ayni hesaptir.

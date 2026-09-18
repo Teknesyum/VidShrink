@@ -126,6 +126,8 @@ public sealed class EncodeRunner
         var trace = new List<EncodeAttempt>();
         var attemptSeconds = 0.0;
         void Iz(EncodeAttempt entry) => trace.Add(entry with { Seconds = Math.Round(attemptSeconds, 3) });
+
+        double Sure(EncodePlan p) => p.EffectiveDurationSeconds(info.DurationSeconds);
         var usedUnderBandRetry = false;
         var usedMeasuredUnderBandRetry = false;
         var passLogPrefix = Path.Combine(Path.GetTempPath(), "vidshrink_" + Guid.NewGuid().ToString("N"));
@@ -180,7 +182,7 @@ public sealed class EncodeRunner
                 || delivered.Saturated || delivered.Trim is not null || usedDeadYieldStep || delivered.PlanUsed.StopsShortOfBandOnPurpose)
                 return delivered;
             if (!BudgetFill.Wants(delivered.OutputMb, effectiveTargetMb, attempt, attemptLimit, usedBudgetFill)) return delivered;
-            var step = BudgetFill.Plan(delivered.PlanUsed, delivered.OutputMb, samples, effectiveTargetMb, info.DurationSeconds);
+            var step = BudgetFill.Plan(delivered.PlanUsed, delivered.OutputMb, samples, effectiveTargetMb, Sure(delivered.PlanUsed));
             if (step is null) return delivered;
 
             usedBudgetFill = true;
@@ -219,7 +221,7 @@ public sealed class EncodeRunner
             fillClock.Stop();
             attemptSeconds = fillClock.Elapsed.TotalSeconds;
             var upMb = new FileInfo(upPath).Length / 1024.0 / 1024.0;
-            var upEfficiency = PlanCalculator.MeasuredEncoderEfficiency(step, upMb, info.DurationSeconds);
+            var upEfficiency = PlanCalculator.MeasuredEncoderEfficiency(step, upMb, Sure(step));
             if (!BudgetFill.Keeps(delivered.OutputMb, upMb, effectiveTargetMb))
             {
                 TryDelete(upPath);
@@ -266,7 +268,7 @@ public sealed class EncodeRunner
                 attemptClock.Stop();
                 attemptSeconds = attemptClock.Elapsed.TotalSeconds;
                 var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
-                var efficiency = PlanCalculator.MeasuredEncoderEfficiency(current, actualMb, info.DurationSeconds);
+                var efficiency = PlanCalculator.MeasuredEncoderEfficiency(current, actualMb, Sure(current));
                 var aimMb = PlanCalculator.RetryAimMb(effectiveTargetMb, efficiency);
                 var over = actualMb > effectiveTargetMb * ToleranceOver;
                 var belowBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < band.LowerMb;
@@ -283,7 +285,7 @@ public sealed class EncodeRunner
                     floorRun.Add(sample);
                     lastSampleAttempt = attempt;
                 }
-                var deadYield = underBand && Saturation.YieldIsDead(PlanCalculator.RawEncoderYield(current, actualMb, info.DurationSeconds));
+                var deadYield = underBand && Saturation.YieldIsDead(PlanCalculator.RawEncoderYield(current, actualMb, Sure(current)));
                 var retryUnderBand = underBand && !deadYield && !usedDeadYieldStep && attempt < attemptLimit
                     && (!usedUnderBandRetry || (informedByYield && !usedMeasuredUnderBandRetry));
 
@@ -297,7 +299,7 @@ public sealed class EncodeRunner
                 if (underBand && (deadYield || usedDeadYieldStep))
                 {
                     var deadStep = !usedDeadYieldStep && attempt < attemptLimit
-                        ? Saturation.StepDeadYield(current, actualMb, effectiveTargetMb, info.DurationSeconds, samples)
+                        ? Saturation.StepDeadYield(current, actualMb, effectiveTargetMb, Sure(current), samples)
                         : null;
                     if (deadStep is not null)
                     {
@@ -328,7 +330,7 @@ public sealed class EncodeRunner
                     usedUnderBandRetry = true;
                     usedMeasuredUnderBandRetry |= informedByYield;
                     KeepFallback(partialPath, actualMb, current, dropped);
-                    current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds, fillUnderBand: true);
+                    current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, Sure(current), fillUnderBand: true);
                     continue;
                 }
 
@@ -347,7 +349,7 @@ public sealed class EncodeRunner
 
                     var hasFallback = fallbackPlan is not null && File.Exists(fallbackPath);
                     var guardStep = floorStep is null && !usedDeadYieldStep && !hasFallback && attempt + 1 == attemptLimit
-                        ? CeilingGuard.Plan(current, samples, effectiveTargetMb, info.DurationSeconds)
+                        ? CeilingGuard.Plan(current, samples, effectiveTargetMb, Sure(current))
                         : null;
 
                     EncodeResult EndRun(bool deliverSmallestOver)
@@ -381,7 +383,7 @@ public sealed class EncodeRunner
                         KeepSmallestOver(partialPath, actualMb, current, dropped);
                         if (floorStep is not null) Iz(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
                         if (guardStep is not null) Iz(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
-                        current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, current.EffectiveDurationSeconds(info.DurationSeconds));
+                        current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, Sure(current));
                         continue;
                     }
 
@@ -441,7 +443,7 @@ public sealed class EncodeRunner
 
                     if (floorStep is not null) Iz(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
                     if (guardStep is not null) Iz(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
-                    current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
+                    current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, Sure(current));
                     continue;
                 }
 
@@ -597,7 +599,7 @@ public sealed class EncodeRunner
         SceneMap? scenes, CancellationToken ct)
     {
         var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance, scenes);
-        return await RunCommandAsync(args, info.DurationSeconds, progress, stage, spanFrom, spanTo, ct);
+        return await RunCommandAsync(args, plan.EffectiveDurationSeconds(info.DurationSeconds), progress, stage, spanFrom, spanTo, ct);
     }
 
     internal static async Task<EncodeCommandOutcome> RunCommandAsync(
