@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Plik ustawień wstępnych zawiera nieprawidłową wartość: {0}",
   "main.preset.error.reserved-id": "Wbudowane ustawienie wstępne już używa nazwy {0}.",
   "main.preset.add.name": "Zapisz bieżące ustawienia jako profil",
-  "main.preset.add.tip": "Zapisuje cel, intencję, kodek, politykę wypełniania i zablokowaną rozdzielczość pod nazwą. Zapisane profile pojawiają się przed tym przyciskiem.",
+  "main.preset.add.tip": "Zapisuje bieżące ustawienia pod nazwą. Zapisane profile pojawiają się przed tym przyciskiem.",
   "main.preset.name.label": "Nazwa",
   "main.preset.save": "Zapisz",
   "main.preset.name-empty": "Najpierw wpisz nazwę.",

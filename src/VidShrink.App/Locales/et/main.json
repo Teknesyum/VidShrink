@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Eelseadistuste failis on vigane väärtus: {0}",
   "main.preset.error.reserved-id": "Sisseehitatud eelseadistus kasutab juba nime {0}.",
   "main.preset.add.name": "Salvesta praegused sätted eelseadistusena",
-  "main.preset.add.tip": "Salvestab sihtmärgi, eesmärgi, koodeki, täitmispoliitika ja lukustatud eraldusvõime nime alla. Salvestatud eelseadistused kuvatakse enne seda nuppu.",
+  "main.preset.add.tip": "Salvestab praegused sätted nime alla. Salvestatud eelseadistused kuvatakse enne seda nuppu.",
   "main.preset.name.label": "Nimi",
   "main.preset.save": "Salvesta",
   "main.preset.name-empty": "Sisesta esmalt nimi.",

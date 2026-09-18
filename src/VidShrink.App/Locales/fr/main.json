@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Le fichier de préréglages contient une valeur non valide : {0}",
   "main.preset.error.reserved-id": "Un préréglage intégré utilise déjà le nom {0}.",
   "main.preset.add.name": "Enregistrer les réglages actuels comme préréglage",
-  "main.preset.add.tip": "Enregistre la cible, l'intention, le codec, la politique de remplissage et la résolution verrouillée sous un nom. Les préréglages enregistrés apparaissent avant ce bouton.",
+  "main.preset.add.tip": "Enregistre les réglages actuels sous un nom. Les préréglages enregistrés apparaissent avant ce bouton.",
   "main.preset.name.label": "Nom",
   "main.preset.save": "Enregistrer",
   "main.preset.name-empty": "Saisissez d'abord un nom.",

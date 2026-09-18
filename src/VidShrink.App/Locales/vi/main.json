@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Tệp cài đặt sẵn chứa giá trị không hợp lệ: {0}",
   "main.preset.error.reserved-id": "Một cài đặt sẵn tích hợp đã dùng tên {0}.",
   "main.preset.add.name": "Lưu cài đặt hiện tại làm cấu hình sẵn",
-  "main.preset.add.tip": "Lưu mục tiêu, mục đích, codec, chính sách lấp đầy và độ phân giải bị khóa dưới một tên. Các cấu hình sẵn đã lưu xuất hiện trước nút này.",
+  "main.preset.add.tip": "Lưu các cài đặt hiện tại dưới một tên. Các cấu hình sẵn đã lưu xuất hiện trước nút này.",
   "main.preset.name.label": "Tên",
   "main.preset.save": "Lưu",
   "main.preset.name-empty": "Nhập tên trước.",

@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Die Voreinstellungsdatei enthält einen ungültigen Wert: {0}",
   "main.preset.error.reserved-id": "Eine integrierte Voreinstellung verwendet bereits den Namen {0}.",
   "main.preset.add.name": "Aktuelle Einstellungen als Vorgabe speichern",
-  "main.preset.add.tip": "Speichert Ziel, Absicht, Codec, Füllrichtlinie und gesperrte Auflösung unter einem Namen. Gespeicherte Vorgaben erscheinen vor dieser Schaltfläche.",
+  "main.preset.add.tip": "Speichert die aktuellen Einstellungen unter einem Namen. Gespeicherte Vorgaben erscheinen vor dieser Schaltfläche.",
   "main.preset.name.label": "Name",
   "main.preset.save": "Speichern",
   "main.preset.name-empty": "Zuerst einen Namen eingeben.",

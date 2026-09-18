@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Forudindstillingsfilen indeholder en ugyldig værdi: {0}",
   "main.preset.error.reserved-id": "En indbygget forudindstilling bruger allerede navnet {0}.",
   "main.preset.add.name": "Gem de aktuelle indstillinger som en forudindstilling",
-  "main.preset.add.tip": "Gemmer mål, hensigt, codec, udfyldningspolitik og låst opløsning under et navn. Gemte forudindstillinger vises før denne knap.",
+  "main.preset.add.tip": "Gemmer de aktuelle indstillinger under et navn. Gemte forudindstillinger vises før denne knap.",
   "main.preset.name.label": "Navn",
   "main.preset.save": "Gem",
   "main.preset.name-empty": "Skriv et navn først.",

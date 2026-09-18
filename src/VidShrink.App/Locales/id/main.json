@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Berkas preset berisi nilai yang tidak valid: {0}",
   "main.preset.error.reserved-id": "Preset bawaan sudah memakai nama {0}.",
   "main.preset.add.name": "Simpan pengaturan saat ini sebagai preset",
-  "main.preset.add.tip": "Menyimpan target, tujuan, codec, kebijakan pengisian, dan resolusi terkunci dengan sebuah nama. Preset yang disimpan muncul sebelum tombol ini.",
+  "main.preset.add.tip": "Menyimpan pengaturan saat ini dengan sebuah nama. Preset yang disimpan muncul sebelum tombol ini.",
   "main.preset.name.label": "Nama",
   "main.preset.save": "Simpan",
   "main.preset.name-empty": "Ketik nama terlebih dahulu.",

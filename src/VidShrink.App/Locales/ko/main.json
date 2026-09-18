@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "프리셋 파일에 잘못된 값이 있습니다: {0}",
   "main.preset.error.reserved-id": "기본 제공 프리셋이 이미 {0} 이름을 사용합니다.",
   "main.preset.add.name": "현재 설정을 프리셋으로 저장",
-  "main.preset.add.tip": "대상, 목적, 코덱, 채우기 정책, 잠긴 해상도를 이름으로 저장합니다. 저장된 프리셋은 이 버튼 앞에 표시됩니다.",
+  "main.preset.add.tip": "현재 설정을 이름으로 저장합니다. 저장된 프리셋은 이 버튼 앞에 표시됩니다.",
   "main.preset.name.label": "이름",
   "main.preset.save": "저장",
   "main.preset.name-empty": "먼저 이름을 입력하세요.",

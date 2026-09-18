@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Het voorinstellingenbestand bevat een ongeldige waarde: {0}",
   "main.preset.error.reserved-id": "Een ingebouwde voorinstelling gebruikt de naam {0} al.",
   "main.preset.add.name": "Huidige instellingen opslaan als voorinstelling",
-  "main.preset.add.tip": "Slaat het doel, de intentie, de codec, het opvulbeleid en de vergrendelde resolutie op onder een naam. Opgeslagen voorinstellingen verschijnen vóór deze knop.",
+  "main.preset.add.tip": "Slaat de huidige instellingen op onder een naam. Opgeslagen voorinstellingen verschijnen vóór deze knop.",
   "main.preset.name.label": "Naam",
   "main.preset.save": "Opslaan",
   "main.preset.name-empty": "Typ eerst een naam.",

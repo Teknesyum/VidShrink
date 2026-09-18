@@ -55,14 +55,18 @@ public sealed class QualityHintTests
         Assert.True(start >= 0 && end > start, "Hedef yongalarının WrapPanel'i bulunamadı.");
 
         var block = xaml[start..end];
-        var chips = Regex.Matches(block, "x:Name=\"(Chip\\w+)\"").Select(match => match.Groups[1].Value).Distinct().ToList();
+        var chips = Regex.Matches(block, "x:Name=\"(Chip\\w+)\"[^>]*?Theme=\"\\{StaticResource ChipButton\\}\"")
+            .Select(match => match.Groups[1].Value)
+            .Where(name => !YongaKapsami.Eylem(block, name))
+            .Distinct()
+            .ToList();
 
         Assert.Equal(
             new[] { "ChipArchive", "ChipWhatsApp", "Chip8", "Chip25", "Chip100", "Chip128", "Chip180", "ChipHalf" }.Order(),
             chips.Order());
 
         // Her yonganın balonu bir StackPanel: ilk çocuk ipucu, kalanını panel dolduruyor.
-        Assert.Equal(chips.Count, Regex.Matches(block, "<ToolTip.Tip>\\s*<StackPanel").Count);
+        Assert.DoesNotContain(chips, name => !YongaKapsami.Balonlu(block, name));
 
         var code = File.ReadAllText(TipSources.WindowCodePath);
         var listed = Regex.Match(code, """\(ChipWhatsApp, 16\), \(Chip8, 8\), \(Chip25, 25\), \(Chip100, 100\),\s*\(Chip128, 128\), \(Chip180, 180\), \(ChipHalf, null\)""");

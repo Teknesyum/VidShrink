@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Faili la mipangilio awali lina thamani batili: {0}",
   "main.preset.error.reserved-id": "Mpangilio awali uliojengewa ndani tayari unatumia jina {0}.",
   "main.preset.add.name": "Hifadhi mipangilio ya sasa kama mpangilio-tangulizi",
-  "main.preset.add.tip": "Huhifadhi lengo, kusudi, kodeki, sera ya ujazaji na azimio lililofungwa chini ya jina. Mipangilio-tangulizi iliyohifadhiwa huonekana kabla ya kitufe hiki.",
+  "main.preset.add.tip": "Huhifadhi mipangilio ya sasa chini ya jina. Mipangilio-tangulizi iliyohifadhiwa huonekana kabla ya kitufe hiki.",
   "main.preset.name.label": "Jina",
   "main.preset.save": "Hifadhi",
   "main.preset.name-empty": "Andika jina kwanza.",

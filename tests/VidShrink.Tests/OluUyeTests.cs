@@ -556,10 +556,10 @@ public sealed class OluUyeTests
             "PresetLibrary.Import ve SaveUser disaridan gelen profili bu uyeye ceviriyor (uretim), turune gore ayiran kol yok. Kullanici on ayarlarini yerlesiklerden ayiran liste arayuzle gelir."),
         new("PresetSourceStatus.Code", "varsayilan-kol", Legitimate,
             "Iki degerli kaynak durumunun olumsuz kolu. PresetLibrary.Validate 'Status == PresetSourceStatus.Official' diye sorup resmi kaynaga adres sartini koyuyor; Code o kosulun else'i, adresi olmayabilir."),
-        new("MacUpdate.DownloadTimeout", "hic-gorunmeyen", Debt,
-            "public static readonly, hicbir yerde okunmuyor. Ayni dosya, ayni sinir."),
-        new("UpdateCheck.ManifestTimeout", "yalniz-disarida", Debt,
-            "Uretimde sifir, testlerde bir gorunum. Ayni dosya, ayni sinir."),
+        new("MacUpdate.DownloadTimeout", "hic-gorunmeyen", Legitimate,
+            "Eski gerekce 'hicbir yerde okunmuyor' diyordu, olcum aksini gosterdi: UpdateCheck.cs:1645 kendi sinifinin icinden 'Timeout = DownloadTimeout' diye okuyor, tarama ise Tur.Uye gorunumu ariyor. Ayni kor nokta DeveloperUnlock.Window satirinda da itiraf edilmis."),
+        new("UpdateCheck.ManifestTimeout", "yalniz-disarida", Legitimate,
+            "Ayni kor noktanin ikincisi: UpdateCheck.cs:205 bildirimden dort satir sonra 'Timeout = ManifestTimeout' diye okuyor. Uretimde sifir gorunum iddiasi nitelenmemis okumayi saymamaktan geliyordu."),
         new("EncoderPathOverride.Software", "varsayilan-kol", Legitimate,
             "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli.")
     };

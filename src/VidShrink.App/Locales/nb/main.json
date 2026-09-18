@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Forhåndsinnstillingsfilen inneholder en ugyldig verdi: {0}",
   "main.preset.error.reserved-id": "En innebygd forhåndsinnstilling bruker allerede navnet {0}.",
   "main.preset.add.name": "Lagre gjeldende innstillinger som en forhåndsinnstilling",
-  "main.preset.add.tip": "Lagrer mål, hensikt, kodek, fyllpolicy og låst oppløsning under et navn. Lagrede forhåndsinnstillinger vises før denne knappen.",
+  "main.preset.add.tip": "Lagrer de gjeldende innstillingene under et navn. Lagrede forhåndsinnstillinger vises før denne knappen.",
   "main.preset.name.label": "Navn",
   "main.preset.save": "Lagre",
   "main.preset.name-empty": "Skriv inn et navn først.",

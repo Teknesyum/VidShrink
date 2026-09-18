@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Priekšiestatījumu fails satur nederīgu vērtību: {0}",
   "main.preset.error.reserved-id": "Iebūvēts priekšiestatījums jau izmanto nosaukumu {0}.",
   "main.preset.add.name": "Saglabāt pašreizējos iestatījumus kā iepriekšuzstādījumu",
-  "main.preset.add.tip": "Saglabā mērķi, nolūku, kodeku, aizpildes politiku un bloķēto izšķirtspēju ar nosaukumu. Saglabātie iepriekšuzstādījumi tiek rādīti pirms šīs pogas.",
+  "main.preset.add.tip": "Saglabā pašreizējos iestatījumus ar nosaukumu. Saglabātie iepriekšuzstādījumi tiek rādīti pirms šīs pogas.",
   "main.preset.name.label": "Nosaukums",
   "main.preset.save": "Saglabāt",
   "main.preset.name-empty": "Vispirms ievadiet nosaukumu.",

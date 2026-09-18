@@ -368,7 +368,7 @@
                               VerticalAlignment="Stretch"
                               Margin="{StaticResource WrapItemMargin}"
                               Background="{StaticResource NeonBlueBorder}"/>
-                      <Button x:Name="ChipAddPreset" Content="+" Theme="{StaticResource ChipButton}"
+                      <Button x:Name="ChipAddPreset" Content="+" Theme="{StaticResource ChipButton}" Classes="eylem"
                               Margin="{StaticResource WrapItemMargin}"
                               AutomationProperties.Name="{loc:Text main.preset.add.name}">
                         <ToolTip.Tip>

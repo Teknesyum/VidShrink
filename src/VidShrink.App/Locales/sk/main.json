@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Súbor predvolieb obsahuje neplatnú hodnotu: {0}",
   "main.preset.error.reserved-id": "Vstavaná predvoľba už používa názov {0}.",
   "main.preset.add.name": "Uložiť aktuálne nastavenia ako predvoľbu",
-  "main.preset.add.tip": "Uloží cieľ, zámer, kodek, zásadu vypĺňania a uzamknuté rozlíšenie pod názvom. Uložené predvoľby sa zobrazujú pred týmto tlačidlom.",
+  "main.preset.add.tip": "Uloží aktuálne nastavenia pod názvom. Uložené predvoľby sa zobrazujú pred týmto tlačidlom.",
   "main.preset.name.label": "Názov",
   "main.preset.save": "Uložiť",
   "main.preset.name-empty": "Najprv zadajte názov.",

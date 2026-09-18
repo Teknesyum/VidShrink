@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Il file dei preset contiene un valore non valido: {0}",
   "main.preset.error.reserved-id": "Un preset integrato usa già il nome {0}.",
   "main.preset.add.name": "Salva le impostazioni correnti come preset",
-  "main.preset.add.tip": "Salva la destinazione, l'intento, il codec, la politica di riempimento e la risoluzione bloccata con un nome. I preset salvati appaiono prima di questo pulsante.",
+  "main.preset.add.tip": "Salva le impostazioni correnti con un nome. I preset salvati appaiono prima di questo pulsante.",
   "main.preset.name.label": "Nome",
   "main.preset.save": "Salva",
   "main.preset.name-empty": "Digita prima un nome.",

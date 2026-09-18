@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Az előbeállítás-fájl érvénytelen értéket tartalmaz: {0}",
   "main.preset.error.reserved-id": "Egy beépített előbeállítás már használja a(z) {0} nevet.",
   "main.preset.add.name": "Jelenlegi beállítások mentése előbeállításként",
-  "main.preset.add.tip": "Elmenti a célt, a szándékot, a kodeket, a kitöltési szabályt és a zárolt felbontást egy néven. A mentett előbeállítások e gomb előtt jelennek meg.",
+  "main.preset.add.tip": "Elmenti a jelenlegi beállításokat egy néven. A mentett előbeállítások e gomb előtt jelennek meg.",
   "main.preset.name.label": "Név",
   "main.preset.save": "Mentés",
   "main.preset.name-empty": "Először adjon meg egy nevet.",

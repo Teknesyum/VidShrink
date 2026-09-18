@@ -10,13 +10,14 @@ dotnet test VidShrink.sln -c Release --filter TipOverflowTests
 16 px). Tavan `Themes/Theme.axaml` belirteçlerinden
 hesaplanır: `TooltipMaxWidth` eksi iki yanın dolgusu ve kenarlığı = **746 px**.
 
-Ölçülen satır: **172** · tavanı aşan: **20** ·
+Ölçülen satır: **180** · tavanı aşan: **20** ·
 tek kelimeyle aşan: **0**
 
 | Dil | İpucu | Satır | Genişlik | Taşma | Görsel satır | Alt satır | Tek kelime |
 | --- | --- | ---: | ---: | ---: | ---: | --- | :-: |
 | EN | main.chip.whatsapp.tip · WhatsApp re-encodes in-chat video with its o… | 1 | 960 | 214 | 2 | VidShrink's quality, not WhatsApp's. |  |
 | TR | main.chip.whatsapp.tip · WhatsApp re-encodes in-chat video with its o… | 1 | 957 | 211 | 2 | değil VidShrink'in kalitesi olur. |  |
+| TR | main.codec.tip · H.264 plays on nearly every device and is wh… | 0 | 919 | 173 | 2 | çalışması gerekiyorsa bunu seçin. |  |
 | EN | main.fast-gpu.tip · Graphics cards encode many times faster than… | 1 | 1158 | 412 | 2 | software encoder's quality at about seven times the speed. |  |
 | TR | main.fast-gpu.tip · Graphics cards encode many times faster than… | 1 | 1116 | 370 | 2 | kodlayıcısıyla neredeyse aynı kaliteyi yaklaşık yedi kat hızlı verir. |  |
 | EN | main.output.estimated-time.tip · VidShrink times the sample encodes it alread… | 0 | 1116 | 370 | 2 | from this machine and this file, not from a preset table. |  |
@@ -33,5 +34,4 @@ tek kelimeyle aşan: **0**
 | TR | main.convert.video-codec.tip · H.264 plays on nearly every device and is wh… | 0 | 919 | 173 | 2 | çalışması gerekiyorsa bunu seçin. |  |
 | TR | main.convert.crf-label.tip · In CRF mode, a lower number means higher qua… | 1 | 803 | 57 | 2 | dosya verir. |  |
 | EN | settings.share.tip · The share target is the service a finished f… | 2 | 912 | 166 | 2 | can close the link early. |  |
-| EN | settings.update.auto-effect · When this is off, VidShrink does not update… | 0 | 915 | 169 | 2 | command that installs it. |  |
 | EN | settings.update.no-self-effect · VidShrink does not update itself on this sys… | 0 | 905 | 159 | 2 | command that installs it. |  |

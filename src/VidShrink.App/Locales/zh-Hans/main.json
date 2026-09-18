@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "预设文件包含无效值：{0}",
   "main.preset.error.reserved-id": "内置预设已使用名称 {0}。",
   "main.preset.add.name": "将当前设置保存为预设",
-  "main.preset.add.tip": "以名称保存目标、意图、编解码器、填充策略和锁定的分辨率。已保存的预设显示在此按钮之前。",
+  "main.preset.add.tip": "将当前设置以名称保存。已保存的预设显示在此按钮之前。",
   "main.preset.name.label": "名称",
   "main.preset.save": "保存",
   "main.preset.name-empty": "请先输入名称。",

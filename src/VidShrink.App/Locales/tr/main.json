@@ -537,7 +537,7 @@
   "main.preset.error.reserved-id": "{0} adını yerleşik bir ön ayar zaten kullanıyor.",
   "main.preset.error.no-hand-brake-preset": "Dosyada HandBrake ön ayarı bulunamadı.",
   "main.preset.add.name": "Şu anki ayarları ön ayar olarak kaydet",
-  "main.preset.add.tip": "Hedefi, niyeti, kodeği, doldurma siyasetini ve kilitli çözünürlüğü bir adla kaydeder. Kaydedilenler bu düğmenin önünde görünür.",
+  "main.preset.add.tip": "Geçerli ayarları bir adla kaydeder. Kaydedilenler bu düğmenin önünde görünür.",
   "main.preset.name.label": "Ad",
   "main.preset.save": "Kaydet",
   "main.preset.name-empty": "Önce bir ad yazın.",

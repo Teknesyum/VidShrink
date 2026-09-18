@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Datoteka predložaka sadrži nevaljanu vrijednost: {0}",
   "main.preset.error.reserved-id": "Ugrađeni predložak već koristi naziv {0}.",
   "main.preset.add.name": "Spremi trenutne postavke kao predložak",
-  "main.preset.add.tip": "Sprema cilj, namjeru, kodek, politiku popunjavanja i zaključanu razlučivost pod nazivom. Spremljeni predlošci prikazuju se prije ovog gumba.",
+  "main.preset.add.tip": "Sprema trenutne postavke pod nazivom. Spremljeni predlošci prikazuju se prije ovog gumba.",
   "main.preset.name.label": "Naziv",
   "main.preset.save": "Spremi",
   "main.preset.name-empty": "Prvo upišite naziv.",

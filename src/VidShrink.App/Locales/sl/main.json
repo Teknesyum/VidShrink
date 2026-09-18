@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Datoteka prednastavitev vsebuje neveljavno vrednost: {0}",
   "main.preset.error.reserved-id": "Vgrajena prednastavitev že uporablja ime {0}.",
   "main.preset.add.name": "Shrani trenutne nastavitve kot prednastavitev",
-  "main.preset.add.tip": "Shrani cilj, namen, kodek, politiko zapolnitve in zaklenjeno ločljivost pod imenom. Shranjene prednastavitve se prikažejo pred tem gumbom.",
+  "main.preset.add.tip": "Shrani trenutne nastavitve pod imenom. Shranjene prednastavitve se prikažejo pred tem gumbom.",
   "main.preset.name.label": "Ime",
   "main.preset.save": "Shrani",
   "main.preset.name-empty": "Najprej vnesite ime.",

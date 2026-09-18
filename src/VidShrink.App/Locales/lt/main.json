@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Išankstinių nustatymų faile yra netinkama reikšmė: {0}",
   "main.preset.error.reserved-id": "Integruotas išankstinis nustatymas jau naudoja pavadinimą {0}.",
   "main.preset.add.name": "Išsaugoti dabartinius nustatymus kaip išankstinį nustatymą",
-  "main.preset.add.tip": "Išsaugo tikslą, paskirtį, kodeką, užpildymo politiką ir užrakintą raišką pavadinimu. Išsaugoti išankstiniai nustatymai rodomi prieš šį mygtuką.",
+  "main.preset.add.tip": "Išsaugo dabartinius nustatymus pavadinimu. Išsaugoti išankstiniai nustatymai rodomi prieš šį mygtuką.",
   "main.preset.name.label": "Pavadinimas",
   "main.preset.save": "Išsaugoti",
   "main.preset.name-empty": "Pirmiausia įveskite pavadinimą.",

@@ -50,6 +50,7 @@ public sealed class YongaPlanTests
 
         var chips = Regex.Matches(markup, """x:Name="(?<name>Chip[\w]*)"[^>]*?Theme="\{StaticResource ChipButton\}""")
             .Select(match => match.Groups["name"].Value)
+            .Where(name => !YongaKapsami.Eylem(markup, name))
             .ToList();
 
         Assert.True(chips.Count > 0, "Biçimlemede ChipButton temalı düğme bulunamadı; tarayıcı ölü.");

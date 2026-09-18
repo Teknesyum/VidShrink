@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "El archivo de ajustes preestablecidos contiene un valor no válido: {0}",
   "main.preset.error.reserved-id": "Un ajuste preestablecido integrado ya usa el nombre {0}.",
   "main.preset.add.name": "Guardar los ajustes actuales como preajuste",
-  "main.preset.add.tip": "Guarda el destino, la intención, el códec, la política de relleno y la resolución bloqueada con un nombre. Los preajustes guardados aparecen antes de este botón.",
+  "main.preset.add.tip": "Guarda la configuración actual con un nombre. Los preajustes guardados aparecen antes de este botón.",
   "main.preset.name.label": "Nombre",
   "main.preset.save": "Guardar",
   "main.preset.name-empty": "Escribe un nombre primero.",

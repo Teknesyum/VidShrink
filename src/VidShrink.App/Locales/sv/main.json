@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Förinställningsfilen innehåller ett ogiltigt värde: {0}",
   "main.preset.error.reserved-id": "En inbyggd förinställning använder redan namnet {0}.",
   "main.preset.add.name": "Spara aktuella inställningar som förinställning",
-  "main.preset.add.tip": "Sparar mål, avsikt, codec, fyllnadspolicy och låst upplösning under ett namn. Sparade förinställningar visas före denna knapp.",
+  "main.preset.add.tip": "Sparar de aktuella inställningarna under ett namn. Sparade förinställningar visas före denna knapp.",
   "main.preset.name.label": "Namn",
   "main.preset.save": "Spara",
   "main.preset.name-empty": "Skriv ett namn först.",

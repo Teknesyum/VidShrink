@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Fișierul de presetări conține o valoare nevalidă: {0}",
   "main.preset.error.reserved-id": "O presetare integrată folosește deja numele {0}.",
   "main.preset.add.name": "Salvează setările curente ca presetare",
-  "main.preset.add.tip": "Salvează ținta, intenția, codecul, politica de umplere și rezoluția blocată sub un nume. Presetările salvate apar înaintea acestui buton.",
+  "main.preset.add.tip": "Salvează setările curente sub un nume. Presetările salvate apar înaintea acestui buton.",
   "main.preset.name.label": "Nume",
   "main.preset.save": "Salvează",
   "main.preset.name-empty": "Introduceți mai întâi un nume.",

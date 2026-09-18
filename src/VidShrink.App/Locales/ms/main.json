@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Fail pratetap mengandungi nilai yang tidak sah: {0}",
   "main.preset.error.reserved-id": "Pratetap terbina dalam sudah menggunakan nama {0}.",
   "main.preset.add.name": "Simpan tetapan semasa sebagai praset",
-  "main.preset.add.tip": "Menyimpan sasaran, tujuan, kodek, dasar isian dan resolusi terkunci di bawah satu nama. Praset yang disimpan dipaparkan sebelum butang ini.",
+  "main.preset.add.tip": "Menyimpan tetapan semasa di bawah satu nama. Praset yang disimpan dipaparkan sebelum butang ini.",
   "main.preset.name.label": "Nama",
   "main.preset.save": "Simpan",
   "main.preset.name-empty": "Taip nama dahulu.",

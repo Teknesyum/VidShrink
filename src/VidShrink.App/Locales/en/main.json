@@ -537,7 +537,7 @@
   "main.preset.error.reserved-id": "A built-in preset already uses the name {0}.",
   "main.preset.error.no-hand-brake-preset": "No HandBrake preset was found in the file.",
   "main.preset.add.name": "Save the current settings as a preset",
-  "main.preset.add.tip": "Saves the target, intent, codec, fill policy and locked resolution under a name. Saved presets appear before this button.",
+  "main.preset.add.tip": "Saves the current settings under a name. Saved presets appear before this button.",
   "main.preset.name.label": "Name",
   "main.preset.save": "Save",
   "main.preset.name-empty": "Type a name first.",

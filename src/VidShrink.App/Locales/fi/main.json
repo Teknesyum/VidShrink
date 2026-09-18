@@ -536,7 +536,7 @@
   "main.preset.error.invalid-value": "Esiasetustiedostossa on virheellinen arvo: {0}",
   "main.preset.error.reserved-id": "Sisäänrakennettu esiasetus käyttää jo nimeä {0}.",
   "main.preset.add.name": "Tallenna nykyiset asetukset esiasetukseksi",
-  "main.preset.add.tip": "Tallentaa kohteen, tarkoituksen, koodekin, täyttökäytännön ja lukitun resoluution nimellä. Tallennetut esiasetukset näkyvät ennen tätä painiketta.",
+  "main.preset.add.tip": "Tallentaa nykyiset asetukset nimellä. Tallennetut esiasetukset näkyvät ennen tätä painiketta.",
   "main.preset.name.label": "Nimi",
   "main.preset.save": "Tallenna",
   "main.preset.name-empty": "Kirjoita ensin nimi.",
