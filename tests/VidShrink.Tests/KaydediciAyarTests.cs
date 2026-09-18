@@ -65,12 +65,12 @@ public sealed class KaydediciAyarTests
     [Fact]
     public void OturumSurerkenDegisenAyarDiskeYazilir()
     {
-        var (oturumsuz, oturumlu) = AyarDosyasiyla(() => AppHost.Run(() =>
+        var (oturumsuz, oturumlu) = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayarYolu);
             Elle(view);
             Sec(view, "CmbContainer", "MP4");
-            var once = DosyadakiDeger("containerChoice");
+            var once = DosyadakiDeger(ayarYolu, "containerChoice");
 
             var alan = typeof(RecorderView).GetField("_session",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
@@ -79,7 +79,7 @@ public sealed class KaydediciAyarTests
             try
             {
                 Sec(view, "CmbContainer", "MOV");
-                return (once, DosyadakiDeger("containerChoice"));
+                return (once, DosyadakiDeger(ayarYolu, "containerChoice"));
             }
             finally
             {
@@ -97,37 +97,95 @@ public sealed class KaydediciAyarTests
         return i >= 0 && i + 1 < args.Count ? args[i + 1] : null;
     }
 
-    private static readonly object AyarKapisi = new();
+    /// <summary>
+    /// Olcume <b>kendi</b> ayar dosyasini verir: var olmayan, kimseyle paylasilmayan bir yol
+    /// uretir, govdeye o yolu gecirir ve sonunda siler. Govde gorunumleri o yolla kurar
+    /// (<c>new RecorderView(ayarYolu)</c>), boylece hem okuma hem yazma paylasilan
+    /// <see cref="RecorderSettings.FilePath"/> dosyasina hic dokunmaz.
+    ///
+    /// <para>Onceki surum paylasilan dosyayi bosaltip geri koyuyordu ve tek bir kokten iki
+    /// yerden deliniyordu. Kok: <c>PersistChoices</c> arayuz olaylariyla <b>ertelenmis</b>
+    /// kosuyor, is tek Avalonia arayuz is parcaciginin kuyrugunda bekliyor. Birinci yuz
+    /// sizinti — bekleyen yazma kapinin <c>finally</c>'si dosyayi geri koyduktan
+    /// <b>sonra</b> bosaliyor ve paylasilan dosyada iz birakiyor. Ikinci yuz o izin bir
+    /// sonraki sinifta okunmasi (main CI 35302890518; kod degismeden ayni commit yeniden
+    /// kosuldu ve yesil dondu). Suit ici paralellik kapali, yani bu bir is parcagi yarisi
+    /// degil kuyruk sirasi sorunu. Ozel yol ikisini de bitiriyor — kilide de gerek
+    /// kalmiyor, cunku paylasilan durum yok.</para>
+    /// </summary>
+    internal static T AyarDosyasiyla<T>(Func<string, T> olc)
+    {
+        using var ayar = new OzelAyar();
+        return olc(ayar.Yol);
+    }
 
     /// <summary>
-    /// Ayar dosyasini bosaltip olcumu kosar, sonra dosyayi oldugu gibi geri koyar. Dosya
-    /// surec basina tek oldugu icin bosaltma-kosum-gerikoyma ucusu <see cref="AyarKapisi"/>
-    /// ile boluenemez yapiliyor: xUnit sinif duzeyinde paralel kostugundan, kilitsiz
-    /// surumde bir sinifin yazdigi secim baska bir sinifin "dosya bos" beklentisine
-    /// karisiyordu. Kilit ayni is parcaciginda yeniden girilebilir, ic ice kullanim guvenli.
+    /// <see cref="AyarDosyasiyla{T}"/>'nin <c>using</c> bicimi. Govdesi tek bir
+    /// <c>AppHost.Run</c> cagrisi olmayan olcumler (ornegin arka arkaya birkac kez
+    /// kosanlar) sarmalayici lambda yerine bunu kullaniyor; yalitim ayni, dosya
+    /// <c>Dispose</c>'da siliniyor.
     /// </summary>
-    internal static T AyarDosyasiyla<T>(Func<T> olc)
+    internal sealed class OzelAyar : IDisposable
     {
-        lock (AyarKapisi)
+        private static readonly object Kapi = new();
+
+        private static readonly HashSet<string> Canli = new(StringComparer.OrdinalIgnoreCase);
+
+        internal string Yol { get; }
+
+        internal OzelAyar()
         {
-            var dosya = RecorderSettings.FilePath!;
-            var onceki = File.Exists(dosya) ? File.ReadAllBytes(dosya) : null;
-            try
-            {
-                if (File.Exists(dosya)) File.Delete(dosya);
-                return olc();
-            }
-            finally
-            {
-                if (onceki is null) File.Delete(dosya);
-                else File.WriteAllBytes(dosya, onceki);
-            }
+            Yol = OzelAyarYolu();
+            lock (Kapi) Canli.Add(Yol);
+        }
+
+        /// <summary>
+        /// Kendi dosyasini siler, sonra sahibi kapanmis butun olcum dosyalarini toplar.
+        /// Sonradan toplama gerekiyor cunku <c>PersistChoices</c> ertelenmis kosuyor:
+        /// arayuz kuyrugunda bekleyen yazma bu <c>Dispose</c>'dan <b>sonra</b> bosalip
+        /// dosyayi yeniden yaratabiliyor. Olculdu — <c>KaydediciArayuzTests</c> kolu
+        /// kosulunca geride bes dosya kaliyordu, biri
+        /// <c>GelismisKollarIstegeVeAyaraGecer</c>'in 1280x720'si. Silme <see cref="Canli"/>
+        /// disindaki dosyalarla sinirli, boylece halen acik bir kapinin dosyasina
+        /// dokunulmuyor.
+        /// </summary>
+        public void Dispose()
+        {
+            lock (Kapi) Canli.Remove(Yol);
+            Sil(Yol);
+
+            string[] canli;
+            lock (Kapi) canli = Canli.ToArray();
+
+            var klasor = Path.GetDirectoryName(Yol)!;
+            foreach (var dosya in Directory.EnumerateFiles(klasor, "recorder-settings-olcu-*.json*").ToArray())
+                if (!canli.Any(c => dosya.StartsWith(c, StringComparison.OrdinalIgnoreCase)))
+                    Sil(dosya);
+        }
+
+        private static void Sil(string dosya)
+        {
+            foreach (var kalan in new[] { dosya, dosya + ".tmp" })
+                if (File.Exists(kalan))
+                    try { File.Delete(kalan); }
+                    catch (IOException) { }
         }
     }
 
-    private static string? DosyadakiDeger(string anahtar)
+    /// <summary>
+    /// Paylasilan ayar dosyasinin <b>klasorunde</b>, ona benzemeyen adla tek kullanimlik bir
+    /// yol. Klasor ayni tutuluyor ki <c>VIDSHRINK_SETTINGS_PATH</c> sozlesmesi bozulmasin ve
+    /// olcum gercek AppData'ya yazmasin; ad tekil oldugu icin iki sinif ayni dosyayi gormez.
+    /// </summary>
+    internal static string OzelAyarYolu()
     {
-        var dosya = RecorderSettings.FilePath!;
+        var klasor = Path.GetDirectoryName(Path.GetFullPath(RecorderSettings.FilePath!))!;
+        Directory.CreateDirectory(klasor);
+        return Path.Combine(klasor, "recorder-settings-olcu-" + Guid.NewGuid().ToString("n") + ".json");
+    }
+
+    internal static string? DosyadakiDeger(string dosya, string anahtar)
+    {
         if (!File.Exists(dosya)) return null;
         return JsonNode.Parse(File.ReadAllText(dosya))?[anahtar]?.ToJsonString();
     }
@@ -142,15 +200,15 @@ public sealed class KaydediciAyarTests
 
     internal sealed record Olcu(string? Dosyada, string? Sorun, IReadOnlyList<string> Args, RecorderRequest? Istek, string? Yol);
 
-    private static Olcu Olc(Satir satir) => AyarDosyasiyla(() => AppHost.Run(() =>
+    private static Olcu Olc(Satir satir) => AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
     {
-        var once = new RecorderView();
+        var once = new RecorderView(ayarYolu);
         Elle(once);
         satir.Degistir(once);
 
-        var dosyada = DosyadakiDeger(satir.Anahtar);
+        var dosyada = DosyadakiDeger(ayarYolu, satir.Anahtar);
 
-        var sonra = new RecorderView();
+        var sonra = new RecorderView(ayarYolu);
         if (sonra.PrepareRecording() is not { } hazir)
             return new Olcu(dosyada, "istek kurulmadi: " + sonra.ErrorText, Array.Empty<string>(), null, null);
 
@@ -165,21 +223,21 @@ public sealed class KaydediciAyarTests
     [Fact]
     public void AcilistaOtomatikKipBirKezOlcerElleVeBassizdaOlcmez()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             var sayac = 0;
-            var otomatik = new RecorderView { OpenMeasure = () => { sayac++; return Task.CompletedTask; } };
+            var otomatik = new RecorderView(ayarYolu) { OpenMeasure = () => { sayac++; return Task.CompletedTask; } };
             otomatik.MeasureOnOpenAsync(true).GetAwaiter().GetResult();
             otomatik.MeasureOnOpenAsync(true).GetAwaiter().GetResult();
             var otomatikSayi = sayac;
 
             sayac = 0;
-            var bassiz = new RecorderView { OpenMeasure = () => { sayac++; return Task.CompletedTask; } };
+            var bassiz = new RecorderView(ayarYolu) { OpenMeasure = () => { sayac++; return Task.CompletedTask; } };
             bassiz.MeasureOnOpenAsync(false).GetAwaiter().GetResult();
             var bassizSayi = sayac;
 
             sayac = 0;
-            var elle = new RecorderView { OpenMeasure = () => { sayac++; return Task.CompletedTask; } };
+            var elle = new RecorderView(ayarYolu) { OpenMeasure = () => { sayac++; return Task.CompletedTask; } };
             Elle(elle);
             elle.MeasureOnOpenAsync(true).GetAwaiter().GetResult();
             return (otomatikSayi, bassizSayi, elleSayi: sayac, elle.AutoMode);
@@ -268,13 +326,13 @@ public sealed class KaydediciAyarTests
     {
         var sorunlar = new List<string>();
         var satirlar = new List<string>();
-        var bos = AyarDosyasiyla(() => AppHost.Run(() =>
+        var bos = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var once = new RecorderView();
+            var once = new RecorderView(ayarYolu);
             Elle(once);
-            var sonra = new RecorderView();
+            var sonra = new RecorderView(ayarYolu);
             var hazir = sonra.PrepareRecording()!.Value;
-            var dosya = JsonNode.Parse(File.ReadAllText(RecorderSettings.FilePath!))!.AsObject();
+            var dosya = JsonNode.Parse(File.ReadAllText(ayarYolu))!.AsObject();
             return (Args: RecorderArguments.Build(hazir.Request, hazir.Path), hazir.Request, hazir.Path, Dosya: dosya);
         }));
 
@@ -308,16 +366,16 @@ public sealed class KaydediciAyarTests
     [Fact]
     public void SesKollariSonrakiAcilisinSesPlaninaGecer()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var once = new RecorderView();
+            var once = new RecorderView(ayarYolu);
             Elle(once);
             Bul<ComboBox>(once, "CmbAudioLayout").SelectedIndex = (int)AudioTrackLayout.SeparateTracks;
             Yaz(once, "TxtAudioGain", "-3.5");
             Bul<CheckBox>(once, "ChkNoiseGate").IsChecked = true;
             Bul<CheckBox>(once, "ChkNoiseSuppression").IsChecked = true;
-            var dosya = File.ReadAllText(RecorderSettings.FilePath!);
-            var sonra = new RecorderView();
+            var dosya = File.ReadAllText(ayarYolu);
+            var sonra = new RecorderView(ayarYolu);
             return (dosya, sonra.Settings.AudioLayout, sonra.Settings.AudioFilters,
                 Kutular: (Bul<ComboBox>(sonra, "CmbAudioLayout").SelectedIndex, Bul<TextBox>(sonra, "TxtAudioGain").Text,
                     Bul<CheckBox>(sonra, "ChkNoiseGate").IsChecked, Bul<CheckBox>(sonra, "ChkNoiseSuppression").IsChecked));
@@ -332,13 +390,13 @@ public sealed class KaydediciAyarTests
     [Fact]
     public void GeriSayimVeKipSonrakiAcilistaKalir()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var once = new RecorderView();
+            var once = new RecorderView(ayarYolu);
             var ilk = (once.SelectedCountdown, once.AdvancedMode, once.ManualMode);
             Elle(once);
             Bul<ComboBox>(once, "CmbCountdown").SelectedIndex = 2;
-            var sonra = new RecorderView();
+            var sonra = new RecorderView(ayarYolu);
             return (ilk, son: (sonra.SelectedCountdown, sonra.AdvancedMode, sonra.ManualMode));
         }));
 
@@ -355,15 +413,15 @@ public sealed class KaydediciAyarTests
     [InlineData("GIF", ".gif")]
     public void OtomatikKipKullanicininKabiniKorurVeKayitDogrulanir(string kap, string uzanti)
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var once = new RecorderView();
+            var once = new RecorderView(ayarYolu);
             Bul<RadioButton>(once, "RadAdvanced").IsChecked = true;
             Sec(once, "CmbContainer", kap);
             Bul<CheckBox>(once, "ChkCursor").IsChecked = false;
             Yaz(once, "TxtMaxDuration", "4");
 
-            var sonra = new RecorderView();
+            var sonra = new RecorderView(ayarYolu);
             sonra.AutoChoice = Aday() with { Fps = 60 };
             var hazir = sonra.PrepareRecording();
             return (sonra.AutoMode, Hazir: hazir, sonra.ErrorText,
@@ -384,16 +442,16 @@ public sealed class KaydediciAyarTests
     [Fact]
     public void OlcumKosmadanOtomatikKipIlkAdayiYazar()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var once = new RecorderView();
+            var once = new RecorderView(ayarYolu);
             Elle(once);
             Sec(once, "CmbCodec", "libx265");
             Yaz(once, "TxtFps", "7");
             var elle = once.BuildRequest()!;
             Bul<RadioButton>(once, "RadSimple").IsChecked = true;
 
-            var sonra = new RecorderView();
+            var sonra = new RecorderView(ayarYolu);
             var beklenen = RecorderAutoPlan.Candidates(sonra.Machine())[0];
             return (elle, sonra.AutoMode, sonra.AdvancedMode, otomatik: sonra.BuildRequest()!, beklenen);
         }));
@@ -407,9 +465,9 @@ public sealed class KaydediciAyarTests
     [Fact]
     public void OtomatikKipteYalnizPrograminYazdigiKollarGizli()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayarYolu);
             Elle(view);
             var elle = Gorunenler(view);
             view.AutoChoice = Aday();
@@ -442,13 +500,13 @@ public sealed class KaydediciAyarTests
     [Fact]
     public void OtomatikKipteHedefBoyutBitHizinaVeSureyeGecer()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var once = new RecorderView();
+            var once = new RecorderView(ayarYolu);
             Bul<RadioButton>(once, "RadAdvanced").IsChecked = true;
             Yaz(once, "TxtTargetSeconds", "30");
             Yaz(once, "TxtTargetMegabytes", "10");
-            var sonra = new RecorderView();
+            var sonra = new RecorderView(ayarYolu);
             sonra.AutoChoice = Aday();
             var hazir = sonra.PrepareRecording()!.Value;
             return RecorderArguments.Build(hazir.Request, hazir.Path);
@@ -557,9 +615,9 @@ public sealed class KaydediciAyarTests
         if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
         Directory.CreateDirectory(klasor);
 
-        var hazir = AyarDosyasiyla(() => AppHost.Run(() =>
+        var hazir = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var once = new RecorderView();
+            var once = new RecorderView(ayarYolu);
             Elle(once);
             Bul<ComboBox>(once, "CmbTarget").SelectedIndex = (int)RecorderTargetKind.Region;
             Yaz(once, "TxtRegionX", "0");
@@ -573,7 +631,7 @@ public sealed class KaydediciAyarTests
             Yaz(once, "TxtScaleHeight", "180");
             Yaz(once, "TxtSplitSeconds", "2");
             Yaz(once, "TxtOutputFolder", klasor);
-            return new RecorderView().PrepareRecording()!.Value;
+            return new RecorderView(ayarYolu).PrepareRecording()!.Value;
         }));
 
         var oturum = await RecorderSession.StartAsync(hazir.Request, hazir.Path);

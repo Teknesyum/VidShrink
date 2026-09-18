@@ -27,8 +27,8 @@ public sealed class KaydediciSeciciTests
 
     private static readonly PixelRect Masaustu = new(0, 0, 1024, 768);
 
-    private static string? Dosyada(string anahtar)
-        => JsonNode.Parse(File.ReadAllText(RecorderSettings.FilePath!))?[anahtar]?.ToJsonString();
+    private static string? Dosyada(string dosya, string anahtar)
+        => File.Exists(dosya) ? JsonNode.Parse(File.ReadAllText(dosya))?[anahtar]?.ToJsonString() : null;
 
     [Fact]
     public void SurukleSerbestteCiftBoyutaIner()
@@ -61,10 +61,10 @@ public sealed class KaydediciSeciciTests
     [Fact]
     public void FareyleCizilenBolgeAyaraVeArgumanaGecer()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             var istenenOran = new List<double?>();
-            var once = new RecorderView { SkipAutoMeasure = true };
+            var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
             Elle(once);
             Bul<ComboBox>(once, "CmbAspect").SelectedIndex = Array.IndexOf(RegionDraw.Aspects, "16:9");
             once.DrawRegion = oran =>
@@ -74,13 +74,13 @@ public sealed class KaydediciSeciciTests
             };
             var cizildi = once.DrawRegionAsync().GetAwaiter().GetResult();
             var kutular = string.Join(",", new[] { "TxtRegionX", "TxtRegionY", "TxtRegionWidth", "TxtRegionHeight" }.Select(a => Bul<TextBox>(once, a).Text));
-            var dosya = (x: Dosyada("regionX"), w: Dosyada("regionWidth"), oran: Dosyada("regionAspect"), hedef: Dosyada("target"));
+            var dosya = (x: Dosyada(ayarYolu, "regionX"), w: Dosyada(ayarYolu, "regionWidth"), oran: Dosyada(ayarYolu, "regionAspect"), hedef: Dosyada(ayarYolu, "target"));
 
-            var vazgecen = new RecorderView { SkipAutoMeasure = true, DrawRegion = _ => Task.FromResult<PixelRect?>(null) };
+            var vazgecen = new RecorderView(ayarYolu) { SkipAutoMeasure = true, DrawRegion = _ => Task.FromResult<PixelRect?>(null) };
             var vazgecildi = vazgecen.DrawRegionAsync().GetAwaiter().GetResult();
             var vazgecKutu = Bul<TextBox>(vazgecen, "TxtRegionWidth").Text;
 
-            var sonra = new RecorderView { SkipAutoMeasure = true };
+            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
             var hazir = sonra.PrepareRecording()!.Value;
             var args = RecorderArguments.Build(hazir.Request, hazir.Path);
             return (cizildi, istenenOran, kutular, dosya, vazgecildi, vazgecKutu, aspect: Bul<ComboBox>(sonra, "CmbAspect").SelectedIndex,
@@ -136,14 +136,14 @@ public sealed class KaydediciSeciciTests
     [Fact]
     public void HazirBoyutBolgeKutularinaVeAyaraYazilir()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var view = new RecorderView { SkipAutoMeasure = true };
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
             var kutu = Bul<ComboBox>(view, "CmbRegionSize");
             var oncesi = Bul<TextBox>(view, "TxtRegionWidth").Text;
             kutu.SelectedIndex = 1 + Array.IndexOf(RegionDraw.Sizes, (1080, 1920));
             return (oncesi, w: Bul<TextBox>(view, "TxtRegionWidth").Text, h: Bul<TextBox>(view, "TxtRegionHeight").Text,
-                jw: Dosyada("regionWidth"), jh: Dosyada("regionHeight"), sayi: kutu.ItemCount);
+                jw: Dosyada(ayarYolu, "regionWidth"), jh: Dosyada(ayarYolu, "regionHeight"), sayi: kutu.ItemCount);
         }));
 
         Assert.NotEqual("1080", olcu.oncesi);
@@ -154,9 +154,9 @@ public sealed class KaydediciSeciciTests
     [Fact]
     public void PencereSeciciBasligiIstegeYazar()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var once = new RecorderView { SkipAutoMeasure = true, ListWindows = () => new[] { "Not Defteri", "Hesap Makinesi" } };
+            var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true, ListWindows = () => new[] { "Not Defteri", "Hesap Makinesi" } };
             Elle(once);
             Bul<ComboBox>(once, "CmbTarget").SelectedIndex = (int)RecorderTargetKind.Window;
             var liste = Bul<ComboBox>(once, "CmbWindow");
@@ -164,9 +164,9 @@ public sealed class KaydediciSeciciTests
             liste.SelectedIndex = 1;
             Avalonia.Threading.Dispatcher.UIThread.RunJobs();
             var kutu = Bul<TextBox>(once, "TxtWindowTitle").Text;
-            var dosyada = Dosyada("windowTitle");
+            var dosyada = Dosyada(ayarYolu, "windowTitle");
 
-            var sonra = new RecorderView { SkipAutoMeasure = true, ListWindows = () => new[] { "Hesap Makinesi" } };
+            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, ListWindows = () => new[] { "Hesap Makinesi" } };
             sonra.RefreshWindowList();
             var hazir = sonra.PrepareRecording()!.Value;
             var args = RecorderArguments.Build(hazir.Request, hazir.Path);
@@ -214,22 +214,22 @@ public sealed class KaydediciSeciciTests
     {
         IReadOnlyList<ScreenBounds> Ekranlar() => new[] { new ScreenBounds(0, 0, 0, 1024, 768), new ScreenBounds(1, 1024, 0, 1920, 1080) };
 
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var degismeyen = new RecorderView { SkipAutoMeasure = true, ScreenSource = Ekranlar };
+            var degismeyen = new RecorderView(ayarYolu) { SkipAutoMeasure = true, ScreenSource = Ekranlar };
             Elle(degismeyen);
             degismeyen.RefreshScreens();
             var ilkHazir = degismeyen.PrepareRecording()!.Value;
             var ilk = RecorderArguments.Build(ilkHazir.Request, ilkHazir.Path);
 
-            var once = new RecorderView { SkipAutoMeasure = true, ScreenSource = Ekranlar };
+            var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true, ScreenSource = Ekranlar };
             once.RefreshScreens();
             var kutu = Bul<ComboBox>(once, "CmbScreen");
             var etiketler = kutu.ItemsSource!.Cast<string>().ToArray();
             kutu.SelectedIndex = 1;
-            var dosyada = Dosyada("screenIndex");
+            var dosyada = Dosyada(ayarYolu, "screenIndex");
 
-            var sonra = new RecorderView { SkipAutoMeasure = true, ScreenSource = Ekranlar };
+            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, ScreenSource = Ekranlar };
             sonra.RefreshScreens();
             var hazir = sonra.PrepareRecording()!.Value;
             var args = RecorderArguments.Build(hazir.Request, hazir.Path);

@@ -177,12 +177,12 @@ public sealed class KaydediciTamponTests
     public void ArayuzTamponuAcarF11KaydederKapatirSecimAyardaKalir()
     {
         var sahte = new SahteTampon();
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var once = new RecorderView();
+            var once = new RecorderView(ayarYolu);
             Bul<ComboBox>(once, "CmbReplaySeconds").SelectedIndex = Array.IndexOf(ReplayBuffer.SecondsChoices, 15);
 
-            var view = new RecorderView();
+            var view = new RecorderView(ayarYolu);
             var secilen = view.SelectedReplaySeconds;
             var f11Kapali = view.RunHotkeyAsync(HotkeyAction.ReplaySave).GetAwaiter().GetResult();
             var kaydetKapali = view.ReplaySaveVisible;

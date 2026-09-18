@@ -148,13 +148,13 @@ public sealed class KaydediciOnizlemeTests
             Kos(new[] { "-hide_banner", "-y", "-f", "lavfi", "-i", "testsrc2=size=320x180:rate=1", "-frames:v", "1", kaynak }, 15000);
         var jpg = Path.Combine(Kanit, "arayuz.jpg");
 
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var kapali = new RecorderView { PreviewLocation = () => jpg };
+            var kapali = new RecorderView(ayarYolu) { PreviewLocation = () => jpg };
             var kapaliYol = kapali.PrepareRecording()?.Request.PreviewPath;
             Bul<CheckBox>(kapali, "ChkLivePreview").IsChecked = true;
 
-            var acik = new RecorderView { PreviewLocation = () => jpg };
+            var acik = new RecorderView(ayarYolu) { PreviewLocation = () => jpg };
             var kutu = Bul<CheckBox>(acik, "ChkLivePreview").IsChecked;
             var acikYol = acik.PrepareRecording()?.Request.PreviewPath;
             Yaz(acik, "TxtTargetMegabytes", "5");

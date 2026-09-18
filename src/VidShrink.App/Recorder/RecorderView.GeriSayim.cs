@@ -39,7 +39,7 @@ internal partial class RecorderView
         {
             if (CmbCountdown.SelectedIndex < 0) return;
             _settings.CountdownSeconds = SelectedCountdown;
-            _settings.Save(RecorderSettings.FilePath);
+            _settings.Save(_settingsPath);
         };
     }
 

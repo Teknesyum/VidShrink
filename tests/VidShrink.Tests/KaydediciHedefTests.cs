@@ -76,11 +76,11 @@ public sealed class KaydediciHedefTests
     [Fact]
     public void TekHedefKutusuKendiSinirinaGecer()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             (RecorderRequest Istek, string Not) Kur(string saniye, string mb)
             {
-                var view = new RecorderView { SkipAutoMeasure = true, AutoChoice = RecorderAutoPlan.Candidates(new RecorderMachine(1920, 1080, 60, 8, []))[0] };
+                var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, AutoChoice = RecorderAutoPlan.Candidates(new RecorderMachine(1920, 1080, 60, 8, []))[0] };
                 Yaz(view, "TxtTargetSeconds", saniye);
                 Yaz(view, "TxtTargetMegabytes", mb);
                 return (view.BuildRequest()!, Bul<TextBlock>(view, "TxtBudgetNote").Text ?? string.Empty);
@@ -114,18 +114,18 @@ public sealed class KaydediciHedefTests
         File.WriteAllBytes(dosya, new byte[] { 1 });
         try
         {
-            var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+            var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
             {
                 var acilan = new List<string>();
-                var kapali = new RecorderView { RevealFolder = acilan.Add };
+                var kapali = new RecorderView(ayarYolu) { RevealFolder = acilan.Add };
                 kapali.Deliver(new RecordResult(true, dosya, 1, false, 0, string.Empty, 1));
                 var kapaliSayi = acilan.Count;
 
-                var once = new RecorderView();
+                var once = new RecorderView(ayarYolu);
                 Bul<CheckBox>(once, "ChkOpenFolder").IsChecked = true;
-                var dosyada = JsonNode.Parse(File.ReadAllText(RecorderSettings.FilePath!))?["openFolderWhenDone"]?.ToJsonString();
+                var dosyada = JsonNode.Parse(File.ReadAllText(ayarYolu))?["openFolderWhenDone"]?.ToJsonString();
 
-                var acik = new RecorderView { RevealFolder = acilan.Add };
+                var acik = new RecorderView(ayarYolu) { RevealFolder = acilan.Add };
                 acik.Deliver(new RecordResult(true, dosya, 1, false, 0, string.Empty, 1));
                 return (kapaliSayi, dosyada, acilan: acilan.ToArray(), kutu: Bul<CheckBox>(acik, "ChkOpenFolder").IsChecked);
             }));
@@ -144,7 +144,7 @@ public sealed class KaydediciHedefTests
     [Fact]
     public void IptalKisayoluOturumYokkenIslemezVeTanimdaVar()
     {
-        var olcu = AppHost.Run(() => new RecorderView().RunHotkeyAsync(HotkeyAction.Discard).GetAwaiter().GetResult());
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() => new RecorderView(ayarYolu).RunHotkeyAsync(HotkeyAction.Discard).GetAwaiter().GetResult()));
 
         Assert.False(olcu);
         Assert.Equal(HotkeyAction.Discard, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F10, Avalonia.Input.KeyModifiers.None));
@@ -170,9 +170,9 @@ public sealed class KaydediciHedefTests
         var klasor = Path.Combine(Kanit, "iptal");
         if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
 
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var view = new RecorderView { SkipAutoMeasure = true };
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
             Elle(view);
             Bul<ComboBox>(view, "CmbTarget").SelectedIndex = (int)RecorderTargetKind.Region;
             Yaz(view, "TxtRegionX", "0");

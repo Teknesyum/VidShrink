@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -164,9 +164,10 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void KareAlinincaYoluSeritteGorunur()
     {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
         var (ok, alinan, bildirim, hata, gorunur) = AppHost.Run<(bool, string?, string, string, bool)>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayar.Yol);
             string? yol = null;
             var sonuc = view.SnapshotAsync(p => { yol = p; return System.Threading.Tasks.Task.FromResult(true); })
                 .GetAwaiter().GetResult();
@@ -185,9 +186,10 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void AlinamayanKareHataOlarakGorunur()
     {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
         var (basarisiz, atilan, bildirim, hata) = AppHost.Run<(bool, bool, string, string)>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayar.Yol);
             var yanlis = view.SnapshotAsync(_ => System.Threading.Tasks.Task.FromResult(false)).GetAwaiter().GetResult();
             var patlayan = view.SnapshotAsync(_ => throw new InvalidOperationException("yok")).GetAwaiter().GetResult();
             return (yanlis, patlayan, view.NoticeText, view.ErrorText);
@@ -279,10 +281,11 @@ public sealed class KaydediciArayuzTests
             var mp4 = Path.Combine(klasor, "kayit.mp4");
             File.WriteAllText(mkv, "x");
 
+            using var ayar = new KaydediciAyarTests.OzelAyar();
             var (gorunur, hedef, argumanlar, bildirim, mp4Gorunur, hata) =
                 AppHost.Run<(bool, string?, IReadOnlyList<string>?, string, bool, string)>(() =>
                 {
-                    var view = new RecorderView();
+                    var view = new RecorderView(ayar.Yol);
                     view.ShowResult(new VidShrink.Ffmpeg.RecordResult(true, mkv, 1, false, 0, string.Empty, 1));
                     var ilk = view.Mp4Visible;
                     IReadOnlyList<string>? yazilan = null;
@@ -290,9 +293,9 @@ public sealed class KaydediciArayuzTests
                         .GetAwaiter().GetResult();
                     var not = view.NoticeText;
 
-                    var baska = new RecorderView();
+                    var baska = new RecorderView(ayar.Yol);
                     baska.ShowResult(new VidShrink.Ffmpeg.RecordResult(true, mp4, 1, false, 0, string.Empty, 1));
-                    var hataView = new RecorderView();
+                    var hataView = new RecorderView(ayar.Yol);
                     hataView.ShowResult(new VidShrink.Ffmpeg.RecordResult(true, mkv, 1, false, 0, string.Empty, 1));
                     hataView.SaveAsMp4Async(_ => System.Threading.Tasks.Task.FromResult(false)).GetAwaiter().GetResult();
                     return (ilk, sonuc, yazilan, not, baska.Mp4Visible, hataView.ErrorText);
@@ -327,9 +330,9 @@ public sealed class KaydediciArayuzTests
     public void BasitVeGelismisKipSecenekPaneliniSurer()
     {
         var olcu = KaydediciAyarTests.AyarDosyasiyla(
-            () => AppHost.Run<(bool, bool, int, bool, bool, int, bool, bool, bool, bool)>(() =>
+            ayarYolu => AppHost.Run<(bool, bool, int, bool, bool, int, bool, bool, bool, bool)>(() =>
             {
-                var view = new RecorderView();
+                var view = new RecorderView(ayarYolu);
                 T Bul<T>(string ad) where T : Avalonia.Controls.Control
                     => Avalonia.Controls.ControlExtensions.FindControl<T>(view, ad)!;
 
@@ -398,9 +401,10 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void GeriSayimSeritteSayilirVeSonundaBaslatir()
     {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
         var olcu = AppHost.Run<(bool, List<int>, List<string>, List<bool>, List<bool>, bool, bool, int)>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayar.Yol);
             Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.ComboBox>(view, "CmbCountdown")!.SelectedIndex = 1;
             var kalan = new List<int>();
             var durum = new List<string>();
@@ -433,9 +437,10 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void GeriSayimIptalDugmesiVeDurdurmaTusuylaKesilir()
     {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
         var olcu = AppHost.Run<(bool, int, bool, int, bool, int, bool)>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayar.Yol);
             Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.ComboBox>(view, "CmbCountdown")!.SelectedIndex = 3;
 
             var ilkAdim = 0;
@@ -481,9 +486,10 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void GeriSayimYokkenBekletmez()
     {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
         var (bitti, cagri) = AppHost.Run<(bool, int)>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayar.Yol);
             Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.ComboBox>(view, "CmbCountdown")!.SelectedIndex = 0;
             var sayi = 0;
             view.CountdownDelay = (_, _) => { sayi++; return System.Threading.Tasks.Task.CompletedTask; };
@@ -633,9 +639,10 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void CerceveKisayoluGizlemeyiCevirir()
     {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
         var (ilk, ikinci, cagrilar) = AppHost.Run<(bool, bool, List<string>)>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayar.Yol);
             var sahte = new SahteCerceve();
             view.FrameHost = sahte;
             view.RaiseEvent(new Avalonia.Input.KeyEventArgs
@@ -727,9 +734,10 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void TepsiEtkinlesinceBostaIpucuVeRengiYazilir()
     {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
         var (once, guncellemeler, kaldirma, bosta, gri) = AppHost.Run<(int, List<(TrayPhase, Avalonia.Media.Color, string)>, int, string, Avalonia.Media.Color)>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayar.Yol);
             var sahte = new SahteTepsi();
             view.TrayHost = sahte;
             var ilk = sahte.Guncellemeler.Count;
@@ -812,7 +820,8 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void TesteGercekKisayolKaydedilmez()
     {
-        var tur = AppHost.Run<string>(() => new RecorderView().GlobalHotkeys.GetType().Name);
+        using var ayar = new KaydediciAyarTests.OzelAyar();
+        var tur = AppHost.Run<string>(() => new RecorderView(ayar.Yol).GlobalHotkeys.GetType().Name);
 
         Assert.Equal(nameof(NoGlobalHotkeys), tur);
     }
@@ -820,9 +829,10 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void GenelKisayolCakismasiKullaniciyaSoylenir()
     {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
         var (kayit, birakma, cakisma, hata, bekleyen) = AppHost.Run<(int, int, string, string, string)>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayar.Yol);
             var sahte = new SahteKisayol();
             sahte.Dolu.Add(Avalonia.Input.Key.F8);
             view.GlobalHotkeys = sahte;
@@ -846,9 +856,10 @@ public sealed class KaydediciArayuzTests
     [Fact]
     public void GenelKisayolBasilincaEylemCalisir()
     {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
         var (gizli, durdu, yenidenGorunur) = AppHost.Run<(bool, bool, bool)>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayar.Yol);
             var sahte = new SahteKisayol();
             view.GlobalHotkeys = sahte;
             view.ActivateHotkeys();
@@ -891,9 +902,9 @@ public sealed class KaydediciArayuzTests
     /// </summary>
     private static T GelismisOlc<T>(Func<RecorderView, Func<string, Avalonia.Controls.Control>, T> olc)
     {
-        return KaydediciAyarTests.AyarDosyasiyla(() => AppHost.Run<T>(() =>
+        return KaydediciAyarTests.AyarDosyasiyla(ayarYolu => AppHost.Run<T>(() =>
         {
-            var view = new RecorderView();
+            var view = new RecorderView(ayarYolu);
             Avalonia.Controls.Control Bul(string ad) => Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Control>(view, ad)!;
             ((Avalonia.Controls.RadioButton)Bul("RadAdvanced")).IsChecked = true;
             ((Avalonia.Controls.RadioButton)Bul("RadManual")).IsChecked = true;

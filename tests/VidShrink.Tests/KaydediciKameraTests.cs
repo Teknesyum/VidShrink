@@ -57,8 +57,8 @@ public sealed class KaydediciKameraTests
     private static readonly AudioCaptureDevice Mikrofon =
         new("Mikrofon", CaptureBackend.DirectShow, AudioSourceRole.Microphone);
 
-    private static string? Dosyada(string anahtar)
-        => JsonNode.Parse(File.ReadAllText(RecorderSettings.FilePath!))?[anahtar]?.ToJsonString();
+    private static string? Dosyada(string dosya, string anahtar)
+        => File.Exists(dosya) ? JsonNode.Parse(File.ReadAllText(dosya))?[anahtar]?.ToJsonString() : null;
 
     [Fact]
     public void KameraDshowGirdisiVeBindirmeGrafigiUretirKamerasizUretmez()
@@ -127,24 +127,24 @@ public sealed class KaydediciKameraTests
     [Fact]
     public void KameraSecimiDosyayaVeSonrakiKaydinIstegineGecer()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             IReadOnlyList<string> iki = new[] { "Kam A", "Kam B" };
-            var once = new RecorderView { SkipAutoMeasure = true, CameraSource = () => iki };
+            var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => iki };
             Elle(once);
             var bosIstek = once.PrepareRecording()!.Value.Request.Webcam;
             var ogeler = Bul<ComboBox>(once, "CmbWebcam").ItemsSource!.Cast<object>().Count();
             Bul<ComboBox>(once, "CmbWebcam").SelectedIndex = 2;
             Bul<ComboBox>(once, "CmbWebcamSize").SelectedIndex = 2;
             Bul<ComboBox>(once, "CmbWebcamCorner").SelectedIndex = Array.IndexOf(RecorderView.WebcamCorners, WebcamCorner.TopRight);
-            var dosya = (Dosyada("webcamName"), Dosyada("webcamWidth"), Dosyada("webcamCorner"));
+            var dosya = (Dosyada(ayarYolu, "webcamName"), Dosyada(ayarYolu, "webcamWidth"), Dosyada(ayarYolu, "webcamCorner"));
 
-            var sonra = new RecorderView { SkipAutoMeasure = true, CameraSource = () => iki };
+            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => iki };
             var istek = sonra.PrepareRecording()!.Value.Request.Webcam;
 
-            var yok = new RecorderView { SkipAutoMeasure = true, CameraSource = () => new[] { "Kam A" } };
+            var yok = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => new[] { "Kam A" } };
             var yokIstek = yok.PrepareRecording()!.Value.Request.Webcam;
-            var adKaldi = Dosyada("webcamName");
+            var adKaldi = Dosyada(ayarYolu, "webcamName");
             return (bosIstek, ogeler, dosya, istek, yokIstek, adKaldi);
         }));
 
@@ -290,17 +290,17 @@ public sealed class KaydediciKameraTests
     [Fact]
     public void BuyutecKutusuDosyayaYaziliriYalnizKayittaAcar()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             var kapali = new SahteBuyutec();
-            var bos = new RecorderView { SkipAutoMeasure = true, Magnifier = kapali };
+            var bos = new RecorderView(ayarYolu) { SkipAutoMeasure = true, Magnifier = kapali };
             bos.SyncInput(true);
             bos.SyncInput(false);
 
             var buyutec = new SahteBuyutec();
-            var view = new RecorderView { SkipAutoMeasure = true, Magnifier = buyutec };
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, Magnifier = buyutec };
             Bul<CheckBox>(view, "ChkMagnifier").IsChecked = true;
-            var dosya = Dosyada("showMagnifier");
+            var dosya = Dosyada(ayarYolu, "showMagnifier");
             view.SyncInput(false);
             var bostaAcik = buyutec.Running;
             view.SyncInput(true);
@@ -312,9 +312,9 @@ public sealed class KaydediciKameraTests
             view.ExpandFromMini();
             view.SyncInput(true);
 
-            var yeni = new RecorderView { SkipAutoMeasure = true, Magnifier = new SahteBuyutec() };
+            var yeni = new RecorderView(ayarYolu) { SkipAutoMeasure = true, Magnifier = new SahteBuyutec() };
             var yeniKutu = Bul<CheckBox>(yeni, "ChkMagnifier").IsChecked;
-            return (kapali: string.Join(" | ", kapali.Cagrilar), dosya, bostaAcik, cagri: string.Join(" | ", buyutec.Cagrilar), mini, ana, yeniKutu, son: Dosyada("showMagnifier"));
+            return (kapali: string.Join(" | ", kapali.Cagrilar), dosya, bostaAcik, cagri: string.Join(" | ", buyutec.Cagrilar), mini, ana, yeniKutu, son: Dosyada(ayarYolu, "showMagnifier"));
         }));
 
         File.WriteAllLines(Path.Combine(Kanit, "buyutec-ayar.txt"), new[]

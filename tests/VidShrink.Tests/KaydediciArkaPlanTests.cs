@@ -136,18 +136,18 @@ public sealed class KaydediciArkaPlanTests
     [Fact]
     public void ArkaPlanSecimiDosyayaVeSonrakiIstegeGecer()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             IReadOnlyList<string> kameralar = new[] { "Kam A" };
-            var once = new RecorderView { SkipAutoMeasure = true, CameraSource = () => kameralar };
+            var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => kameralar };
             Elle(once);
             var ogeler = Bul<ComboBox>(once, "CmbWebcamBackground").ItemsSource!.Cast<object>().Count();
             var ilk = Bul<ComboBox>(once, "CmbWebcamBackground").SelectedIndex;
             Bul<ComboBox>(once, "CmbWebcam").SelectedIndex = 1;
             Bul<ComboBox>(once, "CmbWebcamBackground").SelectedIndex = Array.IndexOf(RecorderView.WebcamBackgrounds, WebcamBackground.Green);
-            var json = JsonNode.Parse(File.ReadAllText(RecorderSettings.FilePath!))?["webcamBackground"]?.ToJsonString();
+            var json = JsonNode.Parse(File.ReadAllText(ayarYolu))?["webcamBackground"]?.ToJsonString();
 
-            var sonra = new RecorderView { SkipAutoMeasure = true, CameraSource = () => kameralar };
+            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => kameralar };
             return (ogeler, ilk, json, istek: sonra.PrepareRecording()!.Value.Request.Webcam);
         }));
 
