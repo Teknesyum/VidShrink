@@ -335,8 +335,15 @@ sildi. **Kural: yayınlanmış uygulama düzeneğin dışında hiç çalıştır
     Belgeleyen kol: `SettingsTests.LanguageUsesSavedThenOperatingSystemThenEnglish`,
     `(null, "", "en")`. **Bu kol tuzak teli değil:** boş dizge değişmez bir `InlineData`
     ve `ResolveLanguage` kültür okumayan saf bir işlev, dolayısıyla anahtar açılsa kol
-    yeşil kalır. Tuzak teli borç olarak durur; çağrı noktasındaki kültür okumasından
-    geçen bir ölçü ister.
+    yeşil kalır. **Tel 18 Eylül 2026'da gerildi:**
+    `tests/VidShrink.Tests/KulturTuzakTeliTests.cs` iki yere birden bakıyor — arayüzü
+    yayınlayan zincirde (`Directory.Build.props`, `VidShrink.App.csproj`, iş akışları)
+    bayrağın hiç geçmemesi, ve `MainWindow.axaml.cs`'de dil çözümünün kültürü hâlâ
+    okuması. İki mutasyonla ölçüldü: bayrak `VidShrink.App.csproj`'a eklenince
+    `ArayuzZincirindeKulturKapatilmiyor`, kültür okuması sabit `"en-US"` ile
+    değiştirilince `DilCozumuKulturuOkuyor` kırmızı döndü. Tarayıcının kör olmadığı,
+    bayrağı gerçekten taşıyan `VidShrink.Launcher` ve `VidShrink.Setup` üzerinde
+    pozitif kontrolle pimli.
   - `LanguageCatalog.cs:307` — `body[..1].ToUpper(culture)` Türkçe `i`'yi `İ` değil `I` yapar
     ("iptal" → "Iptal") ve bu tek çağrı arayüzdeki her metnin satır başını üretiyor.
     Pim: `KulturSozlesmesiTests.TurkceBuyukHarfKuraliKulturdenGeliyor`.

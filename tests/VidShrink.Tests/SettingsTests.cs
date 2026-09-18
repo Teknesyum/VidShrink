@@ -71,9 +71,9 @@ public sealed class SettingsTests
     /// dosyasının hiçbirini almadan İngilizce açar. Kol o sonucu koda bağlar ama
     /// <b>tuzak teli değildir</b>: boş dizge burada değişmez bir <c>InlineData</c>,
     /// <c>ResolveLanguage</c> saf bir işlev ve kültür okumuyor — anahtar açılsa bu satır
-    /// yeşil kalır. Kırmızıya dönmesi için ölçünün <c>MainWindow.axaml.cs:532</c>'deki
-    /// <c>CultureInfo.CurrentUICulture.Name</c> okumasından geçmesi gerekir
-    /// (<c>docs/olcumler/aot-dalgasi.md</c>).
+    /// yeşil kalır. Tel 18 Eylül 2026'da <see cref="KulturTuzakTeliTests"/> ile gerildi: o
+    /// sınıf hem bayrağın kendisine hem de kültürü okuyan kabloya bakıyor ve iki ayrı
+    /// mutasyonla kırmızıya döndüğü ölçüldü (<c>docs/olcumler/aot-dalgasi.md</c>).
     /// </summary>
     [Theory]
     [InlineData("tr", "en-US", "tr")]
