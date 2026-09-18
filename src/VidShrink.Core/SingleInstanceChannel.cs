@@ -1,6 +1,9 @@
 using System.IO.Pipes;
 using System.Text;
 using System.Text.Json;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("VidShrink.Tests")]
 
 namespace VidShrink.Core;
 
@@ -76,12 +79,12 @@ public sealed class SingleInstanceChannel : IDisposable
         }
     }
 
-    internal static string Encode(IReadOnlyList<string> paths) => JsonSerializer.Serialize(paths);
+    internal static string Encode(IReadOnlyList<string> paths) => JsonSerializer.Serialize(paths, YolJson.Default.IReadOnlyListString);
 
     internal static IReadOnlyList<string>? Decode(string? line)
     {
         if (string.IsNullOrEmpty(line)) return null;
-        try { return JsonSerializer.Deserialize<string[]>(line); }
+        try { return JsonSerializer.Deserialize(line, YolJson.Default.StringArray); }
         catch (JsonException) { return null; }
     }
 

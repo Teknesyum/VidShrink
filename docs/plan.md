@@ -881,6 +881,13 @@ Dal `t0/hb-1c-akis`.
 7. Test `StreamMappingTests.cs`: ffmpeg ile 3 sn girdi (2 ses + srt + PGS + 2 bölüm + başlık/tarih; ayrıca
    dönük MP4), çıktı ffprobe ile okunur; çok izli girdide hedef isabeti; her kolun negatif kontrolü.
 
+# AOT Dalgası — Üç Engel (tamamlandı)
+
+Dal `t0/aot-dalga`, taban `a721f6c0`. Üç engel ölçüldü; ikisi kaldırıldı, üçüncüsü
+(palet/kaynak yüklemesi) ölçülüp bırakıldı — tavanı 13,4 ms, gürültü tabanı ±60 ms.
+Sayılar, eşli fark tabloları, reddedilen anahtarlar ve yapılmayanların gerekçesi:
+`docs/olcumler/aot-dalgasi.md`. Danışma: `docs/danisma/2026-09-18-aot-dalgasi-*.md`.
+
 # Plan — Küçültmede Aralık (HandBrake Açığı, Madde 54)
 
 Dal: `t0/hb-acik-kalan`, taban `e962538e`. Karar kaynağı:
@@ -922,3 +929,4 @@ Yerelde kısa sıralı doğrulama: 20 sn kaynaktan 6 sn kesit, hedef boyut tutuy
 S1'in geri gitme payı (10 sn) üretim `-g` tavanından türetildi; gerçek kaynak I-kare
 aralığı ölçülmedi (fable "ölçülmeli" dedi). S2'nin süre-oranı sezgisinin VBR kaynakta
 kaç fazladan deneme turu yediği ölçülmedi.
+

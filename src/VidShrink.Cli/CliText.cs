@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 
@@ -36,7 +36,7 @@ public sealed class CliText
         var name = $"VidShrink.Cli.Locales.{language}.json";
         using var stream = typeof(CliText).Assembly.GetManifestResourceStream(name)
             ?? throw new InvalidOperationException($"Missing locale resource {name}.");
-        return JsonSerializer.Deserialize<Dictionary<string, string>>(stream)
+        return JsonSerializer.Deserialize(stream, CliJson.Default.DictionaryStringString)
             ?? throw new InvalidOperationException($"Empty locale resource {name}.");
     }
 

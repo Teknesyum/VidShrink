@@ -1,4 +1,5 @@
-using System.Text.Json;
+﻿using System.Text.Json;
+using VidShrink.Core;
 using System.Text.Json.Serialization;
 
 namespace VidShrink.Core.Share;
@@ -159,7 +160,7 @@ public sealed class ShareLedger
         {
             if (!File.Exists(_path)) return Array.Empty<ShareLink>();
             var json = File.ReadAllText(_path);
-            return JsonSerializer.Deserialize<List<ShareLink>>(json, Options) ?? new List<ShareLink>();
+            return JsonSerializer.Deserialize(json, PaylasimJson.Default.ListShareLink) ?? new List<ShareLink>();
         }
         catch (JsonException)
         {
@@ -206,6 +207,6 @@ public sealed class ShareLedger
     {
         var folder = Path.GetDirectoryName(_path);
         if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
-        File.WriteAllText(_path, JsonSerializer.Serialize(links, Options));
+        File.WriteAllText(_path, JsonSerializer.Serialize(links, PaylasimJson.Default.IReadOnlyListShareLink));
     }
 }

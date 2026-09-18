@@ -180,7 +180,11 @@ public sealed class KaydediciPencereTests
 
             var mac = Pencereli(RecorderPlatform.MacOs, _ => xlogo with { Title = "xlogo" });
             var macIstek = mac.BuildRequest(applyAuto: false);
-            var macArgs = RecorderArguments.Build(macIstek! with { Container = RecorderContainer.Mov }, "/tmp/m.mov");
+            // Scale = null: olcunun konusu pencere kirpmasi, kalici olcek degil. Gorunum
+            // kurucuda paylasilan recorder-settings.json'u okuyor; baska bir sinif oraya
+            // 1280x720 birakirsa -vf "crop=...,scale=1280:720" oluyor ve bu olcu sira
+            // bagimlisi kiriliyordu (docs/olcumler/aot-dalgasi.md, CI 35291760780).
+            var macArgs = RecorderArguments.Build(macIstek! with { Container = RecorderContainer.Mov, Scale = null }, "/tmp/m.mov");
 
             return (linuxIstek, linuxArgs, linuxHata: linux.ErrorText, waylandIstek, waylandHata: wayland.ErrorText,
                 kapanmisIstek, kapanmisHata: kapanmis.ErrorText, macIstek, macArgs);

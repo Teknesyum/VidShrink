@@ -64,10 +64,18 @@ public sealed class SettingsTests
         finally { if (File.Exists(file)) File.Delete(file); }
     }
 
+    /// <summary>
+    /// Son kol <c>InvariantGlobalization</c> kararının ölçüsü. O kip açıkken
+    /// <c>CultureInfo.CurrentUICulture.Name</c> boş dizgedir; <c>MainWindow.axaml.cs:532</c>
+    /// oraya boş dizge verir ve kaydedilmiş dili olmayan kullanıcı 42 yerelleştirme
+    /// dosyasının hiçbirini almadan İngilizce açar. Kol, kazancın bedelini koda bağlıyor:
+    /// anahtar açılırsa bu satır kırmızıya döner (<c>docs/olcumler/aot-dalgasi.md</c>).
+    /// </summary>
     [Theory]
     [InlineData("tr", "en-US", "tr")]
     [InlineData(null, "tr-TR", "tr")]
     [InlineData("zz", "zz-ZZ", "en")]
+    [InlineData(null, "", "en")]
     public void LanguageUsesSavedThenOperatingSystemThenEnglish(string? saved, string os, string expected)
         => Assert.Equal(expected, MainWindow.ResolveLanguage(saved, os));
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -877,6 +877,18 @@ public sealed class KaydediciArayuzTests
             Assert.Contains("{0}", Locales.Values(language).GetValueOrDefault("recorder.hotkey.taken") ?? string.Empty);
     }
 
+    /// <summary>
+    /// Ölçüm, paylaşılan kaydedici ayar dosyasını yedekleyip <c>finally</c>'de geri yazar.
+    /// Yedek her zaman yetmiyor: kutulara değer verildiğinde <c>PersistChoices</c> işi
+    /// sargının dışına taşıyor ve dosyada 1280x720 kalıyor. Bu, <c>KaydediciPencereTests</c>
+    /// testini CI'da kırdı (koşum 35291760780). Sızıntı orada <c>Scale = null</c> ile
+    /// kanalından kapatıldı; kaynağındaki temizlik kaydedici sahibinin işi.
+    /// <c>Dispatcher.UIThread.RunJobs()</c> ile boşaltmak <b>denendi ve reddedildi</b>:
+    /// arayüz iş parçacığı bütün test sınıflarınca paylaşıldığı için pompa başka
+    /// sınıfların bekleyen işlerini de sırasız boşaltıyor ve
+    /// <c>OynaticiCiftTikSuresiTests</c> iki CI koşumunda düştü
+    /// (<c>docs/olcumler/aot-dalgasi.md</c> bölüm 12).
+    /// </summary>
     private static T GelismisOlc<T>(Func<RecorderView, Func<string, Avalonia.Controls.Control>, T> olc)
     {
         return KaydediciAyarTests.AyarDosyasiyla(() => AppHost.Run<T>(() =>
