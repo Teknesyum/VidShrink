@@ -4,7 +4,7 @@
 birleştirildiğinde hiçbir satır tek başına sır gibi görünmüyor:
 
 ```csharp
-const string belirtec = "eyJhbGciOiJIUzI1NiJ9"
+const string belirtec = "<JWT BASLIGI>"
     + ".PIM77-belirtec-govdesi.imza";
 ```
 
@@ -38,7 +38,7 @@ temiz
 pozitif kontrol: True
 tel kaydi: True
 ayar alani: False
-bolunmus kol: docs\olcumler\butce-doldur.md: <!-- M11 Api-Key: "7hQ2vN9xLm4TpZ8cRb1WnH5kJ6yEaG0" -->
+bolunmus kol: docs\olcumler\butce-doldur.md: <!-- M11 Api-Key: "<32 KARAKTERLIK SAHTE ANAHTAR>" -->
 bolunmus kolun muaf dosyalarda yakaladigi: 2 1
 ```
 
@@ -61,3 +61,15 @@ Başarılı!  - Başarısız:     0, Başarılı:     1, Atlanan:     0, Toplam:
 ```
 
 Kanıt dosyası `anahtar-taramasi.txt` yeşil koşumdan sonra yok.
+
+## Belgenin Kendisi Taramaya Takıldı
+
+Bu belge yazıldıktan sonra ölçü kırmızıya döndü: kanıt bölümleri hem M11'in ektiği sahte
+anahtarı hem de `AltyaziOturumTests.cs`'teki sentetik JWT başlığını **tırnak içinde**
+taşıyordu; yeni kol ikisini de yakaladı.
+
+Ders ölçünün lehine: belgeye verbatim düşen sır de sırdır. İkisi de maskelendi
+(`<32 KARAKTERLIK SAHTE ANAHTAR>`, `<JWT BASLIGI>`); satırın yapısı, dosya adı ve bulgunun
+kendisi yerinde duruyor. Muafiyet listesine belge **eklenmedi** — muafiyet ölçüyü körleştirirdi.
+
+Yeşil koşum belge yazılmadan önce alınmıştı; ilk turda bu yüzden görülmedi.
