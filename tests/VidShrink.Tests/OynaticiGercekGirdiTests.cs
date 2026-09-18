@@ -51,6 +51,25 @@ public sealed class OynaticiGercekGirdiTests
         return Path.Combine(klasor, ad);
     }
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    private static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "girdi");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     private static void Surukle(Window window, PlayerView view, Point bas, Point son)
     {
         Gonder(window, RawPointerEventType.Move, bas, RawInputModifiers.None);
@@ -132,6 +151,8 @@ public sealed class OynaticiGercekGirdiTests
         Assert.Contains("sessiz simgesi: True", rapor);
         Assert.Contains("hiz etiketi: 1.00×", rapor);
         Assert.Contains("pause no -> yes", rapor);
+
+        Kapat("serit-ham-fare.txt");
     }
 
     [Fact]
@@ -196,5 +217,7 @@ public sealed class OynaticiGercekGirdiTests
         Assert.Contains("serit acik: True", rapor);
         Assert.Contains("mute no -> yes", rapor);
         Assert.DoesNotContain("ses tik -> 100", rapor);
+
+        Kapat("serit-ana-pencere.png", "serit-ana-pencere.txt");
     }
 }
