@@ -637,28 +637,29 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         GirdiKanit.Kapat("k9-menu-satirlari.txt");
     }
 
+    /// <summary>
+    /// Olcu eskiden <c>Echo</c>'nun <c>[Conditional("DEBUG")]</c> ile urun ikilisinden
+    /// dustugunu pimliyordu. T176 turu bitti ve iskele tamamen kaldirildi (kod borcu 16);
+    /// iddia artik daha guclu: yontem hic yok. Yansimayla okunur, cunku geri gelmesi
+    /// derlemeyi kirmaz — sessizce eski iskeleyi geri getirirdi.
+    /// </summary>
     [Fact]
     public void OlcumKancasiUrunIkilisindeDerlenmez()
     {
-        var yontem = typeof(PlayerView).GetMethod(
-            "Echo",
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public)!;
-        var kosullar = yontem.GetCustomAttributes(typeof(ConditionalAttribute), false)
-            .Cast<ConditionalAttribute>()
-            .Select(a => a.ConditionString)
-            .ToList();
+        const System.Reflection.BindingFlags hepsi =
+            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance
+            | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public;
 
-        var alanlar = typeof(PlayerView).GetProperties(
-            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public)
-            .Select(p => p.Name)
-            .ToList();
+        var yontem = typeof(PlayerView).GetMethod("Echo", hepsi);
+        var alanlar = typeof(PlayerView).GetProperties(hepsi).Select(p => p.Name).ToList();
 
         GirdiKanit.Write(
             "k13-olcum-kancasi.txt",
-            $"PlayerView.Echo kosullari: {string.Join(", ", kosullar)}{Environment.NewLine}"
+            $"PlayerView.Echo duruyor mu: {yontem is not null}{Environment.NewLine}"
             + $"OpenedMenu ozelligi duruyor mu: {alanlar.Contains("OpenedMenu")}{Environment.NewLine}");
 
-        Assert.Equal(new[] { "DEBUG" }, kosullar);
+        Assert.Null(yontem);
+        Assert.NotNull(typeof(PlayerView).GetProperty("Trace", hepsi));
         Assert.DoesNotContain("OpenedMenu", alanlar);
         GirdiKanit.Kapat("k13-olcum-kancasi.txt");
     }

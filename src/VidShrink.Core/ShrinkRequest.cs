@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.IO.Pipes;
 
 namespace VidShrink.Core;
@@ -73,6 +73,7 @@ public sealed class ShrinkRequestQueue : IDisposable
     private Task? _processTask;
     private int _started;
     private int _disposed;
+    private readonly ManualResetEventSlim _listening = new(false);
 
     public bool IsOwner { get; }
 
@@ -96,7 +97,17 @@ public sealed class ShrinkRequestQueue : IDisposable
         _cancel = new CancellationTokenSource();
         _listenTask = Task.Run(() => ListenLoop(_cancel.Token));
         _processTask = Task.Run(() => ProcessLoop(handler, _cancel.Token));
+
+        _listening.Wait(ListenReadyTimeout, _cancel.Token);
     }
+
+    /// <summary>
+    /// <see cref="StartOwning"/> dinleyici boru kurulana kadar bekler. Beklemeden donuyordu:
+    /// sahiplik kilidi alinmis ama boru henuz yokken gonderen ornek baglanmaya calisiyor ve
+    /// 5 sn'lik <see cref="Submit"/> zaman asimina dusuyordu. Kullanicinin gordugu sey,
+    /// ikinci pencerenin dosyayi ilkine gonderememesiydi.
+    /// </summary>
+    internal static readonly TimeSpan ListenReadyTimeout = TimeSpan.FromSeconds(10);
 
     public bool Submit(ShrinkRequest request, TimeSpan? timeout = null)
     {
@@ -135,6 +146,7 @@ public sealed class ShrinkRequestQueue : IDisposable
         {
             using var server = new NamedPipeServerStream(
                 _pipeName, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances);
+            _listening.Set();
             try
             {
                 server.WaitForConnectionAsync(token).GetAwaiter().GetResult();
@@ -206,6 +218,7 @@ public sealed class ShrinkRequestQueue : IDisposable
         if (Interlocked.Exchange(ref _disposed, 1) == 1) return;
 
         _cancel?.Cancel();
+        _listening.Set();
         _pending.CompleteAdding();
         try { Task.WaitAll(new[] { _listenTask, _processTask }.Where(t => t is not null).ToArray()!, TimeSpan.FromSeconds(5)); }
         catch (AggregateException) { }
@@ -213,5 +226,6 @@ public sealed class ShrinkRequestQueue : IDisposable
         _ownerLock.Dispose();
         _pending.Dispose();
         _cancel?.Dispose();
+        _listening.Dispose();
     }
 }

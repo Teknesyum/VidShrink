@@ -9,12 +9,16 @@ açıkça "bu kod kalkacak" diyor.
 
 ## En ağır
 
-1. `tests/VidShrink.Tests/OluUyeTests.cs:559-560` — Pim "MacUpdate.DownloadTimeout hiçbir
-   yerde okunmuyor" diyor, `src/VidShrink.Core/UpdateCheck.cs:1645` okuyor
-   (`Timeout = DownloadTimeout`). Denetim düzeneğinin kendisi yanlış iddiayı pimliyor;
-   kök neden tarayıcının nitelenmemiş okumayı görmemesi.
-2. `tests/VidShrink.Tests/OluUyeTests.cs:561-562` — Aynı kör noktanın ikincisi:
-   `UpdateCheck.ManifestTimeout` üretimde `UpdateCheck.cs:205`'te okunuyor.
+1. ~~Pim "MacUpdate.DownloadTimeout hiçbir yerde okunmuyor" diyor, `UpdateCheck.cs:1645`
+   okuyor.~~ **Kapandı:** kök neden tarayıcının yalnız `Tür.Üye` görünümünü aramasıydı;
+   bir alan kendi sınıfının içinden nitelenmeden okunuyor (`Timeout = DownloadTimeout`).
+   `MemberScan` artık üyenin **kendi türünü bildiren dosyada** çıplak adı da arıyor;
+   bildirim satırı okuma sayılmıyor. Ölçü üç alanı da kümeden düşürdü ve başka hiçbir
+   satır kaymadı — yani kör nokta kapandı, yanlış pozitif gelmedi.
+   `OluUyeTests.NitelenmemisOkumaGoruluyor` dosya ve satırı pimliyor.
+2. ~~Aynı kör noktanın ikincisi: `UpdateCheck.ManifestTimeout`.~~ **Kapandı:** aynı ölçüyle.
+   Üçüncüsü `DeveloperUnlock.Window` idi; gerekçesinde kör nokta zaten itiraf edilmişti.
+   Üç pim de kaldırıldı: düzenek artık yanlış bir iddiayı pimlemiyor.
 3. `src/VidShrink.Core/PlanCalculator.cs:146-149` — `IEncoderMeasurementState` kendini
    geçici ilan ediyor ama dört üretim yerinde tüketiliyor; T129 birleşince sökülecek iş
    her yeni çağrı yeriyle büyüyor.
@@ -48,8 +52,15 @@ açıkça "bu kod kalkacak" diyor.
 
 ## Orta
 
-11. `src/VidShrink.Core/HdrResolver.cs:5-10`, `PlanCalculator.cs:135-139`,
-    `MainWindow.axaml.cs:2709-2718` — "ölçülmedi" üçüncü durumu üç katmanda ayrı taşınıyor.
+11. ~~`src/VidShrink.Core/HdrResolver.cs:5-10`, `PlanCalculator.cs:135-139`,
+    `MainWindow.axaml.cs:2709-2718` — "ölçülmedi" üçüncü durumu üç katmanda ayrı
+    taşınıyor.~~ **Borç değil, hüküm:** iki bayrak iç içe bir küme, kopya değil.
+    `PlanCalculator.cs:1539/1566/1599/1641`'in dördü de `NotMeasured` ile
+    `CodecNotMeasured`'ı birlikte kuruyor; ayrıştıkları tek yer `:370`, HDR yolu yalnız
+    geniş olanı kuruyor — çünkü ölçülmemiş bir HDR kararı kodlayıcı seçimini geçici
+    yapmaz. Ayrım `:292-295`'te yazılı ve `CodecLockTests` ile
+    `EncoderStateConsumptionTests` iki bayrağı ayrı ayrı pimliyor. Birleştirmek HDR
+    ayrımını kaybettirirdi.
 12. `OluUyeTests.cs:543-544` — `FfmpegArguments.SceneMapRuleOfRecord` üretimde sıfır,
     ölçüm tarafında beş görünüm.
 13. `OluUyeTests.cs:775-778` — `IdetCounts.Progressive` / `.Undetermined` ayrıştırılıyor,

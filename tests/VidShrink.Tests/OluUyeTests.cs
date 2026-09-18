@@ -142,12 +142,32 @@ internal static class MemberScan
                 .OrderBy(p => p, StringComparer.Ordinal)
                 .ToList();
 
+    /// <summary>
+    /// Turun kendi dosyasi: nitelenmemis okumayi ancak burada aramak guvenli. Ayni ad baska
+    /// bir dosyada bambaska bir yerel degiskeni gosterebilir.
+    /// </summary>
+    private static readonly Regex TurBildirimi =
+        new(@"\b(?:class|struct|record|enum|interface)\s+([A-Za-z_][A-Za-z0-9_]*)", RegexOptions.Compiled);
+
+    /// <summary>Bildirim satirinin kendisi okuma degildir: <c>readonly TimeSpan Window =</c>.</summary>
+    private static readonly Regex AlanBildirimi =
+        new(@"\b(?:readonly|const)\s+[\w<>?\[\],.]+\s+$", RegexOptions.Compiled);
+
     internal static IReadOnlyList<MemberVerdict> Scan()
     {
         var files = SourceFiles();
         var outside = OutsideFiles().ToDictionary(f => f, f => Strip(File.ReadAllText(f)), StringComparer.Ordinal);
         var stripped = files.ToDictionary(f => f, f => Strip(File.ReadAllText(f)), StringComparer.Ordinal);
         var raw = files.ToDictionary(f => f, f => File.ReadAllText(f), StringComparer.Ordinal);
+
+        var declares = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        foreach (var file in files)
+            foreach (Match match in TurBildirimi.Matches(stripped[file]))
+            {
+                var ad = match.Groups[1].Value;
+                if (!declares.TryGetValue(ad, out var liste)) declares[ad] = liste = new List<string>();
+                if (!liste.Contains(file, StringComparer.Ordinal)) liste.Add(file);
+            }
 
         var verdicts = new List<MemberVerdict>();
         foreach (var member in Members())
@@ -169,6 +189,25 @@ internal static class MemberScan
                 foreach (Match match in pattern.Matches(raw[file]))
                     if (!kept.Contains(match.Index))
                         masked.Add($"{Relative(file)}:{LineOf(raw[file], match.Index)}  {LineText(raw[file], match.Index)}");
+            }
+
+            if (member.Kind == "alan" && declares.TryGetValue(member.Type, out var kendiDosyalari))
+            {
+                var ciplak = new Regex($@"(?<![.\w]){Regex.Escape(member.Name)}\b", RegexOptions.Compiled);
+                foreach (var file in kendiDosyalari)
+                {
+                    var text = stripped[file];
+                    var ad = Relative(file);
+                    foreach (Match match in ciplak.Matches(text))
+                    {
+                        if (AlanBildirimi.IsMatch(text[Math.Max(0, match.Index - 48)..match.Index])) continue;
+
+                        var satir = LineOf(text, match.Index);
+                        if (uses.Any(u => u.File == ad && u.Line == satir)) continue;
+
+                        uses.Add(new MemberUse(ad, satir, true, "nitelenmemis-okuma", LineText(text, match.Index)));
+                    }
+                }
             }
 
             var outsideUses = outside.Values.Sum(text => pattern.Matches(text).Count);
@@ -544,8 +583,6 @@ public sealed class OluUyeTests
             "Uretimde sifir gorunum, testlerde ve araclarda bes. Bu sinifin en saf hali: alani ayakta tutan tek taraf olcum tarafi. Dusurmek olcum duzenegini kirar, karar ayri sozlesme."),
         new("AudioSourceRole.SystemAudio", "varsayilan-kol", Legitimate,
             "Iki degerli rolun olumsuz kolu. 8d ses girdisini motora baglayip secim yuzeyini acinca kardes uye tuketiciye kavustu: RecorderView.Ses.cs:62 'role == AudioSourceRole.Microphone ? CmbMicrophone : CmbSystemAudio' diye soruyor, sistem sesi o kosulun else'i. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; sistem sesini ayrica adlandirmak ayni kutuyu iki yere yazardi."),
-        new("DeveloperUnlock.Window", "yalniz-disarida", Legitimate,
-            "Uretimde okunuyor ama nitelenmeden: DeveloperUnlock.cs:22 kendi sinifinin icinden \"now - _last <= Window\" diye soruyor, tarama ise Tur.Uye gorunumu ariyor. Nitelenmis tek gorunum GelistiriciSekmesiTests.cs:28 ve :50, pencere sinirini tam degerinden okuyan olculer. Uyeyi public tutan sebep budur: esik disaridan okunabilsin, olcu sabiti kendi kopyalamasin."),
         new("PresetKind.General", "hic-gorunmeyen", Debt,
             "HandBrake A2 on ayar kutuphanesi: uye yalniz gomulu Presets/platformlar.json'da yaziliyor (JSON dizgisinden okunuyor), C# tarafinda adi gecmiyor. Profilleri turune gore ayiran okuyucu on ayar listesi arayuzu; arayuz A2'nin disinda."),
         new("PresetKind.Device", "yalniz-disarida", Debt,
@@ -556,10 +593,6 @@ public sealed class OluUyeTests
             "PresetLibrary.Import ve SaveUser disaridan gelen profili bu uyeye ceviriyor (uretim), turune gore ayiran kol yok. Kullanici on ayarlarini yerlesiklerden ayiran liste arayuzle gelir."),
         new("PresetSourceStatus.Code", "varsayilan-kol", Legitimate,
             "Iki degerli kaynak durumunun olumsuz kolu. PresetLibrary.Validate 'Status == PresetSourceStatus.Official' diye sorup resmi kaynaga adres sartini koyuyor; Code o kosulun else'i, adresi olmayabilir."),
-        new("MacUpdate.DownloadTimeout", "hic-gorunmeyen", Legitimate,
-            "Eski gerekce 'hicbir yerde okunmuyor' diyordu, olcum aksini gosterdi: UpdateCheck.cs:1645 kendi sinifinin icinden 'Timeout = DownloadTimeout' diye okuyor, tarama ise Tur.Uye gorunumu ariyor. Ayni kor nokta DeveloperUnlock.Window satirinda da itiraf edilmis."),
-        new("UpdateCheck.ManifestTimeout", "yalniz-disarida", Legitimate,
-            "Ayni kor noktanin ikincisi: UpdateCheck.cs:205 bildirimden dort satir sonra 'Timeout = ManifestTimeout' diye okuyor. Uretimde sifir gorunum iddiasi nitelenmemis okumayi saymamaktan geliyordu."),
         new("EncoderPathOverride.Software", "varsayilan-kol", Legitimate,
             "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli.")
     };
@@ -590,6 +623,41 @@ public sealed class OluUyeTests
         foreach (var line in found) _output.WriteLine(line);
 
         Assert.Equal(expected, found);
+    }
+
+    /// <summary>
+    /// Kod borcu 1-2'nin kapanisi. Tarama <c>Tur.Uye</c> gorunumu ariyordu, oysa bir alan kendi
+    /// sinifinin icinden nitelenmeden okunur: <c>Timeout = ManifestTimeout</c>. Uc pim bu kor
+    /// noktayi gerekce satirinda itiraf ediyordu — yani duzenek yanlis bir iddiayi pimliyordu.
+    ///
+    /// Olcu, uc alanin da artik nitelenmemis okumasinin gorundugunu ve okumanin bildirim
+    /// satirindan gelmedigini sayar. Tarayicinin kor olmadigi, bildirimin kendisinin okuma
+    /// sayilmadigiyla birlikte pimli: sayilsaydi her alan kendiliginden tuketilmis olurdu.
+    /// </summary>
+    [Fact]
+    public void NitelenmemisOkumaGoruluyor()
+    {
+        var hepsi = MemberScan.Scan().ToDictionary(v => v.Member.ToString(), StringComparer.Ordinal);
+
+        foreach (var (ad, dosya, satir) in new[]
+                 {
+                     ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 205),
+                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1645),
+                     ("DeveloperUnlock.Window", "src/VidShrink.Core/DeveloperUnlock.cs", 22)
+                 })
+        {
+            var hukum = hepsi[ad];
+            var okuma = Assert.Single(hukum.Uses, u => u.Rule == "nitelenmemis-okuma");
+
+            Assert.Equal(dosya, okuma.File);
+            Assert.Equal(satir, okuma.Line);
+            Assert.True(okuma.Consumer);
+            Assert.False(hukum.Flagged, $"{ad} hala isaretli: {hukum.Shape}");
+        }
+
+        Assert.DoesNotContain(
+            hepsi["UpdateCheck.ManifestTimeout"].Uses,
+            u => u.Text.Contains("static readonly", StringComparison.Ordinal));
     }
 
     /// <summary>

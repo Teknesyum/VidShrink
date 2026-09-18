@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.IO.Pipes;
 using VidShrink.Core;
 
@@ -215,6 +215,35 @@ public sealed class QueueTests
         Assert.Equal(5, seen.Length);
         Assert.Equal(expected.OrderBy(x => x), seen.OrderBy(x => x));
         Assert.Equal(seen.Length, seen.Distinct().Count());
+    }
+
+    /// <summary>
+    /// Sahiplik kilidi ile dinleyici boru arasindaki dikis. <c>StartOwning</c> boruyu kurmadan
+    /// donuyordu; gonderen ornek hemen baglanmaya calisinca 5 sn'lik zaman asimina dusup
+    /// dosyayi kaybediyordu. CI'nin yuklu tam suitinde <c>K5</c> tam bu yuzden kirmizi oldu
+    /// (kosum 35368827545, "sira-0.mp4 onaylanmadi", 5 sn).
+    ///
+    /// Olcu yarisi beklemeye birakmaz: baglanma zaman asimi sifir. Kapi kalkarsa boru o anda
+    /// yoktur ve olcu her kosulda kirmizidir; kapi varsa boru bekliyordur ve sifir yeter.
+    /// Kapiyi kaldirmak olculdu: 1/1 kirmizi, "boru henuz dinlemiyor".
+    /// </summary>
+    [Fact]
+    public void K5_owner_is_listening_before_StartOwning_returns()
+    {
+        var channel = Channel();
+        using var owner = new ShrinkRequestQueue(channel);
+        var gorulen = new ConcurrentQueue<string>();
+        var done = new CountdownEvent(1);
+
+        owner.StartOwning(request => { gorulen.Enqueue(request.Path); done.Signal(); });
+
+        using var sender = new ShrinkRequestQueue(channel);
+        Assert.True(
+            sender.Submit(new ShrinkRequest(500, "ilk.mp4"), TimeSpan.Zero),
+            "Sahip StartOwning'den dondugu halde boru henuz dinlemiyor.");
+
+        Assert.True(done.Wait(TimeSpan.FromSeconds(15)), "Istek zamaninda islenmedi.");
+        Assert.Equal(new[] { "ilk.mp4" }, gorulen.ToArray());
     }
 
     [Fact]
