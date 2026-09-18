@@ -1037,6 +1037,7 @@ public class AltyaziIndirmeTests
         Assert.True(izlenen.Count > 500, "git ls-files depoyu okumadi, tarama kor kalirdi: " + izlenen.Count);
 
         var suclular = new List<string>();
+        var bolunmusSuclular = new List<string>();
         foreach (var bagil in izlenen)
         {
             if (!uzantilar.Contains(Path.GetExtension(bagil), StringComparer.OrdinalIgnoreCase)) continue;
@@ -1046,7 +1047,17 @@ public class AltyaziIndirmeTests
             {
                 if (AnahtarKokuyor(satir)) suclular.Add(bagil + ": " + satir.Trim());
             }
+
+            if (PozitifKontrolDosyalari.Contains(bagil, StringComparer.OrdinalIgnoreCase)) continue;
+            foreach (var satir in Birlestir(File.ReadAllText(dosya)))
+            {
+                if (AnahtarKokuyor(satir)) bolunmusSuclular.Add(bagil + ": " + satir.Trim());
+            }
         }
+
+        var muafSayilari = PozitifKontrolDosyalari
+            .Select(d => Birlestir(File.ReadAllText(Path.Combine(GirdiKanit.Root, d))).Count(AnahtarKokuyor))
+            .ToArray();
 
         // Pozitif kontrol: tarayici gercek bicimli bir anahtari yakaliyor mu. Yakalamasaydi
         // bos liste "temiz" degil "kor" demek olurdu. Iki bicim de sinanir: tirnakli kod
@@ -1062,12 +1073,17 @@ public class AltyaziIndirmeTests
             (suclular.Count == 0 ? "temiz" : string.Join("\n", suclular))
             + "\npozitif kontrol: " + AnahtarKokuyor(gomulu)
             + "\ntel kaydi: " + AnahtarKokuyor(telKaydi)
-            + "\nayar alani: " + AnahtarKokuyor(alan));
+            + "\nayar alani: " + AnahtarKokuyor(alan)
+            + "\nbolunmus kol: " + (bolunmusSuclular.Count == 0 ? "temiz" : string.Join("\n", bolunmusSuclular))
+            + "\nbolunmus kolun muaf dosyalarda yakaladigi: " + string.Join(" ", muafSayilari));
 
         Assert.True(AnahtarKokuyor(gomulu), "tarayici gomulu anahtari kaciriyor");
         Assert.True(AnahtarKokuyor(telKaydi), "tarayici tirnaksiz tel kaydi anahtarini kaciriyor");
         Assert.False(AnahtarKokuyor(alan), "tarayici ayar alan adini anahtar saniyor");
+        Assert.All(muafSayilari, sayi => Assert.True(sayi > 0, "muaf dosya birlestiren kolu hic tetiklemiyor, muafiyet olu"));
+        Assert.True(muafSayilari[0] >= 2, "birlestiren kol bolunmus pozitif kontrolleri kaciriyor: " + muafSayilari[0]);
         Assert.Empty(suclular);
+        Assert.Empty(bolunmusSuclular);
 
         AltyaziKanit.Kapat("anahtar-taramasi.txt");
     }
@@ -1104,6 +1120,30 @@ public class AltyaziIndirmeTests
         return cikti.Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s.Trim().Replace('/', Path.DirectorySeparatorChar))
             .ToList();
+    }
+
+    /// <summary>
+    /// Birleştiren kolun muaf tuttuğu dosyalar: ikisi de bölünmüş yazmayı <b>bilerek</b>
+    /// kullanan ölçüler. Liste kapalı; her üyesinin kolu gerçekten tetiklediği
+    /// <c>kendisi</c> sayısıyla pimli, yoksa muafiyet sessizce ölü bir kol olurdu.
+    /// </summary>
+    private static readonly string[] PozitifKontrolDosyalari =
+    [
+        Path.Combine("tests", "VidShrink.Tests", "AltyaziIndirmeTests.cs"),
+        Path.Combine("tests", "VidShrink.Tests", "AltyaziOturumTests.cs"),
+    ];
+
+    /// <summary>
+    /// Satır bazlı tarama <c>"abc" + "def"</c> diye ikiye bölünmüş bir sırrı kaçırıyordu.
+    /// Bu kol bitişik dizi birleştirmelerini (satır sonunu geçenler dahil) kapatıp sonucu
+    /// yeniden satırlara bölüyor, sonra aynı tarayıcı koşuyor. Muaf tutulan tek dosya bu
+    /// ölçünün kendisi: pozitif kontrolleri orada bilerek bölünmüş duruyor, ve muafiyet
+    /// kaldırılınca kolun onları yakaladığı <c>kendisi</c> sayısıyla pimli.
+    /// </summary>
+    private static string[] Birlestir(string metin)
+    {
+        var kapali = System.Text.RegularExpressions.Regex.Replace(metin, "\"\\s*\\+\\s*\"", string.Empty);
+        return kapali.Split('\n');
     }
 
     private static bool AnahtarKokuyor(string satir)
