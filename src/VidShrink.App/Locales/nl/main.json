@@ -112,7 +112,7 @@
   "main.codec.label": "Compressiealgoritme",
   "main.codec.automatic": "Automatisch",
   "main.codec.compatible": "H.264 (compatibel)",
-  "main.codec.smallest": "H.265 (kleinst)",
+  "main.codec.smallest": "AV1 (kleinst)",
 
   "main.allow.resolution": "Mag resolutie verlagen",
   "main.whatsapp-compatible": "WhatsApp-compatibel (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Bijsnijden en opslaan",
   "main.run.accepted-larger": "Groter geaccepteerd: {0} MB boven het doel van {1} MB.",
   "main.run.trimmed": "{0} s is bijgesneden om binnen het doel te passen; lengte {1} → {2}.",
+  "main.run.whatsapp-document": "Stuur het op WhatsApp als document, niet als video: zo wordt het hercoderen in de chat overgeslagen en ziet de ander deze kwaliteit ongewijzigd.",
 
   "main.run.no-space": "Niet genoeg vrije ruimte op de doelschijf; er is minstens {0} MB nodig.",
   "main.run.done": "Klaar in {0} poging(en). {1} MB → {2} MB ({3}% kleiner).",

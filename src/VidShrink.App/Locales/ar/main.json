@@ -112,7 +112,7 @@
   "main.codec.label": "خوارزمية الضغط",
   "main.codec.automatic": "تلقائي",
   "main.codec.compatible": "H.264 (متوافق)",
-  "main.codec.smallest": "H.265 (الأصغر)",
+  "main.codec.smallest": "AV1 (الأصغر)",
 
   "main.allow.resolution": "يجوز خفض الدقة",
   "main.whatsapp-compatible": "متوافق مع WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "قص وحفظ",
   "main.run.accepted-larger": "تم قبول حجم أكبر: {0} MB فوق الهدف البالغ {1} MB.",
   "main.run.trimmed": "تم قص {0} ث لملاءمة الهدف؛ المدة {1} → {2}.",
+  "main.run.whatsapp-document": "أرسِل هذا إلى واتساب كمستند لا كفيديو: هذا يتجاوز إعادة الترميز داخل المحادثة، فيرى الطرف الآخر هذه الجودة كما هي.",
 
   "main.run.no-space": "لا توجد مساحة حرة كافية على القرص الهدف؛ يلزم {0} م.ب على الأقل.",
   "main.run.done": "تم في {0} محاولة. {1} م.ب → {2} م.ب (أصغر بنسبة {3}%).",

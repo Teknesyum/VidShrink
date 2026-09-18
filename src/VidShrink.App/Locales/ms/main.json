@@ -112,7 +112,7 @@
   "main.codec.label": "Algoritma pemampatan",
   "main.codec.automatic": "Automatik",
   "main.codec.compatible": "H.264 (serasi)",
-  "main.codec.smallest": "H.265 (terkecil)",
+  "main.codec.smallest": "AV1 (terkecil)",
 
   "main.allow.resolution": "Boleh turunkan resolusi",
   "main.whatsapp-compatible": "Serasi dengan WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Pangkas dan simpan",
   "main.run.accepted-larger": "Diterima lebih besar: {0} MB melebihi sasaran {1} MB.",
   "main.run.trimmed": "{0} s telah dipangkas supaya sesuai dengan sasaran; tempoh {1} → {2}.",
+  "main.run.whatsapp-document": "Hantar ke WhatsApp sebagai dokumen, bukan sebagai video: cara ini melangkau pengekodan semula dalam sembang, jadi pihak lain melihat kualiti ini seadanya.",
 
   "main.run.no-space": "Ruang kosong tidak mencukupi pada pemacu sasaran; sekurang-kurangnya {0} MB diperlukan.",
   "main.run.done": "Selesai dalam {0} cubaan. {1} MB → {2} MB ({3}% lebih kecil).",

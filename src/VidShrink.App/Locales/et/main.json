@@ -112,7 +112,7 @@
   "main.codec.label": "Tihendusalgoritm",
   "main.codec.automatic": "Automaatne",
   "main.codec.compatible": "H.264 (ühilduv)",
-  "main.codec.smallest": "H.265 (väikseim)",
+  "main.codec.smallest": "AV1 (väikseim)",
 
   "main.allow.resolution": "Võib eraldusvõimet vähendada",
   "main.whatsapp-compatible": "WhatsAppiga ühilduv (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Kärbi ja salvesta",
   "main.run.accepted-larger": "Nõustuti suuremaga: {0} MB üle {1} MB eesmärgi.",
   "main.run.trimmed": "{0} s kärbiti, et mahutada eesmärki; kestus {1} → {2}.",
+  "main.run.whatsapp-document": "Saada see WhatsAppi dokumendina, mitte videona: nii jääb vestluse ümberkodeerimine vahele ja teine pool näeb seda kvaliteeti muutmata.",
 
   "main.run.no-space": "Sihtkettal pole piisavalt vaba ruumi; vaja on vähemalt {0} MB.",
   "main.run.done": "Valmis {0} katsega. {1} MB → {2} MB ({3}% väiksem).",

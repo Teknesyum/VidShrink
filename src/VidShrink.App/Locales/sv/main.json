@@ -112,7 +112,7 @@
   "main.codec.label": "Komprimeringsalgoritm",
   "main.codec.automatic": "Automatisk",
   "main.codec.compatible": "H.264 (kompatibel)",
-  "main.codec.smallest": "H.265 (minst)",
+  "main.codec.smallest": "AV1 (minst)",
 
   "main.allow.resolution": "Får sänka upplösning",
   "main.whatsapp-compatible": "WhatsApp-kompatibel (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Beskär och spara",
   "main.run.accepted-larger": "Accepterade större: {0} MB över målet på {1} MB.",
   "main.run.trimmed": "{0} s beskars för att passa målet; längd {1} → {2}.",
+  "main.run.whatsapp-document": "Skicka den till WhatsApp som ett dokument, inte som en video: då hoppas omkodningen i chatten över och mottagaren ser den här kvaliteten oförändrad.",
 
   "main.run.no-space": "Inte tillräckligt ledigt utrymme på målenheten; minst {0} MB behövs.",
   "main.run.done": "Klart på {0} försök. {1} MB → {2} MB ({3}% mindre).",

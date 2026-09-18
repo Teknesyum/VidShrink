@@ -112,7 +112,7 @@
   "main.codec.label": "อัลกอริทึมบีบอัด",
   "main.codec.automatic": "อัตโนมัติ",
   "main.codec.compatible": "H.264 (เข้ากันได้)",
-  "main.codec.smallest": "H.265 (เล็กที่สุด)",
+  "main.codec.smallest": "AV1 (เล็กที่สุด)",
 
   "main.allow.resolution": "ลดความละเอียดได้",
   "main.whatsapp-compatible": "ใช้งานร่วมกับ WhatsApp ได้ (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "ตัดและบันทึก",
   "main.run.accepted-larger": "ยอมรับไฟล์ที่ใหญ่กว่า เกินเป้าหมาย {1} MB ไป {0} MB",
   "main.run.trimmed": "ตัด {0} วิ เพื่อให้พอดีกับเป้าหมาย ความยาว {1} → {2}",
+  "main.run.whatsapp-document": "ส่งไปยัง WhatsApp เป็นเอกสารแทนวิดีโอ: วิธีนี้ข้ามการเข้ารหัสซ้ำในแชท อีกฝ่ายจึงเห็นคุณภาพนี้อย่างที่เป็น",
 
   "main.run.no-space": "พื้นที่ว่างบนไดรฟ์ปลายทางไม่พอ ต้องการอย่างน้อย {0} MB",
   "main.run.done": "เสร็จใน {0} ครั้ง {1} MB → {2} MB (เล็กลง {3}%)",

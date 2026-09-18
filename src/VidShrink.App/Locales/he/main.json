@@ -112,7 +112,7 @@
   "main.codec.label": "אלגוריתם דחיסה",
   "main.codec.automatic": "אוטומטי",
   "main.codec.compatible": "H.264 (תואם)",
-  "main.codec.smallest": "H.265 (הקטן ביותר)",
+  "main.codec.smallest": "AV1 (הקטן ביותר)",
 
   "main.allow.resolution": "מותר להוריד רזולוציה",
   "main.whatsapp-compatible": "תואם WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "חתוך ושמור",
   "main.run.accepted-larger": "התקבל גדול יותר: {0} MB מעל היעד של {1} MB.",
   "main.run.trimmed": "נחתכו {0} שנ' כדי להתאים ליעד; אורך {1} → {2}.",
+  "main.run.whatsapp-document": "שלחו את הקובץ ב-WhatsApp כמסמך ולא כסרטון: כך עוקפים את הקידוד מחדש בצ'אט, והצד השני רואה את האיכות הזו כפי שהיא.",
 
   "main.run.no-space": "אין מספיק מקום פנוי בכונן היעד; נדרשים לפחות {0} MB.",
   "main.run.done": "הסתיים ב-{0} ניסיון/ות. {1} MB → {2} MB (קטן ב-{3}%).",

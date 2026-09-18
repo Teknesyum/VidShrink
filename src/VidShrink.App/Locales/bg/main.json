@@ -112,7 +112,7 @@
   "main.codec.label": "Алгоритъм за компресия",
   "main.codec.automatic": "Автоматично",
   "main.codec.compatible": "H.264 (съвместим)",
-  "main.codec.smallest": "H.265 (най-малък)",
+  "main.codec.smallest": "AV1 (най-малък)",
 
   "main.allow.resolution": "Може да намали резолюцията",
   "main.whatsapp-compatible": "Съвместимо с WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Изрежи и запази",
   "main.run.accepted-larger": "Приет по-голям: {0} MB над целта от {1} MB.",
   "main.run.trimmed": "{0} с бяха изрязани, за да пасне на целта; продължителност {1} → {2}.",
+  "main.run.whatsapp-document": "Изпратете го в WhatsApp като документ, а не като видео: така се прескача прекодирането в чата и отсрещната страна вижда това качество без промяна.",
 
   "main.run.no-space": "Няма достатъчно свободно място на целевия диск; нужни са поне {0} MB.",
   "main.run.done": "Готово за {0} опит(а). {1} MB → {2} MB ({3}% по-малко).",

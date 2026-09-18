@@ -112,7 +112,7 @@
   "main.codec.label": "Algoritm de comprimare",
   "main.codec.automatic": "Automat",
   "main.codec.compatible": "H.264 (compatibil)",
-  "main.codec.smallest": "H.265 (cel mai mic)",
+  "main.codec.smallest": "AV1 (cel mai mic)",
 
   "main.allow.resolution": "Poate reduce rezoluția",
   "main.whatsapp-compatible": "Compatibil WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Decupează și salvează",
   "main.run.accepted-larger": "Acceptat mai mare: {0} MB peste ținta de {1} MB.",
   "main.run.trimmed": "{0} s au fost tăiate pentru a se încadra în țintă; durata {1} → {2}.",
+  "main.run.whatsapp-document": "Trimite-l pe WhatsApp ca document, nu ca videoclip: astfel se sare peste recodificarea din conversație, iar celălalt vede această calitate așa cum este.",
 
   "main.run.no-space": "Nu este destul spațiu liber pe unitatea țintă; sunt necesari cel puțin {0} MB.",
   "main.run.done": "Gata în {0} încercare(ări). {1} MB → {2} MB ({3}% mai mic).",

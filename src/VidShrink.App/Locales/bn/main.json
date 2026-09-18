@@ -112,7 +112,7 @@
   "main.codec.label": "সংকোচন অ্যালগরিদম",
   "main.codec.automatic": "স্বয়ংক্রিয়",
   "main.codec.compatible": "H.264 (সামঞ্জস্যপূর্ণ)",
-  "main.codec.smallest": "H.265 (সবচেয়ে ছোট)",
+  "main.codec.smallest": "AV1 (সবচেয়ে ছোট)",
 
   "main.allow.resolution": "রেজোলিউশন কমাতে পারে",
   "main.whatsapp-compatible": "WhatsApp-এর সাথে সামঞ্জস্যপূর্ণ (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "ছেঁটে সংরক্ষণ করুন",
   "main.run.accepted-larger": "বড়টি গ্রহণ করা হয়েছে: লক্ষ্য {1} MB-এর চেয়ে {0} MB বেশি।",
   "main.run.trimmed": "লক্ষ্যে ফিট করতে {0} সে ছাঁটা হয়েছে; দৈর্ঘ্য {1} → {2}।",
+  "main.run.whatsapp-document": "WhatsApp-এ এটি ভিডিও হিসেবে নয়, ডকুমেন্ট হিসেবে পাঠান: এতে চ্যাটের পুনঃএনকোডিং এড়ানো যায়, আর অন্য পক্ষ এই মানটিই অবিকৃত দেখে।",
 
   "main.run.no-space": "লক্ষ্য ড্রাইভে যথেষ্ট খালি জায়গা নেই; অন্তত {0} MB দরকার।",
   "main.run.done": "{0} চেষ্টায় সম্পন্ন। {1} MB → {2} MB ({3}% ছোট)।",

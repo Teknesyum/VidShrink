@@ -112,7 +112,7 @@
   "main.codec.label": "Thuật toán nén",
   "main.codec.automatic": "Tự động",
   "main.codec.compatible": "H.264 (tương thích)",
-  "main.codec.smallest": "H.265 (nhỏ nhất)",
+  "main.codec.smallest": "AV1 (nhỏ nhất)",
 
   "main.allow.resolution": "Cho phép hạ độ phân giải",
   "main.whatsapp-compatible": "Tương thích WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Cắt và lưu",
   "main.run.accepted-larger": "Đã chấp nhận bản lớn hơn: {0} MB vượt mục tiêu {1} MB.",
   "main.run.trimmed": "{0} giây đã bị cắt để vừa mục tiêu; thời lượng {1} → {2}.",
+  "main.run.whatsapp-document": "Hãy gửi tệp này trên WhatsApp dưới dạng tài liệu thay vì video: cách này bỏ qua việc mã hóa lại trong cuộc trò chuyện, nên bên kia thấy đúng chất lượng này.",
 
   "main.run.no-space": "Ổ đích không đủ chỗ trống; cần ít nhất {0} MB.",
   "main.run.done": "Xong sau {0} lần thử. {1} MB → {2} MB (nhỏ hơn {3}%).",

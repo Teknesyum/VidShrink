@@ -112,7 +112,7 @@
   "main.codec.label": "Kompresní algoritmus",
   "main.codec.automatic": "Automaticky",
   "main.codec.compatible": "H.264 (kompatibilní)",
-  "main.codec.smallest": "H.265 (nejmenší)",
+  "main.codec.smallest": "AV1 (nejmenší)",
 
   "main.allow.resolution": "Smí snížit rozlišení",
   "main.whatsapp-compatible": "Kompatibilní s WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Oříznout a uložit",
   "main.run.accepted-larger": "Přijato větší: {0} MB nad cílem {1} MB.",
   "main.run.trimmed": "{0} s bylo oříznuto, aby se vešlo do cíle; délka {1} → {2}.",
+  "main.run.whatsapp-document": "Odešlete to na WhatsApp jako dokument, ne jako video: tím se obejde překódování v chatu a druhá strana uvidí tuto kvalitu beze změny.",
 
   "main.run.no-space": "Na cílovém disku není dost volného místa; je potřeba nejméně {0} MB.",
   "main.run.done": "Hotovo za {0} pokus(ů). {1} MB → {2} MB (o {3} % menší).",

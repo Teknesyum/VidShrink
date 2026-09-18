@@ -112,7 +112,7 @@
   "main.codec.label": "Algoritem stiskanja",
   "main.codec.automatic": "Samodejno",
   "main.codec.compatible": "H.264 (združljiv)",
-  "main.codec.smallest": "H.265 (najmanjši)",
+  "main.codec.smallest": "AV1 (najmanjši)",
 
   "main.allow.resolution": "Sme znižati ločljivost",
   "main.whatsapp-compatible": "Združljivo z WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Obreži in shrani",
   "main.run.accepted-larger": "Sprejeto večje: {0} MB nad ciljem {1} MB.",
   "main.run.trimmed": "{0} s je bilo obrezanih, da ustreza cilju; dolžina {1} → {2}.",
+  "main.run.whatsapp-document": "Pošljite to v WhatsAppu kot dokument, ne kot videoposnetek: tako se izogne prekodiranju v pogovoru in druga stran vidi to kakovost nespremenjeno.",
 
   "main.run.no-space": "Na ciljnem pogonu ni dovolj prostora; potrebnih je vsaj {0} MB.",
   "main.run.done": "Končano v {0} poskusih. {1} MB → {2} MB ({3} % manj).",

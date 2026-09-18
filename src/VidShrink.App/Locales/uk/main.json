@@ -112,7 +112,7 @@
   "main.codec.label": "Алгоритм стиснення",
   "main.codec.automatic": "Автоматично",
   "main.codec.compatible": "H.264 (сумісний)",
-  "main.codec.smallest": "H.265 (найменший)",
+  "main.codec.smallest": "AV1 (найменший)",
 
   "main.allow.resolution": "Можна знизити роздільність",
   "main.whatsapp-compatible": "Сумісно з WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Обрізати і зберегти",
   "main.run.accepted-larger": "Прийнято більший: {0} MB понад ціль {1} MB.",
   "main.run.trimmed": "{0} с обрізано, щоб вкластися в ціль; тривалість {1} → {2}.",
+  "main.run.whatsapp-document": "Надішліть це у WhatsApp документом, а не відео: так перекодування в чаті пропускається, і співрозмовник бачить цю якість без змін.",
 
   "main.run.no-space": "Недостатньо вільного місця на цільовому диску; потрібно щонайменше {0} МБ.",
   "main.run.done": "Готово за {0} спроб. {1} МБ → {2} МБ (на {3}% менше).",

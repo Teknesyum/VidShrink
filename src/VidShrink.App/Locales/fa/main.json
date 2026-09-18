@@ -112,7 +112,7 @@
   "main.codec.label": "الگوریتم فشرده‌سازی",
   "main.codec.automatic": "خودکار",
   "main.codec.compatible": "H.264 (سازگار)",
-  "main.codec.smallest": "H.265 (کوچک‌ترین)",
+  "main.codec.smallest": "AV1 (کوچک‌ترین)",
 
   "main.allow.resolution": "کاهش وضوح مجاز",
   "main.whatsapp-compatible": "سازگار با WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "برش و ذخیره",
   "main.run.accepted-larger": "نسخهٔ بزرگ‌تر پذیرفته شد: {0} MB بیشتر از هدف {1} MB.",
   "main.run.trimmed": "{0} ث برای تناسب با هدف بریده شد؛ مدت {1} → {2}.",
+  "main.run.whatsapp-document": "این را در WhatsApp به‌جای ویدیو به‌صورت سند بفرستید: با این کار رمزگذاری دوبارهٔ گفتگو دور زده می‌شود و طرف مقابل همین کیفیت را بدون تغییر می‌بیند.",
 
   "main.run.no-space": "فضای آزاد درایو مقصد کافی نیست؛ دست‌کم {0} MB لازم است.",
   "main.run.done": "در {0} تلاش انجام شد. {1} MB → {2} MB ({3}% کوچک‌تر).",

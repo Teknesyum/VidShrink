@@ -112,7 +112,7 @@
   "main.codec.label": "சுருக்க வழிமுறை",
   "main.codec.automatic": "தானியங்கி",
   "main.codec.compatible": "H.264 (இணக்கமானது)",
-  "main.codec.smallest": "H.265 (மிகச் சிறியது)",
+  "main.codec.smallest": "AV1 (மிகச் சிறியது)",
 
   "main.allow.resolution": "தெளிவுத்திறனைக் குறைக்கலாம்",
   "main.whatsapp-compatible": "WhatsApp உடன் இணக்கமானது (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "வெட்டி சேமி",
   "main.run.accepted-larger": "பெரியது ஏற்கப்பட்டது: இலக்கு {1} MB ஐ விட {0} MB அதிகம்.",
   "main.run.trimmed": "இலக்கிற்கு பொருந்த {0} வி வெட்டப்பட்டது; நீளம் {1} → {2}.",
+  "main.run.whatsapp-document": "இதை WhatsApp-இல் வீடியோவாக அல்ல, ஆவணமாக அனுப்புங்கள்: இதனால் அரட்டையின் மறு குறியாக்கம் தவிர்க்கப்படும், மறுபக்கம் இந்தத் தரத்தையே அப்படியே காணும்.",
 
   "main.run.no-space": "இலக்கு இயக்கியில் போதுமான இடம் இல்லை; குறைந்தது {0} MB தேவை.",
   "main.run.done": "{0} முயற்சியில் முடிந்தது. {1} MB → {2} MB ({3}% சிறியது).",

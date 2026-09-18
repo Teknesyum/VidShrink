@@ -112,7 +112,7 @@
   "main.codec.label": "Pakkausalgoritmi",
   "main.codec.automatic": "Automaattinen",
   "main.codec.compatible": "H.264 (yhteensopiva)",
-  "main.codec.smallest": "H.265 (pienin)",
+  "main.codec.smallest": "AV1 (pienin)",
 
   "main.allow.resolution": "Saa laskea tarkkuutta",
   "main.whatsapp-compatible": "WhatsApp-yhteensopiva (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Rajaa ja tallenna",
   "main.run.accepted-larger": "Hyväksyttiin suurempana: {0} MB yli {1} MB:n tavoitteen.",
   "main.run.trimmed": "{0} s leikattiin tavoitteeseen sopimiseksi; kesto {1} → {2}.",
+  "main.run.whatsapp-document": "Lähetä tiedosto WhatsAppiin dokumenttina eikä videona: näin keskustelun uudelleenkoodaus ohitetaan ja vastaanottaja näkee tämän laadun sellaisenaan.",
 
   "main.run.no-space": "Kohdeasemalla ei ole tarpeeksi vapaata tilaa; tarvitaan vähintään {0} MB.",
   "main.run.done": "Valmis {0} yrityksellä. {1} MB → {2} MB ({3} % pienempi).",

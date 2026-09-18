@@ -112,7 +112,7 @@
   "main.codec.label": "压缩算法",
   "main.codec.automatic": "自动",
   "main.codec.compatible": "H.264（兼容）",
-  "main.codec.smallest": "H.265（最小）",
+  "main.codec.smallest": "AV1（最小）",
 
   "main.allow.resolution": "允许降低分辨率",
   "main.whatsapp-compatible": "兼容 WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "裁剪并保存",
   "main.run.accepted-larger": "已接受更大的文件：超出 {1} MB 目标 {0} MB。",
   "main.run.trimmed": "已裁剪 {0} 秒以适配目标；时长 {1} → {2}。",
+  "main.run.whatsapp-document": "在 WhatsApp 中请以文件形式发送，而不是以视频形式：这样可以跳过聊天中的重新编码，对方看到的就是这里的画质。",
 
   "main.run.no-space": "目标驱动器可用空间不足；至少需要 {0} MB。",
   "main.run.done": "经 {0} 次尝试完成。{1} MB → {2} MB（缩小 {3}%）。",

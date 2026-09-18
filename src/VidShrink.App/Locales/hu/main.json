@@ -112,7 +112,7 @@
   "main.codec.label": "Tömörítési algoritmus",
   "main.codec.automatic": "Automatikus",
   "main.codec.compatible": "H.264 (kompatibilis)",
-  "main.codec.smallest": "H.265 (legkisebb)",
+  "main.codec.smallest": "AV1 (legkisebb)",
 
   "main.allow.resolution": "Csökkentheti a felbontást",
   "main.whatsapp-compatible": "WhatsApp-kompatibilis (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Vágás és mentés",
   "main.run.accepted-larger": "Nagyobb elfogadva: {0} MB a(z) {1} MB-os cél felett.",
   "main.run.trimmed": "{0} mp lett levágva, hogy illeszkedjen a célhoz; hossz {1} → {2}.",
+  "main.run.whatsapp-document": "Küldd el a WhatsAppon dokumentumként, ne videóként: így kimarad a csevegés újrakódolása, és a másik fél változatlanul látja ezt a minőséget.",
 
   "main.run.no-space": "Nincs elég szabad hely a célmeghajtón; legalább {0} MB kell.",
   "main.run.done": "Kész {0} próbálkozással. {1} MB → {2} MB ({3}%-kal kisebb).",

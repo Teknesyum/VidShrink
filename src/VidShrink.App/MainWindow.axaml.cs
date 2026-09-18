@@ -3174,7 +3174,7 @@ public partial class MainWindow : Window
         if (!_preview.IsOpen) _preview.Open();
     }
 
-    private static CodecPreference CodecFromIndex(int index) => index switch
+    internal static CodecPreference CodecFromIndex(int index) => index switch
     {
         1 => CodecPreference.Compatible,
         2 => CodecPreference.MaxCompression,
@@ -4123,6 +4123,14 @@ public partial class MainWindow : Window
         RefreshPlanView();
     }
 
+    private bool WhatsAppTargeted(double targetMb) =>
+        ChkWhatsAppCompatible.IsChecked == true || Math.Abs(targetMb - WhatsAppTargetMb) < 0.005;
+
+    private string WhatsAppDocumentHint(double targetMb) =>
+        WhatsAppTargeted(targetMb) ? " " + Say("main.run.whatsapp-document") : "";
+
+    internal string WhatsAppDocumentHintForTest(double targetMb) => WhatsAppDocumentHint(targetMb);
+
     private async void OnStart(object? sender, RoutedEventArgs e)
     {
         if (_info is null || ActivePlan is null || _cts is not null) return;
@@ -4168,6 +4176,7 @@ public partial class MainWindow : Window
                     TxtResult.Text += " " + Say("main.run.accepted-larger", Num(result.OutputMb - targetMb, "0.00"), Num(targetMb, "0.##"));
                 if (result.Trim is { } trim)
                     TxtResult.Text += " " + Say("main.run.trimmed", Num(trim.RemovedSeconds, "0.#"), Clock(trim.DurationSeconds), Clock(trim.KeptSeconds));
+                TxtResult.Text += WhatsAppDocumentHint(targetMb);
             }
             else if (result.CeilingExceeded)
             {

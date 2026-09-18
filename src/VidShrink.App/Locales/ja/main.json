@@ -112,7 +112,7 @@
   "main.codec.label": "圧縮アルゴリズム",
   "main.codec.automatic": "自動",
   "main.codec.compatible": "H.264(互換性)",
-  "main.codec.smallest": "H.265(最小)",
+  "main.codec.smallest": "AV1(最小)",
 
   "main.allow.resolution": "解像度の低下を許可",
   "main.whatsapp-compatible": "WhatsApp対応(H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "トリミングして保存",
   "main.run.accepted-larger": "より大きいまま許可: 目標 {1} MB を {0} MB 超過。",
   "main.run.trimmed": "目標に収めるため {0} 秒トリミングされました。長さ {1} → {2}。",
+  "main.run.whatsapp-document": "WhatsApp には動画ではなくドキュメントとして送ってください。チャットでの再エンコードを回避でき、相手にはこの画質がそのまま届きます。",
 
   "main.run.no-space": "出力先ドライブの空き容量が不足しています。少なくとも{0} MBが必要です。",
   "main.run.done": "{0}回の試行で完了。{1} MB → {2} MB({3}%削減)。",

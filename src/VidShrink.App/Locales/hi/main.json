@@ -112,7 +112,7 @@
   "main.codec.label": "संपीड़न एल्गोरिदम",
   "main.codec.automatic": "स्वचालित",
   "main.codec.compatible": "H.264 (संगत)",
-  "main.codec.smallest": "H.265 (सबसे छोटा)",
+  "main.codec.smallest": "AV1 (सबसे छोटा)",
 
   "main.allow.resolution": "रिज़ॉल्यूशन घटा सकता है",
   "main.whatsapp-compatible": "WhatsApp के साथ संगत (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "ट्रिम करें और सहेजें",
   "main.run.accepted-larger": "बड़ा स्वीकार किया गया: लक्ष्य {1} MB से {0} MB अधिक।",
   "main.run.trimmed": "लक्ष्य में फ़िट करने के लिए {0} से ट्रिम किया गया; अवधि {1} → {2}।",
+  "main.run.whatsapp-document": "इसे WhatsApp पर वीडियो के बजाय दस्तावेज़ के रूप में भेजें: इससे चैट की दोबारा एन्कोडिंग टल जाती है और सामने वाले को यही गुणवत्ता ज्यों की त्यों मिलती है।",
 
   "main.run.no-space": "लक्ष्य ड्राइव पर पर्याप्त खाली जगह नहीं; कम से कम {0} MB चाहिए।",
   "main.run.done": "{0} प्रयास में पूरा। {1} MB → {2} MB ({3}% छोटा)।",

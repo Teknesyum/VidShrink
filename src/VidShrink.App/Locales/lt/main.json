@@ -112,7 +112,7 @@
   "main.codec.label": "Glaudinimo algoritmas",
   "main.codec.automatic": "Automatinis",
   "main.codec.compatible": "H.264 (suderinamas)",
-  "main.codec.smallest": "H.265 (mažiausias)",
+  "main.codec.smallest": "AV1 (mažiausias)",
 
   "main.allow.resolution": "Gali mažinti raišką",
   "main.whatsapp-compatible": "Suderinama su WhatsApp (H.264)",
@@ -233,6 +233,7 @@
   "main.retry.trim.confirm": "Apkirpti ir išsaugoti",
   "main.run.accepted-larger": "Priimta didesnė: {0} MB virš {1} MB tikslo.",
   "main.run.trimmed": "{0} s buvo apkirpta, kad atitiktų tikslą; trukmė {1} → {2}.",
+  "main.run.whatsapp-document": "Siųskite tai per WhatsApp kaip dokumentą, o ne kaip vaizdo įrašą: taip aplenkiamas pokalbio perkodavimas ir kitas asmuo mato šią kokybę tokią, kokia yra.",
 
   "main.run.no-space": "Tiksliniame diske nepakanka laisvos vietos; reikia bent {0} MB.",
   "main.run.done": "Atlikta per {0} bandymą(-us). {1} MB → {2} MB ({3}% mažiau).",
