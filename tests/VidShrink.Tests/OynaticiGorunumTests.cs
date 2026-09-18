@@ -65,6 +65,25 @@ internal static class GorunumKanit
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "dalga3");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     internal static string Gecici(string ad)
     {
         var path = Path.Combine(Folder, "gecici", ad + "-" + Guid.NewGuid().ToString("N")[..8]);
@@ -171,6 +190,25 @@ internal static class SeritKanit
 
     internal static string N(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "dalga7b");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     internal static void LayOutAt(Window window, Size size)
     {
         window.Width = double.NaN;
@@ -262,6 +300,7 @@ public sealed class OynaticiGorunumTests
         Assert.True(olcu.Item3, "serit beklemeden gizlendi");
         Assert.Equal(TimeSpan.FromMilliseconds(360), olcu.Item4);
         Assert.False(olcu.Item5, "serit bekleme dolunca gizlenmedi");
+        SeritKanit.Kapat("serit-zamanlama.txt");
     }
 
     /// <summary>
@@ -306,6 +345,7 @@ public sealed class OynaticiGorunumTests
         Assert.Equal(okumalar[0].kisa, okumalar[1].kisa);
         Assert.Equal(okumalar[0].uzun, okumalar[1].uzun);
         Assert.Equal(okumalar[0].bilinmeyen, okumalar[1].bilinmeyen);
+        SeritKanit.Kapat("sure-etiketi.txt");
     }
 
     [Fact]
@@ -328,6 +368,7 @@ public sealed class OynaticiGorunumTests
         SeritKanit.Write("yuzey-alani.txt", body.ToString());
 
         Assert.True(olcu.Item1 > 0 && olcu.Item2 > 0, body.ToString());
+        SeritKanit.Kapat("yuzey-alani.txt");
     }
 
     [Fact]
@@ -406,6 +447,7 @@ public sealed class OynaticiGorunumTests
         Assert.StartsWith(Path.GetFileNameWithoutExtension(clip) + "_00-00-0", Path.GetFileName(rapor.yol!), StringComparison.Ordinal);
         Assert.True(GorunumKanit.KaynakBoyutunda(rapor.yol!, clip), body.ToString());
         Assert.False(kontrolGecti, body.ToString());
+        GorunumKanit.Kapat("ekran-goruntusu.txt");
     }
 
     [Fact]
@@ -457,6 +499,7 @@ public sealed class OynaticiGorunumTests
         Assert.Contains(Strings.Get("player.info.bitrate", (rapor.details!.BitsPerSecond / 1000).ToString("0", CultureInfo.CurrentCulture)), rapor.metin);
         Assert.True(sapma <= 0.02, body.ToString());
         Assert.DoesNotContain(codec, rapor.bos);
+        GorunumKanit.Kapat("bilgi-paneli.txt");
     }
 
     [Fact]
@@ -507,6 +550,7 @@ public sealed class OynaticiGorunumTests
         Assert.Equal(new[] { "klip 2.mp4", "klip 10.mp4", "klip 10.mp4", "klip 2.mp4", "klip 10.mp4", "klip 1.mp4" }, rapor.acilan);
         Assert.Contains(rapor.bitisNotu, rapor.sonNotu);
         Assert.Contains("\"All\"", rapor.ayarDosyasi);
+        GorunumKanit.Kapat("klasor-gezinme.txt");
     }
 
     [Fact]
@@ -537,6 +581,7 @@ public sealed class OynaticiGorunumTests
         Assert.Null(sonda);
         Assert.Null(once);
         Assert.Equal("a1.mp4", Path.GetFileName(basa));
+        GorunumKanit.Kapat("klasor-sirasi.txt");
     }
 
     [Fact]
@@ -574,6 +619,7 @@ public sealed class OynaticiGorunumTests
         Assert.Equal(new[] { "v5.mp4", "v12.mp4", "v11.mp4", "v10.mp4", "v9.mp4", "v8.mp4", "v7.mp4", "v6.mp4", "v4.mp4", "v3.mp4" }, geri);
         Assert.Equal(Path.GetFullPath(clip), rapor.ilk);
         Assert.Contains(Path.GetFullPath(clip), rapor.satirlar);
+        GorunumKanit.Kapat("son-dosyalar.txt");
     }
 
     [Fact]
@@ -626,6 +672,7 @@ public sealed class OynaticiGorunumTests
         Assert.Contains("vsrotate", rapor.aynaKalkti.Item1);
         Assert.False(rapor.aynaKalkti.Mirrored);
         Assert.InRange(rapor.oran.AspectOverride, 16.0 / 9 - 0.001, 16.0 / 9 + 0.001);
+        GorunumKanit.Kapat("dondur-aynala.txt");
     }
 
     [Fact]
@@ -670,6 +717,7 @@ public sealed class OynaticiGorunumTests
         Assert.Equal(3, rapor.Item4);
         Assert.True(rapor.genislik > 0);
         Assert.InRange(rapor.hedef, rapor.sure / 2 - 0.5, rapor.sure / 2 + 0.5);
+        GorunumKanit.Kapat("zaman-cubugu-isaretleri.txt");
     }
 
     [Fact]
@@ -707,6 +755,7 @@ public sealed class OynaticiGorunumTests
         Assert.False(rapor.yok);
         Assert.True(rapor.birakilan);
         Assert.Equal(ikinci, rapor.acilan);
+        GorunumKanit.Kapat("ustte-birak.txt");
     }
 
     [Fact]
@@ -730,5 +779,6 @@ public sealed class OynaticiGorunumTests
         Assert.Equal("film_01-02-05-500.png", Path.GetFileName(ilk));
         Assert.Equal("film_01-02-05-500_2.png", Path.GetFileName(ikinci));
         Assert.Equal(RepeatMode.Off, PlayerSettings.Load(bozuk).Repeat);
+        GorunumKanit.Kapat("oynatici-ayarlari.txt");
     }
 }

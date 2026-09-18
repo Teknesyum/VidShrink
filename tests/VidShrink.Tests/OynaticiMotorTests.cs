@@ -26,6 +26,25 @@ internal static class MotorKanit
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-motor");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     internal static string Ms(double value) => value.ToString("0.0", CultureInfo.InvariantCulture);
 
     internal static double Median(IReadOnlyList<double> values)
@@ -224,6 +243,7 @@ public sealed class OynaticiMotorTests
         Assert.Equal(4 * width, stride);
         Assert.True(distinct.Count > 16, $"kare tek renk gibi: {distinct.Count} farkli renk");
         Assert.True(engine.HasAudio);
+        MotorKanit.Kapat("k1-bassiz-kare.txt");
     }
 
     [Fact]
@@ -240,6 +260,8 @@ public sealed class OynaticiMotorTests
         MotorKanit.Write("k2-bozuk-dosya.txt", $"{saat.ElapsedMilliseconds} ms: {hata.Message}{Environment.NewLine}");
         Assert.True(saat.Elapsed < TimeSpan.FromSeconds(10), $"bozuk dosya {saat.ElapsedMilliseconds} ms surdu");
         Assert.False(engine.IsOpen);
+        engine.Dispose();
+        MotorKanit.Kapat("k2-bozuk-dosya.txt", "bozuk-4-bayt.mp4");
     }
 
     [Fact]
@@ -292,6 +314,7 @@ public sealed class OynaticiMotorTests
         }
 
         Assert.False(ayni, "arama bitti denildi ama gosterilen kare acilis karesiyle ayni");
+        MotorKanit.Kapat("k3-arama-inisi.txt");
     }
 
     [Fact]
@@ -327,6 +350,7 @@ public sealed class OynaticiMotorTests
         }
 
         MotorKanit.Write("k3b-ilk-kare-yarisi.txt", satirlar.ToString());
+        MotorKanit.Kapat("k3b-ilk-kare-yarisi.txt");
     }
 
     private static byte[] SonKare(MpvEngine engine)
@@ -384,6 +408,8 @@ public sealed class OynaticiMotorTests
             Assert.True(Math.Abs(s.Konum - s.Hedef) < 2.0, $"{s.Tur} {F(s.Hedef)} inmedi: time-pos {F(s.Konum)}");
             Assert.True(Math.Abs(s.Onbellek - s.Konum) <= 0.001, $"{s.Tur} {F(s.Hedef)}: PositionSeconds {F(s.Onbellek)}, time-pos {F(s.Konum)}");
         }
+
+        MotorKanit.Kapat("k11-seek-olayi-gecikmesi.txt");
     }
 
     [Fact]
@@ -418,6 +444,8 @@ public sealed class OynaticiMotorTests
             Assert.True(Math.Abs(s.Konum - Math.Round(s.Konum / 2) * 2) <= 0.001, $"keyframes {F(s.Hedef)} anahtar kareye inmedi: time-pos {F(s.Konum)}");
             Assert.True(Math.Abs(s.Onbellek - s.Konum) <= 0.001, $"keyframes {F(s.Hedef)}: gec olaydan sonra PositionSeconds {F(s.Onbellek)}, time-pos {F(s.Konum)}");
         }
+
+        MotorKanit.Kapat("k13-gec-time-pos-olayi.txt");
     }
 
     [Fact]
@@ -473,6 +501,8 @@ public sealed class OynaticiMotorTests
             Assert.Equal(SeekOutcome.Shown, s.Sonuc.Outcome);
             Assert.True(s.Sira >= 0, $"{F(s.Hedef)} Shown dondu ama gosterilen kare hedefin karelerinden degil");
         }
+
+        MotorKanit.Kapat("k12-oynarken-arama-karesi.txt");
     }
 
     [Fact]
@@ -517,6 +547,7 @@ public sealed class OynaticiMotorTests
         });
 
         MotorKanit.Write("k4-oynatici-gorunumu.txt", rapor);
+        MotorKanit.Kapat("k4-oynatici-gorunumu.txt");
     }
 
     [Fact]
@@ -551,6 +582,7 @@ public sealed class OynaticiMotorTests
         Assert.True(once.Count >= 90, $"yalniz {once.Count} gecerli ornek");
         Assert.True(Math.Abs(medyan) <= 0.040, $"A/V farki {MotorKanit.Ms(medyan * 1000)} ms");
         Assert.InRange(Math.Abs(kayma), 0.150, 0.250);
+        MotorKanit.Kapat("k5-ses-goruntu.txt");
     }
 
     [Fact]
@@ -605,6 +637,7 @@ public sealed class OynaticiMotorTests
         }
 
         MotorKanit.Write("k10-dispose-yarisi.txt", body.ToString());
+        MotorKanit.Kapat("k10-dispose-yarisi.txt");
     }
 
     private static async Task<List<double>> OrnekleAsync(MpvEngine engine)
@@ -637,6 +670,7 @@ public sealed class OynaticiMotorTestsGirdi : IClassFixture<GirdiKlipFixture>
         Assert.True(coalescer.SeekCalls < 10, $"birikme yok: {coalescer.SeekCalls} arama");
         Assert.NotEmpty(coalescer.LatenciesMs);
         Assert.Empty(gosterilmeyen);
+        MotorKanit.Kapat("k6-on-tik-motor.txt");
     }
 
     [HedefMakineFact]
@@ -646,6 +680,7 @@ public sealed class OynaticiMotorTestsGirdi : IClassFixture<GirdiKlipFixture>
 
         var asan = coalescer.LatenciesMs.Where(ms => ms > 150).ToList();
         Assert.True(asan.Count == 0, "150 ms sinirini asan arama: " + string.Join(", ", asan.Select(MotorKanit.Ms)));
+        MotorKanit.Kapat("k6-on-tik-motor.txt");
     }
 
     private async Task<(SeekCoalescer Coalescer, List<SeekOutcome> Gosterilmeyen)> OnTikKosAsync()
@@ -708,6 +743,7 @@ public sealed class OynaticiMotorAramaOlculeri
 
         Assert.Equal(20, olcum.Gosterilen.Count);
         Assert.True(olcum.Medyan <= 60, $"1080p medyan {MotorKanit.Ms(olcum.Medyan)} ms > 60 ms");
+        MotorKanit.Kapat("k7-arama-h264-1080p60.txt");
     }
 
     [HedefMakineFact]
@@ -718,6 +754,7 @@ public sealed class OynaticiMotorAramaOlculeri
 
         Assert.Equal(20, olcum.Gosterilen.Count);
         Assert.True(olcum.Medyan <= 200, $"2160p medyan {MotorKanit.Ms(olcum.Medyan)} ms > 200 ms");
+        MotorKanit.Kapat("k8-arama-h264-2160p30.txt");
     }
 
     [Fact]
@@ -728,5 +765,6 @@ public sealed class OynaticiMotorAramaOlculeri
 
         Assert.Equal(20, olcum.Gosterilen.Count);
         Assert.True(double.IsFinite(olcum.Medyan) && olcum.Medyan > 0, $"HEVC medyan okunamadi: {olcum.Medyan}");
+        MotorKanit.Kapat("k9-arama-hevc-1080p60.txt");
     }
 }

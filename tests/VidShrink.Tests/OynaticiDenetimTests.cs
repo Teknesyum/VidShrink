@@ -31,6 +31,25 @@ internal static class DenetimKanit
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "dalga1");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     internal static string N(double value) => value.ToString("0.####", CultureInfo.InvariantCulture);
 }
 
@@ -273,6 +292,7 @@ public sealed class KeymapTests
 
         DenetimKanit.Write("keymap-olay-pini.txt", rapor.Item1);
         Assert.True(rapor.hatalar.Count == 0, string.Join(Environment.NewLine, rapor.hatalar));
+        DenetimKanit.Kapat("keymap-olay-pini.txt");
     }
 
     [Fact]
@@ -319,6 +339,7 @@ public sealed class KeymapTests
         Assert.Empty(golgelenen);
         Assert.Empty(erisilmeyen);
         Assert.Empty(izsiz);
+        DenetimKanit.Kapat("keymap-cakisma.txt");
     }
 
     [Fact]
@@ -366,6 +387,7 @@ public sealed class KeymapTests
         Assert.Equal("loopclear", rapor.Item2[^1]);
         Assert.False(rapor.yutuldu);
         Assert.False(rapor.bagsiz);
+        DenetimKanit.Kapat("keymap-sembol.txt");
     }
 
     [Fact]
@@ -418,6 +440,7 @@ public sealed class KeymapTests
 
         DenetimKanit.Write("serit-ipucu.txt", rapor.Item1);
         Assert.True(rapor.hatalar.Count == 0, rapor.Item1);
+        DenetimKanit.Kapat("serit-ipucu.txt");
     }
 
     [Fact]
@@ -481,6 +504,7 @@ public sealed class KeymapTests
         });
 
         DenetimKanit.Write("keymap-menu-ayarlar.txt", rapor);
+        DenetimKanit.Kapat("keymap-menu-ayarlar.txt");
     }
 
     [Fact]
@@ -540,6 +564,7 @@ public sealed class KeymapTests
 
         DenetimKanit.Write("keymap-alt-cakisma.txt", rapor.Item1);
         Assert.Equal(0, rapor.Item2);
+        DenetimKanit.Kapat("keymap-alt-cakisma.txt");
     }
 }
 
@@ -579,6 +604,7 @@ public sealed class OynaticiDenetimMotorTests
         Assert.Equal(2, rapor.motorHizi, 3);
         Assert.InRange(ilerleme, 4 * 0.95, 4 * 1.05);
         Assert.Equal(1, rapor.sifir, 3);
+        DenetimKanit.Kapat("hiz.txt");
     }
 
     [Fact]
@@ -621,6 +647,7 @@ public sealed class OynaticiDenetimMotorTests
         Assert.InRange(ileri, kare * 0.9, kare * 1.1);
         Assert.InRange(geri, -kare * 1.1, -kare * 0.9);
         Assert.False(rapor.oynuyor);
+        DenetimKanit.Kapat("kare-adimi.txt");
     }
 
     [Fact]
@@ -676,6 +703,7 @@ public sealed class OynaticiDenetimMotorTests
         Assert.True(rapor.ornek.Max() <= rapor.b + kare + 1e-3, $"en buyuk {rapor.ornek.Max()} > B + 1 kare");
         Assert.True(alt >= rapor.a - kare - 1e-3, $"en kucuk {alt} < A - 1 kare");
         Assert.True(rapor.temiz);
+        DenetimKanit.Kapat("ab-dongu.txt");
     }
 
     [Fact]
@@ -711,6 +739,7 @@ public sealed class OynaticiDenetimMotorTests
 
         Assert.InRange(rapor.kapanis, 12.2, 12.4);
         Assert.InRange(rapor.acilis, rapor.kapanis - 1, rapor.kapanis + 1);
+        DenetimKanit.Kapat("devam.txt", "gecmis-devam.json");
     }
 
     [Fact]
@@ -757,6 +786,7 @@ public sealed class OynaticiDenetimMotorTests
         Assert.InRange(rapor.gidilen[1], 14.9, 15.1);
         Assert.InRange(rapor.gidilen[2], 7.9, 8.1);
         Assert.Equal(2, rapor.kalan.Count);
+        DenetimKanit.Kapat("yer-imi.txt", "gecmis-yerimi.json");
     }
 
     [Fact]
@@ -807,6 +837,7 @@ public sealed class OynaticiDenetimMotorTests
         Assert.False(rapor[5].Sessiz);
         Assert.Equal(90, rapor[6].Ses, 3);
         Assert.Equal(100, rapor[7].Ses, 3);
+        DenetimKanit.Kapat("ses.txt");
     }
 
     [Fact]
@@ -844,5 +875,6 @@ public sealed class OynaticiDenetimMotorTests
             rapor.Select(s => $"{s.Ad}: beklenen {DenetimKanit.N(s.Beklenen)}, mpv time-pos {DenetimKanit.N(s.Olculen)}")) + Environment.NewLine);
 
         Assert.All(rapor, s => Assert.InRange(s.Olculen, s.Beklenen - 0.05, s.Beklenen + 0.05));
+        DenetimKanit.Kapat("atlama.txt");
     }
 }

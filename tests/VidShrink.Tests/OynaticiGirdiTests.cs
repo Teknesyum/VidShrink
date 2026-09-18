@@ -38,6 +38,25 @@ internal static class GirdiKanit
 
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
+
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(Root, ".calisma", "T176");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
 }
 
 internal static class GirdiSurucu
@@ -166,6 +185,7 @@ public sealed class OynaticiGirdiTests
         Assert.Contains("oynatma False -> True", satirlar[6]);
         Assert.Contains("tam ekran False -> True", satirlar[7]);
         Assert.Contains("tiklama sayaci 0 -> 1", satirlar[8]);
+        GirdiKanit.Kapat("k1-izgara.txt");
     }
 
     [Fact]
@@ -215,6 +235,7 @@ public sealed class OynaticiGirdiTests
         Assert.Equal(10, coalescer.Target);
         Assert.True(coalescer.SeekCalls < 10, $"birikme yok: {coalescer.SeekCalls} arama");
         Assert.Equal(10, coalescer.IssuedTargets[^1]);
+        GirdiKanit.Kapat("k3-birikme.txt");
     }
 
     [Fact]
@@ -262,6 +283,7 @@ public sealed class OynaticiGirdiTests
 
         GirdiKanit.Write("k4-tam-ekran.txt", rapor);
         Assert.Contains("geri donus", rapor);
+        GirdiKanit.Kapat("k4-tam-ekran.txt");
     }
 
     [Fact]
@@ -296,6 +318,7 @@ public sealed class OynaticiGirdiTests
         });
 
         GirdiKanit.Write("k5-menu.txt", rapor);
+        GirdiKanit.Kapat("k5-menu.txt");
     }
 
     [Fact]
@@ -331,6 +354,7 @@ public sealed class OynaticiGirdiTests
 
         GirdiKanit.Write("k6-kabuk.txt", rapor);
         Assert.Contains("sekme basligi:", rapor);
+        GirdiKanit.Kapat("k6-kabuk.txt", "kabuk-ornek.mp4");
     }
 }
 

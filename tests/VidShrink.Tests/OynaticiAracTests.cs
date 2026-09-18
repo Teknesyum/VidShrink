@@ -30,6 +30,25 @@ internal static class AracKanit
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "dalga4b");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     internal static string Gecici(string ad)
     {
         var path = Path.Combine(Folder, "gecici", ad + "-" + Guid.NewGuid().ToString("N")[..8]);
@@ -400,6 +419,7 @@ public sealed class OynaticiAracTests
         Assert.Equal(1.25, rapor.hizli, 3);
         Assert.Equal(1.0, rapor.normal, 3);
         Assert.Equal("1.00×", rapor.hizEtiketi);
+        AracKanit.Kapat("serit-motor.txt");
     }
 
     /// <summary>
@@ -489,6 +509,7 @@ public sealed class OynaticiAracTests
         Assert.False(rapor.gizlendi, "surukleme bitince kucuk resim gizlenmedi");
         Assert.True(double.IsNaN(rapor.kotuSure), "basarisiz arama sure dondurdu");
         Assert.False(rapor.kotuGorunur, "basarisiz aramada kucuk resim gosterildi");
+        AracKanit.Kapat("surukleme-kucukresim.txt");
     }
 
     [Fact]
@@ -553,6 +574,7 @@ public sealed class OynaticiAracTests
         Assert.False(rapor.gizlendi, "fare cikinca kucuk resim gizlenmedi");
         Assert.True(double.IsNaN(rapor.kotuSure), "basarisiz arama sure dondurdu");
         Assert.False(rapor.kotuGorunur, "basarisiz aramada kucuk resim gosterildi");
+        AracKanit.Kapat("kucuk-resim-gosterim.txt");
     }
 
     [HedefMakineFact]
@@ -594,6 +616,7 @@ public sealed class OynaticiAracTests
         Assert.True(rapor.Item4 >= 8, $"yeterli olcum yok: {rapor.Item4}");
         Assert.True(rapor.medyan <= 300, $"kucuk resim medyani {AracKanit.N(rapor.medyan)} ms");
         Assert.True(rapor.p95 <= 300, $"kucuk resim p95 {AracKanit.N(rapor.p95)} ms");
+        AracKanit.Kapat("kucuk-resim-sure.txt");
     }
 
     [Fact]
@@ -644,6 +667,7 @@ public sealed class OynaticiAracTests
         Assert.False(yokSonuc.Ok);
         Assert.Equal((4d, 5d), (isaretli.Start, isaretli.Duration));
         Assert.Equal((20d, 5d), (isaretsiz.Start, isaretsiz.Duration));
+        AracKanit.Kapat("klip-gif.txt");
     }
 
     [Fact]
@@ -705,6 +729,7 @@ public sealed class OynaticiAracTests
         Assert.Equal(rapor.oncekiCerceve, rapor.geriCerceve);
         Assert.Equal(rapor.oncekiUstte, rapor.geriUstte);
         Assert.Null(rapor.bosCikis);
+        AracKanit.Kapat("mini-mod.txt");
     }
 
     [Fact]
@@ -765,6 +790,7 @@ public sealed class OynaticiAracTests
         Assert.False(rapor.bos, "bos metin adres sayildi");
         Assert.Equal(adres, MpvEngine.Target(adres));
         Assert.True(sunucu.Istekler > 0, "yerel sunucuya istek gelmedi");
+        AracKanit.Kapat("adres-ac.txt");
     }
 
     [Fact]
@@ -830,6 +856,7 @@ public sealed class OynaticiAracTests
         Assert.Equal(ToolsOptions.DefaultClipSeconds, bozuk.ClipSeconds);
         Assert.Equal("", bozuk.LastUrl);
         Assert.Equal(ToolsOptions.DefaultGifWidth, yokDosya.GifWidth);
+        AracKanit.Kapat("arac-ayarlari.txt");
     }
 
     [Fact]
@@ -861,5 +888,6 @@ public sealed class OynaticiAracTests
 
         AracKanit.Write("araclar-menusu.txt", rapor.Item1);
         Assert.Equal(2, rapor.basliklar.Distinct().Count());
+        AracKanit.Kapat("araclar-menusu.txt");
     }
 }

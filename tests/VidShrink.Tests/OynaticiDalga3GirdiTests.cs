@@ -130,6 +130,25 @@ public sealed class OynaticiDalga3GirdiTests
         return yol;
     }
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    private static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "girdi-dalga3");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     private static string Klip(string klasor, string ad)
     {
         Assert.True(ToolLocator.IsAvailable(out var eksik), $"klip uretimi icin {eksik} gerekli");
@@ -247,6 +266,7 @@ public sealed class OynaticiDalga3GirdiTests
         Assert.NotNull(sonuc.goruntu);
         Assert.Equal(Path.GetFullPath(sonuc.ayar!), Path.GetDirectoryName(Path.GetFullPath(sonuc.goruntu!)));
         Assert.True(File.Exists(sonuc.goruntu), sonuc.rapor);
+        Kapat("klasor-secici.txt");
     }
 
     /// <summary>
@@ -304,6 +324,8 @@ public sealed class OynaticiDalga3GirdiTests
         {
             Kanit("p3-ham-menu-ayar.txt", body.ToString());
         }
+
+        Kapat("p3-ham-menu-ayar.txt");
     }
 
     /// <summary>
@@ -392,6 +414,8 @@ public sealed class OynaticiDalga3GirdiTests
         {
             Kanit("p3-kisayol-ham-tik.txt", body.ToString());
         }
+
+        Kapat("p3-kisayol-ham-tik.txt");
     }
 
     [Fact]
@@ -402,6 +426,7 @@ public sealed class OynaticiDalga3GirdiTests
         Assert.True(sonuc.cagri == 1, sonuc.rapor);
         Assert.Null(sonuc.ayar);
         Assert.Null(sonuc.dosyada);
+        Kapat("klasor-secici-iptal.txt");
     }
 
     private static (string rapor, string? acilan, string ilk, string ikinci) DosyaSonu(RepeatMode kip)
@@ -446,6 +471,7 @@ public sealed class OynaticiDalga3GirdiTests
         Assert.Contains("play -> True", sonuc.rapor);
         Assert.Contains("autonext -> b-ikinci.mp4", sonuc.rapor);
         Assert.Equal(sonuc.ikinci, sonuc.acilan);
+        Kapat("otomatik-sonraki.txt");
     }
 
     [Fact]
@@ -458,6 +484,7 @@ public sealed class OynaticiDalga3GirdiTests
         Assert.Contains("dosya sonu True", sonuc.rapor);
         Assert.DoesNotContain("autonext", sonuc.rapor);
         Assert.Equal(sonuc.ilk, sonuc.acilan);
+        Kapat("otomatik-sonraki-kapali.txt");
     }
 
     [Fact]
@@ -509,5 +536,6 @@ public sealed class OynaticiDalga3GirdiTests
         Assert.DoesNotContain("DragOver: etki Copy", rapor.Split("dosya:")[0]);
         Assert.Contains("drop -> birakilan.mp4", rapor);
         Assert.DoesNotContain("drop -> silinen.mp4", rapor);
+        Kapat("ham-birak.txt");
     }
 }

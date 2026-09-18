@@ -35,6 +35,27 @@ internal static class YolKanit
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// Ad bir klasörse (testin geçici kökü) ağacıyla birlikte gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-yol-haritasi");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+            else if (Directory.Exists(yol)) Directory.Delete(yol, true);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     internal static string N(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 }
 
@@ -317,6 +338,8 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p2-merkez-miknatisi.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p2-merkez-miknatisi.txt");
     }
 
     [Fact]
@@ -379,6 +402,8 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p3-sag-tik-ayarlar.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p3-sag-tik-ayarlar.txt", "p3");
     }
 
     [Fact]
@@ -421,6 +446,8 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p12-on-saniye-simgesi.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p12-on-saniye-simgesi.txt");
     }
 
     [Fact]
@@ -484,6 +511,8 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p14-ust-bar-gizlenme.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p14-ust-bar-gizlenme.txt", "p14");
     }
 
     /// <summary>
@@ -566,6 +595,8 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p14-acilma-esigi.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p14-acilma-esigi.txt", "p14-esik");
     }
 
     [Fact]
@@ -613,6 +644,8 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p18-hiz-simgesi.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p18-hiz-simgesi.txt");
     }
 
     [Fact]
@@ -698,6 +731,8 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p19-duraklatma-simgesi.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p19-duraklatma-simgesi.txt");
     }
 
     [Fact]
@@ -740,6 +775,8 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p20-anahat.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p20-anahat.txt", "p20");
     }
 
     private static (byte R, byte G, byte B)[,] Ciz(Window window)
@@ -830,6 +867,8 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p24-alt-bar-anahat.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p24-alt-bar-anahat.txt");
     }
 
     /// <summary>
@@ -880,6 +919,8 @@ public sealed class OynaticiYolHaritasiTests
             HoverZone.MotionReduced = sistem;
             YolKanit.Write("p26-yayilarak-acilma.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p26-yayilarak-acilma.txt");
     }
 
     private static (bool Acildi, double Oran, List<(double Ms, double Yayilma, double Sol, double Sag)> Maskeli, bool MaskeKalkti) SeritAcilisi(bool azalt, StringBuilder body)
@@ -994,5 +1035,7 @@ public sealed class OynaticiYolHaritasiTests
         {
             YolKanit.Write("p28-altyazi-otomatik.txt", body.ToString());
         }
+
+        YolKanit.Kapat("p28-altyazi-otomatik.txt", "p28");
     }
 }

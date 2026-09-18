@@ -32,6 +32,25 @@ internal static class ParcaKanit
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "dalga2");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     internal static string Srt(string text) => "1\r\n00:00:00,500 --> 00:00:05,500\r\n" + text + "\r\n\r\n";
 
     internal static string Klip
@@ -182,6 +201,7 @@ public sealed class OynaticiParcaTests
         Assert.Equal(1, engine.AudioTrack);
 
         ParcaKanit.Write("motor-parca-secimi.txt", body.ToString());
+        ParcaKanit.Kapat("motor-parca-secimi.txt");
     }
 
     [Fact]
@@ -211,6 +231,7 @@ public sealed class OynaticiParcaTests
         engine.SetAudioDelay(0);
         Assert.Equal(0, MotorKanit.ReadDouble(engine, "sub-delay"), 6);
         Assert.Equal(0, MotorKanit.ReadDouble(engine, "audio-delay"), 6);
+        ParcaKanit.Kapat("motor-gecikme.txt");
     }
 
     [Fact]
@@ -233,6 +254,8 @@ public sealed class OynaticiParcaTests
 
         Assert.Equal(dis.Id, engine.SubtitleTrack);
         Assert.Equal(ParcaKanit.Turkce, metin);
+        engine.Dispose();
+        ParcaKanit.Kapat("cp1254-dogru.txt", "turkce-cp1254.srt");
     }
 
     [Fact]
@@ -261,6 +284,8 @@ public sealed class OynaticiParcaTests
         Assert.Equal(bozuk, yanlis);
         Assert.NotEqual(ParcaKanit.Turkce, yanlis);
         Assert.Equal(ParcaKanit.Turkce, dogru);
+        engine.Dispose();
+        ParcaKanit.Kapat("cp1254-negatif.txt", "turkce-cp1254-negatif.srt");
     }
 
     [Fact]
@@ -348,6 +373,7 @@ public sealed class OynaticiParcaTests
         Assert.Equal(1, rapor.isaretli);
         Assert.Equal("1", rapor.menudenSes);
         foreach (var parca in rapor.beklenenDurum) Assert.Contains(parca, rapor.durum);
+        ParcaKanit.Kapat("gorunum-parca-kisayol.txt");
     }
 
     [Fact]
@@ -408,5 +434,6 @@ public sealed class OynaticiParcaTests
         Assert.Null(rapor.altyaziSonuc.TrackNotice);
         Assert.True(rapor.videoSonuc.Handled);
         Assert.Equal(0, rapor.videoSonuc.Pencere);
+        ParcaKanit.Kapat("birakma.txt", "birakilan.srt");
     }
 }
