@@ -88,14 +88,22 @@ tamamen boş.
 
 Filtre sınıf adını eşleştirdiği için her kol adıyla ve sayısıyla yazıldı.
 
+Tablonun şartı: her kol **`VIDSHRINK_LIBMPV` verilmiş** bir kabukta koştu. Bu değişken
+olmadan `TestAyarYoluTests` kırmızı döner ve tablo tutmaz — kod kusuru değil ortam eksiği.
+
+```powershell
+$env:VIDSHRINK_LIBMPV = "C:\Users\Administrator\Desktop\Projeler\VidShrink\tools\libmpv\libmpv-2.dll"
+dotnet test tests/VidShrink.Tests -c Release --filter "FullyQualifiedName~Kaydedici"
+```
+
 | Sınıf | Test |
 | --- | --- |
-| `KaydediciAyarYalitimTests` | 2 |
+| `KaydediciAyarYalitimTests` | 3 |
 | `KaydediciOnizlemeTests` | 3 |
 | `KaydediciAyarTests` | 13 |
 | `KaydediciArayuzTests` | 86 |
 | `KaydediciGirdiTests` | 8 |
-| `KaydediciHedefTests` | 8 |
+| `KaydediciHedefTests` | 9 |
 | `KaydediciKameraTests` | 15 |
 | `KaydediciSeciciTests` | 8 |
 | `KaydediciTamponTests` | 4 |
@@ -104,10 +112,11 @@ Filtre sınıf adını eşleştirdiği için her kol adıyla ve sayısıyla yaz�
 | `TestAyarYoluTests` | 4 |
 | `HipersurusTests` | 7 |
 
-Toplam 169 geçti, 1 atlandı. Hiçbir kol sıfır teste denk gelmedi.
+Toplam 171 geçti, 1 atlandı. Hiçbir kol sıfır teste denk gelmedi.
 
-`TestAyarYoluTests` bu worktree'de `VIDSHRINK_LIBMPV` verilmeden kırmızı: worktree'de
-`tools/libmpv` yok, kod kusuru değil ortam eksiği.
+Sayı 169'dan 171'e çıktı ve tablo 2026-09-18'de yeniden sayıldı: kapının kendi pimi
+(`KapiKapandiktanSonraBekleyenYazmaDosyayiKirletmiyor`) eklendi, `KaydediciHedefTests` de bir ölçü
+kazanmış. Satırlar tek tek koşularak sayıldı, toplamdan geriye dağıtılmadı.
 
 ## Yalıtımın dışında bırakılan
 
