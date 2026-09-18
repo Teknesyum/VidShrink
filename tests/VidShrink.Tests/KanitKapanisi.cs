@@ -17,22 +17,12 @@ internal static class KanitKapanisi
     internal static void Onceki(string klasor, params string[] adlar)
     {
         if (!Directory.Exists(klasor)) return;
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-            else if (Directory.Exists(yol)) Directory.Delete(yol, true);
-        }
+        foreach (var ad in adlar) Sil(klasor, ad);
     }
 
     internal static void Kapat(string klasor, params string[] adlar)
     {
-        foreach (var ad in adlar)
-        {
-            var yol = Path.Combine(klasor, ad);
-            if (File.Exists(yol)) File.Delete(yol);
-            else if (Directory.Exists(yol)) Directory.Delete(yol, true);
-        }
+        foreach (var ad in adlar) Sil(klasor, ad);
 
         var dizin = new DirectoryInfo(klasor);
         while (dizin is not null && dizin.Exists && dizin.Name != ".calisma" && dizin.GetFileSystemInfos().Length == 0)
@@ -42,4 +32,28 @@ internal static class KanitKapanisi
             dizin = ust;
         }
     }
+
+    /// <summary>
+    /// Tek adı siler. Ad joker (<c>*</c> ya da <c>?</c>) taşıyorsa eşleşen her girdiyi siler:
+    /// eski <c>AltyaziKanit.Kapat</c> gövdesinin yaptığı buydu, ortak gövdeye geri kondu.
+    /// </summary>
+    private static void Sil(string klasor, string ad)
+    {
+        if (ad.IndexOfAny(Jokerler) >= 0)
+        {
+            if (!Directory.Exists(klasor)) return;
+            foreach (var eslesen in Directory.GetFileSystemEntries(klasor, ad)) SilYolu(eslesen);
+            return;
+        }
+
+        SilYolu(Path.Combine(klasor, ad));
+    }
+
+    private static void SilYolu(string yol)
+    {
+        if (File.Exists(yol)) File.Delete(yol);
+        else if (Directory.Exists(yol)) Directory.Delete(yol, true);
+    }
+
+    private static readonly char[] Jokerler = ['*', '?'];
 }
