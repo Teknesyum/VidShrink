@@ -328,11 +328,15 @@ sildi. **Kural: yayınlanmış uygulama düzeneğin dışında hiç çalıştır
 ## 9. Yapılmayanlar ve gerekçeleri
 
 - **Kaynak yüklemesini tembelleştirme** — tavanı 13,4 ms, gürültü tabanı ±60 ms. Ölçülemez.
-- **`InvariantGlobalization`** — iki ölümcül çağrı noktası, ikisi de artık pimli:
+- **`InvariantGlobalization`** — iki ölümcül çağrı noktası:
   - `MainWindow.axaml.cs:532` — invariant kipte `CurrentUICulture.Name` boş dizge,
     `ResolveLanguage` hiçbir dili tutmaz ve kaydedilmiş dili olmayan kullanıcı 42 dilin
     hiçbirini almadan İngilizce açar.
-    Pim: `SettingsTests.LanguageUsesSavedThenOperatingSystemThenEnglish`, `(null, "", "en")` kolu.
+    Belgeleyen kol: `SettingsTests.LanguageUsesSavedThenOperatingSystemThenEnglish`,
+    `(null, "", "en")`. **Bu kol tuzak teli değil:** boş dizge değişmez bir `InlineData`
+    ve `ResolveLanguage` kültür okumayan saf bir işlev, dolayısıyla anahtar açılsa kol
+    yeşil kalır. Tuzak teli borç olarak durur; çağrı noktasındaki kültür okumasından
+    geçen bir ölçü ister.
   - `LanguageCatalog.cs:307` — `body[..1].ToUpper(culture)` Türkçe `i`'yi `İ` değil `I` yapar
     ("iptal" → "Iptal") ve bu tek çağrı arayüzdeki her metnin satır başını üretiyor.
     Pim: `KulturSozlesmesiTests.TurkceBuyukHarfKuraliKulturdenGeliyor`.
@@ -442,7 +446,10 @@ Kanal kapatıldı, **kaynak kapatılmadı**:
    Ölçünün konusu pencere kırpması; kalıcı ölçek o ölçüye hiç girmemeli. Bu, sızıntının
    kurbana ulaşan kanalını tümden kapatıyor.
 2. **Kaynak açık.** `GelismisKollarIstegeVeAyaraGecer` sınıf bütün koşulduğunda paylaşılan
-   dosyada hâlâ 1280x720 bırakıyor. Ayrı iş olarak kaydedici sahibine devredildi.
+   dosyada hâlâ 1280x720 bırakıyor. Devredilecek ayrı bir sahip yok; borç T0'ın defterinde
+   (`.claude/acik.md`) duruyor ve aynı kökün ikinci yüzüyle birlikte kapanacak:
+   `6f4c2a89`'da main CI'sını kırmızı yapan `KaydediciOnizlemeTests` yarışı da bu paylaşılan
+   `recorder-settings.json`'dan doğuyor (`.calisma/birlesme-kaydi.md`).
 
 ### Reddedilen düzeltme: dispatcher pompası
 

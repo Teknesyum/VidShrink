@@ -68,8 +68,12 @@ public sealed class SettingsTests
     /// Son kol <c>InvariantGlobalization</c> kararının ölçüsü. O kip açıkken
     /// <c>CultureInfo.CurrentUICulture.Name</c> boş dizgedir; <c>MainWindow.axaml.cs:532</c>
     /// oraya boş dizge verir ve kaydedilmiş dili olmayan kullanıcı 42 yerelleştirme
-    /// dosyasının hiçbirini almadan İngilizce açar. Kol, kazancın bedelini koda bağlıyor:
-    /// anahtar açılırsa bu satır kırmızıya döner (<c>docs/olcumler/aot-dalgasi.md</c>).
+    /// dosyasının hiçbirini almadan İngilizce açar. Kol o sonucu koda bağlar ama
+    /// <b>tuzak teli değildir</b>: boş dizge burada değişmez bir <c>InlineData</c>,
+    /// <c>ResolveLanguage</c> saf bir işlev ve kültür okumuyor — anahtar açılsa bu satır
+    /// yeşil kalır. Kırmızıya dönmesi için ölçünün <c>MainWindow.axaml.cs:532</c>'deki
+    /// <c>CultureInfo.CurrentUICulture.Name</c> okumasından geçmesi gerekir
+    /// (<c>docs/olcumler/aot-dalgasi.md</c>).
     /// </summary>
     [Theory]
     [InlineData("tr", "en-US", "tr")]
