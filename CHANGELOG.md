@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- Save the current settings as your own preset: the "+" chip at the end of the chip strip asks
+  for a name only, your presets sit between a separator and that button, clicking one applies it
+  and "×" deletes it with an undo line — no confirmation dialog (`MainWindow.OnAyar.cs`).
 - `--dil` / `--lang` on the command line: the help and the messages follow the flag instead of
   the system language for that run. `en` and `tr` are known, `tr-TR` and `TR` normalise, and an
   unknown code is a usage error (`CliText.cs`, `CliApp.cs`).

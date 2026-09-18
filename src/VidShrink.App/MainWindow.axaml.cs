@@ -258,6 +258,7 @@ public partial class MainWindow : Window
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
         Watch(TxtOpenSubtitlesKey, TextBox.TextProperty, SaveAppSettings);
         Watch(TxtOpenSubtitlesUser, TextBox.TextProperty, SaveAppSettings);
+        InitUserPresets();
         BuildShareTargetStrip();
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
         foreach (var control in new SelectingItemsControl[]

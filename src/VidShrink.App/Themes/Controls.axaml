@@ -393,6 +393,16 @@
         <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
       </ControlTheme>
 
+      <!-- Kullanıcı ön ayarını silen "×". Yonganın içinde durduğu için kendi dolgusu yok;
+           ölçüsü yonganınkinden küçük, rengi yonganın yazı rengi. -->
+      <ControlTheme x:Key="ChipRemoveButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+        <Setter Property="Padding" Value="{StaticResource ChipRemovePadding}"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+      </ControlTheme>
+
       <ControlTheme x:Key="HeaderButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
         <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
         <Setter Property="Padding" Value="{StaticResource HeaderButtonPadding}"/>
