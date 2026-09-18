@@ -180,6 +180,56 @@ public sealed class KaydediciYerlesimTests
     }
 
     [Fact]
+    public void KosedekiMonitorEnGenisDegilkenDeKosedekininCarpaniSecilir()
+    {
+        var genisBirincil = new ScreenBounds(0, 0, 0, 3840, 2160);
+        var darDizustu = new ScreenBounds(1, -1920, 0, 1920, 1200);
+        var yerlesim = new[]
+        {
+            new ScreenPlacement(genisBirincil, 1.0),
+            new ScreenPlacement(darDizustu, 1.5)
+        };
+
+        var birlesim = RecorderLayout.Union(new[] { genisBirincil, darDizustu })!;
+        var ortu = RecorderLayout.Cover(yerlesim)!;
+
+        Assert.Equal(darDizustu.X, birlesim.X);
+        Assert.True((long)genisBirincil.Width * genisBirincil.Height
+                    > (long)darDizustu.Width * darDizustu.Height);
+
+        Assert.Equal(1.5, ortu.Scale);
+        Assert.NotEqual(1.0, ortu.Scale);
+
+        var kaplama = ortu.Physical(1.5);
+        Assert.Equal(birlesim.Width, kaplama.Width);
+        Assert.Equal(birlesim.Height, kaplama.Height);
+    }
+
+    [Fact]
+    public void BirlesimKosesiBoslugaDusunceEnBuyukAlanliMonitorunCarpaniAlinir()
+    {
+        var ustSagdaki = new ScreenBounds(0, 0, 0, 1920, 1080);
+        var altSoldaki = new ScreenBounds(1, -2880, 1080, 2880, 1620);
+        var yerlesim = new[]
+        {
+            new ScreenPlacement(ustSagdaki, 1.0),
+            new ScreenPlacement(altSoldaki, 1.5)
+        };
+
+        var birlesim = RecorderLayout.Union(new[] { ustSagdaki, altSoldaki })!;
+
+        Assert.Null(RecorderLayout.Containing(new[] { ustSagdaki, altSoldaki }, birlesim.X, birlesim.Y));
+        Assert.Null(RecorderLayout.ScaleAt(yerlesim, birlesim.X, birlesim.Y));
+
+        var ortu = RecorderLayout.Cover(yerlesim)!;
+
+        Assert.Equal(1.5, ortu.Scale);
+        Assert.NotEqual(yerlesim[0].Scale, ortu.Scale);
+        Assert.Equal(birlesim.Width / 1.5, ortu.Width);
+        Assert.Equal(birlesim.Height / 1.5, ortu.Height);
+    }
+
+    [Fact]
     public void BirlesimNegatifXtekiMonitoruIceriyor()
     {
         var birlesim = RecorderLayout.Union(IkiEkran)!;

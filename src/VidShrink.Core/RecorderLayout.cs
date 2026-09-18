@@ -74,21 +74,6 @@ public static class RecorderLayout
     }
 
     /// <summary>
-    /// Dikdortgenin <b>tamamen</b> tek bir monitorun icinde kalip kalmadigi. Iki monitore
-    /// yayilan ya da aradaki bosluga dusen dikdortgen <c>false</c> donuyor.
-    /// </summary>
-    public static bool WithinOneScreen(IReadOnlyList<ScreenBounds> screens, RecorderRegion region)
-    {
-        if (screens is null || region is null || region.Width <= 0 || region.Height <= 0) return false;
-        foreach (var s in screens)
-            if (region.X >= s.X && region.Y >= s.Y
-                && region.X + region.Width <= s.X + s.Width
-                && region.Y + region.Height <= s.Y + s.Height)
-                return true;
-        return false;
-    }
-
-    /// <summary>
     /// Dikdortgenin her pikselinin bir monitor tarafindan kapsanip kapsanmadigi. Iki
     /// monitore yayilan dikdortgen kapsanmis sayiliyor; monitorler arasindaki bosluga
     /// tasan dikdortgen sayilmiyor — <c>gdigrab</c> orayi siyah veriyor.
@@ -123,8 +108,9 @@ public static class RecorderLayout
     /// <summary>
     /// Bolge cizim ortusunun yeri. Konum birlesimin sol ust kosesi (fiziksel piksel), boy
     /// ise <b>o koseyi tasiyan</b> monitorun carpanina bolunmus nokta olcusu: pencere
-    /// acildiginda o monitorde dogduğu icin carpani da oradan geliyor. Kose hicbir
-    /// monitorde degilse birlesimle en cok ortusen monitorun carpani aliniyor.
+    /// acildiginda o monitorde dogdugu icin carpani da oradan geliyor. Kose hicbir
+    /// monitorde degilse — L bicimli yerlesimde birlesimin sol ust kosesi bosluga dusebiliyor —
+    /// yedek olarak <b>en buyuk alanli</b> monitorun carpani aliniyor.
     /// </summary>
     public static OverlayCover? Cover(IReadOnlyList<ScreenPlacement> screens)
     {
@@ -134,7 +120,7 @@ public static class RecorderLayout
         foreach (var s in screens) bounds.Add(s.Bounds);
         if (Union(bounds) is not { } union) return null;
 
-        var scale = ScaleAt(screens, union.X, union.Y) ?? Widest(screens);
+        var scale = ScaleAt(screens, union.X, union.Y) ?? LargestArea(screens);
         if (!(scale > 0)) return null;
 
         return new OverlayCover(union.X, union.Y, union.Width / scale, union.Height / scale, scale);
@@ -153,7 +139,8 @@ public static class RecorderLayout
         return null;
     }
 
-    private static double Widest(IReadOnlyList<ScreenPlacement> screens)
+    /// <summary>En buyuk alanli (genislik x yukseklik) monitorun carpani; hicbiri yoksa 0.</summary>
+    private static double LargestArea(IReadOnlyList<ScreenPlacement> screens)
     {
         var best = 0d;
         var area = 0L;

@@ -27,8 +27,9 @@ ffmpeg sürümü: winget `yt-dlp.FFmpeg` altındaki `ffmpeg-N-125875-g5d4d3bdc61
 Aynı koşumun bildirdiği girdi satırı: `Video: bmp, bgra, 1024x768` — makinenin fiziksel çözünürlüğü.
 
 **Sonuç:** `gdigrab` argümanları fiziksel piksel. Avalonia'nın verdiği sınırlar da fiziksel
-piksel olduğu için Windows kolunda ölçekten kaynaklanan bir çevirim **gerekmiyor**; ölçek ≠ 1'de
-yakalama dikdörtgeni ölçülen dört yerleşimin hiçbirinde kaymıyor (aşağıdaki (b1)/(b2) satırları).
+piksel olduğu için Windows kolunda ölçekten kaynaklanan bir çevirim **gerekmiyor**; yakalama
+dikdörtgeni ölçülen **beş** yerleşimin — ölçek ≠ 1 olan **üçü** dahil: (b1), (b2), (d) — hiçbirinde
+kaymıyor.
 Ölçek, kaydedicinin **pencere** tarafını — bölge çizim örtüsünü — ilgilendiriyor.
 
 Bu satırın sınırı: ölçü bu makinedeki bu ffmpeg ikilisine ait. Başka bir yapının manifesti
@@ -64,7 +65,7 @@ monitörün soluna yerleştirilen ikinci monitör negatif masaüstü koordinatla
 `gdigrab` oraya bakabiliyor (K1'in ürettiği `-offset_x -1280` argümanı da negatif). Kural o
 monitördeki her bölge seçimini kapatıyordu.
 
-| Yerleşim | Bölge | ESKİ Validate | YENİ Validate |
+| Yerleşim | Bölge | ESKİ Validate (çıkarsandı, ölçülmedi) | YENİ Validate (ölçüldü) |
 |---|---|---|---|
 | (c) | 640x480+-1200,100 | `Region offsets cannot be negative.` | (hatasız) |
 | (d) | 640x480+-2800,100 | `Region offsets cannot be negative.` | (hatasız) |
@@ -73,6 +74,10 @@ monitördeki her bölge seçimini kapatıyordu.
 Düzeltme: kural sayının işaretine değil **kapsamaya** bakıyor. Monitör listesi dikdörtgeni
 kapsıyorsa negatif ofset geçerli; liste boşsa masaüstünün sola uzandığına kanıt yok ve eski
 kural duruyor (test `NegatifXtekiMonitordeCizilenBolgeKabulEdilir`, boş listeli negatif kontrol).
+
+"ESKİ Validate" sütunu ölçülmedi: düzenek yalnız geçerli kaynağı çağırıyor, sütun `e962538e`'deki
+koşulsuz "Region offsets cannot be negative." kuralından çıkarsandı. Çıkarsama üç satır için de
+tek kuralı okur; buna karşılık "YENİ Validate" sütunu ham çıktıdan geliyor.
 macOS'ta bölge girdi değil kırpma filtresi, kare içinde negatif koordinat yok: orada kural
 olduğu gibi kalıyor (test `MacOstaNegatifBolgeOfsetiHalaReddedilir`).
 
@@ -86,11 +91,15 @@ bunu hiç görmüyordu.
 |---|---|---|---|
 | (a) | 640x480+100,100 | True | (hatasız) |
 | (a) | 640x480+1800,100 — masaüstünün sağından taşıyor | False | `... is not fully covered ...` |
-| (c) | 640x40+-640,1040 — soldaki monitörün altındaki boşluk | False | `... is not fully covered ...` |
+| (c) | 640x40+-640,1040 — soldaki monitörün altındaki boşluk | False | `Region offsets cannot be negative.` **ve** `... is not fully covered ...` (iki hata birden) |
 | (c) | 640x480+-1200,100 | True | (hatasız) |
 
 İki monitöre yayılan (ikisinin de kapsadığı) bölge kabul ediliyor — test
 `IkiMonitoreYayilanBolgeKabulEdilir`.
+
+(c) satırı **iki** hata veriyor çünkü iki kural birden çalışıyor: bölge hem negatif X'te hem de
+monitörlerin kapsamadığı boşlukta. K2'nin gevşettiği negatif kural kapsama koşuluna bağlı,
+kapsanmayan bir dikdörtgende yine ateşleniyor.
 
 ### K4 — Bölge çizim örtüsü karışık DPI'da masaüstünü yanlış kaplıyordu
 
@@ -234,7 +243,7 @@ referans (bu PowerShell, SetProcessDPIAware cagrilmadi): hr=0 awareness=0
 
 ## 5. Mutasyon Koşumu
 
-Her pimin bozulduğunda kırmızıya döndüğü, filtre `KaydediciYerlesimTests` (15 ölçü):
+Her pimin bozulduğunda kırmızıya döndüğü, filtre `KaydediciYerlesimTests` (M1–M4 15 ölçü, M5–M6 17 ölçü):
 
 | # | Bozulan | Kırmızıya dönen ölçü | Ham satır |
 |---|---|---|---|
@@ -242,6 +251,14 @@ Her pimin bozulduğunda kırmızıya döndüğü, filtre `KaydediciYerlesimTests
 | M2 | Negatif ofset kapsamaya bakmadan hata (`&& false`) | `NegatifXtekiMonitordeCizilenBolgeKabulEdilir`, `IkiMonitoreYayilanBolgeKabulEdilir` | `Assert.Empty() Failure: Collection was not empty` ×2 — Başarısız 2, Başarılı 13 |
 | M3 | Kapsama uyarısı hiç verilmiyor (`Count >= 0` → erken çıkış) | `MonitorlerArasiBosluktakiBolgeSiyahDiyeReddedilir`, `MasaustuDisinaTasanBolgeReddedilir` | `Assert.Contains() Failure: Filter not matched in collection` ×2 — Başarısız 2, Başarılı 13 |
 | M4 | `RecorderLayout.Cover` birincil monitörün çarpanını kullanıyor (`screens[0].Scale`) | `KarisikOlcekliOrtuKosedekiMonitorunCarpaniniKullanir` | `Assert.Equal() Failure: Values differ / Expected: 1,5 / Actual: 1` — Başarısız 1, Başarılı 14 |
+| M5 | `Cover` köşeyi hiç sormuyor, doğrudan en büyük alanlı monitör (`var scale = LargestArea(screens);`) | `KosedekiMonitorEnGenisDegilkenDeKosedekininCarpaniSecilir` | `Assert.Equal() Failure: Values differ / Expected: 1,5 / Actual: 1` — Başarısız 1, Başarılı 16 |
+| M6 | Yedek kol kaldırıldı (`ScaleAt(...) ?? 0d` → `Cover` null dönüyor) | `BirlesimKosesiBoslugaDusunceEnBuyukAlanliMonitorunCarpaniAlinir` | `System.NullReferenceException : Object reference not set to an instance of an object.` — Başarısız 1, Başarılı 16 |
+
+M5, köşedeki monitörün **en geniş olmadığı** yerleşimi pimliyor (3840x2160 @1,0 birincil (0,0) +
+1920x1200 @1,5 dizüstü (-1920,0)): orada `LargestArea` birincili, kural dizüstüyü seçiyor.
+M6, yedek kolu koşturan L biçimli yerleşimi pimliyor (1920x1080 @1,0 (0,0) + 2880x1620 @1,5
+(-2880,1080)): birleşimin sol üst köşesi (-2880,0) hiçbir monitörde değil. Bu iki yerleşim
+yalnız test fikstüründe; ölçüm düzeneğinin beş yerleşimi ve yukarıdaki ham çıktı olduğu gibi duruyor.
 
 M3'ün ilk denemesi `if (true) yield break;` ile yazılmıştı ve `error CS0162` ile derlenmedi;
 o koşumda test ikilisi bayat kaldığı için sayılmadı, mutasyon derlenen bir koşula çevrilip

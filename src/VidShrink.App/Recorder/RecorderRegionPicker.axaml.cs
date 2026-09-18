@@ -50,15 +50,17 @@ internal partial class RecorderRegionPicker : Window
     private void Cover()
     {
         var placements = Screens.All
-            .Select(s => new ScreenPlacement(new ScreenBounds(0, s.Bounds.X, s.Bounds.Y, s.Bounds.Width, s.Bounds.Height), s.Scaling))
+            .Select((s, i) => new ScreenPlacement(
+                new ScreenBounds(i, s.Bounds.X, s.Bounds.Y, s.Bounds.Width, s.Bounds.Height), s.Scaling))
             .ToList();
 
         _desktop = RegionDraw.Desktop(Screens.All.Select(s => s.Bounds));
-        if (RecorderLayout.Cover(placements) is not { } cover) return;
+        var cover = RecorderLayout.Cover(placements);
+        var yedekOlcek = Screens.Primary?.Scaling ?? 1;
 
-        Position = new PixelPoint(cover.X, cover.Y);
-        Width = cover.Width;
-        Height = cover.Height;
+        Position = cover is null ? _desktop.Position : new PixelPoint(cover.X, cover.Y);
+        Width = cover?.Width ?? _desktop.Width / yedekOlcek;
+        Height = cover?.Height ?? _desktop.Height / yedekOlcek;
         Scrim.Width = Width;
         Scrim.Height = Height;
     }
