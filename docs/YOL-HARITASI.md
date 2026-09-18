@@ -39,7 +39,8 @@ E, F ve G aynı belirteçlere dokunduğu için ardışık; H arayüzün başka b
 `IconStroke` 1.5'ten **2**'ye, pencere düğmesi üçlüsü 14:16:16'dan **12:18:14**'e,
 kaymış merkezler 12'ye çekildi. Üç sayı da `docs/arastirma/ikon-estetigi.md`'de ölçülüp
 sektör kaynaklarıyla (Lucide, Material) karşılaştırıldı; hiçbiri gözle seçilmedi.
-`IkonKutusuTests` 26 yolu ayrıştırıp kenar payını ve merkezi pimliyor, böylece bir daha
+`IkonKutusuTests` `Icons.axaml`'daki yolların hepsini ayrıştırıp kenar payını ve merkezi
+pimliyor — sayıyı elle yazmıyor, dosyadan okuyor — böylece bir daha
 kayan simge sessizce giremez. Tek muafiyet `IconPlay`: üçgen kütlesi tabanda toplandığı
 için sektör onu bilerek sağa kaydırıyor, ölçü orada +0.5..+1.5 aralığını sınıyor.
 
