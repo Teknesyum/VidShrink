@@ -118,7 +118,9 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
 - `PencereKabuguTests.cs` — pencere kabuğunun düzeni: üst şerit içerikle aynı gözde katman, başlık düğmeleri içeriğin üstünde,
   gizleme sınıfı iki parçayı kapatıyor. Kaynak metin okur; gizlenme ve anahat davranışı `OynaticiYolHaritasiTests`'te.
 - `OynaticiKisayolTests.cs` — tarifteki her kısayol gerçek girdi olayıyla PlayerView'a verilir, etkisi motordan geri okunur;
-  döndürme karenin piksellerinden. Kanıt `.calisma/oynatici-kisayol/`.
+  döndürme karenin piksellerinden. Kanıt `.calisma/oynatici-kisayol/`. `CtrlShiftS` kolu artık
+  **iddia ettiği koşulun tamamını** bekliyor (açı + genişlik + yükseklik + renk konumu); eskiden
+  yalnız genişlik ve açı beklenip araya sabit 0,3 sn konuyordu ve kol zamanlamayla kararsızdı.
 - `OynaticiOdakYoluTests.cs` — aynı tuşlar MainWindow'un odak yolundan: sekme değişimi, kaydırıcı/açılır kutu odakta, tam ekran; ham sağ tıkla menüde döndürme satırı, tuş adı ve ipucu, ham Ctrl+Shift+S kare pikseli; hız adımı ve çift tık `OynaticiSuruklemeTests.cs`te.
 - `OynaticiSuruklemeTests.cs` — `OynaticiCiftTikSuresiTests`: ham C/X ile 0.05 hız adımı motordan, çift tık süresi sistemden (`ClickArbiter.Source`). `OynaticiSuruklemeTests`: kendi döngüde tuşsuz hareket ve yakalama kaybı pencereyi taşımaz, sürüklerken gelen çift tık bayat durumu sıfırlar; varsayılan yol platforma göre (Windows yerel `BeginMoveDrag` + `GetWindowRect` ile kendi döngünün karışmadığı), gerçek `SendMessage(WM_MOVING)` dikdörtgeni merkeze çeker. Her ham bölüm çift tık penceresi kadar bekler — bekleme olmadan önceki testin basışı çift tık sayılıyor. Kanıt `.calisma/oynatici-kisayol/`.
 - `OynaticiYolHaritasiTests.cs` — yol haritası denetiminin oynatıcı maddeleri (P2 sürüklerken ham fareyle merkez mıknatısı ve çok ekran/DPI saf hesabı, P3 menüde ayarlar, P12, P14 üst bar

@@ -494,9 +494,16 @@ public sealed class OynaticiKisayolTests
                 o.Not($"once {KisayolKanit.Kare(o.View)} Rotation {o.Motor.Rotation}");
                 foreach (var (aci, w, h, ilk, ikinci) in beklenen)
                 {
+                    bool Oturdu()
+                    {
+                        if (o.Motor.Rotation != aci) return false;
+                        var k = KisayolKanit.Kare(o.View);
+                        var yer = aci is 90 or 270 ? (k.Ust, k.Alt) : (k.Sol, k.Sag);
+                        return k.W == w && k.H == h && yer == (ilk, ikinci);
+                    }
+
                     o.Bas(Key.S, KeyModifiers.Control | KeyModifiers.Shift);
-                    o.Bekle(() => KisayolKanit.Kare(o.View).W == w && o.Motor.Rotation == aci, 3);
-                    o.Bekle(0.3);
+                    o.Bekle(Oturdu, 5);
                     var kare = KisayolKanit.Kare(o.View);
                     o.Not($"Rotation {o.Motor.Rotation} vf '{o.Oku("vf")}' dwidth {o.Oku("dwidth")}x{o.Oku("dheight")} kare {kare}");
                     var konum = aci is 90 or 270 ? (kare.Ust, kare.Alt) : (kare.Sol, kare.Sag);
