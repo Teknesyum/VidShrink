@@ -71,15 +71,35 @@ public class KucultmeAraligiTests
         Assert.Equal(kare, sonraki, 3);
     }
 
+    /// <summary>
+    /// <para>Ikinci iddia once <c>TrimWindow.SeekLeadSeconds</c> ile karsilastiriyordu; sabiti
+    /// degistiren bir mutasyon iddianin iki yanini birlikte kaydirdigi icin o satir hicbir zaman
+    /// kirmizi olamazdi. Sabitin degerini zaten ustteki <c>Assert.Equal(10.0, ...)</c> pimliyor.</para>
+    /// <para>Yerine gelen iddia bagimsiz bir ozellik olcuyor: girdiden <b>once</b> ve <b>sonra</b>
+    /// gelen <c>-ss</c> degerlerinin toplami baslangic saniyesine esit, yani melez bolusum kayipsiz.
+    /// Bu, kalan kismi sabitleyip onceki kismi bozan bir mutasyonda kirilir ve sabitin degerinden
+    /// bagimsizdir.</para>
+    /// </summary>
     [Fact]
     public void AramaBolusumu_BaslangicKayinca_YalnizHizliKisimBuyur()
     {
+        IReadOnlyList<string> Args(double start)
+            => FfmpegArguments.Build(Kaynak(), Plan(new TrimWindow(start, start + 30)), "cikti.mp4", 0, null);
+
         double Sonraki(double start)
         {
-            var args = FfmpegArguments.Build(Kaynak(), Plan(new TrimWindow(start, start + 30)), "cikti.mp4", 0, null);
+            var args = Args(start);
             var input = args.IndexOf("-i");
             return args.Select((value, index) => (value, index))
                 .Where(pair => pair.value == "-ss" && pair.index > input)
+                .Sum(pair => Value(args, pair.index));
+        }
+
+        double Toplam(double start)
+        {
+            var args = Args(start);
+            return args.Select((value, index) => (value, index))
+                .Where(pair => pair.value == "-ss")
                 .Sum(pair => Value(args, pair.index));
         }
 
@@ -87,7 +107,9 @@ public class KucultmeAraligiTests
         var uzak = Sonraki(360);
         Assert.Equal(yakin, uzak, 3);
         Assert.Equal(10.0, uzak, 3);
-        Assert.Equal(TrimWindow.SeekLeadSeconds, uzak, 3);
+
+        Assert.Equal(60.0, Toplam(60), 3);
+        Assert.Equal(360.0, Toplam(360), 3);
     }
 
     [Theory]
