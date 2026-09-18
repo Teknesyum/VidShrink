@@ -716,10 +716,15 @@
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="Template">
           <ControlTemplate TargetType="CheckBox">
-            <Grid ColumnDefinitions="24,8,*" MinHeight="24" Background="Transparent" VerticalAlignment="Center">
-              <Panel Grid.Column="0" Width="24" Height="24">
+            <Grid MinHeight="{StaticResource TargetMinSize}" Background="Transparent" VerticalAlignment="Center">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{StaticResource CheckColumnWidth}"/>
+                <ColumnDefinition Width="{StaticResource CheckGapWidth}"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Panel Grid.Column="0" Width="{StaticResource TargetMinSize}" Height="{StaticResource TargetMinSize}">
                 <Border Name="CheckOutline"
-                        Width="20" Height="20"
+                        Width="{StaticResource CheckGlyphSize}" Height="{StaticResource CheckGlyphSize}"
                         HorizontalAlignment="Center" VerticalAlignment="Center"
                         Background="{StaticResource Surface}"
                         BorderBrush="{StaticResource NeonBlue}"
@@ -733,7 +738,7 @@
                   </Border.Transitions>
                 </Border>
                 <Path Name="CheckMark"
-                      Width="20" Height="20"
+                      Width="{StaticResource CheckGlyphSize}" Height="{StaticResource CheckGlyphSize}"
                       HorizontalAlignment="Center" VerticalAlignment="Center"
                       Data="M 4 10 L 8 14 L 16 5"
                       Stroke="{StaticResource NeonBlue}"
@@ -750,7 +755,7 @@
                   </Path.Transitions>
                 </Path>
                 <Border Name="FocusRing"
-                        Width="24" Height="24"
+                        Width="{StaticResource TargetMinSize}" Height="{StaticResource TargetMinSize}"
                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                         IsHitTestVisible="False"
                         BorderBrush="Transparent"
@@ -1218,7 +1223,7 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Template">
           <ControlTemplate TargetType="Slider">
-            <Border Name="Root" Background="Transparent" Padding="10,0">
+            <Border Name="Root" Background="Transparent" Padding="{StaticResource SliderTrackPadding}">
               <Panel>
                 <Track Name="PART_Track"
                        Minimum="{TemplateBinding Minimum}"
@@ -1302,7 +1307,7 @@
         <Setter Property="Template">
           <ControlTemplate TargetType="Thumb">
             <Border Name="ThumbVisual"
-                    Margin="1"
+                    Margin="{StaticResource ScrollBarThumbMargin}"
                     Background="{StaticResource NeonBlue}"
                     CornerRadius="{StaticResource RadiusCell}"/>
           </ControlTemplate>
