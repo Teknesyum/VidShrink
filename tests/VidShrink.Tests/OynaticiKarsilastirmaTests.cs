@@ -27,6 +27,25 @@ internal static class KarsilastirmaKanit
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "dalga5");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     internal static string F(double value) => value.ToString("0.000", CultureInfo.InvariantCulture);
 }
 
@@ -235,6 +254,7 @@ public sealed class OynaticiKarsilastirmaTests
         Assert.True(okunan.Count == oynarken.Count, $"oynarken okunamayan kare {oynarken.Count - okunan.Count}");
         Assert.True(farklar.Max() <= 1, $"oynarken iki yari {farklar.Max()} kare ayrisik");
         Assert.True(okunan[^1].Sol!.Value - okunan[0].Sol!.Value >= 60, $"sol yari ilerlemedi: {okunan[0].Sol} -> {okunan[^1].Sol}");
+        KarsilastirmaKanit.Kapat("k1-iki-yari-kare-farki.txt");
     }
 
     [Fact]
@@ -283,6 +303,7 @@ public sealed class OynaticiKarsilastirmaTests
         Assert.True(oynarken - aramaSonrasi >= 0.4, $"Play sonrasi konum ilerlemedi: {KarsilastirmaKanit.F(aramaSonrasi)} -> {KarsilastirmaKanit.F(oynarken)}");
         Assert.True(duraklatildi, "Pause sonrasi ses motoru oynamaya devam ediyor");
         Assert.True(Math.Abs(sonra - durdugu) < 0.05, $"Pause sonrasi konum ilerledi: {KarsilastirmaKanit.F(durdugu)} -> {KarsilastirmaKanit.F(sonra)}");
+        KarsilastirmaKanit.Kapat("k2-onizleme-sesi.txt");
     }
 
     [Fact]
@@ -544,5 +565,6 @@ public sealed class OynaticiEskiYolTests
         Assert.Empty(yuklu);
         Assert.True(motorFabrikasi, "MainWindow karsilastirma panelini motor kaynagiyla kurmuyor");
         Assert.True(sesAlani, "PreviewAudio motor tutmuyor");
+        KarsilastirmaKanit.Kapat("k3-eski-yol-taramasi.txt");
     }
 }

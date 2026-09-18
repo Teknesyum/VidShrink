@@ -27,6 +27,25 @@ internal static class GelismisKanit
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "dalga4a");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     internal static string Gecici(string ad)
     {
         var path = Path.Combine(Folder, "gecici", ad + "-" + Guid.NewGuid().ToString("N")[..8]);
@@ -81,6 +100,7 @@ public sealed class OynaticiGelismisTests
         });
 
         GelismisKanit.Write("goruntu-ayarlari.txt", rapor);
+        GelismisKanit.Kapat("goruntu-ayarlari.txt");
     }
 
     [Fact]
@@ -129,6 +149,7 @@ public sealed class OynaticiGelismisTests
         });
 
         GelismisKanit.Write("ses-ayarlari.txt", rapor);
+        GelismisKanit.Kapat("ses-ayarlari.txt");
     }
 
     /// <summary>
@@ -175,6 +196,7 @@ public sealed class OynaticiGelismisTests
         });
 
         GelismisKanit.Write("altyazi-bicimi.txt", rapor);
+        GelismisKanit.Kapat("altyazi-bicimi.txt");
     }
 
     /// <summary>
@@ -219,6 +241,7 @@ public sealed class OynaticiGelismisTests
         });
 
         GelismisKanit.Write("kare-negatif-kontrol.txt", rapor);
+        GelismisKanit.Kapat("kare-negatif-kontrol.txt");
     }
 
     [Fact]
@@ -256,6 +279,7 @@ public sealed class OynaticiGelismisTests
         });
 
         GelismisKanit.Write("kalicilik.txt", rapor);
+        GelismisKanit.Kapat("kalicilik.txt");
     }
 
     [Fact]
@@ -288,6 +312,7 @@ public sealed class OynaticiGelismisTests
         });
 
         GelismisKanit.Write("gelismis-menu.txt", rapor);
+        GelismisKanit.Kapat("gelismis-menu.txt");
     }
 
     [Fact]
@@ -324,6 +349,7 @@ public sealed class OynaticiGelismisTests
         });
 
         GelismisKanit.Write("ayarlar-kumesi.txt", rapor);
+        GelismisKanit.Kapat("ayarlar-kumesi.txt");
     }
 
     private static IEnumerable<MenuItem> Ilerisi(MenuItem kok)

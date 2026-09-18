@@ -42,6 +42,27 @@ internal static class KisayolKanit
         File.WriteAllText(path, body, new UTF8Encoding(false));
     }
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// Ad bir klasörse (testin geçici kökü) ağacıyla birlikte gider.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-kisayol");
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+            else if (Directory.Exists(yol)) Directory.Delete(yol, true);
+        }
+
+        if (Directory.Exists(klasor) && Directory.GetFileSystemEntries(klasor).Length == 0)
+        {
+            Directory.Delete(klasor);
+        }
+    }
+
     private static string Uret(string path, params string[] args)
     {
         if (File.Exists(path) && new FileInfo(path).Length > 0) return path;
@@ -247,6 +268,7 @@ public sealed class OynaticiKisayolTests
 
         KisayolKanit.Write(Path.Combine("tuslar", ad + ".txt"), kayit);
         Assert.True(hata is null, kayit);
+        KisayolKanit.Kapat(Path.Combine("tuslar", ad + ".txt"), Path.Combine("gecmis", ad + ".json"), "goruntu", "klip-" + ad);
     }
 
     private static string Klip(string ad) => ad switch
@@ -722,6 +744,7 @@ public sealed class OynaticiKisayolTests
 
         KisayolKanit.Write("odak.txt", kayit);
         Assert.True(sonuc, kayit);
+        KisayolKanit.Kapat("odak.txt", Path.Combine("gecmis", "odak.json"));
     }
 
     [Fact]
@@ -763,5 +786,6 @@ public sealed class OynaticiKisayolTests
 
         KisayolKanit.Write("tam-mini.txt", kayit);
         Assert.True(sonuc, kayit);
+        KisayolKanit.Kapat("tam-mini.txt", Path.Combine("gecmis", "tam-mini.json"));
     }
 }
