@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
@@ -422,9 +422,20 @@ public sealed class RecorderSession : IAsyncDisposable
                 _watch.Line(line);
         }, CancellationToken.None);
 
-        _ = await Task.WhenAny(firstBlock.Task, process.WaitForExitAsync(ct), Task.Delay(StartTimeoutMs, ct));
+        var kazanan = await Task.WhenAny(firstBlock.Task, process.WaitForExitAsync(ct), Task.Delay(StartTimeoutMs, ct));
 
-        if (firstBlock.Task.IsCompletedSuccessfully && firstBlock.Task.Result)
+        if (!ReferenceEquals(kazanan, firstBlock.Task) && process.HasExited)
+        {
+            _ = await Task.WhenAny(_stdoutPump, Task.Delay(StartTimeoutMs, ct));
+        }
+
+        var bittiSayilir = firstBlock.Task.IsCompletedSuccessfully && firstBlock.Task.Result;
+        if (!bittiSayilir && process.HasExited && process.ExitCode == 0)
+        {
+            bittiSayilir = File.Exists(path) && new FileInfo(path).Length > 0;
+        }
+
+        if (bittiSayilir)
         {
             State = RecorderState.Running;
             _ = WatchExitAsync(process);
@@ -437,6 +448,9 @@ public sealed class RecorderSession : IAsyncDisposable
         throw new InvalidOperationException(
             $"ffmpeg kaydi baslatamadi ({_lastExitCode}): {FfmpegRunner.Tail(string.Join('\n', _watch.Close(_lastExitCode).Tail))}");
     }
+
+    /// <summary>Ölçü dikişi: ilerleme bloğu hiç gelmemiş gibi davranır; CI'daki belirtinin aynısı.</summary>
+    internal static bool IlerlemeyiYut;
 
     private async Task PumpProgressAsync(Process process, TaskCompletionSource<bool> firstBlock)
     {
@@ -465,7 +479,7 @@ public sealed class RecorderSession : IAsyncDisposable
                 case "out_time_ms" when long.TryParse(value, out var legacy) && _capturedNow == TimeSpan.Zero:
                     _capturedNow = TimeSpan.FromSeconds(legacy / 1_000_000.0);
                     break;
-                case "progress":
+                case "progress" when !IlerlemeyiYut:
                     firstBlock.TrySetResult(true);
                     _progress?.Report(new RecordProgress(
                         _clock.Elapsed, _capturedBefore + _capturedNow, _outputMb, _frames, _dropped));

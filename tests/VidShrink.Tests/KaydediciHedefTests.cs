@@ -235,6 +235,37 @@ public sealed class KaydediciHedefTests
         Assert.InRange(paketBayt - sonKume, 0, sinir);
     }
 
+    /// <summary>
+    /// CI kirmizisinin pimi (35316250545): sinir ilk karede dolunca ffmpeg 0 ile biter ve
+    /// baslangic el sikismasi ilerleme blogunu hic gormeyebilir. Biten kayit "baslatamadi" degildir.
+    /// </summary>
+    [KayitFact]
+    public async Task IlerlemeBloguGelmese_deSifirlaBitenKayitBaslatamadiSayilmaz()
+    {
+        var cikti = Path.Combine(Kanit, "yaris-ilk-kare.mp4");
+        var istek = Istek() with { Quality = 0, KeyframeSeconds = 1, MaxMegabytes = 0.05 };
+
+        RecorderSession.IlerlemeyiYut = true;
+        RecordResult sonuc;
+        bool bitti;
+        try
+        {
+            var oturum = await RecorderSession.StartAsync(istek, cikti);
+            bitti = await Task.WhenAny(oturum.Ended, Task.Delay(15000)) == oturum.Ended;
+            sonuc = await oturum.StopAsync();
+        }
+        finally { RecorderSession.IlerlemeyiYut = false; }
+
+        var bayt = File.Exists(cikti) ? new FileInfo(cikti).Length : 0;
+        File.WriteAllLines(Path.Combine(Kanit, "yaris-ilk-kare.txt"), new[] { $"ilerlemeYutuldu=True ended={bitti} ok={sonuc.Ok} bayt={bayt} kod={sonuc.ExitCode}" });
+        if (File.Exists(cikti)) File.Delete(cikti);
+
+        Assert.True(bitti, "sinir dolunca oturum kendiliginden bitmeli");
+        Assert.True(sonuc.Ok, sonuc.StandardError);
+        Assert.True(bayt > 0);
+        File.Delete(Path.Combine(Kanit, "yaris-ilk-kare.txt"));
+    }
+
     private static (long Toplam, long SonKume) Paketler(string dosya)
     {
         if (!File.Exists(dosya)) return (0, 0);
