@@ -262,3 +262,229 @@ istenmeden gelen kanıtı.
 dotnet test ... --filter "FullyQualifiedName~OynaticiKisayolTests"
 Başarılı!  - Başarısız:     0, Başarılı:    69, Atlanan:     0, Toplam:    69, Süre: 48 s - VidShrink.Tests.dll (net8.0)
 ```
+
+## Yeniden Ölçüm — İki Kolun Dökümü Aynı Genişlikte (18 Eylül 2026)
+
+Yukarıdaki kırmızı koşumun klasör dökümü budanmıştı: yeşilde 13 başlık, kırmızıda 2. Plan
+"ikisinin ham çıktısı birebir" dediği için iki kol da aynı listeyle, aynı betikle
+(`tools/kanit-dokumu.sh`, 13 klasör, `find -maxdepth 2`) yeniden alındı.
+
+Her kolun öncesinde uçucu klasörler silindi (`dalga1`, `dalga3`, `dalga4a`, `dalga4b`,
+`oynatici-yol-haritasi`, `oynatici-kisayol/gecmis`); pahalı önbellek klipleri (2160p kodlama)
+duruyor. İlk deneme bunu atladığı için iki koşumun artığı üst üste bindi — `dalga3` 181 satır
+çıktı, belgedeki yeşilde 68'di. Ölçü o haliyle kıyas taşımaz, atıldı.
+
+Mutasyon değişmedi: `OynaticiDenetimTests.cs:328`, `Assert.Empty(izsiz);` → `Assert.NotEmpty(izsiz);`.
+Koşumdan sonra **elle** geri yazıldı (`git checkout` yok, `git diff` boş).
+
+Motor yerelde `VIDSHRINK_LIBMPV=C:\Users\Administrator\Desktop\Projeler\VidShrink\tools\libmpv\libmpv-2.dll`
+ile verildi; belgenin başındaki `.calisma\hiper\yeni\...` yolu bu makinede yok.
+
+### Sonuçlar
+
+```
+kirmizi: Başarısız! - Başarısız: 1, Başarılı: 158, Atlanan: 0, Toplam: 159, Süre: 3 m 38 s
+         [FAIL] VidShrink.Tests.KeymapTests.KisayolTablosundaCakismaYokVeHerKomutErisilebilir
+         Assert.NotEmpty() Failure: Collection was empty
+         EXITCODE=1
+
+yesil:   Başarısız! - Başarısız: 1, Başarılı: 158, Atlanan: 0, Toplam: 159, Süre: 3 m 38 s
+         [FAIL] VidShrink.Tests.OynaticiMotorTestsGirdi.OnHizliTikteAramalarYuzElliMilisaniyeSinirindaKalir
+         150 ms sinirini asan arama: 204.8
+         EXITCODE=1
+```
+
+Yeşil kolun düşeni mutasyondan bağımsız, yüklü makinede kayan bir zamanlama ölçüsü
+(`[HedefMakineFact]`, CI'da atlanıyor, yerelde sessiz makine istiyor). Tek başına tekrarlandı:
+
+```
+--filter "FullyQualifiedName~OnHizliTikteAramalarYuzElliMilisaniyeSinirindaKalir"
+Başarılı!  - Başarısız: 0, Başarılı: 1, Atlanan: 0, Toplam: 1, Süre: 240 ms
+```
+
+Aynı makinede arka arkaya üç uzun koşum döndüğü için bu ölçünün yerelde kayması beklenir;
+kapanış kuralı hakkında bir şey söylemez.
+
+### İki dökümün farkı
+
+Dökümler satır satır karşılaştırıldı; `gecici\<ad>-<rastgele>` köklerinin adları her koşumda
+değiştiği için onlar elendi. Geriye kalan **tek** fark:
+
+```
+$ diff yesil-dokum.txt kirmizi-dokum.txt | grep "^[<>]" | grep -v "gecici"
+> dalga1\keymap-cakisma.txt
+```
+
+Kuralın söylediği tam olarak bu: kırmızı kolda yalnız düşen testin kanıtı ayakta kalıyor,
+aynı klasördeki diğer on iki testin kanıtı siliniyor, geri kalan 12 klasör iki kolda birebir aynı.
+
+### Kırmızı kolun dökümü (13 klasör, tamamı)
+
+```
+--- klasor: .calisma/oynatici-motor
+oynatici-motor\h264_1080p60.mp4
+oynatici-motor\h264_2160p30.mp4
+oynatici-motor\hevc_1080p60.mp4
+oynatici-motor\konum-kurulu
+oynatici-motor\konum-kurulu\app
+oynatici-motor\konum-kurulu\tools
+oynatici-motor\konum-mac
+oynatici-motor\konum-mac\app
+oynatici-motor\konum-ortam
+oynatici-motor\konum-ortam\app
+oynatici-motor\konum-ortam\ozel
+oynatici-motor\konum-ortam\tools
+oynatici-motor\konum-yayin
+oynatici-motor\konum-yayin\app
+oynatici-motor\konum-yayin\tools
+oynatici-motor\kucuk-320x180-25sn.mp4
+oynatici-motor\serit-cikti-crf35.mp4
+oynatici-motor\serit-kaynak-320x180-30.mp4
+--- klasor: .calisma/dalga2
+dalga2\gomulu.srt
+dalga2\parca-2ses-1altyazi.mkv
+--- klasor: .calisma/dalga3
+dalga3\bolumler.txt
+dalga3\bolumlu-320x180.mp4
+dalga3\gecici
+dalga3\gecici\ayar-8f8fa36e
+dalga3\gecici\bilgi-82b668bb
+dalga3\gecici\birak-0f70351a
+dalga3\gecici\bolum-d3514a64
+dalga3\gecici\goruntu-57e8205b
+dalga3\gecici\goruntu-ayar-e4314242
+dalga3\gecici\klasor-827d8c16
+dalga3\gecici\klasor-ayar-26255267
+dalga3\gecici\otomatik-All-54dd8083
+dalga3\gecici\otomatik-Off-e284f31c
+dalga3\gecici\secici-ayar-378aff89
+dalga3\gecici\secici-ayar-c4aef90f
+dalga3\gecici\secici-hedef-0ddcab57
+dalga3\gecici\secici-hedef-f52968d6
+dalga3\gecici\sira-b8ba77f8
+dalga3\gecici\son-525128df
+dalga3\gecici\son-ayar-4396e255
+dalga3\gecici\ustte-70661357
+--- klasor: .calisma/dalga7b -> YOK
+--- klasor: .calisma/dalga4a
+dalga4a\gecici
+dalga4a\gecici\kalicilik-d0e80cd6
+--- klasor: .calisma/dalga4b
+dalga4b\gecici
+dalga4b\gecici\adres-1d1af62b
+dalga4b\gecici\ayar-67c879f3
+dalga4b\gecici\klip-813d4501
+dalga4b\gecici\kucukresim-a38d65f1
+dalga4b\gecici\kucukresim-esik-75e279bb
+dalga4b\gecici\serit-motor-e507104e
+dalga4b\gecici\serit-surukleme-7ae8e1b3
+--- klasor: .calisma/dalga5 -> YOK
+--- klasor: .calisma/T176
+T176\girdi-20sn.mkv
+T176\k1-sekme.txt
+--- klasor: .calisma/dalga1
+dalga1\keymap-cakisma.txt
+dalga1\player-recent.json
+--- klasor: .calisma/oynatici-yol-haritasi
+oynatici-yol-haritasi\p14
+oynatici-yol-haritasi\p14-esik
+oynatici-yol-haritasi\p14-esik\player-history.json
+oynatici-yol-haritasi\p14\player-history.json
+--- klasor: .calisma/oynatici-kisayol
+oynatici-kisayol\gecmis
+oynatici-kisayol\gecmis\player-recent.json
+oynatici-kisayol\gecmis\player-settings.json
+oynatici-kisayol\kirmizi-sol-mavi-sag-320x180.mp4
+oynatici-kisayol\liste
+oynatici-kisayol\liste\a-uzun-700sn.mkv
+oynatici-kisayol\liste\b-iki-renk.mp4
+oynatici-kisayol\tuslar
+oynatici-kisayol\uzun.srt
+--- klasor: .calisma/girdi-dalga3 -> YOK
+--- klasor: .calisma/girdi -> YOK
+```
+
+### Yeşil kolun dökümü (13 klasör, tamamı)
+
+```
+--- klasor: .calisma/oynatici-motor
+oynatici-motor\h264_1080p60.mp4
+oynatici-motor\h264_2160p30.mp4
+oynatici-motor\hevc_1080p60.mp4
+oynatici-motor\konum-kurulu
+oynatici-motor\konum-kurulu\app
+oynatici-motor\konum-kurulu\tools
+oynatici-motor\konum-mac
+oynatici-motor\konum-mac\app
+oynatici-motor\konum-ortam
+oynatici-motor\konum-ortam\app
+oynatici-motor\konum-ortam\ozel
+oynatici-motor\konum-ortam\tools
+oynatici-motor\konum-yayin
+oynatici-motor\konum-yayin\app
+oynatici-motor\konum-yayin\tools
+oynatici-motor\kucuk-320x180-25sn.mp4
+oynatici-motor\serit-cikti-crf35.mp4
+oynatici-motor\serit-kaynak-320x180-30.mp4
+--- klasor: .calisma/dalga2
+dalga2\gomulu.srt
+dalga2\parca-2ses-1altyazi.mkv
+--- klasor: .calisma/dalga3
+dalga3\bolumler.txt
+dalga3\bolumlu-320x180.mp4
+dalga3\gecici
+dalga3\gecici\ayar-fd4d4508
+dalga3\gecici\bilgi-3c8c94dc
+dalga3\gecici\birak-00a32573
+dalga3\gecici\bolum-250cb7b6
+dalga3\gecici\goruntu-ae3c1b49
+dalga3\gecici\goruntu-ayar-e12a2f07
+dalga3\gecici\klasor-ayar-f7f026a9
+dalga3\gecici\klasor-c9b93dcb
+dalga3\gecici\otomatik-All-14fd1278
+dalga3\gecici\otomatik-Off-a347180d
+dalga3\gecici\secici-ayar-3458440d
+dalga3\gecici\secici-ayar-e51fe0e8
+dalga3\gecici\secici-hedef-2abad47f
+dalga3\gecici\secici-hedef-caa8dc38
+dalga3\gecici\sira-ea5405ca
+dalga3\gecici\son-9843d07d
+dalga3\gecici\son-ayar-2952030f
+dalga3\gecici\ustte-b0e10541
+--- klasor: .calisma/dalga7b -> YOK
+--- klasor: .calisma/dalga4a
+dalga4a\gecici
+dalga4a\gecici\kalicilik-e367e018
+--- klasor: .calisma/dalga4b
+dalga4b\gecici
+dalga4b\gecici\adres-217ef9b5
+dalga4b\gecici\ayar-5bd3f644
+dalga4b\gecici\klip-1e2fc91c
+dalga4b\gecici\kucukresim-39579a93
+dalga4b\gecici\kucukresim-esik-8e51d6e9
+dalga4b\gecici\serit-motor-3026207e
+dalga4b\gecici\serit-surukleme-8bd1a561
+--- klasor: .calisma/dalga5 -> YOK
+--- klasor: .calisma/T176
+T176\girdi-20sn.mkv
+T176\k1-sekme.txt
+--- klasor: .calisma/dalga1
+dalga1\player-recent.json
+--- klasor: .calisma/oynatici-yol-haritasi
+oynatici-yol-haritasi\p14
+oynatici-yol-haritasi\p14-esik
+oynatici-yol-haritasi\p14-esik\player-history.json
+oynatici-yol-haritasi\p14\player-history.json
+--- klasor: .calisma/oynatici-kisayol
+oynatici-kisayol\gecmis
+oynatici-kisayol\gecmis\player-recent.json
+oynatici-kisayol\gecmis\player-settings.json
+oynatici-kisayol\kirmizi-sol-mavi-sag-320x180.mp4
+oynatici-kisayol\liste
+oynatici-kisayol\liste\a-uzun-700sn.mkv
+oynatici-kisayol\liste\b-iki-renk.mp4
+oynatici-kisayol\tuslar
+oynatici-kisayol\uzun.srt
+--- klasor: .calisma/girdi-dalga3 -> YOK
+--- klasor: .calisma/girdi -> YOK
+```
