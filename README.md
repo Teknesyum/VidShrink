@@ -150,6 +150,7 @@ single spelling.
 | Turkish | English |
 |---|---|
 | `--yardim` | `--help` |
+| `--surum` | `--version` |
 | `--hedef` | `--target` |
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |

@@ -150,6 +150,7 @@ bunların tek yazımı var.
 | Türkçe | İngilizce |
 |---|---|
 | `--yardim` | `--help` |
+| `--surum` | `--version` |
 | `--hedef` | `--target` |
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |
