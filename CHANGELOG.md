@@ -7,8 +7,99 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- A screen recorder tab. Pick a screen, a window or drag a region with an aspect-ratio lock
+  and preset sizes; start after an optional 3/5/10 s countdown; F7-F11 work as global hotkeys
+  even when the window is not focused (`RecorderHotkeys.cs:32-39`).
+- Recordings go to Matroska by default and can be remuxed to MP4 from the result panel; MOV
+  and GIF are also available (`RecorderArguments.cs:798-809`).
+- While recording: a click-through frame outside the captured area (F9 hides it), a tray icon
+  with elapsed time and written megabytes, a webcam overlay with optional background removal,
+  a cursor magnifier, click rings with a sound, on-screen keystrokes, a live thumbnail and a
+  rolling replay buffer saved with F11 (`RecorderView.Tampon.cs:95-178`).
+- Grab a still frame without interrupting the recording; split by duration or size with the
+  overall limits counted across parts (`RecorderArguments.cs:1075-1094`); stop at a size cap;
+  open the output folder when done; discard everything with F10.
+- One click removes frozen, idle stretches from a finished recording (`IdleTrim.cs:24`).
+- With "follow recording" on, a finished recording is loaded into the Shrink tab and opened
+  paused in the player without switching tabs (`MainWindow.OdakTakibi.cs:59-82`).
+- Window capture also works on macOS (CGWindowList) and X11 Linux, and refuses under Wayland
+  (`RecorderWindowsMac.cs:22`, `RecorderWindowsX11.cs:22-24`).
+- A headless CLI (`vidshrink-cli`, shipped with every release): `kucult`/`shrink`, `plan` and
+  `izle`/`watch`, with TR/EN flag pairs (`--hedef`/`--target`, `--kes`/`--cut`) and
+  script-friendly exit codes - 0 in band, 2 under, 3 ceiling exceeded, 4 watch errors, 64
+  usage (`CliRequest.cs:10-19`). The GUI and the CLI share one decision engine, `ShrinkEngine`.
+- `izle` watches a folder: it waits for a file to stop growing, never re-shrinks its own
+  output, keeps its state in `.vidshrink-izle.json` and warns but keeps running when the
+  folder is read-only (`WatchFolder.cs:198-231`).
+- `--kes 30-90` shrinks only a window of the source: the target size applies to that window,
+  and a source that already fits is stream-copied into the trimmed window instead of being
+  copied whole (`TrimWindow.cs:56-67`).
+- The player downloads subtitles from OpenSubtitles: search and download from the track menu,
+  sign in from Settings, and a 401 on download says the file needs an account instead of
+  blaming the key (`OpenSubtitlesProvider.cs:403-420`).
+- Keep all tracks: an option that survives restarts, moves every audio and subtitle track into
+  MKV with explicit `-map`, matches the primary audio by language and subtracts the side
+  tracks from the budget; eight stream notes explain the choice (`StreamMapping.cs:115-165`).
+- Overshooting the target by more than 3% asks what to do: retry, trim, accept the larger
+  file, or leave it (`OvershootTrim.cs:22`).
+- Fixed output sizes (1080/720/480) when dynamic resolution is off, plus a WhatsApp
+  compatibility box and a "send as document" hint (`MainWindow.axaml:485-494`).
+- Releases now ship win-arm64 and linux-arm64 alongside x64, and the installer picks the
+  package matching the machine (`release.yml:204`, `UpdateCheck.cs:162`).
+- "Reset all data" deletes the app's settings, history and share records
+  (`AppDataReset.cs:19-30`).
+
+### Changed
+
+- Interlaced sources are detected (idet) and deinterlaced, and the crop is probed, on the
+  ordinary encode path (`VideoFilterChain.cs:105-126`).
+- On a dark source Auto switches from AV1 to H.265 turbo to avoid banding and says so in the
+  reason line; HDR (PQ/HLG) sources are excluded (`DarkContentSwitch.cs:5-25`).
+- The codec strip now offers AV1 as the smallest option - the old "H.265 (smallest)" label
+  named a codec the engine did not use - with a tooltip about device compatibility
+  (`PlanCalculator.cs:1404`).
+- When the delivered file misses the budget the engine fills it with one step up, and a
+  ceiling guard aims 0.90 x ceiling on the last attempt and still delivers the smallest
+  result (`BudgetFill.cs`, `CeilingGuard.cs`).
+- A saturation rule stops attempts once bits stop buying quality and steps the layout down
+  (`Saturation.cs`).
+- Automatic plans no longer drop the frame rate (`PlanCalculator.cs`).
+- Player shortcuts follow the GOM layout: rotation on a key, in the menu and in the tooltip, a
+  0.05 speed step, the double-click time read from the system, and the window snapping to the
+  screen centre while dragged (`Keymap.cs:53`, `PlayerInputMap.cs:257-271`).
+- Alt+wheel resizes the frame, and the right-click menu carries Settings and a player shortcut
+  list as submenus without leaving the player (`PlayerView.axaml.cs:412-447`).
+- The top bar opens in the same band as the bottom strip and stays open while paused; seek
+  buttons print the seconds they skip; the strip opens spreading from the pointer
+  (`HoverZone.cs:116-119`).
+- The icon set moved to Fluent UI System Icons (`Themes/Icons.axaml`).
+- Settings: two-option lists became radio strips, language and theme sit side by side, and the
+  share target is a radio strip (`MainWindow.axaml:1195-1302`).
+- The comparison badge shows only the CRF; ORIGINAL/PROCESSED labels moved above the panel.
+- Shared files default to one day of retention instead of three (`paylasim-hedefleri.json:9`).
+- The Shrink job window can share the finished file (`ShrinkJobWindow.Paylas.cs:22-62`).
+- The macOS installer downloads the MPVKit libmpv dylib with a sha256 check; macOS 14 is the
+  supported baseline (`install-vidshrink.sh:298-320`).
+- The win-x64 publish is ReadyToRun composite; a file opened from the shell reaches the first
+  frame about 120 ms sooner (`VidShrink.App.csproj:17-24`).
+- The launcher no longer shows a panel on an ordinary start: the app is spawned first and
+  maintenance runs behind it, a manual Install first finishes a pending staged update, and an
+  app-folder gate keeps the folder from being written while a copy runs
+  (`Launcher/Program.cs:62-98`).
+- The Linux/macOS installer uses `GITHUB_TOKEN` when present so the release query does not hit
+  the rate limit (`install-vidshrink.sh:397-399`).
+- Units, abbreviations and the new keys are translated in 42-43 languages.
+
 ### Fixed
 
+- A killed recording stays playable: Matroska is written with `-flush_packets 1`
+  (`RecorderArguments.cs:1029`).
+- A recording that ended normally is no longer reported as a start-up failure
+  (`RecorderSession.cs`).
+- An interlaced x264 source has its height cropped to a multiple of 4 instead of failing.
+- ffmpeg 8 rejecting `-top` no longer breaks the deinterlace path.
 - Screen capture on a multi-monitor desktop no longer records the whole virtual desktop when
   the first monitor is selected. `gdigrab` takes no screen index, so every monitor - index 0
   included - is now converted to an offset region; a single-monitor machine keeps the
