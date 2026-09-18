@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Track names and subtitle flags survive the shrink. A track's title is carried over as it is,
+  and a subtitle's default/forced flag is written out explicitly instead of being left to the
+  muxer. In MP4 the title lands in the `name` atom; the `default` flag there is ffmpeg's own
+  (`docs/olcumler/e6-altyazi-bayragi-iz-adi.md`).
 - MOV is a shrink-path container. Name the output `.mov` and the file is muxed as MOV instead of
   being silently treated as MP4: `+faststart` and `mov_text` subtitles carry over from the MP4
   family, and HandBrake's `av_mov` presets import. MOV cannot carry opus or flac, so such a track

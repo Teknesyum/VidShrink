@@ -123,7 +123,8 @@ public static class FfprobeClient
                 GetInt(s, "channels") ?? 0,
                 bitrate,
                 bytes,
-                kind == StreamKind.Video && IsAttachedPicture(s)));
+                kind == StreamKind.Video && IsAttachedPicture(s),
+                tags is { } titleTags ? GetString(titleTags, "title") : null));
         }
         return list;
     }

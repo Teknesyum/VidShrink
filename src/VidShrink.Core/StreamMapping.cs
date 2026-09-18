@@ -31,19 +31,35 @@ public sealed record SourceStream(
     int Channels = 0,
     long BitrateBps = 0,
     long Bytes = 0,
-    bool IsAttachedPicture = false);
+    bool IsAttachedPicture = false,
+    string? Title = null);
 
 public sealed record StreamRequest(bool KeepAllTracks = false, bool PlatformDelivery = false, string? PreferredLanguage = null)
 {
     public static StreamRequest Default { get; } = new();
 }
 
-public sealed record AudioTrack(string Map, TrackAction Action, string Codec, int BitrateK, int? Channels, string? Language)
+public sealed record AudioTrack(string Map, TrackAction Action, string Codec, int BitrateK, int? Channels, string? Language, string? Title = null)
 {
     public bool Copies => Action == TrackAction.Copy;
 }
 
-public sealed record SubtitleTrack(string Map, string Codec, bool Image, string? Language, long Bytes);
+public sealed record SubtitleTrack(string Map, string Codec, bool Image, string? Language, long Bytes,
+    string? Title = null, bool IsDefault = false, bool IsForced = false)
+{
+    /// <summary>
+    /// Kaynağın bayrakları <c>-disposition</c>'a açık yazılır: mp4 muxer'ı yazılmazsa ilk
+    /// altyazıyı kendiliğinden varsayılan yapıyor, MKV yapmıyor
+    /// (<c>docs/olcumler/e6-altyazi-bayragi-iz-adi.md</c>).
+    /// </summary>
+    public string Disposition => (IsDefault, IsForced) switch
+    {
+        (true, true) => "default+forced",
+        (true, false) => "default",
+        (false, true) => "forced",
+        _ => "0"
+    };
+}
 
 public sealed record StreamPlan(
     OutputContainer Container,
@@ -83,6 +99,19 @@ public sealed record StreamPlan(
 
         if (Attachments.Count > 0) a.AddRange(new[] { "-c:t", "copy" });
         if (!Request.KeepAllTracks && Audio.Count == 1) a.AddRange(new[] { "-disposition:a:0", "default" });
+
+        for (var i = 0; i < Audio.Count; i++)
+            if (!string.IsNullOrWhiteSpace(Audio[i].Title))
+                a.AddRange(new[] { "-metadata:s:a:" + i.ToString(CultureInfo.InvariantCulture), "title=" + Audio[i].Title });
+
+        for (var i = 0; i < Subtitles.Count; i++)
+        {
+            var index = i.ToString(CultureInfo.InvariantCulture);
+            if (!string.IsNullOrWhiteSpace(Subtitles[i].Title))
+                a.AddRange(new[] { "-metadata:s:s:" + index, "title=" + Subtitles[i].Title });
+            a.AddRange(new[] { "-disposition:s:" + index, Subtitles[i].Disposition });
+        }
+
         a.AddRange(new[] { "-map_metadata", "0", "-map_chapters", dropChapters ? "-1" : "0" });
         return a;
     }
@@ -218,7 +247,7 @@ public static class StreamMapping
                 var sourceK = source.BitrateBps / 1000.0;
                 if (audioCodec == "copy")
                 {
-                    audio.Add(new AudioTrack(map, TrackAction.Copy, "copy", (int)Math.Round(sourceK > 0 ? sourceK : audioK), null, source.Language));
+                    audio.Add(new AudioTrack(map, TrackAction.Copy, "copy", (int)Math.Round(sourceK > 0 ? sourceK : audioK), null, source.Language, source.Title));
                     continue;
                 }
 
@@ -235,7 +264,7 @@ public static class StreamMapping
                 if (copyable)
                 {
                     passedK += sourceK;
-                    audio.Add(new AudioTrack(map, TrackAction.Copy, "copy", (int)Math.Round(sourceK), null, source.Language));
+                    audio.Add(new AudioTrack(map, TrackAction.Copy, "copy", (int)Math.Round(sourceK), null, source.Language, source.Title));
                     notes.Add(StreamNote.AudioPassthrough);
                     continue;
                 }
@@ -253,7 +282,7 @@ public static class StreamMapping
                 }
                 var codec = audioCodec;
                 if (!IsMp4Family(container) && codec == "aac") codec = "libopus";
-                audio.Add(new AudioTrack(map, TrackAction.Encode, codec, audioK, channels, source.Language));
+                audio.Add(new AudioTrack(map, TrackAction.Encode, codec, audioK, channels, source.Language, source.Title));
             }
         }
 
@@ -272,7 +301,7 @@ public static class StreamMapping
             {
                 if (text)
                 {
-                    subtitles.Add(new SubtitleTrack(Map(source), "mov_text", false, source.Language, source.Bytes));
+                    subtitles.Add(new SubtitleTrack(Map(source), "mov_text", false, source.Language, source.Bytes, source.Title, source.IsDefault, source.IsForced));
                     if (!source.Codec.Equals("mov_text", StringComparison.OrdinalIgnoreCase)) notes.Add(StreamNote.TextSubtitleConverted);
                 }
                 else if (image) notes.Add(StreamNote.ImageSubtitleDropped);
@@ -281,7 +310,7 @@ public static class StreamMapping
 
             if (container == OutputContainer.WebM)
             {
-                if (text) subtitles.Add(new SubtitleTrack(Map(source), "webvtt", false, source.Language, source.Bytes));
+                if (text) subtitles.Add(new SubtitleTrack(Map(source), "webvtt", false, source.Language, source.Bytes, source.Title, source.IsDefault, source.IsForced));
                 else if (image) notes.Add(StreamNote.ImageSubtitleDropped);
                 continue;
             }
@@ -289,11 +318,11 @@ public static class StreamMapping
             if (text)
             {
                 var mov = source.Codec.Equals("mov_text", StringComparison.OrdinalIgnoreCase);
-                subtitles.Add(new SubtitleTrack(Map(source), mov ? "srt" : "copy", false, source.Language, source.Bytes));
+                subtitles.Add(new SubtitleTrack(Map(source), mov ? "srt" : "copy", false, source.Language, source.Bytes, source.Title, source.IsDefault, source.IsForced));
                 if (mov) notes.Add(StreamNote.TextSubtitleConverted);
             }
             else if (image)
-                subtitles.Add(new SubtitleTrack(Map(source), "copy", true, source.Language, source.Bytes));
+                subtitles.Add(new SubtitleTrack(Map(source), "copy", true, source.Language, source.Bytes, source.Title, source.IsDefault, source.IsForced));
         }
 
         var attachments = new List<string>();
