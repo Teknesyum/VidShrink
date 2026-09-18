@@ -14,7 +14,7 @@
   <Color x:Key="AppBgColor">#FF282828</Color>
   <Color x:Key="TextBodyColor">#FFEBDBB2</Color>
   <Color x:Key="TextDisabledColor">#FFA89984</Color>
-  <Color x:Key="OnNeonColor">#FFFFFFFF</Color>
+  <Color x:Key="OnNeonColor">#FF000000</Color>
   <Color x:Key="PinkTextColor">#FFFCD374</Color>
 
   <Color x:Key="NeonBlueFillColor">#1A83A598</Color>
