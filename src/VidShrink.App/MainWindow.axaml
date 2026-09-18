@@ -1264,7 +1264,7 @@
                       <Button x:Name="BtnOpenSubtitlesSignIn" Content="{loc:Text settings-tab.opensubtitles.signin}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignIn"/>
                       <Button x:Name="BtnOpenSubtitlesSignOut" Content="{loc:Text settings-tab.opensubtitles.signout}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignOut"/>
                     </StackPanel>
-                    <TextBlock x:Name="LblOpenSubtitlesStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="LblOpenSubtitlesStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.signedout}"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.accounthint}"/>
                   </StackPanel>
                 </StackPanel>

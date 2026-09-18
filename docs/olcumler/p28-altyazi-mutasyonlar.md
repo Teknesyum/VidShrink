@@ -701,3 +701,20 @@ filtre: FullyQualifiedName~AltyaziIndirmeTests
 Başarısız! - Başarısız:     2, Başarılı:    63, Atlanan:     0, Toplam:    65, Süre: 3 s - VidShrink.Tests.dll (net8.0)
 ```
 
+
+## M16 — Ayarlar Satirinin Acilis Metni (2026-09-18)
+
+CI kosumu 35299914447 `VisibleTextTests.EveryVisibleTextNodeHasContent` ile kirmiziydi:
+`LblOpenSubtitlesStatus` tasarim zamaninda bos aciliyordu, metni yalniz calisma aninda
+`ShowSubtitleSession()` dolduruyordu. Duzeltme: satira gercek acilis durumunun metni verildi
+(`Text="{loc:Text settings-tab.opensubtitles.signedout}"`). Muafiyet listesine eklenmedi.
+
+Mutasyon: `Text` ozniteligi geri cikarildi.
+
+```
+  Hata İletisi:
+   Empty visible text nodes: tab 6: LblOpenSubtitlesStatus
+Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 985 ms - VidShrink.Tests.dll (net8.0)
+```
+
+Geri alindiktan sonra: `Başarılı! - Başarısız: 0, Başarılı: 1, Atlanan: 0, Toplam: 1`.
