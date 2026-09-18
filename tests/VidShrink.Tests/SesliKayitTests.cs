@@ -45,6 +45,9 @@ public sealed class SesliKayitTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Klasor, adlar);
+
     private static readonly AudioCaptureDevice Mikrofon =
         new("Mikrofon Dizisi", CaptureBackend.DirectShow, AudioSourceRole.Microphone);
 
@@ -225,6 +228,8 @@ public sealed class SesliKayitTests
         Assert.Contains("codec_type=video", metin);
         Assert.Contains("codec_type=audio", metin);
         Assert.Equal(2, akislar);
+
+        Kapat("sesli.mp4", "sesli.args.txt", "sesli.ffprobe.txt");
     }
 
     private static (int ExitCode, string Text) Ffprobe(string file, string evidenceName)

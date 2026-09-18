@@ -21,6 +21,9 @@ internal static class SesKanit
 
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
+
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Folder, adlar);
 }
 
 /// <summary>
@@ -130,6 +133,8 @@ public sealed class SesGirisiTests
         Assert.All(liste.Audio, d => Assert.Equal(AudioSourceRole.Microphone, d.Role));
         Assert.All(liste.Audio, d => Assert.StartsWith("@device_cm_", d.Alternative));
         Assert.True(liste.Loaded);
+
+        SesKanit.Kapat("k1-ffmpeg9-dshow-ayristirma.txt");
     }
 
     [Fact]
@@ -146,6 +151,8 @@ public sealed class SesGirisiTests
         Assert.Equal(AudioSourceRole.Microphone, liste.Audio[0].Role);
         Assert.Equal(AudioSourceRole.SystemAudio, liste.Audio[1].Role);
         Assert.Equal("@device_cm_{33D9A762-90C8-11D0-BD43-00A0C911CE86}\\wave_{BBBB}", liste.Audio[1].Alternative);
+
+        SesKanit.Kapat("k2-ffmpeg6-dshow-ayristirma.txt");
     }
 
     [Fact]
@@ -187,6 +194,8 @@ public sealed class SesGirisiTests
         Assert.Equal(AudioSourceRole.SystemAudio, linux.Audio[0].Role);
         Assert.Equal("alsa_input.pci-0000_00_1f.3.analog-stereo", linux.Audio[1].Reference);
         Assert.Equal(AudioSourceRole.Microphone, linux.Audio[2].Role);
+
+        SesKanit.Kapat("k3-mac-linux-ayristirma.txt");
     }
 
     [Fact]
@@ -243,6 +252,8 @@ public sealed class SesGirisiTests
         SesKanit.Write("k4-her-cihaz-arguman.txt", rapor.ToString());
 
         Assert.Equal(9, sayi);
+
+        SesKanit.Kapat("k4-her-cihaz-arguman.txt");
     }
 
     [Fact]
@@ -266,6 +277,8 @@ public sealed class SesGirisiTests
         Assert.Equal(new[] { "[aout]" }, plan.Maps);
         Assert.Equal("audio=Microphone (Realtek High Definition Audio)", plan.Inputs[3]);
         Assert.Equal("audio=Stereo Mix (Realtek High Definition Audio)", plan.Inputs[7]);
+
+        SesKanit.Kapat("k5-amix.txt");
     }
 
     [Fact]
@@ -319,6 +332,8 @@ public sealed class SesGirisiTests
         Assert.NotNull(sebep);
         Assert.Equal(0, plan.InputCount);
         Assert.Empty(plan.Inputs);
+
+        SesKanit.Kapat("k6-negatif-kontrol.txt");
     }
 
     [Fact]

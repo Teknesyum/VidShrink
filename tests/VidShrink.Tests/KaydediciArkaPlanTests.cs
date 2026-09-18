@@ -32,6 +32,9 @@ public sealed class KaydediciArkaPlanTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static RecorderRequest Istek(WebcamBackground arka, int genislik = 160) => new()
     {
         Platform = RecorderPlatform.Windows,
@@ -131,6 +134,8 @@ public sealed class KaydediciArkaPlanTests
         Assert.Equal(("mavi", "kirmizi", "kirmizi"), sonuc["StaticBuyukKutu"]);
         Assert.Equal(("kirmizi", "kirmizi", "kirmizi"), sonuc["StaticBuyukKutuEsik0.08"]);
         Assert.Equal(("kirmizi", "kirmizi", "kirmizi"), sonuc["StaticBuyukKutuEsik0.5"]);
+
+        Kapat(sonuc.Keys.SelectMany(ad => new[] { ad + ".rgb", ad + ".log" }).Append("pikseller.txt").ToArray());
     }
 
     [Fact]

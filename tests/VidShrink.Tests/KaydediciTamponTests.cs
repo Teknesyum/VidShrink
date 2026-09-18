@@ -33,6 +33,9 @@ public sealed class KaydediciTamponTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static RecorderRequest Istek() => new()
     {
         Platform = RecorderPlatform.Windows,
@@ -148,6 +151,8 @@ public sealed class KaydediciTamponTests
         Assert.InRange(enCokParca, 2, ReplayBuffer.PartsFor(saniye) + 1);
         Assert.InRange(sure, saniye - 1.0, ReplayBuffer.SegmentSeconds * ReplayBuffer.PartsFor(saniye) + 0.5);
         Assert.False(Directory.Exists(parcalar));
+
+        Kapat("args.txt", "olcu.txt", "son-saniyeler.mkv");
     }
 
     private sealed class SahteTampon : IReplayBuffer

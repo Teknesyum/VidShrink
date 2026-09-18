@@ -25,6 +25,9 @@ public sealed class KaydediciCerceveTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static readonly PixelRect Ekran = new(0, 0, 1024, 768);
 
     private static RecorderRequest Istek(RecorderTargetKind hedef) => new()
@@ -185,5 +188,7 @@ public sealed class KaydediciCerceveTests
         Assert.False(olcu.kontrolAyar);
         Assert.False(Ayni(olcu.haricPiksel, olcu.renk));
         if (Array.Exists(olcu.once, b => b != 0)) Assert.True(Ayni(olcu.kontrolPiksel, olcu.renk));
+
+        Kapat("cerceve-kayit-disi.txt");
     }
 }

@@ -26,6 +26,9 @@ public sealed class KaydediciHedefTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static RecorderRequest Istek() => new()
     {
         Platform = RecorderPlatform.Windows,
@@ -105,6 +108,8 @@ public sealed class KaydediciHedefTests
         Assert.Equal((TimeSpan.FromSeconds(30), (double?)10), (olcu.ikisi.Istek.MaxDuration, olcu.ikisi.Istek.MaxMegabytes));
         Assert.NotNull(olcu.ikisi.Istek.BitrateKbps);
         Assert.Equal("5242880", Deger(RecorderArguments.Build(olcu.boyut.Istek with { MaxMegabytes = 5 }, "a.mkv"), "-fs"));
+
+        Kapat("tek-hedef.txt");
     }
 
     [Fact]
@@ -112,33 +117,28 @@ public sealed class KaydediciHedefTests
     {
         var dosya = Path.Combine(Kanit, "klasor-ac.mkv");
         File.WriteAllBytes(dosya, new byte[] { 1 });
-        try
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
-            {
-                var acilan = new List<string>();
-                var kapali = new RecorderView(ayarYolu) { RevealFolder = acilan.Add };
-                kapali.Deliver(new RecordResult(true, dosya, 1, false, 0, string.Empty, 1));
-                var kapaliSayi = acilan.Count;
+            var acilan = new List<string>();
+            var kapali = new RecorderView(ayarYolu) { RevealFolder = acilan.Add };
+            kapali.Deliver(new RecordResult(true, dosya, 1, false, 0, string.Empty, 1));
+            var kapaliSayi = acilan.Count;
 
-                var once = new RecorderView(ayarYolu);
-                Bul<CheckBox>(once, "ChkOpenFolder").IsChecked = true;
-                var dosyada = JsonNode.Parse(File.ReadAllText(ayarYolu))?["openFolderWhenDone"]?.ToJsonString();
+            var once = new RecorderView(ayarYolu);
+            Bul<CheckBox>(once, "ChkOpenFolder").IsChecked = true;
+            var dosyada = JsonNode.Parse(File.ReadAllText(ayarYolu))?["openFolderWhenDone"]?.ToJsonString();
 
-                var acik = new RecorderView(ayarYolu) { RevealFolder = acilan.Add };
-                acik.Deliver(new RecordResult(true, dosya, 1, false, 0, string.Empty, 1));
-                return (kapaliSayi, dosyada, acilan: acilan.ToArray(), kutu: Bul<CheckBox>(acik, "ChkOpenFolder").IsChecked);
-            }));
+            var acik = new RecorderView(ayarYolu) { RevealFolder = acilan.Add };
+            acik.Deliver(new RecordResult(true, dosya, 1, false, 0, string.Empty, 1));
+            return (kapaliSayi, dosyada, acilan: acilan.ToArray(), kutu: Bul<CheckBox>(acik, "ChkOpenFolder").IsChecked);
+        }));
 
-            Assert.Equal(0, olcu.kapaliSayi);
-            Assert.Equal("true", olcu.dosyada);
-            Assert.True(olcu.kutu);
-            Assert.Equal(new[] { dosya }, olcu.acilan);
-        }
-        finally
-        {
-            File.Delete(dosya);
-        }
+        Assert.Equal(0, olcu.kapaliSayi);
+        Assert.Equal("true", olcu.dosyada);
+        Assert.True(olcu.kutu);
+        Assert.Equal(new[] { dosya }, olcu.acilan);
+
+        Kapat("klasor-ac.mkv");
     }
 
     [Fact]
@@ -201,6 +201,8 @@ public sealed class KaydediciHedefTests
         Assert.False(olcu.oturum);
         Assert.Empty(olcu.kalan);
         Assert.NotEmpty(olcu.not);
+
+        Kapat("iptal.txt");
     }
 
     [KayitFact]
@@ -233,6 +235,9 @@ public sealed class KaydediciHedefTests
         Assert.Contains("codec_type=video", metin);
         Assert.InRange(sonKume, 1, paketBayt);
         Assert.InRange(paketBayt - sonKume, 0, sinir);
+
+        Kapat("boyut-siniri.txt");
+        KayitKanit.Kapat("boyut-siniri.ffprobe.txt");
     }
 
     /// <summary>
@@ -263,7 +268,7 @@ public sealed class KaydediciHedefTests
         Assert.True(bitti, "sinir dolunca oturum kendiliginden bitmeli");
         Assert.True(sonuc.Ok, sonuc.StandardError);
         Assert.True(bayt > 0);
-        File.Delete(Path.Combine(Kanit, "yaris-ilk-kare.txt"));
+        Kapat("yaris-ilk-kare.txt");
     }
 
     private static (long Toplam, long SonKume) Paketler(string dosya)

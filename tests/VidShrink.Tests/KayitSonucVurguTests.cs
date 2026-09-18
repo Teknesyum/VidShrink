@@ -45,6 +45,9 @@ public sealed class KayitSonucVurguTests
         return yol;
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Klasor(), adlar);
+
     private static string Kayit()
     {
         var dosya = Path.Combine(Klasor(), "kayit.mkv");
@@ -143,6 +146,8 @@ public sealed class KayitSonucVurguTests
         Assert.True(kucult - klasor > 0.45 && kucult - paylas > 0.45);
 
         Assert.True(Math.Abs(esitKucult - esitKlasor) < 0.1, $"eşit fırçada fark {esitKucult:0.000} / {esitKlasor:0.000}");
+
+        Kapat("olcu.txt", "kayit.mkv", "kucult.png", "klasor.png", "paylas.png", "esit-kucult.png", "esit-klasor.png");
     }
 
     private sealed class SahteSaglayici : IShareProvider
@@ -219,5 +224,7 @@ public sealed class KayitSonucVurguTests
         Assert.Equal(0, disaridaYuklenen);
         Assert.Equal(new[] { beklenen }, yuklenen);
         Assert.Equal("https://ornek.test/f1", baglanti);
+
+        Kapat("paylas.txt", "paylasimlar.json", "kayit.mkv");
     }
 }

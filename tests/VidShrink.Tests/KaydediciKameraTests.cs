@@ -44,6 +44,9 @@ public sealed class KaydediciKameraTests
         }
     }
 
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     private static RecorderRequest Istek() => new()
     {
         Platform = RecorderPlatform.Windows,
@@ -162,6 +165,8 @@ public sealed class KaydediciKameraTests
         Assert.Equal(new RecorderWebcam("Kam B", 320, WebcamCorner.TopRight), olcu.istek);
         Assert.Null(olcu.yokIstek);
         Assert.Equal("\"Kam B\"", olcu.adKaldi);
+
+        Kapat("kamera-ayar.txt");
     }
 
     [KameraFact]
@@ -191,6 +196,9 @@ public sealed class KaydediciKameraTests
         Assert.Contains("width=320", metin);
         Assert.Contains("height=240", metin);
         Assert.True(kose - karsi > 8, $"kam kosesi {kose}, karsi kose {karsi}");
+
+        Kapat("kamera-canli.txt");
+        KayitKanit.Kapat("kamera-canli.ffprobe.txt");
     }
 
     private static int Parlaklik(string dosya, string konum)
@@ -244,6 +252,8 @@ public sealed class KaydediciKameraTests
         var ortada = MagnifierPlace.Window(MagnifierPlace.Source(new PixelPoint(500, 400), 144, 2, ekran), 144, 24, ekran);
         Assert.Equal(new PixelPoint(560, 460), ortada);
         File.WriteAllLines(Path.Combine(Kanit, "buyutec-yer.txt"), olcumler);
+
+        Kapat("buyutec-yer.txt");
     }
 
     [Fact]
@@ -277,6 +287,8 @@ public sealed class KaydediciKameraTests
         Assert.Equal(new PixelPoint(olcu.ilk.LastSource.Right + (int)Math.Ceiling(24 * olcu.ilk.RenderScaling), olcu.ilk.LastSource.Bottom + (int)Math.Ceiling(24 * olcu.ilk.RenderScaling)), olcu.ilk.Position);
         Assert.Equal(200, olcu.ikinci.Position.X - olcu.ilk.Position.X);
         Assert.Equal(50, olcu.ikinci.Position.Y - olcu.ilk.Position.Y);
+
+        Kapat("buyutec-pencere.txt");
     }
 
     private sealed class SahteBuyutec : IMagnifier
@@ -332,5 +344,7 @@ public sealed class KaydediciKameraTests
         Assert.False(olcu.ana);
         Assert.False(olcu.yeniKutu);
         Assert.Equal("false", olcu.son);
+
+        Kapat("buyutec-ayar.txt");
     }
 }

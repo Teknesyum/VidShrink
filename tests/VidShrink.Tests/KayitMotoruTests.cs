@@ -102,6 +102,9 @@ internal static class KayitKanit
 
     internal static void Log(string name, IEnumerable<string> lines)
         => File.WriteAllLines(Path.Combine(Folder, name), lines);
+
+    /// <summary>Son asertten sonra çağrılır; kuralı <see cref="KanitKapanisi"/> anlatıyor.</summary>
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Folder, adlar);
 }
 
 /// <summary>
@@ -375,6 +378,8 @@ public sealed class KayitMotoruTests
         Assert.NotEmpty(raporlar);
         Assert.True(raporlar[^1].Frames > 0, "ilerleme kare sayisi tasimali");
         Assert.True(raporlar[^1].Elapsed > TimeSpan.Zero, "ilerleme gecen sureyi tasimali");
+
+        KayitKanit.Kapat("bes-saniye.mp4", "bes-saniye.ffprobe.txt", "bes-saniye.ilerleme.txt");
     }
 
     /// <summary>
@@ -396,6 +401,8 @@ public sealed class KayitMotoruTests
         Assert.False(sonuc.Ok);
         Assert.NotEqual(0, kod);
         Assert.True(kod != 0 || !metin.Contains("codec_type=video"), "yarim dosya oynatilabilir sayilmaz");
+
+        KayitKanit.Kapat("oldurulen.mp4", "oldurulen.ffprobe.txt");
     }
 
     /// <summary>
@@ -422,6 +429,8 @@ public sealed class KayitMotoruTests
         Assert.Equal(RecorderState.Stopped, durum);
         Assert.True(sonuc.Ok, $"kendiliginden biten kayit temiz kapanmali; stderr: {sonuc.StandardError}");
         Assert.False(elle.Ended.IsCompleted, "elle durdurulan oturum kendiliginden bitti sayilmaz");
+
+        KayitKanit.Kapat("sure-siniri.mp4", "elle-durdurulan.mp4", "sure-siniri.txt");
     }
 
     [KayitFact]
@@ -449,6 +458,8 @@ public sealed class KayitMotoruTests
         Assert.InRange(sure!.Value, 3.0, 8.0);
         Assert.Equal(1, metin.Split('\n').Count(satir => satir.Trim() == "codec_type=video"));
         Assert.Equal(RecorderState.Stopped, oturum.State);
+
+        KayitKanit.Kapat("duraklatilan.mp4", "duraklatilan.ffprobe.txt");
     }
 
     /// <summary>
@@ -469,6 +480,8 @@ public sealed class KayitMotoruTests
 
         File.WriteAllText(Path.Combine(KayitKanit.Folder, "olmayan-pencere.stderr.txt"), hata.Message);
         Assert.Contains("ffmpeg kaydi baslatamadi", hata.Message);
+
+        KayitKanit.Kapat("olmayan-pencere.mp4", "olmayan-pencere.stderr.txt");
     }
 
     /// <summary>Canli olculerin ortak istegi: kucuk bir bolge, hizli kodlama.</summary>
