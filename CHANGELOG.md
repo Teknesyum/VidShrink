@@ -5,7 +5,7 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
-## [Unreleased]
+## [0.8.5] - 2026-09-18
 
 ### Added
 
