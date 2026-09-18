@@ -3098,7 +3098,6 @@ public partial class MainWindow : Window
     internal async Task LoadStartupFileAsync(string path)
     {
         Tabs.SelectedIndex = PlayerTabIndex;
-        PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + TabHeaderText((TabItem)Tabs.Items[Tabs.SelectedIndex]!));
         AcilisIzi.Yaz("sekme");
         IlkKareyiBekle();
         _ = CizimiOlcAsync(false);
@@ -3126,7 +3125,6 @@ public partial class MainWindow : Window
     internal void ReportPlayerOpenFailure(Exception ex)
     {
         PlayerOpenFailure = ex;
-        PlayerView.Echo("startup-open-failed=" + ex.GetType().Name);
         ReportSourceError($"{Say("main.error.unusable")}: {DescribeFailure(ex)}");
     }
 

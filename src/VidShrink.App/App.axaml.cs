@@ -61,8 +61,10 @@ public partial class App : Application
         // yaziyor. Arka plana alindi; sonucu bekleyen kimse yok.
         _ = System.Threading.Tasks.Task.Run(() =>
         {
-            try { TempCleanup.CleanupStaleArtifacts(Path.GetTempPath()); } catch { }
-            AcilisIzi.Yaz("gecici-temizlik");
+            var izlenim = "gecici-temizlik";
+            try { TempCleanup.CleanupStaleArtifacts(Path.GetTempPath()); }
+            catch (Exception ex) { izlenim = "gecici-temizlik-hata=" + ex.GetType().Name; }
+            AcilisIzi.Yaz(izlenim);
         });
 
         // Palet pencereden once yurutuluyor: sonra uygulanirsa program bir kare

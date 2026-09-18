@@ -49,10 +49,15 @@ açıkça "bu kod kalkacak" diyor.
 14. `OluUyeTests.cs:485-494` — `ArchitectureOutcome.Assumed` ve
     `HardwareVerdictReason.BitrateFloorTooHigh` hiçbir kolda ayrılmıyor.
 15. `OluUyeTests.cs:487-488` — `ComparisonSourceState.Duraklatildi` hesaplanıp atılıyor.
-16. `src/VidShrink.App/Playback/PlayerView.axaml.cs:232-238` — Bitmiş bir turun
-    (`VIDSHRINK_T176_TRACE`) hata ayıklama iskelesi kalıcı yüzeyde.
-17. `src/VidShrink.App/App.axaml.cs:58-66` — Geçici klasör temizliği çıplak `catch { }`
-    ile susturuluyor; iz başarıyı değil yalnız denemeyi kanıtlıyor.
+16. ~~`src/VidShrink.App/Playback/PlayerView.axaml.cs:232-238` — Bitmiş bir turun
+    (`VIDSHRINK_T176_TRACE`) hata ayıklama iskelesi kalıcı yüzeyde.~~ **Kapandı:**
+    `Echo` ve iki çağrı yeri (`MainWindow.axaml.cs`) kaldırıldı; ortam değişkenini
+    hiçbir test ya da üretim yolu okumuyordu. `_trace` duruyor, `view.Trace` üzerinden
+    ölçüm okuyor.
+17. ~~`src/VidShrink.App/App.axaml.cs:58-66` — Geçici klasör temizliği çıplak `catch { }`
+    ile susturuluyor; iz başarıyı değil yalnız denemeyi kanıtlıyor.~~ **Kapandı:**
+    yakalanan tür ize düşüyor (`gecici-temizlik-hata=<Tür>`), başarılı yolun izi
+    değişmedi.
 18. `OluUyeTests.cs:781-784` — `InstallProgress.Bar` / `.Sentence` yalnız testler okusun
     diye ayakta; açılış paneli silindiği için `Sentence`'ın ekranı da yok.
 
