@@ -251,11 +251,14 @@ public sealed class KareYerlesimTests
         var (tasan, satirlar) = Read(dil, olcu, window => Tasanlar(window, olcu, null, kirpmaKapali: false, balonKapali: false));
 
         var klasor = Path.Combine(TipSources.Root, ".calisma", "t194");
+        var ad = $"infogrid-{dil}-{genislik:0}x{yukseklik:0}.txt";
         Directory.CreateDirectory(klasor);
-        File.WriteAllLines(Path.Combine(klasor, $"infogrid-{dil}-{genislik:0}x{yukseklik:0}.txt"), satirlar);
+        File.WriteAllLines(Path.Combine(klasor, ad), satirlar);
 
         Assert.True(tasan.Count == 0, string.Join(Environment.NewLine, tasan));
         if (olcu == Dar) Assert.Contains(satirlar, satir => satir.Contains("kisaldi", StringComparison.Ordinal));
+
+        Kapat(klasor, ad);
     }
 
     /// <summary>

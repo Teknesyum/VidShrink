@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using VidShrink.Core;
@@ -28,34 +28,62 @@ public sealed class BasarimOlculeri
 [Collection(BasarimOlculeri.Ad)]
 public sealed class PerformanceCheckTests
 {
-    private static readonly string MeasurementLog =
-        Path.Combine(TipSources.Root, ".calisma", "t63", "olcum.txt");
+    private static readonly string Klasor = Path.Combine(TipSources.Root, ".calisma", "t63");
 
     private readonly Xunit.Abstractions.ITestOutputHelper _cikti;
 
-    public PerformanceCheckTests(Xunit.Abstractions.ITestOutputHelper cikti) => _cikti = cikti;
+    /// <summary>
+    /// Kanıt dosyası **test başına** ayrı. Sınıfın on bir ölçüsü bir zamanlar tek
+    /// <c>olcum.txt</c>'ye yazıyordu; o düzende kırmızı düşen bir ölçünün kanıdını,
+    /// aynı koşumda yeşil biten başka bir ölçünün <see cref="Kapat"/>'ı siliyordu —
+    /// denetim bunu geniş filtreyle ölçtü. xUnit her ölçü için yeni bir örnek kurduğu
+    /// için ad örnekten geliyor; ad okunamazsa örneğin kimliğine düşülür.
+    /// </summary>
+    private readonly string _kanit;
 
-    private static void Log(string line)
+    private static int _sayac;
+
+    public PerformanceCheckTests(Xunit.Abstractions.ITestOutputHelper cikti)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(MeasurementLog)!);
-        lock (MeasurementLog) File.AppendAllText(MeasurementLog, line + Environment.NewLine);
+        _cikti = cikti;
+        _kanit = Path.Combine(Klasor, OlcuAdi(cikti) + ".txt");
+    }
+
+    private static string OlcuAdi(Xunit.Abstractions.ITestOutputHelper cikti)
+    {
+        const BindingFlags Her = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+        var tur = cikti.GetType();
+        var deger = tur.GetProperty("Test", Her)?.GetValue(cikti)
+                    ?? tur.GetField("test", Her)?.GetValue(cikti)
+                    ?? tur.GetFields(Her).Select(f => f.GetValue(cikti))
+                        .FirstOrDefault(v => v is Xunit.Abstractions.ITest);
+        var gosterim = (deger as Xunit.Abstractions.ITest)?.DisplayName;
+        if (string.IsNullOrWhiteSpace(gosterim))
+            return "olcu-" + Interlocked.Increment(ref _sayac).ToString(CultureInfo.InvariantCulture);
+
+        var son = gosterim[(gosterim.LastIndexOf('.') + 1)..];
+        var temiz = new string(son.Select(c => char.IsLetterOrDigit(c) ? c : '-').ToArray()).Trim('-');
+        return temiz.Length == 0 ? "olcu" : temiz;
+    }
+
+    private void Log(string line)
+    {
+        Directory.CreateDirectory(Klasor);
+        File.AppendAllText(_kanit, line + Environment.NewLine);
     }
 
     /// <summary>
     /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
     /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
     /// Meşru atlamanın erken dönüşü de yeşildir, orada da çağrılır.
+    ///
+    /// Yalnız **kendi** dosyasını siler; başka ölçünün kanıdına dokunmaz.
     /// </summary>
-    private static void Kapat()
+    private void Kapat()
     {
-        var klasor = Path.GetDirectoryName(MeasurementLog)!;
-        if (!Directory.Exists(klasor)) return;
-
-        lock (MeasurementLog)
-        {
-            if (File.Exists(MeasurementLog)) File.Delete(MeasurementLog);
-            if (Directory.GetFileSystemEntries(klasor).Length == 0) Directory.Delete(klasor);
-        }
+        if (File.Exists(_kanit)) File.Delete(_kanit);
+        if (Directory.Exists(Klasor) && Directory.GetFileSystemEntries(Klasor).Length == 0)
+            Directory.Delete(Klasor);
     }
 
     private static int _atlananSayisi;
@@ -946,7 +974,7 @@ public sealed class PerformanceCheckTests
         Kapat();
     }
 
-    private static void Kos(string etiket, string[] args)
+    private void Kos(string etiket, string[] args)
     {
         var psi = new System.Diagnostics.ProcessStartInfo
         {
