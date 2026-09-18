@@ -27,6 +27,10 @@ public sealed class OynaticiKurulumTests
         return path;
     }
 
+    /// <summary>Son asertten sonra: yeşil koşum kurduğu sahte kurulumu siler, kırmızı koşum bırakır.</summary>
+    private static void Kapat(params string[] adlar)
+        => KanitKapanisi.Kapat(MotorKanit.Folder, adlar.Select(a => "konum-" + a).ToArray());
+
     [Fact]
     public void KurulanDuzendeLibmpvKokunToolsKlasorundenBulunur()
     {
@@ -38,6 +42,7 @@ public sealed class OynaticiKurulumTests
         var ilk = LibMpvLocator.Candidates(null, Path.Combine(kok, "app"), macOs: false).First(File.Exists);
 
         Assert.Equal(Path.GetFullPath(dll), Path.GetFullPath(ilk));
+        Kapat("kurulu");
     }
 
     [Fact]
@@ -53,6 +58,7 @@ public sealed class OynaticiKurulumTests
         var ilk = LibMpvLocator.Candidates(null, Path.Combine(kok, "app"), macOs: false).First(File.Exists);
 
         Assert.Equal(Path.GetFullPath(yanindaki), Path.GetFullPath(ilk));
+        Kapat("yayin");
     }
 
     [Fact]
@@ -69,6 +75,7 @@ public sealed class OynaticiKurulumTests
         var ilk = LibMpvLocator.Candidates(Path.GetDirectoryName(ozel), Path.Combine(kok, "app"), macOs: false).First(File.Exists);
 
         Assert.Equal(Path.GetFullPath(ozel), Path.GetFullPath(ilk));
+        Kapat("ortam");
     }
 
     [Fact]
@@ -85,6 +92,7 @@ public sealed class OynaticiKurulumTests
         Assert.Contains(adaylar, a => a.StartsWith("/usr/local/lib", StringComparison.Ordinal));
         Assert.DoesNotContain(ortamli, a => a.StartsWith("/opt/homebrew/lib", StringComparison.Ordinal));
         Assert.DoesNotContain(windows, a => a.StartsWith("/opt/homebrew/lib", StringComparison.Ordinal));
+        Kapat("mac");
     }
 
     [Fact]
@@ -139,6 +147,7 @@ public sealed class OynaticiKurulumTests
         Assert.Contains("cp -R \"$payload/.\" \"$bundle/Contents/MacOS/\"", Oku("macos-app-bundle.sh"), StringComparison.Ordinal);
         var macos = Path.Combine(KurulumKoku("macos-paket"), "VidShrink.app", "Contents", "MacOS");
         Assert.Contains(Path.Combine(macos, "tools", "libmpv"), LibMpvLocator.AppDirectories(macos));
+        Kapat("macos-paket");
     }
 
     [Fact]

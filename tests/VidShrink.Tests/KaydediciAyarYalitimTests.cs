@@ -170,6 +170,7 @@ public sealed class KaydediciAyarYalitimTests
         Assert.False(olcu.kutu);
         Assert.Null(olcu.onizlemeYolu);
         Assert.True(olcu.ozelVar, "olculen gorunum kendi dosyasini yazmadi");
+        KanitKapanisi.Kapat(Klasor, "yalitim.jpg");
     }
 
     /// <summary>

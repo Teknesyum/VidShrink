@@ -29,6 +29,9 @@ public sealed class KaydediciAyarTests
 
     private static readonly string Klasor = Path.Combine(GirdiKanit.Root, ".calisma", "paket-2", "cikis");
 
+    /// <summary>Son asertten sonra: yeşil koşum kanıtını siler, kırmızı koşum bırakır.</summary>
+    private static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Kanit, adlar);
+
     internal static T Bul<T>(RecorderView view, string ad) where T : Control
         => ControlExtensions.FindControl<T>(view, ad)!;
 
@@ -361,6 +364,7 @@ public sealed class KaydediciAyarTests
         satirlar.Add($"degistirilmeyen | {string.Join(' ', bos.Args)}");
         File.WriteAllLines(Path.Combine(Kanit, "ayar-arguman.txt"), satirlar);
         Assert.True(sorunlar.Count == 0, string.Join(Environment.NewLine, sorunlar));
+        Kapat("ayar-arguman.txt");
     }
 
     [Fact]
@@ -385,6 +389,7 @@ public sealed class KaydediciAyarTests
         Assert.Equal(AudioTrackLayout.SeparateTracks, olcu.AudioLayout);
         Assert.Equal(new AudioFilterOptions(-3.5, true, true), olcu.AudioFilters);
         Assert.Equal(((int)AudioTrackLayout.SeparateTracks, (string?)"-3.5", (bool?)true, (bool?)true), olcu.Kutular);
+        Kapat("ayar-ses.txt");
     }
 
     [Fact]
@@ -606,6 +611,7 @@ public sealed class KaydediciAyarTests
         File.WriteAllLines(Path.Combine(Kanit, "ayar-ffprobe.txt"), kanit);
         Directory.Delete(klasor, true);
         Assert.True(sorunlar.Count == 0, string.Join(Environment.NewLine, sorunlar));
+        Kapat("ayar-ffprobe.txt");
     }
 
     [KayitFact]
@@ -652,7 +658,7 @@ public sealed class KaydediciAyarTests
             Assert.Equal(("h264", "320", "180"), (Oku(bilgi, "codec_name"), Oku(bilgi, "width"), Oku(bilgi, "height")));
         }
         Assert.Equal("15", Deger(RecorderArguments.Build(hazir.Request, hazir.Path), "-framerate"));
-
         Directory.Delete(klasor, true);
+        Kapat("ayar-canli.txt");
     }
 }
