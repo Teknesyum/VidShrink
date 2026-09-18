@@ -1,12 +1,50 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using VidShrink.Core;
+using VidShrink.Ffmpeg;
 
 namespace VidShrink.App;
 
 public partial class MainWindow
 {
     private bool _following;
+    private readonly CurrentMedia _media = new();
+    private Task<MediaInfo>? _yoklamaUcusu;
+    private string? _yoklamaUcusuYolu;
+
+    /// <summary>Sekmelerin ortak odağı. D0'ın tek nesnesi.</summary>
+    internal CurrentMedia Media => _media;
+
+    /// <summary>
+    /// Yoklama dikişi. Ölçüm sahte yoklayıcıyı buraya takar; üretimde ffprobe.
+    /// </summary>
+    internal Func<string, CancellationToken, Task<MediaInfo>> Prober { get; set; }
+        = FfprobeClient.ProbeAsync;
+
+    /// <summary>
+    /// Ortak odakta o dosyanın tazeliği doğrulanmış çözümlemesi varsa ffprobe çağrılmaz.
+    /// Aynı yol için uçuşta bir yoklama varsa çağıranlar onu paylaşır; oynatıcıdan
+    /// Küçült'e geçişin iki kolu bu yüzden tek yoklamaya iner.
+    /// </summary>
+    private Task<MediaInfo> YoklaAsync(string path)
+    {
+        if (_media.InfoFor(path) is { } bilinen) return Task.FromResult(bilinen);
+        if (_yoklamaUcusu is { IsCompleted: false } ucus
+            && CurrentMedia.SamePath(_yoklamaUcusuYolu, path)) return ucus;
+
+        var yeni = Prober(path, CancellationToken.None);
+        _yoklamaUcusuYolu = path;
+        _yoklamaUcusu = yeni;
+        return yeni;
+    }
+
+    /// <summary>Oynatıcı sekmesinden ayrılırken odaktaki dosyanın konumu saklanır.</summary>
+    private void OdakKonumunuAnimsa()
+    {
+        if (Player.LoadedPath is { } yol) _media.Remember(yol, Player.CurrentPosition());
+    }
 
     internal Func<string, Task>? FollowShrinkLoader { get; set; }
 
@@ -25,6 +63,7 @@ public partial class MainWindow
         _following = true;
         try
         {
+            _media.Focus(path, MediaFocusOwner.Recorder);
             if (!SamePath(ShrinkLoadedPath, path)) await (FollowShrinkLoader ?? LoadAsync)(path);
             if (SamePath(Player.LoadedPath, path)) return;
 
@@ -49,7 +88,9 @@ public partial class MainWindow
     private void OnPlayerOpened(string path)
     {
         if (_following || ChkFollowRecording.IsChecked != true) return;
-        if (!File.Exists(path) || SamePath(ShrinkLoadedPath, path)) return;
+        if (!File.Exists(path)) return;
+        _media.Focus(path, MediaFocusOwner.Player);
+        if (SamePath(ShrinkLoadedPath, path)) return;
         _ = (FollowShrinkLoader ?? LoadAsync)(path);
     }
 
