@@ -16,3 +16,6 @@ trash/
 .claude/sonra.md
 .claude/acik.md
 .claude/kapali.md
+
+# Kurucunun sha256 ile indirdigi libmpv; depoya girmez
+tools/libmpv/

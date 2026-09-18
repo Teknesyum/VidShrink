@@ -1142,7 +1142,10 @@ ile aynı: dosyaları siler, klasör boşsa klasörü de siler.
 **Kabul ölçütü.** Her öbek için, o öbeğin filtresiyle iki koşum:
 (a) yeşil koşumdan sonra `.calisma/<klasor>` **yok**;
 (b) sınıflardan birinde son asert bozulunca koşum kırmızı ve kanıt dosyaları **yerinde**.
-İkisinin ham çıktısı `docs/olcumler/kanit-kapanisi-supurme.md`'ye birebir yazılır.
+İkisinin ham çıktısı öbek başına bir dosyaya birebir yazılır:
+`docs/olcumler/kanit-kapanisi-oynatici.md`, `-kaydedici.md`, `-arayuz.md`. Üç dal paralel
+koştuğu için tek dosya çakışırdı; sonradan açılan `-borclari.md`, `-bastan-silme.md`,
+`-joker.md` ve `-fare.md` aynı ailenin borç kapatma ölçümleri.
 
 **Sıra.** Dallar bağımsız, aynı dosyaya dokunmuyorlar; üçü paralel koşabilir. Her dal kendi CI yeşilini
 alır, `main`e yalnız T0 birleştirir.
