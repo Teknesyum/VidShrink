@@ -1,9 +1,23 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using VidShrink.Cli;
 using VidShrink.Core;
 
 namespace VidShrink.Tests;
+
+/// <summary>
+/// Kabuk yoksa olcum kosulmaz; o durumda test sessizce yesil donmesin diye
+/// gerekceli <c>Skip</c> yaziyor.
+/// </summary>
+public sealed class PowerShellFactAttribute : FactAttribute
+{
+    public PowerShellFactAttribute()
+    {
+        if (HbOlcumDuzenegiTests.PowerShellYolu() is null)
+            Skip = "pwsh/powershell bulunamadi, betigin kendi fonksiyonunu kosturan olcum yapilmadi.";
+    }
+}
 
 /// <summary>
 /// B5 SVT kolunda HandBrake'e ürünün x265 preset adı ("slow") <c>--encoder-preset</c>
@@ -17,7 +31,7 @@ public sealed class HbOlcumDuzenegiTests
 {
     private static string Script => File.ReadAllText(Path.Combine(TipSources.Root, "tools", "kalite-paketi-3", "hb.ps1"));
 
-    private static string? PowerShell()
+    internal static string? PowerShellYolu()
     {
         foreach (var name in new[] { "pwsh", "powershell" })
         {
@@ -46,11 +60,10 @@ public sealed class HbOlcumDuzenegiTests
         return match.Value;
     }
 
-    [Fact]
+    [PowerShellFact]
     public void SvtKolununPresetEslemesiUrununAdiniSayiyaCeviriyor()
     {
-        var shell = PowerShell();
-        if (shell is null) return;
+        var shell = PowerShellYolu()!;
 
         var girdiler = new[] { "veryslow", "slower", "slow", "medium", "fast", "faster", "veryfast", "ultrafast", "6", "", "bilinmeyen" };
         var beklenen = new[] { "4", "5", "6", "8", "9", "10", "11", "12", "6", "8", "8" };
@@ -153,5 +166,110 @@ public sealed class HbOlcumDuzenegiTests
             Assert.Equal(oran, CompressionStrategy.Ratio(hedefMb * oran, hedefMb), 3);
             Assert.Equal(CodecPreference.Compatible, CompressionStrategy.AutoPreference(CompressionStrategy.RegimeFor(hedefMb * oran, hedefMb)));
         }
+    }
+
+    /// <summary>
+    /// <c>butceilk</c> kolu bütçe arama döngüsünün süresini ölçüyor: ilk denemenin
+    /// süresi ile toplamı ayrı sütunlarda duruyor. Kol, kodeği CLI'nın kendi
+    /// <c>--kodek</c> anahtarıyla zorluyor; zorlanan ad ile motorun kilitlediği
+    /// kodlayıcı adı burada eşleştiriliyor, yoksa "x265 kolu" diye yazılan satır
+    /// başka bir kodlayıcıyı ölçer. Hız tavanı ayrı bir sabit değil, B5'in
+    /// kendi <c>$script:CliKapi</c> tavanı.
+    /// </summary>
+    [Fact]
+    public void ButceIlkKoluZorladigiKodekleriMotorunKilitledigiAdlaraEsliyor()
+    {
+        var script = Script;
+        Assert.Contains("'butceilk'", script, StringComparison.Ordinal);
+        Assert.Contains("function ButceIlk", script, StringComparison.Ordinal);
+
+        var harita = Kes(@"\$script:ButceKodekleri = \[ordered\]@\{.*?\r?\n");
+        Assert.Contains("x265 = 'libx265'", harita, StringComparison.Ordinal);
+        Assert.Contains("h264 = 'libx264'", harita, StringComparison.Ordinal);
+
+        foreach (var (ad, beklenen) in new[] { ("x265", "libx265"), ("h264", "libx264") })
+        {
+            Assert.True(CliParser.TryParseCodec(ad, out var kodek), $"CLI --kodek {ad} tanımıyor");
+            var kilit = new CliRequest { Codec = kodek }.ToPlanOptions(1.0).LockedCodec;
+            if (kodek == CliCodec.Hevc) Assert.Equal(beklenen, kilit);
+            else Assert.Null(kilit);
+        }
+        Assert.Equal(CodecPreference.Compatible, new CliRequest { Codec = CliCodec.H264 }.ToPlanOptions(1.0).Codec);
+
+        var kol = Kes(@"function ButceIlk \{.*?\r?\n\}");
+        Assert.Contains("@('--kodek', $ad)", kol, StringComparison.Ordinal);
+        Assert.Contains("kodek_tuttu = ($u.Kodlayici -eq $beklenen)", kol, StringComparison.Ordinal);
+        Assert.Contains("$k = $script:CliKapi", kol, StringComparison.Ordinal);
+        Assert.Contains("_oran_ilk_deneme\"] = [math]::Round($u.IlkDenemeSn / $script:bhx.Sn, 3)", kol, StringComparison.Ordinal);
+        Assert.Contains("_oran_toplam\"] = [math]::Round($u.ToplamSn / $script:bhx.Sn, 3)", kol, StringComparison.Ordinal);
+        Assert.Contains("-le $k.hiz_orani_tavan", kol, StringComparison.Ordinal);
+        Assert.DoesNotContain("hiz_orani_tavan = ", kol, StringComparison.Ordinal);
+        Assert.Contains("HbEsBayt $girdi $c $hk (HbTemel $b)", kol, StringComparison.Ordinal);
+
+        var kapi = Kes(@"\$script:CliKapi = \[ordered\]@\{.*?\r?\n");
+        Assert.Contains("hiz_orani_tavan = 1.0", kapi, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Deneme başına süre CLI izinden okunuyor. Alan boş gelirse düzenek sıfır
+    /// yazmaz, <c>Eksik</c> der: eksik ölçüm "ilk deneme 0 saniye sürdü" diye
+    /// rapora giremez.
+    /// </summary>
+    [Fact]
+    public void IzSureleriEksikAlaniSifirDiyeOkumuyor()
+    {
+        var f = Kes(@"function IzSureleri\(.*?\r?\n\}");
+        Assert.Contains("Eksik = $true", f, StringComparison.Ordinal);
+        Assert.Contains("$ler.Count -eq 0", f, StringComparison.Ordinal);
+        Assert.Contains("Ilk = [math]::Round($sn[0], 1)", f, StringComparison.Ordinal);
+        Assert.Contains("Disi = [math]::Round($KodlamaSn - $toplam, 1)", f, StringComparison.Ordinal);
+
+        var urun = Kes(@"function UrunCli\(.*?\r?\n\}");
+        Assert.Contains("$iz = IzSureleri $j.result.trace", urun, StringComparison.Ordinal);
+        Assert.Contains("IlkDenemeSn = $iz.Ilk", urun, StringComparison.Ordinal);
+    }
+
+    private static string Ozetleyici => File.ReadAllText(
+        Path.Combine(TipSources.Root, "tools", "kalite-paketi-3", "butce-ozet.py"));
+
+    /// <summary>
+    /// <c>butce-ozet.py</c> "ilk deneme bandı tuttu mu" kararını kendi bant
+    /// kademesinden veriyor; o kademe motorun <see cref="FillBand.For"/>
+    /// kademesinden kopunca tablo yanlış hücreyi "bantta" diye işaretler. Burada
+    /// betiğin okuduğu çarpanlar motorun kendi çıktısına karşı ölçülüyor: her
+    /// kademeden bir hedefte <c>FillBand.For</c> ile aynı kenarı vermek zorunda.
+    /// </summary>
+    [Fact]
+    public void OzetleyicininBantKademesiMotorunFillBandiylaAyniKenariVeriyor()
+    {
+        var m = Regex.Match(Ozetleyici, @"BANT_KADEME = \((.*?)\)\r?\n", RegexOptions.Singleline);
+        Assert.True(m.Success, "BANT_KADEME bulunamadi.");
+        var kademe = Regex.Matches(m.Groups[1].Value, @"\(([\d.]+), ([\d.]+), ([\d.]+)\)")
+            .Select(x => (
+                Esik: double.Parse(x.Groups[1].Value, CultureInfo.InvariantCulture),
+                Alt: double.Parse(x.Groups[2].Value, CultureInfo.InvariantCulture),
+                Taban: double.Parse(x.Groups[3].Value, CultureInfo.InvariantCulture)))
+            .ToList();
+        Assert.Equal(3, kademe.Count);
+
+        foreach (var hedef in new[] { 1.0, 4.88, 9.99, 10.0, 25.0, 49.9, 50.0, 120.0 })
+        {
+            var (_, alt, taban) = kademe.First(k => hedef >= k.Esik);
+            var motor = FillBand.For(hedef);
+            Assert.Equal(hedef * alt, motor.LowerMb, 6);
+            Assert.Equal(hedef * taban, motor.HardFloorMb, 6);
+            Assert.Equal(hedef, motor.UpperMb, 6);
+        }
+
+        Assert.DoesNotContain("BANT_ALT", Ozetleyici, StringComparison.Ordinal);
+        Assert.Equal(BudgetFill.Floor, OzetSabiti("DOLDUR_ESIK"), 6);
+        Assert.Equal(BudgetFill.Aim, OzetSabiti("DOLDUR_HEDEF"), 6);
+    }
+
+    private static double OzetSabiti(string ad)
+    {
+        var m = Regex.Match(Ozetleyici, $@"^{ad} = ([\d.]+)\s*$", RegexOptions.Multiline);
+        Assert.True(m.Success, $"{ad} bulunamadi.");
+        return double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
     }
 }

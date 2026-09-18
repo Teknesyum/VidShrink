@@ -345,6 +345,7 @@ public static class CliApp
                 writer.WriteNumber("actualMb", Math.Round(attempt.ActualMb, 3));
                 writer.WriteNumber("videoBitrateK", attempt.VideoBitrateK);
                 writer.WriteString("mode", attempt.Mode);
+                writer.WriteNumber("seconds", Math.Round(attempt.Seconds, 2));
                 writer.WriteEndObject();
             }
             writer.WriteEndArray();

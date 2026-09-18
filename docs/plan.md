@@ -36,6 +36,31 @@ Dal `t0/yol-b-kabuk`. Kaynak: `docs/handbrake/yol-haritasi-kalanlar-2026-09-17.m
 12. **ORTA 5.** `origin/main` dala birleşti; 42 dil katalogu birleşim, anahtar kaybı yok.
 13. **DÜŞÜK.** `BirimlerDilDosyasindanGelir` sabit `"/100"` yerine katalogdan okur.
 
+# Bütçe Doldurmanın İkinci Tam Kodlaması ve B5 İlk-Deneme Ölçümü
+
+Dal `t0/butce-ikinci-kodlama`. Soru iki başlıkta aynı kökten: ürünün bütçe arama
+döngüsü kaç tam kodlama koşuyor ve B5 hız oranının ne kadarı bu döngüden geliyor.
+
+Mevcut ölçüm bunu yanıtlayamıyor: `EncodeAttempt` deneme başına süre tutmuyor,
+CLI JSON izinde yalnız dal, kbit ve MB var. Ölçülecek sayı henüz üretilmiyor.
+
+1. **Deneme süresi.** `EncodeRunner`: `EncodeAttempt`'e `Seconds`; döngüde zaten
+   duran `attemptClock` her iz satırına yazılır, bütçe doldurma kolunun kendi saati olur.
+2. **JSON.** `CliApp`: izde `seconds` alanı.
+3. **Düzenek.** `hb.ps1`: `UrunCli` izden `IlkDenemeSn`, `DenemeSnToplami`,
+   `OlcumDisiSn` türetir. Yeni `butceilk` kolu her kesit ve kbit için ürün
+   `--kodek x265`, ürün `--kodek h264` ve eş baytlı HandBrake x265 koşar;
+   kapı satırında toplam oran ile ilk-deneme oranı yan yana. Kalite ölçülmez.
+4. **CI.** `handbrake-kiyas.yml`'de `butceilk` işi.
+5. **Pim.** `HbOlcumDuzenegiTests`: kolun sabitleri ve kapı oranı.
+6. **Belge.** `docs/olcumler/butce-ikinci-kodlama.md`. Hüküm sayı geldikten sonra yazılır.
+
+Altı madde de kapandı; ızgara koşumu 35282699847 yeşil, hüküm belgede. Ölçümden
+çıkan açık madde: yeniden deneme nişanı (`RetryAimMb`, bandın ortası = 0,96·T)
+bütçe doldurma tabanının (0,97) altında, bu yüzden isabetli deneme fazladan tam
+kodlama doğuruyor — 16 hücrenin 9'unda ölçüldü. Nişanı 0,985·T'ye çekmenin sonucu
+ölçülmedi, ayrı iş.
+
 # macOS 13-14 — MPVKit Denemesi
 
 Dal `t0/macos-mpvkit`. Karar: fable 2026-09-17 soru 5. Kod (`src/`) değişmez.

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Concurrent;
 using VidShrink.Core;
@@ -7,7 +7,7 @@ namespace VidShrink.Ffmpeg;
 
 public sealed record EncodeProgress(double Fraction, TimeSpan Elapsed, TimeSpan? Remaining, double OutputMb, string Stage);
 
-public sealed record EncodeAttempt(int Number, string Branch, double AimMb, double ActualMb, int VideoBitrateK, string Mode, double? MeasuredEfficiency = null);
+public sealed record EncodeAttempt(int Number, string Branch, double AimMb, double ActualMb, int VideoBitrateK, string Mode, double? MeasuredEfficiency = null, double Seconds = 0.0);
 
 /// <summary>
 /// Bir kodlama kosumunun sonucu. <see cref="DroppedOptions"/> ffmpeg'in kabul etmeyip
@@ -124,6 +124,8 @@ public sealed class EncodeRunner
         var current = plan;
         var attempt = 0;
         var trace = new List<EncodeAttempt>();
+        var attemptSeconds = 0.0;
+        void Iz(EncodeAttempt entry) => trace.Add(entry with { Seconds = Math.Round(attemptSeconds, 3) });
         var usedUnderBandRetry = false;
         var usedMeasuredUnderBandRetry = false;
         var passLogPrefix = Path.Combine(Path.GetTempPath(), "vidshrink_" + Guid.NewGuid().ToString("N"));
@@ -183,6 +185,7 @@ public sealed class EncodeRunner
 
             usedBudgetFill = true;
             attempt++;
+            var fillClock = Stopwatch.StartNew();
             var upPath = PartialPathFor(outputPath);
             var upDropped = new List<string>();
             var fillAimMb = BudgetFill.Aim * effectiveTargetMb;
@@ -207,10 +210,14 @@ public sealed class EncodeRunner
             catch
             {
                 TryDelete(upPath);
-                trace.Add(new EncodeAttempt(attempt, "budget fill failed, the previous result delivered", fillAimMb, delivered.OutputMb, step.VideoBitrateK, step.Mode));
+                fillClock.Stop();
+                attemptSeconds = fillClock.Elapsed.TotalSeconds;
+                Iz(new EncodeAttempt(attempt, "budget fill failed, the previous result delivered", fillAimMb, delivered.OutputMb, step.VideoBitrateK, step.Mode));
                 return delivered with { Attempts = attempt, Trace = trace };
             }
 
+            fillClock.Stop();
+            attemptSeconds = fillClock.Elapsed.TotalSeconds;
             var upMb = new FileInfo(upPath).Length / 1024.0 / 1024.0;
             var upEfficiency = PlanCalculator.MeasuredEncoderEfficiency(step, upMb, info.DurationSeconds);
             if (!BudgetFill.Keeps(delivered.OutputMb, upMb, effectiveTargetMb))
@@ -219,11 +226,11 @@ public sealed class EncodeRunner
                 var branch = upMb > effectiveTargetMb
                     ? "budget fill over the target, the previous result delivered"
                     : "budget fill came out smaller, the previous result delivered";
-                trace.Add(new EncodeAttempt(attempt, branch, fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
+                Iz(new EncodeAttempt(attempt, branch, fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
                 return delivered with { Attempts = attempt, Trace = trace };
             }
 
-            trace.Add(new EncodeAttempt(attempt, "budget fill, the fuller result delivered", fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
+            Iz(new EncodeAttempt(attempt, "budget fill, the fuller result delivered", fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
             File.Move(upPath, outputPath, overwrite: true);
             return delivered with
             {
@@ -257,6 +264,7 @@ public sealed class EncodeRunner
                 }
 
                 attemptClock.Stop();
+                attemptSeconds = attemptClock.Elapsed.TotalSeconds;
                 var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
                 var efficiency = PlanCalculator.MeasuredEncoderEfficiency(current, actualMb, info.DurationSeconds);
                 var aimMb = PlanCalculator.RetryAimMb(effectiveTargetMb, efficiency);
@@ -281,7 +289,7 @@ public sealed class EncodeRunner
 
                 if (!over && !underBand)
                 {
-                    trace.Add(new EncodeAttempt(attempt, stoppedOnPurpose ? "below band, the plan stopped there on purpose" : "in band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+                    Iz(new EncodeAttempt(attempt, stoppedOnPurpose ? "below band, the plan stopped there on purpose" : "in band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                     File.Move(partialPath, outputPath, overwrite: true);
                     return await FillUpAsync(new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: false, Trace: trace, DroppedOptions: dropped));
                 }
@@ -293,7 +301,7 @@ public sealed class EncodeRunner
                         : null;
                     if (deadStep is not null)
                     {
-                        trace.Add(new EncodeAttempt(attempt, "under band, the encoder did not answer the bitrate", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+                        Iz(new EncodeAttempt(attempt, "under band, the encoder did not answer the bitrate", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                         usedDeadYieldStep = true;
                         usedUnderBandRetry = true;
                         KeepFallback(partialPath, actualMb, current, dropped);
@@ -304,19 +312,19 @@ public sealed class EncodeRunner
                     if (fallbackPlan is not null && fallbackMb > actualMb && File.Exists(fallbackPath))
                     {
                         TryDelete(partialPath);
-                        trace.Add(new EncodeAttempt(attempt, "saturated, the fuller under-band result delivered", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode, efficiency));
+                        Iz(new EncodeAttempt(attempt, "saturated, the fuller under-band result delivered", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode, efficiency));
                         File.Move(fallbackPath, outputPath, overwrite: true);
                         return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: fallbackDropped, Saturated: true);
                     }
 
-                    trace.Add(new EncodeAttempt(attempt, "saturated, under band delivered", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+                    Iz(new EncodeAttempt(attempt, "saturated, under band delivered", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                     File.Move(partialPath, outputPath, overwrite: true);
                     return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: dropped, Saturated: true);
                 }
 
                 if (retryUnderBand)
                 {
-                    trace.Add(new EncodeAttempt(attempt, "under band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+                    Iz(new EncodeAttempt(attempt, "under band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                     usedUnderBandRetry = true;
                     usedMeasuredUnderBandRetry |= informedByYield;
                     KeepFallback(partialPath, actualMb, current, dropped);
@@ -326,7 +334,7 @@ public sealed class EncodeRunner
 
                 if (over)
                 {
-                    trace.Add(new EncodeAttempt(attempt, "over ceiling", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+                    Iz(new EncodeAttempt(attempt, "over ceiling", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
 
                     var floorStep = !usedFloorStep && floorReference is not null
                         ? Saturation.StepLayoutDown(current, floorReference, sample, effectiveTargetMb)
@@ -349,7 +357,7 @@ public sealed class EncodeRunner
 
                         if (fallbackPlan is not null && File.Exists(fallbackPath))
                         {
-                            trace.Add(new EncodeAttempt(attempt, "fallback to the last under-band result", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode));
+                            Iz(new EncodeAttempt(attempt, "fallback to the last under-band result", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode));
                             File.Move(fallbackPath, outputPath, overwrite: true);
                             return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: fallbackDropped,
                                 Saturated: usedDeadYieldStep || Saturation.FillIsSaturated(fallbackMb, effectiveTargetMb));
@@ -357,7 +365,7 @@ public sealed class EncodeRunner
 
                         if (deliverSmallestOver && overPlan is not null && File.Exists(overPath))
                         {
-                            trace.Add(new EncodeAttempt(attempt, "no attempt fit under the target, the smallest result delivered", aimMb, overMb, overPlan.VideoBitrateK, overPlan.Mode));
+                            Iz(new EncodeAttempt(attempt, "no attempt fit under the target, the smallest result delivered", aimMb, overMb, overPlan.VideoBitrateK, overPlan.Mode));
                             File.Move(overPath, outputPath, overwrite: true);
                             return new EncodeResult(true, outputPath, overMb, overPlan, attempt, null, UnderBand: false, CeilingExceeded: true, Trace: trace, DroppedOptions: overDropped, OverTarget: true);
                         }
@@ -371,8 +379,8 @@ public sealed class EncodeRunner
                     {
                         if (attempt >= attemptLimit || usedDeadYieldStep) return await FillUpAsync(EndRun(deliverSmallestOver: true));
                         KeepSmallestOver(partialPath, actualMb, current, dropped);
-                        if (floorStep is not null) trace.Add(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
-                        if (guardStep is not null) trace.Add(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
+                        if (floorStep is not null) Iz(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
+                        if (guardStep is not null) Iz(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
                         current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, current.EffectiveDurationSeconds(info.DurationSeconds));
                         continue;
                     }
@@ -400,7 +408,7 @@ public sealed class EncodeRunner
 
                     if (choice == OvershootChoice.AcceptLarger)
                     {
-                        trace.Add(new EncodeAttempt(attempt, "larger result accepted by the user", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                        Iz(new EncodeAttempt(attempt, "larger result accepted by the user", aimMb, actualMb, current.VideoBitrateK, current.Mode));
                         File.Move(partialPath, outputPath, overwrite: true);
                         return new EncodeResult(true, outputPath, actualMb, current, attempt, null, Trace: trace, DroppedOptions: dropped, OverTarget: true);
                     }
@@ -417,27 +425,27 @@ public sealed class EncodeRunner
                         if (trimmed.Landed)
                         {
                             var trimmedMb = trimmed.Bytes / 1024.0 / 1024.0;
-                            trace.Add(new EncodeAttempt(attempt, $"trimmed {trimmed.Plan!.RemovedSeconds:0.###} s ({side})", aimMb, trimmedMb, current.VideoBitrateK, current.Mode));
+                            Iz(new EncodeAttempt(attempt, $"trimmed {trimmed.Plan!.RemovedSeconds:0.###} s ({side})", aimMb, trimmedMb, current.VideoBitrateK, current.Mode));
                             TryDelete(partialPath);
                             return new EncodeResult(true, outputPath, trimmedMb, current, attempt, null, Trace: trace, DroppedOptions: dropped, Trim: trimmed.Plan);
                         }
-                        trace.Add(new EncodeAttempt(attempt, "trim did not land under the target", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                        Iz(new EncodeAttempt(attempt, "trim did not land under the target", aimMb, actualMb, current.VideoBitrateK, current.Mode));
                         return EndRun(deliverSmallestOver: false);
                     }
 
                     if (choice != OvershootChoice.Retry || attempt >= attemptLimit)
                     {
-                        trace.Add(new EncodeAttempt(attempt, "stopped at the user's request", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                        Iz(new EncodeAttempt(attempt, "stopped at the user's request", aimMb, actualMb, current.VideoBitrateK, current.Mode));
                         return EndRun(deliverSmallestOver: false);
                     }
 
-                    if (floorStep is not null) trace.Add(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
-                    if (guardStep is not null) trace.Add(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
+                    if (floorStep is not null) Iz(new EncodeAttempt(attempt, "encoder floor, the layout steps down", aimMb, actualMb, floorStep.VideoBitrateK, floorStep.Mode, efficiency));
+                    if (guardStep is not null) Iz(new EncodeAttempt(attempt, "ceiling guard, the last attempt aims under the target", aimMb, actualMb, guardStep.VideoBitrateK, guardStep.Mode, efficiency));
                     current = floorStep ?? guardStep ?? PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
                     continue;
                 }
 
-                trace.Add(new EncodeAttempt(attempt, "under band accepted", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+                Iz(new EncodeAttempt(attempt, "under band accepted", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                 File.Move(partialPath, outputPath, overwrite: true);
                 return await FillUpAsync(new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: dropped,
                     Saturated: Saturation.FillIsSaturated(actualMb, effectiveTargetMb)));
