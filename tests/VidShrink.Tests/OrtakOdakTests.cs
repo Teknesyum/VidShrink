@@ -62,7 +62,7 @@ public sealed class OrtakOdakTests
 
         public int Kez => Volatile.Read(ref _kez);
 
-        public IReadOnlyList<string> Yollar => _yollar;
+        public string[] Yollar { get { lock (_yollar) return _yollar.ToArray(); } }
 
         public Task<MediaInfo> Yokla(string yol, CancellationToken ct)
         {
@@ -72,7 +72,7 @@ public sealed class OrtakOdakTests
         }
     }
 
-    private static (int Kez, string? Kucultme, double Sure, double Fps) Gecis(string[] yollar)
+    private static (int Kez, string[] Yoklanan, string? Kucultme, double Sure, double Fps) Gecis(string[] yollar)
     {
         return AppHost.Run(() =>
         {
@@ -90,7 +90,7 @@ public sealed class OrtakOdakTests
                     Dongu(() => gecis.IsCompleted, 30);
                 }
 
-                return (sayac.Kez, window.ShrinkLoadedPath,
+                return (sayac.Kez, sayac.Yollar, window.ShrinkLoadedPath,
                     window.Media.DurationSeconds, window.Media.SourceFps);
             }
             finally { window.Close(); }
@@ -109,6 +109,7 @@ public sealed class OrtakOdakTests
             + $"sure={olcu.Sure}\nfps={olcu.Fps}\n");
 
         Assert.Equal(1, olcu.Kez);
+        Assert.Equal(new[] { dosya }, olcu.Yoklanan);
         Assert.Equal(dosya, olcu.Kucultme);
         Assert.Equal(12.5, olcu.Sure);
         Assert.Equal(30, olcu.Fps);
@@ -125,6 +126,7 @@ public sealed class OrtakOdakTests
         var olcu = Gecis(new[] { bir, iki });
 
         Assert.Equal(2, olcu.Kez);
+        Assert.Equal(new[] { bir, iki }, olcu.Yoklanan);
         Assert.Equal(iki, olcu.Kucultme);
     }
 
