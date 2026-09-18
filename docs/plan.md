@@ -1105,3 +1105,44 @@ ardından Küçült'e geçiş aynı yolu ikinci kez `LoadAsync`'e verir (2. yokl
 **Kabul ölçütü.** (a) Oynatıcıdan Küçült'e geçişte ffprobe bir kez. Negatif kontrol: iki ayrı
 dosya iki yoklama; dosya diskte değişirse yeniden yoklanır. (b) Ayar kapalıyken Küçült'ün
 dosyası kayıt bitince değişmez, açıkken değişir — ikisi aynı testin iki kolu.
+
+---
+
+# Kanıt Klasörü Kapanışı: Kuralın Bütün Süite Süpürülmesi
+
+Kaynak: `f2ef2bfd`'de konan kural, `.claude/acik.md` borcu. Ölçüm `docs/olcumler/k19-d0-ortak-odak.md`
+"Kanıt Klasörünün Kapanışı" bölümü.
+
+**Kural.** Kanıt dosyasını silen çağrı **son asertten sonra** durur. Yeşil koşum kendi bıraktığını
+siler; kırmızı koşum kanıtını korur, çünkü düşen asert o satıra hiç gelmez. Klasör boşalınca o da gider.
+Testin **başında** silmek bu kural değildir: o eski koşumun kanıtını siler, kendininkini bırakır.
+
+**Kapsam.** Tarama 40 sınıf buldu. Üç öbek, üç dal:
+
+1. `t0/kanit-oynatici` — 11 sınıf: `OynaticiMotorTests`, `OynaticiParcaTests`, `OynaticiGorunumTests`,
+   `OynaticiGelismisTests`, `OynaticiAracTests`, `OynaticiKarsilastirmaTests`, `OynaticiGirdiTests`,
+   `OynaticiDenetimTests`, `OynaticiYolHaritasiTests`, `OynaticiKisayolTests`, `OynaticiDalga3GirdiTests`.
+2. `t0/kanit-kaydedici` — 16 sınıf: `KayitMotoruTests`, `KaydediciSeciciTests`, `KaydediciCerceveTests`,
+   `KaydediciGirdiTests`, `KaydediciKameraTests`, `KaydediciHedefTests` (kısmi: üç txt kalıyor),
+   `KaydediciArkaPlanTests`, `KaydediciOnizlemeTests`, `KaydediciTamponTests`, `KayitBolmeTests`,
+   `BoslukKirpmaTests`, `KayitOdakTakibiTests`, `KayitSonucVurguTests`, `KaydediciPencereTests`,
+   `SesGirisiTests`, `SesliKayitTests`.
+3. `t0/kanit-arayuz` — 13 sınıf: `AltyaziIndirmeTests`, `AltyaziOturumTests`, `WindowLayoutTests`,
+   `QualityTargetUiTests`, `QualityTargetTests`, `PerformanceCheckTests`, `PaletteApplyTests`,
+   `UstSeritTikTests`, `MiniKipOlcusuTests`, `TestAyarYoluTests`, `BiciminTests` (kısmi),
+   `FiltreYoklamaTests`, `StreamMappingTests`.
+
+**Dokunulmayan.** `GoruntuCekTests` kanıt üretmek **için** var — ürettiği PNG'ler tasarım kararının
+kaynağı, silinmez. Plana girmez.
+
+**Yardımcı.** Her öbek kendi kanıt yardımcısına (`MotorKanit`, `KayitKanit`, `AltyaziKanit`…) tek bir
+`Kapat(params string[] adlar)` ekler; sınıf başına kopyalanmaz. Gövde `OynaticiGercekGirdiTests.Kapat`
+ile aynı: dosyaları siler, klasör boşsa klasörü de siler.
+
+**Kabul ölçütü.** Her öbek için, o öbeğin filtresiyle iki koşum:
+(a) yeşil koşumdan sonra `.calisma/<klasor>` **yok**;
+(b) sınıflardan birinde son asert bozulunca koşum kırmızı ve kanıt dosyaları **yerinde**.
+İkisinin ham çıktısı `docs/olcumler/kanit-kapanisi-supurme.md`'ye birebir yazılır.
+
+**Sıra.** Dallar bağımsız, aynı dosyaya dokunmuyorlar; üçü paralel koşabilir. Her dal kendi CI yeşilini
+alır, `main`e yalnız T0 birleştirir.
