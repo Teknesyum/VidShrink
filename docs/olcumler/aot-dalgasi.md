@@ -445,7 +445,11 @@ Kanal kapatıldı, **kaynak kapatılmadı**:
 1. **Kurban yalıtıldı.** `KaydediciPencereTests` mac isteğini `Scale = null` ile kuruyor.
    Ölçünün konusu pencere kırpması; kalıcı ölçek o ölçüye hiç girmemeli. Bu, sızıntının
    kurbana ulaşan kanalını tümden kapatıyor.
-2. **Kaynak açık.** `GelismisKollarIstegeVeAyaraGecer` sınıf bütün koşulduğunda paylaşılan
+2. **Kaynak kapandı** (2026-09-18, `t0/kaydedici-ayar-yarisi`). Aşağıdaki madde borcun
+   açık hâlini anlatıyor; kapanışı ve yeniden ölçümü
+   `docs/olcumler/kaydedici-ayar-yalitimi.md` taşıyor. `RecorderView` ayar yolunu artık
+   örnekte tutuyor, paylaşılan dosya hiç oluşmuyor.
+3. **(Kapanmadan önceki hâli.)** `GelismisKollarIstegeVeAyaraGecer` sınıf bütün koşulduğunda paylaşılan
    dosyada hâlâ 1280x720 bırakıyor. Devredilecek ayrı bir sahip yok; borç T0'ın defterinde
    (`.claude/acik.md`) duruyor ve aynı kökün ikinci yüzüyle birlikte kapanacak:
    `6f4c2a89`'da main CI'sını kırmızı yapan `KaydediciOnizlemeTests` yarışı da bu paylaşılan
@@ -465,8 +469,10 @@ kosum 35296182516 (tekrar): ayni test, ham sol tik: 612 ms'de pause yes, 3638 ms
 
 İki koşumda neredeyse aynı sayı: kararsızlık değil, belirleyici bir kırılma. Sebep,
 `AppHost`'un tek bir Avalonia arayüz iş parçacığını **bütün test sınıflarıyla** paylaşması
-(`tests/VidShrink.Tests/AppHost.cs`): sınıflar paralel koşarken `RunJobs()` yalnız çağıranın
-değil, o sırada kuyrukta ne varsa hepsinin işini boşaltıyor. Oynatıcının tık hakemi 900 ms'lik
+(`tests/VidShrink.Tests/AppHost.cs`): `RunJobs()` yalnız çağıranın değil, o sırada kuyrukta
+ne varsa hepsinin işini boşaltıyor. Paralellikle ilgisi yok — suit içi paralellik kapalı
+(`LanguageTests.cs:17`); kuyruk **ertelenmiş** işleri sınıf sınırının ötesine taşıdığı için
+yabancı iş orada duruyor. Oynatıcının tık hakemi 900 ms'lik
 pencereye bakıyor ve sırası bozulunca tek tık 3,6 saniyeye kayıyor.
 
 Pompa ve ona bağlı pim geri alındı; yerinde `GelismisOlc`'un başındaki açıklama duruyor.
