@@ -79,8 +79,7 @@ public sealed class GoruntuCekTests
                         {
                             Width = 40, Height = 40, Stretch = Stretch.Uniform,
                             HorizontalAlignment = HorizontalAlignment.Center,
-                            Data = Geometry.Parse(veri), Stroke = Brushes.White, StrokeThickness = 2 * 40 / 24.0,
-                            StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round
+                            Data = Geometry.Parse(veri), Fill = Brushes.White
                         },
                         new TextBlock { Text = ad, Foreground = Brushes.Gray, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center }
                     }

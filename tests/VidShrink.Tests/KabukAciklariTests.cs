@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Avalonia.Media;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using VidShrink.App;
@@ -44,25 +45,41 @@ public sealed class KabukAciklariTests
         }, sonuc);
     }
 
+    /// <summary>
+    /// K4 ölçüsü, Fluent diline taşındı. Eski sürüm yolun metnindeki sayıları sayıyordu;
+    /// Fluent'in <c>settings_24_filled</c> çizimi aynı şekli Bezier'le kurduğu için o sayım
+    /// artık şekli değil yazımı ölçüyordu. Ölçü şimdi doğrudan dolguyu yokluyor:
+    /// merkezde göbek deliği var, çevresinde dolu bir halka, halkanın dışında altı diş.
+    /// Diş sayısı ışınsal örneklemede dolu/boş geçiş sayısının yarısıdır.
+    /// </summary>
     [Fact]
     public void AyarlarSimgesiDisliCarktir()
     {
-        var yol = IkonKutusuTests.Ikonlar().Single(s => (string)s[0] == "IconSettings")[1] as string;
-        var govde = yol!["M 0,0 M 24,24 ".Length..];
+        var yol = (string)IkonKutusuTests.Ikonlar().Single(s => (string)s[0] == "IconSettings")[1];
+        var govde = yol[IkonKutusuTests.Sabitleyici.Length..];
 
-        var altYollar = Regex.Matches(govde, @"\bM\s").Count;
-        var yalnizNoktalar = Regex.Replace(govde, @"A\s+[\d.]+,[\d.]+\s+-?[\d.]+\s+[01],[01]\s+", "A ");
-        var noktalar = Regex.Matches(yalnizNoktalar,@"(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)")
-            .Select(m => (X: double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture), Y: double.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture)))
-            .Select(p => Math.Sqrt((p.X - 12) * (p.X - 12) + (p.Y - 12) * (p.Y - 12)))
-            .ToList();
+        AppHost.Ensure();
+        var (delik, halka, disler, disUstu) = AppHost.Run(() =>
+        {
+            var geo = Geometry.Parse(govde);
+            bool Dolu(double r, double a) =>
+                geo.FillContains(new Avalonia.Point(12 + r * Math.Cos(a), 12 + r * Math.Sin(a)));
+            double Oran(double r) => Ornek(r).Count(b => b) / 480.0;
+            bool[] Ornek(double r) => Enumerable.Range(0, 480)
+                .Select(i => Dolu(r, 2 * Math.PI * i / 480)).ToArray();
+            int Gecis(double r)
+            {
+                var d = Ornek(r);
+                return Enumerable.Range(0, d.Length).Count(i => d[i] != d[(i + 1) % d.Length]);
+            }
+            var disSayilari = new[] { 8.0, 8.5, 9.0, 9.5 }.Select(Gecis).ToArray();
+            return (Oran(1.5), Oran(5.0), disSayilari, Oran(10.5));
+        });
 
-        var disUclari = noktalar.Count(r => r > 9);
-        var disDipleri = noktalar.Count(r => r is > 6 and < 8);
-
-        Assert.Equal(2, altYollar);
-        Assert.Equal(16, disUclari);
-        Assert.True(disDipleri >= 16, $"diş dibi {disDipleri}");
+        Assert.Equal(0.0, delik);
+        Assert.Equal(1.0, halka);
+        Assert.Equal(0.0, disUstu);
+        Assert.All(disler, g => Assert.Equal(12, g));
     }
 
     [Fact]

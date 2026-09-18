@@ -181,6 +181,8 @@ public sealed class KaydediciGirdiTests
         Assert.Equal(1, olcu.sesSayac);
     }
 
+    private const int Tavan = 30000;
+
     private static void Bekle(int ms)
     {
         var saat = Stopwatch.StartNew();
@@ -192,9 +194,20 @@ public sealed class KaydediciGirdiTests
     }
 
     /// <summary>
-    /// Alt sınır tutma süresi (360 ms), üst sınır yalnız "kendiliğinden kapanır" demek: dağıtıcı zamanlayıcısı
-    /// yüklü koşucuda gecikiyor. Yerelde 379 ms; t0/paket-2b CI koşumu 35191568301'de canlı ffmpeg testleriyle
-    /// aynı anda 6304 ms ölçüldü ve eski 5000 ms sınırı düştü. Üst sınır bekleme döngüsünün 10 sn tavanının altında.
+    /// Ölçünün konusu <b>kapanmanın kendiliğinden olması</b>, ne kadar sürdüğü değil.
+    ///
+    /// <para>Duvar saati üst sınırı ölçüden çıkarıldı. Eskiden 360 ms'lik tutmaya 9500 ms'lik bir
+    /// tavan konuyordu; yüklü koşucuda dağıtıcı zamanlayıcısı bu tavanı da aştı (CI 958'de
+    /// 10589 ms) ve kırmızı gerçek bir kusuru değil makinenin o anki yükünü gösterdi. Üst sınırı
+    /// büyütmek çözüm değil: hangi sayı yazılırsa yazılsın yeterince yüklü bir koşucuda düşer.
+    /// Bu yüzden ölçü <b>durumu</b> sınıyor — pencere kendiliğinden görünmez oldu mu, olduysa
+    /// tutma süresinden önce mi kapandı.</para>
+    ///
+    /// <para>Alt sınırlar duruyor ve kararlı: <see cref="System.Diagnostics.Stopwatch"/> tekdüze,
+    /// <c>Task.Delay</c> erken tetiklenmez, yoklama yalnız gecikme ekler. Halka tutması 360 ms,
+    /// yazı tutması 1500 ms; bunlardan önce kapanmak gerçek bir kusurdur. <see cref="Tavan"/>
+    /// yalnız döngünün sonsuza kadar dönmesini engelleyen bir emniyet süresi — ona takılırsa
+    /// ölçü "kapanmadı" der, "geç kapandı" demez.</para>
     /// </summary>
     [Fact]
     public void GercekHalkaVeTusYazisiYerindeAcilipKendiligindenKapanir()
@@ -213,7 +226,7 @@ public sealed class KaydediciGirdiTests
             var ilk = (halkaAcik: halka.IsVisible, halkaKonum: halka.Position, halkaGen: halka.Width, yaziAcik: yazi.IsVisible, yaziKonum: yazi.Position, yazi: yazi.Text, yaziBoy: yazi.Bounds.Size);
             long halkaKapandi = -1, yaziKapandi = -1;
             var halkaKapaninca = true;
-            while (yaziSaat.ElapsedMilliseconds < 10000 && (halkaKapandi < 0 || yaziKapandi < 0))
+            while (yaziSaat.ElapsedMilliseconds < Tavan && (halkaKapandi < 0 || yaziKapandi < 0))
             {
                 Bekle(10);
                 if (halkaKapandi < 0 && !halka.IsVisible) { halkaKapandi = halkaSaat.ElapsedMilliseconds; halkaKapaninca = yazi.IsVisible; }
@@ -237,8 +250,10 @@ public sealed class KaydediciGirdiTests
         Assert.True(olcu.ilk.yaziAcik);
         Assert.Equal("Ctrl + S", olcu.ilk.yazi);
         Assert.True(olcu.ilk.yaziKonum.Y > 100 + 480 / 2 && olcu.ilk.yaziKonum.Y < 100 + 480);
-        Assert.InRange(olcu.halkaKapandi, 360, 9500);
-        Assert.InRange(olcu.yaziKapandi, 1500, 10000);
+        Assert.True(olcu.halkaKapandi >= 0, $"Halka {Tavan} ms içinde kendiliğinden kapanmadı.");
+        Assert.True(olcu.yaziKapandi >= 0, $"Tuş yazısı {Tavan} ms içinde kendiliğinden kapanmadı.");
+        Assert.True(olcu.halkaKapandi >= 360, $"Halka tutma süresinden önce kapandı: {olcu.halkaKapandi} ms < 360 ms.");
+        Assert.True(olcu.yaziKapandi >= 1500, $"Tuş yazısı tutma süresinden önce kapandı: {olcu.yaziKapandi} ms < 1500 ms.");
     }
 
     [KayitFact]

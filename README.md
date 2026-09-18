@@ -372,6 +372,10 @@ layout and design rules: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 FFmpeg and libmpv are separate programs under their own licenses; VidShrink redistributes
 neither and links no GPL code in ([`docs/kurulum.md`](docs/kurulum.md)).
 
+Third-party material that ships inside the source tree — the Fluent UI System Icons (MIT)
+the icon set is cut from — is listed in
+[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+
 <!-- signature -->
 <div align="center">
 

@@ -2,7 +2,8 @@
 
 Araştırma tarihi: 13 Eylül 2026. İnceleme konusu `src/VidShrink.App/Themes/Icons.axaml` içindeki
 26 adet elle yazılmış `StreamGeometry`. Bu sayı o günün ölçümüdür; `IconRestore` sonradan
-eklendiği için depoda bugün 27 yol var ve testler sayıyı elle yazmaz, dosyadan okur.
+eklendiği için 27 olmuştu; kullanılmayan iki geometri düşünce depoda bugün 25 yol var
+ve testler sayıyı elle yazmaz, dosyadan okur.
 
 Bu belgedeki her sayı ya resmî belgeden ya depo README'sinden ya da ölçülerek çıkarıldı.
 Kendi ikonlarımızın ölçüleri `svgelements` ile sınır kutusu hesaplanarak alındı; kaynak

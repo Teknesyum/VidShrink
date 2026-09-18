@@ -154,10 +154,7 @@
                 Height="{StaticResource IconSizeLg}"
                 Stretch="Uniform"
                 Data="{StaticResource IconRestore}"
-                Stroke="{StaticResource TextBody}"
-                StrokeThickness="{StaticResource IconStroke}"
-                StrokeLineCap="Round"
-                StrokeJoin="Round"/>
+                Fill="{StaticResource TextBody}"/>
         </Button>
       </Grid>
     </Border>

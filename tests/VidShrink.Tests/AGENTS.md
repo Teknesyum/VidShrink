@@ -143,14 +143,25 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
-- `IkonKutusuTests.cs` — `Themes/Icons.axaml`'daki 26 yolun tasarım kutusu: hepsinin başında `M 0,0 M 24,24`
-  sabitleyicisi, mürekkebin 2 birimlik kenar payı içinde kalması, merkezin 12/12'ye ±0.55 oturması.
-  Tek muafiyet `IconPlay` (üçgen optik olarak sağa kaydırılır, +0.5..+1.5 sınanır). Ölçünün kaynağı
+- `IkonKutusuTests.cs` — `Themes/Icons.axaml`'daki her yolun tasarım kutusu (sayı dosyadan okunur): hepsinin başında
+  `F1 M 0,0 M 24,24` sabitleyicisi, mürekkebin 2 birimlik kenar payı içinde kalması (slop 0.01),
+  merkezin 12/12'ye ±0.55 oturması. Muafiyetler: `IconPlay` (optik kaydırma +0.5..+1.5),
+  `IconSpeed` ve `IconCoffee` (Fluent'in kendi çizimi; ölçülen sınır kutularıyla ±0.02 pimli).
+  `IconCode` `</>` parmak izi `FillContains` ile okunur. Ölçünün kaynağı
   `docs/arastirma/ikon-estetigi.md`. Yolları `AppHost` üstünden ayrıştırır.
+- `IkonImzaTests.cs` — simgenin **şekil kimliği**: 24×24 kare 16×16 hücreye bölünüp her hücrenin
+  merkezinde dolgu yoklanıyor, 256 bit imza pimle karşılaştırılıyor (tolerans 2 bit). Sınır kutusu
+  ölçüsünün göremediği şeyi görür: aynı kutuyu dolduran yabancı bir gövde. Pim tablosu katalogla
+  birebir; `ImzalarBirbirindenUzak` en yakın çiftin uzaklığını sayar (ölçülen 14 bit), böylece
+  tolerans iddia değil ölçü olur.
+- `IconsTests.cs` — K9: takım Fluent UI System Icons 24 px Filled. Geometri sayısı ve anahtar kümesi
+  `docs/tasarim/fluent-simge-eslemesi.md` tablosuyla karşılıklı okunur (sayı elle yazılı değil, iki
+  bağımsız kaynaktan), her geometri dolu, ve %100/%150/%200'de başsız çizilen mürekkebin sınır kutusu
+  geometriden hesaplanan kutuyla ±1,5 px eşleşir — kırpılma ölçüsü budur.
 - `GelistiriciSekmesiTests.cs` — gizli Gelişmiş sekmesi: `DeveloperUnlock` eşiği, pencere sınırı, ara açılınca
   sıfırlanma, açıldıktan sonra baştan başlama; biçimlemede sekmenin gizli başladığının ve kapatma düğmesinin pimi.
-- `GoruntuCekTests.cs` — kanıt karesi üretir: `.calisma/kesit-ef/` altına güncelleme panelini ve 26 simgelik
-  sayfayı PNG olarak yazar. Ölçmez, sınamaz; tarz kararlarının resmi buradan çıkar.
+- `GoruntuCekTests.cs` — kanıt karesi üretir: `.calisma/kesit-ef/` altına güncelleme panelini ve simge
+  sayfasını (dolgu diliyle) PNG olarak yazar. Ölçmez, sınamaz; tarz kararlarının resmi buradan çıkar.
 - `StreamMappingTests.cs` — dalga 1c, akış eşleme: ffmpeg'in ürettiği 3 sn'lik mkv (2 ses, srt, elle yazılmış PGS, 2 bölüm,
   başlık/tarih) ve dönüş işaretli mp4. Varsayılan MP4 tek ses + mov_text, İzleri koru MKV tüm izler, platform tek iz;
   çıktılar ffprobe'la okunur. Negatif kontroller: eşlemesiz ffmpeg başka dili seçer ve tarihi düşürür, yan izleri
