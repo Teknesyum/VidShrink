@@ -102,6 +102,8 @@ public sealed class PaletteApplyTests
 
         for (var at = 0; at < once.Count; at++)
             Assert.Equal(once[at].Deger, geri[at].Deger);
+
+        Kapat("fircalar.txt");
     }
 
     /// <summary>
@@ -141,6 +143,8 @@ public sealed class PaletteApplyTests
 
         foreach (var (name, variant, _, acik) in satirlar)
             Assert.Equal(acik ? "Light" : "Dark", variant);
+
+        Kapat("cesit.txt");
     }
 
     [Fact]
@@ -181,6 +185,8 @@ public sealed class PaletteApplyTests
             Assert.Equal(beklenen, sonra);
             Assert.Equal(once, geri);
         }
+
+        Kapat("parlama.txt");
     }
 
     [Fact]
@@ -226,6 +232,8 @@ public sealed class PaletteApplyTests
             Assert.Equal(beklenen, sonra);
             Assert.Equal(once, geri);
         }
+
+        Kapat("parlama-tema.txt");
     }
 
     [Fact]
@@ -250,10 +258,28 @@ public sealed class PaletteApplyTests
         => new Avalonia.Markup.Xaml.Styling.ResourceInclude((Uri?)null) { Source = new Uri($"avares://VidShrink.App/Themes/Palette/{palet}/Theme.axaml") }
             .Loaded.TryGetValue(anahtar, out var deger) ? deger?.ToString() : null;
 
+    private static string Kok => Path.Combine(TipSources.Root, ".calisma", "tema");
+
     private static void Kanit(string metin, string ad = "fircalar.txt")
     {
-        var folder = Path.Combine(TipSources.Root, ".calisma", "tema");
+        var folder = Kok;
         Directory.CreateDirectory(folder);
         File.WriteAllText(Path.Combine(folder, ad), metin);
+    }
+
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    private static void Kapat(params string[] adlar)
+    {
+        if (!Directory.Exists(Kok)) return;
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(Kok, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.GetFileSystemEntries(Kok).Length == 0) Directory.Delete(Kok);
     }
 }

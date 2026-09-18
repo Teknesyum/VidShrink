@@ -26,6 +26,39 @@ internal static class AkisGirdisi
     internal static void Write(string name, string body)
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
+    /// <summary>
+    /// Ölçülerin paylaştığı, <see cref="File.Exists(string)"/> kapısıyla kendini yeniden
+    /// üreten girdiler. Bunları tek bir ölçü silemez; klasörde onlardan başka bir şey
+    /// kalmadığında son biten ölçü hepsini birden kaldırır.
+    /// </summary>
+    private static readonly string[] PaylasilanGirdiler =
+    {
+        "girdi.srt", "girdi.sup", "girdi-meta.txt", "cok-izli.mkv", "yatay.mp4", "donuk.mp4"
+    };
+
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. <paramref name="adlar"/> dosya
+    /// adı ya da desen olabilir. Kendi dosyaları gidince klasörde yalnız paylaşılan
+    /// girdiler kaldıysa onlar da gider, klasör boşalınca o da.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        var kok = Path.Combine(GirdiKanit.Root, ".calisma", "hb-1c-test");
+        if (!Directory.Exists(kok)) return;
+
+        foreach (var ad in adlar)
+            foreach (var yol in Directory.GetFileSystemEntries(kok, ad))
+                if (Directory.Exists(yol)) Directory.Delete(yol, true);
+                else File.Delete(yol);
+
+        var kalan = Directory.GetFileSystemEntries(kok);
+        if (kalan.Any(yol => !PaylasilanGirdiler.Contains(Path.GetFileName(yol), StringComparer.Ordinal))) return;
+
+        foreach (var yol in kalan) File.Delete(yol);
+        Directory.Delete(kok);
+    }
+
     internal static async Task<string> CokIzliAsync()
     {
         if (_cokIzli is not null && File.Exists(_cokIzli)) return _cokIzli;
@@ -400,6 +433,8 @@ public sealed class StreamMappingTests
         Assert.True(hepsi.VideoBitrateK < tek.VideoBitrateK - 100, rapor);
         Assert.True((hepsi.VideoBitrateK + hepsi.NonVideoK) * 600 / 8388.608 <= 50, rapor);
         Assert.Equal(hepsi.Streams.SideK, hepsi.NonVideoK);
+
+        AkisGirdisi.Kapat("birim-butce.txt");
     }
 
     [FfmpegAvailableFact]
@@ -423,6 +458,8 @@ public sealed class StreamMappingTests
         Assert.Equal(2, output.Chapters);
         Assert.Equal("Deneme Basligi", output.Title);
         Assert.StartsWith("2024-05-01", output.CreationTime);
+
+        AkisGirdisi.Kapat("varsayilan.txt", "varsayilan.mp4", "varsayilan-komut.txt");
     }
 
     [FfmpegAvailableFact]
@@ -447,6 +484,8 @@ public sealed class StreamMappingTests
         Assert.Empty(negative.Of("subtitle"));
         Assert.StartsWith("2024-05-01", output.CreationTime);
         Assert.True(string.IsNullOrEmpty(negative.CreationTime));
+
+        AkisGirdisi.Kapat("dil-tercihi.txt", "ingilizce.mp4", "ingilizce-komut.txt", "ffmpeg-kendi-secimi.mp4");
     }
 
     [FfmpegAvailableFact]
@@ -466,6 +505,8 @@ public sealed class StreamMappingTests
         Assert.Equal(new[] { ("subrip", "tur"), ("hdmv_pgs_subtitle", "eng") }, output.Of("subtitle").Select(track => (track.Codec, track.Language ?? "")));
         Assert.Equal(2, output.Chapters);
         Assert.Equal("Deneme Basligi", output.Title);
+
+        AkisGirdisi.Kapat("izleri-koru.txt", "izleri-koru.mkv", "izleri-koru-komut.txt");
     }
 
     [FfmpegAvailableFact]
@@ -482,6 +523,8 @@ public sealed class StreamMappingTests
         Assert.Contains("mp4", output.FormatName);
         Assert.Single(output.Of("audio"));
         Assert.Empty(output.Of("subtitle"));
+
+        AkisGirdisi.Kapat("platform.txt", "platform.mp4", "platform-komut.txt");
     }
 
     [FfmpegAvailableFact]
@@ -498,6 +541,8 @@ public sealed class StreamMappingTests
         Assert.True(girdi.Width > girdi.Height);
         Assert.True(Dikey(girdi));
         Assert.True(Dikey(Assert.Single(output.Of("video"))));
+
+        AkisGirdisi.Kapat("donuk.txt", "donuk-cikti.mp4", "donuk-cikti-komut.txt");
     }
 
     [FfmpegAvailableFact]
@@ -534,6 +579,8 @@ public sealed class StreamMappingTests
         Assert.True(result.OutputMb <= target * 1.01, rapor);
         Assert.True(result.OutputMb >= band.HardFloorMb, rapor);
         Assert.True(eskiIlk > target, rapor);
+
+        AkisGirdisi.Kapat("hedef-dogrulugu.txt", "hedef.mkv", "hedef-komut.txt", "hedef-eski-butce.mkv");
     }
 
     [Fact]

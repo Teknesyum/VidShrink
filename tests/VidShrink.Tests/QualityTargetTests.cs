@@ -252,6 +252,8 @@ public sealed class QualityTargetTests
         // picks 358x202@30 itself (25,439). The unexplained check above counts a recovery flip as
         // a ladder step for that reason.
         Assert.True(worst <= 5.5, $"En kotu sapma {worst:0.###} puan: {worstCase}");
+
+        Kapat("olcum.txt");
     }
 
     [Fact]
@@ -344,6 +346,8 @@ public sealed class QualityTargetTests
         Assert.Equal(1, worstByBound[QualityTargetBound.BelowFloor]);
         Assert.Equal(2, worstByBound[QualityTargetBound.AboveSourceCeiling]);
         Assert.True(worstOverall <= 1320, $"En pahali arama {worstOverall} BuildDetailed cagrisi surdu: {worstOverallCase}");
+
+        Kapat("olcum.txt");
     }
 
     [Fact]
@@ -421,6 +425,8 @@ public sealed class QualityTargetTests
         // because it stepped over a peak; the 0,5% scan is measured at x1,0000 against a 0,15%
         // grid, so the gate is 1,01 - room for the scan's own step, nothing like a missed peak.
         Assert.True(worst <= 1.01, $"Arama gercegin x{worst:0.0000} kati buyuk bir hedef verdi: {worstCase}");
+
+        Kapat("olcum.txt");
     }
 
     [Fact]
@@ -463,6 +469,8 @@ public sealed class QualityTargetTests
         _output.WriteLine(report.ToString());
         Write(report.ToString());
         Assert.True(worst[1.005] < 2.0);
+
+        Kapat("olcum.txt");
     }
 
     // K3: the inversion assumes quality rises with the target. That assumption is measured
@@ -512,6 +520,8 @@ public sealed class QualityTargetTests
         Write(report.ToString());
 
         Assert.True(samples > 0);
+
+        Kapat("olcum.txt");
     }
 
     [FfmpegFact]
@@ -581,14 +591,34 @@ public sealed class QualityTargetTests
         Write(report.ToString());
 
         Assert.True(samples > 0);
+
+        Kapat("olcum.txt", "hareketli-1080p30-120s.mp4", "hareketli-720p60-120s.mp4");
     }
+
+    private static string Kok => Path.Combine(TipSources.Root, ".calisma", "t57");
 
     private static void Write(string text)
     {
-        var root = Path.Combine(TipSources.Root, ".calisma", "t57");
+        var root = Kok;
         Directory.CreateDirectory(root);
         File.AppendAllText(Path.Combine(root, "olcum.txt"),
             $"=== {DateTime.Now.ToString("s", CultureInfo.InvariantCulture)} ==={Environment.NewLine}{text}{Environment.NewLine}");
+    }
+
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    private static void Kapat(params string[] adlar)
+    {
+        if (!Directory.Exists(Kok)) return;
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(Kok, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.GetFileSystemEntries(Kok).Length == 0) Directory.Delete(Kok);
     }
 
     private static async Task Encode(string source, string path)

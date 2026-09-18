@@ -18,6 +18,29 @@ public sealed class FiltreYoklamaTests
         }
     }
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider —
+    /// <c>.calisma/a1</c> da filtre klasörüyle birlikte boşalırsa kalkar.
+    /// </summary>
+    private static void Kapat(params string[] adlar)
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "a1", "filtre");
+        if (!Directory.Exists(klasor)) return;
+
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.GetFileSystemEntries(klasor).Length != 0) return;
+        Directory.Delete(klasor);
+
+        var ust = Path.Combine(GirdiKanit.Root, ".calisma", "a1");
+        if (Directory.Exists(ust) && Directory.GetFileSystemEntries(ust).Length == 0) Directory.Delete(ust);
+    }
+
     private static async Task Ffmpeg(params string[] args)
     {
         var psi = new ProcessStartInfo(ToolLocator.Ffmpeg) { RedirectStandardError = true, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
@@ -54,6 +77,8 @@ public sealed class FiltreYoklamaTests
         var belirsiz = taramali with { IsInterlaced = false, FieldOrder = null };
         Assert.Equal(DeinterlaceMode.On, (await InterlaceProbe.ResolveAsync(belirsiz, VideoFilterOptions.Default)).Deinterlace);
         Assert.Equal(DeinterlaceMode.Off, (await InterlaceProbe.ResolveAsync(duz with { FieldOrder = null }, VideoFilterOptions.Default)).Deinterlace);
+
+        Kapat("taramali.mkv", "duz.mkv");
     }
 
     [FfmpegFact]
@@ -70,6 +95,8 @@ public sealed class FiltreYoklamaTests
         var sayim = await InterlaceProbe.RunAsync(cikti);
         Assert.NotNull(sayim);
         Assert.False(VideoFilterChain.IdetSaysInterlaced(sayim!.Value), sayim.ToString());
+
+        Kapat("taramali-kaynak.mkv", "bwdif.mkv");
     }
 
     [FfmpegFact]
@@ -83,6 +110,8 @@ public sealed class FiltreYoklamaTests
 
         var duz = await Uret("bantsiz.mkv", "fps=25");
         Assert.Null((await CropProbe.RunAsync(duz)).Rect);
+
+        Kapat("bantli.mkv", "bantsiz.mkv");
     }
 
     [FfmpegFact]
@@ -102,5 +131,7 @@ public sealed class FiltreYoklamaTests
 
         Assert.Equal(360, cikti.Width);
         Assert.Equal(648, cikti.Height);
+
+        Kapat("zincir-kaynak.mkv", "zincir.mkv");
     }
 }

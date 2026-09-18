@@ -14,11 +14,13 @@ namespace VidShrink.Tests;
 
 internal static class AltyaziKanit
 {
+    private static string Kok => Path.Combine(GirdiKanit.Root, ".calisma", "p28-altyazi");
+
     internal static string Folder
     {
         get
         {
-            var path = Path.Combine(GirdiKanit.Root, ".calisma", "p28-altyazi");
+            var path = Kok;
             Directory.CreateDirectory(path);
             return path;
         }
@@ -34,6 +36,26 @@ internal static class AltyaziKanit
 
     internal static void Yaz(string ad, string govde)
         => File.WriteAllText(Path.Combine(Folder, ad), govde, new UTF8Encoding(false));
+
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// <paramref name="adlar"/> dosya adı ya da <see cref="Temiz"/>'in bıraktığı klasör adı olabilir.
+    /// </summary>
+    internal static void Kapat(params string[] adlar)
+    {
+        if (!Directory.Exists(Kok)) return;
+        foreach (var ad in adlar)
+        {
+            foreach (var yol in Directory.GetFileSystemEntries(Kok, ad))
+            {
+                if (Directory.Exists(yol)) Directory.Delete(yol, true);
+                else File.Delete(yol);
+            }
+        }
+
+        if (Directory.GetFileSystemEntries(Kok).Length == 0) Directory.Delete(Kok);
+    }
 }
 
 /// <summary>
@@ -174,6 +196,8 @@ public class AltyaziIndirmeTests
         AltyaziKanit.Yaz("hash-sifir.txt", $"boyut {boyut}; beklenen {beklenen}; okunan {MovieHash.Compute(dosya)}");
 
         Assert.Equal(beklenen, MovieHash.Compute(dosya));
+
+        AltyaziKanit.Kapat("hash-sifir", "hash-sifir.txt");
     }
 
     /// <summary>
@@ -203,6 +227,8 @@ public class AltyaziIndirmeTests
         AltyaziKanit.Yaz("hash-iki-uc.txt", $"sozcuk {sozcuk}; beklenen {beklenen}; okunan {okunan}");
 
         Assert.Equal(beklenen, okunan);
+
+        AltyaziKanit.Kapat("hash-iki-uc", "hash-iki-uc.txt");
     }
 
     /// <summary>
@@ -231,6 +257,8 @@ public class AltyaziIndirmeTests
 
         Assert.Equal(once, orta);
         Assert.NotEqual(once, uc);
+
+        AltyaziKanit.Kapat("hash-orta", "hash-orta.txt");
     }
 
     /// <summary>
@@ -253,6 +281,8 @@ public class AltyaziIndirmeTests
         AltyaziKanit.Yaz("hash-sarma.txt", $"boyut {boyut}; beklenen {beklenen}; okunan {okunan}");
 
         Assert.Equal(beklenen, okunan);
+
+        AltyaziKanit.Kapat("hash-sarma", "hash-sarma.txt");
     }
 
     /// <summary>
@@ -284,6 +314,8 @@ public class AltyaziIndirmeTests
 
         Assert.Equal(beklenen, okunan);
         Assert.NotEqual(yalnizBoyut, okunan);
+
+        AltyaziKanit.Kapat("hash-blok", "hash-blok.txt");
     }
 
     /// <summary>128 KB'ın altında iki blok üst üste binerdi; hash üretilmez.</summary>
@@ -298,6 +330,8 @@ public class AltyaziIndirmeTests
 
         Assert.Null(MovieHash.Compute(kucuk));
         Assert.NotNull(MovieHash.Compute(tam));
+
+        AltyaziKanit.Kapat("hash-kucuk");
     }
 
     // ---------- sağlayıcı: arama ----------
@@ -335,6 +369,8 @@ public class AltyaziIndirmeTests
 
         // Parametreler alfabetik: languages, moviehash. Sirasiz istek yonlendiriliyor.
         Assert.EndsWith("/subtitles?languages=en,tr&moviehash=abc123def4567890", ag.Istekler[0], StringComparison.Ordinal);
+
+        AltyaziKanit.Kapat("arama-istegi.txt");
     }
 
     /// <summary>
@@ -354,6 +390,8 @@ public class AltyaziIndirmeTests
         Assert.Matches(@"^VidShrink v\d+\.\d+\.\d+$", kimlik);
         Assert.DoesNotContain("/", kimlik, StringComparison.Ordinal);
         Assert.NotEqual(ShareIdentity.UserAgent, kimlik);
+
+        AltyaziKanit.Kapat("kimlik.txt");
     }
 
     /// <summary>Hash tutmazsa ikinci istek ad aramasıdır; iki istek de tek aramada gider.</summary>
@@ -374,6 +412,8 @@ public class AltyaziIndirmeTests
         Assert.DoesNotContain("moviehash=", ag.Istekler[1], StringComparison.Ordinal);
         Assert.Contains("query=film+adi", ag.Istekler[1], StringComparison.Ordinal);
         Assert.Equal(22, sonuc.Candidates[0].FileId);
+
+        AltyaziKanit.Kapat("arama-ad.txt");
     }
 
     /// <summary>
@@ -395,6 +435,8 @@ public class AltyaziIndirmeTests
         AltyaziKanit.Yaz("siralama.txt", string.Join(" > ", sonuc.Candidates.Select(c => $"{c.FileId}/{c.Language}/{c.DownloadCount}/hash={c.HashMatch}")));
 
         Assert.Equal(new long[] { 4, 3, 2, 1 }, sira);
+
+        AltyaziKanit.Kapat("siralama.txt");
     }
 
     // ---------- sağlayıcı: indirme ----------
@@ -420,6 +462,8 @@ public class AltyaziIndirmeTests
         Assert.Equal(govde, File.ReadAllText(sonuc.Path!));
         Assert.Equal(4, sonuc.Remaining);
         Assert.Contains("\"file_id\":77", ag.Govdeler[0], StringComparison.Ordinal);
+
+        AltyaziKanit.Kapat("indir", "indir.txt");
     }
 
     /// <summary>Kullanıcının kendi altyazısı ezilmez; ikinci dosya numaralanır.</summary>
@@ -441,6 +485,8 @@ public class AltyaziIndirmeTests
         Assert.Equal(Path.Combine(kok, "Film.tr.2.srt"), sonuc.Path);
         Assert.Equal("elle yazilmis", File.ReadAllText(Path.Combine(kok, "Film.tr.srt")));
         Assert.Equal("indirilen", File.ReadAllText(sonuc.Path!));
+
+        AltyaziKanit.Kapat("indir-ezme");
     }
 
     // ---------- hata kolları ----------
@@ -509,6 +555,8 @@ public class AltyaziIndirmeTests
         Assert.Equal(SubtitleOutcome.QuotaExceeded, kotaSonucu.Outcome);
         Assert.Equal(0, kotaSonucu.Remaining);
         Assert.Equal(SubtitleOutcome.NeedAccount, anahtarSonucu.Outcome);
+
+        AltyaziKanit.Kapat("dort-yuz-bir.txt");
     }
 
     /// <summary>
@@ -534,6 +582,8 @@ public class AltyaziIndirmeTests
         Assert.DoesNotContain("Api-Key", ag.Basliklar[1], StringComparison.Ordinal);
         Assert.Equal(ag.Kimlikler[0], ag.Kimlikler[1]);
         Assert.NotEmpty(ag.Kimlikler[1]);
+
+        AltyaziKanit.Kapat("indir-baglanti", "indir-baglanti.txt");
     }
 
     [Theory]
@@ -601,6 +651,8 @@ public class AltyaziIndirmeTests
         Assert.Equal("player.subtitle.download.needaccount", rapor.Oturumsuz.Bildirim);
         Assert.Equal(0, rapor.Oturumsuz.Sorgu);
         Assert.Equal(1, rapor.Oturumlu.Sorgu);
+
+        AltyaziKanit.Kapat("oturumsuz", "oturumsuz.txt");
     }
 
     private static PlayerView Ac(YolMotoru motor, out Window pencere, string yol)
@@ -663,6 +715,8 @@ public class AltyaziIndirmeTests
         Assert.Equal(new long[] { 91 }, rapor.Secilen);
         Assert.Null(rapor.Hash);
         Assert.Equal("player.subtitle.download.done", rapor.Bildirim);
+
+        AltyaziKanit.Kapat("oynatici-indir", "oynatici-indir.txt");
     }
 
     /// <summary>
@@ -686,6 +740,8 @@ public class AltyaziIndirmeTests
         foreach (var dil in Strings.Languages)
             foreach (var anahtar in anahtarlar)
                 Assert.False(string.IsNullOrWhiteSpace(Strings.GetIn(dil, anahtar)), $"{dil}/{anahtar} bos");
+
+        AltyaziKanit.Kapat("hata-kollari.txt");
     }
 
     /// <summary>
@@ -735,6 +791,8 @@ public class AltyaziIndirmeTests
         Assert.Equal("player.subtitle.download.offline", rapor[3].Anahtar);
         Assert.Equal("player.subtitle.download.writefail", rapor[4].Anahtar);
         Assert.Equal(5, rapor.Select(r => r.Anahtar).Distinct(StringComparer.Ordinal).Count());
+
+        AltyaziKanit.Kapat("oynatici-kollar", "oynatici-kollar.txt");
     }
 
     /// <summary>
@@ -777,6 +835,8 @@ public class AltyaziIndirmeTests
             Assert.Contains(Strings.Get("player.subtitle.off"), liste);
             Assert.Contains(Strings.Get("player.subtitle.load"), liste);
         }
+
+        AltyaziKanit.Kapat("oynatici-menu", "oynatici-menu.txt");
     }
 
     /// <summary>Arayüz dili önce, İngilizce sonra; İngilizce arayüzde liste tek elemanlı.</summary>
@@ -853,6 +913,8 @@ public class AltyaziIndirmeTests
 
         Assert.Contains("PIM94", durum, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("film.tr.srt", durum, StringComparison.OrdinalIgnoreCase);
+
+        AltyaziKanit.Kapat("p28-dil", "dil-pim", "dil-pim.txt");
     }
 
     /// <summary>
@@ -909,6 +971,8 @@ public class AltyaziIndirmeTests
 
             var bos = AppSettings.Load(Path.Combine(kok, "yok.json"));
             Assert.Equal("", bos.OpenSubtitlesApiKey);
+
+            AltyaziKanit.Kapat("ayar", "ayar.txt");
         }
         finally
         {
@@ -951,6 +1015,8 @@ public class AltyaziIndirmeTests
             Assert.Equal(1, bosOkuma);
             Assert.All(doluCevaplar, cevap => Assert.True(cevap));
             Assert.Equal(1, doluOkuma);
+
+            AltyaziKanit.Kapat("anahtar-onbellek", "anahtar-onbellek.txt");
         }
         finally
         {
@@ -1002,6 +1068,8 @@ public class AltyaziIndirmeTests
         Assert.True(AnahtarKokuyor(telKaydi), "tarayici tirnaksiz tel kaydi anahtarini kaciriyor");
         Assert.False(AnahtarKokuyor(alan), "tarayici ayar alan adini anahtar saniyor");
         Assert.Empty(suclular);
+
+        AltyaziKanit.Kapat("anahtar-taramasi.txt");
     }
 
     /// <summary>
@@ -1090,6 +1158,8 @@ public class AltyaziIndirmeTests
 
         Assert.Equal("player.subtitle.download.working", okunan.Sirasinda);
         Assert.NotEqual(okunan.Sirasinda, okunan.Sonra);
+
+        AltyaziKanit.Kapat("aramada", "aramada.txt");
     }
 
     /// <summary>
@@ -1159,6 +1229,8 @@ public class AltyaziIndirmeTests
         Assert.Equal(42, klasorler.Length);
         Assert.Empty(eksik);
         Assert.All(klasorler, dil => Assert.Contains(dil, Strings.Languages, StringComparer.OrdinalIgnoreCase));
+
+        AltyaziKanit.Kapat("diller.txt");
     }
 
     /// <summary>
@@ -1176,6 +1248,8 @@ public class AltyaziIndirmeTests
 
         Assert.False(KaynaktaGeciyor(uydurma));
         Assert.True(KaynaktaGeciyor("player.subtitle.download.toofast"));
+
+        AltyaziKanit.Kapat("olu-anahtar.txt");
     }
 
     private static bool KaynaktaGeciyor(string anahtar)

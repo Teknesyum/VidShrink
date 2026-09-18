@@ -18,11 +18,29 @@ public sealed class TestAyarYoluTests
         return dosya.Exists ? $"{dosya.Length}@{dosya.LastWriteTimeUtc.Ticks}" : "yok";
     }
 
+    private static string Kok => Path.Combine(TipSources.Root, ".calisma", "ayar-yolu");
+
     private static void Kanit(string ad, string metin)
     {
-        var klasor = Path.Combine(TipSources.Root, ".calisma", "ayar-yolu");
+        var klasor = Kok;
         Directory.CreateDirectory(klasor);
         File.WriteAllText(Path.Combine(klasor, ad), metin, new UTF8Encoding(false));
+    }
+
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    private static void Kapat(params string[] adlar)
+    {
+        if (!Directory.Exists(Kok)) return;
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(Kok, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.GetFileSystemEntries(Kok).Length == 0) Directory.Delete(Kok);
     }
 
     [Fact]
@@ -91,6 +109,8 @@ public sealed class TestAyarYoluTests
         Assert.Equal(klip, sonuc);
         Assert.Contains(klip, RecentFiles.Load(son).Items);
         Assert.Equal(once, sonra);
+
+        Kapat("son-dosyalar.txt");
     }
 
     [Fact]
@@ -120,5 +140,7 @@ public sealed class TestAyarYoluTests
 
         Assert.Equal(37d, RecorderSettings.Load(yol).TargetMegabytes);
         Assert.Equal(once, sonra);
+
+        Kapat("kaydedici-ayari.txt");
     }
 }
