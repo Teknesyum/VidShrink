@@ -1067,7 +1067,10 @@ public sealed class ManualOverrideTests
         // A1: Filters kullanicinin filtre secimi (deinterlace, denoise, transpose ...), DetectedCrop
         // ise cropdetect yoklamasinin sonucu. Ikisi de istek modelinin yuzeyinde durmali: biri
         // kullanicidan gelir, oteki yoklamadan gelip plana onerilir. Kapali sabit degiller.
-        "Filters", "DetectedCrop"
+        "Filters", "DetectedCrop",
+        // Madde 54: Trim kullanicinin sectigi zaman penceresi. Kapali sabit degil, istegin
+        // kendisi — butce bu pencereden turer (docs/danisma/2026-09-18-fable-kucultmede-aralik.md S2).
+        "Trim"
     };
 
     [Fact]

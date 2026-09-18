@@ -855,3 +855,45 @@ Dal `t0/hb-1c-akis`.
 6. App: gelişmiş ses bölümünde "İzleri koru" kutusu (42 dil), çıktı uzantısı plandan, platform çipi bayrağı.
 7. Test `StreamMappingTests.cs`: ffmpeg ile 3 sn girdi (2 ses + srt + PGS + 2 bölüm + başlık/tarih; ayrıca
    dönük MP4), çıktı ffprobe ile okunur; çok izli girdide hedef isabeti; her kolun negatif kontrolü.
+
+# Plan — Küçültmede Aralık (HandBrake Açığı, Madde 54)
+
+Dal: `t0/hb-acik-kalan`, taban `e962538e`. Karar kaynağı:
+`docs/danisma/2026-09-18-fable-kucultmede-aralik.md` (S1–S6).
+
+## Sorun
+
+HandBrake `--start-at`/`--stop-at` ile kesit küçültüyor. VidShrink'in küçültme yolunda
+aralık **hiç yok**: `EncodePlan`'de Start/End/Trim alanı bulunmuyor, `-ss` yalnız
+`FfmpegArguments.BuildSegment`'te (ölçüm parçası) var ve üretimde çağıran yok.
+`ConversionPlan.Start/End` dönüştürücü yolunda; hedef boyut hesabı yapmıyor.
+Sonuç: kullanıcı bir kesiti hedef boyuta sıkıştıramıyor.
+
+## Adımlar
+
+1. `src/VidShrink.Core/TrimWindow.cs` (yeni) — `TrimWindow(double StartSeconds, double
+   EndSeconds)`; `DurationSeconds`, melez arama bölüşümü (`LeadSeconds`/`RemainderSeconds`,
+   `SeekLeadSeconds = 10.0`), `Apply(MediaInfo)` süreyi ve kaynak baytını süre oranıyla
+   ölçekler (S2).
+2. `EncodePlan.cs` — `Trim` alanı + `Clone()`.
+3. `PlanCalculator.cs` — `PlanOptions.Trim`; `BuildDetailed` hesabı `Trim.Apply(info)`
+   üstünden kurar, böylece rejim/oran/karmaşıklık/bütçe kesit süresinden türer (S2).
+4. `FfmpegArguments.cs` — aralık varken `-ss lead` girdiden **önce**, `-ss remainder` ve
+   `-t duration` girdiden **sonra** (S1, S3).
+5. `StreamMapping.cs` — aralık varken `-map_chapters -1` (S4).
+6. `EncodeRunner.cs` — `OvershootTrim` aralıklı planda devre dışı; `PlanCalculator.Correct`
+   kesit süresini alır (S5).
+7. `src/VidShrink.Cli` — `--kes <bas>-<son>` bayrağı, `kucult` ve `plan` komutlarında.
+8. `tests/VidShrink.Tests/KucultmeAraligiTests.cs` — S6'nın üç ilişki pimi:
+   konum+toplam eşitliği, `-t == End − Start`, bit hızının kesit süresiyle ters oranı.
+
+## Ölçüm
+
+Yerelde kısa sıralı doğrulama: 20 sn kaynaktan 6 sn kesit, hedef boyut tutuyor mu,
+çıktı süresi ve başlangıç karesi doğru mu. Izgara yok, CI hücresi gerekmiyor.
+
+## Borç
+
+S1'in geri gitme payı (10 sn) üretim `-g` tavanından türetildi; gerçek kaynak I-kare
+aralığı ölçülmedi (fable "ölçülmeli" dedi). S2'nin süre-oranı sezgisinin VBR kaynakta
+kaç fazladan deneme turu yediği ölçülmedi.
