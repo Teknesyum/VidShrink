@@ -37,7 +37,10 @@ açıkça "bu kod kalkacak" diyor.
    Harf duyarlılığı artık sabit değil, `WatchFolder.PathComparison` dikişinden geliyor.
    `YolEsitligiTests`; iki mutasyon (sabit `Ordinal`, `ArgumentException` korumasının
    kalkması) 1'er kırmızı.
-10. On ayrı yerde elle süre biçimlendirme (`CliApp.cs:443`, `MainWindow.axaml.cs:3238`,
+10. ~~On ayrı yerde elle süre biçimlendirme~~ **Kapandı:** gövde `Core/Saat`'e indi
+    (`Ekran`, `Kalan`, `Kesit`, `Ffmpeg`, `DosyaAdi`); tarama on iki değil **on dört**
+    çağrı yeri buldu. Plan ve mutasyon dökümü `docs/plan.md`. Eski satır: on ayrı yerde
+    elle süre biçimlendirme (`CliApp.cs:443`, `MainWindow.axaml.cs:3238`,
     `:4255`, `:4342`, `:4404`, `PlayerView.Tools.cs:299`, `RecorderView.Serit.cs:48`,
     `ShrinkJobWindow.axaml.cs:272`, `ConversionArguments.cs:157`) — biçimler tutarsız,
     üç yerde `InvariantCulture` yok. `PlayerView.Serit.cs:69`'un "ikinci kopya yok"

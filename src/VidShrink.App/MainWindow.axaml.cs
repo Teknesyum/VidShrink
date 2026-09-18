@@ -3233,7 +3233,7 @@ public partial class MainWindow : Window
     private void ShowInfo(MediaInfo info)
     {
         Fade(InfoGrid, true);
-        TxtDuration.Text = TimeSpan.FromSeconds(info.DurationSeconds).ToString(@"hh\:mm\:ss");
+        TxtDuration.Text = Saat.Ekran(TimeSpan.FromSeconds(info.DurationSeconds), TimeSpan.FromHours(1));
         TxtSize.Text = Say("main.unit.mb-value", Num(info.FileSizeMb, "0.0"));
         TxtResolution.Text = $"{info.Width}x{info.Height}";
         TxtFps.Text = Num(info.Fps, "0.##");
@@ -4250,7 +4250,7 @@ public partial class MainWindow : Window
             {
                 Progress.Value = p.Fraction;
                 SetStage(TxtStage, LocalizeStage(p.Stage));
-                TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-";
+                TxtRemaining.Text = Saat.Kalan(p.Remaining);
                 if (p.OutputMb > 0) TxtOutSize.Text = Say("main.unit.mb-value", Num(p.OutputMb, "0.0"));
             });
 
@@ -4337,7 +4337,7 @@ public partial class MainWindow : Window
             Num(prompt.TargetMb, "0.##"),
             Num(prompt.OverMb, "0.0"),
             Num(prompt.OverPercent, "0.#"),
-            prompt.AttemptDuration.ToString(@"mm\:ss", CultureInfo.InvariantCulture));
+            Saat.Ekran(prompt.AttemptDuration));
 
         TxtRetryMeaning.Text = prompt.HasUnderBandFallback
             ? Say("main.retry.meaning-with-fallback", Num(prompt.FallbackMb, "0.0"))
@@ -4397,10 +4397,7 @@ public partial class MainWindow : Window
 
     private static string Clock(double seconds)
     {
-        var span = TimeSpan.FromSeconds(Math.Max(0, seconds));
-        return span.TotalHours >= 1
-            ? span.ToString(@"h\:mm\:ss\.f", CultureInfo.InvariantCulture)
-            : span.ToString(@"m\:ss\.f", CultureInfo.InvariantCulture);
+        return Saat.Kesit(TimeSpan.FromSeconds(Math.Max(0, seconds)));
     }
 
     internal Task<OvershootChoice> ShowRetryAskForTest(RetryPrompt prompt)

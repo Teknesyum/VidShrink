@@ -43,10 +43,7 @@ internal partial class RecorderView
     /// Geçen sürenin yazımı. Sayılar değişmez biçimde yazılıyor, yani dil değişince
     /// kaymıyor; bir saati geçen kayıt <c>01:02:12</c> biçimine geçer.
     /// </summary>
-    internal static string Clock(TimeSpan at)
-        => at.TotalHours >= 1
-            ? at.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)
-            : at.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+    internal static string Clock(TimeSpan at) => Saat.Ekran(at);
 
     private void InitSerit()
         => ShowProgress(new RecordProgress(TimeSpan.Zero, TimeSpan.Zero, 0, 0, 0));

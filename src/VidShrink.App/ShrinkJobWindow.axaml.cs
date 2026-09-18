@@ -269,7 +269,7 @@ public partial class ShrinkJobWindow : Window
             {
                 Progress.Value = step.Fraction;
                 TxtStage.Text = step.Stage;
-                TxtRemaining.Text = step.Remaining?.ToString(@"mm\:ss") ?? "-";
+                TxtRemaining.Text = Saat.Kalan(step.Remaining);
             });
 
             var result = await new EncodeRunner().RunAsync(

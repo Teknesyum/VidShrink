@@ -154,5 +154,5 @@ public static class ConversionArguments
         _ => false
     };
 
-    private static string FormatTime(TimeSpan value) => value.ToString(@"hh\:mm\:ss\.fff", CultureInfo.InvariantCulture);
+    private static string FormatTime(TimeSpan value) => Saat.Ffmpeg(value);
 }

@@ -345,10 +345,7 @@ internal partial class ControlStrip : UserControl
     /// </summary>
     internal static string Clock(TimeSpan value, TimeSpan scale)
     {
-        if (value < TimeSpan.Zero) value = TimeSpan.Zero;
-        return scale.TotalHours >= 1
-            ? $"{(int)value.TotalHours:00}:{value.Minutes:00}:{value.Seconds:00}"
-            : $"{(int)value.TotalMinutes:00}:{value.Seconds:00}";
+        return VidShrink.Core.Saat.Ekran(value, scale);
     }
 
     // ---- deneme saati ---------------------------------------------------------------

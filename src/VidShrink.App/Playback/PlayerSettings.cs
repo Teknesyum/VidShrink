@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using VidShrink.Core;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -96,10 +97,7 @@ internal sealed class PlayerSettings
     internal string FileStem(string media, double seconds)
     {
         var at = TimeSpan.FromSeconds(double.IsFinite(seconds) && seconds > 0 ? seconds : 0);
-        var time = ((int)at.TotalHours).ToString("00", CultureInfo.InvariantCulture)
-            + "-" + at.Minutes.ToString("00", CultureInfo.InvariantCulture)
-            + "-" + at.Seconds.ToString("00", CultureInfo.InvariantCulture)
-            + "-" + at.Milliseconds.ToString("000", CultureInfo.InvariantCulture);
+        var time = Saat.DosyaAdi(at);
         var pattern = string.IsNullOrWhiteSpace(ScreenshotPattern) ? DefaultPattern : ScreenshotPattern;
         var stem = pattern
             .Replace("{name}", Path.GetFileNameWithoutExtension(media), StringComparison.Ordinal)

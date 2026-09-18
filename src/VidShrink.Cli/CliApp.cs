@@ -440,8 +440,7 @@ public static class CliApp
 
     private static string Num(double value, string format) => value.ToString(format, CultureInfo.InvariantCulture);
 
-    private static string Clock(TimeSpan span)
-        => span.TotalHours >= 1 ? span.ToString(@"h\:mm\:ss", CultureInfo.InvariantCulture) : span.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+    private static string Clock(TimeSpan span) => Saat.Ekran(span);
 
     private static bool PathEquals(string left, string right) => PathEquality.Same(left, right);
 

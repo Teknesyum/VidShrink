@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using VidShrink.Core;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -296,7 +297,7 @@ internal partial class PlayerView
     private void PlaceThumbnail(double seconds)
     {
         if (ThumbChip is null || ThumbTime is null) return;
-        ThumbTime.Text = TimeSpan.FromSeconds(Math.Max(0, seconds)).ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
+        ThumbTime.Text = Saat.Ekran(TimeSpan.FromSeconds(Math.Max(0, seconds)), TimeSpan.FromHours(1));
         ThumbChip.IsVisible = true;
 
         var duration = _seek.Duration;
