@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node tools/kapali-defter/kapali.js > /dev/null 2>&1"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node tools/kapali-defter/kapali.js > /dev/null 2>&1"
+          }
+        ]
+      }
+    ]
+  }
+}
