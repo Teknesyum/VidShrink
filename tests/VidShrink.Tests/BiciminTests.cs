@@ -823,14 +823,14 @@ public sealed class KareYerlesimTests
     [Fact]
     public void WhatsAppBelgeIpucuDilDosyasindanGelir()
     {
-        var kopya = Kopya("s-whatsapp-belge", new Dictionary<string, string>
+        using var kopya = Kopya("s-whatsapp-belge", new Dictionary<string, string>
         {
             ["\"main.run.whatsapp-document\": \"Send this on WhatsApp as a document"] =
                 "\"main.run.whatsapp-document\": \"Belge kolundan gonder"
         });
 
         (string Onalti, string Yuz) okunan;
-        AppHost.Run(() => Strings.UseRoot(kopya));
+        AppHost.Run(() => Strings.UseRoot(kopya.Locales));
         try
         {
             okunan = Read("en", window =>
@@ -852,6 +852,8 @@ public sealed class KareYerlesimTests
         Assert.StartsWith(" Belge kolundan gonder", okunan.Onalti, StringComparison.Ordinal);
         Assert.DoesNotContain("Send this on WhatsApp", okunan.Onalti, StringComparison.Ordinal);
         Assert.Equal("", okunan.Yuz);
+
+        kopya.Tut = false;
     }
 
     /// <summary>
@@ -866,13 +868,13 @@ public sealed class KareYerlesimTests
     [Fact]
     public void KodekSeridiIpucuDilDosyasindanGelir()
     {
-        var kopya = Kopya("s-kodek-ipucu", new Dictionary<string, string>
+        using var kopya = Kopya("s-kodek-ipucu", new Dictionary<string, string>
         {
             ["\"main.codec.tip\": \"• H.264"] = "\"main.codec.tip\": \"• Balon kolundan H.264"
         });
 
         string okunan;
-        AppHost.Run(() => Strings.UseRoot(kopya));
+        AppHost.Run(() => Strings.UseRoot(kopya.Locales));
         try
         {
             okunan = Read("en", window =>
@@ -896,6 +898,8 @@ public sealed class KareYerlesimTests
 
         Assert.Contains("Balon kolundan H.264", okunan, StringComparison.Ordinal);
         Assert.Contains("AV1", okunan, StringComparison.Ordinal);
+
+        kopya.Tut = false;
     }
 }
 
