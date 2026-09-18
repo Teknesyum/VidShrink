@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Субтитри завантажено: {0}",
   "player.subtitle.download.nokey": "Введіть свій ключ API OpenSubtitles у Налаштуваннях",
   "player.subtitle.download.badkey": "OpenSubtitles не прийняв ключ API",
+  "player.subtitle.download.needaccount": "OpenSubtitles вимагає входу в обліковий запис для завантаження",
   "player.subtitle.download.noresult": "Для цього відео не знайдено субтитрів",
   "player.subtitle.download.quota": "Денну квоту завантаження субтитрів вичерпано",
   "player.subtitle.download.offline": "Не вдалося з'єднатися з OpenSubtitles",

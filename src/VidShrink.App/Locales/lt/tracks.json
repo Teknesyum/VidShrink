@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Subtitrai atsisiųsti: {0}",
   "player.subtitle.download.nokey": "Įveskite savo OpenSubtitles API raktą Nustatymuose",
   "player.subtitle.download.badkey": "OpenSubtitles nepriėmė API rakto",
+  "player.subtitle.download.needaccount": "OpenSubtitles reikalauja prisijungti prie paskyros, kad būtų galima atsisiųsti",
   "player.subtitle.download.noresult": "Šiam vaizdo įrašui subtitrų nerasta",
   "player.subtitle.download.quota": "Dienos subtitrų atsisiuntimo kvota išnaudota",
   "player.subtitle.download.offline": "Nepavyko prisijungti prie OpenSubtitles",

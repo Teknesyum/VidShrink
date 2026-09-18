@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "সাবটাইটেল ডাউনলোড হয়েছে: {0}",
   "player.subtitle.download.nokey": "সেটিংসে আপনার OpenSubtitles API কী লিখুন",
   "player.subtitle.download.badkey": "OpenSubtitles API কী গ্রহণ করেনি",
+  "player.subtitle.download.needaccount": "ডাউনলোডের জন্য OpenSubtitles-এ অ্যাকাউন্ট সাইন-ইন প্রয়োজন",
   "player.subtitle.download.noresult": "এই ভিডিওর জন্য কোনো সাবটাইটেল পাওয়া যায়নি",
   "player.subtitle.download.quota": "সাবটাইটেল ডাউনলোডের দৈনিক কোটা পূর্ণ হয়ে গেছে",
   "player.subtitle.download.offline": "OpenSubtitles-এ পৌঁছানো যায়নি",

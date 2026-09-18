@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Napisy pobrane: {0}",
   "player.subtitle.download.nokey": "Wprowadź swój klucz API OpenSubtitles w Ustawieniach",
   "player.subtitle.download.badkey": "OpenSubtitles nie zaakceptowało klucza API",
+  "player.subtitle.download.needaccount": "OpenSubtitles wymaga zalogowania się na konto, aby pobrać",
   "player.subtitle.download.noresult": "Nie znaleziono napisów dla tego wideo",
   "player.subtitle.download.quota": "Dzienny limit pobierania napisów został wykorzystany",
   "player.subtitle.download.offline": "Nie udało się połączyć z OpenSubtitles",

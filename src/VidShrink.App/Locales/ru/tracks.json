@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Субтитры скачаны: {0}",
   "player.subtitle.download.nokey": "Введите свой API-ключ OpenSubtitles в Настройках",
   "player.subtitle.download.badkey": "OpenSubtitles не принял API-ключ",
+  "player.subtitle.download.needaccount": "OpenSubtitles требует входа в учётную запись для скачивания",
   "player.subtitle.download.noresult": "Субтитры для этого видео не найдены",
   "player.subtitle.download.quota": "Суточная квота на скачивание субтитров исчерпана",
   "player.subtitle.download.offline": "Не удалось связаться с OpenSubtitles",

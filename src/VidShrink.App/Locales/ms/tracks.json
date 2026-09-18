@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Sari kata dimuat turun: {0}",
   "player.subtitle.download.nokey": "Masukkan kunci API OpenSubtitles anda dalam Tetapan",
   "player.subtitle.download.badkey": "OpenSubtitles tidak menerima kunci API",
+  "player.subtitle.download.needaccount": "OpenSubtitles memerlukan log masuk akaun untuk muat turun",
   "player.subtitle.download.noresult": "Tiada sari kata dijumpai untuk video ini",
   "player.subtitle.download.quota": "Kuota muat turun sari kata harian sudah penuh",
   "player.subtitle.download.offline": "OpenSubtitles tidak dapat dihubungi",

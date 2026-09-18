@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Tekstitys ladattu: {0}",
   "player.subtitle.download.nokey": "Anna OpenSubtitles-API-avaimesi Asetuksissa",
   "player.subtitle.download.badkey": "OpenSubtitles ei hyväksynyt API-avainta",
+  "player.subtitle.download.needaccount": "OpenSubtitles vaatii tilille kirjautumisen latausta varten",
   "player.subtitle.download.noresult": "Tälle videolle ei löytynyt tekstitystä",
   "player.subtitle.download.quota": "Tekstitysten päivittäinen latauskiintiö on täynnä",
   "player.subtitle.download.offline": "OpenSubtitlesiin ei saatu yhteyttä",

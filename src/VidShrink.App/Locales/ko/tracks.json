@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "자막을 다운로드했습니다: {0}",
   "player.subtitle.download.nokey": "설정에서 OpenSubtitles API 키를 입력하세요",
   "player.subtitle.download.badkey": "OpenSubtitles가 API 키를 받아들이지 않았습니다",
+  "player.subtitle.download.needaccount": "OpenSubtitles는 다운로드하려면 계정 로그인이 필요합니다",
   "player.subtitle.download.noresult": "이 동영상에 맞는 자막을 찾을 수 없습니다",
   "player.subtitle.download.quota": "일일 자막 다운로드 할당량이 모두 사용되었습니다",
   "player.subtitle.download.offline": "OpenSubtitles에 연결할 수 없습니다",

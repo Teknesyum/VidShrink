@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "字幕已下载：{0}",
   "player.subtitle.download.nokey": "请在设置中输入您的 OpenSubtitles API 密钥",
   "player.subtitle.download.badkey": "OpenSubtitles 未接受该 API 密钥",
+  "player.subtitle.download.needaccount": "OpenSubtitles 下载需要登录账户",
   "player.subtitle.download.noresult": "未找到此视频的字幕",
   "player.subtitle.download.quota": "每日字幕下载配额已用完",
   "player.subtitle.download.offline": "无法连接到 OpenSubtitles",

@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Ondertitel gedownload: {0}",
   "player.subtitle.download.nokey": "Voer uw OpenSubtitles-API-sleutel in bij Instellingen",
   "player.subtitle.download.badkey": "OpenSubtitles heeft de API-sleutel niet geaccepteerd",
+  "player.subtitle.download.needaccount": "OpenSubtitles vereist een accountaanmelding om te downloaden",
   "player.subtitle.download.noresult": "Geen ondertitel gevonden voor deze video",
   "player.subtitle.download.quota": "Het dagelijkse downloadquotum voor ondertitels is bereikt",
   "player.subtitle.download.offline": "OpenSubtitles was niet bereikbaar",

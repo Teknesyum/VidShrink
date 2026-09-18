@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Undertekst lastet ned: {0}",
   "player.subtitle.download.nokey": "Skriv inn din OpenSubtitles-API-nøkkel under Innstillinger",
   "player.subtitle.download.badkey": "OpenSubtitles godtok ikke API-nøkkelen",
+  "player.subtitle.download.needaccount": "OpenSubtitles krever kontoinnlogging for nedlasting",
   "player.subtitle.download.noresult": "Fant ingen undertekst for denne videoen",
   "player.subtitle.download.quota": "Den daglige nedlastingskvoten for undertekster er full",
   "player.subtitle.download.offline": "Kunne ikke nå OpenSubtitles",

@@ -131,6 +131,7 @@ internal partial class PlayerView
     {
         SubtitleOutcome.NoKey => "player.subtitle.download.nokey",
         SubtitleOutcome.BadKey => "player.subtitle.download.badkey",
+        SubtitleOutcome.NeedAccount => "player.subtitle.download.needaccount",
         SubtitleOutcome.NoResult => "player.subtitle.download.noresult",
         SubtitleOutcome.QuotaExceeded => "player.subtitle.download.quota",
         SubtitleOutcome.RateLimited => "player.subtitle.download.toofast",

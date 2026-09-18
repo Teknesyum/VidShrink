@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Ο υπότιτλος λήφθηκε: {0}",
   "player.subtitle.download.nokey": "Εισαγάγετε το κλειδί API του OpenSubtitles στις Ρυθμίσεις",
   "player.subtitle.download.badkey": "Το OpenSubtitles δεν δέχτηκε το κλειδί API",
+  "player.subtitle.download.needaccount": "Το OpenSubtitles απαιτεί σύνδεση λογαριασμού για λήψη",
   "player.subtitle.download.noresult": "Δεν βρέθηκε υπότιτλος για αυτό το βίντεο",
   "player.subtitle.download.quota": "Η ημερήσια ποσόστωση λήψης υποτίτλων έχει εξαντληθεί",
   "player.subtitle.download.offline": "Δεν ήταν δυνατή η επικοινωνία με το OpenSubtitles",

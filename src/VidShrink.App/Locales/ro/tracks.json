@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Subtitrare descărcată: {0}",
   "player.subtitle.download.nokey": "Introduceți cheia API OpenSubtitles în Setări",
   "player.subtitle.download.badkey": "OpenSubtitles nu a acceptat cheia API",
+  "player.subtitle.download.needaccount": "OpenSubtitles necesită autentificare în cont pentru descărcare",
   "player.subtitle.download.noresult": "Nu a fost găsită nicio subtitrare pentru acest videoclip",
   "player.subtitle.download.quota": "Cota zilnică de descărcare a subtitrărilor este epuizată",
   "player.subtitle.download.offline": "OpenSubtitles nu a putut fi contactat",

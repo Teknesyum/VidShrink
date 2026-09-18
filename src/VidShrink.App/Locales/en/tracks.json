@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Subtitle downloaded: {0}",
   "player.subtitle.download.nokey": "Enter your OpenSubtitles API key in Settings",
   "player.subtitle.download.badkey": "OpenSubtitles did not accept the API key",
+  "player.subtitle.download.needaccount": "OpenSubtitles requires an account sign-in for downloads",
   "player.subtitle.download.noresult": "No subtitle found for this video",
   "player.subtitle.download.quota": "The daily subtitle download quota is full",
   "player.subtitle.download.offline": "OpenSubtitles could not be reached",

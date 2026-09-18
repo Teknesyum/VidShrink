@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Subtitri lejupielādēti: {0}",
   "player.subtitle.download.nokey": "Ievadiet savu OpenSubtitles API atslēgu Iestatījumos",
   "player.subtitle.download.badkey": "OpenSubtitles nepieņēma API atslēgu",
+  "player.subtitle.download.needaccount": "OpenSubtitles lejupielādei nepieciešama pieteikšanās kontā",
   "player.subtitle.download.noresult": "Šim videoklipam subtitri netika atrasti",
   "player.subtitle.download.quota": "Dienas subtitru lejupielādes kvota ir pilna",
   "player.subtitle.download.offline": "Nebija iespējams sasniegt OpenSubtitles",

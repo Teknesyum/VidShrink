@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Manukuu yamepakuliwa: {0}",
   "player.subtitle.download.nokey": "Weka ufunguo wako wa API wa OpenSubtitles katika Mipangilio",
   "player.subtitle.download.badkey": "OpenSubtitles haikukubali ufunguo wa API",
+  "player.subtitle.download.needaccount": "OpenSubtitles inahitaji kuingia kwenye akaunti ili kupakua",
   "player.subtitle.download.noresult": "Hakuna manukuu yaliyopatikana kwa video hii",
   "player.subtitle.download.quota": "Kiwango cha kila siku cha kupakua manukuu kimejaa",
   "player.subtitle.download.offline": "Haikuwezekana kufikia OpenSubtitles",

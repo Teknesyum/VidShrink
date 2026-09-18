@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "تم تنزيل الترجمة: {0}",
   "player.subtitle.download.nokey": "أدخل مفتاح API الخاص بـ OpenSubtitles في الإعدادات",
   "player.subtitle.download.badkey": "لم يقبل OpenSubtitles مفتاح API",
+  "player.subtitle.download.needaccount": "يتطلب OpenSubtitles تسجيل الدخول لحساب لأجل التنزيل",
   "player.subtitle.download.noresult": "لم يتم العثور على ترجمة لهذا الفيديو",
   "player.subtitle.download.quota": "حصة تنزيل الترجمات اليومية مكتملة",
   "player.subtitle.download.offline": "تعذر الوصول إلى OpenSubtitles",

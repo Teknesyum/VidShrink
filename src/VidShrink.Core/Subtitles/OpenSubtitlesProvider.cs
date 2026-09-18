@@ -293,10 +293,16 @@ public sealed class OpenSubtitlesProvider : ISubtitleProvider
     private static SubtitleOutcome Sharpen(SubtitleOutcome trouble, string body)
     {
         if (trouble != SubtitleOutcome.BadKey) return trouble;
-        return body.Contains("reset_time", StringComparison.OrdinalIgnoreCase)
-               || body.Contains("\"remaining\"", StringComparison.OrdinalIgnoreCase)
-            ? SubtitleOutcome.QuotaExceeded
-            : trouble;
+        if (body.Contains("reset_time", StringComparison.OrdinalIgnoreCase)
+            || body.Contains("\"remaining\"", StringComparison.OrdinalIgnoreCase))
+            return SubtitleOutcome.QuotaExceeded;
+
+        // Aramanın 401'i anahtarın reddidir; indirmenin 401'i değildir. Şartname
+        // <c>/download</c> için "In HTTP request must be both headers: Api-Key and
+        // Authorization" diyor, yani anahtar tek başına indirmeye yetmiyor. Kullanıcıya
+        // "anahtarın yanlış" demek onu doğru anahtarı yeniden girmeye iter; eksik olan
+        // hesap girişidir.
+        return SubtitleOutcome.NeedAccount;
     }
 
     private static int Quota(string body)

@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Đã tải phụ đề: {0}",
   "player.subtitle.download.nokey": "Nhập khóa API OpenSubtitles của bạn trong Cài đặt",
   "player.subtitle.download.badkey": "OpenSubtitles không chấp nhận khóa API",
+  "player.subtitle.download.needaccount": "OpenSubtitles yêu cầu đăng nhập tài khoản để tải xuống",
   "player.subtitle.download.noresult": "Không tìm thấy phụ đề cho video này",
   "player.subtitle.download.quota": "Đã hết hạn mức tải phụ đề hàng ngày",
   "player.subtitle.download.offline": "Không thể kết nối tới OpenSubtitles",

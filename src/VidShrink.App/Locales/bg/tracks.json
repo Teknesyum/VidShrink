@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Субтитрите са изтеглени: {0}",
   "player.subtitle.download.nokey": "Въведете своя API ключ на OpenSubtitles в Настройки",
   "player.subtitle.download.badkey": "OpenSubtitles не прие API ключа",
+  "player.subtitle.download.needaccount": "OpenSubtitles изисква вход в акаунт за изтегляне",
   "player.subtitle.download.noresult": "За това видео не бяха намерени субтитри",
   "player.subtitle.download.quota": "Дневната квота за изтегляне на субтитри е изчерпана",
   "player.subtitle.download.offline": "OpenSubtitles не беше достигнат",

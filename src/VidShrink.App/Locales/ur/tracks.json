@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "سب ٹائٹل ڈاؤن لوڈ ہو گیا: {0}",
   "player.subtitle.download.nokey": "اپنی OpenSubtitles API کلید ترتیبات میں درج کریں",
   "player.subtitle.download.badkey": "OpenSubtitles نے API کلید قبول نہیں کی",
+  "player.subtitle.download.needaccount": "ڈاؤن لوڈ کے لیے OpenSubtitles اکاؤنٹ میں سائن ان درکار ہے",
   "player.subtitle.download.noresult": "اس ویڈیو کے لیے کوئی سب ٹائٹل نہیں ملا",
   "player.subtitle.download.quota": "سب ٹائٹل ڈاؤن لوڈ کا روزانہ کوٹا پورا ہو گیا ہے",
   "player.subtitle.download.offline": "OpenSubtitles تک رسائی ممکن نہ ہوئی",

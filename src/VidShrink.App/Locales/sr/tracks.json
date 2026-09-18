@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Титл преузет: {0}",
   "player.subtitle.download.nokey": "Унесите свој OpenSubtitles API кључ у Подешавањима",
   "player.subtitle.download.badkey": "OpenSubtitles није прихватио API кључ",
+  "player.subtitle.download.needaccount": "OpenSubtitles захтева пријаву на налог за преузимање",
   "player.subtitle.download.noresult": "За овај видео није пронађен ниједан титл",
   "player.subtitle.download.quota": "Дневна квота за преузимање титлова је попуњена",
   "player.subtitle.download.offline": "OpenSubtitles није било могуће достићи",

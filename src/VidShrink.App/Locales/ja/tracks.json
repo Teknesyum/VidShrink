@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "字幕をダウンロードしました: {0}",
   "player.subtitle.download.nokey": "設定でOpenSubtitlesのAPIキーを入力してください",
   "player.subtitle.download.badkey": "OpenSubtitlesがAPIキーを受け付けませんでした",
+  "player.subtitle.download.needaccount": "OpenSubtitlesはダウンロードにアカウントログインが必要です",
   "player.subtitle.download.noresult": "この動画に対応する字幕は見つかりませんでした",
   "player.subtitle.download.quota": "字幕ダウンロードの1日の上限に達しました",
   "player.subtitle.download.offline": "OpenSubtitlesに接続できませんでした",

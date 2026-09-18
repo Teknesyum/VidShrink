@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Podnapis prenesen: {0}",
   "player.subtitle.download.nokey": "Vnesite svoj API-ključ OpenSubtitles v Nastavitvah",
   "player.subtitle.download.badkey": "OpenSubtitles ni sprejel API-ključa",
+  "player.subtitle.download.needaccount": "OpenSubtitles za prenos zahteva prijavo v račun",
   "player.subtitle.download.noresult": "Za ta videoposnetek ni bilo mogoče najti podnapisa",
   "player.subtitle.download.quota": "Dnevna kvota za prenos podnapisov je izpolnjena",
   "player.subtitle.download.offline": "OpenSubtitles ni bilo mogoče doseči",

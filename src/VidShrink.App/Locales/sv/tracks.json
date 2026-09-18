@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Undertext hämtad: {0}",
   "player.subtitle.download.nokey": "Ange din OpenSubtitles-API-nyckel under Inställningar",
   "player.subtitle.download.badkey": "OpenSubtitles godtog inte API-nyckeln",
+  "player.subtitle.download.needaccount": "OpenSubtitles kräver kontoinloggning för nedladdning",
   "player.subtitle.download.noresult": "Ingen undertext hittades för den här videon",
   "player.subtitle.download.quota": "Den dagliga hämtningskvoten för undertexter är full",
   "player.subtitle.download.offline": "Det gick inte att nå OpenSubtitles",

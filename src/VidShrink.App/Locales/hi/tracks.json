@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "सबटाइटल डाउनलोड हुआ: {0}",
   "player.subtitle.download.nokey": "सेटिंग्स में अपनी OpenSubtitles API कुंजी दर्ज करें",
   "player.subtitle.download.badkey": "OpenSubtitles ने API कुंजी स्वीकार नहीं की",
+  "player.subtitle.download.needaccount": "डाउनलोड के लिए OpenSubtitles में खाते से साइन-इन ज़रूरी है",
   "player.subtitle.download.noresult": "इस वीडियो के लिए कोई सबटाइटल नहीं मिला",
   "player.subtitle.download.quota": "सबटाइटल डाउनलोड का दैनिक कोटा पूरा हो गया है",
   "player.subtitle.download.offline": "OpenSubtitles से संपर्क नहीं हो सका",

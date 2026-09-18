@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Titulky stiahnuté: {0}",
   "player.subtitle.download.nokey": "Zadajte svoj API kľúč OpenSubtitles v Nastaveniach",
   "player.subtitle.download.badkey": "OpenSubtitles kľúč API neprijalo",
+  "player.subtitle.download.needaccount": "OpenSubtitles vyžaduje prihlásenie do účtu na stiahnutie",
   "player.subtitle.download.noresult": "Pre toto video sa nenašli žiadne titulky",
   "player.subtitle.download.quota": "Denný limit sťahovania titulkov je vyčerpaný",
   "player.subtitle.download.offline": "OpenSubtitles sa nepodarilo kontaktovať",

@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "הכתוביות הורדו: {0}",
   "player.subtitle.download.nokey": "הזן את מפתח ה-API של OpenSubtitles בהגדרות",
   "player.subtitle.download.badkey": "OpenSubtitles לא קיבל את מפתח ה-API",
+  "player.subtitle.download.needaccount": "OpenSubtitles מחייב התחברות לחשבון להורדה",
   "player.subtitle.download.noresult": "לא נמצאו כתוביות לסרטון זה",
   "player.subtitle.download.quota": "מכסת ההורדות היומית של כתוביות מלאה",
   "player.subtitle.download.offline": "לא ניתן היה להתחבר ל-OpenSubtitles",

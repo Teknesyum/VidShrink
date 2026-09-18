@@ -886,3 +886,25 @@ Kaynak: `docs/danisma/2026-09-17-fable-kararlar.md` bölüm 6 (fable K6).
 Player→Core referansı (oynatıcı motorunun katmanını kirletir) ya da ikinci bir HTTP
 soyutlaması isterdi. Ağ sağlayıcıları (`UpdateCheck`, `Share`) zaten Core'da; sağlayıcı da
 oraya gitti. Oynatıcı yalnız hazır `.srt` yolunu alır, ağı görmez.
+
+**İndirme kolu: `NeedAccount` ve P29 devri.** OpenSubtitles'ın resmî OpenAPI 3.0.3
+şartnamesi `GET /subtitles` için `security: [{"Api-Key": []}]`, `POST /download` için
+`security: [{"Bearer": []}, {"Api-Key": []}]` diyor ve `/download` açıklaması birebir şunu
+yazıyor: *"VERY IMPORTANT: In HTTP request must be both headers: ```Api-Key``` and
+```Authorization``` stoplight.io doesn't allow to use in shown example both headers"*.
+`Bearer` şemasının tanımı "User token created in the login endpoint to authorise
+opensubtitles.com **user**" — yani `/login`den gelen JWT. Bu sürümde `/login` yok, dolayısıyla
+indirme kolu yalnız anahtarla çalışmayabilir ve bu **canlıda doğrulanmadı** (anahtar yok,
+testler ağa çıkmıyor).
+
+Bunun karşılığı `SubtitleOutcome.NeedAccount`: indirmenin kota gövdesi taşımayan 401/403'ü
+artık `BadKey`ten ayrı bir kola düşüyor ve kullanıcıya "anahtarın yanlış" yerine "hesap
+girişi gerekiyor" deniyor — yanlış metin kullanıcıyı doğru anahtarı yeniden girmeye iterdi.
+Aramanın 401'i `BadKey` kalıyor; arama anahtarla yetiniyor.
+
+Oturum açma kolu **P29**'a devredildi: parola hiç saklanmaz, yalnız JWT + `base_url` + son
+kullanma, `settings.json`dan **ayrı** bir dosyada, Windows'ta DPAPI ile sarılı, Unix'te
+`0600`. 401 gelince belirteç silinir ve "oturum süresi doldu, yeniden giriş yapın" denir —
+kendiliğinden yeniden giriş yok. Unix kolu `ubuntu-latest`te ölçülebilir, macOS koşulamıyor;
+o kol sürüm notunda "ölçülmedi" diye yazılır. P29'un kodtan önceki ilk adımı: yalnız Api-Key
+ile tek canlı `/download` çağrısı, anonim kota sorusunu kapatmak için.

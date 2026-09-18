@@ -15,6 +15,13 @@ public enum SubtitleOutcome
     /// <summary>Sağlayıcı anahtarı tanımadı ya da reddetti.</summary>
     BadKey,
 
+    /// <summary>
+    /// Anahtar geçerli ama indirme için kullanıcı oturumu gerekiyor. Şartname
+    /// <c>/download</c> için <c>Api-Key</c> yanında <c>Authorization</c> başlığını da
+    /// zorunlu tutuyor; o başlık <c>/login</c>den gelen JWT'dir ve bu sürümde yoktur.
+    /// </summary>
+    NeedAccount,
+
     /// <summary>Arama çalıştı, bu videoya altyazı yok.</summary>
     NoResult,
 

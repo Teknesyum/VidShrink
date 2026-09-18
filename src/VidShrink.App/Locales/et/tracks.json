@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "Subtiitrid alla laaditud: {0}",
   "player.subtitle.download.nokey": "Sisestage oma OpenSubtitles API-võti Seadetes",
   "player.subtitle.download.badkey": "OpenSubtitles ei võtnud API-võtit vastu",
+  "player.subtitle.download.needaccount": "OpenSubtitles vajab allalaadimiseks kontosse sisselogimist",
   "player.subtitle.download.noresult": "Sellele videole subtiitreid ei leitud",
   "player.subtitle.download.quota": "Subtiitrite igapäevane allalaadimiskvoot on täis",
   "player.subtitle.download.offline": "OpenSubtitlesiga ei saanud ühendust",

@@ -99,11 +99,16 @@ internal sealed class SahteSaglayici : ISubtitleProvider
 
     internal List<long> Indirilenler { get; } = new();
 
+    /// <summary>Kurulursa arama burada bekler; arama sürerken ekranda ne yazdığı okunabilir.</summary>
+    internal TaskCompletionSource? AramaKapisi { get; set; }
+
     public bool IsConfigured => Kurulu;
 
     public Task<SubtitleSearchResult> SearchAsync(SubtitleQuery query, CancellationToken cancellationToken)
     {
         Sorgular.Add(query);
+        if (AramaKapisi is { } kapi) return kapi.Task.ContinueWith(_ => Arama, cancellationToken,
+            TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
         return Task.FromResult(Arama);
     }
 
@@ -472,7 +477,7 @@ public class AltyaziIndirmeTests
 
         Assert.Equal(SubtitleOutcome.QuotaExceeded, kotaSonucu.Outcome);
         Assert.Equal(0, kotaSonucu.Remaining);
-        Assert.Equal(SubtitleOutcome.BadKey, anahtarSonucu.Outcome);
+        Assert.Equal(SubtitleOutcome.NeedAccount, anahtarSonucu.Outcome);
     }
 
     /// <summary>
@@ -596,8 +601,8 @@ public class AltyaziIndirmeTests
     {
         var kollar = new[]
         {
-            SubtitleOutcome.NoKey, SubtitleOutcome.BadKey, SubtitleOutcome.NoResult,
-            SubtitleOutcome.QuotaExceeded, SubtitleOutcome.RateLimited,
+            SubtitleOutcome.NoKey, SubtitleOutcome.BadKey, SubtitleOutcome.NeedAccount,
+            SubtitleOutcome.NoResult, SubtitleOutcome.QuotaExceeded, SubtitleOutcome.RateLimited,
             SubtitleOutcome.NetworkError, SubtitleOutcome.WriteError
         };
 
@@ -877,4 +882,126 @@ public class AltyaziIndirmeTests
 
         return false;
     }
+
+    /// <summary>
+    /// Arama sürerken ekranda "aranıyor" satırı duruyor. Bu anahtarın tek okuyucusu bu ölçü;
+    /// olmasa 42 dile yazılan metin hiçbir yerde görünmeyen ölü anahtar olurdu.
+    /// </summary>
+    [Fact]
+    public void AramaSurerkenAraniyorSatiriGorunur()
+    {
+        var okunan = AppHost.Run(() =>
+        {
+            var kok = AltyaziKanit.Temiz("aramada");
+            var film = Path.Combine(kok, "film.mp4");
+            File.WriteAllBytes(film, new byte[16]);
+
+            var kapi = new TaskCompletionSource();
+            var saglayici = new SahteSaglayici { AramaKapisi = kapi };
+            var view = Ac(new YolMotoru(), out var pencere, film);
+            view.SubtitleProviderSource = () => saglayici;
+
+            var is_ = view.DownloadSubtitleAsync();
+            DenetimSurucu.Pump(view, () => saglayici.Sorgular.Count > 0, 10);
+            var sirasinda = view.TrackNotice;
+
+            kapi.SetResult();
+            DenetimSurucu.Pump(view, () => is_.IsCompleted, 10);
+            is_.GetAwaiter().GetResult();
+            var sonra = view.TrackNotice;
+            pencere.Close();
+            return (Sirasinda: sirasinda, Sonra: sonra);
+        });
+
+        AltyaziKanit.Yaz("aramada.txt", $"sirasinda {okunan.Sirasinda}; sonra {okunan.Sonra}");
+
+        Assert.Equal("player.subtitle.download.working", okunan.Sirasinda);
+        Assert.NotEqual(okunan.Sirasinda, okunan.Sonra);
+    }
+
+    /// <summary>
+    /// P28 ile 42 dile giren 14 metnin tamamı okunuyor: her biri üretim kaynağında (kod ya
+    /// da axaml) geçiyor ve 42 dilin hepsinde boş olmayan, anahtarın kendisi olmayan bir
+    /// karşılığı var. Okunmayan anahtar dile girer, ekrana hiç çıkmaz.
+    /// </summary>
+    [Theory]
+    [InlineData("player.subtitle.download")]
+    [InlineData("player.subtitle.download.getkey")]
+    [InlineData("player.subtitle.download.working")]
+    [InlineData("player.subtitle.download.done")]
+    [InlineData("player.subtitle.download.nokey")]
+    [InlineData("player.subtitle.download.badkey")]
+    [InlineData("player.subtitle.download.needaccount")]
+    [InlineData("player.subtitle.download.noresult")]
+    [InlineData("player.subtitle.download.quota")]
+    [InlineData("player.subtitle.download.toofast")]
+    [InlineData("player.subtitle.download.offline")]
+    [InlineData("player.subtitle.download.writefail")]
+    [InlineData("settings-tab.opensubtitles.label")]
+    [InlineData("settings-tab.opensubtitles.get")]
+    [InlineData("settings-tab.opensubtitles.hint")]
+    public void EklenenMetinKaynaktaOkunurVeKirkIkiDildeVar(string anahtar)
+    {
+        Assert.True(KaynaktaGeciyor(anahtar), anahtar + " uretim kaynaginda hic okunmuyor");
+
+        var klasorler = Directory.GetDirectories(Path.Combine(GirdiKanit.Root, "src", "VidShrink.App", "Locales"))
+            .Select(Path.GetFileName)
+            .OrderBy(ad => ad, StringComparer.Ordinal)
+            .ToArray();
+
+        var eksik = klasorler
+            .Where(dil => string.IsNullOrWhiteSpace(Strings.GetIn(dil!, anahtar))
+                          || string.Equals(Strings.GetIn(dil!, anahtar), anahtar, StringComparison.Ordinal))
+            .ToArray();
+
+        AltyaziKanit.Yaz("diller.txt",
+            "Strings.Languages (" + Strings.Languages.Count + "): " + string.Join(",", Strings.Languages)
+            + Environment.NewLine
+            + "Locales klasorleri (" + klasorler.Length + "): " + string.Join(",", klasorler));
+
+        // Sayi elle yazilmaz: katalogdaki klasor sayisindan turetilir, yoksa dil eklenince
+        // olcu sabit kalir ve eklenen dili gormez. Olcunun alani katalogtur; Strings.Languages
+        // gomulu kaynak adindan turettigi icin fazladan "zh_Hans" bildiriyor (ayri is).
+        Assert.Equal(42, klasorler.Length);
+        Assert.Empty(eksik);
+        Assert.All(klasorler, dil => Assert.Contains(dil, Strings.Languages, StringComparer.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Yukarıdaki taramanın kör olmadığının kontrolü: uydurma bir anahtar kaynakta
+    /// bulunmuyor ve dil dosyalarında karşılığı yok.
+    /// </summary>
+    [Fact]
+    public void OkunmayanAnahtarTaramasiKorDegil()
+    {
+        const string uydurma = "player.subtitle.download.boyleBirSeyYok";
+
+        AltyaziKanit.Yaz("olu-anahtar.txt",
+            "uydurma kaynakta: " + KaynaktaGeciyor(uydurma)
+            + "\ngercek kaynakta: " + KaynaktaGeciyor("player.subtitle.download.toofast"));
+
+        Assert.False(KaynaktaGeciyor(uydurma));
+        Assert.True(KaynaktaGeciyor("player.subtitle.download.toofast"));
+    }
+
+    private static bool KaynaktaGeciyor(string anahtar)
+    {
+        var kok = Path.Combine(GirdiKanit.Root, "src", "VidShrink.App");
+        var aranan = "\"" + anahtar + "\"";
+        var isaret = "{loc:Text " + anahtar + "}";
+
+        foreach (var dosya in Directory.GetFiles(kok, "*.cs", SearchOption.AllDirectories)
+                     .Concat(Directory.GetFiles(kok, "*.axaml", SearchOption.AllDirectories)))
+        {
+            if (dosya.Contains(Path.DirectorySeparatorChar + "Locales" + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+                continue;
+
+            var metin = File.ReadAllText(dosya);
+            if (metin.Contains(aranan, StringComparison.Ordinal) || metin.Contains(isaret, StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
+    }
 }
+

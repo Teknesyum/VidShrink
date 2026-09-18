@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "வசன வரி பதிவிறக்கம் ஆனது: {0}",
   "player.subtitle.download.nokey": "அமைப்புகளில் உங்கள் OpenSubtitles API விசையை உள்ளிடவும்",
   "player.subtitle.download.badkey": "OpenSubtitles API விசையை ஏற்கவில்லை",
+  "player.subtitle.download.needaccount": "பதிவிறக்க OpenSubtitles கணக்கு உள்நுழைவு தேவை",
   "player.subtitle.download.noresult": "இந்த வீடியோவுக்கு வசன வரி எதுவும் கிடைக்கவில்லை",
   "player.subtitle.download.quota": "வசன வரி பதிவிறக்க தினசரி ஒப்பந்தம் முடிந்துவிட்டது",
   "player.subtitle.download.offline": "OpenSubtitles-ஐ அடைய முடியவில்லை",

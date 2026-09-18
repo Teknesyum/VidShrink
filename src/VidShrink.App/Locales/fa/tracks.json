@@ -43,6 +43,7 @@
   "player.subtitle.download.done": "زیرنویس دریافت شد: {0}",
   "player.subtitle.download.nokey": "کلید API OpenSubtitles خود را در تنظیمات وارد کنید",
   "player.subtitle.download.badkey": "OpenSubtitles کلید API را نپذیرفت",
+  "player.subtitle.download.needaccount": "OpenSubtitles برای دانلود به ورود به حساب کاربری نیاز دارد",
   "player.subtitle.download.noresult": "برای این ویدیو زیرنویسی یافت نشد",
   "player.subtitle.download.quota": "سهمیه روزانه دریافت زیرنویس تمام شده است",
   "player.subtitle.download.offline": "امکان دسترسی به OpenSubtitles نبود",
