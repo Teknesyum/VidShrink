@@ -62,6 +62,8 @@ public class AltyaziOturumTests
         Assert.Equal(biter.ToUnixTimeSeconds(), sonuc.Session!.Expires.ToUnixTimeSeconds());
         Assert.Equal(sonuc.Session.Token, kutu.Read()!.Token);
         Assert.Contains("/login", ag.Istekler[0], StringComparison.Ordinal);
+
+        AltyaziKanit.Kapat("giris-omur.txt");
     }
 
     /// <summary>
@@ -107,6 +109,8 @@ public class AltyaziOturumTests
 
         // Maske her seyi silmis olsaydi yukaridaki iki olcu de gecerdi; iletinin durdugunu goster.
         Assert.Contains("Error login/password", sonuc.Detail, StringComparison.Ordinal);
+
+        AltyaziKanit.Kapat("giris-maske.txt");
     }
 
     /// <summary>Parolanın kendisi isteğin gövdesinde gitmek zorunda; giden gövde okunur.</summary>
@@ -130,6 +134,8 @@ public class AltyaziOturumTests
         Assert.Contains(parola, ag.Govdeler[0], StringComparison.Ordinal);
         Assert.All(ag.Govdeler.Skip(1), govde => Assert.DoesNotContain(parola, govde, StringComparison.Ordinal));
         Assert.All(ag.Basliklar, baslik => Assert.DoesNotContain(parola, baslik, StringComparison.Ordinal));
+
+        AltyaziKanit.Kapat("giris-govde");
     }
 
     /// <summary>Kullanıcı adı ya da parola boşken ağa hiç çıkılmaz.</summary>
@@ -182,6 +188,8 @@ public class AltyaziOturumTests
 
         Assert.Equal(beklenen, ag.Basliklar[1].Contains("Authorization=Bearer " + belirtec, StringComparison.Ordinal));
         Assert.Contains("Api-Key=ANAHTAR", ag.Basliklar[1], StringComparison.Ordinal);
+
+        AltyaziKanit.Kapat("belirtec-vip.txt");
     }
 
     /// <summary>İndirme isteği varsayılan konakta bile <c>Authorization</c> taşır.</summary>
@@ -209,6 +217,8 @@ public class AltyaziOturumTests
 
         // Imzali baglanti kendi kendini yetkilendiriyor; oraya ne anahtar ne belirtec gider.
         Assert.DoesNotContain("Authorization", ag.Basliklar[2], StringComparison.Ordinal);
+
+        AltyaziKanit.Kapat("belirtec-indir", "belirtec-indir.txt");
     }
 
     /// <summary>
@@ -287,6 +297,8 @@ public class AltyaziOturumTests
 
         Assert.Equal(SubtitleOutcome.NeedAccount, sonuc.Outcome);
         Assert.Null(kutu.Read());
+
+        AltyaziKanit.Kapat("indirme-401.txt");
     }
 
     /// <summary>
@@ -327,6 +339,8 @@ public class AltyaziOturumTests
 
         Assert.Equal(SubtitleOutcome.LinkExpired, sonuc.Outcome);
         Assert.Equal(4, sonuc.Remaining);
+
+        AltyaziKanit.Kapat("baglanti-410.txt");
     }
 
     /// <summary>
@@ -363,6 +377,8 @@ public class AltyaziOturumTests
         Assert.Equal(saniye, a.RetryAfterSeconds);
         Assert.Equal(saniye, b.RetryAfterSeconds);
         Assert.Equal(0, c.RetryAfterSeconds);
+
+        AltyaziKanit.Kapat("retry-after.txt");
     }
 
     // ---------- belirtecin saklanması ----------
@@ -379,6 +395,8 @@ public class AltyaziOturumTests
         var ayar = Path.Combine(kok, "settings.json");
 
         Assert.Equal(Path.Combine(kok, "opensubtitles-session.dat"), SessionStore.PathFor(ayar));
+
+        AltyaziKanit.Kapat("oturum-yol");
     }
 
     /// <summary>
@@ -395,6 +413,8 @@ public class AltyaziOturumTests
         {
             Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", ayar);
             Assert.Equal(Path.Combine(kok, "opensubtitles-session.dat"), SessionStore.PathFor());
+
+            AltyaziKanit.Kapat("oturum-degisken");
         }
         finally
         {
@@ -447,6 +467,8 @@ public class AltyaziOturumTests
             Assert.Equal(belirtec, kutu.Read()!.Token);
             Assert.Null(geri);
         }
+
+        AltyaziKanit.Kapat("oturum-kutu", "oturum-kutu.txt");
     }
 
     /// <summary>Bozuk ya da başkasının koruduğu dosya sessizce yok sayılır, çökme olmaz.</summary>
@@ -458,6 +480,8 @@ public class AltyaziOturumTests
         File.WriteAllText(SessionStore.PathFor(ayar), "bu base64 bile degil {{{");
 
         Assert.Null(new SessionStore(ayar).Read());
+
+        AltyaziKanit.Kapat("oturum-bozuk");
     }
 
     /// <summary>

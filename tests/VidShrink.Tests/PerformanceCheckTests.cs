@@ -41,6 +41,23 @@ public sealed class PerformanceCheckTests
         lock (MeasurementLog) File.AppendAllText(MeasurementLog, line + Environment.NewLine);
     }
 
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// Meşru atlamanın erken dönüşü de yeşildir, orada da çağrılır.
+    /// </summary>
+    private static void Kapat()
+    {
+        var klasor = Path.GetDirectoryName(MeasurementLog)!;
+        if (!Directory.Exists(klasor)) return;
+
+        lock (MeasurementLog)
+        {
+            if (File.Exists(MeasurementLog)) File.Delete(MeasurementLog);
+            if (Directory.GetFileSystemEntries(klasor).Length == 0) Directory.Delete(klasor);
+        }
+    }
+
     private static int _atlananSayisi;
 
     /// <summary>
@@ -83,6 +100,8 @@ public sealed class PerformanceCheckTests
         var oncesi = _atlananSayisi;
         Atlandi("mesru deneme", true);
         Assert.Equal(oncesi + 1, _atlananSayisi);
+
+        Kapat();
     }
 
     private const int AtlandiCagriYeriSayisi = 8;
@@ -392,11 +411,14 @@ public sealed class PerformanceCheckTests
             Atlandi($"yazilim yolu butce doldugu icin olculemedi, gecen {result.ElapsedMs}ms " +
                     "(bulgular: " + string.Join(",", result.Findings.Select(f => f.Code)) + ")",
                     mesru: result.BudgetExhausted);
+            Kapat();
             return;
         }
 
         Assert.NotEqual(RecordingImpact.Unknown, result.Impact);
         Assert.True(result.SoftwareRealtimeCores > 0, "yazilim yolu olculemedi");
+
+        Kapat();
     }
 
     /// <summary>
@@ -505,6 +527,7 @@ public sealed class PerformanceCheckTests
             Atlandi("hicbir bos okuma alinamadi, ucunde de butce doldu: gecen " +
                     string.Join(" ", okumalar.Select(r => r.ElapsedMs + "ms")),
                     mesru: okumalar.All(r => r.BudgetExhausted));
+            Kapat();
             return;
         }
 
@@ -553,6 +576,8 @@ public sealed class PerformanceCheckTests
                 DonanimAtla("yuk altinda", yukluDonanim, "yuk karsilastirmasi kurulmadi");
             }
         }
+
+        Kapat();
     }
 
     /// <summary>
@@ -606,6 +631,7 @@ public sealed class PerformanceCheckTests
                     $"{bos.Impact}/{N(bos.SoftwareRealtimeCores)} (olculdu={bos.SoftwareMeasured}), " +
                     "bos taban kalmadi, karar-sinifi iddiasi kurulmadi",
                     mesru: !bos.SoftwareMeasured ? bos.BudgetExhausted : true);
+            Kapat();
             return;
         }
 
@@ -617,12 +643,15 @@ public sealed class PerformanceCheckTests
             Atlandi($"yuk altinda yazilim bacagi butce doldugu icin alinamadi (gecen {yuklu.ElapsedMs}ms), " +
                     "karar-sinifi iddiasi kurulmadi",
                     mesru: yuklu.BudgetExhausted);
+            Kapat();
             return;
         }
 
         Assert.True(yuklu.SoftwareRealtimeCores > bos.SoftwareRealtimeCores,
             $"{yukleyici} is parcacigi olcumde gorunmedi: bos {N(bos.SoftwareRealtimeCores)}, " +
             $"yuklu {N(yuklu.SoftwareRealtimeCores)} gercek zaman cekirdegi");
+
+        Kapat();
     }
 
     /// <summary>
@@ -711,6 +740,8 @@ public sealed class PerformanceCheckTests
         var butce = Assert.Single(result.Findings, f => f.Code == PerformanceFindingCode.BudgetExhausted);
         Assert.Equal(dar, butce.BudgetMs);
         Assert.True(butce.WallMs > dar, "butce bulgusu gecen sureyi tasimiyor");
+
+        Kapat();
     }
 
     /// <summary>
@@ -767,6 +798,8 @@ public sealed class PerformanceCheckTests
             Environment.SetEnvironmentVariable("TMP", oldTmp);
             try { Directory.Delete(temp, true); } catch (IOException) { }
         }
+
+        Kapat();
     }
 
     /// <summary>
@@ -786,6 +819,8 @@ public sealed class PerformanceCheckTests
         Assert.NotEqual(RecordingImpact.HardwareOffload, kapali.Impact);
         Assert.Equal(string.Empty, kapali.HardwareCodec);
         Assert.Contains(kapali.Findings, f => f.Code == PerformanceFindingCode.NoHardwareEncoder);
+
+        Kapat();
     }
 
     /// <summary>
@@ -866,6 +901,8 @@ public sealed class PerformanceCheckTests
         {
             try { Directory.Delete(dir, true); } catch { }
         }
+
+        Kapat();
     }
 
     /// <summary>
@@ -905,6 +942,8 @@ public sealed class PerformanceCheckTests
         {
             try { Directory.Delete(dir, true); } catch { }
         }
+
+        Kapat();
     }
 
     private static void Kos(string etiket, string[] args)

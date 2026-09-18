@@ -121,5 +121,23 @@ public sealed class UstSeritTikTests
 
         var engeller = rapor.ToString().Split('\n').Where(s => s.StartsWith("ENGEL")).ToArray();
         Assert.True(engeller.Length == 0, string.Join("\n", engeller));
+
+        Kapat(klasor, "isabet.txt");
+    }
+
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    private static void Kapat(string klasor, params string[] adlar)
+    {
+        if (!Directory.Exists(klasor)) return;
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.GetFileSystemEntries(klasor).Length == 0) Directory.Delete(klasor);
     }
 }

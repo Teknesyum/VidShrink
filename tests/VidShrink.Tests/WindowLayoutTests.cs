@@ -1569,8 +1569,9 @@ public sealed class WindowLayoutTests
         var size = narrow ? MinimumSize() : DesignSize();
         var tarama = DilTara(dil, size, loaded);
         var klasor = Path.Combine(TipSources.Root, ".calisma", "s20");
+        var ad = $"{dil}-{(narrow ? "dar" : "tasarim")}-{(loaded ? "dolu" : "bos")}.txt";
         Directory.CreateDirectory(klasor);
-        File.WriteAllText(Path.Combine(klasor, $"{dil}-{(narrow ? "dar" : "tasarim")}-{(loaded ? "dolu" : "bos")}.txt"),
+        File.WriteAllText(Path.Combine(klasor, ad),
             tarama.Kayit + string.Join(Environment.NewLine, tarama.Kesik) + Environment.NewLine
             + string.Join(Environment.NewLine, tarama.Sikisma) + Environment.NewLine + $"blok {tarama.Blok}"
             + Environment.NewLine + $"sarmalanan {tarama.Sarmalanan}" + Environment.NewLine + $"toplam {tarama.Toplam:0}");
@@ -1583,6 +1584,25 @@ public sealed class WindowLayoutTests
         Assert.True(tarama.Kesik.Count == 0, string.Join(Environment.NewLine, tarama.Kesik));
         Assert.True(tarama.Sikisma.Count == 0, string.Join(Environment.NewLine, tarama.Sikisma));
         Assert.Single(tarama.Bosluk.Select(b => b.Split('=')[1]).Distinct());
+
+        Kapat(klasor, ad);
+    }
+
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider —
+    /// her kol kendi dosyasını siler, klasörü son biten kol kaldırır.
+    /// </summary>
+    private static void Kapat(string klasor, params string[] adlar)
+    {
+        if (!Directory.Exists(klasor)) return;
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(klasor, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.GetFileSystemEntries(klasor).Length == 0) Directory.Delete(klasor);
     }
 
 

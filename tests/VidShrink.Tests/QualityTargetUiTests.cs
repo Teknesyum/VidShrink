@@ -174,6 +174,25 @@ public sealed class QualityTargetUiTests
 
         Assert.True(bozuk.Count == 0,
             "Kullanicinin yazdigi kalite geri yazildi:" + Environment.NewLine + string.Join(Environment.NewLine, bozuk));
+
+        Kapat("kalite-gidis-donus.txt");
+    }
+
+    /// <summary>
+    /// Son asertten sonra çağrılır: yeşil koşum kendi bıraktığını siler, kırmızı koşum
+    /// kanıtını korur çünkü düşen asert buraya hiç gelmez. Klasör boşalınca o da gider.
+    /// </summary>
+    private static void Kapat(params string[] adlar)
+    {
+        if (!Directory.Exists(MeasurementDirectory)) return;
+        foreach (var ad in adlar)
+        {
+            var yol = Path.Combine(MeasurementDirectory, ad);
+            if (File.Exists(yol)) File.Delete(yol);
+        }
+
+        if (Directory.GetFileSystemEntries(MeasurementDirectory).Length == 0)
+            Directory.Delete(MeasurementDirectory);
     }
 
     /// <summary>
