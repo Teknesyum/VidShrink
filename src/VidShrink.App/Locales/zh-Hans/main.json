@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "两遍编码",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "预设 / 速度",
+  "main.advanced.tune.label": "调优 / 内容类型",
   "main.advanced.audio-kbps.label": "音频目标 (kbps)",
   "main.advanced.audio-channels.label": "音频声道",
   "main.advanced.keep-tracks.label": "保留所有轨道 (MKV)",

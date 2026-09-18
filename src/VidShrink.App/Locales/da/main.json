@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "To gennemløb",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Forvalg / hastighed",
+  "main.advanced.tune.label": "Tuning / indholdstype",
   "main.advanced.audio-kbps.label": "Lydmål (kbps)",
   "main.advanced.audio-channels.label": "Lydkanaler",
   "main.advanced.keep-tracks.label": "Behold alle spor (MKV)",

@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Dvojprechodový",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Predvoľba / rýchlosť",
+  "main.advanced.tune.label": "Ladenie / typ obsahu",
   "main.advanced.audio-kbps.label": "Cieľ zvuku (kbps)",
   "main.advanced.audio-channels.label": "Zvukové kanály",
   "main.advanced.keep-tracks.label": "Zachovať všetky stopy (MKV)",

@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "دوگذره",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "پیش‌تنظیم / سرعت",
+  "main.advanced.tune.label": "تنظیم دقیق / نوع محتوا",
   "main.advanced.audio-kbps.label": "هدف صدا (kbps)",
   "main.advanced.audio-channels.label": "کانال‌های صدا",
   "main.advanced.keep-tracks.label": "حفظ همه ترک‌ها (MKV)",

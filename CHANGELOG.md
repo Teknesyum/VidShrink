@@ -9,6 +9,11 @@ ship as part of it.
 
 ### Added
 
+- The Advanced panel takes a `-tune`. The ladder is per encoder and measured, not copied from
+  the recorder: x264 takes `film|animation|grain`, x265 has no `film`, and SVT-AV1 takes `0|1|2`
+  written into `-svtav1-params` — its `tune=3` cannot open the encoder for ordinary encodes.
+  A value that does not belong to the codec the plan picks is dropped with a line in the reason.
+
 - The CLI locks quality and preset like the window does: `--crf N` (0-63) and
   `--on-ayar NAME` (`--preset`) reach the same locks the Advanced panel writes. A preset
   name that does not belong to the codec the plan picks is dropped with a line in the plan

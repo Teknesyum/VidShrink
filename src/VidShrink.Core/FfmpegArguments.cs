@@ -397,6 +397,38 @@ public static class FfmpegArguments
     public static bool IsKnownPreset(string preset)
         => Presets.Values.Any(values => values.Contains(preset, StringComparer.OrdinalIgnoreCase));
 
+    private static readonly string[] X264Tunes = { "film", "animation", "grain" };
+    private static readonly string[] X265Tunes = { "animation", "grain" };
+    private static readonly string[] Av1Tunes = { "0", "1", "2" };
+
+    /// <summary>
+    /// Kucultme kolunun <c>-tune</c> merdiveni. Kaydedicinin
+    /// <c>RecorderArguments.TunesFor</c>'u burada kullanilmaz: oradaki
+    /// <c>zerolatency</c>/<c>ull</c>/<c>psnr</c> canli yayin degerleri, kucultmede
+    /// kaliteyi dusurur (<c>docs/netlestirme/024-ince-ayar-yuzeyi.md</c>). Bos liste
+    /// "bu kodlayici tune almiyor" demektir.
+    ///
+    /// Merdivenler uydurulmadi, olculdu (<c>docs/olcumler/e1-tune-merdiveni.md</c>):
+    /// x265'in <c>film</c>'i yok, SVT-AV1'in <c>tune=3</c>'u (Tune IQ) yalniz all-intra
+    /// ve low-delay yapilarda kosuyor, siradan kucultmede kodlayiciyi acmiyor.
+    /// </summary>
+    public static IReadOnlyList<string> TunesFor(string codec) => codec?.ToLowerInvariant() switch
+    {
+        "libx264" => X264Tunes,
+        "libx265" => X265Tunes,
+        "libsvtav1" => Av1Tunes,
+        _ => Array.Empty<string>()
+    };
+
+    /// <summary>Ad kodegin merdiveninde mi.</summary>
+    public static bool IsValidTune(string codec, string tune)
+        => TunesFor(codec).Contains(tune, StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Ad herhangi bir kodegin merdiveninde mi — kodek secilmeden once tek denetim.</summary>
+    public static bool IsKnownTune(string tune)
+        => X264Tunes.Contains(tune, StringComparer.OrdinalIgnoreCase)
+           || Av1Tunes.Contains(tune, StringComparer.OrdinalIgnoreCase);
+
     private static readonly HashSet<string> HardwareDecodedCodecs = new(StringComparer.OrdinalIgnoreCase)
     {
         "h264", "hevc", "av1", "vp9", "vp8", "mpeg1video", "mpeg2video", "mpeg4", "vc1", "wmv3"
@@ -452,7 +484,10 @@ public static class FfmpegArguments
         a.AddRange(new[] { "-c:v", plan.Codec });
         if (CodecModel.TakesPreset(plan.Codec))
             a.AddRange(new[] { "-preset", pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset });
-        var psychovisualArgs = CachedPsychovisualArgs(plan.Codec, availability);
+        if (plan.Tune is { Length: > 0 } lockedTune && IsValidTune(plan.Codec, lockedTune)
+            && !plan.Codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase))
+            a.AddRange(new[] { "-tune", lockedTune });
+        var psychovisualArgs = WithLockedTune(plan, CachedPsychovisualArgs(plan.Codec, availability));
 
         if (plan.ModeEnum == EncodeMode.Crf)
         {
@@ -513,6 +548,32 @@ public static class FfmpegArguments
     /// buradan geçer ve bayrak başına tek dizgeye iner.
     /// </summary>
     private static readonly string[] JoinedParamFlags = { "-x264-params", "-x265-params", "-svtav1-params" };
+
+    /// <summary>
+    /// SVT-AV1'in <c>-tune</c>'u ayri bir bayrak degil, <c>-svtav1-params</c> icindeki bir
+    /// anahtar. Kullanici bir deger sabitlediyse psy/AQ kumesinin kendi <c>tune=</c>'u
+    /// onun degeriyle degisir — iki <c>tune=</c> yan yana yazilmaz, cunku ayni anahtarin
+    /// iki kez gecmesinde hangisinin kazandigi olculmedi.
+    /// </summary>
+    private static IReadOnlyList<string> WithLockedTune(EncodePlan plan, IReadOnlyList<string> psychovisual)
+    {
+        if (plan.Tune is not { Length: > 0 } tune
+            || !plan.Codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase)
+            || !IsValidTune(plan.Codec, tune))
+            return psychovisual;
+
+        var merged = psychovisual.ToList();
+        for (var i = 0; i + 1 < merged.Count; i++)
+        {
+            if (!merged[i].Equals("-svtav1-params", StringComparison.OrdinalIgnoreCase)) continue;
+            merged[i + 1] = string.Join(':', merged[i + 1].Split(':')
+                .Select(part => part.StartsWith("tune=", StringComparison.OrdinalIgnoreCase) ? "tune=" + tune : part));
+            return merged;
+        }
+
+        merged.AddRange(new[] { "-svtav1-params", "tune=" + tune });
+        return merged;
+    }
 
     public static IReadOnlyList<string> MergeEncoderParams(IReadOnlyList<string> args)
     {

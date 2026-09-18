@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Due passaggi",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Preset / velocità",
+  "main.advanced.tune.label": "Regolazione / tipo di contenuto",
   "main.advanced.audio-kbps.label": "Obiettivo audio (kbps)",
   "main.advanced.audio-channels.label": "Canali audio",
   "main.advanced.keep-tracks.label": "Mantieni tutte le tracce (MKV)",

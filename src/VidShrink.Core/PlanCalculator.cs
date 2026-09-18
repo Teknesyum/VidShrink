@@ -63,6 +63,12 @@ public sealed class PlanOptions
     /// </summary>
     public string? LockedPreset { get; set; } = null;
 
+    /// <summary>
+    /// Kullanicinin acikca sectigi <c>-tune</c> (x264/x265 icin film|animation|grain,
+    /// SVT-AV1 icin 0..3). Kodege uymayan ad on ayarda oldugu gibi duser, cakmaz.
+    /// </summary>
+    public string? LockedTune { get; set; } = null;
+
     /// <summary>Kullanicinin acikca verdigi ses hedefi (kbps). Doluysa <see cref="PickAudio"/>'nun hesabi yerine gecer.</summary>
     public int? LockedAudioKbps { get; set; } = null;
 
@@ -750,6 +756,20 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.ManualModeOverride, ManualOverrideValue: requestedMode.ToString(), EngineWouldHaveChosen: engineMode));
         }
 
+        if (options.LockedTune is string tune)
+        {
+            if (FfmpegArguments.IsValidTune(codec, tune))
+            {
+                plan.Tune = tune;
+                reason.Add($"kullanici tune degerini {tune} olarak sabitledi");
+                reasonCodes.Add(new ReasonNote(ReasonCode.ManualTuneOverride, ManualOverrideValue: tune));
+            }
+            else
+            {
+                reason.Add($"sabitlenen tune {tune} {codec} merdiveninde yok; plan tune vermeden kosuyor");
+            }
+        }
+
         if (options.LockedPreset is string dropped && !FfmpegArguments.IsValidPreset(codec, dropped))
             reason.Add($"sabitlenen on ayar {dropped} {codec} merdiveninde yok; plan motorun sectigi {plan.Preset} ile kosuyor");
 
@@ -841,6 +861,7 @@ public static class PlanCalculator
         => options.LockedMode is not null
         || options.LockedCrf is not null
         || options.LockedPreset is not null
+        || options.LockedTune is not null
         || options.LockedAudioKbps is not null
         || options.AudioChannels != AudioChannelOverride.Auto;
 
@@ -1063,6 +1084,7 @@ public static class PlanCalculator
         LockedMode = options.LockedMode,
         LockedCrf = options.LockedCrf,
         LockedPreset = options.LockedPreset,
+        LockedTune = options.LockedTune,
         LockedAudioKbps = options.LockedAudioKbps,
         AudioChannels = options.AudioChannels,
         MinResolutionHeight = options.MinResolutionHeight,

@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Dviejų etapų",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Šablonas / greitis",
+  "main.advanced.tune.label": "Derinimas / turinio tipas",
   "main.advanced.audio-kbps.label": "Garso tikslas (kbps)",
   "main.advanced.audio-channels.label": "Garso kanalai",
   "main.advanced.keep-tracks.label": "Išsaugoti visus takelius (MKV)",

@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Dua lintasan",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Preset / kecepatan",
+  "main.advanced.tune.label": "Penyetelan / jenis konten",
   "main.advanced.audio-kbps.label": "Target audio (kbps)",
   "main.advanced.audio-channels.label": "Kanal audio",
   "main.advanced.keep-tracks.label": "Pertahankan semua trek (MKV)",

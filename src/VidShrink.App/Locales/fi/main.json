@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Kaksivaiheinen",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Esiasetus / nopeus",
+  "main.advanced.tune.label": "Viritys / sisältötyyppi",
   "main.advanced.audio-kbps.label": "Äänen kohde (kbps)",
   "main.advanced.audio-channels.label": "Äänikanavat",
   "main.advanced.keep-tracks.label": "Säilytä kaikki raidat (MKV)",

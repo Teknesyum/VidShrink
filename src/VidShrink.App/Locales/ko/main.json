@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "2패스",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "프리셋 / 속도",
+  "main.advanced.tune.label": "튜닝 / 콘텐츠 유형",
   "main.advanced.audio-kbps.label": "오디오 목표 (kbps)",
   "main.advanced.audio-channels.label": "오디오 채널",
   "main.advanced.keep-tracks.label": "모든 트랙 유지 (MKV)",

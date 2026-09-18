@@ -610,12 +610,13 @@ public sealed class AdvancedPanelTests
     }
 
     /// <summary>
-    /// Geçersiz bir gelişmiş değer (bu kodek için bilinmeyen bir ön ayar) motoru
-    /// <see cref="ArgumentException"/> ile düşürür; arayüz çökmüyor, önceki plan ekranda
-    /// kalır ve hata tek satırda görünür.
+    /// Geçersiz bir gelişmiş değer (bu kodek için bilinmeyen bir ön ayar) artık motoru
+    /// düşürmüyor: ad plan kurulurken düşüyor, hata yüzeyi boş kalıyor ve plan motorun
+    /// seçtiği ön ayarla çıkıyor (<c>docs/netlestirme/024-ince-ayar-yuzeyi.md</c>).
+    /// Kullanıcıya susulmuyor — gerekçe satırı düşmeyi yazıyor.
     /// </summary>
     [Fact]
-    public void AnInvalidAdvancedCombinationIsReportedInsteadOfCrashing()
+    public void AnInvalidAdvancedCombinationIsDroppedInsteadOfCrashing()
     {
         Fresh(window =>
         {
@@ -630,7 +631,11 @@ public sealed class AdvancedPanelTests
             FindCombo(window, "CmbAdvPreset").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedPresetCandidates, "p1");
             window.RecalculateForTest();
 
-            Xunit.Assert.NotNull(window.AdvancedErrorForTest);
+            Xunit.Assert.Null(window.AdvancedErrorForTest);
+            var plan = window.ActivePlanForTest!;
+            Xunit.Assert.Equal("libx264", plan.Codec);
+            Xunit.Assert.NotEqual("p1", plan.Preset);
+            Xunit.Assert.Contains("merdiveninde yok", plan.Reason, StringComparison.Ordinal);
             return true;
         });
     }

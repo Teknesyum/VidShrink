@@ -52,6 +52,7 @@ public enum ReasonCode
     ManualModeOverride,
     ManualCrfOverride,
     ManualPresetOverride,
+    ManualTuneOverride,
     ManualCrfClamped,
     ManualModeSupersededByCrf,
     ManualPresetFirstPassRelaxed,
@@ -106,6 +107,7 @@ public sealed class EncodePlan
     [JsonPropertyName("height")] public int Height { get; set; }
     [JsonPropertyName("fps")] public double Fps { get; set; }
     [JsonPropertyName("preset")] public string Preset { get; set; } = "slow";
+    [JsonPropertyName("tune")] public string? Tune { get; set; }
     [JsonPropertyName("pixelFormat")] public string PixelFormat { get; set; } = "yuv420p";
     [JsonIgnore] public string? HdrVideoFilter { get; set; }
     [JsonIgnore] public List<string> HdrColorArgs { get; set; } = new();
@@ -180,5 +182,6 @@ public sealed class EncodePlan
         if (Width != other.Width || Height != other.Height) yield return $"resolution: {Width}x{Height} → {other.Width}x{other.Height}";
         if (Math.Abs(Fps - other.Fps) > 0.01) yield return $"fps: {Fps:0.##} → {other.Fps:0.##}";
         if (Preset != other.Preset) yield return $"preset: {Preset} → {other.Preset}";
+        if (Tune != other.Tune) yield return $"tune: {Tune ?? "-"} → {other.Tune ?? "-"}";
     }
 }

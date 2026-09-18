@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Dva prolaza",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Predložak / brzina",
+  "main.advanced.tune.label": "Ugađanje / vrsta sadržaja",
   "main.advanced.audio-kbps.label": "Cilj zvuka (kbps)",
   "main.advanced.audio-channels.label": "Zvučni kanali",
   "main.advanced.keep-tracks.label": "Zadrži sve zapise (MKV)",

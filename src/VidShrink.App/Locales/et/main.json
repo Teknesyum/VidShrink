@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Kahekäiguline",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Eelseade / kiirus",
+  "main.advanced.tune.label": "Häälestus / sisutüüp",
   "main.advanced.audio-kbps.label": "Heli siht (kbps)",
   "main.advanced.audio-channels.label": "Helikanalid",
   "main.advanced.keep-tracks.label": "Säilita kõik rajad (MKV)",

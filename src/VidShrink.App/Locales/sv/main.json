@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Två pass",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Förval / hastighet",
+  "main.advanced.tune.label": "Justering / innehållstyp",
   "main.advanced.audio-kbps.label": "Ljudmål (kbps)",
   "main.advanced.audio-channels.label": "Ljudkanaler",
   "main.advanced.keep-tracks.label": "Behåll alla spår (MKV)",

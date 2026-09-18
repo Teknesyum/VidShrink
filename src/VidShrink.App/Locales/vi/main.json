@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Hai lượt",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Preset / tốc độ",
+  "main.advanced.tune.label": "Tinh chỉnh / loại nội dung",
   "main.advanced.audio-kbps.label": "Mục tiêu âm thanh (kbps)",
   "main.advanced.audio-channels.label": "Kênh âm thanh",
   "main.advanced.keep-tracks.label": "Giữ mọi rãnh (MKV)",

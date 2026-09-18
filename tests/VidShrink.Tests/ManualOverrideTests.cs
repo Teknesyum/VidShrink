@@ -1062,7 +1062,7 @@ public sealed class ManualOverrideTests
     private static readonly HashSet<string> IzinliPlanOptionsAlanlari = new()
     {
         "TargetMb", "Intent", "Codec", "AllowResolutionDrop", "AllowFpsDrop", "HdrPolicy", "FillPolicy", "SpeedMode",
-        "LockedCodec", "LockedMode", "LockedCrf", "LockedPreset", "LockedAudioKbps", "AudioChannels",
+        "LockedCodec", "LockedMode", "LockedCrf", "LockedPreset", "LockedTune", "LockedAudioKbps", "AudioChannels",
         "MinResolutionHeight", "FixedResolution", "MinFps", "EncoderPath", "KeepAllTracks", "PlatformDelivery", "PreferredLanguage",
         // A1: Filters kullanicinin filtre secimi (deinterlace, denoise, transpose ...), DetectedCrop
         // ise cropdetect yoklamasinin sonucu. Ikisi de istek modelinin yuzeyinde durmali: biri

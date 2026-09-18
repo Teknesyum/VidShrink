@@ -136,6 +136,11 @@ public partial class MainWindow : Window
         "p1", "p2", "p3", "p4", "p5", "p6", "p7",
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"
     };
+    internal static readonly string[] AdvancedTuneCandidates =
+    {
+        "film", "animation", "grain",
+        "0", "1", "2"
+    };
     internal static readonly int[] AdvancedCrfCandidates = { 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 40, 44 };
     internal static readonly int[] AdvancedAudioKbpsCandidates = { 64, 96, 128, 160, 192, 256, 320 };
     internal static readonly int[] AdvancedMinResolutionCandidates = { 480, 540, 720, 900, 1080, 1440, 2160 };
@@ -1275,7 +1280,7 @@ public partial class MainWindow : Window
 
     private SelectingItemsControl[] AdvBoxes() => new SelectingItemsControl[]
     {
-        CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
+        CmbAdvCrf, CmbAdvPreset, CmbAdvTune, CmbAdvAudioKbps, CmbAdvAudioChannels,
         CmbAdvMinResolution, CmbAdvMinFps, CmbAdvCodecLock
     };
 
@@ -1597,6 +1602,9 @@ public partial class MainWindow : Window
         CmbAdvPreset.ItemsSource = new[] { automatic }.Concat(AdvancedPresetCandidates).ToList();
         CmbAdvPreset.SelectedIndex = 0;
 
+        CmbAdvTune.ItemsSource = new[] { automatic }.Concat(AdvancedTuneCandidates).ToList();
+        CmbAdvTune.SelectedIndex = 0;
+
         CmbAdvAudioKbps.ItemsSource = new[] { automatic }.Concat(AdvancedAudioKbpsCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
         CmbAdvAudioKbps.SelectedIndex = 0;
 
@@ -1802,7 +1810,7 @@ public partial class MainWindow : Window
         };
         TxtFrameSummary.Text = FrameBody.IsVisible ? "" : string.Join(" · ", frame);
 
-        var advanced = new SelectingItemsControl[] { CmbAdvCrf, CmbAdvPreset, CmbAdvCodecLock }
+        var advanced = new SelectingItemsControl[] { CmbAdvCrf, CmbAdvPreset, CmbAdvTune, CmbAdvCodecLock }
             .Count(box => box.SelectedIndex > 0)
             + (AdvModeIndex > 0 ? 1 : 0)
             + (AdvEncoderPathIndex > 0 ? 1 : 0);
@@ -1828,6 +1836,9 @@ public partial class MainWindow : Window
 
         if (AdvancedText(CmbAdvPreset) is { } presetText)
             options.LockedPreset = presetText;
+
+        if (AdvancedText(CmbAdvTune) is { } tuneText)
+            options.LockedTune = tuneText;
 
         if (AdvancedText(CmbAdvAudioKbps) is { } audioKbpsText
             && int.TryParse(audioKbpsText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var audioKbps))
@@ -1879,6 +1890,7 @@ public partial class MainWindow : Window
         }) : "";
         TxtAdvCrfNow.Text = has ? Say("main.advanced.now", plan!.Crf is { } crf ? crf.ToString(CultureInfo.InvariantCulture) : "-") : "";
         TxtAdvPresetNow.Text = has ? Say("main.advanced.now", plan!.Preset) : "";
+        TxtAdvTuneNow.Text = has ? Say("main.advanced.now", plan!.Tune ?? "-") : "";
         TxtAdvAudioKbpsNow.Text = has ? Say("main.advanced.now", plan!.AudioBitrateK.ToString(CultureInfo.InvariantCulture)) : "";
         TxtAdvAudioChannelsNow.Text = has
             ? Say("main.advanced.now", plan!.AudioChannels?.ToString(CultureInfo.InvariantCulture) ?? Say("main.advanced.audio-channels.none"))

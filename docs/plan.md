@@ -1,38 +1,34 @@
-# Plan — Kullanıcı Ön Ayar Kütüphanesi Arayüze Bağlanıyor
+# Plan — `-tune` Gelişmiş Panele Açılıyor
 
-Defter satırı: "Kullanici on ayar kutuphanesi arayuzden cagrilmiyor" (18 Eylül 2026).
-Motorda `PresetLibrary.SaveUser` / `LoadUser` / `Import` / `Export` var, arayüzde tek
-kullanım gömülü yongaların okunması. Karar: [020-onayar-arayuzu.md](netlestirme/020-onayar-arayuzu.md).
+Defter satırı E1 (kodlayıcı ayar yüzeyi). Karar:
+[024-ince-ayar-yuzeyi.md](netlestirme/024-ince-ayar-yuzeyi.md) — fable yalnız `-tune`'un
+açılmasını, `-level:v` ile serbest `encoder-opts`'un kapalı kalmasını söyledi. Aynı kararın
+CLI parçası `77cbf7c2` ile kapandı.
 
-## Kapsam
+## Karar
 
-Bu tur **kaydet / uygula / sil** üçlüsünü çıkarıyor. İçe ve dışa aktarma kapsam dışı;
-eksik kalan, kullanıcının ön ayarını başka makineye taşıyamaması — `presets.json` elle
-kopyalanır.
+Liste dar tutuluyor: küçültmede işe yarayan üç x264/x265 değeri (`film`, `animation`,
+`grain`) ve SVT-AV1'in `0..3` tune numarası. Kaydedicinin `TunesFor` merdiveni
+(`zerolatency`, `ull`, `psnr`) küçültmede kullanılmaz, o yüzden yeniden kullanılmıyor —
+küçültme kolunun kendi merdiveni yazılıyor.
+
+Kodeğe uymayan değer ön ayarda olduğu gibi **düşer**: koşum çakmaz, gerekçeye satır düşer.
 
 ## Adımlar
 
-1. **Şerit modeli.** `MainWindow.axaml.cs` içindeki `ChipPlans()` gömülü yongaları
-   veriyor; yanına `PresetLibrary.LoadUser()`'dan gelen kullanıcı ön ayarlarını okuyan bir
-   kol ekleniyor. Gömülü sekiz yonga, ince dikey ayırıcı, kullanıcı yongaları, en sonda
-   "+" — sıra fable'ın kararı.
-2. **Kaydetme.** "+" yongası bir flyout açıyor: tek ad kutusu ve Kaydet düğmesi. Boş ad
-   kaydetmiyor; aynı ad varsa tek satırlık "üstüne yazılsın mı" sorusu çıkıyor. Kaydedilen
-   profil o anki hedef, niyet, kodek, doldurma, kısa kenar, ses ve kabı taşıyor.
-3. **Uygulama ve silme.** Kullanıcı yongasına basmak gömülü yonga ile aynı yolu
-   (`ApplyChipPlan`'ın ön ayar karşılığı) işletiyor. Yonganın üzerindeki "×" siliyor;
-   durum satırında "'Ad' silindi — Geri al" beliriyor, geri alma silinen profili yeniden
-   `SaveUser` ediyor.
-4. **Biçim.** Kullanıcı yongası kesikli kenarlıkla ayrılıyor; renk uydurulmuyor, ölçü
-   `Themes/Theme.axaml` belirtecinden geliyor.
-5. **Metinler.** Yeni anahtarlar 42 dile giriyor (ad kutusu, kaydet, üstüne yazma sorusu,
-   silindi/geri al, boş ad uyarısı).
-6. **Ölçü.** Yeni test sınıfı `OnAyarYongasiTests`: kaydedilen profilin alanları, boş ad,
-   aynı ad, uygulama yolu, silme ve geri alma, sıra (gömülü → ayırıcı → kullanıcı → "+").
-   Ayar dosyası `VIDSHRINK_SETTINGS_PATH` altında; gerçek `%APPDATA%` yazılmıyor.
+1. `FfmpegArguments.TunesFor(codec)` ve `IsValidTune(codec, tune)` — küçültme kolunun
+   merdiveni. x264/x265 → `film|animation|grain`, libsvtav1 → `0|1|2|3`, geri kalan boş.
+2. `EncodePlan.Tune` alanı, `PlanOptions.LockedTune`, `PlanCalculator`'da uygulama +
+   düşme gerekçesi + `ReasonCode.ManualTuneOverride`.
+3. `FfmpegArguments`: x264/x265 için `-tune <ad>`; libsvtav1 için var olan
+   `-svtav1-params tune=1` yerine kullanıcının numarası. İki yerde birden yazılmaz.
+4. Arayüz: `CmbAdvTune` + `TxtAdvTuneNow`, ön ayar satırının hemen altına; `LockedTune`'a
+   bağlanır, "Otomatik" ilk sıra.
+5. Metin: `main.advanced.tune.label` 42 dile.
+6. Ölçü: `TuneYuzeyiTests` — merdiven, düşme, argümana yazılma, svtav1 çakışması,
+   panelin kilidi kurması. Gerçek ffmpeg ile tek kısa koşum, `docs/olcumler/`e.
 
 ## Kapsam dışı
 
-- İçe/dışa aktarma arayüzü ve `SaveFilePickerAsync`.
-- Şerit taşma davranışı (kaydırma mı satır kırma mı) — fable "ölçülmeli" dedi, ayrı iş.
-- "×" jesti (hover mı sürekli mi) — ölçülmedi, sürekli görünür başlıyor.
+- `-level:v` ve serbest `encoder-opts` (fable kapalı dedi).
+- NVENC `-tune hq/ll` — küçültmede kalite kipi zaten `p`-ön ayarından türüyor, ölçülmedi.

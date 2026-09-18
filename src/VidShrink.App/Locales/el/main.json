@@ -148,6 +148,7 @@
   "main.advanced.mode.two-pass": "Δύο περάσματα",
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Προεπιλογή / ταχύτητα",
+  "main.advanced.tune.label": "Ρύθμιση / τύπος περιεχομένου",
   "main.advanced.audio-kbps.label": "Στόχος ήχου (kbps)",
   "main.advanced.audio-channels.label": "Κανάλια ήχου",
   "main.advanced.keep-tracks.label": "Διατήρηση όλων των κομματιών (MKV)",
