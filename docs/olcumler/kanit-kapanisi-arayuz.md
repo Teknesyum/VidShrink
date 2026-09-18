@@ -94,3 +94,14 @@ Basarili!  - Basarisiz:     0, Basarili:     1, Atlanan:     0, Toplam:     1, S
 
 .calisma\mini-olcu   yok
 ```
+
+## CI
+
+```
+gh run list --branch t0/kanit-arayuz
+35324099960  ci  t0/kanit-arayuz  push  success
+
+gh run view 35324099960 --json jobs
+test           completed success
+kaydedici-x11  completed success
+```
