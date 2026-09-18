@@ -90,7 +90,5 @@ public partial class MainWindow
 
     internal void PlayerOpenedForTest(string path) => OnPlayerOpened(path);
 
-    private static bool SamePath(string? left, string? right)
-        => left is not null && right is not null
-           && string.Equals(Path.GetFullPath(left), Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase);
+    private static bool SamePath(string? left, string? right) => PathEquality.Same(left, right);
 }

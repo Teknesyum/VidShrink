@@ -29,9 +29,14 @@ açıkça "bu kod kalkacak" diyor.
    yalnız iki test dosyasından çağrılıyor; `EncodePlan.SuggestedCrop` da okunmuyor.
 8. `tests/VidShrink.Tests/OluUyeTests.cs:495-508` — Önizleme türlerinin beş üyesi
    üretiliyor, okuma tarafında adı geçmiyor.
-9. `src/VidShrink.App/CurrentMedia.cs:52-63`, `MainWindow.OdakTakibi.cs:93-95`,
+9. ~~`src/VidShrink.App/CurrentMedia.cs:52-63`, `MainWindow.OdakTakibi.cs:93-95`,
    `src/VidShrink.Cli/CliApp.cs:446-447` — Aynı yol eşitliği üç gövdede ve davranışları
-   farklı: biri `ArgumentException`'ı yutuyor, ikisi yutmuyor.
+   farklı: biri `ArgumentException`'ı yutuyor, ikisi yutmuyor.~~ **Kapandı:** gövde
+   `Core/PathEquality.Same`'e indi. Bulgu üçü sayıyordu, ölçünün tarayıcısı **beş**
+   buldu — `ShrinkEngine.cs:108` ve `EncodeRunner.cs:492` de aynı deseni yazıyordu.
+   Harf duyarlılığı artık sabit değil, `WatchFolder.PathComparison` dikişinden geliyor.
+   `YolEsitligiTests`; iki mutasyon (sabit `Ordinal`, `ArgumentException` korumasının
+   kalkması) 1'er kırmızı.
 10. On ayrı yerde elle süre biçimlendirme (`CliApp.cs:443`, `MainWindow.axaml.cs:3238`,
     `:4255`, `:4342`, `:4404`, `PlayerView.Tools.cs:299`, `RecorderView.Serit.cs:48`,
     `ShrinkJobWindow.axaml.cs:272`, `ConversionArguments.cs:157`) — biçimler tutarsız,

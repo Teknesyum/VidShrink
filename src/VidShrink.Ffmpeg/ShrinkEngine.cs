@@ -105,6 +105,5 @@ public static class ShrinkEngine
     private static double PlanScale(MediaInfo info, EncodePlan plan)
         => info.Height <= 0 ? 1.0 : (double)plan.Height / info.Height;
 
-    private static bool PathEquals(string left, string right)
-        => string.Equals(Path.GetFullPath(left), Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase);
+    private static bool PathEquals(string left, string right) => PathEquality.Same(left, right);
 }

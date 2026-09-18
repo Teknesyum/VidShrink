@@ -49,18 +49,7 @@ public sealed class CurrentMedia
         Stamp(path);
     }
 
-    public static bool SamePath(string? left, string? right)
-    {
-        if (left is null || right is null) return false;
-        try
-        {
-            return string.Equals(
-                System.IO.Path.GetFullPath(left),
-                System.IO.Path.GetFullPath(right),
-                StringComparison.OrdinalIgnoreCase);
-        }
-        catch (ArgumentException) { return false; }
-    }
+    public static bool SamePath(string? left, string? right) => PathEquality.Same(left, right);
 
     private bool Fresh(string path)
     {

@@ -443,8 +443,7 @@ public static class CliApp
     private static string Clock(TimeSpan span)
         => span.TotalHours >= 1 ? span.ToString(@"h\:mm\:ss", CultureInfo.InvariantCulture) : span.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
 
-    private static bool PathEquals(string left, string right)
-        => string.Equals(Path.GetFullPath(left), Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase);
+    private static bool PathEquals(string left, string right) => PathEquality.Same(left, right);
 
     private sealed class StderrProgress(TextWriter stderr, CliText text) : IProgress<EncodeProgress>
     {

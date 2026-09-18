@@ -489,7 +489,7 @@ public sealed class EncodeRunner
             if (outcome.ExitCode != 0)
                 throw new InvalidOperationException("Kesit akis kopyasiyla paketlenemedi: " + string.Join(Environment.NewLine, outcome.Tail));
         }
-        else if (!string.Equals(Path.GetFullPath(info.FilePath), Path.GetFullPath(deliveredPath), StringComparison.OrdinalIgnoreCase))
+        else if (!PathEquality.Same(info.FilePath, deliveredPath))
         {
             File.Copy(info.FilePath, deliveredPath, overwrite: true);
         }
