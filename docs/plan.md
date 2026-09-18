@@ -1,6 +1,6 @@
 # Yol B: Kabuk Kalemleri (P14, P3, S9, K4, S14, S20)
 
-Dal `t0/yol-b-kabuk`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 7. bölüm satır 3, 4, 5, 6, 13, 12.
+Dal `t0/yol-b-kabuk`. Kaynak: `docs/handbrake/yol-haritasi-kalanlar-2026-09-17.md` 7. bölüm satır 3, 4, 5, 6, 13, 12.
 
 1. **P14.** Üst barın açılma bölgesi `TitleBar.Height` yerine alt şeridin bandı: `PlaybackHoverZoneShare` x oynatıcı
    yüzeyi yüksekliği, pencerenin üst kenarından. `OynaticiYolHaritasiTests` ham fare hareketiyle iki eşiği ölçer.
@@ -47,7 +47,7 @@ Dal `t0/macos-mpvkit`. Karar: fable 2026-09-17 soru 5. Kod (`src/`) değişmez.
 
 # HandBrake A1 — Filtre Zinciri
 
-Dal `t0/hb-a1-filtre`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 31-39, 63; fable K7, K8, B9.
+Dal `t0/hb-a1-filtre`. Kaynak: `docs/handbrake/acik-durumu-2026-09-17.md` satır 31-39, 63; fable K7, K8, B9.
 
 1. **Core.** Yeni `src/VidShrink.Core/VideoFilterChain.cs`: `VideoFilterOptions` (varsayılan: deinterlace koşullu,
    kırpma ve diğer her filtre kapalı), zincir sırası, idet kararı, `PlannedSource` (kırpma/döndürme/detelecine
@@ -82,7 +82,7 @@ Dal `t0/hb-a3-izle`. Kaynak: `docs/danisma/2026-09-17-a3-izle-denetim.md` (iki d
 
 # Yol D — Açılış Paneli Hiçbir Yolda Yok
 
-Dal `t0/yol-d-panel`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` §7 satır 2, K14.
+Dal `t0/yol-d-panel`. Kaynak: `docs/handbrake/yol-haritasi-kalanlar-2026-09-17.md` §7 satır 2, K14.
 
 1. **Panel kalkar.** `Launcher/Splash.cs`, `tools/VidShrink.SplashGen`, `SplashTests.cs` `trash/`'e;
    csproj görüntü hedefi ve sln satırı düşer. Başlatıcının ilerleme parametreleri ve tavanları gider.
@@ -108,7 +108,7 @@ Dal `t0/yol-d-panel`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md`
 
 # Yol A — Oynatıcı: Döndürme Tuşu, Sürüklerken Mıknatıs, Hız Adımı, Çift Tık Süresi
 
-Dal `t0/yol-a-oynatici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` (1. bölüm, P1, P17, 7/1-7-8).
+Dal `t0/yol-a-oynatici`. Kaynak: `docs/handbrake/yol-haritasi-kalanlar-2026-09-17.md` (1. bölüm, P1, P17, 7/1-7-8).
 
 1. **Döndürme bulunur.** Tuş GOM'daki gibi Ctrl+Shift+S kalır. Kısayolu olan her menü satırının ipucu
    "ad (tuş)". Test ham sağ tık (satır görünür, tuş metni ve ipucu), ham Ctrl+Shift+S, kare pikselleri
@@ -121,7 +121,7 @@ Dal `t0/yol-a-oynatici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.
 
 # Ön Ayar Kütüphanesi — HandBrake A2
 
-Dal `t0/hb-a2-onayar`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` satır 42-45.
+Dal `t0/hb-a2-onayar`. Kaynak: `docs/handbrake/acik-durumu-2026-09-17.md` satır 42-45.
 
 1. **Tek tablo.** `src/VidShrink.Core/Presets/platformlar.json` gömülü kaynak; yonga planları (`MainWindow.ChipPlans`)
    buradan okunur. Discord/Telegram/e-posta platformları ve cihaz profilleri aynı tabloya, her değerin kaynağı
@@ -153,7 +153,7 @@ gerçek komuta bağladı, `VtHizli` kapı kalınca fırlatıyor.
 
 # A4 — arm64 Yayın ve Kurucu Bağımlılıkları
 
-Dal `t0/hb-a45-arm-kiyas`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` 4. bölüm A4, satır 56.
+Dal `t0/hb-a45-arm-kiyas`. Kaynak: `docs/handbrake/acik-durumu-2026-09-17.md` 4. bölüm A4, satır 56.
 
 1. **Yayın matrisi.** `release.yml` `publish` matrisine `win-arm64` ve `linux-arm64`; başlatıcı adımı
    `startsWith(matrix.rid, 'win-')` ile arm64'te de koşar. `UpdateCheck.ReleasedRids` altı hedefe çıkar,
@@ -173,7 +173,7 @@ Dal `t0/hb-a45-arm-kiyas`. Kaynak: `.calisma/hb3/acik-durumu-2026-09-17.md` 4. b
 
 # Kaydedici C Grubu — R10/R14 Vurgu, R2 macOS/Linux Pencere, R15 Kanıt
 
-Dal `t0/yol-c-kaydedici`. Kaynak: `.calisma/hb3/yol-haritasi-kalanlar-2026-09-17.md` 2., 6., 7. bölüm (9-11).
+Dal `t0/yol-c-kaydedici`. Kaynak: `docs/handbrake/yol-haritasi-kalanlar-2026-09-17.md` 2., 6., 7. bölüm (9-11).
 
 1. **R10/R14.** `RecorderView.axaml` sonuç paneli: "Küçült'e gönder" ilk sırada `PrimaryButton`, "Klasörü göster"
    ve "Paylaş" `GhostButton`. Test: başsız çizimden düğme pikseli, palet fırçası `NeonBlue` ile kıyas; negatif kontrol eşit tema.
