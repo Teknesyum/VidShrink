@@ -112,7 +112,8 @@
   "main.codec.label": "Algoritam kompresije",
   "main.codec.automatic": "Automatski",
   "main.codec.compatible": "H.264 (kompatibilan)",
-  "main.codec.smallest": "H.265 (najmanji)",
+  "main.codec.smallest": "AV1 (najmanji)",
+  "main.codec.tip": "• H.264 radi na skoro svakom uređaju i to WhatsApp očekuje; izaberite ga kad fajl prosto mora da radi.\n• AV1 kompresuje najbolje i najsporije se kodira, a dekodiraju ga samo noviji telefoni.",
 
   "main.allow.resolution": "Sme da smanji rezoluciju",
   "main.whatsapp-compatible": "Kompatibilno sa WhatsApp-om (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Iseci i sačuvaj",
   "main.run.accepted-larger": "Prihvaćeno veće: {0} MB iznad cilja od {1} MB.",
   "main.run.trimmed": "{0} s je isečeno da stane u cilj; trajanje {1} → {2}.",
+  "main.run.whatsapp-document": "Pošaljite to na WhatsApp kao dokument, a ne kao video: tako se zaobilazi prekodiranje u ćaskanju i druga strana vidi ovaj kvalitet neizmenjen.",
 
   "main.run.no-space": "Nema dovoljno slobodnog prostora na ciljnom disku; potrebno je najmanje {0} MB.",
   "main.run.done": "Gotovo u {0} pokušaja. {1} MB → {2} MB ({3}% manje).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "izvor je taman (prosečna osvetljenost {0}); {1} pravi pruge u senkama, pa Automatski koristi {2} sa turbo prvim prolazom",
 
   "main.advice.budget-generous": "Cilj je izdašan za ovaj izvor, pa ga motor ispunjava bez napora.",
-  "main.advice.codec-upgrade": "Pri ovom pritisku H.265 daje vidljivo bolji rezultat uz istu veličinu; razmislite o prebacivanju algoritma kompresije na automatski ili H.265.",
+  "main.advice.codec-upgrade": "Pri ovom pritisku AV1 daje vidljivo bolji rezultat uz istu veličinu; razmislite o prebacivanju algoritma kompresije na automatski ili AV1.",
   "main.advice.hardware-costs-quality": "Hardverski enkoder je brz, ali pri ovako tesnom cilju gubi primetan kvalitet po megabajtu; rezultat izgleda bolje sa isključenim brzim smanjenjem (GPU).",
   "main.advice.extreme-ratio": "Ekstremna kompresija: gubitak je neizbežan, pa ga motor gura tamo gde je najmanje primetan.",
   "main.advice.below-codec-floor": "Ovaj cilj je zaista premali za ovaj izvor: nijedan raspored ne dostiže bitove po pikselu koje enkoder treba za smislenu sliku. Uzet je najgušći raspored, ali rezultat će izgledati vidljivo pokvareno; jedina prava popravka je povećanje cilja.",

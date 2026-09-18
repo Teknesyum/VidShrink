@@ -112,7 +112,8 @@
   "main.codec.label": "Algorithme de compression",
   "main.codec.automatic": "Automatique",
   "main.codec.compatible": "H.264 (compatible)",
-  "main.codec.smallest": "H.265 (plus petit)",
+  "main.codec.smallest": "AV1 (plus petit)",
+  "main.codec.tip": "• H.264 se lit sur presque tous les appareils et c'est ce que WhatsApp attend ; choisissez-le quand le fichier doit simplement fonctionner.\n• AV1 compresse le mieux et s'encode le plus lentement ; seuls les téléphones récents le décodent.",
 
   "main.allow.resolution": "Peut baisser la résolution",
   "main.whatsapp-compatible": "Compatible WhatsApp (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Rogner et enregistrer",
   "main.run.accepted-larger": "Accepté plus grand : {0} MB au-dessus de la cible de {1} MB.",
   "main.run.trimmed": "{0} s ont été coupées pour respecter la cible ; durée {1} → {2}.",
+  "main.run.whatsapp-document": "Envoyez-le sur WhatsApp en tant que document, pas en tant que vidéo : le réencodage de la discussion est ainsi contourné et le destinataire voit cette qualité telle quelle.",
 
   "main.run.no-space": "Espace libre insuffisant sur le lecteur cible ; il faut au moins {0} Mo.",
   "main.run.done": "Terminé en {0} essai(s). {1} Mo → {2} Mo ({3} % plus petit).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "la source est sombre (luminance moyenne {0}) ; {1} crée des bandes dans les ombres, donc Automatique utilise {2} avec une première passe turbo",
 
   "main.advice.budget-generous": "La cible est généreuse pour cette source, le moteur l'atteint donc sans effort.",
-  "main.advice.codec-upgrade": "À cette pression, H.265 donne un résultat visiblement meilleur à taille égale ; envisagez de passer l'algorithme de compression en automatique ou H.265.",
+  "main.advice.codec-upgrade": "À cette pression, AV1 donne un résultat visiblement meilleur à taille égale ; envisagez de passer l'algorithme de compression en automatique ou AV1.",
   "main.advice.hardware-costs-quality": "L'encodeur matériel est rapide mais perd une qualité sensible par mégaoctet à une cible aussi serrée ; le résultat est meilleur avec la réduction rapide (GPU) désactivée.",
   "main.advice.extreme-ratio": "Compression extrême : la perte est inévitable, le moteur la place donc là où elle se remarque le moins.",
   "main.advice.below-codec-floor": "Cette cible est vraiment trop petite pour cette source : aucune disposition n'atteint les bits par pixel dont l'encodeur a besoin pour une image sensée. La disposition la plus dense a été prise, mais le résultat paraîtra visiblement cassé ; relever la cible est la seule vraie solution.",

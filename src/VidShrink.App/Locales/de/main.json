@@ -112,7 +112,8 @@
   "main.codec.label": "Kompressionsverfahren",
   "main.codec.automatic": "Automatisch",
   "main.codec.compatible": "H.264 (kompatibel)",
-  "main.codec.smallest": "H.265 (kleinste)",
+  "main.codec.smallest": "AV1 (kleinste)",
+  "main.codec.tip": "• H.264 läuft auf fast jedem Gerät und ist, was WhatsApp erwartet; wählen Sie es, wenn die Datei einfach funktionieren muss.\n• AV1 komprimiert am besten, kodiert am langsamsten, und nur neuere Telefone dekodieren es.",
 
   "main.allow.resolution": "Darf Auflösung senken",
   "main.whatsapp-compatible": "WhatsApp-kompatibel (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Zuschneiden und speichern",
   "main.run.accepted-larger": "Größer akzeptiert: {0} MB über dem Ziel von {1} MB.",
   "main.run.trimmed": "{0} s wurden zugeschnitten, um das Ziel zu erreichen; Länge {1} → {2}.",
+  "main.run.whatsapp-document": "Sende die Datei in WhatsApp als Dokument statt als Video: Das umgeht die Neukodierung im Chat, und die Gegenseite sieht diese Qualität unverändert.",
 
   "main.run.no-space": "Zu wenig freier Platz auf dem Ziellaufwerk; mindestens {0} MB werden benötigt.",
   "main.run.done": "Fertig in {0} Versuch(en). {1} MB → {2} MB ({3}% kleiner).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "die Quelle ist dunkel (mittlere Helligkeit {0}); {1} erzeugt in den Schatten Banding, daher nutzt Automatisch {2} mit Turbo-Erstdurchlauf",
 
   "main.advice.budget-generous": "Das Ziel ist für diese Quelle großzügig, die Engine erreicht es ohne Mühe.",
-  "main.advice.codec-upgrade": "Bei diesem Druck liefert H.265 bei gleicher Größe ein sichtbar besseres Ergebnis; erwägen Sie, das Kompressionsverfahren auf automatisch oder H.265 zu stellen.",
+  "main.advice.codec-upgrade": "Bei diesem Druck liefert AV1 bei gleicher Größe ein sichtbar besseres Ergebnis; erwägen Sie, das Kompressionsverfahren auf automatisch oder AV1 zu stellen.",
   "main.advice.hardware-costs-quality": "Der Hardware-Encoder ist schnell, verliert bei einem so engen Ziel aber spürbar Qualität pro Megabyte; das Ergebnis sieht mit ausgeschaltetem schnellen Verkleinern (GPU) besser aus.",
   "main.advice.extreme-ratio": "Extreme Kompression: Verlust ist unvermeidlich, die Engine legt ihn dorthin, wo er am wenigsten auffällt.",
   "main.advice.below-codec-floor": "Dieses Ziel ist für diese Quelle wirklich zu klein: Kein Layout erreicht die Bits pro Pixel, die der Encoder für ein sinnvolles Bild braucht. Das dichteste Layout wurde genommen, aber das Ergebnis wird sichtbar kaputt aussehen; das Ziel zu erhöhen ist die einzige echte Lösung.",

@@ -112,7 +112,8 @@
   "main.codec.label": "Komprimeringsalgoritme",
   "main.codec.automatic": "Automatisk",
   "main.codec.compatible": "H.264 (kompatibel)",
-  "main.codec.smallest": "H.265 (mindst)",
+  "main.codec.smallest": "AV1 (mindst)",
+  "main.codec.tip": "• H.264 afspilles på næsten alle enheder og er det, WhatsApp forventer; vælg den, når filen bare skal virke.\n• AV1 komprimerer bedst og er langsomst at kode, og kun nyere telefoner afkoder den.",
 
   "main.allow.resolution": "Må sænke opløsning",
   "main.whatsapp-compatible": "WhatsApp-kompatibel (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Beskær og gem",
   "main.run.accepted-larger": "Accepteret større: {0} MB over målet på {1} MB.",
   "main.run.trimmed": "{0} s blev beskåret for at passe til målet; længde {1} → {2}.",
+  "main.run.whatsapp-document": "Send den til WhatsApp som et dokument, ikke som en video: det springer omkodningen i chatten over, så modtageren ser denne kvalitet uændret.",
 
   "main.run.no-space": "Ikke nok ledig plads på måldrevet; mindst {0} MB kræves.",
   "main.run.done": "Færdig på {0} forsøg. {1} MB → {2} MB ({3}% mindre).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "kilden er mørk (gennemsnitlig luminans {0}); {1} giver banding i skyggerne, så Automatisk bruger {2} med turbo første gennemløb",
 
   "main.advice.budget-generous": "Målet er rummeligt for denne kilde, så motoren når det uden anstrengelse.",
-  "main.advice.codec-upgrade": "Ved dette pres giver H.265 et synligt bedre resultat ved samme størrelse; overvej at sætte komprimeringsalgoritmen til automatisk eller H.265.",
+  "main.advice.codec-upgrade": "Ved dette pres giver AV1 et synligt bedre resultat ved samme størrelse; overvej at sætte komprimeringsalgoritmen til automatisk eller AV1.",
   "main.advice.hardware-costs-quality": "Hardwarekoderen er hurtig, men mister mærkbar kvalitet pr. megabyte ved et så stramt mål; resultatet ser bedre ud med hurtig krympning (GPU) slået fra.",
   "main.advice.extreme-ratio": "Ekstrem komprimering: tab er uundgåeligt, så motoren lægger det, hvor det er mindst synligt.",
   "main.advice.below-codec-floor": "Dette mål er reelt for lille til denne kilde: intet layout når de bits pr. pixel, koderen kræver for et meningsfuldt billede. Det tætteste layout blev valgt, men resultatet vil se synligt ødelagt ud; at hæve målet er den eneste rigtige løsning.",

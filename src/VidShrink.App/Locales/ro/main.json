@@ -112,7 +112,8 @@
   "main.codec.label": "Algoritm de comprimare",
   "main.codec.automatic": "Automat",
   "main.codec.compatible": "H.264 (compatibil)",
-  "main.codec.smallest": "H.265 (cel mai mic)",
+  "main.codec.smallest": "AV1 (cel mai mic)",
+  "main.codec.tip": "• H.264 rulează pe aproape orice dispozitiv și este ce așteaptă WhatsApp; alege-l când fișierul trebuie pur și simplu să meargă.\n• AV1 comprimă cel mai bine și codează cel mai lent, iar doar telefoanele recente îl decodează.",
 
   "main.allow.resolution": "Poate reduce rezoluția",
   "main.whatsapp-compatible": "Compatibil WhatsApp (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Decupează și salvează",
   "main.run.accepted-larger": "Acceptat mai mare: {0} MB peste ținta de {1} MB.",
   "main.run.trimmed": "{0} s au fost tăiate pentru a se încadra în țintă; durata {1} → {2}.",
+  "main.run.whatsapp-document": "Trimite-l pe WhatsApp ca document, nu ca videoclip: astfel se sare peste recodificarea din conversație, iar celălalt vede această calitate așa cum este.",
 
   "main.run.no-space": "Nu este destul spațiu liber pe unitatea țintă; sunt necesari cel puțin {0} MB.",
   "main.run.done": "Gata în {0} încercare(ări). {1} MB → {2} MB ({3}% mai mic).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "sursa este întunecată (luminanță medie {0}); {1} produce benzi în umbre, așa că Automat folosește {2} cu prima trecere turbo",
 
   "main.advice.budget-generous": "Ținta este generoasă pentru această sursă, deci motorul o atinge fără efort.",
-  "main.advice.codec-upgrade": "La această presiune H.265 dă un rezultat vizibil mai bun la aceeași mărime; ia în calcul trecerea algoritmului de comprimare la automat sau H.265.",
+  "main.advice.codec-upgrade": "La această presiune AV1 dă un rezultat vizibil mai bun la aceeași mărime; ia în calcul trecerea algoritmului de comprimare la automat sau AV1.",
   "main.advice.hardware-costs-quality": "Codorul hardware este rapid, dar pierde calitate vizibilă per megabyte la o țintă atât de strânsă; rezultatul arată mai bine cu micșorarea rapidă (GPU) oprită.",
   "main.advice.extreme-ratio": "Comprimare extremă: pierderea este inevitabilă, deci motorul o împinge acolo unde se observă cel mai puțin.",
   "main.advice.below-codec-floor": "Această țintă este cu adevărat prea mică pentru această sursă: nicio așezare nu atinge biții per pixel de care are nevoie codorul pentru o imagine cu sens. S-a luat cea mai densă așezare, dar rezultatul va arăta vizibil stricat; mărirea țintei este singura soluție reală.",

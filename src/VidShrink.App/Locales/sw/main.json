@@ -112,7 +112,8 @@
   "main.codec.label": "Algoriti ya ufinyazi",
   "main.codec.automatic": "Otomatiki",
   "main.codec.compatible": "H.264 (tangamanifu)",
-  "main.codec.smallest": "H.265 (ndogo zaidi)",
+  "main.codec.smallest": "AV1 (ndogo zaidi)",
+  "main.codec.tip": "• H.264 hucheza karibu kila kifaa na ndiyo WhatsApp inayotarajia; ichague faili inapopaswa kufanya kazi tu.\n• AV1 hufinyaza vizuri zaidi na ni polepole zaidi kusimba, na simu za hivi karibuni tu huisimbua.",
 
   "main.allow.resolution": "Inaweza kupunguza azimio",
   "main.whatsapp-compatible": "Inaendana na WhatsApp (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Kata na uhifadhi",
   "main.run.accepted-larger": "Imekubaliwa kubwa zaidi: {0} MB zaidi ya lengo la {1} MB.",
   "main.run.trimmed": "Sekunde {0} zilikatwa ili kufikia lengo; muda {1} → {2}.",
+  "main.run.whatsapp-document": "Ituma kwenye WhatsApp kama hati, siyo kama video: hivyo usimbaji upya wa gumzo unarukwa, na upande mwingine unaona ubora huu kama ulivyo.",
 
   "main.run.no-space": "Hakuna nafasi ya kutosha kwenye diski lengwa; angalau MB {0} zinahitajika.",
   "main.run.done": "Imekamilika kwa jaribio {0}. MB {1} → MB {2} ({3}% ndogo).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "chanzo ni cheusi (wastani wa mwangaza {0}); {1} huleta mikanda kwenye vivuli, kwa hivyo Otomatiki hutumia {2} na mzunguko wa kwanza wa turbo",
 
   "main.advice.budget-generous": "Lengo ni kubwa kwa chanzo hiki, kwa hiyo injini hulifikia bila shida.",
-  "main.advice.codec-upgrade": "Kwa shinikizo hili H.265 hutoa matokeo bora zaidi ya kuonekana kwa ukubwa ule ule; fikiria kubadilisha algoriti ya ufinyazi kuwa otomatiki au H.265.",
+  "main.advice.codec-upgrade": "Kwa shinikizo hili AV1 hutoa matokeo bora zaidi ya kuonekana kwa ukubwa ule ule; fikiria kubadilisha algoriti ya ufinyazi kuwa otomatiki au AV1.",
   "main.advice.hardware-costs-quality": "Kisimbaji cha maunzi ni cha haraka lakini hupoteza ubora unaoonekana kwa kila megabaiti kwa lengo bana hivi; matokeo huonekana bora ufinyazi wa haraka (GPU) ukiwa umezimwa.",
   "main.advice.extreme-ratio": "Ufinyazi wa kupindukia: hasara haiepukiki, kwa hiyo injini huisukuma mahali inapoonekana kidogo zaidi.",
   "main.advice.below-codec-floor": "Lengo hili ni dogo mno kweli kwa chanzo hiki: hakuna mpangilio unaofikia biti kwa pikseli ambazo kisimbaji kinahitaji kwa picha yenye maana. Mpangilio mzito zaidi ulichukuliwa, lakini matokeo yataonekana yamevunjika waziwazi; kuongeza lengo ndilo suluhisho halisi pekee.",

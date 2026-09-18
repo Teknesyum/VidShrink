@@ -1,5 +1,7 @@
+using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
@@ -652,6 +654,165 @@ public sealed class KareYerlesimTests
         Assert.Contains("24", satir);
         Assert.DoesNotContain("16", satir);
     }
+
+    /// <summary>
+    /// <para>Kodek seridindeki etiket, o secim gercekten hangi kodlayiciya gidiyorsa onu
+    /// soylemeli. "En kucuk" kolu <c>CodecPreference.MaxCompression</c>'a, o da
+    /// <c>PlanCalculator.PreferredCodecFor</c> icinde <c>libsvtav1</c>'e gidiyor; etiket
+    /// yillarca <c>H.265</c> yaziyordu. <c>libx265</c> yalnizca AV1 derlemede yoksa devreye
+    /// giren <b>yedek</b> (<c>FallbackCodecFor</c>), tercih degil.</para>
+    ///
+    /// <para>Olcu sabit karsilastirmiyor: etiketi ekrandan, kodlayiciyi gercek esleme
+    /// zincirinden (<c>CodecFromIndex</c> -> <c>PreferredCodecFor</c>) okuyup ikisini
+    /// karsilastiriyor. <c>RbCodecSmallest</c>'in <c>loc:Text</c> anahtarini degistiren bir
+    /// mutasyon etiketi baska bir ailenin adina cevirir ve olcu kirmizi doner.</para>
+    ///
+    /// <para><b>Dil, pencere kuruldaktan sonra sabitlenir.</b> <c>Read("en", ...)</c>'in
+    /// basindaki <c>Strings.Use</c> yetmiyor: <c>MainWindow</c> yapicisi kayitli arayuz
+    /// dilini geri yukleyip uzerine yaziyor, dolayisiyla olcu kendi basina kosunca Turkce
+    /// etiketi okuyordu ve <c>Locales/en/main.json</c>'a yapilan mutasyon <b>yesil</b>
+    /// kaliyordu. Geri cagirmanin govdesindeki <c>Strings.Use("en")</c> bunu kapatir;
+    /// <c>loc:Text</c> bir <c>LocalizedText</c> bagi verdigi icin kurulmus icerik de
+    /// tazelenir.</para>
+    /// </summary>
+    [Fact]
+    public void KodekEtiketiSecilenKodlayiciyiSoyler()
+    {
+        var etiket = Read("en", window =>
+        {
+            Strings.Use("en");
+            return new[]
+            {
+                Named<RadioButton>(window, "RbCodecAuto").Content?.ToString() ?? "",
+                Named<RadioButton>(window, "RbCodecCompatible").Content?.ToString() ?? "",
+                Named<RadioButton>(window, "RbCodecSmallest").Content?.ToString() ?? ""
+            };
+        });
+
+        var aile = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["libx264"] = "H.264",
+            ["libx265"] = "H.265",
+            ["libsvtav1"] = "AV1"
+        };
+
+        var kanit = new List<string>();
+        foreach (var kol in new[] { 1, 2 })
+        {
+            var tercih = MainWindow.CodecFromIndex(kol);
+            var kodlayici = PlanCalculator.PreferredCodecFor(tercih);
+            kanit.Add($"{kol}\t{tercih}\t{kodlayici}\t{etiket[kol]}");
+        }
+
+        var dizin = Path.Combine(GirdiKanit.Root, ".calisma", "kodek-etiketi");
+        Directory.CreateDirectory(dizin);
+        File.WriteAllText(Path.Combine(dizin, "okunan.txt"), string.Join(Environment.NewLine, kanit));
+
+        Assert.Equal("libsvtav1", PlanCalculator.PreferredCodecFor(MainWindow.CodecFromIndex(2)));
+        foreach (var kol in new[] { 1, 2 })
+        {
+            var kodlayici = PlanCalculator.PreferredCodecFor(MainWindow.CodecFromIndex(kol));
+            Assert.True(aile.ContainsKey(kodlayici), $"aile tablosunda yok: {kodlayici}");
+            Assert.StartsWith(aile[kodlayici], etiket[kol], StringComparison.Ordinal);
+        }
+
+        Assert.Equal(3, etiket.Distinct(StringComparer.Ordinal).Count());
+    }
+
+    /// <summary>
+    /// <para>WhatsApp sohbetteki videoyu kendi dusuk bit hizli kodlayicisiyla yeniden
+    /// kodluyor; "belge olarak gonder" yolu bunu atliyor. Ipucu, WhatsApp hedefli cikti
+    /// uretildiginde sonuc cumlesinin (<c>TxtResult</c>) arkasina ekleniyor.</para>
+    ///
+    /// <para>Olcu <c>HizKareKbitVeCrfBirimleriDilDosyasindanGelir</c>'in desenini kullanir:
+    /// dil dosyasinin kopyasinda cumle baskasiyla degistirilir ve ekrana <b>o</b> cumlenin
+    /// dustugu gorulur. Metin koda sabitlenirse eski cumle gelir ve olcu kirmizi doner.
+    /// Negatif kol da tutuluyor: WhatsApp hedefi olmayan bir boyutta ipucu hic cikmaz,
+    /// yoksa kosul dalini silen mutasyon sessizce gecerdi.</para>
+    ///
+    /// <para><c>Strings.Use("en")</c> pencere kuruldu<b>ktan sonra</b> bir kez daha
+    /// cagriliyor: <c>MainWindow</c>'un kurucusu kayitli arayuz dilini geri yukluyor ve
+    /// <c>Read</c>'in bastaki secimini eziyor. Bu olcu tek basina kosuldugunda Turkce
+    /// cumleyi okuyup kirmizi donuyordu; sinif filtresi icinde onceki testler dili
+    /// birakmis oldugu icin yesil gorunuyordu.</para>
+    /// </summary>
+    [Fact]
+    public void WhatsAppBelgeIpucuDilDosyasindanGelir()
+    {
+        var kopya = Kopya("s-whatsapp-belge", new Dictionary<string, string>
+        {
+            ["\"main.run.whatsapp-document\": \"Send this on WhatsApp as a document"] =
+                "\"main.run.whatsapp-document\": \"Belge kolundan gonder"
+        });
+
+        (string Onalti, string Yuz) okunan;
+        AppHost.Run(() => Strings.UseRoot(kopya));
+        try
+        {
+            okunan = Read("en", window =>
+            {
+                Strings.Use("en");
+                return (window.WhatsAppDocumentHintForTest(16),
+                    window.WhatsAppDocumentHintForTest(100));
+            });
+        }
+        finally
+        {
+            AppHost.Run(() => Strings.UseRoot(null));
+        }
+
+        var dizin = Path.Combine(GirdiKanit.Root, ".calisma", "s-whatsapp-belge");
+        Directory.CreateDirectory(dizin);
+        File.WriteAllText(Path.Combine(dizin, "okunan.txt"), $"16 MB: [{okunan.Onalti}]{Environment.NewLine}100 MB: [{okunan.Yuz}]");
+
+        Assert.StartsWith(" Belge kolundan gonder", okunan.Onalti, StringComparison.Ordinal);
+        Assert.DoesNotContain("Send this on WhatsApp", okunan.Onalti, StringComparison.Ordinal);
+        Assert.Equal("", okunan.Yuz);
+    }
+
+    /// <summary>
+    /// <para>Kucultme seridi artik <c>AV1</c> diyor ve AV1 eski cihazlarda cozulmez; secimin
+    /// bedelini soyleyen bir yer yoktu. Donusum sekmesinin kodek ipucu bu bilgiyi 42 dilde
+    /// zaten tasiyordu, <c>main.codec.tip</c> onun H.264 ve AV1 maddelerinden uretildi.</para>
+    ///
+    /// <para>Olcu ipucunun <b>varligini</b> degil kaynagini tutuyor: dil agacinin kopyasinda
+    /// <c>en</c> degeri degistirilip <c>Strings.UseRoot</c> ile enjekte ediliyor, ekrandaki
+    /// balon o degeri gostermezse kirmizi doner. Metin koda sabitlenirse olcu duser.</para>
+    /// </summary>
+    [Fact]
+    public void KodekSeridiIpucuDilDosyasindanGelir()
+    {
+        var kopya = Kopya("s-kodek-ipucu", new Dictionary<string, string>
+        {
+            ["\"main.codec.tip\": \"• H.264"] = "\"main.codec.tip\": \"• Balon kolundan H.264"
+        });
+
+        string okunan;
+        AppHost.Run(() => Strings.UseRoot(kopya));
+        try
+        {
+            okunan = Read("en", window =>
+            {
+                Strings.Use("en");
+                var satir = Named<Grid>(window, "CodecChoiceRow");
+                var balon = ToolTip.GetTip(satir) as StackPanel;
+                Assert.NotNull(balon);
+                var metin = balon!.Children.OfType<TextBlock>().First();
+                return string.Concat(metin.Inlines?.OfType<Run>().Select(kosu => kosu.Text) ?? Array.Empty<string?>());
+            });
+        }
+        finally
+        {
+            AppHost.Run(() => Strings.UseRoot(null));
+        }
+
+        var dizin = Path.Combine(GirdiKanit.Root, ".calisma", "s-kodek-ipucu");
+        Directory.CreateDirectory(dizin);
+        File.WriteAllText(Path.Combine(dizin, "okunan.txt"), okunan);
+
+        Assert.Contains("Balon kolundan H.264", okunan, StringComparison.Ordinal);
+        Assert.Contains("AV1", okunan, StringComparison.Ordinal);
+    }
 }
 
 /// <summary>
@@ -815,6 +976,22 @@ public sealed class BaslikKapsamiTests
     /// dokumde olculdu) ve dusen <c>pt main.player.menu.settings-all</c> bir kol goturur:
     /// 1480 + 2 - 1 = 1481. Diller 43, dil dosyasi klasoru 42: <c>zh-Hans</c> ve <c>zh_Hans</c>
     /// ayni dosyayi iki adla gezer.</para>
+    /// <para>Metin duzeltmeleri dali (<c>t0/metin-duzeltmeleri</c>) tek anahtar ekledi:
+    /// <c>main.run.whatsapp-document</c>, WhatsApp hedefli cikti bitince sonuc cumlesinin
+    /// arkasina eklenen "belge olarak gonder" ipucu. 42 dil dosyasinin hepsine girdi,
+    /// dusen anahtar yok: 43 x 501 = 21543 degil, bu testin saydigi <b>butun</b> katalog
+    /// kalemleri 38700 + 43 x 1 = 38743. Ayni dal <c>main.codec.smallest</c>'in
+    /// <c>H.265</c> yazan govdesini <c>AV1</c>'e cevirdi; anahtar sayisini degistirmedi ve
+    /// <c>AV1</c> zaten <c>LanguageCatalog.Names</c>'de bildirildigi icin <c>kayip</c> 0
+    /// kaldi. Kol degistiren toplam da degismedi (1481, en 170, tr 61): eklenen cumleler
+    /// nokta tasidigi icin eski kurala gore zaten govde sayiliyor.</para>
+    /// <para>Ayni dalin denetim borclari <b>ikinci</b> anahtari ekledi:
+    /// <c>main.codec.tip</c>, kucultme seridine asilan uyumluluk balonu. Metni uydurulmadi,
+    /// 42 dilde <c>main.convert.video-codec.tip</c>'in H.264 ve AV1 maddelerinden kesildi.
+    /// Yine 42 dosyanin hepsine girdi, dusen yok: 38743 + 43 x 1 = 38786. Ayni borc
+    /// <c>main.advice.codec-upgrade</c>'in iki <c>H.265</c> gecisini <c>AV1</c>'e cevirdi —
+    /// anahtar sayisini degistirmez, <c>kayip</c> 0 kalir, kol degistiren toplam 1481 /
+    /// en 170 / tr 61 yerinde durur.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -842,8 +1019,61 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(38700, gezilen);
+        Assert.Equal(38786, gezilen);
         Assert.Empty(kayip);
+    }
+
+    /// <summary>
+    /// <para>Kodek adi bir metinde gecerken kapali listeyle aranmaz; bicimden cikarilir:
+    /// <c>H.264</c>/<c>H.265</c> gibi <c>H.</c> + uc rakam, <c>AV1</c>/<c>VP9</c> gibi iki
+    /// harf + rakam. Boylece yarin eklenen bir kodek listeyi guncellemeyi unuttugumuz icin
+    /// sessizce gozden kacmaz.</para>
+    ///
+    /// <para>Olcunun kurali: <c>main.advice.codec-upgrade</c> tavsiyesi kullaniciyi kodek
+    /// seridinde bir secenege yolluyor, dolayisiyla andigi her kodek adi seridin uc
+    /// etiketinden birinde gecmek zorunda. Tavsiye 42 dilde yillarca <c>H.265</c> diyordu;
+    /// serit <c>AV1</c>'e cekilince tavsiye var olmayan bir secenegi gosterir oldu. Her dil
+    /// ayri gezilir, adsiz kalan dil de kirmizi doner.</para>
+    /// </summary>
+    [Fact]
+    public void TavsiyeninGosterdigiKodekSeritteBulunur()
+    {
+        var desen = new Regex(@"H\.\d{3}|[A-Z]{2}\d", RegexOptions.CultureInvariant);
+        var etiketAnahtarlari = new[] { "main.codec.automatic", "main.codec.compatible", "main.codec.smallest" };
+
+        var eksik = new List<string>();
+        var gezilen = 0;
+
+        foreach (var dil in Strings.Languages.OrderBy(d => d, StringComparer.Ordinal))
+        {
+            var seritte = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var anahtar in etiketAnahtarlari)
+                foreach (Match esleme in desen.Matches(Strings.GetIn(dil, anahtar)))
+                    seritte.Add(esleme.Value);
+
+            var tavsiyede = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (Match esleme in desen.Matches(Strings.GetIn(dil, "main.advice.codec-upgrade")))
+                tavsiyede.Add(esleme.Value);
+
+            gezilen++;
+            _cikti.WriteLine($"SERIT\t{dil}\t{string.Join(",", seritte)}\ttavsiye\t{string.Join(",", tavsiyede)}");
+
+            if (tavsiyede.Count == 0)
+            {
+                eksik.Add($"{dil}\ttavsiye hicbir kodek adi anmiyor");
+                continue;
+            }
+
+            foreach (var ad in tavsiyede)
+                if (!seritte.Contains(ad))
+                    eksik.Add($"{dil}\t{ad}\tseritte yok: {string.Join(",", seritte)}");
+        }
+
+        foreach (var satir in eksik) _cikti.WriteLine("EKSIK\t" + satir);
+        _cikti.WriteLine($"SAYIM\tdil\t{gezilen}");
+
+        Assert.Equal(Strings.Languages.Count(), gezilen);
+        Assert.Empty(eksik);
     }
 
     [Fact]

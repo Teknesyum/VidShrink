@@ -1,4 +1,7 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("VidShrink.Tests")]
 
 namespace VidShrink.Core;
 
@@ -1396,7 +1399,7 @@ public static class PlanCalculator
         return (audioK, channels);
     }
 
-    private static string PreferredCodecFor(CodecPreference pref) => pref switch
+    internal static string PreferredCodecFor(CodecPreference pref) => pref switch
     {
         CodecPreference.MaxCompression => "libsvtav1",
         CodecPreference.Fast => "h264_nvenc",

@@ -112,7 +112,8 @@
   "main.codec.label": "圧縮アルゴリズム",
   "main.codec.automatic": "自動",
   "main.codec.compatible": "H.264(互換性)",
-  "main.codec.smallest": "H.265(最小)",
+  "main.codec.smallest": "AV1(最小)",
+  "main.codec.tip": "• H.264はほぼすべての機器で再生でき、WhatsAppが期待する形式です。確実に動く必要があるならこれを選んでください。\n• AV1は最も高圧縮ですがエンコードが最も遅く、デコードできるのは最近のスマートフォンだけです。",
 
   "main.allow.resolution": "解像度の低下を許可",
   "main.whatsapp-compatible": "WhatsApp対応(H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "トリミングして保存",
   "main.run.accepted-larger": "より大きいまま許可: 目標 {1} MB を {0} MB 超過。",
   "main.run.trimmed": "目標に収めるため {0} 秒トリミングされました。長さ {1} → {2}。",
+  "main.run.whatsapp-document": "WhatsApp には動画ではなくドキュメントとして送ってください。チャットでの再エンコードを回避でき、相手にはこの画質がそのまま届きます。",
 
   "main.run.no-space": "出力先ドライブの空き容量が不足しています。少なくとも{0} MBが必要です。",
   "main.run.done": "{0}回の試行で完了。{1} MB → {2} MB({3}%削減)。",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "ソースが暗い（平均輝度 {0}）ため、{1}では暗部にバンディングが出ます。自動はターボ初回パス付きの{2}を使います",
 
   "main.advice.budget-generous": "このソースに対して目標は余裕があるため、エンジンは無理なく達成します。",
-  "main.advice.codec-upgrade": "この圧力ではH.265が同じサイズで目に見えて良い結果を出します。圧縮アルゴリズムを自動またはH.265に切り替えることを検討してください。",
+  "main.advice.codec-upgrade": "この圧力ではAV1が同じサイズで目に見えて良い結果を出します。圧縮アルゴリズムを自動またはAV1に切り替えることを検討してください。",
   "main.advice.hardware-costs-quality": "ハードウェアエンコーダーは高速ですが、これほど厳しい目標ではメガバイトあたりの品質が目立って落ちます。高速圧縮(GPU)をオフにした方が見栄えは良くなります。",
   "main.advice.extreme-ratio": "極端な圧縮: 損失は避けられないため、エンジンは最も目立たない場所に押し込みます。",
   "main.advice.below-codec-floor": "この目標はこのソースには本当に小さすぎます。エンコーダーが意味のある映像に必要とするピクセルあたりのビット数に、どのレイアウトも届きません。最も密なレイアウトを採用しましたが、結果は目に見えて崩れます。目標を上げることが唯一の本当の解決策です。",

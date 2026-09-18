@@ -112,7 +112,8 @@
   "main.codec.label": "Komprimeringsalgoritm",
   "main.codec.automatic": "Automatisk",
   "main.codec.compatible": "H.264 (kompatibel)",
-  "main.codec.smallest": "H.265 (minst)",
+  "main.codec.smallest": "AV1 (minst)",
+  "main.codec.tip": "• H.264 spelas på nästan alla enheter och är vad WhatsApp förväntar sig; välj det när filen bara måste fungera.\n• AV1 komprimerar bäst och kodar långsammast, och bara nya telefoner avkodar det.",
 
   "main.allow.resolution": "Får sänka upplösning",
   "main.whatsapp-compatible": "WhatsApp-kompatibel (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Beskär och spara",
   "main.run.accepted-larger": "Accepterade större: {0} MB över målet på {1} MB.",
   "main.run.trimmed": "{0} s beskars för att passa målet; längd {1} → {2}.",
+  "main.run.whatsapp-document": "Skicka den till WhatsApp som ett dokument, inte som en video: då hoppas omkodningen i chatten över och mottagaren ser den här kvaliteten oförändrad.",
 
   "main.run.no-space": "Inte tillräckligt ledigt utrymme på målenheten; minst {0} MB behövs.",
   "main.run.done": "Klart på {0} försök. {1} MB → {2} MB ({3}% mindre).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "källan är mörk (genomsnittlig luminans {0}); {1} ger banding i skuggorna, så Automatiskt använder {2} med turbo första pass",
 
   "main.advice.budget-generous": "Målet är generöst för den här källan, så motorn når det utan ansträngning.",
-  "main.advice.codec-upgrade": "Vid det här trycket ger H.265 ett synbart bättre resultat vid samma storlek; överväg att sätta komprimeringsalgoritmen till automatisk eller H.265.",
+  "main.advice.codec-upgrade": "Vid det här trycket ger AV1 ett synbart bättre resultat vid samma storlek; överväg att sätta komprimeringsalgoritmen till automatisk eller AV1.",
   "main.advice.hardware-costs-quality": "Hårdvarukodaren är snabb men förlorar märkbar kvalitet per megabyte vid ett så stramt mål; resultatet blir bättre med snabb krympning (GPU) avstängd.",
   "main.advice.extreme-ratio": "Extrem komprimering: förlust är oundviklig, så motorn lägger den där den märks minst.",
   "main.advice.below-codec-floor": "Målet är verkligen för litet för den här källan: ingen layout når de bitar per pixel kodaren behöver för en meningsfull bild. Den tätaste layouten valdes, men resultatet kommer att se synbart trasigt ut; att höja målet är den enda riktiga lösningen.",

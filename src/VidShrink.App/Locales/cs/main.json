@@ -112,7 +112,8 @@
   "main.codec.label": "Kompresní algoritmus",
   "main.codec.automatic": "Automaticky",
   "main.codec.compatible": "H.264 (kompatibilní)",
-  "main.codec.smallest": "H.265 (nejmenší)",
+  "main.codec.smallest": "AV1 (nejmenší)",
+  "main.codec.tip": "• H.264 se přehraje téměř na každém zařízení a je to, co WhatsApp očekává; vyberte ho, když soubor musí prostě fungovat.\n• AV1 komprimuje nejlépe a kóduje nejpomaleji a dekódují ho jen nedávné telefony.",
 
   "main.allow.resolution": "Smí snížit rozlišení",
   "main.whatsapp-compatible": "Kompatibilní s WhatsApp (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Oříznout a uložit",
   "main.run.accepted-larger": "Přijato větší: {0} MB nad cílem {1} MB.",
   "main.run.trimmed": "{0} s bylo oříznuto, aby se vešlo do cíle; délka {1} → {2}.",
+  "main.run.whatsapp-document": "Odešlete to na WhatsApp jako dokument, ne jako video: tím se obejde překódování v chatu a druhá strana uvidí tuto kvalitu beze změny.",
 
   "main.run.no-space": "Na cílovém disku není dost volného místa; je potřeba nejméně {0} MB.",
   "main.run.done": "Hotovo za {0} pokus(ů). {1} MB → {2} MB (o {3} % menší).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "zdroj je tmavý (průměrný jas {0}); {1} ve stínech vytváří pruhy, proto Automaticky použije {2} s turbo prvním průchodem",
 
   "main.advice.budget-generous": "Cíl je pro tento zdroj štědrý, motor ho tedy splní bez námahy.",
-  "main.advice.codec-upgrade": "Při tomto tlaku dává H.265 při stejné velikosti viditelně lepší výsledek; zvažte přepnutí kompresního algoritmu na automatiku nebo H.265.",
+  "main.advice.codec-upgrade": "Při tomto tlaku dává AV1 při stejné velikosti viditelně lepší výsledek; zvažte přepnutí kompresního algoritmu na automatiku nebo AV1.",
   "main.advice.hardware-costs-quality": "Hardwarový enkodér je rychlý, ale při tak těsném cíli ztrácí znatelnou kvalitu na megabajt; výsledek vypadá lépe s vypnutým rychlým zmenšením (GPU).",
   "main.advice.extreme-ratio": "Extrémní komprese: ztráta je nevyhnutelná, motor ji tedy tlačí tam, kde je nejméně znát.",
   "main.advice.below-codec-floor": "Tento cíl je pro tento zdroj opravdu příliš malý: žádné rozvržení nedosáhne bitů na pixel, které enkodér potřebuje pro smysluplný obraz. Bylo vzato nejhustší rozvržení, ale výsledek bude viditelně rozbitý; jedinou skutečnou nápravou je zvýšit cíl.",

@@ -112,7 +112,8 @@
   "main.codec.label": "Algoritma kompresi",
   "main.codec.automatic": "Otomatis",
   "main.codec.compatible": "H.264 (kompatibel)",
-  "main.codec.smallest": "H.265 (terkecil)",
+  "main.codec.smallest": "AV1 (terkecil)",
+  "main.codec.tip": "• H.264 diputar di hampir semua perangkat dan yang diharapkan WhatsApp; pilih saat berkas harus langsung berfungsi.\n• AV1 kompresi terbaik dan encode paling lambat, dan hanya ponsel terbaru yang mendekodenya.",
 
   "main.allow.resolution": "Boleh menurunkan resolusi",
   "main.whatsapp-compatible": "Kompatibel dengan WhatsApp (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Potong dan simpan",
   "main.run.accepted-larger": "Diterima lebih besar: {0} MB di atas target {1} MB.",
   "main.run.trimmed": "{0} dtk dipotong agar sesuai target; durasi {1} → {2}.",
+  "main.run.whatsapp-document": "Kirim ke WhatsApp sebagai dokumen, bukan sebagai video: cara ini melewati pengodean ulang di obrolan, sehingga pihak lain melihat kualitas ini apa adanya.",
 
   "main.run.no-space": "Ruang kosong di drive tujuan tidak cukup; setidaknya perlu {0} MB.",
   "main.run.done": "Selesai dalam {0} percobaan. {1} MB → {2} MB ({3}% lebih kecil).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "sumbernya gelap (luma rata-rata {0}); {1} membuat banding di bayangan, jadi Otomatis memakai {2} dengan lintasan pertama turbo",
 
   "main.advice.budget-generous": "Target longgar untuk sumber ini, jadi mesin memenuhinya tanpa kesulitan.",
-  "main.advice.codec-upgrade": "Pada tekanan ini H.265 memberi hasil tampak lebih baik pada ukuran yang sama; pertimbangkan mengubah algoritma kompresi ke otomatis atau H.265.",
+  "main.advice.codec-upgrade": "Pada tekanan ini AV1 memberi hasil tampak lebih baik pada ukuran yang sama; pertimbangkan mengubah algoritma kompresi ke otomatis atau AV1.",
   "main.advice.hardware-costs-quality": "Encoder perangkat keras cepat tetapi kehilangan kualitas yang terasa per megabyte pada target seketat ini; hasil lebih baik dengan perkecil cepat (GPU) dimatikan.",
   "main.advice.extreme-ratio": "Kompresi ekstrem: kehilangan tak terhindarkan, jadi mesin menempatkannya di tempat paling tidak terlihat.",
   "main.advice.below-codec-floor": "Target ini benar-benar terlalu kecil untuk sumber ini: tidak ada tata letak yang mencapai bit per piksel yang dibutuhkan encoder untuk gambar yang berarti. Tata letak terpadat diambil, tetapi hasilnya akan tampak rusak; menaikkan target satu-satunya solusi nyata.",

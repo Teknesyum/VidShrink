@@ -112,7 +112,8 @@
   "main.codec.label": "压缩算法",
   "main.codec.automatic": "自动",
   "main.codec.compatible": "H.264（兼容）",
-  "main.codec.smallest": "H.265（最小）",
+  "main.codec.smallest": "AV1（最小）",
+  "main.codec.tip": "• H.264 几乎能在所有设备上播放，也是 WhatsApp 所期望的；要保证文件能用就选它。\n• AV1 压缩效果最好，编码最慢，只有较新的手机能解码。",
 
   "main.allow.resolution": "允许降低分辨率",
   "main.whatsapp-compatible": "兼容 WhatsApp (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "裁剪并保存",
   "main.run.accepted-larger": "已接受更大的文件：超出 {1} MB 目标 {0} MB。",
   "main.run.trimmed": "已裁剪 {0} 秒以适配目标；时长 {1} → {2}。",
+  "main.run.whatsapp-document": "在 WhatsApp 中请以文件形式发送，而不是以视频形式：这样可以跳过聊天中的重新编码，对方看到的就是这里的画质。",
 
   "main.run.no-space": "目标驱动器可用空间不足；至少需要 {0} MB。",
   "main.run.done": "经 {0} 次尝试完成。{1} MB → {2} MB（缩小 {3}%）。",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "源视频较暗（平均亮度 {0}），{1} 会在暗部产生色带，因此自动模式使用带涡轮首遍的 {2}",
 
   "main.advice.budget-generous": "对此源来说目标很宽裕，引擎可以轻松达到。",
-  "main.advice.codec-upgrade": "在此压力下，H.265 在相同大小下效果明显更好；请考虑将压缩算法切换为自动或 H.265。",
+  "main.advice.codec-upgrade": "在此压力下，AV1 在相同大小下效果明显更好；请考虑将压缩算法切换为自动或 AV1。",
   "main.advice.hardware-costs-quality": "硬件编码器速度快，但在如此紧的目标下每兆字节损失明显；关闭快速压缩 (GPU) 后效果更好。",
   "main.advice.extreme-ratio": "极端压缩：损失不可避免，引擎会把它放在最不易察觉的地方。",
   "main.advice.below-codec-floor": "此目标对此源确实太小：没有任何布局能达到编码器呈现有意义画面所需的每像素码率。已采用最密集的布局，但结果会明显破损；提高目标是唯一真正的解决办法。",

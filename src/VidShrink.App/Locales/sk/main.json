@@ -112,7 +112,8 @@
   "main.codec.label": "Kompresný algoritmus",
   "main.codec.automatic": "Automaticky",
   "main.codec.compatible": "H.264 (kompatibilný)",
-  "main.codec.smallest": "H.265 (najmenší)",
+  "main.codec.smallest": "AV1 (najmenší)",
+  "main.codec.tip": "• H.264 hrá takmer na každom zariadení a očakáva ho WhatsApp; vyberte ho, keď súbor musí jednoducho fungovať.\n• AV1 komprimuje najlepšie a kóduje najpomalšie, dekódujú ho len nedávne telefóny.",
 
   "main.allow.resolution": "Smie znížiť rozlíšenie",
   "main.whatsapp-compatible": "Kompatibilné s WhatsApp (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Orezať a uložiť",
   "main.run.accepted-larger": "Prijaté väčšie: {0} MB nad cieľom {1} MB.",
   "main.run.trimmed": "{0} s bolo orezaných, aby sa zmestilo do cieľa; dĺžka {1} → {2}.",
+  "main.run.whatsapp-document": "Pošlite to cez WhatsApp ako dokument, nie ako video: obíde sa tým prekódovanie v chate a druhá strana uvidí túto kvalitu nezmenenú.",
 
   "main.run.no-space": "Na cieľovom disku nie je dosť voľného miesta; treba aspoň {0} MB.",
   "main.run.done": "Hotovo za {0} pokus(ov). {1} MB → {2} MB (o {3} % menší).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "zdroj je tmavý (priemerný jas {0}); {1} v tieňoch vytvára pruhy, preto Automaticky použije {2} s turbo prvým prechodom",
 
   "main.advice.budget-generous": "Cieľ je pre tento zdroj veľkorysý, takže motor ho splní bez námahy.",
-  "main.advice.codec-upgrade": "Pri tomto tlaku dáva H.265 viditeľne lepší výsledok pri rovnakej veľkosti; zvážte prepnutie kompresného algoritmu na automatiku alebo H.265.",
+  "main.advice.codec-upgrade": "Pri tomto tlaku dáva AV1 viditeľne lepší výsledok pri rovnakej veľkosti; zvážte prepnutie kompresného algoritmu na automatiku alebo AV1.",
   "main.advice.hardware-costs-quality": "Hardvérový enkodér je rýchly, ale pri takto tesnom cieli stráca citeľnú kvalitu na megabajt; výsledok vyzerá lepšie s vypnutým rýchlym zmenšením (GPU).",
   "main.advice.extreme-ratio": "Extrémna kompresia: strata je nevyhnutná, takže motor ju tlačí tam, kde je najmenej viditeľná.",
   "main.advice.below-codec-floor": "Tento cieľ je pre tento zdroj naozaj príliš malý: žiadne rozloženie nedosiahne bity na pixel, ktoré enkodér potrebuje na zmysluplný obraz. Vzalo sa najhustejšie rozloženie, ale výsledok bude viditeľne rozbitý; jediná skutočná náprava je zvýšiť cieľ.",

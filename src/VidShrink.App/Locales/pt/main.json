@@ -112,7 +112,8 @@
   "main.codec.label": "Algoritmo de compressão",
   "main.codec.automatic": "Automático",
   "main.codec.compatible": "H.264 (compatível)",
-  "main.codec.smallest": "H.265 (menor)",
+  "main.codec.smallest": "AV1 (menor)",
+  "main.codec.tip": "• H.264 toca em quase todo dispositivo e é o que o WhatsApp espera; escolha-o quando o arquivo simplesmente precisa funcionar.\n• AV1 comprime melhor e é o mais lento para codificar, e só celulares recentes o decodificam.",
 
   "main.allow.resolution": "Pode reduzir a resolução",
   "main.whatsapp-compatible": "Compatível com WhatsApp (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Cortar e salvar",
   "main.run.accepted-larger": "Aceito maior: {0} MB acima da meta de {1} MB.",
   "main.run.trimmed": "{0} s foram cortados para caber na meta; duração {1} → {2}.",
+  "main.run.whatsapp-document": "Envie para o WhatsApp como documento, não como vídeo: isso ignora a recodificação da conversa e a outra parte vê esta qualidade tal como está.",
 
   "main.run.no-space": "Espaço livre insuficiente na unidade de destino; são necessários pelo menos {0} MB.",
   "main.run.done": "Concluído em {0} tentativa(s). {1} MB → {2} MB ({3}% menor).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "a origem é escura (luminância média {0}); {1} cria faixas nas sombras, então o Automático usa {2} com primeira passagem turbo",
 
   "main.advice.budget-generous": "O alvo é generoso para esta fonte, então o motor o atinge sem esforço.",
-  "main.advice.codec-upgrade": "Nesta pressão o H.265 dá um resultado visivelmente melhor no mesmo tamanho; considere mudar o algoritmo de compressão para automático ou H.265.",
+  "main.advice.codec-upgrade": "Nesta pressão o AV1 dá um resultado visivelmente melhor no mesmo tamanho; considere mudar o algoritmo de compressão para automático ou AV1.",
   "main.advice.hardware-costs-quality": "O codificador de hardware é rápido, mas perde qualidade perceptível por megabyte num alvo tão apertado; o resultado fica melhor com a redução rápida (GPU) desligada.",
   "main.advice.extreme-ratio": "Compressão extrema: a perda é inevitável, então o motor a empurra para onde é menos perceptível.",
   "main.advice.below-codec-floor": "Este alvo é realmente pequeno demais para esta fonte: nenhum layout alcança os bits por pixel que o codificador precisa para uma imagem significativa. O layout mais denso foi adotado, mas o resultado parecerá visivelmente quebrado; aumentar o alvo é a única solução real.",

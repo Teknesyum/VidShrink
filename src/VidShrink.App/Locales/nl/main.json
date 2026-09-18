@@ -112,7 +112,8 @@
   "main.codec.label": "Compressiealgoritme",
   "main.codec.automatic": "Automatisch",
   "main.codec.compatible": "H.264 (compatibel)",
-  "main.codec.smallest": "H.265 (kleinst)",
+  "main.codec.smallest": "AV1 (kleinst)",
+  "main.codec.tip": "• H.264 speelt op vrijwel elk apparaat en is wat WhatsApp verwacht; kies het als het bestand gewoon moet werken.\n• AV1 comprimeert het best en codeert het traagst, en alleen recente telefoons decoderen het.",
 
   "main.allow.resolution": "Mag resolutie verlagen",
   "main.whatsapp-compatible": "WhatsApp-compatibel (H.264)",
@@ -233,6 +234,7 @@
   "main.retry.trim.confirm": "Bijsnijden en opslaan",
   "main.run.accepted-larger": "Groter geaccepteerd: {0} MB boven het doel van {1} MB.",
   "main.run.trimmed": "{0} s is bijgesneden om binnen het doel te passen; lengte {1} → {2}.",
+  "main.run.whatsapp-document": "Stuur het op WhatsApp als document, niet als video: zo wordt het hercoderen in de chat overgeslagen en ziet de ander deze kwaliteit ongewijzigd.",
 
   "main.run.no-space": "Niet genoeg vrije ruimte op de doelschijf; er is minstens {0} MB nodig.",
   "main.run.done": "Klaar in {0} poging(en). {1} MB → {2} MB ({3}% kleiner).",
@@ -394,7 +396,7 @@
   "main.reason.dark-content-hevc": "de bron is donker (gemiddelde luminantie {0}); {1} geeft banding in de schaduwen, dus Automatisch gebruikt {2} met een turbo eerste pass",
 
   "main.advice.budget-generous": "Het doel is ruim voor deze bron, dus de motor haalt het zonder moeite.",
-  "main.advice.codec-upgrade": "Bij deze druk geeft H.265 een zichtbaar beter resultaat bij dezelfde grootte; overweeg het compressiealgoritme op automatisch of H.265 te zetten.",
+  "main.advice.codec-upgrade": "Bij deze druk geeft AV1 een zichtbaar beter resultaat bij dezelfde grootte; overweeg het compressiealgoritme op automatisch of AV1 te zetten.",
   "main.advice.hardware-costs-quality": "De hardware-encoder is snel maar verliest bij zo'n krap doel merkbaar kwaliteit per megabyte; het resultaat ziet er beter uit met snel verkleinen (GPU) uit.",
   "main.advice.extreme-ratio": "Extreme compressie: verlies is onvermijdelijk, dus de motor legt het waar het het minst opvalt.",
   "main.advice.below-codec-floor": "Dit doel is echt te klein voor deze bron: geen enkele indeling haalt de bits per pixel die de encoder nodig heeft voor een zinvol beeld. De dichtste indeling is gekozen, maar het resultaat zal zichtbaar kapot ogen; het doel verhogen is de enige echte oplossing.",
