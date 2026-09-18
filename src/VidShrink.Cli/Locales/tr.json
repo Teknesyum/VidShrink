@@ -59,6 +59,8 @@
   "watch.failed": "Başarısız, not edildi: {0}: {1}. Sonraki başlatmada bir kez daha denenir.",
   "watch.stopped": "İzleme durdu; durum dosyası kaydedildi.",
   "watch.skipped": "Atlandı, bu izlemenin çıktısı: {0}",
+  "watch.collided": "Atlandı: {0} — {1} ile ad çakışıyor (harf farkı). Birini yeniden adlandırın.",
+  "watch.collided.summary": "{0} dosya ad çakışması yüzünden atlandı.",
   "watch.changed": "Dosya küçültülürken değişti; çıktı silindi, yeniden denenecek: {0}",
   "watch.state-elsewhere": "İzlenen klasöre yazılamıyor; durum dosyası {0}",
   "watch.state-not-saved": "Durum dosyası yazılamadı: {0}: {1}. İzleme sürüyor."

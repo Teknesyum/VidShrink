@@ -50,7 +50,7 @@ public sealed record WatchStateLocation(string Path, bool Writable, WatchStateLo
 
 public sealed record WatchOutcome(int ExitCode, bool Success, string? Output, string? Error);
 
-public enum WatchEventKind { Waiting, Processing, Done, Failed, Skipped, Changed, StateNotSaved, Stopped }
+public enum WatchEventKind { Waiting, Processing, Done, Failed, Skipped, Changed, StateNotSaved, Stopped, Collided }
 
 public sealed record WatchEvent(WatchEventKind Kind, string Path, string? Detail = null);
 
@@ -87,6 +87,7 @@ public sealed class WatchFolder
     private readonly Dictionary<string, Observation> _pending = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _retryable = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _skipLogged = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _collisionLogged = new(StringComparer.Ordinal);
 
     public WatchFolder(WatchOptions options, IWatchFileSystem fs, IWatchClock clock, WatchState? state = null)
     {
@@ -101,6 +102,12 @@ public sealed class WatchFolder
     public WatchState State { get; private set; }
     public string StatePath => Options.StatePath ?? Path.Combine(Options.WatchDirectory, StateFileName);
     public int FailedCount { get; private set; }
+
+    /// <summary>
+    /// Harf farkıyla aynı ada inip atlanan dosya sayısı. Koşu bitti ama eksik bitti:
+    /// <c>--bir-kez</c> bu sayı sıfır değilse kısmi çıkışla döner.
+    /// </summary>
+    public int CollidedCount => _collisionLogged.Count;
 
     public static StringComparison ComparisonFor(bool windows, bool mac)
         => windows || mac ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
@@ -201,14 +208,37 @@ public sealed class WatchFolder
         return State.Processed.Any(e => e.Output is { } output && string.Equals(output, name, PathComparison));
     }
 
+    /// <summary>
+    /// Harf farkı çarpışması (<c>docs/netlestirme/021-izle-harf-carpismasi.md</c>). Dosya
+    /// adının kıyaslandığı her yer harfi yok saydığı için, harf duyarlı bir dosya
+    /// sisteminde <c>Klip.mp4</c> ile <c>klip.mp4</c> tek satıra iniyordu: her tarama
+    /// öbürünün damgasını görüp kararlılık sayacını sıfırlıyor, bekleyenler tablosu hiç
+    /// boşalmıyor ve <c>--bir-kez</c> çıkmıyordu.
+    ///
+    /// <para>Kapı platforma değil taramaya bakıyor: aynı taramada aynı kanonik ada inen
+    /// ikinci girdi atlanıyor. Kazanan sıralı (ordinal) adı küçük olan — tarama ordinal
+    /// sıralı olduğu için her koşuda aynı dosya kazanıyor. Atlama bir kez duyuruluyor,
+    /// yoksa her tarama aynı satırı yazardı.</para>
+    /// </summary>
+    private bool Collides(string path, Dictionary<string, string> taken, Action<WatchEvent>? log)
+    {
+        var name = Path.GetFileName(path);
+        if (taken.TryAdd(name, path)) return false;
+        if (string.Equals(taken[name], path, StringComparison.Ordinal)) return false;
+        if (_collisionLogged.Add(path)) log?.Invoke(new WatchEvent(WatchEventKind.Collided, path, Path.GetFileName(taken[name])));
+        return true;
+    }
+
     public IReadOnlyList<string> Poll(Action<WatchEvent>? log = null)
     {
         var now = _clock.UtcNow;
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var ready = new List<string>();
-        foreach (var path in _fs.EnumerateFiles(Options.WatchDirectory).OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
+        var taken = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var path in _fs.EnumerateFiles(Options.WatchDirectory).OrderBy(p => p, StringComparer.Ordinal))
         {
             if (!IsCandidate(path)) continue;
+            if (Collides(path, taken, log)) continue;
             if (IsOwnOutput(path))
             {
                 if (_skipLogged.Add(path)) log?.Invoke(new WatchEvent(WatchEventKind.Skipped, path));

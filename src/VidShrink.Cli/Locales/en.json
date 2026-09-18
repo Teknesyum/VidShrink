@@ -59,6 +59,8 @@
   "watch.failed": "Failed and noted: {0}: {1}. It is tried once more on the next start.",
   "watch.stopped": "Watching stopped; the state file is saved.",
   "watch.skipped": "Skipped, it is an output of this watch: {0}",
+  "watch.collided": "Skipped: {0} — its name collides with {1} (letter case only). Rename one of them.",
+  "watch.collided.summary": "{0} file(s) skipped because of a name collision.",
   "watch.changed": "The file changed while it was shrunk; the output was removed and it will be tried again: {0}",
   "watch.state-elsewhere": "The watched folder is not writable; the state file is {0}",
   "watch.state-not-saved": "The state file could not be written: {0}: {1}. Watching goes on."

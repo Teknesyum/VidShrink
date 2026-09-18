@@ -100,6 +100,11 @@ ship as part of it.
 
 ### Fixed
 
+- `izle --bir-kez` exits on a case-variant pair. `Klip.mp4` and `klip.mp4` in one watched
+  folder used to reset each other's stability counter forever, so neither was shrunk and the
+  run never ended. The scan now settles the collision: the ordinally smallest name wins and is
+  shrunk, the others are skipped with one warning line each, and the run ends with exit code 4
+  plus a summary of how many files were skipped (`WatchFolder.cs`, `CliApp.cs`).
 - A killed recording stays playable: Matroska is written with `-flush_packets 1`
   (`RecorderArguments.cs:1029`).
 - A recording that ended normally is no longer reported as a start-up failure

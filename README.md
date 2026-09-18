@@ -208,17 +208,16 @@ pending, retry and skip tables, the scan order, and the record of what has been 
 So `Klip.mp4` and `klip.mp4` in one watched folder collide even where the filesystem keeps
 them apart as two separate files.
 
-What the collision costs depends on the two files. If their size and modification time
-match, one is taken and the other counts as already processed, so it is never shrunk. If
-they differ — the ordinary case — each scan resets the other's stability counter, the run
-never confirms either file, and neither is ever processed.
+A collision is resolved in the scan, not left to rot. Of the colliding names the ordinally
+smallest wins and is shrunk as usual; the others are skipped with one warning line each,
+`Skipped: klip.mp4 — its name collides with Klip.mp4 (letter case only). Rename one of
+them.`, written once per file and not repeated on later scans. The winner is the same on
+every scan, so the run is deterministic. Rename the skipped file and the watcher picks it
+up as a new file.
 
-In that second regime the pending table never empties, so `--bir-kez` does not exit and the
-run waits forever. A separate `--cikti` does not help: the collision is in the name tables,
-not on disk. Neither regime is measured; both are read from the code.
-
-Exit codes: `0` finished, `4` `--bir-kez` finished but at least one file failed, `1` error,
-`64` wrong usage, `130` stopped with Ctrl+C.
+Exit codes: `0` finished, `4` `--bir-kez` finished but at least one file failed or was
+skipped for a name collision, `1` error, `64` wrong usage, `130` stopped with Ctrl+C. After
+`--bir-kez` a summary line reports how many files were skipped.
 
 ## The Numbers
 

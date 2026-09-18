@@ -181,15 +181,18 @@ public static class CliApp
                 case WatchEventKind.Done: stderr.WriteLine(text.Format("watch.done", name, e.Detail is null ? "-" : Path.GetFileName(e.Detail))); break;
                 case WatchEventKind.Failed: stderr.WriteLine(text.Format("watch.failed", name, e.Detail)); break;
                 case WatchEventKind.Skipped: stderr.WriteLine(text.Format("watch.skipped", name)); break;
+                case WatchEventKind.Collided: stderr.WriteLine(text.Format("watch.collided", name, e.Detail)); break;
                 case WatchEventKind.Changed: stderr.WriteLine(text.Format("watch.changed", name)); break;
                 case WatchEventKind.StateNotSaved: stderr.WriteLine(text.Format("watch.state-not-saved", e.Path, e.Detail)); break;
                 case WatchEventKind.Stopped: stderr.WriteLine(text["watch.stopped"]); break;
             }
         }, ct);
 
+        if (watcher.CollidedCount > 0) stderr.WriteLine(text.Format("watch.collided.summary", watcher.CollidedCount));
+
         return result switch
         {
-            WatchRunResult.Finished => watcher.FailedCount > 0 ? ExitCodes.WatchFailures : ExitCodes.InBand,
+            WatchRunResult.Finished => watcher.FailedCount > 0 || watcher.CollidedCount > 0 ? ExitCodes.WatchFailures : ExitCodes.InBand,
             WatchRunResult.Cancelled => ExitCodes.Cancelled,
             _ => throw new ArgumentOutOfRangeException(nameof(result))
         };

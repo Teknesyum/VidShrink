@@ -307,10 +307,10 @@ public sealed class WatchFolderTests
         Assert.Contains("default APFS volume, which is case-insensitive but case-preserving", ingilizce, StringComparison.Ordinal);
         Assert.Contains("Every other use of a file's name ignores case **on every platform, Linux included**", ingilizce, StringComparison.Ordinal);
         Assert.Contains("`Klip.mp4` and `klip.mp4` in one watched folder collide even where the filesystem keeps them apart as two separate files.", ingilizce, StringComparison.Ordinal);
-        Assert.Contains("one is taken and the other counts as already processed, so it is never shrunk.", ingilizce, StringComparison.Ordinal);
-        Assert.Contains("each scan resets the other's stability counter, the run never confirms either file, and neither is ever processed.", ingilizce, StringComparison.Ordinal);
-        Assert.Contains("the pending table never empties, so `--bir-kez` does not exit", ingilizce, StringComparison.Ordinal);
-        Assert.Contains("Neither regime is measured; both are read from the code.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("the ordinally smallest wins and is shrunk as usual", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("written once per file and not repeated on later scans", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("Rename the skipped file and the watcher picks it up as a new file.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("or was skipped for a name collision", ingilizce, StringComparison.Ordinal);
 
         var turkce = Belge("README.tr.md");
         Assert.Contains("Koşan sistemin kuralına uyan tam iki kıyas var", turkce, StringComparison.Ordinal);
@@ -318,10 +318,10 @@ public sealed class WatchFolderTests
         Assert.Contains("o bölüm harf duyarsız ama harf koruyordur", turkce, StringComparison.Ordinal);
         Assert.Contains("**her platformda, Linux dahil** harfi yok sayıyor", turkce, StringComparison.Ordinal);
         Assert.Contains("dosya sistemi ikisini iki ayrı dosya olarak tutsa bile çakışıyor.", turkce, StringComparison.Ordinal);
-        Assert.Contains("biri alınıyor, öbürü işlenmiş sayılıyor ve hiç küçültülmüyor.", turkce, StringComparison.Ordinal);
-        Assert.Contains("her tarama öbürünün kararlılık sayacını sıfırlıyor", turkce, StringComparison.Ordinal);
-        Assert.Contains("bekleyenler tablosu hiç boşalmadığı için `--bir-kez` çıkmıyor", turkce, StringComparison.Ordinal);
-        Assert.Contains("İki kip de ölçülmedi; ikisi de kod okumasından.", turkce, StringComparison.Ordinal);
+        Assert.Contains("sıralı (ordinal) küçük olan kazanıyor", turkce, StringComparison.Ordinal);
+        Assert.Contains("Satır dosya başına bir kez yazılıyor, sonraki taramalarda tekrarlanmıyor.", turkce, StringComparison.Ordinal);
+        Assert.Contains("izleyici onu yeni dosya olarak görüp küçültüyor.", turkce, StringComparison.Ordinal);
+        Assert.Contains("ad çakışması yüzünden atlandığında `4`", turkce, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -342,13 +342,13 @@ public sealed class WatchFolderTests
         Assert.Contains($"`{ExitCodes.InBand}` in band, `{ExitCodes.UnderBand}` under the band", ingilizce, StringComparison.Ordinal);
         Assert.Contains($"`{ExitCodes.CeilingExceeded}` size ceiling exceeded", ingilizce, StringComparison.Ordinal);
         Assert.Contains($"`{ExitCodes.Error}` error, `{ExitCodes.Usage}` wrong usage, `{ExitCodes.Cancelled}` cancelled.", ingilizce, StringComparison.Ordinal);
-        Assert.Contains($"Exit codes: `{ExitCodes.InBand}` finished, `{ExitCodes.WatchFailures}` `--bir-kez` finished but at least one file failed, `{ExitCodes.Error}` error, `{ExitCodes.Usage}` wrong usage, `{ExitCodes.Cancelled}` stopped with Ctrl+C.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains($"Exit codes: `{ExitCodes.InBand}` finished, `{ExitCodes.WatchFailures}` `--bir-kez` finished but at least one file failed or was skipped for a name collision, `{ExitCodes.Error}` error, `{ExitCodes.Usage}` wrong usage, `{ExitCodes.Cancelled}` stopped with Ctrl+C.", ingilizce, StringComparison.Ordinal);
 
         var turkce = Belge("README.tr.md");
         Assert.Contains($"bantta `{ExitCodes.InBand}`, bandın altında `{ExitCodes.UnderBand}`", turkce, StringComparison.Ordinal);
         Assert.Contains($"boy tavanı aşıldığında `{ExitCodes.CeilingExceeded}`", turkce, StringComparison.Ordinal);
         Assert.Contains($"hatada `{ExitCodes.Error}`, yanlış kullanımda `{ExitCodes.Usage}`, iptalde `{ExitCodes.Cancelled}`.", turkce, StringComparison.Ordinal);
-        Assert.Contains($"Çıkış kodları: bittiğinde `{ExitCodes.InBand}`, `--bir-kez` bitip en az bir dosya başarısız olduğunda `{ExitCodes.WatchFailures}`, hatada `{ExitCodes.Error}`, yanlış kullanımda `{ExitCodes.Usage}`, Ctrl+C ile durdurulduğunda `{ExitCodes.Cancelled}`.", turkce, StringComparison.Ordinal);
+        Assert.Contains($"Çıkış kodları: bittiğinde `{ExitCodes.InBand}`, `--bir-kez` bitip en az bir dosya başarısız olduğunda ya da ad çakışması yüzünden atlandığında `{ExitCodes.WatchFailures}`, hatada `{ExitCodes.Error}`, yanlış kullanımda `{ExitCodes.Usage}`, Ctrl+C ile durdurulduğunda `{ExitCodes.Cancelled}`.", turkce, StringComparison.Ordinal);
     }
 
     /// <summary>

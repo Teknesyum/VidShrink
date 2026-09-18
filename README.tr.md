@@ -213,17 +213,16 @@ bekleyen, yeniden denenecek ve atlanan tabloları, tarama sırası ve işlenenle
 `Klip.mp4` ile `klip.mp4` aynı izlenen klasörde, dosya sistemi ikisini iki ayrı dosya
 olarak tutsa bile çakışıyor.
 
-Çakışmanın bedeli iki dosyaya bağlı. Boyları ve değişiklik saatleri aynıysa biri alınıyor,
-öbürü işlenmiş sayılıyor ve hiç küçültülmüyor. Farklıysa — olağan durum — her tarama
-öbürünün kararlılık sayacını sıfırlıyor, koşum ikisini de doğrulayamıyor ve hiçbiri
-işlenmiyor.
+Çakışma taramanın içinde çözülüyor. Çakışan adlardan sıralı (ordinal) küçük olan kazanıyor
+ve olağan akışta küçülüyor; öbürleri atlanıyor ve her biri için bir uyarı satırı yazılıyor:
+`Atlandı: klip.mp4 — Klip.mp4 ile ad çakışıyor (harf farkı). Birini yeniden adlandırın.`
+Satır dosya başına bir kez yazılıyor, sonraki taramalarda tekrarlanmıyor. Kazanan her
+taramada aynı, yani koşum belirlenimli. Atlanan dosyayı yeniden adlandırınca izleyici onu
+yeni dosya olarak görüp küçültüyor.
 
-Bu ikinci kipte bekleyenler tablosu hiç boşalmadığı için `--bir-kez` çıkmıyor, koşum
-sonsuza kadar bekliyor. Ayrı bir `--cikti` de kurtarmıyor: çakışma diskte değil, ad
-tablolarında. İki kip de ölçülmedi; ikisi de kod okumasından.
-
-Çıkış kodları: bittiğinde `0`, `--bir-kez` bitip en az bir dosya başarısız olduğunda `4`,
-hatada `1`, yanlış kullanımda `64`, Ctrl+C ile durdurulduğunda `130`.
+Çıkış kodları: bittiğinde `0`, `--bir-kez` bitip en az bir dosya başarısız olduğunda ya da
+ad çakışması yüzünden atlandığında `4`, hatada `1`, yanlış kullanımda `64`, Ctrl+C ile
+durdurulduğunda `130`. `--bir-kez` sonunda kaç dosyanın atlandığı bir özet satırında yazıyor.
 
 ## Sayılar
 
