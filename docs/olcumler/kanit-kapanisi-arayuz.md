@@ -160,3 +160,88 @@ t194 YOK
 Denetimin diğer maddeleri (yeşil filtrenin `KareYerlesimTests`'i kapsamaması, kırmızı kolun
 `Toplam: 1` ile alınmış olması, öbek başına tek `Kapat` yerine 12 kopya, plan–dosya adı
 sapması) `.claude/acik.md`'ye gerekçeleriyle yazıldı.
+
+## Yeniden Ölçüm — İki Kol da Geniş Filtreyle (18 Eylül 2026)
+
+Yukarıdaki iki kol dar filtreyle alınmıştı: yeşil 13 sınıfı kapsıyor ama `KareYerlesimTests`'i
+kapsamıyordu (239 test), kırmızı ise tek testle (`Toplam: 1`) koşulmuştu. Bu haliyle "yeşil
+koşum kendi bıraktığını siler, kırmızı kanıtını korur" iddiası aynı kümede sınanmış olmuyor.
+İki kol da aynı geniş filtreyle yeniden alındı.
+
+Filtre (14 sınıf; eskisinin 13'ü + `KareYerlesimTests`):
+
+```
+FullyQualifiedName~VidShrink.Tests.AltyaziIndirmeTests|FullyQualifiedName~VidShrink.Tests.AltyaziOturumTests|FullyQualifiedName~VidShrink.Tests.WindowLayoutTests|FullyQualifiedName~VidShrink.Tests.QualityTargetUiTests|FullyQualifiedName~VidShrink.Tests.QualityTargetTests|FullyQualifiedName~VidShrink.Tests.PerformanceCheckTests|FullyQualifiedName~VidShrink.Tests.PaletteApplyTests|FullyQualifiedName~VidShrink.Tests.UstSeritTikTests|FullyQualifiedName~VidShrink.Tests.MiniKipOlcusuTests|FullyQualifiedName~VidShrink.Tests.TestAyarYoluTests|FullyQualifiedName~VidShrink.Tests.BiciminTests|FullyQualifiedName~VidShrink.Tests.FiltreYoklamaTests|FullyQualifiedName~VidShrink.Tests.StreamMappingTests|FullyQualifiedName~VidShrink.Tests.KareYerlesimTests
+```
+
+Her kolun öncesinde 14 kanıt klasörü silindi; döküm `tools/kanit-dokumu-arayuz.sh` ile alındı.
+Koşum `VIDSHRINK_LIBMPV`'siz açılınca `TestAyarYoluTests` libmpv yokluğundan düşüyor (262/263) —
+kusur değil ortam eksiği, ölçü o haliyle atıldı ve motor verilerek tekrarlandı.
+
+### Yeşil kol
+
+```
+Başarılı!  - Başarısız:     0, Başarılı:   263, Atlanan:     0, Toplam:   263, Süre: 4 m 10 s
+EXITCODE=0
+
+--- klasor: .calisma/p28-altyazi -> YOK
+--- klasor: .calisma/s20 -> YOK
+--- klasor: .calisma/t61 -> YOK
+--- klasor: .calisma/t57 -> YOK
+--- klasor: .calisma/t63 -> YOK
+--- klasor: .calisma/t194 -> YOK
+--- klasor: .calisma/tema -> YOK
+--- klasor: .calisma/serit-tik -> YOK
+--- klasor: .calisma/mini-olcu -> YOK
+--- klasor: .calisma/ayar-yolu -> YOK
+--- klasor: .calisma/a1/filtre -> YOK
+--- klasor: .calisma/a1 -> YOK
+--- klasor: .calisma/hb-1c-test -> YOK
+--- klasor: .calisma/kodek-etiketi -> YOK
+```
+
+263 testin hiçbiri arkasında klasör bırakmadı. Eski yeşil kol 239 testti; aradaki 24 test
+`KareYerlesimTests` ve dalın kendi eklediği kodek etiketi ölçüleri.
+
+### Kırmızı kol (aynı filtre, aynı 263 test)
+
+Mutasyon: `MiniKipOlcusuTests.cs:51`, `Assert.True(belirtec - olculen < adim, ...)` →
+`Assert.True(belirtec - olculen < 0, ...)`. Koşumdan sonra **elle** geri yazıldı.
+
+```
+[xUnit.net 00:01:52.02]     VidShrink.Tests.MiniKipOlcusuTests.SayacGenisligiBelirtectenBuyukDegil [FAIL]
+  Hata İletisi:
+   belirtec olculenden bir SpaceMd'den fazla genis: 72 vs 71
+  Yığın İzleme:
+     at VidShrink.Tests.MiniKipOlcusuTests.SayacGenisligiBelirtectenBuyukDegil() in ...\MiniKipOlcusuTests.cs:line 51
+
+Başarısız! - Başarısız:     1, Başarılı:   262, Atlanan:     0, Toplam:   263, Süre: 3 m 51 s
+EXITCODE=1
+
+--- klasor: .calisma/p28-altyazi -> YOK
+--- klasor: .calisma/s20 -> YOK
+--- klasor: .calisma/t61 -> YOK
+--- klasor: .calisma/t57 -> YOK
+--- klasor: .calisma/t63 -> YOK
+--- klasor: .calisma/t194 -> YOK
+--- klasor: .calisma/tema -> YOK
+--- klasor: .calisma/serit-tik -> YOK
+--- klasor: .calisma/mini-olcu
+mini-olcu\sayac.txt
+--- klasor: .calisma/ayar-yolu -> YOK
+--- klasor: .calisma/a1/filtre -> YOK
+--- klasor: .calisma/a1 -> YOK
+--- klasor: .calisma/hb-1c-test -> YOK
+--- klasor: .calisma/kodek-etiketi -> YOK
+```
+
+```
+$ cat .calisma/mini-olcu/sayac.txt
+MonoValue "00:00:00" olculen=71
+RecorderMiniReadoutWidth=72
+SpaceMd=12
+```
+
+İki dökümün farkı tek satır: `mini-olcu\sayac.txt`. Düşen testin kanıtı duruyor, aynı koşumdaki
+262 testin kanıtı silinmiş, diğer 13 klasör iki kolda da yok. Kural artık aynı küme üstünde,
+iki kolda da ölçülmüş oldu.
