@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Korealainen",
   "player.subtitle.external": " (ulkoinen)",
   "player.subtitle.novideo": "Avaa video ennen tekstitysten lisäämistä",
-  "player.subtitle.loadfailed": "Tekstitystiedostoa ei voitu latata"
+  "player.subtitle.loadfailed": "Tekstitystiedostoa ei voitu latata",
+  "player.subtitle.download": "Lataa tekstitys…",
+  "player.subtitle.download.getkey": "Lataa tekstitys — hanki API-avain…",
+  "player.subtitle.download.working": "Etsitään tekstityksiä…",
+  "player.subtitle.download.done": "Tekstitys ladattu: {0}",
+  "player.subtitle.download.nokey": "Anna OpenSubtitles-API-avaimesi Asetuksissa",
+  "player.subtitle.download.badkey": "OpenSubtitles ei hyväksynyt API-avainta",
+  "player.subtitle.download.noresult": "Tälle videolle ei löytynyt tekstitystä",
+  "player.subtitle.download.quota": "Tekstitysten päivittäinen latauskiintiö on täynnä",
+  "player.subtitle.download.offline": "OpenSubtitlesiin ei saatu yhteyttä",
+  "player.subtitle.download.writefail": "Tekstitystä ei voitu tallentaa videon viereen",
+  "player.subtitle.download.toofast": "Liian monta pyyntöä OpenSubtitlesille — yritä uudelleen hetken kuluttua"
 }

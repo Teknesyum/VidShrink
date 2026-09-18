@@ -41,5 +41,8 @@
   "settings.default-app.open": "Alapértelmezett alkalmazások",
   "settings.default-app.dismiss": "Ne kérdezze újra",
   "settings.player-shortcuts.title": "Lejátszó gyorsbillentyűi",
-  "settings.player-shortcuts.hint": "A lejátszó lap, annak menüje és ez a lista mind ugyanazt a táblát olvassa."
+  "settings.player-shortcuts.hint": "A lejátszó lap, annak menüje és ez a lista mind ugyanazt a táblát olvassa.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API-kulcs",
+  "settings-tab.opensubtitles.get": "Kulcs beszerzése",
+  "settings-tab.opensubtitles.hint": "A lejátszóban a feliratletöltés a saját kulcsát használja. Hozzon létre egy ingyenes fiókot az opensubtitles.com oldalon, majd illessze be a kulcsot ide. Kulcs nélkül ez a funkció kikapcsolva marad."
 }

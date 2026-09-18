@@ -41,5 +41,8 @@
   "settings.default-app.open": "طے شدہ ایپس",
   "settings.default-app.dismiss": "دوبارہ نہ پوچھیں",
   "settings.player-shortcuts.title": "پلیئر شارٹ کٹس",
-  "settings.player-shortcuts.hint": "پلیئر ٹیب، اس کا مینو، اور یہ فہرست سب ایک ہی جدول سے پڑھتے ہیں۔"
+  "settings.player-shortcuts.hint": "پلیئر ٹیب، اس کا مینو، اور یہ فہرست سب ایک ہی جدول سے پڑھتے ہیں۔",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API کلید",
+  "settings-tab.opensubtitles.get": "کلید حاصل کریں",
+  "settings-tab.opensubtitles.hint": "پلیئر میں سب ٹائٹل ڈاؤن لوڈ آپ کی اپنی کلید استعمال کرتا ہے۔ opensubtitles.com پر ایک مفت اکاؤنٹ بنائیں، پھر کلید یہاں چسپاں کریں۔ کلید کے بغیر یہ خصوصیت بند رہتی ہے۔"
 }

@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Korea",
   "player.subtitle.external": " (luaran)",
   "player.subtitle.novideo": "Buka video sebelum menambah sarikata",
-  "player.subtitle.loadfailed": "Fail sarikata tidak dapat dimuatkan"
+  "player.subtitle.loadfailed": "Fail sarikata tidak dapat dimuatkan",
+  "player.subtitle.download": "Muat turun sari kata…",
+  "player.subtitle.download.getkey": "Muat turun sari kata — dapatkan kunci API…",
+  "player.subtitle.download.working": "Mencari sari kata…",
+  "player.subtitle.download.done": "Sari kata dimuat turun: {0}",
+  "player.subtitle.download.nokey": "Masukkan kunci API OpenSubtitles anda dalam Tetapan",
+  "player.subtitle.download.badkey": "OpenSubtitles tidak menerima kunci API",
+  "player.subtitle.download.noresult": "Tiada sari kata dijumpai untuk video ini",
+  "player.subtitle.download.quota": "Kuota muat turun sari kata harian sudah penuh",
+  "player.subtitle.download.offline": "OpenSubtitles tidak dapat dihubungi",
+  "player.subtitle.download.writefail": "Sari kata tidak dapat disimpan di sebelah video",
+  "player.subtitle.download.toofast": "Terlalu banyak permintaan ke OpenSubtitles — cuba lagi sebentar lagi"
 }

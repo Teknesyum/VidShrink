@@ -41,5 +41,8 @@
   "settings.default-app.open": "既定のアプリ",
   "settings.default-app.dismiss": "今後表示しない",
   "settings.player-shortcuts.title": "プレーヤーのショートカット",
-  "settings.player-shortcuts.hint": "プレーヤータブ、そのメニュー、このリストはすべて同じ表を参照します。"
+  "settings.player-shortcuts.hint": "プレーヤータブ、そのメニュー、このリストはすべて同じ表を参照します。",
+  "settings-tab.opensubtitles.label": "OpenSubtitles APIキー",
+  "settings-tab.opensubtitles.get": "キーを取得",
+  "settings-tab.opensubtitles.hint": "プレーヤーの字幕ダウンロードはご自身のキーを使用します。opensubtitles.comで無料のアカウントを作成し、キーをここに貼り付けてください。キーがない場合、この機能はオフのままです。"
 }

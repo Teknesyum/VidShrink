@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "কোরিয়ান",
   "player.subtitle.external": " (বাহ্যিক)",
   "player.subtitle.novideo": "সাবটাইটেল যুক্ত করার আগে একটি ভিডিও খুলুন",
-  "player.subtitle.loadfailed": "সাবটাইটেল ফাইল লোড করা যায়নি"
+  "player.subtitle.loadfailed": "সাবটাইটেল ফাইল লোড করা যায়নি",
+  "player.subtitle.download": "সাবটাইটেল ডাউনলোড করুন…",
+  "player.subtitle.download.getkey": "সাবটাইটেল ডাউনলোড করুন — একটি API কী নিন…",
+  "player.subtitle.download.working": "সাবটাইটেল খোঁজা হচ্ছে…",
+  "player.subtitle.download.done": "সাবটাইটেল ডাউনলোড হয়েছে: {0}",
+  "player.subtitle.download.nokey": "সেটিংসে আপনার OpenSubtitles API কী লিখুন",
+  "player.subtitle.download.badkey": "OpenSubtitles API কী গ্রহণ করেনি",
+  "player.subtitle.download.noresult": "এই ভিডিওর জন্য কোনো সাবটাইটেল পাওয়া যায়নি",
+  "player.subtitle.download.quota": "সাবটাইটেল ডাউনলোডের দৈনিক কোটা পূর্ণ হয়ে গেছে",
+  "player.subtitle.download.offline": "OpenSubtitles-এ পৌঁছানো যায়নি",
+  "player.subtitle.download.writefail": "সাবটাইটেলটি ভিডিওর পাশে সংরক্ষণ করা যায়নি",
+  "player.subtitle.download.toofast": "OpenSubtitles-এ অতিরিক্ত রিকোয়েস্ট পাঠানো হয়েছে — কিছুক্ষণ পর আবার চেষ্টা করুন"
 }

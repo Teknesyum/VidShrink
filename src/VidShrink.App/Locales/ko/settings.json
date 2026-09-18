@@ -41,5 +41,8 @@
   "settings.default-app.open": "기본 앱",
   "settings.default-app.dismiss": "다시 묻지 않기",
   "settings.player-shortcuts.title": "플레이어 단축키",
-  "settings.player-shortcuts.hint": "플레이어 탭, 메뉴, 이 목록은 모두 같은 표를 참조합니다."
+  "settings.player-shortcuts.hint": "플레이어 탭, 메뉴, 이 목록은 모두 같은 표를 참조합니다.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API 키",
+  "settings-tab.opensubtitles.get": "키 받기",
+  "settings-tab.opensubtitles.hint": "플레이어의 자막 다운로드는 사용자 본인의 키를 사용합니다. opensubtitles.com에서 무료 계정을 만든 다음 여기에 키를 붙여넣으세요. 키가 없으면 이 기능은 꺼진 상태로 유지됩니다."
 }

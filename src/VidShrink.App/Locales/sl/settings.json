@@ -41,5 +41,8 @@
   "settings.default-app.open": "Privzete aplikacije",
   "settings.default-app.dismiss": "Ne sprašuj več",
   "settings.player-shortcuts.title": "Bližnjice predvajalnika",
-  "settings.player-shortcuts.hint": "Zavihek predvajalnika, njegov meni in ta seznam berejo isto tabelo."
+  "settings.player-shortcuts.hint": "Zavihek predvajalnika, njegov meni in ta seznam berejo isto tabelo.",
+  "settings-tab.opensubtitles.label": "API-ključ OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Pridobi ključ",
+  "settings-tab.opensubtitles.hint": "Prenos podnapisov v predvajalniku uporablja vaš lastni ključ. Ustvarite brezplačen račun na opensubtitles.com in nato ključ vstavite tukaj. Brez ključa funkcija ostane izklopljena."
 }

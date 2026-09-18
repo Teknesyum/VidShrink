@@ -41,5 +41,8 @@
   "settings.default-app.open": "Програми за замовчуванням",
   "settings.default-app.dismiss": "Більше не питати",
   "settings.player-shortcuts.title": "Клавіші плеєра",
-  "settings.player-shortcuts.hint": "Вкладка плеєра, його меню та цей список читають одну й ту саму таблицю."
+  "settings.player-shortcuts.hint": "Вкладка плеєра, його меню та цей список читають одну й ту саму таблицю.",
+  "settings-tab.opensubtitles.label": "Ключ API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Отримати ключ",
+  "settings-tab.opensubtitles.hint": "Завантаження субтитрів у плеєрі використовує ваш власний ключ. Створіть безкоштовний облік на opensubtitles.com, а потім вставте ключ тут. Без ключа ця функція залишається вимкненою."
 }

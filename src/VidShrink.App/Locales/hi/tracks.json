@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "कोरियाई",
   "player.subtitle.external": " (बाहरी)",
   "player.subtitle.novideo": "उपशीर्षक जोड़ने से पहले एक वीडियो खोलें",
-  "player.subtitle.loadfailed": "उपशीर्षक फ़ाइल लोड नहीं हो सकी"
+  "player.subtitle.loadfailed": "उपशीर्षक फ़ाइल लोड नहीं हो सकी",
+  "player.subtitle.download": "सबटाइटल डाउनलोड करें…",
+  "player.subtitle.download.getkey": "सबटाइटल डाउनलोड करें — API कुंजी प्राप्त करें…",
+  "player.subtitle.download.working": "सबटाइटल खोजे जा रहे हैं…",
+  "player.subtitle.download.done": "सबटाइटल डाउनलोड हुआ: {0}",
+  "player.subtitle.download.nokey": "सेटिंग्स में अपनी OpenSubtitles API कुंजी दर्ज करें",
+  "player.subtitle.download.badkey": "OpenSubtitles ने API कुंजी स्वीकार नहीं की",
+  "player.subtitle.download.noresult": "इस वीडियो के लिए कोई सबटाइटल नहीं मिला",
+  "player.subtitle.download.quota": "सबटाइटल डाउनलोड का दैनिक कोटा पूरा हो गया है",
+  "player.subtitle.download.offline": "OpenSubtitles से संपर्क नहीं हो सका",
+  "player.subtitle.download.writefail": "सबटाइटल वीडियो के पास सहेजा नहीं जा सका",
+  "player.subtitle.download.toofast": "OpenSubtitles को बहुत अधिक रिक्वेस्ट भेजी गईं — थोड़ी देर बाद फिर से कोशिश करें"
 }

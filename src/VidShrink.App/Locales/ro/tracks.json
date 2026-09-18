@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Coreeană",
   "player.subtitle.external": " (externă)",
   "player.subtitle.novideo": "Deschide un videoclip înainte de a adăuga subtitrări",
-  "player.subtitle.loadfailed": "Fișierul de subtitrare nu a putut fi încărcat"
+  "player.subtitle.loadfailed": "Fișierul de subtitrare nu a putut fi încărcat",
+  "player.subtitle.download": "Descarcă subtitrare…",
+  "player.subtitle.download.getkey": "Descarcă subtitrare — obține o cheie API…",
+  "player.subtitle.download.working": "Se caută subtitrări…",
+  "player.subtitle.download.done": "Subtitrare descărcată: {0}",
+  "player.subtitle.download.nokey": "Introduceți cheia API OpenSubtitles în Setări",
+  "player.subtitle.download.badkey": "OpenSubtitles nu a acceptat cheia API",
+  "player.subtitle.download.noresult": "Nu a fost găsită nicio subtitrare pentru acest videoclip",
+  "player.subtitle.download.quota": "Cota zilnică de descărcare a subtitrărilor este epuizată",
+  "player.subtitle.download.offline": "OpenSubtitles nu a putut fi contactat",
+  "player.subtitle.download.writefail": "Subtitrarea nu a putut fi salvată alături de videoclip",
+  "player.subtitle.download.toofast": "Prea multe cereri către OpenSubtitles — încercați din nou într-o clipă"
 }

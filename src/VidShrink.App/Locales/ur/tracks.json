@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "کورین",
   "player.subtitle.external": " (بیرونی)",
   "player.subtitle.novideo": "زیر نویس شامل کرنے سے پہلے ویڈیو کھولیں",
-  "player.subtitle.loadfailed": "زیر نویس فائل لوڈ نہیں ہو سکی"
+  "player.subtitle.loadfailed": "زیر نویس فائل لوڈ نہیں ہو سکی",
+  "player.subtitle.download": "سب ٹائٹل ڈاؤن لوڈ کریں…",
+  "player.subtitle.download.getkey": "سب ٹائٹل ڈاؤن لوڈ کریں — API کلید حاصل کریں…",
+  "player.subtitle.download.working": "سب ٹائٹل تلاش کیے جا رہے ہیں…",
+  "player.subtitle.download.done": "سب ٹائٹل ڈاؤن لوڈ ہو گیا: {0}",
+  "player.subtitle.download.nokey": "اپنی OpenSubtitles API کلید ترتیبات میں درج کریں",
+  "player.subtitle.download.badkey": "OpenSubtitles نے API کلید قبول نہیں کی",
+  "player.subtitle.download.noresult": "اس ویڈیو کے لیے کوئی سب ٹائٹل نہیں ملا",
+  "player.subtitle.download.quota": "سب ٹائٹل ڈاؤن لوڈ کا روزانہ کوٹا پورا ہو گیا ہے",
+  "player.subtitle.download.offline": "OpenSubtitles تک رسائی ممکن نہ ہوئی",
+  "player.subtitle.download.writefail": "سب ٹائٹل ویڈیو کے پاس محفوظ نہیں کیا جا سکا",
+  "player.subtitle.download.toofast": "OpenSubtitles کو بہت زیادہ درخواستیں بھیجی گئیں — تھوڑی دیر میں دوبارہ کوشش کریں"
 }

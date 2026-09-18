@@ -1248,6 +1248,15 @@
                     <TextBlock x:Name="TxtFfmpegPathError" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.ffmpeg-path.hint}"/>
                   </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text settings-tab.opensubtitles.label}" Theme="{StaticResource Label}" Margin="0"/>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                      <TextBox x:Name="TxtOpenSubtitlesKey" Width="360" MaxLines="1" PasswordChar="*"/>
+                      <Button x:Name="BtnOpenSubtitlesKey" Content="{loc:Text settings-tab.opensubtitles.get}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesKeyPage"/>
+                    </StackPanel>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.hint}"/>
+                  </StackPanel>
                 </StackPanel>
               </Border>
 

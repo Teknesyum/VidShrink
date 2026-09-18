@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "קוריאנית",
   "player.subtitle.external": " (חיצוני)",
   "player.subtitle.novideo": "פתח סרטון לפני הוספת כתוביות",
-  "player.subtitle.loadfailed": "לא ניתן היה לטעון את קובץ הכתוביות"
+  "player.subtitle.loadfailed": "לא ניתן היה לטעון את קובץ הכתוביות",
+  "player.subtitle.download": "הורדת כתוביות…",
+  "player.subtitle.download.getkey": "הורדת כתוביות — קבלת מפתח API…",
+  "player.subtitle.download.working": "מחפש כתוביות…",
+  "player.subtitle.download.done": "הכתוביות הורדו: {0}",
+  "player.subtitle.download.nokey": "הזן את מפתח ה-API של OpenSubtitles בהגדרות",
+  "player.subtitle.download.badkey": "OpenSubtitles לא קיבל את מפתח ה-API",
+  "player.subtitle.download.noresult": "לא נמצאו כתוביות לסרטון זה",
+  "player.subtitle.download.quota": "מכסת ההורדות היומית של כתוביות מלאה",
+  "player.subtitle.download.offline": "לא ניתן היה להתחבר ל-OpenSubtitles",
+  "player.subtitle.download.writefail": "לא ניתן היה לשמור את הכתוביות לצד הסרטון",
+  "player.subtitle.download.toofast": "יותר מדי בקשות ל-OpenSubtitles — נסה שוב בעוד רגע"
 }

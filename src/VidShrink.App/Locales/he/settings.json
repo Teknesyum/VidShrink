@@ -41,5 +41,8 @@
   "settings.default-app.open": "יישומי ברירת מחדל",
   "settings.default-app.dismiss": "אל תשאל שוב",
   "settings.player-shortcuts.title": "קיצורי מקלדת של הנגן",
-  "settings.player-shortcuts.hint": "לשונית הנגן, התפריט שלה ורשימה זו כולם קוראים מאותה טבלה."
+  "settings.player-shortcuts.hint": "לשונית הנגן, התפריט שלה ורשימה זו כולם קוראים מאותה טבלה.",
+  "settings-tab.opensubtitles.label": "מפתח API של OpenSubtitles",
+  "settings-tab.opensubtitles.get": "קבלת מפתח",
+  "settings-tab.opensubtitles.hint": "הורדת כתוביות בנגן משתמשת במפתח שלך. צור חשבון משתמש חינמי באתר opensubtitles.com, ולאחר מכן הדבק את המפתח כאן. בלי מפתח, התכונה נשארת כבויה."
 }

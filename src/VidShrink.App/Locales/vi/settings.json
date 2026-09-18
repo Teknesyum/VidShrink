@@ -41,5 +41,8 @@
   "settings.default-app.open": "Ứng dụng mặc định",
   "settings.default-app.dismiss": "Không hỏi lại",
   "settings.player-shortcuts.title": "Phím tắt trình phát",
-  "settings.player-shortcuts.hint": "Tab trình phát, menu của nó và danh sách này đều đọc từ cùng một bảng."
+  "settings.player-shortcuts.hint": "Tab trình phát, menu của nó và danh sách này đều đọc từ cùng một bảng.",
+  "settings-tab.opensubtitles.label": "Khóa API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Lấy khóa",
+  "settings-tab.opensubtitles.hint": "Tải phụ đề trong trình phát dùng khóa riêng của bạn. Tạo một tài khoản miễn phí tại opensubtitles.com, rồi dán khóa vào đây. Không có khóa, tính năng này vẫn tắt."
 }

@@ -41,5 +41,8 @@
   "settings.default-app.open": "App predefinite",
   "settings.default-app.dismiss": "Non chiedere più",
   "settings.player-shortcuts.title": "Scorciatoie del lettore",
-  "settings.player-shortcuts.hint": "La scheda del lettore, il suo menu e questo elenco leggono tutti la stessa tabella."
+  "settings.player-shortcuts.hint": "La scheda del lettore, il suo menu e questo elenco leggono tutti la stessa tabella.",
+  "settings-tab.opensubtitles.label": "Chiave API di OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Ottieni una chiave",
+  "settings-tab.opensubtitles.hint": "Il download dei sottotitoli nel lettore usa la tua chiave personale. Crea un account gratuito su opensubtitles.com, poi incolla qui la chiave. Senza chiave la funzione resta disattivata."
 }

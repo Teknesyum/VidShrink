@@ -41,5 +41,8 @@
   "settings.default-app.open": "இயல்பு பயன்பாடுகள்",
   "settings.default-app.dismiss": "மீண்டும் கேட்காதே",
   "settings.player-shortcuts.title": "இயக்கி குறுக்குவழிகள்",
-  "settings.player-shortcuts.hint": "இயக்கி தாவல், அதன் மெனு மற்றும் இந்தப் பட்டியல் அனைத்தும் ஒரே அட்டவணையைப் படிக்கின்றன."
+  "settings.player-shortcuts.hint": "இயக்கி தாவல், அதன் மெனு மற்றும் இந்தப் பட்டியல் அனைத்தும் ஒரே அட்டவணையைப் படிக்கின்றன.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API விசை",
+  "settings-tab.opensubtitles.get": "விசையைப் பெறு",
+  "settings-tab.opensubtitles.hint": "பிளேயரில் வசன வரி பதிவிறக்கம் உங்கள் சொந்த விசையைப் பயன்படுத்துகிறது. opensubtitles.com-இல் இலவச கணக்கை உருவாக்கி, பின்னர் விசையை இங்கே ஒட்டவும். விசை இல்லாமல் இந்த அம்சம் அணைந்தே இருக்கும்."
 }

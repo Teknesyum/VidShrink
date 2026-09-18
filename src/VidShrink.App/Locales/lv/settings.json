@@ -41,5 +41,8 @@
   "settings.default-app.open": "Noklusējuma lietotnes",
   "settings.default-app.dismiss": "Vairs nejautāt",
   "settings.player-shortcuts.title": "Atskaņotāja saīsnes",
-  "settings.player-shortcuts.hint": "Atskaņotāja cilne, tās izvēlne un šis saraksts visi lasa vienu un to pašu tabulu."
+  "settings.player-shortcuts.hint": "Atskaņotāja cilne, tās izvēlne un šis saraksts visi lasa vienu un to pašu tabulu.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API atslēga",
+  "settings-tab.opensubtitles.get": "Iegūt atslēgu",
+  "settings-tab.opensubtitles.hint": "Subtitru lejupielāde atskaņotājā izmanto jūsu pašu atslēgu. Izveidojiet bezmaksas kontu opensubtitles.com, pēc tam ielīmējiet atslēgu šeit. Bez atslēgas šī funkcija paliek izslēgta."
 }

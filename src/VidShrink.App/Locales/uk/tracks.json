@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Корейське",
   "player.subtitle.external": " (зовнішні)",
   "player.subtitle.novideo": "Відкрийте відео перед додаванням субтитрів",
-  "player.subtitle.loadfailed": "Не вдалося завантажити файл субтитрів"
+  "player.subtitle.loadfailed": "Не вдалося завантажити файл субтитрів",
+  "player.subtitle.download": "Завантажити субтитри…",
+  "player.subtitle.download.getkey": "Завантажити субтитри — отримати ключ API…",
+  "player.subtitle.download.working": "Пошук субтитрів…",
+  "player.subtitle.download.done": "Субтитри завантажено: {0}",
+  "player.subtitle.download.nokey": "Введіть свій ключ API OpenSubtitles у Налаштуваннях",
+  "player.subtitle.download.badkey": "OpenSubtitles не прийняв ключ API",
+  "player.subtitle.download.noresult": "Для цього відео не знайдено субтитрів",
+  "player.subtitle.download.quota": "Денну квоту завантаження субтитрів вичерпано",
+  "player.subtitle.download.offline": "Не вдалося з'єднатися з OpenSubtitles",
+  "player.subtitle.download.writefail": "Не вдалося зберегти субтитри поруч із відео",
+  "player.subtitle.download.toofast": "Надто багато запитів до OpenSubtitles — повторіть спробу за мить"
 }

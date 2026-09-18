@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Korėjiečių",
   "player.subtitle.external": " (išorinis)",
   "player.subtitle.novideo": "Prieš pridedant subtitrus atidarykite vaizdo įrašą",
-  "player.subtitle.loadfailed": "Nepavyko įkelti subtitrų failo"
+  "player.subtitle.loadfailed": "Nepavyko įkelti subtitrų failo",
+  "player.subtitle.download": "Atsisiųsti subtitrus…",
+  "player.subtitle.download.getkey": "Atsisiųsti subtitrus — gauti API raktą…",
+  "player.subtitle.download.working": "Ieškoma subtitrų…",
+  "player.subtitle.download.done": "Subtitrai atsisiųsti: {0}",
+  "player.subtitle.download.nokey": "Įveskite savo OpenSubtitles API raktą Nustatymuose",
+  "player.subtitle.download.badkey": "OpenSubtitles nepriėmė API rakto",
+  "player.subtitle.download.noresult": "Šiam vaizdo įrašui subtitrų nerasta",
+  "player.subtitle.download.quota": "Dienos subtitrų atsisiuntimo kvota išnaudota",
+  "player.subtitle.download.offline": "Nepavyko prisijungti prie OpenSubtitles",
+  "player.subtitle.download.writefail": "Subtitrų nepavyko įrašyti šalia vaizdo įrašo",
+  "player.subtitle.download.toofast": "Pateikta per daug užklausų OpenSubtitles — bandykite dar kartą po kelių sekundžių"
 }

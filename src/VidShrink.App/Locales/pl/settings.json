@@ -41,5 +41,8 @@
   "settings.default-app.open": "Aplikacje domyślne",
   "settings.default-app.dismiss": "Nie pytaj ponownie",
   "settings.player-shortcuts.title": "Skróty odtwarzacza",
-  "settings.player-shortcuts.hint": "Karta odtwarzacza, jego menu i ta lista czytają tę samą tabelę."
+  "settings.player-shortcuts.hint": "Karta odtwarzacza, jego menu i ta lista czytają tę samą tabelę.",
+  "settings-tab.opensubtitles.label": "Klucz API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Uzyskaj klucz",
+  "settings-tab.opensubtitles.hint": "Pobieranie napisów w odtwarzaczu korzysta z własnego klucza. Utwórz bezpłatne konto na opensubtitles.com, a potem wklej tu klucz. Bez klucza funkcja pozostaje wyłączona."
 }

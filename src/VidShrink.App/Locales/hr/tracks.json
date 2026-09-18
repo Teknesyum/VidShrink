@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Korejsko",
   "player.subtitle.external": " (vanjski)",
   "player.subtitle.novideo": "Otvorite video prije dodavanja titlova",
-  "player.subtitle.loadfailed": "Datoteku titlova nije moguće učitati"
+  "player.subtitle.loadfailed": "Datoteku titlova nije moguće učitati",
+  "player.subtitle.download": "Preuzmi titl…",
+  "player.subtitle.download.getkey": "Preuzmi titl — nabavi API ključ…",
+  "player.subtitle.download.working": "Traženje titlova…",
+  "player.subtitle.download.done": "Titl preuzet: {0}",
+  "player.subtitle.download.nokey": "Unesite svoj OpenSubtitles API ključ u Postavkama",
+  "player.subtitle.download.badkey": "OpenSubtitles nije prihvatio API ključ",
+  "player.subtitle.download.noresult": "Za ovaj video nije pronađen nijedan titl",
+  "player.subtitle.download.quota": "Dnevna kvota za preuzimanje titlova je popunjena",
+  "player.subtitle.download.offline": "OpenSubtitles nije bilo moguće dosegnuti",
+  "player.subtitle.download.writefail": "Titl nije moguće spremiti pored videa",
+  "player.subtitle.download.toofast": "Previše zahtjeva prema OpenSubtitles — pokušajte ponovno za trenutak"
 }

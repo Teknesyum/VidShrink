@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Kikorea",
   "player.subtitle.external": " (nje)",
   "player.subtitle.novideo": "Fungua video kabla ya kuongeza manukuu",
-  "player.subtitle.loadfailed": "Faili ya manukuu haikuweza kupakiwa"
+  "player.subtitle.loadfailed": "Faili ya manukuu haikuweza kupakiwa",
+  "player.subtitle.download": "Pakua manukuu…",
+  "player.subtitle.download.getkey": "Pakua manukuu — pata ufunguo wa API…",
+  "player.subtitle.download.working": "Inatafuta manukuu…",
+  "player.subtitle.download.done": "Manukuu yamepakuliwa: {0}",
+  "player.subtitle.download.nokey": "Weka ufunguo wako wa API wa OpenSubtitles katika Mipangilio",
+  "player.subtitle.download.badkey": "OpenSubtitles haikukubali ufunguo wa API",
+  "player.subtitle.download.noresult": "Hakuna manukuu yaliyopatikana kwa video hii",
+  "player.subtitle.download.quota": "Kiwango cha kila siku cha kupakua manukuu kimejaa",
+  "player.subtitle.download.offline": "Haikuwezekana kufikia OpenSubtitles",
+  "player.subtitle.download.writefail": "Manukuu hayakuweza kuhifadhiwa kando ya video",
+  "player.subtitle.download.toofast": "Maombi mengi sana kwa OpenSubtitles — jaribu tena baada ya muda mfupi"
 }

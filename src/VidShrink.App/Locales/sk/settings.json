@@ -41,5 +41,8 @@
   "settings.default-app.open": "Predvolené aplikácie",
   "settings.default-app.dismiss": "Už sa nepýtať",
   "settings.player-shortcuts.title": "Klávesové skratky prehrávača",
-  "settings.player-shortcuts.hint": "Karta prehrávača, jeho ponuka a tento zoznam čítajú z rovnakej tabuľky."
+  "settings.player-shortcuts.hint": "Karta prehrávača, jeho ponuka a tento zoznam čítajú z rovnakej tabuľky.",
+  "settings-tab.opensubtitles.label": "API kľúč OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Získať kľúč",
+  "settings-tab.opensubtitles.hint": "Sťahovanie titulkov v prehrávači používa váš vlastný kľúč. Vytvorte si bezplatný účet na opensubtitles.com a kľúč sem vložte. Bez kľúča zostane táto funkcia vypnutá."
 }

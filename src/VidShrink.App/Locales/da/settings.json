@@ -41,5 +41,8 @@
   "settings.default-app.open": "Standardapps",
   "settings.default-app.dismiss": "Spørg ikke igen",
   "settings.player-shortcuts.title": "Afspillergenveje",
-  "settings.player-shortcuts.hint": "Afspillerfanen, dens menu og denne liste læser alle fra samme tabel."
+  "settings.player-shortcuts.hint": "Afspillerfanen, dens menu og denne liste læser alle fra samme tabel.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles-API-nøgle",
+  "settings-tab.opensubtitles.get": "Få en nøgle",
+  "settings-tab.opensubtitles.hint": "Download af undertekster i afspilleren bruger din egen nøgle. Opret en gratis konto på opensubtitles.com, og indsæt derefter nøglen her. Uden en nøgle forbliver funktionen slået fra."
 }

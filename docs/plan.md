@@ -855,3 +855,34 @@ Dal `t0/hb-1c-akis`.
 6. App: gelişmiş ses bölümünde "İzleri koru" kutusu (42 dil), çıktı uzantısı plandan, platform çipi bayrağı.
 7. Test `StreamMappingTests.cs`: ffmpeg ile 3 sn girdi (2 ses + srt + PGS + 2 bölüm + başlık/tarih; ayrıca
    dönük MP4), çıktı ffprobe ile okunur; çok izli girdide hedef isabeti; her kolun negatif kontrolü.
+
+## P28 — OpenSubtitles'tan altyazı indirme (t0/p28-altyazi)
+
+Kaynak: `docs/danisma/2026-09-17-fable-kararlar.md` bölüm 6 (fable K6).
+
+1. `src/VidShrink.Core/Subtitles/MovieHash.cs`: OpenSubtitles moviehash — dosya boyutu +
+   ilk 64 KB + son 64 KB'ın 64-bit küçük-uçlu sözcük toplamı, sarmalı serbest. 128 KB'tan
+   küçük dosya desteklenmez.
+2. `src/VidShrink.Core/Subtitles/ISubtitleProvider.cs`: `SearchAsync` + `DownloadAsync`,
+   `SubtitleCandidate`, `SubtitleQuery`, `SubtitleOutcome` (Ok / NoKey / NoResult /
+   QuotaExceeded / NetworkError / BadKey).
+3. `src/VidShrink.Core/Subtitles/OpenSubtitlesProvider.cs`: `IHttpTransport` üstünden
+   `GET /subtitles` (moviehash → ad yedeği) ve `POST /download`; dosya videonun yanına
+   `<ad>.<dil>.srt` yazılır.
+4. `src/VidShrink.App/AppSettings.cs`: `openSubtitlesApiKey` anahtarı.
+5. `src/VidShrink.App/MainWindow.axaml(.cs)`: Ayarlar sekmesinde tek metin alanı + anahtarı
+   nereden alacağını söyleyen ipucu ve bağlantı.
+6. `src/VidShrink.App/Playback/PlayerView.Subtitles.cs` + `PlayerView.Tracks.cs`: Altyazılar
+   menüsüne "Altyazı indir…" satırı; sonuç seçimi, indirilen dosyanın `LoadSubtitle` ile
+   motora verilmesi, her hata kolunun `_trackNotice` üstünden bildirilmesi.
+7. `src/VidShrink.App/Locales/*/tracks.json` (42 dil): menü, ilerleme ve altı hata metni.
+8. `tests/VidShrink.Tests/AltyaziIndirmeTests.cs`: moviehash çözümlemeli vektörler, sahte
+   `IHttpTransport` ile arama/indirme/seçim, beş hata kolu, dil dosyası enjeksiyon pimi,
+   ayar gidiş-dönüşü `VIDSHRINK_SETTINGS_PATH` altında.
+
+**K6'dan sapma.** K6 yeni dosyaları `src/VidShrink.Player/Subtitles/` altına koyuyordu;
+`VidShrink.Player` `VidShrink.Core`'a referans vermiyor ve sahte HTTP düzeneği
+(`Core/Share/HttpTransport.cs`, `IHttpTransport`) Core'da. Sağlayıcıyı Player'a koymak ya
+Player→Core referansı (oynatıcı motorunun katmanını kirletir) ya da ikinci bir HTTP
+soyutlaması isterdi. Ağ sağlayıcıları (`UpdateCheck`, `Share`) zaten Core'da; sağlayıcı da
+oraya gitti. Oynatıcı yalnız hazır `.srt` yolunu alır, ağı görmez.

@@ -41,5 +41,8 @@
   "settings.default-app.open": "ডিফল্ট অ্যাপ",
   "settings.default-app.dismiss": "আর জিজ্ঞাসা করবেন না",
   "settings.player-shortcuts.title": "প্লেয়ার শর্টকাট",
-  "settings.player-shortcuts.hint": "প্লেয়ার ট্যাব, তার মেনু এবং এই তালিকা সবই একই টেবিল থেকে পড়ে।"
+  "settings.player-shortcuts.hint": "প্লেয়ার ট্যাব, তার মেনু এবং এই তালিকা সবই একই টেবিল থেকে পড়ে।",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API কী",
+  "settings-tab.opensubtitles.get": "একটি কী নিন",
+  "settings-tab.opensubtitles.hint": "প্লেয়ারে সাবটাইটেল ডাউনলোড আপনার নিজের কী ব্যবহার করে। opensubtitles.com-এ একটি ফ্রি অ্যাকাউন্ট তৈরি করুন, তারপর কী এখানে পেস্ট করুন। কী ছাড়া এই বৈশিষ্ট্যটি বন্ধ থাকে।"
 }

@@ -41,5 +41,8 @@
   "settings.default-app.open": "Aplicații implicite",
   "settings.default-app.dismiss": "Nu mai întreba",
   "settings.player-shortcuts.title": "Comenzi rapide player",
-  "settings.player-shortcuts.hint": "Fila playerului, meniul său și această listă citesc din același tabel."
+  "settings.player-shortcuts.hint": "Fila playerului, meniul său și această listă citesc din același tabel.",
+  "settings-tab.opensubtitles.label": "Cheie API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Obține o cheie",
+  "settings-tab.opensubtitles.hint": "Descărcarea subtitrărilor din player folosește propria dvs. cheie. Creați un cont gratuit pe opensubtitles.com, apoi lipiți cheia aici. Fără o cheie, funcția rămâne dezactivată."
 }

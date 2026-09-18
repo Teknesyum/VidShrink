@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Coreano",
   "player.subtitle.external": " (esterno)",
   "player.subtitle.novideo": "Apri un video prima di aggiungere sottotitoli",
-  "player.subtitle.loadfailed": "Impossibile caricare il file dei sottotitoli"
+  "player.subtitle.loadfailed": "Impossibile caricare il file dei sottotitoli",
+  "player.subtitle.download": "Scarica sottotitolo…",
+  "player.subtitle.download.getkey": "Scarica sottotitolo — ottieni una chiave API…",
+  "player.subtitle.download.working": "Ricerca sottotitoli in corso…",
+  "player.subtitle.download.done": "Sottotitolo scaricato: {0}",
+  "player.subtitle.download.nokey": "Inserisci la tua chiave API di OpenSubtitles nelle Impostazioni",
+  "player.subtitle.download.badkey": "OpenSubtitles non ha accettato la chiave API",
+  "player.subtitle.download.noresult": "Nessun sottotitolo trovato per questo video",
+  "player.subtitle.download.quota": "La quota giornaliera di download dei sottotitoli è esaurita",
+  "player.subtitle.download.offline": "Impossibile raggiungere OpenSubtitles",
+  "player.subtitle.download.writefail": "Il sottotitolo non può essere salvato accanto al video",
+  "player.subtitle.download.toofast": "Troppe richieste a OpenSubtitles — riprova tra un momento"
 }

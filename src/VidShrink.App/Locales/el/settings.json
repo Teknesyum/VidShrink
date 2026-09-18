@@ -41,5 +41,8 @@
   "settings.default-app.open": "Προεπιλεγμένες εφαρμογές",
   "settings.default-app.dismiss": "Να μην ερωτηθώ ξανά",
   "settings.player-shortcuts.title": "Συντομεύσεις αναπαραγωγής",
-  "settings.player-shortcuts.hint": "Η καρτέλα αναπαραγωγής, το μενού της και αυτή η λίστα διαβάζουν όλα από τον ίδιο πίνακα."
+  "settings.player-shortcuts.hint": "Η καρτέλα αναπαραγωγής, το μενού της και αυτή η λίστα διαβάζουν όλα από τον ίδιο πίνακα.",
+  "settings-tab.opensubtitles.label": "Κλειδί API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Απόκτηση κλειδιού",
+  "settings-tab.opensubtitles.hint": "Η λήψη υποτίτλων στον player χρησιμοποιεί το δικό σας κλειδί. Δημιουργήστε δωρεάν λογαριασμό στο opensubtitles.com και επικολλήστε το κλειδί εδώ. Χωρίς κλειδί, η λειτουργία παραμένει ανενεργή."
 }

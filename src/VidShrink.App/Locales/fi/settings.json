@@ -41,5 +41,8 @@
   "settings.default-app.open": "Oletussovellukset",
   "settings.default-app.dismiss": "Älä kysy uudelleen",
   "settings.player-shortcuts.title": "Soittimen pikanäppäimet",
-  "settings.player-shortcuts.hint": "Soitin-välilehti, sen valikko ja tämä luettelo lukevat kaikki samaa taulukkoa."
+  "settings.player-shortcuts.hint": "Soitin-välilehti, sen valikko ja tämä luettelo lukevat kaikki samaa taulukkoa.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles-API-avain",
+  "settings-tab.opensubtitles.get": "Hanki avain",
+  "settings-tab.opensubtitles.hint": "Soittimen tekstityslataus käyttää omaa avaintasi. Luo ilmainen käyttäjätili osoitteessa opensubtitles.com ja liitä avain tähän. Ilman avainta ominaisuus pysyy pois käytöstä."
 }

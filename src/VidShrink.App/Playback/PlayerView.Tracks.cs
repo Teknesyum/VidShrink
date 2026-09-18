@@ -16,6 +16,7 @@ internal partial class PlayerView
 {
     private readonly SubtitleOptions _subtitles = new();
     private string? _trackNotice;
+    private object?[] _trackNoticeArgs = Array.Empty<object?>();
 
     internal SubtitleOptions Subtitles => _subtitles;
 
@@ -36,6 +37,7 @@ internal partial class PlayerView
     {
         _subtitles.ResetDelays();
         _trackNotice = null;
+        _trackNoticeArgs = Array.Empty<object?>();
         _subtitles.ApplyTo(engine);
         LoadSidecarSubtitles(engine);
     }
@@ -162,6 +164,7 @@ internal partial class PlayerView
         if (_engine is not { IsOpen: true } engine)
         {
             _trackNotice = "player.subtitle.novideo";
+            _trackNoticeArgs = Array.Empty<object?>();
             _trace.Add("subadd -> no");
             RefreshState();
             return false;
@@ -169,6 +172,7 @@ internal partial class PlayerView
 
         var added = engine.AddSubtitle(path);
         _trackNotice = added ? null : "player.subtitle.loadfailed";
+        _trackNoticeArgs = Array.Empty<object?>();
         _trace.Add("subadd -> " + (added ? SubtitleName(engine.SubtitleTrack) : "no"));
         RefreshState();
         return added;
@@ -226,7 +230,8 @@ internal partial class PlayerView
     {
         if (_subtitles.SubtitleDelay != 0) parts.Add(Strings.Get("player.subtitle.delay", SubtitleOptions.Signed(_subtitles.SubtitleDelay)));
         if (_subtitles.AudioDelay != 0) parts.Add(Strings.Get("player.tracks.delay", SubtitleOptions.Signed(_subtitles.AudioDelay)));
-        if (_trackNotice is { } notice) parts.Add(Strings.Get(notice));
+        if (_trackNotice is { } notice)
+            parts.Add(_trackNoticeArgs.Length == 0 ? Strings.Get(notice) : Strings.Get(notice, _trackNoticeArgs));
     }
 
     private void AddTrackMenus(MenuFlyout flyout)
@@ -280,6 +285,9 @@ internal partial class PlayerView
 
         items.Add(new Separator());
         items.Add(Plain(Strings.Get("player.subtitle.load"), () => _ = PickSubtitleAsync()));
+        items.Add(SubtitleDownloadReady
+            ? Plain(Strings.Get("player.subtitle.download"), () => _ = DownloadSubtitleAsync())
+            : Plain(Strings.Get("player.subtitle.download.getkey"), OpenSubtitleKeyPage));
         items.Add(Bound(SubtitleOptions.SubtitleCycle));
         items.Add(new Separator());
         items.Add(Bound(SubtitleOptions.SubtitleLater));

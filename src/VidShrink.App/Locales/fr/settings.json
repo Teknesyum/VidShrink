@@ -41,5 +41,8 @@
   "settings.default-app.open": "Applications par défaut",
   "settings.default-app.dismiss": "Ne plus demander",
   "settings.player-shortcuts.title": "Raccourcis du lecteur",
-  "settings.player-shortcuts.hint": "L'onglet du lecteur, son menu et cette liste lisent tous la même table."
+  "settings.player-shortcuts.hint": "L'onglet du lecteur, son menu et cette liste lisent tous la même table.",
+  "settings-tab.opensubtitles.label": "Clé API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Obtenir une clé",
+  "settings-tab.opensubtitles.hint": "Le téléchargement de sous-titres dans le lecteur utilise votre propre clé. Créez un compte gratuit sur opensubtitles.com, puis collez la clé ici. Sans clé, la fonction reste désactivée."
 }

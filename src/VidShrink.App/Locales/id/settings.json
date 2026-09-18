@@ -41,5 +41,8 @@
   "settings.default-app.open": "Aplikasi default",
   "settings.default-app.dismiss": "Jangan tanya lagi",
   "settings.player-shortcuts.title": "Pintasan pemutar",
-  "settings.player-shortcuts.hint": "Tab pemutar, menunya, dan daftar ini semua membaca tabel yang sama."
+  "settings.player-shortcuts.hint": "Tab pemutar, menunya, dan daftar ini semua membaca tabel yang sama.",
+  "settings-tab.opensubtitles.label": "Kunci API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Dapatkan kunci",
+  "settings-tab.opensubtitles.hint": "Unduhan subtitle di pemutar menggunakan kunci Anda sendiri. Buat akun gratis di opensubtitles.com, lalu tempel kuncinya di sini. Tanpa kunci, fitur ini tetap nonaktif."
 }

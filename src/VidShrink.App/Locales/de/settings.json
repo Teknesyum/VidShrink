@@ -41,5 +41,8 @@
   "settings.default-app.open": "Standard-Apps",
   "settings.default-app.dismiss": "Nicht mehr fragen",
   "settings.player-shortcuts.title": "Player-Tastenkürzel",
-  "settings.player-shortcuts.hint": "Der Player-Tab, sein Menü und diese Liste lesen alle aus derselben Tabelle."
+  "settings.player-shortcuts.hint": "Der Player-Tab, sein Menü und diese Liste lesen alle aus derselben Tabelle.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles-API-Schlüssel",
+  "settings-tab.opensubtitles.get": "Schlüssel holen",
+  "settings-tab.opensubtitles.hint": "Der Untertitel-Download im Player nutzt Ihren eigenen Schlüssel. Erstellen Sie ein kostenloses Verbraucherkonto auf opensubtitles.com und fügen Sie den Schlüssel hier ein. Ohne Schlüssel bleibt die Funktion deaktiviert."
 }

@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Koreansk",
   "player.subtitle.external": " (ekstern)",
   "player.subtitle.novideo": "Åbn en video, før du tilføjer undertekster",
-  "player.subtitle.loadfailed": "Undertekstfilen kunne ikke indlæses"
+  "player.subtitle.loadfailed": "Undertekstfilen kunne ikke indlæses",
+  "player.subtitle.download": "Download undertekst…",
+  "player.subtitle.download.getkey": "Download undertekst — få en API-nøgle…",
+  "player.subtitle.download.working": "Søger efter undertekster…",
+  "player.subtitle.download.done": "Undertekst downloadet: {0}",
+  "player.subtitle.download.nokey": "Angiv din OpenSubtitles-API-nøgle under Indstillinger",
+  "player.subtitle.download.badkey": "OpenSubtitles accepterede ikke API-nøglen",
+  "player.subtitle.download.noresult": "Ingen undertekst fundet til denne video",
+  "player.subtitle.download.quota": "Den daglige kvote for download af undertekster er brugt",
+  "player.subtitle.download.offline": "Kunne ikke få forbindelse til OpenSubtitles",
+  "player.subtitle.download.writefail": "Underteksten kunne ikke gemmes ved siden af videoen",
+  "player.subtitle.download.toofast": "For mange anmodninger til OpenSubtitles — prøv igen om lidt"
 }

@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Koreański",
   "player.subtitle.external": " (zewnętrzny)",
   "player.subtitle.novideo": "Otwórz plik wideo przed dodaniem napisów",
-  "player.subtitle.loadfailed": "Nie udało się wczytać pliku z napisami"
+  "player.subtitle.loadfailed": "Nie udało się wczytać pliku z napisami",
+  "player.subtitle.download": "Pobierz napisy…",
+  "player.subtitle.download.getkey": "Pobierz napisy — uzyskaj klucz API…",
+  "player.subtitle.download.working": "Wyszukiwanie napisów…",
+  "player.subtitle.download.done": "Napisy pobrane: {0}",
+  "player.subtitle.download.nokey": "Wprowadź swój klucz API OpenSubtitles w Ustawieniach",
+  "player.subtitle.download.badkey": "OpenSubtitles nie zaakceptowało klucza API",
+  "player.subtitle.download.noresult": "Nie znaleziono napisów dla tego wideo",
+  "player.subtitle.download.quota": "Dzienny limit pobierania napisów został wykorzystany",
+  "player.subtitle.download.offline": "Nie udało się połączyć z OpenSubtitles",
+  "player.subtitle.download.writefail": "Nie udało się zapisać napisów przy pliku wideo",
+  "player.subtitle.download.toofast": "Zbyt wiele żądań do OpenSubtitles — spróbuj ponownie za chwilę"
 }

@@ -41,5 +41,8 @@
   "settings.default-app.open": "Приложения по подразбиране",
   "settings.default-app.dismiss": "Не питай отново",
   "settings.player-shortcuts.title": "Клавишни комбинации на плейъра",
-  "settings.player-shortcuts.hint": "Разделът на плейъра, менюто му и този списък четат от една и съща таблица."
+  "settings.player-shortcuts.hint": "Разделът на плейъра, менюто му и този списък четат от една и съща таблица.",
+  "settings-tab.opensubtitles.label": "API ключ на OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Вземете ключ",
+  "settings-tab.opensubtitles.hint": "Изтеглянето на субтитри в плейъра използва вашия собствен ключ. Създайте безплатен потребителски профил на opensubtitles.com, след което поставете ключа тук. Без ключ функцията остава изключена."
 }

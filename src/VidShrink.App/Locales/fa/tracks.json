@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "کره‌ای",
   "player.subtitle.external": " (خارجی)",
   "player.subtitle.novideo": "پیش از افزودن زیرنویس، یک ویدیو باز کنید",
-  "player.subtitle.loadfailed": "فایل زیرنویس بارگذاری نشد"
+  "player.subtitle.loadfailed": "فایل زیرنویس بارگذاری نشد",
+  "player.subtitle.download": "دریافت زیرنویس…",
+  "player.subtitle.download.getkey": "دریافت زیرنویس — گرفتن کلید API…",
+  "player.subtitle.download.working": "در حال جست‌وجوی زیرنویس…",
+  "player.subtitle.download.done": "زیرنویس دریافت شد: {0}",
+  "player.subtitle.download.nokey": "کلید API OpenSubtitles خود را در تنظیمات وارد کنید",
+  "player.subtitle.download.badkey": "OpenSubtitles کلید API را نپذیرفت",
+  "player.subtitle.download.noresult": "برای این ویدیو زیرنویسی یافت نشد",
+  "player.subtitle.download.quota": "سهمیه روزانه دریافت زیرنویس تمام شده است",
+  "player.subtitle.download.offline": "امکان دسترسی به OpenSubtitles نبود",
+  "player.subtitle.download.writefail": "زیرنویس در کنار ویدیو ذخیره نشد",
+  "player.subtitle.download.toofast": "درخواست‌های بیش از حد به OpenSubtitles — کمی بعد دوباره تلاش کنید"
 }

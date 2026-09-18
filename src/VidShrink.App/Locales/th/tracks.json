@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "เกาหลี",
   "player.subtitle.external": " (ภายนอก)",
   "player.subtitle.novideo": "เปิดวิดีโอก่อนเพิ่มคำบรรยาย",
-  "player.subtitle.loadfailed": "โหลดไฟล์คำบรรยายไม่สำเร็จ"
+  "player.subtitle.loadfailed": "โหลดไฟล์คำบรรยายไม่สำเร็จ",
+  "player.subtitle.download": "ดาวน์โหลดคำบรรยาย…",
+  "player.subtitle.download.getkey": "ดาวน์โหลดคำบรรยาย — รับคีย์ API…",
+  "player.subtitle.download.working": "กำลังค้นหาคำบรรยาย…",
+  "player.subtitle.download.done": "ดาวน์โหลดคำบรรยายแล้ว: {0}",
+  "player.subtitle.download.nokey": "กรอกคีย์ API ของ OpenSubtitles ในการตั้งค่า",
+  "player.subtitle.download.badkey": "OpenSubtitles ไม่ยอมรับคีย์ API",
+  "player.subtitle.download.noresult": "ไม่พบคำบรรยายสำหรับวิดีโอนี้",
+  "player.subtitle.download.quota": "โควตาการดาวน์โหลดคำบรรยายรายวันเต็มแล้ว",
+  "player.subtitle.download.offline": "ไม่สามารถเชื่อมต่อกับ OpenSubtitles ได้",
+  "player.subtitle.download.writefail": "ไม่สามารถบันทึกคำบรรยายไว้ข้างวิดีโอได้",
+  "player.subtitle.download.toofast": "ส่งคำขอไปยัง OpenSubtitles มากเกินไป — โปรดลองใหม่อีกครั้งในอีกสักครู่"
 }

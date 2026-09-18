@@ -41,5 +41,8 @@
   "settings.default-app.open": "Numatytosios programos",
   "settings.default-app.dismiss": "Daugiau neklausti",
   "settings.player-shortcuts.title": "Leistuvo spartieji klavišai",
-  "settings.player-shortcuts.hint": "Leistuvo skirtukas, jo meniu ir šis sąrašas visi skaito tą pačią lentelę."
+  "settings.player-shortcuts.hint": "Leistuvo skirtukas, jo meniu ir šis sąrašas visi skaito tą pačią lentelę.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API raktas",
+  "settings-tab.opensubtitles.get": "Gauti raktą",
+  "settings-tab.opensubtitles.hint": "Subtitrų atsisiuntimas leistuve naudoja jūsų paties raktą. Sukurkite nemokamą paskyrą opensubtitles.com svetainėje, tada įklijuokite raktą čia. Be rakto ši funkcija lieka išjungta."
 }

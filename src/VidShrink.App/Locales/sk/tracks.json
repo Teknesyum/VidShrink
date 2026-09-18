@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Kórejské",
   "player.subtitle.external": " (externé)",
   "player.subtitle.novideo": "Pred pridaním titulkov otvorte video",
-  "player.subtitle.loadfailed": "Súbor s titulkami sa nepodarilo načítať"
+  "player.subtitle.loadfailed": "Súbor s titulkami sa nepodarilo načítať",
+  "player.subtitle.download": "Stiahnuť titulky…",
+  "player.subtitle.download.getkey": "Stiahnuť titulky — získať API kľúč…",
+  "player.subtitle.download.working": "Vyhľadávanie titulkov…",
+  "player.subtitle.download.done": "Titulky stiahnuté: {0}",
+  "player.subtitle.download.nokey": "Zadajte svoj API kľúč OpenSubtitles v Nastaveniach",
+  "player.subtitle.download.badkey": "OpenSubtitles kľúč API neprijalo",
+  "player.subtitle.download.noresult": "Pre toto video sa nenašli žiadne titulky",
+  "player.subtitle.download.quota": "Denný limit sťahovania titulkov je vyčerpaný",
+  "player.subtitle.download.offline": "OpenSubtitles sa nepodarilo kontaktovať",
+  "player.subtitle.download.writefail": "Titulky sa nepodarilo uložiť k videu",
+  "player.subtitle.download.toofast": "Príliš veľa požiadaviek na OpenSubtitles — skúste to o chvíľu znova"
 }

@@ -41,5 +41,8 @@
   "settings.default-app.open": "Programu chaguomsingi",
   "settings.default-app.dismiss": "Usiulize tena",
   "settings.player-shortcuts.title": "Njia za mkato za kichezaji",
-  "settings.player-shortcuts.hint": "Kichupo cha kichezaji, menyu yake, na orodha hii vyote vinasoma jedwali moja."
+  "settings.player-shortcuts.hint": "Kichupo cha kichezaji, menyu yake, na orodha hii vyote vinasoma jedwali moja.",
+  "settings-tab.opensubtitles.label": "Ufunguo wa API wa OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Pata ufunguo",
+  "settings-tab.opensubtitles.hint": "Kupakua manukuu kwenye kicheza kunatumia ufunguo wako binafsi. Fungua akaunti ya bure kwenye opensubtitles.com, kisha bandika ufunguo hapa. Bila ufunguo, kipengele hiki kinabaki kimezimwa."
 }

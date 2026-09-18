@@ -41,5 +41,8 @@
   "settings.default-app.open": "برنامه‌های پیش‌فرض",
   "settings.default-app.dismiss": "دیگر نپرس",
   "settings.player-shortcuts.title": "میانبرهای پخش‌کننده",
-  "settings.player-shortcuts.hint": "تب پخش‌کننده، منوی آن و این فهرست همگی از یک جدول می‌خوانند."
+  "settings.player-shortcuts.hint": "تب پخش‌کننده، منوی آن و این فهرست همگی از یک جدول می‌خوانند.",
+  "settings-tab.opensubtitles.label": "کلید API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "گرفتن کلید",
+  "settings-tab.opensubtitles.hint": "دریافت زیرنویس در پخش‌کننده از کلید شخصی شما استفاده می‌کند. یک حساب رایگان در opensubtitles.com بسازید، سپس کلید را اینجا بچسبانید. بدون کلید، این ویژگی خاموش می‌ماند."
 }

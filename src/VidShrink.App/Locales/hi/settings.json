@@ -41,5 +41,8 @@
   "settings.default-app.open": "डिफ़ॉल्ट ऐप",
   "settings.default-app.dismiss": "फिर न पूछें",
   "settings.player-shortcuts.title": "प्लेयर शॉर्टकट",
-  "settings.player-shortcuts.hint": "प्लेयर टैब, इसका मेनू और यह सूची सभी एक ही टेबल से पढ़ते हैं।"
+  "settings.player-shortcuts.hint": "प्लेयर टैब, इसका मेनू और यह सूची सभी एक ही टेबल से पढ़ते हैं।",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API कुंजी",
+  "settings-tab.opensubtitles.get": "कुंजी प्राप्त करें",
+  "settings-tab.opensubtitles.hint": "प्लेयर में सबटाइटल डाउनलोड आपकी अपनी कुंजी का उपयोग करता है। opensubtitles.com पर एक मुफ़्त खाता बनाएं, फिर कुंजी यहां चिपकाएं। कुंजी के बिना यह सुविधा बंद रहती है।"
 }

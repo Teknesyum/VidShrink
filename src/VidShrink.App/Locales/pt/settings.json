@@ -41,5 +41,8 @@
   "settings.default-app.open": "Aplicativos padrão",
   "settings.default-app.dismiss": "Não perguntar de novo",
   "settings.player-shortcuts.title": "Atalhos do player",
-  "settings.player-shortcuts.hint": "A aba do player, seu menu e esta lista leem a mesma tabela."
+  "settings.player-shortcuts.hint": "A aba do player, seu menu e esta lista leem a mesma tabela.",
+  "settings-tab.opensubtitles.label": "Chave de API do OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Obter uma chave",
+  "settings-tab.opensubtitles.hint": "O download de legendas no player usa sua própria chave. Crie uma conta gratuita em opensubtitles.com e cole a chave aqui. Sem chave, o recurso permanece desativado."
 }

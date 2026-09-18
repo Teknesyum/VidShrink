@@ -41,5 +41,8 @@
   "settings.default-app.open": "Aplikasi lalai",
   "settings.default-app.dismiss": "Jangan tanya lagi",
   "settings.player-shortcuts.title": "Pintasan pemain",
-  "settings.player-shortcuts.hint": "Tab pemain, menunya dan senarai ini semuanya membaca jadual yang sama."
+  "settings.player-shortcuts.hint": "Tab pemain, menunya dan senarai ini semuanya membaca jadual yang sama.",
+  "settings-tab.opensubtitles.label": "Kunci API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Dapatkan kunci",
+  "settings-tab.opensubtitles.hint": "Muat turun sari kata dalam pemain menggunakan kunci anda sendiri. Cipta akaun percuma di opensubtitles.com, kemudian tampal kunci di sini. Tanpa kunci, ciri ini kekal dimatikan."
 }

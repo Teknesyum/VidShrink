@@ -41,5 +41,8 @@
   "settings.default-app.open": "Varsayılan uygulamalar",
   "settings.default-app.dismiss": "Bir daha sorma",
   "settings.player-shortcuts.title": "Oynatıcı kısayolları",
-  "settings.player-shortcuts.hint": "Oynatıcı sekmesi, menüsü ve bu liste aynı tablodan okur."
+  "settings.player-shortcuts.hint": "Oynatıcı sekmesi, menüsü ve bu liste aynı tablodan okur.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API anahtarı",
+  "settings-tab.opensubtitles.get": "Anahtar al",
+  "settings-tab.opensubtitles.hint": "Oynatıcıdaki altyazı indirme kendi anahtarınızı kullanır. opensubtitles.com'da ücretsiz bir tüketici hesabı oluşturun, ardından anahtarı buraya yapıştırın. Anahtar yoksa özellik kapalı kalır."
 }

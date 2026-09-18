@@ -41,5 +41,8 @@
   "settings.default-app.open": "Standardappar",
   "settings.default-app.dismiss": "Fråga inte igen",
   "settings.player-shortcuts.title": "Spelargenvägar",
-  "settings.player-shortcuts.hint": "Spelarfliken, dess meny och den här listan läser alla samma tabell."
+  "settings.player-shortcuts.hint": "Spelarfliken, dess meny och den här listan läser alla samma tabell.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles-API-nyckel",
+  "settings-tab.opensubtitles.get": "Skaffa en nyckel",
+  "settings-tab.opensubtitles.hint": "Hämtning av undertexter i spelaren använder din egen nyckel. Skapa ett kostnadsfritt konto på opensubtitles.com och klistra in nyckeln här. Utan nyckel förblir funktionen avstängd."
 }

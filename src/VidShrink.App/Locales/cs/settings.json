@@ -41,5 +41,8 @@
   "settings.default-app.open": "Výchozí aplikace",
   "settings.default-app.dismiss": "Už se neptat",
   "settings.player-shortcuts.title": "Klávesové zkratky přehrávače",
-  "settings.player-shortcuts.hint": "Karta přehrávače, jeho menu a tento seznam čtou ze stejné tabulky."
+  "settings.player-shortcuts.hint": "Karta přehrávače, jeho menu a tento seznam čtou ze stejné tabulky.",
+  "settings-tab.opensubtitles.label": "API klíč OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Získat klíč",
+  "settings-tab.opensubtitles.hint": "Stahování titulků v přehrávači používá váš vlastní klíč. Vytvořte si bezplatný účet na opensubtitles.com a klíč sem vložte. Bez klíče zůstane tato funkce vypnutá."
 }

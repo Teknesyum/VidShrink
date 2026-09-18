@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "한국어",
   "player.subtitle.external": " (외부)",
   "player.subtitle.novideo": "자막을 추가하기 전에 동영상을 여세요",
-  "player.subtitle.loadfailed": "자막 파일을 불러올 수 없습니다"
+  "player.subtitle.loadfailed": "자막 파일을 불러올 수 없습니다",
+  "player.subtitle.download": "자막 다운로드…",
+  "player.subtitle.download.getkey": "자막 다운로드 — API 키 받기…",
+  "player.subtitle.download.working": "자막을 검색하는 중…",
+  "player.subtitle.download.done": "자막을 다운로드했습니다: {0}",
+  "player.subtitle.download.nokey": "설정에서 OpenSubtitles API 키를 입력하세요",
+  "player.subtitle.download.badkey": "OpenSubtitles가 API 키를 받아들이지 않았습니다",
+  "player.subtitle.download.noresult": "이 동영상에 맞는 자막을 찾을 수 없습니다",
+  "player.subtitle.download.quota": "일일 자막 다운로드 할당량이 모두 사용되었습니다",
+  "player.subtitle.download.offline": "OpenSubtitles에 연결할 수 없습니다",
+  "player.subtitle.download.writefail": "자막을 동영상 옆에 저장할 수 없습니다",
+  "player.subtitle.download.toofast": "OpenSubtitles에 너무 많은 요청을 보냈습니다 — 잠시 후 다시 시도하세요"
 }

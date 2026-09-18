@@ -36,5 +36,16 @@
   "player.subtitle.encoding.korean": "Корейски",
   "player.subtitle.external": " (външни)",
   "player.subtitle.novideo": "Отворете видео, преди да добавите субтитри",
-  "player.subtitle.loadfailed": "Файлът със субтитри не можа да бъде зареден"
+  "player.subtitle.loadfailed": "Файлът със субтитри не можа да бъде зареден",
+  "player.subtitle.download": "Изтегляне на субтитри…",
+  "player.subtitle.download.getkey": "Изтегляне на субтитри — вземете API ключ…",
+  "player.subtitle.download.working": "Търсене на субтитри…",
+  "player.subtitle.download.done": "Субтитрите са изтеглени: {0}",
+  "player.subtitle.download.nokey": "Въведете своя API ключ на OpenSubtitles в Настройки",
+  "player.subtitle.download.badkey": "OpenSubtitles не прие API ключа",
+  "player.subtitle.download.noresult": "За това видео не бяха намерени субтитри",
+  "player.subtitle.download.quota": "Дневната квота за изтегляне на субтитри е изчерпана",
+  "player.subtitle.download.offline": "OpenSubtitles не беше достигнат",
+  "player.subtitle.download.writefail": "Субтитрите не можаха да бъдат запазени до видеото",
+  "player.subtitle.download.toofast": "Твърде много заявки към OpenSubtitles — опитайте отново след малко"
 }

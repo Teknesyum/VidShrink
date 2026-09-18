@@ -253,6 +253,7 @@ public partial class MainWindow : Window
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
+        Watch(TxtOpenSubtitlesKey, TextBox.TextProperty, SaveAppSettings);
         BuildShareTargetStrip();
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
         foreach (var control in new SelectingItemsControl[]
@@ -1322,6 +1323,7 @@ public partial class MainWindow : Window
             FollowRecording = ChkFollowRecording.IsChecked == true,
             FfmpegPathMode = FfmpegPathModeIndex,
             FfmpegPath = TxtFfmpegPath.Text ?? "",
+            OpenSubtitlesApiKey = (TxtOpenSubtitlesKey.Text ?? "").Trim(),
             Theme = _theme
         };
     }
@@ -1358,6 +1360,7 @@ public partial class MainWindow : Window
 
             FfmpegPathModeIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
             TxtFfmpegPath.Text = settings.FfmpegPath;
+            TxtOpenSubtitlesKey.Text = settings.OpenSubtitlesApiKey;
             FfmpegPathPickerRow.IsVisible = settings.FfmpegPathMode == 1;
             ValidateFfmpegPath();
 
@@ -1426,6 +1429,13 @@ public partial class MainWindow : Window
             ReportSourceError($"{Say("main.error.pick")}: {ex.Message}");
         }
     }
+
+    /// <summary>
+    /// Anahtar bizde değil kullanıcıda: sağlayıcının anahtar sayfasını açar, kullanıcı
+    /// kendi anahtarını alıp yandaki kutuya yapıştırır.
+    /// </summary>
+    private void OnOpenSubtitlesKeyPage(object? sender, RoutedEventArgs e)
+        => OpenExternal(VidShrink.Core.Subtitles.OpenSubtitlesProvider.KeyPageUrl);
 
     private async void OnBrowseFfmpegPath(object? sender, RoutedEventArgs e)
     {

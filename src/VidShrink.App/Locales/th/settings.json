@@ -41,5 +41,8 @@
   "settings.default-app.open": "แอปเริ่มต้น",
   "settings.default-app.dismiss": "ไม่ต้องถามอีก",
   "settings.player-shortcuts.title": "ปุ่มลัดตัวเล่น",
-  "settings.player-shortcuts.hint": "แท็บตัวเล่น เมนูของมัน และรายการนี้ ทั้งหมดอ่านจากตารางเดียวกัน"
+  "settings.player-shortcuts.hint": "แท็บตัวเล่น เมนูของมัน และรายการนี้ ทั้งหมดอ่านจากตารางเดียวกัน",
+  "settings-tab.opensubtitles.label": "คีย์ API ของ OpenSubtitles",
+  "settings-tab.opensubtitles.get": "รับคีย์",
+  "settings-tab.opensubtitles.hint": "การดาวน์โหลดคำบรรยายในตัวเล่นใช้คีย์ของคุณเอง สร้างบัญชีผู้ใช้ฟรีที่ opensubtitles.com แล้ววางคีย์ที่นี่ หากไม่มีคีย์ ฟีเจอร์นี้จะปิดอยู่"
 }

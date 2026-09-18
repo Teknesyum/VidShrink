@@ -41,5 +41,8 @@
   "settings.default-app.open": "Zadane aplikacije",
   "settings.default-app.dismiss": "Ne pitaj više",
   "settings.player-shortcuts.title": "Prečaci preglednika",
-  "settings.player-shortcuts.hint": "Kartica preglednika, njezin izbornik i ovaj popis svi čitaju istu tablicu."
+  "settings.player-shortcuts.hint": "Kartica preglednika, njezin izbornik i ovaj popis svi čitaju istu tablicu.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API ključ",
+  "settings-tab.opensubtitles.get": "Nabavi ključ",
+  "settings-tab.opensubtitles.hint": "Preuzimanje titlova u playeru koristi vaš vlastiti ključ. Otvorite besplatni korisnički račun na opensubtitles.com, zatim zalijepite ključ ovdje. Bez ključa značajka ostaje isključena."
 }

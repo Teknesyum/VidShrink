@@ -41,5 +41,8 @@
   "settings.default-app.open": "Default apps",
   "settings.default-app.dismiss": "Do not ask again",
   "settings.player-shortcuts.title": "Player shortcuts",
-  "settings.player-shortcuts.hint": "The player tab, its menu and this list all read the same table."
+  "settings.player-shortcuts.hint": "The player tab, its menu and this list all read the same table.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API key",
+  "settings-tab.opensubtitles.get": "Get a key",
+  "settings-tab.opensubtitles.hint": "Subtitle download in the player uses your own key. Create a free consumer account at opensubtitles.com, then paste the key here. Without a key the feature stays off."
 }

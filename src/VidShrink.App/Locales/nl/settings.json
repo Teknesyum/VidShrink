@@ -41,5 +41,8 @@
   "settings.default-app.open": "Standaard-apps",
   "settings.default-app.dismiss": "Niet meer vragen",
   "settings.player-shortcuts.title": "Sneltoetsen speler",
-  "settings.player-shortcuts.hint": "Het spelertabblad, zijn menu en deze lijst lezen allemaal dezelfde tabel."
+  "settings.player-shortcuts.hint": "Het spelertabblad, zijn menu en deze lijst lezen allemaal dezelfde tabel.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles-API-sleutel",
+  "settings-tab.opensubtitles.get": "Sleutel aanvragen",
+  "settings-tab.opensubtitles.hint": "Het downloaden van ondertitels in de player gebruikt uw eigen sleutel. Maak een gratis account aan op opensubtitles.com en plak de sleutel hier. Zonder sleutel blijft de functie uitgeschakeld."
 }

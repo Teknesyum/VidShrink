@@ -41,5 +41,8 @@
   "settings.default-app.open": "Aplicaciones predeterminadas",
   "settings.default-app.dismiss": "No volver a preguntar",
   "settings.player-shortcuts.title": "Atajos del reproductor",
-  "settings.player-shortcuts.hint": "La pestaña del reproductor, su menú y esta lista leen todos de la misma tabla."
+  "settings.player-shortcuts.hint": "La pestaña del reproductor, su menú y esta lista leen todos de la misma tabla.",
+  "settings-tab.opensubtitles.label": "Clave de API de OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Obtener una clave",
+  "settings-tab.opensubtitles.hint": "La descarga de subtítulos del reproductor usa tu propia clave. Crea una cuenta de consumidor gratuita en opensubtitles.com y pega la clave aquí. Sin clave, la función permanece desactivada."
 }

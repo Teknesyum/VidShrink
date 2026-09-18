@@ -41,5 +41,8 @@
   "settings.default-app.open": "التطبيقات الافتراضية",
   "settings.default-app.dismiss": "لا تسأل مجدداً",
   "settings.player-shortcuts.title": "اختصارات المشغّل",
-  "settings.player-shortcuts.hint": "تبويب المشغّل وقائمته وهذه القائمة كلها تقرأ من الجدول نفسه."
+  "settings.player-shortcuts.hint": "تبويب المشغّل وقائمته وهذه القائمة كلها تقرأ من الجدول نفسه.",
+  "settings-tab.opensubtitles.label": "مفتاح API الخاص بـ OpenSubtitles",
+  "settings-tab.opensubtitles.get": "الحصول على مفتاح",
+  "settings-tab.opensubtitles.hint": "تنزيل الترجمات في المشغل يستخدم مفتاحك الخاص. أنشئ حساب مستخدم مجاني على opensubtitles.com، ثم الصق المفتاح هنا. بدون مفتاح تبقى الميزة معطلة."
 }
