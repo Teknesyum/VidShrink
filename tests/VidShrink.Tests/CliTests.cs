@@ -196,12 +196,54 @@ public sealed class CliTests
     [InlineData("error.extra-input", "plan", "a.mp4", "b.mp4", "--hedef", "25")]
     [InlineData("error.unknown-command", "sil", "a.mp4")]
     [InlineData("error.watch-no-output", "izle", "a.mp4")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "10")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "10-20-30")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "40-20")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "0:70-0:90")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--kes", "-20")]
+    [InlineData("error.bad-range", "plan", "a.mp4", "--hedef", "25", "--cut", "abc-def")]
     public void YanlisKullanimAdiylaReddediliyor(string key, params string[] args)
     {
         var parsed = CliParser.Parse(args);
 
         Assert.False(parsed.Ok);
         Assert.Equal(key, parsed.ErrorKey);
+    }
+
+    /// <summary>
+    /// <c>error.bad-range</c>'i hicbir test okumuyordu (denetim bulgusu): anahtari bozan
+    /// bir mutasyon sessizce geciyordu. Burada hem reddedilen degerin anahtari hem de
+    /// anahtarin iki dil dosyasindaki karsiligi okunur; kabul edilen kesitler ise ayni
+    /// yolun <b>kirmizi olmadigini</b> gosterir, boylece "her sey bad-range" mutasyonu da
+    /// kirilir.
+    /// </summary>
+    [Theory]
+    [InlineData("10-40", 10.0, 40.0)]
+    [InlineData("0:10-0:40", 10.0, 40.0)]
+    [InlineData("90-", 90.0, null)]
+    [InlineData("1:02:03-1:02:04", 3723.0, 3724.0)]
+    public void KabulEdilenKesitBadRangeVermez(string kesit, double start, double? end)
+    {
+        var parsed = CliParser.Parse(new[] { "plan", "a.mp4", "--hedef", "25", "--kes", kesit });
+
+        Assert.True(parsed.Ok, parsed.ErrorKey);
+        Assert.Equal(start, parsed.Request!.TrimStartSeconds);
+        Assert.Equal(end, parsed.Request!.TrimEndSeconds);
+    }
+
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void BadRangeCumlesiDilDosyasindanGeliyorVeDegeriTasiyor(string dil)
+    {
+        var parsed = CliParser.Parse(new[] { "plan", "a.mp4", "--hedef", "25", "--kes", "40-20" });
+
+        Assert.Equal("error.bad-range", parsed.ErrorKey);
+        Assert.Equal("40-20", parsed.ErrorArgument);
+
+        var cumle = CliText.ForLanguage(dil).Format(parsed.ErrorKey!, parsed.ErrorArgument!);
+        Assert.Contains("40-20", cumle, StringComparison.Ordinal);
+        Assert.Contains("0:10-0:40", cumle, StringComparison.Ordinal);
     }
 
     [Fact]

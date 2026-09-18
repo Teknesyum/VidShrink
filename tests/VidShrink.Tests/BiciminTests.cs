@@ -639,6 +639,58 @@ public sealed class KareYerlesimTests
         Assert.DoesNotContain("crf ", govde, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// <para>Denetim borcu: <c>main.unit.score-suffix</c>, <c>main.unit.score-value</c> ve
+    /// <c>main.advanced.mode.crf</c> 42 dilde bayt bayt ayni ("/100", "{0}/100", "CRF").
+    /// Tek degerli olduklari icin dil kollari onlari ayirt edemiyor; ucunu de koda sabit
+    /// yazan bir mutasyon 369 testi yesil birakiyordu.</para>
+    /// <para><b>Karar</b>: "bilincli tek degerli" ilan etmek yerine <b>sozlukten okundugu
+    /// pimlenir</b>. Gerekce: ucu de ekranda kullaniciya gorunen metin ve ceviriye acik —
+    /// "/100" yerine "0-100 puan", "CRF" yerine "kalite carpani" yazmak isteyen bir dil
+    /// tamamen mesru. Tek degerli olmalari bugunku ceviri durumu, kalici bir kural degil;
+    /// birim sabitini koda tasimak o kapiyi kapatirdi. Olcu, <c>Kopya</c> ile dil
+    /// dosyasinin kopyasinda ucunu de baska bicime cevirir: sabiti koddan yazan bir mutasyon
+    /// enjeksiyondan etkilenmez ve burada kirmizi verir.</para>
+    /// </summary>
+    [Fact]
+    public void PuanBirimiVeKipAdiDilDosyasindanGelir()
+    {
+        var kopya = Kopya("s9-puan-kip", new Dictionary<string, string>
+        {
+            ["\"main.unit.score-suffix\": \"/100\""] = "\"main.unit.score-suffix\": \" pts (max 100)\"",
+            ["\"main.unit.score-value\": \"{0}/100\""] = "\"main.unit.score-value\": \"{0} pts (max 100)\"",
+            ["\"main.advanced.mode.crf\": \"CRF\""] = "\"main.advanced.mode.crf\": \"Quality factor\""
+        });
+
+        (string birim, string not, string kip) okunan;
+        AppHost.Run(() => Strings.UseRoot(kopya));
+        try
+        {
+            okunan = Yuklu("en", window =>
+            {
+                var kalite = Named<TextBox>(window, "TxtQualityTarget");
+                var izgara = ((Grid)kalite.Parent!).Children;
+                var birim = (izgara[izgara.IndexOf(kalite) + 1] as TextBlock)?.Text ?? "";
+                var kip = (window.FindControl<ComboBox>("CmbQualityMode")!.Items[0] as ComboBoxItem)?.Content?.ToString() ?? "";
+                return (birim, not: Named<TextBlock>(window, "TxtEstimateNote").Text ?? "", kip);
+            });
+        }
+        finally
+        {
+            AppHost.Run(() => Strings.UseRoot(null));
+        }
+
+        var kanit = Path.Combine(GirdiKanit.Root, ".calisma", "s9-puan-kip");
+        Directory.CreateDirectory(kanit);
+        File.WriteAllText(Path.Combine(kanit, "okunan.txt"), string.Join("\n", okunan.birim, okunan.not, okunan.kip));
+
+        Assert.Equal(" pts (max 100)", okunan.birim, StringComparer.OrdinalIgnoreCase);
+        Assert.EndsWith(" pts (max 100)", okunan.not, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("Quality factor", okunan.kip, StringComparer.OrdinalIgnoreCase);
+        Assert.DoesNotContain("/100", okunan.birim + okunan.not, StringComparison.Ordinal);
+        Assert.DoesNotContain("CRF", okunan.kip, StringComparison.OrdinalIgnoreCase);
+    }
+
     [Fact]
     public void TuretmeSatiriHedefKutusunuIzler()
     {

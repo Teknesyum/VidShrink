@@ -351,6 +351,55 @@ public sealed class WatchFolderTests
         Assert.Contains($"Çıkış kodları: bittiğinde `{ExitCodes.InBand}`, `--bir-kez` bitip en az bir dosya başarısız olduğunda `{ExitCodes.WatchFailures}`,\nhatada `{ExitCodes.Error}`, yanlış kullanımda `{ExitCodes.Usage}`, Ctrl+C ile durdurulduğunda `{ExitCodes.Cancelled}`.", turkce, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// <para>A3 denetim borcu: durum dosyasinin adindaki <c>&lt;hash&gt;</c> de isletim
+    /// sisteminin harf kuralina bagliydi ama hicbir belgede yazmiyordu — kullanici ayni
+    /// klasorun neden bazen tek bazen iki durum dosyasi actigini okuyacagi bir yer yoktu.
+    /// Kural artik iki READMEde yazili ve <b>burada kuralin kendisine</b> bagli: belge
+    /// uzunlugu sabitten okur, ucu de <see cref="WatchFolder.StateKey(string, StringComparison)"/>
+    /// ile uc isletim sistemi kolunda olculur.</para>
+    /// <para>Ozet kolu <c>StateKey</c>'in <b>kendi</b> asiri yuklemesinden alinir, boylece
+    /// olcu kosan makineye bagli kalmaz: Windows ve macOS kollari harfi yok sayar, Linux
+    /// kolu ayirir.</para>
+    /// </summary>
+    [Fact]
+    public void IzleBelgesiOzetAnahtariniKuraldanPimliyor()
+    {
+        var duyarsiz = WatchFolder.ComparisonFor(windows: true, mac: false);
+        var mac = WatchFolder.ComparisonFor(windows: false, mac: true);
+        var duyarli = WatchFolder.ComparisonFor(windows: false, mac: false);
+
+        var kucuk = Path.Combine(Path.GetTempPath(), "gelen");
+        var buyuk = Path.Combine(Path.GetTempPath(), "Gelen");
+        var baska = Path.Combine(Path.GetTempPath(), "giden");
+
+        Assert.Equal(WatchFolder.StateKey(kucuk, duyarsiz), WatchFolder.StateKey(buyuk, duyarsiz));
+        Assert.Equal(WatchFolder.StateKey(kucuk, mac), WatchFolder.StateKey(buyuk, mac));
+        Assert.NotEqual(WatchFolder.StateKey(kucuk, duyarli), WatchFolder.StateKey(buyuk, duyarli));
+        Assert.NotEqual(WatchFolder.StateKey(kucuk, duyarsiz), WatchFolder.StateKey(baska, duyarsiz));
+        Assert.Equal(WatchFolder.StateKey(kucuk, duyarli), WatchFolder.StateKey(kucuk, duyarli));
+
+        var ozet = WatchFolder.StateKey(kucuk, duyarli);
+        Assert.Equal(WatchFolder.StateKeyHexLength, ozet.Length);
+        Assert.All(ozet, harf => Assert.Contains(harf, "0123456789abcdef"));
+        Assert.Equal(
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(kucuk)))
+                [..WatchFolder.StateKeyHexLength].ToLowerInvariant(),
+            ozet);
+
+        var ingilizce = Belge("README.md");
+        Assert.Contains($"`<hash>` is the first {WatchFolder.StateKeyHexLength} hex characters, lowercase, of the SHA-256", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("upper-cased\nfirst where the running system ignores case (Windows and macOS), taken as it stands on\nLinux.", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("one shared state file on Windows and macOS and two\nseparate ones on Linux", ingilizce, StringComparison.Ordinal);
+        Assert.Contains("`izle-<hash>.json`", ingilizce, StringComparison.Ordinal);
+
+        var turkce = Belge("README.tr.md");
+        Assert.Contains($"SHA-256'sının ilk {WatchFolder.StateKeyHexLength} onaltılık karakteri, küçük harfle.", turkce, StringComparison.Ordinal);
+        Assert.Contains("(Windows ve macOS) önce büyük harfe çevriliyor, Linux'ta olduğu gibi alınıyor.", turkce, StringComparison.Ordinal);
+        Assert.Contains("Windows ve macOS'ta tek bir durum dosyasını paylaşıyor, Linux'ta iki ayrı dosya", turkce, StringComparison.Ordinal);
+        Assert.Contains("`izle-<ozet>.json`", turkce, StringComparison.Ordinal);
+    }
+
     private static string Belge(string ad) =>
         File.ReadAllText(Path.Combine(TipSources.Root, ad)).Replace("\r\n", "\n", StringComparison.Ordinal);
 

@@ -86,7 +86,8 @@ public class KucultmeAraligiTests
         var yakin = Sonraki(60);
         var uzak = Sonraki(360);
         Assert.Equal(yakin, uzak, 3);
-        Assert.True(uzak >= 5, $"kare hassas kalan {uzak} saniye, anahtar kare araligini karsilamiyor");
+        Assert.Equal(10.0, uzak, 3);
+        Assert.Equal(TrimWindow.SeekLeadSeconds, uzak, 3);
     }
 
     [Theory]
@@ -242,11 +243,28 @@ public class KucultmeAraligiTests
     [Theory]
     [InlineData(9999.0)]
     [InlineData(601.0)]
+    [InlineData(600.0)]
     public void KaynagiAsanSonUcKaynagaKirpilir(double end)
     {
         var kirpilan = TrimWindow.Of(10, end, 600)!;
-        Assert.Equal(TrimWindow.Of(10, 600, 600)!.DurationSeconds, kirpilan.DurationSeconds, 3);
-        Assert.Equal(590, kirpilan.DurationSeconds, 3);
+
+        Assert.Equal(10.0, kirpilan.StartSeconds, 3);
+        Assert.Equal(600.0, kirpilan.EndSeconds, 3);
+        Assert.Equal(590.0, kirpilan.DurationSeconds, 3);
+    }
+
+    /// <summary>
+    /// Kirpma yalniz <b>asan</b> uca dokunur: kaynagin icinde kalan bir son oldugu gibi
+    /// durur. Ust siniri kaynak suresine sabitleyen bir mutasyon burada kirilir.
+    /// </summary>
+    [Fact]
+    public void KaynaginIcindekiSonKirpilmaz()
+    {
+        var pencere = TrimWindow.Of(10, 200, 600)!;
+
+        Assert.Equal(10.0, pencere.StartSeconds, 3);
+        Assert.Equal(200.0, pencere.EndSeconds, 3);
+        Assert.Equal(190.0, pencere.DurationSeconds, 3);
     }
 }
 

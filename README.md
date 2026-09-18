@@ -161,9 +161,15 @@ deleted and the file is picked up again once it settles.
 
 Progress is kept in `.vidshrink-izle.json` inside the watched folder, by name and size; a
 renamed or resized file counts as new. If that folder is read-only the state goes to the
-output folder as `.vidshrink-izle-<hash>.json`, and failing that to the settings folder. A
-file that failed is retried once on the next start. To process everything again, delete the
-state file.
+output folder as `.vidshrink-izle-<hash>.json`, and failing that to the settings folder as
+`izle-<hash>.json`. A file that failed is retried once on the next start. To process
+everything again, delete the state file.
+
+`<hash>` is the first 16 hex characters, lowercase, of the SHA-256 of the watched folder's
+path. The path enters the hash under the same rule as the two comparisons below: upper-cased
+first where the running system ignores case (Windows and macOS), taken as it stands on
+Linux. So `/gelen` and `/Gelen` get one shared state file on Windows and macOS and two
+separate ones on Linux, and the same folder always produces the same name.
 
 Exactly two comparisons follow the rule of the running system: the watched folder against
 the output folder, and a candidate against the output names this run has written. Those are

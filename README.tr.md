@@ -164,7 +164,14 @@ değişirse çıktı siliniyor ve dosya durulunca yeniden ele alınıyor.
 
 İlerleme, izlenen klasörün içindeki `.vidshrink-izle.json` dosyasında ada ve boya göre
 tutuluyor; adı ya da boyu değişen dosya yeni sayılıyor. O klasör salt okunursa durum çıktı
-klasörüne `.vidshrink-izle-<ozet>.json` olarak, o da tutmazsa ayar klasörüne yazılıyor.
+klasörüne `.vidshrink-izle-<ozet>.json` olarak, o da tutmazsa ayar klasörüne
+`izle-<ozet>.json` olarak yazılıyor.
+
+`<ozet>`, izlenen klasörün yolunun SHA-256'sının ilk 16 onaltılık karakteri, küçük harfle.
+Yol özete aşağıdaki iki kıyasla aynı kurala göre giriyor: koşan sistem harfi yok sayıyorsa
+(Windows ve macOS) önce büyük harfe çevriliyor, Linux'ta olduğu gibi alınıyor. Yani `/gelen`
+ile `/Gelen` Windows ve macOS'ta tek bir durum dosyasını paylaşıyor, Linux'ta iki ayrı dosya
+alıyor; aynı klasör her koşumda aynı adı veriyor.
 
 Başarısız olan dosya, bir sonraki açılışta bir kez yeniden denenir. Her şeyi yeniden
 işlemek için durum dosyasını silin.

@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -123,11 +123,24 @@ public sealed class WatchFolder
         return VideoExtensions.Contains(Path.GetExtension(name));
     }
 
-    public static string StateKey(string watchDirectory)
+    /// <summary>
+    /// Durum dosyasinin adindaki <c>&lt;hash&gt;</c>. Kural iki READMEde yazili ve
+    /// <c>WatchFolderTests.IzleBelgesiOzetAnahtariniKuraldanPimliyor</c> ile pimli:
+    /// yol once <see cref="Normalize"/>'dan gecer, isletim sisteminin kurali harf duyarsizsa
+    /// (Windows, macOS) buyuk harfe cevrilir, SHA-256'nin ilk
+    /// <see cref="StateKeyHexLength"/> onaltilik karakteri kucuk harfle alinir. Ozet
+    /// kiyasin kendisiyle ayni kurala bagli: Linux'ta <c>/gelen</c> ile <c>/Gelen</c> iki
+    /// ayri durum dosyasi, Windows ve macOS'ta tek dosya.
+    /// </summary>
+    public const int StateKeyHexLength = 16;
+
+    public static string StateKey(string watchDirectory) => StateKey(watchDirectory, PathComparison);
+
+    public static string StateKey(string watchDirectory, StringComparison comparison)
     {
         var normalized = Normalize(watchDirectory);
-        if (PathComparison == StringComparison.OrdinalIgnoreCase) normalized = normalized.ToUpperInvariant();
-        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(normalized)))[..16].ToLowerInvariant();
+        if (comparison == StringComparison.OrdinalIgnoreCase) normalized = normalized.ToUpperInvariant();
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(normalized)))[..StateKeyHexLength].ToLowerInvariant();
     }
 
     public static IReadOnlyList<string> StateCandidates(string watchDirectory, string outputDirectory, string? fallbackDirectory)
