@@ -404,3 +404,63 @@ geri alindi
 ```
 
 Sekiz mutasyonun sekizi yakalandı.
+
+## 12. CI'da düşen kaydedici testi: sıra bağımlılığı, dalın kusuru değil
+
+İlk CI koşumu (35291760780) tek testte kırmızı geldi:
+
+```
+Failed VidShrink.Tests.KaydediciPencereTests.SeciciLinuxtaKimlikVeEkranMacteKirpmaYazarWaylandiReddeder [10 s]
+  Assert.Equal() Failure: Strings differ
+  Expected: "crop=640:480:200:100"
+  Actual:   "crop=640:480:200:100,scale=1280:720"
+Failed!  - Failed: 1, Passed: 3314, Skipped: 27, Total: 3342, Duration: 29 m 24 s
+KOSUM KAPISI DUSTU: kod=66 sart=Basarisiz/Failed ozeti sifir degil: 1.
+```
+
+**Kusur bu dalın değil.** `git diff main...HEAD` kaydedici kaynaklarında ve kaydedici
+testlerinde boş; dalın yaptığı tek şey, `AotDalgasiTests`'in üç yeni test sınıfıyla xUnit
+koleksiyon sırasını oynatıp main'de duran gizli bir sıra bağımlılığını görünür kılmak.
+
+Mekanizma, salt ölçümle (`.calisma/test-ciktilari/appdata/<pid>/recorder-settings.json`,
+koşum sonrası kalan dosya):
+
+```
+--filter "FullyQualifiedName~KaydediciArayuzTests"   -> 86/86 yeşil
+kalan dosya: "scaleWidth": 1280, "scaleHeight": 720, "tune": "zerolatency", ...
+aynı filtre, GelismisKollarIstegeVeAyaraGecer dışlanınca -> kalan "scaleWidth": 0
+```
+
+Yani `KaydediciArayuzTests.GelismisKollarIstegeVeAyaraGecer` (satır 938-939) paylaşılan
+ayar dosyasına 1280x720 bırakıyor, `KaydediciPencereTests`'in görünümü onu kurucuda
+(`RecorderView.axaml.cs:40`) okuyor ve `-vf`'e `scale=` ekleniyor
+(`RecorderArguments.cs:1185`).
+
+İki değişiklik yapıldı, ikisi de ölçülü:
+
+1. **Kurban yalıtıldı.** `KaydediciPencereTests` mac isteğini `Scale = null` ile kuruyor.
+   Ölçünün konusu pencere kırpması; kalıcı ölçek o ölçüye girmemeli. Bu, sızıntının
+   kanalını tümden kapatıyor.
+2. **Sargının bekleyen yazması kapsandı.** `GelismisOlc` artık ölçümden sonra
+   `Dispatcher.UIThread.RunJobs()` çağırıyor; bekleyen `PersistChoices` işi `finally`'nin
+   geri yazmasından **önce** boşalıyor. Yeni pim:
+   `KaydediciArayuzTests.PaylasilanAyarDosyasiGelismisOlcumdenSonraKirlenmiyor`.
+
+Pimin mutasyon kanıtı — pompa sökülünce:
+
+```
+Assert.DoesNotContain() Failure: Sub-string found
+Başarısız! - Başarısız: 1, Başarılı: 0, Atlanan: 0, Toplam: 1
+```
+
+geri konunca:
+
+```
+Başarılı!  - Başarısız: 0, Başarılı: 1, Atlanan: 0, Toplam: 1
+```
+
+**Kalan borç (kapatılmadı, ölçüldü):** pompa sızıntının dispatcher ayağını kapatıyor ama
+`GelismisKollarIstegeVeAyaraGecer`'in yirmi alanlık gövdesi sınıf bütün koşulduğunda hâlâ
+dosyada 1280x720 bırakıyor — yinelemeli pompa (8 tur) da boşaltmadı, yani yazma bir
+dispatcher işi değil. Kanal (1) ile kapatıldığı için CI yeşile döner; asıl temizlik
+kaydedici sahibinin işi.
