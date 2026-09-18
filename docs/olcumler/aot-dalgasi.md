@@ -50,11 +50,12 @@ tutmadı: ortanca **526,3 ms** (en az 449,6, p95 677,9). 595 dağılımın için
 bir çelişki değil sürüklenme. Ama tersi de doğru: **eşlenmemiş bir oturum-arası sayı hüküm
 değildir**, ne 595 ne 526,3. Bu dalgadaki bütün hükümler aşağıdaki eşli tablolardan çıktı.
 
-## 2. 175 ms'lik bloğun ayrıştırılması
+## 2. 165 ms'lik bloğun ayrıştırılması
 
-Tabanda `libmpv-hazir → cerceve` tek bir 165 ms'lik aralıktı ve içinde ne olduğu okunamıyordu.
-`App.Initialize`'a `AvaloniaXamlLoader.Load` çağrısının önüne ve arkasına iki prob koydum
-(`app-init`, `app-xaml`; `src/VidShrink.App/App.axaml.cs`). Aynı ikilinin içinde okundu:
+Tabanda `libmpv-hazir → cerceve` tek bir aralıktı ve içinde ne olduğu okunamıyordu: bölüm 1
+tablosunda `300,2 − 135,4 = 164,8 ms`. `App.Initialize`'a `AvaloniaXamlLoader.Load` çağrısının
+önüne ve arkasına iki prob koydum (`app-init`, `app-xaml`; `src/VidShrink.App/App.axaml.cs`).
+Aynı ikilinin içinde okundu:
 
 ```
 libmpv-hazir -> app-init  (Avalonia cerceve kurulusu)   145.2 ms
@@ -62,6 +63,11 @@ app-init     -> app-xaml  (App.axaml'in TAMAMI)          13.4 ms
 app-xaml     -> cerceve   (kalan)                         0.2 ms
 iz:palet adimi (PaletteCatalog.Use)                       0.2 ms
 ```
+
+Bu üçlünün toplamı 158,8 ms, taban tablosundaki 164,8 ms değil: **iki ayrı koşum**. Problar
+tabana sonradan eklendiği için blok yalnız problu ikilide ayrışıyor; iki sayı arasındaki 6 ms
+±60 ms'lik gürültü tabanının çok altında ve bir fark olarak okunmamalı. Aynı koşum içinde
+karşılaştırılabilecek olan, bloğun içindeki üç payın birbirine oranı.
 
 Bu sayı 3. engelin içeriğini değiştirdi; bkz. bölüm 4c.
 
@@ -243,7 +249,7 @@ soğuruluyor. Kullanıcıya ulaşmayan kazanç kazanç değil — anahtar dala g
 | anahtar | ölçüm | karar | gerekçe |
 |---|---|---|---|
 | `PublishReadyToRunComposite` | önceki dalgada ölçüldü | **açık kalıyor** | değişmedi |
-| `InvariantGlobalization` | `ilk-kare` -43,5 ms, 7/10 | **hayır** | 44 kültüre duyarlı çağrı noktası; ikisi ölümcül (bölüm 9) |
+| `InvariantGlobalization` | `ilk-kare` -43,5 ms, 7/10 | **hayır** | iki ölümcül çağrı noktası, ikisi de pimli (bölüm 9) |
 | `System.Globalization.UseNls` | `app-init` -26,5 / -12,2; `ilk-kare` +1,6 | **hayır** | kazanç ilk kareye ulaşmıyor, NLS riski bedava değil |
 | `PublishTrimmed` (partial) | **ölçülemedi** | **ertelendi** | ölçüm kalkanı trim'li süreçte yüklenmiyor (bölüm 8) |
 | `TrimMode=full` | ölçülmedi | **ertelendi** | partial'a göre açılış kazancı beklenmiyor; yalnız AOT öncülü |
@@ -253,13 +259,23 @@ Kesme yayını boyut olarak ölçüldü: **317,9 MB / 229 dosya** (kesilmemiş 3
 
 ## 7. Trim/AOT çözümleyicisi: önce/sonra
 
-`EnableTrimAnalyzer` + `EnableAotAnalyzer` ile derleme (sayım, ölçüm değil; iki bayrak da dalda
-bırakılmadı):
+Sayım, ölçüm değil; iki bayrak da dalda bırakılmadı, komut satırından verildi. Taban için
+`a721f6c0`'a ayrı bir worktree açıldı ve iki ağaçta aynı komut koşuldu:
+
+```
+dotnet build VidShrink.sln -c Release -m:2 -t:Rebuild \
+  -p:EnableTrimAnalyzer=true -p:EnableAotAnalyzer=true -p:TreatWarningsAsErrors=false
+```
+
+Sayılan: çıktıdaki `src\...*.cs(satır,sütun): warning IL2026|IL3050` satırları, tekilleştirilmiş.
+**Test ve araç projeleri kapsam dışı** — `tests/` ve `tools/` altında tabanda 43 nokta daha var,
+hiçbiri sevk edilen ikilide değil.
 
 | | uyarı | nokta |
 |---|---:|---:|
-| önce (`a721f6c0`) | 33 | 13 |
+| önce (`a721f6c0`) | 33 | 18 |
 | sonra (bu dal) | 7 | 5 |
+| kapanan | 26 | 13 |
 
 Kapanan noktalar: `CliText.cs:39`, `DefaultAppSuggestionBar.cs:91`, `PlanParser.cs:35`,
 `PresignedUploadProvider.cs:202`, `ShareResult.cs:162` ve `:209`, `ShareTargets.cs:113`,
@@ -267,9 +283,21 @@ Kapanan noktalar: `CliText.cs:39`, `DefaultAppSuggestionBar.cs:91`, `PlanParser.
 ve `:175`.
 
 Kalan noktalar: `PaletteCatalog.cs:102` ve `:123` (çalışma anı `ResourceInclude(Uri)`) ve
-**`PresetLibrary.cs:91`, `:174`, `:201` — bu üçü H4'ün engel listesinde hiç yoktu.**
-`JsonStringEnumConverter(allowIntegerValues: false)` yansıma istiyor; önayarlar açılış yolunda
-değil ama AOT derlemesi IL3050'yi hata sayar.
+`PresetLibrary.cs:91`, `:174`, `:201`. Sonuncular `JsonStringEnumConverter(allowIntegerValues:
+false)` yüzünden yansıma istiyor; önayarlar açılış yolunda değil ama AOT derlemesi IL3050'yi
+hata sayar.
+
+**H4'ün engel listesi eksikmiş.** `docs/olcumler/hipersurus-h.md:111-122` on iki nokta sayıyor,
+tabanda on sekiz var. Listede hiç olmayan **altı** nokta:
+
+| nokta | durum |
+|---|---|
+| `CliText.cs:39` | bu dalgada kapandı |
+| `WatchFolder.cs:161` | bu dalgada kapandı |
+| `WatchFolder.cs:175` | bu dalgada kapandı |
+| `PresetLibrary.cs:91` | kaldı |
+| `PresetLibrary.cs:174` | kaldı |
+| `PresetLibrary.cs:201` | kaldı |
 
 ## 8. Ölçüm duvarı: trim ölçülemedi
 
@@ -292,16 +320,26 @@ uygulamayı düzeneğin dışında elle çalıştırdım; uygulama tam açıldı
 `Applications\VidShrink.exe\shell\open\command`,
 `Teknesyum.VidShrink.Video\shell\open\command` ve `…\DefaultIcon` `.calisma\aot\v4`'e döndü.
 Üçü de gerçek kuruluma (`%LOCALAPPDATA%\Programs\VidShrink\VidShrink.exe`) geri alındı ve temiz
-çıkana kadar tarandı. **Kural: yayınlanmış uygulama düzeneğin dışında hiç çalıştırılmaz.**
+çıkana kadar tarandı; sonraki bağımsız tarama üç anahtarın da gerçek kuruluma baktığını ve
+01:20:30'dan beri yazılmadığını doğruladı. Ayrı bir anahtar, `Applications\VidShrink.App.exe`,
+bu dalgadan önceki bir worktree yoluna bakıyordu; ona hiçbir `UserChoice` bağlı değildi ve T0
+sildi. **Kural: yayınlanmış uygulama düzeneğin dışında hiç çalıştırılmaz.**
 
 ## 9. Yapılmayanlar ve gerekçeleri
 
 - **Kaynak yüklemesini tembelleştirme** — tavanı 13,4 ms, gürültü tabanı ±60 ms. Ölçülemez.
-- **`InvariantGlobalization`** — `MainWindow.axaml.cs:532`: invariant kipte
-  `CurrentUICulture.Name` boş dizge, `ResolveLanguage` hiçbir dili tutmaz ve kaydedilmiş dili
-  olmayan kullanıcı 42 dilin hiçbirini almadan İngilizce açar. `LanguageCatalog.cs:307`:
-  `body[..1].ToUpper(culture)` Türkçe `i`'yi `İ` değil `I` yapar ("iptal" → "Iptal") ve bu tek
-  çağrı arayüzdeki her metnin satır başını üretiyor. -43,5 ms bu bedeli ödemez.
+- **`InvariantGlobalization`** — iki ölümcül çağrı noktası, ikisi de artık pimli:
+  - `MainWindow.axaml.cs:532` — invariant kipte `CurrentUICulture.Name` boş dizge,
+    `ResolveLanguage` hiçbir dili tutmaz ve kaydedilmiş dili olmayan kullanıcı 42 dilin
+    hiçbirini almadan İngilizce açar.
+    Pim: `SettingsTests.LanguageUsesSavedThenOperatingSystemThenEnglish`, `(null, "", "en")` kolu.
+  - `LanguageCatalog.cs:307` — `body[..1].ToUpper(culture)` Türkçe `i`'yi `İ` değil `I` yapar
+    ("iptal" → "Iptal") ve bu tek çağrı arayüzdeki her metnin satır başını üretiyor.
+    Pim: `KulturSozlesmesiTests.TurkceBuyukHarfKuraliKulturdenGeliyor`.
+
+  -43,5 ms bu bedeli ödemez. (Daha önce burada "44 kültüre duyarlı çağrı noktası" yazıyordu;
+  o sayıyı üreten tarama kayıtlı değildi ve hiçbir test onu pimlemiyordu — çıkarıldı. Kararın
+  ölçüsü yukarıdaki iki pim.)
 - **`UseNls`** — bölüm 5e: kazanç `ilk-kare`'ye ulaşmıyor.
 - **`PublishTrimmed`** — bölüm 8: ölçüm kalkanı olmadan ölçülemez, ölçülmeyen değişiklik dalda
   bırakılmaz.
@@ -331,10 +369,15 @@ verir.
 
 ## 11. Pimler ve mutasyon kanıtı
 
-Dokuz pim: `tests/VidShrink.Tests/AotDalgasiTests.cs` — `AotDalgasiTests` (3 bağlama pimi),
+Dokuz yeni pim: `tests/VidShrink.Tests/AotDalgasiTests.cs` — `AotDalgasiTests` (3 bağlama pimi),
 `AotJsonTests` (3 JSON pimi), `KulturSozlesmesiTests` (3 kültür pimi). Kültür pimleri
 `InvariantGlobalization`/NLS kararının ölçüsünü koda bağlıyor: Türkçe büyük harf kuralı, Türkçe
 ondalık ayırıcı, dil kodu başına boş olmayan kültür.
+
+Buna bir de var olan bir theory'ye eklenen kol katıldı:
+`SettingsTests.LanguageUsesSavedThenOperatingSystemThenEnglish`'e `(null, "", "en")`. Bu kol
+invariant kipin ilk açılış dil algılamasına ne yaptığını pimliyor; gerekçesi testin kendi
+docstring'inde.
 
 Her pim, koruduğu davranışı bozan bir mutasyonla sınandı; verdikt `dotnet test` çıkış kodundan:
 
