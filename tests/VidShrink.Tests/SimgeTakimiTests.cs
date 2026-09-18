@@ -10,7 +10,7 @@ namespace VidShrink.Tests;
 /// Üç şey ölçülüyor. Birincisi kapalı küme: biçimlemede geçen her
 /// <c>{StaticResource Icon...}</c> başvurusunun karşılığı o dosyada var; olmayan anahtar
 /// Avalonia'da sessizce boş <c>Path</c> çiziyor, yani çalışma anında görünmüyor.
-/// <c>IconSizeSm</c>/<c>IconStroke</c> gibi ölçü belirteçleri aynı önekle başlıyor; onların
+/// <c>IconSizeSm</c>/<c>IconSizeMd</c> gibi ölçü belirteçleri aynı önekle başlıyor; onların
 /// kaynağı <c>Theme.axaml</c>, ölçüm iki dosyayı birlikte okuyup yalnız her ikisinde de
 /// bulunmayan adı suçluyor.
 ///
