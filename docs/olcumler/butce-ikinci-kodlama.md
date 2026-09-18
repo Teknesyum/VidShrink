@@ -321,3 +321,16 @@ kaldığı ve bunun 9 hücrede fazladan tam kodlama ürettiğidir.
 
 Ham satırların tamamı `docs/olcumler/butce-ikinci-kodlama-ham.md` dosyasında,
 özetleyicinin bastığı hâliyle.
+
+## CI
+
+```
+gh run list --branch t0/butce-ikinci-kodlama
+35287674916 ci 8918b542 completed success
+35285341684 ci 00dd1ba8 completed failure
+35282699847 handbrake-kiyas 9642686d completed success
+```
+
+`00dd1ba8` kirmizisi olcumun degil pimin kusuruydu: `OzetSabiti` capasi `$`,
+CI'da dosya CRLF geldiginde ``'a takilip "DOLDUR_ESIK bulunamadi" dedi. Capa
+`\s*$` oldu, betik depoda CRLF'e cevrildi, `8918b542` yesil (3253 test).
