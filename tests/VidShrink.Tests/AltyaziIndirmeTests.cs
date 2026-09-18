@@ -917,6 +917,48 @@ public class AltyaziIndirmeTests
     }
 
     /// <summary>
+    /// Menü satırının "anahtar var mı" sorusu her çizimde diske inmiyor. Ayar dosyası
+    /// değişmedikçe okuma bir kez olur; dosya yeniden yazılınca damga düşer ve cevap
+    /// hemen değişir — yani önbellek bayat kalmıyor. Ölçülen sayı gerçek okuma sayacı.
+    /// </summary>
+    [Fact]
+    public void MenuCizimiAyarDosyasiniHerSeferOkumaz()
+    {
+        var kok = AltyaziKanit.Temiz("anahtar-onbellek");
+        var dosya = Path.Combine(kok, "settings.json");
+        var onceki = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
+        Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", dosya);
+        try
+        {
+            var view = AppHost.Run(() => new PlayerView());
+
+            new AppSettings { OpenSubtitlesApiKey = "" }.Save();
+            var bastaki = PlayerView.AnahtarOkumaSayisi;
+            var bosCevaplar = new List<bool>();
+            for (var i = 0; i < 10; i++) bosCevaplar.Add(view.SubtitleDownloadReady);
+            var bosOkuma = PlayerView.AnahtarOkumaSayisi - bastaki;
+
+            new AppSettings { OpenSubtitlesApiKey = "kullanici-anahtari-123" }.Save();
+            var doluCevaplar = new List<bool>();
+            for (var i = 0; i < 10; i++) doluCevaplar.Add(view.SubtitleDownloadReady);
+            var doluOkuma = PlayerView.AnahtarOkumaSayisi - bastaki - bosOkuma;
+
+            AltyaziKanit.Yaz("anahtar-onbellek.txt",
+                $"bos: cevap={string.Join(",", bosCevaplar)} okuma={bosOkuma}\n"
+                + $"dolu: cevap={string.Join(",", doluCevaplar)} okuma={doluOkuma}\n");
+
+            Assert.All(bosCevaplar, cevap => Assert.False(cevap));
+            Assert.Equal(1, bosOkuma);
+            Assert.All(doluCevaplar, cevap => Assert.True(cevap));
+            Assert.Equal(1, doluOkuma);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", onceki);
+        }
+    }
+
+    /// <summary>
     /// Depoda anahtar yok. Tarama <b>butun depo</b>: kaynak kadar belge, test, ayar ve
     /// arayuz dosyasi da. Yalniz <c>src/**/*.cs</c> tarandigi surumde gercek bir ucuncu
     /// taraf anahtari <c>docs/arastirma/</c> altina dusup 65/65 yesil kalmisti.

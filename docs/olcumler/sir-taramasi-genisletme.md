@@ -22,7 +22,7 @@ Belirteç, parola ve `Authorization: Bearer` satırı depoya tarama hiç bakmada
 Genişletilmiş sürüm ilk koşumunda iki gerçek bulgu verdi:
 
 - `docs/arastirma/opensubtitles-istemci-kutuphaneleri.md:64` — subliminal kasetinin
-  `Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9....` satırı. Yükü elenmiş
+  `Authorization: Bearer <JWT>` satırı. Yükü elenmiş
   olsa da aynı kasetin `Api-Key` satırı gerçekti; maskelendi.
 - `tests/VidShrink.Tests/AltyaziOturumTests.cs:416` — kasıtlı sahte pim belirteci.
   Pozitif kontrollerdeki gelenekle aynı biçimde kaynakta iki parçaya bölündü.
@@ -40,8 +40,8 @@ Başarısız! - Başarısız:     1, Başarılı:    64, Atlanan:     0, Toplam:
 Kanıt dosyası suçluları adıyla yazdı:
 
 ```
-docs\arastirma\opensubtitles-istemci-kutuphaneleri.md: Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.QWERTY
-docs\arastirma\opensubtitles-istemci-kutuphaneleri.md: password: Hy7kL9mQ2wRt5vXz8bNc4dFg
+docs\arastirma\opensubtitles-istemci-kutuphaneleri.md: Authorization: Bearer <uc-parcali-JWT>
+docs\arastirma\opensubtitles-istemci-kutuphaneleri.md: password: <24-karakterlik-harf-rakam-dizisi>
 pozitif kontrol: True
 tel kaydi: True
 ayar alani: False

@@ -29,8 +29,41 @@ internal partial class PlayerView
 
     private bool _subtitleDownloadRunning;
 
-    /// <summary>Anahtar girilmiş mi; menü satırının iki yüzünden hangisinin çizileceği buna bakar.</summary>
-    internal bool SubtitleDownloadReady => Provider().IsConfigured;
+    /// <summary>
+    /// Anahtar girilmiş mi; menü satırının iki yüzünden hangisinin çizileceği buna bakar.
+    /// Menü her çizildiğinde sorulduğu için sağlayıcı kurmaz: yalnız
+    /// <see cref="AnahtarVar"/>'ın damgalı önbelleğini okur.
+    /// </summary>
+    internal bool SubtitleDownloadReady =>
+        SubtitleProviderSource is { } source ? source().IsConfigured : AnahtarVar();
+
+    private static string _anahtar = "";
+    private static (string Yol, long Damga, long Boy) _anahtarKaynagi = ("", 0, -1);
+
+    /// <summary>Ayar dosyasının kaç kez gerçekten okunduğu; ölçünün saydığı sayı budur.</summary>
+    internal static int AnahtarOkumaSayisi;
+
+    /// <summary>
+    /// Ayar dosyasını yalnız değiştiğinde okur: yol + son yazma damgası + boy aynıysa
+    /// önceki okuma geçerlidir. Damga aynı kalırken içerik değişemez; kullanıcı anahtarı
+    /// girdiğinde dosya yeniden yazılır ve damga düşer.
+    /// </summary>
+    private static bool AnahtarVar()
+    {
+        var yol = VidShrink.Core.UpdateSettings.DefaultPath;
+        var bilgi = new System.IO.FileInfo(yol);
+        var damga = bilgi.Exists ? bilgi.LastWriteTimeUtc.Ticks : 0;
+        var boy = bilgi.Exists ? bilgi.Length : -1;
+
+        if (_anahtarKaynagi != (yol, damga, boy))
+        {
+            _anahtar = AppSettings.Load(yol).OpenSubtitlesApiKey.Trim();
+            _anahtarKaynagi = (yol, damga, boy);
+            System.Threading.Interlocked.Increment(ref AnahtarOkumaSayisi);
+        }
+
+        return _anahtar.Length > 0;
+    }
 
     private ISubtitleProvider Provider()
     {
