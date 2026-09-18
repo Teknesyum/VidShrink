@@ -19,7 +19,7 @@
     {
       "rule": "forms/unmeasured-label",
       "file": "README.md",
-      "line": 176,
+      "line": 179,
       "reason": "\"(default 2)\" `--aralik` bayrağının program varsayılanı, ölçüm iddiası değil; CliApp.cs:145 `request.PollSeconds ?? 2` ile birebir aynı."
     },
     {
@@ -36,19 +36,19 @@
     {
       "rule": "states/unnamed-interactive",
       "file": "src/VidShrink.App/MainWindow.axaml",
-      "line": 742,
+      "line": 781,
       "reason": "BtnRetryTrim'in Content'i MainWindow.axaml.cs:4331'de Say(\"main.retry.trim\") ile atanıyor; Avalonia'da düğmenin erişilebilir adı Content'ten gelir. Tarayıcı kod tarafındaki atamayı görmüyor."
     },
     {
       "rule": "states/unnamed-interactive",
       "file": "src/VidShrink.App/MainWindow.axaml",
-      "line": 743,
+      "line": 782,
       "reason": "BtnRetryAccept.Content MainWindow.axaml.cs:4327'de, panel görünür olmadan önce çalışan aynı metotta atanıyor."
     },
     {
       "rule": "states/unnamed-interactive",
       "file": "src/VidShrink.App/MainWindow.axaml",
-      "line": 1403,
+      "line": 1442,
       "reason": "BtnUpdateBadge'in adı rozetin metniyle birlikte değişiyor; MainWindow.axaml.cs AutomationProperties.SetName ile TxtUpdateBadge.Text'i yazıyor. Sabit bir axaml adı durum değişince yalan söylerdi. Satır numarası pimli: dosya genelinde muaf tutmak yeni adsız düğmeleri de örterdi."
     },
     {
