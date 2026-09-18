@@ -413,7 +413,8 @@ public class AltyaziOturumTests
         var kok = AltyaziKanit.Temiz("oturum-kutu");
         var ayar = Path.Combine(kok, "settings.json");
         var dosya = SessionStore.PathFor(ayar);
-        const string belirtec = "eyJhbGciOiJIUzI1NiJ9.PIM77-belirtec-govdesi.imza";
+        const string belirtec = "eyJhbGciOiJIUzI1NiJ9"
+            + ".PIM77-belirtec-govdesi.imza";
 
         var kutu = new SessionStore(ayar);
         var oturum = new SubtitleSession(belirtec, SubtitleSession.VipHost,

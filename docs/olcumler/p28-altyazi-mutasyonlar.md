@@ -491,7 +491,7 @@ Found:      "Download subtitle — get an API key…"
 Collection: ["player.subtitle.download", "player.subtitle.download.getkey"]
 Başarısız! - Başarısız:     2, Başarılı:    48, Atlanan:     0, Toplam:    50, Süre: 2 s - VidShrink.Tests.dll (net8.0)
 
-===== M23 menunun altyazi yukle satiri silindi [KIRMIZI] =====
+===== M24 menunun altyazi yukle satiri silindi [KIRMIZI] (M23 ile ayni kesim, ikinci kosum) =====
 dosya: src/VidShrink.App/Playback/PlayerView.Tracks.cs
 (satir silindi)
 ----- ham cikti -----
@@ -503,7 +503,7 @@ Collection: ["Off", "Download subtitle — get an API key…", "Next subtitle", 
 Collection: ["player.subtitle.download", "player.subtitle.download.getkey"]
 Başarısız! - Başarısız:     2, Başarılı:    48, Atlanan:     0, Toplam:    50, Süre: 2 s - VidShrink.Tests.dll (net8.0)
 
-===== M23 menunun "altyazi dosyasi yukle" satiri siliniyor [KIRMIZI] =====
+===== M25 menunun "altyazi dosyasi yukle" satiri siliniyor [KIRMIZI] =====
 dosya: src/VidShrink.App/Playback/PlayerView.Tracks.cs
 -        items.Add(Plain(Strings.Get("player.subtitle.load"), ...));
 ----- ham cikti -----
@@ -513,7 +513,7 @@ Collection: ["Off", "Next subtitle", "Subtitle delay +0,5 s", "Subtitle delay �
 Not found:  "Load subtitle file…"
 Başarısız! - Başarısız:     1, Başarılı:    49, Atlanan:     0, Toplam:    50, Süre: 2 s - VidShrink.Tests.dll (net8.0)
 
-===== M22 indirme satiri menuye geri konuyor [KIRMIZI] =====
+===== M26 indirme satiri menuye geri konuyor [KIRMIZI] (M22 ile ayni kesim, ikinci kosum) =====
 dosya: src/VidShrink.App/Playback/PlayerView.Tracks.cs
 ----- ham cikti -----
   Başarısız VidShrink.Tests.AltyaziIndirmeTests.IndirmeSatiriBuSurumdeMenudeYok [256 ms]
@@ -525,7 +525,7 @@ Found:      "Download subtitle — get an API key…"
 Collection: ["player.subtitle.download", "player.subtitle.download.getkey"]
 Başarısız! - Başarısız:     2, Başarılı:    48, Atlanan:     0, Toplam:    50, Süre: 2 s - VidShrink.Tests.dll (net8.0)
 
-===== M24 yonerge ayiklamasi kalkiyor (ad alani uye okumasi sayiliyor) [KIRMIZI] =====
+===== M27 yonerge ayiklamasi kalkiyor (ad alani uye okumasi sayiliyor) [KIRMIZI] =====
 dosya: tests/VidShrink.Tests/OluUyeTests.cs
 ----- ham cikti -----
   Başarısız VidShrink.Tests.OluUyeTests.OluOzellikYuzeyiPimlenenKume [2 s]

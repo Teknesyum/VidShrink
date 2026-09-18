@@ -925,13 +925,15 @@ public class AltyaziIndirmeTests
     public void DepodaGomuluAnahtarYok()
     {
         string[] uzantilar = [".cs", ".md", ".json", ".axaml", ".xaml", ".yml", ".yaml", ".ps1", ".sh", ".txt"];
-        string[] atlanan = [".git", ".calisma", "trash", "bin", "obj", "node_modules", "packages"];
+        var izlenen = GitinIzledigiDosyalar();
+        Assert.True(izlenen.Count > 500, "git ls-files depoyu okumadi, tarama kor kalirdi: " + izlenen.Count);
+
         var suclular = new List<string>();
-        foreach (var dosya in Directory.EnumerateFiles(GirdiKanit.Root, "*", SearchOption.AllDirectories))
+        foreach (var bagil in izlenen)
         {
-            var bagil = Path.GetRelativePath(GirdiKanit.Root, dosya);
-            if (bagil.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Any(atlanan.Contains)) continue;
-            if (!uzantilar.Contains(Path.GetExtension(dosya), StringComparer.OrdinalIgnoreCase)) continue;
+            if (!uzantilar.Contains(Path.GetExtension(bagil), StringComparer.OrdinalIgnoreCase)) continue;
+            var dosya = Path.Combine(GirdiKanit.Root, bagil);
+            if (!File.Exists(dosya)) continue;
             foreach (var satir in File.ReadAllLines(dosya))
             {
                 if (AnahtarKokuyor(satir)) suclular.Add(bagil + ": " + satir.Trim());
@@ -961,15 +963,46 @@ public class AltyaziIndirmeTests
     }
 
     /// <summary>
-    /// Anahtar satiri: <c>Api-Key</c>/<c>apiKey</c> gecen bir satirda, en az 24 karakterlik,
-    /// hem harf hem rakam tasiyan bir dizi. Tirnak sart degil — belgelerdeki tel kaydi
-    /// (<c>Api-Key: &lt;deger&gt;</c>) tirnaksizdir ve tirnak arayan surum onu kaciriyordu.
-    /// Alan adlari ("openSubtitlesApiKey") rakamsizdir, bu yuzden elenir.
+    /// Sir satiri uc bicimden biri: (1) JWT — <c>eyJ</c> ile baslayan uc noktali yapi, tetik
+    /// sozcuk gerektirmez cunku bicimin kendisi kimlik; (2) sir sozcugu gecen bir satirda en
+    /// az 24 karakterlik, hem harf hem rakam tasiyan bir dizi; (3) parola atamasi. Tirnak sart
+    /// degil — belgelerdeki tel kaydi (<c>Api-Key: &lt;deger&gt;</c>) tirnaksizdir ve tirnak
+    /// arayan surum onu kaciriyordu. Alan adlari ("openSubtitlesApiKey") rakamsizdir, elenir.
+    /// Tek anahtar adina bagli surum yalnizca <c>Api-Key</c> ariyordu: belirtec, parola ve
+    /// bearer basligi ayni depoya tarama hic bakmadan girebilirdi.
     /// </summary>
+    /// <summary>
+    /// Taramanin kapsami: <b>git'in izledigi</b> dosyalar. Sizinti ancak commit'lenmisse
+    /// sizintidir; gitignore'daki <c>.calisma</c>, <c>trash</c>, <c>bin</c> ve oturum
+    /// gunlukleri depoya girmez. Klasor gezen surum bunlari da tarayip yabanci belirtec
+    /// bildiriyordu. Liste bosalirsa olcu "temiz" demeden once bunu yakalar.
+    /// </summary>
+    private static List<string> GitinIzledigiDosyalar()
+    {
+        var baslangic = new System.Diagnostics.ProcessStartInfo("git", "ls-files")
+        {
+            WorkingDirectory = GirdiKanit.Root,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
+        using var surec = System.Diagnostics.Process.Start(baslangic)!;
+        var cikti = surec.StandardOutput.ReadToEnd();
+        surec.StandardError.ReadToEnd();
+        surec.WaitForExit();
+        Assert.Equal(0, surec.ExitCode);
+        return cikti.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim().Replace('/', Path.DirectorySeparatorChar))
+            .ToList();
+    }
+
     private static bool AnahtarKokuyor(string satir)
     {
-        if (!satir.Contains("Api-Key", StringComparison.OrdinalIgnoreCase)
-            && !satir.Contains("apiKey", StringComparison.OrdinalIgnoreCase)) return false;
+        if (System.Text.RegularExpressions.Regex.IsMatch(
+                satir, "eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}\\.")) return true;
+
+        string[] tetikler = ["Api-Key", "apiKey", "api_key", "secret", "token", "bearer", "password", "parola"];
+        if (!tetikler.Any(t => satir.Contains(t, StringComparison.OrdinalIgnoreCase))) return false;
 
         foreach (System.Text.RegularExpressions.Match sabit in
                  System.Text.RegularExpressions.Regex.Matches(satir, "[A-Za-z0-9]{24,}"))
