@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Avalonia.Controls;
@@ -472,18 +473,31 @@ public sealed class CliTests
         Availability = () => throw new InvalidOperationException("availability must not run")
     };
 
+    private const int BeklenenTakmaAdSayisi = 10;
+
     /// <summary>
-    /// Ingilizce takma adlar iki READMEde de yaziliydi diye degil, <b>kaynaktan sayilarak</b>
-    /// pimleniyor: liste testte tekrarlanmaz, <c>CliParser.Parse</c>'in switch kollarindan
-    /// cikarilir. Kural istisnasiz: bir kolun ilk yazimi uzun anahtarsa, ardindan gelen her
-    /// uzun yazim o anahtarin takma adidir. Ayrica sayinin kendisi pimli, boylece kaynaga
-    /// eklenen yeni bir takma ad belgesiz kalamaz.
+    /// <para>Ingilizce takma adlar iki READMEde de yaziliydi diye degil, <b>kaynaktan
+    /// sayilarak</b> pimleniyor: liste testte tekrarlanmaz, <c>CliParser.Parse</c>'in switch
+    /// kollarindan cikarilir.</para>
+    /// <para><b>Turetme kurali istisnasiz</b>: bir kolun <i>uzun</i> yazimlari (<c>--</c> ile
+    /// baslayanlar) sirayla alinir; ilki kanonik, kalan her uzun yazim onun takma adidir. Kisa
+    /// yazimlar (<c>-h</c>, <c>-o</c>) kolun neresinde durursa dursun sayima girmez, dolayisiyla
+    /// bir kola kisa bayrak eklemek sayimi degistirmez — onceki kural "ilk yazim uzun olmali"
+    /// dedigi icin <c>-h</c> ile baslayan yardim kolu disarda kaliyor, <c>--hedef</c> koluna
+    /// <c>-t</c> eklenince sayim sessizce dusuyordu.</para>
+    /// <para>Sayinin kendisi de pimli (<see cref="BeklenenTakmaAdSayisi"/>), boylece kaynaga
+    /// eklenen yeni bir takma ad belgesiz kalamaz. Sayim tutmazsa hata iletisi <b>her kolu ve
+    /// elenme sebebini</b> yazar.</para>
+    /// <para>READMElerin "hepsi" demesi de veriyle pimli: takma adi olmayan uzun anahtarlar
+    /// (<c>--json</c>, <c>--vmaf</c>) kaynaktan cikarilip cumlede istisna olarak araniyor.</para>
     /// </summary>
     [Fact]
     public void IngilizceTakmaAdlarIkiBelgedeDeYaziyor()
     {
-        var adlar = TakmaAdlar();
-        Assert.Equal(9, adlar.Count);
+        var (adlar, tekiller, rapor) = TakmaAdKollari();
+        Assert.True(
+            adlar.Count == BeklenenTakmaAdSayisi,
+            $"CliRequest.cs'te {adlar.Count} takma ad cifti bulundu, beklenen {BeklenenTakmaAdSayisi}.\nKol dokumu:\n{rapor}");
 
         var ingilizce = Belge("README.md");
         var turkce = Belge("README.tr.md");
@@ -493,24 +507,54 @@ public sealed class CliTests
             Assert.Contains($"| `{kanonik}` | `{takma}` |", ingilizce, StringComparison.Ordinal);
             Assert.Contains($"| `{kanonik}` | `{takma}` |", turkce, StringComparison.Ordinal);
         }
+
+        Assert.Contains(
+            MetinPimi.Duz($"{string.Join(" and ", tekiller.Select(a => $"`{a}`"))} are the exceptions: they have a single spelling."),
+            MetinPimi.Duz(ingilizce),
+            StringComparison.Ordinal);
+        Assert.Contains(
+            MetinPimi.Duz($"Tek istisna {string.Join(" ve ", tekiller.Select(a => $"`{a}`"))}: bunların tek yazımı var."),
+            MetinPimi.Duz(turkce),
+            StringComparison.Ordinal);
     }
 
-    private static IReadOnlyList<(string Kanonik, string Takma)> TakmaAdlar()
+    private static (IReadOnlyList<(string Kanonik, string Takma)> Ciftler, IReadOnlyList<string> Tekiller, string Rapor) TakmaAdKollari()
     {
         var kaynak = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Cli", "CliRequest.cs"));
         var basi = kaynak.IndexOf("switch (arg)", StringComparison.Ordinal);
-        Assert.True(basi > 0);
+        Assert.True(basi > 0, "CliRequest.cs icinde 'switch (arg)' bulunamadi");
 
-        var liste = new List<(string, string)>();
+        var ciftler = new List<(string, string)>();
+        var tekiller = new List<string>();
+        var rapor = new StringBuilder();
         foreach (Match kol in Regex.Matches(kaynak[basi..], @"case\s+(""[^""]+""(?:\s+or\s+""[^""]+"")*)"))
         {
             var yazimlar = Regex.Matches(kol.Groups[1].Value, @"""([^""]+)""")
                 .Select(e => e.Groups[1].Value).ToList();
-            if (!yazimlar[0].StartsWith("--", StringComparison.Ordinal)) continue;
-            foreach (var takma in yazimlar.Skip(1).Where(a => a.StartsWith("--", StringComparison.Ordinal)))
-                liste.Add((yazimlar[0], takma));
+            var uzun = yazimlar.Where(a => a.StartsWith("--", StringComparison.Ordinal)).ToList();
+            var ad = $"case {string.Join(" or ", yazimlar.Select(a => $"\"{a}\""))}";
+
+            if (uzun.Count == 0)
+            {
+                rapor.AppendLine($"  elendi  {ad} — uzun yazimi yok");
+                continue;
+            }
+
+            if (uzun.Count == 1)
+            {
+                tekiller.Add(uzun[0]);
+                rapor.AppendLine($"  elendi  {ad} — tek uzun yazim ({uzun[0]}), takma adi yok");
+                continue;
+            }
+
+            foreach (var takma in uzun.Skip(1))
+            {
+                ciftler.Add((uzun[0], takma));
+                rapor.AppendLine($"  cift    {uzun[0]} -> {takma}");
+            }
         }
-        return liste;
+
+        return (ciftler, tekiller, rapor.ToString());
     }
 
     private static string Belge(string ad) =>

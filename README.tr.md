@@ -143,11 +143,13 @@ izliyor, Türkçe ya da İngilizce.
 `--kes <baslangic>-<bitis>` kodlamadan önce kesiyor, böylece hedef boyut elde kalan parçaya
 harcanıyor: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, sona kadar `--kes 90-`.
 
-Uzun anahtarların hepsinin bir de İngilizce takma adı var; iki yazım aynı anahtar, betik
-hangisini isterse onu kullanabiliyor.
+Aşağıdaki uzun anahtarların her birinin bir de İngilizce takma adı var; iki yazım aynı
+anahtar, betik hangisini isterse onu kullanabiliyor. Tek istisna `--json` ve `--vmaf`:
+bunların tek yazımı var.
 
 | Türkçe | İngilizce |
 |---|---|
+| `--yardim` | `--help` |
 | `--hedef` | `--target` |
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |

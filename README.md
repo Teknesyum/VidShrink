@@ -143,11 +143,13 @@ language, Turkish or English.
 `--kes <start>-<end>` trims before the encode, so the target size is spent on the part you
 keep: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, or `--kes 90-` to the end.
 
-Every long option answers to an English alias as well; the two spellings are the same
-option, and a script may use either.
+The long options below each answer to an English alias; the two spellings are the same
+option, and a script may use either. `--json` and `--vmaf` are the exceptions: they have a
+single spelling.
 
 | Turkish | English |
 |---|---|
+| `--yardim` | `--help` |
 | `--hedef` | `--target` |
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |
