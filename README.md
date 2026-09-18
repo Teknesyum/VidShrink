@@ -140,6 +140,24 @@ probe encodes), `--vmaf` (measure the result when ffmpeg has libvmaf), `--hizli`
 goes to stderr; size, duration, attempts and VMAF go to stdout. Help follows the system
 language, Turkish or English.
 
+`--kes <start>-<end>` trims before the encode, so the target size is spent on the part you
+keep: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, or `--kes 90-` to the end.
+
+Every long option answers to an English alias as well; the two spellings are the same
+option, and a script may use either.
+
+| Turkish | English |
+|---|---|
+| `--hedef` | `--target` |
+| `--kalite` | `--quality` |
+| `--kodek` | `--codec` |
+| `--cikti` | `--output` |
+| `--kes` | `--cut` |
+| `--aralik` | `--interval` |
+| `--bir-kez` | `--once` |
+| `--olcumsuz` | `--no-measure` |
+| `--hizli` | `--fast` |
+
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
 size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled.
 

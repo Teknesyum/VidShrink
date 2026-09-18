@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using VidShrink.App;
 using VidShrink.Cli;
@@ -470,4 +471,48 @@ public sealed class CliTests
         Probe = (_, _) => throw new InvalidOperationException("probe must not run"),
         Availability = () => throw new InvalidOperationException("availability must not run")
     };
+
+    /// <summary>
+    /// Ingilizce takma adlar iki READMEde de yaziliydi diye degil, <b>kaynaktan sayilarak</b>
+    /// pimleniyor: liste testte tekrarlanmaz, <c>CliParser.Parse</c>'in switch kollarindan
+    /// cikarilir. Kural istisnasiz: bir kolun ilk yazimi uzun anahtarsa, ardindan gelen her
+    /// uzun yazim o anahtarin takma adidir. Ayrica sayinin kendisi pimli, boylece kaynaga
+    /// eklenen yeni bir takma ad belgesiz kalamaz.
+    /// </summary>
+    [Fact]
+    public void IngilizceTakmaAdlarIkiBelgedeDeYaziyor()
+    {
+        var adlar = TakmaAdlar();
+        Assert.Equal(9, adlar.Count);
+
+        var ingilizce = Belge("README.md");
+        var turkce = Belge("README.tr.md");
+
+        foreach (var (kanonik, takma) in adlar)
+        {
+            Assert.Contains($"| `{kanonik}` | `{takma}` |", ingilizce, StringComparison.Ordinal);
+            Assert.Contains($"| `{kanonik}` | `{takma}` |", turkce, StringComparison.Ordinal);
+        }
+    }
+
+    private static IReadOnlyList<(string Kanonik, string Takma)> TakmaAdlar()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Cli", "CliRequest.cs"));
+        var basi = kaynak.IndexOf("switch (arg)", StringComparison.Ordinal);
+        Assert.True(basi > 0);
+
+        var liste = new List<(string, string)>();
+        foreach (Match kol in Regex.Matches(kaynak[basi..], @"case\s+(""[^""]+""(?:\s+or\s+""[^""]+"")*)"))
+        {
+            var yazimlar = Regex.Matches(kol.Groups[1].Value, @"""([^""]+)""")
+                .Select(e => e.Groups[1].Value).ToList();
+            if (!yazimlar[0].StartsWith("--", StringComparison.Ordinal)) continue;
+            foreach (var takma in yazimlar.Skip(1).Where(a => a.StartsWith("--", StringComparison.Ordinal)))
+                liste.Add((yazimlar[0], takma));
+        }
+        return liste;
+    }
+
+    private static string Belge(string ad) =>
+        File.ReadAllText(Path.Combine(TipSources.Root, ad)).Replace("\r\n", "\n", StringComparison.Ordinal);
 }

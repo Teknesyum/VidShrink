@@ -140,6 +140,24 @@ kodlamalarını atlar), `--vmaf` (ffmpeg'de libvmaf varsa sonucu ölçer), `--hi
 stderr'e, boyut, süre, deneme sayısı ve VMAF stdout'a gidiyor. Yardım metni sistem dilini
 izliyor, Türkçe ya da İngilizce.
 
+`--kes <baslangic>-<bitis>` kodlamadan önce kesiyor, böylece hedef boyut elde kalan parçaya
+harcanıyor: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, sona kadar `--kes 90-`.
+
+Uzun anahtarların hepsinin bir de İngilizce takma adı var; iki yazım aynı anahtar, betik
+hangisini isterse onu kullanabiliyor.
+
+| Türkçe | İngilizce |
+|---|---|
+| `--hedef` | `--target` |
+| `--kalite` | `--quality` |
+| `--kodek` | `--codec` |
+| `--cikti` | `--output` |
+| `--kes` | `--cut` |
+| `--aralik` | `--interval` |
+| `--bir-kez` | `--once` |
+| `--olcumsuz` | `--no-measure` |
+| `--hizli` | `--fast` |
+
 Çıkış kodları: bantta `0`, bandın altında `2` (kalite doyduğu için daha küçük dosya
 saklandı), boy tavanı aşıldığında `3` (en küçük sonuç yine yazılıyor; JSON `output` ve
 `overTarget: true` taşıyor), hatada `1`, yanlış kullanımda `64`, iptalde `130`.
