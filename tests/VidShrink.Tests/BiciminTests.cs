@@ -523,10 +523,36 @@ public sealed class KareYerlesimTests
     /// verilen sablonlari degistirir. Sablonu koddan yazan bir mutasyon bu enjeksiyondan
     /// etkilenmez, dolayisiyla olcum sablonun gercekten dil dosyasindan okundugunu tutar.
     /// </summary>
-    private static string Kopya(string ad, Dictionary<string, string> degisim)
+    /// <summary>
+    /// <see cref="Kopya"/>'nin biraktigi <c>.calisma/&lt;ad&gt;</c> klasorunu kapatir. Denetim
+    /// borcu: 42 dilin tam kopyasi ve kanit dosyasi agacta kaliyordu. <see cref="Tut"/> acikken
+    /// silinmez — testler iddialardan <b>sonra</b> kapatir, boylece kirmizi bir kosumun kaniti
+    /// yerinde durur, yesil kosum kendi biraktigini siler.
+    /// </summary>
+    private sealed class DilKopyasi : IDisposable
+    {
+        public DilKopyasi(string klasor, string locales) { Klasor = klasor; Locales = locales; }
+
+        public string Klasor { get; }
+
+        public string Locales { get; }
+
+        public bool Tut { get; set; } = true;
+
+        public void Dispose()
+        {
+            if (Tut) return;
+            try { if (Directory.Exists(Klasor)) Directory.Delete(Klasor, recursive: true); }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+        }
+    }
+
+    private static DilKopyasi Kopya(string ad, Dictionary<string, string> degisim)
     {
         var kaynak = Path.Combine(AppContext.BaseDirectory, "Locales");
-        var kopya = Path.Combine(GirdiKanit.Root, ".calisma", ad, "Locales");
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", ad);
+        var kopya = Path.Combine(klasor, "Locales");
         foreach (var dosya in Directory.GetFiles(kaynak, "*", SearchOption.AllDirectories))
         {
             var hedef = Path.Combine(kopya, Path.GetRelativePath(kaynak, dosya));
@@ -543,7 +569,7 @@ public sealed class KareYerlesimTests
         }
 
         File.WriteAllText(enAna, metin);
-        return kopya;
+        return new DilKopyasi(klasor, kopya);
     }
 
     /// <summary>
@@ -554,13 +580,13 @@ public sealed class KareYerlesimTests
     [Fact]
     public void KaliteBalonundakiPuanDilDosyasindanGelir()
     {
-        var kopya = Kopya("s9-puan", new Dictionary<string, string>
+        using var kopya = Kopya("s9-puan", new Dictionary<string, string>
         {
             ["\"main.unit.score-value\": \"{0}/100\""] = "\"main.unit.score-value\": \"{0} of 100 pts\""
         });
 
         List<string> satirlar;
-        AppHost.Run(() => Strings.UseRoot(kopya));
+        AppHost.Run(() => Strings.UseRoot(kopya.Locales));
         try
         {
             satirlar = Yuklu("en", window =>
@@ -577,6 +603,8 @@ public sealed class KareYerlesimTests
 
         Assert.True(satirlar.Any(s => s.EndsWith(" of 100 pts", StringComparison.Ordinal)), string.Join(" | ", satirlar));
         Assert.DoesNotContain(satirlar, s => s.EndsWith("/100", StringComparison.Ordinal));
+
+        kopya.Tut = false;
     }
 
     /// <summary>
@@ -590,7 +618,7 @@ public sealed class KareYerlesimTests
     [Fact]
     public void HizKareKbitVeCrfBirimleriDilDosyasindanGelir()
     {
-        var kopya = Kopya("s9-birim", new Dictionary<string, string>
+        using var kopya = Kopya("s9-birim", new Dictionary<string, string>
         {
             ["\"main.unit.kbps-value\": \"{0} kbps\""] = "\"main.unit.kbps-value\": \"{0} kilobit/s\"",
             ["\"main.unit.fps-value\": \"{0} FPS\""] = "\"main.unit.fps-value\": \"{0} kare/s\"",
@@ -599,7 +627,7 @@ public sealed class KareYerlesimTests
         });
 
         List<string> satirlar;
-        AppHost.Run(() => Strings.UseRoot(kopya));
+        AppHost.Run(() => Strings.UseRoot(kopya.Locales));
         try
         {
             satirlar = Yuklu("en", window =>
@@ -637,6 +665,8 @@ public sealed class KareYerlesimTests
         Assert.DoesNotContain("kbps", govde, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("fps", govde, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("crf ", govde, StringComparison.OrdinalIgnoreCase);
+
+        kopya.Tut = false;
     }
 
     /// <summary>
@@ -655,7 +685,7 @@ public sealed class KareYerlesimTests
     [Fact]
     public void PuanBirimiVeKipAdiDilDosyasindanGelir()
     {
-        var kopya = Kopya("s9-puan-kip", new Dictionary<string, string>
+        using var kopya = Kopya("s9-puan-kip", new Dictionary<string, string>
         {
             ["\"main.unit.score-suffix\": \"/100\""] = "\"main.unit.score-suffix\": \" pts (max 100)\"",
             ["\"main.unit.score-value\": \"{0}/100\""] = "\"main.unit.score-value\": \"{0} pts (max 100)\"",
@@ -663,7 +693,7 @@ public sealed class KareYerlesimTests
         });
 
         (string birim, string not, string kip) okunan;
-        AppHost.Run(() => Strings.UseRoot(kopya));
+        AppHost.Run(() => Strings.UseRoot(kopya.Locales));
         try
         {
             okunan = Yuklu("en", window =>
@@ -689,6 +719,8 @@ public sealed class KareYerlesimTests
         Assert.Equal("Quality factor", okunan.kip, StringComparer.OrdinalIgnoreCase);
         Assert.DoesNotContain("/100", okunan.birim + okunan.not, StringComparison.Ordinal);
         Assert.DoesNotContain("CRF", okunan.kip, StringComparison.OrdinalIgnoreCase);
+
+        kopya.Tut = false;
     }
 
     [Fact]
