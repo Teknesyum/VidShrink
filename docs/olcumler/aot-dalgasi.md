@@ -436,31 +436,34 @@ ayar dosyasına 1280x720 bırakıyor, `KaydediciPencereTests`'in görünümü on
 (`RecorderView.axaml.cs:40`) okuyor ve `-vf`'e `scale=` ekleniyor
 (`RecorderArguments.cs:1185`).
 
-İki değişiklik yapıldı, ikisi de ölçülü:
+Kanal kapatıldı, **kaynak kapatılmadı**:
 
 1. **Kurban yalıtıldı.** `KaydediciPencereTests` mac isteğini `Scale = null` ile kuruyor.
-   Ölçünün konusu pencere kırpması; kalıcı ölçek o ölçüye girmemeli. Bu, sızıntının
-   kanalını tümden kapatıyor.
-2. **Sargının bekleyen yazması kapsandı.** `GelismisOlc` artık ölçümden sonra
-   `Dispatcher.UIThread.RunJobs()` çağırıyor; bekleyen `PersistChoices` işi `finally`'nin
-   geri yazmasından **önce** boşalıyor. Yeni pim:
-   `KaydediciArayuzTests.PaylasilanAyarDosyasiGelismisOlcumdenSonraKirlenmiyor`.
+   Ölçünün konusu pencere kırpması; kalıcı ölçek o ölçüye hiç girmemeli. Bu, sızıntının
+   kurbana ulaşan kanalını tümden kapatıyor.
+2. **Kaynak açık.** `GelismisKollarIstegeVeAyaraGecer` sınıf bütün koşulduğunda paylaşılan
+   dosyada hâlâ 1280x720 bırakıyor. Ayrı iş olarak kaydedici sahibine devredildi.
 
-Pimin mutasyon kanıtı — pompa sökülünce:
+### Reddedilen düzeltme: dispatcher pompası
 
-```
-Assert.DoesNotContain() Failure: Sub-string found
-Başarısız! - Başarısız: 1, Başarılı: 0, Atlanan: 0, Toplam: 1
-```
-
-geri konunca:
+İlk denemede `GelismisOlc`'a ölçümden sonra `Dispatcher.UIThread.RunJobs()` konuldu; bekleyen
+`PersistChoices` işini `finally`'den önce boşaltsın diye. Yerelde pimlendi ve mutasyon da
+yakalandı (pompa sökülünce `Assert.DoesNotContain` kırmızı). **CI iki koşumda reddetti:**
 
 ```
-Başarılı!  - Başarısız: 0, Başarılı: 1, Atlanan: 0, Toplam: 1
+kosum 35296182516 (ilk):    Failed OynaticiCiftTikSuresiTests.HizAdimiVeCiftTikSuresiHamGirdiyle
+                            ham sol tik: 618 ms'de pause yes, 3629 ms'de pause yes
+kosum 35296182516 (tekrar): ayni test, ham sol tik: 612 ms'de pause yes, 3638 ms'de pause yes
 ```
 
-**Kalan borç (kapatılmadı, ölçüldü):** pompa sızıntının dispatcher ayağını kapatıyor ama
-`GelismisKollarIstegeVeAyaraGecer`'in yirmi alanlık gövdesi sınıf bütün koşulduğunda hâlâ
-dosyada 1280x720 bırakıyor — yinelemeli pompa (8 tur) da boşaltmadı, yani yazma bir
-dispatcher işi değil. Kanal (1) ile kapatıldığı için CI yeşile döner; asıl temizlik
-kaydedici sahibinin işi.
+İki koşumda neredeyse aynı sayı: kararsızlık değil, belirleyici bir kırılma. Sebep,
+`AppHost`'un tek bir Avalonia arayüz iş parçacığını **bütün test sınıflarıyla** paylaşması
+(`tests/VidShrink.Tests/AppHost.cs`): sınıflar paralel koşarken `RunJobs()` yalnız çağıranın
+değil, o sırada kuyrukta ne varsa hepsinin işini boşaltıyor. Oynatıcının tık hakemi 900 ms'lik
+pencereye bakıyor ve sırası bozulunca tek tık 3,6 saniyeye kayıyor.
+
+Pompa ve ona bağlı pim geri alındı; yerinde `GelismisOlc`'un başındaki açıklama duruyor.
+Ders, ölçüm kuralının aynısı: **paylaşılan iş parçacığında sıra da paylaşılan bir kaynaktır.**
+
+**Not — ilk kırmızı sıraya bağlıydı:** koşum 35291760780 yeniden başlatılınca aynı commit'te
+yeşil geldi. Yani kaydedici kırılması da makineye ya da koda değil sıraya bağlıydı.

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -888,12 +888,15 @@ public sealed class KaydediciArayuzTests
 
     /// <summary>
     /// Ölçüm, paylaşılan kaydedici ayar dosyasını yedekleyip <c>finally</c>'de geri yazar.
-    /// Yedek ancak bekleyen yazmalar sargının içinde boşalırsa işe yarıyor: kutulara değer
-    /// verildiğinde <c>PersistChoices</c> dispatcher'a düşüyor ve pompa çağrılmazsa iş
-    /// <b>sonraki testin</b> içinde diske iniyor — geri yazmadan sonra. O sızıntı
-    /// <c>KaydediciPencereTests.SeciciLinuxta...</c> testini CI'da kırdı: mac kırpması
-    /// <c>crop=640:480:200:100</c> yerine <c>...,scale=1280:720</c> oldu. Pompa
-    /// <c>PaylasilanAyarDosyasiGelismisOlcumdenSonraKirlenmiyor</c> ile pimli.
+    /// Yedek her zaman yetmiyor: kutulara değer verildiğinde <c>PersistChoices</c> işi
+    /// sargının dışına taşıyor ve dosyada 1280x720 kalıyor. Bu, <c>KaydediciPencereTests</c>
+    /// testini CI'da kırdı (koşum 35291760780). Sızıntı orada <c>Scale = null</c> ile
+    /// kanalından kapatıldı; kaynağındaki temizlik kaydedici sahibinin işi.
+    /// <c>Dispatcher.UIThread.RunJobs()</c> ile boşaltmak <b>denendi ve reddedildi</b>:
+    /// arayüz iş parçacığı bütün test sınıflarınca paylaşıldığı için pompa başka
+    /// sınıfların bekleyen işlerini de sırasız boşaltıyor ve
+    /// <c>OynaticiCiftTikSuresiTests</c> iki CI koşumunda düştü
+    /// (<c>docs/olcumler/aot-dalgasi.md</c> bölüm 12).
     /// </summary>
     private static T GelismisOlc<T>(Func<RecorderView, Func<string, Avalonia.Controls.Control>, T> olc)
     {
@@ -907,9 +910,7 @@ public sealed class KaydediciArayuzTests
                 Avalonia.Controls.Control Bul(string ad) => Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Control>(view, ad)!;
                 ((Avalonia.Controls.RadioButton)Bul("RadAdvanced")).IsChecked = true;
                 ((Avalonia.Controls.RadioButton)Bul("RadManual")).IsChecked = true;
-                var sonuc = olc(view, Bul);
-                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-                return sonuc;
+                return olc(view, Bul);
             });
         }
         finally
@@ -937,42 +938,6 @@ public sealed class KaydediciArayuzTests
 
         Assert.True(gelismis);
         Assert.False(basit);
-    }
-
-    /// <summary>
-    /// <c>GelismisOlc</c>'un yedeği bekleyen dispatcher işini kapsıyor mu? Ölçüm ölçek
-    /// kutularına 1280x720 yazıyor; sargıdan çıkıldığında paylaşılan dosyada o değerler
-    /// kalmamalı. Pompa kaldırılırsa bu satır kırmızıya döner ve kirlenmenin kurbanı
-    /// <c>KaydediciPencereTests</c> yeniden sıra bağımlısı olur.
-    /// </summary>
-    [Fact]
-    public void PaylasilanAyarDosyasiGelismisOlcumdenSonraKirlenmiyor()
-    {
-        var dosya = RecorderSettings.FilePath!;
-        var onceki = File.Exists(dosya) ? File.ReadAllBytes(dosya) : null;
-        try
-        {
-            GelismisOlc((view, bul) =>
-            {
-                Sec(bul("CmbContainer"), "MOV");
-                Sec(bul("CmbTune"), "zerolatency");
-                ((Avalonia.Controls.TextBox)bul("TxtScaleWidth")).Text = "1280";
-                ((Avalonia.Controls.TextBox)bul("TxtScaleHeight")).Text = "720";
-                ((Avalonia.Controls.TextBox)bul("TxtAudioGain")).Text = "-3.5";
-                return view.BuildRequest(applyAuto: false);
-            });
-
-            AppHost.Run(() => { Avalonia.Threading.Dispatcher.UIThread.RunJobs(); return 0; });
-
-            var kalan = File.Exists(dosya) ? File.ReadAllText(dosya) : string.Empty;
-            Assert.DoesNotContain("\"scaleWidth\": 1280", kalan);
-            Assert.DoesNotContain("\"scaleHeight\": 720", kalan);
-        }
-        finally
-        {
-            if (onceki is null) { if (File.Exists(dosya)) File.Delete(dosya); }
-            else File.WriteAllBytes(dosya, onceki);
-        }
     }
 
     [Fact]
