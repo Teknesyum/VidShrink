@@ -281,7 +281,7 @@ internal partial class RecorderView
     private void StoreChoices()
     {
         CollectChoices();
-        _settings.Save(RecorderSettings.FilePath);
+        _settings.Save(_settingsPath);
     }
 
     private void CollectChoices()

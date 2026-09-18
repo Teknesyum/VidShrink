@@ -26,6 +26,8 @@ internal partial class RecorderView : UserControl
 {
     private readonly RecorderSettings _settings;
 
+    private readonly string? _settingsPath;
+
     private string? _lastRecording;
 
     /// <summary>Biten kaydı küçültme sekmesine taşıyan kapı; ana pencere kuruyor.</summary>
@@ -34,10 +36,25 @@ internal partial class RecorderView : UserControl
     /// <summary>Biten kaydı oynatıcı sekmesinde açan kapı; ana pencere kuruyor.</summary>
     internal Func<string, Task>? OpenInPlayer { get; set; }
 
-    public RecorderView()
+    public RecorderView() : this(RecorderSettings.FilePath)
     {
+    }
+
+    /// <summary>
+    /// Ayar dosyasının yolunu açıkça alan kurucu. Yol örneğe bağlanıyor, çünkü statik
+    /// <see cref="RecorderSettings.FilePath"/> süreç başına tek ve ölçüm sınıfları
+    /// o tek dosya üzerinden birbirine karışıyordu. Suit içi paralellik kapalı, yani
+    /// iki sınıf aynı anda koşmuyor; kanalı açan şey <c>PersistChoices</c>'ın
+    /// <b>ertelenmiş</b> çalışması: iş tek Avalonia arayüz iş parçacığının kuyruğunda
+    /// bekliyor ve ölçüm bittikten sonra, bir sonraki sınıfın ölçümü sırasında
+    /// boşalabiliyor. Yolu örnekte tutmak o geç yazmayı da kapsıyor — görünüm hâlâ
+    /// kurulurken aldığı dosyaya yazıyor, çağıranın kapısı kapanmış olsa bile.
+    /// </summary>
+    internal RecorderView(string? settingsPath)
+    {
+        _settingsPath = settingsPath;
         InitializeComponent();
-        _settings = RecorderSettings.Load(RecorderSettings.FilePath);
+        _settings = RecorderSettings.Load(_settingsPath);
         InitHedef();
         InitSecici();
         InitGelismis();
@@ -235,7 +252,7 @@ internal partial class RecorderView : UserControl
 
             TxtOutputFolder.Text = picked;
             _settings.OutputFolder = picked;
-            _settings.Save(RecorderSettings.FilePath);
+            _settings.Save(_settingsPath);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
         {

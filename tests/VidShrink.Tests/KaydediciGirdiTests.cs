@@ -28,8 +28,8 @@ public sealed class KaydediciGirdiTests
         }
     }
 
-    private static string? Dosyada(string anahtar)
-        => JsonNode.Parse(File.ReadAllText(RecorderSettings.FilePath!))?[anahtar]?.ToJsonString();
+    private static string? Dosyada(string dosya, string anahtar)
+        => File.Exists(dosya) ? JsonNode.Parse(File.ReadAllText(dosya))?[anahtar]?.ToJsonString() : null;
 
     private sealed class SahteKanca : IInputHooks
     {
@@ -115,22 +115,22 @@ public sealed class KaydediciGirdiTests
     [Fact]
     public void GirdiAyarlariArayuzdenDosyayaVeKancayaGecer()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             var kapaliKanca = new SahteKanca();
-            var kapali = new RecorderView { SkipAutoMeasure = true, InputHooks = kapaliKanca, InputOverlay = new SahteBindirme(), ClickSound = new SahteSes() };
+            var kapali = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = kapaliKanca, InputOverlay = new SahteBindirme(), ClickSound = new SahteSes() };
             kapali.SyncInput(true);
             var kapaliDurum = (kapali.InputActive, kapaliKanca.Cagrilar.Count);
 
-            var once = new RecorderView { SkipAutoMeasure = true };
+            var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
             Bul<CheckBox>(once, "ChkShowClicks").IsChecked = true;
             Bul<CheckBox>(once, "ChkShowKeys").IsChecked = true;
-            var dosya = (Dosyada("showClicks"), Dosyada("clickSound"), Dosyada("showKeys"));
+            var dosya = (Dosyada(ayarYolu, "showClicks"), Dosyada(ayarYolu, "clickSound"), Dosyada(ayarYolu, "showKeys"));
 
             var kanca = new SahteKanca();
             var bindirme = new SahteBindirme();
             var ses = new SahteSes();
-            var view = new RecorderView { SkipAutoMeasure = true, InputHooks = kanca, InputOverlay = bindirme, ClickSound = ses };
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = kanca, InputOverlay = bindirme, ClickSound = ses };
             var kutular = (Bul<CheckBox>(view, "ChkShowClicks").IsChecked, Bul<CheckBox>(view, "ChkClickSound").IsChecked, Bul<CheckBox>(view, "ChkShowKeys").IsChecked);
             view.OnInputClick(new PixelPoint(5, 5));
             view.SyncInput(false);
@@ -144,14 +144,14 @@ public sealed class KaydediciGirdiTests
             view.SyncInput(false);
             kanca.Tik!(new PixelPoint(1, 1));
 
-            var sesli = new RecorderView { SkipAutoMeasure = true };
+            var sesli = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
             Bul<CheckBox>(sesli, "ChkShowClicks").IsChecked = false;
             Bul<CheckBox>(sesli, "ChkShowKeys").IsChecked = false;
             Bul<CheckBox>(sesli, "ChkClickSound").IsChecked = true;
             var sesKanca = new SahteKanca();
             var sesBindirme = new SahteBindirme();
             var sesSayac = new SahteSes();
-            var yalnizSes = new RecorderView { SkipAutoMeasure = true, InputHooks = sesKanca, InputOverlay = sesBindirme, ClickSound = sesSayac };
+            var yalnizSes = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = sesKanca, InputOverlay = sesBindirme, ClickSound = sesSayac };
             yalnizSes.SyncInput(true);
             sesKanca.Tik!(new PixelPoint(10, 10));
             sesKanca.Tus!(0x41, true);
@@ -262,11 +262,11 @@ public sealed class KaydediciGirdiTests
         var klasor = Path.Combine(Kanit, "girdi-canli");
         if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
 
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             var kanca = new SahteKanca();
             var bindirme = new SahteBindirme();
-            var view = new RecorderView { SkipAutoMeasure = true, InputHooks = kanca, InputOverlay = bindirme, ClickSound = new SahteSes() };
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = kanca, InputOverlay = bindirme, ClickSound = new SahteSes() };
             Elle(view);
             Bul<ComboBox>(view, "CmbTarget").SelectedIndex = (int)RecorderTargetKind.Region;
             Yaz(view, "TxtRegionX", "0");
@@ -307,17 +307,17 @@ public sealed class KaydediciGirdiTests
     [Fact]
     public void MiniAyarlarBuyukPencereyeVeDosyayaGecer()
     {
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var view = new RecorderView { SkipAutoMeasure = true, InputHooks = new SahteKanca(), InputOverlay = new SahteBindirme(), ClickSound = new SahteSes() };
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = new SahteKanca(), InputOverlay = new SahteBindirme(), ClickSound = new SahteSes() };
             Bul<CheckBox>(view, "ChkShowKeys").IsChecked = true;
             view.ShrinkToMini();
             var mini = view.Mini!;
             var yansiyan = (mini.ChkShowKeys.IsChecked, mini.ChkShowClicks.IsChecked, mini.ChkCursor.IsEnabled);
 
-            var dosyaOnce = File.ReadAllBytes(RecorderSettings.FilePath!);
+            var dosyaOnce = File.ReadAllBytes(ayarYolu);
             view.Mini!.ShowOptions(false, false, false, false, false, false);
-            var yankisiz = (dosya: dosyaOnce.AsSpan().SequenceEqual(File.ReadAllBytes(RecorderSettings.FilePath!)), anaKutu: Bul<CheckBox>(view, "ChkShowKeys").IsChecked);
+            var yankisiz = (dosya: dosyaOnce.AsSpan().SequenceEqual(File.ReadAllBytes(ayarYolu)), anaKutu: Bul<CheckBox>(view, "ChkShowKeys").IsChecked);
             view.ExpandFromMini();
 
             view.ShrinkToMini();
@@ -325,7 +325,7 @@ public sealed class KaydediciGirdiTests
             view.Mini!.ChkOpenFolder.IsChecked = true;
             view.Mini!.ChkCursor.IsChecked = false;
             var ana = (Bul<CheckBox>(view, "ChkShowClicks").IsChecked, Bul<CheckBox>(view, "ChkOpenFolder").IsChecked, Bul<CheckBox>(view, "ChkCursor").IsChecked);
-            var dosya = (Dosyada("showClicks"), Dosyada("openFolderWhenDone"), Dosyada("showCursor"));
+            var dosya = (Dosyada(ayarYolu, "showClicks"), Dosyada(ayarYolu, "openFolderWhenDone"), Dosyada(ayarYolu, "showCursor"));
             view.ExpandFromMini();
             return (yansiyan, yankisiz, ana, dosya);
         }));
@@ -350,11 +350,11 @@ public sealed class KaydediciGirdiTests
         var klasor = Path.Combine(Kanit, "mini-canli");
         if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
 
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             var kanca = new SahteKanca();
             var bindirme = new SahteBindirme();
-            var view = new RecorderView { SkipAutoMeasure = true, InputHooks = kanca, InputOverlay = bindirme, ClickSound = new SahteSes() };
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = kanca, InputOverlay = bindirme, ClickSound = new SahteSes() };
             Elle(view);
             Bul<ComboBox>(view, "CmbTarget").SelectedIndex = (int)RecorderTargetKind.Region;
             Yaz(view, "TxtRegionX", "0");
@@ -380,7 +380,7 @@ public sealed class KaydediciGirdiTests
             kanca.Tus!(0x43, true);
             view.ApplyMiniOption(new MiniOption(MiniOptionKind.Cursor, false));
             var imlec = (ana: Bul<CheckBox>(view, "ChkCursor").IsChecked, mini: view.Mini!.ChkCursor.IsChecked);
-            var dosya = Dosyada("showKeys");
+            var dosya = Dosyada(ayarYolu, "showKeys");
             Bekle(500);
 
             var iptal = view.RunHotkeyAsync(HotkeyAction.Discard);

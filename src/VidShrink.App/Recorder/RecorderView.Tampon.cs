@@ -48,7 +48,7 @@ internal partial class RecorderView
         {
             if (CmbReplaySeconds.SelectedIndex < 0 || _quiet > 0) return;
             _settings.ReplaySeconds = SelectedReplaySeconds;
-            _settings.Save(RecorderSettings.FilePath);
+            _settings.Save(_settingsPath);
             SyncReplayButtons(_session is null && !CountingDown);
         };
         SyncReplayButtons(true);

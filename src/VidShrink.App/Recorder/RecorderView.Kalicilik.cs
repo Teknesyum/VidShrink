@@ -48,7 +48,7 @@ internal partial class RecorderView
         var current = _settings.ToJson();
         if (current.AsSpan().SequenceEqual(_persisted)) return;
         _persisted = current;
-        _settings.Save(RecorderSettings.FilePath);
+        _settings.Save(_settingsPath);
     }
 
     private void Quietly(Action refresh)

@@ -166,7 +166,7 @@ public sealed class KaydediciPencereTests
     public void SeciciLinuxtaKimlikVeEkranMacteKirpmaYazarWaylandiReddeder()
     {
         var xlogo = new DesktopWindow("xlogo", "0x200001", 100, 50, 320, 240);
-        var olcu = AyarDosyasiyla(() => AppHost.Run(() =>
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             var linux = Pencereli(RecorderPlatform.Linux, t => t == "xlogo" ? xlogo : null, ("DISPLAY", ":99"));
             var linuxIstek = linux.BuildRequest(applyAuto: false);

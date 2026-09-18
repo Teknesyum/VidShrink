@@ -52,7 +52,7 @@ internal partial class RecorderView
     private void OnLevelToggled(object? sender, RoutedEventArgs e)
     {
         _settings.AdvancedMode = AdvancedMode;
-        _settings.Save(RecorderSettings.FilePath);
+        _settings.Save(_settingsPath);
         ApplyLevel();
         ApplyAutoVisibility();
     }
@@ -122,7 +122,7 @@ internal partial class RecorderView
     {
         _settings.TargetSeconds = TargetSeconds is { } sn && sn > 0 ? sn : null;
         _settings.TargetMegabytes = TargetMegabytes is { } mb && mb > 0 ? mb : null;
-        _settings.Save(RecorderSettings.FilePath);
+        _settings.Save(_settingsPath);
         ShowBudgetNote();
     }
 
@@ -158,7 +158,7 @@ internal partial class RecorderView
     private async void OnAutoToggled(object? sender, RoutedEventArgs e)
     {
         _settings.ManualMode = RadManual.IsChecked ?? false;
-        _settings.Save(RecorderSettings.FilePath);
+        _settings.Save(_settingsPath);
         ApplyAutoVisibility();
 
         if (!AutoMode)
