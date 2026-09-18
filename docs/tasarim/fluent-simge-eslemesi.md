@@ -9,7 +9,8 @@ değil `Fill` ile çiziyor, bu yüzden `IconStroke` belirteci düştü.
 
 Sayı hiçbir yerde sabit yazılı değil. `docs/danisma/2026-09-17-fable-kararlar.md` §9 "26 yol"
 diyor; o, 13 Eylül ölçümünün sayısıdır. Takım Fluent'e taşınırken `IconRestore` eklenmiş (27),
-ardından kullanılmayan iki geometri düşürülmüştü — bugün depoda **25** yol var. `IconsTests` bu
+ardından kullanılmayan iki geometri düşürülmüştü; 18 Eylül 2026'da uyarı durumu için
+`IconWarning` eklendi — bugün depoda **26** yol var. `IconsTests` bu
 tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan düşen her anahtar
 ölçüyü kırar.
 
@@ -40,6 +41,7 @@ tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan d
 | 23 | IconRestore | `Square Multiple` | `ic_fluent_square_multiple_24_filled.svg` | Filled / 24 px | Pencere geri al |
 | 24 | IconCoffee | `Drink Coffee` | `ic_fluent_drink_coffee_24_filled.svg` | Filled / 24 px | Bağış bağlantısı |
 | 25 | IconCode | `Code` | `ic_fluent_code_24_filled.svg` | Filled / 24 px | Teknesyum bağlantısı (K4) |
+| 26 | IconWarning | `Warning` | `ic_fluent_warning_24_filled.svg` | Filled / 24 px | Uyarı durumu (`StatusWarning`) |
 
 ## Ölçülen Sınır Kutuları
 

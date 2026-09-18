@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using VidShrink.App.Localization;
 using VidShrink.Ffmpeg;
@@ -130,7 +131,7 @@ internal partial class RecorderView : UserControl
         TxtNotice.IsVisible = false;
         TxtNotice.Text = string.Empty;
         ResultPanel.IsVisible = false;
-        TxtWarning.IsVisible = false;
+        WarningRow.IsVisible = false;
         _lastRecording = null;
         ResetShare();
     }
@@ -170,13 +171,28 @@ internal partial class RecorderView : UserControl
         if (result.Partial)
         {
             TxtWarning.Text = Say("recorder.output.partial");
-            TxtWarning.IsVisible = true;
+            DurumuGoster(uyari: true);
         }
         else if (!result.Ok)
         {
             TxtWarning.Text = Say("recorder.output.failed", result.ExitCode.ToString(CultureInfo.InvariantCulture));
-            TxtWarning.IsVisible = true;
+            DurumuGoster(uyari: false);
         }
+    }
+
+    /// <summary>
+    /// Yarim kayit uyaridir, basarisiz kayit hatadir. Ayrimi renk tek basina tasimaz:
+    /// uyari govde renginde ve ucgen-unlem simgesiyle, hata kirmizi ve simgesiz cikar.
+    /// Karar <c>docs/netlestirme/018-uyari-rengi-27-palette-yok.md</c>.
+    /// </summary>
+    private void DurumuGoster(bool uyari)
+    {
+        var anahtar = uyari ? "StatusWarning" : "StatusError";
+        if (Application.Current?.TryFindResource(anahtar, out var kaynak) == true && kaynak is ControlTheme tema)
+            TxtWarning.Theme = tema;
+
+        WarningGlyph.IsVisible = uyari;
+        WarningRow.IsVisible = true;
     }
 
     private void OnReveal(object? sender, RoutedEventArgs e)

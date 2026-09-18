@@ -11,7 +11,9 @@ Hedef boyuta sıkıştıran video aracı. .NET 8 + Avalonia + ffmpeg.
 - `src/VidShrink.App` — Avalonia arayüzü. Renk yalnız `Themes/Palette/<Ad>/Theme.axaml`
   dosyasından, ölçü yalnız `Themes/Theme.axaml` belirteçlerinden. Açılış paletini
   `App.axaml` bildirir, seçimi `PaletteCatalog.Use` çalışırken uygular; palet ikinci bir
-  yerde merge edilmez, yoksa o kapsam seçimden kopar.
+  yerde merge edilmez, yoksa o kapsam seçimden kopar. Durum metni: `StatusError` hatada,
+  `StatusWarning` "iş bitti ama eksik" durumunda — uyarı renkle değil simge ve ağırlıkla
+  ayrılır, paletlerde uyarı hue'su yok (`docs/netlestirme/018-uyari-rengi-27-palette-yok.md`).
 - `tests/VidShrink.Tests` — tek test projesi. Ölçüsü **dokunulan alan**: değişen her dosyanın
   testleri yerelde yeşil olmadan teslim yok. Tam süit yerelde koşulmaz; itmeden sonra CI
   koşar ve `gh run list` yeşili teslimin şartıdır. `tools/kosum-kapisi` yalnız **majör**

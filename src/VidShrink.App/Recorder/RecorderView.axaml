@@ -176,10 +176,15 @@
                  MaxLines="1"
                  FontFamily="{StaticResource FontMono}"
                  auto:AutomationProperties.Name="{loc:Text recorder.output.title}"/>
-        <TextBlock x:Name="TxtWarning"
-                   Theme="{StaticResource StatusError}"
-                   TextWrapping="Wrap"
-                   IsVisible="False"/>
+        <StackPanel x:Name="WarningRow" Orientation="Horizontal" Spacing="{StaticResource SpaceXs}" IsVisible="False">
+          <Path x:Name="WarningGlyph"
+                Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
+                Stretch="Uniform" VerticalAlignment="Center"
+                Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
+          <TextBlock x:Name="TxtWarning"
+                     Theme="{StaticResource StatusWarning}"
+                     TextWrapping="Wrap"/>
+        </StackPanel>
         <WrapPanel>
           <Button x:Name="BtnToShrink"
                   Theme="{StaticResource PrimaryButton}"

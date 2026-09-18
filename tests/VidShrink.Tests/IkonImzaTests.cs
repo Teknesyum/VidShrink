@@ -68,6 +68,7 @@ public sealed class IkonImzaTests
         ["IconRestore"] = "000007f80c0c00063fe27ff27ff27ff27ff27ff27ff67ff47ff03ff01fe00000",
         ["IconCoffee"] = "000014801680096009201ff03ff83ffe3ffa3ffa3ffe3ff01ff00fe003800000",
         ["IconCode"] = "0000000000000060004008d010882184218411080b1002000600000000000000",
+        ["IconWarning"] = "0000018003c003c007e00f700f701f781f783ffc3e7c7ffe7ffe3ffc00000000",
     };
 
     internal static string Imza(string yol)

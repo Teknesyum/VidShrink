@@ -169,6 +169,19 @@
         <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
       </ControlTheme>
 
+      <!--
+        Uyari hatadan renkle degil bicimle ayrilir: 27 paletin hicbirinde uyari hue'su yok
+        ve elle secmek "renk uydurma" yasagini cignerdi. Karar
+        docs/netlestirme/018-uyari-rengi-27-palette-yok.md. Hata kirmizi ve simgesiz,
+        uyari govde renginde + ucgen-unlem simgesi + SemiBold.
+      -->
+      <ControlTheme x:Key="StatusWarning" TargetType="TextBlock" BasedOn="{StaticResource Body}">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+      </ControlTheme>
+
       <ControlTheme x:Key="SignatureText" TargetType="TextBlock" BasedOn="{StaticResource Hint}">
         <Setter Property="HorizontalAlignment" Value="Right"/>
         <Setter Property="TextAlignment" Value="Right"/>
