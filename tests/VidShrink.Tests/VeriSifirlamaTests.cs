@@ -36,7 +36,7 @@ public sealed class VeriSifirlamaTests
         [
             "settings.json", "player-settings.json", "player-advanced.json", "player-recent.json",
             "player-tools.json", "player-history.json", "layout.json", "recorder-settings.json",
-            "dismissed-update.txt", "paylasimlar.json",
+            "dismissed-update.txt", "paylasimlar.json", "opensubtitles-session.dat",
         ];
 
         Assert.Equal(expected.OrderBy(x => x), AppDataReset.FileNames.OrderBy(x => x));

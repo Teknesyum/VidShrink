@@ -31,11 +31,14 @@ public sealed class SessionStore : ISubtitleSessionStore
     /// <summary>Belirtecin korumalı saklanabildiği platform mu.</summary>
     public static bool Supported => OperatingSystem.IsWindows();
 
+    /// <summary>Oturum dosyasının adı. "Tüm verileri sıfırla" listesi de bunu kullanır.</summary>
+    public const string FileName = "opensubtitles-session.dat";
+
     /// <summary>Ayar dosyasının yanındaki oturum dosyası.</summary>
     public static string PathFor(string? settingsPath = null)
     {
         var settings = Path.GetFullPath(settingsPath ?? UpdateSettings.DefaultPath);
-        return Path.Combine(Path.GetDirectoryName(settings) ?? ".", "opensubtitles-session.dat");
+        return Path.Combine(Path.GetDirectoryName(settings) ?? ".", FileName);
     }
 
     public SubtitleSession? Read()

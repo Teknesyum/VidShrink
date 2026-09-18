@@ -27,6 +27,7 @@ internal static class AppDataReset
         MainWindow.LayoutFileName,
         MainWindow.DismissedNoticeFileName,
         ShareLedgerFileName,
+        Subtitles.SessionStore.FileName,
     };
 
     internal const string ShareLedgerFileName = "paylasimlar.json";

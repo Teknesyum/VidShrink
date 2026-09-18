@@ -48,8 +48,8 @@ ship as part of it.
   compatibility box and a "send as document" hint (`MainWindow.axaml:485-494`).
 - Releases now ship win-arm64 and linux-arm64 alongside x64, and the installer picks the
   package matching the machine (`release.yml:204`, `UpdateCheck.cs:162`).
-- "Reset all data" deletes the app's settings, history and share records
-  (`AppDataReset.cs:19-30`).
+- "Reset all data" deletes every file the app writes to the user's folder, the stored
+  OpenSubtitles session included (`AppDataReset.cs:19-31`).
 
 ### Changed
 
