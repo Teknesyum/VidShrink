@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "கொரியம்",
   "player.subtitle.external": " (வெளிப்புறம்)",
   "player.subtitle.novideo": "வசனங்களைச் சேர்க்கும் முன் ஒரு வீடியோவைத் திற",
-  "player.subtitle.loadfailed": "வசனக் கோப்பை ஏற்ற முடியவில்லை"
+  "player.subtitle.loadfailed": "வசனக் கோப்பை ஏற்ற முடியவில்லை",
+  "player.subtitle.download": "வசன வரிகளை பதிவிறக்கு…",
+  "player.subtitle.download.getkey": "வசன வரிகளை பதிவிறக்கு — API விசையைப் பெறு…",
+  "player.subtitle.download.working": "வசன வரிகள் தேடப்படுகின்றன…",
+  "player.subtitle.download.done": "வசன வரி பதிவிறக்கம் ஆனது: {0}",
+  "player.subtitle.download.nokey": "அமைப்புகளில் உங்கள் OpenSubtitles API விசையை உள்ளிடவும்",
+  "player.subtitle.download.badkey": "OpenSubtitles API விசையை ஏற்கவில்லை",
+  "player.subtitle.download.needaccount": "பதிவிறக்க OpenSubtitles கணக்கு உள்நுழைவு தேவை",
+  "player.subtitle.download.noresult": "இந்த வீடியோவுக்கு வசன வரி எதுவும் கிடைக்கவில்லை",
+  "player.subtitle.download.quota": "வசன வரி பதிவிறக்க தினசரி ஒப்பந்தம் முடிந்துவிட்டது",
+  "player.subtitle.download.offline": "OpenSubtitles-ஐ அடைய முடியவில்லை",
+  "player.subtitle.download.writefail": "வசன வரியை வீடியோவின் அருகில் சேமிக்க முடியவில்லை",
+  "player.subtitle.download.toofast": "OpenSubtitles-க்கு அதிக கோரிக்கைகள் அனுப்பப்பட்டன — சிறிது நேரத்தில் மீண்டும் முயற்சிக்கவும்",
+  "player.subtitle.download.badlogin": "OpenSubtitles உள்நுழைவை ஏற்கவில்லை",
+  "player.subtitle.download.expired": "பதிவிறக்க இணைப்பின் காலம் முடிந்துவிட்டது — மீண்டும் முயற்சிக்கவும்",
+  "player.subtitle.download.toofast.wait": "OpenSubtitles-க்கு அதிக கோரிக்கைகள் அனுப்பப்பட்டன — {0} வினாடிகளில் மீண்டும் முயற்சிக்கவும்"
 }

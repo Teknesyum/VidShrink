@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Κορεατική",
   "player.subtitle.external": " (εξωτερικό)",
   "player.subtitle.novideo": "Ανοίξτε ένα βίντεο πριν προσθέσετε υπότιτλους",
-  "player.subtitle.loadfailed": "Δεν ήταν δυνατή η φόρτωση του αρχείου υποτίτλων"
+  "player.subtitle.loadfailed": "Δεν ήταν δυνατή η φόρτωση του αρχείου υποτίτλων",
+  "player.subtitle.download": "Λήψη υποτίτλου…",
+  "player.subtitle.download.getkey": "Λήψη υποτίτλου — απόκτηση κλειδιού API…",
+  "player.subtitle.download.working": "Αναζήτηση υποτίτλων…",
+  "player.subtitle.download.done": "Ο υπότιτλος λήφθηκε: {0}",
+  "player.subtitle.download.nokey": "Εισαγάγετε το κλειδί API του OpenSubtitles στις Ρυθμίσεις",
+  "player.subtitle.download.badkey": "Το OpenSubtitles δεν δέχτηκε το κλειδί API",
+  "player.subtitle.download.needaccount": "Το OpenSubtitles απαιτεί σύνδεση λογαριασμού για λήψη",
+  "player.subtitle.download.noresult": "Δεν βρέθηκε υπότιτλος για αυτό το βίντεο",
+  "player.subtitle.download.quota": "Η ημερήσια ποσόστωση λήψης υποτίτλων έχει εξαντληθεί",
+  "player.subtitle.download.offline": "Δεν ήταν δυνατή η επικοινωνία με το OpenSubtitles",
+  "player.subtitle.download.writefail": "Ο υπότιτλος δεν ήταν δυνατό να αποθηκευτεί δίπλα στο βίντεο",
+  "player.subtitle.download.toofast": "Πολλά αιτήματα προς το OpenSubtitles — δοκιμάστε ξανά σε λίγο",
+  "player.subtitle.download.badlogin": "Το OpenSubtitles δεν δέχτηκε τη σύνδεση",
+  "player.subtitle.download.expired": "Ο σύνδεσμος λήψης έληξε — δοκιμάστε ξανά",
+  "player.subtitle.download.toofast.wait": "Πολλά αιτήματα προς το OpenSubtitles — δοκιμάστε ξανά σε {0} δ"
 }

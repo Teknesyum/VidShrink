@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "韓国語",
   "player.subtitle.external": " (外部)",
   "player.subtitle.novideo": "字幕を追加する前に動画を開いてください",
-  "player.subtitle.loadfailed": "字幕ファイルを読み込めませんでした"
+  "player.subtitle.loadfailed": "字幕ファイルを読み込めませんでした",
+  "player.subtitle.download": "字幕をダウンロード…",
+  "player.subtitle.download.getkey": "字幕をダウンロード — APIキーを取得…",
+  "player.subtitle.download.working": "字幕を検索しています…",
+  "player.subtitle.download.done": "字幕をダウンロードしました: {0}",
+  "player.subtitle.download.nokey": "設定でOpenSubtitlesのAPIキーを入力してください",
+  "player.subtitle.download.badkey": "OpenSubtitlesがAPIキーを受け付けませんでした",
+  "player.subtitle.download.needaccount": "OpenSubtitlesはダウンロードにアカウントログインが必要です",
+  "player.subtitle.download.noresult": "この動画に対応する字幕は見つかりませんでした",
+  "player.subtitle.download.quota": "字幕ダウンロードの1日の上限に達しました",
+  "player.subtitle.download.offline": "OpenSubtitlesに接続できませんでした",
+  "player.subtitle.download.writefail": "字幕を動画の隣に保存できませんでした",
+  "player.subtitle.download.toofast": "OpenSubtitlesへのリクエストが多すぎます — 少し待ってから再試行してください",
+  "player.subtitle.download.badlogin": "OpenSubtitlesがサインインを受け付けませんでした",
+  "player.subtitle.download.expired": "ダウンロードリンクの有効期限が切れました — もう一度お試しください",
+  "player.subtitle.download.toofast.wait": "OpenSubtitlesへのリクエストが多すぎます — {0}秒後に再試行してください"
 }

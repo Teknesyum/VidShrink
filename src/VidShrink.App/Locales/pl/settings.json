@@ -41,5 +41,18 @@
   "settings.default-app.open": "Aplikacje domyślne",
   "settings.default-app.dismiss": "Nie pytaj ponownie",
   "settings.player-shortcuts.title": "Skróty odtwarzacza",
-  "settings.player-shortcuts.hint": "Karta odtwarzacza, jego menu i ta lista czytają tę samą tabelę."
+  "settings.player-shortcuts.hint": "Karta odtwarzacza, jego menu i ta lista czytają tę samą tabelę.",
+  "settings-tab.opensubtitles.label": "Klucz API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Uzyskaj klucz",
+  "settings-tab.opensubtitles.hint": "Pobieranie napisów w odtwarzaczu korzysta z własnego klucza. Utwórz bezpłatne konto na opensubtitles.com, a potem wklej tu klucz. Bez klucza funkcja pozostaje wyłączona.",
+  "settings-tab.opensubtitles.account": "Konto OpenSubtitles (wymagane do pobierania)",
+  "settings-tab.opensubtitles.user": "Nazwa użytkownika",
+  "settings-tab.opensubtitles.password": "Hasło",
+  "settings-tab.opensubtitles.signin": "Zaloguj się",
+  "settings-tab.opensubtitles.signout": "Wyloguj się",
+  "settings-tab.opensubtitles.signingin": "Logowanie…",
+  "settings-tab.opensubtitles.signedin": "Zalogowano jako {0}",
+  "settings-tab.opensubtitles.signedout": "Nie zalogowano — pobieranie napisów wymaga konta",
+  "settings-tab.opensubtitles.signinfailed": "Logowanie nie powiodło się. Sprawdź nazwę użytkownika, hasło i klucz API.",
+  "settings-tab.opensubtitles.accounthint": "Hasło jest wysyłane do OpenSubtitles tylko w celu zalogowania i nigdy nie jest zapisywane. Zapisywany jest tylko zwrócony token sesji, chroniony przez Windows; na innych systemach sesja trwa do zamknięcia VidShrink."
 }

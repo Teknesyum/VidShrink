@@ -41,5 +41,18 @@
   "settings.default-app.open": "Aplikasi lalai",
   "settings.default-app.dismiss": "Jangan tanya lagi",
   "settings.player-shortcuts.title": "Pintasan pemain",
-  "settings.player-shortcuts.hint": "Tab pemain, menunya dan senarai ini semuanya membaca jadual yang sama."
+  "settings.player-shortcuts.hint": "Tab pemain, menunya dan senarai ini semuanya membaca jadual yang sama.",
+  "settings-tab.opensubtitles.label": "Kunci API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Dapatkan kunci",
+  "settings-tab.opensubtitles.hint": "Muat turun sari kata dalam pemain menggunakan kunci anda sendiri. Cipta akaun percuma di opensubtitles.com, kemudian tampal kunci di sini. Tanpa kunci, ciri ini kekal dimatikan.",
+  "settings-tab.opensubtitles.account": "Akaun OpenSubtitles (diperlukan untuk muat turun)",
+  "settings-tab.opensubtitles.user": "Nama pengguna",
+  "settings-tab.opensubtitles.password": "Kata laluan",
+  "settings-tab.opensubtitles.signin": "Log masuk",
+  "settings-tab.opensubtitles.signout": "Log keluar",
+  "settings-tab.opensubtitles.signingin": "Sedang log masuk…",
+  "settings-tab.opensubtitles.signedin": "Log masuk sebagai {0}",
+  "settings-tab.opensubtitles.signedout": "Belum log masuk — muat turun sari kata memerlukan akaun",
+  "settings-tab.opensubtitles.signinfailed": "Log masuk gagal. Semak nama pengguna, kata laluan dan kunci API.",
+  "settings-tab.opensubtitles.accounthint": "Kata laluan hanya dihantar ke OpenSubtitles untuk log masuk dan tidak pernah disimpan. Hanya token sesi yang dikembalikan disimpan, dilindungi oleh Windows; pada sistem lain, sesi berlangsung sehingga anda menutup VidShrink."
 }

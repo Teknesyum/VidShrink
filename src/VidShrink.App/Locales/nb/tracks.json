@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Koreansk",
   "player.subtitle.external": " (ekstern)",
   "player.subtitle.novideo": "Åpne en video før du legger til undertekster",
-  "player.subtitle.loadfailed": "Kunne ikke laste inn undertekstfilen"
+  "player.subtitle.loadfailed": "Kunne ikke laste inn undertekstfilen",
+  "player.subtitle.download": "Last ned undertekst…",
+  "player.subtitle.download.getkey": "Last ned undertekst — hent en API-nøkkel…",
+  "player.subtitle.download.working": "Søker etter undertekster…",
+  "player.subtitle.download.done": "Undertekst lastet ned: {0}",
+  "player.subtitle.download.nokey": "Skriv inn din OpenSubtitles-API-nøkkel under Innstillinger",
+  "player.subtitle.download.badkey": "OpenSubtitles godtok ikke API-nøkkelen",
+  "player.subtitle.download.needaccount": "OpenSubtitles krever kontoinnlogging for nedlasting",
+  "player.subtitle.download.noresult": "Fant ingen undertekst for denne videoen",
+  "player.subtitle.download.quota": "Den daglige nedlastingskvoten for undertekster er full",
+  "player.subtitle.download.offline": "Kunne ikke nå OpenSubtitles",
+  "player.subtitle.download.writefail": "Underteksten kunne ikke lagres ved siden av videoen",
+  "player.subtitle.download.toofast": "For mange forespørsler til OpenSubtitles — prøv igjen om et øyeblikk",
+  "player.subtitle.download.badlogin": "OpenSubtitles godtok ikke innloggingen",
+  "player.subtitle.download.expired": "Nedlastingslenken er utløpt — prøv igjen",
+  "player.subtitle.download.toofast.wait": "For mange forespørsler til OpenSubtitles — prøv igjen om {0} s"
 }

@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Coreano",
   "player.subtitle.external": " (externa)",
   "player.subtitle.novideo": "Abra um vídeo antes de adicionar legendas",
-  "player.subtitle.loadfailed": "Não foi possível carregar o arquivo de legendas"
+  "player.subtitle.loadfailed": "Não foi possível carregar o arquivo de legendas",
+  "player.subtitle.download": "Baixar legenda…",
+  "player.subtitle.download.getkey": "Baixar legenda — obter uma chave de API…",
+  "player.subtitle.download.working": "Procurando legendas…",
+  "player.subtitle.download.done": "Legenda baixada: {0}",
+  "player.subtitle.download.nokey": "Informe sua chave de API do OpenSubtitles em Configurações",
+  "player.subtitle.download.badkey": "O OpenSubtitles não aceitou a chave de API",
+  "player.subtitle.download.needaccount": "O OpenSubtitles exige login de conta para baixar",
+  "player.subtitle.download.noresult": "Nenhuma legenda encontrada para este vídeo",
+  "player.subtitle.download.quota": "A cota diária de download de legendas está esgotada",
+  "player.subtitle.download.offline": "Não foi possível conectar ao OpenSubtitles",
+  "player.subtitle.download.writefail": "Não foi possível salvar a legenda junto ao vídeo",
+  "player.subtitle.download.toofast": "Muitas solicitações para o OpenSubtitles — tente novamente em um instante",
+  "player.subtitle.download.badlogin": "O OpenSubtitles não aceitou o login",
+  "player.subtitle.download.expired": "O link de download expirou — tente novamente",
+  "player.subtitle.download.toofast.wait": "Muitas solicitações para o OpenSubtitles — tente novamente em {0} s"
 }

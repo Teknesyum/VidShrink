@@ -41,5 +41,18 @@
   "settings.default-app.open": "Default apps",
   "settings.default-app.dismiss": "Do not ask again",
   "settings.player-shortcuts.title": "Player shortcuts",
-  "settings.player-shortcuts.hint": "The player tab, its menu and this list all read the same table."
+  "settings.player-shortcuts.hint": "The player tab, its menu and this list all read the same table.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API key",
+  "settings-tab.opensubtitles.get": "Get a key",
+  "settings-tab.opensubtitles.hint": "Subtitle download in the player uses your own key. Create a free consumer account at opensubtitles.com, then paste the key here. Without a key the feature stays off.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles account (needed for downloads)",
+  "settings-tab.opensubtitles.user": "Username",
+  "settings-tab.opensubtitles.password": "Password",
+  "settings-tab.opensubtitles.signin": "Sign in",
+  "settings-tab.opensubtitles.signout": "Sign out",
+  "settings-tab.opensubtitles.signingin": "Signing in…",
+  "settings-tab.opensubtitles.signedin": "Signed in as {0}",
+  "settings-tab.opensubtitles.signedout": "Not signed in — subtitle downloads need an account",
+  "settings-tab.opensubtitles.signinfailed": "Sign-in failed. Check the username, password and API key.",
+  "settings-tab.opensubtitles.accounthint": "The password is only sent to OpenSubtitles to sign in and is never saved. Only the session token that comes back is stored, protected by Windows; on other systems the session lasts until you close VidShrink."
 }

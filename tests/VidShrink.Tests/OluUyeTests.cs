@@ -331,8 +331,20 @@ internal static class MemberScan
             i++;
         }
 
-        return output.ToString();
+        return Directives.Replace(output.ToString(), m => new string(' ', m.Length));
     }
+
+    /// <summary>
+    /// Ad alani ve <c>using</c> yonergeleri uye okumasi degildir, ama desen
+    /// <c>\.\s*Ad\b</c> onlari da yakaliyordu: <c>namespace VidShrink.Core.Subtitles;</c>
+    /// satiri <c>StreamPlan.Subtitles</c>'i "uretimde tuketiliyor" gosterip pimden
+    /// dusuruyordu. Yonergeler bosluga cevrilir; <c>using var x = ...</c> ve
+    /// <c>using (var x = ...)</c> deyimleri desene girmez, cunku onlarda ad ile
+    /// noktali virgul arasinda bosluk ve <c>=</c> vardir.
+    /// </summary>
+    private static readonly Regex Directives =
+        new(@"^[ \t]*(?:global[ \t]+)?(?:using[ \t]+(?:static[ \t]+)?|namespace[ \t]+)[A-Za-z_][\w.]*[ \t]*(?:;|\r?$)",
+            RegexOptions.Multiline | RegexOptions.Compiled);
 }
 
 /// <summary>

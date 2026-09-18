@@ -41,5 +41,18 @@
   "settings.default-app.open": "기본 앱",
   "settings.default-app.dismiss": "다시 묻지 않기",
   "settings.player-shortcuts.title": "플레이어 단축키",
-  "settings.player-shortcuts.hint": "플레이어 탭, 메뉴, 이 목록은 모두 같은 표를 참조합니다."
+  "settings.player-shortcuts.hint": "플레이어 탭, 메뉴, 이 목록은 모두 같은 표를 참조합니다.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API 키",
+  "settings-tab.opensubtitles.get": "키 받기",
+  "settings-tab.opensubtitles.hint": "플레이어의 자막 다운로드는 사용자 본인의 키를 사용합니다. opensubtitles.com에서 무료 계정을 만든 다음 여기에 키를 붙여넣으세요. 키가 없으면 이 기능은 꺼진 상태로 유지됩니다.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles 계정 (다운로드에 필요)",
+  "settings-tab.opensubtitles.user": "사용자 이름",
+  "settings-tab.opensubtitles.password": "비밀번호",
+  "settings-tab.opensubtitles.signin": "로그인",
+  "settings-tab.opensubtitles.signout": "로그아웃",
+  "settings-tab.opensubtitles.signingin": "로그인하는 중…",
+  "settings-tab.opensubtitles.signedin": "{0}으로 로그인됨",
+  "settings-tab.opensubtitles.signedout": "로그인하지 않음 — 자막을 다운로드하려면 계정이 필요합니다",
+  "settings-tab.opensubtitles.signinfailed": "로그인에 실패했습니다. 사용자 이름, 비밀번호, API 키를 확인하세요.",
+  "settings-tab.opensubtitles.accounthint": "비밀번호는 로그인을 위해서만 OpenSubtitles로 전송되며 저장되지 않습니다. 저장되는 것은 반환된 세션 토큰뿐이며, Windows가 이를 보호합니다. 다른 시스템에서는 VidShrink를 닫을 때까지 세션이 유지됩니다."
 }

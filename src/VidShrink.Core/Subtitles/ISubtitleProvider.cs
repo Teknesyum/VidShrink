@@ -1,0 +1,119 @@
+namespace VidShrink.Core.Subtitles;
+
+/// <summary>
+/// Altyazı arama ve indirmenin sonucu. Her kol kullanıcıya ayrı bir metinle döner;
+/// çağıran taraf istisna yakalamaz, bu değeri okur.
+/// </summary>
+public enum SubtitleOutcome
+{
+    /// <summary>İş bitti.</summary>
+    Ok,
+
+    /// <summary>Ayarlarda API anahtarı yok; özellik kapalı.</summary>
+    NoKey,
+
+    /// <summary>Sağlayıcı anahtarı tanımadı ya da reddetti.</summary>
+    BadKey,
+
+    /// <summary>Kullanıcı adı ya da parola sağlayıcıda tutmadı.</summary>
+    BadLogin,
+
+    /// <summary>
+    /// Anahtar geçerli ama indirme için kullanıcı oturumu gerekiyor. Şartname
+    /// <c>/download</c> için <c>Api-Key</c> yanında <c>Authorization</c> başlığını da
+    /// zorunlu tutuyor; o başlık <c>/login</c>den gelen JWT'dir ve bu sürümde yoktur.
+    /// </summary>
+    NeedAccount,
+
+    /// <summary>Arama çalıştı, bu videoya altyazı yok.</summary>
+    NoResult,
+
+    /// <summary>Günlük indirme kotası doldu.</summary>
+    QuotaExceeded,
+
+    /// <summary>
+    /// Saniyedeki istek sınırı aşıldı (IP başına 5/sn). Kotadan ayrı bir koldur: kota
+    /// gece yarısı yenilenir, bu birkaç saniyede geçer.
+    /// </summary>
+    RateLimited,
+
+    /// <summary>Ağa çıkılamadı ya da sağlayıcı beklenmedik cevap verdi.</summary>
+    NetworkError,
+
+    /// <summary>
+    /// İmzalı indirme bağlantısı geçersiz. Sağlayıcı bağlantıyı üç saatten uzun
+    /// kullandırmıyor; arama yenilenip yeniden indirilmeli.
+    /// </summary>
+    LinkExpired,
+
+    /// <summary>İndirilen dosya videonun yanına yazılamadı.</summary>
+    WriteError
+}
+
+/// <summary>Bir arama isteği.</summary>
+/// <param name="MovieHash">Varsa moviehash; tam eşleşme araması bununla yapılır.</param>
+/// <param name="Name">Hash tutmazsa kullanılan ad araması.</param>
+/// <param name="Languages">Yeğleme sırasıyla dil kodları (arayüz dili, sonra İngilizce).</param>
+public sealed record SubtitleQuery(string? MovieHash, string Name, IReadOnlyList<string> Languages);
+
+/// <summary>Arama sonucundaki tek bir altyazı dosyası.</summary>
+public sealed record SubtitleCandidate(
+    long FileId,
+    string Language,
+    string Release,
+    string FileName,
+    int DownloadCount,
+    bool HashMatch);
+
+/// <summary>Aramanın sonucu.</summary>
+public sealed record SubtitleSearchResult(SubtitleOutcome Outcome, IReadOnlyList<SubtitleCandidate> Candidates)
+{
+    /// <summary>Sonuçsuz bir kol.</summary>
+    public static SubtitleSearchResult Failed(SubtitleOutcome outcome)
+        => new(outcome, Array.Empty<SubtitleCandidate>());
+}
+
+/// <summary>İndirmenin sonucu.</summary>
+/// <param name="Outcome">Kol.</param>
+/// <param name="Path">Başarılıysa videonun yanına yazılan dosyanın tam yolu.</param>
+/// <param name="Remaining">Sağlayıcının bildirdiği kalan günlük hak; bilinmiyorsa -1.</param>
+public sealed record SubtitleDownloadResult(SubtitleOutcome Outcome, string? Path, int Remaining)
+{
+    /// <summary>
+    /// 429'da sağlayıcının <c>Retry-After</c> başlığıyla bildirdiği saniye; bildirmediyse 0.
+    /// Arayüz kullanıcıya ne kadar bekleyeceğini bununla söyler.
+    /// </summary>
+    public int RetryAfterSeconds { get; init; }
+
+    /// <summary>Dosyasız bir kol.</summary>
+    public static SubtitleDownloadResult Failed(SubtitleOutcome outcome, int remaining = -1)
+        => new(outcome, null, remaining);
+}
+
+/// <summary>
+/// Altyazı sağlayıcısı. Ağ bu arayüzün arkasında kalır; testler kendi uygulamasını koyar
+/// ya da gerçek sağlayıcıyı sahte <see cref="Share.IHttpTransport"/> ile kurar.
+/// </summary>
+public interface ISubtitleProvider
+{
+    /// <summary>Anahtar var mı; yoksa arayüz özelliği kapalı gösterir.</summary>
+    bool IsConfigured { get; }
+
+    /// <summary>Geçerli bir kullanıcı oturumu var mı; indirme buna bakar.</summary>
+    bool HasSession { get; }
+
+    /// <summary>
+    /// Kullanıcı adı ve parolayla oturum açar. Parola yalnız bu çağrının gövdesinde geçer;
+    /// saklanan tek şey dönen belirteçtir.
+    /// </summary>
+    Task<SubtitleLoginResult> LoginAsync(string username, string password, CancellationToken cancellationToken);
+
+    /// <summary>Saklanan oturumu siler.</summary>
+    void SignOut();
+
+    /// <summary>Önce moviehash, tutmazsa ad ile arar.</summary>
+    Task<SubtitleSearchResult> SearchAsync(SubtitleQuery query, CancellationToken cancellationToken);
+
+    /// <summary>Seçilen adayı indirip videonun yanına <c>&lt;ad&gt;.&lt;dil&gt;.srt</c> yazar.</summary>
+    Task<SubtitleDownloadResult> DownloadAsync(SubtitleCandidate candidate, string mediaPath, CancellationToken cancellationToken);
+}

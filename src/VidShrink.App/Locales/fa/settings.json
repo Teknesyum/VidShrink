@@ -41,5 +41,18 @@
   "settings.default-app.open": "برنامه‌های پیش‌فرض",
   "settings.default-app.dismiss": "دیگر نپرس",
   "settings.player-shortcuts.title": "میانبرهای پخش‌کننده",
-  "settings.player-shortcuts.hint": "تب پخش‌کننده، منوی آن و این فهرست همگی از یک جدول می‌خوانند."
+  "settings.player-shortcuts.hint": "تب پخش‌کننده، منوی آن و این فهرست همگی از یک جدول می‌خوانند.",
+  "settings-tab.opensubtitles.label": "کلید API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "گرفتن کلید",
+  "settings-tab.opensubtitles.hint": "دریافت زیرنویس در پخش‌کننده از کلید شخصی شما استفاده می‌کند. یک حساب رایگان در opensubtitles.com بسازید، سپس کلید را اینجا بچسبانید. بدون کلید، این ویژگی خاموش می‌ماند.",
+  "settings-tab.opensubtitles.account": "حساب OpenSubtitles (برای دانلود لازم است)",
+  "settings-tab.opensubtitles.user": "نام کاربری",
+  "settings-tab.opensubtitles.password": "رمز عبور",
+  "settings-tab.opensubtitles.signin": "ورود",
+  "settings-tab.opensubtitles.signout": "خروج",
+  "settings-tab.opensubtitles.signingin": "در حال ورود…",
+  "settings-tab.opensubtitles.signedin": "واردشده به‌عنوان {0}",
+  "settings-tab.opensubtitles.signedout": "وارد نشده‌اید — دانلود زیرنویس به حساب کاربری نیاز دارد",
+  "settings-tab.opensubtitles.signinfailed": "ورود ناموفق بود. نام کاربری، رمز عبور و کلید API را بررسی کنید.",
+  "settings-tab.opensubtitles.accounthint": "رمز عبور فقط برای ورود به OpenSubtitles ارسال می‌شود و هرگز ذخیره نمی‌شود. تنها چیزی که ذخیره می‌شود توکن نشستی است که برمی‌گردد و توسط Windows محافظت می‌شود؛ در سایر سیستم‌ها نشست تا زمانی که VidShrink را ببندید ادامه دارد."
 }

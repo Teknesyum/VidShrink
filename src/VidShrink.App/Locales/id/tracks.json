@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Korea",
   "player.subtitle.external": " (eksternal)",
   "player.subtitle.novideo": "Buka video sebelum menambahkan subtitel",
-  "player.subtitle.loadfailed": "Berkas subtitel tidak dapat dimuat"
+  "player.subtitle.loadfailed": "Berkas subtitel tidak dapat dimuat",
+  "player.subtitle.download": "Unduh subtitle…",
+  "player.subtitle.download.getkey": "Unduh subtitle — dapatkan kunci API…",
+  "player.subtitle.download.working": "Mencari subtitle…",
+  "player.subtitle.download.done": "Subtitle terunduh: {0}",
+  "player.subtitle.download.nokey": "Masukkan kunci API OpenSubtitles Anda di Pengaturan",
+  "player.subtitle.download.badkey": "OpenSubtitles tidak menerima kunci API",
+  "player.subtitle.download.needaccount": "OpenSubtitles memerlukan login akun untuk mengunduh",
+  "player.subtitle.download.noresult": "Tidak ada subtitle yang ditemukan untuk video ini",
+  "player.subtitle.download.quota": "Kuota unduhan subtitle harian sudah penuh",
+  "player.subtitle.download.offline": "OpenSubtitles tidak dapat dihubungi",
+  "player.subtitle.download.writefail": "Subtitle tidak dapat disimpan di samping video",
+  "player.subtitle.download.toofast": "Terlalu banyak permintaan ke OpenSubtitles — coba lagi sesaat lagi",
+  "player.subtitle.download.badlogin": "OpenSubtitles tidak menerima proses masuk",
+  "player.subtitle.download.expired": "Tautan unduhan telah kedaluwarsa — coba lagi",
+  "player.subtitle.download.toofast.wait": "Terlalu banyak permintaan ke OpenSubtitles — coba lagi dalam {0} dtk"
 }

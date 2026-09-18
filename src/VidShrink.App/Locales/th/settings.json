@@ -41,5 +41,18 @@
   "settings.default-app.open": "แอปเริ่มต้น",
   "settings.default-app.dismiss": "ไม่ต้องถามอีก",
   "settings.player-shortcuts.title": "ปุ่มลัดตัวเล่น",
-  "settings.player-shortcuts.hint": "แท็บตัวเล่น เมนูของมัน และรายการนี้ ทั้งหมดอ่านจากตารางเดียวกัน"
+  "settings.player-shortcuts.hint": "แท็บตัวเล่น เมนูของมัน และรายการนี้ ทั้งหมดอ่านจากตารางเดียวกัน",
+  "settings-tab.opensubtitles.label": "คีย์ API ของ OpenSubtitles",
+  "settings-tab.opensubtitles.get": "รับคีย์",
+  "settings-tab.opensubtitles.hint": "การดาวน์โหลดคำบรรยายในตัวเล่นใช้คีย์ของคุณเอง สร้างบัญชีผู้ใช้ฟรีที่ opensubtitles.com แล้ววางคีย์ที่นี่ หากไม่มีคีย์ ฟีเจอร์นี้จะปิดอยู่",
+  "settings-tab.opensubtitles.account": "บัญชี OpenSubtitles (จำเป็นสำหรับการดาวน์โหลด)",
+  "settings-tab.opensubtitles.user": "ชื่อผู้ใช้",
+  "settings-tab.opensubtitles.password": "รหัสผ่าน",
+  "settings-tab.opensubtitles.signin": "ลงชื่อเข้าใช้",
+  "settings-tab.opensubtitles.signout": "ลงชื่อออก",
+  "settings-tab.opensubtitles.signingin": "กำลังลงชื่อเข้าใช้…",
+  "settings-tab.opensubtitles.signedin": "ลงชื่อเข้าใช้เป็น {0}",
+  "settings-tab.opensubtitles.signedout": "ยังไม่ได้ลงชื่อเข้าใช้ — การดาวน์โหลดคำบรรยายต้องมีบัญชี",
+  "settings-tab.opensubtitles.signinfailed": "ลงชื่อเข้าใช้ไม่สำเร็จ โปรดตรวจสอบชื่อผู้ใช้ รหัสผ่าน และคีย์ API",
+  "settings-tab.opensubtitles.accounthint": "รหัสผ่านจะถูกส่งไปยัง OpenSubtitles เพื่อลงชื่อเข้าใช้เท่านั้น และจะไม่ถูกบันทึกไว้เลย สิ่งที่ถูกบันทึกมีเพียงโทเคนเซสชันที่ได้กลับมา ซึ่งได้รับการปกป้องโดย Windows ในระบบอื่นเซสชันจะดำเนินไปจนกว่าคุณจะปิด VidShrink"
 }

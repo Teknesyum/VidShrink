@@ -997,9 +997,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1481, toplam);
-        Assert.Equal(170, dilBasina["en"]);
-        Assert.Equal(61, dilBasina["tr"]);
+        Assert.Equal(1598, toplam);
+        Assert.Equal(189, dilBasina["en"]);
+        Assert.Equal(64, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1080,6 +1080,27 @@ public sealed class BaslikKapsamiTests
     /// <c>main.advice.codec-upgrade</c>'in iki <c>H.265</c> gecisini <c>AV1</c>'e cevirdi —
     /// anahtar sayisini degistirmez, <c>kayip</c> 0 kalir, kol degistiren toplam 1481 /
     /// en 170 / tr 61 yerinde durur.</para>
+    /// <para>P28 (<c>t0/p28-altyazi</c>) iki turda anahtar ekledi. Ilk tur on iki
+    /// <c>player.subtitle.download*</c> ve uc <c>settings-tab.opensubtitles.*</c> anahtari
+    /// (15); Yol A ikinci turda on <c>settings-tab.opensubtitles.*</c> oturum alani ve uc
+    /// oturuma bagli hata kolu (<c>badlogin</c>, <c>expired</c>, <c>toofast.wait</c>) ekledi (13).
+    /// Sayi dalin tabanindan (<c>d0aea4d2</c>) turetildi, olcunun fiili ciktisindan degil:
+    /// taban dil basina 900 anahtar, dalin tepesi 928, dusen yok: 928 - 900 = 28,
+    /// 43 x 28 = 1204, gezilen 38700 + 1204 = 39904.</para>
+    /// <para><b>Birlesme sonrasi pim 39990.</b> Dalin pini 39904 kendi tabanina (38700)
+    /// gore dogruydu; main ayni surede dil basina iki anahtar ekledi (43 x 2 = 86).
+    /// Dil basina 900 + 2 + 28 = 930, 43 x 930 = 39990 (= 38786 + 1204 = 39904 + 86).
+    /// Sayi elle hesaplanip yazilmadi: cozum bu degerle konuldu ve olcu yesil dondu,
+    /// yani <c>SAYIM gezilen</c> satirinin kendisi 39990 raporladi.</para>
+    /// <para>Kol degistiren toplam bu yirmi sekizin <c>Title</c> altinda kol degistiren
+    /// kismindan gelir; dokumun KOL satirlari anahtar kumesi basina ve dil basina ayri sayildi.
+    /// Ilk turun on besi: en 11, pt 7, es 6, hu 5, nl 5, ro 5, fr 4, nb 4, da 3, et 3, it 3,
+    /// de 2, sk 2, sw 2, tr 2, cs 1, fi 1, pl 1 = 67. Ikinci turun on ucu: en 8, es 5,
+    /// fr 4, hu 4, pt 4, pl 3, ro 3, cs 2, da 2, it 2, nb 2, nl 2, sk 2, sv 2, sw 2,
+    /// de 1, et 1, tr 1 = 50. Toplam 1481 + 67 + 50 = 1598, en 170 + 11 + 8 = 189,
+    /// tr 61 + 2 + 1 = 64. Ceviriler kucuk harfle basladigi icin ikinci turda da 43 dilin
+    /// 18'i kol degistiriyor; ayni sayi, ayni kume degil: <c>fi</c> ikinci turda kol
+    /// degistirmiyor, <c>sv</c> degistiriyor.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1107,7 +1128,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(38786, gezilen);
+        Assert.Equal(39990, gezilen);
         Assert.Empty(kayip);
     }
 

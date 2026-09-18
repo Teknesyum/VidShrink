@@ -41,5 +41,18 @@
   "settings.default-app.open": "Numatytosios programos",
   "settings.default-app.dismiss": "Daugiau neklausti",
   "settings.player-shortcuts.title": "Leistuvo spartieji klavišai",
-  "settings.player-shortcuts.hint": "Leistuvo skirtukas, jo meniu ir šis sąrašas visi skaito tą pačią lentelę."
+  "settings.player-shortcuts.hint": "Leistuvo skirtukas, jo meniu ir šis sąrašas visi skaito tą pačią lentelę.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API raktas",
+  "settings-tab.opensubtitles.get": "Gauti raktą",
+  "settings-tab.opensubtitles.hint": "Subtitrų atsisiuntimas leistuve naudoja jūsų paties raktą. Sukurkite nemokamą paskyrą opensubtitles.com svetainėje, tada įklijuokite raktą čia. Be rakto ši funkcija lieka išjungta.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles paskyra (reikalinga atsisiuntimams)",
+  "settings-tab.opensubtitles.user": "Naudotojo vardas",
+  "settings-tab.opensubtitles.password": "Slaptažodis",
+  "settings-tab.opensubtitles.signin": "Prisijungti",
+  "settings-tab.opensubtitles.signout": "Atsijungti",
+  "settings-tab.opensubtitles.signingin": "Jungiamasi…",
+  "settings-tab.opensubtitles.signedin": "Prisijungęs kaip {0}",
+  "settings-tab.opensubtitles.signedout": "Neprisijungta — subtitrų atsisiuntimui reikia paskyros",
+  "settings-tab.opensubtitles.signinfailed": "Prisijungti nepavyko. Patikrinkite naudotojo vardą, slaptažodį ir API raktą.",
+  "settings-tab.opensubtitles.accounthint": "Slaptažodis siunčiamas į OpenSubtitles tik prisijungimui ir niekada nesaugomas. Saugomas tik grąžintas sesijos leksemas, apsaugotas Windows; kitose sistemose sesija tęsiasi, kol uždarote VidShrink."
 }

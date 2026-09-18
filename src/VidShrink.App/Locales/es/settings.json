@@ -41,5 +41,18 @@
   "settings.default-app.open": "Aplicaciones predeterminadas",
   "settings.default-app.dismiss": "No volver a preguntar",
   "settings.player-shortcuts.title": "Atajos del reproductor",
-  "settings.player-shortcuts.hint": "La pestaña del reproductor, su menú y esta lista leen todos de la misma tabla."
+  "settings.player-shortcuts.hint": "La pestaña del reproductor, su menú y esta lista leen todos de la misma tabla.",
+  "settings-tab.opensubtitles.label": "Clave de API de OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Obtener una clave",
+  "settings-tab.opensubtitles.hint": "La descarga de subtítulos del reproductor usa tu propia clave. Crea una cuenta de consumidor gratuita en opensubtitles.com y pega la clave aquí. Sin clave, la función permanece desactivada.",
+  "settings-tab.opensubtitles.account": "Cuenta de OpenSubtitles (necesaria para las descargas)",
+  "settings-tab.opensubtitles.user": "Nombre de usuario",
+  "settings-tab.opensubtitles.password": "Contraseña",
+  "settings-tab.opensubtitles.signin": "Iniciar sesión",
+  "settings-tab.opensubtitles.signout": "Cerrar sesión",
+  "settings-tab.opensubtitles.signingin": "Iniciando sesión…",
+  "settings-tab.opensubtitles.signedin": "Sesión iniciada como {0}",
+  "settings-tab.opensubtitles.signedout": "Sesión no iniciada — para descargar subtítulos se necesita una cuenta",
+  "settings-tab.opensubtitles.signinfailed": "No se pudo iniciar sesión. Comprueba el nombre de usuario, la contraseña y la clave de API.",
+  "settings-tab.opensubtitles.accounthint": "La contraseña solo se envía a OpenSubtitles para iniciar sesión y nunca se guarda. Lo único que se almacena es el token de sesión que se recibe, protegido por Windows; en otros sistemas la sesión dura hasta que cierras VidShrink."
 }

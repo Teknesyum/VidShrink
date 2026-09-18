@@ -28,6 +28,8 @@ using Avalonia.Threading;
 using Avalonia.Controls.Presenters;
 using Avalonia.VisualTree;
 using VidShrink.App.Localization;
+using VidShrink.Core.Subtitles;
+using VidShrink.App.Subtitles;
 using VidShrink.App.Themes;
 using VidShrink.App.Performance;
 using VidShrink.App.Playback;
@@ -253,6 +255,8 @@ public partial class MainWindow : Window
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
+        Watch(TxtOpenSubtitlesKey, TextBox.TextProperty, SaveAppSettings);
+        Watch(TxtOpenSubtitlesUser, TextBox.TextProperty, SaveAppSettings);
         BuildShareTargetStrip();
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
         foreach (var control in new SelectingItemsControl[]
@@ -1322,6 +1326,8 @@ public partial class MainWindow : Window
             FollowRecording = ChkFollowRecording.IsChecked == true,
             FfmpegPathMode = FfmpegPathModeIndex,
             FfmpegPath = TxtFfmpegPath.Text ?? "",
+            OpenSubtitlesApiKey = (TxtOpenSubtitlesKey.Text ?? "").Trim(),
+            OpenSubtitlesUser = (TxtOpenSubtitlesUser.Text ?? "").Trim(),
             Theme = _theme
         };
     }
@@ -1358,6 +1364,9 @@ public partial class MainWindow : Window
 
             FfmpegPathModeIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
             TxtFfmpegPath.Text = settings.FfmpegPath;
+            TxtOpenSubtitlesKey.Text = settings.OpenSubtitlesApiKey;
+            TxtOpenSubtitlesUser.Text = settings.OpenSubtitlesUser;
+            ShowSubtitleSession();
             FfmpegPathPickerRow.IsVisible = settings.FfmpegPathMode == 1;
             ValidateFfmpegPath();
 
@@ -1425,6 +1434,67 @@ public partial class MainWindow : Window
         {
             ReportSourceError($"{Say("main.error.pick")}: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Anahtar bizde değil kullanıcıda: sağlayıcının anahtar sayfasını açar, kullanıcı
+    /// kendi anahtarını alıp yandaki kutuya yapıştırır.
+    /// </summary>
+    private void OnOpenSubtitlesKeyPage(object? sender, RoutedEventArgs e)
+        => OpenExternal(OpenSubtitlesProvider.KeyPageUrl);
+
+    /// <summary>
+    /// Kullanici adi ve parolayla OpenSubtitles oturumu acar.
+    /// </summary>
+    /// <remarks>
+    /// Parola kutudan alinir, istegin govdesinde gider ve cagri biter bitmez kutu bosaltilir;
+    /// ayara, gunluge ya da durum satirina girmez. Saklanan tek sey donen belirtectir.
+    /// </remarks>
+    private async void OnOpenSubtitlesSignIn(object? sender, RoutedEventArgs e)
+    {
+        var key = (TxtOpenSubtitlesKey.Text ?? "").Trim();
+        var user = (TxtOpenSubtitlesUser.Text ?? "").Trim();
+        var password = TxtOpenSubtitlesPassword.Text ?? "";
+
+        if (key.Length == 0 || user.Length == 0 || password.Length == 0)
+        {
+            LblOpenSubtitlesStatus.Text = Strings.Get("settings-tab.opensubtitles.signinfailed");
+            return;
+        }
+
+        LblOpenSubtitlesStatus.Text = Strings.Get("settings-tab.opensubtitles.signingin");
+        BtnOpenSubtitlesSignIn.IsEnabled = false;
+        try
+        {
+            using var transport = new CoreShare.HttpClientTransport();
+            var provider = new OpenSubtitlesProvider(transport, key, sessions: new SessionStore());
+            var result = await provider.LoginAsync(user, password, CancellationToken.None);
+            LblOpenSubtitlesStatus.Text = result.Session is not null
+                ? Strings.Get("settings-tab.opensubtitles.signedin", user)
+                : Strings.Get("settings-tab.opensubtitles.signinfailed");
+        }
+        finally
+        {
+            TxtOpenSubtitlesPassword.Text = "";
+            BtnOpenSubtitlesSignIn.IsEnabled = true;
+        }
+    }
+
+    private void OnOpenSubtitlesSignOut(object? sender, RoutedEventArgs e)
+    {
+        new SessionStore().Clear();
+        TxtOpenSubtitlesPassword.Text = "";
+        ShowSubtitleSession();
+    }
+
+    /// <summary>Oturum durumunu yazar; belirtec varsa kimin adina, yoksa gerekli oldugunu.</summary>
+    private void ShowSubtitleSession()
+    {
+        var user = (TxtOpenSubtitlesUser.Text ?? "").Trim();
+        var live = new SessionStore().Read();
+        LblOpenSubtitlesStatus.Text = live is not null && live.Valid(DateTimeOffset.UtcNow) && user.Length > 0
+            ? Strings.Get("settings-tab.opensubtitles.signedin", user)
+            : Strings.Get("settings-tab.opensubtitles.signedout");
     }
 
     private async void OnBrowseFfmpegPath(object? sender, RoutedEventArgs e)

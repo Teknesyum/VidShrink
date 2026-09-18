@@ -41,5 +41,18 @@
   "settings.default-app.open": "Приложения по умолчанию",
   "settings.default-app.dismiss": "Больше не спрашивать",
   "settings.player-shortcuts.title": "Горячие клавиши плеера",
-  "settings.player-shortcuts.hint": "Вкладка плеера, его меню и этот список читают одну и ту же таблицу."
+  "settings.player-shortcuts.hint": "Вкладка плеера, его меню и этот список читают одну и ту же таблицу.",
+  "settings-tab.opensubtitles.label": "API-ключ OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Получить ключ",
+  "settings-tab.opensubtitles.hint": "Загрузка субтитров в проигрывателе использует ваш собственный ключ. Создайте бесплатный аккаунт на opensubtitles.com, затем вставьте ключ сюда. Без ключа функция остаётся отключённой.",
+  "settings-tab.opensubtitles.account": "Учётная запись OpenSubtitles (нужна для скачивания)",
+  "settings-tab.opensubtitles.user": "Имя пользователя",
+  "settings-tab.opensubtitles.password": "Пароль",
+  "settings-tab.opensubtitles.signin": "Войти",
+  "settings-tab.opensubtitles.signout": "Выйти",
+  "settings-tab.opensubtitles.signingin": "Выполняется вход…",
+  "settings-tab.opensubtitles.signedin": "Вы вошли как {0}",
+  "settings-tab.opensubtitles.signedout": "Вход не выполнен — для скачивания субтитров нужна учётная запись",
+  "settings-tab.opensubtitles.signinfailed": "Не удалось войти. Проверьте имя пользователя, пароль и API-ключ.",
+  "settings-tab.opensubtitles.accounthint": "Пароль отправляется в OpenSubtitles только для входа и никогда не сохраняется. Сохраняется только полученный токен сессии, защищённый Windows; на других системах сессия действует до закрытия VidShrink."
 }

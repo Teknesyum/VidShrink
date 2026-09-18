@@ -41,5 +41,18 @@
   "settings.default-app.open": "Vaikerakendused",
   "settings.default-app.dismiss": "Ära enam küsi",
   "settings.player-shortcuts.title": "Mängija kiirklahvid",
-  "settings.player-shortcuts.hint": "Mängija vahekaart, selle menüü ja see loend loevad kõik sama tabelit."
+  "settings.player-shortcuts.hint": "Mängija vahekaart, selle menüü ja see loend loevad kõik sama tabelit.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API-võti",
+  "settings-tab.opensubtitles.get": "Hangi võti",
+  "settings-tab.opensubtitles.hint": "Mängija subtiitrite allalaadimine kasutab teie enda võtit. Looge tasuta konto aadressil opensubtitles.com ja kleepige võti siia. Ilma võtmeta jääb see funktsioon välja lülitatuks.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles konto (vajalik allalaadimiseks)",
+  "settings-tab.opensubtitles.user": "Kasutajanimi",
+  "settings-tab.opensubtitles.password": "Parool",
+  "settings-tab.opensubtitles.signin": "Logi sisse",
+  "settings-tab.opensubtitles.signout": "Logi välja",
+  "settings-tab.opensubtitles.signingin": "Sisselogimine…",
+  "settings-tab.opensubtitles.signedin": "Sisse logitud kui {0}",
+  "settings-tab.opensubtitles.signedout": "Sisse logimata — subtiitrite allalaadimiseks on vajalik konto",
+  "settings-tab.opensubtitles.signinfailed": "Sisselogimine ebaõnnestus. Kontrollige kasutajanime, parooli ja API-võtit.",
+  "settings-tab.opensubtitles.accounthint": "Parool saadetakse OpenSubtitlesile ainult sisselogimiseks ja seda ei salvestata kunagi. Salvestatakse ainult tagasi tulnud seansitunnus, mida kaitseb Windows; teistes süsteemides kestab seanss, kuni sulgete VidShrinki."
 }

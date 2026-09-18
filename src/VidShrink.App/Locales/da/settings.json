@@ -41,5 +41,18 @@
   "settings.default-app.open": "Standardapps",
   "settings.default-app.dismiss": "Spørg ikke igen",
   "settings.player-shortcuts.title": "Afspillergenveje",
-  "settings.player-shortcuts.hint": "Afspillerfanen, dens menu og denne liste læser alle fra samme tabel."
+  "settings.player-shortcuts.hint": "Afspillerfanen, dens menu og denne liste læser alle fra samme tabel.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles-API-nøgle",
+  "settings-tab.opensubtitles.get": "Få en nøgle",
+  "settings-tab.opensubtitles.hint": "Download af undertekster i afspilleren bruger din egen nøgle. Opret en gratis konto på opensubtitles.com, og indsæt derefter nøglen her. Uden en nøgle forbliver funktionen slået fra.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles-konto (nødvendig for downloads)",
+  "settings-tab.opensubtitles.user": "Brugernavn",
+  "settings-tab.opensubtitles.password": "Adgangskode",
+  "settings-tab.opensubtitles.signin": "Log ind",
+  "settings-tab.opensubtitles.signout": "Log ud",
+  "settings-tab.opensubtitles.signingin": "Logger ind…",
+  "settings-tab.opensubtitles.signedin": "Logget ind som {0}",
+  "settings-tab.opensubtitles.signedout": "Ikke logget ind — download af undertekster kræver en konto",
+  "settings-tab.opensubtitles.signinfailed": "Login mislykkedes. Kontrollér brugernavn, adgangskode og API-nøgle.",
+  "settings-tab.opensubtitles.accounthint": "Adgangskoden sendes kun til OpenSubtitles for at logge ind og bliver aldrig gemt. Det eneste, der gemmes, er den sessionstoken, der kommer tilbage, beskyttet af Windows; på andre systemer varer sessionen, til du lukker VidShrink."
 }

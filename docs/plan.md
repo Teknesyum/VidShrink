@@ -930,3 +930,144 @@ S1'in geri gitme payı (10 sn) üretim `-g` tavanından türetildi; gerçek kayn
 aralığı ölçülmedi (fable "ölçülmeli" dedi). S2'nin süre-oranı sezgisinin VBR kaynakta
 kaç fazladan deneme turu yediği ölçülmedi.
 
+
+## P28 — OpenSubtitles'tan altyazı indirme (t0/p28-altyazi)
+
+Kaynak: `docs/danisma/2026-09-17-fable-kararlar.md` bölüm 6 (fable K6).
+
+1. `src/VidShrink.Core/Subtitles/MovieHash.cs`: OpenSubtitles moviehash — dosya boyutu +
+   ilk 64 KB + son 64 KB'ın 64-bit küçük-uçlu sözcük toplamı, sarmalı serbest. 128 KB'tan
+   küçük dosya desteklenmez.
+2. `src/VidShrink.Core/Subtitles/ISubtitleProvider.cs`: `SearchAsync` + `DownloadAsync`,
+   `SubtitleCandidate`, `SubtitleQuery`, `SubtitleOutcome` (Ok / NoKey / NoResult /
+   QuotaExceeded / NetworkError / BadKey).
+3. `src/VidShrink.Core/Subtitles/OpenSubtitlesProvider.cs`: `IHttpTransport` üstünden
+   `GET /subtitles` (moviehash → ad yedeği) ve `POST /download`; dosya videonun yanına
+   `<ad>.<dil>.srt` yazılır.
+4. `src/VidShrink.App/AppSettings.cs`: `openSubtitlesApiKey` anahtarı.
+5. `src/VidShrink.App/MainWindow.axaml(.cs)`: Ayarlar sekmesinde tek metin alanı + anahtarı
+   nereden alacağını söyleyen ipucu ve bağlantı.
+6. `src/VidShrink.App/Playback/PlayerView.Subtitles.cs` + `PlayerView.Tracks.cs`: Altyazılar
+   menüsüne "Altyazı indir…" satırı; sonuç seçimi, indirilen dosyanın `LoadSubtitle` ile
+   motora verilmesi, her hata kolunun `_trackNotice` üstünden bildirilmesi.
+7. `src/VidShrink.App/Locales/*/tracks.json` (42 dil): menü, ilerleme ve altı hata metni.
+8. `tests/VidShrink.Tests/AltyaziIndirmeTests.cs`: moviehash çözümlemeli vektörler, sahte
+   `IHttpTransport` ile arama/indirme/seçim, beş hata kolu, dil dosyası enjeksiyon pimi,
+   ayar gidiş-dönüşü `VIDSHRINK_SETTINGS_PATH` altında.
+
+**K6'dan sapma.** K6 yeni dosyaları `src/VidShrink.Player/Subtitles/` altına koyuyordu;
+`VidShrink.Player` `VidShrink.Core`'a referans vermiyor ve sahte HTTP düzeneği
+(`Core/Share/HttpTransport.cs`, `IHttpTransport`) Core'da. Sağlayıcıyı Player'a koymak ya
+Player→Core referansı (oynatıcı motorunun katmanını kirletir) ya da ikinci bir HTTP
+soyutlaması isterdi. Ağ sağlayıcıları (`UpdateCheck`, `Share`) zaten Core'da; sağlayıcı da
+oraya gitti. Oynatıcı yalnız hazır `.srt` yolunu alır, ağı görmez.
+
+**İndirme kolu: `NeedAccount` ve P29 devri.** OpenSubtitles'ın resmî OpenAPI 3.0.3
+şartnamesi `GET /subtitles` için `security: [{"Api-Key": []}]`, `POST /download` için
+`security: [{"Bearer": []}, {"Api-Key": []}]` diyor ve `/download` açıklaması birebir şunu
+yazıyor: *"VERY IMPORTANT: In HTTP request must be both headers: ```Api-Key``` and
+```Authorization``` stoplight.io doesn't allow to use in shown example both headers"*.
+`Bearer` şemasının tanımı "User token created in the login endpoint to authorise
+opensubtitles.com **user**" — yani `/login`den gelen JWT. Bu sürümde `/login` yok, dolayısıyla
+indirme kolu yalnız anahtarla çalışmayabilir ve bu **canlıda doğrulanmadı** (anahtar yok,
+testler ağa çıkmıyor).
+
+Bunun karşılığı `SubtitleOutcome.NeedAccount`: indirmenin kota gövdesi taşımayan 401/403'ü
+artık `BadKey`ten ayrı bir kola düşüyor ve kullanıcıya "anahtarın yanlış" yerine "hesap
+girişi gerekiyor" deniyor — yanlış metin kullanıcıyı doğru anahtarı yeniden girmeye iterdi.
+Aramanın 401'i `BadKey` kalıyor; arama anahtarla yetiniyor.
+
+Oturum açma kolu **P29**'a devredildi: parola hiç saklanmaz, yalnız JWT + `base_url` + son
+kullanma, `settings.json`dan **ayrı** bir dosyada, Windows'ta DPAPI ile sarılı, Unix'te
+`0600`. 401 gelince belirteç silinir ve "oturum süresi doldu, yeniden giriş yapın" denir —
+kendiliğinden yeniden giriş yok. Unix kolu `ubuntu-latest`te ölçülebilir, macOS koşulamıyor;
+o kol sürüm notunda "ölçülmedi" diye yazılır. P29'un kodtan önceki ilk adımı: yalnız Api-Key
+ile tek canlı `/download` çağrısı, anonim kota sorusunu kapatmak için.
+
+**Yol B: indirme satırı bu sürümde arayüzde yok.** Yukarıdaki 6. madde menüye "Altyazı
+indir…" satırını koyuyordu; fable'ın bu iş sırasında verdiği ikinci hüküm bu satırı geri
+aldı. Gerekçe şartnamenin kendisi: `/download` `Authorization` başlığını zorunlu tutuyor,
+oturum kolu P29'da geldiği için satır çizilseydi **hiç kimsede çalışmayan bir düğme**
+olurdu. Motor kodu (`Core/Subtitles`, `PlayerView.Subtitles.cs`) ve on beş metin 42 dilde
+yerinde duruyor; P29 yalnız satırı geri koyup oturumu bağlayacak. Sürüm P29 birleşmeden
+kesilmez.
+
+Pim karşılığı: `AltyaziIndirmeTests.IndirmeSatiriBuSurumdeMenudeYok` (anahtar girilmişken de
+girilmemişken de menüde yok, dokunulmamış iki satırla olumlu kontrollü) ve
+`MenuMetinleriPYirmiDokuzaBekliyor` (iki yetim anahtar adıyla görünür kalır, kaynakta
+okunmadığı ve 42 dilde çevrili olduğu ayrı ayrı ölçülür).
+
+**Kimlik saklama kararı değişti.** fable'ın önceki "parola hiçbir yerde saklanmaz"
+konumu bu iş sırasında geri alındı: kimlik bilgisi işletim sisteminin kendi kasasında
+durur (Windows DPAPI CurrentUser, Unix ayrı `0600` dosya), `settings.json`a asla girmez.
+401'de belirteç silinir, giriş **bir kez** yeniden denenir, o da düşerse "oturum açılamadı,
+ayarlardan kontrol et" denir. `/login` istek sınırı saniyede 1. `/login` cevabındaki
+`base_url` izlenir ve `Authorization` yalnız `vip-api.opensubtitles.com` için eklenir.
+
+**P29 insan doğrulaması olmadan mühürlenemez.** İndirme kolu T0'ın ölçebileceği bir şey
+değil: sahte `/login` cevabı kodu pimler ama canlı doğrulamanın yerine geçmez. P29'un
+kapanış şartı, kullanıcının kendi hesabıyla girip gerçek bir altyazı indirmesi.
+
+**P28'in kaydırdığı üç pim.** Dal dışı üç ölçü P28 yüzünden kırmızıya döndü, CI koşumu
+35291801874 bunu gösterdi; üçü de gerekçesiyle güncellendi:
+
+- `BaslikKapsamiTests.AdVeBirimYazimiCumleOrtasindaDaKorunur` 38700 → 39345. Taban
+  `d0aea4d2` dil başına 900 anahtar, dal 915, düşen yok: 43 × 15 = 645.
+- `BaslikKapsamiTests.KolDegistirenAnahtarlarSayilir` 1481 → 1548 (en 170 → 181,
+  tr 61 → 63). On beş anahtarın `Title` altında kol değiştiren kısmı dökümden dil başına
+  sayıldı, toplamı 67.
+- `OluUyeTests.OluOzellikYuzeyiPimlenenKume`: `SubtitleQuery.MediaPath` hiçbir yerde
+  okunmuyordu — borç olarak pimlenmek yerine **kaldırıldı**; indirilecek yolu
+  `DownloadAsync` zaten ayrı parametre olarak alıyor. Aynı ölçü `StreamPlan.Subtitles`ı
+  sessizce düşürüyordu: tarayıcının deseni `\.\s*Ad\b`, ve yeni `VidShrink.Core.Subtitles`
+  ad alanı bunu "üretimde tüketiliyor" gösteriyordu. Tarayıcı düzeltildi (`Strip` artık
+  `using`/`namespace` yönergelerini boşluğa çeviriyor) ve `MainWindow.axaml.cs`teki tam
+  nitelenmiş `VidShrink.Core.Subtitles.OpenSubtitlesProvider` kısaltıldı; satır pimde kaldı.
+
+### Yol A — `/login` P28'e giriyor, indirme satırı geri geliyor
+
+Yukarıdaki **Yol B** bölümü geçersizdir; ne yapıldığının kaydı olarak duruyor. Hüküm
+T0'ın iş ortası yönlendirmesiyle döndü: oturum kolu P29'a bırakılmıyor, P28'e giriyor.
+
+**İki gerekçe, biri teknik biri hükmî.** Teknik olan bağımsız ve ölçülebilir: Yol B iki
+metni (`player.subtitle.download`, `player.subtitle.download.getkey`) 43 katalogda bırakıp
+üretimdeki tek okuyucularını sildi. `LocalizationTests.KatalogdaBirikenOluCeviriListesiBuyumuyor`
+sıfır dişli bir cırcırdır — `KnownDead` boş dizidir ve borç kabul etmez — dolayısıyla Yol B
+CI'da (koşum 35294997400) kırmızıydı. Hükmî olan: T0, kullanıcının uygulamada kullanıcı
+adı/parola gireceğini bildirdi. **Bu ikinci gerekçe bu dalda doğrulanmadı;** elimdeki tek
+kullanıcı iletisi yalnız API anahtarından söz ediyor. Rapor bunu açıkça taşır.
+
+1. `Core/Subtitles/SubtitleSession.cs`: `SubtitleSession(Token, Host, Expires)`,
+   `SubtitleLoginResult`, `ISubtitleSessionStore`, `JwtClaims.Expiry` (base64url gövdeden
+   `exp`), `Secrets.Mask` (parolayı ve JWT'yi metinden siler).
+2. `OpenSubtitlesProvider.LoginAsync(kullanıcı, parola)`: `POST /login`, gövde yalnız bu iki
+   alan. 200 → `token` + `base_url`; ömür JWT `exp`inden, `exp` yoksa 12 sa (bazarr'ın
+   değeri). 401/403 → `BadLogin`, 429 → `RateLimited`, kalanı `NetworkError`.
+3. **`Authorization` ne zaman gider:** `/download`'a her zaman (şartname iki başlığı da
+   zorunlu tutuyor), diğer uçlara yalnız `base_url` `vip-api.opensubtitles.com` iken.
+   Bunu doğru yapan tek istemci bazarr; kanıt `.calisma/p28-arastirma/istemci-kutuphaneleri.md` §1.
+   Taban adres artık oturumun `Host`undan türüyor.
+4. **Parola saklanmaz, JWT saklanır.** Parola yalnız `LoginAsync`in gövdesinde geçer;
+   ayara, günlüğe, hata iletisine girmez — `Secrets.Mask` ve `ParolaHataIletisineSizmaz`
+   pimi bunu ölçer. JWT `App/Subtitles/DpapiSessionStore.cs` ile
+   `settings.json`ın **yanındaki** `opensubtitles-session.dat`a yazılır; yol
+   `VIDSHRINK_SETTINGS_PATH`ten türer, `%APPDATA%` sabitlenmez. Windows'ta gövde DPAPI
+   (`CryptProtectData`, `CurrentUser`) ile sarılır; **Windows dışında belirteç diske hiç
+   yazılmaz**, oturum süreç ömrü kadar yaşar. Gerekçe: taşınabilir bir "şifreleme" görüntüsü
+   vermek, korumasız yazmaktan daha kötüdür. DPAPI `crypt32.dll` P/Invoke ile çağrılır;
+   yeni NuGet bağımlılığı yok.
+5. **Kendiliğinden yeniden giriş yok, çünkü parola yok.** T0'ın "401 → belirteci sıfırla,
+   bir kez yeniden giriş" maddesinden sapma: parolayı saklamayınca yeniden giriş için elde
+   bir şey kalmıyor. Bunun yerine belirteç kullanılmadan **önce** `exp`e bakılır; 401 gelirse
+   belirteç silinir ve `NeedAccount` döner. İkisinden birini seçmek gerekiyordu; saklanmayan
+   parola daha sağlam olanı.
+6. **Hata kolları:** 401/403 indirmede → belirteci sil, `NeedAccount`; gövdede kota alanı
+   varsa `QuotaExceeded`. 406 → `QuotaExceeded`, kalan hak gövdeden. 410 → `LinkExpired`
+   (yeni kol; imzalı bağlantı üç saatlik). 429 → `RateLimited` + `Retry-After` saniyesi
+   `SubtitleDownloadResult.RetryAfterSeconds` ile arayüze taşınır.
+7. **İndirme satırı menüde geri.** `AltyaziIndirmeTests.IndirmeSatiriBuSurumdeMenudeYok`
+   pimi tersine çevrilir (`IndirmeSatiriMenudeGorunur`); gerekçe commit iletisine yazılır.
+   İki yetim metin yeniden okunur, `KnownDead` boş kalır.
+8. **Ayarlar**: API anahtarı alanının altına kullanıcı adı + parola kutusu, "Giriş yap" /
+   "Çıkış" düğmesi ve durum satırı. Kullanıcı adı `settings.json`a yazılır (gizli değil),
+   parola hiçbir yere. Dokuz yeni metin 43 katalogda.

@@ -41,5 +41,18 @@
   "settings.default-app.open": "Programu chaguomsingi",
   "settings.default-app.dismiss": "Usiulize tena",
   "settings.player-shortcuts.title": "Njia za mkato za kichezaji",
-  "settings.player-shortcuts.hint": "Kichupo cha kichezaji, menyu yake, na orodha hii vyote vinasoma jedwali moja."
+  "settings.player-shortcuts.hint": "Kichupo cha kichezaji, menyu yake, na orodha hii vyote vinasoma jedwali moja.",
+  "settings-tab.opensubtitles.label": "Ufunguo wa API wa OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Pata ufunguo",
+  "settings-tab.opensubtitles.hint": "Kupakua manukuu kwenye kicheza kunatumia ufunguo wako binafsi. Fungua akaunti ya bure kwenye opensubtitles.com, kisha bandika ufunguo hapa. Bila ufunguo, kipengele hiki kinabaki kimezimwa.",
+  "settings-tab.opensubtitles.account": "Akaunti ya OpenSubtitles (inahitajika kwa kupakua)",
+  "settings-tab.opensubtitles.user": "Jina la mtumiaji",
+  "settings-tab.opensubtitles.password": "Nenosiri",
+  "settings-tab.opensubtitles.signin": "Ingia",
+  "settings-tab.opensubtitles.signout": "Toka",
+  "settings-tab.opensubtitles.signingin": "Inaingia…",
+  "settings-tab.opensubtitles.signedin": "Umeingia kama {0}",
+  "settings-tab.opensubtitles.signedout": "Haujaingia — kupakua manukuu kunahitaji akaunti",
+  "settings-tab.opensubtitles.signinfailed": "Kuingia hakufaulu. Angalia jina la mtumiaji, nenosiri, na ufunguo wa API.",
+  "settings-tab.opensubtitles.accounthint": "Nenosiri hutumwa kwa OpenSubtitles tu kwa kuingia na halihifadhiwi kamwe. Kinachohifadhiwa ni tokeni ya kipindi inayorudi, iliyolindwa na Windows; kwenye mifumo mingine, kipindi hudumu hadi ufunge VidShrink."
 }

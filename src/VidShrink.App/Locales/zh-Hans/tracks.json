@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "韩语",
   "player.subtitle.external": " (外部)",
   "player.subtitle.novideo": "添加字幕前请先打开视频",
-  "player.subtitle.loadfailed": "无法加载字幕文件"
+  "player.subtitle.loadfailed": "无法加载字幕文件",
+  "player.subtitle.download": "下载字幕…",
+  "player.subtitle.download.getkey": "下载字幕 — 获取 API 密钥…",
+  "player.subtitle.download.working": "正在搜索字幕…",
+  "player.subtitle.download.done": "字幕已下载：{0}",
+  "player.subtitle.download.nokey": "请在设置中输入您的 OpenSubtitles API 密钥",
+  "player.subtitle.download.badkey": "OpenSubtitles 未接受该 API 密钥",
+  "player.subtitle.download.needaccount": "OpenSubtitles 下载需要登录账户",
+  "player.subtitle.download.noresult": "未找到此视频的字幕",
+  "player.subtitle.download.quota": "每日字幕下载配额已用完",
+  "player.subtitle.download.offline": "无法连接到 OpenSubtitles",
+  "player.subtitle.download.writefail": "无法将字幕保存在视频旁边",
+  "player.subtitle.download.toofast": "向 OpenSubtitles 发送的请求过多 — 请稍后再试",
+  "player.subtitle.download.badlogin": "OpenSubtitles 未接受此次登录",
+  "player.subtitle.download.expired": "下载链接已过期 — 请重试",
+  "player.subtitle.download.toofast.wait": "向 OpenSubtitles 发送的请求过多 — 请在 {0} 秒后重试"
 }

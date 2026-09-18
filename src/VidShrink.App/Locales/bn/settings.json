@@ -41,5 +41,18 @@
   "settings.default-app.open": "ডিফল্ট অ্যাপ",
   "settings.default-app.dismiss": "আর জিজ্ঞাসা করবেন না",
   "settings.player-shortcuts.title": "প্লেয়ার শর্টকাট",
-  "settings.player-shortcuts.hint": "প্লেয়ার ট্যাব, তার মেনু এবং এই তালিকা সবই একই টেবিল থেকে পড়ে।"
+  "settings.player-shortcuts.hint": "প্লেয়ার ট্যাব, তার মেনু এবং এই তালিকা সবই একই টেবিল থেকে পড়ে।",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API কী",
+  "settings-tab.opensubtitles.get": "একটি কী নিন",
+  "settings-tab.opensubtitles.hint": "প্লেয়ারে সাবটাইটেল ডাউনলোড আপনার নিজের কী ব্যবহার করে। opensubtitles.com-এ একটি ফ্রি অ্যাকাউন্ট তৈরি করুন, তারপর কী এখানে পেস্ট করুন। কী ছাড়া এই বৈশিষ্ট্যটি বন্ধ থাকে।",
+  "settings-tab.opensubtitles.account": "OpenSubtitles অ্যাকাউন্ট (ডাউনলোডের জন্য প্রয়োজন)",
+  "settings-tab.opensubtitles.user": "ব্যবহারকারীর নাম",
+  "settings-tab.opensubtitles.password": "পাসওয়ার্ড",
+  "settings-tab.opensubtitles.signin": "সাইন ইন করুন",
+  "settings-tab.opensubtitles.signout": "সাইন আউট করুন",
+  "settings-tab.opensubtitles.signingin": "সাইন ইন হচ্ছে…",
+  "settings-tab.opensubtitles.signedin": "{0} হিসেবে সাইন ইন করা হয়েছে",
+  "settings-tab.opensubtitles.signedout": "সাইন ইন করা নেই — সাবটাইটেল ডাউনলোডের জন্য অ্যাকাউন্ট প্রয়োজন",
+  "settings-tab.opensubtitles.signinfailed": "সাইন ইন ব্যর্থ হয়েছে। ব্যবহারকারীর নাম, পাসওয়ার্ড এবং API কী পরীক্ষা করুন।",
+  "settings-tab.opensubtitles.accounthint": "পাসওয়ার্ড শুধু সাইন ইনের জন্য OpenSubtitles-এ পাঠানো হয় এবং কখনো সংরক্ষণ করা হয় না। ফিরে আসা সেশন টোকেনটিই একমাত্র যা সংরক্ষণ করা হয়, যা Windows দ্বারা সুরক্ষিত থাকে; অন্য সিস্টেমে VidShrink বন্ধ না করা পর্যন্ত সেশন চলতে থাকে।"
 }

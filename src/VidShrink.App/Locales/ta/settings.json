@@ -41,5 +41,18 @@
   "settings.default-app.open": "இயல்பு பயன்பாடுகள்",
   "settings.default-app.dismiss": "மீண்டும் கேட்காதே",
   "settings.player-shortcuts.title": "இயக்கி குறுக்குவழிகள்",
-  "settings.player-shortcuts.hint": "இயக்கி தாவல், அதன் மெனு மற்றும் இந்தப் பட்டியல் அனைத்தும் ஒரே அட்டவணையைப் படிக்கின்றன."
+  "settings.player-shortcuts.hint": "இயக்கி தாவல், அதன் மெனு மற்றும் இந்தப் பட்டியல் அனைத்தும் ஒரே அட்டவணையைப் படிக்கின்றன.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles API விசை",
+  "settings-tab.opensubtitles.get": "விசையைப் பெறு",
+  "settings-tab.opensubtitles.hint": "பிளேயரில் வசன வரி பதிவிறக்கம் உங்கள் சொந்த விசையைப் பயன்படுத்துகிறது. opensubtitles.com-இல் இலவச கணக்கை உருவாக்கி, பின்னர் விசையை இங்கே ஒட்டவும். விசை இல்லாமல் இந்த அம்சம் அணைந்தே இருக்கும்.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles கணக்கு (பதிவிறக்கங்களுக்குத் தேவை)",
+  "settings-tab.opensubtitles.user": "பயனர்பெயர்",
+  "settings-tab.opensubtitles.password": "கடவுச்சொல்",
+  "settings-tab.opensubtitles.signin": "உள்நுழை",
+  "settings-tab.opensubtitles.signout": "வெளியேறு",
+  "settings-tab.opensubtitles.signingin": "உள்நுழைகிறது…",
+  "settings-tab.opensubtitles.signedin": "{0} ஆக உள்நுழைந்துள்ளீர்கள்",
+  "settings-tab.opensubtitles.signedout": "உள்நுழையவில்லை — வசன வரிகளை பதிவிறக்க கணக்கு தேவை",
+  "settings-tab.opensubtitles.signinfailed": "உள்நுழைவு தோல்வியடைந்தது. பயனர்பெயர், கடவுச்சொல் மற்றும் API விசையை சரிபார்க்கவும்.",
+  "settings-tab.opensubtitles.accounthint": "கடவுச்சொல் உள்நுழைவதற்காக மட்டுமே OpenSubtitles-க்கு அனுப்பப்படுகிறது, ஒருபோதும் சேமிக்கப்படுவதில்லை. திரும்பி வரும் அமர்வு டோக்கன் மட்டுமே சேமிக்கப்படுகிறது, அது Windows ஆல் பாதுகாக்கப்படுகிறது; மற்ற கணினிகளில் நீங்கள் VidShrink-ஐ மூடும் வரை அமர்வு தொடரும்."
 }

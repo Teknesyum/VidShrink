@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Korece",
   "player.subtitle.external": " (dış)",
   "player.subtitle.novideo": "Altyazı eklemeden önce bir video açın",
-  "player.subtitle.loadfailed": "Altyazı dosyası yüklenemedi"
+  "player.subtitle.loadfailed": "Altyazı dosyası yüklenemedi",
+  "player.subtitle.download": "Altyazı indir…",
+  "player.subtitle.download.getkey": "Altyazı indir — API anahtarı al…",
+  "player.subtitle.download.working": "Altyazı aranıyor…",
+  "player.subtitle.download.done": "Altyazı indirildi: {0}",
+  "player.subtitle.download.nokey": "Ayarlar'da OpenSubtitles API anahtarınızı girin",
+  "player.subtitle.download.badkey": "OpenSubtitles API anahtarını kabul etmedi",
+  "player.subtitle.download.needaccount": "OpenSubtitles indirme için hesap girişi gerekiyor",
+  "player.subtitle.download.noresult": "Bu video için altyazı bulunamadı",
+  "player.subtitle.download.quota": "Günlük altyazı indirme kotası doldu",
+  "player.subtitle.download.offline": "OpenSubtitles'a erişilemedi",
+  "player.subtitle.download.writefail": "Altyazı videonun yanına kaydedilemedi",
+  "player.subtitle.download.toofast": "OpenSubtitles'a çok fazla istek gönderildi — birazdan tekrar deneyin",
+  "player.subtitle.download.badlogin": "OpenSubtitles girişi kabul etmedi",
+  "player.subtitle.download.expired": "İndirme bağlantısının süresi doldu — yeniden deneyin",
+  "player.subtitle.download.toofast.wait": "OpenSubtitles’a çok istek gitti — {0} sn sonra yeniden deneyin"
 }

@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Korejské",
   "player.subtitle.external": " (externí)",
   "player.subtitle.novideo": "Před přidáním titulků otevřete video",
-  "player.subtitle.loadfailed": "Soubor s titulky se nepodařilo načíst"
+  "player.subtitle.loadfailed": "Soubor s titulky se nepodařilo načíst",
+  "player.subtitle.download": "Stáhnout titulky…",
+  "player.subtitle.download.getkey": "Stáhnout titulky — získat klíč API…",
+  "player.subtitle.download.working": "Vyhledávání titulků…",
+  "player.subtitle.download.done": "Titulky staženy: {0}",
+  "player.subtitle.download.nokey": "Zadejte svůj API klíč OpenSubtitles v Nastavení",
+  "player.subtitle.download.badkey": "OpenSubtitles klíč API nepřijalo",
+  "player.subtitle.download.needaccount": "OpenSubtitles vyžaduje přihlášení k účtu pro stažení",
+  "player.subtitle.download.noresult": "Pro toto video nebyly nalezeny žádné titulky",
+  "player.subtitle.download.quota": "Denní limit stahování titulků je vyčerpán",
+  "player.subtitle.download.offline": "OpenSubtitles se nepodařilo kontaktovat",
+  "player.subtitle.download.writefail": "Titulky se nepodařilo uložit ke videu",
+  "player.subtitle.download.toofast": "Příliš mnoho požadavků na OpenSubtitles — zkuste to za chvíli znovu",
+  "player.subtitle.download.badlogin": "OpenSubtitles přihlášení nepřijalo",
+  "player.subtitle.download.expired": "Platnost odkazu ke stažení vypršela — zkuste to znovu",
+  "player.subtitle.download.toofast.wait": "Příliš mnoho požadavků na OpenSubtitles — zkuste to znovu za {0} s"
 }

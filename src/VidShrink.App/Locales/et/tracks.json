@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Korea",
   "player.subtitle.external": " (väline)",
   "player.subtitle.novideo": "Ava video enne subtiitrite lisamist",
-  "player.subtitle.loadfailed": "Subtiitrifaili ei saanud laadida"
+  "player.subtitle.loadfailed": "Subtiitrifaili ei saanud laadida",
+  "player.subtitle.download": "Laadi subtiitrid alla…",
+  "player.subtitle.download.getkey": "Laadi subtiitrid alla — hangi API-võti…",
+  "player.subtitle.download.working": "Subtiitrite otsimine…",
+  "player.subtitle.download.done": "Subtiitrid alla laaditud: {0}",
+  "player.subtitle.download.nokey": "Sisestage oma OpenSubtitles API-võti Seadetes",
+  "player.subtitle.download.badkey": "OpenSubtitles ei võtnud API-võtit vastu",
+  "player.subtitle.download.needaccount": "OpenSubtitles vajab allalaadimiseks kontosse sisselogimist",
+  "player.subtitle.download.noresult": "Sellele videole subtiitreid ei leitud",
+  "player.subtitle.download.quota": "Subtiitrite igapäevane allalaadimiskvoot on täis",
+  "player.subtitle.download.offline": "OpenSubtitlesiga ei saanud ühendust",
+  "player.subtitle.download.writefail": "Subtiitreid ei saanud video kõrvale salvestada",
+  "player.subtitle.download.toofast": "OpenSubtitlesile saadetud liiga palju päringuid — proovige veidi hiljem uuesti",
+  "player.subtitle.download.badlogin": "OpenSubtitles ei võtnud sisselogimist vastu",
+  "player.subtitle.download.expired": "Allalaadimislink aegus — proovige uuesti",
+  "player.subtitle.download.toofast.wait": "OpenSubtitlesile saadetud liiga palju päringuid — proovige uuesti {0} s pärast"
 }

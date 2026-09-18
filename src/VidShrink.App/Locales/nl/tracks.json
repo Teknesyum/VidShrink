@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Koreaans",
   "player.subtitle.external": " (extern)",
   "player.subtitle.novideo": "Open een video voor het toevoegen van ondertitels",
-  "player.subtitle.loadfailed": "Het ondertitelbestand kon niet worden geladen"
+  "player.subtitle.loadfailed": "Het ondertitelbestand kon niet worden geladen",
+  "player.subtitle.download": "Ondertitel downloaden…",
+  "player.subtitle.download.getkey": "Ondertitel downloaden — API-sleutel aanvragen…",
+  "player.subtitle.download.working": "Ondertitels zoeken…",
+  "player.subtitle.download.done": "Ondertitel gedownload: {0}",
+  "player.subtitle.download.nokey": "Voer uw OpenSubtitles-API-sleutel in bij Instellingen",
+  "player.subtitle.download.badkey": "OpenSubtitles heeft de API-sleutel niet geaccepteerd",
+  "player.subtitle.download.needaccount": "OpenSubtitles vereist een accountaanmelding om te downloaden",
+  "player.subtitle.download.noresult": "Geen ondertitel gevonden voor deze video",
+  "player.subtitle.download.quota": "Het dagelijkse downloadquotum voor ondertitels is bereikt",
+  "player.subtitle.download.offline": "OpenSubtitles was niet bereikbaar",
+  "player.subtitle.download.writefail": "De ondertitel kon niet naast de video worden opgeslagen",
+  "player.subtitle.download.toofast": "Te veel verzoeken naar OpenSubtitles — probeer het straks opnieuw",
+  "player.subtitle.download.badlogin": "OpenSubtitles heeft het aanmelden niet geaccepteerd",
+  "player.subtitle.download.expired": "De downloadlink is verlopen — probeer het opnieuw",
+  "player.subtitle.download.toofast.wait": "Te veel verzoeken naar OpenSubtitles — probeer het over {0} s opnieuw"
 }

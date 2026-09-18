@@ -41,5 +41,18 @@
   "settings.default-app.open": "Predvolené aplikácie",
   "settings.default-app.dismiss": "Už sa nepýtať",
   "settings.player-shortcuts.title": "Klávesové skratky prehrávača",
-  "settings.player-shortcuts.hint": "Karta prehrávača, jeho ponuka a tento zoznam čítajú z rovnakej tabuľky."
+  "settings.player-shortcuts.hint": "Karta prehrávača, jeho ponuka a tento zoznam čítajú z rovnakej tabuľky.",
+  "settings-tab.opensubtitles.label": "API kľúč OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Získať kľúč",
+  "settings-tab.opensubtitles.hint": "Sťahovanie titulkov v prehrávači používa váš vlastný kľúč. Vytvorte si bezplatný účet na opensubtitles.com a kľúč sem vložte. Bez kľúča zostane táto funkcia vypnutá.",
+  "settings-tab.opensubtitles.account": "Konto OpenSubtitles (potrebné na stiahnutie)",
+  "settings-tab.opensubtitles.user": "Používateľské meno",
+  "settings-tab.opensubtitles.password": "Heslo",
+  "settings-tab.opensubtitles.signin": "Prihlásiť sa",
+  "settings-tab.opensubtitles.signout": "Odhlásiť sa",
+  "settings-tab.opensubtitles.signingin": "Prihlasovanie…",
+  "settings-tab.opensubtitles.signedin": "Prihlásený ako {0}",
+  "settings-tab.opensubtitles.signedout": "Neprihlásené — na stiahnutie titulkov je potrebné konto",
+  "settings-tab.opensubtitles.signinfailed": "Prihlásenie sa nepodarilo. Skontrolujte používateľské meno, heslo a API kľúč.",
+  "settings-tab.opensubtitles.accounthint": "Heslo sa odosiela do OpenSubtitles iba na prihlásenie a nikdy sa neukladá. Ukladá sa iba vrátený token relácie, chránený Windows; na iných systémoch relácia trvá, kým VidShrink nezatvoríte."
 }

@@ -41,5 +41,18 @@
   "settings.default-app.open": "Ứng dụng mặc định",
   "settings.default-app.dismiss": "Không hỏi lại",
   "settings.player-shortcuts.title": "Phím tắt trình phát",
-  "settings.player-shortcuts.hint": "Tab trình phát, menu của nó và danh sách này đều đọc từ cùng một bảng."
+  "settings.player-shortcuts.hint": "Tab trình phát, menu của nó và danh sách này đều đọc từ cùng một bảng.",
+  "settings-tab.opensubtitles.label": "Khóa API OpenSubtitles",
+  "settings-tab.opensubtitles.get": "Lấy khóa",
+  "settings-tab.opensubtitles.hint": "Tải phụ đề trong trình phát dùng khóa riêng của bạn. Tạo một tài khoản miễn phí tại opensubtitles.com, rồi dán khóa vào đây. Không có khóa, tính năng này vẫn tắt.",
+  "settings-tab.opensubtitles.account": "Tài khoản OpenSubtitles (cần để tải xuống)",
+  "settings-tab.opensubtitles.user": "Tên đăng nhập",
+  "settings-tab.opensubtitles.password": "Mật khẩu",
+  "settings-tab.opensubtitles.signin": "Đăng nhập",
+  "settings-tab.opensubtitles.signout": "Đăng xuất",
+  "settings-tab.opensubtitles.signingin": "Đang đăng nhập…",
+  "settings-tab.opensubtitles.signedin": "Đã đăng nhập với tên {0}",
+  "settings-tab.opensubtitles.signedout": "Chưa đăng nhập — cần có tài khoản để tải phụ đề",
+  "settings-tab.opensubtitles.signinfailed": "Đăng nhập không thành công. Kiểm tra tên đăng nhập, mật khẩu và khóa API.",
+  "settings-tab.opensubtitles.accounthint": "Mật khẩu chỉ được gửi đến OpenSubtitles để đăng nhập và không bao giờ được lưu lại. Chỉ mã thông báo phiên nhận về được lưu lại, được Windows bảo vệ; trên các hệ thống khác, phiên đăng nhập kéo dài đến khi bạn đóng VidShrink."
 }

@@ -41,5 +41,18 @@
   "settings.default-app.open": "Standard-Apps",
   "settings.default-app.dismiss": "Nicht mehr fragen",
   "settings.player-shortcuts.title": "Player-Tastenkürzel",
-  "settings.player-shortcuts.hint": "Der Player-Tab, sein Menü und diese Liste lesen alle aus derselben Tabelle."
+  "settings.player-shortcuts.hint": "Der Player-Tab, sein Menü und diese Liste lesen alle aus derselben Tabelle.",
+  "settings-tab.opensubtitles.label": "OpenSubtitles-API-Schlüssel",
+  "settings-tab.opensubtitles.get": "Schlüssel holen",
+  "settings-tab.opensubtitles.hint": "Der Untertitel-Download im Player nutzt Ihren eigenen Schlüssel. Erstellen Sie ein kostenloses Verbraucherkonto auf opensubtitles.com und fügen Sie den Schlüssel hier ein. Ohne Schlüssel bleibt die Funktion deaktiviert.",
+  "settings-tab.opensubtitles.account": "OpenSubtitles-Konto (für Downloads erforderlich)",
+  "settings-tab.opensubtitles.user": "Benutzername",
+  "settings-tab.opensubtitles.password": "Passwort",
+  "settings-tab.opensubtitles.signin": "Anmelden",
+  "settings-tab.opensubtitles.signout": "Abmelden",
+  "settings-tab.opensubtitles.signingin": "Anmeldung läuft…",
+  "settings-tab.opensubtitles.signedin": "Angemeldet als {0}",
+  "settings-tab.opensubtitles.signedout": "Nicht angemeldet — für Untertitel-Downloads ist ein Konto erforderlich",
+  "settings-tab.opensubtitles.signinfailed": "Anmeldung fehlgeschlagen. Überprüfen Sie Benutzername, Passwort und API-Schlüssel.",
+  "settings-tab.opensubtitles.accounthint": "Das Passwort wird nur zur Anmeldung an OpenSubtitles gesendet und nie gespeichert. Gespeichert wird nur das zurückkommende Sitzungstoken, geschützt durch Windows; auf anderen Systemen bleibt die Sitzung bestehen, bis Sie VidShrink schließen."
 }

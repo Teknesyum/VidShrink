@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Koreanisch",
   "player.subtitle.external": " (extern)",
   "player.subtitle.novideo": "Vor dem Hinzufügen von Untertiteln ein Video öffnen",
-  "player.subtitle.loadfailed": "Die Untertiteldatei konnte nicht geladen werden"
+  "player.subtitle.loadfailed": "Die Untertiteldatei konnte nicht geladen werden",
+  "player.subtitle.download": "Untertitel herunterladen…",
+  "player.subtitle.download.getkey": "Untertitel herunterladen — API-Schlüssel holen…",
+  "player.subtitle.download.working": "Untertitel werden gesucht…",
+  "player.subtitle.download.done": "Untertitel heruntergeladen: {0}",
+  "player.subtitle.download.nokey": "Geben Sie Ihren OpenSubtitles-API-Schlüssel in den Einstellungen ein",
+  "player.subtitle.download.badkey": "OpenSubtitles hat den API-Schlüssel nicht akzeptiert",
+  "player.subtitle.download.needaccount": "OpenSubtitles erfordert eine Kontoanmeldung zum Herunterladen",
+  "player.subtitle.download.noresult": "Für dieses Video wurde kein Untertitel gefunden",
+  "player.subtitle.download.quota": "Das tägliche Download-Kontingent für Untertitel ist ausgeschöpft",
+  "player.subtitle.download.offline": "OpenSubtitles konnte nicht erreicht werden",
+  "player.subtitle.download.writefail": "Der Untertitel konnte nicht neben dem Video gespeichert werden",
+  "player.subtitle.download.toofast": "Zu viele Anfragen an OpenSubtitles — versuchen Sie es in einem Moment erneut",
+  "player.subtitle.download.badlogin": "OpenSubtitles hat die Anmeldung nicht akzeptiert",
+  "player.subtitle.download.expired": "Der Download-Link ist abgelaufen — versuchen Sie es erneut",
+  "player.subtitle.download.toofast.wait": "Zu viele Anfragen an OpenSubtitles — versuchen Sie es in {0} s erneut"
 }

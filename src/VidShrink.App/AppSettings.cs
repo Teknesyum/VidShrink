@@ -41,6 +41,19 @@ public sealed class AppSettings
     public int FfmpegPathMode { get; set; }
     public string FfmpegPath { get; set; } = "";
 
+    /// <summary>
+    /// Kullanıcının kendi OpenSubtitles API anahtarı. Depoda anahtar yoktur; boş kalırsa
+    /// altyazı indirme kapalıdır ve oynatıcı kullanıcıyı anahtar sayfasına yollar.
+    /// </summary>
+    public string OpenSubtitlesApiKey { get; set; } = "";
+
+    /// <summary>
+    /// OpenSubtitles kullanici adi. Gizli degildir ve burada durur; <b>parola hicbir zaman
+    /// saklanmaz</b>, yalniz giris anininda gonderilir. Girisin donusu olan belirtec ayri bir
+    /// dosyada, isletim sisteminin korumasiyla durur.
+    /// </summary>
+    public string OpenSubtitlesUser { get; set; } = "";
+
     public static AppSettings Load(string? path = null)
     {
         var file = path ?? UpdateSettings.DefaultPath;
@@ -69,6 +82,8 @@ public sealed class AppSettings
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
             ReadInt(root, "ffmpegPathMode", value => settings.FfmpegPathMode = value);
             ReadString(root, "ffmpegPath", value => settings.FfmpegPath = value);
+            ReadString(root, "openSubtitlesApiKey", value => settings.OpenSubtitlesApiKey = value);
+            ReadString(root, "openSubtitlesUser", value => settings.OpenSubtitlesUser = value);
         }
         catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
         {
@@ -131,6 +146,8 @@ public sealed class AppSettings
         root["followRecording"] = FollowRecording;
         root["ffmpegPathMode"] = FfmpegPathMode;
         root["ffmpegPath"] = FfmpegPath;
+        root["openSubtitlesApiKey"] = OpenSubtitlesApiKey;
+        root["openSubtitlesUser"] = OpenSubtitlesUser;
 
         using var stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None);
         using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });

@@ -36,5 +36,20 @@
   "player.subtitle.encoding.korean": "Koreai",
   "player.subtitle.external": " (külső)",
   "player.subtitle.novideo": "Nyisson meg egy videót a feliratok hozzáadása előtt",
-  "player.subtitle.loadfailed": "A feliratfájlt nem sikerült betölteni"
+  "player.subtitle.loadfailed": "A feliratfájlt nem sikerült betölteni",
+  "player.subtitle.download": "Felirat letöltése…",
+  "player.subtitle.download.getkey": "Felirat letöltése — API-kulcs beszerzése…",
+  "player.subtitle.download.working": "Feliratok keresése…",
+  "player.subtitle.download.done": "Felirat letöltve: {0}",
+  "player.subtitle.download.nokey": "Adja meg az OpenSubtitles API-kulcsát a Beállításokban",
+  "player.subtitle.download.badkey": "Az OpenSubtitles nem fogadta el az API-kulcsot",
+  "player.subtitle.download.needaccount": "Az OpenSubtitles fiókbejelentkezést igényel a letöltéshez",
+  "player.subtitle.download.noresult": "Ehhez a videóhoz nem található felirat",
+  "player.subtitle.download.quota": "A napi feliratletöltési kvóta betelt",
+  "player.subtitle.download.offline": "Az OpenSubtitles nem volt elérhető",
+  "player.subtitle.download.writefail": "A feliratot nem lehetett elmenteni a videó mellé",
+  "player.subtitle.download.toofast": "Túl sok kérés érkezett az OpenSubtitles felé — próbálja újra egy pillanat múlva",
+  "player.subtitle.download.badlogin": "Az OpenSubtitles nem fogadta el a bejelentkezést",
+  "player.subtitle.download.expired": "A letöltési link lejárt — próbálja újra",
+  "player.subtitle.download.toofast.wait": "Túl sok kérés érkezett az OpenSubtitles felé — próbálja újra {0} mp múlva"
 }
