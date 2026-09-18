@@ -823,6 +823,23 @@ internal static class FareKanit
         => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
 
     /// <summary>
+    /// Satırı eklediği anda diske yazan defter. Gövdeyi sonda yazmak kırmızı koşumda kanıtı
+    /// hiç üretmiyordu: düşen asert <c>Write</c>'a gelmiyor, klasör boş kalıyordu.
+    /// </summary>
+    internal sealed class Defter(string ad)
+    {
+        private readonly StringBuilder govde = new();
+
+        internal void Satir(string metin)
+        {
+            govde.AppendLine(metin);
+            Write(ad, govde.ToString());
+        }
+
+        internal string Metin => govde.ToString();
+    }
+
+    /// <summary>
     /// Son asertten sonra cagrilir: yesil kosum kendi biraktigini siler, kirmizi kosum
     /// kanitini korur cunku dusen asert buraya hic gelmez. Klasor bosalinca o da gider.
     /// </summary>
@@ -837,7 +854,7 @@ public sealed class OynaticiFareTests
         var rapor = AppHost.Run(() =>
         {
             var view = GirdiSurucu.Kur(out var window);
-            var body = new StringBuilder();
+            var body = new FareKanit.Defter("f1-tik-ayrimi.txt");
 
             var once = view.IsPlaying;
             view.FarePress(1, 10, 10);
@@ -849,7 +866,7 @@ public sealed class OynaticiFareTests
             view.FareDue(ClickArbiter.DoubleWindowMs);
             var esikUstunde = view.IsPlaying;
 
-            body.AppendLine($"tek tik   : oynatma {once} -> basili {basiliken} -> birakis {birakista} -> {ClickArbiter.DoubleWindowMs - 1} ms {esikAltinda} -> {ClickArbiter.DoubleWindowMs} ms {esikUstunde}");
+            body.Satir($"tek tik   : oynatma {once} -> basili {basiliken} -> birakis {birakista} -> {ClickArbiter.DoubleWindowMs - 1} ms {esikAltinda} -> {ClickArbiter.DoubleWindowMs} ms {esikUstunde}");
 
             var tamOnce = view.Fullscreen.IsFullscreen;
             var oynatmaOnce = view.IsPlaying;
@@ -860,8 +877,8 @@ public sealed class OynaticiFareTests
             view.FareDue(1000 + ClickArbiter.DoubleWindowMs);
             var uretilen = view.Trace.Skip(izOnce).ToList();
 
-            body.AppendLine($"cift tik  : tam ekran {tamOnce} -> {view.Fullscreen.IsFullscreen}, oynatma {oynatmaOnce} -> {view.IsPlaying}");
-            body.AppendLine($"cift tikin urettigi iz: {string.Join(" | ", uretilen)}");
+            body.Satir($"cift tik  : tam ekran {tamOnce} -> {view.Fullscreen.IsFullscreen}, oynatma {oynatmaOnce} -> {view.IsPlaying}");
+            body.Satir($"cift tikin urettigi iz: {string.Join(" | ", uretilen)}");
 
             Assert.False(basiliken);
             Assert.False(birakista);
@@ -871,10 +888,9 @@ public sealed class OynaticiFareTests
             Assert.Equal(oynatmaOnce, view.IsPlaying);
 
             window.Close();
-            return body.ToString();
+            return body.Metin;
         });
 
-        FareKanit.Write("f1-tik-ayrimi.txt", rapor);
         Assert.Contains("fullscreen -> True", rapor);
         FareKanit.Kapat("f1-tik-ayrimi.txt");
     }
@@ -885,21 +901,21 @@ public sealed class OynaticiFareTests
         var rapor = AppHost.Run(() =>
         {
             var view = GirdiSurucu.Kur(out var window);
-            var body = new StringBuilder();
+            var body = new FareKanit.Defter("f2-surukleme-esigi.txt");
 
             view.FarePress(1, 100, 100);
             var kisaKip = view.FareMove(100 + ClickArbiter.DragThresholdDip - 1, 100);
             var kisaBirakis = view.FareRelease(0);
             var kisaTik = view.FareDue(ClickArbiter.DoubleWindowMs);
             var kisaSonrasi = view.IsPlaying;
-            body.AppendLine($"esik alti ({ClickArbiter.DragThresholdDip - 1} dip): kip [{kisaKip}] birakis {kisaBirakis} bekleyen tik {kisaTik} oynatma {kisaSonrasi}");
+            body.Satir($"esik alti ({ClickArbiter.DragThresholdDip - 1} dip): kip [{kisaKip}] birakis {kisaBirakis} bekleyen tik {kisaTik} oynatma {kisaSonrasi}");
 
             var oynatmaOnce = view.IsPlaying;
             view.FarePress(1, 100, 100);
             var uzunKip = view.FareMove(100 + ClickArbiter.DragThresholdDip, 100);
             var uzunBirakis = view.FareRelease(2000);
             var uzunTik = view.FareDue(2000 + ClickArbiter.DoubleWindowMs);
-            body.AppendLine($"esik ustu ({ClickArbiter.DragThresholdDip} dip): kip [{uzunKip}] birakis {uzunBirakis} bekleyen tik {uzunTik} oynatma {oynatmaOnce} -> {view.IsPlaying}");
+            body.Satir($"esik ustu ({ClickArbiter.DragThresholdDip} dip): kip [{uzunKip}] birakis {uzunBirakis} bekleyen tik {uzunTik} oynatma {oynatmaOnce} -> {view.IsPlaying}");
 
             Assert.Equal("", kisaKip);
             Assert.Equal(ReleaseOutcome.Click, kisaBirakis);
@@ -912,10 +928,9 @@ public sealed class OynaticiFareTests
             Assert.Equal(oynatmaOnce, view.IsPlaying);
 
             window.Close();
-            return body.ToString();
+            return body.Metin;
         });
 
-        FareKanit.Write("f2-surukleme-esigi.txt", rapor);
         Assert.Contains("esik ustu", rapor);
         FareKanit.Kapat("f2-surukleme-esigi.txt");
     }
@@ -926,28 +941,27 @@ public sealed class OynaticiFareTests
         var rapor = AppHost.Run(() =>
         {
             var view = GirdiSurucu.Kur(out var window);
-            var body = new StringBuilder();
+            var body = new FareKanit.Defter("f3-tasima-kipi.txt");
 
             view.FarePress(1, 50, 50);
             var normal = view.FareMove(80, 50);
             view.FareRelease(0);
-            body.AppendLine($"normal pencere : tam ekran {view.Fullscreen.IsFullscreen} -> surukleme kipi [{normal}]");
+            body.Satir($"normal pencere : tam ekran {view.Fullscreen.IsFullscreen} -> surukleme kipi [{normal}]");
 
             view.Apply(new PlayerCommand(PlayerCommandKind.ToggleFullscreen, 0));
             view.FarePress(1, 50, 50);
             var tam = view.FareMove(80, 50);
             view.FareRelease(0);
-            body.AppendLine($"tam ekran      : tam ekran {view.Fullscreen.IsFullscreen} -> surukleme kipi [{tam}]");
-            body.AppendLine($"miknatis esigi : {view.Pan.SnapDip} dip (PlaybackBadgeMargin)");
+            body.Satir($"tam ekran      : tam ekran {view.Fullscreen.IsFullscreen} -> surukleme kipi [{tam}]");
+            body.Satir($"miknatis esigi : {view.Pan.SnapDip} dip (PlaybackBadgeMargin)");
 
             Assert.Equal("window", normal);
             Assert.Equal("pan", tam);
 
             window.Close();
-            return body.ToString();
+            return body.Metin;
         });
 
-        FareKanit.Write("f3-tasima-kipi.txt", rapor);
         Assert.Contains("[pan]", rapor);
         FareKanit.Kapat("f3-tasima-kipi.txt");
     }
@@ -958,28 +972,27 @@ public sealed class OynaticiFareTests
         var pan = new SurfacePan(12);
         pan.SetBounds(1000, 800, 600, 400);
 
-        var body = new StringBuilder();
-        body.AppendLine($"sinir: {pan.LimitX} x {pan.LimitY} dip, miknatis {pan.SnapDip} dip");
+        var body = new FareKanit.Defter("f4-miknatis.txt");
+        body.Satir($"sinir: {pan.LimitX} x {pan.LimitY} dip, miknatis {pan.SnapDip} dip");
 
         pan.Drag(pan.SnapDip - 2, 0);
-        body.AppendLine($"esik icinde surukleme ({pan.SnapDip - 2} dip): X {pan.X} Y {pan.Y} ortada {pan.Centered}");
+        body.Satir($"esik icinde surukleme ({pan.SnapDip - 2} dip): X {pan.X} Y {pan.Y} ortada {pan.Centered}");
         Assert.True(pan.Centered);
 
         pan.Drag(pan.SnapDip * 2, 0);
-        body.AppendLine($"esik disinda surukleme ({pan.SnapDip * 2} dip): X {pan.X} Y {pan.Y} ortada {pan.Centered}");
+        body.Satir($"esik disinda surukleme ({pan.SnapDip * 2} dip): X {pan.X} Y {pan.Y} ortada {pan.Centered}");
         Assert.False(pan.Centered);
         Assert.Equal(pan.SnapDip * 2, pan.X);
 
         pan.Drag(-pan.SnapDip, 0);
-        body.AppendLine($"merkeze donus: X {pan.X} Y {pan.Y} ortada {pan.Centered}");
+        body.Satir($"merkeze donus: X {pan.X} Y {pan.Y} ortada {pan.Centered}");
         Assert.True(pan.Centered);
 
         pan.Drag(10000, 10000);
-        body.AppendLine($"sinir disina surukleme: X {pan.X} Y {pan.Y} (sinir {pan.LimitX},{pan.LimitY})");
+        body.Satir($"sinir disina surukleme: X {pan.X} Y {pan.Y} (sinir {pan.LimitX},{pan.LimitY})");
         Assert.Equal(pan.LimitX, pan.X);
         Assert.Equal(pan.LimitY, pan.Y);
 
-        FareKanit.Write("f4-miknatis.txt", body.ToString());
         FareKanit.Kapat("f4-miknatis.txt");
     }
 
@@ -994,32 +1007,31 @@ public sealed class OynaticiFareTests
         var rapor = AppHost.Run(() =>
         {
             var view = GirdiSurucu.Kur(out var window);
-            var body = new StringBuilder();
+            var body = new FareKanit.Defter("f5-menu-konumu.txt");
 
             GirdiSurucu.Press(view, PointerUpdateKind.RightButtonPressed, RawInputModifiers.RightMouseButton);
             var sagTik = view.MenuAnchor;
-            body.AppendLine($"sag tik      : yaslanma [{sagTik}], iz {view.Trace[^1]}");
+            body.Satir($"sag tik      : yaslanma [{sagTik}], iz {view.Trace[^1]}");
 
             view.MenuAtPointer = false;
             view.Apply(Keymap.OpenMenu.ToCommand());
             var dugme = view.MenuAnchor;
-            body.AppendLine($"klavye       : yaslanma [{dugme}], iz {view.Trace[^1]}");
+            body.Satir($"klavye       : yaslanma [{dugme}], iz {view.Trace[^1]}");
 
             var basliklar = view.BuildMenu().Items.OfType<MenuItem>()
                 .Where(item => item.Tag is PlayerAction)
                 .Select(item => item.Header?.ToString() ?? "")
                 .ToList();
-            body.AppendLine($"ilk satir    : {basliklar[0]}");
+            body.Satir($"ilk satir    : {basliklar[0]}");
 
             Assert.Equal("pointer", sagTik);
             Assert.Equal("surface", dugme);
             Assert.Equal(Strings.Get("main.player.menu.settings"), basliklar[0]);
 
             window.Close();
-            return body.ToString();
+            return body.Metin;
         });
 
-        FareKanit.Write("f5-menu-konumu.txt", rapor);
         Assert.Contains("pointer", rapor);
         FareKanit.Kapat("f5-menu-konumu.txt");
     }
@@ -1042,6 +1054,7 @@ public sealed class OynaticiFareTests
                      + $"sekmeye giden satir {sekmeyeGiden}{Environment.NewLine}"
                      + $"ayarlar cagrisi: {acilan}{Environment.NewLine}"
                      + $"iz: {view.Trace[^1]}{Environment.NewLine}";
+            FareKanit.Write("f6-ayarlar-satiri.txt", body);
 
             Assert.Equal(0, sekmeyeGiden);
             Assert.Equal(1, acilan);
@@ -1051,7 +1064,6 @@ public sealed class OynaticiFareTests
             return body;
         });
 
-        FareKanit.Write("f6-ayarlar-satiri.txt", rapor);
         Assert.Contains("ayarlar cagrisi: 1", rapor);
         FareKanit.Kapat("f6-ayarlar-satiri.txt");
     }
