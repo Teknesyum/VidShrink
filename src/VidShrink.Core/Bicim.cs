@@ -1,0 +1,139 @@
+using System.Globalization;
+
+namespace VidShrink.Core;
+
+/// <summary>
+/// Sayı yazımının tek gövdesi. Tarama (<c>docs/inceleme/bicim-govdeleri-2026-09-18.md</c>)
+/// altı ailede 32 ayrı biçim ve ~110 çağrı yeri saydı: aynı megabayt değeri arayüzün
+/// farklı köşelerinde sekiz türlü yazılabiliyordu. Biçim dizgisi burada **parametre
+/// değildir** — yüzeyin adı ne yazdığını söyler, ondalığı gövde bilir. Böylece bir biçimi
+/// değiştirmek, <c>Strings</c> kataloğunda bir dizgiyi değiştirmek kadar tek yerlidir.
+/// </summary>
+public static class Bicim
+{
+    /// <summary>Dosya boyutu. Ailenin en dağınık olanıydı: dokuz ondalık, üç birim tablosu.</summary>
+    public static class Boyut
+    {
+        /// <summary>
+        /// Kaynak ya da çıktı boyutu. Ailenin baskın yazımı <c>0.0</c>; tek ondalık
+        /// megabayt ölçeğinde okunabilir, ikincisi gürültü.
+        /// </summary>
+        public static string Mb(double mb, CultureInfo kultur) =>
+            mb.ToString("0.0", kultur);
+
+        /// <summary>
+        /// Hedef boyut. Kullanıcının kendi girdiği sayı: <c>50</c> yazdıysa <c>50,0</c>
+        /// değil <c>50</c> görmeli, yoksa uygulama onun girdisini düzeltmiş gibi durur.
+        /// </summary>
+        public static string Hedef(double mb, CultureInfo kultur) =>
+            mb.ToString("0.##", kultur);
+
+        /// <summary>
+        /// Hedefle çıktı arasındaki fark. Tek ondalık burada sapmayı sıfır gösteriyordu;
+        /// iki ondalık, "hedefi tutturduk mu" sorusunun gerçek cevabı.
+        /// </summary>
+        public static string Sapma(double mb, CultureInfo kultur) =>
+            mb.ToString("0.00", kultur);
+
+        /// <summary>
+        /// Ham bayt. 1024 tabanında bölünüyorsa birim adı <b>ikilik</b> olmak zorunda:
+        /// <c>ShareErrorClassifier.Size</c> 1024'e bölüp <c>KB/MB/GB</c> yazıyordu ve
+        /// kullanıcıya gerçekte olduğundan ~%5 küçük bir sayı okutuyordu.
+        /// </summary>
+        public static string Bayt(long bayt, CultureInfo kultur)
+        {
+            if (bayt <= 0) return "0 B";
+
+            string[] adlar = { "B", "KiB", "MiB", "GiB", "TiB" };
+            double deger = bayt;
+            var basamak = 0;
+            while (deger >= 1024 && basamak < adlar.Length - 1)
+            {
+                deger /= 1024;
+                basamak++;
+            }
+
+            var sayi = basamak == 0
+                ? deger.ToString("0", kultur)
+                : deger.ToString("0.#", kultur);
+
+            return sayi + " " + adlar[basamak];
+        }
+    }
+
+    /// <summary>
+    /// Yüzde. Yüzey <b>oran</b> alır, yüzde üretir: <c>* 100</c> çarpımı sekiz çağrı
+    /// yerinde elle yazılıyordu. Tek <c>P1</c> kullanımı, yanındaki <c>0.#</c> yüzdelerle
+    /// aynı ekranda iki türlü yazıyordu.
+    /// </summary>
+    public static string Yuzde(double oran, CultureInfo kultur) =>
+        (oran * 100).ToString("0.#", kultur) + "%";
+
+    /// <summary>Bit hızı. Ondalığı hiç anlam taşımıyor, birim eki katalogdan gelir.</summary>
+    public static class BitHizi
+    {
+        /// <summary>Kilobit/saniye değeri. Sayı burada, birim adı <c>Strings</c>'te.</summary>
+        public static string Kbps(int kbps, CultureInfo kultur) =>
+            kbps.ToString("0", kultur);
+
+        /// <summary>
+        /// Bit/saniye'den kilobit'e. Bölme üç yerde tamsayı, bir yerde <c>double</c>
+        /// yapılıyordu; aynı akış iki farklı sayı gösterebiliyordu.
+        /// </summary>
+        public static string BpsToKbps(long bps, CultureInfo kultur) =>
+            Kbps((int)Math.Round(bps / 1000.0), kultur);
+    }
+
+    /// <summary>
+    /// Çözünürlük. İki yazım vardı (<c>1920x1080</c> ve <c>1920×1080</c>); çarpı işareti
+    /// doğru tipografik seçim ve oynatıcı zaten onu kullanıyor. Kültür almaz: boyutlar
+    /// tam sayı, basamak ayracı istemiyorlar.
+    /// </summary>
+    public static string Cozunurluk(int genislik, int yukseklik) =>
+        genislik.ToString(CultureInfo.InvariantCulture)
+        + "×" + yukseklik.ToString(CultureInfo.InvariantCulture);
+
+    /// <summary>Kare hızı. Baskın yazım <c>0.##</c>; oynatıcıdaki <c>0.###</c> tek aykırıydı.</summary>
+    public static string Kare(double fps, CultureInfo kultur) =>
+        fps.ToString("0.##", kultur);
+
+    /// <summary>
+    /// Kullanıcıya gösterilen tarih damgası. Üç dosyada aynı dizgi elle kopyalanmıştı;
+    /// biçim aynıydı ama biri kültürü başka kaynaktan alıyordu.
+    /// </summary>
+    public static string Damga(DateTimeOffset an, CultureInfo kultur) =>
+        an.ToLocalTime().ToString("d MMMM HH:mm", kultur);
+
+    /// <summary>
+    /// Dosya adına giren damga. Kültür <b>alamaz</b>: yerel ay adı ve iki nokta dosya
+    /// adını bozar, Windows iki noktayı hiç kabul etmez.
+    /// </summary>
+    public static string DosyaDamgasi(DateTimeOffset an) =>
+        an.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Motorun İngilizce tanı metinleri. Çevrilmiyorlar; kültüre göre virgül alırlarsa
+    /// iki koşumun günlüğü karşılaştırılamaz hale gelir, o yüzden burada kültür
+    /// <see cref="CultureInfo.InvariantCulture"/> olarak sabittir.
+    /// </summary>
+    public static class Tani
+    {
+        /// <inheritdoc cref="Boyut.Mb(double, CultureInfo)"/>
+        public static string Mb(double mb) => Boyut.Mb(mb, CultureInfo.InvariantCulture);
+
+        /// <inheritdoc cref="Boyut.Hedef(double, CultureInfo)"/>
+        public static string Hedef(double mb) => Boyut.Hedef(mb, CultureInfo.InvariantCulture);
+
+        /// <inheritdoc cref="Boyut.Sapma(double, CultureInfo)"/>
+        public static string Sapma(double mb) => Boyut.Sapma(mb, CultureInfo.InvariantCulture);
+
+        /// <inheritdoc cref="Bicim.Yuzde(double, CultureInfo)"/>
+        public static string Yuzde(double oran) => Bicim.Yuzde(oran, CultureInfo.InvariantCulture);
+
+        /// <inheritdoc cref="BitHizi.Kbps(int, CultureInfo)"/>
+        public static string Kbps(int kbps) => BitHizi.Kbps(kbps, CultureInfo.InvariantCulture);
+
+        /// <inheritdoc cref="Bicim.Kare(double, CultureInfo)"/>
+        public static string Kare(double fps) => Bicim.Kare(fps, CultureInfo.InvariantCulture);
+    }
+}

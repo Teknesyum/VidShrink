@@ -89,6 +89,31 @@ Her yüzey için `tests/VidShrink.Tests/BicimTests.cs`:
 Mutasyon: her yüzeyin ondalığı ve kültür parametresi tek tek bozulup kaç test kırmızı
 döndüğü ölçülür; sıfır kırmızı veren yüzey pimsiz sayılır ve testi yeniden yazılır.
 
+
+### Adım 1 ölçümü — 19 Eylül 2026
+
+`Core/Bicim.cs` + `BicimTests` yazıldı: **19/19 yeşil**. On üç mutasyon tek tek koşuldu,
+**on üçü de kırmızı** döndü — pimsiz yüzey yok:
+
+| Mutasyon | Kırmızı |
+|---|---|
+| `Mb` kültürü → Invariant | 1 |
+| `Mb` ondalığı `0.0` → `0.00` | 3 |
+| `Hedef` `0.##` → `0.0` | 1 |
+| `Sapma` `0.00` → `0.0` | 1 |
+| `Bayt` ikilik ad → ondalık ad (`KiB`→`KB`) | 7 |
+| `Bayt` kültürü → Invariant | 1 |
+| `Yuzde` `*100` çarpımı düşürüldü | 2 |
+| `Kbps` ondalık eklendi | 1 |
+| `Cozunurluk` `×` → `x` | 1 |
+| `Kare` `0.##` → `0.###` | 2 |
+| `Damga` kültürü → Invariant | 1 |
+| `DosyaDamgasi` iki nokta | 1 |
+| `Tani` Invariant → CurrentCulture | 1 |
+
+Kültür dikişi ayrı ayrı pimlendi: `Saat`'te `InvariantCulture` mutasyonu 21 yeşilden
+geçmişti, burada dört ayrı kültür mutasyonunun dördü de kırmızı.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol
