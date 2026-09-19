@@ -33,12 +33,11 @@ public sealed record ShareDiagnosis(
     ShareFailure Failure,
     string Key,
     IReadOnlyList<object> Args,
-    string Detail = "",
     TimeSpan? RetryAfter = null,
     string? SuggestedTargetId = null)
 {
-    public ShareDiagnosis(ShareFailure failure, string key, string detail = "")
-        : this(failure, key, Array.Empty<object>(), detail) { }
+    public ShareDiagnosis(ShareFailure failure, string key)
+        : this(failure, key, Array.Empty<object>()) { }
 }
 
 /// <summary>
@@ -120,40 +119,34 @@ public static class ShareErrorClassifier
             HttpStatusCode.RequestEntityTooLarge => new ShareDiagnosis(
                 ShareFailure.FileTooLarge,
                 "share.error.server-too-large",
-                new object[] { name, target.MaxBytes },
-                detail),
+                new object[] { name, target.MaxBytes }),
 
             HttpStatusCode.TooManyRequests => new ShareDiagnosis(
                 ShareFailure.RateLimited,
                 retryAfter is null ? "share.error.rate-limited" : "share.error.rate-limited-wait",
                 retryAfter is null ? new object[] { name } : new object[] { name, retryAfter.Value },
-                detail,
                 retryAfter),
 
             HttpStatusCode.Forbidden => new ShareDiagnosis(
                 ShareFailure.NotAuthorized,
                 "share.error.forbidden",
                 new object[] { name },
-                detail,
                 retryAfter),
 
             HttpStatusCode.Unauthorized => new ShareDiagnosis(
                 ShareFailure.NotAuthorized,
                 "share.error.unauthorized",
-                new object[] { name },
-                detail),
+                new object[] { name }),
 
             HttpStatusCode.NotFound or HttpStatusCode.Gone => new ShareDiagnosis(
                 ShareFailure.TokenExpired,
                 "share.error.gone",
-                new object[] { name },
-                detail),
+                new object[] { name }),
 
             HttpStatusCode.RequestTimeout => new ShareDiagnosis(
                 ShareFailure.NetworkFailure,
                 "share.error.timeout",
                 new object[] { name },
-                detail,
                 retryAfter),
 
             HttpStatusCode.ServiceUnavailable or HttpStatusCode.BadGateway or HttpStatusCode.GatewayTimeout =>
@@ -161,28 +154,24 @@ public static class ShareErrorClassifier
                     ShareFailure.ServiceError,
                     retryAfter is null ? "share.error.unavailable" : "share.error.unavailable-wait",
                     retryAfter is null ? new object[] { name } : new object[] { name, retryAfter.Value },
-                    detail,
                     retryAfter),
 
             HttpStatusCode.InsufficientStorage => new ShareDiagnosis(
                 ShareFailure.QuotaExceeded,
                 "share.error.storage-full",
                 new object[] { name },
-                detail,
                 retryAfter),
 
             _ when status >= 500 => new ShareDiagnosis(
                 ShareFailure.ServiceError,
                 "share.error.server-fault",
                 new object[] { name, step, status },
-                detail,
                 retryAfter),
 
             _ when status is 400 or 422 => new ShareDiagnosis(
                 ShareFailure.ServiceError,
                 "share.error.bad-request",
-                new object[] { name, status },
-                detail),
+                new object[] { name, status }),
 
             _ => new ShareDiagnosis(
                 ShareFailure.Unknown,
@@ -190,7 +179,6 @@ public static class ShareErrorClassifier
                 string.IsNullOrWhiteSpace(detail)
                     ? new object[] { name, step, status }
                     : new object[] { name, step, status, detail },
-                detail,
                 retryAfter)
         };
 
@@ -206,49 +194,41 @@ public static class ShareErrorClassifier
         {
             OperationCanceledException => new ShareDiagnosis(
                 ShareFailure.Cancelled,
-                "share.error.cancelled",
-                exception.Message),
+                "share.error.cancelled"),
 
             HttpRequestException { InnerException: SocketException socket } => new ShareDiagnosis(
                 ShareFailure.NetworkFailure,
                 socket.SocketErrorCode is SocketError.HostNotFound or SocketError.NoData
                     ? "share.error.host-not-found"
                     : "share.error.connect-failed",
-                new object[] { name },
-                exception.Message),
+                new object[] { name }),
 
             HttpRequestException => new ShareDiagnosis(
                 ShareFailure.NetworkFailure,
                 "share.error.unreachable",
-                new object[] { name },
-                exception.Message),
+                new object[] { name }),
 
             FileNotFoundException or DirectoryNotFoundException => new ShareDiagnosis(
                 ShareFailure.FileUnreadable,
-                "share.error.file-missing",
-                exception.Message),
+                "share.error.file-missing"),
 
             UnauthorizedAccessException => new ShareDiagnosis(
                 ShareFailure.FileUnreadable,
-                "share.error.file-locked",
-                exception.Message),
+                "share.error.file-locked"),
 
             IOException io when IsDiskFull(io) => new ShareDiagnosis(
                 ShareFailure.LocalDiskFull,
-                "share.error.disk-full",
-                exception.Message),
+                "share.error.disk-full"),
 
             IOException => new ShareDiagnosis(
                 ShareFailure.NetworkFailure,
                 "share.error.connection-dropped",
-                new object[] { name, step },
-                exception.Message),
+                new object[] { name, step }),
 
             _ => new ShareDiagnosis(
                 ShareFailure.Unknown,
                 "share.error.unexpected-exception",
-                new object[] { step, exception.Message },
-                exception.Message)
+                new object[] { step, exception.Message })
         };
 
         return Count(diagnosis);
@@ -260,13 +240,11 @@ public static class ShareErrorClassifier
             ? new ShareDiagnosis(
                 ShareFailure.NotAuthorized,
                 "share.error.no-delete-token-hours",
-                new object[] { target.DisplayName, hours },
-                "canDelete=false")
+                new object[] { target.DisplayName, hours })
             : new ShareDiagnosis(
                 ShareFailure.NotAuthorized,
                 "share.error.no-delete-token",
-                new object[] { target.DisplayName },
-                "canDelete=false"));
+                new object[] { target.DisplayName }));
 
     private static ShareDiagnosis Count(ShareDiagnosis diagnosis)
     {

@@ -308,9 +308,48 @@ public sealed class PaylasimHataDiliTests : IDisposable
     }
 
     /// <summary>
+    /// İkinci depo geri gelmesin: <c>Detail</c> sunucunun ham metnini taşıyor ama hiçbir
+    /// gösterim yeri onu okumuyordu — dolduruluyor, taşınıyor, hiç görülmüyordu. Cümlesi
+    /// kurulamayan iki kolda ham metin zaten <c>Args</c>'a giriyor. Alanın geri eklenmesi
+    /// derlemeyi kırmaz, o yüzden yüzey yansımayla pimli.
+    /// </summary>
+    [Fact]
+    public void HamSunucuMetniIcinIkinciDepoYok()
+    {
+        Assert.Null(typeof(ShareDiagnosis).GetProperty("Detail"));
+        Assert.Null(typeof(ShareResult).GetProperty("Detail"));
+
+        Assert.NotNull(typeof(ShareDiagnosis).GetProperty("Args"));
+        Assert.NotNull(typeof(ShareResult).GetProperty("Args"));
+    }
+
+    /// <summary>
+    /// Ham metin kaybolmuyor: cümle kurulamayan iki kolda <c>Args</c>'ın son değeri
+    /// sunucunun kendi açıklamasıdır. Sınıflandırılabilen kolda girmediği olumsuz kontrol.
+    /// </summary>
+    [Fact]
+    public void CumlesiKurulamayanKolHamMetniArgumanaKoyuyor()
+    {
+        var hedef = Tablo().Find("uguu.se")!;
+
+        using var beklenmeyen = new HttpResponseMessage((HttpStatusCode)418);
+        var tani = ShareErrorClassifier.FromResponse(hedef, beklenmeyen, "teapot", ShareStep.Upload);
+        Assert.Equal("share.error.unexpected-detail", tani.Key);
+        Assert.Equal("teapot", tani.Args[^1]);
+
+        var istisna = ShareErrorClassifier.FromException(hedef, new InvalidOperationException("patladi"), ShareStep.Init);
+        Assert.Equal("share.error.unexpected-exception", istisna.Key);
+        Assert.Equal("patladi", istisna.Args[^1]);
+
+        using var sunucu = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+        var sinifli = ShareErrorClassifier.FromResponse(hedef, sunucu, "boom", ShareStep.Upload);
+        Assert.Equal("share.error.server-fault", sinifli.Key);
+        Assert.DoesNotContain("boom", sinifli.Args.Select(a => a?.ToString() ?? string.Empty));
+    }
+
+    /// <summary>
     /// İstisna kurulan satır. İstisnanın iletisi geliştirici tanısıdır: kullanıcıya giden
-    /// yolda <see cref="ShareErrorClassifier.FromException"/> onu bir anahtara çevirir,
-    /// ham hâli yalnız <see cref="ShareResult.Detail"/> alanında kalır.
+    /// yolda <see cref="ShareErrorClassifier.FromException"/> onu bir anahtara çevirir.
     /// </summary>
     private static bool IstisnaKurulumu(string satir) =>
         satir.Contains("throw new", StringComparison.Ordinal) ||

@@ -299,7 +299,8 @@ public sealed class ShareProviderTests
         var result = await provider.UploadAsync(clip.Path);
 
         Assert.Equal(ShareFailure.ServiceError, result.Failure);
-        Assert.Contains("boom", result.Detail);
+        Assert.Equal("share.error.server-fault", result.Key);
+        Assert.Equal(500, Assert.IsType<int>(result.Args[2]));
     }
 
     // ---- Ortak davranış ------------------------------------------------------------------

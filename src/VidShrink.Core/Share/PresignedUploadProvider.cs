@@ -161,8 +161,7 @@ public sealed class PresignedUploadProvider : IShareProvider
             return ShareResult.Failed(new ShareDiagnosis(
                 ShareFailure.TokenExpired,
                 "share.error.token-lost",
-                new object[] { Target.DisplayName },
-                "owner_token yok"));
+                new object[] { Target.DisplayName }));
 
         try
         {

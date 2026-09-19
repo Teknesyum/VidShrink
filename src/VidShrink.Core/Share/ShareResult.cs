@@ -7,8 +7,8 @@ namespace VidShrink.Core.Share;
 /// <summary>
 /// Paylaşım işleminin nasıl bittiği. Cümle burada kurulmaz: kullanıcıya gösterilecek
 /// metnin anahtarı <see cref="ShareDiagnosis.Key"/>, yer tutucularına geçecek ham değerler
-/// <see cref="ShareDiagnosis.Args"/> alanındadır; ham sunucu metni
-/// <see cref="ShareResult.Detail"/> alanında ayrıca taşınır.
+/// <see cref="ShareDiagnosis.Args"/> alanındadır. Cümlesi kurulamayan iki kolda sunucunun
+/// ham metni de argümanlara girer; ayrı bir alanda taşınmaz.
 /// </summary>
 public enum ShareFailure
 {
@@ -96,7 +96,7 @@ public sealed record UploadProgress(long BytesSent, long TotalBytes)
 /// <summary>
 /// Bir paylaşım adımının sonucu. Başarıda <see cref="Link"/> doludur; başarısızlıkta
 /// <see cref="Failure"/> hangi durum olduğunu, <see cref="Key"/> ile <see cref="Args"/>
-/// arayüzün yazacağı cümleyi, <see cref="Detail"/> sunucunun kendi metnini verir.
+/// arayüzün yazacağı cümleyi verir.
 /// </summary>
 public sealed record ShareResult
 {
@@ -105,9 +105,6 @@ public sealed record ShareResult
     public bool Ok => Failure == ShareFailure.None;
 
     public ShareFailure Failure { get; private init; } = ShareFailure.None;
-
-    /// <summary>Sunucudan gelen ham açıklama. Tanı kurulamadığında olduğu gibi gösterilebilir.</summary>
-    public string Detail { get; private init; } = string.Empty;
 
     /// <summary>Arayüzün yazacağı cümlenin anahtarı. Başarıda boştur.</summary>
     public string Key { get; private init; } = string.Empty;
@@ -128,7 +125,6 @@ public sealed record ShareResult
     public static ShareResult Failed(ShareDiagnosis diagnosis) => new()
     {
         Failure = diagnosis.Failure,
-        Detail = diagnosis.Detail,
         Key = diagnosis.Key,
         Args = diagnosis.Args,
         RetryAfter = diagnosis.RetryAfter,

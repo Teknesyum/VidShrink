@@ -833,3 +833,35 @@ degil birebir kendisini gosteriyor; `PreviewQuality.Kopya` bu yuzden "yaklasik" 
 | yaklasik rozeti kopyayi da isaretledi | 1 |
 
 Temel: 31 yesil, 0 kirmizi.
+
+---
+
+# `ShareDiagnosis.Detail` Düşürülüyor (Defter 35)
+
+**Ölçüm.** `Detail` üretimde hiçbir gösterim yerinde okunmuyor. Paylaşım sonucu üç yerde
+tek satır olarak yazılıyor — `MainWindow.axaml.cs:2119,2154`, `RecorderView.Paylas.cs:115`,
+`ShrinkJobWindow.Paylas.cs:125` — ve üçü de yalnız `ShareMessage.Of(result)` çağırıyor,
+o da `result.Key` + `result.Args` okuyor. `Detail`'i okuyan tek satır bir testte.
+
+**Karar: düşürülsün.** Sunucunun ham metni zaten cümle kurulamayan iki kolda
+`Args`'a giriyor — `share.error.unexpected-detail` (`{3}`) ve
+`share.error.unexpected-exception` (`{1}`). Cümlesi kurulabilen kollarda ham gövde
+kullanıcıya gürültüdür; ayrıntı satırına bağlamak tek satırlık durum metnini bozar.
+Yersiz kalan `Detail` ise ikinci bir depo: dolduruluyor, taşınıyor, hiç okunmuyor.
+
+Yer tutucusuz dört anahtar (`cancelled`, `file-missing`, `file-locked`, `disk-full`)
+üç argümanlı kurucuyu yalnız `Detail`'i doldurmak için kullanıyordu; onlarda alan
+tamamen ölüydü.
+
+**Adımlar**
+
+1. `ShareDiagnosis`'ten `Detail` çıkar, üç argümanlı kolaylık kurucusu `(failure, key)` olur.
+2. `ShareResult`'tan `Detail` ve `Failed`'deki atama çıkar; sınıf belgesi düzeltilir.
+3. 24 kurulum yeri (`ShareErrorClassifier` 23, `PresignedUploadProvider` 1) `Detail`
+   argümanını bırakır; `RetryAfter` bir sıra öne kayar.
+4. `ShareProviderTests.AMultipartServerErrorIsClassifiedNotThrown` ham gövde yerine
+   sınıflandırmanın kendisini ölçer (anahtar + argümanlar), yani geçirgen alanı değil davranışı.
+5. `PaylasimHataDiliTests`'e alanın geri gelmemesi için yansımalı pim.
+
+**Ölçü.** Alanı geri eklemek derlemeyi kırmaz, sessizce ikinci depoyu geri getirir —
+`OrtakOdakTests.KonumDeposuCurrentMediaDaYok` ile aynı desen: yüzey yansımayla pimlenir.
