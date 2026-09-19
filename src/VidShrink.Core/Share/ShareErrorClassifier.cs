@@ -1,19 +1,45 @@
-using System.Globalization;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 
 namespace VidShrink.Core.Share;
 
 /// <summary>
+/// Yüklemenin hangi adımında olduğumuz. Eskiden bu bir dizgeydi ve değerleri karışıktı:
+/// <c>"yükleme"</c>, <c>"hazırlık"</c> Türkçe, <c>"init"</c> ve <c>"confirm"</c> ham
+/// protokol sözcüğüydü — ikisi de kullanıcıya gösterilen cümlenin ortasına giriyordu.
+/// Adım artık hüküm; adı arayüzün dilinde yazılır.
+/// </summary>
+public enum ShareStep
+{
+    Prepare,
+    Init,
+    Upload,
+    Confirm,
+    Probe,
+    Delete
+}
+
+/// <summary>
 /// Sınıflandırılmış bir başarısızlık: ne oldu, kullanıcı ne yapabilir, ne zaman tekrar
 /// denenebilir ve varsa hangi hedef bu işi görür.
 /// </summary>
+/// <remarks>
+/// <see cref="Key"/> ve <see cref="Args"/> cümlenin yerine geçti. Core dil katmanını
+/// göremez (<c>Strings</c> arayüzdedir), o yüzden burada kurulan her cümle İngilizce
+/// arayüzde de Türkçe çıkıyordu. Aynı sorunu <c>Core/Subtitles</c> hüküm döndürerek
+/// çözmüştü; paylaşım tarafı da artık cümle kurmuyor.
+/// </remarks>
 public sealed record ShareDiagnosis(
     ShareFailure Failure,
-    string Message,
+    string Key,
+    IReadOnlyList<object> Args,
     string Detail = "",
     TimeSpan? RetryAfter = null,
-    string? SuggestedTargetId = null);
+    string? SuggestedTargetId = null)
+{
+    public ShareDiagnosis(ShareFailure failure, string key, string detail = "")
+        : this(failure, key, Array.Empty<object>(), detail) { }
+}
 
 /// <summary>
 /// HTTP durumunu ve gövdesini kullanıcının <b>yapabileceği bir şeye</b> çevirir.
@@ -55,18 +81,26 @@ public static class ShareErrorClassifier
     /// Dosya hedefin tavanını aşıyor mu; aşıyorsa hangi hedefin yeteceğini de söyler.
     /// Yükleme hiç başlatılmadan önce çağrılır, boşuna bayt harcanmaz.
     /// </summary>
+    /// <remarks>
+    /// Boyutlar ham bayt olarak geçer; biçimi arayüz yazar. Burada yazılsaydı makinenin
+    /// kültürüyle yazılırdı, arayüzün diliyle değil.
+    /// </remarks>
     public static ShareDiagnosis? CheckSize(ShareTarget target, long bytes, ShareTargetTable? table = null)
     {
         if (target.Accepts(bytes)) return null;
 
         var bigger = table?.SmallestAccepting(bytes, target.Id);
-        var message =
-            $"Dosya {Size(bytes)}, {target.DisplayName} en fazla {Size(target.MaxBytes)} kabul ediyor." +
-            (bigger is null
-                ? " Listedeki hiçbir hedefin tavanı yetmiyor; hedef boyutu küçültmek gerekiyor."
-                : $" {bigger.DisplayName} bu boyutu kabul ediyor ({Size(bigger.MaxBytes)}).");
 
-        return Count(new ShareDiagnosis(ShareFailure.FileTooLarge, message, SuggestedTargetId: bigger?.Id));
+        return Count(bigger is null
+            ? new ShareDiagnosis(
+                ShareFailure.FileTooLarge,
+                "share.error.too-large-no-target",
+                new object[] { bytes, target.DisplayName, target.MaxBytes })
+            : new ShareDiagnosis(
+                ShareFailure.FileTooLarge,
+                "share.error.too-large-try",
+                new object[] { bytes, target.DisplayName, target.MaxBytes, bigger.DisplayName, bigger.MaxBytes },
+                SuggestedTargetId: bigger.Id));
     }
 
     /// <summary>Sunucu yanıtını sınıflandırır. <paramref name="body"/> okunmuş gövde metnidir.</summary>
@@ -74,7 +108,7 @@ public static class ShareErrorClassifier
         ShareTarget target,
         HttpResponseMessage response,
         string body,
-        string step)
+        ShareStep step)
     {
         var status = (int)response.StatusCode;
         var retryAfter = RetryAfterOf(response);
@@ -85,70 +119,77 @@ public static class ShareErrorClassifier
         {
             HttpStatusCode.RequestEntityTooLarge => new ShareDiagnosis(
                 ShareFailure.FileTooLarge,
-                $"{name} dosyayı büyük buldu; tavanı {Size(target.MaxBytes)}. Hedef boyutu düşürüp yeniden deneyin.",
+                "share.error.server-too-large",
+                new object[] { name, target.MaxBytes },
                 detail),
 
             HttpStatusCode.TooManyRequests => new ShareDiagnosis(
                 ShareFailure.RateLimited,
-                retryAfter is null
-                    ? $"{name} çok fazla istek aldı. Anonim yüklemede günlük bir sayı sınırı var; bir süre sonra yeniden deneyin."
-                    : $"{name} çok fazla istek aldı. {Wait(retryAfter.Value)} sonra yeniden denenebilir.",
+                retryAfter is null ? "share.error.rate-limited" : "share.error.rate-limited-wait",
+                retryAfter is null ? new object[] { name } : new object[] { name, retryAfter.Value },
                 detail,
                 retryAfter),
 
             HttpStatusCode.Forbidden => new ShareDiagnosis(
                 ShareFailure.NotAuthorized,
-                $"{name} isteği reddetti. Silme jetonu bu dosyaya ait değilse ya da dosya kaldırıldıysa bu olur; " +
-                "yayın zaten kapalı olabilir.",
+                "share.error.forbidden",
+                new object[] { name },
                 detail,
                 retryAfter),
 
             HttpStatusCode.Unauthorized => new ShareDiagnosis(
                 ShareFailure.NotAuthorized,
-                $"{name} isteği yetkisiz saydı. Bu sürümde anonim yükleme bekleniyor; servis kural değiştirmiş olabilir.",
+                "share.error.unauthorized",
+                new object[] { name },
                 detail),
 
             HttpStatusCode.NotFound or HttpStatusCode.Gone => new ShareDiagnosis(
                 ShareFailure.TokenExpired,
-                $"Dosya {name} üzerinde artık yok — ömrü dolmuş ya da zaten silinmiş. Kayıttan düşürüldü.",
+                "share.error.gone",
+                new object[] { name },
                 detail),
 
             HttpStatusCode.RequestTimeout => new ShareDiagnosis(
                 ShareFailure.NetworkFailure,
-                $"{name} zamanında yanıt vermedi. Bağlantınızı kontrol edip yeniden deneyin.",
+                "share.error.timeout",
+                new object[] { name },
                 detail,
                 retryAfter),
 
             HttpStatusCode.ServiceUnavailable or HttpStatusCode.BadGateway or HttpStatusCode.GatewayTimeout =>
                 new ShareDiagnosis(
                     ShareFailure.ServiceError,
-                    retryAfter is null
-                        ? $"{name} şu an hizmet vermiyor. Diğer hedefi deneyin ya da biraz sonra tekrar bakın."
-                        : $"{name} şu an hizmet vermiyor. {Wait(retryAfter.Value)} sonra yeniden denenebilir.",
+                    retryAfter is null ? "share.error.unavailable" : "share.error.unavailable-wait",
+                    retryAfter is null ? new object[] { name } : new object[] { name, retryAfter.Value },
                     detail,
                     retryAfter),
 
             HttpStatusCode.InsufficientStorage => new ShareDiagnosis(
                 ShareFailure.QuotaExceeded,
-                $"{name} deposu dolu. Diğer hedefi deneyin.",
+                "share.error.storage-full",
+                new object[] { name },
                 detail,
                 retryAfter),
 
             _ when status >= 500 => new ShareDiagnosis(
                 ShareFailure.ServiceError,
-                $"{name} {step} adımında sunucu hatası verdi ({status}). Diğer hedefi deneyebilirsiniz.",
+                "share.error.server-fault",
+                new object[] { name, step, status },
                 detail,
                 retryAfter),
 
             _ when status is 400 or 422 => new ShareDiagnosis(
                 ShareFailure.ServiceError,
-                $"{name} isteği anlamadı ({status}). Servis arayüzünü değiştirmiş olabilir; diğer hedefi deneyin.",
+                "share.error.bad-request",
+                new object[] { name, status },
                 detail),
 
             _ => new ShareDiagnosis(
                 ShareFailure.Unknown,
-                $"{name} {step} adımında beklenmeyen bir yanıt verdi ({status}). Sunucunun kendi açıklaması: " +
-                (string.IsNullOrWhiteSpace(detail) ? "yok." : detail),
+                string.IsNullOrWhiteSpace(detail) ? "share.error.unexpected" : "share.error.unexpected-detail",
+                string.IsNullOrWhiteSpace(detail)
+                    ? new object[] { name, step, status }
+                    : new object[] { name, step, status, detail },
                 detail,
                 retryAfter)
         };
@@ -157,7 +198,7 @@ public static class ShareErrorClassifier
     }
 
     /// <summary>Ağ katmanından gelen istisnayı sınıflandırır.</summary>
-    public static ShareDiagnosis FromException(ShareTarget target, Exception exception, string step)
+    public static ShareDiagnosis FromException(ShareTarget target, Exception exception, ShareStep step)
     {
         var name = target.DisplayName;
 
@@ -165,44 +206,48 @@ public static class ShareErrorClassifier
         {
             OperationCanceledException => new ShareDiagnosis(
                 ShareFailure.Cancelled,
-                "Yükleme iptal edildi. Sunucuya yarım dosya bırakılmadı.",
+                "share.error.cancelled",
                 exception.Message),
 
             HttpRequestException { InnerException: SocketException socket } => new ShareDiagnosis(
                 ShareFailure.NetworkFailure,
                 socket.SocketErrorCode is SocketError.HostNotFound or SocketError.NoData
-                    ? $"{name} adresi çözülemedi. Servis kapanmış ya da bu ağdan erişilemiyor olabilir; diğer hedefi deneyin."
-                    : $"{name} sunucusuna bağlanılamadı. Ağ bağlantınızı kontrol edip yeniden deneyin.",
+                    ? "share.error.host-not-found"
+                    : "share.error.connect-failed",
+                new object[] { name },
                 exception.Message),
 
             HttpRequestException => new ShareDiagnosis(
                 ShareFailure.NetworkFailure,
-                $"{name} sunucusuna ulaşılamadı. Ağ bağlantınızı kontrol edip yeniden deneyin.",
+                "share.error.unreachable",
+                new object[] { name },
                 exception.Message),
 
             FileNotFoundException or DirectoryNotFoundException => new ShareDiagnosis(
                 ShareFailure.FileUnreadable,
-                "Yüklenecek dosya bulunamadı. Dönüştürme çıktısı taşınmış ya da silinmiş olabilir.",
+                "share.error.file-missing",
                 exception.Message),
 
             UnauthorizedAccessException => new ShareDiagnosis(
                 ShareFailure.FileUnreadable,
-                "Dosya okunamadı; başka bir program onu açık tutuyor olabilir.",
+                "share.error.file-locked",
                 exception.Message),
 
             IOException io when IsDiskFull(io) => new ShareDiagnosis(
                 ShareFailure.LocalDiskFull,
-                "Yerel diskte yer kalmadı.",
+                "share.error.disk-full",
                 exception.Message),
 
             IOException => new ShareDiagnosis(
                 ShareFailure.NetworkFailure,
-                $"{name} ile bağlantı {step} adımında koptu. Yeniden deneyin.",
+                "share.error.connection-dropped",
+                new object[] { name, step },
                 exception.Message),
 
             _ => new ShareDiagnosis(
                 ShareFailure.Unknown,
-                $"{step} adımında beklenmeyen bir hata oldu: {exception.Message}",
+                "share.error.unexpected-exception",
+                new object[] { step, exception.Message },
                 exception.Message)
         };
 
@@ -210,17 +255,18 @@ public static class ShareErrorClassifier
     }
 
     /// <summary>Silme desteklemeyen hedef için tanı. Ağa çıkılmaz.</summary>
-    public static ShareDiagnosis DeleteUnsupported(ShareTarget target)
-    {
-        var life = target.FixedRetentionHours is { } hours
-            ? $"{hours} saatlik otomatik silme onun yerine geçiyor"
-            : "dosya kendi ömrü dolunca siliniyor";
-
-        return Count(new ShareDiagnosis(
-            ShareFailure.NotAuthorized,
-            $"{target.DisplayName} silme jetonu vermiyor, bu yüzden yayın erken kapatılamıyor; {life}.",
-            "canDelete=false"));
-    }
+    public static ShareDiagnosis DeleteUnsupported(ShareTarget target) =>
+        Count(target.FixedRetentionHours is { } hours
+            ? new ShareDiagnosis(
+                ShareFailure.NotAuthorized,
+                "share.error.no-delete-token-hours",
+                new object[] { target.DisplayName, hours },
+                "canDelete=false")
+            : new ShareDiagnosis(
+                ShareFailure.NotAuthorized,
+                "share.error.no-delete-token",
+                new object[] { target.DisplayName },
+                "canDelete=false"));
 
     private static ShareDiagnosis Count(ShareDiagnosis diagnosis)
     {
@@ -250,23 +296,10 @@ public static class ShareErrorClassifier
         return code is 0x70 or 0x27;
     }
 
-    private static string Wait(TimeSpan span) =>
-        span.TotalMinutes < 1
-            ? $"{Math.Max(1, (int)Math.Ceiling(span.TotalSeconds))} saniye"
-            : $"{(int)Math.Ceiling(span.TotalMinutes)} dakika";
-
     private static string Trim(string body)
     {
         if (string.IsNullOrWhiteSpace(body)) return string.Empty;
         var flat = body.Replace('\r', ' ').Replace('\n', ' ').Trim();
         return flat.Length <= 300 ? flat : flat[..300] + "…";
     }
-
-    /// <summary>
-    /// Boyut yazımı <see cref="Bicim.Boyut.Bayt"/>'a indi. Eski gövde 1024'e bölüp
-    /// <c>KB/MB/GB</c> yazıyordu; kullanıcı gerçekte olduğundan ~%5 küçük görünen bir
-    /// birim adı okuyordu. Sıfırın anlamı ("sınırsız") burada kalır, yazım gövdede.
-    /// </summary>
-    private static string Size(long bytes) =>
-        bytes <= 0 ? "sınırsız" : Bicim.Boyut.Bayt(bytes, CultureInfo.CurrentCulture);
 }

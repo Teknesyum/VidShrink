@@ -52,7 +52,7 @@ public sealed class PresignedUploadProvider : IShareProvider
         IProgress<UploadProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        var step = "hazırlık";
+        var step = ShareStep.Prepare;
         try
         {
             var info = new FileInfo(filePath);
@@ -68,7 +68,7 @@ public sealed class PresignedUploadProvider : IShareProvider
             var contentType = MediaTypes.ForFile(filePath);
             var days = ClampRetention(retentionDays);
 
-            step = "init";
+            step = ShareStep.Init;
             var initBody = new JsonObject
             {
                 ["filename"] = name,
@@ -91,7 +91,7 @@ public sealed class PresignedUploadProvider : IShareProvider
             if (uploadUrl is null || key is null)
                 return ShareResult.Failed(ShareErrorClassifier.FromResponse(Target, initResponse, initText, step));
 
-            step = "yükleme";
+            step = ShareStep.Upload;
             // Content-Type init'te bildirilenle birebir aynı olmalı; imza onu da kapsıyor.
             using var putRequest = new HttpRequestMessage(HttpMethod.Put, uploadUrl)
             {
@@ -106,7 +106,7 @@ public sealed class PresignedUploadProvider : IShareProvider
                 return ShareResult.Failed(ShareErrorClassifier.FromResponse(Target, putResponse, putText, step));
             }
 
-            step = "confirm";
+            step = ShareStep.Confirm;
             var confirmBody = new JsonObject
             {
                 ["r2_key"] = key,
@@ -160,8 +160,8 @@ public sealed class PresignedUploadProvider : IShareProvider
         if (string.IsNullOrEmpty(link.OwnerToken))
             return ShareResult.Failed(new ShareDiagnosis(
                 ShareFailure.TokenExpired,
-                $"Bu dosyanın silme jetonu elimizde yok, {Target.DisplayName} üzerinde erken kapatılamaz. " +
-                "Ömrü dolduğunda kendiliğinden silinecek.",
+                "share.error.token-lost",
+                new object[] { Target.DisplayName },
                 "owner_token yok"));
 
         try
@@ -175,13 +175,13 @@ public sealed class PresignedUploadProvider : IShareProvider
             using var response = await _transport.SendAsync(request, cancellationToken).ConfigureAwait(false);
             var text = await ReadAsync(response, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
-                return ShareResult.Failed(ShareErrorClassifier.FromResponse(Target, response, text, "silme"));
+                return ShareResult.Failed(ShareErrorClassifier.FromResponse(Target, response, text, ShareStep.Delete));
 
             return ShareResult.Success(link);
         }
         catch (Exception e) when (e is not OutOfMemoryException)
         {
-            return ShareResult.Failed(ShareErrorClassifier.FromException(Target, e, "silme"));
+            return ShareResult.Failed(ShareErrorClassifier.FromException(Target, e, ShareStep.Delete));
         }
     }
 

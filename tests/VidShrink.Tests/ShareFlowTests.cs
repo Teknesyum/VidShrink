@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using VidShrink.App;
@@ -68,7 +68,7 @@ public sealed class ShareFlowTests : IDisposable
 
         var result = await flow.ShareAsync(table.DefaultTarget!, _filePath);
 
-        Assert.True(result.Ok, result.Message);
+        Assert.True(result.Ok, result.Key);
         Assert.Equal("https://sahte.example/abc.mp4", result.Link!.Url);
         Assert.Equal("https://sahte.example/abc.mp4", flow.Link!.Url);
         Assert.Single(transport.Requests);
@@ -101,7 +101,7 @@ public sealed class ShareFlowTests : IDisposable
 
         Assert.False(result.Ok);
         Assert.Equal(ShareFailure.FileTooLarge, result.Failure);
-        Assert.NotEmpty(result.Message);
+        Assert.NotEmpty(result.Key);
         Assert.Empty(transport.Requests);
         Assert.Null(flow.Link);
         Assert.Empty(Ledger.Load());
@@ -387,7 +387,7 @@ public sealed class ShareFlowTests : IDisposable
             }
             catch (OperationCanceledException e)
             {
-                return ShareResult.Failed(ShareErrorClassifier.FromException(Target, e, "yükleme"));
+                return ShareResult.Failed(ShareErrorClassifier.FromException(Target, e, ShareStep.Upload));
             }
 
             return ShareResult.Failed(new ShareDiagnosis(ShareFailure.Unknown, "buraya gelinmez"));

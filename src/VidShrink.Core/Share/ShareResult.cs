@@ -5,9 +5,10 @@ using System.Text.Json.Serialization;
 namespace VidShrink.Core.Share;
 
 /// <summary>
-/// Paylaşım işleminin nasıl bittiği. Arayüz bu değeri kendi diline çevirir; kullanıcıya
-/// gösterilecek eyleme dönüşebilir cümle <see cref="ShareDiagnosis.Message"/> alanındadır,
-/// ham sunucu metni <see cref="ShareResult.Detail"/> alanında ayrıca taşınır.
+/// Paylaşım işleminin nasıl bittiği. Cümle burada kurulmaz: kullanıcıya gösterilecek
+/// metnin anahtarı <see cref="ShareDiagnosis.Key"/>, yer tutucularına geçecek ham değerler
+/// <see cref="ShareDiagnosis.Args"/> alanındadır; ham sunucu metni
+/// <see cref="ShareResult.Detail"/> alanında ayrıca taşınır.
 /// </summary>
 public enum ShareFailure
 {
@@ -94,8 +95,8 @@ public sealed record UploadProgress(long BytesSent, long TotalBytes)
 
 /// <summary>
 /// Bir paylaşım adımının sonucu. Başarıda <see cref="Link"/> doludur; başarısızlıkta
-/// <see cref="Failure"/> hangi durum olduğunu, <see cref="Message"/> kullanıcının
-/// yapabileceği şeyi, <see cref="Detail"/> sunucunun kendi metnini verir.
+/// <see cref="Failure"/> hangi durum olduğunu, <see cref="Key"/> ile <see cref="Args"/>
+/// arayüzün yazacağı cümleyi, <see cref="Detail"/> sunucunun kendi metnini verir.
 /// </summary>
 public sealed record ShareResult
 {
@@ -108,8 +109,11 @@ public sealed record ShareResult
     /// <summary>Sunucudan gelen ham açıklama. Tanı kurulamadığında olduğu gibi gösterilebilir.</summary>
     public string Detail { get; private init; } = string.Empty;
 
-    /// <summary>Kullanıcının yapabileceği bir şeye çevrilmiş cümle. Başarıda boştur.</summary>
-    public string Message { get; private init; } = string.Empty;
+    /// <summary>Arayüzün yazacağı cümlenin anahtarı. Başarıda boştur.</summary>
+    public string Key { get; private init; } = string.Empty;
+
+    /// <summary>Anahtarın yer tutucularına geçecek değerler; ham, biçimsiz.</summary>
+    public IReadOnlyList<object> Args { get; private init; } = Array.Empty<object>();
 
     /// <summary>Yeniden denemeden önce beklenecek süre. Sunucu söylemediyse boştur.</summary>
     public TimeSpan? RetryAfter { get; private init; }
@@ -125,7 +129,8 @@ public sealed record ShareResult
     {
         Failure = diagnosis.Failure,
         Detail = diagnosis.Detail,
-        Message = diagnosis.Message,
+        Key = diagnosis.Key,
+        Args = diagnosis.Args,
         RetryAfter = diagnosis.RetryAfter,
         SuggestedTargetId = diagnosis.SuggestedTargetId
     };

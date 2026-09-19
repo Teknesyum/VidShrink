@@ -513,6 +513,79 @@ kontrol. Taban 0 kırmızı / 18 yeşil (`SettingsTabTests` ile birlikte).
 Sıfır yok. `ShareTargetTable.Locate(string)` kaldırıldı; onu kullanan iki eski ölçü
 yeni yüzeye taşındı.
 
+## Paylaşım hatalarının dili — plan
+
+**Kusur.** `Core/Share/ShareErrorClassifier.cs` kullanıcıya gösterilen 27 cümleyi
+Türkçe, sabit metin olarak yazıyor. Core dil katmanını göremez (`Strings` App'te),
+o yüzden İngilizce arayüzde kullanıcı Türkçe cümle okuyor. Üç yerden görünüyor:
+`MainWindow.axaml.cs:2118`, `:2153`, `ShrinkJobWindow.Paylas.cs:124`,
+`RecorderView.Paylas.cs:114` — hepsi `result.Message`'ı olduğu gibi yazıyor.
+
+Yanında iki kusur daha aynı gövdede:
+
+- `Size()` biçimi `CultureInfo.CurrentCulture` ile yazıyor — arayüzün dili değil
+  makinenin kültürü. `bicim-muafiyetleri.txt`'deki tek muafiyet bu satır.
+- `step` kullanıcıya gösteriliyor ve değerleri karışık: `"yükleme"`, `"hazırlık"`,
+  `"yoklama"`, `"silme"` Türkçe; `"init"` ve `"confirm"` ham protokol sözcüğü.
+  Türkçe arayüzde bile cümlenin ortasında İngilizce teknik terim çıkıyor.
+
+**Yerleşik çözüm var, paylaşım onu kullanmıyor.** `Core/Subtitles` aynı sorunu
+çözmüş: Core `SubtitleOutcome` hükmü döndürüyor, App `PlayerView.Subtitles.cs:174`'te
+anahtara çeviriyor. Cümle Core'da hiç doğmuyor. Paylaşım tarafı `ShareFailure`
+hükmünü zaten taşıyor ama yanında bir de hazır cümle taşıyor.
+
+**Neden hüküm tek başına yetmiyor.** `ShareFailure` cümlelerden kaba: tek
+`NetworkFailure` beş ayrı cümleye, `ServiceError` dörde çıkıyor. O yüzden çeviri
+anahtarı hükümden ayrı taşınacak.
+
+### Adımlar
+
+1. `ShareStep` numaralandırması (`Prepare/Init/Upload/Confirm/Probe/Delete`);
+   iki sağlayıcıdaki altı dizge onunla değişir.
+2. `ShareDiagnosis`'te `Message` yerine `Key` + `Args`. `Detail` olduğu gibi kalır
+   (geliştiriciye ait, hiçbir yerde gösterilmiyor — ayrı defter satırı).
+3. `ShareErrorClassifier` cümle kurmayı bırakır: anahtar ve argüman döndürür.
+   `Size` ve `Wait` biçimleri App'e geçer, `CurrentCulture` gövdeden düşer ve
+   muafiyet satırı `bicim-muafiyetleri.txt`'den silinir.
+4. Dört gösterim yeri `Say(result.Key, result.Args)` ile yazar.
+5. Yeni anahtarlar 42 dilde. Çeviri alt ajanlara dağıtılır; her dil dosyası
+   `KeysAreCompleteInEveryLanguage` ölçüsünden geçer.
+
+### Ölçü
+
+Core'da kullanıcıya giden cümle kalmadığı taranır (`BicimDisiYazimTests` deseniyle
+aynı yordam), her anahtarın 42 dilde bulunduğu ve yer tutucularının korunduğu
+sınanır, dört gösterim yerinin ham `Message` yazmadığı pimlenir. Mutasyon: anahtarı
+sabitlemek, argüman sırasını bozmak, `Size`'ı makine kültürüne döndürmek.
+
+### Sonuç
+
+Anahtar sayısı **27 değil 37** çıktı. Tarama, planın saymadığı 28. cümleyi buldu:
+`PresignedUploadProvider.cs:163` silme jetonu yokken Türkçe cümleyi Core'da kuruyordu
+(`share.error.token-lost`). Kalan fark biçim ve adım anahtarlarından:
+`share.size.unlimited`, `share.wait.*`, altı `share.step.*`.
+
+Tarama ilk koşumda yedi Türkçe dizge listeledi; altısı `new …Exception(` gövdesindeydi.
+İstisna metni geliştiriciye ait — `FromException` onu anahtara çeviriyor, ham metin yalnız
+hiçbir yerde gösterilmeyen `Detail`'de kalıyor. Tarayıcı bu kurulumları atlıyor; atlamanın
+kör bir muafiyet olmadığı `IShareProvider.cs` üstünden pozitif kontrolle pimli.
+
+`bicim-muafiyetleri.txt`'den `ShareErrorClassifier.cs` satırı düştü (5 → 4).
+
+| kesim | kırmızı |
+|---|---|
+| taban | 0 |
+| K1 bayt biçimlenmeden geçiyor | 2 |
+| K2 sınırsız eşiği kayıyor | 1 |
+| K3 bekleme birimi sınırı kayıyor | 1 |
+| K4 adımın anahtarı yanlış | 1 |
+| K5 tavan aşımında sığan hedef söylenmiyor | 3 |
+| K6 bir dilde anahtar eksik (ru) | 2 |
+| K7 bir dilde yer tutucu düşüyor (de) | 1 |
+| K8 Core yeniden cümle kuruyor | 2 |
+
+Sıfır yok. Toplam 77 ölçü; geri alındıktan sonra taban yine 0/77.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

@@ -1,4 +1,4 @@
-namespace VidShrink.Core.Share;
+﻿namespace VidShrink.Core.Share;
 
 /// <summary>
 /// Tek adımlı çok parçalı yükleme: dosya <c>files[]</c> alanıyla tek <c>POST</c>'ta gider,
@@ -36,7 +36,7 @@ public sealed class MultipartUploadProvider : IShareProvider
         IProgress<UploadProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        const string step = "yükleme";
+        const ShareStep step = ShareStep.Upload;
         try
         {
             var info = new FileInfo(filePath);
@@ -113,7 +113,7 @@ public sealed class MultipartUploadProvider : IShareProvider
 /// <remarks>
 /// <b>Açılışta çağrılmaz.</b> Uygulama açılırken sessizce ağa çıkmaz; yoklama ancak kullanıcı
 /// paylaş düğmesine bastığında yapılır. Hedef ölmüşse arayüz onu gri gösterir ve sebebini
-/// <see cref="ShareResult.Message"/> alanından yazar.
+/// <see cref="ShareResult.Key"/> anahtarından yazar.
 /// </remarks>
 public static class ShareHealth
 {
@@ -140,11 +140,11 @@ public static class ShareHealth
                     target.Id, string.Empty, url, string.Empty, DateTimeOffset.UtcNow));
 
             var text = await PresignedUploadProvider.ReadAsync(response, cancellationToken).ConfigureAwait(false);
-            return ShareResult.Failed(ShareErrorClassifier.FromResponse(target, response, text, "yoklama"));
+            return ShareResult.Failed(ShareErrorClassifier.FromResponse(target, response, text, ShareStep.Probe));
         }
         catch (Exception e) when (e is not OutOfMemoryException)
         {
-            return ShareResult.Failed(ShareErrorClassifier.FromException(target, e, "yoklama"));
+            return ShareResult.Failed(ShareErrorClassifier.FromException(target, e, ShareStep.Probe));
         }
     }
 }

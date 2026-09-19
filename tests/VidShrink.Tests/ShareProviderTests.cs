@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
@@ -233,7 +233,7 @@ public sealed class ShareProviderTests
 
         Assert.Equal(ShareFailure.ServiceError, result.Failure);
         Assert.Single(transport.Requests);
-        Assert.Contains("hizmet vermiyor", result.Message);
+        Assert.Equal("share.error.unavailable", result.Key);
     }
 
     // ---- uguu.se: tek adımlı akış -------------------------------------------------------
@@ -283,7 +283,8 @@ public sealed class ShareProviderTests
         var result = await provider.DeleteAsync(link);
 
         Assert.False(result.Ok);
-        Assert.Contains("3 saatlik otomatik silme", result.Message);
+        Assert.Equal("share.error.no-delete-token-hours", result.Key);
+        Assert.Equal(3, result.Args[1]);
         Assert.Empty(transport.Requests);
     }
 
@@ -332,7 +333,7 @@ public sealed class ShareProviderTests
         var result = await provider.UploadAsync(clip.Path);
 
         Assert.Equal(ShareFailure.NetworkFailure, result.Failure);
-        Assert.Contains("çözülemedi", result.Message);
+        Assert.Equal("share.error.host-not-found", result.Key);
     }
 
     [Theory]
@@ -433,7 +434,7 @@ public sealed class ShareProviderTests
 
         Assert.False(result.Ok);
         Assert.Equal(ShareFailure.NetworkFailure, result.Failure);
-        Assert.Contains("diğer hedefi deneyin", result.Message);
+        Assert.Equal("share.error.host-not-found", result.Key);
     }
 
     // ---- Sınıflandırma -------------------------------------------------------------------
@@ -449,9 +450,9 @@ public sealed class ShareProviderTests
         Assert.NotNull(diagnosis);
         Assert.Equal(ShareFailure.FileTooLarge, diagnosis!.Failure);
         Assert.Equal("storage.to", diagnosis.SuggestedTargetId);
-        Assert.Contains("128 MiB", diagnosis.Message);
-        Assert.DoesNotContain("128 MB", diagnosis.Message);
-        Assert.Contains("storage.to", diagnosis.Message);
+        Assert.Equal("share.error.too-large-try", diagnosis.Key);
+        Assert.Equal(128L * 1024 * 1024, diagnosis.Args[2]);
+        Assert.Equal("storage.to", diagnosis.Args[3]);
     }
 
     [Fact]
@@ -461,11 +462,11 @@ public sealed class ShareProviderTests
         using var response = new HttpResponseMessage(HttpStatusCode.TooManyRequests);
         response.Headers.TryAddWithoutValidation("Retry-After", "120");
 
-        var diagnosis = ShareErrorClassifier.FromResponse(target, response, "slow down", "init");
+        var diagnosis = ShareErrorClassifier.FromResponse(target, response, "slow down", ShareStep.Init);
 
         Assert.Equal(ShareFailure.RateLimited, diagnosis.Failure);
         Assert.Equal(TimeSpan.FromSeconds(120), diagnosis.RetryAfter);
-        Assert.Contains("2 dakika", diagnosis.Message);
+        Assert.Equal("share.error.rate-limited-wait", diagnosis.Key);
     }
 
     [Theory]
@@ -481,10 +482,10 @@ public sealed class ShareProviderTests
         var target = RealTable().Find("storage.to")!;
         using var response = new HttpResponseMessage(status);
 
-        var diagnosis = ShareErrorClassifier.FromResponse(target, response, "detay", "init");
+        var diagnosis = ShareErrorClassifier.FromResponse(target, response, "detay", ShareStep.Init);
 
         Assert.Equal(expected, diagnosis.Failure);
-        Assert.NotEmpty(diagnosis.Message);
+        Assert.NotEmpty(diagnosis.Key);
     }
 
     /// <summary>
@@ -511,7 +512,7 @@ public sealed class ShareProviderTests
             foreach (var status in known)
             {
                 using var response = new HttpResponseMessage(status);
-                ShareErrorClassifier.FromResponse(target, response, string.Empty, "init");
+                ShareErrorClassifier.FromResponse(target, response, string.Empty, ShareStep.Init);
             }
 
             Assert.Equal(known.Length, ShareErrorClassifier.ClassifiedCount);
@@ -520,7 +521,7 @@ public sealed class ShareProviderTests
 
             using var teapot = new HttpResponseMessage((HttpStatusCode)418);
             Assert.Equal(ShareFailure.Unknown,
-                ShareErrorClassifier.FromResponse(target, teapot, string.Empty, "init").Failure);
+                ShareErrorClassifier.FromResponse(target, teapot, string.Empty, ShareStep.Init).Failure);
             Assert.Equal(1, ShareErrorClassifier.UnknownCount);
         }
         finally
@@ -546,10 +547,9 @@ public sealed class ShareProviderTests
 
         Assert.Equal(ShareFailure.FileTooLarge, result.Failure);
         Assert.Equal("storage.to", result.SuggestedTargetId);
-        Assert.Contains("128 MiB", result.Message);
-        Assert.DoesNotContain("128 MB", result.Message);
-        Assert.Contains("storage.to", result.Message);
-        Assert.DoesNotContain("hiçbir hedefin", result.Message);
+        Assert.Equal("share.error.too-large-try", result.Key);
+        Assert.Equal(128L * 1024 * 1024, result.Args[2]);
+        Assert.Equal("storage.to", result.Args[3]);
         Assert.Empty(transport.Requests);
     }
 

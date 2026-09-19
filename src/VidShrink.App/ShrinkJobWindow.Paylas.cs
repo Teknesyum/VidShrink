@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using VidShrink.App.Localization;
 using VidShrink.Core;
 using CoreShare = VidShrink.Core.Share;
+using VidShrink.App.Share;
 
 namespace VidShrink.App;
 
@@ -121,7 +122,7 @@ public partial class ShrinkJobWindow
         ShareLinkRow.IsVisible = false;
         ShowShareStatus(result.Failure == CoreShare.ShareFailure.Cancelled
             ? Say("settings.share.cancelled")
-            : $"{Say("settings.share.failed")}: {result.Message}");
+            : $"{Say("settings.share.failed")}: {ShareMessage.Of(result)}");
     }
 
     private void OnShareCancel(object? sender, RoutedEventArgs e) => _shareFlow?.Cancel();

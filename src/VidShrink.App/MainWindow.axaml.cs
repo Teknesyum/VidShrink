@@ -30,6 +30,7 @@ using Avalonia.VisualTree;
 using VidShrink.App.Localization;
 using VidShrink.Core.Subtitles;
 using VidShrink.App.Subtitles;
+using VidShrink.App.Share;
 using VidShrink.App.Themes;
 using VidShrink.App.Performance;
 using VidShrink.App.Playback;
@@ -2115,7 +2116,7 @@ public partial class MainWindow : Window
         BtnShareDelete.IsEnabled = flow.CanDelete;
         TxtShareStatus.Text = result.Failure == CoreShare.ShareFailure.Cancelled
             ? Say("settings.share.cancelled")
-            : $"{Say("settings.share.failed")}: {result.Message}";
+            : $"{Say("settings.share.failed")}: {ShareMessage.Of(result)}";
     }
 
     private void OnShareCancel(object? sender, RoutedEventArgs e) => _shareFlow?.Cancel();
@@ -2150,7 +2151,7 @@ public partial class MainWindow : Window
         }
 
         BtnShareDelete.IsEnabled = flow.CanDelete;
-        TxtShareStatus.Text = $"{Say("settings.share.close-failed")}: {result.Message}";
+        TxtShareStatus.Text = $"{Say("settings.share.close-failed")}: {ShareMessage.Of(result)}";
     }
 
     /// <summary>
