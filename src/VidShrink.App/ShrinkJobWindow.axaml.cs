@@ -74,6 +74,7 @@ public partial class ShrinkJobWindow : Window
     private readonly ShellShrinkStartup _startup;
     private readonly ShrinkRequestQueue? _queue;
     private readonly string _language;
+    private readonly AppSettings _appSettings = LoadAppSettings();
     private readonly Queue<ShrinkRequest> _pending = new();
     private readonly List<string> _outputs = new();
     private CancellationTokenSource? _cts;
@@ -263,7 +264,7 @@ public partial class ShrinkJobWindow : Window
             var info = await FfprobeClient.ProbeAsync(request.Path, cts.Token);
             var options = new PlanOptions { TargetMb = request.TargetMegabytes };
             var plan = PlanCalculator.Build(info, options);
-            var output = UniqueOutputPath(request.Path);
+            var output = UniqueOutputPath(request.Path, _appSettings, plan, request.TargetMegabytes);
 
             var progress = new Progress<EncodeProgress>(step =>
             {
@@ -356,16 +357,31 @@ public partial class ShrinkJobWindow : Window
         base.OnClosing(e);
     }
 
-    private static string UniqueOutputPath(string inputPath)
+    /// <summary>
+    /// Kuyruk da ana pencereyle aynı yoldan geçer: sabit çıktı klasörü ve adlandırma deseni
+    /// burada da okunur. Eskiden bu pencerenin kendi kopyası vardı; ikisi de kullanıcının
+    /// ayarını görmüyordu.
+    /// </summary>
+    private static AppSettings LoadAppSettings()
     {
-        var dir = Path.GetDirectoryName(inputPath)!;
-        var name = Path.GetFileNameWithoutExtension(inputPath);
-        if (name.EndsWith("_shrunk", StringComparison.OrdinalIgnoreCase)) name = name[..^"_shrunk".Length];
-        var candidate = Path.Combine(dir, name + "_shrunk.mp4");
-        for (var index = 2; File.Exists(candidate); index++)
-            candidate = Path.Combine(dir, name + "_shrunk_" + index + ".mp4");
-        return candidate;
+        try { return AppSettings.Load(); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return new AppSettings(); }
     }
+
+    internal static string UniqueOutputPath(string inputPath, AppSettings settings, EncodePlan? plan, double targetMb)
+        => ShrinkEngine.UniqueOutputPath(
+            inputPath,
+            "shrunk",
+            "mp4",
+            MainWindow.UsableFixedFolder(settings.OutputFolderMode, settings.OutputFolder),
+            AdlandirmaDeseni.Uygula(settings.OutputNamePattern, new AdBilgisi(ShrinkEngine.KaynakAdi(inputPath))
+            {
+                HedefMb = targetMb,
+                Crf = plan?.Crf,
+                VideoBitrateK = plan?.VideoBitrateK,
+                Yukseklik = plan?.Height,
+                Kodek = plan?.Codec
+            }));
 
     /// <summary>
     /// İş bittiğinde yazılan satır. Arayüzden ayrı duruyor ki ölçülebilsin: hedefi aşan

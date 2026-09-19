@@ -82,19 +82,41 @@ public static class ShrinkEngine
     /// söyler; sessizce kaynağın yanına düşmek ayarı yalan yapar.
     /// </param>
     public static string UniqueOutputPath(string inputPath, string suffix = "shrunk", string extension = "mp4",
-        string? outputDirectory = null)
+        string? outputDirectory = null, string? baseName = null)
     {
         var dir = string.IsNullOrWhiteSpace(outputDirectory)
             ? Path.GetDirectoryName(inputPath)!
             : outputDirectory!;
-        var name = Path.GetFileNameWithoutExtension(inputPath);
         const int firstIndex = 2;
-        if (suffix == "shrunk" && name.EndsWith("_shrunk", StringComparison.OrdinalIgnoreCase))
-            name = name[..^"_shrunk".Length];
-        var candidate = Path.Combine(dir, $"{name}_{suffix}.{extension}");
+        string stem;
+        if (!string.IsNullOrWhiteSpace(baseName))
+        {
+            stem = baseName!;
+        }
+        else
+        {
+            var name = Path.GetFileNameWithoutExtension(inputPath);
+            if (suffix == "shrunk" && name.EndsWith("_shrunk", StringComparison.OrdinalIgnoreCase))
+                name = name[..^"_shrunk".Length];
+            stem = $"{name}_{suffix}";
+        }
+
+        var candidate = Path.Combine(dir, $"{stem}.{extension}");
         for (var index = firstIndex; PathEquals(candidate, inputPath) || File.Exists(candidate); index++)
-            candidate = Path.Combine(dir, $"{name}_{suffix}_{index}.{extension}");
+            candidate = Path.Combine(dir, $"{stem}_{index}.{extension}");
         return candidate;
+    }
+
+    /// <summary>
+    /// Kaynağın adından desenin okuduğu <c>{ad}</c> değeri: <c>_shrunk</c> eki bir kez
+    /// kırpılır, yoksa küçültülen dosya her turda uzar.
+    /// </summary>
+    public static string KaynakAdi(string inputPath)
+    {
+        var name = Path.GetFileNameWithoutExtension(inputPath);
+        return name.EndsWith("_shrunk", StringComparison.OrdinalIgnoreCase)
+            ? name[..^"_shrunk".Length]
+            : name;
     }
 
     public static Task<EncodeResult> EncodeAsync(

@@ -933,3 +933,27 @@ yalnız dosya adı, tam yol değil.
 E3 sabit klasör işinin doğrudan devamı; E8 ölçüm koşumu ister; E7 en geniş yüzey.
 
 **Her adımın ölçüsü mutasyonla kapanır** ve `docs/olcumler/` altına yazılır.
+
+### E3 Kararı: Yer Tutucu Kümesi (2026-09-19)
+
+Plandaki dört yer tutucu yazılırken bir sorun çıktı: `{kalite}` adı boyutu gösterirse
+ad kullanıcıya yalan söyler — defter 28'in tam konusu. Küme dürüst adlarla kapandı:
+
+| Yer tutucu | Değer | Yoksa |
+|---|---|---|
+| `{ad}` | kaynağın adı (`_shrunk` eki kırpılır) | — |
+| `{hedef}` | hedef boyut, `25mb` | boş |
+| `{kalite}` | kodlayıcının kalite kolu: `crf26` ya da `2500k` | boş |
+| `{cozunurluk}` | çıktı yüksekliği, `720p` | boş |
+| `{kodek}` | `h264` / `hevc` / `av1` | boş |
+| `{tarih}` | `2026-09-19` | — |
+
+Tanınmayan yer tutucu reddedilir; değeri olmayan yer tutucu boşa düşer ve arta kalan
+ayırıcılar sadeleşir. Çakışma sayacı desenden **sonra** işler.
+
+**Yolda çıkan ikinci kopya.** `ShrinkJobWindow.axaml.cs:359` kendi `UniqueOutputPath`'ini
+taşıyor: sabit çıktı klasörünü de, deseni de görmüyor. Kuyruğa atılan dosyaların çıktısı
+ayardan bağımsız olarak hep kaynağın yanına düşüyor. Kopya silinir, kuyruk da motorun
+tek yolunu kullanır.
+
+**CLI kapsam dışı:** `--cikti` zaten tam yolu veriyor, desen orada ikinci bir yol olurdu.

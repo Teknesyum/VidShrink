@@ -254,6 +254,7 @@ public partial class MainWindow : Window
         Watch(CmbTheme, SelectingItemsControl.SelectedIndexProperty, OnThemeChosen);
         Watch(RbOutputFixed, ToggleButton.IsCheckedProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
+        Watch(TxtOutputName, TextBox.TextProperty, OnOutputNameChanged);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Player.Opened += OnPlayerOpened;
@@ -1000,6 +1001,7 @@ public partial class MainWindow : Window
         TxtResetSettingsConfirm.Text = Strings.Get("settings.reset-confirm");
         BtnConfirmResetSettings.Content = Strings.Get("settings.reset-confirm-button");
         BtnCancelResetSettings.Content = Strings.Get("settings.reset-cancel");
+        RefreshOutputNamePreview();
     }
 
     /// <summary>Çıktı klasörü kipi: 0 kaynağın yanı, 1 sabit klasör. Kayıtlı ayarla aynı sayı.</summary>
@@ -1330,6 +1332,7 @@ public partial class MainWindow : Window
             AdvKeepTracks = ChkAdvKeepTracks.IsChecked == true,
             OutputFolderMode = OutputFolderModeIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
+            OutputNamePattern = TxtOutputName.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
             FollowRecording = ChkFollowRecording.IsChecked == true,
             FfmpegPathMode = FfmpegPathModeIndex,
@@ -1366,7 +1369,11 @@ public partial class MainWindow : Window
 
             OutputFolderModeIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
             TxtOutputFolder.Text = settings.OutputFolder;
+            TxtOutputName.Text = string.IsNullOrWhiteSpace(settings.OutputNamePattern)
+                ? AdlandirmaDeseni.Varsayilan
+                : settings.OutputNamePattern;
             OutputFolderPickerRow.IsVisible = settings.OutputFolderMode == 1;
+            RefreshOutputNamePreview();
 
             _theme = PaletteCatalog.Use(settings.Theme);
             MarkChosenTheme();
@@ -1404,6 +1411,49 @@ public partial class MainWindow : Window
         OutputFolderPickerRow.IsVisible = OutputFolderModeIndex == 1;
         SaveAppSettings();
     }
+
+    /// <summary>Kullanıcının yazdığı desen: geçerliyse örnek, değilse gerekçe yazılır.</summary>
+    private void OnOutputNameChanged()
+    {
+        RefreshOutputNamePreview();
+        SaveAppSettings();
+    }
+
+    private void OnResetOutputName(object? sender, RoutedEventArgs e)
+        => TxtOutputName.Text = AdlandirmaDeseni.Varsayilan;
+
+    private void RefreshOutputNamePreview()
+    {
+        var desen = TxtOutputName.Text;
+        if (AdlandirmaDeseni.Hata(desen) is { } hata)
+        {
+            LblOutputNamePreview.Text = Strings.Get(hata);
+            LblOutputNamePreview.Classes.Set("error", true);
+            return;
+        }
+
+        LblOutputNamePreview.Classes.Set("error", false);
+        LblOutputNamePreview.Text = string.Format(
+            CultureInfo.CurrentCulture,
+            Strings.Get("settings-tab.output-name.preview"),
+            AdlandirmaDeseni.Uygula(desen, OrnekAdBilgisi()) + ".mp4");
+    }
+
+    /// <summary>Örnek satırın verileri; ekranda dosya yokken de desen okunabilmeli.</summary>
+    private AdBilgisi OrnekAdBilgisi()
+        => _info is null
+            ? new AdBilgisi("video") { HedefMb = ParseTargetMb(), Crf = 26, Yukseklik = 720, Kodek = "libx264" }
+            : AdBilgisiFor(_info.FilePath, ActivePlan);
+
+    private AdBilgisi AdBilgisiFor(string inputPath, EncodePlan? plan)
+        => new(ShrinkEngine.KaynakAdi(inputPath))
+        {
+            HedefMb = _chipSizeCapped ? ParseTargetMb() : null,
+            Crf = plan?.Crf,
+            VideoBitrateK = plan?.VideoBitrateK,
+            Yukseklik = plan?.Height,
+            Kodek = plan?.Codec
+        };
 
     private void OnFfmpegPathModeChanged()
     {
@@ -3553,7 +3603,7 @@ public partial class MainWindow : Window
         RefreshDurationView();
         RefreshAdvancedHints();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments(_info, plan,
-            BuildUniqueOutputPath(_info.FilePath, "shrunk", plan.Streams?.Extension ?? "mp4"), _encoders, _sceneMap?.Map));
+            BuildUniqueOutputPath(_info.FilePath, "shrunk", plan.Streams?.Extension ?? "mp4", plan), _encoders, _sceneMap?.Map));
     }
 
     /// <summary>
@@ -3875,9 +3925,10 @@ public partial class MainWindow : Window
     private bool FixedFolderUnusable =>
         OutputFolderModeIndex == 1 && UsableFixedFolder(OutputFolderModeIndex, TxtOutputFolder.Text) is null;
 
-    private string BuildUniqueOutputPath(string inputPath, string suffix, string extension)
+    private string BuildUniqueOutputPath(string inputPath, string suffix, string extension, EncodePlan? plan = null)
         => ShrinkEngine.UniqueOutputPath(inputPath, suffix, extension,
-            UsableFixedFolder(OutputFolderModeIndex, TxtOutputFolder.Text));
+            UsableFixedFolder(OutputFolderModeIndex, TxtOutputFolder.Text),
+            suffix == "shrunk" ? AdlandirmaDeseni.Uygula(TxtOutputName.Text, AdBilgisiFor(inputPath, plan)) : null);
 
     private void OnTargetSliderChanged()
     {
@@ -4263,7 +4314,7 @@ public partial class MainWindow : Window
     {
         if (_info is null || ActivePlan is null || _cts is not null) return;
 
-        var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", ActivePlan.Streams?.Extension ?? "mp4");
+        var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", ActivePlan.Streams?.Extension ?? "mp4", ActivePlan);
         if (FixedFolderUnusable)
             TxtResult.Text = Say("settings-tab.output-folder.unusable", TxtOutputFolder.Text ?? "");
         var targetMb = ParseTargetMb();

@@ -34,6 +34,9 @@ public sealed class AppSettings
     public int OutputFolderMode { get; set; }
     public string OutputFolder { get; set; } = "";
 
+    /// <summary>Çıktı adının deseni; boşsa <see cref="AdlandirmaDeseni.Varsayilan"/>.</summary>
+    public string OutputNamePattern { get; set; } = VidShrink.Core.AdlandirmaDeseni.Varsayilan;
+
     public bool AdvancedDefaultOpen { get; set; }
 
     public bool FollowRecording { get; set; }
@@ -83,6 +86,7 @@ public sealed class AppSettings
             ReadBool(root, "advKeepTracks", value => settings.AdvKeepTracks = value);
             ReadInt(root, "outputFolderMode", value => settings.OutputFolderMode = value);
             ReadString(root, "outputFolder", value => settings.OutputFolder = value);
+            ReadString(root, "outputNamePattern", value => settings.OutputNamePattern = value);
             ReadString(root, "theme", value => settings.Theme = value);
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
@@ -150,6 +154,7 @@ public sealed class AppSettings
         root["theme"] = Theme;
         root["outputFolderMode"] = OutputFolderMode;
         root["outputFolder"] = OutputFolder;
+        root["outputNamePattern"] = OutputNamePattern;
         root["advancedDefaultOpen"] = AdvancedDefaultOpen;
         root["followRecording"] = FollowRecording;
         root["ffmpegPathMode"] = FfmpegPathMode;
