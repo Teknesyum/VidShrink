@@ -16,6 +16,7 @@ trash/
 .claude/sonra.md
 .claude/acik.md
 .claude/kapali.md
+.claude/kanit/
 
 # Kurucunun sha256 ile indirdigi libmpv; depoya girmez
 tools/libmpv/
