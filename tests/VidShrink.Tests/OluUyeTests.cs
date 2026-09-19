@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -820,7 +820,6 @@ public sealed class OluUyeTests
         "QualityAnchor.SpreadHalvings  hic-gorunmeyen",
         "QualityLevel.SlopeMeasured  yalniz-disarida",
         "QualityMeasurementFailedException.PartialScore  yalniz-disarida",
-        "QualityScore.Alignment  yalniz-disarida",
         "QualityScore.ColorNormalization  yalniz-disarida",
         "QualityScore.Ssim  yalniz-disarida",
         "QualityScore.TonemappedReference  yalniz-disarida",
@@ -857,7 +856,6 @@ public sealed class OluUyeTests
         "TimelinePoint.OutputFrame  yalniz-disarida",
         "TimelinePoint.OutputSeconds  yalniz-disarida",
         "TimelinePoint.SourceSeconds  yalniz-disarida",
-        "TimestampAlignment.Note  yalniz-disarida",
         "TrimOutcome.Rounds  yalniz-disarida",
         "UnknownCaptureDeviceException.DeviceName  yalniz-disarida",
         "WatchEntry.ProcessedUtc  yalniz-disarida",

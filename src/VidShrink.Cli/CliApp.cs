@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -393,7 +393,7 @@ public static class CliApp
             WriteDecision(writer, request, decision);
         });
 
-    private static string ShrinkText(CliDecision decision, EncodeResult result, TimeSpan elapsed, QualityScore? vmaf, CliText text)
+    public static string ShrinkText(CliDecision decision, EncodeResult result, TimeSpan elapsed, QualityScore? vmaf, CliText text)
     {
         var builder = new StringBuilder();
         builder.AppendLine(text.Format("result.output", result.OutputPath));
@@ -404,6 +404,8 @@ public static class CliApp
             ? text.Format("result.vmaf", Num(score, "0.0", text))
             : text["result.vmaf-none"]);
         builder.AppendLine(text.Format("result.predicted", Num(decision.Result.PredictedQuality, "0.0", text), Basis(decision.Result.Estimate.Measured, text)));
+        if (vmaf?.Alignment is { } alignment && alignment.Shifted)
+            builder.AppendLine(text.Format("result.alignment", Num(alignment.ShiftMilliseconds, "0.###", text), Num(alignment.ShiftFrames, "0.###", text)));
         if (result.Success && result.UnderBand) builder.AppendLine(text["result.under-band"]);
         if (result.CeilingExceeded)
             builder.AppendLine(result.Success
@@ -412,7 +414,7 @@ public static class CliApp
         return builder.ToString();
     }
 
-    private static string ShrinkJson(CliRequest request, CliDecision decision, EncodeResult result, TimeSpan elapsed,
+    public static string ShrinkJson(CliRequest request, CliDecision decision, EncodeResult result, TimeSpan elapsed,
         QualityScore? vmaf, int exit)
         => Json(!request.JsonLines, writer =>
         {
@@ -430,6 +432,14 @@ public static class CliApp
             writer.WriteBoolean("overTarget", result.OverTarget);
             if (result.Error is null) writer.WriteNull("error"); else writer.WriteString("error", result.Error);
             if (vmaf?.VmafNegMean is { } score) writer.WriteNumber("vmaf", Math.Round(score, 2)); else writer.WriteNull("vmaf");
+            if (vmaf?.Alignment is { } alignment && alignment.Shifted)
+            {
+                writer.WriteStartObject("alignment");
+                writer.WriteNumber("shiftMs", Math.Round(alignment.ShiftMilliseconds, 3));
+                writer.WriteNumber("shiftFrames", Math.Round(alignment.ShiftFrames, 3));
+                writer.WriteEndObject();
+            }
+            else writer.WriteNull("alignment");
             writer.WriteStartArray("trace");
             foreach (var attempt in result.Trace ?? Array.Empty<EncodeAttempt>())
             {

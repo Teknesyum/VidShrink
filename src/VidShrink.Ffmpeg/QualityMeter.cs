@@ -32,12 +32,8 @@ public sealed record TimestampAlignment(
 
     public bool Shifted => Math.Abs(ShiftSeconds) > 1e-6;
 
-    public string? Note => Shifted
-        ? "Kaynak ve test zaman damgaları "
-          + (ShiftSeconds * 1000).ToString("0.###", CultureInfo.InvariantCulture) + " ms ("
-          + ShiftFrames.ToString("0.###", CultureInfo.InvariantCulture)
-          + " kare) ayrık; kareler zaman damgasına değil kare indeksine eşlendi."
-        : null;
+    /// <summary>Kaymanın milisaniye cinsinden hali; rapor yüzeyleri metni kendi dilinde kurar.</summary>
+    public double ShiftMilliseconds => ShiftSeconds * 1000;
 }
 
 public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement

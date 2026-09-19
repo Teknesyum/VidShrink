@@ -273,13 +273,13 @@ public sealed class QualityMeterTests
 
             Assert.NotNull(clean.Alignment);
             Assert.False(clean.Alignment!.Shifted);
-            Assert.Null(clean.Alignment.Note);
+            Assert.Equal(0, clean.Alignment.ShiftMilliseconds, 6);
 
             Assert.NotNull(overShift.Alignment);
             Assert.True(overShift.Alignment!.Shifted);
             Assert.Equal(0.02, overShift.Alignment.ShiftSeconds, 4);
             Assert.Equal(0.6, overShift.Alignment.ShiftFrames, 3);
-            Assert.Contains("kare indeksine", overShift.Alignment.Note);
+            Assert.Equal(20, overShift.Alignment.ShiftMilliseconds, 3);
         }
         finally { Cleanup(dir); }
     }
