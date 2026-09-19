@@ -13,8 +13,8 @@ dört bölümünde bu belgelere atıf yaptığı için 18 Eylül 2026'da buraya 
 | `fable-kararlar-2026-09-17.md` | fable danışmasının kararları (K/B numaraları) |
 | `ortak-kurallar.md` | dalgaya giren ajanların ortak kuralları |
 
-**Bilinen borç.** HandBrake tarafı ham `HandBrakeCLI --help` çıktısından değil, WebFetch
-özetinden tarandı ve karşılaştırılan HandBrake sürümü bir commit'e sabitlenmedi. Bu yüzden
-~150 uzun bayrağın dokuz kümesi hiç görülmedi; `.claude/acik.md`'deki E1-E9 satırları bu
-kümelerden çıktı. Kapanışı için `docs/olcumler/` altına sürümüyle birlikte bir
-`HandBrakeCLI --help` dökümü alınmalı.
+~~**Bilinen borç.** HandBrake tarafı ham `HandBrakeCLI --help` çıktısından değil, WebFetch
+özetinden tarandı ve karşılaştırılan HandBrake sürümü bir commit'e sabitlenmedi.~~
+**Kapandı 19 Eylül 2026:** döküm alındı ve envanter onunla karşılaştırıldı —
+`envanter-tamlik-2026-09-18.md`, kaynak `HandBrakeCLI 1.11.2`'nin kendi `--help` çıktısı
+(737 satır, ağa çıkılmadan). Bu belgedeki bu paragraf dökümden sonra güncellenmemişti.

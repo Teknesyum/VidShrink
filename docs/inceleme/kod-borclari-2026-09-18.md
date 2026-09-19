@@ -137,8 +137,10 @@ açıkça "bu kod kalkacak" diyor.
     ölçüsüzdü (geri dönen oynatıcı olayı, patlayan açılış); ikisi de pimlendi.
     Ölçüm `docs/olcumler/k8-odak-korumalari-2026-09-19.md` (taban 0/14, üç kesimin üçü
     kırmızı).
-20. `docs/handbrake/README.md:16-22` — Envanter borcu; ölçümü
-    `docs/handbrake/envanter-tamlik-2026-09-18.md`'de.
+20. ~~`docs/handbrake/README.md:16-22` — Envanter borcu; ölçümü
+    `docs/handbrake/envanter-tamlik-2026-09-18.md`'de.~~ **Kapandı:** borç zaten
+    ödenmişti (döküm HandBrakeCLI 1.11.2'nin kendi `--help` çıktısından alınmıştı),
+    yalnız README'deki itiraf paragrafı güncellenmemişti. Paragraf kapanışı gösteriyor.
 
 ## Sonradan çıkan (19 Eylül 2026)
 
