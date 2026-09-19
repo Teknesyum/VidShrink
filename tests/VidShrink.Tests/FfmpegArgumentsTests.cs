@@ -343,6 +343,13 @@ public sealed class FfmpegArgumentsTests
         Assert.Contains("_segments.Describe(info, plan, Math.Max(0, startSeconds), SignatureOutput, _profile)", panelSource);
     }
 
+    /// <summary>
+    /// Isinma listesi psy/AQ secenegi olan her kodlayiciyi kapsar. NVENC 2026-09-19'da
+    /// listeye girdi: uc nvenc kodegi de <c>-lookahead_level</c> yokluyor
+    /// (<c>docs/olcumler/nvenc-kalite-kollari.md</c>). Isinmasalardi ilk kodlama bayragi
+    /// sessizce kaybederdi -- <c>Build</c> saf oldugu icin isitilmamis secenegi
+    /// desteklenmiyor sayar. QSV ve AMF hala listede degil: o saticilarda olculen kol yok.
+    /// </summary>
     [Fact]
     public void Yoklama_isinmasi_psy_secenegi_olan_her_kodlayiciyi_arka_planda_sorar()
     {
@@ -352,7 +359,10 @@ public sealed class FfmpegArgumentsTests
 
         Assert.Contains(("libx265", "-x265-params"), recorder.Warmed);
         Assert.Contains(("libsvtav1", "-svtav1-params"), recorder.Warmed);
-        Assert.DoesNotContain(recorder.Warmed, w => w.Codec.Contains("nvenc"));
+        Assert.Contains(("h264_nvenc", "-lookahead_level"), recorder.Warmed);
+        Assert.Contains(("hevc_nvenc", "-lookahead_level"), recorder.Warmed);
+        Assert.Contains(("av1_nvenc", "-lookahead_level"), recorder.Warmed);
+        Assert.DoesNotContain(recorder.Warmed, w => w.Codec.Contains("qsv") || w.Codec.Contains("amf"));
     }
 
     /// <summary>
@@ -932,9 +942,9 @@ public sealed class FfmpegArgumentsTests
 
     /// <summary>
     /// Donanim ust siniri olculen 5 saniyede sabit ve haritadan bagimsiz: uzun sahneli
-    /// harita bile 60 fps'te <c>-g 300</c> almali. Donanimda sahne kesimi olmadigi icin
-    /// ust sinir gerceklesen araligin kendisi, yani dogrudan atlama butcesi; 2 sn'ye
-    /// indirilirse 120 gelir ve bu olcu kizarir.
+    /// harita bile 60 fps'te <c>-g 300</c> almali. Ust sinir atlama butcesinin <b>ust
+    /// siniri</b>: lookahead acikken NVENC sahne kesimine I-kare ekleyebilir, aralik
+    /// kisalabilir ama uzayamaz. 2 sn'ye indirilirse 120 gelir ve bu olcu kizarir.
     /// </summary>
     [Fact]
     public void Donanim_ust_siniri_bes_saniyede_sabit()
@@ -946,10 +956,11 @@ public sealed class FfmpegArgumentsTests
     }
 
     /// <summary>
-    /// Donanimda sahne kesimi yok (ffmpeg <c>-h encoder=hevc_nvenc</c>: <c>-no-scenecut</c>
-    /// yalniz lookahead acikken is goruyor, bu proje lookahead acmiyor). Orada ust sinir
-    /// gerceklesen araligin kendisi oldugu icin harita ust siniri oynatmaz ve deger
-    /// yazilim yolundaki varsayilandan kisa kalir.
+    /// Donanimda ust siniri sahne haritasi oynatmaz: harita yalnizca yazilim yolunda
+    /// aralik uretir, donanimda tavan sabit gelir ve yazilim yolundaki varsayilandan
+    /// kisa kalir. Sahne kesiminin kendisi donanimda artik kapali degil — lookahead
+    /// acildi (<c>Psychovisual</c>) — ama kestigi yer araligi yalnizca <b>kisaltir</b>,
+    /// burada olculen ust sinira dokunmaz.
     /// </summary>
     [Theory]
     [InlineData("av1_nvenc")]

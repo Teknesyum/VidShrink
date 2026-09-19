@@ -111,3 +111,79 @@ Her kol ürünün gerçek satırından yalnız o bayrakla ayrılıyor; bayt, kbp
 İki kazanan kolun ürüne alınması ayrı bir karar: `-highbitdepth 1` 8 bit kaynaktan 10 bit
 çıktı üretiyor (oynatma uyumluluğu), lookahead ise `FfmpegArguments.cs:262`'de yazılı
 anahtar kare yerleşim garantisini değiştiriyor. İkisi de danışmaya verildi.
+
+## Lookahead Turu: Seviye 1 mi 3 mü, Ne Kadar Sürüyor, Kaç I-Kare
+
+
+Danışma üç koşul koydu (`docs/danisma/2026-09-19-fable-nvenc-kalite-kollari.md`): kodlama
+süresi ve gerçekleşen I-kare sayısı tabloya girsin, `-lookahead_level 1` ile 3
+karşılaştırılsın, donanım tavanı "eşit" değil "≤" olarak yeniden temellendirilsin. İlk ikisi
+burada, üçüncüsü `FfmpegArguments.cs`'de. Her kolda `-rc-lookahead 20` var; ayrışan tek şey
+seviye. Betik `tools/nvenc-2/lookahead.sh`, ham tablo `.calisma/nvenc-2/lookahead*.tsv`.
+
+### h264_nvenc
+
+| kesit | kol | saniye | I-kare | bayt | VMAF-neg ort | p10 | XPSNR |
+|---|---|---|---|---|---|---|---|
+| karanlik | taban | 1.1 | 2 | 2 599 295 | 90.724 | 83.192 | 37.612 |
+| karanlik | `-lookahead_level 1` | 0.9 | 2 | 2 576 124 (-0.89 %) | 90.664 | 84.598 | 37.437 |
+| karanlik | `-lookahead_level 3` | 1.5 | 2 | 2 486 223 (-4.35 %) | 91.398 | 86.253 | 37.629 |
+| parlak | taban | 0.9 | 2 | 3 365 695 | 90.497 | 77.817 | 38.689 |
+| parlak | `-lookahead_level 1` | 1.2 | 2 | 3 179 103 (-5.54 %) | 90.023 | 79.238 | 38.225 |
+| parlak | `-lookahead_level 3` | 1.6 | 2 | 3 192 538 (-5.14 %) | 90.702 | 81.646 | 38.520 |
+| hareketli | taban | 1.0 | 2 | 2 779 921 | 93.111 | 82.865 | 37.478 |
+| hareketli | `-lookahead_level 1` | 1.1 | 2 | 2 597 988 (-6.54 %) | 93.094 | 83.616 | 37.113 |
+| hareketli | `-lookahead_level 3` | 1.5 | 2 | 2 579 646 (-7.20 %) | 93.421 | 84.098 | 37.165 |
+
+### hevc_nvenc
+
+| kesit | kol | saniye | I-kare | bayt | VMAF-neg ort | p10 | XPSNR |
+|---|---|---|---|---|---|---|---|
+| karanlik | taban | 1.0 | 2 | 2 656 500 | 94.458 | 89.602 | 39.288 |
+| karanlik | `-lookahead_level 1` | 0.9 | 2 | 2 708 349 (+1.95 %) | 94.636 | 90.440 | 39.471 |
+| karanlik | `-lookahead_level 3` | 0.9 | 2 | 2 692 564 (+1.36 %) | 94.960 | 90.993 | 39.573 |
+| parlak | taban | 0.9 | 2 | 3 382 128 | 92.635 | 87.652 | 39.692 |
+| parlak | `-lookahead_level 1` | 1.0 | 2 | 3 326 691 (-1.64 %) | 92.252 | 86.842 | 39.589 |
+| parlak | `-lookahead_level 3` | 1.0 | 2 | 3 359 215 (-0.68 %) | 92.730 | 88.004 | 39.653 |
+| hareketli | taban | 0.9 | 2 | 2 788 303 | 96.837 | 90.150 | 39.650 |
+| hareketli | `-lookahead_level 1` | 1.0 | 2 | 2 768 827 (-0.70 %) | 96.998 | 91.224 | 39.698 |
+| hareketli | `-lookahead_level 3` | 1.1 | 2 | 2 763 506 (-0.89 %) | 97.098 | 91.296 | 39.632 |
+
+### av1_nvenc
+
+| kesit | kol | saniye | I-kare | bayt | VMAF-neg ort | p10 | XPSNR |
+|---|---|---|---|---|---|---|---|
+| karanlik | taban | 1.0 | 2 | 2 546 981 | 95.690 | 91.276 | 39.058 |
+| karanlik | `-lookahead_level 1` | 1.1 | 2 | 2 561 317 (+0.56 %) | 95.771 | 91.321 | 39.486 |
+| karanlik | `-lookahead_level 3` | 1.3 | 2 | 2 543 921 (-0.12 %) | 95.953 | 91.764 | 39.489 |
+| parlak | taban | 1.1 | 2 | 3 200 340 | 93.648 | 89.679 | 39.645 |
+| parlak | `-lookahead_level 1` | 1.1 | 2 | 3 178 260 (-0.69 %) | 93.165 | 88.221 | 39.656 |
+| parlak | `-lookahead_level 3` | 1.3 | 2 | 3 165 165 (-1.10 %) | 93.363 | 88.604 | 39.670 |
+| hareketli | taban | 1.1 | 2 | 2 738 492 | 97.500 | 91.619 | 39.882 |
+| hareketli | `-lookahead_level 1` | 1.1 | 2 | 2 705 541 (-1.20 %) | 97.539 | 91.956 | 40.013 |
+| hareketli | `-lookahead_level 3` | 1.2 | 2 | 2 693 162 (-1.66 %) | 97.578 | 92.146 | 39.969 |
+
+## Karar
+
+`-rc-lookahead 20 -lookahead_level 3` **alındı**. Dokuz hücrede (3 kesit × 3 NVENC kodeği)
+p10'un 9'unda, ortalamanın 8'inde tabanı geçiyor — tek kayıp av1/parlak ortalaması — ve
+bunu 9 hücrenin 7'sinde **daha az baytla** yapıyor. En büyük kazanç h264'te: parlak
+kesitte p10 77,817 → 81,646.
+
+`-lookahead_level 1` alınmadı: dokuz hücrenin dokuzunda seviye 3'ün altında ve üçünde
+tabanın da altında. Seviye boş bir düğme değil, ölçülen seviye 3.
+
+**Kolun bedeli ölçüldü ama kesin değil:** seviye 3'ün kodlama süresi 10 sn'lik kesitlerde
+0,9-1,1 sn yerine 1,1-1,6 sn. Mutlak fark 0,5 sn'nin altında ve bu ölçekte zamanlayıcı
+gürültüsü büyük; gerçek bir verim ölçümü (uzun kaynak, tekrarlı koşum) yapılmadı.
+
+**Gerçekleşen I-kare sayısı her kolda aynı çıktı (2).** Yani lookahead'in sahne kesimine
+I-kare ekleme mekanizması bu üç kesitte hiç tetiklenmedi ve gerçekleşen aralık hâlâ tam
+tavana eşit. Buna rağmen `FfmpegArguments.cs`'deki gerekçe "aralık = tavan"dan
+"aralık ≤ tavan"a çevrildi: garanti artık malzemeye değil kurala dayanıyor.
+
+`-highbitdepth 1` **alınmadı**. 6/6 kazanıyor ama 8 bit kaynaktan 10 bit çıktı üretiyor;
+danışmanın okuması, paylaşım kanallarının (WhatsApp, Telegram, Instagram) yüklenen videoyu
+zaten 8 bit'e çevirdiği, yani kazancın kanalda buharlaştığı ve geriye yalnız "eski cihazda
+hiç açılmıyor" riskinin kaldığı yönünde. Kol reddedilmedi, açık bir kalite kipine ertelendi.
+

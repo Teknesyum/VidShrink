@@ -4,7 +4,7 @@ set -u
 # olculmeyen sure kiyaslanamaz.
 D=.calisma/nvenc-2
 B=tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll
-OUT=$D/lookahead.tsv
+OUT=${OUT:-$D/lookahead.tsv}
 echo -e "kesit\tkodek\tkol\tsaniye\tikare\tbayt\tkbps\tvmafneg_ort\tvmafneg_harm\tvmafneg_p10\txpsnr" > $OUT
 kos() {
   kesit="$1"; kod="$2"; on="$3"; ad="$4"; shift 4
@@ -30,6 +30,9 @@ for k in karanlik parlak hareketli; do
   kos $k hevc_nvenc p4 taban
   kos $k hevc_nvenc p4 la1 -rc-lookahead 20 -lookahead_level 1
   kos $k hevc_nvenc p4 la3 -rc-lookahead 20 -lookahead_level 3
+  kos $k h264_nvenc p4 taban
+  kos $k h264_nvenc p4 la1 -rc-lookahead 20 -lookahead_level 1
+  kos $k h264_nvenc p4 la3 -rc-lookahead 20 -lookahead_level 3
   kos $k av1_nvenc p6 taban
   kos $k av1_nvenc p6 la1 -rc-lookahead 20 -lookahead_level 1
   kos $k av1_nvenc p6 la3 -rc-lookahead 20 -lookahead_level 3

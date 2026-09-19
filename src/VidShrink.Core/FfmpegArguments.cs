@@ -258,12 +258,22 @@ public static class FfmpegArguments
     // 20 s produce the same three I-frames at the same places - so 10 s is the ceiling of the
     // clamp, and it agrees with HandBrake's keyint = 10*fps.
     //
-    // Hardware is a different mechanism and gets its own ceiling. NVENC only inserts an I-frame
-    // at a scene cut when lookahead is on (ffmpeg -h encoder=hevc_nvenc: "-no-scenecut ... When
-    // lookahead is enabled"), and this project does not turn lookahead on, so on hardware the
-    // ceiling is the whole placement rule: the realized interval is exactly the ceiling and the
-    // seek cost is exactly what the ceiling says. HardwareKeyframeCeilingSeconds is therefore
-    // the seek budget itself, not a content-derived number.
+    // Hardware is a different mechanism and gets its own ceiling. NVENC inserts an I-frame at a
+    // scene cut only when lookahead is on (ffmpeg -h encoder=hevc_nvenc: "-no-scenecut ... When
+    // lookahead is enabled"). This project DOES turn lookahead on now wherever the encoder
+    // accepts it (Psychovisual: -rc-lookahead 20 -lookahead_level 3, measured in
+    // docs/olcumler/nvenc-kalite-kollari.md), so the ceiling is an upper bound and no longer the
+    // whole placement rule: a scene cut may shorten the realized interval, nothing may lengthen
+    // it, and the seek cost is at most what the ceiling says. That is the same semantics the
+    // software path already has through x264/x265 scenecut.
+    //
+    // The shortening was not observed in that measurement: all three clips came out with the
+    // same two I-frames in every arm, baseline and lookahead alike, so on that material the
+    // realized interval still equals the ceiling. The sentence above is about the guarantee, not
+    // about what those clips did - the guarantee is now "<= ceiling", and a pin reading
+    // "== ceiling" would be pinning the material rather than the rule.
+    // HardwareKeyframeCeilingSeconds is still the seek budget and still not a content-derived
+    // number; content can only spend less of it.
     // The software CRF path keeps a VBV cap where HandBrake leaves one out (encx265.c:514-522
     // fills VBV only on user request or for DoVi). Measured on parca-1-20sn at CRF 23, libx264,
     // same colour space and stream count on both sides. Quality and size do not carry the
@@ -326,7 +336,9 @@ public static class FfmpegArguments
 
     /// <summary>
     /// Kodlayıcının uyacağı anahtar kare aralığı. Yerleşim kararı aralığın içinde kodlayıcıya
-    /// bırakılır; donanımda sahne kesimi olmadığı için üst sınır aralığın kendisidir.
+    /// bırakılır. Donanımda üst sınır <b>üst sınırdır</b>: lookahead açıldığından beri NVENC
+    /// sahne kesimine I-kare ekleyebilir, yani gerçekleşen aralık tavana eşit ya da ondan
+    /// kısadır — uzun olamaz.
     /// </summary>
     public static KeyframeRange KeyframeInterval(string codec, double fps, SceneMap? scenes = null)
     {
@@ -650,6 +662,21 @@ public static class FfmpegArguments
         else if (codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase)
                  && Supported("-svtav1-params", "tune=1:enable-variance-boost=0"))
             args.AddRange(new[] { "-svtav1-params", "tune=1:enable-variance-boost=0" });
+        // NVENC's lookahead. Measured in docs/olcumler/nvenc-kalite-kollari.md over three clips
+        // (dark, bright, motion) x three NVENC encoders at the product's own bitrate line:
+        // -lookahead_level 3 wins VMAF-neg p10 in 9 of 9 cells and the mean in 8 of 9 (av1 on
+        // the bright clip is the one loss), and in 7 of 9 it does so with FEWER bytes. Level 1
+        // was measured in the same run and is worse than level 3 in all nine cells, losing to
+        // the baseline in three of them, so the level is not a free dial - 3 is the measured one.
+        // -spatial-aq 1 -aq-strength 4 lost 6 of 6 cells and -tf_level 4 is rejected by the
+        // driver on hevc_nvenc although ffmpeg lists it; neither is here.
+        //
+        // The gate is -lookahead_level, not -rc-lookahead: -rc-lookahead has been in nvenc for
+        // a decade, -lookahead_level needs a recent ffmpeg and a recent driver. A listed option
+        // is not an accepted one - that is exactly how -tf_level failed - so the probe runs a
+        // real one-frame encode and reads the exit code.
+        else if (CodecModel.Vendor(codec) == EncoderVendor.Nvenc && Supported("-lookahead_level", "3"))
+            args.AddRange(new[] { "-rc-lookahead", "20", "-lookahead_level", "3" });
         return args;
     }
 
