@@ -3,7 +3,7 @@ using VidShrink.Core;
 
 namespace VidShrink.Cli;
 
-public enum CliCommand { Help, Version, Shrink, Plan, Watch }
+public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk }
 
 public enum CliCodec { Auto, H264, Hevc, Av1 }
 
@@ -137,6 +137,8 @@ public static class CliParser
             return Success(new CliRequest { Command = CliCommand.Help });
         if (head is "-v" or "--surum" or "version" or "surum" or "--version")
             return Success(new CliRequest { Command = CliCommand.Version });
+        if (head is "--gunluk" or "--log" or "gunluk")
+            return Success(new CliRequest { Command = CliCommand.Gunluk });
 
         var command = head switch
         {

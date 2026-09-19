@@ -63,6 +63,28 @@ internal static class AppDataReset
             removed.Add(path);
         }
 
+        removed.AddRange(GunlugeSil(folder));
+        return removed;
+    }
+
+    /// <summary>
+    /// Tani gunlugu de kullanicinin verisidir: sifirlama onu da siler, klasoru bos kalirsa
+    /// klasor de gider. Gunluk klasorune elle konmus baska dosyaya dokunulmaz.
+    /// </summary>
+    private static IReadOnlyList<string> GunlugeSil(string folder)
+    {
+        var removed = new List<string>();
+        var klasor = Path.Combine(folder, Gunluk.KlasorAdi);
+        if (!Directory.Exists(klasor)) return removed;
+
+        foreach (var path in new[] { Path.Combine(klasor, Gunluk.DosyaAdi), Path.Combine(klasor, Gunluk.YedekAdi) })
+        {
+            if (!File.Exists(path)) continue;
+            File.Delete(path);
+            removed.Add(path);
+        }
+
+        if (!Directory.EnumerateFileSystemEntries(klasor).Any()) Directory.Delete(klasor);
         return removed;
     }
 }

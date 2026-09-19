@@ -650,11 +650,25 @@ public sealed class EncodeRunner
         await stderrTask;
 
         var outcome = watch.Close(process.ExitCode);
+        GunlugeYaz(args, outcome, stopwatch.Elapsed);
         ThrowIfFailed(outcome);
 
         progress?.Report(new EncodeProgress(spanTo, stopwatch.Elapsed, TimeSpan.Zero, outMb, stage));
         return outcome;
     }
+
+    /// <summary>
+    /// Teslim yolundaki her kosum tani gunlugune bir blok birakir — basarisiz olan da,
+    /// cunku kullanicinin bildirecegi sey zaten o. Gunluge yazamamak kosumu bozmaz.
+    /// </summary>
+    private static void GunlugeYaz(IReadOnlyList<string> args, EncodeCommandOutcome outcome, TimeSpan sure)
+        => Gunluk.Yaz(Gunluk.Blok(
+            FfmpegArguments.ToCommandLine(args),
+            UpdateCheck.CurrentVersion(),
+            ToolLocator.FfmpegVersion,
+            outcome.ExitCode,
+            sure,
+            outcome.Tail));
 
     /// <summary>
     /// Bitmis bir ffmpeg kosumunun teslim yolundaki karari. <see cref="DroppedOptions"/> dolu

@@ -20,6 +20,14 @@ public static class ToolLocator
         return true;
     }
 
+    private static readonly Lazy<string> SurumOnbellegi = new(GetFfmpegVersion, isThreadSafe: true);
+
+    /// <summary>
+    /// Surum satiri surec acarak okunuyor; tani gunlugu her kosumda yaziyor, o yuzden
+    /// bir kez okunup tutulur. Tazeleyen bir yol yok: ffmpeg oturum ortasinda degismiyor.
+    /// </summary>
+    public static string FfmpegVersion => SurumOnbellegi.Value;
+
     public static string GetFfmpegVersion()
     {
         using var process = new Process { StartInfo = StartInfo(Ffmpeg, new[] { "-version" }) };

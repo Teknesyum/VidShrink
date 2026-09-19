@@ -66,6 +66,17 @@ public static class CliApp
             case CliCommand.Version:
                 stdout.WriteLine(CliText.Version);
                 return ExitCodes.InBand;
+            case CliCommand.Gunluk:
+            {
+                var gunluk = Gunluk.Oku();
+                if (gunluk.Length == 0)
+                {
+                    stdout.WriteLine(text["gunluk.bos"]);
+                    return ExitCodes.InBand;
+                }
+                stdout.Write(gunluk);
+                return ExitCodes.InBand;
+            }
         }
 
         try

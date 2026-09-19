@@ -957,3 +957,50 @@ ayardan bağımsız olarak hep kaynağın yanına düşüyor. Kopya silinir, kuy
 tek yolunu kullanır.
 
 **CLI kapsam dışı:** `--cikti` zaten tam yolu veriyor, desen orada ikinci bir yol olurdu.
+
+### E7 Planı: Tanı Günlüğü (2026-09-19)
+
+E8 kapandı (`4c431103`, `docs/olcumler/e8-kap-uyumlulugu.md`). Sıradaki E7, dört açığın
+en genişi: Core, Ffmpeg, Cli, App, 42 dil ve testler.
+
+**Bugünkü durum ölçüldü.** ffmpeg'in komutu tek yerde dizgeye çevriliyor
+(`FfmpegArguments.ToCommandLine`, `FfmpegArguments.cs:715`) ve yalnız ekrana gidiyor
+(`CliApp.cs:311`, `MainWindow.axaml.cs:3605`). stderr iki koşucuda toplanıyor
+(`FfmpegRunner.cs:110` son 8 satır, `EncodeRunner.cs:673` son 15 satır) ve hata olursa
+yalnız istisna mesajına gömülüyor. Diske hiçbir şey yazılmıyor. `Gunluk`/`ActivityLog`
+diye bir kavram kodda yok; diske satır yazan tek örnek `InstallProgress.WriteLog`
+(`InstallProgress.cs:198`), kurulum paneline ait.
+
+**Yer.** `UpdateSettings.DefaultPath`'in klasörü + `gunluk\` (`UpdateCheck.cs:461`,
+`VIDSHRINK_SETTINGS_PATH`'i dinleyen tek doğru kaynak). Dosya `vidshrink.log`, 1 MB'ı
+aşınca `vidshrink.1.log`'a devrilir ve tek yedek tutulur — sınırsız büyüyen günlük
+kullanıcının diskini yiyor, ikiden fazla yedek de kimsenin işine yaramıyor.
+`ShareResult.cs:152` ve `ShareTargets.cs:216` klasörü elle kuruyor ve ortam değişkenini
+dinlemiyor; **bu iş o hatayı tekrarlamayacak**, yol tek yerden gelecek.
+
+**Kayıt.** Her koşum bir blok: zaman damgası, uygulama sürümü, ffmpeg sürümü
+(`ToolLocator.GetFfmpegVersion`), komut satırı, çıkış kodu, süre, stderr kuyruğu.
+Günlük **her zaman açık** — sorun bildirirken "önce günlüğü aç, sonra tekrarla" demek
+kullanıcıyı ikinci kez çalıştırmak demektir.
+
+**Gizlilik tek kural, ölçünün ağırlığı da orada:** günlüğe düşen hiçbir satırda tam yol
+bulunmayacak. Komut satırındaki girdi/çıktı yolları ve stderr'in taşıdığı yollar dosya
+adına indirilir (`C:\Users\Ad\Videolar\tatil.mkv` → `tatil.mkv`). Kullanıcı adı, klasör
+ağacı ve sürücü harfi günlüğe hiç girmez. Negatif kontrol: indirgemeyi kaldıran mutasyon
+ölçüyü kırar.
+
+**Yüzeyler.**
+1. `src/VidShrink.Core/Gunluk.cs` — yol, yazma, devirme, yol indirgeme. Saf ve test edilebilir.
+2. `EncodeRunner.RunCommandAsync` ve `FfmpegRunner.RunAsync` — blok yazan iki çağrı yeri.
+3. `CliParser` — `--gunluk`, komut öncesi kısayol (`-h`/`-v` ile aynı raf, `CliRequest.cs:136`):
+   günlüğün yolunu ve içeriğini stdout'a basıp 0 ile çıkar. Yardım metni `Locales/{en,tr}.json`.
+4. Ayarlar sekmesi — "Günlüğü aç" düğmesi, sıfırlama panelinin komşusu
+   (`MainWindow.axaml:1427`), `Platform.Reveal` ile (`Platform.cs:9`).
+5. `AppDataReset` — günlük klasörü veri sıfırlamaya girer, `VeriSifirlamaTests.cs:42` pimi yenilenir.
+6. Yeni anahtarlar 42 dile; `AltyaziIndirmeTests.cs:1238` desenine `InlineData` satırı.
+
+**Ölçü.** `TaniGunluguTests.cs`: yol ortam değişkenini izliyor, blok altı alanı da
+taşıyor, tam yol hiçbir satırda yok (pozitif kontrol: indirgenmemiş metinde tarayıcının
+gerçekten bulduğu), devirme 1 MB'da bir kez oluyor ve tek yedek kalıyor, CLI kolu 0
+dönüyor ve günlük yokken de çakmıyor. Kabul mutasyonla kapanır, tablo
+`docs/olcumler/e7-tani-gunlugu.md`.

@@ -177,6 +177,7 @@ bunların tek yazımı var.
 | `--kes` | `--cut` |
 | `--aralik` | `--interval` |
 | `--bir-kez` | `--once` |
+| `--gunluk` | `--log` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
 | `--dil` | `--lang` |

@@ -1,4 +1,3 @@
-﻿using System.Linq;
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -1242,6 +1241,28 @@ public partial class MainWindow : Window
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             TxtSystemStatus.Text = $"{Say("settings.error.save")}: {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// Gunlugu dosya yoneticisinde gosterir. Kullaniciya tam yol gosterilmez: durum
+    /// satirinda yalniz dosya adi durur, yolu klasor penceresi zaten tasiyor.
+    /// </summary>
+    private void OnOpenLog(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (!File.Exists(Gunluk.Dosya))
+            {
+                TxtSystemStatus.Text = Say("settings.log.empty");
+                return;
+            }
+            Platform.Reveal(Gunluk.Dosya);
+            TxtSystemStatus.Text = $"{Say("settings.log.opened")}: {Path.GetFileName(Gunluk.Dosya)}";
+        }
+        catch (Exception ex)
+        {
+            TxtSystemStatus.Text = $"{Say("main.error.folder")}: {ex.Message}";
         }
     }
 

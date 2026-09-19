@@ -176,6 +176,7 @@ single spelling.
 | `--kes` | `--cut` |
 | `--aralik` | `--interval` |
 | `--bir-kez` | `--once` |
+| `--gunluk` | `--log` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
 | `--dil` | `--lang` |

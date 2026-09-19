@@ -473,7 +473,7 @@ public sealed class CliTests
         Availability = () => throw new InvalidOperationException("availability must not run")
     };
 
-    private const int BeklenenTakmaAdSayisi = 14;
+    private const int BeklenenTakmaAdSayisi = 15;
 
     /// <summary>
     /// <para>Ingilizce takma adlar iki READMEde de yaziliydi diye degil, <b>kaynaktan

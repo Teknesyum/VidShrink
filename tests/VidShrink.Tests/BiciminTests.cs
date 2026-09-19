@@ -1077,6 +1077,10 @@ public sealed class BaslikKapsamiTests
     /// (<c>b7b485c4</c>) ve cikti adi deseni (<c>1546c9e3</c>) turlari birlikte dil basina on
     /// anahtar ekledi; kol degistiren kismi 1666 - 1649 = 17, en 195 + 1, tr 67 + 1. Iki tur
     /// da pimi yenilemedi, CI iki kosum kirmizi kaldi.</para>
+    ///
+    /// <para><b>19 Eylul 2026, ucuncu yenileme: toplam 1677, en 198, tr 68.</b> Tani gunlugu
+    /// (E7) her dile bes <c>settings.log.*</c> anahtari ekledi; kol degistiren kismi 1677 - 1666 = 11,
+    /// en 196 + 2. Turkce tarafta yeni anahtarlarin hicbiri kol degistirmiyor, tr 68'de kaliyor.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1102,8 +1106,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1666, toplam);
-        Assert.Equal(196, dilBasina["en"]);
+        Assert.Equal(1677, toplam);
+        Assert.Equal(198, dilBasina["en"]);
         Assert.Equal(68, dilBasina["tr"]);
     }
 
@@ -1217,6 +1221,9 @@ public sealed class BaslikKapsamiTests
     /// <c>SAYIM gezilen</c> satirindan alindi, <c>kayip</c> 0 kaldi.</para>
     /// <para><b>19 Eylul 2026, ikinci yenileme: 42570.</b> Ayni iki tur dil basina on anahtar
     /// ekledi: 980 + 10 = 990, 43 x 990 = 42570. <c>kayip</c> yine 0.</para>
+    ///
+    /// <para><b>19 Eylul 2026, ucuncu yenileme: 42785.</b> Tani gunlugu dil basina bes anahtar
+    /// ekledi: 990 + 5 = 995, 43 x 995 = 42785. <c>kayip</c> yine 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1244,7 +1251,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(42570, gezilen);
+        Assert.Equal(42785, gezilen);
         Assert.Empty(kayip);
     }
 

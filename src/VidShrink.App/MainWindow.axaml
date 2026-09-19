@@ -1424,6 +1424,18 @@
 
               <playback:PlayerAdvancedPanel x:Name="PlayerAdvancedPanel"/>
 
+              <Border x:Name="DiagnosticLogPanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceSm}">
+                  <TextBlock Text="{loc:Text settings.log.title}" Theme="{StaticResource Subtitle}"/>
+                  <TextBlock Text="{loc:Text settings.log.hint}" Theme="{StaticResource Caption}" TextWrapping="Wrap"/>
+                  <Button x:Name="BtnOpenLog"
+                          Content="{loc:Text settings.log.open}"
+                          Theme="{StaticResource GhostButton}"
+                          HorizontalAlignment="Left"
+                          Click="OnOpenLog"/>
+                </StackPanel>
+              </Border>
+
               <Border x:Name="ResetSettingsPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Button x:Name="BtnResetSettings"

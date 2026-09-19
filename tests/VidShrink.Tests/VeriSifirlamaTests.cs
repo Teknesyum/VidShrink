@@ -92,4 +92,28 @@ public sealed class VeriSifirlamaTests
         Assert.Empty(othersLeft);
         Assert.True(foreignLeft, "veri olmayan dosya silindi");
     }
+
+    /// <summary>
+    /// Tani gunlugu de kullanicinin verisi: sifirlama onu birakirsa kullanici "her seyi
+    /// sildim" derken eski kosumlarinin dokumunu diskte tutmus oluyor.
+    /// </summary>
+    [Fact]
+    public void SifirlamaTaniGunluguDeSiler()
+    {
+        var folder = Folder();
+        var klasor = Path.Combine(folder, Gunluk.KlasorAdi);
+        Directory.CreateDirectory(klasor);
+        var dosya = Path.Combine(klasor, Gunluk.DosyaAdi);
+        var yedek = Path.Combine(klasor, Gunluk.YedekAdi);
+        Touch(dosya);
+        Touch(yedek);
+
+        var removed = AppDataReset.Run(folder);
+
+        Assert.False(File.Exists(dosya));
+        Assert.False(File.Exists(yedek));
+        Assert.False(Directory.Exists(klasor));
+        Assert.Contains(dosya, removed);
+        Assert.Contains(yedek, removed);
+    }
 }
