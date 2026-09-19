@@ -87,6 +87,43 @@ public sealed record ShareTargetTable
     /// <summary>Tablonun dosya adı. Arama sırası <see cref="Locate"/> içinde.</summary>
     public const string FileName = "paylasim-hedefleri.json";
 
+    /// <summary>Ölçülmüş tavan: uguu.se ana sayfası "Max upload size is 128 MiB" diyor.</summary>
+    public const long UguuMaxBytes = 134_217_728;
+
+    /// <summary>storage.to'nun ilan ettiği 25 GB tavanı.</summary>
+    public const long StorageToMaxBytes = 26_843_545_600;
+
+    /// <summary>
+    /// Dosya yokken arayüzün göstereceği liste: şemada yazılı varsayılanlar, uydurma değer
+    /// değil. Uç nokta taşımaz — adres koda gömülmez, bu yüzden bu tabloyla yükleme
+    /// yapılamaz, yalnız şerit çizilir ve pencere açılmaya devam eder.
+    /// </summary>
+    public static ShareTargetTable Fallback { get; } = new()
+    {
+        Default = "storage.to",
+        Targets =
+        [
+            new ShareTarget
+            {
+                Id = "storage.to",
+                DisplayName = "storage.to",
+                MaxBytes = StorageToMaxBytes,
+                RetentionDays = [1, 2, 3, 4, 5, 6, 7],
+                DefaultRetentionDays = 1,
+                CanDelete = true,
+                PlaysInBrowser = true
+            },
+            new ShareTarget
+            {
+                Id = "uguu.se",
+                DisplayName = "uguu.se",
+                MaxBytes = UguuMaxBytes,
+                FixedRetentionHours = 3,
+                PlaysInBrowser = true
+            }
+        ]
+    };
+
     public ShareTarget? Find(string id) =>
         Targets.FirstOrDefault(t => string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase));
 
@@ -125,6 +162,27 @@ public sealed record ShareTargetTable
             FileName);
 
         return Parse(File.ReadAllText(path));
+    }
+
+    /// <summary>
+    /// Tabloyu okur, okunamazsa <see cref="Fallback"/> döner. Arayüzün kolu budur: hedef
+    /// şeridi çizilemediği için pencerenin açılmaması kabul edilemez. Yükleme yolu hâlâ
+    /// <see cref="Load(string?)"/> kullanır — orada dosya yoksa iş durmalı.
+    /// </summary>
+    /// <param name="locate">Arama; verilmezse <see cref="Locate"/>.</param>
+    public static ShareTargetTable LoadOrFallback(Func<string?>? locate = null)
+    {
+        try
+        {
+            var path = (locate ?? Locate)();
+            if (path is null) return Fallback;
+            var table = Parse(File.ReadAllText(path));
+            return table.Targets.Count == 0 ? Fallback : table;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException)
+        {
+            return Fallback;
+        }
     }
 
     /// <summary>

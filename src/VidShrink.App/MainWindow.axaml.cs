@@ -123,8 +123,7 @@ public partial class MainWindow : Window
     private readonly DeveloperUnlock _developerUnlock = new();
     private AppliedUpdateNotice? _appliedNotice;
     private UpdateBadgeState _updateBadgeState = UpdateBadgeState.Checking;
-    private ShareTargetTable _shareTargets = ShareTargetTable.Fallback;
-    private CoreShare.ShareTargetTable? _shareEndpoints;
+    private CoreShare.ShareTargetTable _shareTargets = CoreShare.ShareTargetTable.Fallback;
     private CoreShare.IHttpTransport? _shareTransport;
     private ShareFlow? _shareFlow;
     private PanelHost? _preview;
@@ -1917,7 +1916,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void InitializeShareUi()
     {
-        _shareTargets = ShareTargetTable.Load();
+        _shareTargets = CoreShare.ShareTargetTable.LoadOrFallback();
 
         BuildShareTargetStrip();
         RefreshShareTarget();
@@ -1944,7 +1943,7 @@ public partial class MainWindow : Window
             _shareTargetRadios.Add(radio);
             ShareTargetStrip.Children.Add(radio);
         }
-        ShareTargetIndex = Math.Max(0, IndexOfTarget(_shareTargets.Default));
+        ShareTargetIndex = Math.Max(0, IndexOfTarget(_shareTargets.DefaultTarget));
         _syncing = wasSyncing;
     }
 
@@ -1960,10 +1959,12 @@ public partial class MainWindow : Window
 
     internal IReadOnlyList<RadioButton> ShareTargetRadios => _shareTargetRadios;
 
-    private int IndexOfTarget(ShareTarget target)
+    private int IndexOfTarget(CoreShare.ShareTarget? target)
     {
+        if (target is null) return -1;
         for (var index = 0; index < _shareTargets.Targets.Count; index++)
-            if (ReferenceEquals(_shareTargets.Targets[index], target)) return index;
+            if (string.Equals(_shareTargets.Targets[index].Id, target.Id, StringComparison.OrdinalIgnoreCase))
+                return index;
         return -1;
     }
 
@@ -1974,12 +1975,12 @@ public partial class MainWindow : Window
         SaveSettings();
     }
 
-    private ShareTarget SelectedShareTarget()
+    private CoreShare.ShareTarget SelectedShareTarget()
     {
         var index = ShareTargetIndex;
         return index >= 0 && index < _shareTargets.Targets.Count
             ? _shareTargets.Targets[index]
-            : _shareTargets.Default;
+            : _shareTargets.DefaultTarget ?? CoreShare.ShareTargetTable.Fallback.Targets[0];
     }
 
     private void RefreshShareTarget()
@@ -1996,7 +1997,7 @@ public partial class MainWindow : Window
             CmbShareRetention.ItemsSource = target.RetentionDays
                 .Select(day => day == 1 ? Say("settings.share.day-one") : Say("settings.share.days", day))
                 .ToList();
-            var chosen = target.RetentionDays.ToList().IndexOf(target.DefaultRetentionDays);
+            var chosen = target.RetentionDays.ToList().IndexOf(target.DefaultRetentionDays ?? -1);
             CmbShareRetention.SelectedIndex = chosen >= 0 ? chosen : 0;
         }
         else
@@ -2024,16 +2025,15 @@ public partial class MainWindow : Window
     /// </summary>
     private CoreShare.ShareTarget? SelectedShareEndpoint()
     {
-        try { _shareEndpoints ??= CoreShare.ShareTargetTable.Load(); }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException) { return null; }
-        return _shareEndpoints.Find(SelectedShareTarget().Id);
+        var target = _shareTargets.Find(SelectedShareTarget().Id);
+        return CoreShare.ShareProviderFactory.CanCreate(target) ? target : null;
     }
 
     private ShareFlow Share() => _shareFlow ??= new ShareFlow(target =>
         CoreShare.ShareProviderFactory.Create(
             target,
             _shareTransport ??= new CoreShare.HttpClientTransport(),
-            _shareEndpoints));
+            _shareTargets));
 
     /// <summary>Seçili ömür, gün. Hedef ömür seçtirmiyorsa boş.</summary>
     private int? SelectedRetentionDays()
@@ -4735,131 +4735,6 @@ internal readonly record struct QualityHint(double? TargetMb, double? Score, Qua
                 : QualityBasis.SourceUnderTarget;
 
         return new QualityHint(target, result.PredictedQuality, basis);
-    }
-}
-
-/// <summary>
-/// Tek bir paylaşım hedefi. Alan adları <c>paylasim-hedefleri.json</c> şemasıyla birebir
-/// aynı; şema T35'te sabitlendi ve iki taraf da onu okuyor.
-/// </summary>
-internal sealed record ShareTarget(
-    string Id,
-    string DisplayName,
-    long MaxBytes,
-    IReadOnlyList<int> RetentionDays,
-    int DefaultRetentionDays,
-    int? FixedRetentionHours,
-    bool CanDelete,
-    bool PlaysInBrowser);
-
-/// <summary>
-/// Hedef listesi arayüze koddan değil dosyadan gelir: JSON'a üçüncü bir hedef eklenince
-/// açılır kutuda kendiliğinden belirir ve tek satır C# değişmez.
-///
-/// Dosyayı T35 yazıyor. Henüz yoksa <see cref="Fallback"/> devreye girer — bunlar
-/// sözleşmede yazılı şema varsayılanlarıdır, uydurma değer değil.
-/// </summary>
-internal sealed record ShareTargetTable(string DefaultId, IReadOnlyList<ShareTarget> Targets)
-{
-    internal const string FileName = "paylasim-hedefleri.json";
-
-    /// <summary>Ölçülmüş tavan: uguu.se ana sayfası "Max upload size is 128 MiB" diyor.</summary>
-    internal const long UguuMaxBytes = 134_217_728;
-
-    /// <summary>storage.to'nun ilan ettiği 25 GB tavanı.</summary>
-    internal const long StorageToMaxBytes = 26_843_545_600;
-
-    internal static ShareTargetTable Fallback { get; } = new(
-        "storage.to",
-        new[]
-        {
-            new ShareTarget("storage.to", "storage.to", StorageToMaxBytes,
-                new[] { 1, 2, 3, 4, 5, 6, 7 }, 1, null, true, true),
-            new ShareTarget("uguu.se", "uguu.se", UguuMaxBytes,
-                Array.Empty<int>(), 0, 3, false, true)
-        });
-
-    internal ShareTarget Default =>
-        Targets.FirstOrDefault(target => string.Equals(target.Id, DefaultId, StringComparison.Ordinal))
-        ?? Targets[0];
-
-    /// <summary>
-    /// Arama Core'un sırasıdır; bu tür kendi sırasını tutmaz. Şerit ile yükleme aynı
-    /// dosyayı okumak zorunda: ayrı arama, kullanıcının kendi kopyasını yalnız bir tarafa
-    /// gösterip görünen tavan ile gidilen adresi ayırıyordu.
-    /// </summary>
-    internal static IEnumerable<string> AramaSirasi() => CoreShare.ShareTargetTable.AramaSirasi();
-
-    internal static ShareTargetTable Load() => Load(CoreShare.ShareTargetTable.Locate);
-
-    /// <summary>
-    /// Arama dışarıdan verilir; bulunamaz ya da okunamazsa <see cref="Fallback"/> kalır ve
-    /// arayüz açılmaya devam eder.
-    /// </summary>
-    internal static ShareTargetTable Load(Func<string?> locate)
-    {
-        try
-        {
-            var path = locate();
-            return path is null ? Fallback : Parse(File.ReadAllText(path));
-        }
-        catch (Exception)
-        {
-            return Fallback;
-        }
-    }
-
-    internal static ShareTargetTable Parse(string json)
-    {
-        using var document = JsonDocument.Parse(json);
-        var root = document.RootElement;
-
-        var targets = new List<ShareTarget>();
-        if (root.TryGetProperty("targets", out var list) && list.ValueKind == JsonValueKind.Array)
-            foreach (var item in list.EnumerateArray())
-                if (ReadTarget(item) is { } target)
-                    targets.Add(target);
-
-        if (targets.Count == 0) return Fallback;
-
-        var defaultId = root.TryGetProperty("default", out var chosen) && chosen.ValueKind == JsonValueKind.String
-            ? chosen.GetString() ?? targets[0].Id
-            : targets[0].Id;
-
-        return new ShareTargetTable(defaultId, targets);
-    }
-
-    private static ShareTarget? ReadTarget(JsonElement item)
-    {
-        if (item.ValueKind != JsonValueKind.Object) return null;
-        if (!item.TryGetProperty("id", out var id) || id.ValueKind != JsonValueKind.String) return null;
-
-        var identifier = id.GetString();
-        if (string.IsNullOrWhiteSpace(identifier)) return null;
-
-        var days = new List<int>();
-        if (item.TryGetProperty("retentionDays", out var retention) && retention.ValueKind == JsonValueKind.Array)
-            foreach (var day in retention.EnumerateArray())
-                if (day.TryGetInt32(out var value))
-                    days.Add(value);
-
-        int? fixedHours = item.TryGetProperty("fixedRetentionHours", out var hours) && hours.TryGetInt32(out var hoursValue)
-            ? hoursValue
-            : null;
-
-        return new ShareTarget(
-            identifier,
-            item.TryGetProperty("displayName", out var name) && name.ValueKind == JsonValueKind.String
-                ? name.GetString() ?? identifier
-                : identifier,
-            item.TryGetProperty("maxBytes", out var max) && max.TryGetInt64(out var maxValue) ? maxValue : 0,
-            days,
-            item.TryGetProperty("defaultRetentionDays", out var fallbackDay) && fallbackDay.TryGetInt32(out var dayValue)
-                ? dayValue
-                : days.FirstOrDefault(),
-            fixedHours,
-            item.TryGetProperty("canDelete", out var canDelete) && canDelete.ValueKind == JsonValueKind.True,
-            item.TryGetProperty("playsInBrowser", out var plays) && plays.ValueKind == JsonValueKind.True);
     }
 }
 

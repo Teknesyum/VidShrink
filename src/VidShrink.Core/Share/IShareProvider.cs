@@ -79,6 +79,16 @@ public static class ShareProviderFactory
             "'init' ve 'confirm', tek adımlı protokol için 'upload' gerekiyor.");
     }
 
+    /// <summary>
+    /// <see cref="Create"/> bu hedef için bir sağlayıcı kurabilir mi. Arayüz yüklemeye
+    /// kalkışmadan önce buna bakar: kural tek yerde kalsın, şerit ile yükleme aynı
+    /// uç nokta şeklini okusun.
+    /// </summary>
+    public static bool CanCreate(ShareTarget? target) =>
+        target is not null &&
+        ((target.Endpoint("init") is not null && target.Endpoint("confirm") is not null) ||
+         target.Endpoint("upload") is not null);
+
     /// <summary>Tablodaki her hedef için bir sağlayıcı kurar.</summary>
     public static IReadOnlyList<IShareProvider> CreateAll(ShareTargetTable table, IHttpTransport transport) =>
         table.Targets.Select(t => Create(t, transport, table)).ToList();

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using VidShrink.App;
@@ -8,9 +8,9 @@ using CoreShare = VidShrink.Core.Share;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// <c>paylasim-hedefleri.json</c>'ı iki tür okuyor: şeridi kuran <see cref="ShareTargetTable"/>
-/// ve yüklemeyi yapan <c>Core.Share.ShareTargetTable</c>. Şema T35'te sabitlendi ve iki taraf
-/// da onu okuyor — ama <b>arama sırası</b> sabitlenmemişti.
+/// <c>paylasim-hedefleri.json</c>'ı bir tek tür okuyor: <see cref="CoreShare.ShareTargetTable"/>.
+/// Eskiden iki tanesi vardı — şeridi kuran App kopyası ve yüklemeyi yapan Core'unki — ve şema
+/// T35'te sabitlenmiş olsa da <b>arama sırası</b> sabitlenmemişti.
 ///
 /// <para>Core önce kullanıcının kendi kopyasına bakıyor (<c>%APPDATA%\VidShrink</c>); belgesi
 /// bunun sebebini de yazıyor: bir uç nokta ölünce kullanıcı sürüm beklemeden düzeltebilsin.
@@ -19,21 +19,29 @@ namespace VidShrink.Tests;
 /// uç noktasına gidiyordu: görünen sınır ile gidilen adres ayrı dosyalardan. Hata yok, uyarı
 /// yok.</para>
 ///
-/// <para>Ölçü pencere açmıyor; arama <see cref="ShareTargetTable.Load(Func{string})"/> ile
-/// dışarıdan veriliyor, gerçek <c>%APPDATA%</c>'ya dokunulmuyor.</para>
+/// <para>İkizin geri gelmemesi ayrıca pimli: App derlemesinde ikinci bir hedef tablosu
+/// türü kalmadı. Tür geri eklense derleme kırılmaz, sessizce iki parser olur.</para>
+///
+/// <para>Ölçü pencere açmıyor; arama <see cref="CoreShare.ShareTargetTable.LoadOrFallback"/>
+/// ile dışarıdan veriliyor, gerçek <c>%APPDATA%</c>'ya dokunulmuyor.</para>
 /// </summary>
 public sealed class PaylasimAramaSirasiTests
 {
     /// <summary>
-    /// Kusurun kendisi: şeridin araması Core'unkiyle aynı olmalı. Ayrı bir arama tutmak
-    /// iki dosyanın sessizce ayrışmasına izin verir.
+    /// Kusurun kendisi: şerit ile yükleme tek tablodan okuyor. App derlemesinde kendi
+    /// <c>ShareTarget</c>/<c>ShareTargetTable</c> türü kalmadı — ikisi ayrıştıkça görünen
+    /// tavan ile gidilen adres ayrı dosyalardan geliyordu.
     /// </summary>
     [Fact]
-    public void SeritVeYuklemeAyniAramayiKullaniyor()
+    public void AppKendiHedefTablosunuTutmuyor()
     {
-        var beklenen = CoreShare.ShareTargetTable.AramaSirasi().ToArray();
+        var ikiz = typeof(MainWindow).Assembly.GetTypes()
+            .Where(tur => tur.Name is "ShareTarget" or "ShareTargetTable")
+            .Select(tur => tur.FullName!)
+            .ToArray();
 
-        Assert.Equal(beklenen, ShareTargetTable.AramaSirasi().ToArray());
+        Assert.Equal(Array.Empty<string>(), ikiz);
+        Assert.NotNull(typeof(CoreShare.ShareTargetTable).GetMethod("LoadOrFallback"));
     }
 
     /// <summary>
@@ -48,7 +56,7 @@ public sealed class PaylasimAramaSirasiTests
             "VidShrink",
             CoreShare.ShareTargetTable.FileName);
 
-        Assert.Equal(kullanici, ShareTargetTable.AramaSirasi().First());
+        Assert.Equal(kullanici, CoreShare.ShareTargetTable.AramaSirasi().First());
     }
 
     /// <summary>
@@ -62,7 +70,7 @@ public sealed class PaylasimAramaSirasiTests
         Directory.CreateDirectory(klasor);
         try
         {
-            var yol = Path.Combine(klasor, ShareTargetTable.FileName);
+            var yol = Path.Combine(klasor, CoreShare.ShareTargetTable.FileName);
             File.WriteAllText(yol, """
             { "version": 1, "default": "ozel.example", "targets": [
               { "id": "ozel.example", "displayName": "Kullanicinin Kopyasi", "maxBytes": 7,
@@ -70,11 +78,11 @@ public sealed class PaylasimAramaSirasiTests
                 "endpoints": { "upload": "https://ozel.example/upload" } } ] }
             """);
 
-            var tablo = ShareTargetTable.Load(() => yol);
+            var tablo = CoreShare.ShareTargetTable.LoadOrFallback(() => yol);
 
             Assert.Equal(new[] { "ozel.example" }, tablo.Targets.Select(hedef => hedef.Id));
             Assert.Equal(7, tablo.Targets[0].MaxBytes);
-            Assert.NotSame(ShareTargetTable.Fallback, tablo);
+            Assert.NotSame(CoreShare.ShareTargetTable.Fallback, tablo);
         }
         finally
         {
@@ -90,9 +98,9 @@ public sealed class PaylasimAramaSirasiTests
     [Fact]
     public void AramaBosDonerseVarsayilanKaliyor()
     {
-        var tablo = ShareTargetTable.Load(() => null);
+        var tablo = CoreShare.ShareTargetTable.LoadOrFallback(() => null);
 
-        Assert.Same(ShareTargetTable.Fallback, tablo);
+        Assert.Same(CoreShare.ShareTargetTable.Fallback, tablo);
         Assert.NotEmpty(tablo.Targets);
     }
 
@@ -104,7 +112,7 @@ public sealed class PaylasimAramaSirasiTests
     {
         var yok = Path.Combine(Calisma(), Guid.NewGuid().ToString("N"), "olmayan.json");
 
-        Assert.Same(ShareTargetTable.Fallback, ShareTargetTable.Load(() => yok));
+        Assert.Same(CoreShare.ShareTargetTable.Fallback, CoreShare.ShareTargetTable.LoadOrFallback(() => yok));
     }
 
     private static string Calisma()

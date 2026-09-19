@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using VidShrink.App;
+using VidShrink.Core.Share;
 
 namespace VidShrink.Tests;
 
@@ -90,13 +91,13 @@ public sealed class SettingsTabTests
         var table = ShareTargetTable.Parse(File.ReadAllText(RealFilePath));
 
         Assert.NotSame(ShareTargetTable.Fallback, table);
-        Assert.Equal("storage.to", table.Default.Id);
+        Assert.Equal("storage.to", table.Default);
         Assert.Equal(new[] { "storage.to", "uguu.se" }, table.Targets.Select(target => target.Id));
 
         var storage = table.Targets[0];
         Assert.Equal(26_843_545_600L, storage.MaxBytes);
         Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7 }, storage.RetentionDays);
-        Assert.Equal(1, storage.DefaultRetentionDays);
+        Assert.Equal(1, storage.DefaultRetentionDays!.Value);
         Assert.True(storage.CanDelete);
 
         var uguu = table.Targets[1];
@@ -133,7 +134,7 @@ public sealed class SettingsTabTests
         {
             File.WriteAllText(Path.Combine(directory, ShareTargetTable.FileName), document.ToJsonString());
 
-            var table = ShareTargetTable.Load(() => Path.Combine(directory, ShareTargetTable.FileName));
+            var table = ShareTargetTable.LoadOrFallback(() => Path.Combine(directory, ShareTargetTable.FileName));
             Assert.NotSame(ShareTargetTable.Fallback, table);
 
             Assert.Equal(3, table.Targets.Count);
@@ -143,7 +144,7 @@ public sealed class SettingsTabTests
             Assert.Equal("yeni.example", third.DisplayName);
             Assert.Equal(1_073_741_824, third.MaxBytes);
             Assert.Equal(new[] { 1, 2 }, third.RetentionDays);
-            Assert.Equal(2, third.DefaultRetentionDays);
+            Assert.Equal(2, third.DefaultRetentionDays!.Value);
             Assert.True(third.CanDelete);
             Assert.False(third.PlaysInBrowser);
         }
@@ -196,10 +197,36 @@ public sealed class SettingsTabTests
     [Fact]
     public void AMissingOrBrokenFileFallsBackToTheSchemaDefaults()
     {
-        Assert.Same(ShareTargetTable.Fallback, ShareTargetTable.Load(() => null));
+        Assert.Same(ShareTargetTable.Fallback, ShareTargetTable.LoadOrFallback(() => null));
         Assert.Equal(2, ShareTargetTable.Fallback.Targets.Count);
-        Assert.Equal("storage.to", ShareTargetTable.Fallback.Default.Id);
-        Assert.Same(ShareTargetTable.Fallback, ShareTargetTable.Parse("""{"version":1,"targets":[]}"""));
+        Assert.Equal("storage.to", ShareTargetTable.Fallback.Default);
+
+        var bos = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".json");
+        File.WriteAllText(bos, """{"version":1,"targets":[]}""");
+        try { Assert.Same(ShareTargetTable.Fallback, ShareTargetTable.LoadOrFallback(() => bos)); }
+        finally { File.Delete(bos); }
+
+        // Varsayılan tablo uç nokta taşımaz: şerit çizilir ama yükleme yapılamaz. Adres
+        // koda gömülmediği için bu bir eksiklik değil, sözleşmenin kendisi.
+        foreach (var hedef in ShareTargetTable.Fallback.Targets)
+            Assert.False(ShareProviderFactory.CanCreate(hedef), hedef.Id);
+
+        foreach (var hedef in ShareTargetTable.Parse(File.ReadAllText(RealFilePath)).Targets)
+            Assert.True(ShareProviderFactory.CanCreate(hedef), hedef.Id);
+
+        // Varsayılanın tavanları uydurma değil: dosyadaki sayılarla aynı. Ayrışırsa
+        // dosyasız açılan pencere gerçekte kabul edilmeyecek bir boyutu kabul eder gibi
+        // görünür — kullanıcı yüklemeye kalkışana kadar bunu göremez.
+        var dosya = ShareTargetTable.Parse(File.ReadAllText(RealFilePath));
+        foreach (var varsayilan in ShareTargetTable.Fallback.Targets)
+        {
+            var esi = dosya.Find(varsayilan.Id);
+            Assert.NotNull(esi);
+            Assert.Equal(esi!.MaxBytes, varsayilan.MaxBytes);
+            Assert.Equal(esi.RetentionDays, varsayilan.RetentionDays);
+            Assert.Equal(esi.FixedRetentionHours, varsayilan.FixedRetentionHours);
+            Assert.Equal(esi.CanDelete, varsayilan.CanDelete);
+        }
     }
 
     /// <summary>
