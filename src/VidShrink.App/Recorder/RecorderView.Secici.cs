@@ -109,7 +109,7 @@ internal partial class RecorderView
 
     private static List<string> SizeLabels()
         => new[] { Say("recorder.target.size-none") }
-            .Concat(RegionDraw.Sizes.Select(s => string.Format(CultureInfo.InvariantCulture, "{0} × {1}", s.Width, s.Height)))
+            .Concat(RegionDraw.Sizes.Select(s => Bicim.Cozunurluk(s.Width, s.Height)))
             .ToList();
 
     private void RefreshSeciciLabels()

@@ -258,7 +258,7 @@ internal partial class RecorderView
         }
 
         var size = choice.Scale is { } scale
-            ? scale.Width.ToString(CultureInfo.InvariantCulture) + "×" + scale.Height.ToString(CultureInfo.InvariantCulture)
+            ? Bicim.Cozunurluk(scale.Width, scale.Height)
             : Say("recorder.auto.native");
 
         var head = Say(

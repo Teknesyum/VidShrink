@@ -52,8 +52,35 @@ public sealed class KaydediciHedefTests
     }
 
     /// <summary>
+    /// Kaydedici ozetindeki cozunurluk ailenin yazimini kullanir. Bu satir sifir
+    /// pimliydi: adim 5'in mutasyonunda govdeyi atlamak 0 kirmizi veriyordu. Ozet
+    /// yalnizca kucultulmus adayda cozunurluk yazar, o yuzden merdivenden <c>Scale</c>
+    /// tasiyan ilk aday seciliyor.
+    /// </summary>
+    [Fact]
+    public void OtomatikOzetCozunurlugunuCarpiIsaretiyleYazar()
+    {
+        var ozet = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+            var makine = new RecorderMachine(1920, 1080, 60, 8, []);
+            var kucultulmus = RecorderAutoPlan.Candidates(makine).First(c => c.Scale is not null);
+
+            view.AutoChoice = kucultulmus;
+            typeof(RecorderView)
+                .GetMethod("ShowAutoSummary", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(view, new object?[] { null });
+
+            return Bul<TextBlock>(view, "TxtAutoSummary").Text ?? string.Empty;
+        }));
+
+        Assert.Contains("960×540", ozet);
+        Assert.DoesNotContain("960x540", ozet);
+    }
+
+    /// <summary>
     /// Butce notundaki bit hizi ailenin yazimini kullanir: basamak ayraci yok.
-    /// Not <c>N0</c> ile yaziliyordu, yani Turkce arayuzde <c>2.636</c>; ayni
+    /// Not <c>N0</c> ile yaziliyordu, yani Turkce arayuzde <c>2.796</c>; ayni
     /// uygulamanin kaynak bilgisi ve plan paneli ayni birimi <c>2796</c> diye
     /// yaziyordu. Bu kol notun rakamlarini okur — eski yazimda ayrac gorunurdu.
     /// </summary>

@@ -486,10 +486,10 @@ internal partial class PlayerView
         if (details is null) return Strings.Get("player.info.none");
         var unknown = Strings.Get("player.info.unknown");
         var size = details.Width > 0 && details.Height > 0
-            ? details.Width.ToString(CultureInfo.InvariantCulture) + "×" + details.Height.ToString(CultureInfo.InvariantCulture)
+            ? Bicim.Cozunurluk(details.Width, details.Height)
             : unknown;
         var fps = double.IsFinite(details.FramesPerSecond) && details.FramesPerSecond > 0
-            ? details.FramesPerSecond.ToString("0.###", CultureInfo.CurrentCulture)
+            ? Bicim.Kare(details.FramesPerSecond, Strings.Culture)
             : unknown;
         var rate = double.IsFinite(details.BitsPerSecond) && details.BitsPerSecond > 0
             ? Bicim.BitHizi.BpsToKbps((long)Math.Round(details.BitsPerSecond))

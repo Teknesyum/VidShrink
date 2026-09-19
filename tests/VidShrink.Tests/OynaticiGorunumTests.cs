@@ -453,8 +453,8 @@ public sealed class OynaticiGorunumTests
         var beklenen = new[]
         {
             Strings.Get("player.info.codec", codec),
-            Strings.Get("player.info.resolution", boyut.Genislik.ToString(CultureInfo.InvariantCulture) + "×" + boyut.Yukseklik.ToString(CultureInfo.InvariantCulture)),
-            Strings.Get("player.info.framerate", fps.ToString("0.###", CultureInfo.CurrentCulture)),
+            Strings.Get("player.info.resolution", Bicim.Cozunurluk(boyut.Genislik, boyut.Yukseklik)),
+            Strings.Get("player.info.framerate", Bicim.Kare(fps, Strings.Culture)),
             Strings.Get("player.info.audio", ses[0], int.Parse(ses[2], CultureInfo.InvariantCulture), int.Parse(ses[1], CultureInfo.InvariantCulture))
         };
         var sapma = rapor.details is null ? double.NaN : Math.Abs(rapor.details.BitsPerSecond - bitHizi) / bitHizi;
@@ -495,6 +495,38 @@ public sealed class OynaticiGorunumTests
         Assert.Contains("1500", metin.kirpilan);
         Assert.DoesNotContain("1499", metin.kirpilan);
         Assert.Contains("1499", metin.asagi);
+    }
+
+    /// <summary>
+    /// Bilgi panelinin cozunurluk ve kare hizi satirlari ailenin yazimini kullanir.
+    /// Cozunurluk carpi isaretiyle (<c>1920×1080</c>), kare hizi <b>iki</b> ondalikla
+    /// ve <b>arayuzun</b> kulturuyle. Oncesinde bu satir <c>0.###</c> ile uc ondalik
+    /// yaziyordu (ailenin tek aykirisi) ve kulturu <c>CultureInfo.CurrentCulture</c>'dan,
+    /// yani makineden okuyordu: Turkce arayuz Ingilizce makinede <c>23.976</c> yaziyordu.
+    /// Beklenen basamaklar elle yazili, canli kol gibi bicim ifadesini kopyalamiyor.
+    /// </summary>
+    [Fact]
+    public void BilgiPaneliCozunurluguVeKareHiziniAileninYazimiylaYazar()
+    {
+        var metin = AppHost.Run(() =>
+        {
+            var onceki = Strings.Language;
+            Strings.Use("tr");
+            try
+            {
+                return PlayerView.Describe(new MediaDetails("h264", 1920, 1080, 23.976, 1_500_000, "aac", 2, 48_000));
+            }
+            finally
+            {
+                Strings.Use(onceki);
+            }
+        });
+
+        Assert.Contains("1920×1080", metin);
+        Assert.DoesNotContain("1920x1080", metin);
+        Assert.Contains("23,98", metin);
+        Assert.DoesNotContain("23,976", metin);
+        Assert.DoesNotContain("23.976", metin);
     }
 
     [Fact]

@@ -1899,8 +1899,8 @@ public partial class MainWindow : Window
         TxtAdvAudioChannelsNow.Text = has
             ? Say("main.advanced.now", plan!.AudioChannels?.ToString(CultureInfo.InvariantCulture) ?? Say("main.advanced.audio-channels.none"))
             : "";
-        TxtAdvMinResolutionNow.Text = has ? Say("main.advanced.now", $"{plan!.Width}x{plan.Height}") : "";
-        TxtAdvMinFpsNow.Text = has ? Say("main.advanced.now", Num(plan!.Fps, "0.##")) : "";
+        TxtAdvMinResolutionNow.Text = has ? Say("main.advanced.now", Bicim.Cozunurluk(plan!.Width, plan.Height)) : "";
+        TxtAdvMinFpsNow.Text = has ? Say("main.advanced.now", Bicim.Kare(plan!.Fps, Strings.Culture)) : "";
         TxtAdvEncoderPathNow.Text = has ? Say("main.advanced.now", CodecModel.IsHardware(plan!.Codec)
             ? Say("main.advanced.encoder-path.hardware")
             : Say("main.advanced.encoder-path.software")) : "";
@@ -3228,8 +3228,8 @@ public partial class MainWindow : Window
         Fade(InfoGrid, true);
         TxtDuration.Text = Saat.Ekran(TimeSpan.FromSeconds(info.DurationSeconds), TimeSpan.FromHours(1));
         TxtSize.Text = Say("main.unit.mb-value", Num(info.FileSizeMb, "0.0"));
-        TxtResolution.Text = $"{info.Width}x{info.Height}";
-        TxtFps.Text = Num(info.Fps, "0.##");
+        TxtResolution.Text = Bicim.Cozunurluk(info.Width, info.Height);
+        TxtFps.Text = Bicim.Kare(info.Fps, Strings.Culture);
         TxtVideoCodec.Text = info.VideoCodec;
         TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {Say("main.unit.k-value", Bicim.BitHizi.BpsToKbps(info.AudioBitrateBps))}" : Say("main.info.none");
         TxtBitrate.Text = Say("main.unit.kbps-value", Bicim.BitHizi.BpsToKbps(info.TotalBitrateBps));
@@ -3523,8 +3523,8 @@ public partial class MainWindow : Window
             EncodeMode.PassThrough => Say("main.plan.mode.copy"),
             _ => $"{Say("main.unit.k-value", Bicim.BitHizi.Kbps(plan.VideoBitrateK))} · {Say("main.plan.mode.two-pass")}"
         });
-        AddPlanFact(Say("main.plan.fact.resolution"), $"{plan.Width}x{plan.Height}");
-        AddPlanFact(Say("main.plan.fact.frame-rate"), Say("main.unit.fps-value", Num(plan.Fps, "0.##")));
+        AddPlanFact(Say("main.plan.fact.resolution"), Bicim.Cozunurluk(plan.Width, plan.Height));
+        AddPlanFact(Say("main.plan.fact.frame-rate"), Say("main.unit.fps-value", Bicim.Kare(plan.Fps, Strings.Culture)));
         AddPlanFact(Say("main.plan.fact.audio"), plan.AudioCodec is null ? Say("main.info.none") : $"{plan.AudioCodec} {Say("main.unit.k-value", Bicim.BitHizi.Kbps(plan.AudioBitrateK))}{channels}");
         AddPlanFact(Say("main.plan.fact.preset"), plan.Preset);
         AddPlanFact(Say("main.plan.fact.estimated-size"), _estimate is { } size ? Say("main.unit.mb-value", Num(size.ExpectedMb, "0.0")) : "-");
@@ -3675,9 +3675,9 @@ public partial class MainWindow : Window
             {
                 ReasonCode.ResolutionScaled => Say("main.reason.resolution-scaled",
                     note.Width, note.Height, Bicim.Yuzde.Hazir(note.ScalePercent, Strings.Culture)),
-                ReasonCode.FrameRateReduced => Say("main.reason.frame-rate-reduced", Num(note.Fps, "0.##")),
+                ReasonCode.FrameRateReduced => Say("main.reason.frame-rate-reduced", Bicim.Kare(note.Fps, Strings.Culture)),
                 ReasonCode.ResolutionRestoredAtCeiling => Say("main.reason.resolution-restored",
-                    note.Width, note.Height, Num(note.Fps, "0.##"), Num(note.Crf, "0")),
+                    note.Width, note.Height, Bicim.Kare(note.Fps, Strings.Culture), Num(note.Crf, "0")),
                 ReasonCode.BudgetExceedsCeiling => ShowsMeasuredQualityStop(plan, note, CurrentOptions().FillPolicy)
                     ? Say("main.reason.measured-quality-stop",
                         Num(note.Crf, "0"), Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##"))
@@ -3727,9 +3727,9 @@ public partial class MainWindow : Window
                 ReasonCode.ManualMinResolutionOverride => Say("main.reason.manual-min-resolution-override",
                     note.ManualOverrideValue, note.EngineWouldHaveChosen, note.Width, note.Height),
                 ReasonCode.ManualMinFpsUnmet => Say("main.reason.manual-min-fps-unmet",
-                    note.ManualOverrideValue, Num(note.Fps, "0.##")),
+                    note.ManualOverrideValue, Bicim.Kare(note.Fps, Strings.Culture)),
                 ReasonCode.ManualMinFpsOverride => Say("main.reason.manual-min-fps-override",
-                    note.ManualOverrideValue, note.EngineWouldHaveChosen, Num(note.Fps, "0.##")),
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen, Bicim.Kare(note.Fps, Strings.Culture)),
                 ReasonCode.ManualCrfClamped => Say("main.reason.manual-crf-clamped",
                     note.ManualOverrideValue, note.EngineWouldHaveChosen, Num(note.Crf, "0")),
                 ReasonCode.ManualCrfOverride => Say("main.reason.manual-crf-override",

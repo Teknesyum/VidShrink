@@ -207,6 +207,47 @@ bir kusurla ölçüldü (`.calisma/mutasyon-oynatici.py`):
 ifadesinden **kopyalıyordu**, yani gövdeyi bozan mutasyon beklentiyi de bozuyor ve kol
 hep yeşil kalıyordu. Beklenen basamaklar artık elle yazılı.
 
+### Adım 5 ölçümü — 19 Eylül 2026
+
+Çözünürlük ve kare hızı indi. Çözünürlük **üç** yazımdaydı: `1920x1080` (kaynak bilgisi,
+plan gerçeği, gelişmiş panel), `1920×1080` (oynatıcı, kaydedici özeti), `1920 × 1080`
+(hazır boyut listesi, çizim penceresinin ölçü etiketi). Yedisi de `Bicim.Cozunurluk`'a
+bağlandı; ffmpeg argümanı üreten `WxH` yazımlarına dokunulmadı.
+
+Kare hızında tek aykırı oynatıcıydı: `0.###` ile **üç** ondalık yazıyor ve kültürü
+`CultureInfo.CurrentCulture`'dan, yani arayüzün dilinden değil **makineden** okuyordu.
+Türkçe arayüz İngilizce makinede `23.976` yazıyordu; artık `23,98`.
+
+Mutasyon, temiz tabanda (0 kırmızı / 125 yeşil):
+
+| mutasyon | kırmızı |
+| --- | --- |
+| gövde çarpı yerine `x` yazıyor | 5 |
+| gövde üç ondalık yazıyor | 3 |
+| gövde kültürü yok sayıyor | 3 |
+| kaynak çözünürlüğü gövdeye uğramıyor | 2 |
+| kaynak kare hızı gövdeye uğramıyor | 1 |
+| plan gerçeği gövdeye uğramıyor | **0** |
+| gelişmiş panel gövdeye uğramıyor | **0** |
+| oynatıcı çözünürlüğü gövdeye uğramıyor | 2 |
+| oynatıcı kare hızı gövdeye uğramıyor | 1 |
+| kaydedici özeti gövdeye uğramıyor | **0** |
+| hazır boyut listesi gövdeye uğramıyor | 1 |
+| çizim etiketi gövdeye uğramıyor | 1 |
+
+Üç sıfır gerçek kör noktaydı — eşdeğer mutant değil, **hiçbir ölçü o satırı
+okumuyordu**. Üçüne pim yazıldı (`PlanVeGelismisPanelCozunurluguCarpiIsaretiyle`,
+`OtomatikOzetCozunurlugunuCarpiIsaretiyleYazar`) ve aynı mutasyonlar yeniden koşuldu:
+
+| mutasyon | kırmızı |
+| --- | --- |
+| plan gerçeği gövdeye uğramıyor | 2 |
+| gelişmiş panel gövdeye uğramıyor | 2 |
+| kaydedici özeti gövdeye uğramıyor | 1 |
+
+Oynatıcının canlı bilgi paneli ölçüsü burada da beklenen değeri biçim ifadesinden
+kopyalıyordu (bit hızındaki aynı kusur). Yanına elle yazılmış basamaklı bir pim kondu.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

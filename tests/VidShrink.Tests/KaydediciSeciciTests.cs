@@ -110,6 +110,55 @@ public sealed class KaydediciSeciciTests
         Kapat("bolge-cizme.txt");
     }
 
+    /// <summary>
+    /// Hazir boyut listesi ve cizim penceresinin olcu etiketi ailenin cozunurluk
+    /// yazimini kullanir. Ikisi de <c>"{0} × {1}"</c> ile bosluklu yaziyordu; ayni
+    /// uygulamanin kaynak bilgisi ve oynaticisi ayni seyi bosluksuz yaziyor. Sifir
+    /// pimli iki cagri yeriydi, yazim sessizce ayrisabiliyordu.
+    /// </summary>
+    [Fact]
+    public void SeciciOlculeriAileninCozunurlukYazimiylaYazilir()
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+            var etiketler = Bul<ComboBox>(view, "CmbRegionSize").ItemsSource!.Cast<string>().ToArray();
+
+            var secici = new RecorderRegionPicker(null);
+            secici.Show();
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Cizdir(secici, new PixelPoint(0, 0), new PixelPoint(1920, 1080));
+            var etiket = secici.FindControl<TextBlock>("TxtSize")!.Text ?? "";
+            secici.Close();
+
+            return (etiketler, etiket);
+        }));
+
+        var hazir = olcu.etiketler.Where(e => e.Contains('×')).ToArray();
+
+        Assert.NotEmpty(hazir);
+        Assert.All(hazir, e => Assert.DoesNotContain(" × ", e));
+        Assert.Contains("1920×1080", hazir);
+        Assert.Equal("1920×1080", olcu.etiket);
+    }
+
+    /// <summary>
+    /// Cizim penceresinin olcu etiketini isaretci olaylarini kurmadan surer: ozel
+    /// <c>_start</c>/<c>_desktop</c> alanlari doldurulup <c>Draw</c> cagrilir. Amac
+    /// surukleme davranisini olcmek degil — o <c>BolgeCizme</c>'de — yalnizca etiketin
+    /// yazimini okumak.
+    /// </summary>
+    private static void Cizdir(RecorderRegionPicker secici, PixelPoint baslangic, PixelPoint bitis)
+    {
+        const System.Reflection.BindingFlags Ozel =
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+
+        var tur = typeof(RecorderRegionPicker);
+        tur.GetField("_desktop", Ozel)!.SetValue(secici, new PixelRect(0, 0, 3840, 2160));
+        tur.GetField("_start", Ozel)!.SetValue(secici, baslangic);
+        tur.GetMethod("Draw", Ozel)!.Invoke(secici, new object[] { bitis });
+    }
+
     [Fact]
     public void CizimPenceresiMasaustunuKaplarVeEscVazgecer()
     {

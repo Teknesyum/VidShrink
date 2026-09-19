@@ -448,6 +448,56 @@ public sealed class KareYerlesimTests
         => Assert.Equal(beklenen, Yuklu(dil, window => Named<TextBlock>(window, "TxtFps").Text));
 
     /// <summary>
+    /// Kaynak bilgisindeki cozunurluk ailenin carpi isaretini kullanir. Bu satirin hic
+    /// pimi yoktu: ayni uygulama <c>1920x1080</c> (kaynak bilgisi, plan gercegi, gelismis
+    /// panel), <c>1920×1080</c> (oynatici, kaydedici ozeti) ve <c>1920 × 1080</c> (bolge
+    /// secicileri) diye uc turlu yaziyordu. Kultur almaz: tam sayida basamak ayraci
+    /// istemiyoruz, iki dilde ayni yazim bekleniyor.
+    /// </summary>
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void KaynakBilgiCozunurluguCarpiIsaretiyle(string dil)
+    {
+        var yazi = Yuklu(dil, window => Named<TextBlock>(window, "TxtResolution").Text ?? "");
+
+        Assert.Equal("3840×2160", yazi);
+        Assert.DoesNotContain("x", yazi);
+    }
+
+    /// <summary>
+    /// Plan panelinin ve gelismis panelin cozunurluk satirlari da ailenin yazimini
+    /// kullanir. Ikisi de <c>$"{Width}x{Height}"</c> ile kuruluyordu ve **hicbir olcu
+    /// okumuyordu**: adim 5'in mutasyonunda ikisi de 0 kirmizi verdi. Deger satiri
+    /// anahtarin yaninda duruyor; "x yok" iddiasi tum panele degil o hucreye yazili
+    /// (kodek adi <c>libx264</c> panelde x tasiyor).
+    /// </summary>
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void PlanVeGelismisPanelCozunurluguCarpiIsaretiyle(string dil)
+    {
+        var okunan = Yuklu(dil, window =>
+        {
+            var hucreler = window.FindControl<Grid>("PlanFacts")!.Children.OfType<TextBlock>()
+                .Select(t => t.Text ?? "").ToArray();
+            return (hucreler, gelismis: Named<TextBlock>(window, "TxtAdvMinResolutionNow").Text ?? "");
+        });
+
+        Strings.Use(dil);
+        var anahtar = Array.IndexOf(okunan.hucreler, Strings.Get("main.plan.fact.resolution"));
+
+        Assert.True(anahtar >= 0, string.Join(" | ", okunan.hucreler));
+
+        var deger = okunan.hucreler[anahtar + 1];
+
+        Assert.Contains("×", deger);
+        Assert.DoesNotContain("x", deger);
+        Assert.Contains("×", okunan.gelismis);
+        Assert.DoesNotContain("x", okunan.gelismis);
+    }
+
+    /// <summary>
     /// Bit hizi ekranda <b>yuvarlanir</b>, kirpilmaz. Bolme tamsayi yapildiginda
     /// 1.499.600 bps ekrana 1499 kbps diye cikiyordu; ayni deger baska bir akista
     /// <c>double</c> ile bolunup 1500 yaziyordu, yani tek kaynak iki sayi gosterebiliyordu.

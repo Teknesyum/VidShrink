@@ -102,7 +102,7 @@ internal partial class RecorderRegionPicker : Window
         Selection.Width = bottomRight.X - topLeft.X;
         Selection.Height = bottomRight.Y - topLeft.Y;
         Selection.IsVisible = true;
-        TxtSize.Text = string.Format(CultureInfo.InvariantCulture, "{0} × {1}", _current.Width, _current.Height);
+        TxtSize.Text = Bicim.Cozunurluk(_current.Width, _current.Height);
         Canvas.SetLeft(SizeTag, topLeft.X);
         Canvas.SetTop(SizeTag, bottomRight.Y);
         SizeTag.IsVisible = true;
