@@ -396,9 +396,11 @@ public sealed class FfmpegArgumentsTests
     /// arayuz is parcacigini kodlayici basina yoklama suresi kadar bloklar. Olcu artik
     /// pencerenin kaynak metnine degil sahte kabiliyetin cagri sayacina bakiyor.
     ///
-    /// <para><b>19 Eylul 2026:</b> son asertteki metin pimi bayattı. Cikti deseni turunda
-    /// <c>BuildUniqueOutputPath</c> dorduncu bir bagimsiz degisken (<c>plan</c>) aldi, pim
-    /// eski uc argumanli cagriyi ariyordu ve test main uzerinde kirmizi kaldi.</para>
+    /// <para><b>19 Eylul 2026:</b> metin pimleri iki kez bayatladi. Once <c>BuildUniqueOutputPath</c>
+    /// dorduncu bir bagimsiz degisken (<c>plan</c>) aldi; sonra yoklama gecidi pencereden
+    /// <c>MainWindow.Yoklama.cs</c>'e ayrildi ve isitma pimi bos dosyada arandi. Isitma pimi artik
+    /// <see cref="TipSources.WindowProbeCodePath"/> okuyor, pencerede hic isitma kalmadigi da ayrica
+    /// pimli -- boylece gecit geri tasinirsa olcu susmaz.</para>
     /// </summary>
     [Fact]
     public void Arayuz_yolunda_kodlayici_yoklamasi_dogurulmaz()
@@ -410,9 +412,11 @@ public sealed class FfmpegArgumentsTests
 
         Assert.Empty(recorder.Warmed);
 
+        var probeSource = File.ReadAllText(TipSources.WindowProbeCodePath).Replace("\r\n", "\n");
+        Assert.Contains("var capabilities = EncoderCapabilities.Instance;\n                WarmPsychovisualProbe(capabilities);", probeSource);
+        Assert.DoesNotContain("WarmPsychovisualProbe(", File.ReadAllText(TipSources.WindowCodePath));
+
         var windowSource = File.ReadAllText(TipSources.WindowCodePath);
-        Assert.Contains("var capabilities = EncoderCapabilities.Instance;\n                WarmPsychovisualProbe(capabilities);",
-            windowSource.Replace("\r\n", "\n"));
         Assert.Contains("BuildUniqueOutputPath(_info.FilePath, \"shrunk\", plan.Streams?.Extension ?? \"mp4\", plan), _encoders, _sceneMap?.Map));", windowSource);
     }
 
