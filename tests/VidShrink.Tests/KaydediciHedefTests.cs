@@ -295,15 +295,23 @@ public sealed class KaydediciHedefTests
         Kapat("iptal.txt");
     }
 
+    /// <summary>
+    /// Sinir ve bekleme ortama bagimli degil. Eski degerler (0,05 MB / 8 sn) hareketsiz
+    /// masaustunde tutmuyordu: 19 Eylul 2026'da gdigrab 8 saniyede 26694 bayt yazdi, sinir
+    /// 52428'di ve olcu kirmizi dondu. Kusur kodda degil, ekran iceriginde — durgun goruntu
+    /// az bayt uretir. Sinir olculen hizin (~3300 bayt/sn) yarisinin altina indirildi ve
+    /// bekleme iki katindan fazlasina acildi: 0,02 MB'a hareketsiz masaustunde ~6,4 saniyede
+    /// ulasilir, hareketli ekranda cok daha erken. Iki yonde de genis pay var.
+    /// </summary>
     [KayitFact]
     public async Task BoyutSiniriDolunacaKayitKendiBiter()
     {
         var cikti = Path.Combine(Kanit, "boyut-siniri.mp4");
-        var istek = Istek() with { Quality = 0, KeyframeSeconds = 1, MaxMegabytes = 0.05 };
+        var istek = Istek() with { Quality = 0, KeyframeSeconds = 1, MaxMegabytes = 0.02 };
 
         var oturum = await RecorderSession.StartAsync(istek, cikti);
         var saat = System.Diagnostics.Stopwatch.StartNew();
-        var bitti = await Task.WhenAny(oturum.Ended, Task.Delay(8000)) == oturum.Ended;
+        var bitti = await Task.WhenAny(oturum.Ended, Task.Delay(20000)) == oturum.Ended;
         var sure = saat.Elapsed.TotalSeconds;
         var sonuc = await oturum.StopAsync();
         var bayt = File.Exists(cikti) ? new FileInfo(cikti).Length : 0;
@@ -311,12 +319,12 @@ public sealed class KaydediciHedefTests
         var (kod, metin) = KayitKanit.Ffprobe(cikti, "boyut-siniri.ffprobe.txt");
         var baslik = File.Exists(cikti) ? System.Text.Encoding.ASCII.GetString(File.ReadAllBytes(cikti), 4, 4) : string.Empty;
         var (paketBayt, sonKume) = Paketler(cikti);
-        var sinir = (long)(0.05 * 1024 * 1024);
+        var sinir = (long)(0.02 * 1024 * 1024);
 
         File.WriteAllLines(Path.Combine(Kanit, "boyut-siniri.txt"), new[] { $"ended={bitti} sn={sure:0.00} ok={sonuc.Ok} teslim={sonuc.OutputPath} bayt={bayt} paket={paketBayt} sonIkiAnahtarKumesi={sonKume} sinir={sinir} yakalamaKaldi={File.Exists(yakalama)} probe={kod}" });
         if (File.Exists(cikti)) File.Delete(cikti);
 
-        Assert.True(bitti, "0,05 MB siniri dolunca oturum kendiliginden bitmeli");
+        Assert.True(bitti, "0,02 MB siniri dolunca oturum kendiliginden bitmeli");
         Assert.True(sonuc.Ok, sonuc.StandardError);
         Assert.Equal(cikti, sonuc.OutputPath);
         Assert.False(File.Exists(yakalama));
