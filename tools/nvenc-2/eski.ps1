@@ -1,3 +1,4 @@
+#requires -Version 7
 param([string]$Calisma = '.calisma/nvenc2', [string]$Json = 'eski.json')
 $ErrorActionPreference = 'Stop'
 $Inv = [Globalization.CultureInfo]::InvariantCulture

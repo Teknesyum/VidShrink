@@ -1,3 +1,4 @@
+#requires -Version 7
 param(
     [string]$Calisma = '.calisma/nvenc2', [string]$Json = 'tara.json', [string]$Hucreler = '', [string]$KolTanim = '',
     [double]$Tolerans = 0.015, [int]$EnCokDeneme = 3)

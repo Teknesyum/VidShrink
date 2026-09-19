@@ -193,7 +193,8 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | A2 ön ayar kütüphanesi | **girdi** | `Core/PresetLibrary.cs`, `Core/Presets/platformlar.json`, `OnAyarKutuphanesiTests` |
 | A3 `izle` | **girdi** | `Core/WatchFolder.cs`, `WatchFolderTests` |
 | A5 CLI ürün yolu + HB SVT hız kolu | **girdi** | `hb.ps1:1610` `urun-cli`, `:1832` svt kolu, `docs/olcumler/handbrake-kiyas-cli.md`, koşum 35248903679, birleşme `ef8e6931` |
-| B1a flac/ac3/eac3 **kodlama** | yapılmadı | `Core/PlanParser.cs:14` hâlâ `aac, libopus, libmp3lame, copy` |
+| B1a ac3/eac3 **kodlama** | **girdi** (19 Eylül, `8f09dc60`) | `Core/PlanParser.cs:14` `AllowedAudioCodecs` artık `ac3, eac3` taşıyor; `LanguageTests` marka adı izinlisi |
+| B1a flac **küçültmede** | yapılmadı | `flac` yalnız dönüştürücüde (`ConversionArguments.cs:127,133,150,157,158`) ve kopyalama listesinde (`StreamMapping.cs:156,157`); `PlanParser.AllowedAudioCodecs`'te yok |
 | B1b loudnorm / gain | yapılmadı | depoda `loudnorm` geçmiyor |
 | B1c harici SRT/ASS | yapılmadı | dış altyazı yalnız oynatıcıda (P28), küçültme yolunda yok |
 | B1d kapak resmi | yapılmadı | `Ffmpeg/FfprobeClient.cs:302-305` `attached_pic`'i yalnız eliyor, taşımıyor |
