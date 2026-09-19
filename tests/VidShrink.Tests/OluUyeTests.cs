@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -707,6 +707,13 @@ public sealed class OluUyeTests
             "Kalan kor nokta kapandiysa satiri pimden dusur: record struct esitligi hala gorulmuyordu.");
     }
 
+    /// <summary>
+    /// Nitelenmemis okumanin gorulup gorulmedigi: satir numaralari kaynagin kendisinden
+    /// pimleniyor.
+    ///
+    /// <para><b>19 Eylul 2026:</b> baslik tarama turu <c>UpdateCheck.cs</c>ye bir satir
+    /// kaydirdi (205 -> 206, 1645 -> 1646). Deger degismedi, yeri degisti.</para>
+    /// </summary>
     [Fact]
     public void NitelenmemisOkumaGoruluyor()
     {
@@ -714,8 +721,8 @@ public sealed class OluUyeTests
 
         foreach (var (ad, dosya, satir) in new[]
                  {
-                     ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 205),
-                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1645),
+                     ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 206),
+                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1646),
                      ("DeveloperUnlock.Window", "src/VidShrink.Core/DeveloperUnlock.cs", 22)
                  })
         {
@@ -794,7 +801,6 @@ public sealed class OluUyeTests
         "LayoutScoreParts.Provided  yalniz-disarida",
         "LayoutScoreParts.Required  yalniz-disarida",
         "MediaInfo.BitDepth  hic-gorunmeyen",
-        "MediaInfo.ChapterCount  hic-gorunmeyen",
         "PerformanceCheckResult.CpuAccountingTrustworthy  yalniz-disarida",
         "PerformanceCheckResult.HardwareMeasured  yalniz-disarida",
         "PerformanceCheckResult.Impact  yalniz-disarida",
@@ -851,6 +857,7 @@ public sealed class OluUyeTests
         "TimelinePoint.OutputFrame  yalniz-disarida",
         "TimelinePoint.OutputSeconds  yalniz-disarida",
         "TimelinePoint.SourceSeconds  yalniz-disarida",
+        "TimestampAlignment.Note  yalniz-disarida",
         "TrimOutcome.Rounds  yalniz-disarida",
         "UnknownCaptureDeviceException.DeviceName  yalniz-disarida",
         "WatchEntry.ProcessedUtc  yalniz-disarida",

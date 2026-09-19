@@ -1,18 +1,5 @@
 namespace VidShrink.Core;
 
-/// <summary>Bir basligin nereden geldigi; girdi argumanini bu belirler.</summary>
-public enum TitleSourceKind
-{
-    /// <summary>Duz dosya: tek baslik, girdi argumani bugunku gibi kalir.</summary>
-    File,
-
-    /// <summary>Cok programli yayin (MPEG-TS): baslik bir programa denk duser.</summary>
-    Program,
-
-    /// <summary>DVD-Video klasoru ya da ISO: baslik <c>dvdvideo</c> demuxer'inin title numarasi.</summary>
-    Dvd,
-}
-
 /// <summary>
 /// Kaynaktaki tek bir baslik. <paramref name="Number"/> kullanicinin yazdigi numaradir:
 /// programda ffprobe'un <c>program_id</c>'si, DVD'de <c>-title</c> degeri, duz dosyada 1.
@@ -26,9 +13,6 @@ public sealed record SourceTitle(
     int ChapterCount,
     string? Label)
 {
-    /// <summary>Basligin turu; girdi argumani bundan kurulur.</summary>
-    public TitleSourceKind Kind { get; init; } = TitleSourceKind.File;
-
     /// <summary>
     /// Basligin tasidigi akislarin **mutlak** ffprobe indeksleri. Eslemeler zaten
     /// <c>0:&lt;indeks&gt;</c> yaziliyor, o yuzden program secmek eslemeyi degil envanteri

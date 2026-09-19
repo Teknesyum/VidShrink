@@ -203,7 +203,6 @@ public static class CliApp
                 writer.WriteNumber("height", b.Height);
                 writer.WriteNumber("streams", b.StreamCount);
                 writer.WriteNumber("chapters", b.ChapterCount);
-                writer.WriteString("kind", b.Kind.ToString().ToLowerInvariant());
                 if (b.Label is { Length: > 0 }) writer.WriteString("label", b.Label);
                 writer.WriteEndObject();
             }

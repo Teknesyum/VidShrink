@@ -320,7 +320,7 @@ public static class FfprobeClient
                     indeksler.Count,
                     0,
                     etiket)
-                { Kind = TitleSourceKind.Program, StreamIndexes = indeksler });
+                { StreamIndexes = indeksler });
             }
         }
 

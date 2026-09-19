@@ -56,8 +56,8 @@ public sealed class BaslikTaramaTests
 
     private static IReadOnlyList<SourceTitle> Ornek() => new[]
     {
-        new SourceTitle(1, 3, 160, 120, 2, 0, "Kisa Baslik") { Kind = TitleSourceKind.Program, StreamIndexes = new[] { 0, 1 } },
-        new SourceTitle(2, 5, 160, 120, 1, 0, "Uzun Baslik") { Kind = TitleSourceKind.Program, StreamIndexes = new[] { 2 } },
+        new SourceTitle(1, 3, 160, 120, 2, 0, "Kisa Baslik") { StreamIndexes = new[] { 0, 1 } },
+        new SourceTitle(2, 5, 160, 120, 1, 0, "Uzun Baslik") { StreamIndexes = new[] { 2 } },
     };
 
     [FfmpegFact]
@@ -73,7 +73,6 @@ public sealed class BaslikTaramaTests
             Assert.Equal(new[] { 1, 2 }, bilgi.Titles.Select(b => b.Number).ToArray());
             Assert.Equal(new[] { "Kisa Baslik", "Uzun Baslik" }, bilgi.Titles.Select(b => b.Label).ToArray());
             Assert.Equal(new[] { 2, 1 }, bilgi.Titles.Select(b => b.StreamCount).ToArray());
-            Assert.All(bilgi.Titles, b => Assert.Equal(TitleSourceKind.Program, b.Kind));
             Assert.Equal(3, bilgi.Titles[0].DurationSeconds, 1);
             Assert.Equal(5, bilgi.Titles[1].DurationSeconds, 1);
         }
@@ -114,7 +113,6 @@ public sealed class BaslikTaramaTests
             Assert.Single(bilgi.Titles);
             Assert.False(bilgi.HasMultipleTitles);
             Assert.Equal(1, bilgi.Titles[0].Number);
-            Assert.Equal(TitleSourceKind.File, bilgi.Titles[0].Kind);
         }
         finally
         {

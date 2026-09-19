@@ -185,10 +185,11 @@ public partial class MainWindow : Window
             Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
             PlayerHistoryFileName);
 
-       BuildLanguageSwitch();
+        BuildLanguageSwitch();
         BuildThemeList();
         Strings.Changed += OnLanguageChanged;
         ShowSourceName();
+        RefreshOutputNamePreview();
         RefreshPlatforms();
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
@@ -1463,9 +1464,8 @@ public partial class MainWindow : Window
         }
 
         LblOutputNamePreview.Classes.Set("error", false);
-        LblOutputNamePreview.Text = string.Format(
-            CultureInfo.CurrentCulture,
-            Strings.Get("settings-tab.output-name.preview"),
+        LblOutputNamePreview.Text = Strings.Get(
+            "settings-tab.output-name.preview",
             AdlandirmaDeseni.Uygula(desen, OrnekAdBilgisi()) + ".mp4");
     }
 
