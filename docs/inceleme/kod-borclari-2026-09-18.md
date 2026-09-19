@@ -81,7 +81,10 @@ açıkça "bu kod kalkacak" diyor.
     okuma önekleri listesini boşaltmak 1 kırmızı.
 14. `OluUyeTests.cs:485-494` — `ArchitectureOutcome.Assumed` ve
     `HardwareVerdictReason.BitrateFloorTooHigh` hiçbir kolda ayrılmıyor.
-15. `OluUyeTests.cs:487-488` — `ComparisonSourceState.Duraklatildi` hesaplanıp atılıyor.
+15. ~~`OluUyeTests.cs:487-488` — `ComparisonSourceState.Duraklatildi` hesaplanıp
+    atılıyor.~~ **Kapandı:** ayırmak gerekiyormuş. Kaynak kendi kararıyla duraklıyor,
+    şerit düğmesi "oynuyor" demeye devam ediyordu; durum artık şeride ve sese iniyor.
+    Üç kesimin üçü kırmızı (`docs/olcumler/k8-duraklama-seride-2026-09-19.md`).
 16. ~~`src/VidShrink.App/Playback/PlayerView.axaml.cs:232-238` — Bitmiş bir turun
     (`VIDSHRINK_T176_TRACE`) hata ayıklama iskelesi kalıcı yüzeyde.~~ **Kapandı:**
     `Echo` ve iki çağrı yeri (`MainWindow.axaml.cs`) kaldırıldı; ortam değişkenini

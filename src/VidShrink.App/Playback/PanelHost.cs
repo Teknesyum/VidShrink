@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -976,8 +976,13 @@ internal sealed class PanelHost : IDisposable
     /// <summary>
     /// Kaynak kurulamadıysa panel sebebi söyler ve program çalışmaya devam eder — panelin
     /// yokluğu programı bozmaz (K2).
+    ///
+    /// <para>Oynuyor/duraklatıldı kolu şeridi kaynağa bağlar: kaynak kendi kararıyla
+    /// duraklayabiliyor (ilk kare istek gelmeden üretildiğinde), o durumda düğme oynuyor
+    /// derken görüntü duruyordu. Şerit düğmesi olayı yalnız kullanıcı bastığında
+    /// yayıyor, buradan yazmak geri besleme kurmuyor.</para>
     /// </summary>
-    private void Report(ComparisonSourceStatus status)
+    internal void Report(ComparisonSourceStatus status)
     {
         if (_disposed) return;
         if (status.State == ComparisonSourceState.Kullanilamiyor)
@@ -989,6 +994,14 @@ internal sealed class PanelHost : IDisposable
         {
             _panel.SetNotice("playback.player-failed");
             _panel.Controls.IsPlaying = false;
+        }
+        else if (status.State is ComparisonSourceState.Oynuyor or ComparisonSourceState.Duraklatildi)
+        {
+            var oynuyor = status.State == ComparisonSourceState.Oynuyor;
+            if (_panel.Controls.IsPlaying == oynuyor) return;
+            _panel.Controls.IsPlaying = oynuyor;
+            if (oynuyor) _audio.Play();
+            else _audio.Pause();
         }
     }
 

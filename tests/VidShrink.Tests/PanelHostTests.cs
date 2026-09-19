@@ -1,4 +1,4 @@
-using VidShrink.App;
+﻿using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.App.Playback;
 using VidShrink.Core;
@@ -187,6 +187,35 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
     /// T50/K1: rozet uc durumda da panele gercekten geciyor. Parca modunda dolu, tam cikti
     /// modunda ve perde durumunda bos.
     /// </summary>
+    /// <summary>
+    /// K8 borcu 15: kaynak kendi kararıyla duraklayabiliyor (ilk kare oynatma isteği
+    /// gelmeden üretildiğinde). Şerit düğmesi o durumda oynuyor diyordu; durum artık
+    /// şeride iniyor. Ses de aynı kolda duruyor ve başlıyor.
+    /// </summary>
+    [Fact]
+    public void Kaynagin_duraklamasi_seride_iniyor()
+    {
+        var dir = Temp();
+        using var encoder = new SegmentEncoder(dir);
+        var panel = AppHost.Run(() => new ComparisonPanel());
+        var host = AppHost.Run(() => new PanelHost(panel, () => new SessizKaynak(), encoder));
+
+        AppHost.Run(() =>
+        {
+            panel.Controls.IsPlaying = true;
+            host.Report(new ComparisonSourceStatus(ComparisonSourceState.Duraklatildi, 1, 0, 0, 0, 0));
+        });
+        Assert.False(panel.Controls.IsPlaying);
+
+        AppHost.Run(() => host.Report(new ComparisonSourceStatus(ComparisonSourceState.Oynuyor, 2, 0, 0, 0, 0)));
+        Assert.True(panel.Controls.IsPlaying);
+
+        AppHost.Run(() => host.Report(new ComparisonSourceStatus(ComparisonSourceState.Aciliyor, 3, 0, 0, 0, 0)));
+        Assert.True(panel.Controls.IsPlaying);
+
+        AppHost.Run(host.Dispose);
+    }
+
     [FfmpegFact]
     public async Task Rozet_panele_gecer()
     {

@@ -572,8 +572,6 @@ public sealed class OluUyeTests
     {
         new("ArchitectureOutcome.Assumed", "varsayilan-kol", Debt,
             "Iki uyeli turun olumsuz kolu. VidShrink-Setup.exe motoru (SetupRunner.RuntimeIdentifier) Read kolunu soruyor; Assumed o kosulun else'i ve kullaniciya varsayim mesajini orada yaziyor. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; Read satirinin pimde isi kalmadi."),
-        new("ComparisonSourceState.Duraklatildi", "varsayilan-kol", Debt,
-            "Karsilastirma kaynaginin duraklatilmis durumu uretiliyor, hicbir kol duraklatilmisi ayirmiyor. Ayirmanin gerekip gerekmedigi olculmedi."),
         new("ConversionQualityMode.Bitrate", "varsayilan-kol", Legitimate,
             "Iki degerli kipin olumsuz kolu. Tek okuyan ConversionArguments.cs:86 'QualityMode == ConversionQualityMode.Crf' diye soruyor; Bitrate o kosulun else'i, ayrica adlandirilmasi ayni dali ikiye bolerdi."),
         new("FillPolicy.QualityCeiling", "varsayilan-kol", Legitimate,
