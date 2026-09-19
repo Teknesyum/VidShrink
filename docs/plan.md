@@ -1311,3 +1311,48 @@ tümden durdururdu.
 5. Ölçü: yoklamanın **kaç kez koştuğunu** sayan mevcut ölçüler korunur (kuyruklama
    davranışı budur) ve `Unmeasured`ın "çalışmıyor"a çökmediği ayrı pimlenir. Mutasyon:
    tetiği kaldırmak, üçüncü durumu iki duruma çökertmek, hdr10 kolunu düşürmek.
+
+## B1a — Çok kanallı ses: ac3/eac3 kodlama, flac kapsam dışı (19 Eylül 2026)
+
+HandBrake açığının B1a maddesi "flac/ac3/eac3 kodlama" diyordu. Danışma maddeyi ikiye böldü
+ve yarısını bilerek kapsam dışına aldı.
+
+**flac küçültme yoluna girmez.** Aracın sözleşmesi "ses bütçesi videodan düşer"; flac'in bit
+hızı kaynağa bağlıdır, kodlamadan önce bilinmez ve sınırlanamaz. Bütçeye ancak tahminle
+girer, o da hedef boyu ya ıskalar ya videoyu belirsiz miktarda ezer. Kayıpsız kaynağı
+korumak isteyen kullanıcının iki yolu zaten var: kaynak flac ise `CopyableAudio` mp4 ve
+mkv'de kopyalıyor, kaynak pcm ise dönüştürücü yolu duruyor. Gerçek boşluk yalnız
+dönüştürücüde: orada `pcm_s16le` var, flac yok. flac pcm'den her durumda küçüktür, o yüzden
+oraya eklenir.
+
+**ac3/eac3 gerçek bir boşluk kapatıyor, ama dar.** Kaynak zaten ac3/eac3 ise passthrough onu
+taşıyor. Kapatmadığı vaka `StreamMapping.cs:150`'de duruyor: `NeverPassedThrough` listesi
+truehd/mlp/dts. Bugün 5.1 DTS kaynak aac'ye gidiyor ve kanal seçilmemişse `:289`'da 2'ye
+iniyor. Boşluk şu üçlüde: DTS/TrueHD kaynak + çok kanallı çıkış isteği + yalnız ac3 okuyan
+TV/AVR. Stereoda ac3'ün aac'ye karşı bir gerekçesi yok, o yüzden kodek seçimi kanal
+seçiminden bağımsız sunulmaz.
+
+### Adımlar
+
+1. `AudioChannelOverride`'a **`Source`** eklenir: "kaynaktaki gibi". Bugün `Auto`, kanal
+   seçilmemişse 2'ye iniyor; `Source` o inişi atlar. İniş kararı `StreamMapping.Decide`'da
+   olduğu için oraya açık bir bayrak geçer, `audioChannels = null`'ın iki anlamı olmaz.
+2. `PlanOptions`'a **`AudioCodecChoice { Auto, Aac, Ac3, Eac3 }`** eklenir; varsayılan
+   `Auto`, `PickAudioCodec()` dokunulmaz. Seçim `Decide`'a taşınır.
+3. Kap kapısı: ac3/eac3 yalnız Mp4/Mkv/Mov. WebM'de istek düşer, `StreamNote` ile söylenir.
+   `!IsMp4Family(container) && codec == "aac" → libopus` satırı ac3/eac3'ü ezmemeli.
+4. Bit hızı: ac3'ün merdiveni ffmpeg'de kapalı bir kümedir, uydurulmaz — **ölçülür** ve
+   `docs/olcumler/b1a-ac3-merdiveni.md`'ye yazılır. Bütçeden seçilen `audioK`'nın altındaki
+   en yakın basamak alınır; hiçbir basamak tutmuyorsa aac'ye dönülür ve not düşer.
+5. `PlanParser.AllowedAudioCodecs`'e `ac3`, `eac3` eklenir.
+6. Arayüz: küçültme ekranında değil, Gelişmiş panelde. Önce kanal kutusuna "kaynaktaki gibi"
+   satırı, sonra yeni bir ses kodeği kutusu; kodek kutusu yalnız kanal "kaynaktaki gibi"
+   iken anlamlı olduğu için varsayılanı `Auto` kalır. `AppSettings`'e `advAudioCodec`.
+7. Dönüştürücüye flac: `ConversionArguments` kap izin listeleri ve `CmbConvertAudio`.
+8. Ölçüler: kap kapısı, merdiven seçimi, kanal korunması, WebM düşüşü, gidiş-dönüş
+   (`GelismisAyarGidisDonusTests` konumla okuduğu için yeni kutu oraya da girer), 42 dil.
+
+### Ölçü
+
+Her kolun negatif kontrolü olacak ve en az iki mutasyonla kırmızı döndüğü ölçülecek.
+Merdiven testi sayıyı elle yazmaz, ölçüm belgesinden okur.
