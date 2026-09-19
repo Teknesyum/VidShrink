@@ -262,8 +262,8 @@ public static class CliApp
         var targetMb = decision.TargetMb;
         if (DiskSpaceGuard.TryGetFreeBytes(decision.OutputPath, out var freeBytes) && !DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb))
         {
-            stderr.WriteLine(text.Format("error.no-space", Num(DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0, "0")));
-            return new FileRun(ExitCodes.Error, null, text.Format("error.no-space", Num(DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0, "0")));
+            stderr.WriteLine(text.Format("error.no-space", Num(DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0, "0", text)));
+            return new FileRun(ExitCodes.Error, null, text.Format("error.no-space", Num(DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0, "0", text)));
         }
 
         var clock = Stopwatch.StartNew();
@@ -294,16 +294,16 @@ public static class CliApp
         var estimate = decision.Result.Estimate;
         var builder = new StringBuilder();
         builder.AppendLine(text.Format("plan.input", info.FilePath));
-        builder.AppendLine(text.Format("plan.source", info.Width, info.Height, Num(info.Fps, "0.##"), Num(info.FileSizeMb, "0.0"), Clock(TimeSpan.FromSeconds(info.DurationSeconds))));
+        builder.AppendLine(text.Format("plan.source", info.Width, info.Height, Num(info.Fps, "0.##", text), Num(info.FileSizeMb, "0.0", text), Clock(TimeSpan.FromSeconds(info.DurationSeconds))));
         if (decision.QualityTarget is { } quality)
-            builder.AppendLine(text.Format("plan.quality-target", Num(quality.RequestedQuality, "0.#"), Num(decision.TargetMb, "0.#"), quality.Bound));
+            builder.AppendLine(text.Format("plan.quality-target", Num(quality.RequestedQuality, "0.#", text), Num(decision.TargetMb, "0.#", text), quality.Bound));
         else
-            builder.AppendLine(text.Format("plan.target", Num(decision.TargetMb, "0.##")));
-        builder.AppendLine(text.Format("plan.video", plan.Codec, plan.Mode, plan.Width, plan.Height, Num(plan.Fps, "0.##"), plan.VideoBitrateK));
+            builder.AppendLine(text.Format("plan.target", Num(decision.TargetMb, "0.##", text)));
+        builder.AppendLine(text.Format("plan.video", plan.Codec, plan.Mode, plan.Width, plan.Height, Num(plan.Fps, "0.##", text), plan.VideoBitrateK));
         if (plan.AudioCodec is not null)
             builder.AppendLine(text.Format("plan.audio", plan.AudioCodec, plan.AudioBitrateK));
-        builder.AppendLine(text.Format("plan.estimate", Num(estimate.ExpectedMb, "0.0"), Num(estimate.LowMb, "0.0"), Num(estimate.HighMb, "0.0")));
-        builder.AppendLine(text.Format("plan.quality", Num(decision.Result.PredictedQuality, "0.0"), Basis(estimate.Measured, text)));
+        builder.AppendLine(text.Format("plan.estimate", Num(estimate.ExpectedMb, "0.0", text), Num(estimate.LowMb, "0.0", text), Num(estimate.HighMb, "0.0", text)));
+        builder.AppendLine(text.Format("plan.quality", Num(decision.Result.PredictedQuality, "0.0", text), Basis(estimate.Measured, text)));
         if (plan.ReasonCodes.Count > 0)
             builder.AppendLine(text.Format("plan.reasons", string.Join(", ", plan.ReasonCodes.Select(note => note.Code))));
         builder.AppendLine(text.Format("plan.output", decision.OutputPath));
@@ -323,17 +323,17 @@ public static class CliApp
     {
         var builder = new StringBuilder();
         builder.AppendLine(text.Format("result.output", result.OutputPath));
-        builder.AppendLine(text.Format("result.size", Num(result.OutputMb, "0.0"), Num(decision.TargetMb, "0.##"), Num(decision.Info.FileSizeMb, "0.0")));
-        builder.AppendLine(text.Format("result.duration", elapsed.TotalSeconds < 60 ? Num(elapsed.TotalSeconds, "0.0") + " s" : Clock(elapsed)));
+        builder.AppendLine(text.Format("result.size", Num(result.OutputMb, "0.0", text), Num(decision.TargetMb, "0.##", text), Num(decision.Info.FileSizeMb, "0.0", text)));
+        builder.AppendLine(text.Format("result.duration", elapsed.TotalSeconds < 60 ? Num(elapsed.TotalSeconds, "0.0", text) + " s" : Clock(elapsed)));
         builder.AppendLine(text.Format("result.attempts", result.Attempts));
         builder.AppendLine(vmaf?.VmafNegMean is { } score
-            ? text.Format("result.vmaf", Num(score, "0.0"))
+            ? text.Format("result.vmaf", Num(score, "0.0", text))
             : text["result.vmaf-none"]);
-        builder.AppendLine(text.Format("result.predicted", Num(decision.Result.PredictedQuality, "0.0"), Basis(decision.Result.Estimate.Measured, text)));
+        builder.AppendLine(text.Format("result.predicted", Num(decision.Result.PredictedQuality, "0.0", text), Basis(decision.Result.Estimate.Measured, text)));
         if (result.Success && result.UnderBand) builder.AppendLine(text["result.under-band"]);
         if (result.CeilingExceeded)
             builder.AppendLine(result.Success
-                ? text.Format("result.ceiling-kept", result.Attempts, Num(result.OutputMb, "0.000"))
+                ? text.Format("result.ceiling-kept", result.Attempts, Num(result.OutputMb, "0.000", text))
                 : text.Format("result.ceiling", result.Attempts));
         return builder.ToString();
     }
@@ -438,7 +438,7 @@ public static class CliApp
 
     private static string Basis(bool measured, CliText text) => text[measured ? "basis.measured" : "basis.estimated"];
 
-    private static string Num(double value, string format) => value.ToString(format, CultureInfo.InvariantCulture);
+    private static string Num(double value, string format, CliText text) => value.ToString(format, text.Culture);
 
     private static string Clock(TimeSpan span) => Saat.Ekran(span);
 

@@ -364,6 +364,38 @@ Sıfır yok. Yeni ölçüler: `SaatTests`'te üç yüzey pimi, `IstemKulturuTest
 `BoslukKirpmaTests.KirpmaBildirimindekiSaniyeAileninYazimiyla`,
 `KaydediciHedefTests.YalnizSureButcesiBasamakAyraciYazmaz`.
 
+### Adım 9 ölçümü — 19 Eylül 2026
+
+Motorun gerekçe sayıları. Adım 7'de görülmüştü: `MainWindow.Num` ile `CliApp.Num`
+aynı sayıları (CRF, bppf, ayrıntı üsteli, puan, MB) yazıyor ama **iki ayrı kültürle**.
+Pencere `Strings.Culture` okuyor, komut satırı `InvariantCulture`. `--dil tr` ile
+Türkçe cümleler kuran komut satırı sayıyı `12.5` diye yazıyordu; aynı programın
+penceresi aynı sayıyı `12,5` diye yazıyor.
+
+Kapanan kusur: `CliText` artık seçilen dilin kültürünü taşıyor (`Culture`), `Num` ve
+`Format` onu okuyor. **İngilizce değişmez kültürde kaldı** — çıktısı makine tarafından
+da okunuyor ve eskiden beri nokta yazıyor. `--json` yolu etkilenmiyor: JSON
+`Utf8JsonWriter` ile kuruluyor, insan metninden geçmiyor.
+
+`MainWindow.Num` duruyor ve doğru: `Strings.Culture` okuyor, `BiciminTests` dört
+yerden pimliyor. Planın "kaldırılsın" maddesi adım 7'de yanlış kurulmuştu.
+
+Temiz taban 0 kırmızı / 67 yeşil. Mutasyon:
+
+| Kesim | Kırmızı |
+| --- | --- |
+| C1 `Format` değişmez kültürde kalır | 1 |
+| C2 `Culture` her dilde değişmez | 2 |
+| C3 `Culture` İngilizcede de tr-TR | 2 |
+| C4 `Num` kültürü dilden almaz | 1 |
+
+C1 ilk koşumda **0 kırmızı** verdi. Eşdeğer değil ama kusur da değil: bugünkü çağrı
+yerlerinin hepsi `Format`'a ya dizge ya tamsayı geçiyor, ham ondalık geçen yok. Yani
+`Format`'ın kültürü kapanan bir kusuru değil, ileride araya girecek ham bir ondalığa
+karşı bir kapı — ve kapı pimsizdi. İki satırlık ham ondalık asertiyle pimlendi,
+yeniden koşumda 1 kırmızı. Bu dürüstçe yazılıyor: adım 9'un kapattığı tek gerçek
+kusur `Num`'un kültürü.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

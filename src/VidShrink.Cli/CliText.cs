@@ -20,6 +20,17 @@ public sealed class CliText
 
     public string Language { get; }
 
+    /// <summary>
+    /// Sayıların yazımı da seçilen dilden gelir. Metin <c>--dil tr</c> ile Türkçeye
+    /// dönerken sayılar <see cref="CultureInfo.InvariantCulture"/> ile yazılıyordu:
+    /// aynı programın penceresi <c>12,5 MB</c>, komut satırı <c>12.5 MB</c> diyordu.
+    /// İngilizce yine değişmez kültürde kalıyor — çıktısı makine tarafından da okunuyor
+    /// ve eskiden beri nokta yazıyor.
+    /// </summary>
+    public CultureInfo Culture => Language == "en"
+        ? CultureInfo.InvariantCulture
+        : CultureInfo.GetCultureInfo(Language);
+
     public static string LanguageFor(CultureInfo culture)
         => string.Equals(culture.TwoLetterISOLanguageName, "tr", StringComparison.OrdinalIgnoreCase) ? "tr" : "en";
 
@@ -120,7 +131,7 @@ public sealed class CliText
             : key;
 
     public string Format(string key, params object?[] args)
-        => string.Format(CultureInfo.InvariantCulture, this[key], args);
+        => string.Format(Culture, this[key], args);
 
     public static string Version
         => typeof(CliText).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion

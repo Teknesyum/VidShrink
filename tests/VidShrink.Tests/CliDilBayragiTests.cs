@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using VidShrink.Cli;
+using VidShrink.Core;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -34,6 +35,71 @@ public sealed class CliDilBayragiTests
         var exit = await CliApp.RunAsync(args, stdout, stderr,
             CliText.For(CultureInfo.GetCultureInfo("en-US")), Ulasilmaz(), CancellationToken.None);
         return (exit, stdout.ToString(), stderr.ToString());
+    }
+
+    /// <summary>
+    /// Seçilen dil sayıların yazımını da belirliyor. <c>CliText.Format</c> her satırı
+    /// <see cref="CultureInfo.InvariantCulture"/> ile kuruyordu: aynı programın penceresi
+    /// Türkçede <c>12,5 MB</c>, komut satırı <c>12.5 MB</c> diyordu. İngilizce değişmez
+    /// kültürde kalıyor — çıktısı makine tarafından da okunuyor. Son iki asert olumlu
+    /// kontrol: aynı sayı gerçekten iki türlü yazılabiliyor.
+    ///
+    /// <para>Son iki asert <c>Format</c>'ın kendi kültürünü okuyor: bugünkü çağrı
+    /// yerlerinin hepsi ya dizge ya tamsayı geçiyor, yani <c>Format</c>'ın kültürü
+    /// kapanan bir kusur değil, ileride araya girecek ham bir ondalığa karşı kapı.
+    /// Bu iki satır olmadan kapı pimsiz kalıyordu (ölçüldü: 0 kırmızı).</para>
+    /// </summary>
+    [Fact]
+    public void SayiYazimiSecilenDildenGeliyor()
+    {
+        var tr = CliText.ForLanguage("tr");
+        var en = CliText.ForLanguage("en");
+
+        Assert.Equal(CultureInfo.GetCultureInfo("tr"), tr.Culture);
+        Assert.Equal(CultureInfo.InvariantCulture, en.Culture);
+
+        Assert.Contains("12,5 MB", tr.Format("plan.target", 12.5.ToString("0.##", tr.Culture)));
+        Assert.Contains("12.5 MB", en.Format("plan.target", 12.5.ToString("0.##", en.Culture)));
+        Assert.DoesNotContain("12.5", tr.Format("plan.target", 12.5.ToString("0.##", tr.Culture)));
+
+        Assert.Contains("12,5", tr.Format("plan.target", 12.5));
+        Assert.Contains("12.5", en.Format("plan.target", 12.5));
+    }
+
+    /// <summary>
+    /// Yazımın çağrı yerinden pimi: <see cref="CliApp.PlanText"/>'in kurduğu plan
+    /// dökümünde Türkçe koşumun hiçbir sayısında nokta yok, İngilizce koşumun hiçbir
+    /// sayısında virgül yok. Seam pimi tek başına yetmez — <c>Num</c>'un kültürü
+    /// dilden alması ayrı bir karar.
+    /// </summary>
+    [Fact]
+    public void PlanDokumununSayilariSecilenDilinAyraciyla()
+    {
+        var kaynak = new MediaInfo
+        {
+            FilePath = "kaynak.mp4",
+            DurationSeconds = 61.5,
+            Width = 1920,
+            Height = 1080,
+            Fps = 23.976,
+            VideoCodec = "h264",
+            FileSizeBytes = 41_000_000,
+            TotalBitrateBps = 8_000_000
+        };
+        var secenek = new PlanOptions { TargetMb = 12.5 };
+        var sonuc = PlanCalculator.BuildDetailed(kaynak, secenek, null);
+        var karar = new CliDecision(kaynak, secenek, sonuc, sonuc.Profile, null, null, "cikti.mp4", Array.Empty<string>());
+        var istek = new CliRequest { Command = CliCommand.Plan, Input = "kaynak.mp4" };
+
+        var turkce = CliApp.PlanText(istek, karar, CliText.ForLanguage("tr"));
+        var ingilizce = CliApp.PlanText(istek, karar, CliText.ForLanguage("en"));
+
+        Assert.Contains("12,5 MB", turkce);
+        Assert.Contains("23,98 fps", turkce);
+        Assert.Contains("12.5 MB", ingilizce);
+        Assert.Contains("23.98 fps", ingilizce);
+        Assert.DoesNotContain("23.98", turkce);
+        Assert.DoesNotContain("23,98", ingilizce);
     }
 
     /// <summary>
