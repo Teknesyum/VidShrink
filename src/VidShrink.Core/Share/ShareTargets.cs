@@ -204,8 +204,9 @@ public sealed record ShareTargetTable
     }
 
     /// <summary>
-    /// Aramanın adayları, sırasıyla. Arayüz tarafı da bu sırayı kullanır; iki taraf ayrı
-    /// arama tutarsa kullanıcının kendi kopyası yalnız birine görünür.
+    /// Aramanın adayları, sırasıyla. Artık yalnız ölçü okuyor: arayüzün kendi araması
+    /// kalmadı, tablo tek türden geliyor. Sıra yine de dışarıdan görünür durur — ayrı
+    /// bir arama geri gelirse kullanıcının kendi kopyası yalnız bir tarafa görünür.
     /// </summary>
     public static IEnumerable<string> AramaSirasi() => Candidates();
 
