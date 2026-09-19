@@ -282,7 +282,7 @@ public static class FfprobeClient
     /// <summary>
     /// Kaynaktaki basliklar. Cok programli bir yayinda her program bir basliktir; program
     /// yoksa ya da tek program varsa kaynak duz dosya sayilir ve tek baslik doner. Numara
-    /// ffprobe'un <c>program_id</c>'sidir, sira degil: <c>-map 0:p:&lt;id&gt;</c> bu sayiyi ister.
+    /// ffprobe'un <c>program_id</c>'sidir, sira degil; kullanici bu sayiyi yaziyor.
     /// </summary>
     private static IReadOnlyList<SourceTitle> Basliklar(
         JsonElement root, double duration, (int width, int height) olcu, int akisSayisi, int bolumSayisi)

@@ -1,4 +1,4 @@
-﻿# Plan — Biçimlerin Tek ve Ulaşılabilir Gövdeye İnmesi
+# Plan — Biçimlerin Tek ve Ulaşılabilir Gövdeye İnmesi
 
 Kullanıcı isteği (18 Eylül 2026): *"düzenlerimiz tek ve belli ulaşılabilir bir yerde olmalı
 aynı stringlerimizi çevirmek nasıl kolaysa bunları çevirmekte öyle kolay olmalı."*
@@ -1044,3 +1044,23 @@ StreamCount, ChapterCount, Label)` ve seçim kuralları — numarayla seçim, en
 `--ana-icerik` en uzunu seçiyor, `--asgari-sure` kısayı eliyor, olmayan başlık numarası
 hata veriyor, `--tarama` hiçbir şey kodlamıyor, DVD kolu doğru demuxer argümanını kuruyor.
 Kabul mutasyonla kapanır, tablo `docs/olcumler/e4-baslik-tarama.md`.
+
+## E8 — Süzgeç yüzeyi (19 Eylül 2026)
+
+**Bulgu.** HandBrake bayrak denetimi üç bağımsız grupta aynı boşluğu gösterdi: motor
+`src/VidShrink.Core/VideoFilterChain.cs` kırpma, keskinleştirme, gürültü giderme, deblock,
+deband, döndürme, dolgu ve gri tonlamayı tam taşıyor, ama `VideoFilterChain.Parse` üretimde
+hiçbir yerden çağrılmıyor. `new PlanOptions` kuran üç yerin hiçbiri `Filters` vermiyor
+(ölçüldü: `grep -rn "new PlanOptions" src -A6 | grep -c Filters` -> 0). Yani eksik olan
+özellik değil, yüzey; tek bir kapı on kadar HandBrake bayrağını birden kapatıyor.
+
+**Yüzeyler.**
+1. CLI — `--suzgec/--filters` tek dizge alır ve `VideoFilterChain.Parse`'a verir; ayrıştırma
+   hatası `error.bad-filter` ile 64 döner.
+2. `CliRequest` — çözümlenen `VideoFilterOptions` plan seçeneklerine girer.
+3. Arayüz — Gelişmiş panelde süzgeç satırı; boş bırakılırsa bugünkü davranış.
+4. Metinler — en/tr yardım satırı, hata anahtarı, 42 dilde arayüz etiketi.
+5. Ölçü — `SuzgecYuzeyiTests`: dizge motora ulaşıyor, argüman zincirinde görünüyor,
+   bozuk dizge 64 döndürüyor, boş dizge bugünkü argümanı değiştirmiyor.
+
+**Kabul.** Mutasyon turu; her kol en az bir kırmızı vermeli.
