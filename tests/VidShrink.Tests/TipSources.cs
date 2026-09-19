@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace VidShrink.Tests;
@@ -24,6 +24,10 @@ internal static class TipSources
 
     internal static readonly string WindowCodePath =
         Path.Combine(Root, "src", "VidShrink.App", "MainWindow.axaml.cs");
+
+    /// <summary>Yoklama gecidi ve donanim hukmunun bagi; pencereden 19 Eylul 2026'da ayrildi.</summary>
+    internal static readonly string WindowProbeCodePath =
+        Path.Combine(Root, "src", "VidShrink.App", "MainWindow.Yoklama.cs");
 
     internal static readonly string ThemePath =
         Path.Combine(Root, "src", "VidShrink.App", "Themes", "Theme.axaml");

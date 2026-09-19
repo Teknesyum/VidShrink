@@ -499,9 +499,9 @@ public class HardwareVerdictTests
     [Fact]
     public void TheProbeStaysOffTheUiThread()
     {
-        var code = File.ReadAllText(TipSources.WindowCodePath);
+        var code = File.ReadAllText(TipSources.WindowProbeCodePath);
         var start = code.IndexOf("private async Task ProbeHardwareEncodersAsync()", StringComparison.Ordinal);
-        Assert.True(start >= 0, "ProbeHardwareEncodersAsync MainWindow.axaml.cs içinde yok.");
+        Assert.True(start >= 0, "ProbeHardwareEncodersAsync MainWindow.Yoklama.cs içinde yok.");
 
         var body = code[start..code.IndexOf("private bool ResolveFastGpuSetting", start, StringComparison.Ordinal)];
 

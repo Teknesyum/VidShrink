@@ -2550,66 +2550,17 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Psy/AQ seçenek yoklamasını arka planda bir kez tüketir. <c>SupportsEncoderOption</c>
-    /// ilk çağrısında ffmpeg süreci doğuruyor ve sonucu önbelleğe alıyor; o ilk çağrı
-    /// arayüz iş parçacığına düşerse plan görünümü kodlayıcı başına yoklamanın süresi kadar
-    /// kilitleniyor. Burada koşturulunca sonraki bütün okumalar önbellekten geliyor.
-    /// </summary>
-    internal static void WarmPsychovisualProbe(IEncoderAvailability capabilities)
-    {
-        foreach (var codec in FfmpegArguments.KnownCodecs)
-            FfmpegArguments.PsychovisualArgs(codec, capabilities);
-    }
-
-    /// <summary>
-    /// Yoklamanın "bu makinede donanım kodlayıcı var" cevabı. Plandaki kodlayıcı adı tek
-    /// başına yetmez: <see cref="PlanCalculator"/> ölçülmemiş bir adayı geçici cevap olarak
-    /// da döndürebiliyor ve o cevap ölçülmüş bir evet gibi okunursa sürücüsüz makine
-    /// hızlı kipi açık görüyor. Geçici cevap bu yüzden aynı gövdenin çalıştırdığı gerçek
-    /// yoklamayla doğrulanır; ölçülmüş bir seçim yeniden sınanmaz.
-    /// </summary>
-    internal static bool HardwareAvailableFrom(EncodePlan plan, EncoderProbeResult probe)
-        => CodecModel.IsHardware(plan.Codec)
-           && (!plan.CodecNotMeasured || (probe.Measured && probe.Succeeded));
-
-    /// <summary>Ölçü için: yoklamanın arayüze taşıdığı donanım cevabı.</summary>
-    internal bool HardwareEncoderAvailable => _hardwareEncoderAvailable;
-
-    private async Task ProbeHardwareEncodersAsync()
-    {
-        var available = false;
-        IEncoderAvailability? encoders = null;
-        var verdict = HardwareVerdict.NotProbed;
-
-        try
-        {
-            (encoders, available, verdict) = await Task.Run(() =>
-            {
-                var capabilities = EncoderCapabilities.Instance;
-                WarmPsychovisualProbe(capabilities);
-                var options = new PlanOptions { TargetMb = WhatsAppTargetMb, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
-                var plan = PlanCalculator.Build(HardwareProbeSource, options, capabilities);
-                var probe = capabilities.Probe(plan.Codec);
-                var decision = HardwareVerdict.Decide(probe, plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
-                return ((IEncoderAvailability?)capabilities, HardwareAvailableFrom(plan, probe), decision);
-            });
-        }
-        catch (Exception ex)
-        {
-            encoders = null;
-            available = false;
-            verdict = HardwareVerdict.NotProbed;
-            TxtSystemStatus.Text = $"{Say("main.error.probe")}: {ex.Message}";
-        }
-
-        ApplyHardwareVerdict(encoders, available, verdict);
-    }
-
-    /// <summary>
     /// Hızlı mod kararının yazıldığı ayar dosyası. Boşken <see cref="UpdateSettings.DefaultPath"/>
     /// kullanılır; ölçüm süreç genelindeki ortam değişkenine dokunmadan kendi dosyasını verir.
     /// </summary>
     internal string? SettingsPathOverride { get; set; }
+
+    /// <summary>
+    /// Avalonia'nın XAML derleyicisi <c>RowDefinition</c>'a bir NameScope girişi vermiyor
+    /// (yalnız <see cref="Control"/> alt sınıfları isimle bulunabiliyor), bu yüzden satır
+    /// çevreleyen <c>PreviewPlanGrid</c> üzerinden 3. sıra olarak bulunuyor.
+    /// </summary>
+    private RowDefinition PlanPanelRow => PreviewPlanGrid.RowDefinitions[2];
 
     /// <summary>
     /// T163/K3: ayırıcının konumu kullanıcı verisidir, ölçü belirteci değil — bu yüzden
@@ -2618,13 +2569,6 @@ public partial class MainWindow : Window
     /// alanı dışında) durduğu için ayrı, küçük bir dosyaya yazılıyor; kayıt yeri yine
     /// aynı ayar klasörü.
     /// </summary>
-    /// <summary>
-    /// Avalonia'nın XAML derleyicisi <c>RowDefinition</c>'a bir NameScope girişi vermiyor
-    /// (yalnız <see cref="Control"/> alt sınıfları isimle bulunabiliyor), bu yüzden satır
-    /// çevreleyen <c>PreviewPlanGrid</c> üzerinden 3. sıra olarak bulunuyor.
-    /// </summary>
-    private RowDefinition PlanPanelRow => PreviewPlanGrid.RowDefinitions[2];
-
     private string SplitterSettingsPath => Path.Combine(
         Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
         LayoutFileName);
@@ -2678,51 +2622,6 @@ public partial class MainWindow : Window
     internal double SplitterFloorForTest => PlanPanelRow.MinHeight;
     internal double SplitterCeilingForTest => PlanPanelRow.MaxHeight;
     internal double SplitterRowActualHeightForTest => PlanPanelRow.ActualHeight;
-
-    /// <summary>
-    /// Yoklamanın sonucunu arayüze ve ayara bağlar. Yoklamadan ayrı durur ki açılış yolu
-    /// ffmpeg çağrılmadan da sınanabilsin.
-    /// </summary>
-    internal void ApplyHardwareVerdict(IEncoderAvailability? encoders, bool available, HardwareVerdict verdict)
-    {
-        _encoders = encoders;
-        _planEncoders = encoders is null
-            ? null
-            : new DeferredEncoderAvailability(encoders, () => Dispatcher.UIThread.Post(ScheduleRecalculate));
-        if (_preview is not null) _preview.Availability = encoders;
-        _hardwareProbed = true;
-        _hardwareEncoderAvailable = available;
-        _hardwareVerdict = verdict;
-
-        var wasSyncing = _syncing;
-        _syncing = true;
-        ChkFastGpu.IsEnabled = available;
-        ChkFastGpu.IsChecked = available && ResolveFastGpuSetting(verdict);
-        _syncing = wasSyncing;
-
-        ApplyFastGpuTip();
-        Recalculate();
-    }
-
-    /// <summary>
-    /// Kararı ayar dosyasıyla buluşturur. Dosyada değer varsa yoklama onu ezmez; yoksa
-    /// bu açılışta bir kez yazılır ve bir daha yoklamaya sorulmaz.
-    /// </summary>
-    private bool ResolveFastGpuSetting(HardwareVerdict verdict)
-    {
-        try
-        {
-            var settings = UpdateSettings.Load(SettingsPathOverride);
-            if (HardwareVerdict.ReprobeRequested()) settings.FastGpu = null;
-            if (verdict.ApplyTo(settings)) settings.Save(SettingsPathOverride);
-            return settings.FastGpu == true;
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            TxtSystemStatus.Text = $"{Say("main.error.setting")}: {ex.Message}";
-            return false;
-        }
-    }
 
     private void OnFastGpuChanged()
     {

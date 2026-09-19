@@ -26,9 +26,16 @@ açıkça "bu kod kalkacak" diyor.
    silmek yoklamayı tümden durdururdu. Tetik üç durumlu yüze taşındı, arayüz kalktı.
    Ölçüm `docs/olcumler/k8-yoklama-tetigi-2026-09-19.md` (taban 0/86, beş kesimin beşi
    kırmızı).
-4. `src/VidShrink.App/MainWindow.axaml.cs` — 4980 satır, depodaki en büyük dosya
+4. ~~`src/VidShrink.App/MainWindow.axaml.cs` — 4980 satır, depodaki en büyük dosya
    (ikincisi 1883). Yoklama siyaseti, donanım hükmü ve `ReasonCode` kolları Core yerine
-   pencerede duruyor. **Şüpheli:** nicel gözlem, hüküm değil.
+   pencerede duruyor. **Şüpheli:** nicel gözlem, hüküm değil.~~
+   **Kapandı 19 Eylül 2026 — öncülü kısmen yanlıştı:** donanım hükmü zaten Core'da
+   (`Core/HardwareVerdict.cs`), `ReasonCode` da öyle (`Core/EncodePlan.cs`); pencerede
+   duran şey hükmü çağıran yol ve kod → dil anahtarı eşlemesiydi, ikisi de arayüz işi.
+   Doğru olan tek şey boydu: üç kapalı bölük kendi dosyasına ayrıldı ve dosya
+   5081 → 4481 satıra indi (`MainWindow.Yoklama.cs` 415, `MainWindow.Gerekce.cs` 209).
+   Taşıma kaynaktan okuyan bir ölçüyü kırdı ve ölçü yeni dosyaya bağlandı.
+   Döküm `docs/olcumler/k8-pencere-boyu-2026-09-19.md`.
 5. ~~`tests/VidShrink.Tests/OluUyeTests.cs:513-534` — `ShareFailure`'ın 11 üyesinden 8'i
    üretiliyor, dördü okunuyor; sınıflandırma mı fazla arayüz mü eksik, ölçülmemiş.~~
    **Kapandı — öncülü yanlıştı:** sınıflandırma fazla değil, kullanıcıya görünen ayrım
