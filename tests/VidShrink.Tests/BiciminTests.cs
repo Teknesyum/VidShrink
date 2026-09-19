@@ -1073,6 +1073,10 @@ public sealed class BaslikKapsamiTests
     /// kol degistiren kismi 1649 - 1628 = 21, en 193 + 2, tr 66 + 1. Bit hizi biriminin
     /// birlestirilmesi ayni turda <c>main.unit.k-value</c>'yu dusurdu, o anahtar govde degil
     /// olcu ("{0}k") oldugu icin kol degistiren kumeye hic girmiyordu: sayilar oynamadi.</para>
+    /// <para><b>19 Eylul 2026, ikinci yenileme: toplam 1666, en 196, tr 68.</b> Olcek carpani
+    /// (<c>b7b485c4</c>) ve cikti adi deseni (<c>1546c9e3</c>) turlari birlikte dil basina on
+    /// anahtar ekledi; kol degistiren kismi 1666 - 1649 = 17, en 195 + 1, tr 67 + 1. Iki tur
+    /// da pimi yenilemedi, CI iki kosum kirmizi kaldi.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1098,9 +1102,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1649, toplam);
-        Assert.Equal(195, dilBasina["en"]);
-        Assert.Equal(67, dilBasina["tr"]);
+        Assert.Equal(1666, toplam);
+        Assert.Equal(196, dilBasina["en"]);
+        Assert.Equal(68, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1211,6 +1215,8 @@ public sealed class BaslikKapsamiTests
     /// anahtar ekledi, bit hizi biriminin birlestirilmesi <c>main.unit.k-value</c>'yu dusurdu:
     /// dil basina 944 + 37 - 1 = 980, 43 x 980 = 42140. Sayi yine olcunun kendi
     /// <c>SAYIM gezilen</c> satirindan alindi, <c>kayip</c> 0 kaldi.</para>
+    /// <para><b>19 Eylul 2026, ikinci yenileme: 42570.</b> Ayni iki tur dil basina on anahtar
+    /// ekledi: 980 + 10 = 990, 43 x 990 = 42570. <c>kayip</c> yine 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1238,7 +1244,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(42140, gezilen);
+        Assert.Equal(42570, gezilen);
         Assert.Empty(kayip);
     }
 
