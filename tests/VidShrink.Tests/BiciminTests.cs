@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
@@ -1087,6 +1087,13 @@ public sealed class BaslikKapsamiTests
     /// besi kol degistiriyor (es/pt <c>label</c>, hu/ro <c>bad</c>, ro <c>label</c>). Ingilizce
     /// "Picture filters" ve Turkce "Gorunt&#252; suzgecleri" zaten kurala uygun yazildi, o yuzden
     /// en ve tr sayilari oynamadi.</para>
+    ///
+    /// <para><b>19 Eylul 2026, besinci yenileme: toplam 1690, en 200, tr 69.</b> Paylasimin
+    /// yeniden deneme yuzu uc <c>settings.share.retry*</c>, onizleme rozeti bir
+    /// <c>main.preview.temsili</c> anahtari ekledi; 172 anahtarin sekizi kol degistiriyor
+    /// (en <c>retry-in</c> ve <c>retry-with</c>, tr <c>retry-with</c>, de/sw <c>retry-in</c>,
+    /// lt <c>retry-with</c>, pt <c>retry</c> ve <c>retry-in</c>). <c>main.preview.temsili</c>
+    /// hicbir dilde kol degistirmiyor.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1112,9 +1119,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1682, toplam);
-        Assert.Equal(198, dilBasina["en"]);
-        Assert.Equal(68, dilBasina["tr"]);
+        Assert.Equal(1690, toplam);
+        Assert.Equal(200, dilBasina["en"]);
+        Assert.Equal(69, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1235,6 +1242,9 @@ public sealed class BaslikKapsamiTests
     /// <c>main.title.label</c> anahtari ekledi: 995 + 1 = 996, 43 x 996 = 42828. <c>kayip</c> yine 0.</para>
     /// <para><b>19 Eylul 2026, besinci yenileme: 42957.</b> Suzgec yuzeyi (E8) dil basina uc
     /// <c>main.advanced.filters.*</c> anahtari ekledi: 996 + 3 = 999, 43 x 999 = 42957. <c>kayip</c> yine 0.</para>
+    /// <para><b>19 Eylul 2026, altinci yenileme: 43129.</b> Paylasimin yeniden deneme yuzu
+    /// uc <c>settings.share.retry*</c> anahtari, onizleme rozeti bir <c>main.preview.temsili</c>
+    /// ekledi: 999 + 4 = 1003, 43 x 1003 = 43129. <c>kayip</c> yine 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1262,7 +1272,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(42957, gezilen);
+        Assert.Equal(43129, gezilen);
         Assert.Empty(kayip);
     }
 
