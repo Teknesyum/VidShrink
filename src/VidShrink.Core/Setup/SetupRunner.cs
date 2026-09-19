@@ -24,10 +24,10 @@ public static class SetupRunner
         if (!WindowsArchitectures.Contains(decision.Architecture))
         {
             if (decision.Outcome == ArchitectureOutcome.Read)
-                throw new SetupException($"Bu mimari için yayın yok: {decision.Architecture}. VidShrink Windows'ta şu an yalnız win-x64 ve win-arm64 için yayımlanıyor.");
-            throw new SetupException("Mimari okunamadı ve işletim sistemi 32 bit görünüyor: win-x64 yayını bu makinede çalışmaz. VidShrink Windows'ta şu an yalnız win-x64 ve win-arm64 için yayımlanıyor.");
+                throw new SetupException(SetupText.Get("setup.arch.unsupported", decision.Architecture));
+            throw new SetupException(SetupText.Get("setup.arch.32bit"));
         }
-        if (!string.IsNullOrEmpty(decision.Note)) log(decision.Note);
+        if (!string.IsNullOrEmpty(decision.NoteKey)) log(SetupText.Get(decision.NoteKey));
         return UpdateCheck.RidFor("windows", decision.Architecture);
     }
 
@@ -48,14 +48,15 @@ public static class SetupRunner
             steps.Add(new SetupStep(name, clock.ElapsedMilliseconds));
         }
 
-        host.Log("VidShrink kurulumu hazırlanıyor...");
+        SetupText.Use(ShellRegistration.ResolveLanguage(options.MenuLanguage, host.UiLanguage));
+        host.Log(SetupText.Get("setup.preparing"));
         var decision = host.Architecture();
         var rid = RuntimeIdentifier(decision, host.Log);
         var libMpvPin = options.LibMpv ?? LibMpvPin.For(decision.Architecture);
         var ffmpegPin = options.Ffmpeg ?? FfmpegPin.For(decision.Architecture);
         var root = Path.GetFullPath(options.InstallRoot).TrimEnd(Path.DirectorySeparatorChar);
         if (!UnderPrograms(root, options.LocalAppData))
-            throw new SetupException($"Güvenlik nedeniyle kurulum yolu LocalAppData\\Programs altında olmalıdır: {root}");
+            throw new SetupException(SetupText.Get("setup.root.outside-programs", root));
 
         var ffmpeg = options.ForceFfmpegDownload ? null : host.FindTool("ffmpeg");
         var ffprobe = options.ForceFfmpegDownload ? null : host.FindTool("ffprobe");
@@ -75,15 +76,15 @@ public static class SetupRunner
             var ffmpegTask = ffmpeg is null || ffprobe is null
                 ? Task.Run(() => SetupDownloads.FetchFfmpegAsync(ffmpegPin, work, cancellationToken), cancellationToken)
                 : null;
-            if (ffmpegTask is not null) host.Log("FFmpeg ve FFprobe indiriliyor...");
+            if (ffmpegTask is not null) host.Log(SetupText.Get("setup.ffmpeg.downloading"));
 
-            host.Log("Son yayın aranıyor...");
+            host.Log(SetupText.Get("setup.release.searching"));
             var tag = options.Tag ?? await SetupDownloads.ResolveLatestTagAsync(cancellationToken);
             var version = tag.TrimStart('v');
-            host.Log($"Kurulacak sürüm: {version}");
+            host.Log(SetupText.Get("setup.version.installing", version));
             Mark("etiket");
 
-            host.Log("Yayın paketi indiriliyor...");
+            host.Log(SetupText.Get("setup.package.downloading"));
             var checksumsTask = SetupDownloads.FetchAssetAsync(client, options, tag, checksumsName, work, cancellationToken);
             var archiveTask = SetupDownloads.FetchAssetAsync(client, options, tag, archiveName, work, cancellationToken);
             var launcherTask = SetupDownloads.FetchAssetAsync(client, options, tag, launcherName, work, cancellationToken);
@@ -93,10 +94,11 @@ public static class SetupRunner
             var checksums = SetupDownloads.ParseChecksums(await File.ReadAllTextAsync(checksumsTask.Result.Path, cancellationToken));
             SetupDownloads.AssertChecksum(checksums, archiveName, archiveTask.Result.Sha256);
             SetupDownloads.AssertChecksum(checksums, launcherName, launcherTask.Result.Sha256);
-            host.Log("İndirilenler doğrulandı.");
+            host.Log(SetupText.Get("setup.downloads.verified"));
 
             var libMpv = await libMpvTask;
-            host.Log($"libmpv hazır ({(libMpv.Reused ? "reused" : "downloaded")}, sha256 doğrulandı).");
+            host.Log(SetupText.Get("setup.libmpv.ready",
+                SetupText.Get(libMpv.Reused ? "setup.libmpv.reused" : "setup.libmpv.downloaded")));
             IReadOnlyDictionary<string, string>? fetchedFfmpeg = ffmpegTask is null ? null : await ffmpegTask;
             if (fetchedFfmpeg is not null)
             {
@@ -139,8 +141,8 @@ public static class SetupRunner
                     : libMpv.Path;
                 Place(libMpvSource, Path.Combine(toolsLibMpv, libMpvPin.FileName), move: true);
 
-                if (!File.Exists(Path.Combine(root, LauncherUpdate.ExecutableName))) throw new SetupException("Kurulan VidShrink.exe bulunamadı.");
-                if (!File.Exists(Path.Combine(appDirectory, AppExecutable))) throw new SetupException("Kurulan app\\VidShrink.App.exe bulunamadı.");
+                if (!File.Exists(Path.Combine(root, LauncherUpdate.ExecutableName))) throw new SetupException(SetupText.Get("setup.launcher.missing"));
+                if (!File.Exists(Path.Combine(appDirectory, AppExecutable))) throw new SetupException(SetupText.Get("setup.app.missing"));
             }
             catch
             {
@@ -162,16 +164,16 @@ public static class SetupRunner
                 var associated = ShellRegistration.WriteFileAssociation(options.ClassesRoot, installedExe);
                 if (options.DefaultRegistry) host.AssociationChanged();
                 modern = await modernTask;
-                var path = modern ? "Windows 11 birincil ve klasik" : "Windows 10 klasik";
-                host.Log($"Sağ tık menüsü {ShellIntegration.MediaExtensions.Count} uzantıya, küçültme alt menüsü {shrinkWritten} girdiye yazıldı ({path} menü).");
-                host.Log($"Dosya ilişkilendirmesi {associated} uzantıya yazıldı.");
+                var path = SetupText.Get(modern ? "setup.menu.modern-and-classic" : "setup.menu.classic");
+                host.Log(SetupText.Get("setup.menu.written", ShellIntegration.MediaExtensions.Count, shrinkWritten, path));
+                host.Log(SetupText.Get("setup.association.written", associated));
             }
             Mark("kabuk");
 
             if (aside is not null) TryDelete(aside);
             SweepAsides(root);
 
-            host.Log($"VidShrink {version} kuruldu: {root}");
+            host.Log(SetupText.Get("setup.installed", version, root));
             if (!options.NoLaunch) host.Launch(installedExe);
             Mark("bitti");
             return new SetupResult(version, root, libMpv.Reused, fetchedFfmpeg is not null, modern, steps);
@@ -197,7 +199,7 @@ public static class SetupRunner
         }
         var unlinked = ShellRegistration.RemoveFileAssociation(options.ClassesRoot);
         if (options.DefaultRegistry) host.AssociationChanged();
-        host.Log($"Sağ tık menüsü ({cleared} uzantı, {packages} paket) ve dosya ilişkilendirmesi ({unlinked} uzantı) kaldırıldı.");
+        host.Log(SetupText.Get("setup.uninstall.menus-removed", cleared, packages, unlinked));
 
         if (!options.SkipShortcuts && host.Shortcuts is { } shortcuts)
         {
@@ -215,11 +217,11 @@ public static class SetupRunner
             if (Directory.Exists(root))
                 await LockedFolder.RunAsync(root, path => Directory.Delete(path, recursive: true), host, cancellationToken);
             SweepAsides(root);
-            host.Log($"VidShrink kaldırıldı: {root}");
+            host.Log(SetupText.Get("setup.uninstalled", root));
         }
         else
         {
-            host.Log($"Kurulum klasörü LocalAppData\\Programs altında değil, silinmedi: {root}");
+            host.Log(SetupText.Get("setup.uninstall.outside-programs", root));
         }
     }
 
@@ -231,7 +233,7 @@ public static class SetupRunner
         var template = Path.Combine(shell, "AppxManifest.template.xml");
         if (!File.Exists(template) || !File.Exists(Path.Combine(shell, "VidShrink.ShellExtension.dll")))
         {
-            host.Log("Bu yayın Windows 11 kabuk paketini taşımıyor; klasik menü yazıldı.");
+            host.Log(SetupText.Get("setup.shell.no-package"));
             return false;
         }
         if (!options.DefaultRegistry || host.ShellPackage is not { } package) return false;
@@ -241,7 +243,7 @@ public static class SetupRunner
         if (package.Registered()) package.Remove();
         if (package.Register(manifest, root)) return true;
 
-        host.Log("Windows 11 birincil sağ tık menüsü eklenemedi (imzasız paket için geliştirici modu gerekiyor); klasik menü 'Daha fazla seçenek göster' altında çalışır.");
+        host.Log(SetupText.Get("setup.shell.package-failed"));
         return false;
     }
 

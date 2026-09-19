@@ -105,7 +105,7 @@ internal sealed partial class ShellShortcuts : IShortcutWriter
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
         thread.Join();
-        if (failure is not null) throw new SetupException("Kısayol yazılamadı: " + failure.Message, failure);
+        if (failure is not null) throw new SetupException(SetupText.Get("setup.shortcut.failed", failure.Message), failure);
         return result;
     }
 

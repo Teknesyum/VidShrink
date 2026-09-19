@@ -31,7 +31,7 @@ public static class LockedFolder
             holderRounds = holders.Count > 0 ? holderRounds + 1 : 0;
             if (holderRounds >= 2)
             {
-                host.Log($"VidShrink kapanmayı bekliyor ({Names(holders)}); virüs taraması sürüyorsa en çok {(int)host.HolderWait.TotalSeconds} sn beklenecek...");
+                host.Log(SetupText.Get("setup.lock.waiting", Names(holders), (int)host.HolderWait.TotalSeconds));
                 foreach (var holder in holders)
                 {
                     try { holder.Kill(); }
@@ -46,9 +46,8 @@ public static class LockedFolder
                 var still = host.FindHolders(root);
                 if (still.Count > 0)
                 {
-                    throw new SetupException(
-                        $"Kurulum klasörü silinemedi: VidShrink {(int)host.HolderWait.TotalSeconds} sn sonra hâlâ açık - {Names(still)}. " +
-                        $"Virüs programı dosyayı tarıyorsa taramanın bitmesini bekleyip kurucuyu yeniden çalıştırın. Klasör: {root}");
+                    throw new SetupException(SetupText.Get(
+                        "setup.lock.still-open", (int)host.HolderWait.TotalSeconds, Names(still), root));
                 }
 
                 holderRounds = 0;
@@ -57,17 +56,14 @@ public static class LockedFolder
 
             if (attempt < Attempts)
             {
-                host.Log($"Kurulum klasörü kilitli, {delay} ms sonra yeniden denenecek ({attempt}/{Attempts})...");
+                host.Log(SetupText.Get("setup.lock.retry", delay, attempt, Attempts));
                 await host.Delay(TimeSpan.FromMilliseconds(delay), cancellationToken);
                 waited += delay;
                 delay *= 2;
             }
         }
 
-        throw new SetupException(
-            $"Kurulum klasörü {Attempts} denemede ve {waited} ms beklemede silinemedi: {root}. " +
-            "Bir dosya başka bir süreçte açık - genellikle virüs taraması ya da Gezgin önizlemesi; " +
-            $"birkaç saniye sonra kurucuyu yeniden çalıştırın. Son hata: {lastMessage}");
+        throw new SetupException(SetupText.Get("setup.lock.failed", Attempts, waited, root, lastMessage));
     }
 
     public static void CloseHolders(string root, SetupHost host)

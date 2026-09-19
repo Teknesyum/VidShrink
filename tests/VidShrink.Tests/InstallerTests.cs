@@ -204,7 +204,7 @@ public sealed class InstallerTests
 
         var hata = Assert.Throws<SetupException>(() => SetupRunner.RuntimeIdentifier(
             ArchitectureChoice.Decide("X86", null, null, true), gunluk.Add));
-        Assert.Contains("Bu mimari için yayın yok", hata.Message, StringComparison.Ordinal);
+        Assert.Equal(SetupText.Get("setup.arch.unsupported", "x86"), hata.Message);
     }
 
     /// <summary>
@@ -267,7 +267,7 @@ public sealed class InstallerTests
 
         Assert.Equal(ArchitectureOutcome.Read, decision.Outcome);
         Assert.Equal("x64", decision.Architecture);
-        Assert.Equal(string.Empty, decision.Note);
+        Assert.Equal(string.Empty, decision.NoteKey);
     }
 
     [Theory]
@@ -308,7 +308,7 @@ public sealed class InstallerTests
 
         Assert.Equal(ArchitectureOutcome.Assumed, decision.Outcome);
         Assert.Equal("x64", decision.Architecture);
-        Assert.False(string.IsNullOrWhiteSpace(decision.Note));
+        Assert.Equal("setup.arch.assumed-x64", decision.NoteKey);
     }
 
     [Fact]
@@ -318,7 +318,7 @@ public sealed class InstallerTests
 
         Assert.Equal(ArchitectureOutcome.Assumed, decision.Outcome);
         Assert.Equal("x86", decision.Architecture);
-        Assert.False(string.IsNullOrWhiteSpace(decision.Note));
+        Assert.Equal("setup.arch.assumed-x86", decision.NoteKey);
     }
 
     /// <summary>

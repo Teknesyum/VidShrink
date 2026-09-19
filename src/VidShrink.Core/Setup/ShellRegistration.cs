@@ -32,7 +32,7 @@ public static class ShellRegistration
     private static void RequireWriteAllowed(string classesRoot)
     {
         if (!WriteAllowed(Environment.ProcessPath, classesRoot))
-            throw new SetupException($"Gerçek kayıt köküne yalnız {SetupExecutableName} yazar: {classesRoot}");
+            throw new SetupException(SetupText.Get("setup.registry.only-setup-writes", SetupExecutableName, classesRoot));
     }
 
     /// <summary>
@@ -84,18 +84,17 @@ public static class ShellRegistration
     }
 
     public static string OpenLabel(string language, string? localesFolder = null) =>
-        Label(language, localesFolder, "shell.menu.open",
-            "Bu Videoyu VidShrink ile Aç", "Open this video with VidShrink");
+        Label(language, localesFolder, "shell.menu.open");
 
     public static string ShrinkLabel(string language, string? localesFolder = null) =>
-        Label(language, localesFolder, "shell.menu.shrink",
-            "VidShrink ile Küçült", "Shrink with VidShrink");
+        Label(language, localesFolder, "shell.menu.shrink");
 
     /// <summary>
     /// Etiketi yayına kopyalanan <c>main.json</c>'dan okur. Dosya yoksa ya da anahtar
-    /// boşsa gömülü iki metne düşer: kurucu yarım bir ağaçta da menü yazabilmeli.
+    /// boşsa <see cref="SetupText"/>'in gömülü ikilisine düşer: kurucu yarım bir ağaçta da
+    /// menü yazabilmeli, ve gömülü çeviri tek dosyada durmalı.
     /// </summary>
-    private static string Label(string language, string? localesFolder, string key, string tr, string en)
+    private static string Label(string language, string? localesFolder, string key)
     {
         if (localesFolder is not null)
         {
@@ -116,7 +115,7 @@ public static class ShellRegistration
             }
         }
 
-        return language.Equals("tr", StringComparison.OrdinalIgnoreCase) ? tr : en;
+        return SetupText.GetIn(language, key);
     }
 
     public static string SoftwareRoot(string classesRoot) =>

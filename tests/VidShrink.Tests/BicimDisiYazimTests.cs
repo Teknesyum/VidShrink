@@ -17,6 +17,10 @@ namespace VidShrink.Tests;
 /// <see cref="System.Globalization.CultureInfo.CurrentCulture"/>. İkisi de aynı şeyi
 /// yapıyor — makinenin kültürünü okuyor, arayüzün dilini değil.</para>
 ///
+/// <para>Yorum satırları sayılmıyor: bir belge satırının kusurlu API'yi adıyla anması
+/// çağrı yeri değildir. <c>ShareMessage.cs</c>'nin <c>remarks</c> bloğu tam bunu yapıyordu
+/// ve ölçü yanlış yere kırmızı veriyordu.</para>
+///
 /// <para>Beklenen küme elle listelenmiyor: muafiyetler <c>Veri/bicim-muafiyetleri.txt</c>
 /// dosyasından okunuyor ve muafiyet dosyasında karşılığı kalmayan satır ölçüyü kırıyor.
 /// Böylece muafiyet listesi de ağaçla birlikte bayatlayamıyor.</para>
@@ -52,8 +56,13 @@ public sealed class BicimDisiYazimTests
             var goreli = Path.GetRelativePath(Kok, yol).Replace('\\', '/');
             var satirlar = File.ReadAllLines(yol);
             for (var i = 0; i < satirlar.Length; i++)
+            {
+                var kirpik = satirlar[i].TrimStart();
+                if (kirpik.StartsWith("//", StringComparison.Ordinal) || kirpik.StartsWith("*", StringComparison.Ordinal))
+                    continue;
                 if (KultursuzSayi.IsMatch(satirlar[i]) || MakineKulturu.IsMatch(satirlar[i]))
                     bulunan.Add(goreli + ":" + (i + 1));
+            }
         }
 
         return bulunan;

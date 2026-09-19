@@ -732,8 +732,70 @@ Yan etki: `BaslikKapsamiTests`'in nüfus sayımları kaydı. Pimler `40592 → 4
 anahtarından geliyor, `main.unit.k-value`'nun düşmesi gezileni bir azalttı. `kayip`
 yine 0. Bu iki pim `5ba0e973`'ün CI koşumunu kırmızıya düşürmüştü.
 
+## Kurucunun dili — plan
+
+Uygulama 42 dil konuşuyor, kurucu yalnız Türkçe. `VidShrink-Setup.exe`'yi indiren bir
+İngiliz kullanıcı ilk karşılaştığı yüzeyde Türkçe okuyor: "Son yayın aranıyor...",
+"Kurulum klasörü kilitli", mimari reddi, `--help`.
+
+Kurucu uygulamanın çeviri katmanını göremiyor. Kırpılmış, tek dosya, kendi kendine yeten
+bir exe; `VidShrink.App`'e referansı yok ve `InvariantGlobalization=true` bilerek açık
+(`KulturTuzakTeliTests` bunu pozitif kontrol olarak kullanıyor). Üstelik kurucu, yayın
+paketini indirip açmadan **önce** de konuşuyor — o anda diskte hiç `Locales` klasörü yok.
+
+### Ölçüm — 19 Eylül 2026
+
+`.calisma/core-turkce.py` Core'da dil katmanından geçmeyen **72 cümle / 12 dosya** buldu
+(daha önce 98/13; paylaşımın 27'si `5ba0e973`'te kapandı). Üç kova ayrıldı:
+
+| kova | sayı | nerede | kullanıcı görüyor mu |
+| --- | --- | --- | --- |
+| kurucu | 50 | `Setup/SetupRunner.cs` 19, `Setup/SetupDownloads.cs` 15, `Setup/LockedFolder.cs` 7, `Setup/ShellRegistration.cs` 1, `UpdateCheck.cs` 2 (`ArchitectureDecision.Note`), `VidShrink.Setup/Program.cs` 6 | **evet**, konsola |
+| iç tanı | 18 | `UpdateCheck.cs` 14, `UpdateStaging.cs` 4 | hayır |
+| programcı hatası | 11 | `ShrinkRequest`, `SingleInstanceChannel`, `IShareProvider`, `ShareTargets`, `Multipart`/`PresignedUploadProvider` | hayır |
+
+Ek olarak `Program.cs`'teki `--help` bloğu (26 satır) düz Türkçe; satır tarayıcısı ham
+dizge (`"""`) olduğu için onu saymadı.
+
+İç tanı kovası kullanıcıya hiç çıkmıyor: `MainWindow.Guncelleme.cs` istisnayı yutup
+`Say("main.update.failed")` yazıyor. `ArchitectureDecision.Note` ilk taramada ölü sanıldı;
+`SetupRunner.cs:30` onu `log`'a basıyor, yani kurucu kovasına girer.
+
+### Karar
+
+Gömülü **tr + en** tablosu, `Core/Setup` içinde. 42 dil gömmek reddedildi: birkaç saniye
+görünen bir konsol için 50 × 42 = 2100 cümle, kırpılmış tek dosyaya ayrıştırıcı yükü ve
+doğrulanamayan çeviri. Yalnız İngilizce de reddedildi: sağ tık etiketi bile yerel dilde
+yazılırken kurucunun kırmızı hatası tek İngilizce yüzey kalırdı.
+
+Dil seçimi yeni kural istemiyor: `ShellRegistration.ResolveLanguage(choice, uiLanguage)`
+klasör verilmediğinde zaten yalnız `tr` ve `en` tanıyor. `SetupHost` `MenuLanguage` ve
+`UiLanguage`'ı hâlihazırda taşıyor.
+
+### Adımlar
+
+1. `Core/Setup/SetupText.cs`: anahtar → (tr, en) tablosu, `Use(dil)`, `Get(anahtar, args)`.
+   Biçimleme `CultureInfo.InvariantCulture`, karşılaştırma `Ordinal`; `InvariantGlobalization`
+   ve `KulturTuzakTeliTests` dokunulmadan kalır.
+2. `VidShrink.Setup/Program.cs` açılışta `SetupText.Use(ShellRegistration.ResolveLanguage(...))`.
+   `--menu-language` ayrıştırılmadan önceki hatalar işletim sisteminin diliyle yazılır.
+3. 50 cümle anahtara taşınır; `--help` bloğu iki dilde yazılır.
+4. `ShellRegistration`'ın gömülü `tr`/`en` menü etiketi ikilisi aynı tabloya iner — iki
+   ayrı gömülü çeviri deposu kalmaz.
+5. Ölçü `KurucuDiliTests`: her anahtar iki dilde dolu, yer tutucuları aynı, kullanılmayan
+   anahtar yok, ve **kaynak pimi** — `Core/Setup` ile `VidShrink.Setup` altında Türkçe
+   cümle taşıyan tek dosya `SetupText.cs`.
+
+### Ölçü
+
+Mutasyon: her kesimde kaç ölçü kırmızıya döner. Sıfır kırmızı veren kesim kör nokta sayılır
+ve ölçü yazılana kadar kapanmaz.
+
 ## Kapsam dışı
 
+- Kurucunun **iç tanı** ve **programcı hatası** cümleleri (29 satır) Türkçe kalır: kullanıcıya
+  çıkmıyorlar, deponun kod içi dili Türkçe ve yalnız istisna gövdelerini İngilizceye çevirmek
+  karışık dil üretirdi. Tarayıcının kapsamı "kullanıcıya çıkan yüzey" diye daraltılır.
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol
   belirliyor): `ClipExport.cs:101`, `SegmentEncoder.cs:383`, `ToolsOptions.cs:132`,
   `MpvEngine.cs:504`, `OvershootTrimmer.cs:123`, `FrameGrabber.cs:266`.

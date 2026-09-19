@@ -53,9 +53,10 @@ public enum ArchitectureOutcome
 
 /// <summary>
 /// Mimari kararı. <c>Architecture</c> hiçbir zaman boş değil — okunamayan bir değer kullanıcıya
-/// boş basılmasın diye. <c>Note</c> yalnız varsayım yapıldığında dolu.
+/// boş basılmasın diye. <c>NoteKey</c> yalnız varsayım yapıldığında dolu ve cümle değil
+/// <see cref="Setup.SetupText"/> anahtarı taşıyor: kararı veren katman dil bilmiyor.
 /// </summary>
-public sealed record ArchitectureDecision(ArchitectureOutcome Outcome, string Architecture, string Note);
+public sealed record ArchitectureDecision(ArchitectureOutcome Outcome, string Architecture, string NoteKey);
 
 /// <summary>
 /// Mimari tek bir kuralla belirleniyor ve iki taraf da bu kuralı izliyor: <see cref="UpdateCheck.Rid"/>
@@ -114,12 +115,12 @@ public static class ArchitectureChoice
             return new ArchitectureDecision(
                 ArchitectureOutcome.Assumed,
                 "x64",
-                "Mimari okunamadı; işletim sistemi 64 bit olduğu için x64 varsayıldı.");
+                "setup.arch.assumed-x64");
 
         return new ArchitectureDecision(
             ArchitectureOutcome.Assumed,
             "x86",
-            "Mimari okunamadı; işletim sistemi 32 bit olduğu için x86 kabul edildi.");
+            "setup.arch.assumed-x86");
     }
 
     public static ArchitectureDecision Decide() => Decide(

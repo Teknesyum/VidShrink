@@ -7,34 +7,17 @@ namespace VidShrink.Setup;
 
 internal static partial class Program
 {
-    private const string Help = """
-        VidShrink-Setup - VidShrink'i kurar, günceller ya da kaldırır.
-
-        Kullanım: VidShrink-Setup.exe [seçenekler]
-
-          --uninstall             Kısayolları, sağ tık menüsünü, ilişkilendirmeyi ve kurulumu kaldırır.
-          --install-root <yol>    Kurulum klasörü (varsayılan %LOCALAPPDATA%\Programs\VidShrink).
-          --registry-root <kök>   Kayıt kökü (varsayılan HKCU:\Software\Classes).
-          --menu-language <dil>   auto, tr ya da en.
-          --skip-shortcuts        Kısayol, menü ve ilişkilendirme yazılmaz.
-          --no-launch             Kurulumdan sonra VidShrink açılmaz.
-          --shortcut-dir <klasör> Kısayollar Masaüstü ve Başlat yerine bu klasöre yazılır.
-          --tag <etiket>          Son yayın yerine bu etiket kurulur.
-          --asset-source <klasör> Yayın varlıkları bu klasörden okunur.
-          --download-ffmpeg       Yüklü FFmpeg olsa da sabitlenmiş FFmpeg indirilir.
-          --timings               Adım sürelerini yazar.
-        """;
-
     private static int Main(string[] args)
     {
         Console.OutputEncoding = new UTF8Encoding(false);
         var ownConsole = GetConsoleProcessList(new uint[2], 2) == 1;
         try
         {
+            SetupText.Use(UserLocaleName());
             var parsed = Parse(args);
             if (parsed is null)
             {
-                Console.WriteLine(Help);
+                Console.WriteLine(SetupText.Get("setup.help"));
                 return 0;
             }
             Run(parsed.Value.Options, parsed.Value.Uninstall, parsed.Value.Timings).GetAwaiter().GetResult();
@@ -45,7 +28,7 @@ internal static partial class Program
             Write(exception.Message, ConsoleColor.Red);
             if (ownConsole)
             {
-                Console.WriteLine("Kapatmak için Enter'a basın.");
+                Console.WriteLine(SetupText.Get("setup.console.press-enter"));
                 Console.ReadLine();
             }
             return 1;
@@ -82,7 +65,7 @@ internal static partial class Program
 
         for (var i = 0; i < args.Length; i++)
         {
-            string Next() => i + 1 < args.Length ? args[++i] : throw new SetupException($"{args[i]} bir değer bekliyor.");
+            string Next() => i + 1 < args.Length ? args[++i] : throw new SetupException(SetupText.Get("setup.arg.value-expected", args[i]));
             switch (args[i].ToLowerInvariant())
             {
                 case "--help" or "-h" or "/?": return null;
@@ -91,7 +74,7 @@ internal static partial class Program
                 case "--registry-root": registryRoot = Next(); break;
                 case "--menu-language":
                     language = Next();
-                    if (language is not ("auto" or "tr" or "en")) throw new SetupException($"Geçersiz menü dili: {language}");
+                    if (language is not ("auto" or "tr" or "en")) throw new SetupException(SetupText.Get("setup.arg.bad-menu-language", language));
                     break;
                 case "--skip-shortcuts": skip = true; break;
                 case "--no-launch": noLaunch = true; break;
@@ -100,7 +83,7 @@ internal static partial class Program
                 case "--asset-source": assetSource = Path.GetFullPath(Next()); break;
                 case "--download-ffmpeg": downloadFfmpeg = true; break;
                 case "--timings": timings = true; break;
-                default: throw new SetupException($"Bilinmeyen seçenek: {args[i]}. Yardım için --help.");
+                default: throw new SetupException(SetupText.Get("setup.arg.unknown-option", args[i]));
             }
         }
 
@@ -201,7 +184,7 @@ internal static partial class Program
         public void Remove()
         {
             if (Invoke($"Get-AppxPackage -Name '{ShellRegistration.PackageName}' | Remove-AppxPackage -ErrorAction Stop") != 0)
-                throw new SetupException("Windows 11 kabuk paketi kaldırılamadı.");
+                throw new SetupException(SetupText.Get("setup.shell.package-remove-failed"));
         }
 
         public bool Register(string manifestPath, string externalLocation) =>
@@ -221,7 +204,7 @@ internal static partial class Program
             start.Environment.Remove("PSModulePath");
             foreach (var argument in new[] { "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", command })
                 start.ArgumentList.Add(argument);
-            using var process = Process.Start(start) ?? throw new SetupException("powershell başlatılamadı.");
+            using var process = Process.Start(start) ?? throw new SetupException(SetupText.Get("setup.powershell.start-failed"));
             var output = process.StandardOutput.ReadToEndAsync();
             var error = process.StandardError.ReadToEndAsync();
             process.WaitForExit();

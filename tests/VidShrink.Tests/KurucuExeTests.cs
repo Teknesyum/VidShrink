@@ -115,8 +115,7 @@ public sealed class KurucuExeTests : IDisposable
 
         Assert.Equal(6, calls);
         Assert.Equal(new[] { 200, 400, 800, 1600, 3200 }, delays);
-        Assert.Contains("6 denemede ve 6200 ms", failure.Message);
-        Assert.Contains("erisim yok", failure.Message);
+        Assert.Equal(SetupText.Get("setup.lock.failed", 6, 6200, _work, "erisim yok"), failure.Message);
     }
 
     [Fact]
@@ -156,8 +155,7 @@ public sealed class KurucuExeTests : IDisposable
 
         Assert.Equal(1, holder.Kills);
         Assert.Equal(TimeSpan.FromSeconds(7), holder.Waited);
-        Assert.Contains("7 sn sonra hâlâ açık", failure.Message);
-        Assert.Contains("kurucuyu yeniden çalıştırın", failure.Message);
+        Assert.Equal(SetupText.Get("setup.lock.still-open", 7, $"{holder.Name} (PID {holder.Id})", _work), failure.Message);
     }
 
     [Fact]
@@ -222,7 +220,7 @@ public sealed class KurucuExeTests : IDisposable
 
         var failure = await Assert.ThrowsAsync<SetupException>(() => SetupRunner.InstallAsync(options, host, CancellationToken.None));
 
-        Assert.Contains("sağlaması tutmuyor", failure.Message);
+        Assert.StartsWith(Prefix("setup.checksum.mismatch"), failure.Message, StringComparison.Ordinal);
         Assert.Equal("eski baslatici", File.ReadAllText(old));
         Assert.Null(Value($@"{options.ClassesRoot}\SystemFileAssociations\.mp4\shell\VidShrink\command"));
     }
@@ -242,7 +240,8 @@ public sealed class KurucuExeTests : IDisposable
 
         var failure = await Assert.ThrowsAsync<SetupException>(() => SetupRunner.InstallAsync(options, host, CancellationToken.None));
 
-        Assert.Contains("ffprobe.exe sağlaması tutmuyor", failure.Message);
+        Assert.StartsWith(Prefix("setup.checksum.mismatch"), failure.Message, StringComparison.Ordinal);
+        Assert.Contains("ffprobe.exe", failure.Message, StringComparison.Ordinal);
         Assert.Equal("eski", File.ReadAllText(Path.Combine(options.InstallRoot, "eski.txt")));
     }
 
@@ -258,7 +257,7 @@ public sealed class KurucuExeTests : IDisposable
 
         var failure = await Assert.ThrowsAsync<SetupException>(() => SetupRunner.InstallAsync(options, host, CancellationToken.None));
 
-        Assert.Contains("Kurulan VidShrink.exe bulunamadı", failure.Message);
+        Assert.Equal(SetupText.Get("setup.launcher.missing"), failure.Message);
         Assert.Equal("eski baslatici", File.ReadAllText(Path.Combine(options.InstallRoot, "VidShrink.exe")));
         Assert.False(File.Exists(Path.Combine(options.InstallRoot, "Baska.exe")));
         Assert.Empty(Directory.GetDirectories(Path.GetDirectoryName(options.InstallRoot)!, "VidShrink.eski-*"));
@@ -273,7 +272,7 @@ public sealed class KurucuExeTests : IDisposable
         options = options with { InstallRoot = Path.Combine(_work, "local", "Programs") };
 
         var failure = await Assert.ThrowsAsync<SetupException>(() => SetupRunner.InstallAsync(options, host, CancellationToken.None));
-        Assert.Contains(@"LocalAppData\Programs altında olmalıdır", failure.Message);
+        Assert.Equal(SetupText.Get("setup.root.outside-programs", options.InstallRoot), failure.Message);
     }
 
     [Fact]
@@ -329,8 +328,8 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Equal(new string('b', 64), table["VidShrink-Setup.exe"]);
 
         SetupDownloads.AssertChecksum(table, "vidshrink-win-x64.zip", hash.ToUpperInvariant());
-        Assert.Contains("Sağlama listesinde", Assert.Throws<SetupException>(() => SetupDownloads.AssertChecksum(table, "yok.zip", hash)).Message);
-        Assert.Contains("sağlaması tutmuyor", Assert.Throws<SetupException>(() => SetupDownloads.AssertChecksum(table, "VidShrink-Setup.exe", hash)).Message);
+        Assert.Equal(SetupText.Get("setup.checksum.missing", "yok.zip"), Assert.Throws<SetupException>(() => SetupDownloads.AssertChecksum(table, "yok.zip", hash)).Message);
+        Assert.Equal(SetupText.Get("setup.checksum.mismatch", "VidShrink-Setup.exe", new string('b', 64), hash), Assert.Throws<SetupException>(() => SetupDownloads.AssertChecksum(table, "VidShrink-Setup.exe", hash)).Message);
 
         Assert.Equal(@"Software\Classes", SetupOptions.NormalizeRegistryRoot(@"HKCU:\Software\Classes\"));
         Assert.Throws<SetupException>(() => SetupOptions.NormalizeRegistryRoot(@"HKLM:\Software\Classes"));
@@ -365,15 +364,15 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Equal(dllSha, UpdateCheck.HashFile(primary.Dll));
 
         var afterMissing = await Prepare("yok", missing, good);
-        Assert.Equal(new[] { $"libmpv indirilemedi, yedek kaynak deneniyor: {missing}" }, afterMissing.Log);
+        Assert.Equal(new[] { SetupText.Get("setup.libmpv.source-failed", missing) }, afterMissing.Log);
         Assert.Equal(dllSha, UpdateCheck.HashFile(afterMissing.Dll));
 
         var afterBad = await Prepare("bozuk", bad, good);
-        Assert.Equal(new[] { $"libmpv sağlaması tutmadı, yedek kaynak deneniyor: {bad}" }, afterBad.Log);
+        Assert.Equal(new[] { SetupText.Get("setup.libmpv.checksum-fallback", bad) }, afterBad.Log);
         Assert.Equal(dllSha, UpdateCheck.HashFile(afterBad.Dll));
 
         var none = await Assert.ThrowsAsync<SetupException>(() => Prepare("hicbiri", missing, bad));
-        Assert.Contains("sağlaması tutmuyor", none.Message);
+        Assert.StartsWith(Prefix("setup.libmpv.archive-mismatch"), none.Message, StringComparison.Ordinal);
     }
 
     private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release)
@@ -493,6 +492,17 @@ public sealed class KurucuExeTests : IDisposable
         var error = process.StandardError.ReadToEndAsync();
         process.WaitForExit();
         return (process.ExitCode, output.Result + error.Result);
+    }
+
+    /// <summary>
+    /// Cümlenin ilk yer tutucuya kadarki değişmez başı. Hangi anahtarın atıldığını
+    /// dilden bağımsız pimliyor; cümlenin tamamı değişkenle dolduğunda karşılaştırılamıyor.
+    /// </summary>
+    private static string Prefix(string key)
+    {
+        var text = SetupText.Get(key);
+        var brace = text.IndexOf('{', StringComparison.Ordinal);
+        return brace < 0 ? text : text[..brace];
     }
 
     private sealed class FakeHolder : IRootHolder
