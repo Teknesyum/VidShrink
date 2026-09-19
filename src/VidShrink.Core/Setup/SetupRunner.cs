@@ -146,7 +146,7 @@ public static class SetupRunner
             }
             catch
             {
-                Restore(root, aside);
+                await RestoreAsync(root, aside, host);
                 aside = null;
                 throw;
             }
@@ -277,15 +277,32 @@ public static class SetupRunner
         else File.Copy(source, destination, overwrite: true);
     }
 
-    private static void Restore(string root, string? aside)
+    /// <summary>
+    /// Yarım kalan kurulumu geri alır: yeni kökü siler, kenara alınan eski kurulumu yerine koyar.
+    /// </summary>
+    /// <remarks>
+    /// Silme tek denemeyle yapılmıyor. Kökü kenara alan ileri yol <see cref="LockedFolder"/>
+    /// merdivenini kullanıyordu, geri koyma ise çıplak tek çağrıydı; kök o anda kilitliyse
+    /// (tarayıcı yeni açılan dosyaları okuyor) silme düşüyor, taşıma hiç denenmiyor ve
+    /// kullanıcının kurulumu <c>VidShrink.eski-*</c> altında sessizce kalıyordu. Kurtaramazsak
+    /// hiç değilse susmuyoruz: klasörün yeri günlüğe yazılıyor.
+    /// </remarks>
+    internal static async Task RestoreAsync(string root, string? aside, SetupHost host)
     {
-        TryDelete(root);
+        try
+        {
+            await LockedFolder.RunAsync(root, path => Directory.Delete(path, recursive: true), host, CancellationToken.None);
+        }
+        catch (Exception) { }
+
         if (aside is null || !Directory.Exists(aside)) return;
         try
         {
             if (!Directory.Exists(root)) Directory.Move(aside, root);
         }
         catch (Exception) { }
+
+        if (Directory.Exists(aside)) host.Log(SetupText.Get("setup.restore.aside-left", aside, root));
     }
 
     public static void SweepAsides(string root)

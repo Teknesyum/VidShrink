@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace VidShrink.Core.Setup;
 
@@ -120,6 +120,9 @@ public static class SetupText
         ["setup.lock.retry"] = (
             "Kurulum klasörü kilitli, {0} ms sonra yeniden denenecek ({1}/{2})...",
             "The install folder is locked; retrying in {0} ms ({1}/{2})..."),
+        ["setup.restore.aside-left"] = (
+            "Kurulum geri alındı ama eski kurulum yerine konamadı; şu an \"{0}\" klasöründe duruyor. \"{1}\" klasörü boşaldığında bu klasörü oraya taşıyabilirsiniz.",
+            "The install was rolled back but the previous install could not be put back; it is now in \"{0}\". Once \"{1}\" is free you can move that folder there."),
         ["setup.lock.failed"] = (
             "Kurulum klasörü {0} denemede ve {1} ms beklemede silinemedi: {2}. Bir dosya başka bir süreçte açık - genellikle virüs taraması ya da Gezgin önizlemesi; birkaç saniye sonra kurucuyu yeniden çalıştırın. Son hata: {3}",
             "The install folder could not be deleted in {0} attempts over {1} ms: {2}. A file is open in another process - usually a virus scan or an Explorer preview; run the installer again in a few seconds. Last error: {3}"),

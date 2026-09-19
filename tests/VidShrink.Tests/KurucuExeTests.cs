@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
 using System.Runtime.Versioning;
 using System.Text;
@@ -263,6 +263,57 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Empty(Directory.GetDirectories(Path.GetDirectoryName(options.InstallRoot)!, "VidShrink.eski-*"));
     }
 
+    /// <summary>
+    /// Geri koyma yolunun kendisi: kök kilitliyken eski kurulum kaybolmuyor ve kullanıcı
+    /// susturulmuyor — kenara alınan klasörün yeri günlüğe yazılıyor. Kilit gerçek bir dosya
+    /// tutamağı, taklit değil. Kilitsiz hâl olumsuz kontrol: eski kurulum yerine dönüyor,
+    /// duyuru yapılmıyor.
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task KilitliKokteGeriKonamayanEskiKurulumunYeriSoyleniyor(bool kilitli)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var kok = Path.Combine(_work, "Programs", "VidShrink");
+        var kenar = kok + SetupRunner.AsideSuffix + "abc12345";
+        Directory.CreateDirectory(Path.Combine(kok, SetupRunner.AppFolder));
+        File.WriteAllText(Path.Combine(kok, SetupRunner.AppFolder, "VidShrink.App.exe"), "yarim");
+        Directory.CreateDirectory(kenar);
+        File.WriteAllText(Path.Combine(kenar, "VidShrink.exe"), "eski baslatici");
+
+        var gunluk = new List<string>();
+        var host = new SetupHost { Delay = (_, _) => Task.CompletedTask, Log = gunluk.Add };
+
+        FileStream? tutamak = kilitli
+            ? new FileStream(Path.Combine(kok, SetupRunner.AppFolder, "VidShrink.App.exe"),
+                FileMode.Open, FileAccess.Read, FileShare.Read)
+            : null;
+        try
+        {
+            await SetupRunner.RestoreAsync(kok, kenar, host);
+        }
+        finally
+        {
+            tutamak?.Dispose();
+        }
+
+        if (kilitli)
+        {
+            Assert.True(Directory.Exists(kenar));
+            Assert.Equal("eski baslatici", File.ReadAllText(Path.Combine(kenar, "VidShrink.exe")));
+            var duyuru = Assert.Single(gunluk, satir => satir.Contains(kenar, StringComparison.Ordinal));
+            Assert.Contains(kok, duyuru, StringComparison.Ordinal);
+        }
+        else
+        {
+            Assert.False(Directory.Exists(kenar));
+            Assert.Equal("eski baslatici", File.ReadAllText(Path.Combine(kok, "VidShrink.exe")));
+            Assert.DoesNotContain(gunluk, satir => satir.Contains(SetupRunner.AsideSuffix, StringComparison.Ordinal));
+        }
+    }
+
     [Fact]
     public async Task ProgramsDisinaKurulmuyor()
     {
@@ -375,7 +426,7 @@ public sealed class KurucuExeTests : IDisposable
         Assert.StartsWith(Prefix("setup.libmpv.archive-mismatch"), none.Message, StringComparison.Ordinal);
     }
 
-    private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release)
+    private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release, Action<string>? gunluk = null)
     {
         var local = Path.Combine(_work, "local");
         var ffmpegZip = Path.Combine(release, "ffmpeg.zip");
@@ -406,6 +457,7 @@ public sealed class KurucuExeTests : IDisposable
             Architecture = () => new ArchitectureDecision(ArchitectureOutcome.Read, "x64", ""),
             Shortcuts = shortcuts,
             Delay = (_, _) => Task.CompletedTask,
+            Log = gunluk ?? (_ => { }),
             Launch = _ => throw new InvalidOperationException("NoLaunch verildi.")
         };
         return (options, host, shortcuts);
