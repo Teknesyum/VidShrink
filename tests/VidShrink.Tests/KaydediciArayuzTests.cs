@@ -758,6 +758,40 @@ public sealed class KaydediciArayuzTests
         Assert.Equal(1, kaldirma);
     }
 
+    /// <summary>
+    /// Kayıt sonucu satırındaki boyut ailenin baskın yazımıyla (<c>0.0</c>) ve arayüzün
+    /// diliyle yazılıyor. Sayı elle yazılı: <c>0.##</c> olsaydı <c>12,0</c> yerine
+    /// <c>12</c>, değişmez kültürle <c>12.0</c> okunurdu.
+    /// </summary>
+    [Fact]
+    public void KayitSonucuBoyutuAileninYazimiylaYazar()
+    {
+        var klasor = CalismaKlasoru();
+        try
+        {
+            var mkv = Path.Combine(klasor, "kayit.mkv");
+            File.WriteAllText(mkv, "x");
+
+            using var ayar = new KaydediciAyarTests.OzelAyar();
+            var satir = AppHost.Run(() =>
+            {
+                var onceki = VidShrink.App.Localization.Strings.Language;
+                VidShrink.App.Localization.Strings.Use("tr");
+                try
+                {
+                    var view = new RecorderView(ayar.Yol);
+                    view.ShowResult(new VidShrink.Ffmpeg.RecordResult(true, mkv, 12.0, false, 0, string.Empty, 1));
+                    return view.ResultText;
+                }
+                finally { VidShrink.App.Localization.Strings.Use(onceki); }
+            });
+
+            Assert.Contains("12,0", satir);
+            Assert.DoesNotContain("12.0", satir);
+        }
+        finally { Directory.Delete(klasor, true); }
+    }
+
     [Fact]
     public void TepsiIpucundaAnlikBoyutVeSureVar()
     {

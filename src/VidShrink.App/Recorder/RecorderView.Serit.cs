@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -38,6 +38,8 @@ internal partial class RecorderView
     internal string DroppedText => TxtDropped.Text ?? string.Empty;
 
     internal string ResultPathText => TxtResultPath.Text ?? string.Empty;
+
+    internal string ResultText => TxtResult.Text ?? string.Empty;
 
     /// <summary>
     /// Geçen sürenin yazımı. Sayılar değişmez biçimde yazılıyor, yani dil değişince

@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -6,6 +6,8 @@ using Avalonia.Layout;
 using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.Core;
+using VidShrink.Ffmpeg;
+using VidShrink.App.Localization;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -198,5 +200,33 @@ public sealed class KucultPaylasTests
             }
             finally { window.Close(); }
         });
-    }
+    }
+    /// <summary>
+    /// İş penceresinin iki boyut satırı ailenin yazımını ve <b>pencerenin kendi dilinin</b>
+    /// kültürünü kullanıyor. Eskiden ikisi de <c>InvariantCulture</c> okuyordu: Türkçe
+    /// arayüzde sapma <c>1.23</c>, tavan aşımı <c>12.0</c> diye noktayla yazılıyordu.
+    /// Beklenen değer <see cref="Bicim.Boyut"/> yüzeyinden ve pencerenin dilinden
+    /// kuruluyor — böylece hem yazım hem kültür kaynağı tek ölçüyle pimleniyor.
+    /// </summary>
+    [Fact]
+    public void IsPenceresininBoyutSatirlariAileninYazimiylaVePencereninDiliyle()
+    {
+        AppHost.Run(() =>
+        {
+            var window = new ShrinkJobWindow(new ShellShrinkStartup(null, ShrinkArgumentProblem.NoTarget, null), null);
+            try
+            {
+                var kultur = Strings.CultureOf(window.Language);
+
+                var asan = new EncodeResult(true, @"C:\ornekideo_shrunk.mp4", 17.23, null!, 1, null, OverTarget: true);
+                var bitti = window.BittiSatiri(asan, 16);
+                Assert.Contains(Bicim.Boyut.Sapma(17.23 - 16, kultur), bitti);
+
+                var tavan = new EncodeResult(false, @"C:\ornekideo_shrunk.mp4", 12.0, null!, 3, null, CeilingExceeded: true);
+                var hata = window.HataSatiri(tavan, 16);
+                Assert.Contains(Bicim.Boyut.Mb(12.0, kultur), hata);
+            }
+            finally { window.Close(); }
+        });
+    }
 }

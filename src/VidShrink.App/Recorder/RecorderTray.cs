@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using VidShrink.Ffmpeg;
+using VidShrink.Core;
 
 namespace VidShrink.App.Recorder;
 
@@ -48,7 +49,7 @@ internal static class RecorderTray
         _ => "recorder.strip.idle"
     };
 
-    internal static string Megabytes(double mb, CultureInfo culture) => Math.Max(0, mb).ToString("0.0", culture);
+    internal static string Megabytes(double mb, CultureInfo culture) => Bicim.Boyut.Mb(Math.Max(0, mb), culture);
 
     internal static WindowIcon Render(Color color)
     {

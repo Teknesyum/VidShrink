@@ -286,6 +286,44 @@ Temiz taban 0 kırmızı / 137 yeşil. Mutasyon:
 
 İki pim eklendikten sonra M3 ve M5 yeniden koşuldu: **ikisi de 1 kırmızı**.
 
+### Adım 7 ölçümü — 19 Eylül 2026
+
+**Planın adım 7'si yanlış kurulmuştu.** "`MainWindow.Num`, `CliApp.Num`,
+`RecorderTray.Megabytes` kaldırılsın, çağrı yeri kalmadığı taramayla kanıtlansın"
+diyordu; tarama bunun tersini gösterdi: `Num`'un ~30, `CliApp.Num`'un ayrıca canlı
+çağrı yeri var. Yazdıkları sayılar (CRF, bppf, ayrıntı üsteli, puan) altı ailenin
+hiçbirine girmiyor — bunlar **motorun gerekçe sayıları**, ayrı bir aile ve ayrı bir iş.
+Silme değil, yeni bir adım. Adım 7 bu yüzden ailenin dışarıda kalan megabayt
+çağrı yerlerine çevrildi.
+
+`MainWindow.Percent` zaten `Bicim.Yuzde.Isaretli`'ye tek satırlık bir takma ad,
+duruyor. `MpvEngine.Percent` kapsam dışı: kullanıcıya yazılan metin değil, mpv'ye
+verilen tamsayı.
+
+İki gerçek kusur kapandı, ikisi de `ShrinkJobWindow`'da:
+
+- Hedefi aşan teslimde sapma `InvariantCulture` ile yazılıyordu — Türkçe arayüz
+  `1,23` yerine `1.23` okuyordu.
+- Tavan aşımı satırındaki boyut da aynı şekilde `12.0` diye noktayla yazılıyordu.
+
+Pencere kendi dilini (`_language`) taşıdığı için doğru kültür `Strings.CultureOf(_language)`.
+İki satır ölçülebilsin diye `UpdateBadge.Compose` kalıbıyla saf işlevlere ayrıldı
+(`BittiSatiri`, `HataSatiri`) — eskiden yalnız uçtan uca bir kodlama koşumunda görünüyorlardı.
+
+Temiz taban 0 kırmızı / 149 yeşil. Mutasyon:
+
+| Kesim | Kırmızı |
+| --- | --- |
+| N1 iş penceresi sapması tek ondalık | **0** |
+| N2 iş penceresi kültürü değişmez | **0** |
+| N3 kaydedici sonucu hedef yazımıyla | **0** |
+| N4 tepsi kırpması kalkar | 1 |
+| N5 tepsi sapma yazımıyla | 1 |
+
+Üç sıfır da eşdeğer değildi — hiçbir ölçü bu üç satırı okumuyordu. Üç pim yazıldı;
+kaydedici satırı için `RecorderView.ResultText` erişimcisi eklendi. Yeniden koşum:
+**N1 / N2 / N3 ve ek olarak N3b (kaydedici satırının kültürü) dördü de 1 kırmızı.**
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

@@ -280,20 +280,14 @@ public partial class ShrinkJobWindow : Window
                 _outputs.Add(result.OutputPath);
                 State = ShrinkJobState.Bitti;
                 Progress.Value = 1;
-                TxtMessage.Text = result.OverTarget
-                    ? result.OutputPath + " " + Say("main.run.accepted-larger",
-                        (result.OutputMb - request.TargetMegabytes).ToString("0.00", CultureInfo.InvariantCulture), request.TargetMegabytes)
-                    : result.OutputPath;
+                TxtMessage.Text = BittiSatiri(result, request.TargetMegabytes);
                 BtnReveal.IsVisible = true;
                 ResetShare(true);
             }
             else
             {
                 State = ShrinkJobState.Hata;
-                TxtMessage.Text = result.CeilingExceeded
-                    ? Say("main.run.over-ceiling", request.TargetMegabytes, result.Attempts,
-                        result.OutputMb.ToString("0.0", CultureInfo.InvariantCulture))
-                    : Say("main.run.ended");
+                TxtMessage.Text = HataSatiri(result, request.TargetMegabytes);
                 BtnOpenInApp.IsVisible = true;
             }
         }
@@ -372,6 +366,27 @@ public partial class ShrinkJobWindow : Window
             candidate = Path.Combine(dir, name + "_shrunk_" + index + ".mp4");
         return candidate;
     }
+
+    /// <summary>
+    /// İş bittiğinde yazılan satır. Arayüzden ayrı duruyor ki ölçülebilsin: hedefi aşan
+    /// teslimde sapma <see cref="Bicim.Boyut.Sapma"/> ile, pencerenin <b>kendi</b>
+    /// dilinin kültüründe yazılıyor. Eskiden burada <c>InvariantCulture</c> vardı ve
+    /// Türkçe arayüz sapmayı <c>1.23</c> diye noktayla okuyordu.
+    /// </summary>
+    internal string BittiSatiri(EncodeResult result, double hedefMb)
+        => result.OverTarget
+            ? result.OutputPath + " " + Say("main.run.accepted-larger",
+                Bicim.Boyut.Sapma(result.OutputMb - hedefMb, Strings.CultureOf(_language)), hedefMb)
+            : result.OutputPath;
+
+    /// <summary>
+    /// İş düştüğünde yazılan satır. Tavanı aşan teslimde boyut ailenin baskın yazımıyla
+    /// (<see cref="Bicim.Boyut.Mb"/>) ve pencerenin dilinin kültüründe yazılıyor.
+    /// </summary>
+    internal string HataSatiri(EncodeResult result, double hedefMb)
+        => result.CeilingExceeded
+            ? Say("main.run.over-ceiling", hedefMb, result.Attempts, Bicim.Boyut.Mb(result.OutputMb, Strings.CultureOf(_language)))
+            : Say("main.run.ended");
 
     private string Say(string key)
         => LanguageCatalog.Title(Strings.GetIn(_language, key), _language);

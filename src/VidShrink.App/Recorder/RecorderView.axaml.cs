@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,6 +10,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using VidShrink.App.Localization;
 using VidShrink.Ffmpeg;
+using VidShrink.Core;
 
 namespace VidShrink.App.Recorder;
 
@@ -165,7 +166,7 @@ internal partial class RecorderView : UserControl
         ResetShare();
         TxtResult.Text = Say(
             "recorder.output.done",
-            result.OutputMb.ToString("0.0", Strings.Culture),
+            Bicim.Boyut.Mb(result.OutputMb, Strings.Culture),
             result.Segments.ToString(CultureInfo.InvariantCulture));
 
         var acilir = OldurulmeyeDayanir(result.OutputPath);
