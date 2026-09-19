@@ -25,6 +25,13 @@ internal partial class RecorderView
     private ShareFlow? _shareFlow;
     private CoreShare.ShareTargetTable? _shareTargets;
     private CoreShare.IHttpTransport? _shareTransport;
+    private ShareRetryBinder? _shareRetry;
+
+    private ShareRetryBinder Retry() => _shareRetry ??= new ShareRetryBinder(
+        BtnRecShareRetry, () => _shareTargets, id => ShareOnce(id));
+
+    /// <summary>Yeniden deneme düğmesinin o anki hali; ölçü piksele değil buna bakar.</summary>
+    internal ShareRetryPrompt ShareRetryPromptForTest => Retry().Current;
 
     /// <summary>Son paylaşımın adresi. Ölçüm kendi gördüğünü okuyabilsin diye açık.</summary>
     internal string ShareLinkText => RecShareLinkRow.IsVisible ? TxtRecShareLink.Text ?? string.Empty : string.Empty;
@@ -36,6 +43,7 @@ internal partial class RecorderView
     {
         BtnRecShare.IsEnabled = true;
         BtnRecShareCancel.IsVisible = false;
+        Retry().Hide();
         RecShareProgress.IsVisible = false;
         RecShareProgress.Value = 0;
         RecShareLinkRow.IsVisible = false;
@@ -64,7 +72,9 @@ internal partial class RecorderView
             _shareTransport ??= new CoreShare.HttpClientTransport(),
             _shareTargets));
 
-    private async void OnShare(object? sender, RoutedEventArgs e)
+    private void OnShare(object? sender, RoutedEventArgs e) => ShareOnce(null);
+
+    private async void ShareOnce(string? targetIdOverride)
     {
         if (Delivered() is not { } path)
         {
@@ -72,7 +82,11 @@ internal partial class RecorderView
             return;
         }
 
-        if (Endpoint() is not { } target)
+        var target = targetIdOverride is null
+            ? Endpoint()
+            : _shareTargets?.Find(targetIdOverride) ?? Endpoint();
+
+        if (target is null)
         {
             ShowShareStatus(Say("settings.share.targets-missing", CoreShare.ShareTargetTable.FileName));
             return;
@@ -83,6 +97,7 @@ internal partial class RecorderView
 
         BtnRecShare.IsEnabled = false;
         BtnRecShareCancel.IsVisible = true;
+        Retry().Hide();
         RecShareProgress.IsVisible = true;
         RecShareProgress.Value = 0;
         RecShareLinkRow.IsVisible = false;
@@ -103,6 +118,7 @@ internal partial class RecorderView
         {
             TxtRecShareLink.Text = link.Url;
             RecShareLinkRow.IsVisible = true;
+            Retry().Hide();
             ShowShareStatus(link.ExpiresAt is { } expires
                 ? Say("settings.share.shared-until", Bicim.Damga(expires, Strings.Culture))
                 : Say("settings.share.shared"));
@@ -110,6 +126,7 @@ internal partial class RecorderView
         }
 
         RecShareLinkRow.IsVisible = false;
+        Retry().Show(result);
         ShowShareStatus(result.Failure == CoreShare.ShareFailure.Cancelled
             ? Say("settings.share.cancelled")
             : $"{Say("settings.share.failed")}: {ShareMessage.Of(result)}");

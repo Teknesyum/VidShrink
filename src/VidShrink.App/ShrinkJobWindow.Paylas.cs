@@ -26,6 +26,13 @@ public partial class ShrinkJobWindow
     private ShareFlow? _shareFlow;
     private CoreShare.ShareTargetTable? _shareTargets;
     private CoreShare.IHttpTransport? _shareTransport;
+    private ShareRetryBinder? _shareRetry;
+
+    private ShareRetryBinder Retry() => _shareRetry ??= new ShareRetryBinder(
+        BtnShareRetry, () => _shareTargets, id => ShareOnce(id));
+
+    /// <summary>Yeniden deneme düğmesinin o anki hali; ölçü piksele değil buna bakar.</summary>
+    internal ShareRetryPrompt ShareRetryPromptForTest => Retry().Current;
 
     /// <summary>Son paylaşımın adresi. Ölçüm kendi gördüğünü okuyabilsin diye açık.</summary>
     internal string ShareLinkText => ShareLinkRow.IsVisible ? TxtShareLink.Text ?? string.Empty : string.Empty;
@@ -46,6 +53,7 @@ public partial class ShrinkJobWindow
         BtnShare.IsVisible = fileReady;
         BtnShare.IsEnabled = fileReady;
         BtnShareCancel.IsVisible = false;
+        Retry().Hide();
         ShareProgress.IsVisible = false;
         ShareProgress.Value = 0;
         ShareLinkRow.IsVisible = false;
@@ -74,7 +82,9 @@ public partial class ShrinkJobWindow
             _shareTransport ??= new CoreShare.HttpClientTransport(),
             _shareTargets));
 
-    private async void OnShare(object? sender, RoutedEventArgs e)
+    private void OnShare(object? sender, RoutedEventArgs e) => ShareOnce(null);
+
+    private async void ShareOnce(string? targetIdOverride)
     {
         if (LastOutput() is not { } path)
         {
@@ -82,7 +92,11 @@ public partial class ShrinkJobWindow
             return;
         }
 
-        if (Endpoint() is not { } target)
+        var target = targetIdOverride is null
+            ? Endpoint()
+            : _shareTargets?.Find(targetIdOverride) ?? Endpoint();
+
+        if (target is null)
         {
             ShowShareStatus(Say("settings.share.targets-missing", CoreShare.ShareTargetTable.FileName));
             return;
@@ -93,6 +107,7 @@ public partial class ShrinkJobWindow
 
         BtnShare.IsEnabled = false;
         BtnShareCancel.IsVisible = true;
+        Retry().Hide();
         ShareProgress.IsVisible = true;
         ShareProgress.Value = 0;
         ShareLinkRow.IsVisible = false;
@@ -113,6 +128,7 @@ public partial class ShrinkJobWindow
         {
             TxtShareLink.Text = link.Url;
             ShareLinkRow.IsVisible = true;
+            Retry().Hide();
             ShowShareStatus(link.ExpiresAt is { } expires
                 ? Say("settings.share.shared-until", Bicim.Damga(expires, Strings.CultureOf(_language)))
                 : Say("settings.share.shared"));
@@ -120,6 +136,7 @@ public partial class ShrinkJobWindow
         }
 
         ShareLinkRow.IsVisible = false;
+        Retry().Show(result);
         ShowShareStatus(result.Failure == CoreShare.ShareFailure.Cancelled
             ? Say("settings.share.cancelled")
             : $"{Say("settings.share.failed")}: {ShareMessage.Of(result)}");

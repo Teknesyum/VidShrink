@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -2193,7 +2193,17 @@ public partial class MainWindow : Window
         if (sharing) ShareProgress.Value = 0;
     }
 
-    private async void OnShare(object? sender, RoutedEventArgs e)
+    private ShareRetryBinder? _shareRetry;
+
+    private ShareRetryBinder Retry() => _shareRetry ??= new ShareRetryBinder(
+        BtnShareRetry, () => _shareTargets, id => ShareOnce(id));
+
+    /// <summary>Yeniden deneme düğmesinin o anki hali; ölçü piksele değil buna bakar.</summary>
+    internal ShareRetryPrompt ShareRetryPromptForTest => Retry().Current;
+
+    private void OnShare(object? sender, RoutedEventArgs e) => ShareOnce(null);
+
+    private async void ShareOnce(string? targetIdOverride)
     {
         if (_lastOutput is null || !File.Exists(_lastOutput))
         {
@@ -2201,7 +2211,11 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (SelectedShareEndpoint() is not { } target)
+        var target = targetIdOverride is null
+            ? SelectedShareEndpoint()
+            : _shareTargets?.Find(targetIdOverride) ?? SelectedShareEndpoint();
+
+        if (target is null)
         {
             TxtShareStatus.Text = Say("settings.share.targets-missing", CoreShare.ShareTargetTable.FileName);
             return;
@@ -2211,6 +2225,7 @@ public partial class MainWindow : Window
         if (flow.Running) return;
 
         SetSharing(true);
+        Retry().Hide();
         TxtShareStatus.Text = Say("settings.share.uploading");
         ShareLinkRow.IsVisible = false;
 
@@ -2227,6 +2242,7 @@ public partial class MainWindow : Window
         {
             TxtShareLink.Text = link.Url;
             ShareLinkRow.IsVisible = true;
+            Retry().Hide();
             BtnShareDelete.IsEnabled = flow.CanDelete;
             TxtShareStatus.Text = link.ExpiresAt is { } expires
                 ? Say("settings.share.shared-until", Bicim.Damga(expires, Strings.Culture))
@@ -2235,6 +2251,7 @@ public partial class MainWindow : Window
         }
 
         ShareLinkRow.IsVisible = false;
+        Retry().Show(result);
         BtnShareDelete.IsEnabled = flow.CanDelete;
         TxtShareStatus.Text = result.Failure == CoreShare.ShareFailure.Cancelled
             ? Say("settings.share.cancelled")

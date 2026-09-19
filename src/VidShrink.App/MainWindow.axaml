@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
@@ -829,6 +829,7 @@
                         <Button x:Name="BtnReveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnReveal"/>
                         <Button x:Name="BtnShare" Content="{loc:Text main.action.share}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShare"/>
                         <Button x:Name="BtnShareCancel" Content="{loc:Text main.action.cancel-upload}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShareCancel"/>
+                        <Button x:Name="BtnShareRetry" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False"/>
                       </WrapPanel>
                       <ProgressBar x:Name="ShareProgress" Maximum="1" IsVisible="False"/>
                       <Grid x:Name="ShareLinkRow"

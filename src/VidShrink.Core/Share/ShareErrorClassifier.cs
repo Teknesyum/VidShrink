@@ -34,7 +34,8 @@ public sealed record ShareDiagnosis(
     string Key,
     IReadOnlyList<object> Args,
     TimeSpan? RetryAfter = null,
-    string? SuggestedTargetId = null)
+    string? SuggestedTargetId = null,
+    ShareStep Step = ShareStep.Prepare)
 {
     public ShareDiagnosis(ShareFailure failure, string key)
         : this(failure, key, Array.Empty<object>()) { }
@@ -182,7 +183,7 @@ public static class ShareErrorClassifier
                 retryAfter)
         };
 
-        return Count(diagnosis);
+        return Count(diagnosis with { Step = step });
     }
 
     /// <summary>Ağ katmanından gelen istisnayı sınıflandırır.</summary>
@@ -231,7 +232,7 @@ public static class ShareErrorClassifier
                 new object[] { step, exception.Message })
         };
 
-        return Count(diagnosis);
+        return Count(diagnosis with { Step = step });
     }
 
     /// <summary>Silme desteklemeyen hedef için tanı. Ağa çıkılmaz.</summary>
@@ -240,11 +241,13 @@ public static class ShareErrorClassifier
             ? new ShareDiagnosis(
                 ShareFailure.NotAuthorized,
                 "share.error.no-delete-token-hours",
-                new object[] { target.DisplayName, hours })
+                new object[] { target.DisplayName, hours },
+                Step: ShareStep.Delete)
             : new ShareDiagnosis(
                 ShareFailure.NotAuthorized,
                 "share.error.no-delete-token",
-                new object[] { target.DisplayName }));
+                new object[] { target.DisplayName },
+                Step: ShareStep.Delete));
 
     private static ShareDiagnosis Count(ShareDiagnosis diagnosis)
     {

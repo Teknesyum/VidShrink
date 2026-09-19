@@ -118,6 +118,12 @@ public sealed record ShareResult
     /// <summary>Bu hata için önerilen başka hedef (örneğin tavanı yeten). Yoksa boştur.</summary>
     public string? SuggestedTargetId { get; private init; }
 
+    /// <summary>
+    /// Hatanın düştüğü adım. Yeniden denemenin güvenli olup olmadığı buna bakar:
+    /// baytlar işlendikten sonraki bir hatada ikinci yükleme aynı dosyayı tekrar gönderir.
+    /// </summary>
+    public ShareStep Step { get; private init; } = ShareStep.Prepare;
+
     public ShareLink? Link { get; private init; }
 
     public static ShareResult Success(ShareLink link) => new() { Link = link };
@@ -128,7 +134,8 @@ public sealed record ShareResult
         Key = diagnosis.Key,
         Args = diagnosis.Args,
         RetryAfter = diagnosis.RetryAfter,
-        SuggestedTargetId = diagnosis.SuggestedTargetId
+        SuggestedTargetId = diagnosis.SuggestedTargetId,
+        Step = diagnosis.Step
     };
 }
 

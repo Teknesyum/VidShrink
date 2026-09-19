@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:auto="using:Avalonia.Automation"
              xmlns:loc="using:VidShrink.App.Localization"
@@ -231,6 +231,10 @@
                   Content="{loc:Text main.action.cancel-upload}"
                   auto:AutomationProperties.Name="{loc:Text main.action.cancel-upload}"
                   Click="OnShareCancel"/>
+          <Button x:Name="BtnRecShareRetry"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsVisible="False"/>
         </WrapPanel>
 
         <ProgressBar x:Name="RecShareProgress" Maximum="1" IsVisible="False"/>

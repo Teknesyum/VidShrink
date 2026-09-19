@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="using:VidShrink.App.Localization"
         x:Class="VidShrink.App.ShrinkJobWindow"
@@ -80,6 +80,9 @@
                 IsVisible="False"/>
         <Button x:Name="BtnShareCancel"
                 Content="{loc:Text main.action.cancel-upload}"
+                Padding="{StaticResource ButtonPaddingSm}"
+                IsVisible="False"/>
+        <Button x:Name="BtnShareRetry"
                 Padding="{StaticResource ButtonPaddingSm}"
                 IsVisible="False"/>
         <Button x:Name="BtnClose"

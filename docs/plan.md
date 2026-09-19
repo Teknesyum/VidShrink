@@ -1257,3 +1257,37 @@ söyledi. O da `trash/`'a gitti.
 Pim dökümü plandakinden geniş: dokuz değil **21 düz pim** ve 3 borç pimi düştü
 (`GrabbedFrame` altı, `TimelinePoint` beş, `KeyframeIndex` iki de listede duruyordu).
 Ölçüm `docs/olcumler/k8-olu-kare-yolu-2026-09-19.md`.
+
+## K8 borcu 5 — paylaşım hatasının kullanıcıya ulaşmayan yarısı (19 Eylül 2026)
+
+Bulgu borcun yazdığından farklı çıktı. Borç "`ShareFailure`'ın 11 üyesinden 8'i
+okunmuyor, sınıflandırma mı fazla arayüz mü eksik" diyordu. Ölçüm: ayrım kullanıcıya
+**zaten ulaşıyor** — enum üzerinden değil, `ShareDiagnosis.Key` üzerinden; 11 üyeye
+karşı 22 anahtar var ve hepsi 42 dilde pimli.
+
+Ölü olan enum değil, **`RetryAfter` ve `SuggestedTargetId`**. Sınıflandırıcı "120 saniye
+sonra yeniden denenebilir" ve "bu dosya için şu hedef yeter" bilgisini hesaplıyor, üç
+gösterim yüzeyinin üçü de atıyor (`grep -n "\.Failure" src/` iki okuma yeri veriyor,
+`RetryAfter` sıfır). Kullanıcı "başarısız: <cümle>" görüyor ve elle baştan başlıyor.
+
+Danışma: fable `b-dar` dedi — tekrar deneme düğmesi eklensin, en büyük risk yeniden
+denemenin idempotent olmaması (bayt gittikten sonraki ağ hatasında ikinci yükleme).
+
+### Adımlar
+
+1. `ShareDiagnosis` ve `ShareResult` başarısızlığın **hangi adımda** olduğunu taşısın
+   (`ShareStep`). Bugün adım sınıflandırıcıya giriyor ama tanıda durmuyor; idempotentlik
+   kararı onsuz verilemez.
+2. `Core/Share/ShareRetry.cs`: tek karar gövdesi. Yeniden deneme yalnız bayt
+   işlenmemişken açılır — `RateLimited` her adımda (429 isteği baştan reddeder),
+   `NetworkFailure`/`ServiceError` yalnız `Prepare`/`Init` adımında. Kalan sekiz üye ve
+   `Upload`/`Confirm` adımı olumsuz kol.
+3. Üç gösterim yüzeyi (`MainWindow`, `RecorderView.Paylas`, `ShrinkJobWindow.Paylas`)
+   aynı kalıbı yazıyor; düğme tek yerde kurulsun. Üç durum: yeniden denenebilir →
+   "Tekrar dene"; `RetryAfter` varsa geri sayımla kilitli; `SuggestedTargetId` varsa
+   "{0} ile dene" ve o hedefe gider. Hiçbiri yoksa düğme görünmez.
+4. Üç yeni anahtar 42 dile.
+5. Ölçü: her `ShareFailure` üyesinin sınıflandırıcıdan **üretilebildiği** küme eşitliğiyle;
+   yeniden deneme kümesinin adıma göre açılıp kapandığı, `Upload` adımındaki ağ hatasında
+   düğmenin çıkmadığı olumsuz kontrolle. Mutasyon: kümeyi genişletmek ve adım şartını
+   kaldırmak ayrı ayrı kırmızı vermeli.

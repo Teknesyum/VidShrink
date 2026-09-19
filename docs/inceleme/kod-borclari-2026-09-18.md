@@ -25,8 +25,17 @@ açıkça "bu kod kalkacak" diyor.
 4. `src/VidShrink.App/MainWindow.axaml.cs` — 4980 satır, depodaki en büyük dosya
    (ikincisi 1883). Yoklama siyaseti, donanım hükmü ve `ReasonCode` kolları Core yerine
    pencerede duruyor. **Şüpheli:** nicel gözlem, hüküm değil.
-5. `tests/VidShrink.Tests/OluUyeTests.cs:513-534` — `ShareFailure`'ın 11 üyesinden 8'i
-   üretiliyor, dördü okunuyor; sınıflandırma mı fazla arayüz mü eksik, ölçülmemiş.
+5. ~~`tests/VidShrink.Tests/OluUyeTests.cs:513-534` — `ShareFailure`'ın 11 üyesinden 8'i
+   üretiliyor, dördü okunuyor; sınıflandırma mı fazla arayüz mü eksik, ölçülmemiş.~~
+   **Kapandı — öncülü yanlıştı:** sınıflandırma fazla değil, kullanıcıya görünen ayrım
+   enum'dan daha ince yapılıyor (11 üyeye karşılık 22 anahtar, 42 dilde pimli). Ölü olan
+   `RetryAfter` ile `SuggestedTargetId`'ydi: Core hesaplıyor, üç gösterim yüzeyi de atıyordu.
+   `Core/Share/ShareRetry.cs` tek karar gövdesi oldu, `ShareStep` tanıya taşındı ve yeniden
+   deneme düğmesi üç yüzeyde aynı gövdeden çiziliyor. Ölçü baytların akıp akmadığı: ağ ve
+   sunucu hatası yalnız `Prepare`/`Init` adımlarında denenir, yoksa kullanıcı ikinci kopya
+   yükler. `NetworkFailure`/`RateLimited`/`ServiceError` pimleri düştü, kalan beşi
+   `varsayilan-kol`a döndü. Süit 59/59; beş kesimin beşi kırmızı, taban ve geri 0/99
+   (`docs/olcumler/k8-paylasim-tekrar-2026-09-19.md`).
 6. ~~`tests/VidShrink.Tests/OluUyeTests.cs:549-556` — `PresetKind`'ın dört üyesi de ölü:
    ön ayar kütüphanesi motorda duruyor, türe göre ayıran üretim kolu yok.~~ **Kapandı:**
    kütüphane CLI'dan açıldı (`profiller`/`presets` komutu, `--profil`/`--profile` bayrağı),
