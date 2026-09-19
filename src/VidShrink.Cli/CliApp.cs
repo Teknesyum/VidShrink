@@ -222,7 +222,7 @@ public static class CliApp
         foreach (var b in basliklar)
         {
             sb.Append("  ").Append(b.Number.ToString(CultureInfo.InvariantCulture)).Append("  ")
-              .Append(TimeSpan.FromSeconds(b.DurationSeconds).ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture))
+              .Append(Saat.Ekran(TimeSpan.FromSeconds(b.DurationSeconds), TimeSpan.FromHours(1)))
               .Append("  ").Append(b.Width.ToString(CultureInfo.InvariantCulture)).Append('x')
               .Append(b.Height.ToString(CultureInfo.InvariantCulture))
               .Append("  ").Append(text.Format("scan.streams", b.StreamCount.ToString(CultureInfo.InvariantCulture)));

@@ -3324,7 +3324,7 @@ public partial class MainWindow : Window
     }
 
     private static string BaslikSuresi(SourceTitle baslik)
-        => TimeSpan.FromSeconds(baslik.DurationSeconds).ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
+        => Saat.Ekran(TimeSpan.FromSeconds(baslik.DurationSeconds), TimeSpan.FromHours(1));
 
     private MediaInfo SecilenBaslikleUygula(MediaInfo info)
     {

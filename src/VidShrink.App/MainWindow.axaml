@@ -235,7 +235,7 @@
 
                     <Grid x:Name="TitleRow" IsVisible="False" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                       <TextBlock Text="{loc:Text main.title.label}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
-                      <ComboBox Grid.Column="1" x:Name="CmbTitle" HorizontalAlignment="Stretch" SelectionChanged="OnTitleChanged"/>
+                      <ComboBox Grid.Column="1" x:Name="CmbTitle" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="OnTitleChanged"/>
                     </Grid>
 
                     <UniformGrid x:Name="InfoGrid" Columns="4" Rows="2" IsVisible="False">
