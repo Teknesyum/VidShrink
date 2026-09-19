@@ -403,7 +403,7 @@ public sealed class StreamMappingTests
         var plan = StreamMapping.Decide(info, StreamRequest.Default, OutputContainer.Mp4, 96, null, "aac", true, 100);
 
         Assert.Equal(
-            new[] { "-map", "0:v:0", "-map", "0:a:0?", "-c:a", "aac", "-b:a", "96k", "-disposition:a:0", "default", "-map_metadata", "0", "-map_chapters", "0" },
+            new[] { "-map", "0:v:0", "-map", "0:a:0?", "-c:a", "aac", "-b:a", "96k", "-filter:a", StreamMapping.SesHizalama, "-disposition:a:0", "default", "-map_metadata", "0", "-map_chapters", "0" },
             plan.OutputArguments());
     }
 

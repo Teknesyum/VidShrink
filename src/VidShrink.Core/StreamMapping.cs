@@ -120,7 +120,12 @@ public sealed record StreamPlan(
     {
         if (track.Copies)
             return new[] { "-c:a" + suffix, "copy" };
-        var a = new List<string> { "-c:a" + suffix, track.Codec, "-b:a" + suffix, track.BitrateK.ToString(CultureInfo.InvariantCulture) + "k" };
+        var a = new List<string>
+        {
+            "-c:a" + suffix, track.Codec,
+            "-b:a" + suffix, track.BitrateK.ToString(CultureInfo.InvariantCulture) + "k",
+            "-filter:a" + suffix, StreamMapping.SesHizalama
+        };
         if (track.Channels is > 0) a.AddRange(new[] { suffix.Length == 0 ? "-ac" : "-ac:a" + suffix, track.Channels.Value.ToString(CultureInfo.InvariantCulture) });
         return a;
     }
@@ -128,6 +133,15 @@ public sealed record StreamPlan(
 
 public static class StreamMapping
 {
+    /// <summary>
+    /// Sesi videoyla ayni anda baslatan suzgec: kaynakta ses videodan gec basliyorsa
+    /// (kap icinde gecikme olarak duruyorsa) basina sessizlik doldurulur. HandBrake'in
+    /// <c>--align-av</c>'sinin karsiligi. Hizali kaynakta cikti <b>bayt bayt ayni</b> kalir
+    /// (<c>docs/olcumler/e8-kap-uyumlulugu.md</c>), yani bedeli yalniz bozuk kaynakta odenir.
+    /// Yalniz sesin yeniden kodlandigi izde islenir; kopyalanan izde suzgec kurulamaz.
+    /// </summary>
+    public const string SesHizalama = "aresample=async=1:first_pts=0";
+
     public const double PassthroughTargetShare = 0.15;
     public const int MinimumTrackK = 24;
 
