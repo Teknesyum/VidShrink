@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,7 +14,10 @@ namespace VidShrink.Tests;
 /// kalanla dağıtılması ve <c>_partial</c> yolu gerçek gdigrab kaydında. 5 sn sınır ve 2 sn bölme en az iki
 /// numaralı parça verir, parçaların toplamı 5 sn'yi aşmaz; bölmesiz aynı kayıt tek parça (negatif kontrol).
 /// Ölçülen: 2 sn bölmede parçalar 3,134 + 1,867 sn; birinci parça ~1,1 sn uzuyor, kalan süre ikinciden
-/// düşüyor (aşımın yoklama, ilerleme bloğu ve nazik kapanış arasında payı ayrılmadı); üst sınır bu yüzden 3,5 sn.
+/// düşüyor (aşımın yoklama, ilerleme bloğu ve nazik kapanış arasında payı ayrılmadı). Aşım makineye bağlı:
+/// bu makinede beş koşumda 3,134-3,2 sn, CI koşucusunda 3,667 sn ölçüldü ve 3,5 sn'lik eski sınır orada
+/// kırmızı verdi (19 Eylül 2026, docs/olcumler/kayit-bolme-parca-siniri.md). Sınır 4,0 sn: bölme hiç
+/// olmasaydı tek parça 5 sn olurdu, yani sınır kusuru hâlâ yakalıyor — zaten <c>Segments</c> pimi de yakalar.
 /// Kapanma süresi 1 ms verilen kayıt öldürülür ve yarım işaretlenir; öldürülen Matroska ffprobe'la okunur paket verir,
 /// öldürülen mp4 vermez — <see cref="RecorderArguments.SurvivesKill"/> tablosu davranışla ölçülür. Ölçülen:
 /// <c>-flush_packets 1</c> olmadan 7 sn'lik Matroska öldürülünce 0 bayt kalıyordu. Kanıt <c>.calisma/paket-2b/bolme/</c>.
@@ -95,7 +98,7 @@ public sealed class KayitBolmeTests
         Assert.False(bolunmus.Partial);
         Assert.InRange(bolunmus.Segments, 2, 4);
         Assert.Equal(bolunmus.Segments, parcaSureleri.Count);
-        Assert.All(parcaSureleri, s => Assert.InRange(s, 0.2, 3.5));
+        Assert.All(parcaSureleri, s => Assert.InRange(s, 0.2, 4.0));
         Assert.InRange(parcaSureleri.Sum(), 4.0, 5.6);
 
         Assert.True(tek.Ok, tek.StandardError);
