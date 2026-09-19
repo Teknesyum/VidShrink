@@ -9,7 +9,9 @@ Sıra kullanıcının. Biten madde silinmez, `[x]` ile işaretlenir ve nedeni sa
 - [x] Ekran kaydedici modülünün tamamlanması — ffmpeg kolu (9c) ve otomatik kip (9d) girdi
 - [x] WhatsApp'a özel azami kalite — Paket 3 ölçtü: `aq-mode=3` karanlık PSNR'ı 8 satırda −0,01 ile +0,07 dB oynattı, kod değişmedi (`docs/olcumler/whatsapp-karanlik.md`)
 - [x] Başlık çubuğu düğmelerinin keskin köşesi — Kesit E anahat dilini tek sözleşmeye bağladı (`RadiusSquare`, `HoverRing`)
-- [ ] Simge takımının dolgu diline geçmesi — `docs/arastirma/ikon-estetigi.md` ikinci tavsiyesi (Fluent), karar kullanıcının
+- [x] Simge takımının dolgu diline geçmesi — `t0/fluent-simgeler` 8cf3ca92 ile girdi; takım Fluent UI System
+  Icons 24 px Filled, eşleme `docs/tasarim/fluent-simge-eslemesi.md`. `IconsTests` geometri sayısını tabloyla
+  karşılıklı okuyor, `IkonImzaTests` 26 simgenin her birini 256 bit şekil imzasıyla pimliyor
 - [ ] **HandBrake algı tarafında da geçilecek** — bugün eşit boyutta (±%2) HandBrake'in x265 ön ayarı
   8,79 VMAF-NEG, 2,60 dB XPSNR ve 0,0299 SSIM önde (`docs/olcumler/handbrake-acigi.md`). Hedef boyuta
   oturtmayı biz kazanıyoruz; kalan açık psy-rd, psy-rdoq ve uyarlamalı niceleme anahtarlarının
