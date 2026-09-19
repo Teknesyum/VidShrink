@@ -25,8 +25,8 @@
     {
       "rule": "forms/unmeasured-label",
       "file": "README.md",
-      "line": 207,
-      "reason": "\"(default 2)\" `--aralik` bayrağının program varsayılanı, ölçüm iddiası değil; CliApp.cs:145 `request.PollSeconds ?? 2` ile birebir aynı. Satır 179 iken 207 oldu: araya `--suzgec` bölümü, anamorfik notu ve `--kirp` satırı girdi."
+      "line": 209,
+      "reason": "\"(default 2)\" `--aralik` bayrağının program varsayılanı, ölçüm iddiası değil; CliApp.cs:145 `request.PollSeconds ?? 2` ile birebir aynı. Satır 179 iken 209 oldu: araya `--suzgec` bölümü, anamorfik notu, `--kirp` ve `--profil`/`--profiller` satırları girdi."
     },
     {
       "rule": "forms/unmeasured-label",

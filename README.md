@@ -188,6 +188,8 @@ single spelling.
 | `--asgari-sure` | `--min-duration` |
 | `--suzgec` | `--filters` |
 | `--kirp` | `--crop` |
+| `--profil` | `--profile` |
+| `--profiller` | `--presets` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
 | `--dil` | `--lang` |

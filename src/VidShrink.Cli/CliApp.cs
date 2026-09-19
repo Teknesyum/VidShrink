@@ -15,6 +15,12 @@ public sealed class CliServices
     public Func<string, CancellationToken, Task<MediaInfo>> Probe { get; init; } = FfprobeClient.ProbeAsync;
     public Func<IEncoderAvailability?> Availability { get; init; } = () => EncoderCapabilities.Instance;
     public Func<MediaInfo, CancellationToken, Task<CropDetection>> DetectCrop { get; init; } = CropProbe.RunAsync;
+    public Func<IReadOnlyList<PresetProfile>> UserPresets { get; init; } = () =>
+    {
+        try { return PresetLibrary.LoadUser(PresetLibrary.DefaultUserPath); }
+        catch (Exception ex) when (ex is PresetFileException or IOException or UnauthorizedAccessException) { return Array.Empty<PresetProfile>(); }
+    };
+
     public IWatchFileSystem WatchFileSystem { get; init; } = PhysicalWatchFileSystem.Instance;
     public IWatchClock WatchClock { get; init; } = SystemWatchClock.Instance;
     public Func<string?> WatchStateFallbackDirectory { get; init; } = () => Path.GetDirectoryName(UpdateSettings.DefaultPath) is { } settings ? Path.Combine(settings, "izle") : null;
@@ -67,6 +73,9 @@ public static class CliApp
             case CliCommand.Version:
                 stdout.WriteLine(CliText.Version);
                 return ExitCodes.InBand;
+            case CliCommand.Profiller:
+                stdout.Write(ProfilListesi(services, text));
+                return ExitCodes.InBand;
             case CliCommand.Gunluk:
             {
                 var gunluk = Gunluk.Oku();
@@ -78,6 +87,27 @@ public static class CliApp
                 stdout.Write(gunluk);
                 return ExitCodes.InBand;
             }
+        }
+
+        if (request.ProfileId is { } istenenProfil)
+        {
+            var bulunan = PresetLibrary.BuiltIn.Find(istenenProfil)
+                ?? services.UserPresets().FirstOrDefault(p => string.Equals(p.Id, istenenProfil, StringComparison.OrdinalIgnoreCase));
+            if (bulunan is null)
+            {
+                stderr.WriteLine(text.Format("error.bad-profile", istenenProfil));
+                stderr.WriteLine(text["usage.hint"]);
+                return ExitCodes.Usage;
+            }
+
+            if (request.TargetMb is null && request.Quality is null && bulunan.TargetMb is null)
+            {
+                stderr.WriteLine(text.Format("error.profile-no-target", istenenProfil));
+                stderr.WriteLine(text["usage.hint"]);
+                return ExitCodes.Usage;
+            }
+
+            request = request with { Profile = bulunan, TargetMb = request.TargetMb ?? (request.Quality is null ? bulunan.TargetMb : null) };
         }
 
         try
@@ -405,6 +435,46 @@ public static class CliApp
             writer.WriteString("command", "plan");
             WriteDecision(writer, request, decision);
         });
+
+    /// <summary>
+    /// <c>profiller</c> komutunun govdesi. Kutuphane <b>turune gore</b> bolumleniyor:
+    /// <see cref="PresetKind"/>'in dort uyesi de burada okunuyor. Bos bolum hic yazilmiyor,
+    /// boylece kullanici profili olmayan kosumda son baslik cikmiyor.
+    /// </summary>
+    public static string ProfilListesi(CliServices services, CliText text)
+    {
+        var builder = new StringBuilder();
+        var kullanici = services.UserPresets();
+        foreach (var (kind, anahtar) in new[]
+                 {
+                     (PresetKind.General, "presets.kind.general"),
+                     (PresetKind.Platform, "presets.kind.platform"),
+                     (PresetKind.Device, "presets.kind.device"),
+                     (PresetKind.User, "presets.kind.user")
+                 })
+        {
+            var profiller = kind == PresetKind.User
+                ? kullanici
+                : PresetLibrary.BuiltIn.OfKind(kind).ToList();
+            if (profiller.Count == 0) continue;
+
+            builder.AppendLine(text[anahtar]);
+            foreach (var profil in profiller)
+            {
+                var ayrinti = new List<string>();
+                if (profil.Name is { Length: > 0 } ad) ayrinti.Add(ad);
+                if (profil.TargetMb is { } mb) ayrinti.Add(text.Format("presets.target", Num(mb, "0.##", text)));
+                else ayrinti.Add(text["presets.no-target"]);
+                if (profil.MaxShortEdge is { } kenar) ayrinti.Add(text.Format("presets.short-edge", kenar.ToString(text.Culture)));
+                builder.AppendLine($"  {profil.Id,-26}{string.Join(", ", ayrinti)}");
+            }
+
+            builder.AppendLine();
+        }
+
+        builder.AppendLine(text["presets.hint"]);
+        return builder.ToString();
+    }
 
     public static string ShrinkText(CliDecision decision, EncodeResult result, TimeSpan elapsed, QualityScore? vmaf, CliText text)
     {

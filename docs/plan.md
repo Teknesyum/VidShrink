@@ -1156,3 +1156,62 @@ Planda öngörülmeyen tek şey `CliTests.BeklenenTakmaAdSayisi` pimiydi: takma 
 sayıldığı için yeni `--kirp`/`--crop` çifti sayımı 21'den 22'ye çıkardı ve pim kırmızı verdi.
 Pimin işi buydu — sayı elle 22 yapıldı, iki README'de de bayrak satırı duruyor.
 
+
+## K8 borcu 6 — ön ayar kütüphanesi kullanıcıya açılıyor (19 Eylül 2026)
+
+### Bulgu
+
+`src/VidShrink.Core/Presets/platformlar.json` on sekiz profil taşıyor: 5 General,
+9 Platform, 4 Device. Bunların **yalnız sekizinin** `chip` alanı var ve arayüz şeridi
+yalnız o sekizi çiziyor. Kalan on profil — `discord-free`, `discord-nitro-basic`,
+`discord-nitro`, `telegram`, `email-gmail`, `email-outlook`, `device-chromecast-gen1-2`,
+`device-chromecast-gen3`, `device-nest-hub`, `device-apple-tv-hd` — depoda duruyor ve
+hiçbir kullanıcı hiçbir yoldan seçemiyor.
+
+`PresetKind`'ın dört üyesi de bu yüzden ölü (`OluUyeTests.cs:635-642`): profilleri
+türüne göre ayıran tek üretim kolu yok, yalnız testler `OfKind` ile okuyor.
+`PresetLibrary.Find` de üretimde çağrılmıyor.
+
+### Karar
+
+Kütüphane CLI'dan açılır; arayüz şeridi sekiz yongada kalır (şerit yeri sınırlı, on sekiz
+yonga kullanıcıyı boğar).
+
+1. `profiller` / `presets` komutu: kütüphaneyi **türüne göre bölümlenmiş** listeler —
+   General, Platform, Device, sonra kullanıcının kendi profilleri. Dört `PresetKind`
+   üyesinin dördü de burada okunur.
+2. `--profil <id>` / `--profile <id>`: profil plan seçeneklerine iner. Profilin verdiği
+   alanlar `Intent`, `Codec`, `FillPolicy`, `FixedResolution`, `LockedAudioKbps`,
+   `Container` ve hedef boyut.
+3. **Öncelik tek yönlü:** elle verilen bayrak kazanır. `--profil telegram --hedef 100MB`
+   hedefi 100 MB yapar, profilin öbür alanları durur. Açık niyet kütüphaneyi ezer.
+4. Tanınmayan kimlik `error.bad-profile` ile 64 döndürür; kimlikler kütüphaneden gelir,
+   testte tekrarlanmaz.
+
+### Adımlar
+
+1. `CliCommand.Profiller` + `profiller`/`presets` ayrıştırması, `CliRequest.ProfileId`
+   ve `--profil`/`--profile` kolu.
+2. `CliRequest.ToPlanOptions`: profil tabanı, üstüne elle verilen alanlar.
+3. Listeleme gövdesi `CliApp`te; başlıklar `presets.kind.*` anahtarlarından, tr + en.
+4. Ölçü: `tests/VidShrink.Tests/OnAyarKitapligiTests.cs` — listede dört bölüm başlığı ve
+   chipsiz on profilin kimliği görünüyor, `--profil` alanları plana indiriyor, elle verilen
+   hedef profili eziyor (olumsuz kontrol), tanınmayan kimlik 64 veriyor, iki dilde anahtarlar.
+5. `OluUyeTests`'teki dört `PresetKind` pimi kalkıyor.
+6. README + README.tr: komut ve bayrak satırı.
+7. Mutasyon turu: her kesim kırmızı, taban ve geri 0/N.
+
+### Sonuç — kapandı (19 Eylül 2026)
+
+Yedi adımın yedisi yapıldı. `OnAyarKitapligiTests` 10/10 yeşil, mutasyon turunda altı
+kesimin altısı kırmızı, taban ve geri 0/10
+(`docs/olcumler/k8-onayar-kitapligi-2026-09-19.md`).
+
+Planda iki sapma var. Birincisi: profilin `Container` alanı plana inmedi, çünkü
+`PlanOptions`'ta kap alanı yok — kap E2'den beri çıktı uzantısından türüyor. İkincisi:
+beşinci adım "dört `PresetKind` pimi kalkıyor" diyordu; yalnız `User` kalktı, kalan üçü
+tarayıcıda `varsayilan-kol` biçimine döndü ve borçtan meşruya çevrildi. Adlandırmak aynı
+tabloyu iki kez yazmak olurdu.
+
+Ayrıca hedefsiz dört cihaz profili için planda olmayan bir hata kolu gerekti
+(`error.profile-no-target`), ve `CliTests.BeklenenTakmaAdSayisi` 22'den 24'e çıktı.

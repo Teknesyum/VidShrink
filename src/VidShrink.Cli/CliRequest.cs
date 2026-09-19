@@ -3,7 +3,7 @@ using VidShrink.Core;
 
 namespace VidShrink.Cli;
 
-public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk }
+public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk, Profiller }
 
 public enum CliCodec { Auto, H264, Hevc, Av1 }
 
@@ -87,6 +87,18 @@ public sealed record CliRequest
     public bool AutoCrop { get; init; }
 
     /// <summary>
+    /// <c>--profil</c>: on ayar kutuphanesindeki bir profilin kimligi. Profil plan
+    /// secenegine taban olur; elle verilen her bayrak onun ustune yazar.
+    /// </summary>
+    public string? ProfileId { get; init; }
+
+    /// <summary>
+    /// <see cref="ProfileId"/> kutuphanede bulununca burada tasinir. Ayristirma kullanici
+    /// profillerini goremez (dosya servisten gelir), o yuzden cozum <c>CliApp</c>te olur.
+    /// </summary>
+    public PresetProfile? Profile { get; init; }
+
+    /// <summary>
     /// Kare ve bolum kollarini kaynaktan cozup kesit pencerisini saniyeye indirir. Donen
     /// metin hata anahtaridir; <c>null</c> ise <paramref name="resolved"/> kullanilabilir.
     /// </summary>
@@ -138,6 +150,15 @@ public sealed record CliRequest
             SpeedMode = Fast ? SpeedMode.Fast : SpeedMode.Quality,
             PreferredLanguage = PreferredLanguage
         };
+        if (Profile is { } profil)
+        {
+            options.Intent = profil.Intent;
+            options.FillPolicy = profil.Fill;
+            options.FixedResolution = profil.MaxShortEdge;
+            options.LockedAudioKbps = profil.AudioKbps;
+            if (Codec == CliCodec.Auto) options.Codec = profil.Codec;
+        }
+
         if (Filters is { } suzgecler) options.Filters = suzgecler;
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
         options.LockedCrf = Crf;
@@ -171,6 +192,8 @@ public static class CliParser
             return Success(new CliRequest { Command = CliCommand.Version });
         if (head is "--gunluk" or "--log" or "gunluk")
             return Success(new CliRequest { Command = CliCommand.Gunluk });
+        if (head is "profiller" or "presets" or "--profiller" or "--presets")
+            return Success(new CliRequest { Command = CliCommand.Profiller });
 
         var command = head switch
         {
@@ -255,6 +278,10 @@ public static class CliParser
                 case "--bir-kez" or "--once" when command == CliCommand.Watch:
                     request = request with { Once = true };
                     break;
+                case "--profil" or "--profile" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var profil)) return Fail("error.missing-value", arg);
+                    request = request with { ProfileId = profil };
+                    break;
                 case "--kirp" or "--crop" when command != CliCommand.Watch:
                     request = request with { AutoCrop = true };
                     break;
@@ -321,7 +348,9 @@ public static class CliParser
 
         if (request.Input is null) return Fail(command == CliCommand.Watch ? "error.watch-no-folder" : "error.no-input", null);
         if (command == CliCommand.Watch && request.Output is null) return Fail("error.watch-no-output", null);
-        if (request.TargetMb is null == request.Quality is null) return Fail("error.target-or-quality", null);
+        if (request.TargetMb is not null && request.Quality is not null) return Fail("error.target-or-quality", null);
+        if (request.ProfileId is null && request.TargetMb is null && request.Quality is null)
+            return Fail("error.target-or-quality", null);
         return Success(request);
     }
 

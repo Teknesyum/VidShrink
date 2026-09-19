@@ -27,10 +27,19 @@ açıkça "bu kod kalkacak" diyor.
    pencerede duruyor. **Şüpheli:** nicel gözlem, hüküm değil.
 5. `tests/VidShrink.Tests/OluUyeTests.cs:513-534` — `ShareFailure`'ın 11 üyesinden 8'i
    üretiliyor, dördü okunuyor; sınıflandırma mı fazla arayüz mü eksik, ölçülmemiş.
-6. `tests/VidShrink.Tests/OluUyeTests.cs:549-556` — `PresetKind`'ın dört üyesi de ölü:
-   ön ayar kütüphanesi motorda duruyor, türe göre ayıran üretim kolu yok.
-7. `src/VidShrink.Ffmpeg/CropProbe.cs:10` — Kırpma yoklaması üretimde hiç koşmuyor,
-   yalnız iki test dosyasından çağrılıyor; `EncodePlan.SuggestedCrop` da okunmuyor.
+6. ~~`tests/VidShrink.Tests/OluUyeTests.cs:549-556` — `PresetKind`'ın dört üyesi de ölü:
+   ön ayar kütüphanesi motorda duruyor, türe göre ayıran üretim kolu yok.~~ **Kapandı:**
+   kütüphane CLI'dan açıldı (`profiller`/`presets` komutu, `--profil`/`--profile` bayrağı),
+   `PresetLibrary.Find` ve `OfKind` artık üretimde koşuyor ve chip'i olmayan on profil
+   seçilebiliyor. `User` pimi düştü; kalan üçü `varsayilan-kol` biçimine döndü ve borçtan
+   meşruya çevrildi — listeleme dört türü tek tablodan geziyor, adıyla karşılaştıran tek
+   kol `User`. `OnAyarKitapligiTests` 10/10; altı kesimin altısı kırmızı
+   (`docs/olcumler/k8-onayar-kitapligi-2026-09-19.md`).
+7. ~~`src/VidShrink.Ffmpeg/CropProbe.cs:10` — Kırpma yoklaması üretimde hiç koşmuyor,
+   yalnız iki test dosyasından çağrılıyor; `EncodePlan.SuggestedCrop` da okunmuyor.~~
+   **Kapandı:** `--kirp` bayrağı yoklamayı üretime soktu; `CropDetection.Rect` pimi de
+   düştü. `OtomatikKirpmaTests` 6/6, beş kesimin beşi kırmızı
+   (`docs/olcumler/k8-kirpma-2026-09-19.md`).
 8. `tests/VidShrink.Tests/OluUyeTests.cs:495-508` — Önizleme türlerinin beş üyesi
    üretiliyor, okuma tarafında adı geçmiyor.
 9. ~~`src/VidShrink.App/CurrentMedia.cs:52-63`, `MainWindow.OdakTakibi.cs:93-95`,
