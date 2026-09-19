@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using VidShrink.Core;
 
 namespace VidShrink.Cli;
@@ -79,6 +79,12 @@ public sealed record CliRequest
     /// varsayilani kullanir; bos dizge de ayni kapiya cikar.
     /// </summary>
     public VideoFilterOptions? Filters { get; init; }
+
+    /// <summary>
+    /// <c>--kirp</c>: siyah bant yoklamasi kosar ve bulunan dikdortgen suzgec kirpmasina girer.
+    /// <c>--suzgec crop=</c> ile birlikte verilirse elle verilen kazanir, yoklama hic kosmaz.
+    /// </summary>
+    public bool AutoCrop { get; init; }
 
     /// <summary>
     /// Kare ve bolum kollarini kaynaktan cozup kesit pencerisini saniyeye indirir. Donen
@@ -248,6 +254,9 @@ public static class CliParser
                     break;
                 case "--bir-kez" or "--once" when command == CliCommand.Watch:
                     request = request with { Once = true };
+                    break;
+                case "--kirp" or "--crop" when command != CliCommand.Watch:
+                    request = request with { AutoCrop = true };
                     break;
                 case "--tarama" or "--scan" when command != CliCommand.Watch:
                     request = request with { Scan = true };

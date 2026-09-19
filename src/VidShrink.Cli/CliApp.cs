@@ -14,6 +14,7 @@ public sealed class CliServices
     public Func<string?> MissingTool { get; init; } = () => ToolLocator.IsAvailable(out var missing) ? null : missing;
     public Func<string, CancellationToken, Task<MediaInfo>> Probe { get; init; } = FfprobeClient.ProbeAsync;
     public Func<IEncoderAvailability?> Availability { get; init; } = () => EncoderCapabilities.Instance;
+    public Func<MediaInfo, CancellationToken, Task<CropDetection>> DetectCrop { get; init; } = CropProbe.RunAsync;
     public IWatchFileSystem WatchFileSystem { get; init; } = PhysicalWatchFileSystem.Instance;
     public IWatchClock WatchClock { get; init; } = SystemWatchClock.Instance;
     public Func<string?> WatchStateFallbackDirectory { get; init; } = () => Path.GetDirectoryName(UpdateSettings.DefaultPath) is { } settings ? Path.Combine(settings, "izle") : null;
@@ -146,6 +147,18 @@ public static class CliApp
             stderr.WriteLine(trimMessage);
             return new FileRun(ExitCodes.Usage, null, trimMessage);
         }
+        if (request.AutoCrop && request.Filters?.Crop is null)
+        {
+            stderr.WriteLine(text["progress.crop"]);
+            var detection = await services.DetectCrop(info, ct);
+            if (detection.Rect is { } rect)
+            {
+                request = request with { Filters = (request.Filters ?? new VideoFilterOptions()).WithCrop(rect) };
+                stderr.WriteLine(text.Format("result.crop", rect.ToString()));
+            }
+            else stderr.WriteLine(text["result.crop-none"]);
+        }
+
         var availability = services.Availability();
         var decision = request.SkipMeasurement
             ? Decide(request, info, null, null, availability)

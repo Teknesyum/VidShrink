@@ -187,6 +187,7 @@ single spelling.
 | `--aci` | `--angle` |
 | `--asgari-sure` | `--min-duration` |
 | `--suzgec` | `--filters` |
+| `--kirp` | `--crop` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
 | `--dil` | `--lang` |

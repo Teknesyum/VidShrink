@@ -1,4 +1,4 @@
-# Plan — Biçimlerin Tek ve Ulaşılabilir Gövdeye İnmesi
+﻿# Plan — Biçimlerin Tek ve Ulaşılabilir Gövdeye İnmesi
 
 Kullanıcı isteği (18 Eylül 2026): *"düzenlerimiz tek ve belli ulaşılabilir bir yerde olmalı
 aynı stringlerimizi çevirmek nasıl kolaysa bunları çevirmekte öyle kolay olmalı."*
@@ -1115,3 +1115,44 @@ daha yüksek.
 Altı adımın altısı da yapıldı. Ölçü `AnamorfikTests` 6/6 yeşil; mutasyon turu altı kesimin
 altısını da kırmızıya çeviriyor, taban ve geri kolları 0/6 (`docs/olcumler/e9-anamorfik.md`).
 Adım 6 beş kesim öngörüyordu, altı koştu: `setsar` iki üreticide ayrı ayrı kesildi.
+
+## K8 borcu 7 — `--kirp`: kırpma yoklaması kullanıcıya açılıyor (19 Eylül 2026)
+
+### Bulgu
+
+`CropProbe` motorda hazır: `RunAsync` on kare örnekliyor, `Decide` modu seçiyor, sonuç
+`CropDetection.Rect`. Üretimde çağıran tek satır yok — yoklamayı yalnız testler ve ölçüm
+düzeneği koşturuyor. `PlanCalculator` yalnız `options.DetectedCrop` **verilmişse**
+`SuggestedCrop`'a yazıyor; doldurmuyor.
+
+Elle kırpma zaten var: `--suzgec crop=W:H:X:Y`. Eksik olan **otomatik** kol — kullanıcı
+siyah bantların ölçüsünü kendi bulmak zorunda.
+
+### Karar
+
+CLI'a `--kirp` / `--crop` bayrağı eklenir. Yoklama koşar, bulunan dikdörtgen süzgeç
+seçeneklerine kırpma olarak girer ve plandan kodlamaya aynı yoldan iner. `--suzgec crop=`
+ile birlikte verilirse **elle verilen kazanır**: açık niyet yoklamayı ezer.
+Bant bulunmazsa satır sessiz, kırpma yok.
+
+### Adımlar
+
+1. `CliRequest.AutoCrop` (bool) ve `--kirp`/`--crop` ayrıştırması.
+2. `CliApp.ProcessFileAsync`: `Decide`'dan önce yoklama, sonuç `Filters.WithCrop`'a.
+   Elle kırpma varsa yoklama hiç koşmaz.
+3. `progress.crop` ve `result.crop` kalıpları tr + en.
+4. Ölçü: `tests/VidShrink.Tests/OtomatikKirpmaTests.cs` — bantlı kaynakta dikdörtgen
+   bulunuyor, bantsız kaynakta sessiz (olumsuz kontrol), elle kırpma yoklamayı eziyor,
+   bayraksız koşumda yoklama hiç çalışmıyor.
+5. README + README.tr: bayrak satırı.
+6. Mutasyon turu: her kesim kırmızı, taban ve geri 0/N.
+
+### Sonuç — kapandı (19 Eylül 2026)
+
+Altı adımın altısı yapıldı. `OtomatikKirpmaTests` 6/6 yeşil, mutasyon turunda beş kesimin
+beşi kırmızı, taban ve geri 0/6 (`docs/olcumler/k8-kirpma-2026-09-19.md`).
+
+Planda öngörülmeyen tek şey `CliTests.BeklenenTakmaAdSayisi` pimiydi: takma adlar kaynaktan
+sayıldığı için yeni `--kirp`/`--crop` çifti sayımı 21'den 22'ye çıkardı ve pim kırmızı verdi.
+Pimin işi buydu — sayı elle 22 yapıldı, iki README'de de bayrak satırı duruyor.
+
