@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace VidShrink.Core;
 
@@ -10,7 +10,10 @@ public enum CodecPreference { Compatible, MaxCompression, Fast, Auto }
 
 public enum HdrPolicy { Preserve, TonemapToSdr }
 
-public enum AudioChannelOverride { Auto, Stereo, Mono, None }
+public enum AudioChannelOverride { Auto, Stereo, Mono, None, Source }
+
+/// <summary>Kullanicinin Gelismis panelde sectigi ses kodegi. <c>Auto</c> "secim yok" demektir.</summary>
+public enum AudioCodecChoice { Auto, Aac, Ac3, Eac3 }
 
 public enum EncoderPathOverride { Auto, Software, Hardware }
 

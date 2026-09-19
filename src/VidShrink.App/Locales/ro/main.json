@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Cipul de arhivă nu are plafon de mărime.\n• Motorul cheltuie biți până la o calitate vizual fără pierderi și se oprește acolo.\n• Cât timp acest cip este activ, numărul din caseta țintă nu construiește planul.\n• Fișierul chiar se micșorează, dar sursa decide cât, nu tu.\n• Dacă trebuie să încapi undeva, alege unul dintre cipurile care numesc o valoare în MB.\n• Atingerea țintei readuce plafonul de mărime.",
   "main.derivation.size": "Țintă {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Fără sunet",
+  "main.advanced.audio-channels.source": "La fel ca sursa",
+  "main.advanced.audio-codec.label": "Codec audio",
   "main.advanced.min-resolution.label": "Prag de rezoluție (cel puțin)",
   "main.advanced.min-fps.label": "Prag de rată de cadre (cel puțin)",
   "main.advanced.encoder-path.label": "Cale de codare",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "o țintă de platformă livrează mereu MP4 fără subtitrări",
   "main.reason.stream.keep-tracks-overridden": "'Păstrează toate pistele' a fost ignorat: o țintă de platformă livrează mereu MP4 cu o singură pistă audio",
   "main.reason.stream.audio-codec-not-in-container": "codecul audio sursă nu poate fi transportat în acest container, așa că pista este recodificată",
+  "main.reason.stream.dolby-not-in-container": "codecul Dolby ales nu poate călători în acest container, așa că pista a fost codificată cu codecul propriu al containerului",
+  "main.reason.stream.dolby-below-channel-floor": "bugetul audio scade sub pragul minim al codecului Dolby ales la acest număr de canale, așa că pista a fost codificată cu codecul propriu al containerului",
   "main.reason.stream.lossless-not-passed": "o pistă TrueHD/DTS fără pierderi nu este copiată niciodată; este recodată",
   "main.reason.fill-crf-lowered": "politica de umplere a țintei a coborât CRF la {0} în loc să se oprească la plafonul de transparență, ajungând aproape de centrul benzii de {1} MB din banda {2}-{3} MB",
   "main.reason.fill-band-center": "pragul CRF {0} a fost atins înainte de banda de umplere, deci VBR cu două treceri țintește direct centrul benzii de {1} MB",

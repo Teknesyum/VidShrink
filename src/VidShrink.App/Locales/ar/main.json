@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• شريحة الأرشيف بلا سقف للحجم.\n• يصرف المحرك البتات حتى جودة لا يُرى فيها فقد ثم يتوقف.\n• ما دامت هذه الشريحة مفعّلة، فالرقم في خانة الهدف لا يبني الخطة.\n• يصغر الملف فعلاً، لكن المصدر يقرر المقدار لا أنت.\n• إن كان عليك الالتزام بحد، فاختر شريحة تذكر رقماً بالميغابايت.\n• لمس الهدف يعيد سقف الحجم.",
   "main.derivation.size": "الهدف {0} م.ب",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "ستيريو",
   "main.advanced.audio-channels.mono": "أحادي",
   "main.advanced.audio-channels.none": "صامت",
+  "main.advanced.audio-channels.source": "كما في المصدر",
+  "main.advanced.audio-codec.label": "ترميز الصوت",
   "main.advanced.min-resolution.label": "الحد الأدنى للدقة (على الأقل)",
   "main.advanced.min-fps.label": "الحد الأدنى لمعدل الإطارات (على الأقل)",
   "main.advanced.encoder-path.label": "مسار المرمّز",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "هدف المنصة يسلّم دائمًا MP4 بلا ترجمات",
   "main.reason.stream.keep-tracks-overridden": "تم تجاهل 'الاحتفاظ بكل المسارات': هدف المنصة يسلّم دائمًا MP4 بمسار صوت واحد",
   "main.reason.stream.audio-codec-not-in-container": "ترميز الصوت المصدر (codec) لا يمكن نقله داخل هذا الحاوية، لذلك يُعاد ترميز المقطع",
+  "main.reason.stream.dolby-not-in-container": "ترميز Dolby المختار لا يمكن نقله في هذه الحاوية، لذلك رُمّز المقطع بترميز الحاوية الخاص",
+  "main.reason.stream.dolby-below-channel-floor": "ميزانية الصوت أقل من الحد الأدنى لترميز Dolby المختار عند هذا العدد من القنوات، لذلك رُمّز المقطع بترميز الحاوية الخاص",
   "main.reason.stream.lossless-not-passed": "مسار TrueHD/DTS بلا فقد لا يُنسخ أبدًا؛ بل يُعاد ترميزه",
   "main.reason.fill-crf-lowered": "سياسة ملء الهدف خفضت CRF إلى {0} بدل التوقف عند سقف الشفافية، لتقع قرب مركز النطاق {1} م.ب داخل نطاق {2}-{3} م.ب",
   "main.reason.fill-band-center": "بُلغ الحد الأدنى CRF {0} قبل نطاق الملء، فتستهدف تمريرتا VBR مركز النطاق {1} م.ب مباشرة",

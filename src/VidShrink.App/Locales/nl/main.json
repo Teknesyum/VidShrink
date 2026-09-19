@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• De archiefchip heeft geen groottelimiet.\n• De motor besteedt bits tot visueel verliesvrije kwaliteit en stopt daar.\n• Zolang deze chip aan staat, bouwt het getal in het doelvak het plan niet.\n• Het bestand wordt wel kleiner, maar de bron bepaalt hoeveel, niet u.\n• Moet het ergens in passen, kies dan een chip die een MB-waarde noemt.\n• Het doel aanraken brengt de groottelimiet terug.",
   "main.derivation.size": "Doel {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Stil",
+  "main.advanced.audio-channels.source": "Zoals in de bron",
+  "main.advanced.audio-codec.label": "Audiocodec",
   "main.advanced.min-resolution.label": "Resolutie-ondergrens (minstens)",
   "main.advanced.min-fps.label": "Beeldsnelheid-ondergrens (minstens)",
   "main.advanced.encoder-path.label": "Encoderpad",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "een platformdoel levert altijd MP4 zonder ondertitels",
   "main.reason.stream.keep-tracks-overridden": "'Alle sporen behouden' is genegeerd: een platformdoel levert altijd MP4 met één audiospoor",
   "main.reason.stream.audio-codec-not-in-container": "de bron-audiocodec kan niet in deze container worden getransporteerd, dus het spoor wordt opnieuw gecodeerd",
+  "main.reason.stream.dolby-not-in-container": "de gekozen Dolby-codec kan niet in deze container worden vervoerd, dus is het spoor met de eigen codec van de container gecodeerd",
+  "main.reason.stream.dolby-below-channel-floor": "het audiobudget blijft onder de ondergrens van de gekozen Dolby-codec bij dit aantal kanalen, dus is het spoor met de eigen codec van de container gecodeerd",
   "main.reason.stream.lossless-not-passed": "een lossless TrueHD/DTS-spoor wordt nooit gekopieerd; het wordt opnieuw gecodeerd",
   "main.reason.fill-crf-lowered": "het vulbeleid verlaagde CRF naar {0} in plaats van bij de transparantielimiet te stoppen, en landt bij het bandcentrum van {1} MB binnen de band van {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-ondergrens {0} is bereikt vóór de vulband, dus VBR met twee doorgangen mikt direct op het bandcentrum van {1} MB",

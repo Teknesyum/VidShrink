@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Chip arsip tidak punya batas ukuran.\n• Mesin memakai bit hingga kualitas nyaris tanpa kehilangan, lalu berhenti.\n• Saat chip ini aktif, angka di kotak target tidak membentuk rencana.\n• Berkas memang mengecil, tetapi sumber yang menentukan seberapa banyak, bukan Anda.\n• Jika harus muat di suatu tempat, pilih chip yang menyebut angka MB.\n• Menyentuh target mengembalikan batas ukuran.",
   "main.derivation.size": "Target {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Senyap",
+  "main.advanced.audio-channels.source": "Sama seperti sumber",
+  "main.advanced.audio-codec.label": "Codec audio",
   "main.advanced.min-resolution.label": "Batas bawah resolusi (minimal)",
   "main.advanced.min-fps.label": "Batas bawah frame rate (minimal)",
   "main.advanced.encoder-path.label": "Jalur encoder",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "target platform selalu menghasilkan MP4 tanpa subtitle",
   "main.reason.stream.keep-tracks-overridden": "'Pertahankan semua trek' diabaikan: target platform selalu menghasilkan MP4 dengan satu trek audio",
   "main.reason.stream.audio-codec-not-in-container": "codec audio sumber tidak dapat dibawa dalam wadah ini, sehingga trek dienkode ulang",
+  "main.reason.stream.dolby-not-in-container": "codec Dolby yang dipilih tidak dapat dibawa dalam wadah ini, sehingga trek dienkode dengan codec milik wadah",
+  "main.reason.stream.dolby-below-channel-floor": "anggaran audio berada di bawah batas bawah codec Dolby yang dipilih pada jumlah kanal ini, sehingga trek dienkode dengan codec milik wadah",
   "main.reason.stream.lossless-not-passed": "trek TrueHD/DTS lossless tidak pernah disalin; trek itu dienkode ulang",
   "main.reason.fill-crf-lowered": "kebijakan isi target menurunkan CRF ke {0} alih-alih berhenti di batas transparansi, mendarat dekat pusat pita {1} MB di dalam pita {2}-{3} MB",
   "main.reason.fill-band-center": "batas bawah CRF {0} tercapai sebelum pita isi, jadi VBR dua lintasan langsung menargetkan pusat pita {1} MB",

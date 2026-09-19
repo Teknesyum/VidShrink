@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Arkivknappen har inget storlekstak.\n• Motorn spenderar bitar upp till visuellt förlustfri kvalitet och stannar där.\n• Så länge den här knappen är på bygger siffran i målrutan inte planen.\n• Filen blir mindre, men källan avgör hur mycket, inte du.\n• Måste du få plats någonstans, välj en av knapparna som anger ett MB-värde.\n• Rör du målet kommer storlekstaket tillbaka.",
   "main.derivation.size": "Mål {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Tyst",
+  "main.advanced.audio-channels.source": "Som i källan",
+  "main.advanced.audio-codec.label": "Ljudkodek",
   "main.advanced.min-resolution.label": "Upplösningsgolv (minst)",
   "main.advanced.min-fps.label": "Bildfrekvensgolv (minst)",
   "main.advanced.encoder-path.label": "Kodarväg",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "ett plattformsmål levererar alltid MP4 utan undertexter",
   "main.reason.stream.keep-tracks-overridden": "'Behåll alla spår' ignorerades: ett plattformsmål levererar alltid MP4 med ett ljudspår",
   "main.reason.stream.audio-codec-not-in-container": "källjudkodeken kan inte transporteras i den här behållaren, så spåret kodas om",
+  "main.reason.stream.dolby-not-in-container": "den valda Dolby-kodeken kan inte transporteras i den här behållaren, så spåret kodades med behållarens egen kodek",
+  "main.reason.stream.dolby-below-channel-floor": "ljudbudgeten hamnar under den valda Dolby-kodekens undre gräns vid detta kanalantal, så spåret kodades med behållarens egen kodek",
   "main.reason.stream.lossless-not-passed": "ett förlustfritt TrueHD/DTS-spår kopieras aldrig; det kodas om",
   "main.reason.fill-crf-lowered": "fyllmålspolicyn sänkte CRF till {0} i stället för att stanna vid transparenstaket och landade nära bandmitten {1} MB inom bandet {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-golvet {0} nåddes före fyllbandet, så tvåpass-VBR siktar direkt på bandmitten {1} MB",

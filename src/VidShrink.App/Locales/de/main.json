@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Der Archiv-Chip hat keine Größenobergrenze.\n• Die Engine gibt Bits bis zur visuell verlustfreien Qualität aus und hört dort auf.\n• Solange dieser Chip aktiv ist, baut die Zahl im Zielfeld den Plan nicht.\n• Die Datei wird kleiner, aber die Quelle bestimmt wie viel, nicht Sie.\n• Wenn es irgendwo hineinpassen muss, wählen Sie einen Chip mit MB-Angabe.\n• Das Ziel anfassen bringt die Größenobergrenze zurück.",
   "main.derivation.size": "Ziel {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Stumm",
+  "main.advanced.audio-channels.source": "Wie in der Quelle",
+  "main.advanced.audio-codec.label": "Audiocodec",
   "main.advanced.min-resolution.label": "Auflösungsuntergrenze (mindestens)",
   "main.advanced.min-fps.label": "Bildraten-Untergrenze (mindestens)",
   "main.advanced.encoder-path.label": "Encoder-Pfad",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "ein Plattformziel liefert immer MP4 ohne Untertitel",
   "main.reason.stream.keep-tracks-overridden": "'Alle Spuren behalten' wurde ignoriert: ein Plattformziel liefert immer MP4 mit einer Tonspur",
   "main.reason.stream.audio-codec-not-in-container": "der Quell-Audiocodec kann in diesem Container nicht transportiert werden, daher wird die Spur neu kodiert",
+  "main.reason.stream.dolby-not-in-container": "der gewählte Dolby-Codec kann in diesem Container nicht transportiert werden, daher wurde die Spur mit dem containereigenen Codec kodiert",
+  "main.reason.stream.dolby-below-channel-floor": "das Audiobudget liegt unter der Untergrenze des gewählten Dolby-Codecs für diese Kanalzahl, daher wurde die Spur mit dem containereigenen Codec kodiert",
   "main.reason.stream.lossless-not-passed": "eine verlustfreie TrueHD/DTS-Spur wird nie kopiert; sie wird neu kodiert",
   "main.reason.fill-crf-lowered": "die Ausfüll-Regel senkte CRF auf {0}, statt an der Transparenz-Obergrenze zu halten, und landet nahe der Bandmitte {1} MB im Band {2}-{3} MB",
   "main.reason.fill-band-center": "die CRF-Untergrenze {0} wurde vor dem Ausfüllband erreicht, VBR mit zwei Durchgängen zielt daher direkt auf die Bandmitte {1} MB",

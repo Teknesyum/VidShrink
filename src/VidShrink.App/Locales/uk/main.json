@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Чіп «Архів» не має стелі розміру.\n• Рушій витрачає біти до візуально безвтратної якості й зупиняється.\n• Поки цей чіп увімкнено, число в полі цілі не будує план.\n• Файл справді стає меншим, але наскільки — вирішує джерело, а не ви.\n• Якщо треба вкластися в ліміт, виберіть чіп із значенням у МБ.\n• Дотик до цілі повертає стелю розміру.",
   "main.derivation.size": "Ціль {0} МБ",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Стерео",
   "main.advanced.audio-channels.mono": "Моно",
   "main.advanced.audio-channels.none": "Без звуку",
+  "main.advanced.audio-channels.source": "Як у джерелі",
+  "main.advanced.audio-codec.label": "Аудіокодек",
   "main.advanced.min-resolution.label": "Поріг роздільності (не менше)",
   "main.advanced.min-fps.label": "Поріг частоти кадрів (не менше)",
   "main.advanced.encoder-path.label": "Шлях кодера",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "ціль для платформи завжди дає MP4 без субтитрів",
   "main.reason.stream.keep-tracks-overridden": "'Зберегти всі доріжки' проігноровано: ціль для платформи завжди дає MP4 з однією звуковою доріжкою",
   "main.reason.stream.audio-codec-not-in-container": "вихідний аудіокодек не може передаватися в цьому контейнері, тому доріжка перекодовується",
+  "main.reason.stream.dolby-not-in-container": "обраний кодек Dolby не можна перенести в цей контейнер, тому доріжку закодовано власним кодеком контейнера",
+  "main.reason.stream.dolby-below-channel-floor": "бюджет звуку нижчий за нижню межу обраного кодека Dolby за такої кількості каналів, тому доріжку закодовано власним кодеком контейнера",
   "main.reason.stream.lossless-not-passed": "доріжка TrueHD/DTS без втрат ніколи не копіюється; вона перекодовується",
   "main.reason.fill-crf-lowered": "політика заповнення цілі знизила CRF до {0} замість зупинки на стелі прозорості, ляглo біля центру смуги {1} МБ у межах {2}-{3} МБ",
   "main.reason.fill-band-center": "поріг CRF {0} досягнуто до смуги заповнення, тож двопрохідний VBR цілиться прямо в центр смуги {1} МБ",

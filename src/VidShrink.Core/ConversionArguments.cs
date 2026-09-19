@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -124,11 +124,13 @@ public static class ConversionArguments
 
     private static bool AudioCopyCompatible(string container, string? codec) => container switch
     {
-        "mp4" or "mov" or "m4a" => codec is "aac" or "alac" or "mp3",
+        "mp4" => codec is "aac" or "alac" or "mp3" or "flac",
+        "mov" or "m4a" => codec is "aac" or "alac" or "mp3",
         "webm" => codec is "opus" or "vorbis",
         "mp3" => codec == "mp3",
         "wav" => codec is "pcm_s16le" or "pcm_s24le" or "pcm_f32le",
         "avi" => codec is "mp3" or "aac" or "pcm_s16le",
+        "flac" => codec == "flac",
         "mkv" => true,
         _ => false
     };
@@ -145,13 +147,15 @@ public static class ConversionArguments
 
     private static bool AudioEncodeCompatible(string container, string codec) => container switch
     {
-        "mp4" or "m4a" => codec is "aac" or "libmp3lame",
+        "mp4" => codec is "aac" or "libmp3lame" or "flac",
+        "m4a" => codec is "aac" or "libmp3lame",
         "mov" => codec is "aac" or "libmp3lame" or "pcm_s16le",
         "webm" => codec is "libopus",
         "mp3" => codec is "libmp3lame",
         "wav" => codec is "pcm_s16le",
         "avi" => codec is "libmp3lame" or "pcm_s16le",
-        "mkv" => codec is "aac" or "libopus" or "libmp3lame" or "pcm_s16le",
+        "flac" => codec == "flac",
+        "mkv" => codec is "aac" or "libopus" or "libmp3lame" or "pcm_s16le" or "flac",
         _ => false
     };
 

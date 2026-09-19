@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• संग्रह चिप में कोई आकार सीमा नहीं है।\n• इंजन दृश्य रूप से हानिरहित गुणवत्ता तक बिट खर्च करता है और वहीं रुकता है।\n• यह चिप चालू रहते लक्ष्य बॉक्स की संख्या योजना नहीं बनाती।\n• फ़ाइल छोटी तो होती है, पर कितनी यह स्रोत तय करता है, आप नहीं।\n• कहीं फ़िट करना हो तो MB संख्या वाली कोई चिप चुनें।\n• लक्ष्य को छूने पर आकार सीमा वापस आ जाती है।",
   "main.derivation.size": "लक्ष्य {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "स्टीरियो",
   "main.advanced.audio-channels.mono": "मोनो",
   "main.advanced.audio-channels.none": "मौन",
+  "main.advanced.audio-channels.source": "स्रोत जैसा",
+  "main.advanced.audio-codec.label": "ऑडियो कोडेक",
   "main.advanced.min-resolution.label": "रिज़ॉल्यूशन न्यूनतम (कम से कम)",
   "main.advanced.min-fps.label": "फ़्रेम दर न्यूनतम (कम से कम)",
   "main.advanced.encoder-path.label": "एन्कोडर पथ",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "प्लेटफ़ॉर्म लक्ष्य हमेशा बिना सबटाइटल का MP4 देता है",
   "main.reason.stream.keep-tracks-overridden": "'सभी ट्रैक रखें' अनदेखा किया गया: प्लेटफ़ॉर्म लक्ष्य हमेशा एक ऑडियो ट्रैक वाला MP4 देता है",
   "main.reason.stream.audio-codec-not-in-container": "स्रोत ऑडियो कोडेक इस कंटेनर में नहीं चल सकता, इसलिए ट्रैक को फिर से एन्कोड किया गया",
+  "main.reason.stream.dolby-not-in-container": "चुना गया Dolby कोडेक इस कंटेनर में नहीं चल सकता, इसलिए ट्रैक कंटेनर के अपने कोडेक से एन्कोड किया गया",
+  "main.reason.stream.dolby-below-channel-floor": "इस चैनल संख्या पर ऑडियो बजट चुने गए Dolby कोडेक की न्यूनतम सीमा से नीचे है, इसलिए ट्रैक कंटेनर के अपने कोडेक से एन्कोड किया गया",
   "main.reason.stream.lossless-not-passed": "लॉसलेस TrueHD/DTS ट्रैक कभी कॉपी नहीं होता; उसे दोबारा एन्कोड किया जाता है",
   "main.reason.fill-crf-lowered": "लक्ष्य भरने की नीति ने पारदर्शिता सीमा पर रुकने के बजाय CRF को {0} पर घटाया, {2}-{3} MB बैंड के भीतर {1} MB बैंड केंद्र के पास उतरते हुए",
   "main.reason.fill-band-center": "CRF न्यूनतम {0} भरण बैंड से पहले पहुँच गया, इसलिए दो-पास VBR सीधे {1} MB बैंड केंद्र को लक्ष्य बनाता है",

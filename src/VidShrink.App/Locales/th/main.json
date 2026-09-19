@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• ชิปเก็บถาวรไม่มีเพดานขนาด\n• เอนจินใช้บิตจนถึงคุณภาพที่ตาแยกไม่ออกจากต้นฉบับแล้วหยุด\n• ขณะเปิดชิปนี้ ตัวเลขในช่องเป้าหมายจะไม่ถูกใช้สร้างแผน\n• ไฟล์เล็กลงจริง แต่ต้นฉบับเป็นผู้กำหนดว่าเล็กแค่ไหน ไม่ใช่คุณ\n• ถ้าต้องให้พอดีที่ไหนสักแห่ง ให้เลือกชิปที่ระบุตัวเลข MB\n• แตะช่องเป้าหมายจะนำเพดานขนาดกลับมา",
   "main.derivation.size": "เป้าหมาย {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "สเตอริโอ",
   "main.advanced.audio-channels.mono": "โมโน",
   "main.advanced.audio-channels.none": "ไม่มีเสียง",
+  "main.advanced.audio-channels.source": "เหมือนต้นฉบับ",
+  "main.advanced.audio-codec.label": "ตัวเข้ารหัสเสียง",
   "main.advanced.min-resolution.label": "พื้นความละเอียด (อย่างน้อย)",
   "main.advanced.min-fps.label": "พื้นเฟรมเรต (อย่างน้อย)",
   "main.advanced.encoder-path.label": "เส้นทางตัวเข้ารหัส",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "เป้าหมายแพลตฟอร์มให้ MP4 ที่ไม่มีคำบรรยายเสมอ",
   "main.reason.stream.keep-tracks-overridden": "ไม่สนใจ 'เก็บทุกแทร็ก': เป้าหมายแพลตฟอร์มให้ MP4 ที่มีแทร็กเสียงเดียวเสมอ",
   "main.reason.stream.audio-codec-not-in-container": "โคเดกเสียงต้นฉบับไม่สามารถส่งผ่านคอนเทนเนอร์นี้ได้ จึงต้องเข้ารหัสแทร็กใหม่",
+  "main.reason.stream.dolby-not-in-container": "ตัวเข้ารหัส Dolby ที่เลือกไม่สามารถบรรจุในคอนเทนเนอร์นี้ได้ แทร็กจึงถูกเข้ารหัสด้วยตัวเข้ารหัสของคอนเทนเนอร์เอง",
+  "main.reason.stream.dolby-below-channel-floor": "งบประมาณเสียงต่ำกว่าขีดล่างของตัวเข้ารหัส Dolby ที่เลือกที่จำนวนช่องนี้ แทร็กจึงถูกเข้ารหัสด้วยตัวเข้ารหัสของคอนเทนเนอร์เอง",
   "main.reason.stream.lossless-not-passed": "แทร็ก TrueHD/DTS แบบไม่สูญเสียจะไม่ถูกคัดลอก แต่จะเข้ารหัสใหม่",
   "main.reason.fill-crf-lowered": "นโยบายเติมให้ถึงเป้าหมายลด CRF เป็น {0} แทนการหยุดที่เพดานความโปร่งใส ตกใกล้กลางแถบ {1} MB ภายในแถบ {2}-{3} MB",
   "main.reason.fill-band-center": "ถึงพื้น CRF {0} ก่อนถึงแถบเติม สองรอบ VBR จึงเล็งกลางแถบ {1} MB โดยตรง",

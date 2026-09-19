@@ -83,6 +83,9 @@ public sealed class PlanOptions
     /// <summary>Kullanicinin acikca sectigi ses kanal politikasi. <see cref="AudioChannelOverride.Auto"/> "secim yok" demektir.</summary>
     public AudioChannelOverride AudioChannels { get; set; } = AudioChannelOverride.Auto;
 
+    /// <summary>Kullanicinin acikca sectigi ses kodegi. <see cref="AudioCodecChoice.Auto"/> "secim yok" demektir.</summary>
+    public AudioCodecChoice AudioCodec { get; set; } = AudioCodecChoice.Auto;
+
     /// <summary>
     /// Kullanicinin "en az bu cozunurluk" olarak verdigi taban (piksel yukseklik). Rejimin
     /// kendi tabanindan (<see cref="RegimeFloors.MinHeight"/>) dusukse yok sayilir — taban
@@ -450,6 +453,9 @@ public static class PlanCalculator
                         audioK = 0;
                         audioChannels = null;
                         break;
+                    case AudioChannelOverride.Source:
+                        audioChannels = null;
+                        break;
                 }
                 reason.Add($"kullanici ses kanalini {options.AudioChannels} olarak sabitledi; motor {engineChannels} secmisti");
                 reasonCodes.Add(new ReasonNote(ReasonCode.ManualAudioChannelsOverride, ManualOverrideValue: options.AudioChannels.ToString(), EngineWouldHaveChosen: engineChannels));
@@ -466,7 +472,8 @@ public static class PlanCalculator
         var streamRequest = new StreamRequest(options.KeepAllTracks, options.PlatformDelivery, options.PreferredLanguage);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
         var streams = StreamMapping.Decide(info, streamRequest, StreamMapping.ContainerFor(streamRequest), audioK, audioChannels,
-            info.HasAudio && audioK > 0 ? PickAudioCodec() : null, audioPassthrough, effectiveTargetMb);
+            info.HasAudio && audioK > 0 ? PickAudioCodec(options.AudioCodec) : null, audioPassthrough, effectiveTargetMb,
+            options.AudioChannels == AudioChannelOverride.Source);
         var sideK = streams.SideK;
         AddStreamNotes(streams, reason);
 
@@ -1665,7 +1672,18 @@ public static class PlanCalculator
         reasonCodes.Add(new ReasonNote(ReasonCode.HardwareBitrateBias, Factor: yield, FallbackCodec: codec));
     }
 
-    private static string PickAudioCodec() => "aac";
+    /// <summary>
+    /// Motorun kendi secimi <c>aac</c>; kullanici Gelismis panelde ac3/eac3 dedigi surece
+    /// degismez. Kabin tasiyamadigi ya da kanal tabanini tutturamayan istek
+    /// <see cref="StreamMapping"/> icinde dusuyor, burada degil — karar kabi ve kaynagin
+    /// kanal sayisini bilen tek yerde kalsin.
+    /// </summary>
+    private static string PickAudioCodec(AudioCodecChoice choice = AudioCodecChoice.Auto) => choice switch
+    {
+        AudioCodecChoice.Ac3 => "ac3",
+        AudioCodecChoice.Eac3 => "eac3",
+        _ => "aac"
+    };
 
     private static void AddStreamNotes(StreamPlan streams, List<string> reason)
     {
@@ -1680,6 +1698,8 @@ public static class PlanCalculator
                 StreamNote.SubtitleDroppedForPlatform => "a platform target always delivers MP4 without subtitles",
                 StreamNote.KeepAllTracksOverriddenByPlatform => "keep tracks was ignored: a platform target always delivers MP4 with one audio track",
                 StreamNote.AudioCodecNotInContainer => "the source audio codec cannot travel in this container, so the track is re-encoded",
+                StreamNote.DolbyCodecNotInContainer => "the chosen Dolby audio codec cannot travel in this container, so the track keeps the default codec",
+                StreamNote.DolbyCodecBelowChannelFloor => "the audio budget is below what the chosen Dolby codec needs for this channel count, so the track keeps the default codec",
                 _ => "a lossless TrueHD/DTS track is never copied; it is re-encoded"
             });
     }

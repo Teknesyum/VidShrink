@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• El chip de archivo no tiene techo de tamaño.\n• El motor gasta bits hasta una calidad visualmente sin pérdida y se detiene ahí.\n• Mientras este chip está activo, el número de la casilla de destino no construye el plan.\n• El archivo sí se reduce, pero cuánto lo decide la fuente, no tú.\n• Si tienes que caber en algún sitio, elige uno de los chips que indica una cifra en MB.\n• Tocar el destino devuelve el techo de tamaño.",
   "main.derivation.size": "Destino {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Estéreo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Silencio",
+  "main.advanced.audio-channels.source": "Igual que el origen",
+  "main.advanced.audio-codec.label": "Códec de audio",
   "main.advanced.min-resolution.label": "Resolución mínima",
   "main.advanced.min-fps.label": "Fotogramas mínimos",
   "main.advanced.encoder-path.label": "Ruta del codificador",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "un objetivo de plataforma siempre entrega MP4 sin subtítulos",
   "main.reason.stream.keep-tracks-overridden": "se ignoró 'Conservar todas las pistas': un objetivo de plataforma siempre entrega MP4 con una sola pista de audio",
   "main.reason.stream.audio-codec-not-in-container": "el códec de audio de origen no puede viajar en este contenedor, así que la pista se recodifica",
+  "main.reason.stream.dolby-not-in-container": "el códec Dolby elegido no puede viajar en este contenedor, así que la pista se codificó con el códec propio del contenedor",
+  "main.reason.stream.dolby-below-channel-floor": "el presupuesto de audio queda por debajo del mínimo del códec Dolby elegido para este número de canales, así que la pista se codificó con el códec propio del contenedor",
   "main.reason.stream.lossless-not-passed": "una pista TrueHD/DTS sin pérdida nunca se copia; se recodifica",
   "main.reason.fill-crf-lowered": "la política de llenar el destino bajó el CRF a {0} en vez de detenerse en el techo de transparencia, cayendo cerca del centro de banda de {1} MB dentro de la banda {2}-{3} MB",
   "main.reason.fill-band-center": "el mínimo CRF {0} se alcanzó antes de la banda de llenado, así que el VBR a dos pasadas apunta directamente al centro de banda de {1} MB",

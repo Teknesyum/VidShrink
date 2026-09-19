@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Cip arkib tiada had saiz.\n• Enjin membelanjakan bit sehingga kualiti tanpa kehilangan yang ketara dan berhenti di situ.\n• Semasa cip ini aktif, nombor dalam kotak sasaran tidak membina pelan.\n• Fail memang menjadi lebih kecil, tetapi sumber yang menentukan berapa banyak, bukan anda.\n• Jika anda perlu muat di suatu tempat, pilih salah satu cip yang menyebut angka MB.\n• Menyentuh sasaran mengembalikan had saiz.",
   "main.derivation.size": "Sasaran {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Senyap",
+  "main.advanced.audio-channels.source": "Sama seperti sumber",
+  "main.advanced.audio-codec.label": "Kodek audio",
   "main.advanced.min-resolution.label": "Lantai resolusi (sekurang-kurangnya)",
   "main.advanced.min-fps.label": "Lantai kadar bingkai (sekurang-kurangnya)",
   "main.advanced.encoder-path.label": "Laluan pengekod",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "sasaran platform sentiasa menghasilkan MP4 tanpa sari kata",
   "main.reason.stream.keep-tracks-overridden": "'Kekalkan semua trek' diabaikan: sasaran platform sentiasa menghasilkan MP4 dengan satu trek audio",
   "main.reason.stream.audio-codec-not-in-container": "codec audio sumber tidak boleh dibawa dalam bekas ini, jadi trek dikodkan semula",
+  "main.reason.stream.dolby-not-in-container": "kodek Dolby yang dipilih tidak boleh dibawa dalam bekas ini, jadi trek dikodkan dengan kodek bekas itu sendiri",
+  "main.reason.stream.dolby-below-channel-floor": "bajet audio berada di bawah had bawah kodek Dolby yang dipilih pada bilangan saluran ini, jadi trek dikodkan dengan kodek bekas itu sendiri",
   "main.reason.stream.lossless-not-passed": "trek TrueHD/DTS tanpa kehilangan tidak pernah disalin; ia dikod semula",
   "main.reason.fill-crf-lowered": "dasar penuhi sasaran menurunkan CRF ke {0} dan bukan berhenti pada had ketelusan, mendarat berhampiran pusat jalur {1} MB di dalam jalur {2}-{3} MB",
   "main.reason.fill-band-center": "lantai CRF {0} dicapai sebelum jalur penuhi, jadi VBR dua laluan menyasarkan pusat jalur {1} MB secara terus",

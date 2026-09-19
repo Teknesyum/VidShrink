@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• آرکائیو چپ کی کوئی سائز حد نہیں۔\n• انجن بصری طور پر بے نقصان معیار تک بٹس خرچ کرتا ہے اور وہیں رک جاتا ہے۔\n• یہ چپ آن ہو تو ہدف خانے کا نمبر منصوبہ نہیں بناتا۔\n• فائل چھوٹی ضرور ہوتی ہے، مگر کتنی، یہ ماخذ طے کرتا ہے، آپ نہیں۔\n• کہیں سمانا ہو تو MB والی کوئی چپ چنیں۔\n• ہدف کو چھونے سے سائز حد واپس آ جاتی ہے۔",
   "main.derivation.size": "ہدف {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "سٹیریو",
   "main.advanced.audio-channels.mono": "مونو",
   "main.advanced.audio-channels.none": "خاموش",
+  "main.advanced.audio-channels.source": "ماخذ جیسا",
+  "main.advanced.audio-codec.label": "آڈیو کوڈک",
   "main.advanced.min-resolution.label": "ریزولوشن کم از کم",
   "main.advanced.min-fps.label": "فریم ریٹ کم از کم",
   "main.advanced.encoder-path.label": "انکوڈر راستہ",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "پلیٹ فارم ہدف ہمیشہ ذیلی عنوانات کے بغیر MP4 دیتا ہے",
   "main.reason.stream.keep-tracks-overridden": "'تمام ٹریکس رکھیں' نظر انداز ہوا: پلیٹ فارم ہدف ہمیشہ ایک آڈیو ٹریک والا MP4 دیتا ہے",
   "main.reason.stream.audio-codec-not-in-container": "ماخذ آڈیو کوڈیک اس کنٹینر میں منتقل نہیں ہو سکتا، اس لیے ٹریک دوبارہ انکوڈ کیا گیا ہے",
+  "main.reason.stream.dolby-not-in-container": "منتخب Dolby کوڈک اس کنٹینر میں منتقل نہیں ہو سکتا، اس لیے ٹریک کو کنٹینر کے اپنے کوڈک سے انکوڈ کیا گیا",
+  "main.reason.stream.dolby-below-channel-floor": "اس چینل تعداد پر آڈیو بجٹ منتخب Dolby کوڈک کی کم از کم حد سے نیچے ہے، اس لیے ٹریک کو کنٹینر کے اپنے کوڈک سے انکوڈ کیا گیا",
   "main.reason.stream.lossless-not-passed": "بغیر نقصان والا TrueHD/DTS ٹریک کبھی کاپی نہیں ہوتا؛ اسے دوبارہ انکوڈ کیا جاتا ہے",
   "main.reason.fill-crf-lowered": "ہدف بھرنے کی پالیسی نے شفافیت حد پر رکنے کے بجائے CRF {0} تک گھٹایا، جو {2}-{3} MB بینڈ کے اندر {1} MB مرکز کے قریب اترتا ہے",
   "main.reason.fill-band-center": "بھرنے کے بینڈ سے پہلے CRF کم از کم {0} پہنچ گئی، اس لیے دو پاس VBR سیدھا {1} MB بینڈ مرکز کا ہدف رکھتا ہے",

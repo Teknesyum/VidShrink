@@ -503,6 +503,14 @@
                             <TextBlock x:Name="TxtAdvAudioChannelsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </StackPanel>
                         </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.audio-codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvAudioCodec" SelectedIndex="0" VerticalAlignment="Center"
+                                      AutomationProperties.Name="{loc:Text main.advanced.audio-codec.label}"/>
+                            <TextBlock x:Name="TxtAdvAudioCodecNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
                         <CheckBox x:Name="ChkAdvKeepTracks" Theme="{StaticResource CheckStyle}" IsChecked="False" Content="{loc:Text main.advanced.keep-tracks.label}"/>
                       </StackPanel>
                     </StackPanel>
@@ -908,6 +916,7 @@
                         <ComboBoxItem Content="MP3" Tag="mp3"/>
                         <ComboBoxItem Content="M4A" Tag="m4a"/>
                         <ComboBoxItem Content="WAV" Tag="wav"/>
+                        <ComboBoxItem Content="FLAC" Tag="flac"/>
                       </ComboBox>
                     </StackPanel>
 
@@ -1035,6 +1044,7 @@
                         <ComboBoxItem Content="Opus" Tag="libopus"/>
                         <ComboBoxItem Content="MP3" Tag="libmp3lame"/>
                         <ComboBoxItem Content="PCM" Tag="pcm_s16le"/>
+                        <ComboBoxItem Content="FLAC" Tag="flac"/>
                         <ComboBoxItem Content="{loc:Text main.convert.copy}" Tag="copy"/>
                         <ComboBoxItem Content="{loc:Text main.convert.drop}"/>
                       </ComboBox>

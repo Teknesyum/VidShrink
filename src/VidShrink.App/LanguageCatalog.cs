@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -47,6 +47,7 @@ internal static class LanguageCatalog
             ["mp3"] = "MP3",
             ["m4a"] = "M4A",
             ["wav"] = "WAV",
+            ["flac"] = "FLAC",
             ["mkv"] = "MKV",
             ["mov"] = "MOV",
             ["avi"] = "AVI",

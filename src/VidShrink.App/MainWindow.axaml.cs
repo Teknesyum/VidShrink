@@ -1315,7 +1315,7 @@ public partial class MainWindow : Window
 
     private SelectingItemsControl[] AdvBoxes() => new SelectingItemsControl[]
     {
-        CmbAdvCrf, CmbAdvPreset, CmbAdvTune, CmbAdvModulus, CmbAdvAudioKbps, CmbAdvAudioChannels,
+        CmbAdvCrf, CmbAdvPreset, CmbAdvTune, CmbAdvModulus, CmbAdvAudioKbps, CmbAdvAudioChannels, CmbAdvAudioCodec,
         CmbAdvMinResolution, CmbAdvMinFps, CmbAdvCodecLock
     };
 
@@ -1359,6 +1359,7 @@ public partial class MainWindow : Window
             AdvModulus = CmbAdvModulus.SelectedIndex,
             AdvAudioKbps = CmbAdvAudioKbps.SelectedIndex,
             AdvAudioChannels = CmbAdvAudioChannels.SelectedIndex,
+            AdvAudioCodec = CmbAdvAudioCodec.SelectedIndex,
             AdvMinResolution = CmbAdvMinResolution.SelectedIndex,
             AdvMinFps = CmbAdvMinFps.SelectedIndex,
             AdvEncoderPath = AdvEncoderPathIndex,
@@ -1393,6 +1394,7 @@ public partial class MainWindow : Window
                 (CmbAdvModulus, settings.AdvModulus),
                 (CmbAdvAudioKbps, settings.AdvAudioKbps),
                 (CmbAdvAudioChannels, settings.AdvAudioChannels),
+                (CmbAdvAudioCodec, settings.AdvAudioCodec),
                 (CmbAdvMinResolution, settings.AdvMinResolution),
                 (CmbAdvMinFps, settings.AdvMinFps),
                 (CmbAdvCodecLock, settings.AdvCodecLock)
@@ -1703,9 +1705,13 @@ public partial class MainWindow : Window
 
         CmbAdvAudioChannels.ItemsSource = new[]
         {
-            automatic, Say("main.advanced.audio-channels.stereo"), Say("main.advanced.audio-channels.mono"), Say("main.advanced.audio-channels.none")
+            automatic, Say("main.advanced.audio-channels.stereo"), Say("main.advanced.audio-channels.mono"), Say("main.advanced.audio-channels.none"),
+            Say("main.advanced.audio-channels.source")
         };
         CmbAdvAudioChannels.SelectedIndex = 0;
+
+        CmbAdvAudioCodec.ItemsSource = new[] { automatic, "AAC", "Dolby Digital (AC-3)", "Dolby Digital Plus (E-AC-3)" };
+        CmbAdvAudioCodec.SelectedIndex = 0;
 
         CmbAdvMinResolution.ItemsSource = new[] { automatic }.Concat(AdvancedMinResolutionCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
         CmbAdvMinResolution.SelectedIndex = 0;
@@ -1894,7 +1900,8 @@ public partial class MainWindow : Window
 
         TxtAudioSummary.Text = AudioBody.IsVisible
             ? ""
-            : string.Join(" · ", CmbAdvAudioKbps.SelectedItem as string ?? "", CmbAdvAudioChannels.SelectedItem as string ?? "");
+            : string.Join(" · ", CmbAdvAudioKbps.SelectedItem as string ?? "", CmbAdvAudioChannels.SelectedItem as string ?? "",
+                CmbAdvAudioCodec.SelectedItem as string ?? "");
 
         var frame = new List<string>
         {
@@ -1946,7 +1953,16 @@ public partial class MainWindow : Window
             1 => AudioChannelOverride.Stereo,
             2 => AudioChannelOverride.Mono,
             3 => AudioChannelOverride.None,
+            4 => AudioChannelOverride.Source,
             _ => AudioChannelOverride.Auto
+        };
+
+        options.AudioCodec = CmbAdvAudioCodec.SelectedIndex switch
+        {
+            1 => AudioCodecChoice.Aac,
+            2 => AudioCodecChoice.Ac3,
+            3 => AudioCodecChoice.Eac3,
+            _ => AudioCodecChoice.Auto
         };
 
         options.KeepAllTracks = ChkAdvKeepTracks.IsChecked == true;
@@ -2015,6 +2031,7 @@ public partial class MainWindow : Window
         TxtAdvAudioChannelsNow.Text = has
             ? Say("main.advanced.now", plan!.AudioChannels?.ToString(CultureInfo.InvariantCulture) ?? Say("main.advanced.audio-channels.none"))
             : "";
+        TxtAdvAudioCodecNow.Text = has ? Say("main.advanced.now", plan!.AudioCodec ?? Say("main.advanced.audio-channels.none")) : "";
         TxtAdvMinResolutionNow.Text = has ? Say("main.advanced.now", Bicim.Cozunurluk(plan!.Width, plan.Height)) : "";
         TxtAdvMinFpsNow.Text = has ? Say("main.advanced.now", Bicim.Kare(plan!.Fps, Strings.Culture)) : "";
         TxtAdvEncoderPathNow.Text = has ? Say("main.advanced.now", CodecModel.IsHardware(plan!.Codec)
@@ -4118,6 +4135,7 @@ public partial class MainWindow : Window
     {
         "mp3" => "libmp3lame",
         "wav" => "pcm_s16le",
+        "flac" => "flac",
         _ => "aac"
     };
 

@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Chipu ya kumbukumbu haina kikomo cha ukubwa.\n• Injini hutumia biti hadi ubora usio na hasara ya kuonekana na kusimama hapo.\n• Chipu hii ikiwa imewashwa, nambari kwenye kisanduku cha lengo haijengi mpango.\n• Faili hupungua, lakini chanzo ndicho huamua kiasi, si wewe.\n• Ukihitaji kutosha mahali fulani, chagua chipu inayotaja kiasi cha MB.\n• Kugusa lengo hurudisha kikomo cha ukubwa.",
   "main.derivation.size": "Lengo MB {0}",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Kimya",
+  "main.advanced.audio-channels.source": "Kama chanzo",
+  "main.advanced.audio-codec.label": "Kodeki ya sauti",
   "main.advanced.min-resolution.label": "Sakafu ya azimio (angalau)",
   "main.advanced.min-fps.label": "Sakafu ya kasi ya fremu (angalau)",
   "main.advanced.encoder-path.label": "Njia ya kisimbaji",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "lengo la jukwaa hutoa MP4 bila manukuu kila wakati",
   "main.reason.stream.keep-tracks-overridden": "'Hifadhi nyimbo zote' imepuuzwa: lengo la jukwaa hutoa MP4 yenye wimbo mmoja wa sauti kila wakati",
   "main.reason.stream.audio-codec-not-in-container": "kodeki ya sauti ya chanzo haiwezi kubebwa kwenye kontena hili, hivyo wimbo unasimbwa upya",
+  "main.reason.stream.dolby-not-in-container": "kodeki ya Dolby uliyochagua haiwezi kubebwa katika chombo hiki, hivyo wimbo umesimbwa kwa kodeki ya chombo chenyewe",
+  "main.reason.stream.dolby-below-channel-floor": "bajeti ya sauti iko chini ya kiwango cha chini cha kodeki ya Dolby uliyochagua kwa idadi hii ya chaneli, hivyo wimbo umesimbwa kwa kodeki ya chombo chenyewe",
   "main.reason.stream.lossless-not-passed": "wimbo wa TrueHD/DTS usiopoteza ubora haunakiliwi kamwe; unasimbwa upya",
   "main.reason.fill-crf-lowered": "sera ya kujaza lengo ilipunguza CRF hadi {0} badala ya kusimama kwenye kikomo cha uwazi, ikifika karibu na kitovu cha bendi cha MB {1} ndani ya bendi ya MB {2}-{3}",
   "main.reason.fill-band-center": "sakafu ya CRF {0} ilifikiwa kabla ya bendi ya kujaza, kwa hiyo VBR ya hatua mbili hulenga kitovu cha bendi cha MB {1} moja kwa moja",

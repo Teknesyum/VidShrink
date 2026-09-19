@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• 보관 칩에는 크기 상한이 없습니다.\n• 엔진은 시각적 무손실 품질까지 비트를 쓰고 거기서 멈춥니다.\n• 이 칩이 켜져 있는 동안 목표 상자의 숫자는 계획에 쓰이지 않습니다.\n• 파일은 작아지지만, 얼마나 작아질지는 사용자가 아니라 원본이 정합니다.\n• 어딘가에 맞춰야 한다면 MB 수치가 적힌 칩을 고르세요.\n• 목표를 건드리면 크기 상한이 다시 생깁니다.",
   "main.derivation.size": "목표 {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "스테레오",
   "main.advanced.audio-channels.mono": "모노",
   "main.advanced.audio-channels.none": "무음",
+  "main.advanced.audio-channels.source": "원본과 동일",
+  "main.advanced.audio-codec.label": "오디오 코덱",
   "main.advanced.min-resolution.label": "해상도 하한 (최소)",
   "main.advanced.min-fps.label": "프레임 속도 하한 (최소)",
   "main.advanced.encoder-path.label": "인코더 경로",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "플랫폼 목표는 항상 자막 없는 MP4를 만듭니다",
   "main.reason.stream.keep-tracks-overridden": "'모든 트랙 유지'가 무시되었습니다: 플랫폼 목표는 항상 오디오 트랙 하나인 MP4를 만듭니다",
   "main.reason.stream.audio-codec-not-in-container": "원본 오디오 코덱은 이 컨테이너에서 사용할 수 없어 트랙을 다시 인코딩합니다",
+  "main.reason.stream.dolby-not-in-container": "선택한 Dolby 코덱은 이 컨테이너에서 전달할 수 없어 트랙을 컨테이너 자체 코덱으로 인코딩했습니다",
+  "main.reason.stream.dolby-below-channel-floor": "이 채널 수에서는 오디오 예산이 선택한 Dolby 코덱의 하한보다 낮아 트랙을 컨테이너 자체 코덱으로 인코딩했습니다",
   "main.reason.stream.lossless-not-passed": "무손실 TrueHD/DTS 트랙은 절대 복사되지 않고 재인코딩됩니다",
   "main.reason.fill-crf-lowered": "채우기 목표 정책이 투명 상한에서 멈추는 대신 CRF를 {0}으로 낮춰 {2}-{3} MB 대역 안의 중심 {1} MB 근처에 도달",
   "main.reason.fill-band-center": "채우기 대역 전에 CRF 하한 {0}에 이르러 2패스 VBR이 대역 중심 {1} MB를 직접 목표로 함",

@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Archyvo žymė neturi dydžio ribos.\n• Variklis skiria bitų iki vizualiai nuostolingos kokybės ir ten sustoja.\n• Kol ši žymė įjungta, skaičius tikslo laukelyje plano nesudaro.\n• Failas sumažėja, bet kiek — sprendžia šaltinis, ne jūs.\n• Jei reikia tilpti į ribą, rinkitės žymę su MB skaičiumi.\n• Palietus tikslą, dydžio riba grįžta.",
   "main.derivation.size": "Tikslas {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Be garso",
+  "main.advanced.audio-channels.source": "Kaip šaltinyje",
+  "main.advanced.audio-codec.label": "Garso kodekas",
   "main.advanced.min-resolution.label": "Raiškos apatinė riba (bent)",
   "main.advanced.min-fps.label": "Kadrų dažnio apatinė riba (bent)",
   "main.advanced.encoder-path.label": "Koduotuvo kelias",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "platformos tikslas visada pateikia MP4 be subtitrų",
   "main.reason.stream.keep-tracks-overridden": "'Išsaugoti visus takelius' nepaisyta: platformos tikslas visada pateikia MP4 su vienu garso takeliu",
   "main.reason.stream.audio-codec-not-in-container": "šaltinio garso kodekas negali būti perduodamas šiame konteineryje, todėl takelis perkoduojamas",
+  "main.reason.stream.dolby-not-in-container": "pasirinktas „Dolby“ kodekas negali būti perduodamas šioje talpykloje, todėl takelis užkoduotas pačios talpyklos kodeku",
+  "main.reason.stream.dolby-below-channel-floor": "garso biudžetas mažesnis už pasirinkto „Dolby“ kodeko apatinę ribą esant tokiam kanalų skaičiui, todėl takelis užkoduotas pačios talpyklos kodeku",
   "main.reason.stream.lossless-not-passed": "nuostolingo glaudinimo neturintis TrueHD/DTS takelis niekada nekopijuojamas; jis perkoduojamas",
   "main.reason.fill-crf-lowered": "tikslo užpildymo politika sumažino CRF iki {0} užuot sustojusi ties skaidrumo riba, nusileisdama prie {1} MB juostos centro {2}-{3} MB juostoje",
   "main.reason.fill-band-center": "CRF apatinė riba {0} pasiekta prieš užpildymo juostą, todėl dviejų etapų VBR tiesiogiai siekia {1} MB juostos centro",

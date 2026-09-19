@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• আর্কাইভ চিপের কোনো আকার সীমা নেই।\n• ইঞ্জিন দৃশ্যত ক্ষতিহীন মান পর্যন্ত বিট খরচ করে সেখানে থামে।\n• এই চিপ চালু থাকলে লক্ষ্য ঘরের সংখ্যা পরিকল্পনা তৈরি করে না।\n• ফাইল ছোট হয় ঠিকই, তবে কতটা তা উৎস ঠিক করে, আপনি নন।\n• কোথাও ফিট করাতে হলে MB সংখ্যা উল্লেখ করা চিপগুলির একটি বেছে নিন।\n• লক্ষ্য স্পর্শ করলে আকার সীমা ফিরে আসে।",
   "main.derivation.size": "লক্ষ্য {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "স্টেরিও",
   "main.advanced.audio-channels.mono": "মোনো",
   "main.advanced.audio-channels.none": "নীরব",
+  "main.advanced.audio-channels.source": "উৎসের মতোই",
+  "main.advanced.audio-codec.label": "অডিও কোডেক",
   "main.advanced.min-resolution.label": "রেজোলিউশন নিম্নসীমা (অন্তত)",
   "main.advanced.min-fps.label": "ফ্রেম রেট নিম্নসীমা (অন্তত)",
   "main.advanced.encoder-path.label": "এনকোডার পথ",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "প্ল্যাটফর্ম লক্ষ্য সবসময় সাবটাইটেল ছাড়া MP4 দেয়",
   "main.reason.stream.keep-tracks-overridden": "'সব ট্র্যাক রাখুন' উপেক্ষা করা হয়েছে: প্ল্যাটফর্ম লক্ষ্য সবসময় একটি অডিও ট্র্যাকসহ MP4 দেয়",
   "main.reason.stream.audio-codec-not-in-container": "উৎস অডিও কোডেক এই কনটেইনারে বহন করা যায় না, তাই ট্র্যাকটি পুনরায় এনকোড করা হয়েছে",
+  "main.reason.stream.dolby-not-in-container": "নির্বাচিত Dolby কোডেক এই কনটেইনারে বহন করা যায় না, তাই ট্র্যাকটি কনটেইনারের নিজস্ব কোডেকে এনকোড করা হয়েছে",
+  "main.reason.stream.dolby-below-channel-floor": "এই চ্যানেল সংখ্যায় নির্বাচিত Dolby কোডেকের সর্বনিম্ন সীমার নিচে অডিও বাজেট, তাই ট্র্যাকটি কনটেইনারের নিজস্ব কোডেকে এনকোড করা হয়েছে",
   "main.reason.stream.lossless-not-passed": "লসলেস TrueHD/DTS ট্র্যাক কখনো কপি হয় না; এটি পুনরায় এনকোড হয়",
   "main.reason.fill-crf-lowered": "লক্ষ্য পূরণ নীতি স্বচ্ছতা সীমায় না থেমে CRF {0}-এ নামিয়েছে, {2}-{3} MB ব্যান্ডের ভেতরে {1} MB ব্যান্ড কেন্দ্রের কাছে পৌঁছে",
   "main.reason.fill-band-center": "পূরণ ব্যান্ডের আগেই CRF নিম্নসীমা {0} পৌঁছেছে, তাই দুই-পাস VBR সরাসরি {1} MB ব্যান্ড কেন্দ্র লক্ষ্য করে",

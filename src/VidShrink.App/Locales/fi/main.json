@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Arkistovalinnalla ei ole kokorajaa.\n• Moottori käyttää bittejä visuaalisesti häviöttömään laatuun asti ja pysähtyy siihen.\n• Kun tämä valinta on päällä, kohderuudun luku ei ohjaa suunnitelmaa.\n• Tiedosto pienenee, mutta lähde päättää kuinka paljon, et sinä.\n• Jos tiedoston pitää mahtua johonkin, valitse jokin MB-lukuinen vaihtoehto.\n• Kohteen koskeminen palauttaa kokorajan.",
   "main.derivation.size": "Kohde {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Äänetön",
+  "main.advanced.audio-channels.source": "Kuten lähteessä",
+  "main.advanced.audio-codec.label": "Äänikoodekki",
   "main.advanced.min-resolution.label": "Tarkkuuden alaraja (vähintään)",
   "main.advanced.min-fps.label": "Ruutunopeuden alaraja (vähintään)",
   "main.advanced.encoder-path.label": "Kooderipolku",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "alustatavoite tuottaa aina MP4:n ilman tekstityksiä",
   "main.reason.stream.keep-tracks-overridden": "'Säilytä kaikki raidat' ohitettiin: alustatavoite tuottaa aina MP4:n yhdellä ääniraidalla",
   "main.reason.stream.audio-codec-not-in-container": "lähteen äänikoodekki ei mahdu tähän säiliöön, joten raita koodataan uudelleen",
+  "main.reason.stream.dolby-not-in-container": "valittu Dolby-koodekki ei mahdu tähän säiliöön, joten raita koodattiin säiliön omalla koodekilla",
+  "main.reason.stream.dolby-below-channel-floor": "äänibudjetti jää valitun Dolby-koodekin alarajan alle tällä kanavamäärällä, joten raita koodattiin säiliön omalla koodekilla",
   "main.reason.stream.lossless-not-passed": "häviötöntä TrueHD/DTS-raitaa ei koskaan kopioida; se koodataan uudelleen",
   "main.reason.fill-crf-lowered": "täyttökohdekäytäntö laski CRF:n arvoon {0} läpinäkyvyyskattoon pysähtymisen sijaan, osuen lähelle {1} MB:n kaistan keskikohtaa {2}-{3} MB:n kaistassa",
   "main.reason.fill-band-center": "CRF-alaraja {0} saavutettiin ennen täyttökaistaa, joten kaksivaiheinen VBR tähtää suoraan {1} MB:n kaistan keskikohtaan",

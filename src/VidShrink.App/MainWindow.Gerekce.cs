@@ -143,6 +143,8 @@ public partial class MainWindow
         StreamNote.SubtitleDroppedForPlatform => "main.reason.stream.subtitle-dropped-platform",
         StreamNote.KeepAllTracksOverriddenByPlatform => "main.reason.stream.keep-tracks-overridden",
         StreamNote.AudioCodecNotInContainer => "main.reason.stream.audio-codec-not-in-container",
+        StreamNote.DolbyCodecNotInContainer => "main.reason.stream.dolby-not-in-container",
+        StreamNote.DolbyCodecBelowChannelFloor => "main.reason.stream.dolby-below-channel-floor",
         _ => "main.reason.stream.lossless-not-passed"
     };
 

@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Čip za arhivu nema gornju granicu veličine.\n• Motor troši bitove do vizuelno neprimetnog gubitka i tu staje.\n• Dok je ovaj čip uključen, broj u polju cilja ne gradi plan.\n• Fajl se smanjuje, ali koliko — odlučuje izvor, ne vi.\n• Ako fajl mora negde da stane, izaberite čip koji navodi MB.\n• Dodir cilja vraća gornju granicu veličine.",
   "main.derivation.size": "Cilj {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Bez zvuka",
+  "main.advanced.audio-channels.source": "Као у извору",
+  "main.advanced.audio-codec.label": "Аудио кодек",
   "main.advanced.min-resolution.label": "Donja granica rezolucije (najmanje)",
   "main.advanced.min-fps.label": "Donja granica kadrova (najmanje)",
   "main.advanced.encoder-path.label": "Putanja enkodera",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "cilj platforme uvek daje MP4 bez titlova",
   "main.reason.stream.keep-tracks-overridden": "'Zadrži sve trake' je zanemareno: cilj platforme uvek daje MP4 sa jednom audio trakom",
   "main.reason.stream.audio-codec-not-in-container": "изворни аудио кодек не може да се преноси у овом контејнеру, па се запис поново кодира",
+  "main.reason.stream.dolby-not-in-container": "изабрани Dolby кодек не може да се пренесе у овом контејнеру, па је запис кодиран сопственим кодеком контејнера",
+  "main.reason.stream.dolby-below-channel-floor": "аудио буџет је испод доње границе изабраног Dolby кодека при овом броју канала, па је запис кодиран сопственим кодеком контејнера",
   "main.reason.stream.lossless-not-passed": "TrueHD/DTS traka bez gubitaka se nikad ne kopira; ponovo se kodira",
   "main.reason.fill-crf-lowered": "politika popunjavanja cilja spustila je CRF na {0} umesto da stane na granici transparentnosti, sletevši blizu centra pojasa od {1} MB unutar pojasa {2}-{3} MB",
   "main.reason.fill-band-center": "donja granica CRF {0} dostignuta je pre pojasa popunjavanja, pa dvoprolazni VBR direktno cilja centar pojasa od {1} MB",

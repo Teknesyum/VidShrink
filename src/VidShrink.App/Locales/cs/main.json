@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Archivní čip nemá strop velikosti.\n• Motor utrácí bity až po vizuálně bezztrátovou kvalitu a tam se zastaví.\n• Dokud je tento čip zapnutý, číslo v cílovém poli plán nesestavuje.\n• Soubor se zmenší, ale o kolik, rozhoduje zdroj, ne vy.\n• Pokud se musíte někam vejít, vyberte jeden z čipů s údajem v MB.\n• Dotyk cíle vrátí strop velikosti zpět.",
   "main.derivation.size": "Cíl {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Ticho",
+  "main.advanced.audio-channels.source": "Jako ve zdroji",
+  "main.advanced.audio-codec.label": "Zvukový kodek",
   "main.advanced.min-resolution.label": "Spodní mez rozlišení (nejméně)",
   "main.advanced.min-fps.label": "Spodní mez snímkové frekvence (nejméně)",
   "main.advanced.encoder-path.label": "Cesta enkodéru",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "cíl platformy vždy dodá MP4 bez titulků",
   "main.reason.stream.keep-tracks-overridden": "'Zachovat všechny stopy' bylo ignorováno: cíl platformy vždy dodá MP4 s jednou zvukovou stopou",
   "main.reason.stream.audio-codec-not-in-container": "zdrojový audio kodek nelze v tomto kontejneru přenášet, proto je stopa překódována",
+  "main.reason.stream.dolby-not-in-container": "zvolený kodek Dolby nelze v tomto kontejneru přenášet, proto byla stopa zakódována vlastním kodekem kontejneru",
+  "main.reason.stream.dolby-below-channel-floor": "zvukový rozpočet je pod dolní hranicí zvoleného kodeku Dolby pro tento počet kanálů, proto byla stopa zakódována vlastním kodekem kontejneru",
   "main.reason.stream.lossless-not-passed": "bezeztrátová stopa TrueHD/DTS se nikdy nekopíruje; překóduje se",
   "main.reason.fill-crf-lowered": "politika naplnění cíle snížila CRF na {0} místo zastavení na stropu průhlednosti a přistává blízko středu pásma {1} MB uvnitř pásma {2}–{3} MB",
   "main.reason.fill-band-center": "spodní mez CRF {0} byla dosažena před pásmem naplnění, dvouprůchodové VBR tedy cílí přímo na střed pásma {1} MB",

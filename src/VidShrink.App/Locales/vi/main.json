@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Chip lưu trữ không có trần dung lượng.\n• Bộ máy chi bit đến mức chất lượng gần như không mất và dừng ở đó.\n• Khi chip này bật, con số trong ô mục tiêu không tạo kế hoạch.\n• Tệp vẫn nhỏ đi, nhưng nguồn quyết định mức giảm, không phải bạn.\n• Nếu cần vừa một giới hạn, hãy chọn chip có ghi số MB.\n• Chạm vào mục tiêu sẽ đưa trần dung lượng trở lại.",
   "main.derivation.size": "Mục tiêu {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Im lặng",
+  "main.advanced.audio-channels.source": "Giống nguồn",
+  "main.advanced.audio-codec.label": "Bộ mã hóa âm thanh",
   "main.advanced.min-resolution.label": "Sàn độ phân giải (tối thiểu)",
   "main.advanced.min-fps.label": "Sàn tốc độ khung (tối thiểu)",
   "main.advanced.encoder-path.label": "Đường mã hóa",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "mục tiêu nền tảng luôn cho MP4 không có phụ đề",
   "main.reason.stream.keep-tracks-overridden": "'Giữ mọi rãnh' đã bị bỏ qua: mục tiêu nền tảng luôn cho MP4 với một rãnh âm thanh",
   "main.reason.stream.audio-codec-not-in-container": "codec âm thanh nguồn không thể truyền trong container này, nên track được mã hóa lại",
+  "main.reason.stream.dolby-not-in-container": "bộ mã hóa Dolby đã chọn không thể đi trong vùng chứa này, nên bản nhạc được mã hóa bằng bộ mã hóa riêng của vùng chứa",
+  "main.reason.stream.dolby-below-channel-floor": "ngân sách âm thanh thấp hơn ngưỡng tối thiểu của bộ mã hóa Dolby đã chọn ở số kênh này, nên bản nhạc được mã hóa bằng bộ mã hóa riêng của vùng chứa",
   "main.reason.stream.lossless-not-passed": "rãnh TrueHD/DTS không mất dữ liệu không bao giờ được sao chép; nó được mã hóa lại",
   "main.reason.fill-crf-lowered": "chính sách lấp đầy mục tiêu hạ CRF xuống {0} thay vì dừng ở trần trong suốt, rơi gần tâm dải {1} MB trong dải {2}-{3} MB",
   "main.reason.fill-band-center": "sàn CRF {0} đạt trước dải lấp đầy, nên VBR hai lượt nhắm thẳng tâm dải {1} MB",

@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• לשבב הארכיון אין תקרת גודל.\n• המנוע מוציא ביטים עד לאיכות ללא הפסד נראה ועוצר שם.\n• כשהשבב הזה פעיל, המספר בתיבת היעד אינו בונה את התוכנית.\n• הקובץ אכן קטן, אבל המקור קובע כמה, לא אתה.\n• אם צריך להיכנס למגבלה, בחר שבב שנוקב במספר MB.\n• נגיעה ביעד מחזירה את תקרת הגודל.",
   "main.derivation.size": "יעד {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "סטריאו",
   "main.advanced.audio-channels.mono": "מונו",
   "main.advanced.audio-channels.none": "שקט",
+  "main.advanced.audio-channels.source": "כמו במקור",
+  "main.advanced.audio-codec.label": "מקודד שמע",
   "main.advanced.min-resolution.label": "רצפת רזולוציה (לפחות)",
   "main.advanced.min-fps.label": "רצפת קצב פריימים (לפחות)",
   "main.advanced.encoder-path.label": "נתיב מקודד",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "יעד פלטפורמה מספק תמיד MP4 ללא כתוביות",
   "main.reason.stream.keep-tracks-overridden": "'שמירת כל הרצועות' לא נלקחה בחשבון: יעד פלטפורמה מספק תמיד MP4 עם רצועת שמע אחת",
   "main.reason.stream.audio-codec-not-in-container": "מקודד השמע המקורי אינו יכול לעבור במכל הזה, לכן הפס מקודד מחדש",
+  "main.reason.stream.dolby-not-in-container": "מקודד Dolby הנבחר אינו יכול לעבור במכל הזה, לכן הפס קודד במקודד של המכל עצמו",
+  "main.reason.stream.dolby-below-channel-floor": "תקציב השמע נמוך מרצפת מקודד Dolby הנבחר במספר הערוצים הזה, לכן הפס קודד במקודד של המכל עצמו",
   "main.reason.stream.lossless-not-passed": "רצועת TrueHD/DTS ללא אובדן לעולם אינה מועתקת; היא מקודדת מחדש",
   "main.reason.fill-crf-lowered": "מדיניות מילוי היעד הורידה את CRF ל-{0} במקום לעצור בתקרת השקיפות, ונחתה ליד מרכז הרצועה {1} MB בתוך רצועת {2}-{3} MB",
   "main.reason.fill-band-center": "רצפת CRF {0} הושגה לפני רצועת המילוי, ולכן VBR בשני מעברים מכוון ישירות למרכז הרצועה {1} MB",

@@ -18,7 +18,9 @@ public enum StreamNote
     SubtitleDroppedForPlatform,
     KeepAllTracksOverriddenByPlatform,
     LosslessAudioNotPassedThrough,
-    AudioCodecNotInContainer
+    AudioCodecNotInContainer,
+    DolbyCodecNotInContainer,
+    DolbyCodecBelowChannelFloor
 }
 
 public sealed record SourceStream(
@@ -199,6 +201,46 @@ public static class StreamMapping
         _ => "mp4"
     };
 
+    /// <summary>
+    /// ac3'un kapali bit hizi merdiveni. Olculdu, uydurulmadi:
+    /// <c>docs/olcumler/b1a-ac3-merdiveni.md</c>. ffmpeg istegi reddetmiyor, sessizce bu
+    /// merdivene oturtuyor; butceye giren sayi ile teslim edilen sayi ayrisirsa hedef boyut
+    /// hesabi yanlis olacagi icin oturtmayi urun kendisi yapiyor.
+    /// </summary>
+    public static readonly int[] Ac3LadderK =
+        { 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512, 576, 640 };
+
+    /// <summary>
+    /// Kanal sayisinin dayattigi alt sinir. Bu kol ffmpeg'de <b>gercekten hata veriyor</b>
+    /// (kodlayici acilmiyor), sessiz oturtma yok — o yuzden urun tabanin altina hic inmiyor.
+    /// Olcum <c>docs/olcumler/b1a-ac3-merdiveni.md</c>: dort kanalda ac3 40k, eac3 48k; bes ve
+    /// alti kanalda ikisi de 48k; ucun altinda ikisi de 32k.
+    /// </summary>
+    public static int ChannelFloorK(string codec, int channels) => channels switch
+    {
+        >= 5 => 48,
+        4 => codec.Equals("eac3", StringComparison.OrdinalIgnoreCase) ? 48 : 40,
+        _ => 32
+    };
+
+    public static bool IsDolby(string? codec)
+        => codec is not null
+            && (codec.Equals("ac3", StringComparison.OrdinalIgnoreCase) || codec.Equals("eac3", StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// ac3 merdivene oturur, eac3 istegi neredeyse birebir teslim eder; tek ortak kisit
+    /// kanal tabani. Olcum <c>docs/olcumler/b1a-ac3-merdiveni.md</c>.
+    /// </summary>
+    public static int FitDolbyBitrateK(string codec, int requestedK)
+    {
+        if (codec.Equals("eac3", StringComparison.OrdinalIgnoreCase)) return requestedK;
+        var fitting = Ac3LadderK.Where(step => step <= requestedK).ToList();
+        return fitting.Count > 0 ? fitting[^1] : Ac3LadderK[0];
+    }
+
+    /// <summary>ac3/eac3 kurulamadiginda donulen kodek; kabin kendi varsayilani.</summary>
+    public static string FallbackAudioCodec(OutputContainer container) => IsMp4Family(container) ? "aac" : "libopus";
+
     public static bool IsTextSubtitle(string codec) => TextSubtitleCodecs.Contains(codec, StringComparer.OrdinalIgnoreCase);
 
     public static bool IsImageSubtitle(string codec) => ImageSubtitleCodecs.Contains(codec, StringComparer.OrdinalIgnoreCase);
@@ -228,7 +270,8 @@ public static class StreamMapping
         int? audioChannels,
         string? audioCodec,
         bool allowPassthrough,
-        double targetMb)
+        double targetMb,
+        bool preserveSourceChannels = false)
     {
         var notes = new List<StreamNote>();
         var duration = Math.Max(info.DurationSeconds, 0.1);
@@ -291,12 +334,34 @@ public static class StreamMapping
                 var channels = audioChannels;
                 if (channels is null && source.Channels > 2)
                 {
-                    channels = 2;
-                    notes.Add(StreamNote.AudioDownmixedToStereo);
+                    if (preserveSourceChannels) channels = source.Channels;
+                    else
+                    {
+                        channels = 2;
+                        notes.Add(StreamNote.AudioDownmixedToStereo);
+                    }
                 }
+
                 var codec = audioCodec;
-                if (!IsMp4Family(container) && codec == "aac") codec = "libopus";
-                audio.Add(new AudioTrack(map, TrackAction.Encode, codec, audioK, channels, source.Language, source.Title));
+                var trackK = audioK;
+                if (IsDolby(codec))
+                {
+                    var wide = channels ?? (source.Channels > 0 ? source.Channels : 2);
+                    if (!CopyableAudio[container].Contains(codec, StringComparer.OrdinalIgnoreCase))
+                    {
+                        codec = FallbackAudioCodec(container);
+                        notes.Add(StreamNote.DolbyCodecNotInContainer);
+                    }
+                    else if (audioK < ChannelFloorK(codec, wide))
+                    {
+                        codec = FallbackAudioCodec(container);
+                        notes.Add(StreamNote.DolbyCodecBelowChannelFloor);
+                    }
+                    else trackK = FitDolbyBitrateK(codec, audioK);
+                }
+                else if (!IsMp4Family(container) && codec == "aac") codec = "libopus";
+
+                audio.Add(new AudioTrack(map, TrackAction.Encode, codec, trackK, channels, source.Language, source.Title));
             }
         }
 

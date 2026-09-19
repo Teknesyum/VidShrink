@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Arkivchippen har intet størrelsesloft.\n• Motoren bruger bits op til visuelt tabsfri kvalitet og stopper der.\n• Mens denne chip er slået til, bygger tallet i målfeltet ikke planen.\n• Filen bliver mindre, men kilden afgør hvor meget, ikke du.\n• Skal den passe et sted, så vælg en af chippene med et MB-tal.\n• Rører du ved målet, kommer størrelsesloftet tilbage.",
   "main.derivation.size": "Mål {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Stum",
+  "main.advanced.audio-channels.source": "Som i kilden",
+  "main.advanced.audio-codec.label": "Lydkodek",
   "main.advanced.min-resolution.label": "Opløsningsgulv (mindst)",
   "main.advanced.min-fps.label": "Billedhastighedsgulv (mindst)",
   "main.advanced.encoder-path.label": "Kodersti",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "et platformsmål leverer altid MP4 uden undertekster",
   "main.reason.stream.keep-tracks-overridden": "'Behold alle spor' blev ignoreret: et platformsmål leverer altid MP4 med ét lydspor",
   "main.reason.stream.audio-codec-not-in-container": "kildens lydkodek kan ikke transporteres i denne container, så sporet genkodes",
+  "main.reason.stream.dolby-not-in-container": "den valgte Dolby-kodek kan ikke transporteres i denne container, så sporet blev kodet med containerens egen kodek",
+  "main.reason.stream.dolby-below-channel-floor": "lydbudgettet ligger under den valgte Dolby-kodeks nedre grænse ved dette kanalantal, så sporet blev kodet med containerens egen kodek",
   "main.reason.stream.lossless-not-passed": "et tabsfrit TrueHD/DTS-spor kopieres aldrig; det omkodes",
   "main.reason.fill-crf-lowered": "fyld målet-politikken sænkede CRF til {0} i stedet for at stoppe ved transparensloftet og lander nær båndcentret på {1} MB inden for båndet {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-gulvet {0} blev nået før fyldbåndet, så VBR med to gennemløb sigter direkte efter båndcentret på {1} MB",

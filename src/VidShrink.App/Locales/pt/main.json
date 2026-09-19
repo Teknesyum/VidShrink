@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• O chip de arquivo não tem teto de tamanho.\n• O motor gasta bits até a qualidade visualmente sem perdas e para ali.\n• Enquanto este chip está ativo, o número na caixa de alvo não monta o plano.\n• O arquivo fica menor, mas quem decide quanto é a fonte, não você.\n• Se precisa caber em algum lugar, escolha um dos chips que indicam um valor em MB.\n• Tocar no alvo traz o teto de tamanho de volta.",
   "main.derivation.size": "Alvo {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Estéreo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Sem som",
+  "main.advanced.audio-channels.source": "Igual à origem",
+  "main.advanced.audio-codec.label": "Codec de áudio",
   "main.advanced.min-resolution.label": "Piso de resolução (no mínimo)",
   "main.advanced.min-fps.label": "Piso de taxa de quadros (no mínimo)",
   "main.advanced.encoder-path.label": "Via do codificador",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "um alvo de plataforma sempre entrega MP4 sem legendas",
   "main.reason.stream.keep-tracks-overridden": "'Manter todas as faixas' foi ignorado: um alvo de plataforma sempre entrega MP4 com uma faixa de áudio",
   "main.reason.stream.audio-codec-not-in-container": "o codec de áudio de origem não pode ser transportado neste contêiner, então a faixa é recodificada",
+  "main.reason.stream.dolby-not-in-container": "o codec Dolby escolhido não pode viajar neste contentor, por isso a faixa foi codificada com o codec do próprio contentor",
+  "main.reason.stream.dolby-below-channel-floor": "o orçamento de áudio fica abaixo do mínimo do codec Dolby escolhido com este número de canais, por isso a faixa foi codificada com o codec do próprio contentor",
   "main.reason.stream.lossless-not-passed": "uma faixa TrueHD/DTS sem perdas nunca é copiada; ela é recodificada",
   "main.reason.fill-crf-lowered": "a política de preencher o alvo baixou o CRF para {0} em vez de parar no teto de transparência, ficando perto do centro de {1} MB dentro da faixa de {2}-{3} MB",
   "main.reason.fill-band-center": "o piso de CRF {0} foi alcançado antes da faixa de preenchimento, então o VBR em duas passagens mira diretamente o centro de {1} MB",

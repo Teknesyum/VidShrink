@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Arşiv yongasının boyut tavanı yoktur.\n• Motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur.\n• Bu yonga seçiliyken hedef kutusundaki sayı plana girmez.\n• Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil.\n• Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin.\n• Hedefe dokunduğunuz anda boyut tavanı geri gelir.",
   "main.derivation.size": "Hedef {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Sessiz",
+  "main.advanced.audio-channels.source": "Kaynaktaki gibi",
+  "main.advanced.audio-codec.label": "Ses kodeği",
   "main.advanced.min-resolution.label": "Çözünürlük tabanı (en az)",
   "main.advanced.min-fps.label": "Kare hızı tabanı (en az)",
   "main.advanced.encoder-path.label": "Kodlayıcı yolu",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "platform hedefi her zaman altyazısız MP4 verir",
   "main.reason.stream.keep-tracks-overridden": "'İzleri koru' yok sayıldı: platform hedefi her zaman tek ses izli MP4 verir",
   "main.reason.stream.audio-codec-not-in-container": "kaynağın ses kodeği bu kapta taşınamıyor, iz yeniden kodlandı",
+  "main.reason.stream.dolby-not-in-container": "seçilen Dolby kodeği bu kapta taşınamıyor, iz kabın kendi kodeğiyle kodlandı",
+  "main.reason.stream.dolby-below-channel-floor": "ses bütçesi bu kanal sayısında seçilen Dolby kodeğinin alt sınırının altında kalıyor, iz kabın kendi kodeğiyle kodlandı",
   "main.reason.stream.lossless-not-passed": "kayıpsız TrueHD/DTS izi hiçbir zaman kopyalanmaz; yeniden kodlandı",
   "main.reason.fill-crf-lowered": "hedefi doldur politikası CRF'yi {0}'e düşürdü; şeffaflık tavanında durmak yerine {2}-{3} MB bandına, {1} MB bant merkezine yaklaşıldı",
   "main.reason.fill-band-center": "CRF {0} tabanına bandı doldurmadan ulaşıldığı için iki geçişli VBR doğrudan {1} MB bant merkezini hedefliyor",

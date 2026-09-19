@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Arhivski čip nima zgornje meje velikosti.\n• Motor porablja bite do vizualno brezizgubne kakovosti in se tam ustavi.\n• Dokler je ta čip vklopljen, številka v ciljnem polju ne gradi načrta.\n• Datoteka se res zmanjša, a koliko, določa vir, ne vi.\n• Če morate ustreči omejitvi, izberite čip, ki navaja vrednost v MB.\n• Dotik cilja vrne zgornjo mejo velikosti.",
   "main.derivation.size": "Cilj {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Brez zvoka",
+  "main.advanced.audio-channels.source": "Kot v viru",
+  "main.advanced.audio-codec.label": "Zvočni kodek",
   "main.advanced.min-resolution.label": "Spodnja meja ločljivosti (vsaj)",
   "main.advanced.min-fps.label": "Spodnja meja hitrosti sličic (vsaj)",
   "main.advanced.encoder-path.label": "Pot kodirnika",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "cilj platforme vedno da MP4 brez podnapisov",
   "main.reason.stream.keep-tracks-overridden": "'Ohrani vse sledi' je bilo prezrto: cilj platforme vedno da MP4 z eno zvočno sledjo",
   "main.reason.stream.audio-codec-not-in-container": "izvorni avdio kodek ne more potovati v tem vsebniku, zato se sled ponovno kodira",
+  "main.reason.stream.dolby-not-in-container": "izbranega kodeka Dolby ni mogoče prenašati v tem vsebniku, zato je bila sled kodirana z vsebnikovim lastnim kodekom",
+  "main.reason.stream.dolby-below-channel-floor": "zvočni proračun je pod spodnjo mejo izbranega kodeka Dolby pri tem številu kanalov, zato je bila sled kodirana z vsebnikovim lastnim kodekom",
   "main.reason.stream.lossless-not-passed": "brezizgubna sled TrueHD/DTS se nikoli ne kopira; ponovno se kodira",
   "main.reason.fill-crf-lowered": "politika zapolnitve cilja je znižala CRF na {0}, namesto da bi se ustavila na meji prosojnosti, in pristala blizu središča pasu {1} MB znotraj pasu {2}–{3} MB",
   "main.reason.fill-band-center": "spodnja meja CRF {0} je bila dosežena pred pasom zapolnitve, zato dvoprehodni VBR neposredno cilja na središče pasu {1} MB",

@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Arkivbrikken har ingen størrelsesgrense.\n• Motoren bruker bits opp til visuelt tapsfri kvalitet og stopper der.\n• Mens denne brikken er på, bygger ikke tallet i målboksen planen.\n• Filen blir mindre, men kilden avgjør hvor mye, ikke du.\n• Må du passe inn et sted, velg en av brikkene som oppgir et MB-tall.\n• Rører du målet, kommer størrelsesgrensen tilbake.",
   "main.derivation.size": "Mål {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Stum",
+  "main.advanced.audio-channels.source": "Som i kilden",
+  "main.advanced.audio-codec.label": "Lydkodek",
   "main.advanced.min-resolution.label": "Oppløsningsgulv (minst)",
   "main.advanced.min-fps.label": "Bildefrekvensgulv (minst)",
   "main.advanced.encoder-path.label": "Koderbane",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "et plattformmål leverer alltid MP4 uten undertekster",
   "main.reason.stream.keep-tracks-overridden": "'Behold alle spor' ble ignorert: et plattformmål leverer alltid MP4 med ett lydspor",
   "main.reason.stream.audio-codec-not-in-container": "kildens lydkodek kan ikke transporteres i denne beholderen, så sporet kodes om",
+  "main.reason.stream.dolby-not-in-container": "den valgte Dolby-kodeken kan ikke fraktes i denne beholderen, så sporet ble kodet med beholderens egen kodek",
+  "main.reason.stream.dolby-below-channel-floor": "lydbudsjettet ligger under den valgte Dolby-kodekens nedre grense ved dette kanalantallet, så sporet ble kodet med beholderens egen kodek",
   "main.reason.stream.lossless-not-passed": "et tapsfritt TrueHD/DTS-spor kopieres aldri; det omkodes",
   "main.reason.fill-crf-lowered": "fyllmålpolicyen senket CRF til {0} i stedet for å stoppe ved transparenstaket, og lander nær båndsenteret {1} MB innenfor båndet {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-gulvet {0} ble nådd før fyllbåndet, så to-pass VBR sikter direkte mot båndsenteret {1} MB",

@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Čip za arhivu nema gornju granicu veličine.\n• Motor troši bitove do vizualno neprimjetnog gubitka i tu staje.\n• Dok je ovaj čip uključen, broj u polju cilja ne gradi plan.\n• Datoteka se smanjuje, ali koliko — odlučuje izvornik, ne vi.\n• Ako morate stati u neku granicu, odaberite čip koji navodi MB.\n• Dodir cilja vraća gornju granicu veličine.",
   "main.derivation.size": "Cilj {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Bez zvuka",
+  "main.advanced.audio-channels.source": "Kao u izvoru",
+  "main.advanced.audio-codec.label": "Audio kodek",
   "main.advanced.min-resolution.label": "Donja granica razlučivosti (najmanje)",
   "main.advanced.min-fps.label": "Donja granica broja sličica (najmanje)",
   "main.advanced.encoder-path.label": "Put kodera",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "cilj platforme uvijek daje MP4 bez titlova",
   "main.reason.stream.keep-tracks-overridden": "'Zadrži sve zapise' zanemareno je: cilj platforme uvijek daje MP4 s jednim audiozapisom",
   "main.reason.stream.audio-codec-not-in-container": "izvorni audio kodek ne može se prenijeti u ovom kontejneru, pa se zapis ponovno kodira",
+  "main.reason.stream.dolby-not-in-container": "odabrani Dolby kodek ne može se prenijeti u ovom kontejneru, pa je zapis kodiran vlastitim kodekom kontejnera",
+  "main.reason.stream.dolby-below-channel-floor": "audio proračun je ispod donje granice odabranog Dolby kodeka pri ovom broju kanala, pa je zapis kodiran vlastitim kodekom kontejnera",
   "main.reason.stream.lossless-not-passed": "TrueHD/DTS zapis bez gubitaka nikad se ne kopira; ponovno se kodira",
   "main.reason.fill-crf-lowered": "pravilo popunjavanja cilja spustilo je CRF na {0} umjesto zaustavljanja na granici prozirnosti, slijećući blizu središta pojasa od {1} MB unutar pojasa {2}-{3} MB",
   "main.reason.fill-band-center": "donja granica CRF {0} dosegnuta je prije pojasa popunjavanja, pa dvoprolazni VBR izravno cilja središte pojasa od {1} MB",

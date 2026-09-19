@@ -31,7 +31,8 @@ public sealed class GelismisAyarGidisDonusTests
             AdvPreset = 3,
             AdvTune = 1,
             AdvAudioKbps = 4,
-            AdvAudioChannels = 1,
+            AdvAudioChannels = 4,
+            AdvAudioCodec = 2,
             AdvMinResolution = 2,
             AdvMinFps = 1,
             AdvEncoderPath = 2,
@@ -58,6 +59,7 @@ public sealed class GelismisAyarGidisDonusTests
             Assert.Equal(yazilan.AdvTune, okunan.AdvTune);
             Assert.Equal(yazilan.AdvAudioKbps, okunan.AdvAudioKbps);
             Assert.Equal(yazilan.AdvAudioChannels, okunan.AdvAudioChannels);
+            Assert.Equal(yazilan.AdvAudioCodec, okunan.AdvAudioCodec);
             Assert.Equal(yazilan.AdvMinResolution, okunan.AdvMinResolution);
             Assert.Equal(yazilan.AdvMinFps, okunan.AdvMinFps);
             Assert.Equal(yazilan.AdvEncoderPath, okunan.AdvEncoderPath);
@@ -76,6 +78,7 @@ public sealed class GelismisAyarGidisDonusTests
         var varsayilan = new AppSettings();
 
         Assert.Equal(0, varsayilan.AdvTune);
+        Assert.Equal(0, varsayilan.AdvAudioCodec);
         Assert.Equal(0, varsayilan.AdvCrf);
         Assert.Equal(0, varsayilan.AdvCodecLock);
     }

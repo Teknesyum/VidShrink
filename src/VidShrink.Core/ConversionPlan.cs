@@ -1,4 +1,4 @@
-namespace VidShrink.Core;
+﻿namespace VidShrink.Core;
 
 public enum ConversionQualityMode { Crf, Bitrate }
 
@@ -17,6 +17,6 @@ public sealed class ConversionPlan
     public TimeSpan? Start { get; init; }
     public TimeSpan? End { get; init; }
     public HdrPolicy HdrPolicy { get; init; } = HdrPolicy.Preserve;
-    public bool AudioOnly => Container is "mp3" or "m4a" or "wav";
+    public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac";
     public bool Gif => Container == "gif";
 }

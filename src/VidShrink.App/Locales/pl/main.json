@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Opcja archiwum nie ma limitu rozmiaru.\n• Silnik wydaje bity aż do jakości wizualnie bezstratnej i tam się zatrzymuje.\n• Gdy ta opcja jest włączona, liczba w polu celu nie buduje planu.\n• Plik się zmniejsza, ale o ile — decyduje źródło, nie Ty.\n• Jeśli musisz się gdzieś zmieścić, wybierz opcję z podaną liczbą MB.\n• Dotknięcie celu przywraca limit rozmiaru.",
   "main.derivation.size": "Cel {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Bez dźwięku",
+  "main.advanced.audio-channels.source": "Tak jak w źródle",
+  "main.advanced.audio-codec.label": "Kodek dźwięku",
   "main.advanced.min-resolution.label": "Próg rozdzielczości (co najmniej)",
   "main.advanced.min-fps.label": "Próg klatkażu (co najmniej)",
   "main.advanced.encoder-path.label": "Ścieżka kodera",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "cel platformy zawsze daje MP4 bez napisów",
   "main.reason.stream.keep-tracks-overridden": "pominięto 'Zachowaj wszystkie ścieżki': cel platformy zawsze daje MP4 z jedną ścieżką dźwiękową",
   "main.reason.stream.audio-codec-not-in-container": "źródłowy kodek audio nie może być przenoszony w tym kontenerze, więc ścieżka jest ponownie kodowana",
+  "main.reason.stream.dolby-not-in-container": "wybrany kodek Dolby nie może być przenoszony w tym kontenerze, więc ścieżkę zakodowano własnym kodekiem kontenera",
+  "main.reason.stream.dolby-below-channel-floor": "budżet dźwięku spada poniżej dolnej granicy wybranego kodeka Dolby przy tej liczbie kanałów, więc ścieżkę zakodowano własnym kodekiem kontenera",
   "main.reason.stream.lossless-not-passed": "bezstratna ścieżka TrueHD/DTS nigdy nie jest kopiowana; jest kodowana ponownie",
   "main.reason.fill-crf-lowered": "polityka wypełniania celu obniżyła CRF do {0} zamiast zatrzymać się na pułapie przezroczystości, lądując blisko środka pasma {1} MB w paśmie {2}-{3} MB",
   "main.reason.fill-band-center": "próg CRF {0} osiągnięto przed pasmem wypełnienia, więc dwuprzebiegowy VBR celuje wprost w środek pasma {1} MB",

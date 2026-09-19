@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Arhiivikiibil pole suuruse ülempiiri.\n• Mootor kulutab bitte kuni visuaalselt kadudeta kvaliteedini ja peatub seal.\n• Kui see kiip on sees, ei koosta sihtkastis olev number plaani.\n• Fail läheb küll väiksemaks, kuid kui palju, otsustab allikas, mitte sina.\n• Kui pead kuhugi mahtuma, vali mõni MB-numbriga kiip.\n• Sihi puudutamine toob suuruse ülempiiri tagasi.",
   "main.derivation.size": "Siht {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Hääletu",
+  "main.advanced.audio-channels.source": "Nagu lähtefailis",
+  "main.advanced.audio-codec.label": "Helikodek",
   "main.advanced.min-resolution.label": "Eraldusvõime alampiir (vähemalt)",
   "main.advanced.min-fps.label": "Kaadrisageduse alampiir (vähemalt)",
   "main.advanced.encoder-path.label": "Kodeerija tee",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "platvormi siht annab alati subtiitriteta MP4",
   "main.reason.stream.keep-tracks-overridden": "'Säilita kõik rajad' jäeti arvestamata: platvormi siht annab alati ühe helirajaga MP4",
   "main.reason.stream.audio-codec-not-in-container": "lähteaudio kodekit ei saa selles konteineris kasutada, seetõttu kodeeritakse rada ümber",
+  "main.reason.stream.dolby-not-in-container": "valitud Dolby kodekit ei saa selles konteineris kasutada, seetõttu kodeeriti rada konteineri enda kodekiga",
+  "main.reason.stream.dolby-below-channel-floor": "helieelarve jääb valitud Dolby kodeki alampiirist allapoole selle kanalite arvu juures, seetõttu kodeeriti rada konteineri enda kodekiga",
   "main.reason.stream.lossless-not-passed": "kadudeta TrueHD/DTS-rada ei kopeerita kunagi; see kodeeritakse ümber",
   "main.reason.fill-crf-lowered": "täitmissihi poliitika langetas CRF-i {0}-le, selle asemel et läbipaistvuse ülempiiril peatuda, maandudes {1} MB riba keskme lähedal {2}-{3} MB ribas",
   "main.reason.fill-band-center": "CRF alampiir {0} saavutati enne täiteriba, seega sihib kahekäiguline VBR otse {1} MB riba keset",

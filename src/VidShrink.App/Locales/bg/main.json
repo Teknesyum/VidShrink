@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Чипът „Архив“ няма таван за размера.\n• Двигателят харчи битове до визуално безгрешно качество и спира там.\n• Докато този чип е включен, числото в полето за цел не гради плана.\n• Файлът наистина става по-малък, но източникът решава колко, не вие.\n• Ако трябва да се вместите някъде, изберете чип с посочени MB.\n• Докосването на целта връща тавана за размера.",
   "main.derivation.size": "Цел {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Стерео",
   "main.advanced.audio-channels.mono": "Моно",
   "main.advanced.audio-channels.none": "Без звук",
+  "main.advanced.audio-channels.source": "Както в източника",
+  "main.advanced.audio-codec.label": "Аудио кодек",
   "main.advanced.min-resolution.label": "Долна граница на резолюцията (поне)",
   "main.advanced.min-fps.label": "Долна граница на кадрите (поне)",
   "main.advanced.encoder-path.label": "Път на енкодера",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "цел за платформа винаги дава MP4 без субтитри",
   "main.reason.stream.keep-tracks-overridden": "'Запази всички писти' беше пренебрегнато: цел за платформа винаги дава MP4 с една аудиописта",
   "main.reason.stream.audio-codec-not-in-container": "изходният аудио кодек не може да се пренася в този контейнер, затова пистата се прекодира",
+  "main.reason.stream.dolby-not-in-container": "избраният Dolby кодек не може да се пренася в този контейнер, затова пистата е кодирана със собствения кодек на контейнера",
+  "main.reason.stream.dolby-below-channel-floor": "аудио бюджетът е под долната граница на избрания Dolby кодек при този брой канали, затова пистата е кодирана със собствения кодек на контейнера",
   "main.reason.stream.lossless-not-passed": "писта TrueHD/DTS без загуби никога не се копира; тя се прекодира",
   "main.reason.fill-crf-lowered": "политиката за запълване на целта свали CRF до {0} вместо да спре на тавана за прозрачност, попадайки около центъра от {1} MB в лентата {2}-{3} MB",
   "main.reason.fill-band-center": "долната граница CRF {0} беше достигната преди лентата за запълване, затова двупроходният VBR цели директно центъра от {1} MB",

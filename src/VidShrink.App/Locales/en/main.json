@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• The archive chip has no size ceiling.\n• The engine spends bits up to visually lossless quality and stops there.\n• While this chip is on, the number in the target box does not build the plan.\n• The file does get smaller, but the source decides how much, not you.\n• If you have to fit somewhere, pick one of the chips that names an MB figure.\n• Touching the target brings the size ceiling back.",
   "main.derivation.size": "Target {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Silent",
+  "main.advanced.audio-channels.source": "Same as source",
+  "main.advanced.audio-codec.label": "Audio codec",
   "main.advanced.min-resolution.label": "Resolution floor (at least)",
   "main.advanced.min-fps.label": "Frame-rate floor (at least)",
   "main.advanced.encoder-path.label": "Encoder path",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "a platform target always delivers MP4 without subtitles",
   "main.reason.stream.keep-tracks-overridden": "'Keep all tracks' was ignored: a platform target always delivers MP4 with one audio track",
   "main.reason.stream.audio-codec-not-in-container": "the source audio codec cannot travel in this container, so the track is re-encoded",
+  "main.reason.stream.dolby-not-in-container": "the chosen Dolby codec cannot travel in this container, so the track was encoded with the container's own codec",
+  "main.reason.stream.dolby-below-channel-floor": "the audio budget falls below the chosen Dolby codec's floor at this channel count, so the track was encoded with the container's own codec",
   "main.reason.stream.lossless-not-passed": "a lossless TrueHD/DTS track is never copied; it is re-encoded",
   "main.reason.fill-crf-lowered": "the fill target policy lowered CRF to {0} instead of stopping at the transparency ceiling, landing near the {1} MB band center inside the {2}-{3} MB band",
   "main.reason.fill-band-center": "CRF floor {0} was reached before the fill band, so two-pass VBR targets the {1} MB band center directly",

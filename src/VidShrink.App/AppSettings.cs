@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using VidShrink.Core;
 
@@ -24,6 +24,8 @@ public sealed class AppSettings
     public int AdvModulus { get; set; }
     public int AdvAudioKbps { get; set; }
     public int AdvAudioChannels { get; set; }
+
+    public int AdvAudioCodec { get; set; }
     public int AdvMinResolution { get; set; }
     public int AdvMinFps { get; set; }
     public int AdvEncoderPath { get; set; }
@@ -79,6 +81,7 @@ public sealed class AppSettings
             ReadInt(root, "advModulus", value => settings.AdvModulus = value);
             ReadInt(root, "advAudioKbps", value => settings.AdvAudioKbps = value);
             ReadInt(root, "advAudioChannels", value => settings.AdvAudioChannels = value);
+            ReadInt(root, "advAudioCodec", value => settings.AdvAudioCodec = value);
             ReadInt(root, "advMinResolution", value => settings.AdvMinResolution = value);
             ReadInt(root, "advMinFps", value => settings.AdvMinFps = value);
             ReadInt(root, "advEncoderPath", value => settings.AdvEncoderPath = value);
@@ -146,6 +149,7 @@ public sealed class AppSettings
         root["advModulus"] = AdvModulus;
         root["advAudioKbps"] = AdvAudioKbps;
         root["advAudioChannels"] = AdvAudioChannels;
+        root["advAudioCodec"] = AdvAudioCodec;
         root["advMinResolution"] = AdvMinResolution;
         root["advMinFps"] = AdvMinFps;
         root["advEncoderPath"] = AdvEncoderPath;

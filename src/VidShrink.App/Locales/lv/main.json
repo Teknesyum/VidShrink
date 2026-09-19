@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• Arhīva mikroshēmai nav izmēra griestu.\n• Dzinējs tērē bitus līdz vizuāli bezzudumu kvalitātei un tur apstājas.\n• Kamēr šī mikroshēma ir ieslēgta, skaitlis mērķa lodziņā plānu neveido.\n• Fails kļūst mazāks, bet cik daudz — nosaka avots, nevis jūs.\n• Ja jāietilpst kaut kur, izvēlieties mikroshēmu, kas nosauc MB skaitli.\n• Pieskaršanās mērķim atgriež izmēra griestus.",
   "main.derivation.size": "Mērķis {0} MB",
@@ -158,6 +158,8 @@
   "main.advanced.audio-channels.stereo": "Stereo",
   "main.advanced.audio-channels.mono": "Mono",
   "main.advanced.audio-channels.none": "Bez skaņas",
+  "main.advanced.audio-channels.source": "Tāpat kā avotā",
+  "main.advanced.audio-codec.label": "Audio kodeks",
   "main.advanced.min-resolution.label": "Izšķirtspējas minimums (vismaz)",
   "main.advanced.min-fps.label": "Kadru ātruma minimums (vismaz)",
   "main.advanced.encoder-path.label": "Kodētāja ceļš",
@@ -374,6 +376,8 @@
   "main.reason.stream.subtitle-dropped-platform": "platformas mērķis vienmēr piegādā MP4 bez subtitriem",
   "main.reason.stream.keep-tracks-overridden": "'Saglabāt visus celiņus' tika ignorēts: platformas mērķis vienmēr piegādā MP4 ar vienu audio celiņu",
   "main.reason.stream.audio-codec-not-in-container": "avota audio kodeku nevar pārsūtīt šajā konteinerā, tāpēc celiņš tiek pārkodēts",
+  "main.reason.stream.dolby-not-in-container": "izvēlēto Dolby kodeku nevar pārnest šajā konteinerā, tāpēc celiņš tika kodēts ar paša konteinera kodeku",
+  "main.reason.stream.dolby-below-channel-floor": "audio budžets ir zem izvēlētā Dolby kodeka apakšējās robežas šādam kanālu skaitam, tāpēc celiņš tika kodēts ar paša konteinera kodeku",
   "main.reason.stream.lossless-not-passed": "bezzudumu TrueHD/DTS celiņš nekad netiek kopēts; tas tiek pārkodēts",
   "main.reason.fill-crf-lowered": "mērķa aizpildes politika pazemināja CRF līdz {0}, nevis apstājās pie caurspīdīguma griestiem, nonākot pie {1} MB joslas centra {2}-{3} MB joslā",
   "main.reason.fill-band-center": "CRF minimums {0} tika sasniegts pirms aizpildes joslas, tāpēc divu gaitu VBR tēmē tieši uz {1} MB joslas centru",
