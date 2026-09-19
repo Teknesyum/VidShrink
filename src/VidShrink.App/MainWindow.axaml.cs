@@ -751,9 +751,9 @@ public partial class MainWindow : Window
     /// <summary>
     /// Yüzde işaretinin yeri de kültürden gelir: İngilizcede sayının sağında
     /// (<c>3.7%</c>), Türkçede solunda (<c>%3,7</c>). Oran verilir, yüzle çarpmayı
-    /// biçim yapar.
+    /// biçim yapar. Gövde <see cref="Bicim.Yuzde"/>'de; burası yalnız kültürü veriyor.
     /// </summary>
-    internal static string Percent(double ratio) => ratio.ToString("P1", Strings.Culture);
+    internal static string Percent(double ratio) => Bicim.Yuzde.Isaretli(ratio, Strings.Culture);
 
     private static string Speak(string language, string key, params object?[] args)
         => LanguageCatalog.Title(Strings.GetIn(language, key, args), language);
@@ -3674,7 +3674,7 @@ public partial class MainWindow : Window
             var text = note.Code switch
             {
                 ReasonCode.ResolutionScaled => Say("main.reason.resolution-scaled",
-                    note.Width, note.Height, Num(note.ScalePercent, "0.#")),
+                    note.Width, note.Height, Bicim.Yuzde.Hazir(note.ScalePercent, Strings.Culture)),
                 ReasonCode.FrameRateReduced => Say("main.reason.frame-rate-reduced", Num(note.Fps, "0.##")),
                 ReasonCode.ResolutionRestoredAtCeiling => Say("main.reason.resolution-restored",
                     note.Width, note.Height, Num(note.Fps, "0.##"), Num(note.Crf, "0")),
@@ -3697,11 +3697,11 @@ public partial class MainWindow : Window
                 ReasonCode.FillTwoPassBandCenter => Say("main.reason.fill-band-center",
                     Num(note.Crf, "0"), Num(note.Mb, "0.0")),
                 ReasonCode.FillTwoPassBandTooNarrowForCrf => Say("main.reason.fill-band-narrow",
-                    Num(note.Factor * 100, "0.#"),
-                    Num((note.TargetMb - note.BandLowerMb) / Math.Max(note.TargetMb, 0.01) * 100, "0.#"),
+                    Bicim.Yuzde.Orandan(note.Factor, Strings.Culture),
+                    Bicim.Yuzde.Orandan((note.TargetMb - note.BandLowerMb) / Math.Max(note.TargetMb, 0.01), Strings.Culture),
                     Num(note.Mb, "0.0")),
                 ReasonCode.HardwareBitrateBias => Say("main.reason.hardware-bitrate-bias",
-                    note.FallbackCodec, Num((1 - note.Factor) * 100, "0.#")),
+                    note.FallbackCodec, Bicim.Yuzde.Orandan(1 - note.Factor, Strings.Culture)),
                 ReasonCode.SourceAlreadyUnderTarget => Say("main.reason.source-under-target",
                     Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##")),
                 ReasonCode.TargetCappedToSource => Say("main.reason.target-capped",
@@ -4329,7 +4329,7 @@ public partial class MainWindow : Window
             Num(prompt.ActualMb, "0.0"),
             Num(prompt.TargetMb, "0.##"),
             Num(prompt.OverMb, "0.0"),
-            Num(prompt.OverPercent, "0.#"),
+            Bicim.Yuzde.Hazir(prompt.OverPercent, Strings.Culture),
             Saat.Ekran(prompt.AttemptDuration));
 
         TxtRetryMeaning.Text = prompt.HasUnderBandFallback

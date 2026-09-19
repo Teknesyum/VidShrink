@@ -77,9 +77,69 @@ public sealed class BicimTests
     [Fact]
     public void YuzdeOranAlirCarpimiKendiYapar()
     {
-        Assert.Equal("62,5%", Bicim.Yuzde(0.625, Tr));
-        Assert.Equal("62.5%", Bicim.Yuzde(0.625, En));
-        Assert.Equal("50%", Bicim.Yuzde(0.5, Tr));
+        Assert.Equal("62,5", Bicim.Yuzde.Orandan(0.625, Tr));
+        Assert.Equal("62.5", Bicim.Yuzde.Orandan(0.625, En));
+        Assert.Equal("50", Bicim.Yuzde.Orandan(0.5, Tr));
+    }
+
+    /// <summary>
+    /// Ondalik tavani: yuzde olceginde ikinci ondalik gurultu. Tek ondalikli degerler
+    /// bunu goremiyordu — <c>0.#</c> ile <c>0.##</c> ayni sonucu veriyordu.
+    /// </summary>
+    [Fact]
+    public void YuzdeTekOndalikTavaniTutar()
+    {
+        Assert.Equal("12,3", Bicim.Yuzde.Orandan(0.12345, Tr));
+        Assert.Equal("12.3", Bicim.Yuzde.Hazir(12.345, En));
+    }
+
+    /// <summary>
+    /// İşaretin yeri kültüre göre değişiyor: Türkçede başta, İngilizcede sonda, Almancada
+    /// sonda ve bölünmez boşlukla. Elle <c>"%"</c> eklemek uygulamanın kendi dilini bozar
+    /// — ölçüm <c>.calisma/yuzde-olcu</c>.
+    /// </summary>
+    [Fact]
+    public void IsaretliYuzdeKulturunYerineUyar()
+    {
+        Assert.Equal("%62,5", Bicim.Yuzde.Isaretli(0.625, Tr));
+        Assert.Equal("62.5%", Bicim.Yuzde.Isaretli(0.625, En));
+        Assert.Equal("62,5 %", Bicim.Yuzde.Isaretli(0.625, CultureInfo.GetCultureInfo("de-DE")));
+        Assert.Equal("%50", Bicim.Yuzde.Isaretli(0.5, Tr));
+    }
+
+    /// <summary>
+    /// İşaretin <b>kendisi</b> de kültürden gelir, elle <c>"%"</c> yazılmaz: ölçüm
+    /// (<c>.calisma/yuzde-olcu</c>) Farsçanın <c>٪</c> (U+066A) kullandığını gösterdi.
+    /// Türkçe/İngilizce/Almanca üçü de <c>%</c> olduğu için bu kol olmadan işareti
+    /// sabitlemek hiçbir ölçüyü kırmıyordu.
+    /// </summary>
+    [Fact]
+    public void YuzdeIsaretiKulturden()
+    {
+        var yazi = Bicim.Yuzde.Isaretli(0.5, CultureInfo.GetCultureInfo("fa-IR"));
+
+        Assert.Contains("٪", yazi);
+        Assert.DoesNotContain("%", yazi);
+    }
+
+    [Fact]
+    public void HazirYuzdeIkinciKezCarpmaz()
+    {
+        Assert.Equal("62,5", Bicim.Yuzde.Hazir(62.5, Tr));
+        Assert.Equal("12", Bicim.Yuzde.Hazir(12, Tr));
+    }
+
+    /// <summary>
+    /// Tam yuzde ondalik yazmaz. Yarim degerde .NET'in <c>"0"</c> bicimi <b>sifirdan uzaga</b>
+    /// yuvarliyor (bankacinin yuvarlamasi degil): 62,5 → 63. Beklenti olculdu, varsayilmadi.
+    /// </summary>
+    [Fact]
+    public void TamYuzdeOndalikYazmaz()
+    {
+        Assert.Equal("100", Bicim.Yuzde.Tam(1.0, Tr));
+        Assert.Equal("175", Bicim.Yuzde.Tam(1.75, Tr));
+        Assert.Equal("63", Bicim.Yuzde.Tam(0.625, Tr));
+        Assert.DoesNotContain(",", Bicim.Yuzde.Tam(0.625, Tr));
     }
 
     [Fact]
@@ -128,7 +188,7 @@ public sealed class BicimTests
         {
             CultureInfo.CurrentCulture = Tr;
             Assert.Equal("12.3", Bicim.Tani.Mb(12.34));
-            Assert.Equal("62.5%", Bicim.Tani.Yuzde(0.625));
+            Assert.Equal("62.5", Bicim.Tani.Yuzde(0.625));
             Assert.Equal("23.98", Bicim.Tani.Kare(23.976));
         }
         finally
