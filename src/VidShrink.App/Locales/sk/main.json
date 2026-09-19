@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Pevný priečinok",
   "settings-tab.output-folder.browse": "Prehľadávať…",
   "settings-tab.output-folder.hint": "Pevný priečinok posiela každý výstup na rovnaké miesto namiesto vedľa zdrojového súboru.",
+  "settings-tab.output-folder.unusable": "Pevný priečinok nie je dostupný ({0}); výstup sa uloží vedľa zdrojového súboru.",
   "settings-tab.advanced-default-open.label": "Zobrazovať rozšírené voľby predvolene rozbalené",
   "settings-tab.advanced-default-open.hint": "Otvorí rozšírenú sekciu automaticky pri každom spustení aplikácie.",
   "settings-tab.follow-recording.label": "Sledovať záznam vo všetkých kartách",

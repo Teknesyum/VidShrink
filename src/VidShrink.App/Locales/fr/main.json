@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Dossier fixe",
   "settings-tab.output-folder.browse": "Parcourir…",
   "settings-tab.output-folder.hint": "Dossier fixe envoie chaque sortie au même endroit plutôt qu'à côté du fichier source.",
+  "settings-tab.output-folder.unusable": "Le dossier fixe est indisponible ({0}) ; la sortie sera placée à côté du fichier source.",
   "settings-tab.advanced-default-open.label": "Afficher les options avancées dépliées par défaut",
   "settings-tab.advanced-default-open.hint": "Ouvre automatiquement la section avancée à chaque démarrage de l'application.",
   "settings-tab.follow-recording.label": "Suivre l'enregistrement dans tous les onglets",

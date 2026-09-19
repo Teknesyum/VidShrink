@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Sabit klasör",
   "settings-tab.output-folder.browse": "Seç…",
   "settings-tab.output-folder.hint": "Sabit klasör her çıktıyı kaynağın yanı yerine hep aynı yere gönderir.",
+  "settings-tab.output-folder.unusable": "Sabit klasör kullanılamıyor ({0}); çıktı kaynağın yanına yazılacak.",
   "settings-tab.advanced-default-open.label": "Gelişmiş seçenekleri varsayılan olarak açık göster",
   "settings-tab.advanced-default-open.hint": "Gelişmiş bölümü uygulama her açıldığında otomatik olarak açar.",
   "settings-tab.follow-recording.label": "Kaydı bütün sekmelerde izle",

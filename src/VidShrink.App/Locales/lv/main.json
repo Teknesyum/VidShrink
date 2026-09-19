@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Fiksēta mape",
   "settings-tab.output-folder.browse": "Pārlūkot…",
   "settings-tab.output-folder.hint": "Fiksēta mape sūta katru izvadi uz vienu vietu, nevis blakus avota failam.",
+  "settings-tab.output-folder.unusable": "Fiksētā mape nav pieejama ({0}); izvade tiks saglabāta blakus avota failam.",
   "settings-tab.advanced-default-open.label": "Rādīt papildu opcijas izvērstas pēc noklusējuma",
   "settings-tab.advanced-default-open.hint": "Automātiski atver papildu sadaļu katrā lietotnes palaišanā.",
   "settings-tab.follow-recording.label": "Sekot ierakstam visās cilnēs",

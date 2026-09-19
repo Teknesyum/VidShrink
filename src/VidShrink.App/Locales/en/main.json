@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Fixed folder",
   "settings-tab.output-folder.browse": "Browse…",
   "settings-tab.output-folder.hint": "Fixed folder sends every output to the same place instead of next to the source file.",
+  "settings-tab.output-folder.unusable": "The fixed folder is unavailable ({0}); the output will go next to the source.",
   "settings-tab.advanced-default-open.label": "Show advanced options expanded by default",
   "settings-tab.advanced-default-open.hint": "Opens the advanced section automatically every time the app starts.",
   "settings-tab.follow-recording.label": "Follow the recording in every tab",

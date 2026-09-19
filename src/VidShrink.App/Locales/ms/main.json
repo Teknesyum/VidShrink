@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Folder tetap",
   "settings-tab.output-folder.browse": "Layari…",
   "settings-tab.output-folder.hint": "Folder tetap menghantar setiap output ke tempat yang sama dan bukan di sebelah fail sumber.",
+  "settings-tab.output-folder.unusable": "Folder tetap tidak boleh digunakan ({0}); output akan disimpan di sebelah fail sumber.",
   "settings-tab.advanced-default-open.label": "Tunjuk pilihan lanjutan terbuka secara lalai",
   "settings-tab.advanced-default-open.hint": "Membuka bahagian lanjutan secara automatik setiap kali aplikasi dimulakan.",
   "settings-tab.follow-recording.label": "Ikut rakaman dalam semua tab",

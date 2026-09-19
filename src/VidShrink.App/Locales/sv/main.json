@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Fast mapp",
   "settings-tab.output-folder.browse": "Bläddra…",
   "settings-tab.output-folder.hint": "Fast mapp skickar all utdata till samma plats i stället för bredvid källfilen.",
+  "settings-tab.output-folder.unusable": "Den fasta mappen är inte tillgänglig ({0}); utdata sparas bredvid källfilen.",
   "settings-tab.advanced-default-open.label": "Visa avancerade val utfällda som standard",
   "settings-tab.advanced-default-open.hint": "Öppnar den avancerade sektionen automatiskt varje gång appen startar.",
   "settings-tab.follow-recording.label": "Följ inspelningen i alla flikar",

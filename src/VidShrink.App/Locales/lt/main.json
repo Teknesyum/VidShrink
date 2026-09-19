@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Fiksuotas aplankas",
   "settings-tab.output-folder.browse": "Naršyti…",
   "settings-tab.output-folder.hint": "Fiksuotas aplankas siunčia visas išvestis į tą pačią vietą, o ne šalia šaltinio failo.",
+  "settings-tab.output-folder.unusable": "Fiksuotas aplankas nepasiekiamas ({0}); išvestis bus išsaugota šalia šaltinio failo.",
   "settings-tab.advanced-default-open.label": "Išplėstines parinktis rodyti išskleistas pagal numatymą",
   "settings-tab.advanced-default-open.hint": "Automatiškai atidaro išplėstinę dalį kiekvieną kartą paleidus programą.",
   "settings-tab.follow-recording.label": "Sekti įrašą visuose skirtukuose",

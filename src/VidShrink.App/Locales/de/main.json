@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Fester Ordner",
   "settings-tab.output-folder.browse": "Durchsuchen…",
   "settings-tab.output-folder.hint": "Fester Ordner legt jede Ausgabe am selben Ort ab statt neben der Quelldatei.",
+  "settings-tab.output-folder.unusable": "Der feste Ordner ist nicht verfügbar ({0}); die Ausgabe wird neben der Quelldatei abgelegt.",
   "settings-tab.advanced-default-open.label": "Erweiterte Optionen standardmäßig ausgeklappt zeigen",
   "settings-tab.advanced-default-open.hint": "Öffnet den erweiterten Bereich bei jedem Start der App automatisch.",
   "settings-tab.follow-recording.label": "Aufnahme in allen Tabs übernehmen",

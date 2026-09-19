@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Thư mục cố định",
   "settings-tab.output-folder.browse": "Duyệt…",
   "settings-tab.output-folder.hint": "Thư mục cố định gửi mọi đầu ra về cùng một nơi thay vì cạnh tệp nguồn.",
+  "settings-tab.output-folder.unusable": "Thư mục cố định không sử dụng được ({0}); đầu ra sẽ được lưu cạnh tệp nguồn.",
   "settings-tab.advanced-default-open.label": "Mặc định mở rộng tùy chọn nâng cao",
   "settings-tab.advanced-default-open.hint": "Tự mở phần nâng cao mỗi khi ứng dụng khởi động.",
   "settings-tab.follow-recording.label": "Theo dõi bản ghi ở mọi thẻ",

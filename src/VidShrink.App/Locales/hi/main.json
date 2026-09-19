@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "निश्चित फ़ोल्डर",
   "settings-tab.output-folder.browse": "ब्राउज़…",
   "settings-tab.output-folder.hint": "निश्चित फ़ोल्डर हर आउटपुट को स्रोत फ़ाइल के पास के बजाय एक ही जगह भेजता है।",
+  "settings-tab.output-folder.unusable": "निश्चित फ़ोल्डर उपलब्ध नहीं है ({0}); आउटपुट स्रोत फ़ाइल के पास सहेजा जाएगा।",
   "settings-tab.advanced-default-open.label": "उन्नत विकल्प डिफ़ॉल्ट रूप से खुले दिखाएँ",
   "settings-tab.advanced-default-open.hint": "ऐप हर बार शुरू होने पर उन्नत अनुभाग अपने आप खोलता है।",
   "settings-tab.follow-recording.label": "हर टैब में रिकॉर्डिंग का अनुसरण करें",

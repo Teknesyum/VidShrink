@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "固定文件夹",
   "settings-tab.output-folder.browse": "浏览…",
   "settings-tab.output-folder.hint": "固定文件夹会把所有输出放到同一位置，而不是源文件旁边。",
+  "settings-tab.output-folder.unusable": "固定文件夹不可用（{0}）；输出将保存在源文件旁边。",
   "settings-tab.advanced-default-open.label": "默认展开高级选项",
   "settings-tab.advanced-default-open.hint": "每次启动应用时自动展开高级部分。",
   "settings-tab.follow-recording.label": "在所有标签页中跟随录制",

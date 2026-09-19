@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Stały folder",
   "settings-tab.output-folder.browse": "Przeglądaj…",
   "settings-tab.output-folder.hint": "Stały folder kieruje każdy wynik w to samo miejsce zamiast obok pliku źródłowego.",
+  "settings-tab.output-folder.unusable": "Stały folder jest niedostępny ({0}); wynik zostanie zapisany obok pliku źródłowego.",
   "settings-tab.advanced-default-open.label": "Domyślnie pokazuj opcje zaawansowane rozwinięte",
   "settings-tab.advanced-default-open.hint": "Otwiera sekcję zaawansowaną automatycznie przy każdym uruchomieniu aplikacji.",
   "settings-tab.follow-recording.label": "Śledź nagranie we wszystkich kartach",

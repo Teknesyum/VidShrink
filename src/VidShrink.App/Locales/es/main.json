@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Carpeta fija",
   "settings-tab.output-folder.browse": "Examinar…",
   "settings-tab.output-folder.hint": "Carpeta fija envía cada salida al mismo sitio en vez de junto al archivo fuente.",
+  "settings-tab.output-folder.unusable": "La carpeta fija no está disponible ({0}); la salida se guardará junto al archivo fuente.",
   "settings-tab.advanced-default-open.label": "Mostrar opciones avanzadas desplegadas por defecto",
   "settings-tab.advanced-default-open.hint": "Abre la sección avanzada automáticamente cada vez que arranca la app.",
   "settings-tab.follow-recording.label": "Seguir la grabación en todas las pestañas",

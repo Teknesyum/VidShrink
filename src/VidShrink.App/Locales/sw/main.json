@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Folda thabiti",
   "settings-tab.output-folder.browse": "Vinjari…",
   "settings-tab.output-folder.hint": "Folda thabiti hupeleka kila matokeo mahali pamoja badala ya kando ya faili ya chanzo.",
+  "settings-tab.output-folder.unusable": "Folda thabiti haipatikani ({0}); matokeo yataandikwa kando ya faili ya chanzo.",
   "settings-tab.advanced-default-open.label": "Onyesha chaguo za kina zikiwa zimepanuliwa kwa chaguomsingi",
   "settings-tab.advanced-default-open.hint": "Hufungua sehemu ya kina kiotomatiki kila programu inapoanza.",
   "settings-tab.follow-recording.label": "Fuata rekodi katika vichupo vyote",

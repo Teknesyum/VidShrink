@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Фиксированная папка",
   "settings-tab.output-folder.browse": "Обзор…",
   "settings-tab.output-folder.hint": "Фиксированная папка отправляет каждый результат в одно место, а не рядом с исходным файлом.",
+  "settings-tab.output-folder.unusable": "Фиксированная папка недоступна ({0}); результат будет сохранён рядом с исходным файлом.",
   "settings-tab.advanced-default-open.label": "Показывать дополнительные параметры развёрнутыми",
   "settings-tab.advanced-default-open.hint": "Открывает дополнительный раздел автоматически при каждом запуске.",
   "settings-tab.follow-recording.label": "Следовать за записью во всех вкладках",

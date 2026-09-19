@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Rögzített mappa",
   "settings-tab.output-folder.browse": "Tallózás…",
   "settings-tab.output-folder.hint": "A rögzített mappa minden kimenetet ugyanoda küld a forrásfájl melletti hely helyett.",
+  "settings-tab.output-folder.unusable": "A rögzített mappa nem elérhető ({0}); a kimenet a forrásfájl mellé kerül.",
   "settings-tab.advanced-default-open.label": "Haladó beállítások alapból kibontva",
   "settings-tab.advanced-default-open.hint": "Minden indításkor automatikusan kinyitja a haladó szakaszt.",
   "settings-tab.follow-recording.label": "A felvétel követése minden lapon",

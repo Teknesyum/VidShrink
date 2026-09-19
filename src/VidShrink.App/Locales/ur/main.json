@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "مقرر فولڈر",
   "settings-tab.output-folder.browse": "براؤز…",
   "settings-tab.output-folder.hint": "مقرر فولڈر ہر نتیجہ ماخذ فائل کے ساتھ کے بجائے ایک ہی جگہ بھیجتا ہے۔",
+  "settings-tab.output-folder.unusable": "مقرر فولڈر دستیاب نہیں ہے ({0})؛ نتیجہ ماخذ فائل کے ساتھ محفوظ ہوگا۔",
   "settings-tab.advanced-default-open.label": "اعلیٰ اختیارات طے شدہ طور پر کھلے دکھائیں",
   "settings-tab.advanced-default-open.hint": "ایپ کے ہر آغاز پر اعلیٰ حصہ خود کھولتا ہے۔",
   "settings-tab.follow-recording.label": "تمام ٹیبز میں ریکارڈنگ کی پیروی کریں",

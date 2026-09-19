@@ -76,9 +76,17 @@ public static class ShrinkEngine
         => FfmpegArguments.Build(info, plan, outputPath,
             plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null, availability, scenes);
 
-    public static string UniqueOutputPath(string inputPath, string suffix = "shrunk", string extension = "mp4")
+    /// <param name="outputDirectory">
+    /// Çıktının yazılacağı klasör. Boş bırakılırsa kaynağın yanı. Klasörün var olduğu
+    /// burada denetlenmez — çağıran kullanılamayan klasörü kendisi eler ve kullanıcıya
+    /// söyler; sessizce kaynağın yanına düşmek ayarı yalan yapar.
+    /// </param>
+    public static string UniqueOutputPath(string inputPath, string suffix = "shrunk", string extension = "mp4",
+        string? outputDirectory = null)
     {
-        var dir = Path.GetDirectoryName(inputPath)!;
+        var dir = string.IsNullOrWhiteSpace(outputDirectory)
+            ? Path.GetDirectoryName(inputPath)!
+            : outputDirectory!;
         var name = Path.GetFileNameWithoutExtension(inputPath);
         const int firstIndex = 2;
         if (suffix == "shrunk" && name.EndsWith("_shrunk", StringComparison.OrdinalIgnoreCase))

@@ -865,3 +865,37 @@ tamamen ölüydü.
 
 **Ölçü.** Alanı geri eklemek derlemeyi kırmaz, sessizce ikinci depoyu geri getirir —
 `OrtakOdakTests.KonumDeposuCurrentMediaDaYok` ile aynı desen: yüzey yansımayla pimlenir.
+
+## Sabit Çıktı Klasörü Gerçekten Çalışsın (Defter 28 Sınıfı)
+
+**Ölçü.** Ayarlar sekmesindeki "Çıktı klasörü" seçimi — `RbOutputBesideSource` /
+`RbOutputFixed` ve yanındaki klasör kutusu — yalnız kaydediliyor, geri yükleniyor ve
+satırın görünürlüğünü açıp kapatıyor (`MainWindow.axaml.cs:255, 1330, 1365, 1400`).
+Çıktı yolunu kuran tek yer `ShrinkEngine.UniqueOutputPath(inputPath, ...)` ve o yalnız
+**kaynağın klasörünü** okuyor (`ShrinkEngine.cs:81`). Dört çağrı yerinin dördü de
+(`MainWindow.axaml.cs:3546, 4224, 4539, 4561`) klasörü hiç geçirmiyor.
+
+Yani kutucuğun kendi ipucu — "Sabit klasör her çıktıyı kaynağın yanı yerine hep aynı
+yere gönderir" — yapılmayan bir şeyi vaat ediyor. Kullanıcı klasörü seçiyor, ayar
+diske yazılıyor, çıktı yine kaynağın yanına düşüyor; hata yok, uyarı yok.
+
+**Karar: ayar bağlansın, kaldırılmasın.** CLI tarafında karşılığı zaten var
+(`CliApp.cs:228`, `izle` akışı `OutputDirectory` ile aynı işi yapıyor); eksik olan
+yalnız arayüzün bağlantısı.
+
+**Sessiz geri düşme olmayacak.** Seçilen klasör yoksa ya da yazılamıyorsa çıktı
+kaynağın yanına düşer **ve durum satırında söylenir**. Sessizce yanına yazmak, bugünkü
+kusurun daha kibar bir biçimi olurdu.
+
+**Adımlar**
+
+1. `ShrinkEngine.UniqueOutputPath`'e `string? outputDirectory = null` eklenir; verilince
+   aday yol o klasörde kurulur, çakışma sayacı ve `_shrunk` tekrar koruması aynı kalır.
+2. `MainWindow.BuildUniqueOutputPath` ayarı okur: kip `Sabit` ve klasör yazılabilirse
+   onu geçirir, değilse kaynağın yanı.
+3. Klasör kullanılamadığında `settings-tab.output-folder.unusable` anahtarı durum
+   satırına yazılır; anahtar 42 dilde.
+4. Ölçü: seçilen klasöre yazıldığı, kip `Kaynağın yanı` iken yazılmadığı (olumsuz
+   kontrol), olmayan klasörde kaynağın yanına düşüp uyarı verdiği, çakışma sayacının
+   hedef klasörde işlediği.
+5. CLI'ın `--cikti`'sı dokunulmaz: orada yol kullanıcının verdiği yoldur.

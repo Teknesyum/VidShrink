@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Kindel kaust",
   "settings-tab.output-folder.browse": "Sirvi…",
   "settings-tab.output-folder.hint": "Kindel kaust saadab iga väljundi samasse kohta, mitte lähtefaili kõrvale.",
+  "settings-tab.output-folder.unusable": "Kindel kaust ei ole kasutatav ({0}); väljund läheb lähtefaili kõrvale.",
   "settings-tab.advanced-default-open.label": "Näita täpsemaid valikuid vaikimisi avatuna",
   "settings-tab.advanced-default-open.hint": "Avab täpsema jaotise automaatselt igal rakenduse käivitusel.",
   "settings-tab.follow-recording.label": "Järgi salvestust kõigil vahekaartidel",

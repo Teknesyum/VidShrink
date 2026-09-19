@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Cartella fissa",
   "settings-tab.output-folder.browse": "Sfoglia…",
   "settings-tab.output-folder.hint": "Cartella fissa manda ogni output nello stesso posto invece che accanto al file sorgente.",
+  "settings-tab.output-folder.unusable": "La cartella fissa non è disponibile ({0}); l'output verrà salvato accanto al file sorgente.",
   "settings-tab.advanced-default-open.label": "Mostra le opzioni avanzate espanse per impostazione predefinita",
   "settings-tab.advanced-default-open.hint": "Apre automaticamente la sezione avanzata a ogni avvio dell'app.",
   "settings-tab.follow-recording.label": "Segui la registrazione in tutte le schede",

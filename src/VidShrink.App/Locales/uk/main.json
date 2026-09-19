@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Фіксована тека",
   "settings-tab.output-folder.browse": "Огляд…",
   "settings-tab.output-folder.hint": "Фіксована тека надсилає кожен результат в одне місце замість теки поруч із джерелом.",
+  "settings-tab.output-folder.unusable": "Фіксована тека недоступна ({0}); результат буде збережено поруч із файлом джерела.",
   "settings-tab.advanced-default-open.label": "Показувати розширені параметри розгорнутими",
   "settings-tab.advanced-default-open.hint": "Відкриває розширений розділ автоматично при кожному запуску програми.",
   "settings-tab.follow-recording.label": "Стежити за записом у всіх вкладках",

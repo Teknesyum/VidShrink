@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Fiksna fascikla",
   "settings-tab.output-folder.browse": "Pregledaj…",
   "settings-tab.output-folder.hint": "Fiksna fascikla šalje svaki izlaz na isto mesto umesto pored izvornog fajla.",
+  "settings-tab.output-folder.unusable": "Fiksna fascikla nije dostupna ({0}); izlaz će biti sačuvan pored izvornog fajla.",
   "settings-tab.advanced-default-open.label": "Prikaži napredne opcije raširene podrazumevano",
   "settings-tab.advanced-default-open.hint": "Automatski otvara napredni odeljak pri svakom pokretanju aplikacije.",
   "settings-tab.follow-recording.label": "Прати снимак у свим картицама",

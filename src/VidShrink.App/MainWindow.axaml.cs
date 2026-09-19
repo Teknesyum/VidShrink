@@ -3834,8 +3834,40 @@ public partial class MainWindow : Window
         };
     }
 
-    private static string BuildUniqueOutputPath(string inputPath, string suffix, string extension)
-        => ShrinkEngine.UniqueOutputPath(inputPath, suffix, extension);
+    /// <summary>
+    /// Ayarlardaki sabit klasör gerçekten kullanılabiliyorsa onu, değilse boş döner.
+    /// Var olmak yetmez: klasöre yazılamıyorsa çıktı oraya gitmez, o yüzden sıfır
+    /// baytlık bir sonda yazılıp silinir. Boş dönen her durumda çağıran kullanıcıya
+    /// söyler — sessizce kaynağın yanına yazmak ayarı yalan yapar.
+    /// </summary>
+    internal static string? UsableFixedFolder(int mode, string? folder)
+    {
+        if (mode != 1 || string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder)) return null;
+
+        var probe = Path.Combine(folder, ".vidshrink-yazma-sondasi-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            File.WriteAllBytes(probe, Array.Empty<byte>());
+            return folder;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+        finally
+        {
+            try { File.Delete(probe); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+        }
+    }
+
+    /// <summary>Sabit klasör seçili ama kullanılamıyor: çıktı kaynağın yanına düşecek.</summary>
+    private bool FixedFolderUnusable =>
+        OutputFolderModeIndex == 1 && UsableFixedFolder(OutputFolderModeIndex, TxtOutputFolder.Text) is null;
+
+    private string BuildUniqueOutputPath(string inputPath, string suffix, string extension)
+        => ShrinkEngine.UniqueOutputPath(inputPath, suffix, extension,
+            UsableFixedFolder(OutputFolderModeIndex, TxtOutputFolder.Text));
 
     private void OnTargetSliderChanged()
     {
@@ -4222,6 +4254,8 @@ public partial class MainWindow : Window
         if (_info is null || ActivePlan is null || _cts is not null) return;
 
         var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", ActivePlan.Streams?.Extension ?? "mp4");
+        if (FixedFolderUnusable)
+            TxtResult.Text = Say("settings-tab.output-folder.unusable", TxtOutputFolder.Text ?? "");
         var targetMb = ParseTargetMb();
         if (DiskSpaceGuard.TryGetFreeBytes(output, out var freeBytes) && !DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb))
         {

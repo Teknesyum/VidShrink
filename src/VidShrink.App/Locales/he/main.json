@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "תיקייה קבועה",
   "settings-tab.output-folder.browse": "עיון…",
   "settings-tab.output-folder.hint": "תיקייה קבועה שולחת כל פלט לאותו מקום במקום ליד קובץ המקור.",
+  "settings-tab.output-folder.unusable": "התיקייה הקבועה אינה זמינה ({0}); הפלט יישמר לצד קובץ המקור.",
   "settings-tab.advanced-default-open.label": "הצג אפשרויות מתקדמות פתוחות כברירת מחדל",
   "settings-tab.advanced-default-open.hint": "פותח את הקטע המתקדם אוטומטית בכל הפעלה של היישום.",
   "settings-tab.follow-recording.label": "לעקוב אחר ההקלטה בכל הלשוניות",

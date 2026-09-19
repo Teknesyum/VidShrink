@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Fast mappe",
   "settings-tab.output-folder.browse": "Bla gjennom…",
   "settings-tab.output-folder.hint": "Fast mappe sender alle utdata til samme sted i stedet for ved siden av kildefilen.",
+  "settings-tab.output-folder.unusable": "Den faste mappen er ikke tilgjengelig ({0}); utdata legges ved siden av kildefilen.",
   "settings-tab.advanced-default-open.label": "Vis avanserte valg utvidet som standard",
   "settings-tab.advanced-default-open.hint": "Åpner den avanserte delen automatisk hver gang appen starter.",
   "settings-tab.follow-recording.label": "Følg opptaket i alle faner",

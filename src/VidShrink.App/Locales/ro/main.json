@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Dosar fix",
   "settings-tab.output-folder.browse": "Răsfoiește…",
   "settings-tab.output-folder.hint": "Dosarul fix trimite fiecare rezultat în același loc, nu lângă fișierul sursă.",
+  "settings-tab.output-folder.unusable": "Dosarul fix nu este disponibil ({0}); rezultatul va fi salvat lângă fișierul sursă.",
   "settings-tab.advanced-default-open.label": "Arată opțiunile avansate extinse implicit",
   "settings-tab.advanced-default-open.hint": "Deschide automat secțiunea avansată la fiecare pornire a aplicației.",
   "settings-tab.follow-recording.label": "Urmărește înregistrarea în toate filele",

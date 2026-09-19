@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "پوشهٔ ثابت",
   "settings-tab.output-folder.browse": "انتخاب…",
   "settings-tab.output-folder.hint": "پوشهٔ ثابت هر خروجی را به‌جای کنار فایل منبع به یک جا می‌فرستد.",
+  "settings-tab.output-folder.unusable": "پوشهٔ ثابت در دسترس نیست ({0})؛ خروجی کنار فایل منبع نوشته می‌شود.",
   "settings-tab.advanced-default-open.label": "گزینه‌های پیشرفته به‌طور پیش‌فرض باز باشند",
   "settings-tab.advanced-default-open.hint": "بخش پیشرفته را در هر بار اجرای برنامه خودکار باز می‌کند.",
   "settings-tab.follow-recording.label": "دنبال کردن ضبط در همه زبانه‌ها",

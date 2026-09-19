@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "고정 폴더",
   "settings-tab.output-folder.browse": "찾아보기…",
   "settings-tab.output-folder.hint": "고정 폴더는 모든 출력을 원본 옆이 아닌 같은 곳으로 보냅니다.",
+  "settings-tab.output-folder.unusable": "고정 폴더를 사용할 수 없습니다({0}). 출력은 원본 파일 옆에 저장됩니다.",
   "settings-tab.advanced-default-open.label": "고급 옵션을 기본으로 펼쳐서 표시",
   "settings-tab.advanced-default-open.hint": "앱을 시작할 때마다 고급 섹션을 자동으로 엽니다.",
   "settings-tab.follow-recording.label": "모든 탭에서 녹화 따라가기",

@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Fiksna mapa",
   "settings-tab.output-folder.browse": "Pregledaj…",
   "settings-tab.output-folder.hint": "Fiksna mapa šalje svaki izlaz na isto mjesto umjesto pored izvorne datoteke.",
+  "settings-tab.output-folder.unusable": "Fiksna mapa nije dostupna ({0}); izlaz će biti pored izvorne datoteke.",
   "settings-tab.advanced-default-open.label": "Prikaži napredne opcije proširene po zadanom",
   "settings-tab.advanced-default-open.hint": "Automatski otvara napredni odjeljak pri svakom pokretanju aplikacije.",
   "settings-tab.follow-recording.label": "Prati snimku u svim karticama",

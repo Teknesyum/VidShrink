@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Pasta fixa",
   "settings-tab.output-folder.browse": "Procurar…",
   "settings-tab.output-folder.hint": "Pasta fixa envia toda saída para o mesmo lugar em vez de ao lado do arquivo de origem.",
+  "settings-tab.output-folder.unusable": "A pasta fixa está indisponível ({0}); a saída será salva ao lado do arquivo de origem.",
   "settings-tab.advanced-default-open.label": "Mostrar opções avançadas expandidas por padrão",
   "settings-tab.advanced-default-open.hint": "Abre a seção avançada automaticamente sempre que o app inicia.",
   "settings-tab.follow-recording.label": "Seguir a gravação em todas as abas",

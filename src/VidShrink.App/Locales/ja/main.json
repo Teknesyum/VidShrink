@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "固定フォルダー",
   "settings-tab.output-folder.browse": "参照…",
   "settings-tab.output-folder.hint": "固定フォルダーは、すべての出力をソースファイルの隣ではなく同じ場所に送ります。",
+  "settings-tab.output-folder.unusable": "固定フォルダーが使用できません（{0}）。出力はソースファイルの隣に保存されます。",
   "settings-tab.advanced-default-open.label": "詳細オプションを既定で展開表示",
   "settings-tab.advanced-default-open.hint": "アプリ起動時に毎回、詳細セクションを自動で開きます。",
   "settings-tab.follow-recording.label": "録画をすべてのタブで追従する",

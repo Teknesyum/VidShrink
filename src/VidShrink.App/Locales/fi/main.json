@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "Kiinteä kansio",
   "settings-tab.output-folder.browse": "Selaa…",
   "settings-tab.output-folder.hint": "Kiinteä kansio lähettää jokaisen tulosteen samaan paikkaan lähdetiedoston viereen sijasta.",
+  "settings-tab.output-folder.unusable": "Kiinteä kansio ei ole käytettävissä ({0}); tuloste tallennetaan lähdetiedoston viereen.",
   "settings-tab.advanced-default-open.label": "Näytä lisäasetukset oletuksena avattuina",
   "settings-tab.advanced-default-open.hint": "Avaa lisäasetusosion automaattisesti joka käynnistyksellä.",
   "settings-tab.follow-recording.label": "Seuraa tallennetta kaikissa välilehdissä",

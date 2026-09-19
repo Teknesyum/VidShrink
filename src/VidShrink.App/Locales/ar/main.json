@@ -462,6 +462,7 @@
   "settings-tab.output-folder.fixed": "مجلد ثابت",
   "settings-tab.output-folder.browse": "استعراض…",
   "settings-tab.output-folder.hint": "المجلد الثابت يرسل كل ناتج إلى المكان نفسه بدل جانب ملف المصدر.",
+  "settings-tab.output-folder.unusable": "المجلد الثابت غير متاح ({0})؛ سيُكتب الناتج بجانب ملف المصدر.",
   "settings-tab.advanced-default-open.label": "إظهار الخيارات المتقدمة موسّعة افتراضياً",
   "settings-tab.advanced-default-open.hint": "يفتح القسم المتقدم تلقائياً في كل مرة يبدأ فيها التطبيق.",
   "settings-tab.follow-recording.label": "تتبّع التسجيل في كل التبويبات",
