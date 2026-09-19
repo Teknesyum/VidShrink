@@ -158,6 +158,14 @@ public sealed class BudgetFillTests
         Assert.InRange(Mb(plan.VideoBitrateK, 1.0), BudgetFill.Floor * Hedef, Hedef);
     }
 
+    /// <summary>
+    /// Donanim kolunda yukari deneme kurulmaz. Gerekcesi 19 Eylul 2026'da olculdu
+    /// (<c>docs/olcumler/nvenc-butce-doldurma.md</c>): NVENC'in teslim yayilimi 16 gercek
+    /// duzeltmede -%4,00 .. +%3,55 (std 2,14), yani kapatilmaya calisilan %4,8'lik butce
+    /// bosluguyla ayni buyuklukte. Bugunku nisanda (0,985) denemelerin 6/16'si hedefi asip
+    /// atiliyor; nisani 0,95'e indirmek asimi bitiriyor ama inisi ortalama 0,95'e, yani
+    /// urunun zaten teslim ettigi yere oturtuyor. Kapi olcume dayaniyor, varsayima degil.
+    /// </summary>
     [Theory]
     [InlineData("h264_nvenc")]
     [InlineData("hevc_nvenc")]
