@@ -472,6 +472,47 @@ başına bir kusur değil, daha büyüğünün parçası — aynı gövde `"sın
 İngilizce arayüzde kullanıcı Türkçe kelime okuyor. Kültürü tek başına düzeltmek bunu
 gizlerdi; ayrı defter satırı olarak duruyor.
 
+### Paylaşım tablosunun arama sırası — 19 Eylül 2026
+
+**Önce yanlış bir öncül.** Bir alt ajanın raporu "tablo yoksa ana pencere hiç açılmıyor"
+diyordu. Doğrulamaya gidildi ve tutmadı: `InitializeShareUi`'nin çağırdığı `Load()`
+arayüzün kendi kaydına ait ve her istisnayı yutup `Fallback` dönüyor; Core'un fırlatan
+`Load()`'unun üç çağrı yerinin üçü de yakalıyor. Çökme yok. Düzeltme ve ölçüsü geri
+alındı, ölçü `trash/` altına taşındı.
+
+**Ama doğrulama sırasında gerçek olan çıktı.** `paylasim-hedefleri.json`'ı iki tür
+okuyor: şeridi kuran `VidShrink.App.ShareTargetTable` ve yüklemeyi yapan
+`Core.Share.ShareTargetTable`. Şema T35'te sabitlendi, iki taraf da onu okuyor — ama
+**arama sırası** sabitlenmemişti:
+
+| | kullanıcının kopyası (`%APPDATA%\VidShrink`) | uygulamanın yanı | üst dizinler |
+|---|---|---|---|
+| Core (yükleme) | 1. | 2. | 3., 8 kademe |
+| App (şerit) | **hiç bakmıyor** | 1. | 2., sınırsız |
+
+Core'un belgesi kullanıcı kopyasının niye ilk sırada olduğunu da yazıyor: bir uç nokta
+ölünce kullanıcı sürüm beklemeden düzeltebilsin. Kullanıcı o kopyayı düzenlediğinde
+şerit paketteki tavanları gösteriyor, yükleme kullanıcının uç noktasına gidiyordu —
+görünen sınır ile gidilen adres ayrı dosyalardan. Hata yok, uyarı yok.
+
+**Düzeltme:** App kendi aramasını bıraktı. `AramaSirasi()` Core'unkini döndürüyor,
+`Load()` Core'un `Locate()`'ini kullanıyor, arama `Load(Func<string?>)` ile dışarıdan
+verilebiliyor — ölçü gerçek `%APPDATA%`'ya dokunmadan koşsun diye.
+
+**Ölçü** `tests/VidShrink.Tests/PaylasimAramaSirasiTests.cs`, beş olgu; ikisi olumsuz
+kontrol. Taban 0 kırmızı / 18 yeşil (`SettingsTabTests` ile birlikte).
+
+| kesim | kırmızı |
+|---|---|
+| K1 App kendi aramasına dönüyor | 3 |
+| K2 `Load` verilen aramayı yok sayıyor | 5 |
+| K3 `Load` koşulsuz `Fallback` | 3 |
+| K4 Core kullanıcı klasörünü atlıyor | 1 |
+| K5 okunamayan dosya yutulmuyor | 1 |
+
+Sıfır yok. `ShareTargetTable.Locate(string)` kaldırıldı; onu kullanan iki eski ölçü
+yeni yüzeye taşındı.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

@@ -145,6 +145,12 @@ public sealed record ShareTargetTable
         return null;
     }
 
+    /// <summary>
+    /// Aramanın adayları, sırasıyla. Arayüz tarafı da bu sırayı kullanır; iki taraf ayrı
+    /// arama tutarsa kullanıcının kendi kopyası yalnız birine görünür.
+    /// </summary>
+    public static IEnumerable<string> AramaSirasi() => Candidates();
+
     private static IEnumerable<string> Candidates()
     {
         yield return Path.Combine(

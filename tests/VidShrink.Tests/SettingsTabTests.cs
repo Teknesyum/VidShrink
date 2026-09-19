@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using VidShrink.App;
 
@@ -85,7 +85,7 @@ public sealed class SettingsTabTests
     public void TheRealFileIsTheOneThatFillsTheList()
     {
         Assert.True(File.Exists(RealFilePath), $"{RealFilePath} yok.");
-        Assert.Equal(RealFilePath, ShareTargetTable.Locate(TipSources.Root));
+        Assert.Contains(RealFilePath, ShareTargetTable.AramaSirasi());
 
         var table = ShareTargetTable.Parse(File.ReadAllText(RealFilePath));
 
@@ -114,7 +114,7 @@ public sealed class SettingsTabTests
     /// K: JSON'a üçüncü bir hedef eklenince arayüzde görünüyor. Ölçüm uydurma bir şemayla
     /// değil, depodaki gerçek dosyanın kendisiyle koşuyor: dosya okunuyor, üçüncü hedef
     /// ekleniyor, sonuç geçici bir dizine yazılıp <see cref="ShareTargetTable.Load"/>'un
-    /// kullandığı yol — <c>Locate</c> ve <c>Parse</c> — üstünden geri okunuyor.
+    /// kullandığı yol — arama ve <c>Parse</c> — üstünden geri okunuyor.
     /// </summary>
     [Fact]
     public void AThirdTargetAddedToTheFileShowsUpWithoutACodeChange()
@@ -133,10 +133,8 @@ public sealed class SettingsTabTests
         {
             File.WriteAllText(Path.Combine(directory, ShareTargetTable.FileName), document.ToJsonString());
 
-            var found = ShareTargetTable.Locate(directory);
-            Assert.NotNull(found);
-
-            var table = ShareTargetTable.Parse(File.ReadAllText(found!));
+            var table = ShareTargetTable.Load(() => Path.Combine(directory, ShareTargetTable.FileName));
+            Assert.NotSame(ShareTargetTable.Fallback, table);
 
             Assert.Equal(3, table.Targets.Count);
             Assert.Equal(new[] { "storage.to", "uguu.se", "yeni.example" }, table.Targets.Select(target => target.Id));
@@ -198,7 +196,7 @@ public sealed class SettingsTabTests
     [Fact]
     public void AMissingOrBrokenFileFallsBackToTheSchemaDefaults()
     {
-        Assert.Null(ShareTargetTable.Locate(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"))));
+        Assert.Same(ShareTargetTable.Fallback, ShareTargetTable.Load(() => null));
         Assert.Equal(2, ShareTargetTable.Fallback.Targets.Count);
         Assert.Equal("storage.to", ShareTargetTable.Fallback.Default.Id);
         Assert.Same(ShareTargetTable.Fallback, ShareTargetTable.Parse("""{"version":1,"targets":[]}"""));

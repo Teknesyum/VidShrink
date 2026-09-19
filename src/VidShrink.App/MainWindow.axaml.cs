@@ -4783,32 +4783,27 @@ internal sealed record ShareTargetTable(string DefaultId, IReadOnlyList<ShareTar
         ?? Targets[0];
 
     /// <summary>
-    /// Dosya çalışma dizininin yanında da olabilir, depo kökünde de. Yayında ikisi aynı yer;
-    /// geliştirmede exe <c>bin/</c> altındadır, bu yüzden üst dizinler taranır.
+    /// Arama Core'un sırasıdır; bu tür kendi sırasını tutmaz. Şerit ile yükleme aynı
+    /// dosyayı okumak zorunda: ayrı arama, kullanıcının kendi kopyasını yalnız bir tarafa
+    /// gösterip görünen tavan ile gidilen adresi ayırıyordu.
     /// </summary>
-    internal static string? Locate(string startDirectory)
-    {
-        var directory = new DirectoryInfo(startDirectory);
-        while (directory is not null)
-        {
-            var candidate = Path.Combine(directory.FullName, FileName);
-            if (File.Exists(candidate)) return candidate;
-            directory = directory.Parent;
-        }
+    internal static IEnumerable<string> AramaSirasi() => CoreShare.ShareTargetTable.AramaSirasi();
 
-        return null;
-    }
+    internal static ShareTargetTable Load() => Load(CoreShare.ShareTargetTable.Locate);
 
-    internal static ShareTargetTable Load()
+    /// <summary>
+    /// Arama dışarıdan verilir; bulunamaz ya da okunamazsa <see cref="Fallback"/> kalır ve
+    /// arayüz açılmaya devam eder.
+    /// </summary>
+    internal static ShareTargetTable Load(Func<string?> locate)
     {
         try
         {
-            var path = Locate(AppContext.BaseDirectory);
+            var path = locate();
             return path is null ? Fallback : Parse(File.ReadAllText(path));
         }
         catch (Exception)
         {
-            // Dosya bozuksa arayüz açılmaya devam eder; şema varsayılanları gösterilir.
             return Fallback;
         }
     }
