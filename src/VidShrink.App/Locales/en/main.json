@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Encoder path",
   "main.advanced.encoder-path.software": "Software",
   "main.advanced.encoder-path.hardware": "Hardware",
+  "main.advanced.filters.label": "Picture filters",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filter not understood",
   "main.advanced.codec-lock.label": "Codec lock",
 
   "main.plan.title": "What it will do",

@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Път на енкодера",
   "main.advanced.encoder-path.software": "Софтуерен",
   "main.advanced.encoder-path.hardware": "Хардуерен",
+  "main.advanced.filters.label": "Филтри на картината",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Филтърът не е разчетен",
   "main.advanced.codec-lock.label": "Заключване на кодека",
 
   "main.plan.title": "Какво ще направи",

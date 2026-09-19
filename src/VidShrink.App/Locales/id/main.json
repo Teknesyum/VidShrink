@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Jalur encoder",
   "main.advanced.encoder-path.software": "Perangkat lunak",
   "main.advanced.encoder-path.hardware": "Perangkat keras",
+  "main.advanced.filters.label": "Filter gambar",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filter tidak dikenali",
   "main.advanced.codec-lock.label": "Kunci codec",
 
   "main.plan.title": "Yang akan dilakukan",

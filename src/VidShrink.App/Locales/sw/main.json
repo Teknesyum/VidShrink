@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Njia ya kisimbaji",
   "main.advanced.encoder-path.software": "Programu",
   "main.advanced.encoder-path.hardware": "Maunzi",
+  "main.advanced.filters.label": "Vichujio vya picha",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Kichujio hakikueleweka",
   "main.advanced.codec-lock.label": "Kufuli ya kodeki",
 
   "main.plan.title": "Itakachofanya",

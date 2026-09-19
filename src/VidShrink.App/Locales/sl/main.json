@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Pot kodirnika",
   "main.advanced.encoder-path.software": "Programska",
   "main.advanced.encoder-path.hardware": "Strojna",
+  "main.advanced.filters.label": "Filtri slike",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filtra ni bilo mogoče razbrati",
   "main.advanced.codec-lock.label": "Zaklep kodeka",
 
   "main.plan.title": "Kaj bo storil",

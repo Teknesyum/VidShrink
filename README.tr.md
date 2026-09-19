@@ -183,6 +183,7 @@ bunların tek yazımı var.
 | `--ana-icerik` | `--main-feature` |
 | `--aci` | `--angle` |
 | `--asgari-sure` | `--min-duration` |
+| `--suzgec` | `--filters` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
 | `--dil` | `--lang` |

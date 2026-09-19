@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Kódolási út",
   "main.advanced.encoder-path.software": "Szoftveres",
   "main.advanced.encoder-path.hardware": "Hardveres",
+  "main.advanced.filters.label": "Képszűrők",
+  "main.advanced.filters.hint": "crop=SZ:M:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "A szűrő nem értelmezhető",
   "main.advanced.codec-lock.label": "Kodekzár",
 
   "main.plan.title": "Mit fog tenni",

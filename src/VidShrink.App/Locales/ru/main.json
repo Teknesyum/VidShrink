@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Путь кодирования",
   "main.advanced.encoder-path.software": "Программный",
   "main.advanced.encoder-path.hardware": "Аппаратный",
+  "main.advanced.filters.label": "Фильтры изображения",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Фильтр не распознан",
   "main.advanced.codec-lock.label": "Фиксация кодека",
 
   "main.plan.title": "Что будет сделано",

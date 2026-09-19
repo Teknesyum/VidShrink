@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "एन्कोडर पथ",
   "main.advanced.encoder-path.software": "सॉफ़्टवेयर",
   "main.advanced.encoder-path.hardware": "हार्डवेयर",
+  "main.advanced.filters.label": "चित्र फ़िल्टर",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "फ़िल्टर समझ नहीं आया",
   "main.advanced.codec-lock.label": "कोडेक लॉक",
 
   "main.plan.title": "यह क्या करेगा",

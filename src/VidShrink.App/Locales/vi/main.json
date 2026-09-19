@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Đường mã hóa",
   "main.advanced.encoder-path.software": "Phần mềm",
   "main.advanced.encoder-path.hardware": "Phần cứng",
+  "main.advanced.filters.label": "Bộ lọc hình ảnh",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Không hiểu bộ lọc",
   "main.advanced.codec-lock.label": "Khóa codec",
 
   "main.plan.title": "Sẽ làm gì",

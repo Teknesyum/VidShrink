@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "مسار المرمّز",
   "main.advanced.encoder-path.software": "برمجي",
   "main.advanced.encoder-path.hardware": "عتادي",
+  "main.advanced.filters.label": "مرشحات الصورة",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "تعذّر فهم المرشح",
   "main.advanced.codec-lock.label": "قفل الترميز",
 
   "main.plan.title": "ما الذي سيفعله",

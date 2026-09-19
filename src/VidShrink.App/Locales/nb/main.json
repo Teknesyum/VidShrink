@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Koderbane",
   "main.advanced.encoder-path.software": "Programvare",
   "main.advanced.encoder-path.hardware": "Maskinvare",
+  "main.advanced.filters.label": "Bildefiltre",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filteret ble ikke forstått",
   "main.advanced.codec-lock.label": "Kodeklås",
 
   "main.plan.title": "Hva den vil gjøre",

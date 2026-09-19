@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Put kodera",
   "main.advanced.encoder-path.software": "Softverski",
   "main.advanced.encoder-path.hardware": "Hardverski",
+  "main.advanced.filters.label": "Filtri slike",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filtar nije prepoznat",
   "main.advanced.codec-lock.label": "Zaključaj kodek",
 
   "main.plan.title": "Što će učiniti",

@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Encoderpad",
   "main.advanced.encoder-path.software": "Software",
   "main.advanced.encoder-path.hardware": "Hardware",
+  "main.advanced.filters.label": "Beeldfilters",
+  "main.advanced.filters.hint": "crop=B:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filter niet begrepen",
   "main.advanced.codec-lock.label": "Codecvergrendeling",
 
   "main.plan.title": "Wat het gaat doen",

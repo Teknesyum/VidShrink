@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "인코더 경로",
   "main.advanced.encoder-path.software": "소프트웨어",
   "main.advanced.encoder-path.hardware": "하드웨어",
+  "main.advanced.filters.label": "영상 필터",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "필터를 해석하지 못했습니다",
   "main.advanced.codec-lock.label": "코덱 고정",
 
   "main.plan.title": "수행할 작업",

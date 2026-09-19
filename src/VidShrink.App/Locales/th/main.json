@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "เส้นทางตัวเข้ารหัส",
   "main.advanced.encoder-path.software": "ซอฟต์แวร์",
   "main.advanced.encoder-path.hardware": "ฮาร์ดแวร์",
+  "main.advanced.filters.label": "ตัวกรองภาพ",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "อ่านตัวกรองไม่ได้",
   "main.advanced.codec-lock.label": "ล็อกโคเดก",
 
   "main.plan.title": "สิ่งที่จะทำ",

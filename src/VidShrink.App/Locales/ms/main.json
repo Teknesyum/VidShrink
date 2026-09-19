@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Laluan pengekod",
   "main.advanced.encoder-path.software": "Perisian",
   "main.advanced.encoder-path.hardware": "Perkakasan",
+  "main.advanced.filters.label": "Penapis gambar",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Penapis tidak difahami",
   "main.advanced.codec-lock.label": "Kunci kodek",
 
   "main.plan.title": "Apa yang akan dilakukan",

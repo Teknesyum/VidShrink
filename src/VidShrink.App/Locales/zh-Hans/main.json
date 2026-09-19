@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "编码器路径",
   "main.advanced.encoder-path.software": "软件",
   "main.advanced.encoder-path.hardware": "硬件",
+  "main.advanced.filters.label": "画面滤镜",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "无法识别该滤镜",
   "main.advanced.codec-lock.label": "锁定编码",
 
   "main.plan.title": "将要执行的操作",

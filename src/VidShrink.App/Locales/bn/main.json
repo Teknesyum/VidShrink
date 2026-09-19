@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "এনকোডার পথ",
   "main.advanced.encoder-path.software": "সফটওয়্যার",
   "main.advanced.encoder-path.hardware": "হার্ডওয়্যার",
+  "main.advanced.filters.label": "ছবির ফিল্টার",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "ফিল্টারটি বোঝা যায়নি",
   "main.advanced.codec-lock.label": "কোডেক লক",
 
   "main.plan.title": "যা করা হবে",

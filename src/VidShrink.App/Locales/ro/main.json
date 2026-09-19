@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Cale de codare",
   "main.advanced.encoder-path.software": "Software",
   "main.advanced.encoder-path.hardware": "Hardware",
+  "main.advanced.filters.label": "Filtre de imagine",
+  "main.advanced.filters.hint": "crop=L:Î:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filtrul nu a fost înțeles",
   "main.advanced.codec-lock.label": "Blocare codec",
 
   "main.plan.title": "Ce va face",

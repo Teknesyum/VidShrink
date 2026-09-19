@@ -1064,3 +1064,6 @@ hiçbir yerden çağrılmıyor. `new PlanOptions` kuran üç yerin hiçbiri `Fil
    bozuk dizge 64 döndürüyor, boş dizge bugünkü argümanı değiştirmiyor.
 
 **Kabul.** Mutasyon turu; her kol en az bir kırmızı vermeli.
+
+**Yapıldı (19 Eylül 2026).** Beş yüzeyin beşi açıldı, ölçü `SuzgecYuzeyiTests` (5 kol,
+5/5 yeşil), sonuç ve mutasyon tablosu `docs/olcumler/e8-suzgec-yuzeyi.md`.

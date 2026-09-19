@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Kodētāja ceļš",
   "main.advanced.encoder-path.software": "Programmatūra",
   "main.advanced.encoder-path.hardware": "Aparatūra",
+  "main.advanced.filters.label": "Attēla filtri",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filtrs nav atpazīts",
   "main.advanced.codec-lock.label": "Kodeka fiksācija",
 
   "main.plan.title": "Ko tas darīs",

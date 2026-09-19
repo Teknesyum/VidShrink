@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "مسیر رمزگذار",
   "main.advanced.encoder-path.software": "نرم‌افزاری",
   "main.advanced.encoder-path.hardware": "سخت‌افزاری",
+  "main.advanced.filters.label": "صافی‌های تصویر",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "صافی خوانده نشد",
   "main.advanced.codec-lock.label": "قفل کدک",
 
   "main.plan.title": "چه خواهد کرد",

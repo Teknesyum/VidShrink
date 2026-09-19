@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Encoder-Pfad",
   "main.advanced.encoder-path.software": "Software",
   "main.advanced.encoder-path.hardware": "Hardware",
+  "main.advanced.filters.label": "Bildfilter",
+  "main.advanced.filters.hint": "crop=B:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filter nicht verstanden",
   "main.advanced.codec-lock.label": "Codec-Sperre",
 
   "main.plan.title": "Was passieren wird",

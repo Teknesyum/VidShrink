@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Kodeerija tee",
   "main.advanced.encoder-path.software": "Tarkvara",
   "main.advanced.encoder-path.hardware": "Riistvara",
+  "main.advanced.filters.label": "Pildifiltrid",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filtrit ei mõistetud",
   "main.advanced.codec-lock.label": "Koodeki lukk",
 
   "main.plan.title": "Mida ta teeb",

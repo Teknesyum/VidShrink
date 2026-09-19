@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Ruta del codificador",
   "main.advanced.encoder-path.software": "Software",
   "main.advanced.encoder-path.hardware": "Hardware",
+  "main.advanced.filters.label": "Filtros de imagen",
+  "main.advanced.filters.hint": "crop=A:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "No se entendió el filtro",
   "main.advanced.codec-lock.label": "Bloqueo de códec",
 
   "main.plan.title": "Qué va a hacer",

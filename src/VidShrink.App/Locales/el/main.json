@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Διαδρομή κωδικοποιητή",
   "main.advanced.encoder-path.software": "Λογισμικό",
   "main.advanced.encoder-path.hardware": "Υλικό",
+  "main.advanced.filters.label": "Φίλτρα εικόνας",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Το φίλτρο δεν αναγνωρίστηκε",
   "main.advanced.codec-lock.label": "Κλείδωμα κωδικοποιητή",
 
   "main.plan.title": "Τι θα κάνει",

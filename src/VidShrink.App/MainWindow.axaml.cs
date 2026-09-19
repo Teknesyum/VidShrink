@@ -1966,6 +1966,29 @@ public partial class MainWindow : Window
         };
 
         options.LockedCodec = AdvancedText(CmbAdvCodecLock);
+
+        options.Filters = SuzgecOku(out _);
+    }
+
+    /// <summary>
+    /// Gelişmiş paneldeki süzgeç kutusunu okur. Boş kutu bugünkü davranıştır; bozuk belirtim
+    /// varsayılana düşer ve <paramref name="hata"/> kutunun yanındaki satırı besler — plan
+    /// hesabı sessizce yanlış süzgeçle koşmasın.
+    /// </summary>
+    private VideoFilterOptions SuzgecOku(out string? hata)
+    {
+        hata = null;
+        var metin = TxtAdvFilters.Text;
+        if (string.IsNullOrWhiteSpace(metin)) return VideoFilterOptions.Default;
+        try
+        {
+            return VideoFilterChain.Parse(metin);
+        }
+        catch (ArgumentException ex)
+        {
+            hata = ex.Message;
+            return VideoFilterOptions.Default;
+        }
     }
 
     /// <summary>
@@ -1995,6 +2018,12 @@ public partial class MainWindow : Window
             ? Say("main.advanced.encoder-path.hardware")
             : Say("main.advanced.encoder-path.software")) : "";
         TxtAdvCodecLockNow.Text = has ? Say("main.advanced.now", plan!.Codec) : "";
+        SuzgecOku(out var suzgecHata);
+        TxtAdvFiltersNow.Text = suzgecHata is not null
+            ? Say("main.advanced.filters.bad")
+            : has && _info is { } kaynak
+                ? Say("main.advanced.now", string.Join(", ", VideoFilterChain.Filters(kaynak, plan!)) is { Length: > 0 } zincir ? zincir : "-")
+                : "";
 
         TxtTargetCrfLockedNotice.IsVisible = has && plan!.ReasonCodes.Any(note => note.Code == ReasonCode.ManualCrfOverride);
     }

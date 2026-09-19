@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Kodersti",
   "main.advanced.encoder-path.software": "Software",
   "main.advanced.encoder-path.hardware": "Hardware",
+  "main.advanced.filters.label": "Billedfiltre",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filteret kunne ikke læses",
   "main.advanced.codec-lock.label": "Codec-lås",
 
   "main.plan.title": "Hvad den vil gøre",

@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Kodlayıcı yolu",
   "main.advanced.encoder-path.software": "Yazılım",
   "main.advanced.encoder-path.hardware": "Donanım",
+  "main.advanced.filters.label": "Görüntü süzgeçleri",
+  "main.advanced.filters.hint": "crop=G:Y:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Süzgeç anlaşılmadı",
   "main.advanced.codec-lock.label": "Kodek kilidi",
 
   "main.plan.title": "Yapılacak işlem",

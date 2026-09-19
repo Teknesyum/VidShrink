@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Kodarväg",
   "main.advanced.encoder-path.software": "Mjukvara",
   "main.advanced.encoder-path.hardware": "Hårdvara",
+  "main.advanced.filters.label": "Bildfilter",
+  "main.advanced.filters.hint": "crop=B:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filtret kunde inte tolkas",
   "main.advanced.codec-lock.label": "Kodeklås",
 
   "main.plan.title": "Vad den kommer att göra",

@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Cesta enkodéra",
   "main.advanced.encoder-path.software": "Softvér",
   "main.advanced.encoder-path.hardware": "Hardvér",
+  "main.advanced.filters.label": "Filtre obrazu",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filter sa nepodarilo prečítať",
   "main.advanced.codec-lock.label": "Zámok kodeku",
 
   "main.plan.title": "Čo sa urobí",

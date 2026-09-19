@@ -1081,6 +1081,12 @@ public sealed class BaslikKapsamiTests
     /// <para><b>19 Eylul 2026, ucuncu yenileme: toplam 1677, en 198, tr 68.</b> Tani gunlugu
     /// (E7) her dile bes <c>settings.log.*</c> anahtari ekledi; kol degistiren kismi 1677 - 1666 = 11,
     /// en 196 + 2. Turkce tarafta yeni anahtarlarin hicbiri kol degistirmiyor, tr 68'de kaliyor.</para>
+    ///
+    /// <para><b>19 Eylul 2026, dorduncu yenileme: toplam 1682, en 198, tr 68.</b> Suzgec yuzeyi
+    /// (E8) her dile uc <c>main.advanced.filters.*</c> anahtari ekledi; 126 anahtarin yalniz
+    /// besi kol degistiriyor (es/pt <c>label</c>, hu/ro <c>bad</c>, ro <c>label</c>). Ingilizce
+    /// "Picture filters" ve Turkce "Gorunt&#252; suzgecleri" zaten kurala uygun yazildi, o yuzden
+    /// en ve tr sayilari oynamadi.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1106,7 +1112,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1677, toplam);
+        Assert.Equal(1682, toplam);
         Assert.Equal(198, dilBasina["en"]);
         Assert.Equal(68, dilBasina["tr"]);
     }
@@ -1227,6 +1233,8 @@ public sealed class BaslikKapsamiTests
     ///
     /// <para><b>19 Eylul 2026, dorduncu yenileme: 42828.</b> Baslik secici (E4) dil basina tek
     /// <c>main.title.label</c> anahtari ekledi: 995 + 1 = 996, 43 x 996 = 42828. <c>kayip</c> yine 0.</para>
+    /// <para><b>19 Eylul 2026, besinci yenileme: 42957.</b> Suzgec yuzeyi (E8) dil basina uc
+    /// <c>main.advanced.filters.*</c> anahtari ekledi: 996 + 3 = 999, 43 x 999 = 42957. <c>kayip</c> yine 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1254,7 +1262,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(42828, gezilen);
+        Assert.Equal(42957, gezilen);
         Assert.Empty(kayip);
     }
 

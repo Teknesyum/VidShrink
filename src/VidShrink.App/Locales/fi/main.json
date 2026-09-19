@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Kooderipolku",
   "main.advanced.encoder-path.software": "Ohjelmisto",
   "main.advanced.encoder-path.hardware": "Laitteisto",
+  "main.advanced.filters.label": "Kuvasuotimet",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Suodinta ei ymmärretty",
   "main.advanced.codec-lock.label": "Koodekkilukko",
 
   "main.plan.title": "Mitä tehdään",

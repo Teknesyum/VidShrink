@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "குறியாக்கிப் பாதை",
   "main.advanced.encoder-path.software": "மென்பொருள்",
   "main.advanced.encoder-path.hardware": "வன்பொருள்",
+  "main.advanced.filters.label": "படக் காரணிகள்",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "வடிகட்டி புரியவில்லை",
   "main.advanced.codec-lock.label": "கோடெக் பூட்டு",
 
   "main.plan.title": "என்ன செய்யும்",

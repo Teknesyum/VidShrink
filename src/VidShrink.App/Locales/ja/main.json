@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "エンコーダー経路",
   "main.advanced.encoder-path.software": "ソフトウェア",
   "main.advanced.encoder-path.hardware": "ハードウェア",
+  "main.advanced.filters.label": "映像フィルター",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "フィルターを解釈できません",
   "main.advanced.codec-lock.label": "コーデック固定",
 
   "main.plan.title": "処理内容",

@@ -74,6 +74,13 @@ public sealed record CliRequest
     public double? MinDurationSeconds { get; init; }
 
     /// <summary>
+    /// <c>--suzgec</c>: cozumlenmis suzgec secenekleri. Ayristirma komut satiri okunurken yapilir,
+    /// bozuk dizge komutu daha kosum baslamadan durdurur. <c>null</c> ise motor bugunku
+    /// varsayilani kullanir; bos dizge de ayni kapiya cikar.
+    /// </summary>
+    public VideoFilterOptions? Filters { get; init; }
+
+    /// <summary>
     /// Kare ve bolum kollarini kaynaktan cozup kesit pencerisini saniyeye indirir. Donen
     /// metin hata anahtaridir; <c>null</c> ise <paramref name="resolved"/> kullanilabilir.
     /// </summary>
@@ -125,6 +132,7 @@ public sealed record CliRequest
             SpeedMode = Fast ? SpeedMode.Fast : SpeedMode.Quality,
             PreferredLanguage = PreferredLanguage
         };
+        if (Filters is { } suzgecler) options.Filters = suzgecler;
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
         options.LockedCrf = Crf;
         options.LockedPreset = Preset;
@@ -268,6 +276,19 @@ public static class CliParser
                     if (!TryParseNumber(asgari, out var asgariSn) || asgariSn < 0 || asgariSn > 86400)
                         return Fail("error.bad-min-duration", asgari);
                     request = request with { MinDurationSeconds = asgariSn };
+                    break;
+                case "--suzgec" or "--filters" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var suzgec)) return Fail("error.missing-value", arg);
+                    VideoFilterOptions cozulen;
+                    try
+                    {
+                        cozulen = VideoFilterChain.Parse(suzgec);
+                    }
+                    catch (ArgumentException)
+                    {
+                        return Fail("error.bad-filter", suzgec);
+                    }
+                    request = request with { Filters = cozulen };
                     break;
                 case "--json":
                     request = request with { Json = true };

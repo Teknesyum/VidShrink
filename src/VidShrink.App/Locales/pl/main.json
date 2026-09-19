@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Ścieżka kodera",
   "main.advanced.encoder-path.software": "Programowy",
   "main.advanced.encoder-path.hardware": "Sprzętowy",
+  "main.advanced.filters.label": "Filtry obrazu",
+  "main.advanced.filters.hint": "crop=S:W:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Nie rozpoznano filtra",
   "main.advanced.codec-lock.label": "Blokada kodeka",
 
   "main.plan.title": "Co zrobi",

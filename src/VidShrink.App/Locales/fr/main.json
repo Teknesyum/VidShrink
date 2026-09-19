@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Voie d'encodage",
   "main.advanced.encoder-path.software": "Logiciel",
   "main.advanced.encoder-path.hardware": "Matériel",
+  "main.advanced.filters.label": "Filtres d'image",
+  "main.advanced.filters.hint": "crop=L:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filtre non compris",
   "main.advanced.codec-lock.label": "Verrou de codec",
 
   "main.plan.title": "Ce qu'il va faire",

@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Via do codificador",
   "main.advanced.encoder-path.software": "Software",
   "main.advanced.encoder-path.hardware": "Hardware",
+  "main.advanced.filters.label": "Filtros de imagem",
+  "main.advanced.filters.hint": "crop=L:A:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Filtro não compreendido",
   "main.advanced.codec-lock.label": "Travar codec",
 
   "main.plan.title": "O que vai fazer",

@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "انکوڈر راستہ",
   "main.advanced.encoder-path.software": "سافٹ ویئر",
   "main.advanced.encoder-path.hardware": "ہارڈویئر",
+  "main.advanced.filters.label": "تصویری فلٹر",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "فلٹر سمجھ نہیں آیا",
   "main.advanced.codec-lock.label": "کوڈیک لاک",
 
   "main.plan.title": "یہ کیا کرے گا",

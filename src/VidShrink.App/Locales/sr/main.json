@@ -163,6 +163,9 @@
   "main.advanced.encoder-path.label": "Putanja enkodera",
   "main.advanced.encoder-path.software": "Softver",
   "main.advanced.encoder-path.hardware": "Hardver",
+  "main.advanced.filters.label": "Филтери слике",
+  "main.advanced.filters.hint": "crop=W:H:X:Y, denoise=hqdn3d, sharpen=medium",
+  "main.advanced.filters.bad": "Филтер није препознат",
   "main.advanced.codec-lock.label": "Zaključan kodek",
 
   "main.plan.title": "Šta će uraditi",
