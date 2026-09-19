@@ -144,3 +144,36 @@ olumsuz kontrolle bağlandı.
   belirliyor): `ClipExport.cs:101`, `SegmentEncoder.cs:383`, `ToolsOptions.cs:132`,
   `MpvEngine.cs:504`, `OvershootTrimmer.cs:123`, `FrameGrabber.cs:266`.
 - `_trace.Add(...)` satırları — test izi, kullanıcı yüzeyi değil.
+
+### Onizleme kusuru — 19 Eylul 2026
+
+Kullanicinin makinesinde cikan "Onizleme Ornegi Kodlanamadi" ekrani
+(`.claude/kanit/onizleme-hatasi-2026-09-19.jpg`) olculdu. Kok neden plan **passthrough**
+oldugunda ortaya cikiyor: kaynak zaten hedefin altindaysa `PlanCalculator` plani
+"oldugu gibi kopyala" diye kuruyor ve bu planda `Codec` kaynagin **cozucu** adini
+(`h264`), `Preset` ise `copy` tasiyor. `BuildSegment` bu plani kodlama argumanina
+ceviriyordu; ffmpeg'in gercek cevabi:
+
+```
+x264 [error]: invalid preset 'copy'
+[vf#0:0] Task finished with error code: -22 (Invalid argument)
+[enc:libx264] Could not open encoder before EOF
+Nothing was written into output file
+```
+
+Kor nokta: `BuildSegment` yedi cagri yerinde yalnizca **dizgi** olarak pimliydi, uretilen
+arguman hicbir olcude ffmpeg'e verilmiyordu. Once kosan olcu yazildi (`OnizlemeParcasiKosarTests`,
+`OnizlemeKaynakTaramaTests`), kusur onunla ureretildi, sonra duzeltildi.
+
+Duzeltme teslimin kendisiyle ayni: `EncodeRunner` passthrough'u kopyalayarak teslim ediyor,
+parca da `-c:v copy` ile kopyalaniyor. Boylece onizleme teslim edilecek goruntunun benzerini
+degil birebir kendisini gosteriyor; `PreviewQuality.Kopya` bu yuzden "yaklasik" rozetini almaz.
+
+| Mutasyon | Kirmizi |
+|---|---|
+| passthrough kolu dusuruldu (eski kusur geri geldi) | 3 |
+| kopya `-c:v copy` yerine kodlayiciya cevrildi | 1 |
+| `Kopya` kalitesi `Desteklenmiyor` oldu | 1 |
+| yaklasik rozeti kopyayi da isaretledi | 1 |
+
+Temel: 31 yesil, 0 kirmizi.

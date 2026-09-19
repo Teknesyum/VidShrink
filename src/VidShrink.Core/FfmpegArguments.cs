@@ -671,12 +671,43 @@ public static class FfmpegArguments
             return BuildSegment(info, flat, window.StartSeconds + startSeconds, durationSeconds, outputPath, availability, scenes);
         }
 
+        if (plan.ModeEnum == EncodeMode.PassThrough)
+            return BuildSegmentCopy(info, startSeconds, durationSeconds, outputPath);
+
         var a = new List<string>(Build(info, plan, outputPath, 0, null, availability, scenes));
         var input = a.IndexOf("-i");
         if (input < 0) throw new InvalidOperationException("Arguman dizisinde girdi bayragi yok.");
 
         a.InsertRange(input, new[] { "-ss", startSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
         a.InsertRange(input + 4, new[] { "-t", durationSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
+        return a;
+    }
+
+    /// <summary>
+    /// Passthrough planinin parcasi. Plan "kaynak zaten hedefin altinda, oldugu gibi
+    /// kopyalanacak" dedigi anda <see cref="EncodePlan.Codec"/> kaynagin <b>cozucu</b> adini
+    /// (<c>h264</c>), <see cref="EncodePlan.Preset"/> ise <c>copy</c> tasir; bunlar kodlayici
+    /// adi ve on ayar degildir. Bu plan kodlama argumanina cevrilirse ffmpeg
+    /// <c>x264 [error]: invalid preset 'copy'</c> der, kodlayici hic acilmaz, filtre grafigi
+    /// <c>-22</c> ile duser ve cikti 0 bayt kalir — kullanicinin 19 Eylul 2026'da gordugu
+    /// "Onizleme Ornegi Kodlanamadi" ekrani buydu
+    /// (<c>.claude/kanit/onizleme-hatasi-2026-09-19.jpg</c>).
+    ///
+    /// Dogrusu teslimin kendisiyle ayni: <see cref="EncodeRunner"/> passthrough'u kopyalayarak
+    /// teslim ediyor, parca da kopyalayarak gosterir. Boylece onizleme kullaniciya teslim
+    /// edilecek goruntunun <b>birebir</b> kendisini gosterir, benzerini degil.
+    /// </summary>
+    private static IReadOnlyList<string> BuildSegmentCopy(
+        MediaInfo info, double startSeconds, double durationSeconds, string outputPath)
+    {
+        var a = new List<string> { "-hide_banner", "-y" };
+        a.AddRange(new[] { "-ss", Seconds(startSeconds) });
+        a.AddRange(new[] { "-i", info.FilePath });
+        a.AddRange(new[] { "-t", Seconds(durationSeconds) });
+        a.AddRange(new[] { "-map", "0:v:0", "-an", "-sn", "-c:v", "copy" });
+        if (Path.GetExtension(outputPath).Equals(".mp4", StringComparison.OrdinalIgnoreCase))
+            a.AddRange(new[] { "-movflags", "+faststart" });
+        a.Add(outputPath);
         return a;
     }
 

@@ -13,7 +13,14 @@ public enum PreviewQuality
     Yaklasik,
 
     /// <summary>Kodlayicinin kalite olcegi modellenmiyor; parca planin kendi hiz kontrolunu tasir.</summary>
-    Desteklenmiyor
+    Desteklenmiyor,
+
+    /// <summary>
+    /// Plan kodlamiyor: kaynak zaten hedefin altinda ve oldugu gibi kopyalanacak. Parca da
+    /// kopyalanir, yani ekranda gorulen goruntu teslim edilecek dosyanin birebir kendisidir —
+    /// bu yuzden <see cref="Kesin"/>'den bile kesindir ve yaklasik rozeti almaz.
+    /// </summary>
+    Kopya
 }
 
 /// <summary>
@@ -75,7 +82,8 @@ public sealed record PreviewSegment
     /// Parcanin gordugu, tam kodlamadan sapmis bir yani var: ya kalite degeri tahmin, ya da
     /// ikinci gecis dusuruldu. Rozetin kosulu budur.
     /// </summary>
-    public bool IsApproximate => Quality.Kind != PreviewQuality.Kesin || DroppedSecondPass;
+    public bool IsApproximate =>
+        Quality.Kind is not (PreviewQuality.Kesin or PreviewQuality.Kopya) || DroppedSecondPass;
 
     /// <summary>Parcanin kodlanmasi icin ffmpeg argumanlari.</summary>
     public required IReadOnlyList<string> Arguments { get; init; }
@@ -99,6 +107,9 @@ public sealed record PreviewSegment
     /// </summary>
     public static PreviewQualityChoice QualityFor(MediaInfo info, EncodePlan plan, ComplexityProfile? complexity = null)
     {
+        if (plan.ModeEnum == EncodeMode.PassThrough)
+            return new PreviewQualityChoice(PreviewQuality.Kopya, null);
+
         if (!ModelledCodecs.Contains(plan.Codec))
             return new PreviewQualityChoice(PreviewQuality.Desteklenmiyor, null);
 
