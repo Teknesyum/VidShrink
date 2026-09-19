@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'Programs\VidShrink'),
     [switch]$NoLaunch,
     [switch]$SkipShortcuts,
@@ -379,14 +379,42 @@ function Write-Windows11ShellMenu([string]$Root, [string]$InstallDirectory) {
     return $true
 }
 
-function Get-ShellMenuLabel([string]$Language) {
-    $choice = $Language
-    if ($choice -eq 'auto') {
-        $interface = ''
-        try { $interface = (Get-UICulture).TwoLetterISOLanguageName } catch { }
-        if ($interface -eq 'tr') { $choice = 'tr' } else { $choice = 'en' }
+function Resolve-ShellMenuLanguage([string]$Language, [string]$LocalesFolder) {
+    $adaylar = @()
+    if ($Language -and $Language -ne 'auto') { $adaylar += $Language }
+    try { $adaylar += (Get-UICulture).Name } catch { }
+
+    foreach ($aday in $adaylar) {
+        $parcalar = @($aday -split '-' | Where-Object { $_ })
+        for ($uzunluk = $parcalar.Count; $uzunluk -ge 1; $uzunluk--) {
+            $etiket = ($parcalar[0..($uzunluk - 1)] -join '-')
+            if ($LocalesFolder -and (Test-Path -LiteralPath $LocalesFolder)) {
+                $klasor = Get-ChildItem -LiteralPath $LocalesFolder -Directory -ErrorAction SilentlyContinue |
+                    Where-Object { $_.Name -eq $etiket } | Select-Object -First 1
+                if ($klasor) { return $klasor.Name }
+            }
+            elseif ($etiket -eq 'tr' -or $etiket -eq 'en') { return $etiket.ToLowerInvariant() }
+        }
     }
-    if ($choice -eq 'tr') { return 'Bu Videoyu VidShrink ile A' + [char]0x00E7 }
+    return 'en'
+}
+
+function Get-LocalizedShellText([string]$Language, [string]$LocalesFolder, [string]$Key) {
+    if (-not $LocalesFolder) { return $null }
+    $dosya = Join-Path (Join-Path $LocalesFolder $Language) 'main.json'
+    if (-not (Test-Path -LiteralPath $dosya)) { return $null }
+    try {
+        $tablo = Get-Content -LiteralPath $dosya -Raw -Encoding UTF8 | ConvertFrom-Json
+        $metin = $tablo.$Key
+        if ($metin) { return $metin }
+    } catch { }
+    return $null
+}
+
+function Get-ShellMenuLabel([string]$Language, [string]$LocalesFolder) {
+    $metin = Get-LocalizedShellText $Language $LocalesFolder 'shell.menu.open'
+    if ($metin) { return $metin }
+    if ($Language -eq 'tr') { return 'Bu Videoyu VidShrink ile A' + [char]0x00E7 }
     return 'Open this video with VidShrink'
 }
 
@@ -394,14 +422,10 @@ function Get-ShellMenuAssociationRoot([string]$Root) {
     return (Join-Path $Root 'SystemFileAssociations')
 }
 
-function Get-ShellShrinkMenuLabel([string]$Language) {
-    $choice = $Language
-    if ($choice -eq 'auto') {
-        $interface = ''
-        try { $interface = (Get-UICulture).TwoLetterISOLanguageName } catch { }
-        if ($interface -eq 'tr') { $choice = 'tr' } else { $choice = 'en' }
-    }
-    if ($choice -eq 'tr') { return 'VidShrink ile K' + [char]0x00FC + [char]0x00E7 + [char]0x00FC + 'lt' }
+function Get-ShellShrinkMenuLabel([string]$Language, [string]$LocalesFolder) {
+    $metin = Get-LocalizedShellText $Language $LocalesFolder 'shell.menu.shrink'
+    if ($metin) { return $metin }
+    if ($Language -eq 'tr') { return 'VidShrink ile K' + [char]0x00FC + [char]0x00E7 + [char]0x00FC + 'lt' }
     return 'Shrink with VidShrink'
 }
 
@@ -477,8 +501,10 @@ function Write-ShellShrinkMenu([string]$Root, [string]$Executable, [string]$Labe
 
 function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language) {
     Remove-ShellMenu $Root | Out-Null
-    $written = Write-ShellMenu $Root $Executable (Get-ShellMenuLabel $Language)
-    $shrinkWritten = Write-ShellShrinkMenu $Root $Executable (Get-ShellShrinkMenuLabel $Language)
+    $locales = Join-Path (Join-Path (Split-Path -Parent $Executable) 'app') 'Locales'
+    $dil = Resolve-ShellMenuLanguage $Language $locales
+    $written = Write-ShellMenu $Root $Executable (Get-ShellMenuLabel $dil $locales)
+    $shrinkWritten = Write-ShellShrinkMenu $Root $Executable (Get-ShellShrinkMenuLabel $dil $locales)
     $modern = Write-Windows11ShellMenu $Root (Split-Path -Parent $Executable)
     $path = if ($modern) { 'Windows 11 birincil ve klasik' } else { 'Windows 10 klasik' }
     Write-Host "Sağ tık menüsü $written uzantıya, küçültme alt menüsü $shrinkWritten girdiye yazıldı ($path menü)." -ForegroundColor Green

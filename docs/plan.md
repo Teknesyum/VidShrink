@@ -586,6 +586,68 @@ kör bir muafiyet olmadığı `IShareProvider.cs` üstünden pozitif kontrolle p
 
 Sıfır yok. Toplam 77 ölçü; geri alındıktan sonra taban yine 0/77.
 
+## Kurucunun sağ tık etiketi 42 dile — plan
+
+**Kusur.** Sağ tık menüsünün etiketini üç yer yazıyor, ikisi iki dille sınırlı:
+
+- `Install-VidShrink.ps1:389,405` — `if ($choice -eq 'tr')` ile Türkçe, değilse İngilizce.
+- `src/VidShrink.Core/Setup/ShellRegistration.cs:47,50` — aynı üçlü, gömülü metinle.
+- `src/VidShrink.App/MainWindow.KabukMenusu.cs:98,100` — `shell.menu.open` /
+  `shell.menu.shrink` anahtarlarından, 42 dilin hepsinde çevrili.
+
+Almanca Windows'ta kurup uygulamayı hiç açmadan bir videoya sağ tıklayan kullanıcı
+İngilizce etiket görüyor. Uygulama ilk açılışta `RelabelShellMenu` ile düzeltiyor —
+yani kusur kalıcı değil, ama kurulumla ilk açılış arasındaki her sağ tıkta duruyor.
+
+**Çeviri zaten var, kurucu ona bakmıyor.** `shell.menu.open` 42 dilde çevrili ve
+`Locales\**\*.json` yayına kopyalanıyor; menü yazıldığı anda (`Mark("dosyalar-yerinde")`
+sonrası) `app\Locales\<dil>\main.json` diskte duruyor. Kurucunun okuması yeterli.
+
+**Neden `Strings` kullanılamıyor.** `Strings` App'te; `VidShrink.Setup`
+`InvariantGlobalization=true` ile derleniyor ve `CultureInfo` orada güvenilir değil —
+`KulturTuzakTeliTests` bu ayrımı zaten pimliyor. O yüzden dil kodu Win32'den
+(`GetUserDefaultLocaleName`) alınacak, çeviri dosyadan okunacak.
+
+### Adımlar
+
+1. `ResolveLanguage` artık `tr`/`en`'e indirmez: seçim ya da işletim sisteminin dil
+   etiketi, `Locales` altında karşılığı olan klasör adına eşlenir; yoksa `en`.
+2. `OpenLabel`/`ShrinkLabel` dosyadan okur (`<kurulum>pp\Locales\<dil>\main.json`),
+   dosya yoksa bugünkü gömülü İngilizce metne düşer.
+3. `VidShrink.Setup/Program.cs:132` LCID kıyası yerine `GetUserDefaultLocaleName`.
+4. `Install-VidShrink.ps1` aynı dosyayı `ConvertFrom-Json` ile okur; iki yazıcının
+   aynı metni ürettiği sınanır.
+
+### Ölçü
+
+Üç yazıcının aynı dilde aynı etiketi verdiği, `Locales`'te olmayan dilin `en`'e düştüğü,
+`Locales` klasörü hiç yokken kurulumun çakmadığı sınanır. Mutasyon: dosya okumasını
+sabit metne çevirmek, düşüş kolunu kaldırmak, dil eşlemesini `tr`/`en`'e geri indirmek.
+
+
+### Sonuç — 19 Eylül 2026
+
+Üç yazıcı da aynı dosyayı okuyor. Kurucunun dil kodu artık `GetUserDefaultLocaleName`'den
+geliyor ve `Locales` klasör adlarıyla en uzun eşleşmeye iniyor: `zh-Hans-CN` → `zh-Hans`,
+`pt-BR` → `pt`, karşılığı olmayan `kl-GL` → `en`. Klasör yerinde değilse eski iki dilli
+kol duruyor.
+
+`SetupRunner`'ın klasörü geçirdiği ilk turda **sıfır kırmızı** verdi: gövde doğruydu ama
+çağrı yeri pimsizdi, klasör hiç geçirilmese her dil İngilizceye düşerdi. Ayrı pim yazıldı.
+
+| kesim | kırmızı |
+|---|---|
+| taban | 0 |
+| M1 etiket dosyadan okunmuyor | 7 |
+| M2 eşleme tr/en'e iniyor | 4 |
+| M3 yalnız tam etiket eşleniyor | 6 |
+| M4 düşüş kolu `en` yerine `tr` | 4 |
+| M5 gömülü metin `tr`'ye bakmıyor | 1 |
+| M6 kurucu klasörü geçirmiyor | **0 → 1** |
+| M7 betik çevirilere bakmıyor | 1 |
+
+Toplam 54 ölçü; geri alındıktan sonra taban yine 0/54.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

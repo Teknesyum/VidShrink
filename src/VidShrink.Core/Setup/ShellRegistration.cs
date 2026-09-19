@@ -1,7 +1,8 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
+using System.Text.Json;
 using Microsoft.Win32;
 
 namespace VidShrink.Core.Setup;
@@ -34,20 +35,89 @@ public static class ShellRegistration
             throw new SetupException($"Gerçek kayıt köküne yalnız {SetupExecutableName} yazar: {classesRoot}");
     }
 
-    public static string ResolveLanguage(string choice, Func<string> uiLanguage)
+    /// <summary>
+    /// Kurulumda çevirilerin durduğu klasör. Menü yazıldığında (<c>dosyalar-yerinde</c>
+    /// damgasından sonra) bu klasör diskte hazırdır.
+    /// </summary>
+    public static string LocalesFolder(string installRoot) =>
+        Path.Combine(installRoot, "app", "Locales");
+
+    /// <summary>
+    /// Menü etiketinin yazılacağı dil. Seçim ya da işletim sisteminin etiketi
+    /// <paramref name="localesFolder"/> altındaki klasör adlarıyla eşlenir; en uzun
+    /// eşleşme kazanır (<c>zh-Hans-CN</c> → <c>zh-Hans</c>). Klasör verilmediğinde ya da
+    /// yerinde olmadığında yalnız <c>tr</c> ve <c>en</c> tanınır — kurucu çevirileri
+    /// okuyamadan menü yazmak zorunda kalırsa eski davranış geçerlidir.
+    /// </summary>
+    public static string ResolveLanguage(string choice, Func<string> uiLanguage, string? localesFolder = null)
     {
-        if (choice is "tr" or "en") return choice;
+        if (Match(choice, localesFolder) is { } secilen) return secilen;
+
         string ui;
         try { ui = uiLanguage(); }
         catch (Exception) { ui = ""; }
-        return ui == "tr" ? "tr" : "en";
+        return Match(ui, localesFolder) ?? "en";
     }
 
-    public static string OpenLabel(string language) =>
-        language == "tr" ? "Bu Videoyu VidShrink ile Aç" : "Open this video with VidShrink";
+    private static string? Match(string? tag, string? localesFolder)
+    {
+        if (string.IsNullOrWhiteSpace(tag)) return null;
 
-    public static string ShrinkLabel(string language) =>
-        language == "tr" ? "VidShrink ile Küçült" : "Shrink with VidShrink";
+        var parcalar = tag.Trim().Split('-', StringSplitOptions.RemoveEmptyEntries);
+        for (var uzunluk = parcalar.Length; uzunluk >= 1; uzunluk--)
+        {
+            var aday = string.Join('-', parcalar[..uzunluk]);
+            if (localesFolder is null || !Directory.Exists(localesFolder))
+            {
+                if (aday.Equals("tr", StringComparison.OrdinalIgnoreCase) ||
+                    aday.Equals("en", StringComparison.OrdinalIgnoreCase))
+                    return aday.ToLowerInvariant();
+                continue;
+            }
+
+            var klasor = Directory.EnumerateDirectories(localesFolder)
+                .FirstOrDefault(d => string.Equals(Path.GetFileName(d), aday, StringComparison.OrdinalIgnoreCase));
+            if (klasor is not null) return Path.GetFileName(klasor);
+        }
+
+        return null;
+    }
+
+    public static string OpenLabel(string language, string? localesFolder = null) =>
+        Label(language, localesFolder, "shell.menu.open",
+            "Bu Videoyu VidShrink ile Aç", "Open this video with VidShrink");
+
+    public static string ShrinkLabel(string language, string? localesFolder = null) =>
+        Label(language, localesFolder, "shell.menu.shrink",
+            "VidShrink ile Küçült", "Shrink with VidShrink");
+
+    /// <summary>
+    /// Etiketi yayına kopyalanan <c>main.json</c>'dan okur. Dosya yoksa ya da anahtar
+    /// boşsa gömülü iki metne düşer: kurucu yarım bir ağaçta da menü yazabilmeli.
+    /// </summary>
+    private static string Label(string language, string? localesFolder, string key, string tr, string en)
+    {
+        if (localesFolder is not null)
+        {
+            var dosya = Path.Combine(localesFolder, language, "main.json");
+            try
+            {
+                if (File.Exists(dosya))
+                {
+                    using var belge = JsonDocument.Parse(File.ReadAllText(dosya));
+                    if (belge.RootElement.TryGetProperty(key, out var deger) &&
+                        deger.ValueKind == JsonValueKind.String &&
+                        deger.GetString() is { Length: > 0 } metin)
+                        return metin;
+                }
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException)
+            {
+            }
+        }
+
+        return language.Equals("tr", StringComparison.OrdinalIgnoreCase) ? tr : en;
+    }
 
     public static string SoftwareRoot(string classesRoot) =>
         SetupOptions.IsDefaultClassesRoot(classesRoot) ? "Software" : classesRoot.TrimEnd('\\');
@@ -60,13 +130,13 @@ public static class ShellRegistration
     }
 
     [SupportedOSPlatform("windows")]
-    public static int WriteMenus(string classesRoot, string executable, string language)
+    public static int WriteMenus(string classesRoot, string executable, string language, string? localesFolder = null)
     {
         RequireWriteAllowed(classesRoot);
         RemoveMenus(classesRoot);
         var associations = classesRoot.TrimEnd('\\') + @"\SystemFileAssociations";
-        var openLabel = OpenLabel(language);
-        var shrinkLabel = ShrinkLabel(language);
+        var openLabel = OpenLabel(language, localesFolder);
+        var shrinkLabel = ShrinkLabel(language, localesFolder);
         var user = Registry.CurrentUser;
 
         foreach (var extension in ShellIntegration.MediaExtensions)

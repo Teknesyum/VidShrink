@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
 using System.Runtime.Versioning;
 
@@ -155,9 +155,10 @@ public static class SetupRunner
             if (!options.SkipShortcuts)
             {
                 WriteShortcuts(options, host, root, installedExe);
-                var language = ShellRegistration.ResolveLanguage(options.MenuLanguage, host.UiLanguage);
+                var locales = ShellRegistration.LocalesFolder(root);
+                var language = ShellRegistration.ResolveLanguage(options.MenuLanguage, host.UiLanguage, locales);
                 var modernTask = Task.Run(() => RegisterModernMenu(options, host, root), cancellationToken);
-                var shrinkWritten = ShellRegistration.WriteMenus(options.ClassesRoot, installedExe, language);
+                var shrinkWritten = ShellRegistration.WriteMenus(options.ClassesRoot, installedExe, language, locales);
                 var associated = ShellRegistration.WriteFileAssociation(options.ClassesRoot, installedExe);
                 if (options.DefaultRegistry) host.AssociationChanged();
                 modern = await modernTask;

@@ -129,7 +129,7 @@ internal static partial class Program
         Shortcuts = new ShellShortcuts(),
         ShellPackage = new PowerShellPackage(),
         Windows11 = Environment.OSVersion.Version.Build >= 22000,
-        UiLanguage = () => (GetUserDefaultUILanguage() & 0x3FF) == 0x1F ? "tr" : "en",
+        UiLanguage = UserLocaleName,
         Launch = path => Process.Start(new ProcessStartInfo(path) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(path) })?.Dispose(),
         AssociationChanged = ShellRegistration.NotifyAssociationChanged,
         DesktopDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
@@ -167,6 +167,29 @@ internal static partial class Program
 
     [DllImport("kernel32.dll")]
     private static extern ushort GetUserDefaultUILanguage();
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetUserDefaultLocaleName(System.Text.StringBuilder name, int size);
+
+    /// <summary>
+    /// İşletim sisteminin dil etiketi (<c>de-DE</c>, <c>zh-Hans-CN</c>). Kurucu
+    /// <c>InvariantGlobalization</c> ile derlendiği için <c>CultureInfo</c> burada
+    /// güvenilir değil; etiket doğrudan Win32'den alınıp klasör adıyla eşlenir.
+    /// Çağrı başarısız olursa eski iki dilli kola düşülür.
+    /// </summary>
+    private static string UserLocaleName()
+    {
+        try
+        {
+            var tampon = new System.Text.StringBuilder(85);
+            if (GetUserDefaultLocaleName(tampon, tampon.Capacity) > 0) return tampon.ToString();
+        }
+        catch (Exception e) when (e is EntryPointNotFoundException or DllNotFoundException)
+        {
+        }
+
+        return (GetUserDefaultUILanguage() & 0x3FF) == 0x1F ? "tr" : "en";
+    }
 
     [DllImport("kernel32.dll")]
     private static extern uint GetConsoleProcessList(uint[] processes, uint count);
