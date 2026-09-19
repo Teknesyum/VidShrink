@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using System.Globalization;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using VidShrink.App;
+using VidShrink.App.Localization;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -284,4 +286,62 @@ public sealed class TasmaKarariTests
         Preset = "ultrafast",
         ExtraArgs = new List<string> { "-threads", "1" }
     };
+
+    /// <summary>
+    /// "Buyuk haliyle kabul et" ile "Kesip sigdir" yazilarini koddan aliyor: XAML'da Content
+    /// yok, arayuz taramasi da statik XAML okudugu icin ikisini "adsiz dugme" sayiyordu. XAML'a
+    /// yer tutucusuz sabit ad kondu, kod da tazelerken adi canli yaziya esitliyor.
+    ///
+    /// <para>Kesme kolu gizliyken yazi kurulmuyor; o yolda adin sabit karsiliga dustugu ayrica
+    /// pimli. Olumsuz kontrol adin bos ya da yer tutuculu kalmamasi.</para>
+    /// </summary>
+    [Fact]
+    public void TasmaDugmeleriEkranOkuyucuyaAdiylaGorunuyor()
+    {
+        var kesimler = new[] { new TrimPlan(TrimSide.End, 0, 137.2, 141.4, 16_000_000) };
+        var soru = new RetryPrompt(3, 3, 16, 16.4, TimeSpan.FromSeconds(30), false, 0, kesimler);
+
+        var okunan = AppHost.Run(() =>
+        {
+            var pencere = new MainWindow();
+            try
+            {
+                var kabulIlk = AutomationProperties.GetName(pencere.BtnRetryAccept);
+                var kesmeIlk = AutomationProperties.GetName(pencere.BtnRetryTrim);
+
+                pencere.ShowRetryAskForTest(soru);
+                var kabul = AutomationProperties.GetName(pencere.BtnRetryAccept);
+                var kabulYazi = pencere.BtnRetryAccept.Content as string;
+                var kesme = AutomationProperties.GetName(pencere.BtnRetryTrim);
+                var kesmeYazi = pencere.BtnRetryTrim.Content as string;
+
+                pencere.ShowRetryAskForTest(soru with { Trims = Array.Empty<TrimPlan>() });
+                var kesmeGizli = AutomationProperties.GetName(pencere.BtnRetryTrim);
+
+                return (kabulIlk, kesmeIlk, kabul, kabulYazi, kesme, kesmeYazi, kesmeGizli, kesmeGorunur: pencere.BtnRetryTrim.IsVisible);
+            }
+            finally { pencere.Close(); }
+        });
+
+        Assert.Equal(Strings.Get("main.retry.accept.name"), okunan.kabulIlk);
+        Assert.Equal(Strings.Get("main.retry.trim.name"), okunan.kesmeIlk);
+
+        Assert.Equal(okunan.kabulYazi, okunan.kabul);
+        Assert.Equal(okunan.kesmeYazi, okunan.kesme);
+        Assert.Contains(Strings.Get("main.retry.accept.name"), okunan.kabul);
+        Assert.NotEqual(Strings.Get("main.retry.accept.name"), okunan.kabul);
+        Assert.Contains(Strings.Get("main.retry.trim.name"), okunan.kesme);
+        Assert.Matches(@"\d", okunan.kabul);
+        Assert.Matches(@"\d", okunan.kesme);
+
+        Assert.False(okunan.kesmeGorunur);
+        Assert.Equal(Strings.Get("main.retry.trim.name"), okunan.kesmeGizli);
+        Assert.NotEqual(okunan.kesme, okunan.kesmeGizli);
+
+        foreach (var ad in new[] { okunan.kabul, okunan.kesme, okunan.kesmeGizli })
+        {
+            Assert.False(string.IsNullOrWhiteSpace(ad));
+            Assert.DoesNotContain("{0}", ad);
+        }
+    }
 }

@@ -3996,11 +3996,19 @@ public partial class MainWindow : Window
             ? Say("main.retry.meaning-with-fallback", Num(prompt.FallbackMb, "0.0"))
             : Say("main.retry.meaning-without-fallback");
         BtnRetryAgain.IsVisible = prompt.CanRetry;
-        BtnRetryAccept.Content = Say("main.retry.accept", Num(prompt.ActualMb, "0.0"));
+        var kabulYazisi = Say("main.retry.accept", Num(prompt.ActualMb, "0.0"));
+        BtnRetryAccept.Content = kabulYazisi;
+        AutomationProperties.SetName(BtnRetryAccept, kabulYazisi);
         var canTrim = prompt.Trims is { Count: > 0 };
         BtnRetryTrim.IsVisible = canTrim;
         if (canTrim)
-            BtnRetryTrim.Content = Say("main.retry.trim", Num(prompt.Trims!.Min(plan => plan.RemovedSeconds), "0.#"));
+        {
+            var kirpmaYazisi = Say("main.retry.trim", Num(prompt.Trims!.Min(plan => plan.RemovedSeconds), "0.#"));
+            BtnRetryTrim.Content = kirpmaYazisi;
+            AutomationProperties.SetName(BtnRetryTrim, kirpmaYazisi);
+        }
+        else
+            AutomationProperties.SetName(BtnRetryTrim, Say("main.retry.trim.name"));
         RbTrimEnd.IsEnabled = prompt.TrimFor(TrimSide.End) is not null;
         RbTrimStart.IsEnabled = prompt.TrimFor(TrimSide.Start) is not null;
         RbTrimBoth.IsEnabled = prompt.TrimFor(TrimSide.Both) is not null;

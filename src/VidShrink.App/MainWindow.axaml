@@ -816,8 +816,8 @@
                         <TextBlock x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
                         <WrapPanel>
                           <Button x:Name="BtnRetryAgain" Content="{loc:Text main.retry.again}" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
-                          <Button x:Name="BtnRetryTrim" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryTrim"/>
-                          <Button x:Name="BtnRetryAccept" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAccept"/>
+                          <Button x:Name="BtnRetryTrim" auto:AutomationProperties.Name="{loc:Text main.retry.trim.name}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryTrim"/>
+                          <Button x:Name="BtnRetryAccept" auto:AutomationProperties.Name="{loc:Text main.retry.accept.name}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAccept"/>
                           <Button x:Name="BtnRetryStop" Content="{loc:Text main.retry.stop}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
                         </WrapPanel>
                         <StackPanel x:Name="RetryTrimPanel" IsVisible="False" Spacing="{StaticResource SpaceSm}">

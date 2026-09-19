@@ -93,7 +93,7 @@ public sealed class LanguageTests : IDisposable
     {
         "Vid", "Shrink", "Buy Me a Coffee", "Teknesyum",
         "MB", "CRF", "1280x720",
-        "MP4", "MKV", "WebM", "MOV", "AVI", "GIF", "MP3", "M4A", "WAV",
+        "MP4", "MKV", "WebM", "MOV", "AVI", "GIF", "MP3", "M4A", "WAV", "FLAC",
         "H.264", "H.265", "VP9", "AV1", "AAC", "Opus", "PCM"
     };
 
@@ -290,6 +290,7 @@ public sealed class LanguageTests : IDisposable
     private static readonly string[] CodeNamesThatStayInCode =
     {
         "Buy me a coffee", "Buy Me a Coffee",
+        "Dolby Digital (AC-3)", "Dolby Digital Plus (E-AC-3)",
         "Windows ARM64", "macOS Apple Silicon (arm64)", "macOS Intel (x64)", "Linux ARM64",
         "GIF palette", "GIF encode",
         "no space left", "not enough space", "disk full", "insufficient disk space",
