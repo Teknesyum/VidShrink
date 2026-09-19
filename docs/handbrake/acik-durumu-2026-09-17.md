@@ -180,3 +180,37 @@ Fable'a gidecek yeni açık sorular (belgelerde "açık" diye kalanlar):
 
 Paralel gruplar dosya kesişmesine göre: A1-A5 birbirine dokunmuyor (A5 yalnız `tools/`/`docs/`). B1→B2 ve B1→B4
 sıralı; B3 bağımsız. C1 tek başına, en son.
+
+## 5. 19 Eylül 2026 Denetimi — Yukarıdaki Sıra Nerede
+
+§4'ün tablosu 17 Eylül'ün fotoğrafıydı; iki günde dalgalar girdi ve tablo bayatladı. Aşağıdaki
+satırlar tabloyu silmiyor, üstüne bugünkü ölçümü yazıyor. Her satır kodda okundu; "yapılmadı"
+diyen satır da bir dosya ve satır numarası gösteriyor.
+
+| İş | Bugün | Kanıt |
+|---|---|---|
+| A1 filtre zinciri | **girdi** | `VideoFilterChainTests` / `FiltreYoklamaTests`, `docs/olcumler/handbrake-filtre.md` |
+| A2 ön ayar kütüphanesi | **girdi** | `Core/PresetLibrary.cs`, `Core/Presets/platformlar.json`, `OnAyarKutuphanesiTests` |
+| A3 `izle` | **girdi** | `Core/WatchFolder.cs`, `WatchFolderTests` |
+| A5 CLI ürün yolu + HB SVT hız kolu | **girdi** | `hb.ps1:1610` `urun-cli`, `:1832` svt kolu, `docs/olcumler/handbrake-kiyas-cli.md`, koşum 35248903679, birleşme `ef8e6931` |
+| B1a flac/ac3/eac3 **kodlama** | yapılmadı | `Core/PlanParser.cs:14` hâlâ `aac, libopus, libmp3lame, copy` |
+| B1b loudnorm / gain | yapılmadı | depoda `loudnorm` geçmiyor |
+| B1c harici SRT/ASS | yapılmadı | dış altyazı yalnız oynatıcıda (P28), küçültme yolunda yok |
+| B1d kapak resmi | yapılmadı | `Ffmpeg/FfprobeClient.cs:302-305` `attached_pic`'i yalnız eliyor, taşımıyor |
+| B1e forced | **kısmen** | `IsForced` taşınıyor (`Core/StreamMapping.cs:30,48,55,318,327,335,339`), otomatik seçim yok |
+| B1f yakma | yapılmadı | A1'in filtre noktasında altyazı yakma kolu yok |
+| B2 küçültmeye aralık | denetlenmedi | bu turda okunmadı |
+| B3 VT plan yolu / VP9 küçültme | yapılmadı | `Core/PlanParser.cs:13` `AllowedCodecs`'te `*_videotoolbox` yok; VP9 hâlâ yalnız dönüştürücüde |
+| B4 HDR10+/DV | yapılmadı | `hdr10plus\|dolby\|dovi\|dynamic_hdr` taraması 0 sonuç |
+| C1-1 `Saturated` satırı | yapılmadı | arayüzde tüketici yok |
+| C1-2 kuyruk düzenleme | yapılmadı | — |
+| C1-3 klasör bırakma | yapılmadı | `MainWindow.axaml.cs:2759-2764` `IStorageFolder`'ı geri çeviriyor |
+| C1-4 "bitince" eylemi | yapılmadı | — |
+| C1-5 filtre paneli | **çekirdek var, yüzey yok** | mantık A1'de; arayüz tek metin kutusu (`MainWindow.axaml:629` → `MainWindow.axaml.cs:1988`) |
+| C1-6 iz paneli | yapılmadı | yalnız `ChkAdvKeepTracks` (`MainWindow.axaml:506`) |
+| C1-7 ön ayar yüzeyi | **kısmen** | `App/MainWindow.OnAyar.cs`, `PresetUndoBar` (`MainWindow.axaml:402`); içe/dışa aktarma yüzeyi dar |
+| D2 karanlık geçişin kapsamı | genişletilmedi | `Core/DarkContentSwitch.cs:21-27` hâlâ Auto + Aggressive/Extreme + libsvtav1 |
+| D3 macOS 14 libmpv | **girdi** | `install-vidshrink.sh:298-305`, `tools/mpvkit-macos/mpvkit-1.0.0.lock`, `.github/workflows/macos-mpvkit.yml:106-159` |
+
+Fable'ın on kararı 17 Eylül'de geldi ve `docs/handbrake/fable-kararlar-2026-09-17.md`'de duruyor;
+"fable'da bekliyor" diyen her not o tarihten itibaren yanlıştır.
