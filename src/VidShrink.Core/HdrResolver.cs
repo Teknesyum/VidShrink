@@ -1,4 +1,4 @@
-namespace VidShrink.Core;
+﻿namespace VidShrink.Core;
 
 public sealed record HdrResolution(string PixelFormat, string? VideoFilter, IReadOnlyList<string> ColorArgs, bool PolicyChanged)
 {
@@ -83,7 +83,7 @@ public static class HdrResolver
             return encoderState == EncoderProbeState.Working;
         }
 
-        if (availability is IEncoderMeasurementState state && !state.IsHdr10Measured(codec))
+        if (availability is IHdr10ProbeAvailability probe && probe.Hdr10State(codec) == EncoderProbeState.Unmeasured)
         {
             notMeasured = true;
             return true;

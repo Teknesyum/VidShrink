@@ -180,13 +180,14 @@ public sealed class PlanCalculatorProbeTests
     /// Hicbir kodlayici olculmemis diyen yetenek nesnesi. <see cref="PlanCalculator"/> bunu
     /// gorunce "donanim yok" dememeli, "heniz olculmedi" demeli.
     /// </summary>
-    private sealed class UnmeasuredAvailability : IEncoderAvailability, IHdr10EncoderAvailability, IEncoderMeasurementState
+    private sealed class UnmeasuredAvailability
+        : IEncoderAvailability, IHdr10EncoderAvailability, IHdr10ProbeAvailability
     {
         public bool HasEncoder(string name) => true;
         public bool WorksAsEncoder(string codec) => false;
         public string? Hdr10PixelFormat(string codec) => null;
-        public bool IsMeasured(string codec) => false;
-        public bool IsHdr10Measured(string codec) => false;
+        public EncoderProbeState EncoderState(string codec) => EncoderProbeState.Unmeasured;
+        public EncoderProbeState Hdr10State(string codec) => EncoderProbeState.Unmeasured;
     }
 
     /// <summary>
@@ -511,6 +512,67 @@ public sealed class PlanCalculatorProbeTests
     }
 
     /// <summary>Gecidin arka plandaki yoklamalari bitene kadar bekler, ustten sinirli.</summary>
+    /// <summary>
+    /// K8 borcu 3. Tetik artik uc durumlu yuzun kendisinde: <c>EncoderState</c> sormak
+    /// olculmemis kodlayiciyi kuyruga aliyor. Eskiden tetik ayri bir
+    /// <c>IEncoderMeasurementState</c> arayuzundeydi ve Core cevabi aldiktan sonra ikinci
+    /// bir cagriyla olcumu baslatiyordu; arayuz kalkinca tetigin cevapla birlikte gelmesi
+    /// gerekiyor. Olumsuz kontrol: hic sorulmayan kodlayici yoklamaya gitmiyor.
+    /// </summary>
+    [Fact]
+    public void UcDurumluYuzeSormakOlcumuKuyrugaAliyor()
+    {
+        var source = new RecordingAvailability(TimeSpan.Zero);
+        var gate = new MainWindow.DeferredEncoderAvailability(source, () => { });
+
+        Assert.Equal(EncoderProbeState.Unmeasured, gate.EncoderState("av1_nvenc"));
+
+        var clock = Stopwatch.StartNew();
+        while (gate.Pending && clock.ElapsedMilliseconds < 15000) Thread.Sleep(5);
+
+        Assert.Contains("works:av1_nvenc", source.Calls);
+        Assert.DoesNotContain("works:hevc_nvenc", source.Calls);
+    }
+
+    /// <summary>
+    /// Ayni tetik HDR10 kolunda: <see cref="HdrResolver"/> yalnizca
+    /// <see cref="IHdr10ProbeAvailability"/> uzerinden soruyor, sormak olcumu baslatmali.
+    /// Olumsuz kontrol: kodlayici yoklamasi bu soruyla baslamiyor.
+    /// </summary>
+    [Fact]
+    public void Hdr10YuzuneSormakOlcumuKuyrugaAliyor()
+    {
+        var source = new RecordingAvailability(TimeSpan.Zero);
+        var gate = new MainWindow.DeferredEncoderAvailability(source, () => { });
+
+        Assert.Equal(EncoderProbeState.Unmeasured, ((IHdr10ProbeAvailability)gate).Hdr10State("hevc_nvenc"));
+
+        var clock = Stopwatch.StartNew();
+        while (gate.Pending && clock.ElapsedMilliseconds < 15000) Thread.Sleep(5);
+
+        Assert.Contains("hdr10:hevc_nvenc", source.Calls);
+        Assert.DoesNotContain("works:hevc_nvenc", source.Calls);
+    }
+
+    /// <summary>
+    /// Yerlesen cevap ucuncu duruma geri dusmuyor ve tekrar sormak ikinci bir yoklama
+    /// dogurmuyor — tetigin cevabin yanina tasinmasi kuyruklamayi cogaltmadi.
+    /// </summary>
+    [Fact]
+    public void YerlesenCevapTekrarSorulunca_YenidenYoklanmiyor()
+    {
+        var source = new RecordingAvailability(TimeSpan.Zero, works: c => c == "h264_nvenc");
+        var gate = new MainWindow.DeferredEncoderAvailability(source, () => { });
+
+        Drain(gate, "h264_nvenc");
+        var ilk = source.Count("works:h264_nvenc");
+
+        Assert.Equal(EncoderProbeState.Working, gate.EncoderState("h264_nvenc"));
+        Assert.Equal(EncoderProbeState.Working, gate.EncoderState("h264_nvenc"));
+
+        Assert.Equal(ilk, source.Count("works:h264_nvenc"));
+    }
+
     private static void Drain(MainWindow.DeferredEncoderAvailability gate, string codec)
     {
         for (var i = 0; i <= MainWindow.DeferredEncoderAvailability.MaxAttempts; i++)

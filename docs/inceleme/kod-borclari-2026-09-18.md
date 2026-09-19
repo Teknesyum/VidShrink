@@ -19,9 +19,13 @@ açıkça "bu kod kalkacak" diyor.
 2. ~~Aynı kör noktanın ikincisi: `UpdateCheck.ManifestTimeout`.~~ **Kapandı:** aynı ölçüyle.
    Üçüncüsü `DeveloperUnlock.Window` idi; gerekçesinde kör nokta zaten itiraf edilmişti.
    Üç pim de kaldırıldı: düzenek artık yanlış bir iddiayı pimlemiyor.
-3. `src/VidShrink.Core/PlanCalculator.cs:146-149` — `IEncoderMeasurementState` kendini
+3. ~~`src/VidShrink.Core/PlanCalculator.cs:146-149` — `IEncoderMeasurementState` kendini
    geçici ilan ediyor ama dört üretim yerinde tüketiliyor; T129 birleşince sökülecek iş
-   her yeni çağrı yeriyle büyüyor.
+   her yeni çağrı yeriyle büyüyor.~~ **Kapandı — öncülü yanlıştı:** arayüz yalnız durum
+   taşımıyordu, ertelenmiş yoklamayı kuyruğa alan **tetik** de oydu; Core çağrı yerlerini
+   silmek yoklamayı tümden durdururdu. Tetik üç durumlu yüze taşındı, arayüz kalktı.
+   Ölçüm `docs/olcumler/k8-yoklama-tetigi-2026-09-19.md` (taban 0/86, beş kesimin beşi
+   kırmızı).
 4. `src/VidShrink.App/MainWindow.axaml.cs` — 4980 satır, depodaki en büyük dosya
    (ikincisi 1883). Yoklama siyaseti, donanım hükmü ve `ReasonCode` kolları Core yerine
    pencerede duruyor. **Şüpheli:** nicel gözlem, hüküm değil.

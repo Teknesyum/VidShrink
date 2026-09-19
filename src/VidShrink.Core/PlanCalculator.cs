@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("VidShrink.Tests")]
@@ -144,23 +144,6 @@ public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double P
     /// bu plana bakip "donanim yok" dememeli, olcum gelince yeniden hesap yapmali.
     /// </summary>
     public bool HardwareNotMeasured { get; init; }
-}
-
-/// <summary>
-/// Yoklamanin ucuncu durumu: "henuz olculmedi". <see cref="IEncoderAvailability"/> yalniz
-/// evet/hayir soyleyebiliyor ve olculmemis bir kodlayici orada "hayir" gorunuyor; bu, henuz
-/// sorulmamis bir donanimi yokmus gibi gostermek demek. Bu arayuz o ayrimi tasiyor.
-///
-/// Gecici: T129 ayni ayrimi <c>EncoderProbeResult</c> uzerinde aciyor. O is birlestiginde
-/// buradaki temsil oraya devredilir ve bu arayuz kalkar.
-/// </summary>
-public interface IEncoderMeasurementState
-{
-    /// <summary>Kodlayicinin calisip calismadigi olculdu mu.</summary>
-    bool IsMeasured(string codec);
-
-    /// <summary>Kodlayicinin HDR10 piksel bicimi olculdu mu.</summary>
-    bool IsHdr10Measured(string codec);
 }
 
 public readonly record struct LayoutScoreParts(

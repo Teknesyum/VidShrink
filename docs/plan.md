@@ -1291,3 +1291,23 @@ denemenin idempotent olmaması (bayt gittikten sonraki ağ hatasında ikinci yü
    yeniden deneme kümesinin adıma göre açılıp kapandığı, `Upload` adımındaki ağ hatasında
    düğmenin çıkmadığı olumsuz kontrolle. Mutasyon: kümeyi genişletmek ve adım şartını
    kaldırmak ayrı ayrı kırmızı vermeli.
+
+## K8 borcu 3 — geçici ölçüm arayüzünün sökülmesi (19 Eylül 2026)
+
+`IEncoderMeasurementState` kendini "T129 birleşince kalkar" diye ilan ediyor. T129 birleşti
+(`EncoderProbeResult.State`, `IEncoderAvailability.EncoderState`, `IHdr10ProbeAvailability`)
+ama arayüz kalkmadı, çünkü borç yanlış yazılmıştı: arayüz yalnız durum taşımıyor, arka plan
+yoklamasını **kuyruğa alan tetik** de o. `DeferredEncoderAvailability.IsMeasured` çağrısı
+`Ready(...)` üzerinden `Measure(...)` doğuruyor; iki Core çağrı yerini silmek yoklamayı
+tümden durdururdu.
+
+1. Tetiği üç durumlu yüze taşı: adaptörün `EncoderState`'i cevabı okumadan önce `Ready`yi
+   çağırsın; `Hdr10State` aynısını hdr10 anahtarı için yapsın (adaptör
+   `IHdr10ProbeAvailability`'yi uygulasın).
+2. `EncoderAvailabilityState.KnownState` tek satıra insin: `availability.EncoderState(codec)`.
+3. `HdrResolver.SupportsHdr10`'un `IsHdr10Measured` kolu `Hdr10State(codec) == Unmeasured`'a
+   dönsün.
+4. `IEncoderMeasurementState` silinsin; üç test sahtesi yeni yüze geçsin.
+5. Ölçü: yoklamanın **kaç kez koştuğunu** sayan mevcut ölçüler korunur (kuyruklama
+   davranışı budur) ve `Unmeasured`ın "çalışmıyor"a çökmediği ayrı pimlenir. Mutasyon:
+   tetiği kaldırmak, üçüncü durumu iki duruma çökertmek, hdr10 kolunu düşürmek.

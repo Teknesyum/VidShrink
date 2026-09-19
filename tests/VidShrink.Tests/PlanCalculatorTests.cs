@@ -532,7 +532,7 @@ public sealed class PlanCalculatorTests
         public int YoklamaSayisi(string codec) => _yoklama.TryGetValue(codec, out var n) ? n : 0;
     }
 
-    private sealed class OlculmemisMakine : IEncoderAvailability, IEncoderMeasurementState
+    private sealed class OlculmemisMakine : IEncoderAvailability, IHdr10ProbeAvailability
     {
         private readonly HashSet<string> _built;
         private readonly HashSet<string> _olculen;
@@ -554,8 +554,12 @@ public sealed class PlanCalculatorTests
             return _works.Contains(codec);
         }
 
-        public bool IsMeasured(string codec) => _olculen.Contains(codec);
-        public bool IsHdr10Measured(string codec) => true;
+        public EncoderProbeState EncoderState(string codec) => !_olculen.Contains(codec)
+            ? EncoderProbeState.Unmeasured
+            : WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+
+        public EncoderProbeState Hdr10State(string codec)
+            => EncoderProbeState.Working;
         public int YoklamaSayisi(string codec) => _yoklama.TryGetValue(codec, out var n) ? n : 0;
     }
 

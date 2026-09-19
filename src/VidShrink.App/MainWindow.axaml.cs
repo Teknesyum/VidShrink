@@ -2565,7 +2565,7 @@ public partial class MainWindow : Window
     /// Yoklamayı arayüz iş parçacığından ayıran geçit.
     ///
     /// Okuma tarafı süreç doğurmaz: yalnız ısıtılmış cevabı verir. Sorulan kodlayıcı henüz
-    /// ölçülmemişse <see cref="IEncoderMeasurementState"/> üzerinden "ölçülmedi" der —
+    /// ölçülmemişse <see cref="IEncoderAvailability.EncoderState"/> üzerinden "ölçülmedi" der —
     /// "çalışmıyor" demez — ve ölçümü arka planda kuyruğa alır. Ölçüm bitince
     /// <c>onMeasured</c> çağrılır ve hesap yenilenir. Aynı kodlayıcı aynı anda iki kez
     /// kuyruğa girmez; N yeniden hesap N yoklama doğurmaz.
@@ -2575,7 +2575,7 @@ public partial class MainWindow : Window
     /// okuyan yol saf.
     /// </summary>
     internal sealed class DeferredEncoderAvailability
-        : IEncoderAvailability, IHdr10EncoderAvailability, IEncoderOptionAvailability, IEncoderMeasurementState
+        : IEncoderAvailability, IHdr10EncoderAvailability, IEncoderOptionAvailability, IHdr10ProbeAvailability
     {
         /// <summary>
         /// Bu süreden uzun süren yoklama yerleşmiş sayılmaz. Yükün altında aynı komut
@@ -2682,21 +2682,43 @@ public partial class MainWindow : Window
         public bool SupportsEncoderOption(string codec, string option, string value)
             => _source is IEncoderOptionAvailability options && options.SupportsEncoderOption(codec, option, value);
 
-        public bool IsMeasured(string codec) => Ready(Key("works", codec), codec, hdr10: false);
+        /// <summary>
+        /// Kodlayıcının yoklaması yerleşti mi — ve yerleşmediyse <b>kuyruğa al</b>. Geçidin
+        /// tetiği budur: sormak ölçümü başlatır. Ölçüler yoklamanın kaç kez koştuğunu
+        /// buradan sayıyor.
+        /// </summary>
+        internal bool IsMeasured(string codec) => Ready(Key("works", codec), codec, hdr10: false);
 
-        public bool IsHdr10Measured(string codec) => Ready(Key("hdr10", codec), codec, hdr10: true);
+        /// <inheritdoc cref="IsMeasured"/>
+        internal bool IsHdr10Measured(string codec) => Ready(Key("hdr10", codec), codec, hdr10: true);
 
         public bool WorksAsEncoder(string codec)
         {
             lock (_gate) return _answers.TryGetValue(Key("works", codec), out var answer) && answer.Works;
         }
 
-        public EncoderProbeState EncoderState(string codec) => AnswerFor(codec) switch
+        /// <summary>
+        /// Üç durumlu yüz. Sorulan kodlayıcı yerleşmemişse ölçüm burada kuyruğa girer;
+        /// eskiden tetik ayrı bir <c>IEncoderMeasurementState</c> arayüzündeydi ve Core
+        /// tarafı üç durumlu cevabı aldıktan <b>sonra</b> ikinci bir çağrıyla ölçümü
+        /// başlatıyordu. Tetik cevabın yanına taşındı; geçici arayüz kalktı.
+        /// </summary>
+        public EncoderProbeState EncoderState(string codec)
         {
-            ProbeAnswer.Working => EncoderProbeState.Working,
-            ProbeAnswer.NotWorking => EncoderProbeState.NotWorking,
-            _ => EncoderProbeState.Unmeasured
-        };
+            var answer = AnswerFor(codec);
+            if (answer is not (ProbeAnswer.Working or ProbeAnswer.NotWorking))
+            {
+                IsMeasured(codec);
+                return EncoderProbeState.Unmeasured;
+            }
+            return answer == ProbeAnswer.Working ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+        }
+
+        /// <inheritdoc cref="EncoderState"/>
+        public EncoderProbeState Hdr10State(string codec)
+            => IsHdr10Measured(codec)
+                ? Hdr10PixelFormat(codec) is not null ? EncoderProbeState.Working : EncoderProbeState.NotWorking
+                : EncoderProbeState.Unmeasured;
 
         public string? Hdr10PixelFormat(string codec)
         {

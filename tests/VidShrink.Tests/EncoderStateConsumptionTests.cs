@@ -101,7 +101,7 @@ public sealed class EncoderStateConsumptionTests
     /// önbellek soğuk, sürücü yok. <see cref="IEncoderAvailability.EncoderState"/> süreç
     /// doğurmadan "ölçülmedi" der; süreç doğuran <see cref="IEncoderAvailability.WorksAsEncoder"/>
     /// gerçekten yoklar ve kodlama sürücüsüz makinede geçmez.
-    /// <c>IEncoderMeasurementState</c> taşımaz — gerçek <c>EncoderCapabilities</c> de taşımıyor.
+    /// Üç durumlu yüzü ezmez — varsayılan gövde "ölçülmedi" der, gerçek <c>EncoderCapabilities</c> de öyle.
     /// </summary>
     private sealed class ColdCapabilities : IEncoderAvailability
     {

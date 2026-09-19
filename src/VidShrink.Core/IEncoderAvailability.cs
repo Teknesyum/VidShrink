@@ -1,4 +1,4 @@
-namespace VidShrink.Core;
+﻿namespace VidShrink.Core;
 
 public interface IEncoderAvailability
 {
@@ -23,12 +23,7 @@ public interface IEncoderAvailability
 public static class EncoderAvailabilityState
 {
     public static EncoderProbeState KnownState(this IEncoderAvailability availability, string codec)
-    {
-        var state = availability.EncoderState(codec);
-        if (state != EncoderProbeState.Unmeasured) return state;
-        if (availability is not IEncoderMeasurementState measured || !measured.IsMeasured(codec)) return state;
-        return availability.WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
-    }
+        => availability.EncoderState(codec);
 }
 
 public interface IEncoderOptionAvailability
