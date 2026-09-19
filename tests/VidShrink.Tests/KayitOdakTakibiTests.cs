@@ -143,6 +143,77 @@ public sealed class KayitOdakTakibiTests
         Kapat("teslim.mkv");
     }
 
+    /// <summary>
+    /// Kayit takibi oynaticiyi acarken oynaticinin kendi olayi geri doner; koruma olmazsa
+    /// ayni dosya kucultme sekmesine ikinci kez yuklenir. Olumsuz kontrol: takip bitince
+    /// ayni olay yeniden yukluyor, yani koruma kalici degil.
+    /// </summary>
+    [Fact]
+    public void TakipSirasindaOynaticidanGelenOlayIkinciKezYuklemiyor()
+    {
+        var dosya = KisaVideo("geridonus.mkv");
+        var olcu = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            try
+            {
+                var yuklenen = new List<string>();
+                window.FollowShrinkLoader = p => { yuklenen.Add(p); return Task.CompletedTask; };
+                window.FollowPlayerOpener = p => { window.PlayerOpenedForTest(p); return Task.CompletedTask; };
+                window.ChkFollowRecording.IsChecked = true;
+
+                var is1 = window.FollowRecordingAsync(dosya);
+                Dongu(() => is1.IsCompleted, 5);
+                var takipte = yuklenen.Count;
+
+                window.PlayerOpenedForTest(dosya);
+                return (takipte, sonra: yuklenen.Count, tamam: is1.IsCompletedSuccessfully);
+            }
+            finally { window.Close(); }
+        });
+
+        Assert.True(olcu.tamam);
+        Assert.Equal(1, olcu.takipte);
+        Assert.Equal(2, olcu.sonra);
+
+        Kapat("geridonus.mkv");
+    }
+
+    /// <summary>
+    /// Oynatici acilisi patlarsa takip dusmuyor: kucultme sekmesi yuklenmis kaliyor, is
+    /// basariyla bitiyor ve koruma geri aliniyor — sonraki olay yine isliyor.
+    /// </summary>
+    [Fact]
+    public void OynaticiAcilisiPatlasaDaTakipDusmuyor()
+    {
+        var dosya = KisaVideo("patlayan.mkv");
+        var olcu = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            try
+            {
+                var yuklenen = new List<string>();
+                window.FollowShrinkLoader = p => { yuklenen.Add(p); return Task.CompletedTask; };
+                window.FollowPlayerOpener = _ => throw new InvalidOperationException("oynatici acilmadi");
+                window.ChkFollowRecording.IsChecked = true;
+
+                var is1 = window.FollowRecordingAsync(dosya);
+                Dongu(() => is1.IsCompleted, 5);
+                var ilk = yuklenen.Count;
+
+                window.PlayerOpenedForTest(dosya);
+                return (tamam: is1.IsCompletedSuccessfully, ilk, sonra: yuklenen.Count);
+            }
+            finally { window.Close(); }
+        });
+
+        Assert.True(olcu.tamam, "oynatici acilisindaki istisna takibi dusurdu");
+        Assert.Equal(1, olcu.ilk);
+        Assert.Equal(2, olcu.sonra);
+
+        Kapat("patlayan.mkv");
+    }
+
     [Fact]
     public void SecenekAcikkenKayitKucultmeyeVeOynaticiyaSekmeDegismedenYuklenir()
     {

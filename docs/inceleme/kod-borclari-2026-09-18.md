@@ -129,9 +129,14 @@ açıkça "bu kod kalkacak" diyor.
 
 ## Hafif
 
-19. `src/VidShrink.App/CurrentMedia.cs`, `MainWindow.OdakTakibi.cs` — Son üç commit'te
+19. ~~`src/VidShrink.App/CurrentMedia.cs`, `MainWindow.OdakTakibi.cs` — Son üç commit'te
     yüzeyi değişen bu iki dosyanın ölçü zarfı en dar (iki test dosyası; karşılaştırma:
-    `MediaInfo` 69, `EncodePlan` 42). **Şüpheli:** incelik, yokluk değil.
+    `MediaInfo` 69, `EncodePlan` 42). **Şüpheli:** incelik, yokluk değil.~~
+    **Kapandı — şüphe ikiye ayrıldı:** `CurrentMedia` gerçekten inceydi, sekiz ölçü
+    damgayı ve tazeliği zaten pimliyor. `MainWindow.OdakTakibi.cs`'te iki koruma
+    ölçüsüzdü (geri dönen oynatıcı olayı, patlayan açılış); ikisi de pimlendi.
+    Ölçüm `docs/olcumler/k8-odak-korumalari-2026-09-19.md` (taban 0/14, üç kesimin üçü
+    kırmızı).
 20. `docs/handbrake/README.md:16-22` — Envanter borcu; ölçümü
     `docs/handbrake/envanter-tamlik-2026-09-18.md`'de.
 
