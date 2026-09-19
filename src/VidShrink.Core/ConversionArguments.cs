@@ -100,6 +100,7 @@ public static class ConversionArguments
         var filters = new List<string>();
         if (plan.Width is { } width && plan.Height is { } height) filters.Add($"scale={width}:{height}:flags=lanczos");
         else if (plan.Height is { } h) filters.Add($"scale=-2:{h}:flags=lanczos");
+        if (info.IsAnamorphic) filters.Add(VideoFilterChain.SquarePixelFilter);
         if (plan.Fps is { } fps && Math.Abs(fps - info.Fps) > 0.01) filters.Add($"fps={fps.ToString("0.###", CultureInfo.InvariantCulture)}");
         return filters;
     }

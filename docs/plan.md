@@ -1067,3 +1067,51 @@ hiçbir yerden çağrılmıyor. `new PlanOptions` kuran üç yerin hiçbiri `Fil
 
 **Yapıldı (19 Eylül 2026).** Beş yüzeyin beşi açıldı, ölçü `SuzgecYuzeyiTests` (5 kol,
 5/5 yeşil), sonuç ve mutasyon tablosu `docs/olcumler/e8-suzgec-yuzeyi.md`.
+
+## E9 — Anamorfik kaynak: piksel en-boy oranı (19 Eylül 2026)
+
+### Bulgu
+
+`grep -rn "sample_aspect_ratio\|setsar\|display_aspect" src tests tools` → **0 satır**. Depo
+piksel en-boy oranını (PAR) hiçbir yerde okumuyor; `MediaInfo.Width` ffprobe'un `width`
+alanı, yani depolanan genişlik. Kare piksel varsayımı DVD dışında doğru, DVD'de değil.
+
+E4 DVD kolunu açtı: 720x480 NTSC kaynak SAR 8:9 ile 640x480 (4:3), SAR 32:27 ile 853x480
+(16:9) gösterilir. Bugün ikisi de 720x480 sayılıyor, ölçek merdiveni yanlış orandan
+iniyor ve çıktı yassı ya da uzun kodlanıyor.
+
+HandBrake'in `--non-anamorphic`, `--auto-anamorphic`, `--itu-par`, `--keep-display-aspect`
+bayraklarının dördü de bu tek eksikte birleşiyor
+(`docs/handbrake/bayrak-hukumleri-2026-09-19.md`).
+
+### Karar
+
+HandBrake'in `--non-anamorphic` davranışı alınır: çıktı **kare pikselli**. Yükseklik
+korunur, genişlik gösterim genişliğine çevrilir. Anamorfik metadata taşıyan çıktı
+üretmiyoruz — küçültme aracının çıktısı paylaşılacak dosya, oynatıcı uyumu kare pikselde
+daha yüksek.
+
+### Adımlar
+
+1. `MediaInfo`: `ParNum`/`ParDen` (varsayılan 1/1), türeyen `DisplayWidth` ve
+   `IsAnamorphic`. `Pixels` gösterim genişliğinden hesaplanmaz — bit hızı modeli
+   kodlanan piksele bakar, o değişmiyor.
+2. `FfprobeClient`: `sample_aspect_ratio` okunur. Yokluk, `"0:1"`, `"N/A"` ve sıfır payda
+   1:1'e düşer. 90° dönüşte PAR de ters çevrilir, `DisplayDimensions` ile aynı kapıdan.
+3. `PlanCalculator.Dimensions`: merdiven `info.Width` yerine `info.DisplayWidth`'ten iner.
+   Tek huni, üç çağıran da oradan geçiyor.
+4. `VideoFilterChain.Filters` ve `ConversionArguments.VideoFilters`: kaynak anamorfikse
+   ölçekten sonra `setsar=1`. Yoksa `scale` süzgeci SAR metadata'sını olduğu gibi taşır ve
+   çıktı ikinci kez esner.
+5. Ölçü: `tests/VidShrink.Tests/AnamorfikTests.cs`. Kollar — ffprobe ayrıştırması (8:9,
+   32:27, `"0:1"`, eksik alan), dönüşte ters çevirme, merdivenin gösterim genişliğinden
+   inmesi, `setsar=1`'in iki argüman üreticisinde de çıkması, kare pikselli kaynakta
+   zincirin **değişmemesi** (olumsuz kontrol).
+6. Mutasyon turu: beş kesim, sıfır kırmızı kalan kol bırakılmaz.
+
+
+### Sonuç — kapandı (19 Eylül 2026)
+
+Altı adımın altısı da yapıldı. Ölçü `AnamorfikTests` 6/6 yeşil; mutasyon turu altı kesimin
+altısını da kırmızıya çeviriyor, taban ve geri kolları 0/6 (`docs/olcumler/e9-anamorfik.md`).
+Adım 6 beş kesim öngörüyordu, altı koştu: `setsar` iki üreticide ayrı ayrı kesildi.

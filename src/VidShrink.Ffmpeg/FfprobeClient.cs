@@ -71,6 +71,8 @@ public static class FfprobeClient
             DurationSeconds = duration,
             Width = DisplayDimensions(v).width,
             Height = DisplayDimensions(v).height,
+            ParNum = PikselOrani(v).num,
+            ParDen = PikselOrani(v).den,
             Fps = ParseFraction(GetString(v, "avg_frame_rate")) ?? ParseFraction(GetString(v, "r_frame_rate")) ?? 30,
             VideoCodec = GetString(v, "codec_name") ?? "unknown",
             TotalBitrateBps = ParseLong(format, "bit_rate") ?? (long)(fileSize * 8 / duration),
@@ -265,13 +267,36 @@ public static class FfprobeClient
     {
         var width = GetInt(stream, "width") ?? 0;
         var height = GetInt(stream, "height") ?? 0;
+        return CeyrekDonus(stream) ? (height, width) : (width, height);
+    }
+
+    private static bool CeyrekDonus(JsonElement stream)
+    {
         var rotation = 0;
         if (stream.TryGetProperty("tags", out var tags))
             rotation = GetInt(tags, "rotate") ?? 0;
         if (stream.TryGetProperty("side_data_list", out var sideData))
             foreach (var item in sideData.EnumerateArray())
                 rotation = GetInt(item, "rotation") ?? rotation;
-        return Math.Abs(rotation) % 180 == 90 ? (height, width) : (width, height);
+        return Math.Abs(rotation) % 180 == 90;
+    }
+
+    /// <summary>
+    /// Piksel en-boy orani. <c>sample_aspect_ratio</c> yoksa, <c>"0:1"</c>, <c>"N/A"</c>
+    /// ya da paydasi sifirsa kare piksel sayilir ve 1:1 doner. Ceyrek donuste oran da ters
+    /// cevrilir, cunku dondurulmus karede genis piksel uzun piksele donusur.
+    /// </summary>
+    private static (int num, int den) PikselOrani(JsonElement stream)
+    {
+        var metin = GetString(stream, "sample_aspect_ratio");
+        if (metin is null) return (1, 1);
+        var parca = metin.Split(':');
+        if (parca.Length != 2
+            || !int.TryParse(parca[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var num)
+            || !int.TryParse(parca[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var den)
+            || num <= 0 || den <= 0)
+            return (1, 1);
+        return CeyrekDonus(stream) ? (den, num) : (num, den);
     }
 
     private static bool IsAttachedPicture(JsonElement stream)

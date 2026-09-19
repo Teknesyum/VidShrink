@@ -89,6 +89,13 @@ public static class VideoFilterChain
     public const string GrayscaleFilter = "hue=s=0";
     public const string DeblockFilter = "deblock=filter=strong:block=8";
     public const string DebandFilter = "deband";
+
+    /// <summary>
+    /// Anamorfik kaynagin ciktisini kare piksele cevirir. Olcek suzgeci kaynagin SAR
+    /// metadata'sini oldugu gibi tasir; sifirlanmazsa oynatici zaten gosterim genisligine
+    /// olceklenmis kareyi ikinci kez esnetir.
+    /// </summary>
+    public const string SquarePixelFilter = "setsar=1";
     public const double DetelecineFpsFactor = 4.0 / 5.0;
 
     public const double IdetDominantShare = 0.25;
@@ -185,6 +192,7 @@ public static class VideoFilterChain
         filters.AddRange(TransposeFilters(options.Transpose));
         if (plan.Width != source.Width || plan.Height != source.Height)
             filters.Add($"scale={plan.Width}:{plan.Height}:flags=lanczos");
+        if (info.IsAnamorphic) filters.Add(SquarePixelFilter);
         if (SharpenText(options.Sharpen) is string sharpen) filters.Add(sharpen);
         if (!string.IsNullOrEmpty(plan.HdrVideoFilter))
             filters.Add(plan.HdrVideoFilter);

@@ -45,6 +45,30 @@ public sealed record MediaInfo
 
     public int ChapterCount => Chapters.Count;
 
+    /// <summary>
+    /// Piksel en-boy oraninin payi. ffprobe'un <c>sample_aspect_ratio</c> alani; yoklugu,
+    /// <c>"0:1"</c> ve <c>"N/A"</c> 1:1'e duser. Kare piksel kaynakta pay ve payda esittir.
+    /// </summary>
+    public int ParNum { get; init; } = 1;
+
+    /// <summary>Piksel en-boy oraninin paydasi. Sifir olmaz; yoklama 1'e cevirir.</summary>
+    public int ParDen { get; init; } = 1;
+
+    /// <summary>
+    /// Kaynak anamorfik mi: depolanan kare kare degil. DVD disinda neredeyse hep
+    /// <c>false</c>.
+    /// </summary>
+    public bool IsAnamorphic => ParNum != ParDen && ParNum > 0 && ParDen > 0;
+
+    /// <summary>
+    /// Kaynagin ekranda gorundugu genislik. Yukseklik korunur, genislik PAR ile carpilir —
+    /// HandBrake'in <c>--non-anamorphic</c> davranisinin aynisi. Olcek merdiveni bu sayidan
+    /// iner; <see cref="Width"/> depolanan genislik olarak kalir.
+    /// </summary>
+    public int DisplayWidth => IsAnamorphic
+        ? Math.Max(1, (int)Math.Round(Width * (double)ParNum / ParDen))
+        : Width;
+
     public double FileSizeMb => FileSizeBytes / 1024.0 / 1024.0;
     public long Pixels => (long)Width * Height;
 }

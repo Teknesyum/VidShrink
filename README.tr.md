@@ -1,4 +1,4 @@
-<!-- lang -->
+﻿<!-- lang -->
 
 [<img src="docs/gorseller/badge-lang.tr.svg" alt="Türkçe seçili, switch to English" width="124" height="44">](README.md)
 
@@ -151,6 +151,10 @@ plan gerekçesine bir satır düşülerek düşüyor.
 yuvarlıyor. Varsayılan 2, çünkü kodlayıcı tek sayılı kenar kabul etmiyor; büyük çarpan eski
 donanım kodlayıcılarının istediği şey ve kenardan biraz daha kırpıyor. Başka bir sayı
 kullanım hatası.
+
+Anamorfik kaynak — depolanan pikselleri kare olmayan bir DVD — ölçeklenmeden önce
+düzleştiriliyor: yükseklik korunuyor, genişlik karenin ekranda göründüğü genişliğe
+çevriliyor ve çıktı kare pikselli oluyor. Kare pikselli kaynakta hiçbir şey değişmiyor.
 
 `--kes <baslangic>-<bitis>` kodlamadan önce kesiyor, böylece hedef boyut elde kalan parçaya
 harcanıyor: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, sona kadar `--kes 90-`.

@@ -1382,8 +1382,9 @@ public static class PlanCalculator
 
     private static (int Width, int Height) Dimensions(MediaInfo info, double scale, int modulus = Olcek.VarsayilanModul)
     {
-        if (scale >= 0.985) return (Olcek.Modul(info.Width, modulus), Olcek.Modul(info.Height, modulus));
-        return (Olcek.Modul((int)Math.Round(info.Width * scale), modulus),
+        var genislik = info.DisplayWidth;
+        if (scale >= 0.985) return (Olcek.Modul(genislik, modulus), Olcek.Modul(info.Height, modulus));
+        return (Olcek.Modul((int)Math.Round(genislik * scale), modulus),
             Olcek.Modul((int)Math.Round(info.Height * scale), modulus));
     }
 
