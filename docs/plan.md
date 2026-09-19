@@ -434,6 +434,44 @@ değil, kaynağın doğruluğu: bugün eşdeğer olmaları değerlerin bugünkü
 geliyor, yüzeyin kendisinden değil. Bu yüzden düşürülemeyen bir ölçü yazılmadı;
 yüzeyler (`Yuzde.HazirTam`, `Saat.Adim`) kendi pimlerini taşıyor (O4, O6).
 
+### Adım 11 ölçümü — 19 Eylül 2026
+
+Kaydedicinin hedef kutuları ve tarayıcı ölçüsü. `tests/VidShrink.Tests/KaydediciHedefYazimiTests.cs`
+ile `tests/VidShrink.Tests/BicimDisiYazimTests.cs`. Temiz taban **0 kırmızı / 7 yeşil**.
+
+Kesim | Ne bozuldu | Kırmızı
+--- | --- | ---
+K1 | Saniye kutusu okurken `Strings.Culture` → `CultureInfo.CurrentCulture` | 1
+K2 | MB kutusu okurken aynısı | 4
+K3 | Saniye kutusu yazarken aynısı | 1
+K4 | MB kutusu yazarken aynısı | 2
+K5 | Gelişmiş panelin sayı kutusu okurken aynısı | 1
+K6 | Tarayıcı deseni eşleşmeyecek hale getirilir | 1
+K7 | Muafiyet listesine karşılığı olmayan satır eklenir | 1
+K8 | Kaynak ağacına kültürsüz bir `ToString("0.00")` eklenir | 1
+
+Sıfır kırmızı veren kesim yok.
+
+**Ölçüm bir öncülü düzeltti.** Kusurun "on kat büyük hedef" olduğunu yazmıştım:
+Türkçe arayüzde `12.5` yazan kullanıcının `125` MB alacağını varsaymıştım. Ölçüm
+hükmü `Süre ve boyut sıfırdan büyük sayı olmalı.` döndürdü — `NumberStyles.Float`
+binlik ayracını kabul etmiyor, yani sayı büyümüyor, **geçersiz sayılıp düşüyor**.
+Kusur daha küçük değil, sadece başka: kullanıcı hedefini hiç yazamıyor. Test ve
+gerekçesi ölçülen hükme göre yeniden yazıldı, varsayılana göre değil.
+
+**Tarayıcı ölçüsü artık var.** Bu bölümün Ölçü başlığında söz verilmişti ve on adım
+boyunca yoktu: yüzeyler tek tek kapanıyordu ama geri dönüşü durduran bir şey yoktu.
+Üç kolu var — kalan yazım sayısı (K8 bunu pimliyor), desenin kör olmadığı (K6) ve
+muafiyet listesinin bayatlamadığı (K7). Muafiyet listesi elle yazılan bir beklenen
+küme değil: `tests/VidShrink.Tests/Veri/bicim-muafiyetleri.txt`, her satırı gerekçeli,
+karşılığı kalmayan satır ölçüyü kırıyor.
+
+**Muafiyet tek satır:** `ShareErrorClassifier.cs`. Oradaki `CurrentCulture` yalnız
+başına bir kusur değil, daha büyüğünün parçası — aynı gövde `"sınırsız"`, `"saniye"`,
+`"dakika"` diye sabit Türkçe metin yazıyor. Core'un içinde, dil katmanından geçmeden.
+İngilizce arayüzde kullanıcı Türkçe kelime okuyor. Kültürü tek başına düzeltmek bunu
+gizlerdi; ayrı defter satırı olarak duruyor.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

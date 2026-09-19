@@ -1,9 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Avalonia.Controls;
 using VidShrink.Core;
+
+using VidShrink.App.Localization;
 
 namespace VidShrink.App.Recorder;
 
@@ -201,7 +203,7 @@ internal partial class RecorderView
         var value = 0d;
         if (string.IsNullOrWhiteSpace(box.Text)
             || ((double.TryParse(box.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out value)
-                    || double.TryParse(box.Text, NumberStyles.Float, CultureInfo.CurrentCulture, out value))
+                    || double.TryParse(box.Text, NumberStyles.Float, Strings.Culture, out value))
                 && double.IsFinite(value) && (signed || value >= 0)))
         {
             store(value);

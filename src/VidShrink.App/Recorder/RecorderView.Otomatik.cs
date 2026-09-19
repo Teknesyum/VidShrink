@@ -75,12 +75,12 @@ internal partial class RecorderView
     }
 
     private int? TargetSeconds =>
-        int.TryParse(TxtTargetSeconds.Text, NumberStyles.Integer, CultureInfo.CurrentCulture, out var sn) ? sn
+        int.TryParse(TxtTargetSeconds.Text, NumberStyles.Integer, Strings.Culture, out var sn) ? sn
         : string.IsNullOrWhiteSpace(TxtTargetSeconds.Text) ? null
         : 0;
 
     private double? TargetMegabytes =>
-        double.TryParse(TxtTargetMegabytes.Text, NumberStyles.Float, CultureInfo.CurrentCulture, out var mb) ? mb
+        double.TryParse(TxtTargetMegabytes.Text, NumberStyles.Float, Strings.Culture, out var mb) ? mb
         : string.IsNullOrWhiteSpace(TxtTargetMegabytes.Text) ? null
         : 0;
 
@@ -104,8 +104,8 @@ internal partial class RecorderView
     {
         RadManual.IsChecked = _settings.ManualMode;
         RadAuto.IsChecked = !_settings.ManualMode;
-        TxtTargetSeconds.Text = _settings.TargetSeconds?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
-        TxtTargetMegabytes.Text = _settings.TargetMegabytes?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
+        TxtTargetSeconds.Text = _settings.TargetSeconds?.ToString(Strings.Culture) ?? string.Empty;
+        TxtTargetMegabytes.Text = _settings.TargetMegabytes?.ToString(Strings.Culture) ?? string.Empty;
         RadManual.IsCheckedChanged += OnAutoToggled;
         InitLevel();
         TxtTargetSeconds.TextChanged += OnBudgetChanged;

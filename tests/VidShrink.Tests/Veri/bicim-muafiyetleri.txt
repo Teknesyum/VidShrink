@@ -1,0 +1,5 @@
+﻿# Bicim gövdelerinin dısında kalmasına izin verilen dosyalar.
+# Her satır: <yol>   # gerekçe
+# Gerekçesiz satır eklenmez; karsılıgı kalmayan satır MuafiyetListesiBayatDegil'i kırar.
+
+src/VidShrink.Core/Share/ShareErrorClassifier.cs   # Core'da sabit Türkçe metin ("sınırsız", "saniye", "dakika") ile aynı kusurun parçası; ayrı defter satırı, dil katmanına tasınacak
