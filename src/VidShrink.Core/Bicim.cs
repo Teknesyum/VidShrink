@@ -122,19 +122,29 @@ public static class Bicim
             ? (mb / 1024).ToString("0", CultureInfo.InvariantCulture) + " GB"
             : mb.ToString("0", CultureInfo.InvariantCulture) + " MB";
 
-    /// <summary>Bit hızı. Ondalığı hiç anlam taşımıyor, birim eki katalogdan gelir.</summary>
+    /// <summary>
+    /// Bit hızı. Ondalığı hiç anlam taşımıyor, birim eki katalogdan gelir.
+    ///
+    /// <b>Kültür almaz, çünkü alamaz.</b> Ailenin geri kalanı kültür parametresi taşıyor;
+    /// bu yüzey taşımıyor ve bu bir eksiklik değil, ölçülmüş bir karar: basamak ayracı
+    /// ve ondalık olmayan bir tam sayıda <c>"0"</c> biçimi .NET'in bildiği
+    /// <b>her</b> kültürde aynı yazımı veriyor (ölçüm <c>.calisma/bithizi-olcu</c>:
+    /// 1500/18800/192 üç değeri tüm özgül kültürlerde tek yazım). Kültür parametresi
+    /// tutulsaydı hiçbir mutasyonun kıramayacağı — yani hiçbir zaman pimlenemeyecek —
+    /// bir söz olurdu. Ondalık gerektiren bir birim (Mbps) eklenirse kültür onunla gelir.
+    /// </summary>
     public static class BitHizi
     {
         /// <summary>Kilobit/saniye değeri. Sayı burada, birim adı <c>Strings</c>'te.</summary>
-        public static string Kbps(int kbps, CultureInfo kultur) =>
-            kbps.ToString("0", kultur);
+        public static string Kbps(int kbps) =>
+            kbps.ToString("0", CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Bit/saniye'den kilobit'e. Bölme üç yerde tamsayı, bir yerde <c>double</c>
         /// yapılıyordu; aynı akış iki farklı sayı gösterebiliyordu.
         /// </summary>
-        public static string BpsToKbps(long bps, CultureInfo kultur) =>
-            Kbps((int)Math.Round(bps / 1000.0), kultur);
+        public static string BpsToKbps(long bps) =>
+            Kbps((int)Math.Round(bps / 1000.0));
     }
 
     /// <summary>
@@ -182,9 +192,6 @@ public static class Bicim
 
         /// <inheritdoc cref="Bicim.Yuzde.Orandan(double, CultureInfo)"/>
         public static string Yuzde(double oran) => Bicim.Yuzde.Orandan(oran, CultureInfo.InvariantCulture);
-
-        /// <inheritdoc cref="BitHizi.Kbps(int, CultureInfo)"/>
-        public static string Kbps(int kbps) => BitHizi.Kbps(kbps, CultureInfo.InvariantCulture);
 
         /// <inheritdoc cref="Bicim.Kare(double, CultureInfo)"/>
         public static string Kare(double fps) => Bicim.Kare(fps, CultureInfo.InvariantCulture);

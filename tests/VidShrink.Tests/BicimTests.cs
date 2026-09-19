@@ -145,9 +145,12 @@ public sealed class BicimTests
     [Fact]
     public void KbpsOndalikYazmaz()
     {
-        Assert.Equal("1500", Bicim.BitHizi.Kbps(1500, Tr));
-        Assert.Equal("1500", Bicim.BitHizi.BpsToKbps(1_500_000, Tr));
-        Assert.Equal("1500", Bicim.BitHizi.BpsToKbps(1_499_600, Tr));
+        Assert.Equal("1500", Bicim.BitHizi.Kbps(1500));
+        Assert.Equal("1500", Bicim.BitHizi.BpsToKbps(1_500_000));
+        Assert.Equal("1500", Bicim.BitHizi.BpsToKbps(1_499_600));
+        Assert.Equal("1499", Bicim.BitHizi.BpsToKbps(1_499_400));
+        Assert.DoesNotContain(".", Bicim.BitHizi.Kbps(200_000));
+        Assert.DoesNotContain(",", Bicim.BitHizi.Kbps(200_000));
     }
 
     [Fact]

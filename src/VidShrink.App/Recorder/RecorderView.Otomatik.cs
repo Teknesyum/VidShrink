@@ -131,8 +131,8 @@ internal partial class RecorderView
         var budget = Budget;
         TxtBudgetNote.Text = budget.Verdict switch
         {
-            RecorderBudgetVerdict.Usable => Say("recorder.budget.result", budget.VideoKbps.ToString("N0", Strings.Culture)),
-            RecorderBudgetVerdict.TooSmall => Say("recorder.budget.too-small", RecorderBudget.MinimumVideoKbps.ToString("N0", Strings.Culture)),
+            RecorderBudgetVerdict.Usable => Say("recorder.budget.result", Bicim.BitHizi.Kbps(budget.VideoKbps)),
+            RecorderBudgetVerdict.TooSmall => Say("recorder.budget.too-small", Bicim.BitHizi.Kbps(RecorderBudget.MinimumVideoKbps)),
             RecorderBudgetVerdict.Invalid => Say("recorder.budget.invalid"),
             _ => SingleTargetNote()
         };

@@ -3231,8 +3231,8 @@ public partial class MainWindow : Window
         TxtResolution.Text = $"{info.Width}x{info.Height}";
         TxtFps.Text = Num(info.Fps, "0.##");
         TxtVideoCodec.Text = info.VideoCodec;
-        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {Say("main.unit.k-value", info.AudioBitrateBps / 1000)}" : Say("main.info.none");
-        TxtBitrate.Text = Say("main.unit.kbps-value", info.TotalBitrateBps / 1000);
+        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {Say("main.unit.k-value", Bicim.BitHizi.BpsToKbps(info.AudioBitrateBps))}" : Say("main.info.none");
+        TxtBitrate.Text = Say("main.unit.kbps-value", Bicim.BitHizi.BpsToKbps(info.TotalBitrateBps));
         TxtHdr.Text = info.IsHdr ? Say("main.info.yes") : Say("main.info.no");
         Fade(HdrPolicyPanel, info.IsHdr);
         SecAudio.IsVisible = info.HasAudio;
@@ -3521,11 +3521,11 @@ public partial class MainWindow : Window
         {
             EncodeMode.Crf => Say("main.plan.mode.crf-value", plan.Crf),
             EncodeMode.PassThrough => Say("main.plan.mode.copy"),
-            _ => $"{Say("main.unit.k-value", plan.VideoBitrateK)} · {Say("main.plan.mode.two-pass")}"
+            _ => $"{Say("main.unit.k-value", Bicim.BitHizi.Kbps(plan.VideoBitrateK))} · {Say("main.plan.mode.two-pass")}"
         });
         AddPlanFact(Say("main.plan.fact.resolution"), $"{plan.Width}x{plan.Height}");
         AddPlanFact(Say("main.plan.fact.frame-rate"), Say("main.unit.fps-value", Num(plan.Fps, "0.##")));
-        AddPlanFact(Say("main.plan.fact.audio"), plan.AudioCodec is null ? Say("main.info.none") : $"{plan.AudioCodec} {Say("main.unit.k-value", plan.AudioBitrateK)}{channels}");
+        AddPlanFact(Say("main.plan.fact.audio"), plan.AudioCodec is null ? Say("main.info.none") : $"{plan.AudioCodec} {Say("main.unit.k-value", Bicim.BitHizi.Kbps(plan.AudioBitrateK))}{channels}");
         AddPlanFact(Say("main.plan.fact.preset"), plan.Preset);
         AddPlanFact(Say("main.plan.fact.estimated-size"), _estimate is { } size ? Say("main.unit.mb-value", Num(size.ExpectedMb, "0.0")) : "-");
 

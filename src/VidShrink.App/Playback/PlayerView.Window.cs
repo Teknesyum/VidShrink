@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using VidShrink.Core;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -491,7 +492,7 @@ internal partial class PlayerView
             ? details.FramesPerSecond.ToString("0.###", CultureInfo.CurrentCulture)
             : unknown;
         var rate = double.IsFinite(details.BitsPerSecond) && details.BitsPerSecond > 0
-            ? (details.BitsPerSecond / 1000).ToString("0", CultureInfo.CurrentCulture)
+            ? Bicim.BitHizi.BpsToKbps((long)Math.Round(details.BitsPerSecond))
             : unknown;
 
         var lines = new List<string>

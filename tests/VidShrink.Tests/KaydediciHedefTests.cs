@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using VidShrink.App.Localization;
 using VidShrink.App.Recorder;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -48,6 +49,41 @@ public sealed class KaydediciHedefTests
         Assert.Null(Deger(sinirsiz, "-fs"));
         Assert.Contains(RecorderArguments.Validate(Istek() with { MaxMegabytes = 0 }, "a.mp4"), e => e.Contains("size limit"));
         Assert.Contains(RecorderArguments.Validate(Istek() with { MaxMegabytes = 2, Container = RecorderContainer.Gif }, "a.gif"), e => e.Contains("GIF"));
+    }
+
+    /// <summary>
+    /// Butce notundaki bit hizi ailenin yazimini kullanir: basamak ayraci yok.
+    /// Not <c>N0</c> ile yaziliyordu, yani Turkce arayuzde <c>2.636</c>; ayni
+    /// uygulamanin kaynak bilgisi ve plan paneli ayni birimi <c>2796</c> diye
+    /// yaziyordu. Bu kol notun rakamlarini okur — eski yazimda ayrac gorunurdu.
+    /// </summary>
+    [Fact]
+    public void ButceNotuBasamakAyraciYazmaz()
+    {
+        var not = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var onceki = Strings.Language;
+            Strings.Use("tr");
+            try
+            {
+                var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, AutoChoice = RecorderAutoPlan.Candidates(new RecorderMachine(1920, 1080, 60, 8, []))[0] };
+                Yaz(view, "TxtTargetSeconds", "30");
+                Yaz(view, "TxtTargetMegabytes", "10");
+                return Bul<TextBlock>(view, "TxtBudgetNote").Text ?? string.Empty;
+            }
+            finally
+            {
+                Strings.Use(onceki);
+            }
+        }));
+
+        File.WriteAllText(Path.Combine(Kanit, "butce-notu.txt"), not);
+
+        Assert.Contains("2796", not);
+        Assert.DoesNotContain("2.796", not);
+        Assert.DoesNotContain("2,796", not);
+
+        Kapat("butce-notu.txt");
     }
 
     [Fact]

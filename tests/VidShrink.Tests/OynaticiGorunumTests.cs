@@ -13,6 +13,7 @@ using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.App.Playback;
+using VidShrink.Core;
 using VidShrink.Ffmpeg;
 using VidShrink.Player;
 using Xunit;
@@ -470,10 +471,30 @@ public sealed class OynaticiGorunumTests
         Assert.False(rapor.gizliyken);
         Assert.True(rapor.Item2);
         foreach (var satir in beklenen) Assert.Contains(satir, rapor.metin);
-        Assert.Contains(Strings.Get("player.info.bitrate", (rapor.details!.BitsPerSecond / 1000).ToString("0", CultureInfo.CurrentCulture)), rapor.metin);
+        Assert.Contains(Strings.Get("player.info.bitrate", Bicim.BitHizi.BpsToKbps((long)Math.Round(rapor.details!.BitsPerSecond))), rapor.metin);
         Assert.True(sapma <= 0.02, body.ToString());
         Assert.DoesNotContain(codec, rapor.bos);
         GorunumKanit.Kapat("bilgi-paneli.txt");
+    }
+
+    /// <summary>
+    /// Bilgi panelinin bit hizi satiri <b>yuvarlanir</b>, kirpilmaz. Canli kolun
+    /// iddiasi bicim ifadesini kopyaliyordu: govdeyi bozan bir mutasyon beklenen
+    /// degeri de bozdugu icin kol hep yesil kaliyordu. Burada beklenen basamaklar
+    /// elle yazili; kirpan bolme (<c>(long)</c>) konuldugunda bu sinif 2 kirmizi
+    /// donuyor (olcum <c>.calisma/mutasyon-oynatici.py</c>). Motor acmaz, dosya okumaz.
+    /// </summary>
+    [Fact]
+    public void BilgiPaneliBitHiziniYuvarlar()
+    {
+        var kirpilan = new MediaDetails("h264", 1920, 1080, 30, 1_499_600, "aac", 2, 48_000);
+        var yukari = new MediaDetails("h264", 1920, 1080, 30, 1_499_400, "aac", 2, 48_000);
+
+        var metin = AppHost.Run(() => (kirpilan: PlayerView.Describe(kirpilan), asagi: PlayerView.Describe(yukari)));
+
+        Assert.Contains("1500", metin.kirpilan);
+        Assert.DoesNotContain("1499", metin.kirpilan);
+        Assert.Contains("1499", metin.asagi);
     }
 
     [Fact]

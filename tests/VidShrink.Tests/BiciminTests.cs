@@ -402,7 +402,9 @@ public sealed class KareYerlesimTests
     /// ve <c>Recalculate</c>. Ekrana yazan kod bu yoldan geciyor, dolayisiyla bicim dizgesi
     /// testte kopyalanmiyor.
     /// </summary>
-    private static T Yuklu<T>(string dil, Func<MainWindow, T> read) =>
+    private static T Yuklu<T>(string dil, Func<MainWindow, T> read) => Yuklu(dil, Ornek(), read);
+
+    private static T Yuklu<T>(string dil, MediaInfo bilgi, Func<MainWindow, T> read) =>
         AppHost.Run(() =>
         {
             var onceki = Strings.Language;
@@ -421,7 +423,7 @@ public sealed class KareYerlesimTests
                     govde.Height = Genis.Height;
                 }
 
-                window.LoadWithoutProbing(OrnekYol, Ornek());
+                window.LoadWithoutProbing(OrnekYol, bilgi);
                 window.SettleFades();
                 window.Measure(Genis);
                 window.Arrange(new Rect(Genis));
@@ -444,6 +446,30 @@ public sealed class KareYerlesimTests
     [InlineData("tr", "59,94")]
     public void KaynakBilgiKareHiziDileUyar(string dil, string beklenen)
         => Assert.Equal(beklenen, Yuklu(dil, window => Named<TextBlock>(window, "TxtFps").Text));
+
+    /// <summary>
+    /// Bit hizi ekranda <b>yuvarlanir</b>, kirpilmaz. Bolme tamsayi yapildiginda
+    /// 1.499.600 bps ekrana 1499 kbps diye cikiyordu; ayni deger baska bir akista
+    /// <c>double</c> ile bolunup 1500 yaziyordu, yani tek kaynak iki sayi gosterebiliyordu.
+    /// Govde (<see cref="Bicim.BitHizi.BpsToKbps"/>) tek bolme yapar. Ses izi ayri
+    /// pimli cunku iki satir iki ayri cagri yeri.
+    /// </summary>
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void KaynakBilgiBitHiziYuvarlanir(string dil)
+    {
+        var bilgi = Ornek() with { TotalBitrateBps = 1_499_600, AudioBitrateBps = 191_500 };
+
+        var okunan = Yuklu(dil, bilgi, window => (
+            hiz: Named<TextBlock>(window, "TxtBitrate").Text ?? "",
+            ses: Named<TextBlock>(window, "TxtAudio").Text ?? ""));
+
+        Assert.Contains("1500", okunan.hiz);
+        Assert.DoesNotContain("1499", okunan.hiz);
+        Assert.Contains("192", okunan.ses);
+        Assert.DoesNotContain("191", okunan.ses);
+    }
 
     /// <summary>
     /// T192 tur 2, tur 1 borcu 3: tahmin araligi satirinin <b>ekrandaki</b> hali.

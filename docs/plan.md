@@ -138,6 +138,75 @@ olumsuz kontrolle bağlandı.
 üretimde koşuyor ama hiçbir test onu okumuyordu. `MenuEtiketiTekGovdedenGeliyor` yazıldı
 — iki yazımın tek gövdeden geldiğini ve GB kolunu pimliyor; aynı mutasyon artık kırmızı.
 
+### Adım 3 ölçümü — 19 Eylül 2026
+
+Yüzde ailesi indi. `*100` çarpımı yedi çağrı yerinden gövdeye alındı; yüzey artık
+**oran** alıyor, değeri zaten 0-100 taşıyan iki yer (`ScalePercent`, `OverPercent`)
+ayrı bir kapıdan (`Hazir`) geçiyor — bu ayrım hiçbir yerde yazılı değildi ve ikinci
+bir çarpım tek bir testi kırmıyordu.
+
+Katalog dizgilerinin dördü yüzde işaretini kendi taşıyor (`{2}%`); o dört yerde
+sayı-yalnız biçim kullanıldı, çıktıları birebir aynı kaldı. Değişen tek yüzey
+`MainWindow.Percent`: `P1` tam değerde `%50,0` yazıyordu, aile yazımı `%50`.
+
+| Mutasyon | Kırmızı |
+|---|---|
+| Kültür deseni yok sayıldı, işaret hep sona | 1 |
+| İşaret kültürden değil sabit `%` | **0 → 1** |
+| `Hazir` ikinci kez çarpıyor | 2 |
+| `Tam` ondalık yazıyor | **0 → 1** |
+| `Orandan` iki ondalık | **0 → 1** |
+
+Üç kör nokta vardı ve hepsinin kökü aynı: tr/en/de üçü de `%` kullanıyor, üçünü
+pimlemek işareti pimlemiyordu. On kültür ölçüldü (`.calisma/yuzde-olcu`); fa-IR
+`٪` (U+066A) yazıyor. Ölçü o kola bağlandı.
+
+### Adım 4 ölçümü — 19 Eylül 2026
+
+Bit hızı indi: `MainWindow` iki bilgi satırı ve iki plan gerçeği, `PlayerView.Describe`,
+kaydedici bütçe notu. İki gerçek kusur kapandı — `MainWindow`'un iki bilgi satırında
+bölme **tamsayıydı ve kırpıyordu** (1.499.600 bps ekranda 1499 kbps), bütçe notu ise
+`N0` ile basamak ayracı yazıp aynı birimi uygulamanın geri kalanından farklı
+gösteriyordu.
+
+Oynatıcı için önce "orada da kırpma var" yazmıştım; **yanlıştı ve ölçüm düzeltti**.
+`MediaDetails.BitsPerSecond` `double`, yani oradaki bölme zaten ondalıklıydı ve `"0"`
+biçimi yuvarlıyordu. Oynatıcının `CultureInfo.CurrentCulture` okuması da — tam sayıda
+her kültür aynı yazımı verdiği için — ekranda hiçbir fark üretmiyordu. Oynatıcı
+değişikliği bir düzeltme değil, **ortak gövdeye bağlama**dır.
+
+**`BitHizi` kültür almıyor, çünkü alamaz.** Ölçüldü (`.calisma/bithizi-olcu`): .NET'in
+bildiği **her** özgül kültürde `"0"` biçimi bu değerlere tek yazım veriyor. Kültür
+parametresi tutulsaydı hiçbir mutasyonun kıramayacağı, yani hiçbir zaman
+pimlenemeyecek bir söz olurdu; parametre kaldırıldı ve gerekçe gövdenin docstring'ine
+yazıldı.
+
+Mutasyon, **temiz tabanda** (0 kırmızı / 98 yeşil) ölçüldü. İlk tablo 1 kırmızılı
+tabanda alınmıştı ve sayıları kirliydi; raporlanmadı, yeniden koşuldu.
+
+| mutasyon | kırmızı |
+| --- | --- |
+| gövde kırpıyor (`Math.Round` → tamsayı bölme) | 4 |
+| gövde basamak ayracı koyuyor (`"0"` → `"N0"`, tr-TR) | 8 |
+| kaynak hızı gövdeye uğramıyor | 2 |
+| ses hızı gövdeye uğramıyor | 2 |
+| oynatıcı gövdeye uğramıyor | **0** |
+| bütçe gövdeye uğramıyor | 1 |
+
+Oynatıcının sıfırı bir kör nokta değil, **eşdeğer mutant**: kol eski ifadeye geri
+döndürüyor, eski ifade de `double` bölüp `"0"` ile yuvarlıyordu — iki taraf da aynı
+basamakları yazıyor, kıracak bir fark yok. Yüzeyin pimli olduğu bunun yerine gerçek
+bir kusurla ölçüldü (`.calisma/mutasyon-oynatici.py`):
+
+| mutasyon | kırmızı |
+| --- | --- |
+| oynatıcı kırpıyor (`(long)` bölme) | 2 |
+| gövde çağrılıyor ama kırpılmış değer veriliyor | 2 |
+
+Ölçünün kendi kusuru da burada kapandı: oynatıcı kolu beklenen değeri biçim
+ifadesinden **kopyalıyordu**, yani gövdeyi bozan mutasyon beklentiyi de bozuyor ve kol
+hep yeşil kalıyordu. Beklenen basamaklar artık elle yazılı.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol
