@@ -19,8 +19,14 @@
     {
       "rule": "forms/unmeasured-label",
       "file": "README.md",
-      "line": 179,
-      "reason": "\"(default 2)\" `--aralik` bayrağının program varsayılanı, ölçüm iddiası değil; CliApp.cs:145 `request.PollSeconds ?? 2` ile birebir aynı."
+      "line": 151,
+      "reason": "\"The default is 2\" `--modul` bayrağının program varsayılanı, ölçüm iddiası değil; Olcek.cs:18 `VarsayilanModul = 2` ile birebir aynı ve PlanCalculator.cs:27 oradan okuyor."
+    },
+    {
+      "rule": "forms/unmeasured-label",
+      "file": "README.md",
+      "line": 202,
+      "reason": "\"(default 2)\" `--aralik` bayrağının program varsayılanı, ölçüm iddiası değil; CliApp.cs:145 `request.PollSeconds ?? 2` ile birebir aynı. Satır 179 iken 202 oldu: araya `--suzgec` bölümü girdi."
     },
     {
       "rule": "forms/unmeasured-label",
@@ -36,19 +42,19 @@
     {
       "rule": "states/unnamed-interactive",
       "file": "src/VidShrink.App/MainWindow.axaml",
-      "line": 781,
-      "reason": "BtnRetryTrim'in Content'i MainWindow.axaml.cs:4331'de Say(\"main.retry.trim\") ile atanıyor; Avalonia'da düğmenin erişilebilir adı Content'ten gelir. Tarayıcı kod tarafındaki atamayı görmüyor."
+      "line": 811,
+      "reason": "BtnRetryTrim'in Content'i MainWindow.axaml.cs:4544'de Say(\"main.retry.trim\") ile atanıyor; Avalonia'da düğmenin erişilebilir adı Content'ten gelir. Tarayıcı kod tarafındaki atamayı görmüyor."
     },
     {
       "rule": "states/unnamed-interactive",
       "file": "src/VidShrink.App/MainWindow.axaml",
-      "line": 782,
-      "reason": "BtnRetryAccept.Content MainWindow.axaml.cs:4327'de, panel görünür olmadan önce çalışan aynı metotta atanıyor."
+      "line": 812,
+      "reason": "BtnRetryAccept.Content MainWindow.axaml.cs:4540'de, panel görünür olmadan önce çalışan aynı metotta atanıyor."
     },
     {
       "rule": "states/unnamed-interactive",
       "file": "src/VidShrink.App/MainWindow.axaml",
-      "line": 1442,
+      "line": 1496,
       "reason": "BtnUpdateBadge'in adı rozetin metniyle birlikte değişiyor; MainWindow.axaml.cs AutomationProperties.SetName ile TxtUpdateBadge.Text'i yazıyor. Sabit bir axaml adı durum değişince yalan söylerdi. Satır numarası pimli: dosya genelinde muaf tutmak yeni adsız düğmeleri de örterdi."
     },
     {
