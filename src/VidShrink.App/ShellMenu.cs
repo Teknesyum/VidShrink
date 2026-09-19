@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using VidShrink.Core;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
 
@@ -234,10 +235,7 @@ internal static class ShellMenu
 
     private const int PackageTimeoutMs = 30_000;
 
-    internal static string TargetLabel(int megabytes)
-        => megabytes >= 1024 && megabytes % 1024 == 0
-            ? (megabytes / 1024).ToString(CultureInfo.InvariantCulture) + " GB"
-            : megabytes.ToString(CultureInfo.InvariantCulture) + " MB";
+    internal static string TargetLabel(int megabytes) => Bicim.HedefEtiketi(megabytes);
 
     private static string Branch(string extension)
         => "Software\\Classes\\SystemFileAssociations\\." + extension + "\\shell";

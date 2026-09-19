@@ -449,7 +449,8 @@ public sealed class ShareProviderTests
         Assert.NotNull(diagnosis);
         Assert.Equal(ShareFailure.FileTooLarge, diagnosis!.Failure);
         Assert.Equal("storage.to", diagnosis.SuggestedTargetId);
-        Assert.Contains("128 MB", diagnosis.Message);
+        Assert.Contains("128 MiB", diagnosis.Message);
+        Assert.DoesNotContain("128 MB", diagnosis.Message);
         Assert.Contains("storage.to", diagnosis.Message);
     }
 
@@ -545,7 +546,8 @@ public sealed class ShareProviderTests
 
         Assert.Equal(ShareFailure.FileTooLarge, result.Failure);
         Assert.Equal("storage.to", result.SuggestedTargetId);
-        Assert.Contains("128 MB", result.Message);
+        Assert.Contains("128 MiB", result.Message);
+        Assert.DoesNotContain("128 MB", result.Message);
         Assert.Contains("storage.to", result.Message);
         Assert.DoesNotContain("hiçbir hedefin", result.Message);
         Assert.Empty(transport.Requests);

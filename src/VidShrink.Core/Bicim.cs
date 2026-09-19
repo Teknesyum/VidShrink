@@ -38,7 +38,9 @@ public static class Bicim
         /// <summary>
         /// Ham bayt. 1024 tabanında bölünüyorsa birim adı <b>ikilik</b> olmak zorunda:
         /// <c>ShareErrorClassifier.Size</c> 1024'e bölüp <c>KB/MB/GB</c> yazıyordu ve
-        /// kullanıcıya gerçekte olduğundan ~%5 küçük bir sayı okutuyordu.
+        /// kullanıcıya gerçekte olduğundan ~%5 küçük bir sayı okutuyordu. Yüzey yalnız
+        /// yazar: sıfırın <i>anlamı</i> (bilinmiyor / sınırsız) çağrı yerine aittir ve
+        /// üç çağrı yerinde üç ayrı sözcük olduğu için buraya taşınmaz.
         /// </summary>
         public static string Bayt(long bayt, CultureInfo kultur)
         {
@@ -55,7 +57,7 @@ public static class Bicim
 
             var sayi = basamak == 0
                 ? deger.ToString("0", kultur)
-                : deger.ToString("0.#", kultur);
+                : deger.ToString("0.##", kultur);
 
             return sayi + " " + adlar[basamak];
         }
@@ -68,6 +70,16 @@ public static class Bicim
     /// </summary>
     public static string Yuzde(double oran, CultureInfo kultur) =>
         (oran * 100).ToString("0.#", kultur) + "%";
+
+    /// <summary>
+    /// Hedef boyut menü etiketi: 1024'ün tam katları GB, diğerleri MB. Aynı gövde
+    /// <c>ShellMenu.TargetLabel</c> ve <c>ShellIntegration.FormatQuickShrinkLabel</c>
+    /// olarak iki kez yazılmıştı; biri kültür veriyordu, diğeri vermiyordu.
+    /// </summary>
+    public static string HedefEtiketi(int mb) =>
+        mb >= 1024 && mb % 1024 == 0
+            ? (mb / 1024).ToString("0", CultureInfo.InvariantCulture) + " GB"
+            : mb.ToString("0", CultureInfo.InvariantCulture) + " MB";
 
     /// <summary>Bit hızı. Ondalığı hiç anlam taşımıyor, birim eki katalogdan gelir.</summary>
     public static class BitHizi

@@ -62,6 +62,19 @@ public sealed class BicimTests
         Assert.Equal("1.5 KiB", Bicim.Boyut.Bayt(1536, En));
 
     [Fact]
+    public void BaytIkiOndalikTavani() =>
+        Assert.Equal("1,18 MiB", Bicim.Boyut.Bayt(1_234_567, Tr));
+
+    [Theory]
+    [InlineData(50, "50 MB")]
+    [InlineData(1023, "1023 MB")]
+    [InlineData(1024, "1 GB")]
+    [InlineData(2048, "2 GB")]
+    [InlineData(1536, "1536 MB")]
+    public void HedefEtiketiTamKatlariGbYazar(int mb, string beklenen) =>
+        Assert.Equal(beklenen, Bicim.HedefEtiketi(mb));
+
+    [Fact]
     public void YuzdeOranAlirCarpimiKendiYapar()
     {
         Assert.Equal("62,5%", Bicim.Yuzde(0.625, Tr));

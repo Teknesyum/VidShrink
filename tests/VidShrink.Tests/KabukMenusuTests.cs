@@ -1,6 +1,8 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using VidShrink.App;
+using VidShrink.Core;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -210,5 +212,26 @@ public class KabukMenusuTests
             Assert.True(File.Exists(path), path);
             Assert.Contains($"\"{key}\"", File.ReadAllText(path));
         }
+    }
+
+    /// <summary>
+    /// Menü etiketi <see cref="Bicim.HedefEtiketi"/>'ne indi. Gerçek hedef listesinde
+    /// 1024 ve 2048 var, yani GB kolu üretimde koşuyor; mutasyon ölçüsü bu kolun hiçbir
+    /// testte pimli olmadığını gösterdi (0 kırmızı). İki yazım tek gövdeden gelmeli:
+    /// kabuk menüsü ile kurulum kaydı aynı etiketi yazmazsa kullanıcı aynı komutu iki
+    /// ayrı adla görür.
+    /// </summary>
+    [Fact]
+    public void MenuEtiketiTekGovdedenGeliyor()
+    {
+        foreach (var mb in ShellIntegration.QuickShrinkTargetsMegabytes)
+        {
+            Assert.Equal(Bicim.HedefEtiketi(mb), ShellMenu.TargetLabel(mb));
+            Assert.Equal(Bicim.HedefEtiketi(mb), ShellIntegration.FormatQuickShrinkLabel(mb));
+        }
+
+        Assert.Equal("1 GB", ShellMenu.TargetLabel(1024));
+        Assert.Equal("2 GB", ShellMenu.TargetLabel(2048));
+        Assert.Equal("100 MB", ShellMenu.TargetLabel(100));
     }
 }

@@ -2157,15 +2157,8 @@ public partial class MainWindow : Window
     /// Tavan JSON'da bayt olarak duruyor ve tam ikilik katlar: 128 MiB ve 25 GiB. Ondalık
     /// birime yuvarlamak sayıyı değiştirirdi, bu yüzden ikilik ad yazılır.
     /// </summary>
-    internal static string DescribeBytes(long bytes)
-    {
-        if (bytes <= 0) return "-";
-        string[] units = { "B", "KiB", "MiB", "GiB", "TiB" };
-        double size = bytes;
-        var unit = 0;
-        while (size >= 1024 && unit < units.Length - 1) { size /= 1024; unit++; }
-        return $"{Num(size, "0.##")} {units[unit]}";
-    }
+    internal static string DescribeBytes(long bytes) =>
+        bytes <= 0 ? "-" : Bicim.Boyut.Bayt(bytes, Strings.Culture);
 
     private void OnAutoUpdateChanged()
     {

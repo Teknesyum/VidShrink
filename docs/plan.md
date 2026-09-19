@@ -114,6 +114,30 @@ döndüğü ölçülür; sıfır kırmızı veren yüzey pimsiz sayılır ve tes
 Kültür dikişi ayrı ayrı pimlendi: `Saat`'te `InvariantCulture` mutasyonu 21 yeşilden
 geçmişti, burada dört ayrı kültür mutasyonunun dördü de kırmızı.
 
+
+### Adım 2 ölçümü — 19 Eylül 2026
+
+Dosya boyutu ailesinin dört gövdesi `Bicim`'e indi: `ShareErrorClassifier.Size`,
+`MainWindow.DescribeBytes`, `ShellMenu.TargetLabel`, `ShellIntegration.FormatQuickShrinkLabel`.
+Son ikisi birbirinin kopyasıydı ve biri kültür veriyor, diğeri vermiyordu; ikisi de
+`Bicim.HedefEtiketi`'ne indi. Derleme `-warnaserror` ile 0 uyarı 0 hata, 138 test yeşil.
+
+**Kullanıcıya gösterilen yalan kapandı:** `ShareErrorClassifier` 1024'e bölüp `KB/MB/GB`
+yazıyordu. İki test bu yanlış birimi **pimliyordu** (`ShareProviderTests` `"128 MB"`);
+yani ölçü kusuru korumuştu. Pimler doğru birime çevrildi ve yanlış adın dönmediği
+olumsuz kontrolle bağlandı.
+
+| Mutasyon | Kırmızı |
+|---|---|
+| Paylaşım boyutu eski yalana döndürüldü | 2 |
+| `DescribeBytes` kültürü düşürüldü | 1 |
+| `ShellMenu` etiketi GB kolunu kaybetti | **0 → 1** |
+| Kabuk etiketi yanlış sayı yazdı | 1 |
+
+Üçüncü satır kör noktaydı: gerçek hedef listesinde 1024 ve 2048 var, yani GB kolu
+üretimde koşuyor ama hiçbir test onu okumuyordu. `MenuEtiketiTekGovdedenGeliyor` yazıldı
+— iki yazımın tek gövdeden geldiğini ve GB kolunu pimliyor; aynı mutasyon artık kırmızı.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

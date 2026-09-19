@@ -25,10 +25,7 @@ public static class ShellIntegration
     public const string ShrinkFlag = "--kucult";
 
     /// <summary>Hedef boyutun menü etiketi: 1024'ün tam katları GB, diğerleri MB.</summary>
-    public static string FormatQuickShrinkLabel(int megabytes)
-        => megabytes >= 1024 && megabytes % 1024 == 0
-            ? $"{megabytes / 1024} GB"
-            : $"{megabytes} MB";
+    public static string FormatQuickShrinkLabel(int megabytes) => Bicim.HedefEtiketi(megabytes);
 
     /// <summary>Kurulum kökündeki başlatıcının açtığı uygulama, köke göre.</summary>
     public const string AppExecutableRelativePath = @"app\VidShrink.App.exe";

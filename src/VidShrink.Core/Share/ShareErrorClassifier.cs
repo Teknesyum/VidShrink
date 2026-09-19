@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 
@@ -261,20 +262,11 @@ public static class ShareErrorClassifier
         return flat.Length <= 300 ? flat : flat[..300] + "…";
     }
 
-    private static string Size(long bytes)
-    {
-        if (bytes <= 0) return "sınırsız";
-        string[] units = { "B", "KB", "MB", "GB", "TB" };
-        double value = bytes;
-        var unit = 0;
-        while (value >= 1024 && unit < units.Length - 1)
-        {
-            value /= 1024;
-            unit++;
-        }
-
-        return value >= 100 || unit == 0
-            ? $"{Math.Round(value)} {units[unit]}"
-            : $"{value:0.#} {units[unit]}";
-    }
+    /// <summary>
+    /// Boyut yazımı <see cref="Bicim.Boyut.Bayt"/>'a indi. Eski gövde 1024'e bölüp
+    /// <c>KB/MB/GB</c> yazıyordu; kullanıcı gerçekte olduğundan ~%5 küçük görünen bir
+    /// birim adı okuyordu. Sıfırın anlamı ("sınırsız") burada kalır, yazım gövdede.
+    /// </summary>
+    private static string Size(long bytes) =>
+        bytes <= 0 ? "sınırsız" : Bicim.Boyut.Bayt(bytes, CultureInfo.CurrentCulture);
 }
