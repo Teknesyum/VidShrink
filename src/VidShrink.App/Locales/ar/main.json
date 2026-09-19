@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "الذكاء الاصطناعي",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "إرشادي",
   "main.preset.error.not-json": "ملف الإعدادات المسبقة ليس JSON صالحًا.",
   "main.preset.error.not-preset-file": "هذا الملف ليس ملف إعدادات مسبقة لـ VidShrink.",
   "main.preset.error.hand-brake-file": "هذا ملف إعدادات مسبقة من HandBrake. استيراد إعدادات HandBrake المسبقة غير متاح بعد.",

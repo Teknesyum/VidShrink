@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Okvirno",
   "main.preset.error.not-json": "Datoteka predložaka nije valjani JSON.",
   "main.preset.error.not-preset-file": "Ova datoteka nije datoteka predložaka VidShrink.",
   "main.preset.error.hand-brake-file": "Ovo je datoteka predložaka HandBrake. Uvoz predložaka iz HandBrakea još nije dostupan.",

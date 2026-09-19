@@ -36,6 +36,12 @@ internal sealed record PreviewClip
     /// <summary>ffmpeg'e gerçekten geçen tam sayı kalite değeri; kodlayıcı ölçeği modellenmiyorsa yok.</summary>
     public required int? Crf { get; init; }
 
+    /// <summary>
+    /// Uygulanan hız kontrolünün güvenilirliği. Rozet sayısız kaldığında sapmanın türünü
+    /// bu ayırır: ölçek modellenmiyorsa kullanıcıya sayı yerine tek kelime gösterilir.
+    /// </summary>
+    public required PreviewQuality QualityKind { get; init; }
+
     /// <summary>İki dosyanın birlikte kodlanma süresi.</summary>
     public required TimeSpan Elapsed { get; init; }
 
@@ -123,6 +129,23 @@ internal sealed class SegmentEncoder : IDisposable
         MediaInfo info, EncodePlan plan, double startSeconds, string outputPath, ComplexityProfile? complexity)
         => PreviewSegment.For(info, plan, startSeconds, outputPath,
             complexity: complexity, availability: Availability, scenes: Scenes);
+
+    /// <summary>
+    /// Hesaplanan parçanın panele geçen yüzü. Saf: süreç açmaz, dosya okumaz — dikiş burada
+    /// durduğu için rozetin gördüğü alanların parçadan geldiği ffmpeg'siz ölçülebiliyor.
+    /// </summary>
+    internal static PreviewClip Klip(
+        PreviewSegment segment, string sourcePath, string encodedPath, double start, TimeSpan elapsed) => new()
+    {
+        SourcePath = sourcePath,
+        EncodedPath = encodedPath,
+        StartSeconds = start,
+        DurationSeconds = segment.DurationSeconds,
+        IsApproximate = segment.IsApproximate,
+        Crf = segment.Plan.Crf,
+        QualityKind = segment.Quality.Kind,
+        Elapsed = elapsed
+    };
 
     /// <summary>Son başarısız kodlamanın sebebi, anahtar hâlinde. Başarıda temizlenir.</summary>
     internal EncodeFailure? LastFailure { get; private set; }
@@ -272,16 +295,7 @@ internal sealed class SegmentEncoder : IDisposable
             Interlocked.Increment(ref _completed);
             LastFailure = null;
 
-            var clip = new PreviewClip
-            {
-                SourcePath = sourcePath,
-                EncodedPath = encodedPath,
-                StartSeconds = start,
-                DurationSeconds = segment.DurationSeconds,
-                IsApproximate = segment.IsApproximate,
-                Crf = segment.Plan.Crf,
-                Elapsed = clock.Elapsed
-            };
+            var clip = Klip(segment, sourcePath, encodedPath, start, clock.Elapsed);
 
             Register(clip);
             return clip;

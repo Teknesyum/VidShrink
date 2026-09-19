@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Kielelezo",
   "main.preset.error.not-json": "Faili la mipangilio awali si JSON halali.",
   "main.preset.error.not-preset-file": "Faili hili si faili la mipangilio awali la VidShrink.",
   "main.preset.error.hand-brake-file": "Hili ni faili la mipangilio awali la HandBrake. Uingizaji wa mipangilio awali ya HandBrake bado haupatikani.",

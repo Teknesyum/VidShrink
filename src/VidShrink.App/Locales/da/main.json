@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Vejledende",
   "main.preset.error.not-json": "Forudindstillingsfilen er ikke gyldig JSON.",
   "main.preset.error.not-preset-file": "Denne fil er ikke en VidShrink-forudindstillingsfil.",
   "main.preset.error.hand-brake-file": "Dette er en HandBrake-forudindstillingsfil. Import af HandBrake-forudindstillinger er endnu ikke tilgængelig.",

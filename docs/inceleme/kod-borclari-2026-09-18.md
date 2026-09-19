@@ -51,9 +51,12 @@ açıkça "bu kod kalkacak" diyor.
    (`docs/olcumler/k8-kirpma-2026-09-19.md`).
 8. ~~`tests/VidShrink.Tests/OluUyeTests.cs:495-508` — Önizleme türlerinin beş üyesi
    üretiliyor, okuma tarafında adı geçmiyor.~~ **Kısmen kapandı:** üç `PreviewState` pimi
-   madde 21 ile birlikte düştü (türün kendisi kaldırıldı). Kalan iki pim
-   (`PreviewQuality.Desteklenmiyor`, `.Yaklasik`) canlı `PreviewSegment`'te duruyor ve
-   borç olarak açık.
+   madde 21 ile birlikte düştü (türün kendisi kaldırıldı). **Artanı da kapandı:** kalan iki
+   pim ölçülünce altında canlı bir kusur çıktı — kodlayıcının kalite ölçeği modellenmiyorsa
+   rozet sayı üretemiyor ve lafza uyulunca parça nihai çıktıdan en çok saptığı yerde hiç
+   uyarı çıkmıyordu. `Desteklenmiyor` haline sayısız ayrı bir rozet kondu
+   (`main.preview.temsili`, 42 dil); o pim düştü, `Yaklasik` meşruya çevrildi. Beş kesimin
+   beşi kırmızı, taban ve geri 0/12 (`docs/olcumler/k8-onizleme-rozeti-2026-09-19.md`).
 9. ~~`src/VidShrink.App/CurrentMedia.cs:52-63`, `MainWindow.OdakTakibi.cs:93-95`,
    `src/VidShrink.Cli/CliApp.cs:446-447` — Aynı yol eşitliği üç gövdede ve davranışları
    farklı: biri `ArgumentException`'ı yutuyor, ikisi yutmuyor.~~ **Kapandı:** gövde

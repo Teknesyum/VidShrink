@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "DI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Orientacinis",
   "main.preset.error.not-json": "Išankstinių nustatymų failas nėra tinkamas JSON.",
   "main.preset.error.not-preset-file": "Šis failas nėra VidShrink išankstinių nustatymų failas.",
   "main.preset.error.hand-brake-file": "Tai HandBrake išankstinių nustatymų failas. HandBrake išankstinių nustatymų importas dar negalimas.",

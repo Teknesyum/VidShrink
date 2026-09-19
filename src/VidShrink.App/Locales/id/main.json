@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Indikatif",
   "main.preset.error.not-json": "Berkas preset bukan JSON yang valid.",
   "main.preset.error.not-preset-file": "Berkas ini bukan berkas preset VidShrink.",
   "main.preset.error.hand-brake-file": "Ini berkas preset HandBrake. Impor preset HandBrake belum tersedia.",

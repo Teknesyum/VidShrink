@@ -200,15 +200,25 @@ internal sealed class PanelHost : IDisposable
     ///
     /// Kullanıcı 09-07: rozette yalnız "CRF x" yazar. Taraf adı (İŞLENMİŞ) panelin üstündeki
     /// etiket satırında durduğu için rozette tekrarlanmaz; sayı yoksa rozet de yoktur.
+    ///
+    /// K8 borcu 8: o karar <see cref="PreviewQuality.Yaklasik"/> halini konuşuyordu. Kodlayıcının
+    /// kalite ölçeği hiç modellenmiyorsa sayı üretilemez ve lafzına uyulunca parça nihai
+    /// çıktıdan <b>en çok</b> saptığı yerde hiç uyarı çıkmıyordu. O hal sayısız tek kelimeyle
+    /// ayrı yazılır; "yaklaşık" denmez, çünkü sapmanın türü başkadır.
     /// </summary>
-    internal string? ApproximateBadge
+    internal string? ApproximateBadge => RozetMetni(ActiveClip);
+
+    /// <summary>
+    /// Rozetin saf gövdesi: panel açmadan ölçülebilsin diye ayrı duruyor. Karar yalnız
+    /// parçaya bakar, panelin durumuna değil.
+    /// </summary>
+    internal static string? RozetMetni(PreviewClip? clip)
     {
-        get
-        {
-            var clip = ActiveClip;
-            if (clip is null || !clip.IsApproximate) return null;
-            return clip.Crf is { } crf ? Strings.Get("main.plan.mode.crf-value", crf) : null;
-        }
+        if (clip is null || !clip.IsApproximate) return null;
+        if (clip.Crf is { } crf) return Strings.Get("main.plan.mode.crf-value", crf);
+        return clip.QualityKind == PreviewQuality.Desteklenmiyor
+            ? Strings.Get("main.preview.temsili")
+            : null;
     }
 
     /// <summary>

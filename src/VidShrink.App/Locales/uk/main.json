@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "ШІ",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Орієнтовно",
   "main.preset.error.not-json": "Файл передустановок не є коректним JSON.",
   "main.preset.error.not-preset-file": "Цей файл не є файлом передустановок VidShrink.",
   "main.preset.error.hand-brake-file": "Це файл передустановок HandBrake. Імпорт передустановок HandBrake ще недоступний.",

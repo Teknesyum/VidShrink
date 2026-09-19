@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Orientativ",
   "main.preset.error.not-json": "Fișierul de presetări nu este JSON valid.",
   "main.preset.error.not-preset-file": "Acest fișier nu este un fișier de presetări VidShrink.",
   "main.preset.error.hand-brake-file": "Acesta este un fișier de presetări HandBrake. Importul presetărilor HandBrake nu este încă disponibil.",

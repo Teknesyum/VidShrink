@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Vägledande",
   "main.preset.error.not-json": "Förinställningsfilen är inte giltig JSON.",
   "main.preset.error.not-preset-file": "Den här filen är inte en förinställningsfil för VidShrink.",
   "main.preset.error.hand-brake-file": "Det här är en förinställningsfil från HandBrake. Import av HandBrake-förinställningar är inte tillgängligt ännu.",

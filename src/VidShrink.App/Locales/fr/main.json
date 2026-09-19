@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "IA",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Indicatif",
   "main.preset.error.not-json": "Le fichier de préréglages n'est pas un JSON valide.",
   "main.preset.error.not-preset-file": "Ce fichier n'est pas un fichier de préréglages VidShrink.",
   "main.preset.error.hand-brake-file": "Ceci est un fichier de préréglages HandBrake. L'import des préréglages HandBrake n'est pas encore disponible.",

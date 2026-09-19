@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Orientacyjnie",
   "main.preset.error.not-json": "Plik ustawień wstępnych nie jest prawidłowym JSON-em.",
   "main.preset.error.not-preset-file": "Ten plik nie jest plikiem ustawień wstępnych VidShrink.",
   "main.preset.error.hand-brake-file": "To jest plik ustawień wstępnych HandBrake. Importowanie ustawień wstępnych HandBrake nie jest jeszcze dostępne.",

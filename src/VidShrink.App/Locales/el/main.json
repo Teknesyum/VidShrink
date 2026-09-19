@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Ενδεικτικό",
   "main.preset.error.not-json": "Το αρχείο προρυθμίσεων δεν είναι έγκυρο JSON.",
   "main.preset.error.not-preset-file": "Αυτό το αρχείο δεν είναι αρχείο προρυθμίσεων του VidShrink.",
   "main.preset.error.hand-brake-file": "Αυτό είναι αρχείο προρυθμίσεων του HandBrake. Η εισαγωγή προρυθμίσεων HandBrake δεν είναι ακόμη διαθέσιμη.",

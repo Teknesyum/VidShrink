@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "Tekoäly",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Suuntaa antava",
   "main.preset.error.not-json": "Esiasetustiedosto ei ole kelvollista JSONia.",
   "main.preset.error.not-preset-file": "Tämä tiedosto ei ole VidShrinkin esiasetustiedosto.",
   "main.preset.error.hand-brake-file": "Tämä on HandBraken esiasetustiedosto. HandBraken esiasetusten tuonti ei ole vielä käytettävissä.",

@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "מייצג",
   "main.preset.error.not-json": "קובץ ההגדרות המוכנות אינו JSON תקין.",
   "main.preset.error.not-preset-file": "קובץ זה אינו קובץ הגדרות מוכנות של VidShrink.",
   "main.preset.error.hand-brake-file": "זהו קובץ הגדרות מוכנות של HandBrake. ייבוא הגדרות מוכנות מ-HandBrake עדיין אינו זמין.",

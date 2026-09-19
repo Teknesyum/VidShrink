@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Indikatif",
   "main.preset.error.not-json": "Fail pratetap bukan JSON yang sah.",
   "main.preset.error.not-preset-file": "Fail ini bukan fail pratetap VidShrink.",
   "main.preset.error.hand-brake-file": "Ini ialah fail pratetap HandBrake. Import pratetap HandBrake belum tersedia.",

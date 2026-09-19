@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "UI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Okvirno",
   "main.preset.error.not-json": "Datoteka prednastavitev ni veljaven JSON.",
   "main.preset.error.not-preset-file": "Ta datoteka ni datoteka prednastavitev VidShrink.",
   "main.preset.error.hand-brake-file": "To je datoteka prednastavitev HandBrake. Uvoz prednastavitev HandBrake še ni na voljo.",

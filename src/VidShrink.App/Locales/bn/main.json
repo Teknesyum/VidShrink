@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "আনুমানিক",
   "main.preset.error.not-json": "প্রিসেট ফাইলটি বৈধ JSON নয়।",
   "main.preset.error.not-preset-file": "এই ফাইলটি VidShrink প্রিসেট ফাইল নয়।",
   "main.preset.error.hand-brake-file": "এটি একটি HandBrake প্রিসেট ফাইল। HandBrake প্রিসেট ইমপোর্ট করার সুবিধা এখনো নেই।",

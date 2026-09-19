@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "هوش مصنوعی",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "تقریبی",
   "main.preset.error.not-json": "فایل پیش‌تنظیم‌ها JSON معتبر نیست.",
   "main.preset.error.not-preset-file": "این فایل، فایل پیش‌تنظیم VidShrink نیست.",
   "main.preset.error.hand-brake-file": "این یک فایل پیش‌تنظیم HandBrake است. درون‌ریزی پیش‌تنظیم‌های HandBrake هنوز موجود نیست.",

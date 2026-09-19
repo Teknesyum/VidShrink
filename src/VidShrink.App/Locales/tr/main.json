@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Temsili",
   "main.preset.error.not-json": "Ön ayar dosyası geçerli bir JSON değil.",
   "main.preset.error.not-preset-file": "Bu dosya bir VidShrink ön ayar dosyası değil.",
   "main.preset.error.hand-brake-file": "Bu bir HandBrake ön ayar dosyası. HandBrake ön ayarlarını içe aktarma henüz yok.",

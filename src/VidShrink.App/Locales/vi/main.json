@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Tham khảo",
   "main.preset.error.not-json": "Tệp cài đặt sẵn không phải JSON hợp lệ.",
   "main.preset.error.not-preset-file": "Tệp này không phải tệp cài đặt sẵn của VidShrink.",
   "main.preset.error.hand-brake-file": "Đây là tệp cài đặt sẵn của HandBrake. Chức năng nhập cài đặt sẵn từ HandBrake hiện chưa có.",

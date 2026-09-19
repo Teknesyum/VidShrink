@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "MI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Tájékoztató",
   "main.preset.error.not-json": "Az előbeállítás-fájl nem érvényes JSON.",
   "main.preset.error.not-preset-file": "Ez a fájl nem VidShrink előbeállítás-fájl.",
   "main.preset.error.hand-brake-file": "Ez egy HandBrake előbeállítás-fájl. A HandBrake-előbeállítások importálása még nem érhető el.",

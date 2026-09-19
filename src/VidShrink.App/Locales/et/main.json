@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Ligikaudne",
   "main.preset.error.not-json": "Eelseadistuste fail ei ole kehtiv JSON.",
   "main.preset.error.not-preset-file": "See fail ei ole VidShrinki eelseadistuste fail.",
   "main.preset.error.hand-brake-file": "See on HandBrake'i eelseadistuste fail. HandBrake'i eelseadistuste importimine ei ole veel saadaval.",

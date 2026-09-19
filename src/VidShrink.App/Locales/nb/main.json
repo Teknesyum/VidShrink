@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "KI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Veiledende",
   "main.preset.error.not-json": "Forhåndsinnstillingsfilen er ikke gyldig JSON.",
   "main.preset.error.not-preset-file": "Denne filen er ikke en forhåndsinnstillingsfil for VidShrink.",
   "main.preset.error.hand-brake-file": "Dette er en forhåndsinnstillingsfil fra HandBrake. Import av HandBrake-forhåndsinnstillinger er ikke tilgjengelig ennå.",

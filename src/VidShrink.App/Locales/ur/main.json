@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "تخمینی",
   "main.preset.error.not-json": "پری سیٹ فائل درست JSON نہیں ہے۔",
   "main.preset.error.not-preset-file": "یہ فائل VidShrink کی پری سیٹ فائل نہیں ہے۔",
   "main.preset.error.hand-brake-file": "یہ HandBrake کی پری سیٹ فائل ہے۔ HandBrake پری سیٹ امپورٹ کرنا ابھی دستیاب نہیں ہے۔",

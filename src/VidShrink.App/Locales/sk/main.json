@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Orientačné",
   "main.preset.error.not-json": "Súbor predvolieb nie je platný JSON.",
   "main.preset.error.not-preset-file": "Tento súbor nie je súborom predvolieb VidShrink.",
   "main.preset.error.hand-brake-file": "Toto je súbor predvolieb HandBrake. Import predvolieb z HandBrake zatiaľ nie je k dispozícii.",

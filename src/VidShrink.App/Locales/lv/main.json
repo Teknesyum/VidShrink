@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "MI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Orientējošs",
   "main.preset.error.not-json": "Priekšiestatījumu fails nav derīgs JSON.",
   "main.preset.error.not-preset-file": "Šis fails nav VidShrink priekšiestatījumu fails.",
   "main.preset.error.hand-brake-file": "Šis ir HandBrake priekšiestatījumu fails. HandBrake priekšiestatījumu importēšana vēl nav pieejama.",

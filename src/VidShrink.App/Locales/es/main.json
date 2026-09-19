@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "IA",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Indicativo",
   "main.preset.error.not-json": "El archivo de ajustes preestablecidos no es un JSON válido.",
   "main.preset.error.not-preset-file": "Este archivo no es un archivo de ajustes preestablecidos de VidShrink.",
   "main.preset.error.hand-brake-file": "Es un archivo de ajustes preestablecidos de HandBrake. La importación de ajustes preestablecidos de HandBrake aún no está disponible.",

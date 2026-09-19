@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "参考値",
   "main.preset.error.not-json": "プリセットファイルは有効な JSON ではありません。",
   "main.preset.error.not-preset-file": "このファイルは VidShrink のプリセットファイルではありません。",
   "main.preset.error.hand-brake-file": "これは HandBrake のプリセットファイルです。HandBrake プリセットのインポートはまだ利用できません。",

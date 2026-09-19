@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "โดยประมาณ",
   "main.preset.error.not-json": "ไฟล์พรีเซ็ตไม่ใช่ JSON ที่ถูกต้อง",
   "main.preset.error.not-preset-file": "ไฟล์นี้ไม่ใช่ไฟล์พรีเซ็ตของ VidShrink",
   "main.preset.error.hand-brake-file": "นี่คือไฟล์พรีเซ็ตของ HandBrake การนำเข้าพรีเซ็ตของ HandBrake ยังไม่พร้อมใช้งาน",

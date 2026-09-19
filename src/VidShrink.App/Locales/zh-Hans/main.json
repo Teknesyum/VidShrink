@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "参考值",
   "main.preset.error.not-json": "预设文件不是有效的 JSON。",
   "main.preset.error.not-preset-file": "此文件不是 VidShrink 预设文件。",
   "main.preset.error.hand-brake-file": "这是 HandBrake 预设文件。导入 HandBrake 预设的功能尚不可用。",

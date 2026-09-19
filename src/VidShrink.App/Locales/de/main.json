@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "KI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Orientierend",
   "main.preset.error.not-json": "Die Voreinstellungsdatei ist kein gültiges JSON.",
   "main.preset.error.not-preset-file": "Diese Datei ist keine VidShrink-Voreinstellungsdatei.",
   "main.preset.error.hand-brake-file": "Dies ist eine HandBrake-Voreinstellungsdatei. Der Import von HandBrake-Voreinstellungen ist noch nicht verfügbar.",

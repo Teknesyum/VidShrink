@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "மாதிரி",
   "main.preset.error.not-json": "முன்னமைவு கோப்பு சரியான JSON அல்ல.",
   "main.preset.error.not-preset-file": "இந்தக் கோப்பு VidShrink முன்னமைவு கோப்பு அல்ல.",
   "main.preset.error.hand-brake-file": "இது HandBrake முன்னமைவு கோப்பு. HandBrake முன்னமைவுகளை இறக்குமதி செய்யும் வசதி இன்னும் இல்லை.",

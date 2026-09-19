@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "IA",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "Indicativo",
   "main.preset.error.not-json": "Il file dei preset non è un JSON valido.",
   "main.preset.error.not-preset-file": "Questo file non è un file di preset di VidShrink.",
   "main.preset.error.hand-brake-file": "Questo è un file di preset di HandBrake. L'importazione dei preset di HandBrake non è ancora disponibile.",

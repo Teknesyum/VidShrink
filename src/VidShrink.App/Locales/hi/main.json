@@ -541,6 +541,7 @@
   "main.unit.score-value": "{0}/100",
   "main.plan.ai": "AI",
   "main.plan.mode.crf-value": "CRF {0}",
+  "main.preview.temsili": "सांकेतिक",
   "main.preset.error.not-json": "प्रीसेट फ़ाइल मान्य JSON नहीं है।",
   "main.preset.error.not-preset-file": "यह फ़ाइल VidShrink प्रीसेट फ़ाइल नहीं है।",
   "main.preset.error.hand-brake-file": "यह HandBrake प्रीसेट फ़ाइल है। HandBrake प्रीसेट इम्पोर्ट करना अभी उपलब्ध नहीं है।",
