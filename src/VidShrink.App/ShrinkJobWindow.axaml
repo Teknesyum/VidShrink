@@ -1,5 +1,6 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auto="using:Avalonia.Automation"
         xmlns:loc="using:VidShrink.App.Localization"
         x:Class="VidShrink.App.ShrinkJobWindow"
         Title="VidShrink"
@@ -83,6 +84,7 @@
                 Padding="{StaticResource ButtonPaddingSm}"
                 IsVisible="False"/>
         <Button x:Name="BtnShareRetry"
+                auto:AutomationProperties.Name="{loc:Text settings.share.retry}"
                 Padding="{StaticResource ButtonPaddingSm}"
                 IsVisible="False"/>
         <Button x:Name="BtnClose"

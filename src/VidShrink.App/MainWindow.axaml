@@ -829,7 +829,7 @@
                         <Button x:Name="BtnReveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnReveal"/>
                         <Button x:Name="BtnShare" Content="{loc:Text main.action.share}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShare"/>
                         <Button x:Name="BtnShareCancel" Content="{loc:Text main.action.cancel-upload}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShareCancel"/>
-                        <Button x:Name="BtnShareRetry" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False"/>
+                        <Button x:Name="BtnShareRetry" auto:AutomationProperties.Name="{loc:Text settings.share.retry}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False"/>
                       </WrapPanel>
                       <ProgressBar x:Name="ShareProgress" Maximum="1" IsVisible="False"/>
                       <Grid x:Name="ShareLinkRow"
@@ -1495,6 +1495,7 @@
           </StackPanel>
           <StackPanel Grid.Column="2" x:Name="TitleBarRight" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
             <Button x:Name="BtnUpdateBadge" Theme="{StaticResource TitleBarLinkButton}" IsVisible="False"
+                    auto:AutomationProperties.Name="{loc:Text main.update.badge}"
                     ToolTip.Tip="{loc:Text main.update.checking}" Click="OnUpdateBadgeClicked">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <Ellipse x:Name="UpdateBadgeDot" Width="{StaticResource BadgeDotSize}" Height="{StaticResource BadgeDotSize}"

@@ -232,6 +232,7 @@
                   auto:AutomationProperties.Name="{loc:Text main.action.cancel-upload}"
                   Click="OnShareCancel"/>
           <Button x:Name="BtnRecShareRetry"
+                  auto:AutomationProperties.Name="{loc:Text settings.share.retry}"
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"
                   IsVisible="False"/>

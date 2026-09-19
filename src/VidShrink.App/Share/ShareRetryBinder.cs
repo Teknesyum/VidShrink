@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia.Automation;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using VidShrink.App.Localization;
@@ -80,7 +81,9 @@ internal sealed class ShareRetryBinder : IDisposable
         var prompt = Current;
         _button.IsVisible = prompt.Visible;
         _button.IsEnabled = prompt.Enabled;
-        _button.Content = prompt.Visible ? Strings.Get(prompt.Key, prompt.Args.ToArray()) : string.Empty;
+        var yazi = prompt.Visible ? Strings.Get(prompt.Key, prompt.Args.ToArray()) : string.Empty;
+        _button.Content = yazi;
+        AutomationProperties.SetName(_button, prompt.Visible ? yazi : Strings.Get("settings.share.retry"));
     }
 
     private void Durdur()

@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Avalonia.Automation;
+using Avalonia.Controls;
+using System.Net;
 using System.Net.Sockets;
 using VidShrink.App.Localization;
 using VidShrink.App.Share;
@@ -218,6 +220,42 @@ public sealed class PaylasimTekrarDenemeTests : IDisposable
             hedef, new OperationCanceledException(), ShareStep.Upload));
 
         Assert.False(ShareRetryPrompt.For(sonuc, Tablo(), 0).Visible);
+    }
+
+    /// <summary>
+    /// Düğmenin ekran okuyucuya verdiği ad. Üç paylaşım yüzeyinde de yazı kodda kuruluyor,
+    /// XAML'da <c>Content</c> yok; 19 Eylül 2026'da arayüz taraması üçünü birden "adsız
+    /// düğme" diye okudu. XAML'a sabit ad eklendi, bağlayıcı da yazıyı tazelerken adı canlı
+    /// tutuyor. Ölçü iki hali de pimliyor: görünürken ad yazının kendisi, gizliyken yazı
+    /// boşalıyor ama ad sabit karşılığa düşüyor — boş ada düşmüyor.
+    /// </summary>
+    [Fact]
+    public void TekrarDugmesininErisimAdiBosKalmiyor()
+    {
+        var hedef = Tablo().DefaultTarget!;
+        using var yanit = new HttpResponseMessage(HttpStatusCode.TooManyRequests);
+        var sonuc = Sonuc(ShareErrorClassifier.FromResponse(hedef, yanit, string.Empty, ShareStep.Init));
+        using var kapali = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+        var gizlenen = Sonuc(ShareErrorClassifier.FromResponse(hedef, kapali, string.Empty, ShareStep.Upload));
+        Assert.False(gizlenen.IsRetryable());
+
+        var olcu = AppHost.Run(() =>
+        {
+            var dugme = new Button();
+            using var baglayici = new ShareRetryBinder(dugme, Tablo, _ => { });
+
+            baglayici.Show(sonuc);
+            var acikYazi = dugme.Content as string;
+            var acikAd = AutomationProperties.GetName(dugme);
+
+            baglayici.Show(gizlenen);
+            return (acikYazi, acikAd, kapaliYazi: dugme.Content as string, kapaliAd: AutomationProperties.GetName(dugme));
+        });
+
+        Assert.Equal(Strings.Get("settings.share.retry"), olcu.acikYazi);
+        Assert.Equal(olcu.acikYazi, olcu.acikAd);
+        Assert.Equal(string.Empty, olcu.kapaliYazi);
+        Assert.Equal(Strings.Get("settings.share.retry"), olcu.kapaliAd);
     }
 
     // ---- Dil ---------------------------------------------------------------------------------
