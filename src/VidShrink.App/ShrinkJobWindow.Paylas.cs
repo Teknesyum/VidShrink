@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using VidShrink.App.Localization;
+using VidShrink.Core;
 using CoreShare = VidShrink.Core.Share;
 
 namespace VidShrink.App;
@@ -112,7 +113,7 @@ public partial class ShrinkJobWindow
             TxtShareLink.Text = link.Url;
             ShareLinkRow.IsVisible = true;
             ShowShareStatus(link.ExpiresAt is { } expires
-                ? Say("settings.share.shared-until", expires.ToLocalTime().ToString("d MMMM HH:mm", Strings.CultureOf(_language)))
+                ? Say("settings.share.shared-until", Bicim.Damga(expires, Strings.CultureOf(_language)))
                 : Say("settings.share.shared"));
             return;
         }

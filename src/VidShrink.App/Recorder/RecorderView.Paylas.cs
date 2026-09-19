@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using VidShrink.App.Localization;
+using VidShrink.Core;
 using CoreShare = VidShrink.Core.Share;
 
 namespace VidShrink.App.Recorder;
@@ -102,7 +103,7 @@ internal partial class RecorderView
             TxtRecShareLink.Text = link.Url;
             RecShareLinkRow.IsVisible = true;
             ShowShareStatus(link.ExpiresAt is { } expires
-                ? Say("settings.share.shared-until", expires.ToLocalTime().ToString("d MMMM HH:mm", Strings.Culture))
+                ? Say("settings.share.shared-until", Bicim.Damga(expires, Strings.Culture))
                 : Say("settings.share.shared"));
             return;
         }

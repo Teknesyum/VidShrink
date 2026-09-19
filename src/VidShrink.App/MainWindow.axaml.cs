@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -2106,7 +2106,7 @@ public partial class MainWindow : Window
             ShareLinkRow.IsVisible = true;
             BtnShareDelete.IsEnabled = flow.CanDelete;
             TxtShareStatus.Text = link.ExpiresAt is { } expires
-                ? Say("settings.share.shared-until", expires.ToLocalTime().ToString("d MMMM HH:mm", Strings.Culture))
+                ? Say("settings.share.shared-until", Bicim.Damga(expires, Strings.Culture))
                 : Say("settings.share.shared");
             return;
         }

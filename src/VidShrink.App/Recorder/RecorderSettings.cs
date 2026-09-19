@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -399,7 +399,7 @@ internal sealed class RecorderSettings
     {
         var folder = ResolveFolder();
         var extension = "." + RecorderArguments.Extension(Container);
-        var stem = "kayit_" + now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+        var stem = "kayit_" + Bicim.DosyaDamgasi(now);
         var candidate = Path.Combine(folder, stem + extension);
         for (var index = 2; File.Exists(candidate); index++)
             candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + extension);
@@ -413,7 +413,7 @@ internal sealed class RecorderSettings
     internal string SnapshotPath(DateTime now)
     {
         var folder = ResolveFolder();
-        var stem = "kare_" + now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+        var stem = "kare_" + Bicim.DosyaDamgasi(now);
         var candidate = Path.Combine(folder, stem + ".png");
         for (var index = 2; File.Exists(candidate); index++)
             candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + ".png");

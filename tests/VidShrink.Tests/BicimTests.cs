@@ -1,3 +1,4 @@
+﻿using System;
 using System.Globalization;
 using VidShrink.Core;
 
@@ -181,6 +182,41 @@ public sealed class BicimTests
     {
         var an = new DateTimeOffset(2026, 9, 19, 14, 5, 0, TimeSpan.Zero);
         Assert.NotEqual(Bicim.Damga(an, Tr), Bicim.Damga(an, En));
+    }
+
+    /// <summary>
+    /// Gösterilen damga kullanıcının saatini yazar, UTC'yi değil. <c>ToLocalTime</c>
+    /// düşürüldüğünde ölçü kırmızı dönsün diye saat farkı makinenin kendi diliminden
+    /// hesaplanıyor: sabit bir saat yazılsa ölçü yalnız +03:00'te doğru olurdu.
+    /// </summary>
+    [Fact]
+    public void DamgaYerelSaatiYazar()
+    {
+        var an = new DateTimeOffset(2026, 9, 19, 14, 5, 0, TimeSpan.Zero);
+        var beklenen = TimeZoneInfo.ConvertTime(an, TimeZoneInfo.Local);
+
+        Assert.Equal(beklenen.ToString("d MMMM HH:mm", Tr), Bicim.Damga(an, Tr));
+        if (beklenen.Offset != TimeSpan.Zero)
+            Assert.NotEqual(an.ToString("d MMMM HH:mm", Tr), Bicim.Damga(an, Tr));
+    }
+
+    /// <summary>
+    /// Dosya adına giren damga takvimi de sabitler. <c>tr-TR</c> Gregoryen olduğu için
+    /// kültürü değiştirmek bu makinede çıktıyı değiştirmiyordu; ölçü bu yüzden takvimi
+    /// başka olan <c>th-TH</c> ile koşuyor — orada yıl 2569 yazılırdı.
+    /// </summary>
+    [Fact]
+    public void DosyaDamgasiTakvimiDeSabitler()
+    {
+        var an = new DateTimeOffset(2026, 9, 19, 14, 5, 3, TimeSpan.Zero);
+        var onceki = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("th-TH");
+            Assert.Equal("2026-09-19_14-05-03", Bicim.DosyaDamgasi(an));
+            Assert.DoesNotContain("2569", Bicim.DosyaDamgasi(an));
+        }
+        finally { CultureInfo.CurrentCulture = onceki; }
     }
 
     [Fact]

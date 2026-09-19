@@ -1,4 +1,4 @@
-# Plan — Biçimlerin Tek ve Ulaşılabilir Gövdeye İnmesi
+﻿# Plan — Biçimlerin Tek ve Ulaşılabilir Gövdeye İnmesi
 
 Kullanıcı isteği (18 Eylül 2026): *"düzenlerimiz tek ve belli ulaşılabilir bir yerde olmalı
 aynı stringlerimizi çevirmek nasıl kolaysa bunları çevirmekte öyle kolay olmalı."*
@@ -247,6 +247,44 @@ okumuyordu**. Üçüne pim yazıldı (`PlanVeGelismisPanelCozunurluguCarpiIsaret
 
 Oynatıcının canlı bilgi paneli ölçüsü burada da beklenen değeri biçim ifadesinden
 kopyalıyordu (bit hızındaki aynı kusur). Yanına elle yazılmış basamaklı bir pim kondu.
+
+### Adım 6 ölçümü — 19 Eylül 2026
+
+Tarih damgası iki ayrı birim: kullanıcıya gösterilen damga (`d MMMM HH:mm`) üç dosyada,
+dosya adına giren damga (`yyyy-MM-dd_HH-mm-ss`) iki dosyada elle kopyalanmıştı. Beşi de
+`Bicim.Damga` / `Bicim.DosyaDamgasi` üstüne alındı.
+
+Planda "kültürü başka kaynaktan alan aykırı" diye yazılan satır — `ShrinkJobWindow.Paylas.cs:115`
+— **aykırı değilmiş**. O pencere kendi dilini (`_language`) taşıyor ve bütün metnini
+`Strings.GetIn(_language, …)` ile yazıyor; damgada `Strings.CultureOf(_language)` okuması
+doğru olandı. Bu yüzden `Damga` kültürü parametre olarak alıyor: kalıp tek yerde, kültür
+çağrı yerinde kalıyor. Adım 6 bir kusur kapatmadı, yalnız kalıbı teke indirdi.
+
+`UpdateBadge`'in `HH':'mm` saati kapsam dışı: o bir damga değil, rozet ölçütünün istediği
+24 saatlik saat, ve zaten tek yerde sabit.
+
+Temiz taban 0 kırmızı / 137 yeşil. Mutasyon:
+
+| Kesim | Kırmızı |
+| --- | --- |
+| M1 gösterilen damga kalıbı bozulur | 1 |
+| M2 kültür yok sayılır | 1 |
+| M3 `ToLocalTime` düşürülür | **0** |
+| M4 dosya damgası tarihsiz kalır | 1 |
+| M5 dosya damgası kültürlü yazılır | **0** |
+| M6 kare dosyası kayıt gövdesini alır | 1 |
+
+İki sıfır ayrı ayrı incelendi, ikisi de eşdeğer değildi:
+
+- **M3 gerçek kör nokta.** Makine +03:00; `ToLocalTime` düşünce gösterilen saat üç saat
+  kayıyor ve hiçbir ölçü bunu okumuyordu. Pim `DamgaYerelSaatiYazar`, beklenen saati
+  makinenin kendi diliminden hesaplıyor — sabit saat yazılsaydı ölçü yalnız +03:00'te
+  doğru olurdu.
+- **M5 bu makinede eşdeğer, genelde değil.** `tr-TR` Gregoryen olduğu için kültürü
+  değiştirmek çıktıyı değiştirmiyordu; takvimi başka olan `th-TH`'de yıl 2569 yazılırdı.
+  Pim `DosyaDamgasiTakvimiDeSabitler` ölçüyü o kültürle koşuyor.
+
+İki pim eklendikten sonra M3 ve M5 yeniden koşuldu: **ikisi de 1 kırmızı**.
 
 ## Kapsam dışı
 
