@@ -1215,3 +1215,45 @@ tabloyu iki kez yazmak olurdu.
 
 Ayrıca hedefsiz dört cihaz profili için planda olmayan bir hata kolu gerekti
 (`error.profile-no-target`), ve `CliTests.BeklenenTakmaAdSayisi` 22'den 24'e çıktı.
+
+## K8 borcu 21 — hiç bağlanmamış kare kesme yolu (19 Eylül 2026)
+
+`FrameGrabber` üretimde **bir kez bile** kurulmadı: `git log -S "new FrameGrabber" -- src/`
+boş dönüyor. `5a44468b` sınıfı ekledi, bağlayan commit hiç gelmedi; karşılaştırma paneli
+T176'dan beri libmpv yolundan besleniyor (`EngineComparisonFrameSource`).
+
+Onu besleyen `PreviewState` / `PreviewStatus` makinesi de aynı durumda: `Derive`'ın tek
+çağıranı testler, `AllowsFrameGrab`'ın tek çağıranı da ölü sınıfın kendisi. Kendi belgesi
+"arayüz kendi koşullarından durum uydurmaz, bunu çağırır" diyor — çağıran arayüz yok.
+
+Kapalı küme, dışarı sızmıyor: `FramePair` ve `FramePairRequest` yalnız `FrameGrabber.cs`
+içinde, `PreviewTimeline` yalnız kendi dosyasında ve testlerinde. `PreviewSegment` canlı
+kalıyor (`SegmentEncoder` kullanıyor), o yüzden `PreviewQuality`'nin iki pimi bu işin
+dışında.
+
+### Adımlar
+
+1. `src/VidShrink.Ffmpeg/FrameGrabber.cs`, `src/VidShrink.Core/PreviewTimeline.cs`,
+   `tests/VidShrink.Tests/FrameGrabberTests.cs`, `tests/VidShrink.Tests/PreviewTimelineTests.cs`
+   → `trash/`.
+2. `OluUyeTests` pimleri düşer: dokuz düz satır (`FrameGrabber.*` dördü, `FramePair.*` ikisi,
+   `PreviewTimeline.*` ikisi, ayrıca kümede görünenler) ve üç `PreviewState` borç satırı.
+3. Prose gönderimleri düzeltilir: `RecorderArguments.cs:254/1100`, `RecorderSession.cs:218`,
+   `OlcekModuluTests.cs:15`, `PreviewSegmentTests.cs:220`'nin dosya listesi.
+4. Ölçü: süit yeşil **ve** ölü üye tarayıcısının kümesi tam bu üyeler kadar küçülür,
+   başka satır kaymaz. Kayarsa taşıma değil, taşımanın yan etkisi ölçülmüş olur.
+
+### Sonuç — kapandı (19 Eylül 2026)
+
+Plandan iki sapma. Birincisi: `FrameGrabberTests.cs` yalnız kendi testlerini taşımıyordu —
+depo genelinde kullanılan dört xUnit geçidi (`FfmpegFact`, `TonemapFact`,
+`HardwareEncoderFact`, `QuietMachineFact`) ve `NoEncoders` o dosyanın başında yaşıyordu.
+Taşıma derlemeyi kırdı; geçitler `tests/VidShrink.Tests/TestGecitleri.cs`'e ayrıldı.
+
+İkincisi: planda üç dosya vardı, dört oldu. `KeyframeIndex`'in tek okuyucusu `FrameGrabber`
+idi; taşıma bittikten sonra tür kendi başına ölü kaldı ve ölçü bunu ikinci turda kırmızıyla
+söyledi. O da `trash/`'a gitti.
+
+Pim dökümü plandakinden geniş: dokuz değil **21 düz pim** ve 3 borç pimi düştü
+(`GrabbedFrame` altı, `TimelinePoint` beş, `KeyframeIndex` iki de listede duruyordu).
+Ölçüm `docs/olcumler/k8-olu-kare-yolu-2026-09-19.md`.

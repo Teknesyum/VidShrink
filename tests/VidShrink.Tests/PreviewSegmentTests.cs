@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
 
@@ -217,7 +217,7 @@ public sealed class PreviewSegmentTests
     {
         var yasak = new Regex(@"\b(Process|File|Directory)\s*\.|using\s+Avalonia");
 
-        foreach (var name in new[] { "PreviewSegment.cs", "PreviewTimeline.cs", "FfmpegArguments.cs" })
+        foreach (var name in new[] { "PreviewSegment.cs", "FfmpegArguments.cs" })
         {
             var path = Path.Combine(TipSources.Root, "src", "VidShrink.Core", name);
             var source = File.ReadAllText(path);

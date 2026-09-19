@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using VidShrink.Cli;
@@ -12,7 +12,7 @@ namespace VidShrink.Tests;
 /// kendisi ve kuralın tek yerde durduğu.
 ///
 /// <para>Kural üç dosyada ayrı ayrı <c>private static int EvenDown</c> olarak yazılıydı
-/// (<c>PlanCalculator</c>, <c>ComplexityProbe</c>, <c>FrameGrabber</c>) ve çarpan üçünde de
+/// (<c>PlanCalculator</c>, <c>ComplexityProbe</c>, kaldırılan <c>FrameGrabber</c>) ve çarpan üçünde de
 /// 2'ye gömülüydü. Kopyalar kaldırıldı; geri gelirlerse bu ölçü değil, bir sonraki ayrışma
 /// yakalar — o yüzden kaynak taraması da burada.</para>
 /// </summary>

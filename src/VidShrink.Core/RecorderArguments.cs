@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -251,8 +251,7 @@ public sealed record RecorderWebcam(
 /// <c>VidShrink.Ffmpeg.RecorderSession</c> biliyor, burasi yalnizca ne kosacagini soyluyor.
 /// <para>
 /// Uretilen listede <c>-nostdin</c> <b>yoktur</b>. Deponun oteki cagrilarinin nerdeyse hepsi
-/// onu veriyor (<c>ClipExport</c>, <c>SegmentEncoder</c>, <c>FrameGrabber</c>,
-/// <c>ComplexityProbe</c>); kaydin nazik durdurma yolu ise tam olarak stdin'e yazilan
+/// onu veriyor (<c>ClipExport</c>, <c>SegmentEncoder</c>, <c>ComplexityProbe</c>); kaydin nazik durdurma yolu ise tam olarak stdin'e yazilan
 /// <c>q</c>'dur, o yuzden bu kolda stdin kapatilmaz. <c>-progress</c> bayraklari da burada
 /// degil: onlari okuyan taraf ekliyor.
 /// </para>
@@ -1097,8 +1096,8 @@ public static class RecorderArguments
 
     /// <summary>
     /// Kayit surerken alinan tek karelik ekran goruntusunun argumanlari. Ayni yakalama
-    /// girdisinden okur — dosyadan kare kesen <c>FrameGrabber</c> burada kullanilamaz,
-    /// cunku canli ekranin bir dosyasi yok. Kodlama kolu hic kurulmaz: bir kare, bir resim.
+    /// girdisinden okur: canli ekranin bir dosyasi yok, dosyadan kare kesen bir yol burada
+    /// kullanilamaz. Kodlama kolu hic kurulmaz: bir kare, bir resim.
     /// </summary>
     public static IReadOnlyList<string> BuildSnapshot(RecorderRequest request, string imagePath)
     {

@@ -1,4 +1,4 @@
-# Kod Borçları Denetimi — 18 Eylül 2026
+﻿# Kod Borçları Denetimi — 18 Eylül 2026
 
 Kapsam: `src/` (211 dosya, `obj/` ve `bin/` hariç), `tests/` (224 dosya), son 20 commit.
 Her bulgu grep çıktısına dayanır; hüküm vermeyen iki madde "şüpheli" işaretlidir.
@@ -40,8 +40,11 @@ açıkça "bu kod kalkacak" diyor.
    **Kapandı:** `--kirp` bayrağı yoklamayı üretime soktu; `CropDetection.Rect` pimi de
    düştü. `OtomatikKirpmaTests` 6/6, beş kesimin beşi kırmızı
    (`docs/olcumler/k8-kirpma-2026-09-19.md`).
-8. `tests/VidShrink.Tests/OluUyeTests.cs:495-508` — Önizleme türlerinin beş üyesi
-   üretiliyor, okuma tarafında adı geçmiyor.
+8. ~~`tests/VidShrink.Tests/OluUyeTests.cs:495-508` — Önizleme türlerinin beş üyesi
+   üretiliyor, okuma tarafında adı geçmiyor.~~ **Kısmen kapandı:** üç `PreviewState` pimi
+   madde 21 ile birlikte düştü (türün kendisi kaldırıldı). Kalan iki pim
+   (`PreviewQuality.Desteklenmiyor`, `.Yaklasik`) canlı `PreviewSegment`'te duruyor ve
+   borç olarak açık.
 9. ~~`src/VidShrink.App/CurrentMedia.cs:52-63`, `MainWindow.OdakTakibi.cs:93-95`,
    `src/VidShrink.Cli/CliApp.cs:446-447` — Aynı yol eşitliği üç gövdede ve davranışları
    farklı: biri `ArgumentException`'ı yutuyor, ikisi yutmuyor.~~ **Kapandı:** gövde
@@ -127,3 +130,6 @@ açıkça "bu kod kalkacak" diyor.
     (`EngineComparisonFrameSource`), ffmpeg'den kare kesen bu yol onun altında kaldı.
     Testleriyle birlikte 1416 satır. Madde 8'in beş pimi bu kökün yaprağı: üyeler
     üretilmiyor değil, üreten sınıfın kendisi üretimde koşmuyor.
+    **Kapandı:** üç dosya `trash/`'a taşındı, 21 düz pim ve 3 borç pimi düştü, başka satır
+    kaymadı. Taşıma ikinci bir ölü tür ortaya çıkardı (`KeyframeIndex`, tek okuyucusu ölü
+    sınıftı); o da taşındı. Ölçüm `docs/olcumler/k8-olu-kare-yolu-2026-09-19.md`.
