@@ -70,8 +70,8 @@ public static class ComplexityProbe
             var meter = measureQuality ? qualityMeasurement ?? QualityMeasurement.Instance : null;
             if (meter is { IsAvailable: false }) meter = null;
 
-            var halfWidth = EvenDown((int)Math.Round(info.Width * ComplexityProfile.ProbeScale));
-            var halfHeight = EvenDown((int)Math.Round(info.Height * ComplexityProfile.ProbeScale));
+            var halfWidth = Olcek.Modul((int)Math.Round(info.Width * ComplexityProfile.ProbeScale));
+            var halfHeight = Olcek.Modul((int)Math.Round(info.Height * ComplexityProfile.ProbeScale));
             var canProbeHalf = halfWidth >= 64 && halfHeight >= 64;
             var preset = speed == SpeedMode.Fast ? FastProbePreset : ComplexityProfile.ProbePreset;
 
@@ -796,7 +796,6 @@ public static class ComplexityProbe
         return samples;
     }
 
-    private static int EvenDown(int value) => value % 2 == 0 ? value : value - 1;
 
     internal readonly record struct WindowSample(long FullBytes, long FullFrames, long HalfBytes, long HalfFrames, WindowQualityMeasurement? Quality = null, double? MeanLuma = null);
 

@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "முன்னமைவு / வேகம்",
   "main.advanced.tune.label": "டியூன் / உள்ளடக்க வகை",
+  "main.advanced.modulus.label": "அளவு மாடுலஸ்",
+  "main.advanced.modulus.hint": "விளிம்புகள் இந்த எண்ணின் மடங்காகக் குறைக்கப்படும்",
   "main.advanced.audio-kbps.label": "ஒலி இலக்கு (kbit/s)",
   "main.advanced.audio-channels.label": "ஒலி சேனல்கள்",
   "main.advanced.keep-tracks.label": "எல்லா தடங்களையும் வைத்திரு (MKV)",

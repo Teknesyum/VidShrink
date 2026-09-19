@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "프리셋 / 속도",
   "main.advanced.tune.label": "튜닝 / 콘텐츠 유형",
+  "main.advanced.modulus.label": "스케일 모듈러스",
+  "main.advanced.modulus.hint": "가장자리는 이 숫자의 배수로 내림 처리됩니다",
   "main.advanced.audio-kbps.label": "오디오 목표 (kbit/s)",
   "main.advanced.audio-channels.label": "오디오 채널",
   "main.advanced.keep-tracks.label": "모든 트랙 유지 (MKV)",

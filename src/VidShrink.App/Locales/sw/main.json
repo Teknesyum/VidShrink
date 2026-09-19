@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Mpangilio / kasi",
   "main.advanced.tune.label": "Urekebishaji / aina ya maudhui",
+  "main.advanced.modulus.label": "Modulus ya kipimo",
+  "main.advanced.modulus.hint": "Kingo hupunguzwa hadi kizidishi cha nambari hii",
   "main.advanced.audio-kbps.label": "Lengo la sauti (kbit/s)",
   "main.advanced.audio-channels.label": "Chaneli za sauti",
   "main.advanced.keep-tracks.label": "Hifadhi nyimbo zote (MKV)",

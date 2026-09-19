@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "प्रीसेट / गति",
   "main.advanced.tune.label": "ट्यून / सामग्री प्रकार",
+  "main.advanced.modulus.label": "स्केल मॉड्यूलस",
+  "main.advanced.modulus.hint": "किनारों को इस संख्या के गुणज तक नीचे की ओर राउंड किया जाता है",
   "main.advanced.audio-kbps.label": "ऑडियो लक्ष्य (kbit/s)",
   "main.advanced.audio-channels.label": "ऑडियो चैनल",
   "main.advanced.keep-tracks.label": "सभी ट्रैक रखें (MKV)",

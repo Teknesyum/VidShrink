@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Reflection;
 using VidShrink.Core;
 using Xunit.Abstractions;
@@ -1064,6 +1064,9 @@ public sealed class ManualOverrideTests
         "TargetMb", "Intent", "Codec", "AllowResolutionDrop", "AllowFpsDrop", "HdrPolicy", "FillPolicy", "SpeedMode",
         "LockedCodec", "LockedMode", "LockedCrf", "LockedPreset", "LockedTune", "LockedAudioKbps", "AudioChannels",
         "MinResolutionHeight", "FixedResolution", "MinFps", "EncoderPath", "KeepAllTracks", "PlatformDelivery", "PreferredLanguage",
+        // E9: ScaleModulus kullanicinin sectigi olcek carpani (2/4/8/16, HandBrake --modulus).
+        // Kapali sabit degil, istegin kendisi; varsayilani 2 ve bugunku davranis o.
+        "ScaleModulus",
         // A1: Filters kullanicinin filtre secimi (deinterlace, denoise, transpose ...), DetectedCrop
         // ise cropdetect yoklamasinin sonucu. Ikisi de istek modelinin yuzeyinde durmali: biri
         // kullanicidan gelir, oteki yoklamadan gelip plana onerilir. Kapali sabit degiller.

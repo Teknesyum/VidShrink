@@ -147,6 +147,11 @@ değeri (0-63) ve kodlayıcı ön ayarı. Ön ayar adı planın seçtiği kodeğ
 x264/x265 için `slow`, NVENC için `p5`, SVT-AV1 için `8` — ait olmayan ad hata vermiyor,
 plan gerekçesine bir satır düşülerek düşüyor.
 
+`--modul N` (`--modulus N`) ölçeklenen kenarları 2, 4, 8 ya da 16'nın katına aşağı
+yuvarlıyor. Varsayılan 2, çünkü kodlayıcı tek sayılı kenar kabul etmiyor; büyük çarpan eski
+donanım kodlayıcılarının istediği şey ve kenardan biraz daha kırpıyor. Başka bir sayı
+kullanım hatası.
+
 `--kes <baslangic>-<bitis>` kodlamadan önce kesiyor, böylece hedef boyut elde kalan parçaya
 harcanıyor: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, sona kadar `--kes 90-`.
 
@@ -166,6 +171,7 @@ bunların tek yazımı var.
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |
 | `--on-ayar` | `--preset` |
+| `--modul` | `--modulus` |
 | `--bolum` | `--chapters` |
 | `--cikti` | `--output` |
 | `--kes` | `--cut` |

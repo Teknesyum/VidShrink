@@ -899,3 +899,37 @@ kusurun daha kibar bir biçimi olurdu.
    kontrol), olmayan klasörde kaynağın yanına düşüp uyarı verdiği, çakışma sayacının
    hedef klasörde işlediği.
 5. CLI'ın `--cikti`'sı dokunulmaz: orada yol kullanıcının verdiği yoldur.
+
+## HandBrake E3/E7/E8/E9 Açığı (Defter 23)
+
+Dört hafif açık, hepsi yerinde ölçüldü — `src/` altında hiçbirinin karşılığı yok:
+`modulus`, `align-av`, `ipod-atom`, `automatic-naming` ve tanı günlüğü için hiçbir
+arama sonuç vermiyor.
+
+**E9 — Ölçek modülü.** Bugün tek bir kural var ve üç yerde ayrı ayrı yazılı:
+`PlanCalculator.cs:1373` ve `ComplexityProbe.cs:799` aynı `EvenDown`'u `private static`
+olarak taşıyor, çarpan 2'ye gömülü. HandBrake 2/4/8/16 sunuyor; eski donanım kodlayıcıları
+16'nın katını ister. Kural Core'da tek yere iner (`Olcek.Modul`), varsayılan 2 kalır,
+Gelişmiş panelde ve CLI'da (`--modul`) seçilir.
+
+**E3 — Otomatik adlandırma deseni.** Çıktı adı bugün `{ad}_shrunk.{uzanti}` olarak
+gömülü. Sabit klasör işi bittiğine göre (`docs/olcumler/sabit-cikti-klasoru.md`) sıradaki
+yalan adlandırmada: kullanıcı klasörü seçebiliyor ama adı seçemiyor. Desen ayarda tutulur
+(`{ad}`, `{kalite}`, `{cozunurluk}`, `{tarih}`), tanınmayan yer tutucu reddedilir ve
+çakışma sayacı desenden **sonra** işler.
+
+**E8 — Kap uyumluluğu.** HandBrake'in `--align-av`'si ffmpeg'de
+`-avoid_negative_ts make_zero` + `aresample` karşılığına, `--ipod-atom`'u ise ffmpeg'in
+ayrı `ipod` muxer'ına düşüyor. İkisi de ölçülmeden yazılmayacak: gerçek ffmpeg 9.0
+koşumuyla çıktının okunduğu bir ölçüm dosyası olmadan kabul edilmez.
+
+**E7 — Tanı günlüğü.** HandBrake'in Activity Log'u, kullanıcı sorun bildirirken
+kopyalayacağı tek yer. Bizde ffmpeg'in komutu ve çıktısı hiçbir yere yazılmıyor.
+Son koşumun komutu, sürümü ve stderr kuyruğu `%APPDATA%\VidShrink\gunluk` altına
+yazılır; CLI'da `--gunluk`, arayüzde Ayarlar'da "Günlüğü aç". Kişisel veri sızmayacak:
+yalnız dosya adı, tam yol değil.
+
+**Sıra:** E9 → E3 → E8 → E7. E9 üç dosyadaki kopyayı tek yere indirdiği için önce;
+E3 sabit klasör işinin doğrudan devamı; E8 ölçüm koşumu ister; E7 en geniş yüzey.
+
+**Her adımın ölçüsü mutasyonla kapanır** ve `docs/olcumler/` altına yazılır.

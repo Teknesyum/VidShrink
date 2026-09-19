@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "الإعداد المسبق / السرعة",
   "main.advanced.tune.label": "الضبط الدقيق / نوع المحتوى",
+  "main.advanced.modulus.label": "مضاعف الأبعاد",
+  "main.advanced.modulus.hint": "يتم تقريب الحواف لأسفل إلى مضاعف لهذا الرقم",
   "main.advanced.audio-kbps.label": "هدف الصوت (كيلوبت/ث)",
   "main.advanced.audio-channels.label": "قنوات الصوت",
   "main.advanced.keep-tracks.label": "الاحتفاظ بكل المسارات (MKV)",

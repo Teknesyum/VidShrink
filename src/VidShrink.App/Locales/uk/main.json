@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Пресет / швидкість",
   "main.advanced.tune.label": "Налаштування / тип вмісту",
+  "main.advanced.modulus.label": "Модуль масштабування",
+  "main.advanced.modulus.hint": "Краї округлюються вниз до кратного цьому числу",
   "main.advanced.audio-kbps.label": "Ціль звуку (кбіт/с)",
   "main.advanced.audio-channels.label": "Канали звуку",
   "main.advanced.keep-tracks.label": "Зберегти всі доріжки (MKV)",

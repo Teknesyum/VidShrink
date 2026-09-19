@@ -1279,7 +1279,7 @@ public partial class MainWindow : Window
 
     private SelectingItemsControl[] AdvBoxes() => new SelectingItemsControl[]
     {
-        CmbAdvCrf, CmbAdvPreset, CmbAdvTune, CmbAdvAudioKbps, CmbAdvAudioChannels,
+        CmbAdvCrf, CmbAdvPreset, CmbAdvTune, CmbAdvModulus, CmbAdvAudioKbps, CmbAdvAudioChannels,
         CmbAdvMinResolution, CmbAdvMinFps, CmbAdvCodecLock
     };
 
@@ -1320,6 +1320,7 @@ public partial class MainWindow : Window
             AdvCrf = CmbAdvCrf.SelectedIndex,
             AdvPreset = CmbAdvPreset.SelectedIndex,
             AdvTune = CmbAdvTune.SelectedIndex,
+            AdvModulus = CmbAdvModulus.SelectedIndex,
             AdvAudioKbps = CmbAdvAudioKbps.SelectedIndex,
             AdvAudioChannels = CmbAdvAudioChannels.SelectedIndex,
             AdvMinResolution = CmbAdvMinResolution.SelectedIndex,
@@ -1352,6 +1353,7 @@ public partial class MainWindow : Window
                 (CmbAdvCrf, settings.AdvCrf),
                 (CmbAdvPreset, settings.AdvPreset),
                 (CmbAdvTune, settings.AdvTune),
+                (CmbAdvModulus, settings.AdvModulus),
                 (CmbAdvAudioKbps, settings.AdvAudioKbps),
                 (CmbAdvAudioChannels, settings.AdvAudioChannels),
                 (CmbAdvMinResolution, settings.AdvMinResolution),
@@ -1609,6 +1611,10 @@ public partial class MainWindow : Window
         CmbAdvTune.ItemsSource = new[] { automatic }.Concat(AdvancedTuneCandidates).ToList();
         CmbAdvTune.SelectedIndex = 0;
 
+        CmbAdvModulus.ItemsSource = new[] { automatic }
+            .Concat(Olcek.Moduller.Select(m => m.ToString(CultureInfo.InvariantCulture))).ToList();
+        CmbAdvModulus.SelectedIndex = 0;
+
         CmbAdvAudioKbps.ItemsSource = new[] { automatic }.Concat(AdvancedAudioKbpsCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
         CmbAdvAudioKbps.SelectedIndex = 0;
 
@@ -1843,6 +1849,10 @@ public partial class MainWindow : Window
 
         if (AdvancedText(CmbAdvTune) is { } tuneText)
             options.LockedTune = tuneText;
+
+        if (AdvancedText(CmbAdvModulus) is { } modulusText
+            && int.TryParse(modulusText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var modulus))
+            options.ScaleModulus = modulus;
 
         if (AdvancedText(CmbAdvAudioKbps) is { } audioKbpsText
             && int.TryParse(audioKbpsText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var audioKbps))

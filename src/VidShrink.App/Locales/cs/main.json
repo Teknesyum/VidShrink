@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Předvolba / rychlost",
   "main.advanced.tune.label": "Ladění / typ obsahu",
+  "main.advanced.modulus.label": "Modul škálování",
+  "main.advanced.modulus.hint": "Okraje se zaokrouhlují dolů na násobek tohoto čísla",
   "main.advanced.audio-kbps.label": "Cíl zvuku (kbit/s)",
   "main.advanced.audio-channels.label": "Zvukové kanály",
   "main.advanced.keep-tracks.label": "Zachovat všechny stopy (MKV)",

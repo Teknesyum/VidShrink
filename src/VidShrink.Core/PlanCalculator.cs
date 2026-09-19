@@ -19,6 +19,14 @@ public sealed class PlanOptions
     public SpeedMode SpeedMode { get; set; } = SpeedMode.Quality;
 
     /// <summary>
+    /// Olceklenen boyutun yuvarlanacagi carpan (HandBrake'in <c>--modulus</c>'u). Varsayilan
+    /// 2: kodlayicilar tek sayili kenar kabul etmez. Eski donanim kodlayicilari 16 ister;
+    /// buyuk carpan kenari daha cok kirptigi icin secim kullanicinin.
+    /// Kume disi bir sayi <see cref="Olcek.Modul"/> tarafindan varsayilana dusurulur.
+    /// </summary>
+    public int ScaleModulus { get; set; } = Olcek.VarsayilanModul;
+
+    /// <summary>
     /// Kullanicinin acikca sectigi kodlayici. <c>null</c> "secim yok" demektir ve motor
     /// <see cref="Codec"/>/<see cref="CompressionStrategy.AutoPreference"/> yolundan gectigi
     /// gibi gecmeye devam eder. Dolu oldugunda kodek kilitlenir; bitrate, preset, cozunurluk,
@@ -491,7 +499,8 @@ public static class PlanCalculator
             SpeedMode = options.SpeedMode,
             MinResolutionHeight = options.MinResolutionHeight,
             FixedResolution = options.FixedResolution,
-            MinFps = options.MinFps
+            MinFps = options.MinFps,
+            ScaleModulus = options.ScaleModulus
         };
 
         var (best, sourceFpsViable) = SearchLayout(info, effective, complexity, codec, videoK, regime);
@@ -1090,6 +1099,13 @@ public static class PlanCalculator
         MinResolutionHeight = options.MinResolutionHeight,
         FixedResolution = options.FixedResolution,
         MinFps = options.MinFps,
+        ScaleModulus = options.ScaleModulus,
+        Trim = options.Trim,
+        KeepAllTracks = options.KeepAllTracks,
+        PlatformDelivery = options.PlatformDelivery,
+        PreferredLanguage = options.PreferredLanguage,
+        Filters = options.Filters,
+        DetectedCrop = options.DetectedCrop,
         EncoderPath = options.EncoderPath
     };
 
@@ -1194,7 +1210,7 @@ public static class PlanCalculator
         {
             if (scale < fallback.Scale - 1e-6 || fps < fallback.Fps - 0.01) continue;
 
-            var (width, height) = Dimensions(info, scale);
+            var (width, height) = Dimensions(info, scale, options.ScaleModulus);
             if (options.FixedResolution is null && height < floors.MinHeight && height < info.Height) continue;
             if (width < 2 || height < 2) continue;
 
@@ -1271,7 +1287,7 @@ public static class PlanCalculator
         foreach (var scale in LayoutScales(info, options, regime))
         {
             if (sourceFpsRuns && fps < sourceFps - 0.01) continue;
-            var (width, height) = Dimensions(info, scale);
+            var (width, height) = Dimensions(info, scale, options.ScaleModulus);
             if (options.FixedResolution is null && height < floors.MinHeight && height < info.Height) continue;
             if (width < 2 || height < 2) continue;
 
@@ -1295,7 +1311,7 @@ public static class PlanCalculator
         if (best is not null) return (best, sourceFpsViable);
         if (densest is not null) return (densest, false);
 
-        var (fallbackWidth, fallbackHeight) = Dimensions(info, 1.0);
+        var (fallbackWidth, fallbackHeight) = Dimensions(info, 1.0, options.ScaleModulus);
         return (new Layout(fallbackWidth, fallbackHeight, info.Fps, 1.0, 0), true);
     }
 
@@ -1309,7 +1325,7 @@ public static class PlanCalculator
         var least = int.MaxValue;
         foreach (var scale in LayoutScales(info, options, regime))
         {
-            var (width, height) = Dimensions(info, scale);
+            var (width, height) = Dimensions(info, scale, options.ScaleModulus);
             if (options.FixedResolution is null && height < floors.MinHeight && height < info.Height) continue;
             if (width < 2 || height < 2) continue;
             least = Math.Min(least, Math.Max(RunnableVideoBitrateK(width, height, fps), CodecModel.UsableBitrateK(codec, width, height, fps)));
@@ -1364,13 +1380,12 @@ public static class PlanCalculator
         }
     }
 
-    private static (int Width, int Height) Dimensions(MediaInfo info, double scale)
+    private static (int Width, int Height) Dimensions(MediaInfo info, double scale, int modulus = Olcek.VarsayilanModul)
     {
-        if (scale >= 0.985) return (EvenDown(info.Width), EvenDown(info.Height));
-        return (EvenDown((int)Math.Round(info.Width * scale)), EvenDown((int)Math.Round(info.Height * scale)));
+        if (scale >= 0.985) return (Olcek.Modul(info.Width, modulus), Olcek.Modul(info.Height, modulus));
+        return (Olcek.Modul((int)Math.Round(info.Width * scale), modulus),
+            Olcek.Modul((int)Math.Round(info.Height * scale), modulus));
     }
-
-    private static int EvenDown(int value) => value % 2 == 0 ? value : value - 1;
 
     private static double ScalePenalty(double scale, PenaltyWeights weights)
     {

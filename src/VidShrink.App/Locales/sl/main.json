@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Prednastavitev / hitrost",
   "main.advanced.tune.label": "Uglaševanje / vrsta vsebine",
+  "main.advanced.modulus.label": "Modul skaliranja",
+  "main.advanced.modulus.hint": "Robovi se zaokrožijo navzdol na večkratnik tega števila",
   "main.advanced.audio-kbps.label": "Cilj zvoka (kbit/s)",
   "main.advanced.audio-channels.label": "Zvočni kanali",
   "main.advanced.keep-tracks.label": "Ohrani vse sledi (MKV)",

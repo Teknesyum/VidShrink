@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Пресет / скорость",
   "main.advanced.tune.label": "Настройка / тип содержимого",
+  "main.advanced.modulus.label": "Модуль масштабирования",
+  "main.advanced.modulus.hint": "Края округляются вниз до кратного этому числу",
   "main.advanced.audio-kbps.label": "Цель для звука (кбит/с)",
   "main.advanced.audio-channels.label": "Аудиоканалы",
   "main.advanced.keep-tracks.label": "Сохранить все дорожки (MKV)",

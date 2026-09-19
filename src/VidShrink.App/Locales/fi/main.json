@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Esiasetus / nopeus",
   "main.advanced.tune.label": "Viritys / sisältötyyppi",
+  "main.advanced.modulus.label": "Skaalauksen jakaja",
+  "main.advanced.modulus.hint": "Reunat pyöristetään alaspäin tämän luvun kerrannaiseen",
   "main.advanced.audio-kbps.label": "Äänen kohde (kbit/s)",
   "main.advanced.audio-channels.label": "Äänikanavat",
   "main.advanced.keep-tracks.label": "Säilytä kaikki raidat (MKV)",

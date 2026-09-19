@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "พรีเซ็ต / ความเร็ว",
   "main.advanced.tune.label": "การปรับจูน / ประเภทเนื้อหา",
+  "main.advanced.modulus.label": "ตัวหารมาตราส่วน",
+  "main.advanced.modulus.hint": "ขอบจะถูกปัดเศษลงให้เป็นจำนวนที่หารด้วยเลขนี้ได้",
   "main.advanced.audio-kbps.label": "เป้าหมายเสียง (kbit/s)",
   "main.advanced.audio-channels.label": "ช่องเสียง",
   "main.advanced.keep-tracks.label": "เก็บทุกแทร็ก (MKV)",

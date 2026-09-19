@@ -243,7 +243,7 @@ public sealed class FrameGrabber : IDisposable
         // tavanlanir. Kare panel genisliginde cozulup 4x buyutulurse kullanici bizim
         // olceklememizi sikistirma hatasi sanar (T30/O5: buyuk istemek bedava).
         var capped = requestedWidth > probe.DisplayWidth;
-        var askedWidth = Even(Math.Clamp(capped ? probe.DisplayWidth : requestedWidth, 2, probe.DisplayWidth));
+        var askedWidth = Olcek.Modul(Math.Clamp(capped ? probe.DisplayWidth : requestedWidth, 2, probe.DisplayWidth));
 
         var filters = new List<string>();
         if (toneMap) filters.Add(HdrResolver.TonemapFilter);
@@ -343,7 +343,6 @@ public sealed class FrameGrabber : IDisposable
         request.RequestedWidth.ToString(CultureInfo.InvariantCulture),
         request.AlignToKeyframe ? "k" : "-");
 
-    private static int Even(int value) => value % 2 == 0 ? value : value - 1;
 
     // showinfo suzgeci kodlayicidan daha cok kare gorur: `-frames:v 1` ciktiya tek kare yazar
     // ama filtre zincirinden birkaci gecer. Teslim edilen kare **ilkidir**, sonuncusu degil.

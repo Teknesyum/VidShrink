@@ -19,6 +19,9 @@ public sealed class AppSettings
     public int AdvCrf { get; set; }
     public int AdvPreset { get; set; }
     public int AdvTune { get; set; }
+
+    /// <summary>Olcek carpani kutusunun secimi; 0 "Otomatik" (motorun varsayilani).</summary>
+    public int AdvModulus { get; set; }
     public int AdvAudioKbps { get; set; }
     public int AdvAudioChannels { get; set; }
     public int AdvMinResolution { get; set; }
@@ -70,6 +73,7 @@ public sealed class AppSettings
             ReadInt(root, "advCrf", value => settings.AdvCrf = value);
             ReadInt(root, "advPreset", value => settings.AdvPreset = value);
             ReadInt(root, "advTune", value => settings.AdvTune = value);
+            ReadInt(root, "advModulus", value => settings.AdvModulus = value);
             ReadInt(root, "advAudioKbps", value => settings.AdvAudioKbps = value);
             ReadInt(root, "advAudioChannels", value => settings.AdvAudioChannels = value);
             ReadInt(root, "advMinResolution", value => settings.AdvMinResolution = value);
@@ -135,6 +139,7 @@ public sealed class AppSettings
         root["advCrf"] = AdvCrf;
         root["advPreset"] = AdvPreset;
         root["advTune"] = AdvTune;
+        root["advModulus"] = AdvModulus;
         root["advAudioKbps"] = AdvAudioKbps;
         root["advAudioChannels"] = AdvAudioChannels;
         root["advMinResolution"] = AdvMinResolution;

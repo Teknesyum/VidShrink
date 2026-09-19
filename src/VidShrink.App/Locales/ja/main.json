@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "プリセット / 速度",
   "main.advanced.tune.label": "チューン / 内容の種類",
+  "main.advanced.modulus.label": "スケール係数",
+  "main.advanced.modulus.hint": "端はこの数の倍数に切り下げられます",
   "main.advanced.audio-kbps.label": "音声目標(kbit/s)",
   "main.advanced.audio-channels.label": "音声チャンネル",
   "main.advanced.keep-tracks.label": "すべてのトラックを保持 (MKV)",

@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "প্রিসেট / গতি",
   "main.advanced.tune.label": "টিউন / কনটেন্টের ধরন",
+  "main.advanced.modulus.label": "স্কেল মডুলাস",
+  "main.advanced.modulus.hint": "প্রান্তগুলো এই সংখ্যার গুণিতকে নিচের দিকে রাউন্ড করা হয়",
   "main.advanced.audio-kbps.label": "অডিও লক্ষ্য (kbit/s)",
   "main.advanced.audio-channels.label": "অডিও চ্যানেল",
   "main.advanced.keep-tracks.label": "সব ট্র্যাক রাখুন (MKV)",

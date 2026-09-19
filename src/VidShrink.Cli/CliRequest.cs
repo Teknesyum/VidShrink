@@ -40,6 +40,9 @@ public sealed record CliRequest
     public double? Crf { get; init; }
     public string? Preset { get; init; }
 
+    /// <summary>Olcek carpani (<c>--modul</c>). Bos birakilirsa motorun varsayilani.</summary>
+    public int? ScaleModulus { get; init; }
+
     /// <summary>
     /// <c>--kes</c>'in kare yazimi (<c>300f-900f</c>). Kare saniyeye ayristirmada degil
     /// <see cref="Resolved"/>'da cevrilir: donusum kaynagin kare hizini ister, ayristirici
@@ -107,6 +110,7 @@ public sealed record CliRequest
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
         options.LockedCrf = Crf;
         options.LockedPreset = Preset;
+        if (ScaleModulus is { } modul) options.ScaleModulus = modul;
         options.Trim = TrimWindow.Of(TrimStartSeconds, TrimEndSeconds, sourceDurationSeconds);
         return options;
     }
@@ -177,6 +181,14 @@ public static class CliParser
                     if (!TryValue(args, ref i, out var preset)) return Fail("error.missing-value", arg);
                     if (!FfmpegArguments.IsKnownPreset(preset)) return Fail("error.bad-preset", preset);
                     request = request with { Preset = preset };
+                    break;
+                case "--modul" or "--modulus" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var modul)) return Fail("error.missing-value", arg);
+                    if (!int.TryParse(modul, System.Globalization.NumberStyles.Integer,
+                            System.Globalization.CultureInfo.InvariantCulture, out var modulDegeri)
+                        || !Olcek.GecerliModul(modulDegeri))
+                        return Fail("error.bad-modulus", modul);
+                    request = request with { ScaleModulus = modulDegeri };
                     break;
                 case "--cikti" or "--output" or "-o":
                     if (!TryValue(args, ref i, out var output)) return Fail("error.missing-value", arg);

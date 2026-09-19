@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using VidShrink.App;
 using VidShrink.Core;
@@ -189,7 +189,7 @@ public sealed class QualityHintTests
     {
         var code = File.ReadAllText(TipSources.WindowCodePath);
         var start = code.IndexOf("internal readonly record struct QualityHint", StringComparison.Ordinal);
-        var end = code.IndexOf("internal sealed record ShareTarget(", start, StringComparison.Ordinal);
+        var end = code.IndexOf("internal sealed class ShareFlow", start, StringComparison.Ordinal);
         Assert.True(start >= 0 && end > start, "QualityHint gövdesi bulunamadı.");
 
         var body = code[start..end];

@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Preset / Tempo",
   "main.advanced.tune.label": "Tuning / Inhaltstyp",
+  "main.advanced.modulus.label": "Skalierungsmodulus",
+  "main.advanced.modulus.hint": "Kanten werden auf ein Vielfaches dieser Zahl abgerundet",
   "main.advanced.audio-kbps.label": "Audio-Ziel (kbit/s)",
   "main.advanced.audio-channels.label": "Audiokanäle",
   "main.advanced.keep-tracks.label": "Alle Spuren behalten (MKV)",

@@ -147,6 +147,10 @@ quality value (0-63) and the encoder preset. The preset name has to belong to th
 the plan picks — `slow` for x264/x265, `p5` for NVENC, `8` for SVT-AV1 — and a name that
 does not belong is dropped with a line in the plan reason, not an error.
 
+`--modul N` (`--modulus N`) rounds the scaled edges down to a multiple of 2, 4, 8 or 16.
+The default is 2, because an encoder cannot take an odd edge; a larger modulus is what old
+hardware encoders want and crops the edge a little more. Any other number is a usage error.
+
 `--kes <start>-<end>` trims before the encode, so the target size is spent on the part you
 keep: `--kes 10-40`, `--kes 0:10-0:40`, `--kes 1:02:03-1:02:04`, or `--kes 90-` to the end.
 
@@ -166,6 +170,7 @@ single spelling.
 | `--kalite` | `--quality` |
 | `--kodek` | `--codec` |
 | `--on-ayar` | `--preset` |
+| `--modul` | `--modulus` |
 | `--bolum` | `--chapters` |
 | `--cikti` | `--output` |
 | `--kes` | `--cut` |

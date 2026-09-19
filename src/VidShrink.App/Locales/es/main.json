@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Preajuste / velocidad",
   "main.advanced.tune.label": "Ajuste / tipo de contenido",
+  "main.advanced.modulus.label": "Módulo de escala",
+  "main.advanced.modulus.hint": "Los bordes se redondean hacia abajo a un múltiplo de este número",
   "main.advanced.audio-kbps.label": "Audio de destino (kbit/s)",
   "main.advanced.audio-channels.label": "Canales de audio",
   "main.advanced.keep-tracks.label": "Conservar todas las pistas (MKV)",

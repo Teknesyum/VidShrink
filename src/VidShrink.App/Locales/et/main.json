@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Eelseade / kiirus",
   "main.advanced.tune.label": "Häälestus / sisutüüp",
+  "main.advanced.modulus.label": "Skaleerimise moodul",
+  "main.advanced.modulus.hint": "Servad ümardatakse allapoole selle arvu kordseks",
   "main.advanced.audio-kbps.label": "Heli siht (kbit/s)",
   "main.advanced.audio-channels.label": "Helikanalid",
   "main.advanced.keep-tracks.label": "Säilita kõik rajad (MKV)",

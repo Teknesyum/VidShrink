@@ -149,6 +149,8 @@
   "main.advanced.crf.label": "CRF",
   "main.advanced.preset.label": "Ön ayar / hız",
   "main.advanced.tune.label": "İnce ayar / içerik türü",
+  "main.advanced.modulus.label": "Ölçek çarpanı",
+  "main.advanced.modulus.hint": "Kenarlar bu sayının katına aşağı yuvarlanır",
   "main.advanced.audio-kbps.label": "Ses hedefi (kbit/sn)",
   "main.advanced.audio-channels.label": "Ses kanalı",
   "main.advanced.keep-tracks.label": "İzleri koru (MKV)",
