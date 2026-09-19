@@ -45,7 +45,7 @@
   "player.info.codec": "Codec video: {0}",
   "player.info.resolution": "Rezoluție: {0}",
   "player.info.framerate": "Rată de cadre: {0} fps",
-  "player.info.bitrate": "Rată de biți: {0} kb/s",
+  "player.info.bitrate": "Rată de biți: {0}",
   "player.info.audio": "Audio: {0}, {1} canale, {2} Hz",
   "player.info.noaudio": "Audio: fără",
   "player.info.none": "Niciun fișier media deschis",

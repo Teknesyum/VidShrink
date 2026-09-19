@@ -492,7 +492,7 @@ internal partial class PlayerView
             ? Bicim.Kare(details.FramesPerSecond, Strings.Culture)
             : unknown;
         var rate = double.IsFinite(details.BitsPerSecond) && details.BitsPerSecond > 0
-            ? Bicim.BitHizi.BpsToKbps((long)Math.Round(details.BitsPerSecond))
+            ? Strings.BitHizi(Bicim.BitHizi.BpsToKbps((long)Math.Round(details.BitsPerSecond)))
             : unknown;
 
         var lines = new List<string>

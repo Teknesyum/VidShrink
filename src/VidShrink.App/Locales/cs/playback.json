@@ -45,7 +45,7 @@
   "player.info.codec": "Video kodek: {0}",
   "player.info.resolution": "Rozlišení: {0}",
   "player.info.framerate": "Snímková frekvence: {0} fps",
-  "player.info.bitrate": "Datový tok: {0} kb/s",
+  "player.info.bitrate": "Datový tok: {0}",
   "player.info.audio": "Zvuk: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Zvuk: žádný",
   "player.info.none": "Žádné otevřené médium",

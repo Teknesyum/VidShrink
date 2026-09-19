@@ -45,7 +45,7 @@
   "player.info.codec": "Videokoodek: {0}",
   "player.info.resolution": "Eraldusvõime: {0}",
   "player.info.framerate": "Kaadrisagedus: {0} fps",
-  "player.info.bitrate": "Bitikiirus: {0} kb/s",
+  "player.info.bitrate": "Bitikiirus: {0}",
   "player.info.audio": "Heli: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Heli: puudub",
   "player.info.none": "Meediat ei ole avatud",

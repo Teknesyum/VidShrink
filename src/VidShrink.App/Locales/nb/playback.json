@@ -45,7 +45,7 @@
   "player.info.codec": "Videokodek: {0}",
   "player.info.resolution": "Oppløsning: {0}",
   "player.info.framerate": "Bildefrekvens: {0} fps",
-  "player.info.bitrate": "Bitrate: {0} kb/s",
+  "player.info.bitrate": "Bitrate: {0}",
   "player.info.audio": "Lyd: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Lyd: ingen",
   "player.info.none": "Ingen media åpen",

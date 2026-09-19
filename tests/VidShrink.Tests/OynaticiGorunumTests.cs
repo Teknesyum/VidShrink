@@ -471,7 +471,7 @@ public sealed class OynaticiGorunumTests
         Assert.False(rapor.gizliyken);
         Assert.True(rapor.Item2);
         foreach (var satir in beklenen) Assert.Contains(satir, rapor.metin);
-        Assert.Contains(Strings.Get("player.info.bitrate", Bicim.BitHizi.BpsToKbps((long)Math.Round(rapor.details!.BitsPerSecond))), rapor.metin);
+        Assert.Contains(Strings.Get("player.info.bitrate", Strings.BitHizi(Bicim.BitHizi.BpsToKbps((long)Math.Round(rapor.details!.BitsPerSecond)))), rapor.metin);
         Assert.True(sapma <= 0.02, body.ToString());
         Assert.DoesNotContain(codec, rapor.bos);
         GorunumKanit.Kapat("bilgi-paneli.txt");

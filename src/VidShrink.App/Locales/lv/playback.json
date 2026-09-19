@@ -45,7 +45,7 @@
   "player.info.codec": "Videokodeks: {0}",
   "player.info.resolution": "Izšķirtspēja: {0}",
   "player.info.framerate": "Kadru biežums: {0} fps",
-  "player.info.bitrate": "Bitu pārraides ātrums: {0} kb/s",
+  "player.info.bitrate": "Bitu pārraides ātrums: {0}",
   "player.info.audio": "Audio: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Audio: nav",
   "player.info.none": "Nav atvērtas datnes",

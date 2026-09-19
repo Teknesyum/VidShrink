@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text.Json.Nodes;
@@ -128,5 +129,35 @@ public sealed class KaydediciHedefYazimiTests
         Assert.NotEqual(ondalik, yuzYirmiBes);
         Assert.NotEqual(ondalik, yabanci);
         Assert.NotEqual(yuzYirmiBes, yabanci);
+    }
+
+    /// <summary>
+    /// Bütçe notundaki bit hızı birimi <c>main.unit.kbps-value</c>'dan geliyor. Cümlenin
+    /// kendisi birimi bırakmıştı; görünüm sayıyı ham geçirirse not birimsiz kalır ve
+    /// aynı pencerede biri birimli biri birimsiz iki bit hızı görünür.
+    /// </summary>
+    [Theory]
+    [InlineData("tr", "125", "kbit/sn")]
+    [InlineData("en", "125", "kbit/s")]
+    [InlineData("tr", "1", "kbit/sn")]
+    [InlineData("en", "1", "kbit/s")]
+    public void ButceNotuBirimiSozluktenAliyor(string dil, string megabayt, string birim)
+    {
+        var not = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var onceki = Strings.Language;
+            Strings.Use(dil);
+            try
+            {
+                var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+                Yaz(view, "TxtTargetSeconds", "600");
+                Yaz(view, "TxtTargetMegabytes", megabayt);
+                return Bul<TextBlock>(view, "TxtBudgetNote").Text ?? string.Empty;
+            }
+            finally { Strings.Use(onceki); }
+        }));
+
+        Assert.NotEmpty(not);
+        Assert.Contains(birim, not, StringComparison.Ordinal);
     }
 }

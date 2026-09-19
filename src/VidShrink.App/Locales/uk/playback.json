@@ -45,7 +45,7 @@
   "player.info.codec": "Відеокодек: {0}",
   "player.info.resolution": "Роздільна здатність: {0}",
   "player.info.framerate": "Частота кадрів: {0} fps",
-  "player.info.bitrate": "Бітрейт: {0} kb/s",
+  "player.info.bitrate": "Бітрейт: {0}",
   "player.info.audio": "Аудіо: {0}, {1} кан., {2} Hz",
   "player.info.noaudio": "Аудіо: немає",
   "player.info.none": "Немає відкритого медіа",

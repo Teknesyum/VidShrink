@@ -45,7 +45,7 @@
   "player.info.codec": "비디오 코덱: {0}",
   "player.info.resolution": "해상도: {0}",
   "player.info.framerate": "프레임 속도: {0} fps",
-  "player.info.bitrate": "비트레이트: {0} kb/s",
+  "player.info.bitrate": "비트레이트: {0}",
   "player.info.audio": "오디오: {0}, {1}채널, {2} Hz",
   "player.info.noaudio": "오디오: 없음",
   "player.info.none": "열려 있는 미디어 없음",

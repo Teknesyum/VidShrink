@@ -586,7 +586,8 @@ public sealed class KareYerlesimTests
             Assert.Equal(Strings.Get("main.unit.score-suffix"), okunan.kaliteBirimi);
             Assert.EndsWith(Strings.Get("main.unit.score-value", ""), okunan.not);
             Assert.Equal(Strings.Get("main.advanced.mode.crf"), okunan.kip);
-            Assert.Equal("18800 kbps", okunan.hiz);
+            Assert.Equal(Strings.Get("main.unit.kbps-value", "18800"), okunan.hiz);
+            Assert.DoesNotContain("kbps", okunan.hiz, StringComparison.Ordinal);
             Assert.Contains(" FPS", okunan.plan);
             if (dil != "en")
             {
@@ -693,10 +694,10 @@ public sealed class KareYerlesimTests
     }
 
     /// <summary>
-    /// O2: <c>main.unit.kbps-value</c>, <c>main.unit.fps-value</c>, <c>main.unit.k-value</c>
-    /// ve <c>main.plan.mode.crf-value</c> sablonlari 42 dilde bayt bayt ayni, bu yuzden dil
+    /// O2: <c>main.unit.kbps-value</c>, <c>main.unit.fps-value</c> ve
+    /// <c>main.plan.mode.crf-value</c> sablonlari 42 dilde bayt bayt ayni, bu yuzden dil
     /// kollari onlari ayirt edemiyor; sabiti koda geri yazan iki mutasyon dil kollarindan
-    /// sag kaliyordu. Burada dil dosyasinin kopyasinda dordu de baska bir bicime cevrilir;
+    /// sag kaliyordu. Burada dil dosyasinin kopyasinda ucu de baska bir bicime cevrilir;
     /// yuklenen pencerenin hiz satiri, ses satiri ve plan izgarasi o bicimleri okur,
     /// Ingilizce sabitler hicbirinde gorunmez.
     /// </summary>
@@ -705,9 +706,8 @@ public sealed class KareYerlesimTests
     {
         using var kopya = Kopya("s9-birim", new Dictionary<string, string>
         {
-            ["\"main.unit.kbps-value\": \"{0} kbps\""] = "\"main.unit.kbps-value\": \"{0} kilobit/s\"",
+            ["\"main.unit.kbps-value\": \"{0} kbit/s\""] = "\"main.unit.kbps-value\": \"{0} kilobit/s\"",
             ["\"main.unit.fps-value\": \"{0} FPS\""] = "\"main.unit.fps-value\": \"{0} kare/s\"",
-            ["\"main.unit.k-value\": \"{0}k\""] = "\"main.unit.k-value\": \"{0} kbit\"",
             ["\"main.plan.mode.crf-value\": \"CRF {0}\""] = "\"main.plan.mode.crf-value\": \"kalite carpani {0}\""
         });
 
@@ -741,13 +741,13 @@ public sealed class KareYerlesimTests
         File.WriteAllText(Path.Combine(kanit, "okunan.txt"), govde);
 
         Assert.EndsWith(" kilobit/s", satirlar[0], StringComparison.OrdinalIgnoreCase);
-        Assert.EndsWith(" kbit", satirlar[1], StringComparison.OrdinalIgnoreCase);
+        Assert.EndsWith(" kilobit/s", satirlar[1], StringComparison.OrdinalIgnoreCase);
         Assert.Contains(" kare/s", govde, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("kalite carpani ", govde, StringComparison.OrdinalIgnoreCase);
         var kucuk = govde.ToLowerInvariant();
-        Assert.Equal(4, kucuk.Split(" kbit", StringSplitOptions.None).Length - 1);
+        Assert.Equal(5, kucuk.Split(" kilobit/s", StringSplitOptions.None).Length - 1);
         Assert.Equal(2, kucuk.Split(" kare/s", StringSplitOptions.None).Length - 1);
-        Assert.DoesNotContain("kbps", govde, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("kbit/s", govde, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("fps", govde, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("crf ", govde, StringComparison.OrdinalIgnoreCase);
 
@@ -1068,6 +1068,11 @@ public sealed class BaslikKapsamiTests
     /// en 189 + 4, tr 64 + 2. Ayni turda <c>main.preset.add.tip</c> kirk dilde kisaltildi
     /// (ipucu tavani olcusu iki satir tasiyordu); kisaltma kol degistiren kumeyi degistirmedi,
     /// sayilar kisaltmadan once ve sonra ayni cikti.</para>
+    /// <para><b>19 Eylul 2026 pimleri: toplam 1649, en 195, tr 67.</b> Paylasim hatalarinin
+    /// dili (<c>5ba0e973</c>) dil basina otuz yedi <c>share.*</c> anahtari ekledi; bunlarin
+    /// kol degistiren kismi 1649 - 1628 = 21, en 193 + 2, tr 66 + 1. Bit hizi biriminin
+    /// birlestirilmesi ayni turda <c>main.unit.k-value</c>'yu dusurdu, o anahtar govde degil
+    /// olcu ("{0}k") oldugu icin kol degistiren kumeye hic girmiyordu: sayilar oynamadi.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1093,9 +1098,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1628, toplam);
-        Assert.Equal(193, dilBasina["en"]);
-        Assert.Equal(66, dilBasina["tr"]);
+        Assert.Equal(1649, toplam);
+        Assert.Equal(195, dilBasina["en"]);
+        Assert.Equal(67, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1202,6 +1207,10 @@ public sealed class BaslikKapsamiTests
     /// Sayi yine olcunun kendi <c>SAYIM gezilen</c> satirindan alindi; gezilen metin
     /// uzunluguna degil anahtar sayisina bagli oldugu icin ceviri kisaltmalari bu sayiyi
     /// oynatmaz.</para>
+    /// <para><b>19 Eylul 2026 pimi 42140.</b> Paylasim hatalarinin dili dil basina otuz yedi
+    /// anahtar ekledi, bit hizi biriminin birlestirilmesi <c>main.unit.k-value</c>'yu dusurdu:
+    /// dil basina 944 + 37 - 1 = 980, 43 x 980 = 42140. Sayi yine olcunun kendi
+    /// <c>SAYIM gezilen</c> satirindan alindi, <c>kayip</c> 0 kaldi.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1229,7 +1238,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(40592, gezilen);
+        Assert.Equal(42140, gezilen);
         Assert.Empty(kayip);
     }
 

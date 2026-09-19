@@ -45,7 +45,7 @@
   "player.info.codec": "קודק וידאו: {0}",
   "player.info.resolution": "רזולוציה: {0}",
   "player.info.framerate": "קצב פריימים: {0} fps",
-  "player.info.bitrate": "קצב סיביות: {0} kb/s",
+  "player.info.bitrate": "קצב סיביות: {0}",
   "player.info.audio": "שמע: {0}, {1} ערוצים, {2} Hz",
   "player.info.noaudio": "שמע: אין",
   "player.info.none": "לא נפתחה מדיה",

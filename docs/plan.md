@@ -648,6 +648,90 @@ kol duruyor.
 
 Toplam 54 ölçü; geri alındıktan sonra taban yine 0/54.
 
+## Bit hızı birimi tek yazıma — plan
+
+Aynı pencerede aynı birim beş ayrı yazımla görünüyor. Türkçe kurulumda:
+
+| yer | anahtar | bugün |
+| --- | --- | --- |
+| kaynak bilgisi, ses | `main.unit.k-value` | `128k` |
+| kaynak bilgisi, toplam | `main.unit.kbps-value` | `2500 kbps` |
+| oynatıcı bilgi paneli | `player.info.bitrate` | `Bit hızı: 2500 kb/s` |
+| kaydedici bütçesi | `recorder.budget.result` | `Hedef bit hızı: 3000 kbit/sn` |
+| hızlı düşür notu | `main.fast-gpu.bitrate-floor` | `… 2000 kbit/s …` |
+| plan gerekçesi | `main.reason.manual-audio-bitrate-override` | `… 128kbps …` |
+| ayar etiketi | `main.advanced.audio-kbps.label` | `Ses hedefi (kbps)` |
+
+Tarama 42 dilin sekiz dosyasında birim taşıyan **16 anahtar, 553 satır** buldu
+(`.calisma/birim-tum-anahtarlar.txt`). Üçü yanlış pozitif: `main.convert.crf-label.tip`,
+`main.convert.audio-bitrate.tip` ve `recorder.advanced.noise-suppression` birimi rakamla
+değil sözcükle anıyor (ar/fa/he), biri de "kbt" değil "kbt etmek" anlamında.
+
+### Kural
+
+Her dilin tek birimi var ve o birim **yalnız `main.unit.kbps-value` içinde yazılı**.
+Birim, o dilin bugün `recorder.budget.result`'ta kullandığı yazım: 37 dilde `kbit/s`,
+`tr` `kbit/sn`, `ru` `кбит/с`, `uk` `кбіт/с`, `ar` `كيلوبت/ث`, `he` `קילוביט/שנייה`,
+`fa` `کیلوبیت بر ثانیه`.
+
+Değer taşıyan cümleler birimi bırakır, çağıran taraf sayıyı `main.unit.kbps-value` ile
+biçimlendirip geçirir. Etiketler (`(kbps)` gibi) cümle değil, birim sözcüğünü doğrudan
+taşır — onlar da aynı yazıma çekilir.
+
+`recorder.advanced.buffer` kapsam dışı: birimi `kbit`, saniye başına değil.
+
+### Adımlar
+
+1. 42 dilde `main.unit.kbps-value` → `{0} <birim>`; `main.unit.k-value` silinir.
+2. Değer cümlelerinden birim düşer: `player.info.bitrate`, `recorder.budget.result`,
+   `recorder.budget.too-small`, `main.fast-gpu.on-usable`, `main.fast-gpu.bitrate-floor`,
+   üç `main.reason.manual-audio-bitrate-*`.
+3. Etiketlerde yazım birleşir: `main.advanced.audio-kbps.label`,
+   `recorder.advanced.bitrate`, `recorder.advanced.max-bitrate`.
+4. Sekiz çağrı yeri sayıyı önceden biçimlendirir (`MainWindow.axaml.cs` 3235/3236/3525/
+   3529/1094/1101/3716/3718/3720, `PlayerView.Window.cs:503`,
+   `RecorderView.Otomatik.cs:134/135`).
+5. `BitHiziBirimiTests`: 42 dilde birim taşıyan tek anahtarın `main.unit.kbps-value`
+   olduğunu, etiketlerin o dilin birimini kullandığını, muafiyet listesinin kapalı
+   olduğunu pimler.
+
+### Ölçü
+
+Mutasyon: bir dilde birim geri getirilir, bir dilde birim bozuk yazılır, `k-value`
+geri eklenir, bir çağrı yeri ham sayı geçirir. Her kesim kırmızı vermeli.
+
+### Sonuç — 19 Eylül 2026
+
+Ledger satırı "üç ayrı yazım" diyordu; tarama Türkçe kurulumda **beş** buldu: `128k`,
+`2500 kbps`, `2500 kb/s`, `3000 kbit/sn`, bitişik `128kbps`. Bir de dil içi sapma:
+Arapça hızlı düşür notu `كبت/ث`, kaydedici `كيلوبت/ث` yazıyordu; Farsça ve İbranice
+notlar Latin `kbit/s`'te kalmıştı.
+
+Yapılan: 42 dilde `main.unit.kbps-value` o dilin birimini aldı, `main.unit.k-value`
+silindi (336 değer cümlesinden birim düştü, 126 etiket aynı yazıma çekildi). Sekiz
+çağrı yeri `Strings.BitHizi` üzerinden geçiyor; anahtarın adı kaynakta yalnız
+`Strings.cs`'te geçiyor ve ölçü bunu pimliyor.
+
+| kesim | kırmızı |
+| --- | --- |
+| taban | 0 |
+| B1 tr kaydedici cümlesi birimi geri alıyor | 2 |
+| B2 de etiketi eski yazıma dönüyor | 1 |
+| B3 ikinci birim anahtarı geri geliyor | 1 |
+| B4 oynatıcı ham sayı geçiriyor | 1 |
+| B5 tr birimi `kbps`'e dönüyor | 4 |
+| B6 biçim anahtar yerine sabit yazıyor | 8 |
+| B7 kaydedici ham sayı geçiriyor | **0 → 2** |
+
+B7 ilk turda sıfır verdi: kaydedicinin bütçe notunu birim açısından okuyan ölçü yoktu.
+`KaydediciHedefYazimiTests.ButceNotuBirimiSozluktenAliyor` yazıldı, kesim 2 kırmızıya
+döndü. Toplam 72 ölçü; geri alındıktan sonra taban yine 0/72.
+
+Yan etki: `BaslikKapsamiTests`'in nüfus sayımları kaydı. Pimler `40592 → 42140` ve
+`1628 → 1649` (en 193 → 195, tr 66 → 67) yenilendi; artış paylaşım işinin otuz yedi
+anahtarından geliyor, `main.unit.k-value`'nun düşmesi gezileni bir azalttı. `kayip`
+yine 0. Bu iki pim `5ba0e973`'ün CI koşumunu kırmızıya düşürmüştü.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

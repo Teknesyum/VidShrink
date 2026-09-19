@@ -45,7 +45,7 @@
   "player.info.codec": "کدک ویدیو: {0}",
   "player.info.resolution": "وضوح تصویر: {0}",
   "player.info.framerate": "نرخ فریم: {0} fps",
-  "player.info.bitrate": "نرخ بیت: {0} kb/s",
+  "player.info.bitrate": "نرخ بیت: {0}",
   "player.info.audio": "صدا: {0}، {1} کانال، {2} Hz",
   "player.info.noaudio": "صدا: هیچ",
   "player.info.none": "رسانه‌ای باز نیست",

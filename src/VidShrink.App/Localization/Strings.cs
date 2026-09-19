@@ -236,6 +236,17 @@ public static class Strings
 
     public static string Get(string key, params object?[] args) => GetIn(Language, key, args);
 
+    /// <summary>
+    /// Bit hızı değerinin tek yüzeyi. Aynı birim beş ayrı yazımla görünüyordu
+    /// (<c>128k</c>, <c>2500 kbps</c>, <c>2500 kb/s</c>, <c>3000 kbit/sn</c>,
+    /// <c>128kbps</c>); birim artık yalnız <c>main.unit.kbps-value</c> içinde yazılı
+    /// ve değer taşıyan cümleler biçimlenmiş metni alıyor.
+    /// </summary>
+    public static string BitHizi(string? kbps) => Get("main.unit.kbps-value", kbps ?? "");
+
+    /// <inheritdoc cref="BitHizi(string)"/>
+    public static string BitHizi(int kbps) => BitHizi(Core.Bicim.BitHizi.Kbps(kbps));
+
     public static string GetIn(string language, string key, params object?[] args)
     {
         var text = GetIn(language, key);
