@@ -324,6 +324,46 @@ Temiz taban 0 kırmızı / 149 yeşil. Mutasyon:
 kaydedici satırı için `RecorderView.ResultText` erişimcisi eklendi. Yeniden koşum:
 **N1 / N2 / N3 ve ek olarak N3b (kaydedici satırının kültürü) dördü de 1 kırmızı.**
 
+### Adım 8 ölçümü — 19 Eylül 2026
+
+Süre ailesi. `Saat` üç yüzey kazandı: `Sure` (tek ondalık, dilin ayracı),
+`TamSaniye` (basamak ayracı yok) ve `Tani.Saniye` (motorun İngilizce metni,
+`InvariantCulture`). Dört çağrı yeri bu yüzeylere indi.
+
+İlk mutasyon koşumunda **sekiz kesimin sekizi de sıfır kırmızı** verdi: ailenin
+tamamı pimsizmiş. Ölçerken ikinci bir kusur çıktı — `PromptBuilder`'ın modele giden
+İngilizce istemi **beş sayıyı** araya biçim koymadan yazıyordu, yani makinenin
+kültürünü okuyordu. Türkçe bir makinede istem `duration: 12,34 s`, `23,98 fps`,
+`target size: 7,25 MB` diyordu; aynı kaynağın iki makinedeki istemi
+karşılaştırılamaz hale geliyordu. Beşi de `Tani` yüzeylerine indi.
+
+`CeilingGuard`'ın gerekçesindeki tavan MB ve nişan oranı da aynı sızıntıyı
+taşıyordu; ikisi de `InvariantCulture`'a bağlandı. `MpvEngine` `VidShrink.Core`'a
+başvurmuyor (bilerek) — oradaki tek sızıntı `Saat` çağrısıyla değil, yerinde
+`InvariantCulture` ile kapatıldı.
+
+Temiz taban 0 kırmızı / 91 yeşil. Pimlerden sonraki mutasyon:
+
+| Kesim | Kırmızı |
+| --- | --- |
+| S1 `Sure` ondalığı düşer | 2 |
+| S2 `Sure` kültürü sabitlenir | 2 |
+| S3 `TamSaniye` basamak ayracı alır | 2 |
+| S4 `Tani` kültürü makineden gelir | 2 |
+| S5 kırpma bildirimi tam saniyeye düşer | 1 |
+| S6 bütçe satırı ondalıklı yazar | 1 |
+| S7 istem süresi makine kültürünü okur | 1 |
+| S7b istem hedefi makine kültürünü okur | 1 |
+| S7c istem kare hızı makine kültürünü okur | 1 |
+| S8 tavan tamponu boş yazar | 1 |
+| S9 tavan MB makine kültürünü okur | 1 |
+| S10 nişan makine kültürünü okur | 1 |
+
+Sıfır yok. Yeni ölçüler: `SaatTests`'te üç yüzey pimi, `IstemKulturuTests`
+(yeni dosya, olumlu kontrollü), `CeilingGuardTests.BekciGerekcesiMakineninKulturunuOkumaz`,
+`BoslukKirpmaTests.KirpmaBildirimindekiSaniyeAileninYazimiyla`,
+`KaydediciHedefTests.YalnizSureButcesiBasamakAyraciYazmaz`.
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

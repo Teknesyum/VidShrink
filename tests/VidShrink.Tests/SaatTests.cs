@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
 
@@ -141,5 +141,53 @@ public sealed class SaatTests
             .ToList();
 
         Assert.Empty(kacaklar);
+    }
+    /// <summary>
+    /// Sayı olarak saniye: saat değil, ölçülen süre. Tek ondalık ve kültürün kendi
+    /// ondalık ayracı — kırpma bildirimi bunu elle yazıyordu.
+    /// </summary>
+    [Fact]
+    public void SureTekOndalikVeKulturunAyraci()
+    {
+        var tr = CultureInfo.GetCultureInfo("tr-TR");
+        var en = CultureInfo.GetCultureInfo("en-US");
+
+        Assert.Equal("3,8", Saat.Sure(3.84, tr));
+        Assert.Equal("3.8", Saat.Sure(3.84, en));
+        Assert.Equal("4,0", Saat.Sure(4, tr));
+    }
+
+    /// <summary>
+    /// Tam saniye basamak ayracı almaz. Bütçe satırı <c>N0</c> kullanıyordu: Türkçe
+    /// arayüzde 2796 saniye <c>2.796</c> diye yazılıp ondalık gibi okunuyordu.
+    /// </summary>
+    [Fact]
+    public void TamSaniyeBasamakAyraciYazmaz()
+    {
+        var tr = CultureInfo.GetCultureInfo("tr-TR");
+
+        Assert.Equal("2796", Saat.TamSaniye(2796, tr));
+        Assert.DoesNotContain(".", Saat.TamSaniye(2796, tr));
+        Assert.DoesNotContain(",", Saat.TamSaniye(2796, tr));
+        Assert.Equal("30", Saat.TamSaniye(30, tr));
+    }
+
+    /// <summary>
+    /// Motorun İngilizce satırlarındaki saniye makinenin kültürünü okumaz. Üç çağrı yeri
+    /// araya biçim koymadan yazıyordu; Türkçe bir makinede İngilizce istem
+    /// <c>12,34 s</c> çıkıyordu.
+    /// </summary>
+    [Fact]
+    public void TaniSaniyesiMakineninKulturunuOkumaz()
+    {
+        var onceki = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("tr-TR");
+            Assert.Equal("12.34", Saat.Tani.Saniye(12.34));
+            Assert.DoesNotContain(",", Saat.Tani.Saniye(12.34));
+            Assert.Equal("2", Saat.Tani.Saniye(2));
+        }
+        finally { CultureInfo.CurrentCulture = onceki; }
     }
 }

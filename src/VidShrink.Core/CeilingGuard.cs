@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -49,8 +49,10 @@ public static class CeilingGuard
         guarded.BitrateBias = 1.0;
         guarded.PeakEqualsRate = capsPeak;
         var yieldText = worstYield.ToString("0.###", CultureInfo.InvariantCulture);
-        guarded.Reason = $"retry: ceiling guard, {over.Count} attempts stayed over the {ceilingMb:0.###} MB target, so the last attempt aims at {Aim:0.00} of it divided by the worst encoder yield {yieldText} seen in this run and asks for {k}k"
-            + (capsPeak ? $" with the peak rate held at the average over a {VbvWindowSeconds:0} s buffer" : "");
+        var ceilingText = ceilingMb.ToString("0.###", CultureInfo.InvariantCulture);
+        var aimText = Aim.ToString("0.00", CultureInfo.InvariantCulture);
+        guarded.Reason = $"retry: ceiling guard, {over.Count} attempts stayed over the {ceilingText} MB target, so the last attempt aims at {aimText} of it divided by the worst encoder yield {yieldText} seen in this run and asks for {k}k"
+            + (capsPeak ? $" with the peak rate held at the average over a {Saat.Tani.Saniye(VbvWindowSeconds)} s buffer" : "");
         guarded.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: over[^1].ActualMb, TargetMb: ceilingMb, AudioMb: 0, Factor: (double)k / Math.Max(1, last.VideoBitrateK)) };
         return guarded;
     }

@@ -1,3 +1,4 @@
+﻿using System.Globalization;
 using System.Diagnostics;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -43,6 +44,31 @@ public sealed class CeilingGuardTests
             var verim = s.ActualMb / Mb(s.VideoBitrateK, 1.0);
             Assert.True(Mb(plan.VideoBitrateK, verim) <= 1.4648, $"verim {verim:0.###} ile {Mb(plan.VideoBitrateK, verim):0.####} MB");
         }
+    }
+
+    /// <summary>
+    /// Bekçinin gerekçesi motorun İngilizce metni: makinenin kültürünü okumamalı. Üç sayı
+    /// (tavan, nişan, tampon saniyesi) araya biçim konmadan yazılıyordu, yani Türkçe bir
+    /// makinede <c>1,465 MB</c> ve <c>0,90</c> çıkıyordu. Ölçü <c>tr-TR</c> altında kurar.
+    /// </summary>
+    [Fact]
+    public void BekciGerekcesiMakineninKulturunuOkumaz()
+    {
+        var onceki = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("tr-TR");
+
+            var plan = CeilingGuard.Plan(Son("libx264"), RampaIzi, 1.4648, 10);
+
+            Assert.NotNull(plan);
+            Assert.Contains("1.465 MB", plan!.Reason);
+            Assert.Contains(CeilingGuard.Aim.ToString("0.00", CultureInfo.InvariantCulture) + " of it", plan.Reason);
+            Assert.Contains(CeilingGuard.VbvWindowSeconds.ToString("0.##", CultureInfo.InvariantCulture) + " s buffer", plan.Reason);
+            Assert.DoesNotContain("1,465", plan.Reason);
+            Assert.DoesNotContain("0,90", plan.Reason);
+        }
+        finally { CultureInfo.CurrentCulture = onceki; }
     }
 
     [Fact]

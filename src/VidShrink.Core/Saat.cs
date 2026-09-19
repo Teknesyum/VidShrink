@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -67,5 +67,33 @@ public static class Saat
             + "-" + deger.Minutes.ToString("00", CultureInfo.InvariantCulture)
             + "-" + deger.Seconds.ToString("00", CultureInfo.InvariantCulture)
             + "-" + deger.Milliseconds.ToString("000", CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Ölçülen saniye sayısı: saat değil, sayı. Kırpmanın "şu kadar saniye atıldı"
+    /// bildirimi gibi yerlerde tek ondalık kalıyor — megabaytla aynı gerekçe, ikinci
+    /// ondalık bu ölçekte gürültü.
+    /// </summary>
+    public static string Sure(double saniye, CultureInfo kultur) =>
+        saniye.ToString("0.0", kultur);
+
+    /// <summary>
+    /// Tam saniye. Basamak ayracı <b>yazılmaz</b>: bütçe satırı <c>N0</c> kullanıyordu ve
+    /// Türkçe arayüzde 2796 saniyeyi <c>2.796</c> diye yazıp ondalık gibi okutuyordu.
+    /// </summary>
+    public static string TamSaniye(double saniye, CultureInfo kultur) =>
+        saniye.ToString("0", kultur);
+
+    /// <summary>
+    /// Motorun İngilizce tanı ve istem metinlerindeki saniye. Kültür sabit: bu satırlar
+    /// çevrilmiyor ve iki koşumun günlüğü karşılaştırılabilir kalmalı. Üç çağrı yeri
+    /// araya biçim koymadan yazıyordu ve makinenin kültürünü okuyordu — Türkçe bir
+    /// makinede İngilizce istem <c>12,34 s</c> diye virgüllü çıkıyordu.
+    /// </summary>
+    public static class Tani
+    {
+        /// <inheritdoc cref="Sure(double, CultureInfo)"/>
+        public static string Saniye(double saniye) =>
+            saniye.ToString("0.##", CultureInfo.InvariantCulture);
     }
 }

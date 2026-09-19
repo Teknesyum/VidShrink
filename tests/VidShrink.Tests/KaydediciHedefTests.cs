@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -111,6 +111,33 @@ public sealed class KaydediciHedefTests
         Assert.DoesNotContain("2,796", not);
 
         Kapat("butce-notu.txt");
+    }
+
+    /// <summary>
+    /// Yalnız süre verilen bütçe satırı saniyeyi basamak ayracı olmadan yazıyor. Satır
+    /// <c>N0</c> kullanıyordu: Türkçe arayüzde 2796 saniye <c>2.796</c> diye yazılıp
+    /// ondalık gibi okunuyordu.
+    /// </summary>
+    [Fact]
+    public void YalnizSureButcesiBasamakAyraciYazmaz()
+    {
+        var not = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var onceki = Strings.Language;
+            Strings.Use("tr");
+            try
+            {
+                var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+                Yaz(view, "TxtTargetSeconds", "2796");
+                return Bul<TextBlock>(view, "TxtBudgetNote").Text ?? string.Empty;
+            }
+            finally { Strings.Use(onceki); }
+        }));
+
+        Assert.Contains("2796", not);
+        Assert.DoesNotContain("2.796", not);
+        Assert.DoesNotContain("2,796", not);
+        Assert.DoesNotContain("2796,0", not);
     }
 
     [Fact]

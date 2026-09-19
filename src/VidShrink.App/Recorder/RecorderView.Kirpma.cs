@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Interactivity;
 using VidShrink.App.Localization;
 using VidShrink.Ffmpeg;
+using VidShrink.Core;
 
 namespace VidShrink.App.Recorder;
 
@@ -38,7 +39,7 @@ internal partial class RecorderView
         else if (result.Target is null)
             ShowNotice(Say("recorder.output.trim-none"));
         else
-            ShowNotice(Say("recorder.output.trim-done", result.RemovedSeconds.ToString("0.0", Strings.Culture), result.Target));
+            ShowNotice(Say("recorder.output.trim-done", Saat.Sure(result.RemovedSeconds, Strings.Culture), result.Target));
 
         return result;
     }

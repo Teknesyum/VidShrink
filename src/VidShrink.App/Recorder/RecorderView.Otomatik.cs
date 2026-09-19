@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -147,7 +147,7 @@ internal partial class RecorderView
         if (seconds is null && megabytes is null) return string.Empty;
         if (seconds is <= 0 || megabytes is <= 0) return Say("recorder.budget.invalid");
         return seconds is { } sn
-            ? Say("recorder.budget.duration-only", sn.ToString("N0", Strings.Culture))
+            ? Say("recorder.budget.duration-only", Saat.TamSaniye(sn, Strings.Culture))
             : Say("recorder.budget.size-only", megabytes!.Value.ToString("0.#", Strings.Culture));
     }
 

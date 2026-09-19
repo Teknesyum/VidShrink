@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -232,7 +232,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         {
             Interlocked.CompareExchange(ref _open, null, open);
             ct.ThrowIfCancellationRequested();
-            throw new PlaybackOpenException(Describe($"libmpv did not load the file within {_options.OpenTimeout.TotalSeconds:0} s."));
+            throw new PlaybackOpenException(Describe($"libmpv did not load the file within {_options.OpenTimeout.TotalSeconds.ToString("0.##", CultureInfo.InvariantCulture)} s."));
         }
 
         await open.Task.ConfigureAwait(false);

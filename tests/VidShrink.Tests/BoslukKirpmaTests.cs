@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -209,5 +209,35 @@ public sealed class BoslukKirpmaTests
         Assert.True(olcu.hataGorunur);
 
         Kapat("panel.mkv", "panel.gif");
+    }
+    /// <summary>
+    /// Kırpma bildirimindeki saniye ailenin yazımıyla (<c>0.0</c>) ve arayüzün diliyle
+    /// yazılıyor. Sayı elle yazılı: tam saniyeye düşseydi <c>12,5</c> yerine <c>13</c>,
+    /// değişmez kültürle <c>12.5</c> okunurdu.
+    /// </summary>
+    [Fact]
+    public void KirpmaBildirimindekiSaniyeAileninYazimiyla()
+    {
+        var dosya = Path.Combine(Kanit, "saniye.mkv");
+        File.WriteAllBytes(dosya, new byte[] { 1 });
+
+        var bildirim = AppHost.Run(() =>
+        {
+            var onceki = VidShrink.App.Localization.Strings.Language;
+            VidShrink.App.Localization.Strings.Use("tr");
+            try
+            {
+                var view = new RecorderView { RevealFolder = _ => { } };
+                view.ShowResult(new RecordResult(true, dosya, 1, false, 0, string.Empty, 1));
+                _ = view.TrimIdleAsync(_ => Task.FromResult(new IdleTrimResult(true, "saniye-trimmed.mkv", 12.5, string.Empty)));
+                return view.NoticeText;
+            }
+            finally { VidShrink.App.Localization.Strings.Use(onceki); }
+        });
+
+        Assert.Contains("12,5", bildirim);
+        Assert.DoesNotContain("12.5", bildirim);
+
+        Kapat("saniye.mkv");
     }
 }
