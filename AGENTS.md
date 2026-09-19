@@ -39,3 +39,14 @@ ağacında doğrudan yazma; iki taraf aynı dosyayı yazınca yarım iş commit'
 
 Dal adı sahibi ve işi söyler: `sole/sagtik-win11`, `serkan/macos-ilk-kosum`,
 `worktree-agent-<id>` (alt ajanlar bunu kendi kurar).
+
+## Alt ajanlar
+
+**Gelen rapor bir iddiadır, bulgu değil.** Ajanın "şöyle çalışıyor" dediği şey kodda
+yerinde ölçülmeden iş alınmaz. Bir tur "tablo yoksa pencere açılmıyor" raporuna göre kod
+düzenlendi; iddia yanlıştı (App'in kendi `Load`'u her istisnayı yutuyor) ve derleme hatası
+olmasa doğrulanmadan teslim edilecekti. Ölçü: iddianın geçtiği satırı aç, oku, sonra karar ver.
+
+**Her ajan `.calisma/` altında kendi klasörüne yazar:** `.calisma/<ajan-dalı>/`. Aynı adı
+paylaşan iki paralel ajan birbirinin betiğini eziyor; çeviri turunda bir ajan betiğini
+yeniden yazmak zorunda kaldı. Klasör adı ajanın dal adıyla aynı olur, tahmin edilmez.
