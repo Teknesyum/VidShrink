@@ -70,8 +70,12 @@ açıkça "bu kod kalkacak" diyor.
     yapmaz. Ayrım `:292-295`'te yazılı ve `CodecLockTests` ile
     `EncoderStateConsumptionTests` iki bayrağı ayrı ayrı pimliyor. Birleştirmek HDR
     ayrımını kaybettirirdi.
-12. `OluUyeTests.cs:543-544` — `FfmpegArguments.SceneMapRuleOfRecord` üretimde sıfır,
-    ölçüm tarafında beş görünüm.
+12. ~~`OluUyeTests.cs:543-544` — `FfmpegArguments.SceneMapRuleOfRecord` üretimde sıfır,
+    ölçüm tarafında beş görünüm.~~ **Borç değil, şart:** alan üretimin varsayılan
+    kuralının altın kopyası. Üretime indirilse ya da `ThresholdRule.Measured`'dan okusa
+    ölçü sabiti kendisiyle karşılaştırır ve kural kaysa bile yeşil kalırdı. Bağımsızlığın
+    yük taşıdığı ölçüldü (`docs/olcumler/k8-kayitli-kural-2026-09-19.md`); pim meşruya
+    çevrildi.
 13. ~~`IdetCounts.Progressive` / `.Undetermined` ayrıştırılıyor, karar kuralı okumuyor.~~
     **Borç değil, üçüncü kör nokta:** karar kuralı `counts.Total`'ı okuyor,
     `Total => Tff + Bff + Progressive + Undetermined` ise iki kolonu da **nitelenmeden**
@@ -111,3 +115,15 @@ açıkça "bu kod kalkacak" diyor.
     `MediaInfo` 69, `EncodePlan` 42). **Şüpheli:** incelik, yokluk değil.
 20. `docs/handbrake/README.md:16-22` — Envanter borcu; ölçümü
     `docs/handbrake/envanter-tamlik-2026-09-18.md`'de.
+
+## Sonradan çıkan (19 Eylül 2026)
+
+21. **En ağır.** `src/VidShrink.Ffmpeg/FrameGrabber.cs` (520 satır) üretimde **hiç
+    kurulmuyor**: `new FrameGrabber` yalnız testlerde geçiyor, `GrabPairAsync`'in üretimde
+    tek çağıranı yok. Onu besleyen `PreviewState` / `PreviewStatus` makinesi de
+    (`PreviewTimeline.cs`) aynı durumda — `Derive` yalnız testlerden çağrılıyor, oysa
+    kendi belgesi "arayüz kendi koşullarından durum uydurmaz, bunu çağırır" diyor.
+    Karşılaştırma paneli T176'dan beri libmpv yolundan besleniyor
+    (`EngineComparisonFrameSource`), ffmpeg'den kare kesen bu yol onun altında kaldı.
+    Testleriyle birlikte 1416 satır. Madde 8'in beş pimi bu kökün yaprağı: üyeler
+    üretilmiyor değil, üreten sınıfın kendisi üretimde koşmuyor.
