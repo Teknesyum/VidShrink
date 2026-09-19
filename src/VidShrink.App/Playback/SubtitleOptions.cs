@@ -1,8 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using VidShrink.Player;
+
+using VidShrink.Core;
+
+using VidShrink.App.Localization;
 
 namespace VidShrink.App.Playback;
 
@@ -132,5 +136,5 @@ internal sealed class SubtitleOptions
     }
 
     internal static string Signed(double value)
-        => (value < 0 ? "−" : "+") + Math.Abs(value).ToString("0.##", CultureInfo.CurrentCulture);
+        => (value < 0 ? "−" : "+") + Saat.Adim(Math.Abs(value), Strings.Culture);
 }

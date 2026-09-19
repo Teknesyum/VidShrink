@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -9,6 +9,8 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using VidShrink.App.Localization;
 using VidShrink.Player;
+
+using VidShrink.Core;
 
 namespace VidShrink.App.Playback;
 
@@ -86,14 +88,14 @@ internal partial class PlayerView
     {
         _subtitles.ShiftSubtitleDelay(seconds);
         _engine?.SetSubtitleDelay(_subtitles.SubtitleDelay);
-        _trace.Add("subdelay " + seconds.ToString("0.###") + " -> " + _subtitles.SubtitleDelay.ToString("0.###"));
+        _trace.Add("subdelay " + Saat.Tani.Konum(seconds) + " -> " + Saat.Tani.Konum(_subtitles.SubtitleDelay));
     }
 
     private void ShiftAudioDelay(double seconds)
     {
         _subtitles.ShiftAudioDelay(seconds);
         _engine?.SetAudioDelay(_subtitles.AudioDelay);
-        _trace.Add("audiodelay " + seconds.ToString("0.###") + " -> " + _subtitles.AudioDelay.ToString("0.###"));
+        _trace.Add("audiodelay " + Saat.Tani.Konum(seconds) + " -> " + Saat.Tani.Konum(_subtitles.AudioDelay));
     }
 
     internal void SelectAudio(long id)
@@ -294,12 +296,12 @@ internal partial class PlayerView
         items.Add(Bound(SubtitleOptions.SubtitleEarlier));
         items.Add(Plain(Strings.Get("player.subtitle.delayreset"), ResetSubtitleDelay));
         items.Add(new Separator());
-        items.Add(Submenu(Strings.Get("player.subtitle.size", (_subtitles.Scale * 100).ToString("0", CultureInfo.CurrentCulture)), new List<Control>
+        items.Add(Submenu(Strings.Get("player.subtitle.size", Bicim.Yuzde.Tam(_subtitles.Scale, Strings.Culture)), new List<Control>
         {
             Plain(Strings.Get("player.subtitle.larger"), () => ResizeSubtitle(1)),
             Plain(Strings.Get("player.subtitle.smaller"), () => ResizeSubtitle(-1))
         }));
-        items.Add(Submenu(Strings.Get("player.subtitle.position", _subtitles.Position.ToString("0", CultureInfo.CurrentCulture)), new List<Control>
+        items.Add(Submenu(Strings.Get("player.subtitle.position", Bicim.Yuzde.HazirTam(_subtitles.Position, Strings.Culture)), new List<Control>
         {
             Plain(Strings.Get("player.subtitle.up"), () => MoveSubtitle(-1)),
             Plain(Strings.Get("player.subtitle.down"), () => MoveSubtitle(1))

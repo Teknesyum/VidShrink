@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using Avalonia;
@@ -11,6 +11,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using VidShrink.App.Localization;
+
+using VidShrink.Core;
 
 namespace VidShrink.App.Playback;
 
@@ -256,10 +258,10 @@ internal partial class PlayerView
         GlyphSeritVolume.Data = Icon(_muted || _volume <= 0 ? "IconVolumeMute" : "IconVolume");
 
         SeritLabel(BtnSeritPlay, Strings.Get(_playing ? "playback.control.pause" : "playback.control.play"), Keymap.FirstKeyRow(Keymap.PlayPause));
-        SeritLabel(BtnSeritBack, Strings.Get("main.player.menu.seek", "−" + Keymap.SeekSmall.ToString(CultureInfo.CurrentCulture)), SeekRow(-Keymap.SeekSmall));
-        SeritLabel(BtnSeritForward, Strings.Get("main.player.menu.seek", "+" + Keymap.SeekSmall.ToString(CultureInfo.CurrentCulture)), SeekRow(Keymap.SeekSmall));
-        TxtSeritBack.Text = "−" + Keymap.SeekSmall.ToString(CultureInfo.CurrentCulture);
-        TxtSeritForward.Text = "+" + Keymap.SeekSmall.ToString(CultureInfo.CurrentCulture);
+        SeritLabel(BtnSeritBack, Strings.Get("main.player.menu.seek", "−" + Keymap.SeekSmall.ToString(Strings.Culture)), SeekRow(-Keymap.SeekSmall));
+        SeritLabel(BtnSeritForward, Strings.Get("main.player.menu.seek", "+" + Keymap.SeekSmall.ToString(Strings.Culture)), SeekRow(Keymap.SeekSmall));
+        TxtSeritBack.Text = "−" + Keymap.SeekSmall.ToString(Strings.Culture);
+        TxtSeritForward.Text = "+" + Keymap.SeekSmall.ToString(Strings.Culture);
         SeritLabel(BtnSeritMute, Strings.Get(Keymap.Mute.LabelKey), Keymap.FirstKeyRow(Keymap.Mute));
         SeritLabel(BtnSeritFullScreen, Strings.Get(Keymap.Fullscreen.LabelKey), Keymap.FirstKeyRow(Keymap.Fullscreen));
         SeritLabel(BtnSeritSpeedReset, Strings.Get(Keymap.NormalSpeed.LabelKey), Keymap.FirstKeyRow(Keymap.NormalSpeed));

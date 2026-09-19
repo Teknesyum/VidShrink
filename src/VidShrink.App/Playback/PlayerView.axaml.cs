@@ -15,6 +15,8 @@ using Avalonia.Threading;
 using VidShrink.App.Localization;
 using VidShrink.Player;
 
+using VidShrink.Core;
+
 namespace VidShrink.App.Playback;
 
 internal partial class PlayerView : UserControl
@@ -126,12 +128,12 @@ internal partial class PlayerView : UserControl
         {
             case PlayerCommandKind.Seek:
                 _seek.Nudge(command.Amount);
-                _trace.Add("seek " + command.Amount.ToString("0.###") + " -> " + _seek.Target.ToString("0.###"));
+                _trace.Add("seek " + Saat.Tani.Konum(command.Amount) + " -> " + Saat.Tani.Konum(_seek.Target));
                 break;
             case PlayerCommandKind.Zoom:
                 _zoom.Wheel(command.Amount, Surface.Bounds.Width / 2, Surface.Bounds.Height / 2);
                 Resize();
-                _trace.Add("zoom " + command.Amount.ToString("0.###") + " -> " + _zoom.PanelScale.ToString("0.###"));
+                _trace.Add("zoom " + Saat.Tani.Konum(command.Amount) + " -> " + Saat.Tani.Konum(_zoom.PanelScale));
                 break;
             case PlayerCommandKind.TogglePlay:
                 TogglePlay();
@@ -152,7 +154,7 @@ internal partial class PlayerView : UserControl
             case PlayerCommandKind.ResetZoom:
                 _zoom.Reset();
                 Resize();
-                _trace.Add("zoomreset -> " + _zoom.PanelScale.ToString("0.###"));
+                _trace.Add("zoomreset -> " + Saat.Tani.Konum(_zoom.PanelScale));
                 break;
             case PlayerCommandKind.LeaveFullscreen:
                 if (_fullscreen.IsFullscreen) ToggleFullscreen();
@@ -161,7 +163,7 @@ internal partial class PlayerView : UserControl
             case PlayerCommandKind.Volume:
                 _volume = Math.Clamp(_volume + command.Amount, 0, VolumeCeiling());
                 _engine?.SetVolume(_volume);
-                _trace.Add("volume " + command.Amount.ToString("0.###") + " -> " + _volume.ToString("0.###"));
+                _trace.Add("volume " + Saat.Tani.Konum(command.Amount) + " -> " + Saat.Tani.Konum(_volume));
                 break;
             case PlayerCommandKind.ToggleMute:
                 _muted = !_muted;
@@ -171,16 +173,16 @@ internal partial class PlayerView : UserControl
             case PlayerCommandKind.Speed:
                 _speed = Math.Clamp(Math.Round(_speed + command.Amount, 2), Keymap.MinimumSpeed, Keymap.MaximumSpeed);
                 _engine?.SetSpeed(_speed);
-                _trace.Add("speed " + command.Amount.ToString("0.###") + " -> " + _speed.ToString("0.###"));
+                _trace.Add("speed " + Saat.Tani.Konum(command.Amount) + " -> " + Saat.Tani.Konum(_speed));
                 break;
             case PlayerCommandKind.SpeedReset:
                 _speed = 1;
                 _engine?.SetSpeed(_speed);
-                _trace.Add("speedreset -> " + _speed.ToString("0.###"));
+                _trace.Add("speedreset -> " + Saat.Tani.Konum(_speed));
                 break;
             case PlayerCommandKind.FrameStep:
                 StepFrame(command.Amount < 0);
-                _trace.Add("frame " + command.Amount.ToString("0.###"));
+                _trace.Add("frame " + Saat.Tani.Konum(command.Amount));
                 break;
             case PlayerCommandKind.LoopStart:
                 MarkLoopStart();
@@ -276,7 +278,7 @@ internal partial class PlayerView : UserControl
         _loopStart = CurrentPosition();
         if (double.IsFinite(_loopEnd) && _loopEnd <= _loopStart) _loopEnd = double.NaN;
         _engine?.SetLoop(_loopStart, _loopEnd);
-        _trace.Add("loop a -> " + _loopStart.ToString("0.###"));
+        _trace.Add("loop a -> " + Saat.Tani.Konum(_loopStart));
     }
 
     private void MarkLoopEnd()
@@ -292,7 +294,7 @@ internal partial class PlayerView : UserControl
         _loopStart = start;
         _loopEnd = at;
         _engine?.SetLoop(_loopStart, _loopEnd);
-        _trace.Add("loop b -> " + _loopEnd.ToString("0.###"));
+        _trace.Add("loop b -> " + Saat.Tani.Konum(_loopEnd));
     }
 
     private void AddBookmark()
@@ -306,7 +308,7 @@ internal partial class PlayerView : UserControl
         var at = CurrentPosition();
         _history.AddBookmark(path, at);
         _history.Save(HistoryPath?.Invoke());
-        _trace.Add("bookmarkadd -> " +at.ToString("0.###"));
+        _trace.Add("bookmarkadd -> " +Saat.Tani.Konum(at));
     }
 
     private void StepBookmark(bool backward)
@@ -324,7 +326,7 @@ internal partial class PlayerView : UserControl
 
         _trackPaused = false;
         _seek.GoTo(next);
-        _trace.Add(name + next.ToString("0.###"));
+        _trace.Add(name + Saat.Tani.Konum(next));
     }
 
     private void OnWheel(object? sender, PointerWheelEventArgs e)
@@ -673,7 +675,7 @@ internal partial class PlayerView : UserControl
         StartRender();
         var resume = HistoryPath is null ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
         _seek.GoTo(resume);
-        if (resume > 0) _trace.Add("resume -> " + resume.ToString("0.###"));
+        if (resume > 0) _trace.Add("resume -> " + Saat.Tani.Konum(resume));
         if (!_playing) TogglePlay();
         AfterOpen(path, engine);
         RefreshState();
@@ -801,16 +803,16 @@ internal partial class PlayerView : UserControl
         if (TxtState is null) return;
         TxtState.Text = Strings.Get(
             "main.player.state",
-            _seek.Target.ToString("0.###"),
+            Saat.Konum(_seek.Target, Strings.Culture),
             _playing ? Strings.Get("main.player.playing") : Strings.Get("main.player.paused"),
-            (_zoom.PanelScale * 100).ToString("0"));
+            Bicim.Yuzde.Tam(_zoom.PanelScale, Strings.Culture));
 
         if (TxtControls is null) return;
-        var parts = new List<string> { Strings.Get("main.player.volume", _volume.ToString("0")) };
+        var parts = new List<string> { Strings.Get("main.player.volume", Bicim.Yuzde.HazirTam(_volume, Strings.Culture)) };
         if (_muted) parts.Add(Strings.Get("main.player.muted"));
-        parts.Add(Strings.Get("main.player.speed", _speed.ToString("0.##")));
+        parts.Add(Strings.Get("main.player.speed", Bicim.Kat(_speed, Strings.Culture)));
         parts.Add(double.IsFinite(_loopStart)
-            ? Strings.Get("main.player.loopstate", _loopStart.ToString("0.##"), double.IsFinite(_loopEnd) ? _loopEnd.ToString("0.##") : "…")
+            ? Strings.Get("main.player.loopstate", Saat.Konum(_loopStart, Strings.Culture), double.IsFinite(_loopEnd) ? Saat.Konum(_loopEnd, Strings.Culture) : "…")
             : Strings.Get("main.player.loopoff"));
         parts.Add(Strings.Get("main.player.bookmarkcount", _path is null ? 0 : _history.Bookmarks(_path).Count));
         AppendTrackState(parts);

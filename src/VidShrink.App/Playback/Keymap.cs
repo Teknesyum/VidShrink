@@ -1,9 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Avalonia.Input;
 using VidShrink.App.Localization;
+
+using VidShrink.Core;
 
 namespace VidShrink.App.Playback;
 
@@ -239,7 +241,7 @@ internal static class Keymap
 
     private static string Signed(double amount, bool bothWays)
     {
-        var magnitude = Math.Abs(amount).ToString("0.##", CultureInfo.CurrentCulture);
+        var magnitude = Saat.Adim(Math.Abs(amount), Strings.Culture);
         if (bothWays) return "±" + magnitude;
         return (amount < 0 ? "−" : "+") + magnitude;
     }

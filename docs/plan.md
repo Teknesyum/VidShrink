@@ -396,6 +396,44 @@ karşı bir kapı — ve kapı pimsizdi. İki satırlık ham ondalık asertiyle 
 yeniden koşumda 1 kırmızı. Bu dürüstçe yazılıyor: adım 9'un kapattığı tek gerçek
 kusur `Num`'un kültürü.
 
+### Adım 10 ölçümü — 19 Eylül 2026
+
+Oynatıcı paneli. Taramanın (`.ToString("0…")` kültürsüz + `CultureInfo.CurrentCulture`)
+bıraktığı son yığın buradaydı: 22 izleme satırı ve altı kullanıcı satırı.
+
+İki ayrı karar, çünkü iki ayrı okuyucu var:
+
+- **İzleme satırları** (`_trace`) ölçü okuyor, kültürden kopuk olmalı — hepsi
+  `Saat.Tani.Konum`'a indi. Eskiden makinenin kültürünü okuyorlardı; Türkçe bir
+  makinede ölçünün okuduğu satır `seek 12,345` yazıyordu.
+- **Panelin kendi satırları** arayüzün dilini okumalı — konum, yakınlaştırma, ses,
+  hız ve A-B döngüsü `Strings.Culture`'a bağlandı. Kapanan gerçek kusur: aynı
+  pencerenin küçültme sekmesi `1,25` derken oynatıcı şeridi `1.25` diyordu.
+
+Dört yeni yüzey: `Saat.Konum` (konum, üç ondalık — aramanın adımı milisaniye),
+`Saat.Adim` (arama miktarı ve altyazı gecikmesi), `Bicim.Kat` (hız çarpanı),
+`Bicim.Yuzde.HazirTam` (zaten yüzde taşıyan tam sayı).
+
+Temiz taban 0 kırmızı / 58 yeşil. Mutasyon:
+
+| Kesim | Kırmızı |
+| --- | --- |
+| O1 `Konum` ondalığı düşer | 1 |
+| O2 `Konum` kültürü sabitlenir | 1 |
+| O3 `Tani.Konum` makineden okur | 1 |
+| O4 `Adim` ondalığı düşer | 1 |
+| O5 `Kat` kültürü sabitlenir | 2 |
+| O6 `HazirTam` yüzle çarpar | 1 |
+| O7 hız satırı makineden okur | 1 |
+| O8 ses satırı makineden okur | **0** |
+
+**O8 eşdeğer, kör nokta değil.** Ses düzeyi tam sayı; `65` her kültürde `65`.
+Aynı şey altyazı boyu menüsünde ve kısayol etiketinde de geçerli — ölçek ve arama
+miktarı tam sayı, ayraç hiç görünmüyor. Bu üç satırda kapanan şey görünen bir kusur
+değil, kaynağın doğruluğu: bugün eşdeğer olmaları değerlerin bugünkü halinden
+geliyor, yüzeyin kendisinden değil. Bu yüzden düşürülemeyen bir ölçü yazılmadı;
+yüzeyler (`Yuzde.HazirTam`, `Saat.Adim`) kendi pimlerini taşıyor (O4, O6).
+
 ## Kapsam dışı
 
 - ffmpeg/mpv **argümanı** üreten biçimler (kullanıcıya gösterilmiyor, ondalığı protokol

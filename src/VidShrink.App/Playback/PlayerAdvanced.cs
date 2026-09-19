@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -6,6 +6,10 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using VidShrink.Player;
+
+using VidShrink.Core;
+
+using VidShrink.App.Localization;
 
 namespace VidShrink.App.Playback;
 
@@ -127,7 +131,7 @@ internal sealed class PlayerAdvanced
     }
 
     internal static string Signed(int value)
-        => (value > 0 ? "+" : "") + value.ToString(CultureInfo.CurrentCulture);
+        => (value > 0 ? "+" : "") + value.ToString(Strings.Culture);
 
     private static string? Text(JsonNode? node)
     {

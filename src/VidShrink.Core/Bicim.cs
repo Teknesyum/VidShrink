@@ -99,6 +99,13 @@ public static class Bicim
         public static string Tam(double oran, CultureInfo kultur) =>
             (oran * 100).ToString("0", kultur);
 
+        /// <summary>
+        /// Zaten yüzde taşıyan tam sayı değer (ses düzeyi). <see cref="Tam"/> ile
+        /// karıştırılmasın diye ayrı ad: biri oranı yüzle çarpar, bu çarpmaz.
+        /// </summary>
+        public static string HazirTam(double yuzde, CultureInfo kultur) =>
+            yuzde.ToString("0", kultur);
+
         private static string DeseneKoy(string sayi, CultureInfo kultur)
         {
             var isaret = kultur.NumberFormat.PercentSymbol;
@@ -152,6 +159,12 @@ public static class Bicim
     /// doğru tipografik seçim ve oynatıcı zaten onu kullanıyor. Kültür almaz: boyutlar
     /// tam sayı, basamak ayracı istemiyorlar.
     /// </summary>
+    /// <summary>
+    /// Oynatma hızı çarpanı (<c>1,25×</c>). İki ondalık, çünkü adım 0,05.
+    /// </summary>
+    public static string Kat(double kat, CultureInfo kultur) =>
+        kat.ToString("0.##", kultur);
+
     public static string Cozunurluk(int genislik, int yukseklik) =>
         genislik.ToString(CultureInfo.InvariantCulture)
         + "×" + yukseklik.ToString(CultureInfo.InvariantCulture);

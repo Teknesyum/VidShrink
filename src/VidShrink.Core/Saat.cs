@@ -90,8 +90,28 @@ public static class Saat
     /// araya biçim koymadan yazıyordu ve makinenin kültürünü okuyordu — Türkçe bir
     /// makinede İngilizce istem <c>12,34 s</c> diye virgüllü çıkıyordu.
     /// </summary>
+    /// <summary>
+    /// Oynatıcının konum yazımı: milisaniye çözünürlüğü aramanın kendi adımından geliyor,
+    /// yuvarlarsak kullanıcı bastığı tuşun etkisini göremez. Kültür arayüzün dilinden
+    /// gelir — panel <c>12,345 sn</c> yazarken aynı pencerenin öbür satırı nokta yazmasın.
+    /// </summary>
+    public static string Konum(double saniye, CultureInfo kultur) =>
+        saniye.ToString("0.###", kultur);
+
+    /// <summary>
+    /// İşaretsiz saniye adımı: arama miktarı, altyazı gecikmesi. Adım 0,05'e kadar
+    /// inebildiği için iki ondalık; işareti çağrı yeri koyuyor, çünkü <c>−</c> ile
+    /// <c>±</c> arasındaki seçim metnin kendi kararı.
+    /// </summary>
+    public static string Adim(double saniye, CultureInfo kultur) =>
+        saniye.ToString("0.##", kultur);
+
     public static class Tani
     {
+        /// <summary>İzleme satırının konumu: ölçü okuyor, kültürden kopuk kalmalı.</summary>
+        public static string Konum(double saniye) =>
+            saniye.ToString("0.###", CultureInfo.InvariantCulture);
+
         /// <inheritdoc cref="Sure(double, CultureInfo)"/>
         public static string Saniye(double saniye) =>
             saniye.ToString("0.##", CultureInfo.InvariantCulture);
