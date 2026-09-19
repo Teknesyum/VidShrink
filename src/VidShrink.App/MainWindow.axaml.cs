@@ -1108,8 +1108,11 @@ public partial class MainWindow : Window
         {
             HardwareVerdictReason.ProbeFailed => Line("main.fast-gpu.probe-failed", v.Codec),
             HardwareVerdictReason.ProbeSlow => Line("main.fast-gpu.probe-slow", v.Codec, v.ElapsedMs, HardwareVerdict.ProbeBudgetMs),
-            _ => Line("main.fast-gpu.bitrate-floor", v.Codec, Strings.BitHizi(v.UsableBitrateK), Strings.BitHizi(v.RequestedBitrateK))
+            HardwareVerdictReason.BitrateFloorTooHigh => Line("main.fast-gpu.bitrate-floor", v.Codec, Strings.BitHizi(v.UsableBitrateK), Strings.BitHizi(v.RequestedBitrateK)),
+            _ => null
         };
+
+        if (measurement is null) return null;
 
         return fastGpuOn
             ? Line("main.fast-gpu.on-against-advice", measurement)

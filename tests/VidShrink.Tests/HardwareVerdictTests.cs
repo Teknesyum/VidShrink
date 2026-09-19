@@ -443,6 +443,44 @@ public class HardwareVerdictTests
         }
     }
 
+    /// <summary>
+    /// K8 borcu 14: kapalı dalların ölçüm cümlesi artık adıyla eşleşiyor. Eskiden bit hızı
+    /// tabanı <c>_</c> kolundaydı; sebep kümesine yeni bir üye girseydi kullanıcı ona da
+    /// "taban çok yüksek" derdi. Tanınmayan sebep artık cümle kurmuyor.
+    /// </summary>
+    [Fact]
+    public void AnUnknownReasonDoesNotBorrowTheBitrateFloorSentence()
+    {
+        var taban = Closed(HardwareVerdictReason.BitrateFloorTooHigh);
+        var bilinmeyen = taban with { Reason = (HardwareVerdictReason)99 };
+
+        Assert.NotNull(MainWindow.FastGpuVerdictLine(taban, false, "tr"));
+        Assert.Null(MainWindow.FastGpuVerdictLine(bilinmeyen, false, "tr"));
+        Assert.Null(MainWindow.FastGpuVerdictLine(bilinmeyen, true, "tr"));
+    }
+
+    /// <summary>
+    /// Üç kapalı dalın her biri kendi ölçüsünü yazmalı: taban cümlesi iki bit hızını,
+    /// yavaş yoklama cümlesi süreyi ve bütçeyi söyler. Cümleler birbirinin yerine geçerse
+    /// kullanıcı yanlış sebebi okur.
+    /// </summary>
+    [Fact]
+    public void EachClosedReasonCarriesItsOwnNumbers()
+    {
+        var taban = Closed(HardwareVerdictReason.BitrateFloorTooHigh);
+        var tabanSatiri = MainWindow.FastGpuVerdictLine(taban, false, "tr");
+        Assert.NotNull(tabanSatiri);
+        Assert.Contains(taban.UsableBitrateK.ToString(), tabanSatiri!, StringComparison.Ordinal);
+        Assert.Contains(taban.RequestedBitrateK.ToString(), tabanSatiri, StringComparison.Ordinal);
+        Assert.DoesNotContain(HardwareVerdict.ProbeBudgetMs.ToString(), tabanSatiri, StringComparison.Ordinal);
+
+        var yavas = Closed(HardwareVerdictReason.ProbeSlow);
+        var yavasSatiri = MainWindow.FastGpuVerdictLine(yavas, false, "tr");
+        Assert.NotNull(yavasSatiri);
+        Assert.Contains(HardwareVerdict.ProbeBudgetMs.ToString(), yavasSatiri!, StringComparison.Ordinal);
+        Assert.Contains(yavas.ElapsedMs.ToString(), yavasSatiri, StringComparison.Ordinal);
+    }
+
     /// <summary>Yoklaması hiç bulunamayan kodlayıcı için "bulundu ama" denmemeli.</summary>
     [Fact]
     public void AMissingEncoderIsNotDescribedAsPresent()

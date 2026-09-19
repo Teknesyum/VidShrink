@@ -79,8 +79,12 @@ açıkça "bu kod kalkacak" diyor.
     verildi. Ölçü **elli** pimi kümeden düşürdü (altısı elle doğrulandı, hepsi gerçekten
     okunuyordu) ve tek satır bile yeni gelmedi. `OzellikteNitelenmemisOkumaGoruluyor`;
     okuma önekleri listesini boşaltmak 1 kırmızı.
-14. `OluUyeTests.cs:485-494` — `ArchitectureOutcome.Assumed` ve
-    `HardwareVerdictReason.BitrateFloorTooHigh` hiçbir kolda ayrılmıyor.
+14. ~~`OluUyeTests.cs:485-494` — `ArchitectureOutcome.Assumed` ve
+    `HardwareVerdictReason.BitrateFloorTooHigh` hiçbir kolda ayrılmıyor.~~ **Kapandı:**
+    bit hızı tabanı `_` jokerindeydi; adıyla yazıldı, tanınmayan sebep artık cümle
+    kurmuyor. `Assumed` borç değil, iki üyeli türün `else` kolu — meşruya çevrildi.
+    Üç kesimin üçü kırmızı; ilk turda bir kör nokta çıkıp kapandı
+    (`docs/olcumler/k8-gerekce-kolu-2026-09-19.md`).
 15. ~~`OluUyeTests.cs:487-488` — `ComparisonSourceState.Duraklatildi` hesaplanıp
     atılıyor.~~ **Kapandı:** ayırmak gerekiyormuş. Kaynak kendi kararıyla duraklıyor,
     şerit düğmesi "oynuyor" demeye devam ediyordu; durum artık şeride ve sese iniyor.
