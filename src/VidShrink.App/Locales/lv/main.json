@@ -66,6 +66,7 @@
   "main.drop.single": "Tikai viens fails vienlaikus",
   "main.drop.no-folder": "Mapes nevar nomest",
 
+  "main.title.label": "Nosaukums",
   "main.info.duration": "Ilgums",
   "main.info.size": "Izmērs",
   "main.info.resolution": "Izšķirtspēja",

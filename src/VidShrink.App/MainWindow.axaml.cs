@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -72,6 +72,15 @@ public partial class MainWindow : Window
     };
 
     private MediaInfo? _info;
+
+    /// <summary>
+    /// Yoklamanin daraltilmamis hali. Baslik secici bunun uzerinden calisiyor: secim
+    /// degisince daraltma her seferinde tam envanterden yeniden kuruluyor, bir onceki
+    /// secimin daralttigi listeden degil.
+    /// </summary>
+    private MediaInfo? _probed;
+
+    private bool _titleSyncing;
     private string? _sourceName;
     private EncodePlan? _autoPlan;
     private EncodePlan? _aiPlan;
@@ -3219,8 +3228,54 @@ public partial class MainWindow : Window
         ApplyLoaded(path, info);
     }
 
+    /// <summary>
+    /// Baslik secici yalnizca birden cok baslik varsa gorunur; tek baslikli dosyada
+    /// arayuz bugunku gibi kaliyor. Satirlar numarayla, sureyle ve varsa kaynagin kendi
+    /// etiketiyle yaziliyor.
+    /// </summary>
+    private void BaslikSeciciyiKur(MediaInfo info)
+    {
+        _titleSyncing = true;
+        try
+        {
+            CmbTitle.ItemsSource = info.Titles
+                .Select(b => string.IsNullOrWhiteSpace(b.Label)
+                    ? b.Number + "  " + BaslikSuresi(b)
+                    : b.Number + "  " + BaslikSuresi(b) + "  " + b.Label)
+                .ToArray();
+            CmbTitle.SelectedIndex = info.Titles.Count > 0 ? 0 : -1;
+            TitleRow.IsVisible = info.HasMultipleTitles;
+        }
+        finally
+        {
+            _titleSyncing = false;
+        }
+    }
+
+    private static string BaslikSuresi(SourceTitle baslik)
+        => TimeSpan.FromSeconds(baslik.DurationSeconds).ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
+
+    private MediaInfo SecilenBaslikleUygula(MediaInfo info)
+    {
+        var index = CmbTitle.SelectedIndex;
+        if (index < 0 || index >= info.Titles.Count) return info;
+        return SourceTitles.Uygula(info, info.Titles[index]);
+    }
+
+    private void OnTitleChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_titleSyncing || _probed is null) return;
+        _info = SecilenBaslikleUygula(_probed);
+        ShowInfo(_info);
+        Recalculate();
+        RefreshConversion();
+    }
+
     private void ApplyLoaded(string path, MediaInfo info)
     {
+        _probed = info;
+        BaslikSeciciyiKur(info);
+        info = SecilenBaslikleUygula(info);
         _info = info;
 
         Fade(DropZone, false);

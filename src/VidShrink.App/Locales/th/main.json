@@ -66,6 +66,7 @@
   "main.drop.single": "ครั้งละหนึ่งไฟล์เท่านั้น",
   "main.drop.no-folder": "วางโฟลเดอร์ไม่ได้",
 
+  "main.title.label": "ชื่อเรื่อง",
   "main.info.duration": "ความยาว",
   "main.info.size": "ขนาด",
   "main.info.resolution": "ความละเอียด",

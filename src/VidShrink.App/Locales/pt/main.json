@@ -66,6 +66,7 @@
   "main.drop.single": "Apenas um arquivo por vez",
   "main.drop.no-folder": "Pastas não podem ser soltas",
 
+  "main.title.label": "Título",
   "main.info.duration": "Duração",
   "main.info.size": "Tamanho",
   "main.info.resolution": "Resolução",

@@ -16,7 +16,7 @@ public static class FfprobeClient
         {
             "-hide_banner", "-v", "error",
             "-print_format", "json",
-            "-show_format", "-show_streams", "-show_chapters",
+            "-show_format", "-show_streams", "-show_chapters", "-show_programs",
             filePath
         };
 
@@ -62,6 +62,8 @@ public static class FfprobeClient
         var colorTransfer = GetString(v, "color_transfer");
         var fieldOrder = GetString(v, "field_order");
 
+        var titles = Basliklar(root, duration, DisplayDimensions(v), inventory.Count, chapters.Count);
+
         return new MediaInfo
         {
             FilePath = filePath,
@@ -88,7 +90,8 @@ public static class FfprobeClient
             AudioBitrateBps = audio is null ? 0 : ParseLong(audio.Value, "bit_rate") ?? 128_000,
             AudioChannels = audio is null ? 0 : GetInt(audio.Value, "channels") ?? 2,
             Streams = inventory,
-            Chapters = chapters
+            Chapters = chapters,
+            Titles = titles
         };
     }
 
@@ -275,6 +278,59 @@ public static class FfprobeClient
         => stream.TryGetProperty("disposition", out var d)
            && d.TryGetProperty("attached_pic", out var a)
            && a.GetInt32() == 1;
+
+    /// <summary>
+    /// Kaynaktaki basliklar. Cok programli bir yayinda her program bir basliktir; program
+    /// yoksa ya da tek program varsa kaynak duz dosya sayilir ve tek baslik doner. Numara
+    /// ffprobe'un <c>program_id</c>'sidir, sira degil: <c>-map 0:p:&lt;id&gt;</c> bu sayiyi ister.
+    /// </summary>
+    private static IReadOnlyList<SourceTitle> Basliklar(
+        JsonElement root, double duration, (int width, int height) olcu, int akisSayisi, int bolumSayisi)
+    {
+        var liste = new List<SourceTitle>();
+        if (root.TryGetProperty("programs", out var programs) && programs.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var p in programs.EnumerateArray())
+            {
+                var numara = GetInt(p, "program_id");
+                if (numara is null) continue;
+                int genislik = 0, yukseklik = 0;
+                double sure = 0;
+                var indeksler = new List<int>();
+                if (p.TryGetProperty("streams", out var ps) && ps.ValueKind == JsonValueKind.Array)
+                    foreach (var st in ps.EnumerateArray())
+                    {
+                        if (GetInt(st, "index") is { } ix) indeksler.Add(ix);
+                        sure = Math.Max(sure, ParseDouble(st, "duration") ?? 0);
+                        if (GetString(st, "codec_type") != "video" || IsAttachedPicture(st) || genislik > 0) continue;
+                        var boy = DisplayDimensions(st);
+                        genislik = boy.width;
+                        yukseklik = boy.height;
+                    }
+
+                string? etiket = null;
+                if (p.TryGetProperty("tags", out var tags) && tags.ValueKind == JsonValueKind.Object)
+                    etiket = GetString(tags, "service_name");
+
+                liste.Add(new SourceTitle(
+                    numara.Value,
+                    sure > 0 ? sure : duration,
+                    genislik,
+                    yukseklik,
+                    indeksler.Count,
+                    0,
+                    etiket)
+                { Kind = TitleSourceKind.Program, StreamIndexes = indeksler });
+            }
+        }
+
+        if (liste.Count > 1) return liste;
+
+        return new[]
+        {
+            new SourceTitle(1, duration, olcu.width, olcu.height, akisSayisi, bolumSayisi, null),
+        };
+    }
 
     private static string? GetString(JsonElement e, string name)
         => e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;

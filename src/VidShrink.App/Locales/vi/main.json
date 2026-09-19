@@ -66,6 +66,7 @@
   "main.drop.single": "Mỗi lần chỉ một tệp",
   "main.drop.no-folder": "Không thể thả thư mục",
 
+  "main.title.label": "Tiêu đề",
   "main.info.duration": "Thời lượng",
   "main.info.size": "Dung lượng",
   "main.info.resolution": "Độ phân giải",

@@ -66,6 +66,7 @@
   "main.drop.single": "Bir seferde tek dosya",
   "main.drop.no-folder": "Klasör bırakılamaz",
 
+  "main.title.label": "Başlık",
   "main.info.duration": "Süre",
   "main.info.size": "Boyut",
   "main.info.resolution": "Çözünürlük",

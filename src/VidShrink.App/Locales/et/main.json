@@ -66,6 +66,7 @@
   "main.drop.single": "Korraga ainult üks fail",
   "main.drop.no-folder": "Kaustu ei saa lohistada",
 
+  "main.title.label": "Tiitel",
   "main.info.duration": "Kestus",
   "main.info.size": "Suurus",
   "main.info.resolution": "Eraldusvõime",

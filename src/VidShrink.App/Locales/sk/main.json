@@ -66,6 +66,7 @@
   "main.drop.single": "Naraz len jeden súbor",
   "main.drop.no-folder": "Priečinky sa nedajú pretiahnuť",
 
+  "main.title.label": "Titul",
   "main.info.duration": "Dĺžka",
   "main.info.size": "Veľkosť",
   "main.info.resolution": "Rozlíšenie",

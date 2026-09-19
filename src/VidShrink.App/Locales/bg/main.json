@@ -66,6 +66,7 @@
   "main.drop.single": "Само по един файл",
   "main.drop.no-folder": "Папки не могат да се пускат",
 
+  "main.title.label": "Заглавие",
   "main.info.duration": "Продължителност",
   "main.info.size": "Размер",
   "main.info.resolution": "Резолюция",

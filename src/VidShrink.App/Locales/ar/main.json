@@ -66,6 +66,7 @@
   "main.drop.single": "ملف واحد في كل مرة",
   "main.drop.no-folder": "لا يمكن إفلات المجلدات",
 
+  "main.title.label": "العنوان",
   "main.info.duration": "المدة",
   "main.info.size": "الحجم",
   "main.info.resolution": "الدقة",

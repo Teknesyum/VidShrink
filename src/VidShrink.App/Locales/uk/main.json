@@ -66,6 +66,7 @@
   "main.drop.single": "Лише один файл за раз",
   "main.drop.no-folder": "Теки перетягувати не можна",
 
+  "main.title.label": "Заголовок",
   "main.info.duration": "Тривалість",
   "main.info.size": "Розмір",
   "main.info.resolution": "Роздільність",

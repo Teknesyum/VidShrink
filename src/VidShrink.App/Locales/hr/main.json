@@ -66,6 +66,7 @@
   "main.drop.single": "Samo jedna datoteka odjednom",
   "main.drop.no-folder": "Mape se ne mogu ispustiti",
 
+  "main.title.label": "Naslov",
   "main.info.duration": "Trajanje",
   "main.info.size": "Veličina",
   "main.info.resolution": "Razlučivost",

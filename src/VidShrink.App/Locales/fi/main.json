@@ -66,6 +66,7 @@
   "main.drop.single": "Vain yksi tiedosto kerrallaan",
   "main.drop.no-folder": "Kansioita ei voi pudottaa",
 
+  "main.title.label": "Nimike",
   "main.info.duration": "Kesto",
   "main.info.size": "Koko",
   "main.info.resolution": "Tarkkuus",

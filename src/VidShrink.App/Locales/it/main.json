@@ -66,6 +66,7 @@
   "main.drop.single": "Un solo file alla volta",
   "main.drop.no-folder": "Le cartelle non possono essere trascinate",
 
+  "main.title.label": "Titolo",
   "main.info.duration": "Durata",
   "main.info.size": "Dimensione",
   "main.info.resolution": "Risoluzione",

@@ -66,6 +66,7 @@
   "main.drop.single": "Tylko jeden plik naraz",
   "main.drop.no-folder": "Nie można upuszczać folderów",
 
+  "main.title.label": "Tytuł",
   "main.info.duration": "Czas trwania",
   "main.info.size": "Rozmiar",
   "main.info.resolution": "Rozdzielczość",

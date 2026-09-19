@@ -66,6 +66,7 @@
   "main.drop.single": "一次只能一个文件",
   "main.drop.no-folder": "不能拖放文件夹",
 
+  "main.title.label": "标题",
   "main.info.duration": "时长",
   "main.info.size": "大小",
   "main.info.resolution": "分辨率",

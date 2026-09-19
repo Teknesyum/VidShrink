@@ -66,6 +66,7 @@
   "main.drop.single": "Only one file at a time",
   "main.drop.no-folder": "Folders cannot be dropped",
 
+  "main.title.label": "Title",
   "main.info.duration": "Duration",
   "main.info.size": "Size",
   "main.info.resolution": "Resolution",

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 
 namespace VidShrink.Core;
@@ -469,12 +469,14 @@ public static class FfmpegArguments
         if (plan.Trim is { } trim)
         {
             if (trim.LeadSeconds > 0) a.AddRange(new[] { "-ss", Seconds(trim.LeadSeconds) });
+            if (plan.Disc is { } disk) a.AddRange(disk.InputArguments());
             a.AddRange(new[] { "-i", info.FilePath });
             a.AddRange(new[] { "-ss", Seconds(trim.RemainderSeconds) });
             a.AddRange(new[] { "-t", Seconds(trim.DurationSeconds) });
         }
         else
         {
+            if (plan.Disc is { } kaynak) a.AddRange(kaynak.InputArguments());
             a.AddRange(new[] { "-i", info.FilePath });
         }
 

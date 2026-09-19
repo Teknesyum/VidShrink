@@ -66,6 +66,7 @@
   "main.drop.single": "Tik vienas failas vienu metu",
   "main.drop.no-folder": "Aplankų numesti negalima",
 
+  "main.title.label": "Pavadinimas",
   "main.info.duration": "Trukmė",
   "main.info.size": "Dydis",
   "main.info.resolution": "Raiška",

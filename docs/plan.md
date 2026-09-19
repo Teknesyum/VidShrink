@@ -1004,3 +1004,43 @@ taşıyor, tam yol hiçbir satırda yok (pozitif kontrol: indirgenmemiş metinde
 gerçekten bulduğu), devirme 1 MB'da bir kez oluyor ve tek yedek kalıyor, CLI kolu 0
 dönüyor ve günlük yokken de çakmıyor. Kabul mutasyonla kapanır, tablo
 `docs/olcumler/e7-tani-gunlugu.md`.
+
+### E4 Planı: Başlık ve Kaynak Tarama (2026-09-19)
+
+**Bugünkü durum.** Yoklama tek noktadan geçiyor: `FfprobeClient.ProbeAsync`
+(`src/VidShrink.Ffmpeg/FfprobeClient.cs:10`), argümanları `-show_format -show_streams
+-show_chapters` (`:15-21`). Video akışı olarak `attached_pic` olmayan **ilk** akış
+alınıyor (`:37-43`). Yani kaynak ne olursa olsun tek bir başlık varsayılıyor: çok programlı
+bir yayında yanlış program seçilebiliyor, DVD klasörü ise hiç açılmıyor.
+
+Bölüm desteği tamam ve uçtan uca bağlı (`--bolum/--chapters`, `CliRequest.cs:210-217`,
+`-map_chapters`). Eksik olan bir üst katman: **başlık**.
+
+**Ölçülen ffmpeg yeteneği (9.0-full_build, 19 Eylül 2026).** `dvdvideo` demuxer var ve
+`-title`, `-angle`, `-chapter_start/-chapter_end`, `-preindex` seçeneklerini taşıyor
+(`ffmpeg -h demuxer=dvdvideo`). Blu-ray için demuxer **yok** (`-demuxers` listesinde
+`bluray` geçmiyor), bu yüzden BD bu turda kapsam dışı ve gerekçesiyle belgelenecek.
+ffprobe `-show_programs` taşıyor; yerelde iki programlı bir TS üretilip doğrulandı
+(`.calisma/e4/coklu.ts`, programlar 1 ve 2).
+
+**Kaynak türleri.** Üç tür ayırt edilecek: düz dosya (tek başlık), çok programlı MPEG-TS
+(her program bir başlık), DVD-Video klasörü/ISO (her başlık bir title numarası). Model
+`src/VidShrink.Core/SourceTitles.cs`: `SourceTitle(Number, DurationSeconds, Width, Height,
+StreamCount, ChapterCount, Label)` ve seçim kuralları — numarayla seçim, en uzunu seçen
+`--ana-icerik`, kısa başlıkları eleyen `--asgari-sure`.
+
+**Yüzeyler.**
+1. `FfprobeClient` — `-show_programs` eklenir, programlar başlığa çevrilir.
+2. `MediaInfo` — `Titles` listesi ve seçili başlık numarası.
+3. Girdi argümanı — TS programında `-map 0:p:<id>`, DVD'de `-f dvdvideo -title N -angle N`.
+4. CLI — `--tarama/--scan` envanteri basar (kodlama yok), `--baslik/--title`,
+   `--ana-icerik/--main-feature`, `--aci/--angle`, `--asgari-sure/--min-duration`.
+5. Metinler — en/tr yardım satırları ve yeni `error.*` anahtarları, iki README'nin takma ad
+   tablosu, `CliTests.BeklenenTakmaAdSayisi` pimi.
+6. Arayüz — başlık seçici yalnız birden çok başlık varsa görünür; tek başlıklı dosyada
+   arayüz bugünkü gibi kalır.
+
+**Ölçü.** `BaslikTaramaTests.cs`: iki programlı gerçek TS taranınca iki başlık çıkıyor,
+`--ana-icerik` en uzunu seçiyor, `--asgari-sure` kısayı eliyor, olmayan başlık numarası
+hata veriyor, `--tarama` hiçbir şey kodlamıyor, DVD kolu doğru demuxer argümanını kuruyor.
+Kabul mutasyonla kapanır, tablo `docs/olcumler/e4-baslik-tarama.md`.

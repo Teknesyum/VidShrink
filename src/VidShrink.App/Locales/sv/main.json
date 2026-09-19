@@ -66,6 +66,7 @@
   "main.drop.single": "Bara en fil i taget",
   "main.drop.no-folder": "Mappar kan inte släppas",
 
+  "main.title.label": "Titel",
   "main.info.duration": "Längd",
   "main.info.size": "Storlek",
   "main.info.resolution": "Upplösning",

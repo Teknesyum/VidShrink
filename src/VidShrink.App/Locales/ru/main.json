@@ -66,6 +66,7 @@
   "main.drop.single": "Только один файл за раз",
   "main.drop.no-folder": "Папки перетаскивать нельзя",
 
+  "main.title.label": "Заголовок",
   "main.info.duration": "Длительность",
   "main.info.size": "Размер",
   "main.info.resolution": "Разрешение",

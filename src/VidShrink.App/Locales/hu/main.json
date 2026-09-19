@@ -66,6 +66,7 @@
   "main.drop.single": "Egyszerre csak egy fájl",
   "main.drop.no-folder": "Mappa nem húzható ide",
 
+  "main.title.label": "Cím",
   "main.info.duration": "Hossz",
   "main.info.size": "Méret",
   "main.info.resolution": "Felbontás",

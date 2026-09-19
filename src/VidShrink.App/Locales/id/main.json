@@ -66,6 +66,7 @@
   "main.drop.single": "Hanya satu berkas sekaligus",
   "main.drop.no-folder": "Folder tidak dapat dijatuhkan",
 
+  "main.title.label": "Judul",
   "main.info.duration": "Durasi",
   "main.info.size": "Ukuran",
   "main.info.resolution": "Resolusi",

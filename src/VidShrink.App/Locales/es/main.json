@@ -66,6 +66,7 @@
   "main.drop.single": "Solo un archivo a la vez",
   "main.drop.no-folder": "No se pueden soltar carpetas",
 
+  "main.title.label": "Título",
   "main.info.duration": "Duración",
   "main.info.size": "Tamaño",
   "main.info.resolution": "Resolución",

@@ -33,6 +33,16 @@ public sealed record MediaInfo
     /// </summary>
     public IReadOnlyList<ChapterMark> Chapters { get; init; } = Array.Empty<ChapterMark>();
 
+    /// <summary>
+    /// Kaynaktaki basliklar, dosyadaki sirayla. Duz dosyada tek ogeli; cok programli bir
+    /// yayinda her program bir baslik. Bos kalmaz — yoklama en az bir baslik doldurur,
+    /// boylece "baslik var mi" sorusu <see cref="HasMultipleTitles"/> ile tek yerde sorulur.
+    /// </summary>
+    public IReadOnlyList<SourceTitle> Titles { get; init; } = Array.Empty<SourceTitle>();
+
+    /// <summary>Baslik secicisinin gorunme sarti: birden cok baslik.</summary>
+    public bool HasMultipleTitles => Titles.Count > 1;
+
     public int ChapterCount => Chapters.Count;
 
     public double FileSizeMb => FileSizeBytes / 1024.0 / 1024.0;

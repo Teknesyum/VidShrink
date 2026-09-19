@@ -66,6 +66,7 @@
   "main.drop.single": "Un singur fișier odată",
   "main.drop.no-folder": "Dosarele nu pot fi trase aici",
 
+  "main.title.label": "Titlu",
   "main.info.duration": "Durată",
   "main.info.size": "Mărime",
   "main.info.resolution": "Rezoluție",

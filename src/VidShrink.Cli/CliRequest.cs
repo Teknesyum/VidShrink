@@ -56,6 +56,24 @@ public sealed record CliRequest
     public int? ChapterTo { get; init; }
 
     /// <summary>
+    /// <c>--tarama</c>: kaynagin baslik envanterini basar, hicbir sey kodlamaz. Bayrak
+    /// komutu degistirmez; kodlamayi durduran sart tek yerde, <see cref="CliApp"/>'te.
+    /// </summary>
+    public bool Scan { get; init; }
+
+    /// <summary><c>--baslik</c>: kullanicinin sectigi baslik numarasi.</summary>
+    public int? Title { get; init; }
+
+    /// <summary><c>--ana-icerik</c>: en uzun basligi sec.</summary>
+    public bool MainFeature { get; init; }
+
+    /// <summary><c>--aci</c>: DVD acisi; yalnizca disk kaynaginda anlamli.</summary>
+    public int? Angle { get; init; }
+
+    /// <summary><c>--asgari-sure</c>: bu sureden kisa basliklar envanterden duser.</summary>
+    public double? MinDurationSeconds { get; init; }
+
+    /// <summary>
     /// Kare ve bolum kollarini kaynaktan cozup kesit pencerisini saniyeye indirir. Donen
     /// metin hata anahtaridir; <c>null</c> ise <paramref name="resolved"/> kullanilabilir.
     /// </summary>
@@ -222,6 +240,34 @@ public static class CliParser
                     break;
                 case "--bir-kez" or "--once" when command == CliCommand.Watch:
                     request = request with { Once = true };
+                    break;
+                case "--tarama" or "--scan" when command != CliCommand.Watch:
+                    request = request with { Scan = true };
+                    break;
+                case "--baslik" or "--title" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var baslik)) return Fail("error.missing-value", arg);
+                    if (!int.TryParse(baslik, NumberStyles.Integer, CultureInfo.InvariantCulture, out var baslikNo)
+                        || baslikNo < 1)
+                        return Fail("error.bad-title", baslik);
+                    if (request.MainFeature) return Fail("error.title-and-main-feature", baslik);
+                    request = request with { Title = baslikNo };
+                    break;
+                case "--ana-icerik" or "--main-feature" when command != CliCommand.Watch:
+                    if (request.Title is not null) return Fail("error.title-and-main-feature", arg);
+                    request = request with { MainFeature = true };
+                    break;
+                case "--aci" or "--angle" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var aci)) return Fail("error.missing-value", arg);
+                    if (!int.TryParse(aci, NumberStyles.Integer, CultureInfo.InvariantCulture, out var aciNo)
+                        || aciNo < 1 || aciNo > 9)
+                        return Fail("error.bad-angle", aci);
+                    request = request with { Angle = aciNo };
+                    break;
+                case "--asgari-sure" or "--min-duration" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var asgari)) return Fail("error.missing-value", arg);
+                    if (!TryParseNumber(asgari, out var asgariSn) || asgariSn < 0 || asgariSn > 86400)
+                        return Fail("error.bad-min-duration", asgari);
+                    request = request with { MinDurationSeconds = asgariSn };
                     break;
                 case "--json":
                     request = request with { Json = true };

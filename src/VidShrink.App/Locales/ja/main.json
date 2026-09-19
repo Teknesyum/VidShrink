@@ -66,6 +66,7 @@
   "main.drop.single": "一度に1ファイルのみ",
   "main.drop.no-folder": "フォルダーはドロップできません",
 
+  "main.title.label": "タイトル",
   "main.info.duration": "長さ",
   "main.info.size": "サイズ",
   "main.info.resolution": "解像度",

@@ -66,6 +66,7 @@
   "main.drop.single": "Samo jedan fajl odjednom",
   "main.drop.no-folder": "Fascikle se ne mogu prevući",
 
+  "main.title.label": "Naslov",
   "main.info.duration": "Trajanje",
   "main.info.size": "Veličina",
   "main.info.resolution": "Rezolucija",

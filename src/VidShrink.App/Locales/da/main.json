@@ -66,6 +66,7 @@
   "main.drop.single": "Kun én fil ad gangen",
   "main.drop.no-folder": "Mapper kan ikke slippes",
 
+  "main.title.label": "Titel",
   "main.info.duration": "Varighed",
   "main.info.size": "Størrelse",
   "main.info.resolution": "Opløsning",

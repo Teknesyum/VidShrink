@@ -177,6 +177,11 @@ single spelling.
 | `--aralik` | `--interval` |
 | `--bir-kez` | `--once` |
 | `--gunluk` | `--log` |
+| `--tarama` | `--scan` |
+| `--baslik` | `--title` |
+| `--ana-icerik` | `--main-feature` |
+| `--aci` | `--angle` |
+| `--asgari-sure` | `--min-duration` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
 | `--dil` | `--lang` |

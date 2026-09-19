@@ -66,6 +66,7 @@
   "main.drop.single": "Nur eine Datei auf einmal",
   "main.drop.no-folder": "Ordner können nicht abgelegt werden",
 
+  "main.title.label": "Titel",
   "main.info.duration": "Dauer",
   "main.info.size": "Größe",
   "main.info.resolution": "Auflösung",

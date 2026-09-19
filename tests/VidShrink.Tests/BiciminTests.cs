@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
@@ -1224,6 +1224,9 @@ public sealed class BaslikKapsamiTests
     ///
     /// <para><b>19 Eylul 2026, ucuncu yenileme: 42785.</b> Tani gunlugu dil basina bes anahtar
     /// ekledi: 990 + 5 = 995, 43 x 995 = 42785. <c>kayip</c> yine 0.</para>
+    ///
+    /// <para><b>19 Eylul 2026, dorduncu yenileme: 42828.</b> Baslik secici (E4) dil basina tek
+    /// <c>main.title.label</c> anahtari ekledi: 995 + 1 = 996, 43 x 996 = 42828. <c>kayip</c> yine 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1251,7 +1254,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(42785, gezilen);
+        Assert.Equal(42828, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -118,6 +118,26 @@ public static class CliApp
 
         stderr.WriteLine(text["progress.probe"]);
         var info = await services.Probe(input, ct);
+
+        if (request.Scan)
+        {
+            stdout.Write(request.Json ? TaramaJson(info, request) : TaramaMetni(info, request, text));
+            return new FileRun(ExitCodes.InBand, null, null);
+        }
+
+        var baslikSoruluyor = request.Title is not null || request.MainFeature || request.MinDurationSeconds is not null;
+        if (info.Titles.Count > 0 || baslikSoruluyor)
+        {
+            if (SourceTitles.Sec(info.Titles, request.Title, request.MainFeature,
+                    request.MinDurationSeconds, out var baslik) is { } baslikHatasi)
+            {
+                var ileti = text.Format(baslikHatasi, request.Title?.ToString(CultureInfo.InvariantCulture));
+                stderr.WriteLine(ileti);
+                return new FileRun(ExitCodes.Usage, null, ileti);
+            }
+            if (baslik is not null) info = SourceTitles.Uygula(info, baslik);
+        }
+
         if (request.Resolved(info, out request) is { } trimError)
         {
             var trimMessage = text.Format(trimError, request.ChapterTo is int son && son != request.ChapterFrom
@@ -145,6 +165,50 @@ public static class CliApp
 
         return await ShrinkAsync(request, decision, stdout, stderr, text, ct);
     }
+
+    /// <summary>
+    /// <c>--tarama</c>'nin metni. Kodlama yok: envanter basilir ve is biter. Asgari sure
+    /// verilmisse elenen basliklar hic yazilmaz — kullanici listede gordugu her numarayi
+    /// <c>--baslik</c> ile verebilsin.
+    /// </summary>
+    private static string TaramaMetni(MediaInfo info, CliRequest request, CliText text)
+    {
+        var basliklar = SourceTitles.Ele(info.Titles, request.MinDurationSeconds);
+        var sb = new StringBuilder();
+        sb.AppendLine(text.Format("scan.titles", basliklar.Count.ToString(CultureInfo.InvariantCulture)));
+        foreach (var b in basliklar)
+        {
+            sb.Append("  ").Append(b.Number.ToString(CultureInfo.InvariantCulture)).Append("  ")
+              .Append(TimeSpan.FromSeconds(b.DurationSeconds).ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture))
+              .Append("  ").Append(b.Width.ToString(CultureInfo.InvariantCulture)).Append('x')
+              .Append(b.Height.ToString(CultureInfo.InvariantCulture))
+              .Append("  ").Append(text.Format("scan.streams", b.StreamCount.ToString(CultureInfo.InvariantCulture)));
+            if (!string.IsNullOrWhiteSpace(b.Label)) sb.Append("  ").Append(b.Label);
+            sb.AppendLine();
+        }
+        return sb.ToString();
+    }
+
+    private static string TaramaJson(MediaInfo info, CliRequest request)
+        => Json(!request.JsonLines, writer =>
+        {
+            writer.WriteString("command", "scan");
+            writer.WriteStartArray("titles");
+            foreach (var b in SourceTitles.Ele(info.Titles, request.MinDurationSeconds))
+            {
+                writer.WriteStartObject();
+                writer.WriteNumber("number", b.Number);
+                writer.WriteNumber("durationSeconds", Math.Round(b.DurationSeconds, 3));
+                writer.WriteNumber("width", b.Width);
+                writer.WriteNumber("height", b.Height);
+                writer.WriteNumber("streams", b.StreamCount);
+                writer.WriteNumber("chapters", b.ChapterCount);
+                writer.WriteString("kind", b.Kind.ToString().ToLowerInvariant());
+                if (b.Label is { Length: > 0 }) writer.WriteString("label", b.Label);
+                writer.WriteEndObject();
+            }
+            writer.WriteEndArray();
+        });
 
     private static async Task<int> WatchAsync(CliRequest request, CliServices services, TextWriter stdout,
         TextWriter stderr, CliText text, CancellationToken ct)

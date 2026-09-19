@@ -66,6 +66,7 @@
   "main.drop.single": "קובץ אחד בלבד בכל פעם",
   "main.drop.no-folder": "אי אפשר לגרור תיקיות",
 
+  "main.title.label": "כותר",
   "main.info.duration": "משך",
   "main.info.size": "גודל",
   "main.info.resolution": "רזולוציה",

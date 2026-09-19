@@ -66,6 +66,7 @@
   "main.drop.single": "Un seul fichier à la fois",
   "main.drop.no-folder": "Les dossiers ne peuvent pas être déposés",
 
+  "main.title.label": "Titre",
   "main.info.duration": "Durée",
   "main.info.size": "Taille",
   "main.info.resolution": "Résolution",

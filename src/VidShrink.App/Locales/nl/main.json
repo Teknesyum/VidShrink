@@ -66,6 +66,7 @@
   "main.drop.single": "Slechts één bestand tegelijk",
   "main.drop.no-folder": "Mappen kunnen niet worden neergezet",
 
+  "main.title.label": "Titel",
   "main.info.duration": "Duur",
   "main.info.size": "Grootte",
   "main.info.resolution": "Resolutie",

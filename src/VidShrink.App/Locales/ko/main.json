@@ -66,6 +66,7 @@
   "main.drop.single": "한 번에 파일 하나만",
   "main.drop.no-folder": "폴더는 놓을 수 없습니다",
 
+  "main.title.label": "타이틀",
   "main.info.duration": "길이",
   "main.info.size": "크기",
   "main.info.resolution": "해상도",

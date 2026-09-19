@@ -66,6 +66,7 @@
   "main.drop.single": "Jen jeden soubor najednou",
   "main.drop.no-folder": "Složky nelze přetáhnout",
 
+  "main.title.label": "Titul",
   "main.info.duration": "Délka",
   "main.info.size": "Velikost",
   "main.info.resolution": "Rozlišení",

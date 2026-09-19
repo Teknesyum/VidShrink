@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace VidShrink.Core;
 
@@ -118,6 +118,12 @@ public sealed class EncodePlan
     [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();
     [JsonIgnore] public bool TurboFirstPass { get; set; }
     [JsonIgnore] public StreamPlan? Streams { get; set; }
+
+    /// <summary>
+    /// DVD-Video kaynagi; <c>null</c> "siradan dosya" demektir. Doluysa her ffmpeg
+    /// cagrisinda <c>-i</c>'den once demuxer ve baslik secimi yazilir.
+    /// </summary>
+    [JsonIgnore] public DiscSource? Disc { get; set; }
     [JsonIgnore] public double NonVideoK => Streams?.SideK ?? AudioBitrateK;
 
     /// <summary>
