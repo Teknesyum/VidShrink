@@ -27,10 +27,11 @@ public class KurulumIlerlemesiTests
         var p = new InstallProgress();
         p.Step(50, 60, "İndiriliyor");
 
-        Assert.Equal(50 * InstallProgress.BurstApproach, p.Advance(), 6);
+        p.Advance();
+        Assert.Equal(50 * InstallProgress.BurstApproach, p.Bar, 6);
 
-        var ikinci = p.Advance();
-        Assert.True(ikinci > 4 && ikinci < 50);
+        p.Advance();
+        Assert.True(p.Bar > 4 && p.Bar < 50);
     }
 
     /// <summary>
@@ -47,7 +48,8 @@ public class KurulumIlerlemesiTests
         var onceki = 0.0;
         for (var i = 0; i < InstallProgress.BurstFrames; i++)
         {
-            var bar = p.Advance();
+            p.Advance();
+            var bar = p.Bar;
             Assert.True(bar >= onceki, "atak çubuğu geri götürdü");
             Assert.True(bar <= 30, $"atak tavanı geçti: {bar}");
             onceki = bar;
@@ -57,7 +59,8 @@ public class KurulumIlerlemesiTests
         var q = new InstallProgress();
         for (var i = 0; i < InstallProgress.BurstFrames; i++) q.Advance();
         q.Step(100, 100, "x");
-        Assert.Equal(100 * InstallProgress.Approach, q.Advance(), 6);
+        q.Advance();
+        Assert.Equal(100 * InstallProgress.Approach, q.Bar, 6);
 
         var tek = new InstallProgress();
         var yarim = new InstallProgress();
@@ -82,8 +85,10 @@ public class KurulumIlerlemesiTests
         var p = new InstallProgress();
         p.Step(1, 90, "Hazırlanıyor");
 
-        Assert.Equal(InstallProgress.MinimumStep, p.Advance(), 6);
-        Assert.Equal(2 * InstallProgress.MinimumStep, p.Advance(), 6);
+        p.Advance();
+        Assert.Equal(InstallProgress.MinimumStep, p.Bar, 6);
+        p.Advance();
+        Assert.Equal(2 * InstallProgress.MinimumStep, p.Bar, 6);
 
         for (var i = 0; i < 3; i++) p.Advance();
         Assert.Equal(1, p.Bar, 6);
@@ -149,7 +154,7 @@ public class KurulumIlerlemesiTests
         Assert.Equal("Adım 6", p.Log.First());
         Assert.Equal("Adım 14", p.Log.Last());
         Assert.Equal(14, p.History.Count);
-        Assert.Equal("Adım 14", p.Sentence);
+        Assert.Equal("Adım 14", p.History.Last());
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using VidShrink.Core;
 
@@ -62,14 +62,19 @@ public static class CubukAtagi
             if (!bulundu && zaman + kare >= manifestMs)
             {
                 var once = manifestMs - zaman;
-                if (once > 0) bar = ilerleme.Advance(TimeSpan.FromMilliseconds(once));
+                if (once > 0)
+                {
+                    ilerleme.Advance(TimeSpan.FromMilliseconds(once));
+                    bar = ilerleme.Bar;
+                }
                 ilerleme.Step(12, 20, "bulundu");
                 bulundu = true;
                 kare -= Math.Max(0, once);
                 zaman = manifestMs;
             }
 
-            bar = ilerleme.Advance(TimeSpan.FromMilliseconds(kare));
+            ilerleme.Advance(TimeSpan.FromMilliseconds(kare));
+            bar = ilerleme.Bar;
             zaman += kare;
             while (anIndeks < Anlar.Length && Anlar[anIndeks] <= zaman) anlik[Anlar[anIndeks++]] = bar;
             foreach (var e in Esikler)

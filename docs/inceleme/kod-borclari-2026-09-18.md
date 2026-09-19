@@ -91,8 +91,11 @@ açıkça "bu kod kalkacak" diyor.
     ile susturuluyor; iz başarıyı değil yalnız denemeyi kanıtlıyor.~~ **Kapandı:**
     yakalanan tür ize düşüyor (`gecici-temizlik-hata=<Tür>`), başarılı yolun izi
     değişmedi.
-18. `OluUyeTests.cs:781-784` — `InstallProgress.Bar` / `.Sentence` yalnız testler okusun
-    diye ayakta; açılış paneli silindiği için `Sentence`'ın ekranı da yok.
+18. ~~`OluUyeTests.cs:781-784` — `InstallProgress.Bar` / `.Sentence` yalnız testler okusun
+    diye ayakta; açılış paneli silindiği için `Sentence`'ın ekranı da yok.~~ **Kapandı:**
+    kök neden panelin silinmesi değil, iki okuma yoluydu. `Advance` artık `void`, çubuk
+    her yerde `Bar`'dan okunuyor; `Sentence` silindi, son cümle `History`'nin son satırı.
+    Altı kesimin altısı kırmızı (`docs/olcumler/k8-ilerleme-yuzeyi-2026-09-19.md`).
 
 ## Hafif
 

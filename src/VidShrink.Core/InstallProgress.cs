@@ -76,15 +76,10 @@ public sealed class InstallProgress
     public double Ceiling { get { lock (_gate) return _ceiling; } }
 
     /// <summary>
-    /// Çizilecek çubuk değeri: <see cref="Advance"/>'in yumuşattığı hal. Üretim çubuğu
-    /// <see cref="Advance"/>'in dönüşünden çiziyor, bu özelliği okumuyor; değer aynı
-    /// hesabın kalıcı halidir ve ilerlemenin tavanı geçmediğini, bitişte sıçramadığını
-    /// KurulumIlerlemesiTests buradan ölçüyor.
+    /// Çizilecek çubuk değeri: <see cref="Advance(TimeSpan)"/>'in yumuşattığı hal. Çubuğun
+    /// tek okuma yolu budur; ilerletmek ile okumak ayrı işler.
     /// </summary>
     public double Bar { get { lock (_gate) return _bar; } }
-
-    /// <summary>Ne yapıldığını söyleyen tam cümle.</summary>
-    public string Sentence { get { lock (_gate) return _sentence; } }
 
     /// <summary>Panelin durumu.</summary>
     public InstallState State { get { lock (_gate) return _state; } }
@@ -121,10 +116,10 @@ public sealed class InstallProgress
     }
 
     /// <summary>
-    /// Bir kareyi ilerletir ve yeni çubuk değerini döndürür. Çubuk yüzdenin altındaysa
-    /// hızla yaklaşır, yüzdeye vardıysa tavana sürünür; ikisini de geçmez.
+    /// Bir kareyi ilerletir. Çubuk yüzdenin altındaysa hızla yaklaşır, yüzdeye vardıysa
+    /// tavana sürünür; ikisini de geçmez. Yeni değer <see cref="Bar"/>'dan okunur.
     /// </summary>
-    public double Advance() => Advance(TimeSpan.FromMilliseconds(FrameMilliseconds));
+    public void Advance() => Advance(TimeSpan.FromMilliseconds(FrameMilliseconds));
 
     /// <summary>
     /// Aynı yasa, geçen süreye göre. Kareler eşit aralıklı düşmüyor: panel her karede
@@ -140,7 +135,7 @@ public sealed class InstallProgress
     /// <para>Yakalama <see cref="Approach"/>'ın zaman sabitiyle sınırlı; donmuş bir
     /// karenin ardından çubuk sıçramıyor, hızlanıyor.</para>
     /// </summary>
-    public double Advance(TimeSpan elapsed)
+    public void Advance(TimeSpan elapsed)
     {
         var frames = Math.Clamp(elapsed.TotalMilliseconds / FrameMilliseconds, 0, 1 / Approach);
 
@@ -150,7 +145,6 @@ public sealed class InstallProgress
             _burstUsed += burst;
             if (burst > 0) Move(burst, BurstApproach, BurstCreep);
             if (frames - burst > 0) Move(frames - burst, Approach, Creep);
-            return _bar;
         }
     }
 

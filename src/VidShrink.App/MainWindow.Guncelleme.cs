@@ -295,7 +295,8 @@ public partial class MainWindow
         UpdateRain.IsRunning = true;
         DrainUpdateReports();
 
-        var bar = HoverZone.MotionReduced ? progress.Percent : progress.Advance(elapsed);
+        if (!HoverZone.MotionReduced) progress.Advance(elapsed);
+        var bar = HoverZone.MotionReduced ? progress.Percent : progress.Bar;
         UpdateBarFill.Width = UpdateBarTrack.Bounds.Width * bar / 100;
         PaintUpdateBar(progress.State);
         AppendUpdateLines(progress.History);
