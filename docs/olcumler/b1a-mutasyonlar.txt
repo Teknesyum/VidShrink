@@ -1,0 +1,28 @@
+B1a mutasyon dokumu - 19 Eylul 2026
+
+Filtre: DolbySesKoluTests | DonusturucuFlacTests | GelismisAyarGidisDonus | StreamMappingTests
+Kosum: .calisma/b1a-mutasyon/kos.py (dosya bellege alinir, kesim uygulanir, sonda aynen geri
+yazilir; git checkout kullanilmaz - commit edilmemis is siliniyordu).
+
+Uc kesim (M4/M5/M6) ilk turda "if (false)" ile yazildi ve -warnaserror derlemeyi kirdi;
+erisilemez kod uyarisi hata sayiliyor. Ayni kollar M13/M14/M15 olarak kosulabilir bicimde
+yeniden yazildi. M3 ve M12 ilk turda kaynak metni tutturamadi, duzeltilip kosuldu.
+
+12 kesimin 12'si kirmizi. Taban kesimden once ve sonra 0/52.
+
+== taban ==
+(0, 52)
+M1 ac3 merdiveninden 640 tavani dusuruldu: kirmizi=3 yesil=49
+M2 merdivene oturtma kaldirildi (istek aynen gecer): kirmizi=1 yesil=51
+M3 kanal tabani 4 kanalda eac3 ile ac3'e esitlendi: kirmizi=1 yesil=51
+M7 panel secimi plana gecmiyor: kirmizi=2 yesil=50
+M8 donusturucude mp4 flac'i kabul etmiyor: kirmizi=1 yesil=51
+M9 donusturucude wav flac'i kabul ediyor: kirmizi=1 yesil=51
+M10 FLAC ses kabi olmaktan cikti: kirmizi=3 yesil=49
+M11 ses kodegi kutusu ayara yazilmiyor: kirmizi=1 yesil=51
+M12 IsDolby eac3'u tanimiyor: kirmizi=1 yesil=51
+M13 kap kapisi kaldirildi (Dolby her kapta gecer): kirmizi=1 yesil=51
+M14 taban denetimi kaldirildi: kirmizi=1 yesil=51
+M15 kanal koruma yok sayildi (hep stereo): kirmizi=2 yesil=50
+== geri konuldu, taban tekrar ==
+(0, 52)
