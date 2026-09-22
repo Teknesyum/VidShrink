@@ -213,7 +213,7 @@ vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB --bir-kez   # drain the fold
 
 `izle` shrinks every video that lands in the folder. `--cikti` is the output folder and is
 required; it cannot be the watched folder. `--aralik <seconds>` sets the scan interval
-(default 2), `--bir-kez` exits once nothing is left to wait for, and the other `kucult`
+(default, unmeasured): 2, `--bir-kez` exits once nothing is left to wait for, and the other `kucult`
 options apply to each file. With `--json`, stdout is NDJSON: one compact JSON object per file.
 
 A file is taken only when its size and modification time stay the same over two consecutive scan
