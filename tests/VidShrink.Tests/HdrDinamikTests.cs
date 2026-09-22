@@ -235,6 +235,26 @@ public sealed class HdrDinamikTests
         Assert.Equal((null, null), FfprobeClient.ParseDolbyVision(bos.RootElement));
     }
 
+    /// <summary>
+    /// B4 yan bulgusu: koordinat ve parlaklik kare hizi ayristiricisindan geciyordu, 0,1'in
+    /// altindaki <c>blue_y</c> ve <c>min_luminance</c> dusuyor ve satir her kaynakta bos
+    /// kaliyordu. CLL'de ffprobe'un alan adi <c>max_average</c>; <c>average_content</c> diye
+    /// bir alan yok.
+    /// </summary>
+    [Fact]
+    public void YoklamaStatikHdrVerisiniOkuyor()
+    {
+        using var akis = JsonDocument.Parse("""
+            {"index":0,"side_data_list":[
+              {"side_data_type":"Mastering display metadata","red_x":"34000/50000","red_y":"16000/50000","green_x":"13250/50000","green_y":"34500/50000","blue_x":"7500/50000","blue_y":"3000/50000","white_point_x":"15635/50000","white_point_y":"16450/50000","min_luminance":"50/10000","max_luminance":"10000000/10000"},
+              {"side_data_type":"Content light level metadata","max_content":1000,"max_average":400}
+            ]}
+            """);
+
+        Assert.Equal("G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,50)", FfprobeClient.ParseMasteringDisplay(akis.RootElement));
+        Assert.Equal("1000,400", FfprobeClient.ParseContentLightLevel(akis.RootElement));
+    }
+
     [Fact]
     public void YoklamaHdr10ArtiKaresiniTaniyor()
     {

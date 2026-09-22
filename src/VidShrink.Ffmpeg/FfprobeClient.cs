@@ -247,22 +247,22 @@ public static class FfprobeClient
         return 8;
     }
 
-    private static string? ParseMasteringDisplay(JsonElement stream)
+    internal static string? ParseMasteringDisplay(JsonElement stream)
     {
         if (!stream.TryGetProperty("side_data_list", out var list)) return null;
         foreach (var item in list.EnumerateArray())
         {
             if (GetString(item, "side_data_type") != "Mastering display metadata") continue;
-            var rx = ParseFraction(GetString(item, "red_x"));
-            var ry = ParseFraction(GetString(item, "red_y"));
-            var gx = ParseFraction(GetString(item, "green_x"));
-            var gy = ParseFraction(GetString(item, "green_y"));
-            var bx = ParseFraction(GetString(item, "blue_x"));
-            var by = ParseFraction(GetString(item, "blue_y"));
-            var wx = ParseFraction(GetString(item, "white_point_x"));
-            var wy = ParseFraction(GetString(item, "white_point_y"));
-            var maxLum = ParseFraction(GetString(item, "max_luminance"));
-            var minLum = ParseFraction(GetString(item, "min_luminance"));
+            var rx = ParseRatio(GetString(item, "red_x"));
+            var ry = ParseRatio(GetString(item, "red_y"));
+            var gx = ParseRatio(GetString(item, "green_x"));
+            var gy = ParseRatio(GetString(item, "green_y"));
+            var bx = ParseRatio(GetString(item, "blue_x"));
+            var by = ParseRatio(GetString(item, "blue_y"));
+            var wx = ParseRatio(GetString(item, "white_point_x"));
+            var wy = ParseRatio(GetString(item, "white_point_y"));
+            var maxLum = ParseRatio(GetString(item, "max_luminance"));
+            var minLum = ParseRatio(GetString(item, "min_luminance"));
             if (rx is null || ry is null || gx is null || gy is null || bx is null || by is null || wx is null || wy is null || maxLum is null || minLum is null)
                 return null;
 
@@ -331,14 +331,14 @@ public static class FfprobeClient
         }
     }
 
-    private static string? ParseContentLightLevel(JsonElement stream)
+    internal static string? ParseContentLightLevel(JsonElement stream)
     {
         if (!stream.TryGetProperty("side_data_list", out var list)) return null;
         foreach (var item in list.EnumerateArray())
         {
             if (GetString(item, "side_data_type") != "Content light level metadata") continue;
             var max = GetInt(item, "max_content");
-            var avg = GetInt(item, "average_content");
+            var avg = GetInt(item, "max_average");
             if (max is null || avg is null) return null;
             return $"{max},{avg}";
         }
@@ -463,14 +463,22 @@ public static class FfprobeClient
         return double.TryParse(v.GetString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : null;
     }
 
+    /// <summary>
+    /// Kare hizi icin: 0,1-1000 disindaki oran (ornegin <c>0/0</c> yerine yazilan 90000/1)
+    /// yok sayilir. Renk koordinati ve parlaklik icin <see cref="ParseRatio"/>; bu suzgec
+    /// <c>blue_y</c> (0,06) ve <c>min_luminance</c> (0,005) degerlerini dusurup mastering
+    /// display satirini her kaynakta bos birakiyordu.
+    /// </summary>
     private static double? ParseFraction(string? value)
+        => ParseRatio(value) is { } fps && fps > 0.1 && fps < 1000 ? fps : null;
+
+    private static double? ParseRatio(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;
         var parts = value.Split('/');
         if (parts.Length != 2) return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var single) ? single : null;
         if (!double.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var num)) return null;
         if (!double.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var den) || den == 0) return null;
-        var fps = num / den;
-        return fps > 0.1 && fps < 1000 ? fps : null;
+        return num / den;
     }
 }
