@@ -407,6 +407,59 @@ public sealed class YerlesimDenetimiTests
         Assert.True(denetim.Kusurlar.Count == 0, dokum);
     }
 
+    /// <summary>
+    /// Açılır pencereler ana ağaçta çizilmiyor: ön ayar kaydetme (en uzun bildirim ve 60
+    /// harflik ad dolu) ve kaydedicinin seçenekleri. İçerik kendi <see cref="FlyoutPresenter"/>
+    /// temasıyla, içeriğe göre boyutlanan bir pencerede taranır; genişliği temanın sınırı belirler.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DilKollari))]
+    public void AcilirPencerelerdeKesikCakismaTasmaYok(string dil)
+    {
+        var denetim = AppHost.Run(() =>
+        {
+            Strings.Use(dil);
+            var ana = new MainWindow();
+            var mini = new VidShrink.App.Recorder.RecorderMini();
+            var d = new Denetim { Dil = dil };
+            try
+            {
+                ana.TxtPresetName.Text = new string('W', 60);
+                ana.TxtPresetNotice.Text = Strings.Get("main.preset.error.hand-brake-file") + " " + string.Format(Strings.Get("main.preset.overwrite"), new string('W', 60));
+                ana.TxtPresetNotice.IsVisible = true;
+                AcilirTara((Flyout)ana.ChipAddPreset.Flyout!, "onayar-kaydet", d);
+                AcilirTara((Flyout)mini.BtnOptions.Flyout!, "kaydedici-secenek", d);
+                return d;
+            }
+            finally
+            {
+                mini.Close();
+                ana.Close();
+                Strings.Use("en");
+            }
+        });
+
+        var dokum = $"{dil} açılır: metin {denetim.Metin}, panel {denetim.Panel}{Environment.NewLine}kusur {denetim.Kusurlar.Count}{Environment.NewLine}"
+            + string.Join(Environment.NewLine, denetim.Kusurlar);
+        _output.WriteLine(dokum);
+        Assert.True(denetim.Metin >= 6, $"yalnız {denetim.Metin} metin ölçüldü");
+        Assert.True(denetim.Kusurlar.Count == 0, dokum);
+    }
+
+    private static void AcilirTara(Flyout acilir, string durum, Denetim denetim)
+    {
+        var icerik = (Control)acilir.Content!;
+        acilir.Content = null;
+        var kap = new Window { SizeToContent = SizeToContent.WidthAndHeight, Content = new FlyoutPresenter { Content = icerik } };
+        kap.Classes.Add("reduced-motion");
+        try { KuyruguTara(kap, durum, denetim, double.PositiveInfinity); }
+        finally
+        {
+            kap.Content = null;
+            kap.Close();
+        }
+    }
+
     private static void KuyruguTara(Window pencere, string durum, Denetim denetim, double? sinir = null)
     {
         var genislik = sinir ?? Belirtec(pencere, "TipMaxWidth");
