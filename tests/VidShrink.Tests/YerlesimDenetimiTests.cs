@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -274,9 +274,27 @@ public sealed class YerlesimDenetimiTests
         pencere.Player.ThumbTime.Text = "01:02:03";
     });
 
-    private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true)
+    /// <summary>
+    /// Taban ile tercih boyutu arasındaki ve üstündeki pencereler: sarılan satırlar ve Auto
+    /// sütunlar başka genişlikte başka yerden kırılıyor; tam ekran 1080p ve 1440p dahil.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(BoyutKollari))]
+    public void AraVeBuyukBoyuttaKesikCakismaTasmaYok(string dil, int en, int boy) =>
+        Denetle(dil, false, $"-{en}x{boy}", null, zorla: new Size(en, boy));
+
+    public static TheoryData<string, int, int> BoyutKollari()
     {
-        var (denetim, boyut) = Ac(dil, dar, null, hazirla: hazirla, yukle: yukle);
+        var kollar = new TheoryData<string, int, int>();
+        foreach (var dil in Diller)
+            foreach (var (en, boy) in new[] { (1280, 800), (1920, 1080), (2560, 1440) })
+                kollar.Add(dil, en, boy);
+        return kollar;
+    }
+
+    private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true, Size? zorla = null)
+    {
+        var (denetim, boyut) = Ac(dil, dar, null, zorla, hazirla: hazirla, yukle: yukle);
         var klasor = Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi");
         var ad = $"{dil}-{(dar ? "taban" : "varsayilan")}{durum}.txt";
         Directory.CreateDirectory(klasor);
