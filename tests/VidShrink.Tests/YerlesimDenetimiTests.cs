@@ -223,6 +223,21 @@ public sealed class YerlesimDenetimiTests
         });
     }
 
+    /// <summary>
+    /// Adı "Toggle" ile bitmeyen düğmelerin açtığı yüzeyler: AI ve başarım ayrıntıları, ayar
+    /// sıfırlama onayı, sabit çözünürlük satırı, HDR ilkesi. Sekme dolaşımı bunları açmıyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    public void AcilanAyrintilardaKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-acilan", pencere =>
+    {
+        pencere.AiDetails.IsVisible = true;
+        pencere.PerformanceDetails.IsVisible = true;
+        pencere.ResetSettingsConfirm.IsVisible = true;
+        pencere.ChkResolution.IsChecked = false;
+        pencere.HdrPolicyPanel.IsVisible = true;
+    });
+
     private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true)
     {
         var (denetim, boyut) = Ac(dil, dar, null, hazirla: hazirla, yukle: yukle);

@@ -1,6 +1,6 @@
 {
   "performance.title": "Performance check",
-  "performance.run": "Run the check",
+  "performance.run": "Run the Check",
   "performance.running": "Measuring — this runs a few short encodes and takes up to twenty seconds.",
   "performance.failed": "The check could not finish",
 

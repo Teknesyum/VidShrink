@@ -201,7 +201,7 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | B1e forced | **dalda** (aynı dal) | `StreamMapping.DefaultForced`: varsayılansız çıktıda forced iz varsayılan olur; `ForcedAltyaziTests`. Foreign Audio Search yok |
 | B1f yakma | **dalda**, yalnız metin altyazı | `VideoFilterChain.BurnFilter` (`subtitles=...:si=N`), CLI `--yak N`; PGS overlay ister, reddedilir; `AltyaziYakmaTests` |
 | B2 küçültmeye aralık | denetlenmedi | bu turda okunmadı |
-| B3 VT plan yolu / VP9 küçültme | yapılmadı | `Core/PlanParser.cs:13` `AllowedCodecs`'te `*_videotoolbox` yok; VP9 hâlâ yalnız dönüştürücüde |
+| B3 VT plan yolu / VP9 küçültme | VT **ölçüldü, kapıdan kaldı** (23 Eylül denetimi); VP9 yapılmadı | VT: K2 2/8, K4 5/8, bağlantı geri alındı, kapı `PlanParserTests.ParserStillRejectsVideoToolboxEncoders` ile kapalı (`docs/olcumler/videotoolbox-hizli.md`); VP9 hâlâ yalnız dönüştürücüde |
 | B4 HDR10+/DV | yapılmadı | `hdr10plus\|dolby\|dovi\|dynamic_hdr` taraması 0 sonuç |
 | C1-1 `Saturated` satırı | **girdi (22 Eylül)** | `MainWindow.SaturatedSuffix`, `ShrinkJobWindow.BittiSatiri`; `main.run.saturated` 42 dilde; `DoygunTeslimTests` 4/4, iki mutasyon kırmızı |
 | C1-2 kuyruk düzenleme | **girdi (22 Eylül)** | bekleyen listesi, yukarı/aşağı/çıkar, sırayı duraklat (`ShrinkJobWindow`, `KuyrukDuzenlemeTests`) |
