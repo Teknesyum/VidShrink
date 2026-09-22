@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.RegularExpressions;
 using VidShrink.Core;
 using Xunit;
 
@@ -63,7 +65,7 @@ public sealed class NvencLookaheadTests
         => Assert.DoesNotContain("-lookahead_level", Kol(codec, destekli: true));
 
     /// <summary>
-    /// Seviye uydurulmadı: belge level 1'i de ölçtü ve 9 hücrenin 9'unda level 3'ün
+    /// Seviye uydurulmadı: belge level 1'i de ölçtü ve ortalamada 9 hücrenin 9'unda level 3'ün
     /// altında kaldı. Kod ölçülen seviyeyi yazıyor.
     /// </summary>
     [Fact]
@@ -133,5 +135,41 @@ public sealed class NvencLookaheadTests
         Assert.Equal("3", tam[tam.ToList().IndexOf("-lookahead_level") + 1]);
         Assert.Contains("-lookahead_level", parca);
         Assert.DoesNotContain("-lookahead_level", kapali);
+    }
+
+    /// <summary>
+    /// Karar paragrafındaki sayılar tablodan yeniden sayılıyor. Önceki yazımda p10 "9/9",
+    /// bayt "7/9", seviye 1'in tabana kaybı "üç" yazıyordu; tablo 8, 8 ve 5 diyordu.
+    /// Özet cümle tablodan kayarsa kırmızı olur.
+    /// </summary>
+    [Fact]
+    public void KararCumlesiTablodanSayiliyor()
+    {
+        var satirlar = new Dictionary<(string Kodek, string Kesit, string Kol), (long Bayt, double Ort, double P10)>();
+        string? kodek = null;
+        foreach (var satir in Belge.Split('\n').SkipWhile(s => !s.StartsWith("### h264_nvenc")).TakeWhile(s => !s.StartsWith("## Karar")))
+        {
+            var baslik = Regex.Match(satir, @"^### (\S+)");
+            if (baslik.Success) { kodek = baslik.Groups[1].Value; continue; }
+            var h = satir.Split('|').Select(x => x.Trim()).ToArray();
+            if (kodek is null || h.Length < 9 || h[1] is not ("karanlik" or "parlak" or "hareketli")) continue;
+            satirlar[(kodek, h[1], h[2])] = (
+                long.Parse(h[5].Split('(')[0].Replace(" ", ""), CultureInfo.InvariantCulture),
+                double.Parse(h[6], CultureInfo.InvariantCulture),
+                double.Parse(h[7], CultureInfo.InvariantCulture));
+        }
+
+        var hucreler = satirlar.Keys.Select(k => (k.Kodek, k.Kesit)).Distinct().ToArray();
+        Assert.Equal(9, hucreler.Length);
+        var taban = hucreler.Select(c => satirlar[(c.Kodek, c.Kesit, "taban")]).ToArray();
+        var bir = hucreler.Select(c => satirlar[(c.Kodek, c.Kesit, "`-lookahead_level 1`")]).ToArray();
+        var uc = hucreler.Select(c => satirlar[(c.Kodek, c.Kesit, "`-lookahead_level 3`")]).ToArray();
+        int Say(Func<int, bool> kosul) => Enumerable.Range(0, 9).Count(kosul);
+
+        var karar = Regex.Replace(Belge[Belge.IndexOf("## Karar")..], @"\s+", " ");
+        Assert.Contains($"ortalamada {Say(i => uc[i].Ort > taban[i].Ort)}/9, p10'da {Say(i => uc[i].P10 > taban[i].P10)}/9 hücrede geçiyor", karar);
+        Assert.Contains($"ve {Say(i => uc[i].Bayt < taban[i].Bayt)}/9 hücrede **daha az baytla**", karar);
+        Assert.Contains($"ortalamada {Say(i => bir[i].Ort < uc[i].Ort)}/9 hücrede seviye 3'ün altında", karar);
+        Assert.Contains($"altında ortalamada {Say(i => bir[i].Ort < taban[i].Ort)}/9, p10'da {Say(i => bir[i].P10 < taban[i].P10)}/9 hücrede", karar);
     }
 }

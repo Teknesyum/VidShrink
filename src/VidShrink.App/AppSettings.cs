@@ -122,7 +122,7 @@ public sealed class AppSettings
 
     /// <summary>
     /// Var olan dosyayı okuyup kendi anahtarlarını üstüne yazar; <see cref="UpdateSettings"/>'in
-    /// yazdığı 25 anahtara dokunmaz, siler de değiştirmez de.
+    /// yazdığı anahtarlara dokunmaz, siler de değiştirmez de.
     /// </summary>
     public void Save(string? path = null)
     {

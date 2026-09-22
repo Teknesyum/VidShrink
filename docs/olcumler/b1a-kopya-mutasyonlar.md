@@ -15,7 +15,9 @@ Süzgeç: `DolbySesKoluTests|OlcekModuluTests`, 70 ölçü. Taban 0/70 kırmız�
 
 M2 eşdeğer: `StreamMapping.Decide` ses varsa ve bütçe sıfırın üstündeyse akış listesi olmasa
 da bir ses izi kuruyor (`inventory` yoksa `info.HasAudio || !inventory` kolu), yani `NewPlan`'ın
-`streams.Audio.Count > 0` koşulunun else'i ses varken erişilmiyor. Satır yine de seçimi
-okuyacak şekilde düzeltildi; iki kol aynı kaynağı okusun.
+`streams.Audio.Count > 0` koşulunun else'i ses varken erişilmiyor. Satır `PickAudioCodec(options.AudioCodec)`
+yapıldı, ama ad7ddaea'da `NewPlan`'a giden `effective` kopyası `AudioCodec` taşımıyordu; satır
+yine Auto okuyordu. Denetim yakaladı, kopyaya alan eklendi. Kol erişilmez olduğu için davranış
+farkı yok ve ölçülemez; düzeltme iki kolun aynı kaynağı okuması için.
 
 Ham çıktı: kesimler yerelde koşuldu, 2026-09-22.

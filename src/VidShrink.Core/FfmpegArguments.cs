@@ -664,10 +664,10 @@ public static class FfmpegArguments
             args.AddRange(new[] { "-svtav1-params", "tune=1:enable-variance-boost=0" });
         // NVENC's lookahead. Measured in docs/olcumler/nvenc-kalite-kollari.md over three clips
         // (dark, bright, motion) x three NVENC encoders at the product's own bitrate line:
-        // -lookahead_level 3 wins VMAF-neg p10 in 9 of 9 cells and the mean in 8 of 9 (av1 on
-        // the bright clip is the one loss), and in 7 of 9 it does so with FEWER bytes. Level 1
-        // was measured in the same run and is worse than level 3 in all nine cells, losing to
-        // the baseline in three of them, so the level is not a free dial - 3 is the measured one.
+        // -lookahead_level 3 wins VMAF-neg mean and p10 in 8 of 9 cells (av1 on the bright clip
+        // loses both), and in 8 of 9 it does so with FEWER bytes. Level 1 was measured in the
+        // same run and is worse than level 3 in all nine cells, losing to the baseline on the
+        // mean in five of them, so the level is not a free dial - 3 is the measured one.
         // -spatial-aq 1 -aq-strength 4 lost 6 of 6 cells and -tf_level 4 is rejected by the
         // driver on hevc_nvenc although ffmpeg lists it; neither is here.
         //

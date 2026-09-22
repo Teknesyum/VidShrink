@@ -490,7 +490,8 @@ public static class PlanCalculator
             MinResolutionHeight = options.MinResolutionHeight,
             FixedResolution = options.FixedResolution,
             MinFps = options.MinFps,
-            ScaleModulus = options.ScaleModulus
+            ScaleModulus = options.ScaleModulus,
+            AudioCodec = options.AudioCodec
         };
 
         var (best, sourceFpsViable) = SearchLayout(info, effective, complexity, codec, videoK, regime);

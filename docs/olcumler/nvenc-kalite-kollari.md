@@ -166,12 +166,12 @@ seviye. Betik `tools/nvenc-2/lookahead.sh`, ham tablo `.calisma/nvenc-2/lookahea
 ## Karar
 
 `-rc-lookahead 20 -lookahead_level 3` **alındı**. Dokuz hücrede (3 kesit × 3 NVENC kodeği)
-p10'un 9'unda, ortalamanın 8'inde tabanı geçiyor — tek kayıp av1/parlak ortalaması — ve
-bunu 9 hücrenin 7'sinde **daha az baytla** yapıyor. En büyük kazanç h264'te: parlak
+tabanı ortalamada 8/9, p10'da 8/9 hücrede geçiyor — tek kayıp av1/parlak, iki ölçüde de —
+ve 8/9 hücrede **daha az baytla** yapıyor. En büyük kazanç h264'te: parlak
 kesitte p10 77,817 → 81,646.
 
-`-lookahead_level 1` alınmadı: dokuz hücrenin dokuzunda seviye 3'ün altında ve üçünde
-tabanın da altında. Seviye boş bir düğme değil, ölçülen seviye 3.
+`-lookahead_level 1` alınmadı: ortalamada 9/9 hücrede seviye 3'ün altında; tabanın da
+altında ortalamada 5/9, p10'da 2/9 hücrede. Seviye boş bir düğme değil, ölçülen seviye 3.
 
 **Kolun bedeli ölçüldü ama kesin değil:** seviye 3'ün kodlama süresi 10 sn'lik kesitlerde
 0,9-1,1 sn yerine 1,1-1,6 sn. Mutlak fark 0,5 sn'nin altında ve bu ölçekte zamanlayıcı
