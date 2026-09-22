@@ -108,7 +108,14 @@ public static class Program
             }),
             Shot(language, outDir, "ayarlar", window => SelectTab(window, "main.tab.settings")),
             Shot(language, outDir, "gelismis", window => SelectTab(window, "main.tab.advanced")),
-            Shot(language, outDir, "hakkinda", window => SelectTab(window, "main.tab.about")),
+            Shot(language, outDir, "hakkinda", window =>
+            {
+                SelectTab(window, "main.tab.settings");
+                Named(window, "AboutBody").IsVisible = true;
+                window.UpdateLayout();
+                ((ScrollViewer)Named(window, "PageSettings")).ScrollToEnd();
+                window.UpdateLayout();
+            }),
 
             Part(language, outDir, "onizleme", "Preview", window =>
             {

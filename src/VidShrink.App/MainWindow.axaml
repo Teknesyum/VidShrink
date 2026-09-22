@@ -45,6 +45,17 @@
     <Style Selector="Window.chrome-hidden TabControl#Tabs /template/ ItemsPresenter#PART_ItemsPresenter">
       <Setter Property="IsVisible" Value="False"/>
     </Style>
+    <Style Selector="Path#AboutGlyph">
+      <Setter Property="RenderTransform" Value="none"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Path#AboutGlyph.open">
+      <Setter Property="RenderTransform" Value="rotate(180deg)"/>
+    </Style>
   </Window.Styles>
 
   <Border x:Name="WindowShell"
@@ -1134,34 +1145,6 @@
           </ScrollViewer>
         </TabItem>
 
-        <TabItem Header="{loc:Text main.tab.about}" izi:AcilisIsareti.Ad="xaml-hakkinda" Tag="{StaticResource IconAbout}" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer x:Name="PageAbout" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
-            <Border Theme="{StaticResource Panel}" Margin="{StaticResource SectionMargin}">
-              <StackPanel Spacing="{StaticResource SpaceMd}">
-                <TextBlock Text="{loc:Text main.about.title}" Theme="{StaticResource H2}"/>
-                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.intro}"/>
-                <TextBlock Text="{loc:Text main.about.engine.title}" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.engine.body}"/>
-                <TextBlock Text="{loc:Text main.about.measured.title}" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource MonoValue}" FontWeight="Normal" Text="{loc:Text main.about.measured.table}"/>
-                <TextBlock Text="{loc:Text main.about.loss.title}" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.loss.body}"/>
-                <TextBlock Text="{loc:Text main.about.scenario.title}" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.scenario.body}"/>
-                <TextBlock Text="{loc:Text main.about.ai.title}" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.ai.body}"/>
-                <TextBlock Text="{loc:Text main.about.codecs.title}" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.codecs.body}"/>
-                <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}"/>
-                <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
-                           Cursor="Hand" PointerPressed="OnSystemStatusTapped"/>
-                <TextBlock Text="{loc:Text main.about.platforms.title}" Theme="{StaticResource H3}"/>
-                <TextBlock x:Name="TxtPlatforms" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
-              </StackPanel>
-            </Border>
-          </ScrollViewer>
-        </TabItem>
-
           <TabItem Header="{loc:Text main.tab.recorder}" izi:AcilisIsareti.Ad="xaml-kaydedici" x:Name="TabRecorder" Tag="{StaticResource IconRecorder}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageRecorder" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
           </ScrollViewer>
@@ -1460,6 +1443,45 @@
                           Theme="{StaticResource GhostButton}"
                           HorizontalAlignment="Left"
                           Click="OnOpenLog"/>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="AboutPanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <Button x:Name="BtnAboutToggle"
+                          Click="OnAboutToggle"
+                          Theme="{StaticResource GhostButton}"
+                          HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Left"
+                          Padding="{StaticResource ButtonPaddingSm}"
+                          auto:AutomationProperties.Name="{loc:Text main.about.title}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                      <Path x:Name="AboutGlyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="1" Text="{loc:Text main.about.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    </Grid>
+                  </Button>
+                  <StackPanel x:Name="AboutBody" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.intro}"/>
+                    <TextBlock Text="{loc:Text main.about.engine.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.engine.body}"/>
+                    <TextBlock Text="{loc:Text main.about.measured.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource MonoValue}" FontWeight="Normal" Text="{loc:Text main.about.measured.table}"/>
+                    <TextBlock Text="{loc:Text main.about.loss.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.loss.body}"/>
+                    <TextBlock Text="{loc:Text main.about.scenario.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.scenario.body}"/>
+                    <TextBlock Text="{loc:Text main.about.ai.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.ai.body}"/>
+                    <TextBlock Text="{loc:Text main.about.codecs.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.codecs.body}"/>
+                  </StackPanel>
+                  <StackPanel x:Name="AboutStatus" Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
+                               Cursor="Hand" PointerPressed="OnSystemStatusTapped"/>
+                    <TextBlock Text="{loc:Text main.about.platforms.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock x:Name="TxtPlatforms" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
+                  </StackPanel>
                 </StackPanel>
               </Border>
 

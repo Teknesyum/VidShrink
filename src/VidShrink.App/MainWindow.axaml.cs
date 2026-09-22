@@ -1257,6 +1257,12 @@ public partial class MainWindow : Window
         }
     }
 
+    private void OnAboutToggle(object? sender, RoutedEventArgs e)
+    {
+        AboutBody.IsVisible = !AboutBody.IsVisible;
+        AboutGlyph.Classes.Set("open", AboutBody.IsVisible);
+    }
+
     /// <summary>
     /// Gunlugu dosya yoneticisinde gosterir. Kullaniciya tam yol gosterilmez: durum
     /// satirinda yalniz dosya adi durur, yolu klasor penceresi zaten tasiyor.

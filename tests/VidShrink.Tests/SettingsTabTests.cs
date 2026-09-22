@@ -42,8 +42,27 @@ public sealed class SettingsTabTests
     }
 
     /// <summary>
-    /// K: güncelleme ayarı About'ta **yok**, Settings'te **var**. Kopyalanmadığını görmek
-    /// için iki sekme de ayrı ayrı aranıyor.
+    /// Anahtari verilen <c>x:Name</c> ile acilan <c>Border</c> blogu. Hakkinda bolumu 2026-09-22'de
+    /// kendi sekmesinden cikip Ayarlar'in en altina paneli olarak girdi; olcu artik sekmeyi
+    /// degil paneli ariyor.
+    /// </summary>
+    private static string Panel(string name)
+    {
+        var xaml = WindowXaml();
+        var start = xaml.IndexOf($"<Border x:Name=\"{name}\"", StringComparison.Ordinal);
+        Assert.True(start >= 0, $"{name} paneli MainWindow.axaml içinde yok.");
+        var depth = 0;
+        for (var at = start; at < xaml.Length; at++)
+        {
+            if (string.CompareOrdinal(xaml, at, "<Border", 0, 7) == 0 && !char.IsLetter(xaml[at + 7])) depth++;
+            else if (string.CompareOrdinal(xaml, at, "</Border>", 0, 9) == 0 && --depth == 0) return xaml[start..(at + 9)];
+        }
+        throw new InvalidOperationException($"{name} paneli kapanmiyor.");
+    }
+
+    /// <summary>
+    /// K: güncelleme ayarı Hakkında panelinde **yok**, Ayarlar'da **var**. Kopyalanmadığını
+    /// görmek için iki yer ayrı ayrı aranıyor.
     /// </summary>
     [Theory]
     [InlineData("ChkAutoUpdate")]
@@ -52,7 +71,35 @@ public sealed class SettingsTabTests
     public void TheUpdateSettingMovedOutOfAboutIntoSettings(string name)
     {
         Assert.Contains($"x:Name=\"{name}\"", Tab("main.tab.settings"), StringComparison.Ordinal);
-        Assert.DoesNotContain(name, Tab("main.tab.about"), StringComparison.Ordinal);
+        Assert.DoesNotContain(name, Panel("AboutPanel"), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// K (2026-09-22, kullanici istegi): Hakkinda ayri sekme degil, Ayarlar'in icinde. Sekme
+    /// basligi hicbir TabItem'da gecmiyor, panel Ayarlar sekmesinin govdesinde duruyor.
+    /// </summary>
+    [Fact]
+    public void AboutLivesInsideSettings()
+    {
+        Assert.DoesNotContain("<TabItem Header=\"{loc:Text main.tab.about}\"", WindowXaml(), StringComparison.Ordinal);
+        Assert.Contains("<Border x:Name=\"AboutPanel\"", Tab("main.tab.settings"), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Sistem durumu satiri hata cumlelerini de tasiyor (ayar kaydi, gunluk, yoklama). Katlanan
+    /// govdenin icine girerse hata kullanici acmadikca gorunmez; o yuzden govdenin disinda.
+    /// </summary>
+    [Theory]
+    [InlineData("TxtSystemStatus")]
+    [InlineData("TxtPlatforms")]
+    public void StatusStaysOutsideTheFoldedBody(string name)
+    {
+        var panel = Panel("AboutPanel");
+        var body = Regex.Match(panel, "<StackPanel x:Name=\"AboutBody\".*?</StackPanel>", RegexOptions.Singleline);
+
+        Assert.True(body.Success);
+        Assert.Contains($"x:Name=\"{name}\"", panel, StringComparison.Ordinal);
+        Assert.DoesNotContain(name, body.Value, StringComparison.Ordinal);
     }
 
     /// <summary>
