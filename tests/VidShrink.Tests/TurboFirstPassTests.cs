@@ -42,6 +42,18 @@ public sealed class TurboFirstPassTests
         return yer < 0 ? "<yok>" : args[yer + 1];
     }
 
+    /// <summary>
+    /// libvpx-vp9'un hiz anahtari <c>-preset</c> degil <c>-cpu-used</c>'dur
+    /// (<see cref="FfmpegArguments.SpeedArgs"/>); genel <see cref="OnAyar(IReadOnlyList{string})"/>
+    /// bu kodekte hep "&lt;yok&gt;" doner. Kodege gore dogru anahtari okur.
+    /// </summary>
+    private static string OnAyar(IReadOnlyList<string> args, string kodek)
+    {
+        var bayrak = CodecModel.IsVp9(kodek) ? "-cpu-used" : "-preset";
+        var yer = args.IndexOf(bayrak);
+        return yer < 0 ? "<yok>" : args[yer + 1];
+    }
+
     [Fact]
     public void Turbo_acikken_ilk_gecis_son_gecisin_on_ayarini_kosmaz()
     {
@@ -244,7 +256,7 @@ public sealed class TurboFirstPassTests
         var onAyar = FfmpegArguments.DefaultPreset(kodek);
         var plan = Plan(kodek, onAyar);
 
-        Assert.Equal(onAyar, OnAyar(FfmpegArguments.Build(Kaynak(), plan, "cikti.mp4", 1, "gunluk")));
+        Assert.Equal(onAyar, OnAyar(FfmpegArguments.Build(Kaynak(), plan, "cikti.mp4", 1, "gunluk"), kodek));
         Assert.Equal(onAyar, FfmpegArguments.FirstPassPreset(kodek, onAyar, turbo: false));
     }
 

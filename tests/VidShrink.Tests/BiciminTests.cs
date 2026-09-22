@@ -1120,6 +1120,15 @@ public sealed class BaslikKapsamiTests
     /// <c>filters.rotate.*</c> 5'er), 101'i C1-1..C1-4 kuyruk ve on ayar turunun anahtarlari.
     /// Sonuc durumu denetiminde en'de dokuz <c>retry.*</c>/<c>action.*</c> dugmesi Title Case'e
     /// alindi; islev sozcugu tasidiklari icin kolda kaldilar, sayi oynamadi.</para>
+    ///
+    /// <para><b>23 Eylul 2026, dokuzuncu yenileme: toplam 1918, en 225, tr 78.</b> B3 (VP9
+    /// kucultme) ve B4 (HDR dinamik veri) dil basina uc gerekce anahtari ekledi:
+    /// <c>main.reason.hdr-dynamic-dropped</c>, <c>main.reason.stream.webm-audio-opus</c>,
+    /// <c>main.reason.stream.webm-stream-dropped</c>. Ucu de noktalama tasimiyor (eski kural
+    /// govde sayardi) ama govde sozcugu tasiyor (en <c>the</c>/<c>or</c>/<c>so</c>, tr
+    /// <c>ve</c>/<c>ya</c>/<c>da</c>), yani yeni kural ile kol degistiriyor: en ve tr'de ucu de
+    /// (1880 + 38 = 1918, en 222 + 3 = 225, tr 75 + 3 = 78). Kalan 38 - 3 - 3 = 32 diger
+    /// dillerde, aynı uc anahtarin ceviri sozcuklerine bagli.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1145,9 +1154,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1880, toplam);
-        Assert.Equal(222, dilBasina["en"]);
-        Assert.Equal(75, dilBasina["tr"]);
+        Assert.Equal(1918, toplam);
+        Assert.Equal(225, dilBasina["en"]);
+        Assert.Equal(78, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1276,6 +1285,9 @@ public sealed class BaslikKapsamiTests
     /// dugmeleri iki <c>main.retry.*.name</c> anahtari ekledi: 1003 + 6 = 1009, 43 x 1009 = 43387. <c>kayip</c> yine 0.</para>
     /// <para><b>22 Eylul 2026, sekizinci yenileme: 45881.</b> C1-1..C1-6 turu 58 anahtar ekledi:
     /// 43 x 1067 = 45881. <c>kayip</c> 0.</para>
+    /// <para><b>23 Eylul 2026, dokuzuncu yenileme: 46010.</b> B4 dil basina bir
+    /// <c>main.reason.hdr-dynamic-dropped</c>, B3 dil basina iki <c>main.reason.stream.webm-*</c>
+    /// anahtari ekledi: dil basina 1067 + 3 = 1070, 43 x 1070 = 46010. <c>kayip</c> yine 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1303,7 +1315,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(45881, gezilen);
+        Assert.Equal(46010, gezilen);
         Assert.Empty(kayip);
     }
 

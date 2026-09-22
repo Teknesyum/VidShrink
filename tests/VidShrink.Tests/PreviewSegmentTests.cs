@@ -111,10 +111,17 @@ public sealed class PreviewSegmentTests
         Assert.False(segment.IsApproximate);
     }
 
+    /// <summary>
+    /// libvpx-vp9 artik modellenmis (B3): kalite olcegi <see cref="CodecModel.CrfRange"/>'in
+    /// varsayilan dalindan geliyor ve <see cref="Planlayicinin_kabul_ettigi_her_kodlayici_siniflandirilmis"/>
+    /// bunu ayrica dogruluyor. Modellenmemis ornek olarak videotoolbox kullanilir: o aile
+    /// <c>PlanParser.AllowedCodecs</c>'ten hic gecmiyor (<see cref="CodecModel.QualityArgs"/>),
+    /// yani hicbir sozlesme onu kalite olcegine baglamadi.
+    /// </summary>
     [Fact]
     public void Modellenmemis_kodlayici_acikca_desteklenmiyor_der()
     {
-        var plan = TwoPassPlan(codec: "libvpx-vp9");
+        var plan = TwoPassPlan(codec: "h264_videotoolbox");
 
         var segment = PreviewSegment.For(Source(), plan, 10, "ornek.mp4");
 
