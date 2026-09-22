@@ -32,6 +32,12 @@ public sealed record PresetProfile
     public int? MaxShortEdge { get; init; }
     public int? AudioKbps { get; init; }
     public OutputContainer? Container { get; init; }
+
+    /// <summary>
+    /// Profilin kilitledigi kodlayici (<see cref="PlanOptions.LockedCodec"/>). Bugun yalniz
+    /// HandBrake'in VP9/WebM on ayarindan <c>libvpx-vp9</c> gelir; bos kalirsa motor secer.
+    /// </summary>
+    public string? LockedCodec { get; init; }
     public PresetSource Source { get; init; } = new();
 
     public PlanOptions ToPlanOptions(double fallbackTargetMb = 25) => new()
@@ -41,7 +47,8 @@ public sealed record PresetProfile
         Codec = Codec,
         FillPolicy = Fill,
         FixedResolution = MaxShortEdge,
-        LockedAudioKbps = AudioKbps
+        LockedAudioKbps = AudioKbps,
+        LockedCodec = LockedCodec
     };
 }
 
@@ -254,6 +261,8 @@ public sealed class PresetLibrary
             throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{index}].maxShortEdge");
         if (profile.AudioKbps is { } kbps && kbps <= 0)
             throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{index}].audioKbps");
+        if (profile.LockedCodec is not null && !PlanCalculator.IsLockableCodec(profile.LockedCodec))
+            throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{index}].lockedCodec");
         if (profile.Source.Status == PresetSourceStatus.Official && !Uri.TryCreate(profile.Source.Url, UriKind.Absolute, out _))
             throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{index}].source.url");
     }
@@ -268,9 +277,10 @@ public sealed class PresetLibrary
 
     /// <summary>
     /// Profilin kabından çıktı uzantısı. Kodlama kabı uzantıdan okuduğu için
-    /// (<see cref="StreamMapping.ForOutput"/>) kabı uygulamak uzantıyı seçmek demek. WebM'in
-    /// kodlama kolu yok (vp9 merdivende değil); <c>null</c> döner ve plan kendi kabını seçer.
-    /// Karar: <c>docs/danisma/010-fable-onayar-kap.md</c>.
+    /// (<see cref="StreamMapping.ForOutput"/>) kabı uygulamak uzantıyı seçmek demek. WebM için
+    /// <c>null</c> döner ve plan kendi kabını seçer: WebM'i kap değil kodek taşır, libvpx-vp9
+    /// kilitli plan <see cref="StreamMapping.ContainerFor(StreamRequest, string?)"/> ile webm'e
+    /// gider, kilitsiz profil ise mp4'te kalır. Karar: <c>docs/danisma/010-fable-onayar-kap.md</c>.
     /// </summary>
     public static string? DeliveredExtension(OutputContainer? container) =>
         container is { } kap and not OutputContainer.WebM ? StreamMapping.ExtensionOf(kap) : null;
@@ -403,6 +413,9 @@ public static class HandBrakePresetImport
         int? shortEdge = null;
         int? audioKbps = null;
         OutputContainer? container = null;
+        string? lockedCodec = null;
+        var encoderNamed = false;
+        int? webmNote = null;
         var qualityMode = false;
 
         foreach (var property in preset.EnumerateObject())
@@ -421,9 +434,18 @@ public static class HandBrakePresetImport
                     break;
                 case "VideoEncoder":
                     var family = EncoderFamily(raw);
-                    if (family is { } known)
+                    if (IsVp9Encoder(raw))
+                    {
+                        lockedCodec = "libvpx-vp9";
+                        encoderNamed = true;
+                        notes.Add(new(property.Name,
+                            raw!.Equals("vp9", StringComparison.OrdinalIgnoreCase) ? PresetNoteOutcome.Carried : PresetNoteOutcome.Approximated,
+                            PresetNoteReason.None, raw));
+                    }
+                    else if (family is { } known)
                     {
                         codec = known;
+                        encoderNamed = true;
                         notes.Add(new(property.Name, PresetNoteOutcome.Approximated, PresetNoteReason.None, raw));
                     }
                     else
@@ -439,15 +461,14 @@ public static class HandBrakePresetImport
                     {
                         "mp4" or "av_mp4" => OutputContainer.Mp4,
                         "mkv" or "av_mkv" => OutputContainer.Mkv,
-                        "webm" or "av_webm" => OutputContainer.Mp4,
+                        "webm" or "av_webm" => OutputContainer.WebM,
                         "mov" or "av_mov" => OutputContainer.Mov,
                         _ => null
                     };
+                    if (container == OutputContainer.WebM) webmNote = notes.Count;
                     notes.Add(container is null
                         ? new(property.Name, PresetNoteOutcome.Dropped, PresetNoteReason.NoEquivalent, raw)
-                        : raw?.ToLowerInvariant() is "webm" or "av_webm"
-                            ? new(property.Name, PresetNoteOutcome.Approximated, PresetNoteReason.NoEquivalent, raw)
-                            : new(property.Name, PresetNoteOutcome.Carried, PresetNoteReason.None, raw));
+                        : new(property.Name, PresetNoteOutcome.Carried, PresetNoteReason.None, raw));
                     break;
                 case "AudioList":
                     var first = value.ValueKind == JsonValueKind.Array ? value.EnumerateArray().FirstOrDefault() : default;
@@ -503,6 +524,13 @@ public static class HandBrakePresetImport
                 notes.Add(new("PictureHeight", PresetNoteOutcome.Dropped, PresetNoteReason.NoEquivalent, height?.ToString(CultureInfo.InvariantCulture)));
         }
 
+        if (webmNote is { } at)
+        {
+            if (lockedCodec is null && !encoderNamed) lockedCodec = "libvpx-vp9";
+            if (lockedCodec is null)
+                notes[at] = notes[at] with { Outcome = PresetNoteOutcome.Approximated, Reason = PresetNoteReason.NoEquivalent };
+        }
+
         var sizeCapped = targetMb is not null && !qualityMode;
         var profile = new PresetProfile
         {
@@ -516,7 +544,8 @@ public static class HandBrakePresetImport
             Fill = sizeCapped ? FillPolicy.FillTarget : FillPolicy.QualityCeiling,
             MaxShortEdge = shortEdge,
             AudioKbps = audioKbps,
-            Container = container
+            Container = container,
+            LockedCodec = lockedCodec
         };
 
         return new HandBrakeTranslation(name, profile, notes);
@@ -524,6 +553,13 @@ public static class HandBrakePresetImport
 
     private static int? IntOf(JsonElement preset, string field) =>
         preset.TryGetProperty(field, out var value) && value.TryGetInt32(out var number) ? number : null;
+
+    /// <summary>
+    /// HandBrake'in VP9 kodlayicilari: <c>vp9</c> birebir tasinir, <c>vp9_10bit</c> gibi
+    /// turevler 8 bit libvpx-vp9'a yaklasir.
+    /// </summary>
+    private static bool IsVp9Encoder(string? encoder)
+        => encoder is not null && encoder.Contains("vp9", StringComparison.OrdinalIgnoreCase);
 
     private static CodecPreference? EncoderFamily(string? encoder)
     {

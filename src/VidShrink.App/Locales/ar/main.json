@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "ميزانية الصوت أقل من الحد الأدنى لترميز Dolby المختار عند هذا العدد من القنوات، لذلك رُمّز المقطع بترميز الحاوية الخاص",
   "main.reason.stream.flac-fell-back": "تعذّر استخدام FLAC: الحاوية لا تدعمه أو أن سقفه البالغ 16 بت لا يتسع ضمن 15% من الهدف، لذا رُمّز المسار بترميز الحاوية الخاص",
   "main.reason.stream.audio-filter-on-copy": "لا يمكن تطبيق تسوية الصوت والتضخيم على مسار صوتي منسوخ، لذا نُسخ المسار دون تغيير",
+  "main.reason.stream.webm-audio-opus": "لا تحمل WebM إلا صوت Opus أو Vorbis، لذا رُمِّز المسار إلى Opus",
+  "main.reason.stream.webm-stream-dropped": "لا تستطيع WebM حمل الترجمات المصورة أو صورة الغلاف أو المرفقات، لذا أُسقطت",
   "main.reason.stream.lossless-not-passed": "مسار TrueHD/DTS بلا فقد لا يُنسخ أبدًا؛ بل يُعاد ترميزه",
   "main.reason.fill-crf-lowered": "سياسة ملء الهدف خفضت CRF إلى {0} بدل التوقف عند سقف الشفافية، لتقع قرب مركز النطاق {1} م.ب داخل نطاق {2}-{3} م.ب",
   "main.reason.fill-band-center": "بُلغ الحد الأدنى CRF {0} قبل نطاق الملء، فتستهدف تمريرتا VBR مركز النطاق {1} م.ب مباشرة",

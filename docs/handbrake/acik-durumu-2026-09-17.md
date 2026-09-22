@@ -31,7 +31,7 @@ Durum anahtarı: öndeyiz / eşit / gerideyiz / yok / ölçülecek / bilerek yap
 
 | # | Alan | Eski → Bugün | Kanıt |
 |---|---|---|---|
-| 14 | Yazılım kodlayıcıları | gerideyiz → **gerideyiz** (ProRes/DNxHR/FFV1 bilerek yapılmaz) | `Core/PlanParser.cs:13` libx264/libx265/libsvtav1; VP9 yalnız dönüştürücüde (`ConversionArguments.cs:137-139`) |
+| 14 | Yazılım kodlayıcıları | gerideyiz → **gerideyiz** (ProRes/DNxHR/FFV1 bilerek yapılmaz) | `Core/PlanParser.cs:13` libx264/libx265/libsvtav1/libvpx-vp9; VP9 küçültmede kilitli kodekle (CLI `--kodek vp9`, Gelişmiş kodek kilidi), WebM + opus, iki geçiş (`Vp9KucultmeTests`) |
 | 15 | Donanım kodlayıcıları | gerideyiz → **gerideyiz** | nvenc/qsv/amf plan yolunda (`PlanParser.cs:13`); VT tanımlı ama plan yolunda yok (`CodecModel.cs:150`, `:159-161`); Media Foundation yok |
 | 16 | Donanım çözme | eşit → **eşit** | `-hwaccel auto` yalnız dağıtım kodeklerinde (`FfmpegArguments.cs:392-401`, merge `8c1ef48f`) |
 | 17 | Kap, küçültme | gerideyiz → **eşit** | `Core/StreamMapping.cs:134-145` Mp4/Mkv/WebM; otomatik seçim Mp4, "İzleri koru"da Mkv (`:131-132`); faststart yalnız Mp4 (`FfmpegArguments.cs:469-470`). WebM otomatik seçilmiyor |
@@ -201,7 +201,7 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | B1e forced | **dalda** (aynı dal) | `StreamMapping.DefaultForced`: varsayılansız çıktıda forced iz varsayılan olur; `ForcedAltyaziTests`. Foreign Audio Search yok |
 | B1f yakma | **dalda**, yalnız metin altyazı | `VideoFilterChain.BurnFilter` (`subtitles=...:si=N`), CLI `--yak N`; PGS overlay ister, reddedilir; `AltyaziYakmaTests` |
 | B2 küçültmeye aralık | denetlenmedi | bu turda okunmadı |
-| B3 VT plan yolu / VP9 küçültme | VT **ölçüldü, kapıdan kaldı** (23 Eylül denetimi); VP9 yapılmadı | VT: K2 2/8, K4 5/8, bağlantı geri alındı, kapı `PlanParserTests.ParserStillRejectsVideoToolboxEncoders` ile kapalı (`docs/olcumler/videotoolbox-hizli.md`); VP9 hâlâ yalnız dönüştürücüde |
+| B3 VT plan yolu / VP9 küçültme | VP9 **girdi (23 Eylül)**; VT **ölçüldü, kapıdan kaldı** (23 Eylül denetimi) | VT: K2 2/8, K4 5/8, bağlantı geri alındı, kapı `PlanParserTests.ParserStillRejectsVideoToolboxEncoders` ile kapalı (`docs/olcumler/videotoolbox-hizli.md`). VP9: `-b:v` + `-pass 1/2`, `-deadline good -cpu-used 4 -row-mt 1`, kap WebM, ses opus; WebM'in taşımadığı iz `WebmStreamDropped` notuyla düşer; HandBrake `av_webm`/`VP9` artık gerçek kol (kilit `libvpx-vp9`). cpu-used ve vp9 CRF ölçeği ölçülmedi. `Vp9KucultmeTests`, mutasyonlar `docs/olcumler/vp9-kucultme-mutasyonlar.md` |
 | B4 HDR10+/DV | yapılmadı | `hdr10plus\|dolby\|dovi\|dynamic_hdr` taraması 0 sonuç |
 | C1-1 `Saturated` satırı | **girdi (22 Eylül)** | `MainWindow.SaturatedSuffix`, `ShrinkJobWindow.BittiSatiri`; `main.run.saturated` 42 dilde; `DoygunTeslimTests` 4/4, iki mutasyon kırmızı |
 | C1-2 kuyruk düzenleme | **girdi (22 Eylül)** | bekleyen listesi, yukarı/aşağı/çıkar, sırayı duraklat (`ShrinkJobWindow`, `KuyrukDuzenlemeTests`) |

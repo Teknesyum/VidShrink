@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "il budget audio scende sotto la soglia minima del codec Dolby scelto con questo numero di canali, quindi la traccia è stata codificata con il codec proprio del contenitore",
   "main.reason.stream.flac-fell-back": "FLAC non utilizzabile: il contenitore non lo supporta o il suo tetto a 16 bit non rientra nel 15% dell'obiettivo, quindi la traccia è stata codificata con il codec proprio del contenitore",
   "main.reason.stream.audio-filter-on-copy": "normalizzazione del volume e guadagno non si applicano a una traccia audio copiata, la traccia è stata copiata senza modifiche",
+  "main.reason.stream.webm-audio-opus": "WebM trasporta solo audio Opus o Vorbis, quindi la traccia è stata codificata in Opus",
+  "main.reason.stream.webm-stream-dropped": "WebM non può trasportare sottotitoli immagine, copertina o allegati, quindi sono stati scartati",
   "main.reason.stream.lossless-not-passed": "una traccia TrueHD/DTS lossless non viene mai copiata; viene ricodificata",
   "main.reason.fill-crf-lowered": "la politica di riempimento dell'obiettivo ha abbassato il CRF a {0} invece di fermarsi al limite di trasparenza, collocandosi vicino al centro della banda di {1} MB dentro la banda {2}-{3} MB",
   "main.reason.fill-band-center": "il minimo CRF {0} è stato raggiunto prima della banda di riempimento, quindi il VBR a due passaggi punta direttamente al centro della banda di {1} MB",

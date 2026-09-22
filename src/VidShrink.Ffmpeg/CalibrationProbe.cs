@@ -219,6 +219,7 @@ public static class CalibrationProbe
         if (c.Equals("h264_qsv")) return new[] { "-global_quality", whole, "-look_ahead", "1" };
         if (c.Contains("qsv")) return new[] { "-global_quality", whole };
         if (c.Contains("amf")) return new[] { "-rc", "cqp", "-qp_i", whole, "-qp_p", whole, "-qp_b", whole };
+        if (CodecModel.IsVp9(c)) return CodecModel.QualityArgs(c, quality);
         return new[] { "-crf", exact };
     }
 
@@ -245,8 +246,7 @@ public static class CalibrationProbe
         args.Add("-c:v");
         args.Add(draft.Codec);
         args.AddRange(QualityArgs(draft.Codec, crf));
-        args.Add("-preset");
-        args.Add(draft.Preset);
+        args.AddRange(FfmpegArguments.SpeedArgs(draft.Codec, draft.Preset));
         FfmpegArguments.WarmPsychovisual(draft.Codec, EncoderCapabilities.Instance);
         var psychovisual = FfmpegArguments.CachedPsychovisualArgs(draft.Codec, EncoderCapabilities.Instance);
         args.AddRange(FfmpegArguments.PsychovisualAndColorArgs(draft.Codec, psychovisual, draft.HdrColorArgs));

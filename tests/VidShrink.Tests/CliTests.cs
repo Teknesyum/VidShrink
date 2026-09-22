@@ -191,7 +191,7 @@ public sealed class CliTests
     [InlineData("error.target-or-quality", "plan", "a.mp4", "--hedef", "25MB", "--kalite", "60")]
     [InlineData("error.bad-quality", "plan", "a.mp4", "--kalite", "0")]
     [InlineData("error.bad-quality", "plan", "a.mp4", "--kalite", "101")]
-    [InlineData("error.bad-codec", "plan", "a.mp4", "--hedef", "25", "--kodek", "vp9")]
+    [InlineData("error.bad-codec", "plan", "a.mp4", "--hedef", "25", "--kodek", "vp8")]
     [InlineData("error.unknown-option", "plan", "a.mp4", "--hedef", "25", "--uydurma")]
     [InlineData("error.missing-value", "plan", "a.mp4", "--hedef")]
     [InlineData("error.no-input", "plan", "--hedef", "25")]

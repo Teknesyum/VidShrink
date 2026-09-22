@@ -22,7 +22,9 @@ public enum StreamNote
     DolbyCodecNotInContainer,
     DolbyCodecBelowChannelFloor,
     FlacFellBack,
-    AudioFilterSkippedOnCopy
+    AudioFilterSkippedOnCopy,
+    WebmAudioOpus,
+    WebmStreamDropped
 }
 
 public static class StreamNotes
@@ -45,6 +47,8 @@ public static class StreamNotes
         StreamNote.DolbyCodecBelowChannelFloor => "dolby-below-channel-floor",
         StreamNote.FlacFellBack => "flac-fell-back",
         StreamNote.AudioFilterSkippedOnCopy => "audio-filter-on-copy",
+        StreamNote.WebmAudioOpus => "webm-audio-opus",
+        StreamNote.WebmStreamDropped => "webm-stream-dropped",
         _ => "lossless-not-passed"
     };
 }
@@ -303,6 +307,18 @@ public static class StreamMapping
     public static OutputContainer ContainerFor(StreamRequest request)
         => request.KeepAllTracks && !request.PlatformDelivery ? OutputContainer.Mkv : OutputContainer.Mp4;
 
+    /// <summary>
+    /// Kap kodegi izler: libvpx-vp9 her zaman WebM'e gider, cunku VP9'un bu urundeki teslimi
+    /// vp9 + opus + webm uclusudur. Kodek geri dusunce (ornegin x264'e) kap eski kurala doner.
+    /// </summary>
+    public static OutputContainer ContainerFor(StreamRequest request, string? videoCodec)
+        => videoCodec is not null && CodecModel.IsVp9(videoCodec) ? OutputContainer.WebM : ContainerFor(request);
+
+    /// <summary>WebM yalniz opus ve vorbis sesi tasir; kodlanan ya da kopyalanan ses bunlardan biri degilse opus olur.</summary>
+    public static bool WebmCarriesAudio(string codec)
+        => codec.Equals("libopus", StringComparison.OrdinalIgnoreCase) || codec.Equals("libvorbis", StringComparison.OrdinalIgnoreCase)
+           || CopyableAudio[OutputContainer.WebM].Contains(codec, StringComparer.OrdinalIgnoreCase);
+
     public static OutputContainer ContainerOf(string outputPath) => Path.GetExtension(outputPath).ToLowerInvariant() switch
     {
         ".mkv" => OutputContainer.Mkv,
@@ -465,6 +481,13 @@ public static class StreamMapping
             {
                 var map = source.Index < 0 ? "0:a:0?" : Map(source);
                 var sourceK = source.BitrateBps / 1000.0;
+                if (audioCodec == "copy" && container == OutputContainer.WebM && !WebmCarriesAudio(source.Codec))
+                {
+                    notes.Add(StreamNote.WebmAudioOpus);
+                    audio.Add(new AudioTrack(map, TrackAction.Encode, "libopus", audioK, audioChannels, source.Language, source.Title,
+                        request.FiltersAudio ? AudioFilter(request, source.SampleRate) : null));
+                    continue;
+                }
                 if (audioCodec == "copy")
                 {
                     audio.Add(new AudioTrack(map, TrackAction.Copy, "copy", (int)Math.Round(sourceK > 0 ? sourceK : audioK), null, source.Language, source.Title));
@@ -539,6 +562,11 @@ public static class StreamMapping
                         trackK = ceiling;
                     }
                 }
+                else if (container == OutputContainer.WebM && !WebmCarriesAudio(codec))
+                {
+                    codec = "libopus";
+                    notes.Add(StreamNote.WebmAudioOpus);
+                }
                 else if (!IsMp4Family(container) && codec == "aac") codec = "libopus";
 
                 audio.Add(new AudioTrack(map, TrackAction.Encode, codec, trackK, channels, source.Language, source.Title,
@@ -574,7 +602,7 @@ public static class StreamMapping
             if (container == OutputContainer.WebM)
             {
                 if (text) subtitles.Add(new SubtitleTrack(Map(source), "webvtt", false, source.Language, source.Bytes, source.Title, source.IsDefault, source.IsForced));
-                else if (image) notes.Add(StreamNote.ImageSubtitleDropped);
+                else notes.Add(StreamNote.WebmStreamDropped);
                 continue;
             }
 
@@ -611,6 +639,9 @@ public static class StreamMapping
             coverMap = Map(cover);
             coverBytes = cover.Bytes;
         }
+        if (container == OutputContainer.WebM && !request.PlatformDelivery
+            && info.Streams.Any(stream => stream.IsAttachedPicture || stream.Kind == StreamKind.Attachment))
+            notes.Add(StreamNote.WebmStreamDropped);
 
         var attachments = new List<string>();
         var attachmentBytes = 0L;

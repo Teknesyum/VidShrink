@@ -5,7 +5,7 @@ namespace VidShrink.Cli;
 
 public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk, Profiller }
 
-public enum CliCodec { Auto, H264, Hevc, Av1 }
+public enum CliCodec { Auto, H264, Hevc, Av1, Vp9 }
 
 public static class ExitCodes
 {
@@ -221,7 +221,11 @@ public sealed record CliRequest
             options.FillPolicy = profil.Fill;
             options.FixedResolution = profil.MaxShortEdge;
             options.LockedAudioKbps = profil.AudioKbps;
-            if (Codec == CliCodec.Auto) options.Codec = profil.Codec;
+            if (Codec == CliCodec.Auto)
+            {
+                options.Codec = profil.Codec;
+                options.LockedCodec = profil.LockedCodec;
+            }
         }
 
         if (Filters is { } suzgecler) options.Filters = suzgecler;
@@ -231,6 +235,7 @@ public sealed record CliRequest
         options.AudioGainDb = AudioGainDb;
         options.ExternalSubtitles = ExternalSubtitles;
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
+        if (Codec == CliCodec.Vp9) options.LockedCodec = "libvpx-vp9";
         options.LockedCrf = Crf;
         options.LockedPreset = Preset;
         if (ScaleModulus is { } modul) options.ScaleModulus = modul;
@@ -486,6 +491,7 @@ public static class CliParser
             case "h264" or "avc" or "x264": codec = CliCodec.H264; return true;
             case "hevc" or "h265" or "x265": codec = CliCodec.Hevc; return true;
             case "av1": codec = CliCodec.Av1; return true;
+            case "vp9" or "libvpx-vp9": codec = CliCodec.Vp9; return true;
             default: codec = CliCodec.Auto; return false;
         }
     }

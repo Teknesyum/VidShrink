@@ -169,7 +169,15 @@ public static class CodecModel
     public static bool SinglePassRateControl(string codec)
         => IsHardware(codec) || Vendor(codec) == EncoderVendor.VideoToolbox;
 
-    public static bool TakesPreset(string codec) => Vendor(codec) != EncoderVendor.VideoToolbox;
+    public static bool TakesPreset(string codec)
+        => Vendor(codec) != EncoderVendor.VideoToolbox && !IsVp9(codec);
+
+    /// <summary>
+    /// libvpx-vp9 <c>-preset</c> tanimaz; hiz <c>-deadline good -cpu-used N</c> ile verilir ve
+    /// <c>-row-mt 1</c> satir bazli paralellik acar. Kalite modu <c>-crf N -b:v 0</c> ister:
+    /// <c>-b:v</c> verilmezse libvpx kisitli kaliteye duser. <c>-crf</c> tamsayi alir.
+    /// </summary>
+    public static bool IsVp9(string codec) => codec.Equals("libvpx-vp9", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// hevc_videotoolbox SDR'de de 10 bit (<c>p010le</c>, Main 10) kodlar. Olcum koşum 35166699260
@@ -282,6 +290,7 @@ public static class CodecModel
                 ? new[] { "-global_quality", whole, "-look_ahead", "1" }
                 : new[] { "-global_quality", whole },
             EncoderVendor.Amf => new[] { "-rc", "cqp", "-qp_i", whole, "-qp_p", whole, "-qp_b", whole },
+            _ when IsVp9(codec) => new[] { "-crf", whole, "-b:v", "0" },
             _ => new[] { "-crf", exact }
         };
     }

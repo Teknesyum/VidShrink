@@ -76,12 +76,13 @@ public sealed class OnAyarAktarimTests : IDisposable
 
     /// <summary>
     /// HandBrake dosyası çevriliyor: bildirim ön ayar adını ve çevirinin sayımlarını taşıyor.
-    /// WebM kabı yaklaşık düştüğü için ayrı satırda adıyla yazılıyor; mp4'te o satır yok (olumsuz kontrol).
+    /// Fikstürün kodlayıcısı x264; WebM onunla kurulamadığı için kap yaklaşık düşüyor ve ayrı
+    /// satırda adıyla yazılıyor; mp4'te o satır yok (olumsuz kontrol).
     /// </summary>
     [Theory]
-    [InlineData("av_webm", true)]
-    [InlineData("av_mp4", false)]
-    public void HandBrakeDosyasiCevrilipOzetleniyor(string fileFormat, bool yaklasikKap)
+    [InlineData("av_webm", true, OutputContainer.WebM)]
+    [InlineData("av_mp4", false, OutputContainer.Mp4)]
+    public void HandBrakeDosyasiCevrilipOzetleniyor(string fileFormat, bool yaklasikKap, OutputContainer kap)
     {
         var kaynak = HandBrakeKopyasi(fileFormat);
         var ceviri = Assert.Single(HandBrakePresetImport.TranslateFile(kaynak));
@@ -100,7 +101,8 @@ public sealed class OnAyarAktarimTests : IDisposable
 
         var dosyada = Assert.Single(PresetLibrary.LoadUser(PresetPath));
         Assert.Equal("hb-sentetik-sosyal-10-mb-720p", dosyada.Id);
-        Assert.Equal(OutputContainer.Mp4, dosyada.Container);
+        Assert.Equal(kap, dosyada.Container);
+        Assert.Null(dosyada.LockedCodec);
     }
 
     /// <summary>

@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "a hangköltségvetés a választott Dolby kodek alsó határa alá esik ennél a csatornaszámnál, ezért a sáv a konténer saját kodekjével lett kódolva",
   "main.reason.stream.flac-fell-back": "A FLAC nem használható: a tároló nem támogatja, vagy a 16 bites plafonja nem fér bele a cél 15%-ába, ezért a sáv a tároló saját kodekjével lett kódolva",
   "main.reason.stream.audio-filter-on-copy": "a hangerő-normalizálás és az erősítés nem alkalmazható másolt hangsávra, ezért a sáv változatlanul lett másolva",
+  "main.reason.stream.webm-audio-opus": "A WebM csak Opus vagy Vorbis hangot hordoz, ezért a sáv Opusra lett kódolva",
+  "main.reason.stream.webm-stream-dropped": "A WebM nem hordozhat képes feliratot, borítóképet vagy mellékletet, ezért ezek kimaradtak",
   "main.reason.stream.lossless-not-passed": "a veszteségmentes TrueHD/DTS sáv soha nem másolódik; újrakódolódik",
   "main.reason.fill-crf-lowered": "a célkitöltési szabály a CRF-et {0}-ra csökkentette az átlátszósági plafonon való megállás helyett, a {2}-{3} MB-os sáv {1} MB-os közepe közelébe érve",
   "main.reason.fill-band-center": "a CRF {0} alsó határ a kitöltési sáv előtt elérve, ezért a kétmenetes VBR közvetlenül a {1} MB-os sávközépet célozza",

@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "بودجه صدا از کف کدک Dolby انتخاب‌شده در این تعداد کانال کمتر است، بنابراین ترک با کدک خود قالب کدگذاری شد",
   "main.reason.stream.flac-fell-back": "امکان استفاده از FLAC نبود: ظرف از آن پشتیبانی نمی‌کند یا سقف ۱۶ بیتی آن در ۱۵٪ هدف جا نمی‌شود، پس مسیر با کدک خود ظرف رمزگذاری شد",
   "main.reason.stream.audio-filter-on-copy": "یکسان‌سازی بلندی صدا و تقویت روی مسیر صوتی کپی‌شده اعمال نمی‌شود، پس مسیر بدون تغییر کپی شد",
+  "main.reason.stream.webm-audio-opus": "WebM فقط صدای Opus یا Vorbis را حمل می‌کند، بنابراین قطعه به Opus رمزگذاری شد",
+  "main.reason.stream.webm-stream-dropped": "WebM نمی‌تواند زیرنویس تصویری، تصویر جلد یا پیوست حمل کند، بنابراین حذف شدند",
   "main.reason.stream.lossless-not-passed": "ترک بی‌اتلاف TrueHD/DTS هرگز کپی نمی‌شود؛ دوباره کدگذاری می‌شود",
   "main.reason.fill-crf-lowered": "سیاست پر کردن هدف به‌جای ایستادن در سقف شفافیت CRF را به {0} پایین آورد و نزدیک مرکز باند {1} MB در باند {2}-{3} MB نشست",
   "main.reason.fill-band-center": "کف CRF {0} پیش از باند پر کردن رسید، پس VBR دوگذره مستقیماً مرکز باند {1} MB را هدف می‌گیرد",
