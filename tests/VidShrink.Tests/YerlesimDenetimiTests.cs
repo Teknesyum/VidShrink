@@ -336,9 +336,47 @@ public sealed class YerlesimDenetimiTests
         Assert.True(denetim.Kusurlar.Count == 0, dokum);
     }
 
-    private static void KuyruguTara(ShrinkJobWindow pencere, string durum, Denetim denetim)
+    /// <summary>
+    /// Kaydedicinin mini şeridi: içeriğe göre boyutlanan çerçevesiz pencere. Kayıt, duraklatma
+    /// ve geri sayım durumları; sayaç en geniş biçimde ("10:59:59").
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DilKollari))]
+    public void MiniSeritteKesikCakismaTasmaYok(string dil)
     {
-        var genislik = Belirtec(pencere, "TipMaxWidth");
+        var denetim = AppHost.Run(() =>
+        {
+            Strings.Use(dil);
+            var mini = new VidShrink.App.Recorder.RecorderMini();
+            try
+            {
+                mini.Classes.Add("reduced-motion");
+                var d = new Denetim { Dil = dil };
+                mini.Follow(RecorderState.Running, "10:59:59");
+                KuyruguTara(mini, "mini-kayit", d, double.PositiveInfinity);
+                mini.Follow(RecorderState.Paused, "10:59:59");
+                KuyruguTara(mini, "mini-duraklatildi", d, double.PositiveInfinity);
+                mini.Follow(RecorderState.Stopped, "00:00", 10);
+                KuyruguTara(mini, "mini-geri-sayim", d, double.PositiveInfinity);
+                return d;
+            }
+            finally
+            {
+                mini.Close();
+                Strings.Use("en");
+            }
+        });
+
+        var dokum = $"{dil} mini: metin {denetim.Metin}, panel {denetim.Panel}{Environment.NewLine}kusur {denetim.Kusurlar.Count}{Environment.NewLine}"
+            + string.Join(Environment.NewLine, denetim.Kusurlar);
+        _output.WriteLine(dokum);
+        Assert.True(denetim.Metin >= 3, $"yalnız {denetim.Metin} metin ölçüldü");
+        Assert.True(denetim.Kusurlar.Count == 0, dokum);
+    }
+
+    private static void KuyruguTara(Window pencere, string durum, Denetim denetim, double? sinir = null)
+    {
+        var genislik = sinir ?? Belirtec(pencere, "TipMaxWidth");
         pencere.Measure(new Size(genislik, double.PositiveInfinity));
         pencere.Arrange(new Rect(pencere.DesiredSize));
         Dispatcher();
@@ -348,7 +386,7 @@ public sealed class YerlesimDenetimiTests
             foreach (var dugum in pencere.GetVisualDescendants().OfType<Layoutable>()) dugum.InvalidateMeasure();
             kok.InvalidateMeasure();
             kok.Measure(new Size(genislik, double.PositiveInfinity));
-            kok.Arrange(new Rect(new Size(genislik, kok.DesiredSize.Height)));
+            kok.Arrange(new Rect(new Size(double.IsInfinity(genislik) ? kok.DesiredSize.Width : genislik, kok.DesiredSize.Height)));
         }
         foreach (var dugum in pencere.GetVisualDescendants().OfType<Visual>()) dugum.RenderTransform = null;
         Metinler(pencere, durum, denetim);
