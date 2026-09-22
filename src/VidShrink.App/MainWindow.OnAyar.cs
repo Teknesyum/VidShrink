@@ -124,8 +124,10 @@ public partial class MainWindow
 
     /// <summary>
     /// Yonganın uyguladığı şey gömülü yonganınkiyle aynı yüzey: hedef, niyet, kodek,
-    /// doldurma ve kısa kenar. Kaydedilmemiş alan uygulanmıyor, yoksa ön ayar taşımadığı
-    /// bir değeri varsayılana çekerdi.
+    /// doldurma ve kısa kenar; bir de CLI'nın <c>--profil</c> kolunun uyguladığı ses bit hızı
+    /// (HandBrake içe aktarımı taşıyor). Kaydedilmemiş alan uygulanmıyor, yoksa ön ayar
+    /// taşımadığı bir değeri varsayılana çekerdi. Ses bit hızı Gelişmiş panelin merdiveninde
+    /// yoksa en yakın basamağa, eşitlikte yukarıdakine iner.
     /// </summary>
     internal void ApplyUserPreset(PresetProfile preset)
     {
@@ -156,6 +158,10 @@ public partial class MainWindow
             }
         }
 
+        if (preset.AudioKbps is { } kbps)
+            CmbAdvAudioKbps.SelectedIndex = 1 + Array.IndexOf(AdvancedAudioKbpsCandidates,
+                AdvancedAudioKbpsCandidates.OrderBy(c => Math.Abs(c - kbps)).ThenByDescending(c => c).First());
+
         RefreshChipDerivation();
         RefreshSectionSummaries();
     }
@@ -174,7 +180,8 @@ public partial class MainWindow
         Intent = _intent,
         Codec = CodecFromIndex(EffectiveCodecIndex),
         Fill = FillPolicyIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget,
-        MaxShortEdge = FixedResolutionShortSide
+        MaxShortEdge = FixedResolutionShortSide,
+        AudioKbps = CmbAdvAudioKbps.SelectedIndex > 0 ? AdvancedAudioKbpsCandidates[CmbAdvAudioKbps.SelectedIndex - 1] : null
     };
 
     private void OnPresetSave(object? sender, RoutedEventArgs e) => SavePreset(TxtPresetName.Text ?? string.Empty);

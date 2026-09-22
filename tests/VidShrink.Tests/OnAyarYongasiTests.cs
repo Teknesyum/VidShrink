@@ -112,7 +112,8 @@ public sealed class OnAyarYongasiTests : IDisposable
                 Intent = Intent.Archive,
                 Codec = CodecPreference.MaxCompression,
                 Fill = FillPolicy.QualityCeiling,
-                MaxShortEdge = 720
+                MaxShortEdge = 720,
+                AudioKbps = 160
             };
             window.ApplyUserPreset(profil);
             return (window.CurrentPreset("Geri"), profil);
@@ -124,6 +125,31 @@ public sealed class OnAyarYongasiTests : IDisposable
         Assert.Equal(profil.SizeCapped, uygulanan.SizeCapped);
         Assert.Equal(profil.TargetMb, uygulanan.TargetMb);
         Assert.Equal(profil.MaxShortEdge, uygulanan.MaxShortEdge);
+        Assert.Equal(profil.AudioKbps, uygulanan.AudioKbps);
+    }
+
+    /// <summary>
+    /// Ses bit hızı: CLI <c>--profil</c> onu kilitliyordu, pencere düşürüyordu. Merdivende
+    /// olmayan değer en yakın basamağa, eşitlikte yukarıya iner; ses taşımayan profil
+    /// kullanıcının seçtiği kutuya dokunmaz (olumsuz kontrol).
+    /// </summary>
+    [Theory]
+    [InlineData(224, "256")]
+    [InlineData(100, "96")]
+    [InlineData(1000, "320")]
+    public void SesBitHiziMerdivenineIner(int kbps, string beklenen)
+    {
+        var (secilen, dokunulmadi) = Read(window =>
+        {
+            window.ApplyUserPreset(new PresetProfile { Id = "Ses", Name = "Ses", Kind = PresetKind.User, AudioKbps = kbps });
+            var secilen = window.CmbAdvAudioKbps.SelectedItem as string;
+            window.CmbAdvAudioKbps.SelectedIndex = 2;
+            window.ApplyUserPreset(new PresetProfile { Id = "Sessiz", Name = "Sessiz", Kind = PresetKind.User });
+            return (secilen, window.CmbAdvAudioKbps.SelectedIndex);
+        });
+
+        Assert.Equal(beklenen, secilen);
+        Assert.Equal(2, dokunulmadi);
     }
 
     /// <summary>Silme onay istemiyor; geri alma silinen profili dosyaya geri yazıyor.</summary>
