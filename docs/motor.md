@@ -176,7 +176,10 @@ yet. HDR→SDR colour loss is held separate and is never folded into these numbe
 ### Current Limits
 
 
-- **No HDR10+ or Dolby Vision passthrough.** An HDR10+ source is delivered as static HDR10.
+- **No HDR10+ passthrough; Dolby Vision only for profile 8.1.** A Dolby Vision 8.1 source
+  keeps its RPU through libx265 and SVT-AV1 (`-dolbyvision 1`, plus `-strict unofficial`
+  in MP4/MOV). HDR10+, other Dolby Vision profiles, hardware encoders and a colour-matrix
+  conversion all fall back to static HDR10, and the plan says so in its reason line.
 - **No right-click menu on macOS or Linux.** Windows only, and nothing equivalent is
   installed elsewhere.
 - **No FFmpeg or libmpv in the box.** The installers fetch them (WinGet, or a pinned and
