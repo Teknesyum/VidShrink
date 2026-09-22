@@ -1312,6 +1312,27 @@ tümden durdururdu.
    davranışı budur) ve `Unmeasured`ın "çalışmıyor"a çökmediği ayrı pimlenir. Mutasyon:
    tetiği kaldırmak, üçüncü durumu iki duruma çökertmek, hdr10 kolunu düşürmek.
 
+## C1-7 — Ön ayar içe/dışa aktarma pencereye bağlanıyor (22 Eylül 2026)
+
+### Bulgu
+
+A2 planının 2. ve 3. maddesi yarım: `PresetLibrary.Import`/`Export` ve
+`HandBrakePresetImport.TranslateFile` Core'da hazır, `main.preset.handbrake.*` anahtarları 42
+dilde duruyor, ama pencerede de CLI'da da onları çağıran tek kol yok.
+
+### Karar
+
+1. "+" açılır penceresine iki düğme: **İçe aktar…** ve **Dışa aktar…**.
+2. İçe aktarma önce VidShrink dosyası dener; `HandBrakeFile` hatası gelirse HandBrake
+   çevirisine geçer. Kaydedilen her profil kullanıcı türünde.
+3. Aynı kimlik ezilmez: var olan (kullanıcı ya da gömülü) kimliğe `-2`, `-3` eklenir, ad
+   ` (2)` alır. İçe aktarma kullanıcının elindekini sessizce silmez.
+4. Bildirim: kaç ön ayar geldiği; HandBrake'te taşınmayan her alan
+   `alan: sebep` satırıyla (`PresetFieldNote.LocaleKey`).
+5. Dışa aktarma kullanıcının ön ayarlarını tek dosyaya yazar; hiç yoksa söyler.
+6. Yeni anahtarlar 42 dilde. Ölçü: `OnAyarAktarimTests` — iki dosya türü, çakışma, not
+   satırı, dışa-içe gidiş dönüş; her kolun olumsuz kontrolü ve mutasyon.
+
 ## B1a — Çok kanallı ses: ac3/eac3 kodlama, flac kapsam dışı (19 Eylül 2026)
 
 HandBrake açığının B1a maddesi "flac/ac3/eac3 kodlama" diyordu. Danışma maddeyi ikiye böldü

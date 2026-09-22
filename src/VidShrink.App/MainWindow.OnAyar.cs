@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using VidShrink.Core;
 
@@ -282,6 +283,137 @@ public partial class MainWindow
         _deletedPreset = null;
         PresetUndoBar.IsVisible = false;
         RefreshUserChips();
+        return true;
+    }
+
+    private async void OnPresetImport(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                AllowMultiple = false,
+                FileTypeFilter = new[]
+                {
+                    new FilePickerFileType(Say("main.preset.file-type")) { Patterns = new[] { "*.json" } },
+                    FilePickerFileTypes.All
+                }
+            });
+            if (files.Count > 0 && files[0].TryGetLocalPath() is { } path) ImportPresets(path);
+        }
+        catch (Exception ex)
+        {
+            ShowPresetNotice(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// İçe aktarma (<c>docs/plan.md</c> C1-7). Önce VidShrink dosyası deneniyor; dosya
+    /// HandBrake'inse çeviriye geçiliyor. Var olan kimlik ezilmiyor, gelen profil <c>-2</c>
+    /// ekiyle yanına yazılıyor. HandBrake'te ön ayar başına bir sayım satırı ve yalnız
+    /// yaklaşık taşınan alanlar yazılıyor: gerçek dosya yüze yakın alan taşıyor, düşenlerin
+    /// hepsini sıralamak bildirimi boğardı.
+    /// </summary>
+    internal bool ImportPresets(string path)
+    {
+        var lines = new List<string>();
+        int count;
+        try
+        {
+            IReadOnlyList<PresetProfile> incoming;
+            try
+            {
+                incoming = PresetLibrary.Parse(File.ReadAllText(path));
+            }
+            catch (PresetFileException ex) when (ex.Error == PresetFileError.HandBrakeFile)
+            {
+                var translations = HandBrakePresetImport.TranslateFile(path);
+                incoming = translations.Select(t => t.Profile).ToList();
+                foreach (var t in translations)
+                {
+                    var fields = t.Notes.Where(note => note.Reason != PresetNoteReason.Structural).ToList();
+                    lines.Add(Say("main.preset.import.summary", t.PresetName,
+                        fields.Count(note => note.Outcome == PresetNoteOutcome.Carried),
+                        fields.Count(note => note.Outcome == PresetNoteOutcome.Approximated),
+                        fields.Count(note => note.Outcome == PresetNoteOutcome.Dropped)));
+                    lines.AddRange(fields.Where(note => note.Outcome == PresetNoteOutcome.Approximated)
+                        .Select(note => $"{note.Field}: {Say(note.LocaleKey)}"));
+                }
+            }
+
+            var stored = _userPresets.ToList();
+            foreach (var profile in incoming)
+                stored = PresetLibrary.SaveUser(Unique(profile, stored), PresetPath).ToList();
+            count = incoming.Count;
+            _userPresets.Clear();
+            _userPresets.AddRange(stored);
+        }
+        catch (Exception ex) when (ex is PresetFileException or IOException or UnauthorizedAccessException)
+        {
+            ShowPresetNotice(ex is PresetFileException preset ? Say(preset.LocaleKey, preset.Detail) : ex.Message);
+            return false;
+        }
+
+        RefreshUserChips();
+        ShowPresetNotice(string.Join("\n", lines.Prepend(Say("main.preset.imported", count))));
+        return true;
+    }
+
+    private static PresetProfile Unique(PresetProfile profile, IReadOnlyList<PresetProfile> stored)
+    {
+        bool Taken(string id) => PresetLibrary.BuiltIn.Find(id) is not null
+            || stored.Any(p => string.Equals(p.Id, id, StringComparison.OrdinalIgnoreCase));
+
+        if (!Taken(profile.Id)) return profile;
+        var n = 2;
+        while (Taken($"{profile.Id}-{n}")) n++;
+        return profile with { Id = $"{profile.Id}-{n}", Name = $"{profile.Name ?? profile.Id} ({n})" };
+    }
+
+    private async void OnPresetExport(object? sender, RoutedEventArgs e)
+    {
+        if (_userPresets.Count == 0)
+        {
+            ShowPresetNotice(Say("main.preset.export-empty"));
+            return;
+        }
+
+        try
+        {
+            var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                SuggestedFileName = "vidshrink-presets.json",
+                DefaultExtension = "json",
+                FileTypeChoices = new[] { new FilePickerFileType(Say("main.preset.file-type")) { Patterns = new[] { "*.json" } } }
+            });
+            if (file?.TryGetLocalPath() is { } path) ExportPresets(path);
+        }
+        catch (Exception ex)
+        {
+            ShowPresetNotice(ex.Message);
+        }
+    }
+
+    /// <summary>Dışa aktarma kullanıcının ön ayarlarını içe aktarmanın okuduğu biçimde yazar.</summary>
+    internal bool ExportPresets(string path)
+    {
+        if (_userPresets.Count == 0)
+        {
+            ShowPresetNotice(Say("main.preset.export-empty"));
+            return false;
+        }
+
+        try
+        {
+            PresetLibrary.Export(_userPresets, path);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            ShowPresetNotice(ex.Message);
+            return false;
+        }
+
+        ShowPresetNotice(Say("main.preset.exported", _userPresets.Count));
         return true;
     }
 }

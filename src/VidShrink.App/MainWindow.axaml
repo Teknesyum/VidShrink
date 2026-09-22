@@ -419,6 +419,13 @@
                               <TextBlock x:Name="TxtPresetNotice" Theme="{StaticResource Hint}"
                                          TextWrapping="Wrap" IsVisible="False"/>
                               <Button x:Name="BtnPresetSave" Content="{loc:Text main.preset.save}" Click="OnPresetSave"/>
+                              <Border Theme="{StaticResource PanelRule}"/>
+                              <WrapPanel>
+                                <Button x:Name="BtnPresetImport" Content="{loc:Text main.preset.import}" Theme="{StaticResource GhostButton}"
+                                        Margin="{StaticResource WrapItemMargin}" Click="OnPresetImport"/>
+                                <Button x:Name="BtnPresetExport" Content="{loc:Text main.preset.export}" Theme="{StaticResource GhostButton}"
+                                        Margin="{StaticResource WrapItemMargin}" Click="OnPresetExport"/>
+                              </WrapPanel>
                             </StackPanel>
                           </Flyout>
                         </Button.Flyout>
