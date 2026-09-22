@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "koder {0} nije izmjeren na ovom računalu, pa se kodiranje vraća na {1}",
   "main.reason.encoder-fallback-not-working": "koder {0} nije se mogao koristiti na ovom računalu, pa se kodiranje vraća na {1}",
   "main.reason.hdr-tonemapped": "izvornik je HDR, ali odabrani koder ne može zadržati 10 bita, pa je tonski preslikan u SDR BT.709",
+  "main.reason.hdr-dynamic-dropped": "izvornik nosi dinamičke HDR metapodatke (HDR10+ ili Dolby Vision) koje ovo kodiranje ne prenosi, pa izlaz zadržava samo statički HDR10 sloj",
   "main.reason.stream.audio-passthrough": "audiozapis kopira se nepromijenjen: spremnik podržava njegov kodek i ostaje unutar 15 % cilja",
   "main.reason.stream.audio-downmixed": "surround audiozapis miješa se u stereo pri ponovnom kodiranju",
   "main.reason.stream.extra-audio-dropped": "zadržava se samo jedan audiozapis; uključite 'Zadrži sve zapise' da se svi prenesu u MKV",

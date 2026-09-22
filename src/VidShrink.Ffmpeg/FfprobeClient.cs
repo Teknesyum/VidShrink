@@ -62,6 +62,10 @@ public static class FfprobeClient
 
         var pixFmt = GetString(v, "pix_fmt");
         var colorTransfer = GetString(v, "color_transfer");
+        var isHdr = colorTransfer is "smpte2084" or "arib-std-b67"
+            || (GetString(v, "color_primaries") is "bt2020" && (pixFmt?.Contains("10le") ?? false));
+        var dolbyVision = ParseDolbyVision(v);
+        var hdr10Plus = isHdr && await HasHdr10PlusAsync(filePath, GetInt(v, "index") ?? 0, ct);
         var fieldOrder = GetString(v, "field_order");
 
         var titles = Basliklar(root, duration, DisplayDimensions(v), inventory.Count, chapters.Count);
@@ -79,8 +83,10 @@ public static class FfprobeClient
             VideoCodec = GetString(v, "codec_name") ?? "unknown",
             TotalBitrateBps = ParseLong(format, "bit_rate") ?? (long)(fileSize * 8 / duration),
             PixelFormat = pixFmt,
-            IsHdr = colorTransfer is "smpte2084" or "arib-std-b67"
-                || (GetString(v, "color_primaries") is "bt2020" && (pixFmt?.Contains("10le") ?? false)),
+            IsHdr = isHdr,
+            DolbyVisionProfile = dolbyVision.Profile,
+            DolbyVisionCompatibilityId = dolbyVision.CompatibilityId,
+            HasHdr10Plus = hdr10Plus,
             ColorPrimaries = GetString(v, "color_primaries"),
             ColorTransfer = colorTransfer,
             ColorSpace = GetString(v, "color_space"),
@@ -265,6 +271,64 @@ public static class FfprobeClient
             return $"G({Chroma(gx.Value)},{Chroma(gy.Value)})B({Chroma(bx.Value)},{Chroma(by.Value)})R({Chroma(rx.Value)},{Chroma(ry.Value)})WP({Chroma(wx.Value)},{Chroma(wy.Value)})L({Luma(maxLum.Value)},{Luma(minLum.Value)})";
         }
         return null;
+    }
+
+    internal static (int? Profile, int? CompatibilityId) ParseDolbyVision(JsonElement stream)
+    {
+        if (!stream.TryGetProperty("side_data_list", out var list) || list.ValueKind != JsonValueKind.Array) return (null, null);
+        foreach (var item in list.EnumerateArray())
+        {
+            if (GetString(item, "side_data_type") != "DOVI configuration record") continue;
+            return (GetInt(item, "dv_profile"), GetInt(item, "dv_bl_signal_compatibility_id"));
+        }
+        return (null, null);
+    }
+
+    internal static bool FrameCarriesHdr10Plus(string frameJson)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(frameJson);
+            if (!doc.RootElement.TryGetProperty("frames", out var frames) || frames.ValueKind != JsonValueKind.Array) return false;
+            foreach (var frame in frames.EnumerateArray())
+            {
+                if (!frame.TryGetProperty("side_data_list", out var list) || list.ValueKind != JsonValueKind.Array) continue;
+                foreach (var item in list.EnumerateArray())
+                    if (GetString(item, "side_data_type") is { } type && type.Contains("SMPTE2094-40", StringComparison.Ordinal))
+                        return true;
+            }
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+        return false;
+    }
+
+    private static async Task<bool> HasHdr10PlusAsync(string filePath, int streamIndex, CancellationToken ct)
+    {
+        var args = new[]
+        {
+            "-hide_banner", "-v", "error",
+            "-select_streams", streamIndex.ToString(CultureInfo.InvariantCulture),
+            "-read_intervals", "%+#1",
+            "-show_frames", "-show_entries", "frame_side_data=side_data_type",
+            "-of", "json", filePath
+        };
+        try
+        {
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, args) };
+            process.Start();
+            var stderrTask = process.StandardError.ReadToEndAsync(ct);
+            var stdout = await process.StandardOutput.ReadToEndAsync(ct);
+            await stderrTask;
+            await process.WaitForExitAsync(ct);
+            return process.ExitCode == 0 && FrameCarriesHdr10Plus(stdout);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return false;
+        }
     }
 
     private static string? ParseContentLightLevel(JsonElement stream)

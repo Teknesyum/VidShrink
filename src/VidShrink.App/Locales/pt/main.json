@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "o codificador {0} não foi medido nesta máquina, então a codificação recorre a {1}",
   "main.reason.encoder-fallback-not-working": "o codificador {0} não pôde ser usado nesta máquina, então a codificação recorre a {1}",
   "main.reason.hdr-tonemapped": "a fonte é HDR mas o codificador selecionado não preserva 10 bits, então foi mapeada para SDR BT.709",
+  "main.reason.hdr-dynamic-dropped": "a fonte traz metadados HDR dinâmicos (HDR10+ ou Dolby Vision) que esta codificação não transmite, então a saída mantém apenas a camada HDR10 estática",
   "main.reason.stream.audio-passthrough": "a faixa de áudio é copiada como está: o contêiner suporta o codec e ela fica dentro de 15% do alvo",
   "main.reason.stream.audio-downmixed": "uma faixa de áudio surround é mixada para estéreo ao ser recodificada",
   "main.reason.stream.extra-audio-dropped": "apenas uma faixa de áudio é mantida; ative 'Manter todas as faixas' para levar todas em MKV",

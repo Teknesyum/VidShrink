@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "codorul {0} nu a fost măsurat pe acest calculator, deci codarea revine la {1}",
   "main.reason.encoder-fallback-not-working": "codorul {0} nu a putut fi folosit pe acest calculator, deci codarea revine la {1}",
   "main.reason.hdr-tonemapped": "sursa este HDR, dar codorul ales nu poate păstra 10 biți, deci a fost mapată tonal în SDR BT.709",
+  "main.reason.hdr-dynamic-dropped": "sursa conține metadate HDR dinamice (HDR10+ sau Dolby Vision) pe care această codare nu le transmite, deci ieșirea păstrează doar stratul HDR10 static",
   "main.reason.stream.audio-passthrough": "pista audio este copiată ca atare: containerul acceptă codecul ei și rămâne în limita a 15% din țintă",
   "main.reason.stream.audio-downmixed": "o pistă audio surround este mixată în stereo la recodare",
   "main.reason.stream.extra-audio-dropped": "se păstrează o singură pistă audio; activați 'Păstrează toate pistele' pentru a le duce pe toate în MKV",

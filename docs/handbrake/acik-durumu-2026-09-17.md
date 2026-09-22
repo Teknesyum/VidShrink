@@ -202,7 +202,7 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | B1f yakma | **dalda**, yalnız metin altyazı | `VideoFilterChain.BurnFilter` (`subtitles=...:si=N`), CLI `--yak N`; PGS overlay ister, reddedilir; `AltyaziYakmaTests` |
 | B2 küçültmeye aralık | denetlenmedi | bu turda okunmadı |
 | B3 VT plan yolu / VP9 küçültme | VP9 **girdi (23 Eylül)**; VT **ölçüldü, kapıdan kaldı** (23 Eylül denetimi) | VT: K2 2/8, K4 5/8, bağlantı geri alındı, kapı `PlanParserTests.ParserStillRejectsVideoToolboxEncoders` ile kapalı (`docs/olcumler/videotoolbox-hizli.md`). VP9: `-b:v` + `-pass 1/2`, `-deadline good -cpu-used 4 -row-mt 1`, kap WebM, ses opus; WebM'in taşımadığı iz `WebmStreamDropped` notuyla düşer; HandBrake `av_webm`/`VP9` artık gerçek kol (kilit `libvpx-vp9`). cpu-used ve vp9 CRF ölçeği ölçülmedi. `Vp9KucultmeTests`, mutasyonlar `docs/olcumler/vp9-kucultme-mutasyonlar.md` |
-| B4 HDR10+/DV | yapılmadı | `hdr10plus\|dolby\|dovi\|dynamic_hdr` taraması 0 sonuç |
+| B4 HDR10+/DV | **girdi (23 Eylül)** | DV 8.1 x265/SVT-AV1'de taşınıyor, MP4'te `-strict unofficial`; HDR10+ ve taşınamayan DV gerekçeye düşüyor; `HdrDinamikTests`, ölçüm `docs/olcumler/b4-hdr-dinamik.md` |
 | C1-1 `Saturated` satırı | **girdi (22 Eylül)** | `MainWindow.SaturatedSuffix`, `ShrinkJobWindow.BittiSatiri`; `main.run.saturated` 42 dilde; `DoygunTeslimTests` 4/4, iki mutasyon kırmızı |
 | C1-2 kuyruk düzenleme | **girdi (22 Eylül)** | bekleyen listesi, yukarı/aşağı/çıkar, sırayı duraklat (`ShrinkJobWindow`, `KuyrukDuzenlemeTests`) |
 | C1-3 klasör bırakma | girdi (22 Eylül) | klasör ya da çoklu video kuyruk penceresine, pencerenin seçenekleriyle (`Core/DroppedMedia`, `KlasorBirakmaTests`) |

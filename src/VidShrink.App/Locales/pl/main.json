@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "koder {0} nie został zmierzony na tej maszynie, więc kodowanie wraca do {1}",
   "main.reason.encoder-fallback-not-working": "kodera {0} nie można użyć na tej maszynie, więc kodowanie wraca do {1}",
   "main.reason.hdr-tonemapped": "źródło jest HDR, ale wybrany koder nie zachowa 10 bitów, więc zmapowano tony do SDR BT.709",
+  "main.reason.hdr-dynamic-dropped": "źródło zawiera dynamiczne metadane HDR (HDR10+ lub Dolby Vision), których to kodowanie nie przenosi, więc wynik zachowuje tylko statyczną warstwę HDR10",
   "main.reason.stream.audio-passthrough": "ścieżka dźwiękowa jest kopiowana bez zmian: kontener obsługuje jej kodek i mieści się w 15% celu",
   "main.reason.stream.audio-downmixed": "ścieżka dźwięku przestrzennego jest miksowana do stereo podczas ponownego kodowania",
   "main.reason.stream.extra-audio-dropped": "zachowywana jest tylko jedna ścieżka dźwiękowa; włącz 'Zachowaj wszystkie ścieżki', aby przenieść wszystkie w MKV",

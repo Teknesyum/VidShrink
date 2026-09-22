@@ -72,7 +72,8 @@ public enum ReasonCode
     ManualEncoderPathUnmet,
     ManualEncoderPathSupersededByCodec,
     ManualOverrideDroppedOnPassThrough,
-    DarkContentHevc
+    DarkContentHevc,
+    HdrDynamicMetadataDropped
 }
 
 public sealed record ReasonNote(
@@ -114,6 +115,9 @@ public sealed class EncodePlan
     [JsonPropertyName("pixelFormat")] public string PixelFormat { get; set; } = "yuv420p";
     [JsonIgnore] public string? HdrVideoFilter { get; set; }
     [JsonIgnore] public List<string> HdrColorArgs { get; set; } = new();
+
+    /// <summary>Kaynagin DV 8.1 RPU'su ciktiya tasinacak; bkz. <see cref="HdrResolution.DolbyVisionCarried"/>.</summary>
+    [JsonIgnore] public bool DolbyVisionCarried { get; set; }
     [JsonIgnore] public VideoFilterOptions Filters { get; set; } = VideoFilterOptions.Default;
     [JsonIgnore] public CropRect? SuggestedCrop { get; set; }
     [JsonPropertyName("extraArgs")] public List<string> ExtraArgs { get; set; } = new();

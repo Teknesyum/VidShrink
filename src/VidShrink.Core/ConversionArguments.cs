@@ -56,6 +56,7 @@ public static class ConversionArguments
         }
 
         var filters = VideoFilters(info, plan);
+        var dolbyVision = false;
         if (plan.Gif)
         {
             if (palettePath is null)
@@ -78,7 +79,9 @@ public static class ConversionArguments
         }
         else
         {
-            var hdr = HdrResolver.Resolve(info, plan.HdrPolicy, plan.VideoCodec, availability);
+            var hdr = HdrResolver.Resolve(info, plan.HdrPolicy, plan.VideoCodec, availability,
+                dolbyVisionCarriable: FfmpegArguments.SupportsRateLimits(plan.VideoCodec) is false);
+            dolbyVision = hdr.DolbyVisionCarried;
             if (!string.IsNullOrEmpty(hdr.VideoFilter)) filters.Add(hdr.VideoFilter);
             if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
 
@@ -88,9 +91,11 @@ public static class ConversionArguments
                 : new[] { "-b:v", $"{plan.VideoBitrateK}k" });
             a.AddRange(new[] { "-pix_fmt", hdr.PixelFormat });
             if (hdr.ColorArgs.Count > 0) a.AddRange(hdr.ColorArgs);
+            if (dolbyVision) a.AddRange(HdrResolver.DolbyVisionArgs);
         }
         AddAudio(a, plan);
         if (plan.Container is "mp4" or "mov" or "m4a") a.AddRange(new[] { "-movflags", "+faststart" });
+        if (dolbyVision && plan.Container is "mp4" or "mov") a.AddRange(HdrResolver.Mp4DolbyVisionArgs);
         a.Add(outputPath);
         return a;
     }

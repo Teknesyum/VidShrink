@@ -174,7 +174,10 @@ yok. HDR→SDR renk kaybı ayrı tutulur ve bu sayılara karıştırılmaz.
 ### Bugünkü sınırlar
 
 
-- **HDR10+ ve Dolby Vision taşınmıyor.** HDR10+ kaynak duruk HDR10 olarak teslim edilir.
+- **HDR10+ taşınmıyor; Dolby Vision yalnız profil 8.1.** Dolby Vision 8.1 kaynağın RPU'su
+  libx265 ve SVT-AV1'de korunur (`-dolbyvision 1`, MP4/MOV'da ayrıca `-strict unofficial`).
+  HDR10+, öteki Dolby Vision profilleri, donanım kodlayıcıları ve renk matrisi dönüşümü
+  duruk HDR10'a düşer; plan bunu gerekçe satırında söyler.
 - **macOS ve Linux'ta sağ tık menüsü yok.** Yalnız Windows'ta var, ötekilere benzeri bir
   şey kurulmuyor.
 - **FFmpeg kutunun içinde gelmiyor.** Kurucular onu paket yöneticinizden çeker ya da

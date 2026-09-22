@@ -23,6 +23,21 @@ public sealed record MediaInfo
     public int BitDepth { get; init; } = 8;
     public string? MasteringDisplayMetadata { get; init; }
     public string? ContentLightLevel { get; init; }
+
+    /// <summary>
+    /// Kaynagin Dolby Vision profili, akisin <c>DOVI configuration record</c> kaydindan.
+    /// DV tasimayan kaynakta <c>null</c>.
+    /// </summary>
+    public int? DolbyVisionProfile { get; init; }
+
+    /// <summary>DV taban katmaninin uyumluluk kimligi: profil 8.1'de 1 (HDR10), 8.4'te 4 (HLG).</summary>
+    public int? DolbyVisionCompatibilityId { get; init; }
+
+    public bool HasDolbyVision => DolbyVisionProfile is not null;
+
+    /// <summary>Ilk karede HDR10+ (SMPTE 2094-40) dinamik meta verisi var. Yalniz HDR kaynakta yoklanir.</summary>
+    public bool HasHdr10Plus { get; init; }
+
     public bool IsInterlaced { get; init; }
     public string? FieldOrder { get; init; }
     public IReadOnlyList<SourceStream> Streams { get; init; } = Array.Empty<SourceStream>();

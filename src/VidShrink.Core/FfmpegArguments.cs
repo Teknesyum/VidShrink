@@ -556,6 +556,8 @@ public static class FfmpegArguments
         a.AddRange(psychovisualArgs);
         a.AddRange(plan.HdrColorArgs);
         a.AddRange(VideoFilterChain.ColorArgs(plan));
+        var dolbyVision = CarriesDolbyVision(info, plan);
+        if (dolbyVision) a.AddRange(HdrResolver.DolbyVisionArgs);
 
         if (pass == 1)
         {
@@ -570,6 +572,8 @@ public static class FfmpegArguments
         a.AddRange(streams.OutputArguments(dropChapters: plan.Trim is not null));
         if (StreamMapping.IsMp4Family(streams.Container))
             a.AddRange(new[] { "-movflags", "+faststart" });
+        if (dolbyVision && StreamMapping.IsMp4Family(streams.Container))
+            a.AddRange(HdrResolver.Mp4DolbyVisionArgs);
         a.AddRange(cover ? plan.ExtraArgs.Select(arg => arg is "-level" or "-level:v" ? "-level:v:0" : arg) : plan.ExtraArgs);
         a.Add(outputPath);
         return MergeEncoderParams(a);
@@ -697,6 +701,16 @@ public static class FfmpegArguments
             args.AddRange(new[] { "-rc-lookahead", "20", "-lookahead_level", "3" });
         return args;
     }
+
+    /// <summary>
+    /// Plan DV tasiyor ve plandan sonra acilan bir ton esleme ya da renk matrisi donusumu
+    /// yok: ikisi de RPU'yu dusurur ve <c>-dolbyvision 1</c> altinda kodlama durur.
+    /// </summary>
+    private static bool CarriesDolbyVision(MediaInfo info, EncodePlan plan)
+        => plan.DolbyVisionCarried
+           && string.IsNullOrEmpty(plan.HdrVideoFilter)
+           && VideoFilterChain.ColorMatrixFilter(info, (plan.Filters ?? VideoFilterOptions.Default).ColorMatrix) is null
+           && HdrResolver.CarriesDolbyVision(info, plan.Codec);
 
     public static IReadOnlyList<string> PsychovisualAndColorArgs(string codec,
         IReadOnlyList<string> psychovisualArgs, IReadOnlyList<string> colorArgs)

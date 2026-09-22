@@ -11,8 +11,8 @@ KAPALI satırı bağımsız denetledim, yedisi de gösterdiği satırda duruyord
 
 | Hüküm | Sayı |
 | --- | --- |
-| KAPALI — karşılığı var | 64 |
-| AÇIK — yok, kullanıcıya değer katar | 35 |
+| KAPALI — karşılığı var | 65 |
+| AÇIK — yok, kullanıcıya değer katar | 34 |
 | KAPSAM DIŞI — ürüne uymuyor | 55 |
 | Toplam | 154 |
 
@@ -34,9 +34,11 @@ orana ölçeklenir. `--non-anamorphic`, `--auto-anamorphic`, `--itu-par`,
 açtığını geri kapatır; VidShrink'in ön ayar kartında süzgeç alanı yok, süzgeçler varsayılan
 kapalı. Tek istisna çözgü: kendiliğinden açılıyor ve kapatma ucu yok.
 
-## Açık kalan 35 bayrak
+## Açık kalan 34 bayrak
 
-`--arate`, `--auto-anamorphic`, `--cfr`, `--chroma-smooth`, `--crop`, `--crop-mode`, `--deblock`, `--denoise`, `--detelecine`, `--drc`, `--encoder-level-list`, `--encoder-profile-list`, `--first-subtitle`, `--grayscale`, `--hdr-dynamic-metadata`, `--hqdn3d`, `--max-duration`, `--nlmeans`, `--no-bwdif`, `--no-deinterlace`, `--no-metadata`, `--non-anamorphic`, `--normalize-mix`, `--pad`, `--pfr`, `--preset-import-file`, `--preset-list`, `--rotate`, `--srt-burn`, `--srt-file`, `--ssa-burn`, `--ssa-file`, `--subtitle-burned`, `--subtitle-lang-list`, `--unsharp`
+`--arate`, `--auto-anamorphic`, `--cfr`, `--chroma-smooth`, `--crop`, `--crop-mode`, `--deblock`, `--denoise`, `--detelecine`, `--drc`, `--encoder-level-list`, `--encoder-profile-list`, `--first-subtitle`, `--grayscale`, `--hqdn3d`, `--max-duration`, `--nlmeans`, `--no-bwdif`, `--no-deinterlace`, `--no-metadata`, `--non-anamorphic`, `--normalize-mix`, `--pad`, `--pfr`, `--preset-import-file`, `--preset-list`, `--rotate`, `--srt-burn`, `--srt-file`, `--ssa-burn`, `--ssa-file`, `--subtitle-burned`, `--subtitle-lang-list`, `--unsharp`
+
+`--hdr-dynamic-metadata` 23 Eylül'de B4 ile kapandı (`docs/olcumler/b4-hdr-dinamik.md`); sayı ona göre.
 
 ## Tam tablo
 
@@ -95,7 +97,7 @@ kapalı. Tek istisna çözgü: kendiliğinden açılıyor ve kapatma ucu yok.
 | `--format` | Kapsayıcı seçer, verilmezse çıktı adından türetir (help:110-115). | `src/VidShrink.Core/StreamMapping.cs:186-199` (uzantıdan kapsayıcı) ve arayüz `src/VidShrink.App/MainWindow.axaml:889-896` (MP4/MKV/WebM/MOV/AVI/GIF/MP3) | KAPALI |
 | `--gain` | Kodlamadan önce sesi dB olarak yükseltir/kısar (help:318-322). | yok | KAPSAM DIŞI — ürün hedef boya sıkıştırır; ses seviyesini **düzenlemek** ayrı bir iş. Oynatıcıdaki ses düzeyi (`src/VidShrink.App/Playback/PlayerView.axaml.cs`, `VolumeLevel`/`SetVolume`) yalnız dinlemeyi etkiler, kodlanan akışa girmez |
 | `--grayscale` | Gri tonlamalı kodlama (help:642). | `src/VidShrink.Core/VideoFilterChain.cs:89` ve `:193` — motor tarafı hazır, ama **yüzey yok**: `VideoFilterChain.Parse` yalnız testlerden çağrılıyor, CLI'da bayrak, arayüzde kutu yok | AÇIK |
-| `--hdr-dynamic-metadata` | HDR10+/Dolby Vision dinamik verisini taşır (help:212-216). | **kısmi ve yetmiyor**: `src/VidShrink.Core/HdrResolver.cs:44-57` yalnız statik HDR10'u (master-display, max-cll) taşıyor; dinamik veri yolu yok | AÇIK |
+| `--hdr-dynamic-metadata` | HDR10+/Dolby Vision dinamik verisini taşır (help:212-216). | **kısmi, karar kapsamında tam**: DV 8.1 `src/VidShrink.Core/HdrResolver.cs:103-104` + `src/VidShrink.Core/FfmpegArguments.cs:548-549,564-565` ile x265/SVT-AV1'de taşınıyor (MP4'te `-strict unofficial`); HDR10+ ve taşınamayan DV `src/VidShrink.Core/PlanCalculator.cs:396-399` ile gerekçeye düşüyor. HDR10+ taşıma açık iş (tam çözme + `dhdr10-info`), profil 5 kapsam dışı (`handbrake-yanit.md:114-116`). Ölçüm `docs/olcumler/b4-hdr-dinamik.md` | KAPALI (B4, 23 Eylül) |
 | `--height` | Depolama yüksekliğini piksel olarak belirler (help:350). | `src/VidShrink.Core/PlanCalculator.cs:93-98` (`FixedResolution`, kısa kenar) ve arayüz `src/VidShrink.App/MainWindow.axaml:959-979` (2160/1440/1080/720/480/özel) | KAPALI |
 | `--hqdn3d` | hqdn3d ile gürültü azaltma, dört güç kademesi (help:479-491). | `src/VidShrink.Core/VideoFilterChain.cs:222-226` (`hqdn3d=…`, üç kademe) — motorda var, **yüzey yok** (grayscale ile aynı boşluk) | AÇIK |
 | `--inline-parameter-sets` | Her IDR öncesine SPS/PPS gömerek uyarlamalı yayına uygun çıktı üretir (help:130-132). | yok | KAPSAM DIŞI — ürün tek dosya teslim ediyor; DASH/HLS paketleme yolu yok, MP4 tarafında yapılan tek şey `+faststart` (`src/VidShrink.Core/FfmpegArguments.cs:542`) |
@@ -132,7 +134,7 @@ kapalı. Tek istisna çözgü: kendiliğinden açılıyor ve kapatma ucu yok.
 | `--no-detelecine` | Ön ayarın açtığı detelecine'i kapatır. | yok | KAPSAM DIŞI — detelecine varsayılan kapalı (`VideoFilterChain.cs:55`), hiçbir ön ayar açmıyor; kapatılacak bir şey yok. |
 | `--no-dvdnav` | DVD okumada dvdnav kitaplığını kullanmaz. | yok — VidShrink DVD'yi ffmpeg'in `dvdvideo` demuxer'ıyla okuyor (`src/VidShrink.Core/SourceTitles.cs:35`) | KAPSAM DIŞI — dvdnav/libdvdread seçimi HandBrake'in kendi okuma yoluna ait; VidShrink'te böyle bir kol yok. |
 | `--no-grayscale` | Ön ayarın açtığı gri kodlamayı kapatır. | yok | KAPSAM DIŞI — gri varsayılan kapalı (`VideoFilterChain.cs:62`), hiçbir ön ayar açmıyor. |
-| `--no-hdr-dynamic-metadata` | HDR10+/Dolby Vision dinamik meta veri taşımasını kapatır. | `src/VidShrink.Core/HdrResolver.cs:51` — yalnız statik HDR10 (`hdr10-opt=1`) korunuyor, dinamik meta veri zaten taşınmıyor | KAPSAM DIŞI — bayrağın istediği davranış VidShrink'in hâlihazırdaki davranışı; açılıp kapatılacak bir kol yok. |
+| `--no-hdr-dynamic-metadata` | HDR10+/Dolby Vision dinamik meta veri taşımasını kapatır. | B4'ten sonra DV 8.1 kendiliğinden taşınıyor (`src/VidShrink.Core/HdrResolver.cs:103-104`); kapatan bayrak yok, ton eşleme ya da renk matrisi seçilince kendiliğinden kapanıyor | KAPSAM DIŞI — kapatma kolu istenmedi; taşıma kapanınca gerekçe satırı söylüyor (`HdrDynamicMetadataDropped`). |
 | `--no-hqdn3d` | Ön ayarın açtığı hqdn3d'yi kapatır. | yok | KAPSAM DIŞI — hqdn3d varsayılan kapalı (`VideoFilterChain.cs:56`), hiçbir ön ayar açmıyor. |
 | `--no-ipod-atom` | Ön ayarın eklediği iPod 5G uyumluluk atomunu eklemez. | yok | KAPSAM DIŞI — iPod 5G atomu VidShrink'in hedef kitlesi değil; kap kararı mp4/mkv/webm ile sınırlı. |
 | `--no-itu-par` | Loose/custom anamorfikte geniş ITU PAR değerlerini kullanmaz. | yok | KAPSAM DIŞI — VidShrink PAR/anamorfiğe hiç dokunmuyor; kaynak taraması `setsar`/`sample_aspect` geçen tek satır bulamadı. |
