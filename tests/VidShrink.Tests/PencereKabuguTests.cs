@@ -29,8 +29,10 @@ public class PencereKabuguTests
     }
 
     /// <summary>
-    /// Şablonda içerik iki satırı da kaplıyor ve sekme şeridi ondan sonra bildiriliyor:
-    /// şerit içeriğin üstünde duruyor, göründüğünde içeriği aşağı itmiyor.
+    /// Sekme şeridi içerikten sonra bildiriliyor, üstte kalıyor. Oynatıcı sekmesinde içerik
+    /// iki satırı da kaplıyor: kendiliğinden gizlenen şerit göründüğünde görüntüyü aşağı
+    /// itmiyor. Diğer sekmelerde şerit sabit durduğu için içerik ikinci satırdan başlıyor;
+    /// kayan sayfa ve kaydırma çubuğu şeridin altına girmiyor (<c>YerlesimDenetimiTests</c>).
     /// </summary>
     [Fact]
     public void SekmeSeridiIcerigiItmiyor()
@@ -42,7 +44,11 @@ public class PencereKabuguTests
 
         Assert.True(icerik > 0 && serit > 0, "şablonun iki parçası da bulunmalı");
         Assert.True(icerik < serit, "şerit içerikten sonra bildirilmeli ki üstte kalsın");
-        Assert.Contains("Grid.RowSpan=\"2\"", controls[icerik..serit]);
+        Assert.Contains("Grid.Row=\"1\"", controls[icerik..serit]);
+        var oynatici = controls.IndexOf("^[SelectedIndex=0] /template/ TransitioningContentControl#SelectedContentHost", StringComparison.Ordinal);
+        Assert.True(oynatici > serit, "oynatıcı sekmesinin kapsama biçemi bulunmalı");
+        var bitis = controls.IndexOf("</Style>", oynatici, StringComparison.Ordinal);
+        Assert.Contains("<Setter Property=\"Grid.RowSpan\" Value=\"2\"/>", controls[oynatici..bitis]);
     }
 
     /// <summary>

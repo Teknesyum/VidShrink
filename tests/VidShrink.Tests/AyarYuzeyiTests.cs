@@ -222,6 +222,11 @@ public sealed class AyarYuzeyiTests
     /// <para>S20: katlanmış bölüm özetleri üçnoktayla dar pencerede 10 piksele iniyordu; başlığın
     /// altında kendi satırına indiler ve sarılıyorlar. Ayar sütunu 975'e uzadı, içerik 915 → 991,
     /// <b>taşma 297</b>; aralık 292-302, genişliği yine ±5 piksel.</para>
+    ///
+    /// <para>Yerleşim denetimi turu: sayfa sekme şeridinin altına girmesin diye kabukta şeridin
+    /// altındaki satıra alındı (<c>YerlesimDenetimiTests</c> "şerit" bulgusu). Katman turunda
+    /// kazanılan 30 piksel geri verildi: görüş alanı 694 → 664, içerik 991 değişmedi,
+    /// <b>taşma 327</b>; aralık 322-332, genişliği yine ±5 piksel.</para>
     /// </summary>
     [Fact]
     public void TabanYukseklikteKucultSekmesininTasmasiBuyumuyor()
@@ -280,7 +285,7 @@ public sealed class AyarYuzeyiTests
             $"Plan sütunu ({withoutSettings:0}) artık görüş alanına ({reading.Item3:0}) sığıyor; "
             + "taşmanın kaynağı ayar sütununa döndü, pim yeniden temellendirilmeli.");
 
-        Assert.InRange(reading.Item2 - reading.Item3, 292d, 302d);
+        Assert.InRange(reading.Item2 - reading.Item3, 322d, 332d);
     }
 
     /// <summary>

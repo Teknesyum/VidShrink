@@ -135,30 +135,35 @@
             -->
             <Grid Grid.Row="1" ColumnDefinitions="*,Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
 
-              <StackPanel Grid.Column="0"
-                          Orientation="Horizontal"
-                          Spacing="{StaticResource SpaceSm}"
-                          VerticalAlignment="Center">
+              <Grid Grid.Column="0"
+                    ColumnSpacing="{StaticResource SpaceSm}"
+                    VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*" MaxWidth="{StaticResource PlaybackSliderWidth}"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <TextBlock x:Name="TxtSeritTime"
                            Theme="{StaticResource PlaybackTimeText}"
                            VerticalAlignment="Center"/>
-                <Button x:Name="BtnSeritMute" Theme="{StaticResource PlaybackBarButton}"
+                <Button Grid.Column="1" x:Name="BtnSeritMute" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.mute}">
                   <Path x:Name="GlyphSeritVolume"
                         Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
                         Data="{StaticResource IconVolume}" Fill="{Binding $parent[Button].Foreground}"/>
                 </Button>
-                <Slider x:Name="SliderSeritVolume"
+                <Slider Grid.Column="2" x:Name="SliderSeritVolume"
                         Theme="{StaticResource PlaybackSlider}"
                         Minimum="0"
                         Maximum="100"
                         TickFrequency="{StaticResource PlaybackVolumeTick}"
                         IsSnapToTickEnabled="True"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
-                <Border Theme="{StaticResource PlaybackValueChip}">
+                <Border Grid.Column="3" Theme="{StaticResource PlaybackValueChip}">
                   <TextBlock x:Name="TxtSeritVolume" Theme="{StaticResource PlaybackValueText}"/>
                 </Border>
-              </StackPanel>
+              </Grid>
 
               <StackPanel Grid.Column="1"
                           Orientation="Horizontal"
@@ -190,31 +195,36 @@
                 </Button>
               </StackPanel>
 
-              <StackPanel Grid.Column="2"
-                          Orientation="Horizontal"
-                          Spacing="{StaticResource SpaceSm}"
-                          HorizontalAlignment="Right"
-                          VerticalAlignment="Center">
-                <Button x:Name="BtnSeritSpeedReset" Theme="{StaticResource PlaybackBarButton}"
+              <Grid Grid.Column="2"
+                    ColumnSpacing="{StaticResource SpaceSm}"
+                    VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*" MaxWidth="{StaticResource PlaybackSliderWidth}"/>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1" x:Name="BtnSeritSpeedReset" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.normalspeed}">
                   <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
                         VerticalAlignment="Center"
                         Data="{StaticResource IconSpeed}" Fill="{Binding $parent[Button].Foreground}"/>
                 </Button>
-                <Slider x:Name="SliderSeritSpeed"
+                <Slider Grid.Column="2" x:Name="SliderSeritSpeed"
                         Theme="{StaticResource PlaybackSlider}"
                         TickFrequency="{StaticResource PlaybackSpeedTick}"
                         IsSnapToTickEnabled="True"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.faster}"/>
-                <Border Theme="{StaticResource PlaybackValueChip}">
+                <Border Grid.Column="3" Theme="{StaticResource PlaybackValueChip}">
                   <TextBlock x:Name="TxtSeritSpeed" Theme="{StaticResource PlaybackValueText}"/>
                 </Border>
-                <Button x:Name="BtnSeritFullScreen" Theme="{StaticResource PlaybackBarButton}"
+                <Button Grid.Column="4" x:Name="BtnSeritFullScreen" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.fullscreen}">
                   <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
                         Data="{StaticResource IconFullScreen}" Fill="{Binding $parent[Button].Foreground}"/>
                 </Button>
-              </StackPanel>
+              </Grid>
             </Grid>
           </Grid>
         </Border>

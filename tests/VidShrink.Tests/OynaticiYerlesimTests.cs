@@ -70,7 +70,7 @@ public sealed class OynaticiYerlesimTests
             var ses = Bul<Slider>(view, "SliderSeritVolume");
             var hiz = Bul<Slider>(view, "SliderSeritSpeed");
 
-            return (ses.Width, hiz.Width,
+            return (ses.MaxWidth, hiz.MaxWidth,
                 Bul<TextBlock>(view, "TxtSeritVolume") is not null,
                 Bul<TextBlock>(view, "TxtSeritSpeed") is not null);
         });
@@ -163,29 +163,45 @@ public sealed class OynaticiYerlesimTests
     /// gözler eşit olmadığı halde kural bozulmamıştı. Şimdi sorulan şey doğru soru:
     /// <b>uyarının satırı içeriğin kapsadığı satırların içinde mi</b>. Katman kendi
     /// satırını geri alırsa kapsamın dışına çıkar ve ölçü kırmızıya düşer.
+    ///
+    /// <para>Yerleşim denetimi turu: oynatıcı dışındaki sekmelerde içerik yalnız ikinci satırı
+    /// kaplıyor (sayfa şeridin altına girmesin diye), oynatıcıda iki satırı. Ölçü iki sekmeyi de
+    /// okur; oynatıcının kapsamı 2, diğerininki 1 pimli, katman ikisinde de içeriğin içinde.</para>
     /// </summary>
     [Fact]
     public void UyariKatmaniIcerigiAsagiItmiyor()
     {
-        var (katmanSatir, icerikIlk, icerikKapsam, ustte) = AppHost.Run(() =>
+        var (oynatici, diger) = AppHost.Run(() =>
         {
             var pencere = new MainWindow();
             var serit = pencere.FindControl<TabControl>("Tabs")!;
-            pencere.Measure(new Size(1600, 1000));
-            pencere.Arrange(new Rect(0, 0, 1600, 1000));
 
-            var katman = serit.GetVisualDescendants()
-                .OfType<ContentPresenter>()
-                .First(denetim => denetim.Name == "NoticeLayer");
-            var host = serit.GetVisualDescendants()
-                .OfType<TransitioningContentControl>()
-                .First(denetim => denetim.Name == "SelectedContentHost");
+            (int Katman, int Ilk, int Kapsam, VerticalAlignment Hiza) Oku(int sekme)
+            {
+                serit.SelectedIndex = sekme;
+                pencere.Measure(new Size(1600, 1000));
+                pencere.Arrange(new Rect(0, 0, 1600, 1000));
+                pencere.UpdateLayout();
 
-            return (Grid.GetRow(katman), Grid.GetRow(host), Grid.GetRowSpan(host), katman.VerticalAlignment);
+                var katman = serit.GetVisualDescendants()
+                    .OfType<ContentPresenter>()
+                    .First(denetim => denetim.Name == "NoticeLayer");
+                var host = serit.GetVisualDescendants()
+                    .OfType<TransitioningContentControl>()
+                    .First(denetim => denetim.Name == "SelectedContentHost");
+
+                return (Grid.GetRow(katman), Grid.GetRow(host), Grid.GetRowSpan(host), katman.VerticalAlignment);
+            }
+
+            return (Oku(pencere.PlayerTabIndex), Oku(pencere.PlayerTabIndex + 1));
         });
 
-        Assert.True(icerikKapsam > 1, "İçerik tek göze çekildi; uyarı yine kendi satırını isteyebilir.");
-        Assert.InRange(katmanSatir, icerikIlk, icerikIlk + icerikKapsam - 1);
-        Assert.Equal(VerticalAlignment.Top, ustte);
+        Assert.Equal(2, oynatici.Kapsam);
+        Assert.Equal(1, diger.Kapsam);
+        foreach (var olcu in new[] { oynatici, diger })
+        {
+            Assert.InRange(olcu.Katman, olcu.Ilk, olcu.Ilk + olcu.Kapsam - 1);
+            Assert.Equal(VerticalAlignment.Top, olcu.Hiza);
+        }
     }
 }

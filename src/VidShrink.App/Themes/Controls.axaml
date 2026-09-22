@@ -790,6 +790,7 @@
                                 Content="{TemplateBinding Content}"
                                 ContentTemplate="{TemplateBinding ContentTemplate}"
                                 Foreground="{TemplateBinding Foreground}"
+                                TextWrapping="Wrap"
                                 VerticalAlignment="Center"/>
             </Grid>
           </ControlTemplate>
@@ -843,8 +844,7 @@
             <Grid RowDefinitions="Auto,*" ClipToBounds="False">
               <TransitioningContentControl Name="SelectedContentHost"
                                            Margin="{StaticResource WorkspaceMargin}"
-                                           Grid.Row="0"
-                                           Grid.RowSpan="2"
+                                           Grid.Row="1"
                                            Content="{TemplateBinding SelectedContent}"
                                            ContentTemplate="{TemplateBinding SelectedContentTemplate}"
                                            HorizontalContentAlignment="Stretch"
@@ -874,6 +874,8 @@
         -->
         <Style Selector="^[SelectedIndex=0] /template/ TransitioningContentControl#SelectedContentHost">
           <Setter Property="Margin" Value="0"/>
+          <Setter Property="Grid.Row" Value="0"/>
+          <Setter Property="Grid.RowSpan" Value="2"/>
         </Style>
       </ControlTheme>
 
