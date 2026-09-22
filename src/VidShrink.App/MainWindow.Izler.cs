@@ -138,7 +138,7 @@ public partial class MainWindow
             VerticalAlignment = VerticalAlignment.Center
         };
         if (this.FindResource("Hint") is Avalonia.Styling.ControlTheme hint) name.Theme = hint;
-        ToolTip.SetTip(name, subtitle.Path);
+        ToolTip.SetTip(name, subtitle.Language is { } dil ? $"{subtitle.Path} · {dil}" : subtitle.Path);
         row.Children.Add(name);
         var size = TokenOf("IconSizeSm");
         var remove = new Button

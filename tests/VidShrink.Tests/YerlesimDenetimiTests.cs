@@ -190,6 +190,39 @@ public sealed class YerlesimDenetimiTests
             logicalCores: 16, elapsedMs: 9_400, budgetMs: 20_000, hardwareEncoderPresent: true));
     });
 
+    /// <summary>
+    /// İz paneli dolu: kaynakta iki metin ve bir görüntü altyazısı, yakma seçimi yapılmış, iki
+    /// dış altyazı dosyası — biri uzun adlı (balonlu kırpılmalı). Örnek kaynakta altyazı yok,
+    /// o yüzden bu satırlar öteki kollarda hiç çizilmiyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    public void IzPanelindeKesikCakismaTasmaYok(string dil, bool dar)
+    {
+        var klasor = Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi", "altyazi");
+        Directory.CreateDirectory(klasor);
+        var dosyalar = new[] { "film.tr.srt", "Konferans_kaydi_oturum_3_soru_cevap_bolumu_duzenlenmemis.en.vtt" }
+            .Select(ad => Path.Combine(klasor, ad)).ToArray();
+        foreach (var dosya in dosyalar) File.WriteAllText(dosya, "1\n00:00:01,000 --> 00:00:02,000\nmerhaba\n");
+        Denetle(dil, dar, "-izler", pencere =>
+        {
+            pencere.LoadWithoutProbing(SamplePath, Sample() with
+            {
+                Streams = new[]
+                {
+                    new SourceStream(0, StreamKind.Video, "hevc"),
+                    new SourceStream(1, StreamKind.Audio, "aac", "tur", Channels: 2),
+                    new SourceStream(2, StreamKind.Subtitle, "hdmv_pgs_subtitle", "eng"),
+                    new SourceStream(3, StreamKind.Subtitle, "subrip", "tur", Title: "Türkçe — yönetmen yorumlu tam altyazı"),
+                    new SourceStream(4, StreamKind.Subtitle, "ass", "eng")
+                }
+            });
+            pencere.AddSubtitleFiles(dosyalar);
+            pencere.CmbBurnSubtitle.SelectedIndex = 1;
+            pencere.ChkAudioLoudnorm.IsChecked = true;
+        });
+    }
+
     private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true)
     {
         var (denetim, boyut) = Ac(dil, dar, null, hazirla: hazirla, yukle: yukle);

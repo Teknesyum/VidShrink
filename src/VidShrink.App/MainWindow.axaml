@@ -569,7 +569,13 @@
                             <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
                               <TextBlock Text="{loc:Text main.subtitles.burn}" Theme="{StaticResource Hint}"/>
                               <ComboBox x:Name="CmbBurnSubtitle"
-                                        auto:AutomationProperties.Name="{loc:Text main.subtitles.burn}"/>
+                                        auto:AutomationProperties.Name="{loc:Text main.subtitles.burn}">
+                                <ComboBox.ItemTemplate>
+                                  <DataTemplate x:DataType="x:String">
+                                    <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding}"/>
+                                  </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                              </ComboBox>
                             </StackPanel>
                           </WrapPanel>
                           <StackPanel x:Name="SubtitleList" Grid.Row="2" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
