@@ -45,7 +45,7 @@
   "settings.update.no-self-effect": "VidShrink does not update itself on this system: it only tells you that a new version exists and shows the command that installs it.",
   "settings.default-app.suggestion": "VidShrink is not the default program for videos. You can pick it on the Windows Default apps page.",
   "settings.default-app.open": "Default apps",
-  "settings.default-app.dismiss": "Do not ask again",
+  "settings.default-app.dismiss": "Do Not Ask Again",
   "settings.player-shortcuts.title": "Player shortcuts",
   "settings.player-shortcuts.hint": "The player tab, its menu and this list all read the same table.",
   "settings-tab.opensubtitles.label": "OpenSubtitles API key",

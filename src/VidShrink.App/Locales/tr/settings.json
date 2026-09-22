@@ -45,7 +45,7 @@
   "settings.update.no-self-effect": "VidShrink bu sistemde kendini güncellemez: yalnızca yeni sürümü ve kuran komutu gösterir.",
   "settings.default-app.suggestion": "VidShrink videolar için varsayılan program değil. Windows'un Varsayılan uygulamalar sayfasından seçebilirsiniz.",
   "settings.default-app.open": "Varsayılan uygulamalar",
-  "settings.default-app.dismiss": "Bir daha sorma",
+  "settings.default-app.dismiss": "Bir Daha Sorma",
   "settings.player-shortcuts.title": "Oynatıcı kısayolları",
   "settings.player-shortcuts.hint": "Oynatıcı sekmesi, menüsü ve bu liste aynı tablodan okur.",
   "settings-tab.opensubtitles.label": "OpenSubtitles API anahtarı",

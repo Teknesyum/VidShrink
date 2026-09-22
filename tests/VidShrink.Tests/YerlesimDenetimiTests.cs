@@ -447,6 +447,18 @@ public sealed class YerlesimDenetimiTests
     }
 
     /// <summary>
+    /// "Varsayılan uygulama değil" önerisi bildirim yığınında. Şerit yalnız gerçek açılışta
+    /// (<c>OnWindowLoaded</c>) ekleniyor, başsız taramada hiç yoktu.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    public void OneriSeridindeKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-oneri", pencere =>
+    {
+        var ayar = Path.Combine(TestPaths.OutputRoot, "yerlesim-oneri", "settings.json");
+        ((Panel)pencere.AppliedNotice.Parent!).Children.Add(new VidShrink.App.Integration.DefaultAppSuggestionBar(ayar));
+    });
+
+    /// <summary>
     /// Balonlar: her sekmede görünen denetimlerin balonu (düz metin ve zengin içerik) kendi
     /// <see cref="ToolTip"/> temasıyla, içeriğe göre boyutlanan bir pencerede taranır.
     /// Balon ancak üstüne gelinince açıldığı için sekme taramasında hiç çizilmiyordu.
