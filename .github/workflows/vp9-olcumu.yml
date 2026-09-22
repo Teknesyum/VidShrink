@@ -24,13 +24,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: ffmpeg kur
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
-          ffmpeg -hide_banner -version | head -n 1
-          ffmpeg -hide_banner -encoders | grep -q libvpx-vp9 || { echo 'libvpx-vp9 yok'; exit 1; }
-          ffmpeg -hide_banner -filters | grep -q libvmaf || { echo 'libvmaf yok'; exit 1; }
+      - name: ffmpeg kur (BtbN n9.0.2, sha256)
+        run: bash tools/vp9-olcumu/kur.sh
       - name: bench derle
         run: dotnet build tools/VidShrink.Bench -c Release -m:2
       - name: olc
@@ -54,12 +49,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: ffmpeg kur
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
-          ffmpeg -hide_banner -encoders | grep -q libvpx-vp9 || { echo 'libvpx-vp9 yok'; exit 1; }
-          ffmpeg -hide_banner -filters | grep -q libvmaf || { echo 'libvmaf yok'; exit 1; }
+      - name: ffmpeg kur (BtbN n9.0.2, sha256)
+        run: bash tools/vp9-olcumu/kur.sh
       - name: bench derle
         run: dotnet build tools/VidShrink.Bench -c Release -m:2
       - name: olc
@@ -84,10 +75,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: ffmpeg kur
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+      - name: ffmpeg kur (BtbN n9.0.2, sha256)
+        run: bash tools/vp9-olcumu/kur.sh
       - name: bench derle
         run: dotnet build tools/VidShrink.Bench -c Release -m:2
       - uses: actions/download-artifact@v4
@@ -109,10 +98,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: ffmpeg kur
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+      - name: ffmpeg kur (BtbN n9.0.2, sha256)
+        run: bash tools/vp9-olcumu/kur.sh
       - uses: actions/download-artifact@v4
         with:
           pattern: vp9-*

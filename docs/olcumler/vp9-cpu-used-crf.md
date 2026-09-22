@@ -16,9 +16,11 @@ Durum: **ölçütler ölçümden önce yazıldı**. Sayılar ve hüküm aşağı
 ## Düzenek
 
 - İş akışı: `.github/workflows/vp9-olcumu.yml`, `workflow_dispatch`, `ubuntu-latest`.
-- ffmpeg: depodaki Linux yöntemi (`apt-get install ffmpeg`, `ci.yml` ve `release.yml` ile
-  aynı). `libvpx-vp9` kodlayıcısı ve `libvmaf` süzgeci yoksa iş kırmızı biter. Sürüm
-  ürünün Windows ffmpeg'inden (GyanD 9.0) farklıdır; sayılar bu sürüm için geçerlidir.
+- ffmpeg: BtbN `n9.0.2` linux64 GPL, sha256 pimli (`tools/vp9-olcumu/kur.sh`). İlk plan
+  depodaki Linux yöntemiydi (`apt-get install ffmpeg`, `ci.yml`/`release.yml`); koşum
+  35795234554'te apt ffmpeg'inde `libvmaf` çıkmadı ve iş kırmızı bitti, ölçüm başlamadan
+  değiştirildi. 9.0 hattı ürünün Windows ffmpeg'iyle (GyanD 9.0) aynı majör; libvpx derlemesi
+  yine farklı olabilir, sayılar bu derleme için geçerlidir.
 - Kesitler koşucuda lavfi ile üretilir, internetten örnek inmez. 1920x1080, 24 fps, 10 sn
   (240 kare), `yuv420p`, FFV1 kayıpsız referans. Her iş kesiti kendisi üretir; sha256
   özette yan yana yazılır ve aynı kesitin sha256'sı işler arasında farklıysa özet bunu
