@@ -446,6 +446,74 @@ public sealed class YerlesimDenetimiTests
         Assert.True(denetim.Kusurlar.Count == 0, dokum);
     }
 
+    /// <summary>
+    /// Balonlar: her sekmede görünen denetimlerin balonu (düz metin ve zengin içerik) kendi
+    /// <see cref="ToolTip"/> temasıyla, içeriğe göre boyutlanan bir pencerede taranır.
+    /// Balon ancak üstüne gelinince açıldığı için sekme taramasında hiç çizilmiyordu.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DilKollari))]
+    public void BalonlardaKesikCakismaTasmaYok(string dil)
+    {
+        var (denetim, sayi) = AppHost.Run(() =>
+        {
+            Strings.Use(dil);
+            var pencere = new MainWindow();
+            var kap = new Window { SizeToContent = SizeToContent.WidthAndHeight };
+            kap.Classes.Add("reduced-motion");
+            var d = new Denetim { Dil = dil };
+            try
+            {
+                pencere.Classes.Add("reduced-motion");
+                pencere.LoadWithoutProbing(SamplePath, Sample());
+                pencere.SettleFades();
+                pencere.TabAdvanced.IsVisible = true;
+                var boyut = new Size(Belirtec(pencere, "WindowPreferredWidth"), Belirtec(pencere, "WindowPreferredHeight"));
+                var balonlar = new List<(string Sahip, object Icerik)>();
+                var gorulen = new HashSet<object>();
+                var sekmeler = pencere.Tabs;
+                Yerlestir(pencere, boyut);
+                for (var sira = 0; sira < sekmeler.ItemCount; sira++)
+                {
+                    if (sekmeler.ContainerFromIndex(sira) is not TabItem { IsVisible: true }) continue;
+                    sekmeler.SelectedIndex = sira;
+                    Yerlestir(pencere, boyut);
+                    foreach (var sahip in pencere.GetVisualDescendants().OfType<Control>())
+                        if (ToolTip.GetTip(sahip) is { } icerik && icerik is not string { Length: 0 } && gorulen.Add(icerik))
+                            balonlar.Add(($"balon {Ad(sahip)}", icerik));
+                }
+
+                foreach (var (sahip, icerik) in balonlar)
+                {
+                    var balon = new ToolTip { Content = icerik };
+                    kap.Content = balon;
+                    try { KuyruguTara(kap, sahip, d, double.PositiveInfinity); }
+                    finally
+                    {
+                        balon.Content = null;
+                        kap.Content = null;
+                    }
+                }
+                return (d, balonlar.Count);
+            }
+            finally
+            {
+                kap.Close();
+                pencere.Close();
+                Strings.Use("en");
+            }
+        });
+
+        var dokum = $"{dil} balon: {sayi} balon, metin {denetim.Metin}, panel {denetim.Panel}{Environment.NewLine}kusur {denetim.Kusurlar.Count}{Environment.NewLine}"
+            + string.Join(Environment.NewLine, denetim.Kusurlar);
+        var klasor = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", ".calisma", "yerlesim-denetimi"));
+        Directory.CreateDirectory(klasor);
+        File.WriteAllText(Path.Combine(klasor, $"{dil}-balonlar.txt"), dokum);
+        _output.WriteLine(dokum);
+        Assert.True(sayi >= 50, $"yalnız {sayi} balon bulundu");
+        Assert.True(denetim.Kusurlar.Count == 0, dokum);
+    }
+
     private static void AcilirTara(Flyout acilir, string durum, Denetim denetim)
     {
         var icerik = (Control)acilir.Content!;

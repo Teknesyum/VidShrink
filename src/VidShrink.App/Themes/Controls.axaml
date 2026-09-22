@@ -1419,7 +1419,8 @@
               <ContentPresenter Name="PART_ContentPresenter"
                                 Content="{TemplateBinding Content}"
                                 ContentTemplate="{TemplateBinding ContentTemplate}"
-                                Foreground="{TemplateBinding Foreground}"/>
+                                Foreground="{TemplateBinding Foreground}"
+                                TextWrapping="Wrap"/>
             </Border>
           </ControlTemplate>
         </Setter>
@@ -1444,7 +1445,8 @@
               <ContentPresenter Name="PART_ContentPresenter"
                                 Content="{TemplateBinding Content}"
                                 ContentTemplate="{TemplateBinding ContentTemplate}"
-                                Foreground="{TemplateBinding Foreground}"/>
+                                Foreground="{TemplateBinding Foreground}"
+                                TextWrapping="Wrap"/>
             </Border>
           </ControlTemplate>
         </Setter>
