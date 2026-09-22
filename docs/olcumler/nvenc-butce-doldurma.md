@@ -67,6 +67,9 @@ n=16, ortalama **+0,37%**, standart sapma **2,14**, aralık **−4,00 .. +3,55**
 
 ## Hüküm: kapı kapalı kalıyor
 
+> 22 Eylül 2026: kapı `nvenc-4-teslim.md`'de yeniden ölçülüp NVENC için 0,97 nişanıyla açıldı.
+> Aşağıdaki hesap yukarı denemenin ortalama inişine bakıyor; `Keeps` ise ikisinin büyüğünü teslim ediyor.
+
 Yukarı deneme hedefi aşarsa `BudgetFill.Keeps` onu atıyor, yani aşım kalite kaybı değil
 **boşa giden deneme**. Bugünkü nişan `Aim = 0,985`. Ölçülen yayılım o nişanla ne yapıyor:
 
