@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "zvukový rozpočet je pod dolní hranicí zvoleného kodeku Dolby pro tento počet kanálů, proto byla stopa zakódována vlastním kodekem kontejneru",
   "main.reason.stream.flac-fell-back": "FLAC nelze použít: kontejner ho nepodporuje nebo se jeho 16bitový strop nevejde do 15 % cíle, stopa proto byla zakódována vlastním kodekem kontejneru",
   "main.reason.stream.audio-filter-on-copy": "normalizaci hlasitosti a zesílení nelze použít na kopírovanou zvukovou stopu, stopa byla zkopírována beze změny",
+  "main.reason.stream.webm-audio-opus": "WebM nese jen zvuk Opus nebo Vorbis, stopa proto byla zakódována do Opus",
+  "main.reason.stream.webm-stream-dropped": "WebM neumí nést obrázkové titulky, obal ani přílohy, proto byly vynechány",
   "main.reason.stream.lossless-not-passed": "bezeztrátová stopa TrueHD/DTS se nikdy nekopíruje; překóduje se",
   "main.reason.fill-crf-lowered": "politika naplnění cíle snížila CRF na {0} místo zastavení na stropu průhlednosti a přistává blízko středu pásma {1} MB uvnitř pásma {2}–{3} MB",
   "main.reason.fill-band-center": "spodní mez CRF {0} byla dosažena před pásmem naplnění, dvouprůchodové VBR tedy cílí přímo na střed pásma {1} MB",

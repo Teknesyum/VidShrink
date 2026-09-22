@@ -108,30 +108,56 @@ public sealed class HandBrakeOnAyarCeviriTests
     [Fact]
     public void DesteklenmeyenKodlayiciVeKapDuser()
     {
-        var vp9 = Single(Synthetic(",\"VideoEncoder\":\"VP9\",\"FileFormat\":\"av_avi\",\"AudioList\":[]"));
-        var encoder = vp9.Note("VideoEncoder")!;
+        var vp8 = Single(Synthetic(",\"VideoEncoder\":\"VP8\",\"FileFormat\":\"av_avi\",\"AudioList\":[]"));
+        var encoder = vp8.Note("VideoEncoder")!;
         Assert.Equal((PresetNoteOutcome.Dropped, PresetNoteReason.UnsupportedCodec), (encoder.Outcome, encoder.Reason));
-        Assert.Equal(PresetNoteReason.NoEquivalent, vp9.Note("FileFormat")!.Reason);
-        Assert.Null(vp9.Profile.Container);
-        Assert.Equal(PresetNoteOutcome.Dropped, vp9.Note("AudioList")!.Outcome);
-        Assert.Null(vp9.Profile.AudioKbps);
+        Assert.Null(vp8.Profile.LockedCodec);
+        Assert.Equal(PresetNoteReason.NoEquivalent, vp8.Note("FileFormat")!.Reason);
+        Assert.Null(vp8.Profile.Container);
+        Assert.Equal(PresetNoteOutcome.Dropped, vp8.Note("AudioList")!.Outcome);
+        Assert.Null(vp8.Profile.AudioKbps);
 
         Assert.Equal(OutputContainer.Mkv, Single(Synthetic(",\"FileFormat\":\"av_mkv\"")).Profile.Container);
     }
 
     /// <summary>
-    /// WebM'in kodlama kolu yok (vp9 merdivende değil): kap Mp4'e düşüyor ve not bunu
-    /// "yaklaşık" diye söylüyor, "taşındı" demiyor. mkv karşılaştırma için taşınıyor.
+    /// WebM gerçek bir kol: kap WebM olarak taşınıyor ve kodek libvpx-vp9'a kilitleniyor,
+    /// kodlayıcı adı verilmese de (HandBrake'in WebM'i VP9 ister). mkv karşılaştırma için taşınıyor.
     /// </summary>
     [Theory]
-    [InlineData("av_webm")]
-    [InlineData("webm")]
-    public void WebmMp4eYaklasikDuser(string bicim)
+    [InlineData("av_webm", "")]
+    [InlineData("webm", "")]
+    [InlineData("av_webm", ",\"VideoEncoder\":\"VP9\"")]
+    public void WebmVp9OlarakTasiniyor(string bicim, string kodlayici)
     {
-        var ceviri = Single(Synthetic($",\"FileFormat\":\"{bicim}\""));
-        Assert.Equal(OutputContainer.Mp4, ceviri.Profile.Container);
-        Assert.Equal(PresetNoteOutcome.Approximated, ceviri.Note("FileFormat")!.Outcome);
+        var ceviri = Single(Synthetic($",\"FileFormat\":\"{bicim}\"{kodlayici}"));
+        Assert.Equal(OutputContainer.WebM, ceviri.Profile.Container);
+        Assert.Equal("libvpx-vp9", ceviri.Profile.LockedCodec);
+        Assert.Equal("libvpx-vp9", ceviri.Profile.ToPlanOptions().LockedCodec);
+        Assert.Equal(PresetNoteOutcome.Carried, ceviri.Note("FileFormat")!.Outcome);
         Assert.Equal(PresetNoteOutcome.Carried, Single(Synthetic(",\"FileFormat\":\"av_mkv\"")).Note("FileFormat")!.Outcome);
+    }
+
+    /// <summary>
+    /// VP9 kodlayıcısı birebir taşınıyor; 10 bit türevi 8 bit libvpx-vp9'a yaklaşıyor. WebM'e
+    /// VP9 dışı bir kodlayıcı adı verilince kilit kurulmuyor ve kap notu "yaklaşık" kalıyor.
+    /// </summary>
+    [Fact]
+    public void Vp9KodlayicisiKilitOluyor()
+    {
+        var vp9 = Single(Synthetic(",\"VideoEncoder\":\"VP9\",\"FileFormat\":\"av_mkv\""));
+        Assert.Equal("libvpx-vp9", vp9.Profile.LockedCodec);
+        Assert.Equal(PresetNoteOutcome.Carried, vp9.Note("VideoEncoder")!.Outcome);
+
+        var onBit = Single(Synthetic(",\"VideoEncoder\":\"vp9_10bit\""));
+        Assert.Equal("libvpx-vp9", onBit.Profile.LockedCodec);
+        Assert.Equal(PresetNoteOutcome.Approximated, onBit.Note("VideoEncoder")!.Outcome);
+
+        var av1Webm = Single(Synthetic(",\"VideoEncoder\":\"svt_av1\",\"FileFormat\":\"av_webm\""));
+        Assert.Null(av1Webm.Profile.LockedCodec);
+        Assert.Equal(PresetNoteOutcome.Approximated, av1Webm.Note("FileFormat")!.Outcome);
+
+        Assert.Null(Single(Synthetic(",\"VideoEncoder\":\"x264\"")).Profile.LockedCodec);
     }
 
     [Fact]

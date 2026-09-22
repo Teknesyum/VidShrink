@@ -481,7 +481,7 @@ public static class PlanCalculator
         var streamRequest = new StreamRequest(options.KeepAllTracks, options.PlatformDelivery, options.PreferredLanguage,
             options.AudioLoudnorm, options.AudioGainDb, options.ExternalSubtitles, options.Filters?.BurnSubtitle);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
-        var streams = StreamMapping.Decide(info, streamRequest, StreamMapping.ContainerFor(streamRequest), audioK, audioChannels,
+        var streams = StreamMapping.Decide(info, streamRequest, StreamMapping.ContainerFor(streamRequest, codec), audioK, audioChannels,
             info.HasAudio && audioK > 0 ? PickAudioCodec(options.AudioCodec) : null, audioPassthrough, effectiveTargetMb,
             options.AudioChannels == AudioChannelOverride.Source);
         var sideK = streams.SideK;
@@ -651,6 +651,13 @@ public static class PlanCalculator
             plan.Mode = "2pass";
             plan.VideoBitrateK = (int)Math.Round(Math.Max(videoK, 0.0));
             AddHardwareYieldNote(codec, complexity, best, reason, reasonCodes);
+        }
+
+        if (CodecModel.IsVp9(codec) && plan.ModeEnum == EncodeMode.Crf && options.LockedCrf is null && options.LockedMode is null)
+        {
+            plan.Mode = "2pass";
+            plan.Crf = null;
+            reason.Add($"libvpx-vp9 has no measured CRF scale in this engine, so the size is held by two-pass VBR at {plan.VideoBitrateK}k instead of a CRF guess");
         }
 
         if (best.MeetsFloor && plan.ModeEnum == EncodeMode.TwoPass)
@@ -1507,8 +1514,13 @@ public static class PlanCalculator
         "libx264", "libx265", "libsvtav1",
         "h264_nvenc", "hevc_nvenc", "av1_nvenc",
         "h264_qsv", "hevc_qsv", "av1_qsv",
-        "h264_amf", "hevc_amf", "av1_amf"
+        "h264_amf", "hevc_amf", "av1_amf",
+        "libvpx-vp9"
     };
+
+    /// <summary>Kilit olarak verilebilecek kodlayici mi; buyuk kucuk harf ayirmaz.</summary>
+    public static bool IsLockableCodec(string? codec)
+        => codec is not null && KnownLockableCodecs.Contains(codec.Trim(), StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Bos/bosluk kilidi "secim yok" sayar; dolu kilit tanidik kodlayicilardan biri degilse
@@ -1725,6 +1737,8 @@ public static class PlanCalculator
                 StreamNote.DolbyCodecBelowChannelFloor => "the audio budget is below what the chosen Dolby codec needs for this channel count, so the track keeps the default codec",
                 StreamNote.FlacFellBack => "FLAC cannot be used here: the container does not carry it or its 16-bit ceiling does not fit 15% of the target, so the track keeps the default codec",
                 StreamNote.AudioFilterSkippedOnCopy => "loudness and gain cannot be applied to a copied audio track; the track is copied unchanged",
+                StreamNote.WebmAudioOpus => "WebM carries only Opus or Vorbis audio, so the track is encoded to Opus",
+                StreamNote.WebmStreamDropped => "WebM cannot carry image subtitles, cover art or attachments, so those streams are dropped",
                 _ => "a lossless TrueHD/DTS track is never copied; it is re-encoded"
             });
     }
@@ -1744,6 +1758,7 @@ public static class PlanCalculator
             return FfmpegArguments.IsValidPreset(codec, preset) ? preset : FfmpegArguments.DefaultPreset(codec);
         }
         if (codec == "libsvtav1") return intent == Intent.SocialMedia && speed != SpeedMode.Fast ? "4" : "6";
+        if (CodecModel.IsVp9(codec)) return speed == SpeedMode.Fast || pref == CodecPreference.Fast ? "5" : FfmpegArguments.DefaultPreset(codec);
         return pref == CodecPreference.Fast ? "medium" : "slow";
     }
 

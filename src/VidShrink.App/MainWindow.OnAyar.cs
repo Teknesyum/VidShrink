@@ -130,6 +130,7 @@ public partial class MainWindow
     /// taşımadığı bir değeri varsayılana çekerdi. Ses bit hızı Gelişmiş panelin merdiveninde
     /// yoksa en yakın basamağa, eşitlikte yukarıdakine iner. Kap çıktı uzantısını seçer
     /// (<see cref="ShrinkExtension"/>); gömülü yonga ya da boyut tavanına dönüş onu bırakır.
+    /// Kodek kilidi (HandBrake'in VP9'u) Gelişmiş paneldeki kodek kilidi kutusunda seçilir.
     /// </summary>
     internal void ApplyUserPreset(PresetProfile preset)
     {
@@ -165,6 +166,12 @@ public partial class MainWindow
             CmbAdvAudioKbps.SelectedIndex = 1 + Array.IndexOf(AdvancedAudioKbpsCandidates,
                 AdvancedAudioKbpsCandidates.OrderBy(c => Math.Abs(c - kbps)).ThenByDescending(c => c).First());
 
+        if (preset.LockedCodec is { } locked && CmbAdvCodecLock.ItemsSource is IList<string> codecs)
+        {
+            var at = codecs.ToList().FindIndex(c => c.Equals(locked, StringComparison.OrdinalIgnoreCase));
+            if (at > 0) CmbAdvCodecLock.SelectedIndex = at;
+        }
+
         RefreshChipDerivation();
         RefreshSectionSummaries();
     }
@@ -185,7 +192,8 @@ public partial class MainWindow
         Fill = FillPolicyIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget,
         MaxShortEdge = FixedResolutionShortSide,
         AudioKbps = CmbAdvAudioKbps.SelectedIndex > 0 ? AdvancedAudioKbpsCandidates[CmbAdvAudioKbps.SelectedIndex - 1] : null,
-        Container = _presetContainer
+        Container = _presetContainer,
+        LockedCodec = AdvancedText(CmbAdvCodecLock) is { } locked && PlanCalculator.IsLockableCodec(locked) ? locked : null
     };
 
     private void OnPresetSave(object? sender, RoutedEventArgs e) => SavePreset(TxtPresetName.Text ?? string.Empty);

@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "이 채널 수에서는 오디오 예산이 선택한 Dolby 코덱의 하한보다 낮아 트랙을 컨테이너 자체 코덱으로 인코딩했습니다",
   "main.reason.stream.flac-fell-back": "FLAC을 사용할 수 없습니다. 컨테이너가 지원하지 않거나 16비트 상한이 목표의 15%에 맞지 않아 트랙을 컨테이너 고유 코덱으로 인코딩했습니다",
   "main.reason.stream.audio-filter-on-copy": "복사하는 오디오 트랙에는 음량 정규화와 게인을 적용할 수 없어 트랙을 그대로 복사했습니다",
+  "main.reason.stream.webm-audio-opus": "WebM은 Opus 또는 Vorbis 오디오만 담을 수 있어 트랙을 Opus로 인코딩했습니다",
+  "main.reason.stream.webm-stream-dropped": "WebM은 이미지 자막, 커버 이미지, 첨부 파일을 담을 수 없어 제외했습니다",
   "main.reason.stream.lossless-not-passed": "무손실 TrueHD/DTS 트랙은 절대 복사되지 않고 재인코딩됩니다",
   "main.reason.fill-crf-lowered": "채우기 목표 정책이 투명 상한에서 멈추는 대신 CRF를 {0}으로 낮춰 {2}-{3} MB 대역 안의 중심 {1} MB 근처에 도달",
   "main.reason.fill-band-center": "채우기 대역 전에 CRF 하한 {0}에 이르러 2패스 VBR이 대역 중심 {1} MB를 직접 목표로 함",

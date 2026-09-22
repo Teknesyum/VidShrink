@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "lydbudsjettet ligger under den valgte Dolby-kodekens nedre grense ved dette kanalantallet, så sporet ble kodet med beholderens egen kodek",
   "main.reason.stream.flac-fell-back": "FLAC kunne ikke brukes: beholderen kan ikke bære det, eller 16-bitstaket får ikke plass i 15 % av målet, så sporet ble kodet med beholderens egen kodek",
   "main.reason.stream.audio-filter-on-copy": "lydnivåutjevning og forsterkning kan ikke brukes på et kopiert lydspor, så sporet ble kopiert uendret",
+  "main.reason.stream.webm-audio-opus": "WebM bærer bare Opus- eller Vorbis-lyd, så sporet ble kodet til Opus",
+  "main.reason.stream.webm-stream-dropped": "WebM kan ikke bære bildeundertekster, omslagsbilde eller vedlegg, så de ble utelatt",
   "main.reason.stream.lossless-not-passed": "et tapsfritt TrueHD/DTS-spor kopieres aldri; det omkodes",
   "main.reason.fill-crf-lowered": "fyllmålpolicyen senket CRF til {0} i stedet for å stoppe ved transparenstaket, og lander nær båndsenteret {1} MB innenfor båndet {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-gulvet {0} ble nådd før fyllbåndet, så to-pass VBR sikter direkte mot båndsenteret {1} MB",

@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "audio proračun je ispod donje granice odabranog Dolby kodeka pri ovom broju kanala, pa je zapis kodiran vlastitim kodekom kontejnera",
   "main.reason.stream.flac-fell-back": "FLAC se nije mogao koristiti: spremnik ga ne podržava ili njegova 16-bitna gornja granica ne stane u 15 % cilja, pa je zapis kodiran vlastitim kodekom spremnika",
   "main.reason.stream.audio-filter-on-copy": "ujednačavanje glasnoće i pojačanje ne mogu se primijeniti na kopirani audiozapis, pa je zapis kopiran nepromijenjen",
+  "main.reason.stream.webm-audio-opus": "WebM nosi samo Opus ili Vorbis zvuk, pa je zapis kodiran u Opus",
+  "main.reason.stream.webm-stream-dropped": "WebM ne može nositi slikovne titlove, naslovnicu ni privitke, pa su izostavljeni",
   "main.reason.stream.lossless-not-passed": "TrueHD/DTS zapis bez gubitaka nikad se ne kopira; ponovno se kodira",
   "main.reason.fill-crf-lowered": "pravilo popunjavanja cilja spustilo je CRF na {0} umjesto zaustavljanja na granici prozirnosti, slijećući blizu središta pojasa od {1} MB unutar pojasa {2}-{3} MB",
   "main.reason.fill-band-center": "donja granica CRF {0} dosegnuta je prije pojasa popunjavanja, pa dvoprolazni VBR izravno cilja središte pojasa od {1} MB",

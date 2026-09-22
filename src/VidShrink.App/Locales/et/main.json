@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "helieelarve jääb valitud Dolby kodeki alampiirist allapoole selle kanalite arvu juures, seetõttu kodeeriti rada konteineri enda kodekiga",
   "main.reason.stream.flac-fell-back": "FLAC-i ei saanud kasutada: konteiner ei toeta seda või selle 16-bitine lagi ei mahu 15% sihist, seega kodeeriti rada konteineri enda koodekiga",
   "main.reason.stream.audio-filter-on-copy": "helitugevuse ühtlustamist ja võimendust ei saa rakendada kopeeritud helirajale, seega kopeeriti rada muutmata kujul",
+  "main.reason.stream.webm-audio-opus": "WebM kannab ainult Opus- või Vorbis-heli, seega kodeeriti rada Opusesse",
+  "main.reason.stream.webm-stream-dropped": "WebM ei suuda kanda pildipõhiseid subtiitreid, kaanepilti ega manuseid, need jäeti välja",
   "main.reason.stream.lossless-not-passed": "kadudeta TrueHD/DTS-rada ei kopeerita kunagi; see kodeeritakse ümber",
   "main.reason.fill-crf-lowered": "täitmissihi poliitika langetas CRF-i {0}-le, selle asemel et läbipaistvuse ülempiiril peatuda, maandudes {1} MB riba keskme lähedal {2}-{3} MB ribas",
   "main.reason.fill-band-center": "CRF alampiir {0} saavutati enne täiteriba, seega sihib kahekäiguline VBR otse {1} MB riba keset",

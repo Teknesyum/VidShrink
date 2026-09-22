@@ -431,6 +431,8 @@
   "main.reason.stream.dolby-below-channel-floor": "äänibudjetti jää valitun Dolby-koodekin alarajan alle tällä kanavamäärällä, joten raita koodattiin säiliön omalla koodekilla",
   "main.reason.stream.flac-fell-back": "FLACia ei voitu käyttää: säiliö ei tue sitä tai sen 16-bittinen katto ei mahdu 15 %:iin tavoitteesta, joten raita koodattiin säiliön omalla koodekilla",
   "main.reason.stream.audio-filter-on-copy": "äänenvoimakkuuden normalisointia ja vahvistusta ei voi käyttää kopioituun ääniraitaan, joten raita kopioitiin muuttamattomana",
+  "main.reason.stream.webm-audio-opus": "WebM kuljettaa vain Opus- tai Vorbis-ääntä, joten raita koodattiin Opukseksi",
+  "main.reason.stream.webm-stream-dropped": "WebM ei voi kuljettaa kuvatekstityksiä, kansikuvaa tai liitteitä, joten ne pudotettiin",
   "main.reason.stream.lossless-not-passed": "häviötöntä TrueHD/DTS-raitaa ei koskaan kopioida; se koodataan uudelleen",
   "main.reason.fill-crf-lowered": "täyttökohdekäytäntö laski CRF:n arvoon {0} läpinäkyvyyskattoon pysähtymisen sijaan, osuen lähelle {1} MB:n kaistan keskikohtaa {2}-{3} MB:n kaistassa",
   "main.reason.fill-band-center": "CRF-alaraja {0} saavutettiin ennen täyttökaistaa, joten kaksivaiheinen VBR tähtää suoraan {1} MB:n kaistan keskikohtaan",

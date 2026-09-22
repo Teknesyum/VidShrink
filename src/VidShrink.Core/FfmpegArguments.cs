@@ -474,6 +474,18 @@ public static class FfmpegArguments
     public static IReadOnlyList<string> HardwareDecodeArgs(string? videoCodec)
         => BenefitsFromHardwareDecode(videoCodec) ? new[] { "-hwaccel", "auto" } : Array.Empty<string>();
 
+    /// <summary>
+    /// Kodegin hiz anahtari. Cogu yazilim ve donanim kodlayicisi <c>-preset</c> alir;
+    /// libvpx-vp9 ayni 0-8 olcegini <c>-cpu-used</c> olarak <c>-deadline good</c> ve
+    /// <c>-row-mt 1</c> ile alir; VideoToolbox hic almaz.
+    /// </summary>
+    public static IReadOnlyList<string> SpeedArgs(string codec, string preset)
+    {
+        if (CodecModel.IsVp9(codec))
+            return new[] { "-deadline", "good", "-cpu-used", preset, "-row-mt", "1" };
+        return CodecModel.TakesPreset(codec) ? new[] { "-preset", preset } : Array.Empty<string>();
+    }
+
     public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix, IEncoderAvailability? availability = null, SceneMap? scenes = null)
     {
         var a = new List<string> { "-hide_banner", "-y" };
@@ -506,8 +518,7 @@ public static class FfmpegArguments
             a.AddRange(new[] { cover ? "-filter:v:0" : "-vf", string.Join(',', filters) });
 
         a.AddRange(new[] { cover ? "-c:v:0" : "-c:v", plan.Codec });
-        if (CodecModel.TakesPreset(plan.Codec))
-            a.AddRange(new[] { "-preset", pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset });
+        a.AddRange(SpeedArgs(plan.Codec, pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset));
         if (plan.Tune is { Length: > 0 } lockedTune && IsValidTune(plan.Codec, lockedTune)
             && !plan.Codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase))
             a.AddRange(new[] { "-tune", lockedTune });
@@ -516,7 +527,7 @@ public static class FfmpegArguments
         if (plan.ModeEnum == EncodeMode.Crf)
         {
             a.AddRange(CodecModel.QualityArgs(plan.Codec, plan.Crf!.Value));
-            if (SupportsRateLimits(plan.Codec) && !CodecModel.IsHardware(plan.Codec))
+            if (SupportsRateLimits(plan.Codec) && !CodecModel.IsHardware(plan.Codec) && !CodecModel.IsVp9(plan.Codec))
                 a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * CrfVbvPeakFactor)}k", "-bufsize", $"{(int)(plan.VideoBitrateK * CrfVbvBufferFactor)}k" });
         }
         else

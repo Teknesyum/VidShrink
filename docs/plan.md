@@ -1504,3 +1504,23 @@ arayüzde yoktu. Ses bölümüne iner (`MainWindow.Izler.cs`):
 `IzPaneliTests`: ses kolları plana (0 dB olumsuz kontrol), ekleme/tekrar/çıkarma, yakma listesi
 yalnız metin, altyazısız kaynak, yeni kaynak sıfırlaması, kuyruğun izleri taşımaması (ses
 kolları geçer), anahtarlar 42 dilde. Beş mutasyonun beşi kırmızı.
+
+## B3 — VP9 Küçültme Yolunda (23 Eylül 2026)
+
+Dokunulan dosya beşi geçtiği için K0 gereği bu bölüm. Kapsam: `libvpx-vp9` hedef boyuta iki geçişle.
+
+1. `Core`: `CodecModel.IsVp9`, vp9 `-preset` almaz; hız `FfmpegArguments.SpeedArgs` ile `-deadline good
+   -cpu-used N -row-mt 1` (N varsayılan 4, hızlı kipte 5 — ölçülmedi). Kalite kolu `-crf N -b:v 0`.
+2. `PlanParser.AllowedCodecs` ve kilitlenebilir kodek kümesine `libvpx-vp9`. Kilitli vp9 planı CRF
+   seçilmişse iki geçişe döner: bu motorda vp9 CRF ölçeği ölçülmedi, boyut VBR ile tutulur.
+3. `StreamMapping.ContainerFor(request, codec)`: vp9 → WebM. WebM sesi opus/vorbis dışını opus'a çevirir
+   (`WebmAudioOpus`), resim altyazı, kapak ve eki düşürür (`WebmStreamDropped`); iki not 42 dilde
+   (`main.reason.stream.*`) ve CLI en/tr'de (`plan.stream.*`).
+4. CLI `--kodek vp9`; Gelişmiş kodek kilidi zaten `KnownLockableCodecs`'ten doluyor. Ön ayar profili
+   `lockedCodec` taşır; pencere kaydederken ve uygularken okur.
+5. HandBrake: `av_webm`/`webm` WebM kabına ve vp9 kilidine, `VP9` kodlayıcısı birebir, `vp9_10bit`
+   yaklaşık; WebM ile vp9 dışı kodlayıcı adı verilirse kap notu yaklaşık kalır.
+
+`Vp9KucultmeTests`: ayrıştırıcı, plan, iki geçiş argümanı, WebM notları, CLI, ön ayar doğrulaması ve
+≤3 sn 320x240 canlı iki geçiş (`-threads 2`, ffmpeg yoksa atlanır). Altı mutasyonun altısı kırmızı:
+`docs/olcumler/vp9-kucultme-mutasyonlar.md`.
