@@ -159,17 +159,57 @@ public sealed class BudgetFillTests
     }
 
     /// <summary>
-    /// Donanim kolunda yukari deneme kurulmaz. Gerekcesi 19 Eylul 2026'da olculdu
-    /// (<c>docs/olcumler/nvenc-butce-doldurma.md</c>): NVENC'in teslim yayilimi 16 gercek
-    /// duzeltmede -%4,00 .. +%3,55 (std 2,14), yani kapatilmaya calisilan %4,8'lik butce
-    /// bosluguyla ayni buyuklukte. Bugunku nisanda (0,985) denemelerin 6/16'si hedefi asip
-    /// atiliyor; nisani 0,95'e indirmek asimi bitiriyor ama inisi ortalama 0,95'e, yani
-    /// urunun zaten teslim ettigi yere oturtuyor. Kapi olcume dayaniyor, varsayima degil.
+    /// NVENC'te yukari deneme 22 Eylul 2026'dan beri kuruluyor, nisani 0,97
+    /// (<c>docs/olcumler/nvenc-4-teslim.md</c>): 18 hucrede ortalama teslim 0,9637'den 0,9712'ye,
+    /// en kotu hucre 0,8656'dan 0,8847'ye cikti, hedefi asan hucre olmadi. 0,985 ortalamada
+    /// biraz daha iyi (0,9736) ama on yukari denemenin dordu bosa gitti ve en kotu hucreyi
+    /// kaldiramadi. Nisan yaziliminkinden ayri, istegin kendisiyle pimli.
     /// </summary>
     [Theory]
     [InlineData("h264_nvenc")]
     [InlineData("hevc_nvenc")]
     [InlineData("av1_nvenc")]
+    public void NvencteYukariDenemeYuzdeDoksanYediyeNisanlanir(string codec)
+    {
+        var teslimMb = 0.90 * Hedef;
+
+        var plan = BudgetFill.Plan(Teslim(codec: codec), teslimMb, Array.Empty<SizeSample>(), Hedef, Sure);
+
+        Assert.NotNull(plan);
+        Assert.Equal((int)Math.Floor(950 * 0.97 * Hedef / teslimMb), plan!.VideoBitrateK);
+        Assert.Contains("aims at 0.970 of the target", plan.Reason);
+    }
+
+    [Fact]
+    public void NegatifKontrolYazilimNisaniNvencinkindenYuksek()
+    {
+        var teslimMb = 0.90 * Hedef;
+
+        var yazilim = BudgetFill.Plan(Teslim(codec: "libx265"), teslimMb, Array.Empty<SizeSample>(), Hedef, Sure);
+        var nvenc = BudgetFill.Plan(Teslim(codec: "hevc_nvenc"), teslimMb, Array.Empty<SizeSample>(), Hedef, Sure);
+
+        Assert.Equal((int)Math.Floor(950 * 0.985 * Hedef / teslimMb), yazilim!.VideoBitrateK);
+        Assert.True(yazilim.VideoBitrateK > nvenc!.VideoBitrateK, $"{yazilim.VideoBitrateK}k / {nvenc.VideoBitrateK}k");
+    }
+
+    [Fact]
+    public void NvencteTavanUstuOrnekIstegiNvencNisaniylaAradegerler()
+    {
+        var teslimMb = 0.92 * Hedef;
+        var ornekler = new[] { new SizeSample(1000, 1.35, true) };
+
+        var plan = BudgetFill.Plan(Teslim(codec: "av1_nvenc"), teslimMb, ornekler, Hedef, Sure);
+
+        var aradeger = 950 + (1000 - 950) * (0.97 * Hedef - teslimMb) / (1.35 - teslimMb);
+        Assert.Equal((int)Math.Floor(aradeger), plan!.VideoBitrateK);
+    }
+
+    /// <summary>
+    /// NVENC disindaki donanim kolunda yukari deneme kurulmaz: teslim yayilimlari olculmedi.
+    /// NVENC'in kapisi <c>docs/olcumler/nvenc-butce-doldurma.md</c>'de kapali birakilmisti,
+    /// <c>nvenc-4-teslim.md</c>'de yeniden olculup acildi.
+    /// </summary>
+    [Theory]
     [InlineData("h264_qsv")]
     [InlineData("hevc_amf")]
     [InlineData("hevc_videotoolbox")]

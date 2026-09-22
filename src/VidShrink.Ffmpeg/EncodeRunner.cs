@@ -190,7 +190,7 @@ public sealed class EncodeRunner
             var fillClock = Stopwatch.StartNew();
             var upPath = PartialPathFor(outputPath);
             var upDropped = new List<string>();
-            var fillAimMb = BudgetFill.Aim * effectiveTargetMb;
+            var fillAimMb = (BudgetFill.AimFor(step.Codec) ?? BudgetFill.Aim) * effectiveTargetMb;
             try
             {
                 if (step.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(step.Codec))
