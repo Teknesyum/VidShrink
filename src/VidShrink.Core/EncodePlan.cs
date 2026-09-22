@@ -73,7 +73,8 @@ public enum ReasonCode
     ManualEncoderPathSupersededByCodec,
     ManualOverrideDroppedOnPassThrough,
     DarkContentHevc,
-    HdrDynamicMetadataDropped
+    HdrDynamicMetadataDropped,
+    Vp9CrfUnmeasuredTwoPass
 }
 
 public sealed record ReasonNote(

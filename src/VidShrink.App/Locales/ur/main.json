@@ -420,6 +420,7 @@
   "main.reason.encoder-fallback-not-working": "{0} انکوڈر اس مشین پر استعمال نہ ہو سکا، اس لیے انکوڈنگ {1} پر لوٹتی ہے",
   "main.reason.hdr-tonemapped": "ماخذ HDR ہے مگر چنا گیا انکوڈر 10-bit برقرار نہیں رکھ سکتا، اس لیے اسے SDR BT.709 پر ٹون میپ کیا گیا",
   "main.reason.hdr-dynamic-dropped": "ماخذ میں متحرک HDR میٹا ڈیٹا (HDR10+ یا Dolby Vision) ہے جسے یہ انکوڈ آگے نہیں لے جاتا، اس لیے آؤٹ پٹ میں صرف جامد HDR10 تہہ رہتی ہے",
+  "main.reason.vp9-crf-unmeasured": "اس انجن میں libvpx-vp9 کا کوئی ناپا ہوا CRF پیمانہ نہیں، اس لیے CRF کے اندازے کے بجائے دو پاس VBR سائز سنبھالتا ہے",
   "main.reason.stream.audio-passthrough": "آڈیو ٹریک جوں کا توں کاپی ہوتا ہے: کنٹینر اس کے کوڈیک کو سپورٹ کرتا ہے اور یہ ہدف کے 15% کے اندر رہتا ہے",
   "main.reason.stream.audio-downmixed": "سراؤنڈ آڈیو ٹریک دوبارہ انکوڈ ہوتے وقت اسٹیریو میں مکس ہوتا ہے",
   "main.reason.stream.extra-audio-dropped": "صرف ایک آڈیو ٹریک رکھا جاتا ہے؛ سب کو MKV میں لے جانے کے لیے 'تمام ٹریکس رکھیں' آن کریں",

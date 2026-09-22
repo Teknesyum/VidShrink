@@ -420,6 +420,7 @@
   "main.reason.encoder-fallback-not-working": "{0} 인코더를 이 컴퓨터에서 쓸 수 없어 {1}(으)로 인코딩",
   "main.reason.hdr-tonemapped": "원본은 HDR이지만 선택한 인코더가 10비트를 유지할 수 없어 SDR BT.709로 톤 매핑됨",
   "main.reason.hdr-dynamic-dropped": "원본에 동적 HDR 메타데이터(HDR10+ 또는 Dolby Vision)가 있지만 이 인코딩은 이를 전달하지 못해 출력에는 정적 HDR10 계층만 남음",
+  "main.reason.vp9-crf-unmeasured": "이 엔진에는 libvpx-vp9의 측정된 CRF 척도가 없어, CRF를 추측하는 대신 2패스 VBR로 크기를 맞춥니다",
   "main.reason.stream.audio-passthrough": "오디오 트랙이 그대로 복사됩니다: 컨테이너가 코덱을 지원하고 목표의 15% 이내입니다",
   "main.reason.stream.audio-downmixed": "서라운드 오디오 트랙은 재인코딩할 때 스테레오로 다운믹스됩니다",
   "main.reason.stream.extra-audio-dropped": "오디오 트랙은 하나만 유지됩니다; 모두 MKV로 옮기려면 '모든 트랙 유지'를 켜세요",

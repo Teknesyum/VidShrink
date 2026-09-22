@@ -121,6 +121,34 @@ public sealed class Vp9KucultmeTests
         Assert.DoesNotContain("-row-mt", x264Args);
     }
 
+    /// <summary>
+    /// Bol hedefte motor CRF'e gider; vp9'da CRF olceklenmedigi icin iki gecise cevrilir ve bu
+    /// gerekce satiri yalniz Ingilizce metin olarak kalmaz, <see cref="ReasonCode.Vp9CrfUnmeasuredTwoPass"/>
+    /// kodunu da birakir, anahtari 42 dilde. Kilitli CRF ve x264 ayni hedefte kodu birakmaz (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void CrfdenIkiGeciseDonusGerekceKoduBirakir()
+    {
+        var info = Kaynak(60, Video, new SourceStream(1, StreamKind.Audio, "aac", "eng", Channels: 2, BitrateBps: 128_000, SampleRate: 48000));
+        static bool Birakti(EncodePlan p) => p.ReasonCodes.Any(n => n.Code == ReasonCode.Vp9CrfUnmeasuredTwoPass);
+
+        var bol = Plan(info, options => { options.TargetMb = 300; options.FillPolicy = FillPolicy.QualityCeiling; });
+        Assert.Equal(EncodeMode.TwoPass, bol.ModeEnum);
+        Assert.True(Birakti(bol), bol.Reason);
+
+        var x264 = Plan(info, options => { options.TargetMb = 300; options.FillPolicy = FillPolicy.QualityCeiling; options.LockedCodec = "libx264"; });
+        Assert.Equal(EncodeMode.Crf, x264.ModeEnum);
+        Assert.False(Birakti(x264));
+
+        var kilitli = Plan(info, options => { options.TargetMb = 300; options.FillPolicy = FillPolicy.QualityCeiling; options.LockedMode = EncodeMode.Crf; options.LockedCrf = 33; });
+        Assert.Equal(EncodeMode.Crf, kilitli.ModeEnum);
+        Assert.False(Birakti(kilitli));
+
+        Assert.Equal(42, Locales.Languages.Count());
+        foreach (var dil in Locales.Languages)
+            Assert.False(string.IsNullOrWhiteSpace(Locales.Values(dil).FirstOrDefault(p => p.Key == "main.reason.vp9-crf-unmeasured").Value), dil);
+    }
+
     /// <summary>WebM'de aac kopyalanamaz, opus'a kodlanir ve not duser; opus kopyasi kopya kalir, not dusmez.</summary>
     [Fact]
     public void WebmSesiOpusOluyor()

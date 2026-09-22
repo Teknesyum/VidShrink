@@ -420,6 +420,7 @@
   "main.reason.encoder-fallback-not-working": "kodaren {0} kunde inte användas på den här datorn, så kodningen faller tillbaka på {1}",
   "main.reason.hdr-tonemapped": "källan är HDR men den valda kodaren kan inte bevara 10 bitar, så den tonmappades till SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "källan bär dynamisk HDR-metadata (HDR10+ eller Dolby Vision) som den här kodningen inte för vidare, så utdata behåller bara det statiska HDR10-lagret",
+  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 har ingen uppmätt CRF-skala i den här motorn, så storleken hålls med tvåpass-VBR i stället för en gissad CRF",
   "main.reason.stream.audio-passthrough": "ljudspåret kopieras oförändrat: behållaren stöder dess codec och det håller sig inom 15 % av målet",
   "main.reason.stream.audio-downmixed": "ett surroundljudspår mixas ned till stereo vid omkodningen",
   "main.reason.stream.extra-audio-dropped": "bara ett ljudspår behålls; slå på 'Behåll alla spår' för att ta med alla i MKV",

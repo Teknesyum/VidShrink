@@ -420,6 +420,7 @@
   "main.reason.encoder-fallback-not-working": "der {0}-Encoder konnte auf diesem Rechner nicht verwendet werden, die Kodierung fällt daher auf {1} zurück",
   "main.reason.hdr-tonemapped": "die Quelle ist HDR, aber der gewählte Encoder kann 10 Bit nicht erhalten, sie wurde daher per Tone-Mapping in SDR BT.709 umgewandelt",
   "main.reason.hdr-dynamic-dropped": "die Quelle trägt dynamische HDR-Metadaten (HDR10+ oder Dolby Vision), die diese Kodierung nicht weitergibt, daher behält die Ausgabe nur die statische HDR10-Ebene",
+  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 hat in dieser Engine keine gemessene CRF-Skala, daher hält Zwei-Pass-VBR die Größe statt einer geschätzten CRF",
   "main.reason.stream.audio-passthrough": "die Tonspur wird unverändert kopiert: der Container unterstützt ihren Codec und sie bleibt unter 15 % des Ziels",
   "main.reason.stream.audio-downmixed": "eine Surround-Tonspur wird beim Neukodieren auf Stereo heruntergemischt",
   "main.reason.stream.extra-audio-dropped": "nur eine Tonspur wird behalten; aktivieren Sie 'Alle Spuren behalten', um alle in MKV zu übernehmen",

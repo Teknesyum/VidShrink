@@ -420,6 +420,7 @@
   "main.reason.encoder-fallback-not-working": "{0} koduotuvo šiame kompiuteryje nepavyko naudoti, todėl kodavimas grįžta prie {1}",
   "main.reason.hdr-tonemapped": "šaltinis yra HDR, bet pasirinktas koduotuvas negali išlaikyti 10 bitų, todėl jis perkeltas į SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "šaltinyje yra dinaminių HDR metaduomenų (HDR10+ arba Dolby Vision), kurių šis kodavimas neperduoda, todėl išvestyje lieka tik statinis HDR10 sluoksnis",
+  "main.reason.vp9-crf-unmeasured": "šiame variklyje libvpx-vp9 neturi išmatuotos CRF skalės, todėl dydį palaiko dviejų praėjimų VBR, o ne spėjamas CRF",
   "main.reason.stream.audio-passthrough": "garso takelis nukopijuojamas nepakeistas: konteineris palaiko jo kodeką ir jis neviršija 15 % tikslo",
   "main.reason.stream.audio-downmixed": "erdvinio garso takelis perkoduojant sumaišomas į stereo",
   "main.reason.stream.extra-audio-dropped": "paliekamas tik vienas garso takelis; įjunkite 'Išsaugoti visus takelius', kad visi būtų perkelti į MKV",

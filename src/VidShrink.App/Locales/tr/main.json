@@ -420,6 +420,7 @@
   "main.reason.encoder-fallback-not-working": "{0} kodlayıcısı bu makinede kullanılamadı, bu yüzden {1}'e düşüldü",
   "main.reason.hdr-tonemapped": "kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor, bu yüzden BT.709 SDR'ye tone-map edildi",
   "main.reason.hdr-dynamic-dropped": "kaynak dinamik HDR meta verisi (HDR10+ ya da Dolby Vision) taşıyor ve bu kodlama onu aktaramıyor, bu yüzden çıktıda yalnız statik HDR10 katmanı kalıyor",
+  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 için bu motorda ölçülmüş bir CRF ölçeği yok; boyutu CRF tahmini yerine iki geçişli VBR tutuyor",
   "main.reason.stream.audio-passthrough": "ses izi olduğu gibi kopyalandı: kap bu kodeği taşıyor ve hedefin %15'ini aşmıyor",
   "main.reason.stream.audio-downmixed": "çok kanallı bir ses izi yeniden kodlanırken stereoya indirildi",
   "main.reason.stream.extra-audio-dropped": "yalnız bir ses izi tutuldu; hepsini MKV'de taşımak için 'İzleri koru'yu açın",

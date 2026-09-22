@@ -420,6 +420,7 @@
   "main.reason.encoder-fallback-not-working": "ตัวเข้ารหัส {0} ใช้บนเครื่องนี้ไม่ได้ การเข้ารหัสจึงกลับไปใช้ {1}",
   "main.reason.hdr-tonemapped": "ต้นฉบับเป็น HDR แต่ตัวเข้ารหัสที่เลือกคง 10 บิตไม่ได้ จึงแปลงโทนเป็น SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "ต้นฉบับมีเมทาดาทา HDR แบบไดนามิก (HDR10+ หรือ Dolby Vision) ที่การเข้ารหัสนี้ส่งต่อไม่ได้ ผลลัพธ์จึงเหลือเพียงชั้น HDR10 แบบคงที่",
+  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 ไม่มีสเกล CRF ที่วัดไว้ในเอนจินนี้ จึงคุมขนาดด้วย VBR สองรอบแทนการเดาค่า CRF",
   "main.reason.stream.audio-passthrough": "แทร็กเสียงถูกคัดลอกตามเดิม: คอนเทนเนอร์รองรับโคเดกของมันและไม่เกิน 15% ของเป้าหมาย",
   "main.reason.stream.audio-downmixed": "แทร็กเสียงเซอร์ราวด์ถูกมิกซ์ลงเป็นสเตอริโอระหว่างเข้ารหัสใหม่",
   "main.reason.stream.extra-audio-dropped": "เก็บแทร็กเสียงไว้เพียงแทร็กเดียว เปิด 'เก็บทุกแทร็ก' เพื่อนำทั้งหมดไปใน MKV",

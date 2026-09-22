@@ -420,6 +420,7 @@
   "main.reason.encoder-fallback-not-working": "kisimbaji cha {0} hakikuweza kutumika kwenye mashine hii, kwa hiyo usimbaji unarudi kwenye {1}",
   "main.reason.hdr-tonemapped": "chanzo ni HDR lakini kisimbaji kilichochaguliwa hakiwezi kuhifadhi biti 10, kwa hiyo kilipangwa toni kuwa SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "chanzo kina metadata ya HDR inayobadilika (HDR10+ au Dolby Vision) ambayo usimbaji huu hauipitishi, kwa hiyo matokeo yanabaki na safu tuli ya HDR10 pekee",
+  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 haina kipimo cha CRF kilichopimwa katika injini hii, kwa hivyo ukubwa hushikiliwa na VBR ya njia mbili badala ya kukisia CRF",
   "main.reason.stream.audio-passthrough": "wimbo wa sauti unanakiliwa kama ulivyo: chombo kinakubali kodeki yake na unabaki ndani ya 15% ya lengo",
   "main.reason.stream.audio-downmixed": "wimbo wa sauti ya mzunguko unachanganywa kuwa stereo unaposimbwa upya",
   "main.reason.stream.extra-audio-dropped": "wimbo mmoja tu wa sauti unahifadhiwa; washa 'Hifadhi nyimbo zote' ili kubeba zote katika MKV",

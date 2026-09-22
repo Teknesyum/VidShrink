@@ -67,6 +67,7 @@ public partial class MainWindow
                 ReasonCode.EncoderFallback => Say(EncoderFallbackReasonKey(note), note.RequestedCodec, note.FallbackCodec),
                 ReasonCode.HdrTonemapped => Say("main.reason.hdr-tonemapped"),
                 ReasonCode.HdrDynamicMetadataDropped => Say("main.reason.hdr-dynamic-dropped"),
+                ReasonCode.Vp9CrfUnmeasuredTwoPass => Say("main.reason.vp9-crf-unmeasured"),
                 ReasonCode.FillCrfLowered => Say("main.reason.fill-crf-lowered",
                     Num(note.Crf, "0.#"), Num(note.Mb, "0.0"), Num(note.BandLowerMb, "0.0"), Num(note.TargetMb, "0.0")),
                 ReasonCode.FillTwoPassBandCenter => Say("main.reason.fill-band-center",
