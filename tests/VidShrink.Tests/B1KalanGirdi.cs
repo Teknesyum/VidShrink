@@ -27,13 +27,7 @@ internal static class B1KalanGirdi
 
     internal static string Yol(string ad) => Path.Combine(Folder, ad);
 
-    internal static void Kapat(params string[] adlar)
-    {
-        foreach (var ad in adlar)
-            foreach (var yol in Directory.GetFiles(Folder, ad))
-                File.Delete(yol);
-        if (!Directory.EnumerateFileSystemEntries(Folder).Any()) Directory.Delete(Folder);
-    }
+    internal static void Kapat(params string[] adlar) => KanitKapanisi.Kapat(Folder, adlar);
 
     internal static MediaInfo Kaynak(double sure, params SourceStream[] streams) => new()
     {
@@ -92,6 +86,39 @@ internal static class B1KalanGirdi
             "-disposition:s:0", zorunlu ? "forced" : "0", yol
         });
         return yol;
+    }
+
+    /// <summary>Gurultulu 3 sn video, 44,1 kHz ses ve 64x64 png kapak (<c>attached_pic</c>) tasiyan mp4.</summary>
+    internal static async Task<(string Yol, long KapakBayti)> KapakliAsync(string ad)
+    {
+        var png = Yol(Path.GetFileNameWithoutExtension(ad) + "-kapak.png");
+        await AkisGirdisi.RunOrThrowAsync(ToolLocator.Ffmpeg, new[]
+        {
+            "-hide_banner", "-y", "-f", "lavfi", "-i", "color=c=red:size=64x64:duration=0.04", "-frames:v", "1", png
+        });
+        var yol = Yol(ad);
+        await AkisGirdisi.RunOrThrowAsync(ToolLocator.Ffmpeg, new[]
+        {
+            "-hide_banner", "-y",
+            "-f", "lavfi", "-i", "testsrc=size=320x240:rate=25:duration=3,noise=alls=60:allf=t",
+            "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=44100:duration=3",
+            "-i", png,
+            "-map", "0", "-map", "1", "-map", "2", "-c:v", "libx264", "-preset", "ultrafast", "-b:v:0", "3M",
+            "-c:a", "aac", "-c:v:1", "png", "-disposition:v:1", "attached_pic", yol
+        });
+        return (yol, new FileInfo(png).Length);
+    }
+
+    /// <summary>1. saniyedeki karenin gri piksellerinin en buyugu (0-255).</summary>
+    internal static async Task<int> EnParlakAsync(string yol, string gri)
+    {
+        await AkisGirdisi.RunOrThrowAsync(ToolLocator.Ffmpeg, new[]
+        {
+            "-hide_banner", "-y", "-ss", "1", "-i", yol, "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "gray", gri
+        });
+        var baytlar = File.ReadAllBytes(gri);
+        Assert.NotEmpty(baytlar);
+        return baytlar.Max();
     }
 
     /// <summary>
