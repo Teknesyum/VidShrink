@@ -145,6 +145,8 @@ public partial class MainWindow
         StreamNote.AudioCodecNotInContainer => "main.reason.stream.audio-codec-not-in-container",
         StreamNote.DolbyCodecNotInContainer => "main.reason.stream.dolby-not-in-container",
         StreamNote.DolbyCodecBelowChannelFloor => "main.reason.stream.dolby-below-channel-floor",
+        StreamNote.FlacFellBack => "main.reason.stream.flac-fell-back",
+        StreamNote.AudioFilterSkippedOnCopy => "main.reason.stream.audio-filter-on-copy",
         _ => "main.reason.stream.lossless-not-passed"
     };
 

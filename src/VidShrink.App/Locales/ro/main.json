@@ -380,6 +380,8 @@
   "main.reason.stream.audio-codec-not-in-container": "codecul audio sursă nu poate fi transportat în acest container, așa că pista este recodificată",
   "main.reason.stream.dolby-not-in-container": "codecul Dolby ales nu poate călători în acest container, așa că pista a fost codificată cu codecul propriu al containerului",
   "main.reason.stream.dolby-below-channel-floor": "bugetul audio scade sub pragul minim al codecului Dolby ales la acest număr de canale, așa că pista a fost codificată cu codecul propriu al containerului",
+  "main.reason.stream.flac-fell-back": "FLAC nu a putut fi folosit: containerul nu îl suportă sau plafonul său de 16 biți nu încape în 15% din țintă, așa că pista a fost codată cu codecul propriu al containerului",
+  "main.reason.stream.audio-filter-on-copy": "normalizarea volumului și amplificarea nu se pot aplica unei piste audio copiate, așa că pista a fost copiată neschimbată",
   "main.reason.stream.lossless-not-passed": "o pistă TrueHD/DTS fără pierderi nu este copiată niciodată; este recodată",
   "main.reason.fill-crf-lowered": "politica de umplere a țintei a coborât CRF la {0} în loc să se oprească la plafonul de transparență, ajungând aproape de centrul benzii de {1} MB din banda {2}-{3} MB",
   "main.reason.fill-band-center": "pragul CRF {0} a fost atins înainte de banda de umplere, deci VBR cu două treceri țintește direct centrul benzii de {1} MB",

@@ -380,6 +380,8 @@
   "main.reason.stream.audio-codec-not-in-container": "o codec de áudio de origem não pode ser transportado neste contêiner, então a faixa é recodificada",
   "main.reason.stream.dolby-not-in-container": "o codec Dolby escolhido não pode viajar neste contentor, por isso a faixa foi codificada com o codec do próprio contentor",
   "main.reason.stream.dolby-below-channel-floor": "o orçamento de áudio fica abaixo do mínimo do codec Dolby escolhido com este número de canais, por isso a faixa foi codificada com o codec do próprio contentor",
+  "main.reason.stream.flac-fell-back": "não foi possível usar FLAC: o contêiner não o suporta ou o seu teto de 16 bits não cabe em 15% do alvo, por isso a faixa foi codificada com o codec próprio do contêiner",
+  "main.reason.stream.audio-filter-on-copy": "a normalização de volume e o ganho não se aplicam a uma faixa de áudio copiada, a faixa foi copiada sem alterações",
   "main.reason.stream.lossless-not-passed": "uma faixa TrueHD/DTS sem perdas nunca é copiada; ela é recodificada",
   "main.reason.fill-crf-lowered": "a política de preencher o alvo baixou o CRF para {0} em vez de parar no teto de transparência, ficando perto do centro de {1} MB dentro da faixa de {2}-{3} MB",
   "main.reason.fill-band-center": "o piso de CRF {0} foi alcançado antes da faixa de preenchimento, então o VBR em duas passagens mira diretamente o centro de {1} MB",

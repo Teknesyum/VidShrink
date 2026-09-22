@@ -20,7 +20,9 @@ public enum StreamNote
     LosslessAudioNotPassedThrough,
     AudioCodecNotInContainer,
     DolbyCodecNotInContainer,
-    DolbyCodecBelowChannelFloor
+    DolbyCodecBelowChannelFloor,
+    FlacFellBack,
+    AudioFilterSkippedOnCopy
 }
 
 public sealed record SourceStream(
@@ -34,20 +36,86 @@ public sealed record SourceStream(
     long BitrateBps = 0,
     long Bytes = 0,
     bool IsAttachedPicture = false,
-    string? Title = null);
+    string? Title = null,
+    int SampleRate = 0);
 
-public sealed record StreamRequest(bool KeepAllTracks = false, bool PlatformDelivery = false, string? PreferredLanguage = null)
+/// <summary>
+/// Kaynagin yanindan ya da <c>--altyazi</c> ile gelen metin altyazi dosyasi. Cikti ona ek bir
+/// <c>-i</c> girdisi olarak baglanir; dil adindan okunur (<c>film.tr.srt</c> → <c>tur</c>).
+/// </summary>
+public sealed record ExternalSubtitle(string Path, string Codec, string? Language, long Bytes)
 {
-    public static StreamRequest Default { get; } = new();
+    public static readonly string[] Extensions = { ".srt", ".ass", ".ssa", ".vtt" };
+
+    public static ExternalSubtitle? FromFile(string path)
+    {
+        var extension = System.IO.Path.GetExtension(path).ToLowerInvariant();
+        var codec = extension switch
+        {
+            ".srt" => "subrip",
+            ".ass" or ".ssa" => "ass",
+            ".vtt" => "webvtt",
+            _ => null
+        };
+        if (codec is null || !File.Exists(path)) return null;
+        var stem = System.IO.Path.GetFileNameWithoutExtension(path);
+        var dot = stem.LastIndexOf('.');
+        var language = dot > 0 ? StreamMapping.LanguageTag(stem[(dot + 1)..]) : null;
+        return new ExternalSubtitle(System.IO.Path.GetFullPath(path), codec, language, new FileInfo(path).Length);
+    }
+
+    /// <summary>
+    /// Girdinin yanindaki altyazi dosyalari: ayni govdeyle baslayan (<c>film.srt</c>,
+    /// <c>film.tr.srt</c>) ve desteklenen uzantili olanlar, ada gore sirali.
+    /// </summary>
+    public static IReadOnlyList<ExternalSubtitle> Sidecars(string inputPath)
+    {
+        var folder = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(inputPath));
+        if (folder is null || !Directory.Exists(folder)) return Array.Empty<ExternalSubtitle>();
+        var stem = System.IO.Path.GetFileNameWithoutExtension(inputPath);
+        return Directory.EnumerateFiles(folder)
+            .Where(file => Extensions.Contains(System.IO.Path.GetExtension(file).ToLowerInvariant()))
+            .Where(file =>
+            {
+                var name = System.IO.Path.GetFileNameWithoutExtension(file);
+                return name.Equals(stem, StringComparison.OrdinalIgnoreCase)
+                    || name.StartsWith(stem + ".", StringComparison.OrdinalIgnoreCase);
+            })
+            .OrderBy(file => file, StringComparer.Ordinal)
+            .Select(FromFile)
+            .OfType<ExternalSubtitle>()
+            .ToList();
+    }
 }
 
-public sealed record AudioTrack(string Map, TrackAction Action, string Codec, int BitrateK, int? Channels, string? Language, string? Title = null)
+/// <summary>
+/// Akis kararinin girdisi. Ses suzgeci (<see cref="AudioLoudnorm"/>, <see cref="AudioGainDb"/>),
+/// dis altyazilar ve yakilan altyazi da burada tasinir: <see cref="StreamMapping.ForOutput"/>
+/// kap degisince karari bu istekten yeniden kurar, alan burada durmazsa orada kaybolur.
+/// <see cref="BurnedSubtitle"/> kaynagin altyazi sirasi (0 tabanli, ffmpeg'in <c>si</c>'si).
+/// </summary>
+public sealed record StreamRequest(
+    bool KeepAllTracks = false,
+    bool PlatformDelivery = false,
+    string? PreferredLanguage = null,
+    bool AudioLoudnorm = false,
+    double? AudioGainDb = null,
+    IReadOnlyList<ExternalSubtitle>? ExternalSubtitles = null,
+    int? BurnedSubtitle = null)
+{
+    public static StreamRequest Default { get; } = new();
+
+    public bool FiltersAudio => AudioLoudnorm || AudioGainDb is { } gain && gain != 0;
+}
+
+public sealed record AudioTrack(string Map, TrackAction Action, string Codec, int BitrateK, int? Channels, string? Language, string? Title = null,
+    string? Filter = null)
 {
     public bool Copies => Action == TrackAction.Copy;
 }
 
 public sealed record SubtitleTrack(string Map, string Codec, bool Image, string? Language, long Bytes,
-    string? Title = null, bool IsDefault = false, bool IsForced = false)
+    string? Title = null, bool IsDefault = false, bool IsForced = false, string? InputPath = null)
 {
     /// <summary>
     /// Kaynağın bayrakları <c>-disposition</c>'a açık yazılır: mp4 muxer'ı yazılmazsa ilk
@@ -71,13 +139,21 @@ public sealed record StreamPlan(
     IReadOnlyList<string> Attachments,
     IReadOnlyList<StreamNote> Notes,
     double SideK,
-    StreamRequest Request)
+    StreamRequest Request,
+    string? CoverMap = null)
 {
     public string Extension => StreamMapping.ExtensionOf(Container);
+
+    /// <summary>
+    /// Ana girdiden sonra eklenen <c>-i</c> girdileri, sirasiyla: dis altyazi dosyalari.
+    /// Esleme <c>1:0</c>, <c>2:0</c>... bu siradan turer.
+    /// </summary>
+    public IReadOnlyList<string> ExtraInputs => Subtitles.Where(track => track.InputPath is not null).Select(track => track.InputPath!).ToList();
 
     public IReadOnlyList<string> OutputArguments(bool dropChapters = false)
     {
         var a = new List<string> { "-map", VideoMap };
+        if (CoverMap is not null) a.AddRange(new[] { "-map", CoverMap });
         foreach (var track in Audio) a.AddRange(new[] { "-map", track.Map });
         foreach (var track in Subtitles) a.AddRange(new[] { "-map", track.Map });
         foreach (var map in Attachments) a.AddRange(new[] { "-map", map });
@@ -99,6 +175,7 @@ public sealed record StreamPlan(
                     a.AddRange(new[] { "-c:s:" + i.ToString(CultureInfo.InvariantCulture), Subtitles[i].Codec });
         }
 
+        if (CoverMap is not null) a.AddRange(new[] { "-c:v:1", "copy", "-disposition:v:1", "attached_pic" });
         if (Attachments.Count > 0) a.AddRange(new[] { "-c:t", "copy" });
         if (!Request.KeepAllTracks && Audio.Count == 1) a.AddRange(new[] { "-disposition:a:0", "default" });
 
@@ -111,6 +188,8 @@ public sealed record StreamPlan(
             var index = i.ToString(CultureInfo.InvariantCulture);
             if (!string.IsNullOrWhiteSpace(Subtitles[i].Title))
                 a.AddRange(new[] { "-metadata:s:s:" + index, "title=" + Subtitles[i].Title });
+            if (Subtitles[i].InputPath is not null && !string.IsNullOrWhiteSpace(Subtitles[i].Language))
+                a.AddRange(new[] { "-metadata:s:s:" + index, "language=" + Subtitles[i].Language });
             a.AddRange(new[] { "-disposition:s:" + index, Subtitles[i].Disposition });
         }
 
@@ -122,12 +201,12 @@ public sealed record StreamPlan(
     {
         if (track.Copies)
             return new[] { "-c:a" + suffix, "copy" };
-        var a = new List<string>
-        {
-            "-c:a" + suffix, track.Codec,
-            "-b:a" + suffix, track.BitrateK.ToString(CultureInfo.InvariantCulture) + "k",
-            "-filter:a" + suffix, StreamMapping.SesHizalama
-        };
+        var a = new List<string> { "-c:a" + suffix, track.Codec };
+        if (StreamMapping.IsFlac(track.Codec))
+            a.AddRange(new[] { "-sample_fmt" + (suffix.Length == 0 ? "" : ":a" + suffix), "s16" });
+        else
+            a.AddRange(new[] { "-b:a" + suffix, track.BitrateK.ToString(CultureInfo.InvariantCulture) + "k" });
+        a.AddRange(new[] { "-filter:a" + suffix, track.Filter ?? StreamMapping.SesHizalama });
         if (track.Channels is > 0) a.AddRange(new[] { suffix.Length == 0 ? "-ac" : "-ac:a" + suffix, track.Channels.Value.ToString(CultureInfo.InvariantCulture) });
         return a;
     }
@@ -143,6 +222,21 @@ public static class StreamMapping
     /// Yalniz sesin yeniden kodlandigi izde islenir; kopyalanan izde suzgec kurulamaz.
     /// </summary>
     public const string SesHizalama = "aresample=async=1:first_pts=0";
+
+    /// <summary>
+    /// ffmpeg'in <c>loudnorm</c> varsayilanlari acik yazili: I=-24 LUFS, LRA=7, TP=-2 dBTP.
+    /// Suzgec ciktisini 192 kHz'e cikariyor; zincirin sonundaki <c>aresample</c> kaynak hizina dondurur.
+    /// </summary>
+    public const string LoudnormFilter = "loudnorm=I=-24:LRA=7:TP=-2";
+
+    public const double MinGainDb = -20;
+    public const double MaxGainDb = 20;
+    public const int DefaultSampleRate = 48000;
+
+    /// <summary>flac'in butceye giren tavani: 16 bit PCM. <c>-sample_fmt s16</c> ile yazilir.</summary>
+    public const int FlacBitsPerSample = 16;
+
+    private static readonly string[] CoverCodecs = { "mjpeg", "png", "bmp" };
 
     public const double PassthroughTargetShare = 0.15;
     public const int MinimumTrackK = 24;
@@ -222,6 +316,51 @@ public static class StreamMapping
         4 => codec.Equals("eac3", StringComparison.OrdinalIgnoreCase) ? 48 : 40,
         _ => 32
     };
+
+    public static bool IsFlac(string? codec) => codec is not null && codec.Equals("flac", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// flac izinin butce tavani, kbit/sn: ornekleme hizi × kanal × 16 bit. flac kayipsiz ve
+    /// degisken; sikistirma bu tavanin altinda kalir, ustune cikmaz.
+    /// </summary>
+    public static int FlacCeilingK(int sampleRate, int channels)
+        => (int)Math.Ceiling((sampleRate > 0 ? sampleRate : DefaultSampleRate) * (double)Math.Max(channels, 1) * FlacBitsPerSample / 1000.0);
+
+    /// <summary>
+    /// Yeniden kodlanan izin ses suzgeci. Istek yoksa yalniz hizalama; kazanc ve normallestirme
+    /// hizalamadan sonra, <c>loudnorm</c>'un 192 kHz'i ise sondaki <c>aresample</c> ile kaynak hizina doner.
+    /// </summary>
+    public static string AudioFilter(StreamRequest request, int sampleRate)
+    {
+        if (!request.FiltersAudio) return SesHizalama;
+        var chain = new List<string> { SesHizalama };
+        if (request.AudioGainDb is { } gain && gain != 0)
+            chain.Add("volume=" + gain.ToString("0.##", CultureInfo.InvariantCulture) + "dB");
+        if (request.AudioLoudnorm)
+        {
+            chain.Add(LoudnormFilter);
+            chain.Add("aresample=" + (sampleRate > 0 ? sampleRate : DefaultSampleRate).ToString(CultureInfo.InvariantCulture));
+        }
+        return string.Join(',', chain);
+    }
+
+    /// <summary>
+    /// Dosya adindaki dil etiketini ffmpeg'in uc harfli koduna cevirir: <c>tr</c> → <c>tur</c>.
+    /// Zaten uc harfli bilinen kod oldugu gibi doner; tanimayan etiket <c>null</c>.
+    /// </summary>
+    public static string? LanguageTag(string tag)
+    {
+        if (LanguageCodes.TryGetValue(tag, out var codes)) return codes[0];
+        var known = LanguageCodes.Values.SelectMany(list => list).FirstOrDefault(code => code.Equals(tag, StringComparison.OrdinalIgnoreCase));
+        return known?.ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// Kapak resmi (<c>attached_pic</c>) yalniz MP4'te tasinir. Olculdu
+    /// (<c>docs/olcumler/b1-kalan-mutasyonlar.md</c>): ffmpeg 9.0'da MOV muxer'i resmi sessizce
+    /// dusuruyor, Matroska muxer'i onu kapak degil tek kareli duz bir video izi olarak yaziyor.
+    /// </summary>
+    public static bool CarriesCover(OutputContainer container) => container == OutputContainer.Mp4;
 
     public static bool IsDolby(string? codec)
         => codec is not null
@@ -305,12 +444,14 @@ public static class StreamMapping
                 if (audioCodec == "copy")
                 {
                     audio.Add(new AudioTrack(map, TrackAction.Copy, "copy", (int)Math.Round(sourceK > 0 ? sourceK : audioK), null, source.Language, source.Title));
+                    if (request.FiltersAudio) notes.Add(StreamNote.AudioFilterSkippedOnCopy);
                     continue;
                 }
 
                 var lossless = NeverPassedThrough.Contains(source.Codec, StringComparer.OrdinalIgnoreCase);
                 if (lossless && allowPassthrough) notes.Add(StreamNote.LosslessAudioNotPassedThrough);
                 var copyable = allowPassthrough
+                    && !request.FiltersAudio
                     && inventory
                     && !lossless
                     && CopyableAudio[container].Contains(source.Codec, StringComparer.OrdinalIgnoreCase)
@@ -359,15 +500,34 @@ public static class StreamMapping
                     }
                     else trackK = FitDolbyBitrateK(codec, audioK);
                 }
+                else if (IsFlac(codec))
+                {
+                    var ceiling = FlacCeilingK(source.SampleRate, channels ?? (source.Channels > 0 ? source.Channels : 2));
+                    if (!CopyableAudio[container].Contains(codec, StringComparer.OrdinalIgnoreCase)
+                        || passedK + ceiling > passthroughBudgetK)
+                    {
+                        codec = FallbackAudioCodec(container);
+                        notes.Add(StreamNote.FlacFellBack);
+                    }
+                    else
+                    {
+                        passedK += ceiling;
+                        trackK = ceiling;
+                    }
+                }
                 else if (!IsMp4Family(container) && codec == "aac") codec = "libopus";
 
-                audio.Add(new AudioTrack(map, TrackAction.Encode, codec, trackK, channels, source.Language, source.Title));
+                audio.Add(new AudioTrack(map, TrackAction.Encode, codec, trackK, channels, source.Language, source.Title,
+                    request.FiltersAudio ? AudioFilter(request, source.SampleRate) : null));
             }
         }
 
         var subtitles = new List<SubtitleTrack>();
+        var subtitleOrdinal = -1;
         foreach (var source in info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle))
         {
+            subtitleOrdinal++;
+            if (request.BurnedSubtitle == subtitleOrdinal) continue;
             if (request.PlatformDelivery)
             {
                 notes.Add(StreamNote.SubtitleDroppedForPlatform);
@@ -404,6 +564,30 @@ public static class StreamMapping
                 subtitles.Add(new SubtitleTrack(Map(source), "copy", true, source.Language, source.Bytes, source.Title, source.IsDefault, source.IsForced));
         }
 
+        foreach (var external in request.ExternalSubtitles ?? Array.Empty<ExternalSubtitle>())
+        {
+            if (request.PlatformDelivery)
+            {
+                notes.Add(StreamNote.SubtitleDroppedForPlatform);
+                continue;
+            }
+            var codec = IsMp4Family(container) ? "mov_text" : container == OutputContainer.WebM ? "webvtt" : "copy";
+            var input = subtitles.Count(track => track.InputPath is not null) + 1;
+            subtitles.Add(new SubtitleTrack(input.ToString(CultureInfo.InvariantCulture) + ":0", codec, false, external.Language, external.Bytes,
+                InputPath: external.Path));
+        }
+
+        subtitles = DefaultForced(subtitles, request.PreferredLanguage, audio.FirstOrDefault()?.Language);
+
+        string? coverMap = null;
+        var coverBytes = 0L;
+        if (CarriesCover(container) && !request.PlatformDelivery
+            && info.Streams.FirstOrDefault(stream => stream.IsAttachedPicture && CoverCodecs.Contains(stream.Codec, StringComparer.OrdinalIgnoreCase)) is { } cover)
+        {
+            coverMap = Map(cover);
+            coverBytes = cover.Bytes;
+        }
+
         var attachments = new List<string>();
         var attachmentBytes = 0L;
         if (keepAll && container == OutputContainer.Mkv)
@@ -414,9 +598,26 @@ public static class StreamMapping
             }
 
         var subtitleBytes = subtitles.Sum(track => track.Bytes);
-        var sideK = audio.Sum(track => (double)track.BitrateK) + (subtitleBytes + attachmentBytes) * 8.0 / 1000.0 / duration;
+        var sideK = audio.Sum(track => (double)track.BitrateK) + (subtitleBytes + attachmentBytes + coverBytes) * 8.0 / 1000.0 / duration;
 
-        return new StreamPlan(container, videoMap, audio, subtitles, attachments, notes.Distinct().ToList(), sideK, request);
+        return new StreamPlan(container, videoMap, audio, subtitles, attachments, notes.Distinct().ToList(), sideK, request, coverMap);
+    }
+
+    /// <summary>
+    /// Ciktida hic varsayilan altyazi yoksa zorunlu (forced) bayrakli iz varsayilan olur:
+    /// once tercih edilen dilde, sonra tutulan sesin dilinde, yoksa ilki. Varsayilan zaten
+    /// varsa ya da zorunlu iz yoksa liste degismez. HandBrake'in "Foreign Audio Search"'u degil;
+    /// yalniz kaynagin kendi bayragini okur.
+    /// </summary>
+    public static List<SubtitleTrack> DefaultForced(List<SubtitleTrack> subtitles, string? preferredLanguage, string? audioLanguage)
+    {
+        if (subtitles.Any(track => track.IsDefault)) return subtitles;
+        var forced = subtitles.Where(track => track.IsForced).ToList();
+        if (forced.Count == 0) return subtitles;
+        var pick = forced.FirstOrDefault(track => LanguageMatches(track.Language, preferredLanguage))
+            ?? forced.FirstOrDefault(track => audioLanguage is not null && string.Equals(track.Language, audioLanguage, StringComparison.OrdinalIgnoreCase))
+            ?? forced[0];
+        return subtitles.Select(track => ReferenceEquals(track, pick) ? track with { IsDefault = true } : track).ToList();
     }
 
     public static StreamPlan ForOutput(MediaInfo info, EncodePlan plan, string outputPath)

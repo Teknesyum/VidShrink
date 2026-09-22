@@ -478,11 +478,19 @@ public static class FfmpegArguments
     {
         var a = new List<string> { "-hide_banner", "-y" };
         a.AddRange(HardwareDecodeArgs(info.VideoCodec));
+        var streams = StreamMapping.ForOutput(info, plan, outputPath);
+        var extraInputs = pass == 1 ? Array.Empty<string>() : streams.ExtraInputs;
+        var cover = pass != 1 && streams.CoverMap is not null;
         if (plan.Trim is { } trim)
         {
             if (trim.LeadSeconds > 0) a.AddRange(new[] { "-ss", Seconds(trim.LeadSeconds) });
             if (plan.Disc is { } disk) a.AddRange(disk.InputArguments());
             a.AddRange(new[] { "-i", info.FilePath });
+            foreach (var extra in extraInputs)
+            {
+                if (trim.LeadSeconds > 0) a.AddRange(new[] { "-ss", Seconds(trim.LeadSeconds) });
+                a.AddRange(new[] { "-i", extra });
+            }
             a.AddRange(new[] { "-ss", Seconds(trim.RemainderSeconds) });
             a.AddRange(new[] { "-t", Seconds(trim.DurationSeconds) });
         }
@@ -490,13 +498,14 @@ public static class FfmpegArguments
         {
             if (plan.Disc is { } kaynak) a.AddRange(kaynak.InputArguments());
             a.AddRange(new[] { "-i", info.FilePath });
+            foreach (var extra in extraInputs) a.AddRange(new[] { "-i", extra });
         }
 
         var filters = VideoFilterChain.Filters(info, plan);
         if (filters.Count > 0)
-            a.AddRange(new[] { "-vf", string.Join(',', filters) });
+            a.AddRange(new[] { cover ? "-filter:v:0" : "-vf", string.Join(',', filters) });
 
-        a.AddRange(new[] { "-c:v", plan.Codec });
+        a.AddRange(new[] { cover ? "-c:v:0" : "-c:v", plan.Codec });
         if (CodecModel.TakesPreset(plan.Codec))
             a.AddRange(new[] { "-preset", pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset });
         if (plan.Tune is { Length: > 0 } lockedTune && IsValidTune(plan.Codec, lockedTune)
@@ -530,14 +539,12 @@ public static class FfmpegArguments
         }
 
         a.AddRange(KeyframeArgs(plan.Codec, plan.Fps, scenes));
-        a.AddRange(new[] { "-pix_fmt", plan.PixelFormat });
+        a.AddRange(new[] { cover ? "-pix_fmt:v:0" : "-pix_fmt", plan.PixelFormat });
         if (CodecModel.OutputProfile(plan.Codec, plan.PixelFormat) is string profile)
-            a.AddRange(new[] { "-profile:v", profile });
+            a.AddRange(new[] { cover ? "-profile:v:0" : "-profile:v", profile });
         a.AddRange(psychovisualArgs);
         a.AddRange(plan.HdrColorArgs);
         a.AddRange(VideoFilterChain.ColorArgs(plan));
-
-        var streams = StreamMapping.ForOutput(info, plan, outputPath);
 
         if (pass == 1)
         {
@@ -552,7 +559,7 @@ public static class FfmpegArguments
         a.AddRange(streams.OutputArguments(dropChapters: plan.Trim is not null));
         if (StreamMapping.IsMp4Family(streams.Container))
             a.AddRange(new[] { "-movflags", "+faststart" });
-        a.AddRange(plan.ExtraArgs);
+        a.AddRange(cover ? plan.ExtraArgs.Select(arg => arg is "-level" or "-level:v" ? "-level:v:0" : arg) : plan.ExtraArgs);
         a.Add(outputPath);
         return MergeEncoderParams(a);
     }
@@ -709,7 +716,7 @@ public static class FfmpegArguments
         if (input < 0) throw new InvalidOperationException("Arguman dizisinde girdi bayragi yok.");
 
         a.InsertRange(input, new[] { "-ss", startSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
-        a.InsertRange(input + 4, new[] { "-t", durationSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
+        a.InsertRange(a.LastIndexOf("-i") + 2, new[] { "-t", durationSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
         return a;
     }
 

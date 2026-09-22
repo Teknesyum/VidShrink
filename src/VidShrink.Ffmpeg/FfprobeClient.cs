@@ -54,6 +54,8 @@ public static class FfprobeClient
         var inventory = Inventory(streams, duration);
         if (inventory.Any(stream => stream.Kind == StreamKind.Subtitle && stream.Bytes <= 0))
             inventory = await MeasureSubtitleBytesAsync(filePath, inventory, ct);
+        if (inventory.FirstOrDefault(stream => stream.IsAttachedPicture) is { } cover)
+            inventory = await MeasureCoverBytesAsync(filePath, inventory, cover.Index, ct);
         var chapters = root.TryGetProperty("chapters", out var chapterList) && chapterList.ValueKind == JsonValueKind.Array
             ? ChapterMarks(chapterList)
             : (IReadOnlyList<ChapterMark>)Array.Empty<ChapterMark>();
@@ -150,19 +152,40 @@ public static class FfprobeClient
                 bitrate,
                 bytes,
                 kind == StreamKind.Video && IsAttachedPicture(s),
-                tags is { } titleTags ? GetString(titleTags, "title") : null));
+                tags is { } titleTags ? GetString(titleTags, "title") : null,
+                (int)(ParseLong(s, "sample_rate") ?? 0)));
         }
         return list;
     }
 
+    /// <summary>
+    /// Kapak resmi tek paketlik bir video izi; ffprobe'un bit hizindan sure ile carpilan bayt
+    /// ona uymaz. Yalniz o izin ilk paketi okunur ve boyutu izin baytina yazilir.
+    /// </summary>
+    private static async Task<List<SourceStream>> MeasureCoverBytesAsync(string filePath, List<SourceStream> inventory, int coverIndex, CancellationToken ct)
+    {
+        var totals = await PacketTotalsAsync(filePath, coverIndex.ToString(CultureInfo.InvariantCulture), "%+#1", ct);
+        return totals is not null && totals.TryGetValue(coverIndex, out var size)
+            ? inventory.Select(stream => stream.Index == coverIndex ? stream with { Bytes = size } : stream).ToList()
+            : inventory;
+    }
+
     private static async Task<List<SourceStream>> MeasureSubtitleBytesAsync(string filePath, List<SourceStream> inventory, CancellationToken ct)
     {
-        var args = new[]
-        {
-            "-hide_banner", "-v", "error", "-select_streams", "s",
-            "-show_entries", "packet=stream_index,size", "-of", "csv=p=0",
-            filePath
-        };
+        var totals = await PacketTotalsAsync(filePath, "s", null, ct);
+        if (totals is null) return inventory;
+        return inventory
+            .Select(stream => stream.Kind == StreamKind.Subtitle && stream.Bytes <= 0 && totals.TryGetValue(stream.Index, out var total)
+                ? stream with { Bytes = total }
+                : stream)
+            .ToList();
+    }
+
+    private static async Task<Dictionary<int, long>?> PacketTotalsAsync(string filePath, string select, string? readIntervals, CancellationToken ct)
+    {
+        var args = new List<string> { "-hide_banner", "-v", "error", "-select_streams", select };
+        if (readIntervals is not null) args.AddRange(new[] { "-read_intervals", readIntervals });
+        args.AddRange(new[] { "-show_entries", "packet=stream_index,size", "-of", "csv=p=0", filePath });
 
         try
         {
@@ -172,7 +195,7 @@ public static class FfprobeClient
             var stdout = await process.StandardOutput.ReadToEndAsync(ct);
             await stderrTask;
             await process.WaitForExitAsync(ct);
-            if (process.ExitCode != 0) return inventory;
+            if (process.ExitCode != 0) return null;
 
             var totals = new Dictionary<int, long>();
             foreach (var line in stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
@@ -183,16 +206,11 @@ public static class FfprobeClient
                 if (!long.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var size)) continue;
                 totals[index] = totals.GetValueOrDefault(index) + size;
             }
-
-            return inventory
-                .Select(stream => stream.Kind == StreamKind.Subtitle && stream.Bytes <= 0 && totals.TryGetValue(stream.Index, out var total)
-                    ? stream with { Bytes = total }
-                    : stream)
-                .ToList();
+            return totals;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            return inventory;
+            return null;
         }
     }
 

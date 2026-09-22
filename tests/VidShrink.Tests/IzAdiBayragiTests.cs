@@ -72,7 +72,7 @@ public sealed class IzAdiBayragiTests
     [Theory]
     [InlineData(false, false, "0")]
     [InlineData(true, false, "default")]
-    [InlineData(false, true, "forced")]
+    [InlineData(false, true, "default+forced")]
     [InlineData(true, true, "default+forced")]
     public void AltyaziBayragiKaynaktanTuruyor(bool varsayilan, bool zorunlu, string beklenen)
     {

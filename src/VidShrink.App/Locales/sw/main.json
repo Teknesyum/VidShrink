@@ -380,6 +380,8 @@
   "main.reason.stream.audio-codec-not-in-container": "kodeki ya sauti ya chanzo haiwezi kubebwa kwenye kontena hili, hivyo wimbo unasimbwa upya",
   "main.reason.stream.dolby-not-in-container": "kodeki ya Dolby uliyochagua haiwezi kubebwa katika chombo hiki, hivyo wimbo umesimbwa kwa kodeki ya chombo chenyewe",
   "main.reason.stream.dolby-below-channel-floor": "bajeti ya sauti iko chini ya kiwango cha chini cha kodeki ya Dolby uliyochagua kwa idadi hii ya chaneli, hivyo wimbo umesimbwa kwa kodeki ya chombo chenyewe",
+  "main.reason.stream.flac-fell-back": "FLAC haikuweza kutumika: kontena haiitumii au kikomo chake cha biti 16 hakitoshei ndani ya 15% ya lengo, kwa hivyo wimbo ulisimbwa kwa kodeki ya kontena yenyewe",
+  "main.reason.stream.audio-filter-on-copy": "usawazishaji wa sauti na ukuzaji haviwezi kutumika kwa wimbo wa sauti ulionakiliwa, kwa hivyo wimbo ulinakiliwa bila kubadilishwa",
   "main.reason.stream.lossless-not-passed": "wimbo wa TrueHD/DTS usiopoteza ubora haunakiliwi kamwe; unasimbwa upya",
   "main.reason.fill-crf-lowered": "sera ya kujaza lengo ilipunguza CRF hadi {0} badala ya kusimama kwenye kikomo cha uwazi, ikifika karibu na kitovu cha bendi cha MB {1} ndani ya bendi ya MB {2}-{3}",
   "main.reason.fill-band-center": "sakafu ya CRF {0} ilifikiwa kabla ya bendi ya kujaza, kwa hiyo VBR ya hatua mbili hulenga kitovu cha bendi cha MB {1} moja kwa moja",

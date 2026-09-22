@@ -380,6 +380,8 @@
   "main.reason.stream.audio-codec-not-in-container": "izvorni avdio kodek ne more potovati v tem vsebniku, zato se sled ponovno kodira",
   "main.reason.stream.dolby-not-in-container": "izbranega kodeka Dolby ni mogoče prenašati v tem vsebniku, zato je bila sled kodirana z vsebnikovim lastnim kodekom",
   "main.reason.stream.dolby-below-channel-floor": "zvočni proračun je pod spodnjo mejo izbranega kodeka Dolby pri tem številu kanalov, zato je bila sled kodirana z vsebnikovim lastnim kodekom",
+  "main.reason.stream.flac-fell-back": "FLAC ni bil uporabljen: vsebnik ga ne podpira ali njegova 16-bitna zgornja meja ne gre v 15 % cilja, zato je bila sled kodirana z lastnim kodekom vsebnika",
+  "main.reason.stream.audio-filter-on-copy": "izenačevanja glasnosti in ojačitve ni mogoče uporabiti na kopirani zvočni sledi, zato je bila sled kopirana nespremenjena",
   "main.reason.stream.lossless-not-passed": "brezizgubna sled TrueHD/DTS se nikoli ne kopira; ponovno se kodira",
   "main.reason.fill-crf-lowered": "politika zapolnitve cilja je znižala CRF na {0}, namesto da bi se ustavila na meji prosojnosti, in pristala blizu središča pasu {1} MB znotraj pasu {2}–{3} MB",
   "main.reason.fill-band-center": "spodnja meja CRF {0} je bila dosežena pred pasom zapolnitve, zato dvoprehodni VBR neposredno cilja na središče pasu {1} MB",

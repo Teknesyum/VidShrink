@@ -380,6 +380,8 @@
   "main.reason.stream.audio-codec-not-in-container": "kaynağın ses kodeği bu kapta taşınamıyor, iz yeniden kodlandı",
   "main.reason.stream.dolby-not-in-container": "seçilen Dolby kodeği bu kapta taşınamıyor, iz kabın kendi kodeğiyle kodlandı",
   "main.reason.stream.dolby-below-channel-floor": "ses bütçesi bu kanal sayısında seçilen Dolby kodeğinin alt sınırının altında kalıyor, iz kabın kendi kodeğiyle kodlandı",
+  "main.reason.stream.flac-fell-back": "FLAC kullanılamadı: kap onu taşımıyor ya da 16 bitlik tavanı hedefin %15'ine sığmıyor, iz kabın kendi kodeğiyle kodlandı",
+  "main.reason.stream.audio-filter-on-copy": "ses eşitleme ve kazanç kopyalanan ses izine uygulanamaz, iz değişmeden kopyalandı",
   "main.reason.stream.lossless-not-passed": "kayıpsız TrueHD/DTS izi hiçbir zaman kopyalanmaz; yeniden kodlandı",
   "main.reason.fill-crf-lowered": "hedefi doldur politikası CRF'yi {0}'e düşürdü; şeffaflık tavanında durmak yerine {2}-{3} MB bandına, {1} MB bant merkezine yaklaşıldı",
   "main.reason.fill-band-center": "CRF {0} tabanına bandı doldurmadan ulaşıldığı için iki geçişli VBR doğrudan {1} MB bant merkezini hedefliyor",

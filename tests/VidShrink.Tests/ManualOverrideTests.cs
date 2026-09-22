@@ -1076,7 +1076,11 @@ public sealed class ManualOverrideTests
         "Trim",
         // B1a: AudioCodec kullanicinin sectigi ses kodegi (AAC, AC-3, E-AC-3; HandBrake --aencoder).
         // Kapali sabit degil, istegin kendisi; varsayilani Auto ve bugunku davranis AAC.
-        "AudioCodec"
+        "AudioCodec",
+        // B1b: AudioLoudnorm ve AudioGainDb kullanicinin ses suzgeci secimi (HandBrake --normalize-mix,
+        // --gain). B1c: ExternalSubtitles kullanicinin ekledigi altyazi dosyalari (--srt-file).
+        // Ucunun de varsayilani bugunku davranis: suzgec yok, dis altyazi yok.
+        "AudioLoudnorm", "AudioGainDb", "ExternalSubtitles"
     };
 
     [Fact]
