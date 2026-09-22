@@ -76,27 +76,21 @@
         </ScrollViewer>
       </StackPanel>
 
-      <Grid x:Name="QueueControls"
-            ColumnDefinitions="Auto,*,Auto"
-            ColumnSpacing="{StaticResource SpaceSm}">
-        <Button Grid.Column="0"
-                x:Name="BtnPause"
+      <StackPanel x:Name="QueueControls" Spacing="{StaticResource SpaceSm}">
+        <Button x:Name="BtnPause"
                 Content="{loc:Text main.shrink-job.pause}"
-                Padding="{StaticResource ButtonPaddingSm}"
-                VerticalAlignment="Center"/>
-        <TextBlock Grid.Column="1"
-                   Text="{loc:Text main.shrink-job.when-done}"
-                   FontSize="{StaticResource FontSizeSm}"
-                   Foreground="{StaticResource TextDisabled}"
-                   HorizontalAlignment="Right"
-                   VerticalAlignment="Center"
-                   TextTrimming="CharacterEllipsis"/>
-        <ComboBox Grid.Column="2"
-                  x:Name="CmbWhenDone"
-                  auto:AutomationProperties.Name="{loc:Text main.shrink-job.when-done}"
-                  MaxDropDownHeight="{StaticResource DropDownMaxHeight}"
-                  VerticalAlignment="Center"/>
-      </Grid>
+                Padding="{StaticResource ButtonPaddingSm}"/>
+        <StackPanel Spacing="{StaticResource SpaceXs}">
+          <TextBlock Text="{loc:Text main.shrink-job.when-done}"
+                     FontSize="{StaticResource FontSizeSm}"
+                     Foreground="{StaticResource TextDisabled}"
+                     TextWrapping="Wrap"/>
+          <ComboBox x:Name="CmbWhenDone"
+                    auto:AutomationProperties.Name="{loc:Text main.shrink-job.when-done}"
+                    MaxDropDownHeight="{StaticResource DropDownMaxHeight}"
+                    HorizontalAlignment="Stretch"/>
+        </StackPanel>
+      </StackPanel>
 
       <TextBlock x:Name="TxtPaused"
                  Text="{loc:Text main.shrink-job.paused}"

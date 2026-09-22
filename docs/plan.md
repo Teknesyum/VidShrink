@@ -1471,3 +1471,36 @@ pencere altı saniye sonra kapanıyor; HandBrake'in "bitince uyut / kapat" seçe
 bitince eylemi sahteyle — geri sayım bitmeden çağrı yok, bitince tek çağrı, vazgeçince hiç,
 "hiçbir şey" seçiliyken hiç, duraklatılmışken hiç (olumsuz kontroller); anahtarlar 42 dilde.
 En az üç mutasyon.
+
+## C1-5 — Süzgeç Paneli (22 Eylül 2026)
+
+Bugün süzgeçler Gelişmiş'te tek metin kutusu (`TxtAdvFilters`), ve kutu izlenmiyor: yazılan
+belirtim plana ancak başka bir seçenek değişince giriyor. Panel metni tek kaynak tutar:
+
+- Core `VideoFilterChain.Format` — `Parse`'ın tersi; `Parse(Format(o)) == o`.
+- Açılır kutular: taramasızlaştırma (otomatik/kapalı/açık), gürültü (kapalı/NLMeans/hqdn3d) +
+  güç, keskinlik, döndür/çevir, renk matrisi. Onay kutuları: telesine geri alma, blok, bant, gri.
+- Denetim değişince metin `Format(Parse(metin) with {...})` olur; kırpma ve kenar metinde kalır.
+  Metin değişince geçerliyse denetimler eşitlenir, plan yeniden hesaplanır (kayıp `Watch`).
+- Anahtarlar 42 dilde; yerleşim denetçisi 0 kusurda kalır.
+
+`SuzgecPaneliTests`: gidiş-dönüş her seçenekte (olumsuz kontrol: varsayılan boş metin), denetim →
+metin → `PlanOptionsForTest().Filters`, metin → denetim, bozuk metin denetimleri bozmaz, kırpma
+denetim değişiminde korunur, anahtarlar 42 dilde. En az üç mutasyon.
+
+## C1-6 — Ses ve Altyazı Kolları (22 Eylül 2026)
+
+B1'in ses yüksekliği, kazanç, dış altyazı ve altyazı yakma kolları motorda ve CLI'da vardı,
+arayüzde yoktu. Ses bölümüne iner (`MainWindow.Izler.cs`):
+
+- `loudnorm` onay kutusu ve -12..+12 dB kazanç (0 dB plana yazılmaz).
+- "Altyazı dosyası ekle" (çoklu seçim) ve kaynak açıkken bırakılan `.srt/.ass/.ssa/.vtt`;
+  liste satırı ad · dil ve çıkarma düğmesi. Tekrar eklenmez.
+- Yakma listesi yalnız kaynağın metin altyazılarını sunar; PGS listede yok, altyazısız
+  kaynakta kutu kapalı. Seçim altyazılar içindeki 0 tabanlı sıraya iner.
+- Dış altyazı ve yakma o videoya ait: yeni kaynakta sıfırlanır, kuyruk penceresine gitmez.
+- Bölüm adı "Ses ve Altyazı"; on anahtar 42 dilde.
+
+`IzPaneliTests`: ses kolları plana (0 dB olumsuz kontrol), ekleme/tekrar/çıkarma, yakma listesi
+yalnız metin, altyazısız kaynak, yeni kaynak sıfırlaması, kuyruğun izleri taşımaması (ses
+kolları geçer), anahtarlar 42 dilde. Beş mutasyonun beşi kırmızı.

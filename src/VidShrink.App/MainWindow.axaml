@@ -548,7 +548,32 @@
                             <TextBlock x:Name="TxtAdvAudioCodecNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.audio.level.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                            <CheckBox x:Name="ChkAudioLoudnorm" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Bottom"
+                                      Content="{loc:Text main.audio.loudnorm}"/>
+                            <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
+                              <TextBlock Text="{loc:Text main.audio.gain}" Theme="{StaticResource Hint}"/>
+                              <ComboBox x:Name="CmbAudioGain"
+                                        auto:AutomationProperties.Name="{loc:Text main.audio.gain}"/>
+                            </StackPanel>
+                          </WrapPanel>
+                        </Grid>
                         <CheckBox x:Name="ChkAdvKeepTracks" Theme="{StaticResource CheckStyle}" IsChecked="False" Content="{loc:Text main.advanced.keep-tracks.label}"/>
+                        <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.subtitles.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                            <Button x:Name="BtnAddSubtitle" Theme="{StaticResource GhostButton}" Click="OnAddSubtitle" VerticalAlignment="Bottom"
+                                    Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.add}"/>
+                            <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
+                              <TextBlock Text="{loc:Text main.subtitles.burn}" Theme="{StaticResource Hint}"/>
+                              <ComboBox x:Name="CmbBurnSubtitle"
+                                        auto:AutomationProperties.Name="{loc:Text main.subtitles.burn}"/>
+                            </StackPanel>
+                          </WrapPanel>
+                          <StackPanel x:Name="SubtitleList" Grid.Row="2" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
+                        </Grid>
                       </StackPanel>
                     </StackPanel>
 
@@ -672,8 +697,41 @@
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <TextBlock Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Row="1" Spacing="{StaticResource SpaceXs}">
+                          <StackPanel Grid.Row="1" Spacing="{StaticResource SpaceSm}">
+                            <WrapPanel x:Name="FilterPanel" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+                              <StackPanel Spacing="{StaticResource SpaceXs}">
+                                <TextBlock Text="{loc:Text main.advanced.filters.deinterlace}" Theme="{StaticResource Hint}"/>
+                                <ComboBox x:Name="CmbFltDeinterlace" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.deinterlace}"/>
+                              </StackPanel>
+                              <StackPanel Spacing="{StaticResource SpaceXs}">
+                                <TextBlock Text="{loc:Text main.advanced.filters.denoise}" Theme="{StaticResource Hint}"/>
+                                <ComboBox x:Name="CmbFltDenoise" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.denoise}"/>
+                              </StackPanel>
+                              <StackPanel Spacing="{StaticResource SpaceXs}">
+                                <TextBlock Text="{loc:Text main.advanced.filters.strength}" Theme="{StaticResource Hint}"/>
+                                <ComboBox x:Name="CmbFltDenoiseStrength" SelectedIndex="1" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.strength}"/>
+                              </StackPanel>
+                              <StackPanel Spacing="{StaticResource SpaceXs}">
+                                <TextBlock Text="{loc:Text main.advanced.filters.sharpen}" Theme="{StaticResource Hint}"/>
+                                <ComboBox x:Name="CmbFltSharpen" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.sharpen}"/>
+                              </StackPanel>
+                              <StackPanel Spacing="{StaticResource SpaceXs}">
+                                <TextBlock Text="{loc:Text main.advanced.filters.rotate}" Theme="{StaticResource Hint}"/>
+                                <ComboBox x:Name="CmbFltRotate" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.rotate}"/>
+                              </StackPanel>
+                              <StackPanel Spacing="{StaticResource SpaceXs}">
+                                <TextBlock Text="{loc:Text main.advanced.filters.color}" Theme="{StaticResource Hint}"/>
+                                <ComboBox x:Name="CmbFltColor" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.color}"/>
+                              </StackPanel>
+                            </WrapPanel>
+                            <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                              <CheckBox x:Name="ChkFltDetelecine" Content="{loc:Text main.advanced.filters.detelecine}"/>
+                              <CheckBox x:Name="ChkFltDeblock" Content="{loc:Text main.advanced.filters.deblock}"/>
+                              <CheckBox x:Name="ChkFltDeband" Content="{loc:Text main.advanced.filters.deband}"/>
+                              <CheckBox x:Name="ChkFltGray" Content="{loc:Text main.advanced.filters.gray}"/>
+                            </WrapPanel>
                             <StackPanel Spacing="{StaticResource SpaceXs}">
+                              <TextBlock Text="{loc:Text main.advanced.filters.spec}" Theme="{StaticResource Hint}"/>
                               <TextBox x:Name="TxtAdvFilters" VerticalAlignment="Center"
                                        auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}"/>
                               <TextBlock x:Name="TxtAdvFiltersNow" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>

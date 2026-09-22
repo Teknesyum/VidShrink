@@ -314,6 +314,53 @@ public static class VideoFilterChain
             _ => info.Height >= 720 ? ("709", "709", "709") : ("170m", "601", "170m")
         };
 
+    /// <summary>
+    /// <see cref="Parse"/>'in tersi: varsayılandan ayrılan her seçenek bir belirteç olur,
+    /// varsayılan seçenek yazılmaz. <c>Parse(Format(o)) == o</c>; yakılan altyazı belirtimde
+    /// yer almaz, dönüşte düşer.
+    /// </summary>
+    public static string Format(VideoFilterOptions options)
+    {
+        var parts = new List<string>();
+        if (options.Deinterlace != DeinterlaceMode.Auto)
+            parts.Add(options.Deinterlace == DeinterlaceMode.On ? "deinterlace=on" : "deinterlace=off");
+        if (options.Detelecine) parts.Add("detelecine");
+        if (options.Denoise != DenoiseFilter.Off)
+            parts.Add($"denoise={(options.Denoise == DenoiseFilter.NlMeans ? "nlmeans" : "hqdn3d")}:{Strength(options.DenoiseStrength)}");
+        if (options.Sharpen != SharpenMode.Off)
+            parts.Add("sharpen=" + options.Sharpen switch
+            {
+                SharpenMode.Light => "light",
+                SharpenMode.Medium => "medium",
+                _ => "strong"
+            });
+        if (options.Deblock) parts.Add("deblock");
+        if (options.Deband) parts.Add("deband");
+        if (options.Grayscale) parts.Add("gray");
+        if (options.Transpose != TransposeMode.None)
+            parts.Add("rotate=" + options.Transpose switch
+            {
+                TransposeMode.Clockwise => "clock",
+                TransposeMode.CounterClockwise => "cclock",
+                TransposeMode.UpsideDown => "180",
+                TransposeMode.FlipHorizontal => "hflip",
+                _ => "vflip"
+            });
+        if (options.Pad is { } pad)
+            parts.Add(string.Create(CultureInfo.InvariantCulture, $"pad={pad.Top}:{pad.Bottom}:{pad.Left}:{pad.Right}"));
+        if (options.ColorMatrix != ColorMatrixTarget.Keep)
+            parts.Add(options.ColorMatrix == ColorMatrixTarget.Bt709 ? "colorspace=bt709" : "colorspace=bt601");
+        if (options.Crop is { } crop) parts.Add("crop=" + crop);
+        return string.Join(", ", parts);
+    }
+
+    private static string Strength(FilterStrength strength) => strength switch
+    {
+        FilterStrength.Light => "light",
+        FilterStrength.Medium => "medium",
+        _ => "strong"
+    };
+
     public static VideoFilterOptions Parse(string? spec)
     {
         var options = VideoFilterOptions.Default;

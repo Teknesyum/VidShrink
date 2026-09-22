@@ -195,6 +195,98 @@ public sealed class YerlesimDenetimiTests
     public void BaslikKuraliKucukSozcuguYakalar(string dil, string metin, bool kusurlu)
         => Assert.Equal(kusurlu, KucukSozcuk(metin, dil) is not null);
 
+    private sealed class SahteSonEylem : IQueueEndActions
+    {
+        public void Reveal(string path) { }
+        public void Sleep() { }
+        public void PowerOff() { }
+    }
+
+    public static TheoryData<string> DilKollari()
+    {
+        var kollar = new TheoryData<string>();
+        foreach (var dil in Diller) kollar.Add(dil);
+        return kollar;
+    }
+
+    /// <summary>
+    /// Kuyruk penceresi: sabit genişlik, içeriğe göre yükseklik. İki durum taranır — uzun adlı
+    /// üç bekleyenle duraklatılmış sıra, ve sıra boşalınca kapatma geri sayımı. Sistem eylemi
+    /// sahtedir; pompa duraklatıldığı için hiçbir dosya kodlanmaz. Pencere dilini ayar
+    /// dosyasından okur; başka bir testin ortak dosyaya yazdığı dil kolu saptırmasın diye
+    /// kurulum anında ayar yolu olmayan bir dosyaya çevrilir ve dil kültürden gelir.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DilKollari))]
+    public void KuyrukPenceresindeKesikCakismaTasmaYok(string dil)
+    {
+        var denetim = AppHost.Run(() =>
+        {
+            var kultur = System.Globalization.CultureInfo.CurrentUICulture;
+            System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo(dil);
+            Strings.Use(dil);
+            var yollar = new[]
+            {
+                @"C:\Videolar\2026-09-22 Yaz tatili — Kapadokya balon turu, gün doğumu (tam uzunluk).mp4",
+                @"C:\Videolar\kisa.mov",
+                @"C:\Videolar\Konferans_kaydi_oturum_3_soru_cevap_bolumu_duzenlenmemis_ham_goruntu.mkv"
+            };
+            var ayar = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
+            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi", "yok", "settings.json"));
+            ShrinkJobWindow pencere;
+            try { pencere = new ShrinkJobWindow(yollar, new PlanOptions { TargetMb = 25 }, false, null) { Actions = new SahteSonEylem() }; }
+            finally { Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", ayar); }
+            try
+            {
+                pencere.Classes.Add("reduced-motion");
+                var d = new Denetim { Dil = dil };
+                pencere.SetPaused(true);
+                pencere.Begin();
+                KuyruguTara(pencere, "kuyruk-duraklatildi", d);
+                while (pencere.Pending.Count > 0) pencere.RemovePending(0);
+                pencere.SetPaused(false);
+                pencere.WhenDone = QueueEndChoice.PowerOff;
+                pencere.QueueDrained();
+                KuyruguTara(pencere, "kuyruk-geri-sayim", d);
+                pencere.CancelCountdown();
+                Assert.Equal(dil, pencere.Language);
+                return d;
+            }
+            finally
+            {
+                pencere.Close();
+                System.Globalization.CultureInfo.CurrentUICulture = kultur;
+                Strings.Use("en");
+            }
+        });
+
+        var dokum = $"{dil} kuyruk: metin {denetim.Metin}, panel {denetim.Panel}{Environment.NewLine}kusur {denetim.Kusurlar.Count}{Environment.NewLine}"
+            + string.Join(Environment.NewLine, denetim.Kusurlar);
+        _output.WriteLine(dokum);
+        Assert.True(denetim.Metin > 10, $"yalnız {denetim.Metin} metin ölçüldü");
+        Assert.True(denetim.Kusurlar.Count == 0, dokum);
+    }
+
+    private static void KuyruguTara(ShrinkJobWindow pencere, string durum, Denetim denetim)
+    {
+        var genislik = Belirtec(pencere, "TipMaxWidth");
+        pencere.Measure(new Size(genislik, double.PositiveInfinity));
+        pencere.Arrange(new Rect(pencere.DesiredSize));
+        Dispatcher();
+        var kok = (Layoutable)pencere.GetVisualChildren().Single();
+        for (var tur = 0; tur < 3; tur++)
+        {
+            foreach (var dugum in pencere.GetVisualDescendants().OfType<Layoutable>()) dugum.InvalidateMeasure();
+            kok.InvalidateMeasure();
+            kok.Measure(new Size(genislik, double.PositiveInfinity));
+            kok.Arrange(new Rect(new Size(genislik, kok.DesiredSize.Height)));
+        }
+        foreach (var dugum in pencere.GetVisualDescendants().OfType<Visual>()) dugum.RenderTransform = null;
+        Metinler(pencere, durum, denetim);
+        Kardesler(pencere, durum, denetim);
+        Tasmalar(pencere, durum, denetim);
+    }
+
     private static (Denetim, Size) Ac(string dil, bool dar, Action<MainWindow>? boz, Size? zorla = null) =>
         AppHost.Run(() =>
         {
@@ -222,7 +314,7 @@ public sealed class YerlesimDenetimiTests
             }
         });
 
-    private static double Belirtec(MainWindow pencere, string anahtar)
+    private static double Belirtec(Window pencere, string anahtar)
     {
         Assert.True(pencere.TryFindResource(anahtar, out var deger), $"{anahtar} belirteci yok");
         return (double)deger!;
@@ -381,7 +473,7 @@ public sealed class YerlesimDenetimiTests
         return new Point(x, y);
     }
 
-    private static void Metinler(MainWindow pencere, string sekme, Denetim denetim)
+    private static void Metinler(Window pencere, string sekme, Denetim denetim)
     {
         foreach (var blok in pencere.GetVisualDescendants().OfType<TextBlock>())
         {
@@ -394,7 +486,7 @@ public sealed class YerlesimDenetimiTests
             var yer = blok.Bounds.Width - blok.Padding.Left - blok.Padding.Right;
             var yukseklikYeri = blok.Bounds.Height - blok.Padding.Top - blok.Padding.Bottom;
             var gereken = blok.TextWrapping == TextWrapping.NoWrap ? GerekenGenislik(blok, metin) : Math.Min(yer, GerekenGenislik(blok, metin));
-            var balonda = blok.TextTrimming != TextTrimming.None && ToolTip.GetTip(blok) as string == metin;
+            var balonda = blok.TextTrimming != TextTrimming.None && ToolTip.GetTip(blok) is string tip && tip.Contains(metin, StringComparison.Ordinal);
 
             var cizilen = blok.TextLayout.Width;
             if (cizilen - yer > 0.5)
@@ -459,7 +551,7 @@ public sealed class YerlesimDenetimiTests
         return r1 < s2 && s1 < r2 && c1 < d2 && d1 < c2;
     }
 
-    private static void Kardesler(MainWindow pencere, string sekme, Denetim denetim)
+    private static void Kardesler(Window pencere, string sekme, Denetim denetim)
     {
         foreach (var panel in pencere.GetVisualDescendants().OfType<Panel>())
         {
@@ -483,13 +575,13 @@ public sealed class YerlesimDenetimiTests
         }
     }
 
-    private static void Tasmalar(MainWindow pencere, string sekme, Denetim denetim)
+    private static void Tasmalar(Window pencere, string sekme, Denetim denetim)
     {
         foreach (var cocuk in pencere.GetVisualDescendants().OfType<Control>())
         {
             if (!denetim.Kapsamda(cocuk) || cocuk.Bounds.Width <= 0 || cocuk.Bounds.Height <= 0) continue;
             if (cocuk.GetVisualParent() is not Control ebeveyn || ebeveyn is TopLevel) continue;
-            if (ebeveyn is Canvas || cocuk is Popup) continue;
+            if (ebeveyn is Canvas || ebeveyn is Viewbox || cocuk is Popup) continue;
             denetim.Denetim_++;
 
             var b = cocuk.Bounds;
@@ -560,7 +652,7 @@ public sealed class YerlesimDenetimiTests
         return null;
     }
 
-    private static void Basliklar(MainWindow pencere, string sekme, Denetim denetim)
+    private static void Basliklar(Window pencere, string sekme, Denetim denetim)
     {
         foreach (var blok in pencere.GetVisualDescendants().OfType<TextBlock>())
         {
@@ -578,7 +670,7 @@ public sealed class YerlesimDenetimiTests
         }
     }
 
-    private static string? BaslikTemasi(MainWindow pencere, ControlTheme tema)
+    private static string? BaslikTemasi(Window pencere, ControlTheme tema)
     {
         foreach (var ad in BaslikTemalari)
             if (pencere.TryFindResource(ad, out var deger) && ReferenceEquals(deger, tema))

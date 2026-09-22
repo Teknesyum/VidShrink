@@ -247,6 +247,14 @@ public partial class MainWindow : Window
             Watch(toggle, ToggleButton.IsCheckedProperty, OnOptionChanged);
         foreach (var toggle in AdvStripToggles())
             Watch(toggle, ToggleButton.IsCheckedProperty, SaveSettings);
+        foreach (var box in FilterBoxes())
+            Watch(box, SelectingItemsControl.SelectedIndexProperty, OnFilterControlChanged);
+        foreach (var check in FilterChecks())
+            Watch(check, ToggleButton.IsCheckedProperty, OnFilterControlChanged);
+        Watch(TxtAdvFilters, TextBox.TextProperty, OnFilterTextChanged);
+        Watch(ChkAudioLoudnorm, ToggleButton.IsCheckedProperty, OnOptionChanged);
+        foreach (var box in new[] { CmbAudioGain, CmbBurnSubtitle })
+            Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
 
         Watch(SliderQuality, RangeBase.ValueProperty, OnQualitySliderChanged);
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);
@@ -1729,6 +1737,104 @@ public partial class MainWindow : Window
 
         CmbAdvCodecLock.ItemsSource = new[] { automatic }.Concat(FfmpegArguments.KnownCodecs.OrderBy(c => c, StringComparer.OrdinalIgnoreCase)).ToList();
         CmbAdvCodecLock.SelectedIndex = 0;
+
+        InitializeFilterUi(automatic);
+        InitializeTrackUi();
+    }
+
+    private bool _suzgecEsitleniyor;
+
+    internal ComboBox[] FilterBoxes() => new[]
+    {
+        CmbFltDeinterlace, CmbFltDenoise, CmbFltDenoiseStrength, CmbFltSharpen, CmbFltRotate, CmbFltColor
+    };
+
+    internal CheckBox[] FilterChecks() => new[] { ChkFltDetelecine, ChkFltDeblock, ChkFltDeband, ChkFltGray };
+
+    /// <summary>
+    /// C1-5: süzgeç panelinin listeleri. Sıraları <see cref="VideoFilterOptions"/>'ın enum
+    /// sırasıyla aynı; seçim sıra numarasıyla enuma çevrilir. Liste kurulunca denetimler
+    /// metin kutusundan yeniden okunur, dil değişimi seçimi kaybettirmez.
+    /// </summary>
+    private void InitializeFilterUi(string automatic)
+    {
+        var was = _suzgecEsitleniyor;
+        _suzgecEsitleniyor = true;
+        var off = Say("main.advanced.filters.off");
+        var strengths = new[] { Say("main.advanced.filters.light"), Say("main.advanced.filters.medium"), Say("main.advanced.filters.strong") };
+        CmbFltDeinterlace.ItemsSource = new[] { automatic, off, Say("main.advanced.filters.on") };
+        CmbFltDenoise.ItemsSource = new[] { off, "NLMeans", "hqdn3d" };
+        CmbFltDenoiseStrength.ItemsSource = strengths;
+        CmbFltSharpen.ItemsSource = new[] { off }.Concat(strengths).ToArray();
+        CmbFltRotate.ItemsSource = new[]
+        {
+            off, Say("main.advanced.filters.rotate.clock"), Say("main.advanced.filters.rotate.cclock"), Say("main.advanced.filters.rotate.180"),
+            Say("main.advanced.filters.rotate.hflip"), Say("main.advanced.filters.rotate.vflip")
+        };
+        CmbFltColor.ItemsSource = new[] { Say("main.advanced.filters.color.keep"), "BT.709", "BT.601" };
+        SuzgecDenetimleriniYaz(TxtAdvFilters.Text is { } metin && !string.IsNullOrWhiteSpace(metin)
+            ? SuzgecOku(out _)
+            : VideoFilterOptions.Default);
+        _suzgecEsitleniyor = was;
+    }
+
+    private void SuzgecDenetimleriniYaz(VideoFilterOptions o)
+    {
+        CmbFltDeinterlace.SelectedIndex = (int)o.Deinterlace;
+        CmbFltDenoise.SelectedIndex = (int)o.Denoise;
+        CmbFltDenoiseStrength.SelectedIndex = (int)o.DenoiseStrength;
+        CmbFltDenoiseStrength.IsEnabled = o.Denoise != DenoiseFilter.Off;
+        CmbFltSharpen.SelectedIndex = (int)o.Sharpen;
+        CmbFltRotate.SelectedIndex = (int)o.Transpose;
+        CmbFltColor.SelectedIndex = (int)o.ColorMatrix;
+        ChkFltDetelecine.IsChecked = o.Detelecine;
+        ChkFltDeblock.IsChecked = o.Deblock;
+        ChkFltDeband.IsChecked = o.Deband;
+        ChkFltGray.IsChecked = o.Grayscale;
+    }
+
+    /// <summary>
+    /// Denetim değişti: metin kutusu tek kaynaktır, denetim onun üstüne yazılır. Kırpma ve
+    /// kenar gibi panelde karşılığı olmayan belirteçler metinden okunup korunur.
+    /// </summary>
+    private void OnFilterControlChanged()
+    {
+        if (_suzgecEsitleniyor) return;
+        static int Index(ComboBox box) => Math.Max(0, box.SelectedIndex);
+        var o = SuzgecOku(out _) with
+        {
+            Deinterlace = (DeinterlaceMode)Index(CmbFltDeinterlace),
+            Denoise = (DenoiseFilter)Index(CmbFltDenoise),
+            DenoiseStrength = (FilterStrength)Index(CmbFltDenoiseStrength),
+            Sharpen = (SharpenMode)Index(CmbFltSharpen),
+            Transpose = (TransposeMode)Index(CmbFltRotate),
+            ColorMatrix = (ColorMatrixTarget)Index(CmbFltColor),
+            Detelecine = ChkFltDetelecine.IsChecked == true,
+            Deblock = ChkFltDeblock.IsChecked == true,
+            Deband = ChkFltDeband.IsChecked == true,
+            Grayscale = ChkFltGray.IsChecked == true
+        };
+        _suzgecEsitleniyor = true;
+        CmbFltDenoiseStrength.IsEnabled = o.Denoise != DenoiseFilter.Off;
+        TxtAdvFilters.Text = VideoFilterChain.Format(o);
+        _suzgecEsitleniyor = false;
+    }
+
+    /// <summary>Metin değişti: geçerliyse denetimler eşitlenir, bozuksa olduğu gibi kalır; plan yeniden hesaplanır.</summary>
+    private void OnFilterTextChanged()
+    {
+        if (!_suzgecEsitleniyor)
+        {
+            var o = SuzgecOku(out var hata);
+            if (hata is null)
+            {
+                _suzgecEsitleniyor = true;
+                SuzgecDenetimleriniYaz(o);
+                _suzgecEsitleniyor = false;
+            }
+        }
+        RefreshAdvancedHints();
+        OnOptionChanged();
     }
 
     /// <summary>Dil değişince "Otomatik" ve enum etiketleri yeniden kurulur, seçim korunur.</summary>
@@ -1996,6 +2102,7 @@ public partial class MainWindow : Window
         options.LockedCodec = AdvancedText(CmbAdvCodecLock);
 
         options.Filters = SuzgecOku(out _);
+        ApplyTrackOptions(options);
     }
 
     /// <summary>
@@ -2729,7 +2836,8 @@ public partial class MainWindow : Window
     private void OnDragOver(object? sender, DragEventArgs e)
     {
         _dropBatch ??= DroppedBatch(e);
-        var accepted = _cts is null && (TryGetDroppedFile(e) is not null || _dropBatch.Count > 1);
+        var accepted = _cts is null && (TryGetDroppedFile(e) is not null || _dropBatch.Count > 1
+            || _info is not null && DroppedSubtitles(e).Count > 0);
         e.DragEffects = accepted ? DragDropEffects.Copy : DragDropEffects.None;
         SetDropVisual(accepted ? DropVisual.Accept : DropVisual.Reject);
         e.Handled = true;
@@ -2750,7 +2858,8 @@ public partial class MainWindow : Window
         e.Handled = true;
         SetDropVisual(DropVisual.Idle);
         if (_cts is not null) return;
-        if (file is not null) await LoadAsync(file);
+        if (_info is not null && DroppedSubtitles(e) is { Count: > 0 } subtitles) AddSubtitleFiles(subtitles);
+        else if (file is not null) await LoadAsync(file);
         else if (batch.Count > 1) OpenBatch(batch).Show();
     }
 
@@ -2759,7 +2868,17 @@ public partial class MainWindow : Window
     /// Tek video bugünkü gibi bu pencereye yüklenir.
     /// </summary>
     internal ShrinkJobWindow OpenBatch(IReadOnlyList<string> paths)
-        => new(paths, CurrentOptions(), !_chipSizeCapped && _info is not null, PresetLibrary.DeliveredExtension(_presetContainer));
+    {
+        var options = CurrentOptions();
+        options.ExternalSubtitles = Array.Empty<ExternalSubtitle>();
+        options.Filters = options.Filters with { BurnSubtitle = null };
+        return new(paths, options, !_chipSizeCapped && _info is not null, PresetLibrary.DeliveredExtension(_presetContainer));
+    }
+
+    /// <summary>C1-6: kaynak açıkken bırakılan altyazı dosyaları o videoya iz olarak eklenir, video sanılıp açılmaz.</summary>
+    private static IReadOnlyList<string> DroppedSubtitles(DragEventArgs e)
+        => e.DataTransfer.TryGetFiles()?.Select(item => item.TryGetLocalPath()).OfType<string>().Where(IsSubtitleFile).ToList()
+            ?? (IReadOnlyList<string>)Array.Empty<string>();
 
     private static IReadOnlyList<string> DroppedBatch(DragEventArgs e)
     {
@@ -2854,6 +2973,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             _info = null;
+            ResetTracksForSource();
             ShowSourceName();
             BtnStart.IsEnabled = BtnConvert.IsEnabled = false;
             Fade(InfoGrid, false);
@@ -2992,6 +3112,7 @@ public partial class MainWindow : Window
     {
         if (_titleSyncing || _probed is null) return;
         _info = SecilenBaslikleUygula(_probed);
+        RefreshBurnChoices();
         ShowInfo(_info);
         Recalculate();
         RefreshConversion();
@@ -3003,6 +3124,7 @@ public partial class MainWindow : Window
         BaslikSeciciyiKur(info);
         info = SecilenBaslikleUygula(info);
         _info = info;
+        ResetTracksForSource();
 
         Fade(DropZone, false);
 
