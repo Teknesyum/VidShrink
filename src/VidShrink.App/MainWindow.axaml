@@ -841,7 +841,7 @@
 
                       <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{StaticResource SpaceXs}">
                         <TextBlock Text="{loc:Text main.output.stage}" Theme="{StaticResource OutFactLabel}"/>
-                        <TextBlock x:Name="TxtStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource OutFactValue}">
+                        <TextBlock x:Name="TxtStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource OutFactValue}" TextWrapping="Wrap">
                           <TextBlock.Transitions>
                             <Transitions>
                               <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
@@ -907,8 +907,13 @@
                             BorderThickness="{StaticResource BorderThin}"
                             CornerRadius="{StaticResource RadiusCell}"
                             Padding="{StaticResource PanelPadding}">
+                      <Border.Styles>
+                        <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
+                          <Setter Property="TextWrapping" Value="Wrap"/>
+                        </Style>
+                      </Border.Styles>
                       <StackPanel Spacing="{StaticResource SpaceSm}">
-                        <TextBlock Text="{loc:Text main.retry.title}" Theme="{StaticResource H3}"/>
+                        <TextBlock Text="{loc:Text main.retry.title}" Theme="{StaticResource H3}" TextWrapping="Wrap"/>
                         <TextBlock x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
                         <WrapPanel>
                           <Button x:Name="BtnRetryAgain" Content="{loc:Text main.retry.again}" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
@@ -917,11 +922,11 @@
                           <Button x:Name="BtnRetryStop" Content="{loc:Text main.retry.stop}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
                         </WrapPanel>
                         <StackPanel x:Name="RetryTrimPanel" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceSm}">
-                          <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                          <WrapPanel ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceXs}">
                             <RadioButton x:Name="RbTrimEnd" GroupName="OvershootTrim" IsChecked="True" Content="{loc:Text main.retry.trim.end}"/>
                             <RadioButton x:Name="RbTrimStart" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.start}"/>
                             <RadioButton x:Name="RbTrimBoth" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.both}"/>
-                          </StackPanel>
+                          </WrapPanel>
                           <TextBlock x:Name="TxtTrimRange" Theme="{StaticResource PlanFactValue}" TextWrapping="Wrap"/>
                           <Button x:Name="BtnTrimConfirm" Content="{loc:Text main.retry.trim.confirm}" Theme="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnTrimConfirm"/>
                         </StackPanel>

@@ -427,7 +427,7 @@ public sealed class FfmpegArgumentsTests
         Assert.DoesNotContain("WarmPsychovisualProbe(", File.ReadAllText(TipSources.WindowCodePath));
 
         var windowSource = File.ReadAllText(TipSources.WindowCodePath);
-        Assert.Contains("BuildUniqueOutputPath(_info.FilePath, \"shrunk\", plan.Streams?.Extension ?? \"mp4\", plan), _encoders, _sceneMap?.Map));", windowSource);
+        Assert.Contains("BuildUniqueOutputPath(_info.FilePath, \"shrunk\", ShrinkExtension(plan), plan), _encoders, _sceneMap?.Map));", windowSource);
     }
 
     /// <summary>

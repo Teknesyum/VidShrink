@@ -1106,6 +1106,13 @@ public sealed class BaslikKapsamiTests
     /// harfle baslayan sozcuklerini buyuttu. Yeni anahtar yok; tr'de buyutulen dort anahtardan biri
     /// (<c>player.advanced.*</c> ucu ya da <c>settings-tab.opensubtitles.account</c>) artik duz
     /// yazi okunmuyor ve koldan cikti. en sayisi oynamadi.</para>
+    ///
+    /// <para><b>22 Eylul 2026, sekizinci yenileme: toplam 1880, en 222, tr 75.</b> Pin main'de
+    /// C1-2 kuyruk duzenlemesinden beri kirmiziydi (a26a3b3a CI: 1784). 154 fazlanin 53'u C1-5
+    /// suzgec ve C1-6 iz anahtarlari (en 4, tr 2; en cok <c>subtitles.burn</c> 7, iki
+    /// <c>filters.rotate.*</c> 5'er), 101'i C1-1..C1-4 kuyruk ve on ayar turunun anahtarlari.
+    /// Sonuc durumu denetiminde en'de dokuz <c>retry.*</c>/<c>action.*</c> dugmesi Title Case'e
+    /// alindi; islev sozcugu tasidiklari icin kolda kaldilar, sayi oynamadi.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1131,9 +1138,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1726, toplam);
-        Assert.Equal(205, dilBasina["en"]);
-        Assert.Equal(71, dilBasina["tr"]);
+        Assert.Equal(1880, toplam);
+        Assert.Equal(222, dilBasina["en"]);
+        Assert.Equal(75, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1260,6 +1267,8 @@ public sealed class BaslikKapsamiTests
     /// <para><b>19 Eylul 2026, yedinci yenileme: 43387.</b> B1a ses kodegi kolu dort
     /// (<c>audio-codec.label</c>, <c>audio-channels.source</c>, iki <c>dolby-*</c> gerekcesi), tasma
     /// dugmeleri iki <c>main.retry.*.name</c> anahtari ekledi: 1003 + 6 = 1009, 43 x 1009 = 43387. <c>kayip</c> yine 0.</para>
+    /// <para><b>22 Eylul 2026, sekizinci yenileme: 45881.</b> C1-1..C1-6 turu 58 anahtar ekledi:
+    /// 43 x 1067 = 45881. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1287,7 +1296,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(43387, gezilen);
+        Assert.Equal(45881, gezilen);
         Assert.Empty(kayip);
     }
 

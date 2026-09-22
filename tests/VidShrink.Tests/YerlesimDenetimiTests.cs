@@ -11,6 +11,7 @@ using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.Core;
+using VidShrink.Ffmpeg;
 using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
@@ -121,11 +122,34 @@ public sealed class YerlesimDenetimiTests
 
     [Theory]
     [MemberData(nameof(Kollar))]
-    public void SekmelerdeKesikCakismaTasmaYok(string dil, bool dar)
+    public void SekmelerdeKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "", null);
+
+    /// <summary>
+    /// İş bitti durumu: aşım sorusu kırpma seçenekleri açık, klasörde göster ve paylaş
+    /// düğmeleri, paylaşım bağlantısı satırı. Yüklü-boş taramada bunların hiçbiri görünmüyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    public void SonucDurumundaKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-sonuc", pencere =>
     {
-        var (denetim, boyut) = Ac(dil, dar, null);
+        var kesimler = new[]
+        {
+            new TrimPlan(TrimSide.End, 0, 137.2, 187.5, 16_000_000),
+            new TrimPlan(TrimSide.Start, 50.3, 187.5, 187.5, 16_000_000),
+            new TrimPlan(TrimSide.Both, 25.1, 162.3, 187.5, 16_000_000)
+        };
+        pencere.ResetShareForTest(true);
+        _ = pencere.ShowRetryAskForTest(new RetryPrompt(3, 3, 16, 16.4, TimeSpan.FromSeconds(30), true, 15.2, kesimler));
+        pencere.BtnRetryTrim.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        pencere.TxtShareLink.Text = "https://example.invalid/d/7f3a9c2e41b8/tatil-cekimi-2160p60-vidshrink.mp4";
+        pencere.ShareLinkRow.IsVisible = true;
+    });
+
+    private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla)
+    {
+        var (denetim, boyut) = Ac(dil, dar, null, hazirla: hazirla);
         var klasor = Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi");
-        var ad = $"{dil}-{(dar ? "taban" : "varsayilan")}.txt";
+        var ad = $"{dil}-{(dar ? "taban" : "varsayilan")}{durum}.txt";
         Directory.CreateDirectory(klasor);
 
         var dokum = new StringBuilder()
@@ -287,7 +311,7 @@ public sealed class YerlesimDenetimiTests
         Tasmalar(pencere, durum, denetim);
     }
 
-    private static (Denetim, Size) Ac(string dil, bool dar, Action<MainWindow>? boz, Size? zorla = null) =>
+    private static (Denetim, Size) Ac(string dil, bool dar, Action<MainWindow>? boz, Size? zorla = null, Action<MainWindow>? hazirla = null) =>
         AppHost.Run(() =>
         {
             Strings.Use(dil);
@@ -298,6 +322,7 @@ public sealed class YerlesimDenetimiTests
                 pencere.LoadWithoutProbing(SamplePath, Sample());
                 pencere.SettleFades();
                 pencere.TabAdvanced.IsVisible = true;
+                hazirla?.Invoke(pencere);
 
                 var boyut = zorla ?? (dar
                     ? new Size(pencere.MinWidth, pencere.MinHeight)
@@ -625,7 +650,11 @@ public sealed class YerlesimDenetimiTests
 
     private static readonly HashSet<string> BaslikTemalari = new(StringComparer.Ordinal) { "H1", "H2", "H3", "Label", "PlanFactLabel" };
 
-    /// <summary>Başlık kuralını bozan ilk sözcük; yoksa <c>null</c>. Cümle işaretli metin gövdedir, sorulmaz.</summary>
+    /// <summary>
+    /// Başlık kuralını bozan ilk sözcük; yoksa <c>null</c>. Cümle işaretli metin gövdedir, sorulmaz.
+    /// Rakamla başlayan parça (<c>50.3s</c>, <c>1080p</c>) sözcük değil sayıdır; <see cref="LanguageCatalog.Title"/>
+    /// de harfle başlamayanı olduğu gibi bırakıyor.
+    /// </summary>
     internal static string? KucukSozcuk(string metin, string dil)
     {
         if (LanguageCatalog.Brands.ContainsKey(metin)) return null;
@@ -637,6 +666,7 @@ public sealed class YerlesimDenetimiTests
         var ilk = true;
         foreach (var parca in metin.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
         {
+            if (char.IsDigit(parca[0])) { ilk = false; continue; }
             var bas = 0;
             while (bas < parca.Length && !char.IsLetter(parca[bas])) bas++;
             if (bas == parca.Length) continue;

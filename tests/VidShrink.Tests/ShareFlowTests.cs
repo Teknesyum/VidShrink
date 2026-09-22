@@ -240,8 +240,8 @@ public sealed class ShareFlowTests : IDisposable
 
     /// <summary>Yeni düğmelerin iki dilde karşılığı var.</summary>
     [Theory]
-    [InlineData("Share the file", "Dosyayı paylaş")]
-    [InlineData("Cancel the upload", "Yüklemeyi iptal et")]
+    [InlineData("Share the File", "Dosyayı paylaş")]
+    [InlineData("Cancel the Upload", "Yüklemeyi iptal et")]
     public void TheShareButtonsAreTranslated(string english, string turkish)
         => Assert.Equal(turkish, Locales.TurkishFor(english));
 
