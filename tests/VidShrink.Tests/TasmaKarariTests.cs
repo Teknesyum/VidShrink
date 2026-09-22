@@ -1,5 +1,6 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -223,6 +224,47 @@ public sealed class TasmaKarariTests
         Assert.Contains("2:17.2", sonAralik);
         Assert.Contains("0:00.0", basAralik);
         Assert.NotEqual(sonAralik["aralik:".Length..], basAralik["aralik-bas:".Length..]);
+    }
+
+    /// <summary>
+    /// Soru paneli ve kırpma seçenekleri belirerek girer: ilk karede görünür ama saydam, iş
+    /// kuyruğu boşalınca hedef opaklık 1 ve bir geçiş taşıyor (çizilen ara kare saat zamanlamasına
+    /// bağlı, ölçülmez). Kırpma seçenekleri
+    /// ikinci basışta anlık kapanır.
+    /// </summary>
+    [Fact]
+    public void SoruPaneliBelirerekGirer()
+    {
+        var kesimler = new[] { new TrimPlan(TrimSide.End, 0, 137.2, 141.4, 16_000_000) };
+        var soru = new RetryPrompt(3, 3, 16, 16.4, TimeSpan.FromSeconds(30), false, 0, kesimler);
+
+        var olcum = AppHost.Run(() =>
+        {
+            var pencere = new MainWindow();
+            try
+            {
+                var gorev = pencere.ShowRetryAskForTest(soru);
+                var ilk = (pencere.RetryAskPanel.IsVisible, pencere.RetryAskPanel.Opacity);
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs(Avalonia.Threading.DispatcherPriority.SystemIdle);
+                var son = (pencere.RetryAskPanel.GetBaseValue(Visual.OpacityProperty).GetValueOrDefault<double>(), pencere.RetryAskPanel.Transitions?.Count ?? 0);
+                pencere.BtnRetryTrim.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                var serit = (pencere.RetryTrimPanel.IsVisible, pencere.RetryTrimPanel.Opacity);
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs(Avalonia.Threading.DispatcherPriority.SystemIdle);
+                var seritSon = (pencere.RetryTrimPanel.GetBaseValue(Visual.OpacityProperty).GetValueOrDefault<double>(), pencere.RetryTrimPanel.Transitions?.Count ?? 0);
+                pencere.BtnRetryTrim.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                var kapali = pencere.RetryTrimPanel.IsVisible;
+                pencere.BtnRetryStop.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                _ = gorev.Result;
+                return (ilk, son, serit, seritSon, kapali);
+            }
+            finally { pencere.Close(); }
+        });
+
+        Assert.Equal((true, 0.0), olcum.ilk);
+        Assert.Equal((1.0, 1), olcum.son);
+        Assert.Equal((true, 0.0), olcum.serit);
+        Assert.Equal((1.0, 1), olcum.seritSon);
+        Assert.False(olcum.kapali);
     }
 
     private static string YeniKlasor()

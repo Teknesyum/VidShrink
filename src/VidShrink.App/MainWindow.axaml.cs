@@ -2374,7 +2374,7 @@ public partial class MainWindow : Window
         if (result.Ok && result.Link is { } link)
         {
             TxtShareLink.Text = link.Url;
-            ShareLinkRow.IsVisible = true;
+            Fade(ShareLinkRow, true);
             Retry().Hide();
             BtnShareDelete.IsEnabled = flow.CanDelete;
             TxtShareStatus.Text = link.ExpiresAt is { } expires
@@ -4183,7 +4183,7 @@ public partial class MainWindow : Window
         }
         RetryTrimPanel.IsVisible = canTrim && RetryTrimPanel.IsVisible;
         RefreshTrimRange();
-        RetryAskPanel.IsVisible = true;
+        Fade(RetryAskPanel, true);
         SetStage(TxtStage, Say("main.output.waiting"));
     }
 
@@ -4241,7 +4241,8 @@ public partial class MainWindow : Window
 
     private void OnRetryTrim(object? sender, RoutedEventArgs e)
     {
-        RetryTrimPanel.IsVisible = !RetryTrimPanel.IsVisible;
+        if (RetryTrimPanel.IsVisible) RetryTrimPanel.IsVisible = false;
+        else Fade(RetryTrimPanel, true);
         RefreshTrimRange();
     }
 
