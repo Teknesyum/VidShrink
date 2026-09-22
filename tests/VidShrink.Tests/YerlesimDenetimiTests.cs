@@ -10,6 +10,7 @@ using Avalonia.Styling;
 using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.App.Localization;
+using VidShrink.App.Performance;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 using Xunit.Abstractions;
@@ -161,6 +162,33 @@ public sealed class YerlesimDenetimiTests
     [MemberData(nameof(Kollar))]
     public void KodlamaSurerkenKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-kosuyor", pencere =>
         pencere.ShowEncodeProgressForTest(new EncodeProgress(0.42, TimeSpan.FromMinutes(3), TimeSpan.FromMinutes(71), 12.3, "pass 2/2 (attempt 3)")));
+
+    /// <summary>
+    /// Ayrıntı yüzeyleri: dönüştürme sonucu ve Göster düğmesi, güncelleme bildirimi ile
+    /// kurulum günlüğü (altı satır, çubuk dolu), donanım başarım sonucu. Hepsi sekme
+    /// dolaşımında boş duruyordu.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    public void AyrintiYuzeylerindeKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-ayrinti", pencere =>
+    {
+        pencere.TxtConvertResult.Text = string.Format(Strings.Get("main.run.converted"), "812.4", "96.1");
+        pencere.BtnConvertReveal.IsVisible = true;
+        pencere.UpdateNotice.IsVisible = true;
+        pencere.TxtNoticeVersion.Text = "0.4.3";
+        var ilerleme = new InstallProgress();
+        pencere.ShowUpdateProgress(ilerleme);
+        ilerleme.Step(0, 10, "Sürüm listesi alınıyor");
+        ilerleme.Step(12, 20, "Sürüm 0.4.3: 6 dosya");
+        foreach (var (ad, sira) in new[] { "VidShrink.App.dll", "VidShrink.Core.dll", "Avalonia.Base.dll", "libmpv-2.dll" }.Select((a, i) => (a, i + 1)))
+            ilerleme.Step(20 + 70.0 * sira / 6, 20 + 70.0 * (sira + 1) / 6, ad + "  " + sira + "/6");
+        for (var i = 0; i < 90; i++) pencere.UpdateFrame(TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds));
+        pencere.ShowPerformanceResult(PerformanceCheck.Evaluate(
+            new EncoderCost("libx264", true, 3100, 3200, 6000),
+            new EncoderCost("h264_nvenc", true, 120, 375, 6000),
+            new EncoderCost("h264_nvenc", true, 120, 360, 6000),
+            logicalCores: 16, elapsedMs: 9_400, budgetMs: 20_000, hardwareEncoderPresent: true));
+    });
 
     private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true)
     {

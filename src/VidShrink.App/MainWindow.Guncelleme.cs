@@ -212,6 +212,7 @@ public partial class MainWindow
         _updateProgress = progress;
         _updateLinesShown = 0;
         UpdateLogLines.Children.Clear();
+        _updateBarPercent = 0;
         UpdateBarFill.Width = 0;
         UpdateLogArea.Height = InstallProgress.LogLines * Scalar("LineHeightBody", 0);
         UpdateLogArea.IsVisible = true;
@@ -225,9 +226,15 @@ public partial class MainWindow
             {
                 if (UpdateNotice.IsVisible && _updateProgress is not null) StartUpdateFrames();
             });
+            Watch(UpdateBarTrack, BoundsProperty, SizeUpdateBar);
         }
         StartUpdateFrames();
     }
+
+    private double _updateBarPercent;
+
+    /// <summary>Dolgu izin yüzdesidir, piksel değil: pencere daralınca iz de daralır, dolgu ondan taşmaz.</summary>
+    private void SizeUpdateBar() => UpdateBarFill.Width = UpdateBarTrack.Bounds.Width * _updateBarPercent / 100;
 
     internal string BakimKlasoru { get; set; } = AppContext.BaseDirectory;
 
@@ -297,7 +304,8 @@ public partial class MainWindow
 
         if (!HoverZone.MotionReduced) progress.Advance(elapsed);
         var bar = HoverZone.MotionReduced ? progress.Percent : progress.Bar;
-        UpdateBarFill.Width = UpdateBarTrack.Bounds.Width * bar / 100;
+        _updateBarPercent = bar;
+        SizeUpdateBar();
         PaintUpdateBar(progress.State);
         AppendUpdateLines(progress.History);
 

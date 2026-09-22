@@ -44,7 +44,7 @@
   "recorder.audio.hint": "Choosing both records two inputs and mixes them into one track.",
   "recorder.output.title": "Output folder",
   "recorder.output.browse": "Browse…",
-  "recorder.output.reveal": "Show in folder",
+  "recorder.output.reveal": "Show in Folder",
   "recorder.output.to-shrink": "Send to Shrink",
   "recorder.output.to-player": "Open in player",
   "recorder.output.done": "Recording finished: {0} MB in {1} segments",
