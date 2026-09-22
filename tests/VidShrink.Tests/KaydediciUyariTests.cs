@@ -33,7 +33,7 @@ public sealed class KaydediciUyariTests
             StandardError: string.Empty,
             Segments: 1));
 
-        var satir = (StackPanel)gorunum.FindControl<StackPanel>("WarningRow")!;
+        var satir = gorunum.FindControl<Grid>("WarningRow")!;
         var simge = (Sekil.Path)gorunum.FindControl<Sekil.Path>("WarningGlyph")!;
         var metin = (TextBlock)gorunum.FindControl<TextBlock>("TxtWarning")!;
 

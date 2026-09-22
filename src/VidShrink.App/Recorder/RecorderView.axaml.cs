@@ -200,7 +200,8 @@ internal partial class RecorderView : UserControl
     /// <summary>
     /// Yarim kayit uyaridir, basarisiz kayit hatadir. Ayrimi renk tek basina tasimaz:
     /// uyari govde renginde ve ucgen-unlem simgesiyle, hata kirmizi ve simgesiz cikar.
-    /// Karar <c>docs/netlestirme/018-uyari-rengi-27-palette-yok.md</c>.
+    /// Karar <c>docs/netlestirme/018-uyari-rengi-27-palette-yok.md</c>. Simgesiz satirda metin
+    /// iki sutunu da kaplar, bos simge sutununun araligi kaymaz.
     /// </summary>
     private void DurumuGoster(bool uyari)
     {
@@ -209,6 +210,8 @@ internal partial class RecorderView : UserControl
             TxtWarning.Theme = tema;
 
         WarningGlyph.IsVisible = uyari;
+        Grid.SetColumn(TxtWarning, uyari ? 1 : 0);
+        Grid.SetColumnSpan(TxtWarning, uyari ? 1 : 2);
         WarningRow.IsVisible = true;
     }
 

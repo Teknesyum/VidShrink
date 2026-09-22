@@ -125,6 +125,7 @@ public sealed class YerlesimDenetimiTests
 
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void SekmelerdeKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "", null);
 
     /// <summary>
@@ -133,6 +134,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void SonucDurumundaKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-sonuc", pencere =>
     {
         var kesimler = new[]
@@ -154,6 +156,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void BosPenceredeKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-bos", null, yukle: false);
 
     /// <summary>
@@ -162,6 +165,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void KodlamaSurerkenKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-kosuyor", pencere =>
         pencere.ShowEncodeProgressForTest(new EncodeProgress(0.42, TimeSpan.FromMinutes(3), TimeSpan.FromMinutes(71), 12.3, "pass 2/2 (attempt 3)")));
 
@@ -172,6 +176,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void AyrintiYuzeylerindeKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-ayrinti", pencere =>
     {
         pencere.TxtConvertResult.Text = string.Format(Strings.Get("main.run.converted"), "812.4", "96.1");
@@ -199,6 +204,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void IzPanelindeKesikCakismaTasmaYok(string dil, bool dar)
     {
         var klasor = Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi", "altyazi");
@@ -231,6 +237,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void AcilanAyrintilardaKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-acilan", pencere =>
     {
         pencere.AiDetails.IsVisible = true;
@@ -246,6 +253,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void KaydediciSonucundaKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-kayit", pencere =>
     {
         var kaydedici = pencere.RecorderPaneForTest;
@@ -263,6 +271,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void OynaticiKatmanlarindaKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-katman", pencere =>
     {
         pencere.Preview.SetRightNotice("playback.panel.pending");
@@ -295,13 +304,17 @@ public sealed class YerlesimDenetimiTests
     }
 
     /// <summary>
-    /// Öbür 37 dil dar pencerede. Beş dil karakter toplamıyla seçildi, ama genişlik karakter
-    /// sayısı değil: Tamil ve Devanagari glifleri geniş, Almanca ve Fince bileşik sözcük tek
-    /// parça kalıyor.
+    /// Öbür 37 dil. Beş dil karakter toplamıyla seçildi, ama genişlik karakter sayısı değil:
+    /// Tamil ve Devanagari glifleri geniş, Almanca ve Fince bileşik sözcük tek parça kalıyor.
+    /// Dil × boyut kollarının her biri bu dillerde dar pencerede de koşar
+    /// (<see cref="KalanDilDarKollari"/>), tek pencereli kollar <see cref="KalanDilKollari"/> ile.
     /// </summary>
-    [Theory]
-    [MemberData(nameof(KalanDilKollari))]
-    public void KalanDillerdeKesikCakismaTasmaYok(string dil) => Denetle(dil, true, "", null);
+    public static TheoryData<string, bool> KalanDilDarKollari()
+    {
+        var kollar = new TheoryData<string, bool>();
+        foreach (var dil in KalanDilKollari()) kollar.Add(dil, true);
+        return kollar;
+    }
 
     public static TheoryData<string> KalanDilKollari()
     {
@@ -411,6 +424,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(DilKollari))]
+    [MemberData(nameof(KalanDilKollari))]
     public void KuyrukPenceresindeKesikCakismaTasmaYok(string dil)
     {
         var denetim = AppHost.Run(() =>
@@ -466,6 +480,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(DilKollari))]
+    [MemberData(nameof(KalanDilKollari))]
     public void MiniSeritteKesikCakismaTasmaYok(string dil)
     {
         var denetim = AppHost.Run(() =>
@@ -505,6 +520,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(DilKollari))]
+    [MemberData(nameof(KalanDilKollari))]
     public void AcilirPencerelerdeKesikCakismaTasmaYok(string dil)
     {
         var denetim = AppHost.Run(() =>
@@ -543,6 +559,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
     public void OneriSeridindeKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-oneri", pencere =>
     {
         var ayar = Path.Combine(TestPaths.OutputRoot, "yerlesim-oneri", "settings.json");
@@ -556,6 +573,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     [Theory]
     [MemberData(nameof(DilKollari))]
+    [MemberData(nameof(KalanDilKollari))]
     public void BalonlardaKesikCakismaTasmaYok(string dil)
     {
         var (denetim, sayi) = AppHost.Run(() =>

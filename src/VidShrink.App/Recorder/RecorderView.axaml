@@ -177,15 +177,15 @@
                  MaxLines="1"
                  FontFamily="{StaticResource FontMono}"
                  auto:AutomationProperties.Name="{loc:Text recorder.output.title}"/>
-        <StackPanel x:Name="WarningRow" Orientation="Horizontal" Spacing="{StaticResource SpaceXs}" IsVisible="False">
+        <Grid x:Name="WarningRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="False">
           <Path x:Name="WarningGlyph"
                 Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
-                Stretch="Uniform" VerticalAlignment="Center"
+                Stretch="Uniform" VerticalAlignment="Top"
                 Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
-          <TextBlock x:Name="TxtWarning"
+          <TextBlock x:Name="TxtWarning" Grid.Column="1"
                      Theme="{StaticResource StatusWarning}"
                      TextWrapping="Wrap"/>
-        </StackPanel>
+        </Grid>
         <WrapPanel>
           <Button x:Name="BtnToShrink"
                   Theme="{StaticResource PrimaryButton}"
