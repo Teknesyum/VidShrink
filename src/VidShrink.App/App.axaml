@@ -1,4 +1,4 @@
-<Application xmlns="https://github.com/avaloniaui"
+﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="VidShrink.App.App"
              Name="VidShrink"
@@ -23,6 +23,23 @@
   <Application.Styles>
     <FluentTheme/>
     <StyleInclude Source="avares://VidShrink.App/Themes/Controls.axaml"/>
+    <!--
+      Açılır pencere yerine süzülür. Hareketi azaltma açık pencerenin açılırları oynamaz.
+    -->
+    <Style Selector="Window:not(.reduced-motion) FlyoutPresenter">
+      <Style.Animations>
+        <Animation Duration="{StaticResource MotionFast}" Easing="CubicEaseOut" FillMode="Forward">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="TranslateTransform.Y" Value="6"/>
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1"/>
+            <Setter Property="TranslateTransform.Y" Value="0"/>
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
   </Application.Styles>
 
 </Application>

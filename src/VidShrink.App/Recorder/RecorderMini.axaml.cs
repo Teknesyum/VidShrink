@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -56,6 +56,7 @@ internal partial class RecorderMini : Window
     public RecorderMini()
     {
         InitializeComponent();
+        if (Playback.HoverZone.MotionReduced) Classes.Add("reduced-motion");
         foreach (var (box, option) in OptionBoxes())
             box.IsCheckedChanged += (_, _) =>
             {
