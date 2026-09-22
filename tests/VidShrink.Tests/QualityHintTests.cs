@@ -212,7 +212,7 @@ public sealed class QualityHintTests
     [InlineData("Ceiling", "Tavan")]
     [InlineData("Lifetime", "Ömür")]
     [InlineData("Deletion", "Silme")]
-    [InlineData("Delete the shared file", "Paylaşılan dosyayı sil")]
+    [InlineData("Delete the Shared File", "Paylaşılan dosyayı sil")]
     public void EveryNewLabelHasBothLanguages(string english, string turkish)
     {
         Assert.Equal(turkish, Locales.TurkishFor(english));

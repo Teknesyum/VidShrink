@@ -459,7 +459,7 @@
   </ControlTheme>
 
   <ControlTheme x:Key="PlaybackSlider" TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
-    <Setter Property="Width" Value="{StaticResource PlaybackSliderWidth}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource PlaybackSliderWidth}"/>
     <Setter Property="Height" Value="{StaticResource PlaybackBarButtonSize}"/>
     <Setter Property="VerticalAlignment" Value="Center"/>
     <Setter Property="Template">

@@ -1100,6 +1100,12 @@ public sealed class BaslikKapsamiTests
     /// kol degistiriyor (<c>dolby-not-in-container</c> 11, <c>dolby-below-channel-floor</c> 9,
     /// <c>retry.trim.name</c> 7, <c>audio-channels.source</c> 6, <c>audio-codec.label</c> 3,
     /// <c>retry.accept.name</c> 1). en besi, tr ucu.</para>
+    ///
+    /// <para><b>22 Eylul 2026, yedinci yenileme: toplam 1726, en 205, tr 71.</b> Yerlesim
+    /// denetcisi (<c>YerlesimDenetimiTests</c>) tr ve en'de 32 basligin (en 22, tr 10) kucuk
+    /// harfle baslayan sozcuklerini buyuttu. Yeni anahtar yok; tr'de buyutulen dort anahtardan biri
+    /// (<c>player.advanced.*</c> ucu ya da <c>settings-tab.opensubtitles.account</c>) artik duz
+    /// yazi okunmuyor ve koldan cikti. en sayisi oynamadi.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1125,9 +1131,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1727, toplam);
+        Assert.Equal(1726, toplam);
         Assert.Equal(205, dilBasina["en"]);
-        Assert.Equal(72, dilBasina["tr"]);
+        Assert.Equal(71, dilBasina["tr"]);
     }
 
     /// <summary>

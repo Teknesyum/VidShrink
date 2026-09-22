@@ -1006,10 +1006,10 @@ public partial class MainWindow : Window
 
     private void RefreshSettingsTexts()
     {
-        BtnResetSettings.Content = Strings.Get("settings.reset-all");
-        TxtResetSettingsConfirm.Text = Strings.Get("settings.reset-confirm");
-        BtnConfirmResetSettings.Content = Strings.Get("settings.reset-confirm-button");
-        BtnCancelResetSettings.Content = Strings.Get("settings.reset-cancel");
+        BtnResetSettings.Content = Say("settings.reset-all");
+        TxtResetSettingsConfirm.Text = Say("settings.reset-confirm");
+        BtnConfirmResetSettings.Content = Say("settings.reset-confirm-button");
+        BtnCancelResetSettings.Content = Say("settings.reset-cancel");
         RefreshOutputNamePreview();
     }
 

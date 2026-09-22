@@ -249,7 +249,7 @@
                       <ComboBox Grid.Column="1" x:Name="CmbTitle" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="OnTitleChanged"/>
                     </Grid>
 
-                    <UniformGrid x:Name="InfoGrid" Columns="4" Rows="2" IsVisible="False">
+                    <UniformGrid x:Name="InfoGrid" Columns="4" Rows="2" ColumnSpacing="{StaticResource SpaceMd}" IsVisible="False">
                       <StackPanel>
                         <TextBlock Text="{loc:Text main.info.duration}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                         <TextBlock x:Name="TxtDuration" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
@@ -448,25 +448,25 @@
                       <StackPanel x:Name="QualitySectionBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
                         <!-- Kullanıcı 09-04: WhatsApp uyumu işaretlenirse eski kodek (H.264) kullanılır, kodek seçimi kilitlenir. -->
                         <CheckBox x:Name="ChkWhatsAppCompatible" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.whatsapp-compatible}"/>
-                        <Grid x:Name="CodecChoiceRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                        <Grid x:Name="CodecChoiceRow" RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <ToolTip.Tip>
                             <StackPanel Spacing="{StaticResource SpaceSm}">
                               <TextBlock x:Name="TxtCodecTip" Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.codec.tip}"/>
                             </StackPanel>
                           </ToolTip.Tip>
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                          <TextBlock Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <RadioButton x:Name="RbCodecAuto" GroupName="ShrinkCodec" IsChecked="True" Content="{loc:Text main.codec.automatic}"/>
                             <RadioButton x:Name="RbCodecCompatible" GroupName="ShrinkCodec" Content="{loc:Text main.codec.compatible}"/>
                             <RadioButton x:Name="RbCodecSmallest" GroupName="ShrinkCodec" Content="{loc:Text main.codec.smallest}"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.fill.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.fill.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <RadioButton x:Name="RbFillTarget" GroupName="ShrinkFill" IsChecked="True" Content="{loc:Text main.fill.target}"/>
                             <RadioButton x:Name="RbFillCeiling" GroupName="ShrinkFill" Content="{loc:Text main.fill.ceiling}"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
                         <CheckBox x:Name="ChkFastGpu" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" HorizontalAlignment="Left" Content="{loc:Text main.fast-gpu}">
                           <ToolTip.Tip>
@@ -474,12 +474,12 @@
                           </ToolTip.Tip>
                         </CheckBox>
                         <StackPanel x:Name="HdrPolicyPanel" IsVisible="False">
-                          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                            <TextBlock Grid.Column="0" Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                          <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                            <TextBlock Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                            <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                               <RadioButton x:Name="RbHdrPreserve" GroupName="ShrinkHdr" IsChecked="True" Content="{loc:Text main.hdr.preserve}"/>
                               <RadioButton x:Name="RbHdrSdr" GroupName="ShrinkHdr" Content="{loc:Text main.hdr.sdr}"/>
-                            </StackPanel>
+                            </WrapPanel>
                           </Grid>
                         </StackPanel>
                       </StackPanel>
@@ -500,27 +500,27 @@
                         </Grid>
                       </Button>
                       <StackPanel x:Name="AudioBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.audio-kbps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.audio-kbps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvAudioKbps" SelectedIndex="0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtAdvAudioKbpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.audio-channels.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.audio-channels.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvAudioChannels" SelectedIndex="0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtAdvAudioChannelsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.audio-codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.audio-codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvAudioCodec" SelectedIndex="0" VerticalAlignment="Center"
                                       AutomationProperties.Name="{loc:Text main.advanced.audio-codec.label}"/>
                             <TextBlock x:Name="TxtAdvAudioCodecNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
                         <CheckBox x:Name="ChkAdvKeepTracks" Theme="{StaticResource CheckStyle}" IsChecked="False" Content="{loc:Text main.advanced.keep-tracks.label}"/>
                       </StackPanel>
@@ -541,33 +541,33 @@
                         </Grid>
                       </Button>
                       <StackPanel x:Name="FrameBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
+                        <WrapPanel ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                           <CheckBox x:Name="ChkResolution" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.resolution}"/>
                           <CheckBox x:Name="ChkFps" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.fps}"/>
-                        </StackPanel>
+                        </WrapPanel>
                         <!-- Kullanıcı 09-04: dinamik çözünürlük varsayılan; kutu kalkınca kullanıcı sabit boyu seçer. -->
-                        <Grid x:Name="FixedResolutionRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}" IsVisible="False">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.fixed-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                        <Grid x:Name="FixedResolutionRow" RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}" IsVisible="False">
+                          <TextBlock Text="{loc:Text main.fixed-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <RadioButton x:Name="RbFixedSource" GroupName="ShrinkFixedResolution" IsChecked="True" Content="{loc:Text main.fixed-resolution.source}"/>
                             <RadioButton x:Name="RbFixed1080" GroupName="ShrinkFixedResolution"/>
                             <RadioButton x:Name="RbFixed720" GroupName="ShrinkFixedResolution"/>
                             <RadioButton x:Name="RbFixed480" GroupName="ShrinkFixedResolution"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvMinResolution" SelectedIndex="0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtAdvMinResolutionNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.min-fps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.min-fps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvMinFps" SelectedIndex="0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtAdvMinFpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
                       </StackPanel>
                     </StackPanel>
@@ -587,70 +587,70 @@
                         </Grid>
                       </Button>
                       <StackPanel x:Name="AdvancedBody" Spacing="{StaticResource SpaceMd}" IsVisible="False" Margin="{StaticResource RowMargin}">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}" VerticalAlignment="Center">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+                            <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                               <RadioButton x:Name="RbAdvModeAuto" GroupName="AdvMode" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
                               <RadioButton x:Name="RbAdvModeCrf" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.crf}"/>
                               <RadioButton x:Name="RbAdvModeTwoPass" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.two-pass}"/>
-                            </StackPanel>
+                            </WrapPanel>
                             <TextBlock x:Name="TxtAdvModeNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.crf.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.crf.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvCrf" SelectedIndex="0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtAdvCrfNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvPreset" SelectedIndex="0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtAdvPresetNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.tune.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.tune.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvTune" SelectedIndex="0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtAdvTuneNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.modulus.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.modulus.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvModulus" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{loc:Text main.advanced.modulus.hint}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                            <TextBlock Text="{loc:Text main.advanced.modulus.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.encoder-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}" VerticalAlignment="Center">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.encoder-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+                            <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                               <RadioButton x:Name="RbAdvPathAuto" GroupName="AdvEncoderPath" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
                               <RadioButton x:Name="RbAdvPathSoftware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.software}"/>
                               <RadioButton x:Name="RbAdvPathHardware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.hardware}"/>
-                            </StackPanel>
+                            </WrapPanel>
                             <TextBlock x:Name="TxtAdvEncoderPathNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.codec-lock.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.codec-lock.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvCodecLock" SelectedIndex="0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtAdvCodecLockNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                          </StackPanel>
+                          </WrapPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <StackPanel Grid.Column="1" HorizontalAlignment="Left" Spacing="{StaticResource SpaceXs}">
-                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}">
-                              <TextBox x:Name="TxtAdvFilters" Width="280" VerticalAlignment="Center"
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Row="1" Spacing="{StaticResource SpaceXs}">
+                            <StackPanel Spacing="{StaticResource SpaceXs}">
+                              <TextBox x:Name="TxtAdvFilters" VerticalAlignment="Center"
                                        auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}"/>
-                              <TextBlock x:Name="TxtAdvFiltersNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                              <TextBlock x:Name="TxtAdvFiltersNow" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <TextBlock Text="{loc:Text main.advanced.filters.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                           </StackPanel>
@@ -724,6 +724,7 @@
                             IsVisible="False">
                         <TextBlock Grid.Column="0"
                                    x:Name="TxtPlanReasonsHead"
+                                   TextWrapping="Wrap"
                                    Theme="{StaticResource H3}"
                                    VerticalAlignment="Center"/>
                         <Button Grid.Column="1"
@@ -909,14 +910,14 @@
                         RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
 
                     <StackPanel Grid.Row="0" Grid.Column="0">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.container}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.container}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.container.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <ComboBox x:Name="CmbContainer" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="MP4" Tag="mp4"/>
                         <ComboBoxItem Content="MKV" Tag="mkv"/>
@@ -932,14 +933,14 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="0" Grid.Column="1">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.video-codec}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.video-codec}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.video-codec.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <ComboBox x:Name="CmbConvertCodec" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="H.264" Tag="libx264"/>
                         <ComboBoxItem Content="H.265" Tag="libx265"/>
@@ -950,14 +951,14 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="0">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.quality-mode}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.quality-mode}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.quality-mode.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <ComboBox x:Name="CmbQualityMode" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.advanced.mode.crf}"/>
                         <ComboBoxItem Content="{loc:Text main.convert.fixed-bitrate}"/>
@@ -965,14 +966,14 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="1">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.crf-label}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.crf-label.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
                         <Slider x:Name="SliderQuality" Minimum="10" Maximum="45" Value="23" VerticalAlignment="Center"/>
                         <TextBox x:Name="TxtQuality" Grid.Column="1" Text="23" Width="96" MaxLines="1" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
@@ -980,14 +981,14 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="0">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.resolution}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.resolution}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.resolution.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <ComboBox x:Name="CmbResolution" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="2160" Tag="2160"/>
@@ -1000,26 +1001,26 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="1">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.custom-resolution}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-resolution}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-resolution.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <TextBox x:Name="TxtCustomResolution" Text="1280x720" MaxLines="1"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" Grid.Column="0">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.frame-rate}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.frame-rate}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.frame-rate.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <ComboBox x:Name="CmbConvertFps" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="60" Tag="60"/>
@@ -1030,26 +1031,26 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" Grid.Column="1">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.custom-fps}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-fps}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-fps.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <TextBox x:Name="TxtCustomFps" Text="25" MaxLines="1"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="4" Grid.Column="0">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.audio}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <ComboBox x:Name="CmbConvertAudio" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="AAC" Tag="aac"/>
                         <ComboBoxItem Content="Opus" Tag="libopus"/>
@@ -1062,38 +1063,38 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="4" Grid.Column="1">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.audio-bitrate}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio-bitrate}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio-bitrate.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <TextBox x:Name="TxtAudioBitrate" Text="128" MaxLines="1"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="5" Grid.Column="0">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.trim-start}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-start}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-start.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <TextBox x:Name="TxtTrimStart" MaxLines="1"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="5" Grid.Column="1">
-                      <StackPanel Orientation="Horizontal">
+                      <WrapPanel>
                         <TextBlock Text="{loc:Text main.convert.trim-end}" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-end}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-end.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </StackPanel>
+                      </WrapPanel>
                       <TextBox x:Name="TxtTrimEnd" MaxLines="1"/>
                     </StackPanel>
 
