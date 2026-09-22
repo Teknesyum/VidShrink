@@ -53,12 +53,12 @@ public sealed class SuzgecPaneliTests
     {
         var (bos, bosSuzgec, gucAcikBasta, metin, suzgec, gucAcik) = Pencerede(window =>
         {
-            var ilk = (window.TxtAdvFilters.Text ?? "", window.PlanOptionsForTest().Filters, window.CmbFltDenoiseStrength.IsEnabled);
-            window.CmbFltDenoise.SelectedIndex = 2;
-            window.CmbFltDenoiseStrength.SelectedIndex = 2;
+            var ilk = (window.TxtAdvFilters.Text ?? "", window.PlanOptionsForTest().Filters, window.FltStrengthGroup.IsEnabled);
+            window.RbFltDenoiseHq.IsChecked = true;
+            window.RbFltStrStrong.IsChecked = true;
             window.CmbFltRotate.SelectedIndex = 1;
             window.ChkFltGray.IsChecked = true;
-            return (ilk.Item1, ilk.Filters, ilk.IsEnabled, window.TxtAdvFilters.Text, window.PlanOptionsForTest().Filters, window.CmbFltDenoiseStrength.IsEnabled);
+            return (ilk.Item1, ilk.Filters, ilk.IsEnabled, window.TxtAdvFilters.Text, window.PlanOptionsForTest().Filters, window.FltStrengthGroup.IsEnabled);
         });
 
         Assert.Equal("", bos);
@@ -82,8 +82,8 @@ public sealed class SuzgecPaneliTests
         var (keskin, bant, renk, taramasiz, gri) = Pencerede(window =>
         {
             window.TxtAdvFilters.Text = "sharpen=light, deband, colorspace=bt601, deinterlace=on";
-            return (window.CmbFltSharpen.SelectedIndex, window.ChkFltDeband.IsChecked, window.CmbFltColor.SelectedIndex,
-                window.CmbFltDeinterlace.SelectedIndex, window.ChkFltGray.IsChecked);
+            return (window.CmbFltSharpen.SelectedIndex, window.ChkFltDeband.IsChecked, MainWindow.Secili(window.FltColor),
+                MainWindow.Secili(window.FltDeinterlace), window.ChkFltGray.IsChecked);
         });
 
         Assert.Equal((int)SharpenMode.Light, keskin);

@@ -103,6 +103,7 @@ internal static class LanguageCatalog
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["Buy me a coffee"] = "Buy Me a Coffee",
+            ["hqdn3d"] = "hqdn3d",
         };
 
     /// <summary>

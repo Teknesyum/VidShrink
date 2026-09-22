@@ -707,15 +707,27 @@
                             <WrapPanel x:Name="FilterPanel" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                               <StackPanel Spacing="{StaticResource SpaceXs}">
                                 <TextBlock Text="{loc:Text main.advanced.filters.deinterlace}" Theme="{StaticResource Hint}"/>
-                                <ComboBox x:Name="CmbFltDeinterlace" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.deinterlace}"/>
+                                <WrapPanel x:Name="FltDeinterlaceGroup" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceXs}">
+                                  <RadioButton x:Name="RbFltDeintAuto" GroupName="FltDeinterlace" IsChecked="True"/>
+                                  <RadioButton x:Name="RbFltDeintOff" GroupName="FltDeinterlace"/>
+                                  <RadioButton x:Name="RbFltDeintOn" GroupName="FltDeinterlace"/>
+                                </WrapPanel>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
                                 <TextBlock Text="{loc:Text main.advanced.filters.denoise}" Theme="{StaticResource Hint}"/>
-                                <ComboBox x:Name="CmbFltDenoise" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.denoise}"/>
+                                <WrapPanel x:Name="FltDenoiseGroup" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceXs}">
+                                  <RadioButton x:Name="RbFltDenoiseOff" GroupName="FltDenoise" IsChecked="True"/>
+                                  <RadioButton x:Name="RbFltDenoiseNlm" GroupName="FltDenoise"/>
+                                  <RadioButton x:Name="RbFltDenoiseHq" GroupName="FltDenoise"/>
+                                </WrapPanel>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
                                 <TextBlock Text="{loc:Text main.advanced.filters.strength}" Theme="{StaticResource Hint}"/>
-                                <ComboBox x:Name="CmbFltDenoiseStrength" SelectedIndex="1" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.strength}"/>
+                                <WrapPanel x:Name="FltStrengthGroup" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceXs}">
+                                  <RadioButton x:Name="RbFltStrLight" GroupName="FltStrength"/>
+                                  <RadioButton x:Name="RbFltStrMedium" GroupName="FltStrength" IsChecked="True"/>
+                                  <RadioButton x:Name="RbFltStrStrong" GroupName="FltStrength"/>
+                                </WrapPanel>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
                                 <TextBlock Text="{loc:Text main.advanced.filters.sharpen}" Theme="{StaticResource Hint}"/>
@@ -727,7 +739,11 @@
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
                                 <TextBlock Text="{loc:Text main.advanced.filters.color}" Theme="{StaticResource Hint}"/>
-                                <ComboBox x:Name="CmbFltColor" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.color}"/>
+                                <WrapPanel x:Name="FltColorGroup" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceXs}">
+                                  <RadioButton x:Name="RbFltColorKeep" GroupName="FltColor" IsChecked="True"/>
+                                  <RadioButton x:Name="RbFltColor709" GroupName="FltColor"/>
+                                  <RadioButton x:Name="RbFltColor601" GroupName="FltColor"/>
+                                </WrapPanel>
                               </StackPanel>
                             </WrapPanel>
                             <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">

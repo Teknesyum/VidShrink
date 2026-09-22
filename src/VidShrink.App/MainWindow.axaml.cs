@@ -249,7 +249,7 @@ public partial class MainWindow : Window
             Watch(toggle, ToggleButton.IsCheckedProperty, SaveSettings);
         foreach (var box in FilterBoxes())
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnFilterControlChanged);
-        foreach (var check in FilterChecks())
+        foreach (var check in FilterChecks().Concat<ToggleButton>(FilterRadios()))
             Watch(check, ToggleButton.IsCheckedProperty, OnFilterControlChanged);
         Watch(TxtAdvFilters, TextBox.TextProperty, OnFilterTextChanged);
         Watch(ChkAudioLoudnorm, ToggleButton.IsCheckedProperty, OnOptionChanged);
@@ -1744,10 +1744,24 @@ public partial class MainWindow : Window
 
     private bool _suzgecEsitleniyor;
 
-    internal ComboBox[] FilterBoxes() => new[]
+    internal ComboBox[] FilterBoxes() => new[] { CmbFltSharpen, CmbFltRotate };
+
+    internal RadioButton[] FltDeinterlace => new[] { RbFltDeintAuto, RbFltDeintOff, RbFltDeintOn };
+    internal RadioButton[] FltDenoise => new[] { RbFltDenoiseOff, RbFltDenoiseNlm, RbFltDenoiseHq };
+    internal RadioButton[] FltStrength => new[] { RbFltStrLight, RbFltStrMedium, RbFltStrStrong };
+    internal RadioButton[] FltColor => new[] { RbFltColorKeep, RbFltColor709, RbFltColor601 };
+
+    internal RadioButton[] FilterRadios() => FltDeinterlace.Concat(FltDenoise).Concat(FltStrength).Concat(FltColor).ToArray();
+
+    /// <summary>Şeridin seçili sırası; seçim yoksa 0. Sıra enum sırasıyla aynı.</summary>
+    internal static int Secili(RadioButton[] serit) => Math.Max(0, Array.FindIndex(serit, r => r.IsChecked == true));
+
+    private static void Sec(RadioButton[] serit, int sira) => serit[Math.Clamp(sira, 0, serit.Length - 1)].IsChecked = true;
+
+    private static void Yaz(RadioButton[] serit, params object[] etiketler)
     {
-        CmbFltDeinterlace, CmbFltDenoise, CmbFltDenoiseStrength, CmbFltSharpen, CmbFltRotate, CmbFltColor
-    };
+        for (var i = 0; i < serit.Length; i++) serit[i].Content = etiketler[i];
+    }
 
     internal CheckBox[] FilterChecks() => new[] { ChkFltDetelecine, ChkFltDeblock, ChkFltDeband, ChkFltGray };
 
@@ -1762,16 +1776,16 @@ public partial class MainWindow : Window
         _suzgecEsitleniyor = true;
         var off = Say("main.advanced.filters.off");
         var strengths = new[] { Say("main.advanced.filters.light"), Say("main.advanced.filters.medium"), Say("main.advanced.filters.strong") };
-        CmbFltDeinterlace.ItemsSource = new[] { automatic, off, Say("main.advanced.filters.on") };
-        CmbFltDenoise.ItemsSource = new[] { off, "NLMeans", "hqdn3d" };
-        CmbFltDenoiseStrength.ItemsSource = strengths;
+        Yaz(FltDeinterlace, automatic, off, Say("main.advanced.filters.on"));
+        Yaz(FltDenoise, off, "NLMeans", "hqdn3d");
+        Yaz(FltStrength, strengths);
         CmbFltSharpen.ItemsSource = new[] { off }.Concat(strengths).ToArray();
         CmbFltRotate.ItemsSource = new[]
         {
             off, Say("main.advanced.filters.rotate.clock"), Say("main.advanced.filters.rotate.cclock"), Say("main.advanced.filters.rotate.180"),
             Say("main.advanced.filters.rotate.hflip"), Say("main.advanced.filters.rotate.vflip")
         };
-        CmbFltColor.ItemsSource = new[] { Say("main.advanced.filters.color.keep"), "BT.709", "BT.601" };
+        Yaz(FltColor, Say("main.advanced.filters.color.keep"), "BT.709", "BT.601");
         SuzgecDenetimleriniYaz(TxtAdvFilters.Text is { } metin && !string.IsNullOrWhiteSpace(metin)
             ? SuzgecOku(out _)
             : VideoFilterOptions.Default);
@@ -1780,13 +1794,13 @@ public partial class MainWindow : Window
 
     private void SuzgecDenetimleriniYaz(VideoFilterOptions o)
     {
-        CmbFltDeinterlace.SelectedIndex = (int)o.Deinterlace;
-        CmbFltDenoise.SelectedIndex = (int)o.Denoise;
-        CmbFltDenoiseStrength.SelectedIndex = (int)o.DenoiseStrength;
-        CmbFltDenoiseStrength.IsEnabled = o.Denoise != DenoiseFilter.Off;
+        Sec(FltDeinterlace, (int)o.Deinterlace);
+        Sec(FltDenoise, (int)o.Denoise);
+        Sec(FltStrength, (int)o.DenoiseStrength);
+        FltStrengthGroup.IsEnabled = o.Denoise != DenoiseFilter.Off;
         CmbFltSharpen.SelectedIndex = (int)o.Sharpen;
         CmbFltRotate.SelectedIndex = (int)o.Transpose;
-        CmbFltColor.SelectedIndex = (int)o.ColorMatrix;
+        Sec(FltColor, (int)o.ColorMatrix);
         ChkFltDetelecine.IsChecked = o.Detelecine;
         ChkFltDeblock.IsChecked = o.Deblock;
         ChkFltDeband.IsChecked = o.Deband;
@@ -1803,19 +1817,19 @@ public partial class MainWindow : Window
         static int Index(ComboBox box) => Math.Max(0, box.SelectedIndex);
         var o = SuzgecOku(out _) with
         {
-            Deinterlace = (DeinterlaceMode)Index(CmbFltDeinterlace),
-            Denoise = (DenoiseFilter)Index(CmbFltDenoise),
-            DenoiseStrength = (FilterStrength)Index(CmbFltDenoiseStrength),
+            Deinterlace = (DeinterlaceMode)Secili(FltDeinterlace),
+            Denoise = (DenoiseFilter)Secili(FltDenoise),
+            DenoiseStrength = (FilterStrength)Secili(FltStrength),
             Sharpen = (SharpenMode)Index(CmbFltSharpen),
             Transpose = (TransposeMode)Index(CmbFltRotate),
-            ColorMatrix = (ColorMatrixTarget)Index(CmbFltColor),
+            ColorMatrix = (ColorMatrixTarget)Secili(FltColor),
             Detelecine = ChkFltDetelecine.IsChecked == true,
             Deblock = ChkFltDeblock.IsChecked == true,
             Deband = ChkFltDeband.IsChecked == true,
             Grayscale = ChkFltGray.IsChecked == true
         };
         _suzgecEsitleniyor = true;
-        CmbFltDenoiseStrength.IsEnabled = o.Denoise != DenoiseFilter.Off;
+        FltStrengthGroup.IsEnabled = o.Denoise != DenoiseFilter.Off;
         TxtAdvFilters.Text = VideoFilterChain.Format(o);
         _suzgecEsitleniyor = false;
     }
