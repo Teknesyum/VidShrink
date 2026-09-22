@@ -59,4 +59,34 @@ public sealed class AcilirGirisTests
         Assert.Equal(!azalt, animasyonlu);
         if (azalt) Assert.Equal(1, saydamlik);
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void MenuyeGiris(bool azalt)
+    {
+        var (saydamlik, animasyonlu) = AppHost.Run(() =>
+        {
+            var satir = new MenuItem { Header = "satır" };
+            var menu = new MenuFlyout();
+            menu.Items.Add(satir);
+            var dugme = new Button { Content = "menü" };
+            var pencere = new Window { Content = dugme, Width = 300, Height = 200 };
+            if (azalt) pencere.Classes.Add("reduced-motion");
+            pencere.Show();
+            try
+            {
+                menu.ShowAt(dugme);
+                Dispatcher.UIThread.RunJobs();
+                var sunucu = satir.GetVisualAncestors().OfType<MenuFlyoutPresenter>().First();
+                var sonuc = (sunucu.Opacity, sunucu.Opacity < 1);
+                menu.Hide();
+                return sonuc;
+            }
+            finally { pencere.Close(); }
+        });
+
+        Assert.Equal(!azalt, animasyonlu);
+        if (azalt) Assert.Equal(1, saydamlik);
+    }
 }

@@ -24,9 +24,9 @@
     <FluentTheme/>
     <StyleInclude Source="avares://VidShrink.App/Themes/Controls.axaml"/>
     <!--
-      Açılır pencere yerine süzülür. Hareketi azaltma açık pencerenin açılırları oynamaz.
+      Açılır pencere ve menü yerine süzülür. Hareketi azaltma açık pencerenin açılırları oynamaz.
     -->
-    <Style Selector="Window:not(.reduced-motion) FlyoutPresenter">
+    <Style Selector="Window:not(.reduced-motion) FlyoutPresenter, Window:not(.reduced-motion) MenuFlyoutPresenter">
       <Style.Animations>
         <Animation Duration="{StaticResource MotionFast}" Easing="CubicEaseOut" FillMode="Forward">
           <KeyFrame Cue="0%">
