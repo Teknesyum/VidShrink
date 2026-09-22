@@ -1,0 +1,127 @@
+name: vp9-olcumu
+
+on:
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+  BENCH: tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll
+
+jobs:
+  cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      matrix:
+        kesit: [gren, gradyan, hareket]
+        hedef: [1500, 4000]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+          ffmpeg -hide_banner -version | head -n 1
+          ffmpeg -hide_banner -encoders | grep -q libvpx-vp9 || { echo 'libvpx-vp9 yok'; exit 1; }
+          ffmpeg -hide_banner -filters | grep -q libvmaf || { echo 'libvmaf yok'; exit 1; }
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - name: olc
+        shell: pwsh
+        run: pwsh tools/vp9-olcumu/kos.ps1 -Is cpu -Kesit ${{ matrix.kesit }} -HedefK ${{ matrix.hedef }} -Cikti "$env:RUNNER_TEMP/vp9"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vp9-cpu-${{ matrix.kesit }}-${{ matrix.hedef }}
+          path: ${{ runner.temp }}/vp9/sonuc-*.json
+          retention-days: 14
+
+  crf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        kesit: [gren, gradyan, hareket]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+          ffmpeg -hide_banner -encoders | grep -q libvpx-vp9 || { echo 'libvpx-vp9 yok'; exit 1; }
+          ffmpeg -hide_banner -filters | grep -q libvmaf || { echo 'libvmaf yok'; exit 1; }
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - name: olc
+        shell: pwsh
+        run: pwsh tools/vp9-olcumu/kos.ps1 -Is crf -Kesit ${{ matrix.kesit }} -Cikti "$env:RUNNER_TEMP/vp9"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vp9-crf-${{ matrix.kesit }}
+          path: ${{ runner.temp }}/vp9/sonuc-*.json
+          retention-days: 14
+
+  inis:
+    needs: crf
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        kesit: [gren, gradyan, hareket]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vp9-crf-*
+          path: ${{ runner.temp }}/crf
+      - name: olc
+        shell: pwsh
+        run: pwsh tools/vp9-olcumu/kos.ps1 -Is inis -Kesit ${{ matrix.kesit }} -Girdi "$env:RUNNER_TEMP/crf" -Cikti "$env:RUNNER_TEMP/vp9"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vp9-inis-${{ matrix.kesit }}
+          path: ${{ runner.temp }}/vp9/sonuc-*.json
+          retention-days: 14
+
+  ozet:
+    needs: [cpu, crf, inis]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ffmpeg kur
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vp9-*
+          path: ${{ runner.temp }}/girdi
+      - name: ozet
+        shell: pwsh
+        run: |
+          pwsh tools/vp9-olcumu/kos.ps1 -Is ozet -Girdi "$env:RUNNER_TEMP/girdi" -Cikti "$env:RUNNER_TEMP/sonuc"
+          Get-Content "$env:RUNNER_TEMP/sonuc/ozet.md" | Add-Content $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vp9-olcumu-sonuc
+          path: ${{ runner.temp }}/sonuc
+          retention-days: 30
