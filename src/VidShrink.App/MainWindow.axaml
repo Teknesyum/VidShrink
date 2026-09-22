@@ -269,40 +269,40 @@
                       <ComboBox Grid.Column="1" x:Name="CmbTitle" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="OnTitleChanged"/>
                     </Grid>
 
-                    <Grid x:Name="InfoGrid" ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}" IsVisible="False">
-                      <StackPanel Grid.Row="0" Grid.Column="0">
+                    <izi:EsitSutunIzgara x:Name="InfoGrid" MaxColumns="4" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}" IsVisible="False">
+                      <StackPanel>
                         <TextBlock Text="{loc:Text main.info.duration}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                         <TextBlock x:Name="TxtDuration" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
-                      <StackPanel Grid.Row="0" Grid.Column="1">
+                      <StackPanel>
                         <TextBlock Text="{loc:Text main.info.size}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                         <TextBlock x:Name="TxtSize" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
-                      <StackPanel Grid.Row="0" Grid.Column="2">
+                      <StackPanel>
                         <TextBlock Text="{loc:Text main.info.resolution}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                         <TextBlock x:Name="TxtResolution" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
-                      <StackPanel Grid.Row="0" Grid.Column="3">
+                      <StackPanel>
                         <TextBlock Text="{loc:Text main.info.fps}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                         <TextBlock x:Name="TxtFps" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
-                      <StackPanel Grid.Row="1" Grid.Column="0">
+                      <StackPanel>
                         <TextBlock Text="{loc:Text main.info.video-codec}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                         <TextBlock x:Name="TxtVideoCodec" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
-                      <StackPanel Grid.Row="1" Grid.Column="1">
+                      <StackPanel>
                         <TextBlock Text="{loc:Text main.info.audio}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                         <TextBlock x:Name="TxtAudio" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
-                      <StackPanel Grid.Row="1" Grid.Column="2">
+                      <StackPanel>
                         <TextBlock Text="{loc:Text main.info.bitrate}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                         <TextBlock x:Name="TxtBitrate" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
-                      <StackPanel Grid.Row="1" Grid.Column="3">
+                      <StackPanel>
                         <TextBlock Text="{loc:Text main.info.hdr}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                         <TextBlock x:Name="TxtHdr" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
-                    </Grid>
+                    </izi:EsitSutunIzgara>
                   </StackPanel>
                 </Border>
 

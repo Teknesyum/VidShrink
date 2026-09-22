@@ -151,8 +151,10 @@ public sealed class BiciminTests : IDisposable
 /// <summary>
 /// T192 K4 ve dorduncu madde. Olcum basiz pencerede, gercek yerlesim motoruyla.
 ///
-/// <para><b>Kaynak bilgi izgarasi.</b> <c>InfoGrid</c> bir <see cref="UniformGrid"/>:
-/// dort sutun esit genislikte ve hucre kirpmiyor. Turkce etiket Ingilizceden uzun
+/// <para><b>Kaynak bilgi izgarasi.</b> <c>InfoGrid</c> bir <see cref="EsitSutunIzgara"/>:
+/// en fazla dort esit sutun; en genis hucre sigmazsa iki, sonra bir sutuna iner
+/// (2026-09-23: sabit dort sutunda deger her dilde ucnoktayla kesiliyordu). Once
+/// hucre kirpmiyordu. Turkce etiket Ingilizceden uzun
 /// oldugu icin "Video kodeği" kendi hucresinden tasip yanindaki "Ses" etiketinin
 /// uzerine biniyordu. Olcu her etiketin genisligini kendi hucresinin genisligiyle
 /// karsilastirir; tasma varsa kirmizi doner.</para>
@@ -212,7 +214,7 @@ public sealed class KareYerlesimTests
                 window.Arrange(new Rect(olcu));
                 window.UpdateLayout();
 
-                Visual? node = window.GetVisualDescendants().OfType<UniformGrid>()
+                Visual? node = window.GetVisualDescendants().OfType<EsitSutunIzgara>()
                     .Single(grid => grid.Name == "InfoGrid");
                 while (node is not null)
                 {
@@ -248,7 +250,11 @@ public sealed class KareYerlesimTests
     public void KaynakBilgiEtiketleriKendiHucresindeKalir(string dil, double genislik, double yukseklik)
     {
         var olcu = new Size(genislik, yukseklik);
-        var (tasan, satirlar) = Read(dil, olcu, window => Tasanlar(window, olcu, null, kirpmaKapali: false, balonKapali: false));
+        var (tasan, satirlar, sutun) = Read(dil, olcu, window =>
+        {
+            var (t, s) = Tasanlar(window, olcu, null, kirpmaKapali: false, balonKapali: false);
+            return (t, s, Named<EsitSutunIzgara>(window, "InfoGrid").Columns);
+        });
 
         var klasor = Path.Combine(TipSources.Root, ".calisma", "t194");
         var ad = $"infogrid-{dil}-{genislik:0}x{yukseklik:0}.txt";
@@ -256,7 +262,8 @@ public sealed class KareYerlesimTests
         File.WriteAllLines(Path.Combine(klasor, ad), satirlar);
 
         Assert.True(tasan.Count == 0, string.Join(Environment.NewLine, tasan));
-        if (olcu == Dar) Assert.Contains(satirlar, satir => satir.Contains("kisaldi", StringComparison.Ordinal));
+        Assert.DoesNotContain(satirlar, satir => satir.Contains("kisaldi", StringComparison.Ordinal));
+        if (olcu == Dar) Assert.True(sutun < 4, $"dar pencerede {sutun} sutun");
 
         Kapat(klasor, ad);
     }
@@ -271,7 +278,7 @@ public sealed class KareYerlesimTests
     [InlineData(false, true)]
     public void OlcuUzunEtiketiYakalar(bool kirpmaKapali, bool balonKapali)
     {
-        var (tasan, _) = Read("tr", Genis, window => Tasanlar(window, Genis, "Cok Uzun Bir Kaynak Bilgi Etiketi Ornegi Daha Da Uzun", kirpmaKapali, balonKapali));
+        var (tasan, _) = Read("tr", Genis, window => Tasanlar(window, Genis, string.Concat(Enumerable.Repeat("Cok Uzun Bir Kaynak Bilgi Etiketi Ornegi Daha Da Uzun ", 6)), kirpmaKapali, balonKapali));
 
         Assert.NotEmpty(tasan);
     }
@@ -284,7 +291,7 @@ public sealed class KareYerlesimTests
     /// </summary>
     private static (List<string> Tasan, List<string> Satirlar) Tasanlar(MainWindow window, Size olcu, string? mutasyon, bool kirpmaKapali, bool balonKapali)
     {
-        var grid = window.GetVisualDescendants().OfType<UniformGrid>()
+        var grid = window.GetVisualDescendants().OfType<EsitSutunIzgara>()
             .Single(g => g.Name == "InfoGrid");
 
         var hucreler = grid.Children
