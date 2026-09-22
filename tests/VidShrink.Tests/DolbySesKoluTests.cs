@@ -193,6 +193,45 @@ public sealed class DolbySesKoluTests
     }
 
     /// <summary>
+    /// Kalite hedefi yolu secenekleri <c>WithTarget</c> ile kopyalayip her denemede yeniden
+    /// planliyor. Kopya ses kodegini tasimazsa kullanicinin Dolby secimi merdivene ulasmadan
+    /// AAC'ye duser (main 8f09dc60'ten beri kirmiziydi). Auto olumsuz kontrol.
+    /// </summary>
+    [Theory]
+    [InlineData(AudioCodecChoice.Ac3, "ac3")]
+    [InlineData(AudioCodecChoice.Eac3, "eac3")]
+    [InlineData(AudioCodecChoice.Auto, "aac")]
+    public void KaliteHedefiYoluSecimiKoruyor(AudioCodecChoice secim, string beklenen)
+    {
+        var sonuc = PlanCalculator.TargetMbForQuality(CokKanalli(), new PlanOptions
+        {
+            TargetMb = 100,
+            AudioCodec = secim,
+            AudioChannels = AudioChannelOverride.Source,
+            LockedAudioKbps = 384
+        }, 60);
+
+        Assert.Equal(beklenen, Assert.Single(sonuc.Plan.Plan.Streams!.Audio).Codec);
+    }
+
+    /// <summary>
+    /// Akis listesi olmayan kaynakta (eski yoklama, tek ses izi) plan kodegi eslemeden degil
+    /// dogrudan secimden geliyor; o kol da secimi okumali.
+    /// </summary>
+    [Theory]
+    [InlineData(AudioCodecChoice.Ac3, "ac3")]
+    [InlineData(AudioCodecChoice.Eac3, "eac3")]
+    [InlineData(AudioCodecChoice.Auto, "aac")]
+    public void AkisListesizKaynaktaSecimOkunuyor(AudioCodecChoice secim, string beklenen)
+    {
+        var info = Kaynak() with { AudioCodec = "ac3", AudioBitrateBps = 448_000, AudioChannels = 6 };
+
+        var plan = PlanCalculator.Build(info, new PlanOptions { TargetMb = 100, AudioCodec = secim });
+
+        Assert.Equal(beklenen, plan.AudioCodec);
+    }
+
+    /// <summary>
     /// <c>IsDolby</c> kapali bir kume: yalniz ac3 ve eac3. Uydurma ve komsu adlarin
     /// kolu acmadigi olumsuz kontrol.
     /// </summary>

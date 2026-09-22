@@ -1094,6 +1094,12 @@ public sealed class BaslikKapsamiTests
     /// (en <c>retry-in</c> ve <c>retry-with</c>, tr <c>retry-with</c>, de/sw <c>retry-in</c>,
     /// lt <c>retry-with</c>, pt <c>retry</c> ve <c>retry-in</c>). <c>main.preview.temsili</c>
     /// hicbir dilde kol degistirmiyor.</para>
+    ///
+    /// <para><b>19 Eylul 2026, altinci yenileme: toplam 1727, en 205, tr 72.</b> B1a ses kodegi
+    /// kolu dort, tasma dugmelerinin ekran okuyucu adi iki anahtar ekledi; 258 anahtarin 37si
+    /// kol degistiriyor (<c>dolby-not-in-container</c> 11, <c>dolby-below-channel-floor</c> 9,
+    /// <c>retry.trim.name</c> 7, <c>audio-channels.source</c> 6, <c>audio-codec.label</c> 3,
+    /// <c>retry.accept.name</c> 1). en besi, tr ucu.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1119,9 +1125,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1690, toplam);
-        Assert.Equal(200, dilBasina["en"]);
-        Assert.Equal(69, dilBasina["tr"]);
+        Assert.Equal(1727, toplam);
+        Assert.Equal(205, dilBasina["en"]);
+        Assert.Equal(72, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1245,6 +1251,9 @@ public sealed class BaslikKapsamiTests
     /// <para><b>19 Eylul 2026, altinci yenileme: 43129.</b> Paylasimin yeniden deneme yuzu
     /// uc <c>settings.share.retry*</c> anahtari, onizleme rozeti bir <c>main.preview.temsili</c>
     /// ekledi: 999 + 4 = 1003, 43 x 1003 = 43129. <c>kayip</c> yine 0.</para>
+    /// <para><b>19 Eylul 2026, yedinci yenileme: 43387.</b> B1a ses kodegi kolu dort
+    /// (<c>audio-codec.label</c>, <c>audio-channels.source</c>, iki <c>dolby-*</c> gerekcesi), tasma
+    /// dugmeleri iki <c>main.retry.*.name</c> anahtari ekledi: 1003 + 6 = 1009, 43 x 1009 = 43387. <c>kayip</c> yine 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1272,7 +1281,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(43129, gezilen);
+        Assert.Equal(43387, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -1073,7 +1073,10 @@ public sealed class ManualOverrideTests
         "Filters", "DetectedCrop",
         // Madde 54: Trim kullanicinin sectigi zaman penceresi. Kapali sabit degil, istegin
         // kendisi — butce bu pencereden turer (docs/danisma/2026-09-18-fable-kucultmede-aralik.md S2).
-        "Trim"
+        "Trim",
+        // B1a: AudioCodec kullanicinin sectigi ses kodegi (AAC, AC-3, E-AC-3; HandBrake --aencoder).
+        // Kapali sabit degil, istegin kendisi; varsayilani Auto ve bugunku davranis AAC.
+        "AudioCodec"
     };
 
     [Fact]

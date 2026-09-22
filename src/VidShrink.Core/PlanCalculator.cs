@@ -819,7 +819,7 @@ public static class PlanCalculator
     {
         Codec = codec,
         Streams = streams,
-        AudioCodec = !info.HasAudio || audioK <= 0 ? null : streams.Audio.Count > 0 ? (streams.Audio[0].Copies ? "copy" : streams.Audio[0].Codec) : PickAudioCodec(),
+        AudioCodec = !info.HasAudio || audioK <= 0 ? null : streams.Audio.Count > 0 ? (streams.Audio[0].Copies ? "copy" : streams.Audio[0].Codec) : PickAudioCodec(options.AudioCodec),
         AudioBitrateK = audioK,
         AudioChannels = audioChannels,
         Width = best.Width,
@@ -1086,6 +1086,7 @@ public static class PlanCalculator
         LockedTune = options.LockedTune,
         LockedAudioKbps = options.LockedAudioKbps,
         AudioChannels = options.AudioChannels,
+        AudioCodec = options.AudioCodec,
         MinResolutionHeight = options.MinResolutionHeight,
         FixedResolution = options.FixedResolution,
         MinFps = options.MinFps,
