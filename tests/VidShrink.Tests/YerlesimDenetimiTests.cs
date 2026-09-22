@@ -255,6 +255,25 @@ public sealed class YerlesimDenetimiTests
         kaydedici.TxtBudgetNote.Text = Strings.Get("recorder.output.partial");
     });
 
+    /// <summary>
+    /// Önizleme ve oynatıcının kodla açılan katmanları: sağ perde metni, yaklaşıklık rozeti,
+    /// kodlama çipi, bilgi paneli, takılma metni, küçük resim çipi.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    public void OynaticiKatmanlarindaKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-katman", pencere =>
+    {
+        pencere.Preview.SetRightNotice("playback.panel.pending");
+        pencere.Preview.SetRightBadge(Strings.Get("main.preview.temsili"));
+        pencere.Preview.Controls.SetEncodeProgress(0.4, 2, 2, 3);
+        pencere.Player.InfoPanel.IsVisible = true;
+        pencere.Player.TxtInfo.Text = "3840×2160 · 59.94 fps · hevc · aac 192 kbit/s";
+        pencere.Player.TxtStall.IsVisible = true;
+        pencere.Player.TxtStall.Text = Strings.Get("main.player.seekfailed");
+        pencere.Player.ThumbChip.IsVisible = true;
+        pencere.Player.ThumbTime.Text = "01:02:03";
+    });
+
     private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true)
     {
         var (denetim, boyut) = Ac(dil, dar, null, hazirla: hazirla, yukle: yukle);
