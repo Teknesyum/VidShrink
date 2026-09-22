@@ -4068,13 +4068,7 @@ public partial class MainWindow : Window
             BtnReveal.IsVisible = false;
             ResetShare(false);
             HideRetryAsk();
-            var progress = new Progress<EncodeProgress>(p =>
-            {
-                Progress.Value = p.Fraction;
-                SetStage(TxtStage, LocalizeStage(p.Stage));
-                TxtRemaining.Text = Saat.Kalan(p.Remaining);
-                if (p.OutputMb > 0) TxtOutSize.Text = Say("main.unit.mb-value", Num(p.OutputMb, "0.0"));
-            });
+            var progress = new Progress<EncodeProgress>(ShowEncodeProgress);
 
             var result = await ShrinkEngine.EncodeAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
             _lastOutput = result.OutputPath;
@@ -4460,6 +4454,20 @@ public partial class MainWindow : Window
 
     private static bool Mentions(string text, params string[] needles)
         => needles.Any(needle => text.Contains(needle, StringComparison.OrdinalIgnoreCase));
+
+    private void ShowEncodeProgress(EncodeProgress p)
+    {
+        Progress.Value = p.Fraction;
+        SetStage(TxtStage, LocalizeStage(p.Stage));
+        TxtRemaining.Text = Saat.Kalan(p.Remaining);
+        if (p.OutputMb > 0) TxtOutSize.Text = Say("main.unit.mb-value", Num(p.OutputMb, "0.0"));
+    }
+
+    internal void ShowEncodeProgressForTest(EncodeProgress p)
+    {
+        SetRunning(true);
+        ShowEncodeProgress(p);
+    }
 
     private void SetRunning(bool running)
     {

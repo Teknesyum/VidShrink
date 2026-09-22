@@ -145,9 +145,26 @@ public sealed class YerlesimDenetimiTests
         pencere.ShareLinkRow.IsVisible = true;
     });
 
-    private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla)
+    /// <summary>
+    /// Kaynak yok: ilk açılış. Bırakma alanı, boş plan ve çıktı kartı "-" değerleriyle; yüklü
+    /// taramada bunların yerini dolu metinler alıyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    public void BosPenceredeKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-bos", null, yukle: false);
+
+    /// <summary>
+    /// Kodlama sürüyor: aşama satırı motorun iki geçişli biçimiyle ("pass 2/2 (attempt 3)"),
+    /// kalan süre saatli, çıktı boyutu dolu.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    public void KodlamaSurerkenKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-kosuyor", pencere =>
+        pencere.ShowEncodeProgressForTest(new EncodeProgress(0.42, TimeSpan.FromMinutes(3), TimeSpan.FromMinutes(71), 12.3, "pass 2/2 (attempt 3)")));
+
+    private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true)
     {
-        var (denetim, boyut) = Ac(dil, dar, null, hazirla: hazirla);
+        var (denetim, boyut) = Ac(dil, dar, null, hazirla: hazirla, yukle: yukle);
         var klasor = Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi");
         var ad = $"{dil}-{(dar ? "taban" : "varsayilan")}{durum}.txt";
         Directory.CreateDirectory(klasor);
@@ -311,7 +328,7 @@ public sealed class YerlesimDenetimiTests
         Tasmalar(pencere, durum, denetim);
     }
 
-    private static (Denetim, Size) Ac(string dil, bool dar, Action<MainWindow>? boz, Size? zorla = null, Action<MainWindow>? hazirla = null) =>
+    private static (Denetim, Size) Ac(string dil, bool dar, Action<MainWindow>? boz, Size? zorla = null, Action<MainWindow>? hazirla = null, bool yukle = true) =>
         AppHost.Run(() =>
         {
             Strings.Use(dil);
@@ -319,7 +336,7 @@ public sealed class YerlesimDenetimiTests
             try
             {
                 pencere.Classes.Add("reduced-motion");
-                pencere.LoadWithoutProbing(SamplePath, Sample());
+                if (yukle) pencere.LoadWithoutProbing(SamplePath, Sample());
                 pencere.SettleFades();
                 pencere.TabAdvanced.IsVisible = true;
                 hazirla?.Invoke(pencere);
