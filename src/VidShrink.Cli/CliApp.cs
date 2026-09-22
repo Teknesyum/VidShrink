@@ -449,6 +449,9 @@ public static class CliApp
         builder.AppendLine(text.Format("plan.quality", Num(decision.Result.PredictedQuality, "0.0", text), Basis(estimate.Measured, text)));
         if (plan.ReasonCodes.Count > 0)
             builder.AppendLine(text.Format("plan.reasons", string.Join(", ", plan.ReasonCodes.Select(note => note.Code))));
+        if (plan.Streams is { } streams)
+            foreach (var note in streams.Notes.Distinct())
+                builder.AppendLine(text.Format("plan.stream-note", text["plan.stream." + StreamNotes.Slug(note)]));
         builder.AppendLine(text.Format("plan.output", decision.OutputPath));
         builder.AppendLine(text["plan.command"]);
         builder.AppendLine(FfmpegArguments.ToCommandLine(decision.Arguments));

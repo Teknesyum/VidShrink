@@ -25,6 +25,30 @@ public enum StreamNote
     AudioFilterSkippedOnCopy
 }
 
+public static class StreamNotes
+{
+    /// <summary>
+    /// Notun metin anahtarlarindaki adi: arayuz <c>main.reason.stream.</c>, CLI <c>plan.stream.</c>
+    /// onekini ekler. Iki yuz ayni adi okudugu icin bir not birinde yazilip otekinde unutulmaz.
+    /// </summary>
+    public static string Slug(StreamNote note) => note switch
+    {
+        StreamNote.AudioPassthrough => "audio-passthrough",
+        StreamNote.AudioDownmixedToStereo => "audio-downmixed",
+        StreamNote.ExtraAudioDropped => "extra-audio-dropped",
+        StreamNote.TextSubtitleConverted => "text-subtitle-converted",
+        StreamNote.ImageSubtitleDropped => "image-subtitle-dropped",
+        StreamNote.SubtitleDroppedForPlatform => "subtitle-dropped-platform",
+        StreamNote.KeepAllTracksOverriddenByPlatform => "keep-tracks-overridden",
+        StreamNote.AudioCodecNotInContainer => "audio-codec-not-in-container",
+        StreamNote.DolbyCodecNotInContainer => "dolby-not-in-container",
+        StreamNote.DolbyCodecBelowChannelFloor => "dolby-below-channel-floor",
+        StreamNote.FlacFellBack => "flac-fell-back",
+        StreamNote.AudioFilterSkippedOnCopy => "audio-filter-on-copy",
+        _ => "lossless-not-passed"
+    };
+}
+
 public sealed record SourceStream(
     int Index,
     StreamKind Kind,

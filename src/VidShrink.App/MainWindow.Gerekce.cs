@@ -133,22 +133,7 @@ public partial class MainWindow
         return parts;
     }
 
-    internal static string StreamNoteKey(StreamNote note) => note switch
-    {
-        StreamNote.AudioPassthrough => "main.reason.stream.audio-passthrough",
-        StreamNote.AudioDownmixedToStereo => "main.reason.stream.audio-downmixed",
-        StreamNote.ExtraAudioDropped => "main.reason.stream.extra-audio-dropped",
-        StreamNote.TextSubtitleConverted => "main.reason.stream.text-subtitle-converted",
-        StreamNote.ImageSubtitleDropped => "main.reason.stream.image-subtitle-dropped",
-        StreamNote.SubtitleDroppedForPlatform => "main.reason.stream.subtitle-dropped-platform",
-        StreamNote.KeepAllTracksOverriddenByPlatform => "main.reason.stream.keep-tracks-overridden",
-        StreamNote.AudioCodecNotInContainer => "main.reason.stream.audio-codec-not-in-container",
-        StreamNote.DolbyCodecNotInContainer => "main.reason.stream.dolby-not-in-container",
-        StreamNote.DolbyCodecBelowChannelFloor => "main.reason.stream.dolby-below-channel-floor",
-        StreamNote.FlacFellBack => "main.reason.stream.flac-fell-back",
-        StreamNote.AudioFilterSkippedOnCopy => "main.reason.stream.audio-filter-on-copy",
-        _ => "main.reason.stream.lossless-not-passed"
-    };
+    internal static string StreamNoteKey(StreamNote note) => "main.reason.stream." + StreamNotes.Slug(note);
 
     private List<string> StrategyLines()
     {
