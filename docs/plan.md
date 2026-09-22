@@ -1333,6 +1333,22 @@ dilde duruyor, ama pencerede de CLI'da da onları çağıran tek kol yok.
 6. Yeni anahtarlar 42 dilde. Ölçü: `OnAyarAktarimTests` — iki dosya türü, çakışma, not
    satırı, dışa-içe gidiş dönüş; her kolun olumsuz kontrolü ve mutasyon.
 
+## C1-8 — CLI ön ayar dosyası okuyor (22 Eylül 2026)
+
+Bulgu: pencere içe aktarıyor (C1-7), CLI hâlâ yalnız kütüphanedeki kimliği alıyor; HandBrakeCLI'nin
+`--preset-import-file`'ına denk yüzey yok.
+
+1. `--profil-dosyasi, --preset-file YOL`: VidShrink ya da HandBrake dosyası. Dosyadaki profiller
+   aramada kütüphaneden önce gelir; kitaplığa yazılmaz (CLI kullanıcının dosyasını değiştirmez).
+2. `--profil` kimlik ya da ad (büyük/küçük harf duyarsız) alır. Dosyada tek profil varsa `--profil`
+   gerekmez; birden çoksa ve seçilmediyse 64 ve adlar listelenir.
+3. HandBrake dosyasında stderr'e ön ayar başına bir özet: aktarılan/yaklaşık/düşen sayısı ve
+   yaklaşık alanların adı. `--json` stdout'u bozulmaz.
+4. Okunamayan dosya 64 değil 1 (girdi hatası), sebep cümlede.
+5. Metin: tr ve en CLI dilleri, yardım metnine satır.
+6. Test: `CliOnAyarDosyasiTests` — VidShrink dosyası, HandBrake dosyası + özet, çok profilde seçim
+   zorunlu, ad ile seçim, bozuk dosya, dosyasız `--profil` davranışı değişmedi (olumsuz kontrol).
+
 ## B1a — Çok kanallı ses: ac3/eac3 kodlama, flac kapsam dışı (19 Eylül 2026)
 
 HandBrake açığının B1a maddesi "flac/ac3/eac3 kodlama" diyordu. Danışma maddeyi ikiye böldü

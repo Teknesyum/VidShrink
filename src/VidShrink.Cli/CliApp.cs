@@ -89,9 +89,28 @@ public static class CliApp
             }
         }
 
+        IReadOnlyList<PresetProfile> dosyadan = Array.Empty<PresetProfile>();
+        if (request.PresetFile is { } profilDosyasi)
+        {
+            if (ProfilDosyasi(profilDosyasi, stderr, text) is not { } okunan) return ExitCodes.Error;
+            dosyadan = okunan;
+            if (request.ProfileId is null)
+            {
+                if (dosyadan.Count != 1)
+                {
+                    stderr.WriteLine(text.Format("error.preset-file-choose", string.Join(", ", dosyadan.Select(p => p.Name ?? p.Id))));
+                    stderr.WriteLine(text["usage.hint"]);
+                    return ExitCodes.Usage;
+                }
+                request = request with { ProfileId = dosyadan[0].Id };
+            }
+        }
+
         if (request.ProfileId is { } istenenProfil)
         {
-            var bulunan = PresetLibrary.BuiltIn.Find(istenenProfil)
+            var bulunan = dosyadan.FirstOrDefault(p => string.Equals(p.Id, istenenProfil, StringComparison.OrdinalIgnoreCase)
+                              || string.Equals(p.Name, istenenProfil, StringComparison.OrdinalIgnoreCase))
+                ?? PresetLibrary.BuiltIn.Find(istenenProfil)
                 ?? services.UserPresets().FirstOrDefault(p => string.Equals(p.Id, istenenProfil, StringComparison.OrdinalIgnoreCase));
             if (bulunan is null)
             {
@@ -436,6 +455,48 @@ public static class CliApp
             writer.WriteString("command", "plan");
             WriteDecision(writer, request, decision);
         });
+
+    /// <summary>
+    /// <c>--profil-dosyasi</c> okuması (<c>docs/plan.md</c> C1-8). VidShrink dosyası doğrudan,
+    /// HandBrake dosyası çeviriyle geliyor; HandBrake'te ön ayar başına özet stderr'e yazılıyor,
+    /// böylece <c>--json</c> çıktısı bozulmuyor. Kullanıcının kitaplığına yazılmıyor.
+    /// </summary>
+    internal static IReadOnlyList<PresetProfile>? ProfilDosyasi(string path, TextWriter stderr, CliText text)
+    {
+        try
+        {
+            try
+            {
+                return PresetLibrary.Import(path);
+            }
+            catch (PresetFileException ex) when (ex.Error == PresetFileError.HandBrakeFile)
+            {
+                var ceviriler = HandBrakePresetImport.TranslateFile(path);
+                foreach (var ceviri in ceviriler)
+                {
+                    var alanlar = ceviri.Notes.Where(n => n.Reason != PresetNoteReason.Structural).ToList();
+                    stderr.WriteLine(text.Format("preset-file.handbrake", ceviri.PresetName,
+                        alanlar.Count(n => n.Outcome == PresetNoteOutcome.Carried),
+                        alanlar.Count(n => n.Outcome == PresetNoteOutcome.Approximated),
+                        alanlar.Count(n => n.Outcome == PresetNoteOutcome.Dropped)));
+                    var yaklasik = alanlar.Where(n => n.Outcome == PresetNoteOutcome.Approximated).Select(n => n.Field).ToList();
+                    if (yaklasik.Count > 0) stderr.WriteLine(text.Format("preset-file.approximated", string.Join(", ", yaklasik)));
+                }
+                return ceviriler.Select(c => c.Profile).ToList();
+            }
+        }
+        catch (Exception ex) when (ex is PresetFileException or IOException or UnauthorizedAccessException)
+        {
+            stderr.WriteLine(text.Format("error.preset-file", path, ex is PresetFileException preset ? text[preset.Error switch
+            {
+                PresetFileError.NotJson => "preset-file.reason.not-json",
+                PresetFileError.SchemaTooNew => "preset-file.reason.too-new",
+                PresetFileError.NotPresetFile or PresetFileError.SchemaMissing or PresetFileError.NoHandBrakePreset => "preset-file.reason.not-preset",
+                _ => "preset-file.reason.invalid"
+            }] : ex.Message));
+            return null;
+        }
+    }
 
     /// <summary>
     /// <c>profiller</c> komutunun govdesi. Kutuphane <b>turune gore</b> bolumleniyor:

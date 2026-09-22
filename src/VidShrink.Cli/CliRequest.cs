@@ -93,6 +93,12 @@ public sealed record CliRequest
     public string? ProfileId { get; init; }
 
     /// <summary>
+    /// <c>--profil-dosyasi</c>: VidShrink ya da HandBrake ön ayar dosyası. İçindeki profiller
+    /// <see cref="ProfileId"/> aramasında kütüphaneden önce gelir; tek profil varsa kimlik gerekmez.
+    /// </summary>
+    public string? PresetFile { get; init; }
+
+    /// <summary>
     /// <see cref="ProfileId"/> kutuphanede bulununca burada tasinir. Ayristirma kullanici
     /// profillerini goremez (dosya servisten gelir), o yuzden cozum <c>CliApp</c>te olur.
     /// </summary>
@@ -282,6 +288,10 @@ public static class CliParser
                     if (!TryValue(args, ref i, out var profil)) return Fail("error.missing-value", arg);
                     request = request with { ProfileId = profil };
                     break;
+                case "--profil-dosyasi" or "--preset-file" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var profilDosyasi)) return Fail("error.missing-value", arg);
+                    request = request with { PresetFile = profilDosyasi };
+                    break;
                 case "--kirp" or "--crop" when command != CliCommand.Watch:
                     request = request with { AutoCrop = true };
                     break;
@@ -349,7 +359,7 @@ public static class CliParser
         if (request.Input is null) return Fail(command == CliCommand.Watch ? "error.watch-no-folder" : "error.no-input", null);
         if (command == CliCommand.Watch && request.Output is null) return Fail("error.watch-no-output", null);
         if (request.TargetMb is not null && request.Quality is not null) return Fail("error.target-or-quality", null);
-        if (request.ProfileId is null && request.TargetMb is null && request.Quality is null)
+        if (request.ProfileId is null && request.PresetFile is null && request.TargetMb is null && request.Quality is null)
             return Fail("error.target-or-quality", null);
         return Success(request);
     }

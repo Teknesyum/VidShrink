@@ -189,6 +189,7 @@ single spelling.
 | `--suzgec` | `--filters` |
 | `--kirp` | `--crop` |
 | `--profil` | `--profile` |
+| `--profil-dosyasi` | `--preset-file` |
 | `--profiller` | `--presets` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
