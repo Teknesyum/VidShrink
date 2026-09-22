@@ -1,4 +1,4 @@
-﻿{
+{
 
   "main.chip.archive.tip": "• Arşiv yongasının boyut tavanı yoktur.\n• Motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur.\n• Bu yonga seçiliyken hedef kutusundaki sayı plana girmez.\n• Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil.\n• Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin.\n• Hedefe dokunduğunuz anda boyut tavanı geri gelir.",
   "main.derivation.size": "Hedef {0} MB",
@@ -554,7 +554,7 @@
   "main.player.paused": "duraklatıldı",
   "main.player.state": "konum {0} sn - {1} - yakınlaştırma {2}%",
   "main.player.stalled": "Oynatma ilerlemiyor; oynatıcı kare üretmiyor.",
-  "main.player.seekfailed": "Arama başarısız: oynatıcı yeni konumda kare gösteremedi.",
+  "main.player.seekfailed": "Atlama başarısız: oynatıcı yeni konumda kare gösteremedi.",
   "main.player.menu.leavefullscreen": "Tam ekrandan çık",
   "main.player.menu.open": "Oynatıcı menüsünü aç",
   "main.player.menu.seek": "{0} sn atla",
