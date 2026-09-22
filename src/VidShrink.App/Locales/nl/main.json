@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "de bron-audiocodec kan niet in deze container worden getransporteerd, dus het spoor wordt opnieuw gecodeerd",
   "main.reason.stream.dolby-not-in-container": "de gekozen Dolby-codec kan niet in deze container worden vervoerd, dus is het spoor met de eigen codec van de container gecodeerd",
   "main.reason.stream.dolby-below-channel-floor": "het audiobudget blijft onder de ondergrens van de gekozen Dolby-codec bij dit aantal kanalen, dus is het spoor met de eigen codec van de container gecodeerd",
+  "main.reason.stream.flac-fell-back": "FLAC kon niet worden gebruikt: de container ondersteunt het niet of het 16-bitplafond past niet in 15% van het doel, dus de track is gecodeerd met de eigen codec van de container",
+  "main.reason.stream.audio-filter-on-copy": "luidheidsnormalisatie en versterking kunnen niet op een gekopieerde audiotrack worden toegepast, de track is ongewijzigd gekopieerd",
   "main.reason.stream.lossless-not-passed": "een lossless TrueHD/DTS-spoor wordt nooit gekopieerd; het wordt opnieuw gecodeerd",
   "main.reason.fill-crf-lowered": "het vulbeleid verlaagde CRF naar {0} in plaats van bij de transparantielimiet te stoppen, en landt bij het bandcentrum van {1} MB binnen de band van {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-ondergrens {0} is bereikt vóór de vulband, dus VBR met twee doorgangen mikt direct op het bandcentrum van {1} MB",

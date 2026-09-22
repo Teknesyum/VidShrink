@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "codec audio sumber tidak boleh dibawa dalam bekas ini, jadi trek dikodkan semula",
   "main.reason.stream.dolby-not-in-container": "kodek Dolby yang dipilih tidak boleh dibawa dalam bekas ini, jadi trek dikodkan dengan kodek bekas itu sendiri",
   "main.reason.stream.dolby-below-channel-floor": "bajet audio berada di bawah had bawah kodek Dolby yang dipilih pada bilangan saluran ini, jadi trek dikodkan dengan kodek bekas itu sendiri",
+  "main.reason.stream.flac-fell-back": "FLAC tidak dapat digunakan: bekas tidak menyokongnya atau had 16-bitnya tidak muat dalam 15% sasaran, jadi trek dikodkan dengan codec bekas itu sendiri",
+  "main.reason.stream.audio-filter-on-copy": "penormalan kelantangan dan gandaan tidak boleh digunakan pada trek audio yang disalin, jadi trek disalin tanpa perubahan",
   "main.reason.stream.lossless-not-passed": "trek TrueHD/DTS tanpa kehilangan tidak pernah disalin; ia dikod semula",
   "main.reason.fill-crf-lowered": "dasar penuhi sasaran menurunkan CRF ke {0} dan bukan berhenti pada had ketelusan, mendarat berhampiran pusat jalur {1} MB di dalam jalur {2}-{3} MB",
   "main.reason.fill-band-center": "lantai CRF {0} dicapai sebelum jalur penuhi, jadi VBR dua laluan menyasarkan pusat jalur {1} MB secara terus",

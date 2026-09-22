@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "codec âm thanh nguồn không thể truyền trong container này, nên track được mã hóa lại",
   "main.reason.stream.dolby-not-in-container": "bộ mã hóa Dolby đã chọn không thể đi trong vùng chứa này, nên bản nhạc được mã hóa bằng bộ mã hóa riêng của vùng chứa",
   "main.reason.stream.dolby-below-channel-floor": "ngân sách âm thanh thấp hơn ngưỡng tối thiểu của bộ mã hóa Dolby đã chọn ở số kênh này, nên bản nhạc được mã hóa bằng bộ mã hóa riêng của vùng chứa",
+  "main.reason.stream.flac-fell-back": "không dùng được FLAC: vùng chứa không hỗ trợ hoặc mức trần 16 bit của nó không vừa 15% mục tiêu, nên rãnh được mã hóa bằng codec riêng của vùng chứa",
+  "main.reason.stream.audio-filter-on-copy": "không thể áp dụng chuẩn hóa âm lượng và khuếch đại cho rãnh âm thanh được sao chép, nên rãnh được sao chép nguyên vẹn",
   "main.reason.stream.lossless-not-passed": "rãnh TrueHD/DTS không mất dữ liệu không bao giờ được sao chép; nó được mã hóa lại",
   "main.reason.fill-crf-lowered": "chính sách lấp đầy mục tiêu hạ CRF xuống {0} thay vì dừng ở trần trong suốt, rơi gần tâm dải {1} MB trong dải {2}-{3} MB",
   "main.reason.fill-band-center": "sàn CRF {0} đạt trước dải lấp đầy, nên VBR hai lượt nhắm thẳng tâm dải {1} MB",

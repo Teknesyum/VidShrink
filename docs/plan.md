@@ -1393,3 +1393,24 @@ seçiminden bağımsız sunulmaz.
 
 Her kolun negatif kontrolü olacak ve en az iki mutasyonla kırmızı döndüğü ölçülecek.
 Merdiven testi sayıyı elle yazmaz, ölçüm belgesinden okur.
+
+## B1 Kalanı: Flac, Ses Normalleştirme, Harici Altyazı, Kapak, Forced, Yakma
+
+Dal `worktree-agent-ac648426fe8f56b4a`. Arayüz (MainWindow.axaml) bu işin dışında; yüzey Core + CLI.
+
+1. **flac:** `AudioCodecChoice.Flac`, `PlanParser.AllowedAudioCodecs`. Kap listesi `CopyableAudio`'dan
+   (Mp4/Mkv evet, WebM/Mov hayır → kabın kodeğine düşer, not). Bütçe PCM üst sınırı
+   (örnekleme × kanal × 16 bit, `-sample_fmt s16`); %15 payını aşarsa düşer, not. `-b:a` yazılmaz.
+2. **loudnorm/gain:** `PlanOptions.AudioLoudnorm`, `AudioGainDb` (-20..+20). Zincir
+   `aresample hizalama → volume → loudnorm → aresample=<kaynak hızı>`. İstenince passthrough kapanır;
+   açık `copy` izinde süzgeç kurulamaz, not düşer. CLI `--ses-normal`, `--ses-kazanc`.
+3. **forced:** çıktıda varsayılan altyazı yoksa forced bayraklı iz varsayılan olur (tercih dili önce).
+4. **Harici SRT/ASS:** `PlanOptions.ExternalSubtitles`; `-i` ek girdi, `N:0` eşlemi, MP4'te mov_text,
+   MKV'de kopya, platformda düşer; baytı bütçeye girer. CLI `--altyazi <dosya>`, `--yan-altyazi`.
+5. **Kapak:** ilk `attached_pic` MP4/MKV'de `-c:v:1 copy -disposition:v:1 attached_pic` ile taşınır,
+   video süzgeci o zaman `-filter:v:0`'a yazılır; baytı yoklamada paketten ölçülür, bütçeye girer.
+6. **Yakma:** metin altyazı `subtitles=` süzgeci A1 zincirinin sonunda; görüntü altyazı (PGS) `overlay`
+   ister ve `-filter_complex` gerektirir. CLI `--yak <n>`.
+
+Ölçü: her madde yeni sınıf, olumsuz kontrol, ≤3 sn lavfi canlı kol, ≥2 mutasyon
+(`docs/olcumler/b1-kalan-mutasyonlar.md`).

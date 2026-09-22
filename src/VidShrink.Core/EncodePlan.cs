@@ -13,7 +13,7 @@ public enum HdrPolicy { Preserve, TonemapToSdr }
 public enum AudioChannelOverride { Auto, Stereo, Mono, None, Source }
 
 /// <summary>Kullanicinin Gelismis panelde sectigi ses kodegi. <c>Auto</c> "secim yok" demektir.</summary>
-public enum AudioCodecChoice { Auto, Aac, Ac3, Eac3 }
+public enum AudioCodecChoice { Auto, Aac, Ac3, Eac3, Flac }
 
 public enum EncoderPathOverride { Auto, Software, Hardware }
 

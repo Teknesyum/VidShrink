@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "the source audio codec cannot travel in this container, so the track is re-encoded",
   "main.reason.stream.dolby-not-in-container": "the chosen Dolby codec cannot travel in this container, so the track was encoded with the container's own codec",
   "main.reason.stream.dolby-below-channel-floor": "the audio budget falls below the chosen Dolby codec's floor at this channel count, so the track was encoded with the container's own codec",
+  "main.reason.stream.flac-fell-back": "FLAC could not be used: the container cannot carry it or its 16-bit ceiling does not fit 15% of the target, so the track was encoded with the container's own codec",
+  "main.reason.stream.audio-filter-on-copy": "loudness and gain cannot be applied to a copied audio track, so the track was copied unchanged",
   "main.reason.stream.lossless-not-passed": "a lossless TrueHD/DTS track is never copied; it is re-encoded",
   "main.reason.fill-crf-lowered": "the fill target policy lowered CRF to {0} instead of stopping at the transparency ceiling, landing near the {1} MB band center inside the {2}-{3} MB band",
   "main.reason.fill-band-center": "CRF floor {0} was reached before the fill band, so two-pass VBR targets the {1} MB band center directly",

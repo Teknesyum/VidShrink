@@ -104,6 +104,65 @@ public sealed record CliRequest
     /// </summary>
     public PresetProfile? Profile { get; init; }
 
+    /// <summary><c>--ses-kodek</c>: yeniden kodlanan sesin kodegi; <c>null</c> ise motor secer.</summary>
+    public AudioCodecChoice? AudioCodec { get; init; }
+
+    /// <summary><c>--ses-normal</c>: yeniden kodlanan sese <c>loudnorm</c>.</summary>
+    public bool AudioLoudnorm { get; init; }
+
+    /// <summary><c>--ses-kazanc</c>: yeniden kodlanan sese sabit kazanc, dB.</summary>
+    public double? AudioGainDb { get; init; }
+
+    /// <summary><c>--altyazi</c>: ciktiya iz olarak eklenecek dosyalar, verildigi sirayla.</summary>
+    public IReadOnlyList<string> SubtitleFiles { get; init; } = Array.Empty<string>();
+
+    /// <summary><c>--yan-altyazi</c>: girdinin yanindaki ayni adli altyazilar da eklenir.</summary>
+    public bool SidecarSubtitles { get; init; }
+
+    /// <summary><c>--yak</c>: kaynagin bu altyazisi (1 tabanli) goruntuye yakilir.</summary>
+    public int? BurnSubtitle { get; init; }
+
+    /// <summary>
+    /// <see cref="SubtitleFiles"/> ve <see cref="SidecarSubtitles"/>'in diskten cozulmus hali;
+    /// <see cref="ResolvedSubtitles"/> doldurur.
+    /// </summary>
+    public IReadOnlyList<ExternalSubtitle> ExternalSubtitles { get; init; } = Array.Empty<ExternalSubtitle>();
+
+    /// <summary>
+    /// Dis altyazi dosyalarini okur ve yakilacak izi kaynakta dogrular. Donen deger hata
+    /// anahtaridir, <paramref name="argument"/> iletideki yer tutucudur; <c>null</c> ise
+    /// <paramref name="resolved"/> kullanilabilir.
+    /// </summary>
+    public string? ResolvedSubtitles(MediaInfo info, out CliRequest resolved, out string? argument)
+    {
+        resolved = this;
+        argument = null;
+        var list = new List<ExternalSubtitle>();
+        foreach (var path in SubtitleFiles)
+        {
+            if (ExternalSubtitle.FromFile(path) is not { } file)
+            {
+                argument = path;
+                return "error.bad-subtitle";
+            }
+            list.Add(file);
+        }
+        if (SidecarSubtitles && Input is not null)
+            list.AddRange(ExternalSubtitle.Sidecars(info.FilePath)
+                .Where(side => !list.Any(file => string.Equals(file.Path, side.Path, StringComparison.OrdinalIgnoreCase))));
+        if (BurnSubtitle is int burn)
+        {
+            var burnFilters = new VideoFilterOptions { BurnSubtitle = burn - 1 };
+            if (VideoFilterChain.Validate(info, burnFilters).Count > 0)
+            {
+                argument = burn.ToString(CultureInfo.InvariantCulture);
+                return "error.bad-burn";
+            }
+        }
+        resolved = this with { ExternalSubtitles = list };
+        return null;
+    }
+
     /// <summary>
     /// Kare ve bolum kollarini kaynaktan cozup kesit pencerisini saniyeye indirir. Donen
     /// metin hata anahtaridir; <c>null</c> ise <paramref name="resolved"/> kullanilabilir.
@@ -166,6 +225,11 @@ public sealed record CliRequest
         }
 
         if (Filters is { } suzgecler) options.Filters = suzgecler;
+        if (BurnSubtitle is int yak) options.Filters = (options.Filters ?? VideoFilterOptions.Default) with { BurnSubtitle = yak - 1 };
+        if (AudioCodec is { } sesKodek) options.AudioCodec = sesKodek;
+        options.AudioLoudnorm = AudioLoudnorm;
+        options.AudioGainDb = AudioGainDb;
+        options.ExternalSubtitles = ExternalSubtitles;
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
         options.LockedCrf = Crf;
         options.LockedPreset = Preset;
@@ -335,6 +399,43 @@ public static class CliParser
                         return Fail("error.bad-filter", suzgec);
                     }
                     request = request with { Filters = cozulen };
+                    break;
+                case "--ses-kodek" or "--audio-codec" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var sesKodek)) return Fail("error.missing-value", arg);
+                    AudioCodecChoice? secilen = sesKodek.ToLowerInvariant() switch
+                    {
+                        "aac" => AudioCodecChoice.Aac,
+                        "ac3" => AudioCodecChoice.Ac3,
+                        "eac3" => AudioCodecChoice.Eac3,
+                        "flac" => AudioCodecChoice.Flac,
+                        _ => null
+                    };
+                    if (secilen is null) return Fail("error.bad-audio-codec", sesKodek);
+                    request = request with { AudioCodec = secilen };
+                    break;
+                case "--ses-normal" or "--loudnorm" when command != CliCommand.Watch:
+                    request = request with { AudioLoudnorm = true };
+                    break;
+                case "--ses-kazanc" or "--gain" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var kazanc)) return Fail("error.missing-value", arg);
+                    if (!TryParseNumber(kazanc, out var db) || db < StreamMapping.MinGainDb || db > StreamMapping.MaxGainDb)
+                        return Fail("error.bad-gain", kazanc);
+                    request = request with { AudioGainDb = db };
+                    break;
+                case "--altyazi" or "--subtitle" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var altyazi)) return Fail("error.missing-value", arg);
+                    if (!ExternalSubtitle.Extensions.Contains(Path.GetExtension(altyazi).ToLowerInvariant()))
+                        return Fail("error.bad-subtitle", altyazi);
+                    request = request with { SubtitleFiles = request.SubtitleFiles.Append(altyazi).ToList() };
+                    break;
+                case "--yan-altyazi" or "--sidecar-subtitles" when command != CliCommand.Watch:
+                    request = request with { SidecarSubtitles = true };
+                    break;
+                case "--yak" or "--burn" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var yak)) return Fail("error.missing-value", arg);
+                    if (!int.TryParse(yak, NumberStyles.Integer, CultureInfo.InvariantCulture, out var yakNo) || yakNo < 1)
+                        return Fail("error.bad-burn", yak);
+                    request = request with { BurnSubtitle = yakNo };
                     break;
                 case "--json":
                     request = request with { Json = true };

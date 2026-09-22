@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "källjudkodeken kan inte transporteras i den här behållaren, så spåret kodas om",
   "main.reason.stream.dolby-not-in-container": "den valda Dolby-kodeken kan inte transporteras i den här behållaren, så spåret kodades med behållarens egen kodek",
   "main.reason.stream.dolby-below-channel-floor": "ljudbudgeten hamnar under den valda Dolby-kodekens undre gräns vid detta kanalantal, så spåret kodades med behållarens egen kodek",
+  "main.reason.stream.flac-fell-back": "FLAC kunde inte användas: behållaren kan inte bära det eller dess 16-bitarstak ryms inte i 15 % av målet, så spåret kodades med behållarens egen codec",
+  "main.reason.stream.audio-filter-on-copy": "ljudnivånormalisering och förstärkning kan inte tillämpas på ett kopierat ljudspår, så spåret kopierades oförändrat",
   "main.reason.stream.lossless-not-passed": "ett förlustfritt TrueHD/DTS-spår kopieras aldrig; det kodas om",
   "main.reason.fill-crf-lowered": "fyllmålspolicyn sänkte CRF till {0} i stället för att stanna vid transparenstaket och landade nära bandmitten {1} MB inom bandet {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-golvet {0} nåddes före fyllbandet, så tvåpass-VBR siktar direkt på bandmitten {1} MB",

@@ -122,6 +122,15 @@ public sealed class PlanOptions
     public VideoFilterOptions Filters { get; set; } = VideoFilterOptions.Default;
 
     public CropRect? DetectedCrop { get; set; }
+
+    /// <summary>B1b: yeniden kodlanan sese <c>loudnorm</c> (EBU R128). Kopyalanan izde kurulamaz.</summary>
+    public bool AudioLoudnorm { get; set; }
+
+    /// <summary>B1b: yeniden kodlanan sese sabit kazanc, dB; <see cref="StreamMapping.MinGainDb"/>..<see cref="StreamMapping.MaxGainDb"/>.</summary>
+    public double? AudioGainDb { get; set; }
+
+    /// <summary>B1c: ciktiya iz olarak eklenen dis metin altyazi dosyalari.</summary>
+    public IReadOnlyList<ExternalSubtitle> ExternalSubtitles { get; set; } = Array.Empty<ExternalSubtitle>();
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -469,7 +478,8 @@ public static class PlanCalculator
                 audioK = Math.Max(StreamMapping.MinimumTrackK, Math.Min(audioK, (int)Math.Round(totalK * CompressionStrategy.AudioBudgetShare(regime) / audioTracks)));
         }
 
-        var streamRequest = new StreamRequest(options.KeepAllTracks, options.PlatformDelivery, options.PreferredLanguage);
+        var streamRequest = new StreamRequest(options.KeepAllTracks, options.PlatformDelivery, options.PreferredLanguage,
+            options.AudioLoudnorm, options.AudioGainDb, options.ExternalSubtitles, options.Filters?.BurnSubtitle);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
         var streams = StreamMapping.Decide(info, streamRequest, StreamMapping.ContainerFor(streamRequest), audioK, audioChannels,
             info.HasAudio && audioK > 0 ? PickAudioCodec(options.AudioCodec) : null, audioPassthrough, effectiveTargetMb,
@@ -491,7 +501,10 @@ public static class PlanCalculator
             FixedResolution = options.FixedResolution,
             MinFps = options.MinFps,
             ScaleModulus = options.ScaleModulus,
-            AudioCodec = options.AudioCodec
+            AudioCodec = options.AudioCodec,
+            AudioLoudnorm = options.AudioLoudnorm,
+            AudioGainDb = options.AudioGainDb,
+            ExternalSubtitles = options.ExternalSubtitles
         };
 
         var (best, sourceFpsViable) = SearchLayout(info, effective, complexity, codec, videoK, regime);
@@ -863,7 +876,10 @@ public static class PlanCalculator
         || options.LockedPreset is not null
         || options.LockedTune is not null
         || options.LockedAudioKbps is not null
-        || options.AudioChannels != AudioChannelOverride.Auto;
+        || options.AudioChannels != AudioChannelOverride.Auto
+        || options.AudioLoudnorm
+        || options.AudioGainDb is { } gain && gain != 0
+        || options.ExternalSubtitles.Count > 0;
 
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {
@@ -1098,7 +1114,10 @@ public static class PlanCalculator
         PreferredLanguage = options.PreferredLanguage,
         Filters = options.Filters,
         DetectedCrop = options.DetectedCrop,
-        EncoderPath = options.EncoderPath
+        EncoderPath = options.EncoderPath,
+        AudioLoudnorm = options.AudioLoudnorm,
+        AudioGainDb = options.AudioGainDb,
+        ExternalSubtitles = options.ExternalSubtitles
     };
 
     public static double RetryAimMb(double targetMb, double? measuredEfficiency)
@@ -1684,6 +1703,7 @@ public static class PlanCalculator
     {
         AudioCodecChoice.Ac3 => "ac3",
         AudioCodecChoice.Eac3 => "eac3",
+        AudioCodecChoice.Flac => "flac",
         _ => "aac"
     };
 
@@ -1702,6 +1722,8 @@ public static class PlanCalculator
                 StreamNote.AudioCodecNotInContainer => "the source audio codec cannot travel in this container, so the track is re-encoded",
                 StreamNote.DolbyCodecNotInContainer => "the chosen Dolby audio codec cannot travel in this container, so the track keeps the default codec",
                 StreamNote.DolbyCodecBelowChannelFloor => "the audio budget is below what the chosen Dolby codec needs for this channel count, so the track keeps the default codec",
+                StreamNote.FlacFellBack => "FLAC cannot be used here: the container does not carry it or its 16-bit ceiling does not fit 15% of the target, so the track keeps the default codec",
+                StreamNote.AudioFilterSkippedOnCopy => "loudness and gain cannot be applied to a copied audio track; the track is copied unchanged",
                 _ => "a lossless TrueHD/DTS track is never copied; it is re-encoded"
             });
     }

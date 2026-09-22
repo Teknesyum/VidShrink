@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "avota audio kodeku nevar pārsūtīt šajā konteinerā, tāpēc celiņš tiek pārkodēts",
   "main.reason.stream.dolby-not-in-container": "izvēlēto Dolby kodeku nevar pārnest šajā konteinerā, tāpēc celiņš tika kodēts ar paša konteinera kodeku",
   "main.reason.stream.dolby-below-channel-floor": "audio budžets ir zem izvēlētā Dolby kodeka apakšējās robežas šādam kanālu skaitam, tāpēc celiņš tika kodēts ar paša konteinera kodeku",
+  "main.reason.stream.flac-fell-back": "FLAC nevarēja izmantot: konteiners to neatbalsta vai tā 16 bitu griesti neietilpst 15% no mērķa, tāpēc celiņš tika kodēts ar konteinera paša kodeku",
+  "main.reason.stream.audio-filter-on-copy": "skaļuma normalizēšanu un pastiprinājumu nevar piemērot kopētam audio celiņam, tāpēc celiņš tika nokopēts nemainīts",
   "main.reason.stream.lossless-not-passed": "bezzudumu TrueHD/DTS celiņš nekad netiek kopēts; tas tiek pārkodēts",
   "main.reason.fill-crf-lowered": "mērķa aizpildes politika pazemināja CRF līdz {0}, nevis apstājās pie caurspīdīguma griestiem, nonākot pie {1} MB joslas centra {2}-{3} MB joslā",
   "main.reason.fill-band-center": "CRF minimums {0} tika sasniegts pirms aizpildes joslas, tāpēc divu gaitu VBR tēmē tieši uz {1} MB joslas centru",

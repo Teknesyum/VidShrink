@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "源音频编码格式无法在此容器中传输，因此该音轨将重新编码",
   "main.reason.stream.dolby-not-in-container": "所选 Dolby 编码无法装入此容器，因此音轨改用容器自身的编码",
   "main.reason.stream.dolby-below-channel-floor": "在此声道数下音频预算低于所选 Dolby 编码的下限，因此音轨改用容器自身的编码",
+  "main.reason.stream.flac-fell-back": "无法使用 FLAC：容器不支持它，或其 16 位上限超出目标的 15%，因此该音轨改用容器自身的编解码器编码",
+  "main.reason.stream.audio-filter-on-copy": "响度标准化和增益无法应用于复制的音轨，因此该音轨按原样复制",
   "main.reason.stream.lossless-not-passed": "无损 TrueHD/DTS 轨道从不复制，而是重新编码",
   "main.reason.fill-crf-lowered": "填满目标策略将 CRF 降至 {0}，而不是停在透明上限，落在 {2}-{3} MB 区间内 {1} MB 的区间中心附近",
   "main.reason.fill-band-center": "在到达填充区间之前已达到 CRF 下限 {0}，因此两遍 VBR 直接以 {1} MB 区间中心为目标",

@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "元の音声コーデックはこのコンテナ形式では扱えないため、トラックは再エンコードされます",
   "main.reason.stream.dolby-not-in-container": "選んだ Dolby コーデックはこのコンテナ形式では扱えないため、トラックはコンテナ本来のコーデックで符号化されました",
   "main.reason.stream.dolby-below-channel-floor": "このチャンネル数では音声の割り当てが選んだ Dolby コーデックの下限を下回るため、トラックはコンテナ本来のコーデックで符号化されました",
+  "main.reason.stream.flac-fell-back": "FLAC は使えませんでした。コンテナが対応していないか、16 ビットの上限が目標の 15% に収まらないため、トラックはコンテナ本来のコーデックで符号化されました",
+  "main.reason.stream.audio-filter-on-copy": "コピーする音声トラックにはラウドネス正規化とゲインを適用できないため、トラックはそのままコピーされました",
   "main.reason.stream.lossless-not-passed": "ロスレスのTrueHD/DTSトラックはコピーされず、再エンコードされます",
   "main.reason.fill-crf-lowered": "目標まで使うポリシーにより、透明性上限で止めずCRFを{0}に下げ、{2}-{3} MBの帯域内の中心{1} MB付近に収めました",
   "main.reason.fill-band-center": "帯域に達する前にCRF下限{0}に到達したため、2パスVBRが帯域中心{1} MBを直接狙います",

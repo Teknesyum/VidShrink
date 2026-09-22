@@ -64,6 +64,13 @@ public sealed record VideoFilterOptions
     public bool Deband { get; init; }
     public CropRect? Crop { get; init; }
 
+    /// <summary>
+    /// B1f: kaynagin bu sirali altyazisi (0 tabanli, ffmpeg'in <c>si</c>'si) goruntuye yakilir ve
+    /// yumusak iz olarak cikmaz. Yalniz metin altyazi; goruntu altyazi (PGS) <c>overlay</c> ve
+    /// <c>-filter_complex</c> ister, <see cref="VideoFilterChain.Validate"/> reddeder.
+    /// </summary>
+    public int? BurnSubtitle { get; init; }
+
     public bool ChangesPicture =>
         Deinterlace == DeinterlaceMode.On
         || Detelecine
@@ -75,7 +82,8 @@ public sealed record VideoFilterOptions
         || Grayscale
         || ColorMatrix != ColorMatrixTarget.Keep
         || Deband
-        || Crop is not null;
+        || Crop is not null
+        || BurnSubtitle is not null;
 
     public bool ChangesPictureFor(MediaInfo info) => ChangesPicture || VideoFilterChain.Deinterlaces(info, this);
 
@@ -174,8 +182,38 @@ public static class VideoFilterChain
             if (p.Top < 0 || p.Bottom < 0 || p.Left < 0 || p.Right < 0) problems.Add("pad: borders must not be negative");
             if ((p.Top + p.Bottom) % 2 != 0 || (p.Left + p.Right) % 2 != 0) problems.Add("pad: added size must be even");
         }
+        if (options.BurnSubtitle is int burn)
+        {
+            var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
+            if (burn < 0 || burn >= subtitles.Count) problems.Add("burn: the source has no such subtitle");
+            else if (!StreamMapping.IsTextSubtitle(subtitles[burn].Codec)) problems.Add("burn: image subtitles need an overlay and are not supported");
+        }
         return problems;
     }
+
+    /// <summary>
+    /// B1f: metin altyaziyi goruntuye yakan <c>subtitles</c> suzgeci. Dosya kaynagin kendisi,
+    /// iz <c>si</c> ile secilir. Kesitte girdi <c>-ss</c> ile arandigi icin karelerin damgasi
+    /// kesitin basindan sayilir; libass ise altyaziyi dosyanin saatiyle okur — suzgec o yuzden
+    /// iki <c>setpts</c> arasina oturur. Goruntu altyazi ya da olmayan iz <c>null</c> verir.
+    /// </summary>
+    public static string? BurnFilter(MediaInfo info, VideoFilterOptions options, double leadSeconds)
+    {
+        if (options.BurnSubtitle is not int burn) return null;
+        var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
+        if (burn < 0 || burn >= subtitles.Count || !StreamMapping.IsTextSubtitle(subtitles[burn].Codec)) return null;
+        var filter = "subtitles=filename='" + FilterPath(info.FilePath) + "':si=" + burn.ToString(CultureInfo.InvariantCulture);
+        if (leadSeconds <= 0) return filter;
+        var lead = leadSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        return $"setpts=PTS+{lead}/TB,{filter},setpts=PTS-{lead}/TB";
+    }
+
+    /// <summary>
+    /// Suzgec grafiginde dosya yolu: tek tirnak grafik duzeyini korur, icerideki <c>:</c> ve
+    /// <c>\</c> secenek duzeyinde kacirilir. Ters bolu once duz boluye cevrilir.
+    /// </summary>
+    public static string FilterPath(string path)
+        => path.Replace('\\', '/').Replace(":", "\\:").Replace("'", "'\\\\\\''");
 
     public static IReadOnlyList<string> Filters(MediaInfo info, EncodePlan plan)
     {
@@ -190,6 +228,7 @@ public static class VideoFilterChain
         if (DenoiseText(options) is string denoise) filters.Add(denoise);
         if (options.Deband) filters.Add(DebandFilter);
         filters.AddRange(TransposeFilters(options.Transpose));
+        if (BurnFilter(info, options, plan.Trim?.LeadSeconds ?? 0) is string burn) filters.Add(burn);
         if (plan.Width != source.Width || plan.Height != source.Height)
             filters.Add($"scale={plan.Width}:{plan.Height}:flags=lanczos");
         if (info.IsAnamorphic) filters.Add(SquarePixelFilter);

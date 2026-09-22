@@ -196,6 +196,12 @@ public static class CliApp
             stderr.WriteLine(trimMessage);
             return new FileRun(ExitCodes.Usage, null, trimMessage);
         }
+        if (request.ResolvedSubtitles(info, out request, out var altyaziArgumani) is { } altyaziHatasi)
+        {
+            var altyaziIletisi = text.Format(altyaziHatasi, altyaziArgumani);
+            stderr.WriteLine(altyaziIletisi);
+            return new FileRun(ExitCodes.Usage, null, altyaziIletisi);
+        }
         if (request.AutoCrop && request.Filters?.Crop is null)
         {
             stderr.WriteLine(text["progress.crop"]);

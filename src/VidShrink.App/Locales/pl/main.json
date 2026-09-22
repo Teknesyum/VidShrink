@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "źródłowy kodek audio nie może być przenoszony w tym kontenerze, więc ścieżka jest ponownie kodowana",
   "main.reason.stream.dolby-not-in-container": "wybrany kodek Dolby nie może być przenoszony w tym kontenerze, więc ścieżkę zakodowano własnym kodekiem kontenera",
   "main.reason.stream.dolby-below-channel-floor": "budżet dźwięku spada poniżej dolnej granicy wybranego kodeka Dolby przy tej liczbie kanałów, więc ścieżkę zakodowano własnym kodekiem kontenera",
+  "main.reason.stream.flac-fell-back": "nie można użyć FLAC: kontener go nie obsługuje lub jego 16-bitowy pułap nie mieści się w 15% celu, więc ścieżkę zakodowano własnym kodekiem kontenera",
+  "main.reason.stream.audio-filter-on-copy": "normalizacji głośności i wzmocnienia nie można zastosować do kopiowanej ścieżki audio, więc ścieżkę skopiowano bez zmian",
   "main.reason.stream.lossless-not-passed": "bezstratna ścieżka TrueHD/DTS nigdy nie jest kopiowana; jest kodowana ponownie",
   "main.reason.fill-crf-lowered": "polityka wypełniania celu obniżyła CRF do {0} zamiast zatrzymać się na pułapie przezroczystości, lądując blisko środka pasma {1} MB w paśmie {2}-{3} MB",
   "main.reason.fill-band-center": "próg CRF {0} osiągnięto przed pasmem wypełnienia, więc dwuprzebiegowy VBR celuje wprost w środek pasma {1} MB",

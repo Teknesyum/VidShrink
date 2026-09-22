@@ -381,6 +381,8 @@
   "main.reason.stream.audio-codec-not-in-container": "מקודד השמע המקורי אינו יכול לעבור במכל הזה, לכן הפס מקודד מחדש",
   "main.reason.stream.dolby-not-in-container": "מקודד Dolby הנבחר אינו יכול לעבור במכל הזה, לכן הפס קודד במקודד של המכל עצמו",
   "main.reason.stream.dolby-below-channel-floor": "תקציב השמע נמוך מרצפת מקודד Dolby הנבחר במספר הערוצים הזה, לכן הפס קודד במקודד של המכל עצמו",
+  "main.reason.stream.flac-fell-back": "לא ניתן היה להשתמש ב-FLAC: המכל אינו תומך בו או שהתקרה של 16 סיביות אינה נכנסת ב-15% מהיעד, ולכן הרצועה קודדה במקודד של המכל עצמו",
+  "main.reason.stream.audio-filter-on-copy": "לא ניתן להחיל נרמול עוצמה והגברה על רצועת שמע מועתקת, ולכן הרצועה הועתקה ללא שינוי",
   "main.reason.stream.lossless-not-passed": "רצועת TrueHD/DTS ללא אובדן לעולם אינה מועתקת; היא מקודדת מחדש",
   "main.reason.fill-crf-lowered": "מדיניות מילוי היעד הורידה את CRF ל-{0} במקום לעצור בתקרת השקיפות, ונחתה ליד מרכז הרצועה {1} MB בתוך רצועת {2}-{3} MB",
   "main.reason.fill-band-center": "רצפת CRF {0} הושגה לפני רצועת המילוי, ולכן VBR בשני מעברים מכוון ישירות למרכז הרצועה {1} MB",

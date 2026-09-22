@@ -194,12 +194,12 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | A3 `izle` | **girdi** | `Core/WatchFolder.cs`, `WatchFolderTests` |
 | A5 CLI ürün yolu + HB SVT hız kolu | **girdi** | `hb.ps1:1610` `urun-cli`, `:1832` svt kolu, `docs/olcumler/handbrake-kiyas-cli.md`, koşum 35248903679, birleşme `ef8e6931` |
 | B1a ac3/eac3 **kodlama** | **girdi** (19 Eylül, `8f09dc60`) | `Core/PlanParser.cs:14` `AllowedAudioCodecs` artık `ac3, eac3` taşıyor; `LanguageTests` marka adı izinlisi |
-| B1a flac **küçültmede** | yapılmadı | `flac` yalnız dönüştürücüde (`ConversionArguments.cs:127,133,150,157,158`) ve kopyalama listesinde (`StreamMapping.cs:156,157`); `PlanParser.AllowedAudioCodecs`'te yok |
-| B1b loudnorm / gain | yapılmadı | depoda `loudnorm` geçmiyor |
-| B1c harici SRT/ASS | yapılmadı | dış altyazı yalnız oynatıcıda (P28), küçültme yolunda yok |
-| B1d kapak resmi | yapılmadı | `Ffmpeg/FfprobeClient.cs:302-305` `attached_pic`'i yalnız eliyor, taşımıyor |
-| B1e forced | **kısmen** | `IsForced` taşınıyor (`Core/StreamMapping.cs:30,48,55,318,327,335,339`), otomatik seçim yok |
-| B1f yakma | yapılmadı | A1'in filtre noktasında altyazı yakma kolu yok |
+| B1a flac **küçültmede** | **dalda** (22 Eylül, `worktree-agent-ac648426fe8f56b4a`, birleşmedi) | `AllowedAudioCodecs` flac taşıyor; bütçeye 16 bit tavanla girer (`StreamMapping.FlacCeilingK`), sığmazsa `FlacFellBack`; CLI `--ses-kodek`; `FlacSesTests` |
+| B1b loudnorm / gain | **dalda** (aynı dal) | `StreamMapping.AudioFilter` (`loudnorm=I=-24:LRA=7:TP=-2`, `volume=NdB`), istenince ses kopyalanmaz; CLI `--ses-normal`, `--ses-kazanc`; `SesNormallestirmeTests` |
+| B1c harici SRT/ASS | **dalda** (aynı dal) | `ExternalSubtitle` ek `-i` girdisi, MP4 mov_text / MKV kopya / WebM webvtt; CLI `--altyazi`, `--yan-altyazi`; `DisAltyaziTests`. Arayüz yüzü yok |
+| B1d kapak resmi | **dalda** (aynı dal), yalnız MP4 | `CoverMap` + `-disposition:v:1 attached_pic`, bayt bütçede; MKV/MOV ölçüldü, taşımıyor; `KapakResmiTests` |
+| B1e forced | **dalda** (aynı dal) | `StreamMapping.DefaultForced`: varsayılansız çıktıda forced iz varsayılan olur; `ForcedAltyaziTests`. Foreign Audio Search yok |
+| B1f yakma | **dalda**, yalnız metin altyazı | `VideoFilterChain.BurnFilter` (`subtitles=...:si=N`), CLI `--yak N`; PGS overlay ister, reddedilir; `AltyaziYakmaTests` |
 | B2 küçültmeye aralık | denetlenmedi | bu turda okunmadı |
 | B3 VT plan yolu / VP9 küçültme | yapılmadı | `Core/PlanParser.cs:13` `AllowedCodecs`'te `*_videotoolbox` yok; VP9 hâlâ yalnız dönüştürücüde |
 | B4 HDR10+/DV | yapılmadı | `hdr10plus\|dolby\|dovi\|dynamic_hdr` taraması 0 sonuç |
