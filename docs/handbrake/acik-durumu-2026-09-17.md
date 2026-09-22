@@ -207,8 +207,8 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | C1-2 kuyruk düzenleme | **girdi (22 Eylül)** | bekleyen listesi, yukarı/aşağı/çıkar, sırayı duraklat (`ShrinkJobWindow`, `KuyrukDuzenlemeTests`) |
 | C1-3 klasör bırakma | girdi (22 Eylül) | klasör ya da çoklu video kuyruk penceresine, pencerenin seçenekleriyle (`Core/DroppedMedia`, `KlasorBirakmaTests`) |
 | C1-4 "bitince" eylemi | **girdi (22 Eylül)** | hiçbir şey / klasörü aç / uyut / kapat; uyut ve kapat 60 sn geri sayımlı, vazgeçilebilir (`QueueEndActions.cs`) |
-| C1-5 filtre paneli | **çekirdek var, yüzey yok** | mantık A1'de; arayüz tek metin kutusu (`MainWindow.axaml:629` → `MainWindow.axaml.cs:1988`) |
-| C1-6 iz paneli | yapılmadı | yalnız `ChkAdvKeepTracks` (`MainWindow.axaml:506`) |
+| C1-5 filtre paneli | **girdi (22 Eylül)** | Gelişmiş'te açılır kutular ve onay kutuları, metin tek kaynak (`VideoFilterChain.Format`, `Parse`'ın tersi); `SuzgecPaneliTests` (7a6286e6) |
+| C1-6 iz paneli | **girdi (22 Eylül)** | ses yüksekliği, kazanç, dış altyazı, metin altyazı yakma ana pencerede; yeni kaynakta sıfırlanır, kuyruğa taşınmaz (`MainWindow.Izler.cs`, `IzPaneliTests` 12/12, 7a6286e6) |
 | C1-7 ön ayar yüzeyi | **girdi (22 Eylül)** | içe/dışa aktarma pencerede, HandBrake dosyası özetle (0666989b); CLI `--profil-dosyasi` (d17e0e3c) |
 | D2 karanlık geçişin kapsamı | genişletilmedi | `Core/DarkContentSwitch.cs:21-27` hâlâ Auto + Aggressive/Extreme + libsvtav1 |
 | D3 macOS 14 libmpv | **girdi** | `install-vidshrink.sh:298-305`, `tools/mpvkit-macos/mpvkit-1.0.0.lock`, `.github/workflows/macos-mpvkit.yml:106-159` |
