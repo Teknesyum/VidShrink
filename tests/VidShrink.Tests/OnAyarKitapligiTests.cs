@@ -169,6 +169,35 @@ public sealed class OnAyarKitapligiTests
         Assert.Equal(100, PlanDugumu(elle.Stdout).GetProperty("targetMb").GetDouble());
     }
 
+    /// <summary>
+    /// Profilin kabı çıktı uzantısını seçiyor (fable kararı B, <c>docs/danisma/010-fable-onayar-kap.md</c>).
+    /// WebM'in kodlama kolu yok, planın kabına düşüyor; kapsız profil de öyle (olumsuz kontrol).
+    /// </summary>
+    [Theory]
+    [InlineData(OutputContainer.Mov, ".mov")]
+    [InlineData(OutputContainer.Mkv, ".mkv")]
+    [InlineData(OutputContainer.WebM, ".mp4")]
+    [InlineData(null, ".mp4")]
+    public async Task ProfilKabiCiktiUzantisiniSeciyor(OutputContainer? kap, string uzanti)
+    {
+        var profil = new PresetProfile { Id = "kapli", Name = "Kapli", TargetMb = 12, Kind = PresetKind.User, Container = kap };
+        var kosum = await Plan(Servisler(profil), "--profil", "kapli");
+
+        Assert.Equal(0, kosum.Exit);
+        Assert.Equal(uzanti, Path.GetExtension(PlanDugumu(kosum.Stdout).GetProperty("output").GetString()));
+    }
+
+    /// <summary>Elle verilen <c>--cikti</c> profilin kabını eziyor.</summary>
+    [Fact]
+    public async Task ElleVerilenCiktiProfilKabiniEziyor()
+    {
+        var profil = new PresetProfile { Id = "kapli", Name = "Kapli", TargetMb = 12, Kind = PresetKind.User, Container = OutputContainer.Mov };
+        var kosum = await Plan(Servisler(profil), "--profil", "kapli", "--cikti", "elle.mp4");
+
+        Assert.Equal(0, kosum.Exit);
+        Assert.Equal(".mp4", Path.GetExtension(PlanDugumu(kosum.Stdout).GetProperty("output").GetString()));
+    }
+
     /// <summary>Tanınmayan kimlik 64 veriyor ve kimliği cümlede yazıyor.</summary>
     [Fact]
     public async Task TaninmayanKimlikReddediliyor()

@@ -152,6 +152,31 @@ public sealed class OnAyarYongasiTests : IDisposable
         Assert.Equal(2, dokunulmadi);
     }
 
+    /// <summary>
+    /// Kap çıktı uzantısını seçiyor ve kayıtta geri geliyor; gömülü yonga onu bırakıyor,
+    /// yoksa sonraki küçültme eski ön ayarın kabıyla çıkardı. WebM mp4'e düşüyor.
+    /// </summary>
+    [Fact]
+    public void KapUzantiyiSeciyorGomuluYongaBirakiyor()
+    {
+        var plan = new EncodePlan { Codec = "libx264", Mode = "2pass" };
+        var (mov, kayit, yongadan, webm) = Read(window =>
+        {
+            window.ApplyUserPreset(new PresetProfile { Id = "Kap", Name = "Kap", Kind = PresetKind.User, Container = OutputContainer.Mov });
+            var mov = window.ShrinkExtension(plan);
+            var kayit = window.CurrentPreset("Kap").Container;
+            window.ApplyChipPlan(MainWindow.ChipPlans().First().Chip);
+            var yongadan = window.ShrinkExtension(plan);
+            window.ApplyUserPreset(new PresetProfile { Id = "Web", Name = "Web", Kind = PresetKind.User, Container = OutputContainer.WebM });
+            return (mov, kayit, yongadan, window.ShrinkExtension(plan));
+        });
+
+        Assert.Equal("mov", mov);
+        Assert.Equal(OutputContainer.Mov, kayit);
+        Assert.Equal("mp4", yongadan);
+        Assert.Equal("mp4", webm);
+    }
+
     /// <summary>Silme onay istemiyor; geri alma silinen profili dosyaya geri yazıyor.</summary>
     [Fact]
     public void SilmeVeGeriAlma()

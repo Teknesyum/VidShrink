@@ -119,6 +119,21 @@ public sealed class HandBrakeOnAyarCeviriTests
         Assert.Equal(OutputContainer.Mkv, Single(Synthetic(",\"FileFormat\":\"av_mkv\"")).Profile.Container);
     }
 
+    /// <summary>
+    /// WebM'in kodlama kolu yok (vp9 merdivende değil): kap Mp4'e düşüyor ve not bunu
+    /// "yaklaşık" diye söylüyor, "taşındı" demiyor. mkv karşılaştırma için taşınıyor.
+    /// </summary>
+    [Theory]
+    [InlineData("av_webm")]
+    [InlineData("webm")]
+    public void WebmMp4eYaklasikDuser(string bicim)
+    {
+        var ceviri = Single(Synthetic($",\"FileFormat\":\"{bicim}\""));
+        Assert.Equal(OutputContainer.Mp4, ceviri.Profile.Container);
+        Assert.Equal(PresetNoteOutcome.Approximated, ceviri.Note("FileFormat")!.Outcome);
+        Assert.Equal(PresetNoteOutcome.Carried, Single(Synthetic(",\"FileFormat\":\"av_mkv\"")).Note("FileFormat")!.Outcome);
+    }
+
     [Fact]
     public void CiftAnahtarTekNotVerir()
     {

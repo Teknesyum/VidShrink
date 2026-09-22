@@ -340,7 +340,8 @@ public static class CliApp
 
         var options = request.ToPlanOptions(target, info.DurationSeconds);
         var result = ShrinkEngine.Decide(info, options, settled, availability);
-        var extension = result.Plan.Streams?.Extension ?? "mp4";
+        var extension = PresetLibrary.DeliveredExtension(request.Profile?.Container)
+            ?? result.Plan.Streams?.Extension ?? "mp4";
         var output = request.Output is { } path ? Path.GetFullPath(path)
             : request.OutputDirectory is { } directory ? ShrinkEngine.UniqueOutputPath(Path.Combine(Path.GetFullPath(directory), Path.GetFileName(info.FilePath)), extension: extension)
             : ShrinkEngine.UniqueOutputPath(info.FilePath, extension: extension);

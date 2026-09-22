@@ -265,6 +265,15 @@ public sealed class PresetLibrary
         using var reader = new StreamReader(stream, Encoding.UTF8);
         return new PresetLibrary(Parse(reader.ReadToEnd()));
     }
+
+    /// <summary>
+    /// Profilin kabından çıktı uzantısı. Kodlama kabı uzantıdan okuduğu için
+    /// (<see cref="StreamMapping.ForOutput"/>) kabı uygulamak uzantıyı seçmek demek. WebM'in
+    /// kodlama kolu yok (vp9 merdivende değil); <c>null</c> döner ve plan kendi kabını seçer.
+    /// Karar: <c>docs/danisma/010-fable-onayar-kap.md</c>.
+    /// </summary>
+    public static string? DeliveredExtension(OutputContainer? container) =>
+        container is { } kap and not OutputContainer.WebM ? StreamMapping.ExtensionOf(kap) : null;
 }
 
 public enum PresetNoteOutcome { Carried, Approximated, Dropped }
@@ -430,13 +439,15 @@ public static class HandBrakePresetImport
                     {
                         "mp4" or "av_mp4" => OutputContainer.Mp4,
                         "mkv" or "av_mkv" => OutputContainer.Mkv,
-                        "webm" or "av_webm" => OutputContainer.WebM,
+                        "webm" or "av_webm" => OutputContainer.Mp4,
                         "mov" or "av_mov" => OutputContainer.Mov,
                         _ => null
                     };
                     notes.Add(container is null
                         ? new(property.Name, PresetNoteOutcome.Dropped, PresetNoteReason.NoEquivalent, raw)
-                        : new(property.Name, PresetNoteOutcome.Carried, PresetNoteReason.None, raw));
+                        : raw?.ToLowerInvariant() is "webm" or "av_webm"
+                            ? new(property.Name, PresetNoteOutcome.Approximated, PresetNoteReason.NoEquivalent, raw)
+                            : new(property.Name, PresetNoteOutcome.Carried, PresetNoteReason.None, raw));
                     break;
                 case "AudioList":
                     var first = value.ValueKind == JsonValueKind.Array ? value.EnumerateArray().FirstOrDefault() : default;

@@ -127,11 +127,13 @@ public partial class MainWindow
     /// doldurma ve kısa kenar; bir de CLI'nın <c>--profil</c> kolunun uyguladığı ses bit hızı
     /// (HandBrake içe aktarımı taşıyor). Kaydedilmemiş alan uygulanmıyor, yoksa ön ayar
     /// taşımadığı bir değeri varsayılana çekerdi. Ses bit hızı Gelişmiş panelin merdiveninde
-    /// yoksa en yakın basamağa, eşitlikte yukarıdakine iner.
+    /// yoksa en yakın basamağa, eşitlikte yukarıdakine iner. Kap çıktı uzantısını seçer
+    /// (<see cref="ShrinkExtension"/>); gömülü yonga ya da boyut tavanına dönüş onu bırakır.
     /// </summary>
     internal void ApplyUserPreset(PresetProfile preset)
     {
         _intent = preset.Intent;
+        _presetContainer = preset.Container;
         _chipSizeCapped = preset.SizeCapped;
         _platformChip = preset.TargetMb is not null;
         SetCodecIndex(preset.Codec switch
@@ -181,7 +183,8 @@ public partial class MainWindow
         Codec = CodecFromIndex(EffectiveCodecIndex),
         Fill = FillPolicyIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget,
         MaxShortEdge = FixedResolutionShortSide,
-        AudioKbps = CmbAdvAudioKbps.SelectedIndex > 0 ? AdvancedAudioKbpsCandidates[CmbAdvAudioKbps.SelectedIndex - 1] : null
+        AudioKbps = CmbAdvAudioKbps.SelectedIndex > 0 ? AdvancedAudioKbpsCandidates[CmbAdvAudioKbps.SelectedIndex - 1] : null,
+        Container = _presetContainer
     };
 
     private void OnPresetSave(object? sender, RoutedEventArgs e) => SavePreset(TxtPresetName.Text ?? string.Empty);

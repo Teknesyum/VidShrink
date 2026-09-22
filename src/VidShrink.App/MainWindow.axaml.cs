@@ -138,6 +138,7 @@ public partial class MainWindow : Window
     private Intent _intent = Intent.Sharing;
     private bool _chipSizeCapped = true;
     private bool _platformChip;
+    private OutputContainer? _presetContainer;
     internal static readonly string[] AdvancedPresetCandidates =
     {
         "ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow",
@@ -1850,9 +1851,10 @@ public partial class MainWindow : Window
         .Select(preset => new ChipPlan(preset.Chip!, preset.TargetMb, preset.SizeCapped, preset.Intent, preset.Codec, preset.Fill))
         .ToList();
 
-    private void ApplyChipPlan(string chip)
+    internal void ApplyChipPlan(string chip)
     {
         var plan = ChipPlans().Single(candidate => candidate.Chip == chip);
+        _presetContainer = null;
         _intent = plan.Intent;
         _chipSizeCapped = plan.SizeCapped;
         _platformChip = plan.TargetMb is not null;
@@ -3372,7 +3374,7 @@ public partial class MainWindow : Window
         RefreshDurationView();
         RefreshAdvancedHints();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments(_info, plan,
-            BuildUniqueOutputPath(_info.FilePath, "shrunk", plan.Streams?.Extension ?? "mp4", plan), _encoders, _sceneMap?.Map));
+            BuildUniqueOutputPath(_info.FilePath, "shrunk", ShrinkExtension(plan), plan), _encoders, _sceneMap?.Map));
     }
 
     /// <summary>
@@ -3495,6 +3497,13 @@ public partial class MainWindow : Window
     private bool FixedFolderUnusable =>
         OutputFolderModeIndex == 1 && UsableFixedFolder(OutputFolderModeIndex, TxtOutputFolder.Text) is null;
 
+    /// <summary>
+    /// Küçültme çıktısının uzantısı: uygulanan kullanıcı ön ayarı bir kap taşıyorsa o, değilse
+    /// planın kabı. Gömülü yonga ya da boyut tavanına dönüş ön ayarın kabını bırakır.
+    /// </summary>
+    internal string ShrinkExtension(EncodePlan plan) =>
+        PresetLibrary.DeliveredExtension(_presetContainer) ?? plan.Streams?.Extension ?? "mp4";
+
     private string BuildUniqueOutputPath(string inputPath, string suffix, string extension, EncodePlan? plan = null)
         => ShrinkEngine.UniqueOutputPath(inputPath, suffix, extension,
             UsableFixedFolder(OutputFolderModeIndex, TxtOutputFolder.Text),
@@ -3538,6 +3547,7 @@ public partial class MainWindow : Window
     {
         _chipSizeCapped = true;
         _platformChip = false;
+        _presetContainer = null;
         RefreshChipDerivation();
         RefreshSectionSummaries();
     }
@@ -3884,7 +3894,7 @@ public partial class MainWindow : Window
     {
         if (_info is null || ActivePlan is null || _cts is not null) return;
 
-        var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", ActivePlan.Streams?.Extension ?? "mp4", ActivePlan);
+        var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", ShrinkExtension(ActivePlan), ActivePlan);
         if (FixedFolderUnusable)
             TxtResult.Text = Say("settings-tab.output-folder.unusable", TxtOutputFolder.Text ?? "");
         var targetMb = ParseTargetMb();
