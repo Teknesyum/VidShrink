@@ -190,3 +190,10 @@ ayrıca doğrulanmadı; onlar sadece hash doğrulamasının yanında not.
 biçiminde hash'siz ajan/denetim raporları, ya CI koşum numarası/registry/yayın ikilisi gibi
 ağ veya sistem durumu gerektiren iddialar, ya da `.calisma/` altında iş bitince silinmesi
 kurala uygun geçici bir dosyaya referans (satır 152).
+
+## Ek: Satır 241-245 (T0)
+
+A denetimi 6-79'u, B denetimi 80-240'ı kapsadı; son beş satır ikisinin dışında kaldı. Beşi
+de yoklandı: `e962538e`, `d0aea4d2`, `a8772d97` main'in atası; APFS notu `README.tr.md`'de;
+ORTA-B/ORTA-C bulgusu `docs/olcumler/bekleme-butceleri.md:109`'da. Şüpheli yok. Böylece
+kapalı defterin bütün satırları (6-245) denetlendi.
