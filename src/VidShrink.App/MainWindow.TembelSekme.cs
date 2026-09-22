@@ -34,6 +34,8 @@ public partial class MainWindow
         }
     }
 
+    internal RecorderView RecorderPaneForTest => RecorderPane;
+
     private void KaydediciSekmesiSecildi()
     {
         if (Tabs.SelectedItem is TabItem secili && ReferenceEquals(secili, TabRecorder)) _ = RecorderPane;

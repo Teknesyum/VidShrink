@@ -238,6 +238,23 @@ public sealed class YerlesimDenetimiTests
         pencere.HdrPolicyPanel.IsVisible = true;
     });
 
+    /// <summary>
+    /// Kaydedici sekmesi kayıt bitmiş halde: yarım kayıt uyarısı, uzun yollu sonuç, kaynak
+    /// satırlarının hepsi ve bütçe notu açık. Sekme dolaşımında kaydedici boş kuruluyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    public void KaydediciSonucundaKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-kayit", pencere =>
+    {
+        var kaydedici = pencere.RecorderPaneForTest;
+        kaydedici.ShowResult(new RecordResult(true,
+            Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi", "Ekran_kaydi_2026-09-23_toplanti_sunumu_uzun_ad.mkv"),
+            812.4, true, 0, string.Empty, 3));
+        foreach (var satir in new Control[] { kaydedici.RowScreen, kaydedici.RowWindow, kaydedici.RowRegion, kaydedici.RowRegionTools, kaydedici.TxtBudgetNote })
+            satir.IsVisible = true;
+        kaydedici.TxtBudgetNote.Text = Strings.Get("recorder.output.partial");
+    });
+
     private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true)
     {
         var (denetim, boyut) = Ac(dil, dar, null, hazirla: hazirla, yukle: yukle);
