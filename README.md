@@ -190,6 +190,12 @@ single spelling.
 | `--kirp` | `--crop` |
 | `--profil` | `--profile` |
 | `--profil-dosyasi` | `--preset-file` |
+| `--ses-kodek` | `--audio-codec` |
+| `--ses-normal` | `--loudnorm` |
+| `--ses-kazanc` | `--gain` |
+| `--altyazi` | `--subtitle` |
+| `--yan-altyazi` | `--sidecar-subtitles` |
+| `--yak` | `--burn` |
 | `--profiller` | `--presets` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
