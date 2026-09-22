@@ -1,0 +1,340 @@
+{
+  "tur": "nvenc-6",
+  "tarih": "2026-09-23",
+  "kapi_commit": "58fdd8be",
+  "ffmpeg": "9.0-full_build (gyan.dev)",
+  "kalite": [
+    {
+      "kol": "taban",
+      "kesit": "gren",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 1000,
+      "hedef_mb": 1.2207,
+      "bayt": 1254619,
+      "teslim_orani": 0.9802,
+      "hedefi_asti": false,
+      "deneme": 1,
+      "kodlama_sn": 3.299,
+      "vmafneg_ort": 80.67,
+      "vmafneg_p10": 78.27
+    },
+    {
+      "kol": "taban",
+      "kesit": "gren",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 2000,
+      "hedef_mb": 2.4414,
+      "bayt": 2462109,
+      "teslim_orani": 0.9618,
+      "hedefi_asti": false,
+      "deneme": 3,
+      "kodlama_sn": 9.758,
+      "vmafneg_ort": 85.1,
+      "vmafneg_p10": 82.96
+    },
+    {
+      "kol": "taban",
+      "kesit": "gren",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 3500,
+      "hedef_mb": 4.2725,
+      "bayt": 4380577,
+      "teslim_orani": 0.9778,
+      "hedefi_asti": false,
+      "deneme": 3,
+      "kodlama_sn": 9.776,
+      "vmafneg_ort": 87.06,
+      "vmafneg_p10": 85.34
+    },
+    {
+      "kol": "taban",
+      "kesit": "gradyan",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 1000,
+      "hedef_mb": 1.2207,
+      "bayt": 1105827,
+      "teslim_orani": 0.8639,
+      "hedefi_asti": false,
+      "deneme": 3,
+      "kodlama_sn": 3.102,
+      "vmafneg_ort": 96.0,
+      "vmafneg_p10": 95.42
+    },
+    {
+      "kol": "taban",
+      "kesit": "gradyan",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 2000,
+      "hedef_mb": 2.4414,
+      "bayt": 1495009,
+      "teslim_orani": 0.584,
+      "hedefi_asti": false,
+      "deneme": 2,
+      "kodlama_sn": 2.058,
+      "vmafneg_ort": 96.29,
+      "vmafneg_p10": 95.89
+    },
+    {
+      "kol": "taban",
+      "kesit": "gradyan",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 3500,
+      "hedef_mb": 4.2725,
+      "bayt": 1472555,
+      "teslim_orani": 0.3287,
+      "hedefi_asti": false,
+      "deneme": 2,
+      "kodlama_sn": 2.077,
+      "vmafneg_ort": 96.27,
+      "vmafneg_p10": 95.85
+    },
+    {
+      "kol": "taban",
+      "kesit": "hayat",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 1000,
+      "hedef_mb": 1.2207,
+      "bayt": 1233134,
+      "teslim_orani": 0.9634,
+      "hedefi_asti": false,
+      "deneme": 4,
+      "kodlama_sn": 4.865,
+      "vmafneg_ort": 8.58,
+      "vmafneg_p10": 2.46
+    },
+    {
+      "kol": "taban",
+      "kesit": "hayat",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 2000,
+      "hedef_mb": 2.4414,
+      "bayt": 2549508,
+      "teslim_orani": 0.9959,
+      "hedefi_asti": false,
+      "deneme": 1,
+      "kodlama_sn": 1.308,
+      "vmafneg_ort": 15.94,
+      "vmafneg_p10": 11.2
+    },
+    {
+      "kol": "taban",
+      "kesit": "hayat",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 3500,
+      "hedef_mb": 4.2725,
+      "bayt": 4339272,
+      "teslim_orani": 0.9686,
+      "hedefi_asti": false,
+      "deneme": 3,
+      "kodlama_sn": 3.614,
+      "vmafneg_ort": 47.84,
+      "vmafneg_p10": 27.1
+    },
+    {
+      "kol": "p7",
+      "kesit": "gren",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 1000,
+      "hedef_mb": 1.2207,
+      "bayt": 1239663,
+      "teslim_orani": 0.9685,
+      "hedefi_asti": false,
+      "deneme": 2,
+      "kodlama_sn": 6.52,
+      "vmafneg_ort": 81.12,
+      "vmafneg_p10": 78.65
+    },
+    {
+      "kol": "p7",
+      "kesit": "gren",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 2000,
+      "hedef_mb": 2.4414,
+      "bayt": 2556664,
+      "teslim_orani": 0.9987,
+      "hedefi_asti": false,
+      "deneme": 1,
+      "kodlama_sn": 3.36,
+      "vmafneg_ort": 85.75,
+      "vmafneg_p10": 83.61
+    },
+    {
+      "kol": "p7",
+      "kesit": "gren",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 3500,
+      "hedef_mb": 4.2725,
+      "bayt": 4387603,
+      "teslim_orani": 0.9794,
+      "hedefi_asti": false,
+      "deneme": 3,
+      "kodlama_sn": 10.077,
+      "vmafneg_ort": 87.23,
+      "vmafneg_p10": 85.54
+    },
+    {
+      "kol": "p7",
+      "kesit": "gradyan",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 1000,
+      "hedef_mb": 1.2207,
+      "bayt": 1175757,
+      "teslim_orani": 0.9186,
+      "hedefi_asti": false,
+      "deneme": 3,
+      "kodlama_sn": 5.872,
+      "vmafneg_ort": 95.88,
+      "vmafneg_p10": 95.24
+    },
+    {
+      "kol": "p7",
+      "kesit": "gradyan",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 2000,
+      "hedef_mb": 2.4414,
+      "bayt": 1646983,
+      "teslim_orani": 0.6434,
+      "hedefi_asti": false,
+      "deneme": 2,
+      "kodlama_sn": 3.902,
+      "vmafneg_ort": 96.3,
+      "vmafneg_p10": 95.93
+    },
+    {
+      "kol": "p7",
+      "kesit": "gradyan",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 3500,
+      "hedef_mb": 4.2725,
+      "bayt": 1637765,
+      "teslim_orani": 0.3656,
+      "hedefi_asti": false,
+      "deneme": 2,
+      "kodlama_sn": 3.905,
+      "vmafneg_ort": 96.29,
+      "vmafneg_p10": 95.9
+    },
+    {
+      "kol": "p7",
+      "kesit": "hayat",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 1000,
+      "hedef_mb": 1.2207,
+      "bayt": 1220800,
+      "teslim_orani": 0.9538,
+      "hedefi_asti": false,
+      "deneme": 4,
+      "kodlama_sn": 5.14,
+      "vmafneg_ort": 8.64,
+      "vmafneg_p10": 2.46
+    },
+    {
+      "kol": "p7",
+      "kesit": "hayat",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 2000,
+      "hedef_mb": 2.4414,
+      "bayt": 2555229,
+      "teslim_orani": 0.9981,
+      "hedefi_asti": false,
+      "deneme": 1,
+      "kodlama_sn": 1.978,
+      "vmafneg_ort": 16.2,
+      "vmafneg_p10": 11.08
+    },
+    {
+      "kol": "p7",
+      "kesit": "hayat",
+      "kodek": "hevc_nvenc",
+      "istenen_kbit": 3500,
+      "hedef_mb": 4.2725,
+      "bayt": 4281044,
+      "teslim_orani": 0.9556,
+      "hedefi_asti": false,
+      "deneme": 3,
+      "kodlama_sn": 6.124,
+      "vmafneg_ort": 48.48,
+      "vmafneg_p10": 27.43
+    }
+  ],
+  "hiz": [
+    {
+      "kesit": "gren",
+      "kodek": "hevc_nvenc",
+      "kol": "taban",
+      "preset": "p4",
+      "sn_tekrarlar": [
+        0.971,
+        0.975,
+        0.985
+      ],
+      "sn_ortanca": 0.975,
+      "fps": 246.2
+    },
+    {
+      "kesit": "gren",
+      "kodek": "hevc_nvenc",
+      "kol": "p7",
+      "preset": "p7",
+      "sn_tekrarlar": [
+        1.954,
+        1.937,
+        1.953
+      ],
+      "sn_ortanca": 1.953,
+      "fps": 122.9
+    },
+    {
+      "kesit": "gradyan",
+      "kodek": "hevc_nvenc",
+      "kol": "taban",
+      "preset": "p4",
+      "sn_tekrarlar": [
+        1.02,
+        1.012,
+        1.027
+      ],
+      "sn_ortanca": 1.02,
+      "fps": 235.4
+    },
+    {
+      "kesit": "gradyan",
+      "kodek": "hevc_nvenc",
+      "kol": "p7",
+      "preset": "p7",
+      "sn_tekrarlar": [
+        1.895,
+        1.927,
+        1.931
+      ],
+      "sn_ortanca": 1.927,
+      "fps": 124.5
+    },
+    {
+      "kesit": "hayat",
+      "kodek": "hevc_nvenc",
+      "kol": "taban",
+      "preset": "p4",
+      "sn_tekrarlar": [
+        1.066,
+        1.066,
+        1.073
+      ],
+      "sn_ortanca": 1.066,
+      "fps": 225.1
+    },
+    {
+      "kesit": "hayat",
+      "kodek": "hevc_nvenc",
+      "kol": "p7",
+      "preset": "p7",
+      "sn_tekrarlar": [
+        1.939,
+        1.917,
+        1.917
+      ],
+      "sn_ortanca": 1.917,
+      "fps": 125.2
+    }
+  ]
+}
