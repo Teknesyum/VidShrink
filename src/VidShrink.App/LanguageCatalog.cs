@@ -25,7 +25,36 @@ internal static class LanguageCatalog
     private static readonly IReadOnlyDictionary<string, HashSet<string>> SmallWords =
         new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase)
         {
-            ["tr"] = new(StringComparer.Ordinal) { "ve", "veya", "ile", "ki", "da", "de" }
+            ["tr"] = new(StringComparer.Ordinal) { "ve", "veya", "ile", "ki", "da", "de" },
+            ["pt"] = new(StringComparer.Ordinal) { "e", "ou", "de", "do", "da", "dos", "das", "em", "no", "na", "nos", "nas", "para", "por", "com", "o", "a", "os", "as", "um", "uma", "ao", "à" },
+            ["es"] = new(StringComparer.Ordinal) { "y", "e", "o", "u", "de", "del", "el", "la", "los", "las", "en", "para", "por", "con", "un", "una", "a", "al" },
+            ["fr"] = new(StringComparer.Ordinal) { "et", "ou", "de", "du", "des", "le", "la", "les", "en", "pour", "par", "avec", "un", "une", "à", "au", "aux", "sur", "d", "l" },
+            ["it"] = new(StringComparer.Ordinal) { "e", "ed", "o", "di", "del", "della", "dei", "delle", "da", "in", "per", "con", "il", "lo", "la", "i", "gli", "le", "un", "una", "a", "al", "su" },
+            ["de"] = new(StringComparer.Ordinal) { "und", "oder", "von", "vom", "zu", "zum", "zur", "mit", "für", "im", "in", "an", "am", "auf", "der", "die", "das", "den", "dem", "des", "ein", "eine" },
+            ["nl"] = new(StringComparer.Ordinal) { "en", "of", "van", "de", "het", "een", "in", "op", "voor", "met", "te", "aan" },
+            ["ro"] = new(StringComparer.Ordinal) { "și", "sau", "de", "din", "la", "cu", "pentru", "în", "pe", "a", "al" },
+            ["sv"] = new(StringComparer.Ordinal) { "och", "eller", "av", "för", "med", "i", "på", "till", "en", "ett" },
+            ["da"] = new(StringComparer.Ordinal) { "og", "eller", "af", "for", "med", "i", "på", "til", "en", "et" },
+            ["nb"] = new(StringComparer.Ordinal) { "og", "eller", "av", "for", "med", "i", "på", "til", "en", "et" },
+            ["pl"] = new(StringComparer.Ordinal) { "i", "a", "lub", "oraz", "w", "we", "z", "ze", "na", "do", "dla", "od", "o" },
+            ["cs"] = new(StringComparer.Ordinal) { "a", "i", "nebo", "v", "ve", "z", "ze", "na", "do", "pro", "s", "se", "o", "k" },
+            ["sk"] = new(StringComparer.Ordinal) { "a", "i", "alebo", "v", "vo", "z", "zo", "na", "do", "pre", "s", "so", "o", "k" },
+            ["sl"] = new(StringComparer.Ordinal) { "in", "ali", "v", "z", "s", "na", "do", "za", "o", "k", "iz" },
+            ["hr"] = new(StringComparer.Ordinal) { "i", "ili", "u", "s", "sa", "na", "do", "za", "o", "k", "iz", "od" },
+            ["sr"] = new(StringComparer.Ordinal) { "i", "ili", "u", "s", "sa", "na", "do", "za", "o", "k", "iz", "od" },
+            ["hu"] = new(StringComparer.Ordinal) { "és", "vagy", "a", "az", "egy" },
+            ["fi"] = new(StringComparer.Ordinal) { "ja", "tai" },
+            ["et"] = new(StringComparer.Ordinal) { "ja", "või" },
+            ["lt"] = new(StringComparer.Ordinal) { "ir", "ar", "arba", "su", "į", "iš", "be" },
+            ["lv"] = new(StringComparer.Ordinal) { "un", "vai", "ar", "no", "uz", "par" },
+            ["id"] = new(StringComparer.Ordinal) { "dan", "atau", "di", "ke", "dari", "untuk", "dengan", "yang" },
+            ["ms"] = new(StringComparer.Ordinal) { "dan", "atau", "di", "ke", "dari", "untuk", "dengan", "yang" },
+            ["sw"] = new(StringComparer.Ordinal) { "na", "au", "ya", "wa", "za", "la", "cha", "kwa" },
+            ["vi"] = new(StringComparer.Ordinal) { "và", "hoặc", "của", "cho", "với", "trong", "để" },
+            ["ru"] = new(StringComparer.Ordinal) { "и", "или", "в", "во", "на", "с", "со", "к", "ко", "по", "для", "из", "от", "о", "об", "до" },
+            ["uk"] = new(StringComparer.Ordinal) { "і", "й", "та", "або", "в", "у", "на", "з", "із", "зі", "до", "для", "від", "по", "о", "про" },
+            ["bg"] = new(StringComparer.Ordinal) { "и", "или", "в", "във", "на", "с", "със", "към", "по", "за", "от", "до", "о" },
+            ["el"] = new(StringComparer.Ordinal) { "και", "ή", "ο", "η", "το", "οι", "τα", "του", "της", "των", "στο", "στη", "στην", "στον", "στα", "σε", "με", "για", "από", "ένα", "μια" }
         };
 
     private static HashSet<string>? SmallWordsOf(string language)

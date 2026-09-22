@@ -143,6 +143,25 @@ public sealed class CasingTests
         => Assert.Equal(expected, LanguageCatalog.Title(text, "en"));
 
     /// <summary>
+    /// Yalnız Türkçenin küçük sözcük listesi vardı; öteki diller bağlacı da büyütüyordu:
+    /// "Qualidade E Compatibilidade", "Qualität Und Kompatibilität" (2026-09-23 yerleşim
+    /// denetimi, pt dökümü). Satır başındaki bağlaç yine büyür (olumsuz kontrol).
+    /// </summary>
+    [Theory]
+    [InlineData("pt", "Qualidade e compatibilidade", "Qualidade e Compatibilidade")]
+    [InlineData("es", "Calidad y compatibilidad", "Calidad y Compatibilidad")]
+    [InlineData("it", "Qualità e compatibilità", "Qualità e Compatibilità")]
+    [InlineData("fr", "Audio et sous-titres", "Audio et Sous-titres")]
+    [InlineData("de", "Audio und Untertitel", "Audio und Untertitel")]
+    [InlineData("pl", "Jakość i zgodność", "Jakość i Zgodność")]
+    [InlineData("ru", "Звук и субтитры", "Звук и Субтитры")]
+    [InlineData("el", "Ήχος και υπότιτλοι", "Ήχος και Υπότιτλοι")]
+    [InlineData("pt", "e depois", "E Depois")]
+    [InlineData("de", "und dann", "Und Dann")]
+    public void ConjunctionsStaySmallInsideATitle(string language, string text, string expected)
+        => Assert.Equal(expected, LanguageCatalog.Title(text, language));
+
+    /// <summary>
     /// T65 K3: birim ve tanımlayıcı listesi tek bir bildirimde durur. İkinci bir kopya
     /// çıkarsa listeler bir süre sonra ayrışır, biri güncellenirken öteki eskir.
     /// </summary>

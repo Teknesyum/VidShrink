@@ -50,27 +50,26 @@
                    Theme="{StaticResource MonoValue}"
                    VerticalAlignment="Center"/>
 
-        <StackPanel Grid.Column="2"
-                    Orientation="Horizontal"
-                    Spacing="{StaticResource SpaceXl}"
-                    HorizontalAlignment="Center"
-                    ToolTip.Tip="{loc:Text recorder.strip.size-hint}">
+        <Grid Grid.Column="2"
+              ColumnDefinitions="*,*,*"
+              ColumnSpacing="{StaticResource SpaceXl}"
+              ToolTip.Tip="{loc:Text recorder.strip.size-hint}">
 
-          <StackPanel MinWidth="{StaticResource RecorderReadoutMinWidth}">
-            <TextBlock Text="{loc:Text recorder.strip.elapsed}" Theme="{StaticResource PlanFactLabel}"/>
+          <StackPanel Grid.Column="0">
+            <TextBlock Text="{loc:Text recorder.strip.elapsed}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
             <TextBlock x:Name="TxtElapsed" Theme="{StaticResource PlanFactValue}"/>
           </StackPanel>
 
-          <StackPanel MinWidth="{StaticResource RecorderReadoutMinWidth}">
-            <TextBlock Text="{loc:Text recorder.strip.frames}" Theme="{StaticResource PlanFactLabel}"/>
+          <StackPanel Grid.Column="1">
+            <TextBlock Text="{loc:Text recorder.strip.frames}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
             <TextBlock x:Name="TxtFrames" Theme="{StaticResource PlanFactValue}"/>
           </StackPanel>
 
-          <StackPanel MinWidth="{StaticResource RecorderReadoutMinWidth}">
-            <TextBlock Text="{loc:Text recorder.strip.dropped}" Theme="{StaticResource PlanFactLabel}"/>
+          <StackPanel Grid.Column="2">
+            <TextBlock Text="{loc:Text recorder.strip.dropped}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
             <TextBlock x:Name="TxtDropped" Theme="{StaticResource PlanFactValue}"/>
           </StackPanel>
-        </StackPanel>
+        </Grid>
 
         <Button Grid.Column="3"
                 x:Name="BtnStart"

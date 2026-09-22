@@ -292,6 +292,26 @@ public sealed class YerlesimDenetimiTests
         return kollar;
     }
 
+    /// <summary>
+    /// Öbür 37 dil dar pencerede. Beş dil karakter toplamıyla seçildi, ama genişlik karakter
+    /// sayısı değil: Tamil ve Devanagari glifleri geniş, Almanca ve Fince bileşik sözcük tek
+    /// parça kalıyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(KalanDilKollari))]
+    public void KalanDillerdeKesikCakismaTasmaYok(string dil) => Denetle(dil, true, "", null);
+
+    public static TheoryData<string> KalanDilKollari()
+    {
+        var kollar = new TheoryData<string>();
+        foreach (var klasor in Directory.GetDirectories(Path.Combine(TipSources.Root, "src", "VidShrink.App", "Locales")).Order(StringComparer.Ordinal))
+        {
+            var dil = Path.GetFileName(klasor);
+            if (!Diller.Contains(dil)) kollar.Add(dil);
+        }
+        return kollar;
+    }
+
     private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true, Size? zorla = null)
     {
         var (denetim, boyut) = Ac(dil, dar, null, zorla, hazirla: hazirla, yukle: yukle);
@@ -940,7 +960,7 @@ public sealed class YerlesimDenetimiTests
 
             var tasma = Math.Max(yatay, dikey);
             if (tasma <= 1) continue;
-            denetim.Ekle(new Kusur("taşma", sekme, Ad(cocuk),
+            denetim.Ekle(new Kusur("taşma", sekme, Ad(cocuk) + (cocuk is TextBlock yazi ? $" [{Kisalt(yazi.Text)}]" : ""),
                 $"{ebeveyn.GetType().Name}{(string.IsNullOrEmpty(ebeveyn.Name) ? "" : "#" + ebeveyn.Name)} [{ebeveyn.Bounds.Width:0.#}x{ebeveyn.Bounds.Height:0.#}] dışına {(yatay >= dikey ? "yatay" : "dikey")} {tasma:0.#}"));
         }
     }

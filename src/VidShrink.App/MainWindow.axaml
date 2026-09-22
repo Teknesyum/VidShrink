@@ -466,10 +466,10 @@
                               HorizontalContentAlignment="Left"
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.quality}">
-                        <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                           <Path x:Name="GlyphQuality" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
                       <StackPanel x:Name="QualitySectionBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
@@ -520,10 +520,10 @@
                               HorizontalContentAlignment="Left"
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.audio}">
-                        <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                           <Path x:Name="GlyphAudio" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
                       <StackPanel x:Name="AudioBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
@@ -592,10 +592,10 @@
                               HorizontalContentAlignment="Left"
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.frame}">
-                        <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                           <Path x:Name="GlyphFrame" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
                       <StackPanel x:Name="FrameBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
@@ -638,10 +638,10 @@
                               HorizontalContentAlignment="Left"
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
-                        <Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                           <Path x:Name="GlyphAdvanced" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                          <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
                       <StackPanel x:Name="AdvancedBody" Classes="disclose" Spacing="{StaticResource SpaceMd}" IsVisible="False" Margin="{StaticResource RowMargin}">
@@ -754,7 +754,7 @@
                               <CheckBox x:Name="ChkFltGray" Content="{loc:Text main.advanced.filters.gray}"/>
                             </WrapPanel>
                             <StackPanel Spacing="{StaticResource SpaceXs}">
-                              <TextBlock Text="{loc:Text main.advanced.filters.spec}" Theme="{StaticResource Hint}"/>
+                              <TextBlock Text="{loc:Text main.advanced.filters.spec}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                               <TextBox x:Name="TxtAdvFilters" VerticalAlignment="Center"
                                        auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}"/>
                               <TextBlock x:Name="TxtAdvFiltersNow" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
