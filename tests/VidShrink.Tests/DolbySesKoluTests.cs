@@ -44,7 +44,7 @@ public sealed class DolbySesKoluTests
     private static StreamPlan Karar(MediaInfo info, OutputContainer container, int audioK, string codec, bool kanallariKoru = true)
         => StreamMapping.Decide(info, StreamRequest.Default, container, audioK, null, codec, false, 100, kanallariKoru);
 
-    /// <summary>Merdiven kodda degil belgede tanimli; iki taraf birebir ayni.</summary>
+    /// <summary>Merdiven kodda (<c>StreamMapping</c>) elle yazili, olcu belgeden okuyup ikisinin birebir ayni oldugunu sinar.</summary>
     [Fact]
     public void Ac3MerdiveniOlcumBelgesindenOkunuyor()
     {
