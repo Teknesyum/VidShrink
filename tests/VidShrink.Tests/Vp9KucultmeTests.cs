@@ -121,6 +121,22 @@ public sealed class Vp9KucultmeTests
         Assert.DoesNotContain("-row-mt", x264Args);
     }
 
+    /// <summary>
+    /// cpu-used: varsayilan (Quality) 1, Hizli 4 — <c>docs/olcumler/vp9-cpu-used-crf.md</c>
+    /// (kosum 35795367223). Ikisi de <c>FfmpegArguments.DefaultPreset("libvpx-vp9")</c>'un
+    /// (1) degil, cunku Hizli olcumde 4'ten hicbir hucrede hizli bulunmadi, 4'te kaldi.
+    /// </summary>
+    [Fact]
+    public void CpuUsedVarsayilanBirHizliDort()
+    {
+        var quality = Plan(Kaynak10Dk());
+        var fast = Plan(Kaynak10Dk(), options => options.SpeedMode = SpeedMode.Fast);
+
+        Assert.Equal("1", quality.Preset);
+        Assert.Equal("1", FfmpegArguments.DefaultPreset(Vp9));
+        Assert.Equal("4", fast.Preset);
+    }
+
     /// <summary>WebM'de aac kopyalanamaz, opus'a kodlanir ve not duser; opus kopyasi kopya kalir, not dusmez.</summary>
     [Fact]
     public void WebmSesiOpusOluyor()
