@@ -33,6 +33,25 @@
     </Style>
 
     <!--
+      Acilir bolum gorunur oldugunda yerine suzulur: Kalite, Ses, Kare, Gelismis, Hakkinda,
+      yeniden kes paneli. Hareketi azaltma acikken hic oynamaz.
+    -->
+    <Style Selector="Window:not(.reduced-motion) StackPanel.disclose[IsVisible=True]">
+      <Style.Animations>
+        <Animation Duration="{StaticResource MotionBase}" Easing="CubicEaseOut" FillMode="Forward">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="TranslateTransform.Y" Value="-10"/>
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1"/>
+            <Setter Property="TranslateTransform.Y" Value="0"/>
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <!--
       Ust serit bir katman: icerik zaten tam yukseklikte duruyor, serit onun ustunde
       goruntuleniyor. Gizlenip acilirken icerik yer degistirmiyor.
     -->
@@ -445,7 +464,7 @@
                           <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
-                      <StackPanel x:Name="QualitySectionBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
+                      <StackPanel x:Name="QualitySectionBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
                         <!-- Kullanıcı 09-04: WhatsApp uyumu işaretlenirse eski kodek (H.264) kullanılır, kodek seçimi kilitlenir. -->
                         <CheckBox x:Name="ChkWhatsAppCompatible" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.whatsapp-compatible}"/>
                         <Grid x:Name="CodecChoiceRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
@@ -499,7 +518,7 @@
                           <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
-                      <StackPanel x:Name="AudioBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
+                      <StackPanel x:Name="AudioBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                           <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.audio-kbps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
@@ -540,7 +559,7 @@
                           <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
-                      <StackPanel x:Name="FrameBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
+                      <StackPanel x:Name="FrameBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
                           <CheckBox x:Name="ChkResolution" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.resolution}"/>
                           <CheckBox x:Name="ChkFps" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.fps}"/>
@@ -586,7 +605,7 @@
                           <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
-                      <StackPanel x:Name="AdvancedBody" Spacing="{StaticResource SpaceMd}" IsVisible="False" Margin="{StaticResource RowMargin}">
+                      <StackPanel x:Name="AdvancedBody" Classes="disclose" Spacing="{StaticResource SpaceMd}" IsVisible="False" Margin="{StaticResource RowMargin}">
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                           <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
@@ -831,7 +850,7 @@
                           <Button x:Name="BtnRetryAccept" auto:AutomationProperties.Name="{loc:Text main.retry.accept.name}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAccept"/>
                           <Button x:Name="BtnRetryStop" Content="{loc:Text main.retry.stop}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
                         </WrapPanel>
-                        <StackPanel x:Name="RetryTrimPanel" IsVisible="False" Spacing="{StaticResource SpaceSm}">
+                        <StackPanel x:Name="RetryTrimPanel" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceSm}">
                           <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
                             <RadioButton x:Name="RbTrimEnd" GroupName="OvershootTrim" IsChecked="True" Content="{loc:Text main.retry.trim.end}"/>
                             <RadioButton x:Name="RbTrimStart" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.start}"/>
@@ -1460,7 +1479,7 @@
                       <TextBlock Grid.Column="1" Text="{loc:Text main.about.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                     </Grid>
                   </Button>
-                  <StackPanel x:Name="AboutBody" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                  <StackPanel x:Name="AboutBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
                     <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.intro}"/>
                     <TextBlock Text="{loc:Text main.about.engine.title}" Theme="{StaticResource H3}"/>
                     <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.engine.body}"/>
