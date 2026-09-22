@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Obreži i spremi",
   "main.run.accepted-larger": "Prihvaćeno veće: {0} MB iznad cilja od {1} MB.",
   "main.run.trimmed": "{0} s je odrezano kako bi stalo u cilj; trajanje {1} → {2}.",
+  "main.run.saturated": "Izvor je u ovoj kvaliteti stao u {0} MB; datoteka od {1} MB ne bi izgledala bolje.",
   "main.run.whatsapp-document": "Pošaljite to na WhatsApp kao dokument, a ne kao videozapis: tako se zaobilazi prekodiranje u razgovoru i druga strana vidi ovu kvalitetu nepromijenjenu.",
 
   "main.run.no-space": "Nema dovoljno slobodnog prostora na ciljnom disku; potrebno je najmanje {0} MB.",

@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Obreži in shrani",
   "main.run.accepted-larger": "Sprejeto večje: {0} MB nad ciljem {1} MB.",
   "main.run.trimmed": "{0} s je bilo obrezanih, da ustreza cilju; dolžina {1} → {2}.",
+  "main.run.saturated": "Vir je pri tej kakovosti zasedel {0} MB; datoteka s {1} MB ne bi bila videti bolje.",
   "main.run.whatsapp-document": "Pošljite to v WhatsAppu kot dokument, ne kot videoposnetek: tako se izogne prekodiranju v pogovoru in druga stran vidi to kakovost nespremenjeno.",
 
   "main.run.no-space": "Na ciljnem pogonu ni dovolj prostora; potrebnih je vsaj {0} MB.",

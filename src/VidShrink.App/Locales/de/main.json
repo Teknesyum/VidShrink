@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Zuschneiden und speichern",
   "main.run.accepted-larger": "Größer akzeptiert: {0} MB über dem Ziel von {1} MB.",
   "main.run.trimmed": "{0} s wurden zugeschnitten, um das Ziel zu erreichen; Länge {1} → {2}.",
+  "main.run.saturated": "Die Quelle passte bei dieser Qualität in {0} MB; eine {1}-MB-Datei hätte nicht besser ausgesehen.",
   "main.run.whatsapp-document": "Sende die Datei in WhatsApp als Dokument statt als Video: Das umgeht die Neukodierung im Chat, und die Gegenseite sieht diese Qualität unverändert.",
 
   "main.run.no-space": "Zu wenig freier Platz auf dem Ziellaufwerk; mindestens {0} MB werden benötigt.",

@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Pangkas dan simpan",
   "main.run.accepted-larger": "Diterima lebih besar: {0} MB melebihi sasaran {1} MB.",
   "main.run.trimmed": "{0} s telah dipangkas supaya sesuai dengan sasaran; tempoh {1} → {2}.",
+  "main.run.saturated": "Sumber muat dalam {0} MB pada kualiti ini; fail {1} MB tidak akan kelihatan lebih baik.",
   "main.run.whatsapp-document": "Hantar ke WhatsApp sebagai dokumen, bukan sebagai video: cara ini melangkau pengekodan semula dalam sembang, jadi pihak lain melihat kualiti ini seadanya.",
 
   "main.run.no-space": "Ruang kosong tidak mencukupi pada pemacu sasaran; sekurang-kurangnya {0} MB diperlukan.",

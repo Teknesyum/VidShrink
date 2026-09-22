@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Potong dan simpan",
   "main.run.accepted-larger": "Diterima lebih besar: {0} MB di atas target {1} MB.",
   "main.run.trimmed": "{0} dtk dipotong agar sesuai target; durasi {1} → {2}.",
+  "main.run.saturated": "Sumber muat dalam {0} MB pada kualitas ini; berkas {1} MB tidak akan terlihat lebih baik.",
   "main.run.whatsapp-document": "Kirim ke WhatsApp sebagai dokumen, bukan sebagai video: cara ini melewati pengodean ulang di obrolan, sehingga pihak lain melihat kualitas ini apa adanya.",
 
   "main.run.no-space": "Ruang kosong di drive tujuan tidak cukup; setidaknya perlu {0} MB.",

@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Cắt và lưu",
   "main.run.accepted-larger": "Đã chấp nhận bản lớn hơn: {0} MB vượt mục tiêu {1} MB.",
   "main.run.trimmed": "{0} giây đã bị cắt để vừa mục tiêu; thời lượng {1} → {2}.",
+  "main.run.saturated": "Ở chất lượng này nguồn chỉ cần {0} MB; tệp {1} MB cũng không đẹp hơn.",
   "main.run.whatsapp-document": "Hãy gửi tệp này trên WhatsApp dưới dạng tài liệu thay vì video: cách này bỏ qua việc mã hóa lại trong cuộc trò chuyện, nên bên kia thấy đúng chất lượng này.",
 
   "main.run.no-space": "Ổ đích không đủ chỗ trống; cần ít nhất {0} MB.",

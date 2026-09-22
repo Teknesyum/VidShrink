@@ -393,7 +393,10 @@ public partial class ShrinkJobWindow : Window
         => result.OverTarget
             ? result.OutputPath + " " + Say("main.run.accepted-larger",
                 Bicim.Boyut.Sapma(result.OutputMb - hedefMb, Strings.CultureOf(_language)), hedefMb)
-            : result.OutputPath;
+            : MainWindow.ShowsSaturated(result)
+                ? result.OutputPath + " " + Say("main.run.saturated",
+                    Bicim.Boyut.Mb(result.OutputMb, Strings.CultureOf(_language)), Bicim.Boyut.Hedef(hedefMb, Strings.CultureOf(_language)))
+                : result.OutputPath;
 
     /// <summary>
     /// İş düştüğünde yazılan satır. Tavanı aşan teslimde boyut ailenin baskın yazımıyla

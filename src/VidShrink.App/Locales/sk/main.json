@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Orezať a uložiť",
   "main.run.accepted-larger": "Prijaté väčšie: {0} MB nad cieľom {1} MB.",
   "main.run.trimmed": "{0} s bolo orezaných, aby sa zmestilo do cieľa; dĺžka {1} → {2}.",
+  "main.run.saturated": "Zdroj sa v tejto kvalite zmestil do {0} MB; súbor s {1} MB by nevyzeral lepšie.",
   "main.run.whatsapp-document": "Pošlite to cez WhatsApp ako dokument, nie ako video: obíde sa tým prekódovanie v chate a druhá strana uvidí túto kvalitu nezmenenú.",
 
   "main.run.no-space": "Na cieľovom disku nie je dosť voľného miesta; treba aspoň {0} MB.",

@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Kata na uhifadhi",
   "main.run.accepted-larger": "Imekubaliwa kubwa zaidi: {0} MB zaidi ya lengo la {1} MB.",
   "main.run.trimmed": "Sekunde {0} zilikatwa ili kufikia lengo; muda {1} → {2}.",
+  "main.run.saturated": "Chanzo kilitosha katika MB {0} kwa ubora huu; faili la MB {1} lisingeonekana bora zaidi.",
   "main.run.whatsapp-document": "Ituma kwenye WhatsApp kama hati, siyo kama video: hivyo usimbaji upya wa gumzo unarukwa, na upande mwingine unaona ubora huu kama ulivyo.",
 
   "main.run.no-space": "Hakuna nafasi ya kutosha kwenye diski lengwa; angalau MB {0} zinahitajika.",

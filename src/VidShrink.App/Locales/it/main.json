@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Taglia e salva",
   "main.run.accepted-larger": "Accettato più grande: {0} MB oltre l'obiettivo di {1} MB.",
   "main.run.trimmed": "Sono stati tagliati {0} s per rientrare nell'obiettivo; durata {1} → {2}.",
+  "main.run.saturated": "La sorgente è stata in {0} MB a questa qualità; un file da {1} MB non sarebbe sembrato migliore.",
   "main.run.whatsapp-document": "Invialo su WhatsApp come documento, non come video: così si evita la ricodifica della chat e l'altra parte vede questa qualità così com'è.",
 
   "main.run.no-space": "Spazio libero insufficiente sull'unità di destinazione; servono almeno {0} MB.",

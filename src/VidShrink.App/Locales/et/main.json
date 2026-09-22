@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Kärbi ja salvesta",
   "main.run.accepted-larger": "Nõustuti suuremaga: {0} MB üle {1} MB eesmärgi.",
   "main.run.trimmed": "{0} s kärbiti, et mahutada eesmärki; kestus {1} → {2}.",
+  "main.run.saturated": "Allikas mahtus selle kvaliteediga {0} MB-sse; {1} MB fail poleks paremini välja näinud.",
   "main.run.whatsapp-document": "Saada see WhatsAppi dokumendina, mitte videona: nii jääb vestluse ümberkodeerimine vahele ja teine pool näeb seda kvaliteeti muutmata.",
 
   "main.run.no-space": "Sihtkettal pole piisavalt vaba ruumi; vaja on vähemalt {0} MB.",

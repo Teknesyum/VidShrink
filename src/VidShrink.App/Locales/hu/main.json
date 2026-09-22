@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Vágás és mentés",
   "main.run.accepted-larger": "Nagyobb elfogadva: {0} MB a(z) {1} MB-os cél felett.",
   "main.run.trimmed": "{0} mp lett levágva, hogy illeszkedjen a célhoz; hossz {1} → {2}.",
+  "main.run.saturated": "A forrás ezen a minőségen {0} MB-ba fért bele; egy {1} MB-os fájl sem nézett volna ki jobban.",
   "main.run.whatsapp-document": "Küldd el a WhatsAppon dokumentumként, ne videóként: így kimarad a csevegés újrakódolása, és a másik fél változatlanul látja ezt a minőséget.",
 
   "main.run.no-space": "Nincs elég szabad hely a célmeghajtón; legalább {0} MB kell.",

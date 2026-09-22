@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "자르고 저장",
   "main.run.accepted-larger": "더 크게 수락됨: 목표 {1} MB보다 {0} MB 초과.",
   "main.run.trimmed": "목표에 맞추기 위해 {0}초가 잘렸습니다. 길이 {1} → {2}.",
+  "main.run.saturated": "이 화질에서 원본은 {0}MB에 들어갔습니다. {1}MB 파일이라도 더 좋아 보이지 않습니다.",
   "main.run.whatsapp-document": "WhatsApp에서 동영상이 아니라 문서로 보내세요. 채팅의 재인코딩을 건너뛰므로 상대방이 이 화질을 그대로 봅니다.",
 
   "main.run.no-space": "대상 드라이브의 여유 공간이 부족합니다. 최소 {0} MB가 필요합니다.",

@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Apgriezt un saglabāt",
   "main.run.accepted-larger": "Pieņemts lielāks: {0} MB virs mērķa {1} MB.",
   "main.run.trimmed": "{0} s tika apgriezti, lai iekļautos mērķī; garums {1} → {2}.",
+  "main.run.saturated": "Avots šajā kvalitātē ietilpa {0} MB; {1} MB fails nebūtu izskatījies labāk.",
   "main.run.whatsapp-document": "Sūtiet to pakalpojumā WhatsApp kā dokumentu, nevis kā video: tā tiek apieta sarunas pārkodēšana un otra puse redz šo kvalitāti nemainītu.",
 
   "main.run.no-space": "Mērķa diskā nepietiek brīvas vietas; vajag vismaz {0} MB.",

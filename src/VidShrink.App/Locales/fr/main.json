@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Rogner et enregistrer",
   "main.run.accepted-larger": "Accepté plus grand : {0} MB au-dessus de la cible de {1} MB.",
   "main.run.trimmed": "{0} s ont été coupées pour respecter la cible ; durée {1} → {2}.",
+  "main.run.saturated": "La source tient en {0} Mo à cette qualité ; un fichier de {1} Mo n’aurait pas été plus beau.",
   "main.run.whatsapp-document": "Envoyez-le sur WhatsApp en tant que document, pas en tant que vidéo : le réencodage de la discussion est ainsi contourné et le destinataire voit cette qualité telle quelle.",
 
   "main.run.no-space": "Espace libre insuffisant sur le lecteur cible ; il faut au moins {0} Mo.",

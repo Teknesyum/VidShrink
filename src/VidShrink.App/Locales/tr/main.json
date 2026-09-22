@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Kes ve kaydet",
   "main.run.accepted-larger": "Büyük hâliyle kabul edildi: {1} MB hedefinin {0} MB üzerinde.",
   "main.run.trimmed": "Hedefe sığması için {0} sn kesildi; süre {1} → {2}.",
+  "main.run.saturated": "Kaynak bu kalitede {0} MB'a sığdı; {1} MB'lık dosya daha iyi görünmezdi.",
   "main.run.whatsapp-document": "WhatsApp'a video olarak değil belge olarak gönderin: sohbetteki yeniden kodlama atlanır, karşı taraf bu kaliteyi olduğu gibi görür.",
 
   "main.run.no-space": "Hedef sürücüde yeterli boş alan yok; en az {0} MB gerekiyor.",

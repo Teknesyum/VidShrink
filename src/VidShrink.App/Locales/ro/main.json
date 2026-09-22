@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Decupează și salvează",
   "main.run.accepted-larger": "Acceptat mai mare: {0} MB peste ținta de {1} MB.",
   "main.run.trimmed": "{0} s au fost tăiate pentru a se încadra în țintă; durata {1} → {2}.",
+  "main.run.saturated": "Sursa a încăput în {0} MB la această calitate; un fișier de {1} MB nu ar fi arătat mai bine.",
   "main.run.whatsapp-document": "Trimite-l pe WhatsApp ca document, nu ca videoclip: astfel se sare peste recodificarea din conversație, iar celălalt vede această calitate așa cum este.",
 
   "main.run.no-space": "Nu este destul spațiu liber pe unitatea țintă; sunt necesari cel puțin {0} MB.",

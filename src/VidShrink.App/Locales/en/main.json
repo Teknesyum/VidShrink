@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Trim and save",
   "main.run.accepted-larger": "Accepted larger: {0} MB over the {1} MB target.",
   "main.run.trimmed": "{0} s was trimmed to fit the target; length {1} → {2}.",
+  "main.run.saturated": "The source fit in {0} MB at this quality; a {1} MB file would not have looked better.",
   "main.run.whatsapp-document": "Send this on WhatsApp as a document, not as a video: that skips the in-chat re-encode, so the other side sees this quality as it is.",
 
   "main.run.no-space": "Not enough free space on the target drive; at least {0} MB is needed.",

@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Rajaa ja tallenna",
   "main.run.accepted-larger": "Hyväksyttiin suurempana: {0} MB yli {1} MB:n tavoitteen.",
   "main.run.trimmed": "{0} s leikattiin tavoitteeseen sopimiseksi; kesto {1} → {2}.",
+  "main.run.saturated": "Lähde mahtui tällä laadulla {0} megatavuun; {1} Mt:n tiedosto ei olisi näyttänyt paremmalta.",
   "main.run.whatsapp-document": "Lähetä tiedosto WhatsAppiin dokumenttina eikä videona: näin keskustelun uudelleenkoodaus ohitetaan ja vastaanottaja näkee tämän laadun sellaisenaan.",
 
   "main.run.no-space": "Kohdeasemalla ei ole tarpeeksi vapaata tilaa; tarvitaan vähintään {0} MB.",

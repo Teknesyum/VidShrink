@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Beskær og gem",
   "main.run.accepted-larger": "Accepteret større: {0} MB over målet på {1} MB.",
   "main.run.trimmed": "{0} s blev beskåret for at passe til målet; længde {1} → {2}.",
+  "main.run.saturated": "Kilden fyldte {0} MB i denne kvalitet; en fil på {1} MB ville ikke have set bedre ud.",
   "main.run.whatsapp-document": "Send den til WhatsApp som et dokument, ikke som en video: det springer omkodningen i chatten over, så modtageren ser denne kvalitet uændret.",
 
   "main.run.no-space": "Ikke nok ledig plads på måldrevet; mindst {0} MB kræves.",

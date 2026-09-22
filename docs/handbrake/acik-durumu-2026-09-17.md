@@ -203,13 +203,13 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | B2 küçültmeye aralık | denetlenmedi | bu turda okunmadı |
 | B3 VT plan yolu / VP9 küçültme | yapılmadı | `Core/PlanParser.cs:13` `AllowedCodecs`'te `*_videotoolbox` yok; VP9 hâlâ yalnız dönüştürücüde |
 | B4 HDR10+/DV | yapılmadı | `hdr10plus\|dolby\|dovi\|dynamic_hdr` taraması 0 sonuç |
-| C1-1 `Saturated` satırı | yapılmadı | arayüzde tüketici yok |
+| C1-1 `Saturated` satırı | **girdi (22 Eylül)** | `MainWindow.SaturatedSuffix`, `ShrinkJobWindow.BittiSatiri`; `main.run.saturated` 42 dilde; `DoygunTeslimTests` 4/4, iki mutasyon kırmızı |
 | C1-2 kuyruk düzenleme | yapılmadı | — |
 | C1-3 klasör bırakma | yapılmadı | `MainWindow.axaml.cs:2759-2764` `IStorageFolder`'ı geri çeviriyor |
 | C1-4 "bitince" eylemi | yapılmadı | — |
 | C1-5 filtre paneli | **çekirdek var, yüzey yok** | mantık A1'de; arayüz tek metin kutusu (`MainWindow.axaml:629` → `MainWindow.axaml.cs:1988`) |
 | C1-6 iz paneli | yapılmadı | yalnız `ChkAdvKeepTracks` (`MainWindow.axaml:506`) |
-| C1-7 ön ayar yüzeyi | **kısmen** | `App/MainWindow.OnAyar.cs`, `PresetUndoBar` (`MainWindow.axaml:402`); içe/dışa aktarma yüzeyi dar |
+| C1-7 ön ayar yüzeyi | **girdi (22 Eylül)** | içe/dışa aktarma pencerede, HandBrake dosyası özetle (0666989b); CLI `--profil-dosyasi` (d17e0e3c) |
 | D2 karanlık geçişin kapsamı | genişletilmedi | `Core/DarkContentSwitch.cs:21-27` hâlâ Auto + Aggressive/Extreme + libsvtav1 |
 | D3 macOS 14 libmpv | **girdi** | `install-vidshrink.sh:298-305`, `tools/mpvkit-macos/mpvkit-1.0.0.lock`, `.github/workflows/macos-mpvkit.yml:106-159` |
 

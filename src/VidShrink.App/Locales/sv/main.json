@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Beskär och spara",
   "main.run.accepted-larger": "Accepterade större: {0} MB över målet på {1} MB.",
   "main.run.trimmed": "{0} s beskars för att passa målet; längd {1} → {2}.",
+  "main.run.saturated": "Källan fick plats på {0} MB i den här kvaliteten; en fil på {1} MB hade inte sett bättre ut.",
   "main.run.whatsapp-document": "Skicka den till WhatsApp som ett dokument, inte som en video: då hoppas omkodningen i chatten över och mottagaren ser den här kvaliteten oförändrad.",
 
   "main.run.no-space": "Inte tillräckligt ledigt utrymme på målenheten; minst {0} MB behövs.",

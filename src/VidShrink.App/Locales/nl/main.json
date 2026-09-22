@@ -245,6 +245,7 @@
   "main.retry.trim.confirm": "Bijsnijden en opslaan",
   "main.run.accepted-larger": "Groter geaccepteerd: {0} MB boven het doel van {1} MB.",
   "main.run.trimmed": "{0} s is bijgesneden om binnen het doel te passen; lengte {1} → {2}.",
+  "main.run.saturated": "De bron paste bij deze kwaliteit in {0} MB; een bestand van {1} MB had er niet beter uitgezien.",
   "main.run.whatsapp-document": "Stuur het op WhatsApp als document, niet als video: zo wordt het hercoderen in de chat overgeslagen en ziet de ander deze kwaliteit ongewijzigd.",
 
   "main.run.no-space": "Niet genoeg vrije ruimte op de doelschijf; er is minstens {0} MB nodig.",

@@ -2791,6 +2791,16 @@ public partial class MainWindow : Window
         return path;
     }
 
+    /// <summary>
+    /// C1-1: kalite doyduğu için hedefin altında teslim edilen dosya bir cümle alır; hedefi aşan ya da
+    /// kırpılan teslim kendi cümlesini zaten taşıdığı için almaz.
+    /// </summary>
+    internal static bool ShowsSaturated(EncodeResult result) =>
+        result.Success && result.Saturated && !result.OverTarget && result.Trim is null;
+
+    internal static string SaturatedSuffix(EncodeResult result, double targetMb) =>
+        ShowsSaturated(result) ? " " + Say("main.run.saturated", Num(result.OutputMb, "0.0"), Num(targetMb, "0.##")) : "";
+
     private void ReportSourceError(string message)
     {
         TxtSourceStatus.Text = message;
@@ -3937,6 +3947,7 @@ public partial class MainWindow : Window
                     TxtResult.Text += " " + Say("main.run.accepted-larger", Num(result.OutputMb - targetMb, "0.00"), Num(targetMb, "0.##"));
                 if (result.Trim is { } trim)
                     TxtResult.Text += " " + Say("main.run.trimmed", Num(trim.RemovedSeconds, "0.#"), Clock(trim.DurationSeconds), Clock(trim.KeptSeconds));
+                TxtResult.Text += SaturatedSuffix(result, targetMb);
                 TxtResult.Text += WhatsAppDocumentHint(targetMb);
             }
             else if (result.CeilingExceeded)
