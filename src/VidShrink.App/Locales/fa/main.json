@@ -63,8 +63,9 @@
   "main.drop.title": "فایل رسانه را اینجا رها کنید",
   "main.drop.hint": "هر قالبی که ffmpeg باز می‌کند",
   "main.drop.release": "رها کنید تا این فایل بارگذاری شود",
-  "main.drop.single": "هر بار فقط یک فایل",
-  "main.drop.no-folder": "پوشه را نمی‌توان رها کرد",
+  "main.drop.batch": "رها کنید: {0} ویدیو در صف قرار می‌گیرد",
+  "main.drop.batch-hint": "یکی‌یکی با تنظیمات فعلی کوچک می‌شوند",
+  "main.drop.none": "اینجا ویدیویی برای کوچک کردن نیست",
 
   "main.title.label": "عنوان",
   "main.info.duration": "مدت",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "مونو",
 
   "main.shrink-job.waiting": "در انتظار درخواست پوسته",
+  "main.shrink-job.batch": "ویدیوهای در صف: {0}",
   "main.shrink-job.rejected": "درخواست فشرده‌سازی پذیرفته نشد",
   "main.shrink-job.target": "هدف {0} — فایل {1} از {2}",
   "main.shrink-job.open-in-app": "باز کردن در برنامه",

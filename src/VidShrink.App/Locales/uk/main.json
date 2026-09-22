@@ -63,8 +63,9 @@
   "main.drop.title": "Перетягніть медіафайл сюди",
   "main.drop.hint": "Будь-який формат, який відкриває ffmpeg",
   "main.drop.release": "Відпустіть, щоб завантажити файл",
-  "main.drop.single": "Лише один файл за раз",
-  "main.drop.no-folder": "Теки перетягувати не можна",
+  "main.drop.batch": "Відпустіть: {0} відео стануть у чергу",
+  "main.drop.batch-hint": "Стискаються по одному з поточними налаштуваннями",
+  "main.drop.none": "Тут немає відео для стиснення",
 
   "main.title.label": "Заголовок",
   "main.info.duration": "Тривалість",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "моно",
 
   "main.shrink-job.waiting": "Очікування запиту від оболонки",
+  "main.shrink-job.batch": "Відео в черзі: {0}",
   "main.shrink-job.rejected": "Запит на стиснення не прийнято",
   "main.shrink-job.target": "Ціль {0} — файл {1} з {2}",
   "main.shrink-job.open-in-app": "Відкрити в програмі",

@@ -83,6 +83,9 @@ public partial class ShrinkJobWindow : Window
     private bool _started;
     private int _accepted;
     private int _finished;
+    private PlanOptions? _template;
+    private bool _ceilingTarget;
+    private string? _extension;
 
     public ShrinkJobWindow() : this(new ShellShrinkStartup(null, ShrinkArgumentProblem.NoTarget, null), null)
     {
@@ -127,6 +130,35 @@ public partial class ShrinkJobWindow : Window
         TxtMessage.Text = "";
         TxtNotice.Text = "";
     }
+
+    /// <summary>
+    /// C1-3: ana pencereye birden çok video ya da klasör bırakıldığında açılan kuyruk. Her dosya
+    /// pencerenin o anki seçeneklerinin kopyasıyla kurulur; boyut tavanı olmayan yongada hedef
+    /// dosyanın kendi kalite tavanından hesaplanır. <paramref name="extension"/> ön ayar kabından gelir.
+    /// </summary>
+    internal ShrinkJobWindow(IReadOnlyList<string> paths, PlanOptions template, bool ceilingTarget, string? extension)
+        : this(new ShellShrinkStartup(paths.Select(path => new ShrinkRequest(0, path)).ToList(), null, paths.FirstOrDefault()), null)
+    {
+        _template = template;
+        _ceilingTarget = ceilingTarget;
+        _extension = extension;
+        TxtHeadline.Text = Say("main.shrink-job.batch", paths.Count);
+    }
+
+    /// <summary>İsteğin plan seçenekleri ve hedefi. Kabuk isteği yalnız hedefi taşır; bırakılan kuyruk pencerenin ayarlarını.</summary>
+    internal (PlanOptions Options, double TargetMb) OptionsFor(ShrinkRequest request, MediaInfo info)
+    {
+        if (_template is null) return (new PlanOptions { TargetMb = request.TargetMegabytes }, request.TargetMegabytes);
+        var targetMb = _ceilingTarget ? PlanCalculator.QualityCeilingTargetMb(info) : _template.TargetMb;
+        return (PlanCalculator.WithTarget(_template, targetMb), targetMb);
+    }
+
+    internal string ExtensionFor(EncodePlan plan) => _extension ?? plan.Streams?.Extension ?? "mp4";
+
+    private string TargetLabel(double targetMb)
+        => _template is null
+            ? ShellIntegration.FormatQuickShrinkLabel((int)targetMb)
+            : Bicim.Boyut.Hedef(targetMb, Strings.CultureOf(_language)) + " MB";
 
     private void OnShellPointerPressed(object? sender, PointerPressedEventArgs e)
     {
@@ -251,10 +283,7 @@ public partial class ShrinkJobWindow : Window
         ResetShare(false);
         Progress.Value = 0;
         TxtHeadline.Text = Path.GetFileName(request.Path);
-        TxtTarget.Text = Say("main.shrink-job.target",
-            ShellIntegration.FormatQuickShrinkLabel(request.TargetMegabytes),
-            _finished + 1,
-            _accepted);
+        TxtTarget.Text = "";
         TxtMessage.Text = "";
 
         var cts = new CancellationTokenSource();
@@ -262,9 +291,10 @@ public partial class ShrinkJobWindow : Window
         try
         {
             var info = await FfprobeClient.ProbeAsync(request.Path, cts.Token);
-            var options = new PlanOptions { TargetMb = request.TargetMegabytes };
+            var (options, targetMb) = OptionsFor(request, info);
+            TxtTarget.Text = Say("main.shrink-job.target", TargetLabel(targetMb), _finished + 1, _accepted);
             var plan = PlanCalculator.Build(info, options);
-            var output = UniqueOutputPath(request.Path, _appSettings, plan, request.TargetMegabytes);
+            var output = UniqueOutputPath(request.Path, _appSettings, plan, targetMb, ExtensionFor(plan));
 
             var progress = new Progress<EncodeProgress>(step =>
             {
@@ -274,21 +304,21 @@ public partial class ShrinkJobWindow : Window
             });
 
             var result = await new EncodeRunner().RunAsync(
-                info, plan, output, request.TargetMegabytes, progress, cts.Token, options.FillPolicy);
+                info, plan, output, targetMb, progress, cts.Token, options.FillPolicy);
 
             if (result.Success)
             {
                 _outputs.Add(result.OutputPath);
                 State = ShrinkJobState.Bitti;
                 Progress.Value = 1;
-                TxtMessage.Text = BittiSatiri(result, request.TargetMegabytes);
+                TxtMessage.Text = BittiSatiri(result, targetMb);
                 BtnReveal.IsVisible = true;
                 ResetShare(true);
             }
             else
             {
                 State = ShrinkJobState.Hata;
-                TxtMessage.Text = HataSatiri(result, request.TargetMegabytes);
+                TxtMessage.Text = HataSatiri(result, targetMb);
                 BtnOpenInApp.IsVisible = true;
             }
         }
@@ -368,11 +398,11 @@ public partial class ShrinkJobWindow : Window
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return new AppSettings(); }
     }
 
-    internal static string UniqueOutputPath(string inputPath, AppSettings settings, EncodePlan? plan, double targetMb)
+    internal static string UniqueOutputPath(string inputPath, AppSettings settings, EncodePlan? plan, double targetMb, string extension = "mp4")
         => ShrinkEngine.UniqueOutputPath(
             inputPath,
             "shrunk",
-            "mp4",
+            extension,
             MainWindow.UsableFixedFolder(settings.OutputFolderMode, settings.OutputFolder),
             AdlandirmaDeseni.Uygula(settings.OutputNamePattern, new AdBilgisi(ShrinkEngine.KaynakAdi(inputPath))
             {

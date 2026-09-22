@@ -63,8 +63,9 @@
   "main.drop.title": "Húzzon ide egy médiafájlt",
   "main.drop.hint": "Bármely formátum, amit az ffmpeg megnyit",
   "main.drop.release": "Engedje el a fájl betöltéséhez",
-  "main.drop.single": "Egyszerre csak egy fájl",
-  "main.drop.no-folder": "Mappa nem húzható ide",
+  "main.drop.batch": "Engedje el: {0} videó kerül a sorba",
+  "main.drop.batch-hint": "Egyenként kicsinyítve a jelenlegi beállításokkal",
+  "main.drop.none": "Itt nincs kicsinyíthető videó",
 
   "main.title.label": "Cím",
   "main.info.duration": "Hossz",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "monó",
 
   "main.shrink-job.waiting": "Várakozás a héjkérésre",
+  "main.shrink-job.batch": "Sorban álló videók: {0}",
   "main.shrink-job.rejected": "A tömörítési kérést nem fogadtuk el",
   "main.shrink-job.target": "Cél: {0} — {1}. fájl a(z) {2}-ból",
   "main.shrink-job.open-in-app": "Megnyitás az alkalmazásban",

@@ -1086,7 +1086,8 @@ public static class PlanCalculator
 
     private static PlanOptions CopyOptions(PlanOptions options) => WithTarget(options, options.TargetMb);
 
-    private static PlanOptions WithTarget(PlanOptions options, double targetMb) => new()
+    /// <summary>Seçeneklerin hedefi değiştirilmiş kopyası; kuyruğa giden her dosya pencerenin ayarlarını bununla alır.</summary>
+    public static PlanOptions WithTarget(PlanOptions options, double targetMb) => new()
     {
         TargetMb = targetMb,
         Intent = options.Intent,

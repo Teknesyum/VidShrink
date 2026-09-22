@@ -122,6 +122,7 @@ public partial class MainWindow : Window
     private bool _chromeShown = true;
     private HoverZone? _chromeZone;
     private DropVisual _dropVisual = DropVisual.Idle;
+    private IReadOnlyList<string>? _dropBatch;
     private DispatcherTimer? _recalculateTimer;
     private DateTime _lastEstimatePulse = DateTime.MinValue;
     private bool _controlsReady;
@@ -2727,7 +2728,8 @@ public partial class MainWindow : Window
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        var accepted = _cts is null && TryGetDroppedFile(e) is not null;
+        _dropBatch ??= DroppedBatch(e);
+        var accepted = _cts is null && (TryGetDroppedFile(e) is not null || _dropBatch.Count > 1);
         e.DragEffects = accepted ? DragDropEffects.Copy : DragDropEffects.None;
         SetDropVisual(accepted ? DropVisual.Accept : DropVisual.Reject);
         e.Handled = true;
@@ -2735,6 +2737,7 @@ public partial class MainWindow : Window
 
     private void OnDragLeave(object? sender, DragEventArgs e)
     {
+        _dropBatch = null;
         SetDropVisual(DropVisual.Idle);
         e.Handled = true;
     }
@@ -2742,10 +2745,27 @@ public partial class MainWindow : Window
     private async void OnDrop(object? sender, DragEventArgs e)
     {
         var file = TryGetDroppedFile(e);
+        var batch = _dropBatch ?? DroppedBatch(e);
+        _dropBatch = null;
         e.Handled = true;
         SetDropVisual(DropVisual.Idle);
-        if (_cts is not null || file is null) return;
-        await LoadAsync(file);
+        if (_cts is not null) return;
+        if (file is not null) await LoadAsync(file);
+        else if (batch.Count > 1) OpenBatch(batch).Show();
+    }
+
+    /// <summary>
+    /// C1-3: birden çok video ya da klasör kuyruk penceresine gider, pencerenin o anki seçenekleriyle.
+    /// Tek video bugünkü gibi bu pencereye yüklenir.
+    /// </summary>
+    internal ShrinkJobWindow OpenBatch(IReadOnlyList<string> paths)
+        => new(paths, CurrentOptions(), !_chipSizeCapped && _info is not null, PresetLibrary.DeliveredExtension(_presetContainer));
+
+    private static IReadOnlyList<string> DroppedBatch(DragEventArgs e)
+    {
+        var items = e.DataTransfer.TryGetFiles();
+        if (items is null) return Array.Empty<string>();
+        return DroppedMedia.Collect(items.Select(item => item.TryGetLocalPath()).OfType<string>());
     }
 
     private void SetDropVisual(DropVisual state)
@@ -2772,12 +2792,13 @@ public partial class MainWindow : Window
     {
         var (title, hint) = _dropVisual switch
         {
+            DropVisual.Accept when _dropBatch is { Count: > 1 } => ("main.drop.batch", "main.drop.batch-hint"),
             DropVisual.Accept => ("main.drop.release", "main.drop.hint"),
-            DropVisual.Reject => ("main.drop.single", "main.drop.no-folder"),
+            DropVisual.Reject => ("main.drop.none", "main.drop.hint"),
             _ => ("main.drop.title", "main.drop.hint")
         };
 
-        TxtDropTitle.Text = Say(title);
+        TxtDropTitle.Text = title == "main.drop.batch" ? Say(title, _dropBatch!.Count) : Say(title);
         TxtDropHint.Text = Say(hint);
     }
 

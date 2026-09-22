@@ -63,8 +63,9 @@
   "main.drop.title": "Trascina qui un file multimediale",
   "main.drop.hint": "Qualsiasi formato che ffmpeg può aprire",
   "main.drop.release": "Rilascia per caricare questo file",
-  "main.drop.single": "Un solo file alla volta",
-  "main.drop.no-folder": "Le cartelle non possono essere trascinate",
+  "main.drop.batch": "Rilascia: {0} video andranno in coda",
+  "main.drop.batch-hint": "Ridotti uno alla volta con le impostazioni attuali",
+  "main.drop.none": "Nessun video da ridurre qui",
 
   "main.title.label": "Titolo",
   "main.info.duration": "Durata",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "In attesa della richiesta dalla shell",
+  "main.shrink-job.batch": "{0} video in coda",
   "main.shrink-job.rejected": "La richiesta di riduzione non è stata accettata",
   "main.shrink-job.target": "Obiettivo {0} — file {1} di {2}",
   "main.shrink-job.open-in-app": "Apri nell'app",

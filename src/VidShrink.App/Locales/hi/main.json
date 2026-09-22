@@ -63,8 +63,9 @@
   "main.drop.title": "मीडिया फ़ाइल यहाँ छोड़ें",
   "main.drop.hint": "ffmpeg जो भी खोल सके",
   "main.drop.release": "यह फ़ाइल लोड करने के लिए छोड़ें",
-  "main.drop.single": "एक बार में एक ही फ़ाइल",
-  "main.drop.no-folder": "फ़ोल्डर छोड़े नहीं जा सकते",
+  "main.drop.batch": "छोड़ें: {0} वीडियो कतार में जाएंगे",
+  "main.drop.batch-hint": "मौजूदा सेटिंग्स के साथ एक-एक करके छोटे किए जाते हैं",
+  "main.drop.none": "यहां छोटा करने के लिए कोई वीडियो नहीं है",
 
   "main.title.label": "शीर्षक",
   "main.info.duration": "अवधि",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "मोनो",
 
   "main.shrink-job.waiting": "शेल अनुरोध की प्रतीक्षा",
+  "main.shrink-job.batch": "कतार में वीडियो: {0}",
   "main.shrink-job.rejected": "सिकोड़ने का अनुरोध स्वीकार नहीं हुआ",
   "main.shrink-job.target": "लक्ष्य {0} — फ़ाइल {1} / {2}",
   "main.shrink-job.open-in-app": "ऐप में खोलें",

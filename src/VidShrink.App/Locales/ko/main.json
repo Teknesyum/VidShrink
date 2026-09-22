@@ -63,8 +63,9 @@
   "main.drop.title": "미디어 파일을 여기에 놓으세요",
   "main.drop.hint": "ffmpeg가 열 수 있는 모든 형식",
   "main.drop.release": "놓으면 이 파일을 불러옵니다",
-  "main.drop.single": "한 번에 파일 하나만",
-  "main.drop.no-folder": "폴더는 놓을 수 없습니다",
+  "main.drop.batch": "놓으면 동영상 {0}개가 대기열에 들어갑니다",
+  "main.drop.batch-hint": "현재 설정으로 하나씩 줄입니다",
+  "main.drop.none": "여기에는 줄일 동영상이 없습니다",
 
   "main.title.label": "타이틀",
   "main.info.duration": "길이",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "모노",
 
   "main.shrink-job.waiting": "셸 요청 대기 중",
+  "main.shrink-job.batch": "대기열의 동영상: {0}",
   "main.shrink-job.rejected": "축소 요청이 수락되지 않았습니다",
   "main.shrink-job.target": "목표 {0} — 파일 {1} / {2}",
   "main.shrink-job.open-in-app": "앱에서 열기",

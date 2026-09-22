@@ -63,8 +63,9 @@
   "main.drop.title": "Bir medya dosyasını buraya bırakın",
   "main.drop.hint": "Ffmpeg'in açabildiği her biçim",
   "main.drop.release": "Yüklemek için bırakın",
-  "main.drop.single": "Bir seferde tek dosya",
-  "main.drop.no-folder": "Klasör bırakılamaz",
+  "main.drop.batch": "Bırakın: {0} video sıraya girecek",
+  "main.drop.batch-hint": "Şimdiki ayarlarla tek tek küçültülür",
+  "main.drop.none": "Burada küçültülecek video yok",
 
   "main.title.label": "Başlık",
   "main.info.duration": "Süre",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "tek kanal",
 
   "main.shrink-job.waiting": "Kabuk isteği bekleniyor",
+  "main.shrink-job.batch": "{0} video sırada",
   "main.shrink-job.rejected": "Küçültme isteği kabul edilmedi",
   "main.shrink-job.target": "Hedef {0} — {2} dosyadan {1}.",
   "main.shrink-job.open-in-app": "Uygulamada aç",

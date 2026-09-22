@@ -63,8 +63,9 @@
   "main.drop.title": "Upuść tu plik multimedialny",
   "main.drop.hint": "Dowolny format, który otwiera ffmpeg",
   "main.drop.release": "Puść, aby wczytać ten plik",
-  "main.drop.single": "Tylko jeden plik naraz",
-  "main.drop.no-folder": "Nie można upuszczać folderów",
+  "main.drop.batch": "Upuść: {0} filmów trafi do kolejki",
+  "main.drop.batch-hint": "Zmniejszane po kolei z bieżącymi ustawieniami",
+  "main.drop.none": "Brak filmu do zmniejszenia",
 
   "main.title.label": "Tytuł",
   "main.info.duration": "Czas trwania",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Oczekiwanie na żądanie z powłoki",
+  "main.shrink-job.batch": "Filmy w kolejce: {0}",
   "main.shrink-job.rejected": "Żądanie zmniejszenia nie zostało przyjęte",
   "main.shrink-job.target": "Cel {0} — plik {1} z {2}",
   "main.shrink-job.open-in-app": "Otwórz w aplikacji",

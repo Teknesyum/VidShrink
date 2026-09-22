@@ -63,8 +63,9 @@
   "main.drop.title": "Ispustite medijsku datoteku ovdje",
   "main.drop.hint": "Bilo koji format koji ffmpeg može otvoriti",
   "main.drop.release": "Pustite za učitavanje ove datoteke",
-  "main.drop.single": "Samo jedna datoteka odjednom",
-  "main.drop.no-folder": "Mape se ne mogu ispustiti",
+  "main.drop.batch": "Otpustite: {0} videozapisa ide u red",
+  "main.drop.batch-hint": "Smanjuju se jedan po jedan s trenutnim postavkama",
+  "main.drop.none": "Ovdje nema videozapisa za smanjivanje",
 
   "main.title.label": "Naslov",
   "main.info.duration": "Trajanje",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Čekanje zahtjeva iz ljuske",
+  "main.shrink-job.batch": "Videozapisi u redu: {0}",
   "main.shrink-job.rejected": "Zahtjev za smanjivanje nije prihvaćen",
   "main.shrink-job.target": "Cilj {0} — datoteka {1} od {2}",
   "main.shrink-job.open-in-app": "Otvori u aplikaciji",

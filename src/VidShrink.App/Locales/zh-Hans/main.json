@@ -63,8 +63,9 @@
   "main.drop.title": "将媒体文件拖到此处",
   "main.drop.hint": "ffmpeg 能打开的任何格式",
   "main.drop.release": "松开以加载此文件",
-  "main.drop.single": "一次只能一个文件",
-  "main.drop.no-folder": "不能拖放文件夹",
+  "main.drop.batch": "松开：{0} 个视频将加入队列",
+  "main.drop.batch-hint": "按当前设置逐个压缩",
+  "main.drop.none": "这里没有可压缩的视频",
 
   "main.title.label": "标题",
   "main.info.duration": "时长",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "单声道",
 
   "main.shrink-job.waiting": "正在等待外壳请求",
+  "main.shrink-job.batch": "队列中的视频：{0}",
   "main.shrink-job.rejected": "压缩请求未被接受",
   "main.shrink-job.target": "目标 {0} — 文件 {1}/{2}",
   "main.shrink-job.open-in-app": "在应用中打开",

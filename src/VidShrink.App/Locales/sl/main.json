@@ -63,8 +63,9 @@
   "main.drop.title": "Sem spustite medijsko datoteko",
   "main.drop.hint": "Katera koli oblika, ki jo ffmpeg odpre",
   "main.drop.release": "Spustite, da naložite to datoteko",
-  "main.drop.single": "Samo ena datoteka naenkrat",
-  "main.drop.no-folder": "Map ni mogoče spustiti",
+  "main.drop.batch": "Spustite: {0} videoposnetkov bo v čakalni vrsti",
+  "main.drop.batch-hint": "Pomanjšani eden za drugim s trenutnimi nastavitvami",
+  "main.drop.none": "Tukaj ni videa za pomanjšanje",
 
   "main.title.label": "Naslov",
   "main.info.duration": "Trajanje",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Čakanje na zahtevo lupine",
+  "main.shrink-job.batch": "Videi v vrsti: {0}",
   "main.shrink-job.rejected": "Zahteva za krčenje ni bila sprejeta",
   "main.shrink-job.target": "Cilj {0} — datoteka {1} od {2}",
   "main.shrink-job.open-in-app": "Odpri v aplikaciji",

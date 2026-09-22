@@ -63,8 +63,9 @@
   "main.drop.title": "メディアファイルをここにドロップ",
   "main.drop.hint": "ffmpegが開ける形式ならすべて対応",
   "main.drop.release": "離すとこのファイルを読み込みます",
-  "main.drop.single": "一度に1ファイルのみ",
-  "main.drop.no-folder": "フォルダーはドロップできません",
+  "main.drop.batch": "ドロップすると {0} 本の動画がキューに入ります",
+  "main.drop.batch-hint": "現在の設定で1本ずつ縮小されます",
+  "main.drop.none": "縮小できる動画がありません",
 
   "main.title.label": "タイトル",
   "main.info.duration": "長さ",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "モノラル",
 
   "main.shrink-job.waiting": "シェルからの要求を待機中",
+  "main.shrink-job.batch": "キュー内の動画: {0}",
   "main.shrink-job.rejected": "圧縮の要求は受理されませんでした",
   "main.shrink-job.target": "目標 {0} — ファイル {1} / {2}",
   "main.shrink-job.open-in-app": "アプリで開く",

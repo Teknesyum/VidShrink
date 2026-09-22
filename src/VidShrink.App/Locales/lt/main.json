@@ -63,8 +63,9 @@
   "main.drop.title": "Numeskite medijos failą čia",
   "main.drop.hint": "Bet koks formatas, kurį atidaro ffmpeg",
   "main.drop.release": "Paleiskite, kad įkeltumėte šį failą",
-  "main.drop.single": "Tik vienas failas vienu metu",
-  "main.drop.no-folder": "Aplankų numesti negalima",
+  "main.drop.batch": "Paleiskite: {0} vaizdo įrašai bus įtraukti į eilę",
+  "main.drop.batch-hint": "Mažinami po vieną su dabartiniais nustatymais",
+  "main.drop.none": "Čia nėra vaizdo įrašo, kurį būtų galima sumažinti",
 
   "main.title.label": "Pavadinimas",
   "main.info.duration": "Trukmė",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Laukiama apvalkalo užklausos",
+  "main.shrink-job.batch": "Vaizdo įrašai eilėje: {0}",
   "main.shrink-job.rejected": "Mažinimo užklausa nepriimta",
   "main.shrink-job.target": "Tikslas {0} — failas {1} iš {2}",
   "main.shrink-job.open-in-app": "Atidaryti programoje",

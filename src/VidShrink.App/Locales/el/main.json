@@ -63,8 +63,9 @@
   "main.drop.title": "Αφήστε εδώ ένα αρχείο πολυμέσων",
   "main.drop.hint": "Κάθε μορφή που ανοίγει το ffmpeg",
   "main.drop.release": "Αφήστε για να φορτωθεί το αρχείο",
-  "main.drop.single": "Ένα αρχείο τη φορά",
-  "main.drop.no-folder": "Δεν γίνεται απόθεση φακέλων",
+  "main.drop.batch": "Αφήστε: {0} βίντεο θα μπουν στην ουρά",
+  "main.drop.batch-hint": "Σμικρύνονται ένα-ένα με τις τρέχουσες ρυθμίσεις",
+  "main.drop.none": "Δεν υπάρχει βίντεο για σμίκρυνση εδώ",
 
   "main.title.label": "Τίτλος",
   "main.info.duration": "Διάρκεια",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "μονοφωνικό",
 
   "main.shrink-job.waiting": "Αναμονή για το αίτημα του κελύφους",
+  "main.shrink-job.batch": "Βίντεο στην ουρά: {0}",
   "main.shrink-job.rejected": "Το αίτημα σμίκρυνσης δεν έγινε δεκτό",
   "main.shrink-job.target": "Στόχος {0} — αρχείο {1} από {2}",
   "main.shrink-job.open-in-app": "Άνοιγμα στην εφαρμογή",

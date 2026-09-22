@@ -63,8 +63,9 @@
   "main.drop.title": "Перетащите сюда медиафайл",
   "main.drop.hint": "Любой формат, который открывает ffmpeg",
   "main.drop.release": "Отпустите, чтобы загрузить файл",
-  "main.drop.single": "Только один файл за раз",
-  "main.drop.no-folder": "Папки перетаскивать нельзя",
+  "main.drop.batch": "Отпустите: {0} видео встанут в очередь",
+  "main.drop.batch-hint": "Сжимаются по одному с текущими настройками",
+  "main.drop.none": "Здесь нет видео для сжатия",
 
   "main.title.label": "Заголовок",
   "main.info.duration": "Длительность",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "моно",
 
   "main.shrink-job.waiting": "Ожидание запроса из оболочки",
+  "main.shrink-job.batch": "Видео в очереди: {0}",
   "main.shrink-job.rejected": "Запрос на сжатие не принят",
   "main.shrink-job.target": "Цель {0} — файл {1} из {2}",
   "main.shrink-job.open-in-app": "Открыть в приложении",

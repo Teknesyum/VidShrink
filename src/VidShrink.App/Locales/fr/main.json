@@ -63,8 +63,9 @@
   "main.drop.title": "Déposez un fichier média ici",
   "main.drop.hint": "Tout format que ffmpeg peut ouvrir",
   "main.drop.release": "Relâchez pour charger ce fichier",
-  "main.drop.single": "Un seul fichier à la fois",
-  "main.drop.no-folder": "Les dossiers ne peuvent pas être déposés",
+  "main.drop.batch": "Relâchez : {0} vidéos seront mises en file",
+  "main.drop.batch-hint": "Réduites une à une avec les réglages actuels",
+  "main.drop.none": "Aucune vidéo à réduire ici",
 
   "main.title.label": "Titre",
   "main.info.duration": "Durée",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "En attente de la requête du shell",
+  "main.shrink-job.batch": "{0} vidéos en file",
   "main.shrink-job.rejected": "La requête de réduction n'a pas été acceptée",
   "main.shrink-job.target": "Cible {0} — fichier {1} sur {2}",
   "main.shrink-job.open-in-app": "Ouvrir dans l'application",

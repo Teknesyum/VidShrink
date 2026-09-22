@@ -63,8 +63,9 @@
   "main.drop.title": "Trage un fișier media aici",
   "main.drop.hint": "Orice format pe care ffmpeg îl poate deschide",
   "main.drop.release": "Eliberează ca să încarci acest fișier",
-  "main.drop.single": "Un singur fișier odată",
-  "main.drop.no-folder": "Dosarele nu pot fi trase aici",
+  "main.drop.batch": "Eliberați: {0} videoclipuri intră în coadă",
+  "main.drop.batch-hint": "Micșorate pe rând cu setările curente",
+  "main.drop.none": "Nu există niciun videoclip de micșorat aici",
 
   "main.title.label": "Titlu",
   "main.info.duration": "Durată",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Se așteaptă cererea din shell",
+  "main.shrink-job.batch": "Videoclipuri în coadă: {0}",
   "main.shrink-job.rejected": "Cererea de micșorare nu a fost acceptată",
   "main.shrink-job.target": "Țintă {0} — fișierul {1} din {2}",
   "main.shrink-job.open-in-app": "Deschide în aplicație",

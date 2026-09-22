@@ -63,8 +63,9 @@
   "main.drop.title": "Pudota mediatiedosto tähän",
   "main.drop.hint": "Mikä tahansa muoto, jonka ffmpeg avaa",
   "main.drop.release": "Vapauta ladataksesi tiedoston",
-  "main.drop.single": "Vain yksi tiedosto kerrallaan",
-  "main.drop.no-folder": "Kansioita ei voi pudottaa",
+  "main.drop.batch": "Pudota: {0} videota lisätään jonoon",
+  "main.drop.batch-hint": "Pienennetään yksi kerrallaan nykyisillä asetuksilla",
+  "main.drop.none": "Täällä ei ole pienennettävää videota",
 
   "main.title.label": "Nimike",
   "main.info.duration": "Kesto",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Odotetaan shell-pyyntöä",
+  "main.shrink-job.batch": "{0} videota jonossa",
   "main.shrink-job.rejected": "Pakkauspyyntöä ei hyväksytty",
   "main.shrink-job.target": "Kohde {0} — tiedosto {1} / {2}",
   "main.shrink-job.open-in-app": "Avaa sovelluksessa",

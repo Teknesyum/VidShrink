@@ -63,8 +63,9 @@
   "main.drop.title": "วางไฟล์สื่อที่นี่",
   "main.drop.hint": "ทุกรูปแบบที่ ffmpeg เปิดได้",
   "main.drop.release": "ปล่อยเพื่อโหลดไฟล์นี้",
-  "main.drop.single": "ครั้งละหนึ่งไฟล์เท่านั้น",
-  "main.drop.no-folder": "วางโฟลเดอร์ไม่ได้",
+  "main.drop.batch": "ปล่อย: วิดีโอ {0} รายการจะเข้าคิว",
+  "main.drop.batch-hint": "ย่อทีละรายการด้วยการตั้งค่าปัจจุบัน",
+  "main.drop.none": "ไม่มีวิดีโอให้ย่อที่นี่",
 
   "main.title.label": "ชื่อเรื่อง",
   "main.info.duration": "ความยาว",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "โมโน",
 
   "main.shrink-job.waiting": "กำลังรอคำขอจากเชลล์",
+  "main.shrink-job.batch": "วิดีโอในคิว: {0}",
   "main.shrink-job.rejected": "คำขอย่อไม่ได้รับการยอมรับ",
   "main.shrink-job.target": "เป้าหมาย {0} — ไฟล์ {1} จาก {2}",
   "main.shrink-job.open-in-app": "เปิดในแอป",

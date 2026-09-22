@@ -63,8 +63,9 @@
   "main.drop.title": "Jatuhkan berkas media di sini",
   "main.drop.hint": "Format apa pun yang bisa dibuka ffmpeg",
   "main.drop.release": "Lepaskan untuk memuat berkas ini",
-  "main.drop.single": "Hanya satu berkas sekaligus",
-  "main.drop.no-folder": "Folder tidak dapat dijatuhkan",
+  "main.drop.batch": "Lepaskan: {0} video akan masuk antrean",
+  "main.drop.batch-hint": "Dikecilkan satu per satu dengan pengaturan saat ini",
+  "main.drop.none": "Tidak ada video untuk dikecilkan di sini",
 
   "main.title.label": "Judul",
   "main.info.duration": "Durasi",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Menunggu permintaan shell",
+  "main.shrink-job.batch": "Video dalam antrean: {0}",
   "main.shrink-job.rejected": "Permintaan perkecil tidak diterima",
   "main.shrink-job.target": "Target {0} — berkas {1} dari {2}",
   "main.shrink-job.open-in-app": "Buka di aplikasi",

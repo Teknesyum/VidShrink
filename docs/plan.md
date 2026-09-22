@@ -1414,3 +1414,32 @@ Dal `worktree-agent-ac648426fe8f56b4a`. Arayüz (MainWindow.axaml) bu işin dı�
 
 Ölçü: her madde yeni sınıf, olumsuz kontrol, ≤3 sn lavfi canlı kol, ≥2 mutasyon
 (`docs/olcumler/b1-kalan-mutasyonlar.md`).
+
+## C1-3 — Klasör ve Çoklu Dosya Bırakma (22 Eylül 2026)
+
+### Bulgu
+
+Ana pencere tek dosya kabul ediyor; klasör ya da iki dosya bırakılınca "Klasör bırakılamaz"
+diyor. Kuyruk penceresi (`ShrinkJobWindow`) zaten sırayla küçültüyor ama yalnız kabuk
+menüsünden besleniyor ve her işi `new PlanOptions { TargetMb }` ile kuruyor: pencerede
+seçilen kodek, çözünürlük, iz ve gelişmiş kollar kuyruğa geçmiyor. Çıktı uzantısı da
+`"mp4"` diye sabit; MKV'ye düşen plan `.mp4` adıyla yazılırdı.
+
+### Karar
+
+- `Core/DroppedMedia.Collect`: bırakılan yolları sırayla gezer; dosya `WatchFolder.IsCandidate`
+  ise alınır, klasörün yalnız **üst düzeyi** taranır (alt klasöre inilmez, büyük bir arşivi
+  yanlışlıkla sıraya sokmamak için), sonuç ad sırasında ve tekrarsız.
+- Tek dosya bugünkü gibi ana pencereye yüklenir. İki ve üstü video kuyruk penceresine gider,
+  **o anki ayarların kopyasıyla** (`PlanCalculator.WithTarget` açılır). Boyut tavanı olmayan
+  yongada hedef her dosyanın kendi `QualityCeilingTargetMb`'sinden hesaplanır.
+- Kuyruk penceresinin çıktı uzantısı plandan (`plan.Streams.Extension`), ön ayar kabı
+  seçiliyse ondan gelir; kabuk menüsü kolu değişmez.
+- Bırakma yüzü sayıyı söyler: "Bırakın: 5 video sıraya girecek"; video yoksa "Burada
+  küçültülecek video yok". Eski `main.drop.single` / `main.drop.no-folder` kalkar.
+
+### Ölçü
+
+`KlasorBirakmaTests`: toplama (gizli dosya, video olmayan, alt klasör, tekrar, sıra — olumsuz
+kontroller), kuyruk penceresinin şablonu plana taşıması (kodek ve hedef), tavansız yongada
+dosya başına hedef, uzantının plandan gelmesi, yeni iki anahtarın 42 dilde. En az iki mutasyon.

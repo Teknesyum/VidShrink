@@ -63,8 +63,9 @@
   "main.drop.title": "میڈیا فائل یہاں چھوڑیں",
   "main.drop.hint": "کوئی بھی فارمیٹ جو ffmpeg کھول سکے",
   "main.drop.release": "یہ فائل لوڈ کرنے کے لیے چھوڑ دیں",
-  "main.drop.single": "ایک وقت میں صرف ایک فائل",
-  "main.drop.no-folder": "فولڈر نہیں چھوڑے جا سکتے",
+  "main.drop.batch": "چھوڑیں: {0} ویڈیوز قطار میں شامل ہوں گی",
+  "main.drop.batch-hint": "موجودہ ترتیبات کے ساتھ ایک ایک کر کے چھوٹی کی جاتی ہیں",
+  "main.drop.none": "یہاں چھوٹی کرنے کے لیے کوئی ویڈیو نہیں",
 
   "main.title.label": "عنوان",
   "main.info.duration": "دورانیہ",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "مونو",
 
   "main.shrink-job.waiting": "شیل درخواست کا انتظار",
+  "main.shrink-job.batch": "قطار میں ویڈیوز: {0}",
   "main.shrink-job.rejected": "سکیڑنے کی درخواست قبول نہیں ہوئی",
   "main.shrink-job.target": "ہدف {0} — فائل {1} از {2}",
   "main.shrink-job.open-in-app": "ایپ میں کھولیں",

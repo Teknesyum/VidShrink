@@ -63,8 +63,9 @@
   "main.drop.title": "Letakkan fail media di sini",
   "main.drop.hint": "Mana-mana format yang ffmpeg boleh buka",
   "main.drop.release": "Lepaskan untuk memuatkan fail ini",
-  "main.drop.single": "Satu fail sahaja pada satu masa",
-  "main.drop.no-folder": "Folder tidak boleh diletakkan",
+  "main.drop.batch": "Lepaskan: {0} video akan dimasukkan ke baris gilir",
+  "main.drop.batch-hint": "Dikecilkan satu demi satu dengan tetapan semasa",
+  "main.drop.none": "Tiada video untuk dikecilkan di sini",
 
   "main.title.label": "Tajuk",
   "main.info.duration": "Tempoh",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Menunggu permintaan shell",
+  "main.shrink-job.batch": "Video dalam baris gilir: {0}",
   "main.shrink-job.rejected": "Permintaan kecilkan tidak diterima",
   "main.shrink-job.target": "Sasaran {0} — fail {1} daripada {2}",
   "main.shrink-job.open-in-app": "Buka dalam aplikasi",

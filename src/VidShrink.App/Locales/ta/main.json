@@ -63,8 +63,9 @@
   "main.drop.title": "ஊடகக் கோப்பை இங்கே இடுங்கள்",
   "main.drop.hint": "ffmpeg திறக்கக்கூடிய எந்த வடிவமும்",
   "main.drop.release": "இந்தக் கோப்பை ஏற்ற விடுங்கள்",
-  "main.drop.single": "ஒரு நேரத்தில் ஒரு கோப்பு மட்டும்",
-  "main.drop.no-folder": "கோப்புறைகளை இட முடியாது",
+  "main.drop.batch": "விடுங்கள்: {0} வீடியோக்கள் வரிசையில் சேரும்",
+  "main.drop.batch-hint": "தற்போதைய அமைப்புகளுடன் ஒவ்வொன்றாகச் சுருக்கப்படும்",
+  "main.drop.none": "இங்கே சுருக்க வீடியோ இல்லை",
 
   "main.title.label": "தலைப்பு",
   "main.info.duration": "நீளம்",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "மோனோ",
 
   "main.shrink-job.waiting": "ஷெல் கோரிக்கைக்காகக் காத்திருக்கிறது",
+  "main.shrink-job.batch": "வரிசையில் வீடியோக்கள்: {0}",
   "main.shrink-job.rejected": "சுருக்கக் கோரிக்கை ஏற்கப்படவில்லை",
   "main.shrink-job.target": "இலக்கு {0} — கோப்பு {1} / {2}",
   "main.shrink-job.open-in-app": "பயன்பாட்டில் திற",

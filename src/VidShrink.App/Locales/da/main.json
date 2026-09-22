@@ -63,8 +63,9 @@
   "main.drop.title": "Slip en mediefil her",
   "main.drop.hint": "Alle formater ffmpeg kan åbne",
   "main.drop.release": "Slip for at indlæse denne fil",
-  "main.drop.single": "Kun én fil ad gangen",
-  "main.drop.no-folder": "Mapper kan ikke slippes",
+  "main.drop.batch": "Slip: {0} videoer sættes i kø",
+  "main.drop.batch-hint": "Formindskes én ad gangen med de nuværende indstillinger",
+  "main.drop.none": "Ingen video at formindske her",
 
   "main.title.label": "Titel",
   "main.info.duration": "Varighed",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Venter på shell-anmodningen",
+  "main.shrink-job.batch": "{0} videoer i kø",
   "main.shrink-job.rejected": "Krympeanmodningen blev ikke accepteret",
   "main.shrink-job.target": "Mål {0} — fil {1} af {2}",
   "main.shrink-job.open-in-app": "Åbn i appen",

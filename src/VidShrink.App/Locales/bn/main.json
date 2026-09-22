@@ -63,8 +63,9 @@
   "main.drop.title": "একটি মিডিয়া ফাইল এখানে ফেলুন",
   "main.drop.hint": "ffmpeg যে ফরম্যাট খুলতে পারে",
   "main.drop.release": "এই ফাইল লোড করতে ছেড়ে দিন",
-  "main.drop.single": "একবারে একটি ফাইল",
-  "main.drop.no-folder": "ফোল্ডার ফেলা যায় না",
+  "main.drop.batch": "ছেড়ে দিন: {0}টি ভিডিও সারিতে যাবে",
+  "main.drop.batch-hint": "বর্তমান সেটিংসে একে একে ছোট করা হয়",
+  "main.drop.none": "এখানে ছোট করার মতো কোনো ভিডিও নেই",
 
   "main.title.label": "শিরোনাম",
   "main.info.duration": "দৈর্ঘ্য",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "মোনো",
 
   "main.shrink-job.waiting": "শেল অনুরোধের অপেক্ষায়",
+  "main.shrink-job.batch": "সারিতে ভিডিও: {0}",
   "main.shrink-job.rejected": "সংকোচন অনুরোধ গৃহীত হয়নি",
   "main.shrink-job.target": "লক্ষ্য {0} — ফাইল {1}/{2}",
   "main.shrink-job.open-in-app": "অ্যাপে খুলুন",

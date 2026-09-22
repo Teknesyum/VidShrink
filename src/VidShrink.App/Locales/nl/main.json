@@ -63,8 +63,9 @@
   "main.drop.title": "Sleep hier een mediabestand heen",
   "main.drop.hint": "Elk formaat dat ffmpeg kan openen",
   "main.drop.release": "Laat los om dit bestand te laden",
-  "main.drop.single": "Slechts één bestand tegelijk",
-  "main.drop.no-folder": "Mappen kunnen niet worden neergezet",
+  "main.drop.batch": "Loslaten: {0} video's gaan in de wachtrij",
+  "main.drop.batch-hint": "Een voor een verkleind met de huidige instellingen",
+  "main.drop.none": "Hier is geen video om te verkleinen",
 
   "main.title.label": "Titel",
   "main.info.duration": "Duur",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Wachten op het shell-verzoek",
+  "main.shrink-job.batch": "{0} video's in de wachtrij",
   "main.shrink-job.rejected": "Het verkleinverzoek is niet geaccepteerd",
   "main.shrink-job.target": "Doel {0} — bestand {1} van {2}",
   "main.shrink-job.open-in-app": "Openen in de app",

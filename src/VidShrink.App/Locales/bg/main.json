@@ -63,8 +63,9 @@
   "main.drop.title": "Пуснете медиен файл тук",
   "main.drop.hint": "Всеки формат, който ffmpeg може да отвори",
   "main.drop.release": "Пуснете, за да заредите този файл",
-  "main.drop.single": "Само по един файл",
-  "main.drop.no-folder": "Папки не могат да се пускат",
+  "main.drop.batch": "Пуснете: {0} видеа ще влязат в опашката",
+  "main.drop.batch-hint": "Смаляват се едно по едно с текущите настройки",
+  "main.drop.none": "Тук няма видео за смаляване",
 
   "main.title.label": "Заглавие",
   "main.info.duration": "Продължителност",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "моно",
 
   "main.shrink-job.waiting": "Изчакване на заявката от обвивката",
+  "main.shrink-job.batch": "Видеа в опашката: {0}",
   "main.shrink-job.rejected": "Заявката за свиване не беше приета",
   "main.shrink-job.target": "Цел {0} — файл {1} от {2}",
   "main.shrink-job.open-in-app": "Отвори в приложението",

@@ -63,8 +63,9 @@
   "main.drop.title": "Nometiet mediju failu šeit",
   "main.drop.hint": "Jebkurš formāts, ko ffmpeg var atvērt",
   "main.drop.release": "Atlaidiet, lai ielādētu šo failu",
-  "main.drop.single": "Tikai viens fails vienlaikus",
-  "main.drop.no-folder": "Mapes nevar nomest",
+  "main.drop.batch": "Atlaidiet: {0} video tiks ievietoti rindā",
+  "main.drop.batch-hint": "Samazināti pa vienam ar pašreizējiem iestatījumiem",
+  "main.drop.none": "Šeit nav video, ko samazināt",
 
   "main.title.label": "Nosaukums",
   "main.info.duration": "Ilgums",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Gaida čaulas pieprasījumu",
+  "main.shrink-job.batch": "Video rindā: {0}",
   "main.shrink-job.rejected": "Saspiešanas pieprasījums netika pieņemts",
   "main.shrink-job.target": "Mērķis {0} — fails {1} no {2}",
   "main.shrink-job.open-in-app": "Atvērt lietotnē",

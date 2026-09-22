@@ -205,7 +205,7 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | B4 HDR10+/DV | yapılmadı | `hdr10plus\|dolby\|dovi\|dynamic_hdr` taraması 0 sonuç |
 | C1-1 `Saturated` satırı | **girdi (22 Eylül)** | `MainWindow.SaturatedSuffix`, `ShrinkJobWindow.BittiSatiri`; `main.run.saturated` 42 dilde; `DoygunTeslimTests` 4/4, iki mutasyon kırmızı |
 | C1-2 kuyruk düzenleme | yapılmadı | — |
-| C1-3 klasör bırakma | yapılmadı | `MainWindow.axaml.cs:2759-2764` `IStorageFolder`'ı geri çeviriyor |
+| C1-3 klasör bırakma | girdi (22 Eylül) | klasör ya da çoklu video kuyruk penceresine, pencerenin seçenekleriyle (`Core/DroppedMedia`, `KlasorBirakmaTests`) |
 | C1-4 "bitince" eylemi | yapılmadı | — |
 | C1-5 filtre paneli | **çekirdek var, yüzey yok** | mantık A1'de; arayüz tek metin kutusu (`MainWindow.axaml:629` → `MainWindow.axaml.cs:1988`) |
 | C1-6 iz paneli | yapılmadı | yalnız `ChkAdvKeepTracks` (`MainWindow.axaml:506`) |

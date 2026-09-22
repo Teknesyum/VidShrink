@@ -63,8 +63,9 @@
   "main.drop.title": "Släpp en mediefil här",
   "main.drop.hint": "Alla format ffmpeg kan öppna",
   "main.drop.release": "Släpp för att läsa in filen",
-  "main.drop.single": "Bara en fil i taget",
-  "main.drop.no-folder": "Mappar kan inte släppas",
+  "main.drop.batch": "Släpp: {0} videor läggs i kö",
+  "main.drop.batch-hint": "Krymps en i taget med nuvarande inställningar",
+  "main.drop.none": "Ingen video att krympa här",
 
   "main.title.label": "Titel",
   "main.info.duration": "Längd",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Väntar på skalbegäran",
+  "main.shrink-job.batch": "{0} videor i kö",
   "main.shrink-job.rejected": "Krympbegäran godtogs inte",
   "main.shrink-job.target": "Mål {0} — fil {1} av {2}",
   "main.shrink-job.open-in-app": "Öppna i appen",

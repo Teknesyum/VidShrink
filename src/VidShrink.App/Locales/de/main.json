@@ -63,8 +63,9 @@
   "main.drop.title": "Mediendatei hier ablegen",
   "main.drop.hint": "Jedes Format, das ffmpeg öffnen kann",
   "main.drop.release": "Loslassen, um diese Datei zu laden",
-  "main.drop.single": "Nur eine Datei auf einmal",
-  "main.drop.no-folder": "Ordner können nicht abgelegt werden",
+  "main.drop.batch": "Loslassen: {0} Videos kommen in die Warteschlange",
+  "main.drop.batch-hint": "Nacheinander mit den aktuellen Einstellungen verkleinert",
+  "main.drop.none": "Hier gibt es kein Video zum Verkleinern",
 
   "main.title.label": "Titel",
   "main.info.duration": "Dauer",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "Mono",
 
   "main.shrink-job.waiting": "Warten auf die Shell-Anfrage",
+  "main.shrink-job.batch": "{0} Videos in der Warteschlange",
   "main.shrink-job.rejected": "Die Verkleinerungsanfrage wurde nicht angenommen",
   "main.shrink-job.target": "Ziel {0} — Datei {1} von {2}",
   "main.shrink-job.open-in-app": "In der App öffnen",

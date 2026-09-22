@@ -63,8 +63,9 @@
   "main.drop.title": "Lohista meediafail siia",
   "main.drop.hint": "Iga vorming, mida ffmpeg avab",
   "main.drop.release": "Lase lahti, et fail laadida",
-  "main.drop.single": "Korraga ainult üks fail",
-  "main.drop.no-folder": "Kaustu ei saa lohistada",
+  "main.drop.batch": "Lase lahti: {0} videot läheb järjekorda",
+  "main.drop.batch-hint": "Vähendatakse ükshaaval praeguste seadetega",
+  "main.drop.none": "Siin pole vähendatavat videot",
 
   "main.title.label": "Tiitel",
   "main.info.duration": "Kestus",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Ootan kesta päringut",
+  "main.shrink-job.batch": "Videoid järjekorras: {0}",
   "main.shrink-job.rejected": "Tihenduspäringut ei võetud vastu",
   "main.shrink-job.target": "Siht {0} — fail {1}/{2}",
   "main.shrink-job.open-in-app": "Ava rakenduses",

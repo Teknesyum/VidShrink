@@ -63,8 +63,9 @@
   "main.drop.title": "Prevucite medijski fajl ovde",
   "main.drop.hint": "Bilo koji format koji ffmpeg otvara",
   "main.drop.release": "Pustite da učitate ovaj fajl",
-  "main.drop.single": "Samo jedan fajl odjednom",
-  "main.drop.no-folder": "Fascikle se ne mogu prevući",
+  "main.drop.batch": "Otpustite: {0} video-snimaka ide u red",
+  "main.drop.batch-hint": "Smanjuju se jedan po jedan sa trenutnim podešavanjima",
+  "main.drop.none": "Ovde nema video-snimka za smanjivanje",
 
   "main.title.label": "Naslov",
   "main.info.duration": "Trajanje",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Čeka se zahtev iz sistema",
+  "main.shrink-job.batch": "Video-snimci u redu: {0}",
   "main.shrink-job.rejected": "Zahtev za smanjenje nije prihvaćen",
   "main.shrink-job.target": "Cilj {0} — fajl {1} od {2}",
   "main.shrink-job.open-in-app": "Otvori u aplikaciji",

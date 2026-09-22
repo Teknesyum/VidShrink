@@ -63,8 +63,9 @@
   "main.drop.title": "Sem pretiahnite mediálny súbor",
   "main.drop.hint": "Akýkoľvek formát, ktorý ffmpeg otvorí",
   "main.drop.release": "Pustite a súbor sa načíta",
-  "main.drop.single": "Naraz len jeden súbor",
-  "main.drop.no-folder": "Priečinky sa nedajú pretiahnuť",
+  "main.drop.batch": "Pustite: {0} videí pôjde do frontu",
+  "main.drop.batch-hint": "Zmenšujú sa jedno po druhom s aktuálnym nastavením",
+  "main.drop.none": "Nie je tu žiadne video na zmenšenie",
 
   "main.title.label": "Titul",
   "main.info.duration": "Dĺžka",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Čaká sa na požiadavku z prostredia",
+  "main.shrink-job.batch": "Videá vo fronte: {0}",
   "main.shrink-job.rejected": "Požiadavka na zmenšenie nebola prijatá",
   "main.shrink-job.target": "Cieľ {0} — súbor {1} z {2}",
   "main.shrink-job.open-in-app": "Otvoriť v aplikácii",

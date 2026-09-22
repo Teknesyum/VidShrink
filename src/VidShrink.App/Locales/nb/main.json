@@ -63,8 +63,9 @@
   "main.drop.title": "Slipp en mediefil her",
   "main.drop.hint": "Alle formater ffmpeg kan åpne",
   "main.drop.release": "Slipp for å laste inn filen",
-  "main.drop.single": "Bare én fil om gangen",
-  "main.drop.no-folder": "Mapper kan ikke slippes",
+  "main.drop.batch": "Slipp: {0} videoer settes i kø",
+  "main.drop.batch-hint": "Krympes én om gangen med gjeldende innstillinger",
+  "main.drop.none": "Ingen video å krympe her",
 
   "main.title.label": "Tittel",
   "main.info.duration": "Varighet",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Venter på skallforespørselen",
+  "main.shrink-job.batch": "{0} videoer i kø",
   "main.shrink-job.rejected": "Krympeforespørselen ble ikke godtatt",
   "main.shrink-job.target": "Mål {0} — fil {1} av {2}",
   "main.shrink-job.open-in-app": "Åpne i appen",

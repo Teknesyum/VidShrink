@@ -63,8 +63,9 @@
   "main.drop.title": "أفلت ملف وسائط هنا",
   "main.drop.hint": "أي صيغة يفتحها ffmpeg",
   "main.drop.release": "أفلت لتحميل هذا الملف",
-  "main.drop.single": "ملف واحد في كل مرة",
-  "main.drop.no-folder": "لا يمكن إفلات المجلدات",
+  "main.drop.batch": "أفلت: ستدخل {0} مقاطع فيديو قائمة الانتظار",
+  "main.drop.batch-hint": "تُصغَّر واحدًا تلو الآخر بالإعدادات الحالية",
+  "main.drop.none": "لا يوجد فيديو لتصغيره هنا",
 
   "main.title.label": "العنوان",
   "main.info.duration": "المدة",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "أحادي",
 
   "main.shrink-job.waiting": "بانتظار طلب الصدفة",
+  "main.shrink-job.batch": "مقاطع الفيديو في الانتظار: {0}",
   "main.shrink-job.rejected": "لم يُقبل طلب التقليص",
   "main.shrink-job.target": "الهدف {0} — الملف {1} من {2}",
   "main.shrink-job.open-in-app": "فتح في التطبيق",

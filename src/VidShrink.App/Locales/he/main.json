@@ -63,8 +63,9 @@
   "main.drop.title": "גרור לכאן קובץ מדיה",
   "main.drop.hint": "כל פורמט ש-ffmpeg יכול לפתוח",
   "main.drop.release": "שחרר כדי לטעון את הקובץ",
-  "main.drop.single": "קובץ אחד בלבד בכל פעם",
-  "main.drop.no-folder": "אי אפשר לגרור תיקיות",
+  "main.drop.batch": "שחררו: {0} סרטונים ייכנסו לתור",
+  "main.drop.batch-hint": "מוקטנים אחד אחד עם ההגדרות הנוכחיות",
+  "main.drop.none": "אין כאן סרטון להקטנה",
 
   "main.title.label": "כותר",
   "main.info.duration": "משך",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "מונו",
 
   "main.shrink-job.waiting": "ממתין לבקשת המעטפת",
+  "main.shrink-job.batch": "סרטונים בתור: {0}",
   "main.shrink-job.rejected": "בקשת הכיווץ לא התקבלה",
   "main.shrink-job.target": "יעד {0} — קובץ {1} מתוך {2}",
   "main.shrink-job.open-in-app": "פתח ביישום",

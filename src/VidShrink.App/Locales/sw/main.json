@@ -63,8 +63,9 @@
   "main.drop.title": "Dondosha faili ya media hapa",
   "main.drop.hint": "Umbizo lolote ffmpeg inaweza kufungua",
   "main.drop.release": "Achia ili kupakia faili hii",
-  "main.drop.single": "Faili moja tu kwa wakati",
-  "main.drop.no-folder": "Folda haziwezi kudondoshwa",
+  "main.drop.batch": "Achilia: video {0} zitaingia kwenye foleni",
+  "main.drop.batch-hint": "Zinapunguzwa moja baada ya nyingine kwa mipangilio ya sasa",
+  "main.drop.none": "Hakuna video ya kupunguza hapa",
 
   "main.title.label": "Kichwa",
   "main.info.duration": "Muda",
@@ -188,6 +189,7 @@
   "main.plan.audio.mono": "mono",
 
   "main.shrink-job.waiting": "Inasubiri ombi la ganda",
+  "main.shrink-job.batch": "Video kwenye foleni: {0}",
   "main.shrink-job.rejected": "Ombi la kufinyaza halikukubaliwa",
   "main.shrink-job.target": "Lengo {0} — faili {1} kati ya {2}",
   "main.shrink-job.open-in-app": "Fungua kwenye programu",
