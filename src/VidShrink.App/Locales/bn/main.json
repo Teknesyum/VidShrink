@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "{0} এনকোডার এই মেশিনে মাপা হয়নি, তাই এনকোডিং {1}-এ ফিরে যায়",
   "main.reason.encoder-fallback-not-working": "{0} এনকোডার এই মেশিনে ব্যবহার করা যায়নি, তাই এনকোডিং {1}-এ ফিরে যায়",
   "main.reason.hdr-tonemapped": "উৎস HDR কিন্তু বাছাই করা এনকোডার 10-বিট রাখতে পারে না, তাই SDR BT.709-এ টোন-ম্যাপ করা",
+  "main.reason.hdr-dynamic-dropped": "উৎসে ডায়নামিক HDR মেটাডেটা (HDR10+ বা Dolby Vision) আছে যা এই এনকোড বহন করে না, তাই আউটপুটে শুধু স্থির HDR10 স্তর থাকে",
   "main.reason.stream.audio-passthrough": "অডিও ট্র্যাক যেমন আছে তেমন কপি হয়: কনটেইনার এর কোডেক সমর্থন করে এবং এটি লক্ষ্যের 15% এর মধ্যে থাকে",
   "main.reason.stream.audio-downmixed": "সারাউন্ড অডিও ট্র্যাক পুনরায় এনকোড করার সময় স্টেরিওতে মিক্স হয়",
   "main.reason.stream.extra-audio-dropped": "শুধু একটি অডিও ট্র্যাক রাখা হয়; সবগুলো MKV-তে নিতে 'সব ট্র্যাক রাখুন' চালু করুন",

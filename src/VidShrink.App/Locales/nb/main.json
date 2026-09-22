@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "{0}-koderen er ikke målt på denne maskinen, så kodingen faller tilbake til {1}",
   "main.reason.encoder-fallback-not-working": "{0}-koderen kunne ikke brukes på denne maskinen, så kodingen faller tilbake til {1}",
   "main.reason.hdr-tonemapped": "kilden er HDR, men valgt koder kan ikke bevare 10-bit, så den ble tonekartlagt til SDR BT.709",
+  "main.reason.hdr-dynamic-dropped": "kilden har dynamiske HDR-metadata (HDR10+ eller Dolby Vision) som denne kodingen ikke fører videre, så utdataene beholder bare det statiske HDR10-laget",
   "main.reason.stream.audio-passthrough": "lydsporet kopieres uendret: containeren støtter kodeken, og det holder seg innenfor 15 % av målet",
   "main.reason.stream.audio-downmixed": "et surround-lydspor mikses ned til stereo under omkodingen",
   "main.reason.stream.extra-audio-dropped": "bare ett lydspor beholdes; slå på 'Behold alle spor' for å ta med alle i MKV",

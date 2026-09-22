@@ -8,6 +8,19 @@ public sealed record HdrResolution(string PixelFormat, string? VideoFilter, IRea
     /// "10 bit tasiyamiyor" demek degildir.
     /// </summary>
     public bool NotMeasured { get; init; }
+
+    /// <summary>
+    /// Kaynagin DV 8.1 RPU'su kodlayiciya <see cref="HdrResolver.DolbyVisionArgs"/> ile
+    /// tasinacak (<c>docs/olcumler/b4-hdr-dinamik.md</c>). MP4 ailesinde <c>dvcC</c> kutusu
+    /// ayrica <see cref="HdrResolver.Mp4DolbyVisionArgs"/> ister.
+    /// </summary>
+    public bool DolbyVisionCarried { get; init; }
+
+    /// <summary>
+    /// Kaynaktaki dinamik HDR verisi (HDR10+ ya da tasinamayan DV) ciktida olmayacak; statik
+    /// HDR10 katmani kalir. Ton eslemede kurulmaz: orada zaten SDR'a inilir ve ayri not duser.
+    /// </summary>
+    public bool DynamicMetadataDropped { get; init; }
 }
 
 public interface IHdr10EncoderAvailability
@@ -21,7 +34,22 @@ public static class HdrResolver
 
     public const string TonemapFilter = "zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709:r=limited,format=yuv420p";
 
-    public static HdrResolution Resolve(MediaInfo info, HdrPolicy requested, string codec, IEncoderAvailability? availability)
+    /// <summary>
+    /// DV tasiyan kodlamanin argumanlari. Renk argumanlarindan ayri durur: kalibrasyon
+    /// ornekleri VBV'siz CRF ile kodlanir ve x265 orada DV bayragiyla acilmaz.
+    /// </summary>
+    public static readonly IReadOnlyList<string> DolbyVisionArgs = new[] { "-dolbyvision", "1" };
+
+    /// <summary>MP4 ailesi <c>dvcC</c>/<c>dvvC</c> kutusunu bu olmadan yazmaz (ffmpeg 9 uyarisi).</summary>
+    public static readonly IReadOnlyList<string> Mp4DolbyVisionArgs = new[] { "-strict", "unofficial" };
+
+    /// <summary>
+    /// <paramref name="dolbyVisionCarriable"/> cagiranin bildigi engeli tasir: renk matrisi
+    /// donusumu (zscale RPU'yu dusurur, kodlama "frame without DOVI metadata" ile durur) ya da
+    /// x265'te VBV'siz oran denetimi ("Dolby Vision requires VBV settings").
+    /// </summary>
+    public static HdrResolution Resolve(MediaInfo info, HdrPolicy requested, string codec, IEncoderAvailability? availability,
+        bool dolbyVisionCarriable = true)
     {
         if (!info.IsHdr)
             return new HdrResolution("yuv420p", null, Array.Empty<string>(), false);
@@ -57,11 +85,23 @@ public static class HdrResolver
             preserveArgs.AddRange(new[] { "-x265-params", x265Params });
         }
 
+        var carried = dolbyVisionCarriable && CarriesDolbyVision(info, codec);
+
         return new HdrResolution(Hdr10PixelFormat(codec, availability) ?? "yuv420p10le", null, preserveArgs, false)
         {
-            NotMeasured = notMeasured
+            NotMeasured = notMeasured,
+            DolbyVisionCarried = carried,
+            DynamicMetadataDropped = info.HasHdr10Plus || (info.HasDolbyVision && !carried)
         };
     }
+
+    /// <summary>
+    /// Yalniz profil 8.1 (HDR10 uyumlu taban katman) ve yalniz yazilim HDR10 kodlayicilari:
+    /// ffmpeg'in DV yazicisi libx265 ve libsvtav1'de var, donanim kodlayicilarinda yok.
+    /// Profil 5 kapsam disi (<c>docs/handbrake/handbrake-yanit.md</c>).
+    /// </summary>
+    public static bool CarriesDolbyVision(MediaInfo info, string codec)
+        => info.DolbyVisionProfile == 8 && info.DolbyVisionCompatibilityId == 1 && SoftwareHdr10Codecs.Contains(codec);
 
     /// <summary>
     /// Olculmemis kodlayici "destekliyor" sayilir ve <paramref name="notMeasured"/> kurulur:

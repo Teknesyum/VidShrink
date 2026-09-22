@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "המקודד {0} לא נמדד במחשב זה, ולכן הקידוד חוזר ל-{1}",
   "main.reason.encoder-fallback-not-working": "לא ניתן להשתמש במקודד {0} במחשב זה, ולכן הקידוד חוזר ל-{1}",
   "main.reason.hdr-tonemapped": "המקור הוא HDR אבל המקודד שנבחר אינו יכול לשמור 10 ביט, ולכן הוא מופה ל-SDR BT.709",
+  "main.reason.hdr-dynamic-dropped": "המקור נושא מטא-נתוני HDR דינמיים (HDR10+ או Dolby Vision) שקידוד זה אינו מעביר, ולכן הפלט שומר רק את שכבת HDR10 הסטטית",
   "main.reason.stream.audio-passthrough": "רצועת השמע מועתקת כפי שהיא: המכל תומך בקודק שלה והיא נשארת בתוך 15% מהיעד",
   "main.reason.stream.audio-downmixed": "רצועת שמע היקפית ממוזגת לסטריאו בזמן הקידוד מחדש",
   "main.reason.stream.extra-audio-dropped": "נשמרת רק רצועת שמע אחת; הפעילו את 'שמירת כל הרצועות' כדי להעביר את כולן ב-MKV",

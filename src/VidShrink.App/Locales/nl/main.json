@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "de {0}-encoder is op deze machine niet gemeten, dus de codering valt terug op {1}",
   "main.reason.encoder-fallback-not-working": "de {0}-encoder kon op deze machine niet worden gebruikt, dus de codering valt terug op {1}",
   "main.reason.hdr-tonemapped": "de bron is HDR maar de gekozen encoder kan 10-bit niet behouden, dus is het tone-mapped naar SDR BT.709",
+  "main.reason.hdr-dynamic-dropped": "de bron bevat dynamische HDR-metadata (HDR10+ of Dolby Vision) die deze codering niet doorgeeft, dus de uitvoer behoudt alleen de statische HDR10-laag",
   "main.reason.stream.audio-passthrough": "het audiospoor wordt ongewijzigd gekopieerd: de container ondersteunt de codec en het blijft binnen 15% van het doel",
   "main.reason.stream.audio-downmixed": "een surround-audiospoor wordt bij het hercoderen naar stereo gemixt",
   "main.reason.stream.extra-audio-dropped": "er blijft maar één audiospoor over; zet 'Alle sporen behouden' aan om ze allemaal in MKV mee te nemen",

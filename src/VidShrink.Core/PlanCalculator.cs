@@ -369,7 +369,8 @@ public static class PlanCalculator
             codec = DarkContentSwitch.Codec;
         }
 
-        var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
+        var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability,
+            dolbyVisionCarriable: VideoFilterChain.ColorMatrixFilter(info, (options.Filters ?? VideoFilterOptions.Default).ColorMatrix) is null);
         if (hdr.NotMeasured) probe.NotMeasured = true;
 
         if (CanPassThrough(info, options, codec, hdr))
@@ -390,6 +391,12 @@ public static class PlanCalculator
             notes.Add(AdviceCode.HdrTonemapped);
             reason.Add("the source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709");
             reasonCodes.Add(new ReasonNote(ReasonCode.HdrTonemapped));
+        }
+
+        if (hdr.DynamicMetadataDropped)
+        {
+            reason.Add("the source carries dynamic HDR metadata (HDR10+, or Dolby Vision other than profile 8.1) that an encode does not pass through, so the output keeps only the static HDR10 layer");
+            reasonCodes.Add(new ReasonNote(ReasonCode.HdrDynamicMetadataDropped));
         }
 
         var preferredCodec = darkSwitch ? codec : lockedCodec ?? (fast ? FastHardwareOrder[0] : PreferredCodecFor(preference));
@@ -843,7 +850,8 @@ public static class PlanCalculator
         TurboFirstPass = options.SpeedMode == SpeedMode.Fast && TurboFirstPassIsSafe(codec),
         PixelFormat = CodecModel.OutputPixelFormat(codec, hdr.PixelFormat),
         HdrVideoFilter = hdr.VideoFilter,
-        HdrColorArgs = new List<string>(hdr.ColorArgs)
+        HdrColorArgs = new List<string>(hdr.ColorArgs),
+        DolbyVisionCarried = hdr.DolbyVisionCarried
     };
 
     /// <summary>

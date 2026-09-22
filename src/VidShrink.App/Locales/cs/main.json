@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "enkodér {0} nebyl na tomto počítači změřen, kódování se tedy vrací k {1}",
   "main.reason.encoder-fallback-not-working": "enkodér {0} nebylo možné na tomto počítači použít, kódování se tedy vrací k {1}",
   "main.reason.hdr-tonemapped": "zdroj je HDR, ale zvolený enkodér nedokáže zachovat 10 bitů, byl tedy tónově mapován na SDR BT.709",
+  "main.reason.hdr-dynamic-dropped": "zdroj nese dynamická HDR metadata (HDR10+ nebo Dolby Vision), která toto kódování nepřenese, výstup si tedy ponechá jen statickou vrstvu HDR10",
   "main.reason.stream.audio-passthrough": "zvuková stopa se kopíruje beze změny: kontejner podporuje její kodek a vejde se do 15 % cíle",
   "main.reason.stream.audio-downmixed": "prostorová zvuková stopa se při překódování smíchá do sterea",
   "main.reason.stream.extra-audio-dropped": "ponechá se jen jedna zvuková stopa; zapněte 'Zachovat všechny stopy', aby se všechny přenesly v MKV",

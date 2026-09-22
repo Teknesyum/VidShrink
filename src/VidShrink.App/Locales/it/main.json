@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "l'encoder {0} non è stato misurato su questa macchina, quindi la codifica ripiega su {1}",
   "main.reason.encoder-fallback-not-working": "l'encoder {0} non è utilizzabile su questa macchina, quindi la codifica ripiega su {1}",
   "main.reason.hdr-tonemapped": "la sorgente è HDR ma l'encoder selezionato non può preservare i 10 bit, quindi è stata convertita con tone mapping in SDR BT.709",
+  "main.reason.hdr-dynamic-dropped": "la sorgente contiene metadati HDR dinamici (HDR10+ o Dolby Vision) che questa codifica non trasferisce, quindi l'uscita conserva solo lo strato HDR10 statico",
   "main.reason.stream.audio-passthrough": "la traccia audio viene copiata così com'è: il contenitore supporta il suo codec e resta entro il 15% dell'obiettivo",
   "main.reason.stream.audio-downmixed": "una traccia audio surround viene ridotta a stereo durante la ricodifica",
   "main.reason.stream.extra-audio-dropped": "viene mantenuta una sola traccia audio; attiva 'Mantieni tutte le tracce' per portarle tutte in MKV",

@@ -419,6 +419,7 @@
   "main.reason.encoder-fallback-not-measured": "رمزگذار {0} روی این دستگاه اندازه‌گیری نشده، پس رمزگذاری به {1} بازمی‌گردد",
   "main.reason.encoder-fallback-not-working": "رمزگذار {0} روی این دستگاه قابل‌استفاده نبود، پس رمزگذاری به {1} بازمی‌گردد",
   "main.reason.hdr-tonemapped": "منبع HDR است اما رمزگذار انتخابی نمی‌تواند 10 بیت را حفظ کند، پس به SDR BT.709 نگاشت شد",
+  "main.reason.hdr-dynamic-dropped": "منبع فراداده HDR پویا (HDR10+ یا Dolby Vision) دارد که این رمزگذاری آن را منتقل نمی‌کند، پس خروجی فقط لایه ایستای HDR10 را نگه می‌دارد",
   "main.reason.stream.audio-passthrough": "ترک صدا همان‌طور که هست کپی می‌شود: قالب کدک آن را پشتیبانی می‌کند و از ۱۵٪ هدف بیشتر نمی‌شود",
   "main.reason.stream.audio-downmixed": "یک ترک صدای فراگیر هنگام کدگذاری دوباره به استریو میکس می‌شود",
   "main.reason.stream.extra-audio-dropped": "فقط یک ترک صدا نگه داشته می‌شود؛ برای انتقال همه در MKV گزینه 'حفظ همه ترک‌ها' را روشن کنید",
