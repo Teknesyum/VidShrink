@@ -195,12 +195,12 @@ public sealed class EncodeRunner
             {
                 if (step.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(step.Codec))
                 {
-                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, scenes, ct)).DroppedOptions);
-                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, scenes, ct)).DroppedOptions);
+                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 1, passLogPrefix, progress, new EncodeStage(1, 2, attempt).ToString(), 0.0, 0.5, scenes, ct)).DroppedOptions);
+                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 2, passLogPrefix, progress, new EncodeStage(2, 2, attempt).ToString(), 0.5, 1.0, scenes, ct)).DroppedOptions);
                 }
                 else
                 {
-                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, scenes, ct)).DroppedOptions);
+                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 0, null, progress, new EncodeStage(1, 1, attempt).ToString(), 0.0, 1.0, scenes, ct)).DroppedOptions);
                 }
             }
             catch (OperationCanceledException)
@@ -257,12 +257,12 @@ public sealed class EncodeRunner
 
                 if (twoPass)
                 {
-                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, scenes, ct)).DroppedOptions);
-                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, scenes, ct)).DroppedOptions);
+                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 1, passLogPrefix, progress, new EncodeStage(1, 2, attempt).ToString(), 0.0, 0.5, scenes, ct)).DroppedOptions);
+                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 2, passLogPrefix, progress, new EncodeStage(2, 2, attempt).ToString(), 0.5, 1.0, scenes, ct)).DroppedOptions);
                 }
                 else
                 {
-                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, scenes, ct)).DroppedOptions);
+                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 0, null, progress, new EncodeStage(1, 1, attempt).ToString(), 0.0, 1.0, scenes, ct)).DroppedOptions);
                 }
 
                 attemptClock.Stop();

@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Automation;
@@ -179,6 +179,8 @@ internal partial class ControlStrip : UserControl
         EncodeText.Text = LanguageCatalog.EncodeMarker(_language, pass, passCount, attempt);
         Refresh();
     }
+
+    internal double EncodeFraction => _encodeFraction;
 
     internal void ClearEncode()
     {

@@ -4462,7 +4462,17 @@ public partial class MainWindow : Window
         SetStage(TxtStage, LocalizeStage(p.Stage));
         TxtRemaining.Text = Saat.Kalan(p.Remaining);
         if (p.OutputMb > 0) TxtOutSize.Text = Say("main.unit.mb-value", Num(p.OutputMb, "0.0"));
+        if (EncodeMarkerOf(p) is { } marker)
+            Preview.Controls.SetEncodeProgress(marker.Fraction, marker.Pass, marker.PassCount, marker.Attempt);
     }
+
+    /// <summary>
+    /// Şeridin kodlama imleci. Motorun kesri bütün geçişlere yayılır (iki geçişte ilki 0–0,5);
+    /// imleç videonun içinde o geçişin vardığı yeri gösterir. Aşama motorun kendi biçiminde
+    /// değilse imleç yerinde kalır.
+    /// </summary>
+    internal static (double Fraction, int Pass, int PassCount, int Attempt)? EncodeMarkerOf(EncodeProgress p)
+        => EncodeStage.Parse(p.Stage) is { } stage ? (stage.Within(p.Fraction), stage.Pass, stage.PassCount, stage.Attempt) : null;
 
     internal void ShowEncodeProgressForTest(EncodeProgress p)
     {
@@ -4470,12 +4480,15 @@ public partial class MainWindow : Window
         ShowEncodeProgress(p);
     }
 
+    internal void EndEncodeForTest() => SetRunning(false);
+
     private void SetRunning(bool running)
     {
         BtnStart.IsEnabled = !running && _info is not null;
         BtnConvert.IsEnabled = !running && _info is not null;
         BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running;
         if (running) return;
+        Preview.Controls.ClearEncode();
         SetStage(TxtStage, Say("main.output.idle"));
         SetStage(TxtConvertStage, Say("main.output.idle"));
         TxtRemaining.Text = "-";
