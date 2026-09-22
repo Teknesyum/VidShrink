@@ -40,6 +40,23 @@
         </Animation>
       </Style.Animations>
     </Style>
+
+    <!--
+      İpucu balonu yerinde belirir, kaymaz: imlecin hemen altında açıldığı için dikey kayma
+      metni gözün önünden çeker. Hareketi azaltma açık pencerede anında görünür.
+    -->
+    <Style Selector="Window:not(.reduced-motion) ToolTip">
+      <Style.Animations>
+        <Animation Duration="{StaticResource MotionFast}" Easing="CubicEaseOut" FillMode="Forward">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0"/>
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1"/>
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
   </Application.Styles>
 
 </Application>

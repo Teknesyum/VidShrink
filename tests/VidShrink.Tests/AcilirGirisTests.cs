@@ -89,4 +89,33 @@ public sealed class AcilirGirisTests
         Assert.Equal(!azalt, animasyonlu);
         if (azalt) Assert.Equal(1, saydamlik);
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void IpucuBalonunaGiris(bool azalt)
+    {
+        var (saydamlik, animasyonlu) = AppHost.Run(() =>
+        {
+            var ipucu = new ToolTip { Content = "ipucu" };
+            var dugme = new Button { Content = "düğme" };
+            ToolTip.SetTip(dugme, ipucu);
+            var pencere = new Window { Content = dugme, Width = 300, Height = 200 };
+            if (azalt) pencere.Classes.Add("reduced-motion");
+            pencere.Show();
+            try
+            {
+                ToolTip.SetIsOpen(dugme, true);
+                Dispatcher.UIThread.RunJobs();
+                Assert.True(ipucu.IsVisible && TopLevel.GetTopLevel(ipucu) is not null);
+                var sonuc = (ipucu.Opacity, ipucu.Opacity < 1);
+                ToolTip.SetIsOpen(dugme, false);
+                return sonuc;
+            }
+            finally { pencere.Close(); }
+        });
+
+        Assert.Equal(!azalt, animasyonlu);
+        if (azalt) Assert.Equal(1, saydamlik);
+    }
 }
