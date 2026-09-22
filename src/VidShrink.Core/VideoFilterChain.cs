@@ -326,7 +326,10 @@ public static class VideoFilterChain
             parts.Add(options.Deinterlace == DeinterlaceMode.On ? "deinterlace=on" : "deinterlace=off");
         if (options.Detelecine) parts.Add("detelecine");
         if (options.Denoise != DenoiseFilter.Off)
-            parts.Add($"denoise={(options.Denoise == DenoiseFilter.NlMeans ? "nlmeans" : "hqdn3d")}:{Strength(options.DenoiseStrength)}");
+        {
+            var denoise = options.Denoise == DenoiseFilter.NlMeans ? "nlmeans" : "hqdn3d";
+            parts.Add($"denoise={denoise}:{Strength(options.DenoiseStrength)}");
+        }
         if (options.Sharpen != SharpenMode.Off)
             parts.Add("sharpen=" + options.Sharpen switch
             {
