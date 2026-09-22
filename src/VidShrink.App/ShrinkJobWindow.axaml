@@ -66,7 +66,63 @@
                  TextWrapping="Wrap"
                  MaxWidth="{StaticResource TipMaxWidth}"/>
 
-      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+      <StackPanel x:Name="PendingPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
+        <TextBlock x:Name="TxtPending"
+                   FontSize="{StaticResource FontSizeSm}"
+                   Foreground="{StaticResource TextDisabled}"/>
+        <ScrollViewer MaxHeight="{StaticResource DropDownMaxHeight}"
+                      HorizontalScrollBarVisibility="Disabled">
+          <StackPanel x:Name="PendingList" Spacing="{StaticResource SpaceXs}"/>
+        </ScrollViewer>
+      </StackPanel>
+
+      <Grid x:Name="QueueControls"
+            ColumnDefinitions="Auto,*,Auto"
+            ColumnSpacing="{StaticResource SpaceSm}">
+        <Button Grid.Column="0"
+                x:Name="BtnPause"
+                Content="{loc:Text main.shrink-job.pause}"
+                Padding="{StaticResource ButtonPaddingSm}"
+                VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="1"
+                   Text="{loc:Text main.shrink-job.when-done}"
+                   FontSize="{StaticResource FontSizeSm}"
+                   Foreground="{StaticResource TextDisabled}"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Center"
+                   TextTrimming="CharacterEllipsis"/>
+        <ComboBox Grid.Column="2"
+                  x:Name="CmbWhenDone"
+                  auto:AutomationProperties.Name="{loc:Text main.shrink-job.when-done}"
+                  MaxDropDownHeight="{StaticResource DropDownMaxHeight}"
+                  VerticalAlignment="Center"/>
+      </Grid>
+
+      <TextBlock x:Name="TxtPaused"
+                 Text="{loc:Text main.shrink-job.paused}"
+                 FontSize="{StaticResource FontSizeSm}"
+                 FontWeight="SemiBold"
+                 TextWrapping="Wrap"
+                 IsVisible="False"/>
+
+      <Grid x:Name="CountdownRow"
+            ColumnDefinitions="*,Auto"
+            ColumnSpacing="{StaticResource SpaceMd}"
+            IsVisible="False">
+        <TextBlock Grid.Column="0"
+                   x:Name="TxtCountdown"
+                   FontSize="{StaticResource FontSizeSm}"
+                   FontWeight="SemiBold"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Center"/>
+        <Button Grid.Column="1"
+                x:Name="BtnCountdownCancel"
+                Content="{loc:Text main.shrink-job.countdown.cancel}"
+                Padding="{StaticResource ButtonPaddingSm}"
+                VerticalAlignment="Center"/>
+      </Grid>
+
+      <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
         <Button x:Name="BtnOpenInApp"
                 Content="{loc:Text main.shrink-job.open-in-app}"
                 Padding="{StaticResource ButtonPaddingSm}"
@@ -90,7 +146,7 @@
         <Button x:Name="BtnClose"
                 Content="{loc:Text main.action.cancel}"
                 Padding="{StaticResource ButtonPaddingSm}"/>
-      </StackPanel>
+      </WrapPanel>
 
       <ProgressBar x:Name="ShareProgress" Maximum="1" Height="{StaticResource ProgressBarHeight}" IsVisible="False"/>
 

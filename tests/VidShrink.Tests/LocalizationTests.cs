@@ -418,6 +418,8 @@ public sealed class LocalizationTests : IDisposable
     /// Anahtar yalnız arayüzde geçmez: motor katmanı da neden açılamadığını cümleyle değil
     /// anahtarla söylüyor. Ölü anahtar sayımı bu yüzden sevkiyattaki bütün derlemelerin
     /// dizgelerine bakar; yalnız arayüze bakan bir sayım motorun kullandığı anahtarı ölü sanır.
+    /// İz notu anahtarları dizge olarak durmaz, not adından üretilir; sayıma üreten
+    /// fonksiyonun kendisinden (<c>MainWindow.StreamNoteKey</c>) girer.
     /// </summary>
     private static IReadOnlyCollection<string> ShippedLiterals()
     {
@@ -433,6 +435,8 @@ public sealed class LocalizationTests : IDisposable
         {
             foreach (var text in KeyCallSites.LiteralsOf(assembly, shape)) all.Add(text);
         }
+
+        foreach (var note in Enum.GetValues<VidShrink.Core.StreamNote>()) all.Add(VidShrink.App.MainWindow.StreamNoteKey(note));
 
         return all;
     }

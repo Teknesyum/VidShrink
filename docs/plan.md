@@ -1443,3 +1443,31 @@ seçilen kodek, çözünürlük, iz ve gelişmiş kollar kuyruğa geçmiyor. Ç�
 `KlasorBirakmaTests`: toplama (gizli dosya, video olmayan, alt klasör, tekrar, sıra — olumsuz
 kontroller), kuyruk penceresinin şablonu plana taşıması (kodek ve hedef), tavansız yongada
 dosya başına hedef, uzantının plandan gelmesi, yeni iki anahtarın 42 dilde. En az iki mutasyon.
+
+## C1-2 + C1-4 — Kuyruk Düzenleme ve "Bitince" Eylemi (22 Eylül 2026)
+
+### Bulgu
+
+Kuyruk penceresi (`ShrinkJobWindow`) bekleyenleri `Queue<ShrinkRequest>` içinde saklıyor ve
+göstermiyor: sıradaki dosyayı çıkarmak, öne almak ya da sırayı durdurmak yok. İş bitince
+pencere altı saniye sonra kapanıyor; HandBrake'in "bitince uyut / kapat" seçeneği yok.
+
+### Karar
+
+- Bekleyenler `List<ShrinkRequest>`; pencerede ad listesi, her satırda yukarı / aşağı / çıkar.
+  Koşan dosya listede değil, başlıkta.
+- "Sırayı duraklat": koşan dosya biter, sıradaki başlamaz; "Sürdür" pompayı yeniden açar.
+- "Bitince" seçimi: hiçbir şey / çıktı klasörünü aç / uyut / kapat. Sıra boşalınca ve
+  duraklatılmamışken çalışır. Uyut ve kapat **60 saniyelik geri sayımla** gelir, "Vazgeç"
+  düğmesi durdurur; pencere bu sırada kapanmaz.
+- Sistem çağrısı `IQueueEndActions` arkasında (`SystemQueueEndActions`: Windows `rundll32
+  powrprof` ve kapatma aracı, macOS `pmset`/`osascript`, Linux `systemctl`). Testler sahte
+  verir; gerçek eylem test sürecinde asla çalışmaz.
+- 15 yeni anahtar, 42 dil.
+
+### Ölçü
+
+`KuyrukDuzenlemeTests`: duraklatılmış kuyrukta sıra, çıkarma, taşıma (sınırda no-op);
+bitince eylemi sahteyle — geri sayım bitmeden çağrı yok, bitince tek çağrı, vazgeçince hiç,
+"hiçbir şey" seçiliyken hiç, duraklatılmışken hiç (olumsuz kontroller); anahtarlar 42 dilde.
+En az üç mutasyon.

@@ -7,6 +7,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Automation;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -75,7 +78,7 @@ public partial class ShrinkJobWindow : Window
     private readonly ShrinkRequestQueue? _queue;
     private readonly string _language;
     private readonly AppSettings _appSettings = LoadAppSettings();
-    private readonly Queue<ShrinkRequest> _pending = new();
+    private readonly List<ShrinkRequest> _pending = new();
     private readonly List<string> _outputs = new();
     private CancellationTokenSource? _cts;
     private DispatcherTimer? _closeTimer;
@@ -86,6 +89,16 @@ public partial class ShrinkJobWindow : Window
     private PlanOptions? _template;
     private bool _ceilingTarget;
     private string? _extension;
+    private bool _paused;
+    private QueueEndChoice _whenDone;
+    private DispatcherTimer? _countdown;
+    private int? _countdownLeft;
+
+    /// <summary>Uyut ve kapat bu kadar saniye geri sayar; "Vazgeç" arada durdurur.</summary>
+    internal const int CountdownSeconds = 60;
+
+    /// <summary>Kuyruk sonu eyleminin sistem yüzü; testler sahtesini verir.</summary>
+    internal IQueueEndActions Actions { get; set; } = SystemQueueEndActions.Instance;
 
     public ShrinkJobWindow() : this(new ShellShrinkStartup(null, ShrinkArgumentProblem.NoTarget, null), null)
     {
@@ -122,6 +135,17 @@ public partial class ShrinkJobWindow : Window
         BtnShare.Click += OnShare;
         BtnShareCancel.Click += OnShareCancel;
         BtnShareCopy.Click += OnCopyShareLink;
+        BtnPause.Click += (_, _) => SetPaused(!_paused);
+        BtnCountdownCancel.Click += (_, _) => CancelCountdown();
+        CmbWhenDone.ItemsSource = new[]
+        {
+            Say("main.shrink-job.done.nothing"),
+            Say("main.shrink-job.done.open-folder"),
+            Say("main.shrink-job.done.sleep"),
+            Say("main.shrink-job.done.power-off")
+        };
+        CmbWhenDone.SelectedIndex = 0;
+        CmbWhenDone.SelectionChanged += (_, _) => _whenDone = (QueueEndChoice)Math.Max(0, CmbWhenDone.SelectedIndex);
 
         TxtHeadline.Text = Say("main.shrink-job.waiting");
         TxtTarget.Text = "";
@@ -184,6 +208,22 @@ public partial class ShrinkJobWindow : Window
 
     internal string MessageText => TxtMessage.Text ?? "";
 
+    /// <summary>Henüz başlamamış istekler, koşacakları sırayla. Koşan dosya burada değil.</summary>
+    internal IReadOnlyList<ShrinkRequest> Pending => _pending;
+
+    internal bool Paused => _paused;
+
+    internal QueueEndChoice WhenDone
+    {
+        get => _whenDone;
+        set => CmbWhenDone.SelectedIndex = (int)value;
+    }
+
+    /// <summary>Geri sayımda kalan saniye; geri sayım yoksa <c>null</c>.</summary>
+    internal int? CountdownLeft => _countdownLeft;
+
+    internal string CountdownText => TxtCountdown.Text ?? "";
+
     /// <summary>Bulunamayan yollar icin basilan uyari satiri; bos ise satir gorunmez.</summary>
     internal string NoticeText => TxtNotice.Text ?? "";
 
@@ -207,6 +247,7 @@ public partial class ShrinkJobWindow : Window
 
         if (_startup.Problem is { } problem)
         {
+            QueueControls.IsVisible = false;
             ShowProblem(problem);
             return;
         }
@@ -237,9 +278,84 @@ public partial class ShrinkJobWindow : Window
     private void Accept(ShrinkRequest request)
     {
         _accepted++;
-        _pending.Enqueue(request);
+        _pending.Add(request);
+        RefreshPending();
         _ = PumpAsync();
     }
+
+    /// <summary>C1-2: bekleyen isteği sıradan çıkarır. Koşan dosyaya dokunmaz.</summary>
+    internal void RemovePending(int index)
+    {
+        if (index < 0 || index >= _pending.Count) return;
+        _pending.RemoveAt(index);
+        _accepted--;
+        RefreshPending();
+    }
+
+    /// <summary>C1-2: bekleyen isteği <paramref name="delta"/> kadar kaydırır; sınırın dışına taşımaz.</summary>
+    internal void MovePending(int index, int delta)
+    {
+        var target = index + delta;
+        if (index < 0 || index >= _pending.Count || target < 0 || target >= _pending.Count) return;
+        (_pending[index], _pending[target]) = (_pending[target], _pending[index]);
+        RefreshPending();
+    }
+
+    /// <summary>
+    /// C1-2: duraklatılan kuyrukta koşan dosya biter, sıradaki başlamaz. Sürdürünce pompa yeniden açılır.
+    /// </summary>
+    internal void SetPaused(bool paused)
+    {
+        _paused = paused;
+        BtnPause.Content = Say(paused ? "main.shrink-job.resume" : "main.shrink-job.pause");
+        TxtPaused.IsVisible = paused;
+        if (!paused) _ = PumpAsync();
+    }
+
+    private void RefreshPending()
+    {
+        PendingPanel.IsVisible = _pending.Count > 0;
+        TxtPending.Text = Say("main.shrink-job.pending", _pending.Count);
+        PendingList.Children.Clear();
+        for (var i = 0; i < _pending.Count; i++) PendingList.Children.Add(PendingRow(i));
+    }
+
+    private Grid PendingRow(int index)
+    {
+        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto"), ColumnSpacing = Token("SpaceXs") };
+        var name = new TextBlock
+        {
+            Text = Path.GetFileName(_pending[index].Path),
+            FontSize = Token("FontSizeSm"),
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        ToolTip.SetTip(name, _pending[index].Path);
+        row.Children.Add(name);
+        AddRowButton(row, 1, "IconChevronUp", "main.shrink-job.move-up", index > 0, () => MovePending(index, -1));
+        AddRowButton(row, 2, "IconChevronDown", "main.shrink-job.move-down", index < _pending.Count - 1, () => MovePending(index, 1));
+        AddRowButton(row, 3, "IconClose", "main.shrink-job.remove", true, () => RemovePending(index));
+        return row;
+    }
+
+    private void AddRowButton(Grid row, int column, string icon, string key, bool enabled, Action click)
+    {
+        var size = Token("IconSizeSm");
+        var button = new Button
+        {
+            Content = new PathIcon { Data = this.FindResource(icon) as Geometry, Width = size, Height = size },
+            Padding = this.FindResource("ChipPadding") is Avalonia.Thickness padding ? padding : default,
+            IsEnabled = enabled,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        AutomationProperties.SetName(button, Say(key));
+        ToolTip.SetTip(button, Say(key));
+        button.Click += (_, _) => click();
+        Grid.SetColumn(button, column);
+        row.Children.Add(button);
+    }
+
+    private double Token(string key) => this.FindResource(key) is double value ? value : 0;
 
     private void ShowProblem(ShrinkArgumentProblem problem)
     {
@@ -260,9 +376,11 @@ public partial class ShrinkJobWindow : Window
         _busy = true;
         try
         {
-            while (_pending.Count > 0)
+            while (_pending.Count > 0 && !_paused)
             {
-                var request = _pending.Dequeue();
+                var request = _pending[0];
+                _pending.RemoveAt(0);
+                RefreshPending();
                 await RunOneAsync(request);
             }
         }
@@ -271,7 +389,69 @@ public partial class ShrinkJobWindow : Window
             _busy = false;
         }
 
-        if (_pending.Count == 0 && State == ShrinkJobState.Bitti) ArmClose();
+        if (_pending.Count == 0 && !_paused && _finished > 0) QueueDrained();
+    }
+
+    /// <summary>
+    /// C1-4: sıra boşaldığında seçilen eylem. Uyut ve kapat geri sayımla gelir ve pencere bu
+    /// sırada kapanmaz; klasör açma son çıktının klasörünü açar.
+    /// </summary>
+    internal void QueueDrained()
+    {
+        if (_pending.Count > 0 || _paused || _busy) return;
+        switch (_whenDone)
+        {
+            case QueueEndChoice.Sleep:
+            case QueueEndChoice.PowerOff:
+                StartCountdown();
+                return;
+            case QueueEndChoice.OpenFolder when _outputs.Count > 0:
+                Reveal(_outputs[^1]);
+                break;
+        }
+        if (State == ShrinkJobState.Bitti) ArmClose();
+    }
+
+    private void StartCountdown()
+    {
+        _countdownLeft = CountdownSeconds;
+        ShowCountdown();
+        _countdown ??= new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdown.Tick -= OnCountdownTick;
+        _countdown.Tick += OnCountdownTick;
+        _countdown.Start();
+    }
+
+    private void OnCountdownTick(object? sender, EventArgs e) => CountdownTick();
+
+    /// <summary>Geri sayımın bir saniyesi. Sıfıra inince eylem bir kez çalışır.</summary>
+    internal void CountdownTick()
+    {
+        if (_countdownLeft is not int left) return;
+        left--;
+        if (left > 0)
+        {
+            _countdownLeft = left;
+            ShowCountdown();
+            return;
+        }
+        var choice = _whenDone;
+        CancelCountdown();
+        if (choice == QueueEndChoice.Sleep) Actions.Sleep();
+        else if (choice == QueueEndChoice.PowerOff) Actions.PowerOff();
+    }
+
+    internal void CancelCountdown()
+    {
+        _countdown?.Stop();
+        _countdownLeft = null;
+        CountdownRow.IsVisible = false;
+    }
+
+    private void ShowCountdown()
+    {
+        CountdownRow.IsVisible = true;
+        TxtCountdown.Text = Say(_whenDone == QueueEndChoice.Sleep ? "main.shrink-job.countdown.sleep" : "main.shrink-job.countdown.power-off", _countdownLeft);
     }
 
     private async Task RunOneAsync(ShrinkRequest request)
@@ -347,7 +527,7 @@ public partial class ShrinkJobWindow : Window
         _closeTimer = new DispatcherTimer { Interval = Linger };
         _closeTimer.Tick += (_, _) =>
         {
-            if (_shareFlow?.Running ?? false) return;
+            if ((_shareFlow?.Running ?? false) || _countdownLeft is not null) return;
             _closeTimer?.Stop();
             if (_pending.Count == 0 && !_busy) Close();
         };
@@ -363,14 +543,14 @@ public partial class ShrinkJobWindow : Window
 
     private void OnReveal(object? sender, RoutedEventArgs e)
     {
-        var path = _outputs.Count > 0 ? _outputs[^1] : null;
-        if (path is null) return;
+        if (_outputs.Count > 0) Reveal(_outputs[^1]);
+    }
+
+    private void Reveal(string path)
+    {
         try
         {
-            if (OperatingSystem.IsWindows())
-                Process.Start(new ProcessStartInfo("explorer.exe", "/select,\"" + path + "\"") { UseShellExecute = true });
-            else
-                Process.Start(new ProcessStartInfo(Path.GetDirectoryName(path)!) { UseShellExecute = true });
+            Actions.Reveal(path);
         }
         catch (Exception ex) when (ex is IOException or System.ComponentModel.Win32Exception)
         {
@@ -381,6 +561,7 @@ public partial class ShrinkJobWindow : Window
     protected override void OnClosing(WindowClosingEventArgs e)
     {
         _closeTimer?.Stop();
+        _countdown?.Stop();
         _cts?.Cancel();
         _shareFlow?.Cancel();
         _queue?.Dispose();
