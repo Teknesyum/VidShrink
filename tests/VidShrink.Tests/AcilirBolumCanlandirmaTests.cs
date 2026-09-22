@@ -11,16 +11,19 @@ namespace VidShrink.Tests;
 
 /// <summary>
 /// Açılır bölümler görünür olunca yerine süzülüyor. Süre <c>MotionBase</c> belirtecinden,
-/// hareketi azaltma açıkken seçici eşleşmiyor. Altı bölümün her biri sınıfı taşıyor;
+/// hareketi azaltma açıkken seçici eşleşmiyor. On bir bölümün her biri sınıfı taşıyor;
 /// biri düşerse o bölüm sessizce sıçrayarak açılırdı.
 /// </summary>
 public sealed class AcilirBolumCanlandirmaTests
 {
     private static readonly string[] Bolumler =
-        { "QualitySectionBody", "AudioBody", "FrameBody", "AdvancedBody", "RetryTrimPanel", "AboutBody" };
+        {
+            "QualitySectionBody", "AudioBody", "FrameBody", "AdvancedBody", "RetryTrimPanel", "AboutBody",
+            "HdrPolicyPanel", "PlanReasons", "AiDetails", "PerformanceDetails", "ResetSettingsConfirm"
+        };
 
     [Fact]
-    public void AltiBolumDeCanlaniyorSureBelirtectenHareketAzaltmaKapatir()
+    public void HerBolumCanlaniyorSureBelirtectenHareketAzaltmaKapatir()
     {
         var (siniflar, secici, sure, belirtec) = AppHost.Run(() =>
         {

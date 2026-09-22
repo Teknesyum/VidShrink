@@ -34,7 +34,8 @@
 
     <!--
       Acilir bolum gorunur oldugunda yerine suzulur: Kalite, Ses, Kare, Gelismis, Hakkinda,
-      yeniden kes paneli. Hareketi azaltma acikken hic oynamaz.
+      yeniden kes paneli, HDR ilkesi, plan gerekceleri, AI ve basarim ayrintisi, sifirlama
+      onayi. Hareketi azaltma acikken hic oynamaz.
     -->
     <Style Selector="Window:not(.reduced-motion) StackPanel.disclose[IsVisible=True]">
       <Style.Animations>
@@ -499,7 +500,7 @@
                             <TextBlock x:Name="TipFastGpu" Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.fast-gpu.tip}"/>
                           </ToolTip.Tip>
                         </CheckBox>
-                        <StackPanel x:Name="HdrPolicyPanel" IsVisible="False">
+                        <StackPanel x:Name="HdrPolicyPanel" Classes="disclose" IsVisible="False">
                           <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                             <TextBlock Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                             <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
@@ -842,7 +843,7 @@
                                   <Path x:Name="GlyphPlanReasons" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                                 </Button>
                       </Grid>
-                      <StackPanel x:Name="PlanReasons" Spacing="{StaticResource SpaceSm}" IsVisible="False"/>
+                      <StackPanel x:Name="PlanReasons" Classes="disclose" Spacing="{StaticResource SpaceSm}" IsVisible="False"/>
                     </StackPanel>
                   </ScrollViewer>
                 </Grid>
@@ -1311,7 +1312,7 @@
                               <Path x:Name="GlyphAiDetails" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                             </Button>
                   </Grid>
-                  <StackPanel x:Name="AiDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                  <StackPanel x:Name="AiDetails" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
                     <TextBlock Text="{loc:Text main.ai.tip}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <WrapPanel>
                       <Button Content="{loc:Text main.ai.copy-prompt}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
@@ -1337,7 +1338,7 @@
                               <Path x:Name="GlyphPerformance" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                             </Button>
                   </Grid>
-                  <StackPanel x:Name="PerformanceDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                  <StackPanel x:Name="PerformanceDetails" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
                     <WrapPanel>
                       <Button x:Name="BtnPerformanceRun"
                               Content="{loc:Text performance.run}"
@@ -1604,7 +1605,7 @@
                           Theme="{StaticResource GhostButton}"
                           HorizontalAlignment="Left"
                           Click="OnResetSettings"/>
-                  <StackPanel x:Name="ResetSettingsConfirm" IsVisible="False" Spacing="{StaticResource SpaceSm}">
+                  <StackPanel x:Name="ResetSettingsConfirm" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceSm}">
                     <TextBlock x:Name="TxtResetSettingsConfirm" Text="{loc:Text settings.reset-confirm}" Theme="{StaticResource Body}"/>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                       <Button x:Name="BtnConfirmResetSettings" Content="{loc:Text settings.reset-confirm-button}" Theme="{StaticResource GhostButton}" Click="OnConfirmResetSettings"/>
