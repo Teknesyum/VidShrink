@@ -25,7 +25,9 @@ namespace VidShrink.Tests;
 /// <item><b>kesik</b> — tek satırlık metnin doğal genişliği kendi yerinden büyük, çok satırlı
 /// metnin yüksekliği kutusuna sığmıyor, ya da metin <c>ClipToBounds</c> açık bir atanın
 /// dışına düşüyor. Üç noktayla kısalıp tam halini balonda taşıyan metin T194 kararı gereği
-/// kesik sayılmaz, ayrı "balonlu" satırına yazılır.</item>
+/// kesik sayılmaz, ayrı "balonlu" satırına yazılır. İstisna <see cref="EsitSutunIzgara"/>: o
+/// panel sütun sayısını içerik sığsın diye seçer, orada üç nokta kusurdur (2026-09-23:
+/// "balonlu" satırlarının tamamı bilgi ızgarasındaydı).</item>
 /// <item><b>çakışma</b> — aynı panelin görünür iki kardeşi 1 pikselden fazla kesişiyor.</item>
 /// <item><b>taşma</b> — çocuk ebeveyninin sınırından dışarı çıkıyor.</item>
 /// <item><b>şerit</b> — sayfa üst şeridin altına giriyor; kaydırılan içerik saydam sekme
@@ -860,7 +862,7 @@ public sealed class YerlesimDenetimiTests
 
             if (blok.TextWrapping == TextWrapping.NoWrap && gereken - yer > 0.5)
             {
-                if (balonda) denetim.Balonlu.Add($"{sekme} · {Ad(blok)} [{Kisalt(metin)}] gereken {gereken:0.#}, yer {yer:0.#}");
+                if (balonda && blok.FindAncestorOfType<EsitSutunIzgara>() is null) denetim.Balonlu.Add($"{sekme} · {Ad(blok)} [{Kisalt(metin)}] gereken {gereken:0.#}, yer {yer:0.#}");
                 else denetim.Ekle(new Kusur("kesik", sekme, $"{Ad(blok)} [{Kisalt(metin)}]", $"genişlik gereken {gereken:0.#}, yer {yer:0.#}"));
                 continue;
             }
