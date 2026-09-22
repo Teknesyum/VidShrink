@@ -298,7 +298,7 @@ public sealed class YerlesimDenetimiTests
     {
         var kollar = new TheoryData<string, int, int>();
         foreach (var dil in Diller)
-            foreach (var (en, boy) in new[] { (1280, 800), (1920, 1080), (2560, 1440) })
+            foreach (var (en, boy) in new[] { (1097, 590), (1280, 688), (1280, 800), (1920, 1080), (2560, 1440) })
                 kollar.Add(dil, en, boy);
         return kollar;
     }

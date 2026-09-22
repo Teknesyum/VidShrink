@@ -378,17 +378,35 @@ public partial class MainWindow : Window
             if (screen is null) return;
 
             var scaling = screen.Scaling <= 0 ? 1 : screen.Scaling;
-            var share = Scalar("WindowWorkAreaShare", 0.9);
-            var roomWidth = screen.WorkingArea.Width / scaling * share;
-            var roomHeight = screen.WorkingArea.Height / scaling * share;
+            var fit = StartupFit(
+                new Size(screen.WorkingArea.Width / scaling, screen.WorkingArea.Height / scaling),
+                Scalar("WindowWorkAreaShare", 0.9),
+                new Size(Scalar("WindowPreferredWidth", Width), Scalar("WindowPreferredHeight", Height)),
+                new Size(MinWidth, MinHeight));
 
-            Width = Math.Max(MinWidth, Math.Min(Scalar("WindowPreferredWidth", Width), roomWidth));
-            Height = Math.Max(MinHeight, Math.Min(Scalar("WindowPreferredHeight", Height), roomHeight));
+            MinWidth = fit.Min.Width;
+            MinHeight = fit.Min.Height;
+            Width = fit.Size.Width;
+            Height = fit.Size.Height;
         }
         catch (Exception)
         {
             // the declared Width/Height in markup stay in force
         }
+    }
+
+    /// <summary>
+    /// Açılış boyutu: tercih boyutu çalışma alanının payına sığdırılır, ama taban boyutun altına
+    /// inmez. Taban da çalışma alanını aşamaz: 1920x1080 %150'de mantıksal alan 1280x688,
+    /// 720'lik taban pencerenin altını görev çubuğunun arkasına itiyordu.
+    /// </summary>
+    internal static (Size Min, Size Size) StartupFit(Size workArea, double share, Size preferred, Size minimum)
+    {
+        var min = new Size(Math.Min(minimum.Width, workArea.Width), Math.Min(minimum.Height, workArea.Height));
+        var size = new Size(
+            Math.Max(min.Width, Math.Min(preferred.Width, workArea.Width * share)),
+            Math.Max(min.Height, Math.Min(preferred.Height, workArea.Height * share)));
+        return (min, size);
     }
 
     private Control[] EntrancePanels() => new Control[] { SourcePanel, TargetPanel, PlanPanel, OutputPanel, AiPanel };
