@@ -1,6 +1,8 @@
 name: vp9-olcumu
 
 on:
+  push:
+    tags: ['olcum-vp9-*']
   workflow_dispatch:
 
 env:
