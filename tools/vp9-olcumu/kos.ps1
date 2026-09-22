@@ -185,12 +185,13 @@ switch ($Is) {
             }
         }
         $md.Add('')
-        $md.Add('### Adim Ozeti (alti hucre)')
+        $md.Add('### Adim Ozeti (yalniz bayti tutan hucreler)')
         $md.Add('')
         $md.Add('| cpu | toplam sure sn | en kotu fark | kabul hucre | en kotu sapma |')
         $md.Add('|---|---|---|---|---|')
         $adimOzeti = foreach ($c in $CpuAdimlari) {
-            $satir = @($hepsi | Where-Object { $_.is -eq 'cpu' -and $_.cpuUsed -eq $c })
+            $gecerli = @($hucreler | Where-Object baytTuttu | ForEach-Object { "$($_.kesit)|$($_.hedef)" })
+            $satir = @($hepsi | Where-Object { $_.is -eq 'cpu' -and $_.cpuUsed -eq $c -and $gecerli -contains "$($_.kesit)|$($_.hedefK)" })
             $farklar = foreach ($r in $satir) {
                 $t = ($hepsi | Where-Object { $_.is -eq 'cpu' -and $_.kesit -eq $r.kesit -and $_.hedefK -eq $r.hedefK -and $_.cpuUsed -eq 0 }).vmafNeg
                 $r.vmafNeg - $t
@@ -206,7 +207,7 @@ switch ($Is) {
             $md.Add("| $c | $($o.toplamSureSn) | $($o.enKotuFark) | $($o.kabulHucre)/$($o.hucre) | $([math]::Round($o.enKotuSapma * 100, 2))% |")
             $o
         }
-        $gecenler = @($adimOzeti | Where-Object { $_.hucre -eq 6 -and $_.kabulHucre -eq 6 })
+        $gecenler = @($adimOzeti | Where-Object { $_.hucre -gt 0 -and $_.kabulHucre -eq $_.hucre })
         $urun = $gecenler | Sort-Object @{ Expression = 'toplamSureSn' }, @{ Expression = 'cpuUsed'; Descending = $true } | Select-Object -First 1
         $md.Add('')
         $md.Add("Olcute gore urun degeri: $(if ($urun) { $urun.cpuUsed } else { 'yok' }) (mevcut $UrunCpu)")
