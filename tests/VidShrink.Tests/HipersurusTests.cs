@@ -149,7 +149,7 @@ public sealed class HipersurusTests
         var tembel = Oku("src", "VidShrink.App", "MainWindow.TembelSekme.cs");
         Assert.Contains("_recorderPane = new RecorderView();", tembel, StringComparison.Ordinal);
         Assert.Contains("PageRecorder.Content = _recorderPane;", tembel, StringComparison.Ordinal);
-        Assert.Contains("TryFindResource(\"SectionMargin\"", tembel, StringComparison.Ordinal);
+        Assert.Contains("TryFindResource(\"PageMargin\"", tembel, StringComparison.Ordinal);
 
         var pencere = Oku("src", "VidShrink.App", "MainWindow.axaml.cs");
         Assert.Contains("KaydediciSekmesiSecildi()", pencere, StringComparison.Ordinal);

@@ -126,6 +126,7 @@ public partial class ShrinkJobWindow : Window
         FlowDirection = Strings.IsRightToLeftLanguage(_language)
             ? Avalonia.Media.FlowDirection.RightToLeft
             : Avalonia.Media.FlowDirection.LeftToRight;
+        Classes.Set("untracked", Strings.IsUntrackedLanguage(_language));
 
         if (OperatingSystem.IsMacOS()) WindowDecorations = WindowDecorations.Full;
         JobShell.PointerPressed += OnShellPointerPressed;
@@ -345,6 +346,8 @@ public partial class ShrinkJobWindow : Window
             Text = Path.GetFileName(_pending[index].Path),
             FontSize = Token("FontSizeSm"),
             TextTrimming = TextTrimming.CharacterEllipsis,
+            FlowDirection = FlowDirection.LeftToRight,
+            HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center
         };
         ToolTip.SetTip(name, _pending[index].Path);

@@ -13,7 +13,7 @@ public partial class MainWindow
     /// <c>InitializeComponent</c>'in olculen payinin 89,4 ms'i buydu ve acilista sekme
     /// hicbir zaman secili degil; kurulum sekmeye basilan ana tasindi.
     ///
-    /// <para>Kenar payi <c>SectionMargin</c> belirtecinden okunuyor, XAML'deki degerin
+    /// <para>Kenar payi <c>PageMargin</c> belirtecinden okunuyor, XAML'deki degerin
     /// aynisi; burada sayi yazilmiyor.</para>
     /// </summary>
     private RecorderView RecorderPane
@@ -23,7 +23,7 @@ public partial class MainWindow
             if (_recorderPane is not null) return _recorderPane;
 
             _recorderPane = new RecorderView();
-            if (this.TryFindResource("SectionMargin", out var pay) && pay is Thickness kalinlik)
+            if (this.TryFindResource("PageMargin", out var pay) && pay is Thickness kalinlik)
                 _recorderPane.Margin = kalinlik;
 
             _recorderPane.OpenInShrink = OpenInShrinkAsync;

@@ -147,12 +147,13 @@ public sealed class SuzgecPaneliTests
     /// G4: Gelişmiş'teki "Şu an" satırlarının değeri (süzgeç zinciri, ön ayar, kodek adı) ffmpeg sözdizimidir
     /// ve dilin başlık kuralından geçmez. Satır önce biçimlenip sonra kapıdan geçtiğinde İngilizce ve Almancada
     /// "Scale=…, Denoise=, Sharpen=" okunuyordu.
-    /// Olumsuz kontrol: aynı metni kapıdan geçirmek sözdizimini büyütür.
+    /// Olumsuz kontrol: aynı metni kapıdan geçirmek sözdizimini büyütür. Zincir iki süzgeçli: iki noktadan sonra üç
+    /// sözcük kapıda cümle sayılır ve büyütülmez (15fa18ac), üç süzgeçli zincirde olumsuz kontrol ölü kalıyordu.
     /// </summary>
     [Fact]
     public void SimdiSatiriDegeriBuyutmez()
     {
-        const string zincir = "scale=1306:734:flags=lanczos, denoise=hqdn3d, sharpen=medium";
+        const string zincir = "scale=1306:734:flags=lanczos, denoise=hqdn3d";
         var sonuc = AppHost.Run(() =>
         {
             var onceki = Strings.Language;

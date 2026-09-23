@@ -113,12 +113,23 @@ public static class Strings
 
     public static bool IsRightToLeft => IsRightToLeftLanguage(Language);
 
-    public static bool IsRightToLeftLanguage(string? language)
+    public static bool IsRightToLeftLanguage(string? language) => InList(RightToLeftLanguages, language);
+
+    /// <summary>
+    /// Harfleri birbirine bağlanan (Arap yazısı) ya da başçizgiyle birleşen (Devanagari,
+    /// Bengal) yazılar ve öbür sağdan sola diller. Harf aralığı bu yazılarda bağı koparır;
+    /// pencere bu dillerde harf aralığını sıfırlar.
+    /// </summary>
+    public static IReadOnlyList<string> UntrackedLanguages { get; } = new[] { "ar", "fa", "he", "ur", "hi", "bn" };
+
+    public static bool IsUntrackedLanguage(string? language) => InList(UntrackedLanguages, language);
+
+    private static bool InList(IReadOnlyList<string> list, string? language)
     {
         if (string.IsNullOrWhiteSpace(language)) return false;
 
         var head = language.Trim().Split('-')[0];
-        return RightToLeftLanguages.Any(code => string.Equals(code, head, StringComparison.OrdinalIgnoreCase));
+        return list.Any(code => string.Equals(code, head, StringComparison.OrdinalIgnoreCase));
     }
 
     public static void Use(string language)

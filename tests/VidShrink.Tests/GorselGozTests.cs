@@ -220,7 +220,7 @@ public sealed class GorselGozTests
             kok.Arrange(new Rect(new Size(420, kok.DesiredSize.Height)));
             Avalonia.Threading.Dispatcher.UIThread.RunJobs();
         }
-        foreach (var dugum in pencere.GetVisualDescendants().OfType<Visual>()) dugum.RenderTransform = null;
+        GorselDenetimTests.DonusumleriSil(pencere);
         var boy = (int)Math.Ceiling(kok.DesiredSize.Height);
         using var bitmap = new RenderTargetBitmap(new PixelSize(420, boy), new Vector(96, 96));
         bitmap.Render((Visual)kok);
@@ -273,11 +273,9 @@ public sealed class GorselGozTests
                 tek.Classes.Add("reduced-motion");
                 tek.Progress.IsVisible = true;
                 tek.RowFacts.IsVisible = true;
-                tek.Progress.Value = 0.42;
                 tek.TxtHeadline.Text = Path.GetFileName(yollar[0]);
                 tek.TxtTarget.Text = Strings.Get("main.shrink-job.target").Replace("{0}", ShellIntegration.FormatQuickShrinkLabel(25), StringComparison.Ordinal).Replace("{1}", "1", StringComparison.Ordinal).Replace("{2}", "1", StringComparison.Ordinal);
-                tek.TxtStage.Text = "pass 2/2 (attempt 3)";
-                tek.TxtRemaining.Text = "01:11:00";
+                tek.ShowProgress(new EncodeProgress(0.42, TimeSpan.FromMinutes(3), TimeSpan.FromMinutes(71), 12.3, "pass 2/2 (attempt 3)"));
                 KaydetIcerik(tek, Path.Combine(klasor, $"{dil}-sagtik-kosuyor.png")); n++;
                 tek.Progress.Value = 1;
                 tek.TxtMessage.Text = Strings.Get("main.run.cancelled");

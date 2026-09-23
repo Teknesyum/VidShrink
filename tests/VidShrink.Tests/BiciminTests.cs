@@ -806,8 +806,8 @@ public sealed class KareYerlesimTests
         Directory.CreateDirectory(kanit);
         File.WriteAllText(Path.Combine(kanit, "okunan.txt"), string.Join("\n", okunan.birim, okunan.not, okunan.kip));
 
-        Assert.Equal(" pts (max 100)", okunan.birim, StringComparer.OrdinalIgnoreCase);
-        Assert.EndsWith(" pts (max 100)", okunan.not, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(" pts (max 100)", okunan.birim.Replace('\u00A0', ' '), StringComparer.OrdinalIgnoreCase);
+        Assert.EndsWith(" pts (max 100)", okunan.not.Replace('\u00A0', ' '), StringComparison.OrdinalIgnoreCase);
         Assert.Equal("Quality factor", okunan.kip, StringComparer.OrdinalIgnoreCase);
         Assert.DoesNotContain("/100", okunan.birim + okunan.not, StringComparison.Ordinal);
         Assert.DoesNotContain("CRF", okunan.kip, StringComparison.OrdinalIgnoreCase);
@@ -1148,8 +1148,13 @@ public sealed class BaslikKapsamiTests
     /// <c>-fill-band-narrow-single-pass</c> 15. 1964 + 8 + 10 + 10 + 15 = 2007; en dordunde de
     /// (228 + 4 = 232), tr yalniz band merkezinde (80 + 1 = 81). Yeniden yazilan
     /// <c>main.output.estimated-output.tip</c> ne once ne sonra kolda.</para>
+    /// <para>2026-09-23, iki nokta sonrasi cumle (15fa18ac, <c>CarriesClauseAfterColon</c>): iki noktadan sonra
+    /// harf tasiyan en az uc sozcuk varsa metin cumle sayilir. 519 anahtar-dil cifti kola girdi, hepsi iki noktadan
+    /// sonra cumle ("Dropped: codec not supported", "Duraklatıldı: şimdiki dosya biter, sıradaki bekler"); en cok
+    /// <c>main.preset.import.summary</c> 41, <c>main.reason.auto-crop</c> 40. 2007 + 519 = 2526; en 232 + 5 = 237,
+    /// tr 81 + 8 = 89. Kurali kaldirmak sayimi 2007/232/81'e geri indiriyor (olculdu).</para>
     /// <para>2026-09-23, Media Foundation: <c>main.reason.no-quality-scale</c> 15 dilde kola giriyor,
-    /// en dahil tr haric: 2007 + 15 = 2022, en 232 + 1 = 233, tr 81.</para>
+    /// en dahil tr haric: iki nokta kuraliyla birlikte 2526 + 15 = 2541, en 237 + 1 = 238, tr 89.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1175,9 +1180,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2022, toplam);
-        Assert.Equal(233, dilBasina["en"]);
-        Assert.Equal(81, dilBasina["tr"]);
+        Assert.Equal(2541, toplam);
+        Assert.Equal(238, dilBasina["en"]);
+        Assert.Equal(89, dilBasina["tr"]);
     }
 
     /// <summary>

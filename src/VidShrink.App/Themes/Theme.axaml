@@ -285,7 +285,7 @@
   <x:Double x:Key="DropDownMaxHeight">280</x:Double>
   <x:Double x:Key="PanelMinHeight">256</x:Double>
   <x:Double x:Key="PlanPanelMinHeight">320</x:Double>
-  <x:Double x:Key="PlanPanelMaxHeight">512</x:Double>
+  <x:Double x:Key="PlanPanelMaxHeight">560</x:Double>
   <x:Double x:Key="DropZoneMinHeight">144</x:Double>
   <x:Double x:Key="DropIconSize">48</x:Double>
   <x:Double x:Key="PauseGlyphSize">96</x:Double>

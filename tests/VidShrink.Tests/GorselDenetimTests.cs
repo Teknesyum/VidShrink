@@ -47,7 +47,13 @@ public sealed class GorselDenetimTests
             root.Arrange(new Rect(size));
             Avalonia.Threading.Dispatcher.UIThread.RunJobs();
         }
-        foreach (var node in window.GetVisualDescendants().OfType<Visual>()) node.RenderTransform = null;
+        DonusumleriSil(window);
+    }
+
+    internal static void DonusumleriSil(Visual kok)
+    {
+        foreach (var node in kok.GetVisualDescendants().OfType<Visual>())
+            if (node.GetVisualParent() is not Viewbox) node.RenderTransform = null;
     }
 
     internal static T Pencere<T>(Size size, Func<MainWindow, T> oku, int sekme = -1, string dil = "tr", bool dolu = true, Action<MainWindow>? hazirla = null) =>

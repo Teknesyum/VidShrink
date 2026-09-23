@@ -48,6 +48,7 @@ public partial class App : Application
     {
         AcilisIzi.Yaz("app-init");
         AvaloniaXamlLoader.Load(this);
+        Localization.YonYalitimi.Kur();
         AcilisIzi.Yaz("app-xaml");
     }
 

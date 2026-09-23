@@ -1145,6 +1145,8 @@ public sealed class LanguageTests : IDisposable
     [InlineData("tr", "Bir dosya yükleyin; motorun verdiği her karar burada madde madde listelenir.")]
     [InlineData("en", "Changes the interface language and is remembered next time.")]
     [InlineData("en", "Load a file and every decision the engine makes is listed here.")]
+    [InlineData("de", "Pausiert: Die aktuelle Datei wird fertig, die nächste wartet")]
+    [InlineData("fr", "En pause : le fichier actuel se termine, le suivant attend")]
     public void GovdeCumlesiKelimeKelimeBuyutulmez(string language, string sentence)
     {
         Assert.True(LanguageCatalog.ReadsAsProse(sentence));
@@ -1155,6 +1157,8 @@ public sealed class LanguageTests : IDisposable
     [InlineData("tr", "doldurma politikası", "Doldurma Politikası")]
     [InlineData("tr", "ses hedefi (kbps)", "Ses Hedefi (kbps)")]
     [InlineData("en", "fill policy", "Fill Policy")]
+    [InlineData("de", "status: bereit", "Status: Bereit")]
+    [InlineData("en", "stage: pass two", "Stage: Pass Two")]
     public void BaslikKelimeKelimeBuyutulmeyeDevamEder(string language, string heading, string expected)
     {
         Assert.False(LanguageCatalog.ReadsAsProse(heading));

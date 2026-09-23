@@ -88,6 +88,10 @@
       <Setter Property="Transitions" Value="{x:Null}"/>
     </Style>
 
+    <Style Selector="Window.untracked TextBlock">
+      <Setter Property="LetterSpacing" Value="0"/>
+    </Style>
+
     <Style Selector="TabControl.compact TabItem /template/ Path#TabIcon">
       <Setter Property="IsVisible" Value="False"/>
     </Style>

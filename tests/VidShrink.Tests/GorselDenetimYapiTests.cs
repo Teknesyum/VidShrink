@@ -19,6 +19,13 @@ public sealed class GorselDenetimYapiTests
 
     public GorselDenetimYapiTests(ITestOutputHelper output) => _output = output;
 
+    private sealed class SahteSonEylem : IQueueEndActions
+    {
+        public void Reveal(string path) { }
+        public void Sleep() { }
+        public void PowerOff() { }
+    }
+
     /// <summary>
     /// Bulgu 10: oynatıcı kısayol tablosunda kalın mono tuş ile sans açıklamanın ilk satır taban
     /// çizgileri aynı yükseklikte. İkisi satırın tepesine yaslıyken 2-3 px kayıyordu.
@@ -151,7 +158,7 @@ public sealed class GorselDenetimYapiTests
             {
                 var secim = Ad<RadioButton>(w, ad);
                 var yazi = secim.GetVisualDescendants().OfType<TextBlock>().First();
-                var yaziSonu = Yeri(yazi, w).Left + yazi.TextLayout.WidthIncludingTrailingWhitespace;
+                var yaziSonu = Yeri(yazi, w).Left + yazi.TextLayout.Width;
                 return (ad, tasma: Math.Max(Yeri(secim, w).Right, yaziSonu) - sag);
             }).ToArray();
         }, sekme: 3, dil: dil);
@@ -262,30 +269,407 @@ public sealed class GorselDenetimYapiTests
         Assert.Equal(orta, sagda, 1);
     }
 
-    /// <summary>
-    /// Görsel denetim bulgu 4: Dönüştür formunda aynı satırdaki iki alan farklı yükseklikteydi
-    /// (biri etiketinin yanında bilgi düğmesi taşıyor) ve kutular aynı çizgide bitmiyordu.
-    /// Satırdaki alanlar alt kenardan hizalanır.
-    /// </summary>
     [Theory]
-    [InlineData("tr")]
-    [InlineData("el")]
-    public void DonusturFormundaSatirAltKenardaHizali(string dil)
+    [InlineData("tr", false)]
+    [InlineData("tr", true)]
+    [InlineData("de", false)]
+    [InlineData("en", false)]
+    [InlineData("el", true)]
+    public void DonusturFormundaEtiketVeDenetimSatirdaHizali(string dil, bool enDar)
     {
-        var farklar = Pencere(Dar, w =>
+        var boyut = enDar ? YerlesimDenetimiTests.DarBoyut : Dar;
+        var farklar = Pencere(boyut, w =>
         {
             var form = Ad<Grid>(w, "ConvertForm");
-            return form.Children.OfType<StackPanel>().Where(c => c.IsVisible)
+            return form.Children.OfType<Grid>().Where(c => c.IsVisible)
                 .GroupBy(Grid.GetRow)
                 .Where(g => g.Count() > 1)
-                .Select(g => (satir: g.Key, fark: g.Max(c => Yeri(c, w).Bottom) - g.Min(c => Yeri(c, w).Bottom)))
+                .Select(g =>
+                {
+                    var etiketler = g.Select(c => Yeri(c.Children[0], w).Bottom).ToArray();
+                    var denetimler = g.Select(c => Yeri(c.Children.Single(d => Grid.GetRow(d) == 1), w).Top).ToArray();
+                    var satirlar = g.Max(c => ((Grid)c.Children[0]).Children.OfType<TextBlock>().Single().TextLayout.TextLines.Count);
+                    return (satir: g.Key, etiket: etiketler.Max() - etiketler.Min(), denetim: denetimler.Max() - denetimler.Min(), satirlar);
+                })
                 .ToArray();
         }, sekme: 2, dil: dil);
 
-        foreach (var (satir, fark) in farklar) _output.WriteLine($"satır {satir}: {fark:0.#}");
-        Assert.NotEmpty(farklar);
-        var enKotu = farklar.MaxBy(f => f.fark);
-        Assert.True(enKotu.fark <= 0.5, $"Satır {enKotu.satir}: alanların alt kenarı {enKotu.fark:0.#} px ayrı.");
+        foreach (var (satir, etiket, denetim, satirlar) in farklar) _output.WriteLine($"satır {satir}: etiket altı {etiket:0.#}, denetim üstü {denetim:0.#}, en çok {satirlar} satır etiket");
+        Assert.Equal(6, farklar.Length);
+        var enKotu = farklar.MaxBy(f => Math.Max(f.etiket, f.denetim));
+        Assert.True(Math.Max(enKotu.etiket, enKotu.denetim) <= 0.5,
+            $"Satır {enKotu.satir}: etiket altları {enKotu.etiket:0.#} px, denetim üstleri {enKotu.denetim:0.#} px ayrı.");
+    }
+
+    [Theory]
+    [InlineData("tr", false)]
+    [InlineData("tr", true)]
+    [InlineData("de", true)]
+    [InlineData("en", true)]
+    [InlineData("ar", true)]
+    public void CiktiOlgulariAyniSatirdaAyniYukseklikte(string dil, bool genis)
+    {
+        var boyut = genis ? Genis : Dar;
+        var satirlar = Pencere(boyut, w =>
+            new[] { "TxtStage", "TxtOutSize", "TxtRemaining", "TxtDurationValue" }
+                .Select(ad => (ad, yer: Yeri(Ad<TextBlock>(w, ad), w)))
+                .Select(d => (d.ad, ust: d.yer.Top, etiketUst: Yeri(((Panel)Ad<TextBlock>(w, d.ad).GetVisualParent()!).Children[0], w).Top))
+                .ToArray(), sekme: 1, dil: dil);
+
+        foreach (var (ad, ust, etiketUst) in satirlar) _output.WriteLine($"{ad}: değer üstü {ust:0.#}, etiket üstü {etiketUst:0.#}");
+        var kaymalar = satirlar.GroupBy(s => Math.Round(s.etiketUst))
+            .Where(g => g.Count() > 1)
+            .Select(g => (satir: string.Join(" / ", g.Select(s => s.ad)), fark: g.Max(s => s.ust) - g.Min(s => s.ust)))
+            .ToArray();
+        Assert.NotEmpty(kaymalar);
+        var enKotu = kaymalar.MaxBy(k => k.fark);
+        Assert.True(enKotu.fark <= 0.5, $"{enKotu.satir}: aynı satırdaki değerler {enKotu.fark:0.#} px kayık.");
+    }
+
+    public static TheoryData<string> TumDiller()
+    {
+        var veri = new TheoryData<string>();
+        foreach (var dil in VidShrink.App.Localization.Strings.Languages) veri.Add(dil);
+        return veri;
+    }
+
+    [Theory]
+    [MemberData(nameof(TumDiller))]
+    public void PlanPaneliKatliykenHerDildeKaymaz(string dil)
+    {
+        var (panel, gorus, icerik) = Pencere(Dar, w =>
+        {
+            var kaydirici = Ad<ScrollViewer>(w, "PlanScroll");
+            return (Ad<Border>(w, "PlanPanel").Bounds.Height, kaydirici.Viewport.Height, kaydirici.Extent.Height);
+        }, sekme: 1, dil: dil);
+
+        _output.WriteLine($"panel {panel:0.#}, görüş {gorus:0.#}, içerik {icerik:0.#}");
+        Assert.True(icerik > 0, "Plan içeriği ölçülmedi.");
+        Assert.True(icerik <= gorus + 0.5, $"Katlı plan {icerik:0.#} px istiyor, görüş alanı {gorus:0.#} px; son satır kırpılıyor.");
+    }
+
+    [Theory]
+    [InlineData("ar", false)]
+    [InlineData("fa", false)]
+    [InlineData("ur", false)]
+    [InlineData("he", false)]
+    [InlineData("hi", false)]
+    [InlineData("en", true)]
+    [InlineData("tr", true)]
+    public void BagliYazidaHarfAraligiSifir(string dil, bool aralikli)
+    {
+        var (sayi, enGenis, ad) = Pencere(Dar, w =>
+        {
+            var metinler = w.GetVisualDescendants().OfType<TextBlock>().ToArray();
+            var enAralikli = metinler.MaxBy(t => t.LetterSpacing)!;
+            return (metinler.Length, enAralikli.LetterSpacing, enAralikli.Text ?? enAralikli.Name ?? "");
+        }, sekme: 1, dil: dil);
+
+        _output.WriteLine($"{sayi} metin, en geniş aralık {enGenis:0.##} ('{ad}')");
+        Assert.True(sayi > 50, "Pencere kurulmadı.");
+        if (aralikli) Assert.True(enGenis > 0, "Harf aralıklı başlık stili hiç uygulanmadı; ölçü kör.");
+        else Assert.True(enGenis == 0, $"'{ad}' {enGenis:0.##} px harf aralığıyla çiziliyor; bağlı yazıda harfler kopuyor.");
+    }
+
+    private static bool Aynali(Visual v)
+    {
+        var sayi = 0;
+        for (Visual? d = v; d is not null; d = d.GetVisualParent()) if (d.HasMirrorTransform) sayi++;
+        return sayi % 2 == 1;
+    }
+
+    [Theory]
+    [InlineData("ar", true)]
+    [InlineData("he", true)]
+    [InlineData("en", false)]
+    public void MedyaSimgeleriAynalanmaz(string dil, bool sagdanSola)
+    {
+        (string ad, bool aynali) Oku(MainWindow w, string ad) => (ad, Aynali(Ad<Avalonia.Controls.Shapes.Path>(w, ad)));
+        var (oynatici, sekme) = Pencere(Dar, w =>
+            (Oku(w, "GlyphSeritPlay"),
+             w.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>().Where(p => p.Name == "TabIcon")
+                .Select(p => (ad: "TabIcon", aynali: Aynali(p))).ToArray()), sekme: 0, dil: dil);
+        var sayfaOku = Pencere(Dar, w => Oku(w, "GlyphPlanReasons").Item2, sekme: 1, dil: dil);
+        var karsilastirma = AppHost.Run(() =>
+        {
+            var serit = new VidShrink.App.Playback.ControlStrip();
+            var pencere = new Window
+            {
+                Width = 600, Height = 120, Content = serit,
+                FlowDirection = sagdanSola ? Avalonia.Media.FlowDirection.RightToLeft : Avalonia.Media.FlowDirection.LeftToRight
+            };
+            pencere.Show();
+            try
+            {
+                pencere.UpdateLayout();
+                return ("GlyphPlayPause", Aynali(Ad<Avalonia.Controls.Shapes.Path>(serit, "GlyphPlayPause")));
+            }
+            finally { pencere.Close(); }
+        });
+        (string ad, bool aynali)[] medya = { oynatici, karsilastirma };
+
+        foreach (var (ad, aynali) in medya.Concat(sekme)) _output.WriteLine($"{ad}: {(aynali ? "aynalı" : "düz")}");
+        _output.WriteLine($"plan oku: {(sayfaOku ? "aynalı" : "düz")}");
+        Assert.Equal(sagdanSola, sayfaOku);
+        Assert.True(sekme.Length >= 5, $"{sekme.Length} sekme simgesi bulundu.");
+        var aynalilar = medya.Concat(sekme).Where(m => m.aynali).Select(m => m.ad).ToArray();
+        Assert.True(aynalilar.Length == 0, $"Aynalanan medya/sekme simgesi: {string.Join(", ", aynalilar)}.");
+    }
+
+    [Theory]
+    [InlineData("ar", true)]
+    [InlineData("en", false)]
+    public void SayiVeKomutSagdanSolaYazidaSoldanSagaOkunur(string dil, bool sagdanSola)
+    {
+        var girdi = sagdanSola ? "الدقة 1228×690 px" : "Resolution 1228×690 px";
+        var (yazi, ilk, ikinci) = AppHost.Run(() =>
+        {
+            var metin = new TextBlock { Text = girdi };
+            var pencere = new Window
+            {
+                Width = 600, Height = 120, Content = metin,
+                FlowDirection = sagdanSola ? Avalonia.Media.FlowDirection.RightToLeft : Avalonia.Media.FlowDirection.LeftToRight
+            };
+            pencere.Show();
+            try
+            {
+                pencere.UpdateLayout();
+                var t = metin.Text!;
+                return (t, metin.TextLayout.HitTestTextPosition(t.IndexOf("1228", StringComparison.Ordinal)).X,
+                    metin.TextLayout.HitTestTextPosition(t.IndexOf("690", StringComparison.Ordinal)).X);
+            }
+            finally { pencere.Close(); }
+        });
+        var kutular = new[] { ("TxtConvertCommand", 2), ("TxtCommand", 4), ("TxtOutputName", 5) }
+            .Select(k => (ad: k.Item1, yon: Pencere(Dar, w => Ad<TextBox>(w, k.Item1).FlowDirection, sekme: k.Item2, dil: dil)))
+            .ToArray();
+        var pencereYonu = Pencere(Dar, w => w.FlowDirection, sekme: 5, dil: dil);
+        Assert.Equal(sagdanSola, pencereYonu == Avalonia.Media.FlowDirection.RightToLeft);
+
+        _output.WriteLine($"{dil}: '1228' x={ilk:0.#}, '690' x={ikinci:0.#}, yalıtım={yazi.Contains('\u200E')}");
+        foreach (var (ad, yon) in kutular) _output.WriteLine($"{ad}: {yon}");
+        if (!sagdanSola) Assert.Equal(girdi, yazi);
+        Assert.True(ilk < ikinci, $"'1228' ({ilk:0.#}) '690'un ({ikinci:0.#}) sağında; çözünürlük ters okunuyor.");
+        Assert.All(kutular, k => Assert.Equal(Avalonia.Media.FlowDirection.LeftToRight, k.yon));
+    }
+
+    [Theory]
+    [InlineData("de", "15,2", "MB")]
+    [InlineData("ar", "15.2", "م.ب")]
+    public void SonucMetnindeSayiBirimindenAyrilmaz(string dil, string sayi, string birim)
+    {
+        var (sonuc, tanik, ikinci) = Pencere(Dar, w =>
+        {
+            var yazi = string.Format(VidShrink.App.Localization.Strings.Get("main.run.done"), 3, "420,0", sayi, "96,4");
+            var sonucMetni = Ad<TextBlock>(w, "TxtResult");
+            var tanikMetni = Ad<TextBlock>(w, "TxtEstimateNote");
+            sonucMetni.Text = yazi;
+            tanikMetni.Text = yazi;
+            var ilk = sonucMetni.Text!;
+            sonucMetni.Text = ilk;
+            return (ilk, tanikMetni.Text!, sonucMetni.Text!);
+        }, sekme: 1, dil: dil);
+
+        _output.WriteLine($"{dil}: {sonuc.Replace("\u00A0", "[nbsp]").Replace("\u200E", "[lrm]")}");
+        Assert.Contains(sayi + " " + birim, tanik.Replace("\u200E", ""), StringComparison.Ordinal);
+        Assert.Contains(sayi + "\u00A0" + birim, sonuc.Replace("\u200E", ""), StringComparison.Ordinal);
+        Assert.DoesNotContain(sayi + " " + birim, sonuc.Replace("\u200E", ""), StringComparison.Ordinal);
+        Assert.Equal(sonuc, ikinci);
+    }
+
+    [Theory]
+    [InlineData("de")]
+    [InlineData("tr")]
+    public void SesSeviyesiKutusuKazancKutusuylaOrtali(string dil)
+    {
+        var (fark, ayniSatir) = Pencere(Genis, w =>
+        {
+            Ad<StackPanel>(w, "AudioBody").IsVisible = true;
+            Yerlestir(w, Genis);
+            var kutu = Ad<CheckBox>(w, "ChkAudioLoudnorm");
+            var kombo = Ad<ComboBox>(w, "CmbAudioGain");
+            var yazi = kutu.GetVisualDescendants().OfType<Border>().First(b => b.Name == "CheckOutline");
+            var k = Yeri(kombo, w);
+            var y = Yeri(yazi, w);
+            return (y.Center.Y - k.Center.Y, y.Top < k.Bottom && y.Bottom > k.Top);
+        }, sekme: 1, dil: dil);
+
+        _output.WriteLine($"{dil}: fark {fark:0.##}, aynı satır {ayniSatir}");
+        Assert.True(ayniSatir, $"{dil}: kutu ile kazanç aynı satırda değil, ölçü bir şey görmüyor.");
+        Assert.True(Math.Abs(fark) < 1, $"{dil}: ses normalleştirme kutusu kazanç kutusundan {fark:0.##} px kayık.");
+    }
+
+    [Theory]
+    [InlineData("tr")]
+    [InlineData("de")]
+    public void PaylasimEtiketleriDenetimleOrtali(string dil)
+    {
+        var farklar = Pencere(Dar, w =>
+        {
+            var kombo = Ad<ComboBox>(w, "CmbShareRetention");
+            var dugme = Ad<Button>(w, "BtnShareDelete");
+            var izgara = (Grid)dugme.GetVisualParent()!;
+            TextBlock Etiket(int satir) => izgara.Children.OfType<TextBlock>().Single(t => Grid.GetRow(t) == satir && Grid.GetColumn(t) == 0);
+            double Orta(Control c) => Yeri(c, w).Center.Y;
+            return new[] { ("Ömür", Orta(Etiket(1)) - Orta(kombo)), ("Silme", Orta(Etiket(2)) - Orta(dugme)) };
+        }, sekme: 5, dil: dil);
+
+        foreach (var (ad, fark) in farklar) _output.WriteLine($"{dil} {ad}: {fark:0.##}");
+        Assert.All(farklar, f => Assert.True(Math.Abs(f.Item2) < 1, $"{f.Item1} etiketi denetimden {f.Item2:0.##} px kayık."));
+    }
+
+    [Theory]
+    [InlineData("tr")]
+    [InlineData("de")]
+    public void SayfaKenariKaydirmaCubugunaDayanmaz(string dil)
+    {
+        var bosluklar = new[] { (1, "PageShrink"), (3, "PageRecorder"), (5, "PageSettings") }
+            .Select(s => (ad: s.Item2, bosluk: Pencere(Dar, w =>
+            {
+                var kaydirici = Ad<ScrollViewer>(w, s.Item2);
+                var icerik = (Control)kaydirici.Content!;
+                var cubuk = kaydirici.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ScrollBar>()
+                    .Single(c => c.Orientation == Orientation.Vertical && ReferenceEquals(c.TemplatedParent, kaydirici));
+                Assert.True(cubuk.IsVisible, $"{s.Item2} kaydırma çubuğu görünmüyor; ölçü boş koşar.");
+                return Yeri(cubuk, w).Left - Yeri(icerik, w).Right;
+            }, sekme: s.Item1, dil: dil)))
+            .ToArray();
+
+        foreach (var (ad, bosluk) in bosluklar) _output.WriteLine($"{dil} {ad}: {bosluk:0.##}");
+        var kucult = bosluklar[0].bosluk;
+        Assert.True(kucult >= 1, $"Küçült'te bile içerik çubuğa dayanıyor ({kucult:0.##} px).");
+        Assert.All(bosluklar, b => Assert.True(Math.Abs(b.bosluk - kucult) < 0.5, $"{b.ad} çubuktan {b.bosluk:0.##} px uzak, Küçült {kucult:0.##} px."));
+    }
+
+    [Theory]
+    [InlineData("de")]
+    [InlineData("en")]
+    [InlineData("ar")]
+    public void KuyrukDugmeSimgeleriOrtadaVeCumleBuyutulmez(string dil)
+    {
+        var (sapmalar, duraklatildi) = AppHost.Run(() =>
+        {
+            var kultur = System.Globalization.CultureInfo.CurrentUICulture;
+            System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo(dil);
+            VidShrink.App.Localization.Strings.Use(dil);
+            var ayar = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
+            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi", "yok", "settings.json"));
+            var yollar = new[] { @"C:\Videolar\a.mp4", @"C:\Videolar\b.mov", @"C:\Videolar\c.mkv" };
+            ShrinkJobWindow pencere;
+            try { pencere = new ShrinkJobWindow(yollar, new VidShrink.Core.PlanOptions { TargetMb = 25 }, false, null) { Actions = new SahteSonEylem() }; }
+            finally { Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", ayar); }
+            try
+            {
+                pencere.Classes.Add("reduced-motion");
+                pencere.SetPaused(true);
+                pencere.Begin();
+                pencere.Measure(new Size(420, double.PositiveInfinity));
+                pencere.Arrange(new Rect(pencere.DesiredSize));
+                pencere.UpdateLayout();
+                DonusumleriSil(pencere);
+                var liste = Ad<StackPanel>(pencere, "PendingList");
+                var olcu = liste.GetVisualDescendants().OfType<Button>()
+                    .Select(d => (ad: Avalonia.Automation.AutomationProperties.GetName(d), sapma: MurekkepSapmasi(d)))
+                    .ToArray();
+                return (olcu, Ad<TextBlock>(pencere, "TxtPaused").Text ?? "");
+            }
+            finally
+            {
+                pencere.Close();
+                System.Globalization.CultureInfo.CurrentUICulture = kultur;
+                VidShrink.App.Localization.Strings.Use("en");
+            }
+        });
+
+        foreach (var (ad, sapma) in sapmalar) _output.WriteLine($"{ad}: {sapma:0.##}");
+        _output.WriteLine(duraklatildi);
+        Assert.Equal(9, sapmalar.Length);
+        var enKotu = sapmalar.MaxBy(s => s.sapma);
+        Assert.True(enKotu.sapma <= 1, $"{enKotu.ad}: simgenin mürekkebi düğmenin ortasından {enKotu.sapma:0.##} px kayık.");
+        Assert.Equal(VidShrink.App.Localization.Strings.GetIn(dil, "main.shrink-job.paused"), duraklatildi.Replace("\u00A0", " ", StringComparison.Ordinal).Replace("\u2060", "", StringComparison.Ordinal));
+    }
+
+    private static double MurekkepSapmasi(Button dugme)
+    {
+        var w = (int)Math.Ceiling(dugme.Bounds.Width);
+        var h = (int)Math.Ceiling(dugme.Bounds.Height);
+        using var bitmap = new Avalonia.Media.Imaging.RenderTargetBitmap(new PixelSize(w, h), new Vector(96, 96));
+        bitmap.Render(dugme);
+        var pikseller = new byte[w * h * 4];
+        var tutamak = System.Runtime.InteropServices.GCHandle.Alloc(pikseller, System.Runtime.InteropServices.GCHandleType.Pinned);
+        try { bitmap.CopyPixels(new PixelRect(0, 0, w, h), tutamak.AddrOfPinnedObject(), pikseller.Length, w * 4); }
+        finally { tutamak.Free(); }
+        int Parlaklik(int x, int y) => pikseller[(y * w + x) * 4 + 2] + pikseller[(y * w + x) * 4 + 1] + pikseller[(y * w + x) * 4];
+        var zemin = Parlaklik(3, h / 2);
+        int sol = w, sag = -1, ust = h, alt = -1;
+        for (var y = 2; y < h - 2; y++)
+            for (var x = 2; x < w - 2; x++)
+            {
+                if (Math.Abs(Parlaklik(x, y) - zemin) < 150) continue;
+                sol = Math.Min(sol, x); sag = Math.Max(sag, x); ust = Math.Min(ust, y); alt = Math.Max(alt, y);
+            }
+        if (sag < 0) return double.PositiveInfinity;
+        return Math.Max(Math.Abs((sol + sag + 1) / 2.0 - w / 2.0), Math.Abs((ust + alt + 1) / 2.0 - h / 2.0));
+    }
+
+    [Theory]
+    [InlineData("tr", 0)]
+    [InlineData("tr", 1)]
+    [InlineData("tr", 2)]
+    [InlineData("de", 0)]
+    [InlineData("en", 1)]
+    [InlineData("ar", 0)]
+    public void BirakmaBasligiTekSozcukleBitmez(string dil, int boyutNo)
+    {
+        var boyut = new[] { Dar, YerlesimDenetimiTests.DarBoyut, Genis }[boyutNo];
+        var (metin, sonSatir, satir) = Pencere(boyut, w =>
+        {
+            var baslik = Ad<TextBlock>(w, "TxtDropTitle");
+            var satirlar = baslik.TextLayout.TextLines;
+            var son = satirlar[^1];
+            var yazi = baslik.Text ?? "";
+            return (yazi, yazi.Substring(son.FirstTextSourceIndex, Math.Min(son.Length, yazi.Length - son.FirstTextSourceIndex)).Trim(), satirlar.Count);
+        }, sekme: 1, dil: dil, dolu: false);
+
+        _output.WriteLine($"{satir} satır, '{metin}', son: '{sonSatir}'");
+        Assert.False(string.IsNullOrEmpty(metin));
+        Assert.True(satir == 1 || sonSatir.Split(new[] { ' ', ' ' }, StringSplitOptions.RemoveEmptyEntries).Length > 1,
+            $"Bırakma başlığının son satırı tek sözcük: '{sonSatir}'.");
+    }
+
+    [Theory]
+    [InlineData("tr", false)]
+    [InlineData("tr", true)]
+    [InlineData("de", false)]
+    [InlineData("ar", false)]
+    public void SimdiSatirlariDenetimSirasiylaHizali(string dil, bool enDar)
+    {
+        var boyut = enDar ? YerlesimDenetimiTests.DarBoyut : Dar;
+        var sonuc = Pencere(boyut, w =>
+        {
+            w.RecalculateForTest();
+            Ad<StackPanel>(w, "AdvancedBody").IsVisible = true;
+            Yerlestir(w, boyut);
+            return new[] { "TxtAdvModeNow", "TxtAdvCrfNow", "TxtAdvPresetNow", "TxtAdvTuneNow", "TxtAdvEncoderPathNow", "TxtAdvCodecLockNow" }
+                .Select(ad => Ad<TextBlock>(w, ad))
+                .Where(t => t.Bounds.Width > 0 && !string.IsNullOrEmpty(t.Text))
+                .Select(t =>
+                {
+                    var yazi = Yeri(t, w);
+                    var orta = yazi.Top + yazi.Height / 2;
+                    var denetimler = t.FindAncestorOfType<Grid>()!.GetVisualDescendants()
+                        .Where(d => d is RadioButton or ComboBox).Cast<Control>().Select(d => Yeri(d, w)).ToArray();
+                    var fark = denetimler.Min(d => Math.Abs(d.Top + d.Height / 2 - orta));
+                    var arada = orta < denetimler.Max(d => d.Bottom);
+                    return (ad: t.Name!, fark: arada ? fark : 0, satir: denetimler.Select(d => Math.Round(d.Top)).Distinct().Count());
+                })
+                .ToArray();
+        }, sekme: 1, dil: dil);
+
+        foreach (var (ad, fark, satir) in sonuc) _output.WriteLine($"{ad}: denetim satırları arasında kalan kayma {fark:0.#} px, denetim satırı {satir}");
+        Assert.Contains(sonuc, s => s.ad == "TxtAdvEncoderPathNow");
+        var enKotu = sonuc.MaxBy(s => s.fark);
+        Assert.True(enKotu.fark <= 1, $"{enKotu.ad} denetim satırlarının arasında, hiçbirinin hizasında değil: {enKotu.fark:0.#} px.");
     }
 
     /// <summary>
