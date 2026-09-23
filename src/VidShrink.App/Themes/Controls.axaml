@@ -304,6 +304,28 @@
         </Style>
       </ControlTheme>
 
+      <ControlTheme x:Key="PanelHeaderToggle" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Style Selector="^:pointerover">
+          <Setter Property="RenderTransform" Value="none"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#HoverRing">
+          <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#Root">
+          <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
+        </Style>
+        <Style Selector="^:pressed">
+          <Setter Property="RenderTransform" Value="none"/>
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Root">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
+      </ControlTheme>
+
       <ControlTheme x:Key="PrimaryButton" TargetType="Button">
         <Setter Property="FocusAdorner" Value="{x:Null}"/>
         <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
@@ -824,6 +846,93 @@
         </Style>
       </ControlTheme>
 
+      <ControlTheme x:Key="{x:Type RadioButton}" TargetType="RadioButton">
+        <Setter Property="FocusAdorner" Value="{x:Null}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="Template">
+          <ControlTemplate TargetType="RadioButton">
+            <Grid MinHeight="{StaticResource TargetMinSize}" Background="{TemplateBinding Background}" VerticalAlignment="Center">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{StaticResource CheckColumnWidth}"/>
+                <ColumnDefinition Width="{StaticResource CheckGapWidth}"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Panel Grid.Column="0" Width="{StaticResource TargetMinSize}" Height="{StaticResource TargetMinSize}">
+                <Ellipse Name="RadioOutline"
+                         Width="{StaticResource CheckGlyphSize}" Height="{StaticResource CheckGlyphSize}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                         Fill="{StaticResource Surface}"
+                         Stroke="{StaticResource NeonBlue}"
+                         StrokeThickness="{StaticResource BorderThinScalar}">
+                  <Ellipse.Transitions>
+                    <Transitions>
+                      <BrushTransition Property="Fill" Duration="{StaticResource MotionInstant}"/>
+                      <BrushTransition Property="Stroke" Duration="{StaticResource MotionInstant}"/>
+                    </Transitions>
+                  </Ellipse.Transitions>
+                </Ellipse>
+                <Ellipse Name="RadioDot"
+                         Width="{StaticResource RadioDotSize}" Height="{StaticResource RadioDotSize}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                         Fill="{StaticResource NeonBlue}"
+                         Opacity="0"
+                         RenderTransform="scale(0.6)">
+                  <Ellipse.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+                      <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+                    </Transitions>
+                  </Ellipse.Transitions>
+                </Ellipse>
+                <Ellipse Name="FocusRing"
+                         Width="{StaticResource TargetMinSize}" Height="{StaticResource TargetMinSize}"
+                         IsHitTestVisible="False"
+                         Stroke="Transparent"
+                         StrokeThickness="{StaticResource FocusRingScalar}"/>
+              </Panel>
+              <ContentPresenter Grid.Column="2"
+                                Name="PART_ContentPresenter"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Foreground="{TemplateBinding Foreground}"
+                                TextWrapping="Wrap"
+                                VerticalAlignment="Center"/>
+            </Grid>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:checked /template/ Ellipse#RadioDot">
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="RenderTransform" Value="none"/>
+        </Style>
+        <Style Selector="^:checked /template/ Ellipse#RadioOutline">
+          <Setter Property="Stroke" Value="{StaticResource NeonPurple}"/>
+          <Setter Property="Fill" Value="{StaticResource NeonBlueActive}"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Ellipse#RadioOutline">
+          <Setter Property="Stroke" Value="{StaticResource NeonPink}"/>
+        </Style>
+        <Style Selector="^:focus-visible /template/ Ellipse#FocusRing">
+          <Setter Property="Stroke" Value="{StaticResource NeonPink}"/>
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Foreground" Value="{StaticResource TextDisabled}"/>
+          <Setter Property="Cursor" Value="No"/>
+        </Style>
+        <Style Selector="^:disabled /template/ Ellipse#RadioOutline">
+          <Setter Property="Stroke" Value="{StaticResource TextDisabled}"/>
+          <Setter Property="Fill" Value="Transparent"/>
+        </Style>
+        <Style Selector="^:disabled /template/ Ellipse#RadioDot">
+          <Setter Property="Fill" Value="{StaticResource TextDisabled}"/>
+        </Style>
+      </ControlTheme>
+
       <ControlTheme x:Key="NeonTabControl" TargetType="TabControl">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -948,12 +1057,24 @@
                         BorderBrush="Transparent"
                         BorderThickness="{StaticResource FocusRingThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}"/>
+                <Border Name="TabIndicator"
+                        IsHitTestVisible="False"
+                        Height="{StaticResource TabIndicatorHeight}"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Stretch"
+                        Background="{StaticResource NeonBlue}"
+                        Opacity="0"
+                        RenderTransform="scaleX(0.4)"/>
               </Panel>
             </Border>
           </ControlTemplate>
         </Setter>
         <Style Selector="^:selected">
           <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        </Style>
+        <Style Selector="^:selected /template/ Border#TabIndicator">
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="RenderTransform" Value="none"/>
         </Style>
         <Style Selector="^:selected /template/ Border#HoverRing">
           <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
@@ -1098,6 +1219,9 @@
         <Style Selector="^:dropdownopen /template/ Border#Root">
           <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
         </Style>
+        <Style Selector="^:dropdownopen /template/ Path#Arrow">
+          <Setter Property="RenderTransform" Value="rotate(180deg)"/>
+        </Style>
         <Style Selector="^:focus-visible /template/ Border#FocusRing">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
         </Style>
@@ -1196,7 +1320,7 @@
                     Background="{StaticResource NeonPink}"
                     BorderBrush="{StaticResource NeonBlue}"
                     BorderThickness="{StaticResource BorderThin}"
-                    CornerRadius="{StaticResource RadiusCell}"/>
+                    CornerRadius="{StaticResource SliderFilledTrackRadius}"/>
           </ControlTemplate>
         </Setter>
       </ControlTheme>
@@ -1212,7 +1336,7 @@
                     Background="{StaticResource Surface}"
                     BorderBrush="{StaticResource NeonBlue}"
                     BorderThickness="{StaticResource BorderThin}"
-                    CornerRadius="{StaticResource RadiusCell}"/>
+                    CornerRadius="{StaticResource SliderEmptyTrackRadius}"/>
           </ControlTemplate>
         </Setter>
       </ControlTheme>

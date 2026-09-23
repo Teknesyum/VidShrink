@@ -57,6 +57,33 @@
         </Animation>
       </Style.Animations>
     </Style>
+
+    <Style Selector="TabControl.compact TabItem /template/ Path#TabIcon">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
+    <Style Selector="Window:not(.reduced-motion) TabItem /template/ Border#TabIndicator">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+          <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionBase}" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
+
+    <Style Selector="Path.chevron">
+      <Setter Property="RenderTransform" Value="none"/>
+    </Style>
+    <Style Selector="Path.chevron.open">
+      <Setter Property="RenderTransform" Value="rotate(180deg)"/>
+    </Style>
+    <Style Selector="Window:not(.reduced-motion) Path.chevron, Window:not(.reduced-motion) ComboBox /template/ Path#Arrow">
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
   </Application.Styles>
 
 </Application>
