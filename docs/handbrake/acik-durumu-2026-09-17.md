@@ -194,13 +194,13 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | A3 `izle` | **girdi** | `Core/WatchFolder.cs`, `WatchFolderTests` |
 | A5 CLI ürün yolu + HB SVT hız kolu | **girdi** | `hb.ps1:1610` `urun-cli`, `:1832` svt kolu, `docs/olcumler/handbrake-kiyas-cli.md`, koşum 35248903679, birleşme `ef8e6931` |
 | B1a ac3/eac3 **kodlama** | **girdi** (19 Eylül, `8f09dc60`) | `Core/PlanParser.cs:14` `AllowedAudioCodecs` artık `ac3, eac3` taşıyor; `LanguageTests` marka adı izinlisi |
-| B1a flac **küçültmede** | **dalda** (22 Eylül, `worktree-agent-ac648426fe8f56b4a`, birleşmedi) | `AllowedAudioCodecs` flac taşıyor; bütçeye 16 bit tavanla girer (`StreamMapping.FlacCeilingK`), sığmazsa `FlacFellBack`; CLI `--ses-kodek`; `FlacSesTests` |
-| B1b loudnorm / gain | **dalda** (aynı dal) | `StreamMapping.AudioFilter` (`loudnorm=I=-24:LRA=7:TP=-2`, `volume=NdB`), istenince ses kopyalanmaz; CLI `--ses-normal`, `--ses-kazanc`; `SesNormallestirmeTests` |
-| B1c harici SRT/ASS | **dalda** (aynı dal) | `ExternalSubtitle` ek `-i` girdisi, MP4 mov_text / MKV kopya / WebM webvtt; CLI `--altyazi`, `--yan-altyazi`; `DisAltyaziTests`. Arayüz yüzü yok |
-| B1d kapak resmi | **dalda** (aynı dal), yalnız MP4 | `CoverMap` + `-disposition:v:1 attached_pic`, bayt bütçede; MKV/MOV ölçüldü, taşımıyor; `KapakResmiTests` |
-| B1e forced | **dalda** (aynı dal) | `StreamMapping.DefaultForced`: varsayılansız çıktıda forced iz varsayılan olur; `ForcedAltyaziTests`. Foreign Audio Search yok |
-| B1f yakma | **dalda**, yalnız metin altyazı | `VideoFilterChain.BurnFilter` (`subtitles=...:si=N`), CLI `--yak N`; PGS overlay ister, reddedilir; `AltyaziYakmaTests` |
-| B2 küçültmeye aralık | denetlenmedi | bu turda okunmadı |
+| B1a flac **küçültmede** | **girdi** (22 Eylül, birleşme `9c16cbb5`) | `AllowedAudioCodecs` flac taşıyor; bütçeye 16 bit tavanla girer (`StreamMapping.FlacCeilingK`), sığmazsa `FlacFellBack`; CLI `--ses-kodek`; `FlacSesTests` |
+| B1b loudnorm / gain | **girdi** (`9c16cbb5`) | `StreamMapping.AudioFilter` (`loudnorm=I=-24:LRA=7:TP=-2`, `volume=NdB`), istenince ses kopyalanmaz; CLI `--ses-normal`, `--ses-kazanc`; `SesNormallestirmeTests` |
+| B1c harici SRT/ASS | **girdi** (`9c16cbb5`) | `ExternalSubtitle` ek `-i` girdisi, MP4 mov_text / MKV kopya / WebM webvtt; CLI `--altyazi`, `--yan-altyazi`; `DisAltyaziTests`. Arayüz yüzü yok |
+| B1d kapak resmi | **girdi** (`9c16cbb5`), yalnız MP4 | `CoverMap` + `-disposition:v:1 attached_pic`, bayt bütçede; MKV/MOV ölçüldü, taşımıyor; `KapakResmiTests` |
+| B1e forced | **girdi** (`9c16cbb5`) | `StreamMapping.DefaultForced`: varsayılansız çıktıda forced iz varsayılan olur; `ForcedAltyaziTests`. Foreign Audio Search yok |
+| B1f yakma | **girdi** (`9c16cbb5`), yalnız metin altyazı | `VideoFilterChain.BurnFilter` (`subtitles=...:si=N`), CLI `--yak N`; PGS overlay ister, reddedilir; `AltyaziYakmaTests` |
+| B2 küçültmeye aralık | **girdi** (23 Eylül denetimi) | `c594a1c1`: CLI `--kes` (saniye ya da `300f-900f`), `EncodePlan.Trim` bütçeyi kesit süresinden alır (`EncodePlan.cs:142-146`); `KucultmeAraligiTests`, `KucultmeAraligiKosucuTests` |
 | B3 VT plan yolu / VP9 küçültme | VP9 **girdi (23 Eylül)**; VT **ölçüldü, kapıdan kaldı** (23 Eylül denetimi) | VT: K2 2/8, K4 5/8, bağlantı geri alındı, kapı `PlanParserTests.ParserStillRejectsVideoToolboxEncoders` ile kapalı (`docs/olcumler/videotoolbox-hizli.md`). VP9: `-b:v` + `-pass 1/2`, `-deadline good -cpu-used 4 -row-mt 1`, kap WebM, ses opus; WebM'in taşımadığı iz `WebmStreamDropped` notuyla düşer; HandBrake `av_webm`/`VP9` artık gerçek kol (kilit `libvpx-vp9`). cpu-used ve vp9 CRF ölçeği ölçülmedi. `Vp9KucultmeTests`, mutasyonlar `docs/olcumler/vp9-kucultme-mutasyonlar.md` |
 | B4 HDR10+/DV | **girdi (23 Eylül)** | DV 8.1 x265/SVT-AV1'de taşınıyor, MP4'te `-strict unofficial`; HDR10+ ve taşınamayan DV gerekçeye düşüyor; `HdrDinamikTests`, ölçüm `docs/olcumler/b4-hdr-dinamik.md` |
 | C1-1 `Saturated` satırı | **girdi (22 Eylül)** | `MainWindow.SaturatedSuffix`, `ShrinkJobWindow.BittiSatiri`; `main.run.saturated` 42 dilde; `DoygunTeslimTests` 4/4, iki mutasyon kırmızı |
