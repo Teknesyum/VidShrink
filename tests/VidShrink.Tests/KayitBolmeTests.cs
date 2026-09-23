@@ -10,19 +10,25 @@ using Xunit;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// Paket 2b borcu: <see cref="RecorderSession"/>'ın kendiliğinden bölme yoklaması, süre sınırının parçalara
+/// Paket 2b borcu: <see cref="RecorderSession"/>'ın kendiliğinden bölmesi, süre sınırının parçalara
 /// kalanla dağıtılması ve <c>_partial</c> yolu gerçek gdigrab kaydında. 5 sn sınır ve 2 sn bölme en az iki
 /// numaralı parça verir, parçaların toplamı 5 sn'yi aşmaz; bölmesiz aynı kayıt tek parça (negatif kontrol).
-/// Ölçülen: 2 sn bölmede parçalar 3,134 + 1,867 sn; birinci parça ~1,1 sn uzuyor, kalan süre ikinciden
-/// düşüyor (aşımın yoklama, ilerleme bloğu ve nazik kapanış arasında payı ayrılmadı). Aşım makineye bağlı ve
-/// büyüyen bir kuyruk: bu makinede beş koşumda 3,134-3,2 sn, bir CI koşumunda 3,667 sn, başka bir CI
-/// koşumunda (paylaşılan koşucuda beş iş birden, 23 Eylül 2026) 4,4 sn ölçüldü — sabit bir tavan (önce 3,5,
-/// sonra 4,0 sn) her yük artışında yeniden kırmızı veriyor (docs/olcumler/kayit-bolme-parca-siniri.md).
-/// Birinci parçanın üst sınırı artık sabit değil, ölçülen toplam süreye bağlı: bölme hiç olmasaydı tek
-/// parça toplamın tamamını yutardı, o yüzden sınır "toplamın tamamına yakın değil" — kuyruk ne kadar
-/// büyürse büyüsün bölmenin gerçekten olduğunu yakalamaya yetiyor, CI'nın o günkü yüküne göre yeniden
-/// ayarlanmıyor. Bölme kararının kendisi (<see cref="RecorderSession.SplitDue"/>) gerçek zamanlamaya
-/// bağlı değil; <c>SplitDueSaf*</c> onu sahte ilerleme/boyut değerleriyle belirlemeci ölçer.
+/// <para>
+/// 23 Eylül 2026'da bölme dışarıdan (250 ms'de bir yoklayan <c>WatchSplitAsync</c> + nazik <c>q</c> kapanışı)
+/// uygulanıyordu ve paylaşılan CI koşucusunda 2 sn'lik bölme 4,4 sn'lik parça üretti — sabit bir tavan (önce
+/// 3,5, sonra 4,0 sn) her yük artışında yeniden kırmızı veriyordu (<c>docs/olcumler/kayit-bolme-parca-siniri.md</c>).
+/// Kök neden gerçekti: nazik kapanışın gecikmesi CI yükü arttıkça uzuyor ve parça süresine giriyordu. Düzeltme
+/// tavanı gevşetmek değil, aşımı üründen kaldırmaktı: <see cref="RecorderArguments.ForSegment"/> artık bölme
+/// ölçütünü parçanın kendi <c>-t</c>/<c>-fs</c> sınırına katıyor (<c>min(bölme ölçütü, kalan toplam)</c>), ffmpeg
+/// parçayı içerik zamanında kendisi kapatıyor; dış yoklama ve nazik kapanış artık parça süresine hiç girmiyor
+/// (<see cref="RecorderSession.WatchExitAsync"/> dogal cikisi "parça doldu, sonrakini aç" diye okuyor). Bu
+/// yüzden alt sınır artık gerçek ve sıkı: 2 sn'lik bölmede ölçülen parçalar 2,0-2,03 sn arası (üç yerel koşum,
+/// <c>docs/olcumler/kayit-bolme-parca-siniri.md</c>), tavan 2,5 sn — 4,4 sn'ye değil 2 katına (yaklaşımın
+/// asıl kusuruna) karşı pimli.
+/// </para>
+/// Argüman düzeyindeki davranış (bölme ölçütünün <c>-t</c>'ye katılması, son kısa parça, bölmesiz kayıtta hiç
+/// yazılmaması) <see cref="KayitFfmpegKoluTests"/>'te <c>ForSegment</c> üzerinden belirlemeci ve mutasyonla
+/// pimli; burada yalnız gerçek ffmpeg sürecinin bunu uyguladığı ölçülüyor.
 /// Kapanma süresi 1 ms verilen kayıt öldürülür ve yarım işaretlenir; öldürülen Matroska ffprobe'la okunur paket verir,
 /// öldürülen mp4 vermez — <see cref="RecorderArguments.SurvivesKill"/> tablosu davranışla ölçülür. Ölçülen:
 /// <c>-flush_packets 1</c> olmadan 7 sn'lik Matroska öldürülünce 0 bayt kalıyordu. Kanıt <c>.calisma/paket-2b/bolme/</c>.
@@ -104,7 +110,7 @@ public sealed class KayitBolmeTests
         Assert.InRange(bolunmus.Segments, 2, 4);
         Assert.Equal(bolunmus.Segments, parcaSureleri.Count);
         var toplam = parcaSureleri.Sum();
-        Assert.All(parcaSureleri, s => Assert.InRange(s, 0.2, toplam * 0.95));
+        Assert.All(parcaSureleri, s => Assert.InRange(s, 0.2, 2.5));
         Assert.InRange(toplam, 4.0, 5.6);
 
         Assert.True(tek.Ok, tek.StandardError);
@@ -123,39 +129,4 @@ public sealed class KayitBolmeTests
             .Concat(new[] { "olcu.txt", "bolunmus.mkv", "tek.mkv", "yarim.mkv", "yarim.mp4" }).ToArray()!);
     }
 
-    /// <summary>
-    /// <see cref="RecorderSession.SplitDue"/>'nun saf hâli: gerçek ffmpeg süreci ya da saat yok,
-    /// yalnız sahte ilerleme/boyut değerleri. Sınırın altı false, sınırın kendisi ve üstü true
-    /// (kapanış <c>&gt;=</c>); boyut ölçütü aynı şekilde ayrı pimli. Bölme yokken (<c>Split: null</c>)
-    /// her girdi için false: negatif kontrol.
-    /// </summary>
-    [Theory]
-    [InlineData(1.999, false)]
-    [InlineData(2.0, true)]
-    [InlineData(2.001, true)]
-    public void SplitDueSafSureEsigindeTetiklenir(double capturedSeconds, bool beklenen)
-    {
-        var split = new RecorderSplit(TimeSpan.FromSeconds(2));
-        var sonuc = RecorderSession.SplitDue(split, TimeSpan.FromSeconds(capturedSeconds), outputMb: 0);
-        Assert.Equal(capturedSeconds >= 2.0, sonuc);
-        Assert.Equal(beklenen, sonuc);
-    }
-
-    [Theory]
-    [InlineData(9.9, false)]
-    [InlineData(10.0, true)]
-    [InlineData(10.1, true)]
-    public void SplitDueSafBoyutEsiginde(double outputMb, bool beklenen)
-    {
-        var split = new RecorderSplit(Megabytes: 10);
-        var sonuc = RecorderSession.SplitDue(split, TimeSpan.Zero, outputMb);
-        Assert.Equal(beklenen, sonuc);
-    }
-
-    /// <summary>Negatif kontrol: bölme kurulmamışken hiçbir sahte değer tetiklemez.</summary>
-    [Fact]
-    public void SplitDueSafBolmeYokkenHicTetiklenmez()
-    {
-        Assert.False(RecorderSession.SplitDue(null, TimeSpan.FromSeconds(999), outputMb: 999_999));
-    }
 }

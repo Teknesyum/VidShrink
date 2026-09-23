@@ -590,14 +590,33 @@ public sealed class KayitFfmpegKoluTests
         => Assert.Null(RecorderArguments.ForSegment(
             Istek() with { MaxDuration = TimeSpan.FromSeconds(150) }, TimeSpan.FromSeconds(gecen)));
 
+    /// <summary>
+    /// Sinirsiz kayitta bolme olcutu artik parcanin kendi -t'sine yaziliyor (ffmpeg parcayi
+    /// kendisi kapatiyor); eskiden istek degismeden geri donuyordu ve kesme
+    /// <c>RecorderSession</c>'in disaridan yoklamasina birakiliyordu. Split her seferinde
+    /// argumana giriyor, sonraki parca da ayni sureyle acilir (surekli bolme).
+    /// </summary>
     [Fact]
-    public void SinirsizKayittaParcaIstegiDegismez()
+    public void SinirsizKayittaBolmeSuresiIlkParcayaYazilir()
     {
         var istek = Istek() with { Split = new RecorderSplit(TimeSpan.FromMinutes(1)) };
 
-        Assert.Same(istek, RecorderArguments.ForSegment(istek, TimeSpan.FromMinutes(3)));
+        var ilkParca = RecorderArguments.ForSegment(istek, TimeSpan.Zero)!;
+        Assert.Null(ilkParca.Split);
+        Assert.Equal("60", Deger(RecorderArguments.Build(ilkParca, @"C:\kayit\a.mp4"), "-t"));
+
+        var sonrakiParca = RecorderArguments.ForSegment(istek, TimeSpan.FromMinutes(3))!;
+        Assert.Equal("60", Deger(RecorderArguments.Build(sonrakiParca, @"C:\kayit\a.mp4"), "-t"));
     }
 
+    /// <summary>
+    /// Bolme suresi kalan toplam sureden uzunsa parca kalanla kurulur (son, kisa parca):
+    /// 150 sn sinirda 120 sn gectiyse kalan 30 sn, 60 sn'lik bolme onu kesmez. Ilk parcada
+    /// (capturedBefore=0) kalan (150) bolme suresinden (60) uzun oldugu icin parca 60 sn'de
+    /// kurulur — bolme olcutu artik hicbir zaman degismeden tasinmiyor (Split hep null'a
+    /// dusuyor), aksi halde kalan sure bolme suresinden kisa kaldiginda dogrulama parcayi
+    /// reddederdi.
+    /// </summary>
     [Fact]
     public void BolmeSuresiKalanSuredenUzunOlsaDaParcaKurulur()
     {
@@ -607,10 +626,25 @@ public sealed class KayitFfmpegKoluTests
             Split = new RecorderSplit(TimeSpan.FromSeconds(60))
         };
 
-        var parca = RecorderArguments.ForSegment(istek, TimeSpan.FromSeconds(120))!;
+        var sonParca = RecorderArguments.ForSegment(istek, TimeSpan.FromSeconds(120))!;
+        Assert.Equal("30", Deger(RecorderArguments.Build(sonParca, @"C:\kayit\a.mp4"), "-t"));
+        Assert.Null(sonParca.Split);
 
-        Assert.Equal("30", Deger(RecorderArguments.Build(parca, @"C:\kayit\a.mp4"), "-t"));
-        Assert.Equal(istek.Split, RecorderArguments.ForSegment(istek, TimeSpan.Zero)!.Split);
+        var ilkParca = RecorderArguments.ForSegment(istek, TimeSpan.Zero)!;
+        Assert.Equal("60", Deger(RecorderArguments.Build(ilkParca, @"C:\kayit\a.mp4"), "-t"));
+        Assert.Null(ilkParca.Split);
+    }
+
+    /// <summary>Negatif kontrol: bolme kurulmamis bir istekte -t bolme olcutunden gelmez, hic yazilmaz.</summary>
+    [Fact]
+    public void BolmeYokkenOlcutArgumanaGirmez()
+    {
+        var istek = Istek();
+        Assert.Null(istek.Split);
+
+        var parca = RecorderArguments.ForSegment(istek, TimeSpan.Zero)!;
+        Assert.Same(istek, parca);
+        Assert.DoesNotContain("-t", RecorderArguments.Build(parca, @"C:\kayit\a.mp4"));
     }
 
     [Fact]
@@ -630,8 +664,10 @@ public sealed class KayitFfmpegKoluTests
     }
 
     /// <summary>
-    /// Bolme olcutu arguman uretmiyor: parcalari <c>RecorderSession</c> aciyor. Olcut
-    /// verilmis bir istek, verilmemis istegin argumaniyla birebir ayni kaliyor.
+    /// <c>Build</c>'in kendisi Split'i hic okumuyor: bir istege sadece Split eklemek (ForSegment'tan
+    /// gecirmeden) argumani degistirmiyor. Split'i -t/-fs'e katan <c>ForSegment</c>; onun ustunden
+    /// gecen davranis <c>BolmeSuresiKalanSuredenUzunOlsaDaParcaKurulur</c> ve
+    /// <c>SinirsizKayittaBolmeSuresiIlkParcayaYazilir</c>'de pimli.
     /// </summary>
     [Fact]
     public void BolmeOlcutuArgumanaGirmez()

@@ -65,3 +65,29 @@ yoklaması (`RecorderSession.cs:344`) ve ffmpeg'in `-progress` blok aralığı (
    Bölme kararının kendisi (`RecorderSession.SplitDue`, artık `internal static` ve saf)
    `KayitBolmeTests.SplitDueSaf*` ile gerçek zamanlamadan bağımsız, sahte ilerleme/boyut
    değerleriyle belirlemeci pimlendi (`>=` sınırını `>`'a çeviren mutasyon 1/7 kırmızı verdi).
+
+## 24 Eylül 2026 — `toplam * 0.95` reddedildi, aşım üründen kaldırıldı
+
+Yukarıdaki `toplam * 0.95` pratikte sınırı kaldırıyordu: 2 sn'lik bölmede 4,4 sn'lik
+parça (iki kat) da bu sınırın içinde kalırdı. Kullanıcı "2 sn'de böl" dediğinde iki katını
+almak gerçek bir kusur — tavanı gevşetmek yerine aşımın kendisi kaldırıldı.
+
+Kök neden zaten biliniyordu: parça, bölme kararı verildikten sonra `FinishSegmentAsync`'in
+nazik `q` kapanışını bekleyerek yakalamayı sürdürüyordu, o bekleme CI yüküne bağlıydı. Asıl
+düzeltme: her parçanın ffmpeg süreci artık **kendi** `-t`/`-fs` sınırını taşıyor
+(`RecorderArguments.ForSegment`, `min(bölme ölçütü, kalan toplam)`), ffmpeg parçayı içerik
+zamanında kendisi kapatıyor — dış yoklama ve nazik kapanışın gecikmesi parça süresine hiç
+girmiyor. `RecorderSession.WatchExitAsync` artık sürecin doğal çıkışını "parça doldu,
+sonrakini aç" (ForSegment null dönmüyorsa) ya da "kayıt bitti" (null dönüyorsa) diye okuyor;
+eski `WatchSplitAsync`'in 250 ms'lik dış yoklaması ve `SplitDue`'nun üretimdeki çağrısı
+kaldırıldı (saf `SplitDue` metodu da artık üretimde kullanılmadığından testleriyle birlikte
+silindi — kalsa ölü kod olurdu).
+
+Üç yerel koşumda (`BolmeSureSiniriniParcalaraDagitirYarimKayitIsaretlenir`, 2 sn bölme, 5 sn
+toplam sınır) ölçülen parça süreleri artık gerçek ve sıkı bir tavana sığıyor; tavan 2,5 sn —
+4,4 sn'yi de, 2 katına çıkan bir kusuru da yakalar, ama gerçek ~2,0-2,03 sn'lik parçalara
+gerçek bir tolerans (bir kare + küçük pay) bırakıyor. Argüman düzeyindeki davranış
+(`-t`'nin bölme ölçütünden yazılması, kalan sürenin bölme süresinden kısa olduğu son parça,
+bölmesiz kayıtta hiç yazılmaması) `KayitFfmpegKoluTests.SinirsizKayittaBolmeSuresiIlkParcayaYazilir`,
+`BolmeSuresiKalanSuredenUzunOlsaDaParcaKurulur` ve `BolmeYokkenOlcutArgumanaGirmez`'de
+belirlemeci pimli.
