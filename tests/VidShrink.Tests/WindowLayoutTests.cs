@@ -94,6 +94,7 @@ public sealed class WindowLayoutTests
     /// </summary>
     private static void LayOutAt(MainWindow window, Size size)
     {
+        BassizYerlesim.PlatformBoyu(window, size);
         // Pencerenin kendi Width/Height degerleri ApplyLayoutConstraints tarafindan olcum
         // argumaninin yerine konur; temizlenmezse pencere her boyutta ayni seyi olcer.
         window.Width = double.NaN;
@@ -106,6 +107,7 @@ public sealed class WindowLayoutTests
         var root = (Layoutable)window.GetVisualChildren().Single();
         root.Measure(size);
         root.Arrange(new Rect(size));
+        BassizYerlesim.IkinciGecis(window, root, size);
 
         ClearEntranceTransforms(window);
     }

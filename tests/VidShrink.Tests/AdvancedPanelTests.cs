@@ -61,6 +61,7 @@ public sealed class AdvancedPanelTests
     /// <summary>Bkz. <c>WindowLayoutTests.LayOutAt</c> — aynı teknik, ekran açmadan yerleşim.</summary>
     private static void LayOutAt(MainWindow window, Size size)
     {
+        BassizYerlesim.PlatformBoyu(window, size);
         window.Width = double.NaN;
         window.Height = double.NaN;
 
@@ -71,6 +72,7 @@ public sealed class AdvancedPanelTests
         var root = (Layoutable)window.GetVisualChildren().Single();
         root.Measure(size);
         root.Arrange(new Rect(size));
+        BassizYerlesim.IkinciGecis(window, root, size);
 
         foreach (var node in window.GetVisualDescendants().OfType<Visual>()) node.RenderTransform = null;
     }
@@ -125,7 +127,9 @@ public sealed class AdvancedPanelTests
         IReadOnlyList<ReasonCode> Codes,
         double PlanBodyHeight,
         double Floor,
-        double Ceiling);
+        double Ceiling,
+        double Viewport,
+        double ReachedEnd);
 
     private static MaxReasonLayout MeasureMaxReasonLayout() =>
         Fresh(window =>
@@ -150,6 +154,8 @@ public sealed class AdvancedPanelTests
             // T54 olcusu de ayni teknikle alinmisti.
             var scroll = window.GetVisualDescendants().OfType<ScrollViewer>().Single(v => v.Name == "PlanScroll");
             var plan = window.ActivePlanForTest;
+            scroll.Offset = new Vector(0, scroll.Extent.Height);
+            var reachedEnd = scroll.Offset.Y + scroll.Viewport.Height;
 
             window.TryFindResource("PlanPanelMinHeight", out var floor);
             window.TryFindResource("PlanPanelMaxHeight", out var ceiling);
@@ -159,7 +165,9 @@ public sealed class AdvancedPanelTests
                 plan?.ReasonCodes.Select(n => n.Code).ToList() ?? new List<ReasonCode>(),
                 scroll.Extent.Height,
                 (double)floor!,
-                (double)ceiling!);
+                (double)ceiling!,
+                scroll.Viewport.Height,
+                reachedEnd);
         });
 
     /// <summary>
@@ -182,21 +190,25 @@ public sealed class AdvancedPanelTests
         Xunit.Assert.True(layout.PlanBodyHeight > 0, "PlanBody hiç ölçülmedi.");
     }
 
-    /// <summary>K2: tavan, K1'in ölçtüğü içerik yüksekliğine sığacak kadar büyük — ölçü
-    /// belirtecin kendisini okur, bir sayı elle tekrar yazılmıyor.</summary>
+    /// <summary>
+    /// K2: en çok gerekçe üreten plan açıkken tavanı aşar ve taşma <c>PlanScroll</c>'a düşer (K6);
+    /// kaydırma listenin sonuna kadar iner. Eski iddia "tavan içeriği taşır" idi ve 232 px ölçümüyle
+    /// geçiyordu; düzenek gerekçeler açıldıktan sonra yeniden ölçmüyordu, 232 px kapalı hâlin boyuydu.
+    /// Açık hâl 446 px genişlikte 1114 px (<c>BassizYerlesim.IkinciGecis</c>).
+    /// </summary>
     [Fact]
-    public void TheCeilingFitsTheMostReasonProducingContent()
+    public void TheMostReasonProducingContentScrollsToItsEndInsideThePlanPanel()
     {
         var layout = MeasureMaxReasonLayout();
 
-        _output.WriteLine($"olculen icerik: {layout.PlanBodyHeight:0.#} px, taban: {layout.Floor:0} px, tavan: {layout.Ceiling:0} px");
+        _output.WriteLine($"olculen icerik: {layout.PlanBodyHeight:0.#} px, gorus: {layout.Viewport:0.#} px, ulasilan son: {layout.ReachedEnd:0.#} px, taban: {layout.Floor:0} px, tavan: {layout.Ceiling:0} px");
 
         Xunit.Assert.True(layout.PlanBodyHeight > 0, "PlanBody hiç ölçülmedi; kıyas boşa düşerdi.");
         Xunit.Assert.True(layout.Ceiling >= layout.Floor,
             $"Tavan ({layout.Ceiling}) taban ({layout.Floor}) altında kalamaz.");
-        Xunit.Assert.True(layout.Ceiling >= layout.PlanBodyHeight,
-            $"K2: tavan ({layout.Ceiling:0} px) en çok gerekçe üreten planın ölçülen "
-            + $"yüksekliğini ({layout.PlanBodyHeight:0.#} px) taşımıyor.");
+        Xunit.Assert.True(layout.PlanBodyHeight > layout.Viewport,
+            $"K2: açık gerekçeler ({layout.PlanBodyHeight:0.#} px) görüş alanını ({layout.Viewport:0.#} px) aşmıyor; taşma kolu ölçülmüyor.");
+        Xunit.Assert.InRange(layout.ReachedEnd, layout.PlanBodyHeight - 0.5, layout.PlanBodyHeight + 0.5);
     }
 
     /// <summary>

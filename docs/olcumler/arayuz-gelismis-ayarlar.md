@@ -510,3 +510,29 @@ TheGridRowHoldsAnOutOfRangeDragRequest(requested: 5000)
 `OluUyeTests`in beklenen kırılması `owns` dışında; tur 5'te de dokunulmadı.
 Yeni renk/ölçü uydurulmadı: ürün tarafına yalnız `SplitterRowActualHeightForTest`
 okuyucusu eklendi, `Theme.axaml` ve `Controls.axaml` diff'te yok.
+
+## Düzeltme (23.09.2026) — K1'in 232 px'i Kapalı Hâlin Boyuydu
+
+Başsız düzenek gerekçeler açıldıktan sonra yeniden ölçmüyordu: `LayOutAt` aynı boyutla
+`Measure` çağırınca önbellek geçerli sayılıyor, yerleşim yöneticisi de gösterilmeyen
+pencerede geçiş koşmuyor. 232 px, gerekçeler **kapalıyken** ölçülmüş boydu.
+
+Düzenek artık ikinci geçişi yapıyor (`tests/VidShrink.Tests/BassizYerlesim.cs`,
+`IkinciGecis`). Aynı bileşimde açık hâl:
+
+```
+olculen icerik: 1114 px, gorus: 424 px, taban: 320 px, tavan: 512 px
+```
+
+Yani en çok gerekçe üreten plan tavanı aşıyor ve taşma `PlanScroll`'a düşüyor; bu, K6'nın
+kendi tasarımı ("açıkken listenin tamamı görünür ve taşma `PlanScroll`'a düşer"). K2'nin
+"tavan içeriği taşır" iddiası yalnız bayat ölçümle geçiyordu. Kol yeniden adlandırıldı:
+`TheMostReasonProducingContentScrollsToItsEndInsideThePlanPanel` — içerik görüş alanını
+aşıyor ve kaydırma listenin sonuna iniyor. Negatif kontrol: `IkinciGecis` etkisizken kol
+kırmızı, `K2: açık gerekçeler (232 px) görüş alanını (232 px) aşmıyor`.
+
+Aynı düzenek kusuru `WindowLayoutTests`/`AdvancedPanelTests`'in yalnız CI'da kırmızı olmasının
+da kökü: platform penceresi açılışta ekrana göre boyutlanıyor (CI koşucusu 1024x720) ve
+pencere düzeyindeki sınırlar onun boyunda kalıyordu; `KucultSutunlari` sol sütun kararını
+düşürdü, bilgi ızgarası iki sütuna indi, dolu sayfa 930 yerine 1038 px ölçüldü. Yerelde
+platform penceresi 1024x720'ye zorlanınca aynı 1038 çıktı; `PlatformBoyu` ile 930.
