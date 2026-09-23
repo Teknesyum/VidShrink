@@ -45,10 +45,17 @@ public static class FfmpegArguments
     /// </summary>
     public static IReadOnlyCollection<string> KnownCodecs => (IReadOnlyCollection<string>)Presets.Keys;
 
+    /// <summary>
+    /// libvpx-vp9 icin <c>1</c>: olcum <c>docs/olcumler/vp9-cpu-used-crf.md</c> (kosum
+    /// 35795367223), tek bayt-gecerli hucrede (gren/4000) cpu-used 1, 92.516 kbps ile tabanin
+    /// (92.209) ustunde, 225 sn; cpu-used 4 92.516'nin altinda kalirdi. HandBrake'in
+    /// libhb/encavcodec.c apply_vpx_preset varsayilani "medium" = cpu-used 2 (veryfast=5,
+    /// faster=4, fast=3, slow=1, slower=0); 1, HandBrake'in "slow" adimina denk gelir.
+    /// </summary>
     public static string DefaultPreset(string codec) => codec.ToLowerInvariant() switch
     {
         "libsvtav1" => "8",
-        "libvpx-vp9" => "4",
+        "libvpx-vp9" => "1",
         "h264_nvenc" or "hevc_nvenc" => "p4",
         "av1_nvenc" => "p6",
         "h264_qsv" or "hevc_qsv" or "av1_qsv" => "medium",

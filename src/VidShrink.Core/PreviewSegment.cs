@@ -49,12 +49,13 @@ public sealed record PreviewSegment
 
     /// <summary>
     /// Kalite olcegi modellenen kodlayicilar. <see cref="CodecModel.ReferenceCrf"/> ve
-    /// <see cref="CodecModel.CrfRange"/> yalnizca h264/hevc/av1 ailelerini tanir; listede
-    /// olmayan bir kodlayici icin bitrate karsiligi <b>baska bir olcekten</b> cikardi.
+    /// <see cref="CodecModel.CrfRange"/> h264/hevc/av1 ailelerini ve libvpx-vp9'u (vp9 kendi
+    /// dalindan degil h264 ile ayni varsayilan dalindan gecer) taniyor; listede olmayan bir
+    /// kodlayici icin bitrate karsiligi <b>baska bir olcekten</b> cikardi.
     /// </summary>
     private static readonly HashSet<string> ModelledCodecs = new(StringComparer.OrdinalIgnoreCase)
     {
-        "libx264", "libx265", "libsvtav1",
+        "libx264", "libx265", "libsvtav1", "libvpx-vp9",
         "h264_nvenc", "hevc_nvenc", "av1_nvenc",
         "h264_qsv", "hevc_qsv", "av1_qsv",
         "h264_amf", "hevc_amf", "av1_amf"

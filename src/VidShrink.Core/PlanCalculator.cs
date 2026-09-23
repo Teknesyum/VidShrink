@@ -1758,6 +1758,13 @@ public static class PlanCalculator
     /// -0,22 / -0,01 bantta, sure HB'nin 1,31-1,39 kati. <c>handbrake</c> 2000@24'te p6 onde oldugu icin
     /// kapsam genisletilmedi; <c>docs/olcumler/handbrake-kiyas-b7-aciklar.md</c>.
     /// </summary>
+    /// <summary>
+    /// libvpx-vp9 Hizli modda <c>4</c> kosar (varsayilanla ayni <see cref="FfmpegArguments.DefaultPreset"/>
+    /// olan <c>1</c> degil). Olcum <c>docs/olcumler/vp9-cpu-used-crf.md</c> (kosum 35795367223):
+    /// cpu-used 5, altı hücrenin altısında 4'ten hem kötü VMAF-NEG (-0,18..-1,31) hem toplamda
+    /// daha uzun sürdü (238/204 sn) — 5 hiçbir hücrede 4'ten hızlı değil, bu yüzden Hızlı=4 ile
+    /// varsayılandan (1) ayrı, ölçülmüş bir adımda kalır.
+    /// </summary>
     private static string PickPreset(string codec, CodecPreference pref, SpeedMode speed, Intent intent)
     {
         if (CodecModel.IsHardware(codec))
@@ -1767,7 +1774,7 @@ public static class PlanCalculator
             return FfmpegArguments.IsValidPreset(codec, preset) ? preset : FfmpegArguments.DefaultPreset(codec);
         }
         if (codec == "libsvtav1") return intent == Intent.SocialMedia && speed != SpeedMode.Fast ? "4" : "6";
-        if (CodecModel.IsVp9(codec)) return speed == SpeedMode.Fast || pref == CodecPreference.Fast ? "5" : FfmpegArguments.DefaultPreset(codec);
+        if (CodecModel.IsVp9(codec)) return speed == SpeedMode.Fast || pref == CodecPreference.Fast ? "4" : FfmpegArguments.DefaultPreset(codec);
         return pref == CodecPreference.Fast ? "medium" : "slow";
     }
 
