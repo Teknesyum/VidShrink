@@ -26,10 +26,14 @@
 
       <TextBlock x:Name="TxtHeadline"
                  FontSize="{StaticResource FontSizeMd}"
-                 TextTrimming="CharacterEllipsis"/>
+                 TextWrapping="Wrap"
+                 MaxLines="2"
+                 TextTrimming="CharacterEllipsis"
+                 ToolTip.Tip="{Binding $self.Text}"/>
 
       <TextBlock x:Name="TxtTarget"
                  FontSize="{StaticResource FontSizeSm}"
+                 TextWrapping="Wrap"
                  Foreground="{StaticResource TextDisabled}"/>
 
       <ProgressBar x:Name="Progress"
@@ -44,7 +48,8 @@
                    Margin="{StaticResource ChipMargin}"/>
         <TextBlock Grid.Column="1" x:Name="TxtStage"
                    FontSize="{StaticResource FontSizeSm}"
-                   TextTrimming="CharacterEllipsis"/>
+                   TextTrimming="CharacterEllipsis"
+                   ToolTip.Tip="{Binding $self.Text}"/>
         <TextBlock Grid.Column="2"
                    Text="{loc:Text main.output.remaining}"
                    FontSize="{StaticResource FontSizeSm}"

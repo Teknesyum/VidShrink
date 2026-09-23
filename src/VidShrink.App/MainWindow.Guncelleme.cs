@@ -348,6 +348,7 @@ public partial class MainWindow
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 HorizontalAlignment = HorizontalAlignment.Left
             };
+            ToolTip.SetTip(line, history[i]);
 
             if (!HoverZone.MotionReduced && motion > TimeSpan.Zero)
             {
