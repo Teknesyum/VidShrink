@@ -2936,7 +2936,8 @@ public partial class MainWindow : Window
             AllowFpsDrop = ChkFps.IsChecked == true,
             HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
             FillPolicy = FillPolicyIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget,
-            SpeedMode = ChkFastGpu.IsChecked == true ? SpeedMode.Fast : SpeedMode.Quality
+            SpeedMode = ChkFastGpu.IsChecked == true ? SpeedMode.Fast : SpeedMode.Quality,
+            DeliveredContainer = PresetLibrary.DeliveredContainer(_presetContainer)
         };
         ApplyAdvancedOptions(options);
         if (ChkWhatsAppCompatible.IsChecked == true) options.LockedCodec = null;
@@ -3647,7 +3648,7 @@ public partial class MainWindow : Window
         {
             EncodeMode.Crf => Say("main.plan.mode.crf-value", plan.Crf),
             EncodeMode.PassThrough => Say("main.plan.mode.copy"),
-            _ => $"{Strings.BitHizi(plan.VideoBitrateK)} · {Say("main.plan.mode.two-pass")}"
+            _ => $"{Strings.BitHizi(plan.VideoBitrateK)} · {Say(RunsSinglePass(plan) ? "main.plan.mode.single-pass" : "main.plan.mode.two-pass")}"
         });
         AddPlanFact(Say("main.plan.fact.resolution"), Bicim.Cozunurluk(plan.Width, plan.Height));
         AddPlanFact(Say("main.plan.fact.frame-rate"), Say("main.unit.fps-value", Bicim.Kare(plan.Fps, Strings.Culture)));
@@ -3699,9 +3700,7 @@ public partial class MainWindow : Window
         var basis = estimate.Measured
             ? Say("main.estimate.basis.measured")
             : Say("main.estimate.basis.estimated");
-        var mode = estimate.Enforced
-            ? Say("main.estimate.mode.enforced")
-            : Say("main.estimate.mode.ceiling");
+        var mode = Say(EstimateModeKey(ActivePlan, estimate));
         TxtEstimateNote.Text = $"{basis} · {mode} · {Say("main.estimate.predicted-quality")} {Say("main.unit.score-value", Num(_predictedQuality, "0.#"))}";
     }
 

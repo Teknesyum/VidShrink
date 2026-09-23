@@ -36,6 +36,24 @@ public partial class MainWindow
         _ => "main.advice.encoder-fallback-not-working"
     };
 
+    /// <summary>
+    /// Plan "2pass" dese de <see cref="CodecModel.SinglePassRateControl"/> kodlayıcıları
+    /// (NVENC/QSV/AMF/VideoToolbox) tek geçiş koşar (<see cref="FfmpegArguments.NeedsTwoPasses"/>);
+    /// arayüz o planı "iki geçiş" diye değil, gerçekte koşan tek geçişli bit hızı denetimi diye söyler.
+    /// </summary>
+    internal static bool RunsSinglePass(EncodePlan? plan) =>
+        plan is { ModeEnum: EncodeMode.TwoPass } && !FfmpegArguments.NeedsTwoPasses(plan.Codec);
+
+    /// <summary>
+    /// Tahmin notunun mod parçası. Akış kopyalamada kodlama yok, boyut kaynağınki; bit hızı
+    /// modunda anahtar gerçekte koşan geçiş sayısını söyler (<see cref="RunsSinglePass"/>).
+    /// </summary>
+    internal static string EstimateModeKey(EncodePlan? plan, SizeEstimate estimate) =>
+        plan?.ModeEnum == EncodeMode.PassThrough ? "main.estimate.mode.copy"
+        : !estimate.Enforced ? "main.estimate.mode.ceiling"
+        : RunsSinglePass(plan) ? "main.estimate.mode.enforced-single-pass"
+        : "main.estimate.mode.enforced";
+
     internal static EncoderFallbackCause EncoderFallbackCauseOf(EncodePlan? plan) =>
         plan?.ReasonCodes.FirstOrDefault(note => note.Code == ReasonCode.EncoderFallback)?.FallbackCause
         ?? EncoderFallbackCause.NotWorking;
@@ -57,7 +75,8 @@ public partial class MainWindow
                         Num(note.Crf, "0"), Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##"))
                     : Say("main.reason.budget-exceeds-ceiling",
                         Num(note.BudgetCrf, "0.#"), Num(note.Crf, "0"), Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##")),
-                ReasonCode.BudgetBelowCeilingTwoPass => Say("main.reason.budget-below-ceiling",
+                ReasonCode.BudgetBelowCeilingTwoPass => Say(RunsSinglePass(plan)
+                        ? "main.reason.budget-below-ceiling-single-pass" : "main.reason.budget-below-ceiling",
                     Num(note.BudgetCrf, "0.#"), Num(note.Crf, "0"), Num(note.TargetMb, "0.##")),
                 ReasonCode.PredictedQualityMeasured => Say("main.reason.quality-measured",
                     Num(note.Score, "0.#"), Num(note.Bppf, "0.0000"), Num(note.DetailExponent, "0.00")),
@@ -73,9 +92,11 @@ public partial class MainWindow
                 ReasonCode.Hdr10PlusDroppedInCut => Say("main.reason.hdr10plus-cut"),
                 ReasonCode.FillCrfLowered => Say("main.reason.fill-crf-lowered",
                     Num(note.Crf, "0.#"), Num(note.Mb, "0.0"), Num(note.BandLowerMb, "0.0"), Num(note.TargetMb, "0.0")),
-                ReasonCode.FillTwoPassBandCenter => Say("main.reason.fill-band-center",
+                ReasonCode.FillTwoPassBandCenter => Say(RunsSinglePass(plan)
+                        ? "main.reason.fill-band-center-single-pass" : "main.reason.fill-band-center",
                     Num(note.Crf, "0"), Num(note.Mb, "0.0")),
-                ReasonCode.FillTwoPassBandTooNarrowForCrf => Say("main.reason.fill-band-narrow",
+                ReasonCode.FillTwoPassBandTooNarrowForCrf => Say(RunsSinglePass(plan)
+                        ? "main.reason.fill-band-narrow-single-pass" : "main.reason.fill-band-narrow",
                     Bicim.Yuzde.Orandan(note.Factor, Strings.Culture),
                     Bicim.Yuzde.Orandan((note.TargetMb - note.BandLowerMb) / Math.Max(note.TargetMb, 0.01), Strings.Culture),
                     Num(note.Mb, "0.0")),
@@ -162,7 +183,7 @@ public partial class MainWindow
         foreach (var note in advice.Notes.Distinct())
         {
             var text = AdviceLine(note, Strings.Language, ChkFastGpu.IsChecked == true,
-                EncoderFallbackCauseOf(ActivePlan));
+                EncoderFallbackCauseOf(ActivePlan), RunsSinglePass(ActivePlan));
             if (text is not null) lines.Add(text);
         }
 
@@ -172,7 +193,7 @@ public partial class MainWindow
     internal static readonly AdviceCode[] AdviceCodesWithoutText = Array.Empty<AdviceCode>();
 
     internal static string? AdviceLine(AdviceCode note, string language, bool fastGpu,
-        EncoderFallbackCause fallbackCause = EncoderFallbackCause.NotWorking)
+        EncoderFallbackCause fallbackCause = EncoderFallbackCause.NotWorking, bool singlePass = false)
     {
 
         return note switch
@@ -191,7 +212,7 @@ public partial class MainWindow
             AdviceCode.ScaleSavesLittle => Speak(language, "main.advice.scale-saves-little"),
             AdviceCode.ResolutionReduced => Speak(language, "main.advice.resolution-reduced"),
             AdviceCode.FrameRateReduced => Speak(language, "main.advice.frame-rate-reduced"),
-            AdviceCode.TargetEnforcedTwoPass => Speak(language, "main.advice.two-pass"),
+            AdviceCode.TargetEnforcedTwoPass => Speak(language, singlePass ? "main.advice.single-pass" : "main.advice.two-pass"),
             AdviceCode.QualityCeilingReached => Speak(language, "main.advice.quality-ceiling"),
             AdviceCode.AudioReduced => Speak(language, "main.advice.audio-reduced"),
             AdviceCode.AudioMono => Speak(language, "main.advice.audio-mono"),

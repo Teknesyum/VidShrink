@@ -1142,6 +1142,12 @@ public sealed class BaslikKapsamiTests
     /// <c>main.reason.hdr10plus-routed-x265</c> 14 dilde kol degistiriyor, ikisi de en ve tr
     /// dahil: 1932 + 32 = 1964, en 226 + 2 = 228, tr 78 + 2 = 80. Oto-kirpmanin iki anahtari
     /// (<c>main.advanced.filters.autocrop</c>, <c>main.reason.auto-crop</c>) hicbir dilde kola girmiyor.</para>
+    /// <para>2026-09-23, tek gecis etiketi: donanim kodlayicisinin tek gecisini soyleyen yedi
+    /// anahtardan dordu kola giriyor: <c>main.estimate.mode.enforced-single-pass</c> 8 dilde,
+    /// <c>main.reason.budget-below-ceiling-single-pass</c> 10, <c>-fill-band-center-single-pass</c> 10,
+    /// <c>-fill-band-narrow-single-pass</c> 15. 1964 + 8 + 10 + 10 + 15 = 2007; en dordunde de
+    /// (228 + 4 = 232), tr yalniz band merkezinde (80 + 1 = 81). Yeniden yazilan
+    /// <c>main.output.estimated-output.tip</c> ne once ne sonra kolda.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1167,9 +1173,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1964, toplam);
-        Assert.Equal(228, dilBasina["en"]);
-        Assert.Equal(80, dilBasina["tr"]);
+        Assert.Equal(2007, toplam);
+        Assert.Equal(232, dilBasina["en"]);
+        Assert.Equal(81, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1309,6 +1315,10 @@ public sealed class BaslikKapsamiTests
     /// (<c>main.reason.hdr10plus-routed-x265</c>, <c>-svtav1</c>, <c>-cut</c>,
     /// <c>main.stage.hdr10plus-metadata</c>, <c>main.run.hdr10plus-short</c>): 1073 + 5 = 1078,
     /// 43 x 1078 = 46354.</para>
+    /// <para>2026-09-23: tek gecis etiketi dil basina yedi anahtar (<c>main.plan.mode.single-pass</c>,
+    /// <c>main.estimate.mode.enforced-single-pass</c>, <c>main.estimate.mode.copy</c>, uc
+    /// <c>main.reason.*-single-pass</c>, <c>main.advice.single-pass</c>): 1078 + 7 = 1085,
+    /// 43 x 1085 = 46655. <c>kayip</c> yine 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1336,7 +1346,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(46354, gezilen);
+        Assert.Equal(46655, gezilen);
         Assert.Empty(kayip);
     }
 
