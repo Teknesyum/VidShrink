@@ -1,4 +1,5 @@
 using VidShrink.App;
+using VidShrink.App.Localization;
 using VidShrink.Core;
 using Xunit;
 
@@ -140,5 +141,33 @@ public sealed class SuzgecPaneliTests
             foreach (var key in anahtarlar)
                 Assert.True(values.TryGetValue(key, out var metin) && metin.Length > 0, $"{language}: {key}");
         }
+    }
+
+    /// <summary>
+    /// G4: Gelişmiş'teki "Şu an" satırlarının değeri (süzgeç zinciri, ön ayar, kodek adı) ffmpeg sözdizimidir
+    /// ve dilin başlık kuralından geçmez. Satır önce biçimlenip sonra kapıdan geçtiğinde İngilizce ve Almancada
+    /// "Scale=…, Denoise=, Sharpen=" okunuyordu.
+    /// Olumsuz kontrol: aynı metni kapıdan geçirmek sözdizimini büyütür.
+    /// </summary>
+    [Fact]
+    public void SimdiSatiriDegeriBuyutmez()
+    {
+        const string zincir = "scale=1306:734:flags=lanczos, denoise=hqdn3d, sharpen=medium";
+        var sonuc = AppHost.Run(() =>
+        {
+            var onceki = Strings.Language;
+            try
+            {
+                return new[] { "en", "de", "tr" }.Select(dil =>
+                {
+                    Strings.Use(dil);
+                    return (dil, satir: MainWindow.SimdiSatiri(zincir), kapidan: LanguageCatalog.Display(Strings.Get("main.advanced.now", zincir)));
+                }).ToArray();
+            }
+            finally { Strings.Use(onceki); }
+        });
+        foreach (var (dil, satir, _) in sonuc)
+            Assert.True(satir.EndsWith(zincir, StringComparison.Ordinal), $"{dil}: {satir}");
+        Assert.Contains(sonuc, s => !s.kapidan.Contains(zincir, StringComparison.Ordinal));
     }
 }

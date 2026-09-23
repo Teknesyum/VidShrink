@@ -118,4 +118,35 @@ public sealed class AcilirGirisTests
         Assert.Equal(!azalt, animasyonlu);
         if (azalt) Assert.Equal(1, saydamlik);
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void SekmeGecisindeEskiSayfa(bool azalt)
+    {
+        var (gorunen, saydamlik) = AppHost.Run(() =>
+        {
+            Strings.Use("en");
+            var pencere = new MainWindow();
+            if (azalt) pencere.Classes.Add("reduced-motion");
+            else pencere.Classes.Remove("reduced-motion");
+            pencere.Show();
+            try
+            {
+                pencere.Tabs.SelectedIndex = 1;
+                Dispatcher.UIThread.RunJobs();
+                pencere.Tabs.SelectedIndex = 5;
+                Dispatcher.UIThread.RunJobs();
+                var ev = pencere.GetVisualDescendants().OfType<TransitioningContentControl>().First(d => d.Name == "SelectedContentHost");
+                var sunucular = ev.GetVisualDescendants().OfType<Avalonia.Controls.Presenters.ContentPresenter>()
+                    .Where(s => s.TemplatedParent == ev && s.IsVisible && s.Content is not null)
+                    .ToList();
+                return (sunucular.Count, sunucular.Min(s => s.Opacity));
+            }
+            finally { pencere.Close(); }
+        });
+
+        Assert.Equal(azalt ? 1 : 2, gorunen);
+        if (azalt) Assert.Equal(1, saydamlik);
+    }
 }

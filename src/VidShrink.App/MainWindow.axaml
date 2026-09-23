@@ -31,6 +31,9 @@
     <Style Selector="Window.reduced-motion Path:not(.chevron)">
       <Setter Property="RenderTransform" Value="none"/>
     </Style>
+    <Style Selector="Window.reduced-motion TabControl /template/ TransitioningContentControl#SelectedContentHost">
+      <Setter Property="PageTransition" Value="{x:Null}"/>
+    </Style>
 
     <!--
       Acilir bolum gorunur oldugunda yerine suzulur: Kalite, Ses, Kare, Gelismis, Hakkinda,
@@ -315,7 +318,7 @@
                           <ColumnDefinition Width="Auto" SharedSizeGroup="HedefBirim"/>
                         </izi:KaydiriciSatiri.ColumnDefinitions>
                         <Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="16" VerticalAlignment="Center"/>
-                        <TextBox x:Name="TxtTarget" Text="16" Width="{StaticResource NumberBoxWidth}" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
+                        <TextBox x:Name="TxtTarget" Text="16" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
                         <TextBlock Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </izi:KaydiriciSatiri>
                     <!--
@@ -452,7 +455,7 @@
                           <ColumnDefinition Width="Auto" SharedSizeGroup="HedefBirim"/>
                         </izi:KaydiriciSatiri.ColumnDefinitions>
                         <Slider x:Name="SliderQualityTarget" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
-                        <TextBox x:Name="TxtQualityTarget" Text="60" Width="{StaticResource NumberBoxWidth}" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
+                        <TextBox x:Name="TxtQualityTarget" Text="60" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
                         <TextBlock Text="{loc:Text main.unit.score-suffix}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </izi:KaydiriciSatiri>
                       <TextBlock x:Name="TxtQualityTargetNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
@@ -985,7 +988,7 @@
                         <TextBox Grid.Column="0"
                                  x:Name="TxtShareLink"
                                  IsReadOnly="True"
-                                 MaxLines="1"
+                                
                                  FontFamily="{StaticResource FontMono}"
                                  VerticalAlignment="Center"/>
                         <Button Grid.Column="1"
@@ -1108,7 +1111,7 @@
                       <izi:KaydiriciSatiri x:Name="CrfSliderRow" ColumnDefinitions="*,Auto" EnDarKaydirici="{StaticResource SliderMinWidth}"
                                            ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
                         <Slider x:Name="SliderQuality" Minimum="10" Maximum="45" Value="23" VerticalAlignment="Center"/>
-                        <TextBox x:Name="TxtQuality" Text="23" Width="{StaticResource NumberBoxWidth}" MaxLines="1" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
+                        <TextBox x:Name="TxtQuality" Text="23" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
                       </izi:KaydiriciSatiri>
                     </StackPanel>
 
@@ -1141,7 +1144,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtCustomResolution" Text="1280x720" MaxLines="1"/>
+                      <TextBox x:Name="TxtCustomResolution" Text="1280x720"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" Grid.Column="0">
@@ -1171,7 +1174,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtCustomFps" Text="25" MaxLines="1"/>
+                      <TextBox x:Name="TxtCustomFps" Text="25"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="4" Grid.Column="0">
@@ -1203,7 +1206,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtAudioBitrate" Text="128" MaxLines="1"/>
+                      <TextBox x:Name="TxtAudioBitrate" Text="128"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="5" Grid.Column="0">
@@ -1215,7 +1218,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtTrimStart" MaxLines="1"/>
+                      <TextBox x:Name="TxtTrimStart"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="5" Grid.Column="1">
@@ -1227,7 +1230,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtTrimEnd" MaxLines="1"/>
+                      <TextBox x:Name="TxtTrimEnd"/>
                     </StackPanel>
 
                   </Grid>
@@ -1408,7 +1411,7 @@
                     <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceSm}">
                       <TextBlock Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                        <TextBox x:Name="TxtDefaultTargetMb" Width="120" MaxLines="1" TextAlignment="Center"/>
+                        <TextBox x:Name="TxtDefaultTargetMb" Width="120" TextAlignment="Center"/>
                         <TextBlock Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </StackPanel>
                       <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
@@ -1431,7 +1434,7 @@
                       <RadioButton x:Name="RbOutputFixed" GroupName="OutputFolderMode" Content="{loc:Text settings-tab.output-folder.fixed}"/>
                     </WrapPanel>
                     <StackPanel x:Name="OutputFolderPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
-                      <TextBox x:Name="TxtOutputFolder" Width="360" MaxLines="1" IsReadOnly="True"/>
+                      <TextBox x:Name="TxtOutputFolder" Width="360" IsReadOnly="True"/>
                       <Button x:Name="BtnBrowseOutputFolder" Content="{loc:Text settings-tab.output-folder.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseOutputFolder"/>
                     </StackPanel>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-folder.hint}"/>
@@ -1440,7 +1443,7 @@
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <TextBlock Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtOutputName" Width="360" MaxLines="1"/>
+                      <TextBox x:Name="TxtOutputName" Width="360"/>
                       <Button x:Name="BtnResetOutputName" Content="{loc:Text settings-tab.output-name.reset}" Theme="{StaticResource GhostButton}" Click="OnResetOutputName"/>
                     </StackPanel>
                     <TextBlock x:Name="LblOutputNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
@@ -1454,7 +1457,7 @@
                       <RadioButton x:Name="RbFfmpegManual" GroupName="FfmpegPathMode" Content="{loc:Text settings-tab.ffmpeg-path.manual}"/>
                     </WrapPanel>
                     <StackPanel x:Name="FfmpegPathPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
-                      <TextBox x:Name="TxtFfmpegPath" Width="360" MaxLines="1"/>
+                      <TextBox x:Name="TxtFfmpegPath" Width="360"/>
                       <Button x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>
                     </StackPanel>
                     <TextBlock x:Name="TxtFfmpegPathError" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
@@ -1464,7 +1467,7 @@
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <TextBlock Text="{loc:Text settings-tab.opensubtitles.label}" Theme="{StaticResource Label}" Margin="0"/>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtOpenSubtitlesKey" Width="360" MaxLines="1" PasswordChar="*"/>
+                      <TextBox x:Name="TxtOpenSubtitlesKey" Width="360" PasswordChar="*"/>
                       <Button x:Name="BtnOpenSubtitlesKey" Content="{loc:Text settings-tab.opensubtitles.get}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesKeyPage"/>
                     </StackPanel>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.hint}"/>
@@ -1473,12 +1476,12 @@
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                       <StackPanel Spacing="{StaticResource SpaceXs}">
                         <TextBlock Text="{loc:Text settings-tab.opensubtitles.user}" Theme="{StaticResource Label}" Margin="0"/>
-                        <TextBox x:Name="TxtOpenSubtitlesUser" Width="180" MaxLines="1"
+                        <TextBox x:Name="TxtOpenSubtitlesUser" Width="180"
                                  auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.user}"/>
                       </StackPanel>
                       <StackPanel Spacing="{StaticResource SpaceXs}">
                         <TextBlock Text="{loc:Text settings-tab.opensubtitles.password}" Theme="{StaticResource Label}" Margin="0"/>
-                        <TextBox x:Name="TxtOpenSubtitlesPassword" Width="180" MaxLines="1" PasswordChar="*"
+                        <TextBox x:Name="TxtOpenSubtitlesPassword" Width="180" PasswordChar="*"
                                  auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.password}"/>
                       </StackPanel>
                       <Button x:Name="BtnOpenSubtitlesSignIn" Content="{loc:Text settings-tab.opensubtitles.signin}" Theme="{StaticResource GhostButton}" VerticalAlignment="Bottom" Click="OnOpenSubtitlesSignIn"/>
