@@ -19,6 +19,13 @@ public sealed class GorselDenetimYapiTests
 
     public GorselDenetimYapiTests(ITestOutputHelper output) => _output = output;
 
+    private sealed class SahteSonEylem : IQueueEndActions
+    {
+        public void Reveal(string path) { }
+        public void Sleep() { }
+        public void PowerOff() { }
+    }
+
     /// <summary>
     /// Bulgu 10: oynatıcı kısayol tablosunda kalın mono tuş ile sans açıklamanın ilk satır taban
     /// çizgileri aynı yükseklikte. İkisi satırın tepesine yaslıyken 2-3 px kayıyordu.
@@ -317,6 +324,77 @@ public sealed class GorselDenetimYapiTests
         Assert.NotEmpty(kaymalar);
         var enKotu = kaymalar.MaxBy(k => k.fark);
         Assert.True(enKotu.fark <= 0.5, $"{enKotu.satir}: aynı satırdaki değerler {enKotu.fark:0.#} px kayık.");
+    }
+
+    [Theory]
+    [InlineData("de")]
+    [InlineData("en")]
+    [InlineData("ar")]
+    public void KuyrukDugmeSimgeleriOrtadaVeCumleBuyutulmez(string dil)
+    {
+        var (sapmalar, duraklatildi) = AppHost.Run(() =>
+        {
+            var kultur = System.Globalization.CultureInfo.CurrentUICulture;
+            System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo(dil);
+            VidShrink.App.Localization.Strings.Use(dil);
+            var ayar = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
+            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi", "yok", "settings.json"));
+            var yollar = new[] { @"C:\Videolar\a.mp4", @"C:\Videolar\b.mov", @"C:\Videolar\c.mkv" };
+            ShrinkJobWindow pencere;
+            try { pencere = new ShrinkJobWindow(yollar, new VidShrink.Core.PlanOptions { TargetMb = 25 }, false, null) { Actions = new SahteSonEylem() }; }
+            finally { Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", ayar); }
+            try
+            {
+                pencere.Classes.Add("reduced-motion");
+                pencere.SetPaused(true);
+                pencere.Begin();
+                pencere.Measure(new Size(420, double.PositiveInfinity));
+                pencere.Arrange(new Rect(pencere.DesiredSize));
+                pencere.UpdateLayout();
+                DonusumleriSil(pencere);
+                var liste = Ad<StackPanel>(pencere, "PendingList");
+                var olcu = liste.GetVisualDescendants().OfType<Button>()
+                    .Select(d => (ad: Avalonia.Automation.AutomationProperties.GetName(d), sapma: MurekkepSapmasi(d)))
+                    .ToArray();
+                return (olcu, Ad<TextBlock>(pencere, "TxtPaused").Text ?? "");
+            }
+            finally
+            {
+                pencere.Close();
+                System.Globalization.CultureInfo.CurrentUICulture = kultur;
+                VidShrink.App.Localization.Strings.Use("en");
+            }
+        });
+
+        foreach (var (ad, sapma) in sapmalar) _output.WriteLine($"{ad}: {sapma:0.##}");
+        _output.WriteLine(duraklatildi);
+        Assert.Equal(9, sapmalar.Length);
+        var enKotu = sapmalar.MaxBy(s => s.sapma);
+        Assert.True(enKotu.sapma <= 1, $"{enKotu.ad}: simgenin mürekkebi düğmenin ortasından {enKotu.sapma:0.##} px kayık.");
+        Assert.Equal(VidShrink.App.Localization.Strings.GetIn(dil, "main.shrink-job.paused"), duraklatildi.Replace("\u00A0", " ", StringComparison.Ordinal).Replace("\u2060", "", StringComparison.Ordinal));
+    }
+
+    private static double MurekkepSapmasi(Button dugme)
+    {
+        var w = (int)Math.Ceiling(dugme.Bounds.Width);
+        var h = (int)Math.Ceiling(dugme.Bounds.Height);
+        using var bitmap = new Avalonia.Media.Imaging.RenderTargetBitmap(new PixelSize(w, h), new Vector(96, 96));
+        bitmap.Render(dugme);
+        var pikseller = new byte[w * h * 4];
+        var tutamak = System.Runtime.InteropServices.GCHandle.Alloc(pikseller, System.Runtime.InteropServices.GCHandleType.Pinned);
+        try { bitmap.CopyPixels(new PixelRect(0, 0, w, h), tutamak.AddrOfPinnedObject(), pikseller.Length, w * 4); }
+        finally { tutamak.Free(); }
+        int Parlaklik(int x, int y) => pikseller[(y * w + x) * 4 + 2] + pikseller[(y * w + x) * 4 + 1] + pikseller[(y * w + x) * 4];
+        var zemin = Parlaklik(3, h / 2);
+        int sol = w, sag = -1, ust = h, alt = -1;
+        for (var y = 2; y < h - 2; y++)
+            for (var x = 2; x < w - 2; x++)
+            {
+                if (Math.Abs(Parlaklik(x, y) - zemin) < 150) continue;
+                sol = Math.Min(sol, x); sag = Math.Max(sag, x); ust = Math.Min(ust, y); alt = Math.Max(alt, y);
+            }
+        if (sag < 0) return double.PositiveInfinity;
+        return Math.Max(Math.Abs((sol + sag + 1) / 2.0 - w / 2.0), Math.Abs((ust + alt + 1) / 2.0 - h / 2.0));
     }
 
     [Theory]

@@ -220,7 +220,7 @@ public sealed class GorselGozTests
             kok.Arrange(new Rect(new Size(420, kok.DesiredSize.Height)));
             Avalonia.Threading.Dispatcher.UIThread.RunJobs();
         }
-        foreach (var dugum in pencere.GetVisualDescendants().OfType<Visual>()) dugum.RenderTransform = null;
+        GorselDenetimTests.DonusumleriSil(pencere);
         var boy = (int)Math.Ceiling(kok.DesiredSize.Height);
         using var bitmap = new RenderTargetBitmap(new PixelSize(420, boy), new Vector(96, 96));
         bitmap.Render((Visual)kok);

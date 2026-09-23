@@ -676,7 +676,7 @@ public sealed class YerlesimDenetimiTests
             kok.Measure(new Size(genislik, double.PositiveInfinity));
             kok.Arrange(new Rect(new Size(double.IsInfinity(genislik) ? kok.DesiredSize.Width : genislik, kok.DesiredSize.Height)));
         }
-        foreach (var dugum in pencere.GetVisualDescendants().OfType<Visual>()) dugum.RenderTransform = null;
+        GorselDenetimTests.DonusumleriSil(pencere);
         Metinler(pencere, durum, denetim);
         Kardesler(pencere, durum, denetim);
         Tasmalar(pencere, durum, denetim);
@@ -758,7 +758,7 @@ public sealed class YerlesimDenetimiTests
             kok.Arrange(new Rect(boyut));
         }
 
-        foreach (var dugum in pencere.GetVisualDescendants().OfType<Visual>()) dugum.RenderTransform = null;
+        GorselDenetimTests.DonusumleriSil(pencere);
     }
 
     private static void Dispatcher() => Avalonia.Threading.Dispatcher.UIThread.RunJobs();

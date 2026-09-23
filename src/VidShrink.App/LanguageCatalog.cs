@@ -141,6 +141,8 @@ internal static class LanguageCatalog
     /// dar: icerik sozcugu (ad, sifat, asil fiil) buraya girmez, cunku o zaman her
     /// baslik cumle sayilirdi.
     /// </summary>
+    private const int ClauseWords = 3;
+
     private static readonly HashSet<string> FunctionWords =
         new(StringComparer.OrdinalIgnoreCase)
         {
@@ -172,7 +174,15 @@ internal static class LanguageCatalog
             if (index + 1 == text.Length || char.IsWhiteSpace(text[index + 1])) return true;
         }
 
-        return CarriesFunctionWord(text);
+        return CarriesClauseAfterColon(text) || CarriesFunctionWord(text);
+    }
+
+    private static bool CarriesClauseAfterColon(string text)
+    {
+        var colon = text.IndexOf(": ", StringComparison.Ordinal);
+        if (colon < 0) return false;
+        var words = text[(colon + 2)..].Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        return words.Count(word => word.Any(char.IsLetter)) >= ClauseWords;
     }
 
     /// <summary>
