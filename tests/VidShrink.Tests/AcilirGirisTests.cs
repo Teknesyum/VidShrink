@@ -111,12 +111,17 @@ public sealed class AcilirGirisTests
             var pencere = new Window { Content = dugme, Width = 300, Height = 200 };
             if (azalt) pencere.Classes.Add("reduced-motion");
             pencere.Show();
+            var enAz = 1.0;
+            ipucu.PropertyChanged += (_, e) =>
+            {
+                if (e.Property == Avalonia.Visual.OpacityProperty) enAz = Math.Min(enAz, ipucu.Opacity);
+            };
             try
             {
                 ToolTip.SetIsOpen(dugme, true);
                 Dispatcher.UIThread.RunJobs();
                 Assert.True(ipucu.IsVisible && TopLevel.GetTopLevel(ipucu) is not null);
-                var enAz = ipucu.Opacity;
+                enAz = Math.Min(enAz, ipucu.Opacity);
                 var saat = Stopwatch.StartNew();
                 while (saat.Elapsed.TotalMilliseconds < 400)
                 {
