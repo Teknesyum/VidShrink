@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "去块",
   "main.advanced.filters.deband": "去色带",
   "main.advanced.filters.gray": "灰度",
+  "main.advanced.filters.autocrop": "裁掉黑边",
   "main.advanced.filters.spec": "规格（裁剪、填充等）",
   "main.advanced.codec-lock.label": "锁定编码",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "{0} 编码器在本机尚未测量，因此编码回退到 {1}",
   "main.reason.encoder-fallback-not-working": "{0} 编码器在本机无法使用，因此编码回退到 {1}",
   "main.reason.hdr-tonemapped": "源为 HDR，但所选编码器无法保留 10 位，因此已色调映射为 SDR BT.709",
+  "main.reason.auto-crop": "已裁掉黑边：{0}x{1}（源 {2}x{3}）",
   "main.reason.hdr-dynamic-dropped": "源带有动态 HDR 元数据（HDR10+ 或 Dolby Vision），本次编码无法传递，因此输出只保留静态 HDR10 层",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9 的 CRF 质量刻度已实测，但 CRF 值对文件大小的影响尚未实测，因此用两遍 VBR 控制大小，而不是猜测 CRF",
   "main.reason.stream.audio-passthrough": "音频轨道按原样复制：容器支持其编解码器，且不超过目标的 15%",

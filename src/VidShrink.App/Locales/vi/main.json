@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Khử khối",
   "main.advanced.filters.deband": "Khử sọc",
   "main.advanced.filters.gray": "Thang độ xám",
+  "main.advanced.filters.autocrop": "Cắt viền đen",
   "main.advanced.filters.spec": "Đặc tả (cắt, đệm và các mục khác)",
   "main.advanced.codec-lock.label": "Khóa codec",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "bộ mã hóa {0} chưa được đo trên máy này, nên mã hóa quay về {1}",
   "main.reason.encoder-fallback-not-working": "không dùng được bộ mã hóa {0} trên máy này, nên mã hóa quay về {1}",
   "main.reason.hdr-tonemapped": "nguồn là HDR nhưng bộ mã hóa đã chọn không giữ được 10-bit, nên đã tone-map sang SDR BT.709",
+  "main.reason.auto-crop": "đã cắt viền đen: {0}x{1} (nguồn {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "nguồn mang siêu dữ liệu HDR động (HDR10+ hoặc Dolby Vision) mà lần mã hóa này không chuyển tiếp được, nên đầu ra chỉ giữ lớp HDR10 tĩnh",
   "main.reason.vp9-crf-unmeasured": "Thang chất lượng CRF của libvpx-vp9 đã được đo, nhưng chưa đo được giá trị CRF ảnh hưởng thế nào đến kích thước tệp, nên kích thước được giự bằng VBR hai lượt thay vì đoán CRF",
   "main.reason.stream.audio-passthrough": "rãnh âm thanh được sao chép nguyên trạng: vùng chứa hỗ trợ codec của nó và nằm trong 15% mục tiêu",

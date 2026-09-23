@@ -752,6 +752,7 @@
                               <CheckBox x:Name="ChkFltDeblock" Content="{loc:Text main.advanced.filters.deblock}"/>
                               <CheckBox x:Name="ChkFltDeband" Content="{loc:Text main.advanced.filters.deband}"/>
                               <CheckBox x:Name="ChkFltGray" Content="{loc:Text main.advanced.filters.gray}"/>
+                              <CheckBox x:Name="ChkFltAutoCrop" Content="{loc:Text main.advanced.filters.autocrop}"/>
                             </WrapPanel>
                             <StackPanel Spacing="{StaticResource SpaceXs}">
                               <TextBlock Text="{loc:Text main.advanced.filters.spec}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>

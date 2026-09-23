@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Odbločenje",
   "main.advanced.filters.deband": "Debanding",
   "main.advanced.filters.gray": "Sivinska lestvica",
+  "main.advanced.filters.autocrop": "Obreži črne pasove",
   "main.advanced.filters.spec": "Specifikacija (obreži, robovi itd.)",
   "main.advanced.codec-lock.label": "Zaklep kodeka",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "kodirnik {0} na tem računalniku ni bil izmerjen, zato kodiranje preide na {1}",
   "main.reason.encoder-fallback-not-working": "kodirnika {0} na tem računalniku ni bilo mogoče uporabiti, zato kodiranje preide na {1}",
   "main.reason.hdr-tonemapped": "vir je HDR, a izbrani kodirnik ne more ohraniti 10 bitov, zato je bil tonsko preslikan v SDR BT.709",
+  "main.reason.auto-crop": "črni pasovi obrezani: {0}x{1} (vir {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "vir nosi dinamične HDR metapodatke (HDR10+ ali Dolby Vision), ki jih to kodiranje ne prenese, zato izhod ohrani le statično plast HDR10",
   "main.reason.vp9-crf-unmeasured": "Kakovostna lestvica CRF za libvpx-vp9 je izmerjena, ni pa izmerjeno, kako se vrednost CRF odraža na velikosti datoteke, zato velikost drži dvoprehodni VBR namesto ugibanja CRF",
   "main.reason.stream.audio-passthrough": "zvočna sled se kopira nespremenjena: vsebnik podpira njen kodek in ostane znotraj 15 % cilja",

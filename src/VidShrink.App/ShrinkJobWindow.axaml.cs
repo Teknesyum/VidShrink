@@ -160,13 +160,27 @@ public partial class ShrinkJobWindow : Window
     /// pencerenin o anki seçeneklerinin kopyasıyla kurulur; boyut tavanı olmayan yongada hedef
     /// dosyanın kendi kalite tavanından hesaplanır. <paramref name="extension"/> ön ayar kabından gelir.
     /// </summary>
-    internal ShrinkJobWindow(IReadOnlyList<string> paths, PlanOptions template, bool ceilingTarget, string? extension)
+    internal ShrinkJobWindow(IReadOnlyList<string> paths, PlanOptions template, bool ceilingTarget, string? extension, bool autoCrop = false)
         : this(new ShellShrinkStartup(paths.Select(path => new ShrinkRequest(0, path)).ToList(), null, paths.FirstOrDefault()), null)
     {
         _template = template;
         _ceilingTarget = ceilingTarget;
         _extension = extension;
+        _autoCrop = autoCrop;
         TxtHeadline.Text = Say("main.shrink-job.batch", paths.Count);
+    }
+
+    private bool _autoCrop;
+
+    /// <summary>
+    /// HB #36: kuyruk "Siyah bantları kırp" kutusunu bayrak olarak taşır, dikdörtgeni değil —
+    /// bantlar dosyaya özgü. Her dosya kendi yoklamasıyla kırpılır; elle yazılmış <c>crop=</c> korunur.
+    /// </summary>
+    internal async Task<PlanOptions> KirpmaylaAsync(PlanOptions options, MediaInfo info, CancellationToken ct)
+    {
+        if (!_autoCrop || options.Filters.Crop is not null) return options;
+        options.Filters = OtomatikKirpma.Uygula(options.Filters, true, await OtomatikKirpma.BulAsync(info, ct));
+        return options;
     }
 
     /// <summary>İsteğin plan seçenekleri ve hedefi. Kabuk isteği yalnız hedefi taşır; bırakılan kuyruk pencerenin ayarlarını.</summary>
@@ -472,6 +486,7 @@ public partial class ShrinkJobWindow : Window
         {
             var info = await FfprobeClient.ProbeAsync(request.Path, cts.Token);
             var (options, targetMb) = OptionsFor(request, info);
+            options = await KirpmaylaAsync(options, info, cts.Token);
             TxtTarget.Text = Say("main.shrink-job.target", TargetLabel(targetMb), _finished + 1, _accepted);
             var plan = PlanCalculator.Build(info, options);
             var output = UniqueOutputPath(request.Path, _appSettings, plan, targetMb, ExtensionFor(plan));

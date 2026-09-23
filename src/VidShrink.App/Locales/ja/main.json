@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "ブロック除去",
   "main.advanced.filters.deband": "バンディング除去",
   "main.advanced.filters.gray": "グレースケール",
+  "main.advanced.filters.autocrop": "黒帯をクロップ",
   "main.advanced.filters.spec": "仕様(クロップ、パッドなど)",
   "main.advanced.codec-lock.label": "コーデック固定",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "{0}エンコーダーはこのマシンで測定されていないため、エンコードは{1}に戻ります",
   "main.reason.encoder-fallback-not-working": "{0}エンコーダーはこのマシンで使用できなかったため、エンコードは{1}に戻ります",
   "main.reason.hdr-tonemapped": "ソースはHDRですが選択したエンコーダーは10ビットを維持できないため、SDR BT.709にトーンマッピングしました",
+  "main.reason.auto-crop": "黒帯をクロップしました: {0}x{1}(ソース {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "ソースには動的HDRメタデータ(HDR10+またはDolby Vision)がありますが、このエンコードでは引き継げないため、出力には静的なHDR10層だけが残ります",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9 の CRF 品質尺度は測定されていますが、CRF 値がファイルサイズにどう反映されるかは測定されていないため、CRF を推測せず 2 パス VBR でサイズを保ちます",
   "main.reason.stream.audio-passthrough": "音声トラックはそのままコピーされます。コンテナがコーデックに対応し、目標の15%以内に収まります",

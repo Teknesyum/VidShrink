@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Усунути блоковість",
   "main.advanced.filters.deband": "Усунути смугастість",
   "main.advanced.filters.gray": "Відтінки сірого",
+  "main.advanced.filters.autocrop": "Обрізати чорні смуги",
   "main.advanced.filters.spec": "Специфікація (обрізка, поля тощо)",
   "main.advanced.codec-lock.label": "Фіксація кодека",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "кодер {0} не виміряно на цій машині, тож кодування переходить на {1}",
   "main.reason.encoder-fallback-not-working": "кодер {0} не вдалося використати на цій машині, тож кодування переходить на {1}",
   "main.reason.hdr-tonemapped": "джерело HDR, але вибраний кодер не зберігає 10 біт, тож його тонально відображено в SDR BT.709",
+  "main.reason.auto-crop": "чорні смуги обрізано: {0}x{1} (джерело {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "джерело містить динамічні метадані HDR (HDR10+ або Dolby Vision), які це кодування не переносить, тож у результаті лишається тільки статичний шар HDR10",
   "main.reason.vp9-crf-unmeasured": "Шкала якості CRF для libvpx-vp9 вимірена, але не вимірено, як значення CRF відображається на розмірі файлу, тому розмір тримає двопрохідний VBR, а не вгаданий CRF",
   "main.reason.stream.audio-passthrough": "звукова доріжка копіюється без змін: контейнер підтримує її кодек і вона вкладається в 15% цілі",

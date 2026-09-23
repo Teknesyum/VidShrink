@@ -264,6 +264,7 @@ public partial class MainWindow : Window
         foreach (var check in FilterChecks().Concat<ToggleButton>(FilterRadios()))
             Watch(check, ToggleButton.IsCheckedProperty, OnFilterControlChanged);
         Watch(TxtAdvFilters, TextBox.TextProperty, OnFilterTextChanged);
+        Watch(ChkFltAutoCrop, ToggleButton.IsCheckedProperty, OnAutoCropChanged);
         Watch(ChkAudioLoudnorm, ToggleButton.IsCheckedProperty, OnOptionChanged);
         foreach (var box in new[] { CmbAudioGain, CmbBurnSubtitle })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
@@ -2221,7 +2222,7 @@ public partial class MainWindow : Window
 
         options.LockedCodec = AdvancedText(CmbAdvCodecLock);
 
-        options.Filters = SuzgecOku(out _);
+        options.Filters = OtomatikKirpma.Uygula(SuzgecOku(out _), OtomatikKirpmaAcik, KirpmaSonucu());
         ApplyTrackOptions(options);
     }
 
@@ -2991,8 +2992,8 @@ public partial class MainWindow : Window
     {
         var options = CurrentOptions();
         options.ExternalSubtitles = Array.Empty<ExternalSubtitle>();
-        options.Filters = options.Filters with { BurnSubtitle = null };
-        return new(paths, options, !_chipSizeCapped && _info is not null, PresetLibrary.DeliveredExtension(_presetContainer));
+        options.Filters = options.Filters with { BurnSubtitle = null, Crop = SuzgecOku(out _).Crop };
+        return new(paths, options, !_chipSizeCapped && _info is not null, PresetLibrary.DeliveredExtension(_presetContainer), OtomatikKirpmaAcik);
     }
 
     /// <summary>C1-6: kaynak açıkken bırakılan altyazı dosyaları o videoya iz olarak eklenir, video sanılıp açılmaz.</summary>
@@ -3269,6 +3270,7 @@ public partial class MainWindow : Window
         RefreshChipDerivation();
 
         UpdateToolStatus();
+        KirpmaYoklamasiniBaslat();
         Recalculate();
         RefreshQualityTargetAvailability();
         DeriveQualityFromTarget();
@@ -4166,6 +4168,8 @@ public partial class MainWindow : Window
 
     private async void OnStart(object? sender, RoutedEventArgs e)
     {
+        if (_info is null || ActivePlan is null || _cts is not null) return;
+        await KirpmaHazirAsync();
         if (_info is null || ActivePlan is null || _cts is not null) return;
 
         var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", ShrinkExtension(ActivePlan), ActivePlan);

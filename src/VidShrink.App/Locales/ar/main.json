@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "إزالة التكتل",
   "main.advanced.filters.deband": "إزالة التبند",
   "main.advanced.filters.gray": "تدرج الرمادي",
+  "main.advanced.filters.autocrop": "قص الأشرطة السوداء",
   "main.advanced.filters.spec": "المواصفة (قص، حشو وأخرى)",
   "main.advanced.codec-lock.label": "قفل الترميز",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "لم يُقس المرمّز {0} على هذا الجهاز، فيعود الترميز إلى {1}",
   "main.reason.encoder-fallback-not-working": "تعذر استخدام المرمّز {0} على هذا الجهاز، فيعود الترميز إلى {1}",
   "main.reason.hdr-tonemapped": "المصدر HDR لكن المرمّز المختار لا يحفظ 10 بت، فحُوّل بالتدرج إلى SDR BT.709",
+  "main.reason.auto-crop": "تم قص الأشرطة السوداء: {0}x{1} (المصدر {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "المصدر يحمل بيانات HDR ديناميكية (HDR10+ أو Dolby Vision) لا يمررها هذا الترميز، لذا يحتفظ الناتج بطبقة HDR10 الثابتة فقط",
   "main.reason.vp9-crf-unmeasured": "مقياس جودة CRF في libvpx-vp9 مُقاس، لكن كيف تنعكس قيمة CRF على حجم الملف غير مُقاس، لذا يُضبط الحجم بترميز VBR بمرحلتين بدلًا من تخمين CRF",
   "main.reason.stream.audio-passthrough": "يُنسخ مسار الصوت كما هو: الحاوية تدعم ترميزه ولا يتجاوز 15% من الهدف",

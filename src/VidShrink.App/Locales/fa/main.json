@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "حذف بلوک‌بندی",
   "main.advanced.filters.deband": "حذف نوار‌بندی",
   "main.advanced.filters.gray": "مقیاس خاکستری",
+  "main.advanced.filters.autocrop": "برش نوارهای سیاه",
   "main.advanced.filters.spec": "مشخصات (برش، حاشیه و موارد دیگر)",
   "main.advanced.codec-lock.label": "قفل کدک",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "رمزگذار {0} روی این دستگاه اندازه‌گیری نشده، پس رمزگذاری به {1} بازمی‌گردد",
   "main.reason.encoder-fallback-not-working": "رمزگذار {0} روی این دستگاه قابل‌استفاده نبود، پس رمزگذاری به {1} بازمی‌گردد",
   "main.reason.hdr-tonemapped": "منبع HDR است اما رمزگذار انتخابی نمی‌تواند 10 بیت را حفظ کند، پس به SDR BT.709 نگاشت شد",
+  "main.reason.auto-crop": "نوارهای سیاه برش خوردند: {0}x{1} (منبع {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "منبع فراداده HDR پویا (HDR10+ یا Dolby Vision) دارد که این رمزگذاری آن را منتقل نمی‌کند، پس خروجی فقط لایه ایستای HDR10 را نگه می‌دارد",
   "main.reason.vp9-crf-unmeasured": "مقیاس کیفیت CRF در libvpx-vp9 اندازه‌گیری شده، اما اینکه یک مقدار CRF چگونه به حجم فایل تبدیل می‌شود اندازه‌گیری نشده، پس اندازه با VBR دوگذره نگه داشته می‌شود نه با حدس CRF",
   "main.reason.stream.audio-passthrough": "ترک صدا همان‌طور که هست کپی می‌شود: قالب کدک آن را پشتیبانی می‌کند و از ۱۵٪ هدف بیشتر نمی‌شود",

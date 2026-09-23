@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Lohkonpoisto",
   "main.advanced.filters.deband": "Bändäyksenpoisto",
   "main.advanced.filters.gray": "Harmaasävy",
+  "main.advanced.filters.autocrop": "Rajaa mustat palkit",
   "main.advanced.filters.spec": "Määritys (rajaus, reunatäyte jne.)",
   "main.advanced.codec-lock.label": "Koodekkilukko",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "{0}-kooderia ei ole mitattu tällä koneella, joten koodaus palaa kooderiin {1}",
   "main.reason.encoder-fallback-not-working": "{0}-kooderia ei voitu käyttää tällä koneella, joten koodaus palaa kooderiin {1}",
   "main.reason.hdr-tonemapped": "lähde on HDR, mutta valittu kooderi ei säilytä 10-bittistä, joten se sävykartoitettiin SDR BT.709:ksi",
+  "main.reason.auto-crop": "mustat palkit rajattu: {0}x{1} (lähde {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "lähteessä on dynaamista HDR-metadataa (HDR10+ tai Dolby Vision), jota tämä koodaus ei välitä, joten tulos säilyttää vain staattisen HDR10-kerroksen",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9:n CRF-laatuasteikko on mitattu, mutta ei se, miten CRF-arvo vaikuttaa tiedostokokoon, joten koko pidetään kaksivaiheisella VBR:llä CRF-arvauksen sijaan",
   "main.reason.stream.audio-passthrough": "ääniraita kopioidaan sellaisenaan: säiliö tukee sen koodekkia ja se pysyy 15 %:n sisällä tavoitteesta",

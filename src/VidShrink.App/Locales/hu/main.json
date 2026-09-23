@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Blokkmentesítés",
   "main.advanced.filters.deband": "Sávmentesítés",
   "main.advanced.filters.gray": "Szürkeárnyalat",
+  "main.advanced.filters.autocrop": "Fekete sávok levágása",
   "main.advanced.filters.spec": "Megadás (vágás, kitöltés stb.)",
   "main.advanced.codec-lock.label": "Kodekzár",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "a(z) {0} kódolót ezen a gépen nem mértük, ezért a kódolás {1}-re vált vissza",
   "main.reason.encoder-fallback-not-working": "a(z) {0} kódoló nem használható ezen a gépen, ezért a kódolás {1}-re vált vissza",
   "main.reason.hdr-tonemapped": "a forrás HDR, de a kiválasztott kódoló nem őrzi meg a 10 bitet, ezért SDR BT.709-re tónusleképeztük",
+  "main.reason.auto-crop": "fekete sávok levágva: {0}x{1} (forrás {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "a forrás dinamikus HDR-metaadatokat hordoz (HDR10+ vagy Dolby Vision), amelyeket ez a kódolás nem visz át, ezért a kimenet csak a statikus HDR10 réteget tartja meg",
   "main.reason.vp9-crf-unmeasured": "a libvpx-vp9 CRF minőségi skálája mérve van, de nincs mérve, hogy egy CRF-érték hogyan hat a fájlméretre, ezért a méretet kétmenetes VBR tartja CRF-becslés helyett",
   "main.reason.stream.audio-passthrough": "a hangsáv változatlanul másolódik: a konténer támogatja a kodekjét, és a cél 15%-án belül marad",

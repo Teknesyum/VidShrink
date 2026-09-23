@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Премахни блокове",
   "main.advanced.filters.deband": "Премахни ленти",
   "main.advanced.filters.gray": "Скала на сивото",
+  "main.advanced.filters.autocrop": "Изрязване на черните ленти",
   "main.advanced.filters.spec": "Спецификация (изрязване, поле и др.)",
   "main.advanced.codec-lock.label": "Заключване на кодека",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "енкодерът {0} не е измерен на тази машина, затова кодирането преминава към {1}",
   "main.reason.encoder-fallback-not-working": "енкодерът {0} не можа да се използва на тази машина, затова кодирането преминава към {1}",
   "main.reason.hdr-tonemapped": "източникът е HDR, но избраният енкодер не може да запази 10-бита, затова беше тонално преобразуван в SDR BT.709",
+  "main.reason.auto-crop": "черните ленти са изрязани: {0}x{1} (източник {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "източникът носи динамични HDR метаданни (HDR10+ или Dolby Vision), които това кодиране не пренася, затова резултатът запазва само статичния слой HDR10",
   "main.reason.vp9-crf-unmeasured": "Качествената CRF скала на libvpx-vp9 е измерена, но не е измерено как стойността на CRF се отразява върху размера на файла, затова размерът се държи с двупасов VBR вместо с предположение за CRF",
   "main.reason.stream.audio-passthrough": "аудиописта се копира без промяна: контейнерът поддържа кодека ѝ и тя остава в рамките на 15% от целта",
