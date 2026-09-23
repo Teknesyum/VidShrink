@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -14,25 +15,46 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class AcilirGirisTests
 {
+    /// <summary>
+    /// Saydamlık örneklenmez, her değişikliği kaydedilir: CI yükünde geçiş ilk
+    /// <c>RunJobs</c> içinde bitiyor ve örnekleme döngüsü hiç ara kare görmüyordu.
+    /// </summary>
+    private sealed class SaydamlikKaydi<T> : IDisposable where T : Avalonia.Visual
+    {
+        private readonly IDisposable _abonelik;
+        public double EnAz { get; private set; } = 1;
+
+        public SaydamlikKaydi() => _abonelik = Avalonia.Visual.OpacityProperty.Changed
+            .AddClassHandler<T>((gorsel, _) => EnAz = Math.Min(EnAz, gorsel.Opacity));
+
+        public void Gor(T gorsel) => EnAz = Math.Min(EnAz, gorsel.Opacity);
+
+        public void Dispose() => _abonelik.Dispose();
+    }
+
+    private static void Bekle(TimeSpan sure)
+    {
+        var saat = Stopwatch.StartNew();
+        while (saat.Elapsed < sure)
+        {
+            using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+            Dispatcher.UIThread.MainLoop(dilim.Token);
+        }
+    }
+
     private static (double saydamlik, bool animasyonlu) Ac(Window pencere, Button dugme, bool azalt)
     {
         if (azalt) pencere.Classes.Add("reduced-motion");
         else pencere.Classes.Remove("reduced-motion");
         pencere.Show();
         var acilir = (Flyout)dugme.Flyout!;
+        using var kayit = new SaydamlikKaydi<FlyoutPresenter>();
         acilir.ShowAt(dugme);
         Dispatcher.UIThread.RunJobs();
-        var sunucu = ((Control)acilir.Content!).GetVisualAncestors().OfType<FlyoutPresenter>().First();
-        var enAz = sunucu.Opacity;
-        var saat = Stopwatch.StartNew();
-        while (saat.Elapsed.TotalMilliseconds < 400)
-        {
-            using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
-            Dispatcher.UIThread.MainLoop(dilim.Token);
-            enAz = Math.Min(enAz, sunucu.Opacity);
-        }
+        kayit.Gor(((Control)acilir.Content!).GetVisualAncestors().OfType<FlyoutPresenter>().First());
+        Bekle(TimeSpan.FromMilliseconds(400));
         acilir.Hide();
-        return (enAz, enAz < 1);
+        return (kayit.EnAz, kayit.EnAz < 1);
     }
 
     [Theory]
@@ -111,25 +133,15 @@ public sealed class AcilirGirisTests
             var pencere = new Window { Content = dugme, Width = 300, Height = 200 };
             if (azalt) pencere.Classes.Add("reduced-motion");
             pencere.Show();
-            var enAz = 1.0;
-            ipucu.PropertyChanged += (_, e) =>
-            {
-                if (e.Property == Avalonia.Visual.OpacityProperty) enAz = Math.Min(enAz, ipucu.Opacity);
-            };
+            using var kayit = new SaydamlikKaydi<ToolTip>();
             try
             {
                 ToolTip.SetIsOpen(dugme, true);
                 Dispatcher.UIThread.RunJobs();
                 Assert.True(ipucu.IsVisible && TopLevel.GetTopLevel(ipucu) is not null);
-                enAz = Math.Min(enAz, ipucu.Opacity);
-                var saat = Stopwatch.StartNew();
-                while (saat.Elapsed.TotalMilliseconds < 400)
-                {
-                    using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
-                    Dispatcher.UIThread.MainLoop(dilim.Token);
-                    enAz = Math.Min(enAz, ipucu.Opacity);
-                }
-                var sonuc = (enAz, enAz < 1);
+                kayit.Gor(ipucu);
+                Bekle(TimeSpan.FromMilliseconds(400));
+                var sonuc = (kayit.EnAz, kayit.EnAz < 1);
                 ToolTip.SetIsOpen(dugme, false);
                 return sonuc;
             }
