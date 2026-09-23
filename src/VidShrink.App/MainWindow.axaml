@@ -89,7 +89,7 @@
         <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="1" izi:AcilisIsareti.Ad="xaml-sekmeler">
         <TabControl.Tag>
         <StackPanel>
-          <Border x:Name="AppliedNotice"
+          <Border x:Name="AppliedNotice" Classes="reveal-panel"
                   Margin="{StaticResource NoticeMargin}"
                   IsVisible="False"
                   Background="{StaticResource Surface}"
@@ -121,7 +121,7 @@
             </Grid>
           </Border>
 
-          <Border x:Name="UpdateNotice"
+          <Border x:Name="UpdateNotice" Classes="reveal-panel"
                   Margin="{StaticResource NoticeMargin}"
                   IsVisible="False"
                   Background="{StaticResource Surface}"
@@ -256,7 +256,7 @@
                       <Button Grid.Column="1" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
                     </Grid>
 
-                    <TextBlock x:Name="TxtSourceStatus" Theme="{StaticResource StatusError}" IsVisible="False"/>
+                    <TextBlock x:Name="TxtSourceStatus" Classes="reveal" Theme="{StaticResource StatusError}" IsVisible="False"/>
 
                     <Grid x:Name="TitleRow" IsVisible="False" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                       <TextBlock Text="{loc:Text main.title.label}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
@@ -438,7 +438,7 @@
                       Silme onay penceresi istemiyor: yonga kalkıyor, bu satır beliriyor ve
                       geri alma silinen ön ayarı geri yazıyor.
                     -->
-                    <StackPanel x:Name="PresetUndoBar" Orientation="Horizontal" IsVisible="False"
+                    <StackPanel x:Name="PresetUndoBar" Classes="reveal-panel" Orientation="Horizontal" IsVisible="False"
                                 Spacing="{StaticResource SpaceSm}">
                       <TextBlock x:Name="TxtPresetUndo" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                       <Button x:Name="BtnPresetUndo" Content="{loc:Text main.preset.undo}"
@@ -773,7 +773,7 @@
                             <TextBlock Text="{loc:Text main.advanced.filters.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                           </StackPanel>
                         </Grid>
-                        <TextBlock x:Name="TxtAdvancedError" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
+                        <TextBlock x:Name="TxtAdvancedError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
                       </StackPanel>
                     </StackPanel>
                   </StackPanel>
@@ -975,8 +975,8 @@
                     </Border>
                     <StackPanel Spacing="{StaticResource SpaceSm}">
                       <WrapPanel>
-                        <Button x:Name="BtnReveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnReveal"/>
-                        <Button x:Name="BtnShare" Content="{loc:Text main.action.share}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShare"/>
+                        <Button x:Name="BtnReveal" Classes="reveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnReveal"/>
+                        <Button x:Name="BtnShare" Classes="reveal" Content="{loc:Text main.action.share}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShare"/>
                         <Button x:Name="BtnShareCancel" Content="{loc:Text main.action.cancel-upload}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShareCancel"/>
                         <Button x:Name="BtnShareRetry" auto:AutomationProperties.Name="{loc:Text settings.share.retry}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False"/>
                       </WrapPanel>
@@ -1256,7 +1256,7 @@
                       </TextBlock.Transitions>
                     </TextBlock>
                     <TextBlock x:Name="TxtConvertResult" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
-                    <Button x:Name="BtnConvertReveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" IsVisible="False" Click="OnReveal"/>
+                    <Button x:Name="BtnConvertReveal" Classes="reveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" IsVisible="False" Click="OnReveal"/>
                   </StackPanel>
                 </Border>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
@@ -1459,7 +1459,7 @@
                       <TextBox x:Name="TxtFfmpegPath" Width="360"/>
                       <Button x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>
                     </StackPanel>
-                    <TextBlock x:Name="TxtFfmpegPathError" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
+                    <TextBlock x:Name="TxtFfmpegPathError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.ffmpeg-path.hint}"/>
                   </StackPanel>
 
@@ -1500,7 +1500,7 @@
                     <CheckBox x:Name="ChkShellMenuOpen" Theme="{StaticResource CheckStyle}" Content="{loc:Text shell.menu.open}"/>
                     <CheckBox x:Name="ChkShellMenuShrink" Theme="{StaticResource CheckStyle}" Content="{loc:Text shell.menu.shrink}"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.shell-menu.hint}"/>
-                    <TextBlock x:Name="TxtShellMenuStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                    <TextBlock x:Name="TxtShellMenuStatus" Classes="reveal" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                   </StackPanel>
                 </StackPanel>
               </Border>

@@ -1,4 +1,4 @@
-﻿<Application xmlns="https://github.com/avaloniaui"
+<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="VidShrink.App.App"
              Name="VidShrink"
@@ -56,6 +56,36 @@
           </KeyFrame>
         </Animation>
       </Style.Animations>
+    </Style>
+
+    <Style Selector="Window:not(.reduced-motion) :is(Control).reveal-panel[IsVisible=True]">
+      <Style.Animations>
+        <Animation Duration="{StaticResource MotionBase}" Easing="CubicEaseOut" FillMode="Forward">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0"/>
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1"/>
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <Style Selector="Window:not(.reduced-motion) :is(Control).reveal[IsVisible=True]">
+      <Style.Animations>
+        <Animation Duration="{StaticResource MotionFast}" Easing="CubicEaseOut" FillMode="Forward">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0"/>
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1"/>
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <Style Selector="Window.reduced-motion ProgressBar">
+      <Setter Property="Transitions" Value="{x:Null}"/>
     </Style>
 
     <Style Selector="TabControl.compact TabItem /template/ Path#TabIcon">

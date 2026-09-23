@@ -175,14 +175,14 @@
 
     <!-- Kayıt bittiğinde teslim edilen dosya. Yol her zaman görünür; yarım dosya da
          gizlenmiyor, kendi satırıyla bildiriliyor. -->
-    <Border x:Name="ResultPanel" Theme="{StaticResource Panel}" IsVisible="False">
+    <Border x:Name="ResultPanel" Classes="reveal-panel" Theme="{StaticResource Panel}" IsVisible="False">
       <StackPanel Spacing="{StaticResource SpaceMd}">
         <TextBlock x:Name="TxtResult" Theme="{StaticResource StatusSuccess}" TextWrapping="Wrap"/>
         <TextBox x:Name="TxtResultPath"
                  IsReadOnly="True"
                  FontFamily="{StaticResource FontMono}"
                  auto:AutomationProperties.Name="{loc:Text recorder.output.title}"/>
-        <Grid x:Name="WarningRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="False">
+        <Grid x:Name="WarningRow" Classes="reveal" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="False">
           <Path x:Name="WarningGlyph"
                 Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
                 Stretch="Uniform" VerticalAlignment="Top"
@@ -268,12 +268,12 @@
       </StackPanel>
     </Border>
 
-    <TextBlock x:Name="TxtError"
+    <TextBlock x:Name="TxtError" Classes="reveal"
                Theme="{StaticResource StatusError}"
                TextWrapping="Wrap"
                IsVisible="False"/>
 
-    <TextBlock x:Name="TxtNotice"
+    <TextBlock x:Name="TxtNotice" Classes="reveal"
                Theme="{StaticResource StatusSuccess}"
                TextWrapping="Wrap"
                IsVisible="False"/>
