@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using VidShrink.Core;
@@ -344,7 +344,7 @@ public static class FfprobeClient
     /// Dosyada HDR10+ tasiyan kare sayisi; cikisin kaynakla kare kare karsilastirmasi icin.
     /// Okunamazsa 0: sayim uyarinin tetigi, okunamayan cikis "tasindi" sayilmamali.
     /// </summary>
-    public static async Task<int> CountHdr10PlusFramesAsync(string filePath, CancellationToken ct)
+    public static async Task<int> CountHdr10PlusAsync(string filePath, CancellationToken ct)
         => (await ReadHdr10PlusAsync(filePath, null, ct))?.Hdr10PlusFrames ?? 0;
 
     private static async Task<bool> HasHdr10PlusAsync(string filePath, int streamIndex, CancellationToken ct)

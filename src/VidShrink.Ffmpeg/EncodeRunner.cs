@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Concurrent;
 using VidShrink.Core;
@@ -125,7 +125,7 @@ public sealed class EncodeRunner
         var bridge = new Hdr10PlusSource();
         var result = await RunEncodeAsync(info, plan, outputPath, targetMb, progress, ct, fillPolicy, profile, askBeforeRetry, scenes, bridge);
         if (bridge.Frames is not int sourceFrames || !result.Success || !File.Exists(result.OutputPath)) return result;
-        var outputFrames = await FfprobeClient.CountHdr10PlusFramesAsync(result.OutputPath, ct);
+        var outputFrames = await FfprobeClient.CountHdr10PlusAsync(result.OutputPath, ct);
         return result with { Hdr10Plus = new Hdr10PlusCount(sourceFrames, outputFrames) };
     }
 
