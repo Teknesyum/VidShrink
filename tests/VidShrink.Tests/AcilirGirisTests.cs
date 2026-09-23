@@ -1,3 +1,4 @@
+﻿using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -22,9 +23,16 @@ public sealed class AcilirGirisTests
         acilir.ShowAt(dugme);
         Dispatcher.UIThread.RunJobs();
         var sunucu = ((Control)acilir.Content!).GetVisualAncestors().OfType<FlyoutPresenter>().First();
-        var sonuc = (sunucu.Opacity, sunucu.Opacity < 1);
+        var enAz = sunucu.Opacity;
+        var saat = Stopwatch.StartNew();
+        while (saat.Elapsed.TotalMilliseconds < 400)
+        {
+            using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+            Dispatcher.UIThread.MainLoop(dilim.Token);
+            enAz = Math.Min(enAz, sunucu.Opacity);
+        }
         acilir.Hide();
-        return sonuc;
+        return (enAz, enAz < 1);
     }
 
     [Theory]
