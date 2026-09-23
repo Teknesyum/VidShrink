@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Avalonia;
@@ -6,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using VidShrink.App.Playback;
 using VidShrink.Player;
 using Xunit;
@@ -60,6 +62,7 @@ public sealed class OynaticiCiftTikSuresiTests
                     var gec = o.Oku("pause");
                     var gecMs = saat.ElapsedMilliseconds;
                     o.Not($"ham sol tik: {erkenMs} ms'de pause {erken}, {gecMs} ms'de pause {gec}");
+                    o.Not($"tik durumu: bekleyen {o.View.Click.Pending}, oynuyor {o.View.IsPlaying}, iz {string.Join(" | ", o.View.Trace.TakeLast(6))}");
                     if (erken != "yes") sonuc ??= $"tek tik {erkenMs} ms'de islendi, 900 ms beklenmedi";
                     if (gec != "no" || gecMs < 880) sonuc ??= $"tek tik {gecMs} ms'de pause {gec}";
                     return (o.Kayit.ToString(), sonuc);
@@ -78,6 +81,81 @@ public sealed class OynaticiCiftTikSuresiTests
         KisayolKanit.Write("hiz-cift-tik.txt", sonucu.Item1);
         if (OperatingSystem.IsWindows()) Assert.Equal(windows, sistem);
         Assert.True(sonucu.Item2 is null, sonucu.Item2 + Environment.NewLine + sonucu.Item1);
+    }
+}
+
+/// <summary>
+/// Ertelenmis tek tik, dispatcher kuyrugunda bekleyen girdi varken de duser. Win32
+/// dispatcher'i <c>HasPendingInput</c> dogru dondukce Input ve alti oncelikli isleri
+/// calistirmaz; varsayilan <see cref="DispatcherTimer"/> Background'da oldugu icin tek tik
+/// orada ac kaliyordu. Sahte girdi kaynagi bu durumu deterministik kurar.
+/// </summary>
+public sealed class OynaticiTekTikZamanlayiciTests
+{
+    [Fact]
+    public void BekleyenGirdiErtelenmisTekTikiAcBirakmaz()
+    {
+        var eski = ClickArbiter.Source;
+        (bool bekleyen, bool arkaPlanKostu, string iz) sonuc;
+        try
+        {
+            ClickArbiter.Source = () => 150;
+            sonuc = AppHost.Run(() =>
+            {
+                var view = new PlayerView();
+                var window = new Window { Width = 320, Height = 240, Content = view };
+                window.Show();
+                Dongu(() => false, 0.2);
+                var ui = Dispatcher.UIThread;
+                var alan = typeof(Dispatcher).GetField("_pendingInputImpl", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                var gercek = alan.GetValue(ui);
+                alan.SetValue(ui, SurekliGirdi.Sar(typeof(Dispatcher).GetField("_impl", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(ui)!));
+                try
+                {
+                    var arkaPlan = false;
+                    ui.Post(() => arkaPlan = true, DispatcherPriority.Background);
+                    view.FarePress(1, 20, 20);
+                    view.FareRelease(Environment.TickCount64);
+                    Dongu(() => !view.Click.Pending, 1.5);
+                    return (view.Click.Pending, arkaPlan, string.Join(" | ", view.Trace));
+                }
+                finally
+                {
+                    alan.SetValue(ui, gercek);
+                    Dongu(() => false, 0.05);
+                    window.Close();
+                    Dispatcher.UIThread.RunJobs();
+                }
+            });
+        }
+        finally
+        {
+            ClickArbiter.Source = eski;
+        }
+
+        Assert.False(sonuc.arkaPlanKostu, "sahte girdi kaynagi Background isini durdurmadi; olcu bos: " + sonuc.iz);
+        Assert.False(sonuc.bekleyen, "tek tik 1,5 sn sonra hala bekliyor: " + sonuc.iz);
+        Assert.Contains("play -> True", sonuc.iz);
+    }
+}
+
+/// <summary>Dispatcher'in girdi sorgusunu hep "bekleyen girdi var" diye yanitlar.</summary>
+public class SurekliGirdi : DispatchProxy
+{
+    private object _hedef = null!;
+
+    internal static object Sar(object hedef)
+    {
+        var tur = typeof(Dispatcher).Assembly.GetType("Avalonia.Threading.IDispatcherImplWithPendingInput")!;
+        var vekil = DispatchProxy.Create(tur, typeof(SurekliGirdi));
+        ((SurekliGirdi)vekil)._hedef = hedef;
+        return vekil;
+    }
+
+    protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+    {
+        if (targetMethod!.Name is "get_HasPendingInput" or "get_CanQueryPendingInput") return true;
+        return targetMethod.Invoke(_hedef, args);
     }
 }
 
