@@ -556,7 +556,7 @@ public sealed class AdvancedPanelTests
     ///
     /// <para>Bu kol kancayı hiç kullanmıyor: <c>Button.ClickEvent</c> yükseltiyor ve
     /// bağlantıyı ölçüyor. Düğmedeki <c>Click="OnToggleAdvanced"</c> silinirse düşer.
-    /// Yön oku da ölçülüyor: açıkken IconChevronUp, kapalıyken IconChevronDown geometrisi.</para>
+    /// Yön oku da ölçülüyor: açıkken <c>open</c> sınıfı (ok 180° döner), kapalıyken yok.</para>
     /// </summary>
     [Fact]
     public void TheAdvancedSectionOpensAndClosesFromItsButton()
@@ -571,15 +571,15 @@ public sealed class AdvancedPanelTests
             var glyph = button.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>().Single(t => t.Name == "GlyphAdvanced");
 
             var s0 = body.IsVisible;
-            var g0 = glyph.Data;
+            var g0 = glyph.Classes.Contains("open");
 
             ClickAdvancedToggle(window);
             var s1 = body.IsVisible;
-            var g1 = glyph.Data;
+            var g1 = glyph.Classes.Contains("open");
 
             ClickAdvancedToggle(window);
             var s2 = body.IsVisible;
-            var g2 = glyph.Data;
+            var g2 = glyph.Classes.Contains("open");
 
             return (s0, s1, s2, g0, g1, g2);
         });
@@ -593,9 +593,9 @@ public sealed class AdvancedPanelTests
             "R1: düğmeye basıldı ama gelişmiş bölüm açılmadı — Click bağlantısı yok, "
             + "çalışan uygulamada dokuz kontrole erişilemez.");
         Xunit.Assert.False(afterSecond, "R1: ikinci tıklama bölümü geri kapatmalı.");
-        Xunit.Assert.NotNull(glyphStart);
-        Xunit.Assert.NotSame(glyphStart, glyphOpen);
-        Xunit.Assert.Same(glyphStart, glyphClosed);
+        Xunit.Assert.False(glyphStart, "Kapalı bölümün oku açık yönde.");
+        Xunit.Assert.True(glyphOpen, "Açılan bölümün oku dönmedi.");
+        Xunit.Assert.False(glyphClosed, "Kapanan bölümün oku açık yönde kaldı.");
     }
 
     /// <summary>K5: CRF sabitlenince hedef alanı artık zorlamadığını tek satırda söylüyor.</summary>

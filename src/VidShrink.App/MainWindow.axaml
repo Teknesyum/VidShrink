@@ -28,7 +28,7 @@
     <Style Selector="Window.reduced-motion Ellipse">
       <Setter Property="RenderTransform" Value="none"/>
     </Style>
-    <Style Selector="Window.reduced-motion Path">
+    <Style Selector="Window.reduced-motion Path:not(.chevron)">
       <Setter Property="RenderTransform" Value="none"/>
     </Style>
 
@@ -65,17 +65,6 @@
     <Style Selector="Window.chrome-hidden TabControl#Tabs /template/ ItemsPresenter#PART_ItemsPresenter">
       <Setter Property="IsVisible" Value="False"/>
     </Style>
-    <Style Selector="Path#AboutGlyph">
-      <Setter Property="RenderTransform" Value="none"/>
-      <Setter Property="Transitions">
-        <Transitions>
-          <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
-        </Transitions>
-      </Setter>
-    </Style>
-    <Style Selector="Path#AboutGlyph.open">
-      <Setter Property="RenderTransform" Value="rotate(180deg)"/>
-    </Style>
   </Window.Styles>
 
   <Border x:Name="WindowShell"
@@ -106,18 +95,19 @@
                   CornerRadius="{StaticResource RadiusControl}"
                   BoxShadow="{DynamicResource GlowBlue}"
                   Padding="{StaticResource ButtonPaddingSm}">
-            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-              <TextBlock Grid.Column="0"
-                         x:Name="TxtAppliedLead"
-                         Text="{loc:Text main.update.applied}"
-                         Theme="{StaticResource Body}"
-                         VerticalAlignment="Center"/>
-              <TextBlock Grid.Column="1"
-                         x:Name="TxtAppliedVersion"
-                         Theme="{StaticResource MonoValue}"
-                         Foreground="{StaticResource NeonBlue}"
-                         VerticalAlignment="Center"/>
-              <Button Grid.Column="3"
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+              <WrapPanel x:Name="AppliedNoticeText" VerticalAlignment="Center" ItemSpacing="{StaticResource SpaceMd}">
+                <TextBlock x:Name="TxtAppliedLead"
+                           Text="{loc:Text main.update.applied}"
+                           Theme="{StaticResource Body}"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"/>
+                <TextBlock x:Name="TxtAppliedVersion"
+                           Theme="{StaticResource MonoValue}"
+                           Foreground="{StaticResource NeonBlue}"
+                           VerticalAlignment="Center"/>
+              </WrapPanel>
+              <Button Grid.Column="1"
                       x:Name="BtnAppliedDismiss"
                       Content="×"
                       Theme="{StaticResource GhostButton}"
@@ -138,30 +128,31 @@
                   BoxShadow="{DynamicResource GlowPurple}"
                   Padding="{StaticResource ButtonPaddingSm}">
             <StackPanel Spacing="{StaticResource SpaceMd}">
-              <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+              <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
                 <Image Grid.Column="0"
                        x:Name="UpdateNoticeIcon"
                        Width="{StaticResource IconSizeLg}"
                        Height="{StaticResource IconSizeLg}"
                        Stretch="Uniform"
                        VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1"
-                           x:Name="TxtNoticeLead"
-                           Text="{loc:Text main.update.available}"
-                           Theme="{StaticResource Body}"
-                           VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2"
-                           x:Name="TxtNoticeVersion"
-                           Theme="{StaticResource MonoValue}"
-                           Foreground="{StaticResource NeonPurple}"
-                           VerticalAlignment="Center"/>
-                <Button Grid.Column="4"
+                <WrapPanel x:Name="UpdateNoticeText" Grid.Column="1" VerticalAlignment="Center" ItemSpacing="{StaticResource SpaceMd}">
+                  <TextBlock x:Name="TxtNoticeLead"
+                             Text="{loc:Text main.update.available}"
+                             Theme="{StaticResource Body}"
+                             TextWrapping="Wrap"
+                             VerticalAlignment="Center"/>
+                  <TextBlock x:Name="TxtNoticeVersion"
+                             Theme="{StaticResource MonoValue}"
+                             Foreground="{StaticResource NeonPurple}"
+                             VerticalAlignment="Center"/>
+                </WrapPanel>
+                <Button Grid.Column="2"
                         x:Name="BtnNoticeInstall"
                         Content="{loc:Text main.action.download}"
                         Theme="{StaticResource PrimaryButton}"
                         VerticalAlignment="Center"
                         Click="OnInstallUpdate"/>
-                <Button Grid.Column="5"
+                <Button Grid.Column="3"
                         x:Name="BtnNoticeDismiss"
                         Content="×"
                         Theme="{StaticResource GhostButton}"
@@ -204,7 +195,7 @@
 
         <TabItem x:Name="TabShrink" izi:AcilisIsareti.Ad="xaml-kucultme" Header="{loc:Text main.tab.shrink}" Tag="{StaticResource IconShrink}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageShrink" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
-            <izi:KucultSutunlari x:Name="ShrinkColumns" Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpaceMd}">
+            <izi:KucultSutunlari x:Name="ShrinkColumns" Margin="{StaticResource PageMargin}" ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpaceMd}">
 
               <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceLg}">
 
@@ -312,20 +303,27 @@
                       <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
                     </StackPanel>
                     <!--
-                      T61: hedef ve kalite tek Grid'de. İkinci sayı kutusunun genişliği
-                      birinciyle aynı sütundan gelir; yeni bir piksel sayısı yazılmadı.
+                      T61: hedef ve kalite aynı sütun ölçüsünü paylaşır (SharedSizeGroup);
+                      sayı kutusunun genişliği NumberBoxWidth belirtecinden gelir.
                     -->
-                    <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
-                          ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceMd}">
-                      <Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="16" VerticalAlignment="Center"/>
-                      <TextBox x:Name="TxtTarget" Grid.Column="1" Text="16" Width="96" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
-                      <TextBlock Grid.Column="2" Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                    <StackPanel Grid.IsSharedSizeScope="True" Spacing="{StaticResource SpaceMd}">
+                      <izi:KaydiriciSatiri x:Name="TargetSliderRow" EnDarKaydirici="{StaticResource SliderMinWidth}"
+                                           ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
+                        <izi:KaydiriciSatiri.ColumnDefinitions>
+                          <ColumnDefinition Width="*"/>
+                          <ColumnDefinition Width="Auto" SharedSizeGroup="HedefKutu"/>
+                          <ColumnDefinition Width="Auto" SharedSizeGroup="HedefBirim"/>
+                        </izi:KaydiriciSatiri.ColumnDefinitions>
+                        <Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="16" VerticalAlignment="Center"/>
+                        <TextBox x:Name="TxtTarget" Text="16" Width="{StaticResource NumberBoxWidth}" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
+                        <TextBlock Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      </izi:KaydiriciSatiri>
                     <!--
                       T46/K1: yonga yalnız sayıyı gösterir. Açıklamanın tek yeri balondur ve
                       balonun ilk satırı yonganın eski etiketidir — etiket ekrandan kalktı,
                       bilgi kalkmadı.
                     -->
-                    <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Spacing="{StaticResource SpaceMd}">
+                    <StackPanel Spacing="{StaticResource SpaceMd}">
                     <TextBlock x:Name="TxtTargetCrfLockedNotice"
                                Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                Text="{loc:Text main.target.crf-locked}"/>
@@ -334,6 +332,13 @@
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.archive.tip}"/>
+                          </StackPanel>
+                        </ToolTip.Tip>
+                      </Button>
+                      <Button x:Name="ChipHalf" Content="{loc:Text main.chip.half}" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetHalf">
+                        <ToolTip.Tip>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.half.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
@@ -388,13 +393,6 @@
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button x:Name="ChipHalf" Content="{loc:Text main.chip.half}" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetHalf">
-                        <ToolTip.Tip>
-                          <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.half.tip}"/>
-                          </StackPanel>
-                        </ToolTip.Tip>
-                      </Button>
                       <!--
                         Kullanıcının kendi ön ayarları gömülü sekizin ardında, ince bir
                         ayırıcının arkasında duruyor; en son eleman her zaman "+". Ayırıcı
@@ -445,12 +443,20 @@
                     </StackPanel>
                     </StackPanel>
 
-                      <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
-                      <Slider x:Name="SliderQualityTarget" Grid.Row="3" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
-                      <TextBox x:Name="TxtQualityTarget" Grid.Row="3" Grid.Column="1" Text="60" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
-                      <TextBlock Grid.Row="3" Grid.Column="2" Text="{loc:Text main.unit.score-suffix}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                      <TextBlock x:Name="TxtQualityTargetNotice" Grid.Row="4" Grid.ColumnSpan="3" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    </Grid>
+                      <TextBlock Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
+                      <izi:KaydiriciSatiri x:Name="QualitySliderRow" EnDarKaydirici="{StaticResource SliderMinWidth}"
+                                           ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
+                        <izi:KaydiriciSatiri.ColumnDefinitions>
+                          <ColumnDefinition Width="*"/>
+                          <ColumnDefinition Width="Auto" SharedSizeGroup="HedefKutu"/>
+                          <ColumnDefinition Width="Auto" SharedSizeGroup="HedefBirim"/>
+                        </izi:KaydiriciSatiri.ColumnDefinitions>
+                        <Slider x:Name="SliderQualityTarget" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
+                        <TextBox x:Name="TxtQualityTarget" Text="60" Width="{StaticResource NumberBoxWidth}" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
+                        <TextBlock Text="{loc:Text main.unit.score-suffix}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      </izi:KaydiriciSatiri>
+                      <TextBlock x:Name="TxtQualityTargetNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    </StackPanel>
                     <Border Theme="{StaticResource PanelRule}"/>
 
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
@@ -467,7 +473,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.quality}">
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                          <Path x:Name="GlyphQuality" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphQuality" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
@@ -521,7 +527,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.audio}">
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                          <Path x:Name="GlyphAudio" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphAudio" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
@@ -566,6 +572,7 @@
                           <TextBlock Text="{loc:Text main.subtitles.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <Button x:Name="BtnAddSubtitle" Theme="{StaticResource GhostButton}" Click="OnAddSubtitle" VerticalAlignment="Bottom"
+                                    MinHeight="{StaticResource FieldMinHeight}"
                                     Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.add}"/>
                             <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
                               <TextBlock Text="{loc:Text main.subtitles.burn}" Theme="{StaticResource Hint}"/>
@@ -593,7 +600,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.frame}">
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                          <Path x:Name="GlyphFrame" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphFrame" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
@@ -639,7 +646,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                          <Path x:Name="GlyphAdvanced" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphAdvanced" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
@@ -747,12 +754,12 @@
                                 </WrapPanel>
                               </StackPanel>
                             </WrapPanel>
-                            <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
-                              <CheckBox x:Name="ChkFltDetelecine" Content="{loc:Text main.advanced.filters.detelecine}"/>
-                              <CheckBox x:Name="ChkFltDeblock" Content="{loc:Text main.advanced.filters.deblock}"/>
-                              <CheckBox x:Name="ChkFltDeband" Content="{loc:Text main.advanced.filters.deband}"/>
-                              <CheckBox x:Name="ChkFltGray" Content="{loc:Text main.advanced.filters.gray}"/>
-                            </WrapPanel>
+                            <izi:SutunIzgara x:Name="FltSwitches" MaxColumns="2" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceSm}">
+                              <CheckBox x:Name="ChkFltDetelecine" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.detelecine}"/>
+                              <CheckBox x:Name="ChkFltDeblock" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.deblock}"/>
+                              <CheckBox x:Name="ChkFltDeband" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.deband}"/>
+                              <CheckBox x:Name="ChkFltGray" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.gray}"/>
+                            </izi:SutunIzgara>
                             <StackPanel Spacing="{StaticResource SpaceXs}">
                               <TextBlock Text="{loc:Text main.advanced.filters.spec}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                               <TextBox x:Name="TxtAdvFilters" VerticalAlignment="Center"
@@ -840,7 +847,7 @@
                                 VerticalAlignment="Center"
                                 auto:AutomationProperties.Name="{loc:Text main.plan.reasons}"
                                 Click="OnTogglePlanReasons">
-                                  <Path x:Name="GlyphPlanReasons" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+                                  <Path x:Name="GlyphPlanReasons" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                                 </Button>
                       </Grid>
                       <StackPanel x:Name="PlanReasons" Classes="disclose" Spacing="{StaticResource SpaceSm}" IsVisible="False"/>
@@ -1010,15 +1017,20 @@
 
         <TabItem Header="{loc:Text main.tab.convert}" izi:AcilisIsareti.Ad="xaml-donusturme" Tag="{StaticResource IconConvert}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageConvert" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
-            <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceXl}">
+            <Grid Margin="{StaticResource PageMargin}" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceXl}">
 
               <Border Grid.Column="0" Theme="{StaticResource Panel}" VerticalAlignment="Top">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text main.convert.title}" Theme="{StaticResource H2}"/>
                   <TextBlock x:Name="TxtConvertSource" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                   <Button Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowse"/>
-                  <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
+                  <Grid x:Name="ConvertForm" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
                         RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                    <Grid.Styles>
+                      <Style Selector="Grid#ConvertForm > StackPanel">
+                        <Setter Property="VerticalAlignment" Value="Bottom"/>
+                      </Style>
+                    </Grid.Styles>
 
                     <StackPanel Grid.Row="0" Grid.Column="0">
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
@@ -1085,10 +1097,11 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                      <izi:KaydiriciSatiri x:Name="CrfSliderRow" ColumnDefinitions="*,Auto" EnDarKaydirici="{StaticResource SliderMinWidth}"
+                                           ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
                         <Slider x:Name="SliderQuality" Minimum="10" Maximum="45" Value="23" VerticalAlignment="Center"/>
-                        <TextBox x:Name="TxtQuality" Grid.Column="1" Text="23" Width="96" MaxLines="1" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
-                      </Grid>
+                        <TextBox x:Name="TxtQuality" Text="23" Width="{StaticResource NumberBoxWidth}" MaxLines="1" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
+                      </izi:KaydiriciSatiri>
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="0">
@@ -1266,33 +1279,35 @@
           <ScrollViewer x:Name="PageAdvanced" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
-              <Button x:Name="BtnHideAdvanced" Theme="{StaticResource GhostButton}"
-                      HorizontalAlignment="Right"
-                      Content="{loc:Text main.window.close}"
-                      Click="OnHideAdvanced"/>
-
               <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                    <TextBlock Grid.Column="0" Text="{loc:Text main.command.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                  <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                    <TextBlock Grid.Column="0" Text="{loc:Text main.command.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    <Button Grid.Column="2"
+                            x:Name="BtnHideAdvanced"
+                            Theme="{StaticResource GhostButton}"
+                            VerticalAlignment="Center"
+                            Content="{loc:Text main.window.close}"
+                            Click="OnHideAdvanced"/>
                     <Button Grid.Column="1"
                             x:Name="BtnCommandExpand"
                             Theme="{StaticResource GhostButton}"
                             VerticalAlignment="Center"
                             auto:AutomationProperties.Name="{loc:Text main.command.title}"
                             Click="OnToggleCommand">
-                              <Path x:Name="GlyphCommand" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+                              <Path x:Name="GlyphCommand" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                             </Button>
                   </Grid>
-                  <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinLines="1" MaxLines="1"/>
+                  <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="1" MaxLines="2"/>
                 </StackPanel>
               </Border>
 
               <Border x:Name="AiPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                  <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
                     <TextBlock Grid.Column="0" Text="{loc:Text main.ai.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="1"
+                    <TextBlock Grid.Row="1"
+                               Grid.ColumnSpan="2"
                                x:Name="TxtAiHint"
                                Text="{loc:Text main.ai.tip}"
                                Theme="{StaticResource Hint}"
@@ -1302,13 +1317,13 @@
                         <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.ai.tip}"/>
                       </ToolTip.Tip>
                     </TextBlock>
-                    <Button Grid.Column="2"
+                    <Button Grid.Column="1"
                             x:Name="BtnAiDetails"
                             Theme="{StaticResource GhostButton}"
                             VerticalAlignment="Center"
                             auto:AutomationProperties.Name="{loc:Text main.ai.title}"
                             Click="OnToggleAiDetails">
-                              <Path x:Name="GlyphAiDetails" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+                              <Path x:Name="GlyphAiDetails" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                             </Button>
                   </Grid>
                   <StackPanel x:Name="AiDetails" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
@@ -1334,7 +1349,7 @@
                             VerticalAlignment="Center"
                             auto:AutomationProperties.Name="{loc:Text performance.title}"
                             Click="OnTogglePerformance">
-                              <Path x:Name="GlyphPerformance" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+                              <Path x:Name="GlyphPerformance" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                             </Button>
                   </Grid>
                   <StackPanel x:Name="PerformanceDetails" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
@@ -1384,7 +1399,10 @@
                   <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
                     <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceSm}">
                       <TextBlock Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
-                      <TextBox x:Name="TxtDefaultTargetMb" Width="120" HorizontalAlignment="Left" MaxLines="1" TextAlignment="Center"/>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                        <TextBox x:Name="TxtDefaultTargetMb" Width="120" MaxLines="1" TextAlignment="Center"/>
+                        <TextBlock Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      </StackPanel>
                       <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
@@ -1399,13 +1417,11 @@
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock Grid.Column="0" Text="{loc:Text settings-tab.output-folder.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
-                        <RadioButton x:Name="RbOutputBesideSource" GroupName="OutputFolderMode" IsChecked="True" Content="{loc:Text settings-tab.output-folder.beside-source}"/>
-                        <RadioButton x:Name="RbOutputFixed" GroupName="OutputFolderMode" Content="{loc:Text settings-tab.output-folder.fixed}"/>
-                      </StackPanel>
-                    </Grid>
+                    <TextBlock Text="{loc:Text settings-tab.output-folder.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                    <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <RadioButton x:Name="RbOutputBesideSource" GroupName="OutputFolderMode" IsChecked="True" Content="{loc:Text settings-tab.output-folder.beside-source}"/>
+                      <RadioButton x:Name="RbOutputFixed" GroupName="OutputFolderMode" Content="{loc:Text settings-tab.output-folder.fixed}"/>
+                    </WrapPanel>
                     <StackPanel x:Name="OutputFolderPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
                       <TextBox x:Name="TxtOutputFolder" Width="360" MaxLines="1" IsReadOnly="True"/>
                       <Button x:Name="BtnBrowseOutputFolder" Content="{loc:Text settings-tab.output-folder.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseOutputFolder"/>
@@ -1414,25 +1430,21 @@
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock Grid.Column="0" Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceSm}">
-                        <TextBox x:Name="TxtOutputName" Width="360" MaxLines="1"/>
-                        <Button x:Name="BtnResetOutputName" Content="{loc:Text settings-tab.output-name.reset}" Theme="{StaticResource GhostButton}" Click="OnResetOutputName"/>
-                      </StackPanel>
-                    </Grid>
+                    <TextBlock Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceSm}">
+                      <TextBox x:Name="TxtOutputName" Width="360" MaxLines="1"/>
+                      <Button x:Name="BtnResetOutputName" Content="{loc:Text settings-tab.output-name.reset}" Theme="{StaticResource GhostButton}" Click="OnResetOutputName"/>
+                    </StackPanel>
                     <TextBlock x:Name="LblOutputNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-name.hint}"/>
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock Grid.Column="0" Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
-                        <RadioButton x:Name="RbFfmpegAuto" GroupName="FfmpegPathMode" IsChecked="True" Content="{loc:Text settings-tab.ffmpeg-path.auto}"/>
-                        <RadioButton x:Name="RbFfmpegManual" GroupName="FfmpegPathMode" Content="{loc:Text settings-tab.ffmpeg-path.manual}"/>
-                      </StackPanel>
-                    </Grid>
+                    <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                    <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <RadioButton x:Name="RbFfmpegAuto" GroupName="FfmpegPathMode" IsChecked="True" Content="{loc:Text settings-tab.ffmpeg-path.auto}"/>
+                      <RadioButton x:Name="RbFfmpegManual" GroupName="FfmpegPathMode" Content="{loc:Text settings-tab.ffmpeg-path.manual}"/>
+                    </WrapPanel>
                     <StackPanel x:Name="FfmpegPathPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
                       <TextBox x:Name="TxtFfmpegPath" Width="360" MaxLines="1"/>
                       <Button x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>
@@ -1548,7 +1560,7 @@
 
               <Border x:Name="DiagnosticLogPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceSm}">
-                  <TextBlock Text="{loc:Text settings.log.title}" Theme="{StaticResource Subtitle}"/>
+                  <TextBlock Text="{loc:Text settings.log.title}" Theme="{StaticResource H2}"/>
                   <TextBlock Text="{loc:Text settings.log.hint}" Theme="{StaticResource Caption}" TextWrapping="Wrap"/>
                   <Button x:Name="BtnOpenLog"
                           Content="{loc:Text settings.log.open}"
@@ -1562,13 +1574,10 @@
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Button x:Name="BtnAboutToggle"
                           Click="OnAboutToggle"
-                          Theme="{StaticResource GhostButton}"
-                          HorizontalAlignment="Stretch"
-                          HorizontalContentAlignment="Left"
-                          Padding="{StaticResource ButtonPaddingSm}"
+                          Theme="{StaticResource PanelHeaderToggle}"
                           auto:AutomationProperties.Name="{loc:Text main.about.title}">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-                      <Path x:Name="AboutGlyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                      <Path x:Name="AboutGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                       <TextBlock Grid.Column="1" Text="{loc:Text main.about.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                     </Grid>
                   </Button>

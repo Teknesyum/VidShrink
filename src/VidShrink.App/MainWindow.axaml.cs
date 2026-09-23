@@ -685,6 +685,13 @@ public partial class MainWindow : Window
     /// olculuyor; rozet acilistan sonra belirdigi ve dil seridi degistirdigi icin onbellege
     /// alinmis bir genislik bayatliyordu. Sag grubun ve seridin boyu degisince yeniden
     /// kosuyor.</para>
+    /// <para>Dil dugmeleri de cekildigi halde yer yetmezse sekmeler simgesiz dizilir
+    /// (<c>compact</c> sinifi); yalniz sag grubu daraltmak el 1136'da Gelismis acikken
+    /// son sekmeyi pencere dugmelerinin 9 px altina sokuyordu. Serit genisligi kararda
+    /// hep simgeli haliyle hesaplanir, yoksa kademe iki durum arasinda gidip gelir.</para>
+    /// <para>Son sekme ile sag grup arasinda en az <c>SpaceLg</c> kalir; hesap yalniz
+    /// ortusmeyi onluyordu ve el 1136'da son sekme pencere dugmelerine yaklasik 10 px
+    /// yaklasiyordu.</para>
     /// </summary>
     private void AlignTabsToTitle()
     {
@@ -699,12 +706,18 @@ public partial class MainWindow : Window
             var serit = Tabs.GetVisualDescendants().OfType<ItemsPresenter>().FirstOrDefault()?.Bounds.Width ?? 0;
             if (serit <= 0 || TitleBarLayer.Bounds.Width <= 0) return;
 
-            var bos = TitleBarLayer.Bounds.Width - sol - serit;
+            var enAz = this.TryFindResource("SpaceLg", out var pay) && pay is double d ? d : 0;
+            var ikon = this.TryFindResource("IconSizeSm", out var boy) && boy is double b ? b : 0;
+            var ara = this.TryFindResource("SpaceSm", out var bosluk) && bosluk is double a ? a : 0;
+            var tasarruf = Tabs.Items.OfType<TabItem>().Count(t => t.IsVisible) * (ikon + ara);
+            var tamSerit = Tabs.Classes.Contains("compact") ? serit + tasarruf : serit;
+            var bos = TitleBarLayer.Bounds.Width - sol - tamSerit - TitleBarContent.Margin.Right - enAz;
             var kademe = TitleBarStage(bos);
             BtnSponsor.IsVisible = kademe < 1;
             BtnGitHub.IsVisible = kademe < 1;
             TxtUpdateBadge.IsVisible = kademe < 2;
             LangSwitch.IsVisible = kademe < 3;
+            Tabs.Classes.Set("compact", kademe > 3);
             InvalidateTitleBarRight();
         }
         finally
@@ -715,7 +728,7 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// Sag grubun kacinci kademede sigdigi: 0 hepsi, 1 baglar cekilmis, 2 rozet yazisi da,
-    /// 3 dil dugmeleri de. Parcalar olcum icin gecici olarak aciliyor; ayni cagride geri
+    /// 3 dil dugmeleri de, 4 o da yetmiyor ve sekmeler simgesiz. Parcalar olcum icin gecici olarak aciliyor; ayni cagride geri
     /// kapandigi icin ekrana hic cizilmiyorlar.
     /// </summary>
     private int TitleBarStage(double bos)
@@ -737,7 +750,8 @@ public partial class MainWindow : Window
         if (tam <= bos) return 0;
         if (tam - baglar <= bos) return 1;
         if (tam - baglar - rozet <= bos) return 2;
-        return 3;
+        if (tam - baglar - rozet - dil <= bos) return 3;
+        return 4;
     }
 
     private void InvalidateTitleBarRight()
@@ -1985,11 +1999,11 @@ public partial class MainWindow : Window
         RefreshSectionSummaries();
     }
 
-    private void Chevron(Avalonia.Controls.Shapes.Path glyph, bool open)
-    {
-        if (this.TryFindResource(open ? "IconChevronUp" : "IconChevronDown", out var deger))
-            glyph.Data = deger as Geometry;
-    }
+    /// <summary>
+    /// Ok geometrisi sabit (<c>IconChevronDown</c>); açık hâl <c>open</c> sınıfıyla 180° döner.
+    /// Dönüşün geçişi yalnız canlandırmalı pencerede kurulu (<c>MainWindow.axaml</c>, <c>Path.chevron</c>).
+    /// </summary>
+    private static void Chevron(Avalonia.Controls.Shapes.Path glyph, bool open) => glyph.Classes.Set("open", open);
 
     internal void ExpandAdvanced() => SetSection(AdvancedBody, GlyphAdvanced, true);
 
@@ -3962,11 +3976,14 @@ public partial class MainWindow : Window
 
     private void OnToggleCommand(object? sender, RoutedEventArgs e) => SetCommandExpanded(!_commandExpanded);
 
+    /// <summary>
+    /// Kapalı komut kutusu da sarar ve iki satır gösterir; tek satırda komutun yalnız
+    /// <c>ffmpeg -hide_banner</c> başı görünüyordu (görsel denetim bulgu 17).
+    /// </summary>
     private void SetCommandExpanded(bool expanded)
     {
         _commandExpanded = expanded;
-        TxtCommand.TextWrapping = expanded ? TextWrapping.Wrap : TextWrapping.NoWrap;
-        TxtCommand.MaxLines = expanded ? 8 : 1;
+        TxtCommand.MaxLines = expanded ? 8 : 2;
         Chevron(GlyphCommand, expanded);
         ApplyScrollAffordance(TxtCommand, TxtCommand.IsPointerOver);
     }
