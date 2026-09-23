@@ -126,6 +126,7 @@ public partial class ShrinkJobWindow : Window
         FlowDirection = Strings.IsRightToLeftLanguage(_language)
             ? Avalonia.Media.FlowDirection.RightToLeft
             : Avalonia.Media.FlowDirection.LeftToRight;
+        Classes.Set("untracked", Strings.IsUntrackedLanguage(_language));
 
         if (OperatingSystem.IsMacOS()) WindowDecorations = WindowDecorations.Full;
         JobShell.PointerPressed += OnShellPointerPressed;

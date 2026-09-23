@@ -14,6 +14,7 @@
     olsun diye IsHitTestVisible kod tarafında kapatılıyor.
   -->
   <Border x:Name="Bar"
+          FlowDirection="LeftToRight"
           Theme="{StaticResource PlaybackStrip}"
           Opacity="0"
           IsHitTestVisible="False"

@@ -326,6 +326,96 @@ public sealed class GorselDenetimYapiTests
         Assert.True(enKotu.fark <= 0.5, $"{enKotu.satir}: aynı satırdaki değerler {enKotu.fark:0.#} px kayık.");
     }
 
+    public static TheoryData<string> TumDiller()
+    {
+        var veri = new TheoryData<string>();
+        foreach (var dil in VidShrink.App.Localization.Strings.Languages) veri.Add(dil);
+        return veri;
+    }
+
+    [Theory]
+    [MemberData(nameof(TumDiller))]
+    public void PlanPaneliKatliykenHerDildeKaymaz(string dil)
+    {
+        var (panel, gorus, icerik) = Pencere(Dar, w =>
+        {
+            var kaydirici = Ad<ScrollViewer>(w, "PlanScroll");
+            return (Ad<Border>(w, "PlanPanel").Bounds.Height, kaydirici.Viewport.Height, kaydirici.Extent.Height);
+        }, sekme: 1, dil: dil);
+
+        _output.WriteLine($"panel {panel:0.#}, görüş {gorus:0.#}, içerik {icerik:0.#}");
+        Assert.True(icerik > 0, "Plan içeriği ölçülmedi.");
+        Assert.True(icerik <= gorus + 0.5, $"Katlı plan {icerik:0.#} px istiyor, görüş alanı {gorus:0.#} px; son satır kırpılıyor.");
+    }
+
+    [Theory]
+    [InlineData("ar", false)]
+    [InlineData("fa", false)]
+    [InlineData("ur", false)]
+    [InlineData("he", false)]
+    [InlineData("hi", false)]
+    [InlineData("en", true)]
+    [InlineData("tr", true)]
+    public void BagliYazidaHarfAraligiSifir(string dil, bool aralikli)
+    {
+        var (sayi, enGenis, ad) = Pencere(Dar, w =>
+        {
+            var metinler = w.GetVisualDescendants().OfType<TextBlock>().ToArray();
+            var enAralikli = metinler.MaxBy(t => t.LetterSpacing)!;
+            return (metinler.Length, enAralikli.LetterSpacing, enAralikli.Text ?? enAralikli.Name ?? "");
+        }, sekme: 1, dil: dil);
+
+        _output.WriteLine($"{sayi} metin, en geniş aralık {enGenis:0.##} ('{ad}')");
+        Assert.True(sayi > 50, "Pencere kurulmadı.");
+        if (aralikli) Assert.True(enGenis > 0, "Harf aralıklı başlık stili hiç uygulanmadı; ölçü kör.");
+        else Assert.True(enGenis == 0, $"'{ad}' {enGenis:0.##} px harf aralığıyla çiziliyor; bağlı yazıda harfler kopuyor.");
+    }
+
+    private static bool Aynali(Visual v)
+    {
+        var sayi = 0;
+        for (Visual? d = v; d is not null; d = d.GetVisualParent()) if (d.HasMirrorTransform) sayi++;
+        return sayi % 2 == 1;
+    }
+
+    [Theory]
+    [InlineData("ar", true)]
+    [InlineData("he", true)]
+    [InlineData("en", false)]
+    public void MedyaSimgeleriAynalanmaz(string dil, bool sagdanSola)
+    {
+        (string ad, bool aynali) Oku(MainWindow w, string ad) => (ad, Aynali(Ad<Avalonia.Controls.Shapes.Path>(w, ad)));
+        var (oynatici, sekme) = Pencere(Dar, w =>
+            (Oku(w, "GlyphSeritPlay"),
+             w.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>().Where(p => p.Name == "TabIcon")
+                .Select(p => (ad: "TabIcon", aynali: Aynali(p))).ToArray()), sekme: 0, dil: dil);
+        var sayfaOku = Pencere(Dar, w => Oku(w, "GlyphPlanReasons").Item2, sekme: 1, dil: dil);
+        var karsilastirma = AppHost.Run(() =>
+        {
+            var serit = new VidShrink.App.Playback.ControlStrip();
+            var pencere = new Window
+            {
+                Width = 600, Height = 120, Content = serit,
+                FlowDirection = sagdanSola ? Avalonia.Media.FlowDirection.RightToLeft : Avalonia.Media.FlowDirection.LeftToRight
+            };
+            pencere.Show();
+            try
+            {
+                pencere.UpdateLayout();
+                return ("GlyphPlayPause", Aynali(Ad<Avalonia.Controls.Shapes.Path>(serit, "GlyphPlayPause")));
+            }
+            finally { pencere.Close(); }
+        });
+        (string ad, bool aynali)[] medya = { oynatici, karsilastirma };
+
+        foreach (var (ad, aynali) in medya.Concat(sekme)) _output.WriteLine($"{ad}: {(aynali ? "aynalı" : "düz")}");
+        _output.WriteLine($"plan oku: {(sayfaOku ? "aynalı" : "düz")}");
+        Assert.Equal(sagdanSola, sayfaOku);
+        Assert.True(sekme.Length >= 5, $"{sekme.Length} sekme simgesi bulundu.");
+        var aynalilar = medya.Concat(sekme).Where(m => m.aynali).Select(m => m.ad).ToArray();
+        Assert.True(aynalilar.Length == 0, $"Aynalanan medya/sekme simgesi: {string.Join(", ", aynalilar)}.");
+    }
+
     [Theory]
     [InlineData("de")]
     [InlineData("en")]

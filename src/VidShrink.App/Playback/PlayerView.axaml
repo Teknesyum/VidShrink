@@ -105,6 +105,7 @@
           IsHitTestVisible ile kod tarafinda suruluyor.
         -->
         <Border x:Name="StripBar"
+                FlowDirection="LeftToRight"
                 Theme="{StaticResource PlaybackStrip}"
                 VerticalAlignment="Bottom"
                 Opacity="0"

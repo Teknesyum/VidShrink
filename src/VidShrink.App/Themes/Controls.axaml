@@ -1028,6 +1028,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center">
                   <Path Name="TabIcon"
+                        FlowDirection="LeftToRight"
                         Width="{StaticResource IconSizeSm}"
                         Height="{StaticResource IconSizeSm}"
                         Stretch="Uniform"

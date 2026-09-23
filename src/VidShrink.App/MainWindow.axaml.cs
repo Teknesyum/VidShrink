@@ -959,9 +959,12 @@ public partial class MainWindow : Window
     }
 
     private void ApplyFlowDirection()
-        => FlowDirection = Strings.IsRightToLeft
+    {
+        FlowDirection = Strings.IsRightToLeft
             ? FlowDirection.RightToLeft
             : FlowDirection.LeftToRight;
+        Classes.Set("untracked", Strings.IsUntrackedLanguage(Strings.Language));
+    }
 
     /// <summary>
     /// Ayarlardaki tam liste. Üst şerit yalnız kısayolu taşır; kurulumdaki her dil buradan
