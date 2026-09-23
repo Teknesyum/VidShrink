@@ -322,7 +322,7 @@ $shellMenuKeyName = 'VidShrink'
 $shellShrinkMenuKeyName = 'VidShrinkKucult'
 $shellPackageName = 'Teknesyum.VidShrink.Shell'
 $shellCommandClsid = '7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58'
-$shellShrinkTargets = @(100, 250, 500, 1024, 2048)
+$shellShrinkTargets = @(100, 250, 500, 1000, 2000)
 $shellShrinkFlag = '--kucult'
 
 $shellMenuExtensions = @(
@@ -430,7 +430,7 @@ function Get-ShellShrinkMenuLabel([string]$Language, [string]$LocalesFolder) {
 }
 
 function Get-QuickShrinkLabel([int]$Megabytes) {
-    if ($Megabytes -ge 1024 -and ($Megabytes % 1024) -eq 0) { return "$($Megabytes / 1024) GB" }
+    if ($Megabytes -ge 1000 -and ($Megabytes % 1000) -eq 0) { return "$($Megabytes / 1000) GB" }
     return "$Megabytes MB"
 }
 

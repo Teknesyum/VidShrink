@@ -120,13 +120,13 @@ public static class Bicim
     }
 
     /// <summary>
-    /// Hedef boyut menü etiketi: 1024'ün tam katları GB, diğerleri MB. Aynı gövde
+    /// Hedef boyut menü etiketi: 1000'in tam katları GB, diğerleri MB. Aynı gövde
     /// <c>ShellMenu.TargetLabel</c> ve <c>ShellIntegration.FormatQuickShrinkLabel</c>
     /// olarak iki kez yazılmıştı; biri kültür veriyordu, diğeri vermiyordu.
     /// </summary>
     public static string HedefEtiketi(int mb) =>
-        mb >= 1024 && mb % 1024 == 0
-            ? (mb / 1024).ToString("0", CultureInfo.InvariantCulture) + " GB"
+        mb >= 1000 && mb % 1000 == 0
+            ? (mb / 1000).ToString("0", CultureInfo.InvariantCulture) + " GB"
             : mb.ToString("0", CultureInfo.InvariantCulture) + " MB";
 
     /// <summary>

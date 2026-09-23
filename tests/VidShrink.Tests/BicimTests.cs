@@ -68,9 +68,11 @@ public sealed class BicimTests
 
     [Theory]
     [InlineData(50, "50 MB")]
-    [InlineData(1023, "1023 MB")]
-    [InlineData(1024, "1 GB")]
-    [InlineData(2048, "2 GB")]
+    [InlineData(999, "999 MB")]
+    [InlineData(1000, "1 GB")]
+    [InlineData(2000, "2 GB")]
+    [InlineData(1024, "1024 MB")]
+    [InlineData(2048, "2048 MB")]
     [InlineData(1536, "1536 MB")]
     public void HedefEtiketiTamKatlariGbYazar(int mb, string beklenen) =>
         Assert.Equal(beklenen, Bicim.HedefEtiketi(mb));
