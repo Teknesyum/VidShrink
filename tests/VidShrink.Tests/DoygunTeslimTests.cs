@@ -53,7 +53,7 @@ public sealed class DoygunTeslimTests
             try
             {
                 var kultur = Strings.CultureOf(window.Language);
-                return (window.BittiSatiri(Sonuc(saturated: true), 25), window.BittiSatiri(Sonuc(), 25),
+                return (window.BittiSatiri(Sonuc(saturated: true), 25, new EncodePlan()), window.BittiSatiri(Sonuc(), 25, new EncodePlan()),
                     Bicim.Boyut.Mb(6.4, kultur), Bicim.Boyut.Hedef(25, kultur));
             }
             finally { window.Close(); }

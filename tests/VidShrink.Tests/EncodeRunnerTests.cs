@@ -492,4 +492,57 @@ public sealed class EncodeRunnerTests
         Assert.False(failed.Ok);
         Assert.True(failed.DroppedAnOption);
     }
+
+    [Fact]
+    public void KalanSureKesirleAyniBirimiOlcer()
+    {
+        Assert.Null(EncodeRunner.Remaining(0.005, TimeSpan.FromSeconds(10)));
+        Assert.Equal(TimeSpan.FromSeconds(10), EncodeRunner.Remaining(0.5, TimeSpan.FromSeconds(10)));
+        Assert.Equal(TimeSpan.FromSeconds(30), EncodeRunner.Remaining(0.25, TimeSpan.FromSeconds(10)));
+        Assert.Equal(TimeSpan.Zero, EncodeRunner.Remaining(1.0, TimeSpan.FromSeconds(10)));
+    }
+
+    /// <summary>
+    /// O1: iki geçişte kesir bütün denemeye yayılır (ikinci geçiş 0,5–1), kalan süre de denemenin
+    /// saatinden hesaplanmalı. Eskiden saat her ffmpeg komutunda sıfırlanıyordu: ikinci geçişin
+    /// başında kalan süre, birinci geçişin 20 saniyesini hiç görmeden sıfıra yakın çıkıyordu.
+    /// Birinci geçişin sonunda da "0 kaldı" yazılıyordu. Burada birinci geçiş 20 saniye önce
+    /// başlamış sayılır; iki komut da tek iş parçacıklı ve bir saniyelik.
+    /// </summary>
+    [FfmpegFact]
+    public async Task KalanSureDenemeninSaatiyleHesaplanir()
+    {
+        var once = TimeSpan.FromSeconds(20);
+        var saat = Stopwatch.StartNew();
+        var birinci = new Toplayici();
+        var ikinci = new Toplayici();
+
+        await EncodeRunner.RunCommandAsync(KisaKomut(), 1.0, birinci, "pass 1/2 (attempt 1)", 0.0, 0.5, CancellationToken.None, () => once + saat.Elapsed);
+        await EncodeRunner.RunCommandAsync(KisaKomut(), 1.0, ikinci, "pass 2/2 (attempt 1)", 0.5, 1.0, CancellationToken.None, () => once + saat.Elapsed);
+
+        Assert.NotEmpty(birinci.Adimlar);
+        Assert.NotEmpty(ikinci.Adimlar);
+        var birincininSonu = birinci.Adimlar[^1];
+        Assert.Equal(0.5, birincininSonu.Fraction);
+        Assert.True(birincininSonu.Remaining >= once, $"Birinci geçişin sonunda kalan {birincininSonu.Remaining}; ikinci geçiş en az birincinin süresi kadar sürer.");
+        Assert.All(ikinci.Adimlar, adim =>
+        {
+            Assert.True(adim.Elapsed >= once, $"Geçen süre {adim.Elapsed}: saat ikinci geçişte sıfırlanmış.");
+            Assert.Equal(EncodeRunner.Remaining(adim.Fraction, adim.Elapsed), adim.Remaining);
+        });
+        Assert.Equal(TimeSpan.Zero, ikinci.Adimlar[^1].Remaining);
+    }
+
+    private static string[] KisaKomut() => new[]
+    {
+        "-hide_banner", "-f", "lavfi", "-i", "testsrc2=size=128x128:rate=30:duration=1",
+        "-threads", "1", "-c:v", "libx264", "-preset", "ultrafast", "-x264-params", "threads=1",
+        "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null"
+    };
+
+    private sealed class Toplayici : IProgress<EncodeProgress>
+    {
+        internal List<EncodeProgress> Adimlar { get; } = new();
+        public void Report(EncodeProgress value) => Adimlar.Add(value);
+    }
 }
