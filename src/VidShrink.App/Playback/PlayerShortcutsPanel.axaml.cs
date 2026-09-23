@@ -76,6 +76,40 @@ internal partial class PlayerShortcutsPanel : UserControl
         }
     }
 
+    /// <summary>
+    /// Kalın mono tuş ile sans açıklamanın ilk satır taban çizgileri. İkisi de satırın tepesine
+    /// yaslanınca yazı tiplerinin çıkış payları farkı kadar (2-3 px) kayıyordu; tabanı yukarıda
+    /// kalan blok fark kadar aşağı itilir.
+    /// </summary>
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        var boyut = base.MeasureOverride(availableSize);
+        return TabanlariHizala() ? base.MeasureOverride(availableSize) : boyut;
+    }
+
+    private bool TabanlariHizala()
+    {
+        var degisti = false;
+        for (var i = 0; i + 1 < Rows.Children.Count; i += 2)
+        {
+            if (Rows.Children[i] is not TextBlock tus || Rows.Children[i + 1] is not TextBlock aciklama) continue;
+            var fark = Taban(aciklama) - Taban(tus);
+            degisti |= Kaydir(tus, Math.Max(0, fark));
+            degisti |= Kaydir(aciklama, Math.Max(0, -fark));
+        }
+        return degisti;
+    }
+
+    private static double Taban(TextBlock blok)
+        => blok.TextLayout.TextLines.Count > 0 ? blok.TextLayout.TextLines[0].Baseline : 0;
+
+    private static bool Kaydir(TextBlock blok, double ust)
+    {
+        if (Math.Abs(blok.Margin.Top - ust) < 0.01) return false;
+        blok.Margin = new Thickness(0, ust, 0, 0);
+        return true;
+    }
+
     private ControlTheme? Find(string key)
         => this.TryFindResource(key, out var value) ? value as ControlTheme : null;
 }

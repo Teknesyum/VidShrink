@@ -11,6 +11,13 @@
     aynı boyutta görünür kalır — altındaki düzen zıplamaz (K4).
   -->
   <UserControl.Styles>
+    <Style Selector="Window:not(.reduced-motion) playback|ComparisonSurface#Surface">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="{StaticResource MotionBase}" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
     <Style Selector="Border#SeparatorHandle">
       <Setter Property="RenderTransform" Value="none"/>
       <Setter Property="Transitions">
