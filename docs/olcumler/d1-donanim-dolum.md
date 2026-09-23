@@ -82,7 +82,61 @@ etmedi (`budget fill over the target, the previous result delivered`). Aşım ş
 - karanlık/av1/1000 (0,9492): NVENC isteğe yanıt vermiyor; 967k → 994k / 1010k aynı 1,159 MB.
 - parlak/hevc/2000 (0,9587): aynı tavan koruması yolu.
 
-Üçü de nişanla değil, NVENC'in küçük hedefte isteğe tepkisiyle ilgili; bu ölçüm onları sınamadı.
+Üçü de nişanla değil, NVENC'in küçük hedefte isteğe tepkisiyle ilgili.
+
+### İstek-Boyut Eğrisi Ölçüldü: Bant Hiçbir İstekle Tutmuyor
+
+`t0/d1-tavan`, 23 Eylül 2026, aynı makine. Ürünün günlüğündeki komut (`komut:` satırı, aynı ölçek,
+`-maxrate`/`-bufsize` = 2·istek, 2pass) istek değiştirilerek doğrudan koşuldu; iki çekirdek, sıralı:
+
+```
+pwsh -NoProfile -File tools/d1-donanim-dolum/egri.ps1 -Girdi <kök>\.calisma\nvenc-2\kesit-parlak.mkv -Olcek 1804:768 -Kodek hevc_nvenc -Kbitler 610,625,640,650,655,656,657,658,660,664,673,685,696 -HedefMb 1.2207
+pwsh -NoProfile -File tools/d1-donanim-dolum/egri.ps1 -Girdi <kök>\.calisma\nvenc-2\kesit-parlak.mkv -Olcek 1882:802 -Kodek hevc_nvenc -Kbitler 1325,1400,1441,1459,1465,1470,1475,1480,1485,1491 -HedefMb 2.4414
+pwsh -NoProfile -File tools/d1-donanim-dolum/egri.ps1 -Girdi <kök>\.calisma\nvenc-2\kesit-karanlik.mkv -Olcek 1882:802 -Kodek av1_nvenc -Onayar p6 -Kbitler 967,1010,1030,1035,1040,1045,1050,1070,1100,1150,1200,1300 -HedefMb 1.2207
+```
+
+Düzenek ürünün denemelerini bayt bayt yeniden üretiyor: 610k → 1,0668, 673k → 1,2398, 696k → 1,2514,
+1325k → 2,1320, 1459k → 2,3407, 967k → 1,1509, 1010k → 1,1587 MB (hepsi ham json'daki izle aynı).
+
+Teslim/hedef; bant 0,97–1,00:
+
+| parlak/hevc/1000 | | parlak/hevc/2000 | | karanlık/av1/1000 | |
+|---|---|---|---|---|---|
+| 610k | 0,8740 | 1325k | 0,8733 | 967k | 0,9428 |
+| 640k | 0,8839 | 1400k | 0,9408 | 1010k | 0,9492 |
+| 650k | 0,8847 | 1441k | 0,9535 | 1030k | 0,9609 |
+| **656k** | **0,8847** | 1459k | 0,9587 | **1040k** | **0,9618** |
+| 657k | 1,0090 | **1470k** | **0,9633** | 1045k | 0,9618 |
+| 664k | 1,0118 | 1475k | 1,0099 | 1050k | 1,0701 |
+| 673k | 1,0157 | 1485k | 1,0116 | 1100k | 1,0847 |
+| 696k | 1,0252 | 1491k | 1,0116 | 1200k | 1,2125 |
+
+Üç hücrede de eğri **basamaklı**: 1k'lik istek artışı dosyayı tek adımda bandın altından hedefin
+üstüne atıyor (656k → 657k: +0,152 MB, hedefin %12,4'ü; 1470k → 1475k: +0,114 MB, %4,7;
+1045k → 1050k: +0,132 MB, %10,8). Basamağın boyu bandın genişliğinden (%3) büyük; bandın içine düşen
+**hiçbir istek yok**. Basamaktan önce eğri düz: 640k–656k 1,079–1,080 MB, 1465k–1470k aynı 2,3518 MB.
+
+Aradeğerleme ve tavan koruması kötü istek üretmiyor; ürünün istekleri ölçülen eğride doğru yerde:
+parlak/hevc/1000'in dolum isteği 673k basamağın üstünde, ama basamağın altındaki en iyi istek (≤656k)
+0,8847 veriyor, bugünkü 610k'den yalnız +1,07 puan. Ne isteğin kaynağı (doğrusal ya da üç örnekli
+ikinci derece aradeğer ikisi de ≈672k verir) ne tavan korumasının nişanı bandı açar.
+
+Kâhin sınırı (her hücrede basamağın altındaki en iyi isteği bilen bir kural):
+
+| Hücre | Bugün | Ulaşılabilir en iyi | Fark |
+|---|---|---|---|
+| parlak/hevc/1000 | 0,8740 | 0,8847 | +1,07 |
+| parlak/hevc/2000 | 0,9587 | 0,9633 | +0,46 |
+| karanlık/av1/1000 | 0,9492 | 0,9618 | +1,26 |
+
+18 hücre ortalamasına etkisi +0,155 puan: 0,9780 → **0,9795**, boşluk %2,05; en kötü hücre 0,8847'de
+kalır. Kâhinsiz bir kural basamağın yerini tek ek denemeyle bilemez (düz bölge ile basamak ilk
+örneklerin hiçbirinde görünmüyor), bu yüzden `ExtraAttempts = 1` altında kod değişmedi.
+Karanlık/av1/1000'in "yanıt yok" görünümü doygunluk değil, aynı basamak: 1030k'de dosya büyüyor,
+1050k'de hedefi %7 aşıyor.
+
+Bandı açacak kol istek değil, NVENC oran denetiminin kendisi (`-maxrate`/`-bufsize` oranı, AQ, QP
+aralığı); bu ölçümün kapsamı dışında.
 
 ## Değişiklik, Test Ve Mutasyon
 
