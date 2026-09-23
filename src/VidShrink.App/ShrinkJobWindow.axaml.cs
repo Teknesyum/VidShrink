@@ -121,6 +121,7 @@ public partial class ShrinkJobWindow : Window
         Strings.Use(_language);
 
         InitializeComponent();
+        if (Playback.HoverZone.MotionReduced) Classes.Add("reduced-motion");
 
         FlowDirection = Strings.IsRightToLeftLanguage(_language)
             ? Avalonia.Media.FlowDirection.RightToLeft

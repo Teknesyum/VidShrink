@@ -522,8 +522,21 @@ public partial class MainWindow : Window
         };
     }
 
-    private void Fade(Control control, bool visible)
+    /// <summary>
+    /// Yüzeyi saydamlıkla gösterir ya da gizler. Hareket azaltma açık pencerede geçiş kurulmaz,
+    /// yüzey hemen görünür ya da gizlenir.
+    /// </summary>
+    internal void Fade(Control control, bool visible)
     {
+        if (Classes.Contains("reduced-motion"))
+        {
+            _fadeGeneration[control] = NextFadeGeneration(control);
+            _fadingOut.Remove(control);
+            control.Transitions = null;
+            control.Opacity = 1;
+            control.IsVisible = visible;
+            return;
+        }
         EnsureFade(control);
         if (visible)
         {
