@@ -817,7 +817,7 @@
                   <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
                     <StackPanel x:Name="PlanBody" Spacing="{StaticResource SpaceMd}">
                       <TextBlock x:Name="TxtPlanEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.plan.empty}"/>
-                      <Grid x:Name="PlanFacts" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}"/>
+                      <izi:CiftIzgara x:Name="PlanFacts" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}"/>
                       <Border x:Name="PlanRule" Theme="{StaticResource PanelRule}" IsVisible="False"/>
                       <!--
                         T46/K6: gerekçeler katlanır. Metin kısalmıyor, yalnız katlanıyor —
@@ -857,12 +857,10 @@
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <TextBlock Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
                     <ProgressBar x:Name="Progress" Maximum="1"/>
-                    <Grid ColumnDefinitions="*,*"
-                          RowDefinitions="Auto,Auto,Auto"
-                          ColumnSpacing="{StaticResource SpaceMd}"
-                          RowSpacing="{StaticResource SpaceMd}">
+                    <StackPanel Spacing="{StaticResource SpaceMd}">
+                    <izi:SutunIzgara x:Name="OutputFacts" MaxColumns="2" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceMd}">
 
-                      <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{StaticResource SpaceXs}">
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
                         <TextBlock Text="{loc:Text main.output.stage}" Theme="{StaticResource OutFactLabel}"/>
                         <TextBlock x:Name="TxtStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource OutFactValue}" TextWrapping="Wrap">
                           <TextBlock.Transitions>
@@ -873,17 +871,17 @@
                         </TextBlock>
                       </StackPanel>
 
-                      <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource SpaceXs}">
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
                         <TextBlock Text="{loc:Text main.output.current-size}" Theme="{StaticResource OutFactLabel}"/>
                         <TextBlock x:Name="TxtOutSize" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
 
-                      <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource SpaceXs}">
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
                         <TextBlock Text="{loc:Text main.output.remaining}" Theme="{StaticResource OutFactLabel}"/>
                         <TextBlock x:Name="TxtRemaining" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
 
-                      <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceXs}">
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
                         <Grid ColumnDefinitions="*,Auto">
                           <TextBlock Grid.Column="0" x:Name="LblDuration" Text="{loc:Text main.output.estimated-time}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
                           <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-time}">
@@ -899,10 +897,11 @@
                             </Transitions>
                           </TextBlock.Transitions>
                         </TextBlock>
-                        <TextBlock x:Name="TxtDurationRange" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                       </StackPanel>
+                    </izi:SutunIzgara>
+                    <TextBlock x:Name="TxtDurationRange" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
-                      <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="{StaticResource SpaceXs}">
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
                         <Grid ColumnDefinitions="*,Auto">
                           <TextBlock Grid.Column="0" x:Name="LblEstimate" Text="{loc:Text main.output.estimated-output}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
                           <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-output}">
@@ -920,7 +919,7 @@
                         </TextBlock>
                         <TextBlock x:Name="TxtEstimateRange" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                       </StackPanel>
-                    </Grid>
+                    </StackPanel>
                     <TextBlock x:Name="TxtEstimateNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <TextBlock x:Name="TxtResult" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                     <Border x:Name="RetryAskPanel"
@@ -1022,14 +1021,14 @@
                         RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
 
                     <StackPanel Grid.Row="0" Grid.Column="0">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.container}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.container}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.container}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.container.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <ComboBox x:Name="CmbContainer" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="MP4" Tag="mp4"/>
                         <ComboBoxItem Content="MKV" Tag="mkv"/>
@@ -1045,14 +1044,14 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="0" Grid.Column="1">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.video-codec}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.video-codec}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.video-codec}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.video-codec.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <ComboBox x:Name="CmbConvertCodec" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="H.264" Tag="libx264"/>
                         <ComboBoxItem Content="H.265" Tag="libx265"/>
@@ -1063,14 +1062,14 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="0">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.quality-mode}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.quality-mode}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.quality-mode}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.quality-mode.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <ComboBox x:Name="CmbQualityMode" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.advanced.mode.crf}"/>
                         <ComboBoxItem Content="{loc:Text main.convert.fixed-bitrate}"/>
@@ -1078,14 +1077,14 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="1">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.crf-label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.crf-label.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
                         <Slider x:Name="SliderQuality" Minimum="10" Maximum="45" Value="23" VerticalAlignment="Center"/>
                         <TextBox x:Name="TxtQuality" Grid.Column="1" Text="23" Width="96" MaxLines="1" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
@@ -1093,14 +1092,14 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="0">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.resolution}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.resolution}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.resolution}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.resolution.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <ComboBox x:Name="CmbResolution" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="2160" Tag="2160"/>
@@ -1113,26 +1112,26 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="1">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.custom-resolution}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-resolution}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-resolution}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-resolution.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <TextBox x:Name="TxtCustomResolution" Text="1280x720" MaxLines="1"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" Grid.Column="0">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.frame-rate}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.frame-rate}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.frame-rate}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.frame-rate.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <ComboBox x:Name="CmbConvertFps" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="60" Tag="60"/>
@@ -1143,26 +1142,26 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" Grid.Column="1">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.custom-fps}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-fps}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-fps}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-fps.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <TextBox x:Name="TxtCustomFps" Text="25" MaxLines="1"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="4" Grid.Column="0">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.audio}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <ComboBox x:Name="CmbConvertAudio" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="AAC" Tag="aac"/>
                         <ComboBoxItem Content="Opus" Tag="libopus"/>
@@ -1175,38 +1174,38 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="4" Grid.Column="1">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.audio-bitrate}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio-bitrate}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio-bitrate}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio-bitrate.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <TextBox x:Name="TxtAudioBitrate" Text="128" MaxLines="1"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="5" Grid.Column="0">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.trim-start}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-start}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-start}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-start.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <TextBox x:Name="TxtTrimStart" MaxLines="1"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="5" Grid.Column="1">
-                      <WrapPanel>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <TextBlock Text="{loc:Text main.convert.trim-end}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-end}">
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-end}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-end.tip}"/>
                           </ToolTip.Tip>
                         </Button>
-                      </WrapPanel>
+                      </Grid>
                       <TextBox x:Name="TxtTrimEnd" MaxLines="1"/>
                     </StackPanel>
 
@@ -1505,7 +1504,7 @@
                     <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtShareCeiling" Theme="{StaticResource PlanFactValue}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Text settings.share.lifetime}" Theme="{StaticResource PlanFactLabel}"/>
-                    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
+                    <StackPanel Spacing="{StaticResource SpaceSm}">
                       <ComboBox x:Name="CmbShareRetention" HorizontalAlignment="Left"/>
                       <TextBlock x:Name="TxtShareRetentionFixed" Theme="{StaticResource PlanFactValue}" IsVisible="False"/>
                     </StackPanel>

@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:playback="using:VidShrink.App.Playback"
              xmlns:auto="using:Avalonia.Automation"
@@ -103,10 +103,10 @@
                     VerticalAlignment="Center">
           <TextBlock x:Name="EmptyTitle"
                      Theme="{StaticResource Label}"
-                     HorizontalAlignment="Center"/>
+                     HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
           <TextBlock x:Name="EmptyHint"
                      Theme="{StaticResource Hint}"
-                     HorizontalAlignment="Center"/>
+                     HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
         </StackPanel>
 
         <!--

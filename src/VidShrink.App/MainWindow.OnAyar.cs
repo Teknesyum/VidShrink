@@ -149,7 +149,7 @@ public partial class MainWindow
         if (preset.TargetMb is { } mb)
         {
             if (mb > SliderTarget.Maximum) SliderTarget.Maximum = mb;
-            TxtTarget.Text = mb.ToString("0.##", CultureInfo.InvariantCulture);
+            TxtTarget.Text = FormatBoxNumber(mb);
         }
 
         if (preset.MaxShortEdge is { } edge)

@@ -1,0 +1,93 @@
+name: vp9-crf-olcek
+
+on:
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+  BENCH: tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll
+  KAYNAK_URL: https://download.blender.org/durian/movies/Sintel.2010.1080p.mkv
+
+jobs:
+  kesit:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur (GyanD 9.0, urunun paketledigi ile ayni)
+        run: pwsh tools/kalite-paketi-3/kur.ps1
+      - name: kaynak indir (Sintel, vp9-gercek-kesit.yml ile ayni kaynak)
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          $hedef = Join-Path $env:RUNNER_TEMP 'kaynak.mkv'
+          Invoke-WebRequest -Uri $env:KAYNAK_URL -OutFile $hedef
+          "kaynak url=$env:KAYNAK_URL sha256=$((Get-FileHash $hedef -Algorithm SHA256).Hash) boy=$((Get-Item $hedef).Length)" | Tee-Object -FilePath (Join-Path $env:RUNNER_TEMP 'kaynak-sha256.txt')
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - name: gercek kesitleri sec (vp9-gercek-kesit ile ayni secim)
+        run: |
+          pwsh tools/kalite-paketi-3/kos.ps1 -Is kesit -Kaynak "$env:RUNNER_TEMP\kaynak.mkv" -Cikti "$env:RUNNER_TEMP\vco" -Bench $env:BENCH
+          Copy-Item "$env:RUNNER_TEMP\kaynak-sha256.txt" "$env:RUNNER_TEMP\vco\"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vco-kesitler
+          path: ${{ runner.temp }}/vco
+          compression-level: 0
+          retention-days: 14
+
+  olc:
+    needs: kesit
+    runs-on: windows-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        kesit: [karanlik, orta, hareketli]
+        grup: [x264, vp9a, vp9b]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur (GyanD 9.0)
+        run: pwsh tools/kalite-paketi-3/kur.ps1
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - uses: actions/download-artifact@v4
+        with:
+          name: vco-kesitler
+          path: ${{ runner.temp }}/kesitler
+      - name: crf izgarasi
+        run: pwsh tools/vp9-crf-olcek/kos.ps1 -Is olc -Kesit ${{ matrix.kesit }} -Grup ${{ matrix.grup }} -Girdi "$env:RUNNER_TEMP\kesitler" -Cikti "$env:RUNNER_TEMP\vco" -Bench $env:BENCH
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vco-olc-${{ matrix.kesit }}-${{ matrix.grup }}
+          path: ${{ runner.temp }}/vco/sonuc-*.json
+          retention-days: 14
+
+  ozet:
+    needs: [kesit, olc]
+    if: always()
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ffmpeg kur (GyanD 9.0)
+        run: pwsh tools/kalite-paketi-3/kur.ps1
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vco-olc-*
+          path: ${{ runner.temp }}/girdi
+      - name: ozet
+        run: |
+          pwsh tools/vp9-crf-olcek/kos.ps1 -Is ozet -Girdi "$env:RUNNER_TEMP\girdi" -Cikti "$env:RUNNER_TEMP\sonuc"
+          Get-Content "$env:RUNNER_TEMP\sonuc\ozet.md" | Add-Content $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vco-sonuc
+          path: ${{ runner.temp }}/sonuc
+          retention-days: 30

@@ -77,7 +77,7 @@ public sealed class OnizlemeRozetiTests
     {
         var info = Kaynak();
 
-        var disarida = PreviewSegment.QualityFor(info, Plan("libvpx-vp9"));
+        var disarida = PreviewSegment.QualityFor(info, Plan("h264_videotoolbox"));
         var iceride = PreviewSegment.QualityFor(info, Plan("libx264"));
 
         Assert.Equal(PreviewQuality.Desteklenmiyor, disarida.Kind);
@@ -96,7 +96,7 @@ public sealed class OnizlemeRozetiTests
         var info = Kaynak();
 
         var disarida = SegmentEncoder.Klip(
-            PreviewSegment.For(info, Plan("libvpx-vp9"), 0, "c.mp4"), "a.mp4", "c.mp4", 0, TimeSpan.Zero);
+            PreviewSegment.For(info, Plan("h264_videotoolbox"), 0, "c.mp4"), "a.mp4", "c.mp4", 0, TimeSpan.Zero);
         var iceride = SegmentEncoder.Klip(
             PreviewSegment.For(info, Plan("libx264"), 0, "d.mp4"), "a.mp4", "d.mp4", 0, TimeSpan.Zero);
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -178,6 +178,7 @@ public partial class MainWindow : Window
         // T43: panel ana pencereye burada bağlanıyor. Kaynağı üreten çağrı tek yerde durur;
         // panel hangi motorun kare ürettiğini bilmez.
         _preview = new PanelHost(Preview, () => new EngineComparisonFrameSource());
+        _preview.SetLanguage(Strings.Language);
 
         Player.PlayerTabIndex = () => PlayerTabIndex;
         Player.CurrentTabIndex = () => Tabs.SelectedIndex;
@@ -1274,8 +1275,8 @@ public partial class MainWindow : Window
         _settingsSyncing = _syncing = _updateUiSyncing = true;
         try
         {
-            TxtTarget.Text = settings.TargetMb.ToString("0.##", CultureInfo.InvariantCulture);
-            TxtQualityTarget.Text = settings.QualityTarget.ToString("0.##", CultureInfo.InvariantCulture);
+            TxtTarget.Text = FormatBoxNumber(settings.TargetMb);
+            TxtQualityTarget.Text = FormatBoxNumber(settings.QualityTarget);
             _savedTargetMb = settings.TargetMb;
             _savedQualityTarget = settings.QualityTarget;
             _intent = (Intent)Math.Clamp(settings.Intent, 0, 2);
@@ -2095,11 +2096,11 @@ public partial class MainWindow : Window
         if (plan.TargetMb is { } fixedMb)
         {
             if (fixedMb > SliderTarget.Maximum) SliderTarget.Maximum = fixedMb;
-            TxtTarget.Text = fixedMb.ToString("0.##", CultureInfo.InvariantCulture);
+            TxtTarget.Text = FormatBoxNumber(fixedMb);
         }
         else if (plan.SizeCapped && _info is not null)
         {
-            TxtTarget.Text = Math.Round(_info.FileSizeMb / 2, 1).ToString("0.##", CultureInfo.InvariantCulture);
+            TxtTarget.Text = FormatBoxNumber(Math.Round(_info.FileSizeMb / 2, 1));
         }
 
         RefreshChipDerivation();
@@ -2913,7 +2914,7 @@ public partial class MainWindow : Window
     }
 
     private double ParseTargetMb()
-        => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : WhatsAppTargetMb;
+        => TryReadBoxNumber(TxtTarget.Text, out var mb) && mb > 0 ? mb : WhatsAppTargetMb;
 
     /// <summary>
     /// Boyut tavani olmayan yonga secildiginde hedef kutusundaki sayi plani kurmaz:
@@ -3263,7 +3264,7 @@ public partial class MainWindow : Window
             : Math.Max(1, Math.Round(info.FileSizeMb / 2));
         SliderTarget.Maximum = Math.Max(SliderTarget.Maximum, Math.Ceiling(suggested));
         SliderTarget.Value = suggested;
-        TxtTarget.Text = suggested.ToString("0.##", CultureInfo.InvariantCulture);
+        TxtTarget.Text = FormatBoxNumber(suggested);
         _syncing = false;
         RefreshChipDerivation();
 
@@ -3572,7 +3573,6 @@ public partial class MainWindow : Window
     private void ResetPlanView()
     {
         PlanFacts.Children.Clear();
-        PlanFacts.RowDefinitions.Clear();
         PlanReasons.Children.Clear();
         PlanRule.IsVisible = false;
         TxtPlanEmpty.IsVisible = true;
@@ -3581,16 +3581,8 @@ public partial class MainWindow : Window
 
     private void AddPlanFact(string label, string value)
     {
-        var row = PlanFacts.RowDefinitions.Count;
-        PlanFacts.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
-
         var key = new TextBlock { Text = LanguageCatalog.Display(label), Theme = Look("PlanFactLabel") };
-        Grid.SetRow(key, row);
-        Grid.SetColumn(key, 0);
-
         var read = new TextBlock { Text = value, Theme = Look("PlanFactValue") };
-        Grid.SetRow(read, row);
-        Grid.SetColumn(read, 1);
 
         PlanFacts.Children.Add(key);
         PlanFacts.Children.Add(read);
@@ -3614,7 +3606,6 @@ public partial class MainWindow : Window
         _estimate = PlanCalculator.Estimate(plan, _info, _profile);
 
         PlanFacts.Children.Clear();
-        PlanFacts.RowDefinitions.Clear();
         PlanReasons.Children.Clear();
         TxtPlanEmpty.IsVisible = false;
 
@@ -3785,7 +3776,7 @@ public partial class MainWindow : Window
     {
         if (_syncing) return;
         _syncing = true;
-        TxtTarget.Text = Math.Round(SliderTarget.Value, 1).ToString("0.##", CultureInfo.InvariantCulture);
+        TxtTarget.Text = FormatBoxNumber(Math.Round(SliderTarget.Value, 1));
         _syncing = false;
         if (!_targetIsDerived) _savedTargetMb = ParseTargetMb();
         RestoreSizeCap();
@@ -3828,7 +3819,7 @@ public partial class MainWindow : Window
     {
         if (_syncing || _qualityIsDerived) return;
         _qualityIsDerived = true;
-        TxtQualityTarget.Text = Math.Round(SliderQualityTarget.Value).ToString("0.##", CultureInfo.InvariantCulture);
+        TxtQualityTarget.Text = FormatBoxNumber(Math.Round(SliderQualityTarget.Value));
         _qualityIsDerived = false;
         _savedQualityTarget = ParseQualityTarget();
         DeriveTargetFromQuality();
@@ -3849,9 +3840,20 @@ public partial class MainWindow : Window
     }
 
     /// <summary>Kutudaki kalite skoru. Okunamayan metin kaydırıcının o anki değeridir.</summary>
+    /// <summary>
+    /// Hedef ve kalite kutusuna yazılan sayı arayüz dilinin ondalık ayırıcısıyla yazılır
+    /// (Türkçede 12,5). Okurken önce o dil, sonra nokta denenir: dil değişmeden önce yazılmış
+    /// metin de, klavyeden nokta basan kullanıcı da sessizce varsayılana düşmez.
+    /// </summary>
+    internal static string FormatBoxNumber(double value) => value.ToString("0.##", Strings.Culture);
+
+    internal static bool TryReadBoxNumber(string? text, out double value)
+        => double.TryParse(text, NumberStyles.Float, Strings.Culture, out value)
+            || double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value)
+            || double.TryParse(text?.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
     private double ParseQualityTarget()
     {
-        var value = double.TryParse(TxtQualityTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var score)
+        var value = TryReadBoxNumber(TxtQualityTarget.Text, out var score)
             ? score
             : SliderQualityTarget.Value;
         return Math.Clamp(value, SliderQualityTarget.Minimum, SliderQualityTarget.Maximum);
@@ -3872,7 +3874,7 @@ public partial class MainWindow : Window
         _targetIsDerived = true;
         if (mb > SliderTarget.Maximum) SliderTarget.Maximum = Math.Ceiling(mb);
         SliderTarget.Value = mb;
-        TxtTarget.Text = mb.ToString("0.##", CultureInfo.InvariantCulture);
+        TxtTarget.Text = FormatBoxNumber(mb);
         _targetIsDerived = false;
 
         ShowQualityTargetBound(result, mb);
@@ -3893,7 +3895,7 @@ public partial class MainWindow : Window
         TargetDerivedQualities++;
         _qualityIsDerived = true;
         SliderQualityTarget.Value = Math.Clamp(score, SliderQualityTarget.Minimum, SliderQualityTarget.Maximum);
-        TxtQualityTarget.Text = Math.Round(score, 1).ToString("0.##", CultureInfo.InvariantCulture);
+        TxtQualityTarget.Text = FormatBoxNumber(Math.Round(score, 1));
         _qualityIsDerived = false;
 
         SetQualityTargetNotice("");

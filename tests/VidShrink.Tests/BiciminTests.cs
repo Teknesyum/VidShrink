@@ -486,7 +486,7 @@ public sealed class KareYerlesimTests
     {
         var okunan = Yuklu(dil, window =>
         {
-            var hucreler = window.FindControl<Grid>("PlanFacts")!.Children.OfType<TextBlock>()
+            var hucreler = window.FindControl<Panel>("PlanFacts")!.Children.OfType<TextBlock>()
                 .Select(t => t.Text ?? "").ToArray();
             return (hucreler, gelismis: Named<TextBlock>(window, "TxtAdvMinResolutionNow").Text ?? "");
         });
@@ -569,7 +569,7 @@ public sealed class KareYerlesimTests
             var kaliteIzgara = ((Grid)kalite.Parent!).Children;
             var kaliteBirimi = (kaliteIzgara[kaliteIzgara.IndexOf(kalite) + 1] as TextBlock)?.Text ?? "";
             var kip = (window.FindControl<ComboBox>("CmbQualityMode")!.Items[0] as ComboBoxItem)?.Content?.ToString() ?? "";
-            var plan = string.Join(" | ", window.FindControl<Grid>("PlanFacts")!.Children.OfType<TextBlock>().Select(t => t.Text));
+            var plan = string.Join(" | ", window.FindControl<Panel>("PlanFacts")!.Children.OfType<TextBlock>().Select(t => t.Text));
             return (hedefBirimi, kaliteBirimi, kip,
                 boyut: Named<TextBlock>(window, "TxtSize").Text ?? "",
                 hiz: Named<TextBlock>(window, "TxtBitrate").Text ?? "",
@@ -729,11 +729,11 @@ public sealed class KareYerlesimTests
                     Named<TextBlock>(window, "TxtBitrate").Text ?? "",
                     Named<TextBlock>(window, "TxtAudio").Text ?? ""
                 };
-                okunan.AddRange(window.FindControl<Grid>("PlanFacts")!.Children.OfType<TextBlock>().Select(t => t.Text ?? ""));
+                okunan.AddRange(window.FindControl<Panel>("PlanFacts")!.Children.OfType<TextBlock>().Select(t => t.Text ?? ""));
                 window.AdvModeIndex = 1;
                 window.RecalculateForTest();
                 window.UpdateLayout();
-                okunan.AddRange(window.FindControl<Grid>("PlanFacts")!.Children.OfType<TextBlock>().Select(t => t.Text ?? ""));
+                okunan.AddRange(window.FindControl<Panel>("PlanFacts")!.Children.OfType<TextBlock>().Select(t => t.Text ?? ""));
                 return okunan;
             });
         }

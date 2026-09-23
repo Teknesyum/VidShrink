@@ -664,7 +664,7 @@ public static class PlanCalculator
         {
             plan.Mode = "2pass";
             plan.Crf = null;
-            reason.Add($"libvpx-vp9 has no measured CRF scale in this engine, so the size is held by two-pass VBR at {plan.VideoBitrateK}k instead of a CRF guess");
+            reason.Add($"libvpx-vp9 has a measured CRF quality scale but no measured CRF-to-size model in this engine, so the size is held by two-pass VBR at {plan.VideoBitrateK}k instead of a CRF guess");
             reasonCodes.Add(new ReasonNote(ReasonCode.Vp9CrfUnmeasuredTwoPass));
         }
 

@@ -376,6 +376,11 @@ public sealed class YerlesimDenetimiTests
             var genis = (Control)yigin.Children[2];
             genis.Tag = "OlumluTasma";
             genis.Width = 5000;
+
+            var sarilan = (TextBlock)yigin.Children[3];
+            sarilan.Tag = "OlumluBolunme";
+            sarilan.Text = "Karşılaştırmalarımızdan";
+            sarilan.Width = 70;
         }, new Size(600, 720));
 
         var metin = string.Join(Environment.NewLine, denetim.Kusurlar);
@@ -384,6 +389,7 @@ public sealed class YerlesimDenetimiTests
         Assert.Contains(denetim.Kusurlar, k => k.Tur == "kesik" && k.Yer.Contains("OlumluKesik", StringComparison.Ordinal));
         Assert.Contains(denetim.Kusurlar, k => k.Tur == "çakışma" && k.Yer.Contains("OlumluCakisma", StringComparison.Ordinal));
         Assert.Contains(denetim.Kusurlar, k => k.Tur == "taşma" && k.Yer.Contains("OlumluTasma", StringComparison.Ordinal));
+        Assert.Contains(denetim.Kusurlar, k => k.Tur == "bolunmus" && k.Yer.Contains("OlumluBolunme", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -878,6 +884,11 @@ public sealed class YerlesimDenetimiTests
                 continue;
             }
 
+            if (BolunenSozcuk(blok, metin, denetim.Dil) is { } bolunen)
+            {
+                denetim.Ekle(new Kusur("bolunmus", sekme, $"{Ad(blok)} [{Kisalt(metin)}]", $"sözcük satır sonunda bölündü: {bolunen}, yer {yer:0.#}"));
+                continue;
+            }
             if (blok.TextWrapping == TextWrapping.NoWrap && gereken - yer > 0.5)
             {
                 if (balonda && blok.FindAncestorOfType<SutunIzgara>() is null) denetim.Balonlu.Add($"{sekme} · {Ad(blok)} [{Kisalt(metin)}] gereken {gereken:0.#}, yer {yer:0.#}");
@@ -999,6 +1010,37 @@ public sealed class YerlesimDenetimiTests
             denetim.Ekle(new Kusur("şerit", sekme, Ad(sayfa), $"sayfa {ust:0.#}'de başlıyor, şerit {seritAlti:0.#}'de bitiyor"));
     }
 
+    /// <summary>
+    /// Satırı hece ya da harf arasından kıran yazılar: Unicode satır kırma kuralında Hangul
+    /// heceleri arasında kırılma serbesttir (CSS'in `word-break: normal`'ı da öyle), Korece
+    /// "2패|스" kusur değil.
+    /// </summary>
+    private static readonly HashSet<string> HarfArasiKirilanDiller = ["ja", "zh-Hans", "th", "ko"];
+
+    /// <summary>
+    /// Sarılan metnin bir satırı harfle bitip sonraki harfle başlıyorsa sözcük ortadan
+    /// bölünmüştür ("Estimat / ed Time"): taşma yok, kesik denetimi görmez, ama okunmaz.
+    /// Sözcük aralığı boşluk olmayan yazılar muaf.
+    /// </summary>
+    internal static string? BolunenSozcuk(TextBlock blok, string metin, string dil)
+    {
+        if (blok.TextWrapping == TextWrapping.NoWrap || HarfArasiKirilanDiller.Contains(dil)) return null;
+        var satirlar = blok.TextLayout.TextLines;
+        for (var i = 0; i < satirlar.Count - 1; i++)
+        {
+            var son = satirlar[i].FirstTextSourceIndex + satirlar[i].Length;
+            if (son <= 0 || son >= metin.Length) continue;
+            if (char.IsLetterOrDigit(metin[son - 1]) && char.IsLetterOrDigit(metin[son]))
+            {
+                var bas = son - 1;
+                while (bas > 0 && char.IsLetterOrDigit(metin[bas - 1])) bas--;
+                var bit = son;
+                while (bit < metin.Length && char.IsLetterOrDigit(metin[bit])) bit++;
+                return $"{metin[bas..son]}|{metin[son..bit]}";
+            }
+        }
+        return null;
+    }
     private static readonly IReadOnlyDictionary<string, HashSet<string>> KucukSozcukler =
         new Dictionary<string, HashSet<string>>(StringComparer.Ordinal)
         {

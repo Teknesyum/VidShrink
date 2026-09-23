@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -596,6 +596,60 @@ public sealed class LanguageTests : IDisposable
         Assert.Equal(Strings.Languages.Count, listed);
     }
 
+    /// <summary>
+    /// Dil pencereden önce seçildiyse (iş penceresinin "Uygulamada aç"ı böyle kurar) değişim
+    /// olayı gelmez; karşılaştırma paneli yine de o dilde açılmalı.
+    /// </summary>
+    [Fact]
+    public void DilZatenSeciliykenAcilanPencereninKarsilastirmaPaneliODilde()
+    {
+        var baslik = AppHost.Run(() =>
+        {
+            Strings.Use("tr");
+            var window = new MainWindow();
+            try
+            {
+                return window.Preview.EmptyTitle.Text;
+            }
+            finally
+            {
+                window.Close();
+                Strings.Use("en");
+            }
+        });
+
+        Assert.Equal(LanguageCatalog.Title(Strings.GetIn("tr", "playback.panel.title"), "tr"), baslik);
+    }
+    /// <summary>
+    /// Türkçe kullanıcı hedefe "15,5" yazar. Kutu değişmez kültürle okunduğunda bu metin
+    /// ayrıştırılamıyor ve plan sessizce WhatsApp varsayılanına düşüyordu; kutuya yazılan
+    /// sayı da Türkçe ekranda noktalı (51.8) çıkıyordu.
+    /// </summary>
+    [Fact]
+    public void TurkceHedefKutusuVirgulluSayiyiOkurVeVirgulleYazar()
+    {
+        var (okunan, noktali, yazilan) = AppHost.Run(() =>
+        {
+            Strings.Use("tr");
+            var window = new MainWindow();
+            try
+            {
+                window.TxtTarget.Text = "15,5";
+                var virgul = window.PlanTargetMb();
+                window.TxtTarget.Text = "15.5";
+                return (virgul, window.PlanTargetMb(), MainWindow.FormatBoxNumber(51.8));
+            }
+            finally
+            {
+                window.Close();
+                Strings.Use("en");
+            }
+        });
+
+        Assert.Equal(15.5, okunan);
+        Assert.Equal(15.5, noktali);
+        Assert.Equal("51,8", yazilan);
+    }
     // ---- K7: üçüncü dil kod değişmeden ---------------------------------------------
 
     private readonly record struct Reading(IReadOnlyList<string> Offered, string Chosen);

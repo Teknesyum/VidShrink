@@ -95,6 +95,7 @@ public static class CodecModel
     {
         "hevc" => 28,
         "av1" => 35,
+        "vp9" => 33,
         _ => 23
     };
 
@@ -102,6 +103,7 @@ public static class CodecModel
     {
         "libx265" => 0.68,
         "libsvtav1" => 0.55,
+        "libvpx-vp9" => 0.6,
         "h264_nvenc" => 1.28,
         "hevc_nvenc" => 0.88,
         "h264_qsv" => 1.25,
@@ -117,6 +119,7 @@ public static class CodecModel
     public static double CrfHalvingStep(string codec) => Family(codec) switch
     {
         "av1" => 7.0,
+        "vp9" => 9.5,
         _ => 6.0
     };
 
@@ -308,6 +311,7 @@ public static class CodecModel
     public static (int Min, int Max) CrfRange(string codec) => Family(codec) switch
     {
         "av1" => (18, 55),
+        "vp9" => (10, 63),
         _ => (10, 45)
     };
 
