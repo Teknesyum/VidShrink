@@ -1265,6 +1265,7 @@
               </Border.Transitions>
               <Panel>
                 <ScrollViewer Name="PART_ScrollViewer"
+                              Margin="{TemplateBinding Padding}"
                               HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
                               VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
                   <TextPresenter Name="PART_TextPresenter"
@@ -1279,7 +1280,6 @@
                                  SelectionBrush="{TemplateBinding SelectionBrush}"
                                  SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
                                  CaretBrush="{TemplateBinding CaretBrush}"
-                                 Margin="{TemplateBinding Padding}"
                                  VerticalAlignment="Center"/>
                 </ScrollViewer>
                 <Border Name="FocusRing"

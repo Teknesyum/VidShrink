@@ -891,6 +891,9 @@ public partial class MainWindow : Window
     private static string Say(string key, params object?[] args)
         => LanguageCatalog.Display(Strings.Get(key, args));
 
+    internal static string SimdiSatiri(string deger)
+        => string.Format(Strings.Culture, Say("main.advanced.now"), deger);
+
     /// <summary>
     /// Aynı geçit, ama dili çağıran seçiyor. Ölçüler iki dilin satırını yan yana koyabilsin
     /// diye var; arayüz her zaman yürürlükteki dili geçiriyor.
@@ -2293,31 +2296,31 @@ public partial class MainWindow : Window
     {
         var plan = ActivePlan;
         var has = plan is not null;
-        TxtAdvModeNow.Text = has ? Say("main.advanced.now", plan!.ModeEnum switch
+        TxtAdvModeNow.Text = has ? SimdiSatiri(plan!.ModeEnum switch
         {
             EncodeMode.Crf => Say("main.advanced.mode.crf"),
             EncodeMode.PassThrough => Say("main.plan.mode.copy"),
             _ => Say("main.advanced.mode.two-pass")
         }) : "";
-        TxtAdvCrfNow.Text = has ? Say("main.advanced.now", plan!.Crf is { } crf ? crf.ToString(CultureInfo.InvariantCulture) : "-") : "";
-        TxtAdvPresetNow.Text = has ? Say("main.advanced.now", plan!.Preset) : "";
-        TxtAdvTuneNow.Text = has ? Say("main.advanced.now", plan!.Tune ?? "-") : "";
-        TxtAdvAudioKbpsNow.Text = has ? Say("main.advanced.now", plan!.AudioBitrateK.ToString(CultureInfo.InvariantCulture)) : "";
+        TxtAdvCrfNow.Text = has ? SimdiSatiri(plan!.Crf is { } crf ? crf.ToString(CultureInfo.InvariantCulture) : "-") : "";
+        TxtAdvPresetNow.Text = has ? SimdiSatiri(plan!.Preset) : "";
+        TxtAdvTuneNow.Text = has ? SimdiSatiri(plan!.Tune ?? "-") : "";
+        TxtAdvAudioKbpsNow.Text = has ? SimdiSatiri(plan!.AudioBitrateK.ToString(CultureInfo.InvariantCulture)) : "";
         TxtAdvAudioChannelsNow.Text = has
-            ? Say("main.advanced.now", plan!.AudioChannels?.ToString(CultureInfo.InvariantCulture) ?? Say("main.advanced.audio-channels.none"))
+            ? SimdiSatiri(plan!.AudioChannels?.ToString(CultureInfo.InvariantCulture) ?? Say("main.advanced.audio-channels.none"))
             : "";
-        TxtAdvAudioCodecNow.Text = has ? Say("main.advanced.now", plan!.AudioCodec ?? Say("main.advanced.audio-channels.none")) : "";
-        TxtAdvMinResolutionNow.Text = has ? Say("main.advanced.now", Bicim.Cozunurluk(plan!.Width, plan.Height)) : "";
-        TxtAdvMinFpsNow.Text = has ? Say("main.advanced.now", Bicim.Kare(plan!.Fps, Strings.Culture)) : "";
-        TxtAdvEncoderPathNow.Text = has ? Say("main.advanced.now", CodecModel.IsHardware(plan!.Codec)
+        TxtAdvAudioCodecNow.Text = has ? SimdiSatiri(plan!.AudioCodec ?? Say("main.advanced.audio-channels.none")) : "";
+        TxtAdvMinResolutionNow.Text = has ? SimdiSatiri(Bicim.Cozunurluk(plan!.Width, plan.Height)) : "";
+        TxtAdvMinFpsNow.Text = has ? SimdiSatiri(Bicim.Kare(plan!.Fps, Strings.Culture)) : "";
+        TxtAdvEncoderPathNow.Text = has ? SimdiSatiri(CodecModel.IsHardware(plan!.Codec)
             ? Say("main.advanced.encoder-path.hardware")
             : Say("main.advanced.encoder-path.software")) : "";
-        TxtAdvCodecLockNow.Text = has ? Say("main.advanced.now", plan!.Codec) : "";
+        TxtAdvCodecLockNow.Text = has ? SimdiSatiri(plan!.Codec) : "";
         SuzgecOku(out var suzgecHata);
         TxtAdvFiltersNow.Text = suzgecHata is not null
             ? Say("main.advanced.filters.bad")
             : has && _info is { } kaynak
-                ? Say("main.advanced.now", string.Join(", ", VideoFilterChain.Filters(kaynak, plan!)) is { Length: > 0 } zincir ? zincir : "-")
+                ? SimdiSatiri(string.Join(", ", VideoFilterChain.Filters(kaynak, plan!)) is { Length: > 0 } zincir ? zincir : "-")
                 : "";
 
         TxtTargetCrfLockedNotice.IsVisible = has && plan!.ReasonCodes.Any(note => note.Code == ReasonCode.ManualCrfOverride);

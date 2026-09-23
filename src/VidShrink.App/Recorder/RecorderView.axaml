@@ -180,7 +180,6 @@
         <TextBlock x:Name="TxtResult" Theme="{StaticResource StatusSuccess}" TextWrapping="Wrap"/>
         <TextBox x:Name="TxtResultPath"
                  IsReadOnly="True"
-                 MaxLines="1"
                  FontFamily="{StaticResource FontMono}"
                  auto:AutomationProperties.Name="{loc:Text recorder.output.title}"/>
         <Grid x:Name="WarningRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="False">
@@ -254,7 +253,6 @@
           <TextBox Grid.Column="0"
                    x:Name="TxtRecShareLink"
                    IsReadOnly="True"
-                   MaxLines="1"
                    FontFamily="{StaticResource FontMono}"
                    VerticalAlignment="Center"/>
           <Button Grid.Column="1"

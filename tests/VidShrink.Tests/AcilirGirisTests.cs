@@ -126,4 +126,47 @@ public sealed class AcilirGirisTests
         Assert.Equal(!azalt, animasyonlu);
         if (azalt) Assert.Equal(1, saydamlik);
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void SekmeGecisindeEskiSayfa(bool azalt)
+    {
+        var (gorunen, saydamlik) = AppHost.Run(() =>
+        {
+            Strings.Use("en");
+            var pencere = new MainWindow();
+            if (azalt) pencere.Classes.Add("reduced-motion");
+            else pencere.Classes.Remove("reduced-motion");
+            pencere.Show();
+            try
+            {
+                pencere.Tabs.SelectedIndex = 1;
+                Dispatcher.UIThread.RunJobs();
+                pencere.Tabs.SelectedIndex = 5;
+                Dispatcher.UIThread.RunJobs();
+                var ev = pencere.GetVisualDescendants().OfType<TransitioningContentControl>().First(d => d.Name == "SelectedContentHost");
+                List<Avalonia.Controls.Presenters.ContentPresenter> Gorunenler() => ev.GetVisualDescendants().OfType<Avalonia.Controls.Presenters.ContentPresenter>()
+                    .Where(s => s.TemplatedParent == ev && s.IsVisible && s.Content is not null)
+                    .ToList();
+                var ilk = Gorunenler();
+                var enCok = ilk.Count;
+                var enAz = ilk.Min(s => s.Opacity);
+                var saat = Stopwatch.StartNew();
+                while (saat.Elapsed.TotalMilliseconds < 400)
+                {
+                    using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+                    Dispatcher.UIThread.MainLoop(dilim.Token);
+                    var simdi = Gorunenler();
+                    enCok = Math.Max(enCok, simdi.Count);
+                    if (simdi.Count > 0) enAz = Math.Min(enAz, simdi.Min(s => s.Opacity));
+                }
+                return (enCok, enAz);
+            }
+            finally { pencere.Close(); }
+        });
+
+        Assert.Equal(azalt ? 1 : 2, gorunen);
+        if (azalt) Assert.Equal(1, saydamlik);
+    }
 }

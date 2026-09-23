@@ -1421,7 +1421,10 @@ public sealed class BaslikKapsamiTests
 
     /// <summary>
     /// Sayidan sonra gelen birim buyutulmuyor: kaydedicinin tampon listesinde "30 S"
-    /// cikiyordu. Karsi yon: sayidan sonra gelen uzun sozcuk basliktaki gibi buyur.
+    /// cikiyordu. Kaydedici metni bicimlemeden once buyuttugu icin birimin onunde sayi degil
+    /// yer tutucu (<c>{0}</c>) durur; o da sayi sayilir. Formul: onceki sozcuk rakam ve
+    /// ayiraclardan ya da <c>{n}</c>den ibaretse ve sozcuk en cok uc kucuk harfse birimdir.
+    /// Karsi yon: sayidan ya da yer tutucudan sonra gelen uzun sozcuk basliktaki gibi buyur.
     /// </summary>
     [Theory]
     [InlineData("30 s", "en", "30 s")]
@@ -1429,6 +1432,9 @@ public sealed class BaslikKapsamiTests
     [InlineData("10 mp", "hu", "10 mp")]
     [InlineData("save last 30 s", "en", "Save Last 30 s")]
     [InlineData("top 10 videos", "en", "Top 10 Videos")]
+    [InlineData("{0} s", "en", "{0} s")]
+    [InlineData("save last {0} s", "en", "Save Last {0} s")]
+    [InlineData("{0} videos", "en", "{0} Videos")]
     public void SayidanSonrakiBirimBuyutulmez(string ham, string dil, string beklenen)
         => Assert.Equal(beklenen, LanguageCatalog.Title(ham, dil));
 }

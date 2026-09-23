@@ -803,6 +803,7 @@ public sealed class YerlesimDenetimiTests
             Metinler(pencere, baslik, denetim);
             Kardesler(pencere, baslik, denetim);
             Tasmalar(pencere, baslik, denetim);
+            YarimSatirlar(pencere, baslik, denetim);
             Serit(pencere, oge, baslik, denetim);
             if (denetim.Dil is "tr" or "en") Basliklar(pencere, baslik, denetim);
         }
@@ -1000,6 +1001,37 @@ public sealed class YerlesimDenetimiTests
             if (tasma <= 1) continue;
             denetim.Ekle(new Kusur("taşma", sekme, Ad(cocuk) + (cocuk is TextBlock yazi ? $" [{Kisalt(yazi.Text)}]" : ""),
                 $"{ebeveyn.GetType().Name}{(string.IsNullOrEmpty(ebeveyn.Name) ? "" : "#" + ebeveyn.Name)} [{ebeveyn.Bounds.Width:0.#}x{ebeveyn.Bounds.Height:0.#}] dışına {(yatay >= dikey ? "yatay" : "dikey")} {tasma:0.#}"));
+        }
+    }
+
+    /// <summary>
+    /// Kaydırılan metin kutusunda görünür alan satır sınırında biter; yarım satır görünmez.
+    /// Kutunun iç boşluğu kaydırılan içeriğin parçasıyken (<c>TextPresenter.Margin</c>) görünür
+    /// alan boşluğu da kapsıyor ve <c>MaxLines</c>'ın kestiği satır alt boşlukta yarısıyla
+    /// görünüyordu (Gelişmiş, FFmpeg komut satırı).
+    /// </summary>
+    private static void YarimSatirlar(Window pencere, string sekme, Denetim denetim)
+    {
+        foreach (var kutu in pencere.GetVisualDescendants().OfType<TextBox>())
+        {
+            if (!denetim.Kapsamda(kutu)) continue;
+            var sunucu = kutu.GetVisualDescendants().OfType<ScrollContentPresenter>().FirstOrDefault();
+            var yazi = kutu.GetVisualDescendants().OfType<TextPresenter>().FirstOrDefault();
+            if (sunucu is null || yazi is null || sunucu.Bounds.Height <= 0) continue;
+            if (yazi.TranslatePoint(default, sunucu) is not { } ust) continue;
+            var alt = sunucu.Bounds.Height;
+            var satirUstu = ust.Y;
+            foreach (var satir in yazi.TextLayout.TextLines)
+            {
+                var satirAlti = satirUstu + satir.Height;
+                if (satirUstu < alt - 1 && satirAlti > alt + 1)
+                {
+                    denetim.Ekle(new Kusur("yarım satır", sekme, Ad(kutu),
+                        $"görünür alan {alt:0.#} px, satır {satirUstu:0.#}-{satirAlti:0.#} arasında kesiliyor"));
+                    break;
+                }
+                satirUstu = satirAlti;
+            }
         }
     }
 
