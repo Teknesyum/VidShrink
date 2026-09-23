@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Automaticky",
   "settings-tab.ffmpeg-path.manual": "Ručne",
   "settings-tab.ffmpeg-path.browse": "Prehľadávať…",
-  "settings-tab.ffmpeg-path.hint": "Ručne nahradí pribalený ffmpeg cestou, ktorú si vyberiete.",
-  "settings-tab.ffmpeg-path.error": "Táto cesta neukazuje na platný spustiteľný súbor ffmpeg.",
+  "settings-tab.ffmpeg-path.hint": "Ručne použije na kódovanie, analýzu a nahrávanie namiesto pribaleného ffmpeg ten, ktorý si vyberiete; ffprobe musí byť v tom istom priečinku.",
+  "settings-tab.ffmpeg-path.error": "Na tejto ceste nie je ffmpeg s ffprobe vedľa neho; namiesto neho sa použije automatický ffmpeg.",
 
   "main.tab.player": "Prehrávač",
   "main.player.menu.playpause": "Prehrať / pozastaviť",

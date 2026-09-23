@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "தானியங்கி",
   "settings-tab.ffmpeg-path.manual": "கையேடு",
   "settings-tab.ffmpeg-path.browse": "உலாவு…",
-  "settings-tab.ffmpeg-path.hint": "கையேடு உள்ளடங்கிய ffmpeg க்குப் பதிலாக நீங்கள் தேர்ந்த பாதையைப் பயன்படுத்தும்.",
-  "settings-tab.ffmpeg-path.error": "இந்தப் பாதை சரியான ffmpeg இயங்கு கோப்பைச் சுட்டவில்லை.",
+  "settings-tab.ffmpeg-path.hint": "கையேடு, குறியாக்கம், பகுப்பாய்வு, பதிவு ஆகியவற்றுக்கு உள்ளடங்கிய ffmpeg க்குப் பதிலாக நீங்கள் தேர்ந்த ffmpeg ஐப் பயன்படுத்தும்; ffprobe அதே கோப்புறையில் இருக்க வேண்டும்.",
+  "settings-tab.ffmpeg-path.error": "இந்தப் பாதையில் அருகில் ffprobe உள்ள ffmpeg இல்லை; அதற்குப் பதிலாக தானியங்கி ffmpeg பயன்படுத்தப்படுகிறது.",
 
   "main.tab.player": "இயக்கி",
   "main.player.menu.playpause": "இயக்கு / இடைநிறுத்து",

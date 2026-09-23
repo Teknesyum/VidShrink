@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "אוטומטי",
   "settings-tab.ffmpeg-path.manual": "ידני",
   "settings-tab.ffmpeg-path.browse": "עיון…",
-  "settings-tab.ffmpeg-path.hint": "ידני מחליף את ffmpeg המצורף בנתיב שתבחר.",
-  "settings-tab.ffmpeg-path.error": "נתיב זה אינו מצביע על קובץ הפעלה תקין של ffmpeg.",
+  "settings-tab.ffmpeg-path.hint": "ידני משתמש ב-ffmpeg שתבחר במקום המצורף לקידוד, לניתוח ולהקלטה; ffprobe חייב להיות באותה תיקייה.",
+  "settings-tab.ffmpeg-path.error": "בנתיב זה אין ffmpeg ולצידו ffprobe; במקומו נעשה שימוש ב-ffmpeg האוטומטי.",
 
   "main.tab.player": "נגן",
   "main.player.menu.playpause": "נגן / השהה",

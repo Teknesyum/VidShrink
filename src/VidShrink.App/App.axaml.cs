@@ -51,6 +51,17 @@ public partial class App : Application
         AcilisIzi.Yaz("app-xaml");
     }
 
+    /// <summary>
+    /// Acilis ayari. Elle ffmpeg yolu pencereden once yururluge girer: kuyruk penceresi ve
+    /// ana pencerenin ilk yoklamasi ayni ffmpeg'i gorur.
+    /// </summary>
+    internal static AppSettings LoadStartupSettings()
+    {
+        var ayar = AppSettings.Load();
+        ayar.ApplyFfmpegPath();
+        return ayar;
+    }
+
     public override void OnFrameworkInitializationCompleted()
     {
         AcilisIzi.Yaz("cerceve");
@@ -71,9 +82,9 @@ public partial class App : Application
         // varsayilan renklerle cizilir ve acilista goz alan bir sicrama olur.
         try
         {
-            var tema = AppSettings.Load().Theme;
+            var ayar = LoadStartupSettings();
             AcilisIzi.Yaz("ayar-okundu");
-            PaletteCatalog.Use(tema);
+            PaletteCatalog.Use(ayar.Theme);
         }
         catch { }
         AcilisIzi.Yaz("palet");

@@ -49,6 +49,16 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
         }
     }
 
+    /// <summary>Kodlayıcı listesi başka bir ffmpeg'den okunacak; <see cref="ToolLocator"/> yol değişince çağırır.</summary>
+    internal static void Forget()
+    {
+        lock (InstanceGate)
+        {
+            _instance = null;
+            _lastLoadTicks = 0;
+        }
+    }
+
     private readonly Dictionary<string, EncoderProbeResult> _probed = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string?> _hdr10PixelFormats = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, bool> _encoderOptions = new(StringComparer.OrdinalIgnoreCase);

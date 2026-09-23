@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuel",
   "settings-tab.ffmpeg-path.browse": "Gennemse…",
-  "settings-tab.ffmpeg-path.hint": "Manuel erstatter den medfølgende ffmpeg med en sti, du vælger.",
-  "settings-tab.ffmpeg-path.error": "Denne sti peger ikke på en gyldig ffmpeg-eksekverbar fil.",
+  "settings-tab.ffmpeg-path.hint": "Manuel bruger den ffmpeg, du vælger, i stedet for den medfølgende til kodning, analyse og optagelse; ffprobe skal ligge i samme mappe.",
+  "settings-tab.ffmpeg-path.error": "Der er ingen ffmpeg med ffprobe ved siden af på denne sti; den automatiske ffmpeg bruges i stedet.",
 
   "main.tab.player": "Afspiller",
   "main.player.menu.playpause": "Afspil / pause",

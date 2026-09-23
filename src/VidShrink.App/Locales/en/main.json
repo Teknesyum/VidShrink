@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatic",
   "settings-tab.ffmpeg-path.manual": "Manual",
   "settings-tab.ffmpeg-path.browse": "Browse…",
-  "settings-tab.ffmpeg-path.hint": "Manual overrides the bundled ffmpeg with a path you choose.",
-  "settings-tab.ffmpeg-path.error": "This path does not point to a valid ffmpeg executable.",
+  "settings-tab.ffmpeg-path.hint": "Manual uses the ffmpeg you choose instead of the bundled one for encoding, analysis and recording; ffprobe must be in the same folder.",
+  "settings-tab.ffmpeg-path.error": "No ffmpeg with ffprobe beside it at this path; the automatic ffmpeg is used instead.",
 
   "main.tab.player": "Player",
   "main.player.menu.playpause": "Play / pause",

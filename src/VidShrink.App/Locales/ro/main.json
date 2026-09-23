@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Automat",
   "settings-tab.ffmpeg-path.manual": "Manual",
   "settings-tab.ffmpeg-path.browse": "Răsfoiește…",
-  "settings-tab.ffmpeg-path.hint": "Manual înlocuiește ffmpeg-ul inclus cu o cale aleasă de tine.",
-  "settings-tab.ffmpeg-path.error": "Această cale nu indică un executabil ffmpeg valid.",
+  "settings-tab.ffmpeg-path.hint": "Manual folosește ffmpeg-ul ales de tine în locul celui inclus pentru codare, analiză și înregistrare; ffprobe trebuie să fie în același folder.",
+  "settings-tab.ffmpeg-path.error": "La această cale nu există ffmpeg cu ffprobe alături; se folosește în schimb ffmpeg-ul automat.",
 
   "main.tab.player": "Player",
   "main.player.menu.playpause": "Redă / pauză",

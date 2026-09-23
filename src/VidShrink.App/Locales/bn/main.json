@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "স্বয়ংক্রিয়",
   "settings-tab.ffmpeg-path.manual": "হাতে",
   "settings-tab.ffmpeg-path.browse": "ব্রাউজ…",
-  "settings-tab.ffmpeg-path.hint": "হাতে দিলে আপনার বাছাই করা পথ অন্তর্ভুক্ত ffmpeg-কে ছাপিয়ে যায়।",
-  "settings-tab.ffmpeg-path.error": "এই পথ বৈধ ffmpeg এক্সিকিউটেবল নির্দেশ করে না।",
+  "settings-tab.ffmpeg-path.hint": "হাতে দিলে এনকোডিং, বিশ্লেষণ ও রেকর্ডিংয়ে অন্তর্ভুক্ত ffmpeg-এর বদলে আপনার বাছাই করা ffmpeg চলে; ffprobe একই ফোল্ডারে থাকতে হবে।",
+  "settings-tab.ffmpeg-path.error": "এই পথে পাশে ffprobe সহ কোনো ffmpeg নেই; এর বদলে স্বয়ংক্রিয় ffmpeg ব্যবহার হচ্ছে।",
 
   "main.tab.player": "প্লেয়ার",
   "main.player.menu.playpause": "চালান / বিরতি",

@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "自动",
   "settings-tab.ffmpeg-path.manual": "手动",
   "settings-tab.ffmpeg-path.browse": "浏览…",
-  "settings-tab.ffmpeg-path.hint": "手动会用您选择的路径覆盖内置的 ffmpeg。",
-  "settings-tab.ffmpeg-path.error": "此路径未指向有效的 ffmpeg 可执行文件。",
+  "settings-tab.ffmpeg-path.hint": "手动会在编码、分析和录制时用您选择的 ffmpeg 代替内置的 ffmpeg；ffprobe 必须位于同一文件夹。",
+  "settings-tab.ffmpeg-path.error": "此路径下没有旁边带 ffprobe 的 ffmpeg；已改用自动 ffmpeg。",
 
   "main.tab.player": "播放器",
   "main.player.menu.playpause": "播放 / 暂停",

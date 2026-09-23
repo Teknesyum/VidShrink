@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "خودکار",
   "settings-tab.ffmpeg-path.manual": "دستی",
   "settings-tab.ffmpeg-path.browse": "انتخاب…",
-  "settings-tab.ffmpeg-path.hint": "دستی ffmpeg همراه برنامه را با مسیری که انتخاب می‌کنید جایگزین می‌کند.",
-  "settings-tab.ffmpeg-path.error": "این مسیر به فایل اجرایی معتبر ffmpeg اشاره نمی‌کند.",
+  "settings-tab.ffmpeg-path.hint": "دستی به‌جای ffmpeg همراه برنامه، ffmpeg انتخابی شما را برای رمزگذاری، تحلیل و ضبط به کار می‌برد؛ ffprobe باید در همان پوشه باشد.",
+  "settings-tab.ffmpeg-path.error": "در این مسیر ffmpeg همراه با ffprobe کنارش نیست؛ به‌جای آن ffmpeg خودکار به کار می‌رود.",
 
   "main.tab.player": "پخش‌کننده",
   "main.player.menu.playpause": "پخش / مکث",

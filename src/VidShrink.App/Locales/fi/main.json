@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Automaattinen",
   "settings-tab.ffmpeg-path.manual": "Manuaalinen",
   "settings-tab.ffmpeg-path.browse": "Selaa…",
-  "settings-tab.ffmpeg-path.hint": "Manuaalinen korvaa mukana tulevan ffmpeg:n valitsemallasi polulla.",
-  "settings-tab.ffmpeg-path.error": "Tämä polku ei osoita kelvolliseen ffmpeg-ohjelmaan.",
+  "settings-tab.ffmpeg-path.hint": "Manuaalinen käyttää koodaukseen, analyysiin ja tallennukseen mukana tulevan sijaan valitsemaasi ffmpeg:tä; ffprobe:n on oltava samassa kansiossa.",
+  "settings-tab.ffmpeg-path.error": "Tässä polussa ei ole ffmpeg:tä, jonka vieressä on ffprobe; sen sijaan käytetään automaattista ffmpeg:tä.",
 
   "main.tab.player": "Soitin",
   "main.player.menu.playpause": "Toista / tauko",

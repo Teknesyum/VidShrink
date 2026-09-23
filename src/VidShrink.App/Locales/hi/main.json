@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "स्वचालित",
   "settings-tab.ffmpeg-path.manual": "मैनुअल",
   "settings-tab.ffmpeg-path.browse": "ब्राउज़…",
-  "settings-tab.ffmpeg-path.hint": "मैनुअल बंडल किए ffmpeg की जगह आपका चुना पथ उपयोग करता है।",
-  "settings-tab.ffmpeg-path.error": "यह पथ किसी मान्य ffmpeg निष्पादन योग्य फ़ाइल की ओर नहीं जाता।",
+  "settings-tab.ffmpeg-path.hint": "मैनुअल एन्कोडिंग, विश्लेषण और रिकॉर्डिंग में बंडल किए ffmpeg की जगह आपका चुना ffmpeg चलाता है; ffprobe उसी फ़ोल्डर में होना चाहिए।",
+  "settings-tab.ffmpeg-path.error": "इस पथ पर साथ में ffprobe वाला कोई ffmpeg नहीं है; इसकी जगह स्वचालित ffmpeg उपयोग हो रहा है।",
 
   "main.tab.player": "प्लेयर",
   "main.player.menu.playpause": "चलाएँ / रोकें",

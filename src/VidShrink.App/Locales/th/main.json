@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "อัตโนมัติ",
   "settings-tab.ffmpeg-path.manual": "กำหนดเอง",
   "settings-tab.ffmpeg-path.browse": "เรียกดู…",
-  "settings-tab.ffmpeg-path.hint": "กำหนดเองใช้เส้นทางที่คุณเลือกแทน ffmpeg ที่มาพร้อมโปรแกรม",
-  "settings-tab.ffmpeg-path.error": "เส้นทางนี้ไม่ชี้ไปยังไฟล์ ffmpeg ที่ใช้งานได้",
+  "settings-tab.ffmpeg-path.hint": "กำหนดเองจะใช้ ffmpeg ที่คุณเลือกแทนตัวที่มาพร้อมโปรแกรมในการเข้ารหัส วิเคราะห์ และบันทึก โดย ffprobe ต้องอยู่ในโฟลเดอร์เดียวกัน",
+  "settings-tab.ffmpeg-path.error": "ไม่มี ffmpeg ที่มี ffprobe อยู่ข้างกันในเส้นทางนี้ จึงใช้ ffmpeg อัตโนมัติแทน",
 
   "main.tab.player": "ตัวเล่น",
   "main.player.menu.playpause": "เล่น / หยุด",

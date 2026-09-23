@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Автоматично",
   "settings-tab.ffmpeg-path.manual": "Вручну",
   "settings-tab.ffmpeg-path.browse": "Огляд…",
-  "settings-tab.ffmpeg-path.hint": "«Вручну» замінює вбудований ffmpeg шляхом на ваш вибір.",
-  "settings-tab.ffmpeg-path.error": "Цей шлях не вказує на дійсний виконуваний файл ffmpeg.",
+  "settings-tab.ffmpeg-path.hint": "«Вручну» використовує для кодування, аналізу й запису вибраний вами ffmpeg замість вбудованого; ffprobe має бути в тій самій теці.",
+  "settings-tab.ffmpeg-path.error": "За цим шляхом немає ffmpeg з ffprobe поруч; натомість використовується автоматичний ffmpeg.",
 
   "main.tab.player": "Плеєр",
   "main.player.menu.playpause": "Відтворити / пауза",

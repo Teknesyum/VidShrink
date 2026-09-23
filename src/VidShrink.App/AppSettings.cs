@@ -51,6 +51,17 @@ public sealed class AppSettings
     public string FfmpegPath { get; set; } = "";
 
     /// <summary>
+    /// Seçimi <see cref="VidShrink.Ffmpeg.ToolLocator"/>'a uygular. Elle kip geçersiz yol
+    /// taşıyorsa otomatik sıra kullanılır ve false döner; true yalnız elle yol yürürlükteyken.
+    /// </summary>
+    public bool ApplyFfmpegPath()
+    {
+        if (FfmpegPathMode == 1) return VidShrink.Ffmpeg.ToolLocator.UseManual(FfmpegPath);
+        VidShrink.Ffmpeg.ToolLocator.UseAutomatic();
+        return false;
+    }
+
+    /// <summary>
     /// Kullanıcının kendi OpenSubtitles API anahtarı. Depoda anahtar yoktur; boş kalırsa
     /// altyazı indirme kapalıdır ve oynatıcı kullanıcıyı anahtar sayfasına yollar.
     /// </summary>

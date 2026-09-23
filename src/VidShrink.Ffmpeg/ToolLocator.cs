@@ -6,11 +6,57 @@ public static class ToolLocator
 {
     internal static readonly string[] MacToolDirectories = { "/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin" };
 
+    private static readonly object ManualGate = new();
+    private static string? _manual;
     private static string? _ffmpeg;
     private static string? _ffprobe;
+    private static string? _version;
 
-    public static string Ffmpeg => _ffmpeg ??= Locate("ffmpeg");
-    public static string Ffprobe => _ffprobe ??= Locate("ffprobe");
+    public static string Ffmpeg => _ffmpeg ??= Locate("ffmpeg", manualFfmpeg: _manual);
+    public static string Ffprobe => _ffprobe ??= Locate("ffprobe", manualFfmpeg: _manual);
+
+    /// <summary>Yürürlükteki elle verilmiş ffmpeg; yoksa null ve otomatik sıra geçerli.</summary>
+    public static string? Manual => _manual;
+
+    /// <summary>
+    /// Elle ffmpeg geçerli mi: dosya var ve yanında aynı klasörde ffprobe duruyor.
+    /// Yoklama ve süre okuması ffprobe'la yapıldığından tek başına ffmpeg yetmez.
+    /// </summary>
+    public static bool IsValidManual(string? ffmpegPath)
+        => !string.IsNullOrWhiteSpace(ffmpegPath)
+           && File.Exists(ffmpegPath)
+           && File.Exists(SiblingFfprobe(ffmpegPath));
+
+    /// <summary>
+    /// Elle yolu yürürlüğe koyar. Geçersizse otomatik sıraya döner ve false verir; çağıran
+    /// kullanıcıya bunu söyler. Yol değişince önbellekler boşalır, sonraki çağrı yeni ffmpeg'i görür.
+    /// </summary>
+    public static bool UseManual(string? ffmpegPath)
+    {
+        var valid = IsValidManual(ffmpegPath);
+        Apply(valid ? Path.GetFullPath(ffmpegPath!) : null);
+        return valid;
+    }
+
+    public static void UseAutomatic() => Apply(null);
+
+    private static void Apply(string? manual)
+    {
+        lock (ManualGate)
+        {
+            if (string.Equals(_manual, manual, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+                return;
+            _manual = manual;
+            _ffmpeg = null;
+            _ffprobe = null;
+            _version = null;
+        }
+        EncoderCapabilities.Forget();
+        CaptureDevices.Invalidate();
+    }
+
+    internal static string SiblingFfprobe(string ffmpegPath)
+        => Path.Combine(Path.GetDirectoryName(Path.GetFullPath(ffmpegPath)) ?? "", OperatingSystem.IsWindows() ? "ffprobe.exe" : "ffprobe");
 
     public static bool IsAvailable(out string? missing)
     {
@@ -20,13 +66,11 @@ public static class ToolLocator
         return true;
     }
 
-    private static readonly Lazy<string> SurumOnbellegi = new(GetFfmpegVersion, isThreadSafe: true);
-
     /// <summary>
     /// Surum satiri surec acarak okunuyor; tani gunlugu her kosumda yaziyor, o yuzden
-    /// bir kez okunup tutulur. Tazeleyen bir yol yok: ffmpeg oturum ortasinda degismiyor.
+    /// bir kez okunup tutulur. Elle ffmpeg yolu degisince <see cref="Apply"/> onbellegi bosaltir.
     /// </summary>
-    public static string FfmpegVersion => SurumOnbellegi.Value;
+    public static string FfmpegVersion => _version ??= GetFfmpegVersion();
 
     public static string GetFfmpegVersion()
     {
@@ -37,8 +81,11 @@ public static class ToolLocator
         return line?.Replace("ffmpeg version ", "", StringComparison.OrdinalIgnoreCase) ?? "unknown";
     }
 
-    internal static string Locate(string name, string? searchPath = null, string? baseDirectory = null)
+    internal static string Locate(string name, string? searchPath = null, string? baseDirectory = null, string? manualFfmpeg = null)
     {
+        if (IsValidManual(manualFfmpeg))
+            return name == "ffprobe" ? SiblingFfprobe(manualFfmpeg!) : Path.GetFullPath(manualFfmpeg!);
+
         var exe = OperatingSystem.IsWindows() ? name + ".exe" : name;
         var baseDir = baseDirectory ?? AppContext.BaseDirectory;
 

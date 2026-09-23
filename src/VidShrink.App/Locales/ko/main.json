@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "자동",
   "settings-tab.ffmpeg-path.manual": "수동",
   "settings-tab.ffmpeg-path.browse": "찾아보기…",
-  "settings-tab.ffmpeg-path.hint": "수동은 내장 ffmpeg 대신 선택한 경로를 사용합니다.",
-  "settings-tab.ffmpeg-path.error": "이 경로는 유효한 ffmpeg 실행 파일을 가리키지 않습니다.",
+  "settings-tab.ffmpeg-path.hint": "수동은 인코딩, 분석, 녹화에 내장 ffmpeg 대신 선택한 ffmpeg를 사용합니다. ffprobe가 같은 폴더에 있어야 합니다.",
+  "settings-tab.ffmpeg-path.error": "이 경로에는 옆에 ffprobe가 있는 ffmpeg가 없습니다. 대신 자동 ffmpeg를 사용합니다.",
 
   "main.tab.player": "플레이어",
   "main.player.menu.playpause": "재생 / 일시정지",

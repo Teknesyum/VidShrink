@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Otomatik",
   "settings-tab.ffmpeg-path.manual": "Elle",
   "settings-tab.ffmpeg-path.browse": "Seç…",
-  "settings-tab.ffmpeg-path.hint": "Elle, birlikte gelen ffmpeg yerine seçtiğiniz yolu kullanır.",
-  "settings-tab.ffmpeg-path.error": "Bu yol geçerli bir ffmpeg çalıştırılabilirine işaret etmiyor.",
+  "settings-tab.ffmpeg-path.hint": "Elle, kodlamada, çözümlemede ve kayıtta birlikte gelen ffmpeg yerine seçtiğiniz ffmpeg'i kullanır; ffprobe aynı klasörde olmalı.",
+  "settings-tab.ffmpeg-path.error": "Bu yolda yanında ffprobe olan bir ffmpeg yok; yerine otomatik ffmpeg kullanılıyor.",
 
   "main.tab.player": "Oynatıcı",
   "main.player.menu.playpause": "Oynat / duraklat",

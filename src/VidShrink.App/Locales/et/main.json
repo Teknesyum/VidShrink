@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Automaatne",
   "settings-tab.ffmpeg-path.manual": "Käsitsi",
   "settings-tab.ffmpeg-path.browse": "Sirvi…",
-  "settings-tab.ffmpeg-path.hint": "Käsitsi asendab kaasas oleva ffmpegi sinu valitud teega.",
-  "settings-tab.ffmpeg-path.error": "See tee ei osuta kehtivale ffmpegi käivitusfailile.",
+  "settings-tab.ffmpeg-path.hint": "Käsitsi kasutab kodeerimisel, analüüsil ja salvestamisel kaasas oleva ffmpegi asemel sinu valitud ffmpegi; ffprobe peab olema samas kaustas.",
+  "settings-tab.ffmpeg-path.error": "Selles teel pole ffmpegi, mille kõrval oleks ffprobe; selle asemel kasutatakse automaatset ffmpegi.",
 
   "main.tab.player": "Mängija",
   "main.player.menu.playpause": "Esita / paus",

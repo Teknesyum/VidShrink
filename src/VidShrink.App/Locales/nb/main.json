@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuell",
   "settings-tab.ffmpeg-path.browse": "Bla gjennom…",
-  "settings-tab.ffmpeg-path.hint": "Manuell overstyrer den medfølgende ffmpeg med en bane du velger.",
-  "settings-tab.ffmpeg-path.error": "Denne banen peker ikke til en gyldig kjørbar ffmpeg.",
+  "settings-tab.ffmpeg-path.hint": "Manuell bruker ffmpeg-en du velger i stedet for den medfølgende til koding, analyse og opptak; ffprobe må ligge i samme mappe.",
+  "settings-tab.ffmpeg-path.error": "Det finnes ingen ffmpeg med ffprobe ved siden av på denne banen; den automatiske ffmpeg-en brukes i stedet.",
 
   "main.tab.player": "Spiller",
   "main.player.menu.playpause": "Spill av / pause",

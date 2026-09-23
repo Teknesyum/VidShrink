@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatski",
   "settings-tab.ffmpeg-path.manual": "Ručno",
   "settings-tab.ffmpeg-path.browse": "Pregledaj…",
-  "settings-tab.ffmpeg-path.hint": "Ručno zamenjuje ugrađeni ffmpeg putanjom koju izaberete.",
-  "settings-tab.ffmpeg-path.error": "Ova putanja ne pokazuje na ispravan ffmpeg izvršni fajl.",
+  "settings-tab.ffmpeg-path.hint": "Ručno za kodiranje, analizu i snimanje koristi ffmpeg koji izaberete umesto ugrađenog; ffprobe mora biti u istoj fascikli.",
+  "settings-tab.ffmpeg-path.error": "Na ovoj putanji nema ffmpeg-a sa ffprobe-om pored njega; umesto njega koristi se automatski ffmpeg.",
 
   "main.tab.player": "Plejer",
   "main.player.menu.playpause": "Pusti / pauziraj",

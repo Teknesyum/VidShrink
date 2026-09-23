@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "خودکار",
   "settings-tab.ffmpeg-path.manual": "دستی",
   "settings-tab.ffmpeg-path.browse": "براؤز…",
-  "settings-tab.ffmpeg-path.hint": "دستی بنڈل شدہ ffmpeg کی جگہ آپ کا چنا راستہ استعمال کرتا ہے۔",
-  "settings-tab.ffmpeg-path.error": "یہ راستہ درست ffmpeg ایگزیکیوٹیبل کی طرف نہیں جاتا۔",
+  "settings-tab.ffmpeg-path.hint": "دستی انکوڈنگ، تجزیے اور ریکارڈنگ میں بنڈل شدہ ffmpeg کی جگہ آپ کا چنا ffmpeg استعمال کرتا ہے؛ ffprobe اسی فولڈر میں ہونا چاہیے۔",
+  "settings-tab.ffmpeg-path.error": "اس راستے پر ساتھ ffprobe والا کوئی ffmpeg نہیں؛ اس کی جگہ خودکار ffmpeg استعمال ہو رہا ہے۔",
 
   "main.tab.player": "پلیئر",
   "main.player.menu.playpause": "چلائیں / روکیں",

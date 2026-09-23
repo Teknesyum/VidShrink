@@ -559,8 +559,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatikus",
   "settings-tab.ffmpeg-path.manual": "Kézi",
   "settings-tab.ffmpeg-path.browse": "Tallózás…",
-  "settings-tab.ffmpeg-path.hint": "A kézi mód a mellékelt ffmpeg helyett az Ön által választott útvonalat használja.",
-  "settings-tab.ffmpeg-path.error": "Ez az útvonal nem érvényes ffmpeg futtatható fájlra mutat.",
+  "settings-tab.ffmpeg-path.hint": "A kézi mód kódoláshoz, elemzéshez és felvételhez a mellékelt helyett az Ön által választott ffmpeg-et használja; az ffprobe-nak ugyanabban a mappában kell lennie.",
+  "settings-tab.ffmpeg-path.error": "Ezen az útvonalon nincs ffmpeg mellette ffprobe-bal; helyette az automatikus ffmpeg fut.",
 
   "main.tab.player": "Lejátszó",
   "main.player.menu.playpause": "Lejátszás / szünet",
