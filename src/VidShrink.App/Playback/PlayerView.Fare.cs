@@ -169,9 +169,14 @@ internal partial class PlayerView
 
     private void StopClickTimer() => _clickTimer?.Stop();
 
+    /// <summary>
+    /// Tek tik zamanlayicisi <see cref="DispatcherPriority.Default"/>'ta: varsayilan Background
+    /// onceligi Win32 dispatcher'inda kuyrukta girdi bekledikce hic calismiyor ve tek tik
+    /// duraklat/baslat olmadan kaybolabiliyordu.
+    /// </summary>
     private DispatcherTimer NewClickTimer()
     {
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(ClickArbiter.DoubleWindowMs) };
+        var timer = new DispatcherTimer(DispatcherPriority.Default) { Interval = TimeSpan.FromMilliseconds(ClickArbiter.DoubleWindowMs) };
         timer.Tick += (_, _) => FareDue(Environment.TickCount64 + ClickArbiter.DoubleWindowMs);
         return timer;
     }
