@@ -283,7 +283,15 @@ public sealed class PresetLibrary
     /// gider, kilitsiz profil ise mp4'te kalır. Karar: <c>docs/danisma/010-fable-onayar-kap.md</c>.
     /// </summary>
     public static string? DeliveredExtension(OutputContainer? container) =>
-        container is { } kap and not OutputContainer.WebM ? StreamMapping.ExtensionOf(kap) : null;
+        DeliveredContainer(container) is { } kap ? StreamMapping.ExtensionOf(kap) : null;
+
+    /// <summary>
+    /// Profilin teslim ettiği kap; <see cref="DeliveredExtension"/> ile aynı kural. Plan bunu
+    /// <see cref="PlanOptions.DeliveredContainer"/> olarak alır, yoksa akış kararları ve yan bütçe
+    /// planın kendi kabına göre kurulur ve kodlama anında sessizce yeniden hesaplanırdı.
+    /// </summary>
+    public static OutputContainer? DeliveredContainer(OutputContainer? container) =>
+        container is { } kap and not OutputContainer.WebM ? kap : null;
 }
 
 public enum PresetNoteOutcome { Carried, Approximated, Dropped }

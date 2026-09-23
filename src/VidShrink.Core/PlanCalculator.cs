@@ -117,6 +117,14 @@ public sealed class PlanOptions
 
     public bool PlatformDelivery { get; set; }
 
+    /// <summary>
+    /// Çıktının gerçekten yazılacağı kap (ön ayar kabı ya da CLI'da çıktı uzantısı). Doluysa akış
+    /// kararları ve yan bütçe bu kaba göre kurulur; boşsa kap <see cref="StreamMapping.ContainerFor(StreamRequest, string?)"/>
+    /// ile türetilir. Kodlama kabı uzantıdan okuduğu için (<see cref="StreamMapping.ForOutput"/>)
+    /// plan başka kaba kurulursa izler, ses kodeği ve notlar kodlamada değişir ama gerekçede görünmez.
+    /// </summary>
+    public OutputContainer? DeliveredContainer { get; set; }
+
     public string? PreferredLanguage { get; set; }
 
     public VideoFilterOptions Filters { get; set; } = VideoFilterOptions.Default;
@@ -512,7 +520,7 @@ public static class PlanCalculator
         var streamRequest = new StreamRequest(options.KeepAllTracks, options.PlatformDelivery, options.PreferredLanguage,
             options.AudioLoudnorm, options.AudioGainDb, options.ExternalSubtitles, options.Filters?.BurnSubtitle);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
-        var streams = StreamMapping.Decide(info, streamRequest, StreamMapping.ContainerFor(streamRequest, codec), audioK, audioChannels,
+        var streams = StreamMapping.Decide(info, streamRequest, options.DeliveredContainer ?? StreamMapping.ContainerFor(streamRequest, codec), audioK, audioChannels,
             info.HasAudio && audioK > 0 ? PickAudioCodec(options.AudioCodec) : null, audioPassthrough, effectiveTargetMb,
             options.AudioChannels == AudioChannelOverride.Source);
         var sideK = streams.SideK;
@@ -1160,6 +1168,7 @@ public static class PlanCalculator
         Trim = options.Trim,
         KeepAllTracks = options.KeepAllTracks,
         PlatformDelivery = options.PlatformDelivery,
+        DeliveredContainer = options.DeliveredContainer,
         PreferredLanguage = options.PreferredLanguage,
         Filters = options.Filters,
         DetectedCrop = options.DetectedCrop,

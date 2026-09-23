@@ -228,6 +228,9 @@ public sealed record CliRequest
             }
         }
 
+        options.DeliveredContainer = PresetLibrary.DeliveredContainer(
+            Output is { } cikti ? StreamMapping.ContainerOf(cikti) : Profile?.Container);
+
         if (Filters is { } suzgecler) options.Filters = suzgecler;
         if (BurnSubtitle is int yak) options.Filters = (options.Filters ?? VideoFilterOptions.Default) with { BurnSubtitle = yak - 1 };
         if (AudioCodec is { } sesKodek) options.AudioCodec = sesKodek;

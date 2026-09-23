@@ -1,3 +1,4 @@
+using VidShrink.Cli;
 using VidShrink.Core;
 
 namespace VidShrink.Tests;
@@ -42,6 +43,49 @@ public sealed class MovKabiTests
     [InlineData("cikti.webm", OutputContainer.WebM)]
     public void KapUzantidanTuruyor(string yol, OutputContainer beklenen)
         => Assert.Equal(beklenen, StreamMapping.ContainerOf(yol));
+
+    /// <summary>
+    /// O3: teslim kabı plana girer. Plan MP4'e kurulup çıktı <c>.mov</c> yazılınca
+    /// <see cref="StreamMapping.ForOutput"/> akışları yeniden hesaplıyor, opus'un yeniden
+    /// kodlanması ve yan bütçe gerekçede görünmüyordu. Artık kodlamaya giden akış planı,
+    /// bütçenin kurulduğu ve gerekçenin okuduğu planın ta kendisi.
+    /// </summary>
+    [Fact]
+    public void TeslimKabiPlanaGiriyor()
+    {
+        var info = Kaynak(Video, new SourceStream(1, StreamKind.Audio, "opus", "eng", Channels: 2, BitrateBps: 128_000));
+        var kapsiz = PlanCalculator.Build(info, new PlanOptions { TargetMb = 25 });
+        var movlu = PlanCalculator.Build(info, new PlanOptions { TargetMb = 25, DeliveredContainer = OutputContainer.Mov });
+
+        Assert.Equal(OutputContainer.Mp4, kapsiz.Streams!.Container);
+        Assert.Equal(OutputContainer.Mov, movlu.Streams!.Container);
+        Assert.Same(movlu.Streams, StreamMapping.ForOutput(info, movlu, "cikti.mov"));
+        Assert.Contains(StreamNote.AudioCodecNotInContainer, movlu.Streams.Notes);
+        Assert.DoesNotContain(StreamNote.AudioCodecNotInContainer, kapsiz.Streams.Notes);
+        Assert.Equal(OutputContainer.Mov,
+            PlanCalculator.WithTarget(new PlanOptions { DeliveredContainer = OutputContainer.Mov }, 10).DeliveredContainer);
+    }
+
+    /// <summary>Ön ayar kabı kuralı: WebM kodekle gelir, plana kap olarak inmez.</summary>
+    [Theory]
+    [InlineData(OutputContainer.Mov, OutputContainer.Mov)]
+    [InlineData(OutputContainer.Mkv, OutputContainer.Mkv)]
+    [InlineData(OutputContainer.WebM, null)]
+    [InlineData(null, null)]
+    public void OnAyarKabiPlanaIniyor(OutputContainer? onAyar, OutputContainer? beklenen)
+        => Assert.Equal(beklenen, PresetLibrary.DeliveredContainer(onAyar));
+
+    /// <summary>CLI'da çıktı uzantısı kabı söyler; plan o kaba kurulur.</summary>
+    [Theory]
+    [InlineData("cikti.mov", OutputContainer.Mov)]
+    [InlineData("cikti.mkv", OutputContainer.Mkv)]
+    public void CliCiktiUzantisiPlanKabi(string cikti, OutputContainer beklenen)
+    {
+        var parsed = CliParser.Parse(["plan", "a.mp4", "--hedef", "25", "--cikti", cikti]);
+
+        Assert.True(parsed.Ok, parsed.ErrorKey);
+        Assert.Equal(beklenen, parsed.Request!.ToPlanOptions(10).DeliveredContainer);
+    }
 
     /// <summary>Uzantı geri yönde de aynı: kap → uzantı.</summary>
     [Fact]
