@@ -804,6 +804,7 @@ public sealed class YerlesimDenetimiTests
             Kardesler(pencere, baslik, denetim);
             Tasmalar(pencere, baslik, denetim);
             YarimSatirlar(pencere, baslik, denetim);
+            GizliSatirlar(pencere, baslik, denetim);
             Serit(pencere, oge, baslik, denetim);
             if (denetim.Dil is "tr" or "en") Basliklar(pencere, baslik, denetim);
         }
@@ -895,6 +896,11 @@ public sealed class YerlesimDenetimiTests
             if (BolunenSozcuk(blok, metin, denetim.Dil) is { } bolunen)
             {
                 denetim.Ekle(new Kusur("bolunmus", sekme, $"{Ad(blok)} [{Kisalt(metin)}]", $"sözcük satır sonunda bölündü: {bolunen}, yer {yer:0.#}"));
+                continue;
+            }
+            if (BolunenBirim(blok, metin, denetim.Dil) is { } birim)
+            {
+                denetim.Ekle(new Kusur("birim", sekme, $"{Ad(blok)} [{Kisalt(metin)}]", $"sayı, birim ya da aralık satır sonunda bölündü: {birim}, yer {yer:0.#}"));
                 continue;
             }
             if (blok.TextWrapping == TextWrapping.NoWrap && gereken - yer > 0.5)
@@ -1035,6 +1041,27 @@ public sealed class YerlesimDenetimiTests
         }
     }
 
+    internal static string? GizliSatir(TextBox kutu)
+    {
+        if (!kutu.IsReadOnly || kutu.TextWrapping == TextWrapping.NoWrap || string.IsNullOrEmpty(kutu.Text)) return null;
+        var sunucu = kutu.GetVisualDescendants().OfType<ScrollContentPresenter>().FirstOrDefault();
+        var yazi = kutu.GetVisualDescendants().OfType<TextPresenter>().FirstOrDefault();
+        if (sunucu is null || yazi is null || sunucu.Bounds.Height <= 0) return null;
+        var gereken = yazi.TextLayout.Height + yazi.Margin.Top + yazi.Margin.Bottom;
+        return gereken - sunucu.Bounds.Height > 1
+            ? $"içerik {gereken:0.#} px, görünür alan {sunucu.Bounds.Height:0.#} px"
+            : null;
+    }
+
+    private static void GizliSatirlar(Window pencere, string sekme, Denetim denetim)
+    {
+        foreach (var kutu in pencere.GetVisualDescendants().OfType<TextBox>())
+        {
+            if (!denetim.Kapsamda(kutu)) continue;
+            if (GizliSatir(kutu) is { } ayrinti) denetim.Ekle(new Kusur("gizli satır", sekme, Ad(kutu), ayrinti));
+        }
+    }
+
     /// <summary>
     /// Oynatıcı sayfası tüm alanı kaplar (T185) ve şerit onun üstünde kendini gizler; bu yüzden
     /// ölçülmez. Öteki her sayfanın kaydırıcısı şeridin altında başlamalı.
@@ -1079,6 +1106,52 @@ public sealed class YerlesimDenetimiTests
             }
         }
         return null;
+    }
+
+    internal static string? BolunenBirim(TextBlock blok, string metin, string dil)
+    {
+        if (blok.TextWrapping == TextWrapping.NoWrap || HarfArasiKirilanDiller.Contains(dil)) return null;
+        var satirlar = blok.TextLayout.TextLines;
+        for (var i = 0; i < satirlar.Count - 1; i++)
+        {
+            var son = satirlar[i].FirstTextSourceIndex + satirlar[i].Length;
+            if (son <= 0 || son >= metin.Length) continue;
+            var sol = son;
+            while (sol > 0 && char.IsWhiteSpace(metin[sol - 1])) sol--;
+            var sag = son;
+            while (sag < metin.Length && char.IsWhiteSpace(metin[sag])) sag++;
+            if (sol == 0 || sag >= metin.Length || metin.AsSpan(sol, sag - sol).IndexOfAny('\n', '\r') >= 0) continue;
+            var once = metin[sol - 1];
+            var sonra = metin[sag];
+            var bitisik = sol == son;
+            var parca = $"{metin[Math.Max(0, sol - 8)..sol]}|{metin[sag..Math.Min(metin.Length, sag + 8)]}";
+
+            if (char.IsDigit(once) && char.IsLetter(sonra) && HarfKosusu(metin, sag) <= 5 && !IsaretMi(metin, sag + HarfKosusu(metin, sag))) return parca;
+            if (once == '×' || (sonra == '×' && char.IsDigit(once))) return parca;
+            if (bitisik && (once == '–' || once == '/') && !char.IsWhiteSpace(sonra)
+                && (once == '–' || HarfKosusuGeri(metin, sol - 1) is > 0 and <= 8 && HarfKosusu(metin, sag) is > 0 and <= 8)) return parca;
+            var ac = metin.LastIndexOf('(', sol - 1);
+            var kapa = metin.IndexOf(')', sag);
+            if (ac >= 0 && kapa > 0 && metin.IndexOf(')', ac) >= sag && kapa - ac - 1 <= 12) return parca;
+        }
+        return null;
+    }
+
+    private static int HarfKosusu(string metin, int bas)
+    {
+        var bit = bas;
+        while (bit < metin.Length && char.IsLetter(metin[bit])) bit++;
+        return bit - bas;
+    }
+
+    private static bool IsaretMi(string metin, int i) =>
+        i < metin.Length && char.GetUnicodeCategory(metin[i]) is System.Globalization.UnicodeCategory.NonSpacingMark or System.Globalization.UnicodeCategory.SpacingCombiningMark;
+
+    private static int HarfKosusuGeri(string metin, int bit)
+    {
+        var bas = bit;
+        while (bas > 0 && char.IsLetter(metin[bas - 1])) bas--;
+        return bit - bas;
     }
     private static readonly IReadOnlyDictionary<string, HashSet<string>> KucukSozcukler =
         new Dictionary<string, HashSet<string>>(StringComparer.Ordinal)

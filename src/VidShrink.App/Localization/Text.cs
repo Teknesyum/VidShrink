@@ -34,7 +34,7 @@ public sealed class LocalizedText : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string Value => LanguageCatalog.Display(Strings.Get(_key));
+    public string Value => Core.Bicim.Satir.Bagla(LanguageCatalog.Display(Strings.Get(_key)));
 
     /// <summary>
     /// Anahtarın bağı. <see cref="BindingBase"/> hedef başına kendi anlatımını kurduğu için

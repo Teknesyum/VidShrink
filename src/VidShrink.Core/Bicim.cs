@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text;
 
 namespace VidShrink.Core;
 
@@ -192,6 +193,68 @@ public static class Bicim
     /// iki koşumun günlüğü karşılaştırılamaz hale gelir, o yüzden burada kültür
     /// <see cref="CultureInfo.InvariantCulture"/> olarak sabittir.
     /// </summary>
+    public static class Satir
+    {
+        public const char BolunmezBosluk = ' ';
+        public const char Baglac = '⁠';
+        private const int KisaParantez = 14;
+        private const int KisaBirim = 7;
+        private const int KisaEgikParca = 8;
+
+        public static string Bagla(string? metin)
+        {
+            if (string.IsNullOrEmpty(metin)) return metin ?? string.Empty;
+            var c = metin.ToCharArray();
+            for (var i = 1; i < c.Length - 1; i++)
+            {
+                if (c[i] != ' ') continue;
+                if (char.IsDigit(c[i - 1]) && BirimMi(metin, i + 1)) c[i] = BolunmezBosluk;
+                else if (c[i - 1] == '×' || (c[i + 1] == '×' && char.IsDigit(c[i - 1]))) c[i] = BolunmezBosluk;
+            }
+
+            for (var i = 0; i < c.Length; i++)
+            {
+                if (c[i] != '(') continue;
+                var kapanis = metin.IndexOf(')', i + 1);
+                if (kapanis < 0 || kapanis - i - 1 > KisaParantez) continue;
+                for (var j = i + 1; j < kapanis; j++)
+                    if (c[j] == ' ') c[j] = BolunmezBosluk;
+            }
+
+            var sonuc = new StringBuilder(c.Length + 4);
+            for (var i = 0; i < c.Length; i++)
+            {
+                sonuc.Append(c[i]);
+                if (i == 0 || i + 1 >= c.Length || char.IsWhiteSpace(c[i - 1]) || char.IsWhiteSpace(c[i + 1])) continue;
+                if (c[i] == '–') sonuc.Append(Baglac);
+                else if (c[i] == '/' && char.IsLetter(c[i - 1]) && char.IsLetter(c[i + 1]) && ParcaUzunlugu(c, i) <= KisaEgikParca)
+                    sonuc.Append(Baglac);
+            }
+
+            return sonuc.ToString();
+        }
+
+        private static bool BirimMi(string metin, int bas)
+        {
+            var son = bas;
+            while (son < metin.Length && !char.IsWhiteSpace(metin[son])) son++;
+            while (son > bas && char.IsPunctuation(metin[son - 1])) son--;
+            if (son == bas || son - bas > KisaBirim || !char.IsLetter(metin[bas])) return false;
+            for (var i = bas; i < son; i++)
+                if (!char.IsLetter(metin[i]) && metin[i] is not '/' and not '.') return false;
+            return true;
+        }
+
+        private static int ParcaUzunlugu(char[] c, int i)
+        {
+            var bas = i;
+            while (bas > 0 && char.IsLetter(c[bas - 1])) bas--;
+            var son = i + 1;
+            while (son < c.Length && char.IsLetter(c[son])) son++;
+            return son - bas;
+        }
+    }
+
     public static class Tani
     {
         /// <inheritdoc cref="Boyut.Mb(double, CultureInfo)"/>

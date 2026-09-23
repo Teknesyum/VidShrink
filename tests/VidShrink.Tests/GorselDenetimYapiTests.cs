@@ -262,30 +262,36 @@ public sealed class GorselDenetimYapiTests
         Assert.Equal(orta, sagda, 1);
     }
 
-    /// <summary>
-    /// Görsel denetim bulgu 4: Dönüştür formunda aynı satırdaki iki alan farklı yükseklikteydi
-    /// (biri etiketinin yanında bilgi düğmesi taşıyor) ve kutular aynı çizgide bitmiyordu.
-    /// Satırdaki alanlar alt kenardan hizalanır.
-    /// </summary>
     [Theory]
-    [InlineData("tr")]
-    [InlineData("el")]
-    public void DonusturFormundaSatirAltKenardaHizali(string dil)
+    [InlineData("tr", false)]
+    [InlineData("tr", true)]
+    [InlineData("de", false)]
+    [InlineData("en", false)]
+    [InlineData("el", true)]
+    public void DonusturFormundaEtiketVeDenetimSatirdaHizali(string dil, bool enDar)
     {
-        var farklar = Pencere(Dar, w =>
+        var boyut = enDar ? YerlesimDenetimiTests.DarBoyut : Dar;
+        var farklar = Pencere(boyut, w =>
         {
             var form = Ad<Grid>(w, "ConvertForm");
-            return form.Children.OfType<StackPanel>().Where(c => c.IsVisible)
+            return form.Children.OfType<Grid>().Where(c => c.IsVisible)
                 .GroupBy(Grid.GetRow)
                 .Where(g => g.Count() > 1)
-                .Select(g => (satir: g.Key, fark: g.Max(c => Yeri(c, w).Bottom) - g.Min(c => Yeri(c, w).Bottom)))
+                .Select(g =>
+                {
+                    var etiketler = g.Select(c => Yeri(c.Children[0], w).Bottom).ToArray();
+                    var denetimler = g.Select(c => Yeri(c.Children.Single(d => Grid.GetRow(d) == 1), w).Top).ToArray();
+                    var satirlar = g.Max(c => ((Grid)c.Children[0]).Children.OfType<TextBlock>().Single().TextLayout.TextLines.Count);
+                    return (satir: g.Key, etiket: etiketler.Max() - etiketler.Min(), denetim: denetimler.Max() - denetimler.Min(), satirlar);
+                })
                 .ToArray();
         }, sekme: 2, dil: dil);
 
-        foreach (var (satir, fark) in farklar) _output.WriteLine($"satır {satir}: {fark:0.#}");
-        Assert.NotEmpty(farklar);
-        var enKotu = farklar.MaxBy(f => f.fark);
-        Assert.True(enKotu.fark <= 0.5, $"Satır {enKotu.satir}: alanların alt kenarı {enKotu.fark:0.#} px ayrı.");
+        foreach (var (satir, etiket, denetim, satirlar) in farklar) _output.WriteLine($"satır {satir}: etiket altı {etiket:0.#}, denetim üstü {denetim:0.#}, en çok {satirlar} satır etiket");
+        Assert.Equal(6, farklar.Length);
+        var enKotu = farklar.MaxBy(f => Math.Max(f.etiket, f.denetim));
+        Assert.True(Math.Max(enKotu.etiket, enKotu.denetim) <= 0.5,
+            $"Satır {enKotu.satir}: etiket altları {enKotu.etiket:0.#} px, denetim üstleri {enKotu.denetim:0.#} px ayrı.");
     }
 
     /// <summary>

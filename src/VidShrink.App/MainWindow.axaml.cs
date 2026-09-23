@@ -4024,22 +4024,6 @@ public partial class MainWindow : Window
         ScheduleRecalculate();
     }
 
-    private bool _commandExpanded;
-
-    private void OnToggleCommand(object? sender, RoutedEventArgs e) => SetCommandExpanded(!_commandExpanded);
-
-    /// <summary>
-    /// Kapalı komut kutusu da sarar ve iki satır gösterir; tek satırda komutun yalnız
-    /// <c>ffmpeg -hide_banner</c> başı görünüyordu (görsel denetim bulgu 17).
-    /// </summary>
-    private void SetCommandExpanded(bool expanded)
-    {
-        _commandExpanded = expanded;
-        TxtCommand.MaxLines = expanded ? 8 : 2;
-        Chevron(GlyphCommand, expanded);
-        ApplyScrollAffordance(TxtCommand, TxtCommand.IsPointerOver);
-    }
-
     private bool _reasonsExpanded;
 
     private void OnTogglePlanReasons(object? sender, RoutedEventArgs e) => SetPlanReasonsExpanded(!_reasonsExpanded);
@@ -4346,27 +4330,27 @@ public partial class MainWindow : Window
         _activeRetryPrompt = prompt;
         TxtOutSize.Text = Say("main.unit.mb-value", Num(prompt.ActualMb, "0.0"));
 
-        TxtRetryOutcome.Text = Say("main.retry.outcome",
+        TxtRetryOutcome.Text = Bicim.Satir.Bagla(Say("main.retry.outcome",
             prompt.Attempt,
             prompt.MaxAttempts,
             Num(prompt.ActualMb, "0.0"),
             Num(prompt.TargetMb, "0.##"),
             Num(prompt.OverMb, "0.0"),
             Bicim.Yuzde.Hazir(prompt.OverPercent, Strings.Culture),
-            Saat.Ekran(prompt.AttemptDuration));
+            Saat.Ekran(prompt.AttemptDuration)));
 
-        TxtRetryMeaning.Text = prompt.HasUnderBandFallback
+        TxtRetryMeaning.Text = Bicim.Satir.Bagla(prompt.HasUnderBandFallback
             ? Say("main.retry.meaning-with-fallback", Num(prompt.FallbackMb, "0.0"))
-            : Say("main.retry.meaning-without-fallback");
+            : Say("main.retry.meaning-without-fallback"));
         BtnRetryAgain.IsVisible = prompt.CanRetry;
-        var kabulYazisi = Say("main.retry.accept", Num(prompt.ActualMb, "0.0"));
+        var kabulYazisi = Bicim.Satir.Bagla(Say("main.retry.accept", Num(prompt.ActualMb, "0.0")));
         BtnRetryAccept.Content = kabulYazisi;
         AutomationProperties.SetName(BtnRetryAccept, kabulYazisi);
         var canTrim = prompt.Trims is { Count: > 0 };
         BtnRetryTrim.IsVisible = canTrim;
         if (canTrim)
         {
-            var kirpmaYazisi = Say("main.retry.trim", Num(prompt.Trims!.Min(plan => plan.RemovedSeconds), "0.#"));
+            var kirpmaYazisi = Bicim.Satir.Bagla(Say("main.retry.trim", Num(prompt.Trims!.Min(plan => plan.RemovedSeconds), "0.#")));
             BtnRetryTrim.Content = kirpmaYazisi;
             AutomationProperties.SetName(BtnRetryTrim, kirpmaYazisi);
         }
@@ -4410,18 +4394,18 @@ public partial class MainWindow : Window
         var removed = new List<string>();
         if (plan.RemovedFromStart > 0) removed.Add($"{Clock(0)}–{Clock(plan.StartSeconds)}");
         if (plan.RemovedFromEnd > 0) removed.Add($"{Clock(plan.EndSeconds)}–{Clock(plan.DurationSeconds)}");
-        TxtTrimRange.Text = Say("main.retry.trim.range",
+        TxtTrimRange.Text = Bicim.Satir.Bagla(Say("main.retry.trim.range",
             Num(plan.RemovedSeconds, "0.#"),
             Clock(plan.DurationSeconds),
             Clock(plan.KeptSeconds),
             string.Join(" · ", removed),
-            Num(Megabayt.Oku(plan.KeptBytes), "0.00"));
+            Num(Megabayt.Oku(plan.KeptBytes), "0.00")));
         BtnTrimConfirm.IsEnabled = true;
     }
 
     private static string Clock(double seconds)
     {
-        return Saat.Kesit(TimeSpan.FromSeconds(Math.Max(0, seconds)));
+        return Saat.Kesit(TimeSpan.FromSeconds(Math.Max(0, seconds)), Strings.Culture);
     }
 
     internal Task<OvershootChoice> ShowRetryAskForTest(RetryPrompt prompt)

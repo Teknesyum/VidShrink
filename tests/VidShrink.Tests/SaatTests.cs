@@ -80,6 +80,17 @@ public sealed class SaatTests
     public void KesitOndalikSaniyeTasiyor(double saniye, string beklenen)
         => Assert.Equal(beklenen, Saat.Kesit(TimeSpan.FromSeconds(saniye)));
 
+    [Theory]
+    [InlineData("tr-TR", 187.5, "3:07,5")]
+    [InlineData("de-DE", 3732.4, "1:02:12,4")]
+    [InlineData("en-US", 187.5, "3:07.5")]
+    public void KesitOndaligiKulturunAyiriciyla(string kultur, double saniye, string beklenen)
+    {
+        var yazi = Saat.Kesit(TimeSpan.FromSeconds(saniye), new System.Globalization.CultureInfo(kultur));
+        Assert.Equal(beklenen, yazi);
+        Assert.Equal(new System.Globalization.CultureInfo(kultur).NumberFormat.NumberDecimalSeparator, yazi[^2].ToString());
+    }
+
     /// <summary>Dosya adı damgasında iki nokta olamaz: Windows kabul etmiyor.</summary>
     [Fact]
     public void DosyaAdindaIkiNoktaYok()

@@ -42,13 +42,16 @@ public static class Saat
     /// konuşuyor ve kullanıcı ekranda kaç onda kesildiğini görüyor. Baştaki sıfırı
     /// yazmaz — aralık yazısı (<c>0:00–1:12.5</c>) iki yana da yayılmasın.
     /// </summary>
-    public static string Kesit(TimeSpan deger)
+    public static string Kesit(TimeSpan deger) => Kesit(deger, CultureInfo.InvariantCulture);
+
+    public static string Kesit(TimeSpan deger, CultureInfo kultur)
     {
         if (deger < TimeSpan.Zero) deger = TimeSpan.Zero;
 
-        return deger.TotalHours >= 1
-            ? deger.ToString(@"h\:mm\:ss\.f", CultureInfo.InvariantCulture)
-            : deger.ToString(@"m\:ss\.f", CultureInfo.InvariantCulture);
+        var tam = deger.TotalHours >= 1
+            ? deger.ToString(@"h\:mm\:ss", CultureInfo.InvariantCulture)
+            : deger.ToString(@"m\:ss", CultureInfo.InvariantCulture);
+        return tam + kultur.NumberFormat.NumberDecimalSeparator + (deger.Milliseconds / 100).ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>ffmpeg'in <c>-ss</c> / <c>-to</c> için beklediği biçim.</summary>

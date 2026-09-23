@@ -1034,16 +1034,20 @@
                   <TextBlock Text="{loc:Text main.convert.title}" Theme="{StaticResource H2}"/>
                   <TextBlock x:Name="TxtConvertSource" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                   <Button Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowse"/>
-                  <Grid x:Name="ConvertForm" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
+                  <Grid x:Name="ConvertForm" Grid.IsSharedSizeScope="True" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
                         RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
                     <Grid.Styles>
-                      <Style Selector="Grid#ConvertForm > StackPanel">
-                        <Setter Property="VerticalAlignment" Value="Bottom"/>
+                      <Style Selector="Grid#ConvertForm > Grid">
+                        <Setter Property="VerticalAlignment" Value="Top"/>
                       </Style>
                     </Grid.Styles>
 
-                    <StackPanel Grid.Row="0" Grid.Column="0">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="0" Grid.Column="0">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel0"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.container}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.container}">
                           <ToolTip.Tip>
@@ -1051,7 +1055,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbContainer" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbContainer" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="MP4" Tag="mp4"/>
                         <ComboBoxItem Content="MKV" Tag="mkv"/>
                         <ComboBoxItem Content="WebM" Tag="webm"/>
@@ -1063,10 +1067,14 @@
                         <ComboBoxItem Content="WAV" Tag="wav"/>
                         <ComboBoxItem Content="FLAC" Tag="flac"/>
                       </ComboBox>
-                    </StackPanel>
+                    </Grid>
 
-                    <StackPanel Grid.Row="0" Grid.Column="1">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="0" Grid.Column="1">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel0"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.video-codec}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.video-codec}">
                           <ToolTip.Tip>
@@ -1074,17 +1082,21 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbConvertCodec" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbConvertCodec" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="H.264" Tag="libx264"/>
                         <ComboBoxItem Content="H.265" Tag="libx265"/>
                         <ComboBoxItem Content="VP9" Tag="libvpx-vp9"/>
                         <ComboBoxItem Content="AV1" Tag="libsvtav1"/>
                         <ComboBoxItem Content="{loc:Text main.convert.copy}" Tag="copy"/>
                       </ComboBox>
-                    </StackPanel>
+                    </Grid>
 
-                    <StackPanel Grid.Row="1" Grid.Column="0">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="1" Grid.Column="0">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel1"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.quality-mode}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.quality-mode}">
                           <ToolTip.Tip>
@@ -1092,14 +1104,18 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbQualityMode" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbQualityMode" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.advanced.mode.crf}"/>
                         <ComboBoxItem Content="{loc:Text main.convert.fixed-bitrate}"/>
                       </ComboBox>
-                    </StackPanel>
+                    </Grid>
 
-                    <StackPanel Grid.Row="1" Grid.Column="1">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="1" Grid.Column="1">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel1"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.crf-label}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}">
                           <ToolTip.Tip>
@@ -1107,15 +1123,19 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <izi:KaydiriciSatiri x:Name="CrfSliderRow" ColumnDefinitions="*,Auto" EnDarKaydirici="{StaticResource SliderMinWidth}"
+                      <izi:KaydiriciSatiri Grid.Row="1" x:Name="CrfSliderRow" ColumnDefinitions="*,Auto" EnDarKaydirici="{StaticResource SliderMinWidth}"
                                            ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
                         <Slider x:Name="SliderQuality" Minimum="10" Maximum="45" Value="23" VerticalAlignment="Center"/>
                         <TextBox x:Name="TxtQuality" Text="23" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
                       </izi:KaydiriciSatiri>
-                    </StackPanel>
+                    </Grid>
 
-                    <StackPanel Grid.Row="2" Grid.Column="0">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="2" Grid.Column="0">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel2"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.resolution}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.resolution}">
                           <ToolTip.Tip>
@@ -1123,7 +1143,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbResolution" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbResolution" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="2160" Tag="2160"/>
                         <ComboBoxItem Content="1440" Tag="1440"/>
@@ -1132,10 +1152,14 @@
                         <ComboBoxItem Content="480" Tag="480"/>
                         <ComboBoxItem Content="{loc:Text main.convert.custom}" Tag="custom"/>
                       </ComboBox>
-                    </StackPanel>
+                    </Grid>
 
-                    <StackPanel Grid.Row="2" Grid.Column="1">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="2" Grid.Column="1">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel2"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.custom-resolution}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-resolution}">
                           <ToolTip.Tip>
@@ -1143,11 +1167,15 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtCustomResolution" Text="1280x720"/>
-                    </StackPanel>
+                      <TextBox Grid.Row="1" x:Name="TxtCustomResolution" Text="1280x720"/>
+                    </Grid>
 
-                    <StackPanel Grid.Row="3" Grid.Column="0">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="3" Grid.Column="0">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel3"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.frame-rate}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.frame-rate}">
                           <ToolTip.Tip>
@@ -1155,17 +1183,21 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbConvertFps" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbConvertFps" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="60" Tag="60"/>
                         <ComboBoxItem Content="30" Tag="30"/>
                         <ComboBoxItem Content="24" Tag="24"/>
                         <ComboBoxItem Content="{loc:Text main.convert.custom}" Tag="custom"/>
                       </ComboBox>
-                    </StackPanel>
+                    </Grid>
 
-                    <StackPanel Grid.Row="3" Grid.Column="1">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="3" Grid.Column="1">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel3"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.custom-fps}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-fps}">
                           <ToolTip.Tip>
@@ -1173,11 +1205,15 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtCustomFps" Text="25"/>
-                    </StackPanel>
+                      <TextBox Grid.Row="1" x:Name="TxtCustomFps" Text="25"/>
+                    </Grid>
 
-                    <StackPanel Grid.Row="4" Grid.Column="0">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="4" Grid.Column="0">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel4"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.audio}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio}">
                           <ToolTip.Tip>
@@ -1185,7 +1221,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbConvertAudio" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbConvertAudio" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="AAC" Tag="aac"/>
                         <ComboBoxItem Content="Opus" Tag="libopus"/>
                         <ComboBoxItem Content="MP3" Tag="libmp3lame"/>
@@ -1194,10 +1230,14 @@
                         <ComboBoxItem Content="{loc:Text main.convert.copy}" Tag="copy"/>
                         <ComboBoxItem Content="{loc:Text main.convert.drop}"/>
                       </ComboBox>
-                    </StackPanel>
+                    </Grid>
 
-                    <StackPanel Grid.Row="4" Grid.Column="1">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="4" Grid.Column="1">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel4"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.audio-bitrate}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio-bitrate}">
                           <ToolTip.Tip>
@@ -1205,11 +1245,15 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtAudioBitrate" Text="128"/>
-                    </StackPanel>
+                      <TextBox Grid.Row="1" x:Name="TxtAudioBitrate" Text="128"/>
+                    </Grid>
 
-                    <StackPanel Grid.Row="5" Grid.Column="0">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="5" Grid.Column="0">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel5"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.trim-start}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-start}">
                           <ToolTip.Tip>
@@ -1217,11 +1261,15 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtTrimStart"/>
-                    </StackPanel>
+                      <TextBox Grid.Row="1" x:Name="TxtTrimStart"/>
+                    </Grid>
 
-                    <StackPanel Grid.Row="5" Grid.Column="1">
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                    <Grid Grid.Row="5" Grid.Column="1">
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ConvertLabel5"/>
+                        <RowDefinition Height="Auto"/>
+                      </Grid.RowDefinitions>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <TextBlock Text="{loc:Text main.convert.trim-end}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-end}">
                           <ToolTip.Tip>
@@ -1229,8 +1277,8 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox x:Name="TxtTrimEnd"/>
-                    </StackPanel>
+                      <TextBox Grid.Row="1" x:Name="TxtTrimEnd"/>
+                    </Grid>
 
                   </Grid>
                 </StackPanel>
@@ -1291,24 +1339,16 @@
 
               <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
                     <TextBlock Grid.Column="0" Text="{loc:Text main.command.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                    <Button Grid.Column="2"
+                    <Button Grid.Column="1"
                             x:Name="BtnHideAdvanced"
                             Theme="{StaticResource GhostButton}"
                             VerticalAlignment="Center"
                             Content="{loc:Text main.window.close}"
                             Click="OnHideAdvanced"/>
-                    <Button Grid.Column="1"
-                            x:Name="BtnCommandExpand"
-                            Theme="{StaticResource GhostButton}"
-                            VerticalAlignment="Center"
-                            auto:AutomationProperties.Name="{loc:Text main.command.title}"
-                            Click="OnToggleCommand">
-                              <Path x:Name="GlyphCommand" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
-                            </Button>
                   </Grid>
-                  <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="1" MaxLines="2"/>
+                  <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="1"/>
                 </StackPanel>
               </Border>
 
