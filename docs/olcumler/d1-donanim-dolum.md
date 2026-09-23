@@ -167,3 +167,88 @@ Elle 0,985'e geri yazıldıktan sonra yeniden derlenip:
 --filter "FullyQualifiedName~BudgetFill|FullyQualifiedName~FillBand|FullyQualifiedName~PlanCalculator|FullyQualifiedName~Correct"
 Passed!  - Failed:     0, Passed:   151, Skipped:     1, Total:   152
 ```
+
+## Oran Denetimi
+
+`t0/d1-oran`, 23 Eylül 2026, aynı makine. Soru: NVENC oran denetimindeki bir değişiklik basamağı
+yumuşatıp üç hücrede (parlak/hevc/1000, parlak/hevc/2000, karanlık/av1/1000) 0,97–1,00 bandına düşen
+bir istek bırakıyor mu, kaliteyi düşürmeden mi? Cevap: **basamağı kaldıran tek kol tepe/tampon = 1·istek;
+bandı açıyor, teslimi yükseltiyor, ama kaliteyi 1 VMAF-NEG'den fazla düşürüyor. Kod değişmedi.**
+
+Düzenek: `egri.ps1`'e `-Tepe`, `-Tampon`, `-Rc`, `-Ek` eklendi (varsayılanlar ürünün komutu: 2·, 2·,
+`vbr -multipass fullres`); `tarama.ps1` üç hücreyi bir kol listesiyle tarar; `kalite.ps1` tek istekle
+kodlar ve VMAF-NEG ölçer (`vmaf_v0.6.1neg`, test kaynağın 1920x818'ine lanczos, `n_threads=2`, ürünün
+Bench ölçeriyle aynı model). İki çekirdek (`/affinity 3`), sıralı. Toplam ölçüm ≈ 27 dk.
+
+```
+pwsh -NoProfile -File tools/d1-donanim-dolum/tarama.ps1 -KesitDizini <kök>\.calisma\nvenc-2 -Calisma .calisma/t0-d1-oran `
+  -Kollar "taban|2|2|vbr -multipass fullres|;tampon1|2|1|vbr -multipass fullres|;tepe1|1|1|vbr -multipass fullres|"
+pwsh -NoProfile -File tools/d1-donanim-dolum/tarama.ps1 ... `
+  -Kollar "saq|2|2|vbr -multipass fullres|-spatial-aq 1;taq|2|2|vbr -multipass fullres|-temporal-aq 1;qres|2|2|vbr -multipass qres|;cbr|1|1|cbr -multipass fullres|;tepe15t1|1.5|1|vbr -multipass fullres|"
+```
+
+Taban kolu önceki eğriyi bayt bayt yeniden üretti (656k 1,0799 / 657k 1,2317 MB). Ham satırlar
+`docs/olcumler/d1-oran-tarama.tsv` (239 satır).
+
+### Basamak Davranışı
+
+Her hücrede basamağın altındaki son ve üstündeki ilk istek (teslim/hedef), bandın içine düşen en iyi istek:
+
+| Kol | parlak/hevc/1000 | parlak/hevc/2000 | karanlık/av1/1000 | Bantta istek |
+|---|---|---|---|---|
+| taban (2·/2·, vbr fullres) | 656k 0,8847 → 657k 1,0090 | 1470k 0,9633 → 1475k 1,0099 | 1045k 0,9618 → 1050k 1,0701 | yok |
+| `-spatial-aq 1` | tabanla bayt bayt aynı | aynı | aynı | yok |
+| `-temporal-aq 1` | tabanla bayt bayt aynı | aynı | aynı | yok |
+| `-multipass qres` | 656k 0,8749 → 657k **0,9931** | 1470k 0,9630 → 1475k 1,0060 | 1045k 0,9577 → 1050k 1,0680 | yalnız A |
+| tampon 1· (tepe 2·) | 656k 0,8620 → 657k 0,9541; 685k **0,9782**, 700k **0,9847**, 720k **0,9957** | 1470k 0,9633 → 1475k 1,0098 | 1045k 0,9657 → 1050k 1,0713 | yalnız A |
+| tepe 1,5· / tampon 1· | 656k 0,7997 → 657k 0,8906 | 1470k 0,9118 → 1475k 0,9529 | 1045k 0,9668 → 1050k 1,0677 | yok |
+| `-rc cbr` (1·/1·) | basamak yok, 700k 0,7286 | basamak yok, 1530k 0,7990 | basamak yok, 1030k **0,9967** | ölçülen ızgarada yalnız C |
+| tepe 1· / tampon 1· (vbr) | basamak yok; 950k **0,9915**, 1000k 1,0423 | basamak yok; 1900k **0,9905**, 2000k 1,0427 | basamak yok; 1010k **0,9829**, 1030k **0,9988** | üçü de |
+
+Basamağın yeri AQ, multipass ve tampondan bağımsız aynı istekte (657k, 1475k, 1050k); 656k/657k
+dosyalarında I-kareler aynı, I dışı karelerin ortalaması 4635 → 5301 bayt (+%14,4): tüm klibin QP'si
+tek adımda kayıyor. Basamağı yalnız tepe = istek kaldırıyor (vbr 1·/1· ile cbr aynı eğriyi veriyor);
+eğri doğrusal (A'da 950k → 1000k +5,08 puan, B'de 1900k → 2000k +5,22 puan).
+
+### 18 Hücre: Tepe 1· / Tampon 1·
+
+`NvencPeakFactor` ve `NvencBufferFactor` geçici olarak 1,0'a yazıldı, Bench derlendi, `teslim.ps1`
+aynı ızgarada koşuldu (6,3 dk), sabitler elle 2,0'a geri yazıldı. Ham: `docs/olcumler/d1-oran-tepe1-ham.json`.
+
+| Kol | Ort. teslim | En kötü | 0,97 altı | Hedefi aşan teslim | Toplam deneme |
+|---|---|---|---|---|---|
+| taban (0,985, 2·/2·) | 0,9780 | 0,8740 | 5 | 0 / 18 | 45 |
+| tepe 1· / tampon 1· | **0,9813** | 0,9549 | 1 | **0 / 18** | 28 |
+
+Boyut şartlarının ikisi tutuyor (0/18, ortalama +0,33 puan). Üç hücre: parlak/hevc/1000 0,8740 → 0,9848,
+parlak/hevc/2000 0,9587 → 0,9843, karanlık/av1/1000 0,9492 → 0,9793. Düşen hücreler: karanlık/hevc/1000
+0,9868 → 0,9549, hareketli/hevc/1000 0,9993 → 0,9719; hareketli/av1/3500 0,9683 → 0,9874 çıktı.
+
+### Kalite
+
+Her kolun teslim ettiği istek `kalite.ps1` ile yeniden kodlandı (boyutlar ürünün izindekiyle aynı çıktı),
+VMAF-NEG ortalaması:
+
+| Hücre | Taban istek / MB / VMAF-NEG | Tepe 1· istek / MB / VMAF-NEG | Fark |
+|---|---|---|---|
+| parlak/hevc/1000 | 610k / 1,0668 / 68,709 | 943k / 1,2022 / 67,461 | **−1,248** |
+| parlak/hevc/2000 | 1459k / 2,3407 / 73,618 | 1888k / 2,4031 / 72,549 | **−1,069** |
+| karanlık/av1/1000 | 1010k / 1,1587 / 56,314 | 1004k / 1,1955 / 56,094 | −0,220 |
+| hareketli/hevc/1000 | 917k / 1,2198 / 55,936 | 967k / 1,1864 / 54,644 | **−1,292** |
+| hareketli/av1/1000 | 930k / 1,2191 / 57,110 | 1006k / 1,2001 / 55,959 | **−1,151** |
+
+Beş hücrenin dördünde düşüş 0,5'i aşıyor; parlak/hevc/1000'de dosya %12,7 büyüyüp VMAF-NEG 1,25 düşüyor.
+Tepe = istek NVENC'in kolay karelerden zor karelere bit taşımasını kesiyor; teslimi dolduran bitler
+kaliteye dönmüyor. Kalan 13 hücre ölçülmedi: karar kuralı ilk hücrede kırıldı.
+
+### Karar
+
+| Şart | Tepe 1· / tampon 1· |
+|---|---|
+| Hedefi aşan teslim 0/18 | tuttu |
+| Ortalama > 0,9780 | tuttu (0,9813) |
+| Hiçbir hücrede > 0,5 VMAF düşüş yok | **kaldı** (4/5 ölçülen hücrede −1,07 … −1,29) |
+
+Kod değişmedi. Kaliteyi korurken bandı açan kol ölçülen kümede yok: AQ bayrakları NVENC'in bu komutunda
+etkisiz, `qres` ve tampon 1· yalnız parlak/hevc/1000'in basamağını kaydırıyor, ötekiler basamağı yerinde
+bırakıyor. Ölçülmedi: `-qmin/-qmax`, `-rc-lookahead` değeri (ürün 20).
