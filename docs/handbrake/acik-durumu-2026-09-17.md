@@ -210,7 +210,7 @@ diyen satır da bir dosya ve satır numarası gösteriyor.
 | C1-5 filtre paneli | **girdi (22 Eylül)** | Gelişmiş'te açılır kutular ve onay kutuları, metin tek kaynak (`VideoFilterChain.Format`, `Parse`'ın tersi); `SuzgecPaneliTests` (7a6286e6) |
 | C1-6 iz paneli | **girdi (22 Eylül)** | ses yüksekliği, kazanç, dış altyazı, metin altyazı yakma ana pencerede; yeni kaynakta sıfırlanır, kuyruğa taşınmaz (`MainWindow.Izler.cs`, `IzPaneliTests` 12/12, 7a6286e6) |
 | C1-7 ön ayar yüzeyi | **girdi (22 Eylül)** | içe/dışa aktarma pencerede, HandBrake dosyası özetle (0666989b); CLI `--profil-dosyasi` (d17e0e3c) |
-| D2 karanlık geçişin kapsamı | genişletilmedi | `Core/DarkContentSwitch.cs:21-27` hâlâ Auto + Aggressive/Extreme + libsvtav1 |
+| D2 karanlık geçişin kapsamı | **ölçüldü, kapıdan kaldı** (23 Eylül denetimi) | CI 35273973330, `docs/olcumler/karanlik-x265.md` §6: CAMBI kapısı 1/2 açıldı, süre ölçütü (≤2×) 7,04× / 4,14× ile kaldı; fable kararı 4 gereği `Balanced` eklenmedi, `DarkContentSwitch.cs:21-27` Auto + Aggressive/Extreme + libsvtav1 |
 | D3 macOS 14 libmpv | **girdi** | `install-vidshrink.sh:298-305`, `tools/mpvkit-macos/mpvkit-1.0.0.lock`, `.github/workflows/macos-mpvkit.yml:106-159` |
 
 Fable'ın on kararı 17 Eylül'de geldi ve `docs/handbrake/fable-kararlar-2026-09-17.md`'de duruyor;
