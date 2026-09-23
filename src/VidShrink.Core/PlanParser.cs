@@ -10,7 +10,7 @@ public sealed record PlanParseResult(EncodePlan? Plan, IReadOnlyList<string> Err
 
 public static class PlanParser
 {
-    private static readonly string[] AllowedCodecs = { "libx264", "libx265", "libsvtav1", "h264_nvenc", "hevc_nvenc", "h264_qsv", "hevc_qsv", "av1_nvenc", "av1_qsv", "h264_amf", "hevc_amf", "av1_amf", "libvpx-vp9" };
+    private static readonly string[] AllowedCodecs = { "libx264", "libx265", "libsvtav1", "h264_nvenc", "hevc_nvenc", "h264_qsv", "hevc_qsv", "av1_nvenc", "av1_qsv", "h264_amf", "hevc_amf", "av1_amf", "h264_mf", "hevc_mf", "av1_mf", "libvpx-vp9" };
     private static readonly string[] AllowedAudioCodecs = { "aac", "libopus", "libmp3lame", "ac3", "eac3", "flac", "copy" };
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -21,6 +21,9 @@ public static class PlanParser
     };
 
     public static PlanParseResult Parse(string raw, MediaInfo info, PlanOptions options)
+        => Parse(raw, info, options, OperatingSystem.IsWindows());
+
+    internal static PlanParseResult Parse(string raw, MediaInfo info, PlanOptions options, bool windows)
     {
         var errors = new List<string>();
         var warnings = new List<string>();
@@ -44,6 +47,13 @@ public static class PlanParser
 
         if (!AllowedCodecs.Contains(plan.Codec, StringComparer.OrdinalIgnoreCase))
             errors.Add($"Unsupported codec: {plan.Codec}");
+        else if (!CodecModel.IsOfferedOn(plan.Codec, windows))
+            errors.Add($"Codec {plan.Codec} is only available on Windows.");
+
+        if (!CodecModel.HasQualityScale(plan.Codec) && plan.Mode.Equals("crf", StringComparison.OrdinalIgnoreCase))
+            errors.Add($"Codec {plan.Codec} has no measured quality scale, so it runs in 2pass mode only.");
+
+        plan.PixelFormat = CodecModel.OutputPixelFormat(plan.Codec, plan.PixelFormat);
 
         if (!plan.Mode.Equals("crf", StringComparison.OrdinalIgnoreCase) && !plan.Mode.Equals("2pass", StringComparison.OrdinalIgnoreCase))
             errors.Add($"Unsupported mode: {plan.Mode}");

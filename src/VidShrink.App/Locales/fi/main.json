@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "lähde sisältää dynaamista HDR10+-metatietoa, jonka vain {1} osaa välittää, joten {0}:n sijaan käytetään {1}:tä",
   "main.reason.hdr10plus-svtav1": "HDR10+ ei kulje SVT-AV1-reitillä, joten tuloste säilyttää vain staattisen HDR10-kerroksen; Automaattinen käyttäisi libx265:tä, joka välittää sen",
   "main.reason.hdr10plus-cut": "HDR10+ putosi pois leikkauksessa: metatiedot seuraavat lähdettä kuva kuvalta, ja rajaus tai kuvataajuuden muutos rikkoo tämän kohdistuksen, joten tuloste säilyttää vain staattisen HDR10-kerroksen",
+  "main.reason.no-quality-scale": "Kohteella {0} ei ole tässä moottorissa CRF:ään sidottua laatuasteikkoa, joten se pitää koon bittinopeudella omassa yksivaiheisessa nopeudensäädössään CRF-arvauksen sijaan",
   "main.reason.stream.audio-passthrough": "ääniraita kopioidaan sellaisenaan: säiliö tukee sen koodekkia ja se pysyy 15 %:n sisällä tavoitteesta",
   "main.reason.stream.audio-downmixed": "surround-ääniraita miksataan stereoksi uudelleenkoodauksessa",
   "main.reason.stream.extra-audio-dropped": "vain yksi ääniraita säilytetään; ota 'Säilytä kaikki raidat' käyttöön, jotta kaikki kulkevat MKV:ssä",

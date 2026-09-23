@@ -151,6 +151,14 @@ public sealed class PreviewSegmentTests
         foreach (var codec in AllowedCodecs())
         {
             var choice = PreviewSegment.QualityFor(Source(), TwoPassPlan(codec));
+            if (!CodecModel.HasQualityScale(codec))
+            {
+                Assert.Equal(PreviewQuality.Desteklenmiyor, choice.Kind);
+                var segment = PreviewSegment.For(Source(), TwoPassPlan(codec), 10, "ornek.mp4");
+                Assert.Contains("-b:v", segment.Arguments);
+                Assert.DoesNotContain("-crf", segment.Arguments);
+                continue;
+            }
             if (choice.Kind == PreviewQuality.Desteklenmiyor || choice.Crf is null)
             {
                 siniflandirilmamis.Add(codec);

@@ -1896,7 +1896,7 @@ public partial class MainWindow : Window
         CmbAdvMinFps.ItemsSource = new[] { automatic }.Concat(AdvancedMinFpsCandidates.Select(c => c.ToString("0.##", CultureInfo.InvariantCulture))).ToList();
         CmbAdvMinFps.SelectedIndex = 0;
 
-        CmbAdvCodecLock.ItemsSource = new[] { automatic }.Concat(FfmpegArguments.KnownCodecs.OrderBy(c => c, StringComparer.OrdinalIgnoreCase)).ToList();
+        CmbAdvCodecLock.ItemsSource = new[] { automatic }.Concat(FfmpegArguments.OfferedCodecs(OperatingSystem.IsWindows()).OrderBy(c => c, StringComparer.OrdinalIgnoreCase)).ToList();
         CmbAdvCodecLock.SelectedIndex = 0;
 
         InitializeFilterUi(automatic);

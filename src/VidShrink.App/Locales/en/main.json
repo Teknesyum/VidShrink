@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "the source carries HDR10+ dynamic metadata, which only {1} can pass through, so {1} is used instead of {0}",
   "main.reason.hdr10plus-svtav1": "HDR10+ is not carried on the SVT-AV1 path, so the output keeps only the static HDR10 layer; Automatic would use libx265, which carries it",
   "main.reason.hdr10plus-cut": "HDR10+ was dropped in the cut: its metadata follows the source frame by frame, and a trim or frame rate change breaks that alignment, so the output keeps only the static HDR10 layer",
+  "main.reason.no-quality-scale": "{0} has no quality scale tied to CRF in this engine, so it holds the size with a bitrate in its own single-pass rate control instead of a CRF guess",
   "main.reason.stream.audio-passthrough": "the audio track is copied as it is: the container carries its codec and it stays within 15% of the target",
   "main.reason.stream.audio-downmixed": "a surround audio track is mixed down to stereo while it is re-encoded",
   "main.reason.stream.extra-audio-dropped": "only one audio track is kept; turn on 'Keep all tracks' to carry all of them in MKV",

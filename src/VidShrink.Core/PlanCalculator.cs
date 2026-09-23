@@ -815,6 +815,14 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.ManualModeOverride, ManualOverrideValue: requestedMode.ToString(), EngineWouldHaveChosen: engineMode));
         }
 
+        if (plan.ModeEnum == EncodeMode.Crf && !CodecModel.HasQualityScale(codec))
+        {
+            plan.Mode = "2pass";
+            plan.Crf = null;
+            reason.Add($"{codec} has no quality scale tied to CRF in this engine, so it holds the size at {plan.VideoBitrateK}k in its own single-pass rate control instead of a CRF guess");
+            reasonCodes.Add(new ReasonNote(ReasonCode.NoQualityScaleBitrate, RequestedCodec: codec));
+        }
+
         if (options.LockedTune is string tune)
         {
             if (FfmpegArguments.IsValidTune(codec, tune))
@@ -1570,12 +1578,20 @@ public static class PlanCalculator
         "h264_nvenc", "hevc_nvenc", "av1_nvenc",
         "h264_qsv", "hevc_qsv", "av1_qsv",
         "h264_amf", "hevc_amf", "av1_amf",
+        "h264_mf", "hevc_mf", "av1_mf",
         "libvpx-vp9"
     };
 
-    /// <summary>Kilit olarak verilebilecek kodlayici mi; buyuk kucuk harf ayirmaz.</summary>
-    public static bool IsLockableCodec(string? codec)
-        => codec is not null && KnownLockableCodecs.Contains(codec.Trim(), StringComparer.OrdinalIgnoreCase);
+    /// <summary>
+    /// Kilit olarak verilebilecek kodlayici mi; buyuk kucuk harf ayirmaz. Platformun onermedigi
+    /// kodlayici (<see cref="CodecModel.IsOfferedOn"/>) kilitlenemez.
+    /// </summary>
+    public static bool IsLockableCodec(string? codec) => IsLockableCodecOn(codec, OperatingSystem.IsWindows());
+
+    internal static bool IsLockableCodecOn(string? codec, bool windows)
+        => codec is not null
+           && KnownLockableCodecs.Contains(codec.Trim(), StringComparer.OrdinalIgnoreCase)
+           && CodecModel.IsOfferedOn(codec.Trim(), windows);
 
     /// <summary>
     /// Bos/bosluk kilidi "secim yok" sayar; dolu kilit tanidik kodlayicilardan biri degilse
@@ -1587,7 +1603,7 @@ public static class PlanCalculator
         if (string.IsNullOrWhiteSpace(locked)) return null;
         var trimmed = locked.Trim();
         var known = KnownLockableCodecs.FirstOrDefault(c => c.Equals(trimmed, StringComparison.OrdinalIgnoreCase));
-        if (known is null)
+        if (known is null || !IsLockableCodec(known))
             throw new ArgumentException($"bilinmeyen kilitli kodlayici: {trimmed}", nameof(PlanOptions.LockedCodec));
         return known;
     }

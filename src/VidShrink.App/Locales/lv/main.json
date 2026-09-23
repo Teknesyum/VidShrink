@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "avots satur dinamiskus HDR10+ metadatus, ko var nodot tikai {1}, tāpēc {0} vietā tiek izmantots {1}",
   "main.reason.hdr10plus-svtav1": "HDR10+ netiek pārnests pa SVT-AV1 ceļu, tāpēc izvade saglabā tikai statisko HDR10 slāni; Automātiski izmantotu libx265, kas to pārnes",
   "main.reason.hdr10plus-cut": "HDR10+ zuda griezumā: metadati seko avotam kadru pa kadram, un apgriešana vai kadru ātruma maiņa izjauc šo saskaņojumu, tāpēc izvade saglabā tikai statisko HDR10 slāni",
+  "main.reason.no-quality-scale": "{0} šajā dzinējā nav ar CRF saistītas kvalitātes skalas, tāpēc tas uztur izmēru ar bitu pārraides ātrumu savā viena gājiena ātruma vadībā, nevis ar minētu CRF",
   "main.reason.stream.audio-passthrough": "audio celiņš tiek kopēts nemainīts: konteiners atbalsta tā kodeku un tas nepārsniedz 15% no mērķa",
   "main.reason.stream.audio-downmixed": "telpiskā audio celiņš pārkodēšanas laikā tiek samiksēts stereo",
   "main.reason.stream.extra-audio-dropped": "tiek paturēts tikai viens audio celiņš; ieslēdziet 'Saglabāt visus celiņus', lai visus pārnestu MKV",

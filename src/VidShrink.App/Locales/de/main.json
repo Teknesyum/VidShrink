@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "die Quelle trägt dynamische HDR10+-Metadaten, die nur {1} weitergeben kann, daher wird {1} statt {0} verwendet",
   "main.reason.hdr10plus-svtav1": "HDR10+ wird im SVT-AV1-Zweig nicht übertragen, daher behält die Ausgabe nur die statische HDR10-Ebene; Automatisch würde libx265 verwenden, das es überträgt",
   "main.reason.hdr10plus-cut": "HDR10+ ist beim Schnitt weggefallen: die Metadaten folgen der Quelle Bild für Bild, und ein Zuschnitt oder eine geänderte Bildrate bricht diese Zuordnung, daher behält die Ausgabe nur die statische HDR10-Ebene",
+  "main.reason.no-quality-scale": "{0} hat in dieser Engine keine an CRF gebundene Qualitätsskala, daher hält es die Größe mit einer Bitrate in seiner eigenen Ein-Pass-Ratensteuerung statt mit einer geschätzten CRF",
   "main.reason.stream.audio-passthrough": "die Tonspur wird unverändert kopiert: der Container unterstützt ihren Codec und sie bleibt unter 15 % des Ziels",
   "main.reason.stream.audio-downmixed": "eine Surround-Tonspur wird beim Neukodieren auf Stereo heruntergemischt",
   "main.reason.stream.extra-audio-dropped": "nur eine Tonspur wird behalten; aktivieren Sie 'Alle Spuren behalten', um alle in MKV zu übernehmen",

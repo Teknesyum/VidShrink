@@ -1148,6 +1148,8 @@ public sealed class BaslikKapsamiTests
     /// <c>-fill-band-narrow-single-pass</c> 15. 1964 + 8 + 10 + 10 + 15 = 2007; en dordunde de
     /// (228 + 4 = 232), tr yalniz band merkezinde (80 + 1 = 81). Yeniden yazilan
     /// <c>main.output.estimated-output.tip</c> ne once ne sonra kolda.</para>
+    /// <para>2026-09-23, Media Foundation: <c>main.reason.no-quality-scale</c> 15 dilde kola giriyor,
+    /// en dahil tr haric: 2007 + 15 = 2022, en 232 + 1 = 233, tr 81.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1173,8 +1175,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2007, toplam);
-        Assert.Equal(232, dilBasina["en"]);
+        Assert.Equal(2022, toplam);
+        Assert.Equal(233, dilBasina["en"]);
         Assert.Equal(81, dilBasina["tr"]);
     }
 
@@ -1319,6 +1321,8 @@ public sealed class BaslikKapsamiTests
     /// <c>main.estimate.mode.enforced-single-pass</c>, <c>main.estimate.mode.copy</c>, uc
     /// <c>main.reason.*-single-pass</c>, <c>main.advice.single-pass</c>): 1078 + 7 = 1085,
     /// 43 x 1085 = 46655. <c>kayip</c> yine 0.</para>
+    /// <para>2026-09-23: Media Foundation dil basina bir anahtar (<c>main.reason.no-quality-scale</c>):
+    /// 1085 + 1 = 1086, 43 x 1086 = 46698.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1346,7 +1350,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(46655, gezilen);
+        Assert.Equal(46698, gezilen);
         Assert.Empty(kayip);
     }
 

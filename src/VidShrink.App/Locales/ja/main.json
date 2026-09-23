@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "ソースにはHDR10+の動的メタデータがあり、それを引き継げるのは{1}だけなので、{0}の代わりに{1}を使います",
   "main.reason.hdr10plus-svtav1": "SVT-AV1の経路ではHDR10+は引き継がれないため、出力には静的なHDR10層だけが残ります。自動なら、HDR10+を引き継げるlibx265を使います",
   "main.reason.hdr10plus-cut": "カットでHDR10+が失われました。メタデータはソースのフレームごとに対応しており、トリミングやフレームレートの変更でその対応が崩れるため、出力には静的なHDR10層だけが残ります",
+  "main.reason.no-quality-scale": "{0} にはこのエンジンで CRF に結び付いた品質尺度がないため、CRF を推測せず、自身の 1 パスのレート制御でビットレートによりサイズを保ちます",
   "main.reason.stream.audio-passthrough": "音声トラックはそのままコピーされます。コンテナがコーデックに対応し、目標の15%以内に収まります",
   "main.reason.stream.audio-downmixed": "サラウンド音声トラックは再エンコード時にステレオへダウンミックスされます",
   "main.reason.stream.extra-audio-dropped": "音声トラックは1つだけ残ります。すべてをMKVで残すには「すべてのトラックを保持」をオンにしてください",
