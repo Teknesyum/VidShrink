@@ -52,7 +52,8 @@ public sealed class OndalikMbTests
     [Fact]
     public void KaynakVeSonucHedeflaAyniBirimde()
     {
-        var info = new MediaInfo { FilePath = "a.mp4", FileSizeBytes = 25_000_000L, DurationSeconds = 10 };
+        var info = new MediaInfo { FilePath = "a.mp4", FileSizeBytes = 25_000_000L, DurationSeconds = 10,
+            Width = 320, Height = 240, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 20_000_000 };
         Assert.Equal(25.0, info.FileSizeMb, 12);
         Assert.Equal(25.0, Megabayt.Oku(Megabayt.Tavan(25)), 12);
     }

@@ -1,5 +1,6 @@
 using System.Globalization;
 using VidShrink.Ab;
+using VidShrink.Core;
 
 namespace VidShrink.Tests;
 

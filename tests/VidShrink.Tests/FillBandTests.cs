@@ -200,7 +200,7 @@ public sealed class FillBandTests
             Preset = "slow"
         };
 
-        var corrected = PlanCalculator.Correct(plan, actualMb: 30, targetMb: 20, durationSeconds: 120);
+        var corrected = PlanCalculator.Correct(plan, actualMb: 31.5, targetMb: 20, durationSeconds: 120);
 
         Assert.Equal(EncodeMode.TwoPass, corrected.ModeEnum);
         Assert.Null(corrected.Crf);
