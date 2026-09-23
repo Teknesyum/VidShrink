@@ -420,7 +420,7 @@
   "main.reason.encoder-fallback-not-working": "the {0} encoder could not be used on this machine, so encoding falls back to {1}",
   "main.reason.hdr-tonemapped": "the source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "the source carries dynamic HDR metadata (HDR10+ or Dolby Vision) that this encode cannot pass through, so the output keeps only the static HDR10 layer",
-  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 has no measured CRF scale in this engine, so two-pass VBR holds the size instead of a CRF guess",
+  "main.reason.vp9-crf-unmeasured": "libvpx-vp9's CRF quality scale is measured, but not how a CRF value translates to file size, so two-pass VBR holds the size instead of a CRF guess",
   "main.reason.stream.audio-passthrough": "the audio track is copied as it is: the container carries its codec and it stays within 15% of the target",
   "main.reason.stream.audio-downmixed": "a surround audio track is mixed down to stereo while it is re-encoded",
   "main.reason.stream.extra-audio-dropped": "only one audio track is kept; turn on 'Keep all tracks' to carry all of them in MKV",

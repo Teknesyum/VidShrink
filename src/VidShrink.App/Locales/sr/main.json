@@ -420,7 +420,7 @@
   "main.reason.encoder-fallback-not-working": "enkoder {0} se nije mogao koristiti na ovoj mašini, pa kodiranje prelazi na {1}",
   "main.reason.hdr-tonemapped": "izvor je HDR, ali izabrani enkoder ne može da sačuva 10 bita, pa je tonski mapiran u SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "izvor nosi dinamičke HDR metapodatke (HDR10+ ili Dolby Vision) koje ovo kodiranje ne prenosi, pa izlaz zadržava samo statički HDR10 sloj",
-  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 nema izmerenu CRF skalu u ovom motoru, pa veličinu drži dvoprolazni VBR umesto nagađanja CRF-a",
+  "main.reason.vp9-crf-unmeasured": "Skala kvaliteta CRF za libvpx-vp9 je izmerena, ali nije izmereno kako se vrednost CRF-a odražava na veličinu fajla, pa veličinu drži dvoprolazni VBR umesto nagađanja CRF-a",
   "main.reason.stream.audio-passthrough": "audio traka se kopira nepromenjena: kontejner podržava njen kodek i ostaje unutar 15% cilja",
   "main.reason.stream.audio-downmixed": "surround audio traka se pri ponovnom kodiranju miksuje u stereo",
   "main.reason.stream.extra-audio-dropped": "zadržava se samo jedna audio traka; uključite 'Zadrži sve trake' da se sve prenesu u MKV",

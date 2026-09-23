@@ -420,7 +420,7 @@
   "main.reason.encoder-fallback-not-working": "pengekod {0} tidak dapat digunakan pada mesin ini, jadi pengekodan kembali ke {1}",
   "main.reason.hdr-tonemapped": "sumber ialah HDR tetapi pengekod yang dipilih tidak dapat mengekalkan 10-bit, jadi ia dipetakan nada ke SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "sumber membawa metadata HDR dinamik (HDR10+ atau Dolby Vision) yang tidak dibawa oleh pengekodan ini, jadi output hanya mengekalkan lapisan HDR10 statik",
-  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 tiada skala CRF yang diukur dalam enjin ini, jadi saiz dikekalkan dengan VBR dua laluan dan bukan tekaan CRF",
+  "main.reason.vp9-crf-unmeasured": "Skala kualiti CRF libvpx-vp9 telah diukur, tetapi bukan cara nilai CRF menjejaskan saiz fail, jadi saiz dikekalkan dengan VBR dua laluan dan bukan tekaan CRF",
   "main.reason.stream.audio-passthrough": "trek audio disalin seperti asal: bekas menyokong codecnya dan ia kekal dalam 15% daripada sasaran",
   "main.reason.stream.audio-downmixed": "trek audio surround dicampur menjadi stereo semasa dikod semula",
   "main.reason.stream.extra-audio-dropped": "hanya satu trek audio dikekalkan; hidupkan 'Kekalkan semua trek' untuk membawa semuanya dalam MKV",

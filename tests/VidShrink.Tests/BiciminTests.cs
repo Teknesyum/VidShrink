@@ -1131,6 +1131,13 @@ public sealed class BaslikKapsamiTests
     /// dillerde, aynı uc anahtarin ceviri sozcuklerine bagli.</para>
     /// <para>2026-09-23: <c>main.reason.vp9-crf-unmeasured</c> (VP9'da CRF yerine iki gecis)
     /// 12 dilde kol degistiriyor, en dahil tr haric: 1918 + 12 = 1930, en 225 + 1 = 226.</para>
+    /// <para>2026-09-23, ikinci duzeltme: <c>main.reason.vp9-crf-unmeasured</c> metni CRF
+    /// kalite olceginin artik olculdugunu, olculmeyenin CRF-boyut cevirisi oldugunu anlatacak
+    /// sekilde yeniden yazildi. Islev sozcugu eslesmesi rastlantisal: cs'de yeni metindeki
+    /// "do" (Cekce "-e"), et ve fi'de "on" (Estonca/Fince "-dir") ingilizce govde listesiyle
+    /// carpisip kola giriyor (+1'er), de'de eski metindeki "in" (Almanca "-de") kalkiyor ve
+    /// govdeden cikiyor (-1). Toplam 1930 + 1 + 1 + 1 - 1 = 1932; en ve tr metni ayni
+    /// govde/kol siniri icinde kaldigi icin 226 ve 78 degismedi.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1156,7 +1163,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1930, toplam);
+        Assert.Equal(1932, toplam);
         Assert.Equal(226, dilBasina["en"]);
         Assert.Equal(78, dilBasina["tr"]);
     }

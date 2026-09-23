@@ -420,7 +420,7 @@
   "main.reason.encoder-fallback-not-working": "enkodér {0} sa na tomto počítači nedal použiť, takže kódovanie sa vracia k {1}",
   "main.reason.hdr-tonemapped": "zdroj je HDR, ale zvolený enkodér nezachová 10 bitov, takže bol tónovo mapovaný na SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "zdroj nesie dynamické HDR metadáta (HDR10+ alebo Dolby Vision), ktoré toto kódovanie neprenesie, výstup si preto ponechá len statickú vrstvu HDR10",
-  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 nemá v tomto jadre zmeranú stupnicu CRF, veľkosť preto drží dvojprechodové VBR namiesto odhadu CRF",
+  "main.reason.vp9-crf-unmeasured": "Kvalitatívna stupnica CRF pre libvpx-vp9 je zmeraná, ale nie je zmerané, ako sa hodnota CRF prejaví na veľkosti súboru, veľkosť preto drží dvojprechodové VBR namiesto odhadu CRF",
   "main.reason.stream.audio-passthrough": "zvuková stopa sa kopíruje bez zmeny: kontajner podporuje jej kodek a zmestí sa do 15 % cieľa",
   "main.reason.stream.audio-downmixed": "priestorová zvuková stopa sa pri prekódovaní zmieša do sterea",
   "main.reason.stream.extra-audio-dropped": "ponechá sa len jedna zvuková stopa; zapnite 'Zachovať všetky stopy', aby sa všetky preniesli v MKV",

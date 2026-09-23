@@ -420,7 +420,7 @@
   "main.reason.encoder-fallback-not-working": "kodeerijat {0} ei saanud selles masinas kasutada, seega langeb kodeerimine {1}-le",
   "main.reason.hdr-tonemapped": "allikas on HDR, kuid valitud kodeerija ei säilita 10-bitist, seega teisendati see toonivastendusega SDR BT.709-ks",
   "main.reason.hdr-dynamic-dropped": "allikas kannab dünaamilisi HDR-metaandmeid (HDR10+ või Dolby Vision), mida see kodeerimine edasi ei kanna, seega jääb väljundisse ainult staatiline HDR10 kiht",
-  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 jaoks pole selles mootoris mõõdetud CRF-skaalat, seega hoiab suurust kahekäiguline VBR, mitte CRF-i oletus",
+  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 CRF kvaliteediskaala on mõõdetud, kuid mitte see, kuidas CRF väärtus mõjutab faili suurust, seega hoiab suurust kahekäiguline VBR, mitte CRF-i oletus",
   "main.reason.stream.audio-passthrough": "helirada kopeeritakse muutmata: konteiner toetab selle koodekit ja see jääb 15% piiresse sihist",
   "main.reason.stream.audio-downmixed": "ruumiline helirada miksitakse ümberkodeerimisel stereoks",
   "main.reason.stream.extra-audio-dropped": "alles jäetakse ainult üks helirada; lülita sisse 'Säilita kõik rajad', et kõik MKV-s kaasa võtta",
