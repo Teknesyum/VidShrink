@@ -371,7 +371,7 @@ public static class PlanCalculator
 
         var hdr10PlusCut = info.HasHdr10Plus && (options.Trim is not null || (options.Filters ?? VideoFilterOptions.Default).Detelecine);
         var hdr10PlusRouted = false;
-        if (lockedCodec is null && options.EncoderPath == EncoderPathOverride.Auto && !hdr10PlusCut
+        if (lockedCodec is null && options.Codec == CodecPreference.Auto && !fast && options.EncoderPath == EncoderPathOverride.Auto && !hdr10PlusCut
             && HdrResolver.Hdr10PlusCodec(info, options.HdrPolicy, codec, availability) is string bridgeCodec)
         {
             reason.Add($"the source carries HDR10+ dynamic metadata, which only {bridgeCodec} carries through a metadata file, so {bridgeCodec} is used instead of {codec}");

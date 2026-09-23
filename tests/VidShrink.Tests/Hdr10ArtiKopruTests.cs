@@ -63,10 +63,13 @@ public sealed class Hdr10ArtiKopruTests : IDisposable
     };
 
     private static PlanResult Planla(MediaInfo info, string? kilit = null, HdrPolicy politika = HdrPolicy.Preserve,
-        TrimWindow? kesit = null, VideoFilterOptions? suzgec = null, IEncoderAvailability? kodlayicilar = null)
+        TrimWindow? kesit = null, VideoFilterOptions? suzgec = null, IEncoderAvailability? kodlayicilar = null,
+        CodecPreference tercih = CodecPreference.Auto, SpeedMode hiz = SpeedMode.Quality)
         => PlanCalculator.BuildDetailed(info, new PlanOptions
         {
             TargetMb = 40,
+            Codec = tercih,
+            SpeedMode = hiz,
             Intent = Intent.Sharing,
             LockedCodec = kilit,
             HdrPolicy = politika,
@@ -251,6 +254,20 @@ public sealed class Hdr10ArtiKopruTests : IDisposable
         Assert.NotEqual("libx265", not.RequestedCodec);
         Assert.False(Var(sonuc, ReasonCode.HdrDynamicMetadataDropped));
         Assert.False(Var(sonuc, ReasonCode.EncoderFallback));
+    }
+
+    [Theory]
+    [InlineData(CodecPreference.Compatible, SpeedMode.Quality)]
+    [InlineData(CodecPreference.MaxCompression, SpeedMode.Quality)]
+    [InlineData(CodecPreference.Auto, SpeedMode.Fast)]
+    public void AcikTercihteYonlendirmeYok(CodecPreference tercih, SpeedMode hiz)
+    {
+        var sonuc = Planla(Hdr10Arti(), kodlayicilar: new Kodlayicilar("libx264", "libx265", "libsvtav1", "h264_nvenc", "hevc_nvenc"), tercih: tercih, hiz: hiz);
+
+        Assert.NotEqual("libx265", sonuc.Plan.Codec);
+        Assert.False(sonuc.Plan.Hdr10PlusBridge);
+        Assert.False(Var(sonuc, ReasonCode.Hdr10PlusRoutedToX265));
+        Assert.True(Var(sonuc, ReasonCode.HdrDynamicMetadataDropped) || Var(sonuc, ReasonCode.Hdr10PlusNotCarriedOnSvtAv1) || Var(sonuc, ReasonCode.HdrTonemapped));
     }
 
     [Fact]
@@ -479,6 +496,7 @@ public sealed class Hdr10ArtiKopruTests : IDisposable
         var plan = PlanCalculator.BuildDetailed(info, new PlanOptions
         {
             TargetMb = info.FileSizeMb * 0.6,
+            Codec = CodecPreference.Auto,
             Intent = Intent.Sharing,
             HdrPolicy = HdrPolicy.Preserve
         }, null, new Kodlayicilar("libx264", "libx265", "libsvtav1")).Plan;
