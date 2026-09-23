@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "sumber membawa metadata dinamik HDR10+ yang hanya boleh diteruskan oleh {1}, jadi {1} digunakan sebagai ganti {0}",
   "main.reason.hdr10plus-svtav1": "HDR10+ tidak diteruskan melalui laluan SVT-AV1, jadi output hanya mengekalkan lapisan HDR10 statik; Automatik akan menggunakan libx265, yang meneruskannya",
   "main.reason.hdr10plus-cut": "HDR10+ hilang semasa pemotongan: metadatanya mengikut sumber bingkai demi bingkai, dan pemangkasan atau perubahan kadar bingkai merosakkan penjajaran itu, jadi output hanya mengekalkan lapisan HDR10 statik",
+  "main.reason.no-quality-scale": "{0} tidak mempunyai skala kualiti yang terikat pada CRF dalam enjin ini, jadi saiz dikekalkan dengan kadar bit dalam kawalan kadar satu laluannya sendiri dan bukan dengan tekaan CRF",
   "main.reason.stream.audio-passthrough": "trek audio disalin seperti asal: bekas menyokong codecnya dan ia kekal dalam 15% daripada sasaran",
   "main.reason.stream.audio-downmixed": "trek audio surround dicampur menjadi stereo semasa dikod semula",
   "main.reason.stream.extra-audio-dropped": "hanya satu trek audio dikekalkan; hidupkan 'Kekalkan semua trek' untuk membawa semuanya dalam MKV",

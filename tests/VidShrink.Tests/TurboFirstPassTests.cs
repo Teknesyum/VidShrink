@@ -232,12 +232,12 @@ public sealed class TurboFirstPassTests
     }
 
     [Fact]
-    public void Bilinen_kodekler_dort_yazilim_dokuz_donanim()
+    public void Bilinen_kodekler_dort_yazilim_on_iki_donanim()
     {
         var bilinen = FfmpegArguments.KnownCodecs.ToArray();
-        Assert.Equal(13, bilinen.Length);
+        Assert.Equal(16, bilinen.Length);
         Assert.Equal(4, bilinen.Count(kodek => !CodecModel.IsHardware(kodek)));
-        Assert.Equal(9, bilinen.Count(CodecModel.IsHardware));
+        Assert.Equal(12, bilinen.Count(CodecModel.IsHardware));
         Assert.Equal(4, bilinen.Count(FfmpegArguments.NeedsTwoPasses));
         Assert.Equal(2, bilinen.Count(CodecModel.SupportsTurboFirstPass));
     }
@@ -256,7 +256,7 @@ public sealed class TurboFirstPassTests
         var onAyar = FfmpegArguments.DefaultPreset(kodek);
         var plan = Plan(kodek, onAyar);
 
-        Assert.Equal(onAyar, OnAyar(FfmpegArguments.Build(Kaynak(), plan, "cikti.mp4", 1, "gunluk"), kodek));
+        Assert.Equal(CodecModel.Vendor(kodek) == EncoderVendor.MediaFoundation ? "<yok>" : onAyar, OnAyar(FfmpegArguments.Build(Kaynak(), plan, "cikti.mp4", 1, "gunluk"), kodek));
         Assert.Equal(onAyar, FfmpegArguments.FirstPassPreset(kodek, onAyar, turbo: false));
     }
 

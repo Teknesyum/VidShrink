@@ -17,6 +17,7 @@ public static class CalibrationProbe
         try
         {
             if (draft.Width < 16 || draft.Height < 16 || draft.Fps <= 0) return profile.WithoutCalibration();
+            if (!CodecModel.HasQualityScale(draft.Codec)) return profile.WithoutCalibration();
 
             var (min, max) = CodecModel.CrfRange(draft.Codec);
             var anchor = Math.Clamp(AnchorCrf(info, draft, profile), min, max);

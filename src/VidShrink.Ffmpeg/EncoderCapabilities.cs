@@ -251,17 +251,34 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
     /// </summary>
     internal enum ProbeOutcome { Accepted, Rejected, Unmeasured }
 
+    /// <summary>
+    /// Yoklamanin ffmpeg argumanlari. Media Foundation uretimde kosacagi bicimde yoklanir:
+    /// <c>-hw_encoding 1</c> olmadan ffmpeg yazilim MFT'sine duser ve h264_mf orada "calisir"
+    /// gorunur, <c>nv12</c> olmadan donanim MFT'si bicim uzlasmasinda duser. Ikisi de yoklamayi
+    /// uretimden ayirirdi.
+    /// </summary>
+    internal static string[] ProbeArguments(string codec)
+    {
+        var args = new List<string>
+        {
+            "-hide_banner", "-loglevel", "error",
+            "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1",
+            "-c:v", codec
+        };
+        if (CodecModel.Vendor(codec) == EncoderVendor.MediaFoundation)
+        {
+            args.AddRange(FfmpegArguments.MediaFoundationDeviceArgs);
+            args.AddRange(new[] { "-pix_fmt", CodecModel.OutputPixelFormat(codec, "yuv420p") });
+        }
+        args.AddRange(new[] { "-frames:v", "1", "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null" });
+        return args.ToArray();
+    }
+
     private static ProbeOutcome RunProbe(string codec)
     {
         try
         {
-            var args = new[]
-            {
-                "-hide_banner", "-loglevel", "error",
-                "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1",
-                "-c:v", codec, "-frames:v", "1",
-                "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null"
-            };
+            var args = ProbeArguments(codec);
             using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
             process.Start();
             var output = process.StandardOutput.ReadToEndAsync();

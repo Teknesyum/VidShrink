@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "a forrás dinamikus HDR10+ metaadatokat hordoz, amelyeket csak a(z) {1} tud továbbvinni, ezért {0} helyett {1} fut",
   "main.reason.hdr10plus-svtav1": "a HDR10+ nem jut át az SVT-AV1 ágon, ezért a kimenet csak a statikus HDR10 réteget tartja meg; az Automatikus a libx265-öt használná, amely átviszi",
   "main.reason.hdr10plus-cut": "a HDR10+ elveszett a vágásnál: a metaadatok képkockáról képkockára követik a forrást, a vágás vagy a képkockasebesség módosítása pedig megtöri ezt az illesztést, ezért a kimenet csak a statikus HDR10 réteget tartja meg",
+  "main.reason.no-quality-scale": "A(z) {0} ebben a motorban nem rendelkezik CRF-hez kötött minőségi skálával, ezért CRF-becslés helyett bitrátával tartja a méretet a saját egymenetes sebességszabályozásában",
   "main.reason.stream.audio-passthrough": "a hangsáv változatlanul másolódik: a konténer támogatja a kodekjét, és a cél 15%-án belül marad",
   "main.reason.stream.audio-downmixed": "a térhatású hangsáv újrakódoláskor sztereóra keveredik",
   "main.reason.stream.extra-audio-dropped": "csak egy hangsáv marad meg; kapcsolja be a 'Minden sáv megtartása' lehetőséget, hogy mind MKV-ban menjen tovább",

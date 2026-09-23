@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "원본에 HDR10+ 동적 메타데이터가 있고 이를 전달할 수 있는 것은 {1}뿐이므로 {0} 대신 {1}을 사용합니다",
   "main.reason.hdr10plus-svtav1": "SVT-AV1 경로에서는 HDR10+가 전달되지 않으므로 출력에는 정적 HDR10 계층만 남습니다. 자동이라면 HDR10+를 전달하는 libx265를 사용합니다",
   "main.reason.hdr10plus-cut": "잘라내기에서 HDR10+가 빠졌습니다. 메타데이터는 원본을 프레임 단위로 따르는데, 트리밍이나 프레임 속도 변경이 그 정렬을 깨뜨리므로 출력에는 정적 HDR10 계층만 남습니다",
+  "main.reason.no-quality-scale": "{0}은(는) 이 엔진에서 CRF에 연결된 품질 척도가 없으므로 CRF를 추측하지 않고 자체 1패스 비트레이트 제어로 크기를 유지합니다",
   "main.reason.stream.audio-passthrough": "오디오 트랙이 그대로 복사됩니다: 컨테이너가 코덱을 지원하고 목표의 15% 이내입니다",
   "main.reason.stream.audio-downmixed": "서라운드 오디오 트랙은 재인코딩할 때 스테레오로 다운믹스됩니다",
   "main.reason.stream.extra-audio-dropped": "오디오 트랙은 하나만 유지됩니다; 모두 MKV로 옮기려면 '모든 트랙 유지'를 켜세요",

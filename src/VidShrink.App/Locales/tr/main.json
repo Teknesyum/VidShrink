@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "kaynak HDR10+ dinamik meta verisi taşıyor ve onu yalnız {1} aktarabiliyor, bu yüzden {0} yerine {1} kullanılıyor",
   "main.reason.hdr10plus-svtav1": "HDR10+ SVT-AV1 kolunda taşınmaz, bu yüzden çıktıda yalnız statik HDR10 katmanı kalıyor; Otomatik, HDR10+'yı taşıyan libx265'i kullanırdı",
   "main.reason.hdr10plus-cut": "HDR10+ kesitte düştü: meta verisi kaynağı kare kare izliyor ve kırpma ya da kare hızı değişimi bu hizayı bozuyor, bu yüzden çıktıda yalnız statik HDR10 katmanı kalıyor",
+  "main.reason.no-quality-scale": "{0} bu motorda CRF'e bağlanmış bir kalite ölçeği taşımıyor; boyutu CRF tahmini yerine kendi tek geçişli hız denetiminde bit hızıyla tutuyor",
   "main.reason.stream.audio-passthrough": "ses izi olduğu gibi kopyalandı: kap bu kodeği taşıyor ve hedefin %15'ini aşmıyor",
   "main.reason.stream.audio-downmixed": "çok kanallı bir ses izi yeniden kodlanırken stereoya indirildi",
   "main.reason.stream.extra-audio-dropped": "yalnız bir ses izi tutuldu; hepsini MKV'de taşımak için 'İzleri koru'yu açın",

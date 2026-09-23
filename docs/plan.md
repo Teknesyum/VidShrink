@@ -1,21 +1,20 @@
-# Plan — Hedef Boyutun Birimi Ondalık MB (O2)
+# Plan — Media Foundation Kodlayıcıları (HB #15)
 
-Karar: `docs/netlestirme/025-mb-birimi.md`. 1 MB = 1 000 000 bayt; etiket "MB" kalır.
+Kapsam: `h264_mf`, `hevc_mf`, `av1_mf` nvenc/qsv/amf ailesinin yanına, yalnız Windows'ta ve
+yalnız elle seçilir. Ölçüler `docs/olcumler/hb15-media-foundation.md`.
 
-- **Core `Megabayt`**: tek yer — `Bayt = 1 000 000`, `Kbit = 8000`, `Oku(bayt)`, `Tavan(mb)`.
-- **Core `PlanCalculator`**: `KbitPerMib 8388,608` → `Megabayt.Kbit`; `ContainerOverhead` ayrı
-  model (mux payı) olarak kalır. `StreamMapping` geçiş bütçesi aynı katsayıya.
-- **Core `MediaInfo.FileSizeMb`**, `RecorderArguments.LimitBytes`, `RecorderBudget.From`: ondalık.
-- **Ffmpeg**: `EncodeRunner` her çıktı okuması ve `targetBytes`, `DiskSpaceGuard.RequiredBytes`,
-  `RecorderSession` çıktı okuması: ondalık. `CalibrationProbe` ffmpeg sonekini ayrıştırıyor, kalır.
-- **App/Cli**: disk alanı iletisi, kesit "kalan boyut" okuması ondalık. Paylaşım tavanı
-  (`Bicim.Boyut.Bayt`, bayt → MiB) ayrı alan, kalır.
-- **Yonga**: uguu 128 → 134 MB; `Chip128` → `Chip134`, `main.chip.128.*` → `main.chip.134.*`
-  42 dilde, ipucu "134 MB".
-- **Araçlar**: `tools/VidShrink.Bench`, `tools/VidShrink.Ab` aynı katsayıya.
-- **Belge**: `docs/olcumler/onayar-kaynaklari.md` MiB cümlesi ve uguu satırı.
-- **Test**: `OndalikMbTests` (olumsuz kontrol 1, 2, 4); 1024²/8388,608 pimleyen testler ve
-  `N * 1024 * 1024` kaynak kalıpları ondalığa taşınır (kaynağın `FileSizeMb`'si aynı kalır).
-  Mutasyon: katsayı 8388,608'e, `targetBytes` 1024²'ye — ikisi de kırmızı olmalı.
-- **Kapsam dışı**: kabuk menüsünün 1024/2048 hızlı hedefleri ("1 GB" etiketi) — kayıtlı menü
-  girdileri bu sayıları argüman olarak taşıyor; değiştirmek kullanıcı kararı.
+1. `CodecModel` — `EncoderVendor.MediaFoundation` (`_mf` soneki), `IsHardware` kapısına girer
+   (tek geçiş, taban, pay, tepe), `TakesPreset` yok, `HasQualityScale` yok, `QualityArgs`
+   açıkça patlar, bit hızı kolu `-rate_control pc_vbr`, piksel biçimi `nv12`,
+   `IsOfferedOn(codec, windows)` Windows dışında MF'yi hiç önermez.
+2. `FfmpegArguments` — ön ayar tablosunda tek basamak `default`; `SpeedArgs` MF'ye
+   `-hw_encoding 1` yazar (donanım MFT'si, yazılım MFT'sine düşmesin); `OfferedCodecs`.
+3. `PlanParser.AllowedCodecs`, `PlanCalculator.KnownLockableCodecs` — MF girer;
+   kilit Windows dışında reddedilir. `FastHardwareOrder`'a **girmez**.
+4. `PlanCalculator` — MF planı CRF kipine düşerse 2pass'e çevrilir (VP9 emsali),
+   `ReasonCode.MfQualityUnmeasuredBitrate`, anahtar 42 dilde.
+5. `EncoderCapabilities.RunProbe` — MF yoklaması `-pix_fmt nv12 -hw_encoding 1` ile.
+6. `CalibrationProbe.QualityArgs` — MF için `-crf` yerine patlamaz; örnekleme MF'de koşmaz.
+7. Arayüz — `CmbAdvCodecLock` `OfferedCodecs`'ten dolar; `LanguageCatalog.Verbatim`.
+8. Testler — `MediaFoundationTests.cs`: argüman, Windows dışı olumsuz kontrol, canlı kol.
+9. Belgeler — ölçüm belgesi, durum belgesi §1/§2/§3, tests AGENTS.md maddesi.

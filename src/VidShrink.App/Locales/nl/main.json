@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "de bron bevat dynamische HDR10+-metadata die alleen {1} kan doorgeven, daarom wordt {1} gebruikt in plaats van {0}",
   "main.reason.hdr10plus-svtav1": "HDR10+ wordt in de SVT-AV1-tak niet meegenomen, dus de uitvoer houdt alleen de statische HDR10-laag; Automatisch zou libx265 gebruiken, dat het wel meeneemt",
   "main.reason.hdr10plus-cut": "HDR10+ is bij het knippen weggevallen: de metadata volgen de bron beeld voor beeld, en inkorten of een andere beeldsnelheid verbreekt die uitlijning, dus de uitvoer houdt alleen de statische HDR10-laag",
+  "main.reason.no-quality-scale": "{0} heeft in deze engine geen kwaliteitsschaal die aan CRF is gekoppeld, dus houdt het de grootte vast met een bitrate in de eigen single-pass bitrateregeling in plaats van een geschatte CRF",
   "main.reason.stream.audio-passthrough": "het audiospoor wordt ongewijzigd gekopieerd: de container ondersteunt de codec en het blijft binnen 15% van het doel",
   "main.reason.stream.audio-downmixed": "een surround-audiospoor wordt bij het hercoderen naar stereo gemixt",
   "main.reason.stream.extra-audio-dropped": "er blijft maar één audiospoor over; zet 'Alle sporen behouden' aan om ze allemaal in MKV mee te nemen",

@@ -77,7 +77,8 @@ public enum ReasonCode
     Vp9CrfUnmeasuredTwoPass,
     Hdr10PlusRoutedToX265,
     Hdr10PlusNotCarriedOnSvtAv1,
-    Hdr10PlusDroppedInCut
+    Hdr10PlusDroppedInCut,
+    NoQualityScaleBitrate
 }
 
 public sealed record ReasonNote(

@@ -319,7 +319,7 @@ public partial class MainWindow
     /// </summary>
     internal static void WarmPsychovisualProbe(IEncoderAvailability capabilities)
     {
-        foreach (var codec in FfmpegArguments.KnownCodecs)
+        foreach (var codec in FfmpegArguments.OfferedCodecs(OperatingSystem.IsWindows()))
             FfmpegArguments.PsychovisualArgs(codec, capabilities);
     }
 
