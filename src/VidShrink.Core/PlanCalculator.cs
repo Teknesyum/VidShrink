@@ -1137,10 +1137,16 @@ public static class PlanCalculator
         ExternalSubtitles = options.ExternalSubtitles
     };
 
+    /// <summary>
+    /// Yeniden denemenin nişanı. Ölçülmüş verim varken nişan <see cref="BudgetFill.Aim"/>·T:
+    /// <see cref="BudgetFill.Floor"/> tabanının üstünde ve hedefin altında, böylece nişanını tutturan
+    /// deneme bütçe doldurmayı tetiklemez. Verim ölçülmemişken nişan bant merkezi, iki geçişin
+    /// yayılımı kadar geri çekilmiş ve bandın alt kenarına kelepçelenmiş.
+    /// </summary>
     public static double RetryAimMb(double targetMb, double? measuredEfficiency)
     {
         var band = FillBand.For(targetMb);
-        if (measuredEfficiency is not null) return band.CenterMb;
+        if (measuredEfficiency is not null) return BudgetFill.Aim * targetMb;
 
         var ceilingAim = targetMb / (1 + TwoPassUncertainty);
         return Math.Max(band.LowerMb, Math.Min(band.CenterMb, ceilingAim));
@@ -1160,7 +1166,7 @@ public static class PlanCalculator
         var requestedVideoMb = aimedVideoMb / (efficiency ?? 1.0);
         var videoBudgetK = Math.Max(0.0, requestedVideoMb * KbitPerMib * ContainerOverhead / Math.Max(durationSeconds, 0.1));
         var aimSource = efficiency is double e
-            ? $"aimed at the {aimMb:0.0} MB band center and divided by the {e:0.###} encoder yield measured on the previous attempt"
+            ? $"aimed at {aimMb:0.0} MB, {BudgetFill.Aim:0.###} of the target, and divided by the {e:0.###} encoder yield measured on the previous attempt"
             : $"aimed at {aimMb:0.0} MB, the band center held back by the +{TwoPassUncertainty * 100:0.#}% two-pass spread because no encoder yield was measured yet";
 
         corrected.Mode = "2pass";
