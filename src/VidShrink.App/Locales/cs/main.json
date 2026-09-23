@@ -301,6 +301,7 @@
   "main.run.done": "Hotovo za {0} pokus(ů). {1} MB → {2} MB (o {3} % menší).",
   "main.run.over-ceiling": "Po {1} pokusech se nepodařilo dostat pod cíl {0} MB (poslední výsledek byl {2} MB). Žádný soubor nebyl zapsán, protože soubor větší než cíl se nikdy nevrací. Zvyšte cíl a zkuste to znovu.",
   "main.run.ended": "Kódování nečekaně skončilo a žádný soubor nebyl zapsán.",
+  "main.run.hdr10plus-short": "HDR10+ se dostalo jen do {0} z {1} snímků zdroje; ostatní snímky nesou jen statické HDR10.",
   "main.run.cancelled": "Zrušeno.",
   "main.run.converted": "Hotovo. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Pokus",
   "main.stage.gif-palette": "Paleta GIF",
   "main.stage.gif-encode": "Kódování GIF",
+  "main.stage.hdr10plus-metadata": "Metadata HDR10+",
 
   "main.ai.title": "Nastavení AI",
   "main.ai.tip": "• Tento krok je volitelný.\n• Zkopírujte výzvu do libovolné chatovací AI, pak vložte a ověřte její odpověď v JSON.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "černé pruhy oříznuty: {0}x{1} (zdroj {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "zdroj nese dynamická HDR metadata (HDR10+ nebo Dolby Vision), která toto kódování nepřenese, výstup si tedy ponechá jen statickou vrstvu HDR10",
   "main.reason.vp9-crf-unmeasured": "Kvalitativní stupnice CRF pro libvpx-vp9 je změřena, ale není změřeno, jak se hodnota CRF promítá do velikosti souboru, takže velikost drží dvouprůchodové VBR místo odhadu CRF",
+  "main.reason.hdr10plus-routed-x265": "zdroj nese dynamická metadata HDR10+, která dokáže přenést jen {1}, proto se místo {0} použije {1}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ se ve větvi SVT-AV1 nepřenáší, takže výstup si ponechá jen statickou vrstvu HDR10; Automaticky by použilo libx265, které ho přenáší",
+  "main.reason.hdr10plus-cut": "HDR10+ se při střihu ztratilo: jeho metadata sledují zdroj snímek po snímku a oříznutí nebo změna snímkové frekvence toto zarovnání naruší, takže výstup si ponechá jen statickou vrstvu HDR10",
   "main.reason.stream.audio-passthrough": "zvuková stopa se kopíruje beze změny: kontejner podporuje její kodek a vejde se do 15 % cíle",
   "main.reason.stream.audio-downmixed": "prostorová zvuková stopa se při překódování smíchá do sterea",
   "main.reason.stream.extra-audio-dropped": "ponechá se jen jedna zvuková stopa; zapněte 'Zachovat všechny stopy', aby se všechny přenesly v MKV",

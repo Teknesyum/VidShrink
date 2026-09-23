@@ -301,6 +301,7 @@
   "main.run.done": "Concluído em {0} tentativa(s). {1} MB → {2} MB ({3}% menor).",
   "main.run.over-ceiling": "Não foi possível ficar abaixo do alvo de {0} MB após {1} tentativa(s) (o último resultado foi {2} MB). Nenhum arquivo foi gravado, porque um arquivo maior que o alvo nunca é entregue. Aumente o alvo e tente de novo.",
   "main.run.ended": "A codificação terminou de forma inesperada e nenhum arquivo foi gravado.",
+  "main.run.hdr10plus-short": "O HDR10+ chegou a apenas {0} dos {1} quadros da origem; os demais quadros levam só HDR10 estático.",
   "main.run.cancelled": "Cancelado.",
   "main.run.converted": "Concluído. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Tentativa",
   "main.stage.gif-palette": "Paleta GIF",
   "main.stage.gif-encode": "Codificação GIF",
+  "main.stage.hdr10plus-metadata": "Metadados HDR10+",
 
   "main.ai.title": "Configurações de IA",
   "main.ai.tip": "• Esta etapa é opcional.\n• Copie um prompt para qualquer IA de chat, depois cole e valide a resposta JSON.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "barras pretas cortadas: {0}x{1} (origem {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "a fonte traz metadados HDR dinâmicos (HDR10+ ou Dolby Vision) que esta codificação não transmite, então a saída mantém apenas a camada HDR10 estática",
   "main.reason.vp9-crf-unmeasured": "A escala de qualidade CRF do libvpx-vp9 está medida, mas não como um valor de CRF se traduz no tamanho do arquivo, então o tamanho é mantido por VBR de duas passagens em vez de um CRF estimado",
+  "main.reason.hdr10plus-routed-x265": "a origem traz metadados dinâmicos HDR10+ que só o {1} consegue transmitir, por isso é usado {1} em vez de {0}",
+  "main.reason.hdr10plus-svtav1": "o HDR10+ não é transmitido pelo caminho SVT-AV1, por isso a saída mantém só a camada HDR10 estática; o Automático usaria libx265, que o transmite",
+  "main.reason.hdr10plus-cut": "o HDR10+ caiu no corte: os metadados acompanham a origem quadro a quadro, e um corte ou uma mudança de taxa de quadros quebra esse alinhamento, por isso a saída mantém só a camada HDR10 estática",
   "main.reason.stream.audio-passthrough": "a faixa de áudio é copiada como está: o contêiner suporta o codec e ela fica dentro de 15% do alvo",
   "main.reason.stream.audio-downmixed": "uma faixa de áudio surround é mixada para estéreo ao ser recodificada",
   "main.reason.stream.extra-audio-dropped": "apenas uma faixa de áudio é mantida; ative 'Manter todas as faixas' para levar todas em MKV",

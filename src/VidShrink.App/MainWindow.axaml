@@ -929,7 +929,14 @@
                       </StackPanel>
                     </StackPanel>
                     <TextBlock x:Name="TxtEstimateNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    <TextBlock x:Name="TxtResult" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}">
+                      <Path x:Name="ResultWarningGlyph"
+                            IsVisible="False"
+                            Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
+                            Stretch="Uniform" VerticalAlignment="Top"
+                            Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
+                      <TextBlock x:Name="TxtResult" Grid.ColumnSpan="2" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                    </Grid>
                     <Border x:Name="RetryAskPanel"
                             IsVisible="False"
                             Background="{StaticResource NeonPinkFill}"

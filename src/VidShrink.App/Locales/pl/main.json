@@ -301,6 +301,7 @@
   "main.run.done": "Gotowe po {0} próbie/próbach. {1} MB → {2} MB ({3}% mniej).",
   "main.run.over-ceiling": "Nie udało się zejść poniżej celu {0} MB po {1} próbie/próbach (ostatni wynik: {2} MB). Nie zapisano pliku, bo plik większy niż cel nigdy nie jest oddawany. Podnieś cel i spróbuj ponownie.",
   "main.run.ended": "Kodowanie zakończyło się nieoczekiwanie i nie zapisano pliku.",
+  "main.run.hdr10plus-short": "HDR10+ dotarło tylko do {0} z {1} klatek źródła; pozostałe klatki niosą tylko statyczne HDR10.",
   "main.run.cancelled": "Anulowano.",
   "main.run.converted": "Gotowe. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Próba",
   "main.stage.gif-palette": "Paleta GIF",
   "main.stage.gif-encode": "Kodowanie GIF",
+  "main.stage.hdr10plus-metadata": "Metadane HDR10+",
 
   "main.ai.title": "Ustawienia AI",
   "main.ai.tip": "• Ten krok jest opcjonalny.\n• Skopiuj prompt do dowolnego czatu AI, potem wklej i zweryfikuj jego odpowiedź JSON.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "czarne pasy przycięte: {0}x{1} (źródło {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "źródło zawiera dynamiczne metadane HDR (HDR10+ lub Dolby Vision), których to kodowanie nie przenosi, więc wynik zachowuje tylko statyczną warstwę HDR10",
   "main.reason.vp9-crf-unmeasured": "Skala jakości CRF dla libvpx-vp9 jest zmierzona, ale nie jest zmierzone, jak wartość CRF przekłada się na rozmiar pliku, więc rozmiar trzyma dwuprzebiegowy VBR zamiast zgadywanego CRF",
+  "main.reason.hdr10plus-routed-x265": "źródło zawiera dynamiczne metadane HDR10+, które przenosi tylko {1}, dlatego zamiast {0} używany jest {1}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ nie jest przenoszone ścieżką SVT-AV1, więc wynik zachowuje tylko statyczną warstwę HDR10; tryb Automatyczny użyłby libx265, który je przenosi",
+  "main.reason.hdr10plus-cut": "HDR10+ przepadło przy cięciu: metadane podążają za źródłem klatka po klatce, a przycięcie lub zmiana liczby klatek na sekundę psuje to dopasowanie, więc wynik zachowuje tylko statyczną warstwę HDR10",
   "main.reason.stream.audio-passthrough": "ścieżka dźwiękowa jest kopiowana bez zmian: kontener obsługuje jej kodek i mieści się w 15% celu",
   "main.reason.stream.audio-downmixed": "ścieżka dźwięku przestrzennego jest miksowana do stereo podczas ponownego kodowania",
   "main.reason.stream.extra-audio-dropped": "zachowywana jest tylko jedna ścieżka dźwiękowa; włącz 'Zachowaj wszystkie ścieżki', aby przenieść wszystkie w MKV",

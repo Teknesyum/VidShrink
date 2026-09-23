@@ -301,6 +301,7 @@
   "main.run.done": "经 {0} 次尝试完成。{1} MB → {2} MB（缩小 {3}%）。",
   "main.run.over-ceiling": "经 {1} 次尝试后仍无法低于 {0} MB 目标（最后结果为 {2} MB）。未写入任何文件，因为大于目标的文件绝不会交付。请提高目标后重试。",
   "main.run.ended": "编码意外结束，未写入任何文件。",
+  "main.run.hdr10plus-short": "HDR10+ 只到达了源 {1} 帧中的 {0} 帧；其余帧只带有静态 HDR10。",
   "main.run.cancelled": "已取消。",
   "main.run.converted": "完成。{0} MB → {1} MB。",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "尝试",
   "main.stage.gif-palette": "GIF 调色板",
   "main.stage.gif-encode": "GIF 编码",
+  "main.stage.hdr10plus-metadata": "HDR10+ 元数据",
 
   "main.ai.title": "AI 设置",
   "main.ai.tip": "• 此步骤可选。\n• 将提示词复制到任意聊天 AI，然后粘贴并验证其 JSON 回答。",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "已裁掉黑边：{0}x{1}（源 {2}x{3}）",
   "main.reason.hdr-dynamic-dropped": "源带有动态 HDR 元数据（HDR10+ 或 Dolby Vision），本次编码无法传递，因此输出只保留静态 HDR10 层",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9 的 CRF 质量刻度已实测，但 CRF 值对文件大小的影响尚未实测，因此用两遍 VBR 控制大小，而不是猜测 CRF",
+  "main.reason.hdr10plus-routed-x265": "源带有 HDR10+ 动态元数据，只有 {1} 能传递它，因此改用 {1} 而不是 {0}",
+  "main.reason.hdr10plus-svtav1": "SVT-AV1 路径不传递 HDR10+，因此输出只保留静态 HDR10 层；自动模式会使用能传递它的 libx265",
+  "main.reason.hdr10plus-cut": "HDR10+ 在剪切中丢失：其元数据逐帧对应源，裁剪或帧率变化会破坏这种对应，因此输出只保留静态 HDR10 层",
   "main.reason.stream.audio-passthrough": "音频轨道按原样复制：容器支持其编解码器，且不超过目标的 15%",
   "main.reason.stream.audio-downmixed": "环绕声音频轨道在重新编码时混缩为立体声",
   "main.reason.stream.extra-audio-dropped": "只保留一条音频轨道；打开“保留所有轨道”可在 MKV 中保留全部",

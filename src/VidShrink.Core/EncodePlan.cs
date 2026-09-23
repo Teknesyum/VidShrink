@@ -74,7 +74,10 @@ public enum ReasonCode
     ManualOverrideDroppedOnPassThrough,
     DarkContentHevc,
     HdrDynamicMetadataDropped,
-    Vp9CrfUnmeasuredTwoPass
+    Vp9CrfUnmeasuredTwoPass,
+    Hdr10PlusRoutedToX265,
+    Hdr10PlusNotCarriedOnSvtAv1,
+    Hdr10PlusDroppedInCut
 }
 
 public sealed record ReasonNote(
@@ -119,6 +122,18 @@ public sealed class EncodePlan
 
     /// <summary>Kaynagin DV 8.1 RPU'su ciktiya tasinacak; bkz. <see cref="HdrResolution.DolbyVisionCarried"/>.</summary>
     [JsonIgnore] public bool DolbyVisionCarried { get; set; }
+
+    /// <summary>
+    /// Kaynagin HDR10+ verisi x265'in <c>dhdr10-info</c> JSON'u ile tasinacak; kodlamadan once
+    /// cozme gecisi kosar. Bkz. <see cref="HdrResolution.Hdr10PlusBridge"/>.
+    /// </summary>
+    [JsonIgnore] public bool Hdr10PlusBridge { get; set; }
+
+    /// <summary>
+    /// Cozme gecisinin yazdigi <c>dhdr10-info</c> JSON'unun yolu; yalniz kosucu kurar ve iki
+    /// gecise de ayni yol verilir. Plan hesabinda hep <c>null</c>.
+    /// </summary>
+    [JsonIgnore] public string? Hdr10PlusMetadataPath { get; set; }
     [JsonIgnore] public VideoFilterOptions Filters { get; set; } = VideoFilterOptions.Default;
     [JsonIgnore] public CropRect? SuggestedCrop { get; set; }
     [JsonPropertyName("extraArgs")] public List<string> ExtraArgs { get; set; } = new();

@@ -301,6 +301,7 @@
   "main.run.done": "Valmis {0} yrityksellä. {1} MB → {2} MB ({3} % pienempi).",
   "main.run.over-ceiling": "Ei päästy alle {0} MB:n kohteen {1} yrityksellä (viimeinen tulos oli {2} MB). Tiedostoa ei kirjoitettu, koska kohdetta suurempaa tiedostoa ei koskaan palauteta. Nosta kohdetta ja yritä uudelleen.",
   "main.run.ended": "Koodaus päättyi odottamatta, eikä tiedostoa kirjoitettu.",
+  "main.run.hdr10plus-short": "HDR10+ ulottui vain {0} kuvaan lähteen {1} kuvasta; muissa kuvissa on vain staattinen HDR10.",
   "main.run.cancelled": "Peruutettu.",
   "main.run.converted": "Valmis. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Yritys",
   "main.stage.gif-palette": "GIF-paletti",
   "main.stage.gif-encode": "GIF-koodaus",
+  "main.stage.hdr10plus-metadata": "HDR10+-metatiedot",
 
   "main.ai.title": "Tekoälyasetukset",
   "main.ai.tip": "• Tämä vaihe on valinnainen.\n• Kopioi kehote mihin tahansa keskustelutekoälyyn, liitä sitten sen JSON-vastaus ja tarkista se.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "mustat palkit rajattu: {0}x{1} (lähde {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "lähteessä on dynaamista HDR-metadataa (HDR10+ tai Dolby Vision), jota tämä koodaus ei välitä, joten tulos säilyttää vain staattisen HDR10-kerroksen",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9:n CRF-laatuasteikko on mitattu, mutta ei se, miten CRF-arvo vaikuttaa tiedostokokoon, joten koko pidetään kaksivaiheisella VBR:llä CRF-arvauksen sijaan",
+  "main.reason.hdr10plus-routed-x265": "lähde sisältää dynaamista HDR10+-metatietoa, jonka vain {1} osaa välittää, joten {0}:n sijaan käytetään {1}:tä",
+  "main.reason.hdr10plus-svtav1": "HDR10+ ei kulje SVT-AV1-reitillä, joten tuloste säilyttää vain staattisen HDR10-kerroksen; Automaattinen käyttäisi libx265:tä, joka välittää sen",
+  "main.reason.hdr10plus-cut": "HDR10+ putosi pois leikkauksessa: metatiedot seuraavat lähdettä kuva kuvalta, ja rajaus tai kuvataajuuden muutos rikkoo tämän kohdistuksen, joten tuloste säilyttää vain staattisen HDR10-kerroksen",
   "main.reason.stream.audio-passthrough": "ääniraita kopioidaan sellaisenaan: säiliö tukee sen koodekkia ja se pysyy 15 %:n sisällä tavoitteesta",
   "main.reason.stream.audio-downmixed": "surround-ääniraita miksataan stereoksi uudelleenkoodauksessa",
   "main.reason.stream.extra-audio-dropped": "vain yksi ääniraita säilytetään; ota 'Säilytä kaikki raidat' käyttöön, jotta kaikki kulkevat MKV:ssä",

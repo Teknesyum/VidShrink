@@ -301,6 +301,7 @@
   "main.run.done": "Imekamilika kwa jaribio {0}. MB {1} → MB {2} ({3}% ndogo).",
   "main.run.over-ceiling": "Haikuweza kufika chini ya lengo la MB {0} baada ya jaribio {1} (matokeo ya mwisho yalikuwa MB {2}). Hakuna faili iliyoandikwa, kwa sababu faili kubwa kuliko lengo hairudishwi kamwe. Ongeza lengo na ujaribu tena.",
   "main.run.ended": "Usimbaji ulimalizika ghafla na hakuna faili iliyoandikwa.",
+  "main.run.hdr10plus-short": "HDR10+ imefika kwenye fremu {0} tu kati ya fremu {1} za chanzo; fremu nyingine zina HDR10 tuli pekee.",
   "main.run.cancelled": "Imeghairiwa.",
   "main.run.converted": "Imekamilika. MB {0} → MB {1}.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Jaribio",
   "main.stage.gif-palette": "Paleti ya GIF",
   "main.stage.gif-encode": "Usimbaji wa GIF",
+  "main.stage.hdr10plus-metadata": "Metadata za HDR10+",
 
   "main.ai.title": "Mipangilio ya AI",
   "main.ai.tip": "• Hatua hii ni ya hiari.\n• Nakili kidokezo kwenye AI yoyote ya gumzo, kisha bandika na uthibitishe jibu lake la JSON.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "mikanda myeusi imepunguzwa: {0}x{1} (chanzo {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "chanzo kina metadata ya HDR inayobadilika (HDR10+ au Dolby Vision) ambayo usimbaji huu hauipitishi, kwa hiyo matokeo yanabaki na safu tuli ya HDR10 pekee",
   "main.reason.vp9-crf-unmeasured": "Kipimo cha ubora wa CRF cha libvpx-vp9 kimepimwa, lakini jinsi thamani ya CRF inavyoathiri ukubwa wa faili haijapimwa, kwa hivyo ukubwa hushikiliwa na VBR ya njia mbili badala ya kukisia CRF",
+  "main.reason.hdr10plus-routed-x265": "chanzo kina metadata za HDR10+ zinazobadilika ambazo {1} pekee inaweza kupitisha, kwa hiyo {1} inatumika badala ya {0}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ haipitishwi kwenye njia ya SVT-AV1, kwa hiyo matokeo yanabaki na safu tuli ya HDR10 pekee; Otomatiki ingetumia libx265, inayoipitisha",
+  "main.reason.hdr10plus-cut": "HDR10+ imepotea kwenye ukataji: metadata zake hufuata chanzo fremu kwa fremu, na kupunguza au kubadilisha kasi ya fremu huvunja upatanisho huo, kwa hiyo matokeo yanabaki na safu tuli ya HDR10 pekee",
   "main.reason.stream.audio-passthrough": "wimbo wa sauti unanakiliwa kama ulivyo: chombo kinakubali kodeki yake na unabaki ndani ya 15% ya lengo",
   "main.reason.stream.audio-downmixed": "wimbo wa sauti ya mzunguko unachanganywa kuwa stereo unaposimbwa upya",
   "main.reason.stream.extra-audio-dropped": "wimbo mmoja tu wa sauti unahifadhiwa; washa 'Hifadhi nyimbo zote' ili kubeba zote katika MKV",

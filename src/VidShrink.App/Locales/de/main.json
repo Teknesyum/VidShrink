@@ -301,6 +301,7 @@
   "main.run.done": "Fertig in {0} Versuch(en). {1} MB → {2} MB ({3}% kleiner).",
   "main.run.over-ceiling": "Das Ziel von {0} MB wurde nach {1} Versuch(en) nicht unterschritten (letztes Ergebnis {2} MB). Es wurde keine Datei geschrieben, weil eine Datei über dem Ziel nie ausgegeben wird. Erhöhen Sie das Ziel und versuchen Sie es erneut.",
   "main.run.ended": "Die Kodierung endete unerwartet, es wurde keine Datei geschrieben.",
+  "main.run.hdr10plus-short": "HDR10+ hat nur {0} der {1} Bilder der Quelle erreicht; die übrigen Bilder tragen nur statisches HDR10.",
   "main.run.cancelled": "Abgebrochen.",
   "main.run.converted": "Fertig. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Versuch",
   "main.stage.gif-palette": "GIF-Palette",
   "main.stage.gif-encode": "GIF-Kodierung",
+  "main.stage.hdr10plus-metadata": "HDR10+-Metadaten",
 
   "main.ai.title": "KI-Einstellungen",
   "main.ai.tip": "• Dieser Schritt ist optional.\n• Kopieren Sie einen Prompt in eine beliebige Chat-KI, fügen Sie dann ihre JSON-Antwort ein und prüfen Sie sie.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "schwarze Balken zugeschnitten: {0}x{1} (Quelle {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "die Quelle trägt dynamische HDR-Metadaten (HDR10+ oder Dolby Vision), die diese Kodierung nicht weitergibt, daher behält die Ausgabe nur die statische HDR10-Ebene",
   "main.reason.vp9-crf-unmeasured": "Die CRF-Qualitätsskala von libvpx-vp9 ist gemessen, aber nicht, wie sich ein CRF-Wert auf die Dateigröße auswirkt, daher hält Zwei-Pass-VBR die Größe statt einer geschätzten CRF",
+  "main.reason.hdr10plus-routed-x265": "die Quelle trägt dynamische HDR10+-Metadaten, die nur {1} weitergeben kann, daher wird {1} statt {0} verwendet",
+  "main.reason.hdr10plus-svtav1": "HDR10+ wird im SVT-AV1-Zweig nicht übertragen, daher behält die Ausgabe nur die statische HDR10-Ebene; Automatisch würde libx265 verwenden, das es überträgt",
+  "main.reason.hdr10plus-cut": "HDR10+ ist beim Schnitt weggefallen: die Metadaten folgen der Quelle Bild für Bild, und ein Zuschnitt oder eine geänderte Bildrate bricht diese Zuordnung, daher behält die Ausgabe nur die statische HDR10-Ebene",
   "main.reason.stream.audio-passthrough": "die Tonspur wird unverändert kopiert: der Container unterstützt ihren Codec und sie bleibt unter 15 % des Ziels",
   "main.reason.stream.audio-downmixed": "eine Surround-Tonspur wird beim Neukodieren auf Stereo heruntergemischt",
   "main.reason.stream.extra-audio-dropped": "nur eine Tonspur wird behalten; aktivieren Sie 'Alle Spuren behalten', um alle in MKV zu übernehmen",

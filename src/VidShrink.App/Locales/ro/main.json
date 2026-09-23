@@ -301,6 +301,7 @@
   "main.run.done": "Gata în {0} încercare(ări). {1} MB → {2} MB ({3}% mai mic).",
   "main.run.over-ceiling": "Nu s-a putut coborî sub ținta de {0} MB după {1} încercare(ări) (ultimul rezultat a fost {2} MB). Nu s-a scris niciun fișier, pentru că un fișier mai mare decât ținta nu este niciodată livrat. Mărește ținta și încearcă din nou.",
   "main.run.ended": "Codarea s-a încheiat neașteptat și nu s-a scris niciun fișier.",
+  "main.run.hdr10plus-short": "HDR10+ a ajuns doar la {0} din cele {1} cadre ale sursei; celelalte cadre poartă doar HDR10 static.",
   "main.run.cancelled": "Anulat.",
   "main.run.converted": "Gata. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Încercare",
   "main.stage.gif-palette": "Paletă GIF",
   "main.stage.gif-encode": "Codare GIF",
+  "main.stage.hdr10plus-metadata": "Metadate HDR10+",
 
   "main.ai.title": "Setări AI",
   "main.ai.tip": "• Acest pas este opțional.\n• Copiază un prompt în orice AI de chat, apoi lipește și validează răspunsul JSON.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "benzile negre au fost decupate: {0}x{1} (sursă {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "sursa conține metadate HDR dinamice (HDR10+ sau Dolby Vision) pe care această codare nu le transmite, deci ieșirea păstrează doar stratul HDR10 static",
   "main.reason.vp9-crf-unmeasured": "Scara de calitate CRF a libvpx-vp9 este măsurată, dar nu și modul în care o valoare CRF se traduce în dimensiunea fișierului, așa că dimensiunea e ținută de VBR în două treceri în loc de un CRF ghicit",
+  "main.reason.hdr10plus-routed-x265": "sursa conține metadate dinamice HDR10+ pe care doar {1} le poate transmite, de aceea se folosește {1} în loc de {0}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ nu este transmis pe calea SVT-AV1, așa că ieșirea păstrează doar stratul HDR10 static; Automat ar folosi libx265, care îl transmite",
+  "main.reason.hdr10plus-cut": "HDR10+ s-a pierdut la tăiere: metadatele urmează sursa cadru cu cadru, iar o tăiere sau o schimbare a ratei de cadre strică această aliniere, așa că ieșirea păstrează doar stratul HDR10 static",
   "main.reason.stream.audio-passthrough": "pista audio este copiată ca atare: containerul acceptă codecul ei și rămâne în limita a 15% din țintă",
   "main.reason.stream.audio-downmixed": "o pistă audio surround este mixată în stereo la recodare",
   "main.reason.stream.extra-audio-dropped": "se păstrează o singură pistă audio; activați 'Păstrează toate pistele' pentru a le duce pe toate în MKV",

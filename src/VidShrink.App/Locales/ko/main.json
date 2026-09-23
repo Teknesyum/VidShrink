@@ -301,6 +301,7 @@
   "main.run.done": "{0}회 시도로 완료. {1} MB → {2} MB ({3}% 감소).",
   "main.run.over-ceiling": "{1}회 시도 후에도 {0} MB 목표 아래로 내려가지 못했습니다(마지막 결과 {2} MB). 목표보다 큰 파일은 절대 넘기지 않으므로 파일을 쓰지 않았습니다. 목표를 올리고 다시 시도하세요.",
   "main.run.ended": "인코딩이 예기치 않게 끝나 파일을 쓰지 않았습니다.",
+  "main.run.hdr10plus-short": "HDR10+가 원본 {1}개 프레임 중 {0}개에만 도달했습니다. 나머지 프레임에는 정적 HDR10만 있습니다.",
   "main.run.cancelled": "취소됨.",
   "main.run.converted": "완료. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "시도",
   "main.stage.gif-palette": "GIF 팔레트",
   "main.stage.gif-encode": "GIF 인코딩",
+  "main.stage.hdr10plus-metadata": "HDR10+ 메타데이터",
 
   "main.ai.title": "AI 설정",
   "main.ai.tip": "• 이 단계는 선택입니다.\n• 프롬프트를 아무 채팅 AI에 복사한 뒤 JSON 답변을 붙여 넣고 검증하세요.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "검은 여백을 잘랐습니다: {0}x{1} (원본 {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "원본에 동적 HDR 메타데이터(HDR10+ 또는 Dolby Vision)가 있지만 이 인코딩은 이를 전달하지 못해 출력에는 정적 HDR10 계층만 남음",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9의 CRF 품질 척도는 측정되었지만, CRF 값이 파일 크기에 어떻게 반영되는지는 측정되지 않아, CRF를 추측하는 대신 2패스 VBR로 크기를 맞춥니다",
+  "main.reason.hdr10plus-routed-x265": "원본에 HDR10+ 동적 메타데이터가 있고 이를 전달할 수 있는 것은 {1}뿐이므로 {0} 대신 {1}을 사용합니다",
+  "main.reason.hdr10plus-svtav1": "SVT-AV1 경로에서는 HDR10+가 전달되지 않으므로 출력에는 정적 HDR10 계층만 남습니다. 자동이라면 HDR10+를 전달하는 libx265를 사용합니다",
+  "main.reason.hdr10plus-cut": "잘라내기에서 HDR10+가 빠졌습니다. 메타데이터는 원본을 프레임 단위로 따르는데, 트리밍이나 프레임 속도 변경이 그 정렬을 깨뜨리므로 출력에는 정적 HDR10 계층만 남습니다",
   "main.reason.stream.audio-passthrough": "오디오 트랙이 그대로 복사됩니다: 컨테이너가 코덱을 지원하고 목표의 15% 이내입니다",
   "main.reason.stream.audio-downmixed": "서라운드 오디오 트랙은 재인코딩할 때 스테레오로 다운믹스됩니다",
   "main.reason.stream.extra-audio-dropped": "오디오 트랙은 하나만 유지됩니다; 모두 MKV로 옮기려면 '모든 트랙 유지'를 켜세요",

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -4222,6 +4222,7 @@ public partial class MainWindow : Window
         {
             SetRunning(true);
             TxtResult.Text = "";
+            ShowResultWarning(false);
             BtnReveal.IsVisible = false;
             ResetShare(false);
             HideRetryAsk();
@@ -4243,6 +4244,11 @@ public partial class MainWindow : Window
                     TxtResult.Text += " " + Say("main.run.trimmed", Num(trim.RemovedSeconds, "0.#"), Clock(trim.DurationSeconds), Clock(trim.KeptSeconds));
                 TxtResult.Text += SaturatedSuffix(result, targetMb);
                 TxtResult.Text += WhatsAppDocumentHint(targetMb);
+                if (Hdr10PlusMissed(result) is { } hdr10Plus)
+                {
+                    TxtResult.Text += " " + Say("main.run.hdr10plus-short", hdr10Plus.OutputFrames, hdr10Plus.SourceFrames);
+                    ShowResultWarning(true);
+                }
             }
             else if (result.CeilingExceeded)
             {
@@ -4656,6 +4662,27 @@ public partial class MainWindow : Window
     /// Sözcükler motorun kendi belirteçleri: ekrana çıkarken karşılıklarıyla değiştirilir,
     /// karşılık sözlükten gelir.
     /// </summary>
+    /// <summary>
+    /// HDR10+ koprusu kostu ve cikistaki HDR10+ kare sayisi kaynaginkini tutmadi: is bitti ama
+    /// eksik, sonuc satiri uyari olur (<c>docs/handbrake/fable-karar-hdr10plus-2026-09-23.md</c> madde 4).
+    /// </summary>
+    internal static Hdr10PlusCount? Hdr10PlusMissed(EncodeResult result)
+        => result.Success && result.Hdr10Plus is { Carried: false } count ? count : null;
+
+    /// <summary>
+    /// Sonuc satirini uyari ya da govde olarak gosterir. Uyari renkle degil simge ve agirlikla
+    /// ayrilir (<c>docs/netlestirme/018-uyari-rengi-27-palette-yok.md</c>); simgesiz satirda
+    /// metin iki sutunu da kaplar.
+    /// </summary>
+    private void ShowResultWarning(bool warning)
+    {
+        if (Application.Current?.TryFindResource(warning ? "StatusWarning" : "Body", out var found) == true && found is ControlTheme theme)
+            TxtResult.Theme = theme;
+        ResultWarningGlyph.IsVisible = warning;
+        Grid.SetColumn(TxtResult, warning ? 1 : 0);
+        Grid.SetColumnSpan(TxtResult, warning ? 1 : 2);
+    }
+
     private static readonly (string Token, string Key)[] StageWords =
     {
         ("GIF palette", "main.stage.gif-palette"),
@@ -4663,7 +4690,8 @@ public partial class MainWindow : Window
         ("encoding", "main.stage.encoding"),
         ("converting", "main.stage.converting"),
         ("pass", "main.stage.pass"),
-        ("attempt", "main.stage.attempt")
+        ("attempt", "main.stage.attempt"),
+        (EncodeRunner.Hdr10PlusStage, "main.stage.hdr10plus-metadata")
     };
 
     private static string LocalizeStage(string stage)

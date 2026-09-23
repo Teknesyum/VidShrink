@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Concurrent;
 using VidShrink.Core;
@@ -15,10 +15,19 @@ public sealed record EncodeAttempt(int Number, string Branch, double AimMb, doub
 /// ayarlarin tamamini tasimiyorsa cagiran bunu buradan ogrenir. Dolu olmasi
 /// <see cref="Success"/> degerini dusurmez.
 /// </summary>
-public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null, IReadOnlyList<string>? DroppedOptions = null, bool OverTarget = false, TrimPlan? Trim = null, bool Saturated = false)
+public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null, IReadOnlyList<string>? DroppedOptions = null, bool OverTarget = false, TrimPlan? Trim = null, bool Saturated = false, Hdr10PlusCount? Hdr10Plus = null)
 {
     /// <summary>Teslim edilen kodlamada motorun verdigi ayarlardan en az biri dusurulmus.</summary>
     public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
+}
+
+/// <summary>
+/// HDR10+ koprusunun kare sayimi: kaynakta ve teslim edilen cikista HDR10+ tasiyan kare.
+/// Esit degilse is uyariyla biter (<c>docs/handbrake/fable-karar-hdr10plus-2026-09-23.md</c> madde 4).
+/// </summary>
+public sealed record Hdr10PlusCount(int SourceFrames, int OutputFrames)
+{
+    public bool Carried => SourceFrames > 0 && SourceFrames == OutputFrames;
 }
 public sealed record ConversionResult(string OutputPath, double OutputMb);
 
@@ -98,6 +107,9 @@ public sealed class EncodeRunner
     private const double ToleranceOver = 1.0;
     private const int MaxAttempts = 3;
 
+    /// <summary>Cozme gecisinin ilerleme satirindaki asama adi; arayuz onu kendi dilinde yazar.</summary>
+    public const string Hdr10PlusStage = "HDR10+ metadata";
+
     public async Task<EncodeResult> RunAsync(
         MediaInfo info,
         EncodePlan plan,
@@ -109,6 +121,54 @@ public sealed class EncodeRunner
         ComplexityProfile? profile = null,
         RetryDecisionAsync? askBeforeRetry = null,
         SceneMap? scenes = null)
+    {
+        var bridge = new Hdr10PlusSource();
+        var result = await RunEncodeAsync(info, plan, outputPath, targetMb, progress, ct, fillPolicy, profile, askBeforeRetry, scenes, bridge);
+        if (bridge.Frames is not int sourceFrames || !result.Success || !File.Exists(result.OutputPath)) return result;
+        var outputFrames = await FfprobeClient.CountHdr10PlusAsync(result.OutputPath, ct);
+        return result with { Hdr10Plus = new Hdr10PlusCount(sourceFrames, outputFrames) };
+    }
+
+    /// <summary>Cozme gecisinin kaynakta saydigi HDR10+ kare; gecis kosmadiysa <c>null</c>.</summary>
+    private sealed class Hdr10PlusSource
+    {
+        internal int? Frames;
+    }
+
+    /// <summary>
+    /// Kaynagin HDR10+ verisini cozup x265 JSON'unu isin gecici onekine yazar; dosya
+    /// <see cref="CleanupPassLogs"/> ile gecis gunlukleriyle birlikte silinir. Donusum
+    /// reddedilirse plan yolsuz kalir ve kodlama HDR10+ tasimadan surer; sayim uyariyi verir.
+    /// </summary>
+    private static async Task<EncodePlan> ExtractHdr10PlusAsync(MediaInfo info, EncodePlan plan, string passLogPrefix,
+        IProgress<EncodeProgress>? progress, Hdr10PlusSource bridge, CancellationToken ct)
+    {
+        var clock = Stopwatch.StartNew();
+        var expected = Math.Max(1.0, info.DurationSeconds * info.Fps);
+        progress?.Report(new EncodeProgress(0, clock.Elapsed, null, 0, Hdr10PlusStage));
+        var extraction = await FfprobeClient.ReadHdr10PlusAsync(info.FilePath,
+            frames => progress?.Report(new EncodeProgress(Math.Min(1.0, frames / expected), clock.Elapsed, null, 0, Hdr10PlusStage)), ct);
+        bridge.Frames = extraction?.Hdr10PlusFrames ?? 0;
+        if (extraction?.Json is not { } json) return plan;
+        var path = passLogPrefix + "_hdr10plus.json";
+        await File.WriteAllTextAsync(path, json, ct);
+        var bridged = plan.Clone();
+        bridged.Hdr10PlusMetadataPath = path;
+        return bridged;
+    }
+
+    private async Task<EncodeResult> RunEncodeAsync(
+        MediaInfo info,
+        EncodePlan plan,
+        string outputPath,
+        double targetMb,
+        IProgress<EncodeProgress>? progress,
+        CancellationToken ct,
+        FillPolicy fillPolicy,
+        ComplexityProfile? profile,
+        RetryDecisionAsync? askBeforeRetry,
+        SceneMap? scenes,
+        Hdr10PlusSource bridge)
     {
         if (plan.ModeEnum == EncodeMode.PassThrough)
             return await PassThroughAsync(info, plan, outputPath, progress, ct);
@@ -248,6 +308,9 @@ public sealed class EncodeRunner
 
         try
         {
+            if (current.Hdr10PlusBridge)
+                current = await ExtractHdr10PlusAsync(info, current, passLogPrefix, progress, bridge, ct);
+
             while (attempt < attemptLimit)
             {
                 attempt++;

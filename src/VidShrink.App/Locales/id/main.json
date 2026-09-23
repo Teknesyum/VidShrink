@@ -301,6 +301,7 @@
   "main.run.done": "Selesai dalam {0} percobaan. {1} MB → {2} MB ({3}% lebih kecil).",
   "main.run.over-ceiling": "Tidak bisa di bawah target {0} MB setelah {1} percobaan (hasil terakhir {2} MB). Tidak ada berkas ditulis, karena berkas lebih besar dari target tidak pernah diserahkan. Naikkan target dan coba lagi.",
   "main.run.ended": "Encoding berakhir tiba-tiba dan tidak ada berkas ditulis.",
+  "main.run.hdr10plus-short": "HDR10+ hanya sampai ke {0} dari {1} bingkai sumber; bingkai lainnya hanya membawa HDR10 statis.",
   "main.run.cancelled": "Dibatalkan.",
   "main.run.converted": "Selesai. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Percobaan",
   "main.stage.gif-palette": "Palet GIF",
   "main.stage.gif-encode": "Encode GIF",
+  "main.stage.hdr10plus-metadata": "Metadata HDR10+",
 
   "main.ai.title": "Pengaturan AI",
   "main.ai.tip": "• Langkah ini opsional.\n• Salin prompt ke AI obrolan apa pun, lalu tempel dan validasi jawaban JSON-nya.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "bilah hitam dipangkas: {0}x{1} (sumber {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "sumber membawa metadata HDR dinamis (HDR10+ atau Dolby Vision) yang tidak diteruskan oleh encode ini, jadi keluaran hanya menyimpan lapisan HDR10 statis",
   "main.reason.vp9-crf-unmeasured": "Skala kualitas CRF libvpx-vp9 sudah diukur, tapi bagaimana nilai CRF berpengaruh pada ukuran berkas belum diukur, jadi ukuran dijaga dengan VBR dua lintasan alih-alih menebak CRF",
+  "main.reason.hdr10plus-routed-x265": "sumber membawa metadata dinamis HDR10+ yang hanya bisa diteruskan oleh {1}, jadi {1} dipakai sebagai ganti {0}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ tidak diteruskan di jalur SVT-AV1, jadi keluaran hanya menyimpan lapisan HDR10 statis; Otomatis akan memakai libx265, yang meneruskannya",
+  "main.reason.hdr10plus-cut": "HDR10+ hilang saat pemotongan: metadatanya mengikuti sumber bingkai demi bingkai, dan pemangkasan atau perubahan laju bingkai merusak keselarasan itu, jadi keluaran hanya menyimpan lapisan HDR10 statis",
   "main.reason.stream.audio-passthrough": "trek audio disalin apa adanya: kontainer mendukung codec-nya dan tetap dalam 15% dari target",
   "main.reason.stream.audio-downmixed": "trek audio surround di-mix ke stereo saat dienkode ulang",
   "main.reason.stream.extra-audio-dropped": "hanya satu trek audio yang dipertahankan; nyalakan 'Pertahankan semua trek' untuk membawa semuanya dalam MKV",

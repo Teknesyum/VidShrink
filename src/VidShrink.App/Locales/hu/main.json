@@ -301,6 +301,7 @@
   "main.run.done": "Kész {0} próbálkozással. {1} MB → {2} MB ({3}%-kal kisebb).",
   "main.run.over-ceiling": "{1} próbálkozás után sem sikerült a {0} MB-os cél alá kerülni (az utolsó eredmény {2} MB volt). Nem íródott fájl, mert a célnál nagyobb fájlt soha nem adunk vissza. Emelje a célt, és próbálja újra.",
   "main.run.ended": "A kódolás váratlanul leállt, és nem íródott fájl.",
+  "main.run.hdr10plus-short": "A HDR10+ a forrás {1} képkockájából csak {0} képkockába jutott el; a többi képkocka csak statikus HDR10-et hordoz.",
   "main.run.cancelled": "Megszakítva.",
   "main.run.converted": "Kész. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Próbálkozás",
   "main.stage.gif-palette": "GIF-paletta",
   "main.stage.gif-encode": "GIF-kódolás",
+  "main.stage.hdr10plus-metadata": "HDR10+ metaadatok",
 
   "main.ai.title": "MI-beállítások",
   "main.ai.tip": "• Ez a lépés nem kötelező.\n• Másoljon egy promptot bármely csevegő MI-be, majd illessze be és ellenőrizze a JSON-válaszát.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "fekete sávok levágva: {0}x{1} (forrás {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "a forrás dinamikus HDR-metaadatokat hordoz (HDR10+ vagy Dolby Vision), amelyeket ez a kódolás nem visz át, ezért a kimenet csak a statikus HDR10 réteget tartja meg",
   "main.reason.vp9-crf-unmeasured": "a libvpx-vp9 CRF minőségi skálája mérve van, de nincs mérve, hogy egy CRF-érték hogyan hat a fájlméretre, ezért a méretet kétmenetes VBR tartja CRF-becslés helyett",
+  "main.reason.hdr10plus-routed-x265": "a forrás dinamikus HDR10+ metaadatokat hordoz, amelyeket csak a(z) {1} tud továbbvinni, ezért {0} helyett {1} fut",
+  "main.reason.hdr10plus-svtav1": "a HDR10+ nem jut át az SVT-AV1 ágon, ezért a kimenet csak a statikus HDR10 réteget tartja meg; az Automatikus a libx265-öt használná, amely átviszi",
+  "main.reason.hdr10plus-cut": "a HDR10+ elveszett a vágásnál: a metaadatok képkockáról képkockára követik a forrást, a vágás vagy a képkockasebesség módosítása pedig megtöri ezt az illesztést, ezért a kimenet csak a statikus HDR10 réteget tartja meg",
   "main.reason.stream.audio-passthrough": "a hangsáv változatlanul másolódik: a konténer támogatja a kodekjét, és a cél 15%-án belül marad",
   "main.reason.stream.audio-downmixed": "a térhatású hangsáv újrakódoláskor sztereóra keveredik",
   "main.reason.stream.extra-audio-dropped": "csak egy hangsáv marad meg; kapcsolja be a 'Minden sáv megtartása' lehetőséget, hogy mind MKV-ban menjen tovább",

@@ -301,6 +301,7 @@
   "main.run.done": "Valmis {0} katsega. {1} MB → {2} MB ({3}% väiksem).",
   "main.run.over-ceiling": "Pärast {1} katset ei õnnestunud {0} MB sihi alla jõuda (viimane tulemus oli {2} MB). Faili ei kirjutatud, sest sihist suuremat faili ei anta kunagi tagasi. Tõsta sihti ja proovi uuesti.",
   "main.run.ended": "Kodeerimine lõppes ootamatult ja faili ei kirjutatud.",
+  "main.run.hdr10plus-short": "HDR10+ jõudis allika {1} kaadrist ainult {0} kaadrini; ülejäänud kaadrid kannavad ainult staatilist HDR10-t.",
   "main.run.cancelled": "Katkestatud.",
   "main.run.converted": "Valmis. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Katse",
   "main.stage.gif-palette": "GIF-palett",
   "main.stage.gif-encode": "GIF-kodeering",
+  "main.stage.hdr10plus-metadata": "HDR10+ metaandmed",
 
   "main.ai.title": "AI seaded",
   "main.ai.tip": "• See samm on valikuline.\n• Kopeeri viip suvalisse vestlus-AI-sse, seejärel kleebi ja kontrolli selle JSON-vastust.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "mustad ribad kärbiti: {0}x{1} (allikas {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "allikas kannab dünaamilisi HDR-metaandmeid (HDR10+ või Dolby Vision), mida see kodeerimine edasi ei kanna, seega jääb väljundisse ainult staatiline HDR10 kiht",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9 CRF kvaliteediskaala on mõõdetud, kuid mitte see, kuidas CRF väärtus mõjutab faili suurust, seega hoiab suurust kahekäiguline VBR, mitte CRF-i oletus",
+  "main.reason.hdr10plus-routed-x265": "allikas kannab dünaamilisi HDR10+ metaandmeid, mida suudab edasi anda ainult {1}, seepärast kasutatakse {0} asemel {1}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ ei liigu SVT-AV1 teel edasi, seega väljund säilitab ainult staatilise HDR10 kihi; Automaatne kasutaks libx265, mis selle edasi annab",
+  "main.reason.hdr10plus-cut": "HDR10+ kadus lõikamisel: metaandmed järgivad allikat kaader kaadri haaval ning kärpimine või kaadrisageduse muutus rikub selle joonduse, seega väljund säilitab ainult staatilise HDR10 kihi",
   "main.reason.stream.audio-passthrough": "helirada kopeeritakse muutmata: konteiner toetab selle koodekit ja see jääb 15% piiresse sihist",
   "main.reason.stream.audio-downmixed": "ruumiline helirada miksitakse ümberkodeerimisel stereoks",
   "main.reason.stream.extra-audio-dropped": "alles jäetakse ainult üks helirada; lülita sisse 'Säilita kõik rajad', et kõik MKV-s kaasa võtta",

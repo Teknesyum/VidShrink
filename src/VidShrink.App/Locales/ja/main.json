@@ -301,6 +301,7 @@
   "main.run.done": "{0}回の試行で完了。{1} MB → {2} MB({3}%削減)。",
   "main.run.over-ceiling": "{1}回試行しても目標{0} MB以下にできませんでした(最後の結果は{2} MB)。目標より大きいファイルは決して渡されないため、ファイルは書き出されていません。目標を上げてもう一度お試しください。",
   "main.run.ended": "エンコードが予期せず終了し、ファイルは書き出されませんでした。",
+  "main.run.hdr10plus-short": "HDR10+が届いたのはソースの{1}フレームのうち{0}フレームだけです。残りのフレームは静的なHDR10のみです。",
   "main.run.cancelled": "キャンセルしました。",
   "main.run.converted": "完了。{0} MB → {1} MB。",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "試行",
   "main.stage.gif-palette": "GIFパレット",
   "main.stage.gif-encode": "GIFエンコード",
+  "main.stage.hdr10plus-metadata": "HDR10+メタデータ",
 
   "main.ai.title": "AI設定",
   "main.ai.tip": "• この手順は任意です。\n• プロンプトをチャットAIにコピーし、そのJSON回答を貼り付けて検証します。",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "黒帯をクロップしました: {0}x{1}(ソース {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "ソースには動的HDRメタデータ(HDR10+またはDolby Vision)がありますが、このエンコードでは引き継げないため、出力には静的なHDR10層だけが残ります",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9 の CRF 品質尺度は測定されていますが、CRF 値がファイルサイズにどう反映されるかは測定されていないため、CRF を推測せず 2 パス VBR でサイズを保ちます",
+  "main.reason.hdr10plus-routed-x265": "ソースにはHDR10+の動的メタデータがあり、それを引き継げるのは{1}だけなので、{0}の代わりに{1}を使います",
+  "main.reason.hdr10plus-svtav1": "SVT-AV1の経路ではHDR10+は引き継がれないため、出力には静的なHDR10層だけが残ります。自動なら、HDR10+を引き継げるlibx265を使います",
+  "main.reason.hdr10plus-cut": "カットでHDR10+が失われました。メタデータはソースのフレームごとに対応しており、トリミングやフレームレートの変更でその対応が崩れるため、出力には静的なHDR10層だけが残ります",
   "main.reason.stream.audio-passthrough": "音声トラックはそのままコピーされます。コンテナがコーデックに対応し、目標の15%以内に収まります",
   "main.reason.stream.audio-downmixed": "サラウンド音声トラックは再エンコード時にステレオへダウンミックスされます",
   "main.reason.stream.extra-audio-dropped": "音声トラックは1つだけ残ります。すべてをMKVで残すには「すべてのトラックを保持」をオンにしてください",
