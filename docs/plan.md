@@ -1,4 +1,28 @@
-﻿# Plan — Biçimlerin Tek ve Ulaşılabilir Gövdeye İnmesi
+﻿# Plan — Görsel Denetim Bulgularının Düzeltilmesi
+
+Kaynak: `.calisma/t0-ci/gorsel/bulgular.md` (Bulgu 2-25, Canlandırma 1-7). Her iddia kodda
+doğrulandı; yanlış çıkanlar gerekçesiyle atlanıyor.
+
+- **2/3** `KucultSutunlari`: orta ve sağ sütun yapışkan, görünüm yüksekliğiyle tavanlı.
+- **21** Küçült/Dönüştür sayfa kenarı belirteci; **9** `KaydiriciSatiri` (dar hücrede kutu alta).
+- **4** Dönüştür formunda hücre içeriği alta hizalı; **13** süzgeç kutuları `SutunIzgara`
+  (en çok iki sütun, sığmayınca bir): eşit `*,*` ızgara 1024 dar kolda etiketi sözcük
+  ortasından bölüyordu (453 kusur).
+- **5** RadioButton teması; **8** dolu iz başparmağın altına uzar; **11** `PanelHeaderToggle`.
+- **6/7/12/15/16/17/18/24/25** başlık, etiket, düğme ve satır düzeltmeleri.
+- **10** kısayol satırlarında taban çizgisi eşitlemesi; **22** başlık ile sekme arasında asgari boşluk.
+- **23** seçili sekme alt çizgisi; Canlandırma **1/3/5/6/7** reduced-motion'a uyar.
+- **14** kısmi (sıra pinli); **19/20** iddia yanlış; Canlandırma **2/4** gerekçeli atlanır.
+- Kırpılma taraması 1-5: kaydedici seçimi `*,*` ızgarada, sekme şeridi dördüncü kademede
+  simgesiz, gelişmiş panel özeti balonlu, yaklaşık rozeti panonun yarısına tavanlı,
+  güncelleme bildirimi sarar. `BtnReplaySave` erişilebilir ad alır.
+- Davranış testleri mutasyonla doğrulanır; pin kayarsa ölçüyle güncellenir. Dar pencere
+  pinleri **9** yüzünden bilerek kayar (`KaydiriciSatiri` dar hücrede iki satır).
+- Yapışkan sütun görüş alanını ilk geçişte bilmediği için `ComparisonPanelTests` başlangıç
+  boyunu oturmuş yerleşimden okur; `PerformanceCheckUiTests` pini `*,Auto,Auto` başlığı
+  sayar (`BtnHideAdvanced` başlığa taşındı).
+
+# Plan — Biçimlerin Tek ve Ulaşılabilir Gövdeye İnmesi
 
 Kullanıcı isteği (18 Eylül 2026): *"düzenlerimiz tek ve belli ulaşılabilir bir yerde olmalı
 aynı stringlerimizi çevirmek nasıl kolaysa bunları çevirmekte öyle kolay olmalı."*

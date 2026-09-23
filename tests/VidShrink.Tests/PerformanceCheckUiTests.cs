@@ -158,7 +158,9 @@ public sealed class PerformanceCheckUiTests
 
     /// <summary>
     /// K1: panel Gelişmiş sekmesinde ve mevcut kalıpta. Kalıbın kendisi kaynaktan
-    /// okunuyor; panelin sekmenin içinde durduğu ise ağaçtan.
+    /// okunuyor; panelin sekmenin içinde durduğu ise ağaçtan. Başlık düzeni CommandPanel ile
+    /// aynı: yıldız başlık sütunu, ardından Auto düğme sütunları. Görsel denetimden sonra
+    /// CommandPanel'in başlığında kapatma düğmesi de durduğu için sütun sayısı değil kalıp sayılır.
     /// </summary>
     [Fact]
     public void ThePanelSitsInTheAdvancedTabInTheSamePatternAsTheOthers()
@@ -180,10 +182,9 @@ public sealed class PerformanceCheckUiTests
         Assert.Contains("Data=\"{StaticResource IconChevronDown}\"", toggle, StringComparison.Ordinal);
         Assert.Contains("Theme=\"{StaticResource GhostButton}\"", toggle, StringComparison.Ordinal);
 
-        // Sütun düzeni CommandPanel ile aynı.
         Assert.Equal(
             2,
-            Regex.Matches(page, Regex.Escape("<Grid ColumnDefinitions=\"*,Auto\" ColumnSpacing=\"{StaticResource SpaceMd}\">")).Count);
+            Regex.Matches(page, "<Grid ColumnDefinitions=\"\\*(,Auto)+\" ColumnSpacing=\"\\{StaticResource SpaceMd\\}\">").Count);
 
         var (inPage, collapsed) = OnAdvancedTab(
             _ => { },

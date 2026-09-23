@@ -88,6 +88,7 @@ public sealed class UstSeritTikTests
 
     internal static void Yerlestir(MainWindow window, Size olcu)
     {
+        BassizYerlesim.PlatformBoyu(window, olcu);
         window.Width = double.NaN;
         window.Height = double.NaN;
         window.Measure(olcu);
@@ -107,7 +108,7 @@ public sealed class UstSeritTikTests
         kok.InvalidateMeasure();
         kok.Measure(olcu);
         kok.Arrange(new Rect(olcu));
-        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        BassizYerlesim.IkinciGecis(window, kok, olcu);
     }
 
     private static string Adi(Control c) => c.Name is { } n ? $"{c.GetType().Name}#{n}" : c.GetType().Name;
@@ -163,6 +164,56 @@ public sealed class UstSeritTikTests
         Assert.True(engeller.Length == 0, string.Join("\n", engeller));
 
         Kapat(klasor, ad);
+    }
+
+    /// <summary>
+    /// Görsel denetim bulgu 22: son sekme ile sağ grup arasında en az <c>SpaceLg</c> kalır.
+    /// Kademe hesabı yalnız örtüşmeyi önlüyordu; el 1136'da "Ρυθμίσεις" pencere düğmelerine
+    /// yaklaşık 10 px yaklaşıyordu. Boşluk her dilde, darından genişine her boyda ölçülür.
+    /// Kırpılma taraması: dil düğmeleri de çekildiğinde el 1136'da Gelişmiş açıkken son sekme
+    /// pencere düğmelerinin 9 px altına giriyordu; dördüncü kademe sekmeleri simgesiz dizer.
+    /// Yerleşim <see cref="BassizYerlesim"/> ile iki geçişli; tek geçişte gizlenen parçalar
+    /// eski yerinde kalıyor ve sağ grup 580 px genişlikte okunuyordu. Genişlik 8 px adımla taranır:
+    /// altı noktalı taramada <c>SpaceLg</c> payını kaldıran mutasyon yeşil kalıyordu, sık taramada tr 1184'te 13 px.
+    /// </summary>
+    [Theory]
+    [InlineData("el")]
+    [InlineData("tr")]
+    [InlineData("de")]
+    public void SonSekmeSagGrubaYaslanmaz(string dil)
+    {
+        var sonuclar = new List<(double En, double Bosluk, double EnAz, string Ayrinti)>();
+        foreach (var en in Enumerable.Range(0, 54).Select(i => 1136 + i * 8.0))
+            sonuclar.Add(AppHost.Run(() =>
+            {
+                Strings.Use(dil);
+                var window = new MainWindow();
+                try
+                {
+                    window.TabAdvanced.IsVisible = true;
+                    var boyut = new Size(en, 1060);
+                    Yerlestir(window, boyut);
+                    Yerlestir(window, boyut);
+                    var sekmeSonu = window.GetVisualDescendants().OfType<TabItem>()
+                        .Where(t => t.IsVisible && t.Bounds.Width > 0 && t.FindAncestorOfType<TabControl>()?.Name == "Tabs")
+                        .Max(t => Yeri(t, window)!.Value.Right);
+                    var sag = window.GetVisualDescendants().OfType<StackPanel>().First(c => c.Name == "TitleBarRight");
+                    var sagBasi = sag.GetVisualChildren().OfType<Control>()
+                        .Where(c => c.IsVisible && c.Bounds.Width > 0)
+                        .Min(c => Yeri(c, window)!.Value.Left);
+                    window.TryFindResource("SpaceLg", out var enAz);
+                    var katman = window.GetVisualDescendants().OfType<Border>().First(b => b.Name == "TitleBarLayer");
+                    return (en, sagBasi - sekmeSonu, (double)enAz!, $"sekme sonu {sekmeSonu:0}, sag grup {sagBasi:0}, katman {katman.Bounds.Width:0}");
+                }
+                finally
+                {
+                    window.Close();
+                    Strings.Use("en");
+                }
+            }));
+
+        var dar = sonuclar.Where(s => s.Bosluk < s.EnAz - 0.5).ToArray();
+        Assert.True(dar.Length == 0, string.Join("; ", dar.Select(s => $"{s.En:0}: {s.Bosluk:0.#} px (en az {s.EnAz:0}; {s.Ayrinti})")));
     }
 
     /// <summary>

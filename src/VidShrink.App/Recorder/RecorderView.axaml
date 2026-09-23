@@ -109,6 +109,7 @@
                 Height="{StaticResource RecorderButtonSize}"
                 Theme="{StaticResource GhostButton}"
                 IsVisible="False"
+                auto:AutomationProperties.Name="{loc:Text recorder.replay.save}"
                 Click="OnReplaySave"/>
 
         <Button Grid.Column="4"
@@ -283,7 +284,7 @@
 
       <Border x:Name="PanelTarget" Grid.Column="0" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
         <StackPanel Spacing="{StaticResource SpaceMd}">
-          <TextBlock Text="{loc:Text recorder.target.title}" Theme="{StaticResource H3}"/>
+          <TextBlock Text="{loc:Text recorder.target.title}" Theme="{StaticResource H2}"/>
 
           <StackPanel>
             <TextBlock Text="{loc:Text recorder.target.what}" Theme="{StaticResource Label}"/>
@@ -387,7 +388,7 @@
 
       <Border x:Name="PanelOptions" Grid.Column="1" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
         <StackPanel Spacing="{StaticResource SpaceMd}">
-          <TextBlock Text="{loc:Text recorder.option.title}" Theme="{StaticResource H3}"/>
+          <TextBlock Text="{loc:Text recorder.option.title}" Theme="{StaticResource H2}"/>
 
           <StackPanel x:Name="PanelAutoResult" Spacing="{StaticResource SpaceSm}">
             <TextBlock x:Name="TxtAutoSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
@@ -419,18 +420,19 @@
                   auto:AutomationProperties.Name="{loc:Text recorder.auto.measure}"
                   Click="OnAutoMeasure"/>
 
-          <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
+          <Grid x:Name="RecorderEncodingChoice" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
             <RadioButton x:Name="RadAuto"
                          GroupName="RecorderEncoding"
                          Content="{loc:Text recorder.auto.automatic}"
                          ToolTip.Tip="{loc:Text recorder.auto.automatic-hint}"
                          auto:AutomationProperties.Name="{loc:Text recorder.auto.automatic}"/>
             <RadioButton x:Name="RadManual"
+                         Grid.Column="1"
                          GroupName="RecorderEncoding"
                          Content="{loc:Text recorder.auto.manual}"
                          ToolTip.Tip="{loc:Text recorder.auto.manual-hint}"
                          auto:AutomationProperties.Name="{loc:Text recorder.auto.manual}"/>
-          </StackPanel>
+          </Grid>
 
           <StackPanel x:Name="PanelManualOptions" Spacing="{StaticResource SpaceMd}">
             <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">
@@ -515,7 +517,7 @@
 
     <Border x:Name="PanelAdvanced" Theme="{StaticResource Panel}">
       <StackPanel Spacing="{StaticResource SpaceMd}">
-        <TextBlock Text="{loc:Text recorder.advanced.title}" Theme="{StaticResource H3}"/>
+        <TextBlock Text="{loc:Text recorder.advanced.title}" Theme="{StaticResource H2}"/>
 
         <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="{StaticResource SpaceSm}">
           <StackPanel Grid.Column="0">
@@ -624,7 +626,7 @@
          yalnız "sessiz" öğesiyle açılıyor ve kayıt sessiz sürüyor. -->
     <Border Theme="{StaticResource Panel}">
       <StackPanel Spacing="{StaticResource SpaceMd}">
-        <TextBlock Text="{loc:Text recorder.audio.title}" Theme="{StaticResource H3}"/>
+        <TextBlock Text="{loc:Text recorder.audio.title}" Theme="{StaticResource H2}"/>
 
         <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
           <StackPanel Grid.Column="0">
@@ -656,7 +658,7 @@
 
     <Border x:Name="PanelWebcam" Theme="{StaticResource Panel}">
       <StackPanel Spacing="{StaticResource SpaceMd}">
-        <TextBlock Text="{loc:Text recorder.webcam.title}" Theme="{StaticResource H3}"/>
+        <TextBlock Text="{loc:Text recorder.webcam.title}" Theme="{StaticResource H2}"/>
 
         <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
           <StackPanel Grid.Column="0">
