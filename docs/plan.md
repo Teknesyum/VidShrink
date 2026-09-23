@@ -12,9 +12,9 @@ yalnız elle seçilir. Ölçüler `docs/olcumler/hb15-media-foundation.md`.
 3. `PlanParser.AllowedCodecs`, `PlanCalculator.KnownLockableCodecs` — MF girer;
    kilit Windows dışında reddedilir. `FastHardwareOrder`'a **girmez**.
 4. `PlanCalculator` — MF planı CRF kipine düşerse 2pass'e çevrilir (VP9 emsali),
-   `ReasonCode.MfQualityUnmeasuredBitrate`, anahtar 42 dilde.
+   `ReasonCode.NoQualityScaleBitrate` (`main.reason.no-quality-scale`), anahtar 42 dilde.
 5. `EncoderCapabilities.RunProbe` — MF yoklaması `-pix_fmt nv12 -hw_encoding 1` ile.
-6. `CalibrationProbe.QualityArgs` — MF için `-crf` yerine patlamaz; örnekleme MF'de koşmaz.
+6. `CalibrationProbe.RunAsync` — `HasQualityScale` yoksa örnekleme koşmaz, profil kalibrasyonsuz döner.
 7. Arayüz — `CmbAdvCodecLock` `OfferedCodecs`'ten dolar; `LanguageCatalog.Verbatim`.
 8. Testler — `MediaFoundationTests.cs`: argüman, Windows dışı olumsuz kontrol, canlı kol.
 9. Belgeler — ölçüm belgesi, durum belgesi §1/§2/§3, tests AGENTS.md maddesi.
