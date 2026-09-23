@@ -97,6 +97,11 @@ public static class HdrResolver
             if (info.ContentLightLevel is { } cll) x265Params += $":max-cll={cll}";
             preserveArgs.AddRange(new[] { "-x265-params", x265Params });
         }
+        else if (codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase)
+                 && SvtAv1StaticParams(info) is { } svtParams)
+        {
+            preserveArgs.AddRange(new[] { "-svtav1-params", svtParams });
+        }
 
         var carried = dolbyVisionCarriable && CarriesDolbyVision(info, codec);
         var bridge = info.HasHdr10Plus && codec.Equals("libx265", StringComparison.OrdinalIgnoreCase);
@@ -124,6 +129,46 @@ public static class HdrResolver
         if (availability is not null && !availability.HasEncoder("libx265")) return null;
         return SupportsHdr10("libx265", availability, out _) ? "libx265" : null;
     }
+
+    /// <summary>
+    /// HDR10 statik verisi SVT-AV1'e <c>mastering-display</c> ve <c>content-light</c> ile
+    /// acikca yazilir (<c>docs/olcumler/hb28-svtav1-hdr10-statik.md</c>). ffmpeg 9 kaynagin
+    /// yan verisini kendiliginden de geciriyor, ama bu eski surumlerde yok; acik anahtar bit
+    /// akisini surumden bagimsiz kilar. Kaynakta veri yoksa <c>null</c>: anahtar yazilmaz.
+    /// </summary>
+    public static string? SvtAv1StaticParams(MediaInfo info)
+    {
+        var parts = new List<string>();
+        if (info.MasteringDisplayMetadata is { } mastering && SvtAv1MasteringDisplay(mastering) is { } svtMastering)
+            parts.Add("mastering-display=" + svtMastering);
+        if (info.ContentLightLevel is { } cll && ContentLightPattern.IsMatch(cll))
+            parts.Add("content-light=" + cll);
+        return parts.Count > 0 ? string.Join(':', parts) : null;
+    }
+
+    /// <summary>
+    /// x265 bicimini (<c>G(x,y)...L(max,min)</c>, renk 1/50000, parlaklik 1/10000 birim)
+    /// SVT-AV1'in kesirli bicimine cevirir. SVT-AV1 x265'in tamsayilarini "clipped to 0.0 to 1.0"
+    /// uyarisiyla bozuyor; olculdu. Bicim tutmazsa <c>null</c>.
+    /// </summary>
+    public static string? SvtAv1MasteringDisplay(string x265MasterDisplay)
+    {
+        var match = MasterDisplayPattern.Match(x265MasterDisplay);
+        if (!match.Success) return null;
+
+        string Chroma(int group) => Fraction(match.Groups[group].Value, 50000, "0.#####");
+        string Luma(int group) => Fraction(match.Groups[group].Value, 10000, "0.####");
+        return $"G({Chroma(1)},{Chroma(2)})B({Chroma(3)},{Chroma(4)})R({Chroma(5)},{Chroma(6)})WP({Chroma(7)},{Chroma(8)})L({Luma(9)},{Luma(10)})";
+    }
+
+    private static string Fraction(string units, int scale, string format)
+        => (long.Parse(units, System.Globalization.CultureInfo.InvariantCulture) / (decimal)scale)
+            .ToString(format, System.Globalization.CultureInfo.InvariantCulture);
+
+    private static readonly System.Text.RegularExpressions.Regex MasterDisplayPattern = new(
+        @"^G\((\d+),(\d+)\)B\((\d+),(\d+)\)R\((\d+),(\d+)\)WP\((\d+),(\d+)\)L\((\d+),(\d+)\)$");
+
+    private static readonly System.Text.RegularExpressions.Regex ContentLightPattern = new(@"^\d+,\d+$");
 
     /// <summary>
     /// Yalniz profil 8.1 (HDR10 uyumlu taban katman) ve yalniz yazilim HDR10 kodlayicilari:
