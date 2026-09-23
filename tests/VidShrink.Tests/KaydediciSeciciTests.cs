@@ -159,6 +159,28 @@ public sealed class KaydediciSeciciTests
         tur.GetMethod("Draw", Ozel)!.Invoke(secici, new object[] { bitis });
     }
 
+    /// <summary>
+    /// Ölçü etiketi ekranın dışına taşmaz: seçim alt kenara dayanınca seçimin üstüne çıkar,
+    /// sağ kenara dayanınca sola çekilir. Ortadaki seçimde yeri seçimin sol alt köşesidir
+    /// (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void OlcuEtiketiEkranIcindeKalir()
+    {
+        var alan = new Size(1920, 1080);
+        var etiket = new Size(90, 24);
+
+        var orta = RecorderRegionPicker.TagPosition(new Rect(100, 100, 400, 300), etiket, alan);
+        var altta = RecorderRegionPicker.TagPosition(new Rect(100, 700, 400, 380), etiket, alan);
+        var sagda = RecorderRegionPicker.TagPosition(new Rect(1880, 100, 40, 40), etiket, alan);
+        var tamEkran = RecorderRegionPicker.TagPosition(new Rect(0, 0, 1920, 1080), etiket, alan);
+
+        Assert.Equal(new Point(100, 400), orta);
+        Assert.Equal(new Point(100, 676), altta);
+        Assert.Equal(new Point(1830, 140), sagda);
+        Assert.Equal(new Point(0, 0), tamEkran);
+    }
+
     [Fact]
     public void CizimPenceresiMasaustunuKaplarVeEscVazgecer()
     {

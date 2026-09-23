@@ -103,8 +103,23 @@ internal partial class RecorderRegionPicker : Window
         Selection.Height = bottomRight.Y - topLeft.Y;
         Selection.IsVisible = true;
         TxtSize.Text = Bicim.Cozunurluk(_current.Width, _current.Height);
-        Canvas.SetLeft(SizeTag, topLeft.X);
-        Canvas.SetTop(SizeTag, bottomRight.Y);
         SizeTag.IsVisible = true;
+        SizeTag.Measure(Size.Infinity);
+        var yer = TagPosition(new Rect(topLeft, bottomRight), SizeTag.DesiredSize, Bounds.Size);
+        Canvas.SetLeft(SizeTag, yer.X);
+        Canvas.SetTop(SizeTag, yer.Y);
+    }
+
+    /// <summary>
+    /// Ölçü etiketi seçimin altına konur; altta yer yoksa seçimin üstüne, orada da yoksa
+    /// ekranın üst kenarına. Yatayda ekranın içinde tutulur.
+    /// </summary>
+    internal static Point TagPosition(Rect selection, Size tag, Size area)
+    {
+        var y = selection.Bottom + tag.Height <= area.Height
+            ? selection.Bottom
+            : Math.Max(0, selection.Top - tag.Height);
+        var x = Math.Clamp(selection.Left, 0, Math.Max(0, area.Width - tag.Width));
+        return new Point(x, y);
     }
 }
