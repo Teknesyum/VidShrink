@@ -3091,6 +3091,17 @@ public partial class MainWindow : Window
     internal static string SaturatedSuffix(EncodeResult result, double targetMb) =>
         ShowsSaturated(result) ? " " + Say("main.run.saturated", Num(result.OutputMb, "0.0"), Num(targetMb, "0.##")) : "";
 
+    /// <summary>
+    /// Büyük hâliyle kabul edilen teslimin cümlesi. Fark, motorun "hedefin üzerinde" dediği
+    /// etkin hedefe göre (<see cref="EncodeRunner.EffectiveTargetMb"/>); kullanıcının hedefi
+    /// kaynağa göre kırpıldığında o hedefle hesaplanan fark eksiye düşüyordu.
+    /// </summary>
+    internal static string AcceptedLargerText(double outputMb, double targetMb, EncodePlan plan)
+    {
+        var effectiveTargetMb = EncodeRunner.EffectiveTargetMb(targetMb, plan);
+        return Say("main.run.accepted-larger", Num(outputMb - effectiveTargetMb, "0.00"), Num(effectiveTargetMb, "0.##"));
+    }
+
     private void ReportSourceError(string message)
     {
         TxtSourceStatus.Text = message;
@@ -4228,7 +4239,8 @@ public partial class MainWindow : Window
             HideRetryAsk();
             var progress = new Progress<EncodeProgress>(ShowEncodeProgress);
 
-            var result = await ShrinkEngine.EncodeAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
+            var plan = ActivePlan;
+            var result = await ShrinkEngine.EncodeAsync(_info, plan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
             _lastOutput = result.OutputPath;
             RefreshPreviewSource();
 
@@ -4239,7 +4251,7 @@ public partial class MainWindow : Window
                 TxtResult.Text = Say("main.run.done",
                     result.Attempts, Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"), Num(saved, "0.#"));
                 if (result.OverTarget)
-                    TxtResult.Text += " " + Say("main.run.accepted-larger", Num(result.OutputMb - targetMb, "0.00"), Num(targetMb, "0.##"));
+                    TxtResult.Text += " " + AcceptedLargerText(result.OutputMb, targetMb, plan);
                 if (result.Trim is { } trim)
                     TxtResult.Text += " " + Say("main.run.trimmed", Num(trim.RemovedSeconds, "0.#"), Clock(trim.DurationSeconds), Clock(trim.KeptSeconds));
                 TxtResult.Text += SaturatedSuffix(result, targetMb);
@@ -4254,7 +4266,7 @@ public partial class MainWindow : Window
             {
                 TxtOutSize.Text = "-";
                 TxtResult.Text = Say("main.run.over-ceiling",
-                    Num(targetMb, "0.##"), result.Attempts, Num(result.OutputMb, "0.0"));
+                    Num(EncodeRunner.EffectiveTargetMb(targetMb, plan), "0.##"), result.Attempts, Num(result.OutputMb, "0.0"));
             }
             else
             {
@@ -4694,12 +4706,18 @@ public partial class MainWindow : Window
         (EncodeRunner.Hdr10PlusStage, "main.stage.hdr10plus-metadata")
     };
 
-    private static string LocalizeStage(string stage)
+    private static string LocalizeStage(string stage) => LocalizeStage(stage, Strings.Language);
+
+    /// <summary>
+    /// Aşama satırı verilen dilde. İş penceresi kendi dilini taşıdığı için süreç genelindeki
+    /// <see cref="Strings.Language"/> yerine bunu çağırır.
+    /// </summary>
+    internal static string LocalizeStage(string stage, string language)
     {
         foreach (var (token, key) in StageWords)
-            stage = stage.Replace(token, Strings.Get(key), StringComparison.OrdinalIgnoreCase);
+            stage = stage.Replace(token, Strings.GetIn(language, key), StringComparison.OrdinalIgnoreCase);
 
-        return LanguageCatalog.Display(stage);
+        return LanguageCatalog.Title(stage, language);
     }
 
     private void OnCancel(object? sender, RoutedEventArgs e)

@@ -137,6 +137,8 @@ public partial class ShrinkJobWindow : Window
         BtnShareCopy.Click += OnCopyShareLink;
         BtnPause.Click += (_, _) => SetPaused(!_paused);
         BtnCountdownCancel.Click += (_, _) => CancelCountdown();
+        BtnOvershootAccept.Click += (_, _) => AnswerOvershoot(true);
+        BtnOvershootStop.Click += (_, _) => AnswerOvershoot(false);
         CmbWhenDone.ItemsSource = new[]
         {
             Say("main.shrink-job.done.nothing"),
@@ -491,29 +493,24 @@ public partial class ShrinkJobWindow : Window
             var plan = PlanCalculator.Build(info, options);
             var output = UniqueOutputPath(request.Path, _appSettings, plan, targetMb, ExtensionFor(plan));
 
-            var progress = new Progress<EncodeProgress>(step =>
-            {
-                Progress.Value = step.Fraction;
-                TxtStage.Text = step.Stage;
-                TxtRemaining.Text = Saat.Kalan(step.Remaining);
-            });
+            var progress = new Progress<EncodeProgress>(ShowProgress);
 
             var result = await new EncodeRunner().RunAsync(
-                info, plan, output, targetMb, progress, cts.Token, options.FillPolicy);
+                info, plan, output, targetMb, progress, cts.Token, options.FillPolicy, askBeforeRetry: AskOvershootAsync);
 
             if (result.Success)
             {
                 _outputs.Add(result.OutputPath);
                 State = ShrinkJobState.Bitti;
                 Progress.Value = 1;
-                TxtMessage.Text = BittiSatiri(result, targetMb);
+                TxtMessage.Text = BittiSatiri(result, targetMb, plan);
                 BtnReveal.IsVisible = true;
                 ResetShare(true);
             }
             else
             {
                 State = ShrinkJobState.Hata;
-                TxtMessage.Text = HataSatiri(result, targetMb);
+                TxtMessage.Text = HataSatiri(result, targetMb, plan);
                 BtnOpenInApp.IsVisible = true;
             }
         }
@@ -533,8 +530,84 @@ public partial class ShrinkJobWindow : Window
             _finished++;
             _cts = null;
             cts.Dispose();
+            HideOvershoot();
         }
     }
+
+    /// <summary>
+    /// Motorun ilerleme satırı. Aşama adı motorun İngilizce belirteçleriyle gelir; ana pencereyle
+    /// aynı sözlükten ve bu pencerenin dilinde yazılır.
+    /// </summary>
+    internal void ShowProgress(EncodeProgress step)
+    {
+        Progress.Value = step.Fraction;
+        TxtStage.Text = MainWindow.LocalizeStage(step.Stage, _language);
+        TxtRemaining.Text = Saat.Kalan(step.Remaining);
+    }
+
+    internal string StageText => TxtStage.Text ?? "";
+
+    /// <summary>
+    /// Kullanıcıya sorulmadan verilebilecek cevap. Deneme hakkı varken motor ana pencerede de
+    /// yeniden dener; hedefin altında kalmış bir sonuç varsa "bırak" onu teslim eder. Geriye
+    /// yalnız hedefi aşan dosyayı teslim etmek kalıyorsa <c>null</c>: o karar kullanıcının.
+    /// </summary>
+    internal static OvershootChoice? UnaskedChoice(RetryPrompt prompt)
+        => prompt.CanRetry ? OvershootChoice.Retry
+            : prompt.HasUnderBandFallback ? OvershootChoice.Leave
+            : null;
+
+    private TaskCompletionSource<OvershootChoice>? _overshootDecision;
+
+    internal bool OvershootAsked => OvershootPanel.IsVisible;
+
+    /// <summary>
+    /// Ana penceredeki aşım sorusunun bu penceredeki karşılığı. Eskiden motor burada sorusuz
+    /// koşuyordu ve hedefi aşan en küçük dosyayı teslim ediyordu; "hedeften büyük dosya asla
+    /// verilmez" diyen satırla çelişiyordu.
+    /// </summary>
+    internal async Task<OvershootChoice> AskOvershootAsync(RetryPrompt prompt, CancellationToken ct)
+    {
+        if (UnaskedChoice(prompt) is { } unasked) return unasked;
+
+        var decision = new TaskCompletionSource<OvershootChoice>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _overshootDecision = decision;
+        await Dispatcher.UIThread.InvokeAsync(() => ShowOvershoot(prompt));
+        using var cancellation = ct.Register(() => decision.TrySetCanceled(ct));
+        try
+        {
+            return await decision.Task;
+        }
+        finally
+        {
+            _overshootDecision = null;
+            await Dispatcher.UIThread.InvokeAsync(HideOvershoot);
+        }
+    }
+
+    private void ShowOvershoot(RetryPrompt prompt)
+    {
+        var kultur = Strings.CultureOf(_language);
+        TxtOvershoot.Text = Say("main.retry.outcome",
+            prompt.Attempt,
+            prompt.MaxAttempts,
+            Bicim.Boyut.Mb(prompt.ActualMb, kultur),
+            Bicim.Boyut.Hedef(prompt.TargetMb, kultur),
+            Bicim.Boyut.Mb(prompt.OverMb, kultur),
+            Bicim.Yuzde.Hazir(prompt.OverPercent, kultur),
+            Saat.Ekran(prompt.AttemptDuration));
+        TxtOvershootMeaning.Text = Say("main.retry.meaning-without-fallback");
+        var kabul = Say("main.retry.accept", Bicim.Boyut.Mb(prompt.ActualMb, kultur));
+        BtnOvershootAccept.Content = kabul;
+        AutomationProperties.SetName(BtnOvershootAccept, kabul);
+        TxtStage.Text = Say("main.output.waiting");
+        OvershootPanel.IsVisible = true;
+    }
+
+    private void HideOvershoot() => OvershootPanel.IsVisible = false;
+
+    internal void AnswerOvershoot(bool accept)
+        => _overshootDecision?.TrySetResult(accept ? OvershootChoice.AcceptLarger : OvershootChoice.Leave);
 
     private void ArmClose()
     {
@@ -613,25 +686,34 @@ public partial class ShrinkJobWindow : Window
     /// İş bittiğinde yazılan satır. Arayüzden ayrı duruyor ki ölçülebilsin: hedefi aşan
     /// teslimde sapma <see cref="Bicim.Boyut.Sapma"/> ile, pencerenin <b>kendi</b>
     /// dilinin kültüründe yazılıyor. Eskiden burada <c>InvariantCulture</c> vardı ve
-    /// Türkçe arayüz sapmayı <c>1.23</c> diye noktayla okuyordu.
+    /// Türkçe arayüz sapmayı <c>1.23</c> diye noktayla okuyordu. Aşım, motorun "hedefin
+    /// üzerinde" dediği etkin hedefe göre (<see cref="EncodeRunner.EffectiveTargetMb"/>).
     /// </summary>
-    internal string BittiSatiri(EncodeResult result, double hedefMb)
-        => result.OverTarget
-            ? result.OutputPath + " " + Say("main.run.accepted-larger",
-                Bicim.Boyut.Sapma(result.OutputMb - hedefMb, Strings.CultureOf(_language)), hedefMb)
-            : MainWindow.ShowsSaturated(result)
-                ? result.OutputPath + " " + Say("main.run.saturated",
-                    Bicim.Boyut.Mb(result.OutputMb, Strings.CultureOf(_language)), Bicim.Boyut.Hedef(hedefMb, Strings.CultureOf(_language)))
-                : result.OutputPath;
+    internal string BittiSatiri(EncodeResult result, double hedefMb, EncodePlan plan)
+    {
+        var kultur = Strings.CultureOf(_language);
+        if (result.OverTarget)
+        {
+            var etkinMb = EncodeRunner.EffectiveTargetMb(hedefMb, plan);
+            return result.OutputPath + " " + Say("main.run.accepted-larger",
+                Bicim.Boyut.Sapma(result.OutputMb - etkinMb, kultur), Bicim.Boyut.Hedef(etkinMb, kultur));
+        }
+        return MainWindow.ShowsSaturated(result)
+            ? result.OutputPath + " " + Say("main.run.saturated", Bicim.Boyut.Mb(result.OutputMb, kultur), Bicim.Boyut.Hedef(hedefMb, kultur))
+            : result.OutputPath;
+    }
 
     /// <summary>
-    /// İş düştüğünde yazılan satır. Tavanı aşan teslimde boyut ailenin baskın yazımıyla
-    /// (<see cref="Bicim.Boyut.Mb"/>) ve pencerenin dilinin kültüründe yazılıyor.
+    /// İş düştüğünde yazılan satır. Boyutlar ailenin yazımıyla (<see cref="Bicim.Boyut"/>) ve
+    /// pencerenin dilinin kültüründe; hedef, motorun altına inemediği etkin hedef.
     /// </summary>
-    internal string HataSatiri(EncodeResult result, double hedefMb)
-        => result.CeilingExceeded
-            ? Say("main.run.over-ceiling", hedefMb, result.Attempts, Bicim.Boyut.Mb(result.OutputMb, Strings.CultureOf(_language)))
+    internal string HataSatiri(EncodeResult result, double hedefMb, EncodePlan plan)
+    {
+        var kultur = Strings.CultureOf(_language);
+        return result.CeilingExceeded
+            ? Say("main.run.over-ceiling", Bicim.Boyut.Hedef(EncodeRunner.EffectiveTargetMb(hedefMb, plan), kultur), result.Attempts, Bicim.Boyut.Mb(result.OutputMb, kultur))
             : Say("main.run.ended");
+    }
 
     private string Say(string key)
         => LanguageCatalog.Title(Strings.GetIn(_language, key), _language);

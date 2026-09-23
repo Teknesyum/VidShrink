@@ -179,7 +179,7 @@ public sealed class EncodeRunner
             plan.Filters = await InterlaceProbe.ResolveAsync(info, plan.Filters, ct);
         }
 
-        var effectiveTargetMb = Math.Min(targetMb, plan.EffectiveTargetMb ?? targetMb);
+        var effectiveTargetMb = EffectiveTargetMb(targetMb, plan);
         var band = FillBand.For(effectiveTargetMb);
         var current = plan;
         var attempt = 0;
@@ -255,12 +255,12 @@ public sealed class EncodeRunner
             {
                 if (step.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(step.Codec))
                 {
-                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 1, passLogPrefix, progress, new EncodeStage(1, 2, attempt).ToString(), 0.0, 0.5, scenes, ct)).DroppedOptions);
-                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 2, passLogPrefix, progress, new EncodeStage(2, 2, attempt).ToString(), 0.5, 1.0, scenes, ct)).DroppedOptions);
+                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 1, passLogPrefix, progress, new EncodeStage(1, 2, attempt).ToString(), 0.0, 0.5, scenes, ct, fillClock)).DroppedOptions);
+                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 2, passLogPrefix, progress, new EncodeStage(2, 2, attempt).ToString(), 0.5, 1.0, scenes, ct, fillClock)).DroppedOptions);
                 }
                 else
                 {
-                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 0, null, progress, new EncodeStage(1, 1, attempt).ToString(), 0.0, 1.0, scenes, ct)).DroppedOptions);
+                    upDropped.AddRange((await RunOneAsync(info, step, upPath, 0, null, progress, new EncodeStage(1, 1, attempt).ToString(), 0.0, 1.0, scenes, ct, fillClock)).DroppedOptions);
                 }
             }
             catch (OperationCanceledException)
@@ -320,12 +320,12 @@ public sealed class EncodeRunner
 
                 if (twoPass)
                 {
-                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 1, passLogPrefix, progress, new EncodeStage(1, 2, attempt).ToString(), 0.0, 0.5, scenes, ct)).DroppedOptions);
-                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 2, passLogPrefix, progress, new EncodeStage(2, 2, attempt).ToString(), 0.5, 1.0, scenes, ct)).DroppedOptions);
+                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 1, passLogPrefix, progress, new EncodeStage(1, 2, attempt).ToString(), 0.0, 0.5, scenes, ct, attemptClock)).DroppedOptions);
+                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 2, passLogPrefix, progress, new EncodeStage(2, 2, attempt).ToString(), 0.5, 1.0, scenes, ct, attemptClock)).DroppedOptions);
                 }
                 else
                 {
-                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 0, null, progress, new EncodeStage(1, 1, attempt).ToString(), 0.0, 1.0, scenes, ct)).DroppedOptions);
+                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 0, null, progress, new EncodeStage(1, 1, attempt).ToString(), 0.0, 1.0, scenes, ct, attemptClock)).DroppedOptions);
                 }
 
                 attemptClock.Stop();
@@ -659,21 +659,40 @@ public sealed class EncodeRunner
     private static async Task<EncodeCommandOutcome> RunOneAsync(
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
         IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo,
-        SceneMap? scenes, CancellationToken ct)
+        SceneMap? scenes, CancellationToken ct, Stopwatch attemptClock)
     {
         var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance, scenes);
-        return await RunCommandAsync(args, plan.EffectiveDurationSeconds(info.DurationSeconds), progress, stage, spanFrom, spanTo, ct);
+        return await RunCommandAsync(args, plan.EffectiveDurationSeconds(info.DurationSeconds), progress, stage, spanFrom, spanTo, ct, () => attemptClock.Elapsed);
     }
+
+    /// <summary>
+    /// Motorun boyut ölçüsünün karşılaştırıldığı hedef: kullanıcının hedefi, plan kaynağa göre
+    /// kırptıysa (<see cref="EncodePlan.EffectiveTargetMb"/>) o. "Hedefin üzerinde" kararı buna
+    /// göre verildiği için aşımı anlatan her satır da buna göre hesaplanır.
+    /// </summary>
+    public static double EffectiveTargetMb(double targetMb, EncodePlan plan)
+        => Math.Min(targetMb, plan.EffectiveTargetMb ?? targetMb);
+
+    /// <summary>
+    /// Kalan süre. <paramref name="fraction"/> ile <paramref name="elapsed"/> aynı birimi ölçmeli:
+    /// kesir bütün geçişlere yayıldığı için geçen süre de ilk geçişin başından sayılır. Geçiş
+    /// başına sıfırlanan saatle ikinci geçiş, birinci geçişin süresini hiç harcanmamış sayıyordu.
+    /// </summary>
+    internal static TimeSpan? Remaining(double fraction, TimeSpan elapsed)
+        => fraction > 0.01
+            ? TimeSpan.FromSeconds(Math.Max(0, elapsed.TotalSeconds / fraction - elapsed.TotalSeconds))
+            : null;
 
     internal static async Task<EncodeCommandOutcome> RunCommandAsync(
         IReadOnlyList<string> commandArgs, double durationSeconds, IProgress<EncodeProgress>? progress,
-        string stage, double spanFrom, double spanTo, CancellationToken ct)
+        string stage, double spanFrom, double spanTo, CancellationToken ct, Func<TimeSpan>? spanElapsed = null)
     {
         var args = commandArgs.ToList();
         args.InsertRange(0, new[] { "-progress", "pipe:1", "-nostats" });
 
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
         var stopwatch = Stopwatch.StartNew();
+        var elapsed = spanElapsed ?? (() => stopwatch.Elapsed);
         var watch = new StderrWatch();
 
         process.Start();
@@ -702,10 +721,8 @@ public sealed class EncodeRunner
 
             var local = Math.Clamp(us / 1_000_000.0 / durationSeconds, 0, 1);
             var overall = spanFrom + local * (spanTo - spanFrom);
-            var remaining = overall > 0.01
-                ? TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds / overall - stopwatch.Elapsed.TotalSeconds)
-                : (TimeSpan?)null;
-            progress?.Report(new EncodeProgress(overall, stopwatch.Elapsed, remaining, outMb, stage));
+            var spent = elapsed();
+            progress?.Report(new EncodeProgress(overall, spent, Remaining(overall, spent), outMb, stage));
         }
 
         await process.WaitForExitAsync(ct);
@@ -716,7 +733,8 @@ public sealed class EncodeRunner
         GunlugeYaz(args, outcome, stopwatch.Elapsed);
         ThrowIfFailed(outcome);
 
-        progress?.Report(new EncodeProgress(spanTo, stopwatch.Elapsed, TimeSpan.Zero, outMb, stage));
+        var done = elapsed();
+        progress?.Report(new EncodeProgress(spanTo, done, spanTo >= 1 ? TimeSpan.Zero : Remaining(spanTo, done), outMb, stage));
         return outcome;
     }
 

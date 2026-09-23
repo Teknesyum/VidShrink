@@ -71,6 +71,30 @@
                  TextWrapping="Wrap"
                  MaxWidth="{StaticResource TipMaxWidth}"/>
 
+      <StackPanel x:Name="OvershootPanel" Spacing="{StaticResource SpaceSm}" IsVisible="False">
+        <TextBlock Text="{loc:Text main.retry.title}"
+                   FontSize="{StaticResource FontSizeMd}"
+                   FontWeight="SemiBold"
+                   TextWrapping="Wrap"/>
+        <TextBlock x:Name="TxtOvershoot"
+                   FontSize="{StaticResource FontSizeSm}"
+                   TextWrapping="Wrap"
+                   MaxWidth="{StaticResource TipMaxWidth}"/>
+        <TextBlock x:Name="TxtOvershootMeaning"
+                   FontSize="{StaticResource FontSizeSm}"
+                   Foreground="{StaticResource TextDisabled}"
+                   TextWrapping="Wrap"
+                   MaxWidth="{StaticResource TipMaxWidth}"/>
+        <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+          <Button x:Name="BtnOvershootAccept"
+                  auto:AutomationProperties.Name="{loc:Text main.retry.accept.name}"
+                  Padding="{StaticResource ButtonPaddingSm}"/>
+          <Button x:Name="BtnOvershootStop"
+                  Content="{loc:Text main.retry.stop}"
+                  Padding="{StaticResource ButtonPaddingSm}"/>
+        </WrapPanel>
+      </StackPanel>
+
       <StackPanel x:Name="PendingPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
         <TextBlock x:Name="TxtPending"
                    FontSize="{StaticResource FontSizeSm}"

@@ -219,11 +219,11 @@ public sealed class KucultPaylasTests
                 var kultur = Strings.CultureOf(window.Language);
 
                 var asan = new EncodeResult(true, @"C:\ornekideo_shrunk.mp4", 17.23, null!, 1, null, OverTarget: true);
-                var bitti = window.BittiSatiri(asan, 16);
+                var bitti = window.BittiSatiri(asan, 16, new EncodePlan());
                 Assert.Contains(Bicim.Boyut.Sapma(17.23 - 16, kultur), bitti);
 
                 var tavan = new EncodeResult(false, @"C:\ornekideo_shrunk.mp4", 12.0, null!, 3, null, CeilingExceeded: true);
-                var hata = window.HataSatiri(tavan, 16);
+                var hata = window.HataSatiri(tavan, 16, new EncodePlan());
                 Assert.Contains(Bicim.Boyut.Mb(12.0, kultur), hata);
             }
             finally { window.Close(); }
