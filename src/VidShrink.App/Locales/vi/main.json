@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "nguồn mang siêu dữ liệu động HDR10+ mà chỉ {1} truyền qua được, nên dùng {1} thay cho {0}",
   "main.reason.hdr10plus-svtav1": "HDR10+ không được truyền qua nhánh SVT-AV1, nên đầu ra chỉ giữ lớp HDR10 tĩnh; Tự động sẽ dùng libx265, bộ mã hóa truyền được nó",
   "main.reason.hdr10plus-cut": "HDR10+ đã mất khi cắt: siêu dữ liệu bám theo nguồn từng khung hình, và việc cắt bớt hay đổi tốc độ khung hình làm lệch sự khớp đó, nên đầu ra chỉ giữ lớp HDR10 tĩnh",
+  "main.reason.no-quality-scale": "{0} không có thang chất lượng gắn với CRF trong công cụ này, nên nó giữ kích thước bằng tốc độ bit trong cơ chế điều khiển tốc độ một lượt của riêng nó thay vì đoán CRF",
   "main.reason.stream.audio-passthrough": "rãnh âm thanh được sao chép nguyên trạng: vùng chứa hỗ trợ codec của nó và nằm trong 15% mục tiêu",
   "main.reason.stream.audio-downmixed": "rãnh âm thanh vòm được trộn xuống stereo khi mã hóa lại",
   "main.reason.stream.extra-audio-dropped": "chỉ giữ một rãnh âm thanh; bật 'Giữ mọi rãnh' để mang tất cả trong MKV",

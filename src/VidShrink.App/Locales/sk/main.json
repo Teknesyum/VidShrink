@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "zdroj nesie dynamické metadáta HDR10+, ktoré dokáže preniesť len {1}, preto sa namiesto {0} použije {1}",
   "main.reason.hdr10plus-svtav1": "HDR10+ sa vo vetve SVT-AV1 neprenáša, takže výstup si ponechá len statickú vrstvu HDR10; Automaticky by použilo libx265, ktoré ho prenáša",
   "main.reason.hdr10plus-cut": "HDR10+ sa pri strihu stratilo: jeho metadáta sledujú zdroj snímku po snímke a orezanie alebo zmena snímkovej frekvencie toto zarovnanie naruší, takže výstup si ponechá len statickú vrstvu HDR10",
+  "main.reason.no-quality-scale": "{0} nemá v tomto nástroji stupnicu kvality naviazanú na CRF, preto drží veľkosť dátovým tokom vo vlastnom jednopriechodovom riadení namiesto odhadu CRF",
   "main.reason.stream.audio-passthrough": "zvuková stopa sa kopíruje bez zmeny: kontajner podporuje jej kodek a zmestí sa do 15 % cieľa",
   "main.reason.stream.audio-downmixed": "priestorová zvuková stopa sa pri prekódovaní zmieša do sterea",
   "main.reason.stream.extra-audio-dropped": "ponechá sa len jedna zvuková stopa; zapnite 'Zachovať všetky stopy', aby sa všetky preniesli v MKV",

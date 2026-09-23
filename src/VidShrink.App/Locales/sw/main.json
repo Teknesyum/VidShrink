@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "chanzo kina metadata za HDR10+ zinazobadilika ambazo {1} pekee inaweza kupitisha, kwa hiyo {1} inatumika badala ya {0}",
   "main.reason.hdr10plus-svtav1": "HDR10+ haipitishwi kwenye njia ya SVT-AV1, kwa hiyo matokeo yanabaki na safu tuli ya HDR10 pekee; Otomatiki ingetumia libx265, inayoipitisha",
   "main.reason.hdr10plus-cut": "HDR10+ imepotea kwenye ukataji: metadata zake hufuata chanzo fremu kwa fremu, na kupunguza au kubadilisha kasi ya fremu huvunja upatanisho huo, kwa hiyo matokeo yanabaki na safu tuli ya HDR10 pekee",
+  "main.reason.no-quality-scale": "{0} haina kipimo cha ubora kilichofungamanishwa na CRF katika injini hii, kwa hivyo inashikilia ukubwa kwa kasi biti katika udhibiti wake wa kasi wa mpito mmoja badala ya kukisia CRF",
   "main.reason.stream.audio-passthrough": "wimbo wa sauti unanakiliwa kama ulivyo: chombo kinakubali kodeki yake na unabaki ndani ya 15% ya lengo",
   "main.reason.stream.audio-downmixed": "wimbo wa sauti ya mzunguko unachanganywa kuwa stereo unaposimbwa upya",
   "main.reason.stream.extra-audio-dropped": "wimbo mmoja tu wa sauti unahifadhiwa; washa 'Hifadhi nyimbo zote' ili kubeba zote katika MKV",

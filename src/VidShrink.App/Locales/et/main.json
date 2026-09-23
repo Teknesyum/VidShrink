@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "allikas kannab dünaamilisi HDR10+ metaandmeid, mida suudab edasi anda ainult {1}, seepärast kasutatakse {0} asemel {1}",
   "main.reason.hdr10plus-svtav1": "HDR10+ ei liigu SVT-AV1 teel edasi, seega väljund säilitab ainult staatilise HDR10 kihi; Automaatne kasutaks libx265, mis selle edasi annab",
   "main.reason.hdr10plus-cut": "HDR10+ kadus lõikamisel: metaandmed järgivad allikat kaader kaadri haaval ning kärpimine või kaadrisageduse muutus rikub selle joonduse, seega väljund säilitab ainult staatilise HDR10 kihi",
+  "main.reason.no-quality-scale": "{0} ei oma selles mootoris CRF-iga seotud kvaliteediskaalat, seega hoiab see suurust bitikiirusega oma ühekäigulises kiirusjuhtimises CRF-i oletamise asemel",
   "main.reason.stream.audio-passthrough": "helirada kopeeritakse muutmata: konteiner toetab selle koodekit ja see jääb 15% piiresse sihist",
   "main.reason.stream.audio-downmixed": "ruumiline helirada miksitakse ümberkodeerimisel stereoks",
   "main.reason.stream.extra-audio-dropped": "alles jäetakse ainult üks helirada; lülita sisse 'Säilita kõik rajad', et kõik MKV-s kaasa võtta",

@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "źródło zawiera dynamiczne metadane HDR10+, które przenosi tylko {1}, dlatego zamiast {0} używany jest {1}",
   "main.reason.hdr10plus-svtav1": "HDR10+ nie jest przenoszone ścieżką SVT-AV1, więc wynik zachowuje tylko statyczną warstwę HDR10; tryb Automatyczny użyłby libx265, który je przenosi",
   "main.reason.hdr10plus-cut": "HDR10+ przepadło przy cięciu: metadane podążają za źródłem klatka po klatce, a przycięcie lub zmiana liczby klatek na sekundę psuje to dopasowanie, więc wynik zachowuje tylko statyczną warstwę HDR10",
+  "main.reason.no-quality-scale": "{0} nie ma w tym silniku skali jakości powiązanej z CRF, więc utrzymuje rozmiar przepływnością we własnej jednoprzebiegowej kontroli zamiast zgadywanego CRF",
   "main.reason.stream.audio-passthrough": "ścieżka dźwiękowa jest kopiowana bez zmian: kontener obsługuje jej kodek i mieści się w 15% celu",
   "main.reason.stream.audio-downmixed": "ścieżka dźwięku przestrzennego jest miksowana do stereo podczas ponownego kodowania",
   "main.reason.stream.extra-audio-dropped": "zachowywana jest tylko jedna ścieżka dźwiękowa; włącz 'Zachowaj wszystkie ścieżki', aby przenieść wszystkie w MKV",

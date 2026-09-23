@@ -1153,6 +1153,8 @@ public sealed class BaslikKapsamiTests
     /// sonra cumle ("Dropped: codec not supported", "Duraklatıldı: şimdiki dosya biter, sıradaki bekler"); en cok
     /// <c>main.preset.import.summary</c> 41, <c>main.reason.auto-crop</c> 40. 2007 + 519 = 2526; en 232 + 5 = 237,
     /// tr 81 + 8 = 89. Kurali kaldirmak sayimi 2007/232/81'e geri indiriyor (olculdu).</para>
+    /// <para>2026-09-23, Media Foundation: <c>main.reason.no-quality-scale</c> 15 dilde kola giriyor,
+    /// en dahil tr haric: iki nokta kuraliyla birlikte 2526 + 15 = 2541, en 237 + 1 = 238, tr 89.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1178,8 +1180,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2526, toplam);
-        Assert.Equal(237, dilBasina["en"]);
+        Assert.Equal(2541, toplam);
+        Assert.Equal(238, dilBasina["en"]);
         Assert.Equal(89, dilBasina["tr"]);
     }
 
@@ -1324,6 +1326,8 @@ public sealed class BaslikKapsamiTests
     /// <c>main.estimate.mode.enforced-single-pass</c>, <c>main.estimate.mode.copy</c>, uc
     /// <c>main.reason.*-single-pass</c>, <c>main.advice.single-pass</c>): 1078 + 7 = 1085,
     /// 43 x 1085 = 46655. <c>kayip</c> yine 0.</para>
+    /// <para>2026-09-23: Media Foundation dil basina bir anahtar (<c>main.reason.no-quality-scale</c>):
+    /// 1085 + 1 = 1086, 43 x 1086 = 46698.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1351,7 +1355,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(46655, gezilen);
+        Assert.Equal(46698, gezilen);
         Assert.Empty(kayip);
     }
 

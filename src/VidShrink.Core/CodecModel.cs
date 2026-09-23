@@ -2,7 +2,7 @@
 
 namespace VidShrink.Core;
 
-public enum EncoderVendor { Software, Nvenc, Qsv, Amf, VideoToolbox }
+public enum EncoderVendor { Software, Nvenc, Qsv, Amf, VideoToolbox, MediaFoundation }
 
 public static class CodecModel
 {
@@ -151,8 +151,29 @@ public static class CodecModel
         if (c.Contains("qsv")) return EncoderVendor.Qsv;
         if (c.Contains("amf")) return EncoderVendor.Amf;
         if (c.Contains("videotoolbox")) return EncoderVendor.VideoToolbox;
+        if (c.EndsWith("_mf", StringComparison.Ordinal)) return EncoderVendor.MediaFoundation;
         return EncoderVendor.Software;
     }
+
+    /// <summary>
+    /// Kodlayicinin bu platformda onerilip onerilmedigi. Media Foundation yalniz Windows'un
+    /// kendi cercevesidir: baska platformda ffmpeg onu derlemez, derlese de arkasinda MFT yok.
+    /// Liste, kilit ve plan cozumleyici bu kapidan gecer; platform parametre olarak verilir ki
+    /// Windows'ta kosan test de Windows disi kolu olcebilsin.
+    /// </summary>
+    public static bool IsOfferedOn(string codec, bool windows)
+        => windows || Vendor(codec) != EncoderVendor.MediaFoundation;
+
+    public static bool IsOffered(string codec) => IsOfferedOn(codec, OperatingSystem.IsWindows());
+
+    /// <summary>
+    /// Kodlayicinin olculmus bir kalite olcegi var mi. VideoToolbox'in <c>-q:v</c>'si ve Media
+    /// Foundation'in <c>-rate_control quality -quality N</c>'si bu depoda bir CRF karsiligina
+    /// baglanmadi (<c>docs/olcumler/hb15-media-foundation.md</c>: <c>-quality</c> olcegi gercek
+    /// ama CRF'ten ona cevirinin dayanagi yok); ikisi de hedef boyutu bit hiziyla tutar.
+    /// </summary>
+    public static bool HasQualityScale(string codec)
+        => Vendor(codec) is not (EncoderVendor.VideoToolbox or EncoderVendor.MediaFoundation);
 
     /// <summary>
     /// Whether the encoder is sent down the hardware path. Everything behind this gate - the
@@ -162,10 +183,14 @@ public static class CodecModel
     /// VideoToolbox is a chip and is still false here: nothing behind this gate has been measured
     /// on it. docs/olcumler/videotoolbox.md gives one bitrate per arm on one Apple M1, which is not
     /// enough for any of them. Opening this gate for VideoToolbox is a measurement, not an edit.
+    /// Media Foundation is carried through the gate like QSV and AMF: on the measuring machine it
+    /// resolves to the NVIDIA MFT and overshoots a single-pass request by 1.02-1.12
+    /// (docs/olcumler/hb15-media-foundation.md), the same side as NVENC, so the reserve and the
+    /// tight peak point the right way; the numbers themselves are still NVENC's.
     /// </summary>
     public static bool IsHardware(string codec) => Vendor(codec) switch
     {
-        EncoderVendor.Nvenc or EncoderVendor.Qsv or EncoderVendor.Amf => true,
+        EncoderVendor.Nvenc or EncoderVendor.Qsv or EncoderVendor.Amf or EncoderVendor.MediaFoundation => true,
         _ => false
     };
 
@@ -173,7 +198,7 @@ public static class CodecModel
         => IsHardware(codec) || Vendor(codec) == EncoderVendor.VideoToolbox;
 
     public static bool TakesPreset(string codec)
-        => Vendor(codec) != EncoderVendor.VideoToolbox && !IsVp9(codec);
+        => Vendor(codec) is not (EncoderVendor.VideoToolbox or EncoderVendor.MediaFoundation) && !IsVp9(codec);
 
     /// <summary>
     /// libvpx-vp9 <c>-preset</c> tanimaz; hiz <c>-deadline good -cpu-used N</c> ile verilir ve
@@ -188,8 +213,17 @@ public static class CodecModel
     /// VMAF-NEG / XPSNR gerilemesi bant icinde, parlak 2000'de +1,11 / +0,30. h264_videotoolbox
     /// 10 bit tasimaz, degismez.
     /// </summary>
+    /// <para>
+    /// Media Foundation donanim MFT'si yalniz <c>nv12</c> ile acilir: <c>-hw_encoding 1</c> ile
+    /// <c>yuv420p</c> "format negotiation failed" ile duser (olcum
+    /// <c>docs/olcumler/hb15-media-foundation.md</c>). <c>ffmpeg -h encoder=hevc_mf</c> 10 bit bir
+    /// bicim listelemiyor, yani 10 bit bir kaynak da <c>nv12</c>'ye iner.
+    /// </para>
     public static string OutputPixelFormat(string codec, string resolved)
-        => resolved == "yuv420p" && codec.Equals("hevc_videotoolbox", StringComparison.OrdinalIgnoreCase) ? "p010le" : resolved;
+    {
+        if (Vendor(codec) == EncoderVendor.MediaFoundation) return "nv12";
+        return resolved == "yuv420p" && codec.Equals("hevc_videotoolbox", StringComparison.OrdinalIgnoreCase) ? "p010le" : resolved;
+    }
 
     public static string? OutputProfile(string codec, string pixelFormat)
         => codec.Equals("hevc_videotoolbox", StringComparison.OrdinalIgnoreCase) && pixelFormat == "p010le" ? "main10" : null;
@@ -288,6 +322,9 @@ public static class CodecModel
             EncoderVendor.VideoToolbox => throw new NotSupportedException(
                 $"VideoToolbox hiz kontrolu olculmedi ({codec}): -crf kabul edilmiyor ve -q:v olceginin "
                 + "bu depoda dayanagi yok. Kapiyi acan sozlesme olcegi olcup bu kolu yazar."),
+            EncoderVendor.MediaFoundation => throw new NotSupportedException(
+                $"Media Foundation kalite olcegi CRF'e baglanmadi ({codec}): -crf kabul edilmiyor, "
+                + "-quality olceginin CRF karsiligi olculmedi. Plan bu kodlayicida bit hizi kipinde kalir."),
             EncoderVendor.Nvenc => new[] { "-rc", "vbr", "-multipass", "fullres", "-cq", exact },
             EncoderVendor.Qsv => codec.Equals("h264_qsv", StringComparison.OrdinalIgnoreCase)
                 ? new[] { "-global_quality", whole, "-look_ahead", "1" }
@@ -305,6 +342,7 @@ public static class CodecModel
         EncoderVendor.Qsv => codec.Equals("h264_qsv", StringComparison.OrdinalIgnoreCase)
             ? new[] { "-look_ahead", "1" }
             : Array.Empty<string>(),
+        EncoderVendor.MediaFoundation => new[] { "-rate_control", "pc_vbr" },
         _ => Array.Empty<string>()
     };
 

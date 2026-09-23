@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "la fuente lleva metadatos dinámicos HDR10+ que solo {1} puede transmitir, por eso se usa {1} en lugar de {0}",
   "main.reason.hdr10plus-svtav1": "HDR10+ no se transmite por la vía SVT-AV1, así que la salida conserva solo la capa HDR10 estática; Automático usaría libx265, que sí lo transmite",
   "main.reason.hdr10plus-cut": "HDR10+ se perdió en el corte: sus metadatos siguen la fuente fotograma a fotograma, y un recorte o un cambio de velocidad de fotogramas rompe esa alineación, así que la salida conserva solo la capa HDR10 estática",
+  "main.reason.no-quality-scale": "{0} no tiene en este motor una escala de calidad ligada a CRF, así que mantiene el tamaño con una tasa de bits en su propio control de tasa de una pasada en lugar de una CRF estimada",
   "main.reason.stream.audio-passthrough": "la pista de audio se copia tal cual: el contenedor admite su códec y no supera el 15 % del objetivo",
   "main.reason.stream.audio-downmixed": "una pista de audio envolvente se mezcla a estéreo al recodificarse",
   "main.reason.stream.extra-audio-dropped": "solo se conserva una pista de audio; active 'Conservar todas las pistas' para llevarlas todas en MKV",

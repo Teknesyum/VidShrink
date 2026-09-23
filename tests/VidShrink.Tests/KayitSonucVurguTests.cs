@@ -79,7 +79,12 @@ public sealed class KayitSonucVurguTests
     }
 
     /// <summary>Düğmenin çizilmiş pikselleri içinde palet fırçasına (±6) eşit olanların oranı.</summary>
-    private static double FircaOrani(Button dugme, Color firca, string png)
+    private static Color Renk(string anahtar) =>
+        Application.Current!.TryGetResource(anahtar, ThemeVariant.Default, out var v) && v is Color c
+            ? c
+            : throw new InvalidOperationException(anahtar + " yok");
+
+    private static double FircaOrani(Button dugme, (Color Bas, Color Son) firca, string png)
     {
         var w = (int)Math.Ceiling(dugme.Bounds.Width);
         var h = (int)Math.Ceiling(dugme.Bounds.Height);
@@ -98,11 +103,20 @@ public sealed class KayitSonucVurguTests
             var b = pixels[i * 4];
             var g = pixels[(i * 4) + 1];
             var r = pixels[(i * 4) + 2];
-            if (Math.Abs(r - firca.R) <= 6 && Math.Abs(g - firca.G) <= 6 && Math.Abs(b - firca.B) <= 6) esit++;
+            for (var t = 0.0; t <= 1.0001; t += 0.02)
+            {
+                if (Math.Abs(r - Ara(firca.Bas.R, firca.Son.R, t)) <= 6 && Math.Abs(g - Ara(firca.Bas.G, firca.Son.G, t)) <= 6 && Math.Abs(b - Ara(firca.Bas.B, firca.Son.B, t)) <= 6)
+                {
+                    esit++;
+                    break;
+                }
+            }
         }
 
         return (double)esit / (w * h);
     }
+
+    private static double Ara(byte bas, byte son, double t) => bas + ((son - bas) * t);
 
     /// <summary>
     /// R10/R14: "Küçült'e gönder" panelin birinci düğmesi ve paletin <c>NeonBlue</c> fırçasıyla dolu;
@@ -117,9 +131,7 @@ public sealed class KayitSonucVurguTests
             var (view, window) = Ac();
             try
             {
-                var renk = Application.Current!.TryGetResource("NeonBlue", ThemeVariant.Default, out var v) && v is ISolidColorBrush b
-                    ? b.Color
-                    : throw new InvalidOperationException("NeonBlue fırçası yok");
+                var renk = (Renk("NeonBlueColor"), Renk("NeonPurpleColor"));
                 var dugmeler = Bul<Button>(view, "BtnToShrink").Parent as Panel ?? throw new InvalidOperationException("panel");
                 var birinci = dugmeler.Children.OfType<Button>().First(d => d.IsVisible).Name;
                 var klasorde = Klasor();

@@ -90,6 +90,7 @@ public partial class MainWindow
                 ReasonCode.Hdr10PlusRoutedToX265 => Say("main.reason.hdr10plus-routed-x265", note.RequestedCodec, note.FallbackCodec),
                 ReasonCode.Hdr10PlusNotCarriedOnSvtAv1 => Say("main.reason.hdr10plus-svtav1"),
                 ReasonCode.Hdr10PlusDroppedInCut => Say("main.reason.hdr10plus-cut"),
+                ReasonCode.NoQualityScaleBitrate => Say("main.reason.no-quality-scale", note.RequestedCodec),
                 ReasonCode.FillCrfLowered => Say("main.reason.fill-crf-lowered",
                     Num(note.Crf, "0.#"), Num(note.Mb, "0.0"), Num(note.BandLowerMb, "0.0"), Num(note.TargetMb, "0.0")),
                 ReasonCode.FillTwoPassBandCenter => Say(RunsSinglePass(plan)

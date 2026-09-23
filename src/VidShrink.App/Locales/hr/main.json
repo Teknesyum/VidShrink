@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "izvor nosi dinamičke HDR10+ metapodatke koje može prenijeti samo {1}, zato se umjesto {0} koristi {1}",
   "main.reason.hdr10plus-svtav1": "HDR10+ se ne prenosi putem SVT-AV1, pa izlaz zadržava samo statički HDR10 sloj; Automatski bi koristio libx265, koji ga prenosi",
   "main.reason.hdr10plus-cut": "HDR10+ je izgubljen pri rezanju: metapodaci prate izvor sličicu po sličicu, a skraćivanje ili promjena broja sličica u sekundi narušava to poravnanje, pa izlaz zadržava samo statički HDR10 sloj",
+  "main.reason.no-quality-scale": "{0} u ovom mehanizmu nema ljestvicu kvalitete vezanu uz CRF, pa veličinu drži brzinom prijenosa u vlastitoj jednoprolaznoj kontroli umjesto procjene CRF-a",
   "main.reason.stream.audio-passthrough": "audiozapis kopira se nepromijenjen: spremnik podržava njegov kodek i ostaje unutar 15 % cilja",
   "main.reason.stream.audio-downmixed": "surround audiozapis miješa se u stereo pri ponovnom kodiranju",
   "main.reason.stream.extra-audio-dropped": "zadržava se samo jedan audiozapis; uključite 'Zadrži sve zapise' da se svi prenesu u MKV",

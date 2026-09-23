@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "kilden bærer dynamiske HDR10+-metadata, som kun {1} kan føre videre, så {1} bruges i stedet for {0}",
   "main.reason.hdr10plus-svtav1": "HDR10+ føres ikke med på SVT-AV1-vejen, så outputtet beholder kun det statiske HDR10-lag; Automatisk ville bruge libx265, som fører det med",
   "main.reason.hdr10plus-cut": "HDR10+ faldt væk ved klipningen: metadataene følger kilden billede for billede, og en beskæring eller en ændret billedhastighed bryder den justering, så outputtet beholder kun det statiske HDR10-lag",
+  "main.reason.no-quality-scale": "{0} har ingen kvalitetsskala knyttet til CRF i denne motor, så den holder størrelsen med en bithastighed i sin egen enkeltgennemløbs-hastighedskontrol i stedet for et CRF-gæt",
   "main.reason.stream.audio-passthrough": "lydsporet kopieres uændret: containeren understøtter dets codec, og det holder sig inden for 15 % af målet",
   "main.reason.stream.audio-downmixed": "et surround-lydspor mixes ned til stereo under omkodningen",
   "main.reason.stream.extra-audio-dropped": "kun ét lydspor beholdes; slå 'Behold alle spor' til for at få dem alle med i MKV",

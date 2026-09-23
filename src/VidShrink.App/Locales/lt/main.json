@@ -432,6 +432,7 @@
   "main.reason.hdr10plus-routed-x265": "šaltinyje yra dinaminių HDR10+ metaduomenų, kuriuos perduoti gali tik {1}, todėl vietoj {0} naudojamas {1}",
   "main.reason.hdr10plus-svtav1": "HDR10+ neperduodamas SVT-AV1 keliu, todėl išvestis išlaiko tik statinį HDR10 sluoksnį; Automatinis naudotų libx265, kuris jį perduoda",
   "main.reason.hdr10plus-cut": "HDR10+ prarastas karpant: metaduomenys seka šaltinį kadras po kadro, o apkarpymas ar kadrų dažnio pakeitimas šį atitikimą suardo, todėl išvestis išlaiko tik statinį HDR10 sluoksnį",
+  "main.reason.no-quality-scale": "{0} šiame variklyje neturi su CRF susietos kokybės skalės, todėl dydį palaiko bitų sparta savo vieno praėjimo spartos valdyme, o ne spėjama CRF reikšme",
   "main.reason.stream.audio-passthrough": "garso takelis nukopijuojamas nepakeistas: konteineris palaiko jo kodeką ir jis neviršija 15 % tikslo",
   "main.reason.stream.audio-downmixed": "erdvinio garso takelis perkoduojant sumaišomas į stereo",
   "main.reason.stream.extra-audio-dropped": "paliekamas tik vienas garso takelis; įjunkite 'Išsaugoti visus takelius', kad visi būtų perkelti į MKV",

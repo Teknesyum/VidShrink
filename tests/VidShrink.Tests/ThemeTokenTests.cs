@@ -153,13 +153,14 @@ public sealed class ThemeTokenTests
     }
 
     /// <summary>
-    /// K2: her alev tabanda sıcak, uçta soğuk. Rampa boyunca ton kırmızıya doğru
-    /// düşüyor, son durak saydam.
+    /// K2: her alev tabanda sıcak, uçta soğuk. Rampa boyunca parlaklık düşüyor, saydamdan
+    /// önceki durak paletin atmosfer kenarı (<c>AtmosEdgeColor</c>), son durak saydam. Ton
+    /// sorulmaz: Neon atmosferi yeşil, öteki paletlerde kırmızıdan sarıya.
     /// </summary>
     [Fact]
     public void EveryFlameRunsFromHotBaseToTransparentTip()
     {
-        var redHue = Hsl(Token("NeonEmberColor")).Hue;
+        var edge = Token("AtmosEdgeColor");
 
         foreach (var key in FlameBrushKeys)
         {
@@ -174,12 +175,11 @@ public sealed class ThemeTokenTests
             Assert.Equal("Transparent", StopColour(stops[^1]));
 
             var heats = stops.Take(stops.Count - 1)
-                .Select(stop => Hsl(StopColour(stop)).Hue)
-                .Select(hue => hue > 180 ? hue - 360 : hue)
+                .Select(stop => Hsl(StopColour(stop)).Lightness)
                 .ToList();
 
             Assert.Equal(heats.OrderByDescending(value => value).ToList(), heats);
-            Assert.Equal(redHue - 360, heats[^1], 3);
+            Assert.Equal(edge, StopColour(stops[^2]));
         }
     }
 
@@ -199,13 +199,13 @@ public sealed class ThemeTokenTests
 
     /// <summary>
     /// T78 K6: parlama ve kor katmanları palete renk eklemeden kuruldu. Her ikisi de
-    /// yalnızca mevcut <c>Ember</c> belirteçlerini kullanıyor ve kendi tonları yok, yalnız
+    /// yalnızca mevcut <c>Atmos</c> belirteçlerini kullanıyor ve kendi tonları yok, yalnız
     /// bir opaklık değeri taşıyorlar.
     /// </summary>
     [Fact]
     public void TheGlowAndTheEmbersAreOpacityVariantsOfTheSameRamp()
     {
-        var allowed = new[] { "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor" };
+        var allowed = new[] { "AtmosEdgeColor", "AtmosMidColor", "AtmosHotColor" };
 
         foreach (var key in FlameBrushKeys)
         {

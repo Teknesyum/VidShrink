@@ -217,7 +217,7 @@ public sealed class LanguageTests : IDisposable
         "OnNeonColor", "PinkTextColor",
         "NeonBlueFillColor", "NeonBlueHoverColor", "NeonBlueActiveColor",
         "NeonBlueBorderColor", "NeonBlueBorderStrongColor", "NeonPinkFillColor",
-        "NeonPurpleBorderColor", "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor",
+        "NeonPurpleBorderColor", "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor", "AtmosHotColor", "AtmosMidColor", "AtmosEdgeColor",
         "EmberDeepColor", "EmberMidColor", "EmberEdgeColor",
         "EmberBarDeepColor", "EmberBarMidColor", "EmberBarEdgeColor",
         "FontSans", "FontMono",

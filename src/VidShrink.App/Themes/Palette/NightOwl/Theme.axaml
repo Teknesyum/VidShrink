@@ -20,7 +20,7 @@
   <Color x:Key="NeonBlueFillColor">#1A82AAFF</Color>
   <Color x:Key="NeonBlueHoverColor">#3382AAFF</Color>
   <Color x:Key="NeonBlueActiveColor">#4D82AAFF</Color>
-  <Color x:Key="NeonBlueBorderColor">#4D82AAFF</Color>
+  <Color x:Key="NeonBlueBorderColor">#4D82AAFE</Color>
   <Color x:Key="NeonBlueBorderStrongColor">#8082AAFF</Color>
   <Color x:Key="NeonPinkFillColor">#1A7FDBCA</Color>
   <Color x:Key="NeonPurpleBorderColor">#80C792EA</Color>
@@ -28,6 +28,9 @@
   <Color x:Key="NeonEmberColor">#FFEF5350</Color>
   <Color x:Key="EmberFlameColor">#FFF78C6C</Color>
   <Color x:Key="EmberBlazeColor">#FFECC48D</Color>
+  <Color x:Key="AtmosHotColor">#FFECC48E</Color>
+  <Color x:Key="AtmosMidColor">#FFF78C6D</Color>
+  <Color x:Key="AtmosEdgeColor">#FFEF5351</Color>
   <Color x:Key="EmberDeepColor">#FF05121F</Color>
   <Color x:Key="EmberMidColor">#FF07131F</Color>
   <Color x:Key="EmberEdgeColor">#FF0A1420</Color>

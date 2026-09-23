@@ -25,6 +25,10 @@
   <SolidColorBrush x:Key="OnNeon" Color="{StaticResource OnNeonColor}"/>
   <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource NeonEmberColor}"/>
   <SolidColorBrush x:Key="EmberBlaze" Color="{StaticResource EmberBlazeColor}"/>
+  <LinearGradientBrush x:Key="AccentGradient" StartPoint="0%,50%" EndPoint="100%,50%">
+    <GradientStop Color="{StaticResource NeonBlueColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource NeonPurpleColor}" Offset="1"/>
+  </LinearGradientBrush>
 
   <x:Double x:Key="PhoenixOpacity">0.08</x:Double>
   <x:Double x:Key="PhoenixGlowInnerOpacity">0.34</x:Double>
@@ -42,48 +46,48 @@
                    Color="{StaticResource SurfaceToneColor}"
                    Opacity="{StaticResource PanelSurfaceOpacity}"/>
   <RadialGradientBrush x:Key="PhoenixGlowInner" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="{StaticResource PhoenixGlowInnerOpacity}">
-    <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
-    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.45"/>
-    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.9"/>
+    <GradientStop Color="{StaticResource AtmosHotColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource AtmosMidColor}" Offset="0.45"/>
+    <GradientStop Color="{StaticResource AtmosEdgeColor}" Offset="0.9"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
 
   <RadialGradientBrush x:Key="PhoenixGlowMid" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="{StaticResource PhoenixGlowMidOpacity}">
-    <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
-    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.4"/>
-    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.85"/>
+    <GradientStop Color="{StaticResource AtmosHotColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource AtmosMidColor}" Offset="0.4"/>
+    <GradientStop Color="{StaticResource AtmosEdgeColor}" Offset="0.85"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
 
   <RadialGradientBrush x:Key="PhoenixGlowOuter" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="{StaticResource PhoenixGlowOuterOpacity}">
-    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0"/>
-    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.55"/>
+    <GradientStop Color="{StaticResource AtmosMidColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource AtmosEdgeColor}" Offset="0.55"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
 
   <LinearGradientBrush x:Key="PhoenixEmberSpark" StartPoint="50%,100%" EndPoint="50%,0%" Opacity="{StaticResource PhoenixEmberSparkOpacity}">
-    <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
-    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.5"/>
-    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.92"/>
+    <GradientStop Color="{StaticResource AtmosHotColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource AtmosMidColor}" Offset="0.5"/>
+    <GradientStop Color="{StaticResource AtmosEdgeColor}" Offset="0.92"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </LinearGradientBrush>
 
   <!-- Broad, low-frequency layers make the backdrop read as heated air rather than an illustration. -->
   <RadialGradientBrush x:Key="EmberAtmosphereOuter" Center="50%,58%" GradientOrigin="42%,62%" RadiusX="58%" RadiusY="58%" Opacity="{StaticResource EmberAtmosphereOuterOpacity}">
-    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0"/>
-    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.48"/>
+    <GradientStop Color="{StaticResource AtmosMidColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource AtmosEdgeColor}" Offset="0.48"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
   <RadialGradientBrush x:Key="EmberAtmosphereCore" Center="48%,56%" GradientOrigin="44%,62%" RadiusX="52%" RadiusY="52%" Opacity="{StaticResource EmberAtmosphereCoreOpacity}">
-    <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
-    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.34"/>
-    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.72"/>
+    <GradientStop Color="{StaticResource AtmosHotColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource AtmosMidColor}" Offset="0.34"/>
+    <GradientStop Color="{StaticResource AtmosEdgeColor}" Offset="0.72"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
   <LinearGradientBrush x:Key="EmberAtmosphereVeil" StartPoint="0%,100%" EndPoint="100%,0%" Opacity="{StaticResource EmberAtmosphereVeilOpacity}">
     <GradientStop Color="Transparent" Offset="0"/>
-    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.38"/>
-    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.62"/>
+    <GradientStop Color="{StaticResource AtmosEdgeColor}" Offset="0.38"/>
+    <GradientStop Color="{StaticResource AtmosMidColor}" Offset="0.62"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </LinearGradientBrush>
   <LinearGradientBrush x:Key="EmberAtmosphereCoal" StartPoint="0%,0%" EndPoint="100%,100%" Opacity="{StaticResource EmberAtmosphereCoalOpacity}">
