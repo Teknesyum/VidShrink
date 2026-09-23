@@ -1,7 +1,10 @@
 using System.Diagnostics;
+using System.Globalization;
+using System.Text.Json;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
 
@@ -18,6 +21,10 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class AnamorfikTests
 {
+    private readonly ITestOutputHelper _cikti;
+
+    public AnamorfikTests(ITestOutputHelper cikti) => _cikti = cikti;
+
     private static string Klasor()
     {
         var yol = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..",
@@ -196,5 +203,134 @@ public sealed class AnamorfikTests
         var argumanlar = ConversionArguments.Build(bilgi, donusum, "cikti.mp4").ToArray();
         var i = Array.IndexOf(argumanlar, "-vf");
         if (i >= 0) Assert.DoesNotContain(VideoFilterChain.SquarePixelFilter, argumanlar[i + 1]);
+    }
+
+    private readonly record struct HamOlcum(int Width, int Height, string Sar, string Dar)
+    {
+        public double GosterimOrani()
+        {
+            var sarParca = Sar.Split(':');
+            var sarPay = double.Parse(sarParca[0], CultureInfo.InvariantCulture);
+            var sarPayda = double.Parse(sarParca[1], CultureInfo.InvariantCulture);
+            return Width * (sarPay / sarPayda) / Height;
+        }
+    }
+
+    /// <summary>
+    /// Cikti dosyasini ffprobe'un kendi alanlariyla okur: <c>sample_aspect_ratio</c> ve
+    /// <c>display_aspect_ratio</c> <see cref="FfprobeClient"/> hic parcalamiyor, HB #40
+    /// olcumu ham degeri ister.
+    /// </summary>
+    private static HamOlcum HamProbe(string yol)
+    {
+        using var process = new Process
+        {
+            StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, new[]
+            {
+                "-v", "error", "-select_streams", "v:0",
+                "-show_entries", "stream=width,height,sample_aspect_ratio,display_aspect_ratio",
+                "-of", "json", yol
+            })
+        };
+        process.Start();
+        var cikti = process.StandardOutput.ReadToEnd();
+        process.StandardError.ReadToEnd();
+        process.WaitForExit();
+        Assert.True(process.ExitCode == 0, $"ffprobe basarisiz: {yol}");
+
+        using var belge = JsonDocument.Parse(cikti);
+        var akis = belge.RootElement.GetProperty("streams")[0];
+        return new HamOlcum(
+            akis.GetProperty("width").GetInt32(),
+            akis.GetProperty("height").GetInt32(),
+            akis.TryGetProperty("sample_aspect_ratio", out var sar) ? sar.GetString() ?? "1:1" : "1:1",
+            akis.TryGetProperty("display_aspect_ratio", out var dar) ? dar.GetString() ?? "0:1" : "0:1");
+    }
+
+    private static void FfmpegCalistir(IReadOnlyList<string> args)
+    {
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args.ToArray()) };
+        process.Start();
+        var stderr = process.StandardError.ReadToEnd();
+        process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+        Assert.True(process.ExitCode == 0, $"kodlama basarisiz: {stderr}");
+    }
+
+    /// <summary>
+    /// HandBrake acigi #40: anamorfik kaynak kucultulunce gosterim orani (DAR) korunuyor
+    /// mu. Gercek kodlama, gercek ffprobe: <see cref="VideoFilterChain.SquarePixelFilter"/>
+    /// varligini kontrol eden birim testleri (yukarida) bunu olcmez, yalniz zincirde dizgeyi
+    /// arar. Burada urunun gercek yolu (<see cref="ConversionArguments.Build"/>) hem
+    /// olceklenen hem olceklenmeyen kolda calistirilip cikti dosyasi okunur.
+    ///
+    /// <para>720x480 SAR 32:27 (DVD NTSC genis ekran) ve 720x576 SAR 64:45 (DVD PAL genis
+    /// ekran) ikisi de gorunumde 16:9; kare piksel 640x480 kontrol kolu. Ham sayilar
+    /// <c>docs/olcumler/anamorfik-olcekleme.md</c>'de.</para>
+    /// </summary>
+    [FfmpegFact]
+    public async Task KucultulmusAnamorfikCiktiGosterimOraniniKoruyor()
+    {
+        var klasor = Klasor();
+        try
+        {
+            var kaynaklar = new (string Ad, string Olcu, string? Sar, double BeklenenDar)[]
+            {
+                ("dvd-ntsc", "720x480", "32/27", 16.0 / 9),
+                ("dvd-pal", "720x576", "64/45", 16.0 / 9),
+                ("kare-kontrol", "640x480", null, 640.0 / 480),
+            };
+
+            foreach (var (ad, olcu, sar, beklenenDar) in kaynaklar)
+            {
+                var kaynakYol = Uret(klasor, $"{ad}.mp4", olcu, sar);
+                var kaynak = await FfprobeClient.ProbeAsync(kaynakYol);
+
+                // Gercek urun yolu: PlanCalculator gosterim genisliginden merdiven kurar
+                // (docs/olcumler/anamorfik-olcekleme.md). Boyutu kucultme kolunu elle de
+                // tetikleyip ConversionArguments'in "-vf" iceren dalindan gecmek icin
+                // gosterim genisliginin yarisi hedef aliniyor.
+                var hedefGenislik = Olcek.Modul((int)Math.Round(kaynak.DisplayWidth * 0.5), 2);
+                var hedefYukseklik = Olcek.Modul((int)Math.Round(kaynak.Height * 0.5), 2);
+                Assert.True(hedefGenislik != kaynak.Width || hedefYukseklik != kaynak.Height,
+                    $"{ad}: yari cozunurluk kaynakla ayni cikti");
+
+                var kucukPlan = PlanCalculator.Build(kaynak, new PlanOptions { TargetMb = 1 });
+                _cikti.WriteLine($"{ad}: PlanCalculator.Build -> {kucukPlan.Width}x{kucukPlan.Height} (kaynak {kaynak.Width}x{kaynak.Height}, gosterim {kaynak.DisplayWidth})");
+
+                var olceklenmisCikti = Path.Combine(klasor, $"{ad}-olcekli.mp4");
+                var olceklenmisArgs = ConversionArguments.Build(
+                    kaynak, new ConversionPlan { Width = hedefGenislik, Height = hedefYukseklik }, olceklenmisCikti);
+                FfmpegCalistir(olceklenmisArgs);
+                var olceklenmisOlcum = HamProbe(olceklenmisCikti);
+
+                var olceksizCikti = Path.Combine(klasor, $"{ad}-olceksiz.mp4");
+                var olceksizArgs = ConversionArguments.Build(kaynak, new ConversionPlan(), olceksizCikti);
+                FfmpegCalistir(olceksizArgs);
+                var olceksizOlcum = HamProbe(olceksizCikti);
+
+                var yukseklikSadeceCikti = Path.Combine(klasor, $"{ad}-yukseklik.mp4");
+                var yukseklikSadeceArgs = ConversionArguments.Build(
+                    kaynak, new ConversionPlan { Height = hedefYukseklik }, yukseklikSadeceCikti);
+                FfmpegCalistir(yukseklikSadeceArgs);
+                var yukseklikSadeceOlcum = HamProbe(yukseklikSadeceCikti);
+
+                _cikti.WriteLine(
+                    $"{ad}: olcekli {olceklenmisOlcum.Width}x{olceklenmisOlcum.Height} sar={olceklenmisOlcum.Sar} " +
+                    $"dar={olceklenmisOlcum.Dar} oran={olceklenmisOlcum.GosterimOrani():0.###} | " +
+                    $"olceksiz {olceksizOlcum.Width}x{olceksizOlcum.Height} sar={olceksizOlcum.Sar} " +
+                    $"dar={olceksizOlcum.Dar} oran={olceksizOlcum.GosterimOrani():0.###} | " +
+                    $"yukseklik-sadece {yukseklikSadeceOlcum.Width}x{yukseklikSadeceOlcum.Height} sar={yukseklikSadeceOlcum.Sar} " +
+                    $"dar={yukseklikSadeceOlcum.Dar} oran={yukseklikSadeceOlcum.GosterimOrani():0.###} | beklenen={beklenenDar:0.###}");
+
+                Assert.InRange(olceklenmisOlcum.GosterimOrani(), beklenenDar - 0.02, beklenenDar + 0.02);
+                Assert.InRange(olceksizOlcum.GosterimOrani(), beklenenDar - 0.02, beklenenDar + 0.02);
+                Assert.InRange(yukseklikSadeceOlcum.GosterimOrani(), beklenenDar - 0.02, beklenenDar + 0.02);
+            }
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
     }
 }
