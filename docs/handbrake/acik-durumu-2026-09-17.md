@@ -62,7 +62,7 @@ Durum anahtarı: öndeyiz / eşit / gerideyiz / yok / ölçülecek / bilerek yap
 | 37 | Döndürme/çevirme | yok → **yok** | kodlamada `transpose|hflip` yok (yalnız oynatıcı `MpvEngine.cs:434-436`) |
 | 38 | Gri, pad | yok → **yok** | `format=gray|pad=` yok |
 | 39 | Renk uzayı | yok → **yok** | `zscale` yalnız tonemap zincirinde (`HdrResolver.cs:22`) |
-| 40 | Ölçekleme | eşit → **eşit** | `scale=W:H:flags=lanczos` (`FfmpegArguments.cs:408-409`); `setsar` yok, anamorfik koruma ölçülmedi |
+| 40 | Ölçekleme | eşit → **eşit** | Küçültme yolu (`PlanCalculator.cs:1411-1417` gösterim genişliğinden, `VideoFilterChain.cs:218-247` `setsar=1`) doğruydu; Dönüştür yolunda (`ConversionArguments.cs:103-112`) çözünürlük seçilmediğinde/yalnız yükseklik seçildiğinde SAR telafisiz siliniyordu (720×480 SAR 32:27 → DAR 1,5 yerine 1,778), düzeltildi ve pimlendi (`docs/olcumler/anamorfik-olcekleme.md`) |
 | 63 | Deband, BM3D | yok → **yok** (BM3D bilerek yapılmaz) | `deband` yok |
 | 41 | Kare hızı | eşit → **eşit** | `fps=` yalnız kaynağın altına (`FfmpegArguments.cs:414-415`); otomatik düşürme yalnız çalışabilir taban altında (B7 Açık 3); pfr yok |
 
