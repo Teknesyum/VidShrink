@@ -92,7 +92,7 @@ public sealed class GecisEtiketiTests
         Assert.False(PlanCalculator.Estimate(plan, info, null).Measured);
         Assert.DoesNotContain("does not guess from the source bitrate", Strings.GetIn("en", "main.output.estimated-output.tip"));
         Assert.DoesNotContain("tahmin yürütmez", Strings.GetIn("tr", "main.output.estimated-output.tip"));
-        Assert.Contains("source bitrate", Strings.GetIn("en", "main.output.estimated-output.tip").Split('\n')[1]);
-        Assert.Contains("kaynak bit hızına düşer", Strings.GetIn("tr", "main.output.estimated-output.tip").Split('\n')[1]);
+        Assert.Contains("source bitrate", Strings.GetIn("en", "main.output.estimated-output.tip").Split('\n')[2]);
+        Assert.Contains("kaynak bit hızına düşer", Strings.GetIn("tr", "main.output.estimated-output.tip").Split('\n')[2]);
     }
 }

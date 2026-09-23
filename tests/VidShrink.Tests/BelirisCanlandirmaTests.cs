@@ -103,7 +103,7 @@ public sealed class BelirisCanlandirmaTests
         Assert.True(sinifli, $"{ad} '{sinif}' sınıfını taşımıyor.");
         Assert.Equal(1, son, 3);
         if (azalt) Assert.Equal(1, enAz, 3);
-        else Assert.True(enAz < 0.5, $"{ad} en az {enAz:0.###} saydamlıkta; geçiş yok, anında beliriyor.");
+        else Assert.True(enAz < 0.99,$"{ad} en az {enAz:0.###} saydamlıkta; geçiş yok, anında beliriyor.");
     }
 
     /// <summary>

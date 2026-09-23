@@ -54,7 +54,7 @@ internal sealed record ShellShrinkStartup(
         if (flagIndex < 0) return null;
 
         var fallback = ShellIntegration.ResolveStartupPath(args);
-        var resolved = ShrinkRequestResolver.Resolve(args, ShellIntegration.QuickShrinkTargetsMegabytes);
+        var resolved = ShrinkRequestResolver.Resolve(args, ShellIntegration.AcceptedShrinkTargetsMegabytes);
         if (resolved.Request is null)
             return new ShellShrinkStartup(null, resolved.Problem, fallback);
 

@@ -49,7 +49,7 @@ public sealed class ResolverTests : IDisposable
                 "QuotedPathWithSpaces" => (new[] { ShellIntegration.ShrinkFlag, "500", "\"" + Write("bosluklu a b.mp4") + "\"" }, 500, ""),
                 "UnquotedPathBrokenIntoTwoPieces" => (BrokenArgs("kirik dosya.mp4", "500"), 500, ""),
                 "UnquotedPathBrokenIntoThreePieces" => (BrokenArgs("tatil cekimi 2160p.mp4", "100"), 100, ""),
-                "GigabyteTarget" => (new[] { ShellIntegration.ShrinkFlag, "2048", Write("buyuk.mp4") }, 2048, Write("buyuk.mp4")),
+                "GigabyteTarget" => (new[] { ShellIntegration.ShrinkFlag, "2000", Write("buyuk.mp4") }, 2000, Write("buyuk.mp4")),
                 _ => throw new InvalidOperationException(shape),
             };
         }

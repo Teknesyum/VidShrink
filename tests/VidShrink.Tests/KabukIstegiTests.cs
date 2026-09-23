@@ -435,7 +435,27 @@ public sealed class KabukIstegiTests
     [Fact]
     public void HizliListeSozlesmedekiBesDeger()
     {
-        Assert.Equal(new[] { 100, 250, 500, 1024, 2048 }, ShellIntegration.QuickShrinkTargetsMegabytes.ToArray());
+        Assert.Equal(new[] { 100, 250, 500, 1000, 2000 }, ShellIntegration.QuickShrinkTargetsMegabytes.ToArray());
         _output.WriteLine($"hizli liste: {ShrinkProblemText.QuickList()}");
+    }
+
+    /// <summary>
+    /// Ondalık MB'a geçmeden önce kurulmuş eski kayıt defteri girdileri "--kucult 1024"
+    /// ya da "--kucult 2048" yazıyordu. Hızlı liste 1000/2000'e döndükten sonra bu iki
+    /// değer artık menüde yok ama gelen istek yine çözülmeli; kullanıcı yeniden kurmadan
+    /// eski kısayolu kırmamalıyız.
+    /// </summary>
+    [Theory]
+    [InlineData(1024)]
+    [InlineData(2048)]
+    public void EskiIkiliHedefHalaCozulur(int legacyTarget)
+    {
+        var file = SampleFile();
+        var startup = Program.StartupFor(new[] { ShellIntegration.ShrinkFlag, legacyTarget.ToString(), file });
+
+        Assert.NotNull(startup);
+        Assert.Null(startup!.Problem);
+        Assert.NotNull(startup.Request);
+        Assert.Equal(legacyTarget, startup.Request!.TargetMegabytes);
     }
 }

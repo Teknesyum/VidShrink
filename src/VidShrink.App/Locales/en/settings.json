@@ -41,7 +41,7 @@
   "settings.share.nothing-to-close": "There is no share to close.",
   "settings.update.title": "Updates",
   "settings.update.auto": "Update automatically",
-  "settings.update.auto-effect": "Off by default: a new version is announced in the top bar and installed with a button. When on, VidShrink updates quietly.",
+  "settings.update.auto-effect": "Off by default: a new version is announced in the top bar and installed with a button.\nWhen on, VidShrink updates quietly.",
   "settings.update.no-self-effect": "VidShrink does not update itself on this system.\nIt tells you a new version exists and shows the command that installs it.",
   "settings.default-app.suggestion": "VidShrink is not the default program for videos. You can pick it on the Windows Default apps page.",
   "settings.default-app.open": "Default apps",

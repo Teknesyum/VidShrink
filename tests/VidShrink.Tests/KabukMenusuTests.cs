@@ -216,7 +216,7 @@ public class KabukMenusuTests
 
     /// <summary>
     /// Menü etiketi <see cref="Bicim.HedefEtiketi"/>'ne indi. Gerçek hedef listesinde
-    /// 1024 ve 2048 var, yani GB kolu üretimde koşuyor; mutasyon ölçüsü bu kolun hiçbir
+    /// 1000 ve 2000 var, yani GB kolu üretimde koşuyor; mutasyon ölçüsü bu kolun hiçbir
     /// testte pimli olmadığını gösterdi (0 kırmızı). İki yazım tek gövdeden gelmeli:
     /// kabuk menüsü ile kurulum kaydı aynı etiketi yazmazsa kullanıcı aynı komutu iki
     /// ayrı adla görür.
@@ -230,8 +230,21 @@ public class KabukMenusuTests
             Assert.Equal(Bicim.HedefEtiketi(mb), ShellIntegration.FormatQuickShrinkLabel(mb));
         }
 
-        Assert.Equal("1 GB", ShellMenu.TargetLabel(1024));
-        Assert.Equal("2 GB", ShellMenu.TargetLabel(2048));
+        Assert.Equal("1 GB", ShellMenu.TargetLabel(1000));
+        Assert.Equal("2 GB", ShellMenu.TargetLabel(2000));
         Assert.Equal("100 MB", ShellMenu.TargetLabel(100));
+    }
+
+    /// <summary>
+    /// Eski kurulumların kayıt defterinde kalan <c>--kucult 1024</c> girdileri (ondalık
+    /// MB'a geçişten önceki hızlı listeden) çalışmaya devam etmeli: 1024 hâlâ geçerli bir
+    /// hedef, yalnız artık "1 GB" değil dürüst "1024 MB" der — 1024 ondalık 1000'in katı
+    /// değil.
+    /// </summary>
+    [Fact]
+    public void EskiBinYirmiDortHedefiDurustEtiketAlir()
+    {
+        Assert.Equal("1024 MB", ShellMenu.TargetLabel(1024));
+        Assert.Equal("1024 MB", ShellIntegration.FormatQuickShrinkLabel(1024));
     }
 }
