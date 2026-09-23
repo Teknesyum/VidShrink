@@ -8,7 +8,7 @@ public sealed class SesTabaniTests
     private static MediaInfo Info(double durationSeconds, int channels = 2, long audioBps = 128_000, double sourceMb = 500, bool hasAudio = true) => new()
     {
         FilePath = "sample.mkv",
-        FileSizeBytes = (long)(sourceMb * 1024 * 1024),
+        FileSizeBytes = (long)(sourceMb * Megabayt.Bayt),
         DurationSeconds = durationSeconds,
         Width = 1920,
         Height = 1080,

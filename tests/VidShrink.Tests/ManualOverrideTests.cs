@@ -44,7 +44,7 @@ public sealed class ManualOverrideTests
         ("av1_nvenc", EncoderProbeState.NotWorking));
 
     private static MediaInfo Info(int width = 1920, int height = 1080, double fps = 30, double durationSeconds = 120,
-        long fileSizeBytes = 500L * 1024 * 1024, int audioChannels = 2, long audioBitrateBps = 128_000) => new()
+        long fileSizeBytes = 500_000_000L, int audioChannels = 2, long audioBitrateBps = 128_000) => new()
     {
         FilePath = "sample.mp4",
         FileSizeBytes = fileSizeBytes,
@@ -131,7 +131,7 @@ public sealed class ManualOverrideTests
     private static MediaInfo KucukKaynak() => new()
     {
         FilePath = "kucuk.mp4",
-        FileSizeBytes = 200L * 1024 * 1024,
+        FileSizeBytes = 200_000_000L,
         DurationSeconds = 10,
         Width = 320,
         Height = 180,
@@ -430,7 +430,7 @@ public sealed class ManualOverrideTests
     private static MediaInfo HedefinAltindaKaynak() => new()
     {
         FilePath = "zaten-kucuk.mp4",
-        FileSizeBytes = 10L * 1024 * 1024,
+        FileSizeBytes = 10_000_000L,
         DurationSeconds = 60,
         Width = 1280,
         Height = 720,
@@ -639,7 +639,7 @@ public sealed class ManualOverrideTests
     [Fact]
     public void F1_KaynakUstuHedefKaynaginYuzde95ineKirpiliyor()
     {
-        var info = Info(1920, 1080, 30, 120, fileSizeBytes: 500L * 1024 * 1024);
+        var info = Info(1920, 1080, 30, 120, fileSizeBytes: 500_000_000L);
         var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 490, Codec = CodecPreference.Auto }, null, AllWorking());
         var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.TargetCappedToSource);
 
@@ -727,7 +727,7 @@ public sealed class ManualOverrideTests
     private static MediaInfo SessizKaynak() => new()
     {
         FilePath = "sessiz.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,

@@ -43,7 +43,7 @@ public sealed class Hdr10ArtiKopruTests : IDisposable
     private static MediaInfo Hdr10Arti() => new()
     {
         FilePath = "kaynak.mkv",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -357,7 +357,7 @@ public sealed class Hdr10ArtiKopruTests : IDisposable
     [Fact]
     public void KareHiziDusunceKopruKapanir()
     {
-        var info = Hdr10Arti() with { Fps = 60, DurationSeconds = 600, FileSizeBytes = 4000L * 1024 * 1024 };
+        var info = Hdr10Arti() with { Fps = 60, DurationSeconds = 600, FileSizeBytes = 4000_000_000L };
         PlanResult Kur(double hedef) => PlanCalculator.BuildDetailed(info, new PlanOptions
         {
             TargetMb = hedef,

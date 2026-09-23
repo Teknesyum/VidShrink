@@ -34,7 +34,7 @@ public sealed class KlasorBirakmaTests : IDisposable
     private static MediaInfo Kaynak(int sesIzi = 1) => new()
     {
         FilePath = "kaynak.mkv",
-        FileSizeBytes = 400L * 1024 * 1024,
+        FileSizeBytes = 400_000_000L,
         DurationSeconds = 600,
         Width = 1920,
         Height = 1080,
@@ -102,7 +102,7 @@ public sealed class KlasorBirakmaTests : IDisposable
     public void TavansizYongadaHedefDosyaBasina()
     {
         var kisa = Kaynak();
-        var uzun = Kaynak() with { DurationSeconds = 2400, FileSizeBytes = 1600L * 1024 * 1024 };
+        var uzun = Kaynak() with { DurationSeconds = 2400, FileSizeBytes = 1600_000_000L };
         var (h1, h2) = AppHost.Run(() =>
         {
             var batch = new ShrinkJobWindow(new[] { "a.mp4", "b.mp4" }, new PlanOptions { TargetMb = 12.5 }, true, null);

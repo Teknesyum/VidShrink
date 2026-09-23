@@ -364,7 +364,7 @@ public class VmafPoolingTests
     private static MediaInfo OyunKaydi() => new()
     {
         FilePath = "kaynak.mp4",
-        FileSizeBytes = 830L * 1024 * 1024,
+        FileSizeBytes = 830_000_000L,
         DurationSeconds = 52.6,
         Width = 1920,
         Height = 1080,

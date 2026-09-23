@@ -34,7 +34,7 @@ public sealed class QualityTargetUiTests
     private static MediaInfo Sample() => new()
     {
         FilePath = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv",
-        FileSizeBytes = 420L * 1024 * 1024,
+        FileSizeBytes = 420_000_000L,
         DurationSeconds = 187.5,
         Width = 3840,
         Height = 2160,
@@ -83,7 +83,7 @@ public sealed class QualityTargetUiTests
     private static MediaInfo FloorBoundSample() => new()
     {
         FilePath = @"C:\Kayitlar\ekran-kaydi-1440p30.mkv",
-        FileSizeBytes = 2200L * 1024 * 1024,
+        FileSizeBytes = 2200_000_000L,
         DurationSeconds = 3600,
         Width = 2560,
         Height = 1440,

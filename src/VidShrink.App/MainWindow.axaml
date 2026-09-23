@@ -376,12 +376,12 @@
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button x:Name="Chip128" Content="128" Tag="128" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                      <Button x:Name="Chip134" Content="134" Tag="134" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
                             <StackPanel Spacing="{StaticResource SpaceSm}">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.128.label}"/>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.128.tip}"/>
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.134.label}"/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.134.tip}"/>
                             </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>

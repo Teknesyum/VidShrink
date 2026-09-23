@@ -35,7 +35,7 @@ public class HardwareVerdictTests
     private static MediaInfo ProbeSource() => new()
     {
         FilePath = "hardware-probe.mp4",
-        FileSizeBytes = 200L * 1024 * 1024,
+        FileSizeBytes = 200_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,

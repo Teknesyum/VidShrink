@@ -31,7 +31,7 @@ public sealed class EncoderStateConsumptionTests
     private static MediaInfo SdrSource() => new()
     {
         FilePath = "sample.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -179,7 +179,7 @@ public sealed class HdrResolverTests
     private static MediaInfo HdrSource() => new()
     {
         FilePath = "sample.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,

@@ -9,7 +9,7 @@ public sealed class VideoFilterChainTests
         bool taramali = false, string? alan = null, string? renk = null) => new()
     {
         FilePath = "kaynak.mp4",
-        FileSizeBytes = 400L * 1024 * 1024,
+        FileSizeBytes = 400_000_000L,
         DurationSeconds = 120,
         Width = w,
         Height = h,
@@ -252,7 +252,7 @@ public sealed class VideoFilterChainTests
     [Fact]
     public void AcikFiltrePassthroughuEngeller()
     {
-        var info = Kaynak(1280, 720) with { FileSizeBytes = 5L * 1024 * 1024, DurationSeconds = 10, TotalBitrateBps = 4_000_000 };
+        var info = Kaynak(1280, 720) with { FileSizeBytes = 5_000_000L, DurationSeconds = 10, TotalBitrateBps = 4_000_000 };
         var sade = PlanCalculator.Build(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto });
         Assert.Equal(EncodeMode.PassThrough, sade.ModeEnum);
 
@@ -269,7 +269,7 @@ public sealed class VideoFilterChainTests
     [Fact]
     public void TaramaliKaynakOtomatiktePassthroughaDusmezProgressiveDuser()
     {
-        var duz = Kaynak(1280, 720, alan: "progressive") with { FileSizeBytes = 5L * 1024 * 1024, DurationSeconds = 10, TotalBitrateBps = 4_000_000 };
+        var duz = Kaynak(1280, 720, alan: "progressive") with { FileSizeBytes = 5_000_000L, DurationSeconds = 10, TotalBitrateBps = 4_000_000 };
         var duzPlan = PlanCalculator.Build(duz, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto });
         Assert.Equal(EncodeMode.PassThrough, duzPlan.ModeEnum);
 

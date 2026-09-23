@@ -30,7 +30,7 @@ public sealed class HardwareFlagTests
     private static MediaInfo SampleInfo() => new()
     {
         FilePath = "sample.mp4",
-        FileSizeBytes = 900L * 1024 * 1024,
+        FileSizeBytes = 900_000_000L,
         DurationSeconds = 300,
         Width = 1920,
         Height = 1080,

@@ -307,13 +307,13 @@ public sealed class SensitivityAbTests
 public sealed class HandBrakeArgumentsAbTests
 {
     [Fact]
-    public void TheBitrateFillsTheRequestedMebibytes()
+    public void TheBitrateFillsTheRequestedMegabytes()
     {
         const double targetMb = 60;
         const double duration = 1036.17;
 
         var kbps = HandBrakeCompetitor.VideoBitrateKbps(targetMb, duration);
-        var producedMb = kbps * 1000.0 * duration / 8.0 / 1024.0 / 1024.0;
+        var producedMb = Megabayt.Oku((long)(kbps * 1000.0 * duration / 8.0));
 
         Assert.InRange(producedMb, targetMb * 0.98, targetMb);
     }

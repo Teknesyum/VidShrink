@@ -30,7 +30,7 @@ public sealed class HdrDinamikTests
     private static MediaInfo Hdr10() => new()
     {
         FilePath = "kaynak.mkv",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -190,7 +190,7 @@ public sealed class HdrDinamikTests
     [Fact]
     public void KaynakHedefinAltindaysaKopyaDinamikNotuDusurmez()
     {
-        var info = Dv(8, 1) with { HasHdr10Plus = true, FileSizeBytes = 10L * 1024 * 1024 };
+        var info = Dv(8, 1) with { HasHdr10Plus = true, FileSizeBytes = 10_000_000L };
         var sonuc = Planla(info, "libx265");
 
         Assert.Equal(EncodeMode.PassThrough, sonuc.Plan.ModeEnum);

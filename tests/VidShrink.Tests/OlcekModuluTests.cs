@@ -111,7 +111,7 @@ public sealed class OlcekModuluTests
             Fps = 30,
             DurationSeconds = 60,
             VideoCodec = "h264",
-            FileSizeBytes = 200L * 1024 * 1024,
+            FileSizeBytes = 200_000_000L,
             TotalBitrateBps = 28_000_000
         };
 
@@ -136,7 +136,7 @@ public sealed class OlcekModuluTests
             Fps = 30,
             DurationSeconds = 60,
             VideoCodec = "h264",
-            FileSizeBytes = 200L * 1024 * 1024,
+            FileSizeBytes = 200_000_000L,
             TotalBitrateBps = 28_000_000
         };
 

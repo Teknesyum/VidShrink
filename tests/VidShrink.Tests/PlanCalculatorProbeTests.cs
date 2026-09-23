@@ -25,7 +25,7 @@ public sealed class PlanCalculatorProbeTests
     private static readonly MediaInfo HdrSource = new()
     {
         FilePath = "hdr.mp4",
-        FileSizeBytes = 200L * 1024 * 1024,
+        FileSizeBytes = 200_000_000L,
         DurationSeconds = 120,
         Width = 3840,
         Height = 2160,

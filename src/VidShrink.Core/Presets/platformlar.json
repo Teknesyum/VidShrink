@@ -7,7 +7,7 @@
     { "id": "whatsapp-chat", "kind": "Platform", "chip": "ChipWhatsApp", "targetMb": 16, "sizeCapped": true, "intent": "Sharing", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Code", "url": "https://faq.whatsapp.com/164676891531296/" } },
     { "id": "size-25", "kind": "General", "chip": "Chip25", "targetMb": 25, "sizeCapped": true, "intent": "Sharing", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Code" } },
     { "id": "size-100", "kind": "General", "chip": "Chip100", "targetMb": 100, "sizeCapped": true, "intent": "Sharing", "codec": "Auto", "fill": "FillTarget", "source": { "status": "Code" } },
-    { "id": "share-uguu", "kind": "Platform", "chip": "Chip128", "targetMb": 128, "sizeCapped": true, "intent": "Sharing", "codec": "Auto", "fill": "FillTarget", "source": { "status": "Code" } },
+    { "id": "share-uguu", "kind": "Platform", "chip": "Chip134", "targetMb": 134, "sizeCapped": true, "intent": "Sharing", "codec": "Auto", "fill": "FillTarget", "source": { "status": "Code" } },
     { "id": "whatsapp-web", "kind": "Platform", "chip": "Chip180", "targetMb": 180, "sizeCapped": true, "intent": "Sharing", "codec": "Auto", "fill": "FillTarget", "source": { "status": "Code" } },
     { "id": "half", "kind": "General", "chip": "ChipHalf", "targetMb": null, "sizeCapped": true, "intent": "Sharing", "codec": "Auto", "fill": "QualityCeiling", "source": { "status": "Code" } },
     { "id": "discord-free", "kind": "Platform", "targetMb": 20, "sizeCapped": true, "intent": "SocialMedia", "codec": "Compatible", "fill": "FillTarget", "source": { "status": "Official", "url": "https://support.discord.com/hc/en-us/articles/25444343291031-File-Attachments-FAQ", "checked": "2026-09-17" } },

@@ -335,7 +335,7 @@ public sealed class ComplexityScanTests
         var info = new MediaInfo
         {
             FilePath = "kaynak.mkv",
-            FileSizeBytes = 400L * 1024 * 1024,
+            FileSizeBytes = 400_000_000L,
             DurationSeconds = 120,
             Width = 1920,
             Height = 1080,

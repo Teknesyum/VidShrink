@@ -24,7 +24,7 @@ public sealed class KesBolumKareTests
     private static MediaInfo Kaynak(IReadOnlyList<ChapterMark>? bolumler = null, double fps = 30) => new()
     {
         FilePath = "a.mp4",
-        FileSizeBytes = 100L * 1024 * 1024,
+        FileSizeBytes = 100_000_000L,
         DurationSeconds = 600,
         Width = 1920,
         Height = 1080,

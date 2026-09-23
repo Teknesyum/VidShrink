@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB befér régebbi fórumokra és szigorú e-mail-átjárókba.",
   "main.chip.25.tip": "25 MB befér a Gmail-mellékletekbe és a legtöbb hibajegyrendszerbe.",
   "main.chip.100.tip": "100 MB archiváláshoz és olyan feltöltésekhez való, ahol a minőség fontosabb az átviteli időnél.",
-  "main.chip.128.label": "Megosztási maximum",
-  "main.chip.128.tip": "• 128 MiB az uguu.se mért felső korlátja, ez a legkisebb határú névtelen megosztási cél.\n• Egy ekkora vagy kisebb fájl mindkét megosztási célnak átadható elutasítás nélkül.\n• A másik cél, a storage.to, jóval többet fogad, így ez a lapka mindkettőhöz biztonságos szám.",
+  "main.chip.134.label": "Megosztási maximum",
+  "main.chip.134.tip": "• 134 MB az uguu.se mért felső korlátja, ez a legkisebb határú névtelen megosztási cél.\n• Egy ekkora vagy kisebb fájl mindkét megosztási célnak átadható elutasítás nélkül.\n• A másik cél, a storage.to, jóval többet fogad, így ez a lapka mindkettőhöz biztonságos szám.",
   "main.chip.180.label": "WhatsApp Web maximum",
   "main.chip.180.tip": "• Telefonon: 16 MB csevegésben, 2 GB dokumentumként.\n• A WhatsApp Web 180 MB-ot fogad fájlonként. Ezt a felhasználók jelentik, a WhatsApp nem teszi közzé.\n• Így egy 180 MB-os vagy kisebb fájl a webes oldalon változatlanul átmegy.",
 

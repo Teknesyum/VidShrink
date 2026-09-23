@@ -32,7 +32,7 @@ public sealed class KaranlikGecisTests
     private static MediaInfo Info() => new()
     {
         FilePath = "sample.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,

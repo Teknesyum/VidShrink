@@ -908,7 +908,7 @@ public sealed class WatchFolderTests
             var log = await RunAsync(ToolLocator.Ffmpeg, "-hide_banner", "-nostdin", "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=15:duration=2",
                 "-c:v", "libx264", "-preset", "ultrafast", "-crf", "8", "-threads", "2", clip);
             Assert.True(log.Exit == 0, log.Stderr);
-            var target = (new FileInfo(clip).Length / 1024.0 / 1024.0 / 2).ToString("0.###", CultureInfo.InvariantCulture) + "MB";
+            var target = (Megabayt.Oku(new FileInfo(clip).Length) / 2).ToString("0.###", CultureInfo.InvariantCulture) + "MB";
 
             var cli = Path.Combine(AppContext.BaseDirectory, "vidshrink.dll");
             Assert.True(File.Exists(cli), cli);

@@ -991,7 +991,7 @@ public sealed class OluUyeTests
     private static MediaInfo Kaynak() => new()
     {
         FilePath = "sample.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -1006,7 +1006,7 @@ public sealed class OluUyeTests
     private static MediaInfo HedefinAltindaKaynak() => new()
     {
         FilePath = "zaten-kucuk.mp4",
-        FileSizeBytes = 10L * 1024 * 1024,
+        FileSizeBytes = 10_000_000L,
         DurationSeconds = 60,
         Width = 1280,
         Height = 720,

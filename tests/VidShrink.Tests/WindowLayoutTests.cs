@@ -51,7 +51,7 @@ public sealed class WindowLayoutTests
     private static MediaInfo Sample() => new()
     {
         FilePath = SamplePath,
-        FileSizeBytes = 420L * 1024 * 1024,
+        FileSizeBytes = 420_000_000L,
         DurationSeconds = 187.5,
         Width = 3840,
         Height = 2160,

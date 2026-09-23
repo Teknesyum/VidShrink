@@ -62,7 +62,7 @@ public partial class MainWindow : Window
     private static readonly MediaInfo HardwareProbeSource = new()
     {
         FilePath = "hardware-probe.mp4",
-        FileSizeBytes = 200L * 1024 * 1024,
+        FileSizeBytes = 200_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -3536,7 +3536,7 @@ public partial class MainWindow : Window
     private IReadOnlyList<(Button Chip, double? TargetMb)> QualityChips() => new (Button, double?)[]
     {
         (ChipWhatsApp, 16), (Chip8, 8), (Chip25, 25), (Chip100, 100),
-        (Chip128, 128), (Chip180, 180), (ChipHalf, null)
+        (Chip134, 134), (Chip180, 180), (ChipHalf, null)
     };
 
     private double? ChipTargetMb(double? declared)
@@ -4234,7 +4234,7 @@ public partial class MainWindow : Window
         var targetMb = ParseTargetMb();
         if (DiskSpaceGuard.TryGetFreeBytes(output, out var freeBytes) && !DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb))
         {
-            var neededMb = DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0;
+            var neededMb = Megabayt.Oku(DiskSpaceGuard.RequiredBytes(targetMb));
             TxtResult.Text = Say("main.run.no-space", Num(neededMb, "0"));
             return;
         }
@@ -4403,7 +4403,7 @@ public partial class MainWindow : Window
             Clock(plan.DurationSeconds),
             Clock(plan.KeptSeconds),
             string.Join(" · ", removed),
-            Num(plan.KeptBytes / 1024.0 / 1024.0, "0.00"));
+            Num(Megabayt.Oku(plan.KeptBytes), "0.00"));
         BtnTrimConfirm.IsEnabled = true;
     }
 

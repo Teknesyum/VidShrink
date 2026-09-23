@@ -20,7 +20,7 @@ public sealed class BudgetFillTests
         Preset = "slow"
     };
 
-    private static double Mb(double k, double verim) => k * Sure / 8388.608 / 0.995 * verim;
+    private static double Mb(double k, double verim) => k * Sure / Megabayt.Kbit / 0.995 * verim;
 
     [Fact]
     public void AltaDusenTeslimBirYukariDenemeTetikler()

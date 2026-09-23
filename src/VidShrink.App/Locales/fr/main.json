@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 Mo passe sur les anciens forums et les passerelles e-mail strictes.",
   "main.chip.25.tip": "25 Mo passe en pièce jointe Gmail et dans la plupart des systèmes de tickets.",
   "main.chip.100.tip": "100 Mo convient à l'archivage et aux envois où la qualité compte plus que le temps de transfert.",
-  "main.chip.128.label": "Maximum de partage",
-  "main.chip.128.tip": "• 128 Mio est le plafond mesuré d'uguu.se, la cible de partage anonyme à la limite la plus basse.\n• Un fichier à cette taille ou en dessous peut être remis à l'une ou l'autre cible sans être refusé.\n• L'autre cible, storage.to, accepte bien plus ; cette puce est donc le chiffre sûr pour les deux.",
+  "main.chip.134.label": "Maximum de partage",
+  "main.chip.134.tip": "• 134 Mo est le plafond mesuré d'uguu.se, la cible de partage anonyme à la limite la plus basse.\n• Un fichier à cette taille ou en dessous peut être remis à l'une ou l'autre cible sans être refusé.\n• L'autre cible, storage.to, accepte bien plus ; cette puce est donc le chiffre sûr pour les deux.",
   "main.chip.180.label": "Maximum WhatsApp Web",
   "main.chip.180.tip": "• Sur le téléphone : 16 Mo en discussion, 2 Go en document.\n• WhatsApp Web accepte 180 Mo par fichier. Ce sont les utilisateurs qui le rapportent, WhatsApp ne le publie pas.\n• Un fichier de 180 Mo ou moins passe donc tel quel côté web.",
 

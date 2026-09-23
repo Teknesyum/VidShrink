@@ -27,7 +27,7 @@ public sealed class CeilingGuardTests
         Preset = codec == "libsvtav1" ? "6" : "slow"
     };
 
-    private static double Mb(int k, double verim) => k * 10 / 8388.608 / 0.995 * verim;
+    private static double Mb(int k, double verim) => k * 10 / Megabayt.Kbit / 0.995 * verim;
 
     [Fact]
     public void RampaIzindeSvtIstegiEnKotuVerimleTavaninDokuzdaDokuzunaNisanAlir()
@@ -188,7 +188,7 @@ public sealed class CeilingGuardTests
         var bekci = sonuc.Trace!.Single(a => a.Branch.StartsWith("ceiling guard", StringComparison.Ordinal));
         Assert.Equal(bekci.VideoBitrateK, sonuc.Trace!.Last(a => a.Branch == "over ceiling").VideoBitrateK);
         Assert.True(bekci.VideoBitrateK < sonuc.Trace!.Where(a => a.Number < 3 && a.Branch == "over ceiling").Min(a => a.VideoBitrateK), iz);
-        Assert.Equal(denenen.Min(), new FileInfo(cikti).Length / 1024.0 / 1024.0, 6);
+        Assert.Equal(denenen.Min(), Megabayt.Oku(new FileInfo(cikti).Length), 6);
         Assert.Empty(Directory.GetFiles(klasor, "vidshrink_partial_*"));
     }
 

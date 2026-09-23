@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB tinka senesniems forumams ir griežtiems el. pašto šliuzams.",
   "main.chip.25.tip": "25 MB tinka Gmail priedams ir daugumai užklausų sistemų.",
   "main.chip.100.tip": "100 MB tinka archyvavimui ir įkėlimams, kur kokybė svarbiau už perdavimo laiką.",
-  "main.chip.128.label": "Bendrinimo maksimumas",
-  "main.chip.128.tip": "• 128 MiB yra išmatuota uguu.se riba — anoniminės bendrinimo paskirties su mažiausiu limitu.\n• Tokio ar mažesnio dydžio failą priims abi bendrinimo paskirtys.\n• Kita paskirtis, storage.to, priima daug daugiau, todėl ši žymė yra saugus skaičius abiem.",
+  "main.chip.134.label": "Bendrinimo maksimumas",
+  "main.chip.134.tip": "• 134 MB yra išmatuota uguu.se riba — anoniminės bendrinimo paskirties su mažiausiu limitu.\n• Tokio ar mažesnio dydžio failą priims abi bendrinimo paskirtys.\n• Kita paskirtis, storage.to, priima daug daugiau, todėl ši žymė yra saugus skaičius abiem.",
   "main.chip.180.label": "WhatsApp Web maksimumas",
   "main.chip.180.tip": "• Telefone: 16 MB pokalbyje, 2 GB kaip dokumentas.\n• WhatsApp Web priima 180 MB failui. Tai praneša naudotojai, WhatsApp to neskelbia.\n• Taigi 180 MB ar mažesnis failas per žiniatinklį pereina toks, koks yra.",
 

@@ -24,7 +24,7 @@ public sealed class CliIzNotuTests : IDisposable
     private static MediaInfo Kaynak(int sesIzi) => new()
     {
         FilePath = "kaynak.mkv",
-        FileSizeBytes = 400L * 1024 * 1024,
+        FileSizeBytes = 400_000_000L,
         DurationSeconds = 600,
         Width = 1920,
         Height = 1080,

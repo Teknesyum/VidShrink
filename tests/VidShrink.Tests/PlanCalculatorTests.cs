@@ -19,7 +19,7 @@ public sealed class PlanCalculatorTests
     private static MediaInfo SampleInfo() => new()
     {
         FilePath = "sample.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -87,7 +87,7 @@ public sealed class PlanCalculatorTests
         var info = new MediaInfo
         {
             FilePath = "sample.mp4",
-            FileSizeBytes = 500L * 1024 * 1024,
+            FileSizeBytes = 500_000_000L,
             DurationSeconds = 120,
             Width = 1920,
             Height = 1080,
@@ -207,7 +207,7 @@ public sealed class PlanCalculatorTests
         var info = new MediaInfo
         {
             FilePath = "huge.mkv",
-            FileSizeBytes = 4L * 1024 * 1024 * 1024 * 1024,
+            FileSizeBytes = 4_194_304_000_000L,
             DurationSeconds = 28800,
             Width = 3840,
             Height = 2160,
@@ -260,7 +260,7 @@ public sealed class PlanCalculatorTests
         var info = new MediaInfo
         {
             FilePath = "dusuk.mp4",
-            FileSizeBytes = 40L * 1024 * 1024,
+            FileSizeBytes = 40_000_000L,
             DurationSeconds = 300,
             Width = 320,
             Height = 180,

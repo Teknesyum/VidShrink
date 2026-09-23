@@ -319,7 +319,7 @@ public sealed class KaydediciHedefTests
         var (kod, metin) = KayitKanit.Ffprobe(cikti, "boyut-siniri.ffprobe.txt");
         var baslik = File.Exists(cikti) ? System.Text.Encoding.ASCII.GetString(File.ReadAllBytes(cikti), 4, 4) : string.Empty;
         var (paketBayt, sonKume) = Paketler(cikti);
-        var sinir = (long)(0.02 * 1024 * 1024);
+        var sinir = Megabayt.Tavan(0.02);
 
         File.WriteAllLines(Path.Combine(Kanit, "boyut-siniri.txt"), new[] { $"ended={bitti} sn={sure:0.00} ok={sonuc.Ok} teslim={sonuc.OutputPath} bayt={bayt} paket={paketBayt} sonIkiAnahtarKumesi={sonKume} sinir={sinir} yakalamaKaldi={File.Exists(yakalama)} probe={kod}" });
         if (File.Exists(cikti)) File.Delete(cikti);

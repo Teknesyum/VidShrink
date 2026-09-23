@@ -24,7 +24,7 @@ public sealed class GorselDenetimTests
 
     internal static MediaInfo Ornek() => new()
     {
-        FilePath = @"C:\Kayitlar\ornek.mkv", FileSizeBytes = 420L * 1024 * 1024, DurationSeconds = 187.5,
+        FilePath = @"C:\Kayitlar\ornek.mkv", FileSizeBytes = 420_000_000L, DurationSeconds = 187.5,
         Width = 3840, Height = 2160, Fps = 59.94, VideoCodec = "hevc", TotalBitrateBps = 18_800_000,
         AudioCodec = "aac", AudioBitrateBps = 192_000, AudioChannels = 2, PixelFormat = "yuv420p"
     };

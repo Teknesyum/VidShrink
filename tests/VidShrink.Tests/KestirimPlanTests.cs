@@ -7,7 +7,7 @@ public sealed class KestirimPlanTests
     private static MediaInfo SampleInfo() => new()
     {
         FilePath = "parca.mkv",
-        FileSizeBytes = 100L * 1024 * 1024,
+        FileSizeBytes = 100_000_000L,
         DurationSeconds = 60,
         Width = 1920,
         Height = 1080,

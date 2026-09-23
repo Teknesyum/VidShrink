@@ -33,7 +33,7 @@ public sealed class OtomatikKirpmaArayuzTests : IDisposable
     private static MediaInfo Kaynak(string yol = KaynakYolu, int genislik = 3840, int yukseklik = 2160) => new()
     {
         FilePath = yol,
-        FileSizeBytes = 420L * 1024 * 1024,
+        FileSizeBytes = 420_000_000L,
         DurationSeconds = 187.5,
         Width = genislik,
         Height = yukseklik,

@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB va bene per forum datati e gateway e-mail rigidi.",
   "main.chip.25.tip": "25 MB va bene per gli allegati Gmail e la maggior parte dei sistemi di ticket.",
   "main.chip.100.tip": "100 MB è adatto ad archiviazione e caricamenti in cui la qualità conta più del tempo di trasferimento.",
-  "main.chip.128.label": "Massimo per la condivisione",
-  "main.chip.128.tip": "• 128 MiB è il limite misurato di uguu.se, la destinazione di condivisione anonima con il limite più basso.\n• Un file pari o inferiore a questa dimensione può essere consegnato a entrambe le destinazioni senza essere rifiutato.\n• L'altra destinazione, storage.to, accetta molto di più, quindi questo chip è il valore sicuro per entrambe.",
+  "main.chip.134.label": "Massimo per la condivisione",
+  "main.chip.134.tip": "• 134 MB è il limite misurato di uguu.se, la destinazione di condivisione anonima con il limite più basso.\n• Un file pari o inferiore a questa dimensione può essere consegnato a entrambe le destinazioni senza essere rifiutato.\n• L'altra destinazione, storage.to, accetta molto di più, quindi questo chip è il valore sicuro per entrambe.",
   "main.chip.180.label": "Massimo WhatsApp Web",
   "main.chip.180.tip": "• Sul telefono: 16 MB in chat, 2 GB come documento.\n• WhatsApp Web accetta 180 MB per file. Lo riferiscono gli utenti, WhatsApp non lo pubblica.\n• Quindi un file di 180 MB o meno passa dal lato web così com'è.",
 

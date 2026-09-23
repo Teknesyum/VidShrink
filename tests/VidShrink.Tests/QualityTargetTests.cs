@@ -21,7 +21,7 @@ public sealed class QualityTargetTests
     private static MediaInfo SampleInfo() => new()
     {
         FilePath = "sample.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -36,7 +36,7 @@ public sealed class QualityTargetTests
     private static MediaInfo ShortPhoneClip() => new()
     {
         FilePath = "phone.mp4",
-        FileSizeBytes = 90L * 1024 * 1024,
+        FileSizeBytes = 90_000_000L,
         DurationSeconds = 42,
         Width = 1080,
         Height = 1920,
@@ -51,7 +51,7 @@ public sealed class QualityTargetTests
     private static MediaInfo LongScreenCapture() => new()
     {
         FilePath = "capture.mkv",
-        FileSizeBytes = 2200L * 1024 * 1024,
+        FileSizeBytes = 2200_000_000L,
         DurationSeconds = 3600,
         Width = 2560,
         Height = 1440,

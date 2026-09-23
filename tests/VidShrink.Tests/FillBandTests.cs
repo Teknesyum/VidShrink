@@ -27,7 +27,7 @@ public sealed class FillBandTests
     private static MediaInfo SampleInfo() => new()
     {
         FilePath = "sample.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -141,7 +141,7 @@ public sealed class FillBandTests
     [Fact]
     public void FillTargetFallsBackToTwoPassWhenTheCrfFloorCannotReachTheBand()
     {
-        var info = SampleInfo() with { FileSizeBytes = 12_000L * 1024 * 1024 };
+        var info = SampleInfo() with { FileSizeBytes = 12_000_000_000L };
         var options = new PlanOptions
         {
             TargetMb = 5000,
