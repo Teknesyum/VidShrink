@@ -9,7 +9,7 @@
   <Color x:Key="NeonBlueColor">#FF399EE6</Color>
   <Color x:Key="NeonPinkColor">#FF86B300</Color>
   <Color x:Key="NeonPurpleColor">#FFA37ACC</Color>
-  <Color x:Key="NeonSuccessColor">#FF86B300</Color>
+  <Color x:Key="NeonSuccessColor">#FF86B301</Color>
   <Color x:Key="SurfaceToneColor">#FFF3F4F5</Color>
   <Color x:Key="AppBgColor">#FFFCFCFC</Color>
   <Color x:Key="TextBodyColor">#FF5C6166</Color>
@@ -20,7 +20,7 @@
   <Color x:Key="NeonBlueFillColor">#1A399EE6</Color>
   <Color x:Key="NeonBlueHoverColor">#33399EE6</Color>
   <Color x:Key="NeonBlueActiveColor">#4D399EE6</Color>
-  <Color x:Key="NeonBlueBorderColor">#4D399EE6</Color>
+  <Color x:Key="NeonBlueBorderColor">#4D399EE7</Color>
   <Color x:Key="NeonBlueBorderStrongColor">#80399EE6</Color>
   <Color x:Key="NeonPinkFillColor">#1A86B300</Color>
   <Color x:Key="NeonPurpleBorderColor">#80A37ACC</Color>
@@ -28,9 +28,9 @@
   <Color x:Key="NeonEmberColor">#FFF07171</Color>
   <Color x:Key="EmberFlameColor">#FFFA8D3E</Color>
   <Color x:Key="EmberBlazeColor">#FFF2AE49</Color>
-  <Color x:Key="AtmosHotColor">#FFF2AE49</Color>
-  <Color x:Key="AtmosMidColor">#FFFA8D3E</Color>
-  <Color x:Key="AtmosEdgeColor">#FFF07171</Color>
+  <Color x:Key="AtmosHotColor">#FFF2AE4A</Color>
+  <Color x:Key="AtmosMidColor">#FFFA8D3F</Color>
+  <Color x:Key="AtmosEdgeColor">#FFF07172</Color>
   <Color x:Key="EmberDeepColor">#FFFDFAFA</Color>
   <Color x:Key="EmberMidColor">#FFFDF9F9</Color>
   <Color x:Key="EmberEdgeColor">#FFFCF7F7</Color>

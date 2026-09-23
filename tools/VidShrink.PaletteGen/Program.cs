@@ -29,7 +29,7 @@ foreach (var seed in seeds)
     var home = Path.Combine(folder, seed.Name);
     Directory.CreateDirectory(home);
     var path = Path.Combine(home, "Theme.axaml");
-    File.WriteAllText(path, Build(seed), new UTF8Encoding(false));
+    File.WriteAllText(path, Distinct(Build(seed)), new UTF8Encoding(false));
     Console.WriteLine($"{seed.Name,-14} {seed.Accent1} {seed.Accent2} {seed.Accent3}");
 }
 
@@ -103,6 +103,22 @@ static string Build(Seed seed)
         </ResourceDictionary>
 
         """;
+}
+
+// Palet değişimi eski rengi yeni renge değerle eşler (PaletteCatalog.Recolour): iki anahtar
+// aynı değeri taşıyıp öteki palette ayrışırsa renk belirsiz sayılır ve hiç boyanmaz. Bu
+// yüzden bir palette her renk değeri tek anahtara aittir; çakışan sonraki anahtarın mavi
+// kanalı bir birim kayar. Ölçü: PaletteApplyTests.AyniRenkIkiAnahtardaYok.
+static string Distinct(string xaml)
+{
+    var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    return System.Text.RegularExpressions.Regex.Replace(xaml, "(<Color x:Key=\"[^\"]+\">)#([0-9A-F]{8})(<)", m =>
+    {
+        var value = Convert.ToUInt32(m.Groups[2].Value, 16);
+        var step = (value & 0xFF) == 0xFF ? uint.MaxValue : 1u;
+        while (!seen.Add(value.ToString("X8"))) value += step;
+        return $"{m.Groups[1].Value}#{value:X8}{m.Groups[3].Value}";
+    });
 }
 
 // Neon dolgunun üstündeki yazı siyah ya da beyaz: üç dolguya en kötü kontrastı yüksek olan.
