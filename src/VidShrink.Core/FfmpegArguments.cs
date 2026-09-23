@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 
 namespace VidShrink.Core;
@@ -562,6 +562,8 @@ public static class FfmpegArguments
             a.AddRange(new[] { cover ? "-profile:v:0" : "-profile:v", profile });
         a.AddRange(psychovisualArgs);
         a.AddRange(plan.HdrColorArgs);
+        if (plan.Hdr10PlusMetadataPath is { Length: > 0 } hdr10PlusPath && plan.Codec.Equals("libx265", StringComparison.OrdinalIgnoreCase))
+            a.AddRange(new[] { "-x265-params", $"dhdr10-info={Hdr10PlusJson.EscapeForX265Params(hdr10PlusPath)}" });
         a.AddRange(VideoFilterChain.ColorArgs(plan));
         var dolbyVision = CarriesDolbyVision(info, plan);
         if (dolbyVision) a.AddRange(HdrResolver.DolbyVisionArgs);

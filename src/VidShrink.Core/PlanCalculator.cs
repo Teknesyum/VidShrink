@@ -369,6 +369,17 @@ public static class PlanCalculator
             codec = DarkContentSwitch.Codec;
         }
 
+        var hdr10PlusCut = info.HasHdr10Plus && (options.Trim is not null || (options.Filters ?? VideoFilterOptions.Default).Detelecine);
+        var hdr10PlusRouted = false;
+        if (lockedCodec is null && options.EncoderPath == EncoderPathOverride.Auto && !hdr10PlusCut
+            && HdrResolver.Hdr10PlusCodec(info, options.HdrPolicy, codec, availability) is string bridgeCodec)
+        {
+            reason.Add($"the source carries HDR10+ dynamic metadata, which only {bridgeCodec} carries through a metadata file, so {bridgeCodec} is used instead of {codec}");
+            reasonCodes.Add(new ReasonNote(ReasonCode.Hdr10PlusRoutedToX265, RequestedCodec: codec, FallbackCodec: bridgeCodec, EngineWouldHaveChosen: codec));
+            codec = bridgeCodec;
+            hdr10PlusRouted = true;
+        }
+
         var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability,
             dolbyVisionCarriable: VideoFilterChain.ColorMatrixFilter(info, (options.Filters ?? VideoFilterOptions.Default).ColorMatrix) is null);
         if (hdr.NotMeasured) probe.NotMeasured = true;
@@ -393,13 +404,26 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.HdrTonemapped));
         }
 
-        if (hdr.DynamicMetadataDropped)
+        var hdr10PlusLost = hdr.DynamicMetadataDropped && info.HasHdr10Plus;
+        var dolbyVisionDropped = hdr.DynamicMetadataDropped && info.HasDolbyVision && !hdr.DolbyVisionCarried;
+        if (hdr10PlusCut && (hdr.Hdr10PlusBridge || hdr10PlusLost))
+        {
+            reason.Add("HDR10+ was dropped in the cut: its metadata is aligned per source frame and a trim or frame rate change breaks that alignment, so the output keeps only the static HDR10 layer");
+            reasonCodes.Add(new ReasonNote(ReasonCode.Hdr10PlusDroppedInCut));
+        }
+        else if (hdr.Hdr10PlusOnSvtAv1)
+        {
+            reason.Add("HDR10+ is not carried on the SVT-AV1 path, so the output keeps only the static HDR10 layer; Automatic would use libx265, which carries it");
+            reasonCodes.Add(new ReasonNote(ReasonCode.Hdr10PlusNotCarriedOnSvtAv1, RequestedCodec: codec, EngineWouldHaveChosen: "libx265"));
+        }
+
+        if (dolbyVisionDropped || (hdr10PlusLost && !hdr10PlusCut && !hdr.Hdr10PlusOnSvtAv1))
         {
             reason.Add("the source carries dynamic HDR metadata (HDR10+, or Dolby Vision other than profile 8.1) that an encode does not pass through, so the output keeps only the static HDR10 layer");
             reasonCodes.Add(new ReasonNote(ReasonCode.HdrDynamicMetadataDropped));
         }
 
-        var preferredCodec = darkSwitch ? codec : lockedCodec ?? (fast ? FastHardwareOrder[0] : PreferredCodecFor(preference));
+        var preferredCodec = darkSwitch || hdr10PlusRouted ? codec : lockedCodec ?? (fast ? FastHardwareOrder[0] : PreferredCodecFor(preference));
         if (codec != preferredCodec)
         {
             var fallbackCause = EncoderFallbackCauseFor(probe);
@@ -830,6 +854,14 @@ public static class PlanCalculator
                 reason.Add($"the budget left {plan.VideoBitrateK}k for video, under the {runnableK}k the encoder still opens a two-pass run at {plan.Width}x{plan.Height}@{plan.Fps:0.##}; the bitrate was raised to {runnableK}k, so the smallest file this source can deliver with its {plan.AudioBitrateK}k audio is about {floorMb:0.##} MB against the {effectiveTargetMb:0.##} MB target");
                 plan.VideoBitrateK = runnableK;
             }
+        }
+
+        plan.Hdr10PlusBridge = hdr.Hdr10PlusBridge && !hdr10PlusCut;
+        if (plan.Hdr10PlusBridge && plan.Fps < info.Fps - 0.01)
+        {
+            plan.Hdr10PlusBridge = false;
+            reason.Add($"HDR10+ was dropped in the cut: its metadata is aligned per source frame and the frame rate drops from {info.Fps:0.##} to {plan.Fps:0.##} fps, so the output keeps only the static HDR10 layer");
+            reasonCodes.Add(new ReasonNote(ReasonCode.Hdr10PlusDroppedInCut, Fps: plan.Fps));
         }
 
         plan.Reason = string.Join("; ", reason);

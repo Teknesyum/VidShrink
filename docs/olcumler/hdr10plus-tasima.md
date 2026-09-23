@@ -121,3 +121,37 @@ Köprünün maliyeti ve açık kararları:
 
 Beş dosyadan fazlasına dokunur (`FfprobeClient`, `MediaInfo`, `HdrResolver`, `FfmpegArguments`, kodlama
 koşucusu, testler). Ek geçişin maliyetine değer mi, karar kullanıcının.
+
+## Köprü Kuruldu: Alan Alan Ölçüm (23 Eylül 2026)
+
+Karar `docs/handbrake/fable-karar-hdr10plus-2026-09-23.md`. Ölçü
+`Hdr10ArtiKopruTests.CanliKopruIkiGecisteHerKareninAlanlariniTasir` (`[FfmpegFact]`, ffmpeg 9.0).
+
+Kaynak: `testsrc2` 320x180, 24 fps, 12 kare, yuv420p10le PQ/BT.2020, x265 `dhdr10-info` ile her karede
+farklı değer (`AverageRGB` 1000 + 7i, `MaxScl[0]` ve son yüzdelik 4000 + i, hedef ekran 400 + i nit,
+dokuz bezier çapası). Plan Otomatik, `libx265`'e yönlendi; iki geçiş, `-threads 2`,
+`pools=2:frame-threads=1`. Koşucu çözme geçişini ayrı adım olarak koştu, JSON'u
+`%TEMP%\vidshrink_<guid>_hdr10plus.json` tam Windows yoluna yazdı ve `C\:/...` kaçışıyla iki geçişe verdi.
+
+```
+kaynak kare=12 hdr10+=12
+cikti  kare=12 hdr10+=12
+kosucu sayimi kaynak=12 cikti=12
+alan alan esit sahne=12/12
+```
+
+Karşılaştırma kare sayısıyla sınırlı değil: kaynağın ve çıkışın ffprobe dökümü aynı dönüştürücüden
+geçirilip sahne JSON'u sahne sahne eşitlendi (12/12 aynı metin; kare 11'de `AverageRGB` 1077,
+`MaxScl` [4011,3500,3000], hedef ekran 411). İş sonunda `%TEMP%`'te yeni `*_hdr10plus.json` kalmadı.
+
+Önceki bölümün açık soruları:
+
+- Windows yolu: `:` → `\:` ve `\` → `/` ile mutlak yol çalışıyor; göreli yol gerekmedi.
+- İki geçiş: karar gereği iki geçişe de aynı JSON veriliyor. Mutasyonda JSON yalnız ikinci geçişe
+  verildiğinde de çıkış 12/12 taşıdı; yani birinci geçiş için şart değil, zararı da yok.
+- Kesit ve fps değişimi: hizalama yapılmadı, köprü kapanıyor ve gerekçe `main.reason.hdr10plus-cut`.
+  Otomatik kipte kesit varken x265'e yönlendirme de yapılmıyor.
+- SVT-AV1: kilitli seçimde köprü yok, gerekçe `main.reason.hdr10plus-svtav1`.
+- Dönüştürücü tanımadığı alanı, iki pencereli kareyi, sıfırdan farklı `fraction_bright_pixels`'ı ve
+  HDR10+ taşımayan ya da iki kez taşıyan kareyi reddeder; o işte köprü veri vermez, çıkış sayımı
+  tutmayınca iş `StatusWarning` ile biter. Gerçek (sentetik olmayan) bir HDR10+ kaynakla ölçülmedi.

@@ -301,6 +301,7 @@
   "main.run.done": "Terminé en {0} essai(s). {1} Mo → {2} Mo ({3} % plus petit).",
   "main.run.over-ceiling": "Impossible de passer sous la cible de {0} Mo après {1} essai(s) (dernier résultat : {2} Mo). Aucun fichier n'a été écrit, car un fichier plus grand que la cible n'est jamais remis. Augmentez la cible et réessayez.",
   "main.run.ended": "L'encodage s'est arrêté de façon inattendue et aucun fichier n'a été écrit.",
+  "main.run.hdr10plus-short": "HDR10+ n'a atteint que {0} des {1} images de la source ; les autres images ne portent que du HDR10 statique.",
   "main.run.cancelled": "Annulé.",
   "main.run.converted": "Terminé. {0} Mo → {1} Mo.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Essai",
   "main.stage.gif-palette": "Palette GIF",
   "main.stage.gif-encode": "Encodage GIF",
+  "main.stage.hdr10plus-metadata": "Métadonnées HDR10+",
 
   "main.ai.title": "Réglages IA",
   "main.ai.tip": "• Cette étape est facultative.\n• Copiez une invite dans n'importe quelle IA de discussion, puis collez et validez sa réponse JSON.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "bandes noires rognées : {0}x{1} (source {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "la source porte des métadonnées HDR dynamiques (HDR10+ ou Dolby Vision) que cet encodage ne transmet pas ; la sortie ne garde donc que la couche HDR10 statique",
   "main.reason.vp9-crf-unmeasured": "L’échelle de qualité CRF de libvpx-vp9 est mesurée, mais pas la façon dont une valeur de CRF se traduit en taille de fichier ; la taille est donc tenue par un VBR en deux passes plutôt que par un CRF deviné",
+  "main.reason.hdr10plus-routed-x265": "la source porte des métadonnées dynamiques HDR10+ que seul {1} sait transmettre, donc {1} est utilisé au lieu de {0}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ n'est pas transmis par la voie SVT-AV1, donc la sortie ne garde que la couche HDR10 statique ; Automatique utiliserait libx265, qui le transmet",
+  "main.reason.hdr10plus-cut": "HDR10+ a été perdu à la découpe : ses métadonnées suivent la source image par image, et un découpage ou un changement de fréquence d'images rompt cet alignement, donc la sortie ne garde que la couche HDR10 statique",
   "main.reason.stream.audio-passthrough": "la piste audio est copiée telle quelle : le conteneur prend en charge son codec et elle reste sous 15 % de la cible",
   "main.reason.stream.audio-downmixed": "une piste audio surround est réduite en stéréo lors du réencodage",
   "main.reason.stream.extra-audio-dropped": "une seule piste audio est conservée ; activez 'Conserver toutes les pistes' pour toutes les garder en MKV",

@@ -301,6 +301,7 @@
   "main.run.done": "Ferdig på {0} forsøk. {1} MB → {2} MB ({3}% mindre).",
   "main.run.over-ceiling": "Kom ikke under målet på {0} MB etter {1} forsøk (siste resultat var {2} MB). Ingen fil ble skrevet, fordi en fil større enn målet aldri leveres. Hev målet og prøv igjen.",
   "main.run.ended": "Kodingen ble uventet avsluttet, og ingen fil ble skrevet.",
+  "main.run.hdr10plus-short": "HDR10+ nådde bare {0} av kildens {1} bilder; de øvrige bildene har bare statisk HDR10.",
   "main.run.cancelled": "Avbrutt.",
   "main.run.converted": "Ferdig. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Forsøk",
   "main.stage.gif-palette": "GIF-palett",
   "main.stage.gif-encode": "GIF-koding",
+  "main.stage.hdr10plus-metadata": "HDR10+-metadata",
 
   "main.ai.title": "KI-innstillinger",
   "main.ai.tip": "• Dette trinnet er valgfritt.\n• Kopier en ledetekst til en hvilken som helst chat-KI, lim så inn og valider JSON-svaret.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "svarte felt beskåret: {0}x{1} (kilde {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "kilden har dynamiske HDR-metadata (HDR10+ eller Dolby Vision) som denne kodingen ikke fører videre, så utdataene beholder bare det statiske HDR10-laget",
   "main.reason.vp9-crf-unmeasured": "CRF-kvalitetsskalaen til libvpx-vp9 er målt, men ikke hvordan en CRF-verdi slår ut i filstørrelse, så størrelsen holdes med to-pass VBR i stedet for en CRF-gjetning",
+  "main.reason.hdr10plus-routed-x265": "kilden har dynamiske HDR10+-metadata som bare {1} kan føre videre, så {1} brukes i stedet for {0}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ føres ikke med på SVT-AV1-veien, så utdataene beholder bare det statiske HDR10-laget; Automatisk ville brukt libx265, som fører det med",
+  "main.reason.hdr10plus-cut": "HDR10+ falt bort i klippingen: metadataene følger kilden bilde for bilde, og en beskjæring eller endret bildefrekvens bryter den justeringen, så utdataene beholder bare det statiske HDR10-laget",
   "main.reason.stream.audio-passthrough": "lydsporet kopieres uendret: containeren støtter kodeken, og det holder seg innenfor 15 % av målet",
   "main.reason.stream.audio-downmixed": "et surround-lydspor mikses ned til stereo under omkodingen",
   "main.reason.stream.extra-audio-dropped": "bare ett lydspor beholdes; slå på 'Behold alle spor' for å ta med alle i MKV",

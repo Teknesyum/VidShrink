@@ -301,6 +301,7 @@
   "main.run.done": "Xong sau {0} lần thử. {1} MB → {2} MB (nhỏ hơn {3}%).",
   "main.run.over-ceiling": "Không xuống dưới mục tiêu {0} MB sau {1} lần thử (kết quả cuối {2} MB). Không ghi tệp nào, vì tệp lớn hơn mục tiêu không bao giờ được trả về. Hãy nâng mục tiêu và thử lại.",
   "main.run.ended": "Mã hóa kết thúc bất ngờ và không ghi tệp nào.",
+  "main.run.hdr10plus-short": "HDR10+ chỉ đến được {0} trong {1} khung hình của nguồn; các khung hình còn lại chỉ mang HDR10 tĩnh.",
   "main.run.cancelled": "Đã hủy.",
   "main.run.converted": "Xong. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Lần thử",
   "main.stage.gif-palette": "Bảng màu GIF",
   "main.stage.gif-encode": "Mã hóa GIF",
+  "main.stage.hdr10plus-metadata": "Siêu dữ liệu HDR10+",
 
   "main.ai.title": "Cài đặt AI",
   "main.ai.tip": "• Bước này là tùy chọn.\n• Sao chép prompt vào bất kỳ AI chat nào, rồi dán và kiểm tra câu trả lời JSON.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "đã cắt viền đen: {0}x{1} (nguồn {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "nguồn mang siêu dữ liệu HDR động (HDR10+ hoặc Dolby Vision) mà lần mã hóa này không chuyển tiếp được, nên đầu ra chỉ giữ lớp HDR10 tĩnh",
   "main.reason.vp9-crf-unmeasured": "Thang chất lượng CRF của libvpx-vp9 đã được đo, nhưng chưa đo được giá trị CRF ảnh hưởng thế nào đến kích thước tệp, nên kích thước được giự bằng VBR hai lượt thay vì đoán CRF",
+  "main.reason.hdr10plus-routed-x265": "nguồn mang siêu dữ liệu động HDR10+ mà chỉ {1} truyền qua được, nên dùng {1} thay cho {0}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ không được truyền qua nhánh SVT-AV1, nên đầu ra chỉ giữ lớp HDR10 tĩnh; Tự động sẽ dùng libx265, bộ mã hóa truyền được nó",
+  "main.reason.hdr10plus-cut": "HDR10+ đã mất khi cắt: siêu dữ liệu bám theo nguồn từng khung hình, và việc cắt bớt hay đổi tốc độ khung hình làm lệch sự khớp đó, nên đầu ra chỉ giữ lớp HDR10 tĩnh",
   "main.reason.stream.audio-passthrough": "rãnh âm thanh được sao chép nguyên trạng: vùng chứa hỗ trợ codec của nó và nằm trong 15% mục tiêu",
   "main.reason.stream.audio-downmixed": "rãnh âm thanh vòm được trộn xuống stereo khi mã hóa lại",
   "main.reason.stream.extra-audio-dropped": "chỉ giữ một rãnh âm thanh; bật 'Giữ mọi rãnh' để mang tất cả trong MKV",

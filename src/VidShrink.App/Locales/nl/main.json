@@ -301,6 +301,7 @@
   "main.run.done": "Klaar in {0} poging(en). {1} MB → {2} MB ({3}% kleiner).",
   "main.run.over-ceiling": "Kon na {0} poging(en) niet onder het doel van {1} MB komen (laatste resultaat was {2} MB). Er is geen bestand geschreven, omdat een bestand groter dan het doel nooit wordt teruggegeven. Verhoog het doel en probeer opnieuw.",
   "main.run.ended": "De codering eindigde onverwacht en er is geen bestand geschreven.",
+  "main.run.hdr10plus-short": "HDR10+ bereikte slechts {0} van de {1} beelden van de bron; de overige beelden dragen alleen statische HDR10.",
   "main.run.cancelled": "Geannuleerd.",
   "main.run.converted": "Klaar. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Poging",
   "main.stage.gif-palette": "GIF-palet",
   "main.stage.gif-encode": "GIF-codering",
+  "main.stage.hdr10plus-metadata": "HDR10+-metadata",
 
   "main.ai.title": "AI-instellingen",
   "main.ai.tip": "• Deze stap is optioneel.\n• Kopieer een prompt naar een chat-AI, plak vervolgens het JSON-antwoord en valideer het.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "zwarte balken bijgesneden: {0}x{1} (bron {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "de bron bevat dynamische HDR-metadata (HDR10+ of Dolby Vision) die deze codering niet doorgeeft, dus de uitvoer behoudt alleen de statische HDR10-laag",
   "main.reason.vp9-crf-unmeasured": "De CRF-kwaliteitsschaal van libvpx-vp9 is gemeten, maar niet hoe een CRF-waarde zich vertaalt naar bestandsgrootte, dus houdt tweepass-VBR de grootte vast in plaats van een geschatte CRF",
+  "main.reason.hdr10plus-routed-x265": "de bron bevat dynamische HDR10+-metadata die alleen {1} kan doorgeven, daarom wordt {1} gebruikt in plaats van {0}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ wordt in de SVT-AV1-tak niet meegenomen, dus de uitvoer houdt alleen de statische HDR10-laag; Automatisch zou libx265 gebruiken, dat het wel meeneemt",
+  "main.reason.hdr10plus-cut": "HDR10+ is bij het knippen weggevallen: de metadata volgen de bron beeld voor beeld, en inkorten of een andere beeldsnelheid verbreekt die uitlijning, dus de uitvoer houdt alleen de statische HDR10-laag",
   "main.reason.stream.audio-passthrough": "het audiospoor wordt ongewijzigd gekopieerd: de container ondersteunt de codec en het blijft binnen 15% van het doel",
   "main.reason.stream.audio-downmixed": "een surround-audiospoor wordt bij het hercoderen naar stereo gemixt",
   "main.reason.stream.extra-audio-dropped": "er blijft maar één audiospoor over; zet 'Alle sporen behouden' aan om ze allemaal in MKV mee te nemen",

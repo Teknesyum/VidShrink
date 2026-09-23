@@ -301,6 +301,7 @@
   "main.run.done": "Done in {0} attempt(s). {1} MB → {2} MB ({3}% smaller).",
   "main.run.over-ceiling": "Could not get under the {0} MB target after {1} attempt(s) (last result was {2} MB). No file was written, because a file larger than the target is never handed back. Raise the target and try again.",
   "main.run.ended": "Encoding ended unexpectedly and no file was written.",
+  "main.run.hdr10plus-short": "HDR10+ reached only {0} of the source's {1} frames; the other frames carry only static HDR10.",
   "main.run.cancelled": "Cancelled.",
   "main.run.converted": "Done. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Attempt",
   "main.stage.gif-palette": "GIF palette",
   "main.stage.gif-encode": "GIF encode",
+  "main.stage.hdr10plus-metadata": "HDR10+ metadata",
 
   "main.ai.title": "AI settings",
   "main.ai.tip": "• This step is optional.\n• Copy a prompt to any chat AI, then paste and validate its JSON answer.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "black bars cropped: {0}x{1} (source {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "the source carries dynamic HDR metadata (HDR10+ or Dolby Vision) that this encode cannot pass through, so the output keeps only the static HDR10 layer",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9's CRF quality scale is measured, but not how a CRF value translates to file size, so two-pass VBR holds the size instead of a CRF guess",
+  "main.reason.hdr10plus-routed-x265": "the source carries HDR10+ dynamic metadata, which only {1} can pass through, so {1} is used instead of {0}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ is not carried on the SVT-AV1 path, so the output keeps only the static HDR10 layer; Automatic would use libx265, which carries it",
+  "main.reason.hdr10plus-cut": "HDR10+ was dropped in the cut: its metadata follows the source frame by frame, and a trim or frame rate change breaks that alignment, so the output keeps only the static HDR10 layer",
   "main.reason.stream.audio-passthrough": "the audio track is copied as it is: the container carries its codec and it stays within 15% of the target",
   "main.reason.stream.audio-downmixed": "a surround audio track is mixed down to stereo while it is re-encoded",
   "main.reason.stream.extra-audio-dropped": "only one audio track is kept; turn on 'Keep all tracks' to carry all of them in MKV",

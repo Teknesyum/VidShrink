@@ -21,6 +21,19 @@ public sealed record HdrResolution(string PixelFormat, string? VideoFilter, IRea
     /// HDR10 katmani kalir. Ton eslemede kurulmaz: orada zaten SDR'a inilir ve ayri not duser.
     /// </summary>
     public bool DynamicMetadataDropped { get; init; }
+
+    /// <summary>
+    /// Kaynagin HDR10+ verisi x265'in <c>dhdr10-info</c> JSON'u ile tasinacak: libavcodec'in
+    /// libx265 sarmalayicisi kare yan verisini atiyor, JSON yolu 12/12 tasiyor
+    /// (<c>docs/olcumler/hdr10plus-tasima.md</c>). Yalniz korunan HDR ve libx265.
+    /// </summary>
+    public bool Hdr10PlusBridge { get; init; }
+
+    /// <summary>
+    /// HDR10+ kaynak korunan HDR ile libsvtav1'e gidiyor; o kolda kopru yok
+    /// (<c>docs/handbrake/fable-karar-hdr10plus-2026-09-23.md</c> madde 2).
+    /// </summary>
+    public bool Hdr10PlusOnSvtAv1 { get; init; }
 }
 
 public interface IHdr10EncoderAvailability
@@ -86,13 +99,30 @@ public static class HdrResolver
         }
 
         var carried = dolbyVisionCarriable && CarriesDolbyVision(info, codec);
+        var bridge = info.HasHdr10Plus && codec.Equals("libx265", StringComparison.OrdinalIgnoreCase);
 
         return new HdrResolution(Hdr10PixelFormat(codec, availability) ?? "yuv420p10le", null, preserveArgs, false)
         {
             NotMeasured = notMeasured,
             DolbyVisionCarried = carried,
-            DynamicMetadataDropped = info.HasHdr10Plus || (info.HasDolbyVision && !carried)
+            Hdr10PlusBridge = bridge,
+            Hdr10PlusOnSvtAv1 = info.HasHdr10Plus && codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase),
+            DynamicMetadataDropped = (info.HasHdr10Plus && !bridge) || (info.HasDolbyVision && !carried)
         };
+    }
+
+    /// <summary>
+    /// HDR10+ kaynakta HDR korunuyorsa kodegi libx265'e yonlendirir: HDR10+ yalniz orada
+    /// tasinir. <c>null</c> doner yonlendirme yoksa — kaynak HDR10+ degil, politika ton esleme,
+    /// kodek zaten libx265 ya da libx265 bu makinede calismiyor. Kilitli kodek ve kesit
+    /// (trim, detelecine) cagiranin karari; burada yalniz kaynak ve kodlayici okunur.
+    /// </summary>
+    public static string? Hdr10PlusCodec(MediaInfo info, HdrPolicy requested, string codec, IEncoderAvailability? availability)
+    {
+        if (!info.IsHdr || !info.HasHdr10Plus || requested != HdrPolicy.Preserve) return null;
+        if (codec.Equals("libx265", StringComparison.OrdinalIgnoreCase)) return null;
+        if (availability is not null && !availability.HasEncoder("libx265")) return null;
+        return SupportsHdr10("libx265", availability, out _) ? "libx265" : null;
     }
 
     /// <summary>

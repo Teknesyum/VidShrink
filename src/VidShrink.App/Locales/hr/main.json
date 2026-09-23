@@ -301,6 +301,7 @@
   "main.run.done": "Gotovo u {0} pokušaj(a). {1} MB → {2} MB ({3}% manje).",
   "main.run.over-ceiling": "Nije se uspjelo spustiti ispod cilja od {0} MB nakon {1} pokušaj(a) (zadnji rezultat bio je {2} MB). Datoteka nije zapisana jer se datoteka veća od cilja nikad ne vraća. Povećajte cilj i pokušajte ponovno.",
   "main.run.ended": "Kodiranje je neočekivano završilo i datoteka nije zapisana.",
+  "main.run.hdr10plus-short": "HDR10+ je stigao samo do {0} od {1} sličica izvora; ostale sličice nose samo statički HDR10.",
   "main.run.cancelled": "Otkazano.",
   "main.run.converted": "Gotovo. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Pokušaj",
   "main.stage.gif-palette": "GIF paleta",
   "main.stage.gif-encode": "GIF kodiranje",
+  "main.stage.hdr10plus-metadata": "HDR10+ metapodaci",
 
   "main.ai.title": "AI postavke",
   "main.ai.tip": "• Ovaj korak nije obavezan.\n• Kopirajte upit u bilo koji AI chat, zatim zalijepite i provjerite njegov JSON odgovor.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "crne trake obrezane: {0}x{1} (izvor {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "izvornik nosi dinamičke HDR metapodatke (HDR10+ ili Dolby Vision) koje ovo kodiranje ne prenosi, pa izlaz zadržava samo statički HDR10 sloj",
   "main.reason.vp9-crf-unmeasured": "Ljestvica kvalitete CRF za libvpx-vp9 je izmjerena, ali nije izmjereno kako se vrijednost CRF-a odražava na veličinu datoteke, pa veličinu drži dvoprolazni VBR umjesto nagađanja CRF-a",
+  "main.reason.hdr10plus-routed-x265": "izvor nosi dinamičke HDR10+ metapodatke koje može prenijeti samo {1}, zato se umjesto {0} koristi {1}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ se ne prenosi putem SVT-AV1, pa izlaz zadržava samo statički HDR10 sloj; Automatski bi koristio libx265, koji ga prenosi",
+  "main.reason.hdr10plus-cut": "HDR10+ je izgubljen pri rezanju: metapodaci prate izvor sličicu po sličicu, a skraćivanje ili promjena broja sličica u sekundi narušava to poravnanje, pa izlaz zadržava samo statički HDR10 sloj",
   "main.reason.stream.audio-passthrough": "audiozapis kopira se nepromijenjen: spremnik podržava njegov kodek i ostaje unutar 15 % cilja",
   "main.reason.stream.audio-downmixed": "surround audiozapis miješa se u stereo pri ponovnom kodiranju",
   "main.reason.stream.extra-audio-dropped": "zadržava se samo jedan audiozapis; uključite 'Zadrži sve zapise' da se svi prenesu u MKV",

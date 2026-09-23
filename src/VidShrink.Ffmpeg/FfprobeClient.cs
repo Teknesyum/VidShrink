@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using VidShrink.Core;
@@ -304,6 +304,48 @@ public static class FfprobeClient
         }
         return false;
     }
+
+    /// <summary>
+    /// Kaynagin butun karelerini cozup HDR10+ yan verisini <see cref="Hdr10PlusJson.Collector"/>'a
+    /// satir satir akitir; dokum bellekte tutulmaz. <paramref name="framesRead"/> okunan kare
+    /// sayisini bildirir. ffprobe acilmaz ya da sifirdan farkli donerse <c>null</c>. Iptalde
+    /// surec oldurulur: uzun bir kaynagin cozumu iptalden sonra arkada surmemeli.
+    /// </summary>
+    public static async Task<Hdr10PlusExtraction?> ReadHdr10PlusAsync(string filePath, Action<int>? framesRead, CancellationToken ct)
+    {
+        try
+        {
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, Hdr10PlusJson.FfprobeArguments(filePath)) };
+            process.Start();
+            using var kill = ct.Register(() => { try { process.Kill(entireProcessTree: true); } catch { } });
+            var stderrTask = process.StandardError.ReadToEndAsync(ct);
+            var collector = new Hdr10PlusJson.Collector();
+            var reported = 0;
+            while (await process.StandardOutput.ReadLineAsync(ct) is { } line)
+            {
+                collector.AddLine(line);
+                if (framesRead is not null && collector.Frames != reported)
+                {
+                    reported = collector.Frames;
+                    framesRead(reported);
+                }
+            }
+            await stderrTask;
+            await process.WaitForExitAsync(ct);
+            return process.ExitCode == 0 ? collector.Result() : null;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Dosyada HDR10+ tasiyan kare sayisi; cikisin kaynakla kare kare karsilastirmasi icin.
+    /// Okunamazsa 0: sayim uyarinin tetigi, okunamayan cikis "tasindi" sayilmamali.
+    /// </summary>
+    public static async Task<int> CountHdr10PlusFramesAsync(string filePath, CancellationToken ct)
+        => (await ReadHdr10PlusAsync(filePath, null, ct))?.Hdr10PlusFrames ?? 0;
 
     private static async Task<bool> HasHdr10PlusAsync(string filePath, int streamIndex, CancellationToken ct)
     {

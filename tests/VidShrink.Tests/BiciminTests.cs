@@ -1138,6 +1138,10 @@ public sealed class BaslikKapsamiTests
     /// carpisip kola giriyor (+1'er), de'de eski metindeki "in" (Almanca "-de") kalkiyor ve
     /// govdeden cikiyor (-1). Toplam 1930 + 1 + 1 + 1 - 1 = 1932; en ve tr metni ayni
     /// govde/kol siniri icinde kaldigi icin 226 ve 78 degismedi.</para>
+    /// <para>2026-09-23, HDR10+ koprusu: <c>main.reason.hdr10plus-cut</c> 18 dilde,
+    /// <c>main.reason.hdr10plus-routed-x265</c> 14 dilde kol degistiriyor, ikisi de en ve tr
+    /// dahil: 1932 + 32 = 1964, en 226 + 2 = 228, tr 78 + 2 = 80. Oto-kirpmanin iki anahtari
+    /// (<c>main.advanced.filters.autocrop</c>, <c>main.reason.auto-crop</c>) hicbir dilde kola girmiyor.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1163,9 +1167,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1932, toplam);
-        Assert.Equal(226, dilBasina["en"]);
-        Assert.Equal(78, dilBasina["tr"]);
+        Assert.Equal(1964, toplam);
+        Assert.Equal(228, dilBasina["en"]);
+        Assert.Equal(80, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1299,6 +1303,11 @@ public sealed class BaslikKapsamiTests
     /// anahtari ekledi: dil basina 1067 + 3 = 1070, 43 x 1070 = 46010. <c>kayip</c> yine 0.</para>
     /// <para>2026-09-23: <c>main.reason.vp9-crf-unmeasured</c> dil basina 1070 + 1 = 1071,
     /// 43 x 1071 = 46053.</para>
+    /// <para>2026-09-23: oto-kirpma dil basina iki anahtar ekledi (<c>main.advanced.filters.autocrop</c>,
+    /// <c>main.reason.auto-crop</c>; pim o birlesimde yenilenmemisti), HDR10+ koprusu bes
+    /// (<c>main.reason.hdr10plus-routed-x265</c>, <c>-svtav1</c>, <c>-cut</c>,
+    /// <c>main.stage.hdr10plus-metadata</c>, <c>main.run.hdr10plus-short</c>): 1071 + 2 + 5 = 1078,
+    /// 43 x 1078 = 46354.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1326,7 +1335,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(46053, gezilen);
+        Assert.Equal(46354, gezilen);
         Assert.Empty(kayip);
     }
 

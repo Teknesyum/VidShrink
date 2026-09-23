@@ -301,6 +301,7 @@
   "main.run.done": "Atlikta per {0} bandymą(-us). {1} MB → {2} MB ({3}% mažiau).",
   "main.run.over-ceiling": "Po {0} bandymo(-ų) nepavyko nusileisti žemiau {1} MB tikslo (paskutinis rezultatas {2} MB). Failas neįrašytas, nes už tikslą didesnis failas niekada negrąžinamas. Padidinkite tikslą ir bandykite dar kartą.",
   "main.run.ended": "Kodavimas netikėtai nutrūko ir failas neįrašytas.",
+  "main.run.hdr10plus-short": "HDR10+ pasiekė tik {0} iš {1} šaltinio kadrų; kiti kadrai neša tik statinį HDR10.",
   "main.run.cancelled": "Atšaukta.",
   "main.run.converted": "Atlikta. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Bandymas",
   "main.stage.gif-palette": "GIF paletė",
   "main.stage.gif-encode": "GIF kodavimas",
+  "main.stage.hdr10plus-metadata": "HDR10+ metaduomenys",
 
   "main.ai.title": "DI nustatymai",
   "main.ai.tip": "• Šis žingsnis neprivalomas.\n• Nukopijuokite užklausą į bet kurį pokalbių DI, tada įklijuokite ir patikrinkite jo JSON atsakymą.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "juodos juostos apkirptos: {0}x{1} (šaltinis {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "šaltinyje yra dinaminių HDR metaduomenų (HDR10+ arba Dolby Vision), kurių šis kodavimas neperduoda, todėl išvestyje lieka tik statinis HDR10 sluoksnis",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9 CRF kokybės skalė yra išmatuota, bet neišmatuota, kaip CRF reikšmė atsispindi failo dydyje, todėl dydį palaiko dviejų praėjimų VBR, o ne spėjamas CRF",
+  "main.reason.hdr10plus-routed-x265": "šaltinyje yra dinaminių HDR10+ metaduomenų, kuriuos perduoti gali tik {1}, todėl vietoj {0} naudojamas {1}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ neperduodamas SVT-AV1 keliu, todėl išvestis išlaiko tik statinį HDR10 sluoksnį; Automatinis naudotų libx265, kuris jį perduoda",
+  "main.reason.hdr10plus-cut": "HDR10+ prarastas karpant: metaduomenys seka šaltinį kadras po kadro, o apkarpymas ar kadrų dažnio pakeitimas šį atitikimą suardo, todėl išvestis išlaiko tik statinį HDR10 sluoksnį",
   "main.reason.stream.audio-passthrough": "garso takelis nukopijuojamas nepakeistas: konteineris palaiko jo kodeką ir jis neviršija 15 % tikslo",
   "main.reason.stream.audio-downmixed": "erdvinio garso takelis perkoduojant sumaišomas į stereo",
   "main.reason.stream.extra-audio-dropped": "paliekamas tik vienas garso takelis; įjunkite 'Išsaugoti visus takelius', kad visi būtų perkelti į MKV",

@@ -301,6 +301,7 @@
   "main.run.done": "Fatto in {0} tentativo/i. {1} MB → {2} MB ({3}% più piccolo).",
   "main.run.over-ceiling": "Impossibile scendere sotto l'obiettivo di {0} MB dopo {1} tentativo/i (ultimo risultato {2} MB). Nessun file è stato scritto, perché un file più grande dell'obiettivo non viene mai consegnato. Alza l'obiettivo e riprova.",
   "main.run.ended": "La codifica si è interrotta inaspettatamente e non è stato scritto alcun file.",
+  "main.run.hdr10plus-short": "HDR10+ è arrivato solo a {0} dei {1} fotogrammi della sorgente; gli altri fotogrammi portano solo HDR10 statico.",
   "main.run.cancelled": "Annullato.",
   "main.run.converted": "Fatto. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Tentativo",
   "main.stage.gif-palette": "Palette GIF",
   "main.stage.gif-encode": "Codifica GIF",
+  "main.stage.hdr10plus-metadata": "Metadati HDR10+",
 
   "main.ai.title": "Impostazioni IA",
   "main.ai.tip": "• Questo passaggio è facoltativo.\n• Copia un prompt in una qualsiasi IA di chat, poi incolla e convalida la sua risposta JSON.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "bande nere ritagliate: {0}x{1} (sorgente {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "la sorgente contiene metadati HDR dinamici (HDR10+ o Dolby Vision) che questa codifica non trasferisce, quindi l'uscita conserva solo lo strato HDR10 statico",
   "main.reason.vp9-crf-unmeasured": "La scala di qualità CRF di libvpx-vp9 è misurata, ma non lo è il modo in cui un valore di CRF si traduce nella dimensione del file, quindi la dimensione è tenuta da un VBR a due passate invece di un CRF stimato",
+  "main.reason.hdr10plus-routed-x265": "la sorgente contiene metadati dinamici HDR10+ che solo {1} riesce a trasmettere, quindi si usa {1} al posto di {0}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ non viene trasmesso nel ramo SVT-AV1, quindi l'output conserva solo lo strato HDR10 statico; Automatico userebbe libx265, che lo trasmette",
+  "main.reason.hdr10plus-cut": "HDR10+ è andato perso nel taglio: i metadati seguono la sorgente fotogramma per fotogramma, e un taglio o un cambio di frequenza dei fotogrammi rompe questo allineamento, quindi l'output conserva solo lo strato HDR10 statico",
   "main.reason.stream.audio-passthrough": "la traccia audio viene copiata così com'è: il contenitore supporta il suo codec e resta entro il 15% dell'obiettivo",
   "main.reason.stream.audio-downmixed": "una traccia audio surround viene ridotta a stereo durante la ricodifica",
   "main.reason.stream.extra-audio-dropped": "viene mantenuta una sola traccia audio; attiva 'Mantieni tutte le tracce' per portarle tutte in MKV",

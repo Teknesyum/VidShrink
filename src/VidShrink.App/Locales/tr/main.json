@@ -301,6 +301,7 @@
   "main.run.done": "{0} denemede tamamlandı. {1} MB → {2} MB (%{3} daha küçük).",
   "main.run.over-ceiling": "{1} denemede {0} MB hedefinin altına inilemedi (son sonuç {2} MB). Dosya teslim edilmedi, çünkü hedeften büyük dosya asla verilmez. Hedefi büyütüp yeniden deneyin.",
   "main.run.ended": "Kodlama beklenmedik biçimde sonlandı, dosya yazılmadı.",
+  "main.run.hdr10plus-short": "HDR10+ kaynağın {1} karesinden yalnız {0} tanesine ulaştı; geri kalan kareler yalnız statik HDR10 taşıyor.",
   "main.run.cancelled": "İptal edildi.",
   "main.run.converted": "Tamamlandı. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Deneme",
   "main.stage.gif-palette": "GIF paleti",
   "main.stage.gif-encode": "GIF kodlama",
+  "main.stage.hdr10plus-metadata": "HDR10+ meta verisi",
 
   "main.ai.title": "AI ayarları",
   "main.ai.tip": "• Bu adım isteğe bağlı.\n• İstemi herhangi bir sohbet AI'ına kopyalayın, ardından JSON yanıtını yapıştırıp doğrulayın.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "siyah bantlar kırpıldı: {0}x{1} (kaynak {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "kaynak dinamik HDR meta verisi (HDR10+ ya da Dolby Vision) taşıyor ve bu kodlama onu aktaramıyor, bu yüzden çıktıda yalnız statik HDR10 katmanı kalıyor",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9'un CRF kalite ölçeği ölçüldü ama bir CRF değerinin dosya boyutuna etkisi ölçülmedi; boyutu CRF tahmini yerine iki geçişli VBR tutuyor",
+  "main.reason.hdr10plus-routed-x265": "kaynak HDR10+ dinamik meta verisi taşıyor ve onu yalnız {1} aktarabiliyor, bu yüzden {0} yerine {1} kullanılıyor",
+  "main.reason.hdr10plus-svtav1": "HDR10+ SVT-AV1 kolunda taşınmaz, bu yüzden çıktıda yalnız statik HDR10 katmanı kalıyor; Otomatik, HDR10+'yı taşıyan libx265'i kullanırdı",
+  "main.reason.hdr10plus-cut": "HDR10+ kesitte düştü: meta verisi kaynağı kare kare izliyor ve kırpma ya da kare hızı değişimi bu hizayı bozuyor, bu yüzden çıktıda yalnız statik HDR10 katmanı kalıyor",
   "main.reason.stream.audio-passthrough": "ses izi olduğu gibi kopyalandı: kap bu kodeği taşıyor ve hedefin %15'ini aşmıyor",
   "main.reason.stream.audio-downmixed": "çok kanallı bir ses izi yeniden kodlanırken stereoya indirildi",
   "main.reason.stream.extra-audio-dropped": "yalnız bir ses izi tutuldu; hepsini MKV'de taşımak için 'İzleri koru'yu açın",

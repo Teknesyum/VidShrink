@@ -301,6 +301,7 @@
   "main.run.done": "Pabeigts {0} mēģinājumā(-os). {1} MB → {2} MB (par {3}% mazāks).",
   "main.run.over-ceiling": "Pēc {1} mēģinājuma(-iem) neizdevās nokļūt zem {0} MB mērķa (pēdējais rezultāts bija {2} MB). Fails netika rakstīts, jo fails, lielāks par mērķi, nekad netiek atdots. Paaugstiniet mērķi un mēģiniet vēlreiz.",
   "main.run.ended": "Kodēšana negaidīti beidzās, un fails netika rakstīts.",
+  "main.run.hdr10plus-short": "HDR10+ sasniedza tikai {0} no avota {1} kadriem; pārējie kadri nes tikai statisko HDR10.",
   "main.run.cancelled": "Atcelts.",
   "main.run.converted": "Pabeigts. {0} MB → {1} MB.",
 
@@ -346,6 +347,7 @@
   "main.stage.attempt": "Mēģinājums",
   "main.stage.gif-palette": "GIF palete",
   "main.stage.gif-encode": "GIF kodēšana",
+  "main.stage.hdr10plus-metadata": "HDR10+ metadati",
 
   "main.ai.title": "MI iestatījumi",
   "main.ai.tip": "• Šis solis nav obligāts.\n• Nokopējiet uzvedni jebkuram tērzēšanas MI, tad ielīmējiet un pārbaudiet tā JSON atbildi.",
@@ -423,6 +425,9 @@
   "main.reason.auto-crop": "melnās joslas apgrieztas: {0}x{1} (avots {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "avotā ir dinamiski HDR metadati (HDR10+ vai Dolby Vision), ko šī kodēšana nepārnes, tāpēc izvadē paliek tikai statiskais HDR10 slānis",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9 CRF kvalitātes skala ir izmērīta, bet nav izmērīts, kā CRF vērtība ietekmē faila izmēru, tāpēc izmēru notur divu gājienu VBR, nevis minēts CRF",
+  "main.reason.hdr10plus-routed-x265": "avots satur dinamiskus HDR10+ metadatus, ko var nodot tikai {1}, tāpēc {0} vietā tiek izmantots {1}",
+  "main.reason.hdr10plus-svtav1": "HDR10+ netiek pārnests pa SVT-AV1 ceļu, tāpēc izvade saglabā tikai statisko HDR10 slāni; Automātiski izmantotu libx265, kas to pārnes",
+  "main.reason.hdr10plus-cut": "HDR10+ zuda griezumā: metadati seko avotam kadru pa kadram, un apgriešana vai kadru ātruma maiņa izjauc šo saskaņojumu, tāpēc izvade saglabā tikai statisko HDR10 slāni",
   "main.reason.stream.audio-passthrough": "audio celiņš tiek kopēts nemainīts: konteiners atbalsta tā kodeku un tas nepārsniedz 15% no mērķa",
   "main.reason.stream.audio-downmixed": "telpiskā audio celiņš pārkodēšanas laikā tiek samiksēts stereo",
   "main.reason.stream.extra-audio-dropped": "tiek paturēts tikai viens audio celiņš; ieslēdziet 'Saglabāt visus celiņus', lai visus pārnestu MKV",

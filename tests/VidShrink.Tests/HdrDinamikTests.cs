@@ -10,7 +10,8 @@ namespace VidShrink.Tests;
 /// B4, dinamik HDR (<c>docs/olcumler/b4-hdr-dinamik.md</c>): DV 8.1 yazilim HEVC/AV1'de
 /// <c>-dolbyvision 1</c> ile tasinir, MP4 ailesinde <c>dvcC</c> icin <c>-strict unofficial</c>
 /// eklenir; tasinamayan DV ve HDR10+ gerekce satirina <see cref="ReasonCode.HdrDynamicMetadataDropped"/>
-/// olarak duser. Canli kollar ≤2 sn 320x180 kaynagi kendisi uretir (DV RPU'su elle yazilir),
+/// olarak duser. HDR10+ x265'te koprudan gecer (<see cref="Hdr10ArtiKopruTests"/>); burada kopru
+/// yolu verilmeden kodlanan x265 ciktisinin 0 kare tasidigi olumsuz kontrol olarak kalir. Canli kollar ≤2 sn 320x180 kaynagi kendisi uretir (DV RPU'su elle yazilir),
 /// kanit <c>.calisma/b4-hdr-dinamik/</c>, her olcu kendi dosyalarini siler.
 /// </summary>
 public sealed class HdrDinamikTests
@@ -178,9 +179,9 @@ public sealed class HdrDinamikTests
     }
 
     [Fact]
-    public void Hdr10ArtiNotDusurur()
+    public void Hdr10ArtiDonanimdaNotDusurur()
     {
-        var sonuc = Planla(Hdr10() with { HasHdr10Plus = true }, "libx265");
+        var sonuc = Planla(Hdr10() with { HasHdr10Plus = true }, "hevc_nvenc");
 
         Assert.True(Dustu(sonuc));
         Assert.Contains("dynamic HDR metadata", sonuc.Plan.Reason, StringComparison.Ordinal);
@@ -385,7 +386,7 @@ public sealed class HdrDinamikTests
     }
 
     [FfmpegFact]
-    public async Task CanliHdr10ArtiYoklanirVeKodlamadaDustuguNotaYaziliyor()
+    public async Task CanliHdr10ArtiYoklanirKoprusuzKodlamaTasimazPlanKopruyuAcar()
     {
         string[] adlar = ["h10.mkv", "h10.json", "h10-duz.mkv", "h10-duz.json", "h10-cikti.mkv"];
         KanitKapanisi.Onceki(Klasor, adlar);
@@ -405,10 +406,12 @@ public sealed class HdrDinamikTests
 
         Assert.Equal(0, Say(kare, "SMPTE2094-40"));
         Assert.Equal(3, Say(kare, "Mastering display"));
-        Assert.True(Dustu(PlanCalculator.BuildDetailed(info, new PlanOptions
+        var plan = PlanCalculator.BuildDetailed(info, new PlanOptions
         {
             TargetMb = info.FileSizeMb * 0.5, Intent = Intent.Sharing, LockedCodec = "libx265", HdrPolicy = HdrPolicy.Preserve
-        }, null, Hepsi)));
+        }, null, Hepsi);
+        Assert.True(plan.Plan.Hdr10PlusBridge);
+        Assert.False(Dustu(plan));
         Kapat(adlar);
     }
 
