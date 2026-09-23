@@ -10,7 +10,7 @@ dotnet test VidShrink.sln -c Release --filter TipOverflowTests
 16 px). Tavan `Themes/Theme.axaml` belirteçlerinden
 hesaplanır: `TooltipMaxWidth` eksi iki yanın dolgusu ve kenarlığı = **746 px**.
 
-Ölçülen satır: **190** · tavanı aşan: **15** ·
+Ölçülen satır: **192** · tavanı aşan: **14** ·
 tek kelimeyle aşan: **0**
 
 | Dil | İpucu | Satır | Genişlik | Taşma | Görsel satır | Alt satır | Tek kelime |
@@ -29,4 +29,3 @@ tek kelimeyle aşan: **0**
 | TR | main.convert.video-codec.tip · H.264 plays on nearly every device and is wh… | 0 | 919 | 173 | 2 | çalışması gerekiyorsa bunu seçin. |  |
 | TR | main.convert.crf-label.tip · In CRF mode, a lower number means higher qua… | 1 | 803 | 57 | 2 | dosya verir. |  |
 | EN | settings.share.tip · The share target is the service a finished f… | 2 | 912 | 166 | 2 | can close the link early. |  |
-| EN | settings.update.auto-effect · Off by default: a new version is announced i… | 0 | 847 | 101 | 2 | updates quietly. |  |
