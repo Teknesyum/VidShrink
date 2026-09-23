@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Автоматично",
   "settings-tab.ffmpeg-path.manual": "Ръчно",
   "settings-tab.ffmpeg-path.browse": "Избери…",
-  "settings-tab.ffmpeg-path.hint": "Ръчно замества вградения ffmpeg с избран от вас път.",
-  "settings-tab.ffmpeg-path.error": "Този път не сочи към валиден изпълним файл на ffmpeg.",
+  "settings-tab.ffmpeg-path.hint": "Ръчно използва избрания от вас ffmpeg вместо вградения за кодиране, анализ и запис; ffprobe трябва да е в същата папка.",
+  "settings-tab.ffmpeg-path.error": "В този път няма ffmpeg с ffprobe до него; вместо това се използва автоматичният ffmpeg.",
 
   "main.tab.player": "Плейър",
   "main.player.menu.playpause": "Пускане / пауза",

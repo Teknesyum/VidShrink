@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Automātiski",
   "settings-tab.ffmpeg-path.manual": "Manuāli",
   "settings-tab.ffmpeg-path.browse": "Pārlūkot…",
-  "settings-tab.ffmpeg-path.hint": "Manuāli aizstāj iebūvēto ffmpeg ar jūsu izvēlētu ceļu.",
-  "settings-tab.ffmpeg-path.error": "Šis ceļš nenorāda uz derīgu ffmpeg izpildāmo failu.",
+  "settings-tab.ffmpeg-path.hint": "Manuāli kodēšanai, analīzei un ierakstīšanai iebūvētā vietā izmanto jūsu izvēlēto ffmpeg; ffprobe jābūt tajā pašā mapē.",
+  "settings-tab.ffmpeg-path.error": "Šajā ceļā nav ffmpeg ar blakus esošu ffprobe; tā vietā tiek izmantots automātiskais ffmpeg.",
 
   "main.tab.player": "Atskaņotājs",
   "main.player.menu.playpause": "Atskaņot / pauze",

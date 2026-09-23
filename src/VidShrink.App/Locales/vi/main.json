@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Tự động",
   "settings-tab.ffmpeg-path.manual": "Thủ công",
   "settings-tab.ffmpeg-path.browse": "Duyệt…",
-  "settings-tab.ffmpeg-path.hint": "Thủ công thay ffmpeg đi kèm bằng đường dẫn bạn chọn.",
-  "settings-tab.ffmpeg-path.error": "Đường dẫn này không trỏ tới tệp ffmpeg hợp lệ.",
+  "settings-tab.ffmpeg-path.hint": "Thủ công dùng ffmpeg bạn chọn thay cho ffmpeg đi kèm khi mã hóa, phân tích và ghi hình; ffprobe phải nằm cùng thư mục.",
+  "settings-tab.ffmpeg-path.error": "Đường dẫn này không có ffmpeg kèm ffprobe bên cạnh; ffmpeg tự động được dùng thay thế.",
 
   "main.tab.player": "Trình phát",
   "main.player.menu.playpause": "Phát / tạm dừng",

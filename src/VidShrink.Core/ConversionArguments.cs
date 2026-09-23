@@ -85,7 +85,8 @@ public static class ConversionArguments
             if (!string.IsNullOrEmpty(hdr.VideoFilter)) filters.Add(hdr.VideoFilter);
             if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
 
-            a.AddRange(new[] { "-c:v", plan.VideoCodec, "-preset", FfmpegArguments.DefaultPreset(plan.VideoCodec) });
+            a.AddRange(new[] { "-c:v", plan.VideoCodec });
+            a.AddRange(FfmpegArguments.SpeedArgs(plan.VideoCodec, FfmpegArguments.DefaultPreset(plan.VideoCodec)));
             a.AddRange(plan.QualityMode == ConversionQualityMode.Crf
                 ? CodecModel.QualityArgs(plan.VideoCodec, plan.Crf)
                 : new[] { "-b:v", $"{plan.VideoBitrateK}k" });

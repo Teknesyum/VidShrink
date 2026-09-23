@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Αυτόματα",
   "settings-tab.ffmpeg-path.manual": "Χειροκίνητα",
   "settings-tab.ffmpeg-path.browse": "Αναζήτηση…",
-  "settings-tab.ffmpeg-path.hint": "Το χειροκίνητο αντικαθιστά το ενσωματωμένο ffmpeg με διαδρομή που επιλέγετε.",
-  "settings-tab.ffmpeg-path.error": "Αυτή η διαδρομή δεν οδηγεί σε έγκυρο εκτελέσιμο ffmpeg.",
+  "settings-tab.ffmpeg-path.hint": "Το χειροκίνητο χρησιμοποιεί το ffmpeg που επιλέγετε αντί για το ενσωματωμένο στην κωδικοποίηση, την ανάλυση και την εγγραφή· το ffprobe πρέπει να βρίσκεται στον ίδιο φάκελο.",
+  "settings-tab.ffmpeg-path.error": "Σε αυτή τη διαδρομή δεν υπάρχει ffmpeg με ffprobe δίπλα του· χρησιμοποιείται αντί αυτού το αυτόματο ffmpeg.",
 
   "main.tab.player": "Αναπαραγωγή",
   "main.player.menu.playpause": "Αναπαραγωγή / παύση",

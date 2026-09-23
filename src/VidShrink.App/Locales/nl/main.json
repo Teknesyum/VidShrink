@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatisch",
   "settings-tab.ffmpeg-path.manual": "Handmatig",
   "settings-tab.ffmpeg-path.browse": "Bladeren…",
-  "settings-tab.ffmpeg-path.hint": "Handmatig vervangt de meegeleverde ffmpeg door een pad dat u kiest.",
-  "settings-tab.ffmpeg-path.error": "Dit pad wijst niet naar een geldig ffmpeg-programma.",
+  "settings-tab.ffmpeg-path.hint": "Handmatig gebruikt voor coderen, analyseren en opnemen de ffmpeg die u kiest in plaats van de meegeleverde; ffprobe moet in dezelfde map staan.",
+  "settings-tab.ffmpeg-path.error": "Op dit pad staat geen ffmpeg met ffprobe ernaast; in plaats daarvan wordt de automatische ffmpeg gebruikt.",
 
   "main.tab.player": "Speler",
   "main.player.menu.playpause": "Afspelen / pauze",

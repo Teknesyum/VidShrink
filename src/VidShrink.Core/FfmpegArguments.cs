@@ -462,6 +462,10 @@ public static class FfmpegArguments
     /// Kesit passthrough'a dustugunde kaynagi oldugu gibi kopyalamak araligi kaybettirir;
     /// pencere akis kopyasiyla yeniden paketlenir. Arama ayni melez duzen
     /// (<c>docs/danisma/2026-09-18-fable-kucultmede-aralik.md</c> S1), kodlama yok.
+    /// Veri akislari (<c>tmcd</c> zaman kodu, GoPro telemetrisi) kopyalanmaz: mp4 muxer'i
+    /// "Could not find tag for codec none" ile basligi yazamiyordu; zaman kodu izi ustveriden
+    /// yeniden kurulur. <c>+faststart</c> MP4 soyunun uc uzantisina da yazilir, .mov'da
+    /// eksikti ve moov dosyanin sonunda kaliyordu.
     /// </summary>
     public static IReadOnlyList<string> BuildTrimCopy(MediaInfo info, TrimWindow trim, string outputPath)
     {
@@ -470,9 +474,9 @@ public static class FfmpegArguments
         a.AddRange(new[] { "-i", info.FilePath });
         a.AddRange(new[] { "-ss", Seconds(trim.RemainderSeconds) });
         a.AddRange(new[] { "-t", Seconds(trim.DurationSeconds) });
-        a.AddRange(new[] { "-map", "0", "-c", "copy", "-map_metadata", "0", "-map_chapters", "-1" });
+        a.AddRange(new[] { "-map", "0", "-map", "-0:d", "-c", "copy", "-map_metadata", "0", "-map_chapters", "-1" });
         a.AddRange(new[] { "-avoid_negative_ts", "make_zero" });
-        if (Path.GetExtension(outputPath).Equals(".mp4", StringComparison.OrdinalIgnoreCase))
+        if (Path.GetExtension(outputPath).ToLowerInvariant() is ".mp4" or ".m4v" or ".mov")
             a.AddRange(new[] { "-movflags", "+faststart" });
         a.Add(outputPath);
         return a;

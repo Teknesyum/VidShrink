@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Otomatiki",
   "settings-tab.ffmpeg-path.manual": "Kwa mkono",
   "settings-tab.ffmpeg-path.browse": "Vinjari…",
-  "settings-tab.ffmpeg-path.hint": "Kwa mkono hubadilisha ffmpeg iliyojumuishwa na njia unayochagua.",
-  "settings-tab.ffmpeg-path.error": "Njia hii haielekezi kwenye faili halali ya ffmpeg inayotekelezeka.",
+  "settings-tab.ffmpeg-path.hint": "Kwa mkono hutumia ffmpeg unayochagua badala ya iliyojumuishwa kwa usimbaji, uchambuzi na kurekodi; ffprobe lazima iwe kwenye folda hiyo hiyo.",
+  "settings-tab.ffmpeg-path.error": "Hakuna ffmpeg yenye ffprobe kando yake kwenye njia hii; ffmpeg ya kiotomatiki inatumika badala yake.",
 
   "main.tab.player": "Kichezaji",
   "main.player.menu.playpause": "Cheza / sitisha",

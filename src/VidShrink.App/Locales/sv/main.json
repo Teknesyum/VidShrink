@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuell",
   "settings-tab.ffmpeg-path.browse": "Bläddra…",
-  "settings-tab.ffmpeg-path.hint": "Manuell ersätter den medföljande ffmpeg med en sökväg du väljer.",
-  "settings-tab.ffmpeg-path.error": "Sökvägen pekar inte på en giltig körbar ffmpeg.",
+  "settings-tab.ffmpeg-path.hint": "Manuell använder den ffmpeg du väljer i stället för den medföljande vid kodning, analys och inspelning; ffprobe måste ligga i samma mapp.",
+  "settings-tab.ffmpeg-path.error": "Det finns ingen ffmpeg med ffprobe bredvid på den här sökvägen; den automatiska ffmpeg används i stället.",
 
   "main.tab.player": "Spelare",
   "main.player.menu.playpause": "Spela / paus",

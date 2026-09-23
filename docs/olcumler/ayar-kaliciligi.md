@@ -160,17 +160,18 @@ buluyordu; T0 tarafindan bu turda duzeltildi, D1. Her iki filtre calistirilinca 
 sayida test, 104 ve 74, yesil geldi; filtre isim eslesme sayisi ile gercek kosum
 sayisi ayni.
 
-## D4 Borc OutputFolder ve FfmpegPath boru hattina baglanmadi
+## D4 Borc OutputFolder boru hattina baglanmadi; FfmpegPath baglandi
 
-VidShrink.Ffmpeg ve VidShrink.Core kaynak dosyalarinda OutputFolder ve FfmpegPath
-adlarina yapilan arama sonucu bos; hic kullanim yok.
+FfmpegPath 2026-09-23'te (dal t0/yy-ffmpeg-yolu) baglandi. ToolLocator.UseManual elle
+yolu ve yanindaki ffprobe'u tum ffmpeg cagrilarinin tek kaynagina koyuyor: kodlama,
+yoklama, kayit, kodlayici yeteneklerinin onbellegi ve surum satiri. Oynatici libmpv
+kullandigi icin kapsam disinda. Ayar acilista (App.LoadStartupSettings) ve pencerede
+degisince hemen (ValidateFfmpegPath) uygulaniyor. Yaninda ffprobe olmayan ya da var
+olmayan yolda otomatik siraya (paketli, sonra PATH) dusuluyor ve bu, Ayarlar'daki
+hata satirinda ve sistem durum satirinda soyleniyor. Olcu ElleFfmpegYoluTests: sahte
+yol ToolLocator'dan donuyor, elle kip kapaliyken eski sira korunuyor (olumsuz kontrol).
 
-OutputFolder ve FfmpegPath bugun yalniz arayuz artı AppSettings kaliciligi
-seviyesinde. Gercek sikistirma ve donusturme cagrilari hala varsayilan davranisi
-kullaniyor: cikti dosyayi kaynagin yanina yaziyor, ffmpeg i sistem PATH inden veya
-mevcut sabit yoldan buluyor. Bu bilincli bir sinir; VidShrink.Ffmpeg bu sozlesmenin
-owns listesinde degil ve kontrat acikca cozum cekirdek veya motor degisikligi
-gerektiriyorsa yazma, bildir diyor. Kullanicinin sectigi cikti klasoru veya elle
-ffmpeg yolu, bir sonraki sikistirma isleminde henuz fiilen kullanilmiyor; yalniz
-hatirlaniyor. Bu boru hattina baglama, ayri bir sozlesme, VidShrink.Ffmpeg owns,
-gerektirir.
+OutputFolder bugun hala yalniz arayuz artı AppSettings kaliciligi seviyesinde: cikti
+dosyayi kaynagin yanina yaziyor. Kullanicinin sectigi cikti klasoru bir sonraki
+sikistirma isleminde henuz fiilen kullanilmiyor; yalniz hatirlaniyor. Bunu boru
+hattina baglamak ayri bir sozlesme gerektirir.

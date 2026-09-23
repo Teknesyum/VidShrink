@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatik",
   "settings-tab.ffmpeg-path.manual": "Manual",
   "settings-tab.ffmpeg-path.browse": "Layari…",
-  "settings-tab.ffmpeg-path.hint": "Manual menggantikan ffmpeg terbina dengan laluan yang anda pilih.",
-  "settings-tab.ffmpeg-path.error": "Laluan ini tidak menunjuk ke fail boleh laku ffmpeg yang sah.",
+  "settings-tab.ffmpeg-path.hint": "Manual menggunakan ffmpeg pilihan anda, bukan yang terbina, untuk pengekodan, analisis dan rakaman; ffprobe mesti berada dalam folder yang sama.",
+  "settings-tab.ffmpeg-path.error": "Tiada ffmpeg dengan ffprobe di sebelahnya pada laluan ini; ffmpeg automatik digunakan sebagai ganti.",
 
   "main.tab.player": "Pemain",
   "main.player.menu.playpause": "Main / jeda",

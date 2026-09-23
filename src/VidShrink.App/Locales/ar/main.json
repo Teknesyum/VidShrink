@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "تلقائي",
   "settings-tab.ffmpeg-path.manual": "يدوي",
   "settings-tab.ffmpeg-path.browse": "استعراض…",
-  "settings-tab.ffmpeg-path.hint": "اليدوي يستبدل ffmpeg المضمّن بمسار تختاره.",
-  "settings-tab.ffmpeg-path.error": "هذا المسار لا يشير إلى ملف ffmpeg تنفيذي صالح.",
+  "settings-tab.ffmpeg-path.hint": "اليدوي يستخدم ffmpeg الذي تختاره بدل المضمّن في الترميز والتحليل والتسجيل؛ يجب أن يكون ffprobe في المجلد نفسه.",
+  "settings-tab.ffmpeg-path.error": "لا يوجد ffmpeg ومعه ffprobe في هذا المسار؛ يُستخدم ffmpeg التلقائي بدلاً منه.",
 
   "main.tab.player": "المشغّل",
   "main.player.menu.playpause": "تشغيل / إيقاف مؤقت",

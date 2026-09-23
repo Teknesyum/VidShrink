@@ -1281,8 +1281,9 @@ public partial class MainWindow : Window
             return;
         }
 
+        var fallback = FfmpegPathModeIndex == 1 && ToolLocator.Manual is null;
         TxtSystemStatus.Text = string.Join("\n",
-            $"FFmpeg: {ToolLocator.Ffmpeg}",
+            fallback ? $"FFmpeg: {ToolLocator.Ffmpeg}\n{Say("settings-tab.ffmpeg-path.error")}" : $"FFmpeg: {ToolLocator.Ffmpeg}",
             $"{Say("main.about.version")}: {_ffmpegVersion ?? Say("main.about.reading")}",
             $".NET: {Environment.Version}",
             $"VidShrink: {AppVersion()}");
@@ -1645,27 +1646,35 @@ public partial class MainWindow : Window
     private void OnFfmpegPathModeChanged()
     {
         FfmpegPathPickerRow.IsVisible = FfmpegPathModeIndex == 1;
+        if (_settingsSyncing) return;
         ValidateFfmpegPath();
         SaveAppSettings();
     }
 
     private void OnFfmpegPathTextChanged()
     {
+        if (_settingsSyncing) return;
         ValidateFfmpegPath();
         SaveAppSettings();
     }
 
+    /// <summary>
+    /// Seçimi <see cref="ToolLocator"/>'a uygular: elle yol geçerliyse kodlama, yoklama ve
+    /// kaydedici onu kullanır; geçersizse otomatik ffmpeg'e düşülür ve bu hata satırında
+    /// söylenir. Yürürlükteki ffmpeg değişince sürüm satırı ve donanım yoklaması tazelenir.
+    /// </summary>
     private void ValidateFfmpegPath()
     {
-        if (FfmpegPathModeIndex != 1)
-        {
-            TxtFfmpegPathError.IsVisible = false;
-            return;
-        }
-        var path = TxtFfmpegPath.Text ?? "";
-        var valid = path.Length > 0 && File.Exists(path);
-        TxtFfmpegPathError.IsVisible = !valid;
-        TxtFfmpegPathError.Text = valid ? "" : Say("settings-tab.ffmpeg-path.error");
+        var before = ToolLocator.Manual;
+        var manual = FfmpegPathModeIndex == 1;
+        var valid = new AppSettings { FfmpegPathMode = FfmpegPathModeIndex, FfmpegPath = TxtFfmpegPath.Text ?? "" }.ApplyFfmpegPath();
+        TxtFfmpegPathError.IsVisible = manual && !valid;
+        TxtFfmpegPathError.Text = manual && !valid ? Say("settings-tab.ffmpeg-path.error") : "";
+        if (before == ToolLocator.Manual) return;
+        _ffmpegVersion = null;
+        UpdateToolStatus();
+        _ = LoadFfmpegVersionAsync();
+        _ = ProbeHardwareEncodersAsync();
     }
 
     private async void OnBrowseOutputFolder(object? sender, RoutedEventArgs e)

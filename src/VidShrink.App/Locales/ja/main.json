@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "自動",
   "settings-tab.ffmpeg-path.manual": "手動",
   "settings-tab.ffmpeg-path.browse": "参照…",
-  "settings-tab.ffmpeg-path.hint": "手動では、同梱のffmpegの代わりに指定したパスを使います。",
-  "settings-tab.ffmpeg-path.error": "このパスは有効なffmpeg実行ファイルを指していません。",
+  "settings-tab.ffmpeg-path.hint": "手動では、エンコード・解析・録画に同梱のffmpegの代わりに指定したffmpegを使います。ffprobeは同じフォルダーに置いてください。",
+  "settings-tab.ffmpeg-path.error": "このパスにはffprobeが隣にあるffmpegがありません。代わりに自動のffmpegを使います。",
 
   "main.tab.player": "プレーヤー",
   "main.player.menu.playpause": "再生 / 一時停止",

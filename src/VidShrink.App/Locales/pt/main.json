@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Automático",
   "settings-tab.ffmpeg-path.manual": "Manual",
   "settings-tab.ffmpeg-path.browse": "Procurar…",
-  "settings-tab.ffmpeg-path.hint": "Manual substitui o ffmpeg incluído por um caminho que você escolhe.",
-  "settings-tab.ffmpeg-path.error": "Este caminho não aponta para um executável ffmpeg válido.",
+  "settings-tab.ffmpeg-path.hint": "Manual usa o ffmpeg que você escolhe em vez do incluído para codificar, analisar e gravar; o ffprobe precisa estar na mesma pasta.",
+  "settings-tab.ffmpeg-path.error": "Não há ffmpeg com ffprobe ao lado neste caminho; o ffmpeg automático é usado no lugar.",
 
   "main.tab.player": "Player",
   "main.player.menu.playpause": "Reproduzir / pausar",

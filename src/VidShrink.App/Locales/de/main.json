@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatisch",
   "settings-tab.ffmpeg-path.manual": "Manuell",
   "settings-tab.ffmpeg-path.browse": "Durchsuchen…",
-  "settings-tab.ffmpeg-path.hint": "Manuell ersetzt das mitgelieferte ffmpeg durch einen Pfad Ihrer Wahl.",
-  "settings-tab.ffmpeg-path.error": "Dieser Pfad zeigt nicht auf eine gültige ffmpeg-Programmdatei.",
+  "settings-tab.ffmpeg-path.hint": "Manuell verwendet für Kodierung, Analyse und Aufnahme das von Ihnen gewählte ffmpeg statt des mitgelieferten; ffprobe muss im selben Ordner liegen.",
+  "settings-tab.ffmpeg-path.error": "Unter diesem Pfad liegt kein ffmpeg mit ffprobe daneben; stattdessen wird das automatische ffmpeg verwendet.",
 
   "main.tab.player": "Player",
   "main.player.menu.playpause": "Abspielen / Pause",

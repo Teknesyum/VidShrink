@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatinis",
   "settings-tab.ffmpeg-path.manual": "Rankinis",
   "settings-tab.ffmpeg-path.browse": "Naršyti…",
-  "settings-tab.ffmpeg-path.hint": "Rankinis pakeičia pridėtą ffmpeg jūsų pasirinktu keliu.",
-  "settings-tab.ffmpeg-path.error": "Šis kelias nerodo į tinkamą ffmpeg vykdomąjį failą.",
+  "settings-tab.ffmpeg-path.hint": "Rankinis kodavimui, analizei ir įrašymui vietoj pridėto naudoja jūsų pasirinktą ffmpeg; ffprobe turi būti tame pačiame aplanke.",
+  "settings-tab.ffmpeg-path.error": "Šiame kelyje nėra ffmpeg su šalia esančiu ffprobe; vietoj jo naudojamas automatinis ffmpeg.",
 
   "main.tab.player": "Grotuvas",
   "main.player.menu.playpause": "Groti / pristabdyti",

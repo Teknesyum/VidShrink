@@ -552,8 +552,8 @@
   "settings-tab.ffmpeg-path.auto": "Automatycznie",
   "settings-tab.ffmpeg-path.manual": "Ręcznie",
   "settings-tab.ffmpeg-path.browse": "Przeglądaj…",
-  "settings-tab.ffmpeg-path.hint": "Ręcznie zastępuje dołączony ffmpeg wybraną przez Ciebie ścieżką.",
-  "settings-tab.ffmpeg-path.error": "Ta ścieżka nie wskazuje na prawidłowy plik wykonywalny ffmpeg.",
+  "settings-tab.ffmpeg-path.hint": "Ręcznie używa do kodowania, analizy i nagrywania wybranego przez Ciebie ffmpeg zamiast dołączonego; ffprobe musi być w tym samym folderze.",
+  "settings-tab.ffmpeg-path.error": "Pod tą ścieżką nie ma ffmpeg z ffprobe obok; zamiast niego używany jest automatyczny ffmpeg.",
 
   "main.tab.player": "Odtwarzacz",
   "main.player.menu.playpause": "Odtwórz / pauza",
