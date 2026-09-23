@@ -14,10 +14,15 @@ namespace VidShrink.Tests;
 /// kalanla dağıtılması ve <c>_partial</c> yolu gerçek gdigrab kaydında. 5 sn sınır ve 2 sn bölme en az iki
 /// numaralı parça verir, parçaların toplamı 5 sn'yi aşmaz; bölmesiz aynı kayıt tek parça (negatif kontrol).
 /// Ölçülen: 2 sn bölmede parçalar 3,134 + 1,867 sn; birinci parça ~1,1 sn uzuyor, kalan süre ikinciden
-/// düşüyor (aşımın yoklama, ilerleme bloğu ve nazik kapanış arasında payı ayrılmadı). Aşım makineye bağlı:
-/// bu makinede beş koşumda 3,134-3,2 sn, CI koşucusunda 3,667 sn ölçüldü ve 3,5 sn'lik eski sınır orada
-/// kırmızı verdi (19 Eylül 2026, docs/olcumler/kayit-bolme-parca-siniri.md). Sınır 4,0 sn: bölme hiç
-/// olmasaydı tek parça 5 sn olurdu, yani sınır kusuru hâlâ yakalıyor — zaten <c>Segments</c> pimi de yakalar.
+/// düşüyor (aşımın yoklama, ilerleme bloğu ve nazik kapanış arasında payı ayrılmadı). Aşım makineye bağlı ve
+/// büyüyen bir kuyruk: bu makinede beş koşumda 3,134-3,2 sn, bir CI koşumunda 3,667 sn, başka bir CI
+/// koşumunda (paylaşılan koşucuda beş iş birden, 23 Eylül 2026) 4,4 sn ölçüldü — sabit bir tavan (önce 3,5,
+/// sonra 4,0 sn) her yük artışında yeniden kırmızı veriyor (docs/olcumler/kayit-bolme-parca-siniri.md).
+/// Birinci parçanın üst sınırı artık sabit değil, ölçülen toplam süreye bağlı: bölme hiç olmasaydı tek
+/// parça toplamın tamamını yutardı, o yüzden sınır "toplamın tamamına yakın değil" — kuyruk ne kadar
+/// büyürse büyüsün bölmenin gerçekten olduğunu yakalamaya yetiyor, CI'nın o günkü yüküne göre yeniden
+/// ayarlanmıyor. Bölme kararının kendisi (<see cref="RecorderSession.SplitDue"/>) gerçek zamanlamaya
+/// bağlı değil; <c>SplitDueSaf*</c> onu sahte ilerleme/boyut değerleriyle belirlemeci ölçer.
 /// Kapanma süresi 1 ms verilen kayıt öldürülür ve yarım işaretlenir; öldürülen Matroska ffprobe'la okunur paket verir,
 /// öldürülen mp4 vermez — <see cref="RecorderArguments.SurvivesKill"/> tablosu davranışla ölçülür. Ölçülen:
 /// <c>-flush_packets 1</c> olmadan 7 sn'lik Matroska öldürülünce 0 bayt kalıyordu. Kanıt <c>.calisma/paket-2b/bolme/</c>.
@@ -98,8 +103,9 @@ public sealed class KayitBolmeTests
         Assert.False(bolunmus.Partial);
         Assert.InRange(bolunmus.Segments, 2, 4);
         Assert.Equal(bolunmus.Segments, parcaSureleri.Count);
-        Assert.All(parcaSureleri, s => Assert.InRange(s, 0.2, 4.0));
-        Assert.InRange(parcaSureleri.Sum(), 4.0, 5.6);
+        var toplam = parcaSureleri.Sum();
+        Assert.All(parcaSureleri, s => Assert.InRange(s, 0.2, toplam * 0.95));
+        Assert.InRange(toplam, 4.0, 5.6);
 
         Assert.True(tek.Ok, tek.StandardError);
         Assert.Equal(1, tek.Segments);
@@ -115,5 +121,41 @@ public sealed class KayitBolmeTests
 
         Kapat((bolunmus.Files ?? Array.Empty<string>()).Select(Path.GetFileName)
             .Concat(new[] { "olcu.txt", "bolunmus.mkv", "tek.mkv", "yarim.mkv", "yarim.mp4" }).ToArray()!);
+    }
+
+    /// <summary>
+    /// <see cref="RecorderSession.SplitDue"/>'nun saf hâli: gerçek ffmpeg süreci ya da saat yok,
+    /// yalnız sahte ilerleme/boyut değerleri. Sınırın altı false, sınırın kendisi ve üstü true
+    /// (kapanış <c>&gt;=</c>); boyut ölçütü aynı şekilde ayrı pimli. Bölme yokken (<c>Split: null</c>)
+    /// her girdi için false: negatif kontrol.
+    /// </summary>
+    [Theory]
+    [InlineData(1.999, false)]
+    [InlineData(2.0, true)]
+    [InlineData(2.001, true)]
+    public void SplitDueSafSureEsigindeTetiklenir(double capturedSeconds, bool beklenen)
+    {
+        var split = new RecorderSplit(TimeSpan.FromSeconds(2));
+        var sonuc = RecorderSession.SplitDue(split, TimeSpan.FromSeconds(capturedSeconds), outputMb: 0);
+        Assert.Equal(capturedSeconds >= 2.0, sonuc);
+        Assert.Equal(beklenen, sonuc);
+    }
+
+    [Theory]
+    [InlineData(9.9, false)]
+    [InlineData(10.0, true)]
+    [InlineData(10.1, true)]
+    public void SplitDueSafBoyutEsiginde(double outputMb, bool beklenen)
+    {
+        var split = new RecorderSplit(Megabytes: 10);
+        var sonuc = RecorderSession.SplitDue(split, TimeSpan.Zero, outputMb);
+        Assert.Equal(beklenen, sonuc);
+    }
+
+    /// <summary>Negatif kontrol: bölme kurulmamışken hiçbir sahte değer tetiklemez.</summary>
+    [Fact]
+    public void SplitDueSafBolmeYokkenHicTetiklenmez()
+    {
+        Assert.False(RecorderSession.SplitDue(null, TimeSpan.FromSeconds(999), outputMb: 999_999));
     }
 }

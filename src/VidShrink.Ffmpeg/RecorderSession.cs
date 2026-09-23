@@ -104,15 +104,26 @@ public sealed class RecorderSession : IAsyncDisposable
     /// ilerleme borusunu okuyan gorevi bekliyor — ayni gorevden cagrilsa kilitlenirdi.
     /// <para>
     /// 250 ms <b>olculmus bir sayi degil</b>. Ust siniri <c>-progress</c> akisi koyuyor:
-    /// ffmpeg ilerleme blogunu varsayilan olarak yarim saniyede bir yaziyor, yani bolme
-    /// olcutunun okudugu sure ve boyut o siklikta tazeleniyor; yarim saniyenin yarisinda
-    /// yoklamak her blogu en gec bir yoklama gecikmesiyle gormeye yetiyor, daha sik yoklamak
-    /// yeni bilgi getirmiyor. Olculen asim: 2 sn bolmede ilk parca 3,134 sn, ikincisi 1,867 sn
-    /// (toplam 5,001 sn sinirda); asimin yoklama, ilerleme blogu ve nazik kapanis arasinda nasil bolundugu ayrilmadi
-    /// (<c>KayitBolmeTests</c>).
+    /// <see cref="StatsPeriodSeconds"/> ile kisaltilmis blok araligi, yani bolme olcutunun
+    /// okudugu sure ve boyut o siklikta tazeleniyor; yarisinda yoklamak her blogu en gec bir
+    /// yoklama gecikmesiyle gormeye yetiyor, daha sik yoklamak yeni bilgi getirmiyor. Bu ikisi
+    /// asimin yalnizca bir bolumunu aciklar: kalan bolum <c>FinishSegmentAsync</c>'in nazik
+    /// kapanisi — stdin'e <c>q</c> yazip surecin cikmasini beklemek — ve bu, paylasilan CI
+    /// kosucusunda yuk arttikca uzuyor (olculen: 3,134 sn yerelde, 3,667 sn bir CI kosumunda,
+    /// 4,4 sn baska bir CI kosumunda; <c>docs/olcumler/kayit-bolme-parca-siniri.md</c>). O
+    /// kuyruk sabit bir tavana sigmiyor; <c>KayitBolmeTests</c> bu yuzden tek parcanin tum
+    /// kaydi yutmadigini sinar, o kuyrugun uzunlugunu degil.
     /// </para>
     /// </summary>
     public const int SplitPollMs = 250;
+
+    /// <summary>
+    /// ffmpeg'in <c>-progress</c> blogunu yazma araligi. Varsayilan 0,5 sn: bolme olcutunun
+    /// gordugu sure/boyut en fazla bu kadar bayatlar. Yarim saniyenin besli birine indirmek
+    /// bu bayatligi (ve dolayisiyla ilk parcanin asimini) kucultur; sifirlamaz, cunku kalan
+    /// asim nazik kapanisin surec zamanlamasindan gelir.
+    /// </summary>
+    public const double StatsPeriodSeconds = 0.1;
 
     private readonly RecorderRequest _request;
     private readonly string _outputPath;
@@ -328,13 +339,16 @@ public sealed class RecorderSession : IAsyncDisposable
 
     /// <summary>
     /// Bolme olcutu dolmus mu. Sure o anki <b>parcanin</b> suresi, boyut da o parcanin
-    /// dosyasi: ikisi de her bolunmede sifirdan basliyor.
+    /// dosyasi: ikisi de her bolunmede sifirdan basliyor. Karar saf: gercek surece
+    /// bagli olmadigindan sahte deger verilerek de yoklanabilir (<c>KayitBolmeTests</c>).
     /// </summary>
-    private bool SplitDue()
+    private bool SplitDue() => SplitDue(_request.Split, _capturedNow, _outputMb);
+
+    internal static bool SplitDue(RecorderSplit? split, TimeSpan capturedNow, double outputMb)
     {
-        if (_request.Split is not { } split) return false;
-        if (split.Duration is { } every && _capturedNow >= every) return true;
-        return split.Megabytes is { } megabytes && _outputMb >= megabytes;
+        if (split is null) return false;
+        if (split.Duration is { } every && capturedNow >= every) return true;
+        return split.Megabytes is { } megabytes && outputMb >= megabytes;
     }
 
     private async Task WatchSplitAsync(CancellationToken ct)
@@ -402,7 +416,11 @@ public sealed class RecorderSession : IAsyncDisposable
         var folder = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
 
-        var args = new List<string> { "-progress", "pipe:1", "-nostats" };
+        var args = new List<string>
+        {
+            "-progress", "pipe:1", "-nostats",
+            "-stats_period", StatsPeriodSeconds.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+        };
         args.AddRange(RecorderArguments.Build(segment, path));
 
         var startInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args);
