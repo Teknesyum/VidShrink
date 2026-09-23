@@ -159,10 +159,10 @@ switch ($Is) {
             $c2 = ($hucre | Where-Object { $_.cpuUsed -eq 2 }).vmafNeg
             if (($c2 - $taban) -lt -0.3) { $cpu2Kabul = $false }
         }
-        $hukumGecerli = $gecerliKesitler.Count -eq $Kesitler.Count
         $md.Add('')
-        if (-not $hukumGecerli) {
-            $md.Add("Hukum: gecersiz — yalniz $($gecerliKesitler.Count)/$($Kesitler.Count) kesit bayt tuttu, olcut butun kesitlerin bayt tutmasini sartliyor.")
+        $md.Add("Bayt tutan kesitler: $($gecerliKesitler.Count)/$($Kesitler.Count) ($($gecerliKesitler -join ', ')). Hukum yalniz bunlara dayanir; olcut butun kesitlerin bayt tutmasini sartlamiyor.")
+        if ($gecerliKesitler.Count -eq 0) {
+            $md.Add('Olcute gore hukum: **yok** — bayt tutan kesit yok, hukum verilemiyor.')
         } elseif ($cpu2Kabul) {
             $md.Add('Olcute gore hukum: **onerilir — cpu-used 2**.')
         } else {
@@ -174,7 +174,6 @@ switch ($Is) {
             satirlar = $hepsi
             hucreler = $hucreler
             gecerliKesitler = $gecerliKesitler
-            hukumGecerli = $hukumGecerli
             cpu2Kabul = $cpu2Kabul
         }
         ConvertTo-Json -InputObject $ham -Depth 6 | Set-Content -Path (Join-Path $Cikti 'vp9-gercek-kesit-ham.json') -Encoding utf8

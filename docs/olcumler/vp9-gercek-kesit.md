@@ -1,7 +1,7 @@
 # VP9 Cpu-Used Gerçek Kesitli Tekrar
 
-Durum: **ölçüt yazıldı, ölçüm sürüyor**. Bu bölüm ölçümden önce yazıldı; sonuç aşağıya
-ölçütün kelimesiyle eklenecek, ölçüt geriye dönük değiştirilmeyecek.
+Durum: **ölçüldü**. Bu bölüm ölçümden önce yazıldı (commit `4ebc725c`); sayılar ve hüküm
+"Sonuç" bölümünde, ölçüt metni değiştirilmedi.
 
 ## Soru
 
@@ -77,4 +77,59 @@ tutmadı") — tasarım hatasıydı. Bu turda hedef, **her kesit için CRF eğri
 
 ## Sonuç
 
-(Ölçüm bitince buraya eklenir.)
+Koşum **35827886622** (etiket `olcum-vp9-gercek-1`, commit `c2120523`), Windows koşucu,
+ffmpeg `9.0-full_build-www.gyan.dev` (GyanD, ürünle aynı derleme), 4 çekirdek. Üç kesitin
+sha256'sı `crf` ve `cpu` işleri arasında aynı. Ham veri `vp9-gercek-kesit-ham.json`.
+
+Not: koşum bitince özet betiğinin (`tools/vp9-gercek-kesit/kos.ps1`, `ozet` kolu) yazdığı
+"gecersiz" satırı yanlıştı — betik, bu ölçütte olmayan bir ek şart eklemişti ("hüküm yalnız
+üç kesitin üçü de bayt tutarsa geçerli"), ölçüt metni ise yalnız *bayt tutan* kesitler
+arasında birliği şart kılıyor. Betik düzeltildi (fazladan şart kaldırıldı); aşağıdaki tablo
+ve hüküm ham JSON'dan elle yeniden hesaplanıp doğrulandı, koşum tekrar edilmedi (veri
+değişmedi, yalnız özet metni hesaplama hatası taşıyordu).
+
+### CRF Eğrisi (cpu-used 4)
+
+kbps, kesit başına, hedef seçimi için:
+
+| kesit | crf 20 | crf 25 | **crf 30** | crf 35 | crf 40 | crf 45 | crf 50 |
+|---|---|---|---|---|---|---|---|
+| karanlık | 6271 | 4691 | **3323** | 2283 | 1541 | 1040 | 704 |
+| orta | 1584 | 1119 | **752** | 486 | 334 | 232 | 171 |
+| hareketli | 7289 | 5599 | **4064** | 2811 | 1946 | 1353 | 932 |
+
+### cpu-used 1/2/4, hedef = kesitin CRF 30 kbps'i
+
+VMAF-NEG farkı cpu-used 1'e göre; süre iki geçişin toplamı (sn); bayt yayılımı hücredeki
+en büyük / en küçük kbps − 1.
+
+| kesit | hedef kbps | cpu | süre sn | kbps | sapma | VMAF-NEG | fark (cpu 1'e) | kabul |
+|---|---|---|---|---|---|---|---|---|
+| karanlık | 3323 | 1 | 102,61 | 3324,9 | +0,06% | 98,180 | 0 | evet |
+| karanlık | 3323 | 2 | 73,07 | 3325,1 | +0,06% | 97,828 | **−0,352** | **hayır** |
+| karanlık | 3323 | 4 | 51,34 | 3396,3 | +2,21% | 96,645 | −1,535 | hayır |
+| orta | 752 | 1 | 67,71 | 753,9 | +0,25% | 92,883 | 0 | evet |
+| orta | 752 | 2 | 49,17 | 754,2 | +0,30% | 92,421 | −0,462 | hayır |
+| orta | 752 | 4 | 37,08 | 844,7 | +12,33% | 92,503 | −0,380 | hayır |
+| hareketli | 4064 | 1 | 111,49 | 4065,5 | +0,04% | 98,921 | 0 | evet |
+| hareketli | 4064 | 2 | 75,51 | 4063,3 | −0,02% | 98,821 | −0,100 | evet |
+| hareketli | 4064 | 4 | 52,34 | 4043,1 | −0,51% | 98,463 | −0,458 | hayır |
+
+- **Bayt tuttu**: karanlık (yayılım %2,15) ve hareketli (yayılım %0,55). **Bayt tutmadı**:
+  orta (yayılım %12,04) — cpu-used 4'ün iki geçişi 752 kbps hedefini %12,33 aşıyor; bu
+  hücre hükme girmez.
+- Bayt tutan iki kesitte cpu-used 2: hareketlide kabul (−0,100 ≥ −0,3), karanlıkta
+  **reddedilir** (−0,352 < −0,3). Ölçüt "hepsinde kabul" istiyor; karanlığın reddi tek
+  başına yeter.
+- **Hüküm (ölçütün kelimesiyle): önerilmez — cpu-used 1 kalır.** cpu-used 4 hükme girmedi
+  (yalnız bilgi için ölçüldü); mevcut ürün varsayılanının 1'e inme kararı (`ff81d654`)
+  değişmiyor, gerçek kesitli tekrar onu 1'in aleyhine çevirmedi.
+
+### Sınırlar
+
+- Üç kesit de aynı kaynaktan (Sintel, animasyon); gerçek çekim (canlı aksiyon) içerik
+  ölçülmedi.
+- CRF 30 hedefi "orta" kesitinde iki geçişli VBR ile doldurulamadı (cpu-used 4'te +%12,33);
+  bu kesit hükme hiç girmedi, ölçüt tek geçerli/geçersiz ayrımıyla bunu doğru işaretledi
+  ama grid'i büyütmek (örn. CRF 25 hedefi) "orta" için de bir hüküm üretebilirdi — bu tur
+  bunu denemedi.
