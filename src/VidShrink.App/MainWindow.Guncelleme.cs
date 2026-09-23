@@ -322,7 +322,7 @@ public partial class MainWindow
         {
             InstallState.Done => "NeonSuccess",
             InstallState.Failed => "NeonEmber",
-            _ => "EmberBlaze"
+            _ => "AccentGradient"
         };
         if (this.TryFindResource(key, out var value) && value is IBrush brush && !ReferenceEquals(UpdateBarFill.Background, brush))
             UpdateBarFill.Background = brush;

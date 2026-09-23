@@ -2656,8 +2656,8 @@ public partial class MainWindow : Window
         var firca = state switch
         {
             UpdateBadgeState.UpToDate => "NeonSuccess",
-            UpdateBadgeState.NewVersion => "EmberBlaze",
-            UpdateBadgeState.Downloading => "EmberBlaze",
+            UpdateBadgeState.NewVersion => "AccentGradient",
+            UpdateBadgeState.Downloading => "AccentGradient",
             UpdateBadgeState.Ready => "NeonSuccess",
             UpdateBadgeState.Installing => "NeonBlue",
             UpdateBadgeState.Offline => "NeonEmber",

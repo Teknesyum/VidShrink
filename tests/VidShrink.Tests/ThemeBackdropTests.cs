@@ -249,15 +249,15 @@ public sealed class ThemeBackdropTests
             $"Başlık çubuğu kontrastı {before:F2} → {after:F2} düştü.");
     }
 
-    /// <summary>K1: kırmızı sıcaklık ölçülebilir olmalı — kırmızı kanal artıyor, mavi geriliyor.</summary>
+    /// <summary>K1: Neon'un zemini yeşil atmosfere çalıyor — yeşil kanal kırmızıyı geçiyor, maviden geri kalmıyor.</summary>
     [Fact]
-    public void TheWorkspaceGradientLeansRed()
+    public void TheWorkspaceGradientLeansGreen()
     {
         foreach (var stop in StopColours("WorkspaceGradient"))
         {
             var (r, g, b) = Channels(stop);
-            Assert.True(r > b, $"{stop} kırmızıya değil maviye çalıyor.");
-            Assert.True(r > g, $"{stop} kırmızıya değil yeşile çalıyor.");
+            Assert.True(g > r, $"{stop} yeşile değil kırmızıya çalıyor.");
+            Assert.True(g >= b, $"{stop} yeşile değil maviye çalıyor.");
         }
     }
 

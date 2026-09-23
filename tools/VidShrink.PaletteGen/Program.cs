@@ -39,8 +39,17 @@ return 0;
 
 static string Build(Seed seed)
 {
-    var onAccent = Luminance(seed.Accent1) > 0.45 ? "#FF000000" : "#FFFFFFFF";
+    var onAccent = OnAccent(seed);
     var light = Luminance(seed.Bg) > 0.5;
+    string Warm(string ground, double weight)
+    {
+        var ember = Dim(Mix(ground, seed.Ember, weight), light);
+        if (seed.Atmos is null) return ember;
+        return Shade(Dim(Mix(ground, seed.Atmos, weight * 3), light), Luminance(ember));
+    }
+    var hot = seed.Atmos is null ? seed.Blaze : Mix(seed.Atmos, "#FFFFFF", 0.35);
+    var mid = seed.Atmos ?? seed.Flame;
+    var edge = seed.Atmos is null ? seed.Ember : Mix(seed.Atmos, seed.Bg, 0.4);
 
     return $"""
         <ResourceDictionary xmlns="https://github.com/avaloniaui"
@@ -73,12 +82,15 @@ static string Build(Seed seed)
           <Color x:Key="NeonEmberColor">{Solid(seed.Ember)}</Color>
           <Color x:Key="EmberFlameColor">{Solid(seed.Flame)}</Color>
           <Color x:Key="EmberBlazeColor">{Solid(seed.Blaze)}</Color>
-          <Color x:Key="EmberDeepColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.02), light))}</Color>
-          <Color x:Key="EmberMidColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.035), light))}</Color>
-          <Color x:Key="EmberEdgeColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.05), light))}</Color>
-          <Color x:Key="EmberBarDeepColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.03), light))}</Color>
-          <Color x:Key="EmberBarMidColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.05), light))}</Color>
-          <Color x:Key="EmberBarEdgeColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.07), light))}</Color>
+          <Color x:Key="AtmosHotColor">{Solid(hot)}</Color>
+          <Color x:Key="AtmosMidColor">{Solid(mid)}</Color>
+          <Color x:Key="AtmosEdgeColor">{Solid(edge)}</Color>
+          <Color x:Key="EmberDeepColor">{Solid(Warm(seed.Bg, 0.02))}</Color>
+          <Color x:Key="EmberMidColor">{Solid(Warm(seed.Bg, 0.035))}</Color>
+          <Color x:Key="EmberEdgeColor">{Solid(Warm(seed.Bg, 0.05))}</Color>
+          <Color x:Key="EmberBarDeepColor">{Solid(Warm(seed.Surface, 0.03))}</Color>
+          <Color x:Key="EmberBarMidColor">{Solid(Warm(seed.Surface, 0.05))}</Color>
+          <Color x:Key="EmberBarEdgeColor">{Solid(Warm(seed.Surface, 0.07))}</Color>
 
           <Color x:Key="PlaybackScrimColor">{Alpha(seed.Bg, 0xCC)}</Color>
           <Color x:Key="PlaybackScrimEdgeColor">{Alpha(seed.Bg, 0x00)}</Color>
@@ -91,6 +103,19 @@ static string Build(Seed seed)
         </ResourceDictionary>
 
         """;
+}
+
+// Neon dolgunun üstündeki yazı siyah ya da beyaz: üç dolguya en kötü kontrastı yüksek olan.
+// Ölçü: PaletKarsitligiTests.
+static string OnAccent(Seed seed)
+{
+    var fills = new[] { seed.Accent1, seed.Accent2, seed.Accent3 };
+    double Worst(double text) => fills.Min(fill =>
+    {
+        var tone = Luminance(fill);
+        return (Math.Max(text, tone) + 0.05) / (Math.Min(text, tone) + 0.05);
+    });
+    return Worst(0) >= Worst(1) ? "#FF000000" : "#FFFFFFFF";
 }
 
 static (int R, int G, int B) Parse(string hex)
@@ -126,6 +151,20 @@ static string Dim(string hex, bool light)
     return $"#{(int)Math.Round(r * 0.78):X2}{(int)Math.Round(g * 0.78):X2}{(int)Math.Round(b * 0.78):X2}";
 }
 
+// Atmosfer rengi zemini boyar ama karartısını değiştirmez: yeşil aynı ağırlıkta kırmızıdan
+// parlak düşer ve gövde yazısının kontrastını yer. Ton korunur, parlaklık ember karışımının
+// parlaklığına iner. Ölçü: ThemeBackdropTests.WarmingTheWorkspaceDoesNotCostBodyTextContrast.
+static string Shade(string hex, double target)
+{
+    var (r, g, b) = Parse(hex);
+    for (var k = 1.0; k > 0; k -= 0.005)
+    {
+        var dark = $"#{(int)(r * k):X2}{(int)(g * k):X2}{(int)(b * k):X2}";
+        if (Luminance(dark) <= target) return dark;
+    }
+    return "#000000";
+}
+
 static string Mix(string first, string second, double weight)
 {
     var (r1, g1, b1) = Parse(first);
@@ -148,4 +187,4 @@ static double Luminance(string hex)
 internal sealed record Seed(
     string Name, string Bg, string Surface, string Accent1, string Accent2, string Accent3,
     string Success, string Ember, string Flame, string Blaze, string TextBody, string TextDim,
-    string Note);
+    string Note, string? Atmos = null);

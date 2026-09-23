@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-  <!-- Programın kendi şeması: is siyahı üzerinde camgöbeği-macenta neon. -->
+  <!-- Programın kendi şeması: is siyahı üzerinde yeşil atmosfer, camgöbeğinden mora giden neon. -->
   <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki on bir çekirdek renkten
        üretildi. Değiştirmek için çekirdeği düzenle ve VidShrink.PaletteGen
        aracını çalıştır; komut docs/tema.md içinde. -->
@@ -28,12 +28,15 @@
   <Color x:Key="NeonEmberColor">#FFFF0033</Color>
   <Color x:Key="EmberFlameColor">#FFFF6600</Color>
   <Color x:Key="EmberBlazeColor">#FFFFFF00</Color>
-  <Color x:Key="EmberDeepColor">#FF080406</Color>
-  <Color x:Key="EmberMidColor">#FF0B0407</Color>
-  <Color x:Key="EmberEdgeColor">#FF0E0407</Color>
-  <Color x:Key="EmberBarDeepColor">#FF140D12</Color>
-  <Color x:Key="EmberBarMidColor">#FF170D12</Color>
-  <Color x:Key="EmberBarEdgeColor">#FF1B0D13</Color>
+  <Color x:Key="AtmosHotColor">#FF7BE2BD</Color>
+  <Color x:Key="AtmosMidColor">#FF34D399</Color>
+  <Color x:Key="AtmosEdgeColor">#FF21815F</Color>
+  <Color x:Key="EmberDeepColor">#FF020505</Color>
+  <Color x:Key="EmberMidColor">#FF020605</Color>
+  <Color x:Key="EmberEdgeColor">#FF020706</Color>
+  <Color x:Key="EmberBarDeepColor">#FF091010</Color>
+  <Color x:Key="EmberBarMidColor">#FF081110</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF081310</Color>
 
   <Color x:Key="PlaybackScrimColor">#CC050507</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#00050507</Color>

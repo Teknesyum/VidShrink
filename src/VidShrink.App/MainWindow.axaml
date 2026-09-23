@@ -185,7 +185,7 @@
                 <Border x:Name="UpdateBarFill"
                         HorizontalAlignment="Left"
                         CornerRadius="{StaticResource RadiusChip}"
-                        Background="{StaticResource EmberBlaze}"/>
+                        Background="{StaticResource AccentGradient}"/>
               </Border>
             </StackPanel>
           </Border>
