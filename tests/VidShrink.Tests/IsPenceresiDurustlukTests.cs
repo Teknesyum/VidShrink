@@ -65,14 +65,14 @@ public sealed class IsPenceresiDurustlukTests
             try
             {
                 window.ShowProgress(new EncodeProgress(0.6, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(2), 1.0, asama));
-                return (window.StageText, MainWindow.LocalizeStage(asama, window.Language));
+                return (window.StageText, MainWindow.LocalizeStageIn(asama, window.Language));
             }
             finally { window.Close(); }
         });
 
         Assert.Equal(beklenen, yazilan);
         Assert.NotEqual(asama, yazilan);
-        Assert.DoesNotContain("attempt", MainWindow.LocalizeStage(asama, "tr"), StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("attempt", MainWindow.LocalizeStageIn(asama, "tr"), StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

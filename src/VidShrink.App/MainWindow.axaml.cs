@@ -4706,13 +4706,13 @@ public partial class MainWindow : Window
         (EncodeRunner.Hdr10PlusStage, "main.stage.hdr10plus-metadata")
     };
 
-    private static string LocalizeStage(string stage) => LocalizeStage(stage, Strings.Language);
+    private static string LocalizeStage(string stage) => LocalizeStageIn(stage, Strings.Language);
 
     /// <summary>
     /// Aşama satırı verilen dilde. İş penceresi kendi dilini taşıdığı için süreç genelindeki
     /// <see cref="Strings.Language"/> yerine bunu çağırır.
     /// </summary>
-    internal static string LocalizeStage(string stage, string language)
+    internal static string LocalizeStageIn(string stage, string language)
     {
         foreach (var (token, key) in StageWords)
             stage = stage.Replace(token, Strings.GetIn(language, key), StringComparison.OrdinalIgnoreCase);

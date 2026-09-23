@@ -541,7 +541,7 @@ public partial class ShrinkJobWindow : Window
     internal void ShowProgress(EncodeProgress step)
     {
         Progress.Value = step.Fraction;
-        TxtStage.Text = MainWindow.LocalizeStage(step.Stage, _language);
+        TxtStage.Text = MainWindow.LocalizeStageIn(step.Stage, _language);
         TxtRemaining.Text = Saat.Kalan(step.Remaining);
     }
 
