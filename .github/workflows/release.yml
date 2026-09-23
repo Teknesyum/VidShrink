@@ -70,6 +70,29 @@ jobs:
     # same suite the developer sees, not a subset of it.
     runs-on: windows-latest
     timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      # Yerlesim denetimi 42 dilde ~670 kol acinca tek is 75 dakikayi asiyordu. Denetim
+      # uc parcaya bolunur ve ana suitle paralel kosar; ucuncu parca tumleyen suzgectir,
+      # yeni eklenen denetim metodu hicbir parcanin disinda kalmaz.
+      matrix:
+        include:
+          - parca: ana
+            filter: 'FullyQualifiedName!~YerlesimDenetimiTests'
+            minimum: 1143
+            skipped: 30
+          - parca: yerlesim-1
+            filter: 'FullyQualifiedName~YerlesimDenetimiTests.SekmelerdeKesik|FullyQualifiedName~YerlesimDenetimiTests.SonucDurumunda|FullyQualifiedName~YerlesimDenetimiTests.BosPencerede|FullyQualifiedName~YerlesimDenetimiTests.KodlamaSurerken|FullyQualifiedName~YerlesimDenetimiTests.AyrintiYuzeylerinde'
+            minimum: 50
+            skipped: 10
+          - parca: yerlesim-2
+            filter: 'FullyQualifiedName~YerlesimDenetimiTests.IzPanelinde|FullyQualifiedName~YerlesimDenetimiTests.AcilanAyrintilarda|FullyQualifiedName~YerlesimDenetimiTests.KaydediciSonucunda|FullyQualifiedName~YerlesimDenetimiTests.OynaticiKatmanlarinda|FullyQualifiedName~YerlesimDenetimiTests.OneriSeridinde'
+            minimum: 50
+            skipped: 10
+          - parca: yerlesim-3
+            filter: 'FullyQualifiedName~YerlesimDenetimiTests&FullyQualifiedName!~YerlesimDenetimiTests.SekmelerdeKesik&FullyQualifiedName!~YerlesimDenetimiTests.SonucDurumunda&FullyQualifiedName!~YerlesimDenetimiTests.BosPencerede&FullyQualifiedName!~YerlesimDenetimiTests.KodlamaSurerken&FullyQualifiedName!~YerlesimDenetimiTests.AyrintiYuzeylerinde&FullyQualifiedName!~YerlesimDenetimiTests.IzPanelinde&FullyQualifiedName!~YerlesimDenetimiTests.AcilanAyrintilarda&FullyQualifiedName!~YerlesimDenetimiTests.KaydediciSonucunda&FullyQualifiedName!~YerlesimDenetimiTests.OynaticiKatmanlarinda&FullyQualifiedName!~YerlesimDenetimiTests.OneriSeridinde'
+            minimum: 50
+            skipped: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -147,12 +170,14 @@ jobs:
       - run: dotnet build VidShrink.sln -c Release -warnaserror
       # Asilan bir testhost "Failed: 0" basip cikis kodu 0 dondurur. Duz `dotnet test`
       # bunu goremiyordu; yayin asilmis bir suitin uzerine yayinlanabilirdi.
-      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1143 -MaximumSkipped 30 -ResultsDir .calisma/kosum-sonuc
+      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal ${{ matrix.minimum }} -MaximumSkipped ${{ matrix.skipped }} -ResultsDir .calisma/kosum-sonuc -Filter $env:KOSUM_FILTER
+        env:
+          KOSUM_FILTER: ${{ matrix.filter }}
       - name: Kosum ciktisi ve hang dump
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kosum-sonuc-yayin
+          name: kosum-sonuc-yayin-${{ matrix.parca }}
           path: .calisma/kosum-sonuc/**
           if-no-files-found: ignore
           retention-days: 7

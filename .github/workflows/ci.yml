@@ -33,6 +33,29 @@ jobs:
     # Same reason as the release gate: the measurement suite opens real Avalonia windows.
     runs-on: windows-latest
     timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      # Yerlesim denetimi 42 dilde ~670 kol acinca tek is 75 dakikayi asiyordu. Denetim
+      # uc parcaya bolunur ve ana suitle paralel kosar; ucuncu parca tumleyen suzgectir,
+      # yeni eklenen denetim metodu hicbir parcanin disinda kalmaz.
+      matrix:
+        include:
+          - parca: ana
+            filter: 'FullyQualifiedName!~YerlesimDenetimiTests'
+            minimum: 1143
+            skipped: 30
+          - parca: yerlesim-1
+            filter: 'FullyQualifiedName~YerlesimDenetimiTests.SekmelerdeKesik|FullyQualifiedName~YerlesimDenetimiTests.SonucDurumunda|FullyQualifiedName~YerlesimDenetimiTests.BosPencerede|FullyQualifiedName~YerlesimDenetimiTests.KodlamaSurerken|FullyQualifiedName~YerlesimDenetimiTests.AyrintiYuzeylerinde'
+            minimum: 50
+            skipped: 10
+          - parca: yerlesim-2
+            filter: 'FullyQualifiedName~YerlesimDenetimiTests.IzPanelinde|FullyQualifiedName~YerlesimDenetimiTests.AcilanAyrintilarda|FullyQualifiedName~YerlesimDenetimiTests.KaydediciSonucunda|FullyQualifiedName~YerlesimDenetimiTests.OynaticiKatmanlarinda|FullyQualifiedName~YerlesimDenetimiTests.OneriSeridinde'
+            minimum: 50
+            skipped: 10
+          - parca: yerlesim-3
+            filter: 'FullyQualifiedName~YerlesimDenetimiTests&FullyQualifiedName!~YerlesimDenetimiTests.SekmelerdeKesik&FullyQualifiedName!~YerlesimDenetimiTests.SonucDurumunda&FullyQualifiedName!~YerlesimDenetimiTests.BosPencerede&FullyQualifiedName!~YerlesimDenetimiTests.KodlamaSurerken&FullyQualifiedName!~YerlesimDenetimiTests.AyrintiYuzeylerinde&FullyQualifiedName!~YerlesimDenetimiTests.IzPanelinde&FullyQualifiedName!~YerlesimDenetimiTests.AcilanAyrintilarda&FullyQualifiedName!~YerlesimDenetimiTests.KaydediciSonucunda&FullyQualifiedName!~YerlesimDenetimiTests.OynaticiKatmanlarinda&FullyQualifiedName!~YerlesimDenetimiTests.OneriSeridinde'
+            minimum: 50
+            skipped: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -128,7 +151,9 @@ jobs:
       # exits 0. -MinimumTotal reads the output and refuses a run that never finished.
       # -MaximumSkipped catches the other blind spot: Total stays the same when a test
       # silently flips from Passed to Skipped, so Total alone can't see it (T115 tur 2).
-      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1143 -MaximumSkipped 30 -ResultsDir .calisma/kosum-sonuc
+      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal ${{ matrix.minimum }} -MaximumSkipped ${{ matrix.skipped }} -ResultsDir .calisma/kosum-sonuc -Filter $env:KOSUM_FILTER
+        env:
+          KOSUM_FILTER: ${{ matrix.filter }}
 
       # Kosum asilirsa blame'in aldigi hang dump buraya duser. Yukarilmazsa asilmanin
       # hangi is parcaciginda oldugu gorulemiyor; koda=65 kirmizisi sebepsiz kaliyor.
@@ -136,7 +161,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kosum-sonuc
+          name: kosum-sonuc-${{ matrix.parca }}
           path: |
             .calisma/kosum-sonuc/**
             .calisma/oynatici-motor/**

@@ -8,7 +8,8 @@ param(
 
     [string]$InputFile,
     [string]$OutputFile,
-    [string]$ResultsDir
+    [string]$ResultsDir,
+    [string]$Filter
 )
 
 $ErrorActionPreference = 'Stop'
@@ -43,7 +44,9 @@ else {
     New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
     $oncekiEap = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
-    $lines = & dotnet test -c Release --no-restore --blame-hang --blame-hang-timeout 10m --logger 'trx;LogFileName=kosum-kapisi.trx' --results-directory $resultsDir 2>&1 | ForEach-Object {
+    $testArgs = @('test', '-c', 'Release', '--no-restore', '--blame-hang', '--blame-hang-timeout', '10m', '--logger', 'trx;LogFileName=kosum-kapisi.trx', '--results-directory', $resultsDir)
+    if ($Filter) { $testArgs += @('--filter', $Filter) }
+    $lines = & dotnet @testArgs 2>&1 | ForEach-Object {
         $line = $_.ToString()
         Write-Host $line
         $line
