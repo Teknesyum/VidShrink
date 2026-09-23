@@ -57,6 +57,13 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     internal static readonly string[] Diller = { "tr", "en", "it", "el", "fr" };
 
+    /// <summary>
+    /// Dar kol makineden bağımsız: pencerenin bildirdiği taban 1136x720, ama açılış onu çalışma
+    /// alanına indiriyor (<c>MainWindow.StartupFit</c>) ve 1024 genişlikli ekranda taban 1024 oluyor.
+    /// CI koşucusunun ekranı 1024 genişlikte; yerel ekran 1136'yı verdiği için kusurlar yalnız CI'da çıkıyordu.
+    /// </summary>
+    internal static readonly Size DarBoyut = new(1024, 720);
+
     private const string SamplePath = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv";
 
     /// <summary>
@@ -689,7 +696,7 @@ public sealed class YerlesimDenetimiTests
                 hazirla?.Invoke(pencere);
 
                 var boyut = zorla ?? (dar
-                    ? new Size(pencere.MinWidth, pencere.MinHeight)
+                    ? DarBoyut
                     : new Size(Belirtec(pencere, "WindowPreferredWidth"), Belirtec(pencere, "WindowPreferredHeight")));
 
                 var denetim = new Denetim { Dil = dil };

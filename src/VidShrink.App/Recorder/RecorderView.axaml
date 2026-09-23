@@ -1,5 +1,6 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:izi="using:VidShrink.App"
              xmlns:auto="using:Avalonia.Automation"
              xmlns:loc="using:VidShrink.App.Localization"
              x:Class="VidShrink.App.Recorder.RecorderView">
@@ -50,27 +51,30 @@
                    Theme="{StaticResource MonoValue}"
                    VerticalAlignment="Center"/>
 
-        <Grid Grid.Column="2"
+        <izi:SutunIzgara Grid.Column="2"
+              x:Name="StripStats"
               Margin="{StaticResource RecorderStatsInset}"
-              ColumnDefinitions="*,*,*"
+              MaxColumns="3"
               ColumnSpacing="{StaticResource SpaceXl}"
+              RowSpacing="{StaticResource SpaceSm}"
+              VerticalAlignment="Center"
               ToolTip.Tip="{loc:Text recorder.strip.size-hint}">
 
-          <StackPanel Grid.Column="0">
+          <StackPanel>
             <TextBlock Text="{loc:Text recorder.strip.elapsed}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
             <TextBlock x:Name="TxtElapsed" Theme="{StaticResource PlanFactValue}"/>
           </StackPanel>
 
-          <StackPanel Grid.Column="1">
+          <StackPanel>
             <TextBlock Text="{loc:Text recorder.strip.frames}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
             <TextBlock x:Name="TxtFrames" Theme="{StaticResource PlanFactValue}"/>
           </StackPanel>
 
-          <StackPanel Grid.Column="2">
+          <StackPanel>
             <TextBlock Text="{loc:Text recorder.strip.dropped}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
             <TextBlock x:Name="TxtDropped" Theme="{StaticResource PlanFactValue}"/>
           </StackPanel>
-        </Grid>
+        </izi:SutunIzgara>
 
         <Button Grid.Column="3"
                 x:Name="BtnStart"

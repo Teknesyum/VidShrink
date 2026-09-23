@@ -1,0 +1,40 @@
+name: suzgecli-test
+
+# Tek bir test süzgecini CI koşucusunda tam süitten ayrı koşar. Bir test yalnız tam süitte
+# kırmızıysa bu koşum ikisini ayırır: burada da kırmızıysa neden koşucunun ortamı (ekran,
+# çalışma alanı, DPI), yeşilse başka bir sınıftan sızan durum. Koşucunun ekran bilgisi ve
+# test sürecinin ayar klasörü günlüğe yazılır.
+
+on:
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: dotnet test --filter ifadesi
+        required: true
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Ekran
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.Windows.Forms
+          [System.Windows.Forms.Screen]::AllScreens | ForEach-Object { "Bounds=$($_.Bounds) WorkingArea=$($_.WorkingArea) Primary=$($_.Primary)" }
+          "Culture=$((Get-Culture).Name) UICulture=$((Get-UICulture).Name)"
+      - name: Derle
+        run: dotnet build tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release -warnaserror -m:2
+      - name: Koş
+        shell: pwsh
+        env:
+          FILTER: ${{ inputs.filter }}
+        run: dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --no-build --filter "$env:FILTER" --logger "console;verbosity=normal"
+      - name: Ayar klasörü
+        if: always()
+        shell: pwsh
+        run: Get-ChildItem -Recurse -File .calisma/test-ciktilari/appdata -Include settings.json,presets.json,layout.json -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName; Get-Content $_.FullName -Raw }

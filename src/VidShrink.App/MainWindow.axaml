@@ -1504,7 +1504,7 @@
                     <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtShareCeiling" Theme="{StaticResource PlanFactValue}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Text settings.share.lifetime}" Theme="{StaticResource PlanFactLabel}"/>
-                    <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
                       <ComboBox x:Name="CmbShareRetention" HorizontalAlignment="Left"/>
                       <TextBlock x:Name="TxtShareRetentionFixed" Theme="{StaticResource PlanFactValue}" IsVisible="False"/>
                     </StackPanel>
