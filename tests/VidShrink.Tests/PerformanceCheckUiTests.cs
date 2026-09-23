@@ -172,7 +172,7 @@ public sealed class PerformanceCheckUiTests
         Assert.Contains("x:Name=\"PerformancePanel\" Theme=\"{StaticResource Panel}\"", page, StringComparison.Ordinal);
         Assert.Contains("Text=\"{loc:Text performance.title}\" Theme=\"{StaticResource H2}\"", page, StringComparison.Ordinal);
         Assert.Contains("x:Name=\"BtnPerformanceExpand\"", page, StringComparison.Ordinal);
-        Assert.Contains("x:Name=\"PerformanceDetails\" IsVisible=\"False\"", page, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"PerformanceDetails\" Classes=\"disclose\" IsVisible=\"False\"", page, StringComparison.Ordinal);
 
         // Açılır düğme diğer iki panelle aynı: IconChevronDown taşıyan GhostButton.
         var after = page[page.IndexOf("BtnPerformanceExpand", StringComparison.Ordinal)..];

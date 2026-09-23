@@ -25,7 +25,7 @@ namespace VidShrink.Tests;
 /// <item><b>kesik</b> — tek satırlık metnin doğal genişliği kendi yerinden büyük, çok satırlı
 /// metnin yüksekliği kutusuna sığmıyor, ya da metin <c>ClipToBounds</c> açık bir atanın
 /// dışına düşüyor. Üç noktayla kısalıp tam halini balonda taşıyan metin T194 kararı gereği
-/// kesik sayılmaz, ayrı "balonlu" satırına yazılır. İstisna <see cref="EsitSutunIzgara"/>: o
+/// kesik sayılmaz, ayrı "balonlu" satırına yazılır. İstisna <see cref="SutunIzgara"/>: o
 /// panel sütun sayısını içerik sığsın diye seçer, orada üç nokta kusurdur (2026-09-23:
 /// "balonlu" satırlarının tamamı bilgi ızgarasındaydı).</item>
 /// <item><b>çakışma</b> — aynı panelin görünür iki kardeşi 1 pikselden fazla kesişiyor.</item>
@@ -880,7 +880,7 @@ public sealed class YerlesimDenetimiTests
 
             if (blok.TextWrapping == TextWrapping.NoWrap && gereken - yer > 0.5)
             {
-                if (balonda && blok.FindAncestorOfType<EsitSutunIzgara>() is null) denetim.Balonlu.Add($"{sekme} · {Ad(blok)} [{Kisalt(metin)}] gereken {gereken:0.#}, yer {yer:0.#}");
+                if (balonda && blok.FindAncestorOfType<SutunIzgara>() is null) denetim.Balonlu.Add($"{sekme} · {Ad(blok)} [{Kisalt(metin)}] gereken {gereken:0.#}, yer {yer:0.#}");
                 else denetim.Ekle(new Kusur("kesik", sekme, $"{Ad(blok)} [{Kisalt(metin)}]", $"genişlik gereken {gereken:0.#}, yer {yer:0.#}"));
                 continue;
             }
@@ -1012,6 +1012,8 @@ public sealed class YerlesimDenetimiTests
     /// Başlık kuralını bozan ilk sözcük; yoksa <c>null</c>. Cümle işaretli metin gövdedir, sorulmaz.
     /// Rakamla başlayan parça (<c>50.3s</c>, <c>1080p</c>) sözcük değil sayıdır; <see cref="LanguageCatalog.Title"/>
     /// de harfle başlamayanı olduğu gibi bırakıyor.
+    /// Sayının hemen ardındaki birim (<c>50,3 sn</c>) de öyle: <see cref="LanguageCatalog.IsUnitAfterNumber"/>
+    /// onu büyütmüyor.
     /// </summary>
     internal static string? KucukSozcuk(string metin, string dil)
     {
@@ -1022,9 +1024,13 @@ public sealed class YerlesimDenetimiTests
 
         var kucuk = KucukSozcukler[dil];
         var ilk = true;
+        string? onceki = null;
         foreach (var parca in metin.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
         {
+            var once = onceki;
+            onceki = parca;
             if (char.IsDigit(parca[0])) { ilk = false; continue; }
+            if (LanguageCatalog.IsUnitAfterNumber(parca, once)) continue;
             var bas = 0;
             while (bas < parca.Length && !char.IsLetter(parca[bas])) bas++;
             if (bas == parca.Length) continue;

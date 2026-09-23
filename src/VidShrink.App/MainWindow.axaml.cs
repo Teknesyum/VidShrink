@@ -115,7 +115,10 @@ public partial class MainWindow : Window
     private HardwareVerdict _hardwareVerdict = HardwareVerdict.NotProbed;
     private bool _motionReduced;
 
-    private double _titleBarRightFull;
+    private bool _aligningTitle;
+    private ContentPresenter? _noticeLayer;
+    private TransitioningContentControl? _contentHost;
+    private Transitions? _noticeSlide;
 
     private const string ChromeHidden = "chrome-hidden";
 
@@ -208,9 +211,17 @@ public partial class MainWindow : Window
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
         SizeChanged += (_, _) => AlignTabsToTitle();
+        TitleBarRight.SizeChanged += (_, _) => AlignTabsToTitle();
+        Tabs.TemplateApplied += (_, _) => Dispatcher.UIThread.Post(() =>
+        {
+            if (Tabs.GetVisualDescendants().OfType<ItemsPresenter>().FirstOrDefault() is { } strip)
+                strip.SizeChanged += (_, _) => AlignTabsToTitle();
+        });
         LoadTitleBarLogo();
         AlignTabsToTitle();
         TrackChrome();
+        TrackNoticeLayer();
+        ShrinkColumns.Olcut = InfoGrid;
         SetupShellMenu();
         Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
         Tabs.SelectionChanged += (_, _) => KaydediciSekmesiSecildi();
@@ -466,6 +477,40 @@ public partial class MainWindow : Window
     }
 
 
+    /// <summary>
+    /// Bildirim yigini icerikle ayni gozde, uste yaslanmis bir katman: oynaticida
+    /// goruntunun ustunde cikiyor ki uyari her acildiginda oynatici kisalmasin. Diger
+    /// sekmelerde ayni katman panel basliklarini ortuyordu; "varsayilan program degil"
+    /// serit Kaynak ve Cikti basliklarini kalici olarak kapatiyordu. Oynatici disinda
+    /// icerik yiginin boyu kadar asagi iniyor, inis hareket azaltilmamissa kayarak.
+    /// </summary>
+    private void TrackNoticeLayer()
+    {
+        Tabs.TemplateApplied += (_, e) =>
+        {
+            _noticeLayer = e.NameScope.Find<ContentPresenter>("NoticeLayer");
+            _contentHost = e.NameScope.Find<TransitioningContentControl>("SelectedContentHost");
+            if (_noticeLayer is not null) _noticeLayer.SizeChanged += (_, _) => PushContentBelowNotices();
+            _noticeSlide = new Transitions
+            {
+                new ThicknessTransition { Property = PaddingProperty, Duration = Motion("MotionBase", 240), Easing = new CubicEaseOut() }
+            };
+            PushContentBelowNotices();
+        };
+        Tabs.SelectionChanged += (_, _) => PushContentBelowNotices();
+    }
+
+    internal static double NoticePush(bool playerTab, double noticeHeight) => playerTab ? 0 : Math.Max(0, noticeHeight);
+
+    private void PushContentBelowNotices()
+    {
+        if (_noticeLayer is null || _contentHost is null) return;
+        var top = NoticePush(Tabs.SelectedIndex == PlayerTabIndex, _noticeLayer.Bounds.Height);
+        if (Math.Abs(_contentHost.Padding.Top - top) < 0.5) return;
+        _contentHost.Transitions = Classes.Contains("reduced-motion") ? null : _noticeSlide;
+        _contentHost.Padding = new Thickness(0, top, 0, 0);
+    }
+
     private void EnsureFade(Control control)
     {
         if (control.Transitions is not null) return;
@@ -632,30 +677,72 @@ public partial class MainWindow : Window
     /// Ust seridin uc blogu ayni 30 pikseli paylasiyor: marka, sekme seridi ve sag grup.
     /// Sekme seridi kendi sablonunda oldugu icin izgara onlari ayiramiyor; dar pencerede
     /// sag grup seridin uzerine biniyor ve en sonra bildirildigi icin tiklari yutuyordu.
-    /// Olculdu: marka 181, serit 652, sag grup 585 piksel; 1418'in altinda ortusme
-    /// kacinilmaz.
     ///
-    /// <para>Cozum sekmeyi degil bagi feda ediyor: yer yetmeyince destek ve GitHub
-    /// dugmeleri gizleniyor, ikisi de Hakkinda sekmesinde duruyor. Esik sabit degil,
-    /// o anki genisliklerden hesaplaniyor.</para>
+    /// <para>Yer yetmeyince parcalar sirayla cekiliyor: once destek ve GitHub dugmeleri
+    /// (ikisi de Hakkinda'da), sonra guncelleme rozetinin yazisi (nokta ve ipucu kalir),
+    /// en son dil dugmeleri (dil Ayarlar'da). Her turda sag grup her sey acikken yeniden
+    /// olculuyor; rozet acilistan sonra belirdigi ve dil seridi degistirdigi icin onbellege
+    /// alinmis bir genislik bayatliyordu. Sag grubun ve seridin boyu degisince yeniden
+    /// kosuyor.</para>
     /// </summary>
     private void AlignTabsToTitle()
     {
-        var gap = TitleBarContent.ColumnSpacing;
-        var sol = TitleBarContent.Margin.Left + TitleBrand.Bounds.Width + gap;
-        Tabs.Padding = new Thickness(sol, 0, 0, 0);
+        if (_aligningTitle) return;
+        _aligningTitle = true;
+        try
+        {
+            var gap = TitleBarContent.ColumnSpacing;
+            var sol = TitleBarContent.Margin.Left + TitleBrand.Bounds.Width + gap;
+            Tabs.Padding = new Thickness(sol, 0, 0, 0);
 
-        var serit = Tabs.GetVisualDescendants().OfType<ItemsPresenter>().FirstOrDefault()?.Bounds.Width ?? 0;
-        if (serit <= 0 || TitleBarLayer.Bounds.Width <= 0) return;
+            var serit = Tabs.GetVisualDescendants().OfType<ItemsPresenter>().FirstOrDefault()?.Bounds.Width ?? 0;
+            if (serit <= 0 || TitleBarLayer.Bounds.Width <= 0) return;
 
-        if (BtnSponsor.IsVisible && BtnGitHub.IsVisible && TitleBarRight.Bounds.Width > _titleBarRightFull)
-            _titleBarRightFull = TitleBarRight.Bounds.Width;
+            var bos = TitleBarLayer.Bounds.Width - sol - serit;
+            var kademe = TitleBarStage(bos);
+            BtnSponsor.IsVisible = kademe < 1;
+            BtnGitHub.IsVisible = kademe < 1;
+            TxtUpdateBadge.IsVisible = kademe < 2;
+            LangSwitch.IsVisible = kademe < 3;
+            InvalidateTitleBarRight();
+        }
+        finally
+        {
+            _aligningTitle = false;
+        }
+    }
 
-        if (_titleBarRightFull <= 0) return;
+    /// <summary>
+    /// Sag grubun kacinci kademede sigdigi: 0 hepsi, 1 baglar cekilmis, 2 rozet yazisi da,
+    /// 3 dil dugmeleri de. Parcalar olcum icin gecici olarak aciliyor; ayni cagride geri
+    /// kapandigi icin ekrana hic cizilmiyorlar.
+    /// </summary>
+    private int TitleBarStage(double bos)
+    {
+        BtnSponsor.IsVisible = true;
+        BtnGitHub.IsVisible = true;
+        TxtUpdateBadge.IsVisible = true;
+        LangSwitch.IsVisible = true;
+        InvalidateTitleBarRight();
+        TitleBarRight.Measure(Size.Infinity);
 
-        var sigar = TitleBarLayer.Bounds.Width - sol - serit >= _titleBarRightFull;
-        BtnSponsor.IsVisible = sigar;
-        BtnGitHub.IsVisible = sigar;
+        var tam = TitleBarRight.DesiredSize.Width;
+        var baglar = BtnSponsor.DesiredSize.Width + BtnGitHub.DesiredSize.Width;
+        var rozet = BtnUpdateBadge.IsVisible
+            ? TxtUpdateBadge.DesiredSize.Width + ((TxtUpdateBadge.Parent as StackPanel)?.Spacing ?? 0)
+            : 0;
+        var dil = LangSwitch.DesiredSize.Width;
+
+        if (tam <= bos) return 0;
+        if (tam - baglar <= bos) return 1;
+        if (tam - baglar - rozet <= bos) return 2;
+        return 3;
+    }
+
+    private void InvalidateTitleBarRight()
+    {
+        foreach (var parca in TitleBarRight.GetVisualDescendants().OfType<Avalonia.Layout.Layoutable>()) parca.InvalidateMeasure();
+        TitleBarRight.InvalidateMeasure();
     }
 
 

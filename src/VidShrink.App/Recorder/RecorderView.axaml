@@ -51,6 +51,7 @@
                    VerticalAlignment="Center"/>
 
         <Grid Grid.Column="2"
+              Margin="{StaticResource RecorderStatsInset}"
               ColumnDefinitions="*,*,*"
               ColumnSpacing="{StaticResource SpaceXl}"
               ToolTip.Tip="{loc:Text recorder.strip.size-hint}">

@@ -8,6 +8,8 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.VisualTree;
 using VidShrink.App;
+using VidShrink.App.Localization;
+using VidShrink.Core;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -23,10 +25,15 @@ public sealed class UstSeritTikTests
 {
     
 
-    private static string Olc(int sekme, Size WindowSize)
+    private static string Olc(int sekme, Size WindowSize, string dil = "en", UpdateBadgeState? rozet = null)
         => AppHost.Run(() =>
         {
+            Strings.Use(dil);
             var window = new MainWindow();
+            try
+            {
+            window.TabAdvanced.IsVisible = true;
+            if (rozet is { } durum) window.SetUpdateBadge(durum);
             Yerlestir(window, WindowSize);
 
             var tabs = window.GetVisualDescendants().OfType<TabControl>().First(t => t.Name == "Tabs");
@@ -51,7 +58,7 @@ public sealed class UstSeritTikTests
 
             var rapor = new StringBuilder();
             var marka = window.GetVisualDescendants().OfType<Control>().First(c => c.Name == "TitleBrand");
-            rapor.AppendLine($"OLCU  en={WindowSize.Width:0}  sekme={sekme}  TitleBrand={Y(Yeri(marka, window)!.Value)}  TabsPadding={tabs.Padding}");
+            rapor.AppendLine($"OLCU  dil={dil} rozet={rozet} en={WindowSize.Width:0}  sekme={sekme}  TitleBrand={Y(Yeri(marka, window)!.Value)}  TabsPadding={tabs.Padding}");
 
             var sag = window.GetVisualDescendants().OfType<Control>().First(c => c.Name == "WindowButtons")
                 .GetVisualAncestors().OfType<StackPanel>().First();
@@ -71,9 +78,15 @@ public sealed class UstSeritTikTests
             }
 
             return rapor.ToString();
+            }
+            finally
+            {
+                window.Close();
+                Strings.Use("en");
+            }
         });
 
-    private static void Yerlestir(MainWindow window, Size olcu)
+    internal static void Yerlestir(MainWindow window, Size olcu)
     {
         window.Width = double.NaN;
         window.Height = double.NaN;
@@ -123,6 +136,33 @@ public sealed class UstSeritTikTests
         Assert.True(engeller.Length == 0, string.Join("\n", engeller));
 
         Kapat(klasor, "isabet.txt");
+    }
+
+    /// <summary>
+    /// Guncelleme rozeti acilistan sonra beliriyor ve dil seridi degistiriyor; ikisi de
+    /// sag grubu genisletip sekmelerin ustune bindiriyordu (1280'de "Denetleniyor" ve dil
+    /// dugmeleri Gelismis ile Ayarlar'in uzerindeydi). Her dilde, en uzun rozet yazisiyla,
+    /// en dar pencereden genise kadar hicbir sekme ortulmuyor.
+    /// </summary>
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void RozetVeDilSekmeleriOrtmuyor(string dil)
+    {
+        var rapor = new StringBuilder();
+        foreach (var en in new double[] { 1136, 1280, 1418 })
+            foreach (var durum in new[] { UpdateBadgeState.Checking, UpdateBadgeState.UpToDate, UpdateBadgeState.NewVersion })
+                for (var i = 0; i < 6; i++) rapor.Append(Olc(i, new Size(en, 1060), dil, durum));
+
+        var klasor = Path.Combine(TipSources.Root, ".calisma", "serit-tik");
+        Directory.CreateDirectory(klasor);
+        var ad = $"rozet-{dil}.txt";
+        File.WriteAllText(Path.Combine(klasor, ad), rapor.ToString(), new UTF8Encoding(false));
+
+        var engeller = rapor.ToString().Split('\n').Where(s => s.StartsWith("ENGEL")).ToArray();
+        Assert.True(engeller.Length == 0, string.Join("\n", engeller));
+
+        Kapat(klasor, ad);
     }
 
     /// <summary>

@@ -151,8 +151,8 @@ public sealed class BiciminTests : IDisposable
 /// <summary>
 /// T192 K4 ve dorduncu madde. Olcum basiz pencerede, gercek yerlesim motoruyla.
 ///
-/// <para><b>Kaynak bilgi izgarasi.</b> <c>InfoGrid</c> bir <see cref="EsitSutunIzgara"/>:
-/// en fazla dort esit sutun; en genis hucre sigmazsa iki, sonra bir sutuna iner
+/// <para><b>Kaynak bilgi izgarasi.</b> <c>InfoGrid</c> bir <see cref="SutunIzgara"/>:
+/// en fazla dort sutun, her sutun kendi en genis hucresi kadar; toplam sigmazsa iki, sonra bir sutuna iner
 /// (2026-09-23: sabit dort sutunda deger her dilde ucnoktayla kesiliyordu). Once
 /// hucre kirpmiyordu. Turkce etiket Ingilizceden uzun
 /// oldugu icin "Video kodeği" kendi hucresinden tasip yanindaki "Ses" etiketinin
@@ -214,7 +214,7 @@ public sealed class KareYerlesimTests
                 window.Arrange(new Rect(olcu));
                 window.UpdateLayout();
 
-                Visual? node = window.GetVisualDescendants().OfType<EsitSutunIzgara>()
+                Visual? node = window.GetVisualDescendants().OfType<SutunIzgara>()
                     .Single(grid => grid.Name == "InfoGrid");
                 while (node is not null)
                 {
@@ -253,7 +253,7 @@ public sealed class KareYerlesimTests
         var (tasan, satirlar, sutun) = Read(dil, olcu, window =>
         {
             var (t, s) = Tasanlar(window, olcu, null, kirpmaKapali: false, balonKapali: false);
-            return (t, s, Named<EsitSutunIzgara>(window, "InfoGrid").Columns);
+            return (t, s, Named<SutunIzgara>(window, "InfoGrid").Columns);
         });
 
         var klasor = Path.Combine(TipSources.Root, ".calisma", "t194");
@@ -291,7 +291,7 @@ public sealed class KareYerlesimTests
     /// </summary>
     private static (List<string> Tasan, List<string> Satirlar) Tasanlar(MainWindow window, Size olcu, string? mutasyon, bool kirpmaKapali, bool balonKapali)
     {
-        var grid = window.GetVisualDescendants().OfType<EsitSutunIzgara>()
+        var grid = window.GetVisualDescendants().OfType<SutunIzgara>()
             .Single(g => g.Name == "InfoGrid");
 
         var hucreler = grid.Children
@@ -365,7 +365,7 @@ public sealed class KareYerlesimTests
         var okunan = Read("tr", window =>
         {
             var ozet = Named<TextBlock>(window, ad);
-            ozet.Text = "Çözünürlük Düşürülebilir · Kare Hızı Düşürülebilir · Ses Yeniden Kodlanabilir";
+            ozet.Text = "Çözünürlük Düşürülebilir · Kare Hızı Düşürülebilir · Ses Yeniden Kodlanabilir · Altyazı Korunur · Bölümler Korunur";
 
             window.Measure(Genis);
             window.Arrange(new Rect(Genis));
@@ -1375,6 +1375,19 @@ public sealed class BaslikKapsamiTests
 
         Assert.True(satir > 0);
     }
+
+    /// <summary>
+    /// Sayidan sonra gelen birim buyutulmuyor: kaydedicinin tampon listesinde "30 S"
+    /// cikiyordu. Karsi yon: sayidan sonra gelen uzun sozcuk basliktaki gibi buyur.
+    /// </summary>
+    [Theory]
+    [InlineData("30 s", "en", "30 s")]
+    [InlineData("5 sn", "tr", "5 sn")]
+    [InlineData("10 mp", "hu", "10 mp")]
+    [InlineData("save last 30 s", "en", "Save Last 30 s")]
+    [InlineData("top 10 videos", "en", "Top 10 Videos")]
+    public void SayidanSonrakiBirimBuyutulmez(string ham, string dil, string beklenen)
+        => Assert.Equal(beklenen, LanguageCatalog.Title(ham, dil));
 }
 
 

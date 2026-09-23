@@ -252,6 +252,7 @@ internal static class LanguageCatalog
         var builder = new StringBuilder(text.Length);
         var index = 0;
         var lineStart = true;
+        string? previous = null;
 
         while (index < text.Length)
         {
@@ -266,13 +267,23 @@ internal static class LanguageCatalog
             var end = index;
             while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
             var word = text[index..end];
-            builder.Append(CapitaliseWord(word, culture, smallWords, lineStart));
+            builder.Append(IsUnitAfterNumber(word, previous) ? word : CapitaliseWord(word, culture, smallWords, lineStart));
             lineStart = false;
+            previous = word;
             index = end;
         }
 
         return builder.ToString();
     }
+
+    /// <summary>
+    /// Sayidan hemen sonra gelen en fazla uc harflik sozcuk bir birimdir ve yazildigi gibi
+    /// kalir: "30 s" "30 S"ye, "5 sn" "5 Sn"ye donmuyor. Birimler dilden dile degistigi
+    /// icin (<c>s</c>, <c>sn</c>, <c>mp</c>, <c>с</c>) liste yerine konumdan taniniyor.
+    /// </summary>
+    internal static bool IsUnitAfterNumber(string word, string? previous)
+        => previous is { Length: > 0 } && char.IsDigit(previous[0]) && previous.All(c => char.IsDigit(c) || c is '.' or ',')
+           && word.Length <= 3 && word.All(char.IsLetter) && !word.Any(char.IsUpper);
 
     /// <summary>
     /// Sozcugun <see cref="Verbatim"/> ya da <see cref="Names"/> listesinde bildirilmis

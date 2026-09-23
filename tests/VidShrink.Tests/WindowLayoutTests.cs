@@ -547,12 +547,16 @@ public sealed class WindowLayoutTests
     /// <para>S20: katlanmış bölüm özetleri başlığın altında kendi satırına indi ve sarılıyor.
     /// <b>Boş/tasarım</b> 865-965 → 941-1041 (ölçülen 991), <b>boş/taban</b> 960-1060 →
     /// 1015-1115 (ölçülen 1065). Dolu aralıklar değişmedi (906).</para>
+    /// <para>2026-09-23: bilgi ızgarası sabit dört sütundan içeriğe göre sütuna geçti (değerler
+    /// kesiliyordu). Tasarım boyunda <see cref="KucultSutunlari"/> sol sütunu dört sütunun
+    /// sığacağı kadar genişletiyor, aralık değişmedi. Dar pencerede sütunlar eşit kalıyor ve
+    /// ızgara iki sütun, dört satır: <b>dolu/dar</b> 906-1006 → 1006-1106 (ölçülen 1056).</para>
     /// </summary>
     [Theory]
     [InlineData(false, false, 941, 1041)]
     [InlineData(false, true, 1015, 1115)]
     [InlineData(true, false, 906, 1006)]
-    [InlineData(true, true, 906, 1006)]
+    [InlineData(true, true, 1006, 1106)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
     {
         var size = narrow ? MinimumSize() : DesignSize();
@@ -722,10 +726,12 @@ public sealed class WindowLayoutTests
     /// <para>S20: katlanmış bölüm özetleri başlığın altında kendi satırına indi. Dolu sayfada
     /// sol sütun 830'dan 906'ya çıktı (Türkçe ölçüm) ve orta sütunla (906) eşitlendi; tabela bu yüzden
     /// beklenen sütunun <b>en uzunlardan biri</b> olmasını sınıyor, eşitlikte ikisi de tutuyor.</para>
+    /// <para>2026-09-23: dolu sayfayı yeniden sol sütun tutuyor: bilgi ızgarası değerleri kesmeden
+    /// dört sütunda, sol sütun <see cref="KucultSutunlari"/> ile o kadar geniş.</para>
     /// </summary>
     [Theory]
     [InlineData(false, 0)]
-    [InlineData(true, 1)]
+    [InlineData(true, 0)]
     public void TheTallestColumnIsWhatHoldsThePage(bool loaded, int holder)
     {
         var (columns, content) = Read(DesignSize(), loaded, window =>

@@ -13,6 +13,9 @@
       RecorderStripPadding    <- ButtonPaddingSm (16,8). Denetim şeridi tek sıra düğmeden
                                  oluşuyor; iç boşluğu da o düğmelerin kendi boşluğu.
       RecorderStripGap        <- SpaceSm (8). Şeritteki iki öğe arası.
+      RecorderStatsInset      <- SpaceLg (16), soldan. Durum sözcüğü ("Boşta") ile sayaç
+                                 grubunun ilk etiketi ("Geçen") 8 px'le bitişik okunuyordu;
+                                 grup aralığı (8 + 16 = 24) sayaçların kendi aralığına (SpaceXl) eşit.
       RecorderButtonSize      <- FieldMinHeight (40). Şerit düğmesinin dokunma hedefi;
                                  alan yüksekliğiyle aynı sayı, şerit tek satır okunuyor.
       RecorderDotSize         <- SpaceMd (12). Kaydediyor göstergesinin çapı.
@@ -39,6 +42,7 @@
 
   <Thickness x:Key="RecorderStripPadding">16,8</Thickness>
   <x:Double x:Key="RecorderStripGap">8</x:Double>
+  <Thickness x:Key="RecorderStatsInset">16,0,0,0</Thickness>
   <x:Double x:Key="RecorderButtonSize">40</x:Double>
   <x:Double x:Key="RecorderDotSize">12</x:Double>
   <x:Double x:Key="RecorderPanelMinHeight">256</x:Double>
