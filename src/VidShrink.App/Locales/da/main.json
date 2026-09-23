@@ -420,7 +420,7 @@
   "main.reason.encoder-fallback-not-working": "{0}-koderen kunne ikke bruges på denne maskine, så kodningen falder tilbage til {1}",
   "main.reason.hdr-tonemapped": "kilden er HDR, men den valgte koder kan ikke bevare 10-bit, så den blev tonemappet til SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "kilden har dynamiske HDR-metadata (HDR10+ eller Dolby Vision), som denne kodning ikke fører videre, så outputtet beholder kun det statiske HDR10-lag",
-  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 har ingen målt CRF-skala i denne motor, så størrelsen holdes med to-pas VBR i stedet for et CRF-gæt",
+  "main.reason.vp9-crf-unmeasured": "CRF-kvalitetsskalaen for libvpx-vp9 er målt, men ikke hvordan en CRF-værdi slår igennem i filstørrelsen, så størrelsen holdes med to-pas VBR i stedet for et CRF-gæt",
   "main.reason.stream.audio-passthrough": "lydsporet kopieres uændret: containeren understøtter dets codec, og det holder sig inden for 15 % af målet",
   "main.reason.stream.audio-downmixed": "et surround-lydspor mixes ned til stereo under omkodningen",
   "main.reason.stream.extra-audio-dropped": "kun ét lydspor beholdes; slå 'Behold alle spor' til for at få dem alle med i MKV",

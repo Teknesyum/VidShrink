@@ -420,7 +420,7 @@
   "main.reason.encoder-fallback-not-working": "a(z) {0} kódoló nem használható ezen a gépen, ezért a kódolás {1}-re vált vissza",
   "main.reason.hdr-tonemapped": "a forrás HDR, de a kiválasztott kódoló nem őrzi meg a 10 bitet, ezért SDR BT.709-re tónusleképeztük",
   "main.reason.hdr-dynamic-dropped": "a forrás dinamikus HDR-metaadatokat hordoz (HDR10+ vagy Dolby Vision), amelyeket ez a kódolás nem visz át, ezért a kimenet csak a statikus HDR10 réteget tartja meg",
-  "main.reason.vp9-crf-unmeasured": "a libvpx-vp9-nek nincs mért CRF-skálája ebben a motorban, ezért a méretet kétmenetes VBR tartja CRF-becslés helyett",
+  "main.reason.vp9-crf-unmeasured": "a libvpx-vp9 CRF minőségi skálája mérve van, de nincs mérve, hogy egy CRF-érték hogyan hat a fájlméretre, ezért a méretet kétmenetes VBR tartja CRF-becslés helyett",
   "main.reason.stream.audio-passthrough": "a hangsáv változatlanul másolódik: a konténer támogatja a kodekjét, és a cél 15%-án belül marad",
   "main.reason.stream.audio-downmixed": "a térhatású hangsáv újrakódoláskor sztereóra keveredik",
   "main.reason.stream.extra-audio-dropped": "csak egy hangsáv marad meg; kapcsolja be a 'Minden sáv megtartása' lehetőséget, hogy mind MKV-ban menjen tovább",

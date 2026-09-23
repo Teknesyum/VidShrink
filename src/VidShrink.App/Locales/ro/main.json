@@ -420,7 +420,7 @@
   "main.reason.encoder-fallback-not-working": "codorul {0} nu a putut fi folosit pe acest calculator, deci codarea revine la {1}",
   "main.reason.hdr-tonemapped": "sursa este HDR, dar codorul ales nu poate păstra 10 biți, deci a fost mapată tonal în SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "sursa conține metadate HDR dinamice (HDR10+ sau Dolby Vision) pe care această codare nu le transmite, deci ieșirea păstrează doar stratul HDR10 static",
-  "main.reason.vp9-crf-unmeasured": "libvpx-vp9 nu are o scară CRF măsurată în acest motor, așa că dimensiunea e ținută de VBR în două treceri în loc de un CRF ghicit",
+  "main.reason.vp9-crf-unmeasured": "Scara de calitate CRF a libvpx-vp9 este măsurată, dar nu și modul în care o valoare CRF se traduce în dimensiunea fișierului, așa că dimensiunea e ținută de VBR în două treceri în loc de un CRF ghicit",
   "main.reason.stream.audio-passthrough": "pista audio este copiată ca atare: containerul acceptă codecul ei și rămâne în limita a 15% din țintă",
   "main.reason.stream.audio-downmixed": "o pistă audio surround este mixată în stereo la recodare",
   "main.reason.stream.extra-audio-dropped": "se păstrează o singură pistă audio; activați 'Păstrează toate pistele' pentru a le duce pe toate în MKV",

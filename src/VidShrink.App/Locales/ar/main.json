@@ -420,7 +420,7 @@
   "main.reason.encoder-fallback-not-working": "تعذر استخدام المرمّز {0} على هذا الجهاز، فيعود الترميز إلى {1}",
   "main.reason.hdr-tonemapped": "المصدر HDR لكن المرمّز المختار لا يحفظ 10 بت، فحُوّل بالتدرج إلى SDR BT.709",
   "main.reason.hdr-dynamic-dropped": "المصدر يحمل بيانات HDR ديناميكية (HDR10+ أو Dolby Vision) لا يمررها هذا الترميز، لذا يحتفظ الناتج بطبقة HDR10 الثابتة فقط",
-  "main.reason.vp9-crf-unmeasured": "لا يملك libvpx-vp9 مقياس CRF مُقاسًا في هذا المحرك، لذا يُضبط الحجم بترميز VBR بمرحلتين بدلًا من تخمين CRF",
+  "main.reason.vp9-crf-unmeasured": "مقياس جودة CRF في libvpx-vp9 مُقاس، لكن كيف تنعكس قيمة CRF على حجم الملف غير مُقاس، لذا يُضبط الحجم بترميز VBR بمرحلتين بدلًا من تخمين CRF",
   "main.reason.stream.audio-passthrough": "يُنسخ مسار الصوت كما هو: الحاوية تدعم ترميزه ولا يتجاوز 15% من الهدف",
   "main.reason.stream.audio-downmixed": "يُمزج مسار صوت محيطي إلى ستيريو أثناء إعادة ترميزه",
   "main.reason.stream.extra-audio-dropped": "يُحتفظ بمسار صوت واحد فقط؛ فعّل 'الاحتفاظ بكل المسارات' لنقلها كلها في MKV",
