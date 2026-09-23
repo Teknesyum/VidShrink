@@ -107,6 +107,63 @@ public sealed class PaletteApplyTests
     }
 
     /// <summary>
+    /// Yeniden boyama rengi değerle eşler; bir palette iki anahtar aynı değeri taşıyıp
+    /// dönülen palette ayrışırsa o renk belirsiz sayılıp boyanmıyordu. RosePine'da
+    /// NeonBlue ile NeonSuccess aynıydı: RosePine'dan dönünce vurgu ve gradyan
+    /// RosePine'ın camgöbeğinde kalıyordu. Her paletten varsayılana dönüş ölçülür.
+    /// </summary>
+    [Fact]
+    public void HerPalettenDonusteVurguYerineOturur()
+    {
+        var kalanlar = AppHost.Run(() =>
+        {
+            PaletteCatalog.Use(PaletteCatalog.Default);
+            var beklenen = VurguOkumasi();
+            var bozuk = new List<string>();
+
+            foreach (var name in PaletteCatalog.Names.Where(name => name != PaletteCatalog.Default))
+            {
+                PaletteCatalog.Use(name);
+                PaletteCatalog.Use(PaletteCatalog.Default);
+                var okunan = VurguOkumasi();
+                if (!okunan.SequenceEqual(beklenen))
+                    bozuk.Add($"{name}: {string.Join(" ", okunan)} ≠ {string.Join(" ", beklenen)}");
+            }
+
+            return bozuk;
+        });
+
+        Assert.True(kalanlar.Count == 0, "Dönüşte eski renkte kalan paletler:\n" + string.Join("\n", kalanlar));
+    }
+
+    private static IReadOnlyList<string> VurguOkumasi()
+    {
+        var gradyan = Resource("AccentGradient") is GradientBrush brush
+            ? brush.GradientStops.Select(stop => stop.Color.ToString())
+            : new[] { "<gradyan yok>" };
+        return new[] { BrushColour("NeonBlue"), BrushColour("NeonSuccess") }.Concat(gradyan).ToList();
+    }
+
+    /// <summary>
+    /// Üreteç bir palette her renk değerini tek anahtara verir; çakışma yeniden boyamayı
+    /// belirsiz yapar (<see cref="HerPalettenDonusteVurguYerineOturur"/>).
+    /// </summary>
+    [Fact]
+    public void AyniRenkIkiAnahtardaYok()
+    {
+        var kok = Path.Combine(TipSources.Root, "src", "VidShrink.App", "Themes", "Palette");
+        var cakisan = PaletteCatalog.Names
+            .SelectMany(name => System.Text.RegularExpressions.Regex
+                .Matches(File.ReadAllText(Path.Combine(kok, name, "Theme.axaml")), "<Color x:Key=\"([^\"]+)\">(#[0-9A-Fa-f]{8})<")
+                .GroupBy(m => m.Groups[2].Value.ToUpperInvariant())
+                .Where(g => g.Count() > 1)
+                .Select(g => $"{name} {g.Key}: {string.Join(", ", g.Select(m => m.Groups[1].Value))}"))
+            .ToList();
+
+        Assert.True(cakisan.Count == 0, string.Join("\n", cakisan));
+    }
+
+    /// <summary>
     /// Zemini açık olan paletler koyu denetim çeşidiyle açılırsa Fluent'in kendi açılır
     /// listeleri ve kaydırma çubukları koyu kalır. Çeşit paletin zemin parlaklığından
     /// hesaplanıyor; elle tutulan bir liste yok.

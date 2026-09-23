@@ -18,6 +18,11 @@ açık sayılır. Bunun iki sonucu var — Fluent'in kendi açılır listeleri v
 uzaklaşmak için koyulaşmak yerine açılır (`PaletteGen`'deki `Dim`, aynı 0,78 büyüklüğü
 ters yönde).
 
+İsteğe bağlı on ikinci çekirdek `atmos`: verilirse zemin tonları ve parıltı katmanları
+(`AtmosHot/Mid/Edge`) kor üçlüsü yerine bu renkten türer; parlaklık ember karışımınınkine
+indirilir, gövde yazısı kontrastı düşmez. Yalnız Neon kullanıyor (yeşil, `docs/tasarim/fable-neon-yesil-2026-09-23.md`).
+Vurgu gradyanı `AccentGradient` (accent1 → accent3) paletten değil `Theme.axaml`dan gelir.
+
 ## On Bir Çekirdek
 
 | Alan | Nerede görünür |
