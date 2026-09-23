@@ -27,7 +27,7 @@ internal static class ShellMenu
 
     internal const string ShrinkFlag = "--kucult";
 
-    internal static readonly int[] ShrinkTargets = { 100, 250, 500, 1024, 2048 };
+    internal static readonly int[] ShrinkTargets = { 100, 250, 500, 1000, 2000 };
 
     internal static readonly string[] Extensions =
     {

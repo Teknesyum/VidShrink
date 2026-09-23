@@ -19,12 +19,28 @@ public static class ShellIntegration
     /// betiği kendi dizisinden yazar; iki liste ölçüde karşılaştırılır.
     /// </summary>
     public static IReadOnlyList<int> QuickShrinkTargetsMegabytes { get; } =
-        new[] { 100, 250, 500, 1024, 2048 };
+        new[] { 100, 250, 500, 1000, 2000 };
+
+    /// <summary>
+    /// Ondalık MB'a geçmeden önceki hızlı listenin ikili hedefleri (1024, 2048). Kayıt
+    /// defterine eski kurulumda yazılmış <c>--kucult 1024</c> gibi çağrılar hâlâ gelir;
+    /// menüde artık gösterilmezler ama <see cref="AcceptedShrinkTargetsMegabytes"/>
+    /// üzerinden kabul edilmeye devam ederler.
+    /// </summary>
+    public static IReadOnlyList<int> LegacyShrinkTargetsMegabytes { get; } =
+        new[] { 1024, 2048 };
+
+    /// <summary>
+    /// <c>--kucult</c> argümanının kabul ettiği hedefler: güncel hızlı liste ve eski
+    /// kurulumlardan kalan ikili hedefler bir arada.
+    /// </summary>
+    public static IReadOnlyList<int> AcceptedShrinkTargetsMegabytes { get; } =
+        QuickShrinkTargetsMegabytes.Concat(LegacyShrinkTargetsMegabytes).ToArray();
 
     /// <summary>Hızlı küçültme isteğini uygulamaya taşıyan komut satırı bayrağı.</summary>
     public const string ShrinkFlag = "--kucult";
 
-    /// <summary>Hedef boyutun menü etiketi: 1024'ün tam katları GB, diğerleri MB.</summary>
+    /// <summary>Hedef boyutun menü etiketi: 1000'in tam katları GB, diğerleri MB.</summary>
     public static string FormatQuickShrinkLabel(int megabytes) => Bicim.HedefEtiketi(megabytes);
 
     /// <summary>Kurulum kökündeki başlatıcının açtığı uygulama, köke göre.</summary>
