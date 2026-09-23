@@ -191,7 +191,6 @@ public sealed record QualityTargetResult(
 public static class PlanCalculator
 {
     private const double ContainerOverhead = 0.995;
-    private const double KbitPerMib = 8388.608;
     public const double TwoPassUncertainty = 0.012;
     public const double SourceSizeCap = 0.95;
     private const double ScaleStep = 0.02;
@@ -451,7 +450,7 @@ public static class PlanCalculator
         if (regime == CompressionRegime.Extreme)
             notes.Add(AdviceCode.ExtremeRatioWarning);
 
-        var totalK = aimMb * KbitPerMib / Math.Max(info.DurationSeconds, 0.1);
+        var totalK = aimMb * Megabayt.Kbit / Math.Max(info.DurationSeconds, 0.1);
         var (audioK, audioChannels) = PickAudio(info, options, regime, totalK, notes);
 
         var audioSilenced = options.AudioChannels == AudioChannelOverride.None;
@@ -652,7 +651,7 @@ public static class PlanCalculator
             if (options.FillPolicy == FillPolicy.FillTarget && !qualityStopBinding)
             {
                 var (minCrf, _) = CodecModel.CrfRange(codec);
-                var totalBudgetK = aimMb * KbitPerMib * ContainerOverhead / Math.Max(info.DurationSeconds, 0.1);
+                var totalBudgetK = aimMb * Megabayt.Kbit * ContainerOverhead / Math.Max(info.DurationSeconds, 0.1);
                 var desiredVideoK = Math.Max(0.0, totalBudgetK - sideK - DeliveryReserveK(codec));
                 var desiredBppf = BitsPerPixel(desiredVideoK, best.Width, best.Height, best.Fps);
                 var fillCrf = complexity.CrfForBppf(codec, desiredBppf, best.Scale, best.Fps, info.Fps);
@@ -1043,7 +1042,7 @@ public static class PlanCalculator
     }
 
     public static int VideoBudgetK(double targetMb, int audioK, double durationSeconds)
-        => (int)Math.Max(0.0, Math.Floor(targetMb * KbitPerMib * ContainerOverhead / Math.Max(durationSeconds, 0.1) - audioK));
+        => (int)Math.Max(0.0, Math.Floor(targetMb * Megabayt.Kbit * ContainerOverhead / Math.Max(durationSeconds, 0.1) - audioK));
 
     public static double EffectiveTargetMb(double targetMb, double sourceMb)
         => sourceMb > 0 ? Math.Min(targetMb, sourceMb * SourceSizeCap) : targetMb;
@@ -1205,7 +1204,7 @@ public static class PlanCalculator
         var aimedVideoMb = Math.Max(aimMb - audioMb, 0.01);
         var factor = aimedVideoMb / deliveredVideoMb;
         var requestedVideoMb = aimedVideoMb / (efficiency ?? 1.0);
-        var videoBudgetK = Math.Max(0.0, requestedVideoMb * KbitPerMib * ContainerOverhead / Math.Max(durationSeconds, 0.1));
+        var videoBudgetK = Math.Max(0.0, requestedVideoMb * Megabayt.Kbit * ContainerOverhead / Math.Max(durationSeconds, 0.1));
         var aimSource = efficiency is double e
             ? $"aimed at {aimMb:0.0} MB, {BudgetFill.Aim:0.###} of the target, and divided by the {e:0.###} encoder yield measured on the previous attempt"
             : $"aimed at {aimMb:0.0} MB, the band center held back by the +{TwoPassUncertainty * 100:0.#}% two-pass spread because no encoder yield was measured yet";
@@ -1237,13 +1236,13 @@ public static class PlanCalculator
         => bppf * Math.Max(1.0, (double)width * height * fps) / 1000.0;
 
     private static double SizeMb(double videoK, double audioK, double durationSeconds)
-        => (videoK + audioK) * durationSeconds / KbitPerMib / ContainerOverhead;
+        => (videoK + audioK) * durationSeconds / Megabayt.Kbit / ContainerOverhead;
 
     public static double NonVideoMb(double nonVideoK, double durationSeconds)
         => SizeMb(0, nonVideoK, durationSeconds);
 
     public static double VideoKbitFor(double videoMb, double durationSeconds)
-        => durationSeconds <= 0 ? 0 : videoMb * KbitPerMib * ContainerOverhead / durationSeconds;
+        => durationSeconds <= 0 ? 0 : videoMb * Megabayt.Kbit * ContainerOverhead / durationSeconds;
 
     private sealed record Layout(int Width, int Height, double Fps, double Scale, double Score, double Bppf = 0, bool MeetsFloor = true, bool Deliverable = true);
 

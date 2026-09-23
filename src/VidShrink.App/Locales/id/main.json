@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB muat untuk forum lama dan gateway e-mail yang ketat.",
   "main.chip.25.tip": "25 MB muat untuk lampiran Gmail dan kebanyakan sistem tiket.",
   "main.chip.100.tip": "100 MB cocok untuk arsip dan unggahan yang mengutamakan kualitas daripada waktu transfer.",
-  "main.chip.128.label": "Maksimum berbagi",
-  "main.chip.128.tip": "• 128 MiB adalah batas terukur uguu.se, tujuan berbagi anonim dengan batas terkecil.\n• Berkas seukuran ini atau lebih kecil bisa diserahkan ke kedua tujuan berbagi tanpa ditolak.\n• Tujuan lain, storage.to, menampung jauh lebih banyak, jadi chip ini angka aman untuk keduanya.",
+  "main.chip.134.label": "Maksimum berbagi",
+  "main.chip.134.tip": "• 134 MB adalah batas terukur uguu.se, tujuan berbagi anonim dengan batas terkecil.\n• Berkas seukuran ini atau lebih kecil bisa diserahkan ke kedua tujuan berbagi tanpa ditolak.\n• Tujuan lain, storage.to, menampung jauh lebih banyak, jadi chip ini angka aman untuk keduanya.",
   "main.chip.180.label": "Maksimum WhatsApp Web",
   "main.chip.180.tip": "• Di ponsel: 16 MB dalam obrolan, 2 GB sebagai dokumen.\n• WhatsApp Web menerima 180 MB per berkas. Ini laporan pengguna, WhatsApp tidak memublikasikannya.\n• Jadi berkas 180 MB atau kurang lewat sisi web apa adanya.",
 

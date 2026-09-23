@@ -114,7 +114,7 @@ public sealed class TasmaKarariTests
         Assert.True(sonuc.OverTarget);
         Assert.False(sonuc.CeilingExceeded);
         Assert.True(File.Exists(cikti));
-        Assert.True(new FileInfo(cikti).Length > 0.001 * 1024 * 1024);
+        Assert.True(new FileInfo(cikti).Length > Megabayt.Tavan(0.001));
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public sealed class TasmaKarariTests
         Assert.True(sonuc.Success, sonuc.Error);
         Assert.NotNull(sonuc.Trim);
         Assert.False(sonuc.OverTarget);
-        Assert.True(new FileInfo(cikti).Length <= (long)Math.Floor(hedefMb * 1024 * 1024), $"{new FileInfo(cikti).Length} bayt, hedef {hedefMb} MB");
+        Assert.True(new FileInfo(cikti).Length <= Megabayt.Tavan(hedefMb), $"{new FileInfo(cikti).Length} bayt, hedef {hedefMb} MB");
     }
 
     [Fact]

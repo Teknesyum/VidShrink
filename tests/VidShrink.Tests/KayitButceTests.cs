@@ -35,9 +35,9 @@ public class KayitButceTests
     }
 
     /// <summary>
-    /// 10 MB / 30 sn, tek ses izi. Katsayı OBS'in tampon hesabının yazımı:
-    /// 10 × 8 × 1024 × 1024 / 1000 / 30 = 2796,2 kbit/sn toplam, eksi 160 ses = 2636 video.
-    /// Yaygın <c>×8192</c> yazımı 2730 verirdi; aradaki %2,4 bilerek OBS'in tarafında.
+    /// 10 MB / 30 sn, tek ses izi:
+    /// 10 × 8000 / 30 = 2666,7 kbit/sn toplam (ondalık MB), eksi 160 ses = 2506 video.
+    /// Eski OBS yazımı (<c>×8 × 1024 × 1024 / 1000</c>) 2636 verirdi.
     /// </summary>
     [Fact]
     public void OnMegabaytOtuzSaniye()
@@ -45,9 +45,9 @@ public class KayitButceTests
         var butce = RecorderBudget.From(10, 30, 1);
 
         Assert.Equal(RecorderBudgetVerdict.Usable, butce.Verdict);
-        Assert.Equal(2636, butce.VideoKbps);
-        Assert.Equal(2796, RecorderBudget.From(10, 30, 0).VideoKbps);
-        Assert.Equal(2476, RecorderBudget.From(10, 30, 2).VideoKbps);
+        Assert.Equal(2506, butce.VideoKbps);
+        Assert.Equal(2666, RecorderBudget.From(10, 30, 0).VideoKbps);
+        Assert.Equal(2346, RecorderBudget.From(10, 30, 2).VideoKbps);
     }
 
     /// <summary>Sıfır, negatif ve sayı olmayan hedefler hesaba girmiyor.</summary>
@@ -83,12 +83,12 @@ public class KayitButceTests
     [Fact]
     public void TabanSinirininIkiYakasi()
     {
-        Assert.Equal(195, (int)(0.7 * 8 * 1024 * 1024 / 1000 / 30));
+        Assert.Equal(186, (int)(0.7 * Megabayt.Kbit / 30));
         Assert.Equal(RecorderBudgetVerdict.TooSmall, RecorderBudget.From(0.7, 30, 0).Verdict);
 
-        Assert.Equal(223, (int)(0.8 * 8 * 1024 * 1024 / 1000 / 30));
+        Assert.Equal(213, (int)(0.8 * Megabayt.Kbit / 30));
         Assert.Equal(RecorderBudgetVerdict.Usable, RecorderBudget.From(0.8, 30, 0).Verdict);
-        Assert.Equal(223, RecorderBudget.From(0.8, 30, 0).VideoKbps);
+        Assert.Equal(213, RecorderBudget.From(0.8, 30, 0).VideoKbps);
     }
 
     /// <summary>

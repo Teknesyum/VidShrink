@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB vừa diễn đàn cũ và cổng e-mail nghiêm ngặt.",
   "main.chip.25.tip": "25 MB vừa tệp đính kèm Gmail và hầu hết hệ thống ticket.",
   "main.chip.100.tip": "100 MB hợp với lưu trữ và tải lên khi chất lượng quan trọng hơn thời gian truyền.",
-  "main.chip.128.label": "Tối đa chia sẻ",
-  "main.chip.128.tip": "• 128 MiB là trần đo được của uguu.se, đích chia sẻ ẩn danh có giới hạn nhỏ nhất.\n• Tệp bằng hoặc dưới mức này có thể gửi tới cả hai đích chia sẻ mà không bị từ chối.\n• Đích còn lại, storage.to, chứa được nhiều hơn nhiều, nên chip này là con số an toàn cho cả hai.",
+  "main.chip.134.label": "Tối đa chia sẻ",
+  "main.chip.134.tip": "• 134 MB là trần đo được của uguu.se, đích chia sẻ ẩn danh có giới hạn nhỏ nhất.\n• Tệp bằng hoặc dưới mức này có thể gửi tới cả hai đích chia sẻ mà không bị từ chối.\n• Đích còn lại, storage.to, chứa được nhiều hơn nhiều, nên chip này là con số an toàn cho cả hai.",
   "main.chip.180.label": "Tối đa WhatsApp Web",
   "main.chip.180.tip": "• Trên điện thoại: 16 MB trong chat, 2 GB dạng tài liệu.\n• WhatsApp Web nhận 180 MB mỗi tệp. Người dùng báo cáo vậy, WhatsApp không công bố.\n• Nên tệp từ 180 MB trở xuống đi qua bản web nguyên vẹn.",
 

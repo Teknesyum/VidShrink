@@ -9,7 +9,7 @@ Durum sütunu: **resmi** = değer aşağıdaki resmi yardım sayfasından okundu
 koddaki değerdir, değiştirilmedi. `OnAyarKutuphanesiTests` bu tablonun her satırını JSON ile
 karşılaştırır.
 
-Birim: VidShrink'in MB'ı yongalardaki gibi MiB'dir. "2 GB" gibi GB değerleri 1000 MB sayıldı.
+Birim: VidShrink'in MB'ı ondalıktır, 1 MB = 1 000 000 bayt (`docs/netlestirme/025-mb-birimi.md`). "2 GB" gibi GB değerleri 1000 MB sayıldı.
 
 | id | değer | durum | kaynak | not |
 |---|---|---|---|---|
@@ -18,7 +18,7 @@ Birim: VidShrink'in MB'ı yongalardaki gibi MiB'dir. "2 GB" gibi GB değerleri 1
 | whatsapp-chat | 16 MB | kodda | https://faq.whatsapp.com/164676891531296/ | SSS sayfası betikle çiziliyor, metni WebFetch ve curl ile okunamadı; 16 MB doğrulanmadı |
 | size-25 | 25 MB | kodda | — | genel yonga |
 | size-100 | 100 MB | kodda | — | genel yonga |
-| share-uguu | 128 MB | kodda | — | `paylasim-hedefleri.json` uguu.se `maxBytes` 134217728 = 128 MiB (ölçülmüş tavan) |
+| share-uguu | 134 MB | kodda | — | `paylasim-hedefleri.json` uguu.se `maxBytes` 134217728 = 128 MiB (ölçülmüş tavan); 134 MB = 134 000 000 bayt, tavanın altında |
 | whatsapp-web | 180 MB | kodda | — | ipucuna göre kullanıcı bildirimi, WhatsApp yayımlamıyor |
 | half | kaynağın yarısı | kodda | — | kaynaktan türetilir |
 | discord-free | 20 MB | resmi | https://support.discord.com/hc/en-us/articles/25444343291031-File-Attachments-FAQ | "As of August 2026, the free upload limit is 20MB (up from 10MB)"; iş tanımındaki 10 MB eski değer |

@@ -40,7 +40,7 @@ public sealed class ChipTests
     [InlineData("Chip8", "8")]
     [InlineData("Chip25", "25")]
     [InlineData("Chip100", "100")]
-    [InlineData("Chip128", "128")]
+    [InlineData("Chip134", "134")]
     [InlineData("Chip180", "180")]
     public void YongaTekSayiGosterir(string name, string number)
     {
@@ -80,7 +80,7 @@ public sealed class ChipTests
     /// </summary>
     [Theory]
     [InlineData("ChipWhatsApp", "WhatsApp Recommended")]
-    [InlineData("Chip128", "Sharing Maximum")]
+    [InlineData("Chip134", "Sharing Maximum")]
     [InlineData("Chip180", "WhatsApp Web Maximum")]
     public void BalonunIlkSatiriEskiEtiket(string name, string label)
     {
@@ -104,7 +104,7 @@ public sealed class ChipTests
     private static VidShrink.Core.MediaInfo Sample() => new()
     {
         FilePath = SamplePath,
-        FileSizeBytes = 420L * 1024 * 1024,
+        FileSizeBytes = 420_000_000L,
         DurationSeconds = 187.5,
         Width = 3840,
         Height = 2160,
@@ -121,7 +121,7 @@ public sealed class ChipTests
     private static VidShrink.Core.MediaInfo Modest() => new()
     {
         FilePath = @"C:\Kayitlar\telefon-kaydi-1080p30.mp4",
-        FileSizeBytes = 90L * 1024 * 1024,
+        FileSizeBytes = 90_000_000L,
         DurationSeconds = 62.0,
         Width = 1920,
         Height = 1080,

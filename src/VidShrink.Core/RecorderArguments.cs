@@ -1092,7 +1092,7 @@ public static class RecorderArguments
         return segment;
     }
 
-    public static long LimitBytes(double megabytes) => (long)Math.Floor(megabytes * 1024 * 1024);
+    public static long LimitBytes(double megabytes) => Megabayt.Tavan(megabytes);
 
     /// <summary>
     /// Kayit surerken alinan tek karelik ekran goruntusunun argumanlari. Ayni yakalama

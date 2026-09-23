@@ -267,7 +267,7 @@ public sealed class FpsDropTests : IClassFixture<FpsDropClips>
         Assert.Equal(0, Run(FfmpegArguments.Build(info, plan, output, 2, log)));
 
         var estimate = PlanCalculator.EstimatedMb(plan, info.DurationSeconds)!.Value;
-        var actual = new FileInfo(output).Length / 1024.0 / 1024.0;
+        var actual = Megabayt.Oku(new FileInfo(output).Length);
         Log($"tahmin {estimate:0.###} MB, gercek {actual:0.###} MB, oran {actual / estimate:0.###}");
 
         Assert.InRange(actual / estimate, 0.5, 1.15);

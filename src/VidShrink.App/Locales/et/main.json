@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB mahub vanematesse foorumitesse ja rangetesse e-posti lüüsidesse.",
   "main.chip.25.tip": "25 MB mahub Gmaili manustesse ja enamikku piletisüsteemidesse.",
   "main.chip.100.tip": "100 MB sobib arhiveerimiseks ja üleslaadimiseks, kus kvaliteet loeb rohkem kui edastusaeg.",
-  "main.chip.128.label": "Jagamise maksimum",
-  "main.chip.128.tip": "• 128 MiB on uguu.se mõõdetud ülempiir — see on väikseima piiriga anonüümne jagamissiht.\n• Selle suurusega või väiksema faili võtab kumbki jagamissiht vastu ilma keeldumata.\n• Teine siht, storage.to, kannab palju rohkem, seega on see kiip mõlemale ohutu number.",
+  "main.chip.134.label": "Jagamise maksimum",
+  "main.chip.134.tip": "• 134 MB on uguu.se mõõdetud ülempiir — see on väikseima piiriga anonüümne jagamissiht.\n• Selle suurusega või väiksema faili võtab kumbki jagamissiht vastu ilma keeldumata.\n• Teine siht, storage.to, kannab palju rohkem, seega on see kiip mõlemale ohutu number.",
   "main.chip.180.label": "WhatsApp Webi maksimum",
   "main.chip.180.tip": "• Telefonis: 16 MB vestluses, 2 GB dokumendina.\n• WhatsApp Web võtab 180 MB faili kohta. Seda teatavad kasutajad, WhatsApp ise ei avalda.\n• Seega läheb 180 MB või väiksem fail veebi kaudu läbi sellisena, nagu on.",
 

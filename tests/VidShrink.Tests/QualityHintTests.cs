@@ -16,7 +16,7 @@ public sealed class QualityHintTests
     private static MediaInfo SampleInfo() => new()
     {
         FilePath = "sample.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -62,14 +62,14 @@ public sealed class QualityHintTests
             .ToList();
 
         Assert.Equal(
-            new[] { "ChipArchive", "ChipWhatsApp", "Chip8", "Chip25", "Chip100", "Chip128", "Chip180", "ChipHalf" }.Order(),
+            new[] { "ChipArchive", "ChipWhatsApp", "Chip8", "Chip25", "Chip100", "Chip134", "Chip180", "ChipHalf" }.Order(),
             chips.Order());
 
         // Her yonganın balonu bir StackPanel: ilk çocuk ipucu, kalanını panel dolduruyor.
         Assert.DoesNotContain(chips, name => !YongaKapsami.Balonlu(block, name));
 
         var code = File.ReadAllText(TipSources.WindowCodePath);
-        var listed = Regex.Match(code, """\(ChipWhatsApp, 16\), \(Chip8, 8\), \(Chip25, 25\), \(Chip100, 100\),\s*\(Chip128, 128\), \(Chip180, 180\), \(ChipHalf, null\)""");
+        var listed = Regex.Match(code, """\(ChipWhatsApp, 16\), \(Chip8, 8\), \(Chip25, 25\), \(Chip100, 100\),\s*\(Chip134, 134\), \(Chip180, 180\), \(ChipHalf, null\)""");
         Assert.True(listed.Success, "QualityChips() boyut hedefi olan yedi yongayı listelemiyor.");
 
         var sized = Regex.Matches(listed.Value, @"\((Chip\w+),").Select(match => match.Groups[1].Value).ToList();

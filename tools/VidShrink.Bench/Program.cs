@@ -393,7 +393,7 @@ static int SearchCost(string[] args)
     var worst = new MediaInfo
     {
         FilePath = "huge.mkv",
-        FileSizeBytes = 4L * 1024 * 1024 * 1024 * 1024,
+        FileSizeBytes = 4_194_304_000_000L,
         DurationSeconds = 28800,
         Width = 3840,
         Height = 2160,
@@ -407,7 +407,7 @@ static int SearchCost(string[] args)
     var typical = new MediaInfo
     {
         FilePath = "capture.mkv",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,
@@ -528,7 +528,7 @@ static async Task<int> PeakCurveAsync(string[] args)
                 }
             }
 
-            var sizeMb = new FileInfo(outputPath).Length / 1024.0 / 1024.0;
+            var sizeMb = Megabayt.Oku(new FileInfo(outputPath).Length);
             var vmaf = await VmafNegAsync(source, outputPath, info.Width, info.Height);
             Console.WriteLine($"| {ratio:0.##} | {peak:0.00} | {produced:0.000} | {bitrateK} | {maxrateK} | {bufsizeK} | {sizeMb:0.###} | {Fmt(vmaf.Mean)} | {Fmt(vmaf.Harmonic)} | {Fmt(vmaf.P10)} | {Fmt(vmaf.Min)} | {vmaf.FloorClampedFrames} |");
             rows.Add(new
@@ -689,7 +689,7 @@ static async Task<int> ShrinkAsync(string[] args)
         .ToArray();
     if (measuredQuality && anchors.Length > 0) complexity = complexity.WithProbeQuality(anchors);
     if (sourceSize is { } overrideSize) info = info with { Width = overrideSize.Width, Height = overrideSize.Height };
-    if (sourceMb is { } overrideMb) info = info with { FileSizeBytes = (long)(overrideMb * 1024 * 1024) };
+    if (sourceMb is { } overrideMb) info = info with { FileSizeBytes = (long)(overrideMb * Megabayt.Bayt) };
     probeWatch.Stop();
     var results = new List<BenchResult>();
     var label = Path.GetFileNameWithoutExtension(source);
@@ -870,7 +870,7 @@ static async Task<int> MeasurePairAsync(string[] args)
         Referans = Path.GetFileName(args[1]),
         Test = Path.GetFileName(args[2]),
         Bayt = bytes,
-        Mb = bytes / 1024.0 / 1024.0,
+        Mb = Megabayt.Oku(bytes),
         test.DurationSeconds,
         Kbps = test.DurationSeconds > 0 ? bytes * 8 / 1000.0 / test.DurationSeconds : (double?)null,
         test.Width,

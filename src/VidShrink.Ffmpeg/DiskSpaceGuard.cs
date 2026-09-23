@@ -1,3 +1,5 @@
+using VidShrink.Core;
+
 namespace VidShrink.Ffmpeg;
 
 public static class DiskSpaceGuard
@@ -6,7 +8,7 @@ public static class DiskSpaceGuard
     private const long Multiplier = 3;
 
     public static long RequiredBytes(double targetMb)
-        => (long)((targetMb * Multiplier + ExtraBufferMb) * 1024.0 * 1024.0);
+        => (long)((targetMb * Multiplier + ExtraBufferMb) * Megabayt.Bayt);
 
     public static bool HasEnoughSpace(long freeBytes, double targetMb)
         => freeBytes >= RequiredBytes(targetMb);

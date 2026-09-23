@@ -405,8 +405,8 @@ public static class CliApp
         var targetMb = decision.TargetMb;
         if (DiskSpaceGuard.TryGetFreeBytes(decision.OutputPath, out var freeBytes) && !DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb))
         {
-            stderr.WriteLine(text.Format("error.no-space", Num(DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0, "0", text)));
-            return new FileRun(ExitCodes.Error, null, text.Format("error.no-space", Num(DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0, "0", text)));
+            stderr.WriteLine(text.Format("error.no-space", Num(Megabayt.Oku(DiskSpaceGuard.RequiredBytes(targetMb)), "0", text)));
+            return new FileRun(ExitCodes.Error, null, text.Format("error.no-space", Num(Megabayt.Oku(DiskSpaceGuard.RequiredBytes(targetMb)), "0", text)));
         }
 
         var clock = Stopwatch.StartNew();

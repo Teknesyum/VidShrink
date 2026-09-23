@@ -14,7 +14,7 @@ public sealed class GecisEtiketiTests
     private static MediaInfo Kaynak() => new()
     {
         FilePath = "kaynak.mp4",
-        FileSizeBytes = 40L * 1024 * 1024,
+        FileSizeBytes = 40_000_000L,
         DurationSeconds = 60,
         Width = 1920,
         Height = 1080,

@@ -14,7 +14,7 @@ public sealed class HardwareRateControlTests
     private static MediaInfo SourceInfo() => new()
     {
         FilePath = "source.mp4",
-        FileSizeBytes = 216L * 1024 * 1024,
+        FileSizeBytes = 216_000_000L,
         DurationSeconds = 400,
         Width = 1920,
         Height = 1080,

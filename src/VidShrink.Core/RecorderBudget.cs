@@ -34,9 +34,9 @@ public readonly record struct RecorderBudget(RecorderBudgetVerdict Verdict, int 
     public const int MinimumVideoKbps = 200;
 
     /// <summary>
-    /// Hedef boyutu ve süreyi bit hızına çevirir. Katsayı OBS'in tampon hesabının
-    /// yazımıdır (<c>×1000/8/1024/1024</c>'ün tersi); yaygın <c>×8192</c> yazımıyla
-    /// arasında %2,4 fark vardır ve burada bilerek OBS'inki seçilmiştir.
+    /// Hedef boyutu ve süreyi bit hızına çevirir. MB ondalık (<see cref="Megabayt"/>):
+    /// küçültmenin hedefiyle aynı birim, 1 MB = 8000 kbit. Eskiden OBS'in
+    /// <c>×8 × 1024 × 1024 / 1000</c> yazımıydı ve %4,9 fazla bayt üretiyordu.
     /// </summary>
     /// <param name="megabytes">Hedef dosya boyutu; verilmediyse <c>null</c>.</param>
     /// <param name="seconds">Hedef süre; verilmediyse <c>null</c>.</param>
@@ -49,7 +49,7 @@ public readonly record struct RecorderBudget(RecorderBudgetVerdict Verdict, int 
             || double.IsNaN(mb) || double.IsInfinity(mb) || mb <= 0 || sn <= 0 || audioTracks < 0)
             return new RecorderBudget(RecorderBudgetVerdict.Invalid, 0);
 
-        var total = mb * 8 * 1024 * 1024 / 1000 / sn;
+        var total = mb * Megabayt.Kbit / sn;
         var video = (int)Math.Floor(total - (double)AudioKbps * audioTracks);
 
         return video < MinimumVideoKbps

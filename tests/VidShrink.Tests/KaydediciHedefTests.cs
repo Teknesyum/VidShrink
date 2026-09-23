@@ -45,7 +45,7 @@ public sealed class KaydediciHedefTests
         var sinirli = RecorderArguments.Build(Istek() with { MaxMegabytes = 5 }, "a.mp4");
         var sinirsiz = RecorderArguments.Build(Istek(), "a.mp4");
 
-        Assert.Equal("5242880", Deger(sinirli, "-fs"));
+        Assert.Equal("5000000", Deger(sinirli, "-fs"));
         Assert.Null(Deger(sinirsiz, "-fs"));
         Assert.Contains(RecorderArguments.Validate(Istek() with { MaxMegabytes = 0 }, "a.mp4"), e => e.Contains("size limit"));
         Assert.Contains(RecorderArguments.Validate(Istek() with { MaxMegabytes = 2, Container = RecorderContainer.Gif }, "a.gif"), e => e.Contains("GIF"));
@@ -80,8 +80,8 @@ public sealed class KaydediciHedefTests
 
     /// <summary>
     /// Butce notundaki bit hizi ailenin yazimini kullanir: basamak ayraci yok.
-    /// Not <c>N0</c> ile yaziliyordu, yani Turkce arayuzde <c>2.796</c>; ayni
-    /// uygulamanin kaynak bilgisi ve plan paneli ayni birimi <c>2796</c> diye
+    /// Not <c>N0</c> ile yaziliyordu, yani Turkce arayuzde <c>2.666</c>; ayni
+    /// uygulamanin kaynak bilgisi ve plan paneli ayni birimi <c>2666</c> diye
     /// yaziyordu. Bu kol notun rakamlarini okur — eski yazimda ayrac gorunurdu.
     /// </summary>
     [Fact]
@@ -106,8 +106,8 @@ public sealed class KaydediciHedefTests
 
         File.WriteAllText(Path.Combine(Kanit, "butce-notu.txt"), not);
 
-        Assert.Contains("2796", not);
-        Assert.DoesNotContain("2.796", not);
+        Assert.Contains("2666", not);
+        Assert.DoesNotContain("2.666", not);
         Assert.DoesNotContain("2,796", not);
 
         Kapat("butce-notu.txt");
@@ -197,7 +197,7 @@ public sealed class KaydediciHedefTests
         Assert.Contains("7", olcu.boyut.Not);
         Assert.Equal((TimeSpan.FromSeconds(30), (double?)10), (olcu.ikisi.Istek.MaxDuration, olcu.ikisi.Istek.MaxMegabytes));
         Assert.NotNull(olcu.ikisi.Istek.BitrateKbps);
-        Assert.Equal("5242880", Deger(RecorderArguments.Build(olcu.boyut.Istek with { MaxMegabytes = 5 }, "a.mkv"), "-fs"));
+        Assert.Equal("5000000", Deger(RecorderArguments.Build(olcu.boyut.Istek with { MaxMegabytes = 5 }, "a.mkv"), "-fs"));
 
         Kapat("tek-hedef.txt");
     }
@@ -319,7 +319,7 @@ public sealed class KaydediciHedefTests
         var (kod, metin) = KayitKanit.Ffprobe(cikti, "boyut-siniri.ffprobe.txt");
         var baslik = File.Exists(cikti) ? System.Text.Encoding.ASCII.GetString(File.ReadAllBytes(cikti), 4, 4) : string.Empty;
         var (paketBayt, sonKume) = Paketler(cikti);
-        var sinir = (long)(0.02 * 1024 * 1024);
+        var sinir = Megabayt.Tavan(0.02);
 
         File.WriteAllLines(Path.Combine(Kanit, "boyut-siniri.txt"), new[] { $"ended={bitti} sn={sure:0.00} ok={sonuc.Ok} teslim={sonuc.OutputPath} bayt={bayt} paket={paketBayt} sonIkiAnahtarKumesi={sonKume} sinir={sinir} yakalamaKaldi={File.Exists(yakalama)} probe={kod}" });
         if (File.Exists(cikti)) File.Delete(cikti);

@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB ustreza starejšim forumom in strogim e-poštnim prehodom.",
   "main.chip.25.tip": "25 MB ustreza prilogam Gmaila in večini sistemov za prijave.",
   "main.chip.100.tip": "100 MB je primerno za arhiviranje in nalaganja, kjer je kakovost pomembnejša od časa prenosa.",
-  "main.chip.128.label": "Največ za deljenje",
-  "main.chip.128.tip": "• 128 MiB je izmerjena zgornja meja uguu.se, anonimnega cilja deljenja z najmanjšo omejitvijo.\n• Datoteko te velikosti ali manjšo sprejmeta oba cilja deljenja brez zavrnitve.\n• Drugi cilj, storage.to, sprejme veliko več, zato je ta čip varna številka za oba.",
+  "main.chip.134.label": "Največ za deljenje",
+  "main.chip.134.tip": "• 134 MB je izmerjena zgornja meja uguu.se, anonimnega cilja deljenja z najmanjšo omejitvijo.\n• Datoteko te velikosti ali manjšo sprejmeta oba cilja deljenja brez zavrnitve.\n• Drugi cilj, storage.to, sprejme veliko več, zato je ta čip varna številka za oba.",
   "main.chip.180.label": "Največ za WhatsApp Web",
   "main.chip.180.tip": "• Na telefonu: 16 MB v klepetu, 2 GB kot dokument.\n• WhatsApp Web sprejme 180 MB na datoteko. To poročajo uporabniki, WhatsApp tega ne objavlja.\n• Datoteka do 180 MB gre torej skozi spletno različico takšna, kot je.",
 

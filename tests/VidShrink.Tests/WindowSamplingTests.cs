@@ -136,7 +136,7 @@ public sealed class WindowSamplingTests
         var info = new MediaInfo
         {
             FilePath = "in.mp4",
-            FileSizeBytes = 830L * 1024 * 1024,
+            FileSizeBytes = 830_000_000L,
             Width = 1920,
             Height = 1080,
             Fps = SourceFps,

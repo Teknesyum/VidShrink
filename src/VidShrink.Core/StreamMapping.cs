@@ -475,7 +475,7 @@ public static class StreamMapping
             if (!keepAll && inventory && info.Streams.Count(stream => stream.Kind == StreamKind.Audio) > 1)
                 notes.Add(StreamNote.ExtraAudioDropped);
 
-            var passthroughBudgetK = targetMb > 0 ? targetMb * PassthroughTargetShare * 8388.608 / duration : 0;
+            var passthroughBudgetK = targetMb > 0 ? targetMb * PassthroughTargetShare * Megabayt.Kbit / duration : 0;
             var passedK = 0.0;
             foreach (var source in sources)
             {

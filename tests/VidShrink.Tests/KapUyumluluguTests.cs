@@ -14,7 +14,7 @@ public sealed class KapUyumluluguTests
     private static MediaInfo Kaynak(params SourceStream[] streams) => new()
     {
         FilePath = "girdi.mkv",
-        FileSizeBytes = 400L * 1024 * 1024,
+        FileSizeBytes = 400_000_000L,
         DurationSeconds = 600,
         Width = 1920,
         Height = 1080,

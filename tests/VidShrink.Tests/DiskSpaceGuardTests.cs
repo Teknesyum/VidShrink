@@ -11,13 +11,13 @@ public sealed class DiskSpaceGuardTests
     [InlineData(0, 199, false)]
     public void HasEnoughSpaceComparesAgainstTargetTimesThreePlusBuffer(double targetMb, long freeMb, bool expected)
     {
-        var freeBytes = freeMb * 1024L * 1024L;
+        var freeBytes = freeMb * 1_000_000L;
         Assert.Equal(expected, DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb));
     }
 
     [Fact]
     public void RequiredBytesMatchesTargetTimesThreePlusTwoHundred()
     {
-        Assert.Equal(500L * 1024 * 1024, DiskSpaceGuard.RequiredBytes(100));
+        Assert.Equal(500_000_000L, DiskSpaceGuard.RequiredBytes(100));
     }
 }

@@ -7,7 +7,7 @@ public sealed class ConversionArgumentsTests
     private static readonly MediaInfo Source = new()
     {
         FilePath = @"C:\media\source.mp4",
-        FileSizeBytes = 20 * 1024 * 1024,
+        FileSizeBytes = 20_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,

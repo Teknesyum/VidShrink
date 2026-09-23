@@ -16,7 +16,7 @@ public sealed class IzPaneliTests : IDisposable
     private static MediaInfo Kaynak(string yol = "C:\\ornek\\film.mkv") => new()
     {
         FilePath = yol,
-        FileSizeBytes = 50L * 1024 * 1024,
+        FileSizeBytes = 50_000_000L,
         DurationSeconds = 60,
         Width = 1280,
         Height = 720,

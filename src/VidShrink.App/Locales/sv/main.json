@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB passar äldre forum och strikta e-postgränser.",
   "main.chip.25.tip": "25 MB passar Gmail-bilagor och de flesta ärendesystem.",
   "main.chip.100.tip": "100 MB passar arkivering och uppladdningar där kvalitet väger tyngre än överföringstid.",
-  "main.chip.128.label": "Delningsmax",
-  "main.chip.128.tip": "• 128 MiB är det uppmätta taket för uguu.se, det anonyma delningsmålet med lägst gräns.\n• En fil på eller under den storleken kan lämnas till båda delningsmålen utan att nekas.\n• Det andra målet, storage.to, tar mycket mer, så den här knappen är det säkra värdet för båda.",
+  "main.chip.134.label": "Delningsmax",
+  "main.chip.134.tip": "• 134 MB är det uppmätta taket för uguu.se, det anonyma delningsmålet med lägst gräns.\n• En fil på eller under den storleken kan lämnas till båda delningsmålen utan att nekas.\n• Det andra målet, storage.to, tar mycket mer, så den här knappen är det säkra värdet för båda.",
   "main.chip.180.label": "WhatsApp Web-max",
   "main.chip.180.tip": "• I telefonen: 16 MB i chatten, 2 GB som dokument.\n• WhatsApp Web tar 180 MB per fil. Användare rapporterar detta, WhatsApp publicerar det inte.\n• En fil på 180 MB eller mindre går alltså igenom webbsidan som den är.",
 

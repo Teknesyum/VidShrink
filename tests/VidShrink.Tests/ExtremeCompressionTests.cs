@@ -18,7 +18,7 @@ public sealed class ExtremeCompressionTests
     private static MediaInfo GameCapture() => new()
     {
         FilePath = "gothic.mp4",
-        FileSizeBytes = 830L * 1024 * 1024,
+        FileSizeBytes = 830_000_000L,
         DurationSeconds = SourceSeconds,
         Width = 1920,
         Height = 1080,

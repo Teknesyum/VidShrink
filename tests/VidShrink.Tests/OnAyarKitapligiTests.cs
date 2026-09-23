@@ -18,7 +18,7 @@ public sealed class OnAyarKitapligiTests
     private static MediaInfo Kaynak() => new()
     {
         FilePath = Path.Combine(Path.GetTempPath(), "kitaplik-kaynak.mp4"),
-        FileSizeBytes = 400L * 1024 * 1024,
+        FileSizeBytes = 400_000_000L,
         DurationSeconds = 600,
         Width = 1920,
         Height = 1080,

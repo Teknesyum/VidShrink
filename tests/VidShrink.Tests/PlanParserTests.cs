@@ -8,7 +8,7 @@ public sealed class PlanParserTests
     private static readonly MediaInfo Source = new()
     {
         FilePath = @"C:\media\source.mp4",
-        FileSizeBytes = 40 * 1024 * 1024,
+        FileSizeBytes = 40_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,

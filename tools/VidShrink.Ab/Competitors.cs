@@ -31,7 +31,7 @@ public sealed class HandBrakeCompetitor : ICompetitor
         if (durationSeconds <= 0) throw new ArgumentOutOfRangeException(nameof(durationSeconds));
         if (containerOverhead is < 0 or >= 1) throw new ArgumentOutOfRangeException(nameof(containerOverhead));
 
-        var bits = targetMb * 1024.0 * 1024.0 * 8.0 * (1.0 - containerOverhead);
+        var bits = targetMb * Megabayt.Bayt * 8.0 * (1.0 - containerOverhead);
         return Math.Max(1, (int)Math.Round(bits / durationSeconds / 1000.0, MidpointRounding.AwayFromZero));
     }
 

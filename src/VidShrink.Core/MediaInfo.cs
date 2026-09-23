@@ -84,7 +84,7 @@ public sealed record MediaInfo
         ? Math.Max(1, (int)Math.Round(Width * (double)ParNum / ParDen))
         : Width;
 
-    public double FileSizeMb => FileSizeBytes / 1024.0 / 1024.0;
+    public double FileSizeMb => Megabayt.Oku(FileSizeBytes);
     public long Pixels => (long)Width * Height;
 }
 

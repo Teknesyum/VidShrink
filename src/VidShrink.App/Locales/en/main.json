@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB fits older forums and strict e-mail gateways.",
   "main.chip.25.tip": "25 MB fits Gmail attachments and most ticket systems.",
   "main.chip.100.tip": "100 MB suits archiving and uploads where quality matters more than transfer time.",
-  "main.chip.128.label": "Sharing maximum",
-  "main.chip.128.tip": "• 128 MiB is the measured ceiling of uguu.se, the anonymous share target with the smallest limit.\n• A file at or under this size can be handed to either share target without being refused.\n• The other target, storage.to, carries far more, so this chip is the safe number for both.",
+  "main.chip.134.label": "Sharing maximum",
+  "main.chip.134.tip": "• 134 MB is the measured ceiling of uguu.se, the anonymous share target with the smallest limit.\n• A file at or under this size can be handed to either share target without being refused.\n• The other target, storage.to, carries far more, so this chip is the safe number for both.",
   "main.chip.180.label": "WhatsApp Web maximum",
   "main.chip.180.tip": "• On the phone: 16 MB in chat, 2 GB as a document.\n• WhatsApp Web takes 180 MB per file. The user reports this, WhatsApp does not publish it.\n• So a file of 180 MB or less goes through the web side as it is.",
 

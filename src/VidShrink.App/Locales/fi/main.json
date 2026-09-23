@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB mahtuu vanhoille foorumeille ja tiukoille sähköpostipalvelimille.",
   "main.chip.25.tip": "25 MB mahtuu Gmail-liitteisiin ja useimpiin tikettijärjestelmiin.",
   "main.chip.100.tip": "100 MB sopii arkistointiin ja lähetyksiin, joissa laatu on siirtoaikaa tärkeämpi.",
-  "main.chip.128.label": "Jaon enimmäiskoko",
-  "main.chip.128.tip": "• 128 MiB on uguu.se:n mitattu yläraja; se on pienimmän rajan anonyymi jakokohde.\n• Tämän kokoinen tai pienempi tiedosto kelpaa kummallekin jakokohteelle.\n• Toinen kohde, storage.to, ottaa paljon enemmän, joten tämä on kummallekin turvallinen luku.",
+  "main.chip.134.label": "Jaon enimmäiskoko",
+  "main.chip.134.tip": "• 134 MB on uguu.se:n mitattu yläraja; se on pienimmän rajan anonyymi jakokohde.\n• Tämän kokoinen tai pienempi tiedosto kelpaa kummallekin jakokohteelle.\n• Toinen kohde, storage.to, ottaa paljon enemmän, joten tämä on kummallekin turvallinen luku.",
   "main.chip.180.label": "WhatsApp Webin enimmäiskoko",
   "main.chip.180.tip": "• Puhelimessa: 16 MB keskustelussa, 2 GB asiakirjana.\n• WhatsApp Web ottaa 180 MB per tiedosto. Käyttäjät raportoivat tämän, WhatsApp ei julkaise sitä.\n• Joten 180 MB tai pienempi tiedosto menee webin kautta sellaisenaan.",
 

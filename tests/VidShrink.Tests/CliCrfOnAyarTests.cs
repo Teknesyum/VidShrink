@@ -14,7 +14,7 @@ public sealed class CliCrfOnAyarTests
     private static MediaInfo Info() => new()
     {
         FilePath = "girdi.mp4",
-        FileSizeBytes = 400L * 1024 * 1024,
+        FileSizeBytes = 400_000_000L,
         DurationSeconds = 600,
         Width = 1920,
         Height = 1080,

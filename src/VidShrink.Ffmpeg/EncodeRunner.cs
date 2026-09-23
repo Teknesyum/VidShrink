@@ -280,7 +280,7 @@ public sealed class EncodeRunner
 
             fillClock.Stop();
             attemptSeconds = fillClock.Elapsed.TotalSeconds;
-            var upMb = new FileInfo(upPath).Length / 1024.0 / 1024.0;
+            var upMb = Megabayt.Oku(new FileInfo(upPath).Length);
             var upEfficiency = PlanCalculator.MeasuredEncoderEfficiency(step, upMb, Sure(step));
             if (!BudgetFill.Keeps(delivered.OutputMb, upMb, effectiveTargetMb))
             {
@@ -330,7 +330,7 @@ public sealed class EncodeRunner
 
                 attemptClock.Stop();
                 attemptSeconds = attemptClock.Elapsed.TotalSeconds;
-                var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
+                var actualMb = Megabayt.Oku(new FileInfo(partialPath).Length);
                 var efficiency = PlanCalculator.MeasuredEncoderEfficiency(current, actualMb, Sure(current));
                 var aimMb = PlanCalculator.RetryAimMb(effectiveTargetMb, efficiency);
                 var over = actualMb > effectiveTargetMb * ToleranceOver;
@@ -450,7 +450,7 @@ public sealed class EncodeRunner
                         continue;
                     }
 
-                    var targetBytes = (long)Math.Floor(effectiveTargetMb * 1024 * 1024);
+                    var targetBytes = Megabayt.Tavan(effectiveTargetMb);
                     IReadOnlyList<TrimPlan> trims = Array.Empty<TrimPlan>();
                     if (OvershootTrim.Offered(current, actualMb, effectiveTargetMb))
                     {
@@ -489,7 +489,7 @@ public sealed class EncodeRunner
                         var trimmed = await OvershootTrimmer.TrimAsync(partialPath, outputPath, targetBytes, side, ct);
                         if (trimmed.Landed)
                         {
-                            var trimmedMb = trimmed.Bytes / 1024.0 / 1024.0;
+                            var trimmedMb = Megabayt.Oku(trimmed.Bytes);
                             Iz(new EncodeAttempt(attempt, $"trimmed {trimmed.Plan!.RemovedSeconds:0.###} s ({side})", aimMb, trimmedMb, current.VideoBitrateK, current.Mode));
                             TryDelete(partialPath);
                             return new EncodeResult(true, outputPath, trimmedMb, current, attempt, null, Trace: trace, DroppedOptions: dropped, Trim: trimmed.Plan);
@@ -557,7 +557,7 @@ public sealed class EncodeRunner
             File.Copy(info.FilePath, deliveredPath, overwrite: true);
         }
 
-        var mb = new FileInfo(deliveredPath).Length / 1024.0 / 1024.0;
+        var mb = Megabayt.Oku(new FileInfo(deliveredPath).Length);
         var trace = new List<EncodeAttempt> { new(1, "pass-through", mb, mb, plan.VideoBitrateK, plan.Mode) };
         return new EncodeResult(true, deliveredPath, mb, plan, 1, null, Trace: trace);
     }
@@ -586,7 +586,7 @@ public sealed class EncodeRunner
                 await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, availability: EncoderCapabilities.Instance), duration, progress, "converting", 0, 1, ct);
 
             File.Move(partialPath, outputPath, overwrite: true);
-            return new ConversionResult(outputPath, new FileInfo(outputPath).Length / 1024.0 / 1024.0);
+            return new ConversionResult(outputPath, Megabayt.Oku(new FileInfo(outputPath).Length));
         }
         catch (OperationCanceledException) { TryDelete(partialPath); throw; }
         catch { TryDelete(partialPath); throw; }
@@ -715,7 +715,7 @@ public sealed class EncodeRunner
             var value = readLine[(sep + 1)..];
 
             if (key == "total_size" && long.TryParse(value, out var size))
-                outMb = size / 1024.0 / 1024.0;
+                outMb = Megabayt.Oku(size);
 
             if (key != "out_time_ms" || !long.TryParse(value, out var us)) continue;
 

@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB past in oudere forums en strenge e-mailgateways.",
   "main.chip.25.tip": "25 MB past in Gmail-bijlagen en de meeste ticketsystemen.",
   "main.chip.100.tip": "100 MB is geschikt voor archivering en uploads waar kwaliteit belangrijker is dan overdrachtstijd.",
-  "main.chip.128.label": "Deelmaximum",
-  "main.chip.128.tip": "• 128 MiB is de gemeten limiet van uguu.se, het anonieme deeldoel met de kleinste limiet.\n• Een bestand op of onder deze grootte kan aan beide deeldoelen worden gegeven zonder te worden geweigerd.\n• Het andere doel, storage.to, neemt veel meer, dus deze chip is het veilige getal voor beide.",
+  "main.chip.134.label": "Deelmaximum",
+  "main.chip.134.tip": "• 134 MB is de gemeten limiet van uguu.se, het anonieme deeldoel met de kleinste limiet.\n• Een bestand op of onder deze grootte kan aan beide deeldoelen worden gegeven zonder te worden geweigerd.\n• Het andere doel, storage.to, neemt veel meer, dus deze chip is het veilige getal voor beide.",
   "main.chip.180.label": "WhatsApp Web maximum",
   "main.chip.180.tip": "• Op de telefoon: 16 MB in de chat, 2 GB als document.\n• WhatsApp Web neemt 180 MB per bestand. Dit melden gebruikers, WhatsApp publiceert het niet.\n• Een bestand van 180 MB of minder gaat dus ongewijzigd door de webkant.",
 

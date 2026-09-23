@@ -14,7 +14,7 @@ public sealed class SosyalOnAyarTests
     private static MediaInfo Kaynak() => new()
     {
         FilePath = "social.mp4",
-        FileSizeBytes = 300L * 1024 * 1024,
+        FileSizeBytes = 300_000_000L,
         DurationSeconds = 30,
         Width = 1920,
         Height = 1080,

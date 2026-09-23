@@ -10,7 +10,7 @@ public sealed class HizalamaRaporuTests
     private static MediaInfo Kaynak() => new()
     {
         FilePath = @"C:\Kayitlar\hizalama.mp4",
-        FileSizeBytes = 90L * 1024 * 1024,
+        FileSizeBytes = 90_000_000L,
         DurationSeconds = 62.0,
         Width = 1920,
         Height = 1080,

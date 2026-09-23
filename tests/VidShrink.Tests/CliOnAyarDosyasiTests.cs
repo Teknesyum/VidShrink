@@ -25,7 +25,7 @@ public sealed class CliOnAyarDosyasiTests : IDisposable
     private static MediaInfo Kaynak() => new()
     {
         FilePath = "kaynak.mp4",
-        FileSizeBytes = 400L * 1024 * 1024,
+        FileSizeBytes = 400_000_000L,
         DurationSeconds = 600,
         Width = 1920,
         Height = 1080,

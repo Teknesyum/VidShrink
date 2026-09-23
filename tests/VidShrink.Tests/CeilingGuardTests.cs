@@ -7,11 +7,15 @@ namespace VidShrink.Tests;
 
 public sealed class CeilingGuardTests
 {
+    private const double MiB = 1024.0 * 1024.0 / Megabayt.Bayt;
+
+    private const double Tavan = 1.4648 * MiB;
+
     private static readonly SizeSample[] RampaIzi =
     {
-        new(1174, 1.497, true),
-        new(1102, 1.707, true),
-        new(908, 1.522, true)
+        new(1174, 1.497 * MiB, true),
+        new(1102, 1.707 * MiB, true),
+        new(908, 1.522 * MiB, true)
     };
 
     private static EncodePlan Son(string codec, int k = 908) => new()
@@ -27,12 +31,12 @@ public sealed class CeilingGuardTests
         Preset = codec == "libsvtav1" ? "6" : "slow"
     };
 
-    private static double Mb(int k, double verim) => k * 10 / 8388.608 / 0.995 * verim;
+    private static double Mb(int k, double verim) => k * 10 / Megabayt.Kbit / 0.995 * verim;
 
     [Fact]
     public void RampaIzindeSvtIstegiEnKotuVerimleTavaninDokuzdaDokuzunaNisanAlir()
     {
-        var plan = CeilingGuard.Plan(Son("libsvtav1"), RampaIzi, 1.4648, 10);
+        var plan = CeilingGuard.Plan(Son("libsvtav1"), RampaIzi, Tavan, 10);
 
         Assert.NotNull(plan);
         Assert.Equal(786, plan!.VideoBitrateK);
@@ -42,14 +46,14 @@ public sealed class CeilingGuardTests
         foreach (var s in RampaIzi)
         {
             var verim = s.ActualMb / Mb(s.VideoBitrateK, 1.0);
-            Assert.True(Mb(plan.VideoBitrateK, verim) <= 1.4648, $"verim {verim:0.###} ile {Mb(plan.VideoBitrateK, verim):0.####} MB");
+            Assert.True(Mb(plan.VideoBitrateK, verim) <= Tavan, $"verim {verim:0.###} ile {Mb(plan.VideoBitrateK, verim):0.####} MB");
         }
     }
 
     /// <summary>
     /// Bekçinin gerekçesi motorun İngilizce metni: makinenin kültürünü okumamalı. Üç sayı
     /// (tavan, nişan, tampon saniyesi) araya biçim konmadan yazılıyordu, yani Türkçe bir
-    /// makinede <c>1,465 MB</c> ve <c>0,90</c> çıkıyordu. Ölçü <c>tr-TR</c> altında kurar.
+    /// makinede <c>1,536 MB</c> ve <c>0,90</c> çıkıyordu. Ölçü <c>tr-TR</c> altında kurar.
     /// </summary>
     [Fact]
     public void BekciGerekcesiMakineninKulturunuOkumaz()
@@ -59,13 +63,13 @@ public sealed class CeilingGuardTests
         {
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("tr-TR");
 
-            var plan = CeilingGuard.Plan(Son("libx264"), RampaIzi, 1.4648, 10);
+            var plan = CeilingGuard.Plan(Son("libx264"), RampaIzi, Tavan, 10);
 
             Assert.NotNull(plan);
-            Assert.Contains("1.465 MB", plan!.Reason);
+            Assert.Contains("1.536 MB", plan!.Reason);
             Assert.Contains(CeilingGuard.Aim.ToString("0.00", CultureInfo.InvariantCulture) + " of it", plan.Reason);
             Assert.Contains(CeilingGuard.VbvWindowSeconds.ToString("0.##", CultureInfo.InvariantCulture) + " s buffer", plan.Reason);
-            Assert.DoesNotContain("1,465", plan.Reason);
+            Assert.DoesNotContain("1,536", plan.Reason);
             Assert.DoesNotContain("0,90", plan.Reason);
         }
         finally { CultureInfo.CurrentCulture = onceki; }
@@ -74,7 +78,7 @@ public sealed class CeilingGuardTests
     [Fact]
     public void X264BekcisiTepeyiOrtalamayaEsitlerVeBirSaniyelikTamponuPayaKatar()
     {
-        var plan = CeilingGuard.Plan(Son("libx264"), RampaIzi, 1.4648, 10);
+        var plan = CeilingGuard.Plan(Son("libx264"), RampaIzi, Tavan, 10);
 
         Assert.NotNull(plan);
         Assert.Equal(714, plan!.VideoBitrateK);
@@ -85,7 +89,7 @@ public sealed class CeilingGuardTests
     public void X265BekcisiTepeyiSerbestBirakirCunkuTepeEsitlemesiTasmayiBuyuttu()
     {
         var info = new MediaInfo { FilePath = "kaynak.mp4", DurationSeconds = 10, Width = 1920, Height = 1080, Fps = 24, VideoCodec = "h264", FileSizeBytes = 10_000_000, TotalBitrateBps = 8_000_000 };
-        var plan = CeilingGuard.Plan(Son("libx265"), RampaIzi, 1.4648, 10);
+        var plan = CeilingGuard.Plan(Son("libx265"), RampaIzi, Tavan, 10);
 
         Assert.NotNull(plan);
         Assert.False(plan!.PeakEqualsRate);
@@ -102,7 +106,7 @@ public sealed class CeilingGuardTests
         var plan = CeilingGuard.Plan(Son("libx264", 990), izler, 1.0, 10);
 
         Assert.NotNull(plan);
-        Assert.Equal(682, plan!.VideoBitrateK);
+        Assert.Equal(651, plan!.VideoBitrateK);
         Assert.Equal(1.0, CeilingGuard.WorstYield(Son("libx264", 990), izler, 10));
     }
 
@@ -111,7 +115,7 @@ public sealed class CeilingGuardTests
     {
         var izler = RampaIzi.Append(new SizeSample(500, Mb(500, 1.9), false)).ToArray();
 
-        var plan = CeilingGuard.Plan(Son("libsvtav1", 500), izler, 1.4648, 10);
+        var plan = CeilingGuard.Plan(Son("libsvtav1", 500), izler, Tavan, 10);
 
         Assert.NotNull(plan);
         Assert.Equal((int)Math.Floor(500 * CeilingGuard.BelowTriedRequest), plan!.VideoBitrateK);
@@ -120,7 +124,7 @@ public sealed class CeilingGuardTests
 
     [Fact]
     public void TekTavanUstuOrnekteBekciKurulmaz()
-        => Assert.Null(CeilingGuard.Plan(Son("libsvtav1"), RampaIzi.Take(1).ToArray(), 1.4648, 10));
+        => Assert.Null(CeilingGuard.Plan(Son("libsvtav1"), RampaIzi.Take(1).ToArray(), Tavan, 10));
 
     [Fact]
     public void IstekKosulabilirTabaninAltinaDuserseBekciKurulmaz()
@@ -130,7 +134,7 @@ public sealed class CeilingGuardTests
     public void BayrakX264ArgumanindaTepeVeTamponuIstegeEsitler()
     {
         var info = new MediaInfo { FilePath = "kaynak.mp4", DurationSeconds = 10, Width = 1920, Height = 1080, Fps = 24, VideoCodec = "h264", FileSizeBytes = 10_000_000, TotalBitrateBps = 8_000_000 };
-        var bekci = CeilingGuard.Plan(Son("libx264"), RampaIzi, 1.4648, 10)!;
+        var bekci = CeilingGuard.Plan(Son("libx264"), RampaIzi, Tavan, 10)!;
         var bayraksiz = bekci.Clone();
         bayraksiz.PeakEqualsRate = false;
 
@@ -158,9 +162,9 @@ public sealed class CeilingGuardTests
     [Fact]
     public void DuzeltmeBekcininBayraginiTasimaz()
     {
-        var bekci = CeilingGuard.Plan(Son("libx264"), RampaIzi, 1.4648, 10)!;
+        var bekci = CeilingGuard.Plan(Son("libx264"), RampaIzi, Tavan, 10)!;
 
-        var sonraki = PlanCalculator.Correct(bekci, 1.6, 1.4648, 10);
+        var sonraki = PlanCalculator.Correct(bekci, 1.6 * MiB, Tavan, 10);
 
         Assert.False(sonraki.PeakEqualsRate);
     }
@@ -188,7 +192,7 @@ public sealed class CeilingGuardTests
         var bekci = sonuc.Trace!.Single(a => a.Branch.StartsWith("ceiling guard", StringComparison.Ordinal));
         Assert.Equal(bekci.VideoBitrateK, sonuc.Trace!.Last(a => a.Branch == "over ceiling").VideoBitrateK);
         Assert.True(bekci.VideoBitrateK < sonuc.Trace!.Where(a => a.Number < 3 && a.Branch == "over ceiling").Min(a => a.VideoBitrateK), iz);
-        Assert.Equal(denenen.Min(), new FileInfo(cikti).Length / 1024.0 / 1024.0, 6);
+        Assert.Equal(denenen.Min(), Megabayt.Oku(new FileInfo(cikti).Length), 6);
         Assert.Empty(Directory.GetFiles(klasor, "vidshrink_partial_*"));
     }
 

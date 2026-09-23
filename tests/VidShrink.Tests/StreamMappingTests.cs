@@ -262,7 +262,7 @@ public sealed class StreamMappingTests
     private static MediaInfo Kaynak(params SourceStream[] streams) => new()
     {
         FilePath = "girdi.mkv",
-        FileSizeBytes = 400L * 1024 * 1024,
+        FileSizeBytes = 400_000_000L,
         DurationSeconds = 600,
         Width = 1920,
         Height = 1080,
@@ -340,8 +340,8 @@ public sealed class StreamMappingTests
         Assert.False(Assert.Single(dar.Audio).Copies);
         Assert.Equal("libopus", Assert.Single(webm.Audio).Codec);
         Assert.False(Assert.Single(izinsiz.Audio).Copies);
-        Assert.True(100 * StreamMapping.PassthroughTargetShare * 8388.608 / 600 >= 128);
-        Assert.True(5 * StreamMapping.PassthroughTargetShare * 8388.608 / 600 < 128);
+        Assert.True(100 * StreamMapping.PassthroughTargetShare * Megabayt.Kbit / 600 >= 128);
+        Assert.True(5 * StreamMapping.PassthroughTargetShare * Megabayt.Kbit / 600 < 128);
     }
 
     [Fact]
@@ -423,7 +423,7 @@ public sealed class StreamMappingTests
         var rapor = string.Concat(
             I($"tek iz : kap {tek.Streams!.Container} ses {tek.Streams.Audio.Count} altyazi {tek.Streams.Subtitles.Count} yan {tek.NonVideoK:0.#} kbit video {tek.VideoBitrateK} kbit{Environment.NewLine}"),
             I($"hepsi  : kap {hepsi.Streams!.Container} ses {hepsi.Streams.Audio.Count} altyazi {hepsi.Streams.Subtitles.Count} yan {hepsi.NonVideoK:0.#} kbit video {hepsi.VideoBitrateK} kbit{Environment.NewLine}"),
-            I($"hesap  : tek {(tek.VideoBitrateK + tek.NonVideoK) * 600 / 8388.608:0.00} MB, hepsi {(hepsi.VideoBitrateK + hepsi.NonVideoK) * 600 / 8388.608:0.00} MB (hedef 50){Environment.NewLine}"));
+            I($"hesap  : tek {(tek.VideoBitrateK + tek.NonVideoK) * 600 / Megabayt.Kbit:0.00} MB, hepsi {(hepsi.VideoBitrateK + hepsi.NonVideoK) * 600 / Megabayt.Kbit:0.00} MB (hedef 50){Environment.NewLine}"));
         AkisGirdisi.Write("birim-butce.txt", rapor);
 
         Assert.Equal(OutputContainer.Mkv, hepsi.Streams.Container);
@@ -431,7 +431,7 @@ public sealed class StreamMappingTests
         Assert.Single(hepsi.Streams.Subtitles);
         Assert.True(hepsi.NonVideoK > tek.NonVideoK + 100, rapor);
         Assert.True(hepsi.VideoBitrateK < tek.VideoBitrateK - 100, rapor);
-        Assert.True((hepsi.VideoBitrateK + hepsi.NonVideoK) * 600 / 8388.608 <= 50, rapor);
+        Assert.True((hepsi.VideoBitrateK + hepsi.NonVideoK) * 600 / Megabayt.Kbit <= 50, rapor);
         Assert.Equal(hepsi.Streams.SideK, hepsi.NonVideoK);
 
         AkisGirdisi.Kapat("birim-butce.txt");

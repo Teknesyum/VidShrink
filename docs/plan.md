@@ -1,20 +1,21 @@
-# Plan — HDR10+ Köprüsü (x265 dhdr10-info)
+# Plan — Hedef Boyutun Birimi Ondalık MB (O2)
 
-Karar: `docs/handbrake/fable-karar-hdr10plus-2026-09-23.md`. Ölçüm: `docs/olcumler/hdr10plus-tasima.md`.
+Karar: `docs/netlestirme/025-mb-birimi.md`. 1 MB = 1 000 000 bayt; etiket "MB" kalır.
 
-- **Core `Hdr10PlusJson`**: ffprobe `-show_frames` JSON metninden x265 `dhdr10-info` JSON'u üreten saf
-  işlev (alan değerleri paydaya ölçeklenir, sıra gösterim sırası); yol kaçışı (`\` → `/`, `:` → `\:`).
-- **Core `HdrResolver`**: `Hdr10PlusBridge` (HDR10+ kaynak, korunan HDR, libx265) ve
-  `Hdr10PlusOnSvtAv1`; köprü varken `DynamicMetadataDropped` kurulmaz. Yönlendirme işlevi:
-  kilitsiz, korunan HDR10+ kaynakta x265 kullanılabilirse kodek x265 olur.
-- **Core `PlanCalculator`**: yönlendirme ve iki yeni gerekçe — `Hdr10PlusNotCarriedOnSvtAv1`
-  (kilitli SVT-AV1), `Hdr10PlusDroppedInCut` (trim, detelecine ya da fps düşüşü köprüyü kapatır).
-- **Core `EncodePlan` / `FfmpegArguments`**: `Hdr10PlusBridge`, `Hdr10PlusMetadataPath`; yol varken
-  x265'in iki geçişine de aynı `dhdr10-info` gider.
-- **Ffmpeg**: `FfprobeClient` kare başına yan veriyi okur ve çıkışta HDR10+ kare sayar;
-  `EncodeRunner` köprüde önce ayrı ilerleme adımıyla çözme geçişini koşar, JSON'u işin geçici
-  önekine (`vidshrink_<guid>_hdr10plus.json`) yazar, iş sonunda önekle birlikte silinir;
-  kaynak/çıkış sayısı `EncodeResult`'a girer.
-- **App**: iki gerekçe ve bir aşama sözcüğü 42 dilde; sayılar eşit değilse sonuç `StatusWarning`.
-- **Test**: dönüştürücü alan değerleri, kaçış, yönlendirme, SVT-AV1, kesit, argüman, canlı
-  `[FfmpegFact]` (12 kare, `-threads 2`); her davranışa elle mutasyon.
+- **Core `Megabayt`**: tek yer — `Bayt = 1 000 000`, `Kbit = 8000`, `Oku(bayt)`, `Tavan(mb)`.
+- **Core `PlanCalculator`**: `KbitPerMib 8388,608` → `Megabayt.Kbit`; `ContainerOverhead` ayrı
+  model (mux payı) olarak kalır. `StreamMapping` geçiş bütçesi aynı katsayıya.
+- **Core `MediaInfo.FileSizeMb`**, `RecorderArguments.LimitBytes`, `RecorderBudget.From`: ondalık.
+- **Ffmpeg**: `EncodeRunner` her çıktı okuması ve `targetBytes`, `DiskSpaceGuard.RequiredBytes`,
+  `RecorderSession` çıktı okuması: ondalık. `CalibrationProbe` ffmpeg sonekini ayrıştırıyor, kalır.
+- **App/Cli**: disk alanı iletisi, kesit "kalan boyut" okuması ondalık. Paylaşım tavanı
+  (`Bicim.Boyut.Bayt`, bayt → MiB) ayrı alan, kalır.
+- **Yonga**: uguu 128 → 134 MB; `Chip128` → `Chip134`, `main.chip.128.*` → `main.chip.134.*`
+  42 dilde, ipucu "134 MB".
+- **Araçlar**: `tools/VidShrink.Bench`, `tools/VidShrink.Ab` aynı katsayıya.
+- **Belge**: `docs/olcumler/onayar-kaynaklari.md` MiB cümlesi ve uguu satırı.
+- **Test**: `OndalikMbTests` (olumsuz kontrol 1, 2, 4); 1024²/8388,608 pimleyen testler ve
+  `N * 1024 * 1024` kaynak kalıpları ondalığa taşınır (kaynağın `FileSizeMb`'si aynı kalır).
+  Mutasyon: katsayı 8388,608'e, `targetBytes` 1024²'ye — ikisi de kırmızı olmalı.
+- **Kapsam dışı**: kabuk menüsünün 1024/2048 hızlı hedefleri ("1 GB" etiketi) — kayıtlı menü
+  girdileri bu sayıları argüman olarak taşıyor; değiştirmek kullanıcı kararı.

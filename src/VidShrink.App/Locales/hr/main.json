@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB stane u starije forume i stroge e-mail prolaze.",
   "main.chip.25.tip": "25 MB stane u Gmail privitke i većinu sustava prijava.",
   "main.chip.100.tip": "100 MB odgovara arhiviranju i prijenosima gdje je kvaliteta važnija od vremena prijenosa.",
-  "main.chip.128.label": "Maksimum za dijeljenje",
-  "main.chip.128.tip": "• 128 MiB je izmjerena granica uguu.se, anonimnog odredišta dijeljenja s najmanjim ograničenjem.\n• Datoteka te veličine ili manja može se predati bilo kojem odredištu bez odbijanja.\n• Drugo odredište, storage.to, prima puno više, pa je ovaj čip siguran broj za oba.",
+  "main.chip.134.label": "Maksimum za dijeljenje",
+  "main.chip.134.tip": "• 134 MB je izmjerena granica uguu.se, anonimnog odredišta dijeljenja s najmanjim ograničenjem.\n• Datoteka te veličine ili manja može se predati bilo kojem odredištu bez odbijanja.\n• Drugo odredište, storage.to, prima puno više, pa je ovaj čip siguran broj za oba.",
   "main.chip.180.label": "Maksimum za WhatsApp Web",
   "main.chip.180.tip": "• Na telefonu: 16 MB u razgovoru, 2 GB kao dokument.\n• WhatsApp Web prima 180 MB po datoteci. To javljaju korisnici, WhatsApp to ne objavljuje.\n• Dakle datoteka od 180 MB ili manja prolazi kroz web stranu kakva jest.",
 

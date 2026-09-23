@@ -21,7 +21,7 @@ public sealed class UretimYoluTests
 
     public UretimYoluTests(ITestOutputHelper cikti) => _cikti = cikti;
 
-    private static MediaInfo Kaynak(double sureSaniye = 240, long boyut = 400L * 1024 * 1024) => new()
+    private static MediaInfo Kaynak(double sureSaniye = 240, long boyut = 400_000_000L) => new()
     {
         FilePath = "kaynak.mkv",
         FileSizeBytes = boyut,

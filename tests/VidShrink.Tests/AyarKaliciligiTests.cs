@@ -293,7 +293,7 @@ public sealed class AyarKaliciligiTests
     private static MediaInfo BuyukKaynak() => new()
     {
         FilePath = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv",
-        FileSizeBytes = 420L * 1024 * 1024,
+        FileSizeBytes = 420_000_000L,
         DurationSeconds = 187.5,
         Width = 3840,
         Height = 2160,

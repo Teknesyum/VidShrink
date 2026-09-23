@@ -471,7 +471,7 @@ public sealed class RecorderSession : IAsyncDisposable
                     _dropped = _droppedBefore + drop;
                     break;
                 case "total_size" when long.TryParse(value, out var size):
-                    _outputMb = size / 1024.0 / 1024.0;
+                    _outputMb = Megabayt.Oku(size);
                     break;
                 case "out_time_us" when long.TryParse(value, out var micros):
                     _capturedNow = TimeSpan.FromSeconds(micros / 1_000_000.0);
@@ -626,7 +626,7 @@ public sealed class RecorderSession : IAsyncDisposable
     }
 
     private static double SizeMb(string path)
-        => File.Exists(path) ? new FileInfo(path).Length / 1024.0 / 1024.0 : 0;
+        => File.Exists(path) ? Megabayt.Oku(new FileInfo(path).Length) : 0;
 
     private static async Task<bool> WaitForExitAsync(Process process, int timeoutMs, CancellationToken ct)
     {

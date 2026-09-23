@@ -32,7 +32,7 @@ internal static class B1KalanGirdi
     internal static MediaInfo Kaynak(double sure, params SourceStream[] streams) => new()
     {
         FilePath = Path.Combine("C:\\kaynak", "girdi.mkv"),
-        FileSizeBytes = 400L * 1024 * 1024,
+        FileSizeBytes = 400_000_000L,
         DurationSeconds = sure,
         Width = 1920,
         Height = 1080,

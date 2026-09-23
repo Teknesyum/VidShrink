@@ -44,7 +44,7 @@ public sealed class EncoderAvailabilityTests
     private static MediaInfo OrnekKaynak() => new()
     {
         FilePath = "ornek.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,

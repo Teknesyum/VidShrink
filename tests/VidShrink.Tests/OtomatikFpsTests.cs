@@ -12,13 +12,13 @@ public sealed class OtomatikFpsTests
     private static MediaInfo Hareketli(double seconds, double sizeMb) => new()
     {
         FilePath = "hareketli.mp4",
-        FileSizeBytes = (long)(sizeMb * 1024 * 1024),
+        FileSizeBytes = (long)(sizeMb * Megabayt.Bayt),
         DurationSeconds = seconds,
         Width = 1920,
         Height = 1080,
         Fps = 60,
         VideoCodec = "h264",
-        TotalBitrateBps = (long)(sizeMb * 8 * 1024 * 1024 / seconds),
+        TotalBitrateBps = (long)(sizeMb * 8 * Megabayt.Bayt / seconds),
         AudioCodec = "aac",
         AudioBitrateBps = 160_000,
         AudioChannels = 2

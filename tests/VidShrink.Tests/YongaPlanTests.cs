@@ -26,7 +26,7 @@ public sealed class YongaPlanTests
     private static MediaInfo Source() => new()
     {
         FilePath = @"C:\Kayitlar\telefon-kaydi-1080p30.mp4",
-        FileSizeBytes = 90L * 1024 * 1024,
+        FileSizeBytes = 90_000_000L,
         DurationSeconds = 62.0,
         Width = 1920,
         Height = 1080,
@@ -66,7 +66,7 @@ public sealed class YongaPlanTests
     [InlineData("ChipWhatsApp", 16d, Intent.Sharing, CodecPreference.Compatible, FillPolicy.FillTarget)]
     [InlineData("Chip25", 25d, Intent.Sharing, CodecPreference.Compatible, FillPolicy.FillTarget)]
     [InlineData("Chip100", 100d, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget)]
-    [InlineData("Chip128", 128d, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget)]
+    [InlineData("Chip134", 134d, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget)]
     [InlineData("Chip180", 180d, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget)]
     public void MbYazanYongalarKendiTavaniniTasiyor(
         string chip, double target, Intent intent, CodecPreference codec, FillPolicy fill)

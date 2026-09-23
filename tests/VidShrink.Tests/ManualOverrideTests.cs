@@ -44,7 +44,7 @@ public sealed class ManualOverrideTests
         ("av1_nvenc", EncoderProbeState.NotWorking));
 
     private static MediaInfo Info(int width = 1920, int height = 1080, double fps = 30, double durationSeconds = 120,
-        long fileSizeBytes = 500L * 1024 * 1024, int audioChannels = 2, long audioBitrateBps = 128_000) => new()
+        long fileSizeBytes = 500_000_000L, int audioChannels = 2, long audioBitrateBps = 128_000) => new()
     {
         FilePath = "sample.mp4",
         FileSizeBytes = fileSizeBytes,
@@ -74,14 +74,17 @@ public sealed class ManualOverrideTests
     // calisabiliyorken kare dusurmuyor (hareketli 300 kbit'te dusurme 16,77 VMAF-NEG kaybettirdi,
     // kosum 35158725446), 614x346@15 yerine 576x324@30.
     //
+    // O2 (docs/netlestirme/025-mb-birimi.md): MB ondalik oldu, 1 MB 8000 kbit; video bit hizlari
+    // ayni bayt oraninda (8000 / 8388,608) indi; 6 ve 8 MB kollarinda yerlesim de kuculdu.
+    //
     // Varsayilan davranisi degistiren her mutasyon bu kollari dusurur.
 
     [Theory]
-    [InlineData(1920, 1080, 30, 120, 25.0, "libsvtav1", "2pass", 1567, -1, 1920, 1080, 30.0, 128, -1, "6")]
-    [InlineData(1280, 720, 24, 300, 8.0, "libsvtav1", "2pass", 188, -1, 1202, 676, 24.0, 26, 1, "6")]
-    [InlineData(3840, 2160, 60, 45, 50.0, "libsvtav1", "2pass", 9016, -1, 3840, 2160, 60.0, 128, -1, "6")]
-    [InlineData(1920, 1080, 30, 600, 6.0, "libsvtav1", "2pass", 56, -1, 576, 324, 30.0, 24, 1, "6")]
-    [InlineData(1280, 720, 30, 30, 100.0, "libx264", "2pass", 27305, -1, 1280, 720, 30.0, 128, -1, "slow")]
+    [InlineData(1920, 1080, 30, 120, 25.0, "libsvtav1", "2pass", 1489, -1, 1920, 1080, 30.0, 128, -1, "6")]
+    [InlineData(1280, 720, 24, 300, 8.0, "libsvtav1", "2pass", 179, -1, 1178, 662, 24.0, 25, 1, "6")]
+    [InlineData(3840, 2160, 60, 45, 50.0, "libsvtav1", "2pass", 8593, -1, 3840, 2160, 60.0, 128, -1, "6")]
+    [InlineData(1920, 1080, 30, 600, 6.0, "libsvtav1", "2pass", 52, -1, 538, 302, 30.0, 24, 1, "6")]
+    [InlineData(1280, 720, 30, 30, 100.0, "libx264", "2pass", 26034, -1, 1280, 720, 30.0, 128, -1, "slow")]
     public void K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni(
         int srcW, int srcH, double srcFps, double durationSeconds, double targetMb,
         string codec, string mode, int videoK, int crf, int width, int height, double fps,
@@ -131,7 +134,7 @@ public sealed class ManualOverrideTests
     private static MediaInfo KucukKaynak() => new()
     {
         FilePath = "kucuk.mp4",
-        FileSizeBytes = 200L * 1024 * 1024,
+        FileSizeBytes = 200_000_000L,
         DurationSeconds = 10,
         Width = 320,
         Height = 180,
@@ -430,7 +433,7 @@ public sealed class ManualOverrideTests
     private static MediaInfo HedefinAltindaKaynak() => new()
     {
         FilePath = "zaten-kucuk.mp4",
-        FileSizeBytes = 10L * 1024 * 1024,
+        FileSizeBytes = 10_000_000L,
         DurationSeconds = 60,
         Width = 1280,
         Height = 720,
@@ -639,7 +642,7 @@ public sealed class ManualOverrideTests
     [Fact]
     public void F1_KaynakUstuHedefKaynaginYuzde95ineKirpiliyor()
     {
-        var info = Info(1920, 1080, 30, 120, fileSizeBytes: 500L * 1024 * 1024);
+        var info = Info(1920, 1080, 30, 120, fileSizeBytes: 500_000_000L);
         var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 490, Codec = CodecPreference.Auto }, null, AllWorking());
         var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.TargetCappedToSource);
 
@@ -727,7 +730,7 @@ public sealed class ManualOverrideTests
     private static MediaInfo SessizKaynak() => new()
     {
         FilePath = "sessiz.mp4",
-        FileSizeBytes = 500L * 1024 * 1024,
+        FileSizeBytes = 500_000_000L,
         DurationSeconds = 120,
         Width = 1920,
         Height = 1080,

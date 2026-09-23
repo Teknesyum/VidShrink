@@ -23,7 +23,7 @@ public sealed class OnAyarKutuphanesiTests
             new MainWindow.ChipPlan("ChipWhatsApp", 16, true, Intent.Sharing, CodecPreference.Compatible, FillPolicy.FillTarget),
             new MainWindow.ChipPlan("Chip25", 25, true, Intent.Sharing, CodecPreference.Compatible, FillPolicy.FillTarget),
             new MainWindow.ChipPlan("Chip100", 100, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
-            new MainWindow.ChipPlan("Chip128", 128, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
+            new MainWindow.ChipPlan("Chip134", 134, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
             new MainWindow.ChipPlan("Chip180", 180, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
             new MainWindow.ChipPlan("ChipHalf", null, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.QualityCeiling),
         };
@@ -41,7 +41,7 @@ public sealed class OnAyarKutuphanesiTests
         Assert.False(Get("archive").SizeCapped);
         Assert.Equal(16, Get("whatsapp-chat").TargetMb);
         Assert.Equal("ChipWhatsApp", Get("whatsapp-chat").Chip);
-        Assert.Equal(128, Get("share-uguu").TargetMb);
+        Assert.Equal(134, Get("share-uguu").TargetMb);
         Assert.Equal(180, Get("whatsapp-web").TargetMb);
         Assert.Equal(FillPolicy.QualityCeiling, Get("half").Fill);
     }

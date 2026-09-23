@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB passen zu älteren Foren und strengen E-Mail-Gateways.",
   "main.chip.25.tip": "25 MB passen zu Gmail-Anhängen und den meisten Ticketsystemen.",
   "main.chip.100.tip": "100 MB eignen sich für Archivierung und Uploads, bei denen Qualität wichtiger ist als Übertragungszeit.",
-  "main.chip.128.label": "Freigabe-Maximum",
-  "main.chip.128.tip": "• 128 MiB sind die gemessene Obergrenze von uguu.se, dem anonymen Freigabeziel mit dem kleinsten Limit.\n• Eine Datei bis zu dieser Größe kann an beide Freigabeziele übergeben werden, ohne abgewiesen zu werden.\n• Das andere Ziel, storage.to, nimmt weit mehr, dieser Chip ist also die sichere Zahl für beide.",
+  "main.chip.134.label": "Freigabe-Maximum",
+  "main.chip.134.tip": "• 134 MB sind die gemessene Obergrenze von uguu.se, dem anonymen Freigabeziel mit dem kleinsten Limit.\n• Eine Datei bis zu dieser Größe kann an beide Freigabeziele übergeben werden, ohne abgewiesen zu werden.\n• Das andere Ziel, storage.to, nimmt weit mehr, dieser Chip ist also die sichere Zahl für beide.",
   "main.chip.180.label": "WhatsApp-Web-Maximum",
   "main.chip.180.tip": "• Am Telefon: 16 MB im Chat, 2 GB als Dokument.\n• WhatsApp Web nimmt 180 MB pro Datei. Das berichten Nutzer, WhatsApp veröffentlicht es nicht.\n• Eine Datei bis 180 MB geht auf der Web-Seite also unverändert durch.",
 

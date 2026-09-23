@@ -89,8 +89,8 @@
   "main.chip.8.tip": "8 MB cabe en foros antiguos y pasarelas de correo estrictas.",
   "main.chip.25.tip": "25 MB cabe en adjuntos de Gmail y la mayoría de sistemas de tickets.",
   "main.chip.100.tip": "100 MB sirve para archivar y subir cuando la calidad importa más que el tiempo de transferencia.",
-  "main.chip.128.label": "Máximo para compartir",
-  "main.chip.128.tip": "• 128 MiB es el techo medido de uguu.se, el destino de compartir anónimo con el límite más pequeño.\n• Un archivo de este tamaño o menor se puede entregar a cualquiera de los dos destinos sin ser rechazado.\n• El otro destino, storage.to, admite mucho más, así que este chip es la cifra segura para ambos.",
+  "main.chip.134.label": "Máximo para compartir",
+  "main.chip.134.tip": "• 134 MB es el techo medido de uguu.se, el destino de compartir anónimo con el límite más pequeño.\n• Un archivo de este tamaño o menor se puede entregar a cualquiera de los dos destinos sin ser rechazado.\n• El otro destino, storage.to, admite mucho más, así que este chip es la cifra segura para ambos.",
   "main.chip.180.label": "Máximo de WhatsApp Web",
   "main.chip.180.tip": "• En el teléfono: 16 MB en el chat, 2 GB como documento.\n• WhatsApp Web admite 180 MB por archivo. Lo reportan los usuarios, WhatsApp no lo publica.\n• Así que un archivo de 180 MB o menos pasa por la web tal cual.",
 

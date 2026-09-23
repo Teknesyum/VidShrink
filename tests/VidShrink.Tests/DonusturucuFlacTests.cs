@@ -19,7 +19,7 @@ public sealed class DonusturucuFlacTests
     private static MediaInfo Kaynak(string audioCodec = "aac") => new()
     {
         FilePath = "girdi.mkv",
-        FileSizeBytes = 40L * 1024 * 1024,
+        FileSizeBytes = 40_000_000L,
         DurationSeconds = 60,
         Width = 1280,
         Height = 720,

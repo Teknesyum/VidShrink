@@ -19,7 +19,7 @@ public sealed class CliTests
     private static MediaInfo Source() => new()
     {
         FilePath = @"C:\Kayitlar\telefon-kaydi-1080p30.mp4",
-        FileSizeBytes = 90L * 1024 * 1024,
+        FileSizeBytes = 90_000_000L,
         DurationSeconds = 62.0,
         Width = 1920,
         Height = 1080,
@@ -401,7 +401,7 @@ public sealed class CliTests
             if (result.GetProperty("success").GetBoolean())
             {
                 Assert.True(File.Exists(output));
-                Assert.InRange(result.GetProperty("outputMb").GetDouble() - new FileInfo(output).Length / 1024.0 / 1024.0, -0.0006, 0.0006);
+                Assert.InRange(result.GetProperty("outputMb").GetDouble() - Megabayt.Oku(new FileInfo(output).Length), -0.0006, 0.0006);
             }
             Assert.Contains("%", stderr.ToString(), StringComparison.Ordinal);
             Assert.DoesNotContain("%", stdout.ToString(), StringComparison.Ordinal);
@@ -438,7 +438,7 @@ public sealed class CliTests
             Assert.Contains(input, arguments);
             Assert.Contains(output, arguments);
             Assert.Equal(FfmpegArguments.ToCommandLine(arguments), root.GetProperty("commandLine").GetString());
-            Assert.True(root.GetProperty("targetMb").GetDouble() < new FileInfo(input).Length / 1024.0 / 1024.0);
+            Assert.True(root.GetProperty("targetMb").GetDouble() < Megabayt.Oku(new FileInfo(input).Length));
             Assert.False(string.IsNullOrWhiteSpace(stderr));
             Assert.False(File.Exists(output));
         }
@@ -464,7 +464,7 @@ public sealed class CliTests
     }
 
     private static string HalfSize(string path)
-        => (new FileInfo(path).Length / 1024.0 / 1024.0 / 2).ToString("0.###", CultureInfo.InvariantCulture) + "MB";
+        => (Megabayt.Oku(new FileInfo(path).Length) / 2).ToString("0.###", CultureInfo.InvariantCulture) + "MB";
 
     private static CliServices Unreachable() => new()
     {
