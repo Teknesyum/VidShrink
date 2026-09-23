@@ -689,7 +689,12 @@ public partial class MainWindow : Window
     /// <para>Dil dugmeleri de cekildigi halde yer yetmezse sekmeler simgesiz dizilir
     /// (<c>compact</c> sinifi); yalniz sag grubu daraltmak el 1136'da Gelismis acikken
     /// son sekmeyi pencere dugmelerinin 9 px altina sokuyordu. Serit genisligi kararda
-    /// hep simgeli haliyle hesaplanir, yoksa kademe iki durum arasinda gidip gelir.</para>
+    /// hep simgeli haliyle hesaplanir, yoksa kademe iki durum arasinda gidip gelir.
+    /// Simgeli genislik sinifa gore degil son yerlesime gore bulunur
+    /// (<see cref="SimgesizDizildi"/>): sinif degistikten sonra yerlesim kosmadan gelen bir
+    /// <c>SizeChanged</c> cagrisi sinifi yeni, genisligi eski haliyle okuyordu; simgesiz
+    /// genislik simgeli sanilinca kademe 3'e dusuyor, sonraki cagri 4'e geri aliyordu.
+    /// 1024 ekranli CI kosucusunda el 1152'de son sekme sag gruba 7 px kaliyordu.</para>
     /// <para>Son sekme ile sag grup arasinda en az <c>SpaceLg</c> kalir; hesap yalniz
     /// ortusmeyi onluyordu ve el 1136'da son sekme pencere dugmelerine yaklasik 10 px
     /// yaklasiyordu.</para>
@@ -710,8 +715,7 @@ public partial class MainWindow : Window
             var enAz = this.TryFindResource("SpaceLg", out var pay) && pay is double d ? d : 0;
             var ikon = this.TryFindResource("IconSizeSm", out var boy) && boy is double b ? b : 0;
             var ara = this.TryFindResource("SpaceSm", out var bosluk) && bosluk is double a ? a : 0;
-            var tasarruf = Tabs.Items.OfType<TabItem>().Count(t => t.IsVisible) * (ikon + ara);
-            var tamSerit = Tabs.Classes.Contains("compact") ? serit + tasarruf : serit;
+            var tamSerit = serit + Tabs.Items.OfType<TabItem>().Count(t => t.IsVisible && SimgesizDizildi(t, ikon)) * (ikon + ara);
             var bos = TitleBarLayer.Bounds.Width - sol - tamSerit - TitleBarContent.Margin.Right - enAz;
             var kademe = TitleBarStage(bos);
             BtnSponsor.IsVisible = kademe < 1;
@@ -725,6 +729,17 @@ public partial class MainWindow : Window
         {
             _aligningTitle = false;
         }
+    }
+
+    /// <summary>
+    /// Sekmenin son yerlesimde simgesiz dizilip dizilmedigi: baslik yiginiyla yazinin
+    /// genislik farki simgeye yetmiyorsa simge o yerlesimde yer tutmadi. Sinif degil
+    /// yerlesim okunur; seridin genisligi de ayni yerlesimden geliyor.
+    /// </summary>
+    private static bool SimgesizDizildi(TabItem sekme, double ikon)
+    {
+        var yazi = sekme.GetVisualDescendants().OfType<ContentPresenter>().FirstOrDefault(p => p.Name == "PART_ContentPresenter");
+        return yazi?.GetVisualParent() is StackPanel yigin && yigin.Bounds.Width - yazi.Bounds.Width < ikon;
     }
 
     /// <summary>
