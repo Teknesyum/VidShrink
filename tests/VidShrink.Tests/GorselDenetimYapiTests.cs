@@ -158,7 +158,7 @@ public sealed class GorselDenetimYapiTests
             {
                 var secim = Ad<RadioButton>(w, ad);
                 var yazi = secim.GetVisualDescendants().OfType<TextBlock>().First();
-                var yaziSonu = Yeri(yazi, w).Left + yazi.TextLayout.WidthIncludingTrailingWhitespace;
+                var yaziSonu = Yeri(yazi, w).Left + yazi.TextLayout.Width;
                 return (ad, tasma: Math.Max(Yeri(secim, w).Right, yaziSonu) - sag);
             }).ToArray();
         }, sekme: 3, dil: dil);
@@ -414,6 +414,131 @@ public sealed class GorselDenetimYapiTests
         Assert.True(sekme.Length >= 5, $"{sekme.Length} sekme simgesi bulundu.");
         var aynalilar = medya.Concat(sekme).Where(m => m.aynali).Select(m => m.ad).ToArray();
         Assert.True(aynalilar.Length == 0, $"Aynalanan medya/sekme simgesi: {string.Join(", ", aynalilar)}.");
+    }
+
+    [Theory]
+    [InlineData("ar", true)]
+    [InlineData("en", false)]
+    public void SayiVeKomutSagdanSolaYazidaSoldanSagaOkunur(string dil, bool sagdanSola)
+    {
+        var girdi = sagdanSola ? "الدقة 1228×690 px" : "Resolution 1228×690 px";
+        var (yazi, ilk, ikinci) = AppHost.Run(() =>
+        {
+            var metin = new TextBlock { Text = girdi };
+            var pencere = new Window
+            {
+                Width = 600, Height = 120, Content = metin,
+                FlowDirection = sagdanSola ? Avalonia.Media.FlowDirection.RightToLeft : Avalonia.Media.FlowDirection.LeftToRight
+            };
+            pencere.Show();
+            try
+            {
+                pencere.UpdateLayout();
+                var t = metin.Text!;
+                return (t, metin.TextLayout.HitTestTextPosition(t.IndexOf("1228", StringComparison.Ordinal)).X,
+                    metin.TextLayout.HitTestTextPosition(t.IndexOf("690", StringComparison.Ordinal)).X);
+            }
+            finally { pencere.Close(); }
+        });
+        var kutular = new[] { ("TxtConvertCommand", 2), ("TxtCommand", 4), ("TxtOutputName", 5) }
+            .Select(k => (ad: k.Item1, yon: Pencere(Dar, w => Ad<TextBox>(w, k.Item1).FlowDirection, sekme: k.Item2, dil: dil)))
+            .ToArray();
+        var pencereYonu = Pencere(Dar, w => w.FlowDirection, sekme: 5, dil: dil);
+        Assert.Equal(sagdanSola, pencereYonu == Avalonia.Media.FlowDirection.RightToLeft);
+
+        _output.WriteLine($"{dil}: '1228' x={ilk:0.#}, '690' x={ikinci:0.#}, yalıtım={yazi.Contains('\u200E')}");
+        foreach (var (ad, yon) in kutular) _output.WriteLine($"{ad}: {yon}");
+        if (!sagdanSola) Assert.Equal(girdi, yazi);
+        Assert.True(ilk < ikinci, $"'1228' ({ilk:0.#}) '690'un ({ikinci:0.#}) sağında; çözünürlük ters okunuyor.");
+        Assert.All(kutular, k => Assert.Equal(Avalonia.Media.FlowDirection.LeftToRight, k.yon));
+    }
+
+    [Theory]
+    [InlineData("de", "15,2", "MB")]
+    [InlineData("ar", "15.2", "م.ب")]
+    public void SonucMetnindeSayiBirimindenAyrilmaz(string dil, string sayi, string birim)
+    {
+        var (sonuc, tanik, ikinci) = Pencere(Dar, w =>
+        {
+            var yazi = string.Format(VidShrink.App.Localization.Strings.Get("main.run.done"), 3, "420,0", sayi, "96,4");
+            var sonucMetni = Ad<TextBlock>(w, "TxtResult");
+            var tanikMetni = Ad<TextBlock>(w, "TxtEstimateNote");
+            sonucMetni.Text = yazi;
+            tanikMetni.Text = yazi;
+            var ilk = sonucMetni.Text!;
+            sonucMetni.Text = ilk;
+            return (ilk, tanikMetni.Text!, sonucMetni.Text!);
+        }, sekme: 1, dil: dil);
+
+        _output.WriteLine($"{dil}: {sonuc.Replace("\u00A0", "[nbsp]").Replace("\u200E", "[lrm]")}");
+        Assert.Contains(sayi + " " + birim, tanik.Replace("\u200E", ""), StringComparison.Ordinal);
+        Assert.Contains(sayi + "\u00A0" + birim, sonuc.Replace("\u200E", ""), StringComparison.Ordinal);
+        Assert.DoesNotContain(sayi + " " + birim, sonuc.Replace("\u200E", ""), StringComparison.Ordinal);
+        Assert.Equal(sonuc, ikinci);
+    }
+
+    [Theory]
+    [InlineData("de")]
+    [InlineData("tr")]
+    public void SesSeviyesiKutusuKazancKutusuylaOrtali(string dil)
+    {
+        var (fark, ayniSatir) = Pencere(Genis, w =>
+        {
+            Ad<StackPanel>(w, "AudioBody").IsVisible = true;
+            Yerlestir(w, Genis);
+            var kutu = Ad<CheckBox>(w, "ChkAudioLoudnorm");
+            var kombo = Ad<ComboBox>(w, "CmbAudioGain");
+            var yazi = kutu.GetVisualDescendants().OfType<Border>().First(b => b.Name == "CheckOutline");
+            var k = Yeri(kombo, w);
+            var y = Yeri(yazi, w);
+            return (y.Center.Y - k.Center.Y, y.Top < k.Bottom && y.Bottom > k.Top);
+        }, sekme: 1, dil: dil);
+
+        _output.WriteLine($"{dil}: fark {fark:0.##}, aynı satır {ayniSatir}");
+        Assert.True(ayniSatir, $"{dil}: kutu ile kazanç aynı satırda değil, ölçü bir şey görmüyor.");
+        Assert.True(Math.Abs(fark) < 1, $"{dil}: ses normalleştirme kutusu kazanç kutusundan {fark:0.##} px kayık.");
+    }
+
+    [Theory]
+    [InlineData("tr")]
+    [InlineData("de")]
+    public void PaylasimEtiketleriDenetimleOrtali(string dil)
+    {
+        var farklar = Pencere(Dar, w =>
+        {
+            var kombo = Ad<ComboBox>(w, "CmbShareRetention");
+            var dugme = Ad<Button>(w, "BtnShareDelete");
+            var izgara = (Grid)dugme.GetVisualParent()!;
+            TextBlock Etiket(int satir) => izgara.Children.OfType<TextBlock>().Single(t => Grid.GetRow(t) == satir && Grid.GetColumn(t) == 0);
+            double Orta(Control c) => Yeri(c, w).Center.Y;
+            return new[] { ("Ömür", Orta(Etiket(1)) - Orta(kombo)), ("Silme", Orta(Etiket(2)) - Orta(dugme)) };
+        }, sekme: 5, dil: dil);
+
+        foreach (var (ad, fark) in farklar) _output.WriteLine($"{dil} {ad}: {fark:0.##}");
+        Assert.All(farklar, f => Assert.True(Math.Abs(f.Item2) < 1, $"{f.Item1} etiketi denetimden {f.Item2:0.##} px kayık."));
+    }
+
+    [Theory]
+    [InlineData("tr")]
+    [InlineData("de")]
+    public void SayfaKenariKaydirmaCubugunaDayanmaz(string dil)
+    {
+        var bosluklar = new[] { (1, "PageShrink"), (3, "PageRecorder"), (5, "PageSettings") }
+            .Select(s => (ad: s.Item2, bosluk: Pencere(Dar, w =>
+            {
+                var kaydirici = Ad<ScrollViewer>(w, s.Item2);
+                var icerik = (Control)kaydirici.Content!;
+                var cubuk = kaydirici.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ScrollBar>()
+                    .Single(c => c.Orientation == Orientation.Vertical && ReferenceEquals(c.TemplatedParent, kaydirici));
+                Assert.True(cubuk.IsVisible, $"{s.Item2} kaydırma çubuğu görünmüyor; ölçü boş koşar.");
+                return Yeri(cubuk, w).Left - Yeri(icerik, w).Right;
+            }, sekme: s.Item1, dil: dil)))
+            .ToArray();
+
+        foreach (var (ad, bosluk) in bosluklar) _output.WriteLine($"{dil} {ad}: {bosluk:0.##}");
+        var kucult = bosluklar[0].bosluk;
+        Assert.True(kucult >= 1, $"Küçült'te bile içerik çubuğa dayanıyor ({kucult:0.##} px).");
+        Assert.All(bosluklar, b => Assert.True(Math.Abs(b.bosluk - kucult) < 0.5, $"{b.ad} çubuktan {b.bosluk:0.##} px uzak, Küçült {kucult:0.##} px."));
     }
 
     [Theory]

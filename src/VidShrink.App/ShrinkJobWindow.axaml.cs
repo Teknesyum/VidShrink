@@ -346,6 +346,8 @@ public partial class ShrinkJobWindow : Window
             Text = Path.GetFileName(_pending[index].Path),
             FontSize = Token("FontSizeSm"),
             TextTrimming = TextTrimming.CharacterEllipsis,
+            FlowDirection = FlowDirection.LeftToRight,
+            HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center
         };
         ToolTip.SetTip(name, _pending[index].Path);

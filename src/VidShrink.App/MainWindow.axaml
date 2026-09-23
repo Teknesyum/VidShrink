@@ -562,6 +562,7 @@
                           <TextBlock Text="{loc:Text main.audio.level.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <CheckBox x:Name="ChkAudioLoudnorm" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Bottom"
+                                      MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
                                       Content="{loc:Text main.audio.loudnorm}"/>
                             <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
                               <TextBlock Text="{loc:Text main.audio.gain}" Theme="{StaticResource Hint}"/>
@@ -1284,7 +1285,7 @@
                 <Border Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <TextBlock Text="{loc:Text main.convert.command}" Theme="{StaticResource H2}"/>
-                    <TextBox x:Name="TxtConvertCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="6" MaxLines="6"/>
+                    <TextBox x:Name="TxtConvertCommand" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="6" MaxLines="6"/>
                     <TextBlock x:Name="TxtConvertValidation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </StackPanel>
                 </Border>
@@ -1331,7 +1332,7 @@
 
           <TabItem x:Name="TabAdvanced" IsVisible="False" izi:AcilisIsareti.Ad="xaml-gelismis" Header="{loc:Text main.tab.advanced}" Tag="{StaticResource IconAdvanced}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageAdvanced" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
-            <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
+            <StackPanel Margin="{StaticResource PageMargin}" Spacing="{StaticResource SpaceLg}">
 
               <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
@@ -1344,7 +1345,7 @@
                             Content="{loc:Text main.window.close}"
                             Click="OnHideAdvanced"/>
                   </Grid>
-                  <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="1"/>
+                  <TextBox x:Name="TxtCommand" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="1"/>
                 </StackPanel>
               </Border>
 
@@ -1419,7 +1420,7 @@
 
         <TabItem Header="{loc:Text main.tab.settings}" izi:AcilisIsareti.Ad="xaml-ayarlar" x:Name="TabSettings" Tag="{StaticResource IconSettings}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
-            <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
+            <StackPanel Margin="{StaticResource PageMargin}" Spacing="{StaticResource SpaceLg}">
 
               <Border x:Name="GeneralSettingsPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
@@ -1478,7 +1479,7 @@
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <TextBlock Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtOutputName" Width="360"/>
+                      <TextBox x:Name="TxtOutputName" FlowDirection="LeftToRight" Width="360"/>
                       <Button x:Name="BtnResetOutputName" Content="{loc:Text settings-tab.output-name.reset}" Theme="{StaticResource GhostButton}" Click="OnResetOutputName"/>
                     </StackPanel>
                     <TextBlock x:Name="LblOutputNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
@@ -1555,34 +1556,32 @@
                   <WrapPanel x:Name="ShareTargetStrip" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}"/>
 
                   <Grid ColumnDefinitions="Auto,*"
-                        RowDefinitions="Auto,Auto,Auto"
+                        RowDefinitions="Auto,Auto,Auto,Auto"
                         ColumnSpacing="{StaticResource SpaceMd}"
                         RowSpacing="{StaticResource SpaceSm}">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Text settings.share.ceiling}" Theme="{StaticResource PlanFactLabel}"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtShareCeiling" Theme="{StaticResource PlanFactValue}"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Text settings.share.lifetime}" Theme="{StaticResource PlanFactLabel}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Text settings.share.lifetime}" Theme="{StaticResource PlanFactLabel}" VerticalAlignment="Center"/>
                     <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
                       <ComboBox x:Name="CmbShareRetention" HorizontalAlignment="Left"/>
                       <TextBlock x:Name="TxtShareRetentionFixed" Theme="{StaticResource PlanFactValue}" IsVisible="False"/>
                     </StackPanel>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Text settings.share.deletion}" Theme="{StaticResource PlanFactLabel}"/>
-                    <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
-                      <Button x:Name="BtnShareDelete"
-                              Content="{loc:Text settings.share.delete}"
-                              Theme="{StaticResource GhostButton}"
-                              HorizontalAlignment="Left"
-                              IsEnabled="False"
-                              Click="OnShareDelete">
-                        <Button.Styles>
-                          <Style Selector="Button:disabled">
-                            <Setter Property="ToolTip.Tip" Value="{loc:Text settings.share.delete.disabled-tip}"/>
-                          </Style>
-                        </Button.Styles>
-                      </Button>
-                      <TextBlock x:Name="TxtShareDeleteNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    </StackPanel>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Text settings.share.deletion}" Theme="{StaticResource PlanFactLabel}" VerticalAlignment="Center"/>
+                    <Button Grid.Row="2" Grid.Column="1" x:Name="BtnShareDelete"
+                            Content="{loc:Text settings.share.delete}"
+                            Theme="{StaticResource GhostButton}"
+                            HorizontalAlignment="Left"
+                            IsEnabled="False"
+                            Click="OnShareDelete">
+                      <Button.Styles>
+                        <Style Selector="Button:disabled">
+                          <Setter Property="ToolTip.Tip" Value="{loc:Text settings.share.delete.disabled-tip}"/>
+                        </Style>
+                      </Button.Styles>
+                    </Button>
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TxtShareDeleteNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </Grid>
                 </StackPanel>
               </Border>

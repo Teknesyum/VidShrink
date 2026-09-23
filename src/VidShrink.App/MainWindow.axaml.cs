@@ -174,6 +174,12 @@ public partial class MainWindow : Window
         InitializeComponent();
         AcilisIzi.Yaz("xaml");
         _controlsReady = true;
+        TxtResult.PropertyChanged += (_, e) =>
+        {
+            if (e.Property != TextBlock.TextProperty || TxtResult.Text is not { Length: > 0 } yazi) return;
+            var bagli = Bicim.Satir.Bagla(yazi);
+            if (bagli != yazi) TxtResult.SetCurrentValue(TextBlock.TextProperty, bagli);
+        };
 
         // T43: panel ana pencereye burada bağlanıyor. Kaynağı üreten çağrı tek yerde durur;
         // panel hangi motorun kare ürettiğini bilmez.

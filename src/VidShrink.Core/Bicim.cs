@@ -204,7 +204,7 @@ public static class Bicim
             for (var i = 1; i < c.Length - 1; i++)
             {
                 if (c[i] != ' ') continue;
-                if (char.IsDigit(c[i - 1]) && BirimMi(metin, i + 1)) c[i] = BolunmezBosluk;
+                if ((char.IsDigit(c[i - 1]) || (c[i - 1] == SoldanSagaIsareti && i > 1 && char.IsDigit(c[i - 2]))) && BirimMi(metin, i + 1)) c[i] = BolunmezBosluk;
                 else if (c[i - 1] == '×' || (c[i + 1] == '×' && char.IsDigit(c[i - 1]))) c[i] = BolunmezBosluk;
             }
 
@@ -237,6 +237,94 @@ public static class Bicim
             if (son <= 0 || bagli.IndexOf(' ') == son || bagli.Length - son - 1 > KisaSonSozcuk) return bagli;
             return string.Concat(bagli.AsSpan(0, son), BolunmezBosluk.ToString(), bagli.AsSpan(son + 1));
         }
+
+        public const char SoldanSagaIsareti = '\u200E';
+
+        public static string Yalit(string? metin)
+        {
+            if (string.IsNullOrEmpty(metin)) return string.Empty;
+            if (metin.IndexOf(SoldanSagaIsareti) >= 0) metin = metin.Replace(SoldanSagaIsareti.ToString(), string.Empty);
+            if (!metin.Any(SagdanSolaMi))
+                return metin.Any(c => !char.IsWhiteSpace(c)) ? SoldanSagaIsareti + metin + SoldanSagaIsareti : metin;
+
+            var sonuc = new StringBuilder(metin.Length + 8);
+            var satirBasi = 0;
+            for (var i = 0; i <= metin.Length; i++)
+            {
+                if (i < metin.Length && metin[i] is not '\n' and not '\r') continue;
+                SatiriYalit(metin, satirBasi, i, sonuc);
+                if (i < metin.Length) sonuc.Append(metin[i]);
+                satirBasi = i + 1;
+            }
+
+            return sonuc.ToString();
+        }
+
+        private static void SatiriYalit(string metin, int bas, int son, StringBuilder sonuc)
+        {
+            var parcalar = new List<(int Bas, int Son, bool Sol)>();
+            var i = bas;
+            while (i < son)
+            {
+                if (char.IsWhiteSpace(metin[i])) { i++; continue; }
+                var j = i;
+                var sagdanSola = false;
+                while (j < son && !char.IsWhiteSpace(metin[j])) sagdanSola |= SagdanSolaMi(metin[j++]);
+                parcalar.Add((i, j, !sagdanSola));
+                i = j;
+            }
+
+            var yazilan = bas;
+            var k = 0;
+            while (k < parcalar.Count)
+            {
+                if (!parcalar[k].Sol) { k++; continue; }
+                var ilk = k;
+                while (k < parcalar.Count && parcalar[k].Sol) k++;
+                var sonParca = k - 1;
+                var cekirdekIlk = ilk;
+                while (cekirdekIlk <= sonParca && !HarfYaDaRakam(metin, parcalar[cekirdekIlk])) cekirdekIlk++;
+                var cekirdekSon = sonParca;
+                while (cekirdekSon >= cekirdekIlk && !HarfYaDaRakam(metin, parcalar[cekirdekSon])) cekirdekSon--;
+
+                var cekirdekVar = cekirdekIlk <= cekirdekSon;
+                OklariCevir(metin, parcalar, ilk, cekirdekVar ? cekirdekIlk - 1 : sonParca, sonuc, ref yazilan);
+                if (!cekirdekVar) continue;
+                var cekirdekBas = parcalar[cekirdekIlk].Bas;
+                var cekirdekBitis = parcalar[cekirdekSon].Son;
+                while (cekirdekBitis > cekirdekBas + 1 && CumleNoktalamasi(metin[cekirdekBitis - 1])) cekirdekBitis--;
+                sonuc.Append(metin, yazilan, cekirdekBas - yazilan)
+                    .Append(SoldanSagaIsareti)
+                    .Append(metin, cekirdekBas, cekirdekBitis - cekirdekBas)
+                    .Append(SoldanSagaIsareti);
+                yazilan = cekirdekBitis;
+                OklariCevir(metin, parcalar, cekirdekSon + 1, sonParca, sonuc, ref yazilan);
+            }
+
+            sonuc.Append(metin, yazilan, son - yazilan);
+        }
+
+        private static void OklariCevir(string metin, List<(int Bas, int Son, bool Sol)> parcalar, int ilk, int son, StringBuilder sonuc, ref int yazilan)
+        {
+            for (var p = ilk; p <= son; p++)
+            {
+                if (!metin.AsSpan(parcalar[p].Bas, parcalar[p].Son - parcalar[p].Bas).SequenceEqual("→")) continue;
+                sonuc.Append(metin, yazilan, parcalar[p].Bas - yazilan).Append('←');
+                yazilan = parcalar[p].Son;
+            }
+        }
+
+        private static bool HarfYaDaRakam(string metin, (int Bas, int Son, bool Sol) parca)
+        {
+            for (var i = parca.Bas; i < parca.Son; i++)
+                if (char.IsLetterOrDigit(metin[i])) return true;
+            return false;
+        }
+
+        private static bool CumleNoktalamasi(char c) => c is '.' or ',' or ';' or ':' or '!' or '?' or '،' or '؛';
+
+        private static bool SagdanSolaMi(char c) =>
+            c is >= '\u0590' and <= '\u08FF' or >= '\uFB1D' and <= '\uFDFF' or >= '\uFE70' and <= '\uFEFC';
 
         private static bool BirimMi(string metin, int bas)
         {
