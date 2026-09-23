@@ -657,12 +657,10 @@
                       <StackPanel x:Name="AdvancedBody" Classes="disclose" Spacing="{StaticResource SpaceMd}" IsVisible="False" Margin="{StaticResource RowMargin}">
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <TextBlock Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                              <RadioButton x:Name="RbAdvModeAuto" GroupName="AdvMode" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
-                              <RadioButton x:Name="RbAdvModeCrf" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.crf}"/>
-                              <RadioButton x:Name="RbAdvModeTwoPass" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.two-pass}"/>
-                            </WrapPanel>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                            <RadioButton x:Name="RbAdvModeAuto" GroupName="AdvMode" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
+                            <RadioButton x:Name="RbAdvModeCrf" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.crf}"/>
+                            <RadioButton x:Name="RbAdvModeTwoPass" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.two-pass}"/>
                             <TextBlock x:Name="TxtAdvModeNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
@@ -696,12 +694,10 @@
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <TextBlock Text="{loc:Text main.advanced.encoder-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                              <RadioButton x:Name="RbAdvPathAuto" GroupName="AdvEncoderPath" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
-                              <RadioButton x:Name="RbAdvPathSoftware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.software}"/>
-                              <RadioButton x:Name="RbAdvPathHardware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.hardware}"/>
-                            </WrapPanel>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                            <RadioButton x:Name="RbAdvPathAuto" GroupName="AdvEncoderPath" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
+                            <RadioButton x:Name="RbAdvPathSoftware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.software}"/>
+                            <RadioButton x:Name="RbAdvPathHardware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.hardware}"/>
                             <TextBlock x:Name="TxtAdvEncoderPathNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
@@ -872,7 +868,7 @@
                     <izi:SutunIzgara x:Name="OutputFacts" MaxColumns="2" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceMd}">
 
                       <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="{loc:Text main.output.stage}" Theme="{StaticResource OutFactLabel}"/>
+                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.stage}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
                         <TextBlock x:Name="TxtStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource OutFactValue}" TextWrapping="Wrap">
                           <TextBlock.Transitions>
                             <Transitions>
@@ -883,12 +879,12 @@
                       </StackPanel>
 
                       <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="{loc:Text main.output.current-size}" Theme="{StaticResource OutFactLabel}"/>
+                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.current-size}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
                         <TextBlock x:Name="TxtOutSize" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
 
                       <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="{loc:Text main.output.remaining}" Theme="{StaticResource OutFactLabel}"/>
+                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.remaining}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
                         <TextBlock x:Name="TxtRemaining" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
 

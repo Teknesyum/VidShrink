@@ -3093,7 +3093,7 @@ public partial class MainWindow : Window
             _ => ("main.drop.title", "main.drop.hint")
         };
 
-        TxtDropTitle.Text = title == "main.drop.batch" ? Say(title, _dropBatch!.Count) : Say(title);
+        TxtDropTitle.Text = Bicim.Satir.SonuBagla(title == "main.drop.batch" ? Say(title, _dropBatch!.Count) : Say(title));
         TxtDropHint.Text = Say(hint);
     }
 

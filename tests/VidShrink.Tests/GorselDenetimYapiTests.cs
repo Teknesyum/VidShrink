@@ -294,6 +294,91 @@ public sealed class GorselDenetimYapiTests
             $"Satır {enKotu.satir}: etiket altları {enKotu.etiket:0.#} px, denetim üstleri {enKotu.denetim:0.#} px ayrı.");
     }
 
+    [Theory]
+    [InlineData("tr", false)]
+    [InlineData("tr", true)]
+    [InlineData("de", true)]
+    [InlineData("en", true)]
+    [InlineData("ar", true)]
+    public void CiktiOlgulariAyniSatirdaAyniYukseklikte(string dil, bool genis)
+    {
+        var boyut = genis ? Genis : Dar;
+        var satirlar = Pencere(boyut, w =>
+            new[] { "TxtStage", "TxtOutSize", "TxtRemaining", "TxtDurationValue" }
+                .Select(ad => (ad, yer: Yeri(Ad<TextBlock>(w, ad), w)))
+                .Select(d => (d.ad, ust: d.yer.Top, etiketUst: Yeri(((Panel)Ad<TextBlock>(w, d.ad).GetVisualParent()!).Children[0], w).Top))
+                .ToArray(), sekme: 1, dil: dil);
+
+        foreach (var (ad, ust, etiketUst) in satirlar) _output.WriteLine($"{ad}: değer üstü {ust:0.#}, etiket üstü {etiketUst:0.#}");
+        var kaymalar = satirlar.GroupBy(s => Math.Round(s.etiketUst))
+            .Where(g => g.Count() > 1)
+            .Select(g => (satir: string.Join(" / ", g.Select(s => s.ad)), fark: g.Max(s => s.ust) - g.Min(s => s.ust)))
+            .ToArray();
+        Assert.NotEmpty(kaymalar);
+        var enKotu = kaymalar.MaxBy(k => k.fark);
+        Assert.True(enKotu.fark <= 0.5, $"{enKotu.satir}: aynı satırdaki değerler {enKotu.fark:0.#} px kayık.");
+    }
+
+    [Theory]
+    [InlineData("tr", 0)]
+    [InlineData("tr", 1)]
+    [InlineData("tr", 2)]
+    [InlineData("de", 0)]
+    [InlineData("en", 1)]
+    [InlineData("ar", 0)]
+    public void BirakmaBasligiTekSozcukleBitmez(string dil, int boyutNo)
+    {
+        var boyut = new[] { Dar, YerlesimDenetimiTests.DarBoyut, Genis }[boyutNo];
+        var (metin, sonSatir, satir) = Pencere(boyut, w =>
+        {
+            var baslik = Ad<TextBlock>(w, "TxtDropTitle");
+            var satirlar = baslik.TextLayout.TextLines;
+            var son = satirlar[^1];
+            var yazi = baslik.Text ?? "";
+            return (yazi, yazi.Substring(son.FirstTextSourceIndex, Math.Min(son.Length, yazi.Length - son.FirstTextSourceIndex)).Trim(), satirlar.Count);
+        }, sekme: 1, dil: dil, dolu: false);
+
+        _output.WriteLine($"{satir} satır, '{metin}', son: '{sonSatir}'");
+        Assert.False(string.IsNullOrEmpty(metin));
+        Assert.True(satir == 1 || sonSatir.Split(new[] { ' ', ' ' }, StringSplitOptions.RemoveEmptyEntries).Length > 1,
+            $"Bırakma başlığının son satırı tek sözcük: '{sonSatir}'.");
+    }
+
+    [Theory]
+    [InlineData("tr", false)]
+    [InlineData("tr", true)]
+    [InlineData("de", false)]
+    [InlineData("ar", false)]
+    public void SimdiSatirlariDenetimSirasiylaHizali(string dil, bool enDar)
+    {
+        var boyut = enDar ? YerlesimDenetimiTests.DarBoyut : Dar;
+        var sonuc = Pencere(boyut, w =>
+        {
+            w.RecalculateForTest();
+            Ad<StackPanel>(w, "AdvancedBody").IsVisible = true;
+            Yerlestir(w, boyut);
+            return new[] { "TxtAdvModeNow", "TxtAdvCrfNow", "TxtAdvPresetNow", "TxtAdvTuneNow", "TxtAdvEncoderPathNow", "TxtAdvCodecLockNow" }
+                .Select(ad => Ad<TextBlock>(w, ad))
+                .Where(t => t.Bounds.Width > 0 && !string.IsNullOrEmpty(t.Text))
+                .Select(t =>
+                {
+                    var yazi = Yeri(t, w);
+                    var orta = yazi.Top + yazi.Height / 2;
+                    var denetimler = t.FindAncestorOfType<Grid>()!.GetVisualDescendants()
+                        .Where(d => d is RadioButton or ComboBox).Cast<Control>().Select(d => Yeri(d, w)).ToArray();
+                    var fark = denetimler.Min(d => Math.Abs(d.Top + d.Height / 2 - orta));
+                    var arada = orta < denetimler.Max(d => d.Bottom);
+                    return (ad: t.Name!, fark: arada ? fark : 0, satir: denetimler.Select(d => Math.Round(d.Top)).Distinct().Count());
+                })
+                .ToArray();
+        }, sekme: 1, dil: dil);
+
+        foreach (var (ad, fark, satir) in sonuc) _output.WriteLine($"{ad}: denetim satırları arasında kalan kayma {fark:0.#} px, denetim satırı {satir}");
+        Assert.Contains(sonuc, s => s.ad == "TxtAdvEncoderPathNow");
+        var enKotu = sonuc.MaxBy(s => s.fark);
+        Assert.True(enKotu.fark <= 1, $"{enKotu.ad} denetim satırlarının arasında, hiçbirinin hizasında değil: {enKotu.fark:0.#} px.");
+    }
+
     /// <summary>
     /// Görsel denetim bulgu 13: süzgeç anahtarları sarılan bir satırdaydı; dar pencerede
     /// ikinci satır birinci satırın sütunlarıyla hizalanmıyordu. Anahtarlar sütunlu ızgarada,

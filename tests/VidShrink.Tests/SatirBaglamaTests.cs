@@ -26,6 +26,19 @@ public sealed class SatirBaglamaTests
     public void CumleDokunulmadanKalir(string girdi)
         => Assert.Equal(girdi, Bicim.Satir.Bagla(girdi));
 
+    [Theory]
+    [InlineData("Bir medya dosyasını buraya bırakın", "Bir medya dosyasını buraya bırakın")]
+    [InlineData("Drop a media file here", "Drop a media file here")]
+    public void SonSozcukOncekineBaglanir(string girdi, string beklenen)
+        => Assert.Equal(beklenen, Bicim.Satir.SonuBagla(girdi));
+
+    [Theory]
+    [InlineData("Mediendatei ablegen")]
+    [InlineData("Tek")]
+    [InlineData("Dosyayı buraya olağanüstüdüzenlemeler")]
+    public void SonSozcukUzunsaYaIkiSozcuksaBaglanmaz(string girdi)
+        => Assert.Equal(girdi, Bicim.Satir.SonuBagla(girdi));
+
     [Fact]
     public void BosVeNullBosDoner()
     {

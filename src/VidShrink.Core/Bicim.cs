@@ -188,11 +188,6 @@ public static class Bicim
     public static string DosyaDamgasi(DateTimeOffset an) =>
         an.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
 
-    /// <summary>
-    /// Motorun İngilizce tanı metinleri. Çevrilmiyorlar; kültüre göre virgül alırlarsa
-    /// iki koşumun günlüğü karşılaştırılamaz hale gelir, o yüzden burada kültür
-    /// <see cref="CultureInfo.InvariantCulture"/> olarak sabittir.
-    /// </summary>
     public static class Satir
     {
         public const char BolunmezBosluk = ' ';
@@ -200,6 +195,7 @@ public static class Bicim
         private const int KisaParantez = 14;
         private const int KisaBirim = 7;
         private const int KisaEgikParca = 8;
+        private const int KisaSonSozcuk = 12;
 
         public static string Bagla(string? metin)
         {
@@ -234,6 +230,14 @@ public static class Bicim
             return sonuc.ToString();
         }
 
+        public static string SonuBagla(string? metin)
+        {
+            var bagli = Bagla(metin);
+            var son = bagli.LastIndexOf(' ');
+            if (son <= 0 || bagli.IndexOf(' ') == son || bagli.Length - son - 1 > KisaSonSozcuk) return bagli;
+            return string.Concat(bagli.AsSpan(0, son), BolunmezBosluk.ToString(), bagli.AsSpan(son + 1));
+        }
+
         private static bool BirimMi(string metin, int bas)
         {
             var son = bas;
@@ -255,6 +259,11 @@ public static class Bicim
         }
     }
 
+    /// <summary>
+    /// Motorun İngilizce tanı metinleri. Çevrilmiyorlar; kültüre göre virgül alırlarsa
+    /// iki koşumun günlüğü karşılaştırılamaz hale gelir, o yüzden burada kültür
+    /// <see cref="CultureInfo.InvariantCulture"/> olarak sabittir.
+    /// </summary>
     public static class Tani
     {
         /// <inheritdoc cref="Boyut.Mb(double, CultureInfo)"/>
