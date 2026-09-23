@@ -1,0 +1,127 @@
+name: vp9-gercek-kesit
+
+on:
+  push:
+    tags: ['olcum-vp9-gercek-*']
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+  BENCH: tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll
+  KAYNAK_URL: https://download.blender.org/durian/movies/Sintel.2010.1080p.mkv
+
+jobs:
+  kesit:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur (GyanD 9.0, urunun paketledigi ile ayni)
+        run: pwsh tools/kalite-paketi-3/kur.ps1
+      - name: kaynak indir (Sintel, kalite-olcumu.yml ile ayni kaynak)
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          $hedef = Join-Path $env:RUNNER_TEMP 'kaynak.mkv'
+          Invoke-WebRequest -Uri $env:KAYNAK_URL -OutFile $hedef
+          "kaynak url=$env:KAYNAK_URL sha256=$((Get-FileHash $hedef -Algorithm SHA256).Hash) boy=$((Get-Item $hedef).Length)" | Tee-Object -FilePath (Join-Path $env:RUNNER_TEMP 'kaynak-sha256.txt')
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - name: gercek kesitleri sec (karanlik/parlak/orta/hareketli)
+        run: |
+          pwsh tools/kalite-paketi-3/kos.ps1 -Is kesit -Kaynak "$env:RUNNER_TEMP\kaynak.mkv" -Cikti "$env:RUNNER_TEMP\vp9g" -Bench $env:BENCH
+          Copy-Item "$env:RUNNER_TEMP\kaynak-sha256.txt" "$env:RUNNER_TEMP\vp9g\"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vp9g-kesitler
+          path: ${{ runner.temp }}/vp9g
+          compression-level: 0
+          retention-days: 14
+
+  crf:
+    needs: kesit
+    runs-on: windows-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        kesit: [karanlik, orta, hareketli]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur (GyanD 9.0)
+        run: pwsh tools/kalite-paketi-3/kur.ps1
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - uses: actions/download-artifact@v4
+        with:
+          name: vp9g-kesitler
+          path: ${{ runner.temp }}/kesitler
+      - name: crf izgarasi (cpu-used 4)
+        run: pwsh tools/vp9-gercek-kesit/kos.ps1 -Is crf -Kesit ${{ matrix.kesit }} -Girdi "$env:RUNNER_TEMP\kesitler" -Cikti "$env:RUNNER_TEMP\vp9g" -Bench $env:BENCH
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vp9g-crf-${{ matrix.kesit }}
+          path: ${{ runner.temp }}/vp9g/sonuc-*.json
+          retention-days: 14
+
+  cpu:
+    needs: crf
+    runs-on: windows-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        kesit: [karanlik, orta, hareketli]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: ffmpeg kur (GyanD 9.0)
+        run: pwsh tools/kalite-paketi-3/kur.ps1
+      - name: bench derle
+        run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - uses: actions/download-artifact@v4
+        with:
+          name: vp9g-kesitler
+          path: ${{ runner.temp }}/girdi
+      - uses: actions/download-artifact@v4
+        with:
+          name: vp9g-crf-${{ matrix.kesit }}
+          path: ${{ runner.temp }}/girdi
+      - name: cpu-used 1/2/4 (hedef CRF 30 kbps'i)
+        run: pwsh tools/vp9-gercek-kesit/kos.ps1 -Is cpu -Kesit ${{ matrix.kesit }} -Girdi "$env:RUNNER_TEMP\girdi" -Cikti "$env:RUNNER_TEMP\vp9g" -Bench $env:BENCH
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vp9g-cpu-${{ matrix.kesit }}
+          path: ${{ runner.temp }}/vp9g/sonuc-*.json
+          retention-days: 14
+
+  ozet:
+    needs: [kesit, crf, cpu]
+    if: always()
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ffmpeg kur (GyanD 9.0)
+        run: pwsh tools/kalite-paketi-3/kur.ps1
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vp9g-*
+          path: ${{ runner.temp }}/girdi
+      - name: ozet
+        run: |
+          pwsh tools/vp9-gercek-kesit/kos.ps1 -Is ozet -Girdi "$env:RUNNER_TEMP\girdi" -Cikti "$env:RUNNER_TEMP\sonuc"
+          Get-Content "$env:RUNNER_TEMP\sonuc\ozet.md" | Add-Content $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vp9g-sonuc
+          path: ${{ runner.temp }}/sonuc
+          retention-days: 30
