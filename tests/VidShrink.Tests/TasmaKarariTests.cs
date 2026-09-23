@@ -243,6 +243,7 @@ public sealed class TasmaKarariTests
             var pencere = new MainWindow();
             try
             {
+                pencere.Classes.Remove("reduced-motion");
                 var gorev = pencere.ShowRetryAskForTest(soru);
                 var ilk = (pencere.RetryAskPanel.IsVisible, pencere.RetryAskPanel.Opacity);
                 Avalonia.Threading.Dispatcher.UIThread.RunJobs(Avalonia.Threading.DispatcherPriority.SystemIdle);

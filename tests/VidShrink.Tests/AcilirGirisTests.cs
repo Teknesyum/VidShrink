@@ -116,7 +116,15 @@ public sealed class AcilirGirisTests
                 ToolTip.SetIsOpen(dugme, true);
                 Dispatcher.UIThread.RunJobs();
                 Assert.True(ipucu.IsVisible && TopLevel.GetTopLevel(ipucu) is not null);
-                var sonuc = (ipucu.Opacity, ipucu.Opacity < 1);
+                var enAz = ipucu.Opacity;
+                var saat = Stopwatch.StartNew();
+                while (saat.Elapsed.TotalMilliseconds < 400)
+                {
+                    using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+                    Dispatcher.UIThread.MainLoop(dilim.Token);
+                    enAz = Math.Min(enAz, ipucu.Opacity);
+                }
+                var sonuc = (enAz, enAz < 1);
                 ToolTip.SetIsOpen(dugme, false);
                 return sonuc;
             }

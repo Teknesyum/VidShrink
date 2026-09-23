@@ -123,7 +123,7 @@
   "main.allow.fps": "Kare hızı düşürülebilir",
 
   "main.fast-gpu": "Hızlı düşür (GPU)",
-  "main.fast-gpu.tip": "• Ekran kartı kodlamayı işlemciye göre kat kat hızlandırır.\n• VidShrink kartınızın sunduğu en iyi kodlayıcıyı seçer; modern kartlarda AV1 kodlayıcısı yazılım kodlayıcısıyla neredeyse aynı kaliteyi yaklaşık yedi kat hızlı verir.\n• Daha eski kartlarda hız yine gelir, ama bedeli megabayt başına bir miktar kalitedir.",
+  "main.fast-gpu.tip": "• Ekran kartı kodlamayı işlemciye göre kat kat hızlandırır.\n• VidShrink kartınızın sunduğu en iyi kodlayıcıyı seçer.\n• Modern kartlarda AV1, yazılımla neredeyse aynı kaliteyi yedi kat hızlı verir.\n• Daha eski kartlarda hız yine gelir, ama bedeli megabayt başına bir miktar kalitedir.",
   "main.fast-gpu.tip-missing": "• Bu bilgisayarda kullanılabilir donanım kodlayıcı bulunamadı, bu yüzden hızlı düşürme kullanılamıyor.\n• Ekran kartı normalde işlemciden kat kat hızlı kodlar.",
   "main.fast-gpu.on-usable": "• Hızlı düşür kendiliğinden açıldı: {0} yoklamayı {1} ms'de geçti ve istenen {2} takip edebildiği {3} sınırının üstünde.",
   "main.fast-gpu.off-usable": "• {0} ölçümü geçti; kutu elle kapatıldığı için kapalı kalıyor.",
@@ -255,7 +255,7 @@
   "main.output.estimated-time": "Tahmini süre",
   "main.output.estimated-time.tip": "• VidShrink bu klip için koşturduğu örnek kodlamaların süresini ölçer; bu sayının arkasındaki hız ön ayar tablosundan değil, bu makineden ve bu dosyadan gelir.\n• İki geçişli işlerde aralık geniştir, çünkü birinci geçiş yalnızca görüntüyü çözümler ve ikinciden ucuza mal olur, ne kadar ucuz olduğu ise ölçülmez.\n• Plan, örneklerin kodlanmadığı ayarlara geçtiğinde süre tahmin edilmez, boş bırakılır.",
   "main.output.estimated-output": "Tahmini çıktı",
-  "main.output.estimated-output.tip": "• VidShrink plan yapmadan önce tam olarak bu klipten kısa örnekleri iki çözünürlükte kodlar ve gerçekte kaç bit gerektiğini ölçer.\n• Ölçüm bitene kadar ya da örnek kodlama başarısız olursa tahmin kaynak bit hızına düşer; tahminin altındaki not hangisi olduğunu söyler.\n• İki geçişli işler yüzde birkaç içinde iner; donanım kodlayıcıları tek geçiş koşar ve hedefin altında kalabilir; kalite tavanlı işler ise bilerek hedefin altında kalır, çünkü kalanı harcamak gözle görülür bir şey satın almaz.",
+  "main.output.estimated-output.tip": "• VidShrink plan yapmadan önce bu klipten kısa örnekleri iki çözünürlükte kodlar.\n• Klibin gerçekte kaç bit istediğini böyle ölçer.\n• Ölçüm bitene kadar ya da örnek kodlama başarısız olursa tahmin kaynak bit hızına düşer.\n• Tahminin altındaki not hangisi olduğunu söyler.\n• İki geçişli işler yüzde birkaç içinde iner.\n• Donanım kodlayıcıları tek geçiş koşar ve hedefin altında kalabilir.\n• Kalite tavanlı işler bilerek hedefin altında kalır, çünkü kalanı harcamak gözle görülür bir şey satın almaz.",
   "main.output.waiting": "Kararınız bekleniyor",
 
   "main.estimate.of-source": "Kaynağın",

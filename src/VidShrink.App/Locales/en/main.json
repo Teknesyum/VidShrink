@@ -123,7 +123,7 @@
   "main.allow.fps": "May Lower Frame Rate",
 
   "main.fast-gpu": "Fast shrink (GPU)",
-  "main.fast-gpu.tip": "• Graphics cards encode many times faster than the CPU.\n• VidShrink picks the best encoder your card offers; on a modern card the AV1 encoder reaches nearly the software encoder's quality at about seven times the speed.\n• On older cards the speed still arrives, but it costs some quality per megabyte.",
+  "main.fast-gpu.tip": "• Graphics cards encode many times faster than the CPU.\n• VidShrink picks the best encoder your card offers.\n• On a modern card, AV1 nearly matches software quality at about seven times the speed.\n• On older cards the speed still arrives, but it costs some quality per megabyte.",
   "main.fast-gpu.tip-missing": "• No usable hardware encoder was found on this computer, so fast shrink is unavailable.\n• The graphics card would normally encode many times faster than the CPU.",
   "main.fast-gpu.on-usable": "• Fast shrink turned itself on: {0} passed the probe in {1} ms and the requested {2} sits above the {3} it can follow.",
   "main.fast-gpu.off-usable": "• {0} passed the measurement; the box stays off because it was turned off by hand.",
@@ -255,7 +255,7 @@
   "main.output.estimated-time": "Estimated time",
   "main.output.estimated-time.tip": "• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file, not from a preset table.\n• Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured.\n• If the plan moves to settings the samples were not encoded with, the time is left blank, not guessed.",
   "main.output.estimated-output": "Estimated output",
-  "main.output.estimated-output.tip": "• Before planning, VidShrink encodes short samples of this clip at two resolutions and measures how many bits it needs.\n• Until that measurement finishes, or if the sample encode fails, the estimate falls back to the source bitrate; the note under the estimate says which of the two it is.\n• Two-pass runs land within a few percent; hardware encoders run a single pass and can come in under the target; quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see.",
+  "main.output.estimated-output.tip": "• Before planning, VidShrink encodes short samples of this clip at two resolutions.\n• It measures how many bits the clip really needs.\n• Until then, or if the sample fails, the estimate uses the source bitrate.\n• The note under the estimate says which of the two it is.\n• Two-pass runs land within a few percent.\n• Hardware encoders run a single pass and can come in under the target.\n• Quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see.",
   "main.output.waiting": "Waiting for your decision",
 
   "main.estimate.of-source": "Of source",
