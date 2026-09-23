@@ -6,7 +6,7 @@ public static class BudgetFill
 {
     public const double Floor = 0.97;
     public const double Aim = 0.985;
-    public const double NvencAim = 0.97;
+    public const double NvencAim = 0.985;
     public const int ExtraAttempts = 1;
 
     public static bool Wants(double deliveredMb, double targetMb, int attemptsUsed, int attemptLimit, bool alreadyUsed)

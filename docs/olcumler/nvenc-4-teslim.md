@@ -89,3 +89,5 @@ ayrı bir karar; bu ölçüm onu sınamadı.
 ## Sonraki Değişiklik (23.09.2026)
 
 Bu belgedeki `RetryAimMb` davranışı (ölçülen verimle bant merkezine, 10 MB altında 0,96·T) artık geçerli değil: nişan `BudgetFill.Aim`·T (0,985·T). Yazılım kodlayıcı ızgarasındaki ölçüm `retry-nisan-dolum.md`'de. NVENC satırları yeniden ölçülmedi.
+
+NVENC yukarı denemesinin nişanı da 0,97'den 0,985'e çekildi (23.09.2026): aynı ızgarada ortalama 0,9750 → 0,9780, hedefi aşan teslim 0/18. Ölçüm d1-donanim-dolum.md'de.
