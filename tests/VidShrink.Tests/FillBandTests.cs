@@ -224,10 +224,10 @@ public sealed class FillBandTests
     private const double MeasuredLibx264Yield = 0.9815;
 
     [Theory]
-    [InlineData(180.0, 177.48, 174.96)]
-    [InlineData(25.0, 24.375, 23.75)]
-    [InlineData(8.0, 7.68, 7.36)]
-    public void RetryAimTargetsTheBandCenterWhenTheYieldIsMeasured(double targetMb, double expectedAimMb, double expectedLowerMb)
+    [InlineData(180.0, 177.3, 174.96)]
+    [InlineData(25.0, 24.625, 23.75)]
+    [InlineData(8.0, 7.88, 7.36)]
+    public void RetryAimTargetsTheBudgetFillAimWhenTheYieldIsMeasured(double targetMb, double expectedAimMb, double expectedLowerMb)
     {
         var aim = PlanCalculator.RetryAimMb(targetMb, MeasuredLibx264Yield);
 
@@ -237,10 +237,11 @@ public sealed class FillBandTests
     }
 
     [Theory]
-    [InlineData(8.0, 7.68, 7.76)]
-    [InlineData(1.0, 0.96, 0.97)]
-    [InlineData(4.88, 4.6848, 4.7336)]
-    public void RetryAimStaysUnderTheBudgetFillFloorSoAnOnAimAttemptTriggersOneMoreEncode(
+    [InlineData(180.0, 177.3, 174.6)]
+    [InlineData(8.0, 7.88, 7.76)]
+    [InlineData(1.0, 0.985, 0.97)]
+    [InlineData(4.88, 4.8068, 4.7336)]
+    public void RetryAimSitsBetweenTheBudgetFillFloorAndTheCeilingSoAnOnAimAttemptIsDelivered(
         double targetMb, double expectedAimMb, double expectedFloorMb)
     {
         var aim = PlanCalculator.RetryAimMb(targetMb, MeasuredLibx264Yield);
@@ -248,10 +249,12 @@ public sealed class FillBandTests
 
         Assert.Equal(expectedAimMb, aim, 6);
         Assert.Equal(expectedFloorMb, floorMb, 6);
-        Assert.True(aim < floorMb,
-            $"The retry aim {aim:0.0000} MB is no longer under the budget fill floor {floorMb:0.0000} MB.");
-        Assert.True(BudgetFill.Wants(aim, targetMb, attemptsUsed: 2, attemptLimit: 3, alreadyUsed: false),
-            "An attempt that lands exactly on the retry aim must still ask for one more full encode.");
+        Assert.True(aim > floorMb,
+            $"The retry aim {aim:0.0000} MB must sit above the budget fill floor {floorMb:0.0000} MB.");
+        Assert.True(aim < targetMb,
+            $"The retry aim {aim:0.0000} MB must stay under the {targetMb:0.####} MB ceiling.");
+        Assert.False(BudgetFill.Wants(aim, targetMb, attemptsUsed: 2, attemptLimit: 3, alreadyUsed: false),
+            "An attempt that lands exactly on the retry aim must be delivered without one more full encode.");
     }
 
     [Theory]

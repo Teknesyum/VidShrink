@@ -85,3 +85,7 @@ onu ölçtü.
 Kalan açık: 0,97 kolunda 8 hücre hâlâ 0,97'nin altında. Düzeltme denemesi 0,96'ya
 nişanlanıyor; yukarı deneme ya 0,97 eşiğinde tetiklenmiyor ya da aşıp atılıyor (parlak hevc 2000). Küçük hedefte bant merkezini NVENC için yukarı almak
 ayrı bir karar; bu ölçüm onu sınamadı.
+
+## Sonraki Değişiklik (23.09.2026)
+
+Bu belgedeki `RetryAimMb` davranışı (ölçülen verimle bant merkezine, 10 MB altında 0,96·T) artık geçerli değil: nişan `BudgetFill.Aim`·T (0,985·T). Yazılım kodlayıcı ızgarasındaki ölçüm `retry-nisan-dolum.md`'de. NVENC satırları yeniden ölçülmedi.
