@@ -1080,7 +1080,10 @@ public sealed class ManualOverrideTests
         // B1b: AudioLoudnorm ve AudioGainDb kullanicinin ses suzgeci secimi (HandBrake --normalize-mix,
         // --gain). B1c: ExternalSubtitles kullanicinin ekledigi altyazi dosyalari (--srt-file).
         // Ucunun de varsayilani bugunku davranis: suzgec yok, dis altyazi yok.
-        "AudioLoudnorm", "AudioGainDb", "ExternalSubtitles"
+        "AudioLoudnorm", "AudioGainDb", "ExternalSubtitles",
+        // O3: DeliveredContainer on ayarin teslim kabi (MOV, MKV ...). Kapali sabit degil, istegin
+        // kendisi; bos kalinca kap plandan turer ve bugunku davranis o.
+        "DeliveredContainer"
     };
 
     [Fact]
