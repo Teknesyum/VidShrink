@@ -1569,7 +1569,7 @@
                     </StackPanel>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Text settings.share.deletion}" Theme="{StaticResource PlanFactLabel}" VerticalAlignment="Center"/>
-                    <Button Grid.Row="2" Grid.Column="1" x:Name="BtnShareDelete"
+                    <Button x:Name="BtnShareDelete" Grid.Row="2" Grid.Column="1"
                             Content="{loc:Text settings.share.delete}"
                             Theme="{StaticResource GhostButton}"
                             HorizontalAlignment="Left"
