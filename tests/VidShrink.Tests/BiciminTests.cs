@@ -1299,6 +1299,8 @@ public sealed class BaslikKapsamiTests
     /// anahtari ekledi: dil basina 1067 + 3 = 1070, 43 x 1070 = 46010. <c>kayip</c> yine 0.</para>
     /// <para>2026-09-23: <c>main.reason.vp9-crf-unmeasured</c> dil basina 1070 + 1 = 1071,
     /// 43 x 1071 = 46053.</para>
+    /// <para>2026-09-23: otomatik kirpma (HandBrake #36) dil basina <c>main.advanced.filters.autocrop</c>
+    /// ve <c>main.reason.auto-crop</c>: 1071 + 2 = 1073, 43 x 1073 = 46139. <c>kayip</c> yine 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1326,7 +1328,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(46053, gezilen);
+        Assert.Equal(46139, gezilen);
         Assert.Empty(kayip);
     }
 

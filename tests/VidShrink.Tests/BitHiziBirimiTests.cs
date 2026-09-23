@@ -35,6 +35,8 @@ public class BitHiziBirimiTests
         ["main.advanced.audio-kbps.label"] = "etiket, cümle değil",
         ["recorder.advanced.bitrate"] = "etiket, cümle değil",
         ["recorder.advanced.max-bitrate"] = "etiket, cümle değil",
+        ["main.convert.crf-label"] = "etiket, cümle değil",
+        ["main.convert.audio-bitrate"] = "etiket, cümle değil",
         ["main.convert.audio-bitrate.tip"] = "birimi rakamla değil sözcükle anıyor (ar/fa/he)",
         ["main.convert.crf-label.tip"] = "birimi rakamla değil sözcükle anıyor (fa)"
     };
@@ -44,7 +46,9 @@ public class BitHiziBirimiTests
     {
         ("main.json", "main.advanced.audio-kbps.label"),
         ("recorder.json", "recorder.advanced.bitrate"),
-        ("recorder.json", "recorder.advanced.max-bitrate")
+        ("recorder.json", "recorder.advanced.max-bitrate"),
+        ("main.json", "main.convert.crf-label"),
+        ("main.json", "main.convert.audio-bitrate")
     };
 
     private static string[] Diller() =>

@@ -35,15 +35,19 @@ jobs:
     timeout-minutes: 75
     strategy:
       fail-fast: false
-      # Yerlesim denetimi 42 dilde ~670 kol acinca tek is 75 dakikayi asiyordu. Denetim
-      # uc parcaya bolunur ve ana suitle paralel kosar; ucuncu parca tumleyen suzgectir,
-      # yeni eklenen denetim metodu hicbir parcanin disinda kalmaz.
+      # Tek is 75 dakikayi asiyordu. 35852667687'de ana 55 dk (toplam 3293 sn), bunun 1046 sn'si
+      # alti UstSeritTik kolu; o sinif kendi parcasinda. Yerlesim denetimi uc parcada 3-5 dk;
+      # ucuncu parca tumleyen suzgectir, yeni eklenen denetim metodu hicbir parcanin disinda kalmaz.
       matrix:
         include:
           - parca: ana
-            filter: 'FullyQualifiedName!~YerlesimDenetimiTests'
+            filter: 'FullyQualifiedName!~YerlesimDenetimiTests&FullyQualifiedName!~UstSeritTikTests'
             minimum: 1143
             skipped: 30
+          - parca: ust-serit
+            filter: 'FullyQualifiedName~UstSeritTikTests'
+            minimum: 6
+            skipped: 0
           - parca: yerlesim-1
             filter: 'FullyQualifiedName~YerlesimDenetimiTests.SekmelerdeKesik|FullyQualifiedName~YerlesimDenetimiTests.SonucDurumunda|FullyQualifiedName~YerlesimDenetimiTests.BosPencerede|FullyQualifiedName~YerlesimDenetimiTests.KodlamaSurerken|FullyQualifiedName~YerlesimDenetimiTests.AyrintiYuzeylerinde'
             minimum: 50
