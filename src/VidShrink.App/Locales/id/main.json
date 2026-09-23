@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Hilangkan blocking",
   "main.advanced.filters.deband": "Hilangkan banding",
   "main.advanced.filters.gray": "Skala abu-abu",
+  "main.advanced.filters.autocrop": "Pangkas bilah hitam",
   "main.advanced.filters.spec": "Spesifikasi (crop, pad, dll.)",
   "main.advanced.codec-lock.label": "Kunci codec",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "encoder {0} belum diukur di mesin ini, jadi encoding kembali ke {1}",
   "main.reason.encoder-fallback-not-working": "encoder {0} tidak dapat dipakai di mesin ini, jadi encoding kembali ke {1}",
   "main.reason.hdr-tonemapped": "sumber HDR tetapi encoder yang dipilih tidak bisa mempertahankan 10-bit, jadi dipetakan ke SDR BT.709",
+  "main.reason.auto-crop": "bilah hitam dipangkas: {0}x{1} (sumber {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "sumber membawa metadata HDR dinamis (HDR10+ atau Dolby Vision) yang tidak diteruskan oleh encode ini, jadi keluaran hanya menyimpan lapisan HDR10 statis",
   "main.reason.vp9-crf-unmeasured": "Skala kualitas CRF libvpx-vp9 sudah diukur, tapi bagaimana nilai CRF berpengaruh pada ukuran berkas belum diukur, jadi ukuran dijaga dengan VBR dua lintasan alih-alih menebak CRF",
   "main.reason.stream.audio-passthrough": "trek audio disalin apa adanya: kontainer mendukung codec-nya dan tetap dalam 15% dari target",

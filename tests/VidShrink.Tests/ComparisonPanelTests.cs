@@ -380,6 +380,8 @@ public sealed class ComparisonPanelTests
     /// K3'ün ikinci yarısı: tuşa ikinci basış eski boya döndürür ve dönüş <b>birebir</b>.
     /// Ölçü kabuğun gerçekten yerleştiği boyu okuyor — hedef kademe değil — çünkü kusur
     /// tam orada görünürdü: panel bandına yaklaşık dönseydi altındaki düzen kayardı.
+    /// Başlangıç boyu da oturmuş yerleşimden okunur: Küçült'ün orta sütunu görüş alanını
+    /// ilk geçişte bilmiyor, tek geçişte bant 619, oturunca 632 px okunuyordu.
     /// </summary>
     [Fact]
     public void Maksimize_tusu_ikinci_basista_eski_boya_doner()
@@ -387,6 +389,7 @@ public sealed class ComparisonPanelTests
         var (band, grown, back, stage, promoted) = Read((host, panel) =>
         {
             panel.MotionReduced = true;
+            ReLayOut(host, WindowSize);
             var start = panel.Shell.Bounds.Size;
 
             var button = ZoomButton(host, "BtnPanelMaximize");

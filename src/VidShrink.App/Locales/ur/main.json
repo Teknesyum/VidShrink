@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "بلاکنگ ہٹائیں",
   "main.advanced.filters.deband": "بینڈنگ ہٹائیں",
   "main.advanced.filters.gray": "گرے اسکیل",
+  "main.advanced.filters.autocrop": "سیاہ پٹیاں تراشیں",
   "main.advanced.filters.spec": "وضاحت (کراپ، پیڈ وژیرہ)",
   "main.advanced.codec-lock.label": "کوڈیک لاک",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "{0} انکوڈر اس مشین پر نہیں ناپا گیا، اس لیے انکوڈنگ {1} پر لوٹتی ہے",
   "main.reason.encoder-fallback-not-working": "{0} انکوڈر اس مشین پر استعمال نہ ہو سکا، اس لیے انکوڈنگ {1} پر لوٹتی ہے",
   "main.reason.hdr-tonemapped": "ماخذ HDR ہے مگر چنا گیا انکوڈر 10-bit برقرار نہیں رکھ سکتا، اس لیے اسے SDR BT.709 پر ٹون میپ کیا گیا",
+  "main.reason.auto-crop": "سیاہ پٹیاں تراشی گئیں: {0}x{1} (ماخذ {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "ماخذ میں متحرک HDR میٹا ڈیٹا (HDR10+ یا Dolby Vision) ہے جسے یہ انکوڈ آگے نہیں لے جاتا، اس لیے آؤٹ پٹ میں صرف جامد HDR10 تہہ رہتی ہے",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9 کا CRF کوالٹی پیمانہ ناپا گیا ہے، لیکن یہ نہیں ناپا گیا کہ CRF ویلیو فائل کے سائز پر کیسے اثر ڈالتی ہے، اس لیے CRF کے اندازے کے بجائے دو پاس VBR سائز سنبھالتا ہے",
   "main.reason.stream.audio-passthrough": "آڈیو ٹریک جوں کا توں کاپی ہوتا ہے: کنٹینر اس کے کوڈیک کو سپورٹ کرتا ہے اور یہ ہدف کے 15% کے اندر رہتا ہے",

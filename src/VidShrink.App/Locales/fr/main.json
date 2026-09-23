@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Déblocage",
   "main.advanced.filters.deband": "Débandage",
   "main.advanced.filters.gray": "Niveaux de gris",
+  "main.advanced.filters.autocrop": "Rogner les bandes noires",
   "main.advanced.filters.spec": "Spécification (recadrage, marges, etc.)",
   "main.advanced.codec-lock.label": "Verrou de codec",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "l'encodeur {0} n'a pas été mesuré sur cette machine, l'encodage se rabat donc sur {1}",
   "main.reason.encoder-fallback-not-working": "l'encodeur {0} n'a pas pu être utilisé sur cette machine, l'encodage se rabat donc sur {1}",
   "main.reason.hdr-tonemapped": "la source est HDR mais l'encodeur choisi ne peut pas conserver le 10 bits ; elle a donc été convertie en SDR BT.709",
+  "main.reason.auto-crop": "bandes noires rognées : {0}x{1} (source {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "la source porte des métadonnées HDR dynamiques (HDR10+ ou Dolby Vision) que cet encodage ne transmet pas ; la sortie ne garde donc que la couche HDR10 statique",
   "main.reason.vp9-crf-unmeasured": "L’échelle de qualité CRF de libvpx-vp9 est mesurée, mais pas la façon dont une valeur de CRF se traduit en taille de fichier ; la taille est donc tenue par un VBR en deux passes plutôt que par un CRF deviné",
   "main.reason.stream.audio-passthrough": "la piste audio est copiée telle quelle : le conteneur prend en charge son codec et elle reste sous 15 % de la cible",

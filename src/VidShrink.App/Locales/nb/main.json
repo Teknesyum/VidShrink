@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Deblokkering",
   "main.advanced.filters.deband": "Debanding",
   "main.advanced.filters.gray": "Gråtoner",
+  "main.advanced.filters.autocrop": "Beskjær svarte felt",
   "main.advanced.filters.spec": "Spesifikasjon (beskjæring, kant m.m.)",
   "main.advanced.codec-lock.label": "Kodeklås",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "{0}-koderen er ikke målt på denne maskinen, så kodingen faller tilbake til {1}",
   "main.reason.encoder-fallback-not-working": "{0}-koderen kunne ikke brukes på denne maskinen, så kodingen faller tilbake til {1}",
   "main.reason.hdr-tonemapped": "kilden er HDR, men valgt koder kan ikke bevare 10-bit, så den ble tonekartlagt til SDR BT.709",
+  "main.reason.auto-crop": "svarte felt beskåret: {0}x{1} (kilde {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "kilden har dynamiske HDR-metadata (HDR10+ eller Dolby Vision) som denne kodingen ikke fører videre, så utdataene beholder bare det statiske HDR10-laget",
   "main.reason.vp9-crf-unmeasured": "CRF-kvalitetsskalaen til libvpx-vp9 er målt, men ikke hvordan en CRF-verdi slår ut i filstørrelse, så størrelsen holdes med to-pass VBR i stedet for en CRF-gjetning",
   "main.reason.stream.audio-passthrough": "lydsporet kopieres uendret: containeren støtter kodeken, og det holder seg innenfor 15 % av målet",

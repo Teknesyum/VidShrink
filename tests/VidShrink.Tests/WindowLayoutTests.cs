@@ -553,12 +553,18 @@ public sealed class WindowLayoutTests
     /// kesiliyordu). Tasarım boyunda <see cref="KucultSutunlari"/> sol sütunu dört sütunun
     /// sığacağı kadar genişletiyor, aralık değişmedi. Dar pencerede sütunlar eşit kalıyor ve
     /// ızgara iki sütun, dört satır: <b>dolu/dar</b> 906-1006 → 1006-1106 (ölçülen 1056).</para>
+    /// <para>Görsel denetim bulgu 9 (bilinçli): dar pencerede hedef ve kalite kaydırıcıları
+    /// kutudan ayrı kendi satırına iniyor (<see cref="KaydiriciSatiri"/>), yoksa en az
+    /// <c>SliderMinWidth</c> kalmıyordu. <b>Boş/dar</b> 1015-1115 → 1079-1179 (ölçülen 1129),
+    /// <b>dolu/dar</b> 1006-1106 → 1093-1193 (ölçülen 1143). Tasarım boyu değişmedi.
+    /// Nedeni ölçüldü: <c>KaydiriciSatiri</c> hep tek satır kalınca iki dar kol eski
+    /// aralıklarında geçiyor.</para>
     /// </summary>
     [Theory]
     [InlineData(false, false, 941, 1041)]
-    [InlineData(false, true, 1015, 1115)]
+    [InlineData(false, true, 1079, 1179)]
     [InlineData(true, false, 906, 1006)]
-    [InlineData(true, true, 1006, 1106)]
+    [InlineData(true, true, 1093, 1193)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
     {
         var size = narrow ? MinimumSize() : DesignSize();
@@ -730,10 +736,14 @@ public sealed class WindowLayoutTests
     /// beklenen sütunun <b>en uzunlardan biri</b> olmasını sınıyor, eşitlikte ikisi de tutuyor.</para>
     /// <para>2026-09-23: dolu sayfayı yeniden sol sütun tutuyor: bilgi ızgarası değerleri kesmeden
     /// dört sütunda, sol sütun <see cref="KucultSutunlari"/> ile o kadar geniş.</para>
+    /// <para>Görsel denetim (2026-09-23): dolu sayfayı yeniden orta sütun tutuyor — ölçülen sol 902,
+    /// orta 906, sağ 502. Orta sütunun boyu değişmedi; sol sütun 4 piksel kısaldı. Sütunların
+    /// dış boşluğu artık <c>PageMargin</c> (sağda kaydırma çubuğuna yer açan pay), sayfa içeriği
+    /// en uzun sütun ile onun dikey payının toplamı.</para>
     /// </summary>
     [Theory]
     [InlineData(false, 0)]
-    [InlineData(true, 0)]
+    [InlineData(true, 1)]
     public void TheTallestColumnIsWhatHoldsThePage(bool loaded, int holder)
     {
         var (columns, content) = Read(DesignSize(), loaded, window =>
@@ -757,7 +767,7 @@ public sealed class WindowLayoutTests
 
         // Sayfa içeriği en uzun sütun ile sekme boşluğunun toplamı.
         var margin = Read(DesignSize(), loaded, window =>
-            window.TryFindResource("SectionMargin", out var value) && value is Thickness pad
+            window.TryFindResource("PageMargin", out var value) && value is Thickness pad
                 ? pad.Top + pad.Bottom
                 : double.NaN);
 

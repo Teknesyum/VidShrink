@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Deblokiranje",
   "main.advanced.filters.deband": "Debanding",
   "main.advanced.filters.gray": "Sivi tonovi",
+  "main.advanced.filters.autocrop": "Obreži crne trake",
   "main.advanced.filters.spec": "Specifikacija (izrezivanje, rubovi itd.)",
   "main.advanced.codec-lock.label": "Zaključaj kodek",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "koder {0} nije izmjeren na ovom računalu, pa se kodiranje vraća na {1}",
   "main.reason.encoder-fallback-not-working": "koder {0} nije se mogao koristiti na ovom računalu, pa se kodiranje vraća na {1}",
   "main.reason.hdr-tonemapped": "izvornik je HDR, ali odabrani koder ne može zadržati 10 bita, pa je tonski preslikan u SDR BT.709",
+  "main.reason.auto-crop": "crne trake obrezane: {0}x{1} (izvor {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "izvornik nosi dinamičke HDR metapodatke (HDR10+ ili Dolby Vision) koje ovo kodiranje ne prenosi, pa izlaz zadržava samo statički HDR10 sloj",
   "main.reason.vp9-crf-unmeasured": "Ljestvica kvalitete CRF za libvpx-vp9 je izmjerena, ali nije izmjereno kako se vrijednost CRF-a odražava na veličinu datoteke, pa veličinu drži dvoprolazni VBR umjesto nagađanja CRF-a",
   "main.reason.stream.audio-passthrough": "audiozapis kopira se nepromijenjen: spremnik podržava njegov kodek i ostaje unutar 15 % cilja",

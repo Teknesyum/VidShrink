@@ -129,6 +129,8 @@ public partial class MainWindow
             if (text is not null) parts.Add(text);
         }
 
+        if (KirpmaGerekcesi(plan) is { } kirpma) parts.Add(kirpma);
+
         if (plan.Streams is { } streams)
             foreach (var note in streams.Notes) parts.Add(Say(StreamNoteKey(note)));
 

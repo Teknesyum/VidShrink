@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Bloku novēršana",
   "main.advanced.filters.deband": "Joslojuma novēršana",
   "main.advanced.filters.gray": "Pelēktoņi",
+  "main.advanced.filters.autocrop": "Apgriezt melnās joslas",
   "main.advanced.filters.spec": "Specifikācija (apgriešana, malas u.c.)",
   "main.advanced.codec-lock.label": "Kodeka fiksācija",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "kodētājs {0} šajā datorā nav mērīts, tāpēc kodēšana atgriežas pie {1}",
   "main.reason.encoder-fallback-not-working": "kodētāju {0} šajā datorā neizdevās lietot, tāpēc kodēšana atgriežas pie {1}",
   "main.reason.hdr-tonemapped": "avots ir HDR, bet izvēlētais kodētājs nevar saglabāt 10 bitus, tāpēc tas tika toņu kartēts uz SDR BT.709",
+  "main.reason.auto-crop": "melnās joslas apgrieztas: {0}x{1} (avots {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "avotā ir dinamiski HDR metadati (HDR10+ vai Dolby Vision), ko šī kodēšana nepārnes, tāpēc izvadē paliek tikai statiskais HDR10 slānis",
   "main.reason.vp9-crf-unmeasured": "libvpx-vp9 CRF kvalitātes skala ir izmērīta, bet nav izmērīts, kā CRF vērtība ietekmē faila izmēru, tāpēc izmēru notur divu gājienu VBR, nevis minēts CRF",
   "main.reason.stream.audio-passthrough": "audio celiņš tiek kopēts nemainīts: konteiners atbalsta tā kodeku un tas nepārsniedz 15% no mērķa",

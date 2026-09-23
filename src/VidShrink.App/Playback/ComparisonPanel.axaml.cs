@@ -275,6 +275,12 @@ internal partial class ComparisonPanel : UserControl
 
     // ---- ayırıcı (K2) -------------------------------------------------------------
 
+    /// <summary>
+    /// T49/K4: yaklaşık rozetinin tavanı panonun sağ yarısı eksi kenar boşluğu; sığmayan metin
+    /// üç noktayla kırpılır ve panelin istediği genişliği büyütmez. Tavan perdeye bağlı değil,
+    /// rozetin konumu gibi panonun köşesine bağlı (T184/K3): perdenin genişliğinden türediğinde
+    /// ayırıcı sağa kaydıkça tavan 0'a iniyor ve metin tümden kayboluyordu.
+    /// </summary>
     private void ApplySplit()
     {
         Surface.Split = _split;
@@ -287,10 +293,7 @@ internal partial class ComparisonPanel : UserControl
             var right = Math.Max(0, width - Math.Clamp(_split, 0, 1) * width);
             RightCurtain.Width = right;
 
-            // T49/K4: rozetin tavanı sağ yarının kendi genişliği eksi kenar boşluğu.
-            // Uydurulmuş sayı yok; sığmayan metin üç noktayla kırpılır ve panelin
-            // istediği genişliği büyütmez.
-            ApproxBadge.MaxWidth = Math.Max(0, right - Inset("PlaybackBadgeMargin", 24));
+            ApproxBadge.MaxWidth = Math.Max(0, width / 2 - Inset("PlaybackBadgeMargin", 24));
         }
 
         RefreshBadgeFade();
@@ -546,6 +549,7 @@ internal partial class ComparisonPanel : UserControl
     {
         var empty = !Surface.HasFrame;
         EmptyState.IsVisible = empty;
+        Surface.Opacity = empty ? 0 : 1;
         // Perde varken sağ tarafta "işlenmiş" diye bir şey yok; yonga da sebebi söyleyen
         // perdenin üstünde durmaz.
         RightCurtain.IsVisible = !empty && _rightNotice is not null;

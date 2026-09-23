@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Odblokování",
   "main.advanced.filters.deband": "Odpruhování",
   "main.advanced.filters.gray": "Stupně šedi",
+  "main.advanced.filters.autocrop": "Oříznout černé pruhy",
   "main.advanced.filters.spec": "Specifikace (oříznutí, okraje aj.)",
   "main.advanced.codec-lock.label": "Zámek kodeku",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "enkodér {0} nebyl na tomto počítači změřen, kódování se tedy vrací k {1}",
   "main.reason.encoder-fallback-not-working": "enkodér {0} nebylo možné na tomto počítači použít, kódování se tedy vrací k {1}",
   "main.reason.hdr-tonemapped": "zdroj je HDR, ale zvolený enkodér nedokáže zachovat 10 bitů, byl tedy tónově mapován na SDR BT.709",
+  "main.reason.auto-crop": "černé pruhy oříznuty: {0}x{1} (zdroj {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "zdroj nese dynamická HDR metadata (HDR10+ nebo Dolby Vision), která toto kódování nepřenese, výstup si tedy ponechá jen statickou vrstvu HDR10",
   "main.reason.vp9-crf-unmeasured": "Kvalitativní stupnice CRF pro libvpx-vp9 je změřena, ale není změřeno, jak se hodnota CRF promítá do velikosti souboru, takže velikost drží dvouprůchodové VBR místo odhadu CRF",
   "main.reason.stream.audio-passthrough": "zvuková stopa se kopíruje beze změny: kontejner podporuje její kodek a vejde se do 15 % cíle",

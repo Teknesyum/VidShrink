@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "Αφαίρεση μπλοκαρίσματος",
   "main.advanced.filters.deband": "Αφαίρεση λωρίδωσης",
   "main.advanced.filters.gray": "Κλίμακα του γκρι",
+  "main.advanced.filters.autocrop": "Περικοπή μαύρων λωρίδων",
   "main.advanced.filters.spec": "Προδιαγραφή (περικοπή, περιθώριο κ.λπ.)",
   "main.advanced.codec-lock.label": "Κλείδωμα κωδικοποιητή",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "ο κωδικοποιητής {0} δεν έχει μετρηθεί σε αυτό το μηχάνημα, οπότε η κωδικοποίηση επιστρέφει σε {1}",
   "main.reason.encoder-fallback-not-working": "ο κωδικοποιητής {0} δεν μπόρεσε να χρησιμοποιηθεί σε αυτό το μηχάνημα, οπότε η κωδικοποίηση επιστρέφει σε {1}",
   "main.reason.hdr-tonemapped": "η πηγή είναι HDR αλλά ο επιλεγμένος κωδικοποιητής δεν διατηρεί 10-bit, οπότε έγινε tone-mapping σε SDR BT.709",
+  "main.reason.auto-crop": "οι μαύρες λωρίδες περικόπηκαν: {0}x{1} (πηγή {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "η πηγή φέρει δυναμικά μεταδεδομένα HDR (HDR10+ ή Dolby Vision) που αυτή η κωδικοποίηση δεν μεταφέρει, οπότε η έξοδος κρατά μόνο το στατικό επίπεδο HDR10",
   "main.reason.vp9-crf-unmeasured": "Η κλίμακα ποιότητας CRF του libvpx-vp9 έχει μετρηθεί, αλλά δεν έχει μετρηθεί πώς μια τιμή CRF μεταφράζεται σε μέγεθος αρχείου, οπότε το μέγεθος κρατιέται με VBR δύο περασμάτων αντί για εκτίμηση CRF",
   "main.reason.stream.audio-passthrough": "το κομμάτι ήχου αντιγράφεται ως έχει: το περιέκτης υποστηρίζει τον κωδικοποιητή του και μένει εντός του 15% του στόχου",

@@ -199,6 +199,7 @@
   "main.advanced.filters.deblock": "הסרת חסימות",
   "main.advanced.filters.deband": "הסרת פסים",
   "main.advanced.filters.gray": "גווני אפור",
+  "main.advanced.filters.autocrop": "חיתוך פסים שחורים",
   "main.advanced.filters.spec": "מפרט (חיתוך, ריפוד ועוד)",
   "main.advanced.codec-lock.label": "נעילת קודק",
 
@@ -419,6 +420,7 @@
   "main.reason.encoder-fallback-not-measured": "המקודד {0} לא נמדד במחשב זה, ולכן הקידוד חוזר ל-{1}",
   "main.reason.encoder-fallback-not-working": "לא ניתן להשתמש במקודד {0} במחשב זה, ולכן הקידוד חוזר ל-{1}",
   "main.reason.hdr-tonemapped": "המקור הוא HDR אבל המקודד שנבחר אינו יכול לשמור 10 ביט, ולכן הוא מופה ל-SDR BT.709",
+  "main.reason.auto-crop": "הפסים השחורים נחתכו: {0}x{1} (מקור {2}x{3})",
   "main.reason.hdr-dynamic-dropped": "המקור נושא מטא-נתוני HDR דינמיים (HDR10+ או Dolby Vision) שקידוד זה אינו מעביר, ולכן הפלט שומר רק את שכבת HDR10 הסטטית",
   "main.reason.vp9-crf-unmeasured": "סולם האיכות CRF של libvpx-vp9 נמדד, אך לא נמדד כיצד ערך CRF מתורגם לגודל הקובץ, ולכן הגודל נשמר ב-VBR דו-מעברי במקום בניחוש CRF",
   "main.reason.stream.audio-passthrough": "רצועת השמע מועתקת כפי שהיא: המכל תומך בקודק שלה והיא נשארת בתוך 15% מהיעד",
