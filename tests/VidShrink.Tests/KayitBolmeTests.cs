@@ -10,14 +10,25 @@ using Xunit;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// Paket 2b borcu: <see cref="RecorderSession"/>'ın kendiliğinden bölme yoklaması, süre sınırının parçalara
+/// Paket 2b borcu: <see cref="RecorderSession"/>'ın kendiliğinden bölmesi, süre sınırının parçalara
 /// kalanla dağıtılması ve <c>_partial</c> yolu gerçek gdigrab kaydında. 5 sn sınır ve 2 sn bölme en az iki
 /// numaralı parça verir, parçaların toplamı 5 sn'yi aşmaz; bölmesiz aynı kayıt tek parça (negatif kontrol).
-/// Ölçülen: 2 sn bölmede parçalar 3,134 + 1,867 sn; birinci parça ~1,1 sn uzuyor, kalan süre ikinciden
-/// düşüyor (aşımın yoklama, ilerleme bloğu ve nazik kapanış arasında payı ayrılmadı). Aşım makineye bağlı:
-/// bu makinede beş koşumda 3,134-3,2 sn, CI koşucusunda 3,667 sn ölçüldü ve 3,5 sn'lik eski sınır orada
-/// kırmızı verdi (19 Eylül 2026, docs/olcumler/kayit-bolme-parca-siniri.md). Sınır 4,0 sn: bölme hiç
-/// olmasaydı tek parça 5 sn olurdu, yani sınır kusuru hâlâ yakalıyor — zaten <c>Segments</c> pimi de yakalar.
+/// <para>
+/// 23 Eylül 2026'da bölme dışarıdan (250 ms'de bir yoklayan <c>WatchSplitAsync</c> + nazik <c>q</c> kapanışı)
+/// uygulanıyordu ve paylaşılan CI koşucusunda 2 sn'lik bölme 4,4 sn'lik parça üretti — sabit bir tavan (önce
+/// 3,5, sonra 4,0 sn) her yük artışında yeniden kırmızı veriyordu (<c>docs/olcumler/kayit-bolme-parca-siniri.md</c>).
+/// Kök neden gerçekti: nazik kapanışın gecikmesi CI yükü arttıkça uzuyor ve parça süresine giriyordu. Düzeltme
+/// tavanı gevşetmek değil, aşımı üründen kaldırmaktı: <see cref="RecorderArguments.ForSegment"/> artık bölme
+/// ölçütünü parçanın kendi <c>-t</c>/<c>-fs</c> sınırına katıyor (<c>min(bölme ölçütü, kalan toplam)</c>), ffmpeg
+/// parçayı içerik zamanında kendisi kapatıyor; dış yoklama ve nazik kapanış artık parça süresine hiç girmiyor
+/// (<see cref="RecorderSession.WatchExitAsync"/> dogal cikisi "parça doldu, sonrakini aç" diye okuyor). Bu
+/// yüzden alt sınır artık gerçek ve sıkı: 2 sn'lik bölmede ölçülen parçalar 2,0-2,03 sn arası (üç yerel koşum,
+/// <c>docs/olcumler/kayit-bolme-parca-siniri.md</c>), tavan 2,5 sn — 4,4 sn'ye değil 2 katına (yaklaşımın
+/// asıl kusuruna) karşı pimli.
+/// </para>
+/// Argüman düzeyindeki davranış (bölme ölçütünün <c>-t</c>'ye katılması, son kısa parça, bölmesiz kayıtta hiç
+/// yazılmaması) <see cref="KayitFfmpegKoluTests"/>'te <c>ForSegment</c> üzerinden belirlemeci ve mutasyonla
+/// pimli; burada yalnız gerçek ffmpeg sürecinin bunu uyguladığı ölçülüyor.
 /// Kapanma süresi 1 ms verilen kayıt öldürülür ve yarım işaretlenir; öldürülen Matroska ffprobe'la okunur paket verir,
 /// öldürülen mp4 vermez — <see cref="RecorderArguments.SurvivesKill"/> tablosu davranışla ölçülür. Ölçülen:
 /// <c>-flush_packets 1</c> olmadan 7 sn'lik Matroska öldürülünce 0 bayt kalıyordu. Kanıt <c>.calisma/paket-2b/bolme/</c>.
@@ -98,8 +109,9 @@ public sealed class KayitBolmeTests
         Assert.False(bolunmus.Partial);
         Assert.InRange(bolunmus.Segments, 2, 4);
         Assert.Equal(bolunmus.Segments, parcaSureleri.Count);
-        Assert.All(parcaSureleri, s => Assert.InRange(s, 0.2, 4.0));
-        Assert.InRange(parcaSureleri.Sum(), 4.0, 5.6);
+        var toplam = parcaSureleri.Sum();
+        Assert.All(parcaSureleri, s => Assert.InRange(s, 0.2, 2.5));
+        Assert.InRange(toplam, 4.0, 5.6);
 
         Assert.True(tek.Ok, tek.StandardError);
         Assert.Equal(1, tek.Segments);
@@ -116,4 +128,5 @@ public sealed class KayitBolmeTests
         Kapat((bolunmus.Files ?? Array.Empty<string>()).Select(Path.GetFileName)
             .Concat(new[] { "olcu.txt", "bolunmus.mkv", "tek.mkv", "yarim.mkv", "yarim.mp4" }).ToArray()!);
     }
+
 }

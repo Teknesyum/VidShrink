@@ -1062,34 +1062,49 @@ public static class RecorderArguments
     }
 
     /// <summary>
-    /// Bir parcanin istegi. Sure siniri kaydin toplamina ait, parcaya degil: duraklatip
-    /// surdurmek ve kendiliginden bolme yeni bir ffmpeg sureci aciyor ve her surec
-    /// <c>-t</c>'yi sifirdan sayiyor. Ilk parcadan sonra <c>-t</c>'ye kalan sure yaziliyor.
-    /// Bolme olcutu argumana girmedigi icin sonraki parcanin isteginde tasinmiyor; tasinsa
-    /// kalan sure bolme suresinden kisa kaldiginda dogrulama parcayi reddederdi.
-    /// Kalan sure <c>-t</c>'nin yazilabildigi en kucuk adimdan (1 ms) kisaysa <c>null</c>
-    /// doner ve yeni parca acilmaz.
+    /// Bir parcanin istegi. Bolme olcutu artik parcanin kendi <c>-t</c>/<c>-fs</c> sinirina
+    /// katiliyor: her parca (ilki dahil) kalan toplam sure/boyut ile bolme olcutunun kucugunu
+    /// (<c>min</c>) kendi sinir olarak aliyor, boylece ffmpeg parcayi icerik zamaninda kendisi
+    /// kapatiyor — dis yoklamanin ya da nazik kapanisin gecikmesi parca suresine hic girmiyor
+    /// (eskiden <c>RecorderSession</c> parcayi disaridan yoklayip nazikce kapatiyordu; bu yol
+    /// CI yukunde 2 sn'lik bolmede 4,4 sn'lik parca uretiyordu, bkz.
+    /// <c>docs/olcumler/kayit-bolme-parca-siniri.md</c>). Duraklatip surdurmek yine yeni bir
+    /// ffmpeg sureci aciyor ve her surec <c>-t</c>'yi sifirdan sayiyor.
+    /// Kalan sure <c>-t</c>'nin yazilabildigi en kucuk adimdan (1 ms) kisaysa, ya da kalan
+    /// boyut bayta yuvarlaninca sifirlaniyorsa <c>null</c> doner ve yeni parca acilmaz.
     /// </summary>
     public static RecorderRequest? ForSegment(RecorderRequest request, TimeSpan capturedBefore, double writtenMbBefore = 0)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var segment = request;
 
-        if (capturedBefore > TimeSpan.Zero && request.MaxDuration is { } limit)
+        TimeSpan? newMaxDuration = request.MaxDuration;
+        if (request.MaxDuration is { } limit)
         {
             var remaining = limit - capturedBefore;
             if (remaining < TimeSpan.FromMilliseconds(1)) return null;
-            segment = segment with { MaxDuration = remaining, Split = null };
+            newMaxDuration = request.Split?.Duration is { } every && every < remaining ? every : remaining;
         }
-
-        if (writtenMbBefore > 0 && request.MaxMegabytes is { } cap)
+        else if (request.Split?.Duration is { } soleEvery)
         {
-            var left = cap - writtenMbBefore;
-            if (LimitBytes(left) < 1) return null;
-            segment = segment with { MaxMegabytes = left, Split = null };
+            newMaxDuration = soleEvery;
         }
 
-        return segment;
+        double? newMaxMegabytes = request.MaxMegabytes;
+        if (request.MaxMegabytes is { } cap)
+        {
+            var remainingBytes = cap - writtenMbBefore;
+            if (LimitBytes(remainingBytes) < 1) return null;
+            newMaxMegabytes = request.Split?.Megabytes is { } megabytes && megabytes < remainingBytes ? megabytes : remainingBytes;
+        }
+        else if (request.Split?.Megabytes is { } soleMegabytes)
+        {
+            newMaxMegabytes = soleMegabytes;
+        }
+
+        if (Equals(newMaxDuration, request.MaxDuration) && Equals(newMaxMegabytes, request.MaxMegabytes) && request.Split is null)
+            return request;
+
+        return request with { MaxDuration = newMaxDuration, MaxMegabytes = newMaxMegabytes, Split = null };
     }
 
     public static long LimitBytes(double megabytes) => Megabayt.Tavan(megabytes);

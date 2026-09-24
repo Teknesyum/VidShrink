@@ -99,20 +99,17 @@ public sealed class RecorderSession : IAsyncDisposable
     public const int StartTimeoutMs = 15_000;
 
     /// <summary>
-    /// Bolme olcutunun ne siklikta yoklandigi. Yoklama ilerleme borusundan degil ayri bir
-    /// gorevden yapiliyor: bolme o anki parcayi kapatip yenisini aciyor, kapatma ise
-    /// ilerleme borusunu okuyan gorevi bekliyor — ayni gorevden cagrilsa kilitlenirdi.
-    /// <para>
-    /// 250 ms <b>olculmus bir sayi degil</b>. Ust siniri <c>-progress</c> akisi koyuyor:
-    /// ffmpeg ilerleme blogunu varsayilan olarak yarim saniyede bir yaziyor, yani bolme
-    /// olcutunun okudugu sure ve boyut o siklikta tazeleniyor; yarim saniyenin yarisinda
-    /// yoklamak her blogu en gec bir yoklama gecikmesiyle gormeye yetiyor, daha sik yoklamak
-    /// yeni bilgi getirmiyor. Olculen asim: 2 sn bolmede ilk parca 3,134 sn, ikincisi 1,867 sn
-    /// (toplam 5,001 sn sinirda); asimin yoklama, ilerleme blogu ve nazik kapanis arasinda nasil bolundugu ayrilmadi
-    /// (<c>KayitBolmeTests</c>).
-    /// </para>
+    /// ffmpeg'in <c>-progress</c> blogunu yazma araligi. Yoklamaya artik bagli degil — her
+    /// parca kendi <c>-t</c>/<c>-fs</c> sinirini <see cref="RecorderArguments.ForSegment"/>
+    /// uzerinden tasiyor ve ffmpeg parcayi icerik zamaninda kendisi kapatiyor
+    /// (<see cref="WatchExitAsync"/> dogal cikisi "parca doldu, sonrakini ac" diye okuyor).
+    /// Eskiden bolme, ayri bir gorevin 250 ms'de bir yokladigi <c>SplitDue</c> ile disaridan
+    /// kararlastirilip nazik <c>q</c> kapanisiyla uygulaniyordu; o yol CI yukunde nazik
+    /// kapanisin gecikmesini parca suresine katiyordu (2 sn'lik bolmede 4,4 sn'lik parca,
+    /// <c>docs/olcumler/kayit-bolme-parca-siniri.md</c>). 0,1 sn'lik blok araligi yalnizca
+    /// ilerleme raporunun (<c>RecordProgress</c>) tazeligini etkiliyor, parca sinirini degil.
     /// </summary>
-    public const int SplitPollMs = 250;
+    public const double StatsPeriodSeconds = 0.1;
 
     private readonly RecorderRequest _request;
     private readonly string _outputPath;
@@ -122,8 +119,6 @@ public sealed class RecorderSession : IAsyncDisposable
     private readonly EncodeRunner.StderrWatch _watch = new();
     private readonly SemaphoreSlim _turn = new(1, 1);
 
-    private CancellationTokenSource? _watchStop;
-    private Task? _watcher;
     private Process? _process;
     private Task? _stdoutPump;
     private Task? _stderrPump;
@@ -201,14 +196,6 @@ public sealed class RecorderSession : IAsyncDisposable
         }
 
         await session.StartSegmentAsync(ct);
-
-        if (request.Split is { IsSet: true })
-        {
-            session._watchStop = new CancellationTokenSource();
-            var token = session._watchStop.Token;
-            session._watcher = Task.Run(() => session.WatchSplitAsync(token), CancellationToken.None);
-        }
-
         return session;
     }
 
@@ -266,7 +253,6 @@ public sealed class RecorderSession : IAsyncDisposable
     /// </summary>
     public async Task<RecordResult> StopAsync(int stopTimeoutMs = StopTimeoutMs, CancellationToken ct = default)
     {
-        await StopWatcherAsync();
         await _turn.WaitAsync(ct);
         try
         {
@@ -319,75 +305,10 @@ public sealed class RecorderSession : IAsyncDisposable
     /// <summary>Yarida kalan bir oturum makinede ffmpeg birakmaz.</summary>
     public async ValueTask DisposeAsync()
     {
-        await StopWatcherAsync();
         if (_process is null) return;
         _partial = true;
         await FinishSegmentAsync(0, CancellationToken.None);
         State = RecorderState.Stopped;
-    }
-
-    /// <summary>
-    /// Bolme olcutu dolmus mu. Sure o anki <b>parcanin</b> suresi, boyut da o parcanin
-    /// dosyasi: ikisi de her bolunmede sifirdan basliyor.
-    /// </summary>
-    private bool SplitDue()
-    {
-        if (_request.Split is not { } split) return false;
-        if (split.Duration is { } every && _capturedNow >= every) return true;
-        return split.Megabytes is { } megabytes && _outputMb >= megabytes;
-    }
-
-    private async Task WatchSplitAsync(CancellationToken ct)
-    {
-        while (!ct.IsCancellationRequested)
-        {
-            try { await Task.Delay(SplitPollMs, ct); }
-            catch (OperationCanceledException) { return; }
-
-            if (ct.IsCancellationRequested) return;
-            if (State != RecorderState.Running || !SplitDue()) continue;
-
-            await _turn.WaitAsync(CancellationToken.None);
-            try
-            {
-                if (State != RecorderState.Running || !SplitDue()) continue;
-                await FinishSegmentAsync(StopTimeoutMs, CancellationToken.None);
-                if (_partial)
-                {
-                    State = RecorderState.Stopped;
-                    _ended.TrySetResult();
-                    return;
-                }
-
-                await StartSegmentAsync(CancellationToken.None);
-                if (State == RecorderState.Stopped)
-                {
-                    _ended.TrySetResult();
-                    return;
-                }
-            }
-            catch (InvalidOperationException)
-            {
-                State = RecorderState.Stopped;
-                _ended.TrySetResult();
-                return;
-            }
-            finally { _turn.Release(); }
-        }
-    }
-
-    private async Task StopWatcherAsync()
-    {
-        if (_watchStop is null) return;
-        _watchStop.Cancel();
-        if (_watcher is not null)
-        {
-            try { await _watcher; } catch { }
-        }
-
-        _watchStop.Dispose();
-        _watchStop = null;
-        _watcher = null;
     }
 
     private async Task StartSegmentAsync(CancellationToken ct)
@@ -402,7 +323,11 @@ public sealed class RecorderSession : IAsyncDisposable
         var folder = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
 
-        var args = new List<string> { "-progress", "pipe:1", "-nostats" };
+        var args = new List<string>
+        {
+            "-progress", "pipe:1", "-nostats",
+            "-stats_period", StatsPeriodSeconds.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+        };
         args.AddRange(RecorderArguments.Build(segment, path));
 
         var startInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args);
@@ -525,6 +450,16 @@ public sealed class RecorderSession : IAsyncDisposable
 
     public Task Ended => _ended.Task;
 
+    /// <summary>
+    /// Surecin kendiliginden cikisi. Her parca kendi <c>-t</c>/<c>-fs</c> sinirini tasidigi
+    /// icin dogal cikis iki seyden biri olabilir: bolme sinirina gelindi (daha kayit sürecek)
+    /// ya da kaydin toplam siniri tukendi (kayit bitti). Ikisini de <c>RecorderArguments.ForSegment</c>
+    /// ayirt ediyor: null donmezse "parca doldu, sonrakini ac" — <c>StartSegmentAsync</c> yeni
+    /// bir surec acar ve bu gorev kendini yeni surec icin yeniden kurar; null donerse kayit
+    /// bitmis sayilir. Kullanicinin <see cref="PauseAsync"/>/<see cref="StopAsync"/>/
+    /// <see cref="DisposeAsync"/> ile nazikce durdurmasi <c>_closing</c> bayragiyla burasindan
+    /// ayrilir, o yuzden kullanicinin durdurmasi eskisi gibi calisir.
+    /// </summary>
     private async Task WatchExitAsync(Process process)
     {
         try { await process.WaitForExitAsync(); }
@@ -532,15 +467,29 @@ public sealed class RecorderSession : IAsyncDisposable
 
         if (_closing || !ReferenceEquals(_process, process)) return;
         await _turn.WaitAsync();
+        var finished = true;
         try
         {
             if (!ReferenceEquals(_process, process)) return;
             await FinishSegmentAsync(StopTimeoutMs, CancellationToken.None);
-            State = RecorderState.Stopped;
+
+            if (!_partial)
+            {
+                try
+                {
+                    await StartSegmentAsync(CancellationToken.None);
+                    finished = State != RecorderState.Running;
+                }
+                catch (InvalidOperationException) { State = RecorderState.Stopped; }
+            }
+            else
+            {
+                State = RecorderState.Stopped;
+            }
         }
         finally { _turn.Release(); }
 
-        _ended.TrySetResult();
+        if (finished) _ended.TrySetResult();
     }
 
     private async Task<RecordResult> AssembleAsync(CancellationToken ct)
