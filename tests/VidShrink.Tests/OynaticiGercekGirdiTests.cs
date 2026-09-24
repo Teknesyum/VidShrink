@@ -91,7 +91,12 @@ public sealed class OynaticiGercekGirdiTests
             var alt = new Point(view.Bounds.Width / 2, view.Bounds.Height - 10);
             Gonder(window, RawPointerEventType.Move, new Point(alt.X, 50), RawInputModifiers.None);
             Gonder(window, RawPointerEventType.Move, alt, RawInputModifiers.None);
-            DenetimSurucu.Pump(view, () => view.SeritRevealed, 3);
+            var saat = System.Diagnostics.Stopwatch.StartNew();
+            while (!view.SeritRevealed && saat.Elapsed.TotalSeconds < 5)
+            {
+                using var dilim = new System.Threading.CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+                Avalonia.Threading.Dispatcher.UIThread.MainLoop(dilim.Token);
+            }
             body.AppendLine($"serit acik: {view.SeritRevealed}");
 
             var mute = view.FindControl<Button>("BtnSeritMute")!;

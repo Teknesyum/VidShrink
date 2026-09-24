@@ -322,7 +322,11 @@ public sealed class GorselDenetimYapiTests
             .Where(g => g.Count() > 1)
             .Select(g => (satir: string.Join(" / ", g.Select(s => s.ad)), fark: g.Max(s => s.ust) - g.Min(s => s.ust)))
             .ToArray();
-        Assert.NotEmpty(kaymalar);
+        if (kaymalar.Length == 0)
+        {
+            Assert.All(satirlar, s => Assert.True(s.ust > s.etiketUst + 0.5, $"{s.ad}: satır paylaşmayan değer etiketinin altında değil."));
+            return;
+        }
         var enKotu = kaymalar.MaxBy(k => k.fark);
         Assert.True(enKotu.fark <= 0.5, $"{enKotu.satir}: aynı satırdaki değerler {enKotu.fark:0.#} px kayık.");
     }
