@@ -388,7 +388,7 @@
     <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
     <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
     <Setter Property="FontWeight" Value="Bold"/>
-    <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PinkText}"/>
   </ControlTheme>
 
   <!--
