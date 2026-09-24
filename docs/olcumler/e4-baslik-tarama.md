@@ -46,7 +46,7 @@ DVD ayrı: orada demuxer'in kendisi değişiyor, o yüzden `EncodePlan.Disc` dol
 | `--tarama` | `--scan` | Envanteri basar, hiçbir şey kodlamaz |
 | `--baslik N` | `--title N` | Numarayla başlık seçer |
 | `--ana-icerik` | `--main-feature` | En uzun başlığı seçer |
-| `--aci N` | `--angle N` | DVD açısı, 1–9 |
+| ~~`--aci N`~~ | ~~`--angle N`~~ | Kaldırıldı: CLI disk kaynağını hiç kurmuyordu, açı hiçbir koşuma ulaşmıyordu |
 | `--asgari-sure SN` | `--min-duration SEC` | Kısa başlıkları envanterden düşer |
 
 `--baslik` ile `--ana-icerik` birlikte verilemiyor; iki sırada da reddediliyor.

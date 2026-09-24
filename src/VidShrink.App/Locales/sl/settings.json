@@ -30,6 +30,7 @@
   "settings.share.uploading": "Nalaganje ...",
   "settings.share.shared-until": "Deljeno. Povezava ostane odprta do {0}.",
   "settings.share.shared": "Deljeno.",
+  "settings.share.link-copied": "Povezava je kopirana.",
   "settings.share.cancelled": "Preklicano.",
   "settings.share.failed": "Datoteke ni bilo mogoče deliti",
   "settings.share.retry": "Poskusi znova",

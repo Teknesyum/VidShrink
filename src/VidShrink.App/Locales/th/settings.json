@@ -30,6 +30,7 @@
   "settings.share.uploading": "กำลังอัปโหลด...",
   "settings.share.shared-until": "แชร์แล้ว ลิงก์เปิดอยู่จนถึง {0}",
   "settings.share.shared": "แชร์แล้ว",
+  "settings.share.link-copied": "คัดลอกลิงก์แล้ว",
   "settings.share.cancelled": "ยกเลิกแล้ว",
   "settings.share.failed": "ไม่สามารถแชร์ไฟล์ได้",
   "settings.share.retry": "ลองอีกครั้ง",

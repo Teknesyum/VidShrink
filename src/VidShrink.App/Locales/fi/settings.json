@@ -30,6 +30,7 @@
   "settings.share.uploading": "Lähetetään...",
   "settings.share.shared-until": "Jaettu. Linkki pysyy auki {0} asti.",
   "settings.share.shared": "Jaettu.",
+  "settings.share.link-copied": "Linkki kopioitiin.",
   "settings.share.cancelled": "Peruutettu.",
   "settings.share.failed": "Tiedostoa ei voitu jakaa",
   "settings.share.retry": "Yritä uudelleen",

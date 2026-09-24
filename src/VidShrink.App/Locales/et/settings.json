@@ -30,6 +30,7 @@
   "settings.share.uploading": "Üleslaadimine...",
   "settings.share.shared-until": "Jagatud. Link püsib avatud kuni {0}.",
   "settings.share.shared": "Jagatud.",
+  "settings.share.link-copied": "Link on kopeeritud.",
   "settings.share.cancelled": "Katkestatud.",
   "settings.share.failed": "Faili ei saanud jagada",
   "settings.share.retry": "Proovi uuesti",

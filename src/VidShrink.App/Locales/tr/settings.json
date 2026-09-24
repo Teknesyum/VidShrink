@@ -30,6 +30,7 @@
   "settings.share.uploading": "Yükleniyor...",
   "settings.share.shared-until": "Paylaşıldı. Bağlantı {0} tarihine kadar açık.",
   "settings.share.shared": "Paylaşıldı.",
+  "settings.share.link-copied": "Bağlantı kopyalandı.",
   "settings.share.cancelled": "İptal edildi.",
   "settings.share.failed": "Paylaşılamadı",
   "settings.share.retry": "Tekrar dene",

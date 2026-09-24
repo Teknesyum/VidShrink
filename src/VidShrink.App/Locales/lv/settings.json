@@ -30,6 +30,7 @@
   "settings.share.uploading": "Augšupielādē...",
   "settings.share.shared-until": "Koplietots. Saite ir atvērta līdz {0}.",
   "settings.share.shared": "Koplietots.",
+  "settings.share.link-copied": "Saite ir nokopēta.",
   "settings.share.cancelled": "Atcelts.",
   "settings.share.failed": "Failu neizdevās koplietot",
   "settings.share.retry": "Mēģināt vēlreiz",

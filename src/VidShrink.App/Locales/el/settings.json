@@ -30,6 +30,7 @@
   "settings.share.uploading": "Μεταφόρτωση...",
   "settings.share.shared-until": "Κοινοποιήθηκε. Ο σύνδεσμος μένει ανοιχτός έως {0}.",
   "settings.share.shared": "Κοινοποιήθηκε.",
+  "settings.share.link-copied": "Ο σύνδεσμος αντιγράφηκε.",
   "settings.share.cancelled": "Ακυρώθηκε.",
   "settings.share.failed": "Το αρχείο δεν κοινοποιήθηκε",
   "settings.share.retry": "Δοκιμή ξανά",

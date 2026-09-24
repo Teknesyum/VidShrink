@@ -30,6 +30,7 @@
   "settings.share.uploading": "Nahráva sa...",
   "settings.share.shared-until": "Zdieľané. Odkaz zostáva otvorený do {0}.",
   "settings.share.shared": "Zdieľané.",
+  "settings.share.link-copied": "Odkaz bol skopírovaný.",
   "settings.share.cancelled": "Zrušené.",
   "settings.share.failed": "Súbor sa nepodarilo zdieľať",
   "settings.share.retry": "Skúsiť znova",

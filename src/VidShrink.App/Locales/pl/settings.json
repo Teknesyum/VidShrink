@@ -30,6 +30,7 @@
   "settings.share.uploading": "Wysyłanie...",
   "settings.share.shared-until": "Udostępniono. Łącze pozostaje otwarte do {0}.",
   "settings.share.shared": "Udostępniono.",
+  "settings.share.link-copied": "Link został skopiowany.",
   "settings.share.cancelled": "Anulowano.",
   "settings.share.failed": "Nie udało się udostępnić pliku",
   "settings.share.retry": "Spróbuj ponownie",

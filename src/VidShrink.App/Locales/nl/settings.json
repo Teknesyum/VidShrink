@@ -30,6 +30,7 @@
   "settings.share.uploading": "Uploaden...",
   "settings.share.shared-until": "Gedeeld. De link blijft open tot {0}.",
   "settings.share.shared": "Gedeeld.",
+  "settings.share.link-copied": "De link is gekopieerd.",
   "settings.share.cancelled": "Geannuleerd.",
   "settings.share.failed": "Het bestand kon niet worden gedeeld",
   "settings.share.retry": "Opnieuw proberen",

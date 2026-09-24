@@ -30,6 +30,7 @@
   "settings.share.uploading": "Feltöltés...",
   "settings.share.shared-until": "Megosztva. A link eddig marad nyitva: {0}.",
   "settings.share.shared": "Megosztva.",
+  "settings.share.link-copied": "A hivatkozás másolva.",
   "settings.share.cancelled": "Megszakítva.",
   "settings.share.failed": "A fájlt nem sikerült megosztani",
   "settings.share.retry": "Újra",

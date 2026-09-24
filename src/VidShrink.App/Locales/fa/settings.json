@@ -30,6 +30,7 @@
   "settings.share.uploading": "در حال بارگذاری...",
   "settings.share.shared-until": "به اشتراک گذاشته شد. پیوند تا {0} باز می‌ماند.",
   "settings.share.shared": "به اشتراک گذاشته شد.",
+  "settings.share.link-copied": "پیوند کپی شد.",
   "settings.share.cancelled": "لغو شد.",
   "settings.share.failed": "فایل به اشتراک گذاشته نشد",
   "settings.share.retry": "دوباره تلاش کنید",

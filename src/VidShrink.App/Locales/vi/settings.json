@@ -30,6 +30,7 @@
   "settings.share.uploading": "Đang tải lên...",
   "settings.share.shared-until": "Đã chia sẻ. Liên kết mở đến {0}.",
   "settings.share.shared": "Đã chia sẻ.",
+  "settings.share.link-copied": "Đã sao chép liên kết.",
   "settings.share.cancelled": "Đã hủy.",
   "settings.share.failed": "Không chia sẻ được tệp",
   "settings.share.retry": "Thử lại",

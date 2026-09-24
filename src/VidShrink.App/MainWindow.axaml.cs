@@ -2579,14 +2579,27 @@ public partial class MainWindow : Window
 
     private async void OnCopyShareLink(object? sender, RoutedEventArgs e)
     {
-        // Pano yoksa adres yine okunabilir ve seçilebilir kalır; kullanıcıya hata basılmaz.
+        var clipboard = Clipboard;
+        TxtShareStatus.Text = await CopyShareLinkAsync(
+            clipboard is null ? null : text => clipboard.SetTextAsync(text), TxtShareLink.Text ?? "", Say);
+    }
+
+    /// <summary>
+    /// Paylaşım bağlantısını panoya yazar ve kullanıcıya gösterilecek durumu döndürür: yazıldıysa
+    /// <c>settings.share.link-copied</c>, pano yoksa ya da yazma düşerse <c>main.ai.clipboard-failed</c>
+    /// ve nedeni. İki pencere aynı sonucu aynı sözle söyler; adres her durumda seçilebilir kalır.
+    /// </summary>
+    internal static async Task<string> CopyShareLinkAsync(Func<string, Task>? setText, string link, Func<string, string> say)
+    {
         try
         {
-            if (Clipboard is null) return;
-            await Clipboard.SetTextAsync(TxtShareLink.Text ?? "");
+            if (setText is null) throw new InvalidOperationException(say("main.ai.no-clipboard"));
+            await setText(link);
+            return say("settings.share.link-copied");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            return $"{say("main.ai.clipboard-failed")}: {ex.Message}";
         }
     }
 
@@ -4266,7 +4279,7 @@ public partial class MainWindow : Window
                 TxtOutSize.Text = Say("main.unit.mb-value", Num(result.OutputMb, "0.0"));
                 var saved = 100 - result.OutputMb / _info.FileSizeMb * 100;
                 TxtResult.Text = Say("main.run.done",
-                    result.Attempts, Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"), Num(saved, "0.#"));
+                    result.DeliveredAttemptNumber, Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"), Num(saved, "0.#"));
                 if (result.OverTarget)
                     TxtResult.Text += " " + AcceptedLargerText(result.OutputMb, targetMb, plan);
                 if (result.Trim is { } trim)

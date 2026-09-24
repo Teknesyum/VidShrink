@@ -30,6 +30,7 @@
   "settings.share.uploading": "பதிவேற்றுகிறது...",
   "settings.share.shared-until": "பகிரப்பட்டது. {0} வரை இணைப்பு திறந்திருக்கும்.",
   "settings.share.shared": "பகிரப்பட்டது.",
+  "settings.share.link-copied": "இணைப்பு நகலெடுக்கப்பட்டது.",
   "settings.share.cancelled": "ரத்து செய்யப்பட்டது.",
   "settings.share.failed": "கோப்பைப் பகிர முடியவில்லை",
   "settings.share.retry": "மீண்டும் முயற்சி",

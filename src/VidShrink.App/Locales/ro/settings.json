@@ -30,6 +30,7 @@
   "settings.share.uploading": "Se încarcă...",
   "settings.share.shared-until": "Partajat. Linkul rămâne deschis până la {0}.",
   "settings.share.shared": "Partajat.",
+  "settings.share.link-copied": "Linkul a fost copiat.",
   "settings.share.cancelled": "Anulat.",
   "settings.share.failed": "Fișierul nu a putut fi partajat",
   "settings.share.retry": "Încearcă din nou",

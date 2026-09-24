@@ -30,6 +30,7 @@
   "settings.share.uploading": "Caricamento...",
   "settings.share.shared-until": "Condiviso. Il link resta aperto fino a {0}.",
   "settings.share.shared": "Condiviso.",
+  "settings.share.link-copied": "Il link è stato copiato.",
   "settings.share.cancelled": "Annullato.",
   "settings.share.failed": "Il file non è stato condiviso",
   "settings.share.retry": "Riprova",

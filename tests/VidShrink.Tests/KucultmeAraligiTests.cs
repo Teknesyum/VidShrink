@@ -412,7 +412,7 @@ public class KucultmeAraligiCliTests
     {
         var result = VidShrink.Cli.CliParser.Parse(new[] { "izle", "klasor", "--cikti", "hedef", "--hedef", "25MB", bayrak, "10-40" });
         Assert.False(result.Ok);
-        Assert.Equal("error.unknown-option", result.ErrorKey);
+        Assert.Equal("error.not-in-watch", result.ErrorKey);
 
         var kucult = VidShrink.Cli.CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25MB", bayrak, "10-40" });
         Assert.True(kucult.Ok, kucult.ErrorKey);

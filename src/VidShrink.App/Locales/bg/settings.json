@@ -30,6 +30,7 @@
   "settings.share.uploading": "Качване...",
   "settings.share.shared-until": "Споделено. Връзката остава отворена до {0}.",
   "settings.share.shared": "Споделено.",
+  "settings.share.link-copied": "Връзката е копирана.",
   "settings.share.cancelled": "Отказано.",
   "settings.share.failed": "Файлът не можа да се сподели",
   "settings.share.retry": "Опитай отново",

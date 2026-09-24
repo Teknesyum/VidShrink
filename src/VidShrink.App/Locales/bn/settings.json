@@ -30,6 +30,7 @@
   "settings.share.uploading": "আপলোড হচ্ছে...",
   "settings.share.shared-until": "শেয়ার হয়েছে। লিংক {0} পর্যন্ত খোলা থাকবে।",
   "settings.share.shared": "শেয়ার হয়েছে।",
+  "settings.share.link-copied": "লিংক কপি হয়েছে।",
   "settings.share.cancelled": "বাতিল হয়েছে।",
   "settings.share.failed": "ফাইল শেয়ার করা যায়নি",
   "settings.share.retry": "আবার চেষ্টা করুন",

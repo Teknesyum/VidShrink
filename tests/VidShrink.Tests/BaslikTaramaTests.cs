@@ -205,8 +205,8 @@ public sealed class BaslikTaramaTests
         Assert.Equal("error.title-and-main-feature",
             CliParser.Parse(new[] { "kucult", "a.mp4", "--ana-icerik", "--baslik", "2" }).ErrorKey);
         Assert.Equal("error.bad-title", CliParser.Parse(new[] { "kucult", "a.mp4", "--baslik", "0" }).ErrorKey);
-        Assert.Equal("error.bad-angle", CliParser.Parse(new[] { "kucult", "a.mp4", "--aci", "0" }).ErrorKey);
-        Assert.Null(CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25MB", "--aci", "9", "--asgari-sure", "60" }).ErrorKey);
+        Assert.Equal("error.unknown-option", CliParser.Parse(new[] { "kucult", "a.mp4", "--aci", "2" }).ErrorKey);
+        Assert.Null(CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25MB", "--asgari-sure", "60" }).ErrorKey);
     }
 
     /// <summary>

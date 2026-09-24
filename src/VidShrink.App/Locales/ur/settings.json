@@ -30,6 +30,7 @@
   "settings.share.uploading": "اپ لوڈ ہو رہا ہے...",
   "settings.share.shared-until": "شیئر ہو گیا۔ لنک {0} تک کھلا رہے گا۔",
   "settings.share.shared": "شیئر ہو گیا۔",
+  "settings.share.link-copied": "لنک کاپی ہو گیا۔",
   "settings.share.cancelled": "منسوخ ہو گیا۔",
   "settings.share.failed": "فائل شیئر نہ ہو سکی",
   "settings.share.retry": "دوبارہ کوشش کریں",

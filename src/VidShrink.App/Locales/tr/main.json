@@ -251,7 +251,7 @@
   "main.output.stage": "Aşama",
   "main.output.idle": "Boşta",
   "main.output.current-size": "Güncel çıktı boyutu",
-  "main.output.remaining": "Kalan",
+  "main.output.remaining": "Bu denemede kalan",
   "main.output.estimated-time": "Tahmini süre",
   "main.output.estimated-time.tip": "• VidShrink bu klip için koşturduğu örnek kodlamaların süresini ölçer; bu sayının arkasındaki hız ön ayar tablosundan değil, bu makineden ve bu dosyadan gelir.\n• İki geçişli işlerde aralık geniştir, çünkü birinci geçiş yalnızca görüntüyü çözümler ve ikinciden ucuza mal olur, ne kadar ucuz olduğu ise ölçülmez.\n• Plan, örneklerin kodlanmadığı ayarlara geçtiğinde süre tahmin edilmez, boş bırakılır.",
   "main.output.estimated-output": "Tahmini çıktı",
@@ -302,7 +302,7 @@
 
   "main.run.no-space": "Hedef sürücüde yeterli boş alan yok; en az {0} MB gerekiyor.",
   "main.run.done": "{0} denemede tamamlandı. {1} MB → {2} MB (%{3} daha küçük).",
-  "main.run.over-ceiling": "{1} denemede {0} MB hedefinin altına inilemedi (son sonuç {2} MB). Dosya teslim edilmedi, çünkü hedeften büyük dosya asla verilmez. Hedefi büyütüp yeniden deneyin.",
+  "main.run.over-ceiling": "{1} denemede {0} MB hedefinin altına inilemedi (son sonuç {2} MB). Hedeften büyük sonuç kabul edilmediği için dosya teslim edilmedi. Hedefi büyütüp yeniden deneyin.",
   "main.run.ended": "Kodlama beklenmedik biçimde sonlandı, dosya yazılmadı.",
   "main.run.hdr10plus-short": "HDR10+ kaynağın {1} karesinden yalnız {0} tanesine ulaştı; geri kalan kareler yalnız statik HDR10 taşıyor.",
   "main.run.cancelled": "İptal edildi.",
@@ -454,7 +454,7 @@
   "main.reason.fill-band-narrow": "tek CRF adımı dosyayı %{0} kaydırıyor, bu da %{1}'lik doldurma bandından geniş; CRF banda giremediği için iki geçişli VBR doğrudan {2} MB hedefliyor",
   "main.reason.fill-band-narrow-single-pass": "tek CRF adımı dosyayı %{0} kaydırıyor, bu da %{1}'lik doldurma bandından geniş; CRF banda giremediği için donanım kodlayıcısının tek geçişli bit hızı denetimi doğrudan {2} MB hedefliyor",
   "main.reason.hardware-bitrate-bias": "{0} donanım kodlayıcısı bu klip için henüz kalibre edilmedi; verilen bit hızının %{1} altına düşebilir, bu yüzden istenen bit hızı hedefte kalır ve tahminin alt ucu o kadar aşağı açılır",
-  "main.reason.source-under-target": "kaynak zaten {0} MB, {1} MB hedefin altında; bu yüzden yeniden kodlanmadan olduğu gibi kopyalanıyor",
+  "main.reason.source-under-target": "kaynak zaten {0} MB, {1} MB hedefin altında; bu yüzden yeniden kodlanmadan olduğu gibi kopyalanıyor ve seçilen kap ne olursa olsun kendi kabında, kendi uzantısıyla kalıyor",
   "main.reason.target-capped": "hedef {0} MB'a çekildi çünkü çıktı yapıldığı dosyadan büyük olamaz ({1} MB istenmişti)",
 
   "main.reason.manual-encoder-path-superseded": "kodlayıcı yolu {0} olarak sabitlendi ama aynı anda kodek de kilitlendi; kodek kilidi önceliklidir ve kullanılan {1}",

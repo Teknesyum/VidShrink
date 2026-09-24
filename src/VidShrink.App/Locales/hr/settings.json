@@ -30,6 +30,7 @@
   "settings.share.uploading": "Prijenos...",
   "settings.share.shared-until": "Podijeljeno. Poveznica ostaje otvorena do {0}.",
   "settings.share.shared": "Podijeljeno.",
+  "settings.share.link-copied": "Poveznica je kopirana.",
   "settings.share.cancelled": "Otkazano.",
   "settings.share.failed": "Datoteka se nije mogla podijeliti",
   "settings.share.retry": "Pokušaj ponovno",
