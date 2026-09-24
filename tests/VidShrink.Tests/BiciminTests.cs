@@ -1155,6 +1155,10 @@ public sealed class BaslikKapsamiTests
     /// tr 81 + 8 = 89. Kurali kaldirmak sayimi 2007/232/81'e geri indiriyor (olculdu).</para>
     /// <para>2026-09-23, Media Foundation: <c>main.reason.no-quality-scale</c> 15 dilde kola giriyor,
     /// en dahil tr haric: iki nokta kuraliyla birlikte 2526 + 15 = 2541, en 237 + 1 = 238, tr 89.</para>
+    /// <para>2026-09-24, kaydedici durustlugu: yedi yeni kaydedici anahtarindan dordu kola giriyor:
+    /// <c>recorder.output.done-partial</c> 34 dilde, <c>recorder.output.done-failed</c> 33,
+    /// <c>recorder.replay.saved-mkv</c> 7, <c>recorder.discarded-kept</c> 5. 2541 + 79 = 2620; en dordunde de
+    /// (238 + 4 = 242), tr yalniz <c>recorder.discarded-kept</c>'te (89 + 1 = 90).</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1180,9 +1184,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2541, toplam);
-        Assert.Equal(238, dilBasina["en"]);
-        Assert.Equal(89, dilBasina["tr"]);
+        Assert.Equal(2620, toplam);
+        Assert.Equal(242, dilBasina["en"]);
+        Assert.Equal(90, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1328,6 +1332,9 @@ public sealed class BaslikKapsamiTests
     /// 43 x 1085 = 46655. <c>kayip</c> yine 0.</para>
     /// <para>2026-09-23: Media Foundation dil basina bir anahtar (<c>main.reason.no-quality-scale</c>):
     /// 1085 + 1 = 1086, 43 x 1086 = 46698.</para>
+    /// <para>2026-09-24: kaydedici durustlugu dil basina yedi anahtar (<c>recorder.discarded-kept</c>,
+    /// <c>recorder.output.done-partial</c>, <c>-done-failed</c>, <c>-partial-unverified</c>, <c>-gif-failed</c>,
+    /// <c>-not-moved</c>, <c>recorder.replay.saved-mkv</c>): 1086 + 7 = 1093, 43 x 1093 = 46999.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1355,7 +1362,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(46698, gezilen);
+        Assert.Equal(46999, gezilen);
         Assert.Empty(kayip);
     }
 
