@@ -293,8 +293,20 @@ public sealed class YalanYokCliTests
     {
         Assert.Contains("bu denemede", Tr.Format("progress.encode", 40, "pass 1/2 (attempt 2)", "01:00"));
         Assert.Contains("left in this attempt", En.Format("progress.encode", 40, "pass 1/2 (attempt 2)", "01:00"));
-        foreach (var (dil, kelime) in new[] { ("tr", "deneme"), ("en", "attempt"), ("de", "Versuch"), ("ar", "محاولة") })
+        foreach (var (dil, kelime) in new[] { ("en", "attempt"), ("de", "Versuch"), ("ar", "محاولة") })
             Assert.Contains(kelime, Strings.GetIn(dil, "main.output.remaining"), StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Türkçe etiket dar pencerede iki sütunu tutan bütçeye sığmıyor ("Denemede" bile ızgarayı tek
+    /// sütuna indiriyor), "Kalan" kalıyor; denemeyi hemen üstteki aşama hücresi söylüyor.
+    /// </summary>
+    [Fact]
+    public void AsamaMetniDenemeyiSoyluyor()
+    {
+        var asama = new EncodeStage(1, 2, 2).ToString();
+        Assert.Contains("attempt 2", asama);
+        Assert.Contains("deneme 2", MainWindow.LocalizeStageIn(asama, "tr"), StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

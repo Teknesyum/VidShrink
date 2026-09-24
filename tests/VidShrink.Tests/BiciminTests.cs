@@ -1155,6 +1155,8 @@ public sealed class BaslikKapsamiTests
     /// tr 81 + 8 = 89. Kurali kaldirmak sayimi 2007/232/81'e geri indiriyor (olculdu).</para>
     /// <para>2026-09-23, Media Foundation: <c>main.reason.no-quality-scale</c> 15 dilde kola giriyor,
     /// en dahil tr haric: iki nokta kuraliyla birlikte 2526 + 15 = 2541, en 237 + 1 = 238, tr 89.</para>
+    /// <para>2026-09-24, yalan yok: <c>main.output.remaining</c> en'de "Remaining" iken "Left in this attempt" oldu ve
+    /// kola giriyor (tr "Kalan" kaldi): 2541 + 1 = 2542, en 239, tr 89.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1180,8 +1182,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2541, toplam);
-        Assert.Equal(238, dilBasina["en"]);
+        Assert.Equal(2542, toplam);
+        Assert.Equal(239, dilBasina["en"]);
         Assert.Equal(89, dilBasina["tr"]);
     }
 
@@ -1328,6 +1330,7 @@ public sealed class BaslikKapsamiTests
     /// 43 x 1085 = 46655. <c>kayip</c> yine 0.</para>
     /// <para>2026-09-23: Media Foundation dil basina bir anahtar (<c>main.reason.no-quality-scale</c>):
     /// 1085 + 1 = 1086, 43 x 1086 = 46698.</para>
+    /// <para>2026-09-24, yalan yok: dil basina <c>settings.share.link-copied</c>: 1086 + 1 = 1087, 43 x 1087 = 46741.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1355,7 +1358,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(46698, gezilen);
+        Assert.Equal(46741, gezilen);
         Assert.Empty(kayip);
     }
 

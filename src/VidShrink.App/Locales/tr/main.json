@@ -251,7 +251,7 @@
   "main.output.stage": "Aşama",
   "main.output.idle": "Boşta",
   "main.output.current-size": "Güncel çıktı boyutu",
-  "main.output.remaining": "Bu denemede kalan",
+  "main.output.remaining": "Kalan",
   "main.output.estimated-time": "Tahmini süre",
   "main.output.estimated-time.tip": "• VidShrink bu klip için koşturduğu örnek kodlamaların süresini ölçer; bu sayının arkasındaki hız ön ayar tablosundan değil, bu makineden ve bu dosyadan gelir.\n• İki geçişli işlerde aralık geniştir, çünkü birinci geçiş yalnızca görüntüyü çözümler ve ikinciden ucuza mal olur, ne kadar ucuz olduğu ise ölçülmez.\n• Plan, örneklerin kodlanmadığı ayarlara geçtiğinde süre tahmin edilmez, boş bırakılır.",
   "main.output.estimated-output": "Tahmini çıktı",
