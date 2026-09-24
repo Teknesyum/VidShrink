@@ -50,6 +50,7 @@
   "recorder.output.done": "Kurekodi kumekamilika: {0} MB katika sehemu {1}",
   "recorder.output.partial": "Kurekodi hakukufungwa vizuri. Faili imehifadhiwa na inaweza kuchezwa. Sekunde za mwisho zinaweza kukosekana.",
   "recorder.output.partial-broken": "Kurekodi hakukufungwa vizuri. Faili haiwezi kuchezwa. Chagua MKV kwa kurekodi kunakofuata.",
+  "recorder.output.partial-broken-mkv": "Kurekodi hakukufungwa vizuri. Faili haiwezi kuchezwa.",
   "recorder.output.failed": "ffmpeg imemaliza kwa msimbo {0}.",
   "recorder.error.no-ffmpeg": "{0} haikuweza kupatikana.",
   "recorder.error.invalid": "Mipangilio hii hairuhusu kurekodi: {0}",

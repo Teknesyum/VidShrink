@@ -225,6 +225,9 @@ public static class CliApp
             return new FileRun(ExitCodes.Usage, null, text["error.same-output"]);
         }
 
+        if (request.Output is { } istenen && !PathEquals(Path.GetFullPath(istenen), decision.OutputPath))
+            stderr.WriteLine(text.Format("output.not-webm", decision.Plan.Codec, Path.GetExtension(decision.OutputPath)));
+
         if (request.Command == CliCommand.Plan)
         {
             stdout.Write(request.Json ? PlanJson(request, decision) : PlanText(request, decision, text));
@@ -367,12 +370,22 @@ public static class CliApp
         var result = ShrinkEngine.Decide(info, options, settled, availability);
         var extension = PresetLibrary.DeliveredExtension(request.Profile?.Container)
             ?? result.Plan.Streams?.Extension ?? "mp4";
-        var output = request.Output is { } path ? Path.GetFullPath(path)
+        var output = request.Output is { } path ? WebmOrWhatCarries(Path.GetFullPath(path), result.Plan)
             : request.OutputDirectory is { } directory ? ShrinkEngine.UniqueOutputPath(Path.Combine(Path.GetFullPath(directory), Path.GetFileName(info.FilePath)), extension: extension)
             : ShrinkEngine.UniqueOutputPath(info.FilePath, extension: extension);
         var arguments = ShrinkEngine.DisplayedArguments(info, result.Plan, output, availability, scenes?.Map);
         return new CliDecision(info, options, result, settled, scenes, qualityTarget, output, arguments);
     }
+
+    /// <summary>
+    /// <c>--cikti x.webm</c> istendi ama planin kodegi WebM'e girmiyorsa (H.264, HEVC) dosya
+    /// planin kendi kabinin uzantisiyla yazilir; webm adli bir mp4 ya da ffmpeg'in reddettigi bir
+    /// komut teslim edilmez.
+    /// </summary>
+    public static string WebmOrWhatCarries(string output, EncodePlan plan) =>
+        StreamMapping.ContainerOf(output) == OutputContainer.WebM && plan.Streams is { } streams && streams.Container != OutputContainer.WebM
+            ? Path.ChangeExtension(output, streams.Extension)
+            : output;
 
     public static async Task<CliDecision> MeasureAndDecideAsync(CliRequest request, MediaInfo info,
         IEncoderAvailability? availability, TextWriter stderr, CliText text, CancellationToken ct)

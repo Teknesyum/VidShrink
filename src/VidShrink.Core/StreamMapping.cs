@@ -26,7 +26,9 @@ public enum StreamNote
     WebmAudioOpus,
     WebmStreamDropped,
     ExtraAudioDroppedByContainer,
-    Vp9FellBackToMp4
+    Vp9FellBackToMp4,
+    ImageSubtitleDroppedByContainer,
+    Vp9FellBack
 }
 
 public static class StreamNotes
@@ -53,6 +55,8 @@ public static class StreamNotes
         StreamNote.WebmStreamDropped => "webm-stream-dropped",
         StreamNote.ExtraAudioDroppedByContainer => "extra-audio-dropped-by-container",
         StreamNote.Vp9FellBackToMp4 => "vp9-fell-back-to-mp4",
+        StreamNote.ImageSubtitleDroppedByContainer => "image-subtitle-dropped-by-container",
+        StreamNote.Vp9FellBack => "vp9-fell-back",
         _ => "lossless-not-passed"
     };
 }
@@ -602,7 +606,7 @@ public static class StreamMapping
                     subtitles.Add(new SubtitleTrack(Map(source), "mov_text", false, source.Language, source.Bytes, source.Title, source.IsDefault, source.IsForced));
                     if (!source.Codec.Equals("mov_text", StringComparison.OrdinalIgnoreCase)) notes.Add(StreamNote.TextSubtitleConverted);
                 }
-                else if (image) notes.Add(StreamNote.ImageSubtitleDropped);
+                else if (image) notes.Add(request.KeepAllTracks && !request.PlatformDelivery ? StreamNote.ImageSubtitleDroppedByContainer : StreamNote.ImageSubtitleDropped);
                 continue;
             }
 

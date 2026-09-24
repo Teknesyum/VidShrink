@@ -50,6 +50,7 @@
   "recorder.output.done": "Nahrávání dokončeno: {0} MB v {1} segmentech",
   "recorder.output.partial": "Nahrávání se neuzavřelo čistě. Soubor je uložen a lze jej přehrát. Poslední sekundy mohou chybět.",
   "recorder.output.partial-broken": "Nahrávání se neuzavřelo čistě. Soubor nelze přehrát. Pro další nahrávání zvolte MKV.",
+  "recorder.output.partial-broken-mkv": "Nahrávání se neuzavřelo čistě. Soubor nelze přehrát.",
   "recorder.output.failed": "ffmpeg skončil s kódem {0}.",
   "recorder.error.no-ffmpeg": "{0} nebylo nalezeno.",
   "recorder.error.invalid": "Tato nastavení neumožňují nahrávání: {0}",

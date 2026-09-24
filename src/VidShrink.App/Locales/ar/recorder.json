@@ -50,6 +50,7 @@
   "recorder.output.done": "انتهى التسجيل: {0} MB في {1} جزءًا",
   "recorder.output.partial": "لم يُغلق التسجيل بشكل سليم. تم حفظ الملف ويمكن تشغيله. قد تكون الثواني الأخيرة مفقودة.",
   "recorder.output.partial-broken": "لم يُغلق التسجيل بشكل سليم. لا يمكن تشغيل الملف. اختر MKV للتسجيل التالي.",
+  "recorder.output.partial-broken-mkv": "لم يُغلق التسجيل بشكل سليم. لا يمكن تشغيل الملف.",
   "recorder.output.failed": "انتهى ffmpeg بالرمز {0}.",
   "recorder.error.no-ffmpeg": "تعذّر العثور على {0}.",
   "recorder.error.invalid": "لا تسمح هذه الإعدادات بالتسجيل: {0}",

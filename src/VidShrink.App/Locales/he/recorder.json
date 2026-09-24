@@ -50,6 +50,7 @@
   "recorder.output.done": "ההקלטה הסתיימה: {0} MB ב-{1} מקטעים",
   "recorder.output.partial": "ההקלטה לא נסגרה כראוי. הקובץ נשמר וניתן לנגן אותו. ייתכן שהשניות האחרונות חסרות.",
   "recorder.output.partial-broken": "ההקלטה לא נסגרה כראוי. לא ניתן לנגן את הקובץ. בחר MKV להקלטה הבאה.",
+  "recorder.output.partial-broken-mkv": "ההקלטה לא נסגרה כראוי. לא ניתן לנגן את הקובץ.",
   "recorder.output.failed": "ffmpeg הסתיים עם קוד {0}.",
   "recorder.error.no-ffmpeg": "{0} לא נמצא.",
   "recorder.error.invalid": "ההגדרות הללו אינן מאפשרות הקלטה: {0}",

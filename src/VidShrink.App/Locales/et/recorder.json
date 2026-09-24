@@ -50,6 +50,7 @@
   "recorder.output.done": "Salvestus lõpetatud: {0} MB {1} segmendis",
   "recorder.output.partial": "Salvestus ei sulgunud korralikult. Fail on salvestatud ja seda saab esitada. Viimased sekundid võivad puududa.",
   "recorder.output.partial-broken": "Salvestus ei sulgunud korralikult. Faili ei saa esitada. Valige järgmiseks salvestuseks MKV.",
+  "recorder.output.partial-broken-mkv": "Salvestus ei sulgunud korralikult. Faili ei saa esitada.",
   "recorder.output.failed": "ffmpeg lõpetas koodiga {0}.",
   "recorder.error.no-ffmpeg": "{0} ei leitud.",
   "recorder.error.invalid": "Need seaded ei võimalda salvestust: {0}",

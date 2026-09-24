@@ -50,6 +50,7 @@
   "recorder.output.done": "บันทึกเสร็จแล้ว: {0} MB ใน {1} ส่วน",
   "recorder.output.partial": "การบันทึกไม่ได้ปิดอย่างถูกต้อง ไฟล์ถูกบันทึกไว้แล้วและเล่นได้ วินาทีสุดท้ายอาจหายไป",
   "recorder.output.partial-broken": "การบันทึกไม่ได้ปิดอย่างถูกต้อง ไฟล์นี้เล่นไม่ได้ เลือก MKV สำหรับการบันทึกครั้งถัดไป",
+  "recorder.output.partial-broken-mkv": "การบันทึกไม่ได้ปิดอย่างถูกต้อง ไฟล์นี้เล่นไม่ได้",
   "recorder.output.failed": "ffmpeg สิ้นสุดด้วยรหัส {0}",
   "recorder.error.no-ffmpeg": "ไม่พบ {0}",
   "recorder.error.invalid": "การตั้งค่าเหล่านี้ไม่อนุญาตให้บันทึก: {0}",

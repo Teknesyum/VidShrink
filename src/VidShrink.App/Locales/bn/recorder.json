@@ -50,6 +50,7 @@
   "recorder.output.done": "রেকর্ডিং শেষ হয়েছে: {1} খণ্ডে {0} MB",
   "recorder.output.partial": "রেকর্ডিং ঠিকভাবে বন্ধ হয়নি। ফাইলটি সংরক্ষিত হয়েছে এবং চালানো যাবে। শেষ কয়েক সেকেন্ড অনুপস্থিত থাকতে পারে।",
   "recorder.output.partial-broken": "রেকর্ডিং ঠিকভাবে বন্ধ হয়নি। ফাইলটি চালানো যাবে না। পরবর্তী রেকর্ডিংয়ের জন্য MKV বেছে নিন।",
+  "recorder.output.partial-broken-mkv": "রেকর্ডিং ঠিকভাবে বন্ধ হয়নি। ফাইলটি চালানো যাবে না।",
   "recorder.output.failed": "ffmpeg কোড {0} নিয়ে শেষ হয়েছে।",
   "recorder.error.no-ffmpeg": "{0} খুঁজে পাওয়া যায়নি।",
   "recorder.error.invalid": "এই সেটিংসে রেকর্ডিং সম্ভব নয়: {0}",

@@ -50,6 +50,7 @@
   "recorder.output.done": "Felvétel kész: {0} MB {1} szegmensben",
   "recorder.output.partial": "A felvétel nem zárult le megfelelően. A fájl mentve van és lejátszható. Az utolsó másodpercek hiányozhatnak.",
   "recorder.output.partial-broken": "A felvétel nem zárult le megfelelően. A fájl nem játszható le. A következő felvételhez válassza az MKV-t.",
+  "recorder.output.partial-broken-mkv": "A felvétel nem zárult le megfelelően. A fájl nem játszható le.",
   "recorder.output.failed": "Az ffmpeg {0} kóddal fejeződött be.",
   "recorder.error.no-ffmpeg": "{0} nem található.",
   "recorder.error.invalid": "Ezek a beállítások nem teszik lehetővé a felvételt: {0}",

@@ -50,6 +50,7 @@
   "recorder.output.done": "Snemanje končano: {0} MB v {1} delih",
   "recorder.output.partial": "Snemanje se ni pravilno zaprlo. Datoteka je shranjena in jo je mogoče predvajati. Zadnje sekunde morda manjkajo.",
   "recorder.output.partial-broken": "Snemanje se ni pravilno zaprlo. Datoteke ni mogoče predvajati. Za naslednje snemanje izberite MKV.",
+  "recorder.output.partial-broken-mkv": "Snemanje se ni pravilno zaprlo. Datoteke ni mogoče predvajati.",
   "recorder.output.failed": "ffmpeg se je končal s kodo {0}.",
   "recorder.error.no-ffmpeg": "{0} ni bilo mogoče najti.",
   "recorder.error.invalid": "Te nastavitve ne dovoljujejo snemanja: {0}",

@@ -175,7 +175,8 @@ internal partial class RecorderView : UserControl
 
         if (result.Partial)
         {
-            TxtWarning.Text = Say(YarimAnahtari(result.Playable));
+            TxtWarning.Text = Say(YarimAnahtari(result.Playable,
+                VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) == VidShrink.Core.RecorderContainer.Mkv));
             DurumuGoster(uyari: true);
         }
         else if (result.MissingGif is not null)
@@ -209,12 +210,14 @@ internal partial class RecorderView : UserControl
     /// <summary>
     /// Oldurulen kaydin oynatilabilir oldugu kap turunden cikarilmaz: motor dosyayi ffprobe ile
     /// yoklar (<see cref="RecordResult.Playable"/>). Okundu ise "oynatilabilir", okunamadi ise
-    /// "oynatilamaz"; yoklanamadiysa hicbiri soylenmez.
+    /// "oynatilamaz"; yoklanamadiysa hicbiri soylenmez. Okunamayan kayit zaten MKV ise "sonraki
+    /// kayit icin MKV secin" onerisi yalan olur; o dal oneriyi tasimayan metni secer.
     /// Karar <c>docs/netlestirme/019-yarim-kayit-metni.md</c>.
     /// </summary>
-    internal static string YarimAnahtari(bool? oynar) => oynar switch
+    internal static string YarimAnahtari(bool? oynar, bool mkv) => oynar switch
     {
         true => "recorder.output.partial",
+        false when mkv => "recorder.output.partial-broken-mkv",
         false => "recorder.output.partial-broken",
         null => "recorder.output.partial-unverified"
     };

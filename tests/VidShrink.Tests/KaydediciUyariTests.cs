@@ -125,6 +125,22 @@ public sealed class KaydediciUyariTests
     }
 
     /// <summary>
+    /// ffprobe okunamayan MKV'yi de bulabiliyor. O zaman "sonraki kayit icin MKV secin" demek
+    /// yalan: kayit zaten MKV'ydi. MKV dali oneriyi tasimayan metni secer; mp4 dali (ustteki olcu)
+    /// oneriyi korur. Iki metin ayri olmali, yoksa ayrim kagit uzerinde kalir.
+    /// </summary>
+    [Fact]
+    public void OkunamayanYarimMkvMkvOnermez()
+    {
+        var sahne = Sahne(yarim: true, ".mkv", oynar: false);
+
+        Assert.Equal(Metin("recorder.output.partial-broken-mkv"), sahne.Metin);
+        Assert.DoesNotContain("MKV", sahne.Metin);
+        Assert.Contains("MKV", Metin("recorder.output.partial-broken"));
+        Assert.False(sahne.OynaticiEtkin);
+    }
+
+    /// <summary>
     /// Iki metnin gercekten ayri olmasi yukaridaki iki olcunun on sarti: ayni metne
     /// baglansalardi ikisi de gecerdi ve ayrim kagit uzerinde kalirdi.
     /// </summary>

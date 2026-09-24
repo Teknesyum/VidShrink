@@ -537,11 +537,14 @@ public static class PlanCalculator
             options.AudioLoudnorm, options.AudioGainDb, options.ExternalSubtitles, options.Filters?.BurnSubtitle,
             ExplicitAudioCodec: options.AudioCodec != AudioCodecChoice.Auto);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
-        var streams = StreamMapping.Decide(info, streamRequest, options.DeliveredContainer ?? StreamMapping.ContainerFor(streamRequest, codec), audioK, audioChannels,
+        var container = options.DeliveredContainer is { } teslim && (teslim != OutputContainer.WebM || CodecModel.FitsWebM(codec))
+            ? teslim
+            : StreamMapping.ContainerFor(streamRequest, codec);
+        var streams = StreamMapping.Decide(info, streamRequest, container, audioK, audioChannels,
             info.HasAudio && audioK > 0 ? PickAudioCodec(options.AudioCodec) : null, audioPassthrough, effectiveTargetMb,
             options.AudioChannels == AudioChannelOverride.Source);
         if (lockedCodec is not null && CodecModel.IsVp9(lockedCodec) && !CodecModel.IsVp9(codec) && streams.Container != OutputContainer.WebM)
-            streams = streams with { Notes = streams.Notes.Append(StreamNote.Vp9FellBackToMp4).ToList() };
+            streams = streams with { Notes = streams.Notes.Append(streams.Container == OutputContainer.Mp4 ? StreamNote.Vp9FellBackToMp4 : StreamNote.Vp9FellBack).ToList() };
         var sideK = streams.SideK;
         AddStreamNotes(streams, reason);
 
@@ -1823,6 +1826,8 @@ public static class PlanCalculator
                 StreamNote.Vp9FellBackToMp4 => "VP9 could not be used, so the video is encoded with libx264 and the output is MP4 instead of WebM",
                 StreamNote.TextSubtitleConverted => "text subtitles are carried as timed text; styling is lost",
                 StreamNote.ImageSubtitleDropped => "image subtitles (PGS/VobSub) cannot be carried in MP4 and are dropped; turn on keep tracks to carry them in MKV",
+                StreamNote.Vp9FellBack => "VP9 could not be used, so the video is encoded with libx264 and the output is not WebM",
+                StreamNote.ImageSubtitleDroppedByContainer => "image subtitles (PGS/VobSub) are dropped; keep tracks is on, but the chosen MP4/MOV container does not carry them",
                 StreamNote.SubtitleDroppedForPlatform => "a platform target always delivers MP4 without subtitles",
                 StreamNote.KeepAllTracksOverriddenByPlatform => "keep tracks was ignored: a platform target always delivers MP4 with one audio track",
                 StreamNote.AudioCodecNotInContainer => "the source audio codec cannot travel in this container, so the track is re-encoded",

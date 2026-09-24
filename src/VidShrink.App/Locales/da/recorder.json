@@ -50,6 +50,7 @@
   "recorder.output.done": "Optagelse afsluttet: {0} MB i {1} segmenter",
   "recorder.output.partial": "Optagelsen blev ikke lukket korrekt. Filen er gemt og kan afspilles. De sidste sekunder mangler muligvis.",
   "recorder.output.partial-broken": "Optagelsen blev ikke lukket korrekt. Filen kan ikke afspilles. Vælg MKV til den næste optagelse.",
+  "recorder.output.partial-broken-mkv": "Optagelsen blev ikke lukket korrekt. Filen kan ikke afspilles.",
   "recorder.output.failed": "ffmpeg afsluttede med kode {0}.",
   "recorder.error.no-ffmpeg": "{0} kunne ikke findes.",
   "recorder.error.invalid": "Disse indstillinger tillader ikke en optagelse: {0}",

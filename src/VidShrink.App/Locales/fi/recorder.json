@@ -50,6 +50,7 @@
   "recorder.output.done": "Tallennus valmis: {0} MB, {1} segmentissä",
   "recorder.output.partial": "Tallennus ei sulkeutunut siististi. Tiedosto on tallennettu ja se voidaan toistaa. Viimeiset sekunnit voivat puuttua.",
   "recorder.output.partial-broken": "Tallennus ei sulkeutunut siististi. Tiedostoa ei voi toistaa. Valitse seuraavaan tallennukseen MKV.",
+  "recorder.output.partial-broken-mkv": "Tallennus ei sulkeutunut siististi. Tiedostoa ei voi toistaa.",
   "recorder.output.failed": "ffmpeg päättyi koodilla {0}.",
   "recorder.error.no-ffmpeg": "{0} ei löytynyt.",
   "recorder.error.invalid": "Nämä asetukset eivät salli tallennusta: {0}",

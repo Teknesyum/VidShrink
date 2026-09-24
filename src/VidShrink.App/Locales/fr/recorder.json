@@ -50,6 +50,7 @@
   "recorder.output.done": "Enregistrement terminé : {0} MB en {1} segments",
   "recorder.output.partial": "L'enregistrement ne s'est pas fermé correctement. Le fichier est enregistré et peut être lu. Les dernières secondes peuvent manquer.",
   "recorder.output.partial-broken": "L'enregistrement ne s'est pas fermé correctement. Le fichier ne peut pas être lu. Choisissez MKV pour le prochain enregistrement.",
+  "recorder.output.partial-broken-mkv": "L'enregistrement ne s'est pas fermé correctement. Le fichier ne peut pas être lu.",
   "recorder.output.failed": "ffmpeg s'est terminé avec le code {0}.",
   "recorder.error.no-ffmpeg": "{0} est introuvable.",
   "recorder.error.invalid": "Ces paramètres ne permettent pas un enregistrement : {0}",

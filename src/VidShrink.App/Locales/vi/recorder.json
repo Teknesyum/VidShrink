@@ -50,6 +50,7 @@
   "recorder.output.done": "Ghi hình hoàn tất: {0} MB trong {1} phân đoạn",
   "recorder.output.partial": "Bản ghi không được đóng đúng cách. Tệp đã được lưu và có thể phát. Vài giây cuối có thể bị thiếu.",
   "recorder.output.partial-broken": "Bản ghi không được đóng đúng cách. Không thể phát tệp này. Hãy chọn MKV cho lần ghi tiếp theo.",
+  "recorder.output.partial-broken-mkv": "Bản ghi không được đóng đúng cách. Không thể phát tệp này.",
   "recorder.output.failed": "ffmpeg đã kết thúc với mã {0}.",
   "recorder.error.no-ffmpeg": "Không thể tìm thấy {0}.",
   "recorder.error.invalid": "Các cài đặt này không cho phép ghi hình: {0}",

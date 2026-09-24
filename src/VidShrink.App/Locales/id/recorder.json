@@ -50,6 +50,7 @@
   "recorder.output.done": "Perekaman selesai: {0} MB dalam {1} segmen",
   "recorder.output.partial": "Perekaman tidak ditutup dengan benar. Berkas tersimpan dan dapat diputar. Beberapa detik terakhir mungkin hilang.",
   "recorder.output.partial-broken": "Perekaman tidak ditutup dengan benar. Berkas tidak dapat diputar. Pilih MKV untuk perekaman berikutnya.",
+  "recorder.output.partial-broken-mkv": "Perekaman tidak ditutup dengan benar. Berkas tidak dapat diputar.",
   "recorder.output.failed": "ffmpeg berakhir dengan kode {0}.",
   "recorder.error.no-ffmpeg": "{0} tidak ditemukan.",
   "recorder.error.invalid": "Pengaturan ini tidak mengizinkan perekaman: {0}",

@@ -50,6 +50,7 @@
   "recorder.output.done": "Įrašymas baigtas: {0} MB, {1} dalyse",
   "recorder.output.partial": "Įrašas neužsidarė tvarkingai. Failas išsaugotas ir jį galima atkurti. Paskutinių sekundžių gali trūkti.",
   "recorder.output.partial-broken": "Įrašas neužsidarė tvarkingai. Failo atkurti negalima. Kitam įrašui pasirinkite MKV.",
+  "recorder.output.partial-broken-mkv": "Įrašas neužsidarė tvarkingai. Failo atkurti negalima.",
   "recorder.output.failed": "ffmpeg baigė darbą su kodu {0}.",
   "recorder.error.no-ffmpeg": "{0} nerasta.",
   "recorder.error.invalid": "Šie nustatymai neleidžia įrašyti: {0}",

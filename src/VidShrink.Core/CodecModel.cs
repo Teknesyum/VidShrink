@@ -207,6 +207,9 @@ public static class CodecModel
     /// </summary>
     public static bool IsVp9(string codec) => codec.Equals("libvpx-vp9", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>WebM kabinin tasiyabildigi video aileleri: VP8, VP9, AV1. H.264 ve HEVC webm'e yazilamaz.</summary>
+    public static bool FitsWebM(string codec) => Family(codec) is "vp8" or "vp9" or "av1";
+
     /// <summary>
     /// hevc_videotoolbox SDR'de de 10 bit (<c>p010le</c>, Main 10) kodlar. Olcum koşum 35166699260
     /// (<c>docs/olcumler/handbrake-kiyas-b7-aciklar.md</c>): 8 bit urune gore alti film hucresinde

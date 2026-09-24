@@ -50,6 +50,7 @@
   "recorder.output.done": "Ierakstīšana pabeigta: {0} MB, {1} daļās",
   "recorder.output.partial": "Ieraksts netika korekti aizvērts. Fails ir saglabāts, un to var atskaņot. Pēdējās sekundes var trūkt.",
   "recorder.output.partial-broken": "Ieraksts netika korekti aizvērts. Failu nevar atskaņot. Nākamajam ierakstam izvēlieties MKV.",
+  "recorder.output.partial-broken-mkv": "Ieraksts netika korekti aizvērts. Failu nevar atskaņot.",
   "recorder.output.failed": "ffmpeg beidza darbu ar kodu {0}.",
   "recorder.error.no-ffmpeg": "{0} netika atrasts.",
   "recorder.error.invalid": "Šie iestatījumi neļauj veikt ierakstīšanu: {0}",

@@ -50,6 +50,7 @@
   "recorder.output.done": "Opptak ferdig: {0} MB i {1} segmenter",
   "recorder.output.partial": "Opptaket ble ikke lukket riktig. Filen er lagret og kan spilles av. De siste sekundene kan mangle.",
   "recorder.output.partial-broken": "Opptaket ble ikke lukket riktig. Filen kan ikke spilles av. Velg MKV til neste opptak.",
+  "recorder.output.partial-broken-mkv": "Opptaket ble ikke lukket riktig. Filen kan ikke spilles av.",
   "recorder.output.failed": "ffmpeg avsluttet med kode {0}.",
   "recorder.error.no-ffmpeg": "Fant ikke {0}.",
   "recorder.error.invalid": "Disse innstillingene tillater ikke et opptak: {0}",

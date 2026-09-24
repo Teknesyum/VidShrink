@@ -228,7 +228,7 @@ public sealed class KaydediciDurustlukTests : IDisposable
     {
         var ekran = Ciz(v => v.ShowResult(Sonuc(Path.Combine(_klasor, "a.mkv"), yarim: true, oynar: false)));
 
-        Assert.Equal(Metin("recorder.output.partial-broken"), ekran.Uyari);
+        Assert.Equal(Metin("recorder.output.partial-broken-mkv"), ekran.Uyari);
     }
 
     [FfmpegFact]

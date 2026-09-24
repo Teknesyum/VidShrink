@@ -50,6 +50,7 @@
   "recorder.output.done": "Snimanje završeno: {0} MB u {1} segmenata",
   "recorder.output.partial": "Snimanje se nije uredno zatvorilo. Fajl je sačuvan i može da se reprodukuje. Poslednje sekunde možda nedostaju.",
   "recorder.output.partial-broken": "Snimanje se nije uredno zatvorilo. Fajl ne može da se reprodukuje. Za sledeće snimanje izaberite MKV.",
+  "recorder.output.partial-broken-mkv": "Snimanje se nije uredno zatvorilo. Fajl ne može da se reprodukuje.",
   "recorder.output.failed": "ffmpeg je završio sa kodom {0}.",
   "recorder.error.no-ffmpeg": "{0} nije pronađen.",
   "recorder.error.invalid": "Ova podešavanja ne dozvoljavaju snimanje: {0}",

@@ -50,6 +50,7 @@
   "recorder.output.done": "Opname voltooid: {0} MB in {1} segmenten",
   "recorder.output.partial": "De opname is niet netjes afgesloten. Het bestand is opgeslagen en kan worden afgespeeld. De laatste seconden ontbreken mogelijk.",
   "recorder.output.partial-broken": "De opname is niet netjes afgesloten. Het bestand kan niet worden afgespeeld. Kies MKV voor de volgende opname.",
+  "recorder.output.partial-broken-mkv": "De opname is niet netjes afgesloten. Het bestand kan niet worden afgespeeld.",
   "recorder.output.failed": "ffmpeg is gestopt met code {0}.",
   "recorder.error.no-ffmpeg": "{0} kon niet worden gevonden.",
   "recorder.error.invalid": "Deze instellingen staan geen opname toe: {0}",

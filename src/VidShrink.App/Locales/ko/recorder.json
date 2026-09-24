@@ -50,6 +50,7 @@
   "recorder.output.done": "녹화 완료: {1}개 구간에 {0} MB",
   "recorder.output.partial": "녹화가 정상적으로 닫히지 않았습니다. 파일은 저장되었으며 재생할 수 있습니다. 마지막 몇 초가 없을 수 있습니다.",
   "recorder.output.partial-broken": "녹화가 정상적으로 닫히지 않았습니다. 파일을 재생할 수 없습니다. 다음 녹화에는 MKV를 선택하세요.",
+  "recorder.output.partial-broken-mkv": "녹화가 정상적으로 닫히지 않았습니다. 파일을 재생할 수 없습니다.",
   "recorder.output.failed": "ffmpeg가 코드 {0}로 종료되었습니다.",
   "recorder.error.no-ffmpeg": "{0}을(를) 찾을 수 없습니다.",
   "recorder.error.invalid": "이 설정으로는 녹화할 수 없습니다: {0}",
