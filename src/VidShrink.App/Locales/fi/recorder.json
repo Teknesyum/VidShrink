@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Poista staattinen tausta",
   "recorder.webcam.background.green": "Poista viherkangas",
   "recorder.webcam.background.hint": "Taustan poisto toimii staattisen taustan tai viherkankaan kanssa; siirry pois kuvasta ennen tallennuksen alkua, jotta ensimmäinen kuva näkee tyhjän taustan.",
-  "recorder.option.magnifier": "Kohdistimen suurennuslasi"
+  "recorder.option.magnifier": "Kohdistimen suurennuslasi",
+  "recorder.discarded-kept": "Tallennus hylättiin, mutta tätä tiedostoa ei voitu poistaa: {0}",
+  "recorder.output.done-partial": "Tallennus jäi kesken: {0} MB, {1} segmentissä",
+  "recorder.output.done-failed": "Tallennus epäonnistui: {0} MB, {1} segmentissä",
+  "recorder.output.partial-unverified": "Tallennus ei sulkeutunut siististi. Tiedosto on levyllä, mutta sen toistettavuutta ei voitu tarkistaa. Viimeiset sekunnit voivat puuttua.",
+  "recorder.output.gif-failed": "GIF-tiedostoa ei voitu tehdä (ffmpeg päättyi koodilla {0}). Tallennus säilytettiin MKV-muodossa.",
+  "recorder.output.not-moved": "Tiedostoa ei voitu siirtää pyydettyyn nimeen; se on näytetyssä polussa: {0}",
+  "recorder.replay.saved-mkv": "Viimeiset sekunnit tallennettu MKV-muodossa, puskuri ei voi kirjoittaa GIF-tiedostoa: {0}"
 }

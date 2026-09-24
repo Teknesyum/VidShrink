@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Pašalinti statišką foną",
   "recorder.webcam.background.green": "Pašalinti žalią ekraną",
   "recorder.webcam.background.hint": "Fono šalinimas veikia su statišku fonu arba žaliu ekranu; prieš pradėdami įrašymą išeikite iš kadro, kad pirmasis kadras matytų tuščią foną.",
-  "recorder.option.magnifier": "Žymeklio didinamasis stiklas"
+  "recorder.option.magnifier": "Žymeklio didinamasis stiklas",
+  "recorder.discarded-kept": "Įrašymas atmestas, bet šio failo nepavyko ištrinti: {0}",
+  "recorder.output.done-partial": "Įrašas nebaigtas: {0} MB, {1} dalyse",
+  "recorder.output.done-failed": "Įrašymas nepavyko: {0} MB, {1} dalyse",
+  "recorder.output.partial-unverified": "Įrašas neužsidarė tvarkingai. Failas yra diske, bet nepavyko patikrinti, ar jį galima atkurti. Paskutinių sekundžių gali trūkti.",
+  "recorder.output.gif-failed": "GIF sukurti nepavyko (ffmpeg baigė darbą kodu {0}). Įrašas išsaugotas kaip MKV.",
+  "recorder.output.not-moved": "Failo nepavyko perkelti prašomu pavadinimu; jis yra rodomame kelyje: {0}",
+  "recorder.replay.saved-mkv": "Paskutinės sekundės išsaugotos kaip MKV, buferis negali rašyti GIF: {0}"
 }

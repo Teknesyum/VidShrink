@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Elimină fundalul static",
   "recorder.webcam.background.green": "Elimină ecranul verde",
   "recorder.webcam.background.hint": "Eliminarea fundalului funcționează cu un fundal static sau un ecran verde; ieșiți din cadru înainte de începerea înregistrării, ca primul cadru să vadă fundalul gol.",
-  "recorder.option.magnifier": "Lupa cursorului"
+  "recorder.option.magnifier": "Lupa cursorului",
+  "recorder.discarded-kept": "Înregistrare anulată, dar acest fișier nu a putut fi șters: {0}",
+  "recorder.output.done-partial": "Înregistrare incompletă: {0} MB în {1} segmente",
+  "recorder.output.done-failed": "Înregistrarea a eșuat: {0} MB în {1} segmente",
+  "recorder.output.partial-unverified": "Înregistrarea nu s-a închis corect. Fișierul este pe disc, dar nu s-a putut verifica dacă poate fi redat. Este posibil să lipsească ultimele secunde.",
+  "recorder.output.gif-failed": "GIF-ul nu a putut fi creat (ffmpeg s-a încheiat cu codul {0}). Înregistrarea a fost păstrată ca MKV.",
+  "recorder.output.not-moved": "Fișierul nu a putut fi mutat la numele cerut; se află la calea afișată: {0}",
+  "recorder.replay.saved-mkv": "Ultimele secunde salvate ca MKV, memoria tampon nu poate scrie GIF: {0}"
 }

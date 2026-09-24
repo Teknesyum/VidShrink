@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "고정 배경 제거",
   "recorder.webcam.background.green": "그린 스크린 제거",
   "recorder.webcam.background.hint": "배경 제거는 고정 배경이나 그린 스크린에서 작동합니다. 첫 프레임이 빈 배경을 담도록 녹화를 시작하기 전에 화면 밖으로 나가세요.",
-  "recorder.option.magnifier": "커서 돋보기"
+  "recorder.option.magnifier": "커서 돋보기",
+  "recorder.discarded-kept": "녹화가 취소되었지만 이 파일을 삭제할 수 없습니다: {0}",
+  "recorder.output.done-partial": "녹화가 불완전합니다: {1}개 구간에 {0} MB",
+  "recorder.output.done-failed": "녹화에 실패했습니다: {1}개 구간에 {0} MB",
+  "recorder.output.partial-unverified": "녹화가 정상적으로 닫히지 않았습니다. 파일은 디스크에 있지만 재생 가능한지 확인할 수 없었습니다. 마지막 몇 초가 없을 수 있습니다.",
+  "recorder.output.gif-failed": "GIF를 만들 수 없습니다 (ffmpeg가 코드 {0}(으)로 종료됨). 녹화는 MKV로 보존되었습니다.",
+  "recorder.output.not-moved": "파일을 요청한 이름으로 옮길 수 없습니다. 표시된 경로에 있습니다: {0}",
+  "recorder.replay.saved-mkv": "마지막 몇 초가 MKV로 저장되었습니다. 버퍼는 GIF를 쓸 수 없습니다: {0}"
 }

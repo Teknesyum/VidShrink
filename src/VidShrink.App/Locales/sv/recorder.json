@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Ta bort statisk bakgrund",
   "recorder.webcam.background.green": "Ta bort greenscreen",
   "recorder.webcam.background.hint": "Borttagning av bakgrund fungerar med en statisk bakgrund eller en greenscreen; kliv ut ur bilden innan inspelningen startar så att första bildrutan ser den tomma bakgrunden.",
-  "recorder.option.magnifier": "Markörförstoring"
+  "recorder.option.magnifier": "Markörförstoring",
+  "recorder.discarded-kept": "Inspelningen kasserades, men den här filen kunde inte raderas: {0}",
+  "recorder.output.done-partial": "Inspelningen är ofullständig: {0} MB i {1} segment",
+  "recorder.output.done-failed": "Inspelningen misslyckades: {0} MB i {1} segment",
+  "recorder.output.partial-unverified": "Inspelningen stängdes inte korrekt. Filen finns på disken, men det gick inte att kontrollera om den kan spelas upp. De sista sekunderna kan saknas.",
+  "recorder.output.gif-failed": "GIF-filen kunde inte skapas (ffmpeg avslutades med kod {0}). Inspelningen behölls som MKV.",
+  "recorder.output.not-moved": "Filen kunde inte flyttas till det begärda namnet; den finns på den visade sökvägen: {0}",
+  "recorder.replay.saved-mkv": "Senaste sekunderna sparade som MKV, bufferten kan inte skriva GIF: {0}"
 }

@@ -1117,7 +1117,8 @@ public sealed class KayitFfmpegKoluTests
         var kaynak = File.ReadAllText(Path.Combine(KokDizin(), "src", "VidShrink.Ffmpeg", "RecorderSession.cs"));
 
         Assert.Contains("RecorderArguments.CaptureRequest(request)", kaynak);
-        Assert.Contains("GifPalette.Build(capture.OutputPath, _gifPath, _request.Fps)", kaynak);
+        Assert.Contains("GifPalette.Build(capture.OutputPath, gifPath, fps)", kaynak);
+        Assert.Contains("ConvertToGifAsync(capture, _gifPath, _request.Fps, ct)", kaynak);
         Assert.Contains("return _gifPath is null ? result : await ConvertToGifAsync(result, ct);", kaynak);
     }
 

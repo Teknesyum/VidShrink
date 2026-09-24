@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Buang latar statik",
   "recorder.webcam.background.green": "Buang skrin hijau",
   "recorder.webcam.background.hint": "Pembuangan latar berfungsi dengan latar statik atau skrin hijau; keluar dari bingkai sebelum rakaman bermula supaya bingkai pertama melihat latar yang kosong.",
-  "recorder.option.magnifier": "Kanta pembesar kursor"
+  "recorder.option.magnifier": "Kanta pembesar kursor",
+  "recorder.discarded-kept": "Rakaman dibuang, tetapi fail ini tidak dapat dipadam: {0}",
+  "recorder.output.done-partial": "Rakaman tidak lengkap: {0} MB dalam {1} segmen",
+  "recorder.output.done-failed": "Rakaman gagal: {0} MB dalam {1} segmen",
+  "recorder.output.partial-unverified": "Rakaman tidak ditutup dengan betul. Fail ada pada cakera, tetapi tidak dapat disemak sama ada ia boleh dimainkan. Beberapa saat terakhir mungkin hilang.",
+  "recorder.output.gif-failed": "GIF tidak dapat dibuat (ffmpeg tamat dengan kod {0}). Rakaman disimpan sebagai MKV.",
+  "recorder.output.not-moved": "Fail tidak dapat dipindahkan ke nama yang diminta; ia berada di laluan yang ditunjukkan: {0}",
+  "recorder.replay.saved-mkv": "Saat terakhir disimpan sebagai MKV, penimbal tidak dapat menulis GIF: {0}"
 }

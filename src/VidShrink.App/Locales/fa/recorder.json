@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "حذف پس‌زمینه ثابت",
   "recorder.webcam.background.green": "حذف پرده سبز",
   "recorder.webcam.background.hint": "حذف پس‌زمینه با پس‌زمینه ثابت یا پرده سبز کار می‌کند؛ پیش از شروع ضبط از کادر بیرون بروید تا نخستین فریم پس‌زمینه خالی را ببیند.",
-  "recorder.option.magnifier": "ذره‌بین نشانگر"
+  "recorder.option.magnifier": "ذره‌بین نشانگر",
+  "recorder.discarded-kept": "ضبط لغو شد، اما این فایل حذف نشد: {0}",
+  "recorder.output.done-partial": "ضبط ناقص است: {0} MB در {1} بخش",
+  "recorder.output.done-failed": "ضبط ناموفق بود: {0} MB در {1} بخش",
+  "recorder.output.partial-unverified": "ضبط به‌درستی بسته نشد. فایل روی دیسک است، اما بررسی اینکه قابل پخش است یا نه ممکن نشد. ممکن است چند ثانیه پایانی موجود نباشد.",
+  "recorder.output.gif-failed": "ساخت GIF ممکن نشد (ffmpeg با کد {0} پایان یافت). ضبط به‌صورت MKV نگه داشته شد.",
+  "recorder.output.not-moved": "فایل به نام درخواستی منتقل نشد؛ در مسیر نمایش‌داده‌شده است: {0}",
+  "recorder.replay.saved-mkv": "ثانیه‌های آخر به‌صورت MKV ذخیره شد، بافر نمی‌تواند GIF بنویسد: {0}"
 }

@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Sabit arka planı kaldır",
   "recorder.webcam.background.green": "Yeşil perdeyi kaldır",
   "recorder.webcam.background.hint": "Arka plan kaldırma sabit arka plan veya yeşil perde ile çalışır; kayda başlamadan kadrajdan çekilin ki ilk kare boş arka planı görsün.",
-  "recorder.option.magnifier": "İmleç büyüteci"
+  "recorder.option.magnifier": "İmleç büyüteci",
+  "recorder.discarded-kept": "Kayıt iptal edildi, ama şu dosya silinemedi: {0}",
+  "recorder.output.done-partial": "Kayıt yarım kaldı: {1} parçada {0} MB",
+  "recorder.output.done-failed": "Kayıt başarısız: {1} parçada {0} MB",
+  "recorder.output.partial-unverified": "Kayıt temiz kapanmadı. Dosya diskte duruyor, ama oynatılıp oynatılamayacağı denetlenemedi. Son saniyeler eksik olabilir.",
+  "recorder.output.gif-failed": "GIF üretilemedi (ffmpeg {0} koduyla bitti). Kayıt MKV olarak korundu.",
+  "recorder.output.not-moved": "Dosya istenen ada taşınamadı, gösterilen yolda duruyor: {0}",
+  "recorder.replay.saved-mkv": "Son saniyeler MKV olarak kaydedildi, tampon GIF yazamıyor: {0}"
 }

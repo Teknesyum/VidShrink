@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Usuń statyczne tło",
   "recorder.webcam.background.green": "Usuń zielony ekran",
   "recorder.webcam.background.hint": "Usuwanie tła działa ze statycznym tłem lub zielonym ekranem; przed rozpoczęciem nagrywania wyjdź z kadru, aby pierwsza klatka zobaczyła puste tło.",
-  "recorder.option.magnifier": "Lupa kursora"
+  "recorder.option.magnifier": "Lupa kursora",
+  "recorder.discarded-kept": "Nagranie odrzucone, ale tego pliku nie udało się usunąć: {0}",
+  "recorder.output.done-partial": "Nagranie niekompletne: {0} MB w {1} segmentach",
+  "recorder.output.done-failed": "Nagrywanie nie powiodło się: {0} MB w {1} segmentach",
+  "recorder.output.partial-unverified": "Nagranie nie zostało poprawnie zamknięte. Plik jest na dysku, ale nie udało się sprawdzić, czy da się go odtworzyć. Ostatnich sekund może brakować.",
+  "recorder.output.gif-failed": "Nie udało się utworzyć GIF-a (ffmpeg zakończył się kodem {0}). Nagranie zachowano jako MKV.",
+  "recorder.output.not-moved": "Nie udało się przenieść pliku pod żądaną nazwę; znajduje się w pokazanej ścieżce: {0}",
+  "recorder.replay.saved-mkv": "Ostatnie sekundy zapisane jako MKV, bufor nie może zapisać GIF-a: {0}"
 }

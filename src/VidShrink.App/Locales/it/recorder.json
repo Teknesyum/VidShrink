@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Rimuovi sfondo statico",
   "recorder.webcam.background.green": "Rimuovi green screen",
   "recorder.webcam.background.hint": "La rimozione dello sfondo funziona con uno sfondo statico o un green screen; esci dall'inquadratura prima di avviare la registrazione, così il primo fotogramma vede lo sfondo vuoto.",
-  "recorder.option.magnifier": "Lente del cursore"
+  "recorder.option.magnifier": "Lente del cursore",
+  "recorder.discarded-kept": "Registrazione scartata, ma questo file non è stato eliminato: {0}",
+  "recorder.output.done-partial": "Registrazione incompleta: {0} MB in {1} segmenti",
+  "recorder.output.done-failed": "Registrazione non riuscita: {0} MB in {1} segmenti",
+  "recorder.output.partial-unverified": "La registrazione non si è chiusa correttamente. Il file è sul disco, ma non è stato possibile verificare se si riproduce. Potrebbero mancare gli ultimi secondi.",
+  "recorder.output.gif-failed": "Impossibile creare la GIF (ffmpeg è terminato con codice {0}). La registrazione è stata conservata come MKV.",
+  "recorder.output.not-moved": "Impossibile spostare il file al nome richiesto; si trova nel percorso mostrato: {0}",
+  "recorder.replay.saved-mkv": "Ultimi secondi salvati come MKV, il buffer non può scrivere GIF: {0}"
 }

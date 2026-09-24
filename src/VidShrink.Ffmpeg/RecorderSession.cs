@@ -55,6 +55,15 @@ public enum RecorderState
 /// <paramref name="OutputPath"/> ile ayni; kendiliginden bolunen kayitta bolum sayisi
 /// kadar eleman var ve <paramref name="OutputPath"/> ilki oluyor.
 /// </param>
+/// <param name="DeliveryError">
+/// Parca istenen ada tasinamadi; <paramref name="OutputPath"/> ve <paramref name="Files"/> o zaman
+/// dosyanin gercekte durdugu parca yolunu gosterir, bu alan da sebebi tasir.
+/// </param>
+/// <param name="MissingGif">GIF istendi ama cevrilemedi: istenen GIF yolu. Yakalama dosyasi yerinde korunur.</param>
+/// <param name="Playable">
+/// Yarim dosya ffprobe ile yoklandi: <c>true</c> en az bir video paketi okundu, <c>false</c> okunamadi,
+/// <c>null</c> yoklanmadi ya da ffprobe calismadi.
+/// </param>
 public sealed record RecordResult(
     bool Ok,
     string OutputPath,
@@ -64,7 +73,10 @@ public sealed record RecordResult(
     string StandardError,
     int Segments,
     IReadOnlyList<string>? DroppedOptions = null,
-    IReadOnlyList<string>? Files = null)
+    IReadOnlyList<string>? Files = null,
+    string? DeliveryError = null,
+    string? MissingGif = null,
+    bool? Playable = null)
 {
     /// <summary>Kayitta verilen ayarlardan en az biri dusurulmus.</summary>
     public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
@@ -290,16 +302,23 @@ public sealed class RecorderSession : IAsyncDisposable
         return capture with { OutputPath = delivered[0], OutputMb = delivered.Sum(SizeMb), Files = delivered };
     }
 
-    private async Task<RecordResult> ConvertToGifAsync(RecordResult capture, CancellationToken ct)
-    {
-        if (!capture.Ok || _gifPath is null || !File.Exists(capture.OutputPath)) return capture;
+    private Task<RecordResult> ConvertToGifAsync(RecordResult capture, CancellationToken ct)
+        => ConvertToGifAsync(capture, _gifPath, _request.Fps, ct);
 
-        var run = await FfmpegRunner.RunAsync(GifPalette.Build(capture.OutputPath, _gifPath, _request.Fps), ct);
-        if (!run.Ok || !File.Exists(_gifPath))
-            return capture with { Ok = false, ExitCode = run.ExitCode, StandardError = run.StandardError };
+    /// <summary>
+    /// Yakalama dosyasini GIF'e cevirir. Cevrilemezse yakalama dosyasi silinmez ve sonuc
+    /// <see cref="RecordResult.MissingGif"/> ile GIF'in uretilmedigini soyler.
+    /// </summary>
+    internal static async Task<RecordResult> ConvertToGifAsync(RecordResult capture, string? gifPath, int fps, CancellationToken ct)
+    {
+        if (!capture.Ok || gifPath is null || !File.Exists(capture.OutputPath)) return capture;
+
+        var run = await FfmpegRunner.RunAsync(GifPalette.Build(capture.OutputPath, gifPath, fps), ct);
+        if (!run.Ok || !File.Exists(gifPath))
+            return capture with { Ok = false, ExitCode = run.ExitCode, StandardError = run.StandardError, MissingGif = gifPath };
 
         TryDelete(capture.OutputPath);
-        return capture with { OutputPath = _gifPath, OutputMb = SizeMb(_gifPath), Files = new[] { _gifPath } };
+        return capture with { OutputPath = gifPath, OutputMb = SizeMb(gifPath), Files = new[] { gifPath } };
     }
 
     /// <summary>Yarida kalan bir oturum makinede ffmpeg birakmaz.</summary>
@@ -502,27 +521,21 @@ public sealed class RecorderSession : IAsyncDisposable
 
         if (_segments.Count == 1)
         {
-            Deliver(_segments[0], _outputPath);
-            return new RecordResult(!_partial, _outputPath, SizeMb(_outputPath), _partial, _lastExitCode, tail, 1,
-                outcome.DroppedOptions, new[] { _outputPath });
+            var (delivered, error) = Deliver(_segments[0], _outputPath);
+            return new RecordResult(!_partial, delivered, SizeMb(delivered), _partial, _lastExitCode, tail, 1,
+                outcome.DroppedOptions, new[] { delivered }, DeliveryError: error,
+                Playable: _partial ? await HasPacketAsync(delivered, ct) : null);
         }
 
         if (_partial)
             return new RecordResult(false, _segments[^1], SizeMb(_segments[^1]), true, _lastExitCode, tail, _segments.Count,
-                outcome.DroppedOptions, new[] { _segments[^1] });
+                outcome.DroppedOptions, new[] { _segments[^1] }, Playable: await HasPacketAsync(_segments[^1], ct));
 
         if (_request.Split is { IsSet: true })
         {
-            var parts = new List<string>(_segments.Count);
-            for (var index = 0; index < _segments.Count; index++)
-            {
-                var part = SplitPath(index);
-                Deliver(_segments[index], part);
-                parts.Add(part);
-            }
-
+            var parts = DeliverAll(_segments.Select((segment, index) => (segment, SplitPath(index))).ToList(), out var error);
             return new RecordResult(true, parts[0], parts.Sum(SizeMb), false, _lastExitCode, tail, parts.Count,
-                outcome.DroppedOptions, parts);
+                outcome.DroppedOptions, parts, DeliveryError: error);
         }
 
         var listPath = _outputPath + ".parcalar.txt";
@@ -544,12 +557,68 @@ public sealed class RecorderSession : IAsyncDisposable
             outcome.DroppedOptions, new[] { _outputPath });
     }
 
-    /// <summary>Tek parcali kayit dogrudan istenen ada tasinir; yarim dosya da tasinir, gizlenmez.</summary>
-    private static void Deliver(string segment, string outputPath)
+    /// <summary>
+    /// Tek parcali kayit dogrudan istenen ada tasinir; yarim dosya da tasinir, gizlenmez.
+    /// Tasima basarisizsa donen yol dosyanin gercekte durdugu parca yoludur ve hata sebebi yaninda gelir.
+    /// </summary>
+    internal static (string Path, string? Error) Deliver(string segment, string outputPath)
     {
-        if (string.Equals(segment, outputPath, StringComparison.OrdinalIgnoreCase)) return;
-        if (!File.Exists(segment)) return;
-        try { File.Move(segment, outputPath, overwrite: true); } catch { }
+        if (string.Equals(segment, outputPath, StringComparison.OrdinalIgnoreCase)) return (outputPath, null);
+        if (!File.Exists(segment)) return (outputPath, null);
+        try
+        {
+            File.Move(segment, outputPath, overwrite: true);
+            return (outputPath, null);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return (segment, ex.Message);
+        }
+    }
+
+    /// <summary>Bolunen kaydin bolumlerini tasir; donen liste her bolumun diskteki gercek yolu, ilk hata <paramref name="error"/>'da.</summary>
+    internal static IReadOnlyList<string> DeliverAll(IReadOnlyList<(string Segment, string Target)> moves, out string? error)
+    {
+        error = null;
+        var paths = new List<string>(moves.Count);
+        foreach (var (segment, target) in moves)
+        {
+            var (path, failure) = Deliver(segment, target);
+            paths.Add(path);
+            error ??= failure;
+        }
+
+        return paths;
+    }
+
+    /// <summary>
+    /// Yarim dosyanin oynatilabilir oldugu kap turunden cikarilmaz, dosyadan okunur: ffprobe ilk
+    /// video paketini okuyabiliyorsa <c>true</c>, okuyamiyorsa <c>false</c>, ffprobe calismadiysa <c>null</c>.
+    /// </summary>
+    internal static async Task<bool?> HasPacketAsync(string path, CancellationToken ct = default)
+    {
+        if (!File.Exists(path) || new FileInfo(path).Length == 0) return false;
+        try
+        {
+            using var process = new Process
+            {
+                StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, new[]
+                {
+                    "-hide_banner", "-v", "error", "-select_streams", "v:0", "-read_intervals", "%+#1",
+                    "-show_entries", "packet=size", "-of", "csv=p=0", path
+                })
+            };
+            process.Start();
+            var stdout = process.StandardOutput.ReadToEndAsync(ct);
+            var stderr = process.StandardError.ReadToEndAsync(ct);
+            await process.WaitForExitAsync(ct);
+            await stderr;
+            return process.ExitCode == 0 && (await stdout).Trim().Length > 0;
+        }
+        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            return null;
+        }
     }
 
     private string SegmentPath(int index)
