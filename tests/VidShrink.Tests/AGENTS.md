@@ -154,7 +154,9 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   (`--update-now`) yuva ve güncelleme kilidi dışarıdan tutulurken uygulamayı 15 sn'nin altında açar.
   `BaslaticiPanelsizTests.Yerinde.cs` — Yükle'nin hızlı yolu (`InPlaceUpdate`, `YerindeGuncelleme`): uygulama doğumu ortanca
   70 ms (n=10, 63-77; eski `--update-now` aynı koşulda 158 ms), `< 1000 ms` pimli; kilitli dosya geri alınır ve eski yol aynı
-  sahneyle kurar; yuva ya da kilit tutulurken hızlı yol denenmez; `Recover`, `SweepRetired`, sahne mührü. Geri almayı
+  sahneyle kurar; kapı ya da kilit tutulurken hızlı yol denenmez, yuva engellemez; gerçek koşulda (arka plan başlatıcısı yuvayı
+  tutup kapıda beklerken) 68 ms (n=10, 57-73; yuvayı isteyen önceki sürüm aynı koşulda eski yoldan 114 ms) ve başlatıcı sonra
+  dokunmadan çekilir (`Kurulmus` silinince iki test kırmızı), başlatıcının kendi dosyası sahnedeyse geçiş onun çıkışında oturur; `Recover`, `SweepRetired`, sahne mührü. Geri almayı
   kaldıran mutasyon 2/4 kırmızı. `docs/olcumler/hizli-guncelleme.md`.
 - `KabukMenusuKayitTests.cs` — aynı menünün davranışı, yalnız `ShellMenu.TestRoot` altında: kutunun komutu başlatıcıyı
   (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.

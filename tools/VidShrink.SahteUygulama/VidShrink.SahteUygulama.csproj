@@ -15,6 +15,8 @@
 
   <ItemGroup>
     <Compile Include="..\..\src\VidShrink.Launcher\UygulamaKlasoruKapisi.cs" Link="UygulamaKlasoruKapisi.cs" />
+    <Compile Include="..\..\src\VidShrink.Launcher\KurulumBekleyeni.cs" Link="KurulumBekleyeni.cs" />
+    <Compile Include="..\..\src\VidShrink.App\YerindeGuncelleme.cs" Link="YerindeGuncelleme.cs" />
   </ItemGroup>
 
 </Project>

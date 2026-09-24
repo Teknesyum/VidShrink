@@ -14,11 +14,15 @@ namespace VidShrink.App;
 /// (<see cref="InPlaceUpdate"/>), yeni sürüm açılır, bu süreç kapanır. Başlatıcı, çıkış
 /// beklemesi ve ikinci doğrulama yok.
 ///
-/// <para>Kilitler yenileri değil, başlatıcının kullandıklarıdır: klasör başına bekleyen
-/// yuvası (<see cref="KurulumBekleyeni.Ad"/>), uygulama klasörü kapısı ve güncelleme
-/// kilidi. Üçü de beklemeden alınır; biri tutuluyorsa (arka planda başlatıcı kurmayı
-/// bekliyor, başka bir kopya yazıyor) hızlı yol denenmez ve çağıran eski yola düşer.
-/// Klasörden koşan başka bir uygulama varsa da denenmez.</para>
+/// <para>Kilitler yenileri değil, başlatıcının kısa süre tuttuklarıdır: uygulama klasörü
+/// kapısı ve güncelleme kilidi, ikisi de beklemeden. Bekleyen yuvası
+/// (<see cref="KurulumBekleyeni.Ad"/>) alınmaz: arka plan başlatıcısı indirdiği sahneyi
+/// kurmak için bu uygulamanın kapanmasını beklerken yuvayı günlerce tutar, kapıyı ise
+/// beklerken bırakır. Güncellemenin olduğu tipik an budur; yuvaya bağlı kalan hızlı yol
+/// orada hep düşerdi. Takastan sonra o başlatıcı kapıyı alınca sürüm işaretini yeni
+/// görür ve kurmadan çekilir (<see cref="KurulumBekleyeni.Kurulmus(string, StagedUpdate)"/>).
+/// Kapı ya da kilit tutuluyorsa (başka bir kopya şu an yazıyor, indirme sürüyor) ya da
+/// klasörden koşan başka bir uygulama varsa hızlı yol denenmez, çağıran eski yola düşer.</para>
 /// </summary>
 internal static class YerindeGuncelleme
 {
@@ -38,34 +42,28 @@ internal static class YerindeGuncelleme
     /// </summary>
     internal static bool Uygula(string baseDirectory, string appDirectory, StagedUpdate staged, string? kilitAdi = null)
     {
-        using var yuva = new Mutex(initiallyOwned: false, KurulumBekleyeni.Ad(appDirectory));
-        if (!Tut(yuva)) return false;
+        var kapi = UygulamaKlasoruKapisi.Al(appDirectory, TimeSpan.Zero);
+        if (kapi is null) return false;
         try
         {
-            var kapi = UygulamaKlasoruKapisi.Al(appDirectory, TimeSpan.Zero);
-            if (kapi is null) return false;
+            using var kilit = new Mutex(initiallyOwned: false, kilitAdi ?? UpdateStaging.MutexName);
+            if (!Tut(kilit)) return false;
             try
             {
-                using var kilit = new Mutex(initiallyOwned: false, kilitAdi ?? UpdateStaging.MutexName);
-                if (!Tut(kilit)) return false;
-                try
-                {
-                    if (KosanVar(appDirectory)) return false;
-                    if (KurulumBekleyeni.Kurulmus(appDirectory, staged)) return false;
-                    var baslaticiBekliyor = InPlaceUpdate.Apply(baseDirectory, appDirectory, staged);
-                    UygulamaKlasoruKapisi.HatayiSil(appDirectory);
-                    if (baslaticiBekliyor) GecisiBaslat(baseDirectory);
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-                finally { Birak(kilit); }
+                if (KosanVar(appDirectory)) return false;
+                if (KurulumBekleyeni.Kurulmus(appDirectory, staged)) return false;
+                var baslaticiBekliyor = InPlaceUpdate.Apply(baseDirectory, appDirectory, staged);
+                UygulamaKlasoruKapisi.HatayiSil(appDirectory);
+                if (baslaticiBekliyor) GecisiBaslat(baseDirectory);
+                return true;
             }
-            finally { UygulamaKlasoruKapisi.Birak(kapi); }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally { Birak(kilit); }
         }
-        finally { Birak(yuva); }
+        finally { UygulamaKlasoruKapisi.Birak(kapi); }
     }
 
     /// <summary>

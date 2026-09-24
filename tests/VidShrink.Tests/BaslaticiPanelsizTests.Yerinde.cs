@@ -128,23 +128,104 @@ public sealed partial class BaslaticiPanelsizTests
     }
 
     [Fact]
-    public void YuvaTutulurkenHizliYolDenenmez()
+    public void KapiYaDaKilitTutulurkenHizliYolDenenmezYuvaEngellemez()
     {
         using var klasor = new YerindeKlasoru();
         var sahne = klasor.Sahne("9.9.9", "a.txt");
         var kilit = TestKilidi();
 
-        using (MutexTutucu.Baslat(KurulumBekleyeni.Ad(klasor.App)))
+        using (MutexTutucu.Baslat(UygulamaKlasoruKapisi.Ad(klasor.App)))
             Assert.False(YerindeGuncelleme.Uygula(klasor.Kok, klasor.App, sahne, kilit));
         using (MutexTutucu.Baslat(kilit))
             Assert.False(YerindeGuncelleme.Uygula(klasor.Kok, klasor.App, sahne, kilit));
         Assert.Equal(new[] { "a.txt=v1", "b.dll=v1" }, klasor.Icerik());
 
-        Assert.True(YerindeGuncelleme.Uygula(klasor.Kok, klasor.App, sahne, kilit));
+        using (MutexTutucu.Baslat(KurulumBekleyeni.Ad(klasor.App)))
+            Assert.True(YerindeGuncelleme.Uygula(klasor.Kok, klasor.App, sahne, kilit));
         Assert.Equal(new[] { "a.txt=v2", "b.dll=v1" }, klasor.Icerik());
         Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(klasor.App));
         Assert.Equal("9.9.9", File.ReadAllText(Path.Combine(klasor.App, AppliedUpdateNotice.MarkerFileName)));
         Assert.False(Directory.Exists(sahne.Stage));
+    }
+
+    /// <summary>
+    /// Gerçek koşul: başlatıcı uygulamayı açmış, arka planda sahneyi indirmiş ve kurmak için
+    /// uygulamanın kapanmasını bekliyor; bekleyen yuvası onun elinde. Sahte uygulama bu anda
+    /// "Yükle"ye basar. Süre basıştan yeni sürümün açılışına kadar. Sonra arka plan başlatıcısı
+    /// kapıyı alır, kurulu sürümü görür ve dokunmadan çekilir: dosyalar ve yazılma anları
+    /// takastan sonraki gibi kalır, hata işareti yok.
+    /// </summary>
+    [SahteKurulumFact]
+    public void ArkaPlanBaslaticisiBeklerkenYukleHizliYoldanAcar()
+    {
+        var sureler = new List<long>();
+        var kollar = new List<string>();
+        for (var tur = 0; tur < OlcumTekrari; tur++)
+        {
+            using var kurulum = new SahteKurulum();
+            var (kol, ms) = ArkaPlanBeklerkenYukle(kurulum, kurulum.SahteYayin("9.9.9", hepsi: true));
+            sureler.Add(ms);
+            kollar.Add(kol);
+            _cikti.WriteLine($"arka-plan-bekler-yukle-ms\t{tur + 1}\t{ms}\tkol\t{kol}");
+        }
+
+        var ortanca = Ortanca(sureler);
+        _cikti.WriteLine($"arka-plan-bekler-yukle-ortanca-ms\t{ortanca}\tn\t{sureler.Count}\taralik\t{sureler.Min()}-{sureler.Max()}");
+        Assert.All(kollar, kol => Assert.Equal("hizli", kol));
+        Assert.True(ortanca < 1000, $"arka plan başlatıcısı beklerken hızlı yolun ortancası {ortanca} ms");
+    }
+
+    /// <summary>
+    /// Sahnede başlatıcının kendi dosyası da var ve arka plan başlatıcısı tam o dosyadan koşuyor.
+    /// Hızlı yol koşan ikilinin üstüne yazamaz; yeni başlatıcı yan adda bekler, geçişi yapan
+    /// süreç arka plan başlatıcısı çekilip çıkınca adı devralır.
+    /// </summary>
+    [SahteKurulumFact]
+    public void ArkaPlanBaslaticisiKendiDosyasiSahnedeykenGecisOnunCikisindaTamamlanir()
+    {
+        using var kurulum = new SahteKurulum();
+        var hedef = Path.Combine(kurulum.Kok, LauncherUpdate.ExecutableName);
+        var yeni = File.ReadAllBytes(hedef).Concat(new byte[] { 0 }).ToArray();
+        var (kol, ms) = ArkaPlanBeklerkenYukle(kurulum, kurulum.SahteYayin("9.9.9", hepsi: true, baslatici: yeni));
+        _cikti.WriteLine($"baslatici-sahnede-yukle-ms\t{ms}\tkol\t{kol}");
+        Assert.Equal("hizli", kol);
+
+        var ozet = Convert.ToHexString(SHA256.HashData(yeni));
+        Assert.True(Bekle(() => !File.Exists(Path.Combine(kurulum.Kok, LauncherUpdate.JournalName))
+            && Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(hedef))) == ozet, 40000), "başlatıcı geçişi tamamlanmadı");
+        Assert.True(Bekle(() => Process.GetProcessesByName("VidShrink.new").Length == 0, 10000), "geçişi yapan süreç çıkmadı");
+        Assert.Equal("9.9.9", LauncherUpdate.ReadVersionMarker(kurulum.Kok));
+        Assert.False(File.Exists(LauncherUpdate.Incoming(kurulum.Kok, LauncherUpdate.ExecutableName)));
+    }
+
+    private (string Kol, long Ms) ArkaPlanBeklerkenYukle(SahteKurulum kurulum, string kaynak)
+    {
+        using var baslatici = kurulum.Baslatici(gecikme: 0, omur: 30000, kaynak: kaynak, ayar: kurulum.AyarDosyasi(),
+            ek: new Dictionary<string, string> { ["VIDSHRINK_SAHTE_YUKLE"] = "1", ["VIDSHRINK_SAHTE_YENI_OMUR_MS"] = "1500" });
+        Assert.True(Bekle(() => kurulum.Olaylar().Any(o => o.Olay == "yukle"), 40000), "sahte uygulama Yükle'ye basmadı");
+        var olaylar = kurulum.Olaylar();
+        var basis = olaylar.Single(o => o.Olay == "yukle-basladi");
+        var kol = olaylar.Single(o => o.Olay == "yukle").Deger;
+        Assert.Equal("yuva-dolu", basis.Deger);
+
+        SahteOlay? acilis = null;
+        Assert.True(Bekle(() => (acilis = kurulum.Olaylar().FirstOrDefault(o => o.Olay == "acildi" && o.Pid != basis.Pid)) is not null, 25000),
+            "yeni sürüm açılmadı");
+        var ms = (acilis!.Zaman - basis.Zaman) / TimeSpan.TicksPerMillisecond;
+        var anlar = kol == "hizli" ? kurulum.Dosyalari().ToDictionary(y => y, File.GetLastWriteTimeUtc) : null;
+
+        Assert.True(baslatici.WaitForExit(60000), "arka plan başlatıcısı çıkmadı");
+        kurulum.HepsiniBekle(30000);
+        kurulum.Dokum(_cikti);
+        kurulum.HepsiYeniSurum();
+        Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(kurulum.App));
+        if (anlar is not null)
+        {
+            foreach (var (yol, an) in anlar) Assert.Equal(an, File.GetLastWriteTimeUtc(yol));
+            Assert.False(InPlaceUpdate.HasPending(kurulum.App));
+            Assert.Equal(3, InPlaceUpdate.SweepRetired(kurulum.App));
+        }
+        return (kol, ms);
     }
 
     [Fact]

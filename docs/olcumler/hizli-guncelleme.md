@@ -11,7 +11,8 @@ altında sahte kurulum: gerçek başlatıcı, `tools/VidShrink.SahteUygulama`, y
 
 ## Önce ve Sonra
 
-Aynı koşul: sahne hazır, yuva ve güncelleme kilidi boş, 2026-09-25, Release, bu makine.
+Koşul: sahne hazır, yuva ve güncelleme kilidi boş, 2026-09-25, Release, bu makine. Arka planda
+bekleyen başlatıcıyla gerçek koşul aşağıda ayrı tabloda.
 
 | Yol | Koşum | n | Ortanca | Aralık |
 |---|---|---|---|---|
@@ -34,9 +35,55 @@ başlatıcı açılmaz, eski süreç yeni süreci açtıktan sonra kapanır (tek
 yuva ve güncelleme kilidi **dışarıdan tutulurken** alındı (`ElleYukleArkaPlanIndirirkenAcilisiGeciktirmez`),
 süre 3 sn'lik elle yuva bütçesinin vazgeçmesidir. Bu turda aynı test bir kez: 3163 ms.
 
-Hızlı yol üç kilidi sıfır beklemeyle alır; biri tutuluyorsa denemez ve eski yola düşer. Yani
-arka planda kurulumu bekleyen bir başlatıcı yuvayı tutarken "Yükle" hâlâ bu 3,1 sn'yi öder.
-Hızlı yol bu koşulu değiştirmiyor.
+Bu koşul (yuva **ve** indirme kilidi tutuluyor: arka plan başlatıcısı henüz indiriyor)
+hızlı yolda da eski yola düşer, çünkü güncelleme kilidi sıfır beklemeyle alınamıyor. Yani
+3,1 sn bu dar pencerede (arka plan indirmesi sürerken "Yükle") duruyor; hızlı yol onu
+kaldırmıyor.
+
+## Gerçek Koşul: Arka Plan Başlatıcısı Kapıda Beklerken
+
+Güncellemenin olduğu tipik an: başlatıcı uygulamayı açmış, arka planda sahneyi indirmiş ve
+kurmak için uygulamanın kapanmasını bekliyor (`KurulumBekleyeni.Kur` → `BosalincaAl`, 7 gün).
+Bekleyen yuvası onun elinde; kapıyı ise beklerken bırakıyor. İlk sürüm hızlı yolu yuvaya
+bağlıyordu, bu yüzden tam bu anda hep düşüyordu. Şimdi hızlı yol yuvayı almıyor; yalnız kapı
+ve güncelleme kilidi, ikisi de sıfır beklemeyle.
+
+Test `ArkaPlanBaslaticisiBeklerkenYukleHizliYoldanAcar`: gerçek başlatıcı ayarda
+`autoUpdate` açık, sahte yayından indirir ve kapıda bekler. Sahte uygulama (`VIDSHRINK_SAHTE_YUKLE=1`)
+yuvanın dolu, mührün yazılmış, indirme kilidinin boş olmasını bekler, sonra uygulamanın
+`HizliYukle`sini taklit eder: `Uygula` + `YeniSurumuAc`, olmazsa `--update-now`. Süre
+`yukle-basladi` olayından yeni sürecin `acildi` olayına. Her turda basış anında yuva dolu
+(`yuva-dolu`) doğrulandı.
+
+| Sürüm | Kol | n | Ortanca | Aralık |
+|---|---|---|---|---|
+| Önce (`HEAD` `YerindeGuncelleme`, yuvayı ister) | 10/10 eski | 10 | 114 ms | 104-145 ms |
+| Sonra (yuvasız) | 10/10 hızlı | 10 | 68 ms | 57-73 ms |
+
+Önce kolu 3,1 sn değil: eski uygulama çıkınca kapıda bekleyen arka plan başlatıcısı hemen
+kurar ve yuvayı bırakır, `--update-now` başlatıcısı yuvayı 3 sn dolmadan alır. Denetim notundaki
+"yuva dolu → 3,1 sn" beklentisi bu koşulda ölçülmedi; kazanç 114 → 68 ms ve kurulumun
+uygulamanın kendi sürecinde yapılması.
+
+Sonra arka plan başlatıcısı: eski süreç yeni süreci açıp çıkar, başlatıcı yeni süreç koştuğu
+için beklemeye devam eder (kapıyı alamaması doğru), yeni süreç kapanınca kapı ve kilidi alır,
+`Kurulmus` sürüm işaretini 9.9.9 görür ve kurmadan çekilir. Ölçülen: üç dosya v2, yazılma
+anları yeni sürüm açıldığı andakiyle aynı, sürüm işareti 9.9.9, hata işareti yok, sahne yok,
+takas günlüğü yok, `SweepRetired` üç `.old` siler, başlatıcı 60 sn içinde çıkar.
+
+## Başlatıcının Kendi Dosyası Sahnede
+
+`ArkaPlanBaslaticisiKendiDosyasiSahnedeykenGecisOnunCikisindaTamamlanir`: yayın `launcher`
+alanında `VidShrink.exe` taşıyor (gerçek başlatıcı + bir bayt) ve arka plan başlatıcısı tam o
+dosyadan koşuyor. Hızlı yol 75 ms, kol hızlı. `InPlaceUpdate.Apply` yeni başlatıcıyı
+`VidShrink.new.exe`'ye koyar, günlüğü kurar, koşan ikilinin üstüne yazamaz (`Commit` sıfır
+pencereyle düşer), `GecisiBaslat` geçişi yapan süreci pid'siz açar (30 sn pencere). Arka plan
+başlatıcısı çekilip çıkınca geçiş oturur: `VidShrink.exe` yeni özette, başlatıcı sürüm
+işareti 9.9.9, günlük ve `.new` yok. Geçti.
+
+Uygulama 30 sn'den uzun açık kalırsa geçiş süreci vazgeçer; bu yıkıcı değil (`Commit` başarısızlıkta
+hiçbir şeye dokunmaz), günlük ve `.new` kalır, başlatıcının bir sonraki açılışında `Repair`
+geçişi pid'li süreçle yeniden kurar. Bu kol ayrıca ölçülmedi; mevcut `LauncherUpdate` testlerinin alanı.
 
 ## Olumsuz Kontrol: Kilitli Dosya
 
@@ -59,6 +106,12 @@ satırı `_ = done;` yapıldı. Sonuç 4 testin 2'si kırmızı:
 - `KilitliDosyaGeriAlinirEskiYolYineKurar` — metinler farklı.
 
 Satır geri kondu, `BaslaticiPanelsizTests` 37/37 yeşil.
+
+İkinci mutasyon arka plan başlatıcısının çekilme kolunda: `KurulumBekleyeni.Kur`'daki
+`if (Kurulmus(appDirectory, staged)) return false;` silindi. İki gerçek koşul testi de kırmızı
+(`HepsiYeniSurum` içinde `Assert.False`: başlatıcı silinmiş sahneden yeniden kurmaya kalkıp
+hata işareti yazdı). Satır geri kondu; `BaslaticiPanelsizTests`, `OluUyeTests`, `InPlace`,
+`KurulumBekleyeni` süzgeci 59/59 yeşil.
 
 ## Sahne Mührü
 

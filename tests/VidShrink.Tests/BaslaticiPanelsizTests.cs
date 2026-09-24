@@ -836,7 +836,7 @@ public sealed partial class BaslaticiPanelsizTests
         /// <c>VIDSHRINK_UPDATE_SOURCE</c> bu klasörü gösterince gerçek başlatıcı gerçek
         /// indirme yolundan geçer, ağ olmadan.
         /// </summary>
-        internal string SahteYayin(string surum, bool hepsi = false)
+        internal string SahteYayin(string surum, bool hepsi = false, byte[]? baslatici = null)
         {
             var kaynak = Path.Combine(Kok, "yayin");
             var icerik = Path.Combine(Kok, "yayin-icerik");
@@ -853,9 +853,20 @@ public sealed partial class BaslaticiPanelsizTests
             var zip = Path.Combine(kaynak, UpdateCheck.ArchiveAssetName(UpdateCheck.Rid));
             if (File.Exists(zip)) File.Delete(zip);
             System.IO.Compression.ZipFile.CreateFromDirectory(icerik, zip);
+            var baslaticiAlani = "";
+            if (baslatici is not null)
+            {
+                var arsiv = Path.Combine(kaynak, UpdateCheck.LauncherArchiveAssetName(UpdateCheck.Rid));
+                if (File.Exists(arsiv)) File.Delete(arsiv);
+                using (var yazici = System.IO.Compression.ZipFile.Open(arsiv, System.IO.Compression.ZipArchiveMode.Create))
+                using (var akis = yazici.CreateEntry(LauncherUpdate.ExecutableName).Open())
+                    akis.Write(baslatici);
+                baslaticiAlani = $",\"launcher\":[{{\"path\":\"{LauncherUpdate.ExecutableName}\"," +
+                    $"\"sha256\":\"{Convert.ToHexString(SHA256.HashData(baslatici))}\",\"size\":{baslatici.Length}}}]";
+            }
             File.WriteAllText(Path.Combine(kaynak, UpdateCheck.ManifestAssetName(UpdateCheck.Rid)),
                 $"{{\"version\":\"{surum}\",\"commit\":\"test\",\"built\":\"2026-09-16T00:00:00Z\"," +
-                $"\"rid\":\"{UpdateCheck.Rid}\",\"files\":[{string.Join(",", satirlar)}]}}");
+                $"\"rid\":\"{UpdateCheck.Rid}\",\"files\":[{string.Join(",", satirlar)}]{baslaticiAlani}}}");
             return kaynak;
         }
 
@@ -876,15 +887,18 @@ public sealed partial class BaslaticiPanelsizTests
             return yol;
         }
 
-        internal Process Baslatici(int gecikme, int omur, string? kaynak = null, string? ayar = null, string[]? args = null)
-            => Baslat(Path.Combine(Kok, "VidShrink.exe"), gecikme, omur, baslaticidan: false, kaynak, ayar, args);
+        internal Process Baslatici(
+            int gecikme, int omur, string? kaynak = null, string? ayar = null, string[]? args = null,
+            IReadOnlyDictionary<string, string>? ek = null)
+            => Baslat(Path.Combine(Kok, "VidShrink.exe"), gecikme, omur, baslaticidan: false, kaynak, ayar, args, ek);
 
         internal Process UygulamaDogrudan(bool baslaticidan, int omur)
             => Baslat(Path.Combine(App, "VidShrink.App.exe"), 0, omur, baslaticidan);
 
         private Process Baslat(
             string dosya, int gecikme, int omur, bool baslaticidan,
-            string? kaynak = null, string? ayar = null, string[]? args = null)
+            string? kaynak = null, string? ayar = null, string[]? args = null,
+            IReadOnlyDictionary<string, string>? ek = null)
         {
             var start = new ProcessStartInfo { FileName = dosya, WorkingDirectory = Path.GetDirectoryName(dosya)!, UseShellExecute = false };
             start.Environment["VIDSHRINK_UPDATE_DISABLED"] = "1";
@@ -902,6 +916,7 @@ public sealed partial class BaslaticiPanelsizTests
             start.Environment.Remove("VIDSHRINK_ACILIS_IZI");
             if (baslaticidan) start.Environment[LauncherUpdate.LaunchedVariable] = "1";
             else start.Environment.Remove(LauncherUpdate.LaunchedVariable);
+            foreach (var (ad, deger) in ek ?? new Dictionary<string, string>()) start.Environment[ad] = deger;
             return Process.Start(start)!;
         }
 
