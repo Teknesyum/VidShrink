@@ -15,7 +15,9 @@ namespace VidShrink.Tests;
 /// Durum değişince beliren yüzeyler (bildirim şeritleri, hata ve durum satırları, sonuç
 /// paneli ve düğmeleri) saydamdan süzülerek gelir; ilerleme çubuğu değerine kayarak varır.
 /// Her kol 400 ms boyunca 2 ms dilimlerle örneklenir: tek <c>RunJobs</c> okuması Win32'de
-/// render tikinden önce kalıyor. <c>reduced-motion</c> sınıflı pencerede ara değer görülmez.
+/// render tikinden önce kalıyor. Saydamlığın en düşüğü ayrıca <c>OpacityProperty</c>
+/// değişim olayından tutulur; CI yükünde örnekleme geçişi kaçırabiliyor.
+/// <c>reduced-motion</c> sınıflı pencerede ara değer görülmez.
 /// </summary>
 public sealed class BelirisCanlandirmaTests
 {
@@ -91,8 +93,13 @@ public sealed class BelirisCanlandirmaTests
                 yuzey.IsVisible = false;
                 Dispatcher.UIThread.RunJobs();
                 Ornekle(() => { });
+                var enAz = 1.0;
+                yuzey.PropertyChanged += (_, e) =>
+                {
+                    if (e.Property == Avalonia.Visual.OpacityProperty) enAz = Math.Min(enAz, yuzey.Opacity);
+                };
                 yuzey.IsVisible = true;
-                var enAz = yuzey.Opacity;
+                enAz = Math.Min(enAz, yuzey.Opacity);
                 Ornekle(() => enAz = Math.Min(enAz, yuzey.Opacity));
                 return (yuzey.Classes.Contains(sinif), enAz, yuzey.Opacity);
             }

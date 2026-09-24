@@ -647,6 +647,54 @@ public sealed class KayitFfmpegKoluTests
         Assert.DoesNotContain("-t", RecorderArguments.Build(parca, @"C:\kayit\a.mp4"));
     }
 
+    /// <summary>
+    /// Kendiliginden biten parca: bolmesiz kayit son olcumu -t'nin birkac ms altinda kalsa da
+    /// biter (CI'da 5 sn'lik kayit 2 parca cikiyordu); bolmeyle sinirlanan parca sonrakini acar,
+    /// toplam sinira gelen son parca acmaz.
+    /// </summary>
+    [Theory]
+    [InlineData(null, 5.0, 0.0, 4.97, false)]
+    [InlineData(null, null, 0.0, 30.0, false)]
+    [InlineData(2.0, 5.0, 0.0, 1.97, true)]
+    [InlineData(2.0, 5.0, 3.94, 4.97, false)]
+    [InlineData(2.0, 5.0, 3.94, 4.60, false)]
+    [InlineData(2.0, 5.0, 2.9, 4.6, true)]
+    [InlineData(2.0, 5.0, 3.0, 5.0, false)]
+    [InlineData(2.0, null, 40.0, 42.0, true)]
+    public void DogalCikisYalnizBolmeSinirindaParcaAcar(double? bolme, double? toplam, double baslangic, double cikis, bool acar)
+    {
+        var istek = Istek() with
+        {
+            MaxDuration = toplam is { } t ? TimeSpan.FromSeconds(t) : null,
+            Split = bolme is { } b ? new RecorderSplit(TimeSpan.FromSeconds(b)) : null
+        };
+
+        Assert.Equal(acar, RecorderArguments.NaturalExitContinues(istek, TimeSpan.FromSeconds(baslangic), 0, TimeSpan.FromSeconds(cikis)));
+    }
+
+    /// <summary>
+    /// Boyutla bolmede ayni kural: bolme boyutu kalan toplamdan kucukse devam, degilse son parca.
+    /// Toplam sure sinirina birkac ms kala biten boyut parcasi da kaydi bitirir.
+    /// </summary>
+    [Theory]
+    [InlineData(0.0, 1.0, true)]
+    [InlineData(8.5, 1.0, false)]
+    [InlineData(0.0, 4.97, false)]
+    public void BoyutlaBolmedeSonParcaDevamEtmez(double yazilan, double cikis, bool acar)
+    {
+        var istek = Istek() with { MaxMegabytes = 10, MaxDuration = TimeSpan.FromSeconds(5), Split = new RecorderSplit(Megabytes: 2) };
+
+        Assert.Equal(acar, RecorderArguments.NaturalExitContinues(istek, TimeSpan.Zero, yazilan, TimeSpan.FromSeconds(cikis)));
+    }
+
+    [Fact]
+    public void OturumDogalCikistaKarariSaftanAlir()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(KokDizin(), "src", "VidShrink.Ffmpeg", "RecorderSession.cs"));
+
+        Assert.Contains("RecorderArguments.NaturalExitContinues(_request, _segmentCapturedAtStart, _segmentWrittenAtStart, _capturedBefore)", kaynak);
+    }
+
     [Fact]
     public void OturumHerParcayiKalanSureyleKurar()
     {

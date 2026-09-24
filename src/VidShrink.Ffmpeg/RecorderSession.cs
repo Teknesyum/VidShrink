@@ -143,6 +143,8 @@ public sealed class RecorderSession : IAsyncDisposable
     private TimeSpan _capturedNow;
     private int _lastExitCode;
     private bool _partial;
+    private TimeSpan _segmentCapturedAtStart;
+    private double _segmentWrittenAtStart;
     private string? _gifPath;
     private bool _closing;
     private readonly TaskCompletionSource _ended = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -338,6 +340,8 @@ public sealed class RecorderSession : IAsyncDisposable
             return;
         }
 
+        _segmentCapturedAtStart = _capturedBefore;
+        _segmentWrittenAtStart = _segments.Count == 0 ? 0 : WrittenMb;
         var path = SegmentPath(_segments.Count);
         var folder = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
@@ -472,10 +476,11 @@ public sealed class RecorderSession : IAsyncDisposable
     /// <summary>
     /// Surecin kendiliginden cikisi. Her parca kendi <c>-t</c>/<c>-fs</c> sinirini tasidigi
     /// icin dogal cikis iki seyden biri olabilir: bolme sinirina gelindi (daha kayit sürecek)
-    /// ya da kaydin toplam siniri tukendi (kayit bitti). Ikisini de <c>RecorderArguments.ForSegment</c>
-    /// ayirt ediyor: null donmezse "parca doldu, sonrakini ac" — <c>StartSegmentAsync</c> yeni
-    /// bir surec acar ve bu gorev kendini yeni surec icin yeniden kurar; null donerse kayit
-    /// bitmis sayilir. Kullanicinin <see cref="PauseAsync"/>/<see cref="StopAsync"/>/
+    /// ya da kaydin toplam siniri tukendi (kayit bitti). Ikisini <c>RecorderArguments.NaturalExitContinues</c>
+    /// ayirt ediyor: parca bolme olcutuyle sinirlanmissa "parca doldu, sonrakini ac" —
+    /// <c>StartSegmentAsync</c> yeni bir surec acar ve bu gorev kendini yeni surec icin yeniden
+    /// kurar; degilse kayit bitmis sayilir. Kalan sureye bakmak yetmiyor: son <c>out_time</c>
+    /// <c>-t</c>'nin birkac ms altinda kalinca bolmesiz kayit ikinci bir parca aciyordu. Kullanicinin <see cref="PauseAsync"/>/<see cref="StopAsync"/>/
     /// <see cref="DisposeAsync"/> ile nazikce durdurmasi <c>_closing</c> bayragiyla burasindan
     /// ayrilir, o yuzden kullanicinin durdurmasi eskisi gibi calisir.
     /// </summary>
@@ -492,7 +497,7 @@ public sealed class RecorderSession : IAsyncDisposable
             if (!ReferenceEquals(_process, process)) return;
             await FinishSegmentAsync(StopTimeoutMs, CancellationToken.None);
 
-            if (!_partial)
+            if (!_partial && RecorderArguments.NaturalExitContinues(_request, _segmentCapturedAtStart, _segmentWrittenAtStart, _capturedBefore))
             {
                 try
                 {

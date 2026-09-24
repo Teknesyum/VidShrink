@@ -1107,6 +1107,29 @@ public static class RecorderArguments
         return request with { MaxDuration = newMaxDuration, MaxMegabytes = newMaxMegabytes, Split = null };
     }
 
+    /// <summary>
+    /// Kalan surenin "kayit bitti" sayildigi alt sinir. Ilerleme blogunun son <c>out_time</c>'i
+    /// <c>-t</c>'nin birkac ms altinda kalabiliyor; bu fark yeni bir parca acmamali.
+    /// </summary>
+    public static readonly TimeSpan TailTolerance = TimeSpan.FromMilliseconds(250);
+
+    /// <summary>
+    /// Kendiliginden biten bir parcanin ardindan yeni parca acilir mi. Yalniz parca bolme
+    /// olcutuyle sinirlanmissa (bolme siniri kalan toplamdan kucukse) acilir; toplam sure ya da
+    /// boyut sinirina gelen parca kaydi bitirir. Kalan sure <see cref="TailTolerance"/>'tan
+    /// kisaysa yine biter: olcum gecikmesinden kalan birkac ms'lik kuyruk parca sayilmaz.
+    /// </summary>
+    public static bool NaturalExitContinues(RecorderRequest request, TimeSpan capturedAtStart, double writtenMbAtStart, TimeSpan capturedAtExit)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.Split is not { IsSet: true } split) return false;
+        if (request.MaxDuration is { } total && total - capturedAtExit < TailTolerance) return false;
+
+        var byDuration = split.Duration is { } every && (request.MaxDuration is not { } limit || every < limit - capturedAtStart);
+        var bySize = split.Megabytes is { } megabytes && (request.MaxMegabytes is not { } cap || megabytes < cap - writtenMbAtStart);
+        return byDuration || bySize;
+    }
+
     public static long LimitBytes(double megabytes) => Megabayt.Tavan(megabytes);
 
     /// <summary>
