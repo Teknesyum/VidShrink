@@ -75,6 +75,8 @@
   "plan.stream.audio-passthrough": "ses izi olduğu gibi kopyalandı: kap bu kodeği taşıyor ve hedefin %15'ini aşmıyor",
   "plan.stream.audio-downmixed": "çok kanallı bir ses izi yeniden kodlanırken stereoya indirildi",
   "plan.stream.extra-audio-dropped": "yalnız bir ses izi tutuldu; hepsini MKV'de taşımak pencerenin 'İzleri koru' kutusuyla olur, CLI'da bu seçenek yok",
+  "plan.stream.extra-audio-dropped-by-container": "yalnız bir ses izi tutuldu; izleri koru açık ama MP4/MOV kabı fazladan izleri taşımıyor",
+  "plan.stream.vp9-fell-back-to-mp4": "VP9 kullanılamadı; video libx264 ile kodlandı ve çıktı WebM değil MP4",
   "plan.stream.text-subtitle-converted": "metin altyazılar zamanlı metin olarak taşındı; biçimlendirme kayboldu",
   "plan.stream.image-subtitle-dropped": "görüntü altyazılar (PGS/VobSub) MP4'te taşınamadığı için düşürüldü; MKV'de taşımak pencerenin 'İzleri koru' kutusuyla olur, CLI'da bu seçenek yok",
   "plan.stream.subtitle-dropped-platform": "platform hedefi her zaman altyazısız MP4 verir",

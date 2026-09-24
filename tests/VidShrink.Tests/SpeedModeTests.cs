@@ -39,7 +39,7 @@ public sealed class SpeedModeTests
     {
         TargetMb = targetMb,
         Intent = Intent.Sharing,
-        SpeedMode = SpeedMode.Fast
+        Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast
     };
 
     [Fact]
@@ -135,7 +135,7 @@ public sealed class SpeedModeTests
         foreach (var codec in FastHardwareCodecs)
         foreach (var target in new[] { 180.0, 25.0, 8.0 })
         {
-            var options = new PlanOptions { TargetMb = target, Intent = Intent.Sharing, SpeedMode = SpeedMode.Fast };
+            var options = new PlanOptions { TargetMb = target, Intent = Intent.Sharing, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
             var availability = new FakeAvailability("libx264", codec);
             var plan = PlanCalculator.BuildDetailed(SampleInfo(), options, null, availability).Plan;
 
@@ -167,7 +167,7 @@ public sealed class SpeedModeTests
         var options = new PlanOptions
         {
             TargetMb = 25,
-            SpeedMode = SpeedMode.Fast,
+            Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast,
             AllowResolutionDrop = false,
             AllowFpsDrop = false
         };
@@ -215,7 +215,7 @@ public sealed class SpeedModeTests
         var options = new PlanOptions
         {
             TargetMb = 25,
-            SpeedMode = SpeedMode.Fast,
+            Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast,
             AllowResolutionDrop = false,
             AllowFpsDrop = false
         };

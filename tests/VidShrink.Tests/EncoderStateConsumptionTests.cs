@@ -75,7 +75,7 @@ public sealed class EncoderStateConsumptionTests
 
         var result = PlanCalculator.BuildDetailed(
             SdrSource(),
-            new PlanOptions { TargetMb = 25, SpeedMode = SpeedMode.Fast },
+            new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast },
             null,
             availability);
 

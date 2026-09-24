@@ -133,7 +133,7 @@ public sealed class EncoderAvailabilityTests
 
         var result = PlanCalculator.BuildDetailed(
             OrnekKaynak(),
-            new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, SpeedMode = SpeedMode.Fast },
+            new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast },
             null,
             makine);
 

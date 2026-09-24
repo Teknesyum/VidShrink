@@ -54,6 +54,10 @@ public partial class MainWindow
         : RunsSinglePass(plan) ? "main.estimate.mode.enforced-single-pass"
         : "main.estimate.mode.enforced";
 
+    internal static bool EncoderFallbackToHardware(EncodePlan? plan) =>
+        plan?.ReasonCodes.FirstOrDefault(note => note.Code == ReasonCode.EncoderFallback)?.FallbackCodec is { } fallback
+        && CodecModel.IsHardware(fallback);
+
     internal static EncoderFallbackCause EncoderFallbackCauseOf(EncodePlan? plan) =>
         plan?.ReasonCodes.FirstOrDefault(note => note.Code == ReasonCode.EncoderFallback)?.FallbackCause
         ?? EncoderFallbackCause.NotWorking;
@@ -184,7 +188,7 @@ public partial class MainWindow
         foreach (var note in advice.Notes.Distinct())
         {
             var text = AdviceLine(note, Strings.Language, ChkFastGpu.IsChecked == true,
-                EncoderFallbackCauseOf(ActivePlan), RunsSinglePass(ActivePlan));
+                EncoderFallbackCauseOf(ActivePlan), RunsSinglePass(ActivePlan), EncoderFallbackToHardware(ActivePlan));
             if (text is not null) lines.Add(text);
         }
 
@@ -194,7 +198,8 @@ public partial class MainWindow
     internal static readonly AdviceCode[] AdviceCodesWithoutText = Array.Empty<AdviceCode>();
 
     internal static string? AdviceLine(AdviceCode note, string language, bool fastGpu,
-        EncoderFallbackCause fallbackCause = EncoderFallbackCause.NotWorking, bool singlePass = false)
+        EncoderFallbackCause fallbackCause = EncoderFallbackCause.NotWorking, bool singlePass = false,
+        bool fallbackToHardware = false)
     {
 
         return note switch
@@ -217,7 +222,9 @@ public partial class MainWindow
             AdviceCode.QualityCeilingReached => Speak(language, "main.advice.quality-ceiling"),
             AdviceCode.AudioReduced => Speak(language, "main.advice.audio-reduced"),
             AdviceCode.AudioMono => Speak(language, "main.advice.audio-mono"),
-            AdviceCode.EncoderFallback => fastGpu
+            AdviceCode.EncoderFallback => fallbackToHardware
+                ? Speak(language, "main.advice.encoder-fallback-hardware")
+                : fastGpu
                 ? Speak(language, "main.advice.encoder-fallback-gpu")
                 : Speak(language, EncoderFallbackAdviceKey(fallbackCause)),
             AdviceCode.HdrTonemapped => Speak(language, "main.advice.hdr-tonemapped"),

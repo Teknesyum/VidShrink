@@ -308,7 +308,7 @@ public sealed class HardwareRateControlTests
         foreach (var detail in new[] { -0.2, 0.2, 0.55, 0.9, 1.4 })
         foreach (var motion in new[] { 0.0, 0.25, 0.6, 1.0 })
         {
-            var options = new PlanOptions { TargetMb = targetMb, FillPolicy = FillPolicy.FillTarget, SpeedMode = SpeedMode.Fast };
+            var options = new PlanOptions { TargetMb = targetMb, FillPolicy = FillPolicy.FillTarget, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
             var profile = ComplexityProfile.FromSourceBitrate(info) with
             {
                 Measured = true,
@@ -367,7 +367,7 @@ public sealed class HardwareRateControlTests
     public void TheHardwareRequestHoldsBackTheDeliveryReserve()
     {
         var info = SourceInfo();
-        var options = new PlanOptions { TargetMb = 8, FillPolicy = FillPolicy.FillTarget, SpeedMode = SpeedMode.Fast };
+        var options = new PlanOptions { TargetMb = 8, FillPolicy = FillPolicy.FillTarget, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
 
         var hardware = PlanCalculator.BuildDetailed(info, options, null, new FixedAvailability("av1_nvenc")).Plan;
         var processor = PlanCalculator.BuildDetailed(info, options, null, new FixedAvailability("libx264")).Plan;
@@ -470,7 +470,7 @@ public sealed class HardwareRateControlTests
     public void ACalibratedHardwarePlanKeepsTheNeutralBias()
     {
         var info = SourceInfo();
-        var options = new PlanOptions { TargetMb = 100, FillPolicy = FillPolicy.FillTarget, SpeedMode = SpeedMode.Fast };
+        var options = new PlanOptions { TargetMb = 100, FillPolicy = FillPolicy.FillTarget, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
 
         var (plan, _) = SettledPlan(info, options);
 
@@ -482,7 +482,7 @@ public sealed class HardwareRateControlTests
     public void AnUncalibratedHardwarePlanLeavesRoomUnderTheEstimateInsteadOfRaisingTheRequest()
     {
         var info = SourceInfo();
-        var options = new PlanOptions { TargetMb = 100, FillPolicy = FillPolicy.FillTarget, SpeedMode = SpeedMode.Fast };
+        var options = new PlanOptions { TargetMb = 100, FillPolicy = FillPolicy.FillTarget, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
 
         var plan = PlanCalculator.BuildDetailed(info, options, null, new FixedAvailability("av1_nvenc")).Plan;
         var estimate = PlanCalculator.Estimate(plan, info, null);
@@ -499,7 +499,7 @@ public sealed class HardwareRateControlTests
         var info = SourceInfo();
         foreach (var targetMb in new[] { 8.0, 25.0, 50.0, 100.0 })
         {
-            var options = new PlanOptions { TargetMb = targetMb, FillPolicy = FillPolicy.FillTarget, SpeedMode = SpeedMode.Fast };
+            var options = new PlanOptions { TargetMb = targetMb, FillPolicy = FillPolicy.FillTarget, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
             var (plan, _) = SettledPlan(info, options);
             var estimated = PlanCalculator.EstimatedMb(plan, info.DurationSeconds);
 
