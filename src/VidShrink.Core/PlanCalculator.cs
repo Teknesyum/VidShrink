@@ -273,6 +273,19 @@ public static class PlanCalculator
         "av1_nvenc", "hevc_nvenc", "av1_qsv", "hevc_qsv", "av1_amf", "hevc_amf", "h264_nvenc"
     };
 
+    private static readonly string[] CompatibleHardwareOrder =
+    {
+        "h264_nvenc", "h264_qsv", "h264_amf"
+    };
+
+    /// <summary>
+    /// Hizli yolun aday sirasi kullanicinin kodek secimine uyar: acikca H.264 (Uyumlu)
+    /// isteyene yalniz H.264 donanimi denenir, sonra libx264. Otomatik'in rejimden
+    /// turettigi tercih sirayi degistirmez; yalniz kullanicinin kendi secimi degistirir.
+    /// </summary>
+    internal static IReadOnlyList<string> FastOrderFor(CodecPreference userChoice)
+        => userChoice == CodecPreference.Compatible ? CompatibleHardwareOrder : FastHardwareOrder;
+
     public static EncodePlan Build(MediaInfo info, PlanOptions options, IEncoderAvailability? availability = null)
         => BuildDetailed(info, options, null, availability).Plan;
 
@@ -331,10 +344,11 @@ public static class PlanCalculator
             ? CompressionStrategy.AutoPreference(regime)
             : options.Codec;
         var fast = options.SpeedMode == SpeedMode.Fast;
+        var fastOrder = FastOrderFor(options.Codec);
         var lockedCodec = NormalizeLockedCodec(options.LockedCodec);
         var codec = lockedCodec is not null
             ? PickLockedCodec(lockedCodec, availability, probe)
-            : fast ? PickFastCodec(preference, availability, probe) : PickCodec(preference, availability, probe);
+            : fast ? PickFastCodec(preference, fastOrder, availability, probe) : PickCodec(preference, availability, probe);
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
 
         if (lockedCodec is not null && options.EncoderPath != EncoderPathOverride.Auto
@@ -345,6 +359,7 @@ public static class PlanCalculator
                 ManualOverrideValue: options.EncoderPath.ToString(), EngineWouldHaveChosen: codec, FallbackCodec: codec));
         }
 
+        string? pathPreferredCodec = null;
         if (lockedCodec is null && options.EncoderPath != EncoderPathOverride.Auto)
         {
             var engineCodec = codec;
@@ -352,15 +367,17 @@ public static class PlanCalculator
             if (!wantsHardware && CodecModel.IsHardware(codec))
                 codec = LockedFallbackCodecFor(codec);
             else if (wantsHardware && !CodecModel.IsHardware(codec))
-                codec = PickFastCodec(preference, availability, probe);
+                codec = PickFastCodec(preference, fastOrder, availability, probe);
 
             if (CodecModel.IsHardware(codec) != wantsHardware)
             {
+                pathPreferredCodec = codec;
                 reason.Add($"kullanici kodlayici yolunu {options.EncoderPath} olarak sabitledi ama bu makinede o yolda kullanilabilir kodlayici yok; istek karsilanmadi ve {codec} ile devam ediliyor");
                 reasonCodes.Add(new ReasonNote(ReasonCode.ManualEncoderPathUnmet, ManualOverrideValue: options.EncoderPath.ToString(), EngineWouldHaveChosen: engineCodec, FallbackCodec: codec));
             }
             else if (codec != engineCodec)
             {
+                pathPreferredCodec = wantsHardware ? fastOrder[0] : codec;
                 reason.Add($"kullanici kodlayici yolunu {options.EncoderPath} olarak sabitledi; motor {engineCodec} secmisti, kullanilan {codec}");
                 reasonCodes.Add(new ReasonNote(ReasonCode.ManualEncoderPathOverride, ManualOverrideValue: options.EncoderPath.ToString(), EngineWouldHaveChosen: engineCodec, FallbackCodec: codec));
             }
@@ -430,7 +447,7 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.HdrDynamicMetadataDropped));
         }
 
-        var preferredCodec = darkSwitch || hdr10PlusRouted ? codec : lockedCodec ?? (fast ? FastHardwareOrder[0] : PreferredCodecFor(preference));
+        var preferredCodec = darkSwitch || hdr10PlusRouted ? codec : lockedCodec ?? pathPreferredCodec ?? (fast ? fastOrder[0] : PreferredCodecFor(preference));
         if (codec != preferredCodec)
         {
             var fallbackCause = EncoderFallbackCauseFor(probe);
@@ -517,11 +534,14 @@ public static class PlanCalculator
         }
 
         var streamRequest = new StreamRequest(options.KeepAllTracks, options.PlatformDelivery, options.PreferredLanguage,
-            options.AudioLoudnorm, options.AudioGainDb, options.ExternalSubtitles, options.Filters?.BurnSubtitle);
+            options.AudioLoudnorm, options.AudioGainDb, options.ExternalSubtitles, options.Filters?.BurnSubtitle,
+            ExplicitAudioCodec: options.AudioCodec != AudioCodecChoice.Auto);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
         var streams = StreamMapping.Decide(info, streamRequest, options.DeliveredContainer ?? StreamMapping.ContainerFor(streamRequest, codec), audioK, audioChannels,
             info.HasAudio && audioK > 0 ? PickAudioCodec(options.AudioCodec) : null, audioPassthrough, effectiveTargetMb,
             options.AudioChannels == AudioChannelOverride.Source);
+        if (lockedCodec is not null && CodecModel.IsVp9(lockedCodec) && !CodecModel.IsVp9(codec) && streams.Container != OutputContainer.WebM)
+            streams = streams with { Notes = streams.Notes.Append(StreamNote.Vp9FellBackToMp4).ToList() };
         var sideK = streams.SideK;
         AddStreamNotes(streams, reason);
 
@@ -1732,15 +1752,15 @@ public static class PlanCalculator
     /// sorunun kendisiyle yoklamayi sirayla koyar, yani tarama bir adayi gecerken de onu
     /// olcume yollar.
     /// </summary>
-    private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState probe)
+    private static string PickFastCodec(CodecPreference pref, IReadOnlyList<string> order, IEncoderAvailability? availability, ProbeState probe)
     {
-        if (availability is null) return FastHardwareOrder[0];
-        probe.PreferredCodecInBuild = availability.HasEncoder(FastHardwareOrder[0]);
+        if (availability is null) return order[0];
+        probe.PreferredCodecInBuild = availability.HasEncoder(order[0]);
         string? unmeasured = null;
-        foreach (var candidate in FastHardwareOrder)
+        foreach (var candidate in order)
         {
             var state = availability.KnownState(candidate);
-            if (candidate == FastHardwareOrder[0]) probe.PreferredCodecState = state;
+            if (candidate == order[0]) probe.PreferredCodecState = state;
             if (state == EncoderProbeState.Unmeasured)
             {
                 unmeasured ??= candidate;
@@ -1799,6 +1819,8 @@ public static class PlanCalculator
                 StreamNote.AudioPassthrough => "the audio track is copied as it is: the container carries its codec, it is no larger than a re-encode and stays within 15% of the target",
                 StreamNote.AudioDownmixedToStereo => "a surround audio track is mixed down to stereo while it is re-encoded",
                 StreamNote.ExtraAudioDropped => "only one audio track is kept; turn on keep tracks to carry all of them in MKV",
+                StreamNote.ExtraAudioDroppedByContainer => "only one audio track is kept; keep tracks is on, but the chosen MP4/MOV container does not carry the extra tracks",
+                StreamNote.Vp9FellBackToMp4 => "VP9 could not be used, so the video is encoded with libx264 and the output is MP4 instead of WebM",
                 StreamNote.TextSubtitleConverted => "text subtitles are carried as timed text; styling is lost",
                 StreamNote.ImageSubtitleDropped => "image subtitles (PGS/VobSub) cannot be carried in MP4 and are dropped; turn on keep tracks to carry them in MKV",
                 StreamNote.SubtitleDroppedForPlatform => "a platform target always delivers MP4 without subtitles",

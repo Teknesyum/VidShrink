@@ -24,7 +24,9 @@ public enum StreamNote
     FlacFellBack,
     AudioFilterSkippedOnCopy,
     WebmAudioOpus,
-    WebmStreamDropped
+    WebmStreamDropped,
+    ExtraAudioDroppedByContainer,
+    Vp9FellBackToMp4
 }
 
 public static class StreamNotes
@@ -49,6 +51,8 @@ public static class StreamNotes
         StreamNote.AudioFilterSkippedOnCopy => "audio-filter-on-copy",
         StreamNote.WebmAudioOpus => "webm-audio-opus",
         StreamNote.WebmStreamDropped => "webm-stream-dropped",
+        StreamNote.ExtraAudioDroppedByContainer => "extra-audio-dropped-by-container",
+        StreamNote.Vp9FellBackToMp4 => "vp9-fell-back-to-mp4",
         _ => "lossless-not-passed"
     };
 }
@@ -121,6 +125,8 @@ public sealed record ExternalSubtitle(string Path, string Codec, string? Languag
 /// dis altyazilar ve yakilan altyazi da burada tasinir: <see cref="StreamMapping.ForOutput"/>
 /// kap degisince karari bu istekten yeniden kurar, alan burada durmazsa orada kaybolur.
 /// <see cref="BurnedSubtitle"/> kaynagin altyazi sirasi (0 tabanli, ffmpeg'in <c>si</c>'si).
+/// <see cref="ExplicitAudioCodec"/> ses kodeginin kullanicidan geldigini soyler: motorun kendi
+/// <c>aac</c>'si Matroska'da Opus'a doner, kullanicinin sectigi AAC donmez.
 /// </summary>
 public sealed record StreamRequest(
     bool KeepAllTracks = false,
@@ -129,7 +135,8 @@ public sealed record StreamRequest(
     bool AudioLoudnorm = false,
     double? AudioGainDb = null,
     IReadOnlyList<ExternalSubtitle>? ExternalSubtitles = null,
-    int? BurnedSubtitle = null)
+    int? BurnedSubtitle = null,
+    bool ExplicitAudioCodec = false)
 {
     public static StreamRequest Default { get; } = new();
 
@@ -473,7 +480,7 @@ public static class StreamMapping
                 : new List<SourceStream> { new(-1, StreamKind.Audio, info.AudioCodec ?? "", Channels: info.AudioChannels, BitrateBps: info.AudioBitrateBps) };
 
             if (!keepAll && inventory && info.Streams.Count(stream => stream.Kind == StreamKind.Audio) > 1)
-                notes.Add(StreamNote.ExtraAudioDropped);
+                notes.Add(request.KeepAllTracks && !request.PlatformDelivery ? StreamNote.ExtraAudioDroppedByContainer : StreamNote.ExtraAudioDropped);
 
             var passthroughBudgetK = targetMb > 0 ? targetMb * PassthroughTargetShare * Megabayt.Kbit / duration : 0;
             var passedK = 0.0;
@@ -567,7 +574,7 @@ public static class StreamMapping
                     codec = "libopus";
                     notes.Add(StreamNote.WebmAudioOpus);
                 }
-                else if (!IsMp4Family(container) && codec == "aac") codec = "libopus";
+                else if (!IsMp4Family(container) && codec == "aac" && !request.ExplicitAudioCodec) codec = "libopus";
 
                 audio.Add(new AudioTrack(map, TrackAction.Encode, codec, trackK, channels, source.Language, source.Title,
                     request.FiltersAudio ? AudioFilter(request, source.SampleRate) : null));

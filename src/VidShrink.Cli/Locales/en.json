@@ -75,6 +75,8 @@
   "plan.stream.audio-passthrough": "the audio track is copied as it is: the container carries its codec and it stays within 15% of the target",
   "plan.stream.audio-downmixed": "a surround audio track is mixed down to stereo while it is re-encoded",
   "plan.stream.extra-audio-dropped": "only one audio track is kept; carrying all of them in MKV takes the window's 'Keep all tracks' box; the CLI has no such option",
+  "plan.stream.extra-audio-dropped-by-container": "only one audio track is kept; keep tracks is on, but the MP4/MOV container does not carry the extra tracks",
+  "plan.stream.vp9-fell-back-to-mp4": "VP9 could not be used, so the video is encoded with libx264 and the output is MP4 instead of WebM",
   "plan.stream.text-subtitle-converted": "text subtitles are carried as timed text; styling is lost",
   "plan.stream.image-subtitle-dropped": "image subtitles (PGS/VobSub) cannot be carried in MP4 and are dropped; carrying them in MKV takes the window's 'Keep all tracks' box; the CLI has no such option",
   "plan.stream.subtitle-dropped-platform": "a platform target always delivers MP4 without subtitles",

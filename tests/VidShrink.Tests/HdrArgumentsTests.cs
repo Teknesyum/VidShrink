@@ -88,7 +88,7 @@ public sealed class HdrArgumentsTests
     [Fact]
     public void FastAv1NvencPreservesHdrWhenTenBitProbeSucceeds()
     {
-        var options = new PlanOptions { TargetMb = 40, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
+        var options = new PlanOptions { TargetMb = 40, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
         var availability = new FakeAvailability("av1_nvenc", "libx265");
 
         var result = PlanCalculator.BuildDetailed(Hdr10Info(), options, null, availability);
@@ -105,7 +105,7 @@ public sealed class HdrArgumentsTests
     [Fact]
     public void RemovingAv1NvencTenBitCapabilityMakesFastPathTonemap()
     {
-        var options = new PlanOptions { TargetMb = 40, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
+        var options = new PlanOptions { TargetMb = 40, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
         var availability = new FakeAvailability("av1_nvenc");
         IHdr10EncoderAvailability mutation = new NoHdrAvailability();
 
@@ -204,7 +204,7 @@ public sealed class HdrArgumentsTests
     [Fact]
     public void ProbeAnswerDecidesFastPathPixelFormatNotTheCodecName()
     {
-        var options = new PlanOptions { TargetMb = 40, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
+        var options = new PlanOptions { TargetMb = 40, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
         var encoders = new FakeAvailability("av1_nvenc");
 
         var p010 = PlanCalculator.BuildDetailed(Hdr10Info(), options, null,
@@ -256,7 +256,7 @@ public sealed class HdrArgumentsTests
     [Fact]
     public void DroppedHdrReachesTheUserAsAPlanLineInBothLanguages()
     {
-        var options = new PlanOptions { TargetMb = 40, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
+        var options = new PlanOptions { TargetMb = 40, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
         var availability = new MutatedAvailability(new FakeAvailability("av1_nvenc"), new NoHdrAvailability());
 
         var dropped = PlanCalculator.BuildDetailed(Hdr10Info(), options, null, availability);

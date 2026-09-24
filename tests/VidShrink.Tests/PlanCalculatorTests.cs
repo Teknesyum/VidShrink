@@ -687,7 +687,7 @@ public sealed class PlanCalculatorTests
     public void HizliKipDonanimYoklamasinaBagliKaliyor()
     {
         var makine = new SurucusuzMakine(built: NvencliDerleme, works: YalnizYazilim);
-        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, SpeedMode = SpeedMode.Fast };
+        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
 
         var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
 
