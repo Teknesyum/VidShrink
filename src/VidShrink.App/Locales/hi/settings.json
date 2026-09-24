@@ -30,6 +30,7 @@
   "settings.share.uploading": "अपलोड हो रहा है...",
   "settings.share.shared-until": "साझा हुआ। लिंक {0} तक खुला रहेगा।",
   "settings.share.shared": "साझा हुआ।",
+  "settings.share.link-copied": "लिंक कॉपी हो गया।",
   "settings.share.cancelled": "रद्द किया गया।",
   "settings.share.failed": "फ़ाइल साझा नहीं हो सकी",
   "settings.share.retry": "फिर कोशिश करें",

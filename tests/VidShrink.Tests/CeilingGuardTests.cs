@@ -193,6 +193,8 @@ public sealed class CeilingGuardTests
         Assert.Equal(bekci.VideoBitrateK, sonuc.Trace!.Last(a => a.Branch == "over ceiling").VideoBitrateK);
         Assert.True(bekci.VideoBitrateK < sonuc.Trace!.Where(a => a.Number < 3 && a.Branch == "over ceiling").Min(a => a.VideoBitrateK), iz);
         Assert.Equal(denenen.Min(), Megabayt.Oku(new FileInfo(cikti).Length), 6);
+        var teslimEdilen = sonuc.Trace!.Where(a => a.Branch == "over ceiling").MinBy(a => a.ActualMb)!.Number;
+        Assert.True(teslimEdilen == sonuc.DeliveredAttemptNumber, $"teslim {teslimEdilen}, bildirilen {sonuc.DeliveredAttemptNumber}: {iz}");
         Assert.Empty(Directory.GetFiles(klasor, "vidshrink_partial_*"));
     }
 

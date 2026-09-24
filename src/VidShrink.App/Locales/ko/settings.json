@@ -30,6 +30,7 @@
   "settings.share.uploading": "업로드 중...",
   "settings.share.shared-until": "공유됨. 링크는 {0}까지 열려 있습니다.",
   "settings.share.shared": "공유됨.",
+  "settings.share.link-copied": "링크를 복사했습니다.",
   "settings.share.cancelled": "취소됨.",
   "settings.share.failed": "파일을 공유할 수 없습니다",
   "settings.share.retry": "다시 시도",

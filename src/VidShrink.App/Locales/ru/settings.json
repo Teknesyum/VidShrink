@@ -30,6 +30,7 @@
   "settings.share.uploading": "Загрузка...",
   "settings.share.shared-until": "Отправлено. Ссылка действует до {0}.",
   "settings.share.shared": "Отправлено.",
+  "settings.share.link-copied": "Ссылка скопирована.",
   "settings.share.cancelled": "Отменено.",
   "settings.share.failed": "Не удалось отправить файл",
   "settings.share.retry": "Повторить",

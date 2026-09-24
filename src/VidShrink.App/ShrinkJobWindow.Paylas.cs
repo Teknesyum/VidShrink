@@ -146,13 +146,8 @@ public partial class ShrinkJobWindow
 
     private async void OnCopyShareLink(object? sender, RoutedEventArgs e)
     {
-        try
-        {
-            if (TopLevel.GetTopLevel(this)?.Clipboard is not { } clipboard) return;
-            await clipboard.SetTextAsync(TxtShareLink.Text ?? string.Empty);
-        }
-        catch (Exception)
-        {
-        }
+        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+        ShowShareStatus(await MainWindow.CopyShareLinkAsync(
+            clipboard is null ? null : text => clipboard.SetTextAsync(text), TxtShareLink.Text ?? string.Empty, Say));
     }
 }

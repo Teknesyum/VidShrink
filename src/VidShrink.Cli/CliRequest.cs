@@ -67,9 +67,6 @@ public sealed record CliRequest
     /// <summary><c>--ana-icerik</c>: en uzun basligi sec.</summary>
     public bool MainFeature { get; init; }
 
-    /// <summary><c>--aci</c>: DVD acisi; yalnizca disk kaynaginda anlamli.</summary>
-    public int? Angle { get; init; }
-
     /// <summary><c>--asgari-sure</c>: bu sureden kisa basliklar envanterden duser.</summary>
     public double? MinDurationSeconds { get; init; }
 
@@ -259,6 +256,21 @@ public static class CliParser
     public const double MinCrf = 0;
     public const double MaxCrf = 63;
 
+    /// <summary>Motorun yazabildigi kaplar; <c>--cikti</c> baska bir uzanti tasiyorsa komut durur.</summary>
+    public static readonly IReadOnlySet<string> OutputExtensions =
+        new HashSet<string>(StringComparer.Ordinal) { ".mp4", ".mkv", ".webm", ".mov" };
+
+    /// <summary>Yalniz tek dosya komutlarinda anlamli secenekler; <c>izle</c> bunlari bilir ama kabul etmez.</summary>
+    public static readonly IReadOnlySet<string> NotInWatch = new HashSet<string>(StringComparer.Ordinal)
+    {
+        "--crf", "--on-ayar", "--preset", "--modul", "--modulus", "--kes", "--cut", "--bolum", "--chapters",
+        "--profil", "--profile", "--profil-dosyasi", "--preset-file", "--kirp", "--crop", "--tarama", "--scan",
+        "--baslik", "--title", "--ana-icerik", "--main-feature", "--asgari-sure", "--min-duration",
+        "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm",
+        "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
+        "--yak", "--burn",
+    };
+
     public static CliParseResult Parse(IReadOnlyList<string> args)
     {
         if (args.Count == 0) return Success(new CliRequest { Command = CliCommand.Help });
@@ -327,6 +339,8 @@ public static class CliParser
                     break;
                 case "--cikti" or "--output" or "-o":
                     if (!TryValue(args, ref i, out var output)) return Fail("error.missing-value", arg);
+                    if (command != CliCommand.Watch && !OutputExtensions.Contains(Path.GetExtension(output).ToLowerInvariant()))
+                        return Fail("error.bad-output-extension", output);
                     request = request with { Output = output };
                     break;
                 case "--kes" or "--cut" when command != CliCommand.Watch:
@@ -381,13 +395,6 @@ public static class CliParser
                 case "--ana-icerik" or "--main-feature" when command != CliCommand.Watch:
                     if (request.Title is not null) return Fail("error.title-and-main-feature", arg);
                     request = request with { MainFeature = true };
-                    break;
-                case "--aci" or "--angle" when command != CliCommand.Watch:
-                    if (!TryValue(args, ref i, out var aci)) return Fail("error.missing-value", arg);
-                    if (!int.TryParse(aci, NumberStyles.Integer, CultureInfo.InvariantCulture, out var aciNo)
-                        || aciNo < 1 || aciNo > 9)
-                        return Fail("error.bad-angle", aci);
-                    request = request with { Angle = aciNo };
                     break;
                 case "--asgari-sure" or "--min-duration" when command != CliCommand.Watch:
                     if (!TryValue(args, ref i, out var asgari)) return Fail("error.missing-value", arg);
@@ -458,6 +465,7 @@ public static class CliParser
                     request = request with { Fast = true };
                     break;
                 default:
+                    if (command == CliCommand.Watch && NotInWatch.Contains(arg)) return Fail("error.not-in-watch", arg);
                     if (arg.StartsWith('-') && arg.Length > 1) return Fail("error.unknown-option", arg);
                     if (request.Input is not null) return Fail("error.extra-input", arg);
                     request = request with { Input = arg };

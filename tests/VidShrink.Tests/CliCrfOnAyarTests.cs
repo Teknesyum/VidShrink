@@ -83,7 +83,7 @@ public sealed class CliCrfOnAyarTests
         var parsed = CliParser.Parse(new[] { "izle", "klasor", "--cikti", "c", "--hedef", "25", bayrak, deger });
 
         Assert.False(parsed.Ok);
-        Assert.Equal("error.unknown-option", parsed.ErrorKey);
+        Assert.Equal("error.not-in-watch", parsed.ErrorKey);
     }
 
     /// <summary>Ayrıştırıcının tanıdığı ad, motorun merdivenlerinden geliyor.</summary>

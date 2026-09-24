@@ -443,6 +443,7 @@ public static class CliApp
         else
             builder.AppendLine(text.Format("plan.target", Num(decision.TargetMb, "0.##", text)));
         builder.AppendLine(text.Format("plan.video", plan.Codec, plan.Mode, plan.Width, plan.Height, Num(plan.Fps, "0.##", text), plan.VideoBitrateK));
+        foreach (var note in EncoderNotes(plan, text)) builder.AppendLine(note);
         if (plan.AudioCodec is not null)
             builder.AppendLine(text.Format("plan.audio", plan.AudioCodec, plan.AudioBitrateK));
         builder.AppendLine(text.Format("plan.estimate", Num(estimate.ExpectedMb, "0.0", text), Num(estimate.LowMb, "0.0", text), Num(estimate.HighMb, "0.0", text)));
@@ -452,7 +453,10 @@ public static class CliApp
         if (plan.Streams is { } streams)
             foreach (var note in streams.Notes.Distinct())
                 builder.AppendLine(text.Format("plan.stream-note", text["plan.stream." + StreamNotes.Slug(note)]));
-        builder.AppendLine(text.Format("plan.output", decision.OutputPath));
+        builder.AppendLine(text.Format("plan.output", plan.ModeEnum == EncodeMode.PassThrough
+            ? EncodeRunner.PassThroughPath(info.FilePath, decision.OutputPath)
+            : decision.OutputPath));
+        if (PassThroughNote(decision, text) is { } kept) builder.AppendLine(kept);
         builder.AppendLine(text["plan.command"]);
         builder.AppendLine(FfmpegArguments.ToCommandLine(decision.Arguments));
         return builder.ToString();
@@ -553,7 +557,12 @@ public static class CliApp
         builder.AppendLine(text.Format("result.output", result.OutputPath));
         builder.AppendLine(text.Format("result.size", Num(result.OutputMb, "0.0", text), Num(decision.TargetMb, "0.##", text), Num(decision.Info.FileSizeMb, "0.0", text)));
         builder.AppendLine(text.Format("result.duration", elapsed.TotalSeconds < 60 ? Num(elapsed.TotalSeconds, "0.0", text) + " s" : Clock(elapsed)));
-        builder.AppendLine(text.Format("result.attempts", result.Attempts));
+        builder.AppendLine(result.DeliveredAttemptNumber == result.Attempts
+            ? text.Format("result.attempts", result.Attempts)
+            : text.Format("result.attempts-delivered", result.Attempts, result.DeliveredAttemptNumber));
+        builder.AppendLine(text.Format("result.encoder", result.PlanUsed.Codec));
+        foreach (var note in EncoderNotes(decision.Plan, text)) builder.AppendLine(note);
+        if (result.Success && PassThroughNote(decision, text) is { } kept) builder.AppendLine(kept);
         builder.AppendLine(vmaf?.VmafNegMean is { } score
             ? text.Format("result.vmaf", Num(score, "0.0", text))
             : text["result.vmaf-none"]);
@@ -566,6 +575,33 @@ public static class CliApp
                 ? text.Format("result.ceiling-kept", result.Attempts, Num(result.OutputMb, "0.000", text))
                 : text.Format("result.ceiling", result.Attempts));
         return builder.ToString();
+    }
+
+    /// <summary>
+    /// Plandaki kodlayici yedegi insan diliyle: istenen kodlayici, yerine gecen ve nedeni.
+    /// Gerekce satiri yalniz kod adini tasiyor; bu satir kullaniciya ne oldugunu soyler.
+    /// </summary>
+    internal static IEnumerable<string> EncoderNotes(EncodePlan plan, CliText text)
+        => plan.ReasonCodes
+            .Where(note => note.Code == ReasonCode.EncoderFallback)
+            .Select(note => text.Format("note.line", text.Format(note.FallbackCause switch
+            {
+                EncoderFallbackCause.NotInBuild => "note.encoder-fallback-not-in-build",
+                EncoderFallbackCause.NotMeasured => "note.encoder-fallback-not-measured",
+                _ => "note.encoder-fallback-not-working"
+            }, note.RequestedCodec, note.FallbackCodec)));
+
+    /// <summary>
+    /// Kopyalama kolu kaynagin kabinda kalir (<see cref="EncodeRunner.PassThroughPath"/>); istenen
+    /// uzanti baskaysa bunu soyleyen not, degilse <c>null</c>.
+    /// </summary>
+    internal static string? PassThroughNote(CliDecision decision, CliText text)
+    {
+        if (decision.Plan.ModeEnum != EncodeMode.PassThrough) return null;
+        var kept = EncodeRunner.PassThroughPath(decision.Info.FilePath, decision.OutputPath);
+        if (kept == decision.OutputPath) return null;
+        return text.Format("note.line", text.Format("note.passthrough-extension",
+            Path.GetExtension(kept), Path.GetExtension(decision.OutputPath)));
     }
 
     public static string ShrinkJson(CliRequest request, CliDecision decision, EncodeResult result, TimeSpan elapsed,

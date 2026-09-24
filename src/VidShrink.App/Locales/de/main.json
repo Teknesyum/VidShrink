@@ -251,7 +251,7 @@
   "main.output.stage": "Phase",
   "main.output.idle": "Bereit",
   "main.output.current-size": "Aktuelle Ausgabegröße",
-  "main.output.remaining": "Verbleibend",
+  "main.output.remaining": "Rest dieses Versuchs",
   "main.output.estimated-time": "Geschätzte Zeit",
   "main.output.estimated-time.tip": "• VidShrink stoppt die Zeit der Proben-Encodes, die es an diesem Clip bereits ausgeführt hat; die Geschwindigkeit hinter dieser Zahl stammt von diesem Rechner und dieser Datei, nicht aus einer Preset-Tabelle.\n• Läufe mit zwei Durchgängen bekommen eine weite Spanne, weil der erste Durchgang nur das Bild analysiert und weniger kostet als der zweite, und wie viel weniger wird nicht gemessen.\n• Wechselt der Plan zu Einstellungen, mit denen die Proben nicht kodiert wurden, bleibt die Zeit leer statt geraten.",
   "main.output.estimated-output": "Geschätzte Ausgabe",
@@ -302,7 +302,7 @@
 
   "main.run.no-space": "Zu wenig freier Platz auf dem Ziellaufwerk; mindestens {0} MB werden benötigt.",
   "main.run.done": "Fertig in {0} Versuch(en). {1} MB → {2} MB ({3}% kleiner).",
-  "main.run.over-ceiling": "Das Ziel von {0} MB wurde nach {1} Versuch(en) nicht unterschritten (letztes Ergebnis {2} MB). Es wurde keine Datei geschrieben, weil eine Datei über dem Ziel nie ausgegeben wird. Erhöhen Sie das Ziel und versuchen Sie es erneut.",
+  "main.run.over-ceiling": "Das Ziel von {0} MB wurde nach {1} Versuch(en) nicht unterschritten (letztes Ergebnis {2} MB). Es wurde keine Datei geschrieben, weil das größere Ergebnis nicht angenommen wurde. Erhöhen Sie das Ziel und versuchen Sie es erneut.",
   "main.run.ended": "Die Kodierung endete unerwartet, es wurde keine Datei geschrieben.",
   "main.run.hdr10plus-short": "HDR10+ hat nur {0} der {1} Bilder der Quelle erreicht; die übrigen Bilder tragen nur statisches HDR10.",
   "main.run.cancelled": "Abgebrochen.",
@@ -454,7 +454,7 @@
   "main.reason.fill-band-narrow": "ein CRF-Schritt verschiebt die Datei um {0}%, breiter als das Ausfüllband von {1}%, ein einzelner CRF-Durchgang kann daher nicht darin landen und VBR mit zwei Durchgängen zielt direkt auf {2} MB",
   "main.reason.fill-band-narrow-single-pass": "ein CRF-Schritt verschiebt die Datei um {0}%, breiter als das Ausfüllband von {1}%, CRF kann daher nicht darin landen, und die Bitratensteuerung mit einem Durchgang dieses Hardware-Encoders zielt direkt auf {2} MB",
   "main.reason.hardware-bitrate-bias": "der {0}-Hardware-Encoder ist für diesen Clip noch nicht kalibriert und kann {1}% unter der vorgegebenen Bitrate landen, die verlangte Bitrate bleibt daher auf dem Ziel und die Schätzung lässt darunter so viel Raum",
-  "main.reason.source-under-target": "die Quelle hat bereits {0} MB, unter dem Ziel von {1} MB, sie wird daher unverändert kopiert statt neu kodiert",
+  "main.reason.source-under-target": "die Quelle hat bereits {0} MB, unter dem Ziel von {1} MB, sie wird daher unverändert kopiert statt neu kodiert und behält unabhängig vom gewählten Container ihren eigenen Container und ihre Endung",
   "main.reason.target-capped": "das Ziel wurde auf {0} MB gedeckelt, weil die Ausgabe nie größer wird als ihre Quelle ({1} MB waren verlangt)",
 
   "main.reason.manual-encoder-path-superseded": "der Encoder-Pfad war auf {0} fixiert, aber der Codec war zugleich gesperrt; die Codec-Sperre gewinnt, verwendet wird der Encoder {1}",

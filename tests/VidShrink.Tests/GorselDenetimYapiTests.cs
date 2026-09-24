@@ -307,6 +307,7 @@ public sealed class GorselDenetimYapiTests
     [InlineData("de", true)]
     [InlineData("en", true)]
     [InlineData("ar", true)]
+    [InlineData("ar", false)]
     public void CiktiOlgulariAyniSatirdaAyniYukseklikte(string dil, bool genis)
     {
         var boyut = genis ? Genis : Dar;

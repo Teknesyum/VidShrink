@@ -30,6 +30,7 @@
   "settings.share.uploading": "מעלה...",
   "settings.share.shared-until": "שותף. הקישור נשאר פתוח עד {0}.",
   "settings.share.shared": "שותף.",
+  "settings.share.link-copied": "הקישור הועתק.",
   "settings.share.cancelled": "בוטל.",
   "settings.share.failed": "לא ניתן לשתף את הקובץ",
   "settings.share.retry": "נסה שוב",

@@ -30,6 +30,7 @@
   "settings.share.uploading": "Įkeliama...",
   "settings.share.shared-until": "Bendrinta. Nuoroda galioja iki {0}.",
   "settings.share.shared": "Bendrinta.",
+  "settings.share.link-copied": "Nuoroda nukopijuota.",
   "settings.share.cancelled": "Atšaukta.",
   "settings.share.failed": "Failo nepavyko bendrinti",
   "settings.share.retry": "Bandyti dar kartą",

@@ -30,6 +30,7 @@
   "settings.share.uploading": "正在上传...",
   "settings.share.shared-until": "已分享。链接保持开放至 {0}。",
   "settings.share.shared": "已分享。",
+  "settings.share.link-copied": "链接已复制。",
   "settings.share.cancelled": "已取消。",
   "settings.share.failed": "文件无法分享",
   "settings.share.retry": "重试",

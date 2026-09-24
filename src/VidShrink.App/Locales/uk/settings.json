@@ -30,6 +30,7 @@
   "settings.share.uploading": "Вивантаження...",
   "settings.share.shared-until": "Поширено. Посилання відкрите до {0}.",
   "settings.share.shared": "Поширено.",
+  "settings.share.link-copied": "Посилання скопійовано.",
   "settings.share.cancelled": "Скасовано.",
   "settings.share.failed": "Не вдалося поширити файл",
   "settings.share.retry": "Спробувати ще раз",

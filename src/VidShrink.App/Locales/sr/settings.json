@@ -30,6 +30,7 @@
   "settings.share.uploading": "Otpremanje...",
   "settings.share.shared-until": "Podeljeno. Veza ostaje otvorena do {0}.",
   "settings.share.shared": "Podeljeno.",
+  "settings.share.link-copied": "Link je kopiran.",
   "settings.share.cancelled": "Otkazano.",
   "settings.share.failed": "Fajl nije podeljen",
   "settings.share.retry": "Покушај поново",

@@ -30,6 +30,7 @@
   "settings.share.uploading": "جارٍ الرفع...",
   "settings.share.shared-until": "تمت المشاركة. يبقى الرابط مفتوحاً حتى {0}.",
   "settings.share.shared": "تمت المشاركة.",
+  "settings.share.link-copied": "تم نسخ الرابط.",
   "settings.share.cancelled": "أُلغي.",
   "settings.share.failed": "تعذر مشاركة الملف",
   "settings.share.retry": "أعد المحاولة",

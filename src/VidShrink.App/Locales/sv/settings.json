@@ -30,6 +30,7 @@
   "settings.share.uploading": "Laddar upp...",
   "settings.share.shared-until": "Delad. Länken är öppen till {0}.",
   "settings.share.shared": "Delad.",
+  "settings.share.link-copied": "Länken kopierades.",
   "settings.share.cancelled": "Avbrutet.",
   "settings.share.failed": "Filen kunde inte delas",
   "settings.share.retry": "Försök igen",

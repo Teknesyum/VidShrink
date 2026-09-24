@@ -19,6 +19,16 @@ public sealed record EncodeResult(bool Success, string OutputPath, double Output
 {
     /// <summary>Teslim edilen kodlamada motorun verdigi ayarlardan en az biri dusurulmus.</summary>
     public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
+
+    /// <summary>
+    /// Teslim edilen dosyayi ureten denemenin numarasi. <see cref="Attempts"/> kosulan denemelerin
+    /// toplamidir; yedege donuldugunde ya da doldurma turu reddedildiginde teslim edilen dosya daha
+    /// erken bir denemeden gelir. Bos ise son deneme teslim edilmistir.
+    /// </summary>
+    public int? DeliveredAttempt { get; init; }
+
+    /// <summary>Teslim edilen denemenin numarasi; <see cref="DeliveredAttempt"/> bossa <see cref="Attempts"/>.</summary>
+    public int DeliveredAttemptNumber => DeliveredAttempt ?? Attempts;
 }
 
 /// <summary>
@@ -194,6 +204,7 @@ public sealed class EncodeRunner
         var partialPath = PartialPathFor(outputPath);
         var fallbackPath = PartialPathFor(outputPath);
         var fallbackMb = 0.0;
+        var fallbackAttempt = 0;
         EncodePlan? fallbackPlan = null;
         IReadOnlyList<string> fallbackDropped = Array.Empty<string>();
         var samples = new List<SizeSample>();
@@ -205,6 +216,7 @@ public sealed class EncodeRunner
         var lastSampleAttempt = 0;
         var overPath = PartialPathFor(outputPath);
         var overMb = 0.0;
+        var overAttempt = 0;
         EncodePlan? overPlan = null;
         IReadOnlyList<string> overDropped = Array.Empty<string>();
 
@@ -218,6 +230,7 @@ public sealed class EncodeRunner
             TryDelete(overPath);
             File.Move(path, overPath, overwrite: true);
             overMb = mb;
+            overAttempt = attempt;
             overPlan = used;
             overDropped = droppedOptions;
         }
@@ -232,6 +245,7 @@ public sealed class EncodeRunner
             TryDelete(fallbackPath);
             File.Move(path, fallbackPath, overwrite: true);
             fallbackMb = mb;
+            fallbackAttempt = attempt;
             fallbackPlan = used;
             fallbackDropped = droppedOptions;
         }
@@ -275,7 +289,7 @@ public sealed class EncodeRunner
                 fillClock.Stop();
                 attemptSeconds = fillClock.Elapsed.TotalSeconds;
                 Iz(new EncodeAttempt(attempt, "budget fill failed, the previous result delivered", fillAimMb, delivered.OutputMb, step.VideoBitrateK, step.Mode));
-                return delivered with { Attempts = attempt, Trace = trace };
+                return delivered with { Attempts = attempt, Trace = trace, DeliveredAttempt = delivered.DeliveredAttemptNumber };
             }
 
             fillClock.Stop();
@@ -289,7 +303,7 @@ public sealed class EncodeRunner
                     ? "budget fill over the target, the previous result delivered"
                     : "budget fill came out smaller, the previous result delivered";
                 Iz(new EncodeAttempt(attempt, branch, fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
-                return delivered with { Attempts = attempt, Trace = trace };
+                return delivered with { Attempts = attempt, Trace = trace, DeliveredAttempt = delivered.DeliveredAttemptNumber };
             }
 
             Iz(new EncodeAttempt(attempt, "budget fill, the fuller result delivered", fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
@@ -299,6 +313,7 @@ public sealed class EncodeRunner
                 OutputMb = upMb,
                 PlanUsed = step,
                 Attempts = attempt,
+                DeliveredAttempt = attempt,
                 Trace = trace,
                 DroppedOptions = upDropped,
                 UnderBand = upMb < band.LowerMb,
@@ -379,7 +394,7 @@ public sealed class EncodeRunner
                         TryDelete(partialPath);
                         Iz(new EncodeAttempt(attempt, "saturated, the fuller under-band result delivered", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode, efficiency));
                         File.Move(fallbackPath, outputPath, overwrite: true);
-                        return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: fallbackDropped, Saturated: true);
+                        return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: fallbackDropped, Saturated: true) { DeliveredAttempt = fallbackAttempt };
                     }
 
                     Iz(new EncodeAttempt(attempt, "saturated, under band delivered", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
@@ -425,14 +440,14 @@ public sealed class EncodeRunner
                             Iz(new EncodeAttempt(attempt, "fallback to the last under-band result", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode));
                             File.Move(fallbackPath, outputPath, overwrite: true);
                             return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: fallbackDropped,
-                                Saturated: usedDeadYieldStep || Saturation.FillIsSaturated(fallbackMb, effectiveTargetMb));
+                                Saturated: usedDeadYieldStep || Saturation.FillIsSaturated(fallbackMb, effectiveTargetMb)) { DeliveredAttempt = fallbackAttempt };
                         }
 
                         if (deliverSmallestOver && overPlan is not null && File.Exists(overPath))
                         {
                             Iz(new EncodeAttempt(attempt, "no attempt fit under the target, the smallest result delivered", aimMb, overMb, overPlan.VideoBitrateK, overPlan.Mode));
                             File.Move(overPath, outputPath, overwrite: true);
-                            return new EncodeResult(true, outputPath, overMb, overPlan, attempt, null, UnderBand: false, CeilingExceeded: true, Trace: trace, DroppedOptions: overDropped, OverTarget: true);
+                            return new EncodeResult(true, outputPath, overMb, overPlan, attempt, null, UnderBand: false, CeilingExceeded: true, Trace: trace, DroppedOptions: overDropped, OverTarget: true) { DeliveredAttempt = overAttempt };
                         }
 
                         return new EncodeResult(false, outputPath, actualMb, current, attempt,
@@ -536,13 +551,22 @@ public sealed class EncodeRunner
         }
     }
 
+    /// <summary>
+    /// Kopyalama kolunun yazdigi yol: akislar oldugu gibi kopyalandigi icin dosya kaynagin kabinda
+    /// kalir, istenen uzanti baskaysa kaynaginkine cevrilir. Cagiranlar kullaniciya bunu soyler.
+    /// </summary>
+    public static string PassThroughPath(string sourcePath, string outputPath)
+    {
+        var sourceExtension = Path.GetExtension(sourcePath);
+        return string.IsNullOrEmpty(sourceExtension) || sourceExtension.Equals(Path.GetExtension(outputPath), StringComparison.OrdinalIgnoreCase)
+            ? outputPath
+            : Path.ChangeExtension(outputPath, sourceExtension);
+    }
+
     private static async Task<EncodeResult> PassThroughAsync(
         MediaInfo info, EncodePlan plan, string outputPath, IProgress<EncodeProgress>? progress, CancellationToken ct)
     {
-        var sourceExtension = Path.GetExtension(info.FilePath);
-        var deliveredPath = string.IsNullOrEmpty(sourceExtension) || sourceExtension.Equals(Path.GetExtension(outputPath), StringComparison.OrdinalIgnoreCase)
-            ? outputPath
-            : Path.ChangeExtension(outputPath, sourceExtension);
+        var deliveredPath = PassThroughPath(info.FilePath, outputPath);
 
         if (plan.Trim is { } trim)
         {

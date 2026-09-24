@@ -30,6 +30,7 @@
   "settings.share.uploading": "Memuat naik...",
   "settings.share.shared-until": "Dikongsi. Pautan kekal terbuka sehingga {0}.",
   "settings.share.shared": "Dikongsi.",
+  "settings.share.link-copied": "Pautan telah disalin.",
   "settings.share.cancelled": "Dibatalkan.",
   "settings.share.failed": "Fail tidak dapat dikongsi",
   "settings.share.retry": "Cuba lagi",

@@ -30,6 +30,7 @@
   "settings.share.uploading": "Inapakia...",
   "settings.share.shared-until": "Imeshirikiwa. Kiungo kinabaki wazi hadi {0}.",
   "settings.share.shared": "Imeshirikiwa.",
+  "settings.share.link-copied": "Kiungo kimenakiliwa.",
   "settings.share.cancelled": "Imeghairiwa.",
   "settings.share.failed": "Faili haikuweza kushirikiwa",
   "settings.share.retry": "Jaribu tena",

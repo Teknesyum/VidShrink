@@ -251,7 +251,7 @@
   "main.output.stage": "Stage",
   "main.output.idle": "Idle",
   "main.output.current-size": "Current output size",
-  "main.output.remaining": "Remaining",
+  "main.output.remaining": "Left in this attempt",
   "main.output.estimated-time": "Estimated time",
   "main.output.estimated-time.tip": "• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file, not from a preset table.\n• Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured.\n• If the plan moves to settings the samples were not encoded with, the time is left blank, not guessed.",
   "main.output.estimated-output": "Estimated output",
@@ -302,7 +302,7 @@
 
   "main.run.no-space": "Not enough free space on the target drive; at least {0} MB is needed.",
   "main.run.done": "Done in {0} attempt(s). {1} MB → {2} MB ({3}% smaller).",
-  "main.run.over-ceiling": "Could not get under the {0} MB target after {1} attempt(s) (last result was {2} MB). No file was written, because a file larger than the target is never handed back. Raise the target and try again.",
+  "main.run.over-ceiling": "Could not get under the {0} MB target after {1} attempt(s) (last result was {2} MB). No file was written, because the larger result was not accepted. Raise the target and try again.",
   "main.run.ended": "Encoding ended unexpectedly and no file was written.",
   "main.run.hdr10plus-short": "HDR10+ reached only {0} of the source's {1} frames; the other frames carry only static HDR10.",
   "main.run.cancelled": "Cancelled.",
@@ -454,7 +454,7 @@
   "main.reason.fill-band-narrow": "one CRF step moves the file by {0}%, wider than the {1}% fill band, so single-pass CRF cannot land inside it and two-pass VBR targets {2} MB directly",
   "main.reason.fill-band-narrow-single-pass": "one CRF step moves the file by {0}%, wider than the {1}% fill band, so CRF cannot land inside it and this hardware encoder's single-pass bitrate control targets {2} MB directly",
   "main.reason.hardware-bitrate-bias": "the {0} hardware encoder is not calibrated for this clip yet and can land {1}% under the bitrate it is given, so the requested bitrate stays on the target and the estimate opens that much room underneath",
-  "main.reason.source-under-target": "the source is already {0} MB, under the {1} MB target, so it is copied as it is instead of being re-encoded",
+  "main.reason.source-under-target": "the source is already {0} MB, under the {1} MB target, so it is copied as it is instead of being re-encoded and keeps its own container and extension whatever container was chosen",
   "main.reason.target-capped": "the target was capped to {0} MB because the output is never larger than what it was made from ({1} MB was asked for)",
 
   "main.reason.manual-encoder-path-superseded": "the encoder path was fixed to {0} but the codec was also locked at the same time; the codec lock wins and the encoder used is {1}",

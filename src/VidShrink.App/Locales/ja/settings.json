@@ -30,6 +30,7 @@
   "settings.share.uploading": "アップロード中...",
   "settings.share.shared-until": "共有しました。リンクは{0}まで有効です。",
   "settings.share.shared": "共有しました。",
+  "settings.share.link-copied": "リンクをコピーしました。",
   "settings.share.cancelled": "キャンセルしました。",
   "settings.share.failed": "ファイルを共有できませんでした",
   "settings.share.retry": "再試行",

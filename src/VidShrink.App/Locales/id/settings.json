@@ -30,6 +30,7 @@
   "settings.share.uploading": "Mengunggah...",
   "settings.share.shared-until": "Dibagikan. Tautan tetap terbuka hingga {0}.",
   "settings.share.shared": "Dibagikan.",
+  "settings.share.link-copied": "Tautan disalin.",
   "settings.share.cancelled": "Dibatalkan.",
   "settings.share.failed": "Berkas tidak dapat dibagikan",
   "settings.share.retry": "Coba lagi",

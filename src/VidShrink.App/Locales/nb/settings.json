@@ -30,6 +30,7 @@
   "settings.share.uploading": "Laster opp...",
   "settings.share.shared-until": "Delt. Lenken er åpen til {0}.",
   "settings.share.shared": "Delt.",
+  "settings.share.link-copied": "Lenken er kopiert.",
   "settings.share.cancelled": "Avbrutt.",
   "settings.share.failed": "Filen kunne ikke deles",
   "settings.share.retry": "Prøv igjen",

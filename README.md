@@ -184,7 +184,6 @@ single spelling.
 | `--tarama` | `--scan` |
 | `--baslik` | `--title` |
 | `--ana-icerik` | `--main-feature` |
-| `--aci` | `--angle` |
 | `--asgari-sure` | `--min-duration` |
 | `--suzgec` | `--filters` |
 | `--kirp` | `--crop` |
