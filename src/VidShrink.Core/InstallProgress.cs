@@ -168,9 +168,9 @@ public sealed class InstallProgress
     }
 
     /// <summary>
-    /// İşi bitirir: durum değişir, yüzde ve tavan sona taşınır. Çubuk sıçramaz; aynı
-    /// yaklaşma yasasıyla (fark × <see cref="Approach"/>) sona koşar, panel dolduktan
-    /// sonra kapanır. Sonuç duyurulduktan sonra düğmeler görünür.
+    /// İşi bitirir: durum değişir, yüzde ve tavan sona taşınır. Başarıda çubuk beklemeden
+    /// %100'e oturur; tavana sürünme bitmiş işi geciktirmez. Başarısızlıkta çubuk olduğu
+    /// yerde kalır. Sonuç duyurulduktan sonra düğmeler görünür.
     /// </summary>
     public void Finish(bool succeeded, string sentence)
     {
@@ -179,6 +179,7 @@ public sealed class InstallProgress
             _state = succeeded ? InstallState.Done : InstallState.Failed;
             _percent = succeeded ? 100 : _percent;
             _ceiling = _percent;
+            if (succeeded) _bar = 100;
             _sentence = sentence ?? string.Empty;
             _log.Add(_sentence);
         }

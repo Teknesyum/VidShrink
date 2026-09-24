@@ -130,7 +130,9 @@ internal static class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        YerindeGuncelleme.OncekiSureciBekle();
         if (global::VidShrink.Launcher.UygulamaKlasoruKapisi.BaslaticiyaDevret(AppContext.BaseDirectory, args)) return 0;
+        Task.Run(() => InPlaceUpdate.SweepRetired(AppContext.BaseDirectory));
         var startup = StartupFor(args);
         if (startup is null) return RunMain(args);
 

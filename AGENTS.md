@@ -14,6 +14,9 @@ Hedef boyuta sıkıştıran video aracı. .NET 8 + Avalonia + ffmpeg.
   yerde merge edilmez, yoksa o kapsam seçimden kopar. Durum metni: `StatusError` hatada,
   `StatusWarning` "iş bitti ama eksik" durumunda — uyarı renkle değil simge ve ağırlıkla
   ayrılır, paletlerde uyarı hue'su yok (`docs/netlestirme/018-uyari-rengi-27-palette-yok.md`).
+- Güncelleme "Yükle"si önce yerinde takas dener (`Core/InPlaceUpdate`, `App/YerindeGuncelleme`): değişen dosya
+  `<ad>.old` olur, sahne adını alır, uygulama kendini yeniden açar, `.old` açılışta silinir. Yuva, kapı ya da güncelleme
+  kilidi tutuluyorsa ya da takas düşerse geri alınır ve başlatıcının `--update-now` yoluna düşülür.
 - `tests/VidShrink.Tests` — tek test projesi. Ölçüsü **dokunulan alan**: değişen her dosyanın
   testleri yerelde yeşil olmadan teslim yok. Tam süit yerelde koşulmaz; itmeden sonra CI
   koşar ve `gh run list` yeşili teslimin şartıdır. `tools/kosum-kapisi` yalnız **majör**

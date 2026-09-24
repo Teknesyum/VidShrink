@@ -174,7 +174,7 @@ public sealed class KontrastTests
             using var katman = new RenderTargetBitmap(boyut, new Vector(96 * s, 96 * s));
             katman.Render(kok);
             using var akis = new MemoryStream();
-            katman.Save(akis);
+            katman.Save(akis, PngBitmapEncoderOptions.Default);
             akis.Position = 0;
             using var duz = new Bitmap(akis);
             using var bmp = new RenderTargetBitmap(boyut, new Vector(96, 96));

@@ -80,9 +80,14 @@ public static class UpdateStaging
 
     /// <summary>
     /// Sahneyi toplar. Kurulacak bir şey yoksa (liste yok, zaten güncel) null döner.
-    /// <paramref name="lanes"/> 1 ise dosyalar sırayla iner ve her devam çağıranın
-    /// eşzamanlama bağlamına döner; düşük öncelikli iş parçacığında koşan çağıran böylece
-    /// özet ve açma işini de o iş parçacığında tutar.
+    /// <paramref name="lanes"/> 1 ise dosyalar sırayla iner. Birden çoksa en çok o kadar
+    /// dosya aynı anda iner; çağıranın eşzamanlama bağlamı varsa şeritlerin gövdeleri de o
+    /// bağlamda koşar. Düşük öncelikli iş parçacığında koşan çağıran böylece özet ve açma
+    /// işini o iş parçacığında tutar, yalnız ağ beklemeleri üst üste biner.
+    ///
+    /// <para>Bitince (iptalde de) sahneye <see cref="StageSeal"/> yazılır: doğrulanan her
+    /// dosyanın özeti, boyu ve yazma zamanı. Sonraki doğrulamalar mühre uyan dosyayı
+    /// yeniden özetlemez.</para>
     /// </summary>
     public static async Task<StagedUpdate?> StageAsync(
         string baseDirectory,
@@ -140,6 +145,7 @@ public static class UpdateStaging
         }
         else Directory.CreateDirectory(stage);
 
+        var seal = StageSeal.Load(stage);
         var done = 0;
 
         void Downloaded(ManifestFile file)
@@ -159,33 +165,43 @@ public static class UpdateStaging
                 foreach (var file in files)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    await StageFileAsync(archive, file, target(file), cancellationToken);
+                    await StageFileAsync(archive, file, target(file), seal, cancellationToken);
                     Downloaded(file);
                 }
                 return;
             }
 
+            var options = new ParallelOptions { MaxDegreeOfParallelism = lanes, CancellationToken = cancellationToken };
+            if (SynchronizationContext.Current is not null)
+                options.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             await Parallel.ForEachAsync(
                 files,
-                new ParallelOptions { MaxDegreeOfParallelism = lanes, CancellationToken = cancellationToken },
+                options,
                 async (file, token) =>
                 {
-                    await StageFileAsync(archive, file, target(file), token);
+                    await StageFileAsync(archive, file, target(file), seal, token);
                     Downloaded(file);
                 });
         }
 
-        if (changed.Count > 0)
+        try
         {
-            var archive = await RemoteZip.OpenAsync(Source(UpdateCheck.ArchiveAssetName(rid), source, throttle, userAgent), cancellationToken);
-            await Fetch(archive, changed, file => UpdateCheck.LocalPath(stage, file.Path));
-        }
+            if (changed.Count > 0)
+            {
+                var archive = await RemoteZip.OpenAsync(Source(UpdateCheck.ArchiveAssetName(rid), source, throttle, userAgent), cancellationToken);
+                await Fetch(archive, changed, file => UpdateCheck.LocalPath(stage, file.Path));
+            }
 
-        if (launcherChanged.Count > 0 || shellChanged.Count > 0)
+            if (launcherChanged.Count > 0 || shellChanged.Count > 0)
+            {
+                var archive = await RemoteZip.OpenAsync(Source(UpdateCheck.LauncherArchiveAssetName(rid), source, throttle, userAgent), cancellationToken);
+                await Fetch(archive, launcherChanged, file => LauncherUpdate.StagePath(stage, file.Path));
+                await Fetch(archive, shellChanged, file => ShellUpdate.StagePath(stage, file.Path));
+            }
+        }
+        finally
         {
-            var archive = await RemoteZip.OpenAsync(Source(UpdateCheck.LauncherArchiveAssetName(rid), source, throttle, userAgent), cancellationToken);
-            await Fetch(archive, launcherChanged, file => LauncherUpdate.StagePath(stage, file.Path));
-            await Fetch(archive, shellChanged, file => ShellUpdate.StagePath(stage, file.Path));
+            seal.Save();
         }
 
         Say(new UpdateStageReport(UpdateStagePhase.Staged, 1, 1, manifest.Version, Done: total, Total: total));
@@ -204,21 +220,27 @@ public static class UpdateStaging
     private static void WriteStageVersion(string stage, string version) =>
         File.WriteAllText(Path.Combine(stage, StageVersionName), version);
 
-    /// <summary>Sahnedeki dosya boyutu ve özetiyle manifeste oturuyor mu.</summary>
-    private static bool AlreadyStaged(string target, ManifestFile file)
+    /// <summary>
+    /// Sahnedeki dosya boyutu ve özetiyle manifeste oturuyor mu. Mühür dosyayı tanıyorsa
+    /// yeniden özetlenmez; tanımıyorsa bir kez özetlenir ve tutarsa mühre girer.
+    /// </summary>
+    private static bool AlreadyStaged(string target, ManifestFile file, StageSeal seal)
     {
         if (!File.Exists(target)) return false;
         try
         {
             if (new FileInfo(target).Length != file.Size) return false;
-            return string.Equals(UpdateCheck.HashFile(target), file.Sha256, StringComparison.OrdinalIgnoreCase);
+            if (seal.Holds(target, file)) return true;
+            if (!string.Equals(UpdateCheck.HashFile(target), file.Sha256, StringComparison.OrdinalIgnoreCase)) return false;
+            seal.Record(target, file.Sha256);
+            return true;
         }
         catch (IOException) { return false; }
     }
 
-    private static async Task StageFileAsync(RemoteZip archive, ManifestFile file, string target, CancellationToken cancellationToken)
+    private static async Task StageFileAsync(RemoteZip archive, ManifestFile file, string target, StageSeal seal, CancellationToken cancellationToken)
     {
-        if (AlreadyStaged(target, file)) return;
+        if (AlreadyStaged(target, file, seal)) return;
 
         var entry = archive.Resolve(file.Path)
             ?? throw new FileNotFoundException($"Arşivde yok: {file.Path}");
@@ -235,6 +257,7 @@ public static class UpdateStaging
             await File.WriteAllBytesAsync(partial, bytes, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             File.Move(partial, target, overwrite: true);
+            seal.Record(target, file.Sha256);
         }
         catch
         {

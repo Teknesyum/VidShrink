@@ -61,10 +61,8 @@ public sealed class GoruntuCekTests
                 satir.RenderTransform = null;
             }
             foreach (var parca in kok.GetVisualDescendants().OfType<Layoutable>()) parca.InvalidateMeasure();
-            var perde = window.FindControl<MatrixRain>("UpdateRain")!;
             kok.Measure(new Size(1200, 800));
             kok.Arrange(new Rect(0, 0, 1200, 800));
-            for (var i = 0; i < 4; i++) perde.Step();
             Kaydet(kok, 1200, 800, 1, "guncelleme-paneli.png");
 
             var sayfa = new WrapPanel { Width = 700, Background = Brushes.Black };

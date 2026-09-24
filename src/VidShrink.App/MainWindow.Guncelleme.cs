@@ -19,14 +19,17 @@ namespace VidShrink.App;
 ///
 /// <para><b>İndirme oynatmayı yavaşlatmaz.</b> Bütün iş <see cref="LowPriorityWork"/>'ün
 /// en düşük öncelikli tek iş parçacığında koşar: ağdan okuma, arşivden açma, özet ve diske
-/// yazma. Dosyalar tek şeritte, sırayla iner; iş parçacığı havuzu ve arayüz iş parçacığı
-/// kullanılmaz. Gövde başlıklardan sonra 64 KB'lık parçalarla okunur ve oynatıcı oynarken
+/// yazma. Dosyalar başlatıcının şerit sayısıyla (<see cref="UpdateStaging.LauncherLanes"/>)
+/// aynı anda iner; şeritlerin gövdeleri yine o iş parçacığında koşar, yalnız ağ beklemeleri
+/// üst üste biner. İş parçacığı havuzu ve arayüz iş parçacığı kullanılmaz. Gövde başlıklardan sonra 64 KB'lık parçalarla okunur ve oynatıcı oynarken
 /// <see cref="DownloadThrottle"/> hızı sınırlar. İş tarafı arayüze hiçbir şey göndermez:
 /// bildirimler bir kuyruğa düşer, arayüz onu yalnız panel açıkken kendi kare saatinde
 /// boşaltır.</para>
 ///
-/// <para>Kurulum burada yapılmaz. "Yükle" mevcut akışı (<see cref="OnInstallUpdate"/>)
-/// çalıştırır; başlatıcı aynı sahneyi bulur, özeti tutan dosyaları yeniden indirmez.</para>
+/// <para>"Yükle" (<see cref="OnInstallUpdate"/>) inen sahneyi yerinde uygular
+/// (<see cref="YerindeGuncelleme"/>): değişen dosyalar <c>.old</c> olur, yenileri adlarını
+/// alır, yeni sürüm açılır, bu pencere kapanır. Hızlı yol düşerse başlatıcı eski akışla
+/// aynı sahneyi bulur, özeti tutan dosyaları yeniden indirmez.</para>
 /// </summary>
 public partial class MainWindow
 {
@@ -44,6 +47,7 @@ public partial class MainWindow
     private int _updateLinesShown;
     private bool _updateNoticeWatched;
     private CancellationTokenSource? _updateCancel;
+    private volatile StagedUpdate? _stagedUpdate;
 
     /// <summary>
     /// İndirmeyi başlatır. Başlatıcısı olmayan kurulumda indirilecek yer yok; o zaman
@@ -59,6 +63,7 @@ public partial class MainWindow
 
         while (_updateReports.TryDequeue(out _)) { }
         _updateLastPhase = null;
+        _stagedUpdate = null;
         SetUpdateBadge(UpdateBadgeState.Downloading);
         ShowUpdateProgress(new InstallProgress());
 
@@ -82,8 +87,9 @@ public partial class MainWindow
             try
             {
                 var staged = await UpdateStaging.StageAsync(
-                    baseDirectory, appDirectory, source, 1, throttle, nameof(VidShrink),
+                    baseDirectory, appDirectory, source, UpdateStaging.LauncherLanes, throttle, nameof(VidShrink),
                     reports.Enqueue, token);
+                _stagedUpdate = staged;
                 return staged is not null;
             }
             catch (OperationCanceledException)
@@ -204,8 +210,8 @@ public partial class MainWindow
     }
 
     /// <summary>
-    /// Paneli bir ilerleme köprüsüne bağlar: günlük alanı ve çubuk görünür olur, perde
-    /// yağmaya başlar. Ölçüm de örnek bir köprüyü buradan verir.
+    /// Paneli bir ilerleme köprüsüne bağlar: günlük alanı ve çubuk görünür olur. Ölçüm de
+    /// örnek bir köprüyü buradan verir.
     /// </summary>
     internal void ShowUpdateProgress(InstallProgress progress)
     {
@@ -217,7 +223,6 @@ public partial class MainWindow
         UpdateLogArea.Height = InstallProgress.LogLines * Scalar("LineHeightBody", 0);
         UpdateLogArea.IsVisible = true;
         UpdateBarTrack.IsVisible = true;
-        UpdateRain.IsRunning = true;
         UpdateNotice.IsVisible = true;
         if (!_updateNoticeWatched)
         {
@@ -295,11 +300,9 @@ public partial class MainWindow
         if (progress is null || !UpdateNotice.IsVisible)
         {
             _updateFrame?.Stop();
-            UpdateRain.IsRunning = false;
             return;
         }
 
-        UpdateRain.IsRunning = true;
         DrainUpdateReports();
 
         if (!HoverZone.MotionReduced) progress.Advance(elapsed);
@@ -312,7 +315,6 @@ public partial class MainWindow
         if (progress.State != InstallState.Running && bar >= progress.Ceiling)
         {
             _updateFrame?.Stop();
-            UpdateRain.IsRunning = false;
         }
     }
 

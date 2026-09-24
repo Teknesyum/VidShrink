@@ -2771,8 +2771,10 @@ public partial class MainWindow : Window
     /// <summary>
     /// Panelin birincil düğmesi. Sahne inmediyse "İndir" olarak indirmeyi başlatır
     /// (<see cref="StartUpdateDownload"/>); indikten sonra "Yükle" olur ve aşağıdaki kurulum
-    /// akışı yalnız o zaman koşar. Güncellemeyi uygulama yapamaz: kendi dll'lerini
-    /// tutan süreç odur. Bu yüzden başlatıcı elle yükleme kipinde açılır, bu süreç kapanır,
+    /// akışı yalnız o zaman koşar. Önce hızlı yol denenir (<see cref="YerindeGuncelleme"/>):
+    /// değişen dosyalar koşan süreç altında yeniden adlandırılıp yerine konur, yeni sürüm
+    /// açılır, bu süreç kapanır. Hızlı yol kilit bulamaz ya da bir dosya taşınamazsa hiçbir
+    /// şey değişmemiştir; o zaman başlatıcı elle yükleme kipinde açılır, bu süreç kapanır,
     /// başlatıcı çıkışı bekleyip güncellemeyi uygular ve uygulamayı yeni sürümle açar.
     /// Kendiliğinden güncelleme ayarına bakılmaz ve yazılmaz; elle bir yükleme tercihi
     /// değiştirmez. Kapanmadan önce rozete ara metin yazılmaz: pencere o karede gidiyor,
@@ -2802,6 +2804,8 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (HizliYukle()) return;
+
         try
         {
             var start = new ProcessStartInfo { FileName = launcher, UseShellExecute = false };
@@ -2816,6 +2820,30 @@ public partial class MainWindow : Window
         }
 
         Close();
+    }
+
+    /// <summary>
+    /// Yükle'nin hızlı yolu. Sahne bu oturumda indiyse yerinde uygular, yeni sürümü açar ve
+    /// pencereyi kapatır. Yanlış dönerse dosyalar olduğu gibidir ve çağıran eski yolu sürer.
+    /// </summary>
+    private bool HizliYukle()
+    {
+        var staged = _stagedUpdate;
+        if (staged is null) return false;
+        var appDirectory = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+        var baseDirectory = Path.GetDirectoryName(appDirectory);
+        if (string.IsNullOrEmpty(baseDirectory)) return false;
+        if (!YerindeGuncelleme.Uygula(baseDirectory, appDirectory, staged)) return false;
+        _stagedUpdate = null;
+
+        try { using var yeni = YerindeGuncelleme.YeniSurumuAc(baseDirectory, appDirectory); }
+        catch (Exception exception) when (exception is InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+            return false;
+        }
+
+        Close();
+        return true;
     }
 
     /// <summary>

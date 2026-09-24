@@ -127,7 +127,7 @@ internal static class UygulamaKlasoruKapisi
 
         var klasor = appDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         var baslatici = LauncherUpdate.LocateLauncher(klasor);
-        if (!Devretmeli(baslaticidan, baslatici is not null, Tutuluyor(klasor), UpdateStage.HasPending(klasor)))
+        if (!Devretmeli(baslaticidan, baslatici is not null, Tutuluyor(klasor), UpdateStage.HasPending(klasor) || InPlaceUpdate.HasPending(klasor)))
             return false;
 
         var start = new ProcessStartInfo

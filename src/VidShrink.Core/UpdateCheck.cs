@@ -689,14 +689,19 @@ public static class UpdateStage
     public static bool HasPending(string appDirectory) =>
         File.Exists(Path.Combine(appDirectory, JournalName));
 
-    /// <summary>Özeti tutmayan ilk dosyayı döndürür; hepsi doğruysa null.</summary>
+    /// <summary>
+    /// Özeti tutmayan ilk dosyayı döndürür; hepsi doğruysa null. Sahnenin
+    /// <see cref="StageSeal"/>'ına uyan dosya yeniden özetlenmez.
+    /// </summary>
     public static ManifestFile? FindMismatch(string stageDirectory, IReadOnlyList<ManifestFile> files)
     {
+        var seal = StageSeal.Load(stageDirectory);
         foreach (var file in files)
         {
             var staged = UpdateCheck.LocalPath(stageDirectory, file.Path);
             if (!File.Exists(staged)) return file;
             if (new FileInfo(staged).Length != file.Size) return file;
+            if (seal.Holds(staged, file)) continue;
             if (!string.Equals(UpdateCheck.HashFile(staged), file.Sha256, StringComparison.OrdinalIgnoreCase))
                 return file;
         }

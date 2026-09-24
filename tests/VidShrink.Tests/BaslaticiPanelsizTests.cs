@@ -32,7 +32,7 @@ public sealed class SahteKurulumFactAttribute : FactAttribute
     }
 }
 
-public sealed class BaslaticiPanelsizTests
+public sealed partial class BaslaticiPanelsizTests
 {
     private readonly ITestOutputHelper _cikti;
 
@@ -832,26 +832,42 @@ public sealed class BaslaticiPanelsizTests
 
         /// <summary>
         /// Yerel sahte yayın: manifestin saydığı tek dosya <c>a.txt</c>, arşiv onun v2 halini
-        /// taşıyor. <c>VIDSHRINK_UPDATE_SOURCE</c> bu klasörü gösterince gerçek başlatıcı
-        /// gerçek indirme yolundan geçer, ağ olmadan.
+        /// taşıyor. <paramref name="hepsi"/> doğruysa üç dosyanın üçü de yayında.
+        /// <c>VIDSHRINK_UPDATE_SOURCE</c> bu klasörü gösterince gerçek başlatıcı gerçek
+        /// indirme yolundan geçer, ağ olmadan.
         /// </summary>
-        internal string SahteYayin(string surum)
+        internal string SahteYayin(string surum, bool hepsi = false)
         {
             var kaynak = Path.Combine(Kok, "yayin");
             var icerik = Path.Combine(Kok, "yayin-icerik");
             Directory.CreateDirectory(kaynak);
             Directory.CreateDirectory(icerik);
             var bayt = Encoding.UTF8.GetBytes("v2");
-            File.WriteAllBytes(Path.Combine(icerik, "a.txt"), bayt);
+            var ozet = Convert.ToHexString(SHA256.HashData(bayt));
+            var satirlar = new List<string>();
+            foreach (var dosya in hepsi ? Dosyalar : new[] { "a.txt" })
+            {
+                File.WriteAllBytes(Path.Combine(icerik, dosya), bayt);
+                satirlar.Add($"{{\"path\":\"{dosya}\",\"sha256\":\"{ozet}\",\"size\":{bayt.Length}}}");
+            }
             var zip = Path.Combine(kaynak, UpdateCheck.ArchiveAssetName(UpdateCheck.Rid));
             if (File.Exists(zip)) File.Delete(zip);
             System.IO.Compression.ZipFile.CreateFromDirectory(icerik, zip);
-            var ozet = Convert.ToHexString(SHA256.HashData(bayt));
             File.WriteAllText(Path.Combine(kaynak, UpdateCheck.ManifestAssetName(UpdateCheck.Rid)),
                 $"{{\"version\":\"{surum}\",\"commit\":\"test\",\"built\":\"2026-09-16T00:00:00Z\"," +
-                $"\"rid\":\"{UpdateCheck.Rid}\",\"files\":[{{\"path\":\"a.txt\",\"sha256\":\"{ozet}\",\"size\":{bayt.Length}}}]}}");
+                $"\"rid\":\"{UpdateCheck.Rid}\",\"files\":[{string.Join(",", satirlar)}]}}");
             return kaynak;
         }
+
+        /// <summary>Sahte uygulamanın doğrudan açılırken istediği ortam.</summary>
+        internal Dictionary<string, string> SahteOrtam(int omur) => new()
+        {
+            ["VIDSHRINK_SAHTE_ISARET"] = Isaret,
+            ["VIDSHRINK_SAHTE_OMUR_MS"] = omur.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ["VIDSHRINK_UPDATE_DISABLED"] = "1"
+        };
+
+        internal IEnumerable<string> Dosyalari() => Dosyalar.Select(dosya => Path.Combine(App, dosya));
 
         internal string AyarDosyasi()
         {

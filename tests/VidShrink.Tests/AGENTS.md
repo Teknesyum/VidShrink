@@ -108,7 +108,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   (0,7 MB elenir — 0,8 MB geçer), `ApplyBudget`'in kalite kolunu tavanlı bit hızına çevirip `Validate`'ten geçmesi.
   Süreç çalıştırmaz, kanıt dosyası bırakmaz.
 - `KurulumIlerlemesiTests.cs` — kurulum panelinin tavan kuralı: ilk 24 karelik açılış atağı (yaklaşma 0,2, sürünme 0,08),
-  sonra çubuğun yüzdeye fark × 0,08 (en az 0,2) ile yaklaşması, yüzde durunca tavana fark × 0,006 ile sürünüp tavanı geçmemesi, geriye yazan adımın yüzdeyi
+  sonra çubuğun yüzdeye fark × 0,08 (en az 0,2) ile yaklaşması, başarıda çubuğun hemen 100'e oturması, yüzde durunca tavana fark × 0,006 ile sürünüp tavanı geçmemesi, geriye yazan adımın yüzdeyi
   düşürmemesi, 0-100 kırpması, günlüğün ekranda dokuz satırda durup diske tamamının gitmesi, sonucun duyurulması.
   Çizim ölçmez; ölçtüğü şey köprünün kararı.
 - `KayitTeslimTests.cs` — kayıt bittikten sonraki teslim: sonuç panelindeki dört kapı (klasör, küçültme, oynatıcı,
@@ -152,6 +152,10 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   (kapalı kipi negatif kontrol), `MainModule` fırlatan süreç bizim sayılmaz. Gerçek süreçle: yerel sahte yayından
   (`VIDSHRINK_UPDATE_SOURCE`, manifest + zip) yuva tutulurken koşan başlatıcı kurmaz, yuva boşken v2 kurar; elle Yükle
   (`--update-now`) yuva ve güncelleme kilidi dışarıdan tutulurken uygulamayı 15 sn'nin altında açar.
+  `BaslaticiPanelsizTests.Yerinde.cs` — Yükle'nin hızlı yolu (`InPlaceUpdate`, `YerindeGuncelleme`): uygulama doğumu ortanca
+  70 ms (n=10, 63-77; eski `--update-now` aynı koşulda 158 ms), `< 1000 ms` pimli; kilitli dosya geri alınır ve eski yol aynı
+  sahneyle kurar; yuva ya da kilit tutulurken hızlı yol denenmez; `Recover`, `SweepRetired`, sahne mührü. Geri almayı
+  kaldıran mutasyon 2/4 kırmızı. `docs/olcumler/hizli-guncelleme.md`.
 - `KabukMenusuKayitTests.cs` — aynı menünün davranışı, yalnız `ShellMenu.TestRoot` altında: kutunun komutu başlatıcıyı
   (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı

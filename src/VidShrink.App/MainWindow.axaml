@@ -170,7 +170,6 @@
                       Background="{StaticResource AppBg}"
                       CornerRadius="{StaticResource RadiusChip}">
                 <Panel>
-                  <izi:MatrixRain x:Name="UpdateRain" Foreground="{StaticResource NeonSuccess}" Opacity="{StaticResource BorderDecorativeOpacity}"/>
                   <StackPanel x:Name="UpdateLogLines"
                               VerticalAlignment="Bottom"
                               Margin="{StaticResource ChipPadding}"/>

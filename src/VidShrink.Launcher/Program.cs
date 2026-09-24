@@ -56,7 +56,7 @@ internal static class Program
             return 0;
         }
 
-        var pending = UpdateStage.HasPending(appDirectory);
+        var pending = UpdateStage.HasPending(appDirectory) || InPlaceUpdate.HasPending(appDirectory);
         if (!updateNow && !pending && args.Length > 0 && File.Exists(args[0]))
         {
             UygulamaKlasoruKapisi.Bekle(appDirectory, KapiBeklemesi);
@@ -97,7 +97,7 @@ internal static class Program
     private static void ResumePending(string appDirectory)
     {
         UygulamaKlasoruKapisi.Bekle(appDirectory, KapiBeklemesi);
-        if (!UpdateStage.HasPending(appDirectory)) return;
+        if (!UpdateStage.HasPending(appDirectory) && !InPlaceUpdate.HasPending(appDirectory)) return;
 
         var kapi = UygulamaKlasoruKapisi.BosalincaAl(appDirectory, KapiBeklemesi);
         if (kapi is null)
@@ -109,8 +109,10 @@ internal static class Program
         try
         {
             UygulamaKlasoruKapisi.Gecikme();
+            InPlaceUpdate.Recover(appDirectory);
             UpdateStage.ResumePending(appDirectory);
-            if (!UpdateStage.HasPending(appDirectory)) UygulamaKlasoruKapisi.HatayiSil(appDirectory);
+            if (!UpdateStage.HasPending(appDirectory) && !InPlaceUpdate.HasPending(appDirectory))
+                UygulamaKlasoruKapisi.HatayiSil(appDirectory);
         }
         catch (Exception exception)
         {

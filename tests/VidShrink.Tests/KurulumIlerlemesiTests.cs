@@ -158,9 +158,9 @@ public class KurulumIlerlemesiTests
     }
 
     /// <summary>
-    /// Is bitene kadar durum calisiyor; bitince yuzde sona tasiniyor. 15 Eylul 2026'da
-    /// cubugun sicramasi kaldirildi: Finish artik _bar'a dokunmuyor, cubuk ayni
-    /// yaklasma yasasiyla sona kosuyor ve panel ancak dolduktan sonra kapaniyor.
+    /// Is bitene kadar durum calisiyor; bitince yuzde sona tasiniyor. 25 Eylul 2026'dan
+    /// beri basarida cubuk beklemeden 100'e oturuyor: tavana surunme bitmis isi
+    /// geciktirmiyor. Basarisizlikta cubuk oldugu yerde kaliyor.
     /// </summary>
     [Fact]
     public void SonucDuyuruluyor()
@@ -173,8 +173,8 @@ public class KurulumIlerlemesiTests
         Assert.Equal(InstallState.Done, p.State);
         Assert.Equal(100, p.Percent);
 
-        Assert.True(p.Bar < 100, "bitis cubugu sicratmiyor");
-        for (var i = 0; i < 400; i++) p.Advance();
+        Assert.Equal(100, p.Bar);
+        p.Advance();
         Assert.Equal(100, p.Bar);
 
         var q = new InstallProgress();
