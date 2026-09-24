@@ -1155,6 +1155,9 @@ public sealed class BaslikKapsamiTests
     /// tr 81 + 8 = 89. Kurali kaldirmak sayimi 2007/232/81'e geri indiriyor (olculdu).</para>
     /// <para>2026-09-23, Media Foundation: <c>main.reason.no-quality-scale</c> 15 dilde kola giriyor,
     /// en dahil tr haric: iki nokta kuraliyla birlikte 2526 + 15 = 2541, en 237 + 1 = 238, tr 89.</para>
+    /// <para>2026-09-24, soylenen ile yapilan: <c>main.reason.stream.vp9-fell-back-to-mp4</c> 18 dilde kola
+    /// giriyor ("VP9 could not be used, ..."), en dahil tr haric; yeni iki anahtar kolun disinda.
+    /// 2541 + 18 = 2559, en 238 + 1 = 239, tr 89.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1180,8 +1183,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2541, toplam);
-        Assert.Equal(238, dilBasina["en"]);
+        Assert.Equal(2559, toplam);
+        Assert.Equal(239, dilBasina["en"]);
         Assert.Equal(89, dilBasina["tr"]);
     }
 
@@ -1328,6 +1331,9 @@ public sealed class BaslikKapsamiTests
     /// 43 x 1085 = 46655. <c>kayip</c> yine 0.</para>
     /// <para>2026-09-23: Media Foundation dil basina bir anahtar (<c>main.reason.no-quality-scale</c>):
     /// 1085 + 1 = 1086, 43 x 1086 = 46698.</para>
+    /// <para>2026-09-24: soylenen ile yapilan dil basina uc anahtar (<c>main.advice.encoder-fallback-hardware</c>,
+    /// <c>main.reason.stream.extra-audio-dropped-by-container</c>, <c>main.reason.stream.vp9-fell-back-to-mp4</c>):
+    /// 1086 + 3 = 1089, 43 x 1089 = 46827.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1355,7 +1361,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(46698, gezilen);
+        Assert.Equal(46827, gezilen);
         Assert.Empty(kayip);
     }
 
