@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Xóa nền tĩnh",
   "recorder.webcam.background.green": "Xóa phông xanh",
   "recorder.webcam.background.hint": "Xóa nền hoạt động với nền tĩnh hoặc phông xanh; hãy bước ra khỏi khung hình trước khi bắt đầu ghi để khung hình đầu tiên thấy nền trống.",
-  "recorder.option.magnifier": "Kính lúp con trỏ"
+  "recorder.option.magnifier": "Kính lúp con trỏ",
+  "recorder.discarded-kept": "Đã hủy bản ghi, nhưng không thể xóa tệp này: {0}",
+  "recorder.output.done-partial": "Bản ghi chưa hoàn chỉnh: {0} MB trong {1} phân đoạn",
+  "recorder.output.done-failed": "Ghi hình thất bại: {0} MB trong {1} phân đoạn",
+  "recorder.output.partial-unverified": "Bản ghi không được đóng đúng cách. Tệp nằm trên đĩa, nhưng không thể kiểm tra liệu nó có phát được hay không. Vài giây cuối có thể bị thiếu.",
+  "recorder.output.gif-failed": "Không thể tạo GIF (ffmpeg kết thúc với mã {0}). Bản ghi được giữ ở dạng MKV.",
+  "recorder.output.not-moved": "Không thể chuyển tệp sang tên đã yêu cầu; tệp nằm ở đường dẫn hiển thị: {0}",
+  "recorder.replay.saved-mkv": "Đã lưu các giây cuối ở dạng MKV, bộ đệm không thể ghi GIF: {0}"
 }

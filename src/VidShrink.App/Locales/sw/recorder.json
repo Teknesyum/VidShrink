@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Ondoa mandharinyuma tuli",
   "recorder.webcam.background.green": "Ondoa skrini ya kijani",
   "recorder.webcam.background.hint": "Kuondoa mandharinyuma hufanya kazi na mandharinyuma tuli au skrini ya kijani; toka kwenye fremu kabla ya kuanza kurekodi ili fremu ya kwanza ione mandharinyuma tupu.",
-  "recorder.option.magnifier": "Kikuza mshale"
+  "recorder.option.magnifier": "Kikuza mshale",
+  "recorder.discarded-kept": "Kurekodi kumeghairiwa, lakini faili hili halikuweza kufutwa: {0}",
+  "recorder.output.done-partial": "Kurekodi hakujakamilika: {0} MB katika sehemu {1}",
+  "recorder.output.done-failed": "Kurekodi kumeshindwa: {0} MB katika sehemu {1}",
+  "recorder.output.partial-unverified": "Kurekodi hakukufungwa vizuri. Faili liko kwenye diski, lakini haikuwezekana kukagua kama linacheza. Sekunde za mwisho zinaweza kukosekana.",
+  "recorder.output.gif-failed": "GIF haikuweza kutengenezwa (ffmpeg ilimaliza kwa msimbo {0}). Rekodi imehifadhiwa kama MKV.",
+  "recorder.output.not-moved": "Faili halikuweza kuhamishwa kwenye jina lililoombwa; liko kwenye njia iliyoonyeshwa: {0}",
+  "recorder.replay.saved-mkv": "Sekunde za mwisho zimehifadhiwa kama MKV, bafa haiwezi kuandika GIF: {0}"
 }

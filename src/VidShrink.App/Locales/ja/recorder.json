@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "静止した背景を除去",
   "recorder.webcam.background.green": "グリーンバックを除去",
   "recorder.webcam.background.hint": "背景除去は静止した背景かグリーンバックで機能します。最初のフレームが空の背景を捉えるよう、録画開始前にフレームの外へ出てください。",
-  "recorder.option.magnifier": "カーソル拡大鏡"
+  "recorder.option.magnifier": "カーソル拡大鏡",
+  "recorder.discarded-kept": "録画は破棄されましたが、このファイルを削除できませんでした: {0}",
+  "recorder.output.done-partial": "録画は不完全です: {1} セグメントで {0} MB",
+  "recorder.output.done-failed": "録画に失敗しました: {1} セグメントで {0} MB",
+  "recorder.output.partial-unverified": "録画が正しく閉じられませんでした。ファイルはディスク上にありますが、再生できるかどうかを確認できませんでした。最後の数秒が欠けている可能性があります。",
+  "recorder.output.gif-failed": "GIF を作成できませんでした (ffmpeg はコード {0} で終了しました)。録画は MKV として保持されました。",
+  "recorder.output.not-moved": "ファイルを指定の名前に移動できませんでした。表示されているパスにあります: {0}",
+  "recorder.replay.saved-mkv": "直近の秒数を MKV として保存しました。バッファーは GIF を書き込めません: {0}"
 }

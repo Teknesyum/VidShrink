@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Odstrani statično ozadje",
   "recorder.webcam.background.green": "Odstrani zeleno platno",
   "recorder.webcam.background.hint": "Odstranjevanje ozadja deluje s statičnim ozadjem ali zelenim platnom; pred začetkom snemanja stopite iz kadra, da prva sličica vidi prazno ozadje.",
-  "recorder.option.magnifier": "Lupa kazalca"
+  "recorder.option.magnifier": "Lupa kazalca",
+  "recorder.discarded-kept": "Snemanje zavrženo, vendar te datoteke ni bilo mogoče izbrisati: {0}",
+  "recorder.output.done-partial": "Snemanje je nepopolno: {0} MB v {1} delih",
+  "recorder.output.done-failed": "Snemanje ni uspelo: {0} MB v {1} delih",
+  "recorder.output.partial-unverified": "Snemanje se ni pravilno zaprlo. Datoteka je na disku, vendar ni bilo mogoče preveriti, ali se predvaja. Zadnje sekunde morda manjkajo.",
+  "recorder.output.gif-failed": "GIF-a ni bilo mogoče ustvariti (ffmpeg se je končal s kodo {0}). Posnetek je ohranjen kot MKV.",
+  "recorder.output.not-moved": "Datoteke ni bilo mogoče premakniti pod zahtevano ime; je na prikazani poti: {0}",
+  "recorder.replay.saved-mkv": "Zadnje sekunde shranjene kot MKV, medpomnilnik ne more pisati GIF: {0}"
 }

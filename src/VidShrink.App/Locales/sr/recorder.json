@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Уклони статичну позадину",
   "recorder.webcam.background.green": "Уклони зелени екран",
   "recorder.webcam.background.hint": "Уклањање позадине ради са статичном позадином или зеленим екраном; изађите из кадра пре почетка снимања да би први кадар видео празну позадину.",
-  "recorder.option.magnifier": "Lupa kurzora"
+  "recorder.option.magnifier": "Lupa kurzora",
+  "recorder.discarded-kept": "Snimanje je odbačeno, ali ovaj fajl nije mogao da se obriše: {0}",
+  "recorder.output.done-partial": "Snimanje je nepotpuno: {0} MB u {1} segmenata",
+  "recorder.output.done-failed": "Snimanje nije uspelo: {0} MB u {1} segmenata",
+  "recorder.output.partial-unverified": "Snimanje se nije uredno zatvorilo. Fajl je na disku, ali nije moglo da se proveri da li se reprodukuje. Poslednje sekunde možda nedostaju.",
+  "recorder.output.gif-failed": "GIF nije mogao da se napravi (ffmpeg je završio sa kodom {0}). Snimak je zadržan kao MKV.",
+  "recorder.output.not-moved": "Fajl nije mogao da se premesti pod traženo ime; nalazi se na prikazanoj putanji: {0}",
+  "recorder.replay.saved-mkv": "Poslednje sekunde sačuvane kao MKV, bafer ne može da piše GIF: {0}"
 }

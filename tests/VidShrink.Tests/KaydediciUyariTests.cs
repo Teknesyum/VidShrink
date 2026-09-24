@@ -17,7 +17,7 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class KaydediciUyariTests
 {
-    private static RecordSahne Sahne(bool yarim, string uzanti = ".mkv") => AppHost.Run(() =>
+    private static RecordSahne Sahne(bool yarim, string uzanti = ".mkv", bool? oynar = null) => AppHost.Run(() =>
     {
         using var ayar = new KaydediciAyarTests.OzelAyar();
         var klasor = Path.GetTempPath();
@@ -31,7 +31,8 @@ public sealed class KaydediciUyariTests
             Partial: yarim,
             ExitCode: yarim ? 0 : 1,
             StandardError: string.Empty,
-            Segments: 1));
+            Segments: 1,
+            Playable: oynar));
 
         var satir = gorunum.FindControl<Grid>("WarningRow")!;
         var simge = (Sekil.Path)gorunum.FindControl<Sekil.Path>("WarningGlyph")!;
@@ -95,14 +96,14 @@ public sealed class KaydediciUyariTests
     }
 
     /// <summary>
-    /// Oldurulen Matroska okunur paket birakiyor: metin dosyanin durdugunu ve oynatilabildigini
-    /// soyler, teslim dugmeleri acik kalir. Karar
+    /// ffprobe'un paket okudugu yarim dosya: metin dosyanin durdugunu ve oynatilabildigini
+    /// soyler, teslim dugmeleri acik kalir. Yoklama motorda (<c>RecordResult.Playable</c>). Karar
     /// <c>docs/netlestirme/019-yarim-kayit-metni.md</c>, olgu <c>KayitBolmeTests</c>.
     /// </summary>
     [Fact]
     public void YarimMatroskaOynatilabilirDiyor()
     {
-        var sahne = Sahne(yarim: true, ".mkv");
+        var sahne = Sahne(yarim: true, ".mkv", oynar: true);
 
         Assert.Equal(Metin("recorder.output.partial"), sahne.Metin);
         Assert.True(sahne.OynaticiEtkin);
@@ -110,13 +111,13 @@ public sealed class KaydediciUyariTests
     }
 
     /// <summary>
-    /// Oldurulen mp4'te <c>moov</c> atomu yazilmamis olur; dosya acilmaz. Metin bunu soyler ve
+    /// ffprobe'un paket okuyamadigi yarim dosya (oldurulen mp4'te <c>moov</c> yazilmamis olur). Metin bunu soyler ve
     /// tiklandiginda kesin hata verecek iki dugme pasif kalir — kullanici bos yere tiklamasin.
     /// </summary>
     [Fact]
     public void YarimMp4OynatilamazDiyor()
     {
-        var sahne = Sahne(yarim: true, ".mp4");
+        var sahne = Sahne(yarim: true, ".mp4", oynar: false);
 
         Assert.Equal(Metin("recorder.output.partial-broken"), sahne.Metin);
         Assert.False(sahne.OynaticiEtkin);

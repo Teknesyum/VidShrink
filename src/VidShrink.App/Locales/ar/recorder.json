@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "إزالة الخلفية الثابتة",
   "recorder.webcam.background.green": "إزالة الشاشة الخضراء",
   "recorder.webcam.background.hint": "تعمل إزالة الخلفية مع خلفية ثابتة أو شاشة خضراء؛ ابتعد عن الإطار قبل بدء التسجيل ليرى الإطار الأول الخلفية فارغة.",
-  "recorder.option.magnifier": "عدسة مكبرة للمؤشر"
+  "recorder.option.magnifier": "عدسة مكبرة للمؤشر",
+  "recorder.discarded-kept": "تم إلغاء التسجيل، لكن تعذّر حذف هذا الملف: {0}",
+  "recorder.output.done-partial": "التسجيل غير مكتمل: {0} MB في {1} جزءًا",
+  "recorder.output.done-failed": "فشل التسجيل: {0} MB في {1} جزءًا",
+  "recorder.output.partial-unverified": "لم يُغلق التسجيل بشكل سليم. الملف موجود على القرص، لكن تعذّر التحقق من إمكانية تشغيله. قد تكون الثواني الأخيرة مفقودة.",
+  "recorder.output.gif-failed": "تعذّر إنشاء ملف GIF (انتهى ffmpeg بالرمز {0}). تم الاحتفاظ بالتسجيل بصيغة MKV.",
+  "recorder.output.not-moved": "تعذّر نقل الملف إلى الاسم المطلوب؛ وهو موجود في المسار المعروض: {0}",
+  "recorder.replay.saved-mkv": "تم حفظ الثواني الأخيرة بصيغة MKV، فالمخزن المؤقت لا يكتب GIF: {0}"
 }

@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Statische achtergrond verwijderen",
   "recorder.webcam.background.green": "Greenscreen verwijderen",
   "recorder.webcam.background.hint": "Achtergrond verwijderen werkt met een statische achtergrond of een greenscreen; stap uit beeld voordat de opname begint, zodat het eerste beeld de lege achtergrond ziet.",
-  "recorder.option.magnifier": "Cursorvergrootglas"
+  "recorder.option.magnifier": "Cursorvergrootglas",
+  "recorder.discarded-kept": "Opname weggegooid, maar dit bestand kon niet worden verwijderd: {0}",
+  "recorder.output.done-partial": "Opname onvolledig: {0} MB in {1} segmenten",
+  "recorder.output.done-failed": "Opname mislukt: {0} MB in {1} segmenten",
+  "recorder.output.partial-unverified": "De opname is niet netjes afgesloten. Het bestand staat op de schijf, maar of het afspeelt kon niet worden gecontroleerd. De laatste seconden ontbreken mogelijk.",
+  "recorder.output.gif-failed": "De GIF kon niet worden gemaakt (ffmpeg eindigde met code {0}). De opname is als MKV bewaard.",
+  "recorder.output.not-moved": "Het bestand kon niet naar de gevraagde naam worden verplaatst; het staat op het getoonde pad: {0}",
+  "recorder.replay.saved-mkv": "Laatste seconden opgeslagen als MKV, de buffer kan geen GIF schrijven: {0}"
 }

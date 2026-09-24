@@ -165,37 +165,59 @@ internal partial class RecorderView : UserControl
                                 && VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) != VidShrink.Core.RecorderContainer.Gif;
         ResetShare();
         TxtResult.Text = Say(
-            "recorder.output.done",
+            BaslikAnahtari(result),
             Bicim.Boyut.Mb(result.OutputMb, Strings.Culture),
             result.Segments.ToString(CultureInfo.InvariantCulture));
 
-        var acilir = OldurulmeyeDayanir(result.OutputPath);
-        BtnToPlayer.IsEnabled = !result.Partial || acilir;
-        BtnToShrink.IsEnabled = !result.Partial || acilir;
+        BtnToPlayer.IsEnabled = !result.Partial || result.Playable != false;
+        BtnToShrink.IsEnabled = !result.Partial || result.Playable != false;
+        var exitCode = result.ExitCode.ToString(CultureInfo.InvariantCulture);
 
         if (result.Partial)
         {
-            TxtWarning.Text = Say(acilir ? "recorder.output.partial" : "recorder.output.partial-broken");
+            TxtWarning.Text = Say(YarimAnahtari(result.Playable));
+            DurumuGoster(uyari: true);
+        }
+        else if (result.MissingGif is not null)
+        {
+            TxtWarning.Text = Say("recorder.output.gif-failed", exitCode);
             DurumuGoster(uyari: true);
         }
         else if (!result.Ok)
         {
-            TxtWarning.Text = Say("recorder.output.failed", result.ExitCode.ToString(CultureInfo.InvariantCulture));
+            TxtWarning.Text = Say("recorder.output.failed", exitCode);
             DurumuGoster(uyari: false);
+        }
+        else if (result.DeliveryError is { } neden)
+        {
+            TxtWarning.Text = Say("recorder.output.not-moved", neden);
+            DurumuGoster(uyari: true);
         }
     }
 
     /// <summary>
-    /// Oldurulen kaydin dosyasi her kapta diskte durur, ama <b>acilabilir</b> olmasi kaba
-    /// bagli: Matroska <c>-flush_packets 1</c> ile okunur paket birakiyor, mp4/mov ise
-    /// <c>moov</c> atomunu kapanista yazdigi icin acilmaz dosya birakiyor. Ayrimi motor
-    /// <see cref="VidShrink.Core.RecorderArguments.SurvivesKill"/> ile tutuyor; arayuz o
-    /// karari tekrar etmiyor, ayni yerden okuyor.
+    /// Sonuc basligi kaydin nasil bittigini soyler: yarim kayit "yarim kaldi", basarisiz kayit
+    /// "basarisiz" der. GIF'e cevrilemeyen kayit bitmistir, eksigi uyari satirinda soylenir.
+    /// </summary>
+    internal static string BaslikAnahtari(RecordResult result) => result switch
+    {
+        { Partial: true } => "recorder.output.done-partial",
+        { Ok: false, MissingGif: null } => "recorder.output.done-failed",
+        _ => "recorder.output.done"
+    };
+
+    /// <summary>
+    /// Oldurulen kaydin oynatilabilir oldugu kap turunden cikarilmaz: motor dosyayi ffprobe ile
+    /// yoklar (<see cref="RecordResult.Playable"/>). Okundu ise "oynatilabilir", okunamadi ise
+    /// "oynatilamaz"; yoklanamadiysa hicbiri soylenmez.
     /// Karar <c>docs/netlestirme/019-yarim-kayit-metni.md</c>.
     /// </summary>
-    private static bool OldurulmeyeDayanir(string yol)
-        => VidShrink.Core.RecorderArguments.ContainerOf(yol) is { } kap
-           && VidShrink.Core.RecorderArguments.SurvivesKill(kap);
+    internal static string YarimAnahtari(bool? oynar) => oynar switch
+    {
+        true => "recorder.output.partial",
+        false => "recorder.output.partial-broken",
+        null => "recorder.output.partial-unverified"
+    };
 
     /// <summary>
     /// Yarim kayit uyaridir, basarisiz kayit hatadir. Ayrimi renk tek basina tasimaz:

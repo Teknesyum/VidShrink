@@ -1160,6 +1160,10 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-24, soylenen ile yapilan: <c>main.reason.stream.vp9-fell-back-to-mp4</c> 18 dilde kola
     /// giriyor ("VP9 could not be used, ..."), en dahil tr haric; yeni iki anahtar kolun disinda.
     /// ustune yalan yok CLI satiri: 2542 + 18 = 2560, en 239 + 1 = 240, tr 89.</para>
+    /// <para>2026-09-24, kaydedici durustlugu: yedi yeni kaydedici anahtarindan dordu kola giriyor:
+    /// <c>recorder.output.done-partial</c> 34 dilde, <c>recorder.output.done-failed</c> 33,
+    /// <c>recorder.replay.saved-mkv</c> 7, <c>recorder.discarded-kept</c> 5. 2541 + 79 = 2620; en dordunde de
+    /// (238 + 4 = 242), tr yalniz <c>recorder.discarded-kept</c>'te (89 + 1 = 90); ustteki iki satirla birlikte 2560 + 79 = 2639, en 244, tr 90.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1185,9 +1189,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2560, toplam);
-        Assert.Equal(240, dilBasina["en"]);
-        Assert.Equal(89, dilBasina["tr"]);
+        Assert.Equal(2639, toplam);
+        Assert.Equal(244, dilBasina["en"]);
+        Assert.Equal(90, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1337,6 +1341,9 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-24: soylenen ile yapilan dil basina uc anahtar (<c>main.advice.encoder-fallback-hardware</c>,
     /// <c>main.reason.stream.extra-audio-dropped-by-container</c>, <c>main.reason.stream.vp9-fell-back-to-mp4</c>):
     /// ustune yalan yok CLI anahtari: 1087 + 3 = 1090, 43 x 1090 = 46870.</para>
+    /// <para>2026-09-24: kaydedici durustlugu dil basina yedi anahtar (<c>recorder.discarded-kept</c>,
+    /// <c>recorder.output.done-partial</c>, <c>-done-failed</c>, <c>-partial-unverified</c>, <c>-gif-failed</c>,
+    /// <c>-not-moved</c>, <c>recorder.replay.saved-mkv</c>): 1086 + 7 = 1093, 43 x 1093 = 46999; ustteki iki satirla birlikte 1090 + 7 = 1097, 43 x 1097 = 47171.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1364,7 +1371,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(46870, gezilen);
+        Assert.Equal(47171, gezilen);
         Assert.Empty(kayip);
     }
 

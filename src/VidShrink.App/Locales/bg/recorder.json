@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Премахни неподвижния фон",
   "recorder.webcam.background.green": "Премахни зеления екран",
   "recorder.webcam.background.hint": "Премахването на фона работи с неподвижен фон или зелен екран; излезте от кадъра преди началото на записа, за да види първият кадър празния фон.",
-  "recorder.option.magnifier": "Лупа за курсора"
+  "recorder.option.magnifier": "Лупа за курсора",
+  "recorder.discarded-kept": "Записът е отменен, но този файл не можа да бъде изтрит: {0}",
+  "recorder.output.done-partial": "Записът е непълен: {0} MB в {1} сегмента",
+  "recorder.output.done-failed": "Записът се провали: {0} MB в {1} сегмента",
+  "recorder.output.partial-unverified": "Записът не се затвори чисто. Файлът е на диска, но не можа да се провери дали може да се възпроизведе. Последните секунди може да липсват.",
+  "recorder.output.gif-failed": "GIF не можа да бъде създаден (ffmpeg завърши с код {0}). Записът е запазен като MKV.",
+  "recorder.output.not-moved": "Файлът не можа да бъде преместен под исканото име; той е на показания път: {0}",
+  "recorder.replay.saved-mkv": "Последните секунди са записани като MKV, буферът не може да пише GIF: {0}"
 }

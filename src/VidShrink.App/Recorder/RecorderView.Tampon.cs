@@ -170,7 +170,8 @@ internal partial class RecorderView
         }
 
         ClearMessages();
-        if (result is { Ok: true, Target: { } saved }) ShowNotice(Say("recorder.replay.saved", saved));
+        if (result is { Ok: true, Target: { } saved })
+            ShowNotice(Say(_settings.Container == RecorderContainer.Gif ? "recorder.replay.saved-mkv" : "recorder.replay.saved", saved));
         else ShowError(Say("recorder.replay.failed", result.Error));
 
         RefreshSerit();

@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Fjern fast baggrund",
   "recorder.webcam.background.green": "Fjern grønskærm",
   "recorder.webcam.background.hint": "Fjernelse af baggrund virker med en fast baggrund eller en grønskærm; træd ud af billedet, før optagelsen starter, så det første billede ser den tomme baggrund.",
-  "recorder.option.magnifier": "Markørforstørrelse"
+  "recorder.option.magnifier": "Markørforstørrelse",
+  "recorder.discarded-kept": "Optagelsen blev annulleret, men denne fil kunne ikke slettes: {0}",
+  "recorder.output.done-partial": "Optagelsen er ufuldstændig: {0} MB i {1} segmenter",
+  "recorder.output.done-failed": "Optagelsen mislykkedes: {0} MB i {1} segmenter",
+  "recorder.output.partial-unverified": "Optagelsen blev ikke lukket korrekt. Filen ligger på disken, men det kunne ikke kontrolleres, om den kan afspilles. De sidste sekunder mangler muligvis.",
+  "recorder.output.gif-failed": "GIF'en kunne ikke laves (ffmpeg sluttede med kode {0}). Optagelsen blev beholdt som MKV.",
+  "recorder.output.not-moved": "Filen kunne ikke flyttes til det ønskede navn; den ligger på den viste sti: {0}",
+  "recorder.replay.saved-mkv": "Sidste sekunder gemt som MKV, bufferen kan ikke skrive GIF: {0}"
 }

@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Убрать неподвижный фон",
   "recorder.webcam.background.green": "Убрать зелёный экран",
   "recorder.webcam.background.hint": "Удаление фона работает с неподвижным фоном или зелёным экраном; выйдите из кадра до начала записи, чтобы первый кадр увидел пустой фон.",
-  "recorder.option.magnifier": "Лупа курсора"
+  "recorder.option.magnifier": "Лупа курсора",
+  "recorder.discarded-kept": "Запись отменена, но этот файл не удалось удалить: {0}",
+  "recorder.output.done-partial": "Запись не завершена: {0} МБ в {1} сегментах",
+  "recorder.output.done-failed": "Запись не удалась: {0} МБ в {1} сегментах",
+  "recorder.output.partial-unverified": "Запись завершилась некорректно. Файл находится на диске, но проверить, воспроизводится ли он, не удалось. Последние секунды могут отсутствовать.",
+  "recorder.output.gif-failed": "Не удалось создать GIF (ffmpeg завершился с кодом {0}). Запись сохранена в MKV.",
+  "recorder.output.not-moved": "Не удалось переместить файл под запрошенное имя; он находится по показанному пути: {0}",
+  "recorder.replay.saved-mkv": "Последние секунды сохранены в MKV, буфер не может записывать GIF: {0}"
 }

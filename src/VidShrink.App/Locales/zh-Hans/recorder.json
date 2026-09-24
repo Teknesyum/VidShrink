@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "移除静态背景",
   "recorder.webcam.background.green": "移除绿幕",
   "recorder.webcam.background.hint": "背景移除适用于静态背景或绿幕；开始录制前请离开画面，让第一帧看到空背景。",
-  "recorder.option.magnifier": "光标放大镜"
+  "recorder.option.magnifier": "光标放大镜",
+  "recorder.discarded-kept": "录制已放弃，但无法删除此文件：{0}",
+  "recorder.output.done-partial": "录制不完整：{1} 个片段共 {0} MB",
+  "recorder.output.done-failed": "录制失败：{1} 个片段共 {0} MB",
+  "recorder.output.partial-unverified": "录制未正常结束。文件在磁盘上，但无法检查它能否播放。最后几秒可能缺失。",
+  "recorder.output.gif-failed": "无法生成 GIF（ffmpeg 以代码 {0} 结束）。录制已保留为 MKV。",
+  "recorder.output.not-moved": "无法将文件移动到所请求的名称；它位于显示的路径：{0}",
+  "recorder.replay.saved-mkv": "最后几秒已保存为 MKV，缓冲区无法写入 GIF：{0}"
 }

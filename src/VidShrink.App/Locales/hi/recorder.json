@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "स्थिर पृष्ठभूमि हटाएँ",
   "recorder.webcam.background.green": "हरी स्क्रीन हटाएँ",
   "recorder.webcam.background.hint": "पृष्ठभूमि हटाना स्थिर पृष्ठभूमि या हरी स्क्रीन के साथ काम करता है; रिकॉर्डिंग शुरू होने से पहले फ़्रेम से हट जाएँ ताकि पहला फ़्रेम खाली पृष्ठभूमि देखे।",
-  "recorder.option.magnifier": "कर्सर मैग्निफायर"
+  "recorder.option.magnifier": "कर्सर मैग्निफायर",
+  "recorder.discarded-kept": "रिकॉर्डिंग रद्द की गई, लेकिन यह फ़ाइल हटाई नहीं जा सकी: {0}",
+  "recorder.output.done-partial": "रिकॉर्डिंग अधूरी रही: {1} खंडों में {0} MB",
+  "recorder.output.done-failed": "रिकॉर्डिंग विफल रही: {1} खंडों में {0} MB",
+  "recorder.output.partial-unverified": "रिकॉर्डिंग ठीक से बंद नहीं हुई। फ़ाइल डिस्क पर है, लेकिन यह जाँचा नहीं जा सका कि वह चलती है या नहीं। अंतिम कुछ सेकंड गायब हो सकते हैं।",
+  "recorder.output.gif-failed": "GIF नहीं बन सका (ffmpeg कोड {0} के साथ समाप्त हुआ)। रिकॉर्डिंग MKV के रूप में रखी गई।",
+  "recorder.output.not-moved": "फ़ाइल को माँगे गए नाम पर नहीं ले जाया जा सका; वह दिखाए गए पथ पर है: {0}",
+  "recorder.replay.saved-mkv": "आखिरी सेकंड MKV के रूप में सहेजे गए, बफ़र GIF नहीं लिख सकता: {0}"
 }

@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Retirer l'arrière-plan fixe",
   "recorder.webcam.background.green": "Retirer le fond vert",
   "recorder.webcam.background.hint": "La suppression de l'arrière-plan fonctionne avec un arrière-plan fixe ou un fond vert ; sortez du cadre avant le début de l'enregistrement pour que la première image voie l'arrière-plan vide.",
-  "recorder.option.magnifier": "Loupe du curseur"
+  "recorder.option.magnifier": "Loupe du curseur",
+  "recorder.discarded-kept": "Enregistrement annulé, mais ce fichier n'a pas pu être supprimé : {0}",
+  "recorder.output.done-partial": "Enregistrement incomplet : {0} MB en {1} segments",
+  "recorder.output.done-failed": "Échec de l'enregistrement : {0} MB en {1} segments",
+  "recorder.output.partial-unverified": "L'enregistrement ne s'est pas fermé correctement. Le fichier est sur le disque, mais sa lecture n'a pas pu être vérifiée. Les dernières secondes peuvent manquer.",
+  "recorder.output.gif-failed": "Le GIF n'a pas pu être créé (ffmpeg s'est terminé avec le code {0}). L'enregistrement a été conservé en MKV.",
+  "recorder.output.not-moved": "Le fichier n'a pas pu être déplacé vers le nom demandé ; il se trouve au chemin affiché : {0}",
+  "recorder.replay.saved-mkv": "Dernières secondes enregistrées en MKV, le tampon ne peut pas écrire de GIF : {0}"
 }

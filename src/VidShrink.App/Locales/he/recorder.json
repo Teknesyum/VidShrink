@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "הסר רקע קבוע",
   "recorder.webcam.background.green": "הסר מסך ירוק",
   "recorder.webcam.background.hint": "הסרת רקע עובדת עם רקע קבוע או מסך ירוק; צאו מהפריים לפני תחילת ההקלטה כדי שהפריים הראשון יראה את הרקע הריק.",
-  "recorder.option.magnifier": "זכוכית מגדלת לסמן"
+  "recorder.option.magnifier": "זכוכית מגדלת לסמן",
+  "recorder.discarded-kept": "ההקלטה בוטלה, אך לא ניתן היה למחוק את הקובץ הזה: {0}",
+  "recorder.output.done-partial": "ההקלטה לא הושלמה: {0} MB ב-{1} מקטעים",
+  "recorder.output.done-failed": "ההקלטה נכשלה: {0} MB ב-{1} מקטעים",
+  "recorder.output.partial-unverified": "ההקלטה לא נסגרה כראוי. הקובץ נמצא בדיסק, אך לא ניתן היה לבדוק אם הוא ניתן לניגון. ייתכן שהשניות האחרונות חסרות.",
+  "recorder.output.gif-failed": "לא ניתן היה ליצור את ה-GIF (ffmpeg הסתיים בקוד {0}). ההקלטה נשמרה כ-MKV.",
+  "recorder.output.not-moved": "לא ניתן היה להעביר את הקובץ לשם המבוקש; הוא נמצא בנתיב המוצג: {0}",
+  "recorder.replay.saved-mkv": "השניות האחרונות נשמרו כ-MKV, המאגר אינו יכול לכתוב GIF: {0}"
 }

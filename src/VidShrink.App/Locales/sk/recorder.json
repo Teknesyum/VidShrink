@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Odstrániť statické pozadie",
   "recorder.webcam.background.green": "Odstrániť zelené plátno",
   "recorder.webcam.background.hint": "Odstránenie pozadia funguje so statickým pozadím alebo zeleným plátnom; pred začiatkom záznamu vystúpte zo záberu, aby prvá snímka zachytila prázdne pozadie.",
-  "recorder.option.magnifier": "Lupa kurzora"
+  "recorder.option.magnifier": "Lupa kurzora",
+  "recorder.discarded-kept": "Nahrávanie zrušené, ale tento súbor sa nepodarilo vymazať: {0}",
+  "recorder.output.done-partial": "Nahrávanie je neúplné: {0} MB v {1} segmentoch",
+  "recorder.output.done-failed": "Nahrávanie zlyhalo: {0} MB v {1} segmentoch",
+  "recorder.output.partial-unverified": "Nahrávanie sa neuzavrelo správne. Súbor je na disku, ale nepodarilo sa overiť, či sa dá prehrať. Posledné sekundy môžu chýbať.",
+  "recorder.output.gif-failed": "GIF sa nepodarilo vytvoriť (ffmpeg skončil s kódom {0}). Nahrávka bola ponechaná ako MKV.",
+  "recorder.output.not-moved": "Súbor sa nepodarilo presunúť pod požadovaný názov; je na zobrazenej ceste: {0}",
+  "recorder.replay.saved-mkv": "Posledné sekundy uložené ako MKV, vyrovnávacia pamäť nevie zapísať GIF: {0}"
 }

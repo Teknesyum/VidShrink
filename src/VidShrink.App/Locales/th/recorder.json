@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "ลบพื้นหลังที่นิ่ง",
   "recorder.webcam.background.green": "ลบฉากเขียว",
   "recorder.webcam.background.hint": "การลบพื้นหลังใช้ได้กับพื้นหลังที่นิ่งหรือฉากเขียว ออกจากกรอบภาพก่อนเริ่มบันทึกเพื่อให้เฟรมแรกเห็นพื้นหลังที่ว่าง",
-  "recorder.option.magnifier": "แว่นขยายเคอร์เซอร์"
+  "recorder.option.magnifier": "แว่นขยายเคอร์เซอร์",
+  "recorder.discarded-kept": "ยกเลิกการบันทึกแล้ว แต่ไม่สามารถลบไฟล์นี้ได้: {0}",
+  "recorder.output.done-partial": "การบันทึกไม่สมบูรณ์: {0} MB ใน {1} ส่วน",
+  "recorder.output.done-failed": "การบันทึกล้มเหลว: {0} MB ใน {1} ส่วน",
+  "recorder.output.partial-unverified": "การบันทึกไม่ได้ปิดอย่างถูกต้อง ไฟล์อยู่บนดิสก์ แต่ไม่สามารถตรวจสอบได้ว่าเล่นได้หรือไม่ วินาทีสุดท้ายอาจหายไป",
+  "recorder.output.gif-failed": "ไม่สามารถสร้าง GIF ได้ (ffmpeg จบด้วยรหัส {0}) เก็บการบันทึกไว้เป็น MKV",
+  "recorder.output.not-moved": "ไม่สามารถย้ายไฟล์ไปยังชื่อที่ขอได้ ไฟล์อยู่ที่เส้นทางที่แสดง: {0}",
+  "recorder.replay.saved-mkv": "บันทึกวินาทีสุดท้ายเป็น MKV แล้ว บัฟเฟอร์เขียน GIF ไม่ได้: {0}"
 }

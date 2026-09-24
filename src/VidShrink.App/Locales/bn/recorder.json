@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "স্থির পটভূমি সরান",
   "recorder.webcam.background.green": "সবুজ পর্দা সরান",
   "recorder.webcam.background.hint": "পটভূমি সরানো স্থির পটভূমি বা সবুজ পর্দার সাথে কাজ করে; রেকর্ডিং শুরুর আগে ফ্রেম থেকে সরে যান যাতে প্রথম ফ্রেম খালি পটভূমি দেখে।",
-  "recorder.option.magnifier": "কার্সার ম্যাগনিফায়ার"
+  "recorder.option.magnifier": "কার্সার ম্যাগনিফায়ার",
+  "recorder.discarded-kept": "রেকর্ডিং বাতিল হয়েছে, কিন্তু এই ফাইলটি মোছা যায়নি: {0}",
+  "recorder.output.done-partial": "রেকর্ডিং অসম্পূর্ণ: {1} খণ্ডে {0} MB",
+  "recorder.output.done-failed": "রেকর্ডিং ব্যর্থ হয়েছে: {1} খণ্ডে {0} MB",
+  "recorder.output.partial-unverified": "রেকর্ডিং ঠিকভাবে বন্ধ হয়নি। ফাইলটি ডিস্কে আছে, কিন্তু এটি চালানো যাবে কি না তা যাচাই করা যায়নি। শেষ কয়েক সেকেন্ড অনুপস্থিত থাকতে পারে।",
+  "recorder.output.gif-failed": "GIF তৈরি করা যায়নি (ffmpeg {0} কোডে শেষ হয়েছে)। রেকর্ডিংটি MKV হিসেবে রাখা হয়েছে।",
+  "recorder.output.not-moved": "ফাইলটি চাওয়া নামে সরানো যায়নি; এটি দেখানো পথে আছে: {0}",
+  "recorder.replay.saved-mkv": "শেষ সেকেন্ডগুলো MKV হিসেবে সংরক্ষিত হয়েছে, বাফার GIF লিখতে পারে না: {0}"
 }

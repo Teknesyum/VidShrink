@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Quitar fondo estático",
   "recorder.webcam.background.green": "Quitar pantalla verde",
   "recorder.webcam.background.hint": "La eliminación del fondo funciona con un fondo estático o una pantalla verde; sal del encuadre antes de empezar a grabar para que el primer fotograma vea el fondo vacío.",
-  "recorder.option.magnifier": "Lupa del cursor"
+  "recorder.option.magnifier": "Lupa del cursor",
+  "recorder.discarded-kept": "Grabación descartada, pero este archivo no se pudo eliminar: {0}",
+  "recorder.output.done-partial": "Grabación incompleta: {0} MB en {1} segmentos",
+  "recorder.output.done-failed": "La grabación falló: {0} MB en {1} segmentos",
+  "recorder.output.partial-unverified": "La grabación no se cerró correctamente. El archivo está en el disco, pero no se pudo comprobar si se reproduce. Es posible que falten los últimos segundos.",
+  "recorder.output.gif-failed": "No se pudo crear el GIF (ffmpeg terminó con el código {0}). La grabación se conservó como MKV.",
+  "recorder.output.not-moved": "El archivo no se pudo mover al nombre solicitado; está en la ruta mostrada: {0}",
+  "recorder.replay.saved-mkv": "Últimos segundos guardados como MKV, el búfer no puede escribir GIF: {0}"
 }

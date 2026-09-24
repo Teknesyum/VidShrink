@@ -162,8 +162,8 @@ internal partial class RecorderView
     /// <summary>
     /// Kaydı bitirir ve teslim edilen dosyayı gösterir. Yarım dosya da gösteriliyor:
     /// <see cref="RecordResult.Partial"/> doğruyken yol yine görünür, yanına da dosyanın
-    /// açılıp açılamayacağı yazılır — ayrım kaba bağlı, Matroska öldürülmeye dayanıyor,
-    /// mp4/mov dayanmıyor (<c>docs/netlestirme/019-yarim-kayit-metni.md</c>).
+    /// açılıp açılamayacağı yazılır — ayrım kap türünden değil, motorun ffprobe yoklamasından
+    /// (<see cref="RecordResult.Playable"/>, <c>docs/netlestirme/019-yarim-kayit-metni.md</c>).
     /// </summary>
     internal async Task StopAsync()
     {
@@ -196,6 +196,30 @@ internal partial class RecorderView
 
     private bool _stopping;
 
+    /// <summary>İptal edilen kaydın dosyalarını siler; silinemeyip diskte kalanları döndürür.</summary>
+    internal static IReadOnlyList<string> DeleteRecording(RecordResult result)
+    {
+        var kalan = new List<string>();
+        foreach (var file in (result.Files ?? Array.Empty<string>()).Append(result.OutputPath).Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            try { if (File.Exists(file)) File.Delete(file); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+            if (File.Exists(file)) kalan.Add(file);
+        }
+
+        return kalan;
+    }
+
+    /// <summary>
+    /// "Dosya silindi" yalnız hiçbir dosya diskte kalmadıysa söylenir; kalan varsa yollarıyla
+    /// hata satırında gösterilir.
+    /// </summary>
+    internal void ReportDiscard(IReadOnlyList<string> kalan)
+    {
+        if (kalan.Count == 0) ShowNotice(Say("recorder.discarded"));
+        else ShowError(Say("recorder.discarded-kept", string.Join(Environment.NewLine, kalan)));
+    }
+
     internal async Task<bool> DiscardAsync()
     {
         if (CountingDown)
@@ -210,16 +234,10 @@ internal partial class RecorderView
         _stopping = true;
         try
         {
-            var result = await session.StopAsync();
-            foreach (var file in (result.Files ?? Array.Empty<string>()).Append(result.OutputPath).Distinct(StringComparer.OrdinalIgnoreCase))
-            {
-                try { if (File.Exists(file)) File.Delete(file); }
-                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
-            }
-
+            var kalan = DeleteRecording(await session.StopAsync());
             ClearMessages();
             ExpandFromMini();
-            ShowNotice(Say("recorder.discarded"));
+            ReportDiscard(kalan);
             return true;
         }
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException)

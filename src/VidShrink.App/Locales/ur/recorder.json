@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "ساکن پس منظر ہٹائیں",
   "recorder.webcam.background.green": "سبز پردہ ہٹائیں",
   "recorder.webcam.background.hint": "پس منظر ہٹانا ساکن پس منظر یا سبز پردے کے ساتھ کام کرتا ہے؛ ریکارڈنگ شروع ہونے سے پہلے فریم سے ہٹ جائیں تاکہ پہلا فریم خالی پس منظر دیکھے۔",
-  "recorder.option.magnifier": "کرسر میگنیفائر"
+  "recorder.option.magnifier": "کرسر میگنیفائر",
+  "recorder.discarded-kept": "ریکارڈنگ منسوخ کر دی گئی، لیکن یہ فائل حذف نہیں ہو سکی: {0}",
+  "recorder.output.done-partial": "ریکارڈنگ نامکمل رہی: {1} حصوں میں {0} MB",
+  "recorder.output.done-failed": "ریکارڈنگ ناکام رہی: {1} حصوں میں {0} MB",
+  "recorder.output.partial-unverified": "ریکارڈنگ درست طریقے سے بند نہیں ہوئی۔ فائل ڈسک پر موجود ہے، لیکن یہ جانچا نہیں جا سکا کہ یہ چلتی ہے یا نہیں۔ آخری چند سیکنڈ غائب ہو سکتے ہیں۔",
+  "recorder.output.gif-failed": "GIF نہیں بن سکا (ffmpeg کوڈ {0} کے ساتھ ختم ہوا)۔ ریکارڈنگ MKV کے طور پر رکھی گئی۔",
+  "recorder.output.not-moved": "فائل مطلوبہ نام پر منتقل نہیں ہو سکی؛ یہ دکھائے گئے راستے پر ہے: {0}",
+  "recorder.replay.saved-mkv": "آخری سیکنڈ MKV کے طور پر محفوظ ہو گئے، بفر GIF نہیں لکھ سکتا: {0}"
 }

@@ -182,5 +182,12 @@
   "recorder.webcam.background.static": "Прибрати нерухоме тло",
   "recorder.webcam.background.green": "Прибрати зелений екран",
   "recorder.webcam.background.hint": "Видалення тла працює з нерухомим тлом або зеленим екраном; вийдіть із кадру до початку запису, щоб перший кадр побачив порожнє тло.",
-  "recorder.option.magnifier": "Лупа курсора"
+  "recorder.option.magnifier": "Лупа курсора",
+  "recorder.discarded-kept": "Запис скасовано, але цей файл не вдалося видалити: {0}",
+  "recorder.output.done-partial": "Запис незавершений: {0} МБ у {1} сегментах",
+  "recorder.output.done-failed": "Запис не вдався: {0} МБ у {1} сегментах",
+  "recorder.output.partial-unverified": "Запис не закрився належним чином. Файл є на диску, але перевірити, чи він відтворюється, не вдалося. Останніх секунд може бракувати.",
+  "recorder.output.gif-failed": "Не вдалося створити GIF (ffmpeg завершився з кодом {0}). Запис збережено як MKV.",
+  "recorder.output.not-moved": "Не вдалося перемістити файл під потрібну назву; він за показаним шляхом: {0}",
+  "recorder.replay.saved-mkv": "Останні секунди збережено як MKV, буфер не може записувати GIF: {0}"
 }
