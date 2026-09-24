@@ -2690,7 +2690,8 @@ public partial class MainWindow : Window
         if (this.TryFindResource(firca, out var kaynak) && kaynak is IBrush brush)
         {
             UpdateBadgeDot.Fill = brush;
-            if (state is UpdateBadgeState.NewVersion or UpdateBadgeState.Downloading or UpdateBadgeState.Ready)
+            if (state is UpdateBadgeState.Ready)
+
                 TxtUpdateBadge.Foreground = brush;
             else TxtUpdateBadge.ClearValue(TextBlock.ForegroundProperty);
         }

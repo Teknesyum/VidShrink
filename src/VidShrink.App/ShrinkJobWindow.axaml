@@ -34,7 +34,7 @@
       <TextBlock x:Name="TxtTarget"
                  FontSize="{StaticResource FontSizeSm}"
                  TextWrapping="Wrap"
-                 Foreground="{StaticResource TextDisabled}"/>
+                 Foreground="{StaticResource TextBody}"/>
 
       <ProgressBar x:Name="Progress"
                    Minimum="0" Maximum="1"
@@ -44,7 +44,7 @@
         <TextBlock Grid.Column="0"
                    Text="{loc:Text main.output.stage}"
                    FontSize="{StaticResource FontSizeSm}"
-                   Foreground="{StaticResource TextDisabled}"
+                   Foreground="{StaticResource TextBody}"
                    Margin="{StaticResource ChipMargin}"/>
         <TextBlock Grid.Column="1" x:Name="TxtStage"
                    FontSize="{StaticResource FontSizeSm}"
@@ -53,7 +53,7 @@
         <TextBlock Grid.Column="2"
                    Text="{loc:Text main.output.remaining}"
                    FontSize="{StaticResource FontSizeSm}"
-                   Foreground="{StaticResource TextDisabled}"
+                   Foreground="{StaticResource TextBody}"
                    Margin="{StaticResource ChipMargin}"/>
         <TextBlock Grid.Column="3" x:Name="TxtRemaining"
                    FontSize="{StaticResource FontSizeSm}"/>
@@ -61,7 +61,7 @@
 
       <TextBlock x:Name="TxtNotice"
                  FontSize="{StaticResource FontSizeSm}"
-                 Foreground="{StaticResource NeonPink}"
+                 Foreground="{StaticResource EmberBlaze}"
                  TextWrapping="Wrap"
                  MaxWidth="{StaticResource TipMaxWidth}"
                  IsVisible="False"/>
@@ -82,14 +82,14 @@
                    MaxWidth="{StaticResource TipMaxWidth}"/>
         <TextBlock x:Name="TxtOvershootMeaning"
                    FontSize="{StaticResource FontSizeSm}"
-                   Foreground="{StaticResource TextDisabled}"
+                   Foreground="{StaticResource TextBody}"
                    TextWrapping="Wrap"
                    MaxWidth="{StaticResource TipMaxWidth}"/>
         <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-          <Button x:Name="BtnOvershootAccept"
+          <Button Theme="{StaticResource GhostButton}" x:Name="BtnOvershootAccept"
                   auto:AutomationProperties.Name="{loc:Text main.retry.accept.name}"
                   Padding="{StaticResource ButtonPaddingSm}"/>
-          <Button x:Name="BtnOvershootStop"
+          <Button Theme="{StaticResource GhostButton}" x:Name="BtnOvershootStop"
                   Content="{loc:Text main.retry.stop}"
                   Padding="{StaticResource ButtonPaddingSm}"/>
         </WrapPanel>
@@ -98,7 +98,7 @@
       <StackPanel x:Name="PendingPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
         <TextBlock x:Name="TxtPending"
                    FontSize="{StaticResource FontSizeSm}"
-                   Foreground="{StaticResource TextDisabled}"/>
+                   Foreground="{StaticResource TextBody}"/>
         <ScrollViewer MaxHeight="{StaticResource DropDownMaxHeight}"
                       HorizontalScrollBarVisibility="Disabled">
           <StackPanel x:Name="PendingList" Spacing="{StaticResource SpaceXs}"/>
@@ -106,13 +106,13 @@
       </StackPanel>
 
       <StackPanel x:Name="QueueControls" Spacing="{StaticResource SpaceSm}">
-        <Button x:Name="BtnPause"
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnPause"
                 Content="{loc:Text main.shrink-job.pause}"
                 Padding="{StaticResource ButtonPaddingSm}"/>
         <StackPanel Spacing="{StaticResource SpaceXs}">
           <TextBlock Text="{loc:Text main.shrink-job.when-done}"
                      FontSize="{StaticResource FontSizeSm}"
-                     Foreground="{StaticResource TextDisabled}"
+                     Foreground="{StaticResource TextBody}"
                      TextWrapping="Wrap"/>
           <ComboBox x:Name="CmbWhenDone"
                     auto:AutomationProperties.Name="{loc:Text main.shrink-job.when-done}"
@@ -138,7 +138,7 @@
                    FontWeight="SemiBold"
                    TextWrapping="Wrap"
                    VerticalAlignment="Center"/>
-        <Button Grid.Column="1"
+        <Button Theme="{StaticResource GhostButton}" Grid.Column="1"
                 x:Name="BtnCountdownCancel"
                 Content="{loc:Text main.shrink-job.countdown.cancel}"
                 Padding="{StaticResource ButtonPaddingSm}"
@@ -146,27 +146,27 @@
       </Grid>
 
       <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-        <Button x:Name="BtnOpenInApp"
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnOpenInApp"
                 Content="{loc:Text main.shrink-job.open-in-app}"
                 Padding="{StaticResource ButtonPaddingSm}"
                 IsVisible="False"/>
-        <Button x:Name="BtnReveal"
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnReveal"
                 Content="{loc:Text main.action.show-in-folder}"
                 Padding="{StaticResource ButtonPaddingSm}"
                 IsVisible="False"/>
-        <Button x:Name="BtnShare"
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnShare"
                 Content="{loc:Text main.action.share}"
                 Padding="{StaticResource ButtonPaddingSm}"
                 IsVisible="False"/>
-        <Button x:Name="BtnShareCancel"
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnShareCancel"
                 Content="{loc:Text main.action.cancel-upload}"
                 Padding="{StaticResource ButtonPaddingSm}"
                 IsVisible="False"/>
-        <Button x:Name="BtnShareRetry"
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnShareRetry"
                 auto:AutomationProperties.Name="{loc:Text settings.share.retry}"
                 Padding="{StaticResource ButtonPaddingSm}"
                 IsVisible="False"/>
-        <Button x:Name="BtnClose"
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnClose"
                 Content="{loc:Text main.action.cancel}"
                 Padding="{StaticResource ButtonPaddingSm}"/>
       </WrapPanel>
@@ -182,7 +182,7 @@
                  IsReadOnly="True"
                  FontFamily="{StaticResource FontMono}"
                  VerticalAlignment="Center"/>
-        <Button Grid.Column="1"
+        <Button Theme="{StaticResource GhostButton}" Grid.Column="1"
                 x:Name="BtnShareCopy"
                 Content="{loc:Text main.action.copy}"
                 Padding="{StaticResource ButtonPaddingSm}"
@@ -191,7 +191,7 @@
 
       <TextBlock x:Name="TxtShareStatus"
                  FontSize="{StaticResource FontSizeSm}"
-                 Foreground="{StaticResource TextDisabled}"
+                 Foreground="{StaticResource TextBody}"
                  TextWrapping="Wrap"
                  IsVisible="False"/>
 

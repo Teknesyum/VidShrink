@@ -119,7 +119,7 @@
               Height="{StaticResource IconSizeLg}"
               Stretch="Uniform"
               Data="{StaticResource IconStop}"
-              Fill="{StaticResource TextBody}"/>
+              Fill="{StaticResource OnNeon}"/>
       </Button>
 
       <Button Grid.Column="2"

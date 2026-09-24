@@ -1,0 +1,7 @@
+project  core/fixed-window-maximize-open  the window cannot be resized but its maximize control was not turned off (maximizable / CanMaximize) — it dangles doing nothing.
+project  core/fixed-window-no-shrink  the window is fixed-size but no CSS marks a shrinkable area (overflow: auto/hidden, or min-height: 0 on a flex child) — content clips instead of scrolling.
+docs/olcumler/hb15-media-foundation.md:13  forms/unmeasured-label  Unmeasured number: carry the (default, unmeasured) label.
+docs/olcumler/hb15-media-foundation.md:46  forms/unmeasured-label  Unmeasured number: carry the (default, unmeasured) label.
+src/VidShrink.App/Playback/PlayerAdvancedPanel.axaml:1  core/component-without-motion  no enter/exit definition
+tools/kararsiz.js:1  guncelleme/sessiz-dongu  this file runs a background loop (setInterval) with no status indicator (role="status", aria-live, a badge) in it.
+1183 files · 6 open · 0 fixed · 0 error(s) · 20 ignored

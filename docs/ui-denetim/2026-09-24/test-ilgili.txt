@@ -1,0 +1,4 @@
+C:\Users\Administrator\Desktop\Projeler\VidShrink\tests\VidShrink.Tests\bin\Debug\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+
+Başarılı!  - Başarısız:     0, Başarılı:  1365, Atlanan:     0, Toplam:  1365, Süre: 19 m 4 s - VidShrink.Tests.dll (net8.0)

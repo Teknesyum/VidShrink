@@ -1,0 +1,376 @@
+C:\Users\Administrator\Desktop\Projeler\VidShrink\tests\VidShrink.Tests\bin\Debug\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:27.09]     VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor [FAIL]
+  Başarısız VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor [20 s]
+  Hata İletisi:
+   364 çift 7:1 altında (2273 ölçüm)
+RecorderMini [pressed] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnStop "Path": bg #00F3FF fg #FFFFFF 1.19
+RecorderMini [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnStop "Path": bg #00F3FF fg #FFFFFF 1.28
+RecorderMini [dinlenik] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnStop "Path": bg #00F3FF fg #FFFFFF 1.38
+RecorderMini [focus-visible] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnStop "Path": bg #00F3FF fg #FFFFFF 1.38
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnZoomIn "+": bg #0D656B fg #B026FF 1.48
+ana-oynatici [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #7B64FF fg #000000 2.48
+ana-kucult [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnRetryAgain "Try Again": bg #7B64FF fg #000000 2.48
+ana-kucult [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnTrimConfirm "Trim and Save": bg #7B64FF fg #000000 2.48
+ana-kucult [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #7B64FF fg #000000 2.48
+ana-donustur [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #7B64FF fg #000000 2.48
+ana-kaydedici [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnStart "Start": bg #7B64FF fg #000000 2.48
+ana-kaydedici [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnStop "Stop": bg #7B64FF fg #000000 2.48
+ana-kaydedici [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnToShrink "Send to Shrink": bg #7B64FF fg #000000 2.48
+ana-kaydedici [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnDrawRegion "Draw with mouse": bg #7B64FF fg #000000 2.48
+ana-kaydedici [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #7B64FF fg #000000 2.48
+ana-gelismis [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #7B64FF fg #000000 2.48
+ana-ayarlar [pressed] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #7B64FF fg #000000 2.48
+kucultme-isi [pressed] yazi WrapPanel > Button#BtnOvershootStop > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnOvershootStop "Bu Haliyle Bırak": bg #8D8D8E fg #FFFFFF 3.33
+kucultme-isi [pressed] yazi StackPanel#QueueControls > Button#BtnPause > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnPause "Sırayı Duraklat": bg #8D8D8E fg #FFFFFF 3.33
+kucultme-isi [pressed] yazi Grid#CountdownRow > Button#BtnCountdownCancel > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnCountdownCancel "Vazgeç": bg #8D8D8E fg #FFFFFF 3.33
+kucultme-isi [pressed] yazi WrapPanel > Button#BtnOpenInApp > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnOpenInApp "Uygulamada Aç": bg #8D8D8E fg #FFFFFF 3.33
+kucultme-isi [pressed] yazi WrapPanel > Button#BtnReveal > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnReveal "Klasörde Göster": bg #8D8D8E fg #FFFFFF 3.33
+kucultme-isi [pressed] yazi WrapPanel > Button#BtnShare > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnShare "Dosyayı Paylaş": bg #8D8D8E fg #FFFFFF 3.33
+kucultme-isi [pressed] yazi WrapPanel > Button#BtnShareCancel > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnShareCancel "Yüklemeyi İptal Et": bg #8D8D8E fg #FFFFFF 3.33
+kucultme-isi [pressed] yazi WrapPanel > Button#BtnClose > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnClose "İptal": bg #8D8D8E fg #FFFFFF 3.33
+kucultme-isi [pressed] yazi Grid#ShareLinkRow > Button#BtnShareCopy > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnShareCopy "Kopyala": bg #8D8D8E fg #FFFFFF 3.33
+ana-oynatici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #9645FF fg #000000 3.56
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnRetryAgain "Try Again": bg #9645FF fg #000000 3.56
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnTrimConfirm "Trim and Save": bg #9645FF fg #000000 3.56
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #9645FF fg #000000 3.56
+ana-donustur [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #9645FF fg #000000 3.56
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnStart "Start": bg #9645FF fg #000000 3.56
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnStop "Stop": bg #9645FF fg #000000 3.56
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnToShrink "Send to Shrink": bg #9645FF fg #000000 3.56
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnDrawRegion "Draw with mouse": bg #9645FF fg #000000 3.56
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #9645FF fg #000000 3.56
+ana-gelismis [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #9645FF fg #000000 3.56
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #9645FF fg #000000 3.56
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnRetryStop "Leave It as Is": bg #2A112C fg #B026FF 3.75
+ana-donustur [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnConvertReveal "Show in Folder": bg #15171A fg #B026FF 3.91
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnRecShare "Share the File": bg #15171A fg #B026FF 3.91
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnRecShareCancel "Cancel the Upload": bg #15171A fg #B026FF 3.91
+kucultme-isi [dinlenik] yazi Border#JobShell > StackPanel > Grid#RowFacts > TextBlock "Aşama": bg #111114 fg #71717A 3.91
+kucultme-isi [dinlenik] yazi StackPanel > StackPanel#QueueControls > StackPanel > TextBlock "Bitince": bg #111114 fg #71717A 3.91
+kucultme-isi [dinlenik] yazi ContentPresenter#PART_ContentPresenter > Border#JobShell > StackPanel > TextBlock#TxtTarget "Örnek 0.9": bg #111114 fg #71717A 3.91
+kucultme-isi [dinlenik] yazi Border#JobShell > StackPanel > StackPanel#OvershootPanel > TextBlock#TxtOvershootMeaning "Örnek 0.9": bg #111114 fg #71717A 3.91
+kucultme-isi [dinlenik] yazi Border#JobShell > StackPanel > StackPanel#PendingPanel > TextBlock#TxtPending "Örnek 0.9": bg #111114 fg #71717A 3.91
+kucultme-isi [dinlenik] yazi ContentPresenter#PART_ContentPresenter > Border#JobShell > StackPanel > TextBlock#TxtShareStatus "Örnek 0.9": bg #111114 fg #71717A 3.91
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnTrimIdle "Trim Idle Parts": bg #15161A fg #B026FF 3.92
+ana-kucult [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#GlyphRestart @Button#Restart "GlyphRestart": bg #141619 fg #B026FF 3.94
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnReplay "Start Buffer": bg #121618 fg #B026FF 3.94
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnPause "Pause": bg #121618 fg #B026FF 3.95
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnToMp4 "Save as MP4": bg #141619 fg #B026FF 3.95
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnResetOutputName "Default": bg #141619 fg #B026FF 3.95
+ana-kucult [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#GlyphPlayPause @Button#PlayPause "GlyphPlayPause": bg #131618 fg #B026FF 3.96
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnBrowse "Browse…": bg #141518 fg #B026FF 3.97
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnShareCopy "Copy": bg #141518 fg #B026FF 3.98
+ana-donustur [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "Browse Source": bg #141418 fg #B026FF 3.98
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnCountdownCancel "Cancel": bg #121518 fg #B026FF 3.98
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnWindowRefresh "Refresh": bg #141518 fg #B026FF 3.98
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnAudioRefresh "Refresh the List": bg #141518 fg #B026FF 3.98
+ana-gelismis [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#GlyphPerformance @Button#BtnPerformanceExpand "GlyphPerformance": bg #141518 fg #B026FF 3.98
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnShare "Share the File": bg #141418 fg #B026FF 4.00
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnReplaySave "Save Last 30 s": bg #121517 fg #B026FF 4.00
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnResume "Resume": bg #121517 fg #B026FF 4.00
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnBrowseEmpty "Browse": bg #131417 fg #B026FF 4.01
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#Chip100 "100": bg #121417 fg #B026FF 4.01
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnSnapshot "Snapshot": bg #121417 fg #B026FF 4.01
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnBrowseFfmpegPath "Browse…": bg #121417 fg #B026FF 4.01
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#Chip25 "25": bg #121316 fg #B026FF 4.03
+ana-kucult [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#GlyphPlanReasons @Button#BtnPlanReasons "GlyphPlanReasons": bg #131317 fg #B026FF 4.03
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#ChipWhatsApp "16": bg #111316 fg #B026FF 4.04
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnRecShareCopy "Copy": bg #121316 fg #B026FF 4.04
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnAutoMeasure "Measure Again": bg #131316 fg #B026FF 4.04
+ana-gelismis [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageAdvanced "Apply Pasted JSON": bg #121316 fg #B026FF 4.04
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnBrowseOutputFolder "Browse…": bg #121316 fg #B026FF 4.04
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#ChipHalf "Half": bg #121316 fg #B026FF 4.05
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#Chip8 "8": bg #121316 fg #B026FF 4.05
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#ChipAddPreset "+": bg #121316 fg #B026FF 4.05
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnToPlayer "Open in Player": bg #111316 fg #B026FF 4.05
+ana-gelismis [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#GlyphAiDetails @Button#BtnAiDetails "GlyphAiDetails": bg #121216 fg #B026FF 4.05
+ana-gelismis [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnRevert "Back to automatic": bg #121316 fg #B026FF 4.05
+ana-gelismis [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnPerformanceRun "Run the Check": bg #121216 fg #B026FF 4.05
+ana-oynatici [dinlenik] yazi StackPanel > Grid > WrapPanel#UpdateNoticeText > TextBlock#TxtNoticeVersion @TabControl#Tabs "Örnek 0.9": bg #121216 fg #B026FF 4.06
+ana-oynatici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnAppliedDismiss "×": bg #121216 fg #B026FF 4.06
+ana-oynatici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeDismiss "×": bg #121216 fg #B026FF 4.06
+ana-kucult [dinlenik] yazi StackPanel > Grid > WrapPanel#UpdateNoticeText > TextBlock#TxtNoticeVersion @TabControl#Tabs "Örnek 0.9": bg #121216 fg #B026FF 4.06
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnAppliedDismiss "×": bg #121216 fg #B026FF 4.06
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeDismiss "×": bg #121216 fg #B026FF 4.06
+ana-donustur [dinlenik] yazi StackPanel > Grid > WrapPanel#UpdateNoticeText > TextBlock#TxtNoticeVersion @TabControl#Tabs "Örnek 0.9": bg #121216 fg #B026FF 4.06
+ana-donustur [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnAppliedDismiss "×": bg #121216 fg #B026FF 4.06
+ana-donustur [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeDismiss "×": bg #121216 fg #B026FF 4.06
+ana-kaydedici [dinlenik] yazi StackPanel > Grid > WrapPanel#UpdateNoticeText > TextBlock#TxtNoticeVersion @TabControl#Tabs "Örnek 0.9": bg #121216 fg #B026FF 4.06
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnReveal "Show in Folder": bg #121216 fg #B026FF 4.06
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnAppliedDismiss "×": bg #121216 fg #B026FF 4.06
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeDismiss "×": bg #121216 fg #B026FF 4.06
+ana-gelismis [dinlenik] yazi StackPanel > Grid > WrapPanel#UpdateNoticeText > TextBlock#TxtNoticeVersion @TabControl#Tabs "Örnek 0.9": bg #121216 fg #B026FF 4.06
+ana-gelismis [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnAppliedDismiss "×": bg #121216 fg #B026FF 4.06
+ana-gelismis [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeDismiss "×": bg #121216 fg #B026FF 4.06
+ana-ayarlar [dinlenik] yazi StackPanel > Grid > WrapPanel#UpdateNoticeText > TextBlock#TxtNoticeVersion @TabControl#Tabs "Örnek 0.9": bg #121216 fg #B026FF 4.06
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnOpenSubtitlesKey "Get a Key": bg #111216 fg #B026FF 4.06
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnOpenSubtitlesSignIn "Sign in": bg #111216 fg #B026FF 4.06
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnAppliedDismiss "×": bg #121216 fg #B026FF 4.06
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeDismiss "×": bg #121216 fg #B026FF 4.06
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageShrink "Browse": bg #111215 fg #B026FF 4.07
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#ChipArchive "Archive": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#Chip134 "134": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#Chip180 "180": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnPresetUndo "Undo": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > Grid > Path#GlyphQuality @Button#BtnQualityToggle "GlyphQuality": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > Grid > Path#GlyphAudio @Button#BtnAudioToggle "GlyphAudio": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnAddSubtitle "Add Subtitle File": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > Grid > Path#GlyphFrame @Button#BtnFrameToggle "GlyphFrame": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > Grid > Path#GlyphAdvanced @Button#BtnAdvancedToggle "GlyphAdvanced": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnReveal "Show in Folder": bg #101114 fg #B026FF 4.10
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnShareCancel "Cancel the Upload": bg #101114 fg #B026FF 4.10
+ana-gelismis [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageAdvanced "Copy Prompt": bg #101114 fg #B026FF 4.10
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnOpenSubtitlesSignOut "Sign Out": bg #101114 fg #B026FF 4.10
+ana-ayarlar [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > Grid > Path#Glyph @Button#BtnToggle "Glyph": bg #101114 fg #B026FF 4.10
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @PlayerAdvancedPanel#PlayerAdvancedPanel "-": bg #101114 fg #B026FF 4.10
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnReset "Reset Everything": bg #101114 fg #B026FF 4.10
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnOpenLog "Open the Log": bg #101114 fg #B026FF 4.10
+ana-ayarlar [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > Grid > Path#AboutGlyph @Button#BtnAboutToggle "AboutGlyph": bg #101114 fg #B026FF 4.10
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnResetSettings "Reset All Settings": bg #101114 fg #B026FF 4.10
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnConfirmResetSettings "Reset Settings": bg #101114 fg #B026FF 4.10
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnCancelResetSettings "Cancel": bg #101114 fg #B026FF 4.10
+ana-gelismis [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnHideAdvanced "Close": bg #101114 fg #B026FF 4.11
+ana-oynatici [dinlenik] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-oynatici [dinlenik] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-oynatici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Türkçe": bg #020706 fg #B026FF 4.41
+ana-oynatici [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-oynatici [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-oynatici [pressed] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-oynatici [pressed] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-oynatici [focus-visible] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-oynatici [focus-visible] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-kucult [dinlenik] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-kucult [dinlenik] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-kucult [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Türkçe": bg #020706 fg #B026FF 4.41
+ana-kucult [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-kucult [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-kucult [pressed] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-kucult [pressed] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-kucult [focus-visible] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-kucult [focus-visible] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-donustur [dinlenik] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-donustur [dinlenik] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-donustur [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Türkçe": bg #020706 fg #B026FF 4.41
+ana-donustur [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-donustur [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-donustur [pressed] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-donustur [pressed] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-donustur [focus-visible] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-donustur [focus-visible] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-kaydedici [dinlenik] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-kaydedici [dinlenik] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-kaydedici [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Türkçe": bg #020706 fg #B026FF 4.41
+ana-kaydedici [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-kaydedici [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-kaydedici [pressed] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-kaydedici [pressed] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-kaydedici [focus-visible] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-kaydedici [focus-visible] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-gelismis [dinlenik] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-gelismis [dinlenik] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-gelismis [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Türkçe": bg #020706 fg #B026FF 4.41
+ana-gelismis [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-gelismis [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-gelismis [pressed] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-gelismis [pressed] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-gelismis [focus-visible] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-gelismis [focus-visible] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-ayarlar [dinlenik] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-ayarlar [dinlenik] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-ayarlar [pointerover] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Türkçe": bg #020706 fg #B026FF 4.41
+ana-ayarlar [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-ayarlar [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-ayarlar [pressed] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-ayarlar [pressed] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-ayarlar [focus-visible] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSponsor "Path": bg #020706 fg #B026FF 4.41
+ana-ayarlar [focus-visible] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor @Button#BtnSponsor "Buy Me a Coffee": bg #020706 fg #B026FF 4.41
+ana-oynatici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#GlyphSeritVolume @Button#BtnSeritMute "GlyphSeritVolume": bg #050507 fg #B026FF 4.43
+ana-oynatici [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSeritBack "Path": bg #050507 fg #B026FF 4.43
+ana-oynatici [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSeritBack @Button#BtnSeritBack "−10": bg #050507 fg #B026FF 4.43
+ana-oynatici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#GlyphSeritPlay @Button#BtnSeritPlay "GlyphSeritPlay": bg #050507 fg #B026FF 4.43
+ana-oynatici [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSeritForward @Button#BtnSeritForward "+10": bg #050507 fg #B026FF 4.43
+ana-oynatici [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnSeritForward "Path": bg #050507 fg #B026FF 4.43
+ana-oynatici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnSeritSpeedReset "Path": bg #050507 fg #B026FF 4.43
+ana-oynatici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnSeritFullScreen "Path": bg #050507 fg #B026FF 4.43
+ana-oynatici [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-oynatici [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-oynatici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnMinimize "Path": bg #B026FF fg #000000 4.57
+ana-oynatici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#MaximizeGlyph @Button#BtnMaximize "MaximizeGlyph": bg #B026FF fg #000000 4.57
+ana-kucult [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnRetryAgain "Try Again": bg #B026FF fg #000000 4.57
+ana-kucult [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnTrimConfirm "Trim and Save": bg #B026FF fg #000000 4.57
+ana-kucult [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-kucult [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnRetryAgain "Try Again": bg #B026FF fg #000000 4.57
+ana-kucult [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnTrimConfirm "Trim and Save": bg #B026FF fg #000000 4.57
+ana-kucult [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-kucult [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnMinimize "Path": bg #B026FF fg #000000 4.57
+ana-kucult [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#MaximizeGlyph @Button#BtnMaximize "MaximizeGlyph": bg #B026FF fg #000000 4.57
+ana-donustur [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-donustur [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-donustur [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnMinimize "Path": bg #B026FF fg #000000 4.57
+ana-donustur [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#MaximizeGlyph @Button#BtnMaximize "MaximizeGlyph": bg #B026FF fg #000000 4.57
+ana-kaydedici [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnStart "Start": bg #B026FF fg #000000 4.57
+ana-kaydedici [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnStop "Stop": bg #B026FF fg #000000 4.57
+ana-kaydedici [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnToShrink "Send to Shrink": bg #B026FF fg #000000 4.57
+ana-kaydedici [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnDrawRegion "Draw with mouse": bg #B026FF fg #000000 4.57
+ana-kaydedici [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-kaydedici [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnStart "Start": bg #B026FF fg #000000 4.57
+ana-kaydedici [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnStop "Stop": bg #B026FF fg #000000 4.57
+ana-kaydedici [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnToShrink "Send to Shrink": bg #B026FF fg #000000 4.57
+ana-kaydedici [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnDrawRegion "Draw with mouse": bg #B026FF fg #000000 4.57
+ana-kaydedici [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-kaydedici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnMinimize "Path": bg #B026FF fg #000000 4.57
+ana-kaydedici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#MaximizeGlyph @Button#BtnMaximize "MaximizeGlyph": bg #B026FF fg #000000 4.57
+ana-gelismis [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-gelismis [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-gelismis [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnMinimize "Path": bg #B026FF fg #000000 4.57
+ana-gelismis [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#MaximizeGlyph @Button#BtnMaximize "MaximizeGlyph": bg #B026FF fg #000000 4.57
+ana-ayarlar [dinlenik] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-ayarlar [focus-visible] yazi Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock @Button#BtnNoticeInstall "Download": bg #B026FF fg #000000 4.57
+ana-ayarlar [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnMinimize "Path": bg #B026FF fg #000000 4.57
+ana-ayarlar [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path#MaximizeGlyph @Button#BtnMaximize "MaximizeGlyph": bg #B026FF fg #000000 4.57
+ana-kucult [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnPanelFullScreen "Path": bg #0B6269 fg #00F3FF 5.13
+ana-oynatici [dinlenik] yazi Border#Stage > Panel#Surface > Border > TextBlock#TxtStall @PlayerView#Player "Örnek 0.9": bg #050507 fg #FF0033 5.14
+ana-kucult [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnPanelMaximize "Path": bg #0B6269 fg #00F3FF 5.14
+ana-kaydedici [dinlenik] yazi RecorderView > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtError @ScrollViewer#PageRecorder "Örnek 0.9": bg #111916 fg #FF00EA 5.47
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #15181A fg #FF00EA 5.48
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #121618 fg #FF00EA 5.59
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #141518 fg #FF00EA 5.61
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #141418 fg #FF00EA 5.63
+ana-oynatici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabControl#Tabs "Convert": bg #0A1613 fg #FF00EA 5.65
+ana-kucult [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabControl#Tabs "Convert": bg #0A1613 fg #FF00EA 5.65
+ana-donustur [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabControl#Tabs "Convert": bg #0A1613 fg #FF00EA 5.65
+ana-kaydedici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabControl#Tabs "Convert": bg #0A1613 fg #FF00EA 5.65
+ana-gelismis [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabControl#Tabs "Convert": bg #0A1613 fg #FF00EA 5.65
+ana-ayarlar [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabControl#Tabs "Convert": bg #0A1613 fg #FF00EA 5.65
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #131417 fg #FF00EA 5.66
+ana-ayarlar [dinlenik] yazi Border#GeneralSettingsPanel > StackPanel > StackPanel > TextBlock#TxtFfmpegPathError @ScrollViewer#PageSettings "Örnek 0.9": bg #131417 fg #FF00EA 5.66
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #121417 fg #FF00EA 5.67
+kucultme-isi [dinlenik] yazi StackPanel#QueueControls > Button#BtnPause > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnPause "Sırayı Duraklat": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [dinlenik] yazi WrapPanel > Button#BtnClose > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnClose "İptal": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [dinlenik] yazi WrapPanel > Button#BtnOvershootStop > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnOvershootStop "Bu Haliyle Bırak": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [dinlenik] yazi Grid#CountdownRow > Button#BtnCountdownCancel > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnCountdownCancel "Vazgeç": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [dinlenik] yazi WrapPanel > Button#BtnOpenInApp > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnOpenInApp "Uygulamada Aç": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [dinlenik] yazi WrapPanel > Button#BtnReveal > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnReveal "Klasörde Göster": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [dinlenik] yazi WrapPanel > Button#BtnShare > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnShare "Dosyayı Paylaş": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [dinlenik] yazi WrapPanel > Button#BtnShareCancel > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnShareCancel "Yüklemeyi İptal Et": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [dinlenik] yazi Grid#ShareLinkRow > Button#BtnShareCopy > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnShareCopy "Kopyala": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [focus-visible] yazi WrapPanel > Button#BtnOvershootStop > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnOvershootStop "Bu Haliyle Bırak": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [focus-visible] yazi StackPanel#QueueControls > Button#BtnPause > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnPause "Sırayı Duraklat": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [focus-visible] yazi Grid#CountdownRow > Button#BtnCountdownCancel > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnCountdownCancel "Vazgeç": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [focus-visible] yazi WrapPanel > Button#BtnOpenInApp > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnOpenInApp "Uygulamada Aç": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [focus-visible] yazi WrapPanel > Button#BtnReveal > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnReveal "Klasörde Göster": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [focus-visible] yazi WrapPanel > Button#BtnShare > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnShare "Dosyayı Paylaş": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [focus-visible] yazi WrapPanel > Button#BtnShareCancel > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnShareCancel "Yüklemeyi İptal Et": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [focus-visible] yazi WrapPanel > Button#BtnClose > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnClose "İptal": bg #666669 fg #FFFFFF 5.68
+kucultme-isi [focus-visible] yazi Grid#ShareLinkRow > Button#BtnShareCopy > ContentPresenter#PART_ContentPresenter > AccessText @Button#BtnShareCopy "Kopyala": bg #666669 fg #FFFFFF 5.68
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #121316 fg #FF00EA 5.69
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #121317 fg #FF00EA 5.69
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #111316 fg #FF00EA 5.69
+ana-kucult [dinlenik] yazi StackPanel > StackPanel#SecAdvanced > StackPanel#AdvancedBody > TextBlock#TxtAdvancedError @ScrollViewer#PageShrink "Örnek 0.9": bg #121316 fg #FF00EA 5.71
+ana-kucult [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageShrink "?": bg #121216 fg #FF00EA 5.73
+ana-kucult [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageShrink "?": bg #111215 fg #FF00EA 5.74
+ana-donustur [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageConvert "?": bg #111215 fg #FF00EA 5.75
+ana-kucult [dinlenik] yazi StackPanel > Border#SourcePanel > StackPanel > TextBlock#TxtSourceStatus @ScrollViewer#PageShrink "Örnek 0.9": bg #101114 fg #FF00EA 5.79
+ana-ayarlar [pointerover] yazi Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock @ScrollViewer#PageSettings "?": bg #101114 fg #FF00EA 5.79
+kucultme-isi [dinlenik] yazi ContentPresenter#PART_ContentPresenter > Border#JobShell > StackPanel > TextBlock#TxtNotice "Örnek 0.9": bg #111114 fg #FF00EA 5.79
+acilir-liste [dinlenik] yazi ComboBoxItem > Border#ItemBorder > ContentPresenter#PART_ContentPresenter > TextBlock "Seçili seçenek": bg #0D565C fg #00F3FF 6.10
+acilir-liste [selected] yazi ComboBoxItem > Border#ItemBorder > ContentPresenter#PART_ContentPresenter > TextBlock "Örnek seçenek": bg #0D565C fg #00F3FF 6.10
+acilir-liste [pressed] yazi ComboBoxItem > Border#ItemBorder > ContentPresenter#PART_ContentPresenter > TextBlock "Seçili seçenek": bg #0D565C fg #00F3FF 6.10
+acilir-liste [focus-visible] yazi ComboBoxItem > Border#ItemBorder > ContentPresenter#PART_ContentPresenter > TextBlock "Seçili seçenek": bg #0D565C fg #00F3FF 6.10
+ana-oynatici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabPlayer "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabPlayer "Player": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabShrink "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabShrink "Shrink": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabControl#Tabs "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabRecorder "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabRecorder "Recorder": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabAdvanced "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabAdvanced "Advanced": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabSettings "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabSettings "Settings": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtUpdateBadge @Button#BtnUpdateBadge "Örnek 0.9": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnGitHub "Path": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtGitHub @Button#BtnGitHub "Teknesyum": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabPlayer "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabPlayer "Player": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabShrink "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabShrink "Shrink": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabControl#Tabs "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabRecorder "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabRecorder "Recorder": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabAdvanced "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabAdvanced "Advanced": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabSettings "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabSettings "Settings": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtUpdateBadge @Button#BtnUpdateBadge "Örnek 0.9": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnGitHub "Path": bg #020706 fg #FF00EA 6.22
+ana-kucult [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtGitHub @Button#BtnGitHub "Teknesyum": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabPlayer "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabPlayer "Player": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabShrink "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabShrink "Shrink": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabControl#Tabs "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabRecorder "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabRecorder "Recorder": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabAdvanced "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabAdvanced "Advanced": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabSettings "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabSettings "Settings": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtUpdateBadge @Button#BtnUpdateBadge "Örnek 0.9": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnGitHub "Path": bg #020706 fg #FF00EA 6.22
+ana-donustur [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtGitHub @Button#BtnGitHub "Teknesyum": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabPlayer "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabPlayer "Player": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabShrink "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabShrink "Shrink": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabControl#Tabs "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabRecorder "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabRecorder "Recorder": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabAdvanced "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabAdvanced "Advanced": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabSettings "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabSettings "Settings": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtUpdateBadge @Button#BtnUpdateBadge "Örnek 0.9": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnGitHub "Path": bg #020706 fg #FF00EA 6.22
+ana-kaydedici [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtGitHub @Button#BtnGitHub "Teknesyum": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabPlayer "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabPlayer "Player": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabShrink "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabShrink "Shrink": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabControl#Tabs "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabRecorder "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabRecorder "Recorder": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabAdvanced "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabAdvanced "Advanced": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabSettings "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabSettings "Settings": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtUpdateBadge @Button#BtnUpdateBadge "Örnek 0.9": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnGitHub "Path": bg #020706 fg #FF00EA 6.22
+ana-gelismis [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtGitHub @Button#BtnGitHub "Teknesyum": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabPlayer "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabPlayer "Player": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabShrink "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabShrink "Shrink": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabControl#Tabs "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabRecorder "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabRecorder "Recorder": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabAdvanced "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabAdvanced "Advanced": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] simge Border#TabOutline > Panel > StackPanel > Path#TabIcon @TabItem#TabSettings "TabIcon": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] yazi Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock @TabItem#TabSettings "Settings": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtUpdateBadge @Button#BtnUpdateBadge "Örnek 0.9": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] simge Panel > ContentPresenter#PART_ContentPresenter > StackPanel > Path @Button#BtnGitHub "Path": bg #020706 fg #FF00EA 6.22
+ana-ayarlar [pointerover] yazi Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtGitHub @Button#BtnGitHub "Teknesyum": bg #020706 fg #FF00EA 6.22
+ana-oynatici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnClose "Path": bg #FF00EA fg #000000 6.44
+ana-kucult [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnClose "Path": bg #FF00EA fg #000000 6.44
+ana-donustur [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnClose "Path": bg #FF00EA fg #000000 6.44
+ana-kaydedici [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnClose "Path": bg #FF00EA fg #000000 6.44
+ana-gelismis [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnClose "Path": bg #FF00EA fg #000000 6.44
+ana-ayarlar [pointerover] simge Border#Root > Panel > ContentPresenter#PART_ContentPresenter > Path @Button#BtnClose "Path": bg #FF00EA fg #000000 6.44
+  Yığın İzleme:
+     at VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor() in C:\Users\Administrator\Desktop\Projeler\VidShrink\tests\VidShrink.Tests\KontrastTests.cs:line 71
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+Başarısız! - Başarısız:     1, Başarılı:     0, Atlanan:     0, Toplam:     1, Süre: 20 s - VidShrink.Tests.dll (net8.0)

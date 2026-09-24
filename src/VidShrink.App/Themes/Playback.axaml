@@ -272,9 +272,9 @@
       <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
     </Style>
     <Style Selector="^:pointerover">
-      <Setter Property="Background" Value="{StaticResource NeonBlueHover}"/>
       <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
     </Style>
+
     <Style Selector="^:disabled">
       <Setter Property="Foreground" Value="{StaticResource TextDisabled}"/>
       <Setter Property="BorderBrush" Value="{StaticResource TextDisabled}"/>

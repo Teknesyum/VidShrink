@@ -94,7 +94,8 @@ public sealed class NeonYesilTests
         var cubuk = Regex.Match(kontroller, "x:Key=\"\\{x:Type ProgressBar\\}\"[\\s\\S]*?Property=\"Foreground\" Value=\"([^\"]+)\"");
         var guncelleme = Regex.Match(pencere, "x:Name=\"UpdateBarFill\"[^>]*Background=\"([^\"]+)\"");
 
-        Assert.Equal("{StaticResource AccentGradient}", birincil.Groups[1].Value);
+        Assert.Equal("{StaticResource NeonBlue}", birincil.Groups[1].Value);
+
         Assert.Equal("{StaticResource AccentGradient}", cubuk.Groups[1].Value);
         Assert.Equal("{StaticResource AccentGradient}", guncelleme.Groups[1].Value);
     }

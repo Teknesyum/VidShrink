@@ -110,7 +110,7 @@
       </ControlTheme>
 
       <ControlTheme x:Key="PlanBullet" TargetType="TextBlock" BasedOn="{StaticResource MonoValue}">
-        <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+        <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         <Setter Property="Margin" Value="{StaticResource PlanBulletMargin}"/>
         <Setter Property="VerticalAlignment" Value="Top"/>
       </ControlTheme>
@@ -167,7 +167,7 @@
       <ControlTheme x:Key="StatusError" TargetType="TextBlock" BasedOn="{StaticResource Body}">
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
-        <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+        <Setter Property="Foreground" Value="{StaticResource EmberBlaze}"/>
       </ControlTheme>
 
       <!--
@@ -274,7 +274,7 @@
           </ControlTemplate>
         </Setter>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource NeonPurple}"/>
+          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
           <Setter Property="RenderTransform" Value="scale(1.02)"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#HoverRing">
@@ -328,7 +328,7 @@
 
       <ControlTheme x:Key="PrimaryButton" TargetType="Button">
         <Setter Property="FocusAdorner" Value="{x:Null}"/>
-        <Setter Property="Background" Value="{StaticResource AccentGradient}"/>
+        <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
         <Setter Property="Foreground" Value="{StaticResource OnNeon}"/>
         <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
@@ -383,13 +383,13 @@
           <Setter Property="RenderTransform" Value="scale(1.02)"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
-          <Setter Property="Opacity" Value="0.85"/>
+          <Setter Property="BorderBrush" Value="{StaticResource TextBody}"/>
         </Style>
         <Style Selector="^:pressed">
           <Setter Property="RenderTransform" Value="scale(0.98)"/>
         </Style>
         <Style Selector="^:pressed /template/ Border#Root">
-          <Setter Property="Opacity" Value="0.7"/>
+          <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
         </Style>
         <Style Selector="^:focus-visible /template/ Border#FocusRing">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
@@ -459,7 +459,7 @@
       </ControlTheme>
 
       <ControlTheme x:Key="SupportButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
-        <Setter Property="Foreground" Value="{StaticResource NeonPurple}"/>
+        <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
         <Setter Property="HorizontalAlignment" Value="Right"/>
         <Style Selector="^:pressed /template/ Border#Root">
@@ -468,7 +468,7 @@
       </ControlTheme>
 
       <ControlTheme x:Key="TitleBarSupportButton" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
-        <Setter Property="Foreground" Value="{StaticResource NeonPurple}"/>
+        <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
         <Style Selector="^:pressed /template/ Border#Root">
           <Setter Property="Background" Value="Transparent"/>
         </Style>
@@ -477,7 +477,7 @@
       <ControlTheme x:Key="TitleBarLinkButton" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
         <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+          <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
         </Style>
         <Style Selector="^:pressed /template/ Border#Root">
           <Setter Property="Background" Value="Transparent"/>
@@ -520,7 +520,7 @@
           </ControlTemplate>
         </Setter>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
           <Setter Property="RenderTransform" Value="scale(1.02)"/>
         </Style>
         <Style Selector="^:pressed">
@@ -590,7 +590,7 @@
           </ControlTemplate>
         </Setter>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Badge">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
@@ -665,7 +665,7 @@
           </ControlTemplate>
         </Setter>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Badge">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
@@ -730,11 +730,8 @@
           <Setter Property="Foreground" Value="{StaticResource OnNeon}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
-          <Setter Property="Background" Value="{StaticResource NeonPurple}"/>
-          <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
-        </Style>
-        <Style Selector="^:pressed /template/ Border#Root">
-          <Setter Property="Opacity" Value="0.7"/>
+          <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
+          <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
         </Style>
         <Style Selector="^:focus-visible /template/ Border#FocusRing">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
@@ -744,11 +741,12 @@
       <ControlTheme x:Key="CloseWindowButton" TargetType="Button" BasedOn="{StaticResource WindowControlButton}">
         <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource OnNeon}"/>
+          <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
-          <Setter Property="Background" Value="{StaticResource NeonPink}"/>
+          <Setter Property="Background" Value="Transparent"/>
           <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
+          <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         </Style>
       </ControlTheme>
 
@@ -1081,7 +1079,7 @@
           <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
         </Style>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#HoverRing">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
@@ -1126,9 +1124,10 @@
           </ControlTemplate>
         </Setter>
         <Style Selector="^:selected">
-          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
         <Style Selector="^:selected /template/ Border#ItemBorder">
+
           <Setter Property="Background" Value="{StaticResource NeonBlueActive}"/>
         </Style>
         <Style Selector="^:pointerover">

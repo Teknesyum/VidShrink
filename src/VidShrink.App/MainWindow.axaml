@@ -146,7 +146,7 @@
                              VerticalAlignment="Center"/>
                   <TextBlock x:Name="TxtNoticeVersion"
                              Theme="{StaticResource MonoValue}"
-                             Foreground="{StaticResource NeonPurple}"
+                             Foreground="{StaticResource NeonBlue}"
                              VerticalAlignment="Center"/>
                 </WrapPanel>
                 <Button Grid.Column="2"
@@ -770,7 +770,7 @@
                             <TextBlock Text="{loc:Text main.advanced.filters.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                           </StackPanel>
                         </Grid>
-                        <TextBlock x:Name="TxtAdvancedError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
+                        <TextBlock x:Name="TxtAdvancedError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
                       </StackPanel>
                     </StackPanel>
                   </StackPanel>
@@ -1496,7 +1496,7 @@
                       <TextBox x:Name="TxtFfmpegPath" Width="360"/>
                       <Button x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>
                     </StackPanel>
-                    <TextBlock x:Name="TxtFfmpegPathError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
+                    <TextBlock x:Name="TxtFfmpegPathError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.ffmpeg-path.hint}"/>
                   </StackPanel>
 

@@ -1,0 +1,13 @@
+project  core/fixed-window-maximize-open  the window cannot be resized but its maximize control was not turned off (maximizable / CanMaximize) — it dangles doing nothing.
+project  core/fixed-window-no-shrink  the window is fixed-size but no CSS marks a shrinkable area (overflow: auto/hidden, or min-height: 0 on a flex child) — content clips instead of scrolling.
+docs/olcumler/hb15-media-foundation.md:13  forms/unmeasured-label  Unmeasured number: carry the (default, unmeasured) label.
+docs/olcumler/hb15-media-foundation.md:46  forms/unmeasured-label  Unmeasured number: carry the (default, unmeasured) label.
+src/VidShrink.App/MainWindow.axaml:149  okunurluk/pair-contrast  bg Surface (#121216) on fg NeonPurple (#b026ff) — 4.1:1, below 7:1
+src/VidShrink.App/Playback/PlayerAdvancedPanel.axaml:1  core/component-without-motion  no enter/exit definition
+src/VidShrink.App/Playback/PlayerView.axaml:84  okunurluk/pair-contrast  bg AppBg (#050507) on fg NeonEmber (#ff0033) — 5.1:1, below 7:1
+src/VidShrink.App/ShrinkJobWindow.axaml:64  okunurluk/pair-contrast  bg PanelSurface (#121216) on fg NeonPink (#ff00ea) — 5.7:1, below 7:1
+src/VidShrink.App/Themes/Controls.axaml:733  okunurluk/pair-contrast  bg NeonPurple (#b026ff) on fg OnNeon (#000000) — 4.6:1, below 7:1
+src/VidShrink.App/Themes/Controls.axaml:750  okunurluk/pair-contrast  bg NeonPink (#ff00ea) on fg OnNeon (#000000) — 6.4:1, below 7:1
+src/VidShrink.App/Themes/Controls.axaml:1132  okunurluk/pair-contrast  bg NeonBlueActive (#00f3ff 30%) on fg NeonBlue (#00f3ff) — 6.7:1, below 7:1
+tools/kararsiz.js:1  guncelleme/sessiz-dongu  this file runs a background loop (setInterval) with no status indicator (role="status", aria-live, a badge) in it.
+1177 files · 12 open · 0 fixed · 6 error(s) · 20 ignored

@@ -81,7 +81,7 @@
                      Theme="{StaticResource MonoValue}"
                      TextWrapping="Wrap"
                      IsVisible="False"
-                     Foreground="{StaticResource NeonEmber}"/>
+                     Foreground="{StaticResource EmberBlaze}"/>
         </Border>
 
         <Canvas x:Name="ThumbLayer" IsHitTestVisible="False">
