@@ -5,6 +5,75 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.9.0] - 2026-09-24
+
+### Added
+
+- Media Foundation encoders (`h264_mf`, `hevc_mf`, `av1_mf`) can be picked by
+  hand on Windows: hardware encoding, NV12, VBR, no CRF, off by default in
+  Auto (HandBrake #15).
+- SVT-AV1 writes HDR10 static metadata explicitly - mastering-display and
+  content-light values - instead of leaving it to the container (HandBrake
+  #28).
+- An HDR10+ bridge carries the source's dynamic metadata frame by frame
+  through x265's `dhdr10-info`; Dolby Vision 8.1 is carried through x265 and
+  SVT-AV1 (MP4 marks it `-strict unofficial`), and HDR10+ or an unmovable DV
+  profile falls back to a reason line instead of being dropped silently.
+- A VP9 shrink path: `libvpx-vp9`, two-pass, muxed as WebM with opus audio.
+- "Crop black bars" in the Advanced filter panel probes and removes letterbox
+  bars automatically (HandBrake #36).
+- Anamorphic sources keep their pixel aspect ratio: it is read from the
+  source and the output is squared instead of being stretched.
+- Dropping a folder or several video files at once queues all of them, using
+  the window's own options for each.
+- The queue can be reordered and edited, and an action for when the queue
+  finishes can be set.
+- The Advanced panel gained a filter surface, and the audio/subtitle track
+  list moved into the main window.
+- HandBrake parity's remaining six items: flac audio, loudnorm/gain, external
+  subtitle files, cover art, the forced-subtitle flag, and subtitle burn-in.
+- NVENC budget-filling opens with a 0.97 margin on the retry aim.
+- A Neon palette: green background, cyan-to-purple accent gradient.
+
+### Changed
+
+- Target size is decimal MB (1 MB = 1,000,000 bytes) everywhere, not MiB; the
+  quick-target chips use decimal GB (1000/2000 instead of 1024/2048).
+- Split recordings: each part carries its own `-t`/`-fs` limit instead of a
+  shared overshoot budget, and only the part that actually reaches the split
+  boundary opens the next one - an unsplit 5 s recording no longer comes out
+  as two parts under CI load.
+- Double-click detection runs its single-click timer at Default priority;
+  pending input no longer delays or drops the single click.
+- Popups, flyouts, menus and the progress bar fade or slide in and respect
+  "reduce motion"; many UI layout issues across all 42 languages were
+  found and fixed by an automated layout audit.
+- Command box, number-unit pairs, Arabic/Hebrew bidi isolation and several
+  alignments were reworked across the interface (UI pass 3).
+
+### Fixed
+
+- The CLI, the recorder and the plan reasons now say only what actually
+  happened: a recording that could not be deleted is reported with its path, a half-finished
+  recording is checked with ffprobe before being called complete, GIF and
+  buffer results state the real outcome, an unreadable half MKV no longer
+  suggests reopening it as MKV, and a fallback encoder or container/track
+  choice is named plainly instead of implied.
+- MKV keeps AAC audio when the source is already AAC instead of re-encoding
+  it needlessly; a fast H.264 fallback stays on hardware instead of quietly
+  falling back to software.
+- Ceiling-exceeding results no longer say "never" in any of the 38 covered
+  languages.
+- With "Keep tracks" already on, the image-subtitle note names the container
+  that dropped the track instead of telling you to tick the box.
+- HandBrake #40: anamorphic DAR was distorted on the shrink path; the source
+  aspect ratio is now preserved.
+
+### Removed
+
+- The CLI's `--aci` flag was removed; the plan reason line already carries
+  the same information.
+
 ## [0.8.5] - 2026-09-18
 
 ### Added
