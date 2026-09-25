@@ -40,6 +40,8 @@ jobs:
       tested: ${{ steps.tested.outputs.tested }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 30
 
       - id: read
         name: Read the version from the tag and check it against the tree
@@ -66,6 +68,8 @@ jobs:
 
       # Minor ve yamada ayni commit'in ci.yml kosumu yesilse suit ikinci kez kosmaz: o commit
       # zaten olculdu. Majorde (x.0.0) ya da CI yesili yoksa kapi tam kosar.
+      # Yalniz .md/docs/.claude degisen commit'te ci.yml hic acilmaz; o zaman farki yalniz bu
+      # yollar olan en yakin atanin yesili aranir.
       - id: tested
         name: Ayni commit'in CI yesilini ara
         env:
@@ -75,8 +79,12 @@ jobs:
           version="${{ steps.read.outputs.version }}"
           tested=false
           if [[ ! "$version" =~ ^[0-9]+\.0\.0$ ]]; then
-            count=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?head_sha=${{ github.sha }}&status=success&per_page=1" --jq '.total_count')
-            if [ "${count:-0}" -gt 0 ]; then tested=true; fi
+            for c in $(git rev-list --max-count=30 HEAD); do
+              other=$(git diff --name-only "$c" HEAD | grep -Ev '^(\.claude/|docs/)|\.md$' || true)
+              if [ -n "$other" ]; then break; fi
+              count=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?head_sha=$c&status=success&per_page=1" --jq '.total_count')
+              if [ "${count:-0}" -gt 0 ]; then tested=true; echo "Yesil CI: $c"; break; fi
+            done
           fi
           echo "CI yesili: $tested"
           echo "tested=$tested" >> "$GITHUB_OUTPUT"
@@ -98,21 +106,37 @@ jobs:
       # Ana parca ci.yml ile ayni dort harf grubuna bolundu (36035794976: 46 dk -> ~14 dk).
       matrix:
         include:
-          - parca: ana-gad
-            filter: 'FullyQualifiedName~VidShrink.Tests.G|FullyQualifiedName~VidShrink.Tests.A|FullyQualifiedName~VidShrink.Tests.D'
-            minimum: 390
+          - parca: ana-gadw
+            filter: 'FullyQualifiedName~VidShrink.Tests.G|FullyQualifiedName~VidShrink.Tests.A|FullyQualifiedName~VidShrink.Tests.D|FullyQualifiedName~VidShrink.Tests.W'
+            minimum: 490
             skipped: 10
-          - parca: ana-kp
-            filter: 'FullyQualifiedName~VidShrink.Tests.K|FullyQualifiedName~VidShrink.Tests.P'
-            minimum: 900
-            skipped: 12
-          - parca: ana-ow
-            filter: 'FullyQualifiedName~VidShrink.Tests.O|FullyQualifiedName~VidShrink.Tests.W'
-            minimum: 400
+          - parca: ana-k
+            filter: 'FullyQualifiedName~VidShrink.Tests.K'
+            minimum: 700
             skipped: 10
+          - parca: ana-p
+            filter: 'FullyQualifiedName~VidShrink.Tests.P'
+            minimum: 220
+            skipped: 10
+          - parca: ana-o1
+            filter: 'FullyQualifiedName~VidShrink.Tests.OynaticiM'
+            minimum: 12
+            skipped: 6
+          - parca: ana-o2
+            filter: 'FullyQualifiedName~VidShrink.Tests.O&FullyQualifiedName!~VidShrink.Tests.OynaticiM'
+            minimum: 290
+            skipped: 8
+          - parca: ana-qs
+            filter: 'FullyQualifiedName~VidShrink.Tests.Q|FullyQualifiedName~VidShrink.Tests.S'
+            minimum: 440
+            skipped: 10
+          - parca: ana-b
+            filter: 'FullyQualifiedName~VidShrink.Tests.B'
+            minimum: 185
+            skipped: 6
           - parca: ana-kalan
-            filter: 'FullyQualifiedName!~VidShrink.Tests.G&FullyQualifiedName!~VidShrink.Tests.A&FullyQualifiedName!~VidShrink.Tests.D&FullyQualifiedName!~VidShrink.Tests.K&FullyQualifiedName!~VidShrink.Tests.P&FullyQualifiedName!~VidShrink.Tests.O&FullyQualifiedName!~VidShrink.Tests.W&FullyQualifiedName!~YerlesimDenetimiTests&FullyQualifiedName!~UstSeritTikTests'
-            minimum: 2200
+            filter: 'FullyQualifiedName!~VidShrink.Tests.G&FullyQualifiedName!~VidShrink.Tests.A&FullyQualifiedName!~VidShrink.Tests.D&FullyQualifiedName!~VidShrink.Tests.W&FullyQualifiedName!~VidShrink.Tests.K&FullyQualifiedName!~VidShrink.Tests.P&FullyQualifiedName!~VidShrink.Tests.O&FullyQualifiedName!~VidShrink.Tests.Q&FullyQualifiedName!~VidShrink.Tests.S&FullyQualifiedName!~VidShrink.Tests.B&FullyQualifiedName!~YerlesimDenetimiTests&FullyQualifiedName!~UstSeritTikTests'
+            minimum: 1620
             skipped: 25
           - parca: ust-serit
             filter: 'FullyQualifiedName~UstSeritTikTests'

@@ -41,23 +41,42 @@ jobs:
       # 35994275984'te ana 46 dk tek basina (4939 test, 2712 sn). Sinif adinin ilk harfiyle dort
       # parcaya bolundu: G+A+D 694 sn, K+P 734 sn, O+W 691 sn, geri kalan 594 sn. Dorduncu parca
       # tumleyen suzgectir; yeni sinif hangi harfle baslarsa baslasin bir parcaya duser.
+      # 36120718858'de duvar saati 13 dk: ana-kalan 627 sn, ana-kp 489 sn, ana-ow 496 sn test suresi.
+      # Trx sinif sureleriyle en uzunu ~290 sn olacak sekilde sekize bolundu (P 290, QS 261, O2 237,
+      # GADW 208, K 200, kalan 199, B 167, O1 140). Son parca yine tumleyen suzgectir.
       matrix:
         include:
-          - parca: ana-gad
-            filter: 'FullyQualifiedName~VidShrink.Tests.G|FullyQualifiedName~VidShrink.Tests.A|FullyQualifiedName~VidShrink.Tests.D'
-            minimum: 390
+          - parca: ana-gadw
+            filter: 'FullyQualifiedName~VidShrink.Tests.G|FullyQualifiedName~VidShrink.Tests.A|FullyQualifiedName~VidShrink.Tests.D|FullyQualifiedName~VidShrink.Tests.W'
+            minimum: 490
             skipped: 10
-          - parca: ana-kp
-            filter: 'FullyQualifiedName~VidShrink.Tests.K|FullyQualifiedName~VidShrink.Tests.P'
-            minimum: 900
-            skipped: 12
-          - parca: ana-ow
-            filter: 'FullyQualifiedName~VidShrink.Tests.O|FullyQualifiedName~VidShrink.Tests.W'
-            minimum: 400
+          - parca: ana-k
+            filter: 'FullyQualifiedName~VidShrink.Tests.K'
+            minimum: 700
             skipped: 10
+          - parca: ana-p
+            filter: 'FullyQualifiedName~VidShrink.Tests.P'
+            minimum: 220
+            skipped: 10
+          - parca: ana-o1
+            filter: 'FullyQualifiedName~VidShrink.Tests.OynaticiM'
+            minimum: 12
+            skipped: 6
+          - parca: ana-o2
+            filter: 'FullyQualifiedName~VidShrink.Tests.O&FullyQualifiedName!~VidShrink.Tests.OynaticiM'
+            minimum: 290
+            skipped: 8
+          - parca: ana-qs
+            filter: 'FullyQualifiedName~VidShrink.Tests.Q|FullyQualifiedName~VidShrink.Tests.S'
+            minimum: 440
+            skipped: 10
+          - parca: ana-b
+            filter: 'FullyQualifiedName~VidShrink.Tests.B'
+            minimum: 185
+            skipped: 6
           - parca: ana-kalan
-            filter: 'FullyQualifiedName!~VidShrink.Tests.G&FullyQualifiedName!~VidShrink.Tests.A&FullyQualifiedName!~VidShrink.Tests.D&FullyQualifiedName!~VidShrink.Tests.K&FullyQualifiedName!~VidShrink.Tests.P&FullyQualifiedName!~VidShrink.Tests.O&FullyQualifiedName!~VidShrink.Tests.W&FullyQualifiedName!~YerlesimDenetimiTests&FullyQualifiedName!~UstSeritTikTests'
-            minimum: 2200
+            filter: 'FullyQualifiedName!~VidShrink.Tests.G&FullyQualifiedName!~VidShrink.Tests.A&FullyQualifiedName!~VidShrink.Tests.D&FullyQualifiedName!~VidShrink.Tests.W&FullyQualifiedName!~VidShrink.Tests.K&FullyQualifiedName!~VidShrink.Tests.P&FullyQualifiedName!~VidShrink.Tests.O&FullyQualifiedName!~VidShrink.Tests.Q&FullyQualifiedName!~VidShrink.Tests.S&FullyQualifiedName!~VidShrink.Tests.B&FullyQualifiedName!~YerlesimDenetimiTests&FullyQualifiedName!~UstSeritTikTests'
+            minimum: 1620
             skipped: 25
           - parca: ust-serit
             filter: 'FullyQualifiedName~UstSeritTikTests'
