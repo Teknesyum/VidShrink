@@ -204,6 +204,57 @@ public sealed class KurucuExeTests : IDisposable
     }
 
     [Fact]
+    public async Task AdimlarMonotonVeGunlukSatirlariKaybolmuyor()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var adimlar = new List<(int Yuzde, int Tavan, string Cumle)>();
+        var gunluk = new List<string>();
+        var (options, host, _) = Setup(FakeRelease(), gunluk.Add, (yuzde, tavan, cumle) => adimlar.Add((yuzde, tavan, cumle)));
+
+        var result = await SetupRunner.InstallAsync(options, host, CancellationToken.None);
+
+        Assert.True(adimlar.Count >= 7, string.Join(" | ", adimlar));
+        for (var i = 0; i < adimlar.Count; i++)
+        {
+            Assert.True(adimlar[i].Tavan >= adimlar[i].Yuzde, adimlar[i].ToString());
+            Assert.False(string.IsNullOrWhiteSpace(adimlar[i].Cumle));
+            if (i > 0) Assert.True(adimlar[i].Yuzde >= adimlar[i - 1].Yuzde, $"{adimlar[i - 1]} -> {adimlar[i]}");
+        }
+
+        Assert.Equal(4, adimlar[0].Yuzde);
+        Assert.Equal((100, 100, SetupText.Get("setup.step.done", result.Version)), adimlar[^1]);
+        Assert.Contains(SetupText.Get("setup.step.shell"), adimlar.Select(a => a.Cumle));
+        Assert.Contains(SetupText.Get("setup.release.searching"), gunluk);
+        Assert.True(gunluk.Count > adimlar.Count, $"{gunluk.Count} <= {adimlar.Count}");
+
+        var kademeler = adimlar.Where(a => a.Yuzde < 100).Select(a => SetupPanelStages.IndexOf(a.Yuzde)).Distinct().ToArray();
+        Assert.Equal(new[] { 0, 1, 2, 3, 4 }, kademeler);
+        int Kademe(string anahtar) => SetupPanelStages.IndexOf(adimlar.Single(a => a.Cumle == SetupText.Get(anahtar)).Yuzde);
+        Assert.Equal(0, Kademe("setup.step.tools"));
+        Assert.Equal(1, Kademe("setup.step.verify"));
+        Assert.Equal(2, Kademe("setup.step.place"));
+        Assert.Equal(3, Kademe("setup.step.shell"));
+        Assert.Equal(4, Kademe("setup.step.shortcut"));
+    }
+
+    [Fact]
+    public async Task KisayolsuzKurulumKabukAdiminiAtliyor()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var adimlar = new List<string>();
+        var (options, host, _) = Setup(FakeRelease(), adim: (_, _, cumle) => adimlar.Add(cumle));
+        options = options with { SkipShortcuts = true };
+
+        await SetupRunner.InstallAsync(options, host, CancellationToken.None);
+
+        Assert.DoesNotContain(SetupText.Get("setup.step.shell"), adimlar);
+        Assert.DoesNotContain(SetupText.Get("setup.step.shortcut"), adimlar);
+        Assert.Contains(SetupText.Get("setup.step.place"), adimlar);
+    }
+
+    [Fact]
     public async Task SaglamaTutmazsaEskiKurulumaDokunulmuyor()
     {
         if (!OperatingSystem.IsWindows()) return;
@@ -468,7 +519,7 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Equal(dllSha, UpdateCheck.HashFile(fallback.Dll));
     }
 
-    private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release, Action<string>? gunluk = null)
+    private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release, Action<string>? gunluk = null, Action<int, int, string>? adim = null)
     {
         var local = Path.Combine(_work, "local");
         var ffmpegZip = Path.Combine(release, "ffmpeg.zip");
@@ -500,6 +551,7 @@ public sealed class KurucuExeTests : IDisposable
             Shortcuts = shortcuts,
             Delay = (_, _) => Task.CompletedTask,
             Log = gunluk ?? (_ => { }),
+            Step = adim ?? ((_, _, _) => { }),
             Launch = _ => throw new InvalidOperationException("NoLaunch verildi.")
         };
         return (options, host, shortcuts);

@@ -49,6 +49,7 @@ public static class SetupRunner
         }
 
         SetupText.Use(ShellRegistration.ResolveLanguage(options.MenuLanguage, host.UiLanguage));
+        host.Step(4, 10, SetupText.Get("setup.step.preparing"));
         host.Log(SetupText.Get("setup.preparing"));
         var decision = host.Architecture();
         var rid = RuntimeIdentifier(decision, host.Log);
@@ -78,12 +79,14 @@ public static class SetupRunner
                 : null;
             if (ffmpegTask is not null) host.Log(SetupText.Get("setup.ffmpeg.downloading"));
 
+            host.Step(10, 18, SetupText.Get("setup.step.release"));
             host.Log(SetupText.Get("setup.release.searching"));
             var tag = options.Tag ?? await SetupDownloads.ResolveLatestTagAsync(cancellationToken);
             var version = tag.TrimStart('v');
             host.Log(SetupText.Get("setup.version.installing", version));
             Mark("etiket");
 
+            host.Step(18, 48, SetupText.Get("setup.step.download", version));
             host.Log(SetupText.Get("setup.package.downloading"));
             var checksumsTask = SetupDownloads.FetchAssetAsync(client, options, tag, checksumsName, work, cancellationToken);
             var archiveTask = SetupDownloads.FetchAssetAsync(client, options, tag, archiveName, work, cancellationToken);
@@ -91,11 +94,7 @@ public static class SetupRunner
             await Task.WhenAll(checksumsTask, archiveTask, launcherTask);
             Mark("yayin-indirildi");
 
-            var checksums = SetupDownloads.ParseChecksums(await File.ReadAllTextAsync(checksumsTask.Result.Path, cancellationToken));
-            SetupDownloads.AssertChecksum(checksums, archiveName, archiveTask.Result.Sha256);
-            SetupDownloads.AssertChecksum(checksums, launcherName, launcherTask.Result.Sha256);
-            host.Log(SetupText.Get("setup.downloads.verified"));
-
+            host.Step(48, 62, SetupText.Get("setup.step.tools"));
             var libMpv = await libMpvTask;
             host.Log(SetupText.Get("setup.libmpv.ready",
                 SetupText.Get(libMpv.Reused ? "setup.libmpv.reused" : "setup.libmpv.downloaded")));
@@ -107,6 +106,13 @@ public static class SetupRunner
             }
             Mark("araclar-hazir");
 
+            host.Step(62, 70, SetupText.Get("setup.step.verify"));
+            var checksums = SetupDownloads.ParseChecksums(await File.ReadAllTextAsync(checksumsTask.Result.Path, cancellationToken));
+            SetupDownloads.AssertChecksum(checksums, archiveName, archiveTask.Result.Sha256);
+            SetupDownloads.AssertChecksum(checksums, launcherName, launcherTask.Result.Sha256);
+            host.Log(SetupText.Get("setup.downloads.verified"));
+
+            host.Step(70, 86, SetupText.Get("setup.step.place"));
             LockedFolder.CloseHolders(root, host);
             if (options.DefaultRegistry && host.ShellPackage is { } package && package.Registered()) package.Remove();
 
@@ -156,7 +162,7 @@ public static class SetupRunner
             var modern = false;
             if (!options.SkipShortcuts)
             {
-                WriteShortcuts(options, host, root, installedExe);
+                host.Step(86, 93, SetupText.Get("setup.step.shell"));
                 var locales = ShellRegistration.LocalesFolder(root);
                 var language = ShellRegistration.ResolveLanguage(options.MenuLanguage, host.UiLanguage, locales);
                 var modernTask = Task.Run(() => RegisterModernMenu(options, host, root), cancellationToken);
@@ -167,6 +173,9 @@ public static class SetupRunner
                 var path = SetupText.Get(modern ? "setup.menu.modern-and-classic" : "setup.menu.classic");
                 host.Log(SetupText.Get("setup.menu.written", ShellIntegration.MediaExtensions.Count, shrinkWritten, path));
                 host.Log(SetupText.Get("setup.association.written", associated));
+
+                host.Step(93, 99, SetupText.Get("setup.step.shortcut"));
+                WriteShortcuts(options, host, root, installedExe);
             }
             Mark("kabuk");
 
@@ -175,6 +184,7 @@ public static class SetupRunner
 
             host.Log(SetupText.Get("setup.installed", version, root));
             if (!options.NoLaunch) host.Launch(installedExe);
+            host.Step(100, 100, SetupText.Get("setup.step.done", version));
             Mark("bitti");
             return new SetupResult(version, root, libMpv.Reused, fetchedFfmpeg is not null, modern, steps);
         }

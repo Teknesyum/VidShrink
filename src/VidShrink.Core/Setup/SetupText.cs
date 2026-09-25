@@ -195,6 +195,117 @@ public static class SetupText
         ["setup.powershell.start-failed"] = (
             "powershell başlatılamadı.",
             "powershell could not be started."),
+        ["setup.step.preparing"] = (
+            "Hazırlanıyor",
+            "Preparing"),
+        ["setup.step.release"] = (
+            "Son sürüm aranıyor",
+            "Looking for the latest version"),
+        ["setup.step.download"] = (
+            "VidShrink {0} indiriliyor",
+            "Downloading VidShrink {0}"),
+        ["setup.step.verify"] = (
+            "İndirilenler doğrulanıyor",
+            "Verifying the downloads"),
+        ["setup.step.tools"] = (
+            "FFmpeg ve libmpv hazırlanıyor",
+            "Preparing FFmpeg and libmpv"),
+        ["setup.step.place"] = (
+            "Dosyalar yerleştiriliyor",
+            "Putting the files in place"),
+        ["setup.step.shell"] = (
+            "Sağ tık menüsü ve ilişkilendirme yazılıyor",
+            "Writing the context menu and the file association"),
+        ["setup.step.shortcut"] = (
+            "Kısayollar yazılıyor",
+            "Writing the shortcuts"),
+        ["setup.stage.download"] = (
+            "İndirme",
+            "Download"),
+        ["setup.stage.download.detail"] = (
+            "VidShrink paketi, FFmpeg ve libmpv GitHub Releases'tan",
+            "VidShrink package, FFmpeg and libmpv from GitHub Releases"),
+        ["setup.stage.verify"] = (
+            "Doğrulama",
+            "Verification"),
+        ["setup.stage.verify.detail"] = (
+            "Her dosyanın sha256 özeti yayınla karşılaştırılır",
+            "Every file's sha256 is checked against the release"),
+        ["setup.stage.place"] = (
+            "Yerleştirme",
+            "Placement"),
+        ["setup.stage.place.detail"] = (
+            "Program kurulum klasörüne yerleştirilir",
+            "The program is put into the install folder"),
+        ["setup.stage.shell"] = (
+            "Kabuk Kaydı",
+            "Shell Registration"),
+        ["setup.stage.shell.detail"] = (
+            "Sağ tık menüsü ve video ilişkilendirmesi",
+            "Context menu and video file association"),
+        ["setup.stage.shortcut"] = (
+            "Kısayol",
+            "Shortcuts"),
+        ["setup.stage.shortcut.detail"] = (
+            "Başlat menüsü ve masaüstü kısayolu",
+            "Start menu and desktop shortcut"),
+        ["setup.panel.ready"] = (
+            "VidShrink kullanıcı klasörüne kurulur, yönetici izni gerekmez.",
+            "VidShrink installs into your user folder, no administrator rights needed."),
+        ["setup.panel.running"] = (
+            "Kuruluyor, bu pencereyi kapatmayın.",
+            "Installing, keep this window open."),
+        ["setup.panel.done"] = (
+            "Kurulum tamamlandı, VidShrink hazır.",
+            "Setup is complete, VidShrink is ready."),
+        ["setup.panel.rehearsal-done"] = (
+            "Prova tamamlandı, hiçbir şey kalıcı yazılmadı.",
+            "Rehearsal complete, nothing was written permanently."),
+        ["setup.panel.install"] = (
+            "Kur",
+            "Install"),
+        ["setup.panel.installing"] = (
+            "Kuruluyor",
+            "Installing"),
+        ["setup.panel.retry"] = (
+            "Yeniden Dene",
+            "Try Again"),
+        ["setup.panel.change"] = (
+            "Değiştir",
+            "Change"),
+        ["setup.panel.location"] = (
+            "Kurulum:",
+            "Install to:"),
+        ["setup.panel.location-invalid"] = (
+            "Kurulum yeri {0} altında olmalı.",
+            "The install folder must be under {0}."),
+        ["setup.panel.pick-folder"] = (
+            "VidShrink'in kurulacağı klasörü seçin",
+            "Choose the folder to install VidShrink into"),
+        ["setup.step.done"] = (
+            "Kurulum tamamlandı · sürüm {0}",
+            "Setup complete · version {0}"),
+        ["setup.panel.title"] = (
+            "Kurulum",
+            "Setup"),
+        ["setup.panel.failed"] = (
+            "Kurulum yarıda kaldı: {0}",
+            "Setup stopped: {0}"),
+        ["setup.panel.log-path"] = (
+            "Günlük · {0}",
+            "Log · {0}"),
+        ["setup.panel.open-app"] = (
+            "Programı Aç",
+            "Open VidShrink"),
+        ["setup.panel.open-log"] = (
+            "Günlüğü Aç",
+            "Open Log"),
+        ["setup.panel.close"] = (
+            "Kapat",
+            "Close"),
+        ["setup.panel.rehearsal"] = (
+            "Prova: geçici klasöre kurulur, kısayol ve menü yazılmaz, program açılmaz · {0}",
+            "Rehearsal: installs into a temporary folder, writes no shortcut or menu, does not start the program · {0}"),
         ["shell.menu.open"] = (
             "Bu Videoyu VidShrink ile Aç",
             "Open this video with VidShrink"),
@@ -218,6 +329,10 @@ public static class SetupText
               --asset-source <klasör> Yayın varlıkları bu klasörden okunur.
               --download-ffmpeg       Yüklü FFmpeg olsa da sabitlenmiş FFmpeg indirilir.
               --timings               Adım sürelerini yazar.
+              --console               Seçenek vermeden de konsolda kurar; panel açılmaz.
+              --panel                 Verilen seçeneklerle grafik paneli açar.
+
+            Seçeneksiz açılınca grafik kurulum paneli gösterilir.
             """,
             """
             VidShrink-Setup - installs, updates or removes VidShrink.
@@ -235,6 +350,10 @@ public static class SetupText
               --asset-source <folder> Release assets are read from this folder.
               --download-ffmpeg       Downloads the pinned FFmpeg even if one is installed.
               --timings               Prints the duration of each step.
+              --console               Installs in the console even without options; no panel.
+              --panel                 Opens the graphical panel with the given options.
+
+            Started without options it shows the graphical setup panel.
             """)
     };
 
