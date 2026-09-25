@@ -1354,6 +1354,8 @@ public sealed class BaslikKapsamiTests
     /// <c>main.reason.stream.vp9-fell-back</c>, <c>recorder.output.partial-broken-mkv</c>): 1097 + 3 = 1100, 43 x 1100 = 47300.</para>
     /// <para>2026-09-25, bolge duzenleyici: dil basina dort anahtar (<c>recorder.region.title</c>, <c>-start</c>, <c>-settings</c>,
     /// <c>-close</c>): 1100 + 4 = 1104, 43 x 1104 = 47472.</para>
+    /// <para>2026-09-25, mini serit: dil basina iki anahtar (<c>recorder.mini.offer</c>, <c>recorder.mini.region</c>):
+    /// 1104 + 2 = 1106, 43 x 1106 = 47558.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1381,7 +1383,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(47472, gezilen);
+        Assert.Equal(47558, gezilen);
         Assert.Empty(kayip);
     }
 
