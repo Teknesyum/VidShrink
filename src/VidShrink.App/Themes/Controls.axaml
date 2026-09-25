@@ -1,5 +1,6 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:izi="using:VidShrink.App">
   <Styles.Resources>
     <ResourceDictionary>
       <!--
@@ -921,7 +922,7 @@
         </Style>
         <Style Selector="^:checked /template/ Ellipse#RadioOutline">
           <Setter Property="Stroke" Value="{StaticResource NeonPurple}"/>
-          <Setter Property="Fill" Value="{StaticResource NeonBlueActive}"/>
+          <Setter Property="Fill" Value="{StaticResource NeonBlue}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Ellipse#RadioOutline">
           <Setter Property="Stroke" Value="{StaticResource NeonPink}"/>
@@ -1325,15 +1326,21 @@
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
           <ControlTemplate TargetType="RepeatButton">
-            <Border Name="FilledTrack"
-                    Height="{StaticResource SliderTrackHeight}"
-                    VerticalAlignment="Center"
-                    Background="{StaticResource NeonPink}"
-                    BorderBrush="{StaticResource NeonBlue}"
-                    BorderThickness="{StaticResource BorderThin}"
-                    CornerRadius="{StaticResource SliderFilledTrackRadius}"/>
+            <Panel Background="Transparent">
+              <Border Name="FilledTrack"
+                      Height="{StaticResource SliderTrackHeight}"
+                      VerticalAlignment="Center"
+                      Background="{StaticResource NeonBlue}"
+                      BorderBrush="{StaticResource NeonBlue}"
+                      BorderThickness="{StaticResource BorderThin}"
+                      CornerRadius="{StaticResource SliderFilledTrackRadius}"/>
+            </Panel>
           </ControlTemplate>
         </Setter>
+        <Style Selector="^:disabled /template/ Border#FilledTrack">
+          <Setter Property="Background" Value="{StaticResource TextDisabled}"/>
+          <Setter Property="BorderBrush" Value="{StaticResource TextDisabled}"/>
+        </Style>
       </ControlTheme>
 
       <ControlTheme x:Key="SliderEmptyTrack" TargetType="RepeatButton">
@@ -1341,15 +1348,27 @@
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
           <ControlTemplate TargetType="RepeatButton">
-            <Border Name="RemainingTrack"
-                    Height="{StaticResource SliderTrackHeight}"
-                    VerticalAlignment="Center"
-                    Background="{StaticResource Surface}"
-                    BorderBrush="{StaticResource NeonBlue}"
-                    BorderThickness="{StaticResource BorderThin}"
-                    CornerRadius="{StaticResource SliderEmptyTrackRadius}"/>
+            <Panel Background="Transparent">
+              <Border Name="RemainingTrack"
+                      Height="{StaticResource SliderTrackHeight}"
+                      VerticalAlignment="Center"
+                      Background="{StaticResource NeonBlueFill}"
+                      BorderBrush="{StaticResource NeonBlueBorder}"
+                      BorderThickness="{StaticResource BorderThin}"
+                      CornerRadius="{StaticResource SliderEmptyTrackRadius}"/>
+            </Panel>
           </ControlTemplate>
         </Setter>
+        <Style Selector="^.ustunde /template/ Border#RemainingTrack">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+        </Style>
+        <Style Selector="^.odak /template/ Border#RemainingTrack">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+        </Style>
+        <Style Selector="^:disabled /template/ Border#RemainingTrack">
+          <Setter Property="Background" Value="Transparent"/>
+          <Setter Property="BorderBrush" Value="{StaticResource TextDisabled}"/>
+        </Style>
       </ControlTheme>
 
       <ControlTheme x:Key="SliderThumb" TargetType="Thumb">
@@ -1357,32 +1376,54 @@
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
           <ControlTemplate TargetType="Thumb">
-            <Ellipse Name="Knob"
-                     Fill="{StaticResource NeonBlue}"
-                     Stroke="{StaticResource NeonPink}"
-                     StrokeThickness="2"
-                     RenderTransform="none">
-              <Ellipse.Transitions>
-                <Transitions>
-                  <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
-                </Transitions>
-              </Ellipse.Transitions>
-            </Ellipse>
+            <Panel Background="Transparent">
+              <Ellipse Name="Knob"
+                       Width="{StaticResource SliderThumbSize}"
+                       Height="{StaticResource SliderThumbSize}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Fill="{StaticResource AppBg}"
+                       Stroke="{StaticResource NeonBlue}"
+                       StrokeThickness="{StaticResource SliderThumbStroke}"
+                       RenderTransform="none">
+                <Ellipse.Transitions>
+                  <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+                  </Transitions>
+                </Ellipse.Transitions>
+              </Ellipse>
+            </Panel>
           </ControlTemplate>
         </Setter>
         <Style Selector="^:pointerover /template/ Ellipse#Knob">
           <Setter Property="RenderTransform" Value="scale(1.1)"/>
         </Style>
-        <Style Selector="^:pressed /template/ Ellipse#Knob">
+        <Style Selector="^.ustunde /template/ Ellipse#Knob">
           <Setter Property="RenderTransform" Value="scale(1.1)"/>
+        </Style>
+        <Style Selector="^.odak /template/ Ellipse#Knob">
+          <Setter Property="RenderTransform" Value="scale(1.1)"/>
+        </Style>
+        <Style Selector="^:pressed /template/ Ellipse#Knob">
+          <Setter Property="RenderTransform" Value="scale(1.2)"/>
+          <Setter Property="Fill" Value="{StaticResource NeonBlue}"/>
+        </Style>
+        <Style Selector="^.basili /template/ Ellipse#Knob">
+          <Setter Property="RenderTransform" Value="scale(1.2)"/>
+          <Setter Property="Fill" Value="{StaticResource NeonBlue}"/>
+        </Style>
+        <Style Selector="^:disabled /template/ Ellipse#Knob">
+          <Setter Property="RenderTransform" Value="none"/>
+          <Setter Property="Stroke" Value="{StaticResource TextDisabled}"/>
         </Style>
       </ControlTheme>
 
       <ControlTheme x:Key="{x:Type Slider}" TargetType="Slider">
         <Setter Property="FocusAdorner" Value="{x:Null}"/>
-        <Setter Property="Height" Value="{StaticResource TargetMinSize}"/>
+        <Setter Property="Height" Value="{StaticResource FieldMinHeight}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="izi:KaydiriciHareketi.Etkin" Value="True"/>
         <Setter Property="Template">
           <ControlTemplate TargetType="Slider">
             <Border Name="Root" Background="Transparent" Padding="{StaticResource SliderTrackPadding}">
@@ -1402,8 +1443,7 @@
                   <Track.Thumb>
                     <Thumb Name="ThumbVisual"
                            Theme="{StaticResource SliderThumb}"
-                           Width="{StaticResource SliderThumbSize}"
-                           Height="{StaticResource SliderThumbSize}"/>
+                           Width="{StaticResource SliderThumbSize}"/>
                   </Track.Thumb>
                 </Track>
                 <Border Name="FocusRing"
@@ -1421,6 +1461,7 @@
         <Style Selector="^:disabled">
           <Setter Property="Cursor" Value="No"/>
         </Style>
+
       </ControlTheme>
 
       <ControlTheme x:Key="{x:Type ProgressBar}" TargetType="ProgressBar">

@@ -7,6 +7,10 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Changed
+
+- Sliders share one theme: 40 px hit area across the whole track height, filled track and knob that grow on hover/press/focus, a gray disabled state, keyboard steps derived from the range (arrows small, PageUp/PageDown large), and the knob glides to a new value set by keyboard or the value box; the player's seek bar uses the same family.
+
 ## [0.9.4] - 2026-09-25
 
 ### Added

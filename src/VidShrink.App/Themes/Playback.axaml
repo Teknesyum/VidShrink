@@ -421,74 +421,10 @@
     <Setter Property="MinHeight" Value="{StaticResource PlaybackPlayButtonSize}"/>
   </ControlTheme>
 
-  <ControlTheme x:Key="PlaybackSliderFill" TargetType="RepeatButton">
-    <Setter Property="Focusable" Value="False"/>
-    <Setter Property="Template">
-      <ControlTemplate TargetType="RepeatButton">
-        <Panel Background="Transparent">
-          <Border Theme="{StaticResource PlaybackTrackFill}" VerticalAlignment="Center"/>
-        </Panel>
-      </ControlTemplate>
-    </Setter>
-  </ControlTheme>
-
-  <ControlTheme x:Key="PlaybackSliderRest" TargetType="RepeatButton">
-    <Setter Property="Focusable" Value="False"/>
-    <Setter Property="Template">
-      <ControlTemplate TargetType="RepeatButton">
-        <Panel Background="Transparent">
-          <Border Theme="{StaticResource PlaybackTrack}" VerticalAlignment="Center"/>
-        </Panel>
-      </ControlTemplate>
-    </Setter>
-  </ControlTheme>
-
-  <ControlTheme x:Key="PlaybackSliderThumb" TargetType="Thumb">
-    <Setter Property="Cursor" Value="Hand"/>
-    <Setter Property="Template">
-      <ControlTemplate TargetType="Thumb">
-        <Border Name="Knob" Theme="{StaticResource PlaybackThumb}"/>
-      </ControlTemplate>
-    </Setter>
-    <Style Selector="^:pointerover /template/ Border#Knob">
-      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
-    </Style>
-    <Style Selector="^:pressed /template/ Border#Knob">
-      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
-    </Style>
-  </ControlTheme>
-
   <ControlTheme x:Key="PlaybackSlider" TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
     <Setter Property="MaxWidth" Value="{StaticResource PlaybackSliderWidth}"/>
     <Setter Property="Height" Value="{StaticResource PlaybackBarButtonSize}"/>
     <Setter Property="VerticalAlignment" Value="Center"/>
-    <Setter Property="Template">
-      <ControlTemplate TargetType="Slider">
-        <Panel Background="Transparent">
-          <Track Name="PART_Track"
-                 Minimum="{TemplateBinding Minimum}"
-                 Maximum="{TemplateBinding Maximum}"
-                 Value="{TemplateBinding Value, Mode=TwoWay}"
-                 Orientation="{TemplateBinding Orientation}"
-                 IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
-            <Track.DecreaseButton>
-              <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource PlaybackSliderFill}"/>
-            </Track.DecreaseButton>
-            <Track.IncreaseButton>
-              <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource PlaybackSliderRest}"/>
-            </Track.IncreaseButton>
-            <Track.Thumb>
-              <Thumb Name="ThumbVisual" Theme="{StaticResource PlaybackSliderThumb}"/>
-            </Track.Thumb>
-          </Track>
-          <Border Name="FocusRing"
-                  IsHitTestVisible="False"
-                  BorderBrush="Transparent"
-                  BorderThickness="{StaticResource FocusRingThickness}"
-                  CornerRadius="{StaticResource RadiusChip}"/>
-        </Panel>
-      </ControlTemplate>
-    </Setter>
     <Style Selector="^:focus-visible /template/ Border#FocusRing">
       <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
     </Style>
