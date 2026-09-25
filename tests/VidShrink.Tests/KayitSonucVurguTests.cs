@@ -8,6 +8,7 @@ using Avalonia.Input.Raw;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
+using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.App.Recorder;
 using VidShrink.Core.Share;
@@ -211,7 +212,17 @@ public sealed class KayitSonucVurguTests
                 Fareyle(window, RawPointerEventType.LeftButtonUp, bos, RawInputModifiers.None);
                 var disarida = saglayici?.Yuklenen.Count ?? 0;
 
-                var merkez = dugme.TranslatePoint(new Point(dugme.Bounds.Width / 2, dugme.Bounds.Height / 2), window)!.Value;
+                Point Merkez() => dugme.TranslatePoint(new Point(dugme.Bounds.Width / 2, dugme.Bounds.Height / 2), window)!.Value;
+                bool Isabet(Point p) => window.InputHitTest(p) is Visual v && (ReferenceEquals(v, dugme) || v.GetVisualAncestors().Contains(dugme));
+                var bekleme = System.Diagnostics.Stopwatch.StartNew();
+                while (!(dugme.IsEffectivelyEnabled && Isabet(Merkez())) && bekleme.Elapsed.TotalSeconds < 10)
+                {
+                    window.UpdateLayout();
+                    Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                    Thread.Sleep(10);
+                }
+
+                var merkez = Merkez();
                 Fareyle(window, RawPointerEventType.Move, merkez, RawInputModifiers.None);
                 Fareyle(window, RawPointerEventType.LeftButtonDown, merkez, RawInputModifiers.LeftMouseButton);
                 Fareyle(window, RawPointerEventType.LeftButtonUp, merkez, RawInputModifiers.None);
