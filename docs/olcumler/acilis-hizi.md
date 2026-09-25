@@ -438,3 +438,59 @@ kullanılmadı.
 | Her koşumun bütün adımları | [T-hipersurus-F-ham.jsonl](T-hipersurus-F-ham.jsonl) |
 | Ölçüm düzeneği | [tools/acilis-hizi/EkranSaati](../../tools/acilis-hizi/EkranSaati), [tools/acilis-hizi/KayitKalkani](../../tools/acilis-hizi/KayitKalkani) |
 | Plan | [docs/plan.md](../plan.md) "Hipersürüş F dalgası" |
+## Başlatıcı NativeAOT
+
+Tarih: 2026-09-25. Düzenek: `tools/acilis-hizi/EkranSaati` (ayrı masaüstü, `KayitKalkani`,
+`VIDSHRINK_SETTINGS_PATH` her koşumda `.calisma` altında, `VIDSHRINK_UPDATE_DISABLED=1`).
+Boş açılış, `--bitis ilk-boya`, taraflar dönüşümlü sırayla eşleşik. `olcum.ps1` kullanılmadı:
+HKCU'yu ve ayar dosyasını korumuyor.
+
+Değişen tek şey kökteki `VidShrink.exe`: ReadyToRun + tek dosya yerine NativeAOT
+(`PublishAot`, `OptimizationPreference=Speed`, 69,8 MB → 6,5 MB). Uygulama iki tarafta aynı kopya.
+
+Sıcak, n=10 (ortanca ms, fark eşleşik ortanca):
+
+| Adım | Taban | AOT | Fark | Lehine |
+| --- | ---: | ---: | ---: | ---: |
+| baslatici | 67,2 | 10,2 | −57,5 | 10/10 |
+| app-dogdu | 76,6 | 15,8 | −61,4 | 10/10 |
+| main | 140,3 | 84,4 | −56,5 | 10/10 |
+| cerceve | 326,1 | 261,2 | −52,5 | 10/10 |
+| pencere-kuruldu | 509,3 | 466,4 | −45,4 | 9/10 |
+| pencere-yuklendi | 676,3 | 628,7 | −46,9 | 7/10 |
+| ilk-boya | 754,9 | 717,3 | −45,6 | 6/10 |
+
+Soğuk, n=6:
+
+| Adım | Taban | AOT | Fark | Lehine |
+| --- | ---: | ---: | ---: | ---: |
+| baslatici | 99,8 | 21,5 | −78,4 | 6/6 |
+| app-dogdu | 117,1 | 28,6 | −88,6 | 6/6 |
+| main | 266,1 | 165,0 | −103,4 | 6/6 |
+| cerceve | 507,5 | 396,2 | −115,5 | 6/6 |
+| pencere-kuruldu | 778,0 | 635,7 | −133,3 | 6/6 |
+| pencere-yuklendi | 937,2 | 809,3 | −121,4 | 6/6 |
+| ilk-boya | 1171,0 | 1092,8 | −87,8 | 5/6 |
+
+Kazanç başlatıcının kendi gövdesinde: `app-dogdu`'ya kadar her çiftte önde, sonrası
+aynı uygulama olduğu için fark taşınıyor ve gürültüye karışıyor (ilk-boya sıcakta 6/10).
+
+Uygulamada `DOTNET_TieredPGO=0` da denendi (AOT'ye karşı, sıcak n=10): ilk-boya −33,4,
+7/10, en az/en çok −211/+215. Gürültü bandının içinde; uygulanmadı.
+
+Güncelleme yolu aynı: yerel manifestli `--bakim` koşumunda iki başlatıcı da çıkış 0,
+tek istek (`/manifest-win-x64.json`), aynı dosyaları yazıyor; AOT 46 ms, taban 115 ms.
+
+NativeAOT Linux'tan Windows'a derlenemiyor; `release.yml`'de başlatıcı ayrı bir
+`launcher` işinde `windows-latest`'te çıkıyor, `publish` onu yapıt olarak alıyor.
+
+Kalan darboğaz uygulamanın içinde (sıcak, AOT): `app-dogdu`→`main` ~68 ms (.NET konağı),
+`main`→`app-init` ~158 ms (Avalonia platformu), XAML ~145 ms, `pencere-kuruldu`→`pencere-yuklendi`
+~162 ms (Show, ilk yerleşim, kompozisyon).
+
+| Ne | Nerede |
+| --- | --- |
+| Sıcak özet ve ham | [T-baslatici-aot-sicak-ozet.txt](T-baslatici-aot-sicak-ozet.txt), [T-baslatici-aot-sicak-ham.jsonl](T-baslatici-aot-sicak-ham.jsonl) |
+| Soğuk özet ve ham | [T-baslatici-aot-soguk-ozet.txt](T-baslatici-aot-soguk-ozet.txt), [T-baslatici-aot-soguk-ham.jsonl](T-baslatici-aot-soguk-ham.jsonl) |
+| TieredPGO=0 | [T-baslatici-aot-pgo0-ozet.txt](T-baslatici-aot-pgo0-ozet.txt), [T-baslatici-aot-pgo0-ham.jsonl](T-baslatici-aot-pgo0-ham.jsonl) |
+| Bakım yolu | [T-baslatici-aot-bakim-smoke.txt](T-baslatici-aot-bakim-smoke.txt) |

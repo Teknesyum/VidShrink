@@ -291,7 +291,7 @@ public sealed class Windows11ShellMenuTests
         var build = Regex.Match(workflow, @"run: msbuild src/VidShrink\.ShellExtension/VidShrink\.ShellExtension\.vcxproj(?<arguments>[^\r\n]*)");
         Assert.True(build.Success);
         Assert.DoesNotContain("PlatformToolset", build.Groups["arguments"].Value);
-        Assert.Contains("needs: [version, test, shell-extension]", workflow);
+        Assert.Contains("needs: [version, test, shell-extension, launcher]", workflow);
         Assert.Contains("path: publish-launcher/shell", workflow);
     }
 }

@@ -11,6 +11,10 @@ ship as part of it.
 
 - `VidShrink-Setup.exe` opens a graphical setup panel when started without arguments (native Win32/GDI+, no WinForms/WPF): five steps (download, sha256 verification, placement, shell registration, shortcuts) with check/number/failure marks, a gradient progress bar with percentage, a fading monospace log, an install location row with a Change button, and the Install / Installing / Close + Open app / Retry button flow. Any flag or `--console` keeps the console installer; `VIDSHRINK_SETUP_PROVA` runs a rehearsal into a temporary folder; the log is also written to `%LOCALAPPDATA%\VidShrink\kurulum.log`.
 
+### Changed
+
+- The Windows launcher is now NativeAOT, so a double-click starts the application about 60 ms sooner warm and 90 ms sooner cold.
+
 ## [0.9.3] - 2026-09-25
 
 ### Fixed

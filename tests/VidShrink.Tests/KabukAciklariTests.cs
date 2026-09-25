@@ -85,7 +85,8 @@ public sealed class KabukAciklariTests
     [Fact]
     public void HakkindaYayinlananHerPlatformuYazarVeBuKurulumuIsaretler()
     {
-        var yayin = File.ReadAllText(Path.Combine(TipSources.Root, ".github", "workflows", "release.yml"));
+        var yayin = File.ReadAllText(Path.Combine(TipSources.Root, ".github", "workflows", "release.yml")).ReplaceLineEndings("\n");
+        yayin = yayin[yayin.IndexOf("\n  publish:\n", StringComparison.Ordinal)..];
         var matris = Regex.Match(yayin, @"rid:\s*\[(?<liste>[^\]]+)\]").Groups["liste"].Value
             .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(matris.OrderBy(r => r), UpdateCheck.ReleasedRids.OrderBy(r => r));

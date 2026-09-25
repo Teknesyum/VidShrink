@@ -24,20 +24,35 @@ public sealed class HipersurusTests
     /// <summary>
     /// C1. İki yayın da önceden derlenmiş kodla çıkıyor. Anahtarlar kalkarsa açılışta bütün
     /// IL yeniden JIT'lenir ve ölçülen kazanç geri verilir.
+    ///
+    /// <para>Başlatıcı 25 Eylül 2026'dan beri NativeAOT: ReadyToRun'lu tek dosya 70 MB'lık
+    /// paketi açıp çalışma zamanını kuruyordu, uygulama ondan sonra doğuyordu. Eşleşik
+    /// ölçüde <c>app-dogdu</c> sıcakta 61 ms, soğukta 89 ms öne geldi
+    /// (<c>docs/olcumler/acilis-hizi.md</c>, "Başlatıcı NativeAOT"). NativeAOT Linux'tan
+    /// Windows'a derlenemediği için başlatıcı yayında ayrı bir Windows işinde çıkıyor.</para>
     /// </summary>
     [Fact]
     public void YayinOncedenDerlenmisKodlaCikiyor()
     {
         var uygulama = Oku("src", "VidShrink.App", "VidShrink.App.csproj");
         var baslatici = Oku("src", "VidShrink.Launcher", "VidShrink.Launcher.csproj");
+        var yayin = Oku(".github", "workflows", "release.yml").ReplaceLineEndings("\n");
 
-        foreach (var (ad, metin) in new[] { ("uygulama", uygulama), ("baslatici", baslatici) })
-        {
-            Assert.True(metin.Contains("<PublishReadyToRun>true</PublishReadyToRun>", StringComparison.Ordinal),
-                $"{ad}: PublishReadyToRun yok");
-            Assert.True(metin.Contains("<TieredPGO>true</TieredPGO>", StringComparison.Ordinal),
-                $"{ad}: TieredPGO yok");
-        }
+        Assert.True(uygulama.Contains("<PublishReadyToRun>true</PublishReadyToRun>", StringComparison.Ordinal),
+            "uygulama: PublishReadyToRun yok");
+        Assert.True(uygulama.Contains("<TieredPGO>true</TieredPGO>", StringComparison.Ordinal),
+            "uygulama: TieredPGO yok");
+
+        Assert.Contains("<PublishAot>true</PublishAot>", baslatici, StringComparison.Ordinal);
+        Assert.DoesNotContain("<PublishSingleFile>true</PublishSingleFile>", baslatici, StringComparison.Ordinal);
+
+        var baslaticiIsi = yayin[yayin.IndexOf("\n  launcher:\n", StringComparison.Ordinal)..];
+        baslaticiIsi = baslaticiIsi[..baslaticiIsi.IndexOf("\n  publish:\n", StringComparison.Ordinal)];
+        Assert.Contains("runs-on: windows-latest", baslaticiIsi, StringComparison.Ordinal);
+        Assert.Contains("dotnet publish src/VidShrink.Launcher/VidShrink.Launcher.csproj", baslaticiIsi, StringComparison.Ordinal);
+        var yayinIsi = yayin[yayin.IndexOf("\n  publish:\n", StringComparison.Ordinal)..];
+        Assert.DoesNotContain("dotnet publish src/VidShrink.Launcher/VidShrink.Launcher.csproj", yayinIsi, StringComparison.Ordinal);
+        Assert.Contains("name: launcher-${{ matrix.rid }}\n          path: publish-launcher\n", yayinIsi, StringComparison.Ordinal);
 
         Assert.DoesNotContain("<PublishAot>true</PublishAot>", uygulama, StringComparison.Ordinal);
         Assert.Contains("<PropertyGroup Condition=\"'$(RuntimeIdentifier)' == 'win-x64'\">\r\n    <PublishReadyToRunComposite>true</PublishReadyToRunComposite>", uygulama.ReplaceLineEndings("\r\n"), StringComparison.Ordinal);
