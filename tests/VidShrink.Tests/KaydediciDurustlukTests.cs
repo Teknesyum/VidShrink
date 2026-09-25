@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -261,7 +261,7 @@ public sealed class KaydediciDurustlukTests : IDisposable
     private static (string Not, string Hedef) TamponNotu(RecorderContainer kap)
         => AyarDosyasiyla(ayarYolu =>
         {
-            File.WriteAllText(ayarYolu, "{\"containerChoice\":\"" + kap + "\"}");
+            File.WriteAllText(ayarYolu, "{\"containerFormat\":\"" + kap + "\"}");
             return AppHost.Run(() =>
             {
                 var view = new RecorderView(ayarYolu);

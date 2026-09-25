@@ -420,18 +420,27 @@ public static class RecorderArguments
             Path.GetFileNameWithoutExtension(outputPath) + ".gif-kayit.mkv");
     }
 
-    public static bool SizeNeedsMatroska(RecorderRequest request)
-        => request.Container is RecorderContainer.Mp4 or RecorderContainer.Mov
-           && (request.MaxMegabytes is not null || request.Split?.Megabytes is not null);
+    /// <summary>
+    /// MP4 ve MOV teslimi Matroska'ya yakalanir, durunca <c>-c copy -movflags +faststart</c> ile
+    /// teslim kabina cevrilir. mp4/mov muxer'i <c>moov</c> atomunu kapanista yaziyor: oldurulen
+    /// surec oynatilamaz dosya birakiyordu (<see cref="SurvivesKill"/>). Parcali mp4
+    /// (<c>empty_moov</c>) oldurulmeye dayanirdi ama paylasim yuzeylerinde (WhatsApp, bazi
+    /// tarayici oynaticilari) aranamiyor ya da reddediliyor; one alinmis <c>moov</c>'lu
+    /// duz mp4 hepsinde aciliyor.
+    /// </summary>
+    public static bool CapturesInMatroska(RecorderRequest request)
+        => request.Container is RecorderContainer.Mp4 or RecorderContainer.Mov;
 
-    public static string SizeCapturePath(string outputPath)
-        => Path.Combine(Path.GetDirectoryName(outputPath) ?? string.Empty, Path.GetFileNameWithoutExtension(outputPath) + ".boyut.mkv");
+    private const string CaptureMark = ".yakalama";
 
-    public static string SizeDeliveryPath(string capturePath, string extension)
+    public static string MatroskaCapturePath(string outputPath)
+        => Path.Combine(Path.GetDirectoryName(outputPath) ?? string.Empty, Path.GetFileNameWithoutExtension(outputPath) + CaptureMark + ".mkv");
+
+    public static string MatroskaDeliveryPath(string capturePath, string extension)
     {
         var stem = Path.GetFileNameWithoutExtension(capturePath);
-        var mark = stem.LastIndexOf(".boyut", StringComparison.Ordinal);
-        if (mark >= 0) stem = stem.Remove(mark, ".boyut".Length);
+        var mark = stem.LastIndexOf(CaptureMark, StringComparison.Ordinal);
+        if (mark >= 0) stem = stem.Remove(mark, CaptureMark.Length);
         return Path.Combine(Path.GetDirectoryName(capturePath) ?? string.Empty, stem + extension);
     }
 

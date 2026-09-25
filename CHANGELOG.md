@@ -5,6 +5,21 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [Unreleased]
+
+### Changed
+- Screen recordings are now delivered as MP4 by default, so they open directly in
+  WhatsApp, browsers and social apps. MP4 and MOV are captured in Matroska and remuxed
+  with `-c copy -movflags +faststart` on stop, so a killed recording still yields a
+  playable MP4. The choice is stored as `containerFormat`; the old default `Mkv`
+  written by earlier versions reads as MP4.
+- The region editor's toolbar is icon-only and much smaller (379x49 to 78x30 px); the
+  region size moved into the start button's tooltip.
+
+### Added
+- While recording, the region editor's toolbar shows stop and pause/resume, using the
+  recorder's own stop path; during the countdown stop cancels it.
+
 ## [0.9.3] - 2026-09-25
 
 ### Fixed

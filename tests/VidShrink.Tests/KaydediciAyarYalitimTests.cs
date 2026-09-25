@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Avalonia.Controls;
 using VidShrink.App.Recorder;
@@ -153,7 +153,7 @@ public sealed class KaydediciAyarYalitimTests
                 KaydediciAyarTests.Bul<CheckBox>(kirletici, "ChkLivePreview").IsChecked = true;
                 var kirleticiKurdu = kirletici.PrepareRecording() is not null;
 
-                var kap = KaydediciAyarTests.DosyadakiDeger(paylasilan, "containerChoice");
+                var kap = KaydediciAyarTests.DosyadakiDeger(paylasilan, "containerFormat");
                 var onizleme = KaydediciAyarTests.DosyadakiDeger(paylasilan, "livePreview");
 
                 var olculen = new RecorderView(ayarYolu) { PreviewLocation = () => jpg };

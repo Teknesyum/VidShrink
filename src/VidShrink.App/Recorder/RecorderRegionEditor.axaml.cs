@@ -6,13 +6,28 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Automation;
+using VidShrink.App.Localization;
 using VidShrink.Core;
 
 namespace VidShrink.App.Recorder;
 
 /// <summary>
-/// Çizimden sonra ekranda kalan bölge. Kırmızı çerçeve, sekiz tutamak ve üstünde ince araç
-/// paneli; kenardan sürüklenince taşınır, tutamaktan sürüklenince boyutlanır. Windows'ta
+/// Düzenleyicinin araç paneli kaydın hangi anında: boştayken bölge düzenlenir ve kayıt
+/// başlatılır; geri sayımda, kayıtta ve duraklatmada bölge kilitlenir, panelde durdur
+/// (ve duraklat/sürdür) kalır.
+/// </summary>
+internal enum RegionEditorPhase
+{
+    Idle,
+    Counting,
+    Running,
+    Paused
+}
+
+/// <summary>
+/// Çizimden sonra ekranda kalan bölge. Kırmızı çerçeve, sekiz tutamak ve üstünde yalnız
+/// simgeden oluşan araç paneli; kayıt sürerken bölge kilitlenir ve panelde durdurma kalır; kenardan sürüklenince taşınır, tutamaktan sürüklenince boyutlanır. Windows'ta
 /// pencere biçimi yalnız halka, tutamaklar ve panelden oluşuyor, iç alan tıklamayı alttaki
 /// uygulamaya bırakıyor. Hesapların hepsi <see cref="RegionEdit"/> içinde.
 /// </summary>
@@ -24,6 +39,7 @@ internal partial class RecorderRegionEditor : Window
     private PixelRect _toolbar;
     private (RegionGrip Grip, PixelPoint Start, PixelRect Region)? _drag;
     private bool _closingQuietly;
+    private RegionEditorPhase _phase = RegionEditorPhase.Idle;
     private readonly Dictionary<RegionGrip, Cursor> _cursors = new();
 
     internal event EventHandler<PixelRect>? RegionChanged;
@@ -33,6 +49,12 @@ internal partial class RecorderRegionEditor : Window
     internal event EventHandler? StartRequested;
 
     internal event EventHandler? SettingsRequested;
+
+    internal event EventHandler? PauseRequested;
+
+    internal event EventHandler? ResumeRequested;
+
+    internal event EventHandler? StopRequested;
 
     internal event EventHandler? Dismissed;
 
@@ -62,7 +84,12 @@ internal partial class RecorderRegionEditor : Window
         AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
         BtnStart.Click += (_, _) => StartRequested?.Invoke(this, EventArgs.Empty);
         BtnSettings.Click += (_, _) => SettingsRequested?.Invoke(this, EventArgs.Empty);
+        BtnPause.Click += (_, _) => PauseRequested?.Invoke(this, EventArgs.Empty);
+        BtnResume.Click += (_, _) => ResumeRequested?.Invoke(this, EventArgs.Empty);
+        BtnStop.Click += (_, _) => StopRequested?.Invoke(this, EventArgs.Empty);
         BtnClose.Click += (_, _) => Close();
+        ShowPhase();
+        ShowSize();
     }
 
     internal PixelRect Region => _region;
@@ -72,6 +99,43 @@ internal partial class RecorderRegionEditor : Window
     internal bool CaptureExcluded { get; private set; }
 
     internal bool Shaped { get; private set; }
+
+    internal RegionEditorPhase Phase => _phase;
+
+    /// <summary>Bölgenin boyu; panelde yazı yok, başlat düğmesinin ipucunda duruyor.</summary>
+    internal string SizeText { get; private set; } = string.Empty;
+
+    internal static bool Editable(RegionEditorPhase phase) => phase == RegionEditorPhase.Idle;
+
+    internal void SetPhase(RegionEditorPhase phase)
+    {
+        if (phase == _phase) return;
+        _phase = phase;
+        if (!Editable(phase)) _drag = null;
+        ShowPhase();
+        if (_desktop.Width > 0) Arrange();
+    }
+
+    private void ShowPhase()
+    {
+        var editable = Editable(_phase);
+        BtnStart.IsVisible = editable;
+        BtnSettings.IsVisible = editable;
+        BtnPause.IsVisible = _phase == RegionEditorPhase.Running;
+        BtnResume.IsVisible = _phase == RegionEditorPhase.Paused;
+        BtnStop.IsVisible = !editable;
+        Edge.IsVisible = editable;
+        foreach (var (_, handle) in HandleControls()) handle.IsVisible = editable;
+        if (!editable) Surface.Cursor = CursorOf(RegionGrip.None);
+    }
+
+    private void ShowSize()
+    {
+        SizeText = Bicim.Cozunurluk(_region.Width, _region.Height);
+        var start = LanguageCatalog.Display(Strings.Get("recorder.region.start"));
+        ToolTip.SetTip(BtnStart, $"{start} · {SizeText}");
+        AutomationProperties.SetName(BtnStart, $"{start} {SizeText}");
+    }
 
     /// <summary>Kapanışı <see cref="Dismissed"/> olayı çıkarmadan yapar; kapatan taraf zaten biliyor.</summary>
     internal void CloseQuietly()
@@ -107,7 +171,7 @@ internal partial class RecorderRegionEditor : Window
             e.Handled = true;
             Close();
         }
-        else if (e.Key == Key.Enter)
+        else if (e.Key == Key.Enter && Editable(_phase))
         {
             e.Handled = true;
             StartRequested?.Invoke(this, EventArgs.Empty);
@@ -129,7 +193,7 @@ internal partial class RecorderRegionEditor : Window
 
     private void OnPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+        if (!Editable(_phase) || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         var point = ScreenPoint(e);
         var grip = RegionEdit.Hit(point, _region, Band, HandlePixels);
         if (grip == RegionGrip.None) return;
@@ -140,6 +204,7 @@ internal partial class RecorderRegionEditor : Window
 
     private void OnMoved(object? sender, PointerEventArgs e)
     {
+        if (!Editable(_phase)) return;
         var point = ScreenPoint(e);
         if (_drag is not { } drag)
         {
@@ -198,7 +263,7 @@ internal partial class RecorderRegionEditor : Window
             Canvas.SetTop(handle, center.Y - handle.Height / 2);
         }
 
-        TxtSize.Text = Bicim.Cozunurluk(_region.Width, _region.Height);
+        ShowSize();
         Toolbar.Measure(Size.Infinity);
         var scaling = RenderScaling;
         var bar = new PixelSize(
@@ -224,7 +289,7 @@ internal partial class RecorderRegionEditor : Window
     private void ApplyShape()
     {
         if (!OperatingSystem.IsWindows() || TryGetPlatformHandle() is not { } handle) return;
-        var parts = RegionEdit.Shape(_region, Band, HandlePixels, _toolbar, Position);
+        var parts = RegionEdit.Shape(_region, Band, HandlePixels, _toolbar, Position, Editable(_phase));
         var shape = CreateRectRgn(0, 0, 0, 0);
         if (shape == IntPtr.Zero) return;
         foreach (var part in parts)
@@ -269,9 +334,15 @@ internal interface IRegionEditorHost
 
     event EventHandler? SettingsRequested;
 
+    event EventHandler? PauseRequested;
+
+    event EventHandler? ResumeRequested;
+
+    event EventHandler? StopRequested;
+
     event EventHandler? Dismissed;
 
-    void Show(PixelRect region, double? ratio);
+    void Show(PixelRect region, double? ratio, RegionEditorPhase phase);
 
     void Hide();
 
@@ -292,9 +363,15 @@ internal sealed class RegionEditorHost : IRegionEditorHost
 
     public event EventHandler? SettingsRequested;
 
+    public event EventHandler? PauseRequested;
+
+    public event EventHandler? ResumeRequested;
+
+    public event EventHandler? StopRequested;
+
     public event EventHandler? Dismissed;
 
-    public void Show(PixelRect region, double? ratio)
+    public void Show(PixelRect region, double? ratio, RegionEditorPhase phase)
     {
         if (_editor is null)
         {
@@ -303,6 +380,9 @@ internal sealed class RegionEditorHost : IRegionEditorHost
             editor.RegionCommitted += (_, r) => Committed?.Invoke(this, r);
             editor.StartRequested += (_, _) => StartRequested?.Invoke(this, EventArgs.Empty);
             editor.SettingsRequested += (_, _) => SettingsRequested?.Invoke(this, EventArgs.Empty);
+            editor.PauseRequested += (_, _) => PauseRequested?.Invoke(this, EventArgs.Empty);
+            editor.ResumeRequested += (_, _) => ResumeRequested?.Invoke(this, EventArgs.Empty);
+            editor.StopRequested += (_, _) => StopRequested?.Invoke(this, EventArgs.Empty);
             editor.Dismissed += (_, _) =>
             {
                 if (!ReferenceEquals(_editor, editor)) return;
@@ -310,12 +390,14 @@ internal sealed class RegionEditorHost : IRegionEditorHost
                 Dismissed?.Invoke(this, EventArgs.Empty);
             };
             _editor = editor;
+            editor.SetPhase(phase);
             editor.Show();
             editor.Activate();
             return;
         }
 
         if (!_editor.IsVisible) _editor.Show();
+        _editor.SetPhase(phase);
         _editor.Update(region, ratio);
     }
 

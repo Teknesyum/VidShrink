@@ -223,12 +223,18 @@ internal static class RegionEdit
     /// <summary>
     /// Windows pencere biçimi: çerçeve halkası, sekiz tutamak ve araç paneli. Dikdörtgenler
     /// pencerenin sol üst köşesine (<paramref name="origin"/>) göre; bu biçimin dışı
-    /// tıklamayı alttaki uygulamaya bırakır.
+    /// tıklamayı alttaki uygulamaya bırakır. Bölge düzenlenemezken (<paramref name="editable"/>
+    /// yanlış, kayıt sürüyor) yalnız panel kalır: halka ve tutamak tıklamayı yutmasın.
     /// </summary>
-    internal static IReadOnlyList<PixelRect> Shape(PixelRect region, int band, int handle, PixelRect toolbar, PixelPoint origin)
+    internal static IReadOnlyList<PixelRect> Shape(PixelRect region, int band, int handle, PixelRect toolbar, PixelPoint origin, bool editable = true)
     {
-        var parts = new List<PixelRect>(Ring(region, band));
-        parts.AddRange(Handles.Select(g => HandleRect(region, g, Math.Max(handle, 2 * band))));
+        var parts = new List<PixelRect>();
+        if (editable)
+        {
+            parts.AddRange(Ring(region, band));
+            parts.AddRange(Handles.Select(g => HandleRect(region, g, Math.Max(handle, 2 * band))));
+        }
+
         parts.Add(toolbar);
         return parts
             .Where(p => p.Width > 0 && p.Height > 0)

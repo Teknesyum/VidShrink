@@ -3,6 +3,7 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using VidShrink.Core;
+using VidShrink.Ffmpeg;
 
 namespace VidShrink.App.Recorder;
 
@@ -46,6 +47,9 @@ internal partial class RecorderView
         _regionEditor.Committed += OnEditorCommitted;
         _regionEditor.StartRequested += OnEditorStart;
         _regionEditor.SettingsRequested += OnEditorSettings;
+        _regionEditor.PauseRequested += OnEditorPause;
+        _regionEditor.ResumeRequested += OnEditorResume;
+        _regionEditor.StopRequested += OnEditorStop;
         _regionEditor.Dismissed += OnEditorDismissed;
         _regionEditorWired = true;
     }
@@ -56,6 +60,9 @@ internal partial class RecorderView
         host.Committed -= OnEditorCommitted;
         host.StartRequested -= OnEditorStart;
         host.SettingsRequested -= OnEditorSettings;
+        host.PauseRequested -= OnEditorPause;
+        host.ResumeRequested -= OnEditorResume;
+        host.StopRequested -= OnEditorStop;
         host.Dismissed -= OnEditorDismissed;
     }
 
@@ -96,18 +103,18 @@ internal partial class RecorderView
     }
 
     /// <summary>
-    /// Düzenleyiciyi duruma uydurur: hedef bölge değilse kapanır; kayıt, geri sayım ya da
-    /// tampon sürerken gizlenir (kayıt çerçevesi zaten görünüyor); boştayken kutulardaki
-    /// bölgeyle gösterilir.
+    /// Düzenleyiciyi duruma uydurur: hedef bölge değilse kapanır; tampon sürerken gizlenir;
+    /// geri sayım ve kayıt sürerken bölge kilitli, panelinde durdur (ve duraklat/sürdür)
+    /// görünür; boştayken kutulardaki bölgeyle düzenlenir.
     /// </summary>
     internal void SyncRegionEditor()
     {
         var region = RegionInBoxes();
-        switch (EditorWanted(EditingRegion, SelectedTarget == RecorderTargetKind.Region, region is not null,
-                    _session is not null || CountingDown || ReplayRunning))
+        switch (EditorWanted(EditingRegion, SelectedTarget == RecorderTargetKind.Region, region is not null, ReplayRunning))
         {
             case RegionEditorState.Shown:
-                _regionEditor.Show(region!.Value, RegionDraw.Ratio(SelectedAspect));
+                _regionEditor.Show(region!.Value, RegionDraw.Ratio(SelectedAspect),
+                    EditorPhase(_session is not null, State, CountingDown));
                 break;
             case RegionEditorState.Hidden:
                 _regionEditor.Hide();
@@ -123,6 +130,12 @@ internal partial class RecorderView
         => !editing || !targetIsRegion || !regionReadable ? RegionEditorState.Closed
             : busy ? RegionEditorState.Hidden
             : RegionEditorState.Shown;
+
+    internal static RegionEditorPhase EditorPhase(bool recording, RecorderState state, bool countingDown)
+        => countingDown ? RegionEditorPhase.Counting
+            : !recording ? RegionEditorPhase.Idle
+            : state == RecorderState.Paused ? RegionEditorPhase.Paused
+            : RegionEditorPhase.Running;
 
     /// <summary>Düzenleyiciyi kapatır; ana pencereye dokunmaz (uygulama kapanışı, hedef değişimi).</summary>
     internal void CloseRegionEditor()
@@ -141,6 +154,12 @@ internal partial class RecorderView
     }
 
     private async void OnEditorStart(object? sender, EventArgs e) => await StartAsync();
+
+    private async void OnEditorPause(object? sender, EventArgs e) => await PauseAsync();
+
+    private async void OnEditorResume(object? sender, EventArgs e) => await ResumeAsync();
+
+    private async void OnEditorStop(object? sender, EventArgs e) => await StopAsync();
 
     private void OnEditorSettings(object? sender, EventArgs e) => RestoreHostWindow();
 

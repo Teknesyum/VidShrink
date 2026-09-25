@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -30,7 +31,9 @@ namespace VidShrink.Tests;
 /// yazılmaması) <see cref="KayitFfmpegKoluTests"/>'te <c>ForSegment</c> üzerinden belirlemeci ve mutasyonla
 /// pimli; burada yalnız gerçek ffmpeg sürecinin bunu uyguladığı ölçülüyor.
 /// Kapanma süresi 1 ms verilen kayıt öldürülür ve yarım işaretlenir; öldürülen Matroska ffprobe'la okunur paket verir,
-/// öldürülen mp4 vermez — <see cref="RecorderArguments.SurvivesKill"/> tablosu davranışla ölçülür. Ölçülen:
+/// mp4 muxer'ının kendisi öldürülünce vermez — <see cref="RecorderArguments.SurvivesKill"/> tablosu davranışla ölçülür.
+/// Kaydedicinin MP4 teslimi o yüzden Matroska'ya yakalanıyor: aynı öldürme oturumdan geçince teslim edilen mp4
+/// okunur paket veriyor (<see cref="RecorderArguments.CapturesInMatroska"/>). Ölçülen:
 /// <c>-flush_packets 1</c> olmadan 7 sn'lik Matroska öldürülünce 0 bayt kalıyordu. Kanıt <c>.calisma/paket-2b/bolme/</c>.
 /// </summary>
 public sealed class KayitBolmeTests
@@ -76,6 +79,21 @@ public sealed class KayitBolmeTests
         return await oturum.StopAsync(1);
     }
 
+    private static async Task<int> HamMp4Oldur(string cikti)
+    {
+        var args = RecorderArguments.Build(Istek() with { MaxDuration = null, Container = RecorderContainer.Mp4, Region = new RecorderRegion(0, 0, 640, 480) }, cikti);
+        var psi = new ProcessStartInfo(ToolLocator.Ffmpeg) { RedirectStandardError = true, RedirectStandardOutput = true, RedirectStandardInput = true, UseShellExecute = false, CreateNoWindow = true };
+        foreach (var arg in args) psi.ArgumentList.Add(arg);
+        using var surec = Process.Start(psi)!;
+        var hata = surec.StandardError.ReadToEndAsync();
+        var cikis = surec.StandardOutput.ReadToEndAsync();
+        await Task.Delay(7000);
+        surec.Kill();
+        await surec.WaitForExitAsync();
+        await Task.WhenAll(hata, cikis);
+        return Oynar(cikti);
+    }
+
     private static async Task<RecordResult> Kaydet(RecorderRequest istek, string cikti)
     {
         var oturum = await RecorderSession.StartAsync(istek, cikti);
@@ -87,7 +105,7 @@ public sealed class KayitBolmeTests
     [KayitFact]
     public async Task BolmeSureSiniriniParcalaraDagitirYarimKayitIsaretlenir()
     {
-        Onceki("olcu.txt", "tek.mkv", "yarim.mkv", "yarim.mp4");
+        Onceki("olcu.txt", "tek.mkv", "yarim.mkv", "yarim.mp4", "ham.mp4");
         foreach (var eski in Directory.GetFiles(Kanit, "bolunmus*")) File.Delete(eski);
 
         var bolunmus = await Kaydet(Istek() with { Split = new RecorderSplit(TimeSpan.FromSeconds(2)) }, Path.Combine(Kanit, "bolunmus.mkv"));
@@ -96,13 +114,15 @@ public sealed class KayitBolmeTests
 
         var yarim = await Oldur(RecorderContainer.Mkv, Path.Combine(Kanit, "yarim.mkv"));
         var yarimMp4 = await Oldur(RecorderContainer.Mp4, Path.Combine(Kanit, "yarim.mp4"));
+        var ham = await HamMp4Oldur(Path.Combine(Kanit, "ham.mp4"));
 
         File.WriteAllLines(Path.Combine(Kanit, "olcu.txt"), new[]
         {
             $"bolunmus ok={bolunmus.Ok} partial={bolunmus.Partial} parca={bolunmus.Segments} sureler={string.Join(' ', parcaSureleri.Select(s => s.ToString("0.###", CultureInfo.InvariantCulture)))} toplam={parcaSureleri.Sum().ToString("0.###", CultureInfo.InvariantCulture)}",
             $"tek ok={tek.Ok} parca={tek.Segments} sure={(File.Exists(tek.OutputPath) ? Sure(tek.OutputPath) : double.NaN).ToString("0.###", CultureInfo.InvariantCulture)}",
             $"yarim ok={yarim.Ok} partial={yarim.Partial} cikis={yarim.ExitCode} dosya={File.Exists(yarim.OutputPath)} paket={Oynar(yarim.OutputPath)}",
-            $"yarim mp4 ok={yarimMp4.Ok} partial={yarimMp4.Partial} cikis={yarimMp4.ExitCode} dosya={File.Exists(yarimMp4.OutputPath)} paket={Oynar(yarimMp4.OutputPath)}"
+            $"yarim mp4 ok={yarimMp4.Ok} partial={yarimMp4.Partial} cikis={yarimMp4.ExitCode} dosya={File.Exists(yarimMp4.OutputPath)} paket={Oynar(yarimMp4.OutputPath)}",
+            $"ham mp4 paket={ham}"
         });
 
         Assert.True(bolunmus.Ok, bolunmus.StandardError);
@@ -121,12 +141,15 @@ public sealed class KayitBolmeTests
         Assert.False(yarim.Ok);
         Assert.True(Oynar(yarim.OutputPath) > 15, "oldurulen mkv oynamiyor");
         Assert.True(yarimMp4.Partial);
-        Assert.Equal(0, Oynar(yarimMp4.OutputPath));
+        Assert.EndsWith(".mp4", yarimMp4.OutputPath, StringComparison.Ordinal);
+        Assert.True(Oynar(yarimMp4.OutputPath) > 15, "oldurulen mp4 teslimi oynamiyor");
+        Assert.Contains("mp4", KaydediciOnizlemeTests.Probe(yarimMp4.OutputPath, "format=format_name"), StringComparison.Ordinal);
+        Assert.Equal(0, ham);
         Assert.Equal(Oynar(yarim.OutputPath) > 0, RecorderArguments.SurvivesKill(RecorderContainer.Mkv));
-        Assert.Equal(Oynar(yarimMp4.OutputPath) > 0, RecorderArguments.SurvivesKill(RecorderContainer.Mp4));
+        Assert.Equal(ham > 0, RecorderArguments.SurvivesKill(RecorderContainer.Mp4));
 
         Kapat((bolunmus.Files ?? Array.Empty<string>()).Select(Path.GetFileName)
-            .Concat(new[] { "olcu.txt", "bolunmus.mkv", "tek.mkv", "yarim.mkv", "yarim.mp4" }).ToArray()!);
+            .Concat(new[] { "olcu.txt", "bolunmus.mkv", "tek.mkv", "yarim.mkv", "yarim.mp4", "ham.mp4" }).ToArray()!);
     }
 
 }

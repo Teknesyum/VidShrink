@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Avalonia;
@@ -51,7 +51,7 @@ public sealed class KayitSonucVurguTests
 
     private static string Kayit()
     {
-        var dosya = Path.Combine(Klasor(), "kayit.mkv");
+        var dosya = Path.Combine(Klasor(), "kayit.mp4");
         File.WriteAllBytes(dosya, new byte[4096]);
         return dosya;
     }
@@ -160,7 +160,7 @@ public sealed class KayitSonucVurguTests
 
         Assert.True(Math.Abs(esitKucult - esitKlasor) < 0.1, $"eşit fırçada fark {esitKucult:0.000} / {esitKlasor:0.000}");
 
-        Kapat("olcu.txt", "kayit.mkv", "kucult.png", "klasor.png", "paylas.png", "esit-kucult.png", "esit-klasor.png");
+        Kapat("olcu.txt", "kayit.mp4", "kucult.png", "klasor.png", "paylas.png", "esit-kucult.png", "esit-klasor.png");
     }
 
     private sealed class SahteSaglayici : IShareProvider
@@ -184,6 +184,42 @@ public sealed class KayitSonucVurguTests
 
         public Task<ShareResult> DeleteAsync(ShareLink link, CancellationToken cancellationToken = default)
             => Task.FromResult(ShareResult.Success(link));
+    }
+
+    /// <summary>
+    /// Varsayılan kap MP4: teslim edilen <c>.mp4</c> son kayıt olur, "Küçült'e gönder" izleyicisine aynı yol gider ve
+    /// "MP4 olarak kaydet" gizli kalır. Olumsuz kontrol: aynı akışta <c>.mkv</c> teslimi düğmeyi gösterir.
+    /// </summary>
+    [Fact]
+    public void Mp4TeslimiSonKayitOlurVeIzleyiciyeGider()
+    {
+        var mkv = Path.Combine(Klasor(), "kayit-olcu.mkv");
+        File.WriteAllBytes(mkv, new byte[16]);
+        var (izlenen, mp4Dugmesi, mkvDugmesi, beklenen) = AppHost.Run(() =>
+        {
+            var view = new RecorderView { SkipAutoMeasure = true };
+            var window = new Window { Width = 1100, Height = 900, Content = view };
+            window.Show();
+            try
+            {
+                var gelen = new List<string>();
+                view.RevealFolder = _ => { };
+                view.RecordingDelivered = yol => { gelen.Add(yol); return Task.CompletedTask; };
+                var dosya = Kayit();
+                view.Deliver(new RecordResult(true, dosya, 1, false, 0, string.Empty, 1));
+                var mp4 = view.Mp4Visible;
+                view.Deliver(new RecordResult(true, mkv, 1, false, 0, string.Empty, 1));
+                return (gelen, mp4, view.Mp4Visible, dosya);
+            }
+            finally { window.Close(); }
+        });
+
+        Assert.EndsWith(".mp4", beklenen);
+        Assert.Equal(new[] { beklenen, mkv }, izlenen);
+        Assert.False(mp4Dugmesi);
+        Assert.True(mkvDugmesi);
+
+        Kapat("kayit.mp4", "kayit-olcu.mkv");
     }
 
     /// <summary>
@@ -233,7 +269,7 @@ public sealed class KayitSonucVurguTests
                     Thread.Sleep(10);
                 }
 
-                return (disarida, saglayici?.Yuklenen.ToList() ?? new List<string>(), view.ShareLinkText, Path.Combine(Klasor(), "kayit.mkv"));
+                return (disarida, saglayici?.Yuklenen.ToList() ?? new List<string>(), view.ShareLinkText, Path.Combine(Klasor(), "kayit.mp4"));
             }
             finally { window.Close(); }
         });
@@ -248,6 +284,6 @@ public sealed class KayitSonucVurguTests
         Assert.Equal(new[] { beklenen }, yuklenen);
         Assert.Equal("https://ornek.test/f1", baglanti);
 
-        Kapat("paylas.txt", "paylasimlar.json", "kayit.mkv");
+        Kapat("paylas.txt", "paylasimlar.json", "kayit.mp4");
     }
 }
