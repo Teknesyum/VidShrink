@@ -75,12 +75,25 @@ jobs:
       # Tek is 75 dakikayi asiyordu. 35852667687'de ana 55 dk (toplam 3293 sn), bunun 1046 sn'si
       # alti UstSeritTik kolu; o sinif kendi parcasinda. Yerlesim denetimi uc parcada 3-5 dk;
       # ucuncu parca tumleyen suzgectir, yeni eklenen denetim metodu hicbir parcanin disinda kalmaz.
+      # Ana parca ci.yml ile ayni dort harf grubuna bolundu (36035794976: 46 dk -> ~14 dk).
       matrix:
         include:
-          - parca: ana
-            filter: 'FullyQualifiedName!~YerlesimDenetimiTests&FullyQualifiedName!~UstSeritTikTests'
-            minimum: 1143
-            skipped: 30
+          - parca: ana-gad
+            filter: 'FullyQualifiedName~VidShrink.Tests.G|FullyQualifiedName~VidShrink.Tests.A|FullyQualifiedName~VidShrink.Tests.D'
+            minimum: 390
+            skipped: 10
+          - parca: ana-kp
+            filter: 'FullyQualifiedName~VidShrink.Tests.K|FullyQualifiedName~VidShrink.Tests.P'
+            minimum: 900
+            skipped: 12
+          - parca: ana-ow
+            filter: 'FullyQualifiedName~VidShrink.Tests.O|FullyQualifiedName~VidShrink.Tests.W'
+            minimum: 400
+            skipped: 10
+          - parca: ana-kalan
+            filter: 'FullyQualifiedName!~VidShrink.Tests.G&FullyQualifiedName!~VidShrink.Tests.A&FullyQualifiedName!~VidShrink.Tests.D&FullyQualifiedName!~VidShrink.Tests.K&FullyQualifiedName!~VidShrink.Tests.P&FullyQualifiedName!~VidShrink.Tests.O&FullyQualifiedName!~VidShrink.Tests.W&FullyQualifiedName!~YerlesimDenetimiTests&FullyQualifiedName!~UstSeritTikTests'
+            minimum: 2200
+            skipped: 25
           - parca: ust-serit
             filter: 'FullyQualifiedName~UstSeritTikTests'
             minimum: 6
