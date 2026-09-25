@@ -20,6 +20,10 @@ ship as part of it.
 - While recording, the region editor's toolbar shows stop and pause/resume, using the
   recorder's own stop path; during the countdown stop cancels it.
 
+### Fixed
+- A recording killed within its first seconds no longer leaves a header-only Matroska file:
+  the muxer now closes a cluster every 500 ms (`-cluster_time_limit`) instead of every 5 s.
+
 ## [0.9.3] - 2026-09-25
 
 ### Fixed

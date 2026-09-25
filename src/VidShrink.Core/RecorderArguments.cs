@@ -477,7 +477,9 @@ public static class RecorderArguments
     /// Matroska: mp4/mov muxer'i <c>moov</c> atomunu kapanista yaziyor. Matroska da ancak
     /// <c>-flush_packets 1</c> ile: bayraksiz 640x480 gdigrab kaydi 7 sn sonra olduruldugunde
     /// ffmpeg 79 KiB bildirirken dosya 0 bayt kaldi, bayrakla 80 KiB ve 76 okunur paket
-    /// (<c>KayitBolmeTests</c>).
+    /// (<c>KayitBolmeTests</c>). Bayrak da yetmiyor: muxer kumeyi (cluster) 5 sn tutuyor,
+    /// 3 sn'de oldurulen kayit 582 baytlik basliktan ibaretti; <c>-cluster_time_limit 500</c>
+    /// ile ayni oldurme 12 okunur paket birakti (<c>KayitMotoruTests</c>).
     /// </summary>
     public static bool SurvivesKill(RecorderContainer container) => container == RecorderContainer.Mkv;
 
@@ -1035,7 +1037,7 @@ public static class RecorderArguments
         if (request.Container is RecorderContainer.Mp4 or RecorderContainer.Mov)
             a.AddRange(new[] { "-movflags", "+faststart" });
         else if (request.Container == RecorderContainer.Mkv)
-            a.AddRange(new[] { "-flush_packets", "1" });
+            a.AddRange(new[] { "-flush_packets", "1", "-cluster_time_limit", "500" });
 
         a.Add(outputPath);
         a.AddRange(PreviewArgs(request));

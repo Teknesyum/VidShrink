@@ -383,8 +383,9 @@ public sealed class KayitMotoruTests
     }
 
     /// <summary>
-    /// Negatif kontrol: nazik durdurmaya sure taninmazsa surec oldurulur, mux kapanmaz ve
-    /// dosya ffprobe'ta bozuk cikar. <c>q</c> ile kapanan ayni kayit okunuyordu.
+    /// Nazik durdurmaya sure taninmazsa surec oldurulur. MP4 Matroska'ya yakalandigi icin
+    /// oldurulen kayit yine de yarim isaretli, oynatilabilir bir mp4 olarak teslim edilir;
+    /// ham mp4 muxer'inin 0 paket biraktigi negatif kontrol <c>KayitBolmeTests</c>'te.
     /// </summary>
     [KayitFact]
     public async Task ZamanAsiminaDusenDurdurmaYarimDosyaBirakir()
@@ -399,8 +400,10 @@ public sealed class KayitMotoruTests
 
         Assert.True(sonuc.Partial, "oldurulen kayit yarim isaretlenmeli");
         Assert.False(sonuc.Ok);
-        Assert.NotEqual(0, kod);
-        Assert.True(kod != 0 || !metin.Contains("codec_type=video"), "yarim dosya oynatilabilir sayilmaz");
+        Assert.Equal(cikti, sonuc.OutputPath);
+        Assert.Equal(0, kod);
+        Assert.Contains("codec_type=video", metin);
+        Assert.False(File.Exists(RecorderArguments.MatroskaCapturePath(cikti)), "yakalama dosyasi teslimden sonra kalmamali");
 
         KayitKanit.Kapat("oldurulen.mp4", "oldurulen.ffprobe.txt");
     }

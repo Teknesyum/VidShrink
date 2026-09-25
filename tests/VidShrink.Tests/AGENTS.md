@@ -31,7 +31,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
 - `KayitMotoruTests.cs` — 8a dalgası, ekran kaydı motoru: üç platformun yakalama argümanı (gdigrab/avfoundation/x11grab),
   `-nostdin` verilmediğinin pimi, negatif kontroller (uydurma kodek, kırpmasız macOS pencere, tek sayılı bölge). Canlı kol
   `[KayitFact]` ile gdigrab'a bağlı: 5 sn'lik gerçek kayıt, `q` ile kapanan dosya ffprobe'ta okunur, zaman aşımında
-  öldürülen dosya bozuk çıkar, duraklatılan kayıt iki parçadan birleşir. Kanıt `.calisma/dalga8a/`.
+  öldürülen kayıt yarım işaretli ama Matroska yakalamasından oynatılabilir mp4 olarak kalır, duraklatılan kayıt iki parçadan birleşir. Kanıt `.calisma/dalga8a/`.
 - `SesGirisiTests.cs` — 8c dalgası, ses girişi: pimli ffmpeg çıktısı üzerinden cihaz listesi ayrıştırması, dshow/
   avfoundation/pulse argümanları, iki girdide `amix`, uydurma cihaz adının negatif kontrolü. İki canlı kol gerçek
   cihaz ister. Kanıt `.calisma/dalga8c/`.
