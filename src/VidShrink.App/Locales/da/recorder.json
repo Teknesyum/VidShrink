@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Den skrevne størrelse opdateres ikke, mens optagelsen kører; den kommer først, når optagelsen er slut.",
   "recorder.mini.title": "Optagelsesstyring, kompakt",
   "recorder.mini.shrink": "Formindsk til den kompakte bjælke",
+  "recorder.mini.offer": "Mini-optager",
+  "recorder.mini.region": "Vælg område",
   "recorder.mini.expand": "Tilbage til hele vinduet",
   "recorder.mini.drag-hint": "Træk bjælken i dens tæller",
   "recorder.mini.in-frame": "Der er ikke valgt noget område, så den kompakte bjælke har ingen plads uden for billedet og kommer med i optagelsen.",

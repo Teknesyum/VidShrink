@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "書き込まれたサイズは録画中には更新されず、録画が終了したときに表示されます。",
   "recorder.mini.title": "録画コントロール（小）",
   "recorder.mini.shrink": "小さいバーに縮小",
+  "recorder.mini.offer": "ミニ録画",
+  "recorder.mini.region": "範囲を選択",
   "recorder.mini.expand": "全画面ウィンドウに戻る",
   "recorder.mini.drag-hint": "バーはカウンターをつかんでドラッグします",
   "recorder.mini.in-frame": "領域が選択されていないため、小さいバーを画角の外に置く場所がなく、録画に写り込みます。",

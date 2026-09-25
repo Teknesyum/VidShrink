@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Die geschriebene Größe wird während der Aufnahme nicht aktualisiert; sie erscheint erst, wenn die Aufnahme endet.",
   "recorder.mini.title": "Aufnahmesteuerung, kompakt",
   "recorder.mini.shrink": "Auf die kompakte Leiste verkleinern",
+  "recorder.mini.offer": "Mini-Rekorder",
+  "recorder.mini.region": "Bereich wählen",
   "recorder.mini.expand": "Zurück zum vollen Fenster",
   "recorder.mini.drag-hint": "Die Leiste am Zähler ziehen",
   "recorder.mini.in-frame": "Es ist kein Bereich ausgewählt, daher hat die kompakte Leiste keinen Platz außerhalb des Bildausschnitts und erscheint in der Aufnahme.",

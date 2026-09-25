@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Zapisana velikost se ne prikazuje sproti med snemanjem; pojavi se šele, ko se snemanje konča.",
   "recorder.mini.title": "Nadzor snemanja, strnjen",
   "recorder.mini.shrink": "Pomanjšaj v strnjeno vrstico",
+  "recorder.mini.offer": "Mini snemalnik",
+  "recorder.mini.region": "Izberi območje",
   "recorder.mini.expand": "Nazaj na celotno okno",
   "recorder.mini.drag-hint": "Vrstico vlecite za njen števec",
   "recorder.mini.in-frame": "Nobeno območje ni izbrano, zato strnjena vrstica nima kam zunaj kadra in se bo pojavila v posnetku.",

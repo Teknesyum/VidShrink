@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Zapsaná velikost se během nahrávání neaktualizuje; objeví se až po jeho skončení.",
   "recorder.mini.title": "Ovládání nahrávání, kompaktní",
   "recorder.mini.shrink": "Zmenšit na kompaktní lištu",
+  "recorder.mini.offer": "Mini nahrávání",
+  "recorder.mini.region": "Vybrat oblast",
   "recorder.mini.expand": "Zpět na celé okno",
   "recorder.mini.drag-hint": "Lištu táhněte za počitadlo",
   "recorder.mini.in-frame": "Není vybrána žádná oblast, takže kompaktní lišta nemá kam mimo záběr ustoupit a objeví se v nahrávce.",

@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "A kiírt méret nem frissül a felvétel közben; csak a felvétel végén jelenik meg.",
   "recorder.mini.title": "Felvételi vezérlők, kicsinyítve",
   "recorder.mini.shrink": "Kicsinyítés a kis sávra",
+  "recorder.mini.offer": "Mini felvevő",
+  "recorder.mini.region": "Terület kijelölése",
   "recorder.mini.expand": "Vissza a teljes ablakra",
   "recorder.mini.drag-hint": "A sávot a számlálójánál fogva húzza",
   "recorder.mini.in-frame": "Nincs kijelölt terület, így a kis sávnak nincs hová kerülnie a képkivágáson kívül, és rákerül a felvételre.",

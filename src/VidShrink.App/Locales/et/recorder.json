@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Kirjutatud suurus ei uuene salvestuse ajal; see ilmub alles pärast salvestuse lõppu.",
   "recorder.mini.title": "Salvestuse juhtnupud, kompaktsed",
   "recorder.mini.shrink": "Vähenda kompaktseks ribaks",
+  "recorder.mini.offer": "Minisalvesti",
+  "recorder.mini.region": "Vali ala",
   "recorder.mini.expand": "Tagasi täisaknasse",
   "recorder.mini.drag-hint": "Lohista riba loendurist",
   "recorder.mini.in-frame": "Ala pole valitud, seega pole kompaktsel ribal kaadrist väljaspool kohta ja see jääb salvestusse.",

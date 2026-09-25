@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Saiz yang ditulis tidak menstrim semasa rakaman berjalan; ia tiba selepas rakaman tamat.",
   "recorder.mini.title": "Kawalan rakaman, ringkas",
   "recorder.mini.shrink": "Kecilkan ke bar ringkas",
+  "recorder.mini.offer": "Perakam mini",
+  "recorder.mini.region": "Pilih kawasan",
   "recorder.mini.expand": "Kembali ke tetingkap penuh",
   "recorder.mini.drag-hint": "Seret bar pada pembilangnya",
   "recorder.mini.in-frame": "Tiada kawasan dipilih, jadi bar ringkas tiada tempat di luar bingkai dan akan muncul dalam rakaman.",

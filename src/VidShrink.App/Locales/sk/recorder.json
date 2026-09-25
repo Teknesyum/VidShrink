@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Zapísaná veľkosť sa počas nahrávania neprenáša priebežne; zobrazí sa až po skončení nahrávania.",
   "recorder.mini.title": "Ovládanie nahrávania, kompaktné",
   "recorder.mini.shrink": "Zmenšiť na kompaktný pruh",
+  "recorder.mini.offer": "Mini nahrávanie",
+  "recorder.mini.region": "Vybrať oblasť",
   "recorder.mini.expand": "Späť na celé okno",
   "recorder.mini.drag-hint": "Pruh ťahajte za počítadlo",
   "recorder.mini.in-frame": "Nie je vybratá žiadna oblasť, takže kompaktný pruh nemá kam mimo záberu a objaví sa v nahrávke.",

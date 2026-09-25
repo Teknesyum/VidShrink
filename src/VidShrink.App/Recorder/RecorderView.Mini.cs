@@ -79,6 +79,7 @@ internal partial class RecorderView
         _mini.ToggleRequested += async (_, _) => await ToggleAsync();
         _mini.StopRequested += async (_, _) => await StopAsync();
         _mini.ExpandRequested += (_, _) => ExpandFromMini();
+        _mini.RegionRequested += async (_, _) => await DrawFromMiniAsync();
         _mini.OptionChanged += (_, option) => ApplyMiniOption(option);
         _mini.Closed += (_, _) => ExpandFromMini();
         _mini.AddHandler(KeyDownEvent, OnHotkey, RoutingStrategies.Tunnel);
@@ -93,6 +94,29 @@ internal partial class RecorderView
         RefreshMini();
 
         owner?.Hide();
+    }
+
+    /// <summary>
+    /// Şeritten bölge çizimi: şerit çizim sürerken saklanıyor, sonra yeni kadrajın dışına
+    /// yeniden konuyor. Ana pencere gizli kalıyor.
+    /// </summary>
+    internal async System.Threading.Tasks.Task<bool> DrawFromMiniAsync()
+    {
+        var mini = _mini;
+        if (mini is null) return false;
+
+        mini.Hide();
+        try { return await DrawRegionAsync(); }
+        finally
+        {
+            if (ReferenceEquals(_mini, mini))
+            {
+                mini.Show();
+                var region = FrameRegion();
+                MiniInFrame = region is null;
+                mini.PlaceOutside(region);
+            }
+        }
     }
 
     /// <summary>Mini kipi kapatır ve ana pencereyi geri getirir.</summary>

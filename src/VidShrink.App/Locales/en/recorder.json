@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "The written size does not stream while the recording runs; it arrives once the recording ends.",
   "recorder.mini.title": "Recording controls, compact",
   "recorder.mini.shrink": "Shrink to the compact bar",
+  "recorder.mini.offer": "Mini recorder",
+  "recorder.mini.region": "Select region",
   "recorder.mini.expand": "Back to the full window",
   "recorder.mini.drag-hint": "Drag the bar by its counter",
   "recorder.mini.in-frame": "No region is selected, so the compact bar has nowhere outside the frame to sit and will appear in the recording.",

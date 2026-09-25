@@ -111,6 +111,49 @@ public sealed class KaydediciSeciciTests
     }
 
     /// <summary>
+    /// Mini şeritteki Bölge seç düğmesi çizimi açar: çizim sürerken şerit gizli, sonra şerit
+    /// açık kalır ve bölge kutulara yazılır. Kayıt sürerken düğme görünmez.
+    /// </summary>
+    [Fact]
+    public void MiniSerittenBolgeCizilirSeritAcikKalir()
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            bool? cizerkenGorunur = null;
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+            view.ShrinkToMini();
+            var mini = view.Mini!;
+            view.DrawRegion = _ =>
+            {
+                cizerkenGorunur = mini.IsVisible;
+                return Task.FromResult<PixelRect?>(new PixelRect(100, 50, 641, 361));
+            };
+            var bostaDugme = mini.BtnRegion.IsVisible;
+            mini.BtnRegion.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var sonra = (acik: view.MiniOpen, gorunur: mini.IsVisible, genislik: Bul<TextBox>(view, "TxtRegionWidth").Text);
+            mini.Follow(VidShrink.Ffmpeg.RecorderState.Running, "00:00:01");
+            var kayittaDugme = mini.BtnRegion.IsVisible;
+            view.ExpandFromMini();
+            return (bostaDugme, cizerkenGorunur, sonra, kayittaDugme);
+        }));
+
+        File.WriteAllLines(Path.Combine(Kanit, "mini-bolge.txt"), new[]
+        {
+            $"bosta dugme={olcu.bostaDugme} cizerken serit gorunur={olcu.cizerkenGorunur}",
+            $"sonra: mini acik={olcu.sonra.acik} gorunur={olcu.sonra.gorunur} genislik={olcu.sonra.genislik}",
+            $"kayitta dugme={olcu.kayittaDugme}"
+        });
+
+        Assert.True(olcu.bostaDugme);
+        Assert.False(olcu.cizerkenGorunur);
+        Assert.Equal((true, true, "640"), olcu.sonra);
+        Assert.False(olcu.kayittaDugme);
+
+        Kapat("mini-bolge.txt");
+    }
+
+    /// <summary>
     /// Hazir boyut listesi ve cizim penceresinin olcu etiketi ailenin cozunurluk
     /// yazimini kullanir. Ikisi de <c>"{0} × {1}"</c> ile bosluklu yaziyordu; ayni
     /// uygulamanin kaynak bilgisi ve oynaticisi ayni seyi bosluksuz yaziyor. Sifir

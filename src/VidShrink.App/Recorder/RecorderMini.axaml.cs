@@ -49,6 +49,8 @@ internal partial class RecorderMini : Window
 
     internal event EventHandler? ExpandRequested;
 
+    internal event EventHandler? RegionRequested;
+
     internal event EventHandler<MiniOption>? OptionChanged;
 
     private bool _showingOptions;
@@ -104,6 +106,7 @@ internal partial class RecorderMini : Window
         LiveDot.IsVisible = running;
 
         BtnStop.IsVisible = running || paused || counting;
+        BtnRegion.IsVisible = !BtnStop.IsVisible;
 
         if (this.FindResource(running ? "IconPause" : "IconPlay") is Geometry glyph)
             ToggleGlyph.Data = glyph;
@@ -161,4 +164,6 @@ internal partial class RecorderMini : Window
     private void OnStop(object? sender, RoutedEventArgs e) => StopRequested?.Invoke(this, EventArgs.Empty);
 
     private void OnExpand(object? sender, RoutedEventArgs e) => ExpandRequested?.Invoke(this, EventArgs.Empty);
+
+    private void OnRegion(object? sender, RoutedEventArgs e) => RegionRequested?.Invoke(this, EventArgs.Empty);
 }

@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "El tamaño escrito no se actualiza mientras la grabación está en curso; aparece cuando la grabación termina.",
   "recorder.mini.title": "Controles de grabación, compactos",
   "recorder.mini.shrink": "Reducir a la barra compacta",
+  "recorder.mini.offer": "Minigrabadora",
+  "recorder.mini.region": "Elegir región",
   "recorder.mini.expand": "Volver a la ventana completa",
   "recorder.mini.drag-hint": "Arrastra la barra por su contador",
   "recorder.mini.in-frame": "No hay ninguna región seleccionada, así que la barra compacta no tiene dónde situarse fuera del encuadre y aparecerá en la grabación.",

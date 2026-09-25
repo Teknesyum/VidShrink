@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Įrašytas dydis nesrautinamas, kol vyksta įrašymas; jis atsiranda tik įrašymui pasibaigus.",
   "recorder.mini.title": "Įrašymo valdikliai, sumažinti",
   "recorder.mini.shrink": "Sumažinti iki mažos juostos",
+  "recorder.mini.offer": "Mini įrašiklis",
+  "recorder.mini.region": "Pasirinkti sritį",
   "recorder.mini.expand": "Grįžti į visą langą",
   "recorder.mini.drag-hint": "Juostą tempkite už skaitiklio",
   "recorder.mini.in-frame": "Sritis nepasirinkta, todėl mažai juostai nėra vietos už kadro ribų ir ji pateks į įrašą.",

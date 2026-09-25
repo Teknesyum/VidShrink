@@ -20,12 +20,12 @@ public class MiniKipTests
         => File.ReadAllText(Path.Combine(TipSources.Root, Path.Combine(parca))).Replace("\r\n", "\n");
 
     /// <summary>
-    /// Şeritte yalnız kayıt sürerken anlamı olan öğeler var: nokta, sayaç, tek düğmeye
-    /// indirilmiş başlat/duraklat, durdur, büyüt. Kare ve düşen kare okumaları büyük
+    /// Şeritte yalnız kaydın temel öğeleri var: nokta, sayaç, kayıt yokken bölge seçimi, ayarlar,
+    /// tek düğmeye indirilmiş başlat/duraklat, durdur, büyüt. Kare ve düşen kare okumaları büyük
     /// pencerede kalıyor — sahadaki hiçbir kompakt yüzeyde ikiden fazla okuma yok.
     /// </summary>
     [Fact]
-    public void SeritteYalnizBesOgeVar()
+    public void SeritteYalnizTemelOgelerVar()
     {
         var mini = Oku("src", "VidShrink.App", "Recorder", "RecorderMini.axaml");
 
@@ -35,13 +35,14 @@ public class MiniKipTests
         Assert.Contains("x:Name=\"BtnStop\"", mini);
         Assert.Contains("x:Name=\"BtnExpand\"", mini);
         Assert.Contains("x:Name=\"BtnOptions\"", mini);
+        Assert.Contains("x:Name=\"BtnRegion\"", mini);
 
         Assert.DoesNotContain("TxtFrames", mini);
         Assert.DoesNotContain("TxtDropped", mini);
         Assert.DoesNotContain("CmbTarget", mini);
         Assert.DoesNotContain("ResultPanel", mini);
 
-        Assert.Equal(4, mini.Split("x:Name=\"Btn").Length - 1);
+        Assert.Equal(5, mini.Split("x:Name=\"Btn").Length - 1);
     }
 
     /// <summary>Üç ölçü de belirteçten okunuyor; XAML'a sayı yazılmıyor.</summary>

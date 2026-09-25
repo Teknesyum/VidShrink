@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Ukubwa ulioandikwa haujitokezi wakati kurekodi kunaendelea; hufika mara kurekodi kunapomalizika.",
   "recorder.mini.title": "Vidhibiti vya kurekodi, vifupi",
   "recorder.mini.shrink": "Punguza hadi upau mfupi",
+  "recorder.mini.offer": "Kinasa kidogo",
+  "recorder.mini.region": "Chagua eneo",
   "recorder.mini.expand": "Rudi kwenye dirisha kamili",
   "recorder.mini.drag-hint": "Buruta upau kwa kihesabu chake",
   "recorder.mini.in-frame": "Hakuna eneo lililochaguliwa, kwa hivyo upau mfupi hauna nafasi nje ya fremu na utaonekana kwenye rekodi.",

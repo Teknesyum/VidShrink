@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "La taille écrite ne s'affiche pas pendant l'enregistrement ; elle apparaît une fois l'enregistrement terminé.",
   "recorder.mini.title": "Commandes d'enregistrement, compactes",
   "recorder.mini.shrink": "Réduire à la barre compacte",
+  "recorder.mini.offer": "Mini-enregistreur",
+  "recorder.mini.region": "Choisir une zone",
   "recorder.mini.expand": "Revenir à la fenêtre complète",
   "recorder.mini.drag-hint": "Faites glisser la barre par son compteur",
   "recorder.mini.in-frame": "Aucune région n'est sélectionnée, la barre compacte n'a donc nulle part où se placer hors du cadre et apparaîtra dans l'enregistrement.",

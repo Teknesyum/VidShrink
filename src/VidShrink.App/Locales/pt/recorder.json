@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "O tamanho gravado não é transmitido enquanto a gravação está em andamento; ele chega assim que a gravação termina.",
   "recorder.mini.title": "Controles de gravação, compactos",
   "recorder.mini.shrink": "Reduzir para a barra compacta",
+  "recorder.mini.offer": "Minigravador",
+  "recorder.mini.region": "Escolher região",
   "recorder.mini.expand": "Voltar para a janela inteira",
   "recorder.mini.drag-hint": "Arraste a barra pelo contador",
   "recorder.mini.in-frame": "Nenhuma região está selecionada, então a barra compacta não tem onde ficar fora do enquadramento e aparecerá na gravação.",

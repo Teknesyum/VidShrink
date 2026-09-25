@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "录制进行时不会实时显示已写入的大小；只有在录制结束后才会出现。",
   "recorder.mini.title": "录制控制（精简）",
   "recorder.mini.shrink": "缩小为精简条",
+  "recorder.mini.offer": "迷你录制",
+  "recorder.mini.region": "选择区域",
   "recorder.mini.expand": "返回完整窗口",
   "recorder.mini.drag-hint": "拖动计时器可移动精简条",
   "recorder.mini.in-frame": "尚未选择区域，精简条无处安放在画面之外，会被录进画面。",

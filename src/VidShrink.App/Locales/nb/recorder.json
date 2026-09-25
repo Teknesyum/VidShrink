@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Den skrevne størrelsen strømmes ikke mens opptaket pågår; den kommer først når opptaket er ferdig.",
   "recorder.mini.title": "Opptakskontroller, kompakt",
   "recorder.mini.shrink": "Krymp til den kompakte linjen",
+  "recorder.mini.offer": "Miniopptaker",
+  "recorder.mini.region": "Velg område",
   "recorder.mini.expand": "Tilbake til hele vinduet",
   "recorder.mini.drag-hint": "Dra linjen i telleren",
   "recorder.mini.in-frame": "Ingen område er valgt, så den kompakte linjen har ingen plass utenfor bildet og kommer med i opptaket.",

@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Kích thước đã ghi không hiển thị trong khi ghi hình đang diễn ra; nó chỉ xuất hiện khi việc ghi hình kết thúc.",
   "recorder.mini.title": "Điều khiển ghi hình, thu gọn",
   "recorder.mini.shrink": "Thu gọn thành thanh nhỏ",
+  "recorder.mini.offer": "Trình ghi mini",
+  "recorder.mini.region": "Chọn vùng",
   "recorder.mini.expand": "Trở lại cửa sổ đầy đủ",
   "recorder.mini.drag-hint": "Kéo thanh bằng bộ đếm của nó",
   "recorder.mini.in-frame": "Chưa chọn vùng nào, nên thanh nhỏ không có chỗ đứng ngoài khung hình và sẽ lọt vào bản ghi.",

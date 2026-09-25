@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Ukuran yang ditulis tidak diperbarui saat perekaman berlangsung; ukuran baru muncul setelah perekaman selesai.",
   "recorder.mini.title": "Kontrol perekaman, ringkas",
   "recorder.mini.shrink": "Ciutkan ke bilah ringkas",
+  "recorder.mini.offer": "Perekam mini",
+  "recorder.mini.region": "Pilih area",
   "recorder.mini.expand": "Kembali ke jendela penuh",
   "recorder.mini.drag-hint": "Seret bilah dari penghitungnya",
   "recorder.mini.in-frame": "Tidak ada wilayah yang dipilih, sehingga bilah ringkas tidak punya tempat di luar bingkai dan akan ikut terekam.",

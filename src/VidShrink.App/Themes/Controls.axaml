@@ -467,6 +467,17 @@
         </Style>
       </ControlTheme>
 
+      <ControlTheme x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+        <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+        <Style Selector="^ /template/ Border#Root">
+          <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Root">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
+      </ControlTheme>
+
       <ControlTheme x:Key="TitleBarSupportButton" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
         <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
         <Style Selector="^:pressed /template/ Border#Root">

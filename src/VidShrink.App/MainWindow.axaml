@@ -1432,12 +1432,12 @@
                   <Grid x:Name="LanguageThemeRow" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
                     <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceSm}">
                       <TextBlock Text="{loc:Text settings-tab.language.label}" Theme="{StaticResource Label}"/>
-                      <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch"/>
+                      <ComboBox x:Name="CmbLanguage" Width="{StaticResource FieldWidth}" HorizontalAlignment="Left"/>
                       <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.language.hint}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
                       <TextBlock Text="{loc:Text settings-tab.theme.label}" Theme="{StaticResource Label}"/>
-                      <ComboBox x:Name="CmbTheme" HorizontalAlignment="Stretch"/>
+                      <ComboBox x:Name="CmbTheme" Width="{StaticResource FieldWidth}" HorizontalAlignment="Left"/>
                       <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.theme.hint}"/>
                     </StackPanel>
                   </Grid>

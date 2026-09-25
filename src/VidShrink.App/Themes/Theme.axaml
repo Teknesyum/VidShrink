@@ -278,6 +278,8 @@
   <x:Double x:Key="SliderThumbSize">20</x:Double>
   <x:Double x:Key="SliderMinWidth">200</x:Double>
   <x:Double x:Key="NumberBoxWidth">96</x:Double>
+  <x:Double x:Key="FieldWidth">280</x:Double>
+  <x:Double x:Key="FieldWidthSm">120</x:Double>
   <x:Double x:Key="TabIndicatorHeight">2</x:Double>
   <x:Double x:Key="ProgressBarHeight">8</x:Double>
   <x:Double x:Key="TitleBarHeight">30</x:Double>

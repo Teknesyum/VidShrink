@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "הגודל הכתוב אינו מתעדכן בזמן ההקלטה; הוא מופיע רק כשההקלטה מסתיימת.",
   "recorder.mini.title": "פקדי הקלטה, מוקטנים",
   "recorder.mini.shrink": "הקטנה לסרגל המוקטן",
+  "recorder.mini.offer": "מקליט מוקטן",
+  "recorder.mini.region": "בחירת אזור",
   "recorder.mini.expand": "חזרה לחלון המלא",
   "recorder.mini.drag-hint": "גרור את הסרגל באמצעות המונה שלו",
   "recorder.mini.in-frame": "לא נבחר אזור, ולכן לסרגל המוקטן אין מקום מחוץ לפריים והוא ייכנס להקלטה.",

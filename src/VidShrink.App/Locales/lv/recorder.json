@@ -14,6 +14,8 @@
   "recorder.strip.size-hint": "Ierakstītais izmērs nepārraidās, kamēr notiek ierakstīšana; tas parādās tikai pēc ierakstīšanas beigām.",
   "recorder.mini.title": "Ierakstīšanas vadīklas, kompaktas",
   "recorder.mini.shrink": "Samazināt līdz kompaktajai joslai",
+  "recorder.mini.offer": "Mini ierakstītājs",
+  "recorder.mini.region": "Izvēlēties apgabalu",
   "recorder.mini.expand": "Atpakaļ uz pilno logu",
   "recorder.mini.drag-hint": "Velciet joslu aiz tās skaitītāja",
   "recorder.mini.in-frame": "Nav izvēlēts neviens apgabals, tāpēc kompaktajai joslai nav vietas ārpus kadra un tā parādīsies ierakstā.",

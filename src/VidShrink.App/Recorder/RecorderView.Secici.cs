@@ -157,7 +157,7 @@ internal partial class RecorderView
     {
         if (_session is not null || CountingDown) return false;
 
-        var host = TopLevel.GetTopLevel(this) as Window;
+        var host = TopLevel.GetTopLevel(this) is Window { IsVisible: true } shown ? shown : null;
         var state = host?.WindowState ?? WindowState.Normal;
         if (host is not null) host.WindowState = WindowState.Minimized;
 
