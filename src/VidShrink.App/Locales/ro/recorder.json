@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "Înregistrarea nu s-a închis corect. Fișierul este pe disc, dar nu s-a putut verifica dacă poate fi redat. Este posibil să lipsească ultimele secunde.",
   "recorder.output.gif-failed": "GIF-ul nu a putut fi creat (ffmpeg s-a încheiat cu codul {0}). Înregistrarea a fost păstrată ca MKV.",
   "recorder.output.not-moved": "Fișierul nu a putut fi mutat la numele cerut; se află la calea afișată: {0}",
-  "recorder.replay.saved-mkv": "Ultimele secunde salvate ca MKV, memoria tampon nu poate scrie GIF: {0}"
+  "recorder.replay.saved-mkv": "Ultimele secunde salvate ca MKV, memoria tampon nu poate scrie GIF: {0}",
+  "recorder.region.title": "Editor de regiune",
+  "recorder.region.start": "Pornește înregistrarea",
+  "recorder.region.settings": "Setări",
+  "recorder.region.close": "Închide regiunea"
 }

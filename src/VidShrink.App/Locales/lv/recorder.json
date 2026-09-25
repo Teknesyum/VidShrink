@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "Ieraksts netika korekti aizvērts. Fails ir diskā, bet neizdevās pārbaudīt, vai to var atskaņot. Pēdējās sekundes var trūkt.",
   "recorder.output.gif-failed": "GIF neizdevās izveidot (ffmpeg beidza darbu ar kodu {0}). Ieraksts saglabāts kā MKV.",
   "recorder.output.not-moved": "Failu neizdevās pārvietot uz pieprasīto nosaukumu; tas atrodas parādītajā ceļā: {0}",
-  "recorder.replay.saved-mkv": "Pēdējās sekundes saglabātas kā MKV, buferis nevar rakstīt GIF: {0}"
+  "recorder.replay.saved-mkv": "Pēdējās sekundes saglabātas kā MKV, buferis nevar rakstīt GIF: {0}",
+  "recorder.region.title": "Apgabala redaktors",
+  "recorder.region.start": "Sākt ierakstu",
+  "recorder.region.settings": "Iestatījumi",
+  "recorder.region.close": "Aizvērt apgabalu"
 }

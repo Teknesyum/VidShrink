@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "A felvétel nem zárult le megfelelően. A fájl a lemezen van, de nem sikerült ellenőrizni, hogy lejátszható-e. Az utolsó másodpercek hiányozhatnak.",
   "recorder.output.gif-failed": "A GIF nem készült el (az ffmpeg {0} kóddal fejeződött be). A felvétel MKV-ként megmaradt.",
   "recorder.output.not-moved": "A fájlt nem sikerült a kért névre áthelyezni; a megjelenített útvonalon van: {0}",
-  "recorder.replay.saved-mkv": "Az utolsó másodpercek MKV-ként mentve, a puffer nem tud GIF-et írni: {0}"
+  "recorder.replay.saved-mkv": "Az utolsó másodpercek MKV-ként mentve, a puffer nem tud GIF-et írni: {0}",
+  "recorder.region.title": "Területszerkesztő",
+  "recorder.region.start": "Felvétel indítása",
+  "recorder.region.settings": "Beállítások",
+  "recorder.region.close": "Terület bezárása"
 }

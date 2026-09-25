@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "रिकॉर्डिंग ठीक से बंद नहीं हुई। फ़ाइल डिस्क पर है, लेकिन यह जाँचा नहीं जा सका कि वह चलती है या नहीं। अंतिम कुछ सेकंड गायब हो सकते हैं।",
   "recorder.output.gif-failed": "GIF नहीं बन सका (ffmpeg कोड {0} के साथ समाप्त हुआ)। रिकॉर्डिंग MKV के रूप में रखी गई।",
   "recorder.output.not-moved": "फ़ाइल को माँगे गए नाम पर नहीं ले जाया जा सका; वह दिखाए गए पथ पर है: {0}",
-  "recorder.replay.saved-mkv": "आखिरी सेकंड MKV के रूप में सहेजे गए, बफ़र GIF नहीं लिख सकता: {0}"
+  "recorder.replay.saved-mkv": "आखिरी सेकंड MKV के रूप में सहेजे गए, बफ़र GIF नहीं लिख सकता: {0}",
+  "recorder.region.title": "क्षेत्र संपादक",
+  "recorder.region.start": "रिकॉर्डिंग शुरू करें",
+  "recorder.region.settings": "सेटिंग्स",
+  "recorder.region.close": "क्षेत्र बंद करें"
 }

@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "录制未正常结束。文件在磁盘上，但无法检查它能否播放。最后几秒可能缺失。",
   "recorder.output.gif-failed": "无法生成 GIF（ffmpeg 以代码 {0} 结束）。录制已保留为 MKV。",
   "recorder.output.not-moved": "无法将文件移动到所请求的名称；它位于显示的路径：{0}",
-  "recorder.replay.saved-mkv": "最后几秒已保存为 MKV，缓冲区无法写入 GIF：{0}"
+  "recorder.replay.saved-mkv": "最后几秒已保存为 MKV，缓冲区无法写入 GIF：{0}",
+  "recorder.region.title": "区域编辑器",
+  "recorder.region.start": "开始录制",
+  "recorder.region.settings": "设置",
+  "recorder.region.close": "关闭区域"
 }

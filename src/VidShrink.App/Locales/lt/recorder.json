@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "Įrašas neužsidarė tvarkingai. Failas yra diske, bet nepavyko patikrinti, ar jį galima atkurti. Paskutinių sekundžių gali trūkti.",
   "recorder.output.gif-failed": "GIF sukurti nepavyko (ffmpeg baigė darbą kodu {0}). Įrašas išsaugotas kaip MKV.",
   "recorder.output.not-moved": "Failo nepavyko perkelti prašomu pavadinimu; jis yra rodomame kelyje: {0}",
-  "recorder.replay.saved-mkv": "Paskutinės sekundės išsaugotos kaip MKV, buferis negali rašyti GIF: {0}"
+  "recorder.replay.saved-mkv": "Paskutinės sekundės išsaugotos kaip MKV, buferis negali rašyti GIF: {0}",
+  "recorder.region.title": "Srities redaktorius",
+  "recorder.region.start": "Pradėti įrašymą",
+  "recorder.region.settings": "Nustatymai",
+  "recorder.region.close": "Uždaryti sritį"
 }

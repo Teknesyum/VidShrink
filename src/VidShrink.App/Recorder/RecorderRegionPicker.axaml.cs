@@ -49,20 +49,28 @@ internal partial class RecorderRegionPicker : Window
 
     private void Cover()
     {
-        var placements = Screens.All
+        _desktop = Cover(this);
+        Scrim.Width = Width;
+        Scrim.Height = Height;
+    }
+
+    /// <summary>Pencereyi bütün masaüstünü kaplayacak yere ve boya koyar; masaüstünü piksel olarak döndürür.</summary>
+    internal static PixelRect Cover(Window window)
+    {
+        var screens = window.Screens;
+        var placements = screens.All
             .Select((s, i) => new ScreenPlacement(
                 new ScreenBounds(i, s.Bounds.X, s.Bounds.Y, s.Bounds.Width, s.Bounds.Height), s.Scaling))
             .ToList();
 
-        _desktop = RegionDraw.Desktop(Screens.All.Select(s => s.Bounds));
+        var desktop = RegionDraw.Desktop(screens.All.Select(s => s.Bounds));
         var cover = RecorderLayout.Cover(placements);
-        var yedekOlcek = Screens.Primary?.Scaling ?? 1;
+        var yedekOlcek = screens.Primary?.Scaling ?? 1;
 
-        Position = cover is null ? _desktop.Position : new PixelPoint(cover.X, cover.Y);
-        Width = cover?.Width ?? _desktop.Width / yedekOlcek;
-        Height = cover?.Height ?? _desktop.Height / yedekOlcek;
-        Scrim.Width = Width;
-        Scrim.Height = Height;
+        window.Position = cover is null ? desktop.Position : new PixelPoint(cover.X, cover.Y);
+        window.Width = cover?.Width ?? desktop.Width / yedekOlcek;
+        window.Height = cover?.Height ?? desktop.Height / yedekOlcek;
+        return desktop;
     }
 
     private PixelPoint ScreenPoint(PointerEventArgs e) => this.PointToScreen(e.GetPosition(this));

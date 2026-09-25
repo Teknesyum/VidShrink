@@ -1,0 +1,63 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auto="using:Avalonia.Automation"
+        xmlns:loc="using:VidShrink.App.Localization"
+        x:Class="VidShrink.App.Recorder.RecorderRegionEditor"
+        Title="VidShrink"
+        WindowDecorations="None"
+        CanResize="False"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        auto:AutomationProperties.Name="{loc:Text recorder.region.title}">
+  <Canvas x:Name="Surface" Background="Transparent">
+    <Border x:Name="Edge"
+            BorderBrush="{StaticResource NeonEmber}"
+            BorderThickness="{StaticResource RecorderFrameBorder}"
+            IsHitTestVisible="False"/>
+    <Border x:Name="HandleTopLeft" Classes="grip" IsHitTestVisible="False"/>
+    <Border x:Name="HandleTop" Classes="grip" IsHitTestVisible="False"/>
+    <Border x:Name="HandleTopRight" Classes="grip" IsHitTestVisible="False"/>
+    <Border x:Name="HandleRight" Classes="grip" IsHitTestVisible="False"/>
+    <Border x:Name="HandleBottomRight" Classes="grip" IsHitTestVisible="False"/>
+    <Border x:Name="HandleBottom" Classes="grip" IsHitTestVisible="False"/>
+    <Border x:Name="HandleBottomLeft" Classes="grip" IsHitTestVisible="False"/>
+    <Border x:Name="HandleLeft" Classes="grip" IsHitTestVisible="False"/>
+    <Border x:Name="Toolbar"
+            Theme="{StaticResource Panel}"
+            Padding="{StaticResource RecorderRegionToolbarPadding}">
+      <StackPanel Orientation="Horizontal" Spacing="{StaticResource RecorderStripGap}">
+        <TextBlock x:Name="TxtSize"
+                   Theme="{StaticResource MonoValue}"
+                   VerticalAlignment="Center"/>
+        <Button x:Name="BtnStart"
+                Theme="{StaticResource PrimaryButton}"
+                Padding="{StaticResource ButtonPaddingSm}"
+                Content="{loc:Text recorder.region.start}"
+                auto:AutomationProperties.Name="{loc:Text recorder.region.start}"/>
+        <Button x:Name="BtnSettings"
+                Theme="{StaticResource GhostButton}"
+                Content="{loc:Text recorder.region.settings}"
+                auto:AutomationProperties.Name="{loc:Text recorder.region.settings}"/>
+        <Button x:Name="BtnClose"
+                Theme="{StaticResource GhostButton}"
+                ToolTip.Tip="{loc:Text recorder.region.close}"
+                auto:AutomationProperties.Name="{loc:Text recorder.region.close}">
+          <Path Width="{StaticResource IconSizeSm}"
+                Height="{StaticResource IconSizeSm}"
+                Stretch="Uniform"
+                Data="{StaticResource IconClose}"
+                Fill="{StaticResource TextBody}"/>
+        </Button>
+      </StackPanel>
+    </Border>
+  </Canvas>
+  <Window.Styles>
+    <Style Selector="Border.grip">
+      <Setter Property="Width" Value="{StaticResource RecorderRegionHandle}"/>
+      <Setter Property="Height" Value="{StaticResource RecorderRegionHandle}"/>
+      <Setter Property="Background" Value="{StaticResource NeonEmber}"/>
+    </Style>
+  </Window.Styles>
+</Window>

@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "Die Aufnahme wurde nicht sauber geschlossen. Die Datei liegt auf dem Datenträger, ob sie abspielbar ist, konnte aber nicht geprüft werden. Die letzten Sekunden fehlen möglicherweise.",
   "recorder.output.gif-failed": "Das GIF konnte nicht erstellt werden (ffmpeg endete mit Code {0}). Die Aufnahme wurde als MKV behalten.",
   "recorder.output.not-moved": "Die Datei konnte nicht unter den gewünschten Namen verschoben werden; sie liegt unter dem angezeigten Pfad: {0}",
-  "recorder.replay.saved-mkv": "Letzte Sekunden als MKV gespeichert, der Puffer kann kein GIF schreiben: {0}"
+  "recorder.replay.saved-mkv": "Letzte Sekunden als MKV gespeichert, der Puffer kann kein GIF schreiben: {0}",
+  "recorder.region.title": "Bereichseditor",
+  "recorder.region.start": "Aufnahme starten",
+  "recorder.region.settings": "Einstellungen",
+  "recorder.region.close": "Bereich schließen"
 }

@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "การบันทึกไม่ได้ปิดอย่างถูกต้อง ไฟล์อยู่บนดิสก์ แต่ไม่สามารถตรวจสอบได้ว่าเล่นได้หรือไม่ วินาทีสุดท้ายอาจหายไป",
   "recorder.output.gif-failed": "ไม่สามารถสร้าง GIF ได้ (ffmpeg จบด้วยรหัส {0}) เก็บการบันทึกไว้เป็น MKV",
   "recorder.output.not-moved": "ไม่สามารถย้ายไฟล์ไปยังชื่อที่ขอได้ ไฟล์อยู่ที่เส้นทางที่แสดง: {0}",
-  "recorder.replay.saved-mkv": "บันทึกวินาทีสุดท้ายเป็น MKV แล้ว บัฟเฟอร์เขียน GIF ไม่ได้: {0}"
+  "recorder.replay.saved-mkv": "บันทึกวินาทีสุดท้ายเป็น MKV แล้ว บัฟเฟอร์เขียน GIF ไม่ได้: {0}",
+  "recorder.region.title": "ตัวแก้ไขพื้นที่",
+  "recorder.region.start": "เริ่มบันทึก",
+  "recorder.region.settings": "การตั้งค่า",
+  "recorder.region.close": "ปิดพื้นที่"
 }

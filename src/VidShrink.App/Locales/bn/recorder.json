@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "রেকর্ডিং ঠিকভাবে বন্ধ হয়নি। ফাইলটি ডিস্কে আছে, কিন্তু এটি চালানো যাবে কি না তা যাচাই করা যায়নি। শেষ কয়েক সেকেন্ড অনুপস্থিত থাকতে পারে।",
   "recorder.output.gif-failed": "GIF তৈরি করা যায়নি (ffmpeg {0} কোডে শেষ হয়েছে)। রেকর্ডিংটি MKV হিসেবে রাখা হয়েছে।",
   "recorder.output.not-moved": "ফাইলটি চাওয়া নামে সরানো যায়নি; এটি দেখানো পথে আছে: {0}",
-  "recorder.replay.saved-mkv": "শেষ সেকেন্ডগুলো MKV হিসেবে সংরক্ষিত হয়েছে, বাফার GIF লিখতে পারে না: {0}"
+  "recorder.replay.saved-mkv": "শেষ সেকেন্ডগুলো MKV হিসেবে সংরক্ষিত হয়েছে, বাফার GIF লিখতে পারে না: {0}",
+  "recorder.region.title": "অঞ্চল সম্পাদক",
+  "recorder.region.start": "রেকর্ডিং শুরু করুন",
+  "recorder.region.settings": "সেটিংস",
+  "recorder.region.close": "অঞ্চল বন্ধ করুন"
 }

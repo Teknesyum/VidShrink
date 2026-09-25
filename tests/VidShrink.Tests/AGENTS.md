@@ -66,6 +66,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   (`RegionDraw`); sahte `DrawRegion` ile çizilen bölge kutulara, json'a ve `-offset_x/-video_size`'a geçer, Esc
   vazgeçer; çizim penceresi gerçek açılıp masaüstünü kaplar. Hazır boyut, pencere seçici (sahte `ListWindows`,
   `Pick` eleme negatifleri), ekran seçici (sahte `ScreenSource`, ikinci ekranın ofseti). Kanıt `.calisma/paket-2/`.
+- `KaydediciBolgeDuzenleyiciTests.cs` — çizilen bölge ekranda kalır (`RegionEdit`, Windows): sekiz tutamak karşı kenarı sabit tutar, taşıma boyu korur, oran kilidi ve masaüstü sınırı korunur, araç paneli üstte → altta → içte, pencere biçimi halka + tutamak + panel (iç alan boş); sahte `IRegionEditorHost` ile çizim → düzenleyici → kutular/json, hedef değişince kapanma, kayıtta gizlenme (`EditorWanted`). Kenar tutamağında oranı bozan mutasyon 1/11 kırmızı.
 - `KaydediciCerceveTests.cs` — paket 2, çerçeve her hedefte: ekran/pencere/bölge dikdörtgeni, ekrana sığmayan çerçeve
   içe, gerçek pencerenin istemci alanı, affinity 0x11 gerçek pencerede (negatif kontrol affinity'siz).
 - `KaydediciGirdiTests.cs` — paket 2, tıklama halkası, tıklama sesi, tuş gösterimi: `KeyText`/`KeyTracker`, bellek

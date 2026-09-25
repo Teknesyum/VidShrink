@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "Kayıt temiz kapanmadı. Dosya diskte duruyor, ama oynatılıp oynatılamayacağı denetlenemedi. Son saniyeler eksik olabilir.",
   "recorder.output.gif-failed": "GIF üretilemedi (ffmpeg {0} koduyla bitti). Kayıt MKV olarak korundu.",
   "recorder.output.not-moved": "Dosya istenen ada taşınamadı, gösterilen yolda duruyor: {0}",
-  "recorder.replay.saved-mkv": "Son saniyeler MKV olarak kaydedildi, tampon GIF yazamıyor: {0}"
+  "recorder.replay.saved-mkv": "Son saniyeler MKV olarak kaydedildi, tampon GIF yazamıyor: {0}",
+  "recorder.region.title": "Bölge düzenleyici",
+  "recorder.region.start": "Kaydı başlat",
+  "recorder.region.settings": "Ayarlar",
+  "recorder.region.close": "Bölgeyi kapat"
 }

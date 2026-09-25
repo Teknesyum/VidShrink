@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "録画が正しく閉じられませんでした。ファイルはディスク上にありますが、再生できるかどうかを確認できませんでした。最後の数秒が欠けている可能性があります。",
   "recorder.output.gif-failed": "GIF を作成できませんでした (ffmpeg はコード {0} で終了しました)。録画は MKV として保持されました。",
   "recorder.output.not-moved": "ファイルを指定の名前に移動できませんでした。表示されているパスにあります: {0}",
-  "recorder.replay.saved-mkv": "直近の秒数を MKV として保存しました。バッファーは GIF を書き込めません: {0}"
+  "recorder.replay.saved-mkv": "直近の秒数を MKV として保存しました。バッファーは GIF を書き込めません: {0}",
+  "recorder.region.title": "範囲エディター",
+  "recorder.region.start": "録画を開始",
+  "recorder.region.settings": "設定",
+  "recorder.region.close": "範囲を閉じる"
 }

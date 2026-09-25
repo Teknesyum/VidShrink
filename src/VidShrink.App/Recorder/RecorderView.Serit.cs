@@ -314,6 +314,7 @@ internal partial class RecorderView
             : Say("recorder.strip.idle");
 
         SyncFrame();
+        SyncRegionEditor();
         SyncPreview(running);
         SyncInput(_session is not null);
         SyncTray();

@@ -59,6 +59,7 @@ internal partial class RecorderView : UserControl
         _settings = RecorderSettings.Load(_settingsPath);
         InitHedef();
         InitSecici();
+        InitDuzenleyici();
         InitGelismis();
         InitOtomatik();
         InitSes();
@@ -96,6 +97,7 @@ internal partial class RecorderView : UserControl
         Strings.Changed -= OnLanguageChanged;
         DeactivateTray();
         DeactivateHotkeys();
+        CloseRegionEditor();
         base.OnDetachedFromVisualTree(e);
     }
 

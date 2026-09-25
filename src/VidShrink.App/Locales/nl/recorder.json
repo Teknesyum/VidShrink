@@ -190,5 +190,9 @@
   "recorder.output.partial-unverified": "De opname is niet netjes afgesloten. Het bestand staat op de schijf, maar of het afspeelt kon niet worden gecontroleerd. De laatste seconden ontbreken mogelijk.",
   "recorder.output.gif-failed": "De GIF kon niet worden gemaakt (ffmpeg eindigde met code {0}). De opname is als MKV bewaard.",
   "recorder.output.not-moved": "Het bestand kon niet naar de gevraagde naam worden verplaatst; het staat op het getoonde pad: {0}",
-  "recorder.replay.saved-mkv": "Laatste seconden opgeslagen als MKV, de buffer kan geen GIF schrijven: {0}"
+  "recorder.replay.saved-mkv": "Laatste seconden opgeslagen als MKV, de buffer kan geen GIF schrijven: {0}",
+  "recorder.region.title": "Gebiedseditor",
+  "recorder.region.start": "Opname starten",
+  "recorder.region.settings": "Instellingen",
+  "recorder.region.close": "Gebied sluiten"
 }
