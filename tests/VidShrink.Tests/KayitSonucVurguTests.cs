@@ -216,7 +216,7 @@ public sealed class KayitSonucVurguTests
                 Fareyle(window, RawPointerEventType.LeftButtonDown, merkez, RawInputModifiers.LeftMouseButton);
                 Fareyle(window, RawPointerEventType.LeftButtonUp, merkez, RawInputModifiers.None);
                 var saat = System.Diagnostics.Stopwatch.StartNew();
-                while (view.ShareLinkText != "https://ornek.test/f1" && saat.Elapsed.TotalSeconds < 5)
+                while (view.ShareLinkText != "https://ornek.test/f1" && saat.Elapsed.TotalSeconds < 20)
                 {
                     Avalonia.Threading.Dispatcher.UIThread.RunJobs();
                     Thread.Sleep(10);

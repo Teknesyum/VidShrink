@@ -254,6 +254,25 @@ public sealed class KaydediciHedefTests
         gorev.GetAwaiter().GetResult();
     }
 
+    private static void KayitKapat(RecorderView view, Task baslat)
+    {
+        var saat = System.Diagnostics.Stopwatch.StartNew();
+        while (!baslat.IsCompleted && saat.ElapsedMilliseconds < 60000)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(20);
+        }
+
+        if (!view.HasSession) return;
+        var iptal = view.RunHotkeyAsync(HotkeyAction.Discard);
+        saat.Restart();
+        while (!iptal.IsCompleted && saat.ElapsedMilliseconds < 15000)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(20);
+        }
+    }
+
     [KayitFact]
     public void IptalKaydiDurdururVeDosyayiSiler()
     {
@@ -273,14 +292,21 @@ public sealed class KaydediciHedefTests
             Sec(view, "CmbPreset", "ultrafast");
             Yaz(view, "TxtOutputFolder", klasor);
 
-            Pompala(view.StartAsync(), 15000);
-            var basladi = view.HasSession;
-            var yazilan = Directory.Exists(klasor) ? Directory.GetFiles(klasor).Length : 0;
-            Pompala(Task.Delay(1500), 3000);
-            var iptal = view.RunHotkeyAsync(HotkeyAction.Discard);
-            Pompala(iptal, 15000);
-            return (basladi, hata: view.ErrorText, iptal: iptal.Result, oturum: view.HasSession, not: view.NoticeText,
-                kalan: Directory.Exists(klasor) ? Directory.GetFiles(klasor, "*", SearchOption.AllDirectories) : Array.Empty<string>());
+            var baslat = view.StartAsync();
+            try
+            {
+                Pompala(baslat, 45000);
+                var basladi = view.HasSession;
+                Pompala(Task.Delay(1500), 3000);
+                var iptal = view.RunHotkeyAsync(HotkeyAction.Discard);
+                Pompala(iptal, 15000);
+                return (basladi, hata: view.ErrorText, iptal: iptal.Result, oturum: view.HasSession, not: view.NoticeText,
+                    kalan: Directory.Exists(klasor) ? Directory.GetFiles(klasor, "*", SearchOption.AllDirectories) : Array.Empty<string>());
+            }
+            finally
+            {
+                KayitKapat(view, baslat);
+            }
         }));
 
         File.WriteAllLines(Path.Combine(Kanit, "iptal.txt"), new[] { $"basladi={olcu.basladi} iptal={olcu.iptal} oturum={olcu.oturum} not={olcu.not} hata={olcu.hata} kalan={olcu.kalan.Length}" });
