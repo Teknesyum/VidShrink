@@ -14,6 +14,7 @@ ship as part of it.
 ### Changed
 
 - The updated-to-new-version notice closes by itself after 5 seconds; hovering it or keyboard focus inside pauses the countdown, which resumes from the time left.
+- Sliders share one theme: 40 px hit area across the whole track height, filled track and knob that grow on hover/press/focus, a gray disabled state, keyboard steps derived from the range (arrows small, PageUp/PageDown large), and the knob glides to a new value set by keyboard or the value box; the player's seek bar uses the same family.
 
 ## [0.9.4] - 2026-09-25
 

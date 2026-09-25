@@ -322,7 +322,7 @@
                           <ColumnDefinition Width="Auto" SharedSizeGroup="HedefKutu"/>
                           <ColumnDefinition Width="Auto" SharedSizeGroup="HedefBirim"/>
                         </izi:KaydiriciSatiri.ColumnDefinitions>
-                        <Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="16" VerticalAlignment="Center"/>
+                        <Slider x:Name="SliderTarget" auto:AutomationProperties.Name="{loc:Text main.target.title}" Minimum="1" Maximum="500" Value="16" VerticalAlignment="Center"/>
                         <TextBox x:Name="TxtTarget" Text="16" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
                         <TextBlock Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </izi:KaydiriciSatiri>
@@ -459,7 +459,7 @@
                           <ColumnDefinition Width="Auto" SharedSizeGroup="HedefKutu"/>
                           <ColumnDefinition Width="Auto" SharedSizeGroup="HedefBirim"/>
                         </izi:KaydiriciSatiri.ColumnDefinitions>
-                        <Slider x:Name="SliderQualityTarget" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
+                        <Slider x:Name="SliderQualityTarget" auto:AutomationProperties.Name="{loc:Text main.quality.title}" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
                         <TextBox x:Name="TxtQualityTarget" Text="60" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
                         <TextBlock Text="{loc:Text main.unit.score-suffix}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </izi:KaydiriciSatiri>
@@ -1127,7 +1127,7 @@
                       </Grid>
                       <izi:KaydiriciSatiri Grid.Row="1" x:Name="CrfSliderRow" ColumnDefinitions="*,Auto" EnDarKaydirici="{StaticResource SliderMinWidth}"
                                            ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
-                        <Slider x:Name="SliderQuality" Minimum="10" Maximum="45" Value="23" VerticalAlignment="Center"/>
+                        <Slider x:Name="SliderQuality" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}" Minimum="10" Maximum="45" Value="23" VerticalAlignment="Center"/>
                         <TextBox x:Name="TxtQuality" Text="23" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
                       </izi:KaydiriciSatiri>
                     </Grid>

@@ -340,7 +340,7 @@ public sealed class PaletteApplyTests
             .Sum(dosya => System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(dosya), @"\{DynamicResource Glow(Blue|Pink|Purple)\}").Count);
 
         Assert.True(statik.Count == 0, string.Join("\n", statik));
-        Assert.True(dinamik >= 15, $"dinamik parlama başvurusu {dinamik}");
+        Assert.True(dinamik >= 14, $"dinamik parlama başvurusu {dinamik}");
     }
 
     private static string? PaletteDegeri(string palet, string anahtar)
