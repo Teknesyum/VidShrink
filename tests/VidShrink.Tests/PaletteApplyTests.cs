@@ -246,6 +246,38 @@ public sealed class PaletteApplyTests
         Kapat("parlama.txt");
     }
 
+    /// <summary>
+    /// Edilgen birincil düğme mavi dolgusunu bırakır. Denetimdeki 3.51 (docs/ui-denetim/2026-09-24.md,
+    /// açık kalem 2) <c>RunJobs</c>'tan hemen sonra, <c>BrushTransition</c> bitmeden okunmuştu;
+    /// geçiş bitince dolgu saydam, çerçeve soluk, gölge yok.
+    /// </summary>
+    [Fact]
+    public void EdilgenBirincilDugmeDolguyuBirakir()
+    {
+        var olcu = AppHost.Run(() =>
+        {
+            var dugme = new Button { Theme = (ControlTheme)Resource("PrimaryButton")!, Content = "x", IsEnabled = false };
+            var window = new Window { Width = 300, Height = 200, Content = dugme };
+            window.Show();
+            var saat = System.Diagnostics.Stopwatch.StartNew();
+            while (saat.ElapsedMilliseconds < 600)
+            {
+                using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+                Avalonia.Threading.Dispatcher.UIThread.MainLoop(dilim.Token);
+            }
+
+            var kok = Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(dugme).OfType<Border>().First(b => b.Name == "Root");
+            var sonuc = (dolgu: (kok.Background as ISolidColorBrush)?.Color, cerceve: (kok.BorderBrush as ISolidColorBrush)?.Color,
+                soluk: ((ISolidColorBrush)Resource("TextDisabled")!).Color, golge: kok.BoxShadow.ToString());
+            window.Close();
+            return sonuc;
+        });
+
+        Assert.Equal(Colors.Transparent, olcu.dolgu);
+        Assert.Equal(olcu.soluk, olcu.cerceve);
+        Assert.Equal("none", olcu.golge);
+    }
+
     [Fact]
     public void DenetimTemasiVeSablondakiParlamaPaletleCanliDegisir()
     {
