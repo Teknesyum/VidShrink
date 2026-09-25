@@ -198,6 +198,8 @@ $libMpvFallbackUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/d
 $libMpvArchiveSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
 $libMpvDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
 $libMpvFileName = 'libmpv-2.dll'
+$libMpvZipUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/libmpv-2-x86_64-20260903.zip'
+$libMpvZipSha256 = '1FC71846BD6E63D280E4F52D212F6F80695339E98632698930CF4FFE9F4BDBAD'
 
 # arm64 kolunun pinleri. libmpv'nin aarch64 derlemesi aynı shinchiro sürümünden, kendi
 # yayınımıza aynadan kopyalanmış hâliyle; ffmpeg ise BtbN'den, çünkü GyanD yalnız x86_64
@@ -208,6 +210,8 @@ $libMpvArm64Url = 'https://github.com/Teknesyum/VidShrink/releases/download/deps
 $libMpvArm64FallbackUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-aarch64-20260903-git-69e63f425a.7z'
 $libMpvArm64ArchiveSha256 = '9D4E0CF7370FD1DD9A91A9D8139F24A88ECE9E58B00F5A9CA50B391D03114F2F'
 $libMpvArm64DllSha256 = '3BFC5A042CC6EBE45ACE74992DBC135EE84E3E1B33AFAC070F8902A2D64A22E9'
+$libMpvArm64ZipUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/libmpv-2-aarch64-20260903.zip'
+$libMpvArm64ZipSha256 = 'A0DFCF27FA8468E4C52170779B27CEC3A6BF2BE57EAC2E021EC6D39D36228156'
 
 $ffmpegArm64Url = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-08-31-13-27/ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0.zip'
 $ffmpegArm64Entries = @(
@@ -220,6 +224,8 @@ function Use-Arm64Pins {
     $script:libMpvFallbackUrl = $libMpvArm64FallbackUrl
     $script:libMpvArchiveSha256 = $libMpvArm64ArchiveSha256
     $script:libMpvDllSha256 = $libMpvArm64DllSha256
+    $script:libMpvZipUrl = $libMpvArm64ZipUrl
+    $script:libMpvZipSha256 = $libMpvArm64ZipSha256
 }
 
 function Get-FileSha256([string]$Path) {
@@ -271,6 +277,33 @@ function Install-LibMpv([string]$WorkRoot, [string]$Destination, [string]$Existi
     if ($Existing -and (Test-Path -LiteralPath $Existing) -and (Get-FileSha256 $Existing) -eq $libMpvDllSha256) {
         Copy-Item -LiteralPath $Existing -Destination $target -Force
         return 'reused'
+    }
+
+    $zipArchive = Join-Path $WorkRoot 'libmpv.zip'
+    $zipExtract = Join-Path $WorkRoot 'libmpv-zip'
+    $ProgressPreference = 'SilentlyContinue'
+    Write-Host 'libmpv indiriliyor...' -ForegroundColor Cyan
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri $libMpvZipUrl -OutFile $zipArchive
+        if ((Get-FileSha256 $zipArchive) -eq $libMpvZipSha256) {
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            New-Item -ItemType Directory -Path $zipExtract -Force | Out-Null
+            $zip = [System.IO.Compression.ZipFile]::OpenRead($zipArchive)
+            try {
+                $entry = $zip.Entries | Where-Object { $_.Name -eq $libMpvFileName } | Select-Object -First 1
+                if ($entry) { [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $zipExtract $libMpvFileName), $true) }
+            }
+            finally { $zip.Dispose() }
+            $zipDll = Join-Path $zipExtract $libMpvFileName
+            if ((Test-Path -LiteralPath $zipDll) -and (Get-FileSha256 $zipDll) -eq $libMpvDllSha256) {
+                Copy-Item -LiteralPath $zipDll -Destination $target -Force
+                return 'downloaded'
+            }
+        }
+        Write-Host "libmpv sağlaması tutmadı, yedek kaynak deneniyor: $libMpvZipUrl" -ForegroundColor Yellow
+    }
+    catch {
+        Write-Host "libmpv indirilemedi, yedek kaynak deneniyor: $libMpvZipUrl" -ForegroundColor Yellow
     }
 
     $tar = Join-Path $env:SystemRoot 'System32\tar.exe'

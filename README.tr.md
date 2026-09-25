@@ -420,6 +420,15 @@ dağıtmaz ve içine GPL kodu bağlamaz ([`docs/kurulum.tr.md`](docs/kurulum.tr.
 Kaynak ağacının içinde dağıtılan üçüncü taraf malzeme — simge takımının kesildiği Fluent UI
 System Icons (MIT) — [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) dosyasında.
 
+## Tek Satırda Kurulum
+
+Windows 10 ya da 11'de PowerShell'e yapıştırın. Son `VidShrink-Setup.exe`'yi indirip
+çalıştırır; yönetici yetkisi istemez.
+
+```powershell
+irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile "$env:TEMP\VidShrink-Setup.exe"; & "$env:TEMP\VidShrink-Setup.exe"
+```
+
 <!-- signature -->
 <div align="center">
 

@@ -9,7 +9,9 @@ public sealed class SetupException : Exception
 
 public sealed record PinnedEntry(string EntryPath, string FileName, string Sha256);
 
-public sealed record LibMpvPin(IReadOnlyList<string> Urls, string ArchiveSha256, string FileName, string DllSha256)
+public sealed record LibMpvPin(
+    IReadOnlyList<string> Urls, string ArchiveSha256, string FileName, string DllSha256,
+    string? ZipUrl = null, string? ZipSha256 = null)
 {
     public static LibMpvPin X64 { get; } = new(
         new[]
@@ -19,7 +21,9 @@ public sealed record LibMpvPin(IReadOnlyList<string> Urls, string ArchiveSha256,
         },
         "fac135c68a35b7639e39d72c0c365104edbaebdea39a0dfdd8c36e8c8e80faef",
         "libmpv-2.dll",
-        "673e6397920ab64a9c5b3a618f7f16d38854efe72b58665f1f84e4e873b763a4");
+        "673e6397920ab64a9c5b3a618f7f16d38854efe72b58665f1f84e4e873b763a4",
+        "https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/libmpv-2-x86_64-20260903.zip",
+        "1fc71846bd6e63d280e4f52d212f6f80695339e98632698930cf4ffe9f4bdbad");
 
     public static LibMpvPin Arm64 { get; } = new(
         new[]
@@ -29,7 +33,9 @@ public sealed record LibMpvPin(IReadOnlyList<string> Urls, string ArchiveSha256,
         },
         "9d4e0cf7370fd1dd9a91a9d8139f24a88ece9e58b00f5a9ca50b391d03114f2f",
         "libmpv-2.dll",
-        "3bfc5a042cc6ebe45ace74992dbc135ee84e3e1b33afac070f8902a2d64a22e9");
+        "3bfc5a042cc6ebe45ace74992dbc135ee84e3e1b33afac070f8902a2d64a22e9",
+        "https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/libmpv-2-aarch64-20260903.zip",
+        "a0dfcf27fa8468e4c52170779b27cec3a6bf2be57eac2e021ec6d39d36228156");
 
     public static LibMpvPin Default => X64;
 

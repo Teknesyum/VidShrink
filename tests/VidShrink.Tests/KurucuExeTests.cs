@@ -336,6 +336,8 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Contains($"$libMpvArchiveSha256 = '{pin.ArchiveSha256.ToUpperInvariant()}'", script);
         Assert.Contains($"$libMpvDllSha256 = '{pin.DllSha256.ToUpperInvariant()}'", script);
         Assert.Contains($"$libMpvFileName = '{pin.FileName}'", script);
+        Assert.Contains($"$libMpvZipUrl = '{pin.ZipUrl}'", script);
+        Assert.Contains($"$libMpvZipSha256 = '{pin.ZipSha256!.ToUpperInvariant()}'", script);
         Assert.Contains($"$script:RemoveAttempts = {LockedFolder.Attempts}", script);
         Assert.Contains($"$script:RemoveFirstDelayMilliseconds = {LockedFolder.FirstDelayMilliseconds}", script);
         Assert.Contains($"$script:RemoveHolderWaitSeconds = {(int)LockedFolder.HolderWait.TotalSeconds}", script);
@@ -358,6 +360,8 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Contains($"$libMpvArm64FallbackUrl = '{libMpv.Urls[1]}'", script);
         Assert.Contains($"$libMpvArm64ArchiveSha256 = '{libMpv.ArchiveSha256.ToUpperInvariant()}'", script);
         Assert.Contains($"$libMpvArm64DllSha256 = '{libMpv.DllSha256.ToUpperInvariant()}'", script);
+        Assert.Contains($"$libMpvArm64ZipUrl = '{libMpv.ZipUrl}'", script);
+        Assert.Contains($"$libMpvArm64ZipSha256 = '{libMpv.ZipSha256!.ToUpperInvariant()}'", script);
         Assert.Contains($"$ffmpegArm64Url = '{ffmpeg.Url}'", script);
         foreach (var entry in ffmpeg.Entries)
         {
@@ -424,6 +428,44 @@ public sealed class KurucuExeTests : IDisposable
 
         var none = await Assert.ThrowsAsync<SetupException>(() => Prepare("hicbiri", missing, bad));
         Assert.StartsWith(Prefix("setup.libmpv.archive-mismatch"), none.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Windows 10'un tar'ı 7z açamıyor ("tar çıkış kodu 1"). Zip kaynağı tar'a hiç
+    /// uğramadan açılmalı; 7z kaynağı olarak açılamayan bir dosya verilince bile kurulum
+    /// zip'ten biter. Zip tutmazsa 7z koluna düşülür.
+    /// </summary>
+    [Fact]
+    public async Task LibmpvZipKaynagiTarsizAcilir()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var release = Path.Combine(_work, "libmpv-zip-kaynak");
+        Directory.CreateDirectory(release);
+        var zip = Path.Combine(release, "libmpv.zip");
+        Zip(zip, ("klasor/libmpv-2.dll", "libmpv ikilisi"));
+        var sevenZip = Path.Combine(release, "mpv-dev.7z");
+        File.WriteAllText(sevenZip, "tar bunu acamaz");
+        var good = Path.Combine(release, "mpv-dev.zip");
+        Zip(good, ("libmpv-2.dll", "libmpv ikilisi"));
+        var dllSha = Sha("libmpv ikilisi");
+
+        async Task<(string Dll, List<string> Log)> Prepare(string name, LibMpvPin pin)
+        {
+            var work = Path.Combine(_work, "libmpv-zip-" + name);
+            Directory.CreateDirectory(work);
+            var log = new List<string>();
+            var result = await SetupDownloads.PrepareLibMpvAsync(new HttpClient(), pin, null, work, log.Add, CancellationToken.None);
+            return (result.Path, log);
+        }
+
+        var zipped = await Prepare("zip", new LibMpvPin(new[] { sevenZip }, UpdateCheck.HashFile(sevenZip), "libmpv-2.dll", dllSha, zip, UpdateCheck.HashFile(zip)));
+        Assert.Empty(zipped.Log);
+        Assert.Equal(dllSha, UpdateCheck.HashFile(zipped.Dll));
+
+        var fallback = await Prepare("yedek", new LibMpvPin(new[] { good }, UpdateCheck.HashFile(good), "libmpv-2.dll", dllSha, zip, new string('0', 64)));
+        Assert.Equal(new[] { SetupText.Get("setup.libmpv.checksum-fallback", zip) }, fallback.Log);
+        Assert.Equal(dllSha, UpdateCheck.HashFile(fallback.Dll));
     }
 
     private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release, Action<string>? gunluk = null)

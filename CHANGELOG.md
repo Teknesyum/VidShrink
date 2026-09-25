@@ -5,6 +5,19 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.9.3] - 2026-09-25
+
+### Fixed
+
+- The Windows installer no longer stops at "libmpv arşivi açılamadı (tar çıkış kodu 1)" on
+  machines whose built-in `tar` cannot read 7z (Windows 10). libmpv now comes as a zip
+  opened by .NET itself; the 7z archive stays as the fallback. The PowerShell script
+  follows the same path.
+
+### Added
+
+- A one-line PowerShell install command at the end of the README.
+
 ## [0.9.2] - 2026-09-25
 
 ### Added

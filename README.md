@@ -415,6 +415,15 @@ Third-party material that ships inside the source tree — the Fluent UI System 
 the icon set is cut from — is listed in
 [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
 
+## One-line install
+
+Paste into PowerShell on Windows 10 or 11. It downloads the latest `VidShrink-Setup.exe`
+and runs it; no administrator rights.
+
+```powershell
+irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile "$env:TEMP\VidShrink-Setup.exe"; & "$env:TEMP\VidShrink-Setup.exe"
+```
+
 <!-- signature -->
 <div align="center">
 

@@ -117,7 +117,10 @@ public static class SetupDownloads
             return (existing, true);
         }
 
-        var tar = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "tar.exe");
+        if (pin.ZipUrl is not null && await TryZipAsync(client, pin, workRoot, log, cancellationToken) is { } zipped)
+            return (zipped, false);
+
+        var tar =Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "tar.exe");
         if (!File.Exists(tar)) throw new SetupException(SetupText.Get("setup.libmpv.no-tar", tar));
 
         var archive = Path.Combine(workRoot, "mpv-dev" + Path.GetExtension(pin.Urls[0]));
@@ -161,6 +164,51 @@ public static class SetupDownloads
         if (!string.Equals(actual, pin.DllSha256, StringComparison.OrdinalIgnoreCase))
             throw new SetupException(SetupText.Get("setup.checksum.mismatch", pin.FileName, pin.DllSha256, actual));
         return (dll, false);
+    }
+
+    /// <summary>
+    /// Zip kaynağı: .NET'in kendi açıcısıyla açılır, tar gerekmez. Windows 10'un tar'ı 7z'yi
+    /// açamıyor. Herhangi bir adım tutmazsa <c>null</c> döner ve 7z kaynaklarına düşülür.
+    /// </summary>
+    private static async Task<string?> TryZipAsync(
+        HttpClient client, LibMpvPin pin, string workRoot, Action<string> log, CancellationToken cancellationToken)
+    {
+        var url = pin.ZipUrl!;
+        var archive = Path.Combine(workRoot, "libmpv.zip");
+        try
+        {
+            var fetched = url.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+                ? await FetchAsync(client, url, archive, cancellationToken)
+                : await CopyHashedAsync(url, archive, cancellationToken);
+            if (!string.Equals(fetched.Sha256, pin.ZipSha256, StringComparison.OrdinalIgnoreCase))
+            {
+                log(SetupText.Get("setup.libmpv.checksum-fallback", url));
+                return null;
+            }
+
+            var extract = Path.Combine(workRoot, "libmpv-zip");
+            Directory.CreateDirectory(extract);
+            var dll = Path.Combine(extract, pin.FileName);
+            using (var zip = System.IO.Compression.ZipFile.OpenRead(archive))
+            {
+                var entry = zip.Entries.FirstOrDefault(e => string.Equals(e.Name, pin.FileName, StringComparison.OrdinalIgnoreCase));
+                if (entry is null)
+                {
+                    log(SetupText.Get("setup.libmpv.source-failed", url));
+                    return null;
+                }
+                System.IO.Compression.ZipFileExtensions.ExtractToFile(entry, dll, true);
+            }
+
+            if (string.Equals(UpdateCheck.HashFile(dll), pin.DllSha256, StringComparison.OrdinalIgnoreCase)) return dll;
+            log(SetupText.Get("setup.libmpv.checksum-fallback", url));
+            return null;
+        }
+        catch (Exception exception) when (exception is SetupException or HttpRequestException or IOException or InvalidDataException)
+        {
+            log(SetupText.Get("setup.libmpv.source-failed", url));
+            return null;
+        }
     }
 
     public static async Task<IReadOnlyDictionary<string, string>> FetchFfmpegAsync(
