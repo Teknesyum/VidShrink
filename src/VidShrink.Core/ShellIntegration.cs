@@ -37,6 +37,14 @@ public static class ShellIntegration
     public static IReadOnlyList<int> AcceptedShrinkTargetsMegabytes { get; } =
         QuickShrinkTargetsMegabytes.Concat(LegacyShrinkTargetsMegabytes).ToArray();
 
+    /// <summary>
+    /// VidShrink'in varsayılan oynatıcı sayılması için kendisine gitmesi gereken uzantılar.
+    /// Windows 10'un "Video oynatıcı" seçimi yalnız temel video türlerini atar; gif, ts, dav
+    /// gibi uzantılar başka programlarda kalır. <see cref="MediaExtensions"/>'ın tamamını
+    /// istemek, seçim yapılmış olsa bile önerinin hiç kalkmamasına yol açıyordu.
+    /// </summary>
+    public static IReadOnlyList<string> DefaultPlayerExtensions { get; } = new[] { "mp4" };
+
     /// <summary>Hızlı küçültme isteğini uygulamaya taşıyan komut satırı bayrağı.</summary>
     public const string ShrinkFlag = "--kucult";
 

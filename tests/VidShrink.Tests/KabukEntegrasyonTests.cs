@@ -19,6 +19,35 @@ public sealed class KabukEntegrasyonTests
     private static IReadOnlyList<(string Key, string Name, string? Value)> Plan()
         => FileAssociation.Plan(Executable);
 
+    /// <summary>
+    /// Windows 10'da "Video oynatıcı" VidShrink seçildiğinde öneri kalkıyor mu. O seçim
+    /// gif, ts, dav gibi uzantıları atamaz; denetim bütün listeyi isterse şerit hiç kalkmaz.
+    /// </summary>
+    [Fact]
+    public void VarsayilanDenetimiVideoOynaticiSeciminiYeterliSayiyor()
+    {
+        Assert.Contains("mp4", ShellIntegration.DefaultPlayerExtensions);
+        Assert.All(ShellIntegration.DefaultPlayerExtensions, e => Assert.Contains(e, ShellIntegration.MediaExtensions));
+        Assert.DoesNotContain("gif", ShellIntegration.DefaultPlayerExtensions);
+        Assert.DoesNotContain("ts", ShellIntegration.DefaultPlayerExtensions);
+
+        var window = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.axaml.cs"));
+        Assert.Contains("Wanted(executable, ShellIntegration.DefaultPlayerExtensions,", window, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Windows'un varsayılan uygulamalar listesinde görünen ad exe'nin dosya açıklamasından
+    /// gelir; derleme başlığı verilmezse "VidShrink.App" yazıyordu.
+    /// </summary>
+    [Fact]
+    public void UygulamaExesiVidShrinkAdiylaGorunuyor()
+    {
+        var title = typeof(VidShrink.App.App).Assembly
+            .GetCustomAttributes(typeof(System.Reflection.AssemblyTitleAttribute), false)
+            .Cast<System.Reflection.AssemblyTitleAttribute>().Single().Title;
+        Assert.Equal("VidShrink", title);
+    }
+
     [Fact]
     public void PlanYalnizKullaniciKapsamindaYaziyor()
     {

@@ -351,7 +351,7 @@ public partial class MainWindow : Window
 
         var executable = Environment.ProcessPath;
         if (string.IsNullOrEmpty(executable)) return;
-        if (!Integration.DefaultAppSuggestionBar.Wanted(executable, ShellIntegration.MediaExtensions, SettingsPathOverride)) return;
+        if (!Integration.DefaultAppSuggestionBar.Wanted(executable, ShellIntegration.DefaultPlayerExtensions, SettingsPathOverride)) return;
         if (AppliedNotice.Parent is not Panel host) return;
 
         host.Children.Add(new Integration.DefaultAppSuggestionBar(SettingsPathOverride));
