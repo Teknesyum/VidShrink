@@ -1,0 +1,19 @@
+
+ad              : taban
+bitti           : True
+cikis           : 0
+ms              : 115
+istek           : 1 istek: /manifest-win-x64.json
+launcherVersion : 0.9.3
+hashCache       : True
+dosyalar        : \.launcher-version \settings.json \VidShrink.exe \app\.update-hashes.json \app\.update-version \app\VidShrink.App.exe
+
+ad              : aot
+bitti           : True
+cikis           : 0
+ms              : 46
+istek           : 1 istek: /manifest-win-x64.json
+launcherVersion : 0.9.3
+hashCache       : True
+dosyalar        : \.launcher-version \settings.json \VidShrink.exe \app\.update-hashes.json \app\.update-version \app\VidShrink.App.exe
+

@@ -278,9 +278,44 @@ jobs:
           path: shell-extension/
           if-no-files-found: error
 
+  launcher:
+    # The launcher is NativeAOT: it reaches Main before a ReadyToRun single file has even
+    # unpacked its runtime, and the application is born that much sooner. NativeAOT cannot
+    # cross-compile from Linux to Windows, so both Windows launchers are produced here and
+    # handed to the publish job as artifacts; win-arm64 uses the runner's ARM64 MSVC tools.
+    needs: [version, test]
+    if: ${{ !cancelled() && needs.version.result == 'success' && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+    runs-on: windows-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        rid: [win-x64, win-arm64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish the launcher
+        shell: bash
+        run: |
+          dotnet publish src/VidShrink.Launcher/VidShrink.Launcher.csproj \
+            -c Release -r ${{ matrix.rid }} \
+            -p:Version=${{ needs.version.outputs.version }} \
+            -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
+            -o publish-launcher
+          find publish-launcher -name '*.pdb' -type f -print -delete | wc -l
+          ls -la publish-launcher
+          test -f publish-launcher/VidShrink.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: launcher-${{ matrix.rid }}
+          path: publish-launcher/
+          if-no-files-found: error
+
   publish:
-    needs: [version, test, shell-extension]
-    if: ${{ !cancelled() && needs.shell-extension.result == 'success' }}
+    needs: [version, test, shell-extension, launcher]
+    if: ${{ !cancelled() && needs.shell-extension.result == 'success' && needs.launcher.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -317,18 +352,16 @@ jobs:
             -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
             -o publish/${{ matrix.rid }}
 
-      - name: Publish the launcher
+      - name: Fetch the launcher
         # Windows only, both architectures. The launcher is what the shortcuts point at and
         # what applies an update before the application is loaded; without it in the release
-        # the installer has nowhere to get it from. The csproj pins win-x64; -r overrides it,
-        # so win-arm64 gets its own native launcher rather than an emulated one.
+        # the installer has nowhere to get it from. It is NativeAOT, built by the launcher job
+        # on a Windows runner, so win-arm64 gets its own native launcher rather than an emulated one.
         if: startsWith(matrix.rid, 'win-')
-        run: |
-          dotnet publish src/VidShrink.Launcher/VidShrink.Launcher.csproj \
-            -c Release -r ${{ matrix.rid }} \
-            -p:Version=${{ needs.version.outputs.version }} \
-            -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
-            -o publish-launcher
+        uses: actions/download-artifact@v4
+        with:
+          name: launcher-${{ matrix.rid }}
+          path: publish-launcher
 
       - name: Publish the setup program
         # Windows only. VidShrink-Setup.exe is a trimmed single-file console program that
