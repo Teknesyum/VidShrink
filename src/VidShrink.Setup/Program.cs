@@ -20,6 +20,7 @@ internal static partial class Program
                 Console.WriteLine(SetupText.Get("setup.help"));
                 return 0;
             }
+            if (SetupLaunch.UsePanel(args)) return RunPanel(parsed.Value.Options, ownConsole);
             Run(parsed.Value.Options, parsed.Value.Uninstall, parsed.Value.Timings).GetAwaiter().GetResult();
             return 0;
         }
@@ -35,9 +36,25 @@ internal static partial class Program
         }
     }
 
+    private static int RunPanel(SetupOptions options, bool ownConsole)
+    {
+        var rehearsal = SetupLaunch.RehearsalRequested(Environment.GetEnvironmentVariable(SetupLaunch.RehearsalVariable));
+        var logRoot = options.LocalAppData;
+        if (rehearsal)
+        {
+            var scratch = Path.Combine(Path.GetTempPath(), "vidshrink-prova-" + Guid.NewGuid().ToString("N")[..8]);
+            options = SetupLaunch.Rehearsal(options, scratch);
+            logRoot = scratch;
+        }
+        options = SetupLaunch.ForPanel(options);
+        SetupText.Use(ShellRegistration.ResolveLanguage(options.MenuLanguage, UserLocaleName));
+        if (ownConsole) Native.ShowWindow(Native.GetConsoleWindow(), Native.SW_HIDE);
+        return Panel.Run(options, rehearsal, SetupLaunch.LogPath(logRoot), (log, step) => CreateHost(log, step, rehearsal));
+    }
+
     private static async Task Run(SetupOptions options, bool uninstall, bool timings)
     {
-        var host = CreateHost();
+        var host = CreateHost(message => Write(message, ConsoleColor.Cyan), (_, _, _) => { }, rehearsal: false);
         var clock = Stopwatch.StartNew();
         if (uninstall)
         {
@@ -83,6 +100,7 @@ internal static partial class Program
                 case "--asset-source": assetSource = Path.GetFullPath(Next()); break;
                 case "--download-ffmpeg": downloadFfmpeg = true; break;
                 case "--timings": timings = true; break;
+                case "--console" or "--panel": break;
                 default: throw new SetupException(SetupText.Get("setup.arg.unknown-option", args[i]));
             }
         }
@@ -104,13 +122,14 @@ internal static partial class Program
         return (options, uninstall, timings);
     }
 
-    private static SetupHost CreateHost() => new()
+    private static SetupHost CreateHost(Action<string> log, Action<int, int, string> step, bool rehearsal) => new()
     {
-        Log = message => Write(message, ConsoleColor.Cyan),
+        Log = log,
+        Step = step,
         FindHolders = LockedFolder.FindProcesses,
         FindTool = FindTool,
-        Shortcuts = new ShellShortcuts(),
-        ShellPackage = new PowerShellPackage(),
+        Shortcuts = rehearsal ? null : new ShellShortcuts(),
+        ShellPackage = rehearsal ? null : new PowerShellPackage(),
         Windows11 = Environment.OSVersion.Version.Build >= 22000,
         UiLanguage = UserLocaleName,
         Launch = path => Process.Start(new ProcessStartInfo(path) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(path) })?.Dispose(),

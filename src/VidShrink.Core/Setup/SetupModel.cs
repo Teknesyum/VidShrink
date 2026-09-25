@@ -156,6 +156,12 @@ public sealed class SetupHost
 {
     public Action<string> Log { get; init; } = _ => { };
 
+    /// <summary>
+    /// Kurulumun vardığı yer: yüzde, bir sonraki adıma kadar sürünülebilecek tavan ve adım
+    /// cümlesi. Panel yalnız bunu dinler; konsol yok sayar. Çağrılar tekdüze artar.
+    /// </summary>
+    public Action<int, int, string> Step { get; init; } = (_, _, _) => { };
+
     public Func<string, IReadOnlyList<IRootHolder>> FindHolders { get; init; } = _ => Array.Empty<IRootHolder>();
 
     public Func<TimeSpan, CancellationToken, Task> Delay { get; init; } = Task.Delay;
