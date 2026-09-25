@@ -76,7 +76,7 @@ public sealed class KayitBolmeTests
     {
         var oturum = await RecorderSession.StartAsync(Istek() with { MaxDuration = null, Container = kap, Region = new RecorderRegion(0, 0, 640, 480) }, cikti);
         await Task.Delay(7000);
-        return await oturum.StopAsync(1);
+        return await oturum.StopAsync(0);
     }
 
     private static async Task<int> HamMp4Oldur(string cikti)
