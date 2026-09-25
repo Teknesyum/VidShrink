@@ -27,20 +27,67 @@
     <Border x:Name="Toolbar"
             Theme="{StaticResource Panel}"
             Padding="{StaticResource RecorderRegionToolbarPadding}">
-      <StackPanel Orientation="Horizontal" Spacing="{StaticResource RecorderStripGap}">
-        <TextBlock x:Name="TxtSize"
-                   Theme="{StaticResource MonoValue}"
-                   VerticalAlignment="Center"/>
+      <StackPanel Orientation="Horizontal">
         <Button x:Name="BtnStart"
+                Classes="tool"
                 Theme="{StaticResource PrimaryButton}"
-                Padding="{StaticResource ButtonPaddingSm}"
-                Content="{loc:Text recorder.region.start}"
-                auto:AutomationProperties.Name="{loc:Text recorder.region.start}"/>
+                ToolTip.Tip="{loc:Text recorder.region.start}"
+                auto:AutomationProperties.Name="{loc:Text recorder.region.start}">
+          <Path Width="{StaticResource IconSizeSm}"
+                Height="{StaticResource IconSizeSm}"
+                Stretch="Uniform"
+                Data="{StaticResource IconRecorder}"
+                Fill="{StaticResource OnNeon}"/>
+        </Button>
         <Button x:Name="BtnSettings"
+                Classes="tool"
                 Theme="{StaticResource GhostButton}"
-                Content="{loc:Text recorder.region.settings}"
-                auto:AutomationProperties.Name="{loc:Text recorder.region.settings}"/>
+                ToolTip.Tip="{loc:Text recorder.region.settings}"
+                auto:AutomationProperties.Name="{loc:Text recorder.region.settings}">
+          <Path Width="{StaticResource IconSizeSm}"
+                Height="{StaticResource IconSizeSm}"
+                Stretch="Uniform"
+                Data="{StaticResource IconSettings}"
+                Fill="{StaticResource TextBody}"/>
+        </Button>
+        <Button x:Name="BtnPause"
+                Classes="tool"
+                Theme="{StaticResource GhostButton}"
+                IsVisible="False"
+                ToolTip.Tip="{loc:Text recorder.strip.pause}"
+                auto:AutomationProperties.Name="{loc:Text recorder.strip.pause}">
+          <Path Width="{StaticResource IconSizeSm}"
+                Height="{StaticResource IconSizeSm}"
+                Stretch="Uniform"
+                Data="{StaticResource IconPause}"
+                Fill="{StaticResource TextBody}"/>
+        </Button>
+        <Button x:Name="BtnResume"
+                Classes="tool"
+                Theme="{StaticResource GhostButton}"
+                IsVisible="False"
+                ToolTip.Tip="{loc:Text recorder.strip.resume}"
+                auto:AutomationProperties.Name="{loc:Text recorder.strip.resume}">
+          <Path Width="{StaticResource IconSizeSm}"
+                Height="{StaticResource IconSizeSm}"
+                Stretch="Uniform"
+                Data="{StaticResource IconPlay}"
+                Fill="{StaticResource TextBody}"/>
+        </Button>
+        <Button x:Name="BtnStop"
+                Classes="tool"
+                Theme="{StaticResource PrimaryButton}"
+                IsVisible="False"
+                ToolTip.Tip="{loc:Text recorder.strip.stop}"
+                auto:AutomationProperties.Name="{loc:Text recorder.strip.stop}">
+          <Path Width="{StaticResource IconSizeSm}"
+                Height="{StaticResource IconSizeSm}"
+                Stretch="Uniform"
+                Data="{StaticResource IconStop}"
+                Fill="{StaticResource OnNeon}"/>
+        </Button>
         <Button x:Name="BtnClose"
+                Classes="tool"
                 Theme="{StaticResource GhostButton}"
                 ToolTip.Tip="{loc:Text recorder.region.close}"
                 auto:AutomationProperties.Name="{loc:Text recorder.region.close}">
@@ -54,6 +101,15 @@
     </Border>
   </Canvas>
   <Window.Styles>
+    <Style Selector="Button.tool">
+      <Setter Property="Width" Value="{StaticResource RecorderRegionButtonSize}"/>
+      <Setter Property="Height" Value="{StaticResource RecorderRegionButtonSize}"/>
+      <Setter Property="MinWidth" Value="0"/>
+      <Setter Property="MinHeight" Value="0"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
     <Style Selector="Border.grip">
       <Setter Property="Width" Value="{StaticResource RecorderRegionHandle}"/>
       <Setter Property="Height" Value="{StaticResource RecorderRegionHandle}"/>

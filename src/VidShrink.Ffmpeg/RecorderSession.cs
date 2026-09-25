@@ -194,13 +194,13 @@ public sealed class RecorderSession : IAsyncDisposable
                 progress)
             { _gifPath = outputPath };
         }
-        else if (RecorderArguments.SizeNeedsMatroska(request))
+        else if (RecorderArguments.CapturesInMatroska(request))
         {
             var errors = RecorderArguments.Validate(request, outputPath);
             if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
             session = new RecorderSession(
                 request with { Container = RecorderContainer.Mkv },
-                RecorderArguments.SizeCapturePath(outputPath),
+                RecorderArguments.MatroskaCapturePath(outputPath),
                 progress)
             { _remuxExtension = Path.GetExtension(outputPath) };
         }
@@ -284,12 +284,13 @@ public sealed class RecorderSession : IAsyncDisposable
 
     private async Task<RecordResult> RemuxAsync(RecordResult capture, CancellationToken ct)
     {
+        if (!capture.Ok && !capture.Partial) return capture;
         var files = capture.Files ?? new[] { capture.OutputPath };
         var delivered = new List<string>(files.Count);
         foreach (var file in files)
         {
             if (!File.Exists(file)) continue;
-            var target = RecorderArguments.SizeDeliveryPath(file, _remuxExtension!);
+            var target = RecorderArguments.MatroskaDeliveryPath(file, _remuxExtension!);
             var run = await FfmpegRunner.RunAsync(new[]
             {
                 "-hide_banner", "-y", "-nostdin", "-i", file, "-map", "0", "-c", "copy", "-movflags", "+faststart", target

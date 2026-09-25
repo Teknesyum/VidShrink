@@ -38,6 +38,13 @@
                                  aralarındaki SpaceSm boşluklar.
       RecorderPreviewWidth    <- RecorderArguments.PreviewWidth (320). Canlı önizleme
                                  karesi ffmpeg'in yazdığı boyutta, ölçeklenmeden çizilir.
+
+    Bölge düzenleyicinin araç paneli. Kaydın üstünde duruyor, ekranda en az yer tutmalı.
+
+      RecorderRegionButtonSize<- TargetMinSize (24). Panelde yalnız simge düğmesi var;
+                                 dokunma hedefinin tabanı, altına inilmiyor.
+      RecorderRegionToolbarPadding <- FocusRingScalar (2). Düğmeler arası boşluk yok;
+                                 kenarda yalnız klavye odak halkasının sığacağı pay.
   -->
 
   <Thickness x:Key="RecorderStripPadding">16,8</Thickness>
@@ -58,7 +65,8 @@
   <x:Double x:Key="RecorderRegionHandle">12</x:Double>
   <x:Double x:Key="RecorderRegionGrip">4</x:Double>
   <x:Double x:Key="RecorderRegionToolbarGap">4</x:Double>
-  <Thickness x:Key="RecorderRegionToolbarPadding">8,4</Thickness>
+  <Thickness x:Key="RecorderRegionToolbarPadding">2</Thickness>
+  <x:Double x:Key="RecorderRegionButtonSize">24</x:Double>
 
   <x:Double x:Key="RecorderClickRingSize">48</x:Double>
   <x:Double x:Key="RecorderClickRingThickness">4</x:Double>

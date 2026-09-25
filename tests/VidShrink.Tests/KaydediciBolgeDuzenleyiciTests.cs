@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using VidShrink.App.Recorder;
 using VidShrink.Core;
+using VidShrink.Ffmpeg;
 using Xunit;
 using static VidShrink.Tests.KaydediciAyarTests;
 
@@ -119,6 +120,9 @@ public sealed class KaydediciBolgeDuzenleyiciTests
         Assert.False(Kapsar(120, 300));
         Assert.True(Kapsar(110, 300));
         Assert.True(Kapsar(750, 300));
+
+        var kayitta = RegionEdit.Shape(Bolge, 4, 12, panel, koken, editable: false);
+        Assert.Equal(new[] { new PixelRect(110, 70, 300, 40) }, kayitta);
     }
 
     [Fact]
@@ -144,7 +148,7 @@ public sealed class KaydediciBolgeDuzenleyiciTests
     }
 
     [Fact]
-    public void DuzenleyiciKayitSurerkenGizlenirHedefDegisinceKapanir()
+    public void DuzenleyiciTampondaGizlenirHedefDegisinceKapanir()
     {
         Assert.Equal(RegionEditorState.Shown, RecorderView.EditorWanted(true, true, true, false));
         Assert.Equal(RegionEditorState.Hidden, RecorderView.EditorWanted(true, true, true, true));
@@ -157,6 +161,76 @@ public sealed class KaydediciBolgeDuzenleyiciTests
         Assert.True(yuzey >= 0 && serit.IndexOf("SyncRegionEditor();", yuzey, StringComparison.Ordinal) > yuzey);
     }
 
+    [Fact]
+    public void KayitEvresiOturumdanVeGeriSayimdanOkunur()
+    {
+        Assert.Equal(RegionEditorPhase.Idle, RecorderView.EditorPhase(false, RecorderState.Stopped, false));
+        Assert.Equal(RegionEditorPhase.Counting, RecorderView.EditorPhase(false, RecorderState.Stopped, true));
+        Assert.Equal(RegionEditorPhase.Running, RecorderView.EditorPhase(true, RecorderState.Running, false));
+        Assert.Equal(RegionEditorPhase.Paused, RecorderView.EditorPhase(true, RecorderState.Paused, false));
+
+        Assert.True(RecorderRegionEditor.Editable(RegionEditorPhase.Idle));
+        Assert.All(new[] { RegionEditorPhase.Counting, RegionEditorPhase.Running, RegionEditorPhase.Paused },
+            e => Assert.False(RecorderRegionEditor.Editable(e)));
+    }
+
+    [Fact]
+    public void DuzenleyicininDugmeleriKaydedicininKendiYolunuCagirir()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(GirdiKanit.Root, "src", "VidShrink.App", "Recorder", "RecorderView.Duzenleyici.cs"));
+
+        Assert.Contains("OnEditorStart(object? sender, EventArgs e) => await StartAsync();", kaynak);
+        Assert.Contains("OnEditorPause(object? sender, EventArgs e) => await PauseAsync();", kaynak);
+        Assert.Contains("OnEditorResume(object? sender, EventArgs e) => await ResumeAsync();", kaynak);
+        Assert.Contains("OnEditorStop(object? sender, EventArgs e) => await StopAsync();", kaynak);
+        Assert.DoesNotContain("session.StopAsync", kaynak);
+        Assert.DoesNotContain("_session.PauseAsync", kaynak);
+    }
+
+    [Fact]
+    public void GeriSayimdaPanelDurdurGosterirVeDurdurSayimiKeser()
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var sahte = new SahteDuzenleyici();
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, RegionEditorEnabled = true, RegionEditor = sahte };
+            Elle(view);
+            view.DrawRegion = _ => Task.FromResult<PixelRect?>(new PixelRect(100, 50, 640, 360));
+            view.DrawRegionAsync().GetAwaiter().GetResult();
+            var bosta = sahte.Evre;
+            Bul<ComboBox>(view, "CmbCountdown").SelectedIndex = 3;
+
+            var adim = 0;
+            RegionEditorPhase? sayarken = null;
+            view.CountdownDelay = (_, ct) =>
+            {
+                if (++adim == 2)
+                {
+                    sayarken = sahte.Evre;
+                    sahte.Durdur();
+                }
+
+                return ct.IsCancellationRequested ? Task.FromCanceled(ct) : Task.CompletedTask;
+            };
+            var tamamlandi = view.CountdownAsync().GetAwaiter().GetResult();
+
+            sahte.Duraklat();
+            sahte.Surdur();
+
+            return (bosta, sayarken, tamamlandi, adim, sonra: sahte.Evre, gizle: sahte.Cagrilar.Count(c => c == "gizle"),
+                oturum: view.HasSession || view.CountingDown, acik: sahte.IsOpen);
+        }));
+
+        Assert.Equal(RegionEditorPhase.Idle, olcu.bosta);
+        Assert.Equal(RegionEditorPhase.Counting, olcu.sayarken);
+        Assert.False(olcu.tamamlandi);
+        Assert.Equal(2, olcu.adim);
+        Assert.Equal(RegionEditorPhase.Idle, olcu.sonra);
+        Assert.Equal(0, olcu.gizle);
+        Assert.False(olcu.oturum);
+        Assert.True(olcu.acik);
+    }
+
     private sealed class SahteDuzenleyici : IRegionEditorHost
     {
         public List<string> Cagrilar { get; } = new();
@@ -164,6 +238,8 @@ public sealed class KaydediciBolgeDuzenleyiciTests
         public PixelRect? Son { get; private set; }
 
         public double? Oran { get; private set; }
+
+        public RegionEditorPhase? Evre { get; private set; }
 
         public bool IsOpen { get; private set; }
 
@@ -175,13 +251,20 @@ public sealed class KaydediciBolgeDuzenleyiciTests
 
         public event EventHandler? SettingsRequested;
 
+        public event EventHandler? PauseRequested;
+
+        public event EventHandler? ResumeRequested;
+
+        public event EventHandler? StopRequested;
+
         public event EventHandler? Dismissed;
 
-        public void Show(PixelRect region, double? ratio)
+        public void Show(PixelRect region, double? ratio, RegionEditorPhase phase)
         {
             IsOpen = true;
             Son = region;
             Oran = ratio;
+            Evre = phase;
             Cagrilar.Add("goster");
         }
 
@@ -198,6 +281,12 @@ public sealed class KaydediciBolgeDuzenleyiciTests
         public void Birak(PixelRect r) => Committed?.Invoke(this, r);
 
         public void Ayarlar() => SettingsRequested?.Invoke(this, EventArgs.Empty);
+
+        public void Durdur() => StopRequested?.Invoke(this, EventArgs.Empty);
+
+        public void Duraklat() => PauseRequested?.Invoke(this, EventArgs.Empty);
+
+        public void Surdur() => ResumeRequested?.Invoke(this, EventArgs.Empty);
 
         public void KullaniciKapatti()
         {

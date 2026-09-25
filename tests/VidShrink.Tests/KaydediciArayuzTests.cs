@@ -225,19 +225,26 @@ public sealed class KaydediciArayuzTests
     }
 
     [Fact]
-    public void VarsayilanKapMatroska()
+    public void VarsayilanKapMp4()
     {
         var settings = new RecorderSettings { OutputFolder = @"C:\kayit" };
+        var yol = settings.OutputPath(new DateTime(2026, 9, 16, 10, 0, 0, DateTimeKind.Local));
 
-        Assert.Equal(RecorderContainer.Mkv, settings.Container);
-        Assert.EndsWith(".mkv", settings.OutputPath(new DateTime(2026, 9, 16, 10, 0, 0, DateTimeKind.Local)));
+        Assert.Equal(RecorderContainer.Mp4, settings.Container);
+        Assert.Equal(".mp4", Path.GetExtension(yol));
+        Assert.StartsWith(Path.Combine(@"C:\kayit", "kayit_"), yol);
+        Assert.Equal(RecorderContainer.Mp4, RecorderArguments.ContainerOf(yol));
+        Assert.True(RecorderArguments.CapturesInMatroska(new RecorderRequest { Platform = RecorderPlatform.Windows, Target = RecorderTargetKind.Screen, Container = settings.Container }));
     }
 
     [Theory]
-    [InlineData("{\"container\":\"Mp4\"}", RecorderContainer.Mkv)]
+    [InlineData("{\"container\":\"Mp4\"}", RecorderContainer.Mp4)]
     [InlineData("{\"container\":\"Mov\"}", RecorderContainer.Mov)]
     [InlineData("{\"containerChoice\":\"Mp4\",\"container\":\"Mov\"}", RecorderContainer.Mp4)]
-    [InlineData("{}", RecorderContainer.Mkv)]
+    [InlineData("{\"containerChoice\":\"Mkv\"}", RecorderContainer.Mp4)]
+    [InlineData("{\"containerChoice\":\"Gif\"}", RecorderContainer.Gif)]
+    [InlineData("{\"containerFormat\":\"Mkv\",\"containerChoice\":\"Mp4\"}", RecorderContainer.Mkv)]
+    [InlineData("{}", RecorderContainer.Mp4)]
     public void EskiAyardakiKapOkunur(string json, RecorderContainer beklenen)
     {
         var klasor = CalismaKlasoru();
@@ -262,8 +269,12 @@ public sealed class KaydediciArayuzTests
             var dosya = Path.Combine(klasor, "recorder.json");
             new RecorderSettings { Container = RecorderContainer.Mp4 }.Save(dosya);
 
-            Assert.Contains("\"containerChoice\": \"Mp4\"", File.ReadAllText(dosya));
+            Assert.Contains("\"containerFormat\": \"Mp4\"", File.ReadAllText(dosya));
+            Assert.DoesNotContain("containerChoice", File.ReadAllText(dosya));
             Assert.Equal(RecorderContainer.Mp4, RecorderSettings.Load(dosya).Container);
+
+            new RecorderSettings { Container = RecorderContainer.Mkv }.Save(dosya);
+            Assert.Equal(RecorderContainer.Mkv, RecorderSettings.Load(dosya).Container);
         }
         finally
         {

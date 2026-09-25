@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -72,8 +72,8 @@ public sealed class KaydediciAyarTests
         {
             var view = new RecorderView(ayarYolu);
             Elle(view);
-            Sec(view, "CmbContainer", "MP4");
-            var once = DosyadakiDeger(ayarYolu, "containerChoice");
+            Sec(view, "CmbContainer", "MKV");
+            var once = DosyadakiDeger(ayarYolu, "containerFormat");
 
             var alan = typeof(RecorderView).GetField("_session",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
@@ -82,7 +82,7 @@ public sealed class KaydediciAyarTests
             try
             {
                 Sec(view, "CmbContainer", "MOV");
-                return (once, DosyadakiDeger(ayarYolu, "containerChoice"));
+                return (once, DosyadakiDeger(ayarYolu, "containerFormat"));
             }
             finally
             {
@@ -90,7 +90,7 @@ public sealed class KaydediciAyarTests
             }
         }));
 
-        Assert.Equal("\"Mp4\"", oturumsuz);
+        Assert.Equal("\"Mkv\"", oturumsuz);
         Assert.Equal("\"Mov\"", oturumlu);
     }
 
@@ -277,9 +277,9 @@ public sealed class KaydediciAyarTests
                 ? null : $"-video_size {Deger(a, "-video_size")} -offset_x {Deger(a, "-offset_x")} -offset_y {Deger(a, "-offset_y")}");
         yield return new("cikis klasoru", v => Yaz(v, "TxtOutputFolder", Klasor), "outputFolder", JsonSerializer.Serialize(Klasor),
             (_, _, yol) => yol.StartsWith(Klasor, StringComparison.OrdinalIgnoreCase) ? null : "yol " + yol);
-        yield return new("kap", v => Sec(v, "CmbContainer", "MP4"), "containerChoice", "\"Mp4\"",
-            (_, a, yol) => yol.EndsWith(".mp4", StringComparison.Ordinal) && Deger(a, "-movflags") == "+faststart" ? null : "yol " + yol,
-            p => Oku(p, "format_name")?.Contains("mp4", StringComparison.Ordinal) == true ? null : "format_name " + Oku(p, "format_name"));
+        yield return new("kap", v => Sec(v, "CmbContainer", "MKV"), "containerFormat", "\"Mkv\"",
+            (_, a, yol) => yol.EndsWith(".mkv", StringComparison.Ordinal) && Deger(a, "-movflags") is null ? null : "yol " + yol,
+            p => Oku(p, "format_name")?.Contains("matroska", StringComparison.Ordinal) == true ? null : "format_name " + Oku(p, "format_name"));
         yield return new("olcek", v => { Yaz(v, "TxtScaleWidth", "320"); Yaz(v, "TxtScaleHeight", "180"); }, "scaleWidth", "320",
             (_, a, _) => Deger(a, "-vf") == "scale=320:180" ? null : "-vf " + Deger(a, "-vf"),
             p => Oku(p, "width") == "320" && Oku(p, "height") == "180" ? null : $"{Oku(p, "width")}x{Oku(p, "height")}");

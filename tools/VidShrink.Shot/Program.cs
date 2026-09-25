@@ -52,6 +52,9 @@ public static class Program
         Directory.CreateDirectory(Path.GetDirectoryName(SettingsFile)!);
         Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", SettingsFile);
 
+        if (args.Length > 1 && args[0] == "bolge-paneli")
+            return BolgePaneli.Run(Path.GetFullPath(args[1]), args.Length > 2 ? args[2] : "kare");
+
         var outDir = args.Length > 0
             ? Path.GetFullPath(args[0])
             : Path.Combine(RepoRoot(), "docs", "gorseller");

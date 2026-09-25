@@ -13,7 +13,7 @@ internal partial class RecorderView
 {
     internal static readonly RecorderContainer[] Containers =
     {
-        RecorderContainer.Mkv, RecorderContainer.Mp4, RecorderContainer.Mov, RecorderContainer.Gif
+        RecorderContainer.Mp4, RecorderContainer.Mkv, RecorderContainer.Mov, RecorderContainer.Gif
     };
 
     private static string ContainerLabel(RecorderContainer container) => container switch

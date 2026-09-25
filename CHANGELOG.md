@@ -10,14 +10,25 @@ ship as part of it.
 ### Added
 
 - `VidShrink-Setup.exe` opens a graphical setup panel when started without arguments (native Win32/GDI+, no WinForms/WPF): five steps (download, sha256 verification, placement, shell registration, shortcuts) with check/number/failure marks, a gradient progress bar with percentage, a fading monospace log, an install location row with a Change button, and the Install / Installing / Close + Open app / Retry button flow. Any flag or `--console` keeps the console installer; `VIDSHRINK_SETUP_PROVA` runs a rehearsal into a temporary folder; the log is also written to `%LOCALAPPDATA%\VidShrink\kurulum.log`.
+- While recording, the region editor's toolbar shows stop and pause/resume, using the
+  recorder's own stop path; during the countdown stop cancels it.
 
 ### Changed
 
 - The Windows launcher is now NativeAOT, so a double-click starts the application about 60 ms sooner warm and 90 ms sooner cold.
+- Screen recordings are now delivered as MP4 by default, so they open directly in
+  WhatsApp, browsers and social apps. MP4 and MOV are captured in Matroska and remuxed
+  with `-c copy -movflags +faststart` on stop, so a killed recording still yields a
+  playable MP4. The choice is stored as `containerFormat`; the old default `Mkv`
+  written by earlier versions reads as MP4.
+- The region editor's toolbar is icon-only and much smaller (379x49 to 78x30 px); the
+  region size moved into the start button's tooltip.
 
 ### Fixed
 
 - Windows 10 with an old `vulkan-1.dll` no longer shows the "entry point vkGetPhysicalDeviceProperties2 not found" system dialog when a video opens: the installer and CI now place a pinned Vulkan loader (1.4.357.0) next to `libmpv-2.dll`, and if libmpv still fails to load the player is disabled with an in-app error instead of a system dialog.
+- A recording killed within its first seconds no longer leaves a header-only Matroska file:
+  the muxer now closes a cluster every 500 ms (`-cluster_time_limit`) instead of every 5 s.
 
 ## [0.9.3] - 2026-09-25
 

@@ -152,18 +152,20 @@ public sealed class KaydediciHedefTests
     }
 
     [Fact]
-    public void Mp4BoyutSiniriMatroskaYakalamayaDuser()
+    public void Mp4VeMovHerZamanMatroskayaYakalanir()
     {
-        Assert.True(RecorderArguments.SizeNeedsMatroska(Istek() with { MaxMegabytes = 5 }));
-        Assert.True(RecorderArguments.SizeNeedsMatroska(Istek() with { Container = RecorderContainer.Mov, Split = new RecorderSplit(null, 5) }));
-        Assert.False(RecorderArguments.SizeNeedsMatroska(Istek() with { Container = RecorderContainer.Mkv, MaxMegabytes = 5 }));
-        Assert.False(RecorderArguments.SizeNeedsMatroska(Istek()));
-        Assert.False(RecorderArguments.SizeNeedsMatroska(Istek() with { Split = new RecorderSplit(TimeSpan.FromSeconds(5), null) }));
+        Assert.True(RecorderArguments.CapturesInMatroska(Istek() with { MaxMegabytes = 5 }));
+        Assert.True(RecorderArguments.CapturesInMatroska(Istek() with { Container = RecorderContainer.Mov, Split = new RecorderSplit(null, 5) }));
+        Assert.True(RecorderArguments.CapturesInMatroska(Istek()));
+        Assert.True(RecorderArguments.CapturesInMatroska(Istek() with { Split = new RecorderSplit(TimeSpan.FromSeconds(5), null) }));
+        Assert.False(RecorderArguments.CapturesInMatroska(Istek() with { Container = RecorderContainer.Mkv, MaxMegabytes = 5 }));
+        Assert.False(RecorderArguments.CapturesInMatroska(Istek() with { Container = RecorderContainer.Mkv }));
+        Assert.False(RecorderArguments.CapturesInMatroska(Istek() with { Container = RecorderContainer.Gif }));
 
-        var yakalama = RecorderArguments.SizeCapturePath(Path.Combine("k", "kayit_1.mp4"));
-        Assert.Equal(Path.Combine("k", "kayit_1.boyut.mkv"), yakalama);
-        Assert.Equal(Path.Combine("k", "kayit_1.mp4"), RecorderArguments.SizeDeliveryPath(yakalama, ".mp4"));
-        Assert.Equal(Path.Combine("k", "kayit_1.bolum2.mov"), RecorderArguments.SizeDeliveryPath(Path.Combine("k", "kayit_1.boyut.bolum2.mkv"), ".mov"));
+        var yakalama = RecorderArguments.MatroskaCapturePath(Path.Combine("k", "kayit_1.mp4"));
+        Assert.Equal(Path.Combine("k", "kayit_1.yakalama.mkv"), yakalama);
+        Assert.Equal(Path.Combine("k", "kayit_1.mp4"), RecorderArguments.MatroskaDeliveryPath(yakalama, ".mp4"));
+        Assert.Equal(Path.Combine("k", "kayit_1.bolum2.mov"), RecorderArguments.MatroskaDeliveryPath(Path.Combine("k", "kayit_1.yakalama.bolum2.mkv"), ".mov"));
     }
 
     [Fact]
@@ -197,7 +199,7 @@ public sealed class KaydediciHedefTests
         Assert.Contains("7", olcu.boyut.Not);
         Assert.Equal((TimeSpan.FromSeconds(30), (double?)10), (olcu.ikisi.Istek.MaxDuration, olcu.ikisi.Istek.MaxMegabytes));
         Assert.NotNull(olcu.ikisi.Istek.BitrateKbps);
-        Assert.Equal("5000000", Deger(RecorderArguments.Build(olcu.boyut.Istek with { MaxMegabytes = 5 }, "a.mkv"), "-fs"));
+        Assert.Equal("5000000", Deger(RecorderArguments.Build(olcu.boyut.Istek with { MaxMegabytes = 5, Container = RecorderContainer.Mkv }, "a.mkv"), "-fs"));
 
         Kapat("tek-hedef.txt");
     }
@@ -341,7 +343,7 @@ public sealed class KaydediciHedefTests
         var sure = saat.Elapsed.TotalSeconds;
         var sonuc = await oturum.StopAsync();
         var bayt = File.Exists(cikti) ? new FileInfo(cikti).Length : 0;
-        var yakalama = RecorderArguments.SizeCapturePath(cikti);
+        var yakalama = RecorderArguments.MatroskaCapturePath(cikti);
         var (kod, metin) = KayitKanit.Ffprobe(cikti, "boyut-siniri.ffprobe.txt");
         var baslik = File.Exists(cikti) ? System.Text.Encoding.ASCII.GetString(File.ReadAllBytes(cikti), 4, 4) : string.Empty;
         var (paketBayt, sonKume) = Paketler(cikti);

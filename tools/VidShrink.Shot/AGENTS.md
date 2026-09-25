@@ -5,6 +5,10 @@ README görsellerini üreten çekim düzeneği. T189'da kuruldu.
     dotnet run --project tools/VidShrink.Shot                      # docs/gorseller/ altına
     dotnet run --project tools/VidShrink.Shot -- <çıkış klasörü>
     dotnet run --project tools/VidShrink.Shot -- <çıkış klasörü> <klip.mp4>
+    dotnet run --project tools/VidShrink.Shot -- bolge-paneli <çıkış klasörü> <etiket>
+
+`bolge-paneli` kaydedicinin bölge düzenleyicisindeki araç panelini kendi ölçüsünde, her
+evre için ayrı çizer (`bolge-paneli-<etiket>-<evre>.png`) ve boyutu stdout'a yazar.
 
 **Pencere masaüstünde açılmaz.** Uygulama Avalonia'nın başsız platformunda (Skia çizimi
 açık) kurulur, `MainWindow` 1600x1000 görüş alanında ölçülüp yerleştirilir, kök görsel
