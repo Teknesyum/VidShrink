@@ -22,6 +22,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 env:
   DOTNET_NOLOGO: 'true'
@@ -36,6 +37,7 @@ jobs:
       version: ${{ steps.read.outputs.version }}
       commit: ${{ steps.read.outputs.commit }}
       built: ${{ steps.read.outputs.built }}
+      tested: ${{ steps.tested.outputs.tested }}
     steps:
       - uses: actions/checkout@v4
 
@@ -62,8 +64,26 @@ jobs:
           echo "commit=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
           echo "built=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
+      # Minor ve yamada ayni commit'in ci.yml kosumu yesilse suit ikinci kez kosmaz: o commit
+      # zaten olculdu. Majorde (x.0.0) ya da CI yesili yoksa kapi tam kosar.
+      - id: tested
+        name: Ayni commit'in CI yesilini ara
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="${{ steps.read.outputs.version }}"
+          tested=false
+          if [[ ! "$version" =~ ^[0-9]+\.0\.0$ ]]; then
+            count=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?head_sha=${{ github.sha }}&status=success&per_page=1" --jq '.total_count')
+            if [ "${count:-0}" -gt 0 ]; then tested=true; fi
+          fi
+          echo "CI yesili: $tested"
+          echo "tested=$tested" >> "$GITHUB_OUTPUT"
+
   test:
     needs: version
+    if: needs.version.outputs.tested != 'true'
     # Windows, not Linux. AppHost now picks a windowing backend per platform, so the
     # suite completes on Linux and macOS too, on Avalonia's headless backend. The gate
     # stays where the windows really open: that way the release is checked against the
@@ -201,6 +221,7 @@ jobs:
 
   shell-extension:
     needs: [version, test]
+    if: ${{ !cancelled() && needs.version.result == 'success' && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
@@ -235,6 +256,7 @@ jobs:
 
   publish:
     needs: [version, test, shell-extension]
+    if: ${{ !cancelled() && needs.shell-extension.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -409,6 +431,7 @@ jobs:
 
   release:
     needs: [version, publish]
+    if: ${{ !cancelled() && needs.publish.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
