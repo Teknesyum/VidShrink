@@ -5,6 +5,22 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.9.1] - 2026-09-25
+
+### Changed
+
+- Install swaps the files in place: each running file is renamed to `.old`, the
+  verified staged file takes its name and the app reopens itself, without handing
+  over to the launcher. Measured from Install to the new process: 68 ms instead of
+  114 ms, also while the background launcher waits at the door.
+- A manual update download runs on six lanes instead of one; the 4 MB/s cap while
+  playing stays.
+- The progress bar settles at 100% as soon as the work ends.
+
+### Removed
+
+- The Matrix rain behind the update panel.
+
 ## [0.9.0] - 2026-09-24
 
 ### Added
