@@ -1172,6 +1172,8 @@ public sealed class BaslikKapsamiTests
     /// kola giriyor, 4 dilde (es fr pt ro: "Editor de región"), en ve tr haric: 2651 + 4 = 2655, en 245, tr 90.</para>
     /// <para>2026-09-25, libmpv yukleme hatasi: <c>main.player.engine.loadfailed</c> 5 dilde kola giriyor (bn hi ja th ur),
     /// en ve tr haric: 2655 + 5 = 2660, en 245, tr 90.</para>
+    /// <para>2026-09-25, Indir ve Yukle: <c>main.action.downloadinstall</c> 5 dilde kola giriyor (cs en sk sl tr):
+    /// 2660 + 5 = 2665, en 246, tr 91.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1197,9 +1199,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2660, toplam);
-        Assert.Equal(245, dilBasina["en"]);
-        Assert.Equal(90, dilBasina["tr"]);
+        Assert.Equal(2665, toplam);
+        Assert.Equal(246, dilBasina["en"]);
+        Assert.Equal(91, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1359,6 +1361,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-25, mini serit: dil basina iki anahtar (<c>recorder.mini.offer</c>, <c>recorder.mini.region</c>):
     /// 1104 + 2 = 1106, 43 x 1106 = 47558.</para>
     /// <para>2026-09-25, libmpv yukleme hatasi: dil basina <c>main.player.engine.loadfailed</c>: 1106 + 1 = 1107, 43 x 1107 = 47601.</para>
+    /// <para>2026-09-25, Indir ve Yukle: dil basina <c>main.action.downloadinstall</c>: 1107 + 1 = 1108, 43 x 1108 = 47644.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1386,7 +1389,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(47601, gezilen);
+        Assert.Equal(47644, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -45,6 +45,7 @@
 
   "main.action.install": "Installer",
   "main.action.download": "Hent",
+  "main.action.downloadinstall": "Hent og installer",
 
   "main.action.browse": "Gennemse",
   "main.action.cancel": "Annuller",

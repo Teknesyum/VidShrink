@@ -45,6 +45,7 @@
 
   "main.action.install": "Sakinisha",
   "main.action.download": "Pakua",
+  "main.action.downloadinstall": "Pakua na usakinishe",
 
   "main.action.browse": "Vinjari",
   "main.action.cancel": "Ghairi",

@@ -45,6 +45,7 @@
 
   "main.action.install": "Paigalda",
   "main.action.download": "Laadi alla",
+  "main.action.downloadinstall": "Laadi alla ja paigalda",
 
   "main.action.browse": "Sirvi",
   "main.action.cancel": "Loobu",

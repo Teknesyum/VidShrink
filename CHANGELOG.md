@@ -7,6 +7,14 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- The update notice has a second button, Download and Install: the update downloads and installs itself as soon as it is ready; cancelling or a failed download brings both buttons back.
+
+### Changed
+
+- The updated-to-new-version notice closes by itself after 5 seconds; hovering it or keyboard focus inside pauses the countdown, which resumes from the time left.
+
 ## [0.9.4] - 2026-09-25
 
 ### Added

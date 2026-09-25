@@ -45,6 +45,7 @@
 
   "main.action.install": "Asenna",
   "main.action.download": "Lataa",
+  "main.action.downloadinstall": "Lataa ja asenna",
 
   "main.action.browse": "Selaa",
   "main.action.cancel": "Peruuta",

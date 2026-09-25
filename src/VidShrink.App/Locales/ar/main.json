@@ -45,6 +45,7 @@
 
   "main.action.install": "تثبيت",
   "main.action.download": "تنزيل",
+  "main.action.downloadinstall": "تنزيل وتثبيت",
 
   "main.action.browse": "استعراض",
   "main.action.cancel": "إلغاء",

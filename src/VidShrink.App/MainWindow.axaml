@@ -131,7 +131,7 @@
                   BoxShadow="{DynamicResource GlowPurple}"
                   Padding="{StaticResource ButtonPaddingSm}">
             <StackPanel Spacing="{StaticResource SpaceMd}">
-              <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+              <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
                 <Image Grid.Column="0"
                        x:Name="UpdateNoticeIcon"
                        Width="{StaticResource IconSizeLg}"
@@ -156,6 +156,12 @@
                         VerticalAlignment="Center"
                         Click="OnInstallUpdate"/>
                 <Button Grid.Column="3"
+                        x:Name="BtnNoticeDownloadInstall"
+                        Content="{loc:Text main.action.downloadinstall}"
+                        Theme="{StaticResource PrimaryButton}"
+                        VerticalAlignment="Center"
+                        Click="OnDownloadAndInstallUpdate"/>
+                <Button Grid.Column="4"
                         x:Name="BtnNoticeDismiss"
                         Content="×"
                         Theme="{StaticResource GhostButton}"

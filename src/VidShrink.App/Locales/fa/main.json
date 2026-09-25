@@ -45,6 +45,7 @@
 
   "main.action.install": "نصب",
   "main.action.download": "دانلود",
+  "main.action.downloadinstall": "دانلود و نصب",
 
   "main.action.browse": "انتخاب",
   "main.action.cancel": "لغو",

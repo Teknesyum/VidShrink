@@ -45,6 +45,7 @@
 
   "main.action.install": "Installieren",
   "main.action.download": "Herunterladen",
+  "main.action.downloadinstall": "Herunterladen und installieren",
 
   "main.action.browse": "Durchsuchen",
   "main.action.cancel": "Abbrechen",
