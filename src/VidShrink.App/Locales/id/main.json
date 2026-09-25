@@ -45,6 +45,7 @@
 
   "main.action.install": "Pasang",
   "main.action.download": "Unduh",
+  "main.action.downloadinstall": "Unduh dan pasang",
 
   "main.action.browse": "Telusuri",
   "main.action.cancel": "Batal",

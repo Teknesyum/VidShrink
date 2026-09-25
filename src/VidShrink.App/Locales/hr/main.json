@@ -45,6 +45,7 @@
 
   "main.action.install": "Instaliraj",
   "main.action.download": "Preuzmi",
+  "main.action.downloadinstall": "Preuzmi i instaliraj",
 
   "main.action.browse": "Pregledaj",
   "main.action.cancel": "Odustani",

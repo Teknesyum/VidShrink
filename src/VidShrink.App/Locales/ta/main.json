@@ -45,6 +45,7 @@
 
   "main.action.install": "நிறுவு",
   "main.action.download": "பதிவிறக்கு",
+  "main.action.downloadinstall": "பதிவிறக்கி நிறுவு",
 
   "main.action.browse": "உலாவு",
   "main.action.cancel": "ரத்து",

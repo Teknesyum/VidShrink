@@ -284,35 +284,36 @@ public sealed class ShareFlowTests : IDisposable
     // ---- K3: güncelleme bildirimi -------------------------------------------------------
 
     /// <summary>
-    /// K3: şerit kullanıcı kapatana kadar durur. İşaret dosyası yalnız kapatma
-    /// düğmesinden silinir; şerit göründüğü anda silinseydi okunmadan kaybolurdu.
+    /// K3: işaret dosyası yalnız şerit kapanınca silinir — kullanıcı kapatınca ya da şerit
+    /// süresini görünür doldurunca; şerit göründüğü anda silinseydi okunmadan kaybolurdu.
+    /// Kapanma yolu tek: <c>CloseAppliedNotice</c>, onu da yalnız kapatma düğmesi ve sayaç çağırır.
     /// </summary>
     [Fact]
-    public void TheAppliedNoticeIsClearedOnlyWhenTheUserClosesIt()
+    public void TheAppliedNoticeIsClearedOnlyWhenItCloses()
     {
         var code = File.ReadAllText(TipSources.WindowCodePath);
 
         var calls = Regex.Matches(code, @"_appliedNotice\?\.Shown\(\)");
         Assert.Single(calls);
 
+        var close = code.IndexOf("private void CloseAppliedNotice", StringComparison.Ordinal);
         var dismiss = code.IndexOf("private void OnDismissAppliedNotice", StringComparison.Ordinal);
-        Assert.True(dismiss >= 0, "Kapatma işleyicisi yok.");
-        Assert.True(calls[0].Index > dismiss, "İşaret kapatma işleyicisinin dışında siliniyor.");
+        Assert.True(close >= 0 && dismiss > close, "Kapatma yolu yok.");
+        Assert.True(calls[0].Index > close && calls[0].Index < dismiss, "İşaret kapanma yolunun dışında siliniyor.");
+        Assert.Equal(3, Regex.Matches(code, @"\bCloseAppliedNotice\(\)").Count);
         Assert.DoesNotContain("ClearAppliedMarker", code, StringComparison.Ordinal);
     }
 
-    /// <summary>K3: şeridin zaman aşımı yok, kendiliğinden kaybolmaz.</summary>
+    /// <summary>
+    /// K3'ün süresi: şerit <see cref="MainWindow.AppliedNoticeSeconds"/> saniye görünür kalır.
+    /// Davranışı <c>GuncellemeIndirYukleTests</c> ölçer; burası sayının tek yerde olduğunu pimler.
+    /// </summary>
     [Fact]
-    public void TheAppliedNoticeHasNoTimeout()
+    public void TheAppliedNoticeTimeoutIsOneNamedConstant()
     {
         var code = File.ReadAllText(TipSources.WindowCodePath);
-        var start = code.IndexOf("private void ReportAppliedUpdate", StringComparison.Ordinal);
-        var end = code.IndexOf("private void OnDismissAppliedNotice", StringComparison.Ordinal);
-
-        Assert.True(start >= 0 && end > start);
-        var body = code[start..end];
-        Assert.DoesNotContain("Timer", body, StringComparison.Ordinal);
-        Assert.DoesNotContain("Delay", body, StringComparison.Ordinal);
+        Assert.Equal(5, MainWindow.AppliedNoticeSeconds);
+        Assert.Single(Regex.Matches(code, @"TimeSpan\.FromSeconds\(AppliedNoticeSeconds\)"));
     }
 
     /// <summary>K3: bilgi yeniden başlamayı aşar — okunmadan kapatılan şerit geri gelir.</summary>

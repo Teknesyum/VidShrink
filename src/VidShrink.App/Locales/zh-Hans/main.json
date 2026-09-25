@@ -45,6 +45,7 @@
 
   "main.action.install": "安装",
   "main.action.download": "下载",
+  "main.action.downloadinstall": "下载并安装",
 
   "main.action.browse": "浏览",
   "main.action.cancel": "取消",

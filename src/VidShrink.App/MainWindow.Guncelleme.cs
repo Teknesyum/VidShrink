@@ -5,6 +5,7 @@ using System.IO;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Transformation;
@@ -48,6 +49,40 @@ public partial class MainWindow
     private bool _updateNoticeWatched;
     private CancellationTokenSource? _updateCancel;
     private volatile StagedUpdate? _stagedUpdate;
+    private bool _installAfterDownload;
+
+    /// <summary>İş parçacığının bildirim kuyruğu; ölçü sahte bir sahneleme bildirimi koyar.</summary>
+    internal ConcurrentQueue<UpdateStageReport> UpdateReports => _updateReports;
+
+    /// <summary>
+    /// "İndir ve yükle" basıldı, indirme sürüyor: sahne hazır olunca <see cref="OnInstallUpdate"/>
+    /// kullanıcı bir daha basmadan koşar. İptalde ve düşen indirmede sıfırlanır.
+    /// </summary>
+    internal bool InstallAfterDownload => _installAfterDownload;
+
+    /// <summary>Ölçünün indirme yerine koyduğu iş; boşken gerçek indirme başlar.</summary>
+    internal Action? UpdateDownloadStarter { get; set; }
+
+    /// <summary>Ölçünün kurulum yerine koyduğu iş; boşken "Yükle" yolu koşar.</summary>
+    internal Action? StagedUpdateInstaller { get; set; }
+
+    /// <summary>
+    /// Panelin ikinci düğmesi: indirmeyi başlatır ve bitince kurulumu kendiliğinden sürer.
+    /// İndirme başlamazsa bayrak düşer; başlatıcısı olmayan kurulumda "İndir" gibi yayın
+    /// sayfasını açar.
+    /// </summary>
+    private void OnDownloadAndInstallUpdate(object? sender, RoutedEventArgs e)
+    {
+        if (_updateBadgeState is UpdateBadgeState.Downloading or UpdateBadgeState.Ready or UpdateBadgeState.Installing) return;
+
+        _installAfterDownload = true;
+        (UpdateDownloadStarter ?? StartUpdateDownload)();
+        if (_updateBadgeState == UpdateBadgeState.Downloading) return;
+
+        _installAfterDownload = false;
+        if (UpdateDownloadStarter is null && LauncherUpdate.LocateLauncher(AppContext.BaseDirectory) is null)
+            OpenExternal(UpdateCheck.ReleasesPageUrl);
+    }
 
     /// <summary>
     /// İndirmeyi başlatır. Başlatıcısı olmayan kurulumda indirilecek yer yok; o zaman
@@ -118,13 +153,15 @@ public partial class MainWindow
         if (_updateBadgeState != UpdateBadgeState.Downloading) return;
         var cancel = _updateCancel;
         if (cancel is null || cancel.IsCancellationRequested) return;
+        _installAfterDownload = false;
         cancel.Cancel();
         RefreshUpdateNoticeButton();
     }
 
     /// <summary>
     /// Panelin öncü cümlesi ve birincil düğmesi rozetin durumunu izler: inmemişken "İndir",
-    /// inerken kapalı, indikten sonra "Yükle".
+    /// inerken kapalı, indikten sonra "Yükle". İkinci düğme "İndir ve yükle" yalnız indirme
+    /// başlamadan görünür.
     /// </summary>
     private void RefreshUpdateNoticeButton()
     {
@@ -135,6 +172,7 @@ public partial class MainWindow
             UpdateBadgeState.Downloading => "main.action.cancel",
             _ => "main.action.download"
         });
+        BtnNoticeDownloadInstall.IsVisible = state is not (UpdateBadgeState.Downloading or UpdateBadgeState.Ready or UpdateBadgeState.Installing);
         BtnNoticeInstall.IsEnabled = state switch
         {
             UpdateBadgeState.Installing => false,
@@ -153,8 +191,10 @@ public partial class MainWindow
     /// <summary>İndirme ya da kurulum sürerken panel kapanmaz; × gizlenir, kapatma yolları bekler.</summary>
     internal bool UpdateNoticeLocked => _updateBadgeState is UpdateBadgeState.Downloading or UpdateBadgeState.Installing;
 
-    private void OnUpdateDownloadFinished(Task<bool?> task)
+    internal void OnUpdateDownloadFinished(Task<bool?> task)
     {
+        var installNow = _installAfterDownload;
+        _installAfterDownload = false;
         DrainUpdateReports();
         var progress = _updateProgress;
         if (progress is null) return;
@@ -164,6 +204,12 @@ public partial class MainWindow
         {
             progress.Finish(true, Say("main.update.ready"));
             SetUpdateBadge(UpdateBadgeState.Ready);
+            if (installNow)
+            {
+                StartUpdateFrames();
+                (StagedUpdateInstaller ?? (() => OnInstallUpdate(this, new RoutedEventArgs())))();
+                return;
+            }
         }
         else if (task.IsCanceled)
         {

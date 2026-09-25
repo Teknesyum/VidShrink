@@ -45,6 +45,7 @@
 
   "main.action.install": "Инсталирај",
   "main.action.download": "Преузми",
+  "main.action.downloadinstall": "Преузми и инсталирај",
 
   "main.action.browse": "Pregledaj",
   "main.action.cancel": "Otkaži",

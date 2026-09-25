@@ -45,6 +45,7 @@
 
   "main.action.install": "Nainstalovat",
   "main.action.download": "Stáhnout",
+  "main.action.downloadinstall": "Stáhnout a nainstalovat",
 
   "main.action.browse": "Procházet",
   "main.action.cancel": "Zrušit",

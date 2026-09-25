@@ -45,6 +45,7 @@
 
   "main.action.install": "Installer",
   "main.action.download": "Last ned",
+  "main.action.downloadinstall": "Last ned og installer",
 
   "main.action.browse": "Bla gjennom",
   "main.action.cancel": "Avbryt",

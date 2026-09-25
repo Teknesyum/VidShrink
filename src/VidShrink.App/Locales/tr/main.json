@@ -45,6 +45,7 @@
 
   "main.action.install": "Yükle",
   "main.action.download": "İndir",
+  "main.action.downloadinstall": "İndir ve Yükle",
 
   "main.action.browse": "Gözat",
   "main.action.cancel": "İptal",

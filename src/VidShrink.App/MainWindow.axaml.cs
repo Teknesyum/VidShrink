@@ -1836,8 +1836,9 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// Kendini güncelleyen uygulama yeniden başlar, bu yüzden "geçildi" bilgisi bellekte
-    /// tutulamaz: başlatıcının bıraktığı işaret dosyası okunur. İşaret <b>yalnız kullanıcı
-    /// şeridi kapatınca</b> silinir; şerit görüldüğü anda silinseydi, kullanıcı okumadan
+    /// tutulamaz: başlatıcının bıraktığı işaret dosyası okunur. İşaret şerit kapanınca
+    /// silinir: kullanıcı kapatınca ya da şerit <see cref="AppliedNoticeSeconds"/> saniye
+    /// görünüp kendiliğinden gidince. Görüldüğü anda silinseydi, kullanıcı okumadan
     /// pencereyi kapattığında bilgi bir daha hiç görünmezdi.
     /// </summary>
     private void ReportAppliedUpdate()
@@ -1846,14 +1847,92 @@ public partial class MainWindow : Window
         if (!_appliedNotice.Load()) return;
 
         TxtAppliedVersion.Text = _appliedNotice.Version!;
-        AppliedNotice.IsVisible = true;
+        ShowAppliedNotice();
     }
 
-    private void OnDismissAppliedNotice(object? sender, RoutedEventArgs e)
+    /// <summary>"Yeni sürüme geçildi" şeridinin kendiliğinden kapanma süresi.</summary>
+    internal const int AppliedNoticeSeconds = 5;
+
+    private PausableCountdown? _appliedCountdown;
+    private DispatcherTimer? _appliedTimer;
+    private bool _appliedPointerOver;
+    private bool _appliedNoticeWatched;
+
+    /// <summary>Şeridin sayacının saati; ölçü sahte saat verir.</summary>
+    internal Func<TimeSpan> AppliedNoticeClock { get; set; } = () => AppliedNoticeWatch.Elapsed;
+
+    private static readonly Stopwatch AppliedNoticeWatch = Stopwatch.StartNew();
+
+    internal PausableCountdown? AppliedNoticeCountdown => _appliedCountdown;
+
+    internal DispatcherTimer? AppliedNoticeTimer => _appliedTimer;
+
+    /// <summary>
+    /// Şeridi gösterir ve <see cref="AppliedNoticeSeconds"/> saniyelik sayacı kurar. Fare
+    /// üstündeyken ya da klavye odağı şeritteyken sayaç durur, ayrılınca kalandan sürer.
+    /// </summary>
+    internal void ShowAppliedNotice()
     {
+        AppliedNotice.IsVisible = true;
+        if (!_appliedNoticeWatched)
+        {
+            _appliedNoticeWatched = true;
+            AppliedNotice.PointerEntered += (_, _) => AppliedNoticePointer(true);
+            AppliedNotice.PointerExited += (_, _) => AppliedNoticePointer(false);
+            AppliedNotice.GotFocus += (_, _) => RefreshAppliedCountdown();
+            AppliedNotice.LostFocus += (_, _) => RefreshAppliedCountdown();
+        }
+        _appliedPointerOver = false;
+        _appliedCountdown = new PausableCountdown(TimeSpan.FromSeconds(AppliedNoticeSeconds), AppliedNoticeClock);
+        RefreshAppliedCountdown();
+    }
+
+    internal void AppliedNoticePointer(bool over)
+    {
+        _appliedPointerOver = over;
+        RefreshAppliedCountdown();
+    }
+
+    private void RefreshAppliedCountdown()
+    {
+        var countdown = _appliedCountdown;
+        if (countdown is null) return;
+
+        if (_appliedPointerOver || AppliedNotice.IsKeyboardFocusWithin)
+        {
+            countdown.Pause();
+            _appliedTimer?.Stop();
+            return;
+        }
+
+        countdown.Resume();
+        if (_appliedTimer is null)
+        {
+            _appliedTimer = new DispatcherTimer();
+            _appliedTimer.Tick += (_, _) => AppliedNoticeTick();
+        }
+        _appliedTimer.Stop();
+        _appliedTimer.Interval = countdown.Remaining > TimeSpan.Zero ? countdown.Remaining : TimeSpan.FromMilliseconds(1);
+        _appliedTimer.Start();
+    }
+
+    internal void AppliedNoticeTick()
+    {
+        var countdown = _appliedCountdown;
+        if (countdown is null) return;
+        if (countdown.Elapsed) CloseAppliedNotice();
+        else RefreshAppliedCountdown();
+    }
+
+    private void CloseAppliedNotice()
+    {
+        _appliedTimer?.Stop();
+        _appliedCountdown = null;
         _appliedNotice?.Shown();
         AppliedNotice.IsVisible = false;
     }
+
+    private void OnDismissAppliedNotice(object? sender, RoutedEventArgs e) => CloseAppliedNotice();
 
     private void RefreshUpdateTexts()
     {

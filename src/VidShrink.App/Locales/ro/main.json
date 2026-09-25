@@ -45,6 +45,7 @@
 
   "main.action.install": "Instalează",
   "main.action.download": "Descarcă",
+  "main.action.downloadinstall": "Descarcă și instalează",
 
   "main.action.browse": "Răsfoiește",
   "main.action.cancel": "Anulează",

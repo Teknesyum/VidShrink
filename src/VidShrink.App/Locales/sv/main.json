@@ -45,6 +45,7 @@
 
   "main.action.install": "Installera",
   "main.action.download": "Ladda ned",
+  "main.action.downloadinstall": "Ladda ned och installera",
 
   "main.action.browse": "Bläddra",
   "main.action.cancel": "Avbryt",

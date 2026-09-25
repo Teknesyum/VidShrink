@@ -45,6 +45,7 @@
 
   "main.action.install": "インストール",
   "main.action.download": "ダウンロード",
+  "main.action.downloadinstall": "ダウンロードしてインストール",
 
   "main.action.browse": "参照",
   "main.action.cancel": "キャンセル",

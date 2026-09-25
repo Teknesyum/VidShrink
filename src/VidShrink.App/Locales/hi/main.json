@@ -45,6 +45,7 @@
 
   "main.action.install": "इंस्टॉल करें",
   "main.action.download": "डाउनलोड",
+  "main.action.downloadinstall": "डाउनलोड और इंस्टॉल करें",
 
   "main.action.browse": "ब्राउज़",
   "main.action.cancel": "रद्द करें",

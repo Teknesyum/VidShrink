@@ -45,6 +45,7 @@
 
   "main.action.install": "Telepítés",
   "main.action.download": "Letöltés",
+  "main.action.downloadinstall": "Letöltés és telepítés",
 
   "main.action.browse": "Tallózás",
   "main.action.cancel": "Mégse",

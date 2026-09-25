@@ -45,6 +45,7 @@
 
   "main.action.install": "Встановити",
   "main.action.download": "Завантажити",
+  "main.action.downloadinstall": "Завантажити й встановити",
 
   "main.action.browse": "Огляд",
   "main.action.cancel": "Скасувати",

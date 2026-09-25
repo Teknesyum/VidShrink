@@ -45,6 +45,7 @@
 
   "main.action.install": "ইনস্টল করুন",
   "main.action.download": "ডাউনলোড",
+  "main.action.downloadinstall": "ডাউনলোড ও ইনস্টল করুন",
 
   "main.action.browse": "ব্রাউজ",
   "main.action.cancel": "বাতিল",
