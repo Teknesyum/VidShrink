@@ -5,6 +5,22 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.9.2] - 2026-09-25
+
+### Added
+
+- A drawn recording region stays on screen: drag its edges or corners to resize it,
+  drag the frame to move it, and use the thin toolbar above it to see the size,
+  start recording, open the settings or close it. Clicks inside the region reach
+  the app underneath, and the frame itself is kept out of the recording (Windows).
+- The mini recorder strip has a Select region button.
+
+### Changed
+
+- Recorder options sit in fixed-width cells that wrap, instead of combo boxes
+  stretched across the whole window; the language and theme boxes in Settings too.
+- The button that switches to the mini recorder is labelled and highlighted.
+
 ## [0.9.1] - 2026-09-25
 
 ### Changed
