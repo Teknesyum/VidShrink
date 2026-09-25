@@ -114,7 +114,7 @@ public sealed class SetupPanelProgress
         lock (gate) return new SetupPanelSnapshot(bar.Bar, bar.Percent, step, state, Tail(lines, VisibleLines));
     }
 
-    public int KeptCount
+    internal int KeptCount
     {
         get
         {
