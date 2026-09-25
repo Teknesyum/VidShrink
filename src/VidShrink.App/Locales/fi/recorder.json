@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Tallennus ei sulkeutunut siististi. Tiedosto on levyllä, mutta sen toistettavuutta ei voitu tarkistaa. Viimeiset sekunnit voivat puuttua.",
   "recorder.output.gif-failed": "GIF-tiedostoa ei voitu tehdä (ffmpeg päättyi koodilla {0}). Tallennus säilytettiin MKV-muodossa.",
   "recorder.output.not-moved": "Tiedostoa ei voitu siirtää pyydettyyn nimeen; se on näytetyssä polussa: {0}",
-  "recorder.replay.saved-mkv": "Viimeiset sekunnit tallennettu MKV-muodossa, puskuri ei voi kirjoittaa GIF-tiedostoa: {0}"
+  "recorder.replay.saved-mkv": "Viimeiset sekunnit tallennettu MKV-muodossa, puskuri ei voi kirjoittaa GIF-tiedostoa: {0}",
+  "recorder.region.title": "Alueen muokkain",
+  "recorder.region.start": "Aloita tallennus",
+  "recorder.region.settings": "Asetukset",
+  "recorder.region.close": "Sulje alue"
 }

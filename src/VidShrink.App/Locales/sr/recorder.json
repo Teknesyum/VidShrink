@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Snimanje se nije uredno zatvorilo. Fajl je na disku, ali nije moglo da se proveri da li se reprodukuje. Poslednje sekunde možda nedostaju.",
   "recorder.output.gif-failed": "GIF nije mogao da se napravi (ffmpeg je završio sa kodom {0}). Snimak je zadržan kao MKV.",
   "recorder.output.not-moved": "Fajl nije mogao da se premesti pod traženo ime; nalazi se na prikazanoj putanji: {0}",
-  "recorder.replay.saved-mkv": "Poslednje sekunde sačuvane kao MKV, bafer ne može da piše GIF: {0}"
+  "recorder.replay.saved-mkv": "Poslednje sekunde sačuvane kao MKV, bafer ne može da piše GIF: {0}",
+  "recorder.region.title": "Уређивач области",
+  "recorder.region.start": "Покрени снимање",
+  "recorder.region.settings": "Подешавања",
+  "recorder.region.close": "Затвори област"
 }

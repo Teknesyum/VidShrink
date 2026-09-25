@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "ریکارڈنگ درست طریقے سے بند نہیں ہوئی۔ فائل ڈسک پر موجود ہے، لیکن یہ جانچا نہیں جا سکا کہ یہ چلتی ہے یا نہیں۔ آخری چند سیکنڈ غائب ہو سکتے ہیں۔",
   "recorder.output.gif-failed": "GIF نہیں بن سکا (ffmpeg کوڈ {0} کے ساتھ ختم ہوا)۔ ریکارڈنگ MKV کے طور پر رکھی گئی۔",
   "recorder.output.not-moved": "فائل مطلوبہ نام پر منتقل نہیں ہو سکی؛ یہ دکھائے گئے راستے پر ہے: {0}",
-  "recorder.replay.saved-mkv": "آخری سیکنڈ MKV کے طور پر محفوظ ہو گئے، بفر GIF نہیں لکھ سکتا: {0}"
+  "recorder.replay.saved-mkv": "آخری سیکنڈ MKV کے طور پر محفوظ ہو گئے، بفر GIF نہیں لکھ سکتا: {0}",
+  "recorder.region.title": "علاقہ ایڈیٹر",
+  "recorder.region.start": "ریکارڈنگ شروع کریں",
+  "recorder.region.settings": "ترتیبات",
+  "recorder.region.close": "علاقہ بند کریں"
 }

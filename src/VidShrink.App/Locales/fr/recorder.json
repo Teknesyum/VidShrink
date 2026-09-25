@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "L'enregistrement ne s'est pas fermé correctement. Le fichier est sur le disque, mais sa lecture n'a pas pu être vérifiée. Les dernières secondes peuvent manquer.",
   "recorder.output.gif-failed": "Le GIF n'a pas pu être créé (ffmpeg s'est terminé avec le code {0}). L'enregistrement a été conservé en MKV.",
   "recorder.output.not-moved": "Le fichier n'a pas pu être déplacé vers le nom demandé ; il se trouve au chemin affiché : {0}",
-  "recorder.replay.saved-mkv": "Dernières secondes enregistrées en MKV, le tampon ne peut pas écrire de GIF : {0}"
+  "recorder.replay.saved-mkv": "Dernières secondes enregistrées en MKV, le tampon ne peut pas écrire de GIF : {0}",
+  "recorder.region.title": "Éditeur de zone",
+  "recorder.region.start": "Démarrer l'enregistrement",
+  "recorder.region.settings": "Paramètres",
+  "recorder.region.close": "Fermer la zone"
 }

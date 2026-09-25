@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Bản ghi không được đóng đúng cách. Tệp nằm trên đĩa, nhưng không thể kiểm tra liệu nó có phát được hay không. Vài giây cuối có thể bị thiếu.",
   "recorder.output.gif-failed": "Không thể tạo GIF (ffmpeg kết thúc với mã {0}). Bản ghi được giữ ở dạng MKV.",
   "recorder.output.not-moved": "Không thể chuyển tệp sang tên đã yêu cầu; tệp nằm ở đường dẫn hiển thị: {0}",
-  "recorder.replay.saved-mkv": "Đã lưu các giây cuối ở dạng MKV, bộ đệm không thể ghi GIF: {0}"
+  "recorder.replay.saved-mkv": "Đã lưu các giây cuối ở dạng MKV, bộ đệm không thể ghi GIF: {0}",
+  "recorder.region.title": "Trình chỉnh vùng",
+  "recorder.region.start": "Bắt đầu ghi",
+  "recorder.region.settings": "Cài đặt",
+  "recorder.region.close": "Đóng vùng"
 }

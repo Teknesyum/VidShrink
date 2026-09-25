@@ -1168,6 +1168,8 @@ public sealed class BaslikKapsamiTests
     /// kola giriyor, 12 dilde (cs en fr hr hu lt nl pl pt ro sk sr), en dahil tr haric;
     /// <c>-image-subtitle-dropped-by-container</c> ve <c>recorder.output.partial-broken-mkv</c> kolun disinda,
     /// yeniden yazilan <c>main.run.over-ceiling</c> ne once ne sonra kolda: 2639 + 12 = 2651, en 245, tr 90.</para>
+    /// <para>2026-09-25, bolge duzenleyici: dort yeni <c>recorder.region.*</c> anahtarindan yalniz <c>recorder.region.title</c>
+    /// kola giriyor, 4 dilde (es fr pt ro: "Editor de región"), en ve tr haric: 2651 + 4 = 2655, en 245, tr 90.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1193,7 +1195,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2651, toplam);
+        Assert.Equal(2655, toplam);
         Assert.Equal(245, dilBasina["en"]);
         Assert.Equal(90, dilBasina["tr"]);
     }
@@ -1350,6 +1352,8 @@ public sealed class BaslikKapsamiTests
     /// <c>-not-moved</c>, <c>recorder.replay.saved-mkv</c>): 1086 + 7 = 1093, 43 x 1093 = 46999; ustteki iki satirla birlikte 1090 + 7 = 1097, 43 x 1097 = 47171.</para>
     /// <para>2026-09-24, yalan yok kalan uclar: dil basina uc anahtar (<c>main.reason.stream.image-subtitle-dropped-by-container</c>,
     /// <c>main.reason.stream.vp9-fell-back</c>, <c>recorder.output.partial-broken-mkv</c>): 1097 + 3 = 1100, 43 x 1100 = 47300.</para>
+    /// <para>2026-09-25, bolge duzenleyici: dil basina dort anahtar (<c>recorder.region.title</c>, <c>-start</c>, <c>-settings</c>,
+    /// <c>-close</c>): 1100 + 4 = 1104, 43 x 1104 = 47472.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1377,7 +1381,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(47300, gezilen);
+        Assert.Equal(47472, gezilen);
         Assert.Empty(kayip);
     }
 

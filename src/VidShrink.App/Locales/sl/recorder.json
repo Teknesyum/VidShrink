@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Snemanje se ni pravilno zaprlo. Datoteka je na disku, vendar ni bilo mogoče preveriti, ali se predvaja. Zadnje sekunde morda manjkajo.",
   "recorder.output.gif-failed": "GIF-a ni bilo mogoče ustvariti (ffmpeg se je končal s kodo {0}). Posnetek je ohranjen kot MKV.",
   "recorder.output.not-moved": "Datoteke ni bilo mogoče premakniti pod zahtevano ime; je na prikazani poti: {0}",
-  "recorder.replay.saved-mkv": "Zadnje sekunde shranjene kot MKV, medpomnilnik ne more pisati GIF: {0}"
+  "recorder.replay.saved-mkv": "Zadnje sekunde shranjene kot MKV, medpomnilnik ne more pisati GIF: {0}",
+  "recorder.region.title": "Urejevalnik območja",
+  "recorder.region.start": "Začni snemanje",
+  "recorder.region.settings": "Nastavitve",
+  "recorder.region.close": "Zapri območje"
 }

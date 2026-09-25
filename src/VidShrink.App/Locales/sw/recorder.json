@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Kurekodi hakukufungwa vizuri. Faili liko kwenye diski, lakini haikuwezekana kukagua kama linacheza. Sekunde za mwisho zinaweza kukosekana.",
   "recorder.output.gif-failed": "GIF haikuweza kutengenezwa (ffmpeg ilimaliza kwa msimbo {0}). Rekodi imehifadhiwa kama MKV.",
   "recorder.output.not-moved": "Faili halikuweza kuhamishwa kwenye jina lililoombwa; liko kwenye njia iliyoonyeshwa: {0}",
-  "recorder.replay.saved-mkv": "Sekunde za mwisho zimehifadhiwa kama MKV, bafa haiwezi kuandika GIF: {0}"
+  "recorder.replay.saved-mkv": "Sekunde za mwisho zimehifadhiwa kama MKV, bafa haiwezi kuandika GIF: {0}",
+  "recorder.region.title": "Kihariri cha eneo",
+  "recorder.region.start": "Anza kurekodi",
+  "recorder.region.settings": "Mipangilio",
+  "recorder.region.close": "Funga eneo"
 }

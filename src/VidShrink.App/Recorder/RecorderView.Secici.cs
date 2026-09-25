@@ -158,28 +158,30 @@ internal partial class RecorderView
         if (_session is not null || CountingDown) return false;
 
         var host = TopLevel.GetTopLevel(this) is Window { IsVisible: true } shown ? shown : null;
-        var state = host?.WindowState ?? WindowState.Normal;
+        var state = _stateBeforeEditor ?? host?.WindowState ?? WindowState.Normal;
+        if (EditingRegion) CloseRegionEditor();
         if (host is not null) host.WindowState = WindowState.Minimized;
 
-        PixelRect? drawn;
+        PixelRect? drawn = null;
         try { drawn = await DrawRegion(RegionDraw.Ratio(SelectedAspect)); }
         finally
         {
-            if (host is not null) host.WindowState = state;
+            var keepMinimized = RegionEditorEnabled && drawn is { } d && RegionDraw.Usable(d);
+            if (host is not null && !keepMinimized) host.WindowState = state;
         }
 
         if (drawn is not { } rect || !RegionDraw.Usable(rect)) return false;
 
-        rect = new PixelRect(rect.X, rect.Y, rect.Width - rect.Width % 2, rect.Height - rect.Height % 2);
-        Quietly(() =>
-        {
-            TxtRegionX.Text = rect.X.ToString(CultureInfo.InvariantCulture);
-            TxtRegionY.Text = rect.Y.ToString(CultureInfo.InvariantCulture);
-            TxtRegionWidth.Text = rect.Width.ToString(CultureInfo.InvariantCulture);
-            TxtRegionHeight.Text = rect.Height.ToString(CultureInfo.InvariantCulture);
-        });
+        WriteRegion(rect);
         CmbTarget.SelectedIndex = (int)RecorderTargetKind.Region;
         StoreChoices();
+        if (RegionEditorEnabled)
+        {
+            _stateBeforeEditor = state;
+            EditingRegion = true;
+            SyncRegionEditor();
+        }
+
         return true;
     }
 

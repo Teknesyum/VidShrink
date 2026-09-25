@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "ההקלטה לא נסגרה כראוי. הקובץ נמצא בדיסק, אך לא ניתן היה לבדוק אם הוא ניתן לניגון. ייתכן שהשניות האחרונות חסרות.",
   "recorder.output.gif-failed": "לא ניתן היה ליצור את ה-GIF (ffmpeg הסתיים בקוד {0}). ההקלטה נשמרה כ-MKV.",
   "recorder.output.not-moved": "לא ניתן היה להעביר את הקובץ לשם המבוקש; הוא נמצא בנתיב המוצג: {0}",
-  "recorder.replay.saved-mkv": "השניות האחרונות נשמרו כ-MKV, המאגר אינו יכול לכתוב GIF: {0}"
+  "recorder.replay.saved-mkv": "השניות האחרונות נשמרו כ-MKV, המאגר אינו יכול לכתוב GIF: {0}",
+  "recorder.region.title": "עורך אזור",
+  "recorder.region.start": "התחל הקלטה",
+  "recorder.region.settings": "הגדרות",
+  "recorder.region.close": "סגור אזור"
 }

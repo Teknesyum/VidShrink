@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Запись завершилась некорректно. Файл находится на диске, но проверить, воспроизводится ли он, не удалось. Последние секунды могут отсутствовать.",
   "recorder.output.gif-failed": "Не удалось создать GIF (ffmpeg завершился с кодом {0}). Запись сохранена в MKV.",
   "recorder.output.not-moved": "Не удалось переместить файл под запрошенное имя; он находится по показанному пути: {0}",
-  "recorder.replay.saved-mkv": "Последние секунды сохранены в MKV, буфер не может записывать GIF: {0}"
+  "recorder.replay.saved-mkv": "Последние секунды сохранены в MKV, буфер не может записывать GIF: {0}",
+  "recorder.region.title": "Редактор области",
+  "recorder.region.start": "Начать запись",
+  "recorder.region.settings": "Настройки",
+  "recorder.region.close": "Закрыть область"
 }

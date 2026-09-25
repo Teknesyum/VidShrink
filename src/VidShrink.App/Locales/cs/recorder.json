@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Nahrávání se neuzavřelo čistě. Soubor je na disku, ale nepodařilo se ověřit, zda jej lze přehrát. Poslední sekundy mohou chybět.",
   "recorder.output.gif-failed": "GIF se nepodařilo vytvořit (ffmpeg skončil s kódem {0}). Nahrávka byla ponechána jako MKV.",
   "recorder.output.not-moved": "Soubor se nepodařilo přesunout pod požadovaný název; je na zobrazené cestě: {0}",
-  "recorder.replay.saved-mkv": "Poslední sekundy uloženy jako MKV, vyrovnávací paměť neumí zapsat GIF: {0}"
+  "recorder.replay.saved-mkv": "Poslední sekundy uloženy jako MKV, vyrovnávací paměť neumí zapsat GIF: {0}",
+  "recorder.region.title": "Editor oblasti",
+  "recorder.region.start": "Spustit nahrávání",
+  "recorder.region.settings": "Nastavení",
+  "recorder.region.close": "Zavřít oblast"
 }

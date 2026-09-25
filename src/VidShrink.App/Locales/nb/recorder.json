@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Opptaket ble ikke lukket riktig. Filen ligger på disken, men det kunne ikke kontrolleres om den kan spilles av. De siste sekundene kan mangle.",
   "recorder.output.gif-failed": "GIF-en kunne ikke lages (ffmpeg avsluttet med kode {0}). Opptaket ble beholdt som MKV.",
   "recorder.output.not-moved": "Filen kunne ikke flyttes til ønsket navn; den ligger på stien som vises: {0}",
-  "recorder.replay.saved-mkv": "Siste sekunder lagret som MKV, bufferen kan ikke skrive GIF: {0}"
+  "recorder.replay.saved-mkv": "Siste sekunder lagret som MKV, bufferen kan ikke skrive GIF: {0}",
+  "recorder.region.title": "Områderedigering",
+  "recorder.region.start": "Start opptak",
+  "recorder.region.settings": "Innstillinger",
+  "recorder.region.close": "Lukk område"
 }

@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "ضبط به‌درستی بسته نشد. فایل روی دیسک است، اما بررسی اینکه قابل پخش است یا نه ممکن نشد. ممکن است چند ثانیه پایانی موجود نباشد.",
   "recorder.output.gif-failed": "ساخت GIF ممکن نشد (ffmpeg با کد {0} پایان یافت). ضبط به‌صورت MKV نگه داشته شد.",
   "recorder.output.not-moved": "فایل به نام درخواستی منتقل نشد؛ در مسیر نمایش‌داده‌شده است: {0}",
-  "recorder.replay.saved-mkv": "ثانیه‌های آخر به‌صورت MKV ذخیره شد، بافر نمی‌تواند GIF بنویسد: {0}"
+  "recorder.replay.saved-mkv": "ثانیه‌های آخر به‌صورت MKV ذخیره شد، بافر نمی‌تواند GIF بنویسد: {0}",
+  "recorder.region.title": "ویرایشگر ناحیه",
+  "recorder.region.start": "شروع ضبط",
+  "recorder.region.settings": "تنظیمات",
+  "recorder.region.close": "بستن ناحیه"
 }

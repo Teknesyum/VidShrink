@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Inspelningen stängdes inte korrekt. Filen finns på disken, men det gick inte att kontrollera om den kan spelas upp. De sista sekunderna kan saknas.",
   "recorder.output.gif-failed": "GIF-filen kunde inte skapas (ffmpeg avslutades med kod {0}). Inspelningen behölls som MKV.",
   "recorder.output.not-moved": "Filen kunde inte flyttas till det begärda namnet; den finns på den visade sökvägen: {0}",
-  "recorder.replay.saved-mkv": "Senaste sekunderna sparade som MKV, bufferten kan inte skriva GIF: {0}"
+  "recorder.replay.saved-mkv": "Senaste sekunderna sparade som MKV, bufferten kan inte skriva GIF: {0}",
+  "recorder.region.title": "Områdesredigerare",
+  "recorder.region.start": "Starta inspelning",
+  "recorder.region.settings": "Inställningar",
+  "recorder.region.close": "Stäng område"
 }

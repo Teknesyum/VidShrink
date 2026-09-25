@@ -67,7 +67,7 @@ public sealed class KaydediciSeciciTests
         var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             var istenenOran = new List<double?>();
-            var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+            var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true, RegionEditorEnabled = false };
             Elle(once);
             Bul<ComboBox>(once, "CmbAspect").SelectedIndex = Array.IndexOf(RegionDraw.Aspects, "16:9");
             once.DrawRegion = oran =>

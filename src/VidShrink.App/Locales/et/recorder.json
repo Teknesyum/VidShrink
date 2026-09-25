@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Salvestus ei sulgunud korralikult. Fail on kettal, kuid selle esitatavust ei õnnestunud kontrollida. Viimased sekundid võivad puududa.",
   "recorder.output.gif-failed": "GIF-i ei õnnestunud luua (ffmpeg lõpetas koodiga {0}). Salvestus säilitati MKV-na.",
   "recorder.output.not-moved": "Faili ei õnnestunud soovitud nimele teisaldada; see asub näidatud teel: {0}",
-  "recorder.replay.saved-mkv": "Viimased sekundid salvestati MKV-na, puhver ei saa GIF-i kirjutada: {0}"
+  "recorder.replay.saved-mkv": "Viimased sekundid salvestati MKV-na, puhver ei saa GIF-i kirjutada: {0}",
+  "recorder.region.title": "Piirkonna redaktor",
+  "recorder.region.start": "Alusta salvestamist",
+  "recorder.region.settings": "Seaded",
+  "recorder.region.close": "Sulge piirkond"
 }

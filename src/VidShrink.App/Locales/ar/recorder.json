@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "لم يُغلق التسجيل بشكل سليم. الملف موجود على القرص، لكن تعذّر التحقق من إمكانية تشغيله. قد تكون الثواني الأخيرة مفقودة.",
   "recorder.output.gif-failed": "تعذّر إنشاء ملف GIF (انتهى ffmpeg بالرمز {0}). تم الاحتفاظ بالتسجيل بصيغة MKV.",
   "recorder.output.not-moved": "تعذّر نقل الملف إلى الاسم المطلوب؛ وهو موجود في المسار المعروض: {0}",
-  "recorder.replay.saved-mkv": "تم حفظ الثواني الأخيرة بصيغة MKV، فالمخزن المؤقت لا يكتب GIF: {0}"
+  "recorder.replay.saved-mkv": "تم حفظ الثواني الأخيرة بصيغة MKV، فالمخزن المؤقت لا يكتب GIF: {0}",
+  "recorder.region.title": "محرر المنطقة",
+  "recorder.region.start": "بدء التسجيل",
+  "recorder.region.settings": "الإعدادات",
+  "recorder.region.close": "إغلاق المنطقة"
 }

@@ -192,5 +192,9 @@
   "recorder.output.partial-unverified": "Rakaman tidak ditutup dengan betul. Fail ada pada cakera, tetapi tidak dapat disemak sama ada ia boleh dimainkan. Beberapa saat terakhir mungkin hilang.",
   "recorder.output.gif-failed": "GIF tidak dapat dibuat (ffmpeg tamat dengan kod {0}). Rakaman disimpan sebagai MKV.",
   "recorder.output.not-moved": "Fail tidak dapat dipindahkan ke nama yang diminta; ia berada di laluan yang ditunjukkan: {0}",
-  "recorder.replay.saved-mkv": "Saat terakhir disimpan sebagai MKV, penimbal tidak dapat menulis GIF: {0}"
+  "recorder.replay.saved-mkv": "Saat terakhir disimpan sebagai MKV, penimbal tidak dapat menulis GIF: {0}",
+  "recorder.region.title": "Editor kawasan",
+  "recorder.region.start": "Mula merakam",
+  "recorder.region.settings": "Tetapan",
+  "recorder.region.close": "Tutup kawasan"
 }
