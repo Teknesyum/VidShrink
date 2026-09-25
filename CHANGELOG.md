@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.9.5] - 2026-09-25
+
 ### Added
 
 - The update notice has a second button, Download and Install: the update downloads and installs itself as soon as it is ready; cancelling or a failed download brings both buttons back.
