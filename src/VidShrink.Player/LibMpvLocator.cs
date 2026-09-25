@@ -58,25 +58,49 @@ public static class LibMpvLocator
         return list;
     }
 
+    /// <summary>
+    /// libmpv bulundu ama yüklenemedi: çoğunlukla bir bağımlılığı eksik ya da eski
+    /// (sistemdeki <c>vulkan-1.dll</c> Vulkan 1.1 işlevlerini taşımıyor).
+    /// </summary>
+    public const string LoadFailedKey = "main.player.engine.loadfailed";
+
+    private static string? _loadFailure;
+
+    /// <summary>
+    /// Bulunup yüklenemeyen kitaplığın nedeni. Doluysa oynatıcı bu süreçte kapalıdır:
+    /// aynı dosya tekrar denenmez, her açılış aynı istisnayı hemen alır.
+    /// </summary>
+    public static string? LoadFailure
+    {
+        get { lock (Gate) return _loadFailure; }
+    }
+
     public static void EnsureLoaded()
     {
         lock (Gate)
         {
             if (_handle != IntPtr.Zero) return;
+            if (_loadFailure is { } known) throw new PlaybackEngineUnavailableException(known, LoadFailedKey);
 
             var environmentValue = Environment.GetEnvironmentVariable(EnvironmentVariable);
             var tried = new List<string>();
+            var failures = new List<string>();
             foreach (var candidate in Candidates(environmentValue, AppContext.BaseDirectory))
             {
                 tried.Add(candidate);
                 if (!File.Exists(candidate)) continue;
-                if (!NativeLibrary.TryLoad(candidate, out var handle)) continue;
+                if (!TryLoadQuietly(candidate, out var handle, out var error))
+                {
+                    failures.Add($"{candidate}: {error}");
+                    continue;
+                }
                 Bind(handle, candidate);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(environmentValue))
             {
+                using var quiet = LoaderErrorMode.Suppress();
                 foreach (var name in FileNames)
                 {
                     tried.Add(name + " (system search path)");
@@ -86,8 +110,37 @@ public static class LibMpvLocator
                 }
             }
 
+            if (failures.Count > 0)
+            {
+                _loadFailure = $"libmpv could not be loaded: {string.Join("; ", failures)}";
+                throw new PlaybackEngineUnavailableException(_loadFailure, LoadFailedKey);
+            }
+
             throw new PlaybackEngineUnavailableException(
                 $"libmpv was not found. Set {EnvironmentVariable} to the libmpv file or its folder. Tried: {string.Join("; ", tried)}");
+        }
+    }
+
+    /// <summary>
+    /// Kitaplığı tam yoluyla yükler; bağımlılıklar önce kitaplığın kendi klasöründe aranır
+    /// (<c>LOAD_WITH_ALTERED_SEARCH_PATH</c>), bu yüzden <c>tools\libmpv\vulkan-1.dll</c>
+    /// System32'dekinden önce gelir. Windows'ta yükleme <c>SEM_FAILCRITICALERRORS</c> altında
+    /// yapılır: eksik giriş noktası sistem iletişim kutusu açmaz, hata olarak döner.
+    /// </summary>
+    internal static bool TryLoadQuietly(string path, out IntPtr handle, out string? error)
+    {
+        using var quiet = LoaderErrorMode.Suppress();
+        try
+        {
+            handle = NativeLibrary.Load(path);
+            error = null;
+            return true;
+        }
+        catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException)
+        {
+            handle = IntPtr.Zero;
+            error = ex.Message;
+            return false;
         }
     }
 

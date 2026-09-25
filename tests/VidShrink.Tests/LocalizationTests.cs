@@ -430,7 +430,8 @@ public sealed class LocalizationTests : IDisposable
                  {
                      typeof(Strings).Assembly,
                      typeof(VidShrink.Core.Playback.ComparisonSourceStatus).Assembly,
-                     typeof(VidShrink.Ffmpeg.ToolLocator).Assembly
+                     typeof(VidShrink.Ffmpeg.ToolLocator).Assembly,
+                     typeof(VidShrink.Player.LibMpvLocator).Assembly
                  })
         {
             foreach (var text in KeyCallSites.LiteralsOf(assembly, shape)) all.Add(text);

@@ -15,6 +15,10 @@ ship as part of it.
 
 - The Windows launcher is now NativeAOT, so a double-click starts the application about 60 ms sooner warm and 90 ms sooner cold.
 
+### Fixed
+
+- Windows 10 with an old `vulkan-1.dll` no longer shows the "entry point vkGetPhysicalDeviceProperties2 not found" system dialog when a video opens: the installer and CI now place a pinned Vulkan loader (1.4.357.0) next to `libmpv-2.dll`, and if libmpv still fails to load the player is disabled with an in-app error instead of a system dialog.
+
 ## [0.9.3] - 2026-09-25
 
 ### Fixed

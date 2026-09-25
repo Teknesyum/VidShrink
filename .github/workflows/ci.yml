@@ -170,6 +170,22 @@ jobs:
             Write-Error "libmpv-2.dll sha256 uyusmuyor: beklenen=$expectedDllSha256 gelen=$dllActual"
             exit 1
           }
+          $vulkanUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/vulkan-1-x86_64-1.4.357.0.zip'
+          $expectedVulkanZipSha256 = '38A05198C4BB467BF81DC17731A5A9F7F79147E80FDAE638A18DA23F4D9A8AE9'
+          $expectedVulkanDllSha256 = 'CD862090370454630B31B174E3D4EB474FDA38EA034998D1FE1767B0C99A8696'
+          $vulkanZip = Join-Path $env:RUNNER_TEMP 'vulkan-1.zip'
+          Invoke-WebRequest -Uri $vulkanUrl -OutFile $vulkanZip
+          $vulkanZipActual = (Get-FileHash -Path $vulkanZip -Algorithm SHA256).Hash
+          if ($vulkanZipActual -ne $expectedVulkanZipSha256) {
+            Write-Error "vulkan-1 zip sha256 uyusmuyor: beklenen=$expectedVulkanZipSha256 gelen=$vulkanZipActual"
+            exit 1
+          }
+          Expand-Archive -Path $vulkanZip -DestinationPath $dir -Force
+          $vulkanActual = (Get-FileHash -Path (Join-Path $dir 'vulkan-1.dll') -Algorithm SHA256).Hash
+          if ($vulkanActual -ne $expectedVulkanDllSha256) {
+            Write-Error "vulkan-1.dll sha256 uyusmuyor: beklenen=$expectedVulkanDllSha256 gelen=$vulkanActual"
+            exit 1
+          }
           Add-Content -Path $env:GITHUB_ENV -Value "VIDSHRINK_LIBMPV=$dll"
       # Informational only: this does not fail the build. If a future version swap drops
       # libvmaf, the quality-meter measures should degrade to a counted, documented skip

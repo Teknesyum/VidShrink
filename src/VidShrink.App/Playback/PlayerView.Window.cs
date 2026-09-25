@@ -210,6 +210,9 @@ internal partial class PlayerView
         {
             await OpenAsync(path).ConfigureAwait(true);
         }
+        catch (PlaybackEngineUnavailableException ex) when (ex.MessageKey is not null)
+        {
+        }
         catch (Exception ex) when (ex is PlaybackOpenException or PlaybackEngineUnavailableException or IOException or UnauthorizedAccessException or ObjectDisposedException)
         {
             TxtStall.IsVisible = true;

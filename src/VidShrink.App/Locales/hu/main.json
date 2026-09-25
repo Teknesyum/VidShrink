@@ -579,6 +579,7 @@
   "main.player.state": "pozíció {0} mp - {1} - nagyítás {2}%",
   "main.player.stalled": "A lejátszás megállt; a lejátszó nem ad képkockákat.",
   "main.player.seekfailed": "A keresés nem sikerült: a lejátszó nem jelenített meg képkockát az új helyzetben.",
+  "main.player.engine.loadfailed": "A lejátszó ki van kapcsolva: a libmpv nem tölthető be. Egy rendszerkönyvtár hiányzik vagy elavult (általában a videokártya-illesztő vulkan-1.dll fájlja). Telepítse újra a VidShrinket, vagy frissítse a videokártya-illesztőt.",
   "main.player.menu.leavefullscreen": "Teljes képernyő elhagyása",
   "main.player.menu.open": "Lejátszó menüjének megnyitása",
   "main.player.menu.seek": "Ugrás {0} mp",

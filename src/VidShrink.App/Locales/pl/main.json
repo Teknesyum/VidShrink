@@ -579,6 +579,7 @@
   "main.player.state": "pozycja {0} s - {1} - zoom {2}%",
   "main.player.stalled": "Odtwarzanie przestało postępować; odtwarzacz nie produkuje klatek.",
   "main.player.seekfailed": "Przewijanie nie powiodło się: odtwarzacz nie wyświetlił klatki w nowej pozycji.",
+  "main.player.engine.loadfailed": "Odtwarzacz wyłączony: nie udało się wczytać libmpv. Brakuje biblioteki systemowej lub jest przestarzała (zwykle vulkan-1.dll sterownika karty graficznej). Zainstaluj ponownie VidShrink lub zaktualizuj sterownik karty graficznej.",
   "main.player.menu.leavefullscreen": "Wyjdź z pełnego ekranu",
   "main.player.menu.open": "Otwórz menu odtwarzacza",
   "main.player.menu.seek": "Przewiń {0} s",

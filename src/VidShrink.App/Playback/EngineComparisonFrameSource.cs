@@ -109,7 +109,7 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
         }
         catch (Exception ex)
         {
-            SetUnavailable(MpvEngine.FailedKey, ex.Message);
+            SetUnavailable(KeyFor(ex), ex.Message);
             return;
         }
 
@@ -120,7 +120,7 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
         catch (Exception ex)
         {
             left.Dispose();
-            SetUnavailable(MpvEngine.FailedKey, ex.Message);
+            SetUnavailable(KeyFor(ex), ex.Message);
             return;
         }
 
@@ -520,6 +520,9 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
         }).ConfigureAwait(false);
         life?.Dispose();
     }
+
+    internal static string KeyFor(Exception ex)
+        => ex is PlaybackEngineUnavailableException { MessageKey: { } key } ? key : MpvEngine.FailedKey;
 
     private void SetUnavailable(string key, string? arg = null)
     {

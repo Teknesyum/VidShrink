@@ -182,6 +182,8 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Equal("ffmpeg ikilisi", File.ReadAllText(Path.Combine(root, "tools", "ffmpeg", "ffmpeg.exe")));
         Assert.Equal("ffprobe ikilisi", File.ReadAllText(Path.Combine(root, "tools", "ffmpeg", "ffprobe.exe")));
         Assert.Equal("libmpv ikilisi", File.ReadAllText(Path.Combine(root, "tools", "libmpv", "libmpv-2.dll")));
+        Assert.Equal("vulkan ikilisi", File.ReadAllText(Path.Combine(root, "tools", "libmpv", VulkanLoaderPin.FileName)));
+        Assert.Equal("vulkan lisansi", File.ReadAllText(Path.Combine(root, "tools", "libmpv", VulkanLoaderPin.LicenseFileName)));
         Assert.True(result.FfmpegDownloaded);
         Assert.False(result.LibMpvReused);
         Assert.Empty(Directory.GetDirectories(Path.GetDirectoryName(root)!, "VidShrink.eski-*"));
@@ -195,6 +197,8 @@ public sealed class KurucuExeTests : IDisposable
         var again = await SetupRunner.InstallAsync(options, host, CancellationToken.None);
         Assert.True(again.LibMpvReused);
         Assert.Equal("libmpv ikilisi", File.ReadAllText(Path.Combine(root, "tools", "libmpv", "libmpv-2.dll")));
+        Assert.Equal("vulkan ikilisi", File.ReadAllText(Path.Combine(root, "tools", "libmpv", VulkanLoaderPin.FileName)));
+        Assert.Equal("vulkan lisansi", File.ReadAllText(Path.Combine(root, "tools", "libmpv", VulkanLoaderPin.LicenseFileName)));
 
         await SetupRunner.UninstallAsync(options, host, CancellationToken.None);
         Assert.False(Directory.Exists(root));
@@ -519,11 +523,57 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Equal(dllSha, UpdateCheck.HashFile(fallback.Dll));
     }
 
+    /// <summary>
+    /// Vulkan yükleyicisi: zip ve DLL sağlaması ayrı ayrı denetlenir, tutmazsa kurulum durur;
+    /// kurulu klasörde sağlaması tutan <c>vulkan-1.dll</c> yeniden indirilmez, tutmayan indirilir.
+    /// </summary>
+    [Fact]
+    public async Task VulkanYukleyicisiSaglamaylaHazirlanir()
+    {
+        var release = Path.Combine(_work, "vulkan-kaynak");
+        Directory.CreateDirectory(release);
+        var zip = Path.Combine(release, "vulkan-1.zip");
+        Zip(zip, ("klasor/" + VulkanLoaderPin.FileName, "vulkan ikilisi"), (VulkanLoaderPin.LicenseFileName, "vulkan lisansi"));
+        var zipSha = UpdateCheck.HashFile(zip);
+        var dllSha = Sha("vulkan ikilisi");
+        var sayac = 0;
+
+        Task<PreparedVulkanLoader> Prepare(VulkanLoaderPin pin, string? existing = null)
+        {
+            var work = Path.Combine(_work, "vulkan-" + ++sayac);
+            Directory.CreateDirectory(work);
+            return SetupDownloads.PrepareVulkanLoaderAsync(new HttpClient(), pin, existing, work, CancellationToken.None);
+        }
+
+        var fresh = await Prepare(new VulkanLoaderPin(zip, zipSha, dllSha));
+        Assert.False(fresh.Reused);
+        Assert.Equal(dllSha, UpdateCheck.HashFile(fresh.Dll));
+        Assert.Equal("vulkan lisansi", File.ReadAllText(fresh.License!));
+
+        var badZip = await Assert.ThrowsAsync<SetupException>(() => Prepare(new VulkanLoaderPin(zip, new string('0', 64), dllSha)));
+        Assert.StartsWith(Prefix("setup.checksum.mismatch"), badZip.Message, StringComparison.Ordinal);
+        var badDll = await Assert.ThrowsAsync<SetupException>(() => Prepare(new VulkanLoaderPin(zip, zipSha, new string('0', 64))));
+        Assert.Equal(SetupText.Get("setup.checksum.mismatch", VulkanLoaderPin.FileName, new string('0', 64), dllSha), badDll.Message);
+
+        var installed = Path.Combine(_work, "vulkan-kurulu");
+        Directory.CreateDirectory(installed);
+        File.WriteAllText(Path.Combine(installed, VulkanLoaderPin.FileName), "vulkan ikilisi");
+        var reused = await Prepare(new VulkanLoaderPin(Path.Combine(release, "yok.zip"), zipSha, dllSha), installed);
+        Assert.True(reused.Reused);
+        Assert.Equal(Path.Combine(installed, VulkanLoaderPin.FileName), reused.Dll);
+
+        File.WriteAllText(Path.Combine(installed, VulkanLoaderPin.FileName), "eski surucunun yukleyicisi");
+        var replaced = await Prepare(new VulkanLoaderPin(zip, zipSha, dllSha), installed);
+        Assert.False(replaced.Reused);
+        Assert.Equal(dllSha, UpdateCheck.HashFile(replaced.Dll));
+    }
+
     private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release, Action<string>? gunluk = null, Action<int, int, string>? adim = null)
     {
         var local = Path.Combine(_work, "local");
         var ffmpegZip = Path.Combine(release, "ffmpeg.zip");
         var libMpvZip = Path.Combine(release, "mpv-dev.zip");
+        var vulkanZip = Path.Combine(release, "vulkan-1.zip");
         var shortcuts = new FakeShortcuts();
         var options = new SetupOptions
         {
@@ -537,7 +587,8 @@ public sealed class KurucuExeTests : IDisposable
             AssetSource = release,
             Tag = "v1.2.3",
             ForceFfmpegDownload = true,
-            LibMpv = new LibMpvPin(new[] { libMpvZip }, UpdateCheck.HashFile(libMpvZip), "libmpv-2.dll", Sha("libmpv ikilisi")),
+            LibMpv = new LibMpvPin(new[] { libMpvZip }, UpdateCheck.HashFile(libMpvZip), "libmpv-2.dll", Sha("libmpv ikilisi"),
+                Vulkan: new VulkanLoaderPin(vulkanZip, UpdateCheck.HashFile(vulkanZip), Sha("vulkan ikilisi"))),
             Ffmpeg = new FfmpegPin(ffmpegZip, new[]
             {
                 new PinnedEntry("ffmpeg-9.0-full_build/bin/ffmpeg.exe", "ffmpeg.exe", Sha("ffmpeg ikilisi")),
@@ -574,6 +625,7 @@ public sealed class KurucuExeTests : IDisposable
             ("ffmpeg-9.0-full_build/bin/ffplay.exe", "ffplay ikilisi"),
             ("ffmpeg-9.0-full_build/bin/ffprobe.exe", "ffprobe ikilisi"));
         Zip(Path.Combine(release, "mpv-dev.zip"), ("libmpv-2.dll", "libmpv ikilisi"), ("include/client.h", "baslik"));
+        Zip(Path.Combine(release, "vulkan-1.zip"), (VulkanLoaderPin.FileName, "vulkan ikilisi"), (VulkanLoaderPin.LicenseFileName, "vulkan lisansi"));
         return release;
     }
 

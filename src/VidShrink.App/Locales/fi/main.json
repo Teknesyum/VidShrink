@@ -579,6 +579,7 @@
   "main.player.state": "kohta {0} s - {1} - zoomaus {2} %",
   "main.player.stalled": "Toisto lakkasi etenemästä; soitin ei tuota ruutuja.",
   "main.player.seekfailed": "Haku epäonnistui: soitin ei näyttänyt kuvaa uudessa kohdassa.",
+  "main.player.engine.loadfailed": "Soitin on poistettu käytöstä: libmpv:tä ei voitu ladata. Järjestelmäkirjasto puuttuu tai on vanhentunut (yleensä näytönohjaimen ajurin vulkan-1.dll). Asenna VidShrink uudelleen tai päivitä näytönohjaimen ajuri.",
   "main.player.menu.leavefullscreen": "Poistu koko näytöstä",
   "main.player.menu.open": "Avaa soittimen valikko",
   "main.player.menu.seek": "Siirry {0} s",

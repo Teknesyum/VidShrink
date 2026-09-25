@@ -579,6 +579,7 @@
   "main.player.state": "position {0} s - {1} - zoom {2} %",
   "main.player.stalled": "La lecture n'avance plus ; le lecteur ne produit pas d'images.",
   "main.player.seekfailed": "Le déplacement a échoué : le lecteur n'a pas affiché d'image à la nouvelle position.",
+  "main.player.engine.loadfailed": "Lecteur désactivé : impossible de charger libmpv. Une bibliothèque système est absente ou obsolète (généralement le vulkan-1.dll du pilote graphique). Réinstallez VidShrink ou mettez à jour le pilote graphique.",
   "main.player.menu.leavefullscreen": "Quitter le plein écran",
   "main.player.menu.open": "Ouvrir le menu du lecteur",
   "main.player.menu.seek": "Avancer de {0} s",

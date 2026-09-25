@@ -579,6 +579,7 @@
   "main.player.state": "מיקום {0} שנ' - {1} - זום {2}%",
   "main.player.stalled": "הניגון הפסיק להתקדם; הנגן אינו מפיק פריימים.",
   "main.player.seekfailed": "הדילוג נכשל: הנגן לא הציג פריים במיקום החדש.",
+  "main.player.engine.loadfailed": "הנגן הושבת: לא ניתן היה לטעון את libmpv. ספריית מערכת חסרה או ישנה (בדרך כלל vulkan-1.dll של מנהל ההתקן הגרפי). התקינו מחדש את VidShrink או עדכנו את מנהל ההתקן הגרפי.",
   "main.player.menu.leavefullscreen": "צאת ממסך מלא",
   "main.player.menu.open": "פתיחת תפריט הנגן",
   "main.player.menu.seek": "דילוג {0} שנ'",

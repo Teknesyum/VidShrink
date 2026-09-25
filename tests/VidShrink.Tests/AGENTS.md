@@ -23,6 +23,8 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   konum geri okunur; cp1254 .srt `sub-text`'te bozulmaz, cp1252 negatif kontrolü bozar. Kısayol, menü ve
   altyazı bırakma PlayerView üstünden. Kanıt `.calisma/dalga2/`.
 - `OynaticiKurulumTests.cs` — libmpv konum sırası, kurucu sabitleri CI ile aynı, açılamayan motor atılır.
+  Vulkan yükleyici sabitleri Core/betik/CI'da aynı; eksik giriş noktalı kitaplık (yamalı `msimg32.dll` kopyası)
+  kutu açmadan 0x7F döner ve iş parçacığının hata kipi geri gelir (geri yüklemeyi kaldırmak kırmızı).
   Kurduğu sahte kurulumlar (`konum-*`) son asertten sonra kapanır; kanıt kapanışı kuralı bu sınıfa,
   `KaydediciAyarTests`'e ve `KaydediciAyarYalitimTests`'e 2026-09-18'de uygulandı — kuralı uygulamayan
   sınıf kalmadı.
@@ -188,7 +190,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   başlık/tarih) ve dönüş işaretli mp4. Varsayılan MP4 tek ses + mov_text, İzleri koru MKV tüm izler, platform tek iz;
   çıktılar ffprobe'la okunur. Negatif kontroller: eşlemesiz ffmpeg başka dili seçer ve tarihi düşürür, yan izleri
   saymayan bütçe hedefi aşar. Her `StreamNote` ayrı bir `main.reason.stream.*` anahtarına düşer, anahtar 42 dilde çevrilidir ve pencerenin gerekçe satırında görünür. Kanıt `.calisma/hb-1c-test/`.
-- `KurucuExeTests.cs` — `VidShrink-Setup.exe` motoru (`Core/Setup`): betikle aynı kayıt ağacını yazıp siler (test anahtarında), kilitli klasör denemeleri, sahte yayınla çevrimdışı kurulum ve kaldırma, sağlama tutmazsa eski kuruluma dokunulmaması, yarım kurulumda geri koyma, sabitlerin betikle aynılığı. Gerçek kayıt köküne test konağı yazamaz. Çıktı `.calisma/test-ciktilari/kurucu-exe/`.
+- `KurucuExeTests.cs` — `VidShrink-Setup.exe` motoru (`Core/Setup`): betikle aynı kayıt ağacını yazıp siler (test anahtarında), kilitli klasör denemeleri, sahte yayınla çevrimdışı kurulum ve kaldırma, sağlama tutmazsa eski kuruluma dokunulmaması, yarım kurulumda geri koyma, sabitlerin betikle aynılığı. Vulkan yükleyicisi: zip ve DLL sağlaması ayrı, tutan kurulu DLL yeniden kullanılır. Gerçek kayıt köküne test konağı yazamaz. Çıktı `.calisma/test-ciktilari/kurucu-exe/`.
 - `KurucuPanelTests.cs` — kurulum panelinin saf kararları (pencere açmaz): motor yüzdesi beş adıma düşer (0 indirme, 62 sha256, 70 yerleştirme, 86 kabuk kaydı, 93 kısayol; `SetupRunner` adımlarıyla aynı), adım durumları evreyi izler, kısayolsuz kurulumda son iki adım atlanır; düğme sırası Kur → pasif Kuruluyor → Kapat + Programı Aç (prova yalnız Kapat), hatada Günlüğü Aç + Yeniden Dene; "Değiştir"le seçilen yer `%LOCALAPPDATA%\Programs` altında kalır, altına VidShrink eklenir; günlük bellekte 300 satırda durur, ekranda dokuz.
 - `HipersurusHTests.cs` — H dalgası: `--bakim` açılış görüntüsünden önce başlamıyor (yedek bekleme, başlatıcı hatası), sinyal boş açılışta boyaya, dosyayla ilk kareye bağlı; panelin ölçüm aşaması erteleme pimi. Davranışı `PlaybackResumeTests` (ilk parça 1 ms, `Probed` planı ekrandaki parçayı iptal etmiyor), composite pimi `HipersurusTests`. Ölçüm `docs/olcumler/hipersurus-h.md`.
 - `TestAyarYoluTests.cs` — modül başlatıcısı `VIDSHRINK_SETTINGS_PATH`'i `.calisma/test-ciktilari/appdata/<pid>`'e alır; ana pencerede açılan dosyanın son dosyalar listesi ve kaydedici ayarı oraya yazılır, gerçek `%APPDATA%\VidShrink` dosyalarının boyut/zaman damgası değişmez (yalnız okunur). Kanıt `.calisma/ayar-yolu/`.

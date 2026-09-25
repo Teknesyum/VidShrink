@@ -1170,6 +1170,8 @@ public sealed class BaslikKapsamiTests
     /// yeniden yazilan <c>main.run.over-ceiling</c> ne once ne sonra kolda: 2639 + 12 = 2651, en 245, tr 90.</para>
     /// <para>2026-09-25, bolge duzenleyici: dort yeni <c>recorder.region.*</c> anahtarindan yalniz <c>recorder.region.title</c>
     /// kola giriyor, 4 dilde (es fr pt ro: "Editor de región"), en ve tr haric: 2651 + 4 = 2655, en 245, tr 90.</para>
+    /// <para>2026-09-25, libmpv yukleme hatasi: <c>main.player.engine.loadfailed</c> 5 dilde kola giriyor (bn hi ja th ur),
+    /// en ve tr haric: 2655 + 5 = 2660, en 245, tr 90.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1195,7 +1197,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2655, toplam);
+        Assert.Equal(2660, toplam);
         Assert.Equal(245, dilBasina["en"]);
         Assert.Equal(90, dilBasina["tr"]);
     }
@@ -1356,6 +1358,7 @@ public sealed class BaslikKapsamiTests
     /// <c>-close</c>): 1100 + 4 = 1104, 43 x 1104 = 47472.</para>
     /// <para>2026-09-25, mini serit: dil basina iki anahtar (<c>recorder.mini.offer</c>, <c>recorder.mini.region</c>):
     /// 1104 + 2 = 1106, 43 x 1106 = 47558.</para>
+    /// <para>2026-09-25, libmpv yukleme hatasi: dil basina <c>main.player.engine.loadfailed</c>: 1106 + 1 = 1107, 43 x 1107 = 47601.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1383,7 +1386,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(47558, gezilen);
+        Assert.Equal(47601, gezilen);
         Assert.Empty(kayip);
     }
 

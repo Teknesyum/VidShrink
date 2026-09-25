@@ -579,6 +579,7 @@
   "main.player.state": "অবস্থান {0} সে - {1} - জুম {2}%",
   "main.player.stalled": "প্লেব্যাক আর এগোচ্ছে না; প্লেয়ার ফ্রেম দিচ্ছে না।",
   "main.player.seekfailed": "সিক ব্যর্থ: প্লেয়ার নতুন অবস্থানে ফ্রেম দেখাতে পারেনি।",
+  "main.player.engine.loadfailed": "প্লেয়ার বন্ধ করা হয়েছে: libmpv লোড করা যায়নি। সিস্টেমের একটি লাইব্রেরি নেই বা পুরোনো (সাধারণত গ্রাফিক্স ড্রাইভারের vulkan-1.dll)। VidShrink আবার ইনস্টল করুন বা গ্রাফিক্স ড্রাইভার আপডেট করুন।",
   "main.player.menu.leavefullscreen": "ফুলস্ক্রিন থেকে বের হন",
   "main.player.menu.open": "প্লেয়ার মেনু খুলুন",
   "main.player.menu.seek": "{0} সে সিক করুন",

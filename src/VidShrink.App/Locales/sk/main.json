@@ -579,6 +579,7 @@
   "main.player.state": "pozícia {0} s - {1} - priblíženie {2}%",
   "main.player.stalled": "Prehrávanie prestalo postupovať; prehrávač nevytvára snímky.",
   "main.player.seekfailed": "Skok zlyhal: prehrávač na novej pozícii nezobrazil snímku.",
+  "main.player.engine.loadfailed": "Prehrávač je vypnutý: libmpv sa nepodarilo načítať. Systémová knižnica chýba alebo je zastaraná (zvyčajne vulkan-1.dll ovládača grafickej karty). Preinštalujte VidShrink alebo aktualizujte ovládač grafickej karty.",
   "main.player.menu.leavefullscreen": "Opustiť celú obrazovku",
   "main.player.menu.open": "Otvoriť ponuku prehrávača",
   "main.player.menu.seek": "Posunúť o {0} s",

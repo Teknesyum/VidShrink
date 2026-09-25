@@ -74,6 +74,9 @@ public static class SetupRunner
 
             var existingLibMpv = Path.Combine(root, "tools", "libmpv", libMpvPin.FileName);
             var libMpvTask = Task.Run(() => SetupDownloads.PrepareLibMpvAsync(client, libMpvPin, existingLibMpv, work, host.Log, cancellationToken), cancellationToken);
+            var vulkanTask = libMpvPin.Vulkan is { } vulkanPin
+                ? Task.Run(() => SetupDownloads.PrepareVulkanLoaderAsync(client, vulkanPin, Path.GetDirectoryName(existingLibMpv), work, cancellationToken), cancellationToken)
+                : null;
             var ffmpegTask = ffmpeg is null || ffprobe is null
                 ? Task.Run(() => SetupDownloads.FetchFfmpegAsync(ffmpegPin, work, cancellationToken), cancellationToken)
                 : null;
@@ -98,6 +101,7 @@ public static class SetupRunner
             var libMpv = await libMpvTask;
             host.Log(SetupText.Get("setup.libmpv.ready",
                 SetupText.Get(libMpv.Reused ? "setup.libmpv.reused" : "setup.libmpv.downloaded")));
+            var vulkan = vulkanTask is null ? null : await vulkanTask;
             IReadOnlyDictionary<string, string>? fetchedFfmpeg = ffmpegTask is null ? null : await ffmpegTask;
             if (fetchedFfmpeg is not null)
             {
@@ -146,6 +150,15 @@ public static class SetupRunner
                     ? Path.Combine(aside, "tools", "libmpv", libMpvPin.FileName)
                     : libMpv.Path;
                 Place(libMpvSource, Path.Combine(toolsLibMpv, libMpvPin.FileName), move: true);
+                if (vulkan is not null)
+                {
+                    var vulkanFrom = vulkan.Reused && aside is not null ? Path.Combine(aside, "tools", "libmpv") : null;
+                    Place(vulkanFrom is null ? vulkan.Dll : Path.Combine(vulkanFrom, VulkanLoaderPin.FileName),
+                        Path.Combine(toolsLibMpv, VulkanLoaderPin.FileName), move: true);
+                    var license = vulkanFrom is null ? vulkan.License : Path.Combine(vulkanFrom, VulkanLoaderPin.LicenseFileName);
+                    if (license is not null && File.Exists(license))
+                        Place(license, Path.Combine(toolsLibMpv, VulkanLoaderPin.LicenseFileName), move: true);
+                }
 
                 if (!File.Exists(Path.Combine(root, LauncherUpdate.ExecutableName))) throw new SetupException(SetupText.Get("setup.launcher.missing"));
                 if (!File.Exists(Path.Combine(appDirectory, AppExecutable))) throw new SetupException(SetupText.Get("setup.app.missing"));

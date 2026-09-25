@@ -8,6 +8,7 @@ Hedef boyuta sıkıştıran video aracı. .NET 8 + Avalonia + ffmpeg.
   pakete girmez; Windows kurucusu `tools\libmpv`'ye sha256'lı indirir, macOS kurucusu
   MPVKit'ten bağlanmış dylib'i (`deps-libmpv-macos-mpvkit-1.0.0`, `tools/mpvkit-macos`) sha256'lı
   `tools/libmpv`'ye indirir, tutmazsa brew komutunu söyler, Linux kurucusu paket komutunu söyler, yerelde `VIDSHRINK_LIBMPV`, CI'da sha256'lı indirme.
+  Windows'ta libmpv'nin yanına pinli `vulkan-1.dll` de konur (eski sistem yükleyicisinde giriş noktası eksik).
 - `src/VidShrink.App` — Avalonia arayüzü. Renk yalnız `Themes/Palette/<Ad>/Theme.axaml`
   dosyasından, ölçü yalnız `Themes/Theme.axaml` belirteçlerinden. Açılış paletini
   `App.axaml` bildirir, seçimi `PaletteCatalog.Use` çalışırken uygular; palet ikinci bir

@@ -11,7 +11,7 @@ public sealed record PinnedEntry(string EntryPath, string FileName, string Sha25
 
 public sealed record LibMpvPin(
     IReadOnlyList<string> Urls, string ArchiveSha256, string FileName, string DllSha256,
-    string? ZipUrl = null, string? ZipSha256 = null)
+    string? ZipUrl = null, string? ZipSha256 = null, VulkanLoaderPin? Vulkan = null)
 {
     public static LibMpvPin X64 { get; } = new(
         new[]
@@ -23,7 +23,8 @@ public sealed record LibMpvPin(
         "libmpv-2.dll",
         "673e6397920ab64a9c5b3a618f7f16d38854efe72b58665f1f84e4e873b763a4",
         "https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/libmpv-2-x86_64-20260903.zip",
-        "1fc71846bd6e63d280e4f52d212f6f80695339e98632698930cf4ffe9f4bdbad");
+        "1fc71846bd6e63d280e4f52d212f6f80695339e98632698930cf4ffe9f4bdbad",
+        VulkanLoaderPin.X64);
 
     public static LibMpvPin Arm64 { get; } = new(
         new[]
@@ -35,12 +36,37 @@ public sealed record LibMpvPin(
         "libmpv-2.dll",
         "3bfc5a042cc6ebe45ace74992dbc135ee84e3e1b33afac070f8902a2d64a22e9",
         "https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/libmpv-2-aarch64-20260903.zip",
-        "a0dfcf27fa8468e4c52170779b27cec3a6bf2be57eac2e021ec6d39d36228156");
+        "a0dfcf27fa8468e4c52170779b27cec3a6bf2be57eac2e021ec6d39d36228156",
+        VulkanLoaderPin.Arm64);
 
     public static LibMpvPin Default => X64;
 
     public static LibMpvPin For(string architecture) =>
         string.Equals(architecture, "arm64", StringComparison.OrdinalIgnoreCase) ? Arm64 : X64;
+}
+
+/// <summary>
+/// Khronos Vulkan Loader (LunarG VulkanRT 1.4.357.0 bileşenleri, Apache-2.0/MIT), libmpv'nin
+/// yanına <c>tools\libmpv\vulkan-1.dll</c> olarak konur. libmpv <c>vulkan-1.dll</c>'yi doğrudan
+/// içe aktarıyor ve <c>vkGetPhysicalDeviceProperties2</c> ister; eski sürücülerin System32'ye
+/// bıraktığı 1.0 yükleyicisinde bu işlev yok ve libmpv hiç yüklenmiyor. Kitaplık tam yoluyla
+/// yüklendiği için yanındaki yükleyici System32'dekinden önce gelir. Zip, DLL'yi ve lisans
+/// metnini taşır; ikisi de <c>deps-libmpv-20260903</c> sürümünde.
+/// </summary>
+public sealed record VulkanLoaderPin(string Url, string ZipSha256, string DllSha256)
+{
+    public const string FileName = "vulkan-1.dll";
+    public const string LicenseFileName = "VulkanRT-License.txt";
+
+    public static VulkanLoaderPin X64 { get; } = new(
+        "https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/vulkan-1-x86_64-1.4.357.0.zip",
+        "38a05198c4bb467bf81dc17731a5a9f7f79147e80fdae638a18da23f4d9a8ae9",
+        "cd862090370454630b31b174e3d4eb474fda38ea034998d1fe1767b0c99a8696");
+
+    public static VulkanLoaderPin Arm64 { get; } = new(
+        "https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/vulkan-1-aarch64-1.4.357.0.zip",
+        "2495aea7ef927005cb34609a74a379537f9a154beb9f308b2fefd13c5b72c38b",
+        "cc5dd0bec8a7afef013c61ddd511d31500a3b3a45c229150a9ae73ead708ab76");
 }
 
 /// <summary>

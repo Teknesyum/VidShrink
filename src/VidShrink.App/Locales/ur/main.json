@@ -579,6 +579,7 @@
   "main.player.state": "مقام {0} س - {1} - زوم {2}%",
   "main.player.stalled": "پلے بیک آگے بڑھنا بند ہو گیا؛ پلیئر فریم نہیں دے رہا۔",
   "main.player.seekfailed": "سیک ناکام: پلیئر نئی پوزیشن پر فریم نہ دکھا سکا۔",
+  "main.player.engine.loadfailed": "پلیئر بند کر دیا گیا: libmpv لوڈ نہیں ہو سکا۔ سسٹم کی کوئی لائبریری موجود نہیں یا پرانی ہے (عموماً گرافکس ڈرائیور کی vulkan-1.dll)۔ VidShrink دوبارہ انسٹال کریں یا گرافکس ڈرائیور اپ ڈیٹ کریں۔",
   "main.player.menu.leavefullscreen": "فل سکرین سے باہر نکلیں",
   "main.player.menu.open": "پلیئر مینو کھولیں",
   "main.player.menu.seek": "{0} سیکنڈ آگے/پیچھے جائیں",

@@ -579,6 +579,7 @@
   "main.player.state": "posisjon {0} s - {1} - zoom {2}%",
   "main.player.stalled": "Avspillingen sluttet å gå fremover; spilleren leverer ingen bilder.",
   "main.player.seekfailed": "Søk mislyktes: spilleren viste ikke et bilde på den nye posisjonen.",
+  "main.player.engine.loadfailed": "Spilleren er slått av: libmpv kunne ikke lastes inn. Et systembibliotek mangler eller er utdatert (vanligvis grafikkdriverens vulkan-1.dll). Installer VidShrink på nytt, eller oppdater grafikkdriveren.",
   "main.player.menu.leavefullscreen": "Avslutt fullskjerm",
   "main.player.menu.open": "Åpne avspillermenyen",
   "main.player.menu.seek": "Spol {0} s",

@@ -579,6 +579,7 @@
   "main.player.state": "位置 {0} 秒 - {1} - 缩放 {2}%",
   "main.player.stalled": "播放停止前进；播放器未产生任何帧。",
   "main.player.seekfailed": "跳转失败：播放器未在新位置显示帧。",
+  "main.player.engine.loadfailed": "播放器已停用：无法加载 libmpv。系统库缺失或过旧（通常是显卡驱动的 vulkan-1.dll）。请重新安装 VidShrink 或更新显卡驱动。",
   "main.player.menu.leavefullscreen": "退出全屏",
   "main.player.menu.open": "打开播放器菜单",
   "main.player.menu.seek": "跳转 {0} 秒",

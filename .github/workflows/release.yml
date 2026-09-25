@@ -224,6 +224,22 @@ jobs:
             Write-Error "libmpv-2.dll sha256 uyusmuyor: beklenen=$expectedDllSha256 gelen=$dllActual"
             exit 1
           }
+          $vulkanUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/vulkan-1-x86_64-1.4.357.0.zip'
+          $expectedVulkanZipSha256 = '38A05198C4BB467BF81DC17731A5A9F7F79147E80FDAE638A18DA23F4D9A8AE9'
+          $expectedVulkanDllSha256 = 'CD862090370454630B31B174E3D4EB474FDA38EA034998D1FE1767B0C99A8696'
+          $vulkanZip = Join-Path $env:RUNNER_TEMP 'vulkan-1.zip'
+          Invoke-WebRequest -Uri $vulkanUrl -OutFile $vulkanZip
+          $vulkanZipActual = (Get-FileHash -Path $vulkanZip -Algorithm SHA256).Hash
+          if ($vulkanZipActual -ne $expectedVulkanZipSha256) {
+            Write-Error "vulkan-1 zip sha256 uyusmuyor: beklenen=$expectedVulkanZipSha256 gelen=$vulkanZipActual"
+            exit 1
+          }
+          Expand-Archive -Path $vulkanZip -DestinationPath $dir -Force
+          $vulkanActual = (Get-FileHash -Path (Join-Path $dir 'vulkan-1.dll') -Algorithm SHA256).Hash
+          if ($vulkanActual -ne $expectedVulkanDllSha256) {
+            Write-Error "vulkan-1.dll sha256 uyusmuyor: beklenen=$expectedVulkanDllSha256 gelen=$vulkanActual"
+            exit 1
+          }
           Add-Content -Path $env:GITHUB_ENV -Value "VIDSHRINK_LIBMPV=$dll"
       # Kapi `dotnet test --no-restore` kosuyor: restore'u yapan derleme adimi olmadan
       # NETSDK1004 veriyor ve kapi bunu "Basarisiz/Failed ozeti yok" diye bildiriyor.
@@ -670,7 +686,8 @@ jobs:
 
           $ffmpeg = Join-Path $env:RUNNER_TEMP 'deps/ffmpeg/ffmpeg.exe'
           $dll = Join-Path $env:RUNNER_TEMP 'deps/libmpv/libmpv-2.dll'
-          foreach ($pe in @($ffmpeg, $dll)) {
+          $vulkan = Join-Path $env:RUNNER_TEMP 'deps/libmpv/vulkan-1.dll'
+          foreach ($pe in @($ffmpeg, $dll, $vulkan)) {
             $b = [IO.File]::ReadAllBytes((Resolve-Path $pe).Path)
             $off = [BitConverter]::ToInt32($b, 0x3C)
             $machine = [BitConverter]::ToUInt16($b, $off + 4)

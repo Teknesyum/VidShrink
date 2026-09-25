@@ -579,6 +579,7 @@
   "main.player.state": "asukoht {0} s - {1} - suum {2}%",
   "main.player.stalled": "Esitus ei edene; mängija ei tooda kaadreid.",
   "main.player.seekfailed": "Kerimine ebaõnnestus: mängija ei näidanud uues asukohas kaadrit.",
+  "main.player.engine.loadfailed": "Mängija on välja lülitatud: libmpv laadimine ebaõnnestus. Süsteemiteek puudub või on vananenud (tavaliselt graafikadraiveri vulkan-1.dll). Paigaldage VidShrink uuesti või värskendage graafikadraiverit.",
   "main.player.menu.leavefullscreen": "Väljumine täisekraanist",
   "main.player.menu.open": "Ava mängija menüü",
   "main.player.menu.seek": "Keri {0} s",

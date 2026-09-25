@@ -201,6 +201,17 @@ $libMpvFileName = 'libmpv-2.dll'
 $libMpvZipUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/libmpv-2-x86_64-20260903.zip'
 $libMpvZipSha256 = '1FC71846BD6E63D280E4F52D212F6F80695339E98632698930CF4FFE9F4BDBAD'
 
+# Khronos Vulkan Loader (LunarG VulkanRT 1.4.357.0). libmpv vulkan-1.dll'yi doğrudan içe
+# aktarıyor; eski sürücünün System32'deki 1.0 yükleyicisinde vkGetPhysicalDeviceProperties2
+# yok ve libmpv yüklenmiyor. libmpv'nin yanına konan yükleyici System32'dekinden önce gelir.
+# Sayılar SetupModel.cs'deki VulkanLoaderPin ile aynı.
+$vulkanLoaderZipUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/vulkan-1-x86_64-1.4.357.0.zip'
+$vulkanLoaderZipSha256 = '38A05198C4BB467BF81DC17731A5A9F7F79147E80FDAE638A18DA23F4D9A8AE9'
+$vulkanLoaderDllSha256 = 'CD862090370454630B31B174E3D4EB474FDA38EA034998D1FE1767B0C99A8696'
+$vulkanLoaderArm64ZipUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/vulkan-1-aarch64-1.4.357.0.zip'
+$vulkanLoaderArm64ZipSha256 = '2495AEA7EF927005CB34609A74A379537F9A154BEB9F308B2FEFD13C5B72C38B'
+$vulkanLoaderArm64DllSha256 = 'CC5DD0BEC8A7AFEF013C61DDD511D31500A3B3A45C229150A9AE73EAD708AB76'
+
 # arm64 kolunun pinleri. libmpv'nin aarch64 derlemesi aynı shinchiro sürümünden, kendi
 # yayınımıza aynadan kopyalanmış hâliyle; ffmpeg ise BtbN'den, çünkü GyanD yalnız x86_64
 # derliyor. BtbN'in kayan `latest` etiketi her gün üstüne yazıldığı için sabitleme olmaz;
@@ -226,6 +237,9 @@ function Use-Arm64Pins {
     $script:libMpvDllSha256 = $libMpvArm64DllSha256
     $script:libMpvZipUrl = $libMpvArm64ZipUrl
     $script:libMpvZipSha256 = $libMpvArm64ZipSha256
+    $script:vulkanLoaderZipUrl = $vulkanLoaderArm64ZipUrl
+    $script:vulkanLoaderZipSha256 = $vulkanLoaderArm64ZipSha256
+    $script:vulkanLoaderDllSha256 = $vulkanLoaderArm64DllSha256
 }
 
 function Get-FileSha256([string]$Path) {
@@ -348,6 +362,51 @@ function Install-LibMpv([string]$WorkRoot, [string]$Destination, [string]$Existi
     }
 
     Copy-Item -LiteralPath $dll -Destination $target -Force
+    return 'downloaded'
+}
+
+function Install-VulkanLoader([string]$WorkRoot, [string]$Destination, [string]$ExistingDirectory) {
+    New-Item -ItemType Directory -Path $Destination -Force | Out-Null
+    $target = Join-Path $Destination 'vulkan-1.dll'
+    $existing = if ($ExistingDirectory) { Join-Path $ExistingDirectory 'vulkan-1.dll' } else { '' }
+    if ($existing -and (Test-Path -LiteralPath $existing) -and (Get-FileSha256 $existing) -eq $vulkanLoaderDllSha256) {
+        Copy-Item -LiteralPath $existing -Destination $target -Force
+        $existingLicense = Join-Path $ExistingDirectory 'VulkanRT-License.txt'
+        if (Test-Path -LiteralPath $existingLicense) { Copy-Item -LiteralPath $existingLicense -Destination $Destination -Force }
+        return 'reused'
+    }
+
+    $archive = Join-Path $WorkRoot 'vulkan-1.zip'
+    $extract = Join-Path $WorkRoot 'vulkan'
+    $ProgressPreference = 'SilentlyContinue'
+    Write-Host 'Vulkan yükleyicisi indiriliyor...' -ForegroundColor Cyan
+    Invoke-WebRequest -UseBasicParsing -Uri $vulkanLoaderZipUrl -OutFile $archive
+    $actual = Get-FileSha256 $archive
+    if ($actual -ne $vulkanLoaderZipSha256) {
+        throw "Vulkan yükleyici arşivinin sağlaması tutmuyor. Beklenen $vulkanLoaderZipSha256, bulunan $actual. Kurulum durduruldu."
+    }
+
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    New-Item -ItemType Directory -Path $extract -Force | Out-Null
+    $zip = [System.IO.Compression.ZipFile]::OpenRead($archive)
+    try {
+        foreach ($name in 'vulkan-1.dll', 'VulkanRT-License.txt') {
+            $entry = $zip.Entries | Where-Object { $_.Name -eq $name } | Select-Object -First 1
+            if ($entry) { [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $extract $name), $true) }
+        }
+    }
+    finally { $zip.Dispose() }
+
+    $dll = Join-Path $extract 'vulkan-1.dll'
+    if (-not (Test-Path -LiteralPath $dll)) { throw 'Vulkan yükleyici arşivinde vulkan-1.dll yok.' }
+    $dllActual = Get-FileSha256 $dll
+    if ($dllActual -ne $vulkanLoaderDllSha256) {
+        throw "vulkan-1.dll sağlaması tutmuyor. Beklenen $vulkanLoaderDllSha256, bulunan $dllActual. Kurulum durduruldu."
+    }
+
+    Copy-Item -LiteralPath $dll -Destination $target -Force
+    $license = Join-Path $extract 'VulkanRT-License.txt'
+    if (Test-Path -LiteralPath $license) { Copy-Item -LiteralPath $license -Destination $Destination -Force }
     return 'downloaded'
 }
 
@@ -817,6 +876,8 @@ if ($DepsOnly) {
     $depsLibMpv = Join-Path $depsRoot 'libmpv'
     Install-LibMpv $depsWork $depsLibMpv '' | Out-Null
     Write-Host "libmpv hazır (sha256 doğrulandı): $(Join-Path $depsLibMpv $libMpvFileName)" -ForegroundColor Green
+    Install-VulkanLoader $depsWork $depsLibMpv '' | Out-Null
+    Write-Host "Vulkan yükleyicisi hazır (sha256 doğrulandı): $(Join-Path $depsLibMpv 'vulkan-1.dll')" -ForegroundColor Green
     return
 }
 
@@ -903,6 +964,8 @@ try {
     $installedLibMpv = Join-Path $resolvedInstallRoot "tools\libmpv\$libMpvFileName"
     $libMpvSource = Install-LibMpv $workRoot $libMpvRoot $installedLibMpv
     Write-Host "libmpv hazır ($libMpvSource, sha256 doğrulandı)." -ForegroundColor Cyan
+    $vulkanSource = Install-VulkanLoader $workRoot $libMpvRoot (Join-Path $resolvedInstallRoot 'tools\libmpv')
+    Write-Host "Vulkan yükleyicisi hazır ($vulkanSource, sha256 doğrulandı)." -ForegroundColor Cyan
 
     foreach ($processName in 'VidShrink.App', 'VidShrink') {
         Get-Process $processName -ErrorAction SilentlyContinue |

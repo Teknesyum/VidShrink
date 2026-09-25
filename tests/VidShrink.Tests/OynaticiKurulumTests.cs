@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 using VidShrink.App.Playback;
 using VidShrink.Player;
 using Xunit;
@@ -126,6 +127,98 @@ public sealed class OynaticiKurulumTests
         Assert.Contains("Install-LibMpv $workRoot $libMpvRoot $installedLibMpv", kurulum, StringComparison.Ordinal);
         Assert.Contains("$actual -ne $libMpvArchiveSha256", kurulum, StringComparison.Ordinal);
         Assert.Contains("$dllActual -ne $libMpvDllSha256", kurulum, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// libmpv <c>vulkan-1.dll</c>'yi doğrudan içe aktarıyor; eski sürücünün yükleyicisinde
+    /// <c>vkGetPhysicalDeviceProperties2</c> yok. Kurucu, kurucu exe ve CI aynı Khronos
+    /// yükleyicisini aynı sağlamayla libmpv'nin yanına koyar.
+    /// </summary>
+    [Fact]
+    public void VulkanYukleyicisiUcYerdeAyniSabitleLibmpvYaninaKonur()
+    {
+        var kurulum = Oku("Install-VidShrink.ps1");
+        var ci = Oku(".github", "workflows", "ci.yml");
+        var release = Oku(".github", "workflows", "release.yml");
+        var x64 = VidShrink.Core.Setup.VulkanLoaderPin.X64;
+        var arm64 = VidShrink.Core.Setup.VulkanLoaderPin.Arm64;
+
+        Assert.Same(x64, VidShrink.Core.Setup.LibMpvPin.X64.Vulkan);
+        Assert.Same(arm64, VidShrink.Core.Setup.LibMpvPin.Arm64.Vulkan);
+        var libmpvSurum = Regex.Match(Sabit(kurulum, "libMpvUrl"), @"/(deps-libmpv-\d{8})/").Groups[1].Value;
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/{libmpvSurum}/vulkan-1-x86_64-1.4.357.0.zip", x64.Url);
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/{libmpvSurum}/vulkan-1-aarch64-1.4.357.0.zip", arm64.Url);
+        Assert.NotEqual(x64.DllSha256, arm64.DllSha256);
+
+        Assert.Equal(x64.Url, Sabit(kurulum, "vulkanLoaderZipUrl"));
+        Assert.Equal(x64.ZipSha256.ToUpperInvariant(), Sabit(kurulum, "vulkanLoaderZipSha256"));
+        Assert.Equal(x64.DllSha256.ToUpperInvariant(), Sabit(kurulum, "vulkanLoaderDllSha256"));
+        Assert.Equal(arm64.Url, Sabit(kurulum, "vulkanLoaderArm64ZipUrl"));
+        Assert.Equal(arm64.ZipSha256.ToUpperInvariant(), Sabit(kurulum, "vulkanLoaderArm64ZipSha256"));
+        Assert.Equal(arm64.DllSha256.ToUpperInvariant(), Sabit(kurulum, "vulkanLoaderArm64DllSha256"));
+        foreach (var (ad, metin) in new[] { ("ci.yml", ci), ("release.yml", release) })
+        {
+            Assert.True(metin.Contains($"$vulkanUrl = '{x64.Url}'", StringComparison.Ordinal), $"{ad} vulkan adresi farkli");
+            Assert.True(metin.Contains($"$expectedVulkanZipSha256 = '{x64.ZipSha256.ToUpperInvariant()}'", StringComparison.Ordinal), $"{ad} vulkan zip sha256 farkli");
+            Assert.True(metin.Contains($"$expectedVulkanDllSha256 = '{x64.DllSha256.ToUpperInvariant()}'", StringComparison.Ordinal), $"{ad} vulkan-1.dll sha256 farkli");
+            var vulkan = metin.IndexOf("$vulkanUrl", StringComparison.Ordinal);
+            var ortam = metin.IndexOf("VIDSHRINK_LIBMPV=", vulkan, StringComparison.Ordinal);
+            Assert.True(ortam > vulkan, $"{ad} vulkan-1.dll libmpv ortam degiskeninden sonra iniyor");
+        }
+
+        Assert.Contains("Install-VulkanLoader $workRoot $libMpvRoot (Join-Path $resolvedInstallRoot 'tools\\libmpv')", kurulum, StringComparison.Ordinal);
+        Assert.Contains("$dllActual -ne $vulkanLoaderDllSha256", kurulum, StringComparison.Ordinal);
+        Assert.Contains("$script:vulkanLoaderDllSha256 = $vulkanLoaderArm64DllSha256", kurulum, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Eksik giriş noktalı bağımlılık: <c>msimg32.dll</c> kopyasının <c>GDI32.dll</c> içe aktarımı
+    /// yanındaki <c>GDZ32.dll</c>'ye (aslında <c>version.dll</c>) çevrilir. Yükleme 0x7F ile düşer,
+    /// iletişim kutusu yerine hata döner, iş parçacığının hata kipi eski haline gelir.
+    /// Kutu açılsaydı yükleme beklerdi; 20 sn'lik sınır bunu kırmızıya çevirir.
+    /// </summary>
+    [Fact]
+    public void EksikGirisNoktasiIletisimKutusuAcmadanHataDoner()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        var kok = KurulumKoku("giris-noktasi");
+        var sistem = Environment.GetFolderPath(Environment.SpecialFolder.System);
+        var ikili = File.ReadAllBytes(Path.Combine(sistem, "msimg32.dll"));
+        var eski = System.Text.Encoding.ASCII.GetBytes("GDI32.dll\0");
+        var yeni = System.Text.Encoding.ASCII.GetBytes("GDZ32.dll\0");
+        var degisen = 0;
+        for (var i = 0; i + eski.Length <= ikili.Length; i++)
+        {
+            if (!ikili.AsSpan(i, eski.Length).SequenceEqual(eski)) continue;
+            yeni.CopyTo(ikili, i);
+            degisen++;
+        }
+        Assert.True(degisen > 0, "msimg32.dll GDI32.dll adini tasimiyor");
+        var sonda = Path.Combine(kok, "vidshrink-sonda.dll");
+        File.WriteAllBytes(sonda, ikili);
+        File.Copy(Path.Combine(sistem, "version.dll"), Path.Combine(kok, "GDZ32.dll"));
+
+        uint once = 0, sonra = 0, icerde = 0;
+        var sonuc = false;
+        string? hata = null;
+        var is_ = new Thread(() =>
+        {
+            LoaderErrorMode.SetThreadErrorMode(0, out _);
+            once = LoaderErrorMode.Current;
+            using (LoaderErrorMode.Suppress()) icerde = LoaderErrorMode.Current;
+            sonuc = LibMpvLocator.TryLoadQuietly(sonda, out var tutamac, out hata);
+            if (sonuc) NativeLibrary.Free(tutamac);
+            sonra = LoaderErrorMode.Current;
+        }) { IsBackground = true };
+        is_.Start();
+
+        Assert.True(is_.Join(TimeSpan.FromSeconds(20)), "yukleme 20 sn icinde donmedi: sistem iletisim kutusu acik kalmis olabilir");
+        Assert.False(sonuc, "eksik giris noktali kitaplik yuklendi");
+        Assert.Contains("0x8007007F", hata ?? "", StringComparison.Ordinal);
+        Assert.Equal(0u, once);
+        Assert.Equal(LoaderErrorMode.FailCriticalErrors | LoaderErrorMode.NoOpenFileErrorBox, icerde);
+        Assert.Equal(once, sonra);
+        Kapat("giris-noktasi");
     }
 
     [Fact]
@@ -259,7 +352,7 @@ public sealed class OynaticiGorunumuFabrikaTests
                 Thread.Sleep(5);
             }
 
-            return (open, sahte, view.Engine);
+            return (open, sahte, view.Engine, bosMetin: view.EngineUnavailableText);
         });
 
         Assert.True(sonuc.open.IsFaulted, "OpenAsync hatayi yutmamali");
@@ -268,6 +361,52 @@ public sealed class OynaticiGorunumuFabrikaTests
         Assert.True(sonuc.sahte.Atildi, "acilamayan motor Dispose edilmedi");
         Assert.Equal(0, sonuc.sahte.FaultedAboneleri);
         Assert.Null(sonuc.Item3);
+        Assert.Null(sonuc.bosMetin);
+    }
+
+    /// <summary>
+    /// libmpv bulundu ama yüklenemedi (eski vulkan-1.dll): görünüm boş durum yerine
+    /// <c>StatusError</c> temalı Türkçe iletiyi gösterir; anahtarsız hata iletiyi açmaz.
+    /// </summary>
+    [Fact]
+    public void YuklenemeyenMotorHataTemaliIletiyiGosterir()
+    {
+        var sonuc = AppHost.Run(() =>
+        {
+            var view = new PlayerView();
+            view.EngineFactory = () => throw new PlaybackEngineUnavailableException("libmpv could not be loaded", LibMpvLocator.LoadFailedKey);
+            var open = view.OpenAsync("yok.mp4");
+            var saat = Stopwatch.StartNew();
+            while (!open.IsCompleted && saat.Elapsed < TimeSpan.FromSeconds(5))
+            {
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                Thread.Sleep(5);
+            }
+
+            var tema = Avalonia.Controls.ResourceNodeExtensions.TryFindResource(Avalonia.Application.Current!, "StatusError", out var deger) ? deger : null;
+            var beklenen = VidShrink.App.LanguageCatalog.Display(VidShrink.App.Localization.Strings.Get(LibMpvLocator.LoadFailedKey));
+
+            var anahtarsiz = new PlayerView();
+            anahtarsiz.EngineFactory = () => throw new PlaybackEngineUnavailableException("libmpv not found");
+            var ikinci = anahtarsiz.OpenAsync("yok.mp4");
+            while (!ikinci.IsCompleted && saat.Elapsed < TimeSpan.FromSeconds(10))
+            {
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                Thread.Sleep(5);
+            }
+
+            return (open, view.EngineUnavailableText, beklenen, AyniTema: ReferenceEquals(view.TxtEngine.Theme, tema), view.TxtEmpty.IsVisible, ikinci, Anahtarsiz: anahtarsiz.EngineUnavailableText);
+        });
+
+        Assert.True(sonuc.open.IsFaulted, "OpenAsync hatayi yutmamali");
+        Assert.IsType<PlaybackEngineUnavailableException>(sonuc.open.Exception!.InnerException);
+        Assert.False(string.IsNullOrWhiteSpace(sonuc.beklenen));
+        Assert.NotEqual(LibMpvLocator.LoadFailedKey, sonuc.beklenen);
+        Assert.Equal(sonuc.beklenen, sonuc.EngineUnavailableText);
+        Assert.True(sonuc.AyniTema, "ileti StatusError temasinda degil");
+        Assert.False(sonuc.IsVisible, "bos durum metni iletinin yaninda gorunuyor");
+        Assert.True(sonuc.ikinci.IsFaulted);
+        Assert.Null(sonuc.Anahtarsiz);
     }
 
     private sealed class AcilmayanMotor : IPlaybackEngine

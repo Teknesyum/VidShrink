@@ -579,6 +579,7 @@
   "main.player.state": "موقعیت {0} ث - {1} - بزرگ‌نمایی {2}%",
   "main.player.stalled": "پخش پیش نمی‌رود؛ پخش‌کننده فریم تولید نمی‌کند.",
   "main.player.seekfailed": "جستجو ناموفق: پخش‌کننده در موقعیت جدید فریمی نشان نداد.",
+  "main.player.engine.loadfailed": "پخش‌کننده غیرفعال شد: libmpv بارگذاری نشد. یک کتابخانهٔ سیستمی وجود ندارد یا قدیمی است (معمولاً vulkan-1.dll درایور کارت گرافیک). VidShrink را دوباره نصب کنید یا درایور کارت گرافیک را به‌روز کنید.",
   "main.player.menu.leavefullscreen": "خروج از حالت تمام‌صفحه",
   "main.player.menu.open": "باز کردن منوی پخش‌کننده",
   "main.player.menu.seek": "پرش {0} ثانیه",
