@@ -579,6 +579,7 @@
   "main.player.state": "الموضع {0} ث - {1} - التكبير {2}%",
   "main.player.stalled": "توقف التشغيل عن التقدم؛ المشغّل لا ينتج إطارات.",
   "main.player.seekfailed": "فشل الانتقال: تعذر على المشغّل عرض إطار في الموضع الجديد.",
+  "main.player.engine.loadfailed": "تم تعطيل المشغل: تعذر تحميل libmpv. مكتبة في النظام مفقودة أو قديمة (غالبًا vulkan-1.dll الخاصة بتعريف بطاقة الرسومات). أعد تثبيت VidShrink أو حدّث تعريف بطاقة الرسومات.",
   "main.player.menu.leavefullscreen": "الخروج من ملء الشاشة",
   "main.player.menu.open": "فتح قائمة المشغّل",
   "main.player.menu.seek": "الانتقال {0} ث",

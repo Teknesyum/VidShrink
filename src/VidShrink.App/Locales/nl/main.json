@@ -579,6 +579,7 @@
   "main.player.state": "positie {0} s - {1} - zoom {2}%",
   "main.player.stalled": "Het afspelen ging niet verder; de speler levert geen beelden.",
   "main.player.seekfailed": "Zoeken mislukt: de speler toonde geen beeld op de nieuwe positie.",
+  "main.player.engine.loadfailed": "Speler uitgeschakeld: libmpv kon niet worden geladen. Een systeembibliotheek ontbreekt of is verouderd (meestal vulkan-1.dll van het grafische stuurprogramma). Installeer VidShrink opnieuw of werk het grafische stuurprogramma bij.",
   "main.player.menu.leavefullscreen": "Volledig scherm verlaten",
   "main.player.menu.open": "Open het spelermenu",
   "main.player.menu.seek": "Zoek {0} s",

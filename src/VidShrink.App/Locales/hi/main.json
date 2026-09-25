@@ -579,6 +579,7 @@
   "main.player.state": "स्थिति {0} से - {1} - ज़ूम {2}%",
   "main.player.stalled": "प्लेबैक आगे बढ़ना बंद हो गया; प्लेयर फ़्रेम नहीं दे रहा।",
   "main.player.seekfailed": "सीक विफल: प्लेयर नई स्थिति में फ़्रेम नहीं दिखा सका।",
+  "main.player.engine.loadfailed": "प्लेयर बंद कर दिया गया: libmpv लोड नहीं हो सका। कोई सिस्टम लाइब्रेरी नहीं है या पुरानी है (आमतौर पर ग्राफ़िक्स ड्राइवर की vulkan-1.dll)। VidShrink फिर से इंस्टॉल करें या ग्राफ़िक्स ड्राइवर अपडेट करें।",
   "main.player.menu.leavefullscreen": "फ़ुल स्क्रीन से बाहर आएं",
   "main.player.menu.open": "प्लेयर मेनू खोलें",
   "main.player.menu.seek": "{0} सेकंड सीक करें",

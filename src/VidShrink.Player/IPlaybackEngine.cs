@@ -192,4 +192,13 @@ public sealed class PlaybackOpenException : Exception
 public sealed class PlaybackEngineUnavailableException : Exception
 {
     public PlaybackEngineUnavailableException(string message, Exception? inner = null) : base(message, inner) { }
+
+    public PlaybackEngineUnavailableException(string message, string messageKey, Exception? inner = null) : base(message, inner)
+        => MessageKey = messageKey;
+
+    /// <summary>
+    /// Kullanıcıya gösterilecek iletinin anahtarı. Boşsa ileti motorun genel
+    /// "kullanılamıyor" anahtarıyla yazılır.
+    /// </summary>
+    public string? MessageKey { get; }
 }

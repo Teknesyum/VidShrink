@@ -579,6 +579,7 @@
   "main.player.state": "位置 {0} 秒 - {1} - ズーム {2}%",
   "main.player.stalled": "再生が進まなくなりました。プレーヤーがフレームを生成していません。",
   "main.player.seekfailed": "シークに失敗しました。プレーヤーが新しい位置でフレームを表示できませんでした。",
+  "main.player.engine.loadfailed": "プレーヤーを無効にしました: libmpv を読み込めませんでした。システムのライブラリが見つからないか古くなっています (多くはグラフィックドライバーの vulkan-1.dll)。VidShrink を再インストールするか、グラフィックドライバーを更新してください。",
   "main.player.menu.leavefullscreen": "全画面表示を終了",
   "main.player.menu.open": "プレーヤーメニューを開く",
   "main.player.menu.seek": "{0} 秒シーク",

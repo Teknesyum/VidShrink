@@ -3293,6 +3293,11 @@ public partial class MainWindow : Window
     internal void ReportPlayerOpenFailure(Exception ex)
     {
         PlayerOpenFailure = ex;
+        if (ex is global::VidShrink.Player.PlaybackEngineUnavailableException { MessageKey: { } key })
+        {
+            ReportSourceError($"{Say(key)}\n{ex.Message}");
+            return;
+        }
         ReportSourceError($"{Say("main.error.unusable")}: {DescribeFailure(ex)}");
     }
 

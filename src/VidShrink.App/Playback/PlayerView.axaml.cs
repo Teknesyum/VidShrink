@@ -624,6 +624,32 @@ internal partial class PlayerView : UserControl
 
     internal async Task OpenAsync(string path, CancellationToken ct = default)
     {
+        try
+        {
+            await OpenCoreAsync(path, ct).ConfigureAwait(true);
+        }
+        catch (PlaybackEngineUnavailableException ex) when (ex.MessageKey is { } key)
+        {
+            ShowEngineUnavailable(key);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Motor bu süreçte kullanılamıyor (libmpv bulundu ama yüklenemedi): oynatıcı alanı
+    /// boş durum yerine <c>StatusError</c> temalı iletiyi gösterir.
+    /// </summary>
+    internal void ShowEngineUnavailable(string key)
+    {
+        TxtEmpty.IsVisible = false;
+        TxtEngine.Text = LanguageCatalog.Display(Strings.Get(key));
+        TxtEngine.IsVisible = true;
+    }
+
+    internal string? EngineUnavailableText => TxtEngine.IsVisible ? TxtEngine.Text : null;
+
+    private async Task OpenCoreAsync(string path, CancellationToken ct)
+    {
         Close();
         IPlaybackEngine? engine = null;
         var onden = AcilisMotoru.Devral(path);

@@ -6,6 +6,8 @@ Oynatıcı sekmesinin ve karşılaştırma panelinin motoru. `IPlaybackEngine` m
 - `Native.cs` — P/Invoke; imzalar `client.h`/`render.h`'den.
 - `LibMpvLocator` — sıra: `VIDSHRINK_LIBMPV`, uygulama klasörü, onun ve bir üstünün `tools/libmpv`'si, macOS'ta
   Homebrew/MacPorts `lib`, sistem yolu; yoksa `PlaybackEngineUnavailableException`. libmpv arşive girmez.
+  Yükleme `LoaderErrorMode.Suppress` altında (sistem kutusu yok); yüklenmeyen dosya `LoadFailedKey` → `StatusError`.
+  libmpv `vulkan-1.dll`'yi statik içe aktarır; kurucu ve CI pinli 1.4.357.0'ı yanına koyar (`VulkanLoaderPin`).
 - `MpvEngine` — üç iş parçacığı: çağıran, `mpv-events`, `mpv-render`. Render iş parçacığı yalnız
   `mpv_render_*` çağırır; çağıranın libmpv çağrıları `_handleGate` altında.
 - Arama bitişi: aramanın RESTART'ı, komuttan sonra takası biten yeni kare **ve** render'da yarım yeni kare yok.

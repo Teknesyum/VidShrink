@@ -579,6 +579,7 @@
   "main.player.state": "ตำแหน่ง {0} วิ - {1} - ซูม {2}%",
   "main.player.stalled": "การเล่นหยุดเดินหน้า ตัวเล่นไม่ผลิตเฟรม",
   "main.player.seekfailed": "ค้นหาตำแหน่งล้มเหลว: ตัวเล่นไม่แสดงเฟรมที่ตำแหน่งใหม่",
+  "main.player.engine.loadfailed": "ปิดใช้งานเครื่องเล่นแล้ว: โหลด libmpv ไม่ได้ ไลบรารีของระบบหายไปหรือเก่าเกินไป (ส่วนใหญ่คือ vulkan-1.dll ของไดรเวอร์กราฟิก) ติดตั้ง VidShrink ใหม่หรืออัปเดตไดรเวอร์กราฟิก",
   "main.player.menu.leavefullscreen": "ออกจากเต็มจอ",
   "main.player.menu.open": "เปิดเมนูตัวเล่น",
   "main.player.menu.seek": "เลื่อน {0} วิ",

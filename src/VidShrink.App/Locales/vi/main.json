@@ -579,6 +579,7 @@
   "main.player.state": "vị trí {0} s - {1} - thu phóng {2}%",
   "main.player.stalled": "Phát không tiến thêm; trình phát không tạo khung.",
   "main.player.seekfailed": "Tua thất bại: trình phát không hiển thị khung ở vị trí mới.",
+  "main.player.engine.loadfailed": "Đã tắt trình phát: không tải được libmpv. Một thư viện hệ thống bị thiếu hoặc đã cũ (thường là vulkan-1.dll của trình điều khiển đồ họa). Hãy cài lại VidShrink hoặc cập nhật trình điều khiển đồ họa.",
   "main.player.menu.leavefullscreen": "Thoát toàn màn hình",
   "main.player.menu.open": "Mở menu trình phát",
   "main.player.menu.seek": "Tua {0} giây",

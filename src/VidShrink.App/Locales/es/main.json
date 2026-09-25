@@ -579,6 +579,7 @@
   "main.player.state": "posición {0} s - {1} - zoom {2}%",
   "main.player.stalled": "La reproducción dejó de avanzar; el reproductor no produce fotogramas.",
   "main.player.seekfailed": "El salto falló: el reproductor no mostró un fotograma en la nueva posición.",
+  "main.player.engine.loadfailed": "Reproductor desactivado: no se pudo cargar libmpv. Falta una biblioteca del sistema o está desactualizada (normalmente vulkan-1.dll del controlador gráfico). Reinstala VidShrink o actualiza el controlador gráfico.",
   "main.player.menu.leavefullscreen": "Salir de pantalla completa",
   "main.player.menu.open": "Abrir el menú del reproductor",
   "main.player.menu.seek": "Saltar {0} s",

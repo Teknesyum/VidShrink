@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
@@ -6,6 +7,8 @@ using System.Text.RegularExpressions;
 namespace VidShrink.Core.Setup;
 
 public sealed record FetchedFile(string Path, string Sha256);
+
+public sealed record PreparedVulkanLoader(string Dll, string? License, bool Reused);
 
 public static class SetupDownloads
 {
@@ -164,6 +167,53 @@ public static class SetupDownloads
         if (!string.Equals(actual, pin.DllSha256, StringComparison.OrdinalIgnoreCase))
             throw new SetupException(SetupText.Get("setup.checksum.mismatch", pin.FileName, pin.DllSha256, actual));
         return (dll, false);
+    }
+
+    /// <summary>
+    /// libmpv'nin yanına konacak Khronos Vulkan yükleyicisi. Kurulu klasörde sağlaması tutan
+    /// <c>vulkan-1.dll</c> varsa yeniden indirilmez. Zip ve DLL sağlaması tutmazsa kurulum durur.
+    /// </summary>
+    public static async Task<PreparedVulkanLoader> PrepareVulkanLoaderAsync(
+        HttpClient client, VulkanLoaderPin pin, string? existingDirectory, string workRoot, CancellationToken cancellationToken)
+    {
+        if (existingDirectory is not null)
+        {
+            var installed = Path.Combine(existingDirectory, VulkanLoaderPin.FileName);
+            if (File.Exists(installed) &&
+                string.Equals(UpdateCheck.HashFile(installed), pin.DllSha256, StringComparison.OrdinalIgnoreCase))
+            {
+                var license = Path.Combine(existingDirectory, VulkanLoaderPin.LicenseFileName);
+                return new PreparedVulkanLoader(installed, File.Exists(license) ? license : null, true);
+            }
+        }
+
+        var archive = Path.Combine(workRoot, "vulkan-1.zip");
+        var fetched = pin.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+            ? await FetchAsync(client, pin.Url, archive, cancellationToken)
+            : await CopyHashedAsync(pin.Url, archive, cancellationToken);
+        if (!string.Equals(fetched.Sha256, pin.ZipSha256, StringComparison.OrdinalIgnoreCase))
+            throw new SetupException(SetupText.Get("setup.checksum.mismatch", Path.GetFileName(pin.Url), pin.ZipSha256, fetched.Sha256));
+
+        var extract = Path.Combine(workRoot, "vulkan");
+        Directory.CreateDirectory(extract);
+        var dll = Path.Combine(extract, VulkanLoaderPin.FileName);
+        string? licenseFile = null;
+        using (var zip = ZipFile.OpenRead(archive))
+        {
+            var entry = zip.Entries.FirstOrDefault(e => string.Equals(e.Name, VulkanLoaderPin.FileName, StringComparison.OrdinalIgnoreCase))
+                ?? throw new SetupException(SetupText.Get("setup.libmpv.not-in-archive", VulkanLoaderPin.FileName));
+            entry.ExtractToFile(dll, true);
+            if (zip.Entries.FirstOrDefault(e => string.Equals(e.Name, VulkanLoaderPin.LicenseFileName, StringComparison.OrdinalIgnoreCase)) is { } text)
+            {
+                licenseFile = Path.Combine(extract, VulkanLoaderPin.LicenseFileName);
+                text.ExtractToFile(licenseFile, true);
+            }
+        }
+
+        var actual = UpdateCheck.HashFile(dll);
+        if (!string.Equals(actual, pin.DllSha256, StringComparison.OrdinalIgnoreCase))
+            throw new SetupException(SetupText.Get("setup.checksum.mismatch", VulkanLoaderPin.FileName, pin.DllSha256, actual));
+        return new PreparedVulkanLoader(dll, licenseFile, false);
     }
 
     /// <summary>

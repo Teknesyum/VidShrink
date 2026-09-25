@@ -46,6 +46,13 @@
                    Theme="{StaticResource MonoValue}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
+        <TextBlock x:Name="TxtEngine"
+                   Theme="{StaticResource StatusError}"
+                   IsVisible="False"
+                   Margin="{StaticResource PlaybackBadgeMargin}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   TextAlignment="Center"/>
 
         <!--
           Bilgi rozeti ve tanilama satirlari. Dort duz metin satiri sayfadan kalkti ama

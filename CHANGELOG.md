@@ -5,6 +5,12 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [Unreleased]
+
+### Fixed
+
+- Windows 10 with an old `vulkan-1.dll` no longer shows the "entry point vkGetPhysicalDeviceProperties2 not found" system dialog when a video opens: the installer and CI now place a pinned Vulkan loader (1.4.357.0) next to `libmpv-2.dll`, and if libmpv still fails to load the player is disabled with an in-app error instead of a system dialog.
+
 ## [0.9.3] - 2026-09-25
 
 ### Fixed

@@ -579,6 +579,7 @@
   "main.player.state": "pozicija {0} s - {1} - zum {2}%",
   "main.player.stalled": "Reprodukcija je prestala da napreduje; plejer ne proizvodi kadrove.",
   "main.player.seekfailed": "Premotavanje nije uspelo: plejer nije prikazao kadar na novoj poziciji.",
+  "main.player.engine.loadfailed": "Plejer je isključen: libmpv nije moguće učitati. Sistemska biblioteka nedostaje ili je zastarela (obično vulkan-1.dll drajvera grafičke kartice). Ponovo instalirajte VidShrink ili ažurirajte drajver grafičke kartice.",
   "main.player.menu.leavefullscreen": "Izađi iz celog ekrana",
   "main.player.menu.open": "Otvori meni plejera",
   "main.player.menu.seek": "Pomeri {0} s",

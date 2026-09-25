@@ -579,6 +579,7 @@
   "main.player.state": "konum {0} sn - {1} - yakınlaştırma {2}%",
   "main.player.stalled": "Oynatma ilerlemiyor; oynatıcı kare üretmiyor.",
   "main.player.seekfailed": "Atlama başarısız: oynatıcı yeni konumda kare gösteremedi.",
+  "main.player.engine.loadfailed": "Oynatıcı kapatıldı: libmpv yüklenemedi. Sistemdeki bir kitaplık eksik ya da eski (çoğunlukla ekran kartı sürücüsünün vulkan-1.dll dosyası). VidShrink'i yeniden kurun ya da ekran kartı sürücüsünü güncelleyin.",
   "main.player.menu.leavefullscreen": "Tam ekrandan çık",
   "main.player.menu.open": "Oynatıcı menüsünü aç",
   "main.player.menu.seek": "{0} sn atla",

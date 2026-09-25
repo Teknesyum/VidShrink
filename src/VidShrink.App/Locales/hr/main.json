@@ -579,6 +579,7 @@
   "main.player.state": "položaj {0} s - {1} - zum {2}%",
   "main.player.stalled": "Reprodukcija je prestala napredovati; preglednik ne proizvodi sličice.",
   "main.player.seekfailed": "Premotavanje nije uspjelo: preglednik nije prikazao sličicu na novoj pozici.",
+  "main.player.engine.loadfailed": "Reproduktor je isključen: libmpv nije moguće učitati. Sistemska biblioteka nedostaje ili je zastarjela (obično vulkan-1.dll upravljačkog programa grafičke kartice). Ponovno instalirajte VidShrink ili ažurirajte upravljački program grafičke kartice.",
   "main.player.menu.leavefullscreen": "Izlaz iz cijelog zaslona",
   "main.player.menu.open": "Otvori izbornik preglednika",
   "main.player.menu.seek": "Premotaj {0} s",

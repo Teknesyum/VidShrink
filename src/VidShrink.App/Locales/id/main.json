@@ -579,6 +579,7 @@
   "main.player.state": "posisi {0} dtk - {1} - zoom {2}%",
   "main.player.stalled": "Pemutaran berhenti maju; pemutar tidak menghasilkan frame.",
   "main.player.seekfailed": "Pencarian gagal: pemutar tidak menampilkan frame di posisi baru.",
+  "main.player.engine.loadfailed": "Pemutar dinonaktifkan: libmpv tidak dapat dimuat. Sebuah pustaka sistem hilang atau usang (biasanya vulkan-1.dll milik driver grafis). Instal ulang VidShrink atau perbarui driver grafis.",
   "main.player.menu.leavefullscreen": "Keluar layar penuh",
   "main.player.menu.open": "Buka menu pemutar",
   "main.player.menu.seek": "Lompat {0} dtk",
