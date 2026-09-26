@@ -20,3 +20,5 @@ trash/
 
 # Kurucunun sha256 ile indirdigi libmpv; depoya girmez
 tools/libmpv/
+
+tmp/
