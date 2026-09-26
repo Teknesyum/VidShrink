@@ -91,6 +91,16 @@
       "file": "docs/olcumler/hb15-media-foundation.md",
       "line": 46,
       "reason": "\"h264_mf default\" rate_control kipinin adı, varsayılan bir sayı değil; satırdaki 1,080 / 1,045 / 1,044 aynı belgenin ölçüm tablosundan gelen ölçülmüş teslim oranları."
+    },
+    {
+      "rule": "kabuk/sablon-imzasiz",
+      "file": "src/VidShrink.App/MainWindow.axaml",
+      "reason": "scaffold.js ustcubuk şablonu projenin başlık çubuğunu taşıyamıyor: 42 dilli dil seçici için içerik yuvası yok, rozet 4 durum biliyor, sponsor/imza simgeleri ve büyüt/geri al simge değişimi yok, 17 ölçü/renk anahtarı projede tanımsız. Şablona geçmek davranış kaybı olur; şablon bu yuvaları kazanınca muafiyet kalkar."
+    },
+    {
+      "rule": "kabuk/sablon-imzasiz",
+      "file": "src/VidShrink.Core/UpdateBadge.cs",
+      "reason": "Arayüzsüz, 54 satırlık saf mantık (Core katmanı); tarayıcı yalnız adından yakalıyor. scaffold.js durum şablonu bir görünüm üretir ve Core'a giremez; ayrıca 3 durum biliyor (projede 7), sürünen ilerleme, canlı günlük ve indirme sırasında kilitli kapatma yok."
     }
   ]
 }
