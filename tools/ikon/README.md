@@ -1,12 +1,18 @@
 # tools/ikon
 
-`uret.py` VidShrink ikonunu (`src/VidShrink.App/Assets/VidShrink.ico`, 9 boy) ve
-uygulama logosunu (`src/VidShrink.App/Assets/VidShrink.png`, 1024) deterministik
-uretir. Kaynak geometri `src/VidShrink.App/Assets/VidShrink.svg` ile ayni Bezier
-noktalarini elle tasir; makinede cairosvg/resvg/inkscape yoktu, bu yuzden betik
-SVG'yi rasterlemek yerine ayni koordinatlari dogrudan Pillow + numpy ile
-supersample cizer (arms icin egri uzerine dizilmis disklerin birlesimi, ucgen icin
-kose yuvarlatilmis poligon + gradyan maskesi).
+**Tek kaynak bu betiktir.** `uret.py` VidShrink ikonunu (`src/VidShrink.App/Assets/VidShrink.ico`,
+9 boy), uygulama logosunu (`src/VidShrink.App/Assets/VidShrink.png`, 1024) VE
+`src/VidShrink.App/Assets/VidShrink.svg`'yi AYNI geometri sabitlerinden (`ARM_INNER_TOP`,
+`ARM_OUTER_TOP`, `TRIANGLE_OUTER/INNER`) uretir - `emit_svg()` bu sabitleri okuyup SVG
+yazar, raster taraf onlari Pillow+numpy ile supersample cizer. `VidShrink.svg` elle
+duzenlenmez; degisiklik `uret.py`'de yapilir ve betik yeniden calistirilir. Makinede
+cairosvg/resvg/inkscape yoktu, bu yuzden raster taraf SVG'yi geri okumaz (ayni sayilari
+bagimsiz cizer) - ama kaynak sayilar (geometri + renk) tek yerde, `uret.py`'de.
+
+Kol siluetti eski ikonun piksel olcumunden turetildi (ic/dis kenar profili, bkz.
+`ARM_INNER_TOP`/`ARM_OUTER_TOP` docstring'i): tek kapali poligon - kanca + govde + ok
+hep ayni parca, sonradan birlestirilen ayri sekiller degil. Ucgen icin kose yuvarlatilmis
+poligon + gradyan maskesi.
 
 ## Calistirma
 
