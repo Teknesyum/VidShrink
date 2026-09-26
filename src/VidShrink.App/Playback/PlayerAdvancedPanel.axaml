@@ -3,7 +3,13 @@
              xmlns:auto="using:Avalonia.Automation"
              xmlns:loc="using:VidShrink.App.Localization"
              x:Class="VidShrink.App.Playback.PlayerAdvancedPanel">
-  <Border Theme="{StaticResource Panel}">
+  <Border x:Name="Root" Theme="{StaticResource Panel}" Classes="enter">
+    <Border.Transitions>
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="{StaticResource MotionBase}" Easing="CubicEaseOut"/>
+        <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionBase}" Easing="CubicEaseOut"/>
+      </Transitions>
+    </Border.Transitions>
     <StackPanel Spacing="{StaticResource SpaceMd}">
       <Button x:Name="BtnToggle"
               Click="OnToggle"
@@ -15,7 +21,7 @@
           <TextBlock Grid.Column="2" x:Name="TxtSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
         </Grid>
       </Button>
-      <StackPanel x:Name="Body" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+      <StackPanel x:Name="Body" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
         <TextBlock Text="{loc:Text player.advanced.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
         <Grid x:Name="Rows"
               ColumnDefinitions="Auto,Auto,Auto,Auto"

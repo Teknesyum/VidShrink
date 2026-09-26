@@ -7,14 +7,14 @@
         Title="VidShrink"
         Width="{StaticResource TipMaxWidth}"
         SizeToContent="Height"
-        CanResize="False"
+        CanResize="False" CanMaximize="False"
         ShowInTaskbar="True"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource AppBg}"
         ExtendClientAreaToDecorationsHint="True"
         WindowDecorations="BorderOnly"
         ExtendClientAreaTitleBarHeightHint="-1"
-        FontFamily="{StaticResource FontSans}"
+        FontFamily="{StaticResource FontSans}" FontSize="{StaticResource FontSizeMd}"
         Foreground="{StaticResource TextBody}">
 
   <Border x:Name="JobShell"

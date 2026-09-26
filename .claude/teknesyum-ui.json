@@ -79,6 +79,18 @@
       "rule": "forms/no-placeholder",
       "file": "src/VidShrink.App/Recorder/RecorderView.axaml",
       "reason": "On alanın hepsinde görünür Label ve auto:AutomationProperties.Name var; placeholder etiket yerine geçmiyor, boş alanın ne anlama geldiğini söylüyor (\"Boş: kapalı\", \"isteğe bağlı\"). Alan doldurulunca kaybolması bilgi kaybı değil. Satır numarası yazılmıyor: gelişmiş panel büyüdükçe onu da kayıyor."
+    },
+    {
+      "rule": "forms/unmeasured-label",
+      "file": "docs/olcumler/hb15-media-foundation.md",
+      "line": 13,
+      "reason": "`ffmpeg -h encoder=h264_mf` çıktısının alıntısı: \"default -1\" kodlayıcının -rate_control seçeneğinin sıralı değeri, ölçüm iddiası değil; ffmpeg'in yazdığı satır değiştirilmez."
+    },
+    {
+      "rule": "forms/unmeasured-label",
+      "file": "docs/olcumler/hb15-media-foundation.md",
+      "line": 46,
+      "reason": "\"h264_mf default\" rate_control kipinin adı, varsayılan bir sayı değil; satırdaki 1,080 / 1,045 / 1,044 aynı belgenin ölçüm tablosundan gelen ölçülmüş teslim oranları."
     }
   ]
 }
