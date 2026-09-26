@@ -11,6 +11,10 @@ ship as part of it.
 
 - A share link now comes with a QR code to scan with a phone, on the recorder result, the Shrink tab and the Shrink window. It shows only while a link is ready (not during upload or after an error), is drawn dark on a light plate with a four-module quiet zone in every palette (contrast at least 7:1), and has an accessible name.
 
+### Changed
+
+- Automatic updates are on by default on Windows for new installs (an existing choice in the settings file is kept). The update downloads quietly after the window has opened, the badge says it will install when you close VidShrink, and it installs on exit by swapping the files in place without reopening the app (about 0.3 s for a full release). If the swap cannot finish, the launcher waits for the app to exit and installs then. The launcher no longer downloads in the background at startup. macOS and Linux are unchanged.
+
 ## [0.9.5] - 2026-09-25
 
 ### Added

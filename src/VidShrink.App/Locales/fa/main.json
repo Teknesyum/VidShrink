@@ -32,6 +32,7 @@
   "main.update.badge": "به‌روزرسانی",
   "main.update.downloading": "در حال دانلود…",
   "main.update.ready": "آماده نصب",
+  "main.update.ready-on-exit": "به‌روزرسانی آماده است، هنگام بستن نصب می‌شود",
   "main.update.failed": "دانلود به‌روزرسانی ممکن نشد",
   "main.update.maintenance-failed": "نصب به‌روزرسانی ممکن نشد، در اجرای بعدی دوباره تلاش می‌شود",
   "main.update.cancelled": "دانلود لغو شد",

@@ -32,6 +32,7 @@
   "main.update.badge": "Update",
   "main.update.downloading": "Downloading…",
   "main.update.ready": "Ready to install",
+  "main.update.ready-on-exit": "Update ready, installs when you close VidShrink",
   "main.update.failed": "The update could not be downloaded",
   "main.update.maintenance-failed": "The update could not be installed, it will be retried on the next start",
   "main.update.cancelled": "Download cancelled",

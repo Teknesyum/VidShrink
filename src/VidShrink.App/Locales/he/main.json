@@ -32,6 +32,7 @@
   "main.update.badge": "עדכון",
   "main.update.downloading": "מוריד…",
   "main.update.ready": "מוכן להתקנה",
+  "main.update.ready-on-exit": "העדכון מוכן, יותקן בסגירה",
   "main.update.failed": "לא ניתן היה להוריד את העדכון",
   "main.update.maintenance-failed": "לא ניתן היה להתקין את העדכון, ניסיון נוסף יתבצע בהפעלה הבאה",
   "main.update.cancelled": "ההורדה בוטלה",

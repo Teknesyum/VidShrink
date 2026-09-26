@@ -219,7 +219,7 @@ internal static class Program
         return true;
     }
 
-    private static string? FileVersionOf(string path)
+    internal static string? FileVersionOf(string path)
         => System.Diagnostics.FileVersionInfo.GetVersionInfo(path).ProductVersion;
 
     /// <summary>

@@ -19,8 +19,13 @@ namespace VidShrink.Launcher;
 /// Başlatıcı geçişi burada yapılmaz, yalnız kurulur. Geçişi çıkışta yerine geçecek ikili
 /// yapar; döndürülen değer o çağrının gerekip gerekmediğidir.
 ///
-/// Bu çağrı açılış yolunda değil: uygulama ekrana geldikten sonra koşar
-/// (<c>Program.cs</c>). İndirme hemen, kurulum klasörden koşan uygulama kapanınca. Eskiden açılış kapısının içindeydi ve bu yüzden bütçesi 90
+/// Yalnız elle yol koşar (<c>force</c>): "Yükle"nin <c>--update-now</c>'ı ve kapanışta
+/// takas düşünce <c>--install-on-exit</c>. Otomatik güncellemenin arka plan turu artık
+/// uygulamanın: açılış bittikten sonra indirir, kapanırken kurar. Başlatıcının eski arka
+/// plan turu uygulamayı doğurur doğurmaz indirmeye giriyor ve kapı boşalana dek günlerce
+/// bekliyordu; iki indirici aynı sahne için yarışmasın diye kapatıldı.
+///
+/// Eskiden bu çağrı açılış kapısının içindeydi ve bu yüzden bütçesi 90
 /// saniyeydi; ölçülen 0.3.0 → 0.4.1 farkı 375 dosya ve 134,8 MB, yani o bütçede
 /// bitmesi mümkün değildi. Yarıda kalan sahne de silindiği için her açılış sıfırdan
 /// başlıyor, kurulum hiç yakınsamıyordu.
@@ -75,7 +80,7 @@ internal static class Updater
 
     public static bool Run(string baseDirectory, string appDirectory, bool force = false)
     {
-        if (!force && !UpdateCheck.AutoUpdateEnabled()) return false;
+        if (!force) return false;
         if (Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_DISABLED") == "1") return false;
 
         return KurulumBekleyeni.Calistir(baseDirectory, appDirectory, force, MutexName, () =>

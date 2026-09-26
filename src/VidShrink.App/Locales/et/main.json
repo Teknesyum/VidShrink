@@ -32,6 +32,7 @@
   "main.update.badge": "Uuendus",
   "main.update.downloading": "Laadin alla…",
   "main.update.ready": "Valmis paigaldamiseks",
+  "main.update.ready-on-exit": "Uuendus valmis, paigaldatakse sulgemisel",
   "main.update.failed": "Uuendust ei õnnestunud alla laadida",
   "main.update.maintenance-failed": "Uuendust ei õnnestunud paigaldada, järgmisel käivitamisel proovitakse uuesti",
   "main.update.cancelled": "Allalaadimine tühistati",

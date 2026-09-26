@@ -42,7 +42,7 @@
   "settings.share.nothing-to-close": "لا مشاركة لإغلاقها.",
   "settings.update.title": "التحديثات",
   "settings.update.auto": "التحديث تلقائياً",
-  "settings.update.auto-effect": "مطفأ افتراضيًا: يُعلَن عن الإصدار الجديد في الشريط العلوي ويُنزَّل ويُثبَّت بزر واحد. عند التفعيل، يحدّث VidShrink نفسه بصمت.",
+  "settings.update.auto-effect": "عند التفعيل، يُنزَّل الإصدار الجديد في الخلفية ويُثبَّت عند إغلاق VidShrink. عند الإيقاف، يُعلَن عن الإصدار الجديد في الشريط العلوي ويُثبَّت بزر.",
   "settings.update.no-self-effect": "لا يحدّث VidShrink نفسه على هذا النظام: يخبرك فقط بوجود إصدار جديد ويعرض الأمر الذي يثبته.",
   "settings.default-app.suggestion": "VidShrink ليس البرنامج الافتراضي للفيديو. يمكنك اختياره في صفحة التطبيقات الافتراضية في Windows.",
   "settings.default-app.open": "التطبيقات الافتراضية",

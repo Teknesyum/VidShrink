@@ -32,6 +32,7 @@
   "main.update.badge": "Aktualizace",
   "main.update.downloading": "Stahování…",
   "main.update.ready": "Připraveno k instalaci",
+  "main.update.ready-on-exit": "Aktualizace připravena, nainstaluje se při zavření",
   "main.update.failed": "Aktualizaci se nepodařilo stáhnout",
   "main.update.maintenance-failed": "Aktualizaci se nepodařilo nainstalovat, při příštím spuštění se to zkusí znovu",
   "main.update.cancelled": "Stahování zrušeno",

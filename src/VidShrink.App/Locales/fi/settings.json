@@ -43,7 +43,7 @@
 
   "settings.update.title": "Päivitykset",
   "settings.update.auto": "Päivitä automaattisesti",
-  "settings.update.auto-effect": "Oletuksena pois päältä: uudesta versiosta ilmoitetaan yläpalkissa, ja se ladataan ja asennetaan napista. Kun päällä, VidShrink päivittää itsensä hiljaa.",
+  "settings.update.auto-effect": "Päällä: uusi versio ladataan taustalla ja asennetaan, kun VidShrink suljetaan. Pois: uudesta versiosta ilmoitetaan yläpalkissa ja se asennetaan painikkeella.",
   "settings.update.no-self-effect": "VidShrink ei päivitä itseään tässä järjestelmässä: se vain kertoo uudesta versiosta ja näyttää komennon, joka asentaa sen.",
 
   "settings.default-app.suggestion": "VidShrink ei ole videoiden oletusohjelma. Voit valita sen Windowsin Oletussovellukset-sivulta.",

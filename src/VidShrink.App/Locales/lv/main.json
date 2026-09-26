@@ -32,6 +32,7 @@
   "main.update.badge": "Atjauninājums",
   "main.update.downloading": "Lejupielādē…",
   "main.update.ready": "Gatavs instalēšanai",
+  "main.update.ready-on-exit": "Atjauninājums gatavs, tiks instalēts aizverot",
   "main.update.failed": "Atjauninājumu neizdevās lejupielādēt",
   "main.update.maintenance-failed": "Atjauninājumu neizdevās instalēt, nākamajā palaišanas reizē tiks mēģināts vēlreiz",
   "main.update.cancelled": "Lejupielāde atcelta",

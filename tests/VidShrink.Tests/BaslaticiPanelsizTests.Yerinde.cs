@@ -149,11 +149,13 @@ public sealed partial class BaslaticiPanelsizTests
     }
 
     /// <summary>
-    /// Gerçek koşul: başlatıcı uygulamayı açmış, arka planda sahneyi indirmiş ve kurmak için
-    /// uygulamanın kapanmasını bekliyor; bekleyen yuvası onun elinde. Sahte uygulama bu anda
-    /// "Yükle"ye basar. Süre basıştan yeni sürümün açılışına kadar. Sonra arka plan başlatıcısı
-    /// kapıyı alır, kurulu sürümü görür ve dokunmadan çekilir: dosyalar ve yazılma anları
-    /// takastan sonraki gibi kalır, hata işareti yok.
+    /// Önceki sürümün başlatıcısıyla geçiş anı: o başlatıcı uygulamayı açmış, arka planda
+    /// sahneyi indirmiş ve kurmak için uygulamanın kapanmasını bekliyor; bekleyen yuvası onun
+    /// elinde. Bu sürümün başlatıcısı o turu koşmuyor; bekleyen süreç içinde önceki sürümün
+    /// çağrısıyla (<see cref="KurulumBekleyeni.Calistir"/>) canlandırılır. Sahte uygulama bu
+    /// anda "Yükle"ye basar. Süre basıştan yeni sürümün açılışına kadar. Sonra bekleyen kapıyı
+    /// alır, kurulu sürümü görür ve dokunmadan çekilir: dosyalar ve yazılma anları takastan
+    /// sonraki gibi kalır, hata işareti yok.
     /// </summary>
     [SahteKurulumFact]
     public void ArkaPlanBaslaticisiBeklerkenYukleHizliYoldanAcar()
@@ -176,17 +178,17 @@ public sealed partial class BaslaticiPanelsizTests
     }
 
     /// <summary>
-    /// Sahnede başlatıcının kendi dosyası da var ve arka plan başlatıcısı tam o dosyadan koşuyor.
-    /// Hızlı yol koşan ikilinin üstüne yazamaz; yeni başlatıcı yan adda bekler, geçişi yapan
-    /// süreç arka plan başlatıcısı çekilip çıkınca adı devralır.
+    /// Sahnede başlatıcının kendi dosyası da var ve başlatıcı tam o dosyadan hâlâ koşuyor
+    /// (bakım gecikmesi onu açık tutar). Hızlı yol koşan ikilinin üstüne yazamaz; yeni
+    /// başlatıcı yan adda bekler, geçişi yapan süreç başlatıcı çıkınca adı devralır.
     /// </summary>
     [SahteKurulumFact]
-    public void ArkaPlanBaslaticisiKendiDosyasiSahnedeykenGecisOnunCikisindaTamamlanir()
+    public void KosanBaslaticininKendiDosyasiSahnedeykenGecisOnunCikisindaTamamlanir()
     {
         using var kurulum = new SahteKurulum();
         var hedef = Path.Combine(kurulum.Kok, LauncherUpdate.ExecutableName);
         var yeni = File.ReadAllBytes(hedef).Concat(new byte[] { 0 }).ToArray();
-        var (kol, ms) = ArkaPlanBeklerkenYukle(kurulum, kurulum.SahteYayin("9.9.9", hepsi: true, baslatici: yeni));
+        var (kol, ms) = ArkaPlanBeklerkenYukle(kurulum, kurulum.SahteYayin("9.9.9", hepsi: true, baslatici: yeni), gecikme: 12000);
         _cikti.WriteLine($"baslatici-sahnede-yukle-ms\t{ms}\tkol\t{kol}");
         Assert.Equal("hizli", kol);
 
@@ -198,10 +200,16 @@ public sealed partial class BaslaticiPanelsizTests
         Assert.False(File.Exists(LauncherUpdate.Incoming(kurulum.Kok, LauncherUpdate.ExecutableName)));
     }
 
-    private (string Kol, long Ms) ArkaPlanBeklerkenYukle(SahteKurulum kurulum, string kaynak)
+    private (string Kol, long Ms) ArkaPlanBeklerkenYukle(SahteKurulum kurulum, string kaynak, int gecikme = 0)
     {
-        using var baslatici = kurulum.Baslatici(gecikme: 0, omur: 30000, kaynak: kaynak, ayar: kurulum.AyarDosyasi(),
+        using var baslatici = kurulum.Baslatici(gecikme: gecikme, omur: 30000, kaynak: kaynak, ayar: kurulum.AyarDosyasi(),
             ek: new Dictionary<string, string> { ["VIDSHRINK_SAHTE_YUKLE"] = "1", ["VIDSHRINK_SAHTE_YENI_OMUR_MS"] = "1500" });
+        Assert.True(Bekle(() => kurulum.Olaylar().Any(o => o.Olay == "acildi"), 25000), "başlatıcı uygulamayı açmadı");
+        var bekleyen = Task.Factory.StartNew(
+            () => KurulumBekleyeni.Calistir(kurulum.Kok, kurulum.App, false, UpdateStaging.MutexName,
+                () => UpdateStaging.StageAsync(kurulum.Kok, kurulum.App, kaynak, UpdateStaging.LauncherLanes, null,
+                    "VidShrink-OncekiBaslatici", null, CancellationToken.None).GetAwaiter().GetResult(), false),
+            CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         Assert.True(Bekle(() => kurulum.Olaylar().Any(o => o.Olay == "yukle"), 40000), "sahte uygulama Yükle'ye basmadı");
         var olaylar = kurulum.Olaylar();
         var basis = olaylar.Single(o => o.Olay == "yukle-basladi");
@@ -214,7 +222,8 @@ public sealed partial class BaslaticiPanelsizTests
         var ms = (acilis!.Zaman - basis.Zaman) / TimeSpan.TicksPerMillisecond;
         var anlar = kol == "hizli" ? kurulum.Dosyalari().ToDictionary(y => y, File.GetLastWriteTimeUtc) : null;
 
-        Assert.True(baslatici.WaitForExit(60000), "arka plan başlatıcısı çıkmadı");
+        Assert.True(bekleyen.Wait(60000), "önceki sürümün bekleyeni çekilmedi");
+        Assert.True(baslatici.WaitForExit(60000), "başlatıcı çıkmadı");
         kurulum.HepsiniBekle(30000);
         kurulum.Dokum(_cikti);
         kurulum.HepsiYeniSurum();
@@ -226,6 +235,37 @@ public sealed partial class BaslaticiPanelsizTests
             Assert.Equal(3, InPlaceUpdate.SweepRetired(kurulum.App));
         }
         return (kol, ms);
+    }
+
+    /// <summary>
+    /// Kapanışta kurmanın kapanışa eklediği süre, en kötü kol: uygulamanın Release çıktısındaki her dosya
+    /// (2026-09-26, `bin/Release/net8.0` 424 dosya) değişmiş sayılır. Yeniden adlandırma boyuttan bağımsız, dosyalar küçük.
+    /// Süre <c>Uygula</c>'nın tamamı: kapı, kilit, koşan süreç yoklaması, takas, işaret.
+    /// </summary>
+    [Fact]
+    public void KapanistaTakasGercekDosyaSayisindaOlculur()
+    {
+        const int DosyaSayisi = 424;
+        var sureler = new List<long>();
+        for (var tur = 0; tur < OlcumTekrari; tur++)
+        {
+            using var klasor = new YerindeKlasoru();
+            var adlar = Enumerable.Range(0, DosyaSayisi).Select(i => $"d{i:D3}.dll").ToArray();
+            foreach (var ad in adlar) File.WriteAllText(Path.Combine(klasor.App, ad), "v1");
+            var sahne = klasor.Sahne("9.9.9", adlar);
+
+            var saat = Stopwatch.StartNew();
+            var oturdu = YerindeGuncelleme.Uygula(klasor.Kok, klasor.App, sahne, "Local\\Teknesyum.VidShrink.Test." + Guid.NewGuid().ToString("N"));
+            saat.Stop();
+            Assert.True(oturdu, "takas oturmadı");
+            Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(klasor.App));
+            sureler.Add(saat.ElapsedMilliseconds);
+            _cikti.WriteLine($"kapanista-takas-ms\t{tur + 1}\t{saat.ElapsedMilliseconds}\tdosya\t{DosyaSayisi}");
+        }
+
+        var ortanca = Ortanca(sureler);
+        _cikti.WriteLine($"kapanista-takas-ortanca-ms\t{ortanca}\tn\t{sureler.Count}\taralik\t{sureler.Min()}-{sureler.Max()}");
+        Assert.True(ortanca < 3000, $"kapanışta takasın ortancası {ortanca} ms");
     }
 
     [Fact]

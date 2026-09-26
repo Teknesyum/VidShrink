@@ -419,8 +419,12 @@ public sealed class UpdateSettings
     public const string FolderName = "VidShrink";
     public static readonly string FileName = "settings.json";
 
-    /// <summary>Varsayılan kapalı: güncelleme rozetteki düğmeyle indirilip kurulur. Açılırsa Windows'ta kendiliğinden kurulur. Dosyada yazılı değer korunur.</summary>
-    public bool AutoUpdate { get; set; }
+    /// <summary>
+    /// Windows'ta varsayılan açık: uygulama açılış bittikten sonra yeni sürümü arka planda
+    /// indirir ve kapanırken kurar. macOS ve Linux'ta varsayılan kapalı kalır; orada rozet
+    /// haber verir. Dosyada yazılı değer, <c>false</c> dahil, korunur.
+    /// </summary>
+    public bool AutoUpdate { get; set; } = OperatingSystem.IsWindows();
 
     /// <summary>
     /// Hızlı düşür (GPU) kutusunun durumu. Alan yoksa karar henüz verilmemiştir; ilk
@@ -877,6 +881,14 @@ public static class LauncherUpdate
     /// okunmaz, yazılmaz: elle bir kez yüklemek kullanıcının tercihini değiştirmez.
     /// </summary>
     public const string UpdateNowArgument = "--update-now";
+
+    /// <summary>
+    /// Kapanışta kurma kipi: uygulama çıkarken yerinde takas düşerse başlatıcıyı bununla
+    /// bırakır. Başlatıcı çağıranın çıkmasını bekler, sahneyi elle yolun bütçeleriyle kurar
+    /// ve uygulamayı yeniden açmadan çıkar. Pencere, uyarı kutusu ya da ffmpeg denetimi yok:
+    /// kullanıcı programı kapatmıştır.
+    /// </summary>
+    public const string InstallOnExitArgument = "--install-on-exit";
 
     /// <summary>
     /// Uygulama çift tıkla doğrudan açıldığında başlatıcının bakım işini arkada yaptırdığı kip.

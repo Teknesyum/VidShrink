@@ -32,6 +32,7 @@
   "main.update.badge": "Uppdatering",
   "main.update.downloading": "Laddar ned…",
   "main.update.ready": "Redo att installera",
+  "main.update.ready-on-exit": "Uppdatering klar, installeras när du stänger",
   "main.update.failed": "Uppdateringen kunde inte laddas ned",
   "main.update.maintenance-failed": "Uppdateringen kunde inte installeras, ett nytt försök görs vid nästa start",
   "main.update.cancelled": "Nedladdningen avbröts",

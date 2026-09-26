@@ -32,6 +32,7 @@
   "main.update.badge": "Kemas kini",
   "main.update.downloading": "Memuat turun…",
   "main.update.ready": "Sedia untuk dipasang",
+  "main.update.ready-on-exit": "Kemas kini sedia, dipasang semasa ditutup",
   "main.update.failed": "Kemas kini tidak dapat dimuat turun",
   "main.update.maintenance-failed": "Kemas kini tidak dapat dipasang, ia akan dicuba semula pada permulaan seterusnya",
   "main.update.cancelled": "Muat turun dibatalkan",

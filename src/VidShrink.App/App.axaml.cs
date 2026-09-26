@@ -105,6 +105,11 @@ public partial class App : Application
 
             if (window is MainWindow main)
             {
+                desktop.Exit += (_, _) =>
+                {
+                    try { main.KapanistaGuncelle(); }
+                    catch (Exception) { }
+                };
                 var files = _files ?? new Integration.ForwardedFiles();
                 main.AcceptForwardedFiles(files);
                 if (this.TryGetFeature<IActivatableLifetime>() is { } activatable)

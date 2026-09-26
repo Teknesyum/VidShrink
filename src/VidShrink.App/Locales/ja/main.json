@@ -32,6 +32,7 @@
   "main.update.badge": "アップデート",
   "main.update.downloading": "ダウンロード中…",
   "main.update.ready": "インストールの準備完了",
+  "main.update.ready-on-exit": "アップデートの準備ができました。終了時にインストールされます",
   "main.update.failed": "アップデートをダウンロードできませんでした",
   "main.update.maintenance-failed": "アップデートをインストールできませんでした。次回の起動時に再試行します",
   "main.update.cancelled": "ダウンロードをキャンセルしました",

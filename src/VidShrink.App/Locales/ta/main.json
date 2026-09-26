@@ -32,6 +32,7 @@
   "main.update.badge": "புதுப்பிப்பு",
   "main.update.downloading": "பதிவிறக்குகிறது…",
   "main.update.ready": "நிறுவத் தயார்",
+  "main.update.ready-on-exit": "புதுப்பிப்பு தயார், மூடும்போது நிறுவப்படும்",
   "main.update.failed": "புதுப்பிப்பைப் பதிவிறக்க முடியவில்லை",
   "main.update.maintenance-failed": "புதுப்பிப்பை நிறுவ முடியவில்லை, அடுத்த தொடக்கத்தில் மீண்டும் முயற்சிக்கப்படும்",
   "main.update.cancelled": "பதிவிறக்கம் ரத்துசெய்யப்பட்டது",

@@ -545,30 +545,48 @@ public sealed partial class BaslaticiPanelsizTests
         kurulum.HepsiniBekle(60000);
     }
 
+    /// <summary>
+    /// Otomatik güncelleme uygulamanın işi: açılış bittikten sonra indirir, kapanırken kurar.
+    /// Başlatıcının arka plan turu otomatik güncelleme açıkken de indirmez, sahne klasörü
+    /// açmaz, uygulamanın kapanmasını beklemez; ikisi aynı sahne için yarışmaz.
+    /// </summary>
     [SahteKurulumFact]
-    public void IkinciBaslaticiSurecindeYuvaAlinmaz()
+    public void ArkaPlanBaslaticisiOtomatikAcikkenIndirmez()
     {
         using var kurulum = new SahteKurulum();
         var kaynak = kurulum.SahteYayin("9.9.9");
-        var ayar = kurulum.AyarDosyasi();
         var a = Path.Combine(kurulum.App, "a.txt");
 
-        using (MutexTutucu.Baslat(KurulumBekleyeni.Ad(kurulum.App)))
-        {
-            using var ilk = kurulum.Baslatici(gecikme: 0, omur: 1200, kaynak: kaynak, ayar: ayar);
-            Assert.True(ilk.WaitForExit(60000), "yuva tutulurken başlatıcı çıkmadı");
-            kurulum.HepsiniBekle(60000);
-            _cikti.WriteLine($"yuva-tutulurken\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
-            Assert.Equal("v1", File.ReadAllText(a));
-            Assert.Null(UpdateCheck.ReadVersionMarker(kurulum.App));
-        }
-
-        using var ikinci = kurulum.Baslatici(gecikme: 0, omur: 1200, kaynak: kaynak, ayar: ayar);
-        Assert.True(ikinci.WaitForExit(60000), "yuva boşken başlatıcı çıkmadı");
+        using var baslatici = kurulum.Baslatici(gecikme: 0, omur: 1200, kaynak: kaynak, ayar: kurulum.AyarDosyasi());
+        Assert.True(baslatici.WaitForExit(60000), "başlatıcı çıkmadı");
         kurulum.HepsiniBekle(60000);
-        _cikti.WriteLine($"yuva-bosken\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
+        _cikti.WriteLine($"arka-plan-otomatik-acik\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}");
+        Assert.Contains(kurulum.Olaylar(), o => o.Olay == "acildi");
+        Assert.Equal("v1", File.ReadAllText(a));
+        Assert.Null(UpdateCheck.ReadVersionMarker(kurulum.App));
+        Assert.False(Directory.Exists(Path.Combine(kurulum.Kok, UpdateStaging.StageDirectoryName)), "arka plan başlatıcısı sahne indirdi");
+    }
+
+    /// <summary>
+    /// Kapanışta takas düşünce uygulama başlatıcıyı <see cref="LauncherUpdate.InstallOnExitArgument"/>
+    /// ile bırakıp çıkar. Başlatıcı sahneyi kurar ve uygulamayı açmaz: kullanıcı programı kapattı.
+    /// </summary>
+    [SahteKurulumFact]
+    public void KapanisKipiKurarVeUygulamayiAcmaz()
+    {
+        using var kurulum = new SahteKurulum();
+        var kaynak = kurulum.SahteYayin("9.9.9");
+        var a = Path.Combine(kurulum.App, "a.txt");
+
+        using var baslatici = kurulum.Baslatici(
+            gecikme: 0, omur: 1200, kaynak: kaynak, args: new[] { LauncherUpdate.InstallOnExitArgument, "999999" });
+        Assert.True(baslatici.WaitForExit(60000), "kapanış kipindeki başlatıcı çıkmadı");
+        kurulum.HepsiniBekle(60000);
+        _cikti.WriteLine($"kapanis-kipi\t{File.ReadAllText(a)}\tisaret\t{UpdateCheck.ReadVersionMarker(kurulum.App)}\tcikis\t{baslatici.ExitCode}");
+        Assert.Equal(0, baslatici.ExitCode);
         Assert.Equal("v2", File.ReadAllText(a));
         Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(kurulum.App));
+        Assert.DoesNotContain(kurulum.Olaylar(), o => o.Olay == "acildi");
     }
 
     [Theory]

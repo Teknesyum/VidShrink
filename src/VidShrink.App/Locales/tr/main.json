@@ -32,6 +32,7 @@
   "main.update.badge": "Güncelleme",
   "main.update.downloading": "İndiriliyor…",
   "main.update.ready": "Yüklemeye hazır",
+  "main.update.ready-on-exit": "Güncelleme hazır, kapanınca kurulacak",
   "main.update.failed": "Güncelleme indirilemedi",
   "main.update.maintenance-failed": "Güncelleme kurulamadı, bir sonraki açılışta yeniden denenecek",
   "main.update.cancelled": "İndirme iptal edildi",

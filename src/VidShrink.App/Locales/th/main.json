@@ -32,6 +32,7 @@
   "main.update.badge": "อัปเดต",
   "main.update.downloading": "กำลังดาวน์โหลด…",
   "main.update.ready": "พร้อมติดตั้ง",
+  "main.update.ready-on-exit": "อัปเดตพร้อมแล้ว จะติดตั้งเมื่อปิดโปรแกรม",
   "main.update.failed": "ดาวน์โหลดอัปเดตไม่สำเร็จ",
   "main.update.maintenance-failed": "ติดตั้งอัปเดตไม่สำเร็จ จะลองใหม่เมื่อเปิดครั้งถัดไป",
   "main.update.cancelled": "ยกเลิกการดาวน์โหลดแล้ว",

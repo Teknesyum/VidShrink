@@ -102,16 +102,30 @@ public partial class MainWindow
         SetUpdateBadge(UpdateBadgeState.Downloading);
         ShowUpdateProgress(new InstallProgress());
 
+        _updateCancel?.Dispose();
+        var cancel = new CancellationTokenSource();
+        _updateCancel = cancel;
+
+        var work = SahneyiIndir(baseDirectory, appDirectory, cancel.Token);
+
+        work.ContinueWith(
+            task => Dispatcher.UIThread.Post(() => OnUpdateDownloadFinished(task)),
+            TaskScheduler.Default);
+    }
+
+    /// <summary>
+    /// Sahneleme işi: tek kilit (<see cref="UpdateStaging.MutexName"/>) altında, en düşük
+    /// öncelikli iş parçacığında. Kilit başkasındaysa hiçbir şey indirmeden <c>null</c> döner;
+    /// elle indirme ile otomatik indirme aynı sahneyi iki kez indirmez.
+    /// </summary>
+    internal Task<bool?> SahneyiIndir(string baseDirectory, string appDirectory, CancellationToken token)
+    {
         var player = Player;
         var throttle = new DownloadThrottle(PlaybackDownloadBytesPerSecond, () => player.IsPlaying);
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE");
         var reports = _updateReports;
-        _updateCancel?.Dispose();
-        var cancel = new CancellationTokenSource();
-        _updateCancel = cancel;
-        var token = cancel.Token;
 
-        var work = LowPriorityWork.Run<bool?>(nameof(StartUpdateDownload), async () =>
+        return LowPriorityWork.Run<bool?>(nameof(StartUpdateDownload), async () =>
         {
             using var only = new Mutex(initiallyOwned: false, UpdateStaging.MutexName);
             var held = false;
@@ -137,10 +151,6 @@ public partial class MainWindow
                 only.ReleaseMutex();
             }
         });
-
-        work.ContinueWith(
-            task => Dispatcher.UIThread.Post(() => OnUpdateDownloadFinished(task)),
-            TaskScheduler.Default);
     }
 
     /// <summary>

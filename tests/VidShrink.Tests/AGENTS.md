@@ -153,14 +153,15 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   (ikinci açılış indirmez, beklemez), kurulu sürümde hata yazılmaz (bozuk sahne negatif kontrol), daha yeni sürüm eskiye
   düşürülmez, `Kur` dışarıdan verilen beklemeyi aşmaz, üç bekleme bütçesi vazgeçme süresiyle pimli (yuva 3030 ms, indirme kilidi 20000 ms, kurulum kilidi 20011 ms; arka plan yuva/indirme 0 ms, kurulum kilidini sürdürür), elle Yükle'nin uygulamayı doğurması ortanca 3133 ms (n=15, aralık 3098-3308, üst uç pimli değil) — `docs/olcumler/bekleme-butceleri.md`, prova kipi kurmaz
   (kapalı kipi negatif kontrol), `MainModule` fırlatan süreç bizim sayılmaz. Gerçek süreçle: yerel sahte yayından
-  (`VIDSHRINK_UPDATE_SOURCE`, manifest + zip) yuva tutulurken koşan başlatıcı kurmaz, yuva boşken v2 kurar; elle Yükle
+  (`VIDSHRINK_UPDATE_SOURCE`, manifest + zip) arka plan başlatıcısı otomatik açıkken de indirmez, uygulamayı açar; `--install-on-exit` kipi v2 kurar ve uygulamayı açmaz; elle Yükle
   (`--update-now`) yuva ve güncelleme kilidi dışarıdan tutulurken uygulamayı 15 sn'nin altında açar.
   `BaslaticiPanelsizTests.Yerinde.cs` — Yükle'nin hızlı yolu (`InPlaceUpdate`, `YerindeGuncelleme`): uygulama doğumu ortanca
   70 ms (n=10, 63-77; eski `--update-now` aynı koşulda 158 ms), `< 1000 ms` pimli; kilitli dosya geri alınır ve eski yol aynı
   sahneyle kurar; kapı ya da kilit tutulurken hızlı yol denenmez, yuva engellemez; gerçek koşulda (arka plan başlatıcısı yuvayı
   tutup kapıda beklerken) 68 ms (n=10, 57-73; yuvayı isteyen önceki sürüm aynı koşulda eski yoldan 114 ms) ve başlatıcı sonra
-  dokunmadan çekilir (`Kurulmus` silinince iki test kırmızı), başlatıcının kendi dosyası sahnedeyse geçiş onun çıkışında oturur; `Recover`, `SweepRetired`, sahne mührü. Geri almayı
-  kaldıran mutasyon 2/4 kırmızı. `docs/olcumler/hizli-guncelleme.md`.
+  dokunmadan çekilir (`Kurulmus` silinince iki test kırmızı), (eski sürümün bekleyeni süreç içinde `KurulumBekleyeni` ile taklit edilir) ve başlatıcının kendi dosyası sahnedeyse geçiş onun çıkışında oturur; `Recover`, `SweepRetired`, sahne mührü. Geri almayı
+  kaldıran mutasyon 2/4 kırmızı. `docs/olcumler/hizli-guncelleme.md`. Kapanışta takas 424 dosyada ortanca 315 ms (n=10, 249-391), `docs/olcumler/kapanista-guncelleme.md`.
+- `KapanistaGuncellemeTests.cs` — otomatik güncelleme açılışı uzatmadan iner, çıkışta kurulur: sessiz indirme `AcilisBitti`'den önce başlamaz (sahte `AcilisBittiBekle`), otomatik kapalıyken indirmez, sahne olunca rozet ipucu "kapanınca kurulacak" der, sahnesiz indirme susar, güncelleme kilidi tutulurken ikinci indirme başlamaz; çıkışta sahne varsa yerinde takas (sahte `YerindeTakas`) yeni sürümü açmaz, düşerse başlatıcıya (`--install-on-exit`) geçer, sahne yokken ya da kapalıyken dokunmaz; kurulumun `desktop.Exit`'e bağlı olduğu ve başlatıcının arka plan indirmesinin kalktığı kaynaktan pimli; yeni metin 42 dilde. Gerçek süreç açmaz, ağa çıkmaz. Yedi mutasyonun yedisi kırmızı.
 - `KabukMenusuKayitTests.cs` — aynı menünün davranışı, yalnız `ShellMenu.TestRoot` altında: kutunun komutu başlatıcıyı
   (`VidShrink.exe`) gösteriyor; `Relabel` anahtarı silip kurmuyor (komut altındaki işaret kalıyor), yalnız `MUIVerb` yazıyor, aynı etiketle 0 dönüyor. Her test gerçek HKCU komut değerinin değişmediğini sınar.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı

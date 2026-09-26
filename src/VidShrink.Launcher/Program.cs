@@ -33,6 +33,9 @@ internal static class Program
         if (args.Length > 0 && args[0] == LauncherUpdate.CommitArgument)
             return LauncherUpdate.Commit(baseDirectory, ParentProcessId(args)) ? 0 : 3;
 
+        if (args.Length > 0 && args[0] == LauncherUpdate.InstallOnExitArgument)
+            return KapanistaKur(baseDirectory, appDirectory, ParentProcessId(args));
+
         var updateNow = args.Length > 0 && args[0] == LauncherUpdate.UpdateNowArgument;
         if (updateNow)
         {
@@ -91,6 +94,22 @@ internal static class Program
         AcilisIzi.Yaz("app-dogdu");
 
         Maintain(baseDirectory, appDirectory, previousVersion, download: !updateNow, pendingSwap: swap);
+        return 0;
+    }
+
+    /// <summary>
+    /// Uygulama kapanırken yerinde takas düşünce buraya gelinir. Çağıranın çıkması beklenir,
+    /// sahne elle yolun kısa bütçeleriyle kurulur, uygulama yeniden açılmaz: kullanıcı
+    /// programı kapattı. Kurulamazsa sahne diskte kalır, bir sonraki kapanış aynı işi dener.
+    /// </summary>
+    private static int KapanistaKur(string baseDirectory, string appDirectory, int? callerId)
+    {
+        WaitForExit(callerId);
+        var previousVersion = UpdateCheck.ReadVersionMarker(appDirectory);
+        var swap = false;
+        try { swap = Updater.Run(baseDirectory, appDirectory, force: true); }
+        catch (Exception) { }
+        Maintain(baseDirectory, appDirectory, previousVersion, download: false, pendingSwap: swap);
         return 0;
     }
 

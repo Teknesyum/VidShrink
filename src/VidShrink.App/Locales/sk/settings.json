@@ -43,7 +43,7 @@
 
   "settings.update.title": "Aktualizácie",
   "settings.update.auto": "Aktualizovať automaticky",
-  "settings.update.auto-effect": "V predvolenom nastavení vypnuté: nová verzia sa oznámi v hornej lište a stiahne a nainštaluje tlačidlom. Keď je zapnuté, VidShrink sa aktualizuje sám potichu.",
+  "settings.update.auto-effect": "Zapnuté: nová verzia sa stiahne na pozadí a nainštaluje sa pri zatvorení VidShrink. Vypnuté: nová verzia sa ohlási v hornej lište a nainštaluje sa tlačidlom.",
   "settings.update.no-self-effect": "VidShrink sa na tomto systéme sám neaktualizuje: iba oznámi, že existuje nová verzia, a zobrazí príkaz, ktorý ju nainštaluje.",
 
   "settings.default-app.suggestion": "VidShrink nie je predvolený program pre videá. Môžete ho vybrať na stránke Predvolené aplikácie vo Windows.",

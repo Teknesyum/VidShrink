@@ -662,7 +662,8 @@ public partial class MainWindow : Window
             // gorunurlerini degistirmez: serit de bildirim de ayni acilista belirir.
             ShowDefaultAppSuggestion();
             AcilisIzi.Yaz("varsayilan-oneri");
-            _ = CheckForUpdateAsync();
+            if (UpdateCheck.AutoUpdateEnabled(settings)) _ = OtomatikGuncellemeyiBaslatAsync();
+            else _ = CheckForUpdateAsync();
             await LoadFfmpegVersionAsync();
             await ProbeHardwareEncodersAsync();
         }
@@ -2727,10 +2728,22 @@ public partial class MainWindow : Window
             return;
         }
 
-        // Açıkken güncellemeyi başlatıcı sessizce yapıyor, söylenecek bir şey yok.
-        // Kapatıldığı anda haber verme görevi uygulamaya geçer.
-        if (UpdateCheck.AutoUpdateEnabled(settings)) { if (!UpdateNoticeLocked) UpdateNotice.IsVisible = false; }
-        else _ = CheckForUpdateAsync();
+        if (UpdateCheck.AutoUpdateEnabled(settings))
+        {
+            if (UpdateNoticeLocked) return;
+            UpdateNotice.IsVisible = false;
+            if (_updateBadgeState is not UpdateBadgeState.Ready) _ = OtomatikGuncellemeyiBaslatAsync();
+            else if (OperatingSystem.IsWindows())
+            {
+                _kapanistaKurulacak = true;
+                SetUpdateBadge(UpdateBadgeState.Ready);
+            }
+            return;
+        }
+
+        _kapanistaKurulacak = false;
+        if (_sessizIndirme is not null) _updateCancel?.Cancel();
+        _ = CheckForUpdateAsync();
     }
 
     /// <summary>
@@ -2776,7 +2789,7 @@ public partial class MainWindow : Window
                 TxtUpdateBadge.Foreground = brush;
             else TxtUpdateBadge.ClearValue(TextBlock.ForegroundProperty);
         }
-        ToolTip.SetTip(BtnUpdateBadge, state is UpdateBadgeState.Ready ? Say("main.update.ready") : TxtUpdateBadge.Text);
+        ToolTip.SetTip(BtnUpdateBadge, state is UpdateBadgeState.Ready ? HazirIpucu() : TxtUpdateBadge.Text);
         AutomationProperties.SetName(BtnUpdateBadge, TxtUpdateBadge.Text);
         BtnUpdateBadge.IsVisible = true;
         RefreshUpdateNoticeButton();
@@ -2900,6 +2913,7 @@ public partial class MainWindow : Window
             return;
         }
 
+        _stagedUpdate = null;
         Close();
     }
 

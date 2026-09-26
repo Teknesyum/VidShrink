@@ -32,6 +32,7 @@
   "main.update.badge": "Actualizare",
   "main.update.downloading": "Se descarcă…",
   "main.update.ready": "Gata de instalare",
+  "main.update.ready-on-exit": "Actualizare pregătită, se instalează la închidere",
   "main.update.failed": "Actualizarea nu a putut fi descărcată",
   "main.update.maintenance-failed": "Actualizarea nu a putut fi instalată, se va reîncerca la următoarea pornire",
   "main.update.cancelled": "Descărcare anulată",

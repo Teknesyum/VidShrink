@@ -42,7 +42,7 @@
   "settings.share.nothing-to-close": "No hay ningún enlace que cerrar.",
   "settings.update.title": "Actualizaciones",
   "settings.update.auto": "Actualizar automáticamente",
-  "settings.update.auto-effect": "Desactivado de forma predeterminada: una nueva versión se anuncia en la barra superior y se descarga e instala con un botón. Si está activado, VidShrink se actualiza solo, en silencio.",
+  "settings.update.auto-effect": "Activado: la nueva versión se descarga en segundo plano y se instala al cerrar VidShrink. Desactivado: la nueva versión se anuncia en la barra superior y se instala con un botón.",
   "settings.update.no-self-effect": "VidShrink no se actualiza solo en este sistema: solo avisa de que hay una nueva versión y muestra el comando que la instala.",
   "settings.default-app.suggestion": "VidShrink no es el programa por defecto para vídeos. Puedes elegirlo en la página Aplicaciones predeterminadas de Windows.",
   "settings.default-app.open": "Aplicaciones predeterminadas",

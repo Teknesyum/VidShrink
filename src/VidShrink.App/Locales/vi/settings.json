@@ -42,7 +42,7 @@
   "settings.share.nothing-to-close": "Không có chia sẻ để đóng.",
   "settings.update.title": "Cập nhật",
   "settings.update.auto": "Tự động cập nhật",
-  "settings.update.auto-effect": "Mặc định tắt: phiên bản mới được báo trên thanh trên cùng và được tải xuống, cài đặt bằng một nút bấm. Khi bật, VidShrink tự cập nhật âm thầm.",
+  "settings.update.auto-effect": "Khi bật, phiên bản mới được tải về trong nền và cài đặt khi đóng VidShrink. Khi tắt, phiên bản mới được thông báo trên thanh trên cùng và cài đặt bằng một nút.",
   "settings.update.no-self-effect": "VidShrink không tự cập nhật trên hệ thống này: chỉ báo có phiên bản mới và hiện lệnh cài đặt.",
   "settings.default-app.suggestion": "VidShrink không phải chương trình mặc định cho video. Bạn có thể chọn nó ở trang Ứng dụng mặc định của Windows.",
   "settings.default-app.open": "Ứng dụng mặc định",

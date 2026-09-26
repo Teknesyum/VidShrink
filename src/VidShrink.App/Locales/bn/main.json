@@ -32,6 +32,7 @@
   "main.update.badge": "আপডেট",
   "main.update.downloading": "ডাউনলোড হচ্ছে…",
   "main.update.ready": "ইনস্টলের জন্য প্রস্তুত",
+  "main.update.ready-on-exit": "আপডেট প্রস্তুত, বন্ধ করলে ইনস্টল হবে",
   "main.update.failed": "আপডেট ডাউনলোড করা যায়নি",
   "main.update.maintenance-failed": "আপডেট ইনস্টল করা যায়নি, পরের বার চালু করলে আবার চেষ্টা করা হবে",
   "main.update.cancelled": "ডাউনলোড বাতিল হয়েছে",

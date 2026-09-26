@@ -32,6 +32,7 @@
   "main.update.badge": "Update",
   "main.update.downloading": "Downloaden…",
   "main.update.ready": "Klaar om te installeren",
+  "main.update.ready-on-exit": "Update klaar, wordt bij afsluiten geïnstalleerd",
   "main.update.failed": "De update kon niet worden gedownload",
   "main.update.maintenance-failed": "De update kon niet worden geïnstalleerd, bij de volgende start wordt het opnieuw geprobeerd",
   "main.update.cancelled": "Downloaden geannuleerd",

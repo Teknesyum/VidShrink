@@ -32,6 +32,7 @@
   "main.update.badge": "Päivitys",
   "main.update.downloading": "Ladataan…",
   "main.update.ready": "Valmis asennettavaksi",
+  "main.update.ready-on-exit": "Päivitys valmis, asennetaan sulkemisen yhteydessä",
   "main.update.failed": "Päivitystä ei voitu ladata",
   "main.update.maintenance-failed": "Päivitystä ei voitu asentaa, sitä yritetään uudelleen seuraavalla käynnistyskerralla",
   "main.update.cancelled": "Lataus peruttiin",

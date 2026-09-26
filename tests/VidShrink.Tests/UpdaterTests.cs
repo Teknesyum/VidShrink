@@ -265,12 +265,13 @@ public sealed class UpdaterTests : IDisposable
     }
 
     [Fact]
-    public void AutoUpdateIsOffUntilTheUserTurnsItOn()
+    public void AutoUpdateIsOnByDefaultOnWindowsOnly()
     {
         var file = Path.Combine(_root, "settings.json");
 
-        Assert.False(UpdateSettings.Load(file).AutoUpdate);
-        Assert.False(UpdateCheck.AutoUpdateEnabled(UpdateSettings.Load(file)));
+        Assert.Equal(OperatingSystem.IsWindows(), UpdateSettings.Load(file).AutoUpdate);
+        Assert.Equal(OperatingSystem.IsWindows(), UpdateCheck.AutoUpdateEnabled(UpdateSettings.Load(file)));
+        Assert.Equal(OperatingSystem.IsWindows(), new UpdateSettings().AutoUpdate);
 
         new UpdateSettings { AutoUpdate = true }.Save(file);
         Assert.True(UpdateSettings.Load(file).AutoUpdate);
@@ -291,8 +292,16 @@ public sealed class UpdaterTests : IDisposable
         kept.Save(file);
         Assert.True(UpdateSettings.Load(file).AutoUpdate);
 
-        File.WriteAllText(file, "{\"language\": \"tr\", \"targetMb\": 25}");
+        File.WriteAllText(file, "{\"autoUpdate\": false, \"language\": \"tr\", \"targetMb\": 25}");
+        var off = UpdateSettings.Load(file);
+        Assert.False(off.AutoUpdate);
+        off.TargetMb = 30;
+        off.Save(file);
         Assert.False(UpdateSettings.Load(file).AutoUpdate);
+        Assert.Contains("\"autoUpdate\": false", File.ReadAllText(file), StringComparison.Ordinal);
+
+        File.WriteAllText(file, "{\"language\": \"tr\", \"targetMb\": 25}");
+        Assert.Equal(OperatingSystem.IsWindows(), UpdateSettings.Load(file).AutoUpdate);
     }
 
     [Fact]
@@ -300,7 +309,7 @@ public sealed class UpdaterTests : IDisposable
     {
         var file = Path.Combine(_root, "settings.json");
         File.WriteAllText(file, "{ bozuk");
-        Assert.False(UpdateSettings.Load(file).AutoUpdate);
+        Assert.Equal(OperatingSystem.IsWindows(), UpdateSettings.Load(file).AutoUpdate);
     }
 
     [Fact]
@@ -1525,6 +1534,9 @@ exit $code
     /// <para>Yol D'de olağan tur da bakımı <c>Maintain</c>'e bıraktı; geçiş çağrısı artık tek,
     /// <c>Maintain</c>'in içinde. Üç kol (<c>--bakim</c>, hızlı, olağan) onu çağırıyor, iki doğum
     /// kolunda <c>StartApp</c>'tan sonra.</para>
+    ///
+    /// <para>Kapanışta kurulum (<c>--install-on-exit</c>) dördüncü çağıran: uygulamayı açmaz,
+    /// sahneyi kurduktan sonra bakımı indirmesiz koşar; geçiş yine tek çağrıdan.</para>
     /// </summary>
     [Fact]
     public void TheLauncherStartsTheCommitterOnTheWayOut()
@@ -1543,7 +1555,7 @@ exit $code
         Assert.True(gates[0].Index < calls[0].Index, "gecis cagrisi bekleyen gecis kapisinin icinde degil");
         var main = code[..maintain];
         var bakimCagrilari = Regex.Matches(main, @"\n\s+Maintain\(baseDirectory, appDirectory, previousVersion, ");
-        Assert.Equal(3, bakimCagrilari.Count);
+        Assert.Equal(4, bakimCagrilari.Count);
         var fast = code.IndexOf("if (!updateNow && !pending && args.Length > 0 && File.Exists(args[0]))", StringComparison.Ordinal);
         Assert.True(launches[0].Index > fast && launches[0].Index < bakimCagrilari[1].Index,
             "hizli turda bakim uygulamadan once koşuyor");
