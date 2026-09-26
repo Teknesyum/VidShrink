@@ -80,7 +80,7 @@
   "recorder.auto.note.hardware": "donanım kodlayıcısı yoklandı",
   "recorder.auto.note.software": "çalışan donanım kodlayıcısı yok",
   "recorder.auto.note.refresh": "kare hızı ekranın yenileme hızından",
-  "recorder.auto.note.stepped": "kare hızı bir basamak indirildi",
+  "recorder.auto.note.stepped": "kare hızı düşürüldü",
   "recorder.auto.note.kept": "çözünürlük korundu",
   "recorder.auto.note.halved": "çözünürlük yarıya indirildi",
   "recorder.auto.note.container": "kap mkv: öldürülen kayıt oynatılabilir kalıyor",

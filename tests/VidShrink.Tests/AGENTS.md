@@ -70,7 +70,9 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   `Pick` eleme negatifleri), ekran seçici (sahte `ScreenSource`, ikinci ekranın ofseti). Kanıt `.calisma/paket-2/`.
 - `KaydediciBolgeDuzenleyiciTests.cs` — çizilen bölge ekranda kalır (`RegionEdit`, Windows): sekiz tutamak karşı kenarı sabit tutar, taşıma boyu korur, oran kilidi ve masaüstü sınırı korunur, araç paneli üstte → altta → içte, pencere biçimi halka + tutamak + panel (iç alan boş); sahte `IRegionEditorHost` ile çizim → düzenleyici → kutular/json, hedef değişince kapanma, tamponda gizlenme (`EditorWanted`); kayıt evresi (`EditorPhase`: boşta/geri sayım/kayıt/duraklatma) panelde başlat yerine durdur ve duraklat/sürdür gösterir, bölge kilitlenir ve pencere biçimi yalnız panel kalır; panelin durdurması kaydedicinin kendi `StopAsync`'inden geçer (geri sayımı keser, kaynak pimi). Kenar tutamağında oranı bozan mutasyon 1/11 kırmızı.
 - `KaydediciCerceveTests.cs` — paket 2, çerçeve her hedefte: ekran/pencere/bölge dikdörtgeni, ekrana sığmayan çerçeve
-  içe, gerçek pencerenin istemci alanı, affinity 0x11 gerçek pencerede (negatif kontrol affinity'siz).
+  içe, gerçek pencerenin istemci alanı, affinity 0x11 gerçek pencerede (negatif kontrol affinity'siz). Kayıtta bölge
+  geçirgen: çerçeve yalnız kenar şeridi (`Ring`), `WindowFromPoint` bölge içi ve şeritte alttakini, panelde bizimkini bulur;
+  kayıt evresinde panel `WS_EX_NOACTIVATE`. Otomatik kipte Windows tavanı 30 kare (`GdigrabMaxFps`, `KayitOtomatikKipTests`).
 - `KaydediciGirdiTests.cs` — paket 2, tıklama halkası, tıklama sesi, tuş gösterimi: `KeyText`/`KeyTracker`, bellek
   WAV'ı, bindirme yeri; sahte `IInputHooks`/`IInputOverlay`/`IClickSound` ile kutu → json → kanca, kapalı kutu kanca
   kurmaz; gerçek halka ve tuş penceresi açılıp süresinde kapanır. Gerçek düşük seviye kanca testte kurulmaz.

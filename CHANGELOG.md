@@ -11,6 +11,10 @@ ship as part of it.
 
 - A share link now comes with a QR code to scan with a phone, on the recorder result, the Shrink tab and the Shrink window. It shows only while a link is ready (not during upload or after an error), is drawn dark on a light plate with a four-module quiet zone in every palette (contrast at least 7:1), and has an accessible name.
 
+### Fixed
+
+- Region recording no longer bogs the PC down: on Windows, automatic mode caps the capture at 30 fps instead of following the display refresh rate (60/120), which kept gdigrab copying the desktop nonstop and still delivered only about 80 of 120 frames. The recording frame is now only its edge strip, so clicks and the mouse wheel reach the app under the region even if the click-through style is lost, and the region toolbar no longer takes focus while recording.
+
 ## [0.9.5] - 2026-09-25
 
 ### Added

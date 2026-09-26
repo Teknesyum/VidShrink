@@ -56,13 +56,54 @@ internal partial class RecorderFrame : Window
     internal double Thickness
         => this.TryFindResource("RecorderFrameThickness", out var value) && value is double d ? d : 0;
 
+    /// <summary>
+    /// Pencere biçimi: yalnız kenar şeridi. İç alan pencereye ait değil, tıklama ve tekerlek
+    /// stil kaybolsa da alttaki uygulamaya gidiyor; DWM de iç alanı birleştirmiyor.
+    /// </summary>
+    internal static IReadOnlyList<PixelRect> Ring(PixelSize size, int edge)
+    {
+        if (edge * 2 >= size.Width || edge * 2 >= size.Height) return new[] { new PixelRect(size) };
+        return new[]
+        {
+            new PixelRect(0, 0, size.Width, edge),
+            new PixelRect(0, size.Height - edge, size.Width, edge),
+            new PixelRect(0, edge, edge, size.Height - 2 * edge),
+            new PixelRect(size.Width - edge, edge, edge, size.Height - 2 * edge)
+        };
+    }
+
+    private PixelSize _size;
+    private int _edge;
+
+    internal bool Shaped { get; private set; }
+
     internal void Place(PixelRect region)
     {
         var scaling = (Screens.ScreenFromPoint(new PixelPoint(region.X, region.Y)) ?? Screens.Primary)?.Scaling ?? 1;
-        var placed = Placement(region, EdgePixels(Thickness, scaling), Screens.All.Select(s => s.Bounds));
+        _edge = EdgePixels(Thickness, scaling);
+        var placed = Placement(region, _edge, Screens.All.Select(s => s.Bounds));
+        _size = placed.Size;
         Position = placed.Position;
         Width = placed.Width / scaling;
         Height = placed.Height / scaling;
+        ApplyShape();
+    }
+
+    private void ApplyShape()
+    {
+        if (!OperatingSystem.IsWindows() || _size.Width <= 0 || TryGetPlatformHandle() is not { } handle) return;
+        var shape = CreateRectRgn(0, 0, 0, 0);
+        if (shape == IntPtr.Zero) return;
+        foreach (var part in Ring(_size, _edge))
+        {
+            var piece = CreateRectRgn(part.X, part.Y, part.Right, part.Bottom);
+            if (piece == IntPtr.Zero) continue;
+            CombineRgn(shape, shape, piece, RgnOr);
+            DeleteObject(piece);
+        }
+
+        Shaped = SetWindowRgn(handle.Handle, shape, true) != 0;
+        if (!Shaped) DeleteObject(shape);
     }
 
     internal static PixelRect? WindowBounds(string title)
@@ -83,7 +124,22 @@ internal partial class RecorderFrame : Window
         var current = GetWindowLongPtr(handle.Handle, GwlExStyle).ToInt64();
         SetWindowLongPtr(handle.Handle, GwlExStyle, new IntPtr(ClickThroughStyle(current)));
         if (ExcludeFromCapture) CaptureExcluded = SetWindowDisplayAffinity(handle.Handle, ExcludeFromCaptureAffinity);
+        ApplyShape();
     }
+
+    private const int RgnOr = 2;
+
+    [DllImport("gdi32.dll")]
+    private static extern IntPtr CreateRectRgn(int left, int top, int right, int bottom);
+
+    [DllImport("gdi32.dll")]
+    private static extern int CombineRgn(IntPtr destination, IntPtr first, IntPtr second, int mode);
+
+    [DllImport("gdi32.dll")]
+    private static extern bool DeleteObject(IntPtr handle);
+
+    [DllImport("user32.dll")]
+    private static extern int SetWindowRgn(IntPtr hwnd, IntPtr region, bool redraw);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct NativeRect

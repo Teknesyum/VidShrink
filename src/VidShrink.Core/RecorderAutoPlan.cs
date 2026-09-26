@@ -35,14 +35,16 @@ public enum RecorderAutoNote
 /// Otomatik kipin girdisi: kosan makinenin olculebilen yani. <paramref name="WorkingEncoders"/>
 /// <b>yoklanmis</b> adlarin listesi — <c>EncoderCapabilities.WorksAsEncoder</c> gercekten bir
 /// ffmpeg kosumu yapiyor, burada varsayim yok. Bos liste "hicbiri olculmedi" demektir ve
-/// yazilim koluna dusulur.
+/// yazilim koluna dusulur. <paramref name="MaxCaptureFps"/> yakalama yolunun tavani;
+/// 0 tavan yok demektir.
 /// </summary>
 public readonly record struct RecorderMachine(
     int CaptureWidth,
     int CaptureHeight,
     double RefreshHz,
     int CpuCores,
-    IReadOnlyList<string> WorkingEncoders);
+    IReadOnlyList<string> WorkingEncoders,
+    int MaxCaptureFps = 0);
 
 /// <summary>
 /// Otomatik kipin urettigi tek aday. <see cref="RecorderAutoPlan.Apply"/> bunu bir
@@ -93,6 +95,14 @@ public static class RecorderAutoPlan
 
     /// <summary>Yenileme hizi okunamadiginda kullanilan kare hizi.</summary>
     public const int FallbackFps = RecorderArguments.DefaultFps;
+
+    /// <summary>
+    /// Windows yakalamasinin (<c>gdigrab</c>) otomatik kipteki tavani. gdigrab her kareyi
+    /// masaustunden <c>BitBlt</c> ile okuyor ve DWM'i her okumada beklemeye aliyor;
+    /// 1280x720 bolgede 60 istenince 41, 120 istenince 80 kare geldi ve DWM'in payi 30'a
+    /// gore bes kat artti. 30'da istenen kare tam geliyor.
+    /// </summary>
+    public const int GdigrabMaxFps = 30;
 
     /// <summary>Kabul edilen kare hizlari.</summary>
     public static IReadOnlyList<int> FrameRates => FpsLadder;
@@ -165,7 +175,10 @@ public static class RecorderAutoPlan
     {
         var codec = CodecFor(machine.WorkingEncoders);
         var hardware = !string.Equals(codec, SoftwareCodec, StringComparison.Ordinal);
-        var fps = FpsFor(machine.RefreshHz);
+        var refreshFps = FpsFor(machine.RefreshHz);
+        var fps = machine.MaxCaptureFps > 0 && refreshFps > machine.MaxCaptureFps
+            ? FpsFor(machine.MaxCaptureFps)
+            : refreshFps;
         var slower = StepDown(fps);
         var half = Halved(machine.CaptureWidth, machine.CaptureHeight);
 
@@ -184,7 +197,7 @@ public static class RecorderAutoPlan
                 hardware ? RecorderAutoNote.HardwareEncoderChosen : RecorderAutoNote.SoftwareEncoderFallback,
                 RecorderAutoNote.PresetFollowsEncoder,
                 RecorderAutoNote.ContainerSurvivesKill,
-                rate == fps ? RecorderAutoNote.FpsFollowsRefreshRate : RecorderAutoNote.FpsSteppedDown,
+                rate == refreshFps ? RecorderAutoNote.FpsFollowsRefreshRate : RecorderAutoNote.FpsSteppedDown,
                 scale is null ? RecorderAutoNote.ResolutionKept : RecorderAutoNote.ResolutionHalved
             };
 

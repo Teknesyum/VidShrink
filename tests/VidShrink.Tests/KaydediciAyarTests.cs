@@ -444,6 +444,23 @@ public sealed class KaydediciAyarTests
         Assert.Equal(kap == "GIF" ? GifPalette.MaxFps : 60, istek.Fps);
     }
 
+    /// <summary>
+    /// Görünümün kurduğu makine Windows'ta gdigrab tavanını taşıyor; tavan düşerse yenileme
+    /// hızı 60 ve üstü olan ekranda otomatik kip gdigrab'a 60/120 kare ister.
+    /// </summary>
+    [Fact]
+    public void WindowsMakinesiGdigrabTavaniniTasir()
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+            return (tavan: view.Machine().MaxCaptureFps, fps: view.BuildRequest()!.Fps);
+        }));
+
+        Assert.Equal(OperatingSystem.IsWindows() ? RecorderAutoPlan.GdigrabMaxFps : 0, olcu.tavan);
+        if (OperatingSystem.IsWindows()) Assert.InRange(olcu.fps, 1, RecorderAutoPlan.GdigrabMaxFps);
+    }
+
     [Fact]
     public void OlcumKosmadanOtomatikKipIlkAdayiYazar()
     {
