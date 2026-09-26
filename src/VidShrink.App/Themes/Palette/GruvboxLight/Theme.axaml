@@ -2,9 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <!-- Gruvbox'ın açık yarısı; krem kağıt zemin, aynı toprak tonlu vurgular. -->
-  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki on bir çekirdek renkten
-       üretildi. Değiştirmek için çekirdeği düzenle ve VidShrink.PaletteGen
-       aracını çalıştır; komut docs/tema.md içinde. -->
+  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki standart rollerden
+       (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
+       VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
 
   <Color x:Key="NeonBlueColor">#FF076678</Color>
   <Color x:Key="NeonPinkColor">#FFB57614</Color>

@@ -38,33 +38,56 @@ public static class PaletteCatalog
     /// <summary>Açık ve koyu paleti ayıran zemin parlaklığı.</summary>
     private const double LightThreshold = 0.5;
 
-    public const string Default = "Neon";
+    /// <summary>
+    /// Teknesyum UI standardının kendi teması. Ayarında palet yazılı olan kullanıcı kendi
+    /// seçiminde kalır; varsayılan yalnız ayarı boş olana düşer. Ölçü: <c>PaletteTests</c>.
+    /// </summary>
+    public const string Default = "Teknesyum";
 
     /// <summary>
-    /// Sıra <c>seeds.json</c> ile aynı: varsayılan başta, sonra koyu paletler tanınırlık
-    /// sırasında, en sonda açık zeminli olanlar.
+    /// Sıra <c>seeds.json</c> ile aynı: varsayılan başta, sonra koyu paletler, en sonda açık
+    /// zeminli olanlar; iki grupta da önce projenin paletleri, sonra standardınkiler.
     /// </summary>
     public static IReadOnlyList<string> Names { get; } = new[]
     {
-        "Neon", "Dracula", "Nord", "Gruvbox",
+        "Teknesyum", "Neon", "Dracula", "Nord", "Gruvbox",
         "TokyoNight", "Catppuccin", "OneDark", "Monokai",
         "Solarized", "Everforest", "RosePine", "Ayu",
         "NightOwl", "Synthwave", "Cobalt", "MaterialOcean",
         "Github", "Kanagawa", "Horizon", "Moonlight",
+        "Gece", "Grafit", "Kadife", "Kor",
         "SolarizedLight", "GithubLight", "CatppuccinLatte",
-        "RosePineDawn", "AyuLight", "GruvboxLight"
+        "RosePineDawn", "AyuLight", "GruvboxLight",
+        "Buz", "Kagit", "Kar", "Keskin", "Kirik"
+    };
+
+    /// <summary>
+    /// Standart temaların görünen adı, <c>seeds.json</c>'daki <c>baslik</c>. Klasör adı ASCII
+    /// kalmak zorunda, görünen ad Türkçe harfini taşır. Özel ad sayılır, çevrilmez.
+    /// Tohumla aynı kalması <c>PaletteTests</c>'te.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string> Titles = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        ["Gece"] = "Gece Mavisi",
+        ["Buz"] = "Buz Grisi",
+        ["Kagit"] = "Sıcak Kâğıt",
+        ["Kar"] = "Kar Beyazı",
+        ["Keskin"] = "Keskin Beyaz",
+        ["Kirik"] = "Kırık Beyaz"
     };
 
     /// <summary>Yürürlükte olan paletin adı.</summary>
     public static string Current { get; private set; } = Default;
 
     /// <summary>
-    /// Listede görünen ad: dosya adı tek kelime, burada büyük harften bölünür —
-    /// <c>TokyoNight</c> ekranda <c>Tokyo Night</c> olur.
+    /// Listede görünen ad. Başlığı yazılı palet başlığıyla görünür; ötekilerde dosya adı büyük
+    /// harften bölünür — <c>TokyoNight</c> ekranda <c>Tokyo Night</c> olur.
     /// </summary>
     public static string Label(string name)
-        => string.Concat(name.Select((letter, at) =>
-            at > 0 && char.IsUpper(letter) && !char.IsUpper(name[at - 1]) ? " " + letter : letter.ToString()));
+        => Titles.TryGetValue(name, out var title)
+            ? title
+            : string.Concat(name.Select((letter, at) =>
+                at > 0 && char.IsUpper(letter) && !char.IsUpper(name[at - 1]) ? " " + letter : letter.ToString()));
 
     /// <summary>
     /// Paletin zemini açık mı? Elle tutulan bir liste yok; karar zemin renginin

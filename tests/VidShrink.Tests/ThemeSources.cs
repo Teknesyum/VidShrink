@@ -20,8 +20,16 @@ internal static class ThemeSources
     internal static readonly string AppPath =
         Path.Combine(TipSources.Root, "src", "VidShrink.App", "App.axaml");
 
-    /// <summary><c>App.axaml</c>'dan başlayarak birleştirilen sözlük dosyaları, birleşme sırasıyla.</summary>
-    internal static IReadOnlyList<string> Files(string? appAxamlPath = null)
+    private static readonly Regex PaletteFile = new(
+        @"^Themes/Palette/[^/]+/Theme\.axaml$", RegexOptions.Compiled);
+
+    /// <summary>
+    /// <c>App.axaml</c>'dan başlayarak birleştirilen sözlük dosyaları, birleşme sırasıyla.
+    /// <paramref name="palette"/> verilirse açılış paletinin yerine o palet okunur: bir paletin
+    /// kendi tasarımını anlatan ölçü (Neon'un yeşil atmosferi gibi) varsayılan değişince başka
+    /// paleti okumasın diye.
+    /// </summary>
+    internal static IReadOnlyList<string> Files(string? appAxamlPath = null, string? palette = null)
     {
         var start = Path.GetFullPath(appAxamlPath ?? AppPath);
         var root = Path.GetDirectoryName(start)!;
@@ -32,8 +40,12 @@ internal static class ThemeSources
         {
             if (!seen.Add(file) || !File.Exists(file)) return;
             foreach (Match match in Include.Matches(File.ReadAllText(file)))
-                Walk(Path.GetFullPath(Path.Combine(
-                    root, match.Groups["path"].Value.Replace('/', Path.DirectorySeparatorChar))));
+            {
+                var path = match.Groups["path"].Value;
+                if (palette is not null && PaletteFile.IsMatch(path))
+                    path = $"Themes/Palette/{palette}/Theme.axaml";
+                Walk(Path.GetFullPath(Path.Combine(root, path.Replace('/', Path.DirectorySeparatorChar))));
+            }
             ordered.Add(file);
         }
 
@@ -42,12 +54,12 @@ internal static class ThemeSources
     }
 
     /// <summary>Birleşen sözlüklerin bütün belirteçleri. <c>App.axaml</c>'ın kendisi sözlük taşımaz.</summary>
-    internal static IEnumerable<XElement> Resources() => Files()
+    internal static IEnumerable<XElement> Resources(string? palette = null) => Files(palette: palette)
         .Where(file => !string.Equals(Path.GetFileName(file), "App.axaml", StringComparison.OrdinalIgnoreCase))
         .SelectMany(file => XDocument.Load(file).Root!.Elements());
 
-    internal static XElement Resource(string key) => Resources()
+    internal static XElement Resource(string key, string? palette = null) => Resources(palette)
         .Single(element => (string?)element.Attribute(X + "Key") == key);
 
-    internal static string Token(string key) => Resource(key).Value.Trim();
+    internal static string Token(string key, string? palette = null) => Resource(key, palette).Value.Trim();
 }

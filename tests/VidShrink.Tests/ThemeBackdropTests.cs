@@ -58,9 +58,9 @@ public sealed class ThemeBackdropTests
 
     private static string Token(string key) => ThemeSources.Token(key);
 
-    private static IEnumerable<string> StopColours(string brushKey)
+    private static IEnumerable<string> StopColours(string brushKey, string? palette = null)
     {
-        var colours = ThemeSources.Resources()
+        var colours = ThemeSources.Resources(palette)
             .Single(element => (string?)element.Attribute(X + "Key") == brushKey)
             .Elements(Ui + "GradientStop")
             .Select(stop => (string)stop.Attribute("Color")!);
@@ -69,7 +69,7 @@ public sealed class ThemeBackdropTests
         {
             var key = colour.Trim();
             Assert.StartsWith("{StaticResource", key);
-            yield return Token(key.Replace("{StaticResource", string.Empty).Trim(' ', '}'));
+            yield return ThemeSources.Token(key.Replace("{StaticResource", string.Empty).Trim(' ', '}'), palette);
         }
     }
 
@@ -249,11 +249,11 @@ public sealed class ThemeBackdropTests
             $"Başlık çubuğu kontrastı {before:F2} → {after:F2} düştü.");
     }
 
-    /// <summary>K1: Neon'un zemini yeşil atmosfere çalıyor — yeşil kanal kırmızıyı geçiyor, maviden geri kalmıyor.</summary>
+    /// <summary>K1: Neon'un zemini yeşil atmosfere çalıyor — yeşil kanal kırmızıyı geçiyor, maviden geri kalmıyor. Neon'un tasarımı; ölçü varsayılan paleti değil Neon'u okur.</summary>
     [Fact]
     public void TheWorkspaceGradientLeansGreen()
     {
-        foreach (var stop in StopColours("WorkspaceGradient"))
+        foreach (var stop in StopColours("WorkspaceGradient", "Neon"))
         {
             var (r, g, b) = Channels(stop);
             Assert.True(g > r, $"{stop} yeşile değil kırmızıya çalıyor.");
