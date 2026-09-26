@@ -217,17 +217,13 @@ public sealed class KaydediciCerceveTests
     [DllImport("user32.dll")]
     private static extern IntPtr GetAncestor(IntPtr hwnd, uint flags);
 
-    [DllImport("user32.dll")]
-    private static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
-
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
     private static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int index);
 
-    private static bool Bizim(int x, int y)
+    private static bool Bizim(int x, int y, params IntPtr[] pencereler)
     {
         var kok = GetAncestor(WindowFromPoint(new Nokta { X = x, Y = y }), 2);
-        GetWindowThreadProcessId(kok, out var pid);
-        return pid == Environment.ProcessId;
+        return pencereler.Contains(kok);
     }
 
     /// <summary>
@@ -256,14 +252,16 @@ public sealed class KaydediciCerceveTests
                 var cerceveStil = GetWindowLongPtr(cerceve.TryGetPlatformHandle()!.Handle, -20).ToInt64();
                 var panelStil = GetWindowLongPtr(duzenleyici.TryGetPlatformHandle()!.Handle, -20).ToInt64();
                 var panel = duzenleyici.ToolbarBounds;
+                var cerceveHwnd = cerceve.TryGetPlatformHandle()!.Handle;
+                var panelHwnd = duzenleyici.TryGetPlatformHandle()!.Handle;
                 var noktalar = new[]
                 {
                     (bolge.X + 1, bolge.Y + 1), (bolge.Center.X, bolge.Center.Y), (bolge.Right - 2, bolge.Bottom - 2),
                     (bolge.X - 1, bolge.Center.Y), (bolge.Center.X, bolge.Bottom)
                 };
                 return (cerceveStil, panelStil, cerceve.Shaped, duzenleyici.Shaped,
-                    ic: noktalar.Select(n => (n, bizim: Bizim(n.Item1, n.Item2))).ToArray(),
-                    panel, panelBizim: Bizim(panel.Center.X, panel.Center.Y));
+                    ic: noktalar.Select(n => (n, bizim: Bizim(n.Item1, n.Item2, cerceveHwnd, panelHwnd))).ToArray(),
+                    panel, panelBizim: Bizim(panel.Center.X, panel.Center.Y, panelHwnd));
             }
             finally
             {
