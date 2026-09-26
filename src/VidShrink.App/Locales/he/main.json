@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "הושמט: VidShrink קובע זאת לפי גודל היעד",
   "main.preset.handbrake.dropped.no-equivalent": "הושמט: אין ל-VidShrink מקבילה",
   "main.preset.handbrake.dropped.unsupported-codec": "הושמט: הקודק אינו נתמך",
-  "main.preset.handbrake.dropped.structural": "דולג: מבנה הרשימה של HandBrake"
+  "main.preset.handbrake.dropped.structural": "דולג: מבנה הרשימה של HandBrake",
+  "main.share.qr": "קוד QR של קישור השיתוף",
+  "main.share.qr-hint": "סרקו בטלפון כדי לפתוח את הקישור."
 }

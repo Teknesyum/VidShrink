@@ -274,6 +274,7 @@
   <x:Double x:Key="BadgeDotSize">8</x:Double>
   <x:Double x:Key="IconSizeMd">20</x:Double>
   <x:Double x:Key="IconSizeLg">24</x:Double>
+  <x:Double x:Key="ShareQrModuleSize">4</x:Double>
   <x:Double x:Key="SliderTrackHeight">10</x:Double>
   <x:Double x:Key="SliderThumbSize">20</x:Double>
   <x:Double x:Key="SliderThumbStroke">2</x:Double>

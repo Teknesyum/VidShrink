@@ -2624,6 +2624,7 @@ public partial class MainWindow : Window
         Retry().Hide();
         TxtShareStatus.Text = Say("settings.share.uploading");
         ShareLinkRow.IsVisible = false;
+        TxtShareLink.Text = "";
 
         var progress = new Progress<CoreShare.UploadProgress>(step => ShareProgress.Value = step.Fraction);
         var result = await flow.ShareAsync(target, _lastOutput, SelectedRetentionDays(), progress);
@@ -2647,6 +2648,7 @@ public partial class MainWindow : Window
         }
 
         ShareLinkRow.IsVisible = false;
+        TxtShareLink.Text = "";
         Retry().Show(result);
         BtnShareDelete.IsEnabled = flow.CanDelete;
         TxtShareStatus.Text = result.Failure == CoreShare.ShareFailure.Cancelled

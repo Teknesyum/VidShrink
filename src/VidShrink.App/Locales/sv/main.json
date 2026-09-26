@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Borttagen: VidShrink avgör detta utifrån målstorleken",
   "main.preset.handbrake.dropped.no-equivalent": "Borttagen: VidShrink saknar motsvarighet",
   "main.preset.handbrake.dropped.unsupported-codec": "Borttagen: codec stöds inte",
-  "main.preset.handbrake.dropped.structural": "Hoppades över: HandBrakes liststruktur"
+  "main.preset.handbrake.dropped.structural": "Hoppades över: HandBrakes liststruktur",
+  "main.share.qr": "QR-kod för delningslänken",
+  "main.share.qr-hint": "Skanna med telefonen för att öppna länken."
 }

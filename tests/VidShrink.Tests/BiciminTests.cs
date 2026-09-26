@@ -1174,6 +1174,8 @@ public sealed class BaslikKapsamiTests
     /// en ve tr haric: 2655 + 5 = 2660, en 245, tr 90.</para>
     /// <para>2026-09-25, Indir ve Yukle: <c>main.action.downloadinstall</c> 5 dilde kola giriyor (cs en sk sl tr):
     /// 2660 + 5 = 2665, en 246, tr 91.</para>
+    /// <para>2026-09-26, paylasim QR'i: <c>main.share.qr</c> 7 dilde kola giriyor (en fr hu nb nl pt ro), tr haric;
+    /// <c>main.share.qr-hint</c> kolun disinda: 2665 + 7 = 2672, en 247, tr 91.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1199,8 +1201,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2665, toplam);
-        Assert.Equal(246, dilBasina["en"]);
+        Assert.Equal(2672, toplam);
+        Assert.Equal(247, dilBasina["en"]);
         Assert.Equal(91, dilBasina["tr"]);
     }
 
@@ -1362,6 +1364,7 @@ public sealed class BaslikKapsamiTests
     /// 1104 + 2 = 1106, 43 x 1106 = 47558.</para>
     /// <para>2026-09-25, libmpv yukleme hatasi: dil basina <c>main.player.engine.loadfailed</c>: 1106 + 1 = 1107, 43 x 1107 = 47601.</para>
     /// <para>2026-09-25, Indir ve Yukle: dil basina <c>main.action.downloadinstall</c>: 1107 + 1 = 1108, 43 x 1108 = 47644.</para>
+    /// <para>2026-09-26, paylasim QR'i: dil basina iki anahtar (<c>main.share.qr</c>, <c>main.share.qr-hint</c>): 1108 + 2 = 1110, 43 x 1110 = 47730.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1389,7 +1392,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(47644, gezilen);
+        Assert.Equal(47730, gezilen);
         Assert.Empty(kayip);
     }
 

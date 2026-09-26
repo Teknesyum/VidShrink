@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "ตัดออก: VidShrink กำหนดจากขนาดเป้าหมาย",
   "main.preset.handbrake.dropped.no-equivalent": "ตัดออก: VidShrink ไม่มีค่าที่เทียบเท่า",
   "main.preset.handbrake.dropped.unsupported-codec": "ตัดออก: ไม่รองรับโคเดก",
-  "main.preset.handbrake.dropped.structural": "ข้าม: โครงสร้างรายการของ HandBrake"
+  "main.preset.handbrake.dropped.structural": "ข้าม: โครงสร้างรายการของ HandBrake",
+  "main.share.qr": "คิวอาร์โค้ดของลิงก์แชร์",
+  "main.share.qr-hint": "สแกนด้วยโทรศัพท์เพื่อเปิดลิงก์"
 }

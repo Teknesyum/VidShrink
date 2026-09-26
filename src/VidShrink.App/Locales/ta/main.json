@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "கைவிடப்பட்டது: VidShrink இதை இலக்கு அளவிலிருந்து தீர்மானிக்கிறது",
   "main.preset.handbrake.dropped.no-equivalent": "கைவிடப்பட்டது: VidShrink-இல் இணை இல்லை",
   "main.preset.handbrake.dropped.unsupported-codec": "கைவிடப்பட்டது: கோடெக் ஆதரிக்கப்படவில்லை",
-  "main.preset.handbrake.dropped.structural": "தவிர்க்கப்பட்டது: HandBrake பட்டியல் அமைப்பு"
+  "main.preset.handbrake.dropped.structural": "தவிர்க்கப்பட்டது: HandBrake பட்டியல் அமைப்பு",
+  "main.share.qr": "பகிர்வு இணைப்பின் QR குறியீடு",
+  "main.share.qr-hint": "இணைப்பைத் திறக்க உங்கள் தொலைபேசியால் ஸ்கேன் செய்யவும்."
 }

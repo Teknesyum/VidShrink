@@ -3,6 +3,7 @@
              xmlns:izi="using:VidShrink.App"
              xmlns:auto="using:Avalonia.Automation"
              xmlns:loc="using:VidShrink.App.Localization"
+             xmlns:share="using:VidShrink.App.Share"
              x:Class="VidShrink.App.Recorder.RecorderView">
 
   <StackPanel Spacing="{StaticResource SpaceLg}">
@@ -253,7 +254,9 @@
         <Grid x:Name="RecShareLinkRow"
               IsVisible="False"
               ColumnDefinitions="*,Auto"
-              ColumnSpacing="{StaticResource SpaceMd}">
+              RowDefinitions="Auto,Auto"
+              ColumnSpacing="{StaticResource SpaceMd}"
+              RowSpacing="{StaticResource SpaceMd}">
           <TextBox Grid.Column="0"
                    x:Name="TxtRecShareLink"
                    IsReadOnly="True"
@@ -266,6 +269,22 @@
                   Content="{loc:Text main.action.copy}"
                   auto:AutomationProperties.Name="{loc:Text main.action.copy}"
                   Click="OnCopyShareLink"/>
+          <Grid Grid.Row="1"
+                Grid.ColumnSpan="2"
+                RowDefinitions="Auto,Auto"
+                RowSpacing="{StaticResource SpaceSm}"
+                IsVisible="{Binding #QrRecShare.IsVisible}">
+            <share:ShareQrCode HorizontalAlignment="Left"
+                               x:Name="QrRecShare"
+                               Link="{Binding #TxtRecShareLink.Text}"
+                               ModuleSize="{StaticResource ShareQrModuleSize}"
+                               auto:AutomationProperties.Name="{loc:Text main.share.qr}"
+                               auto:AutomationProperties.HelpText="{loc:Text main.share.qr-hint}"/>
+            <TextBlock Grid.Row="1"
+                       Theme="{StaticResource Hint}"
+                       Text="{loc:Text main.share.qr-hint}"
+                       TextWrapping="Wrap"/>
+          </Grid>
         </Grid>
 
         <TextBlock x:Name="TxtRecShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>

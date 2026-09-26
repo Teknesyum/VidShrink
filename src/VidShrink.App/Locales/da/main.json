@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Udeladt: VidShrink bestemmer dette ud fra målstørrelsen",
   "main.preset.handbrake.dropped.no-equivalent": "Udeladt: VidShrink har ingen tilsvarende",
   "main.preset.handbrake.dropped.unsupported-codec": "Udeladt: codec understøttes ikke",
-  "main.preset.handbrake.dropped.structural": "Sprunget over: HandBrakes listestruktur"
+  "main.preset.handbrake.dropped.structural": "Sprunget over: HandBrakes listestruktur",
+  "main.share.qr": "QR-kode til delingslinket",
+  "main.share.qr-hint": "Scan med din telefon for at åbne linket."
 }

@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "حذف شد: VidShrink این را از اندازهٔ هدف تعیین می‌کند",
   "main.preset.handbrake.dropped.no-equivalent": "حذف شد: VidShrink معادلی ندارد",
   "main.preset.handbrake.dropped.unsupported-codec": "حذف شد: کدک پشتیبانی نمی‌شود",
-  "main.preset.handbrake.dropped.structural": "رد شد: ساختار فهرست HandBrake"
+  "main.preset.handbrake.dropped.structural": "رد شد: ساختار فهرست HandBrake",
+  "main.share.qr": "کد QR پیوند اشتراک‌گذاری",
+  "main.share.qr-hint": "برای باز کردن پیوند، آن را با تلفن خود اسکن کنید."
 }

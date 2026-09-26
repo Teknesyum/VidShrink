@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "제외: VidShrink가 목표 크기로 결정함",
   "main.preset.handbrake.dropped.no-equivalent": "제외: VidShrink에 대응 항목 없음",
   "main.preset.handbrake.dropped.unsupported-codec": "제외: 지원하지 않는 코덱",
-  "main.preset.handbrake.dropped.structural": "건너뜀: HandBrake 목록 구조"
+  "main.preset.handbrake.dropped.structural": "건너뜀: HandBrake 목록 구조",
+  "main.share.qr": "공유 링크 QR 코드",
+  "main.share.qr-hint": "휴대폰으로 스캔하면 링크가 열립니다."
 }

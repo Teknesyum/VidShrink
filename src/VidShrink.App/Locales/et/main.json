@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Välja jäetud: VidShrink otsustab selle sihtsuuruse järgi",
   "main.preset.handbrake.dropped.no-equivalent": "Välja jäetud: VidShrinkis pole vastet",
   "main.preset.handbrake.dropped.unsupported-codec": "Välja jäetud: koodekit ei toetata",
-  "main.preset.handbrake.dropped.structural": "Vahele jäetud: HandBrake'i loendi struktuur"
+  "main.preset.handbrake.dropped.structural": "Vahele jäetud: HandBrake'i loendi struktuur",
+  "main.share.qr": "Jagamislingi QR-kood",
+  "main.share.qr-hint": "Lingi avamiseks skanni see telefoniga."
 }

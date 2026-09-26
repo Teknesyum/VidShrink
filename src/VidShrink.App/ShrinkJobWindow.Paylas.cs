@@ -111,6 +111,7 @@ public partial class ShrinkJobWindow
         ShareProgress.IsVisible = true;
         ShareProgress.Value = 0;
         ShareLinkRow.IsVisible = false;
+        TxtShareLink.Text = string.Empty;
         ShowShareStatus(Say("settings.share.uploading"));
 
         var progress = new Progress<CoreShare.UploadProgress>(step => ShareProgress.Value = step.Fraction);
@@ -136,6 +137,7 @@ public partial class ShrinkJobWindow
         }
 
         ShareLinkRow.IsVisible = false;
+        TxtShareLink.Text = string.Empty;
         Retry().Show(result);
         ShowShareStatus(result.Failure == CoreShare.ShareFailure.Cancelled
             ? Say("settings.share.cancelled")

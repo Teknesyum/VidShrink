@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Отброшено: VidShrink определяет это по целевому размеру",
   "main.preset.handbrake.dropped.no-equivalent": "Отброшено: в VidShrink нет аналога",
   "main.preset.handbrake.dropped.unsupported-codec": "Отброшено: кодек не поддерживается",
-  "main.preset.handbrake.dropped.structural": "Пропущено: структура списка HandBrake"
+  "main.preset.handbrake.dropped.structural": "Пропущено: структура списка HandBrake",
+  "main.share.qr": "QR-код ссылки для общего доступа",
+  "main.share.qr-hint": "Отсканируйте телефоном, чтобы открыть ссылку."
 }

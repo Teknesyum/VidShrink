@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Vervallen: VidShrink bepaalt dit uit de doelgrootte",
   "main.preset.handbrake.dropped.no-equivalent": "Vervallen: VidShrink heeft geen equivalent",
   "main.preset.handbrake.dropped.unsupported-codec": "Vervallen: codec niet ondersteund",
-  "main.preset.handbrake.dropped.structural": "Overgeslagen: HandBrake-lijststructuur"
+  "main.preset.handbrake.dropped.structural": "Overgeslagen: HandBrake-lijststructuur",
+  "main.share.qr": "QR-code van de deellink",
+  "main.share.qr-hint": "Scan met je telefoon om de link te openen."
 }

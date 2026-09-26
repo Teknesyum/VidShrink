@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Dibuang: VidShrink menentukannya dari ukuran target",
   "main.preset.handbrake.dropped.no-equivalent": "Dibuang: VidShrink tidak punya padanannya",
   "main.preset.handbrake.dropped.unsupported-codec": "Dibuang: codec tidak didukung",
-  "main.preset.handbrake.dropped.structural": "Dilewati: struktur daftar HandBrake"
+  "main.preset.handbrake.dropped.structural": "Dilewati: struktur daftar HandBrake",
+  "main.share.qr": "Kode QR untuk tautan berbagi",
+  "main.share.qr-hint": "Pindai dengan ponsel untuk membuka tautan."
 }

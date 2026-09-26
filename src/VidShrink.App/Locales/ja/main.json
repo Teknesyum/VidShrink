@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "除外: VidShrink が目標サイズから決定します",
   "main.preset.handbrake.dropped.no-equivalent": "除外: VidShrink に相当する設定がありません",
   "main.preset.handbrake.dropped.unsupported-codec": "除外: 対応していないコーデックです",
-  "main.preset.handbrake.dropped.structural": "スキップ: HandBrake のリスト構造"
+  "main.preset.handbrake.dropped.structural": "スキップ: HandBrake のリスト構造",
+  "main.share.qr": "共有リンクの QR コード",
+  "main.share.qr-hint": "スマートフォンでスキャンするとリンクが開きます。"
 }

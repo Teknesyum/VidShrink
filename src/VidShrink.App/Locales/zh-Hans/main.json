@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "已舍弃：VidShrink 根据目标大小决定",
   "main.preset.handbrake.dropped.no-equivalent": "已舍弃：VidShrink 没有对应项",
   "main.preset.handbrake.dropped.unsupported-codec": "已舍弃：不支持该编解码器",
-  "main.preset.handbrake.dropped.structural": "已跳过：HandBrake 列表结构"
+  "main.preset.handbrake.dropped.structural": "已跳过：HandBrake 列表结构",
+  "main.share.qr": "分享链接的二维码",
+  "main.share.qr-hint": "用手机扫描即可打开链接。"
 }

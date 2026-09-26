@@ -7,6 +7,10 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- A share link now comes with a QR code to scan with a phone, on the recorder result, the Shrink tab and the Shrink window. It shows only while a link is ready (not during upload or after an error), is drawn dark on a light plate with a four-module quiet zone in every palette (contrast at least 7:1), and has an accessible name.
+
 ## [0.9.5] - 2026-09-25
 
 ### Added

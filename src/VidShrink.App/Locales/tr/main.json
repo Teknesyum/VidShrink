@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Düştü: VidShrink bunu hedef boyuttan kendisi belirler",
   "main.preset.handbrake.dropped.no-equivalent": "Düştü: VidShrink'te karşılığı yok",
   "main.preset.handbrake.dropped.unsupported-codec": "Düştü: kodek desteklenmiyor",
-  "main.preset.handbrake.dropped.structural": "Atlandı: HandBrake liste yapısı"
+  "main.preset.handbrake.dropped.structural": "Atlandı: HandBrake liste yapısı",
+  "main.share.qr": "Paylaşım bağlantısının QR kodu",
+  "main.share.qr-hint": "Bağlantıyı telefonda açmak için okutun."
 }

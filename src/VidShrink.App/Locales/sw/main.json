@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Imeachwa: VidShrink huamua hili kutokana na ukubwa lengwa",
   "main.preset.handbrake.dropped.no-equivalent": "Imeachwa: VidShrink haina kinachofanana",
   "main.preset.handbrake.dropped.unsupported-codec": "Imeachwa: kodeki haitumiki",
-  "main.preset.handbrake.dropped.structural": "Imerukwa: muundo wa orodha wa HandBrake"
+  "main.preset.handbrake.dropped.structural": "Imerukwa: muundo wa orodha wa HandBrake",
+  "main.share.qr": "Msimbo wa QR wa kiungo cha kushiriki",
+  "main.share.qr-hint": "Changanua kwa simu yako ili kufungua kiungo."
 }

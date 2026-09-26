@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:loc="using:VidShrink.App.Localization"
+        xmlns:share="using:VidShrink.App.Share"
         x:Class="VidShrink.App.ShrinkJobWindow"
         Title="VidShrink"
         Width="{StaticResource TipMaxWidth}"
@@ -176,7 +177,9 @@
       <Grid x:Name="ShareLinkRow"
             IsVisible="False"
             ColumnDefinitions="*,Auto"
-            ColumnSpacing="{StaticResource SpaceMd}">
+            RowDefinitions="Auto,Auto"
+            ColumnSpacing="{StaticResource SpaceMd}"
+            RowSpacing="{StaticResource SpaceMd}">
         <TextBox Grid.Column="0"
                  x:Name="TxtShareLink"
                  IsReadOnly="True"
@@ -187,6 +190,23 @@
                 Content="{loc:Text main.action.copy}"
                 Padding="{StaticResource ButtonPaddingSm}"
                 VerticalAlignment="Center"/>
+        <Grid Grid.Row="1"
+              Grid.ColumnSpan="2"
+              RowDefinitions="Auto,Auto"
+              RowSpacing="{StaticResource SpaceSm}"
+              IsVisible="{Binding #QrShare.IsVisible}">
+          <share:ShareQrCode HorizontalAlignment="Left"
+                             x:Name="QrShare"
+                             Link="{Binding #TxtShareLink.Text}"
+                             ModuleSize="{StaticResource ShareQrModuleSize}"
+                             auto:AutomationProperties.Name="{loc:Text main.share.qr}"
+                             auto:AutomationProperties.HelpText="{loc:Text main.share.qr-hint}"/>
+          <TextBlock Grid.Row="1"
+                     Text="{loc:Text main.share.qr-hint}"
+                     FontSize="{StaticResource FontSizeSm}"
+                     Foreground="{StaticResource TextBody}"
+                     TextWrapping="Wrap"/>
+        </Grid>
       </Grid>
 
       <TextBlock x:Name="TxtShareStatus"
