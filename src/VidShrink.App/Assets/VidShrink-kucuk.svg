@@ -1,6 +1,7 @@
 <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-  <!-- Tek kaynak. Elle yazilmis kubik Bezier path'ler; rasterleme tools/ikon/uret.py
-       tarafindan headless Microsoft Edge ile yapilir (gercek SVG motoru). -->
+  <!-- Kucuk boy (16/20/24) varyanti - VidShrink.svg ile ayni yol/gradyan, yalnizca
+       stroke kalinliklari buyutuldu (kucuk boyda incelen kontur okunurlugu icin).
+       VidShrink.svg elle degistirildiginde bu dosya da elle esitlenir. -->
   <defs>
     <linearGradient id="kolGrad" x1="0" y1="49" x2="80" y2="207" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#6fb7ff"/>
@@ -14,24 +15,24 @@
 
   <g id="kolSol">
     <path d="M47.0,49.0 C48.8,50.5 59.8,53.0 58.0,58.0 C56.2,63.0 41.7,72.5 36.0,79.0 C30.3,85.5 26.0,83.7 24.0,97.0 C22.0,110.3 22.0,145.7 24.0,159.0 C26.0,172.3 30.3,170.5 36.0,177.0 C41.7,183.5 56.2,193.0 58.0,198.0 C59.8,203.0 48.8,205.5 47.0,207.0"
-          fill="none" stroke="#000000" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+          fill="none" stroke="#000000" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M47.0,49.0 C48.8,50.5 59.8,53.0 58.0,58.0 C56.2,63.0 41.7,72.5 36.0,79.0 C30.3,85.5 26.0,83.7 24.0,97.0 C22.0,110.3 22.0,145.7 24.0,159.0 C26.0,172.3 30.3,170.5 36.0,177.0 C41.7,183.5 56.2,193.0 58.0,198.0 C59.8,203.0 48.8,205.5 47.0,207.0"
-          fill="none" stroke="url(#kolGrad)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+          fill="none" stroke="url(#kolGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M47.0,49.0 C48.8,50.5 59.8,53.0 58.0,58.0 C56.2,63.0 41.7,72.5 36.0,79.0 C30.3,85.5 26.0,94.0 24.0,97.0"
-          fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
     <polygon points="35.0,115.0 58.0,115.0 58.0,108.0 75.0,128.0 58.0,148.0 58.0,141.0 35.0,141.0"
-             fill="url(#kolGrad)" stroke="#000000" stroke-width="8" stroke-linejoin="round" paint-order="stroke"/>
+             fill="url(#kolGrad)" stroke="#000000" stroke-width="11" stroke-linejoin="round" paint-order="stroke"/>
   </g>
 
   <g id="kolSag">
     <path d="M209.0,49.0 C207.2,50.5 196.2,53.0 198.0,58.0 C199.8,63.0 214.3,72.5 220.0,79.0 C225.7,85.5 230.0,83.7 232.0,97.0 C234.0,110.3 234.0,145.7 232.0,159.0 C230.0,172.3 225.7,170.5 220.0,177.0 C214.3,183.5 199.8,193.0 198.0,198.0 C196.2,203.0 207.2,205.5 209.0,207.0"
-          fill="none" stroke="#000000" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+          fill="none" stroke="#000000" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M209.0,49.0 C207.2,50.5 196.2,53.0 198.0,58.0 C199.8,63.0 214.3,72.5 220.0,79.0 C225.7,85.5 230.0,83.7 232.0,97.0 C234.0,110.3 234.0,145.7 232.0,159.0 C230.0,172.3 225.7,170.5 220.0,177.0 C214.3,183.5 199.8,193.0 198.0,198.0 C196.2,203.0 207.2,205.5 209.0,207.0"
-          fill="none" stroke="url(#kolGrad)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+          fill="none" stroke="url(#kolGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M209.0,49.0 C207.2,50.5 196.2,53.0 198.0,58.0 C199.8,63.0 214.3,72.5 220.0,79.0 C225.7,85.5 230.0,94.0 232.0,97.0"
-          fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
     <polygon points="221.0,115.0 198.0,115.0 198.0,108.0 181.0,128.0 198.0,148.0 198.0,141.0 221.0,141.0"
-             fill="url(#kolGrad)" stroke="#000000" stroke-width="8" stroke-linejoin="round" paint-order="stroke"/>
+             fill="url(#kolGrad)" stroke="#000000" stroke-width="11" stroke-linejoin="round" paint-order="stroke"/>
   </g>
 
   <path d="M100.0,74.0 Q86.0,74.0 86.0,88.0 L86.0,168.0 Q86.0,182.0 100.0,182.0 Q106.6,182.0 111.8,177.9 L161.9,137.2 Q170.0,130.6 170.0,128.0 Q170.0,125.4 161.9,118.8 L111.8,78.1 Q106.6,74.0 100.0,74.0 Z"

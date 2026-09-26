@@ -1,18 +1,26 @@
 # tools/ikon
 
-**Tek kaynak bu betiktir.** `uret.py` VidShrink ikonunu (`src/VidShrink.App/Assets/VidShrink.ico`,
-9 boy), uygulama logosunu (`src/VidShrink.App/Assets/VidShrink.png`, 1024) VE
-`src/VidShrink.App/Assets/VidShrink.svg`'yi AYNI geometri sabitlerinden (`ARM_INNER_TOP`,
-`ARM_OUTER_TOP`, `TRIANGLE_OUTER/INNER`) uretir - `emit_svg()` bu sabitleri okuyup SVG
-yazar, raster taraf onlari Pillow+numpy ile supersample cizer. `VidShrink.svg` elle
-duzenlenmez; degisiklik `uret.py`'de yapilir ve betik yeniden calistirilir. Makinede
-cairosvg/resvg/inkscape yoktu, bu yuzden raster taraf SVG'yi geri okumaz (ayni sayilari
-bagimsiz cizer) - ama kaynak sayilar (geometri + renk) tek yerde, `uret.py`'de.
+**Tek kaynak `src/VidShrink.App/Assets/VidShrink.svg`.** Elle yazilmis kubik Bezier
+`path`'lerle kurulu: parantez kollari `stroke-linecap="round" stroke-linejoin="round"`
+kalin bir stroke (kontur icin siyah + uzerinde gradyan renkli iki kopya), govdenin
+ic kavisinde ayrica ince yari-saydam beyaz bir "parlama" stroke'u; ok govdesi+basi
+ayni `<g>` icinde kolla ayni gradyan dolguyu tasiyan, acikca ayrisan bir sekil
+(`paint-order="stroke"` ile siyah kontur dolgunun altina/etrafina ciziliyor); oynat
+ucgeni kose yuvarlatilmis path + ikinci gradyan + camlanma ucgeni.
 
-Kol siluetti eski ikonun piksel olcumunden turetildi (ic/dis kenar profili, bkz.
-`ARM_INNER_TOP`/`ARM_OUTER_TOP` docstring'i): tek kapali poligon - kanca + govde + ok
-hep ayni parca, sonradan birlestirilen ayri sekiller degil. Ucgen icin kose yuvarlatilmis
-poligon + gradyan maskesi.
+Kucuk boylar icin `VidShrink-kucuk.svg`: ayni yol/gradyan verisi, yalnizca stroke
+kalinliklari buyutulmus (16/20/24px'te gercek SVG motorunun anti-alias'i konturu
+inceltiyor, kalin kontur bunu telafi ediyor). `VidShrink.svg` elle degistiginde bu
+dosya da elle esitlenir (script otomatik turetmiyor - iki dosya kucuk ve kasitli
+farkli).
+
+**Rasterleme `uret.py`, gercek bir SVG motoruyla: headless Microsoft Edge**
+(`msedge --headless=new --screenshot=... --window-size=N,N
+--default-background-color=00000000`, SVG'yi saran seffaf-zeminli bir HTML
+uzerinden). Betik SVG'yi DEGISTIRMEZ, yalnizca okur ve her ICO boyunda
+(16, 20, 24, 32, 40, 48, 64, 128, 256) + logo boyunda (1024) render alip
+`VidShrink.ico`/`VidShrink.png`'yi yazar. `KUCUK_SINIR` sabiti (`uret.py` icinde,
+su an 24) bu boy ve altinda `VidShrink-kucuk.svg`'yi kullanir.
 
 ## Calistirma
 
@@ -20,8 +28,13 @@ poligon + gradyan maskesi.
 python tools/ikon/uret.py
 ```
 
-Bagimlilik: `Pillow`, `numpy` (bu makinede onceden kuruluydu; yoksa
-`pip install pillow numpy` proje disina dokunmaz).
+Bagimlilik: Microsoft Edge (herhangi bir surum, headless calisir - makinede
+`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe` bulundu), Pillow
+(yalniz ICO paketlemek icin, rasterlemede degil).
 
-Kucuk boylar (<=32px) buyuk cizimden kucultulmez: her boy kendi kol kalinligi
-carpaniyla (`stroke_boost`) ayrica cizilir, okunurluk boylece korunur.
+## Gecmis
+
+Onceki iki surum (poligon-birlesimi + Pillow/numpy supersample) denetci
+tarafindan reddedildi: koseler poligondan geldigi icin keskindi, ok govdeyle
+kaynasip ayirt edilemiyordu, dolgu duzdu. Bu surum SVG'yi hand-authored kubik
+Bezier + gercek tarayici motoruyla cozdu.
