@@ -38,3 +38,6 @@ Onceki iki surum (poligon-birlesimi + Pillow/numpy supersample) denetci
 tarafindan reddedildi: koseler poligondan geldigi icin keskindi, ok govdeyle
 kaynasip ayirt edilemiyordu, dolgu duzdu. Bu surum SVG'yi hand-authored kubik
 Bezier + gercek tarayici motoruyla cozdu.
+
+Ucuncu turda geometri T0'in kendi elle cizdigi SVG ile degisti; uretim duzeni
+(headless Edge + `uret.py`) aynen kaldi.

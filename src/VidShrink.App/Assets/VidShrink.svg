@@ -1,42 +1,57 @@
-<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-  <!-- Tek kaynak. Elle yazilmis kubik Bezier path'ler; rasterleme tools/ikon/uret.py
-       tarafindan headless Microsoft Edge ile yapilir (gercek SVG motoru). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
   <defs>
-    <linearGradient id="kolGrad" x1="0" y1="49" x2="80" y2="207" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#6fb7ff"/>
-      <stop offset="1" stop-color="#9acdff"/>
+    <linearGradient id="kol" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9acdff"/>
+      <stop offset="0.5" stop-color="#6fb7ff"/>
+      <stop offset="1" stop-color="#5992cc"/>
     </linearGradient>
-    <linearGradient id="ucgenGrad" x1="94" y1="86" x2="158" y2="170" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#fa8cff"/>
+    <linearGradient id="oynat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fcbaff"/>
+      <stop offset="0.45" stop-color="#fa8cff"/>
       <stop offset="1" stop-color="#ac7fff"/>
     </linearGradient>
+    <path id="parantez" d="M78 36 C52 36 40 48 40 74 V106 C40 118 34 126 24 128 C34 130 40 138 40 150 V182 C40 208 52 220 78 220" fill="none"/>
+    <path id="govde" d="M40 128 H64" fill="none"/>
+    <path id="bas" d="M60 113 L80 128 L60 143 Z"/>
+    <path id="ucgen" d="M117 102 L117 154 L158 128 Z"/>
   </defs>
 
-  <g id="kolSol">
-    <path d="M47.0,49.0 C48.8,50.5 59.8,53.0 58.0,58.0 C56.2,63.0 41.7,72.5 36.0,79.0 C30.3,85.5 26.0,83.7 24.0,97.0 C22.0,110.3 22.0,145.7 24.0,159.0 C26.0,172.3 30.3,170.5 36.0,177.0 C41.7,183.5 56.2,193.0 58.0,198.0 C59.8,203.0 48.8,205.5 47.0,207.0"
-          fill="none" stroke="#000000" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M47.0,49.0 C48.8,50.5 59.8,53.0 58.0,58.0 C56.2,63.0 41.7,72.5 36.0,79.0 C30.3,85.5 26.0,83.7 24.0,97.0 C22.0,110.3 22.0,145.7 24.0,159.0 C26.0,172.3 30.3,170.5 36.0,177.0 C41.7,183.5 56.2,193.0 58.0,198.0 C59.8,203.0 48.8,205.5 47.0,207.0"
-          fill="none" stroke="url(#kolGrad)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M47.0,49.0 C48.8,50.5 59.8,53.0 58.0,58.0 C56.2,63.0 41.7,72.5 36.0,79.0 C30.3,85.5 26.0,94.0 24.0,97.0"
-          fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    <polygon points="35.0,115.0 58.0,115.0 58.0,108.0 75.0,128.0 58.0,148.0 58.0,141.0 35.0,141.0"
-             fill="url(#kolGrad)" stroke="#000000" stroke-width="8" stroke-linejoin="round" paint-order="stroke"/>
+  <g stroke="#000" stroke-linecap="round" stroke-linejoin="round" fill="#000">
+    <g stroke-width="34">
+      <use href="#parantez"/>
+      <use href="#parantez" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <g stroke-width="26">
+      <use href="#govde"/>
+      <use href="#govde" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <g stroke-width="20">
+      <use href="#bas"/>
+      <use href="#bas" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <use href="#ucgen" stroke-width="36"/>
   </g>
 
-  <g id="kolSag">
-    <path d="M209.0,49.0 C207.2,50.5 196.2,53.0 198.0,58.0 C199.8,63.0 214.3,72.5 220.0,79.0 C225.7,85.5 230.0,83.7 232.0,97.0 C234.0,110.3 234.0,145.7 232.0,159.0 C230.0,172.3 225.7,170.5 220.0,177.0 C214.3,183.5 199.8,193.0 198.0,198.0 C196.2,203.0 207.2,205.5 209.0,207.0"
-          fill="none" stroke="#000000" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M209.0,49.0 C207.2,50.5 196.2,53.0 198.0,58.0 C199.8,63.0 214.3,72.5 220.0,79.0 C225.7,85.5 230.0,83.7 232.0,97.0 C234.0,110.3 234.0,145.7 232.0,159.0 C230.0,172.3 225.7,170.5 220.0,177.0 C214.3,183.5 199.8,193.0 198.0,198.0 C196.2,203.0 207.2,205.5 209.0,207.0"
-          fill="none" stroke="url(#kolGrad)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M209.0,49.0 C207.2,50.5 196.2,53.0 198.0,58.0 C199.8,63.0 214.3,72.5 220.0,79.0 C225.7,85.5 230.0,94.0 232.0,97.0"
-          fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    <polygon points="221.0,115.0 198.0,115.0 198.0,108.0 181.0,128.0 198.0,148.0 198.0,141.0 221.0,141.0"
-             fill="url(#kolGrad)" stroke="#000000" stroke-width="8" stroke-linejoin="round" paint-order="stroke"/>
+  <g stroke="url(#kol)" stroke-linecap="round" stroke-linejoin="round" fill="url(#kol)">
+    <g stroke-width="20">
+      <use href="#parantez"/>
+      <use href="#parantez" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <g stroke-width="12">
+      <use href="#govde"/>
+      <use href="#govde" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <g stroke-width="6">
+      <use href="#bas"/>
+      <use href="#bas" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
   </g>
 
-  <path d="M100.0,74.0 Q86.0,74.0 86.0,88.0 L86.0,168.0 Q86.0,182.0 100.0,182.0 Q106.6,182.0 111.8,177.9 L161.9,137.2 Q170.0,130.6 170.0,128.0 Q170.0,125.4 161.9,118.8 L111.8,78.1 Q106.6,74.0 100.0,74.0 Z"
-        fill="#000000"/>
-  <path d="M104.5,86.0 Q94.0,86.0 94.0,96.4 L94.0,159.6 Q94.0,170.0 104.5,170.0 Q109.1,170.0 112.9,166.9 L152.7,132.8 Q158.0,128.0 158.0,128.0 Q158.0,128.0 152.7,123.2 L112.9,89.1 Q109.1,86.0 104.5,86.0 Z"
-        fill="url(#ucgenGrad)"/>
-  <path d="M99.0,90.0 L99.0,128.0 L124.0,111.0 Z" fill="#ffffff" fill-opacity="0.38"/>
+  <use href="#ucgen" fill="url(#oynat)" stroke="url(#oynat)" stroke-width="22" stroke-linejoin="round"/>
+  <path d="M109 100 C109 95 114 93 118 96 L140 109 C128 110 117 115 109 124 Z" fill="#ffffff" fill-opacity="0.3"/>
+
+  <g fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round">
+    <path d="M70 44 C56 46 49 54 48 72"/>
+    <path d="M186 44 C200 46 207 54 208 72"/>
+  </g>
 </svg>
