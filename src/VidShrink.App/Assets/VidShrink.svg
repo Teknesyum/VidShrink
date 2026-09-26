@@ -1,0 +1,40 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    VidShrink ikonu - vektor kaynak.
+    Motif: iki yanda sikistirmayi anlatan yuvarlatilmis parantez kollari, ice bakan
+    oklar, ortada koyu cerceveli oynat ucgeni.
+    Renkler yalniz teknesyum-ui/benim.tokens.json'dan (brand.renk-1, brand.renk-2-text,
+    brand.renk-3-text, brand.black). Turetilmis tonlar (karisim/alfa kesimleri, tokende
+    yok): renk-1-acik = renk-1 %30 beyaza karisik, renk-1-koyu = renk-1 %20 siyaha
+    karisik, renk-2-parlak = renk-2-text %40 beyaza karisik. Bu dosya ile
+    tools/ikon/uret.py ayni geometriyi elle tasir; biri degisince digeri de guncellenir.
+  -->
+  <defs>
+    <linearGradient id="kolSol" x1="24" y1="72" x2="100" y2="184" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9acdff"/>
+      <stop offset="1" stop-color="#5992cc"/>
+    </linearGradient>
+    <linearGradient id="kolSag" x1="156" y1="72" x2="232" y2="184" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5992cc"/>
+      <stop offset="1" stop-color="#9acdff"/>
+    </linearGradient>
+    <linearGradient id="ucgen" x1="104" y1="86" x2="168" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fa8cff"/>
+      <stop offset="1" stop-color="#ac7fff"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M100,46 C24,72 24,184 100,210" fill="none" stroke="url(#kolSol)"
+        stroke-width="30" stroke-linecap="round"/>
+  <path d="M156,46 C232,72 232,184 156,210" fill="none" stroke="url(#kolSag)"
+        stroke-width="30" stroke-linecap="round"/>
+
+  <polygon points="52,110 52,146 92,128" fill="#6fb7ff"/>
+  <polygon points="204,110 204,146 164,128" fill="#6fb7ff"/>
+
+  <path d="M107.78,81.57 Q96,74 96,88 L96,168 Q96,182 107.78,174.43
+           L172.43,132.87 Q180,128 172.43,123.13 Z" fill="#000000"/>
+  <path d="M113.2,92.04 Q104,86 104,97 L104,159 Q104,170 113.2,163.96
+           L162.15,131.84 Q168,128 162.15,124.16 Z" fill="url(#ucgen)"/>
+  <polygon points="104,86 128,128 118,128 104,159" fill="#fcbaff" opacity="0.43"/>
+</svg>
