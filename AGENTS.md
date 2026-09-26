@@ -19,6 +19,9 @@ Hedef boyuta sıkıştıran video aracı. .NET 8 + Avalonia + ffmpeg.
   `<ad>.old` olur, sahne adını alır, uygulama kendini yeniden açar, `.old` açılışta silinir. Bekleyen yuvasını almaz
   (arka plan başlatıcısı kapıda beklerken onu günlerce tutar, takastan sonra `Kurulmus` ile çekilir); kapı ya da güncelleme
   kilidi tutuluyorsa ya da takas düşerse geri alınır ve başlatıcının `--update-now` yoluna düşülür.
+- Otomatik güncelleme Windows'ta varsayılan açık (`MainWindow.KapanistaGuncelleme.cs`): sahne `AcilisBitti`'den sonra
+  sessizce iner, kurulum uygulamanın çıkışında yerinde takasla olur ve yeni sürüm açılmaz; takas düşerse başlatıcı
+  `--install-on-exit <pid>` ile çıkışı bekleyip kurar. Başlatıcının arka plan indirme turu kalktı. Ölçüm `docs/olcumler/kapanista-guncelleme.md`.
 - `tests/VidShrink.Tests` — tek test projesi. Ölçüsü **dokunulan alan**: değişen her dosyanın
   testleri yerelde yeşil olmadan teslim yok. Tam süit yerelde koşulmaz; itmeden sonra CI
   koşar ve `gh run list` yeşili teslimin şartıdır. `tools/kosum-kapisi` yalnız **majör**

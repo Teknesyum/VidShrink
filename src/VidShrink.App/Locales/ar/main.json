@@ -32,6 +32,7 @@
   "main.update.badge": "تحديث",
   "main.update.downloading": "جارٍ التنزيل…",
   "main.update.ready": "جاهز للتثبيت",
+  "main.update.ready-on-exit": "التحديث جاهز، سيُثبَّت عند الإغلاق",
   "main.update.failed": "تعذّر تنزيل التحديث",
   "main.update.maintenance-failed": "تعذّر تثبيت التحديث، ستتم إعادة المحاولة عند التشغيل التالي",
   "main.update.cancelled": "تم إلغاء التنزيل",

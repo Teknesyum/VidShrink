@@ -32,6 +32,7 @@
   "main.update.badge": "اپ ڈیٹ",
   "main.update.downloading": "ڈاؤن لوڈ ہو رہا ہے…",
   "main.update.ready": "انسٹال کے لیے تیار",
+  "main.update.ready-on-exit": "اپ ڈیٹ تیار ہے، بند کرنے پر انسٹال ہوگی",
   "main.update.failed": "اپ ڈیٹ ڈاؤن لوڈ نہیں ہو سکا",
   "main.update.maintenance-failed": "اپ ڈیٹ انسٹال نہیں ہو سکا، اگلی بار شروع کرنے پر دوبارہ کوشش کی جائے گی",
   "main.update.cancelled": "ڈاؤن لوڈ منسوخ کر دیا گیا",

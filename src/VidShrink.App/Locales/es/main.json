@@ -32,6 +32,7 @@
   "main.update.badge": "Actualización",
   "main.update.downloading": "Descargando…",
   "main.update.ready": "Lista para instalar",
+  "main.update.ready-on-exit": "Actualización lista, se instalará al cerrar",
   "main.update.failed": "No se pudo descargar la actualización",
   "main.update.maintenance-failed": "No se pudo instalar la actualización, se volverá a intentar en el próximo inicio",
   "main.update.cancelled": "Descarga cancelada",

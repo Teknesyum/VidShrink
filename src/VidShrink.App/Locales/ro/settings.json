@@ -43,7 +43,7 @@
 
   "settings.update.title": "Actualizări",
   "settings.update.auto": "Actualizare automată",
-  "settings.update.auto-effect": "Dezactivat implicit: o versiune nouă este anunțată în bara de sus și descărcată și instalată cu un buton. Dacă e activat, VidShrink se actualizează singur, discret.",
+  "settings.update.auto-effect": "Activat: noua versiune se descarcă în fundal și se instalează la închiderea VidShrink. Dezactivat: noua versiune este anunțată în bara de sus și se instalează cu un buton.",
   "settings.update.no-self-effect": "VidShrink nu se actualizează singur pe acest sistem: doar te anunță că există o versiune nouă și arată comanda care o instalează.",
 
   "settings.default-app.suggestion": "VidShrink nu este programul implicit pentru videoclipuri. Îl poți alege în pagina Aplicații implicite din Windows.",

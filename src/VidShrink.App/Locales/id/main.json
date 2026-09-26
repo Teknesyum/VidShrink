@@ -32,6 +32,7 @@
   "main.update.badge": "Pembaruan",
   "main.update.downloading": "Mengunduh…",
   "main.update.ready": "Siap dipasang",
+  "main.update.ready-on-exit": "Pembaruan siap, dipasang saat ditutup",
   "main.update.failed": "Pembaruan tidak dapat diunduh",
   "main.update.maintenance-failed": "Pembaruan tidak dapat dipasang, akan dicoba lagi saat mulai berikutnya",
   "main.update.cancelled": "Unduhan dibatalkan",

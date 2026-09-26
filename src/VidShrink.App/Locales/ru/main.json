@@ -32,6 +32,7 @@
   "main.update.badge": "Обновление",
   "main.update.downloading": "Загрузка…",
   "main.update.ready": "Готово к установке",
+  "main.update.ready-on-exit": "Обновление готово, установится при закрытии",
   "main.update.failed": "Не удалось загрузить обновление",
   "main.update.maintenance-failed": "Не удалось установить обновление, попытка повторится при следующем запуске",
   "main.update.cancelled": "Загрузка отменена",

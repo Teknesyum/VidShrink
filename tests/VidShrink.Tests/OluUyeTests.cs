@@ -698,6 +698,9 @@ public sealed class OluUyeTests
     ///
     /// <para><b>25 Eylul 2026:</b> sahne muhru <c>UpdateStage.FindMismatch</c>e bes satir
     /// ekledi (1646 -> 1651). Deger degismedi, yeri degisti.</para>
+    ///
+    /// <para><b>26 Eylul 2026:</b> kapanista guncelleme <c>UpdateCheck.cs</c>ye on iki satir
+    /// ekledi (1651 -> 1663). Deger degismedi, yeri degisti.</para>
     /// </summary>
     [Fact]
     public void NitelenmemisOkumaGoruluyor()
@@ -707,7 +710,7 @@ public sealed class OluUyeTests
         foreach (var (ad, dosya, satir) in new[]
                  {
                      ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 206),
-                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1651),
+                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1663),
                      ("DeveloperUnlock.Window", "src/VidShrink.Core/DeveloperUnlock.cs", 22)
                  })
         {

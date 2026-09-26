@@ -32,6 +32,7 @@
   "main.update.badge": "更新",
   "main.update.downloading": "正在下载…",
   "main.update.ready": "可以安装",
+  "main.update.ready-on-exit": "更新已就绪，将在关闭时安装",
   "main.update.failed": "无法下载更新",
   "main.update.maintenance-failed": "无法安装更新，将在下次启动时重试",
   "main.update.cancelled": "已取消下载",

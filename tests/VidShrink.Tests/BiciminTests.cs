@@ -1178,6 +1178,9 @@ public sealed class BaslikKapsamiTests
     /// <c>main.share.qr-hint</c> kolun disinda: 2665 + 7 = 2672, en 247, tr 91.</para>
     /// <para>2026-09-26, bolge kaydi kare tavani: tr <c>recorder.auto.note.stepped</c> "kare hızı düşürüldü" oldu, uc kelimeyle
     /// duzyazi sayilmiyor ve koldan cikiyor: 2672 - 1 = 2671, en 247, tr 90.</para>
+    /// <para>2026-09-26, kapanista guncelleme: <c>main.update.ready-on-exit</c> 2 dilde kola giriyor (en hu); yeniden yazilan
+    /// <c>settings.update.auto-effect</c> 3 dilde koldan cikiyor (bn hi ur; eski metin kolda, yenisi degil, eski Locales ile kosularak olculdu):
+    /// 2672 + 2 - 3 = 2671, en 248, tr 91; bolge kaydi birlesmesinin tr eksigiyle 2670, en 248, tr 90.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1203,8 +1206,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2671, toplam);
-        Assert.Equal(247, dilBasina["en"]);
+        Assert.Equal(2670, toplam);
+        Assert.Equal(248, dilBasina["en"]);
         Assert.Equal(90, dilBasina["tr"]);
     }
 
@@ -1367,6 +1370,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-25, libmpv yukleme hatasi: dil basina <c>main.player.engine.loadfailed</c>: 1106 + 1 = 1107, 43 x 1107 = 47601.</para>
     /// <para>2026-09-25, Indir ve Yukle: dil basina <c>main.action.downloadinstall</c>: 1107 + 1 = 1108, 43 x 1108 = 47644.</para>
     /// <para>2026-09-26, paylasim QR'i: dil basina iki anahtar (<c>main.share.qr</c>, <c>main.share.qr-hint</c>): 1108 + 2 = 1110, 43 x 1110 = 47730.</para>
+    /// <para>2026-09-26, kapanista guncelleme: dil basina <c>main.update.ready-on-exit</c>: 1110 + 1 = 1111, 43 x 1111 = 47773.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1394,7 +1398,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(47730, gezilen);
+        Assert.Equal(47773, gezilen);
         Assert.Empty(kayip);
     }
 

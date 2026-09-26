@@ -32,6 +32,7 @@
   "main.update.badge": "Cập nhật",
   "main.update.downloading": "Đang tải xuống…",
   "main.update.ready": "Sẵn sàng cài đặt",
+  "main.update.ready-on-exit": "Bản cập nhật đã sẵn sàng, sẽ cài khi đóng",
   "main.update.failed": "Không thể tải bản cập nhật",
   "main.update.maintenance-failed": "Không thể cài đặt bản cập nhật, sẽ thử lại ở lần khởi động tiếp theo",
   "main.update.cancelled": "Đã hủy tải xuống",

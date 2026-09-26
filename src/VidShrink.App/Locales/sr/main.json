@@ -32,6 +32,7 @@
   "main.update.badge": "Ажурирање",
   "main.update.downloading": "Преузимање…",
   "main.update.ready": "Спремно за инсталацију",
+  "main.update.ready-on-exit": "Ажурирање је спремно, инсталираће се при затварању",
   "main.update.failed": "Ажурирање није могуће преузети",
   "main.update.maintenance-failed": "Ажурирање није могуће инсталирати, покушаће се поново при следећем покретању",
   "main.update.cancelled": "Преузимање је отказано",

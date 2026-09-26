@@ -43,7 +43,7 @@
 
   "settings.update.title": "Uuendused",
   "settings.update.auto": "Uuenda automaatselt",
-  "settings.update.auto-effect": "Vaikimisi väljas: uuest versioonist teatatakse ülemises ribas ning see laaditakse alla ja paigaldatakse nupuga. Kui sees, uuendab VidShrink end vaikselt ise.",
+  "settings.update.auto-effect": "Sees: uus versioon laaditakse taustal alla ja paigaldatakse VidShrinki sulgemisel. Väljas: uuest versioonist antakse teada ülaribal ja see paigaldatakse nupuga.",
   "settings.update.no-self-effect": "VidShrink ei uuenda end selles süsteemis ise: ta ainult teatab, et uus versioon on olemas, ja näitab käsku, mis selle paigaldab.",
 
   "settings.default-app.suggestion": "VidShrink pole videote vaikeprogramm. Saad selle valida Windowsi vaikerakenduste lehel.",

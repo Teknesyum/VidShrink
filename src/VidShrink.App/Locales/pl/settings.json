@@ -43,7 +43,7 @@
 
   "settings.update.title": "Aktualizacje",
   "settings.update.auto": "Aktualizuj automatycznie",
-  "settings.update.auto-effect": "Domyślnie wyłączone: nowa wersja jest ogłaszana na górnym pasku, a pobranie i instalacja odbywają się jednym przyciskiem. Gdy włączone, VidShrink aktualizuje się sam, po cichu.",
+  "settings.update.auto-effect": "Włączone: nowa wersja pobiera się w tle i instaluje po zamknięciu VidShrink. Wyłączone: nowa wersja jest zgłaszana na górnym pasku i instalowana przyciskiem.",
   "settings.update.no-self-effect": "VidShrink nie aktualizuje się sam w tym systemie: tylko informuje, że istnieje nowa wersja, i pokazuje polecenie, które ją instaluje.",
 
   "settings.default-app.suggestion": "VidShrink nie jest domyślnym programem do wideo. Możesz go wybrać na stronie Aplikacje domyślne w Windows.",

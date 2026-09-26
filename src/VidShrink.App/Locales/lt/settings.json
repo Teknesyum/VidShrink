@@ -42,7 +42,7 @@
   "settings.share.nothing-to-close": "Nėra bendrinimo, kurį būtų galima uždaryti.",
   "settings.update.title": "Atnaujinimai",
   "settings.update.auto": "Atnaujinti automatiškai",
-  "settings.update.auto-effect": "Pagal numatytuosius nustatymus išjungta: nauja versija pranešama viršutinėje juostoje ir atsisiunčiama bei įdiegiama mygtuku. Kai įjungta, VidShrink atsinaujina pati tyliai.",
+  "settings.update.auto-effect": "Įjungta: nauja versija atsisiunčiama fone ir įdiegiama uždarant VidShrink. Išjungta: apie naują versiją pranešama viršutinėje juostoje, ji įdiegiama mygtuku.",
   "settings.update.no-self-effect": "Šioje sistemoje VidShrink savęs neatnaujina: tik praneša, kad yra nauja versija, ir parodo ją įdiegiančią komandą.",
   "settings.default-app.suggestion": "VidShrink nėra numatytoji vaizdo įrašų programa. Ją galite pasirinkti Windows numatytųjų programų puslapyje.",
   "settings.default-app.open": "Numatytosios programos",

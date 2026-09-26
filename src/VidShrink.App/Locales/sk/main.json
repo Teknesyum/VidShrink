@@ -32,6 +32,7 @@
   "main.update.badge": "Aktualizácia",
   "main.update.downloading": "Sťahuje sa…",
   "main.update.ready": "Pripravené na inštaláciu",
+  "main.update.ready-on-exit": "Aktualizácia pripravená, nainštaluje sa pri zatvorení",
   "main.update.failed": "Aktualizáciu sa nepodarilo stiahnuť",
   "main.update.maintenance-failed": "Aktualizáciu sa nepodarilo nainštalovať, pri ďalšom spustení sa to skúsi znova",
   "main.update.cancelled": "Sťahovanie zrušené",

@@ -42,7 +42,7 @@
   "settings.share.nothing-to-close": "Nav koplietošanas, ko slēgt.",
   "settings.update.title": "Atjauninājumi",
   "settings.update.auto": "Atjaunināt automātiski",
-  "settings.update.auto-effect": "Pēc noklusējuma izslēgts: jauna versija tiek paziņota augšējā joslā un lejupielādēta un instalēta ar pogu. Ja ieslēgts, VidShrink atjaunina sevi klusi.",
+  "settings.update.auto-effect": "Ieslēgts: jaunā versija tiek lejupielādēta fonā un instalēta, aizverot VidShrink. Izslēgts: par jauno versiju paziņo augšējā joslā, un to instalē ar pogu.",
   "settings.update.no-self-effect": "VidShrink šajā sistēmā pats neatjauninās: tas tikai paziņo, ka ir jauna versija, un parāda komandu, kas to instalē.",
   "settings.default-app.suggestion": "VidShrink nav noklusējuma programma video failiem. To var izvēlēties Windows lapā Noklusējuma lietotnes.",
   "settings.default-app.open": "Noklusējuma lietotnes",

@@ -32,6 +32,7 @@
   "main.update.badge": "Naujinys",
   "main.update.downloading": "Atsisiunčiama…",
   "main.update.ready": "Paruošta diegti",
+  "main.update.ready-on-exit": "Naujinys paruoštas, bus įdiegtas uždarant",
   "main.update.failed": "Naujinio atsisiųsti nepavyko",
   "main.update.maintenance-failed": "Naujinio įdiegti nepavyko, bus bandoma dar kartą kito paleidimo metu",
   "main.update.cancelled": "Atsisiuntimas atšauktas",

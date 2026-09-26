@@ -42,7 +42,7 @@
   "settings.share.nothing-to-close": "বন্ধ করার মতো কোনো শেয়ার নেই।",
   "settings.update.title": "আপডেট",
   "settings.update.auto": "স্বয়ংক্রিয় আপডেট",
-  "settings.update.auto-effect": "ডিফল্টরূপে বন্ধ: নতুন সংস্করণ উপরের বারে জানানো হয় এবং একটি বোতামে ডাউনলোড ও ইনস্টল হয়। চালু থাকলে VidShrink নিজে থেকে নীরবে আপডেট হয়ে যায়।",
+  "settings.update.auto-effect": "চালু থাকলে নতুন সংস্করণ পটভূমিতে ডাউনলোড হয় এবং VidShrink বন্ধ হলে ইনস্টল হয়। বন্ধ থাকলে নতুন সংস্করণের খবর উপরের বারে দেখানো হয় এবং বোতাম দিয়ে ইনস্টল হয়।",
   "settings.update.no-self-effect": "এই সিস্টেমে VidShrink নিজেকে আপডেট করে না: শুধু নতুন সংস্করণ আছে জানায় এবং ইনস্টল কমান্ডটি দেখায়।",
   "settings.default-app.suggestion": "VidShrink ভিডিওর ডিফল্ট প্রোগ্রাম নয়। Windows-এর ডিফল্ট অ্যাপ পাতায় এটি বেছে নিতে পারেন।",
   "settings.default-app.open": "ডিফল্ট অ্যাপ",

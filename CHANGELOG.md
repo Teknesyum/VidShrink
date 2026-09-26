@@ -15,6 +15,10 @@ ship as part of it.
 
 - Region recording no longer bogs the PC down: on Windows, automatic mode caps the capture at 30 fps instead of following the display refresh rate (60/120), which kept gdigrab copying the desktop nonstop and still delivered only about 80 of 120 frames. The recording frame is now only its edge strip, so clicks and the mouse wheel reach the app under the region even if the click-through style is lost, and the region toolbar no longer takes focus while recording.
 
+### Changed
+
+- Automatic updates are on by default on Windows for new installs (an existing choice in the settings file is kept). The update downloads quietly after the window has opened, the badge says it will install when you close VidShrink, and it installs on exit by swapping the files in place without reopening the app (about 0.3 s for a full release). If the swap cannot finish, the launcher waits for the app to exit and installs then. The launcher no longer downloads in the background at startup. macOS and Linux are unchanged.
+
 ## [0.9.5] - 2026-09-25
 
 ### Added

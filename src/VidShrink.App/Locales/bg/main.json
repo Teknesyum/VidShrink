@@ -32,6 +32,7 @@
   "main.update.badge": "Актуализация",
   "main.update.downloading": "Изтегляне…",
   "main.update.ready": "Готово за инсталиране",
+  "main.update.ready-on-exit": "Актуализацията е готова, ще се инсталира при затваряне",
   "main.update.failed": "Актуализацията не можа да бъде изтеглена",
   "main.update.maintenance-failed": "Актуализацията не можа да бъде инсталирана, ще се опита отново при следващото стартиране",
   "main.update.cancelled": "Изтеглянето е отменено",

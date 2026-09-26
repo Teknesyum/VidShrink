@@ -32,6 +32,7 @@
   "main.update.badge": "Aktualizacja",
   "main.update.downloading": "Pobieranie…",
   "main.update.ready": "Gotowa do instalacji",
+  "main.update.ready-on-exit": "Aktualizacja gotowa, zostanie zainstalowana przy zamknięciu",
   "main.update.failed": "Nie udało się pobrać aktualizacji",
   "main.update.maintenance-failed": "Nie udało się zainstalować aktualizacji, ponowna próba nastąpi przy następnym uruchomieniu",
   "main.update.cancelled": "Pobieranie anulowane",

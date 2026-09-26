@@ -32,6 +32,7 @@
   "main.update.badge": "Sasisho",
   "main.update.downloading": "Inapakua…",
   "main.update.ready": "Tayari kusakinishwa",
+  "main.update.ready-on-exit": "Sasisho liko tayari, litasakinishwa ukifunga",
   "main.update.failed": "Sasisho halikuweza kupakuliwa",
   "main.update.maintenance-failed": "Sasisho halikuweza kusakinishwa, litajaribiwa tena wakati ujao wa kuanzisha",
   "main.update.cancelled": "Upakuaji umeghairiwa",

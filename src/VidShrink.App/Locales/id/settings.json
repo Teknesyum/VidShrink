@@ -42,7 +42,7 @@
   "settings.share.nothing-to-close": "Tidak ada berbagi untuk ditutup.",
   "settings.update.title": "Pembaruan",
   "settings.update.auto": "Perbarui otomatis",
-  "settings.update.auto-effect": "Nonaktif secara default: versi baru diumumkan di bilah atas serta diunduh dan dipasang dengan satu tombol. Jika aktif, VidShrink memperbarui dirinya sendiri secara diam-diam.",
+  "settings.update.auto-effect": "Jika aktif, versi baru diunduh di latar belakang dan dipasang saat VidShrink ditutup. Jika nonaktif, versi baru diumumkan di bilah atas dan dipasang dengan tombol.",
   "settings.update.no-self-effect": "VidShrink tidak memperbarui diri di sistem ini: hanya memberi tahu ada versi baru dan menampilkan perintah untuk memasangnya.",
   "settings.default-app.suggestion": "VidShrink bukan program bawaan untuk video. Anda dapat memilihnya di halaman Aplikasi default Windows.",
   "settings.default-app.open": "Aplikasi default",

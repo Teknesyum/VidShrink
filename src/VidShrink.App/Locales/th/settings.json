@@ -42,7 +42,7 @@
   "settings.share.nothing-to-close": "ไม่มีการแชร์ให้ปิด",
   "settings.update.title": "อัปเดต",
   "settings.update.auto": "อัปเดตอัตโนมัติ",
-  "settings.update.auto-effect": "ปิดโดยค่าเริ่มต้น เวอร์ชันใหม่จะแจ้งที่แถบด้านบนและดาวน์โหลดพร้อมติดตั้งด้วยปุ่มเดียว เมื่อเปิดไว้ VidShrink จะอัปเดตตัวเองอย่างเงียบ ๆ",
+  "settings.update.auto-effect": "เมื่อเปิด เวอร์ชันใหม่จะดาวน์โหลดเบื้องหลังและติดตั้งเมื่อปิด VidShrink เมื่อปิด จะแจ้งเวอร์ชันใหม่ที่แถบด้านบนและติดตั้งด้วยปุ่ม",
   "settings.update.no-self-effect": "VidShrink ไม่อัปเดตตัวเองบนระบบนี้: จะแจ้งเพียงว่ามีเวอร์ชันใหม่และแสดงคำสั่งสำหรับติดตั้ง",
   "settings.default-app.suggestion": "VidShrink ไม่ใช่โปรแกรมเริ่มต้นสำหรับวิดีโอ คุณเลือกได้ในหน้าแอปเริ่มต้นของ Windows",
   "settings.default-app.open": "แอปเริ่มต้น",

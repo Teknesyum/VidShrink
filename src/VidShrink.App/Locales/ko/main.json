@@ -32,6 +32,7 @@
   "main.update.badge": "업데이트",
   "main.update.downloading": "다운로드 중…",
   "main.update.ready": "설치 준비 완료",
+  "main.update.ready-on-exit": "업데이트 준비 완료, 종료할 때 설치됩니다",
   "main.update.failed": "업데이트를 다운로드할 수 없습니다",
   "main.update.maintenance-failed": "업데이트를 설치할 수 없습니다. 다음 실행 때 다시 시도합니다",
   "main.update.cancelled": "다운로드가 취소되었습니다",

@@ -32,6 +32,7 @@
   "main.update.badge": "Mise à jour",
   "main.update.downloading": "Téléchargement…",
   "main.update.ready": "Prête à installer",
+  "main.update.ready-on-exit": "Mise à jour prête, installée à la fermeture",
   "main.update.failed": "Impossible de télécharger la mise à jour",
   "main.update.maintenance-failed": "Impossible d'installer la mise à jour, nouvel essai au prochain démarrage",
   "main.update.cancelled": "Téléchargement annulé",

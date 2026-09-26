@@ -32,6 +32,7 @@
   "main.update.badge": "Aggiornamento",
   "main.update.downloading": "Download in corso…",
   "main.update.ready": "Pronto da installare",
+  "main.update.ready-on-exit": "Aggiornamento pronto, verrà installato alla chiusura",
   "main.update.failed": "Impossibile scaricare l'aggiornamento",
   "main.update.maintenance-failed": "Impossibile installare l'aggiornamento, verrà ritentato al prossimo avvio",
   "main.update.cancelled": "Download annullato",
