@@ -6,10 +6,11 @@ Programdaki bütün renkler tek bir dosyadan çıkar:
 src/VidShrink.App/Themes/Palette/seeds.json
 ```
 
-Her tema burada **on bir hex** ile duruyor. Ölçüler (boşluk, yuvarlaklık, yazı boyu)
-`Themes/Theme.axaml` içinde ve palete dokunmuyor — renk değiştirince yerleşim yerinde kalır.
+Her tema burada Teknesyum UI standardının **rolleriyle** duruyor. Ölçüler (boşluk, yuvarlaklık,
+yazı boyu) `Themes/Theme.axaml` içinde ve palete dokunmuyor — renk değiştirince yerleşim yerinde kalır.
 
-Bugün **26 palet** var: 20 koyu zeminli, 6 açık zeminli. Ayarlardan seçilen palet
+Bugün **36 palet** var: projenin 26'sı, standardın 9 teması ve varsayılan `Teknesyum`
+(birleşimin kararları `docs/netlestirme/027-palet-birlesimi.md`). Ayarlardan seçilen palet
 **çalışırken** yürürlüğe girer, yeniden başlatma istemez (`PaletteCatalog.Use`).
 
 Açık/koyu ayrımı elle tutulmuyor: zemin renginin sRGB parlaklığı 0,5'in üstündeyse palet
@@ -18,30 +19,33 @@ açık sayılır. Bunun iki sonucu var — Fluent'in kendi açılır listeleri v
 uzaklaşmak için koyulaşmak yerine açılır (`PaletteGen`'deki `Dim`, aynı 0,78 büyüklüğü
 ters yönde).
 
-İsteğe bağlı on ikinci çekirdek `atmos`: verilirse zemin tonları ve parıltı katmanları
+İsteğe bağlı `atmos` rolü: verilirse zemin tonları ve parıltı katmanları
 (`AtmosHot/Mid/Edge`) kor üçlüsü yerine bu renkten türer; parlaklık ember karışımınınkine
 indirilir, gövde yazısı kontrastı düşmez. Yalnız Neon kullanıyor (yeşil, `docs/tasarim/fable-neon-yesil-2026-09-23.md`).
 Vurgu gradyanı `AccentGradient` (accent1 → accent3) paletten değil `Theme.axaml`dan gelir.
 
-## On Bir Çekirdek
+## Roller
 
-| Alan | Nerede görünür |
-| --- | --- |
-| `bg` | Pencere zemini, en koyu ton |
-| `surface` | Kart ve panel yüzeyi |
-| `accent1` | Birincil vurgu: düğme kenarı, odak halkası, ilerleme |
-| `accent2` | İkincil vurgu |
-| `accent3` | Üçüncü vurgu |
-| `success` | "Bitti" yeşili |
-| `ember` | Sıkıştırma ateşinin koyu ucu |
-| `flame` | Ateşin ortası |
-| `blaze` | Ateşin parlak ucu |
-| `textBody` | Ana yazı |
-| `textDim` | Sönük yazı, ipucu, devre dışı |
+| Rol | Anahtar | Nerede görünür |
+| --- | --- | --- |
+| `black` | `AppBg` | Pencere zemini |
+| `surface` | `SurfaceTone` | Kart ve panel yüzeyi |
+| `renk-1` | `NeonBlue` | Birincil vurgu: düğme kenarı, odak halkası, ilerleme |
+| `renk-2` | `NeonPink` | İkincil vurgu |
+| `renk-3` | `NeonPurple` | Üçüncü vurgu |
+| `renk-2-text` | `PinkText` | Hata yazısı |
+| `success` | `NeonSuccess` | "Bitti" yeşili |
+| `warning` | `EmberBlaze` | Uyarı, ateşin parlak ucu |
+| `danger` (yoksa `renk-2`) | `NeonEmber` | Ateşin koyu ucu |
+| `flame` (yoksa danger ile warning'in ortası) | `EmberFlame` | Ateşin ortası |
+| `text` | `TextBody` | Ana yazı |
+| `disabled` | `TextDisabled` | Sönük yazı, ipucu, devre dışı |
 
-Geri kalan 21 anahtar bunlardan türetilir: dolgular `accent1`'in `1A`/`33`/`4D` alfalı
-hâlleri, parıltılar `40` alfalı, perde `bg`'nin `CC` alfalısı, ateş şeridi `bg` ile
-`ember`in az oranlı karışımı.
+`renk-3-text` ve `glass-base` tohumda durur, anahtara inmez. `baslik` verilirse listede o
+görünür (`Kagit` → `Sıcak Kâğıt`); palet adları çevrilmez. Geri kalan anahtarlar bunlardan
+türetilir: dolgular `renk-1`'in `1A`/`33`/`4D` alfalı hâlleri, parıltılar `40` alfalı, perde
+zeminin `CC` alfalısı, ateş şeridi zemin ile `danger`ın az oranlı karışımı. Aynı değer iki
+anahtara düşerse sonraki anahtarın mavi kanalı bir birim kayar (`PaletteBuilder.Distinct`).
 
 ## Kendi Temanı Eklemek
 
@@ -53,9 +57,16 @@ hâlleri, parıltılar `40` alfalı, perde `bg`'nin `CC` alfalısı, ateş şeri
 dotnet run --project tools/VidShrink.PaletteGen
 ```
 
-3. Adı `src/VidShrink.App/Themes/PaletteCatalog.cs` içindeki `Names` listesine yaz.
-   Unutursan `PaletteTests` kırmızı yanar ve söyler.
+3. Adı `src/VidShrink.App/Themes/PaletteCatalog.cs` içindeki `Names` listesine, `baslik`
+   verdiysen `Titles`'a yaz. Unutursan `PaletteTests` kırmızı yanar ve söyler.
 4. `dotnet test --filter PaletteTests`.
+
+Standardın temaları değişince tohumlar oradan yeniden alınır; projenin kendi tohumları
+(`kaynak: vidshrink`) korunur:
+
+```bash
+dotnet run --project tools/VidShrink.PaletteGen -- import <temalar-klasörü> <benim.tokens.json>
+```
 
 Araç `Palette/<Ad>/Theme.axaml` dosyalarının hepsini silip yeniden yazar; o dosyaları elle
 düzenleme, düzenlemen çekirdekte kalıcı olur.

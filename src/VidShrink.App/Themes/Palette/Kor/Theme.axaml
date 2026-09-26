@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Gruvbox Dark ve Discord Dark'ın sıcak, kahve-gri zemini. -->
+  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki standart rollerden
+       (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
+       VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
+
+  <Color x:Key="NeonBlueColor">#FF8ABEFF</Color>
+  <Color x:Key="NeonPinkColor">#FFD94AC9</Color>
+  <Color x:Key="NeonPurpleColor">#FFAB82EF</Color>
+  <Color x:Key="NeonSuccessColor">#FF9BE087</Color>
+  <Color x:Key="SurfaceToneColor">#FF1E1A18</Color>
+  <Color x:Key="AppBgColor">#FF151210</Color>
+  <Color x:Key="TextBodyColor">#FFF8F2EA</Color>
+  <Color x:Key="TextDisabledColor">#FF8F867F</Color>
+  <Color x:Key="OnNeonColor">#FF000000</Color>
+  <Color x:Key="PinkTextColor">#FFF8BAF0</Color>
+
+  <Color x:Key="NeonBlueFillColor">#1A8ABEFF</Color>
+  <Color x:Key="NeonBlueHoverColor">#338ABEFF</Color>
+  <Color x:Key="NeonBlueActiveColor">#4D8ABEFF</Color>
+  <Color x:Key="NeonBlueBorderColor">#4D8ABEFE</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#808ABEFF</Color>
+  <Color x:Key="NeonPinkFillColor">#1AD94AC9</Color>
+  <Color x:Key="NeonPurpleBorderColor">#80AB82EF</Color>
+
+  <Color x:Key="NeonEmberColor">#FFD94ACA</Color>
+  <Color x:Key="EmberFlameColor">#FFEC8C96</Color>
+  <Color x:Key="EmberBlazeColor">#FFFFCD62</Color>
+  <Color x:Key="AtmosHotColor">#FFFFCD63</Color>
+  <Color x:Key="AtmosMidColor">#FFEC8C97</Color>
+  <Color x:Key="AtmosEdgeColor">#FFD94ACB</Color>
+  <Color x:Key="EmberDeepColor">#FF140F10</Color>
+  <Color x:Key="EmberMidColor">#FF161011</Color>
+  <Color x:Key="EmberEdgeColor">#FF181014</Color>
+  <Color x:Key="EmberBarDeepColor">#FF1C1517</Color>
+  <Color x:Key="EmberBarMidColor">#FF1E161A</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF22171C</Color>
+
+  <Color x:Key="PlaybackScrimColor">#CC151210</Color>
+  <Color x:Key="PlaybackScrimEdgeColor">#00151210</Color>
+
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #408ABEFF</BoxShadows>
+  <BoxShadows x:Key="GlowPink">0 0 20 0 #40D94AC9</BoxShadows>
+  <BoxShadows x:Key="GlowPurple">0 0 20 0 #40AB82EF</BoxShadows>
+  <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
+
+</ResourceDictionary>

@@ -320,6 +320,17 @@ public sealed class LanguageTests : IDisposable
         "Localization key ' ' is missing in ' ' and in ' '."
     };
 
+    /// <summary>
+    /// Palet başlıkları özel ad sayılır, çevrilmez (<c>docs/netlestirme/027-palet-birlesimi.md</c>).
+    /// Muafiyet elle yazılı değil, <c>seeds.json</c>'daki <c>baslik</c>tan okunur ve yalnız tam
+    /// eşleşmeye geçer: başlığa benzeyen bir arayüz cümlesi taramaya yine yakalanır.
+    /// </summary>
+    private static readonly HashSet<string> PaletteTitles = VidShrink.PaletteGen.PaletteSeed
+        .Load(Path.Combine(TipSources.Root, "src", "VidShrink.App", "Themes", "Palette", "seeds.json"))
+        .Select(seed => seed.Title)
+        .OfType<string>()
+        .ToHashSet(StringComparer.Ordinal);
+
     private static readonly Regex CsLiteral = new("(?<interpolated>\\$)?\"(?<body>(?:[^\"\\\\\n]|\\\\.)*)\"", RegexOptions.Compiled);
     private static readonly Regex CsWord = new(@"\p{L}{3,}", RegexOptions.Compiled);
 
@@ -361,6 +372,7 @@ public sealed class LanguageTests : IDisposable
             if (!value.Contains(' ')) continue;
             if (CsWord.Matches(value).Count < 2) continue;
             if (CodeNamesThatStayInCode.Contains(value, StringComparer.Ordinal)) continue;
+            if (PaletteTitles.Contains(value) && relative == Path.Combine("Themes", "PaletteCatalog.cs")) continue;
 
             stray.Add(value);
         }

@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Xml.Linq;
 using VidShrink.App;
 using VidShrink.App.Themes;
+using VidShrink.PaletteGen;
 
 namespace VidShrink.Tests;
 
@@ -74,34 +75,153 @@ public sealed class PaletteTests
             $"{files.Count} palet, {reference.Count} anahtar:\n" + string.Join("\n", complaints));
     }
 
+    private static IReadOnlyList<PaletteSeed> Seeds() => PaletteSeed.Load(Path.Combine(Folder, "seeds.json"));
+
     /// <summary>
-    /// Palet dosyaları elle yazılmadı: kaynak <c>seeds.json</c>. Ölçü her paletin
-    /// zeminini ve üç vurgusunu kendi çekirdeğiyle karşılaştırıyor — dosya elle
-    /// düzenlenip çekirdekten koparsa burada yakalanır.
+    /// Palet dosyaları elle yazılmadı: kaynak <c>seeds.json</c>, her palet standardın rolleriyle.
+    /// Ölçü rol → anahtar eşlemesini üreticiden bağımsız okuyor: dosya elle düzenlenip tohumdan
+    /// koparsa ya da eşleme kayarsa burada yakalanır. Çalışırken palet değeri değere boyadığı
+    /// için bir palette iki anahtar aynı değeri taşıyamaz; çakışan değer mavi kanalda birer birim
+    /// kaydırılıyor (<c>PaletteBuilder.Distinct</c>). Burada okunan rollerde kayan iki yer var:
+    /// Teknesyum ve Keskin'de zemin yüzeye eşit, yedi palette (Nord, Gruvbox, GruvboxLight,
+    /// Solarized, SolarizedLight, Everforest, Synthwave) uyarı renk-2'ye eşit. Ölçü bu kaymayı en
+    /// çok iki birime kadar kabul ediyor.
     /// </summary>
     [Fact]
     public void HerPaletKendiCekirdeginiTasir()
     {
-        using var seeds = JsonDocument.Parse(File.ReadAllText(Path.Combine(Folder, "seeds.json")));
-        var listed = seeds.RootElement.EnumerateArray().ToList();
+        var seeds = Seeds();
 
-        Assert.Equal(PaletteCatalog.Names, listed.Select(seed => seed.GetProperty("name").GetString()));
+        Assert.Equal(PaletteCatalog.Names, seeds.Select(seed => seed.Name));
 
-        foreach (var seed in listed)
+        foreach (var seed in seeds)
         {
-            var name = seed.GetProperty("name").GetString()!;
-            var body = File.ReadAllText(Address(name));
+            var body = File.ReadAllText(Address(seed.Name));
 
-            foreach (var (field, key) in new[]
+            foreach (var (role, key) in new[]
                      {
-                         ("bg", "AppBgColor"), ("surface", "SurfaceToneColor"),
-                         ("accent1", "NeonBlueColor"), ("accent2", "NeonPinkColor"),
-                         ("accent3", "NeonPurpleColor"), ("textBody", "TextBodyColor")
+                         ("surface", "SurfaceToneColor"), ("renk-1", "NeonBlueColor"),
+                         ("renk-2", "NeonPinkColor"), ("renk-3", "NeonPurpleColor"),
+                         ("text", "TextBodyColor"), ("renk-2-text", "PinkTextColor"),
+                         ("disabled", "TextDisabledColor"), ("warning", "EmberBlazeColor"),
+                         ("black", "AppBgColor")
                      })
             {
-                var wanted = "#FF" + seed.GetProperty(field).GetString()![1..].ToUpperInvariant();
-                Assert.Contains($"<Color x:Key=\"{key}\">{wanted}</Color>", body, StringComparison.Ordinal);
+                var wanted = Convert.ToUInt32(seed.Role(role)![1..], 16);
+                var match = System.Text.RegularExpressions.Regex.Match(body,
+                    $"<Color x:Key=\"{key}\">#FF([0-9A-F]{{6}})</Color>");
+                Assert.True(match.Success, $"{seed.Name}: {key} yok.");
+                var carried = Convert.ToUInt32(match.Groups[1].Value, 16);
+                Assert.True((carried & 0xFFFF00) == (wanted & 0xFFFF00)
+                            && Math.Abs((int)(carried & 0xFF) - (int)(wanted & 0xFF)) <= 2,
+                    $"{seed.Name}: {role} #{wanted:X6}, {key} #{carried:X6} taşıyor.");
             }
+        }
+    }
+
+    /// <summary>
+    /// Palet dosyaları üreticinin çıktısıyla aynı: tohumdan yeniden üretilen metin diskteki
+    /// dosyaya eşit. Satır sonu karşılaştırmaya girmez, git onu makineye göre çeviriyor.
+    /// Dosya elle düzenlenirse ya da tohum değişip araç koşulmazsa kırmızı yanar.
+    /// </summary>
+    [Fact]
+    public void PaletDosyalariTohumdanYenidenUretilir()
+    {
+        var seeds = Seeds();
+        Assert.Equal(36, seeds.Count);
+
+        var drift = seeds
+            .Where(seed => File.ReadAllText(Address(seed.Name)).Replace("\r\n", "\n", StringComparison.Ordinal)
+                           != PaletteBuilder.Build(seed))
+            .Select(seed => seed.Name)
+            .ToList();
+
+        Assert.True(drift.Count == 0,
+            "Tohumdan kopan palet: " + string.Join(", ", drift)
+            + ". Komut: dotnet run --project tools/VidShrink.PaletteGen");
+    }
+
+    /// <summary>
+    /// 36 paletin kaynağı: 26'sı projenin, 9'u standardın tema kalıpları, biri standardın kendi
+    /// teması. Hiçbiri silinmedi; kaynak kayarsa ya da bir palet düşerse sayım kırmızı yanar.
+    /// </summary>
+    [Fact]
+    public void ProjeninYirmiAltiPaletiVeStandardinOnuBirArada()
+    {
+        var bySource = Seeds().GroupBy(seed => seed.Source.StartsWith("teknesyum-ui/temalar/", StringComparison.Ordinal)
+                ? "temalar"
+                : seed.Source)
+            .ToDictionary(group => group.Key, group => group.Select(seed => seed.Name).ToArray());
+
+        Assert.Equal(26, bySource[PaletteSeed.ProjectSource].Length);
+        Assert.Equal(new[] { "Gece", "Grafit", "Kadife", "Kor", "Buz", "Kagit", "Kar", "Keskin", "Kirik" },
+            bySource["temalar"]);
+        Assert.Equal(new[] { PaletteCatalog.Default }, bySource[PaletteSeed.OwnSource]);
+        Assert.Equal(3, bySource.Count);
+    }
+
+    /// <summary>
+    /// Görünen ad tohumdaki <c>baslik</c>tan gelir: klasör adı ASCII, ekranda Türkçe harf
+    /// korunur (<c>Kagit</c> → <c>Sıcak Kâğıt</c>). Başlığı olmayan palette ad büyük harften
+    /// bölünür.
+    /// </summary>
+    [Fact]
+    public void GorunenAdTohumdakiBasliktanGelir()
+    {
+        foreach (var seed in Seeds())
+        {
+            var wanted = seed.Title ?? string.Concat(seed.Name.Select((letter, at) =>
+                at > 0 && char.IsUpper(letter) && !char.IsUpper(seed.Name[at - 1]) ? " " + letter : letter.ToString()));
+            Assert.Equal(wanted, PaletteCatalog.Label(seed.Name));
+        }
+
+        Assert.Equal("Sıcak Kâğıt", PaletteCatalog.Label("Kagit"));
+        Assert.Equal("Kırık Beyaz", PaletteCatalog.Label("Kirik"));
+        Assert.Equal("Tokyo Night", PaletteCatalog.Label("TokyoNight"));
+    }
+
+    /// <summary>
+    /// Yeni varsayılan Teknesyum, ama ayarında palet yazılı kullanıcı kendi seçiminde kalır:
+    /// eski varsayılan <c>Neon</c> ayarda yazılıysa Neon açılır. Ayarı boş olan, ya da ayar
+    /// dosyası hiç olmayan, Teknesyum'la açılır. <c>App.axaml</c>'ın açılış paleti de
+    /// varsayılanla aynı; ayrışırsa <c>Use</c> ilk seçimde hiç boyamaz.
+    /// </summary>
+    [Fact]
+    public void KayitliSecimKorunurBosAyarVarsayilanaDuser()
+    {
+        Assert.Equal("Teknesyum", PaletteCatalog.Default);
+        Assert.Contains($"Themes/Palette/{PaletteCatalog.Default}/Theme.axaml",
+            File.ReadAllText(ThemeSources.AppPath), StringComparison.Ordinal);
+
+        var folder = Path.Combine(TestPaths.OutputRoot, "tema", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+
+        try
+        {
+            var saved = Path.Combine(folder, "neon.json");
+            File.WriteAllText(saved, "{\"theme\":\"Neon\"}");
+            var empty = Path.Combine(folder, "bos.json");
+            File.WriteAllText(empty, "{}");
+
+            var (fromSaved, fromEmpty, fromMissing) = AppHost.Run(() =>
+            {
+                try
+                {
+                    return (
+                        PaletteCatalog.Use(AppSettings.Load(saved).Theme),
+                        PaletteCatalog.Use(AppSettings.Load(empty).Theme),
+                        PaletteCatalog.Use(AppSettings.Load(Path.Combine(folder, "yok.json")).Theme));
+                }
+                finally { PaletteCatalog.Use(PaletteCatalog.Default); }
+            });
+
+            Assert.Equal("Neon", fromSaved);
+            Assert.Equal("Teknesyum", fromEmpty);
+            Assert.Equal("Teknesyum", fromMissing);
+        }
+        finally
+        {
+            try { Directory.Delete(folder, recursive: true); } catch (IOException) { }
         }
     }
 

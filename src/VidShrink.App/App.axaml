@@ -7,7 +7,7 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://VidShrink.App/Themes/Palette/Neon/Theme.axaml"/>
+        <ResourceInclude Source="avares://VidShrink.App/Themes/Palette/Teknesyum/Theme.axaml"/>
         <ResourceInclude Source="avares://VidShrink.App/Themes/Theme.axaml"/>
         <ResourceInclude Source="avares://VidShrink.App/Themes/Icons.axaml"/>
         <!-- T39: oynatıcıya ait belirteçler. Theme.axaml'dan sonra gelir, çünkü

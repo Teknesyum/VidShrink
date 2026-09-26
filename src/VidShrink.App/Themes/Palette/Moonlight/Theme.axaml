@@ -2,9 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <!-- Ay ışığı mavisi; Tokyo Night'ın daha yumuşak, mor eğilimli kardeşi. -->
-  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki on bir çekirdek renkten
-       üretildi. Değiştirmek için çekirdeği düzenle ve VidShrink.PaletteGen
-       aracını çalıştır; komut docs/tema.md içinde. -->
+  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki standart rollerden
+       (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
+       VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
 
   <Color x:Key="NeonBlueColor">#FF82AAFF</Color>
   <Color x:Key="NeonPinkColor">#FF4FD6BE</Color>

@@ -2,9 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <!-- Monokai Pro; canlı ve doygun şeker renkleri, sıcak gri zemin. -->
-  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki on bir çekirdek renkten
-       üretildi. Değiştirmek için çekirdeği düzenle ve VidShrink.PaletteGen
-       aracını çalıştır; komut docs/tema.md içinde. -->
+  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki standart rollerden
+       (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
+       VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
 
   <Color x:Key="NeonBlueColor">#FF78DCE8</Color>
   <Color x:Key="NeonPinkColor">#FFFF6188</Color>

@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- macOS ve Fluent'in artırılmış kontrast kipi: saf beyaz üstünde saf siyah. -->
+  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki standart rollerden
+       (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
+       VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
+
+  <Color x:Key="NeonBlueColor">#FF0F3AA8</Color>
+  <Color x:Key="NeonPinkColor">#FFA80FA8</Color>
+  <Color x:Key="NeonPurpleColor">#FF5A1FC0</Color>
+  <Color x:Key="NeonSuccessColor">#FF0B4D24</Color>
+  <Color x:Key="SurfaceToneColor">#FFFFFFFF</Color>
+  <Color x:Key="AppBgColor">#FFFFFFFE</Color>
+  <Color x:Key="TextBodyColor">#FF000000</Color>
+  <Color x:Key="TextDisabledColor">#FF6B7280</Color>
+  <Color x:Key="OnNeonColor">#FFFFFFFD</Color>
+  <Color x:Key="PinkTextColor">#FF6E0F78</Color>
+
+  <Color x:Key="NeonBlueFillColor">#1A0F3AA8</Color>
+  <Color x:Key="NeonBlueHoverColor">#330F3AA8</Color>
+  <Color x:Key="NeonBlueActiveColor">#4D0F3AA8</Color>
+  <Color x:Key="NeonBlueBorderColor">#4D0F3AA9</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#800F3AA8</Color>
+  <Color x:Key="NeonPinkFillColor">#1AA80FA8</Color>
+  <Color x:Key="NeonPurpleBorderColor">#805A1FC0</Color>
+
+  <Color x:Key="NeonEmberColor">#FFA80FA9</Color>
+  <Color x:Key="EmberFlameColor">#FF822454</Color>
+  <Color x:Key="EmberBlazeColor">#FF5C3A00</Color>
+  <Color x:Key="AtmosHotColor">#FF5C3A01</Color>
+  <Color x:Key="AtmosMidColor">#FF822455</Color>
+  <Color x:Key="AtmosEdgeColor">#FFA80FAA</Color>
+  <Color x:Key="EmberDeepColor">#FFFDFBFD</Color>
+  <Color x:Key="EmberMidColor">#FFFDF9FD</Color>
+  <Color x:Key="EmberEdgeColor">#FFFCF6FC</Color>
+  <Color x:Key="EmberBarDeepColor">#FFFDFAFD</Color>
+  <Color x:Key="EmberBarMidColor">#FFFCF6FD</Color>
+  <Color x:Key="EmberBarEdgeColor">#FFFAF2FA</Color>
+
+  <Color x:Key="PlaybackScrimColor">#CCFFFFFF</Color>
+  <Color x:Key="PlaybackScrimEdgeColor">#00FFFFFF</Color>
+
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #400F3AA8</BoxShadows>
+  <BoxShadows x:Key="GlowPink">0 0 20 0 #40A80FA8</BoxShadows>
+  <BoxShadows x:Key="GlowPurple">0 0 20 0 #405A1FC0</BoxShadows>
+  <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
+
+</ResourceDictionary>

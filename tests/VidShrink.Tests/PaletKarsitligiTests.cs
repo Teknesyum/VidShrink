@@ -124,6 +124,86 @@ public sealed class PaletKarsitligiTests
         Assert.Equal(AaAltindaKalanlar.OrderBy(p => p, StringComparer.Ordinal), altta);
     }
 
+    private const double StandartEsik = 7.0;
+
+    private static readonly string[] MetinAnahtarlari =
+    [
+        "TextBodyColor", "PinkTextColor", "EmberBlazeColor", "NeonSuccessColor", "NeonBlueColor"
+    ];
+
+    private static readonly string[] MetinZeminleri = ["AppBgColor", "SurfaceToneColor"];
+
+    /// <summary>
+    /// Standardin rolleri ham degeriyle alindi, degistirilmedi; <c>renk-2</c> ve <c>renk-3</c>
+    /// dolgulari bu temalarda siyahla da beyazla da 7:1'e ulasamiyor. Standardin kurali boyle
+    /// dolguya <c>on: null</c> der: yazi tasimaz. Kalan borc
+    /// <c>docs/netlestirme/027-palet-birlesimi.md</c>'de.
+    /// </summary>
+    private static readonly string[] YaziTasimayanDolgular =
+    [
+        "Buz:NeonPinkColor", "Buz:NeonPurpleColor",
+        "Gece:NeonPinkColor", "Gece:NeonPurpleColor",
+        "Grafit:NeonPinkColor",
+        "Kadife:NeonPinkColor", "Kadife:NeonPurpleColor",
+        "Kagit:NeonPinkColor", "Kagit:NeonPurpleColor",
+        "Kar:NeonPinkColor", "Kar:NeonPurpleColor",
+        "Keskin:NeonPinkColor",
+        "Kirik:NeonPinkColor", "Kirik:NeonPurpleColor",
+        "Kor:NeonPinkColor"
+    ];
+
+    public static IEnumerable<object[]> StandartPaletler() =>
+        VidShrink.PaletteGen.PaletteSeed.Load(Path.Combine(PaletKoku, "seeds.json"))
+            .Where(tohum => tohum.Source != VidShrink.PaletteGen.PaletteSeed.ProjectSource)
+            .Select(tohum => new object[] { tohum.Name });
+
+    /// <summary>
+    /// Standardin esigi: metin 7:1. Standarttan gelen on palette govde yazisi, hata yazisi
+    /// (<c>renk-2-text</c>), uyari, basari ve <c>renk-1</c> etiketi zeminde de yuzeyde de gecer.
+    /// <c>disabled</c> standartta 7:1'den muaf, olcuye girmiyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(StandartPaletler))]
+    public void StandartPalettedeMetinYediyeBiriGeciyor(string palet)
+    {
+        var xaml = File.ReadAllText(Path.Combine(PaletKoku, palet, "Theme.axaml"));
+        var dusuk = new List<string>();
+
+        foreach (var metin in MetinAnahtarlari)
+            foreach (var zemin in MetinZeminleri)
+            {
+                var oran = Karsitlik(Renk(xaml, metin)!, Renk(xaml, zemin)!);
+                _cikti.WriteLine($"STANDART\t{palet}\t{metin}\t{zemin}\t{oran:0.00}");
+                if (oran < StandartEsik) dusuk.Add($"{metin}/{zemin} {oran:0.00}");
+            }
+
+        Assert.True(dusuk.Count == 0, $"{palet}: " + string.Join(", ", dusuk));
+    }
+
+    /// <summary>
+    /// Standart paletlerde <c>OnNeon</c>'un 7:1'i gecemedigi dolgular tek tek yazili. Yeni bir
+    /// dolgu dusmesi de, listedekinin duzelmesi de kirmizi verir.
+    /// </summary>
+    [Fact]
+    public void StandartPalettedeYaziTasimayanDolgularPimli()
+    {
+        var altta = new List<string>();
+        foreach (var palet in StandartPaletler().Select(o => (string)o[0]))
+        {
+            var xaml = File.ReadAllText(Path.Combine(PaletKoku, palet, "Theme.axaml"));
+            var on = Renk(xaml, "OnNeonColor")!;
+            foreach (var dolgu in new[] { "NeonBlueColor", "NeonPinkColor", "NeonPurpleColor" })
+            {
+                var oran = Karsitlik(on, Renk(xaml, dolgu)!);
+                _cikti.WriteLine($"DOLGU\t{palet}\t{dolgu}\t{on}\t{oran:0.00}");
+                if (oran < StandartEsik) altta.Add($"{palet}:{dolgu}");
+            }
+        }
+
+        Assert.Equal(YaziTasimayanDolgular.OrderBy(p => p, StringComparer.Ordinal),
+            altta.OrderBy(p => p, StringComparer.Ordinal));
+    }
+
     /// <summary>
     /// Olcunun kendi kor olmadiginin pimi: bilinen karsitliklar elle hesaplanip dogrulaniyor.
     /// Beyaz uzerine siyah 21:1, kendi uzerine her renk 1:1, acik mavi neon uzerine beyaz 2,30:1

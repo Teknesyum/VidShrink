@@ -62,11 +62,11 @@ public sealed class ThemeTokenTests
     private static IReadOnlyList<XElement> FlameStops(string brushKey) =>
         Resource(brushKey).Elements(Ui + "GradientStop").ToList();
 
-    private static string StopColour(XElement stop)
+    private static string StopColour(XElement stop, string? palette = null)
     {
         var raw = ((string)stop.Attribute("Color")!).Trim();
         return raw.StartsWith("{StaticResource", StringComparison.Ordinal)
-            ? Token(raw.Replace("{StaticResource", string.Empty).Trim(' ', '}'))
+            ? ThemeSources.Token(raw.Replace("{StaticResource", string.Empty).Trim(' ', '}'), palette)
             : raw;
     }
 
@@ -108,14 +108,15 @@ public sealed class ThemeTokenTests
 
     /// <summary>
     /// K1: iki ton uydurulmadı, <c>NeonEmberColor</c>'dan hesaplandı. Doygunluk ve
-    /// parlaklık kırmızıyla birebir aynı; yalnız ton eşit adımlarla sarıya yürüyor.
+    /// parlaklık kırmızıyla birebir aynı; yalnız ton eşit adımlarla sarıya yürüyor. Neon'un
+    /// tasarımı: öteki paletlerin uyarı rengi kendi rolünden geliyor, bu yüzden ölçü Neon'u okur.
     /// </summary>
     [Fact]
     public void BothWarmTonesAreDerivedFromTheEmberRed()
     {
-        var red = Hsl(Token("NeonEmberColor"));
-        var flame = Hsl(Token("EmberFlameColor"));
-        var blaze = Hsl(Token("EmberBlazeColor"));
+        var red = Hsl(ThemeSources.Token("NeonEmberColor", "Neon"));
+        var flame = Hsl(ThemeSources.Token("EmberFlameColor", "Neon"));
+        var blaze = Hsl(ThemeSources.Token("EmberBlazeColor", "Neon"));
 
         foreach (var tone in new[] { flame, blaze })
         {
@@ -155,12 +156,14 @@ public sealed class ThemeTokenTests
     /// <summary>
     /// K2: her alev tabanda sıcak, uçta soğuk. Rampa boyunca parlaklık düşüyor, saydamdan
     /// önceki durak paletin atmosfer kenarı (<c>AtmosEdgeColor</c>), son durak saydam. Ton
-    /// sorulmaz: Neon atmosferi yeşil, öteki paletlerde kırmızıdan sarıya.
+    /// sorulmaz: Neon atmosferi yeşil, öteki paletlerde kırmızıdan sarıya. Kararma sırası Neon'un
+    /// tasarımı: 36 paletin 22'sinde atmosferin kenarı sıcak tabandan açık (Teknesyum dahil),
+    /// bu yüzden ölçü Neon'u okur.
     /// </summary>
     [Fact]
     public void EveryFlameRunsFromHotBaseToTransparentTip()
     {
-        var edge = Token("AtmosEdgeColor");
+        var edge = ThemeSources.Token("AtmosEdgeColor", "Neon");
 
         foreach (var key in FlameBrushKeys)
         {
@@ -175,11 +178,11 @@ public sealed class ThemeTokenTests
             Assert.Equal("Transparent", StopColour(stops[^1]));
 
             var heats = stops.Take(stops.Count - 1)
-                .Select(stop => Hsl(StopColour(stop)).Lightness)
+                .Select(stop => Hsl(StopColour(stop, "Neon")).Lightness)
                 .ToList();
 
             Assert.Equal(heats.OrderByDescending(value => value).ToList(), heats);
-            Assert.Equal(edge, StopColour(stops[^2]));
+            Assert.Equal(edge, StopColour(stops[^2], "Neon"));
         }
     }
 

@@ -69,7 +69,9 @@ public sealed class PaletteApplyTests
     /// <summary>
     /// Kusurun kendisi: palet değişince ekranı boyayan fırçalar da değişmeli. Negatif
     /// kontrol, ölçünün ilk sürümünde kırmızı yanan şey — önceki ve sonraki değer aynıysa
-    /// kullanıcı temayı seçer ve programda hiçbir şey değişmez.
+    /// kullanıcı temayı seçer ve programda hiçbir şey değişmez. Karşı palet, okunan her değeri
+    /// varsayılandan ayrı olan ilk palet: Teknesyum ile Neon gövde yazısını paylaşıyor. Seçim
+    /// ekrana yansımıyorsa hiçbir palet ayrışmaz ve son okuma kırmızı verir.
     /// </summary>
     [Fact]
     public void PaletDegisince_YasayanFircalarDaDegisir()
@@ -79,9 +81,13 @@ public sealed class PaletteApplyTests
             var baslangic = PaletteCatalog.Use(PaletteCatalog.Default);
             var a = Okuma();
 
-            var oteki = PaletteCatalog.Names.First(name => name != PaletteCatalog.Default);
-            PaletteCatalog.Use(oteki);
-            var b = Okuma();
+            IReadOnlyList<(string Etiket, string Deger)> b = a;
+            foreach (var oteki in PaletteCatalog.Names.Where(name => name != PaletteCatalog.Default))
+            {
+                PaletteCatalog.Use(oteki);
+                b = Okuma();
+                if (a.Zip(b).All(cift => cift.First.Deger != cift.Second.Deger)) break;
+            }
 
             PaletteCatalog.Use(baslangic);
             return (a, b, Okuma());
