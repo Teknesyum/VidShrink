@@ -1176,6 +1176,8 @@ public sealed class BaslikKapsamiTests
     /// 2660 + 5 = 2665, en 246, tr 91.</para>
     /// <para>2026-09-26, paylasim QR'i: <c>main.share.qr</c> 7 dilde kola giriyor (en fr hu nb nl pt ro), tr haric;
     /// <c>main.share.qr-hint</c> kolun disinda: 2665 + 7 = 2672, en 247, tr 91.</para>
+    /// <para>2026-09-26, bolge kaydi kare tavani: tr <c>recorder.auto.note.stepped</c> "kare hızı düşürüldü" oldu, uc kelimeyle
+    /// duzyazi sayilmiyor ve koldan cikiyor: 2672 - 1 = 2671, en 247, tr 90.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1201,9 +1203,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2672, toplam);
+        Assert.Equal(2671, toplam);
         Assert.Equal(247, dilBasina["en"]);
-        Assert.Equal(91, dilBasina["tr"]);
+        Assert.Equal(90, dilBasina["tr"]);
     }
 
     /// <summary>
