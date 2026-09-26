@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="kol" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9acdff"/>
+      <stop offset="0.5" stop-color="#6fb7ff"/>
+      <stop offset="1" stop-color="#5992cc"/>
+    </linearGradient>
+    <linearGradient id="oynat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fcbaff"/>
+      <stop offset="0.45" stop-color="#fa8cff"/>
+      <stop offset="1" stop-color="#ac7fff"/>
+    </linearGradient>
+    <path id="parantez" d="M78 36 C52 36 40 48 40 74 V106 C40 118 34 126 24 128 C34 130 40 138 40 150 V182 C40 208 52 220 78 220" fill="none"/>
+    <path id="govde" d="M40 128 H64" fill="none"/>
+    <path id="bas" d="M60 113 L80 128 L60 143 Z"/>
+    <path id="ucgen" d="M117 102 L117 154 L158 128 Z"/>
+  </defs>
+
+  <g stroke="#000" stroke-linecap="round" stroke-linejoin="round" fill="#000">
+    <g stroke-width="34">
+      <use href="#parantez"/>
+      <use href="#parantez" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <g stroke-width="26">
+      <use href="#govde"/>
+      <use href="#govde" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <g stroke-width="20">
+      <use href="#bas"/>
+      <use href="#bas" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <use href="#ucgen" stroke-width="36"/>
+  </g>
+
+  <g stroke="url(#kol)" stroke-linecap="round" stroke-linejoin="round" fill="url(#kol)">
+    <g stroke-width="20">
+      <use href="#parantez"/>
+      <use href="#parantez" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <g stroke-width="12">
+      <use href="#govde"/>
+      <use href="#govde" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+    <g stroke-width="6">
+      <use href="#bas"/>
+      <use href="#bas" transform="matrix(-1 0 0 1 256 0)"/>
+    </g>
+  </g>
+
+  <use href="#ucgen" fill="url(#oynat)" stroke="url(#oynat)" stroke-width="22" stroke-linejoin="round"/>
+  <path d="M109 100 C109 95 114 93 118 96 L140 109 C128 110 117 115 109 124 Z" fill="#ffffff" fill-opacity="0.3"/>
+
+  <g fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round">
+    <path d="M70 44 C56 46 49 54 48 72"/>
+    <path d="M186 44 C200 46 207 54 208 72"/>
+  </g>
+</svg>
