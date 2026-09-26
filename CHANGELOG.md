@@ -7,6 +7,10 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Fixed
+
+- Region recording no longer bogs the PC down: on Windows, automatic mode caps the capture at 30 fps instead of following the display refresh rate (60/120), which kept gdigrab copying the desktop nonstop and still delivered only about 80 of 120 frames. The recording frame is now only its edge strip, so clicks and the mouse wheel reach the app under the region even if the click-through style is lost, and the region toolbar no longer takes focus while recording.
+
 ## [0.9.5] - 2026-09-25
 
 ### Added

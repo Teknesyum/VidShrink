@@ -302,7 +302,26 @@ internal partial class RecorderRegionEditor : Window
 
         Shaped = SetWindowRgn(handle.Handle, shape, true) != 0;
         if (!Shaped) DeleteObject(shape);
+
+        var current = GetWindowLongPtr(handle.Handle, GwlExStyle).ToInt64();
+        var wanted = PhaseStyle(current, _phase);
+        if (wanted != current) SetWindowLongPtr(handle.Handle, GwlExStyle, new IntPtr(wanted));
     }
+
+    /// <summary>
+    /// Kayıt evrelerinde panel etkinleşmez: durdur/duraklat tıklaması kaydedilen uygulamanın
+    /// odağını ve klavyesini almaz. Boştayken Esc/Enter için etkinleşebilir.
+    /// </summary>
+    internal static long PhaseStyle(long exStyle, RegionEditorPhase phase)
+        => Editable(phase) ? exStyle & ~RecorderFrame.ExNoActivate : exStyle | RecorderFrame.ExNoActivate;
+
+    private const int GwlExStyle = -20;
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
+    private static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int index);
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
+    private static extern IntPtr SetWindowLongPtr(IntPtr hwnd, int index, IntPtr value);
 
     private const int RgnOr = 2;
 
@@ -392,7 +411,7 @@ internal sealed class RegionEditorHost : IRegionEditorHost
             _editor = editor;
             editor.SetPhase(phase);
             editor.Show();
-            editor.Activate();
+            if (RecorderRegionEditor.Editable(phase)) editor.Activate();
             return;
         }
 

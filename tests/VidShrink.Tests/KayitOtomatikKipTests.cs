@@ -109,6 +109,37 @@ public class KayitOtomatikKipTests
     }
 
     /// <summary>
+    /// gdigrab tavanı: 60 Hz ve üstündeki ekranda ilk aday 30'u geçmiyor, yenileme hızı
+    /// tavanın altındaysa ona dokunulmuyor, tavansız makine eski merdiveni koruyor (olumsuz
+    /// kontrol). Tavan yenileme hızını izlemediği için not "indirildi" diyor.
+    /// </summary>
+    [Theory]
+    [InlineData(60, 30, 30)]
+    [InlineData(144, 30, 30)]
+    [InlineData(180, 30, 30)]
+    [InlineData(24, 30, 24)]
+    [InlineData(0, 30, 30)]
+    [InlineData(144, 0, 120)]
+    [InlineData(60, 0, 60)]
+    public void YakalamaTavaniIlkAdayinKareHiziniSinirliyor(double hz, int tavan, int beklenen)
+    {
+        var ladder = RecorderAutoPlan.Candidates(new RecorderMachine(1920, 1080, hz, 8, Array.Empty<string>(), tavan));
+
+        Assert.Equal(beklenen, ladder[0].Fps);
+        Assert.All(ladder, aday => Assert.InRange(aday.Fps, 1, beklenen));
+        var tavanaTakildi = beklenen < RecorderAutoPlan.FpsFor(hz);
+        Assert.Contains(tavanaTakildi ? RecorderAutoNote.FpsSteppedDown : RecorderAutoNote.FpsFollowsRefreshRate, ladder[0].Notes);
+    }
+
+    [Fact]
+    public void GdigrabTavaniOtuz()
+    {
+        Assert.Equal(30, RecorderAutoPlan.GdigrabMaxFps);
+        var ladder = RecorderAutoPlan.Candidates(Makine(hz: 120) with { MaxCaptureFps = RecorderAutoPlan.GdigrabMaxFps });
+        Assert.Equal(new[] { 30, 24, 30, 24 }, ladder.Select(a => a.Fps).ToArray());
+    }
+
+    /// <summary>
     /// Otomatik kipin yazdığı her aday motorun kendi doğrulamasından geçiyor: uydurma bir
     /// ön ayar, kabul edilmeyen bir piksel biçimi ya da tek sayılı bir ölçek buraya
     /// sızamıyor.

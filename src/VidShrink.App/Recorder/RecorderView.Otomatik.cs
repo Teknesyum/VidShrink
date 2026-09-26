@@ -313,7 +313,8 @@ internal partial class RecorderView
             height,
             ScreenRefresh.PrimaryHz(),
             Environment.ProcessorCount,
-            WorkingEncoders());
+            WorkingEncoders(),
+            OperatingSystem.IsWindows() ? RecorderAutoPlan.GdigrabMaxFps : 0);
     }
 
     private (int Width, int Height) CaptureSize()

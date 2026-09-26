@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
@@ -190,5 +191,112 @@ public sealed class KaydediciCerceveTests
         if (Array.Exists(olcu.once, b => b != 0)) Assert.True(Ayni(olcu.kontrolPiksel, olcu.renk));
 
         Kapat("cerceve-kayit-disi.txt");
+    }
+
+    [Fact]
+    public void CerceveSeridiYalnizKenar()
+    {
+        Assert.Equal(new[]
+        {
+            new PixelRect(0, 0, 644, 2), new PixelRect(0, 362, 644, 2),
+            new PixelRect(0, 2, 2, 360), new PixelRect(642, 2, 2, 360)
+        }, RecorderFrame.Ring(new PixelSize(644, 364), 2));
+        Assert.Equal(new[] { new PixelRect(0, 0, 4, 4) }, RecorderFrame.Ring(new PixelSize(4, 4), 2));
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Nokta
+    {
+        public int X;
+        public int Y;
+    }
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr WindowFromPoint(Nokta nokta);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetAncestor(IntPtr hwnd, uint flags);
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
+    private static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int index);
+
+    private static bool Bizim(int x, int y)
+    {
+        var kok = GetAncestor(WindowFromPoint(new Nokta { X = x, Y = y }), 2);
+        GetWindowThreadProcessId(kok, out var pid);
+        return pid == Environment.ProcessId;
+    }
+
+    /// <summary>
+    /// Kayıt sürerken bölgenin üstünde duran iki pencere (çerçeve ve kayıt evresindeki
+    /// düzenleyici) tıklamayı ve tekerleği geçiriyor. Ölçü Windows'un kendi isabet testi
+    /// (<c>WindowFromPoint</c>, fare mesajı ve üzerine gelindiğinde kaydırma bununla yönlenir):
+    /// bölgenin içi ve çerçeve şeridi alttaki uygulamaya düşer. Düzenleyicinin paneli bizim
+    /// pencerede kalır (olumlu kontrol: ölçü kör değil). Çerçeve stilinde WS_EX_TRANSPARENT ve
+    /// WS_EX_LAYERED, kayıt evresindeki panelde WS_EX_NOACTIVATE okunur.
+    /// </summary>
+    [KayitFact]
+    public void KayittaBolgeTiklamaVeTekerlegiGecirir()
+    {
+        var olcu = AppHost.Run(() =>
+        {
+            var bolge = new PixelRect(300, 300, 640, 360);
+            var cerceve = new RecorderFrame();
+            cerceve.Place(bolge);
+            cerceve.Show();
+            var duzenleyici = new RecorderRegionEditor(bolge, null);
+            duzenleyici.SetPhase(RegionEditorPhase.Running);
+            duzenleyici.Show();
+            Bekle(800);
+            try
+            {
+                var cerceveStil = GetWindowLongPtr(cerceve.TryGetPlatformHandle()!.Handle, -20).ToInt64();
+                var panelStil = GetWindowLongPtr(duzenleyici.TryGetPlatformHandle()!.Handle, -20).ToInt64();
+                var panel = duzenleyici.ToolbarBounds;
+                var noktalar = new[]
+                {
+                    (bolge.X + 1, bolge.Y + 1), (bolge.Center.X, bolge.Center.Y), (bolge.Right - 2, bolge.Bottom - 2),
+                    (bolge.X - 1, bolge.Center.Y), (bolge.Center.X, bolge.Bottom)
+                };
+                return (cerceveStil, panelStil, cerceve.Shaped, duzenleyici.Shaped,
+                    ic: noktalar.Select(n => (n, bizim: Bizim(n.Item1, n.Item2))).ToArray(),
+                    panel, panelBizim: Bizim(panel.Center.X, panel.Center.Y));
+            }
+            finally
+            {
+                duzenleyici.CloseQuietly();
+                cerceve.Close();
+                Bekle(200);
+            }
+        });
+
+        File.WriteAllLines(Path.Combine(Kanit, "kayit-gecirgenlik.txt"), new[]
+        {
+            $"cerceveStil=0x{olcu.cerceveStil:X} panelStil=0x{olcu.panelStil:X} cerceveBicimli={olcu.Item3} panelBicimli={olcu.Item4}",
+            string.Join(" ", olcu.ic.Select(n => $"{n.n}={(n.bizim ? "bizim" : "alttaki")}")),
+            $"panel={olcu.panel} merkez={(olcu.panelBizim ? "bizim" : "alttaki")}"
+        });
+
+        Assert.Equal(RecorderFrame.ExTransparent | RecorderFrame.ExLayered | RecorderFrame.ExNoActivate,
+            olcu.cerceveStil & (RecorderFrame.ExTransparent | RecorderFrame.ExLayered | RecorderFrame.ExNoActivate));
+        Assert.Equal(RecorderFrame.ExNoActivate, olcu.panelStil & RecorderFrame.ExNoActivate);
+        Assert.True(olcu.Item3);
+        Assert.True(olcu.Item4);
+        Assert.All(olcu.ic, n => Assert.False(n.bizim, $"{n.n} bizim pencereye dustu"));
+        Assert.True(olcu.panelBizim, "panel isabet almiyor: olcu kor");
+
+        Kapat("kayit-gecirgenlik.txt");
+    }
+
+    [Fact]
+    public void PanelYalnizBostaEtkinlesir()
+    {
+        const long diger = 0x8 | 0x200000;
+        Assert.Equal(diger, RecorderRegionEditor.PhaseStyle(diger | RecorderFrame.ExNoActivate, RegionEditorPhase.Idle));
+        foreach (var evre in new[] { RegionEditorPhase.Counting, RegionEditorPhase.Running, RegionEditorPhase.Paused })
+            Assert.Equal(diger | RecorderFrame.ExNoActivate, RecorderRegionEditor.PhaseStyle(diger, evre));
     }
 }
