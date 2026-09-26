@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Praleista: VidShrink tai nustato pagal tikslinį dydį",
   "main.preset.handbrake.dropped.no-equivalent": "Praleista: VidShrink neturi atitikmens",
   "main.preset.handbrake.dropped.unsupported-codec": "Praleista: kodekas nepalaikomas",
-  "main.preset.handbrake.dropped.structural": "Praleista: HandBrake sąrašo struktūra"
+  "main.preset.handbrake.dropped.structural": "Praleista: HandBrake sąrašo struktūra",
+  "main.share.qr": "Bendrinimo nuorodos QR kodas",
+  "main.share.qr-hint": "Nuskaitykite telefonu, kad atidarytumėte nuorodą."
 }

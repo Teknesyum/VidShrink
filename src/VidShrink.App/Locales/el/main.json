@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Παραλείφθηκε: το VidShrink το αποφασίζει από το μέγεθος-στόχο",
   "main.preset.handbrake.dropped.no-equivalent": "Παραλείφθηκε: το VidShrink δεν έχει αντίστοιχο",
   "main.preset.handbrake.dropped.unsupported-codec": "Παραλείφθηκε: ο κωδικοποιητής δεν υποστηρίζεται",
-  "main.preset.handbrake.dropped.structural": "Παρακάμφθηκε: δομή λίστας του HandBrake"
+  "main.preset.handbrake.dropped.structural": "Παρακάμφθηκε: δομή λίστας του HandBrake",
+  "main.share.qr": "Κωδικός QR του συνδέσμου κοινοποίησης",
+  "main.share.qr-hint": "Σαρώστε με το τηλέφωνό σας για να ανοίξετε τον σύνδεσμο."
 }

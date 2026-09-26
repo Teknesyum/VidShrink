@@ -4,6 +4,7 @@
         xmlns:playback="using:VidShrink.App.Playback"
         xmlns:recorder="using:VidShrink.App.Recorder"
         xmlns:loc="using:VidShrink.App.Localization"
+        xmlns:share="using:VidShrink.App.Share"
         xmlns:izi="using:VidShrink.App"
         x:Class="VidShrink.App.MainWindow"
         Title="VidShrink"
@@ -986,7 +987,9 @@
                       <Grid x:Name="ShareLinkRow"
                             IsVisible="False"
                             ColumnDefinitions="*,Auto"
-                            ColumnSpacing="{StaticResource SpaceMd}">
+                            RowDefinitions="Auto,Auto"
+                            ColumnSpacing="{StaticResource SpaceMd}"
+                            RowSpacing="{StaticResource SpaceMd}">
                         <TextBox Grid.Column="0"
                                  x:Name="TxtShareLink"
                                  IsReadOnly="True"
@@ -998,6 +1001,22 @@
                                 Theme="{StaticResource GhostButton}"
                                 VerticalAlignment="Center"
                                 Click="OnCopyShareLink"/>
+                        <Grid Grid.Row="1"
+                              Grid.ColumnSpan="2"
+                              RowDefinitions="Auto,Auto"
+                              RowSpacing="{StaticResource SpaceSm}"
+                              IsVisible="{Binding #QrShare.IsVisible}">
+                          <share:ShareQrCode HorizontalAlignment="Left"
+                                             x:Name="QrShare"
+                                             Link="{Binding #TxtShareLink.Text}"
+                                             ModuleSize="{StaticResource ShareQrModuleSize}"
+                                             auto:AutomationProperties.Name="{loc:Text main.share.qr}"
+                                             auto:AutomationProperties.HelpText="{loc:Text main.share.qr-hint}"/>
+                          <TextBlock Grid.Row="1"
+                                     Theme="{StaticResource Hint}"
+                                     Text="{loc:Text main.share.qr-hint}"
+                                     TextWrapping="Wrap"/>
+                        </Grid>
                       </Grid>
                       <TextBlock x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </StackPanel>

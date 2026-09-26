@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "छोड़ा गया: VidShrink इसे लक्ष्य आकार से तय करता है",
   "main.preset.handbrake.dropped.no-equivalent": "छोड़ा गया: VidShrink में इसका समकक्ष नहीं है",
   "main.preset.handbrake.dropped.unsupported-codec": "छोड़ा गया: कोडेक समर्थित नहीं",
-  "main.preset.handbrake.dropped.structural": "छोड़ा गया: HandBrake सूची संरचना"
+  "main.preset.handbrake.dropped.structural": "छोड़ा गया: HandBrake सूची संरचना",
+  "main.share.qr": "शेयर लिंक का QR कोड",
+  "main.share.qr-hint": "लिंक खोलने के लिए फ़ोन से स्कैन करें।"
 }

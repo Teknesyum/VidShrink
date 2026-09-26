@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "বাদ: VidShrink এটি লক্ষ্য আকার থেকে ঠিক করে",
   "main.preset.handbrake.dropped.no-equivalent": "বাদ: VidShrink-এ এর সমতুল্য নেই",
   "main.preset.handbrake.dropped.unsupported-codec": "বাদ: কোডেক সমর্থিত নয়",
-  "main.preset.handbrake.dropped.structural": "এড়ানো হয়েছে: HandBrake তালিকার গঠন"
+  "main.preset.handbrake.dropped.structural": "এড়ানো হয়েছে: HandBrake তালিকার গঠন",
+  "main.share.qr": "শেয়ার লিংকের QR কোড",
+  "main.share.qr-hint": "লিংকটি খুলতে ফোন দিয়ে স্ক্যান করুন।"
 }

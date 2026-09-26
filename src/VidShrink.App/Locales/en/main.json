@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Dropped: VidShrink decides this from the target size",
   "main.preset.handbrake.dropped.no-equivalent": "Dropped: VidShrink has no equivalent",
   "main.preset.handbrake.dropped.unsupported-codec": "Dropped: codec not supported",
-  "main.preset.handbrake.dropped.structural": "Skipped: HandBrake list structure"
+  "main.preset.handbrake.dropped.structural": "Skipped: HandBrake list structure",
+  "main.share.qr": "QR code for the share link",
+  "main.share.qr-hint": "Scan with your phone to open the link."
 }

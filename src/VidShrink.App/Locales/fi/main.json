@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Pudotettu: VidShrink päättää tämän tavoitekoosta",
   "main.preset.handbrake.dropped.no-equivalent": "Pudotettu: VidShrinkissä ei ole vastinetta",
   "main.preset.handbrake.dropped.unsupported-codec": "Pudotettu: koodekkia ei tueta",
-  "main.preset.handbrake.dropped.structural": "Ohitettu: HandBraken luettelorakenne"
+  "main.preset.handbrake.dropped.structural": "Ohitettu: HandBraken luettelorakenne",
+  "main.share.qr": "Jakolinkin QR-koodi",
+  "main.share.qr-hint": "Avaa linkki skannaamalla koodi puhelimella."
 }

@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Omis: VidShrink decide asta din dimensiunea țintă",
   "main.preset.handbrake.dropped.no-equivalent": "Omis: VidShrink nu are un echivalent",
   "main.preset.handbrake.dropped.unsupported-codec": "Omis: codec neacceptat",
-  "main.preset.handbrake.dropped.structural": "Sărit: structura listei HandBrake"
+  "main.preset.handbrake.dropped.structural": "Sărit: structura listei HandBrake",
+  "main.share.qr": "Cod QR pentru linkul de partajare",
+  "main.share.qr-hint": "Scanați cu telefonul pentru a deschide linkul."
 }

@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Izlaists: VidShrink to nosaka pēc mērķa lieluma",
   "main.preset.handbrake.dropped.no-equivalent": "Izlaists: VidShrink nav atbilstības",
   "main.preset.handbrake.dropped.unsupported-codec": "Izlaists: kodeks netiek atbalstīts",
-  "main.preset.handbrake.dropped.structural": "Izlaists: HandBrake saraksta struktūra"
+  "main.preset.handbrake.dropped.structural": "Izlaists: HandBrake saraksta struktūra",
+  "main.share.qr": "Kopīgošanas saites QR kods",
+  "main.share.qr-hint": "Noskenējiet ar tālruni, lai atvērtu saiti."
 }

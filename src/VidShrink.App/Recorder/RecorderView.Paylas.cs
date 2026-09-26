@@ -101,6 +101,7 @@ internal partial class RecorderView
         RecShareProgress.IsVisible = true;
         RecShareProgress.Value = 0;
         RecShareLinkRow.IsVisible = false;
+        TxtRecShareLink.Text = string.Empty;
         ShowShareStatus(Say("settings.share.uploading"));
 
         var progress = new Progress<CoreShare.UploadProgress>(step => RecShareProgress.Value = step.Fraction);
@@ -126,6 +127,7 @@ internal partial class RecorderView
         }
 
         RecShareLinkRow.IsVisible = false;
+        TxtRecShareLink.Text = string.Empty;
         Retry().Show(result);
         ShowShareStatus(result.Failure == CoreShare.ShareFailure.Cancelled
             ? Say("settings.share.cancelled")

@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Izpuščeno: VidShrink to določi iz ciljne velikosti",
   "main.preset.handbrake.dropped.no-equivalent": "Izpuščeno: VidShrink nima ustreznice",
   "main.preset.handbrake.dropped.unsupported-codec": "Izpuščeno: kodek ni podprt",
-  "main.preset.handbrake.dropped.structural": "Preskočeno: struktura seznama HandBrake"
+  "main.preset.handbrake.dropped.structural": "Preskočeno: struktura seznama HandBrake",
+  "main.share.qr": "Koda QR povezave za deljenje",
+  "main.share.qr-hint": "Skenirajte s telefonom, da odprete povezavo."
 }

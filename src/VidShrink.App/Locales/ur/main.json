@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "چھوڑ دیا گیا: VidShrink یہ ہدف سائز سے طے کرتا ہے",
   "main.preset.handbrake.dropped.no-equivalent": "چھوڑ دیا گیا: VidShrink میں اس کا متبادل نہیں",
   "main.preset.handbrake.dropped.unsupported-codec": "چھوڑ دیا گیا: کوڈیک معاون نہیں",
-  "main.preset.handbrake.dropped.structural": "نظرانداز: HandBrake فہرست کی ساخت"
+  "main.preset.handbrake.dropped.structural": "نظرانداز: HandBrake فہرست کی ساخت",
+  "main.share.qr": "شیئر لنک کا QR کوڈ",
+  "main.share.qr-hint": "لنک کھولنے کے لیے فون سے اسکین کریں۔"
 }

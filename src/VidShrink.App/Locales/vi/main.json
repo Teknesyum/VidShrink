@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Bỏ qua: VidShrink tự quyết định từ kích thước mục tiêu",
   "main.preset.handbrake.dropped.no-equivalent": "Bỏ qua: VidShrink không có tương đương",
   "main.preset.handbrake.dropped.unsupported-codec": "Bỏ qua: không hỗ trợ codec",
-  "main.preset.handbrake.dropped.structural": "Đã bỏ qua: cấu trúc danh sách HandBrake"
+  "main.preset.handbrake.dropped.structural": "Đã bỏ qua: cấu trúc danh sách HandBrake",
+  "main.share.qr": "Mã QR của liên kết chia sẻ",
+  "main.share.qr-hint": "Quét bằng điện thoại để mở liên kết."
 }

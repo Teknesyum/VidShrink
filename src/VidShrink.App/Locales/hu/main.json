@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Elhagyva: a VidShrink ezt a célméretből dönti el",
   "main.preset.handbrake.dropped.no-equivalent": "Elhagyva: a VidShrinkben nincs megfelelője",
   "main.preset.handbrake.dropped.unsupported-codec": "Elhagyva: a kodek nem támogatott",
-  "main.preset.handbrake.dropped.structural": "Kihagyva: HandBrake listaszerkezet"
+  "main.preset.handbrake.dropped.structural": "Kihagyva: HandBrake listaszerkezet",
+  "main.share.qr": "A megosztási hivatkozás QR-kódja",
+  "main.share.qr-hint": "Olvassa be a telefonjával a hivatkozás megnyitásához."
 }

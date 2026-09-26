@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Відкинуто: VidShrink визначає це за цільовим розміром",
   "main.preset.handbrake.dropped.no-equivalent": "Відкинуто: у VidShrink немає відповідника",
   "main.preset.handbrake.dropped.unsupported-codec": "Відкинуто: кодек не підтримується",
-  "main.preset.handbrake.dropped.structural": "Пропущено: структура списку HandBrake"
+  "main.preset.handbrake.dropped.structural": "Пропущено: структура списку HandBrake",
+  "main.share.qr": "QR-код посилання для спільного доступу",
+  "main.share.qr-hint": "Відскануйте телефоном, щоб відкрити посилання."
 }

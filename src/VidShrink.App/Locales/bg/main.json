@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Пропуснато: VidShrink го определя от целевия размер",
   "main.preset.handbrake.dropped.no-equivalent": "Пропуснато: VidShrink няма съответствие",
   "main.preset.handbrake.dropped.unsupported-codec": "Пропуснато: кодекът не се поддържа",
-  "main.preset.handbrake.dropped.structural": "Прескочено: структура на списъка на HandBrake"
+  "main.preset.handbrake.dropped.structural": "Прескочено: структура на списъка на HandBrake",
+  "main.share.qr": "QR код на връзката за споделяне",
+  "main.share.qr-hint": "Сканирайте с телефона си, за да отворите връзката."
 }

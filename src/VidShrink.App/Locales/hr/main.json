@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Izostavljeno: VidShrink to određuje iz ciljne veličine",
   "main.preset.handbrake.dropped.no-equivalent": "Izostavljeno: VidShrink nema ekvivalent",
   "main.preset.handbrake.dropped.unsupported-codec": "Izostavljeno: kodek nije podržan",
-  "main.preset.handbrake.dropped.structural": "Preskočeno: struktura popisa HandBrake"
+  "main.preset.handbrake.dropped.structural": "Preskočeno: struktura popisa HandBrake",
+  "main.share.qr": "QR kod poveznice za dijeljenje",
+  "main.share.qr-hint": "Skenirajte telefonom da biste otvorili poveznicu."
 }

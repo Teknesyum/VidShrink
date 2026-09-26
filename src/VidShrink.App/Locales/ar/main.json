@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "أُسقط: يحدده VidShrink من الحجم المستهدف",
   "main.preset.handbrake.dropped.no-equivalent": "أُسقط: لا يوجد مقابل في VidShrink",
   "main.preset.handbrake.dropped.unsupported-codec": "أُسقط: الترميز غير مدعوم",
-  "main.preset.handbrake.dropped.structural": "تُخطي: بنية قائمة HandBrake"
+  "main.preset.handbrake.dropped.structural": "تُخطي: بنية قائمة HandBrake",
+  "main.share.qr": "رمز QR لرابط المشاركة",
+  "main.share.qr-hint": "امسح الرمز بهاتفك لفتح الرابط."
 }

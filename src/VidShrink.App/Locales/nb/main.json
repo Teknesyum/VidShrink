@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Utelatt: VidShrink bestemmer dette ut fra målstørrelsen",
   "main.preset.handbrake.dropped.no-equivalent": "Utelatt: VidShrink har ingen tilsvarende",
   "main.preset.handbrake.dropped.unsupported-codec": "Utelatt: kodek støttes ikke",
-  "main.preset.handbrake.dropped.structural": "Hoppet over: HandBrakes listestruktur"
+  "main.preset.handbrake.dropped.structural": "Hoppet over: HandBrakes listestruktur",
+  "main.share.qr": "QR-kode for delingslenken",
+  "main.share.qr-hint": "Skann med telefonen for å åpne lenken."
 }

@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Vynechané: VidShrink to určí z cieľovej veľkosti",
   "main.preset.handbrake.dropped.no-equivalent": "Vynechané: VidShrink nemá ekvivalent",
   "main.preset.handbrake.dropped.unsupported-codec": "Vynechané: kodek nie je podporovaný",
-  "main.preset.handbrake.dropped.structural": "Preskočené: štruktúra zoznamu HandBrake"
+  "main.preset.handbrake.dropped.structural": "Preskočené: štruktúra zoznamu HandBrake",
+  "main.share.qr": "QR kód odkazu na zdieľanie",
+  "main.share.qr-hint": "Naskenujte telefónom a otvorte odkaz."
 }

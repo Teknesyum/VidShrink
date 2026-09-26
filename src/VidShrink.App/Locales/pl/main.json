@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Pominięto: VidShrink ustala to na podstawie rozmiaru docelowego",
   "main.preset.handbrake.dropped.no-equivalent": "Pominięto: VidShrink nie ma odpowiednika",
   "main.preset.handbrake.dropped.unsupported-codec": "Pominięto: kodek nieobsługiwany",
-  "main.preset.handbrake.dropped.structural": "Pominięto: struktura listy HandBrake"
+  "main.preset.handbrake.dropped.structural": "Pominięto: struktura listy HandBrake",
+  "main.share.qr": "Kod QR linku udostępniania",
+  "main.share.qr-hint": "Zeskanuj telefonem, aby otworzyć link."
 }

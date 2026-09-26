@@ -656,5 +656,7 @@
   "main.preset.handbrake.dropped.engine-decides": "Scartato: VidShrink lo decide dalla dimensione obiettivo",
   "main.preset.handbrake.dropped.no-equivalent": "Scartato: VidShrink non ha un equivalente",
   "main.preset.handbrake.dropped.unsupported-codec": "Scartato: codec non supportato",
-  "main.preset.handbrake.dropped.structural": "Saltato: struttura dell'elenco di HandBrake"
+  "main.preset.handbrake.dropped.structural": "Saltato: struttura dell'elenco di HandBrake",
+  "main.share.qr": "Codice QR del link di condivisione",
+  "main.share.qr-hint": "Scansionalo con il telefono per aprire il link."
 }
