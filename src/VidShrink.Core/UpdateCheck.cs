@@ -422,9 +422,17 @@ public sealed class UpdateSettings
     /// <summary>
     /// Windows'ta varsayılan açık: uygulama açılış bittikten sonra yeni sürümü arka planda
     /// indirir ve kapanırken kurar. macOS ve Linux'ta varsayılan kapalı kalır; orada rozet
-    /// haber verir. Dosyada yazılı değer, <c>false</c> dahil, korunur.
+    /// haber verir. Dosyada yazılı değer, <c>false</c> dahil, korunur; yalnız
+    /// <see cref="AutoUpdateDefaultMarker"/> taşımayan eski dosyanın <c>false</c>'u Windows'ta
+    /// bir kez açılır, çünkü eski kayıt varsayılanı da seçimi de aynı alana yazıyordu.
     /// </summary>
     public bool AutoUpdate { get; set; } = OperatingSystem.IsWindows();
+
+    /// <summary>
+    /// Otomatik güncellemenin varsayılan açık olduğu sürümden sonra yazılmış dosyanın işareti.
+    /// Bu işaretle yazılmış <c>false</c> kullanıcının seçimidir ve göç ona dokunmaz.
+    /// </summary>
+    public const string AutoUpdateDefaultMarker = "autoUpdateDefaultOn";
 
     /// <summary>
     /// Hızlı düşür (GPU) kutusunun durumu. Alan yoksa karar henüz verilmemiştir; ilk
@@ -494,6 +502,11 @@ public sealed class UpdateSettings
                 (value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False))
             {
                 settings.AutoUpdate = value.GetBoolean();
+                if (!settings.AutoUpdate && OperatingSystem.IsWindows() &&
+                    !document.RootElement.TryGetProperty(AutoUpdateDefaultMarker, out _))
+                {
+                    settings.AutoUpdate = true;
+                }
             }
             if (document.RootElement.TryGetProperty("fastGpu", out var fastGpu) &&
                 (fastGpu.ValueKind == JsonValueKind.True || fastGpu.ValueKind == JsonValueKind.False))
@@ -564,6 +577,7 @@ public sealed class UpdateSettings
         using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
         writer.WriteStartObject();
         writer.WriteBoolean("autoUpdate", AutoUpdate);
+        writer.WriteBoolean(AutoUpdateDefaultMarker, true);
         if (FastGpu.HasValue) writer.WriteBoolean("fastGpu", FastGpu.Value);
         if (!string.IsNullOrWhiteSpace(Language)) writer.WriteString("language", Language);
         writer.WriteNumber("targetMb", TargetMb);

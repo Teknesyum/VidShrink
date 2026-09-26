@@ -17,7 +17,7 @@ ship as part of it.
 
 ### Changed
 
-- Automatic updates are on by default on Windows for new installs (an existing choice in the settings file is kept). The update downloads quietly after the window has opened, the badge says it will install when you close VidShrink, and it installs on exit by swapping the files in place without reopening the app (about 0.3 s for a full release). If the swap cannot finish, the launcher waits for the app to exit and installs then. The launcher no longer downloads in the background at startup. macOS and Linux are unchanged.
+- Automatic updates are on by default on Windows. Settings files written before this version are switched on once, because they stored the old default and a deliberate "off" the same way; turning it off again from then on sticks. The update downloads quietly after the window has opened, the badge says it will install when you close VidShrink, and it installs on exit by swapping the files in place without reopening the app (about 0.3 s for a full release). If the swap cannot finish, the launcher waits for the app to exit and installs then. The launcher no longer downloads in the background at startup. macOS and Linux are unchanged.
 
 ## [0.9.5] - 2026-09-25
 

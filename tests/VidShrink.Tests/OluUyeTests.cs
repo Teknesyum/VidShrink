@@ -701,6 +701,8 @@ public sealed class OluUyeTests
     ///
     /// <para><b>26 Eylul 2026:</b> kapanista guncelleme <c>UpdateCheck.cs</c>ye on iki satir
     /// ekledi (1651 -> 1663). Deger degismedi, yeri degisti.</para>
+    /// <para><b>26 Eylul 2026:</b> eski ayar dosyasinin tek seferlik otomatik guncelleme gocu <c>UpdateCheck.cs</c>ye
+    /// on dort satir ekledi (1663 -> 1677). Deger degismedi, yeri degisti.</para>
     /// </summary>
     [Fact]
     public void NitelenmemisOkumaGoruluyor()
@@ -710,7 +712,7 @@ public sealed class OluUyeTests
         foreach (var (ad, dosya, satir) in new[]
                  {
                      ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 206),
-                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1663),
+                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1677),
                      ("DeveloperUnlock.Window", "src/VidShrink.Core/DeveloperUnlock.cs", 22)
                  })
         {

@@ -292,7 +292,7 @@ public sealed class UpdaterTests : IDisposable
         kept.Save(file);
         Assert.True(UpdateSettings.Load(file).AutoUpdate);
 
-        File.WriteAllText(file, "{\"autoUpdate\": false, \"language\": \"tr\", \"targetMb\": 25}");
+        File.WriteAllText(file, "{\"autoUpdate\": false, \"autoUpdateDefaultOn\": true, \"language\": \"tr\", \"targetMb\": 25}");
         var off = UpdateSettings.Load(file);
         Assert.False(off.AutoUpdate);
         off.TargetMb = 30;
@@ -302,6 +302,31 @@ public sealed class UpdaterTests : IDisposable
 
         File.WriteAllText(file, "{\"language\": \"tr\", \"targetMb\": 25}");
         Assert.Equal(OperatingSystem.IsWindows(), UpdateSettings.Load(file).AutoUpdate);
+    }
+
+    /// <summary>
+    /// 0.8.5-0.9.5 arası kayıt <c>autoUpdate: false</c>'u herkese yazdı; varsayılanla bilinçli
+    /// seçim ayrılamıyor. İşaretsiz eski dosyanın <c>false</c>'u Windows'ta bir kez açılır;
+    /// ilk kayıttan sonra işaret yazılır ve kullanıcının yeniden kapattığı <c>false</c> kalır.
+    /// </summary>
+    [Fact]
+    public void OldUnmarkedOffTurnsOnOnceThenAChoiceSticks()
+    {
+        var file = Path.Combine(_root, "settings.json");
+
+        File.WriteAllText(file, "{\"autoUpdate\": false, \"language\": \"tr\", \"targetMb\": 25}");
+        var migrated = UpdateSettings.Load(file);
+        Assert.Equal(OperatingSystem.IsWindows(), migrated.AutoUpdate);
+        Assert.Equal("tr", migrated.Language);
+        Assert.Equal(25, migrated.TargetMb);
+
+        migrated.AutoUpdate = false;
+        migrated.Save(file);
+        Assert.Contains("\"autoUpdateDefaultOn\": true", File.ReadAllText(file), StringComparison.Ordinal);
+        Assert.False(UpdateSettings.Load(file).AutoUpdate);
+
+        UpdateSettings.Load(file).Save(file);
+        Assert.False(UpdateSettings.Load(file).AutoUpdate);
     }
 
     [Fact]
