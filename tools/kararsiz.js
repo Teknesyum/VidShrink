@@ -81,6 +81,7 @@ function gozetle(saniye) {
   fs.writeFileSync(cikti, 'gozlenen dizin: ' + temp + '\n');
   let onceki = new Set();
   const bitis = Date.now() + saniye * 1000;
+  console.log('durum: gozlem basladi, ' + saniye + ' sn, dizin ' + temp + ', gunluk ' + cikti);
 
   const tik = setInterval(() => {
     let simdi;
@@ -92,6 +93,8 @@ function gozetle(saniye) {
     const damga = new Date().toISOString().slice(11, 23);
     for (const ad of eklenen) fs.appendFileSync(cikti, damga + '  + ' + ad + '\n');
     if (silinen.length) fs.appendFileSync(cikti, damga + '  - ' + silinen.length + ' dosya: ' + silinen.join(' ') + '\n');
+    if (eklenen.length || silinen.length)
+      console.log('durum: ' + damga + '  +' + eklenen.length + ' -' + silinen.length + ', izlenen ' + simdi.size + ', kalan ' + Math.max(0, Math.ceil((bitis - Date.now()) / 1000)) + ' sn');
     onceki = simdi;
 
     if (Date.now() > bitis) { clearInterval(tik); console.log('gozlem bitti: ' + cikti); }

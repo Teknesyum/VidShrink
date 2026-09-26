@@ -483,6 +483,7 @@ internal partial class PlayerView
             SizeToContent = SizeToContent.WidthAndHeight,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = false,
+            CanMaximize = false,
             ShowInTaskbar = false,
             Content = new StackPanel
             {

@@ -57,6 +57,7 @@ internal partial class PlayerAdvancedPanel : UserControl
         Strings.Changed -= OnLanguageChanged;
         Strings.Changed += OnLanguageChanged;
         Build();
+        Dispatcher.UIThread.Post(() => Root.Classes.Remove("enter"));
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
