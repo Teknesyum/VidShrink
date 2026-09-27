@@ -123,7 +123,9 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     /// <summary>Bir kaynagin libmpv'ye verilecek hali: adres oldugu gibi, dosya tam yolla.</summary>
     public static string Target(string path)
-        => Uri.TryCreate(path, UriKind.Absolute, out var uri)
+        => path.StartsWith("edl://", StringComparison.OrdinalIgnoreCase)
+            ? path
+            : Uri.TryCreate(path, UriKind.Absolute, out var uri)
            && RemoteSchemes.Any(scheme => string.Equals(scheme, uri.Scheme, StringComparison.OrdinalIgnoreCase))
             ? path.Trim()
             : Path.GetFullPath(path);
