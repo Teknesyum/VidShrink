@@ -1,0 +1,15 @@
+{
+  "sig.brand": "Teknesyum",
+  "sig.brandTitle": "Open the Teknesyum GitHub page",
+  "sig.support": "Buy me a coffee",
+  "sig.supportTitle": "Click to support the project",
+  "sig.site": "teknesyum.com",
+  "sig.siteTitle": "Open the Teknesyum site",
+  "update.label": "Update",
+  "update.download": "New version available, click to download",
+  "update.install": "Downloaded, click to install",
+  "sync.synced": "Synced",
+  "sync.offline": "Offline",
+  "sync.now": "Sync now",
+  "app.title": "Application name"
+}

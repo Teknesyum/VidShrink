@@ -1,0 +1,15 @@
+{
+  "sig.brand": "Teknesyum",
+  "sig.brandTitle": "Teknesyum GitHub sayfasını aç",
+  "sig.support": "Destek Ol",
+  "sig.supportTitle": "Projeyi desteklemek için tıkla",
+  "sig.site": "teknesyum.com",
+  "sig.siteTitle": "Teknesyum sitesini aç",
+  "update.label": "Güncelleme",
+  "update.download": "Yeni sürüm var, indirmek için tıklayın",
+  "update.install": "İndirildi, kurmak için tıklayın",
+  "sync.synced": "Eşitlendi",
+  "sync.offline": "Çevrimdışı",
+  "sync.now": "Şimdi eşitle",
+  "app.title": "Uygulama adı"
+}

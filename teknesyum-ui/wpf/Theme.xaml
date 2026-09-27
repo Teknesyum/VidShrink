@@ -1,0 +1,545 @@
+<!-- Teknesyum Neon — WPF. Add inside App.xaml > Application.Resources > MergedDictionaries. -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+  <Color x:Key="Renk1Color">#FF6FB7FF</Color>
+  <Color x:Key="Renk2Color">#FFCBA7D2</Color>
+  <Color x:Key="Renk3Color">#FFC3A3FF</Color>
+  <Color x:Key="Renk2TextColor">#FFFA8CFF</Color>
+  <Color x:Key="Renk3TextColor">#FFAC7FFF</Color>
+
+  <SolidColorBrush x:Key="Renk1"     Color="#FF6FB7FF"/>
+  <SolidColorBrush x:Key="Renk2"     Color="#FFCBA7D2"/>
+  <SolidColorBrush x:Key="Renk3"     Color="#FFC3A3FF"/>
+  <SolidColorBrush x:Key="Success"     Color="#FF66F09A"/>
+  <SolidColorBrush x:Key="Surface"     Color="#F5000000"/>
+  <SolidColorBrush x:Key="AppBg"       Color="#FF000000"/>
+
+  <!-- Window background: derived.bg-gradient (type flat, angle 160). The
+       overlay carries the grid or the halo glows; the TkWindow template draws both. -->
+  <SolidColorBrush x:Key="AppBackground" Color="#FF000000"/>
+  <SolidColorBrush x:Key="AppBackgroundOverlay" Color="Transparent"/>
+  <SolidColorBrush x:Key="WindowEdge" Color="Transparent"/>
+  <SolidColorBrush x:Key="ScrollbarThumb" Color="#FFAC7FFF"/>
+  <SolidColorBrush x:Key="ScrollbarThumbHover" Color="#FFCBA7D2"/>
+  <SolidColorBrush x:Key="ScrollbarTrack" Color="#4D000000"/>
+
+  <SolidColorBrush x:Key="Renk2Text" Color="#FFFA8CFF"/>
+  <SolidColorBrush x:Key="Renk3Text" Color="#FFAC7FFF"/>
+
+  <!-- SEMANTIC ROLE LAYER (SKILL §2).
+       THE ROLE WINS: every control that reports state (error text, form
+       validation, warning box, status dot, danger button) writes these brushes.
+       Brand and decoration (glow, scrollbar, hero, heading) keep writing the
+       brand brush. XAML has no aliases; each role is a SEPARATE brush object
+       carrying the same hex as the brand brush. The hex table is the single
+       source of truth and is never edited by hand; equality is measured in the
+       audit.
+       The `Success` brush was renamed from `NeonSuccess` on 2026-08-23: success
+       is not a brand colour, it is a role. The same rename applies in
+       Theme.axaml (U7's file).
+       `Info` IS DELIBERATELY ABSENT: there is no info box today, and an unused
+       token is debt. If one opens it binds to renk-1, and an info fill is never
+       used on the same screen as a primary button. -->
+  <SolidColorBrush x:Key="Danger"     Color="#FFCBA7D2"/>
+  <!-- The TEXT role of danger. The fill renk-2 falls below the 7:1 threshold as
+       text; error text writes this brush. -->
+  <SolidColorBrush x:Key="DangerText" Color="#FFFA8CFF"/>
+
+  <!-- warning #FFD24D — WARNING SURFACE ONLY: text, border, icon.
+       NO FILL, NO BUTTON. The constraint is the same pattern as success.
+       The ban was measured: white text on an amber fill is 1.44:1, it collapses.
+       WHAT REPLACES IT: warning text `Warning` (14.58:1), border
+       `Warning50` (3.96:1 on #000000, clears the 3:1 threshold), icon same colour.
+       If an action is needed the button is primary (renk-1) or `Danger` (renk-2).
+       COLOUR ALONE CARRIES NO MEANING, amber included from the start: amber does
+       not separate from success under protanopia, dE2000 15.2
+       A warning row carries an icon or text in
+       addition to colour.
+       CAVEAT: this hex is subject to the U9 dE measurement. -->
+  <SolidColorBrush x:Key="Warning"    Color="#FFFFD24D"/>
+  <SolidColorBrush x:Key="Warning50"  Color="#80FFD24D"/>
+
+  <SolidColorBrush x:Key="TextBody"  Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="TextLabel" Color="#FF6FB7FF"/>
+  <!-- A disabled control is exempt from 7:1 (SKILL §2) and there is a price: a
+       colour-blind user cannot see the grey. This brush is never used alone —
+       every disabled control carries a marker in addition to the grey: ToolTip
+       text is MANDATORY, plus Cursor="No" and, where possible, an icon. A merely
+       dimmed control is an incomplete delivery. The "muted text" brush was
+       deleted on 2026-08-23: it carried exactly the same value as white, and a
+       single value with two names eventually diverges. For secondary text the
+       answer is not grey, it is deleting the text (SKILL §2, "no mid greys"). -->
+  <SolidColorBrush x:Key="Disabled"  Color="#FF8A8F9A"/>
+
+  <!-- On pairs: the text brush each fill takes, measured by generate.js at 7:1
+       after compositing a translucent fill over Surface. A fill with no On brush
+       carries no text. -->
+  <SolidColorBrush x:Key="OnRenk1"       Color="#FF000000"/>
+  <SolidColorBrush x:Key="OnRenk2"       Color="#FF000000"/>
+  <SolidColorBrush x:Key="OnRenk3"       Color="#FF000000"/>
+  <SolidColorBrush x:Key="OnSuccess"     Color="#FF000000"/>
+  <SolidColorBrush x:Key="OnDanger"      Color="#FF000000"/>
+  <SolidColorBrush x:Key="OnDangerText"  Color="#FF000000"/>
+  <SolidColorBrush x:Key="OnPanel"       Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnGlass"       Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk1x10"    Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk1x20"    Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk1x30"    Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk1x50"    Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk2x10"    Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk2x20"    Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk2x30"    Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk3x10"    Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk3x20"    Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="OnRenk3x30"    Color="#FFFFFFFF"/>
+
+  <SolidColorBrush x:Key="Renk1x10"     Color="#1A6FB7FF"/>
+  <SolidColorBrush x:Key="Renk1x20"     Color="#336FB7FF"/>
+  <SolidColorBrush x:Key="Renk1x30"     Color="#4D6FB7FF"/>
+  <SolidColorBrush x:Key="Renk1x50"     Color="#806FB7FF"/>
+  <SolidColorBrush x:Key="Renk1x60"     Color="#996FB7FF"/>
+
+  <SolidColorBrush x:Key="Renk2x10"     Color="#1ACBA7D2"/>
+  <SolidColorBrush x:Key="Renk2x20"     Color="#33CBA7D2"/>
+  <SolidColorBrush x:Key="Renk2x30"     Color="#4DCBA7D2"/>
+  <SolidColorBrush x:Key="Renk2x50"     Color="#80CBA7D2"/>
+  <SolidColorBrush x:Key="Renk2x60"     Color="#99CBA7D2"/>
+
+  <SolidColorBrush x:Key="Renk3x10"     Color="#1AC3A3FF"/>
+  <SolidColorBrush x:Key="Renk3x20"     Color="#33C3A3FF"/>
+  <SolidColorBrush x:Key="Renk3x30"     Color="#4DC3A3FF"/>
+  <SolidColorBrush x:Key="Renk3x50"     Color="#80C3A3FF"/>
+  <SolidColorBrush x:Key="Renk3x60"     Color="#99C3A3FF"/>
+
+  <SolidColorBrush x:Key="Renk2Text50"  Color="#80FA8CFF"/>
+  <SolidColorBrush x:Key="Renk3Text50"  Color="#80AC7FFF"/>
+
+  <SolidColorBrush x:Key="BorderDefault"    Color="#8C6FB7FF"/>
+  <SolidColorBrush x:Key="BorderStrong"     Color="#B36FB7FF"/>
+  <SolidColorBrush x:Key="BorderDecorative" Color="#336FB7FF"/>
+
+  <!-- The chain's only source is SKILL §3; the order matches. Atkinson
+       Hyperlegible Next is the default and is EMBEDDED in the project: setup.js
+       copies it into the app's Assets/Fonts and rewrites this line. -->
+  <FontFamily x:Key="FontSans">Atkinson Hyperlegible Next, Segoe UI</FontFamily>
+  <FontFamily x:Key="FontMono">Cascadia Mono, Consolas</FontFamily>
+
+  <Duration x:Key="TInstant">0:0:0.04</Duration>
+  <Duration x:Key="TFast">0:0:0.08</Duration>
+  <Duration x:Key="TBase">0:0:0.15</Duration>
+  <Duration x:Key="TSlow">0:0:0.24</Duration>
+  <!-- Hero glow: same intensity as the CSS token `tk-glow-hero` — blur 8, opacity 0.8. -->
+  <DropShadowEffect x:Key="HeroGlow" x:Shared="False" Color="#FF6FB7FF"
+                    BlurRadius="0" ShadowDepth="0" Opacity="0"/>
+
+  <DropShadowEffect x:Key="PanelShadow" x:Shared="False" Color="#FF000000"
+                    BlurRadius="0" ShadowDepth="0" Opacity="0"/>
+
+  <CubicEase x:Key="EOut" EasingMode="EaseOut"/>
+  <CubicEase x:Key="EIn" EasingMode="EaseIn"/>
+  <KeySpline x:Key="SplineOut" ControlPoint1="0.05,0.7" ControlPoint2="0.1,1"/>
+  <KeySpline x:Key="SplineIn" ControlPoint1="0.4,0" ControlPoint2="1,1"/>
+
+  <!-- Numeric tokens: the same values as the CSS tk-* custom properties, in DIP.
+       Tracking is em, line height a multiplier, ratios unitless. -->
+  <sys:Double x:Key="FontSize1">14</sys:Double>
+  <sys:Double x:Key="FontSize2">16</sys:Double>
+  <sys:Double x:Key="FontSize3">20</sys:Double>
+  <sys:Double x:Key="FontSize4">24</sys:Double>
+  <sys:Double x:Key="FontSize5">32</sys:Double>
+  <sys:Double x:Key="LineHeightBody">1.6</sys:Double>
+  <sys:Double x:Key="LineHeightHeading">1.25</sys:Double>
+  <sys:Double x:Key="LineHeightMono">1.5</sys:Double>
+  <sys:Double x:Key="MeasureCh">65</sys:Double>
+  <sys:Double x:Key="TrackingLabel">0.08</sys:Double>
+  <sys:Double x:Key="TrackingH3">0.02</sys:Double>
+  <sys:Double x:Key="TrackingH2">0</sys:Double>
+  <sys:Double x:Key="TrackingHero">-0.015</sys:Double>
+  <FontWeight x:Key="WeightBody">Normal</FontWeight>
+  <FontWeight x:Key="WeightSemi">SemiBold</FontWeight>
+  <FontWeight x:Key="WeightHero">ExtraBold</FontWeight>
+
+  <sys:Double x:Key="Space1">4</sys:Double>
+  <sys:Double x:Key="Space2">8</sys:Double>
+  <sys:Double x:Key="Space3">12</sys:Double>
+  <sys:Double x:Key="Space4">16</sys:Double>
+  <sys:Double x:Key="Space5">24</sys:Double>
+  <Thickness x:Key="PanelPadding">24</Thickness>
+  <Thickness x:Key="InputPadding">12,0</Thickness>
+  <sys:Double x:Key="SectionGap">24</sys:Double>
+  <sys:Double x:Key="RowGap">12</sys:Double>
+  <sys:Double x:Key="FieldGap">8</sys:Double>
+  <sys:Double x:Key="FieldStack">16</sys:Double>
+  <sys:Double x:Key="ToastInset">24</sys:Double>
+  <sys:Double x:Key="ToastGap">12</sys:Double>
+
+  <CornerRadius x:Key="Radius">3</CornerRadius>
+  <CornerRadius x:Key="WindowRadius">3</CornerRadius>
+  <Thickness x:Key="BorderWidth">1</Thickness>
+  <sys:Double x:Key="FocusWidth">2</sys:Double>
+  <sys:Double x:Key="FocusOffset">2</sys:Double>
+
+  <sys:Double x:Key="TargetMin">24</sys:Double>
+  <sys:Double x:Key="ScrollbarWidth">3</sys:Double>
+  <sys:Double x:Key="TitleBarHeightMin">28</sys:Double>
+  <sys:Double x:Key="TitleBarHeightMax">28</sys:Double>
+  <sys:Double x:Key="SidebarWidth">240</sys:Double>
+  <sys:Double x:Key="SidebarCollapsedWidth">48</sys:Double>
+  <sys:Double x:Key="InputHeight">40</sys:Double>
+  <sys:Double x:Key="ModalWidth">560</sys:Double>
+  <sys:Double x:Key="ModalMaxRatio">0.85</sys:Double>
+  <sys:Double x:Key="ToastWidth">360</sys:Double>
+  <sys:Double x:Key="ToastMax">3</sys:Double>
+  <Duration x:Key="ToastLife">0:0:6</Duration>
+  <sys:Double x:Key="IconSize1">14</sys:Double>
+  <sys:Double x:Key="IconSize2">16</sys:Double>
+  <sys:Double x:Key="IconSize3">22</sys:Double>
+  <sys:Double x:Key="IconSize4">56</sys:Double>
+
+  <sys:Double x:Key="ScaleHover">1.02</sys:Double>
+  <sys:Double x:Key="ScalePress">0.98</sys:Double>
+  <sys:Double x:Key="ScaleIconHover">1.1</sys:Double>
+  <sys:Double x:Key="EntryOffset">8</sys:Double>
+  <sys:Double x:Key="OverlayOffset">4</sys:Double>
+  <sys:Double x:Key="StaggerMax">6</sys:Double>
+  <sys:Double x:Key="GlowMargin">24</sys:Double>
+  <sys:Double x:Key="BgSweepMax">20</sys:Double>
+  <Duration x:Key="Stagger">0:0:0.04</Duration>
+  <Duration x:Key="LoadingLoopMin">0:0:1.4</Duration>
+  <Duration x:Key="FrameBudget">0:0:0.016</Duration>
+  <Duration x:Key="BgRotateMin">0:0:40</Duration>
+
+  <SolidColorBrush x:Key="LabelBrandBrush" Color="#FF6FB7FF"/>
+  <sys:Double x:Key="LabelBrandSize">14</sys:Double>
+  <FontWeight x:Key="LabelBrandWeight">SemiBold</FontWeight>
+  <SolidColorBrush x:Key="LabelSupportBrush" Color="#FFAC7FFF"/>
+  <sys:Double x:Key="LabelSupportSize">14</sys:Double>
+  <FontWeight x:Key="LabelSupportWeight">SemiBold</FontWeight>
+  <SolidColorBrush x:Key="LabelSiteBrush" Color="#FF6FB7FF"/>
+  <sys:Double x:Key="LabelSiteSize">14</sys:Double>
+  <FontWeight x:Key="LabelSiteWeight">SemiBold</FontWeight>
+  <SolidColorBrush x:Key="LabelUpdateBrush" Color="#FFFFFFFF"/>
+  <sys:Double x:Key="LabelUpdateSize">14</sys:Double>
+  <FontWeight x:Key="LabelUpdateWeight">SemiBold</FontWeight>
+  <SolidColorBrush x:Key="LabelSyncBrush" Color="#FFFFFFFF"/>
+  <sys:Double x:Key="LabelSyncSize">14</sys:Double>
+  <FontWeight x:Key="LabelSyncWeight">SemiBold</FontWeight>
+  <SolidColorBrush x:Key="LabelTitleBrush" Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="LabelTitleAccentBrush" Color="#FFFA8CFF"/>
+  <sys:Double x:Key="LabelTitleSize">20</sys:Double>
+  <FontWeight x:Key="LabelTitleWeight">SemiBold</FontWeight>
+  <sys:Double x:Key="ButtonHeight">28</sys:Double>
+  <Thickness x:Key="ButtonPadding">10,0</Thickness>
+  <sys:Double x:Key="GlassBlur">0</sys:Double>
+  <sys:Double x:Key="BgAngle">160</sys:Double>
+  <sys:String x:Key="BackgroundType">flat</sys:String>
+  <sys:String x:Key="ScrollbarStyle">fade</sys:String>
+  <sys:String x:Key="ScrollBehavior">auto</sys:String>
+  <sys:Double x:Key="ScrollbarThickness">3</sys:Double>
+  <Thickness x:Key="ScrollbarThumbInset">0</Thickness>
+  <CornerRadius x:Key="ScrollbarThumbRadius">3</CornerRadius>
+  <Duration x:Key="TFadeOut">0:0:0.48</Duration>
+
+  <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
+    <Setter Property="Control.Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Grid Margin="-5" SnapsToDevicePixels="True" UseLayoutRounding="True">
+            <!-- Derived from shape.r, shape.focus-offset and shape.focus-w. -->
+            <Rectangle Margin="4" RadiusX="4" RadiusY="4"
+                       Stroke="#FF000000" StrokeThickness="{StaticResource FocusWidth}"/>
+            <Rectangle Margin="2" RadiusX="6" RadiusY="6"
+                       Stroke="#FF6FB7FF" StrokeThickness="{StaticResource FocusWidth}"/>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Scale 1.25 major third: 14 / 16 / 20 / 24 / 30 DIP. Line height is set with
+       LineHeight + LineStackingStrategy="BlockLineHeight"; without the second,
+       WPF grows the line box to the tallest glyph and diverges from CSS.
+       Weight: headings and labels SemiBold (600), only hero Black (900).
+       TRACKING COMPENSATION: WPF has no letter spacing. CSS applies 0.02em on h2,
+       0.05em on h3, 0.15em on labels; that cannot be applied here. The
+       compensation is written in SKILL §3 — in WPF what separates a label from
+       body text is size, weight and colour, not spacing. Write an attached
+       behavior and the compensation lifts, with the CSS values used verbatim. -->
+
+  <Style x:Key="H2" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize4}"/>
+    <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+    <Setter Property="LineHeight" Value="30"/>
+    <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+    <Setter Property="Foreground" Value="{StaticResource Renk1}"/>
+  </Style>
+
+  <Style x:Key="H3" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize3}"/>
+    <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+    <Setter Property="LineHeight" Value="25"/>
+    <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+    <Setter Property="Foreground" Value="{StaticResource TextLabel}"/>
+  </Style>
+
+  <Style x:Key="Label" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize1}"/>
+    <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+    <Setter Property="LineHeight" Value="17.5"/>
+    <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+    <Setter Property="Foreground" Value="{StaticResource TextLabel}"/>
+  </Style>
+
+  <Style x:Key="Body" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
+    <Setter Property="LineHeight" Value="25.6"/>
+    <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+    <Setter Property="Typography.NumeralAlignment" Value="Tabular"/>
+    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+  </Style>
+
+  <!-- Help / hint text. CSS counterpart .tk-hint. -->
+  <Style x:Key="Hint" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize1}"/>
+    <Setter Property="LineHeight" Value="22.4"/>
+    <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+    <Setter Property="Typography.NumeralAlignment" Value="Tabular"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+  </Style>
+
+  <Style x:Key="Hero" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize5}"/>
+    <Setter Property="FontWeight" Value="{StaticResource WeightHero}"/>
+    <Setter Property="LineHeight" Value="40"/>
+    <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+    <Setter Property="Foreground" Value="{StaticResource Renk1}"/>
+    <Setter Property="Effect" Value="{StaticResource HeroGlow}"/>
+  </Style>
+
+  <Style x:Key="MonoValue" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
+    <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+    <Setter Property="LineHeight" Value="24"/>
+    <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+    <Setter Property="Foreground" Value="{StaticResource Renk2Text}"/>
+  </Style>
+
+  <Style x:Key="Panel" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource Surface}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource BorderDefault}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource Radius}"/>
+    <Setter Property="Padding" Value="{StaticResource PanelPadding}"/>
+    <Setter Property="Effect" Value="{StaticResource PanelShadow}"/>
+  </Style>
+
+  <!-- Warning surface. Derives from `Panel`; the only change is the border. The
+       background stays `Surface` because an amber fill is banned. Put an icon or
+       the word "Warning" inside the box in addition to colour. -->
+  <Style x:Key="WarningPanel" TargetType="Border" BasedOn="{StaticResource Panel}">
+    <Setter Property="BorderBrush" Value="{StaticResource Warning50}"/>
+  </Style>
+
+  <!-- Warning text. No glow: text is never given a glow (SKILL §2), the sole
+       exception being hero. -->
+  <Style x:Key="WarningBody" TargetType="TextBlock" BasedOn="{StaticResource Body}">
+    <Setter Property="Foreground" Value="{StaticResource Warning}"/>
+  </Style>
+
+  <!-- Error text writes the text renk-2, not the fill renk-2 — the 7:1 threshold. -->
+  <Style x:Key="DangerBody" TargetType="TextBlock" BasedOn="{StaticResource Body}">
+    <Setter Property="Foreground" Value="{StaticResource DangerText}"/>
+  </Style>
+
+  <!-- Window shell: edge (shape.window-edge), AppBackground, the overlay layer, then content. -->
+  <Style x:Key="TkWindow" TargetType="Window">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
+    <Setter Property="Background" Value="{StaticResource AppBackground}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource WindowEdge}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Window">
+          <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{StaticResource WindowRadius}" Background="{TemplateBinding Background}">
+            <Grid ClipToBounds="True">
+              <Border Background="{StaticResource AppBackgroundOverlay}" IsHitTestVisible="False"/>
+              <AdornerDecorator>
+                <ContentPresenter/>
+              </AdornerDecorator>
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="TkScrollThumb" TargetType="Thumb">
+    <Setter Property="Background" Value="{StaticResource ScrollbarThumb}"/>
+    <Setter Property="Margin" Value="{StaticResource ScrollbarThumbInset}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Thumb">
+          <Border x:Name="th" Background="{TemplateBinding Background}" CornerRadius="{StaticResource ScrollbarThumbRadius}"/>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="th" Property="Background" Value="{StaticResource ScrollbarThumbHover}"/>
+            </Trigger>
+            <Trigger Property="IsDragging" Value="True">
+              <Setter TargetName="th" Property="Background" Value="{StaticResource ScrollbarThumbHover}"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <ControlTemplate x:Key="TkScrollBarVertical" TargetType="ScrollBar">
+    <Border Background="{TemplateBinding Background}" CornerRadius="{StaticResource ScrollbarThumbRadius}">
+      <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="True">
+        <Track.Thumb>
+          <Thumb x:Name="thumb" Style="{StaticResource TkScrollThumb}" Opacity="0"/>
+        </Track.Thumb>
+      </Track>
+    </Border>
+    <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ScrollViewer}}" Value="True">
+              <DataTrigger.EnterActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="thumb" Storyboard.TargetProperty="Opacity" To="1" Duration="{StaticResource TFast}" EasingFunction="{StaticResource EOut}"/></Storyboard></BeginStoryboard></DataTrigger.EnterActions>
+              <DataTrigger.ExitActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="thumb" Storyboard.TargetProperty="Opacity" To="0" Duration="{StaticResource TFadeOut}" EasingFunction="{StaticResource EOut}"/></Storyboard></BeginStoryboard></DataTrigger.ExitActions>
+            </DataTrigger>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
+
+  <ControlTemplate x:Key="TkScrollBarHorizontal" TargetType="ScrollBar">
+    <Border Background="{TemplateBinding Background}" CornerRadius="{StaticResource ScrollbarThumbRadius}">
+      <Track x:Name="PART_Track" Orientation="Horizontal">
+        <Track.Thumb>
+          <Thumb x:Name="thumb" Style="{StaticResource TkScrollThumb}" Opacity="0"/>
+        </Track.Thumb>
+      </Track>
+    </Border>
+    <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ScrollViewer}}" Value="True">
+              <DataTrigger.EnterActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="thumb" Storyboard.TargetProperty="Opacity" To="1" Duration="{StaticResource TFast}" EasingFunction="{StaticResource EOut}"/></Storyboard></BeginStoryboard></DataTrigger.EnterActions>
+              <DataTrigger.ExitActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="thumb" Storyboard.TargetProperty="Opacity" To="0" Duration="{StaticResource TFadeOut}" EasingFunction="{StaticResource EOut}"/></Storyboard></BeginStoryboard></DataTrigger.ExitActions>
+            </DataTrigger>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
+
+  <!-- metric.scrollbar-style fade: one implicit style per orientation. -->
+  <Style TargetType="ScrollBar">
+    <Setter Property="Background" Value="{StaticResource ScrollbarTrack}"/>
+    <Setter Property="MinWidth" Value="0"/>
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="Width" Value="{StaticResource ScrollbarThickness}"/>
+    <Setter Property="Template" Value="{StaticResource TkScrollBarVertical}"/>
+    <Style.Triggers>
+      <Trigger Property="Orientation" Value="Horizontal">
+        <Setter Property="Width" Value="NaN"/>
+        <Setter Property="Height" Value="{StaticResource ScrollbarThickness}"/>
+        <Setter Property="Template" Value="{StaticResource TkScrollBarHorizontal}"/>
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <Style x:Key="PrimaryButton" TargetType="Button">
+    <Setter Property="Background" Value="{StaticResource Renk1}"/>
+    <Setter Property="Foreground" Value="Black"/>
+    <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ButtonHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource ButtonPadding}"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="{StaticResource Radius}"
+                  BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                  Padding="{TemplateBinding Padding}" RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform>
+              <ScaleTransform ScaleX="1" ScaleY="1"/>
+            </Border.RenderTransform>
+            <Border.Effect>
+              <DropShadowEffect Color="{StaticResource Renk1Color}" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
+            </Border.Effect>
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="{StaticResource ScaleHover}" Duration="{StaticResource TInstant}" EasingFunction="{StaticResource EOut}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="{StaticResource ScaleHover}" Duration="{StaticResource TInstant}" EasingFunction="{StaticResource EOut}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="1" Duration="{StaticResource TInstant}" EasingFunction="{StaticResource EOut}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="1" Duration="{StaticResource TInstant}" EasingFunction="{StaticResource EOut}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="{StaticResource ScalePress}" Duration="{StaticResource TInstant}" EasingFunction="{StaticResource EOut}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="{StaticResource ScalePress}" Duration="{StaticResource TInstant}" EasingFunction="{StaticResource EOut}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="1" Duration="{StaticResource TInstant}" EasingFunction="{StaticResource EOut}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="1" Duration="{StaticResource TInstant}" EasingFunction="{StaticResource EOut}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="bd" Property="Background" Value="Transparent"/>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Disabled}"/>
+              <Setter TargetName="bd" Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
+              <Setter TargetName="bd" Property="Effect" Value="{x:Null}"/>
+              <Setter Property="Foreground" Value="{StaticResource Disabled}"/>
+              <Setter Property="Cursor" Value="No"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+    <Setter Property="Background" Value="{StaticResource DangerText}"/>
+    <Setter Property="Foreground" Value="{StaticResource OnDangerText}"/>
+  </Style>
+
+</ResourceDictionary>

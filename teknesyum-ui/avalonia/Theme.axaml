@@ -1,0 +1,569 @@
+<!-- Teknesyum Neon, Avalonia 11. The root element is Styles, not ResourceDictionary:
+     resources live in Styles.Resources, global rules are Style Selectors below.
+     Binding:
+       <Application.Styles>
+         <FluentTheme/>
+         <StyleInclude Source="avares://App/Assets/Theme.axaml"/>
+       </Application.Styles>
+     Usage: Theme="{StaticResource H2}" (instead of WPF's Style="{StaticResource H2}").
+     Detail and rule rationale: references/avalonia.md -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=netstandard">
+
+  <Styles.Resources>
+
+    <Color x:Key="Renk1Color">#FF6FB7FF</Color>
+    <Color x:Key="Renk2Color">#FFCBA7D2</Color>
+    <Color x:Key="Renk3Color">#FFC3A3FF</Color>
+    <Color x:Key="Renk2TextColor">#FFFA8CFF</Color>
+    <Color x:Key="Renk3TextColor">#FFAC7FFF</Color>
+
+    <SolidColorBrush x:Key="Renk1"     Color="#FF6FB7FF"/>
+    <SolidColorBrush x:Key="Renk2"     Color="#FFCBA7D2"/>
+    <SolidColorBrush x:Key="Renk3"     Color="#FFC3A3FF"/>
+    <SolidColorBrush x:Key="Success"     Color="#FF66F09A"/>
+    <SolidColorBrush x:Key="Surface"     Color="#F5000000"/>
+    <SolidColorBrush x:Key="AppBg"       Color="#FF000000"/>
+
+    <!-- Window background from bg-gradient: AppBackground plus AppBackgroundOverlay.
+         Avalonia has no ColorInterpolationMode, sRGB interpolation is forced. With
+         rotate on, the Window template background animates between
+         AppBackgroundFrom and AppBackgroundTo. -->
+    <SolidColorBrush x:Key="AppBackground" Color="#FF000000"/>
+    <SolidColorBrush x:Key="AppBackgroundOverlay" Color="Transparent"/>
+
+    <SolidColorBrush x:Key="WindowEdge" Color="Transparent"/>
+    <SolidColorBrush x:Key="ScrollbarThumb" Color="#FFAC7FFF"/>
+    <SolidColorBrush x:Key="ScrollbarThumbHover" Color="#FFCBA7D2"/>
+    <SolidColorBrush x:Key="ScrollbarTrack" Color="#4D000000"/>
+
+    <SolidColorBrush x:Key="Renk2Text" Color="#FFFA8CFF"/>
+    <SolidColorBrush x:Key="Renk3Text" Color="#FFAC7FFF"/>
+
+    <!-- SEMANTIC ROLE LAYER (SKILL §2). Identical to Theme.xaml; the rationale is
+         written there and is not repeated here. The hex comes from the single
+         source of truth and is never edited by hand. The Success brush was renamed
+         from NeonSuccess on 2026-08-23 and this file carries the new name. -->
+    <SolidColorBrush x:Key="Danger"     Color="#FFCBA7D2"/>
+    <SolidColorBrush x:Key="DangerText" Color="#FFFA8CFF"/>
+    <SolidColorBrush x:Key="Warning"    Color="#FFFFD24D"/>
+    <SolidColorBrush x:Key="Warning50"  Color="#80FFD24D"/>
+
+    <SolidColorBrush x:Key="TextBody"  Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="TextLabel" Color="#FF6FB7FF"/>
+    <!-- A disabled control is exempt from 7:1 (SKILL §2) and there is a price: a
+         colour-blind user cannot see the grey. This brush is never used alone;
+         every disabled control carries a marker in addition to the grey:
+         ToolTip.Tip text is MANDATORY, plus Cursor="No" and, where possible, an
+         icon. A merely dimmed control is an incomplete delivery. For secondary
+         text the answer is not grey, it is deleting the text. -->
+    <SolidColorBrush x:Key="Disabled"  Color="#FF8A8F9A"/>
+
+    <!-- On pairs: the text brush each fill takes, measured by generate.js at 7:1
+         after compositing a translucent fill over Surface. A fill with no On brush
+         carries no text. -->
+    <SolidColorBrush x:Key="OnRenk1"       Color="#FF000000"/>
+    <SolidColorBrush x:Key="OnRenk2"       Color="#FF000000"/>
+    <SolidColorBrush x:Key="OnRenk3"       Color="#FF000000"/>
+    <SolidColorBrush x:Key="OnSuccess"     Color="#FF000000"/>
+    <SolidColorBrush x:Key="OnDanger"      Color="#FF000000"/>
+    <SolidColorBrush x:Key="OnDangerText"  Color="#FF000000"/>
+    <SolidColorBrush x:Key="OnPanel"       Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnGlass"       Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk1x10"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk1x20"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk1x30"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk1x50"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk2x10"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk2x20"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk2x30"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk3x10"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk3x20"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk3x30"    Color="#FFFFFFFF"/>
+
+    <SolidColorBrush x:Key="Renk1x10"     Color="#1A6FB7FF"/>
+    <SolidColorBrush x:Key="Renk1x20"     Color="#336FB7FF"/>
+    <SolidColorBrush x:Key="Renk1x30"     Color="#4D6FB7FF"/>
+    <SolidColorBrush x:Key="Renk1x50"     Color="#806FB7FF"/>
+    <SolidColorBrush x:Key="Renk1x60"     Color="#996FB7FF"/>
+
+    <SolidColorBrush x:Key="Renk2x10"     Color="#1ACBA7D2"/>
+    <SolidColorBrush x:Key="Renk2x20"     Color="#33CBA7D2"/>
+    <SolidColorBrush x:Key="Renk2x30"     Color="#4DCBA7D2"/>
+    <SolidColorBrush x:Key="Renk2x50"     Color="#80CBA7D2"/>
+    <SolidColorBrush x:Key="Renk2x60"     Color="#99CBA7D2"/>
+
+    <SolidColorBrush x:Key="Renk3x10"     Color="#1AC3A3FF"/>
+    <SolidColorBrush x:Key="Renk3x20"     Color="#33C3A3FF"/>
+    <SolidColorBrush x:Key="Renk3x30"     Color="#4DC3A3FF"/>
+    <SolidColorBrush x:Key="Renk3x50"     Color="#80C3A3FF"/>
+    <SolidColorBrush x:Key="Renk3x60"     Color="#99C3A3FF"/>
+
+    <SolidColorBrush x:Key="Renk2Text50"  Color="#80FA8CFF"/>
+    <SolidColorBrush x:Key="Renk3Text50"  Color="#80AC7FFF"/>
+
+    <SolidColorBrush x:Key="BorderDefault"    Color="#8C6FB7FF"/>
+    <SolidColorBrush x:Key="BorderStrong"     Color="#B36FB7FF"/>
+    <SolidColorBrush x:Key="BorderDecorative" Color="#336FB7FF"/>
+
+    <!-- The chain's only source is SKILL §3; the order matches. Atkinson
+         Hyperlegible Next is the default and is EMBEDDED in the project, not
+         assumed present on the system. setup.js copies the font into the app's
+         Assets/Fonts and rewrites this line to an avares URI. -->
+    <FontFamily x:Key="FontSans">avares://VidShrink.App/Assets/Fonts#Atkinson Hyperlegible Next, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontMono">Cascadia Mono, Consolas</FontFamily>
+
+    <!-- Avalonia has no Duration resource type; Transition.Duration and
+         Animation.Duration take a TimeSpan. The names are kept verbatim, the type
+         changed. -->
+    <sys:TimeSpan x:Key="TInstant">0:0:0.04</sys:TimeSpan>
+    <sys:TimeSpan x:Key="TFast">0:0:0.08</sys:TimeSpan>
+    <sys:TimeSpan x:Key="TBase">0:0:0.15</sys:TimeSpan>
+    <sys:TimeSpan x:Key="TSlow">0:0:0.24</sys:TimeSpan>
+
+    <!-- Hero glow: same intensity as the CSS token tk-glow-hero, blur 8, opacity
+         0.8. The council had put this name on the banned-string list; the reason
+         was catching WPF leftovers. In Avalonia 11 DropShadowEffect is a real API
+         and the only way to glow text. The deviation is recorded in the contract's
+         Output section. The WPF-specific ShadowDepth property is ABSENT here and
+         the test looks for it. -->
+    <DropShadowEffect x:Key="HeroGlow" Color="#FF6FB7FF"
+                      BlurRadius="0" OffsetX="0" OffsetY="0" Opacity="0"/>
+
+    <!-- SKILL §5.4 tokens: e-out cubic-bezier(0.2,0,0,1), e-in (0.4,0,1,1).
+         SplineEasing carries the CSS curve verbatim. If your version has no
+         SplineEasing the counterparts are <CubicEaseOut/> and <CubicEaseIn/>, and
+         the curve stays approximate. -->
+    <SplineEasing x:Key="EOut" X1="0.05" Y1="0.7" X2="0.1" Y2="1"/>
+    <SplineEasing x:Key="EIn"  X1="0.4" Y1="0" X2="1" Y2="1"/>
+
+    <!-- Numeric tokens: the same values as the CSS tk-* custom properties, in DIP.
+         Tracking is em, line height a multiplier, ratios unitless. -->
+    <sys:Double x:Key="FontSize1">14</sys:Double>
+    <sys:Double x:Key="FontSize2">16</sys:Double>
+    <sys:Double x:Key="FontSize3">20</sys:Double>
+    <sys:Double x:Key="FontSize4">24</sys:Double>
+    <sys:Double x:Key="FontSize5">32</sys:Double>
+    <sys:Double x:Key="LineHeightBody">1.6</sys:Double>
+    <sys:Double x:Key="LineHeightHeading">1.25</sys:Double>
+    <sys:Double x:Key="LineHeightMono">1.5</sys:Double>
+    <sys:Double x:Key="MeasureCh">65</sys:Double>
+    <sys:Double x:Key="TrackingLabel">0.08</sys:Double>
+    <sys:Double x:Key="TrackingH3">0.02</sys:Double>
+    <sys:Double x:Key="TrackingH2">0</sys:Double>
+    <sys:Double x:Key="TrackingHero">-0.015</sys:Double>
+    <FontWeight x:Key="WeightBody">Normal</FontWeight>
+    <FontWeight x:Key="WeightSemi">SemiBold</FontWeight>
+    <FontWeight x:Key="WeightHero">ExtraBold</FontWeight>
+
+    <sys:Double x:Key="Space1">4</sys:Double>
+    <sys:Double x:Key="Space2">8</sys:Double>
+    <sys:Double x:Key="Space3">12</sys:Double>
+    <sys:Double x:Key="Space4">16</sys:Double>
+    <sys:Double x:Key="Space5">24</sys:Double>
+    <Thickness x:Key="PanelPadding">24</Thickness>
+    <Thickness x:Key="InputPadding">12,0</Thickness>
+    <sys:Double x:Key="SectionGap">24</sys:Double>
+    <sys:Double x:Key="RowGap">12</sys:Double>
+    <sys:Double x:Key="FieldGap">8</sys:Double>
+    <sys:Double x:Key="FieldStack">16</sys:Double>
+    <sys:Double x:Key="ToastInset">24</sys:Double>
+    <sys:Double x:Key="ToastGap">12</sys:Double>
+
+    <CornerRadius x:Key="Radius">3</CornerRadius>
+    <CornerRadius x:Key="WindowRadius">3</CornerRadius>
+    <Thickness x:Key="BorderWidth">1</Thickness>
+    <sys:Double x:Key="FocusWidth">2</sys:Double>
+    <sys:Double x:Key="FocusOffset">2</sys:Double>
+
+    <sys:Double x:Key="TargetMin">24</sys:Double>
+    <sys:Double x:Key="ScrollbarWidth">3</sys:Double>
+    <sys:Double x:Key="TitleBarHeightMin">28</sys:Double>
+    <sys:Double x:Key="TitleBarHeightMax">28</sys:Double>
+    <sys:Double x:Key="SidebarWidth">240</sys:Double>
+    <sys:Double x:Key="SidebarCollapsedWidth">48</sys:Double>
+    <sys:Double x:Key="InputHeight">40</sys:Double>
+    <sys:Double x:Key="ModalWidth">560</sys:Double>
+    <sys:Double x:Key="ModalMaxRatio">0.85</sys:Double>
+    <sys:Double x:Key="ToastWidth">360</sys:Double>
+    <sys:Double x:Key="ToastMax">3</sys:Double>
+    <sys:TimeSpan x:Key="ToastLife">0:0:6</sys:TimeSpan>
+    <sys:Double x:Key="IconSize1">14</sys:Double>
+    <sys:Double x:Key="IconSize2">16</sys:Double>
+    <sys:Double x:Key="IconSize3">22</sys:Double>
+    <sys:Double x:Key="IconSize4">56</sys:Double>
+
+    <sys:Double x:Key="ScaleHover">1.02</sys:Double>
+    <sys:Double x:Key="ScalePress">0.98</sys:Double>
+    <sys:Double x:Key="ScaleIconHover">1.1</sys:Double>
+    <sys:Double x:Key="EntryOffset">8</sys:Double>
+    <sys:Double x:Key="OverlayOffset">4</sys:Double>
+    <sys:Double x:Key="StaggerMax">6</sys:Double>
+    <sys:Double x:Key="GlowMargin">24</sys:Double>
+    <sys:Double x:Key="BgSweepMax">20</sys:Double>
+    <sys:TimeSpan x:Key="Stagger">0:0:0.04</sys:TimeSpan>
+    <sys:TimeSpan x:Key="LoadingLoopMin">0:0:1.4</sys:TimeSpan>
+    <sys:TimeSpan x:Key="FrameBudget">0:0:0.016</sys:TimeSpan>
+    <sys:TimeSpan x:Key="BgRotateMin">0:0:40</sys:TimeSpan>
+
+    <SolidColorBrush x:Key="LabelBrandBrush" Color="#FF6FB7FF"/>
+    <sys:Double x:Key="LabelBrandSize">14</sys:Double>
+    <FontWeight x:Key="LabelBrandWeight">SemiBold</FontWeight>
+    <SolidColorBrush x:Key="LabelSupportBrush" Color="#FFAC7FFF"/>
+    <sys:Double x:Key="LabelSupportSize">14</sys:Double>
+    <FontWeight x:Key="LabelSupportWeight">SemiBold</FontWeight>
+    <SolidColorBrush x:Key="LabelSiteBrush" Color="#FF6FB7FF"/>
+    <sys:Double x:Key="LabelSiteSize">14</sys:Double>
+    <FontWeight x:Key="LabelSiteWeight">SemiBold</FontWeight>
+    <SolidColorBrush x:Key="LabelUpdateBrush" Color="#FFFFFFFF"/>
+    <sys:Double x:Key="LabelUpdateSize">14</sys:Double>
+    <FontWeight x:Key="LabelUpdateWeight">SemiBold</FontWeight>
+    <SolidColorBrush x:Key="LabelSyncBrush" Color="#FFFFFFFF"/>
+    <sys:Double x:Key="LabelSyncSize">14</sys:Double>
+    <FontWeight x:Key="LabelSyncWeight">SemiBold</FontWeight>
+    <SolidColorBrush x:Key="LabelTitleBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="LabelTitleAccentBrush" Color="#FFFA8CFF"/>
+    <sys:Double x:Key="LabelTitleSize">20</sys:Double>
+    <FontWeight x:Key="LabelTitleWeight">SemiBold</FontWeight>
+    <sys:Double x:Key="ButtonHeight">28</sys:Double>
+    <Thickness x:Key="ButtonPadding">10,0</Thickness>
+    <sys:Double x:Key="GlassBlur">0</sys:Double>
+    <sys:Double x:Key="BgAngle">160</sys:Double>
+    <sys:String x:Key="BackgroundType">flat</sys:String>
+    <sys:String x:Key="ScrollbarStyle">fade</sys:String>
+    <sys:String x:Key="ScrollBehavior">auto</sys:String>
+    <sys:Double x:Key="ScrollbarThickness">3</sys:Double>
+    <Thickness x:Key="ScrollbarThumbInset">0</Thickness>
+    <CornerRadius x:Key="ScrollbarThumbRadius">3</CornerRadius>
+    <sys:TimeSpan x:Key="TFadeOut">0:0:0.48</sys:TimeSpan>
+
+    <!-- Scale 1.25 major third: 14 / 16 / 20 / 24 / 30 DIP.
+         Avalonia has no LineStackingStrategy and does not need one: LineHeight
+         already behaves like a box height here, closer to CSS than WPF.
+         Weight: headings and labels SemiBold (600), only hero Black (900).
+         TRACKING COMPENSATION: Avalonia DOES have letter spacing
+         (TextBlock.LetterSpacing, in DIP, not em). CSS applies 0.02em on h2,
+         0.05em on h3, 0.15em on labels. NOT WRITTEN HERE: the em-to-DIP conversion
+         varies per size (0.15em on a 14px label = 2.1 DIP) and setting it unmeasured
+         would split the three platforms. The WPF compensation (size, weight,
+         colour) applies here too; whoever wants LetterSpacing should update
+         SKILL §3 first, then walk all three templates together. -->
+
+    <ControlTheme x:Key="H2" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+      <Setter Property="FontSize" Value="{StaticResource FontSize4}"/>
+      <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+      <Setter Property="LineHeight" Value="30"/>
+      <Setter Property="Foreground" Value="{StaticResource Renk1}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="H3" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+      <Setter Property="FontSize" Value="{StaticResource FontSize3}"/>
+      <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+      <Setter Property="LineHeight" Value="25"/>
+      <Setter Property="Foreground" Value="{StaticResource TextLabel}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="Label" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+      <Setter Property="FontSize" Value="{StaticResource FontSize1}"/>
+      <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+      <Setter Property="LineHeight" Value="17.5"/>
+      <Setter Property="Foreground" Value="{StaticResource TextLabel}"/>
+    </ControlTheme>
+
+    <!-- Tabular figures: the counterpart of WPF's Typography.NumeralAlignment="Tabular"
+         is FontFeatures="+tnum" (Avalonia 11.1+). THE VERSION WAS NOT CONFIRMED, so
+         the line is left OFF: if the feature is missing the XAML never loads at all
+         and the whole theme falls. The chosen substitute is mono: every number that
+         must align is written with the MonoValue theme (SKILL §3, "every number is
+         mono"). Once you have verified the target version, enable this line inside
+         Body and Hint:
+           <Setter Property="FontFeatures" Value="+tnum"/> -->
+
+    <ControlTheme x:Key="Body" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+      <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
+      <Setter Property="LineHeight" Value="25.6"/>
+      <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+    </ControlTheme>
+
+    <!-- Help / hint text. CSS counterpart .tk-hint. -->
+    <ControlTheme x:Key="Hint" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+      <Setter Property="FontSize" Value="{StaticResource FontSize1}"/>
+      <Setter Property="LineHeight" Value="22.4"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+      <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="Hero" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+      <Setter Property="FontSize" Value="{StaticResource FontSize5}"/>
+      <Setter Property="FontWeight" Value="{StaticResource WeightHero}"/>
+      <Setter Property="LineHeight" Value="40"/>
+      <Setter Property="Foreground" Value="{StaticResource Renk1}"/>
+      <!-- This is the only role where text is given a glow (SKILL §2). -->
+      <Setter Property="Effect" Value="{StaticResource HeroGlow}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="MonoValue" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+      <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
+      <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+      <Setter Property="LineHeight" Value="24"/>
+      <Setter Property="Foreground" Value="{StaticResource Renk2Text}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="Panel" TargetType="Border">
+      <Setter Property="Background" Value="{StaticResource Surface}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource BorderDefault}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
+      <Setter Property="CornerRadius" Value="{StaticResource Radius}"/>
+      <Setter Property="Padding" Value="{StaticResource PanelPadding}"/>
+      <Setter Property="BoxShadow" Value="0 0 0 0 #00000000"/>
+    </ControlTheme>
+
+    <!-- Warning surface. Derives from Panel; the only change is the border. The
+         background stays Surface because an amber fill is banned. Put an icon or
+         the word "Warning" inside the box in addition to colour. Avalonia supports
+         BasedOn on ControlTheme too. -->
+    <ControlTheme x:Key="WarningPanel" TargetType="Border"
+                  BasedOn="{StaticResource Panel}">
+      <Setter Property="BorderBrush" Value="{StaticResource Warning50}"/>
+    </ControlTheme>
+
+    <!-- Warning text. No glow: text is never given a glow (SKILL §2), the sole
+         exception being hero. -->
+    <ControlTheme x:Key="WarningBody" TargetType="TextBlock"
+                  BasedOn="{StaticResource Body}">
+      <Setter Property="Foreground" Value="{StaticResource Warning}"/>
+    </ControlTheme>
+
+    <!-- Error text writes the text renk-2, not the fill renk-2 — the 7:1 threshold. -->
+    <ControlTheme x:Key="DangerBody" TargetType="TextBlock"
+                  BasedOn="{StaticResource Body}">
+      <Setter Property="Foreground" Value="{StaticResource DangerText}"/>
+    </ControlTheme>
+
+    <!-- THE AVALONIA COUNTERPART OF LESSON U1.
+         In WPF, giving a ScaleTransform as a Style Setter value caused two bugs:
+         the object is shared across all instances, and once frozen it cannot be
+         written. Avalonia has no Freezable and no freezing, so that trap is gone;
+         but its relative remains — a transform object given as a Setter value is
+         still shared. The avoidance is natural: this file gives NO object to
+         RenderTransform ANYWHERE. The value is always text ("scale(0.98)", "none")
+         and is resolved per element as TransformOperations. The same rule applies
+         to you: do not write
+         <Setter Property="RenderTransform"><ScaleTransform .../></Setter>. -->
+    <ControlTheme x:Key="PrimaryButton" TargetType="Button">
+      <Setter Property="Background" Value="{StaticResource Renk1}"/>
+      <Setter Property="Foreground" Value="Black"/>
+      <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
+      <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+      <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
+      <Setter Property="MinHeight" Value="{StaticResource ButtonHeight}"/>
+      <Setter Property="Padding" Value="{StaticResource ButtonPadding}"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Template">
+        <ControlTemplate TargetType="Button">
+          <!-- The glow is given to the box (SKILL §2), from derived.glow-button. In
+               BoxShadow the opacity is the colour alpha. -->
+          <Border Name="bd"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  Padding="{TemplateBinding Padding}"
+                  CornerRadius="{StaticResource Radius}"
+                  RenderTransformOrigin="50%,50%"
+                  BoxShadow="0 0 0 0 #006FB7FF">
+            <!-- Do NOT write keyframe animations for hover and press. Avalonia does
+                 not rewind a keyframe when leaving a pseudo-class; the button stays
+                 stuck on the last frame. The right tool is Transitions, which run
+                 in both directions. -->
+            <Border.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity"
+                                  Duration="{StaticResource TInstant}"
+                                  Easing="{StaticResource EOut}"/>
+                <TransformOperationsTransition Property="RenderTransform"
+                                               Duration="{StaticResource TInstant}"
+                                               Easing="{StaticResource EOut}"/>
+              </Transitions>
+            </Border.Transitions>
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+
+      <!-- Because Transitions are bidirectional, WPF's EIn/EOut split collapses to
+           a single Easing. Separate curves for entry and exit are not possible; an
+           accepted simplification, noted in the contract's Output section. -->
+      <Style Selector="^:pointerover /template/ Border#bd">
+        <Setter Property="RenderTransform" Value="scale(1.02)"/>
+      </Style>
+
+      <Style Selector="^:pressed /template/ Border#bd">
+        <Setter Property="RenderTransform" Value="scale(0.98)"/>
+      </Style>
+
+      <Style Selector="^:disabled /template/ Border#bd">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Disabled}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
+        <Setter Property="BoxShadow" Value="none"/>
+      </Style>
+      <Style Selector="^:disabled">
+        <Setter Property="Foreground" Value="{StaticResource Disabled}"/>
+        <Setter Property="Cursor" Value="No"/>
+      </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+      <Setter Property="Background" Value="{StaticResource DangerText}"/>
+      <Setter Property="Foreground" Value="{StaticResource OnDangerText}"/>
+    </ControlTheme>
+
+  </Styles.Resources>
+
+  <Style Selector=":is(Window)">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
+  </Style>
+
+  <!-- FOCUS RING, application wide.
+       In WPF this was done with a style keyed on
+       {x:Static SystemParameters.FocusVisualStyleKey}; Avalonia has no such key,
+       its counterpart is the FocusAdorner property on Control. Avalonia already
+       draws the ring only in keyboard modality, so the CSS :focus-visible
+       behaviour comes for free.
+       Geometry from shape.r, shape.focus-offset and shape.focus-w: the inner layer
+       sits 1 DIP outside the element, the outer layer focus-offset + 1 outside. -->
+  <Style Selector="Control">
+    <Setter Property="FocusAdorner">
+      <FocusAdornerTemplate>
+        <Panel Margin="-5" UseLayoutRounding="True">
+          <Rectangle Margin="4" RadiusX="4" RadiusY="4"
+                     Stroke="#FF000000" StrokeThickness="{StaticResource FocusWidth}"/>
+          <Rectangle Margin="2" RadiusX="6" RadiusY="6"
+                     Stroke="#FF6FB7FF" StrokeThickness="{StaticResource FocusWidth}"/>
+        </Panel>
+      </FocusAdornerTemplate>
+    </Setter>
+  </Style>
+
+  <!-- WINDOW SHELL. The Window template's content host paints AppBackground and
+       the shape.window-edge border, so every window gets the background without
+       markup. The overlay (grid lines or halo glows) is drawn by an EMPTY
+       <Panel Classes="appbg"/> behind the content as a sibling. -->
+  <Style Selector=":is(Window) /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource AppBackground}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource WindowEdge}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource WindowRadius}"/>
+  </Style>
+
+  <Style Selector="Panel.appbg">
+    <Setter Property="Background" Value="{StaticResource AppBackgroundOverlay}"/>
+    <Setter Property="IsHitTestVisible" Value="False"/>
+  </Style>
+
+  <!-- SCROLLBARS, metric.scrollbar-style fade. -->
+  <Style Selector="ScrollBar">
+    <Setter Property="Background" Value="{StaticResource ScrollbarTrack}"/>
+    <Setter Property="MinWidth" Value="0"/>
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" CornerRadius="{StaticResource ScrollbarThumbRadius}">
+          <Track Name="track"
+                 Minimum="{TemplateBinding Minimum}"
+                 Maximum="{TemplateBinding Maximum}"
+                 Value="{TemplateBinding Value, Mode=TwoWay}"
+                 ViewportSize="{TemplateBinding ViewportSize}"
+                 Orientation="{TemplateBinding Orientation}">
+            <Thumb Name="thumb"/>
+          </Track>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="ScrollBar:vertical">
+    <Setter Property="Width" Value="{StaticResource ScrollbarThickness}"/>
+  </Style>
+  <Style Selector="ScrollBar:vertical /template/ Track#track">
+    <Setter Property="IsDirectionReversed" Value="True"/>
+  </Style>
+  <Style Selector="ScrollBar:horizontal">
+    <Setter Property="Height" Value="{StaticResource ScrollbarThickness}"/>
+  </Style>
+  <Style Selector="ScrollBar /template/ Thumb#thumb">
+    <Setter Property="Background" Value="{StaticResource ScrollbarThumb}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource ScrollbarThumbRadius}"/>
+    <Setter Property="Margin" Value="{StaticResource ScrollbarThumbInset}"/>
+    <Setter Property="Opacity" Value="0"/>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"/>
+      </ControlTemplate>
+    </Setter>
+    <Setter Property="Transitions">
+      <Transitions>
+          <BrushTransition Property="Background" Duration="{StaticResource TInstant}" Easing="{StaticResource EOut}"/>
+          <DoubleTransition Property="Opacity" Duration="{StaticResource TFadeOut}" Easing="{StaticResource EOut}"/>
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="ScrollBar /template/ Thumb#thumb:pointerover">
+    <Setter Property="Background" Value="{StaticResource ScrollbarThumbHover}"/>
+  </Style>
+  <Style Selector="ScrollBar /template/ Thumb#thumb:pressed">
+    <Setter Property="Background" Value="{StaticResource ScrollbarThumbHover}"/>
+  </Style>
+  <Style Selector="ScrollViewer:pointerover /template/ ScrollBar /template/ Thumb#thumb">
+    <Setter Property="Opacity" Value="1"/>
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Background" Duration="{StaticResource TInstant}" Easing="{StaticResource EOut}"/>
+        <DoubleTransition Property="Opacity" Duration="{StaticResource TFast}" Easing="{StaticResource EOut}"/>
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <!-- REDUCED MOTION, applied in the template.
+       A rule written in a file that the template does not apply is this standard's
+       sneakiest class of bug (motion.md M4); that is exactly what happened on the
+       WPF side. Avalonia has no ready API, so the mechanism is:
+
+         On window open, read the reduced-motion preference.
+         If the preference is OFF, add the "anim" class to the Window; if ON, DO NOT.
+
+       The class lives in one place, on the window itself; the rules below look at
+       it. The reading code is in references/avalonia.md, ready to copy.
+       Without the "anim" class two things fall at once:
+         1) The window background rotation never starts.
+         2) The rule below cancels the press scale.
+       The opacity transition remains; the interface is not lifeless, but it does
+       not make you dizzy (M4). -->
+  <Style Selector="Window:not(.anim) Button:pressed /template/ Border#bd">
+    <Setter Property="RenderTransform" Value="none"/>
+  </Style>
+
+  <!-- The same cancellation for signature chips (Signature.axaml, Classes="sigchip").
+       The rule lives here because Signature.axaml's own Styles collection sees only
+       its own subtree, not the Window above it. -->
+  <Style Selector="Window:not(.anim) Button.sigchip:pointerover /template/ Border#bd">
+    <Setter Property="RenderTransform" Value="none"/>
+  </Style>
+
+</Styles>

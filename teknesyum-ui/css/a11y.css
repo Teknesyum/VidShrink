@@ -1,0 +1,74 @@
+
+
+.tk-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tk-sr-only-focusable:focus,
+.tk-sr-only-focusable:focus-within {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  white-space: normal;
+}
+
+.tk-live:empty {
+  display: block;
+  min-height: 0;
+}
+
+/* ==========================================================================
+   3 · forced-colors — neon sisteme teslim edilir
+   ========================================================================== */
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: var(--tk-focus-w) solid Highlight;
+    outline-offset: var(--tk-focus-offset);
+    box-shadow: none;
+  }
+
+  .tk-hero,
+  .tk-btn,
+  .tk-panel {
+    filter: none;
+    box-shadow: none;
+  }
+
+  .tk-btn:disabled {
+    color: GrayText;
+    border-color: GrayText;
+    opacity: 1;
+  }
+
+  .tk-dot-on {
+    background: CanvasText;
+  }
+  .tk-dot-off {
+    background: transparent;
+    border-color: CanvasText;
+  }
+
+  body {
+    background: Canvas;
+    animation: none;
+  }
+}
+
+.tk-color-swatch {
+  forced-color-adjust: none;
+}

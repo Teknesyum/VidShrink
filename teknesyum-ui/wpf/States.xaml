@@ -1,0 +1,462 @@
+<!-- Teknesyum Neon - WPF state layer: toggle, slider, value cell, icon button.
+     Added to App.xaml > Application.Resources > MergedDictionaries AFTER Theme.xaml;
+     it reads every brush, duration and font resource from there and has no colour of
+     its own. Rationale, measurements and exemptions: references/states.md.
+
+     WHY A FULL TEMPLATE: Theme.xaml has NO toggle or slider style at all. On the web the
+     state layer sits on top of existing classes, but in WPF there is no base to extend,
+     so the measurements live here too. They match components.md exactly: track 44x24,
+     thumb 16, cell 40x40, icon button 32x32. There is one radius (6 DIP); the circle
+     exception is only the toggle thumb and the slider thumb.
+
+     Five states are complete on every control: static, hover, focus, pressed, disabled.
+     Hover is nowhere the only carrier; its focus twin writes the same value. The second
+     carrier of the pressed state is colour; in WPF the reduced-motion setting does not
+     drop a ScaleTransform, but the rule was kept as is for parity.
+
+     A XAML comment cannot contain a double hyphen; ranges are written with "to" or a
+     single hyphen. -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ======================================================================
+       1 · Toggle - five states
+       ====================================================================== -->
+
+  <!-- The grey of the OFF state is the Disabled brush, and this is the ONLY exception to
+       the single-grey rule (states.md §4). COLOUR IS NOT what separates off from
+       disabled: a disabled control carries Cursor="No", ToolTip and
+       AutomationProperties.HelpText; an off one does not. Giving a disabled toggle a
+       ToolTip is therefore mandatory, not a choice. -->
+  <Style x:Key="TkToggle" TargetType="ToggleButton">
+    <Setter Property="Width" Value="44"/>
+    <Setter Property="Height" Value="24"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Background" Value="{StaticResource AppBg}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource Disabled}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Border x:Name="track"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="12"
+                  RenderTransformOrigin="0.5,0.5"
+                  SnapsToDevicePixels="True">
+            <Border.RenderTransform>
+              <ScaleTransform ScaleX="1" ScaleY="1"/>
+            </Border.RenderTransform>
+            <Border x:Name="thumb" Width="16" Height="16" CornerRadius="8"
+                    HorizontalAlignment="Left" Margin="3,0,0,0"
+                    Background="{StaticResource Disabled}">
+              <Border.RenderTransform>
+                <TranslateTransform X="0"/>
+              </Border.RenderTransform>
+            </Border>
+          </Border>
+          <ControlTemplate.Triggers>
+
+            <!-- static, on. The thumb movement is never left without a transition (SKILL §5.4). -->
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="track" Property="Background" Value="{StaticResource Renk1x30}"/>
+              <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource Renk1x60}"/>
+              <Setter TargetName="thumb" Property="Background" Value="{StaticResource Renk1}"/>
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="thumb" To="20"
+                                     Duration="{StaticResource TInstant}"
+                                     EasingFunction="{StaticResource EOut}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="thumb" To="0"
+                                     Duration="{StaticResource TInstant}"
+                                     EasingFunction="{StaticResource EIn}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
+            </Trigger>
+
+            <!-- hover. Measured: BorderStrong on the surface is 5.49:1. -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsMouseOver" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource BorderStrong}"/>
+            </MultiTrigger>
+
+            <!-- focus. Hover's twin: the same border value. The ring is drawn by FocusVisualStyle
+                 (Theme.xaml, two layers, no transition). Hover cannot be the only carrier. -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsKeyboardFocused" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource BorderStrong}"/>
+            </MultiTrigger>
+
+            <!-- pressed. The second carrier is the border; scale is never left on its own. -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsPressed" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource BorderStrong}"/>
+              <MultiTrigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="track" To="{StaticResource ScalePress}"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="track" To="{StaticResource ScalePress}"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </MultiTrigger.EnterActions>
+              <MultiTrigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="track" To="1"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="track" To="1"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </MultiTrigger.ExitActions>
+            </MultiTrigger>
+
+            <!-- disabled. Last, so it overrides the hover and pressed rules. Measured: 4.12:1 on
+                 the surface, 4.35:1 on the black track. Opacity NEVER CHANGES. -->
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="track" Property="Background" Value="Transparent"/>
+              <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource Disabled}"/>
+              <Setter TargetName="thumb" Property="Background" Value="{StaticResource Disabled}"/>
+              <Setter Property="Cursor" Value="No"/>
+            </Trigger>
+
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- ======================================================================
+       2 · Slider - five states
+       ====================================================================== -->
+
+  <!-- The static track border is BorderDecorative (2.14:1) and is DELIBERATELY below 3:1:
+       the static carrier is not the track but the thumb and the mono value to its right.
+       Hover and focus raise the track to 4.11. -->
+  <Style x:Key="TkSliderThumb" TargetType="Thumb">
+    <Setter Property="Width" Value="16"/>
+    <Setter Property="Height" Value="16"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Thumb">
+          <Border x:Name="thumb" Width="16" Height="16" CornerRadius="8"
+                  Background="{StaticResource Renk1}"/>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="thumb" Property="Background" Value="{StaticResource Disabled}"/>
+              <Setter Property="Cursor" Value="No"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="TkSlider" TargetType="Slider">
+    <Setter Property="MinHeight" Value="{StaticResource TargetMin}"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="IsMoveToPointEnabled" Value="True"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Slider">
+          <Grid>
+            <Border x:Name="track" Height="4" CornerRadius="2"
+                    VerticalAlignment="Center"
+                    Background="{StaticResource AppBg}"
+                    BorderThickness="{StaticResource BorderWidth}"
+                    BorderBrush="{StaticResource BorderDecorative}"
+                    SnapsToDevicePixels="True"/>
+            <Track x:Name="PART_Track">
+              <Track.DecreaseRepeatButton>
+                <RepeatButton Command="Slider.DecreaseLarge" Opacity="0" Focusable="False"/>
+              </Track.DecreaseRepeatButton>
+              <Track.IncreaseRepeatButton>
+                <RepeatButton Command="Slider.IncreaseLarge" Opacity="0" Focusable="False"/>
+              </Track.IncreaseRepeatButton>
+              <Track.Thumb>
+                <Thumb Style="{StaticResource TkSliderThumb}"/>
+              </Track.Thumb>
+            </Track>
+          </Grid>
+          <ControlTemplate.Triggers>
+
+            <!-- hover -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsMouseOver" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource BorderDefault}"/>
+            </MultiTrigger>
+
+            <!-- focus. Hover's twin, the same value; the ring is drawn by FocusVisualStyle.
+                 No new value. -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsKeyboardFocusWithin" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource BorderDefault}"/>
+            </MultiTrigger>
+
+            <!-- pressed, meaning dragging. WPF's Slider has no IsPressed; the drag lasts while
+                 the mouse capture is on the thumb. 5.49:1. -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsMouseCaptureWithin" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource BorderStrong}"/>
+            </MultiTrigger>
+
+            <!-- disabled. Last, so it overrides hover and drag: hover is CANCELLED. -->
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource Disabled}"/>
+              <Setter Property="Cursor" Value="No"/>
+            </Trigger>
+
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- ======================================================================
+       3 · Value cell - five states
+       ====================================================================== -->
+
+  <!-- TWO DIFFERENT THINGS, TWO DIFFERENT NAMES. TkCell is a selectable CONTROL
+       (components.md gives the cell cursor-pointer and a hover ring); TkValue is a
+       read-only DISPLAY and takes none of the five states. The distinction and its
+       rationale are in states.md §5. -->
+  <Style x:Key="TkCell" TargetType="ToggleButton">
+    <Setter Property="Width" Value="40"/>
+    <Setter Property="Height" Value="40"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{StaticResource Renk1}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Border x:Name="bd" CornerRadius="{StaticResource Radius}"
+                  Background="Transparent"
+                  BorderThickness="{StaticResource BorderWidth}"
+                  BorderBrush="Transparent"
+                  RenderTransformOrigin="0.5,0.5"
+                  SnapsToDevicePixels="True">
+            <Border.RenderTransform>
+              <ScaleTransform ScaleX="1" ScaleY="1"/>
+            </Border.RenderTransform>
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+
+            <!-- static, selected -->
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="bd" Property="Background" Value="{StaticResource Renk1x20}"/>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Renk1x50}"/>
+              <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+            </Trigger>
+
+            <!-- hover -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsMouseOver" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Renk1x50}"/>
+            </MultiTrigger>
+
+            <!-- focus. Hover's twin. -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsKeyboardFocused" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Renk1x50}"/>
+            </MultiTrigger>
+
+            <!-- pressed. The second carrier is the border. -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsPressed" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource BorderStrong}"/>
+              <MultiTrigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="{StaticResource ScalePress}"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="{StaticResource ScalePress}"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </MultiTrigger.EnterActions>
+              <MultiTrigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="1"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="1"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </MultiTrigger.ExitActions>
+            </MultiTrigger>
+
+            <!-- disabled. The hover ring is EXPLICITLY cancelled: the border returns to Disabled,
+                 the fill goes transparent, the glow is removed. 4.12:1. -->
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="bd" Property="Background" Value="Transparent"/>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Disabled}"/>
+              <Setter TargetName="bd" Property="Effect" Value="{x:Null}"/>
+              <Setter Property="Foreground" Value="{StaticResource Disabled}"/>
+              <Setter Property="Cursor" Value="No"/>
+            </Trigger>
+
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Read-only display. None of the five states apply; with Focusable off and
+       IsHitTestVisible off, hover, focus and pressed CANNOT arise. -->
+  <Style x:Key="TkValue" TargetType="TextBlock" BasedOn="{StaticResource MonoValue}">
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="IsHitTestVisible" Value="False"/>
+  </Style>
+
+  <!-- ======================================================================
+       4 · Icon button - five states
+       ====================================================================== -->
+
+  <Style x:Key="TkIconButton" TargetType="Button">
+    <Setter Property="Width" Value="32"/>
+    <Setter Property="Height" Value="32"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="bd" CornerRadius="{StaticResource Radius}"
+                  Background="Transparent"
+                  BorderThickness="{StaticResource BorderWidth}"
+                  BorderBrush="Transparent"
+                  RenderTransformOrigin="0.5,0.5"
+                  SnapsToDevicePixels="True">
+            <Border.RenderTransform>
+              <ScaleTransform ScaleX="1" ScaleY="1"/>
+            </Border.RenderTransform>
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+
+            <!-- hover: fill renk-2 /10 (1.06), border renk-2 /50 (2.17), text OnRenk2x10: Renk2Text on it is 6.89:1 -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsMouseOver" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="bd" Property="Background" Value="{StaticResource Renk2x10}"/>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Renk2x50}"/>
+              <Setter Property="Foreground" Value="{StaticResource OnRenk2x10}"/>
+            </MultiTrigger>
+
+            <!-- focus: hover's twin, the same three values -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsKeyboardFocused" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="bd" Property="Background" Value="{StaticResource Renk2x10}"/>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Renk2x50}"/>
+              <Setter Property="Foreground" Value="{StaticResource OnRenk2x10}"/>
+            </MultiTrigger>
+
+            <!-- pressed: fill /10 to /30 (1.06 to 1.42), border /50 to FULL renk-2 (2.17 to 6.11).
+                 The border carries the jump, not scale. -->
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsPressed" Value="True"/>
+                <Condition Property="IsEnabled" Value="True"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="bd" Property="Background" Value="{StaticResource Renk2x30}"/>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Renk2}"/>
+              <Setter Property="Foreground" Value="{StaticResource OnRenk2x30}"/>
+              <MultiTrigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="{StaticResource ScalePress}"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="{StaticResource ScalePress}"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </MultiTrigger.EnterActions>
+              <MultiTrigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="1"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                    <DoubleAnimation Storyboard.TargetName="bd" To="1"
+                                     Duration="{StaticResource TInstant}"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </MultiTrigger.ExitActions>
+            </MultiTrigger>
+
+            <!-- disabled. 4.12:1. ToolTip is mandatory (SKILL §2). -->
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="bd" Property="Background" Value="Transparent"/>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Disabled}"/>
+              <Setter TargetName="bd" Property="Effect" Value="{x:Null}"/>
+              <Setter Property="Foreground" Value="{StaticResource Disabled}"/>
+              <Setter Property="Cursor" Value="No"/>
+            </Trigger>
+
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+</ResourceDictionary>

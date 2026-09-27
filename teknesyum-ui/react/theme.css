@@ -1,0 +1,455 @@
+/* Teknesyum Neon — single source. Do not override these values in a project. */
+
+@theme {
+  --color-neon-renk-1: #6fb7ff;
+  --color-neon-renk-2: #cba7d2;
+  --color-neon-renk-3: #c3a3ff;
+  --color-neon-success: #66f09a;
+  --color-renk-2-text: #fa8cff;
+  --color-renk-3-text: #ac7fff;
+  --color-surface: #000000;
+  --color-dark-glass: rgba(15, 17, 23, 0.9);
+
+  /* Semantic role layer — Tailwind side. This and the `--tk-*` layer are TWO
+     SEPARATE layers; updating one and leaving the other strands a helper class
+     like `bg-danger` on an old hex. Walk both together; the audit measures their
+     equality.
+     A role's Tailwind name carries the role name, not the brand name:
+     `text-danger`, `border-warning`. `--color-neon-success` was not renamed
+     because `references/components.md` binds to that name; the role name lives
+     in `--tk-success`. */
+  --color-danger: #cba7d2;
+  --color-danger-text: #fa8cff;
+  --color-warning: #ffd24d;
+
+  /* The chain's only source is SKILL §3; the order here matches the order there.
+     Atkinson Hyperlegible Next is the default and is embedded in the project, not
+     assumed present on the system. Without embedding the chain falls back to
+     Segoe UI — that is not an acceptance, it is a gap; embedding is part of
+     delivery. */
+  --font-sans: 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: Cascadia Mono, Consolas, ui-monospace, 'Courier New', monospace;
+}
+
+:root {
+  --tk-renk-1: #6fb7ff;
+  --tk-renk-2: #cba7d2;
+  --tk-renk-3: #c3a3ff;
+  --tk-success: #66f09a;
+  --tk-surface: #000000;
+  --tk-bg-rotate: 48s;
+  --tk-bg-from: #000000;
+  --tk-bg-to: #000000;
+  --tk-bg: var(--tk-surface);
+  --tk-bg-type: flat;
+  --tk-glass: rgba(15, 17, 23, 0.9);
+
+  --tk-renk-2-text: #fa8cff;
+  --tk-renk-3-text: #ac7fff;
+
+  /* --- semantic role layer (SKILL §2) ---
+     THE ROLE WINS. Every component that reports state — error text, form
+     validation, warning box, status dot, danger button — writes this layer.
+     Brand and decoration (glow, scrollbar, hero, heading) keep writing the brand
+     token. A role token follows the VALUE of a brand token, not a copy of it:
+     the hex is never hand-written, it is bound with `var()`. The one exception
+     is `--tk-warning` — it has no counterpart in the brand triad and carries its
+     own hex.
+     `--tk-success` is defined above and is already a role token; no second name
+     was given, because a single value with two names eventually diverges.
+     `--tk-info` IS DELIBERATELY ABSENT: there is no info box today and an unused
+     token is debt. If one opens it binds to renk-1 (`var(--tk-renk-1)`) and an info
+     fill is never used on the same screen as a primary button — both would be
+     renk-1 fills and the user could not tell which one is clickable. */
+  --tk-danger: var(--tk-renk-2);
+  /* The TEXT role of danger. The fill renk-2 falls below §2's 7:1 threshold as
+     text; error text therefore writes this token rather than the fill token.
+     The renk-2/renk-3 fill-vs-text split continues in the
+     role layer. */
+  --tk-danger-text: var(--tk-renk-2-text);
+
+  /* `warning #ffd24d` — WARNING SURFACE ONLY: text, border, icon.
+     No fill, no button. The constraint is the same pattern as `success`, not a
+     new one. The ban was measured: white text on an amber fill is 1.44:1 — it
+     collapses. Black text would give 14.58:1, but a pattern that permits a fill
+     reopens the text-colour argument every time; a warning surface is built from
+     text, border and icon.
+     WHAT REPLACES IT: warning text `--tk-warning` (14.58:1), border
+     `--tk-warning-border` (3.96:1 on `#000000` — clears 1.4.11's 3:1 threshold;
+     renk-2 /50 at 3.02 and renk-3 /50 at 3.01 did NOT carry this rung, amber does),
+     icon the same colour. If an action is needed the button is primary (renk-1) or
+     `danger` (renk-2) — the warning colour never enters a button.
+     COLOUR ALONE CARRIES NO MEANING, amber included from the start: amber does
+     not separate from `success` under protanopia, ΔE2000 15.2
+     A warning row carries an icon or text in
+     addition to colour — no exceptions.
+     CAVEAT: the `warning` hex is subject to the `U9` ΔE measurement. If it comes
+     out badly, these two lines are what change; the role name and the constraint
+     do not. */
+  --tk-warning: #ffd24d;
+  --tk-warning-border: rgba(255, 210, 77, 0.5);
+
+  --tk-text: #ffffff;
+  --tk-text-label: #6fb7ff;
+  /* A disabled control is exempt from 7:1 (SKILL §2) and that exemption has a
+     price: a colour-blind user cannot see the grey. So `--tk-disabled` is never
+     used alone — every disabled control carries a marker in addition to the grey:
+     `title`/`ToolTip` text is mandatory, plus `cursor: not-allowed` and, where
+     possible, an icon. A merely dimmed control is an incomplete delivery. */
+  --tk-disabled: #8a8f9a;
+
+  /* On pairs: the text colour each fill takes, measured by generate.js at 7:1
+     after compositing a translucent fill over surface. A fill with no on pair
+     carries no text. */
+  --tk-on-renk-1: #000000;
+  --tk-on-renk-2: #000000;
+  --tk-on-renk-3: #000000;
+  --tk-on-success: #000000;
+  --tk-on-danger: #000000;
+  --tk-on-danger-text: #000000;
+  --tk-on-panel: #ffffff;
+  --tk-on-glass: #ffffff;
+  --tk-on-renk-1-10: #ffffff;
+  --tk-on-renk-1-20: #ffffff;
+  --tk-on-renk-1-30: #ffffff;
+  --tk-on-renk-1-50: #ffffff;
+  --tk-on-renk-2-10: #ffffff;
+  --tk-on-renk-2-20: #ffffff;
+  --tk-on-renk-2-30: #ffffff;
+  --tk-on-renk-3-10: #ffffff;
+  --tk-on-renk-3-20: #ffffff;
+  --tk-on-renk-3-30: #ffffff;
+
+  --tk-border: rgba(111, 183, 255, 0.55);
+  --tk-border-strong: rgba(111, 183, 255, 0.7);
+  --tk-border-decorative: rgba(111, 183, 255, 0.2);
+
+  /* There is one radius: 6px. The conflict was closed on 2026-08-23 in favour of
+     `layout.md` — a rounded rectangle takes the smaller corner (SKILL §5). The
+     old 16/12/8/6 scale was removed; the four names below remain for backward
+     compatibility and all point at the same single value. The one exception is
+     the circle (`?` badge, slider thumb, status dot) — there, `border-radius: 50%`. */
+  --tk-r: 3px;
+  --tk-r-box: var(--tk-r);
+  --tk-r-btn: var(--tk-r);
+  --tk-r-cell: var(--tk-r);
+  --tk-r-chip: var(--tk-r);
+
+  /* Type scale — 1.25 major third, five steps. Do not add an intermediate size;
+     if one is needed, the scale itself is up for discussion, not a single use
+     site. */
+  --tk-fs-1: 14px;
+  --tk-fs-2: 16px;
+  --tk-fs-3: 20px;
+  --tk-fs-4: 24px;
+  --tk-fs-5: 32px;
+
+  --tk-lh-body: 1.6;
+  --tk-lh-heading: 1.25;
+  --tk-lh-mono: 1.5;
+  --tk-measure: 65ch;
+
+  --tk-tr-label: 0.08em;
+  --tk-tr-h3: 0.02em;
+  --tk-tr-h2: 0em;
+  --tk-tr-hero: -0.015em;
+
+  /* 700 is forbidden outside hero (SKILL §3); hierarchy is carried by size. */
+  --tk-fw-body: 400;
+  --tk-fw-semi: 600;
+  --tk-fw-hero: 800;
+
+  /* Spacing ladder. Everything below it is a reference, not a second
+     measurement: a panel's padding IS step 5, it is not "24 by coincidence". */
+  --tk-sp-1: 4px;
+  --tk-sp-2: 8px;
+  --tk-sp-3: 12px;
+  --tk-sp-4: 16px;
+  --tk-sp-5: 24px;
+  --tk-panel-padding: var(--tk-sp-5);
+  --tk-section-gap: var(--tk-sp-5);
+  --tk-row-gap: var(--tk-sp-3);
+  --tk-field-gap: var(--tk-sp-2);
+  --tk-field-stack: var(--tk-sp-4);
+  --tk-input-padding-x: var(--tk-sp-3);
+  --tk-toast-inset: var(--tk-sp-5);
+  --tk-toast-gap: var(--tk-sp-3);
+
+  --tk-r-window: 3px;
+  --tk-border-w: 1px;
+  --tk-window-edge: transparent;
+  --tk-glass-blur: 0px;
+  /* The focus ring is two layers and never animates (SKILL §5.3). */
+  --tk-focus-w: 2px;
+  --tk-focus-offset: 2px;
+
+  --tk-target-min: 24px;
+  --tk-scrollbar-w: 3px;
+  /* The title bar height is a range in the source, not one number; both ends
+     are tokens so a project can pick inside them and stay checkable. */
+  --tk-titlebar-h-min: 28px;
+  --tk-titlebar-h-max: 28px;
+  --tk-sidebar-w: 240px;
+  --tk-sidebar-collapsed-w: 48px;
+  --tk-input-h: 40px;
+  --tk-btn-h: 28px;
+  --tk-btn-px: 10px;
+  --tk-scrollbar-style: fade;
+  --tk-scroll-behavior: auto;
+  --tk-thumb: rgba(172, 127, 255, 1);
+  --tk-thumb-hover: rgba(203, 167, 210, 1);
+  --tk-track: rgba(0, 0, 0, 0.3);
+  --tk-modal-w: min(560px, 90vw);
+  --tk-modal-max-ratio: 0.85;
+  --tk-toast-w: min(360px, calc(100vw - var(--tk-sp-5) * 2));
+  --tk-toast-max: 3;
+  /* Danger toasts never auto-dismiss; this life belongs to the others. */
+  --tk-toast-life: 6000ms;
+  --tk-icon-1: 14px;
+  --tk-icon-2: 16px;
+  --tk-icon-3: 22px;
+  --tk-icon-4: 56px;
+
+  --tk-scale-hover: 1.02;
+  --tk-scale-press: 0.98;
+  --tk-scale-icon-hover: 1.1;
+  --tk-entry-offset: var(--tk-sp-2);
+  --tk-overlay-offset: var(--tk-sp-1);
+  --tk-stagger: 40ms;
+  --tk-stagger-max: 6;
+  /* An outward glow needs this much clear space; otherwise use a /50 border. */
+  --tk-glow-margin: var(--tk-sp-5);
+  --tk-loading-loop-min: 1400ms;
+  --tk-frame-budget: 16ms;
+  --tk-bg-rotate-min: 40000ms;
+  --tk-bg-sweep-max: 20deg;
+  --tk-label-brand-color: var(--tk-renk-1);
+  --tk-label-brand-fs: var(--tk-fs-1);
+  --tk-label-brand-fw: var(--tk-fw-semi);
+  --tk-label-support-color: var(--tk-renk-3-text);
+  --tk-label-support-fs: var(--tk-fs-1);
+  --tk-label-support-fw: var(--tk-fw-semi);
+  --tk-label-site-color: var(--tk-renk-1);
+  --tk-label-site-fs: var(--tk-fs-1);
+  --tk-label-site-fw: var(--tk-fw-semi);
+  --tk-label-update-color: var(--tk-text);
+  --tk-label-update-fs: var(--tk-fs-1);
+  --tk-label-update-fw: var(--tk-fw-semi);
+  --tk-label-sync-color: var(--tk-text);
+  --tk-label-sync-fs: var(--tk-fs-1);
+  --tk-label-sync-fw: var(--tk-fw-semi);
+  --tk-label-title-color: var(--tk-text);
+  --tk-label-title-fs: var(--tk-fs-3);
+  --tk-label-title-fw: var(--tk-fw-semi);
+  --tk-label-title-accent: var(--tk-renk-2-text);
+
+  --tk-t-instant: 40ms;
+  --tk-t-fast: 80ms;
+  --tk-t-base: 150ms;
+  --tk-t-slow: 240ms;
+  --tk-e-out: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --tk-e-in: cubic-bezier(0.4, 0, 1, 1);
+  --tk-e-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --tk-e-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --tk-e-fast-slow-fast: cubic-bezier(0.15, 0.85, 0.85, 0.15);
+  --tk-e-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --tk-e-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+  --tk-e-linear: cubic-bezier(0, 0, 1, 1);
+
+  --tk-glow-renk-1: 0 0 0px rgba(111, 183, 255, 0);
+  --tk-glow-renk-2: 0 0 0px rgba(203, 167, 210, 0);
+  --tk-glow-renk-3: 0 0 0px rgba(195, 163, 255, 0);
+  /* The hero glow is one token and gives the same intensity on both platforms:
+     blur 8, opacity 0.8. Its XAML counterpart is `HeroGlow` (Theme.xaml). */
+  --tk-glow-hero: 0 0 0px rgba(111, 183, 255, 0);
+  /* A shadow is not a glow: it separates the panel from the background gradient
+     and takes no brand colour. */
+  --tk-shadow-panel: 0 0 0px rgba(0, 0, 0, 0);
+  --tk-scrim: rgba(0, 0, 0, 0.6);
+}
+
+@property --tk-bg-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 160deg;
+}
+
+@keyframes tk-bg-rotate {
+  from { --tk-bg-angle: 150deg; }
+  to   { --tk-bg-angle: 170deg; }
+}
+
+html { scroll-behavior: var(--tk-scroll-behavior); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans, 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif);
+  font-size: var(--tk-fs-2);
+  line-height: var(--tk-lh-body);
+  /* Numbers inside a sentence stay sans but align; data numbers go to `.tk-mono` (§3). */
+  font-variant-numeric: tabular-nums;
+  color: var(--tk-text);
+  background: var(--tk-bg);
+  background-attachment: fixed;
+}
+
+/* --- typography --- */
+.tk-h2 {
+  font-size: var(--tk-fs-4); font-weight: 600;
+  line-height: var(--tk-lh-heading); letter-spacing: var(--tk-tr-h2);
+  color: var(--tk-renk-1);
+}
+.tk-h3 {
+  font-size: var(--tk-fs-3); font-weight: 600;
+  line-height: var(--tk-lh-heading); letter-spacing: var(--tk-tr-h3);
+  color: var(--tk-text-label);
+}
+.tk-label {
+  font-size: var(--tk-fs-1); font-weight: 600;
+  line-height: var(--tk-lh-heading); letter-spacing: var(--tk-tr-label);
+  color: var(--tk-text-label);
+}
+.tk-mono {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--tk-fs-2); font-weight: 600;
+  line-height: var(--tk-lh-mono);
+  color: var(--tk-renk-2-text);
+}
+.tk-hero {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--tk-fs-5); font-weight: var(--tk-fw-hero);
+  line-height: var(--tk-lh-heading); letter-spacing: var(--tk-tr-hero);
+  color: var(--tk-renk-1); filter: drop-shadow(var(--tk-glow-hero));
+}
+.tk-hint {
+  font-size: var(--tk-fs-1); line-height: var(--tk-lh-body); color: var(--tk-text);
+}
+/* Readable line length. A long block of text is wrapped in this class (§3.2). */
+.tk-prose { max-width: var(--tk-measure); line-height: var(--tk-lh-body); }
+/* The second signal separating h3 from a label — when size is not enough (§3). */
+.tk-h3-rule { border-bottom: var(--tk-border-w) solid var(--tk-border-decorative); padding-bottom: var(--tk-sp-2); }
+
+/* --- surfaces --- */
+.tk-panel {
+  background: rgba(0, 0, 0, 0.96);
+  backdrop-filter: blur(var(--tk-glass-blur));
+  border: var(--tk-border-w) solid var(--tk-border);
+  border-radius: var(--tk-r);
+  padding: var(--tk-panel-padding);
+  box-shadow: var(--tk-shadow-panel);
+}
+.tk-window { border: var(--tk-border-w) solid var(--tk-window-edge); border-radius: var(--tk-r-window); }
+.tk-divider { border: 0; border-top: var(--tk-border-w) solid var(--tk-border-decorative); margin: var(--tk-section-gap) 0; }
+
+/* --- focus: two layers, no transition, keyboard modality only --- */
+:focus-visible {
+  outline: var(--tk-focus-w) solid var(--tk-renk-1);
+  outline-offset: var(--tk-focus-offset);
+  box-shadow: 0 0 0 var(--tk-focus-w) #000000;
+  transition: none;
+}
+:focus:not(:focus-visible) { outline: none; }
+[data-tk-scroll-target] { scroll-margin-top: var(--tk-titlebar-h-max); scroll-margin-bottom: var(--tk-sp-5); }
+
+/* --- buttons --- */
+.tk-btn {
+  font-weight: 600; letter-spacing: var(--tk-tr-h2);
+  font-size: var(--tk-fs-2); line-height: var(--tk-lh-heading);
+  min-height: var(--tk-btn-h); padding: 0 var(--tk-btn-px); border-radius: var(--tk-r);
+  border: var(--tk-border-w) solid transparent; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--tk-sp-3);
+  transition: transform var(--tk-t-instant) var(--tk-e-out),
+              background-color var(--tk-t-instant) var(--tk-e-out),
+              border-color var(--tk-t-instant) var(--tk-e-out);
+}
+.tk-btn:hover { transform: scale(var(--tk-scale-hover)); }
+/* The pressed state takes a SECOND carrier: under reduced motion `theme.css` stops the
+   transition, so `scale` snaps without travel and 0.98 barely reads. The border carries it.
+   Reduced motion never writes `transform: none`: positioning transforms
+   (a modal centred with translate(-50%, -50%)) must stay where they are. */
+.tk-btn:active {
+  transform: scale(var(--tk-scale-press));
+  border-color: var(--tk-border-strong);
+  transition-duration: var(--tk-t-instant);
+}
+.tk-btn-primary   { background: var(--tk-renk-1);   color: var(--tk-on-renk-1); box-shadow: var(--tk-glow-renk-1); }
+/* Hover is carried by scale alone: black on renk-1 /80 measured 6.43:1, below 7:1. */
+/* The class name was already in role language; its contents moved to the role
+   token too. The glow stays on the brand token — a glow is decoration, it does
+   not report state. The fill is the danger TEXT cut: black on the fill renk-2 is
+   10.00:1, below 7:1, so renk-2 carries no text (tokens: on.danger); black on
+   danger-text is 10.26:1. Hover is carried by scale alone. */
+.tk-btn-danger    { background: var(--tk-danger-text); color: var(--tk-on-danger-text); box-shadow: var(--tk-glow-renk-2); }
+/* A tint and its own hue never meet on one surface (ui-duzeni): the ghost keeps its
+   colour in the border and writes body text. Hover adds the renk-3 /10 fill under its
+   on pair. */
+.tk-btn-ghost {
+  background: transparent;
+  border-color: var(--tk-renk-3-text);
+  color: var(--tk-text);
+}
+.tk-btn-ghost:hover { background: rgba(195, 163, 255, 0.1); color: var(--tk-on-renk-3-10); }
+/* The disabled state does not end at dimming: `title` text is mandatory (§2). */
+.tk-btn:disabled {
+  color: var(--tk-disabled);
+  background: transparent;
+  border-color: var(--tk-disabled);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- scrollbar --- */
+::-webkit-scrollbar { width: var(--tk-scrollbar-w); height: var(--tk-scrollbar-w); }
+::-webkit-scrollbar-track { background: var(--tk-track); border-radius: var(--tk-r); }
+::-webkit-scrollbar-thumb {
+  background: var(--tk-thumb); border-radius: var(--tk-r);
+  /* No glow on the scrollbar: a halo on a thin moving bar smears and reads as noise
+     (user feedback, 2026-09-26). Only the fill colour transitions. */
+  transition: background-color var(--tk-t-instant) var(--tk-e-out);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tk-thumb-hover);
+}
+@property --tk-thumb-a { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
+* { --tk-thumb-a: 0%; transition: --tk-thumb-a calc(var(--tk-t-slow) * 2) var(--tk-e-out); }
+*:is(:hover, [data-tk-scrolling]) { --tk-thumb-a: 100%; transition-duration: var(--tk-t-fast); }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--tk-thumb) var(--tk-thumb-a), transparent); }
+
+
+/* --- title bar and signature (§4) --- */
+.tk-titlebar { -webkit-app-region: drag; }
+.tk-titlebar a,
+.tk-titlebar button,
+.tk-no-drag { -webkit-app-region: no-drag; }
+
+/* --- status dot: colour alone carries no meaning (WCAG 1.4.1, §2) --- */
+.tk-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.tk-dot-on  { background: var(--tk-success); border: 0; }
+/* It reports state, not brand — so it writes a role token. The shape difference
+   (filled circle / ring) is the second carrier beside colour; strip the colour
+   and the information still stands. */
+.tk-dot-off { background: transparent; border: 2px solid var(--tk-danger); }
+
+/* --- warning surface (§2) ---
+   Used as a modifier on `.tk-panel`: <div class="tk-panel tk-warn">.
+   NO FILL — the panel background stays `surface`; what changes is the border and
+   text colour. The box must carry an icon or the word "Warning" in addition to
+   colour; amber does not separate from success under protanopia (measurement above). */
+.tk-warn { border-color: var(--tk-warning-border); color: var(--tk-warning); }
+/* Warning text can also stand alone, without a box. No glow: text is never given
+   a glow (§2), the sole exception being hero. */
+.tk-warn-text { color: var(--tk-warning); }
+/* Error text writes the text renk-2, not the fill renk-2 — the 7:1 threshold. */
+.tk-danger-text { color: var(--tk-danger-text); }
+
+/* --- motion: reduced-motion preference (detail: references/motion.md) --- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: opacity !important;
+    transition-duration: var(--tk-t-instant) !important;
+  }
+}

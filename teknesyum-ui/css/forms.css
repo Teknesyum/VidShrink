@@ -1,0 +1,249 @@
+
+
+.tk-input {
+  min-height: var(--tk-input-h);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--tk-sp-3);
+  font-family: var(--font-sans, 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif);
+  font-size: var(--tk-fs-2);
+  line-height: var(--tk-lh-body);
+  color: var(--tk-text);
+  background: var(--tk-surface);
+  border: var(--tk-border-w) solid var(--tk-border);
+  border-radius: var(--tk-r);
+  transition: border-color var(--tk-t-instant) var(--tk-e-out),
+              background-color var(--tk-t-instant) var(--tk-e-out);
+}
+
+.tk-input.tk-mono-input,
+.tk-input.tk-mono {
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  line-height: var(--tk-lh-mono);
+}
+.tk-input.tk-mono {
+  color: var(--tk-text);
+}
+
+.tk-input:hover:not(:disabled):not([readonly]) {
+  border-color: var(--tk-border-strong);
+}
+
+.tk-input:focus-visible {
+  border-color: var(--tk-border-strong);
+}
+
+.tk-input:active:not(:disabled):not([readonly]) {
+  border-color: var(--tk-border-strong);
+  caret-color: var(--tk-renk-2-text);
+}
+
+.tk-input {
+  caret-color: var(--tk-renk-1);
+}
+.tk-input::selection {
+  background: var(--tk-border-decorative);
+  color: var(--tk-text);
+}
+
+.tk-input-error,
+.tk-input[aria-invalid='true'] {
+  border-color: var(--tk-danger);
+}
+
+.tk-input:disabled {
+  color: var(--tk-disabled);
+  background: transparent;
+  border-color: var(--tk-disabled);
+  cursor: not-allowed;
+}
+
+.tk-input[readonly] {
+  border-color: var(--tk-border);
+  color: var(--tk-text);
+  cursor: default;
+}
+
+.tk-input::placeholder {
+  color: var(--tk-text);
+  opacity: 1;
+}
+
+.tk-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-field-gap);
+  margin-bottom: var(--tk-field-stack);
+}
+
+.tk-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tk-sp-2);
+  margin: 0;
+  font-size: var(--tk-fs-1);
+  line-height: var(--tk-lh-body);
+  color: var(--tk-danger-text);
+  text-shadow: none;
+  transition: opacity var(--tk-t-fast) var(--tk-e-out);
+}
+.tk-error[data-tk-giriyor='1'] { opacity: 0; }
+
+.tk-error-icon {
+  flex: 0 0 auto;
+  width: var(--tk-icon-2);
+  height: var(--tk-icon-2);
+  color: currentColor;
+}
+
+.tk-modal-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: grid;
+  place-items: center;
+  padding: var(--tk-sp-5);
+  transition: opacity var(--tk-t-base) var(--tk-e-out);
+}
+.tk-modal-scrim[data-tk-kapaniyor='1'] {
+  opacity: 0;
+  transition: opacity var(--tk-t-fast) var(--tk-e-in);
+}
+
+.tk-modal {
+  width: var(--tk-modal-w);
+  max-height: calc(var(--tk-modal-max-ratio) * 100vh);
+  overflow: auto;
+  transition: opacity var(--tk-t-base) var(--tk-e-out),
+              transform var(--tk-t-base) var(--tk-e-out);
+}
+.tk-modal[data-tk-giriyor='1'] {
+  opacity: 0;
+  transform: scale(var(--tk-scale-press));
+}
+.tk-modal[data-tk-kapaniyor='1'] {
+  opacity: 0;
+  transform: scale(var(--tk-scale-press));
+  transition: opacity var(--tk-t-fast) var(--tk-e-in),
+              transform var(--tk-t-fast) var(--tk-e-in);
+}
+
+.tk-modal-body {
+  max-width: var(--tk-measure);
+  line-height: var(--tk-lh-body);
+  color: var(--tk-text);
+}
+
+.tk-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tk-row-gap);
+  margin-top: var(--tk-section-gap);
+}
+
+.tk-modal-scrim[data-tk-modal='confirm'] {
+  cursor: default;
+}
+.tk-modal-scrim[data-tk-modal='info'] {
+  cursor: pointer;
+}
+.tk-modal-scrim[data-tk-modal='info'] > .tk-modal {
+  cursor: auto;
+}
+
+/* ==========================================================================
+   4 · Toast
+   ========================================================================== */
+
+.tk-toast-stack {
+  position: fixed;
+  right: var(--tk-toast-inset);
+  bottom: var(--tk-toast-inset);
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-toast-gap);
+  pointer-events: none;
+}
+
+.tk-toast-stack > .tk-toast:nth-last-child(n + 4) {
+  display: none;
+}
+
+.tk-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tk-toast-gap);
+  width: var(--tk-toast-w);
+  padding: var(--tk-sp-3);
+  color: var(--tk-text);
+  font-size: var(--tk-fs-1);
+  line-height: var(--tk-lh-body);
+  transition: opacity var(--tk-t-fast) var(--tk-e-out),
+              transform var(--tk-t-fast) var(--tk-e-out);
+  --tk-toast-timer: running;
+  animation-play-state: var(--tk-toast-timer);
+}
+.tk-toast * {
+  animation-play-state: var(--tk-toast-timer);
+}
+.tk-toast[data-tk-giriyor='1'] {
+  opacity: 0;
+  transform: translateX(var(--tk-entry-offset));
+}
+.tk-toast[data-tk-kapaniyor='1'] {
+  opacity: 0;
+  transform: translateX(var(--tk-entry-offset));
+  transition: opacity var(--tk-t-instant) var(--tk-e-in),
+              transform var(--tk-t-instant) var(--tk-e-in);
+}
+
+.tk-toast-success { border-color: var(--tk-success); }
+.tk-toast-success .tk-toast-icon,
+.tk-toast-success .tk-toast-title { color: var(--tk-success); }
+
+.tk-toast-warning { border-color: var(--tk-warning-border); }
+.tk-toast-warning .tk-toast-icon,
+.tk-toast-warning .tk-toast-title { color: var(--tk-warning); }
+
+.tk-toast-danger { border-color: var(--tk-danger); }
+.tk-toast-danger .tk-toast-icon,
+.tk-toast-danger .tk-toast-title { color: var(--tk-danger-text); }
+
+.tk-toast-icon {
+  flex: 0 0 auto;
+  width: var(--tk-icon-2);
+  height: var(--tk-icon-2);
+}
+.tk-toast-title {
+  font-weight: 600;
+  letter-spacing: var(--tk-tr-h2);
+}
+.tk-toast-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tk-toast-close {
+  flex: 0 0 auto;
+  width: var(--tk-target-min);
+  height: var(--tk-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--tk-r);
+  color: var(--tk-text);
+  cursor: pointer;
+  transition: color var(--tk-t-instant) var(--tk-e-out);
+}
+.tk-toast-close:hover { color: var(--tk-renk-1); }
+.tk-toast-close svg { width: var(--tk-icon-1); height: var(--tk-icon-1); }
+
+.tk-toast:hover,
+.tk-toast:focus-within {
+  --tk-toast-timer: paused;
+}
+

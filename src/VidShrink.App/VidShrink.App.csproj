@@ -85,4 +85,7 @@
     <Move SourceFiles="$(PublishDir)$(AssemblyName)" DestinationFiles="$(PublishDir)$(MacHostName)" />
   </Target>
 
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\Fonts\**" />
+  </ItemGroup>
 </Project>

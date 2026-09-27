@@ -1,0 +1,100 @@
+<StackPanel xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:loc="clr-namespace:Teknesyum.Localization"
+            Orientation="Horizontal" VerticalAlignment="Center">
+
+  <StackPanel.Resources>
+
+    <ControlTheme x:Key="SigChip" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="{StaticResource Radius}"/>
+      <Setter Property="Padding" Value="{StaticResource InputPadding}"/>
+      <Setter Property="MinHeight" Value="{StaticResource TargetMin}"/>
+      <Setter Property="MinWidth" Value="{StaticResource TargetMin}"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Template">
+        <ControlTemplate TargetType="Button">
+          <Panel>
+            <Border Name="bd"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    Padding="{TemplateBinding Padding}"
+                    RenderTransformOrigin="50%,50%">
+              <Border.Transitions>
+                <Transitions>
+                  <TransformOperationsTransition Property="RenderTransform"
+                                                 Duration="{StaticResource TInstant}"
+                                                 Easing="{StaticResource EOut}"/>
+                </Transitions>
+              </Border.Transitions>
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"/>
+            </Border>
+            <Border Name="ul"
+                    Height="{StaticResource FocusWidth}"
+                    VerticalAlignment="Bottom"
+                    Margin="{TemplateBinding Padding}"
+                    Background="{TemplateBinding Foreground}"
+                    RenderTransformOrigin="50%,50%"
+                    RenderTransform="scaleX(0)">
+              <Border.Transitions>
+                <Transitions>
+                  <TransformOperationsTransition Property="RenderTransform"
+                                                 Duration="{StaticResource TInstant}"
+                                                 Easing="{StaticResource EOut}"/>
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+
+      <Style Selector="^:pointerover /template/ Border#ul">
+        <Setter Property="RenderTransform" Value="scaleX(1)"/>
+      </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="SigText" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </ControlTheme>
+
+  </StackPanel.Resources>
+
+  <Button Theme="{StaticResource SigChip}" Classes="sigchip"
+          Foreground="{StaticResource LabelSupportBrush}"
+          Margin="0,0,8,0"
+          Tag="https://github.com/sponsors/Teknesyum"
+          Click="OnSignatureNavigate"
+          ToolTip.Tip="{loc:Str sig.supportTitle}">
+    <StackPanel Orientation="Horizontal">
+      <Canvas Width="12" Height="12" VerticalAlignment="Center" Margin="0,0,6,0">
+        <Path Stroke="{StaticResource LabelSupportBrush}" StrokeThickness="2"
+              StrokeJoin="Round" StrokeLineCap="Round"
+              Data="M2 4.5 H8.5 V8 A2 2 0 0 1 6.5 10 H4 A2 2 0 0 1 2 8 Z
+                    M8.5 5.5 H9.25 A1.25 1.25 0 0 1 9.25 8 H8.5
+                    M4 1.25 V2.25 M6 1.25 V2.25"/>
+      </Canvas>
+      <TextBlock Theme="{StaticResource SigText}"
+                 Foreground="{StaticResource LabelSupportBrush}" FontSize="{StaticResource LabelSupportSize}" FontWeight="{StaticResource LabelSupportWeight}"
+                 Text="{loc:Str sig.support}"/>
+    </StackPanel>
+  </Button>
+
+  <Button Theme="{StaticResource SigChip}" Classes="sigchip"
+          Foreground="{StaticResource LabelBrandBrush}"
+          Tag="https://github.com/Teknesyum"
+          Click="OnSignatureNavigate"
+          ToolTip.Tip="{loc:Str sig.brandTitle}">
+    <TextBlock Theme="{StaticResource SigText}"
+               Foreground="{StaticResource LabelBrandBrush}" FontSize="{StaticResource LabelBrandSize}" FontWeight="{StaticResource LabelBrandWeight}"
+               Text="{loc:Str sig.brand}"/>
+  </Button>
+</StackPanel>
+

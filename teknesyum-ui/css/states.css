@@ -1,0 +1,123 @@
+
+/* --- toggle ---
+   The grey of the off state is `--tk-disabled`, and this is the ONLY exception to the
+   single-grey rule (states.md §4). Colour is not what separates off from disabled: a
+   disabled control carries a cursor, `title` and `aria-disabled`; an off one does not. */
+[data-tk='toggle'] {
+  transition:
+    border-color var(--tk-t-instant) var(--tk-e-out),
+    background-color var(--tk-t-instant) var(--tk-e-out),
+    transform var(--tk-t-instant) var(--tk-e-out);
+}
+/* Hover cannot be the only carrier: its focus twin is in the same selector list.
+   Measured 5.49:1. */
+[data-tk='toggle']:hover:not(:disabled),
+[data-tk='toggle']:focus-visible:not(:disabled) {
+  border-color: var(--tk-border-strong);
+}
+/* The second carrier of the pressed state is the border: under reduced motion `theme.css`
+   stops the transition, so `scale` snaps without travel and barely reads. */
+[data-tk='toggle']:active:not(:disabled) {
+  border-color: var(--tk-border-strong);
+  transform: scale(var(--tk-scale-press));
+}
+[data-tk='toggle']:disabled {
+  border-color: var(--tk-disabled);
+  background-color: transparent;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+[data-tk='toggle']:disabled [data-tk='toggle-thumb'] {
+  background-color: var(--tk-disabled);
+}
+
+/* --- slider ---
+   The static track border is `--tk-border-decorative` (2.14:1) and is deliberately
+   below 3:1: the static carrier is not the track but the thumb and the mono value to
+   its right. Hover and focus raise the track to 4.11. */
+[data-tk='slider'] {
+  transition: border-color var(--tk-t-instant) var(--tk-e-out);
+}
+[data-tk='slider']:hover:not(:disabled),
+[data-tk='slider']:focus-visible:not(:disabled) {
+  border-color: var(--tk-border);
+}
+/* Dragging. `:active` lasts while the mouse button is held; the thumb takes no
+   `transform`. */
+[data-tk='slider']:active:not(:disabled) {
+  border-color: var(--tk-border-strong);
+}
+[data-tk='slider']:disabled {
+  border-color: var(--tk-disabled);
+  cursor: not-allowed;
+  transform: none;
+}
+[data-tk='slider']:disabled::-webkit-slider-thumb {
+  background-color: var(--tk-disabled);
+  cursor: not-allowed;
+}
+[data-tk='slider']:disabled::-moz-range-thumb {
+  background-color: var(--tk-disabled);
+  cursor: not-allowed;
+}
+
+/* --- value cell ---
+   A selectable CONTROL. The read-only display is `data-tk="value"` and takes none of
+   the five states; the distinction is written in `states.md` §5 and has no counterpart
+   in this file.
+   The hover ring is in `components.md`; its focus twin is the general two-layer ring in
+   `theme.css`, so there is NO positive hover rule here — only the disabled state and
+   its cancellation. */
+[data-tk='cell']:disabled {
+  color: var(--tk-disabled);
+  border-color: var(--tk-disabled);
+  background-color: transparent;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+/* The explicit cancellation of the hover ring. Source order is not to be trusted: a
+   rule of equal specificity can also come from the Tailwind output `components.md`
+   produces. */
+[data-tk='cell']:disabled:hover {
+  border-color: var(--tk-disabled);
+  box-shadow: none;
+  transform: none;
+}
+
+/* --- icon button ---
+   Hover and focus share a selector list: the border that appears on hover also appears
+   from the keyboard.
+   CAVEAT: these three values are also written in the icon row of `components.md`
+   "Buttons". The second source was left deliberately — `components.md` is not in this
+   contract's `owns` list; deduplication belongs to the `U10` merge. */
+[data-tk='icon-button'] {
+  transition:
+    color var(--tk-t-instant) var(--tk-e-out),
+    background-color var(--tk-t-instant) var(--tk-e-out),
+    border-color var(--tk-t-instant) var(--tk-e-out),
+    transform var(--tk-t-instant) var(--tk-e-out);
+}
+[data-tk='icon-button']:hover:not(:disabled),
+[data-tk='icon-button']:focus-visible:not(:disabled) {
+  color: var(--tk-renk-2-text);
+  background-color: color-mix(in srgb, var(--tk-renk-2) 10%, transparent);
+  border-color: color-mix(in srgb, var(--tk-renk-2) 50%, transparent);
+}
+/* Pressed: fill 1.06 → 1.42, border 2.17 → 6.11. The border carries the jump, not
+   `scale` — under reduced motion the scale snaps without travel and the border remains. */
+[data-tk='icon-button']:active:not(:disabled) {
+  color: var(--tk-renk-2-text);
+  background-color: color-mix(in srgb, var(--tk-renk-2) 30%, transparent);
+  border-color: var(--tk-renk-2);
+  transform: scale(var(--tk-scale-press));
+}
+[data-tk='icon-button']:disabled {
+  color: var(--tk-disabled);
+  background-color: transparent;
+  border-color: var(--tk-disabled);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}

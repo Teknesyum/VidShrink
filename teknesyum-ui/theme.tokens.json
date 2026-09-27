@@ -1,0 +1,312 @@
+{
+  "_": [
+    "Teknesyum Neon — the single source of truth for theme tokens.",
+    "Edit this file, then run `node ui/scripts/generate.js`; theme.css, Theme.xaml,",
+    "Theme.axaml and Palette.cs are generated from it. Never edit a generated file",
+    "by hand: the next run produces a diff and test/u11-tema.js fails.",
+    "New theme: copy this file as theme.<name>.tokens.json and fill it in, then run",
+    "`node ui/scripts/generate.js theme.<name>.tokens.json`. One file, one command.",
+    "Derived values are declarative (ref + alpha); the derivation rules (alpha byte,",
+    "gradient stops, platform formats) live in generate.js."
+  ],
+  "meta": {
+    "name": "neon",
+    "dark": true,
+    "rationale": "The public standard is plain: black, white and grey, no glow, no tuned values. It is dark only — until a second theme is defined (SKILL §1)."
+  },
+  "brand": {
+    "renk-1": {
+      "value": "#6fb7ff",
+      "rationale": "Primary brand colour: primary button fill, heading, label, focus ring."
+    },
+    "renk-2": {
+      "value": "#cba7d2",
+      "rationale": "The FILL cut of the secondary brand colour; as text it gives 10.00:1, so text work goes to renk-2-text."
+    },
+    "renk-3": {
+      "value": "#c3a3ff",
+      "rationale": "Tertiary brand colour: decoration, scrollbar, ghost button."
+    },
+    "renk-2-text": {
+      "value": "#fa8cff",
+      "rationale": "The TEXT cut of renk-2: 10.26:1 on #000000, clears §2's 7:1 threshold."
+    },
+    "renk-3-text": {
+      "value": "#ac7fff",
+      "rationale": "The TEXT cut of renk-3; the fill renk-3 does not clear the 7:1 text threshold."
+    },
+    "surface": {
+      "value": "#000000",
+      "rationale": "The dark end of the background and the panel base; every contrast measurement is against this ground."
+    },
+    "black": {
+      "value": "#000000",
+      "rationale": "The opening end of the background gradient and the inner layer of the focus ring."
+    },
+    "glass-base": {
+      "value": "#0f1117",
+      "rationale": "The base colour of the glass surface; never used alone, it lives through the glass derivation."
+    }
+  },
+  "role": {
+    "success": {
+      "value": "#66f09a",
+      "rationale": "Success role; it has no counterpart in the brand triad and carries its own hex. Renamed from NeonSuccess to a role on 2026-08-23."
+    },
+    "danger": {
+      "ref": "renk-2",
+      "rationale": "A role follows the brand's VALUE, not a copy of it; danger fill and danger button."
+    },
+    "danger-text": {
+      "ref": "renk-2-text",
+      "rationale": "Error text writes the text renk-2, not the fill renk-2 — the 7:1 threshold (10.26:1)."
+    },
+    "warning": {
+      "value": "#ffd24d",
+      "rationale": "WARNING SURFACE ONLY: text (14.58:1), border, icon. No fill, no button — white text on this fill is 1.80:1. The hex is subject to the U9 ΔE measurement."
+    },
+    "warning-border": {
+      "ref": "warning",
+      "alpha": 0.5,
+      "rationale": "3.96:1 on #000000 — clears 1.4.11's 3:1 threshold; renk-2 /50 (3.02) and renk-3 /50 (3.01) did not."
+    },
+    "text": {
+      "value": "#ffffff",
+      "rationale": "Body text. No mid greys; for secondary text the answer is not grey, it is deleting the text (SKILL §2)."
+    },
+    "text-label": {
+      "ref": "renk-1",
+      "rationale": "Label and h3 colour; bound to renk-1, not a copy of it."
+    },
+    "disabled": {
+      "value": "#8a8f9a",
+      "rationale": "The only colour exempt from 7:1 (SKILL §2); never used alone — title/ToolTip is mandatory, plus a cursor and, where possible, an icon."
+    }
+  },
+  "derived": {
+    "panel": {
+      "ref": "surface",
+      "alpha": 0.96,
+      "rationale": "Panel background; the XAML Surface brush and .tk-panel take the same value from here."
+    },
+    "glass": {
+      "ref": "glass-base",
+      "alpha": 0.9,
+      "blur": 0,
+      "rationale": "Glass surface (dark-glass); title bar and translucent layers."
+    },
+    "border": {
+      "ref": "renk-1",
+      "alpha": 0.55,
+      "rationale": "Default border."
+    },
+    "border-strong": {
+      "ref": "renk-1",
+      "alpha": 0.7,
+      "rationale": "Emphasised border."
+    },
+    "border-decorative": {
+      "ref": "renk-1",
+      "alpha": 0.2,
+      "rationale": "Decorative rule; carries no information, outside the scope of 1.4.11."
+    },
+    "tone-scale": {
+      "bases": ["renk-1", "renk-2", "renk-3"],
+      "steps": [10, 20, 30, 50, 60],
+      "rationale": "XAML/Avalonia has no var(); alpha cuts are generated as named brushes."
+    },
+    "text-scale": {
+      "bases": ["renk-2-text", "renk-3-text"],
+      "steps": [50],
+      "rationale": "Translucent brushes for the text cuts."
+    },
+    "glow": {
+      "bases": ["renk-1", "renk-2", "renk-3"],
+      "alpha": 0,
+      "blur": 0,
+      "rationale": "Box glow, off in the plain standard (alpha 0); text is never given a glow, the sole exception being hero (SKILL §2)."
+    },
+    "glow-hero": {
+      "ref": "renk-1",
+      "alpha": 0,
+      "blur": 0,
+      "rationale": "Off in the plain standard (alpha 0); a theme turns the hero glow on by raising alpha, blur 8 on both platforms."
+    },
+    "glow-button": {
+      "ref": "renk-1",
+      "alpha": 0,
+      "blur": 0,
+      "rationale": "Primary button halo, off in the plain standard (alpha 0); in BoxShadow opacity is the colour alpha (alpha × 255)."
+    },
+    "shadow-panel": {
+      "ref": "black",
+      "alpha": 0,
+      "blur": 0,
+      "rationale": "Panel drop shadow; separates the panel from the background gradient without a second border (components.md Panel)."
+    },
+    "scrim": {
+      "ref": "black",
+      "alpha": 0.6,
+      "rationale": "Modal scrim (forms.md \u00a73); the same value on both platforms (#99000000)."
+    },
+    "bg-gradient": {
+      "from": "black",
+      "to": "surface",
+      "stops": 16,
+      "type": "flat",
+      "angle": 160,
+      "rotate": false,
+      "halo-alpha": [0.18, 0.14, 0.14],
+      "grid-alpha": 0.08,
+      "grid-size": 32,
+      "rationale": "Not a flat colour but an 11-stop gradient (SKILL §2); the stops are linearly interpolated in the script, which closes banding."
+    },
+    "scrollbar-thumb": { "ref": "renk-3-text", "hover-ref": "renk-2", "rationale": "Scrollbar thumb and its hover colour. No glow: a halo on a thin moving bar smears." },
+    "scrollbar-track": { "ref": "black", "alpha": 0.3, "rationale": "Scrollbar track under the thumb." }
+  },
+  "on": {
+    "_": ["Which text colour sits on each fill. on names an existing colour; null means the fill carries no text.","generate.js composites a translucent fill over surface, measures the pair and refuses to generate below 7:1."],
+    "renk-1": { "on": "black", "rationale": "black on renk 1%: 9.89:1." },
+    "renk-2": { "on": "black", "rationale": "black on renk 2%: 10.00:1." },
+    "renk-3": { "on": "black", "rationale": "black on renk 3%: 10.00:1." },
+    "success": { "on": "black", "rationale": "black on success: 14.50:1." },
+    "danger": { "on": "black", "rationale": "black on danger: 10.00:1." },
+    "danger-text": { "on": "black", "rationale": "black on danger-text: 10.26:1." },
+    "panel": { "on": "text", "rationale": "text on panel over surface: 21.00:1." },
+    "glass": { "on": "text", "rationale": "text on glass over surface: 19.12:1." },
+    "renk-1-10": { "on": "text", "rationale": "text on renk-1 10% over surface: 18.79:1." },
+    "renk-1-20": { "on": "text", "rationale": "text on renk-1 20% over surface: 15.65:1." },
+    "renk-1-30": { "on": "text", "rationale": "text on renk-1 30% over surface: 12.24:1." },
+    "renk-1-50": { "on": "text", "rationale": "text on renk-1 50% over surface: 7.03:1." },
+    "renk-1-60": { "on": null, "rationale": "Carries no text: the best pair, text on renk-1 60% over surface, is 5.36:1, below 7:1." },
+    "renk-2-10": { "on": "text", "rationale": "text on renk-2 10% over surface: 18.76:1." },
+    "renk-2-20": { "on": "text", "rationale": "text on renk-2 20% over surface: 15.58:1." },
+    "renk-2-30": { "on": "text", "rationale": "text on renk-2 30% over surface: 12.16:1." },
+    "renk-2-50": { "on": null, "rationale": "Carries no text: the best pair, text on renk-2 50% over surface, is 6.96:1, below 7:1." },
+    "renk-2-60": { "on": null, "rationale": "Carries no text: the best pair, text on renk-2 60% over surface, is 5.31:1, below 7:1." },
+    "renk-3-10": { "on": "text", "rationale": "text on renk-3 10% over surface: 18.77:1." },
+    "renk-3-20": { "on": "text", "rationale": "text on renk-3 20% over surface: 15.59:1." },
+    "renk-3-30": { "on": "text", "rationale": "text on renk-3 30% over surface: 12.16:1." },
+    "renk-3-50": { "on": null, "rationale": "Carries no text: the best pair, text on renk-3 50% over surface, is 6.97:1, below 7:1." },
+    "renk-3-60": { "on": null, "rationale": "Carries no text: the best pair, text on renk-3 60% over surface, is 5.31:1, below 7:1." }
+  },
+  "duration": {
+    "instant": { "ms": 40, "rationale": "Press/release response." },
+    "fast": { "ms": 80, "rationale": "Hover and small transitions." },
+    "base": { "ms": 150, "rationale": "Default transition." },
+    "slow": { "ms": 240, "rationale": "Panel and scene transitions." },
+    "bg-rotate": { "ms": 48000, "rationale": "Background rotation — the one named exception to the infinite-loop ban (SKILL §5.4)." }
+  },
+  "easing": {
+    "out": { "bezier": [0.05, 0.7, 0.1, 1], "rationale": "Default for entering/settling elements (§5.4)." },
+    "in": { "bezier": [0.4, 0, 1, 1], "rationale": "Element leaving the scene." },
+    "spring": { "bezier": [0.34, 1.36, 0.64, 1], "rationale": "Emphasis spring; used on the web side only." },
+    "in-out": { "bezier": [0.4, 0, 0.2, 1], "rationale": "Slow start, fast middle, slow end: an element moving from one place to another on screen." },
+    "fast-slow-fast": { "bezier": [0.15, 0.85, 0.85, 0.15], "rationale": "Fast start, slow middle, fast end: a pass that lingers on the midpoint, such as a carousel step or a highlight sweep." },
+    "emphasized": { "bezier": [0.05, 0.7, 0.1, 1], "rationale": "Snaps in and settles long: large panels and modals entering; the frame after the input already moves." },
+    "sharp": { "bezier": [0.4, 0, 0.6, 1], "rationale": "Short symmetric curve for elements that may return at any moment, such as a drawer or a tooltip." },
+    "linear": { "bezier": [0, 0, 1, 1], "rationale": "Constant speed: only for progress, spinners and colour fades, never for movement." }
+  },
+  "size": {
+    "fs-1": { "value": 14, "unit": "px", "rationale": "Type scale step 1 \u2014 label, hint, h3. The floor: no text below 14 (SKILL \u00a73)." },
+    "fs-2": { "value": 16, "unit": "px", "rationale": "Body and button text." },
+    "fs-3": { "value": 20, "unit": "px", "rationale": "h3." },
+    "fs-4": { "value": 24, "unit": "px", "rationale": "h2." },
+    "fs-5": { "value": 32, "unit": "px", "rationale": "Hero number; 32 sets the hero clear of fs-4 (readability pass, 2026-09-25). Do not add an intermediate step." },
+    "lh-body": { "value": 1.6, "rationale": "Body and hint line height." },
+    "lh-heading": { "value": 1.25, "rationale": "Heading, label, hero and button line height." },
+    "lh-mono": { "value": 1.5, "rationale": "Mono value line height." },
+    "measure": { "value": 65, "unit": "ch", "rationale": "Maximum readable line length for a prose block (SKILL \u00a73)." },
+    "tr-label": { "value": 0.08, "unit": "em", "rationale": "Label tracking; the widest cut, it separates a label from an h3 at the same size." },
+    "tr-h3": { "value": 0.02, "unit": "em", "rationale": "h3 tracking." },
+    "tr-h2": { "value": 0, "unit": "em", "rationale": "h2 and button tracking." },
+    "tr-hero": { "value": -0.015, "unit": "em", "rationale": "Hero tracking; the only negative cut, large mono digits fall apart without it." },
+    "fw-body": { "value": 400, "xaml": "Normal", "rationale": "Body weight. 700 is forbidden outside hero (SKILL \u00a73)." },
+    "fw-semi": { "value": 600, "xaml": "SemiBold", "rationale": "h2, h3, label and mono weight." },
+    "fw-hero": { "value": 800, "xaml": "ExtraBold", "rationale": "Hero number only." }
+  },
+  "space": {
+    "1": { "value": 4, "unit": "px", "rationale": "Spacing ladder step 1; also the menu and tooltip entry offset." },
+    "2": { "value": 8, "unit": "px", "rationale": "Step 2: field inner gap, tab gap, panel entry offset." },
+    "3": { "value": 12, "unit": "px", "rationale": "Step 3: row gap, toast stack gap, input horizontal padding." },
+    "4": { "value": 16, "unit": "px", "rationale": "Step 4: gap between two fields." },
+    "5": { "value": 24, "unit": "px", "rationale": "Step 5: panel padding, section gap, glow clearance." },
+    "panel-padding": { "ref": "space.5", "rationale": "Panel inner padding (SKILL \u00a75); the ladder value, not a separate measurement." },
+    "section-gap": { "ref": "space.5", "rationale": "Gap between two sections." },
+    "row-gap": { "ref": "space.3", "rationale": "Gap between two rows." },
+    "field-gap": { "ref": "space.2", "rationale": "Gap between a field's label, control and help text (forms.md \u00a71)." },
+    "field-stack": { "ref": "space.4", "rationale": "Gap between two fields." },
+    "input-padding-x": { "ref": "space.3", "rationale": "Text input horizontal padding (forms.md \u00a71)." },
+    "toast-inset": { "ref": "space.5", "rationale": "Toast distance from the viewport edge (forms.md \u00a74)." },
+    "toast-gap": { "ref": "space.3", "rationale": "Gap between two stacked toasts." }
+  },
+  "shape": {
+    "r": { "value": 3, "unit": "px", "rationale": "The single radius (SKILL \u00a75, layout.md \u00a75.1). The exception is the circle: badge, slider thumb, status dot." },
+    "r-window": { "value": 3, "unit": "px", "rationale": "Window shell radius, drawn title bar included (desktop.md \u00a710)." },
+    "border-w": { "value": 1, "unit": "px", "rationale": "Default border width; the tab outline sits 1 DIP inset with the same width." },
+    "window-edge": { "ref": "none", "rationale": "Window shell outline colour; none draws no edge." },
+    "focus-w": { "value": 2, "unit": "px", "rationale": "Focus ring outline width; the inner layer is black (SKILL \u00a75.3)." },
+    "focus-offset": { "value": 2, "unit": "px", "rationale": "Focus ring offset. The ring never animates." }
+  },
+  "metric": {
+    "target-min": { "value": 24, "unit": "px", "rationale": "Minimum interactive target, 24\u00d724 DIP (SKILL \u00a75.3); the checkbox cell takes the same value." },
+    "scrollbar-w": { "value": 3, "unit": "px", "rationale": "Scrollbar track width and height (SKILL \u00a75.3)." },
+    "scrollbar-style": { "value": "fade", "rationale": "Scrollbar look: solid, thin, pill, hover, fade or shrink." },
+    "scroll-behavior": { "value": "auto", "rationale": "Programmatic scroll: auto or smooth. Reduced motion forces auto." },
+    "titlebar-h-min": { "value": 28, "unit": "px", "rationale": "Drawn title bar floor (SKILL \u00a74, desktop.md \u00a710)." },
+    "titlebar-h-max": { "value": 28, "unit": "px", "rationale": "Drawn title bar ceiling; the source gives a range, not one number." },
+    "sidebar-w": { "value": 240, "unit": "px", "rationale": "Open sidebar width (layout.md \u00a75.7)." },
+    "sidebar-collapsed-w": { "value": 48, "unit": "px", "rationale": "Collapsed sidebar width; icon only." },
+    "input-h": { "value": 40, "unit": "px", "rationale": "Text input minimum height (forms.md \u00a71)." },
+    "btn-h": { "value": 28, "unit": "px", "rationale": "Button minimum height." },
+    "btn-px": { "value": 10, "unit": "px", "rationale": "Button horizontal padding." },
+    "modal-w": { "value": 560, "unit": "px", "vw-max": 90, "rationale": "Modal width: 560, capped at 90% of the viewport (forms.md \u00a73)." },
+    "modal-max-ratio": { "value": 0.85, "rationale": "Modal maximum height as a share of the viewport." },
+    "toast-w": { "value": 360, "unit": "px", "gutter-ref": "space.5", "rationale": "Toast width: 360, capped at the viewport minus one inset per side (forms.md \u00a74)." },
+    "toast-max": { "value": 3, "rationale": "Maximum toasts visible at once; the stack cap is enforced by the scanner." },
+    "toast-life": { "value": 6000, "unit": "ms", "rationale": "Toast life. Danger toasts never auto-dismiss; hover and focus pause the timer." },
+    "icon-1": { "value": 14, "unit": "px", "rationale": "Smallest icon, inline with label text (components.md)." },
+    "icon-2": { "value": 16, "unit": "px", "rationale": "Button and row icon." },
+    "icon-3": { "value": 22, "unit": "px", "rationale": "Title bar and toolbar icon." },
+    "icon-4": { "value": 56, "unit": "px", "rationale": "Empty-state icon." }
+  },
+  "motion": {
+    "scale-hover": { "value": 1.02, "rationale": "Hover scale; the signature block uses the same value \u2014 hover is never carried by opacity (SKILL \u00a75)." },
+    "scale-press": { "value": 0.98, "rationale": "Press scale." },
+    "scale-icon-hover": { "value": 1.1, "rationale": "Icon-only control hover scale (SKILL \u00a75.4)." },
+    "entry-offset": { "ref": "space.2", "rationale": "Entry animation offset for panels and lists (SKILL \u00a75.4)." },
+    "overlay-offset": { "ref": "space.1", "rationale": "Menu and tooltip entry offset; smaller, because they open next to the pointer." },
+    "stagger": { "value": 40, "unit": "ms", "rationale": "List stagger step; empty to filled uses the same step (motion.md M8)." },
+    "stagger-max": { "value": 6, "rationale": "Maximum staggered items; beyond this the list enters as one block." },
+    "glow-margin": { "ref": "space.5", "rationale": "Clear space an outward glow needs; without it use a /50 border instead (motion.md M15)." },
+    "loading-loop-min": { "value": 1400, "unit": "ms", "rationale": "Loading loop floor; a faster loop reads as an error (motion.md M2)." },
+    "frame-budget": { "value": 16, "unit": "ms", "rationale": "Frame budget at the 95th percentile (motion.md M15)." },
+    "bg-rotate-min": { "value": 40000, "unit": "ms", "rationale": "Background rotation floor; the shipped value is duration.bg-rotate (motion.md M10)." },
+    "bg-sweep-max": { "value": 20, "unit": "deg", "rationale": "Background gradient angle sweep ceiling; the CSS keyframe runs 150 to 170." }
+  },
+  "font": {
+    "sans": {
+      "chain": ["Atkinson Hyperlegible Next", "Segoe UI"],
+      "css-fallback": "system-ui, -apple-system, sans-serif",
+      "css-body-fallback": "system-ui, sans-serif",
+      "css-quote": true,
+      "rationale": "The chain's only source is SKILL §3; Atkinson Hyperlegible Next is embedded in the project, not assumed present on the system."
+    },
+    "mono": {
+      "chain": ["Cascadia Mono", "Consolas"],
+      "css-fallback": "ui-monospace, 'Courier New', monospace",
+      "css-body-fallback": "monospace",
+      "css-quote": false,
+      "rationale": "Every number, key and piece of code is written in mono (SKILL §3)."
+    }
+  },
+  "label": {
+    "_": "Every piece of chrome text the apps share: the words (tr, en) and their look (colour ref, size step, weight step). The preview edits them; setup writes labels.tr.json and labels.en.json next to each target so every app reads the same words.",
+    "brand": { "tr": "Teknesyum", "en": "Teknesyum", "hint-tr": "Teknesyum GitHub sayfasını aç", "hint-en": "Open the Teknesyum GitHub page", "ref": "renk-1", "fs": "fs-1", "weight": "fw-semi", "rationale": "Signature brand chip; colour and weight match the titlebar chip." },
+    "support": { "tr": "Destek Ol", "en": "Buy me a coffee", "hint-tr": "Projeyi desteklemek için tıkla", "hint-en": "Click to support the project", "ref": "renk-3-text", "fs": "fs-1", "weight": "fw-semi", "rationale": "Support chip; renk-3-text as in the titlebar support chip." },
+    "site": { "tr": "teknesyum.com", "en": "teknesyum.com", "hint-tr": "Teknesyum sitesini aç", "hint-en": "Open the Teknesyum site", "ref": "renk-1", "fs": "fs-1", "weight": "fw-semi", "rationale": "Site chip beside the support chip." },
+    "update": { "tr": "Güncelleme", "en": "Update", "download-tr": "Yeni sürüm var, indirmek için tıklayın", "download-en": "New version available, click to download", "install-tr": "İndirildi, kurmak için tıklayın", "install-en": "Downloaded, click to install", "ref": "text", "fs": "fs-1", "weight": "fw-semi", "rationale": "Two-step update badge: the label and the hint for each step." },
+    "sync": { "tr": "Eşitlendi", "en": "Synced", "offline-tr": "Çevrimdışı", "offline-en": "Offline", "hint-tr": "Şimdi eşitle", "hint-en": "Sync now", "ref": "text", "fs": "fs-1", "weight": "fw-semi", "rationale": "Sync badge states; the state colour comes from the role tokens." },
+    "title": { "tr": "Uygulama adı", "en": "Application name", "ref": "text", "accent-ref": "renk-2-text", "fs": "fs-3", "weight": "fw-semi", "rationale": "Window title: the app name, its accent part and their look." }
+  }
+}

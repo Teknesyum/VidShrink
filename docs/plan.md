@@ -1,39 +1,40 @@
-# Plan: Uc Denetimi, Tema Birleşimi, Yeni İkon
+# Plan: Uc 0.20.0, Arayüzün Düzene Bağlanması
 
-2026-09-27. İstek: "uc denetimini çalıştır; 27 temayı silmeden iki tema çeşidini birleştir (32 ya da 36);
-her ekran her panel; ikonu daha yumuşak çizimle ve yeni temanın renkleriyle yeniden oluştur."
+2026-09-27. İstek: `uc`. Eklenti 0.20.0 uc'yi dönüştürme emri sayıyor: renk, ölçü, köşe, süre,
+eğri ve yazı değerleri `teknesyum-ui/` altındaki üretilmiş kaynaklardan gelir; marka, destek,
+site, güncelleme, eşitleme yazıları ve pencere başlığı `labels.*.json`'dan okunur.
 
 ## Başlangıç Ölçümü
 
-- Projede 26 palet (`Themes/Palette/*`, `PaletteCatalog.Names`), 31 renk anahtarı, varsayılan `Neon`.
-- Standardın temaları: `teknesyum-ui/templates/temalar/` altında 9 tema (4 koyu, 5 açık) ve
-  `benim.tokens.json` (Teknesyum Neon, standardın kendi teması).
-- `scan.js` başlangıcı: 18 açık, 12 hata (`.calisma/t0-uc/scan-0.txt`).
-- Raf: 10 kitap hiç uygulanmadı.
+- `setup.js --apply --template benim`: 23 dosya, "düzen eşleşmesi 0 fark".
+- Kurulum `.claude/teknesyum-ui.json`'ı yeniden yazıp 18 muafiyeti düşürdü; geri kondu.
+- `scan.js`: 0 hata, 6 uyarı (`.calisma/t0-uc2/scan-0.txt`): 4 elle yazılmış imza yazısı,
+  1 `fixed-window-no-shrink`, 1 `tools/ikon/README.md` sayı etiketi.
+- Üretilen `teknesyum-ui/avalonia/Theme.axaml` 178 anahtar, proje `Themes/Theme.axaml` 151;
+  ortak 10. Proje ölçüleri kendi adlarıyla elle yazılmış (SpaceXs, RadiusControl, MotionFast…).
+- Yazı tipi iki kopya: `src/VidShrink.App/Fonts` (eski) ve `Assets/Fonts` (kurulumun).
 
 ## Karar
 
-- **36 palet:** 26 mevcut + 9 standart tema + standardın kendi teması (`Teknesyum`). Hiçbiri silinmez.
-- **Tek şema:** her palet standardın token şemasıyla (renk-1..3, metin kesimleri, surface, text,
-  disabled, success, warning) yazılır; projenin 31 anahtarı bu kaynaktan türetilir. Palet kendi değerini
-  taşımaz, standardın rollerine bağlanır.
-- **Yeni varsayılan:** `Teknesyum`. Kayıtlı palet seçimi olan kullanıcıda seçim korunur.
-- **İkon:** vektör kaynaktan (SVG) yeniden çizilir, `Teknesyum` renkleriyle, bütün ico boyları üretilir.
-- `ui-duzeni`'nin "yalnız koyu tema" kuralı açık paletlere uygulanmaz: sahip 27'yi korumamızı istedi.
-  Açık paletler de aynı 7:1 ölçüsünden geçer. Rapora "uygulanmayan kural" olarak yazılır.
+- Proje anahtarları kalır (çağıranlar kırılmasın), değerleri üretilmiş anahtarlara bağlanır:
+  `Themes/Theme.axaml` üretilmiş Theme.axaml'ı birleştirir, kendi anahtarı üretilene
+  `StaticResource` takma adı olur. Eşi olmayan ölçü (pencere, oynatıcı parçaları) üretilen
+  ölçekten türetilir ya da gerekçesiyle rapora yazılır.
+- 36 palet kalır. Teknesyum paleti rengini `teknesyum-ui/theme.tokens.json`'dan alır;
+  diğer 35 palet aynı rol şemasıyla (Renk1-3, On*, Danger, Warning…) yazılır.
+- Yazı tipi tek kopya: `Assets/Fonts` (kurulum her `--apply`'da orayı yazar); eski `Fonts/` `trash/`'e.
+- İmza yazıları (`Teknesyum`, "Buy me a coffee") `labels.<dil>.json`'dan okunur.
+- Kısayol simgesi: kullanıcının masaüstü kurulumuna dokunulmaz (güvenlik kuralı); 0.10.0
+  kurulumu simgeyi exe'den taşıyor. Rapora "uygulanmayan" olarak yazılır.
 
 ## İşler
 
 | # | İş | Sahip | Bağımlılık |
 |---|---|---|---|
-| 1 | Tema birleşimi: şema, 10 yeni palet, türetme, varsayılan | ajan (opus) | — |
-| 2 | İkon yeniden çizimi | ajan (sonnet) | renkler 1'in `Teknesyum`'undan, değerler bu planda sabit |
-| 3 | `scan.js` bulguları: kök yazı boyu, hareket, sabit pencere, şablon imzası | ajan (opus) | — |
-| 4 | Raf kitapları (10) | ajan (sonnet) | `.gitignore` bu işin |
-| 5 | Canlı denetim: ekran envanteri, 36 palet × her ekran × her durum kontrast, %100/125/150 görüntü, körlemesine bakış, düzeltme, tekrar | ajan (opus) | 1 ve 3 birleşmiş olmalı |
-| 6 | Rapor `docs/ui-denetim/2026-09-27.md`, sürüm | T0 | 5 |
+| 1 | Token bağlama, palet rol şeması, yazı tipi tekleme, etiketler, ekran envanteri, canlı kontrast, görüntüler, rapor | ajan (opus) | — |
+| 2 | Birleşim, main CI, `uc.js --bitti`, sürüm | T0 | 1 |
 
 ## Bitiş
 
-Sıfır kontrast hatası (canlı, her durum, 36 palet), sıfır `scan.js` hatası, envanterde denetlenmemiş ekran
-yok, "çalışıyor" başsız testle ve "kullanılabilir" görüntüyle ayrı kanıt, main CI yeşil.
+`esle.js --denetle` 0 fark, `scan.js` 0 hata, canlı kontrast 0 hata (36 palet), envanterde
+düzene geçmemiş ekran yok, başsız test ve yan yana görüntü ayrı kanıt, main CI yeşil.
