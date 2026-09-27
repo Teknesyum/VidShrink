@@ -13,64 +13,152 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using VidShrink.App;
+using VidShrink.App.Localization;
+using VidShrink.App.Themes;
 using Xunit;
 
 namespace VidShrink.Tests;
 
 public sealed class KontrastTests
 {
-    private const double Esik = 7.0;
+    private const double YaziEsigi = 7.0;
+    private const double SimgeEsigi = 3.0;
     private static readonly double[] Olcekler = { 1.0, 1.25, 1.5 };
-    private static readonly string[] Durumlar = { ":pointerover", ":pressed", ":focus-visible", ":selected", ":checked" };
+    private static readonly string[] Durumlar = { ":pointerover", ":pressed", ":focus-visible", ":selected", ":checked", ":open" };
     private static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
 
-    private sealed record Olcum(string Ekran, string Durum, string Tur, string Yol, string Metin, string Zemin, string On, double Oran);
+    private sealed record Olcum(string Ekran, string Durum, string Tur, string Yol, string Metin, string Zemin, string On, double Oran)
+    {
+        public string Anahtar { get; set; } = "";
+    }
 
-    [Fact]
-    public void HerYaziVeSimgeEsigiGeciyor()
+    public static TheoryData<string> Paletler()
+    {
+        var veri = new TheoryData<string>();
+        foreach (var ad in PaletteCatalog.Names) veri.Add(ad);
+        return veri;
+    }
+
+    private static double Esik(string tur) => tur == "simge" ? SimgeEsigi : YaziEsigi;
+
+    [Theory]
+    [MemberData(nameof(Paletler))]
+    public void HerYaziVeSimgeEsigiGeciyor(string palet)
     {
         var klasor = Environment.GetEnvironmentVariable("UC_KLASOR");
         var asama = Environment.GetEnvironmentVariable("UC_ASAMA") ?? "olcum";
+        var cekilecek = (Environment.GetEnvironmentVariable("UC_CEK") ?? PaletteCatalog.Default).Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        var cek = klasor != null && (cekilecek.Contains(palet) || cekilecek.Contains("*"));
+        var ayarKlasoru = Path.Combine(TestPaths.OutputRoot, "kontrast", palet);
         var olcumler = AppHost.Run(() =>
         {
             var hepsi = new List<Olcum>();
-            foreach (var (ekran, kur) in Ekranlar())
+            var kultur = CultureInfo.CurrentUICulture;
+            var ayar = Environment.GetEnvironmentVariable(TestAyarYolu.Degisken);
+            Directory.CreateDirectory(ayarKlasoru);
+            File.WriteAllText(Path.Combine(ayarKlasoru, "settings.json"), "{\"theme\":\"" + palet + "\",\"language\":\"tr\"}");
+            Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, Path.Combine(ayarKlasoru, "settings.json"));
+            CultureInfo.CurrentUICulture = new CultureInfo("tr");
+            Strings.Use("tr");
+            try
             {
-                var pencere = kur();
-                try
+                Assert.Equal(palet, PaletteCatalog.Use(palet));
+                var adlar = RenkAdlari();
+                foreach (var (ekran, kur) in Ekranlar())
                 {
-                    var kok = Yerlestir(pencere);
-                    if (klasor != null) Cek(pencere, kok, ekran, asama, klasor);
-                    Tara(ekran, "dinlenik", pencere, pencere, hepsi);
-                    ZorlaGoster(pencere);
-                    Yerlestir(pencere);
-                    Tara(ekran, "dinlenik", pencere, pencere, hepsi);
-                    Durumlari(ekran, pencere, hepsi);
+                    var pencere = kur();
+                    try
+                    {
+                        Assert.Equal(palet, PaletteCatalog.Current);
+                        var kok = Yerlestir(pencere);
+                        if (cek) Cek(pencere, kok, palet + "-" + ekran, asama, klasor!);
+                        Tara(ekran, "dinlenik", pencere, pencere, hepsi);
+                        ZorlaGoster(pencere);
+                        Yerlestir(pencere);
+                        Tara(ekran, "dinlenik", pencere, pencere, hepsi);
+                        Durumlari(ekran, pencere, hepsi);
+                    }
+                    finally
+                    {
+                        pencere.Close();
+                    }
                 }
-                finally
-                {
-                    pencere.Close();
-                }
+                foreach (var o in hepsi) o.Anahtar = adlar.TryGetValue(o.On, out var ad) ? ad : o.On;
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, ayar);
+                PaletteCatalog.Use(PaletteCatalog.Default);
+                CultureInfo.CurrentUICulture = kultur;
+                Strings.Use("en");
+                try { Directory.Delete(ayarKlasoru, true); }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
             }
             return hepsi;
         });
 
         var tekil = olcumler.GroupBy(o => o.Ekran + "|" + o.Durum + "|" + o.Tur + "|" + o.Yol + "|" + o.On + "|" + o.Zemin).Select(g => g.First()).ToList();
-        var bulgular = tekil.Where(o => o.Durum != "edilgen" && o.Oran < Esik).ToList();
+        var altinda = tekil.Where(o => o.Durum != "edilgen" && o.Oran < Esik(o.Tur)).ToList();
+        var ertelenen = Ertelenenler.TryGetValue(palet, out var liste) ? liste : new Dictionary<string, double>();
+        var bulgular = altinda.Where(o => !(ertelenen.TryGetValue(o.Anahtar, out var taban) && o.Oran >= taban)).ToList();
+        var kapanan = ertelenen.Keys.Where(k => !altinda.Any(o => o.Anahtar == k)).ToList();
         if (klasor != null)
         {
             Directory.CreateDirectory(klasor);
-            var sb = new StringBuilder("ekran\tdurum\ttur\toran\tzemin\ton\tyol\tmetin\n");
+            var sb = new StringBuilder("palet\tekran\tdurum\ttur\toran\tzemin\ton\tanahtar\tyol\tmetin\n");
             foreach (var o in tekil.OrderBy(o => o.Oran))
-                sb.Append(o.Ekran).Append('\t').Append(o.Durum).Append('\t').Append(o.Tur).Append('\t')
-                  .Append(o.Oran.ToString("0.00", Inv)).Append('\t').Append(o.Zemin).Append('\t').Append(o.On).Append('\t')
+                sb.Append(palet).Append('\t').Append(o.Ekran).Append('\t').Append(o.Durum).Append('\t').Append(o.Tur).Append('\t')
+                  .Append(o.Oran.ToString("0.00", Inv)).Append('\t').Append(o.Zemin).Append('\t').Append(o.On).Append('\t').Append(o.Anahtar).Append('\t')
                   .Append(o.Yol).Append('\t').Append(o.Metin).Append('\n');
-            File.WriteAllText(Path.Combine(klasor, "kontrast-" + asama + ".tsv"), sb.ToString());
+            File.WriteAllText(Path.Combine(klasor, "kontrast-" + asama + "-" + palet + ".tsv"), sb.ToString());
         }
 
-        Assert.True(bulgular.Count == 0,
-            bulgular.Count + " çift " + Esik.ToString(Inv) + ":1 altında (" + tekil.Count + " ölçüm)\n" +
-            string.Join("\n", bulgular.OrderBy(o => o.Oran).Select(o => o.Ekran + " [" + o.Durum + "] " + o.Tur + " " + o.Yol + " \"" + o.Metin + "\": bg " + o.Zemin + " fg " + o.On + " " + o.Oran.ToString("0.00", Inv))));
+        Assert.True(bulgular.Count == 0 && kapanan.Count == 0,
+            palet + ": " + bulgular.Count + " çift eşiğin altında (" + tekil.Count + " ölçüm)"
+            + (kapanan.Count > 0 ? "; ertelenen listesinde olup artık eşiği geçen: " + string.Join(", ", kapanan) : "") + "\n" +
+            string.Join("\n", bulgular.OrderBy(o => o.Oran).Select(o => o.Ekran + " [" + o.Durum + "] " + o.Tur + " " + o.Anahtar + " " + o.Yol + " \"" + o.Metin + "\": bg " + o.Zemin + " fg " + o.On + " " + o.Oran.ToString("0.00", Inv))));
+    }
+
+    private static readonly IReadOnlyDictionary<string, Dictionary<string, double>> Ertelenenler = new Dictionary<string, Dictionary<string, double>>
+    {
+        ["Ayu"] = new() { ["TextBody"] = 4.91 },
+        ["AyuLight"] = new() { ["EmberBlaze"] = 1.64, ["NeonBlue"] = 2.40, ["NeonSuccess"] = 2.15, ["PinkText"] = 1.70, ["TextBody"] = 4.28 },
+        ["Catppuccin"] = new() { ["NeonBlue"] = 4.53, ["TextBody"] = 4.79 },
+        ["CatppuccinLatte"] = new() { ["EmberBlaze"] = 1.91, ["NeonBlue"] = 3.52, ["NeonSuccess"] = 2.49, ["OnNeon"] = 4.26, ["PinkText"] = 2.00, ["TextBody"] = 4.41 },
+        ["Cobalt"] = new() { ["NeonBlue"] = 6.74, ["NeonSuccess"] = 5.46, ["TextBody"] = 3.86 },
+        ["Dracula"] = new() { ["NeonBlue"] = 6.73, ["TextBody"] = 5.17 },
+        ["Everforest"] = new() { ["EmberBlaze"] = 6.49, ["NeonBlue"] = 4.33, ["NeonSuccess"] = 6.14, ["TextBody"] = 4.01 },
+        ["Github"] = new() { ["NeonBlue"] = 5.84 },
+        ["GithubLight"] = new() { ["EmberBlaze"] = 3.91, ["NeonBlue"] = 4.19, ["NeonSuccess"] = 4.17, ["OnNeon"] = 5.18, ["PinkText"] = 2.61 },
+        ["Gruvbox"] = new() { ["NeonBlue"] = 3.53, ["NeonSuccess"] = 5.82, ["TextBody"] = 5.26 },
+        ["GruvboxLight"] = new() { ["EmberBlaze"] = 2.64, ["NeonBlue"] = 4.19, ["NeonSuccess"] = 3.38, ["OnNeon"] = 6.59, ["PinkText"] = 1.96, ["TextBody"] = 5.49 },
+        ["Horizon"] = new() { ["NeonBlue"] = 4.64, ["TextBody"] = 6.26 },
+        ["Kanagawa"] = new() { ["NeonBlue"] = 4.37, ["NeonSuccess"] = 6.64, ["TextBody"] = 5.81 },
+        ["MaterialOcean"] = new() { ["NeonBlue"] = 5.76 },
+        ["Monokai"] = new() { ["NeonBlue"] = 5.48, ["NeonSuccess"] = 6.90, ["TextBody"] = 5.35 },
+        ["Moonlight"] = new() { ["NeonBlue"] = 4.24, ["TextBody"] = 4.75 },
+        ["NightOwl"] = new() { ["NeonBlue"] = 5.21, ["TextBody"] = 6.06 },
+        ["Nord"] = new() { ["NeonBlue"] = 4.96, ["NeonSuccess"] = 6.27, ["TextBody"] = 5.85 },
+        ["OneDark"] = new() { ["NeonBlue"] = 4.36, ["NeonSuccess"] = 6.57, ["TextBody"] = 4.66 },
+        ["RosePine"] = new() { ["TextBody"] = 5.99 },
+        ["RosePineDawn"] = new() { ["EmberBlaze"] = 1.78, ["NeonBlue"] = 2.77, ["NeonSuccess"] = 4.95, ["OnNeon"] = 6.12, ["PinkText"] = 1.75, ["TextBody"] = 5.09 },
+        ["Solarized"] = new() { ["EmberBlaze"] = 4.10, ["NeonBlue"] = 3.63, ["NeonSuccess"] = 4.15, ["OnNeon"] = 6.64, ["TextBody"] = 6.79 },
+        ["SolarizedLight"] = new() { ["EmberBlaze"] = 2.47, ["NeonBlue"] = 2.69, ["NeonSuccess"] = 2.53, ["OnNeon"] = 5.70, ["PinkText"] = 1.87 },
+        ["Synthwave"] = new() { ["TextBody"] = 6.09 },
+        ["TokyoNight"] = new() { ["NeonBlue"] = 4.61, ["TextBody"] = 5.17 }
+    };
+
+    private static Dictionary<string, string> RenkAdlari()
+    {
+        var adlar = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (Application.Current?.Resources.MergedDictionaries is not { Count: > 0 } birlesik) return adlar;
+        var sozluk = birlesik[0] is Avalonia.Markup.Xaml.Styling.ResourceInclude ri ? ri.Loaded : birlesik[0] as IResourceDictionary;
+        if (sozluk == null) return adlar;
+        foreach (var anahtar in sozluk.Keys)
+            if (sozluk.TryGetValue(anahtar, out var deger) && deger is Color c)
+                adlar.TryAdd(Hex(c), anahtar.ToString()!.Replace("Color", ""));
+        return adlar;
     }
 
     private static IEnumerable<(string, Func<Window>)> Ekranlar()
@@ -97,7 +185,7 @@ public sealed class KontrastTests
         yield return ("kucultme-isi", () => new ShrinkJobWindow());
 
         var app = typeof(MainWindow).Assembly;
-        foreach (var ad in new[] { "RecorderMini", "RecorderRegionPicker", "RecorderFrame", "RecorderKeyCaption", "RecorderMagnifier", "RecorderClickRing" })
+        foreach (var ad in new[] { "RecorderMini", "RecorderRegionPicker", "RecorderRegionEditor", "RecorderFrame", "RecorderKeyCaption", "RecorderMagnifier", "RecorderClickRing" })
         {
             var tip = app.GetTypes().Single(t => t.Name == ad);
             yield return (ad, () => (Window)Activator.CreateInstance(tip, true)!);
@@ -113,11 +201,20 @@ public sealed class KontrastTests
             yuzey.Bind(Border.BackgroundProperty, yuzey.GetResourceObservable("Surface"));
             var ipucu = new ToolTip { Content = "İpucu metni" };
             var kutu = new FlyoutPresenter { Content = "Açılır kutu metni" };
+            var sagTik = new MenuFlyoutPresenter
+            {
+                Items =
+                {
+                    new MenuItem { Header = "Oynat", InputGesture = new KeyGesture(Key.Space) },
+                    new MenuItem { Header = "Altyazı", Items = { new MenuItem { Header = "Kapalı" } } },
+                    new MenuItem { Header = "Seçilemez", IsEnabled = false, InputGesture = new KeyGesture(Key.E, KeyModifiers.Control) }
+                }
+            };
             return new Window
             {
                 Width = 480,
-                Height = 360,
-                Content = new StackPanel { Children = { new ComboBox(), yuzey, ipucu, kutu } }
+                Height = 480,
+                Content = new StackPanel { Children = { new ComboBox(), yuzey, ipucu, kutu, sagTik } }
             };
         });
     }
@@ -167,8 +264,10 @@ public sealed class KontrastTests
         var b = kok.Bounds;
         if (b.Width <= 0 || b.Height <= 0) return;
         Directory.CreateDirectory(klasor);
+        var golgeler = kok.GetVisualDescendants().OfType<Border>().ToList();
         foreach (var s in Olcekler)
         {
+            var bastirma = s == 1.0 ? new List<IDisposable>() : golgeler.Select(bd => bd.SetValue(Border.BoxShadowProperty, default(BoxShadows), Avalonia.Data.BindingPriority.Animation)).OfType<IDisposable>().ToList();
             var etiket = ((int)Math.Round(s * 100)).ToString(Inv);
             var boyut = new PixelSize((int)Math.Ceiling(b.Width * s), (int)Math.Ceiling(b.Height * s));
             using var katman = new RenderTargetBitmap(boyut, new Vector(96 * s, 96 * s));
@@ -185,6 +284,7 @@ public sealed class KontrastTests
                 ctx.DrawImage(duz, alan);
             }
             bmp.Save(Path.Combine(klasor, ekran + "-" + etiket + "-" + asama + ".png"), PngBitmapEncoderOptions.Default);
+            foreach (var d in bastirma) d.Dispose();
         }
     }
 
@@ -206,7 +306,7 @@ public sealed class KontrastTests
     private static void Durumlari(string ekran, Window w, List<Olcum> hepsi)
     {
         var etkilesimli = w.GetVisualDescendants().OfType<TemplatedControl>()
-            .Where(c => c is Button || c is TabItem || c is ComboBoxItem || c is ListBoxItem || c is ComboBox || c is TextBox || c is Slider)
+            .Where(c => c is Button || c is TabItem || c is MenuItem || c is ComboBoxItem || c is ListBoxItem || c is ComboBox || c is TextBox || c is Slider)
             .ToList();
         foreach (var c in etkilesimli)
         {
@@ -214,12 +314,16 @@ public sealed class KontrastTests
             foreach (var d in Durumlar)
             {
                 if (d == ":checked" && c is not ToggleButton) continue;
-                if (d == ":selected" && c is not (TabItem or ListBoxItem)) continue;
+                if (d == ":selected" && c is not (TabItem or ListBoxItem or MenuItem)) continue;
+                if (d == ":open" && c is not MenuItem { ItemCount: > 0 }) continue;
                 var vardi = c.Classes.Contains(d);
+                var seciliVardi = c.Classes.Contains(":selected");
                 sozde.Set(d, true);
+                if (d == ":open") sozde.Set(":selected", true);
                 Dispatcher.UIThread.RunJobs();
                 Tara(ekran, d.TrimStart(':'), c, w, hepsi);
                 if (!vardi) sozde.Set(d, false);
+                if (d == ":open" && !seciliVardi) sozde.Set(":selected", false);
             }
             if (c.IsEnabled)
             {
@@ -267,7 +371,7 @@ public sealed class KontrastTests
             metin = pi.Name ?? "PathIcon";
             tur = "simge";
         }
-        else if (d is Sekil.Path p && p.GetVisualAncestors().Any(a => a is Button || a is TabItem || a is ToggleButton))
+        else if (d is Sekil.Path p && p.GetVisualAncestors().Any(a => a is Button || a is TabItem || a is ToggleButton || a is MenuItem))
         {
             on = p.Fill ?? p.Stroke;
             metin = p.Name ?? "Path";

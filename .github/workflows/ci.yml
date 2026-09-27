@@ -51,7 +51,7 @@ jobs:
             minimum: 490
             skipped: 10
           - parca: ana-k
-            filter: 'FullyQualifiedName~VidShrink.Tests.K'
+            filter: 'FullyQualifiedName~VidShrink.Tests.K&FullyQualifiedName!~KontrastTests'
             minimum: 700
             skipped: 10
           - parca: ana-p
@@ -78,6 +78,10 @@ jobs:
             filter: 'FullyQualifiedName!~VidShrink.Tests.G&FullyQualifiedName!~VidShrink.Tests.A&FullyQualifiedName!~VidShrink.Tests.D&FullyQualifiedName!~VidShrink.Tests.W&FullyQualifiedName!~VidShrink.Tests.K&FullyQualifiedName!~VidShrink.Tests.P&FullyQualifiedName!~VidShrink.Tests.O&FullyQualifiedName!~VidShrink.Tests.Q&FullyQualifiedName!~VidShrink.Tests.S&FullyQualifiedName!~VidShrink.Tests.B&FullyQualifiedName!~YerlesimDenetimiTests&FullyQualifiedName!~UstSeritTikTests'
             minimum: 1620
             skipped: 25
+          - parca: kontrast
+            filter: 'FullyQualifiedName~KontrastTests'
+            minimum: 36
+            skipped: 0
           - parca: ust-serit
             filter: 'FullyQualifiedName~UstSeritTikTests'
             minimum: 6

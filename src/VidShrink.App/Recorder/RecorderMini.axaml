@@ -22,6 +22,7 @@
     hepsi kayıt öncesi kararlar ve kayıt başladıktan sonra zaten değişemiyorlar.  -->
   <Border x:Name="MiniStrip"
           Theme="{StaticResource Panel}"
+          Background="{StaticResource Surface}"
           Padding="{StaticResource RecorderStripPadding}"
           MinWidth="{StaticResource RecorderMiniMinWidth}"
           Height="{StaticResource RecorderMiniHeight}">

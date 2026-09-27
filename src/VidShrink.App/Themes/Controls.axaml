@@ -1630,6 +1630,24 @@
         </Setter>
       </ControlTheme>
 
+      <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="Surface"/>
+      <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="NeonPurple"/>
+      <StaticResource x:Key="MenuFlyoutItemForeground" ResourceKey="TextBody"/>
+      <StaticResource x:Key="MenuFlyoutItemForegroundPointerOver" ResourceKey="OnNeon"/>
+      <StaticResource x:Key="MenuFlyoutItemForegroundPressed" ResourceKey="OnNeon"/>
+      <StaticResource x:Key="MenuFlyoutItemForegroundDisabled" ResourceKey="TextDisabled"/>
+      <StaticResource x:Key="MenuFlyoutItemBackgroundPointerOver" ResourceKey="NeonBlue"/>
+      <StaticResource x:Key="MenuFlyoutItemBackgroundPressed" ResourceKey="NeonBlue"/>
+      <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForeground" ResourceKey="TextBody"/>
+      <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" ResourceKey="OnNeon"/>
+      <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPressed" ResourceKey="OnNeon"/>
+      <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled" ResourceKey="TextDisabled"/>
+      <StaticResource x:Key="MenuFlyoutSubItemChevron" ResourceKey="TextBody"/>
+      <StaticResource x:Key="MenuFlyoutSubItemChevronPointerOver" ResourceKey="OnNeon"/>
+      <StaticResource x:Key="MenuFlyoutSubItemChevronPressed" ResourceKey="OnNeon"/>
+      <StaticResource x:Key="MenuFlyoutSubItemChevronSubMenuOpened" ResourceKey="OnNeon"/>
+      <StaticResource x:Key="MenuFlyoutSubItemChevronDisabled" ResourceKey="TextDisabled"/>
+
     </ResourceDictionary>
   </Styles.Resources>
 </Styles>

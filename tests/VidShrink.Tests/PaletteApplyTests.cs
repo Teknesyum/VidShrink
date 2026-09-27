@@ -142,6 +142,47 @@ public sealed class PaletteApplyTests
         Assert.True(kalanlar.Count == 0, "Dönüşte eski renkte kalan paletler:\n" + string.Join("\n", kalanlar));
     }
 
+    [Fact]
+    public void VarsayilandanGecinceFircaKendiRenginiAlir()
+    {
+        var kaymalar = AppHost.Run(() =>
+        {
+            var bozuk = new List<string>();
+            foreach (var name in PaletteCatalog.Names.Where(name => name != PaletteCatalog.Default))
+            {
+                PaletteCatalog.Use(PaletteCatalog.Default);
+                var merged = Application.Current!.Resources.MergedDictionaries;
+                var kurulmamis = new Avalonia.Markup.Xaml.Styling.ResourceInclude((Uri?)null)
+                {
+                    Source = new Uri("avares://VidShrink.App/Themes/Theme.axaml")
+                };
+                merged.Add(kurulmamis);
+                try
+                {
+                    PaletteCatalog.Use(name);
+                    var sozluk = new Avalonia.Markup.Xaml.Styling.ResourceInclude((Uri?)null)
+                    {
+                        Source = new Uri($"avares://VidShrink.App/Themes/Palette/{name}/Theme.axaml")
+                    }.Loaded;
+                    foreach (var key in sozluk.Keys.OfType<string>().Where(k => k.EndsWith("Color", StringComparison.Ordinal)))
+                    {
+                        if (!sozluk.TryGetValue(key, out var deger) || deger is not Color beklenen) continue;
+                        if (Resource(key[..^"Color".Length]) is not SolidColorBrush firca) continue;
+                        if (firca.Color != beklenen) bozuk.Add($"{name} {key[..^"Color".Length]}: {firca.Color} ≠ {beklenen}");
+                    }
+                }
+                finally
+                {
+                    merged.Remove(kurulmamis);
+                }
+            }
+            PaletteCatalog.Use(PaletteCatalog.Default);
+            return bozuk;
+        });
+
+        Assert.True(kaymalar.Count == 0, "Başka anahtarın rengine kayan fırçalar:\n" + string.Join("\n", kaymalar));
+    }
+
     private static IReadOnlyList<string> VurguOkumasi()
     {
         var gradyan = Resource("AccentGradient") is GradientBrush brush

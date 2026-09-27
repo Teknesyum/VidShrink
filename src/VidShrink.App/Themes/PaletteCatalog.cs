@@ -121,10 +121,12 @@ public static class PaletteCatalog
         var incoming = Load(wanted);
         var recolour = Recolour(Load(Current), incoming);
 
+        var live = Live(app);
+
         if (app.Resources.MergedDictionaries is { Count: > 0 } merged)
             merged[0] = new ResourceInclude((Uri?)null) { Source = Address(wanted) };
 
-        Repaint(app, recolour);
+        Repaint(live, recolour);
 
         app.RequestedThemeVariant = Background(incoming) is { } colour && Luminance(colour) > LightThreshold
             ? ThemeVariant.Light
@@ -171,18 +173,28 @@ public static class PaletteCatalog
     /// Kurulmuş her fırçayı yerinde boyar. Anahtarlar sözlüklerden toplanır, nesneler
     /// <see cref="Application.TryGetResource(object, ThemeVariant, out object)"/> ile
     /// alınır: sözlükler XAML'ı geç kuruyor, doğrudan değer okumak kurulmamış bir kalem
-    /// döndürebilir.
+    /// döndürebilir. Nesneler palet sözlüğü değişmeden önce toplanır: henüz kurulmamış bir
+    /// fırça değişimden sonra kurulursa yeni paletin rengiyle doğar ve üstüne bir de eski
+    /// paletten eşlenir; Teknesyum'un SurfaceTone'u (#000000) Nord'un OnNeon'una (#000000)
+    /// denk geldiği için OnNeon Nord'un zemin rengine geçiyordu.
     /// </summary>
-    private static void Repaint(Application app, IReadOnlyDictionary<Color, Color> recolour)
+    private static IReadOnlyList<object> Live(Application app)
+    {
+        var live = new List<object>();
+        foreach (var key in Keys(app))
+        {
+            if (app.TryGetResource(key, null, out var value) && value is not null) live.Add(value);
+        }
+        return live;
+    }
+
+    private static void Repaint(IReadOnlyList<object> live, IReadOnlyDictionary<Color, Color> recolour)
     {
         if (recolour.Count == 0) return;
 
         var painted = new HashSet<object>(ReferenceEqualityComparer.Instance);
 
-        foreach (var key in Keys(app))
-        {
-            if (app.TryGetResource(key, null, out var value)) Paint(value, recolour, painted);
-        }
+        foreach (var value in live) Paint(value, recolour, painted);
     }
 
     /// <summary>Uygulamanın kaynak sözlüklerinde ve biçem kapsamında bildirilen bütün anahtarlar.</summary>
