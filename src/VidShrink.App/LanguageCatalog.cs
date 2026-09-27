@@ -125,14 +125,13 @@ internal static class LanguageCatalog
         };
 
     /// <summary>
-    /// Marka yazımları. Tek sözcük kuralı bunları bozar — "Buy me a coffee" sözcük sözcük
-    /// büyütülünce "Buy Me A Coffee" olur, oysa markanın kendi yazımı "Buy Me a Coffee".
+    /// Marka yazımları. Tek sözcük kuralı bunları bozar — "hqdn3d" büyütülünce
+    /// "Hqdn3d" olur. Standardın etiketleri (<see cref="Localization.Etiketler"/>) buraya girmez.
     /// Bütün dizge eşleşince yazım olduğu gibi döner; bu bir çeviri değil, sabit yazımdır.
     /// </summary>
     internal static readonly IReadOnlyDictionary<string, string> Brands =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            ["Buy me a coffee"] = "Buy Me a Coffee",
             ["hqdn3d"] = "hqdn3d",
         };
 

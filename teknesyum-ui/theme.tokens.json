@@ -261,6 +261,8 @@
     "btn-h": { "value": 28, "unit": "px", "rationale": "Button minimum height." },
     "btn-px": { "value": 10, "unit": "px", "rationale": "Button horizontal padding." },
     "modal-w": { "value": 560, "unit": "px", "vw-max": 90, "rationale": "Modal width: 560, capped at 90% of the viewport (forms.md \u00a73)." },
+    "installer-w": { "value": 720, "unit": "px", "rationale": "Installer window width; every installer takes the same window (AmeliyatListe reference)." },
+    "installer-h": { "value": 540, "unit": "px", "rationale": "Installer window height." },
     "modal-max-ratio": { "value": 0.85, "rationale": "Modal maximum height as a share of the viewport." },
     "toast-w": { "value": 360, "unit": "px", "gutter-ref": "space.5", "rationale": "Toast width: 360, capped at the viewport minus one inset per side (forms.md \u00a74)." },
     "toast-max": { "value": 3, "rationale": "Maximum toasts visible at once; the stack cap is enforced by the scanner." },

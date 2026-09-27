@@ -1,0 +1,7 @@
+project  core/fixed-window-no-shrink  the window is fixed-size but no CSS marks a shrinkable area (overflow: auto/hidden, or min-height: 0 on a flex child) — content clips instead of scrolling.
+src/VidShrink.App/LanguageCatalog.cs:128  etiket/signature-text  "Buy me a coffee" — signature text written by hand; read sig.support from teknesyum-ui/<target>/labels.<lang>.json so every app shows the same text
+src/VidShrink.App/LanguageCatalog.cs:135  etiket/signature-text  "Buy me a coffee" — signature text written by hand; read sig.support from teknesyum-ui/<target>/labels.<lang>.json so every app shows the same text
+src/VidShrink.App/MainWindow.axaml:1738  etiket/signature-text  "Teknesyum" — signature text written by hand; read sig.brand from teknesyum-ui/<target>/labels.<lang>.json so every app shows the same text
+src/VidShrink.App/MainWindow.axaml:1742  etiket/signature-text  "Teknesyum" — signature text written by hand; read sig.brand from teknesyum-ui/<target>/labels.<lang>.json so every app shows the same text
+tools/ikon/README.md:19  forms/unmeasured-label  Unmeasured number: carry the (default, unmeasured) label.
+1209 files · 6 open · 0 fixed · 0 error(s) · 23 ignored

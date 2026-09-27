@@ -38,15 +38,13 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\VidShrink.png" />
     <AvaloniaResource Include="Assets\VidShrink.ico" />
-    <AvaloniaResource Include="Fonts\AtkinsonHyperlegibleNext-Regular.ttf" />
-    <AvaloniaResource Include="Fonts\AtkinsonHyperlegibleNext-SemiBold.ttf" />
-    <AvaloniaResource Include="Fonts\AtkinsonHyperlegibleNext-Bold.ttf" />
-    <None Update="Fonts\OFL.txt" CopyToOutputDirectory="PreserveNewest" />
+    <AvaloniaXaml Include="..\..\teknesyum-ui\avalonia\Theme.axaml" Link="Themes\Duzen\Theme.axaml" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Locales\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     <EmbeddedResource Include="Locales\**\*.json" />
+    <EmbeddedResource Include="..\..\teknesyum-ui\avalonia\labels.*.json" LogicalName="VidShrink.App.Labels.%(Filename)%(Extension)" WithCulture="false" />
   </ItemGroup>
 
   <!-- Paylasim hedefleri koddan degil tablodan gelir; tablo pakete girmezse kurulu yapida
@@ -87,5 +85,6 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\Fonts\**" />
+    <None Update="Assets\Fonts\OFL.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

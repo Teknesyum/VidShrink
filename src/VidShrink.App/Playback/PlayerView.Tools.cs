@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -497,6 +498,11 @@ internal partial class PlayerView
                 }
             }
         };
+
+        open.Bind(StyledElement.ThemeProperty, new Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("PrimaryButton"));
+        cancel.Bind(StyledElement.ThemeProperty, new Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("GhostButton"));
+        dialog.Bind(TemplatedControl.BackgroundProperty, new Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("AppBg"));
+        dialog.Bind(TemplatedControl.ForegroundProperty, new Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("TextBody"));
 
         open.Click += (_, _) => dialog.Close(box.Text);
         cancel.Click += (_, _) => dialog.Close(null);

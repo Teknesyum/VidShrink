@@ -717,7 +717,7 @@ public sealed class ComparisonPanelTests
         var (corner, centre) = Read((host, panel) =>
         {
             var clip = Assert.IsType<RectangleGeometry>(panel.Stage.Clip);
-            return (clip.FillContains(new Point(1, 1)), clip.FillContains(clip.Rect.Center));
+            return (clip.FillContains(new Point(0.5, 0.5)), clip.FillContains(clip.Rect.Center));
         });
 
         Assert.False(corner);

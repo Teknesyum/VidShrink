@@ -1,0 +1,69 @@
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  VidShrink.Core -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Core\bin\Release\net8.0\VidShrink.Core.dll
+  VidShrink.Player -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Player\bin\Release\net8.0\VidShrink.Player.dll
+  VidShrink.PaletteGen -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tools\VidShrink.PaletteGen\bin\Release\net8.0\vidshrink-palettegen.dll
+  VidShrink.Ffmpeg -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Ffmpeg\bin\Release\net8.0\VidShrink.Ffmpeg.dll
+  VidShrink.Ab -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tools\VidShrink.Ab\bin\Release\net8.0\VidShrink.Ab.dll
+  VidShrink.Cli -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Cli\bin\Release\net8.0\vidshrink.dll
+  VidShrink.Bench -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tools\VidShrink.Bench\bin\Release\net8.0\VidShrink.Bench.dll
+  VidShrink.App -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.App\bin\Release\net8.0\VidShrink.App.dll
+  VidShrink.Tests -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll
+C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+  Başarısız VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "SolarizedLight") [8 s]
+  Hata İletisi:
+   SolarizedLight: 1 çift eşiğin altında (2335 ölçüm)
+ana-kaydedici [dinlenik] yazi NeonSuccess RecorderView > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtNotice @ScrollViewer#PageRecorder "Örnek 0.9": bg #F8DED1 fg #859900 2.50
+  Yığın İzleme:
+     at VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(String palet) in C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\KontrastTests.cs:line 117
+   at InvokeStub_KontrastTests.HerYaziVeSimgeEsigiGeciyor(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:02:08.81]     VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "SolarizedLight") [FAIL]
+[xUnit.net 00:02:16.82]     VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "RosePineDawn") [FAIL]
+  Başarısız VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "RosePineDawn") [8 s]
+  Hata İletisi:
+   RosePineDawn: 1 çift eşiğin altında (2297 ölçüm)
+ana-kaydedici [dinlenik] yazi NeonSuccess RecorderView > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtNotice @ScrollViewer#PageRecorder "Örnek 0.9": bg #F1E4E1 fg #286983 4.92
+  Yığın İzleme:
+     at VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(String palet) in C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\KontrastTests.cs:line 117
+   at InvokeStub_KontrastTests.HerYaziVeSimgeEsigiGeciyor(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  Başarısız VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "GruvboxLight") [8 s]
+  Hata İletisi:
+   GruvboxLight: 1 çift eşiğin altında (2337 ölçüm)
+ana-kaydedici [dinlenik] yazi NeonSuccess StackPanel > Border#ResultPanel > StackPanel > TextBlock#TxtResult @ScrollViewer#PageRecorder "Örnek 0.9": bg #E9D5AE fg #79740E 3.37
+  Yığın İzleme:
+     at VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(String palet) in C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\KontrastTests.cs:line 117
+   at InvokeStub_KontrastTests.HerYaziVeSimgeEsigiGeciyor(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:02:41.46]     VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "GruvboxLight") [FAIL]
+[xUnit.net 00:02:57.57]     VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "AyuLight") [FAIL]
+  Başarısız VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "AyuLight") [8 s]
+  Hata İletisi:
+   AyuLight: 1 çift eşiğin altında (2272 ölçüm)
+ana-kaydedici [dinlenik] yazi NeonSuccess RecorderView > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtNotice @ScrollViewer#PageRecorder "Örnek 0.9": bg #FAEAEA fg #86B301 2.13
+  Yığın İzleme:
+     at VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(String palet) in C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\KontrastTests.cs:line 117
+   at InvokeStub_KontrastTests.HerYaziVeSimgeEsigiGeciyor(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:03:14.21]     VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "CatppuccinLatte") [FAIL]
+  Başarısız VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "CatppuccinLatte") [8 s]
+  Hata İletisi:
+   CatppuccinLatte: 1 çift eşiğin altında (2326 ölçüm)
+ana-kaydedici [dinlenik] yazi NeonSuccess RecorderView > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtNotice @ScrollViewer#PageRecorder "Örnek 0.9": bg #EFD7DF fg #40A02B 2.47
+  Yığın İzleme:
+     at VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(String palet) in C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\KontrastTests.cs:line 117
+   at InvokeStub_KontrastTests.HerYaziVeSimgeEsigiGeciyor(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  Başarısız VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "GithubLight") [7 s]
+  Hata İletisi:
+   GithubLight: 1 çift eşiğin altında (2326 ölçüm)
+ana-kaydedici [dinlenik] yazi NeonSuccess RecorderView > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtNotice @ScrollViewer#PageRecorder "Örnek 0.9": bg #F8E2E4 fg #1A7F38 4.11
+  Yığın İzleme:
+     at VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(String palet) in C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\KontrastTests.cs:line 117
+   at InvokeStub_KontrastTests.HerYaziVeSimgeEsigiGeciyor(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:04:37.36]     VidShrink.Tests.KontrastTests.HerYaziVeSimgeEsigiGeciyor(palet: "GithubLight") [FAIL]
+
+Başarısız! - Başarısız:     6, Başarılı:   110, Atlanan:     0, Toplam:   116, Süre: 5 m 15 s - VidShrink.Tests.dll (net8.0)

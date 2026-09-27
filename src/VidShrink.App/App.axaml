@@ -22,6 +22,7 @@
 
   <Application.Styles>
     <FluentTheme/>
+    <StyleInclude Source="avares://VidShrink.App/Themes/Duzen/Theme.axaml"/>
     <StyleInclude Source="avares://VidShrink.App/Themes/Controls.axaml"/>
     <!--
       Açılır pencere ve menü yerine süzülür. Hareketi azaltma açık pencerenin açılırları oynamaz.

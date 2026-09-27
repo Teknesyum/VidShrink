@@ -80,7 +80,7 @@ public sealed class NeonYesilTests
             .Select(d => ((string)d.Attribute("Color")!).Trim())
             .ToList();
 
-        Assert.Equal(new[] { "{StaticResource NeonBlueColor}", "{StaticResource NeonPurpleColor}" }, duraklar);
+        Assert.Equal(new[] { "{StaticResource Renk1Color}", "{StaticResource Renk3Color}" }, duraklar);
     }
 
     /// <summary>Birincil düğme, ilerleme çubuğu ve güncelleme çubuğu gradyanla dolar; sarı dolgu kalmadı.</summary>

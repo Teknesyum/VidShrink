@@ -39,8 +39,11 @@ public sealed record PaletteSeed(
         "danger", "flame", "atmos"
     };
 
-    /// <summary>Standardın kendi temasının kaynağı; bu kaynaktan gelen palet listede başa oturur.</summary>
-    public const string OwnSource = "teknesyum-ui/benim.tokens.json";
+    /// <summary>
+    /// Standardın kendi temasının kaynağı; bu kaynaktan gelen palet listede başa oturur. Renkleri
+    /// tohumda yazılı değil, her okumada bu dosyadan gelir; dosyayı <c>setup.js --apply</c> günceller.
+    /// </summary>
+    public const string OwnSource = "teknesyum-ui/theme.tokens.json";
 
     /// <summary>Projenin kendi 26 paletinin kaynağı.</summary>
     public const string ProjectSource = "vidshrink";
@@ -68,7 +71,31 @@ public sealed record PaletteSeed(
     public static IReadOnlyList<PaletteSeed> Load(string path)
     {
         using var document = JsonDocument.Parse(File.ReadAllText(path));
-        return document.RootElement.EnumerateArray().Select(Read).ToList();
+        return document.RootElement.EnumerateArray()
+            .Select(element => IsOwn(element) ? Own(path, element) : Read(element))
+            .ToList();
+    }
+
+    private static bool IsOwn(JsonElement element)
+        => element.TryGetProperty("kaynak", out var source) && source.GetString() == OwnSource;
+
+    private static PaletteSeed Own(string seedFile, JsonElement element)
+    {
+        var seed = StandardImport.FromTokens(OwnTokens(seedFile));
+        return element.TryGetProperty("note", out var note) && note.GetString() is { } text
+            ? seed with { Note = text }
+            : seed;
+    }
+
+    /// <summary>Tohum dosyasından yukarı yürüyerek projenin <see cref="OwnSource"/> dosyasını bulur.</summary>
+    public static string OwnTokens(string seedFile)
+    {
+        for (var dir = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(seedFile))!); dir is not null; dir = dir.Parent)
+        {
+            var candidate = Path.Combine(dir.FullName, OwnSource);
+            if (File.Exists(candidate)) return candidate;
+        }
+        throw new FileNotFoundException($"{OwnSource} bulunamadı: {seedFile} üstünde yok.");
     }
 
     private static PaletteSeed Read(JsonElement element)
@@ -104,8 +131,9 @@ public sealed record PaletteSeed(
                 writer.WriteString("name", seed.Name);
                 if (seed.Title is not null) writer.WriteString("baslik", seed.Title);
                 writer.WriteString("kaynak", seed.Source);
-                foreach (var role in Roles)
-                    if (seed.Role(role) is { } value) writer.WriteString(role, value);
+                if (seed.Source != OwnSource)
+                    foreach (var role in Roles)
+                        if (seed.Role(role) is { } value) writer.WriteString(role, value);
                 writer.WriteString("note", seed.Note);
                 writer.WriteEndObject();
             }

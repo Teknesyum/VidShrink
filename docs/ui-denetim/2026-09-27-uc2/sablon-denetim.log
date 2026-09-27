@@ -1,0 +1,116 @@
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  VidShrink.Core -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Core\bin\Release\net8.0\VidShrink.Core.dll
+  VidShrink.Player -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Player\bin\Release\net8.0\VidShrink.Player.dll
+  VidShrink.Ffmpeg -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Ffmpeg\bin\Release\net8.0\VidShrink.Ffmpeg.dll
+  VidShrink.App -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.App\bin\Release\net8.0\VidShrink.App.dll
+  Denetim -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\.calisma\worktree-agent-ab2d9de8f21f2713f\denetim-kok\bin\Release\net8.0\Denetim.dll
+C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\.calisma\worktree-agent-ab2d9de8f21f2713f\denetim-kok\bin\Release\net8.0\Denetim.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:17.07]     VidShrink.App.Kontrast.KontrastTests.EveryTextClearsTheThreshold [FAIL]
+  Başarısız VidShrink.App.Kontrast.KontrastTests.EveryTextClearsTheThreshold [13 s]
+  Hata İletisi:
+   2 pair(s) below 7:1
+ana · dinlenik | simge | Border#SourcePanel > StackPanel > Panel#DropZone > Rectangle#DropOutline | "simge" | on #1A6FB7FF | zemin #000000 | 1.12:1 | KALIR
+ana · dinlenik | simge | Track#PART_Track > Thumb#ThumbVisual > Panel > Ellipse#Knob | "simge" | on #000001 | zemin #000000 | 1.00:1 | KALIR
+  Yığın İzleme:
+     at VidShrink.App.Kontrast.KontrastTests.EveryTextClearsTheThreshold() in C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\.calisma\worktree-agent-ab2d9de8f21f2713f\denetim-kok\teknesyum-ui\denetim\KontrastTests.cs:line 93
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:27.14]     VidShrink.App.Kontrast.KabukTests.HerDugmeDurumuKendiKirpmasinaSigar [FAIL]
+  Başarısız VidShrink.App.Kontrast.KabukTests.HerDugmeDurumuKendiKirpmasinaSigar [10 s]
+  Hata İletisi:
+   #BtnBrowseEmpty:pointerover Border: 209.22, 321.61, 119.55999999999997, 79.77999999999997 kırpılıyor, kırpma 229.22, 341.61, 79.55999999999997, 39.77999999999997 [Button#BtnBrowseEmpty,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnBrowseEmpty:pressed Border: 210.78, 322.39, 116.44000000000003, 78.22000000000003 kırpılıyor, kırpma 230.78, 342.39, 76.44000000000003, 38.22000000000003 [Button#BtnBrowseEmpty,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#ChipArchive:pointerover Border: 28.35, 528.73, 106.30000000000001, 67.53999999999996 kırpılıyor, kırpma 48.35, 548.73, 66.30000000000001, 27.539999999999964 [Button#ChipArchive,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#ChipArchive:pressed Border: 29.650000000000006, 529.27, 103.69999999999999, 66.46000000000004 kırpılıyor, kırpma 49.650000000000006, 549.27, 63.69999999999999, 26.460000000000036 [Button#ChipArchive,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#ChipHalf:pointerover Border: 117.26999999999998, 528.73, 114.46000000000001, 67.53999999999996 kırpılıyor, kırpma 137.26999999999998, 548.73, 74.46000000000001, 27.539999999999964 [Button#ChipHalf,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#ChipHalf:pressed Border: 118.73000000000002, 529.27, 111.53999999999999, 66.46000000000004 kırpılıyor, kırpma 138.73000000000002, 549.27, 71.53999999999999, 26.460000000000036 [Button#ChipHalf,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip8:pointerover Border: 214.66, 528.73, 74.67999999999998, 67.53999999999996 kırpılıyor, kırpma 234.66, 548.73, 34.67999999999998, 27.539999999999964 [Button#Chip8,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip8:pressed Border: 215.34, 529.27, 73.32000000000002, 66.46000000000004 kırpılıyor, kırpma 235.34, 549.27, 33.32000000000002, 26.460000000000036 [Button#Chip8,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#ChipWhatsApp:pointerover Border: 272.58, 528.73, 82.83999999999997, 67.53999999999996 kırpılıyor, kırpma 292.58, 548.73, 42.839999999999975, 27.539999999999964 [Button#ChipWhatsApp,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#ChipWhatsApp:pressed Border: 273.42, 529.27, 81.16000000000003, 66.46000000000004 kırpılıyor, kırpma 293.42, 549.27, 41.160000000000025, 26.460000000000036 [Button#ChipWhatsApp,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip25:pointerover Border: 338.58, 528.73, 82.83999999999997, 67.53999999999996 kırpılıyor, kırpma 358.58, 548.73, 42.839999999999975, 27.539999999999964 [Button#Chip25,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip25:pressed Border: 339.42, 529.27, 81.16000000000003, 66.46000000000004 kırpılıyor, kırpma 359.42, 549.27, 41.160000000000025, 26.460000000000036 [Button#Chip25,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip100:pointerover Border: 28.5, 563.73, 91, 67.53999999999996 kırpılıyor, kırpma 48.5, 583.73, 51, 27.539999999999964 [Button#Chip100,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip100:pressed Border: 29.5, 564.27, 89, 66.46000000000004 kırpılıyor, kırpma 49.5, 584.27, 49, 26.460000000000036 [Button#Chip100,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip134:pointerover Border: 102.5, 563.73, 91, 67.53999999999996 kırpılıyor, kırpma 122.5, 583.73, 51, 27.539999999999964 [Button#Chip134,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip134:pressed Border: 103.5, 564.27, 89, 66.46000000000004 kırpılıyor, kırpma 123.5, 584.27, 49, 26.460000000000036 [Button#Chip134,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip180:pointerover Border: 176.5, 563.73, 91, 67.53999999999996 kırpılıyor, kırpma 196.5, 583.73, 51, 27.539999999999964 [Button#Chip180,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#Chip180:pressed Border: 177.5, 564.27, 89, 66.46000000000004 kırpılıyor, kırpma 197.5, 584.27, 49, 26.460000000000036 [Button#Chip180,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#ChipAddPreset:pointerover Border: 250.65999999999997, 563.73, 74.68, 67.53999999999996 kırpılıyor, kırpma 270.65999999999997, 583.73, 34.68000000000001, 27.539999999999964 [Button#ChipAddPreset,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#ChipAddPreset:pressed Border: 251.34000000000003, 564.27, 73.32, 66.46000000000004 kırpılıyor, kırpma 271.34000000000003, 584.27, 33.31999999999999, 26.460000000000036 [Button#ChipAddPreset,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnQualityToggle:pointerover Border: 24.609999999999985, 824.44, 487.78, 97.12 kırpılıyor, kırpma 44.609999999999985, 844.44, 447.78, 57.120000000000005 [Button#BtnQualityToggle,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnQualityToggle:pressed Border: 33.390000000000015, 825.56, 470.22, 94.88 kırpılıyor, kırpma 53.390000000000015, 845.56, 430.22, 54.879999999999995 [Button#BtnQualityToggle,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnAudioToggle:pointerover Border: 24.609999999999985, 892.44, 487.78, 97.12 kırpılıyor, kırpma 44.609999999999985, 912.44, 447.78, 57.120000000000005 [Button#BtnAudioToggle,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnAudioToggle:pressed Border: 33.390000000000015, 893.56, 470.22, 94.88 kırpılıyor, kırpma 53.390000000000015, 913.56, 430.22, 54.879999999999995 [Button#BtnAudioToggle,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnFrameToggle:pointerover Border: 24.609999999999985, 960.44, 487.78, 97.11999999999989 kırpılıyor, kırpma 44.609999999999985, 980.44, 447.78, 57.11999999999989 [Button#BtnFrameToggle,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnFrameToggle:pressed Border: 33.390000000000015, 961.56, 470.22, 94.88000000000011 kırpılıyor, kırpma 53.390000000000015, 981.56, 430.22, 54.88000000000011 [Button#BtnFrameToggle,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnPanelMaximize Border: 925, 148, 64, 64 kırpılıyor, kırpma 945, 168, 24, 24 [Button#BtnPanelMaximize,Grid#Stage,Border#Shell,ComparisonPanel#Preview,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnPanelMaximize:pointerover Border: 924.76, 147.76, 64.48000000000002, 64.47999999999999 kırpılıyor, kırpma 944.76, 167.76, 24.480000000000018, 24.47999999999999 [Button#BtnPanelMaximize,Grid#Stage,Border#Shell,ComparisonPanel#Preview,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnPanelMaximize:pressed Border: 925.24, 148.24, 63.51999999999998, 63.52000000000001 kırpılıyor, kırpma 945.24, 168.24, 23.519999999999982, 23.52000000000001 [Button#BtnPanelMaximize,Grid#Stage,Border#Shell,ComparisonPanel#Preview,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnPanelMaximize:focus-visible Border: 925, 148, 64, 64 kırpılıyor, kırpma 945, 168, 24, 24 [Button#BtnPanelMaximize,Grid#Stage,Border#Shell,ComparisonPanel#Preview,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnPanelFullScreen Border: 957, 148, 64, 64 kırpılıyor, kırpma 977, 168, 24, 24 [Button#BtnPanelFullScreen,Grid#Stage,Border#Shell,ComparisonPanel#Preview,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnPanelFullScreen:pointerover Border: 956.76, 147.76, 64.48000000000002, 64.47999999999999 kırpılıyor, kırpma 976.76, 167.76, 24.480000000000018, 24.47999999999999 [Button#BtnPanelFullScreen,Grid#Stage,Border#Shell,ComparisonPanel#Preview,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnPanelFullScreen:pressed Border: 957.24, 148.24, 63.51999999999998, 63.52000000000001 kırpılıyor, kırpma 977.24, 168.24, 23.519999999999982, 23.52000000000001 [Button#BtnPanelFullScreen,Grid#Stage,Border#Shell,ComparisonPanel#Preview,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+#BtnPanelFullScreen:focus-visible Border: 957, 148, 64, 64 kırpılıyor, kırpma 977, 168, 24, 24 [Button#BtnPanelFullScreen,Grid#Stage,Border#Shell,ComparisonPanel#Preview,ScrollContentPresenter#PART_ContentPresenter,ScrollViewer#PageShrink,TransitioningContentControl#SelectedContentHost,MainWindow#]
+"Varsayılan Uygulamalar":pointerover Border: 1154.1, 44.629999999999995, 233.79999999999995, 77.74000000000001 kırpılıyor, kırpma 1174.1, 64.63, 193.79999999999995, 37.74000000000001 [Button#,DefaultAppSuggestionBar#,MainWindow#]
+"Varsayılan Uygulamalar":pressed Border: 1157.9, 45.370000000000005, 226.20000000000005, 76.25999999999999 kırpılıyor, kırpma 1177.9, 65.37, 186.20000000000005, 36.25999999999999 [Button#,DefaultAppSuggestionBar#,MainWindow#]
+"Bir Daha Sorma":pointerover Border: 1352.63, 44.629999999999995, 179.74, 77.74000000000001 kırpılıyor, kırpma 1372.63, 64.63, 139.74, 37.74000000000001 [Button#,DefaultAppSuggestionBar#,MainWindow#]
+"Bir Daha Sorma":pressed Border: 1355.37, 45.370000000000005, 174.26, 76.25999999999999 kırpılıyor, kırpma 1375.37, 65.37, 134.26, 36.25999999999999 [Button#,DefaultAppSuggestionBar#,MainWindow#]
+  Yığın İzleme:
+     at VidShrink.App.Kontrast.KabukTests.HerDugmeDurumuKendiKirpmasinaSigar() in C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\.calisma\worktree-agent-ab2d9de8f21f2713f\denetim-kok\teknesyum-ui\denetim\KabukTests.cs:line 101
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:27.58]     VidShrink.App.Kontrast.KabukTests.HicbirYaziFs2AltindaDegil [FAIL]
+  Başarısız VidShrink.App.Kontrast.KabukTests.HicbirYaziFs2AltindaDegil [436 ms]
+  Hata İletisi:
+   43 yazı fs-2 altında:
+StackPanel > StackPanel > WrapPanel#ChipStrip > Button#ChipArchive "Arşiv" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Arşiv" 14 < 16
+StackPanel > StackPanel > WrapPanel#ChipStrip > Button#ChipHalf "Yarısı" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Yarısı" 14 < 16
+StackPanel > StackPanel > WrapPanel#ChipStrip > Button#Chip8 "8" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "8" 14 < 16
+StackPanel > StackPanel > WrapPanel#ChipStrip > Button#ChipWhatsApp "16" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "16" 14 < 16
+StackPanel > StackPanel > WrapPanel#ChipStrip > Button#Chip25 "25" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "25" 14 < 16
+StackPanel > StackPanel > WrapPanel#ChipStrip > Button#Chip100 "100" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "100" 14 < 16
+StackPanel > StackPanel > WrapPanel#ChipStrip > Button#Chip134 "134" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "134" 14 < 16
+StackPanel > StackPanel > WrapPanel#ChipStrip > Button#Chip180 "180" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "180" 14 < 16
+StackPanel > StackPanel > WrapPanel#ChipStrip > Button#ChipAddPreset "+" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "+" 14 < 16
+StackPanel > SutunIzgara#OutputFacts > StackPanel > TextBlock#TxtStage "Boşta" 14 < 16
+StackPanel > SutunIzgara#OutputFacts > StackPanel > TextBlock#TxtOutSize "-" 14 < 16
+StackPanel > SutunIzgara#OutputFacts > StackPanel > TextBlock#TxtRemaining "-" 14 < 16
+SutunIzgara#OutputFacts > StackPanel > Grid > Button "?" 14 < 16
+Panel > Border#Badge > ContentPresenter#PART_ContentPresenter > TextBlock "?" 14 < 16
+StackPanel > SutunIzgara#OutputFacts > StackPanel > TextBlock#TxtDurationValue "-" 14 < 16
+StackPanel > StackPanel > Grid > Button "?" 14 < 16
+StackPanel > StackPanel > StackPanel > TextBlock#TxtEstimateValue "-" 14 < 16
+Border > DockPanel > StackPanel > Button "Varsayılan Uygulamalar" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Varsayılan Uygulamalar" 14 < 16
+Border > DockPanel > StackPanel > Button "Bir Daha Sorma" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Bir Daha Sorma" 14 < 16
+ContentPresenter#PART_ContentPresenter > Border > DockPanel > TextBlock "VidShrink videolar için varsayılan program değil. Windows'un Varsayılan uygulamalar sayfasından seçebilirsiniz." 14 < 16
+Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock "Oynatıcı" 14 < 16
+Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock "Küçült" 14 < 16
+Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock "Dönüştür" 14 < 16
+Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock "Kaydedici" 14 < 16
+Panel > StackPanel > ContentPresenter#PART_ContentPresenter > TextBlock "Ayarlar" 14 < 16
+StackPanel#TitleBarRight > StackPanel > StackPanel#LangSwitch > Button "English" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "English" 14 < 16
+StackPanel#TitleBarRight > StackPanel > StackPanel#LangSwitch > Button "Türkçe" 14 < 16
+Border#Root > Panel > ContentPresenter#PART_ContentPresenter > TextBlock "Türkçe" 14 < 16
+Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtSponsor "Destek Ol" 14 < 16
+Panel > ContentPresenter#PART_ContentPresenter > StackPanel > TextBlock#TxtGitHub "Teknesyum" 14 < 16
+  Yığın İzleme:
+     at VidShrink.App.Kontrast.KabukTests.HicbirYaziFs2AltindaDegil() in C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\.calisma\worktree-agent-ab2d9de8f21f2713f\denetim-kok\teknesyum-ui\denetim\KabukTests.cs:line 80
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+Başarısız! - Başarısız:     3, Başarılı:     2, Atlanan:     0, Toplam:     5, Süre: 27 s - Denetim.dll (net8.0)

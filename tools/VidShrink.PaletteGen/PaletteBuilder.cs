@@ -16,6 +16,33 @@ public static class PaletteBuilder
 {
     public const string FileName = "Theme.axaml";
 
+    /// <summary>
+    /// Standardın rol adı → paletin anahtarı. Proje fırçaları rol adını okur; renk tek anahtarda
+    /// kalır, böylece palet geçişinde bir değer iki anahtara bölünmez.
+    /// </summary>
+    public static IReadOnlyList<(string Role, string Key)> RoleAliases { get; } =
+    [
+        ("Renk1Color", "NeonBlueColor"),
+        ("Renk2Color", "NeonPinkColor"),
+        ("Renk3Color", "NeonPurpleColor"),
+        ("Renk2TextColor", "PinkTextColor"),
+        ("SuccessColor", "NeonSuccessColor"),
+        ("SurfaceColor", "SurfaceToneColor"),
+        ("DisabledColor", "TextDisabledColor"),
+        ("OnRenk1Color", "OnNeonColor"),
+        ("OnRenk2Color", "OnNeonColor"),
+        ("OnRenk3Color", "OnNeonColor"),
+        ("Renk1x10Color", "NeonBlueFillColor"),
+        ("Renk1x20Color", "NeonBlueHoverColor"),
+        ("Renk1x30Color", "NeonBlueActiveColor"),
+        ("Renk2x10Color", "NeonPinkFillColor"),
+        ("Renk3x50Color", "NeonPurpleBorderColor"),
+        ("BorderDefaultColor", "NeonBlueBorderColor"),
+        ("BorderStrongColor", "NeonBlueBorderStrongColor"),
+        ("DangerColor", "NeonEmberColor"),
+        ("WarningColor", "EmberBlazeColor"),
+    ];
+
     /// <summary><c>danger</c> verilmemişse standardın kuralı: <c>danger</c> <c>renk-2</c>'nin değerini izler.</summary>
     public static string Danger(PaletteSeed seed) => seed.Danger ?? seed.Renk2;
 
@@ -55,8 +82,8 @@ public static class PaletteBuilder
         var mid = seed.Atmos ?? flame;
         var edge = seed.Atmos is null ? ember : Mix(seed.Atmos, bg, 0.4);
 
-        var lines = new[]
-        {
+        string[] lines =
+        [
             "<ResourceDictionary xmlns=\"https://github.com/avaloniaui\"",
             "                    xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\">",
             "",
@@ -105,9 +132,13 @@ public static class PaletteBuilder
             $"  <BoxShadows x:Key=\"GlowPurple\">0 0 20 0 {Alpha(seed.Renk3, 0x40)}</BoxShadows>",
             "  <BoxShadows x:Key=\"GlowNone\">0 0 0 0 #00000000</BoxShadows>",
             "",
+            "  <!-- Standardın rol adları. Themes/Theme.axaml fırçaları bu adlara bağlanır;",
+            "       değer yukarıdaki tek anahtardan gelir, ikinci bir renk yazılmaz. -->",
+            .. RoleAliases.Select(alias => $"  <StaticResource x:Key=\"{alias.Role}\" ResourceKey=\"{alias.Key}\"/>"),
+            "",
             "</ResourceDictionary>",
             ""
-        };
+        ];
 
         return string.Join("\n", lines);
     }

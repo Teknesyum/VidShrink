@@ -81,6 +81,7 @@ internal sealed class DefaultAppSuggestionBar : UserControl
     private static Button Action(string key)
     {
         var button = new Button { VerticalAlignment = VerticalAlignment.Center };
+        button.Bind(StyledElement.ThemeProperty, Token("GhostButton"));
         button.Bind(ContentControl.ContentProperty, Text(key));
         button.Bind(TemplatedControl.PaddingProperty, Token("ButtonPaddingSm"));
         button.Bind(TemplatedControl.FontSizeProperty, Token("FontSizeSm"));
