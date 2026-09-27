@@ -134,9 +134,9 @@
     }
   ],
   "uc": {
-    "surum": "0.20.0",
-    "duzen": "0546268da3b3bc91",
-    "commit": "331a53cc367de2a374a984807738fedabaf5f07b",
+    "surum": "0.26.0",
+    "duzen": "a0eaf97ec84216aa",
+    "commit": "1f04c7fd499b720fc783f5adc08348fa648a2524",
     "tarih": "2026-09-27"
   }
 }
