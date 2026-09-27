@@ -92,6 +92,11 @@ Arayüz yok, süreç yok, saf `record`. Sprocket'in deseni: zaman `long` **tick*
 
 Bu dalga tamamen sınanabilir: süreç açmaz, dosya okumaz.
 
+**Durum: kuruldu.** `src/VidShrink.Core/Editing/EditClip.cs` (`EditTime`, `EditClip`),
+`EditTimeline.cs`, `EditCommands.cs`; testler `KesimListesiTests.cs`, `KesimListesiGeriAlTests.cs`
+(70/70). Hız 0,01-100, 0,01 adımlı; geri yön eksi işaretle, sıfır reddedilir. `PreviewTimeline`
+bağlanmadı: ölü kod olarak `trash/`'e taşınmıştı (7a4d2f7b); tek parçalı hal `EditTimeline.FromSource`.
+
 ## D2 — `edl://` ile önizleme
 
 Kesim listesi mpv'nin `edl://` metnine çevrilir ve mevcut motor onu tek dosya gibi açar
