@@ -13,15 +13,15 @@
 
   <Styles.Resources>
 
-    <Color x:Key="Renk1Color">#FF6FB7FF</Color>
-    <Color x:Key="Renk2Color">#FFCBA7D2</Color>
-    <Color x:Key="Renk3Color">#FFC3A3FF</Color>
+    <Color x:Key="Renk1Color">#FF4DA6FF</Color>
+    <Color x:Key="Renk2Color">#FFDE7EF1</Color>
+    <Color x:Key="Renk3Color">#FFB68FFF</Color>
     <Color x:Key="Renk2TextColor">#FFFA8CFF</Color>
     <Color x:Key="Renk3TextColor">#FFAC7FFF</Color>
 
-    <SolidColorBrush x:Key="Renk1"     Color="#FF6FB7FF"/>
-    <SolidColorBrush x:Key="Renk2"     Color="#FFCBA7D2"/>
-    <SolidColorBrush x:Key="Renk3"     Color="#FFC3A3FF"/>
+    <SolidColorBrush x:Key="Renk1"     Color="#FF4DA6FF"/>
+    <SolidColorBrush x:Key="Renk2"     Color="#FFDE7EF1"/>
+    <SolidColorBrush x:Key="Renk3"     Color="#FFB68FFF"/>
     <SolidColorBrush x:Key="Success"     Color="#FF66F09A"/>
     <SolidColorBrush x:Key="Surface"     Color="#F5000000"/>
     <SolidColorBrush x:Key="AppBg"       Color="#FF000000"/>
@@ -35,7 +35,7 @@
 
     <SolidColorBrush x:Key="WindowEdge" Color="Transparent"/>
     <SolidColorBrush x:Key="ScrollbarThumb" Color="#FFAC7FFF"/>
-    <SolidColorBrush x:Key="ScrollbarThumbHover" Color="#FFCBA7D2"/>
+    <SolidColorBrush x:Key="ScrollbarThumbHover" Color="#FFDE7EF1"/>
     <SolidColorBrush x:Key="ScrollbarTrack" Color="#4D000000"/>
 
     <SolidColorBrush x:Key="Renk2Text" Color="#FFFA8CFF"/>
@@ -45,13 +45,13 @@
          written there and is not repeated here. The hex comes from the single
          source of truth and is never edited by hand. The Success brush was renamed
          from NeonSuccess on 2026-08-23 and this file carries the new name. -->
-    <SolidColorBrush x:Key="Danger"     Color="#FFCBA7D2"/>
+    <SolidColorBrush x:Key="Danger"     Color="#FFDE7EF1"/>
     <SolidColorBrush x:Key="DangerText" Color="#FFFA8CFF"/>
     <SolidColorBrush x:Key="Warning"    Color="#FFFFD24D"/>
     <SolidColorBrush x:Key="Warning50"  Color="#80FFD24D"/>
 
     <SolidColorBrush x:Key="TextBody"  Color="#FFFFFFFF"/>
-    <SolidColorBrush x:Key="TextLabel" Color="#FF6FB7FF"/>
+    <SolidColorBrush x:Key="TextLabel" Color="#FF4DA6FF"/>
     <!-- A disabled control is exempt from 7:1 (SKILL §2) and there is a price: a
          colour-blind user cannot see the grey. This brush is never used alone;
          every disabled control carries a marker in addition to the grey:
@@ -78,34 +78,36 @@
     <SolidColorBrush x:Key="OnRenk2x10"    Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="OnRenk2x20"    Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="OnRenk2x30"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk2x50"    Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="OnRenk3x10"    Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="OnRenk3x20"    Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="OnRenk3x30"    Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="OnRenk3x50"    Color="#FFFFFFFF"/>
 
-    <SolidColorBrush x:Key="Renk1x10"     Color="#1A6FB7FF"/>
-    <SolidColorBrush x:Key="Renk1x20"     Color="#336FB7FF"/>
-    <SolidColorBrush x:Key="Renk1x30"     Color="#4D6FB7FF"/>
-    <SolidColorBrush x:Key="Renk1x50"     Color="#806FB7FF"/>
-    <SolidColorBrush x:Key="Renk1x60"     Color="#996FB7FF"/>
+    <SolidColorBrush x:Key="Renk1x10"     Color="#1A4DA6FF"/>
+    <SolidColorBrush x:Key="Renk1x20"     Color="#334DA6FF"/>
+    <SolidColorBrush x:Key="Renk1x30"     Color="#4D4DA6FF"/>
+    <SolidColorBrush x:Key="Renk1x50"     Color="#804DA6FF"/>
+    <SolidColorBrush x:Key="Renk1x60"     Color="#994DA6FF"/>
 
-    <SolidColorBrush x:Key="Renk2x10"     Color="#1ACBA7D2"/>
-    <SolidColorBrush x:Key="Renk2x20"     Color="#33CBA7D2"/>
-    <SolidColorBrush x:Key="Renk2x30"     Color="#4DCBA7D2"/>
-    <SolidColorBrush x:Key="Renk2x50"     Color="#80CBA7D2"/>
-    <SolidColorBrush x:Key="Renk2x60"     Color="#99CBA7D2"/>
+    <SolidColorBrush x:Key="Renk2x10"     Color="#1ADE7EF1"/>
+    <SolidColorBrush x:Key="Renk2x20"     Color="#33DE7EF1"/>
+    <SolidColorBrush x:Key="Renk2x30"     Color="#4DDE7EF1"/>
+    <SolidColorBrush x:Key="Renk2x50"     Color="#80DE7EF1"/>
+    <SolidColorBrush x:Key="Renk2x60"     Color="#99DE7EF1"/>
 
-    <SolidColorBrush x:Key="Renk3x10"     Color="#1AC3A3FF"/>
-    <SolidColorBrush x:Key="Renk3x20"     Color="#33C3A3FF"/>
-    <SolidColorBrush x:Key="Renk3x30"     Color="#4DC3A3FF"/>
-    <SolidColorBrush x:Key="Renk3x50"     Color="#80C3A3FF"/>
-    <SolidColorBrush x:Key="Renk3x60"     Color="#99C3A3FF"/>
+    <SolidColorBrush x:Key="Renk3x10"     Color="#1AB68FFF"/>
+    <SolidColorBrush x:Key="Renk3x20"     Color="#33B68FFF"/>
+    <SolidColorBrush x:Key="Renk3x30"     Color="#4DB68FFF"/>
+    <SolidColorBrush x:Key="Renk3x50"     Color="#80B68FFF"/>
+    <SolidColorBrush x:Key="Renk3x60"     Color="#99B68FFF"/>
 
     <SolidColorBrush x:Key="Renk2Text50"  Color="#80FA8CFF"/>
     <SolidColorBrush x:Key="Renk3Text50"  Color="#80AC7FFF"/>
 
-    <SolidColorBrush x:Key="BorderDefault"    Color="#8C6FB7FF"/>
-    <SolidColorBrush x:Key="BorderStrong"     Color="#B36FB7FF"/>
-    <SolidColorBrush x:Key="BorderDecorative" Color="#336FB7FF"/>
+    <SolidColorBrush x:Key="BorderDefault"    Color="#8C4DA6FF"/>
+    <SolidColorBrush x:Key="BorderStrong"     Color="#B34DA6FF"/>
+    <SolidColorBrush x:Key="BorderDecorative" Color="#334DA6FF"/>
 
     <!-- The chain's only source is SKILL §3; the order matches. Atkinson
          Hyperlegible Next is the default and is EMBEDDED in the project, not
@@ -128,7 +130,7 @@
          and the only way to glow text. The deviation is recorded in the contract's
          Output section. The WPF-specific ShadowDepth property is ABSENT here and
          the test looks for it. -->
-    <DropShadowEffect x:Key="HeroGlow" Color="#FF6FB7FF"
+    <DropShadowEffect x:Key="HeroGlow" Color="#FF4DA6FF"
                       BlurRadius="0" OffsetX="0" OffsetY="0" Opacity="0"/>
 
     <!-- SKILL §5.4 tokens: e-out cubic-bezier(0.2,0,0,1), e-in (0.4,0,1,1).
@@ -185,6 +187,8 @@
     <sys:Double x:Key="SidebarCollapsedWidth">48</sys:Double>
     <sys:Double x:Key="InputHeight">40</sys:Double>
     <sys:Double x:Key="ModalWidth">560</sys:Double>
+    <sys:Double x:Key="InstallerWidth">720</sys:Double>
+    <sys:Double x:Key="InstallerHeight">540</sys:Double>
     <sys:Double x:Key="ModalMaxRatio">0.85</sys:Double>
     <sys:Double x:Key="ToastWidth">360</sys:Double>
     <sys:Double x:Key="ToastMax">3</sys:Double>
@@ -207,13 +211,13 @@
     <sys:TimeSpan x:Key="FrameBudget">0:0:0.016</sys:TimeSpan>
     <sys:TimeSpan x:Key="BgRotateMin">0:0:40</sys:TimeSpan>
 
-    <SolidColorBrush x:Key="LabelBrandBrush" Color="#FF6FB7FF"/>
+    <SolidColorBrush x:Key="LabelBrandBrush" Color="#FF4DA6FF"/>
     <sys:Double x:Key="LabelBrandSize">14</sys:Double>
     <FontWeight x:Key="LabelBrandWeight">SemiBold</FontWeight>
     <SolidColorBrush x:Key="LabelSupportBrush" Color="#FFAC7FFF"/>
     <sys:Double x:Key="LabelSupportSize">14</sys:Double>
     <FontWeight x:Key="LabelSupportWeight">SemiBold</FontWeight>
-    <SolidColorBrush x:Key="LabelSiteBrush" Color="#FF6FB7FF"/>
+    <SolidColorBrush x:Key="LabelSiteBrush" Color="#FF4DA6FF"/>
     <sys:Double x:Key="LabelSiteSize">14</sys:Double>
     <FontWeight x:Key="LabelSiteWeight">SemiBold</FontWeight>
     <SolidColorBrush x:Key="LabelUpdateBrush" Color="#FFFFFFFF"/>
@@ -382,7 +386,7 @@
                   Padding="{TemplateBinding Padding}"
                   CornerRadius="{StaticResource Radius}"
                   RenderTransformOrigin="50%,50%"
-                  BoxShadow="0 0 0 0 #006FB7FF">
+                  BoxShadow="0 0 0 0 #004DA6FF">
             <!-- Do NOT write keyframe animations for hover and press. Avalonia does
                  not rewind a keyframe when leaving a pseudo-class; the button stays
                  stuck on the last frame. The right tool is Transitions, which run
@@ -456,7 +460,7 @@
           <Rectangle Margin="4" RadiusX="5" RadiusY="5"
                      Stroke="#FF000000" StrokeThickness="{StaticResource FocusWidth}"/>
           <Rectangle Margin="2" RadiusX="7" RadiusY="7"
-                     Stroke="#FF6FB7FF" StrokeThickness="{StaticResource FocusWidth}"/>
+                     Stroke="#FF4DA6FF" StrokeThickness="{StaticResource FocusWidth}"/>
         </Panel>
       </FocusAdornerTemplate>
     </Setter>
