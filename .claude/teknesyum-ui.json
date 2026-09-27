@@ -132,5 +132,11 @@
       "file": "src/VidShrink.Core/UpdateBadge.cs",
       "reason": "Arayüzsüz, 54 satırlık saf mantık (Core katmanı); tarayıcı yalnız adından yakalıyor. scaffold.js durum şablonu bir görünüm üretir ve Core'a giremez; ayrıca 3 durum biliyor (projede 7), sürünen ilerleme, canlı günlük ve indirme sırasında kilitli kapatma yok."
     }
-  ]
+  ],
+  "uc": {
+    "surum": "0.20.0",
+    "duzen": "52e0c6b7355cba20",
+    "commit": "6fc6027707771d779e8e373da6891f43b355bbfe",
+    "tarih": "2026-09-27"
+  }
 }

@@ -7,6 +7,15 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-27
+
+### Changed
+
+- The interface now takes its sizes, spacing, corner radius, motion timing and font from the Teknesyum UI layout instead of its own hand-written values; a layout update reaches the app without code changes.
+- The Teknesyum palette reads its colours straight from the layout tokens; all 36 palettes share one role schema.
+- Brand and support texts come from the shared label files.
+- The default-app suggestion bar and the Open URL dialog use the themed buttons.
+
 ## [0.10.0] - 2026-09-27
 
 ### Added
