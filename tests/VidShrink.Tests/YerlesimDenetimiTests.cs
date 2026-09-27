@@ -788,7 +788,7 @@ public sealed class YerlesimDenetimiTests
     /// geçiş aynı şeyi yapar. Geçersizleme kaldırılınca 10/18 kol kırmızı döner (ölçüldü).
     /// <para>Üçüncü geçiş (2026-09-27, düzenleyici D3): <c>UpdateLayout</c> pencerenin kendi
     /// boyutunda koşup üst şerit kademesini geniş haliyle kuruyor, zorlanan boyuttaki ilk geçiş
-    /// kademeyi (marka çekilir, sekme dolgusu değişir) yerleşim sırasında düzeltiyor; iki geçişte
+    /// kademeyi (yedi sekmeli şerit simgesiz dizilir) yerleşim sırasında düzeltiyor; iki geçişte
     /// sekme şeridi eski dolguyla yerleşmiş ve ölçüsü geçersiz kalıyordu (1024'te 8 dil kırmızı).</para>
     /// </summary>
     private static void Yerlestir(MainWindow pencere, Size boyut)

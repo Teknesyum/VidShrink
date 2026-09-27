@@ -150,6 +150,12 @@ belirteçten türetilmiş.
 9. Testler `DuzenleyiciCizelgeTests.cs`: yakalama, görünür klip ≤12, 10 işlem/Undo/Redo,
    peer rolü, sabit renk/ölçü taraması; `KontrastTests.Ekranlar()`'a düzenleyici.
 
+**Uygulamada çıkanlar:** yedi sekmeyle 1024 px'te sekiz dil kolu şerit taşması verdi; kusur
+denetçinin iki geçişiydi (şerit simgesiz kademeye yerleşim sırasında geçiyor, ölçü bayat
+kalıyordu), yerleşim denetçisi ağacı artık üç kez ölçer. Uygulama koduna dokunulmadı.
+Çizelgenin tam boy iki katmanı (iz zemini, oynatma başı) kardeş çakışmasından muaf. Araç
+çubuğu ve çizelge `Panel` zemininde: pencere zemininin parıltısı üstünde yazı 7:1 tutmadı.
+
 ## D4 — Teslim
 
 Üç kip (fable sorusu 2) ffmpeg'e çevrilir: kayıpsız parçalar concat demuxer'la, kenar

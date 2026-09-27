@@ -102,19 +102,19 @@ public sealed class DuzenleyiciCizelgeTests
     [Fact]
     public void OnIslemOnGeriAlOnYineleEsitlik()
     {
-        var (ilk, islenmis, geriAlinmis, yinelenmis, cizelgedeki) = AppHost.Run(() =>
+        var (adimlar, geriAdimlar, ileriAdimlar, cizelgedeki) = AppHost.Run(() =>
         {
             var view = new EditorView();
             view.ShowTimeline(EditTimeline.FromSource(S(120)), 30);
             var zar = new Random(20260927);
-            var ilk = view.Model!.Clips.ToList();
+            var adimlar = new List<List<EditClip>> { view.Model!.Clips.ToList() };
             var yapilan = 0;
             for (var deneme = 0; yapilan < 10 && deneme < 500; deneme++)
             {
                 var model = view.Model!;
                 var sec = zar.Next(model.Clips.Count);
                 view.TimelineView.SelectedIndex = sec;
-                var basarili = zar.Next(5) switch
+                var basarili = (yapilan % 5) switch
                 {
                     0 => Bol(view, zar),
                     1 => view.SetSpeed(new[] { 0.5m, 1.5m, 2m, 3m }[zar.Next(4)]),
@@ -122,23 +122,35 @@ public sealed class DuzenleyiciCizelgeTests
                     3 => view.DeleteSelected(),
                     _ => Aralik(view, zar)
                 };
-                if (basarili) yapilan++;
+                if (!basarili) continue;
+                yapilan++;
+                adimlar.Add(view.Model!.Clips.ToList());
             }
 
             Assert.Equal(10, yapilan);
-            var islenmis = view.Model!.Clips.ToList();
-            for (var i = 0; i < 10; i++) Assert.True(view.Undo());
-            var geriAlinmis = view.Model!.Clips.ToList();
+            var geriAdimlar = new List<List<EditClip>>();
+            for (var i = 0; i < 10; i++)
+            {
+                Assert.True(view.Undo());
+                geriAdimlar.Add(view.Model!.Clips.ToList());
+            }
             Assert.False(view.Undo());
-            for (var i = 0; i < 10; i++) Assert.True(view.Redo());
-            var yinelenmis = view.Model!.Clips.ToList();
-            return (ilk, islenmis, geriAlinmis, yinelenmis, view.TimelineView.Model!.Clips.ToList());
+            var ileriAdimlar = new List<List<EditClip>>();
+            for (var i = 0; i < 10; i++)
+            {
+                Assert.True(view.Redo());
+                ileriAdimlar.Add(view.Model!.Clips.ToList());
+            }
+            return (adimlar, geriAdimlar, ileriAdimlar, view.TimelineView.Model!.Clips.ToList());
         });
 
-        Assert.NotEqual(ilk, islenmis);
-        Assert.Equal(ilk, geriAlinmis);
-        Assert.Equal(islenmis, yinelenmis);
-        Assert.Equal(islenmis, cizelgedeki);
+        Assert.NotEqual(adimlar[0], adimlar[10]);
+        for (var i = 0; i < 10; i++)
+        {
+            Assert.Equal(adimlar[9 - i], geriAdimlar[i]);
+            Assert.Equal(adimlar[i + 1], ileriAdimlar[i]);
+        }
+        Assert.Equal(adimlar[10], cizelgedeki);
     }
 
     private static bool Bol(EditorView view, Random zar)

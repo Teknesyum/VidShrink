@@ -727,32 +727,23 @@ public partial class MainWindow : Window
         try
         {
             var gap = TitleBarContent.ColumnSpacing;
-            TitleBrand.IsVisible = true;
-            TitleBrand.Measure(Size.Infinity);
-            var sol = TitleBarContent.Margin.Left + TitleBrand.DesiredSize.Width + gap;
+            var sol = TitleBarContent.Margin.Left + TitleBrand.Bounds.Width + gap;
+            Tabs.Padding = new Thickness(sol, 0, 0, 0);
 
-            var sekmeler = Tabs.Items.OfType<TabItem>().Where(t => t.IsVisible).ToList();
-            var serit = sekmeler.Sum(t => t.Bounds.Width + t.Margin.Left + t.Margin.Right);
-            if (serit <= 0 || TitleBarLayer.Bounds.Width <= 0)
-            {
-                Tabs.Padding = new Thickness(sol, 0, 0, 0);
-                return;
-            }
+            var serit = Tabs.GetVisualDescendants().OfType<ItemsPresenter>().FirstOrDefault()?.Bounds.Width ?? 0;
+            if (serit <= 0 || TitleBarLayer.Bounds.Width <= 0) return;
 
             var enAz = this.TryFindResource("SpaceLg", out var pay) && pay is double d ? d : 0;
             var ikon = this.TryFindResource("IconSizeSm", out var boy) && boy is double b ? b : 0;
             var ara = this.TryFindResource("SpaceSm", out var bosluk) && bosluk is double a ? a : 0;
-            var simge = sekmeler.Count * (ikon + ara);
-            var tamSerit = serit + sekmeler.Count(t => SimgesizDizildi(t, ikon)) * (ikon + ara);
+            var tamSerit = serit + Tabs.Items.OfType<TabItem>().Count(t => t.IsVisible && SimgesizDizildi(t, ikon)) * (ikon + ara);
             var bos = TitleBarLayer.Bounds.Width - sol - tamSerit - TitleBarContent.Margin.Right - enAz;
-            var kademe = TitleBarStage(bos, simge);
+            var kademe = TitleBarStage(bos);
             BtnSponsor.IsVisible = kademe < 1;
             BtnGitHub.IsVisible = kademe < 1;
             TxtUpdateBadge.IsVisible = kademe < 2;
             LangSwitch.IsVisible = kademe < 3;
             Tabs.Classes.Set("compact", kademe > 3);
-            TitleBrand.IsVisible = kademe < 5;
-            Tabs.Padding = new Thickness(kademe < 5 ? sol : TitleBarContent.Margin.Left, 0, 0, 0);
             InvalidateTitleBarRight();
         }
         finally
@@ -774,11 +765,10 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// Sag grubun kacinci kademede sigdigi: 0 hepsi, 1 baglar cekilmis, 2 rozet yazisi da,
-    /// 3 dil dugmeleri de, 4 o da yetmiyor ve sekmeler simgesiz, 5 simgesiz serit de sigmiyor ve
-    /// marka cekilir (duzenleyici sekmesiyle 1024 genislikte de/el/ta/vi seridi 6-105 px tasiyordu). Parcalar olcum icin gecici olarak aciliyor; ayni cagride geri
+    /// 3 dil dugmeleri de, 4 o da yetmiyor ve sekmeler simgesiz. Parcalar olcum icin gecici olarak aciliyor; ayni cagride geri
     /// kapandigi icin ekrana hic cizilmiyorlar.
     /// </summary>
-    private int TitleBarStage(double bos, double simge)
+    private int TitleBarStage(double bos)
     {
         BtnSponsor.IsVisible = true;
         BtnGitHub.IsVisible = true;
@@ -798,8 +788,7 @@ public partial class MainWindow : Window
         if (tam - baglar <= bos) return 1;
         if (tam - baglar - rozet <= bos) return 2;
         if (tam - baglar - rozet - dil <= bos) return 3;
-        if (tam - baglar - rozet - dil <= bos + simge) return 4;
-        return 5;
+        return 4;
     }
 
     private void InvalidateTitleBarRight()
