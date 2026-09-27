@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Avalonia;
@@ -136,14 +136,14 @@ public sealed class KontrastTests
         ["Horizon"] = new() { ["NeonBlue"] = 4.64, ["TextBody"] = 6.26 },
         ["Kanagawa"] = new() { ["NeonBlue"] = 4.37, ["NeonSuccess"] = 6.64, ["TextBody"] = 5.81 },
         ["MaterialOcean"] = new() { ["NeonBlue"] = 5.76 },
-        ["Monokai"] = new() { ["NeonBlue"] = 5.48, ["NeonSuccess"] = 6.90, ["TextBody"] = 5.35 },
+        ["Monokai"] = new() { ["NeonBlue"] = 5.48, ["NeonSuccess"] = 6.90, ["PinkText"] = 6.53, ["TextBody"] = 5.35 },
         ["Moonlight"] = new() { ["NeonBlue"] = 4.24, ["TextBody"] = 4.75 },
         ["NightOwl"] = new() { ["NeonBlue"] = 5.21, ["TextBody"] = 6.06 },
         ["Nord"] = new() { ["NeonBlue"] = 4.96, ["NeonSuccess"] = 6.27, ["TextBody"] = 5.85 },
         ["OneDark"] = new() { ["NeonBlue"] = 4.36, ["NeonSuccess"] = 6.57, ["TextBody"] = 4.66 },
         ["RosePine"] = new() { ["TextBody"] = 5.99 },
         ["RosePineDawn"] = new() { ["EmberBlaze"] = 1.78, ["NeonBlue"] = 2.77, ["NeonSuccess"] = 4.95, ["OnNeon"] = 6.12, ["PinkText"] = 1.75, ["TextBody"] = 5.09 },
-        ["Solarized"] = new() { ["EmberBlaze"] = 4.10, ["NeonBlue"] = 3.63, ["NeonSuccess"] = 4.15, ["OnNeon"] = 6.64, ["TextBody"] = 6.79 },
+        ["Solarized"] = new() { ["EmberBlaze"] = 4.10, ["NeonBlue"] = 3.63, ["NeonSuccess"] = 4.15, ["OnNeon"] = 6.64, ["PinkText"] = 6.93, ["TextBody"] = 6.79 },
         ["SolarizedLight"] = new() { ["EmberBlaze"] = 2.47, ["NeonBlue"] = 2.69, ["NeonSuccess"] = 2.53, ["OnNeon"] = 5.70, ["PinkText"] = 1.87 },
         ["Synthwave"] = new() { ["TextBody"] = 6.09 },
         ["TokyoNight"] = new() { ["NeonBlue"] = 4.61, ["TextBody"] = 5.17 }
@@ -177,6 +177,7 @@ public sealed class KontrastTests
                 var adv = w.FindControl<TabItem>("TabAdvanced");
                 if (adv != null) adv.IsVisible = true;
                 tabs.SelectedIndex = sira;
+                w.FindControl<VidShrink.App.Playback.ComparisonPanel>("Preview")?.Controls.SetEncodeProgress(0.22, 1, 2, 2);
                 Dispatcher.UIThread.RunJobs();
                 return w;
             });
