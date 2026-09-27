@@ -38,7 +38,7 @@ public static class ShortcutIcons
             try
             {
                 var target = writer.ReadTarget(shortcut);
-                if (string.IsNullOrEmpty(target) || !string.Equals(Path.GetFullPath(target), exe, StringComparison.OrdinalIgnoreCase)) continue;
+                if (!PathEquality.Same(target, exe, StringComparison.OrdinalIgnoreCase)) continue;
                 writer.SetIcon(shortcut, exe + ",0");
                 rewritten++;
             }
