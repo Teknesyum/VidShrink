@@ -509,13 +509,13 @@ public sealed class OynaticiYolHaritasiTests
     }
 
     /// <summary>
-    /// O1: iki barin birbirine esitligi mutasyona olu — <c>HoverZone.Band</c> yariya
-    /// indirilirse iki esik de ayni oranda kuculur ve esitlik korunur. Bu yuzden esik
-    /// mutlak olarak da pimlendi: bant yuzey yuksekliginin dortte biri
-    /// (<c>PlaybackHoverZoneShare</c> = 0,25), iki esik de o sayinin 1 px komsulugunda.
+    /// Ust bar sabit piksel bandinda acilir (<c>PlaybackTopRevealZone</c> = 48, danisma 015
+    /// S3), alt serit hala yuzeyin dortte birinde (<c>PlaybackHoverZoneShare</c> = 0,25).
+    /// Ust esik belirtece 1 px komsulukta pimli ve yuzeyin dortte birinden kucuk: esik
+    /// orana geri donerse 800 px pencerede 190 px'e cikar ve iki kosul birden kirilir.
     /// </summary>
     [Fact]
-    public void P14UstBarVeAltSeritAyniMesafedeAcilir()
+    public void P14UstBarSabitBantAltSeritOranlaAcilir()
     {
         var body = new StringBuilder();
         try
@@ -573,14 +573,14 @@ public sealed class OynaticiYolHaritasiTests
             var bant = view.RevealBand;
             var yuzeyYuksekligi = yuzey.Bounds.Height;
             var baslik = window.TitleBar.Height;
+            var tetik = window.TopRevealZone;
             view.Close();
             window.Close();
 
-            Assert.True(Math.Abs(ust - altEsik) <= 1, $"ust {ust} px, alt {altEsik} px" + Environment.NewLine + body);
-            Assert.True(Math.Abs(ust - bant) <= 1, $"ust {ust} px, bant {YolKanit.N(bant)}");
+            Assert.True(Math.Abs(ust - tetik) <= 1, $"ust {ust} px, tetik {YolKanit.N(tetik)}" + Environment.NewLine + body);
+            Assert.True(ust < bant - 1, $"ust {ust} px oran bandina ({YolKanit.N(bant)}) kaydi");
             Assert.True(ust > baslik + 1, $"ust esik baslik yuksekliginde kaldi: {ust} <= {YolKanit.N(baslik)}");
             Assert.Equal(yuzeyYuksekligi * 0.25, bant, 1);
-            Assert.InRange(ust, yuzeyYuksekligi * 0.25 - 1, yuzeyYuksekligi * 0.25 + 1);
             Assert.InRange(altEsik, yuzeyYuksekligi * 0.25 - 1, yuzeyYuksekligi * 0.25 + 1);
             return 0;
         });

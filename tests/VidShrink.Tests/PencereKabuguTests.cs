@@ -52,38 +52,47 @@ public class PencereKabuguTests
     }
 
     /// <summary>
-    /// Başlık çubuğunun düğmeleri sekme denetiminden <b>sonra</b> bildiriliyor. Avalonia'da
-    /// aynı gözdeki kardeşlerin sırası z düzenidir: düğmeler önce bildirildiği sürece
-    /// oynatıcı sekmesinin tam pencereyi kaplayan donuk sahnesi onların üstüne biniyordu,
-    /// şerit geri gelince düğmeler görünmüyor ve tıklama oynatıcıya gidiyordu.
+    /// Başlık çubuğunun düğmeleri sekme şablonunun tek üst katmanında (<c>TopOverlay</c>):
+    /// <c>TitleBarLayer</c> sekme denetiminin <c>UstPanel.Icerik</c> değeri, şablon onu
+    /// seçili içerikten ve sekme şeridinden <b>sonra</b> bildiriyor. Avalonia'da aynı gözdeki
+    /// kardeşlerin sırası z düzenidir: oynatıcının tam pencereyi kaplayan sahnesi düğmelerin
+    /// üstüne binmiyor, sekmeler de düğmelerin altında kalıyor.
     ///
-    /// <para>Bandın zemini <c>TitleBar</c>'da kaldı, içerik <c>TitleBarLayer</c>'a çıktı.
-    /// Katmanın kendi zemini yok; ortadaki boş sütun tıklamayı altındaki sekme şeridine
+    /// <para>Katmanın kendi zemini yok; ortadaki boş sütun tıklamayı altındaki sekme şeridine
     /// geçiriyor, yalnız iki yandaki düğmeler hedef oluyor.</para>
     /// </summary>
     [Fact]
     public void BaslikDugmeleriIcerigiUstunde()
     {
         var xaml = Xaml();
+        var controls = Controls();
 
-        var serit = xaml.IndexOf("</TabControl>", StringComparison.Ordinal);
+        var bas = xaml.IndexOf("<izi:UstPanel.Icerik>", StringComparison.Ordinal);
+        var son = xaml.IndexOf("</izi:UstPanel.Icerik>", StringComparison.Ordinal);
         var katman = xaml.IndexOf("<Border x:Name=\"TitleBarLayer\"", StringComparison.Ordinal);
-
-        Assert.True(serit > 0 && katman > 0, "iki parça da bulunmalı");
-        Assert.True(katman > serit, "başlık katmanı sekme denetiminden sonra bildirilmeli");
-        Assert.Contains("x:Name=\"TitleBarContent\"", xaml[katman..]);
+        var sekmeSonu = xaml.IndexOf("</TabControl>", StringComparison.Ordinal);
+        Assert.True(bas > 0 && bas < katman && katman < son && son < sekmeSonu, "başlık katmanı UstPanel.Icerik içinde olmalı");
+        Assert.Contains("x:Name=\"TitleBarContent\"", xaml[katman..son]);
         Assert.DoesNotContain("Background", xaml[katman..(katman + 160)]);
-        Assert.Contains("Selector=\"Window.chrome-hidden Border#TitleBarLayer\"", xaml);
+
+        var icerik = controls.IndexOf("Name=\"SelectedContentHost\"", StringComparison.Ordinal);
+        var ust = controls.IndexOf("<Panel Name=\"TopOverlay\"", StringComparison.Ordinal);
+        var serit = controls.IndexOf("Name=\"PART_ItemsPresenter\"", StringComparison.Ordinal);
+        var dugmeler = controls.IndexOf("Name=\"TopOverlayContent\"", StringComparison.Ordinal);
+        Assert.True(icerik > 0 && icerik < ust && ust < serit && serit < dugmeler, "sıra: içerik, üst katman, şerit, düğmeler");
+        Assert.Contains("{TemplateBinding izi:UstPanel.Icerik}", controls[dugmeler..(dugmeler + 200)]);
     }
 
-    /// <summary>Gizleme sınıfı hem başlık çubuğunu hem sekme şeridini kapatıyor.</summary>
+    /// <summary>Gizleme sınıfı tek bağla tüm üst katmanı kapatıyor: şerit, düğmeler, paravan.</summary>
     [Fact]
     public void GizlemeSinifiIkiParcayiKapatiyor()
     {
         var xaml = Xaml();
 
         Assert.Contains("Selector=\"Window.chrome-hidden Border#TitleBar\"", xaml);
-        Assert.Contains("PART_ItemsPresenter", Regex.Match(
+        Assert.Equal("Selector=\"Window.chrome-hidden TabControl#Tabs /template/ Panel#TopOverlay\"", Regex.Match(
             xaml, @"Selector=""Window\.chrome-hidden TabControl#Tabs[^""]*""").Value);
+        Assert.Single(Regex.Matches(xaml, @"Selector=""Window\.chrome-hidden TabControl#Tabs"));
+        Assert.DoesNotContain("Window.chrome-hidden Border#TitleBarLayer", xaml);
     }
 }
