@@ -156,13 +156,9 @@ public sealed class KeymapTests
             case PlayerInputKind.Wheel:
                 GirdiSurucu.Wheel(view, 1, input.Modifiers);
                 break;
-            case PlayerInputKind.DoubleClick:
-                GirdiSurucu.Press(view, PointerUpdateKind.LeftButtonPressed, RawInputModifiers.LeftMouseButton, 2);
-                break;
             case PlayerInputKind.Press when input.Button == PlayerButton.Left:
                 GirdiSurucu.Press(view, PointerUpdateKind.LeftButtonPressed, RawInputModifiers.LeftMouseButton);
-                view.FareRelease(0);
-                view.FareDue(ClickArbiter.DoubleWindowMs);
+                view.FareRelease();
                 break;
             case PlayerInputKind.Press when input.Button == PlayerButton.Middle:
                 GirdiSurucu.Press(view, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
@@ -606,7 +602,7 @@ public sealed class OynaticiDenetimMotorTests
             var fps = DenetimSurucu.Motor(view).FramesPerSecond;
 
             var p0 = DenetimSurucu.Konum(view);
-            GirdiSurucu.Key(view, Key.F);
+            GirdiSurucu.Key(view, Key.OemPeriod, KeyModifiers.None, ".");
             DenetimSurucu.Pump(view, () => Math.Abs(DenetimSurucu.Konum(view) - p0) > 1e-4, 3);
             DenetimSurucu.Wait(view, 0.2);
             var p1 = DenetimSurucu.Konum(view);
@@ -627,7 +623,7 @@ public sealed class OynaticiDenetimMotorTests
         var geri = rapor.p2 - rapor.p1;
         DenetimKanit.Write("kare-adimi.txt",
             $"fps {DenetimKanit.N(rapor.fps)}, 1/fps {DenetimKanit.N(kare)} sn{Environment.NewLine}"
-            + $"F: {DenetimKanit.N(rapor.p0)} -> {DenetimKanit.N(rapor.p1)} = {DenetimKanit.N(ileri)} sn ({DenetimKanit.N(ileri / kare)} kare), sonra oynatma {rapor.oynuyor}{Environment.NewLine}"
+            + $"Nokta: {DenetimKanit.N(rapor.p0)} -> {DenetimKanit.N(rapor.p1)} = {DenetimKanit.N(ileri)} sn ({DenetimKanit.N(ileri / kare)} kare), sonra oynatma {rapor.oynuyor}{Environment.NewLine}"
             + $"Shift+F: {DenetimKanit.N(rapor.p1)} -> {DenetimKanit.N(rapor.p2)} = {DenetimKanit.N(geri)} sn ({DenetimKanit.N(geri / kare)} kare){Environment.NewLine}");
 
         Assert.InRange(rapor.fps, 29, 31);

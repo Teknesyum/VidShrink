@@ -195,6 +195,13 @@ internal partial class ControlStrip : UserControl
         PlayPauseRequested?.Invoke(this, EventArgs.Empty);
     }
 
+    internal void SeekBy(double seconds)
+    {
+        if (_duration is null || seconds == 0) return;
+        Position = _position + TimeSpan.FromSeconds(seconds);
+        SeekRequested?.Invoke(this, _position);
+    }
+
     internal void SetLanguage(string language)
     {
         _language = language;

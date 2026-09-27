@@ -66,6 +66,7 @@ internal partial class ComparisonPanel : UserControl
     private bool _enlarged;
     private double _restore;
     private Point _panFrom;
+    private readonly ClickArbiter _click = new();
     private double _split = 0.5;
 
     public ComparisonPanel()
@@ -390,8 +391,26 @@ internal partial class ComparisonPanel : UserControl
 
     private void OnWheel(object? sender, PointerWheelEventArgs e)
     {
-        Zoom(e.Delta.Y, e.GetPosition(Surface));
+        var notches = e.Delta.Y != 0 ? e.Delta.Y : e.Delta.X;
+        if (notches == 0) return;
+        Wheel(notches, e.KeyModifiers, e.GetPosition(Surface));
         e.Handled = true;
+    }
+
+    internal PlayerCommand Wheel(double notches, KeyModifiers modifiers, Point anchor)
+    {
+        var command = Keymap.ForWheel(notches, modifiers);
+        switch (command.Kind)
+        {
+            case PlayerCommandKind.Seek:
+                Strip.SeekBy(command.Amount);
+                break;
+            case PlayerCommandKind.Zoom:
+                Zoom(notches, anchor);
+                break;
+        }
+
+        return command;
     }
 
     /// <summary>
@@ -508,12 +527,36 @@ internal partial class ComparisonPanel : UserControl
 
     private void OnStagePressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!e.GetCurrentPoint(Stage).Properties.IsLeftButtonPressed) return;
+        if (e.Source is Visual source && (ReferenceEquals(source, Strip) || Strip.IsVisualAncestorOf(source))) return;
+        var point = e.GetCurrentPoint(Stage);
+        if (point.Properties.IsMiddleButtonPressed)
+        {
+            ToggleFullScreen();
+            e.Handled = true;
+            return;
+        }
+
+        if (!point.Properties.IsLeftButtonPressed) return;
+        StagePress(point.Position);
         if (!_gesture.CanPan) return;
         _panning = true;
-        _panFrom = e.GetPosition(Stage);
         e.Pointer.Capture(Stage);
         Stage.Cursor = new Cursor(StandardCursorType.SizeAll);
+    }
+
+    internal void StagePress(Point at)
+    {
+        _click.Press(at.X, at.Y);
+        _panFrom = at;
+    }
+
+    internal void StageMove(Point at) => _click.Move(at.X, at.Y);
+
+    internal ReleaseOutcome StageRelease()
+    {
+        var outcome = _click.Release();
+        if (outcome == ReleaseOutcome.Click) Strip.TogglePlay();
+        return outcome;
     }
 
     private void OnStageMoved(object? sender, PointerEventArgs e)
@@ -521,6 +564,7 @@ internal partial class ComparisonPanel : UserControl
         // T40: şerit panelin alt bölgesinde belirir; bölge oranı Stage yüksekliğinden.
         var here = e.GetPosition(Stage);
         Strip.PointerAt(here.Y, Stage.Bounds.Height);
+        StageMove(here);
 
         if (!_panning) return;
         var now = e.GetPosition(Stage);
@@ -530,6 +574,7 @@ internal partial class ComparisonPanel : UserControl
 
     private void OnStageReleased(object? sender, PointerReleasedEventArgs e)
     {
+        if (e.InitialPressMouseButton == MouseButton.Left) StageRelease();
         if (!_panning) return;
         _panning = false;
         e.Pointer.Capture(null);
@@ -879,6 +924,13 @@ internal partial class ComparisonPanel : UserControl
         if (e.Key == Key.Space)
         {
             Strip.TogglePlay();
+            e.Handled = true;
+            return;
+        }
+
+        if (Keymap.ForKey(e.Key, e.KeyModifiers, e.KeySymbol).Kind == PlayerCommandKind.ToggleFullscreen)
+        {
+            ToggleFullScreen();
             e.Handled = true;
             return;
         }

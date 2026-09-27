@@ -36,6 +36,11 @@ public partial class MainWindow
         RelabelShellMenu();
     }
 
+    private void OnMakeDefaultApp(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (OperatingSystem.IsWindows()) Integration.DefaultApp.OpenSettings();
+    }
+
     private static bool ShellMenuInstalled(string menu)
     {
         if (!OperatingSystem.IsWindows()) return false;

@@ -1563,6 +1563,10 @@
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.shell-menu.hint}"/>
                     <TextBlock x:Name="TxtShellMenuStatus" Classes="reveal" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                   </StackPanel>
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <Button x:Name="BtnMakeDefaultApp" Content="{loc:Text settings-tab.default-app.button}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnMakeDefaultApp"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-app.hint}"/>
+                  </StackPanel>
                 </StackPanel>
               </Border>
 

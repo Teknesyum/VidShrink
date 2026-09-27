@@ -8,12 +8,17 @@ namespace VidShrink.Tests;
 /// <summary>
 /// Test konağı gerçek HKCU\Software\Classes'a yazdığında kullanıcının sağ tık menüsünün 312
 /// değeri testhost.exe'yi gösterdi. Yazma kökü süreç adına bağlı: yalnız VidShrink.App.exe
-/// gerçek kayda yazar, gerisi ya enjekte edilen test köküne yazar ya hiç yazmaz.
+/// gerçek kayda yazar, gerisi ya enjekte edilen test köküne yazar ya hiç yazmaz. Ad yetmez:
+/// derleme çıktısındaki VidShrink.App.exe de kayda yazıyordu; izin yalnız kurulu düzende,
+/// exe bir <c>app\</c> klasöründeyken ve bir üstte <c>VidShrink.exe</c> başlatıcısı varken.
 /// </summary>
 public class KayitDefteriKapisiTests
 {
     [Theory]
     [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\app\VidShrink.App.exe", true)]
+    [InlineData(@"C:\repo\src\VidShrink.App\bin\Release\net8.0\VidShrink.App.exe", false)]
+    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\VidShrink.App.exe", false)]
+    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\app\VidShrink.exe", false)]
     [InlineData(@"C:\repo\tests\bin\Debug\net8.0\testhost.exe", false)]
     [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\VidShrink.exe", false)]
     [InlineData(@"C:\tools\VidShrink.Bench.exe", false)]
@@ -22,9 +27,57 @@ public class KayitDefteriKapisiTests
     [InlineData(null, false)]
     public void YalnizUygulamaSureciGercekKaydaYazar(string? processPath, bool allowed)
     {
-        Assert.Equal(allowed, RegistryWriteGate.Allows(processPath));
-        Assert.Equal(allowed ? string.Empty : null, ShellMenu.WriteRoot(processPath, null));
-        Assert.Equal(allowed, FileAssociation.WriteAllowed(processPath, FileAssociation.ClassesRoot));
+        Assert.Equal(allowed, RegistryWriteGate.Allows(processPath, _ => true));
+        Assert.False(RegistryWriteGate.Allows(processPath, _ => false));
+        Assert.False(RegistryWriteGate.Allows(processPath));
+        Assert.Null(ShellMenu.WriteRoot(processPath, null));
+        Assert.False(FileAssociation.WriteAllowed(processPath, FileAssociation.ClassesRoot));
+    }
+
+    [Fact]
+    public void YalnizKuruluDuzendeGercekKaydaYazar()
+    {
+        var root = Path.Combine(TipSources.Root, ".calisma", "kayit-defteri-kapisi", Guid.NewGuid().ToString("N"));
+        var install = Path.Combine(root, "Programs", "VidShrink");
+        var app = Path.Combine(install, "app", "VidShrink.App.exe");
+        var launcher = Path.Combine(install, "VidShrink.exe");
+        var build = Path.Combine(root, "src", "VidShrink.App", "bin", "Release", "net8.0", "VidShrink.App.exe");
+        var inside = Path.Combine(root, "tek", "app", "VidShrink.App.exe");
+        void Touch(string path)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllBytes(path, Array.Empty<byte>());
+        }
+
+        try
+        {
+            Touch(app);
+            Touch(launcher);
+            Touch(build);
+            Touch(Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(build)!)!, "VidShrink.exe"));
+            Touch(Path.Combine(Path.GetDirectoryName(build)!, "VidShrink.exe"));
+            Touch(inside);
+            Touch(Path.Combine(Path.GetDirectoryName(inside)!, "VidShrink.exe"));
+
+            Assert.True(RegistryWriteGate.Allows(app));
+            Assert.Equal(string.Empty, ShellMenu.WriteRoot(app, null));
+            Assert.True(FileAssociation.WriteAllowed(app, FileAssociation.ClassesRoot));
+
+            Assert.False(RegistryWriteGate.Allows(build));
+            Assert.Null(ShellMenu.WriteRoot(build, null));
+            Assert.False(FileAssociation.WriteAllowed(build, FileAssociation.ClassesRoot));
+
+            Assert.False(RegistryWriteGate.Allows(inside));
+
+            File.Delete(launcher);
+            Assert.False(RegistryWriteGate.Allows(app));
+            Assert.Null(ShellMenu.WriteRoot(app, null));
+            Assert.False(FileAssociation.WriteAllowed(app, FileAssociation.ClassesRoot));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
     }
 
     [Fact]
@@ -64,6 +117,8 @@ public class KayitDefteriKapisiTests
         var association = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "Integration", "FileAssociation.cs"));
         Assert.Contains("WriteAllowed(Environment.ProcessPath, classesRoot)", association);
         Assert.Contains("!allowed || !Write(", association);
+        Assert.Contains("if (allowed) RemoveStaleLegacy(classesRoot);", association);
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(association, @"RemoveStaleLegacy\(classesRoot\)"));
     }
 
     [Fact]

@@ -124,7 +124,7 @@ public sealed class OynaticiGirdiTests
 
             var sesOnce = view.VolumeLevel;
             var konumOnce = view.PositionSeconds;
-            GirdiSurucu.Wheel(view, -1, KeyModifiers.None);
+            GirdiSurucu.Wheel(view, 1, KeyModifiers.None);
             rows.Add($"tekerlek\tses {sesOnce:0.###} -> {view.VolumeLevel:0.###} (konum {konumOnce:0.###} -> {view.PositionSeconds:0.###} sn)");
 
             Tekerlek("ctrl+tekerlek", KeyModifiers.Control);
@@ -162,12 +162,12 @@ public sealed class OynaticiGirdiTests
         GirdiKanit.Write("k1-izgara.txt", string.Join(Environment.NewLine, satirlar) + Environment.NewLine);
 
         Assert.Equal(9, satirlar.Count);
-        Assert.Contains("ses 100 -> 95 (konum 0 -> 0 sn)", satirlar[0]);
-        Assert.Contains("konum 0 -> 10 sn", satirlar[1]);
-        Assert.Contains("konum 10 -> 70 sn", satirlar[2]);
-        Assert.Contains("konum 70 -> 370 sn", satirlar[3]);
+        Assert.Contains("ses 100 -> 100 (konum 0 -> 10 sn)", satirlar[0]);
+        Assert.Contains("konum 10 -> 20 sn", satirlar[1]);
+        Assert.Contains("konum 20 -> 80 sn", satirlar[2]);
+        Assert.Contains("konum 80 -> 380 sn", satirlar[3]);
         Assert.Contains("yakinlastirma 1 -> 1.24", satirlar[4]);
-        Assert.Contains("konum 370 -> 370 sn", satirlar[4]);
+        Assert.Contains("konum 380 -> 380 sn", satirlar[4]);
         Assert.Contains("iz menu (oynatma False -> False)", satirlar[5]);
         Assert.Contains("oynatma False -> True", satirlar[6]);
         Assert.Contains("tam ekran False -> True", satirlar[7]);
@@ -178,16 +178,19 @@ public sealed class OynaticiGirdiTests
     [Fact]
     public void TekerlekAdimlariHaritadakiDortSayidir()
     {
-        Assert.Equal(new PlayerCommand(PlayerCommandKind.Volume, 5), Keymap.ForWheel(1, KeyModifiers.None));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 10), Keymap.ForWheel(1, KeyModifiers.None));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, -10), Keymap.ForWheel(-1, KeyModifiers.None));
         Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 10), Keymap.ForWheel(1, KeyModifiers.Control));
         Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 60), Keymap.ForWheel(1, KeyModifiers.Shift));
         Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, -300), Keymap.ForWheel(-1, KeyModifiers.Control | KeyModifiers.Shift));
         Assert.Equal(PlayerCommandKind.Zoom, Keymap.ForWheel(1, KeyModifiers.Alt).Kind);
-        Assert.Equal(PlayerCommandKind.TogglePlay, Keymap.ForPress(PlayerButton.Left, 1).Kind);
-        Assert.Equal(PlayerCommandKind.ToggleFullscreen, Keymap.ForPress(PlayerButton.Left, 2).Kind);
-        Assert.Equal(PlayerCommandKind.ContextMenu, Keymap.ForPress(PlayerButton.Right, 1).Kind);
-        Assert.Equal(PlayerCommandKind.ToggleFullscreen, Keymap.ForPress(PlayerButton.Middle, 1).Kind);
+        Assert.Equal(PlayerCommandKind.TogglePlay, Keymap.ForPress(PlayerButton.Left).Kind);
+        Assert.Equal(PlayerCommandKind.ContextMenu, Keymap.ForPress(PlayerButton.Right).Kind);
+        Assert.Equal(PlayerCommandKind.ToggleFullscreen, Keymap.ForPress(PlayerButton.Middle).Kind);
+        Assert.Equal(PlayerCommandKind.ToggleFullscreen, Keymap.ForKey(Key.F, KeyModifiers.None, "f").Kind);
+        Assert.Equal(PlayerCommandKind.LeaveFullscreen, Keymap.ForKey(Key.Escape, KeyModifiers.None, null).Kind);
         Assert.Equal(PlayerCommandKind.TogglePlay, Keymap.ForKey(Key.Space, KeyModifiers.None, " ").Kind);
+        Assert.Equal(PlayerCommandKind.Volume, Keymap.ForKey(Key.Up, KeyModifiers.None, null).Kind);
     }
 
     [Fact]
@@ -850,7 +853,7 @@ internal static class FareKanit
 public sealed class OynaticiFareTests
 {
     [Fact]
-    public void TekTikDuraklatirCiftTikTamEkranaGecerVeIkisiCakismaz()
+    public void TekTikBirakistaAnindaCevirirCiftTikTamEkranaGecmez()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -858,41 +861,40 @@ public sealed class OynaticiFareTests
             var body = new FareKanit.Defter("f1-tik-ayrimi.txt");
 
             var once = view.IsPlaying;
-            view.FarePress(1, 10, 10);
+            view.FarePress(10, 10);
             var basiliken = view.IsPlaying;
-            view.FareRelease(0);
+            view.FareRelease();
             var birakista = view.IsPlaying;
-            view.FareDue(ClickArbiter.DoubleWindowMs - 1);
-            var esikAltinda = view.IsPlaying;
-            view.FareDue(ClickArbiter.DoubleWindowMs);
-            var esikUstunde = view.IsPlaying;
 
-            body.Satir($"tek tik   : oynatma {once} -> basili {basiliken} -> birakis {birakista} -> {ClickArbiter.DoubleWindowMs - 1} ms {esikAltinda} -> {ClickArbiter.DoubleWindowMs} ms {esikUstunde}");
+            body.Satir($"tek tik   : oynatma {once} -> basili {basiliken} -> birakis {birakista}");
 
             var tamOnce = view.Fullscreen.IsFullscreen;
             var oynatmaOnce = view.IsPlaying;
             var izOnce = view.Trace.Count;
-            view.FarePress(1, 10, 10);
-            view.FareRelease(1000);
-            view.FarePress(2, 10, 10);
-            view.FareDue(1000 + ClickArbiter.DoubleWindowMs);
+            view.FarePress(10, 10);
+            view.FareRelease();
+            var ilkBirakis = view.IsPlaying;
+            view.FarePress(10, 10);
+            view.FareRelease();
             var uretilen = view.Trace.Skip(izOnce).ToList();
 
-            body.Satir($"cift tik  : tam ekran {tamOnce} -> {view.Fullscreen.IsFullscreen}, oynatma {oynatmaOnce} -> {view.IsPlaying}");
+            body.Satir($"cift tik  : tam ekran {tamOnce} -> {view.Fullscreen.IsFullscreen}, oynatma {oynatmaOnce} -> {ilkBirakis} -> {view.IsPlaying}");
             body.Satir($"cift tikin urettigi iz: {string.Join(" | ", uretilen)}");
 
+            Assert.False(once);
             Assert.False(basiliken);
-            Assert.False(birakista);
-            Assert.False(esikAltinda);
-            Assert.True(esikUstunde);
-            Assert.Equal(new[] { "fullscreen -> True" }, uretilen);
+            Assert.True(birakista);
+            Assert.False(tamOnce);
+            Assert.False(view.Fullscreen.IsFullscreen);
+            Assert.NotEqual(oynatmaOnce, ilkBirakis);
             Assert.Equal(oynatmaOnce, view.IsPlaying);
+            Assert.DoesNotContain(uretilen, satir => satir.StartsWith("fullscreen", StringComparison.Ordinal));
 
             window.Close();
             return body.Metin;
         });
 
-        Assert.Contains("fullscreen -> True", rapor);
+        Assert.Contains("tam ekran False -> False", rapor);
         FareKanit.Kapat("f1-tik-ayrimi.txt");
     }
 
@@ -904,28 +906,24 @@ public sealed class OynaticiFareTests
             var view = GirdiSurucu.Kur(out var window);
             var body = new FareKanit.Defter("f2-surukleme-esigi.txt");
 
-            view.FarePress(1, 100, 100);
+            view.FarePress(100, 100);
             var kisaKip = view.FareMove(100 + ClickArbiter.DragThresholdDip - 1, 100);
-            var kisaBirakis = view.FareRelease(0);
-            var kisaTik = view.FareDue(ClickArbiter.DoubleWindowMs);
+            var kisaBirakis = view.FareRelease();
             var kisaSonrasi = view.IsPlaying;
-            body.Satir($"esik alti ({ClickArbiter.DragThresholdDip - 1} dip): kip [{kisaKip}] birakis {kisaBirakis} bekleyen tik {kisaTik} oynatma {kisaSonrasi}");
+            body.Satir($"esik alti ({ClickArbiter.DragThresholdDip - 1} dip): kip [{kisaKip}] birakis {kisaBirakis} oynatma {kisaSonrasi}");
 
             var oynatmaOnce = view.IsPlaying;
-            view.FarePress(1, 100, 100);
+            view.FarePress(100, 100);
             var uzunKip = view.FareMove(100 + ClickArbiter.DragThresholdDip, 100);
-            var uzunBirakis = view.FareRelease(2000);
-            var uzunTik = view.FareDue(2000 + ClickArbiter.DoubleWindowMs);
-            body.Satir($"esik ustu ({ClickArbiter.DragThresholdDip} dip): kip [{uzunKip}] birakis {uzunBirakis} bekleyen tik {uzunTik} oynatma {oynatmaOnce} -> {view.IsPlaying}");
+            var uzunBirakis = view.FareRelease();
+            body.Satir($"esik ustu ({ClickArbiter.DragThresholdDip} dip): kip [{uzunKip}] birakis {uzunBirakis} oynatma {oynatmaOnce} -> {view.IsPlaying}");
 
             Assert.Equal("", kisaKip);
             Assert.Equal(ReleaseOutcome.Click, kisaBirakis);
-            Assert.True(kisaTik);
             Assert.True(kisaSonrasi);
 
             Assert.Equal("window", uzunKip);
             Assert.Equal(ReleaseOutcome.Drag, uzunBirakis);
-            Assert.False(uzunTik);
             Assert.Equal(oynatmaOnce, view.IsPlaying);
 
             window.Close();
@@ -944,15 +942,15 @@ public sealed class OynaticiFareTests
             var view = GirdiSurucu.Kur(out var window);
             var body = new FareKanit.Defter("f3-tasima-kipi.txt");
 
-            view.FarePress(1, 50, 50);
+            view.FarePress(50, 50);
             var normal = view.FareMove(80, 50);
-            view.FareRelease(0);
+            view.FareRelease();
             body.Satir($"normal pencere : tam ekran {view.Fullscreen.IsFullscreen} -> surukleme kipi [{normal}]");
 
             view.Apply(new PlayerCommand(PlayerCommandKind.ToggleFullscreen, 0));
-            view.FarePress(1, 50, 50);
+            view.FarePress(50, 50);
             var tam = view.FareMove(80, 50);
-            view.FareRelease(0);
+            view.FareRelease();
             body.Satir($"tam ekran      : tam ekran {view.Fullscreen.IsFullscreen} -> surukleme kipi [{tam}]");
             body.Satir($"miknatis esigi : {view.Pan.SnapDip} dip (PlaybackBadgeMargin)");
 

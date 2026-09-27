@@ -152,6 +152,53 @@ public sealed class DosyaIliskiTests : IDisposable
         AssertForeignEntriesSurvive();
         using var real = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{FileAssociation.ProgId}\shell\open\command");
         Assert.DoesNotContain(_launcher, real?.GetValue("") as string ?? "", StringComparison.OrdinalIgnoreCase);
+
+        Assert.Equal("VidShrink", Read(@"Applications\VidShrink.exe", "FriendlyAppName"));
+        using var supported = Open(@"Applications\VidShrink.exe\SupportedTypes");
+        Assert.NotNull(supported);
+        Assert.Equal(Sorted(ShellIntegration.MediaExtensions.Select(extension => "." + extension)), Sorted(supported!.GetValueNames()));
+        Assert.Null(Open(@"Applications\VidShrink.App.exe"));
+    }
+
+    [SupportedOSPlatform("windows")]
+    private void PlantLegacyApplication(string target)
+    {
+        using var command = Registry.CurrentUser.CreateSubKey($@"{_testKey}\Applications\VidShrink.App.exe\shell\open\command");
+        command.SetValue("", $"\"{target}\" \"%1\"");
+    }
+
+    [Fact]
+    [SupportedOSPlatform("windows")]
+    public void Derleme_ciktisini_gosteren_eski_uygulama_anahtari_kayitta_siliniyor()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        PlantLegacyApplication(Path.Combine(_work, "src", "VidShrink.App", "bin", "Release", "net8.0", "VidShrink.App.exe"));
+        Assert.NotNull(Open(@"Applications\VidShrink.App.exe"));
+
+        var failed = FileAssociation.Register(_launcher, _testKey);
+
+        Assert.Empty(failed);
+        Assert.Null(Open(@"Applications\VidShrink.App.exe"));
+        Assert.Equal("VidShrink", Read(@"Applications\VidShrink.exe", "FriendlyAppName"));
+    }
+
+    [Fact]
+    [SupportedOSPlatform("windows")]
+    public void Kurulu_duzeni_gosteren_eski_uygulama_anahtari_korunuyor()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        var app = Path.Combine(_installRoot, "app", "VidShrink.App.exe");
+        Directory.CreateDirectory(Path.GetDirectoryName(app)!);
+        File.WriteAllText(app, "uygulama");
+        PlantLegacyApplication(app);
+
+        Assert.False(VidShrink.Core.Setup.ShellRegistration.RemoveStaleLegacyApplication(_testKey));
+        Assert.NotNull(Open(@"Applications\VidShrink.App.exe"));
+
+        File.Delete(_launcher);
+        Assert.True(VidShrink.Core.Setup.ShellRegistration.RemoveStaleLegacyApplication(_testKey));
+        Assert.Null(Open(@"Applications\VidShrink.App.exe"));
+        Assert.False(VidShrink.Core.Setup.ShellRegistration.RemoveStaleLegacyApplication(_testKey));
     }
 
     [Fact]

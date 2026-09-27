@@ -25,6 +25,10 @@ public static class ShellRegistration
 
     public const string SetupExecutableName = "VidShrink-Setup.exe";
 
+    public const string LauncherExecutableName = "VidShrink.exe";
+
+    public const string AppExecutableName = "VidShrink.App.exe";
+
     public static bool WriteAllowed(string? processPath, string classesRoot) =>
         !SetupOptions.IsDefaultClassesRoot(classesRoot) ||
         string.Equals(Path.GetFileName(processPath), SetupExecutableName, StringComparison.OrdinalIgnoreCase);
@@ -210,35 +214,99 @@ public static class ShellRegistration
         return removed;
     }
 
+    public static bool IsInstalledLayout(string? appExecutable, Func<string, bool>? fileExists = null)
+    {
+        if (string.IsNullOrWhiteSpace(appExecutable)) return false;
+        if (!string.Equals(Path.GetFileName(appExecutable), AppExecutableName, StringComparison.OrdinalIgnoreCase)) return false;
+        var folder = Path.GetDirectoryName(appExecutable);
+        if (string.IsNullOrEmpty(folder) || !string.Equals(Path.GetFileName(folder), "app", StringComparison.OrdinalIgnoreCase)) return false;
+        var root = Path.GetDirectoryName(folder);
+        if (string.IsNullOrEmpty(root)) return false;
+        return (fileExists ?? File.Exists)(Path.Combine(root, LauncherExecutableName));
+    }
+
+    public static IReadOnlyList<(string Key, string Name, string? Value)> ClassesPlan(string classesRoot, string executable)
+    {
+        var classes = classesRoot.TrimEnd('\\');
+        var command = $"\"{ShellIntegration.OpenCommandTarget(executable)}\" \"%1\"";
+        var progId = $@"{classes}\{ProgId}";
+        var application = $@"{classes}\Applications\{LauncherExecutableName}";
+        var entries = new List<(string, string, string?)>
+        {
+            (progId, "", AssociationName),
+            (progId, "FriendlyTypeName", AssociationName),
+            (progId + @"\DefaultIcon", "", $"{executable},0"),
+            (progId + @"\shell\open\command", "", command),
+            (application, "FriendlyAppName", AssociationName),
+            (application + @"\shell\open\command", "", command)
+        };
+
+        foreach (var extension in ShellIntegration.MediaExtensions)
+            entries.Add((application + @"\SupportedTypes", "." + extension, ""));
+
+        foreach (var extension in ShellIntegration.MediaExtensions)
+            entries.Add(($@"{classes}\.{extension}\OpenWithProgids", ProgId, null));
+
+        return entries;
+    }
+
+    public static string? CommandExecutable(string? command)
+    {
+        if (string.IsNullOrWhiteSpace(command)) return null;
+        var text = command.TrimStart();
+        if (text.StartsWith('"'))
+        {
+            var end = text.IndexOf('"', 1);
+            return end > 1 ? text[1..end] : null;
+        }
+
+        var space = text.IndexOf(' ');
+        return space < 0 ? text : text[..space];
+    }
+
+    [SupportedOSPlatform("windows")]
+    public static bool RemoveStaleLegacyApplication(string classesRoot, Func<string, bool>? fileExists = null)
+    {
+        var classes = classesRoot.TrimEnd('\\');
+        var legacy = $@"{classes}\Applications\{AppExecutableName}";
+        string? command;
+        using (var key = Registry.CurrentUser.OpenSubKey(legacy))
+        {
+            if (key is null) return false;
+            using var open = key.OpenSubKey(@"shell\open\command");
+            command = open?.GetValue("") as string;
+        }
+
+        if (IsInstalledLayout(CommandExecutable(command), fileExists)) return false;
+        Registry.CurrentUser.DeleteSubKeyTree(legacy, false);
+        RemoveEmpty($@"{classes}\Applications");
+        return true;
+    }
+
     [SupportedOSPlatform("windows")]
     public static int WriteFileAssociation(string classesRoot, string executable)
     {
         RequireWriteAllowed(classesRoot);
-        var classes = classesRoot.TrimEnd('\\');
         var software = SoftwareRoot(classesRoot);
-        var command = $"\"{ShellIntegration.OpenCommandTarget(executable)}\" \"%1\"";
-        var progId = $@"{classes}\{ProgId}";
-        var application = $@"{classes}\Applications\{Path.GetFileName(executable)}";
         var capabilities = $@"{software}\{CapabilitiesPath}";
 
-        SetString(progId, "", AssociationName);
-        SetString(progId, "FriendlyTypeName", AssociationName);
-        SetString(progId + @"\DefaultIcon", "", $"{executable},0");
-        SetString(progId + @"\shell\open\command", "", command);
+        RemoveStaleLegacyApplication(classesRoot);
+        foreach (var (key, name, value) in ClassesPlan(classesRoot, executable))
+        {
+            if (value is not null)
+            {
+                SetString(key, name, value);
+                continue;
+            }
 
-        SetString(application, "FriendlyAppName", AssociationName);
-        SetString(application + @"\shell\open\command", "", command);
+            using var list = Registry.CurrentUser.CreateSubKey(key);
+            list.SetValue(name, Array.Empty<byte>(), RegistryValueKind.None);
+        }
 
         SetString(capabilities, "ApplicationName", AssociationName);
         SetString(capabilities, "ApplicationDescription", AssociationName);
-
         foreach (var extension in ShellIntegration.MediaExtensions)
-        {
-            SetString(application + @"\SupportedTypes", "." + extension, "");
             SetString(capabilities + @"\FileAssociations", "." + extension, ProgId);
-            using var list = Registry.CurrentUser.CreateSubKey($@"{classes}\.{extension}\OpenWithProgids");
-            list.SetValue(ProgId, Array.Empty<byte>(), RegistryValueKind.None);
-        }
 
         SetString(software + @"\RegisteredApplications", AssociationName, capabilities);
         return ShellIntegration.MediaExtensions.Count;
@@ -270,7 +338,7 @@ public static class ShellRegistration
         }
 
         user.DeleteSubKeyTree($@"{classes}\{ProgId}", false);
-        user.DeleteSubKeyTree($@"{classes}\Applications\VidShrink.exe", false);
+        user.DeleteSubKeyTree($@"{classes}\Applications\{LauncherExecutableName}", false);
         RemoveEmpty($@"{classes}\Applications");
         user.DeleteSubKeyTree($@"{software}\{CapabilitiesPath}", false);
         RemoveEmpty($@"{software}\Teknesyum\VidShrink");

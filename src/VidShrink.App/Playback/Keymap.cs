@@ -13,8 +13,7 @@ internal enum PlayerInputKind
 {
     Key,
     Wheel,
-    Press,
-    DoubleClick
+    Press
 }
 
 internal readonly record struct PlayerInput(
@@ -35,9 +34,6 @@ internal readonly record struct PlayerInput(
 
     internal static PlayerInput OnPress(PlayerButton button)
         => new(PlayerInputKind.Press, Key.None, null, button, KeyModifiers.None);
-
-    internal static PlayerInput OnDoubleClick()
-        => new(PlayerInputKind.DoubleClick, Key.None, null, PlayerButton.Left, KeyModifiers.None);
 }
 
 internal sealed record PlayerAction(PlayerCommandKind Command, double Amount, string LabelKey, int MenuGroup)
@@ -98,15 +94,15 @@ internal static class Keymap
 
     internal static readonly IReadOnlyList<KeymapRow> Rows = new KeymapRow[]
     {
-        new(PlayerInput.OnWheel(), Volume(VolumeStep)),
+        new(PlayerInput.OnWheel(), Seek(SeekSmall)),
         new(PlayerInput.OnWheel(KeyModifiers.Control), Seek(SeekSmall)),
         new(PlayerInput.OnWheel(KeyModifiers.Shift), Seek(SeekMedium)),
         new(PlayerInput.OnWheel(KeyModifiers.Control | KeyModifiers.Shift), Seek(SeekLarge)),
         new(PlayerInput.OnWheel(KeyModifiers.Alt), Zoom),
         new(PlayerInput.OnPress(PlayerButton.Left), PlayPause),
         new(PlayerInput.OnPress(PlayerButton.Middle), Fullscreen),
-        new(PlayerInput.OnDoubleClick(), Fullscreen),
         new(PlayerInput.OnPress(PlayerButton.Right), OpenMenu),
+        new(PlayerInput.OnKey(Key.F), Fullscreen),
         new(PlayerInput.OnKey(Key.Space), PlayPause),
         new(PlayerInput.OnKey(Key.P, KeyModifiers.Control), PlayPause),
         new(PlayerInput.OnKey(Key.Space, KeyModifiers.Control), Stop),
@@ -132,7 +128,8 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.F, KeyModifiers.Control | KeyModifiers.Shift), Faster),
         new(PlayerInput.OnKey(Key.B, KeyModifiers.Control | KeyModifiers.Shift), Slower),
         new(PlayerInput.OnKey(Key.N, KeyModifiers.Control | KeyModifiers.Shift), NormalSpeed),
-        new(PlayerInput.OnKey(Key.F), NextFrame),
+        new(PlayerInput.OnSymbol(".", Key.OemPeriod), NextFrame),
+        new(PlayerInput.OnSymbol(",", Key.OemComma), PreviousFrame),
         new(PlayerInput.OnKey(Key.F, KeyModifiers.Shift), PreviousFrame),
         new(PlayerInput.OnSymbol(">", Key.OemPeriod, KeyModifiers.Control | KeyModifiers.Shift), NextFrame),
         new(PlayerInput.OnSymbol("<", Key.OemComma, KeyModifiers.Control | KeyModifiers.Shift), PreviousFrame),
@@ -184,12 +181,8 @@ internal static class Keymap
         return row is null ? PlayerCommand.None : row.Action.ToCommand(notches);
     }
 
-    internal static PlayerCommand ForPress(PlayerButton button, int clicks)
-    {
-        if (button == PlayerButton.Left && clicks >= 2)
-            return Find(r => r.Input.Kind == PlayerInputKind.DoubleClick);
-        return Find(r => r.Input.Kind == PlayerInputKind.Press && r.Input.Button == button);
-    }
+    internal static PlayerCommand ForPress(PlayerButton button)
+        => Find(r => r.Input.Kind == PlayerInputKind.Press && r.Input.Button == button);
 
     internal static PlayerCommand ForKey(Key key, KeyModifiers modifiers, string? symbol)
     {
@@ -220,7 +213,6 @@ internal static class Keymap
         parts.Add(input.Kind switch
         {
             PlayerInputKind.Wheel => Strings.Get("main.player.input.wheel"),
-            PlayerInputKind.DoubleClick => Strings.Get("main.player.input.double"),
             PlayerInputKind.Press when input.Button == PlayerButton.Left => Strings.Get("main.player.input.left"),
             PlayerInputKind.Press when input.Button == PlayerButton.Middle => Strings.Get("main.player.input.middle"),
             PlayerInputKind.Press => Strings.Get("main.player.input.right"),

@@ -228,16 +228,6 @@ internal sealed class StallWatch
     }
 }
 
-/// <summary>Basisin ilk kararı: tek tik icin kurulur, cift tik hemen bilinir.</summary>
-internal enum PressOutcome
-{
-    /// <summary>Tek tik. Kararı birakista verilir; burada yalnız kurulur.</summary>
-    Armed,
-
-    /// <summary>Cift tikin ikinci basisi. Bekleyen tek tik burada iptal olur.</summary>
-    Double
-}
-
 /// <summary>Birakisin sonucu: tiklama mi, surukleme mi, yoksa bize ait olmayan bir birakis mi.</summary>
 internal enum ReleaseOutcome
 {
@@ -247,64 +237,38 @@ internal enum ReleaseOutcome
 }
 
 /// <summary>
-/// Sol tikin uc isi tek bir basistan dogar: tek tik duraklat/baslat, cift tik tam ekran,
-/// basili tutup surukleme pencere tasima ya da pan. Bu sinif ucunu birbirinden ayirir ve
-/// hicbirinin otekini tetiklemesini birakmaz.
+/// Sol basistan iki is dogar: tiklama duraklat/baslat, basili tutup surukleme pencere tasima
+/// ya da pan. Tiklama birakista hemen islenir; cift tik beklenmez, ikinci tik yine
+/// duraklat/baslat olur. Oynatici ve karsilastirma paneli bu sinifi paylasir.
 ///
-/// Iki esik var, ikisi de uydurulmadi:
-///   <see cref="DragThresholdDip"/> — Windows'un kendi surukleme esigi (SM_CXDRAG/SM_CYDRAG
-///   varsayilani 4 piksel). Bu kadar oynamayan bir basis kullanicinin niyetinde tiklamadir.
-///   <see cref="DoubleWindowMs"/> — sistemin cift tik penceresi (<see cref="SystemDoubleClick"/>:
-///   Windows'ta GetDoubleClickTime, obur platformlarda Avalonia'nin platform ayari). Tek tikin
-///   isi bu pencere dolmadan yapilmaz; yapilsaydi her cift tik once duraklatir, sonra tam ekrana
-///   gecerdi.
-///
-/// Sinif bilerek saf: saati disaridan aliyor, pencere suresini <see cref="Source"/>'tan okuyor.
-/// Bu yuzden olcum pencere acmayi da sistem suresini beklemeyi de gerektirmiyor.
+/// Esik uydurulmadi: <see cref="DragThresholdDip"/> Windows'un kendi surukleme esigi
+/// (SM_CXDRAG/SM_CYDRAG varsayilani 4 piksel). Bu kadar oynamayan bir basis tiklamadir.
 /// </summary>
 internal sealed class ClickArbiter
 {
     /// <summary>Windows SM_CXDRAG/SM_CYDRAG varsayilani. Bunun altindaki oynama tiklamadir.</summary>
     internal const double DragThresholdDip = 4;
 
-    /// <summary>Cift tik penceresinin kaynagi. Varsayilan sistem ayari; test sahte sure verir.</summary>
-    internal static Func<double> Source { get; set; } = SystemDoubleClick.Milliseconds;
-
-    /// <summary>Tek tik bu kadar beklenir.</summary>
-    internal static double DoubleWindowMs => Source();
-
     private double _originX;
     private double _originY;
-    private double _pendingAt = double.NaN;
     private bool _down;
     private bool _dragging;
 
     /// <summary>Basis surukleme esigini gecti mi.</summary>
     internal bool Dragging => _dragging;
 
-    /// <summary>Cift tik penceresinin dolmasini bekleyen bir tek tik var mi.</summary>
-    internal bool Pending => !double.IsNaN(_pendingAt);
-
     internal double TravelX { get; private set; }
 
     internal double TravelY { get; private set; }
 
-    internal PressOutcome Press(int clickCount, double x, double y)
+    internal void Press(double x, double y)
     {
-        if (clickCount >= 2)
-        {
-            Cancel();
-            return PressOutcome.Double;
-        }
-
         _down = true;
         _dragging = false;
-        _pendingAt = double.NaN;
         _originX = x;
         _originY = y;
         TravelX = 0;
         TravelY = 0;
-        return PressOutcome.Armed;
     }
 
     /// <summary>Fare oynadi. Esigi ilk gecisten sonra hep <c>true</c> doner.</summary>
@@ -318,7 +282,7 @@ internal sealed class ClickArbiter
         return _dragging;
     }
 
-    internal ReleaseOutcome Release(double nowMs)
+    internal ReleaseOutcome Release()
     {
         if (!_down) return ReleaseOutcome.None;
         _down = false;
@@ -328,23 +292,13 @@ internal sealed class ClickArbiter
             return ReleaseOutcome.Drag;
         }
 
-        _pendingAt = nowMs;
         return ReleaseOutcome.Click;
-    }
-
-    /// <summary>Cift tik penceresi doldu mu. Doldurduysa bekleyen tik tuketilir.</summary>
-    internal bool Due(double nowMs)
-    {
-        if (double.IsNaN(_pendingAt) || nowMs - _pendingAt < DoubleWindowMs) return false;
-        _pendingAt = double.NaN;
-        return true;
     }
 
     internal void Cancel()
     {
         _down = false;
         _dragging = false;
-        _pendingAt = double.NaN;
     }
 }
 
@@ -416,31 +370,4 @@ internal sealed class SurfacePan
 
     private static double Clamp(double value, double low, double high)
         => value < low ? low : value > high ? high : value;
-}
-
-internal static class SystemDoubleClick
-{
-    internal const double FallbackMs = 500;
-
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern uint GetDoubleClickTime();
-
-    internal static double Milliseconds()
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            try
-            {
-                var ms = GetDoubleClickTime();
-                if (ms > 0) return ms;
-            }
-            catch (DllNotFoundException) { }
-            catch (EntryPointNotFoundException) { }
-        }
-
-        var platform = Avalonia.Application.Current?.PlatformSettings?.GetDoubleTapTime(Avalonia.Input.PointerType.Mouse).TotalMilliseconds;
-        return platform is > 0 ? platform.Value : FallbackMs;
-    }
-
-    internal static double WindowsValue() => OperatingSystem.IsWindows() ? GetDoubleClickTime() : double.NaN;
 }

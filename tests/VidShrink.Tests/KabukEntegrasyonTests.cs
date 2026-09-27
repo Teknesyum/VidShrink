@@ -49,6 +49,95 @@ public sealed class KabukEntegrasyonTests
     }
 
     [Fact]
+    public void KurucuExesiDeVidShrinkAdiylaGorunuyor()
+    {
+        var project = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Setup", "VidShrink.Setup.csproj"));
+        Assert.Contains("<AssemblyTitle>VidShrink Setup</AssemblyTitle>", project, StringComparison.Ordinal);
+        Assert.Contains("<Product>VidShrink</Product>", File.ReadAllText(Path.Combine(TipSources.Root, "Directory.Build.props")), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Uygulama ile kurucu tek planı yazıyor. Eskiden uygulama kendi adıyla
+    /// <c>Applications\VidShrink.App.exe</c> açıyordu; Varsayılan uygulamalar sayfasında
+    /// iki VidShrink görünüyordu, biri derleme çıktısını gösteriyordu.
+    /// </summary>
+    [Fact]
+    public void UygulamaIleKurucuAyniKayitPlaniniYaziyor()
+    {
+        const string App = @"C:\Programs\VidShrink\app\VidShrink.App.exe";
+        Assert.Equal(VidShrink.Core.Setup.ShellRegistration.ClassesPlan(@"Software\Classes", Executable), Plan());
+        Assert.Equal(VidShrink.Core.Setup.ShellRegistration.ClassesPlan(@"Software\Classes", App), FileAssociation.Plan(App));
+
+        foreach (var executable in new[] { Executable, App })
+        {
+            var plan = FileAssociation.Plan(executable);
+            Assert.DoesNotContain(plan, entry => entry.Key.Contains(@"Applications\VidShrink.App.exe", StringComparison.OrdinalIgnoreCase));
+            var application = plan.Where(entry => entry.Key.StartsWith(@"Software\Classes\Applications\", StringComparison.Ordinal)).ToList();
+            Assert.All(application, entry => Assert.StartsWith(@"Software\Classes\Applications\VidShrink.exe", entry.Key, StringComparison.Ordinal));
+            Assert.Equal("VidShrink", application.Single(entry => entry.Name == "FriendlyAppName").Value);
+            Assert.Equal(ShellIntegration.MediaExtensions.Select(extension => "." + extension),
+                application.Where(entry => entry.Key.EndsWith(@"\SupportedTypes", StringComparison.Ordinal)).Select(entry => entry.Name));
+        }
+    }
+
+    [Theory]
+    [InlineData(@"""C:\Programs\VidShrink\app\VidShrink.App.exe"" ""%1""", @"C:\Programs\VidShrink\app\VidShrink.App.exe")]
+    [InlineData(@"C:\x\VidShrink.App.exe %1", @"C:\x\VidShrink.App.exe")]
+    [InlineData(@"""""", null)]
+    [InlineData("", null)]
+    [InlineData(null, null)]
+    public void KomuttakiExeOkunuyor(string? command, string? executable)
+        => Assert.Equal(executable, VidShrink.Core.Setup.ShellRegistration.CommandExecutable(command));
+
+    /// <summary>
+    /// Ayarlar'daki "Varsayılan Yap" Windows'un Varsayılan uygulamalar sayfasını VidShrink
+    /// kaydında açıyor; kayıt defterine kendisi yazmıyor.
+    /// </summary>
+    [Fact]
+    public void VarsayilanYapDugmesiKendiSayfamiziAciyor()
+    {
+        var inPanel = AppHost.Run(() =>
+        {
+            var main = new VidShrink.App.MainWindow();
+            try
+            {
+                var button = main.FindControl<Button>("BtnMakeDefaultApp");
+                return button is not null && button.GetLogicalAncestors().OfType<Control>().Any(control => control.Name == "ShellMenuPanel");
+            }
+            finally
+            {
+                main.Close();
+            }
+        });
+        Assert.True(inPanel);
+
+        var axaml = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.axaml"));
+        var at = axaml.IndexOf("x:Name=\"BtnMakeDefaultApp\"", StringComparison.Ordinal);
+        Assert.True(at > axaml.IndexOf("x:Name=\"ShellMenuPanel\"", StringComparison.Ordinal));
+        Assert.Contains("Click=\"OnMakeDefaultApp\"", axaml.Substring(at, 200), StringComparison.Ordinal);
+
+        var code = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.KabukMenusu.cs"));
+        var handler = code.Substring(code.IndexOf("void OnMakeDefaultApp(", StringComparison.Ordinal), 200);
+        Assert.Contains("Integration.DefaultApp.OpenSettings()", handler, StringComparison.Ordinal);
+        Assert.DoesNotContain("Registry", handler, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("settings-tab.default-app.button")]
+    [InlineData("settings-tab.default-app.hint")]
+    public void VarsayilanYapAnahtarlariButunDillerde(string key)
+    {
+        Assert.Equal(42, Locales.Languages.Count);
+        foreach (var language in Locales.Languages)
+        {
+            var path = Path.Combine(TipSources.Root, "src", "VidShrink.App", "Locales", language, "main.json");
+            using var document = JsonDocument.Parse(File.ReadAllText(path));
+            Assert.True(document.RootElement.TryGetProperty(key, out var value), $"{language}: {key}");
+            Assert.False(string.IsNullOrWhiteSpace(value.GetString()), $"{language}: {key}");
+        }
+    }
+
+    [Fact]
     public void PlanYalnizKullaniciKapsamindaYaziyor()
     {
         Assert.NotEmpty(Plan());

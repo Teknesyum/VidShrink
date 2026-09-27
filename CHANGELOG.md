@@ -7,6 +7,21 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Changed
+
+- Player: a single left click now plays or pauses the moment the button is released, with no double-click wait; double-click no longer toggles fullscreen.
+- Player: fullscreen moves to the middle mouse button and the F key (Esc still leaves it); the mouse wheel now seeks 10 seconds instead of changing the volume. Frame stepping moves to "." and ",". The comparison panel follows the same rules.
+- Windows: the app and the installer write one "Open with" registration, `Applications\VidShrink.exe` named VidShrink; the app no longer creates `Applications\VidShrink.App.exe`, and a leftover one that points outside the installed layout is removed.
+- Windows: the setup executable now describes itself as "VidShrink Setup".
+
+### Added
+
+- Settings: a "Make Default" button opens the Windows Default apps page at the VidShrink entry.
+
+### Fixed
+
+- Windows: a VidShrink.App.exe run from a build folder no longer writes file associations or the right-click menu into the registry; writing is allowed only in the installed layout (`app\VidShrink.App.exe` with `VidShrink.exe` one folder up).
+
 ## [0.11.0] - 2026-09-27
 
 ### Changed

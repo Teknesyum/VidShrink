@@ -17,7 +17,6 @@ internal partial class PlayerView
 
     private SurfacePan? _pan;
     private PointerPressedEventArgs? _pressArgs;
-    private DispatcherTimer? _clickTimer;
     private TranslateTransform? _shift;
     private Point _lastDrag;
     private string _dragMode = "";
@@ -58,29 +57,21 @@ internal partial class PlayerView
     }
 
     /// <summary>
-    /// Sol basis. Cift tik burada hemen tam ekrana gider; tek tik yalniz kurulur, isini
-    /// birakista ve cift tik penceresi dolunca yapar. Doner deger: olay yutuldu mu.
+    /// Sol basis yalniz kurulur; isini birakista yapar. Cift tik ayri bir hareket degil.
     /// </summary>
-    internal bool FarePress(PointerPressedEventArgs e, double x, double y)
+    internal void FarePress(PointerPressedEventArgs e, double x, double y)
     {
         _pressArgs = e;
-        return FarePress(e.ClickCount, x, y);
+        FarePress(x, y);
     }
 
-    internal bool FarePress(int clicks, double x, double y)
+    internal void FarePress(double x, double y)
     {
         _windowDrag = false;
         _leftClicks++;
         _dragMode = "";
-        if (_click.Press(clicks, x, y) == PressOutcome.Double)
-        {
-            StopClickTimer();
-            Apply(Keymap.ForPress(PlayerButton.Left, clicks));
-            return true;
-        }
-
+        _click.Press(x, y);
         _lastDrag = new Point(x, y);
-        return false;
     }
 
     /// <summary>
@@ -108,23 +99,13 @@ internal partial class PlayerView
         return _dragMode;
     }
 
-    /// <summary>Birakis. Surukleme olmadan biten basis bekleyen tek tika donusur.</summary>
-    internal ReleaseOutcome FareRelease(double nowMs)
+    /// <summary>Birakis. Surukleme olmadan biten basis o anda duraklat/baslat olur.</summary>
+    internal ReleaseOutcome FareRelease()
     {
-        var outcome = _click.Release(nowMs);
+        var outcome = _click.Release();
         _dragMode = "";
-        if (outcome == ReleaseOutcome.Click) StartClickTimer();
-        else StopClickTimer();
+        if (outcome == ReleaseOutcome.Click) Apply(Keymap.ForPress(PlayerButton.Left));
         return outcome;
-    }
-
-    /// <summary>Cift tik penceresi doldu mu; dolduysa bekleyen tek tik duraklat/baslat olur.</summary>
-    internal bool FareDue(double nowMs)
-    {
-        if (!_click.Due(nowMs)) return false;
-        StopClickTimer();
-        Apply(Keymap.ForPress(PlayerButton.Left, 1));
-        return true;
     }
 
     internal void ResetPan()
@@ -158,28 +139,6 @@ internal partial class PlayerView
     private bool WindowIsNormal()
         => !_fullscreen.IsFullscreen
            && (TopLevel.GetTopLevel(this) is not Window window || window.WindowState == WindowState.Normal);
-
-    private void StartClickTimer()
-    {
-        _clickTimer ??= NewClickTimer();
-        _clickTimer.Stop();
-        _clickTimer.Interval = TimeSpan.FromMilliseconds(ClickArbiter.DoubleWindowMs);
-        _clickTimer.Start();
-    }
-
-    private void StopClickTimer() => _clickTimer?.Stop();
-
-    /// <summary>
-    /// Tek tik zamanlayicisi <see cref="DispatcherPriority.Default"/>'ta: varsayilan Background
-    /// onceligi Win32 dispatcher'inda kuyrukta girdi bekledikce hic calismiyor ve tek tik
-    /// duraklat/baslat olmadan kaybolabiliyordu.
-    /// </summary>
-    private DispatcherTimer NewClickTimer()
-    {
-        var timer = new DispatcherTimer(DispatcherPriority.Default) { Interval = TimeSpan.FromMilliseconds(ClickArbiter.DoubleWindowMs) };
-        timer.Tick += (_, _) => FareDue(Environment.TickCount64 + ClickArbiter.DoubleWindowMs);
-        return timer;
-    }
 
     private void OnFarePointerMoved(object? sender, PointerEventArgs e)
     {
@@ -356,6 +315,6 @@ internal partial class PlayerView
         }
 
         if (IsSeekBarSource(e.Source)) return;
-        FareRelease(Environment.TickCount64);
+        FareRelease();
     }
 }
