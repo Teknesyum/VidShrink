@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Povećaj ploču",
   "playback.panel.fullscreen": "Puni zaslon",
   "playback.zoom.out": "Umanji prikaz",
-  "playback.zoom.in": "Uvećaj prikaz"
+  "playback.zoom.in": "Uvećaj prikaz",
+  "player.menu.reveal": "Otvori lokaciju datoteke",
+  "player.menu.view": "Slika",
+  "player.menu.playback": "Reprodukcija",
+  "player.menu.loop": "Ponavljanje i oznake"
 }

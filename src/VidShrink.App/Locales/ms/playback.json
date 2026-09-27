@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Besarkan panel",
   "playback.panel.fullscreen": "Skrin penuh",
   "playback.zoom.out": "Zum keluar",
-  "playback.zoom.in": "Zum masuk"
+  "playback.zoom.in": "Zum masuk",
+  "player.menu.reveal": "Buka lokasi fail",
+  "player.menu.view": "Gambar",
+  "player.menu.playback": "Main balik",
+  "player.menu.loop": "Ulangan dan penanda buku"
 }

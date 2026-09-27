@@ -53,5 +53,9 @@
   "playback.panel.maximize": "প্যানেল বড় করুন",
   "playback.panel.fullscreen": "পূর্ণ পর্দা",
   "playback.zoom.out": "জুম আউট করুন",
-  "playback.zoom.in": "জুম ইন করুন"
+  "playback.zoom.in": "জুম ইন করুন",
+  "player.menu.reveal": "ফাইলের অবস্থান খুলুন",
+  "player.menu.view": "ভিডিও",
+  "player.menu.playback": "প্লেব্যাক",
+  "player.menu.loop": "পুনরাবৃত্তি ও বুকমার্ক"
 }

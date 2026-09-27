@@ -236,22 +236,9 @@ internal partial class PlayerView
             parts.Add(_trackNoticeArgs.Length == 0 ? Strings.Get(notice) : Strings.Get(notice, _trackNoticeArgs));
     }
 
-    private void AddTrackMenus(MenuFlyout flyout)
-    {
-        var at = flyout.Items.Count;
-        for (var i = 0; i < flyout.Items.Count; i++)
-        {
-            if (flyout.Items[i] is MenuItem { Tag: PlayerAction action } && ReferenceEquals(action, Keymap.Mute))
-            {
-                at = i + 1;
-                break;
-            }
-        }
+    private MenuItem AudioMenu() => Submenu(Strings.Get("player.tracks.audio"), BuildAudioItems());
 
-        flyout.Items.Insert(at, new Separator());
-        flyout.Items.Insert(at + 1, Submenu(Strings.Get("player.tracks.audio"), BuildAudioItems()));
-        flyout.Items.Insert(at + 2, Submenu(Strings.Get("player.subtitle.menu"), BuildSubtitleItems()));
-    }
+    private MenuItem SubtitleMenu() => Submenu(Strings.Get("player.subtitle.menu"), BuildSubtitleItems());
 
     internal List<Control> BuildAudioItems()
     {

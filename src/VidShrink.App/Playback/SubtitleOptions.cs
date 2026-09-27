@@ -25,12 +25,12 @@ internal sealed class SubtitleOptions
     internal const double DefaultPosition = 100;
     internal const string AutoCodepage = "auto";
 
-    internal static readonly PlayerAction AudioCycle = new(PlayerCommandKind.AudioCycle, 0, "player.tracks.cycle", 0);
-    internal static readonly PlayerAction SubtitleCycle = new(PlayerCommandKind.SubtitleCycle, 0, "player.subtitle.cycle", 0);
-    internal static readonly PlayerAction SubtitleLater = new(PlayerCommandKind.SubtitleDelay, SubtitleDelayStep, "player.subtitle.delay", 0);
-    internal static readonly PlayerAction SubtitleEarlier = new(PlayerCommandKind.SubtitleDelay, -SubtitleDelayStep, "player.subtitle.delay", 0);
-    internal static readonly PlayerAction AudioLater = new(PlayerCommandKind.AudioDelay, AudioDelayStep, "player.tracks.delay", 0);
-    internal static readonly PlayerAction AudioEarlier = new(PlayerCommandKind.AudioDelay, -AudioDelayStep, "player.tracks.delay", 0);
+    internal static readonly PlayerAction AudioCycle = new(PlayerCommandKind.AudioCycle, 0, "player.tracks.cycle");
+    internal static readonly PlayerAction SubtitleCycle = new(PlayerCommandKind.SubtitleCycle, 0, "player.subtitle.cycle");
+    internal static readonly PlayerAction SubtitleLater = new(PlayerCommandKind.SubtitleDelay, SubtitleDelayStep, "player.subtitle.delay");
+    internal static readonly PlayerAction SubtitleEarlier = new(PlayerCommandKind.SubtitleDelay, -SubtitleDelayStep, "player.subtitle.delay");
+    internal static readonly PlayerAction AudioLater = new(PlayerCommandKind.AudioDelay, AudioDelayStep, "player.tracks.delay");
+    internal static readonly PlayerAction AudioEarlier = new(PlayerCommandKind.AudioDelay, -AudioDelayStep, "player.tracks.delay");
 
     internal static readonly IReadOnlyList<string> Extensions = new[] { "srt", "ass", "ssa", "vtt", "sub" };
 

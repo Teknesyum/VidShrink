@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Zvětšit panel",
   "playback.panel.fullscreen": "Celá obrazovka",
   "playback.zoom.out": "Oddálit",
-  "playback.zoom.in": "Přiblížit"
+  "playback.zoom.in": "Přiblížit",
+  "player.menu.reveal": "Otevřít umístění souboru",
+  "player.menu.view": "Obraz",
+  "player.menu.playback": "Přehrávání",
+  "player.menu.loop": "Opakování a záložky"
 }

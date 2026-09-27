@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Panua paneli",
   "playback.panel.fullscreen": "Skrini nzima",
   "playback.zoom.out": "Punguza ukubwa",
-  "playback.zoom.in": "Ongeza ukubwa"
+  "playback.zoom.in": "Ongeza ukubwa",
+  "player.menu.reveal": "Fungua mahali faili lilipo",
+  "player.menu.view": "Picha",
+  "player.menu.playback": "Uchezaji",
+  "player.menu.loop": "Kurudia na alamisho"
 }

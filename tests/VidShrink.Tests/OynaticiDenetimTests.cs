@@ -443,12 +443,12 @@ public sealed class KeymapTests
                 Strings.Use(dil);
                 Dispatcher.UIThread.RunJobs();
 
-                var tumu = view.BuildMenu().Items.OfType<MenuItem>().ToList();
-                var menu = tumu.Where(item => item.Tag is PlayerAction).ToList();
+                var akis = view.BuildMenu();
+                var tumu = akis.Items.OfType<MenuItem>().ToList();
+                var menu = OynaticiGirdiTestsMenuSatirlari.EylemSatirlari(akis).ToList();
                 var ekler = tumu.Where(item => item.Tag is null).Select(item => item.Header as string).ToList();
                 body.AppendLine($"[{dil}] menu {menu.Count} satir, ek satirlar: {string.Join(" | ", ekler)}");
-                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.tools.menu") }, ekler);
-                Assert.Equal(tumu.IndexOf(menu.First(item => ReferenceEquals(item.Tag, Keymap.Mute))) + 1, tumu.FindIndex(item => item.Tag is null));
+                Assert.Equal(OynaticiGirdiTestsMenuSatirlari.EkBasliklar(), ekler);
                 Assert.Equal(Keymap.MenuActions.Count, menu.Count);
                 foreach (var (item, action) in menu.Zip(Keymap.MenuActions))
                 {

@@ -267,26 +267,22 @@ internal partial class PlayerView
 
     private string? RecentFile() => SettingsFolder() is { } folder ? Path.Combine(folder, RecentFiles.FileName) : null;
 
-    private void AppendWindowMenu(MenuFlyout flyout)
+    private bool? ToggleState(PlayerAction action)
     {
         EnsureSettings();
-        foreach (var item in flyout.Items.OfType<MenuItem>())
+        return action.Command switch
         {
-            if (item.Tag is not PlayerAction action) continue;
-            bool? on = action.Command switch
-            {
-                PlayerCommandKind.ToggleTopmost => _topmost,
-                PlayerCommandKind.Mirror => _mirrored,
-                PlayerCommandKind.ToggleInfo => _infoVisible,
-                PlayerCommandKind.ToggleShuffle => _settings.Shuffle,
-                _ => null
-            };
-            if (on is not { } value) continue;
-            item.ToggleType = MenuItemToggleType.CheckBox;
-            item.IsChecked = value;
-        }
+            PlayerCommandKind.ToggleTopmost => _topmost,
+            PlayerCommandKind.Mirror => _mirrored,
+            PlayerCommandKind.ToggleInfo => _infoVisible,
+            PlayerCommandKind.ToggleShuffle => _settings.Shuffle,
+            _ => null
+        };
+    }
 
-        flyout.Items.Add(new Separator());
+    private MenuItem RecentMenu()
+    {
+        EnsureSettings();
         var recent = new MenuItem { Header = Strings.Get("player.list.recent") };
         var files = _recent.Items;
         if (files.Count == 0) recent.Items.Add(new MenuItem { Header = Strings.Get("player.list.recent-empty"), IsEnabled = false });
@@ -298,7 +294,7 @@ internal partial class PlayerView
             recent.Items.Add(entry);
         }
 
-        flyout.Items.Add(recent);
+        return recent;
     }
 
     private void OnRecentRow(object? sender, RoutedEventArgs e)

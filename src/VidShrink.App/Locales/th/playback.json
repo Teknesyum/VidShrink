@@ -53,5 +53,9 @@
   "playback.panel.maximize": "ขยายแผงให้ใหญ่สุด",
   "playback.panel.fullscreen": "เต็มหน้าจอ",
   "playback.zoom.out": "ซูมออก",
-  "playback.zoom.in": "ซูมเข้า"
+  "playback.zoom.in": "ซูมเข้า",
+  "player.menu.reveal": "เปิดตำแหน่งไฟล์",
+  "player.menu.view": "ภาพ",
+  "player.menu.playback": "การเล่น",
+  "player.menu.loop": "เล่นซ้ำและบุ๊กมาร์ก"
 }

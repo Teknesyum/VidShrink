@@ -106,26 +106,21 @@ internal partial class PlayerView
 
     private string? ToolsFile() => SettingsFolder() is { } folder ? Path.Combine(folder, ToolsOptions.FileName) : null;
 
-    private void AppendToolsMenu(MenuFlyout flyout)
+    private MenuItem ToolsMenu()
     {
         EnsureTools();
-        var children = new List<Control>
+        var mini = ToolsRow(ToolsOptions.MiniMode);
+        mini.ToggleType = MenuItemToggleType.CheckBox;
+        mini.IsChecked = _mini.IsMini;
+        return Submenu(Strings.Get("player.tools.menu"), new List<Control>
         {
             ToolsRow(ToolsOptions.Clip),
             ToolsRow(ToolsOptions.Gif),
+            ToolsRow(ToolsOptions.OpenUrl),
             new Separator(),
-            ToolsRow(ToolsOptions.MiniMode),
-            ToolsRow(ToolsOptions.OpenUrl)
-        };
-
-        if (children[3] is MenuItem mini)
-        {
-            mini.ToggleType = MenuItemToggleType.CheckBox;
-            mini.IsChecked = _mini.IsMini;
-        }
-
-        flyout.Items.Add(new Separator());
-        flyout.Items.Add(Submenu(Strings.Get("player.tools.menu"), children));
+            ActionRow(Keymap.Info),
+            mini
+        });
     }
 
     private MenuItem ToolsRow(PlayerAction action)

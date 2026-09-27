@@ -53,5 +53,9 @@
   "playback.panel.maximize": "पैनल बड़ा करें",
   "playback.panel.fullscreen": "पूर्ण स्क्रीन",
   "playback.zoom.out": "ज़ूम आउट करें",
-  "playback.zoom.in": "ज़ूम इन करें"
+  "playback.zoom.in": "ज़ूम इन करें",
+  "player.menu.reveal": "फ़ाइल का स्थान खोलें",
+  "player.menu.view": "चित्र",
+  "player.menu.playback": "प्लेबैक",
+  "player.menu.loop": "दोहराव और बुकमार्क"
 }

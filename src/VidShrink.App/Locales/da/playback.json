@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Forstør panelet",
   "playback.panel.fullscreen": "Fuld skærm",
   "playback.zoom.out": "Zoom ud",
-  "playback.zoom.in": "Zoom ind"
+  "playback.zoom.in": "Zoom ind",
+  "player.menu.reveal": "Åbn filplacering",
+  "player.menu.view": "Billede",
+  "player.menu.playback": "Afspilning",
+  "player.menu.loop": "Gentagelse og bogmærker"
 }

@@ -53,5 +53,9 @@
   "playback.panel.maximize": "放大面板",
   "playback.panel.fullscreen": "全屏",
   "playback.zoom.out": "缩小",
-  "playback.zoom.in": "放大"
+  "playback.zoom.in": "放大",
+  "player.menu.reveal": "打开文件所在位置",
+  "player.menu.view": "画面",
+  "player.menu.playback": "播放",
+  "player.menu.loop": "循环与书签"
 }

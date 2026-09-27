@@ -53,5 +53,9 @@
   "playback.panel.maximize": "بزرگ‌نمایی پنل",
   "playback.panel.fullscreen": "تمام‌صفحه",
   "playback.zoom.out": "کوچک‌نمایی",
-  "playback.zoom.in": "بزرگ‌نمایی"
+  "playback.zoom.in": "بزرگ‌نمایی",
+  "player.menu.reveal": "باز کردن محل فایل",
+  "player.menu.view": "تصویر",
+  "player.menu.playback": "پخش",
+  "player.menu.loop": "تکرار و نشانک‌ها"
 }
