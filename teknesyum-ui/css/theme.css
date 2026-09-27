@@ -1,9 +1,9 @@
 /* Teknesyum Neon — single source. Do not override these values in a project. */
 
 @theme {
-  --color-neon-renk-1: #6fb7ff;
-  --color-neon-renk-2: #cba7d2;
-  --color-neon-renk-3: #c3a3ff;
+  --color-neon-renk-1: #4da6ff;
+  --color-neon-renk-2: #de7ef1;
+  --color-neon-renk-3: #b68fff;
   --color-neon-success: #66f09a;
   --color-renk-2-text: #fa8cff;
   --color-renk-3-text: #ac7fff;
@@ -18,7 +18,7 @@
      `text-danger`, `border-warning`. `--color-neon-success` was not renamed
      because `references/components.md` binds to that name; the role name lives
      in `--tk-success`. */
-  --color-danger: #cba7d2;
+  --color-danger: #de7ef1;
   --color-danger-text: #fa8cff;
   --color-warning: #ffd24d;
 
@@ -32,9 +32,9 @@
 }
 
 :root {
-  --tk-renk-1: #6fb7ff;
-  --tk-renk-2: #cba7d2;
-  --tk-renk-3: #c3a3ff;
+  --tk-renk-1: #4da6ff;
+  --tk-renk-2: #de7ef1;
+  --tk-renk-3: #b68fff;
   --tk-success: #66f09a;
   --tk-surface: #000000;
   --tk-bg-rotate: 48s;
@@ -76,7 +76,7 @@
      text, border and icon.
      WHAT REPLACES IT: warning text `--tk-warning` (14.58:1), border
      `--tk-warning-border` (3.96:1 on `#000000` — clears 1.4.11's 3:1 threshold;
-     renk-2 /50 at 3.02 and renk-3 /50 at 3.01 did NOT carry this rung, amber does),
+     renk-2 /50 at 2.66 and renk-3 /50 at 2.67 did NOT carry this rung, amber does),
      icon the same colour. If an action is needed the button is primary (renk-1) or
      `danger` (renk-2) — the warning colour never enters a button.
      COLOUR ALONE CARRIES NO MEANING, amber included from the start: amber does
@@ -90,7 +90,7 @@
   --tk-warning-border: rgba(255, 210, 77, 0.5);
 
   --tk-text: #ffffff;
-  --tk-text-label: #6fb7ff;
+  --tk-text-label: #4da6ff;
   /* A disabled control is exempt from 7:1 (SKILL §2) and that exemption has a
      price: a colour-blind user cannot see the grey. So `--tk-disabled` is never
      used alone — every disabled control carries a marker in addition to the grey:
@@ -116,13 +116,15 @@
   --tk-on-renk-2-10: #ffffff;
   --tk-on-renk-2-20: #ffffff;
   --tk-on-renk-2-30: #ffffff;
+  --tk-on-renk-2-50: #ffffff;
   --tk-on-renk-3-10: #ffffff;
   --tk-on-renk-3-20: #ffffff;
   --tk-on-renk-3-30: #ffffff;
+  --tk-on-renk-3-50: #ffffff;
 
-  --tk-border: rgba(111, 183, 255, 0.55);
-  --tk-border-strong: rgba(111, 183, 255, 0.7);
-  --tk-border-decorative: rgba(111, 183, 255, 0.2);
+  --tk-border: rgba(77, 166, 255, 0.55);
+  --tk-border-strong: rgba(77, 166, 255, 0.7);
+  --tk-border-decorative: rgba(77, 166, 255, 0.2);
 
   /* There is one radius: 6px. The conflict was closed on 2026-08-23 in favour of
      `layout.md` — a rounded rectangle takes the smaller corner (SKILL §5). The
@@ -197,9 +199,11 @@
   --tk-scrollbar-style: fade;
   --tk-scroll-behavior: auto;
   --tk-thumb: rgba(172, 127, 255, 1);
-  --tk-thumb-hover: rgba(203, 167, 210, 1);
+  --tk-thumb-hover: rgba(222, 126, 241, 1);
   --tk-track: rgba(0, 0, 0, 0.3);
   --tk-modal-w: min(560px, 90vw);
+  --tk-installer-w: 720px;
+  --tk-installer-h: 540px;
   --tk-modal-max-ratio: 0.85;
   --tk-toast-w: min(360px, calc(100vw - var(--tk-sp-5) * 2));
   --tk-toast-max: 3;
@@ -256,12 +260,12 @@
   --tk-e-sharp: cubic-bezier(0.4, 0, 0.6, 1);
   --tk-e-linear: cubic-bezier(0, 0, 1, 1);
 
-  --tk-glow-renk-1: 0 0 0px rgba(111, 183, 255, 0);
-  --tk-glow-renk-2: 0 0 0px rgba(203, 167, 210, 0);
-  --tk-glow-renk-3: 0 0 0px rgba(195, 163, 255, 0);
+  --tk-glow-renk-1: 0 0 0px rgba(77, 166, 255, 0);
+  --tk-glow-renk-2: 0 0 0px rgba(222, 126, 241, 0);
+  --tk-glow-renk-3: 0 0 0px rgba(182, 143, 255, 0);
   /* The hero glow is one token and gives the same intensity on both platforms:
      blur 8, opacity 0.8. Its XAML counterpart is `HeroGlow` (Theme.xaml). */
-  --tk-glow-hero: 0 0 0px rgba(111, 183, 255, 0);
+  --tk-glow-hero: 0 0 0px rgba(77, 166, 255, 0);
   /* A shadow is not a glow: it separates the panel from the background gradient
      and takes no brand colour. */
   --tk-shadow-panel: 0 0 0px rgba(0, 0, 0, 0);
@@ -374,11 +378,11 @@ body {
   transition-duration: var(--tk-t-instant);
 }
 .tk-btn-primary   { background: var(--tk-renk-1);   color: var(--tk-on-renk-1); box-shadow: var(--tk-glow-renk-1); }
-/* Hover is carried by scale alone: black on renk-1 /80 measured 6.43:1, below 7:1. */
+/* Hover is carried by scale alone: black on renk-1 /80 measured 5.42:1, below 7:1. */
 /* The class name was already in role language; its contents moved to the role
    token too. The glow stays on the brand token — a glow is decoration, it does
    not report state. The fill is the danger TEXT cut: black on the fill renk-2 is
-   10.00:1, below 7:1, so renk-2 carries no text (tokens: on.danger); black on
+   8.36:1, below 7:1, so renk-2 carries no text (tokens: on.danger); black on
    danger-text is 10.26:1. Hover is carried by scale alone. */
 .tk-btn-danger    { background: var(--tk-danger-text); color: var(--tk-on-danger-text); box-shadow: var(--tk-glow-renk-2); }
 /* A tint and its own hue never meet on one surface (ui-duzeni): the ghost keeps its
@@ -389,7 +393,7 @@ body {
   border-color: var(--tk-renk-3-text);
   color: var(--tk-text);
 }
-.tk-btn-ghost:hover { background: rgba(195, 163, 255, 0.1); color: var(--tk-on-renk-3-10); }
+.tk-btn-ghost:hover { background: rgba(182, 143, 255, 0.1); color: var(--tk-on-renk-3-10); }
 /* The disabled state does not end at dimming: `title` text is mandatory (§2). */
 .tk-btn:disabled {
   color: var(--tk-disabled);

@@ -7,9 +7,9 @@ namespace Teknesyum.Theme;
 /// Teknesyum Neon — WinForms/console palette. Do not change these values.
 public static class Palette
 {
-    public static readonly Color Renk1      = ColorTranslator.FromHtml("#6FB7FF");
-    public static readonly Color Renk2      = ColorTranslator.FromHtml("#CBA7D2");
-    public static readonly Color Renk3      = ColorTranslator.FromHtml("#C3A3FF");
+    public static readonly Color Renk1      = ColorTranslator.FromHtml("#4DA6FF");
+    public static readonly Color Renk2      = ColorTranslator.FromHtml("#DE7EF1");
+    public static readonly Color Renk3      = ColorTranslator.FromHtml("#B68FFF");
     public static readonly Color Success    = ColorTranslator.FromHtml("#66F09A");
 
     public static readonly Color Renk2Text  = ColorTranslator.FromHtml("#FA8CFF");
@@ -60,15 +60,15 @@ public static class Palette
     public static readonly Color AppBgFrom  = ColorTranslator.FromHtml("#000000");
     public static readonly Color AppBgTo    = ColorTranslator.FromHtml("#000000");
 
-    public static readonly Color BorderDefault    = Color.FromArgb(0x8C, 0x6F, 0xB7, 0xFF);
-    public static readonly Color BorderStrong     = Color.FromArgb(0xB3, 0x6F, 0xB7, 0xFF);
-    public static readonly Color BorderDecorative = Color.FromArgb(0x33, 0x6F, 0xB7, 0xFF);
+    public static readonly Color BorderDefault    = Color.FromArgb(0x8C, 0x4D, 0xA6, 0xFF);
+    public static readonly Color BorderStrong     = Color.FromArgb(0xB3, 0x4D, 0xA6, 0xFF);
+    public static readonly Color BorderDecorative = Color.FromArgb(0x33, 0x4D, 0xA6, 0xFF);
 
-    public static readonly Color FocusRing      = ColorTranslator.FromHtml("#6FB7FF");
+    public static readonly Color FocusRing      = ColorTranslator.FromHtml("#4DA6FF");
     public static readonly Color FocusRingInner = ColorTranslator.FromHtml("#000000");
 
     public static readonly Color TextBody   = ColorTranslator.FromHtml("#FFFFFF");
-    public static readonly Color TextLabel  = ColorTranslator.FromHtml("#6FB7FF");
+    public static readonly Color TextLabel  = ColorTranslator.FromHtml("#4DA6FF");
 
     /// A disabled control is exempt from 7:1 (SKILL §2) and there is a price: a
     /// colour-blind user cannot see the grey. This colour is never used alone —
@@ -133,6 +133,8 @@ public static class Palette
     public const int    SidebarCollapsedWidth = 48;
     public const int    InputHeight           = 40;
     public const int    ModalWidth            = 560;
+    public const int    InstallerWidth        = 720;
+    public const int    InstallerHeight       = 540;
     public const double ModalMaxRatio         = 0.85;
     public const int    ToastWidth            = 360;
     public const int    ToastMax              = 3;
@@ -151,7 +153,7 @@ public static class Palette
     public const string ScrollBehavior = "auto";
     public static readonly Color WindowEdge          = Color.Transparent;
     public static readonly Color ScrollbarThumb      = Color.FromArgb(0xFF, 0xAC, 0x7F, 0xFF);
-    public static readonly Color ScrollbarThumbHover = Color.FromArgb(0xFF, 0xCB, 0xA7, 0xD2);
+    public static readonly Color ScrollbarThumbHover = Color.FromArgb(0xFF, 0xDE, 0x7E, 0xF1);
     public static readonly Color ScrollbarTrack      = Color.FromArgb(0x4D, 0x00, 0x00, 0x00);
 
     public const double ScaleHover     = 1.02;
@@ -213,9 +215,9 @@ public static class Palette
 /// ANSI console colours (for CLI projects such as Runly).
 public static class Ansi
 {
-    public const string Renk1      = "[38;2;111;183;255m";
-    public const string Renk2      = "[38;2;203;167;210m";
-    public const string Renk3      = "[38;2;195;163;255m";
+    public const string Renk1      = "[38;2;77;166;255m";
+    public const string Renk2      = "[38;2;222;126;241m";
+    public const string Renk3      = "[38;2;182;143;255m";
     public const string Renk2Text  = "[38;2;250;140;255m";
     public const string Renk3Text  = "[38;2;172;127;255m";
     public const string Success    = "[38;2;102;240;154m";

@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "plugin": "0.20.0",
+  "plugin": "0.26.0",
   "template": "benim",
   "off": false,
   "targets": [
@@ -27,7 +27,7 @@
     "sponsor": "https://github.com/sponsors/Teknesyum"
   },
   "note": "",
-  "duzen": "0546268da3b3bc91",
+  "duzen": "a0eaf97ec84216aa",
   "installedAt": "2026-09-27T03:51:43.068Z",
   "ignore": [
     {

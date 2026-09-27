@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-09-27
+
+### Changed
+
+- Teknesyum palette: refreshed from the Teknesyum UI layout's new colours; the green background is darker so body text keeps 7:1 contrast against it.
+
 ## [0.12.1] - 2026-09-27
 
 ### Changed
