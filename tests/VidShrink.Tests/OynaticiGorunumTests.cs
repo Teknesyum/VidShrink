@@ -235,12 +235,12 @@ public sealed class OynaticiGorunumTests
     /// yerlestiriliyor. Sayi kanit dosyasina yazilir, pim alttaki taban degerdir.
     /// </summary>
     /// <summary>
-    /// 7b/K1: alt şerit gösterirken beklemez, gizlerken belirtecinin söylediği 360 ms'yi
-    /// bekler. İki sayı da <c>Themes/Playback.axaml</c>'den geliyor; ölçüm sayıyı
-    /// kodlamıyor, sayacın ne kadar beklemek istediğini okuyor.
+    /// 7b/K1: alt şerit ne gösterirken ne gizlerken bekler; fare banttan çıkınca şerit
+    /// aynı anda kapanır (kullanıcı isteği, danışma 015). İki süre de
+    /// <c>Themes/Playback.axaml</c>'den geliyor; ölçüm sayacın kurulup kurulmadığını okuyor.
     /// </summary>
     [Fact]
-    public void SeritGostermedeBeklemezGizlemedeBekler()
+    public void SeritGostermedeVeGizlemedeBeklemez()
     {
         var olcu = SeritKanit.OynaticidaOku(view =>
         {
@@ -255,26 +255,23 @@ public sealed class OynaticiGorunumTests
             var gostermedeSayac = saat.Bekliyor;
 
             bolge.PointerWithin(false);
-            var halaAcik = view.SeritRevealed;
-            var gizlemeSuresi = saat.Sure;
-
-            saat.Ilerlet();
-            return (acildi, gostermedeSayac, halaAcik, gizlemeSuresi, view.SeritRevealed);
+            var cikinca = view.SeritRevealed;
+            var gizlemedeSayac = saat.Bekliyor;
+            var belirtec = (TimeSpan)view.FindResource("PlaybackStripHideDelay")!;
+            return (acildi, gostermedeSayac, cikinca, gizlemedeSayac, belirtec);
         });
 
         var body = new StringBuilder();
-        body.AppendLine($"gosterme -> gorunur {olcu.Item1}, sayac kuruldu {olcu.Item2}");
-        body.AppendLine($"gosterme beklemesi: 0 ms");
-        body.AppendLine($"fare cikti -> hala gorunur {olcu.Item3}");
-        body.AppendLine($"gizleme beklemesi: {SeritKanit.N(olcu.Item4.TotalMilliseconds)} ms");
-        body.AppendLine($"bekleme dolunca -> gorunur {olcu.Item5}");
+        body.AppendLine($"gosterme -> gorunur {olcu.acildi}, sayac kuruldu {olcu.gostermedeSayac}");
+        body.AppendLine($"fare cikti -> gorunur {olcu.cikinca}, sayac kuruldu {olcu.gizlemedeSayac}");
+        body.AppendLine($"gizleme belirteci: {SeritKanit.N(olcu.belirtec.TotalMilliseconds)} ms");
         SeritKanit.Write("serit-zamanlama.txt", body.ToString());
 
-        Assert.True(olcu.Item1, "serit gosterme icin bekledi");
-        Assert.False(olcu.Item2, "gosterme sayac kurdu");
-        Assert.True(olcu.Item3, "serit beklemeden gizlendi");
-        Assert.Equal(TimeSpan.FromMilliseconds(360), olcu.Item4);
-        Assert.False(olcu.Item5, "serit bekleme dolunca gizlenmedi");
+        Assert.True(olcu.acildi, "serit gosterme icin bekledi");
+        Assert.False(olcu.gostermedeSayac, "gosterme sayac kurdu");
+        Assert.Equal(TimeSpan.Zero, olcu.belirtec);
+        Assert.False(olcu.cikinca, "serit fare cikinca acik kaldi");
+        Assert.False(olcu.gizlemedeSayac, "gizleme sayac kurdu");
         SeritKanit.Kapat("serit-zamanlama.txt");
     }
 

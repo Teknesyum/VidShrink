@@ -256,12 +256,27 @@ public sealed class OynaticiOdakYoluTests
                 HamFare(o.Window, RawPointerEventType.Move, yuzey, RawInputModifiers.None);
                 HamFare(o.Window, RawPointerEventType.RightButtonDown, yuzey, RawInputModifiers.RightMouseButton);
                 HamFare(o.Window, RawPointerEventType.RightButtonUp, yuzey, RawInputModifiers.None);
+                var gorunumBasligi = Strings.Get("player.menu.view");
+                PopupRoot? kok = null;
+                MenuItem? gorunum = null;
+                o.Bekle(() => (kok = Acilirlar().FirstOrDefault(k => !onceki.Contains(k))) is not null
+                              && (gorunum = kok.GetVisualDescendants().OfType<MenuItem>().FirstOrDefault(m => Equals(m.Header, gorunumBasligi))) is not null, 5);
+                o.Bekle(0.3);
+                if (kok is null || gorunum is null) return (o.Kayit.ToString(), "menude gorunum alt menusu yok");
+                o.Not($"kok menude dondurme satiri {kok.GetVisualDescendants().OfType<MenuItem>().Any(m => ReferenceEquals(m.Tag, Keymap.Rotate))}");
+
+                var kokAcilirlar = Acilirlar();
+                var basliktaki = Orta(kok, gorunum);
+                HamFare(kok, RawPointerEventType.Move, basliktaki, RawInputModifiers.None);
+                HamFare(kok, RawPointerEventType.LeftButtonDown, basliktaki, RawInputModifiers.LeftMouseButton);
+                HamFare(kok, RawPointerEventType.LeftButtonUp, basliktaki, RawInputModifiers.None);
                 PopupRoot? menu = null;
                 MenuItem? satir = null;
-                o.Bekle(() => (menu = Acilirlar().FirstOrDefault(k => !onceki.Contains(k))) is not null
+                o.Bekle(() => (menu = Acilirlar().FirstOrDefault(k => !kokAcilirlar.Contains(k))) is not null
                               && (satir = menu.GetVisualDescendants().OfType<MenuItem>().FirstOrDefault(m => ReferenceEquals(m.Tag, Keymap.Rotate))) is not null, 5);
                 o.Bekle(0.3);
-                if (menu is null || satir is null) return (o.Kayit.ToString(), "menude dondurme satiri yok");
+                o.Not($"gorunum alt menusu acik {gorunum.IsSubMenuOpen}");
+                if (menu is null || satir is null) return (o.Kayit.ToString(), "gorunum alt menusunde dondurme satiri yok");
 
                 o.Not($"menu acik {o.View.MenuOpen}, capa {o.View.MenuAnchor}, kok giris {(menu.PlatformImpl is { } pi && Giris(pi) is not null)}");
                 var isabet = menu.InputHitTest(Orta(menu, satir)) is Visual v && (ReferenceEquals(v, satir) || v.GetVisualAncestors().Contains(satir));
@@ -273,6 +288,9 @@ public sealed class OynaticiOdakYoluTests
                 if (ipucu is null || !ipucu.Contains(baslik, StringComparison.Ordinal) || !ipucu.Contains(gesture, StringComparison.Ordinal)) sonuc ??= "ipucunda tus adi yok";
 
                 HamTus(menu.PlatformImpl is { } mi && Giris(mi) is not null ? menu : o.Window, Key.Escape, RawInputModifiers.None, null);
+                o.Bekle(() => !gorunum.IsSubMenuOpen, 3);
+                if (o.View.MenuOpen)
+                    HamTus(kok.PlatformImpl is { } ki && Giris(ki) is not null ? kok : o.Window, Key.Escape, RawInputModifiers.None, null);
                 o.Bekle(() => !o.View.MenuOpen, 3);
                 o.Not($"menu kapandi {!o.View.MenuOpen}");
 
