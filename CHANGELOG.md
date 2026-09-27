@@ -7,6 +7,25 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-09-27
+
+### Added
+
+- 36 colour palettes: the 26 existing ones plus 10 from the Teknesyum UI standard (Buz, Gece, Grafit, Kadife, Kagit, Kar, Keskin, Kirik, Kor, Teknesyum). Every palette is now generated from one role schema; the existing 26 keep their exact colours.
+- A live contrast check runs in CI over every window, state and palette.
+
+### Changed
+
+- New default palette: Teknesyum. A palette you already chose is kept.
+- New application icon, drawn from an SVG source in the Teknesyum colours.
+- Window root text uses the theme font size token.
+
+### Fixed
+
+- Switching palettes no longer leaves some brushes on the previous palette's colours.
+- The context menu shortcut text and the recorder mini strip background now follow the palette.
+- Fixed-size windows can no longer be maximised.
+
 ## [0.9.6] - 2026-09-26
 
 ### Added
