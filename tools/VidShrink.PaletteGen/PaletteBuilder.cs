@@ -76,6 +76,7 @@ public static class PaletteBuilder
         {
             var warmed = Dim(Mix(ground, ember, weight), light);
             if (seed.Atmos is null) return warmed;
+            if (seed.Ground is { } strength) return Dim(Mix(ground, seed.Atmos, weight * strength), light);
             return Shade(Dim(Mix(ground, seed.Atmos, weight * 3), light), Luminance(warmed));
         }
         var hot = seed.Atmos is null ? blaze : Mix(seed.Atmos, "#FFFFFF", 0.35);

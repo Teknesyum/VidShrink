@@ -54,8 +54,9 @@ the player instead of pushing it down.
 | Shift + wheel | step sixty seconds |
 | Ctrl + Shift + wheel | step five minutes |
 | Alt + wheel | zoom |
-| Right-click, or Space | toggle playback |
-| Middle-click | toggle full screen, and put the window back where it was |
+| Left-click, or Space | toggle playback |
+| Middle-click, or F | toggle full screen, and put the window back where it was |
+| Right-click | open the context menu |
 
 The context menu carries the same three actions.
 
