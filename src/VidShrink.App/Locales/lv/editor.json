@@ -12,5 +12,15 @@
   "editor.zoom-out": "Tālināt",
   "editor.export": "Eksportēt",
   "editor.timeline": "Laika josla",
-  "editor.playhead": "Atskaņošanas galviņa"
+  "editor.playhead": "Atskaņošanas galviņa",
+  "editor.export.mode": "Eksporta režīms",
+  "editor.export.fast": "Ātrs (bez zudumiem)",
+  "editor.export.smart": "Gudrs",
+  "editor.export.full": "Pilna pārkodēšana",
+  "editor.export.save-title": "Eksportēt rediģēto video",
+  "editor.export.done": "Eksportēts: {0}",
+  "editor.export.failed": "Eksportēšana neizdevās: {0}",
+  "editor.export.reencoded": "Klipi {0} maina ātrumu vai tiek atskaņoti atpakaļgaitā, tāpēc tiek pārkodēti.",
+  "editor.export.fallback": "Šo avotu nevar griezt bez pārkodēšanas, tāpēc tiek pārkodēts viss video.",
+  "editor.export.reverse-limit": "Apgrieztais klips {0} pārsniedz atmiņas ierobežojumu ({1}). Lai turpinātu, vēlreiz noklikšķiniet uz Eksportēt."
 }

@@ -49,6 +49,7 @@ internal partial class EditorView : UserControl
         BtnZoomIn.Click += (_, _) => Timeline.ZoomCentered(true);
         BtnZoomOut.Click += (_, _) => Timeline.ZoomCentered(false);
         TxtSpeed.KeyDown += OnSpeedKey;
+        InitExport();
 
         MnuSplit.Click += (_, _) => Split();
         MnuDelete.Click += (_, _) => DeleteSelected();
@@ -311,6 +312,8 @@ internal partial class EditorView : UserControl
         {
             TxtSpeed.Text = string.Empty;
         }
+
+        RefreshExport();
     }
 
     private void OnDragOver(object? sender, DragEventArgs e)

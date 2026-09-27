@@ -12,5 +12,15 @@
   "editor.zoom-out": "Micșorează",
   "editor.export": "Exportă",
   "editor.timeline": "Cronologie",
-  "editor.playhead": "Cap de redare"
+  "editor.playhead": "Cap de redare",
+  "editor.export.mode": "Mod de export",
+  "editor.export.fast": "Rapid (fără pierderi)",
+  "editor.export.smart": "Inteligent",
+  "editor.export.full": "Recodare completă",
+  "editor.export.save-title": "Exportă videoclipul editat",
+  "editor.export.done": "Exportat: {0}",
+  "editor.export.failed": "Exportul a eșuat: {0}",
+  "editor.export.reencoded": "Clipurile {0} schimbă viteza sau rulează invers și sunt recodate.",
+  "editor.export.fallback": "Această sursă nu poate fi tăiată fără recodare, așa că întregul videoclip este recodat.",
+  "editor.export.reverse-limit": "Clipul inversat {0} depășește limita de memorie ({1}). Apasă din nou Exportă pentru a continua."
 }

@@ -12,5 +12,15 @@
   "editor.zoom-out": "Verkleinern",
   "editor.export": "Exportieren",
   "editor.timeline": "Zeitleiste",
-  "editor.playhead": "Abspielkopf"
+  "editor.playhead": "Abspielkopf",
+  "editor.export.mode": "Exportmodus",
+  "editor.export.fast": "Schnell (verlustfrei)",
+  "editor.export.smart": "Intelligent",
+  "editor.export.full": "Komplett neu kodieren",
+  "editor.export.save-title": "Bearbeitetes Video exportieren",
+  "editor.export.done": "Exportiert: {0}",
+  "editor.export.failed": "Export fehlgeschlagen: {0}",
+  "editor.export.reencoded": "Die Clips {0} ändern die Geschwindigkeit oder laufen rückwärts und werden neu kodiert.",
+  "editor.export.fallback": "Diese Quelle lässt sich nicht ohne Neukodierung schneiden, daher wird das ganze Video neu kodiert.",
+  "editor.export.reverse-limit": "Der rückwärts laufende Clip {0} ist länger als das Speicherlimit ({1}). Zum Fortfahren erneut auf Exportieren klicken."
 }

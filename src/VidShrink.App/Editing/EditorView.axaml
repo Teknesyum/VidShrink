@@ -19,7 +19,22 @@
           <Button x:Name="BtnZoomOut" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-out}"/>
           <Button x:Name="BtnZoomIn" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-in}"/>
           <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.export}" IsEnabled="False"/>
+          <ComboBox x:Name="CmbExportMode" AutomationProperties.Name="{loc:Text editor.export.mode}" SelectedIndex="1">
+            <ComboBoxItem Content="{loc:Text editor.export.fast}"/>
+            <ComboBoxItem Content="{loc:Text editor.export.smart}"/>
+            <ComboBoxItem Content="{loc:Text editor.export.full}"/>
+          </ComboBox>
         </WrapPanel>
+        <StackPanel x:Name="ExportBar" Spacing="{StaticResource SpaceSm}" IsVisible="False">
+          <ProgressBar x:Name="ExportProgress" Maximum="1" IsVisible="False"/>
+          <TextBlock x:Name="TxtExportNote" Theme="{StaticResource StatusWarning}" TextWrapping="Wrap" IsVisible="False"/>
+          <TextBlock x:Name="TxtExportStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+          <WrapPanel Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+            <Button x:Name="BtnExportCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
+            <Button x:Name="BtnExportReveal" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.show-in-folder}" IsVisible="False"/>
+            <Button x:Name="BtnExportPlay" Theme="{StaticResource GhostButton}" Content="{loc:Text recorder.output.to-player}" IsVisible="False"/>
+          </WrapPanel>
+        </StackPanel>
         <editing:EditorTimeline x:Name="Timeline" AutomationProperties.Name="{loc:Text editor.timeline}">
           <editing:EditorTimeline.ContextMenu>
             <ContextMenu x:Name="TimelineMenu">

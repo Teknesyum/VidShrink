@@ -12,5 +12,15 @@
   "editor.zoom-out": "Oddialiť",
   "editor.export": "Exportovať",
   "editor.timeline": "Časová os",
-  "editor.playhead": "Prehrávacia hlava"
+  "editor.playhead": "Prehrávacia hlava",
+  "editor.export.mode": "Režim exportu",
+  "editor.export.fast": "Rýchly (bezstratový)",
+  "editor.export.smart": "Inteligentný",
+  "editor.export.full": "Úplné prekódovanie",
+  "editor.export.save-title": "Exportovať upravené video",
+  "editor.export.done": "Exportované: {0}",
+  "editor.export.failed": "Export zlyhal: {0}",
+  "editor.export.reencoded": "Klipy {0} menia rýchlosť alebo bežia odzadu a budú prekódované.",
+  "editor.export.fallback": "Tento zdroj nemožno strihať bez prekódovania, preto sa prekóduje celé video.",
+  "editor.export.reverse-limit": "Obrátený klip {0} je dlhší ako limit pamäte ({1}). Pre pokračovanie znova kliknite na Exportovať."
 }

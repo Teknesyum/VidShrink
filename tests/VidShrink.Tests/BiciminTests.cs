@@ -1186,6 +1186,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-27, duzenleyici D3: on dort <c>editor.*</c> anahtarindan 10 kol 7 dilde (en: mark-in, zoom-in; es: timeline;
     /// fr: mark-out, playhead; pt: playhead, timeline; ro: playhead; sv ve vi: zoom-in), <c>main.tab.editor</c> kolun disinda:
     /// 2676 + 10 = 2686, en 251, tr 91.</para>
+    /// <para>2026-09-28, duzenleyici D4: on <c>editor.export.*</c> anahtarindan 7 kol 6 dilde (es pt sw: mode; ro: mode, failed;
+    /// fr: failed; lt: fast): 2686 + 7 = 2693, en 251, tr 91.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1211,7 +1213,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2686, toplam);
+        Assert.Equal(2693, toplam);
         Assert.Equal(251, dilBasina["en"]);
         Assert.Equal(91, dilBasina["tr"]);
     }
@@ -1379,6 +1381,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-27, oynatici sag menusu: dil basina dort anahtar (<c>player.menu.reveal</c>, <c>-view</c>, <c>-playback</c>,
     /// <c>-loop</c>): pimli 47816 = 43 x 1112 uzerine 1112 + 4 = 1116, 43 x 1116 = 47988.</para>
     /// <para>2026-09-27, duzenleyici D3: <c>main.tab.editor</c> ve on dort <c>editor.*</c> anahtari: 1116 + 15 = 1131, 43 x 1131 = 48633.</para>
+    /// <para>2026-09-28, duzenleyici D4: on <c>editor.export.*</c> anahtari: 1131 + 10 = 1141, 43 x 1141 = 49063.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1406,7 +1409,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(48633, gezilen);
+        Assert.Equal(49063, gezilen);
         Assert.Empty(kayip);
     }
 

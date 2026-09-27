@@ -775,7 +775,6 @@ public sealed class OluUyeTests
         "LayoutScoreParts.Hysteresis  yalniz-disarida",
         "LayoutScoreParts.Provided  yalniz-disarida",
         "LayoutScoreParts.Required  yalniz-disarida",
-        "MediaInfo.BitDepth  hic-gorunmeyen",
         "PerformanceCheckResult.CpuAccountingTrustworthy  yalniz-disarida",
         "PerformanceCheckResult.HardwareMeasured  yalniz-disarida",
         "PerformanceCheckResult.Impact  yalniz-disarida",

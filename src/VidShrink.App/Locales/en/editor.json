@@ -12,5 +12,15 @@
   "editor.zoom-out": "Zoom out",
   "editor.export": "Export",
   "editor.timeline": "Timeline",
-  "editor.playhead": "Playhead"
+  "editor.playhead": "Playhead",
+  "editor.export.mode": "Export mode",
+  "editor.export.fast": "Fast (lossless)",
+  "editor.export.smart": "Smart",
+  "editor.export.full": "Full re-encode",
+  "editor.export.save-title": "Export edited video",
+  "editor.export.done": "Exported: {0}",
+  "editor.export.failed": "Export failed: {0}",
+  "editor.export.reencoded": "Clips {0} change speed or play in reverse and are re-encoded.",
+  "editor.export.fallback": "This source can't be cut without re-encoding, so the whole video is re-encoded.",
+  "editor.export.reverse-limit": "Reversed clip {0} is longer than the memory limit ({1}). Press Export again to continue."
 }

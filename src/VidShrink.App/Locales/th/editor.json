@@ -12,5 +12,15 @@
   "editor.zoom-out": "ย่อ",
   "editor.export": "ส่งออก",
   "editor.timeline": "ไทม์ไลน์",
-  "editor.playhead": "หัวเล่น"
+  "editor.playhead": "หัวเล่น",
+  "editor.export.mode": "โหมดส่งออก",
+  "editor.export.fast": "เร็ว (ไม่สูญเสียคุณภาพ)",
+  "editor.export.smart": "อัจฉริยะ",
+  "editor.export.full": "เข้ารหัสใหม่ทั้งหมด",
+  "editor.export.save-title": "ส่งออกวิดีโอที่แก้ไข",
+  "editor.export.done": "ส่งออกแล้ว: {0}",
+  "editor.export.failed": "ส่งออกไม่สำเร็จ: {0}",
+  "editor.export.reencoded": "คลิป {0} เปลี่ยนความเร็วหรือเล่นย้อนกลับ จึงถูกเข้ารหัสใหม่",
+  "editor.export.fallback": "แหล่งนี้ตัดโดยไม่เข้ารหัสใหม่ไม่ได้ จึงเข้ารหัสวิดีโอใหม่ทั้งหมด",
+  "editor.export.reverse-limit": "คลิปย้อนกลับ {0} ยาวเกินขีดจำกัดหน่วยความจำ ({1}) กดส่งออกอีกครั้งเพื่อดำเนินการต่อ"
 }

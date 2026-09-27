@@ -12,5 +12,15 @@
   "editor.zoom-out": "축소",
   "editor.export": "내보내기",
   "editor.timeline": "타임라인",
-  "editor.playhead": "재생 헤드"
+  "editor.playhead": "재생 헤드",
+  "editor.export.mode": "내보내기 모드",
+  "editor.export.fast": "빠름(무손실)",
+  "editor.export.smart": "스마트",
+  "editor.export.full": "전체 재인코딩",
+  "editor.export.save-title": "편집한 동영상 내보내기",
+  "editor.export.done": "내보냄: {0}",
+  "editor.export.failed": "내보내기 실패: {0}",
+  "editor.export.reencoded": "클립 {0}은(는) 속도가 바뀌거나 역재생되어 재인코딩됩니다.",
+  "editor.export.fallback": "이 소스는 재인코딩 없이 자를 수 없어 동영상 전체를 재인코딩합니다.",
+  "editor.export.reverse-limit": "역재생 클립 {0}이(가) 메모리 한도({1})를 넘습니다. 계속하려면 내보내기를 다시 누르세요."
 }

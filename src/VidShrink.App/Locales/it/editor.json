@@ -12,5 +12,15 @@
   "editor.zoom-out": "Riduci",
   "editor.export": "Esporta",
   "editor.timeline": "Timeline",
-  "editor.playhead": "Indicatore di riproduzione"
+  "editor.playhead": "Indicatore di riproduzione",
+  "editor.export.mode": "Modalità di esportazione",
+  "editor.export.fast": "Veloce (senza perdita)",
+  "editor.export.smart": "Intelligente",
+  "editor.export.full": "Ricodifica completa",
+  "editor.export.save-title": "Esporta il video modificato",
+  "editor.export.done": "Esportato: {0}",
+  "editor.export.failed": "Esportazione non riuscita: {0}",
+  "editor.export.reencoded": "Le clip {0} cambiano velocità o sono al contrario e vengono ricodificate.",
+  "editor.export.fallback": "Questa sorgente non si può tagliare senza ricodifica, quindi l'intero video viene ricodificato.",
+  "editor.export.reverse-limit": "La clip invertita {0} supera il limite di memoria ({1}). Premi di nuovo Esporta per continuare."
 }

@@ -12,5 +12,15 @@
   "editor.zoom-out": "Perkecil",
   "editor.export": "Ekspor",
   "editor.timeline": "Linimasa",
-  "editor.playhead": "Penanda putar"
+  "editor.playhead": "Penanda putar",
+  "editor.export.mode": "Mode ekspor",
+  "editor.export.fast": "Cepat (lossless)",
+  "editor.export.smart": "Pintar",
+  "editor.export.full": "Encode ulang penuh",
+  "editor.export.save-title": "Ekspor video yang diedit",
+  "editor.export.done": "Diekspor: {0}",
+  "editor.export.failed": "Ekspor gagal: {0}",
+  "editor.export.reencoded": "Klip {0} mengubah kecepatan atau diputar mundur sehingga di-encode ulang.",
+  "editor.export.fallback": "Sumber ini tidak bisa dipotong tanpa encode ulang, jadi seluruh video di-encode ulang.",
+  "editor.export.reverse-limit": "Klip terbalik {0} melebihi batas memori ({1}). Tekan Ekspor lagi untuk melanjutkan."
 }

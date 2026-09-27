@@ -12,5 +12,15 @@
   "editor.zoom-out": "Zoom arrière",
   "editor.export": "Exporter",
   "editor.timeline": "Chronologie",
-  "editor.playhead": "Tête de lecture"
+  "editor.playhead": "Tête de lecture",
+  "editor.export.mode": "Mode d'exportation",
+  "editor.export.fast": "Rapide (sans perte)",
+  "editor.export.smart": "Intelligent",
+  "editor.export.full": "Réencodage complet",
+  "editor.export.save-title": "Exporter la vidéo montée",
+  "editor.export.done": "Exporté : {0}",
+  "editor.export.failed": "Échec de l'exportation : {0}",
+  "editor.export.reencoded": "Les clips {0} changent de vitesse ou sont inversés et sont réencodés.",
+  "editor.export.fallback": "Cette source ne peut pas être coupée sans réencodage, la vidéo entière est donc réencodée.",
+  "editor.export.reverse-limit": "Le clip inversé {0} dépasse la limite de mémoire ({1}). Appuyez de nouveau sur Exporter pour continuer."
 }

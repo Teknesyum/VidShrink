@@ -49,7 +49,7 @@ public partial class MainWindow
         {
             if (_editorPane is not null) return _editorPane;
 
-            _editorPane = new EditorView();
+            _editorPane = new EditorView { OpenInPlayer = OpenInPlayerAsync };
             PageEditor.Content = _editorPane;
             return _editorPane;
         }

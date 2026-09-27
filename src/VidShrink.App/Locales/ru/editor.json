@@ -12,5 +12,15 @@
   "editor.zoom-out": "Отдалить",
   "editor.export": "Экспорт",
   "editor.timeline": "Шкала времени",
-  "editor.playhead": "Указатель воспроизведения"
+  "editor.playhead": "Указатель воспроизведения",
+  "editor.export.mode": "Режим экспорта",
+  "editor.export.fast": "Быстрый (без потерь)",
+  "editor.export.smart": "Умный",
+  "editor.export.full": "Полное перекодирование",
+  "editor.export.save-title": "Экспорт отредактированного видео",
+  "editor.export.done": "Экспортировано: {0}",
+  "editor.export.failed": "Ошибка экспорта: {0}",
+  "editor.export.reencoded": "Клипы {0} меняют скорость или идут в обратную сторону и будут перекодированы.",
+  "editor.export.fallback": "Этот источник нельзя резать без перекодирования, поэтому всё видео будет перекодировано.",
+  "editor.export.reverse-limit": "Обращённый клип {0} длиннее ограничения памяти ({1}). Нажмите «Экспорт» ещё раз, чтобы продолжить."
 }

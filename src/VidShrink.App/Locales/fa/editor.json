@@ -12,5 +12,15 @@
   "editor.zoom-out": "کوچک‌نمایی",
   "editor.export": "خروجی",
   "editor.timeline": "خط زمانی",
-  "editor.playhead": "نشانگر پخش"
+  "editor.playhead": "نشانگر پخش",
+  "editor.export.mode": "حالت خروجی",
+  "editor.export.fast": "سریع (بی‌اتلاف)",
+  "editor.export.smart": "هوشمند",
+  "editor.export.full": "رمزگذاری دوباره کامل",
+  "editor.export.save-title": "خروجی گرفتن از ویدیوی ویرایش‌شده",
+  "editor.export.done": "خروجی گرفته شد: {0}",
+  "editor.export.failed": "خروجی گرفتن ناموفق بود: {0}",
+  "editor.export.reencoded": "کلیپ‌های {0} سرعت را تغییر می‌دهند یا وارونه پخش می‌شوند و دوباره رمزگذاری می‌شوند.",
+  "editor.export.fallback": "این منبع بدون رمزگذاری دوباره بریده نمی‌شود، پس کل ویدیو دوباره رمزگذاری می‌شود.",
+  "editor.export.reverse-limit": "کلیپ وارونه {0} از حد حافظه ({1}) بلندتر است. برای ادامه دوباره خروجی را بزنید."
 }

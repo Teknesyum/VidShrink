@@ -167,6 +167,19 @@ argümanlarına `-force_key_frames`/`-g` konursa kendi ürettiğimiz dosya sık 
 olur ve hızlı kip neredeyse kare hassasiyetine çıkar. Kaydedicinin argümanında `-g` kolu
 zaten var (`KayitFfmpegKoluTests`).
 
+**Uygulandı (2026-09-28):** saf kurucu `Core/Editing/EditExport` üç kipi üretir. Hızlı: concat
+demuxer `inpoint`/`outpoint`, anahtar kareye oturur. Akıllı (varsayılan): gövde kopya, kenar
+GOP'lar yeniden kodlanmış MPEG-TS parçaları, son adım concat `-c copy`; yalnız h264/hevc +
+aac ya da sessiz kaynakta, öbüründe Tam'a düşer. Tam: tek `filter_complex`, `trim`/`atrim`,
+`setpts` + `atempo` zinciri (her çarpan 0,5–2), `reverse`/`areverse`. Hızı ≠ 1 ya da geri
+klip Hızlı/Akıllı'da yeniden kodlanır ve arayüz bunu söyler. Anahtar kareler
+`Ffmpeg/EditExportRunner`'ın ffprobe yoklamasından; koşucu `EncodeRunner.RunCommandAsync`
+(ilerleme, iptal, stderr boşaltma). Geri klip bellek sınırı `docs/olcumler/ters-klip-bellek-siniri.md`;
+aşan klip teslimden önce uyarır, ikinci basışta sürer. Testler `DuzenleyiciTeslimTests`.
+
+**Açık madde:** `-force_key_frames`/`-g` ile kendi çıktımızı kayıpsız kesilebilir yapmak
+uygulanmadı; küçültme ve kayıt argümanlarına dokunulmadı.
+
 ## D5 — Kısayollar
 
 Altı NLE'nin ortak çekirdeği: J/K/L, I/O, M, Space, Ctrl+Z, Ctrl+A, Home/End
