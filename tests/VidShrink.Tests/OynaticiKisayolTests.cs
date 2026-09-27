@@ -222,7 +222,7 @@ public sealed class OynaticiKisayolTests
         "Bosluk", "CtrlP", "CtrlBosluk", "Geri", "Enter", "AltEnter", "Esc", "Menu",
         "Sag", "Sol", "CtrlSag", "CtrlSol", "ShiftSag", "ShiftSol", "AltSag", "AltSol",
         "Yukari", "Asagi", "M", "C", "X", "Z", "CtrlShiftF", "CtrlShiftB", "CtrlShiftN",
-        "F", "ShiftF", "CtrlBuyuktur", "CtrlKucuktur",
+        "F", "ShiftF", "Nokta", "Virgul", "CtrlBuyuktur", "CtrlKucuktur",
         "KoseliAc", "KoseliKapa", "KoseliAcTrQ", "EgikCizgi",
         "A", "S", "Buyuktur", "Kucuktur", "CtrlNokta", "CtrlVirgul",
         "CtrlF5", "CtrlShiftS", "CtrlH", "CtrlA", "CtrlF1", "CtrlE",
@@ -431,7 +431,8 @@ public sealed class OynaticiKisayolTests
             case "CtrlShiftF": return Hiz(o, Key.F, KeyModifiers.Control | KeyModifiers.Shift, 1.05);
             case "CtrlShiftB": return Hiz(o, Key.B, KeyModifiers.Control | KeyModifiers.Shift, 0.95);
             case "CtrlShiftN": return Hiz(o, Key.N, KeyModifiers.Control | KeyModifiers.Shift, 1, 1.5);
-            case "F": return Kare(o, Key.F, KeyModifiers.None, 1, "f");
+            case "Nokta": return Kare(o, Key.OemPeriod, KeyModifiers.None, 1, ".");
+            case "Virgul": return Kare(o, Key.OemComma, KeyModifiers.None, -1, ",");
             case "ShiftF": return Kare(o, Key.F, KeyModifiers.Shift, -1, "F");
             case "CtrlBuyuktur": return Kare(o, Key.OemPeriod, KeyModifiers.Control | KeyModifiers.Shift, 1, ">");
             case "CtrlKucuktur": return Kare(o, Key.OemComma, KeyModifiers.Control | KeyModifiers.Shift, -1, "<");
@@ -650,10 +651,9 @@ public sealed class OynaticiKisayolTests
             {
                 o.View.Apply(new PlayerCommand(PlayerCommandKind.Volume, 50 - o.View.VolumeLevel));
                 o.Bekle(0.2);
-                GirdiSurucu.Wheel(o.View, 1, KeyModifiers.None);
-                o.Bekle(() => Math.Abs(o.Sayi("volume") - 55) < 1e-6, 2);
-                o.Not($"teker: volume {F(o.Sayi("volume"))}, beklenen 55");
-                return Math.Abs(o.Sayi("volume") - 55) < 1e-6 ? null : "volume degismedi";
+                var arama = Teker(o, KeyModifiers.None, 10);
+                o.Not($"teker: volume {F(o.Sayi("volume"))}, beklenen 50");
+                return arama ?? (Math.Abs(o.Sayi("volume") - 50) < 1e-6 ? null : "teker sesi degistirdi");
             }
             case "CtrlTeker": return Teker(o, KeyModifiers.Control, 10);
             case "ShiftTeker": return Teker(o, KeyModifiers.Shift, 60);
@@ -685,17 +685,30 @@ public sealed class OynaticiKisayolTests
             {
                 var once = o.Oku("pause");
                 GirdiSurucu.Press(o.View, PointerUpdateKind.LeftButtonPressed, RawInputModifiers.LeftMouseButton);
-                o.View.FareRelease(0);
-                o.View.FareDue(ClickArbiter.DoubleWindowMs);
+                o.View.FareRelease();
                 o.Bekle(() => o.Oku("pause") == "no", 3);
                 o.Not($"sol tik: pause {once} -> {o.Oku("pause")}");
                 return once == "yes" && o.Oku("pause") == "no" ? null : "sol tik oynatmadi";
             }
             case "CiftTik":
+            {
+                var once = (Durum: o.Window.WindowState, Pause: o.Oku("pause"));
+                GirdiSurucu.Press(o.View, PointerUpdateKind.LeftButtonPressed, RawInputModifiers.LeftMouseButton);
+                o.View.FareRelease();
+                var ara = o.View.IsPlaying;
+                GirdiSurucu.Press(o.View, PointerUpdateKind.LeftButtonPressed, RawInputModifiers.LeftMouseButton, 2);
+                o.View.FareRelease();
+                o.Bekle(() => o.Oku("pause") == once.Pause, 3);
+                o.Bekle(0.3);
+                var sonra = (Durum: o.Window.WindowState, Pause: o.Oku("pause"));
+                o.Not($"cift tik: WindowState {once.Durum} -> {sonra.Durum}, pause {once.Pause} -> ilk birakista oynatma {ara} -> {sonra.Pause}");
+                return sonra.Durum != WindowState.FullScreen && ara && sonra.Pause == once.Pause ? null : "cift tik tam ekrana gecti ya da iki kez cevirmedi";
+            }
+            case "F":
             case "OrtaTik":
             {
                 var once = o.Window.WindowState;
-                if (ad == "CiftTik") GirdiSurucu.Press(o.View, PointerUpdateKind.LeftButtonPressed, RawInputModifiers.LeftMouseButton, 2);
+                if (ad == "F") o.Bas(Key.F, KeyModifiers.None, "f");
                 else GirdiSurucu.Press(o.View, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
                 o.Bekle(0.3);
                 var sonra = o.Window.WindowState;

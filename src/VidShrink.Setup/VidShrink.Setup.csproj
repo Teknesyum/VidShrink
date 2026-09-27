@@ -8,6 +8,7 @@
     <AssemblyName>VidShrink-Setup</AssemblyName>
     <RootNamespace>VidShrink.Setup</RootNamespace>
     <Description>VidShrink Setup</Description>
+    <AssemblyTitle>VidShrink Setup</AssemblyTitle>
     <ApplicationIcon>..\VidShrink.App\Assets\VidShrink.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

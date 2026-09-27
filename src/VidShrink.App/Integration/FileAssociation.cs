@@ -22,8 +22,6 @@ internal static class FileAssociation
     /// <summary>Kaydın yazıldığı kök; <c>HKEY_CURRENT_USER</c> altında görecelidir.</summary>
     internal const string ClassesRoot = @"Software\Classes";
 
-    private const string DisplayName = "VidShrink";
-
     private static readonly IntPtr CurrentUser = new(unchecked((int)0x80000001));
 
     private const int KeyWrite = 0x20006;
@@ -36,27 +34,9 @@ internal static class FileAssociation
     /// Uygulama koşmadan da sınanabilsin diye yazma işi ayrı durur.
     /// </summary>
     internal static IReadOnlyList<(string Key, string Name, string? Value)> Plan(string executablePath, string classesRoot = ClassesRoot)
-    {
-        var target = ShellIntegration.OpenCommandTarget(executablePath);
-        var command = $"\"{target}\" \"%1\"";
-        var entries = new List<(string, string, string?)>
-        {
-            ($@"{classesRoot}\{ProgId}", "", DisplayName),
-            ($@"{classesRoot}\{ProgId}", "FriendlyTypeName", DisplayName),
-            ($@"{classesRoot}\{ProgId}\DefaultIcon", "", $"{executablePath},0"),
-            ($@"{classesRoot}\{ProgId}\shell\open\command", "", command),
-            ($@"{classesRoot}\Applications\{Path.GetFileName(executablePath)}\shell\open\command", "", command)
-        };
+        => VidShrink.Core.Setup.ShellRegistration.ClassesPlan(classesRoot, executablePath);
 
-        foreach (var extension in ShellIntegration.MediaExtensions)
-        {
-            entries.Add(($@"{classesRoot}\.{extension}\OpenWithProgids", ProgId, null));
-        }
-
-        return entries;
-    }
-
-    internal const string LauncherName = "VidShrink.exe";
+    internal const string LauncherName = VidShrink.Core.Setup.ShellRegistration.LauncherExecutableName;
 
     internal static string LaunchTarget(string processPath)
     {
@@ -80,6 +60,7 @@ internal static class FileAssociation
     {
         var failed = new List<string>();
         var allowed = WriteAllowed(Environment.ProcessPath, classesRoot);
+        if (allowed) RemoveStaleLegacy(classesRoot);
         foreach (var (key, name, value) in Plan(executablePath, classesRoot))
         {
             if (!allowed || !Write(key, name, value)) failed.Add($"{key}|{name}");
@@ -91,6 +72,18 @@ internal static class FileAssociation
 
     internal static bool WriteAllowed(string? processPath, string classesRoot)
         => !string.Equals(classesRoot, ClassesRoot, StringComparison.OrdinalIgnoreCase) || RegistryWriteGate.Allows(processPath);
+
+    [SupportedOSPlatform("windows")]
+    private static void RemoveStaleLegacy(string classesRoot)
+    {
+        try
+        {
+            VidShrink.Core.Setup.ShellRegistration.RemoveStaleLegacyApplication(classesRoot);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+        {
+        }
+    }
 
     [SupportedOSPlatform("windows")]
     private static bool Write(string key, string name, string? value)

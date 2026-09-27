@@ -507,6 +507,99 @@ public sealed class ComparisonPanelTests
             $"maksimize tuşu tam ekranı bırakmadı: {maximized.covered.Height:0.#} -> {maximized.after.Height:0.#}");
     }
 
+    private static readonly Pointer PanelFare = new(Pointer.GetNextFreeId(), PointerType.Mouse, true);
+
+    private static void PanelBas(Control stage, PointerUpdateKind kind, RawInputModifiers buttons, int clicks = 1) =>
+        stage.RaiseEvent(new PointerPressedEventArgs(stage, PanelFare, stage, new Point(20, 20), 0,
+            new PointerPointProperties(buttons, kind), KeyModifiers.None, clicks)
+        {
+            RoutedEvent = InputElement.PointerPressedEvent
+        });
+
+    /// <summary>
+    /// Karşılaştırma paneli oynatıcıyla aynı girdiyi izler: tekerlek zamanı 10 sn kaydırır
+    /// (Alt ile yakınlaştırır), tek tık bırakışta oynat/duraklatı hemen çevirir, çift tık tam
+    /// ekrana geçmez; tam ekran orta tuş ve F ile.
+    /// </summary>
+    [Fact]
+    public void Panel_girdisi_oynaticiyla_ayni()
+    {
+        var (seek, zoom, clicks, full) = Read((host, panel) =>
+        {
+            var strip = panel.Controls;
+            strip.Duration = TimeSpan.FromSeconds(60);
+            strip.Position = TimeSpan.FromSeconds(20);
+            var requested = new List<double>();
+            strip.SeekRequested += (_, at) => requested.Add(at.TotalSeconds);
+            var toggles = 0;
+            strip.PlayPauseRequested += (_, _) => toggles++;
+
+            var stageBefore = panel.Shelter;
+            var tStart = panel.Gesture.T;
+            var down = panel.Wheel(1, KeyModifiers.None, new Point(0, 0));
+            var afterDown = strip.Position.TotalSeconds;
+            panel.Wheel(-1, KeyModifiers.None, new Point(0, 0));
+            var afterUp = strip.Position.TotalSeconds;
+            var seekResult = (down.Kind, afterDown, afterUp, Requested: string.Join(",", requested), Same: panel.Shelter == stageBefore && panel.Gesture.T == tStart);
+
+            var tBefore = panel.Gesture.T;
+            var zoomCommand = panel.Wheel(1, KeyModifiers.Alt, new Point(0, 0));
+            Settle(host);
+            var zoomResult = (zoomCommand.Kind, Position: strip.Position.TotalSeconds, Grew: panel.Gesture.T > tBefore);
+            panel.Descend();
+            Settle(host);
+
+            var playing = strip.IsPlaying;
+            panel.StagePress(new Point(20, 20));
+            var heldToggles = toggles;
+            var first = panel.StageRelease();
+            var afterFirst = strip.IsPlaying;
+            panel.StagePress(new Point(20, 20));
+            panel.StageRelease();
+            var afterDouble = strip.IsPlaying;
+            panel.StagePress(new Point(20, 20));
+            panel.StageMove(new Point(60, 20));
+            var dragged = panel.StageRelease();
+            Settle(host);
+            var clickResult = (heldToggles, first, Flipped: afterFirst != playing, Back: afterDouble == playing, Toggles: toggles, dragged, Full: panel.Shelter == ShelterStage.Full);
+
+            var stage = panel.FindControl<Control>("Stage")!;
+            PanelBas(stage, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
+            Settle(host);
+            var middleOn = panel.Shelter;
+            PanelBas(stage, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
+            Settle(host);
+            var middleOff = panel.Shelter;
+            var shell = panel.FindControl<Control>("Shell")!;
+            shell.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.F, KeySymbol = "f", Source = shell });
+            Settle(host);
+            var keyOn = panel.Shelter;
+            return (seekResult, zoomResult, clickResult, (middleOn, middleOff, keyOn));
+        });
+
+        Assert.Equal(PlayerCommandKind.Seek, seek.Kind);
+        Assert.Equal(30, seek.afterDown, 3);
+        Assert.Equal(20, seek.afterUp, 3);
+        Assert.Equal("30,20", seek.Requested);
+        Assert.True(seek.Same, "tekerlek paneli büyüttü");
+
+        Assert.Equal(PlayerCommandKind.Zoom, zoom.Kind);
+        Assert.Equal(20, zoom.Position, 3);
+        Assert.True(zoom.Grew, "Alt+tekerlek paneli büyütmedi");
+
+        Assert.Equal(0, clicks.heldToggles);
+        Assert.Equal(ReleaseOutcome.Click, clicks.first);
+        Assert.True(clicks.Flipped, "tek tık bırakışta oynatmayı çevirmedi");
+        Assert.True(clicks.Back, "çift tık iki kez çevirmedi");
+        Assert.Equal(2, clicks.Toggles);
+        Assert.NotEqual(ReleaseOutcome.Click, clicks.dragged);
+        Assert.False(clicks.Full, "çift tık tam ekrana geçti");
+
+        Assert.Equal(ShelterStage.Full, full.middleOn);
+        Assert.NotEqual(ShelterStage.Full, full.middleOff);
+        Assert.Equal(ShelterStage.Full, full.keyOn);
+    }
+
     /// <summary>Yerleşimi verilen boyda yeniden koşturur; ölçüm arada bir ölçü değiştirdiyse.</summary>
     private static void ReLayOut(MainWindow window, Size size)
     {

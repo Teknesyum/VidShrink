@@ -234,15 +234,15 @@ internal partial class PlayerView : UserControl
     internal void FeedWheel(double notches, KeyModifiers modifiers)
         => Apply(Keymap.ForWheel(notches, modifiers));
 
-    internal void FeedPress(PlayerButton button, int clicks = 1)
+    internal void FeedPress(PlayerButton button)
     {
         if (button == PlayerButton.Left)
         {
-            FarePress(clicks, 0, 0);
+            FarePress(0, 0);
             return;
         }
 
-        Apply(Keymap.ForPress(button, clicks));
+        Apply(Keymap.ForPress(button));
     }
 
     internal bool FeedKey(Key key, KeyModifiers modifiers = KeyModifiers.None, string? symbol = null)
@@ -350,12 +350,12 @@ internal partial class PlayerView : UserControl
         if (button == PlayerButton.Left)
         {
             var at = point.Position;
-            if (FarePress(e, at.X, at.Y)) e.Handled = true;
+            FarePress(e, at.X, at.Y);
             return;
         }
 
         if (button == PlayerButton.Right) MenuAtPointer = true;
-        FeedPress(button, e.ClickCount);
+        FeedPress(button);
         e.Handled = true;
     }
 

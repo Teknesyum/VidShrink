@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Avalonia;
@@ -15,28 +14,17 @@ using static VidShrink.Tests.OynaticiOdakYoluTests;
 
 namespace VidShrink.Tests;
 
-public sealed class OynaticiCiftTikSuresiTests
+public sealed class OynaticiHamTikTests
 {
     [Fact]
-    public void HizAdimiVeCiftTikSuresiHamGirdiyle()
+    public void HizAdimiVeHamTekTikAnindaOynatir()
     {
-        var sistem = SystemDoubleClick.Milliseconds();
-        var windows = SystemDoubleClick.WindowsValue();
-        var eski = ClickArbiter.Source;
-        Assert.Equal(new Func<double>(SystemDoubleClick.Milliseconds), eski);
-        var varsayilan = ClickArbiter.DoubleWindowMs;
-        Assert.Equal(sistem, varsayilan);
-        (string, string?) sonucu;
-        try
-        {
-            ClickArbiter.Source = () => 900;
-            sonucu = AppHost.Run(() =>
+        var sonucu = AppHost.Run(() =>
             {
-                var o = KisayolOrtam.Ac(KisayolKanit.Uzun, "hiz-cift-tik");
+                var o = KisayolOrtam.Ac(KisayolKanit.Uzun, "hiz-tek-tik");
                 string? sonuc = null;
                 try
                 {
-                    o.Not($"sistem cift tik {F(sistem)} ms, GetDoubleClickTime {F(windows)} ms, arbiter varsayilani {F(varsayilan)} ms, testte 900 ms");
                     var hizlar = new List<string> { F(o.Sayi("speed")) };
                     foreach (var (key, sembol, beklenen) in new[] { (Key.C, "c", 1.05), (Key.C, "c", 1.1), (Key.X, "x", 1.05), (Key.X, "x", 1.0), (Key.X, "x", 0.95) })
                     {
@@ -53,18 +41,18 @@ public sealed class OynaticiCiftTikSuresiTests
                     HamFare(o.Window, RawPointerEventType.Move, nokta, RawInputModifiers.None);
                     DenetimSurucu.Wait(o.View, 0.05);
                     HamFare(o.Window, RawPointerEventType.LeftButtonDown, nokta, RawInputModifiers.LeftMouseButton);
+                    var basili = o.View.IsPlaying;
                     HamFare(o.Window, RawPointerEventType.LeftButtonUp, nokta, RawInputModifiers.None);
+                    var birakis = o.View.IsPlaying;
                     var saat = Stopwatch.StartNew();
-                    Dongu(() => saat.ElapsedMilliseconds >= 600, 2);
-                    var erken = o.Oku("pause");
-                    var erkenMs = saat.ElapsedMilliseconds;
                     Dongu(() => o.Oku("pause") == "no", 3);
-                    var gec = o.Oku("pause");
-                    var gecMs = saat.ElapsedMilliseconds;
-                    o.Not($"ham sol tik: {erkenMs} ms'de pause {erken}, {gecMs} ms'de pause {gec}");
-                    o.Not($"tik durumu: bekleyen {o.View.Click.Pending}, oynuyor {o.View.IsPlaying}, iz {string.Join(" | ", o.View.Trace.TakeLast(6))}");
-                    if (erken != "yes") sonuc ??= $"tek tik {erkenMs} ms'de islendi, 900 ms beklenmedi";
-                    if (gec != "no" || gecMs < 880) sonuc ??= $"tek tik {gecMs} ms'de pause {gec}";
+                    var motor = o.Oku("pause");
+                    var motorMs = saat.ElapsedMilliseconds;
+                    o.Not($"ham sol tik: basiliyken oynuyor {basili}, birakista oynuyor {birakis}, motor {motorMs} ms'de pause {motor}");
+                    o.Not($"iz {string.Join(" | ", o.View.Trace.TakeLast(6))}");
+                    if (basili) sonuc ??= "basista oynatma degisti, birakis beklenmedi";
+                    if (!birakis) sonuc ??= "birakista oynatma aninda degismedi";
+                    if (motor != "no") sonuc ??= $"motor {motorMs} ms'de pause {motor}";
                     return (o.Kayit.ToString(), sonuc);
                 }
                 finally
@@ -72,92 +60,12 @@ public sealed class OynaticiCiftTikSuresiTests
                     o.Kapat();
                 }
             });
-        }
-        finally
-        {
-            ClickArbiter.Source = eski;
-        }
 
-        KisayolKanit.Write("hiz-cift-tik.txt", sonucu.Item1);
-        if (OperatingSystem.IsWindows()) Assert.Equal(windows, sistem);
+        KisayolKanit.Write("hiz-tek-tik.txt", sonucu.Item1);
         Assert.True(sonucu.Item2 is null, sonucu.Item2 + Environment.NewLine + sonucu.Item1);
     }
 }
 
-/// <summary>
-/// Ertelenmis tek tik, dispatcher kuyrugunda bekleyen girdi varken de duser. Win32
-/// dispatcher'i <c>HasPendingInput</c> dogru dondukce Input ve alti oncelikli isleri
-/// calistirmaz; varsayilan <see cref="DispatcherTimer"/> Background'da oldugu icin tek tik
-/// orada ac kaliyordu. Sahte girdi kaynagi bu durumu deterministik kurar.
-/// </summary>
-public sealed class OynaticiTekTikZamanlayiciTests
-{
-    [Fact]
-    public void BekleyenGirdiErtelenmisTekTikiAcBirakmaz()
-    {
-        var eski = ClickArbiter.Source;
-        (bool bekleyen, bool arkaPlanKostu, string iz) sonuc;
-        try
-        {
-            ClickArbiter.Source = () => 150;
-            sonuc = AppHost.Run(() =>
-            {
-                var view = new PlayerView();
-                var window = new Window { Width = 320, Height = 240, Content = view };
-                window.Show();
-                Dongu(() => false, 0.2);
-                var ui = Dispatcher.UIThread;
-                var alan = typeof(Dispatcher).GetField("_pendingInputImpl", BindingFlags.NonPublic | BindingFlags.Instance)!;
-                var gercek = alan.GetValue(ui);
-                alan.SetValue(ui, SurekliGirdi.Sar(typeof(Dispatcher).GetField("_impl", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(ui)!));
-                try
-                {
-                    var arkaPlan = false;
-                    ui.Post(() => arkaPlan = true, DispatcherPriority.Background);
-                    view.FarePress(1, 20, 20);
-                    view.FareRelease(Environment.TickCount64);
-                    Dongu(() => !view.Click.Pending, 1.5);
-                    return (view.Click.Pending, arkaPlan, string.Join(" | ", view.Trace));
-                }
-                finally
-                {
-                    alan.SetValue(ui, gercek);
-                    Dongu(() => false, 0.05);
-                    window.Close();
-                    Dispatcher.UIThread.RunJobs();
-                }
-            });
-        }
-        finally
-        {
-            ClickArbiter.Source = eski;
-        }
-
-        Assert.False(sonuc.arkaPlanKostu, "sahte girdi kaynagi Background isini durdurmadi; olcu bos: " + sonuc.iz);
-        Assert.False(sonuc.bekleyen, "tek tik 1,5 sn sonra hala bekliyor: " + sonuc.iz);
-        Assert.Contains("play -> True", sonuc.iz);
-    }
-}
-
-/// <summary>Dispatcher'in girdi sorgusunu hep "bekleyen girdi var" diye yanitlar.</summary>
-public class SurekliGirdi : DispatchProxy
-{
-    private object _hedef = null!;
-
-    internal static object Sar(object hedef)
-    {
-        var tur = typeof(Dispatcher).Assembly.GetType("Avalonia.Threading.IDispatcherImplWithPendingInput")!;
-        var vekil = DispatchProxy.Create(tur, typeof(SurekliGirdi));
-        ((SurekliGirdi)vekil)._hedef = hedef;
-        return vekil;
-    }
-
-    protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
-    {
-        if (targetMethod!.Name is "get_HasPendingInput" or "get_CanQueryPendingInput") return true;
-        return targetMethod.Invoke(_hedef, args);
-    }
-}
 
 public sealed class OynaticiSuruklemeTests
 {
@@ -207,7 +115,7 @@ public sealed class OynaticiSuruklemeTests
                 Denetle("basili kalmis basis + tussuz hareket", bas, false);
                 Olay(RawPointerEventType.LeftButtonUp, 120, 80, RawInputModifiers.None);
 
-                DenetimSurucu.Wait(view, ClickArbiter.DoubleWindowMs / 1000 + 0.3);
+                DenetimSurucu.Wait(view, 0.3);
                 bas = window.Position;
                 Olay(RawPointerEventType.Move, 0, 0, RawInputModifiers.None);
                 Olay(RawPointerEventType.LeftButtonDown, 0, 0, RawInputModifiers.LeftMouseButton);
@@ -219,7 +127,7 @@ public sealed class OynaticiSuruklemeTests
                 Denetle("surukleme sirasinda tus kayboldu (Alt+Tab) + tussuz hareket", tasindi, false);
                 Olay(RawPointerEventType.LeftButtonUp, 150, 100, RawInputModifiers.None);
 
-                DenetimSurucu.Wait(view, ClickArbiter.DoubleWindowMs / 1000 + 0.3);
+                DenetimSurucu.Wait(view, 0.3);
                 bas = window.Position;
                 tutma = window.PointToScreen(new Point(view.Bounds.Width / 2, view.Bounds.Height / 2));
                 Olay(RawPointerEventType.Move, 0, 0, RawInputModifiers.None);
@@ -249,7 +157,7 @@ public sealed class OynaticiSuruklemeTests
     }
 
     [Fact]
-    public void SuruklerkenGelenCiftTikBayatSuruklemeDurumunuSifirlar()
+    public void SuruklerkenGelenIkinciBasisDurumuSifirlarTamEkranaGecmez()
     {
         var body = new StringBuilder();
         var hatalar = new List<string>();
@@ -271,7 +179,7 @@ public sealed class OynaticiSuruklemeTests
                     DenetimSurucu.Wait(view, 0.05);
                 }
 
-                DenetimSurucu.Wait(view, ClickArbiter.DoubleWindowMs / 1000 + 0.3);
+                DenetimSurucu.Wait(view, 0.3);
                 Olay(RawPointerEventType.Move, 0, 0, RawInputModifiers.None);
                 Olay(RawPointerEventType.LeftButtonDown, 0, 0, RawInputModifiers.LeftMouseButton);
                 Olay(RawPointerEventType.Move, 30, 20, RawInputModifiers.LeftMouseButton);
@@ -280,18 +188,20 @@ public sealed class OynaticiSuruklemeTests
                 if (!view.WindowDragging || tasindi != new PixelPoint(70, 50)) hatalar.Add("pozitif kontrol: surukleme baslamadi");
 
                 Olay(RawPointerEventType.LeftButtonDown, 30, 20, RawInputModifiers.LeftMouseButton);
-                var ciftTik = view.Fullscreen.IsFullscreen || !view.WindowDragging;
                 body.AppendLine($"ikinci basis: tam ekran {view.Fullscreen.IsFullscreen}, kip {view.DragMode}, surukleniyor {view.WindowDragging}");
                 if (view.WindowDragging) hatalar.Add("ikinci basis bayat surukleme durumunu sifirlamadi");
+                if (view.Fullscreen.IsFullscreen) hatalar.Add("ikinci basis tam ekrana gecti");
 
-                Olay(RawPointerEventType.Move, 90, 60, RawInputModifiers.LeftMouseButton);
-                Olay(RawPointerEventType.Move, 150, 100, RawInputModifiers.LeftMouseButton);
+                Olay(RawPointerEventType.Move, 45, 30, RawInputModifiers.LeftMouseButton);
+                Olay(RawPointerEventType.Move, 60, 40, RawInputModifiers.LeftMouseButton);
                 var son = window.Position;
-                body.AppendLine($"cift tikten sonra basili hareket: konum {son}, beklenen {tasindi} ya da tam ekranin kosesi, surukleniyor {view.WindowDragging}");
-                if (son != tasindi && son != new PixelPoint(0, 0)) hatalar.Add($"bayat surukleme pencereyi tasidi: {son}");
-                if (view.WindowDragging) hatalar.Add("cift tikten sonra surukleme surdu");
-                body.AppendLine($"cift tik gorundu mu: {ciftTik}");
-                Olay(RawPointerEventType.LeftButtonUp, 150, 100, RawInputModifiers.None);
+                var beklenen = new PixelPoint(tasindi.X + 30, tasindi.Y + 20);
+                body.AppendLine($"ikinci basistan sonra basili hareket: konum {son}, beklenen {beklenen}, tam ekran {view.Fullscreen.IsFullscreen}, surukleniyor {view.WindowDragging}");
+                if (son != beklenen) hatalar.Add($"yeni surukleme tutulan noktayi imlecin altinda tutmadi: {son}");
+                if (view.Fullscreen.IsFullscreen) hatalar.Add("basili hareket tam ekrana gecti");
+                Olay(RawPointerEventType.LeftButtonUp, 60, 40, RawInputModifiers.None);
+                body.AppendLine($"birakis: surukleniyor {view.WindowDragging}, konum {window.Position}");
+                if (view.WindowDragging) hatalar.Add("birakistan sonra surukleme surdu");
 
                 body.AppendLine("iz: " + string.Join(" | ", view.Trace));
                 window.Close();
@@ -340,7 +250,7 @@ public sealed class OynaticiSuruklemeTests
                     DenetimSurucu.Wait(view, 0.05);
                 }
 
-                DenetimSurucu.Wait(view, ClickArbiter.DoubleWindowMs / 1000 + 0.3);
+                DenetimSurucu.Wait(view, 0.3);
                 var oncesi = window.Position;
                 var oncesiYerel = oncesi;
                 if (OperatingSystem.IsWindows() && GetWindowRect(window.TryGetPlatformHandle()!.Handle, out var r0))
@@ -423,7 +333,7 @@ public sealed class OynaticiSuruklemeTests
                     if (rect.Left != beklenen.X || rect.Top != beklenen.Y || rect.Right - rect.Left != w || rect.Bottom - rect.Top != h) hatalar.Add(satir);
                 }
 
-                DenetimSurucu.Wait(view, ClickArbiter.DoubleWindowMs / 1000 + 0.3);
+                DenetimSurucu.Wait(view, 0.3);
                 var tutma = new Point(window.ClientSize.Width / 2, window.ClientSize.Height / 2);
                 body.AppendLine($"gorunum {view.Bounds.Width}x{view.Bounds.Height}, istemci {window.ClientSize.Width}x{window.ClientSize.Height}, tutma {tutma}, durum {window.WindowState}, etkin {window.IsActive}");
                 var saat = Stopwatch.StartNew();
