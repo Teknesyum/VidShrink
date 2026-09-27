@@ -509,13 +509,12 @@ public sealed class OynaticiYolHaritasiTests
     }
 
     /// <summary>
-    /// O1: iki barin birbirine esitligi mutasyona olu — <c>HoverZone.Band</c> yariya
-    /// indirilirse iki esik de ayni oranda kuculur ve esitlik korunur. Bu yuzden esik
-    /// mutlak olarak da pimlendi: bant sabit piksel (<c>PlaybackHoverZoneHeight</c> = 96),
-    /// iki esik de o sayinin 1 px komsulugunda.
+    /// Ust bar sabit piksel bandinda acilir (<c>PlaybackTopRevealZone</c> = 48, danisma 015
+    /// S3), alt serit de sabit piksel bandinda (<c>PlaybackHoverZoneHeight</c> = 96). Ust esik
+    /// belirtece 1 px komsulukta pimli ve alt bandin altinda; alt esik 96 px komsulugunda.
     /// </summary>
     [Fact]
-    public void P14UstBarVeAltSeritAyniMesafedeAcilir()
+    public void P14UstBarSabitBantAltSeritOranlaAcilir()
     {
         var body = new StringBuilder();
         try
@@ -572,14 +571,14 @@ public sealed class OynaticiYolHaritasiTests
             var altEsik = Esik("alt serit", d => new Point(640, alt - d), () => view.SeritRevealed, altSaat);
             var bant = view.RevealBand;
             var baslik = window.TitleBar.Height;
+            var tetik = window.TopRevealZone;
             view.Close();
             window.Close();
 
-            Assert.True(Math.Abs(ust - altEsik) <= 1, $"ust {ust} px, alt {altEsik} px" + Environment.NewLine + body);
-            Assert.True(Math.Abs(ust - bant) <= 1, $"ust {ust} px, bant {YolKanit.N(bant)}");
+            Assert.True(Math.Abs(ust - tetik) <= 1, $"ust {ust} px, tetik {YolKanit.N(tetik)}" + Environment.NewLine + body);
+            Assert.True(ust < bant - 1, $"ust {ust} px oran bandina ({YolKanit.N(bant)}) kaydi");
             Assert.True(ust > baslik + 1, $"ust esik baslik yuksekliginde kaldi: {ust} <= {YolKanit.N(baslik)}");
             Assert.Equal(96, bant, 1);
-            Assert.InRange(ust, 95, 97);
             Assert.InRange(altEsik, 95, 97);
             return 0;
         });

@@ -448,19 +448,25 @@
         <Setter Property="Height" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSquare}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource HeaderRestBorder}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
         <Style Selector="^:pointerover">
           <Setter Property="RenderTransform" Value="none"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
-          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+          <Setter Property="Background" Value="{StaticResource NeonBlueHover}"/>
+          <Setter Property="BorderBrush" Value="Transparent"/>
           <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#HoverRing">
-          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+          <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
         <Style Selector="^:pressed">
           <Setter Property="RenderTransform" Value="none"/>
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Root">
+          <Setter Property="Background" Value="{StaticResource NeonBlueActive}"/>
+          <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
       </ControlTheme>
 
@@ -494,18 +500,12 @@
 
       <ControlTheme x:Key="TitleBarSupportButton" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
         <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
-        <Style Selector="^:pressed /template/ Border#Root">
-          <Setter Property="Background" Value="Transparent"/>
-        </Style>
       </ControlTheme>
 
       <ControlTheme x:Key="TitleBarLinkButton" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
         <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         <Style Selector="^:pointerover">
           <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
-        </Style>
-        <Style Selector="^:pressed /template/ Border#Root">
-          <Setter Property="Background" Value="Transparent"/>
         </Style>
       </ControlTheme>
 
@@ -727,7 +727,7 @@
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
           <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
-          <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
+          <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
       </ControlTheme>
 
@@ -737,9 +737,8 @@
           <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
-          <Setter Property="Background" Value="Transparent"/>
-          <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
-          <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+          <Setter Property="Background" Value="{StaticResource NeonPinkFill}"/>
+          <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
       </ControlTheme>
 
@@ -941,14 +940,32 @@
                                 Grid.Row="1"
                                 VerticalAlignment="Top"
                                 Content="{TemplateBinding Tag}"/>
-              <ItemsPresenter Name="PART_ItemsPresenter"
-                              Grid.Row="0"
-                              Height="{StaticResource TitleBarHeight}"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Top"
-                              ItemsPanel="{TemplateBinding ItemsPanel}"
-                              ClipToBounds="False"
-                              Margin="{TemplateBinding Padding}"/>
+              <Panel Name="TopOverlay"
+                     Classes="reveal"
+                     Grid.Row="0"
+                     Grid.RowSpan="2"
+                     VerticalAlignment="Top">
+                <Border Name="TopScrim"
+                        IsVisible="False"
+                        IsHitTestVisible="False"
+                        VerticalAlignment="Top"
+                        Height="{StaticResource PlaybackTopScrimHeight}"
+                        Background="{StaticResource PlaybackTopScrimVeil}"/>
+                <ItemsPresenter Name="PART_ItemsPresenter"
+                                Height="{StaticResource TitleBarHeight}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                ClipToBounds="False"
+                                Margin="{TemplateBinding Padding}"/>
+                <ContentPresenter Name="TopOverlayContent"
+                                  VerticalAlignment="Top"
+                                  Content="{TemplateBinding izi:UstPanel.Icerik}"/>
+              </Panel>
+              <Border Name="TopRowSpacer"
+                      Grid.Row="0"
+                      IsHitTestVisible="False"
+                      Height="{StaticResource TitleBarHeight}"/>
             </Grid>
           </ControlTemplate>
         </Setter>
@@ -960,6 +977,9 @@
           <Setter Property="Margin" Value="0"/>
           <Setter Property="Grid.Row" Value="0"/>
           <Setter Property="Grid.RowSpan" Value="2"/>
+        </Style>
+        <Style Selector="^[SelectedIndex=0] /template/ Border#TopScrim">
+          <Setter Property="IsVisible" Value="True"/>
         </Style>
       </ControlTheme>
 
@@ -974,9 +994,9 @@
         <Setter Property="Height" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="{StaticResource HeaderRestBorder}"/>
-        <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
-        <Setter Property="CornerRadius" Value="{StaticResource RadiusSquare}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="ClipToBounds" Value="False"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
@@ -988,12 +1008,6 @@
                     BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="{TemplateBinding CornerRadius}"
                     UseLayoutRounding="True">
-              <Border.Transitions>
-                <Transitions>
-                  <BrushTransition Property="Background" Duration="{StaticResource MotionInstant}"/>
-                  <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
-                </Transitions>
-              </Border.Transitions>
               <Panel>
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource SpaceSm}"
@@ -1015,55 +1029,46 @@
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"/>
                 </StackPanel>
-                <Border Name="HoverRing"
-                        IsHitTestVisible="False"
-                        BorderBrush="Transparent"
-                        BorderThickness="{StaticResource BorderStrong}"
-                        CornerRadius="{TemplateBinding CornerRadius}">
-                  <Border.Transitions>
-                    <Transitions>
-                      <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
-                    </Transitions>
-                  </Border.Transitions>
-                </Border>
                 <Border Name="TabIndicator"
                         IsHitTestVisible="False"
                         Height="{StaticResource TabIndicatorHeight}"
+                        Margin="{TemplateBinding Padding}"
                         VerticalAlignment="Bottom"
                         HorizontalAlignment="Stretch"
-                        Background="{StaticResource NeonBlue}"
+                        Background="{TemplateBinding Foreground}"
                         Opacity="0"
-                        RenderTransform="scaleX(0.4)"/>
+                        RenderTransform="scaleX(0)"/>
               </Panel>
             </Border>
           </ControlTemplate>
         </Setter>
+        <Style Selector="^:pointerover">
+          <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
+        </Style>
+        <Style Selector="^:focus-visible">
+          <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#TabIndicator">
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="RenderTransform" Value="none"/>
+        </Style>
+        <Style Selector="^:focus-visible /template/ Border#TabIndicator">
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="RenderTransform" Value="none"/>
+        </Style>
         <Style Selector="^:selected">
-          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
         <Style Selector="^:selected /template/ Border#TabIndicator">
           <Setter Property="Opacity" Value="1"/>
           <Setter Property="RenderTransform" Value="none"/>
         </Style>
-        <Style Selector="^:selected /template/ Border#HoverRing">
-          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
-        </Style>
-        <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
-        </Style>
-        <Style Selector="^:pointerover /template/ Border#HoverRing">
-          <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
-        </Style>
-        <Style Selector="^:pointerover /template/ Border#TabOutline">
-          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
-        </Style>
         <Style Selector="^:disabled">
           <Setter Property="Foreground" Value="{StaticResource TextDisabled}"/>
           <Setter Property="Cursor" Value="No"/>
         </Style>
-        <Style Selector="^:disabled /template/ Border#TabOutline">
-          <Setter Property="BorderBrush" Value="{StaticResource TextDisabled}"/>
-          <Setter Property="Background" Value="Transparent"/>
+        <Style Selector="^:disabled /template/ Border#TabIndicator">
+          <Setter Property="Opacity" Value="0"/>
         </Style>
       </ControlTheme>
 

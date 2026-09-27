@@ -106,6 +106,16 @@
     <GradientStop Color="{StaticResource EmberBarEdgeColor}" Offset="1"/>
   </LinearGradientBrush>
 
+  <!--
+    PlaybackTopScrimVeil <- PlaybackScrimVeil'in aynası: yön ters (üstten aşağı), duraklar aynı;
+    dolu kısım 1 - PlaybackScrimEdge (0,25) = 0,75, son çeyrek PlaybackScrimEdgeColor'a söner.
+  -->
+  <LinearGradientBrush x:Key="PlaybackTopScrimVeil" StartPoint="50%,0%" EndPoint="50%,100%">
+    <GradientStop Offset="0" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.75" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="1" Color="{StaticResource PlaybackScrimEdgeColor}"/>
+  </LinearGradientBrush>
+
   <LinearGradientBrush x:Key="WorkspaceGradient" StartPoint="0%,0%" EndPoint="100%,100%">
     <GradientStop Color="{StaticResource EmberDeepColor}" Offset="0"/>
     <GradientStop Color="{StaticResource EmberDeepColor}" Offset="0.25"/>
@@ -287,6 +297,14 @@
   <x:Double x:Key="TabIndicatorHeight">2</x:Double>
   <StaticResource x:Key="ProgressBarHeight" ResourceKey="Space2"/>
   <StaticResource x:Key="TitleBarHeight" ResourceKey="TitleBarHeightMax"/>
+  <!--
+    PlaybackTopRevealZone  <- 3 x SpaceLg (16) = 48; üst tetik bandı sabit piksel, pencere
+                              boyuyla büyümez (danışma 015 S3).
+    PlaybackTopScrimHeight <- 2 x PlaybackTopRevealZone = 96; paravanın dolu 72 px'i başlık
+                              satırını (TitleBarHeight) örter, son çeyreği söner.
+  -->
+  <x:Double x:Key="PlaybackTopRevealZone">48</x:Double>
+  <x:Double x:Key="PlaybackTopScrimHeight">96</x:Double>
   <x:Double x:Key="TooltipMaxWidth">780</x:Double>
   <x:Double x:Key="FlyoutMaxWidth">896</x:Double>
   <x:Double x:Key="DropDownMaxHeight">280</x:Double>

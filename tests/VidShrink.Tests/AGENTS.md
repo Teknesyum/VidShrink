@@ -131,6 +131,9 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
 - `KodlamaImleciTests.cs` — önizleme şeridinin kodlama imleci gerçek kodlamadan beslenir: aşama metni `EncodeStage`'de yazılıp okunur (gidiş-dönüş), geçiş içi kesir yere çevrilir (2/2'de 0,75 → 0,5), tanınmayan aşamada imleç yok; kodlama bitince yonga gizlenir.
 - `PencereKabuguTests.cs` — pencere kabuğunun düzeni: üst şerit içerikle aynı gözde katman, başlık düğmeleri içeriğin üstünde,
   gizleme sınıfı iki parçayı kapatıyor. Kaynak metin okur; gizlenme ve anahat davranışı `OynaticiYolHaritasiTests`'te.
+- `UstPanelTests.cs` — oynatıcının tek üst paneli `TopOverlay`: şerit, başlık düğmeleri ve paravan içinde, `chrome-hidden`
+  üçünü birden kapatır; paravan 96 px, tetik bandı 48 px, alt paravanın aynası, yalnız oynatıcıda. Başlık düğmeleri ve
+  sekmelerde görünür anahat yok; hover/basılı zemin palet fırçasından. Başsız saat donuk olduğu için `Transitions` kapatılır.
 - `OynaticiKisayolTests.cs` — tarifteki her kısayol gerçek girdi olayıyla PlayerView'a verilir, etkisi motordan geri okunur;
   döndürme karenin piksellerinden. Kanıt `.calisma/oynatici-kisayol/`. `CtrlShiftS` kolu artık
   **iddia ettiği koşulun tamamını** bekliyor (açı + genişlik + yükseklik + renk konumu); eskiden
@@ -173,7 +176,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   `F1 M 0,0 M 24,24` sabitleyicisi, mürekkebin 2 birimlik kenar payı içinde kalması (slop 0.01),
   merkezin 12/12'ye ±0.55 oturması. Muafiyetler: `IconPlay` (optik kaydırma +0.5..+1.5),
   `IconSpeed` ve `IconCoffee` (Fluent'in kendi çizimi; ölçülen sınır kutularıyla ±0.02 pimli).
-  `IconCode` `</>` parmak izi `FillContains` ile okunur. Ölçünün kaynağı
+  Teknesyum düğmesi simgesiz: `IconCode` sözlükte yok, düğmede yol yok. Ölçünün kaynağı
   `docs/arastirma/ikon-estetigi.md`. Yolları `AppHost` üstünden ayrıştırır.
 - `IkonImzaTests.cs` — simgenin **şekil kimliği**: 24×24 kare 16×16 hücreye bölünüp her hücrenin
   merkezinde dolgu yoklanıyor, 256 bit imza pimle karşılaştırılıyor (tolerans 2 bit). Sınır kutusu
