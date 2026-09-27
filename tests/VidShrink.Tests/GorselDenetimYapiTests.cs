@@ -161,7 +161,7 @@ public sealed class GorselDenetimYapiTests
                 var yaziSonu = Yeri(yazi, w).Left + yazi.TextLayout.Width;
                 return (ad, tasma: Math.Max(Yeri(secim, w).Right, yaziSonu) - sag);
             }).ToArray();
-        }, sekme: 3, dil: dil);
+        }, sekme: 4, dil: dil);
 
         foreach (var (ad, tasma) in tasmalar) _output.WriteLine($"{ad}: {tasma:0.#}");
         var enKotu = tasmalar.MaxBy(t => t.tasma);
@@ -292,7 +292,7 @@ public sealed class GorselDenetimYapiTests
                     return (satir: g.Key, etiket: etiketler.Max() - etiketler.Min(), denetim: denetimler.Max() - denetimler.Min(), satirlar);
                 })
                 .ToArray();
-        }, sekme: 2, dil: dil);
+        }, sekme: 3, dil: dil);
 
         foreach (var (satir, etiket, denetim, satirlar) in farklar) _output.WriteLine($"satır {satir}: etiket altı {etiket:0.#}, denetim üstü {denetim:0.#}, en çok {satirlar} satır etiket");
         Assert.Equal(6, farklar.Length);
@@ -315,7 +315,7 @@ public sealed class GorselDenetimYapiTests
             new[] { "TxtStage", "TxtOutSize", "TxtRemaining", "TxtDurationValue" }
                 .Select(ad => (ad, yer: Yeri(Ad<TextBlock>(w, ad), w)))
                 .Select(d => (d.ad, ust: d.yer.Top, etiketUst: Yeri(((Panel)Ad<TextBlock>(w, d.ad).GetVisualParent()!).Children[0], w).Top))
-                .ToArray(), sekme: 1, dil: dil);
+                .ToArray(), sekme: 2, dil: dil);
 
         foreach (var (ad, ust, etiketUst) in satirlar) _output.WriteLine($"{ad}: değer üstü {ust:0.#}, etiket üstü {etiketUst:0.#}");
         var kaymalar = satirlar.GroupBy(s => Math.Round(s.etiketUst))
@@ -346,7 +346,7 @@ public sealed class GorselDenetimYapiTests
         {
             var kaydirici = Ad<ScrollViewer>(w, "PlanScroll");
             return (Ad<Border>(w, "PlanPanel").Bounds.Height, kaydirici.Viewport.Height, kaydirici.Extent.Height);
-        }, sekme: 1, dil: dil);
+        }, sekme: 2, dil: dil);
 
         _output.WriteLine($"panel {panel:0.#}, görüş {gorus:0.#}, içerik {icerik:0.#}");
         Assert.True(icerik > 0, "Plan içeriği ölçülmedi.");
@@ -368,7 +368,7 @@ public sealed class GorselDenetimYapiTests
             var metinler = w.GetVisualDescendants().OfType<TextBlock>().ToArray();
             var enAralikli = metinler.MaxBy(t => t.LetterSpacing)!;
             return (metinler.Length, enAralikli.LetterSpacing, enAralikli.Text ?? enAralikli.Name ?? "");
-        }, sekme: 1, dil: dil);
+        }, sekme: 2, dil: dil);
 
         _output.WriteLine($"{sayi} metin, en geniş aralık {enGenis:0.##} ('{ad}')");
         Assert.True(sayi > 50, "Pencere kurulmadı.");
@@ -394,7 +394,7 @@ public sealed class GorselDenetimYapiTests
             (Oku(w, "GlyphSeritPlay"),
              w.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>().Where(p => p.Name == "TabIcon")
                 .Select(p => (ad: "TabIcon", aynali: Aynali(p))).ToArray()), sekme: 0, dil: dil);
-        var sayfaOku = Pencere(Dar, w => Oku(w, "GlyphPlanReasons").Item2, sekme: 1, dil: dil);
+        var sayfaOku = Pencere(Dar, w => Oku(w, "GlyphPlanReasons").Item2, sekme: 2, dil: dil);
         var karsilastirma = AppHost.Run(() =>
         {
             var serit = new VidShrink.App.Playback.ControlStrip();
@@ -445,10 +445,10 @@ public sealed class GorselDenetimYapiTests
             }
             finally { pencere.Close(); }
         });
-        var kutular = new[] { ("TxtConvertCommand", 2), ("TxtCommand", 4), ("TxtOutputName", 5) }
+        var kutular = new[] { ("TxtConvertCommand", 3), ("TxtCommand", 5), ("TxtOutputName", 6) }
             .Select(k => (ad: k.Item1, yon: Pencere(Dar, w => Ad<TextBox>(w, k.Item1).FlowDirection, sekme: k.Item2, dil: dil)))
             .ToArray();
-        var pencereYonu = Pencere(Dar, w => w.FlowDirection, sekme: 5, dil: dil);
+        var pencereYonu = Pencere(Dar, w => w.FlowDirection, sekme: 6, dil: dil);
         Assert.Equal(sagdanSola, pencereYonu == Avalonia.Media.FlowDirection.RightToLeft);
 
         _output.WriteLine($"{dil}: '1228' x={ilk:0.#}, '690' x={ikinci:0.#}, yalıtım={yazi.Contains('\u200E')}");
@@ -473,7 +473,7 @@ public sealed class GorselDenetimYapiTests
             var ilk = sonucMetni.Text!;
             sonucMetni.Text = ilk;
             return (ilk, tanikMetni.Text!, sonucMetni.Text!);
-        }, sekme: 1, dil: dil);
+        }, sekme: 2, dil: dil);
 
         _output.WriteLine($"{dil}: {sonuc.Replace("\u00A0", "[nbsp]").Replace("\u200E", "[lrm]")}");
         Assert.Contains(sayi + " " + birim, tanik.Replace("\u200E", ""), StringComparison.Ordinal);
@@ -497,7 +497,7 @@ public sealed class GorselDenetimYapiTests
             var k = Yeri(kombo, w);
             var y = Yeri(yazi, w);
             return (y.Center.Y - k.Center.Y, y.Top < k.Bottom && y.Bottom > k.Top);
-        }, sekme: 1, dil: dil);
+        }, sekme: 2, dil: dil);
 
         _output.WriteLine($"{dil}: fark {fark:0.##}, aynı satır {ayniSatir}");
         Assert.True(ayniSatir, $"{dil}: kutu ile kazanç aynı satırda değil, ölçü bir şey görmüyor.");
@@ -517,7 +517,7 @@ public sealed class GorselDenetimYapiTests
             TextBlock Etiket(int satir) => izgara.Children.OfType<TextBlock>().Single(t => Grid.GetRow(t) == satir && Grid.GetColumn(t) == 0);
             double Orta(Control c) => Yeri(c, w).Center.Y;
             return new[] { ("Ömür", Orta(Etiket(1)) - Orta(kombo)), ("Silme", Orta(Etiket(2)) - Orta(dugme)) };
-        }, sekme: 5, dil: dil);
+        }, sekme: 6, dil: dil);
 
         foreach (var (ad, fark) in farklar) _output.WriteLine($"{dil} {ad}: {fark:0.##}");
         Assert.All(farklar, f => Assert.True(Math.Abs(f.Item2) < 1, $"{f.Item1} etiketi denetimden {f.Item2:0.##} px kayık."));
@@ -528,7 +528,7 @@ public sealed class GorselDenetimYapiTests
     [InlineData("de")]
     public void SayfaKenariKaydirmaCubugunaDayanmaz(string dil)
     {
-        var bosluklar = new[] { (1, "PageShrink"), (3, "PageRecorder"), (5, "PageSettings") }
+        var bosluklar = new[] { (2, "PageShrink"), (4, "PageRecorder"), (6, "PageSettings") }
             .Select(s => (ad: s.Item2, bosluk: Pencere(Dar, w =>
             {
                 var kaydirici = Ad<ScrollViewer>(w, s.Item2);
@@ -634,7 +634,7 @@ public sealed class GorselDenetimYapiTests
             var son = satirlar[^1];
             var yazi = baslik.Text ?? "";
             return (yazi, yazi.Substring(son.FirstTextSourceIndex, Math.Min(son.Length, yazi.Length - son.FirstTextSourceIndex)).Trim(), satirlar.Count);
-        }, sekme: 1, dil: dil, dolu: false);
+        }, sekme: 2, dil: dil, dolu: false);
 
         _output.WriteLine($"{satir} satır, '{metin}', son: '{sonSatir}'");
         Assert.False(string.IsNullOrEmpty(metin));
@@ -669,7 +669,7 @@ public sealed class GorselDenetimYapiTests
                     return (ad: t.Name!, fark: arada ? fark : 0, satir: denetimler.Select(d => Math.Round(d.Top)).Distinct().Count());
                 })
                 .ToArray();
-        }, sekme: 1, dil: dil);
+        }, sekme: 2, dil: dil);
 
         foreach (var (ad, fark, satir) in sonuc) _output.WriteLine($"{ad}: denetim satırları arasında kalan kayma {fark:0.#} px, denetim satırı {satir}");
         Assert.Contains(sonuc, s => s.ad == "TxtAdvEncoderPathNow");
@@ -708,7 +708,7 @@ public sealed class GorselDenetimYapiTests
                 return p.First.DesiredSize.Width - p.First.Margin.Left - p.First.Margin.Right - p.Second.Width;
             });
             return (Math.Abs(hepsi[0].Left - hepsi[2].Left), Math.Abs(hepsi[1].Left - hepsi[3].Left), hepsi.Max(r => r.Right) - sinir, sikisma);
-        }, sekme: 1, dil: dil);
+        }, sekme: 2, dil: dil);
 
         _output.WriteLine($"sol {solFark:0.#}, sağ {sagFark:0.#}, taşma {tasma:0.#}, sıkışma {sikisma:0.#}");
         Assert.True(solFark <= 0.5 && sagFark <= 0.5, $"Sütunlar kaymış: sol {solFark:0.#}, sağ {sagFark:0.#} px.");

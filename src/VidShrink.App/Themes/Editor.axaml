@@ -102,7 +102,7 @@
       <Setter Property="Background" Value="{StaticResource NeonBlueActive}"/>
       <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
       <Setter Property="BorderThickness" Value="{StaticResource EditorClipSelectedBorder}"/>
-      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
     </Style>
   </ControlTheme>
 

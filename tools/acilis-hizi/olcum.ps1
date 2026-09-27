@@ -15,7 +15,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $Adimlar = @('kabuk-ilk-kare', 'baslatici', 'app-dogdu', 'main', 'tek-ornek', 'libmpv-hazir', 'cerceve', 'gecici-temizlik', 'ayar-okundu',
-             'palet', 'pencere-yapici', 'xaml-sekmeler', 'xaml-oynatici', 'xaml-kucultme',
+             'palet', 'pencere-yapici', 'xaml-sekmeler', 'xaml-oynatici', 'xaml-duzenleyici', 'xaml-kucultme',
              'xaml-donusturme', 'xaml-hakkinda', 'xaml-kaydedici', 'xaml-gelismis',
              'xaml-ayarlar', 'xaml-sekmeler-bitti', 'xaml', 'yapici-bitti', 'pencere-kuruldu',
              'pencere-yuklendi', 'ayarlar', 'varsayilan-oneri', 'giris-canlandirmasi',
