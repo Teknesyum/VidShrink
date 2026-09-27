@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-09-27
+
 ### Changed
 
 - Player: the bare mouse wheel steps one second; Ctrl steps ten seconds, Shift sixty, Ctrl+Shift five minutes.
