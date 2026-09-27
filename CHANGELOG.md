@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-28
+
+### Changed
+
+- First stable release. Same feature set as 0.14.0: shrink, convert, recorder, player and editor tabs; from here on version numbers follow semantic versioning with a stable 1.x line.
+
 ## [0.14.0] - 2026-09-28
 
 ### Added
