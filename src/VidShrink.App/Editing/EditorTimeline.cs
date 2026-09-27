@@ -31,6 +31,8 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
     private double _width;
     private double _fps = double.NaN;
     private int _selected = -1;
+    private bool _all;
+    private readonly List<long> _markers = new();
     private long _playhead;
 
     private Point _press;
@@ -64,6 +66,10 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
     internal long? MarkIn { get; private set; }
 
     internal long? MarkOut { get; private set; }
+
+    internal IReadOnlyList<long> Markers => _markers;
+
+    internal bool AllSelected => _all;
 
     internal long? SnapLine { get; private set; }
 
@@ -140,8 +146,9 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         {
             var count = _model?.Clips.Count ?? 0;
             var next = value >= 0 && value < count ? value : -1;
-            if (next == _selected) return;
+            if (next == _selected && !_all) return;
             _selected = next;
+            _all = false;
             foreach (var clip in _live) clip.Classes.Set("selected", clip.Index == _selected);
             SelectionChanged?.Invoke();
         }
@@ -164,6 +171,8 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
     {
         _model = model;
         _selected = -1;
+        _all = false;
+        _markers.Clear();
         MarkIn = null;
         MarkOut = null;
         _viewStart = 0;
@@ -179,6 +188,8 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         if (_selected >= (_model?.Clips.Count ?? 0)) _selected = -1;
         if (MarkIn is { } a && a > (_model?.Duration ?? 0)) MarkIn = null;
         if (MarkOut is { } b && b > (_model?.Duration ?? 0)) MarkOut = null;
+        _markers.RemoveAll(m => m > (_model?.Duration ?? 0));
+        if (_model is not { Clips.Count: > 0 }) _all = false;
         Playhead = _playhead;
         PixelsPerTick = _ppt;
         SelectionChanged?.Invoke();
@@ -189,6 +200,26 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         MarkIn = markIn;
         MarkOut = markOut;
         _overlay.InvalidateVisual();
+    }
+
+    internal void SelectAll()
+    {
+        if (_model is not { Clips.Count: > 0 }) return;
+        _selected = -1;
+        _all = true;
+        foreach (var clip in _live) clip.Classes.Set("selected", true);
+        SelectionChanged?.Invoke();
+    }
+
+    internal bool AddMarker(long time)
+    {
+        if (_model is not { } model) return false;
+        var at = Math.Clamp(time, 0, model.Duration);
+        var index = _markers.BinarySearch(at);
+        if (index >= 0) _markers.RemoveAt(index);
+        else _markers.Insert(~index, at);
+        _overlay.InvalidateVisual();
+        return index < 0;
     }
 
     internal double TimeToX(long time) => HeaderWidth + (time - _viewStart) * _ppt;
@@ -249,6 +280,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         if (playhead) Consider(_playhead);
         if (MarkIn is { } a) Consider(a);
         if (MarkOut is { } b) Consider(b);
+        foreach (var marker in _markers) Consider(marker);
         return best;
     }
 
@@ -547,7 +579,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         {
             var index = first + i;
             var clip = shown.Clips[index];
-            _live[i].Show(index, clip, index == _selected, clip.TimelineLength * _ppt < minWidth);
+            _live[i].Show(index, clip, _all || index == _selected, clip.TimelineLength * _ppt < minWidth);
         }
     }
 

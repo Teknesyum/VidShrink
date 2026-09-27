@@ -34,6 +34,7 @@ internal sealed class EditorPlayhead : RangeBase
         using var clip = context.PushClip(new Rect(left, 0, Bounds.Width - left, Bounds.Height));
 
         DrawRange(context, top, bottom);
+        DrawMarkers(context, bottom);
         DrawGhost(context, top);
         DrawSnap(context, bottom);
         DrawHead(context, bottom);
@@ -51,6 +52,30 @@ internal sealed class EditorPlayhead : RangeBase
         }
 
         context.DrawLine(pen, new Point(x0, top), new Point(x0, bottom));
+    }
+
+    private void DrawMarkers(DrawingContext context, double bottom)
+    {
+        if (_owner.Markers.Count == 0) return;
+        var brush = EditorTokens.Brush(this, "NeonBlue");
+        var pen = new Pen(brush, EditorTokens.Size(this, "EditorClipBorder"));
+        var handle = EditorTokens.Size(this, "EditorPlayheadHandle") / 2;
+        var ruler = _owner.RulerHeight;
+        foreach (var marker in _owner.Markers)
+        {
+            var x = _owner.TimeToX(marker);
+            context.DrawLine(pen, new Point(x, ruler), new Point(x, bottom));
+            var geometry = new StreamGeometry();
+            using (var g = geometry.Open())
+            {
+                g.BeginFigure(new Point(x - handle / 2, ruler - handle), true);
+                g.LineTo(new Point(x + handle / 2, ruler - handle));
+                g.LineTo(new Point(x, ruler));
+                g.EndFigure(true);
+            }
+
+            context.DrawGeometry(brush, null, geometry);
+        }
     }
 
     private void DrawGhost(DrawingContext context, double top)

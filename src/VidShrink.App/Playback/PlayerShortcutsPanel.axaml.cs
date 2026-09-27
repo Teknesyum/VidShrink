@@ -84,15 +84,15 @@ internal partial class PlayerShortcutsPanel : UserControl
     protected override Size MeasureOverride(Size availableSize)
     {
         var boyut = base.MeasureOverride(availableSize);
-        return TabanlariHizala() ? base.MeasureOverride(availableSize) : boyut;
+        return TabanlariHizala(Rows) ? base.MeasureOverride(availableSize) : boyut;
     }
 
-    private bool TabanlariHizala()
+    internal static bool TabanlariHizala(Grid rows)
     {
         var degisti = false;
-        for (var i = 0; i + 1 < Rows.Children.Count; i += 2)
+        for (var i = 0; i + 1 < rows.Children.Count; i += 2)
         {
-            if (Rows.Children[i] is not TextBlock tus || Rows.Children[i + 1] is not TextBlock aciklama) continue;
+            if (rows.Children[i] is not TextBlock tus || rows.Children[i + 1] is not TextBlock aciklama) continue;
             var fark = Taban(aciklama) - Taban(tus);
             degisti |= Kaydir(tus, Math.Max(0, fark));
             degisti |= Kaydir(aciklama, Math.Max(0, -fark));

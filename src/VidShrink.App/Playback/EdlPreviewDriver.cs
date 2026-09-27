@@ -16,6 +16,13 @@ public sealed class EdlPreviewDriver : IDisposable
     private volatile bool _playing;
     private EdlPart? _reverse;
     private long _cursor;
+    private double _rate = 1;
+    private bool _backward;
+    private long _backCursor;
+
+    public const double MinRate = 0.01;
+
+    public const double MaxRate = 100;
 
     public EdlPreviewDriver(IPlaybackEngine engine, EdlPreview preview, TimeSpan? interval = null)
     {
@@ -36,14 +43,55 @@ public sealed class EdlPreviewDriver : IDisposable
 
     public long EdlPosition => _reverse is not null ? _cursor : Clamp(EditTime.FromSeconds(Finite(_engine.PositionSeconds)));
 
-    public long TimelinePosition => _preview.ToTimeline(EdlPosition);
+    public long TimelinePosition => _backward ? _backCursor : _preview.ToTimeline(EdlPosition);
+
+    public double Rate => _rate;
+
+    public bool Backward => _backward;
+
+    public double Shuttle => _playing ? (_backward ? -_rate : _rate) : 0;
 
     public Task OpenAsync(CancellationToken ct = default) => _engine.OpenAsync(_preview.Uri, ct);
 
+    public void SetRate(double rate)
+    {
+        if (!double.IsFinite(rate) || rate <= 0) throw new ArgumentOutOfRangeException(nameof(rate), rate, "Hiz pozitif olmalidir");
+        _rate = Math.Clamp(rate, MinRate, MaxRate);
+        if (!_backward && _reverse is null && _preview.Parts.Count > 0) ApplySpeed(_preview.PartAtEdl(EdlPosition));
+    }
+
+    public void PlayBackward()
+    {
+        if (!_backward)
+        {
+            _backCursor = _preview.ToTimeline(EdlPosition);
+            _backward = true;
+        }
+
+        _reverse = null;
+        _engine.Pause();
+        _playing = true;
+        StartLoop();
+    }
+
     public void Play()
     {
+        if (_backward)
+        {
+            _backward = false;
+            _playing = true;
+            _ = SeekAsync(_backCursor);
+            StartLoop();
+            return;
+        }
+
         _playing = true;
         if (_reverse is null) _engine.Play();
+        StartLoop();
+    }
+
+    private void StartLoop()
+    {
         if (_loop is null)
         {
             _loop = new CancellationTokenSource();
@@ -66,6 +114,13 @@ public sealed class EdlPreviewDriver : IDisposable
         try
         {
             _reverse = null;
+            if (_backward)
+            {
+                _backCursor = Math.Clamp(timelineTime, 0, _preview.TimelineDuration);
+                await _engine.SeekAsync(EditTime.ToSeconds(_preview.ToEdl(_backCursor)), precision, ct).ConfigureAwait(false);
+                return;
+            }
+
             var edl = _preview.ToEdl(timelineTime);
             var part = _preview.PartAtEdl(edl);
             ApplySpeed(part);
@@ -85,6 +140,12 @@ public sealed class EdlPreviewDriver : IDisposable
         try
         {
             if (!_playing) return;
+
+            if (_backward)
+            {
+                await StepBackwardAsync(elapsedSeconds, ct).ConfigureAwait(false);
+                return;
+            }
 
             if (_reverse is { } reversing)
             {
@@ -115,9 +176,16 @@ public sealed class EdlPreviewDriver : IDisposable
         _loop = null;
     }
 
+    private async Task StepBackwardAsync(double elapsedSeconds, CancellationToken ct)
+    {
+        _backCursor = Math.Max(0, _backCursor - EditTime.FromSeconds(Math.Max(0, elapsedSeconds) * _rate));
+        if (_backCursor == 0) _playing = false;
+        await _engine.SeekAsync(EditTime.ToSeconds(_preview.ToEdl(_backCursor)), SeekPrecision.Exact, ct).ConfigureAwait(false);
+    }
+
     private async Task StepBackAsync(EdlPart part, double elapsedSeconds, CancellationToken ct)
     {
-        var step = EditTime.FromSeconds(Math.Max(0, elapsedSeconds) * (double)part.Clip.Speed);
+        var step = EditTime.FromSeconds(Math.Max(0, elapsedSeconds) * (double)part.Clip.Speed * _rate);
         _cursor -= step;
         if (_cursor > part.EdlStart)
         {
@@ -150,7 +218,7 @@ public sealed class EdlPreviewDriver : IDisposable
 
     private void ApplySpeed(EdlPart part)
     {
-        var speed = (double)part.Clip.Speed;
+        var speed = Math.Clamp((double)part.Clip.Speed * _rate, MinRate, MaxRate);
         if (Math.Abs(_engine.Speed - speed) > 1e-9) _engine.SetSpeed(speed);
     }
 

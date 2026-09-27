@@ -30,6 +30,7 @@ internal partial class EditorView : UserControl
     public EditorView()
     {
         InitializeComponent();
+        Preview.KeyboardEnabled = false;
         _clock = new DispatcherTimer { Interval = EdlPreviewDriver.DefaultInterval };
         _clock.Tick += (_, _) => Follow();
 
@@ -39,7 +40,7 @@ internal partial class EditorView : UserControl
         AddHandler(DragDrop.DropEvent, OnDrop);
 
         Timeline.Seek += OnSeek;
-        Timeline.MoveRequested += (from, to) => Apply(model => model.Move(from, to), to);
+        Timeline.MoveRequested += (from, to) => Move(from, to);
         Timeline.SelectionChanged += RefreshToolbar;
 
         BtnSplit.Click += (_, _) => Split();
@@ -104,7 +105,7 @@ internal partial class EditorView : UserControl
         }
 
         if (!CurrentMedia.SamePath(path, _source) || Preview.Engine is not { } engine || !(engine.DurationSeconds > 0)) return;
-        ShowTimeline(EditTimeline.FromSource(EditTime.FromSeconds(engine.DurationSeconds)), engine.FramesPerSecond);
+        ShowTimeline(EditTimeline.FromSource(EditTime.FromSeconds(engine.DurationSeconds)), SourceFps(KnownInfo?.Invoke(path)?.Fps, engine.FramesPerSecond));
         await ReloadAsync(0).ConfigureAwait(true);
     }
 
@@ -146,6 +147,7 @@ internal partial class EditorView : UserControl
     internal bool SetSpeed(decimal speed)
     {
         var selected = Timeline.SelectedIndex;
+        if (Timeline.AllSelected) return Apply(model => ValidSpeed(speed) && model.SetSpeedAll(speed), -1);
         return Apply(model =>
         {
             if (selected < 0 || selected >= model.Clips.Count || speed == 0) return false;
@@ -155,13 +157,22 @@ internal partial class EditorView : UserControl
         }, selected);
     }
 
+    private static bool ValidSpeed(decimal speed)
+    {
+        if (speed == 0) return false;
+        var magnitude = decimal.Round(Math.Abs(speed), 2, MidpointRounding.AwayFromZero);
+        return magnitude >= EditClip.MinSpeed && magnitude <= EditClip.MaxSpeed;
+    }
+
     internal bool Reverse()
     {
-        var selected = Timeline.SelectedIndex;
+        var selected = ActiveIndex;
         if (_model is not { } model || selected < 0 || selected >= model.Clips.Count) return false;
         var clip = model.Clips[selected];
         return SetSpeed(clip.Reversed ? clip.Speed : -clip.Speed);
     }
+
+    internal bool Move(int from, int to) => Apply(model => model.Move(from, to), to);
 
     internal bool Undo() => Apply(model => model.Undo(), Timeline.SelectedIndex);
 
@@ -170,40 +181,6 @@ internal partial class EditorView : UserControl
     internal void MarkIn() => Timeline.SetMarks(Timeline.Playhead, Timeline.MarkOut is { } end && end > Timeline.Playhead ? end : null);
 
     internal void MarkOut() => Timeline.SetMarks(Timeline.MarkIn is { } start && start < Timeline.Playhead ? start : null, Timeline.Playhead);
-
-    internal bool HandleKey(Key key, KeyModifiers modifiers)
-    {
-        if (_model is null) return false;
-        if (key == Key.Delete && modifiers == KeyModifiers.None)
-        {
-            DeleteSelected();
-            return true;
-        }
-
-        if (modifiers != KeyModifiers.Control) return false;
-        if (key == Key.Z) Undo();
-        else if (key == Key.Y) Redo();
-        else return false;
-        return true;
-    }
-
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnAttachedToVisualTree(e);
-        if (TopLevel.GetTopLevel(this) is { } top) top.AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
-    }
-
-    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        if (TopLevel.GetTopLevel(this) is { } top) top.RemoveHandler(KeyDownEvent, OnKey);
-        base.OnDetachedFromVisualTree(e);
-    }
-
-    private void OnKey(object? sender, KeyEventArgs e)
-    {
-        if (e.Handled || !IsEffectivelyVisible || e.Source is TextBox) return;
-        if (HandleKey(e.Key, e.KeyModifiers)) e.Handled = true;
-    }
 
     private bool Apply(Func<EditTimeline, bool> edit, int select)
     {
@@ -243,8 +220,7 @@ internal partial class EditorView : UserControl
     private void Follow()
     {
         if (_driver is not { } driver) return;
-        if (Preview.IsPlaying && !driver.Playing) driver.Play();
-        else if (!Preview.IsPlaying && driver.Playing) driver.Pause();
+        SyncDriver();
         if (!Timeline.Scrubbing) Timeline.Playhead = driver.TimelinePosition;
     }
 
@@ -275,7 +251,7 @@ internal partial class EditorView : UserControl
             MnuSpeed.Items.Add(item);
         }
 
-        var hasClip = Timeline.SelectedIndex >= 0;
+        var hasClip = ActiveIndex >= 0;
         MnuSpeed.IsEnabled = hasClip;
         MnuReverse.IsEnabled = hasClip;
         MnuDelete.IsEnabled = BtnDelete.IsEnabled;
@@ -283,19 +259,21 @@ internal partial class EditorView : UserControl
         MnuDeleteRange.IsEnabled = Timeline.MarkIn is { } a && Timeline.MarkOut is { } b && b > a;
     }
 
+    private int ActiveIndex => Timeline.AllSelected && _model is { Clips.Count: > 0 } ? 0 : Timeline.SelectedIndex;
+
     private bool Reversed()
     {
-        var selected = Timeline.SelectedIndex;
+        var selected = ActiveIndex;
         return _model is { } model && selected >= 0 && selected < model.Clips.Count && model.Clips[selected].Reversed;
     }
 
     private void RefreshToolbar()
     {
         var model = _model;
-        var selected = Timeline.SelectedIndex;
+        var selected = ActiveIndex;
         var hasClip = model is not null && selected >= 0 && selected < model.Clips.Count;
         BtnSplit.IsEnabled = model is not null;
-        BtnDelete.IsEnabled = hasClip && model!.Clips.Count > 1;
+        BtnDelete.IsEnabled = hasClip && !Timeline.AllSelected && model!.Clips.Count > 1;
         BtnUndo.IsEnabled = model?.CanUndo ?? false;
         BtnRedo.IsEnabled = model?.CanRedo ?? false;
         BtnZoomIn.IsEnabled = model is not null;
