@@ -129,7 +129,7 @@
      old 16/12/8/6 scale was removed; the four names below remain for backward
      compatibility and all point at the same single value. The one exception is
      the circle (`?` badge, slider thumb, status dot) — there, `border-radius: 50%`. */
-  --tk-r: 3px;
+  --tk-r: 4px;
   --tk-r-box: var(--tk-r);
   --tk-r-btn: var(--tk-r);
   --tk-r-cell: var(--tk-r);
@@ -175,7 +175,7 @@
   --tk-toast-inset: var(--tk-sp-5);
   --tk-toast-gap: var(--tk-sp-3);
 
-  --tk-r-window: 3px;
+  --tk-r-window: 4px;
   --tk-border-w: 1px;
   --tk-window-edge: transparent;
   --tk-glass-blur: 0px;

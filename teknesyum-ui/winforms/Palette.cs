@@ -85,11 +85,11 @@ public static class Palette
     /// There is one radius: 6 DIP (SKILL §5, `layout.md` §5.1). Card, panel, button
     /// and cell take the same value. The one exception is the circle: `?` badge,
     /// slider thumb, status dot.
-    public const int Radius = 3;
+    public const int Radius = 4;
 
     /// Numeric tokens: the same values as the CSS `--tk-*` layer, in DIP.
     /// Tracking is em, line height a multiplier, ratios unitless, times in ms.
-    public const int    WindowRadius = 3;
+    public const int    WindowRadius = 4;
     public const int    BorderWidth  = 1;
     public const int    FocusWidth   = 2;
     public const int    FocusOffset  = 2;

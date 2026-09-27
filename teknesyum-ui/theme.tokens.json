@@ -241,8 +241,8 @@
     "toast-gap": { "ref": "space.3", "rationale": "Gap between two stacked toasts." }
   },
   "shape": {
-    "r": { "value": 3, "unit": "px", "rationale": "The single radius (SKILL \u00a75, layout.md \u00a75.1). The exception is the circle: badge, slider thumb, status dot." },
-    "r-window": { "value": 3, "unit": "px", "rationale": "Window shell radius, drawn title bar included (desktop.md \u00a710)." },
+    "r": { "value": 4, "unit": "px", "rationale": "The single radius (SKILL \u00a75, layout.md \u00a75.1). The exception is the circle: badge, slider thumb, status dot." },
+    "r-window": { "value": 4, "unit": "px", "rationale": "Window shell radius, drawn title bar included (desktop.md \u00a710)." },
     "border-w": { "value": 1, "unit": "px", "rationale": "Default border width; the tab outline sits 1 DIP inset with the same width." },
     "window-edge": { "ref": "none", "rationale": "Window shell outline colour; none draws no edge." },
     "focus-w": { "value": 2, "unit": "px", "rationale": "Focus ring outline width; the inner layer is black (SKILL \u00a75.3)." },

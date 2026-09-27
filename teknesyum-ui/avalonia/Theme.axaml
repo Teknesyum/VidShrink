@@ -171,8 +171,8 @@
     <sys:Double x:Key="ToastInset">24</sys:Double>
     <sys:Double x:Key="ToastGap">12</sys:Double>
 
-    <CornerRadius x:Key="Radius">3</CornerRadius>
-    <CornerRadius x:Key="WindowRadius">3</CornerRadius>
+    <CornerRadius x:Key="Radius">4</CornerRadius>
+    <CornerRadius x:Key="WindowRadius">4</CornerRadius>
     <Thickness x:Key="BorderWidth">1</Thickness>
     <sys:Double x:Key="FocusWidth">2</sys:Double>
     <sys:Double x:Key="FocusOffset">2</sys:Double>
@@ -235,7 +235,7 @@
     <sys:String x:Key="ScrollBehavior">auto</sys:String>
     <sys:Double x:Key="ScrollbarThickness">3</sys:Double>
     <Thickness x:Key="ScrollbarThumbInset">0</Thickness>
-    <CornerRadius x:Key="ScrollbarThumbRadius">3</CornerRadius>
+    <CornerRadius x:Key="ScrollbarThumbRadius">4</CornerRadius>
     <sys:TimeSpan x:Key="TFadeOut">0:0:0.48</sys:TimeSpan>
 
     <!-- Scale 1.25 major third: 14 / 16 / 20 / 24 / 30 DIP.
@@ -453,9 +453,9 @@
     <Setter Property="FocusAdorner">
       <FocusAdornerTemplate>
         <Panel Margin="-5" UseLayoutRounding="True">
-          <Rectangle Margin="4" RadiusX="4" RadiusY="4"
+          <Rectangle Margin="4" RadiusX="5" RadiusY="5"
                      Stroke="#FF000000" StrokeThickness="{StaticResource FocusWidth}"/>
-          <Rectangle Margin="2" RadiusX="6" RadiusY="6"
+          <Rectangle Margin="2" RadiusX="7" RadiusY="7"
                      Stroke="#FF6FB7FF" StrokeThickness="{StaticResource FocusWidth}"/>
         </Panel>
       </FocusAdornerTemplate>
