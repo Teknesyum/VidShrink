@@ -19,5 +19,15 @@
   "editor.zoom-out": "ज़ूम आउट",
   "editor.export": "निर्यात करें",
   "editor.timeline": "टाइमलाइन",
-  "editor.playhead": "प्लेहेड"
+  "editor.playhead": "प्लेहेड",
+  "editor.export.mode": "एक्सपोर्ट मोड",
+  "editor.export.fast": "तेज़ (लॉसलेस)",
+  "editor.export.smart": "स्मार्ट",
+  "editor.export.full": "पूरा री-एनकोड",
+  "editor.export.save-title": "संपादित वीडियो एक्सपोर्ट करें",
+  "editor.export.done": "एक्सपोर्ट हुआ: {0}",
+  "editor.export.failed": "एक्सपोर्ट विफल: {0}",
+  "editor.export.reencoded": "क्लिप {0} की गति बदली है या वे उल्टी चलती हैं, इसलिए री-एनकोड होंगी।",
+  "editor.export.fallback": "इस स्रोत को री-एनकोड किए बिना काटा नहीं जा सकता, इसलिए पूरा वीडियो री-एनकोड होगा।",
+  "editor.export.reverse-limit": "उल्टी क्लिप {0} मेमोरी सीमा ({1}) से लंबी है। जारी रखने के लिए एक्सपोर्ट फिर से दबाएँ।"
 }

@@ -19,5 +19,15 @@
   "editor.zoom-out": "Віддалити",
   "editor.export": "Експорт",
   "editor.timeline": "Шкала часу",
-  "editor.playhead": "Покажчик відтворення"
+  "editor.playhead": "Покажчик відтворення",
+  "editor.export.mode": "Режим експорту",
+  "editor.export.fast": "Швидкий (без втрат)",
+  "editor.export.smart": "Розумний",
+  "editor.export.full": "Повне перекодування",
+  "editor.export.save-title": "Експорт відредагованого відео",
+  "editor.export.done": "Експортовано: {0}",
+  "editor.export.failed": "Помилка експорту: {0}",
+  "editor.export.reencoded": "Кліпи {0} змінюють швидкість або відтворюються назад і будуть перекодовані.",
+  "editor.export.fallback": "Це джерело не можна різати без перекодування, тому все відео буде перекодовано.",
+  "editor.export.reverse-limit": "Обернений кліп {0} довший за обмеження пам’яті ({1}). Натисніть «Експорт» ще раз, щоб продовжити."
 }

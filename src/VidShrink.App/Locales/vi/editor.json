@@ -19,5 +19,15 @@
   "editor.zoom-out": "Thu nhỏ",
   "editor.export": "Xuất",
   "editor.timeline": "Dòng thời gian",
-  "editor.playhead": "Đầu phát"
+  "editor.playhead": "Đầu phát",
+  "editor.export.mode": "Chế độ xuất",
+  "editor.export.fast": "Nhanh (không mất dữ liệu)",
+  "editor.export.smart": "Thông minh",
+  "editor.export.full": "Mã hóa lại toàn bộ",
+  "editor.export.save-title": "Xuất video đã chỉnh sửa",
+  "editor.export.done": "Đã xuất: {0}",
+  "editor.export.failed": "Xuất thất bại: {0}",
+  "editor.export.reencoded": "Các đoạn {0} đổi tốc độ hoặc phát ngược nên sẽ được mã hóa lại.",
+  "editor.export.fallback": "Nguồn này không thể cắt mà không mã hóa lại, nên toàn bộ video sẽ được mã hóa lại.",
+  "editor.export.reverse-limit": "Đoạn phát ngược {0} vượt quá giới hạn bộ nhớ ({1}). Nhấn Xuất lần nữa để tiếp tục."
 }

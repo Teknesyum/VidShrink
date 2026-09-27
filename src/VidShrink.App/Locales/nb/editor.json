@@ -19,5 +19,15 @@
   "editor.zoom-out": "Zoom ut",
   "editor.export": "Eksporter",
   "editor.timeline": "Tidslinje",
-  "editor.playhead": "Avspillingshode"
+  "editor.playhead": "Avspillingshode",
+  "editor.export.mode": "Eksportmodus",
+  "editor.export.fast": "Rask (tapsfri)",
+  "editor.export.smart": "Smart",
+  "editor.export.full": "Full omkoding",
+  "editor.export.save-title": "Eksporter redigert video",
+  "editor.export.done": "Eksportert: {0}",
+  "editor.export.failed": "Eksporten mislyktes: {0}",
+  "editor.export.reencoded": "Klippene {0} endrer hastighet eller spilles baklengs og omkodes.",
+  "editor.export.fallback": "Kilden kan ikke klippes uten omkoding, så hele videoen omkodes.",
+  "editor.export.reverse-limit": "Det baklengs klippet {0} er lengre enn minnegrensen ({1}). Klikk Eksporter igjen for å fortsette."
 }

@@ -19,5 +19,15 @@
   "editor.zoom-out": "Nutolinti",
   "editor.export": "Eksportuoti",
   "editor.timeline": "Laiko juosta",
-  "editor.playhead": "Atkūrimo žymeklis"
+  "editor.playhead": "Atkūrimo žymeklis",
+  "editor.export.mode": "Eksporto režimas",
+  "editor.export.fast": "Greitas (be nuostolių)",
+  "editor.export.smart": "Išmanus",
+  "editor.export.full": "Visiškas perkodavimas",
+  "editor.export.save-title": "Eksportuoti redaguotą vaizdo įrašą",
+  "editor.export.done": "Eksportuota: {0}",
+  "editor.export.failed": "Eksportuoti nepavyko: {0}",
+  "editor.export.reencoded": "Klipai {0} keičia greitį arba grojami atgal, todėl perkoduojami.",
+  "editor.export.fallback": "Šio šaltinio negalima karpyti neperkodavus, todėl perkoduojamas visas vaizdo įrašas.",
+  "editor.export.reverse-limit": "Atbulinis klipas {0} viršija atminties ribą ({1}). Norėdami tęsti, dar kartą spustelėkite Eksportuoti."
 }

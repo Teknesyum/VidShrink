@@ -19,5 +19,15 @@
   "editor.zoom-out": "تصغير",
   "editor.export": "تصدير",
   "editor.timeline": "المخطط الزمني",
-  "editor.playhead": "مؤشر التشغيل"
+  "editor.playhead": "مؤشر التشغيل",
+  "editor.export.mode": "وضع التصدير",
+  "editor.export.fast": "سريع (بلا فقد)",
+  "editor.export.smart": "ذكي",
+  "editor.export.full": "إعادة ترميز كاملة",
+  "editor.export.save-title": "تصدير الفيديو المحرَّر",
+  "editor.export.done": "تم التصدير: {0}",
+  "editor.export.failed": "فشل التصدير: {0}",
+  "editor.export.reencoded": "المقاطع {0} تغيّر السرعة أو تُشغَّل بالعكس، لذا يُعاد ترميزها.",
+  "editor.export.fallback": "لا يمكن قص هذا المصدر دون إعادة ترميز، لذا يُعاد ترميز الفيديو كله.",
+  "editor.export.reverse-limit": "المقطع المعكوس {0} يتجاوز حد الذاكرة ({1}). اضغط تصدير مرة أخرى للمتابعة."
 }

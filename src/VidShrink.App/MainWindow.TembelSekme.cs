@@ -49,7 +49,7 @@ public partial class MainWindow
         {
             if (_editorPane is not null) return _editorPane;
 
-            _editorPane = new EditorView { KnownInfo = Media.InfoFor };
+            _editorPane = new EditorView { KnownInfo = Media.InfoFor, OpenInPlayer = OpenInPlayerAsync };
             PageEditor.Content = _editorPane;
             return _editorPane;
         }

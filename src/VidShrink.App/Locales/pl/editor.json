@@ -19,5 +19,15 @@
   "editor.zoom-out": "Pomniejsz",
   "editor.export": "Eksportuj",
   "editor.timeline": "Oś czasu",
-  "editor.playhead": "Głowica odtwarzania"
+  "editor.playhead": "Głowica odtwarzania",
+  "editor.export.mode": "Tryb eksportu",
+  "editor.export.fast": "Szybki (bezstratny)",
+  "editor.export.smart": "Inteligentny",
+  "editor.export.full": "Pełne ponowne kodowanie",
+  "editor.export.save-title": "Eksportuj edytowane wideo",
+  "editor.export.done": "Wyeksportowano: {0}",
+  "editor.export.failed": "Eksport nie powiódł się: {0}",
+  "editor.export.reencoded": "Klipy {0} zmieniają prędkość lub są odtwarzane wstecz i zostaną ponownie zakodowane.",
+  "editor.export.fallback": "Tego źródła nie da się przyciąć bez ponownego kodowania, więc całe wideo zostanie zakodowane ponownie.",
+  "editor.export.reverse-limit": "Odwrócony klip {0} przekracza limit pamięci ({1}). Kliknij Eksportuj ponownie, aby kontynuować."
 }

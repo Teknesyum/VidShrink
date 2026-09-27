@@ -19,5 +19,15 @@
   "editor.zoom-out": "Umanji",
   "editor.export": "Izvezi",
   "editor.timeline": "Vremenska linija",
-  "editor.playhead": "Glava reprodukcije"
+  "editor.playhead": "Glava reprodukcije",
+  "editor.export.mode": "Režim izvoza",
+  "editor.export.fast": "Brzo (bez gubitaka)",
+  "editor.export.smart": "Pametno",
+  "editor.export.full": "Potpuno ponovno kodiranje",
+  "editor.export.save-title": "Izvezi uređeni video",
+  "editor.export.done": "Izvezeno: {0}",
+  "editor.export.failed": "Izvoz nije uspeo: {0}",
+  "editor.export.reencoded": "Isečci {0} menjaju brzinu ili se puštaju unazad pa se ponovo kodiraju.",
+  "editor.export.fallback": "Ovaj izvor ne može da se seče bez ponovnog kodiranja pa se ceo video ponovo kodira.",
+  "editor.export.reverse-limit": "Obrnuti isečak {0} prelazi ograničenje memorije ({1}). Za nastavak ponovo kliknite Izvezi."
 }

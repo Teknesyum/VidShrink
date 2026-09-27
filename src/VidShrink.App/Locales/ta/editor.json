@@ -19,5 +19,15 @@
   "editor.zoom-out": "சிறிதாக்கு",
   "editor.export": "ஏற்றுமதி",
   "editor.timeline": "காலவரிசை",
-  "editor.playhead": "இயக்கக் குறி"
+  "editor.playhead": "இயக்கக் குறி",
+  "editor.export.mode": "ஏற்றுமதி முறை",
+  "editor.export.fast": "வேகம் (இழப்பில்லா)",
+  "editor.export.smart": "ஸ்மார்ட்",
+  "editor.export.full": "முழு மறுகுறியாக்கம்",
+  "editor.export.save-title": "திருத்திய வீடியோவை ஏற்றுமதி செய்",
+  "editor.export.done": "ஏற்றுமதியானது: {0}",
+  "editor.export.failed": "ஏற்றுமதி தோல்வி: {0}",
+  "editor.export.reencoded": "கிளிப்புகள் {0} வேகம் மாறுகின்றன அல்லது பின்னோக்கி இயங்குகின்றன, எனவே மறுகுறியாக்கம் செய்யப்படும்.",
+  "editor.export.fallback": "இந்த மூலத்தை மறுகுறியாக்கம் இன்றி வெட்ட முடியாது, எனவே முழு வீடியோவும் மறுகுறியாக்கம் செய்யப்படும்.",
+  "editor.export.reverse-limit": "பின்னோக்கிய கிளிப் {0} நினைவக வரம்பை ({1}) மீறுகிறது. தொடர மீண்டும் ஏற்றுமதியை அழுத்தவும்."
 }

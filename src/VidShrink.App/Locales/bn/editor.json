@@ -19,5 +19,15 @@
   "editor.zoom-out": "জুম আউট",
   "editor.export": "রপ্তানি করুন",
   "editor.timeline": "টাইমলাইন",
-  "editor.playhead": "প্লেহেড"
+  "editor.playhead": "প্লেহেড",
+  "editor.export.mode": "এক্সপোর্ট মোড",
+  "editor.export.fast": "দ্রুত (লসলেস)",
+  "editor.export.smart": "স্মার্ট",
+  "editor.export.full": "সম্পূর্ণ রি-এনকোড",
+  "editor.export.save-title": "সম্পাদিত ভিডিও এক্সপোর্ট করুন",
+  "editor.export.done": "এক্সপোর্ট হয়েছে: {0}",
+  "editor.export.failed": "এক্সপোর্ট ব্যর্থ: {0}",
+  "editor.export.reencoded": "ক্লিপ {0} গতি বদলায় বা উল্টো চলে, তাই রি-এনকোড হবে।",
+  "editor.export.fallback": "এই উৎস রি-এনকোড ছাড়া কাটা যায় না, তাই পুরো ভিডিও রি-এনকোড হবে।",
+  "editor.export.reverse-limit": "উল্টো ক্লিপ {0} মেমরি সীমা ({1}) ছাড়িয়ে যায়। চালিয়ে যেতে আবার এক্সপোর্ট চাপুন।"
 }

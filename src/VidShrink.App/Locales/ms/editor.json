@@ -19,5 +19,15 @@
   "editor.zoom-out": "Zum keluar",
   "editor.export": "Eksport",
   "editor.timeline": "Garis masa",
-  "editor.playhead": "Penanda main"
+  "editor.playhead": "Penanda main",
+  "editor.export.mode": "Mod eksport",
+  "editor.export.fast": "Pantas (tanpa kehilangan)",
+  "editor.export.smart": "Pintar",
+  "editor.export.full": "Kod semula penuh",
+  "editor.export.save-title": "Eksport video yang disunting",
+  "editor.export.done": "Dieksport: {0}",
+  "editor.export.failed": "Eksport gagal: {0}",
+  "editor.export.reencoded": "Klip {0} menukar kelajuan atau dimainkan terbalik dan dikod semula.",
+  "editor.export.fallback": "Sumber ini tidak boleh dipotong tanpa kod semula, jadi seluruh video dikod semula.",
+  "editor.export.reverse-limit": "Klip terbalik {0} melebihi had memori ({1}). Tekan Eksport sekali lagi untuk meneruskan."
 }

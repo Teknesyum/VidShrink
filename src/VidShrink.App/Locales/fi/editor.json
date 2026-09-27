@@ -19,5 +19,15 @@
   "editor.zoom-out": "Loitonna",
   "editor.export": "Vie",
   "editor.timeline": "Aikajana",
-  "editor.playhead": "Toistokohta"
+  "editor.playhead": "Toistokohta",
+  "editor.export.mode": "Vientitila",
+  "editor.export.fast": "Nopea (häviötön)",
+  "editor.export.smart": "Älykäs",
+  "editor.export.full": "Täysi uudelleenkoodaus",
+  "editor.export.save-title": "Vie muokattu video",
+  "editor.export.done": "Viety: {0}",
+  "editor.export.failed": "Vienti epäonnistui: {0}",
+  "editor.export.reencoded": "Leikkeet {0} muuttavat nopeutta tai toistuvat takaperin, joten ne koodataan uudelleen.",
+  "editor.export.fallback": "Tätä lähdettä ei voi leikata ilman uudelleenkoodausta, joten koko video koodataan uudelleen.",
+  "editor.export.reverse-limit": "Takaperin toistuva leike {0} ylittää muistirajan ({1}). Jatka painamalla Vie uudelleen."
 }

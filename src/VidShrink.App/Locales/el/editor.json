@@ -19,5 +19,15 @@
   "editor.zoom-out": "Σμίκρυνση",
   "editor.export": "Εξαγωγή",
   "editor.timeline": "Χρονολόγιο",
-  "editor.playhead": "Κεφαλή αναπαραγωγής"
+  "editor.playhead": "Κεφαλή αναπαραγωγής",
+  "editor.export.mode": "Λειτουργία εξαγωγής",
+  "editor.export.fast": "Γρήγορη (χωρίς απώλειες)",
+  "editor.export.smart": "Έξυπνη",
+  "editor.export.full": "Πλήρης επανακωδικοποίηση",
+  "editor.export.save-title": "Εξαγωγή επεξεργασμένου βίντεο",
+  "editor.export.done": "Εξήχθη: {0}",
+  "editor.export.failed": "Η εξαγωγή απέτυχε: {0}",
+  "editor.export.reencoded": "Τα κλιπ {0} αλλάζουν ταχύτητα ή παίζουν ανάποδα και επανακωδικοποιούνται.",
+  "editor.export.fallback": "Αυτή η πηγή δεν κόβεται χωρίς επανακωδικοποίηση, οπότε επανακωδικοποιείται όλο το βίντεο.",
+  "editor.export.reverse-limit": "Το ανάποδο κλιπ {0} υπερβαίνει το όριο μνήμης ({1}). Πατήστε ξανά Εξαγωγή για να συνεχίσετε."
 }

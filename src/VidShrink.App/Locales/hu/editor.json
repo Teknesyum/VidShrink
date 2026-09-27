@@ -19,5 +19,15 @@
   "editor.zoom-out": "Kicsinyítés",
   "editor.export": "Exportálás",
   "editor.timeline": "Idővonal",
-  "editor.playhead": "Lejátszófej"
+  "editor.playhead": "Lejátszófej",
+  "editor.export.mode": "Exportálási mód",
+  "editor.export.fast": "Gyors (veszteségmentes)",
+  "editor.export.smart": "Okos",
+  "editor.export.full": "Teljes újrakódolás",
+  "editor.export.save-title": "Szerkesztett videó exportálása",
+  "editor.export.done": "Exportálva: {0}",
+  "editor.export.failed": "Az exportálás sikertelen: {0}",
+  "editor.export.reencoded": "A(z) {0} klipek sebességet váltanak vagy visszafelé játszódnak, ezért újrakódolódnak.",
+  "editor.export.fallback": "Ez a forrás nem vágható újrakódolás nélkül, ezért a teljes videó újrakódolódik.",
+  "editor.export.reverse-limit": "A(z) {0} visszafelé játszott klip hosszabb a memóriakorlátnál ({1}). A folytatáshoz kattints újra az Exportálásra."
 }

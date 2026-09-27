@@ -19,5 +19,15 @@
   "editor.zoom-out": "Uitzoomen",
   "editor.export": "Exporteren",
   "editor.timeline": "Tijdlijn",
-  "editor.playhead": "Afspeelkop"
+  "editor.playhead": "Afspeelkop",
+  "editor.export.mode": "Exportmodus",
+  "editor.export.fast": "Snel (verliesvrij)",
+  "editor.export.smart": "Slim",
+  "editor.export.full": "Volledig hercoderen",
+  "editor.export.save-title": "Bewerkte video exporteren",
+  "editor.export.done": "Geëxporteerd: {0}",
+  "editor.export.failed": "Exporteren mislukt: {0}",
+  "editor.export.reencoded": "Clips {0} veranderen van snelheid of spelen achteruit en worden gehercodeerd.",
+  "editor.export.fallback": "Deze bron kan niet zonder hercoderen worden geknipt, dus de hele video wordt gehercodeerd.",
+  "editor.export.reverse-limit": "Omgekeerde clip {0} is langer dan de geheugenlimiet ({1}). Klik nogmaals op Exporteren om door te gaan."
 }
