@@ -373,6 +373,10 @@ public sealed class PaletteApplyTests
         Kapat("parlama-tema.txt");
     }
 
+    /// <summary>
+    /// Taban 11: ince alt şerit isteğiyle <c>PlaybackStrip</c> temasının <c>GlowBlue</c> gölgesi
+    /// kalktı (9ae166d6), yani on iki başvurudan biri silinmeyle eksildi, statiğe dönmedi.
+    /// </summary>
     [Fact]
     public void ParlamaGolgesiStatikKaynaklaBaglanmaz()
     {
@@ -388,7 +392,7 @@ public sealed class PaletteApplyTests
             .Sum(dosya => System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(dosya), @"\{DynamicResource Glow(Blue|Pink|Purple)\}").Count);
 
         Assert.True(statik.Count == 0, string.Join("\n", statik));
-        Assert.True(dinamik >= 12, $"dinamik parlama başvurusu {dinamik}");
+        Assert.True(dinamik >= 11, $"dinamik parlama başvurusu {dinamik}");
     }
 
     private static string? PaletteDegeri(string palet, string anahtar)

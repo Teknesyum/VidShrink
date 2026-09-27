@@ -454,7 +454,7 @@
           <Setter Property="RenderTransform" Value="none"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
-          <Setter Property="Background" Value="{StaticResource NeonBlueHover}"/>
+          <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
           <Setter Property="BorderBrush" Value="Transparent"/>
           <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
         </Style>
@@ -465,7 +465,7 @@
           <Setter Property="RenderTransform" Value="none"/>
         </Style>
         <Style Selector="^:pressed /template/ Border#Root">
-          <Setter Property="Background" Value="{StaticResource NeonBlueActive}"/>
+          <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
           <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
       </ControlTheme>
@@ -475,6 +475,12 @@
         <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         <Style Selector="^.selected">
           <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        </Style>
+        <Style Selector="^:pointerover">
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+        </Style>
+        <Style Selector="^:pressed">
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
       </ControlTheme>
 
@@ -500,12 +506,21 @@
 
       <ControlTheme x:Key="TitleBarSupportButton" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
         <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
+        <Style Selector="^:pointerover">
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+        </Style>
+        <Style Selector="^:pressed">
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+        </Style>
       </ControlTheme>
 
       <ControlTheme x:Key="TitleBarLinkButton" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
         <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+        </Style>
+        <Style Selector="^:pressed">
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
       </ControlTheme>
 
@@ -1043,10 +1058,10 @@
           </ControlTemplate>
         </Setter>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
         <Style Selector="^:focus-visible">
-          <Setter Property="Foreground" Value="{StaticResource PinkText}"/>
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#TabIndicator">
           <Setter Property="Opacity" Value="1"/>

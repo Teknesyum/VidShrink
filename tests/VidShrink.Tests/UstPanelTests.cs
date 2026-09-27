@@ -132,6 +132,9 @@ public sealed class UstPanelTests
             .Where(b => Gorunur(b) && b.BorderThickness != default && b.BorderBrush is { } f && !(f is ISolidColorBrush s && s.Color.A == 0) && f.Opacity > 0)
             .Select(b => $"{d.Name ?? d.GetType().Name}/{b.Name} {b.BorderThickness}");
 
+    /// <summary>Hover ve basılı zemin <c>NeonBlueFill</c>, yazı <c>TextBody</c>: <c>NeonBlueHover</c>/<c>NeonBlueActive</c>
+    /// üstünde NeonBlue ve PinkText 36 paletin hepsinde 7:1'in altına düşüyordu (main 36334690557); NeonBlueFill üstünde de
+    /// PinkText 13 palette, NeonBlue Teknesyum'da (6,61) kalıyor. TextBody dolgu üstünde 36 palette geçiyor.</summary>
     [Fact]
     public void BaslikDugmeleriAnahatsizHoverZeminle()
     {
@@ -156,6 +159,7 @@ public sealed class UstPanelTests
                 Yenile(window);
                 var kok = Adli<Border>(d, "Root");
                 var z = (kok.Background as ISolidColorBrush)?.Color.ToString() ?? "yok";
+                z += " " + ((d.Foreground as ISolidColorBrush)?.Color.ToString() ?? "yok");
                 var anahat = Anahat(d).ToArray();
                 sinif.Set(sozde, false);
                 Yenile(window);
@@ -171,23 +175,26 @@ public sealed class UstPanelTests
                 markaHover: Zemin(window.BtnGitHub, ":pointerover"),
                 dilHover: Zemin(dil, ":pointerover"),
                 markaBasili: Zemin(window.BtnGitHub, ":pressed"),
+                destekBasili: Zemin(window.BtnSponsor, ":pressed"),
+                dilBasili: Zemin(dil, ":pressed"),
                 kapatHover: Zemin(window.BtnClose, ":pointerover"),
                 kucultHover: Zemin(window.BtnMinimize, ":pointerover"),
-                hover: renk("NeonBlueHover"),
-                basili: renk("NeonBlueActive"),
+                dolgu: renk("NeonBlueFill") + " " + renk("TextBody"),
                 pembe: renk("NeonPinkFill"),
                 mavi: renk("NeonBlue"));
         });
         _cikti.WriteLine($"{sonuc.sayi} parca; kenarli: {string.Join(", ", sonuc.kenarli)}");
-        _cikti.WriteLine($"destek {sonuc.destekHover}, marka {sonuc.markaHover}/{sonuc.markaBasili}, dil {sonuc.dilHover}, kapat {sonuc.kapatHover}, kucult {sonuc.kucultHover}");
+        _cikti.WriteLine($"destek {sonuc.destekHover}/{sonuc.destekBasili}, marka {sonuc.markaHover}/{sonuc.markaBasili}, dil {sonuc.dilHover}/{sonuc.dilBasili}, kapat {sonuc.kapatHover}, kucult {sonuc.kucultHover}");
 
         Assert.True(sonuc.sayi >= 10, $"yalnız {sonuc.sayi} parça bulundu");
         Assert.Empty(sonuc.kenarli);
-        Assert.Equal(sonuc.hover, sonuc.destekHover);
-        Assert.Equal(sonuc.hover, sonuc.markaHover);
-        Assert.Equal(sonuc.hover, sonuc.dilHover);
-        Assert.Equal(sonuc.basili, sonuc.markaBasili);
-        Assert.Equal(sonuc.pembe, sonuc.kapatHover);
-        Assert.Equal(sonuc.mavi, sonuc.kucultHover);
+        Assert.Equal(sonuc.dolgu, sonuc.dilHover);
+        Assert.Equal(sonuc.dolgu, sonuc.dilBasili);
+        Assert.Equal(sonuc.dolgu, sonuc.markaHover);
+        Assert.Equal(sonuc.dolgu, sonuc.markaBasili);
+        Assert.Equal(sonuc.dolgu, sonuc.destekHover);
+        Assert.Equal(sonuc.dolgu, sonuc.destekBasili);
+        Assert.StartsWith(sonuc.pembe + " ", sonuc.kapatHover);
+        Assert.StartsWith(sonuc.mavi + " ", sonuc.kucultHover);
     }
 }

@@ -168,25 +168,40 @@ public sealed class AcilirGirisTests
             {
                 pencere.Tabs.SelectedIndex = 1;
                 Dispatcher.UIThread.RunJobs();
-                pencere.Tabs.SelectedIndex = 5;
-                Dispatcher.UIThread.RunJobs();
                 var ev = pencere.GetVisualDescendants().OfType<TransitioningContentControl>().First(d => d.Name == "SelectedContentHost");
                 List<Avalonia.Controls.Presenters.ContentPresenter> Gorunenler() => ev.GetVisualDescendants().OfType<Avalonia.Controls.Presenters.ContentPresenter>()
                     .Where(s => s.TemplatedParent == ev && s.IsVisible && s.Content is not null)
                     .ToList();
-                var ilk = Gorunenler();
-                var enCok = ilk.Count;
-                var enAz = ilk.Min(s => s.Opacity);
+                var enCok = 0;
+                var enAz = 1.0;
+                var olcuyor = false;
+                var kararan = new HashSet<Avalonia.Controls.Presenters.ContentPresenter>();
+                void Gor()
+                {
+                    var simdi = Gorunenler();
+                    enCok = Math.Max(enCok, simdi.Count);
+                    if (simdi.Count > 0) enAz = Math.Min(enAz, simdi.Min(s => s.Opacity));
+                }
+                void Degisti(Avalonia.Controls.Presenters.ContentPresenter s, AvaloniaPropertyChangedEventArgs _)
+                {
+                    if (!olcuyor || s.TemplatedParent != ev || !s.IsVisible || s.Content is null) return;
+                    if (s.Opacity > 0 && s.Opacity < 1) kararan.Add(s);
+                    enAz = Math.Min(enAz, s.Opacity);
+                }
+                using var saydamlik = Avalonia.Visual.OpacityProperty.Changed.AddClassHandler<Avalonia.Controls.Presenters.ContentPresenter>(Degisti);
+                olcuyor = true;
+                pencere.Tabs.SelectedIndex = 5;
+                Dispatcher.UIThread.RunJobs();
+                Gor();
                 var saat = Stopwatch.StartNew();
                 while (saat.Elapsed.TotalMilliseconds < 400)
                 {
                     using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
                     Dispatcher.UIThread.MainLoop(dilim.Token);
-                    var simdi = Gorunenler();
-                    enCok = Math.Max(enCok, simdi.Count);
-                    if (simdi.Count > 0) enAz = Math.Min(enAz, simdi.Min(s => s.Opacity));
+                    Gor();
                 }
-                return (enCok, enAz);
+                olcuyor = false;
+                return (Math.Max(enCok, kararan.Count), enAz);
             }
             finally { pencere.Close(); }
         });

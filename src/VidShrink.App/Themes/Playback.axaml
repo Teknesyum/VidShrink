@@ -39,7 +39,7 @@
       PlaybackStripPadding     <- TooltipPadding (16,12)
       PlaybackStripMargin      <- SpaceMd (12), rozet kenar boşluğuyla aynı
       PlaybackStripGap         <- SpaceMd (12), şerit içindeki sütun arası
-      PlaybackStripHideDelay   <- MotionSlow (360 ms)
+      PlaybackStripHideDelay   <- ölçü değil: fare çıkınca şerit beklemeden kaybolur (0).
       PlaybackStripShowDelay   <- ölçü değil: şerit beklemeden belirir (T70/K5).
       PlaybackHoverZoneShare   <- SpaceXs / SpaceLg (4/16 = 0,25); oran, piksel değil
       PlaybackTimelineHeight   <- TargetMinSize (24), dokunma hedefi

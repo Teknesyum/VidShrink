@@ -417,6 +417,9 @@ public sealed class OynaticiAracTests
     /// <para>Negatif kontrol iki yönlü: önizleme motoruna ulaşan konum farenin gittiği
     /// yeri izliyor (yanlış konum farklı kare ister), ve arama başarısız olduğunda küçük
     /// resim hiç gösterilmiyor.</para>
+    ///
+    /// <para>Çubuk yüksekliği <c>PlaybackSeekBarHeight</c>'tan okunur; ince şerit isteğiyle
+    /// 40'tan 24'e indi (9ae166d6).</para>
     /// </summary>
     [Fact]
     public void SuruklerkenKucukResimFareyiTakipEder()
@@ -437,7 +440,8 @@ public sealed class OynaticiAracTests
 
             var cubuk = view.FindControl<Panel>("SeekBar")!;
             var genislik = cubuk.Bounds.Width;
-            body.AppendLine($"zaman cubugu genisligi {AracKanit.N(genislik)} px, yuksekligi {AracKanit.N(cubuk.Bounds.Height)} px");
+            var belirtec = (double)view.FindResource("PlaybackSeekBarHeight")!;
+            body.AppendLine($"zaman cubugu genisligi {AracKanit.N(genislik)} px, yuksekligi {AracKanit.N(cubuk.Bounds.Height)} px, belirtec {AracKanit.N(belirtec)} px");
 
             CubukBas(cubuk, genislik * 0.1);
             DenetimSurucu.Pump(view, () => view.ThumbnailWork.IsCompleted, 5);
@@ -482,13 +486,14 @@ public sealed class OynaticiAracTests
 
             view.Close();
             window.Close();
-            return (body.ToString(), genislik, cubuk.Bounds.Height, gorunur, gecikmeler.Count, medyan, p95, artan, istenen, gizlendi, kotuSure, kotuGorunur);
+            return (body.ToString(), genislik, cubuk.Bounds.Height, gorunur, gecikmeler.Count, medyan, p95, artan, istenen, gizlendi, kotuSure, kotuGorunur, belirtec);
         });
 
         AracKanit.Write("surukleme-kucukresim.txt", rapor.Item1);
 
         Assert.True(rapor.genislik > 0, "zaman cubugunun genisligi olculemedi");
-        Assert.Equal(40, rapor.Item3);
+        Assert.Equal(24, rapor.belirtec);
+        Assert.Equal(rapor.belirtec, rapor.Item3);
         Assert.True(rapor.gorunur, "suruklerken kucuk resim gosterilmedi");
         Assert.True(rapor.Item5 >= 5, $"surukleme yolundan yeterli onizleme gelmedi: {rapor.Item5}");
         Assert.True(rapor.artan, "onizleme fareyi takip etmedi");

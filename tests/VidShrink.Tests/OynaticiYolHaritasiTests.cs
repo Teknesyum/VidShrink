@@ -919,11 +919,34 @@ public sealed class OynaticiYolHaritasiTests
         YolKanit.Kapat("p26-yayilarak-acilma.txt");
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct EkranNoktasi
+    {
+        public int X;
+        public int Y;
+    }
+
+    [DllImport("user32.dll", EntryPoint = "GetCursorPos")]
+    private static extern bool ImlecKonumu(out EkranNoktasi nokta);
+
+    /// <summary>
+    /// Pencereyi gerçek imlecin dışına alır. Şerit gecikmesiz kaybolduğu için gerçek imlecin
+    /// pencereye düşürdüğü tek bir <c>WM_MOUSEMOVE</c> (bant dışı y) şeridi ölçümün ortasında
+    /// kapatıyordu; eskiden 360 ms'lik kaybolma elle saatte beklediği için görünmüyordu.
+    /// </summary>
+    private static void ImlectenUzak(Window window)
+    {
+        if (!OperatingSystem.IsWindows() || !ImlecKonumu(out var imlec)) return;
+        window.Position = new PixelPoint(imlec.X + 64, imlec.Y + 64);
+        Dispatcher.UIThread.RunJobs();
+    }
+
     private static (bool Acildi, double Oran, List<(double Ms, double Yayilma, double Sol, double Sag)> Maskeli, bool MaskeKalkti) SeritAcilisi(bool azalt, StringBuilder body)
     {
         HoverZone.MotionReduced = azalt;
         var motor = new YolMotoru();
         var view = Ac(motor, out var window);
+        ImlectenUzak(window);
         var saat = new ElleSaat();
         var serit = view.FindControl<Border>("StripBar")!;
         var yuzey = view.FindControl<Panel>("Surface")!;
@@ -964,10 +987,20 @@ public sealed class OynaticiYolHaritasiTests
         {
             if (e.Property == PlayerView.SeritSpreadProperty) Ornekle();
         }
+        var bandY = yuzey.Bounds.Height - 4;
+        var yabanci = new List<string>();
+        void Kaydir(object? _, PointerEventArgs e)
+        {
+            var y = e.GetPosition(yuzey).Y;
+            if (Math.Abs(y - bandY) > 0.5) yabanci.Add($"{YolKanit.N(saatDuvar.Elapsed.TotalMilliseconds)} ms hareket y {YolKanit.N(y)}");
+        }
+        void Cikti(object? _, PointerEventArgs e) => yabanci.Add($"{YolKanit.N(saatDuvar.Elapsed.TotalMilliseconds)} ms yuzeyden cikis");
         view.PropertyChanged += Yayildi;
-        Hareket(window, view, new Point(fareX, yuzey.Bounds.Height - 4));
+        yuzey.PointerMoved += Kaydir;
+        yuzey.PointerExited += Cikti;
+        Hareket(window, view, new Point(fareX, bandY));
         var oran = view.SeritPointerX / serit.Bounds.Width;
-        Hareket(window, view, new Point(seritSol.X + serit.Bounds.Width * 0.8, yuzey.Bounds.Height - 4));
+        Hareket(window, view, new Point(seritSol.X + serit.Bounds.Width * 0.8, bandY));
         while (saatDuvar.Elapsed.TotalMilliseconds < 400)
         {
             Ornekle();
@@ -975,10 +1008,13 @@ public sealed class OynaticiYolHaritasiTests
             Dispatcher.UIThread.MainLoop(dilim.Token);
         }
         view.PropertyChanged -= Yayildi;
+        yuzey.PointerMoved -= Kaydir;
+        yuzey.PointerExited -= Cikti;
 
         body.AppendLine($"  fare serit uzerinde oran {YolKanit.N(oran)}, serit acik {view.SeritRevealed}, ornek {ornekler.Count}");
         foreach (var o in ornekler.Where((_, i) => i % 8 == 0))
             body.AppendLine($"  {YolKanit.N(o.Ms)} ms: yayilma {YolKanit.N(o.Yayilma)}, maske [{YolKanit.N(o.Sol)} .. {YolKanit.N(o.Sag)}]");
+        body.AppendLine($"  bant disi isaretci olayi {yabanci.Count}{(yabanci.Count > 0 ? ": " + string.Join("; ", yabanci.Take(6)) : "")}");
 
         var maskeli = ornekler.Where(o => !double.IsNaN(o.Sol)).ToList();
         var kalkti = maskeli.Count > 0 && ornekler.Any(o => o.Ms > maskeli[^1].Ms && double.IsNaN(o.Sol) && o.Yayilma >= 1);

@@ -23,7 +23,7 @@ namespace VidShrink.App.Playback;
 /// <para>Serit kendi gorunurluk kuralini yazmiyor. Karsilastirma panelinin serdi ile ayni
 /// <see cref="HoverZone"/> nesnesini ve ayni iki belirteci kullaniyor
 /// (<c>PlaybackStripShowDelay</c> / <c>PlaybackStripHideDelay</c>): fare panonun alt
-/// bandina girince beklemeden belirir, cikinca 360 ms sonra kaybolur. Duraklatilmisken ya
+/// bandina girince beklemeden belirir, cikinca beklemeden kaybolur. Duraklatilmisken ya
 /// da fare seridin uzerindeyken hic kaybolmaz.</para>
 ///
 /// <para>Dugmeler kendi islerini yapmiyor, <see cref="PlayerView.Apply"/> yoluna giriyor:
