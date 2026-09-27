@@ -1,6 +1,10 @@
-﻿using System.Text.Json.Nodes;
+﻿using VidShrink.Core;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using Avalonia.Automation;
+using Avalonia.Controls;
 using VidShrink.App;
+using VidShrink.App.Localization;
 using VidShrink.Core.Share;
 
 namespace VidShrink.Tests;
@@ -289,38 +293,85 @@ public sealed class SettingsTabTests
 }
 
 /// <summary>
-/// Marka yazımı. Büyük harf geçidi her sözcüğü büyütüyor ve "Buy Me A Coffee" yazıyordu;
-/// markanın kendi yazımı "Buy Me a Coffee". Yazım <see cref="LanguageCatalog.Brands"/>'te
-/// sabit, çeviri girdisi değil: Türkçede de aynı kalır.
+/// Başlık şeridinin marka ve destek bağları standardın etiketinden
+/// (<c>teknesyum-ui/avalonia/labels.&lt;dil&gt;.json</c>) okunur, olduğu gibi gösterilir:
+/// başlık kuralından geçmez, çeviri girdisi değildir. tr dışındaki diller en'e düşer.
 /// </summary>
 public sealed class BrandSpellingTests
 {
-    private const string Sponsor = "Buy Me a Coffee";
-
-    [Theory]
-    [InlineData("Buy me a coffee")]
-    [InlineData("Buy Me a Coffee")]
-    [InlineData("BUY ME A COFFEE")]
-    public void TheSponsorBrandKeepsItsOwnSpelling(string written)
+    private static string Etiket(string dil, string anahtar)
     {
-        Assert.Equal(Sponsor, LanguageCatalog.Title(written, "en"));
-        Assert.Equal(Sponsor, LanguageCatalog.Title(written, "tr"));
+        var yol = Path.Combine(TipSources.Root, "teknesyum-ui", "avalonia", $"labels.{(dil == "tr" ? "tr" : "en")}.json");
+        return JsonNode.Parse(File.ReadAllText(yol))![anahtar]!.GetValue<string>();
     }
 
-    /// <summary>Görünen metin ile erişilebilir ad aynı dizge olacak.</summary>
     [Fact]
-    public void TheButtonAndItsAccessibleNameCarryTheSameString()
+    public void BaglarBicimlemedeElleYazilmaz()
     {
         var xaml = File.ReadAllText(TipSources.WindowXamlPath);
 
-        Assert.Contains($"""auto:AutomationProperties.Name="{Sponsor}" """.TrimEnd(), xaml, StringComparison.Ordinal);
-        Assert.Contains($"""<TextBlock x:Name="TxtSponsor" Text="{Sponsor}" """.TrimEnd(), xaml, StringComparison.Ordinal);
-        Assert.DoesNotContain("Buy me a coffee", xaml, StringComparison.Ordinal);
-        Assert.DoesNotContain("Buy Me A Coffee", xaml, StringComparison.Ordinal);
+        Assert.Contains("""<TextBlock x:Name="TxtSponsor" Text="{loc:Etiket sig.support}" """.TrimEnd(), xaml, StringComparison.Ordinal);
+        Assert.Contains("""<TextBlock x:Name="TxtGitHub" Text="{loc:Etiket sig.brand}" """.TrimEnd(), xaml, StringComparison.Ordinal);
+        Assert.Contains("""auto:AutomationProperties.Name="{loc:Etiket sig.support}" ToolTip.Tip="{loc:Etiket sig.supportTitle}" """.TrimEnd(), xaml, StringComparison.Ordinal);
+        Assert.Contains("""auto:AutomationProperties.Name="{loc:Etiket sig.brand}" ToolTip.Tip="{loc:Etiket sig.brandTitle}" """.TrimEnd(), xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("Buy me a coffee", xaml, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Text=\"Teknesyum\"", xaml, StringComparison.Ordinal);
     }
 
-    /// <summary>Marka çevrilmez: sözlükte girdisi olmayacak.</summary>
+    [Theory]
+    [InlineData("tr")]
+    [InlineData("en")]
+    [InlineData("de")]
+    public void EkrandakiMetinEtiketDosyasininKendisidir(string dil)
+    {
+        var okunan = AppHost.Run(() =>
+        {
+            Strings.Use(dil);
+            var window = new MainWindow();
+            try
+            {
+                window.SetUpdateBadge(UpdateBadgeState.NewVersion);
+                var rozet = window.TxtUpdateBadge.Text;
+                var rozetIpucu = ToolTip.GetTip(window.BtnUpdateBadge) as string;
+                window.SetUpdateBadge(UpdateBadgeState.Offline);
+                return (Destek: window.TxtSponsor.Text, DestekAdi: AutomationProperties.GetName(window.BtnSponsor),
+                    DestekIpucu: ToolTip.GetTip(window.BtnSponsor) as string,
+                    Marka: window.TxtGitHub.Text, MarkaAdi: AutomationProperties.GetName(window.BtnGitHub),
+                    MarkaIpucu: ToolTip.GetTip(window.BtnGitHub) as string,
+                    Rozet: rozet, RozetIpucu: rozetIpucu, Cevrimdisi: window.TxtUpdateBadge.Text);
+            }
+            finally
+            {
+                window.Close();
+                Strings.Use("en");
+            }
+        });
+
+        Assert.Equal(Etiket(dil, "sig.support"), okunan.Destek);
+        Assert.Equal(Etiket(dil, "sig.support"), okunan.DestekAdi);
+        Assert.Equal(Etiket(dil, "sig.supportTitle"), okunan.DestekIpucu);
+        Assert.Equal(Etiket(dil, "sig.brand"), okunan.Marka);
+        Assert.Equal(Etiket(dil, "sig.brand"), okunan.MarkaAdi);
+        Assert.Equal(Etiket(dil, "sig.brandTitle"), okunan.MarkaIpucu);
+
+        if (dil is "tr" or "en")
+        {
+            Assert.Equal(Etiket(dil, "update.label"), okunan.Rozet);
+            Assert.Equal(Etiket(dil, "update.download"), okunan.RozetIpucu);
+            Assert.Matches("^" + Regex.Escape(Etiket(dil, "sync.offline")) + "( · .+)?$", okunan.Cevrimdisi);
+        }
+        else
+        {
+            Assert.NotEqual(Etiket(dil, "update.download"), okunan.RozetIpucu);
+            Assert.Equal(okunan.Rozet, okunan.RozetIpucu);
+        }
+    }
+
     [Fact]
-    public void TheBrandIsNotATranslationEntry()
-        => Assert.DoesNotContain(Sponsor, Locales.Values("en").Values);
+    public void EtiketBaslikKuralindanVeSozluktenGecmez()
+    {
+        Assert.DoesNotContain(Etiket("en", "sig.support"), LanguageCatalog.Brands.Keys, StringComparer.OrdinalIgnoreCase);
+        Assert.DoesNotContain(Etiket("en", "sig.support"), Locales.Values("en").Values);
+        Assert.DoesNotContain(Etiket("tr", "sig.support"), Locales.Values("tr").Values);
+    }
 }

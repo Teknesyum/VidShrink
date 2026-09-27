@@ -367,6 +367,10 @@ public sealed class LocalizationTests : IDisposable
         Assert.Equal(
             new[]
             {
+                "VidShrink.App.Localization.EtiketExtension::.ctor",
+                "VidShrink.App.Localization.EtiketMetni::.ctor",
+                "VidShrink.App.Localization.EtiketMetni::For",
+                "VidShrink.App.Localization.Etiketler::Get",
                 "VidShrink.App.Localization.LocalizedText::.ctor",
                 "VidShrink.App.Localization.LocalizedText::For",
                 "VidShrink.App.Localization.Strings::Get",

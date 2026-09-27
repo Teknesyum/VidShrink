@@ -1226,7 +1226,7 @@ public sealed class YerlesimDenetimiTests
     /// </summary>
     internal static string? KucukSozcuk(string metin, string dil)
     {
-        if (LanguageCatalog.Brands.ContainsKey(metin)) return null;
+        if (LanguageCatalog.Brands.ContainsKey(metin) || VidShrink.App.Localization.Etiketler.Tablo(dil == "tr" ? "tr" : "en").Values.Contains(metin)) return null;
         for (var i = 0; i < metin.Length; i++)
             if (metin[i] is '.' or ';' or '!' or '?' && (i + 1 == metin.Length || char.IsWhiteSpace(metin[i + 1])))
                 return null;

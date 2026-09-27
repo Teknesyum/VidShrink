@@ -593,7 +593,7 @@ public static class Program
         while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "VidShrink.sln")))
             dir = dir.Parent;
         if (dir is null) throw new InvalidOperationException("Repo koku bulunamadi (VidShrink.sln).");
-        return Path.Combine(dir.FullName, "src", "VidShrink.App", "Fonts", "AtkinsonHyperlegibleNext-Regular.ttf");
+        return Path.Combine(dir.FullName, "src", "VidShrink.App", "Assets", "Fonts", "AtkinsonHyperlegibleNext-Regular.ttf");
     }
 
     private static void WaitUntil(Func<bool> cond, int timeoutMs)

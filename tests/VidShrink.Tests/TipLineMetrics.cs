@@ -81,7 +81,7 @@ internal static class TipLineMetrics
         var horizontalPadding = double.Parse(
             tokens["TooltipPadding"].Split(',')[0], CultureInfo.InvariantCulture);
 
-        var border = double.Parse(tokens["BorderThin"], CultureInfo.InvariantCulture);
+        var border = double.Parse(ThemeSources.Token("BorderThin"), CultureInfo.InvariantCulture);
 
         return maxWidth - (2 * horizontalPadding) - (2 * border);
     }
@@ -109,7 +109,7 @@ internal static class TipLineMetrics
         AppHost.Ensure();
 
         return new Typeface(new FontFamily(
-            "avares://VidShrink.App/Fonts#Atkinson Hyperlegible Next"));
+            "avares://VidShrink.App/Assets/Fonts#Atkinson Hyperlegible Next"));
     }
 
     /// <summary>

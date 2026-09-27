@@ -336,7 +336,7 @@
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Padding" Value="{StaticResource ButtonPadding}"/>
-        <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
+        <Setter Property="MinHeight" Value="{StaticResource ButtonHeight}"/>
         <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
@@ -408,7 +408,7 @@
 
       <!-- Readable pink for text. The fill pink measures 4.57:1 on the surface and misses the
            floor; this one measures 7.72:1, so coloured words use it and fills keep NeonPink. -->
-      <SolidColorBrush x:Key="PinkText" Color="{StaticResource PinkTextColor}"/>
+      <SolidColorBrush x:Key="PinkText" Color="{StaticResource Renk2TextColor}"/>
 
       <ControlTheme x:Key="ChipButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
         <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
@@ -1523,12 +1523,7 @@
         </Style>
       </ControlTheme>
 
-      <ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
-        <Setter Property="Background" Value="{StaticResource Surface}"/>
-        <Style Selector="^:vertical">
-          <Setter Property="Width" Value="{StaticResource ScrollBarThickness}"/>
-          <Setter Property="Template">
-            <ControlTemplate TargetType="ScrollBar">
+      <ControlTemplate x:Key="ScrollBarVerticalTemplate" TargetType="ScrollBar">
               <Border Background="{TemplateBinding Background}" CornerRadius="{StaticResource RadiusCell}">
                 <Track Name="PART_Track"
                        Minimum="{TemplateBinding Minimum}"
@@ -1549,12 +1544,8 @@
                 </Track>
               </Border>
             </ControlTemplate>
-          </Setter>
-        </Style>
-        <Style Selector="^:horizontal">
-          <Setter Property="Height" Value="{StaticResource ScrollBarThickness}"/>
-          <Setter Property="Template">
-            <ControlTemplate TargetType="ScrollBar">
+
+      <ControlTemplate x:Key="ScrollBarHorizontalTemplate" TargetType="ScrollBar">
               <Border Background="{TemplateBinding Background}" CornerRadius="{StaticResource RadiusCell}">
                 <Track Name="PART_Track"
                        Minimum="{TemplateBinding Minimum}"
@@ -1574,7 +1565,16 @@
                 </Track>
               </Border>
             </ControlTemplate>
-          </Setter>
+
+      <ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
+        <Setter Property="Background" Value="{StaticResource Surface}"/>
+        <Style Selector="^:vertical">
+          <Setter Property="Width" Value="{StaticResource ScrollBarThickness}"/>
+          <Setter Property="Template" Value="{StaticResource ScrollBarVerticalTemplate}"/>
+        </Style>
+        <Style Selector="^:horizontal">
+          <Setter Property="Height" Value="{StaticResource ScrollBarThickness}"/>
+          <Setter Property="Template" Value="{StaticResource ScrollBarHorizontalTemplate}"/>
         </Style>
       </ControlTheme>
 
@@ -1650,4 +1650,27 @@
 
     </ResourceDictionary>
   </Styles.Resources>
+
+  <Style Selector=":is(Window) /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{x:Null}"/>
+    <Setter Property="BorderBrush" Value="{x:Null}"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="CornerRadius" Value="0"/>
+  </Style>
+
+  <Style Selector="MenuFlyoutPresenter, ContextMenu">
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
+  </Style>
+
+  <Style Selector="ScrollBar">
+    <Setter Property="Background" Value="{StaticResource Surface}"/>
+  </Style>
+  <Style Selector="ScrollBar:vertical">
+    <Setter Property="Width" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="Template" Value="{StaticResource ScrollBarVerticalTemplate}"/>
+  </Style>
+  <Style Selector="ScrollBar:horizontal">
+    <Setter Property="Height" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="Template" Value="{StaticResource ScrollBarHorizontalTemplate}"/>
+  </Style>
 </Styles>

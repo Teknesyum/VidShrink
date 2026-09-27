@@ -164,7 +164,8 @@ public sealed class PaletteApplyTests
                     {
                         Source = new Uri($"avares://VidShrink.App/Themes/Palette/{name}/Theme.axaml")
                     }.Loaded;
-                    foreach (var key in sozluk.Keys.OfType<string>().Where(k => k.EndsWith("Color", StringComparison.Ordinal)))
+                    var takmaAdlar = VidShrink.PaletteGen.PaletteBuilder.RoleAliases.Select(a => a.Role).ToHashSet(StringComparer.Ordinal);
+                    foreach (var key in sozluk.Keys.OfType<string>().Where(k => k.EndsWith("Color", StringComparison.Ordinal) && !takmaAdlar.Contains(k)))
                     {
                         if (!sozluk.TryGetValue(key, out var deger) || deger is not Color beklenen) continue;
                         if (Resource(key[..^"Color".Length]) is not SolidColorBrush firca) continue;

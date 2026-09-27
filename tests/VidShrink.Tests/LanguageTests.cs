@@ -91,7 +91,7 @@ public sealed class LanguageTests : IDisposable
     /// </summary>
     private static readonly string[] XamlNamesThatStayAsWritten =
     {
-        "Vid", "Shrink", "Buy Me a Coffee", "Teknesyum",
+        "Vid", "Shrink",
         "MB", "CRF", "1280x720",
         "MP4", "MKV", "WebM", "MOV", "AVI", "GIF", "MP3", "M4A", "WAV", "FLAC",
         "H.264", "H.265", "VP9", "AV1", "AAC", "Opus", "PCM"
@@ -220,7 +220,7 @@ public sealed class LanguageTests : IDisposable
         "NeonPurpleBorderColor", "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor", "AtmosHotColor", "AtmosMidColor", "AtmosEdgeColor",
         "EmberDeepColor", "EmberMidColor", "EmberEdgeColor",
         "EmberBarDeepColor", "EmberBarMidColor", "EmberBarEdgeColor",
-        "FontSans", "FontMono",
+        "FontMono",
         "GlowBlue", "GlowPink", "GlowPurple",
         "LinkGitHub", "LinkRepo", "LinkSponsor", "AppIconUri",
         "PlaybackMaximizeIcon", "PlaybackFullScreenIcon",
@@ -289,7 +289,6 @@ public sealed class LanguageTests : IDisposable
     /// </summary>
     private static readonly string[] CodeNamesThatStayInCode =
     {
-        "Buy me a coffee", "Buy Me a Coffee",
         "Dolby Digital (AC-3)", "Dolby Digital Plus (E-AC-3)",
         "Windows ARM64", "macOS Apple Silicon (arm64)", "macOS Intel (x64)", "Linux ARM64",
         "GIF palette", "GIF encode",

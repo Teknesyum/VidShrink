@@ -437,7 +437,7 @@ public sealed class ThemeBackdropTests
     /// <summary>
     /// K3: panel zemini artik donuk degil. Saydamlik bir opaklik belirtecinden geliyor,
     /// <c>Panel</c> temasi o belirteci tasiyan fircayi okuyor ve palete renk eklenmedi:
-    /// fircanin rengi mevcut <c>SurfaceToneColor</c>.
+    /// fircanin rengi mevcut <c>SurfaceColor</c> (paletin <c>SurfaceToneColor</c> takma adi).
     /// </summary>
     [Fact]
     public void ThePanelBackgroundIsDrivenByAnOpacityToken()
@@ -446,7 +446,7 @@ public sealed class ThemeBackdropTests
 
         var brush = Resource("PanelSurface");
         Assert.Equal("SolidColorBrush", brush.Name.LocalName);
-        Assert.Equal("{StaticResource SurfaceToneColor}", ((string)brush.Attribute("Color")!).Trim());
+        Assert.Equal("{StaticResource SurfaceColor}", ((string)brush.Attribute("Color")!).Trim());
         Assert.Equal("{StaticResource PanelSurfaceOpacity}", ((string)brush.Attribute("Opacity")!).Trim());
 
         Assert.InRange(PanelOpacity(), 0.75, 1.0);

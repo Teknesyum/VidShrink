@@ -2768,6 +2768,13 @@ public partial class MainWindow : Window
             UpdateBadgeState.Installing => "main.update.starting",
             _ => "main.update.offline"
         });
+        var etiket = state switch
+        {
+            UpdateBadgeState.NewVersion or UpdateBadgeState.Downloading or UpdateBadgeState.Ready => "update.label",
+            UpdateBadgeState.Offline => "sync.offline",
+            _ => null
+        };
+        if (etiket is not null && Etiketler.Kapsar(Strings.Language)) govde = Etiketler.Get(etiket);
 
         var firca = state switch
         {
@@ -2789,7 +2796,12 @@ public partial class MainWindow : Window
                 TxtUpdateBadge.Foreground = brush;
             else TxtUpdateBadge.ClearValue(TextBlock.ForegroundProperty);
         }
-        ToolTip.SetTip(BtnUpdateBadge, state is UpdateBadgeState.Ready ? HazirIpucu() : TxtUpdateBadge.Text);
+        ToolTip.SetTip(BtnUpdateBadge, state switch
+        {
+            UpdateBadgeState.Ready => HazirIpucu(),
+            UpdateBadgeState.NewVersion when Etiketler.Kapsar(Strings.Language) => Etiketler.Get("update.download"),
+            _ => TxtUpdateBadge.Text
+        });
         AutomationProperties.SetName(BtnUpdateBadge, TxtUpdateBadge.Text);
         BtnUpdateBadge.IsVisible = true;
         RefreshUpdateNoticeButton();

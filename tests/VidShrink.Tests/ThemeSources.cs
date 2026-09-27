@@ -58,8 +58,30 @@ internal static class ThemeSources
         .Where(file => !string.Equals(Path.GetFileName(file), "App.axaml", StringComparison.OrdinalIgnoreCase))
         .SelectMany(file => XDocument.Load(file).Root!.Elements());
 
-    internal static XElement Resource(string key, string? palette = null) => Resources(palette)
-        .Single(element => (string?)element.Attribute(X + "Key") == key);
+    /// <summary>
+    /// Standardın üretilmiş teması: <c>teknesyum-ui/avalonia/Theme.axaml</c>. Projeye bağlıdır,
+    /// kopyalanmaz; projede tanımı olmayan belirteç buradan çözülür.
+    /// </summary>
+    internal static readonly string GeneratedPath =
+        Path.Combine(TipSources.Root, "teknesyum-ui", "avalonia", "Theme.axaml");
+
+    private static readonly XNamespace Avalonia = "https://github.com/avaloniaui";
+
+    internal static IEnumerable<XElement> GeneratedResources()
+        => XDocument.Load(GeneratedPath).Root!.Element(Avalonia + "Styles.Resources")!.Elements();
+
+    /// <summary>
+    /// Anahtarın tanımı. <c>&lt;StaticResource ResourceKey&gt;</c> takma adı izlenir; projede
+    /// yoksa üretilmiş temaya bakılır.
+    /// </summary>
+    internal static XElement Resource(string key, string? palette = null)
+    {
+        var own = Resources(palette).SingleOrDefault(element => (string?)element.Attribute(X + "Key") == key)
+                  ?? GeneratedResources().Single(element => (string?)element.Attribute(X + "Key") == key);
+        return own.Name.LocalName == "StaticResource" && (string?)own.Attribute("ResourceKey") is { } target
+            ? Resource(target, palette)
+            : own;
+    }
 
     internal static string Token(string key, string? palette = null) => Resource(key, palette).Value.Trim();
 }

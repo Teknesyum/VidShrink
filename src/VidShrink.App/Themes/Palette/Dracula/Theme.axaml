@@ -46,4 +46,26 @@
   <BoxShadows x:Key="GlowPurple">0 0 20 0 #40BD93F9</BoxShadows>
   <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
 
+  <!-- Standardın rol adları. Themes/Theme.axaml fırçaları bu adlara bağlanır;
+       değer yukarıdaki tek anahtardan gelir, ikinci bir renk yazılmaz. -->
+  <StaticResource x:Key="Renk1Color" ResourceKey="NeonBlueColor"/>
+  <StaticResource x:Key="Renk2Color" ResourceKey="NeonPinkColor"/>
+  <StaticResource x:Key="Renk3Color" ResourceKey="NeonPurpleColor"/>
+  <StaticResource x:Key="Renk2TextColor" ResourceKey="PinkTextColor"/>
+  <StaticResource x:Key="SuccessColor" ResourceKey="NeonSuccessColor"/>
+  <StaticResource x:Key="SurfaceColor" ResourceKey="SurfaceToneColor"/>
+  <StaticResource x:Key="DisabledColor" ResourceKey="TextDisabledColor"/>
+  <StaticResource x:Key="OnRenk1Color" ResourceKey="OnNeonColor"/>
+  <StaticResource x:Key="OnRenk2Color" ResourceKey="OnNeonColor"/>
+  <StaticResource x:Key="OnRenk3Color" ResourceKey="OnNeonColor"/>
+  <StaticResource x:Key="Renk1x10Color" ResourceKey="NeonBlueFillColor"/>
+  <StaticResource x:Key="Renk1x20Color" ResourceKey="NeonBlueHoverColor"/>
+  <StaticResource x:Key="Renk1x30Color" ResourceKey="NeonBlueActiveColor"/>
+  <StaticResource x:Key="Renk2x10Color" ResourceKey="NeonPinkFillColor"/>
+  <StaticResource x:Key="Renk3x50Color" ResourceKey="NeonPurpleBorderColor"/>
+  <StaticResource x:Key="BorderDefaultColor" ResourceKey="NeonBlueBorderColor"/>
+  <StaticResource x:Key="BorderStrongColor" ResourceKey="NeonBlueBorderStrongColor"/>
+  <StaticResource x:Key="DangerColor" ResourceKey="NeonEmberColor"/>
+  <StaticResource x:Key="WarningColor" ResourceKey="EmberBlazeColor"/>
+
 </ResourceDictionary>

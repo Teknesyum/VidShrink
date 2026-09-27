@@ -312,7 +312,7 @@ public sealed class SettingsTests
         var balloon = ThemeNumber(theme, "TooltipMaxWidth");
         var padding = double.Parse(
             ThemeText(theme, "TooltipPadding").Split(',')[0], CultureInfo.InvariantCulture);
-        var border = ThemeNumber(theme, "BorderThin");
+        var border = double.Parse(ThemeSources.Token("BorderThin"), CultureInfo.InvariantCulture);
 
         Assert.Equal(balloon, TipLineMetrics.Balloon);
         Assert.Equal(balloon - (2 * padding) - (2 * border), TipLineMetrics.Ceiling);

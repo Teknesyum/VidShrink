@@ -242,7 +242,7 @@
                           <Path.Effect>
                             <DropShadowEffect OffsetX="0" OffsetY="0"
                                               BlurRadius="{StaticResource DropIconGlowRadius}"
-                                              Color="{StaticResource NeonBlueColor}"/>
+                                              Color="{StaticResource Renk1Color}"/>
                           </Path.Effect>
                           <Path.Transitions>
                             <Transitions>
@@ -1728,18 +1728,18 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource WindowButtonMargin}">
               <StackPanel x:Name="LangSwitch" Orientation="Horizontal"/>
             </StackPanel>
-            <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
+            <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="{loc:Etiket sig.support}" ToolTip.Tip="{loc:Etiket sig.supportTitle}" Click="OnOpenSponsor">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
                       Data="{StaticResource IconCoffee}" Fill="{Binding $parent[Button].Foreground}"/>
-                <TextBlock x:Name="TxtSponsor" Text="Buy Me a Coffee" VerticalAlignment="Center"/>
+                <TextBlock x:Name="TxtSponsor" Text="{loc:Etiket sig.support}" VerticalAlignment="Center"/>
               </StackPanel>
             </Button>
-            <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="Teknesyum" Click="OnOpenGitHub">
+            <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="{loc:Etiket sig.brand}" ToolTip.Tip="{loc:Etiket sig.brandTitle}" Click="OnOpenGitHub">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
                       Data="{StaticResource IconCode}" Fill="{Binding $parent[Button].Foreground}"/>
-                <TextBlock x:Name="TxtGitHub" Text="Teknesyum" VerticalAlignment="Center"/>
+                <TextBlock x:Name="TxtGitHub" Text="{loc:Etiket sig.brand}" VerticalAlignment="Center"/>
               </StackPanel>
             </Button>
             <!--

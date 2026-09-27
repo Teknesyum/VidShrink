@@ -2,32 +2,32 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="using:System">
 
-  <SolidColorBrush x:Key="NeonBlue" Color="{StaticResource NeonBlueColor}"/>
-  <SolidColorBrush x:Key="NeonPink" Color="{StaticResource NeonPinkColor}"/>
-  <SolidColorBrush x:Key="NeonPurple" Color="{StaticResource NeonPurpleColor}"/>
-  <SolidColorBrush x:Key="NeonSuccess" Color="{StaticResource NeonSuccessColor}"/>
-  <SolidColorBrush x:Key="Surface" Color="{StaticResource SurfaceToneColor}"/>
+  <SolidColorBrush x:Key="NeonBlue" Color="{StaticResource Renk1Color}"/>
+  <SolidColorBrush x:Key="NeonPink" Color="{StaticResource Renk2Color}"/>
+  <SolidColorBrush x:Key="NeonPurple" Color="{StaticResource Renk3Color}"/>
+  <SolidColorBrush x:Key="NeonSuccess" Color="{StaticResource SuccessColor}"/>
+  <SolidColorBrush x:Key="Surface" Color="{StaticResource SurfaceColor}"/>
   <SolidColorBrush x:Key="AppBg" Color="{StaticResource AppBgColor}"/>
   <SolidColorBrush x:Key="TextBody" Color="{StaticResource TextBodyColor}"/>
-  <SolidColorBrush x:Key="TextDisabled" Color="{StaticResource TextDisabledColor}"/>
+  <SolidColorBrush x:Key="TextDisabled" Color="{StaticResource DisabledColor}"/>
   <x:Double x:Key="BorderDecorativeOpacity">0.3</x:Double>
   <SolidColorBrush x:Key="HeaderRestBorder"
-                   Color="{StaticResource TextDisabledColor}"
+                   Color="{StaticResource DisabledColor}"
                    Opacity="{StaticResource BorderDecorativeOpacity}"/>
 
-  <SolidColorBrush x:Key="NeonBlueFill" Color="{StaticResource NeonBlueFillColor}"/>
-  <SolidColorBrush x:Key="NeonBlueHover" Color="{StaticResource NeonBlueHoverColor}"/>
-  <SolidColorBrush x:Key="NeonBlueActive" Color="{StaticResource NeonBlueActiveColor}"/>
-  <SolidColorBrush x:Key="NeonBlueBorder" Color="{StaticResource NeonBlueBorderColor}"/>
-  <SolidColorBrush x:Key="NeonBlueBorderStrong" Color="{StaticResource NeonBlueBorderStrongColor}"/>
-  <SolidColorBrush x:Key="NeonPinkFill" Color="{StaticResource NeonPinkFillColor}"/>
-  <SolidColorBrush x:Key="NeonPurpleBorder" Color="{StaticResource NeonPurpleBorderColor}"/>
-  <SolidColorBrush x:Key="OnNeon" Color="{StaticResource OnNeonColor}"/>
-  <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource NeonEmberColor}"/>
-  <SolidColorBrush x:Key="EmberBlaze" Color="{StaticResource EmberBlazeColor}"/>
+  <SolidColorBrush x:Key="NeonBlueFill" Color="{StaticResource Renk1x10Color}"/>
+  <SolidColorBrush x:Key="NeonBlueHover" Color="{StaticResource Renk1x20Color}"/>
+  <SolidColorBrush x:Key="NeonBlueActive" Color="{StaticResource Renk1x30Color}"/>
+  <SolidColorBrush x:Key="NeonBlueBorder" Color="{StaticResource BorderDefaultColor}"/>
+  <SolidColorBrush x:Key="NeonBlueBorderStrong" Color="{StaticResource BorderStrongColor}"/>
+  <SolidColorBrush x:Key="NeonPinkFill" Color="{StaticResource Renk2x10Color}"/>
+  <SolidColorBrush x:Key="NeonPurpleBorder" Color="{StaticResource Renk3x50Color}"/>
+  <SolidColorBrush x:Key="OnNeon" Color="{StaticResource OnRenk1Color}"/>
+  <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource DangerColor}"/>
+  <SolidColorBrush x:Key="EmberBlaze" Color="{StaticResource WarningColor}"/>
   <LinearGradientBrush x:Key="AccentGradient" StartPoint="0%,50%" EndPoint="100%,50%">
-    <GradientStop Color="{StaticResource NeonBlueColor}" Offset="0"/>
-    <GradientStop Color="{StaticResource NeonPurpleColor}" Offset="1"/>
+    <GradientStop Color="{StaticResource Renk1Color}" Offset="0"/>
+    <GradientStop Color="{StaticResource Renk3Color}" Offset="1"/>
   </LinearGradientBrush>
 
   <x:Double x:Key="PhoenixOpacity">0.08</x:Double>
@@ -43,7 +43,7 @@
   <x:Double x:Key="PauseGlyphOpacity">0.5</x:Double>
 
   <SolidColorBrush x:Key="PanelSurface"
-                   Color="{StaticResource SurfaceToneColor}"
+                   Color="{StaticResource SurfaceColor}"
                    Opacity="{StaticResource PanelSurfaceOpacity}"/>
   <RadialGradientBrush x:Key="PhoenixGlowInner" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="{StaticResource PhoenixGlowInnerOpacity}">
     <GradientStop Color="{StaticResource AtmosHotColor}" Offset="0"/>
@@ -195,29 +195,26 @@
     </DrawingBrush.Drawing>
   </DrawingBrush>
 
-  <FontFamily x:Key="FontSans">avares://VidShrink.App/Fonts#Atkinson Hyperlegible Next</FontFamily>
   <FontFamily x:Key="FontMono">Consolas,Cascadia Mono,Menlo,DejaVu Sans Mono,Liberation Mono,Courier New</FontFamily>
 
-  <x:Double x:Key="FontSizeSm">14</x:Double>
-  <x:Double x:Key="FontSizeMd">16</x:Double>
-  <x:Double x:Key="FontSizeLg">20</x:Double>
-  <x:Double x:Key="FontSizeHero">28</x:Double>
+  <StaticResource x:Key="FontSizeSm" ResourceKey="FontSize1"/>
+  <StaticResource x:Key="FontSizeMd" ResourceKey="FontSize2"/>
+  <StaticResource x:Key="FontSizeLg" ResourceKey="FontSize3"/>
+  <StaticResource x:Key="FontSizeHero" ResourceKey="FontSize5"/>
 
-  <x:Double x:Key="TrackingLg">2</x:Double>
-  <x:Double x:Key="TrackingMd">1.6</x:Double>
-  <x:Double x:Key="TrackingLabel">2.1</x:Double>
-  <x:Double x:Key="LineHeightBody">24</x:Double>
+  <x:Double x:Key="TrackingLg">0</x:Double>
+  <x:Double x:Key="TrackingMd">0.32</x:Double>
+  <x:Double x:Key="TrackingLabel">1.12</x:Double>
+  <x:Double x:Key="LineHeightBody">25.6</x:Double>
   <x:Double x:Key="TipMaxWidth">420</x:Double>
 
-  <x:Double x:Key="SpaceXs">4</x:Double>
-  <x:Double x:Key="SpaceSm">8</x:Double>
-  <x:Double x:Key="SpaceMd">12</x:Double>
-  <x:Double x:Key="SpaceLg">16</x:Double>
-  <x:Double x:Key="SpaceXl">24</x:Double>
+  <StaticResource x:Key="SpaceXs" ResourceKey="Space1"/>
+  <StaticResource x:Key="SpaceSm" ResourceKey="Space2"/>
+  <StaticResource x:Key="SpaceMd" ResourceKey="Space3"/>
+  <StaticResource x:Key="SpaceLg" ResourceKey="Space4"/>
+  <StaticResource x:Key="SpaceXl" ResourceKey="Space5"/>
 
-  <Thickness x:Key="PanelPadding">24</Thickness>
   <Thickness x:Key="DropZonePadding">12</Thickness>
-  <Thickness x:Key="ButtonPadding">24,12</Thickness>
   <Thickness x:Key="ButtonPaddingSm">16,8</Thickness>
   <Thickness x:Key="ChipPadding">12,4</Thickness>
   <Thickness x:Key="ChipRemovePadding">6,0</Thickness>
@@ -238,41 +235,41 @@
   <Thickness x:Key="SectionMargin">0,16,0,0</Thickness>
   <Thickness x:Key="PageMargin">0,16,12,0</Thickness>
   <Thickness x:Key="RowMargin">0,12,0,0</Thickness>
-  <Thickness x:Key="BorderThin">1</Thickness>
+  <StaticResource x:Key="BorderThin" ResourceKey="BorderWidth"/>
   <Thickness x:Key="BorderStrong">2</Thickness>
   <x:Double x:Key="BorderThinScalar">1</x:Double>
   <Thickness x:Key="FocusRingThickness">2</Thickness>
-  <x:Double x:Key="FocusRingScalar">2</x:Double>
+  <StaticResource x:Key="FocusRingScalar" ResourceKey="FocusWidth"/>
   <Thickness x:Key="PopupPadding">4</Thickness>
 
-  <CornerRadius x:Key="RadiusSquare">3</CornerRadius>
-  <CornerRadius x:Key="RadiusChip">6</CornerRadius>
-  <CornerRadius x:Key="RadiusCell">8</CornerRadius>
-  <CornerRadius x:Key="SliderFilledTrackRadius">8,0,0,8</CornerRadius>
-  <CornerRadius x:Key="SliderEmptyTrackRadius">0,8,8,0</CornerRadius>
-  <CornerRadius x:Key="RadiusControl">12</CornerRadius>
-  <CornerRadius x:Key="RadiusPanel">16</CornerRadius>
-  <x:Double x:Key="RadiusPanelScalar">16</x:Double>
+  <StaticResource x:Key="RadiusSquare" ResourceKey="Radius"/>
+  <StaticResource x:Key="RadiusChip" ResourceKey="Radius"/>
+  <StaticResource x:Key="RadiusCell" ResourceKey="Radius"/>
+  <CornerRadius x:Key="SliderFilledTrackRadius">3,0,0,3</CornerRadius>
+  <CornerRadius x:Key="SliderEmptyTrackRadius">0,3,3,0</CornerRadius>
+  <StaticResource x:Key="RadiusControl" ResourceKey="Radius"/>
+  <StaticResource x:Key="RadiusPanel" ResourceKey="WindowRadius"/>
+  <x:Double x:Key="RadiusPanelScalar">3</x:Double>
 
-  <sys:TimeSpan x:Key="MotionInstant">00:00:00.0900000</sys:TimeSpan>
-  <sys:TimeSpan x:Key="MotionFast">00:00:00.1600000</sys:TimeSpan>
-  <sys:TimeSpan x:Key="MotionBase">00:00:00.2400000</sys:TimeSpan>
-  <sys:TimeSpan x:Key="MotionSlow">00:00:00.3600000</sys:TimeSpan>
+  <StaticResource x:Key="MotionInstant" ResourceKey="TInstant"/>
+  <StaticResource x:Key="MotionFast" ResourceKey="TFast"/>
+  <StaticResource x:Key="MotionBase" ResourceKey="TBase"/>
+  <StaticResource x:Key="MotionSlow" ResourceKey="TSlow"/>
   <sys:TimeSpan x:Key="PauseGlyphHold">00:00:00.5000000</sys:TimeSpan>
   <x:Double x:Key="MotionStaggerMs">40</x:Double>
   <x:Int32 x:Key="MotionStaggerCount">6</x:Int32>
 
-  <x:Double x:Key="TargetMinSize">24</x:Double>
+  <StaticResource x:Key="TargetMinSize" ResourceKey="TargetMin"/>
   <x:Double x:Key="InfoBadgeSize">18</x:Double>
-  <x:Double x:Key="FieldMinHeight">40</x:Double>
+  <StaticResource x:Key="FieldMinHeight" ResourceKey="InputHeight"/>
   <x:Double x:Key="WindowButtonWidth">42</x:Double>
-  <x:Double x:Key="WindowButtonHeight">30</x:Double>
+  <StaticResource x:Key="WindowButtonHeight" ResourceKey="TitleBarHeightMax"/>
   <x:Double x:Key="ScrollBarThickness">10</x:Double>
   <x:Double x:Key="CheckGlyphSize">20</x:Double>
   <x:Double x:Key="RadioDotSize">10</x:Double>
-  <x:Double x:Key="IconSizeSm">16</x:Double>
-  <x:Double x:Key="BadgeDotSize">8</x:Double>
-  <x:Double x:Key="IconSizeMd">20</x:Double>
+  <StaticResource x:Key="IconSizeSm" ResourceKey="IconSize2"/>
+  <StaticResource x:Key="BadgeDotSize" ResourceKey="Space2"/>
+  <StaticResource x:Key="IconSizeMd" ResourceKey="IconSize3"/>
   <x:Double x:Key="IconSizeLg">24</x:Double>
   <x:Double x:Key="ShareQrModuleSize">4</x:Double>
   <x:Double x:Key="SliderTrackHeight">10</x:Double>
@@ -283,8 +280,8 @@
   <x:Double x:Key="FieldWidth">280</x:Double>
   <x:Double x:Key="FieldWidthSm">120</x:Double>
   <x:Double x:Key="TabIndicatorHeight">2</x:Double>
-  <x:Double x:Key="ProgressBarHeight">8</x:Double>
-  <x:Double x:Key="TitleBarHeight">30</x:Double>
+  <StaticResource x:Key="ProgressBarHeight" ResourceKey="Space2"/>
+  <StaticResource x:Key="TitleBarHeight" ResourceKey="TitleBarHeightMax"/>
   <x:Double x:Key="TooltipMaxWidth">780</x:Double>
   <x:Double x:Key="DropDownMaxHeight">280</x:Double>
   <x:Double x:Key="PanelMinHeight">256</x:Double>

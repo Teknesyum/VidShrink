@@ -1,0 +1,15 @@
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  VidShrink.Core -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Core\bin\Release\net8.0\VidShrink.Core.dll
+  VidShrink.PaletteGen -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tools\VidShrink.PaletteGen\bin\Release\net8.0\vidshrink-palettegen.dll
+  VidShrink.Player -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Player\bin\Release\net8.0\VidShrink.Player.dll
+  VidShrink.Ffmpeg -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Ffmpeg\bin\Release\net8.0\VidShrink.Ffmpeg.dll
+  VidShrink.App -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.App\bin\Release\net8.0\VidShrink.App.dll
+  VidShrink.Cli -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\src\VidShrink.Cli\bin\Release\net8.0\vidshrink.dll
+  VidShrink.Bench -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tools\VidShrink.Bench\bin\Release\net8.0\VidShrink.Bench.dll
+  VidShrink.Ab -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tools\VidShrink.Ab\bin\Release\net8.0\VidShrink.Ab.dll
+  VidShrink.Tests -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll
+C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-ab2d9de8f21f2713f\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+
+Başarılı!  - Başarısız:     0, Başarılı:   800, Atlanan:     0, Toplam:   800, Süre: 10 m 40 s - VidShrink.Tests.dll (net8.0)
