@@ -6,29 +6,29 @@
        (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
        VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
 
-  <Color x:Key="NeonBlueColor">#FF0969DA</Color>
-  <Color x:Key="NeonPinkColor">#FF1A7F37</Color>
-  <Color x:Key="NeonPurpleColor">#FF8250DF</Color>
-  <Color x:Key="NeonSuccessColor">#FF1A7F38</Color>
+  <Color x:Key="NeonBlueColor">#FF064691</Color>
+  <Color x:Key="NeonPinkColor">#FF15652C</Color>
+  <Color x:Key="NeonPurpleColor">#FF682BD8</Color>
+  <Color x:Key="NeonSuccessColor">#FF125625</Color>
   <Color x:Key="SurfaceToneColor">#FFF6F8FA</Color>
   <Color x:Key="AppBgColor">#FFFFFFFF</Color>
   <Color x:Key="TextBodyColor">#FF1F2328</Color>
   <Color x:Key="TextDisabledColor">#FF656D76</Color>
   <Color x:Key="OnNeonColor">#FFFFFFFE</Color>
-  <Color x:Key="PinkTextColor">#FF66A979</Color>
+  <Color x:Key="PinkTextColor">#FF345C3F</Color>
 
-  <Color x:Key="NeonBlueFillColor">#1A0969DA</Color>
-  <Color x:Key="NeonBlueHoverColor">#330969DA</Color>
-  <Color x:Key="NeonBlueActiveColor">#4D0969DA</Color>
-  <Color x:Key="NeonBlueBorderColor">#4D0969DB</Color>
-  <Color x:Key="NeonBlueBorderStrongColor">#800969DA</Color>
-  <Color x:Key="NeonPinkFillColor">#1A1A7F37</Color>
-  <Color x:Key="NeonPurpleBorderColor">#808250DF</Color>
+  <Color x:Key="NeonBlueFillColor">#1A064691</Color>
+  <Color x:Key="NeonBlueHoverColor">#33064691</Color>
+  <Color x:Key="NeonBlueActiveColor">#4D064691</Color>
+  <Color x:Key="NeonBlueBorderColor">#4D064692</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#80064691</Color>
+  <Color x:Key="NeonPinkFillColor">#1A15652C</Color>
+  <Color x:Key="NeonPurpleBorderColor">#80682BD8</Color>
 
   <Color x:Key="NeonEmberColor">#FFCF222E</Color>
   <Color x:Key="EmberFlameColor">#FFBC4C00</Color>
-  <Color x:Key="EmberBlazeColor">#FF9A6700</Color>
-  <Color x:Key="AtmosHotColor">#FF9A6701</Color>
+  <Color x:Key="EmberBlazeColor">#FF644300</Color>
+  <Color x:Key="AtmosHotColor">#FF644301</Color>
   <Color x:Key="AtmosMidColor">#FFBC4C01</Color>
   <Color x:Key="AtmosEdgeColor">#FFCF222F</Color>
   <Color x:Key="EmberDeepColor">#FFFEFCFC</Color>
@@ -41,9 +41,9 @@
   <Color x:Key="PlaybackScrimColor">#CCFFFFFF</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#00FFFFFF</Color>
 
-  <BoxShadows x:Key="GlowBlue">0 0 20 0 #400969DA</BoxShadows>
-  <BoxShadows x:Key="GlowPink">0 0 20 0 #401A7F37</BoxShadows>
-  <BoxShadows x:Key="GlowPurple">0 0 20 0 #408250DF</BoxShadows>
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #40064691</BoxShadows>
+  <BoxShadows x:Key="GlowPink">0 0 20 0 #4015652C</BoxShadows>
+  <BoxShadows x:Key="GlowPurple">0 0 20 0 #40682BD8</BoxShadows>
   <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
 
   <!-- Standardın rol adları. Themes/Theme.axaml fırçaları bu adlara bağlanır;

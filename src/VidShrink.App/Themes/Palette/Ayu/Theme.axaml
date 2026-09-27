@@ -12,7 +12,7 @@
   <Color x:Key="NeonSuccessColor">#FFAAD94C</Color>
   <Color x:Key="SurfaceToneColor">#FF131721</Color>
   <Color x:Key="AppBgColor">#FF0B0E14</Color>
-  <Color x:Key="TextBodyColor">#FFBFBDB6</Color>
+  <Color x:Key="TextBodyColor">#FFE4E3E0</Color>
   <Color x:Key="TextDisabledColor">#FF8A9199</Color>
   <Color x:Key="OnNeonColor">#FF000000</Color>
   <Color x:Key="PinkTextColor">#FFB8EEDC</Color>
