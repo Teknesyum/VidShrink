@@ -7,6 +7,10 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Changed
+
+- Settings saved before Teknesyum became the default still named the old default `Neon`, so the new colours never showed. That value now moves to Teknesyum once; choosing Neon again afterwards is kept.
+
 ## [0.11.0] - 2026-09-27
 
 ### Changed

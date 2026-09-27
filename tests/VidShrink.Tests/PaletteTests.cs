@@ -181,10 +181,10 @@ public sealed class PaletteTests
     }
 
     /// <summary>
-    /// Yeni varsayılan Teknesyum, ama ayarında palet yazılı kullanıcı kendi seçiminde kalır:
-    /// eski varsayılan <c>Neon</c> ayarda yazılıysa Neon açılır. Ayarı boş olan, ya da ayar
-    /// dosyası hiç olmayan, Teknesyum'la açılır. <c>App.axaml</c>'ın açılış paleti de
-    /// varsayılanla aynı; ayrışırsa <c>Use</c> ilk seçimde hiç boyamaz.
+    /// Yeni varsayılan Teknesyum. İşaretsiz dosyadaki <c>Neon</c> eski varsayılandır ve bir kez
+    /// Teknesyum'a göçer; işaretle yazılmış Neon kullanıcının seçimidir ve açılır. Ayarı boş
+    /// olan, ya da ayar dosyası hiç olmayan, Teknesyum'la açılır. <c>App.axaml</c>'ın açılış
+    /// paleti de varsayılanla aynı; ayrışırsa <c>Use</c> ilk seçimde hiç boyamaz.
     /// </summary>
     [Fact]
     public void KayitliSecimKorunurBosAyarVarsayilanaDuser()
@@ -198,16 +198,19 @@ public sealed class PaletteTests
 
         try
         {
+            var legacy = Path.Combine(folder, "eski-neon.json");
+            File.WriteAllText(legacy, "{\"theme\":\"Neon\"}");
             var saved = Path.Combine(folder, "neon.json");
-            File.WriteAllText(saved, "{\"theme\":\"Neon\"}");
+            File.WriteAllText(saved, "{\"theme\":\"Neon\",\"" + AppSettings.ThemeMigrationMarker + "\":true}");
             var empty = Path.Combine(folder, "bos.json");
             File.WriteAllText(empty, "{}");
 
-            var (fromSaved, fromEmpty, fromMissing) = AppHost.Run(() =>
+            var (fromLegacy, fromSaved, fromEmpty, fromMissing) = AppHost.Run(() =>
             {
                 try
                 {
                     return (
+                        PaletteCatalog.Use(AppSettings.Load(legacy).Theme),
                         PaletteCatalog.Use(AppSettings.Load(saved).Theme),
                         PaletteCatalog.Use(AppSettings.Load(empty).Theme),
                         PaletteCatalog.Use(AppSettings.Load(Path.Combine(folder, "yok.json")).Theme));
@@ -215,6 +218,7 @@ public sealed class PaletteTests
                 finally { PaletteCatalog.Use(PaletteCatalog.Default); }
             });
 
+            Assert.Equal("Teknesyum", fromLegacy);
             Assert.Equal("Neon", fromSaved);
             Assert.Equal("Teknesyum", fromEmpty);
             Assert.Equal("Teknesyum", fromMissing);
