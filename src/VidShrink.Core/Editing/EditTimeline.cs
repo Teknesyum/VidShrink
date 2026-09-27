@@ -172,6 +172,35 @@ public sealed class EditTimeline
         return true;
     }
 
+    /// <summary>
+    /// Butun parcalara ayni hizi yazar; tek adimda geri alinir. Sinirlar <see cref="SetSpeed"/>
+    /// ile aynidir. Hicbir parca degismezse <c>false</c> doner.
+    /// </summary>
+    public bool SetSpeedAll(decimal speed)
+    {
+        if (speed == 0)
+            throw new ArgumentOutOfRangeException(nameof(speed), speed, "Hiz sifir olamaz; geri yon eksi isaretle yazilir");
+
+        var magnitude = decimal.Round(Math.Abs(speed), 2, MidpointRounding.AwayFromZero);
+        if (magnitude < EditClip.MinSpeed || magnitude > EditClip.MaxSpeed)
+            throw new ArgumentOutOfRangeException(nameof(speed), speed, "Hizin mutlak degeri 0,01 ile 100 arasinda olmalidir");
+
+        var steps = new List<IEditCommand>();
+        for (var i = 0; i < _clips.Count; i++)
+        {
+            var before = _clips[i];
+            var after = before.WithMotion(magnitude, speed < 0);
+            if (after == before) continue;
+            var step = new ReplaceCommand(i, before, after);
+            step.Apply(_clips);
+            steps.Add(step);
+        }
+
+        if (steps.Count == 0) return false;
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
     public bool Undo()
     {
         if (!CanUndo) return false;

@@ -175,6 +175,15 @@ bugünkü `Keymap.cs` ile çakışıyor (S, X, Z, A, B, M, C); çakışma tablos
 sekmeye bağlı kapsam: düzenleyici sekmesi etkinken NLE haritası, diğerlerinde bugünkü
 harita.
 
+**Uygulandı (28 Eylül 2026):** harita tek yerde, `App/Editing/EditorKeymap.cs`; düzenleyici
+kendi `TopLevel` tünel işleyicisinde yalnız görünürken ve kaynak `TextBox` değilken tuşu alır,
+gömülü `PlayerView`'ın klavyesi kapalı (`KeyboardEnabled`), öteki sekmeler `Keymap.cs`'e düşer.
+J/K/L mekiği `EdlPreviewDriver.SetRate`/`PlayBackward` üstünden (tekrar basış hızı ikiye katlar,
+tavan 8×), ←/→ bir kare, M işaretçi (yakalama hedefi), Ctrl+A tümünü seçer, hız tümüne tek geri
+alma adımıyla (`EditTimeline.SetSpeedAll`). Tuşlar menüde (`InputGesture`), ipucunda ve
+`EditorShortcutsPanel`'de; yedi anahtar 42 dilde. Kare hızı dosyadan, bilinmezse 30. Testler
+`DuzenleyiciKisayolTests.cs`; 028'in 1/4/5. kabul ölçüleri `docs/olcumler/d3-cizelge-olcumleri.md`.
+
 ## Sıra
 
 1. **D0** — ortak odak. Tek başına bugünkü altı sekmeye değer katıyor.

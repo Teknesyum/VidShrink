@@ -382,10 +382,12 @@ internal partial class PlayerView : UserControl
 
     private void OnKey(object? sender, KeyEventArgs e)
     {
-        if (e.Handled || !IsEffectivelyVisible) return;
+        if (e.Handled || !IsEffectivelyVisible || !KeyboardEnabled) return;
         if (e.Source is TextBox) return;
         if (FeedKey(e.Key, e.KeyModifiers, e.KeySymbol)) e.Handled = true;
     }
+
+    internal bool KeyboardEnabled { get; set; } = true;
 
     internal bool MenuAtPointer { get; set; }
 
