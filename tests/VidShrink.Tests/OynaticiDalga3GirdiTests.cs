@@ -518,7 +518,7 @@ public sealed class OynaticiDalga3GirdiTests
         var clipAdi = Path.GetFileName(clip);
         Assert.Contains($"klasorden sonra acik: {clipAdi}", rapor);
         Assert.Contains($"silinenden sonra acik: {clipAdi}", rapor);
-        Assert.Contains("dosyadan sonra acik: birakilan.mp4", rapor);
+        if (!rapor.Contains("dosyadan sonra acik: birakilan.mp4", StringComparison.Ordinal)) Assert.Fail("dosya birakma acmadi:\n" + rapor);
         Assert.Contains("DragOver: etki Copy", rapor.Split("dosya:")[1]);
         Assert.DoesNotContain("DragOver: etki Copy", rapor.Split("dosya:")[0]);
         Assert.Contains("drop -> birakilan.mp4", rapor);
