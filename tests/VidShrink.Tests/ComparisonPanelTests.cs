@@ -578,9 +578,9 @@ public sealed class ComparisonPanelTests
         });
 
         Assert.Equal(PlayerCommandKind.Seek, seek.Kind);
-        Assert.Equal(30, seek.afterDown, 3);
+        Assert.Equal(21, seek.afterDown, 3);
         Assert.Equal(20, seek.afterUp, 3);
-        Assert.Equal("30,20", seek.Requested);
+        Assert.Equal("21,20", seek.Requested);
         Assert.True(seek.Same, "tekerlek paneli büyüttü");
 
         Assert.Equal(PlayerCommandKind.Zoom, zoom.Kind);

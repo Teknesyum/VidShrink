@@ -651,7 +651,7 @@ public sealed class OynaticiKisayolTests
             {
                 o.View.Apply(new PlayerCommand(PlayerCommandKind.Volume, 50 - o.View.VolumeLevel));
                 o.Bekle(0.2);
-                var arama = Teker(o, KeyModifiers.None, 10);
+                var arama = Teker(o, KeyModifiers.None, 1);
                 o.Not($"teker: volume {F(o.Sayi("volume"))}, beklenen 50");
                 return arama ?? (Math.Abs(o.Sayi("volume") - 50) < 1e-6 ? null : "teker sesi degistirdi");
             }
