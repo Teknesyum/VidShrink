@@ -1130,6 +1130,48 @@
         </Style>
       </ControlTheme>
 
+      <ControlTheme x:Key="PlaylistItem" TargetType="ListBoxItem">
+        <Setter Property="FocusAdorner" Value="{x:Null}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBody}"/>
+        <Setter Property="Padding" Value="{StaticResource FieldPadding}"/>
+        <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ListBoxItem">
+            <Border Name="ItemBorder"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="Transparent"
+                    BorderThickness="{StaticResource BorderThin}"
+                    Padding="{TemplateBinding Padding}"
+                    CornerRadius="{StaticResource RadiusCell}">
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Foreground="{TemplateBinding Foreground}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="Center"/>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:selected">
+          <Setter Property="Foreground" Value="{DynamicResource TextBody}"/>
+        </Style>
+        <Style Selector="^:selected /template/ Border#ItemBorder">
+          <Setter Property="Background" Value="{DynamicResource NeonBlueFill}"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource NeonBlueBorderStrong}"/>
+        </Style>
+        <Style Selector="^:pointerover">
+          <Setter Property="Foreground" Value="{DynamicResource OnNeon}"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#ItemBorder">
+          <Setter Property="Background" Value="{DynamicResource NeonBlue}"/>
+        </Style>
+      </ControlTheme>
+
       <ControlTheme x:Key="{x:Type ComboBox}" TargetType="ComboBox">
         <Setter Property="FocusAdorner" Value="{StaticResource DuzenOdakHalkasi}"/>
         <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
@@ -1612,6 +1654,14 @@
   </Style>
 
   <Style Selector="MenuFlyoutPresenter, ContextMenu">
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
+  </Style>
+
+  <Style Selector="Border.playlist">
+    <Setter Property="Background" Value="{DynamicResource MenuFlyoutPresenterBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource MenuFlyoutPresenterBorderBrush}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource MenuFlyoutPresenterBorderThemeThickness}"/>
+    <Setter Property="Padding" Value="{DynamicResource MenuFlyoutPresenterThemePadding}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
   </Style>
 

@@ -30,7 +30,7 @@
     <!--
       Açılır pencere ve menü yerine süzülür. Hareketi azaltma açık pencerenin açılırları oynamaz.
     -->
-    <Style Selector="Window:not(.reduced-motion) FlyoutPresenter, Window:not(.reduced-motion) MenuFlyoutPresenter">
+    <Style Selector="Window:not(.reduced-motion) FlyoutPresenter, Window:not(.reduced-motion) MenuFlyoutPresenter, Window:not(.reduced-motion) Border.playlist">
       <Style.Animations>
         <Animation Duration="{StaticResource MotionFast}" Easing="CubicEaseOut" FillMode="Forward">
           <KeyFrame Cue="0%">

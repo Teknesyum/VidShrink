@@ -46,16 +46,21 @@ internal static class FolderNavigator
         return order;
     }
 
+    internal static int IndexOf(IReadOnlyList<string> files, string current)
+    {
+        var full = Path.GetFullPath(current);
+        var index = -1;
+        for (var i = 0; i < files.Count; i++)
+            if (PathComparer.Equals(files[i], full)) index = i;
+        return index;
+    }
+
     internal static string? Step(string current, bool forward, RepeatMode repeat, bool shuffle, int seed)
     {
         var files = Order(Siblings(current), shuffle, seed);
         if (files.Count == 0) return null;
 
-        var full = Path.GetFullPath(current);
-        var index = -1;
-        for (var i = 0; i < files.Count; i++)
-            if (PathComparer.Equals(files[i], full)) index = i;
-
+        var index = IndexOf(files, current);
         if (index < 0) return forward ? files[0] : files[^1];
 
         var next = index + (forward ? 1 : -1);

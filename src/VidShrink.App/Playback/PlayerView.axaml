@@ -238,5 +238,23 @@
         </Border>
       </Panel>
     </Border>
+
+    <Popup x:Name="PlaylistPopup"
+           Placement="AnchorAndGravity"
+           PlacementAnchor="TopLeft"
+           PlacementGravity="BottomRight"
+           PlacementConstraintAdjustment="SlideX,SlideY,ResizeY"
+           IsLightDismissEnabled="False">
+      <Border x:Name="PlaylistPanel" Classes="playlist">
+        <ListBox x:Name="PlaylistList"
+                 Width="{StaticResource PlaylistWidth}"
+                 MaxHeight="{StaticResource PlaylistMaxHeight}"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 SelectionMode="Single"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ItemContainerTheme="{StaticResource PlaylistItem}"/>
+      </Border>
+    </Popup>
   </Grid>
 </UserControl>
