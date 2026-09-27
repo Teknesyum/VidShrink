@@ -19,7 +19,7 @@
           <Button x:Name="BtnZoomOut" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-out}"/>
           <Button x:Name="BtnZoomIn" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-in}"/>
           <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.export}" IsEnabled="False"/>
-          <ComboBox x:Name="CmbExportMode" AutomationProperties.Name="{loc:Text editor.export.mode}" SelectedIndex="1">
+          <ComboBox x:Name="CmbExportMode" Width="{StaticResource FieldWidth}" AutomationProperties.Name="{loc:Text editor.export.mode}" SelectedIndex="1">
             <ComboBoxItem Content="{loc:Text editor.export.fast}"/>
             <ComboBoxItem Content="{loc:Text editor.export.smart}"/>
             <ComboBoxItem Content="{loc:Text editor.export.full}"/>
