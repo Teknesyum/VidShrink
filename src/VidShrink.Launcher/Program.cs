@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using VidShrink.Core;
+using VidShrink.Core.Setup;
 
 namespace VidShrink.Launcher;
 
@@ -31,7 +32,11 @@ internal static class Program
         var executable = Path.Combine(appDirectory, AppExecutableName);
 
         if (args.Length > 0 && args[0] == LauncherUpdate.CommitArgument)
-            return LauncherUpdate.Commit(baseDirectory, ParentProcessId(args)) ? 0 : 3;
+        {
+            var committed = LauncherUpdate.Commit(baseDirectory, ParentProcessId(args));
+            if (committed) ShortcutIcons.RefreshInstalled(baseDirectory);
+            return committed ? 0 : 3;
+        }
 
         if (args.Length > 0 && args[0] == LauncherUpdate.InstallOnExitArgument)
             return KapanistaKur(baseDirectory, appDirectory, ParentProcessId(args));

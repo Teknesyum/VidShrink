@@ -190,6 +190,10 @@ public static class UpdateCheck
     /// </summary>
     public static string LauncherArchiveAssetName(string rid) => $"vidshrink-launcher-{rid}.zip";
 
+    public static string PackageAssetName(string rid) => $"vidshrink-update-{rid}.zip";
+
+    public static string ChecksumsAssetName(string rid) => $"checksums-{rid}.txt";
+
     public static string LatestAssetUrl(string asset) =>
         $"https://github.com/Teknesyum/VidShrink/releases/latest/download/{asset}";
 

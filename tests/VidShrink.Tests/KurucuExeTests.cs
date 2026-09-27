@@ -159,6 +159,24 @@ public sealed class KurucuExeTests : IDisposable
     }
 
     [Fact]
+    public async Task KisayollarYazildiktanSonraKabugaHaberVerilir()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var release = FakeRelease();
+        var haberAnindakiKisayol = new List<int>();
+        FakeShortcuts? kisayollar = null;
+        var (options, host, shortcuts) = Setup(release, kabukHaberi: () => haberAnindakiKisayol.Add(kisayollar!.Targets.Count));
+        kisayollar = shortcuts;
+
+        await SetupRunner.InstallAsync(options, host, CancellationToken.None);
+
+        Assert.Equal(new[] { 2 }, haberAnindakiKisayol);
+        var exe = Path.Combine(options.InstallRoot, "VidShrink.exe");
+        Assert.All(shortcuts.Targets.Values, hedef => Assert.Equal(exe, hedef));
+    }
+
+    [Fact]
     public async Task CevrimdisiKurulumBetiginDuzeniniKuruyor()
     {
         if (!OperatingSystem.IsWindows()) return;
@@ -568,7 +586,7 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Equal(dllSha, UpdateCheck.HashFile(replaced.Dll));
     }
 
-    private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release, Action<string>? gunluk = null, Action<int, int, string>? adim = null)
+    private (SetupOptions Options, SetupHost Host, FakeShortcuts Shortcuts) Setup(string release, Action<string>? gunluk = null, Action<int, int, string>? adim = null, Action? kabukHaberi = null)
     {
         var local = Path.Combine(_work, "local");
         var ffmpegZip = Path.Combine(release, "ffmpeg.zip");
@@ -603,6 +621,7 @@ public sealed class KurucuExeTests : IDisposable
             Delay = (_, _) => Task.CompletedTask,
             Log = gunluk ?? (_ => { }),
             Step = adim ?? ((_, _, _) => { }),
+            AssociationChanged = kabukHaberi ?? (() => { }),
             Launch = _ => throw new InvalidOperationException("NoLaunch verildi.")
         };
         return (options, host, shortcuts);
@@ -741,5 +760,9 @@ public sealed class KurucuExeTests : IDisposable
         }
 
         public string? ReadTarget(string shortcutPath) => File.ReadAllText(shortcutPath);
+
+        public Dictionary<string, string> Icons { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        public void SetIcon(string shortcutPath, string icon) => Icons[shortcutPath] = icon;
     }
 }

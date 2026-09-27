@@ -12,6 +12,10 @@ internal static class TestAyarYolu
     [ModuleInitializer]
     internal static void Bagla()
     {
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(VidShrink.Core.Setup.ShortcutIcons.DirectoryVariable)))
+            Environment.SetEnvironmentVariable(VidShrink.Core.Setup.ShortcutIcons.DirectoryVariable,
+                Path.Combine(TestPaths.OutputRoot, "kisayol", Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+
         var mevcut = Environment.GetEnvironmentVariable(Degisken);
         if (!string.IsNullOrWhiteSpace(mevcut))
         {

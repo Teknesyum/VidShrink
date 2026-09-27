@@ -181,7 +181,6 @@ public static class SetupRunner
                 var modernTask = Task.Run(() => RegisterModernMenu(options, host, root), cancellationToken);
                 var shrinkWritten = ShellRegistration.WriteMenus(options.ClassesRoot, installedExe, language, locales);
                 var associated = ShellRegistration.WriteFileAssociation(options.ClassesRoot, installedExe);
-                if (options.DefaultRegistry) host.AssociationChanged();
                 modern = await modernTask;
                 var path = SetupText.Get(modern ? "setup.menu.modern-and-classic" : "setup.menu.classic");
                 host.Log(SetupText.Get("setup.menu.written", ShellIntegration.MediaExtensions.Count, shrinkWritten, path));
@@ -189,6 +188,7 @@ public static class SetupRunner
 
                 host.Step(93, 99, SetupText.Get("setup.step.shortcut"));
                 WriteShortcuts(options, host, root, installedExe);
+                if (options.DefaultRegistry || host.Shortcuts is not null) host.AssociationChanged();
             }
             Mark("kabuk");
 

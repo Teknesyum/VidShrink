@@ -22,7 +22,9 @@ public enum UpdateStagePhase
     Downloaded,
 
     /// <summary>Bütün dosyalar sahnede.</summary>
-    Staged
+    Staged,
+
+    Receiving
 }
 
 /// <summary>
@@ -186,6 +188,13 @@ public static class UpdateStaging
 
         try
         {
+            if (await StagePackageAsync(stage, manifest, changed, launcherChanged, shellChanged, seal,
+                    source, throttle, userAgent, Say, Downloaded, cancellationToken))
+            {
+                Say(new UpdateStageReport(UpdateStagePhase.Staged, 1, 1, manifest.Version, Done: total, Total: total));
+                return new StagedUpdate(manifest, stage, changed, launcherChanged, shellChanged);
+            }
+
             if (changed.Count > 0)
             {
                 var archive = await RemoteZip.OpenAsync(Source(UpdateCheck.ArchiveAssetName(rid), source, throttle, userAgent), cancellationToken);
@@ -256,6 +265,227 @@ public static class UpdateStaging
         {
             await File.WriteAllBytesAsync(partial, bytes, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
+            File.Move(partial, target, overwrite: true);
+            seal.Record(target, file.Sha256);
+        }
+        catch
+        {
+            TryDelete(partial);
+            throw;
+        }
+    }
+
+    public const string PackageAppFolder = "app";
+
+    public const string PackageLauncherFolder = "launcher";
+
+    public const string PackageDownloadSuffix = ".download";
+
+    public static string PackagePath(string stage, string rid) =>
+        Path.Combine(stage, UpdateCheck.PackageAssetName(rid) + PackageDownloadSuffix);
+
+    private static async Task<bool> StagePackageAsync(
+        string stage,
+        ReleaseManifest manifest,
+        IReadOnlyList<ManifestFile> app,
+        IReadOnlyList<ManifestFile> launcher,
+        IReadOnlyList<ManifestFile> shell,
+        StageSeal seal,
+        string? source,
+        DownloadThrottle? throttle,
+        string userAgent,
+        Action<UpdateStageReport> say,
+        Action<ManifestFile> downloaded,
+        CancellationToken cancellationToken)
+    {
+        var rid = UpdateCheck.Rid;
+        var name = UpdateCheck.PackageAssetName(rid);
+        using var client = source is null ? CreateClient(userAgent) : null;
+
+        var checksums = await FetchChecksumsAsync(client, rid, source, cancellationToken);
+        if (checksums is null || !checksums.TryGetValue(name, out var expected)) return false;
+
+        var path = PackagePath(stage, rid);
+        var version = manifest.Version;
+        void Progress(long received, long length)
+        {
+            var share = length <= 0 ? 0 : Math.Clamp((double)received / length, 0, 1);
+            var part = 0.20 + 0.60 * share;
+            say(new UpdateStageReport(UpdateStagePhase.Receiving, part, 0.80, version, name,
+                (int)(received / 1024), (int)(Math.Max(0, length) / 1024)));
+        }
+
+        if (!HashMatches(path, expected))
+        {
+            if (client is null) await CopyLocalAsync(Path.Combine(source!, name), path, throttle, Progress, cancellationToken);
+            else await DownloadAsync(client, AssetUrl(name), path, throttle, Progress, cancellationToken);
+
+            if (!HashMatches(path, expected))
+            {
+                TryDelete(path);
+                throw new InvalidDataException($"Güncelleme paketinin özeti tutmadı: {name}");
+            }
+        }
+
+        ExtractPackage(path, stage, app, launcher, shell, seal, downloaded, cancellationToken);
+        TryDelete(path);
+        return true;
+    }
+
+    private static HttpClient CreateClient(string userAgent)
+    {
+        var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
+        return client;
+    }
+
+    private static async Task<IReadOnlyDictionary<string, string>?> FetchChecksumsAsync(
+        HttpClient? client, string rid, string? source, CancellationToken cancellationToken)
+    {
+        var asset = UpdateCheck.ChecksumsAssetName(rid);
+        string text;
+        if (client is null)
+        {
+            var local = Path.Combine(source!, asset);
+            if (!File.Exists(local)) return null;
+            text = await File.ReadAllTextAsync(local, cancellationToken);
+        }
+        else
+        {
+            try
+            {
+                using var response = await client.GetAsync(AssetUrl(asset), cancellationToken);
+                if (!response.IsSuccessStatusCode) return null;
+                text = await response.Content.ReadAsStringAsync(cancellationToken);
+            }
+            catch (HttpRequestException) { return null; }
+            catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested) { return null; }
+        }
+        return Setup.SetupDownloads.ParseChecksums(text);
+    }
+
+    private static bool HashMatches(string path, string expected)
+    {
+        if (!File.Exists(path)) return false;
+        try { return string.Equals(UpdateCheck.HashFile(path), expected, StringComparison.OrdinalIgnoreCase); }
+        catch (IOException) { return false; }
+    }
+
+    private static async Task CopyLocalAsync(
+        string from, string to, DownloadThrottle? throttle, Action<long, long> progress, CancellationToken cancellationToken)
+    {
+        await using var input = new FileStream(from, FileMode.Open, FileAccess.Read, FileShare.Read, DownloadThrottle.ChunkBytes, useAsync: true);
+        await using var output = new FileStream(to, FileMode.Create, FileAccess.Write, FileShare.None, DownloadThrottle.ChunkBytes, useAsync: true);
+        await PumpAsync(input, output, 0, input.Length, throttle, progress, cancellationToken);
+    }
+
+    private static async Task DownloadAsync(
+        HttpClient client, string url, string to, DownloadThrottle? throttle, Action<long, long> progress, CancellationToken cancellationToken)
+    {
+        var have = File.Exists(to) ? new FileInfo(to).Length : 0;
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        if (have > 0) request.Headers.Range = new RangeHeaderValue(have, null);
+        using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        if (response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
+        {
+            TryDelete(to);
+            await DownloadAsync(client, url, to, throttle, progress, cancellationToken);
+            return;
+        }
+        response.EnsureSuccessStatusCode();
+
+        var resumed = have > 0 && response.StatusCode == HttpStatusCode.PartialContent;
+        var start = resumed ? have : 0;
+        var length = response.Content.Headers.ContentLength is long body ? start + body : -1;
+        await using var input = await response.Content.ReadAsStreamAsync(cancellationToken);
+        await using var output = new FileStream(to, resumed ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, DownloadThrottle.ChunkBytes, useAsync: true);
+        await PumpAsync(input, output, start, length, throttle, progress, cancellationToken);
+    }
+
+    private static async Task PumpAsync(
+        Stream input, Stream output, long start, long length, DownloadThrottle? throttle,
+        Action<long, long> progress, CancellationToken cancellationToken)
+    {
+        var buffer = new byte[DownloadThrottle.ChunkBytes];
+        var received = start;
+        var lastPercent = -1;
+        progress(received, length);
+        while (true)
+        {
+            var count = await input.ReadAsync(buffer, cancellationToken);
+            if (count == 0) break;
+            await output.WriteAsync(buffer.AsMemory(0, count), cancellationToken);
+            received += count;
+            if (throttle is not null) await throttle.PaceAsync(count, cancellationToken);
+            var percent = length > 0 ? (int)(100 * received / length) : lastPercent;
+            if (percent != lastPercent)
+            {
+                lastPercent = percent;
+                progress(received, length);
+            }
+        }
+        await output.FlushAsync(cancellationToken);
+        progress(received, length <= 0 ? received : length);
+    }
+
+    private static void ExtractPackage(
+        string package,
+        string stage,
+        IReadOnlyList<ManifestFile> app,
+        IReadOnlyList<ManifestFile> launcher,
+        IReadOnlyList<ManifestFile> shell,
+        StageSeal seal,
+        Action<ManifestFile> downloaded,
+        CancellationToken cancellationToken)
+    {
+        using var zip = System.IO.Compression.ZipFile.OpenRead(package);
+        var entries = new Dictionary<string, System.IO.Compression.ZipArchiveEntry>(StringComparer.Ordinal);
+        foreach (var entry in zip.Entries) entries[entry.FullName.Replace('\\', '/')] = entry;
+
+        void Unpack(IReadOnlyList<ManifestFile> files, string folder, Func<ManifestFile, string> target)
+        {
+            foreach (var file in files)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var destination = target(file);
+                if (!AlreadyStaged(destination, file, seal))
+                {
+                    if (!entries.TryGetValue(folder + "/" + file.Path, out var entry))
+                        throw new FileNotFoundException($"Pakette yok: {folder}/{file.Path}");
+                    UnpackEntry(entry, file, destination, seal);
+                }
+                downloaded(file);
+            }
+        }
+
+        Unpack(app, PackageAppFolder, file => UpdateCheck.LocalPath(stage, file.Path));
+        Unpack(launcher, PackageLauncherFolder, file => LauncherUpdate.StagePath(stage, file.Path));
+        Unpack(shell, PackageLauncherFolder, file => ShellUpdate.StagePath(stage, file.Path));
+    }
+
+    private static void UnpackEntry(System.IO.Compression.ZipArchiveEntry entry, ManifestFile file, string target, StageSeal seal)
+    {
+        var folder = Path.GetDirectoryName(target);
+        if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+        var partial = target + PartialSuffix;
+        try
+        {
+            string hash;
+            using (var input = entry.Open())
+            using (var output = new FileStream(partial, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var sha = System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA256))
+            {
+                var buffer = new byte[DownloadThrottle.ChunkBytes];
+                int count;
+                while ((count = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    sha.AppendData(buffer, 0, count);
+                    output.Write(buffer, 0, count);
+                }
+                hash = Convert.ToHexString(sha.GetHashAndReset());
+            }
+            if (!string.Equals(hash, file.Sha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException($"Paketteki dosyanın özeti tutmadı: {file.Path}");
             File.Move(partial, target, overwrite: true);
             seal.Record(target, file.Sha256);
         }

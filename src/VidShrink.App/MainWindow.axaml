@@ -182,17 +182,26 @@
                               Margin="{StaticResource ChipPadding}"/>
                 </Panel>
               </Border>
-              <Border x:Name="UpdateBarTrack"
-                      IsVisible="False"
-                      Height="{StaticResource ProgressBarHeight}"
-                      CornerRadius="{StaticResource RadiusChip}"
-                      Background="{StaticResource AppBg}"
-                      ClipToBounds="True">
-                <Border x:Name="UpdateBarFill"
-                        HorizontalAlignment="Left"
+              <Grid x:Name="UpdateProgressRow"
+                    IsVisible="False"
+                    ColumnDefinitions="*,Auto"
+                    ColumnSpacing="{StaticResource SpaceMd}">
+                <Border x:Name="UpdateBarTrack"
+                        VerticalAlignment="Center"
+                        Height="{StaticResource ProgressBarHeight}"
                         CornerRadius="{StaticResource RadiusChip}"
-                        Background="{StaticResource AccentGradient}"/>
-              </Border>
+                        Background="{StaticResource AppBg}"
+                        ClipToBounds="True">
+                  <Border x:Name="UpdateBarFill"
+                          HorizontalAlignment="Left"
+                          CornerRadius="{StaticResource RadiusChip}"
+                          Background="{StaticResource AccentGradient}"/>
+                </Border>
+                <TextBlock x:Name="TxtUpdatePercent"
+                           Grid.Column="1"
+                           VerticalAlignment="Center"
+                           Theme="{StaticResource MonoValue}"/>
+              </Grid>
             </StackPanel>
           </Border>
         </StackPanel>

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using VidShrink.Core;
+using VidShrink.Core.Setup;
 
 namespace VidShrink.Launcher;
 
@@ -71,6 +72,7 @@ internal static class KurulumBekleyeni
                 LauncherUpdate.Stage(stage, baseDirectory, staged.Launcher);
                 var applied = UpdateRollout.Apply(stage, baseDirectory, appDirectory, staged.App, staged.Launcher, staged.Manifest, staged.Shell);
                 UygulamaKlasoruKapisi.HatayiSil(appDirectory);
+                if (applied) ShortcutIcons.RefreshInstalled(baseDirectory);
                 return applied;
             }
             catch (Exception exception)

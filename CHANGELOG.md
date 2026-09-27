@@ -7,6 +7,11 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Changed
+
+- Updates now download as one package (`vidshrink-update-<rid>.zip`, checked against `checksums-<rid>.txt`) and unpack on the machine; the panel shows only a progress bar with a percentage, and only after the first second, so a short update shows no panel at all. The old per-file archives stay in the release for older clients.
+- After every update and install, the desktop and Start menu shortcuts that point at the installed VidShrink get their icon rewritten and Windows is told to refresh, so a new icon is not hidden by the icon cache.
+
 ## [0.11.0] - 2026-09-27
 
 ### Changed

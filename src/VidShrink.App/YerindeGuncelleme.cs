@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using VidShrink.Core;
+using VidShrink.Core.Setup;
 using VidShrink.Launcher;
 
 namespace VidShrink.App;
@@ -54,6 +55,7 @@ internal static class YerindeGuncelleme
                 if (KurulumBekleyeni.Kurulmus(appDirectory, staged)) return false;
                 var baslaticiBekliyor = InPlaceUpdate.Apply(baseDirectory, appDirectory, staged);
                 UygulamaKlasoruKapisi.HatayiSil(appDirectory);
+                ShortcutIcons.RefreshInstalled(baseDirectory);
                 if (baslaticiBekliyor) GecisiBaslat(baseDirectory);
                 return true;
             }

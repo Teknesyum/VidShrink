@@ -1,8 +1,8 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
-using VidShrink.Core.Setup;
+using System.Runtime.Versioning;
 
-namespace VidShrink.Setup;
+namespace VidShrink.Core.Setup;
 
 [GeneratedComInterface]
 [Guid("000214F9-0000-0000-C000-000000000046")]
@@ -41,7 +41,8 @@ internal partial interface IPersistFile
     void GetCurFile(out IntPtr fileName);
 }
 
-internal sealed partial class ShellShortcuts : IShortcutWriter
+[SupportedOSPlatform("windows")]
+public sealed partial class ShellShortcuts : IShortcutWriter
 {
     private static readonly Guid ShellLinkClass = new("00021401-0000-0000-C000-000000000046");
     private static readonly Guid ShellLinkInterface = new("000214F9-0000-0000-C000-000000000046");
@@ -59,6 +60,43 @@ internal sealed partial class ShellShortcuts : IShortcutWriter
             ((IPersistFile)link).Save(shortcutPath, true);
             return 0;
         });
+    }
+
+    public void SetIcon(string shortcutPath, string icon)
+    {
+        OnSta(() =>
+        {
+            var link = Create();
+            ((IPersistFile)link).Load(shortcutPath, 2);
+            var (path, index) = SplitIcon(icon);
+            link.SetIconLocation(path, index);
+            ((IPersistFile)link).Save(shortcutPath, true);
+            return 0;
+        });
+    }
+
+    public string? ReadIcon(string shortcutPath) => OnSta(() =>
+    {
+        var link = Create();
+        ((IPersistFile)link).Load(shortcutPath, 0);
+        var buffer = Marshal.AllocHGlobal(32768 * sizeof(char));
+        try
+        {
+            Marshal.WriteInt16(buffer, 0);
+            link.GetIconLocation(buffer, 32768, out var index);
+            return Marshal.PtrToStringUni(buffer) + "," + index.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(buffer);
+        }
+    });
+
+    private static (string Path, int Index) SplitIcon(string icon)
+    {
+        var comma = icon.LastIndexOf(',');
+        var index = comma > 0 && int.TryParse(icon[(comma + 1)..], out var parsed) ? parsed : 0;
+        return (comma > 0 ? icon[..comma] : icon, index);
     }
 
     public string? ReadTarget(string shortcutPath) => OnSta(() =>

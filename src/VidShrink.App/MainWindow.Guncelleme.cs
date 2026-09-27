@@ -255,9 +255,7 @@ public partial class MainWindow
                 UpdateStagePhase.Unreachable => Say("main.update.log.unreachable"),
                 UpdateStagePhase.Current => Say("main.update.log.current"),
                 UpdateStagePhase.Found => Say("main.update.log.found", report.Version, report.Total),
-                UpdateStagePhase.Downloaded => Path.GetFileName(report.File) + "  "
-                    + report.Done.ToString(CultureInfo.InvariantCulture) + "/"
-                    + report.Total.ToString(CultureInfo.InvariantCulture),
+                UpdateStagePhase.Receiving or UpdateStagePhase.Downloaded => Say("main.update.downloading"),
                 _ => null
             };
             if (sentence is null) continue;
@@ -266,8 +264,9 @@ public partial class MainWindow
     }
 
     /// <summary>
-    /// Paneli bir ilerleme köprüsüne bağlar: günlük alanı ve çubuk görünür olur. Ölçüm de
-    /// örnek bir köprüyü buradan verir.
+    /// Paneli bir ilerleme köprüsüne bağlar. İndirme sürerken dosya listesi yoktur; çubuk
+    /// <see cref="UpdateBarRevealDelay"/> dolunca görünür, iş bitince yalnız son cümle kalır.
+    /// Ölçüm de örnek bir köprüyü buradan verir.
     /// </summary>
     internal void ShowUpdateProgress(InstallProgress progress)
     {
@@ -275,10 +274,11 @@ public partial class MainWindow
         _updateLinesShown = 0;
         UpdateLogLines.Children.Clear();
         _updateBarPercent = 0;
+        _updateRunningFor = TimeSpan.Zero;
         UpdateBarFill.Width = 0;
-        UpdateLogArea.Height = InstallProgress.LogLines * Scalar("LineHeightBody", 0);
-        UpdateLogArea.IsVisible = true;
-        UpdateBarTrack.IsVisible = true;
+        TxtUpdatePercent.Text = "";
+        UpdateLogArea.IsVisible = false;
+        UpdateProgressRow.IsVisible = false;
         UpdateNotice.IsVisible = true;
         if (!_updateNoticeWatched)
         {
@@ -293,6 +293,9 @@ public partial class MainWindow
     }
 
     private double _updateBarPercent;
+    private TimeSpan _updateRunningFor;
+
+    internal static readonly TimeSpan UpdateBarRevealDelay = TimeSpan.FromSeconds(1);
 
     /// <summary>Dolgu izin yüzdesidir, piksel değil: pencere daralınca iz de daralır, dolgu ondan taşmaz.</summary>
     private void SizeUpdateBar() => UpdateBarFill.Width = UpdateBarTrack.Bounds.Width * _updateBarPercent / 100;
@@ -339,8 +342,8 @@ public partial class MainWindow
     }
 
     /// <summary>
-    /// Panelin bir karesi: kuyruk boşalır, yeni satırlar yumuşakça girer, çubuk geçen
-    /// süreye göre ilerler. Panel kapalıysa ya da çubuk durmuşsa saat kendini durdurur.
+    /// Panelin bir karesi: kuyruk boşalır, çubuk geçen süreye göre ilerler, iş bitince
+    /// sonuç cümlesi yumuşakça girer. Panel kapalıysa ya da çubuk durmuşsa saat kendini durdurur.
     /// </summary>
     internal void UpdateFrame()
     {
@@ -364,9 +367,15 @@ public partial class MainWindow
         if (!HoverZone.MotionReduced) progress.Advance(elapsed);
         var bar = HoverZone.MotionReduced ? progress.Percent : progress.Bar;
         _updateBarPercent = bar;
+        if (progress.State == InstallState.Running)
+        {
+            _updateRunningFor += elapsed;
+            if (_updateRunningFor >= UpdateBarRevealDelay) UpdateProgressRow.IsVisible = true;
+        }
         SizeUpdateBar();
+        TxtUpdatePercent.Text = (bar / 100).ToString("P0", CultureInfo.CurrentUICulture);
         PaintUpdateBar(progress.State);
-        AppendUpdateLines(progress.History);
+        if (progress.State != InstallState.Running) ShowUpdateOutcome(progress.History);
 
         if (progress.State != InstallState.Running && bar >= progress.Ceiling)
         {
@@ -386,49 +395,42 @@ public partial class MainWindow
             UpdateBarFill.Background = brush;
     }
 
-    private void AppendUpdateLines(IReadOnlyList<string> history)
+    private void ShowUpdateOutcome(IReadOnlyList<string> history)
     {
-        if (history.Count == _updateLinesShown) return;
+        if (history.Count == _updateLinesShown || history.Count == 0) return;
 
         var enter = Scalar("SpaceSm", 0);
         var motion = this.TryFindResource("MotionBase", out var duration) && duration is TimeSpan span ? span : TimeSpan.Zero;
-        var dim = this.TryFindResource("TextDisabled", out var disabled) ? disabled as IBrush : null;
 
-        for (var i = _updateLinesShown; i < history.Count; i++)
+        var line = new TextBlock
         {
-            foreach (var child in UpdateLogLines.Children.OfType<TextBlock>())
-                if (dim is not null) child.Foreground = dim;
+            Text = history[^1],
+            Theme = Look("MonoValue"),
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+        ToolTip.SetTip(line, history[^1]);
 
-            var line = new TextBlock
+        if (!HoverZone.MotionReduced && motion > TimeSpan.Zero)
+        {
+            line.Opacity = 0;
+            line.RenderTransform = TransformOperations.Parse(FormattableString.Invariant($"translateY({enter}px)"));
+            line.Transitions = new Transitions
             {
-                Text = history[i],
-                Theme = Look("MonoValue"),
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                HorizontalAlignment = HorizontalAlignment.Left
+                new DoubleTransition { Property = OpacityProperty, Duration = motion },
+                new TransformOperationsTransition { Property = RenderTransformProperty, Duration = motion }
             };
-            ToolTip.SetTip(line, history[i]);
-
-            if (!HoverZone.MotionReduced && motion > TimeSpan.Zero)
+            var entering = line;
+            Dispatcher.UIThread.Post(() =>
             {
-                line.Opacity = 0;
-                line.RenderTransform = TransformOperations.Parse(FormattableString.Invariant($"translateY({enter}px)"));
-                line.Transitions = new Transitions
-                {
-                    new DoubleTransition { Property = OpacityProperty, Duration = motion },
-                    new TransformOperationsTransition { Property = RenderTransformProperty, Duration = motion }
-                };
-                var entering = line;
-                Dispatcher.UIThread.Post(() =>
-                {
-                    entering.Opacity = 1;
-                    entering.RenderTransform = TransformOperations.Parse("none");
-                }, DispatcherPriority.Background);
-            }
-
-            UpdateLogLines.Children.Add(line);
-            while (UpdateLogLines.Children.Count > InstallProgress.LogLines) UpdateLogLines.Children.RemoveAt(0);
+                entering.Opacity = 1;
+                entering.RenderTransform = TransformOperations.Parse("none");
+            }, DispatcherPriority.Background);
         }
 
+        UpdateLogLines.Children.Clear();
+        UpdateLogLines.Children.Add(line);
+        UpdateLogArea.IsVisible = true;
         _updateLinesShown = history.Count;
     }
 }

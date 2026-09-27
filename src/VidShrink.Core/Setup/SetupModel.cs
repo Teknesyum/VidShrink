@@ -167,6 +167,8 @@ public interface IShortcutWriter
     void Write(string shortcutPath, string target, string workingDirectory, string icon);
 
     string? ReadTarget(string shortcutPath);
+
+    void SetIcon(string shortcutPath, string icon);
 }
 
 public interface IShellPackage

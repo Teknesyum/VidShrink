@@ -57,15 +57,15 @@ public sealed class KirpilmaIpucuTests
             var window = new MainWindow();
             var ilerleme = new InstallProgress();
             window.ShowUpdateProgress(ilerleme);
-            ilerleme.Step(0, 10, Uzun);
-            ilerleme.Step(10, 20, "ikinci");
+            ilerleme.Step(0, 10, "ilk");
+            ilerleme.Finish(false, Uzun);
             for (var i = 0; i < 90; i++) window.UpdateFrame(TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds));
             return window.FindControl<StackPanel>("UpdateLogLines")!.Children.OfType<TextBlock>()
                 .Select(s => (s.Text, Ipucu: ToolTip.GetTip(s) as string)).ToList();
         });
 
-        Assert.NotEmpty(ipuclari);
-        Assert.Contains(ipuclari, s => s.Text == Uzun);
-        Assert.All(ipuclari, s => Assert.Equal(s.Text, s.Ipucu));
+        var satir = Assert.Single(ipuclari);
+        Assert.Equal(Uzun, satir.Text);
+        Assert.Equal(Uzun, satir.Ipucu);
     }
 }

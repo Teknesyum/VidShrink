@@ -492,6 +492,12 @@ jobs:
           if [ -d publish-launcher ]; then
             ( cd publish-launcher && zip -qr "$GITHUB_WORKSPACE/assets/vidshrink-launcher-${{ matrix.rid }}.zip" . )
             checksummed="$checksummed vidshrink-launcher-${{ matrix.rid }}.zip"
+            mkdir -p pkg
+            cp -r publish/${{ matrix.rid }} pkg/app
+            cp -r publish-launcher pkg/launcher
+            ( cd pkg && zip -qr "$GITHUB_WORKSPACE/assets/vidshrink-update-${{ matrix.rid }}.zip" app launcher )
+            rm -rf pkg
+            checksummed="$checksummed vidshrink-update-${{ matrix.rid }}.zip"
           fi
           if [ -f publish-setup/VidShrink-Setup.exe ]; then
             cp publish-setup/VidShrink-Setup.exe assets/VidShrink-Setup.exe

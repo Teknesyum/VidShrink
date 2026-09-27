@@ -47,12 +47,18 @@ public sealed class GoruntuCekTests
             window.ShowUpdateProgress(ilerleme);
             ilerleme.Step(0, 10, "Sürüm listesi alınıyor");
             ilerleme.Step(12, 20, "Sürüm 0.4.3: 6 dosya");
-            foreach (var (ad, sira) in new[] { "VidShrink.App.dll", "VidShrink.Core.dll", "Avalonia.Base.dll", "libmpv-2.dll" }.Select((a, i) => (a, i + 1)))
-                ilerleme.Step(20 + 70.0 * sira / 6, 20 + 70.0 * (sira + 1) / 6, ad + "  " + sira + "/6");
+            ilerleme.Step(20, 80, "İndiriliyor");
+            ilerleme.Step(55, 80, "İndiriliyor");
             kok.Measure(new Size(1200, 800));
             kok.Arrange(new Rect(0, 0, 1200, 800));
             for (var i = 0; i < 90; i++) window.UpdateFrame(TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds));
-            Assert.Equal(6, window.FindControl<StackPanel>("UpdateLogLines")!.Children.Count);
+            Assert.Empty(window.FindControl<StackPanel>("UpdateLogLines")!.Children);
+            Assert.True(window.FindControl<Grid>("UpdateProgressRow")!.IsVisible);
+            foreach (var parca in kok.GetVisualDescendants().OfType<Layoutable>()) parca.InvalidateMeasure();
+            kok.InvalidateMeasure();
+            kok.Measure(new Size(1200, 800));
+            kok.Arrange(new Rect(0, 0, 1200, 800));
+            window.UpdateFrame(TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds));
             Assert.True(window.FindControl<Border>("UpdateBarFill")!.Width > 0);
             foreach (var satir in window.FindControl<StackPanel>("UpdateLogLines")!.Children)
             {

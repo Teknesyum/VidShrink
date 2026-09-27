@@ -178,7 +178,7 @@ public sealed class YerlesimDenetimiTests
 
     /// <summary>
     /// Ayrıntı yüzeyleri: dönüştürme sonucu ve Göster düğmesi, güncelleme bildirimi ile
-    /// kurulum günlüğü (altı satır, çubuk dolu), donanım başarım sonucu. Hepsi sekme
+    /// indirme çubuğu (yüzdesiyle, dosya listesiz), donanım başarım sonucu. Hepsi sekme
     /// dolaşımında boş duruyordu.
     /// </summary>
     [Theory]
@@ -194,8 +194,7 @@ public sealed class YerlesimDenetimiTests
         pencere.ShowUpdateProgress(ilerleme);
         ilerleme.Step(0, 10, "Sürüm listesi alınıyor");
         ilerleme.Step(12, 20, "Sürüm 0.4.3: 6 dosya");
-        foreach (var (ad, sira) in new[] { "VidShrink.App.dll", "VidShrink.Core.dll", "Avalonia.Base.dll", "libmpv-2.dll" }.Select((a, i) => (a, i + 1)))
-            ilerleme.Step(20 + 70.0 * sira / 6, 20 + 70.0 * (sira + 1) / 6, ad + "  " + sira + "/6");
+        ilerleme.Step(55, 80, "İndiriliyor");
         for (var i = 0; i < 90; i++) pencere.UpdateFrame(TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds));
         pencere.ShowPerformanceResult(PerformanceCheck.Evaluate(
             new EncoderCost("libx264", true, 3100, 3200, 6000),

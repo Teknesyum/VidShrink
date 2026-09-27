@@ -22,6 +22,10 @@ Hedef boyuta sıkıştıran video aracı. .NET 8 + Avalonia + ffmpeg.
 - Otomatik güncelleme Windows'ta varsayılan açık (`MainWindow.KapanistaGuncelleme.cs`): sahne `AcilisBitti`'den sonra
   sessizce iner, kurulum uygulamanın çıkışında yerinde takasla olur ve yeni sürüm açılmaz; takas düşerse başlatıcı
   `--install-on-exit <pid>` ile çıkışı bekleyip kurar. Başlatıcının arka plan indirme turu kalktı. Ölçüm `docs/olcumler/kapanista-guncelleme.md`.
+- Sahne tek paketten iner (`UpdateStaging.StagePackageAsync`): `vidshrink-update-<rid>.zip` (`app/` + `launcher/`), özeti
+  `checksums-<rid>.txt`'de; satır yoksa eski dosya dosya aralık yoluna düşülür, eski arşivler yayında kalır. Panelde yalnız çubuk
+  ve yüzde, 1 sn'den önce görünmez; dosya listesi yok. Her kurulum ve güncelleme sonunda `Core/Setup/ShortcutIcons` hedefi
+  kurulu exe olan kısayolların simgesini `<exe>,0` yazar ve `SHChangeNotify` çağırır (testte `VIDSHRINK_SHORTCUT_DIR`).
 - `tests/VidShrink.Tests` — tek test projesi. Ölçüsü **dokunulan alan**: değişen her dosyanın
   testleri yerelde yeşil olmadan teslim yok. Tam süit yerelde koşulmaz; itmeden sonra CI
   koşar ve `gh run list` yeşili teslimin şartıdır. `tools/kosum-kapisi` yalnız **majör**
