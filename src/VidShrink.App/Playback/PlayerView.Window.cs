@@ -180,6 +180,25 @@ internal partial class PlayerView
         _trace.Add("autonext -> " + StepFile(true));
     }
 
+    /// <summary>
+    /// Sondayken oynat: klasörde sonraki dosya varsa ona geçer ve true döner; yoksa başa
+    /// sarar, oynatmayı çağıran sürdürür.
+    /// </summary>
+    private bool PlayFromEnd()
+    {
+        EnsureSettings();
+        if (_path is { } path && FolderNavigator.Step(path, true, _settings.Repeat, _settings.Shuffle, _shuffleSeed) is { } next)
+        {
+            _trace.Add("end -> " + Path.GetFileName(next));
+            _navigation = OpenQuietlyAsync(next);
+            return true;
+        }
+
+        _seek.GoTo(0);
+        _trace.Add("end -> tostart");
+        return false;
+    }
+
     private string StepFile(bool forward)
     {
         EnsureSettings();

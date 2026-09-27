@@ -118,7 +118,7 @@
                 Opacity="0"
                 IsHitTestVisible="False"
                 auto:AutomationProperties.Name="{loc:Text playback.control.strip}">
-          <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+          <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceXs}">
 
             <Panel Grid.Row="0"
                    x:Name="SeekBar"

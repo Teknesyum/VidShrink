@@ -474,6 +474,62 @@ public sealed class OynaticiDalga3GirdiTests
         Kapat("otomatik-sonraki-kapali.txt");
     }
 
+    private static (string rapor, string? acilan, string ilk, string ikinci, bool oynuyor) SondanOynat(bool ikinciVar)
+    {
+        var klasor = GorunumKanit.Gecici("sondan-" + (ikinciVar ? "sonraki" : "tek"));
+        var ilk = Klip(klasor, "a-ilk.mp4");
+        var ikinci = ikinciVar ? Klip(klasor, "b-ikinci.mp4") : Path.Combine(klasor, "b-ikinci.mp4");
+        var ayar = Path.Combine(klasor, "ayar", "history.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(ayar)!);
+        var s = AppHost.Run(() =>
+        {
+            var body = new StringBuilder();
+            var view = DenetimSurucu.Ac(ilk, out var window, ayar);
+            window.Show();
+            view.Settings.Repeat = RepeatMode.Off;
+            DenetimSurucu.Wait(view, 0.2);
+            if (!view.IsPlaying) Tus(window, Key.Space);
+            DenetimSurucu.Pump(view, () => view.Engine?.EndReached == true && !view.IsPlaying, 8);
+            body.AppendLine($"sonda: dosya sonu {view.Engine?.EndReached}, oynuyor {view.IsPlaying}");
+            Tus(window, Key.Space);
+            if (ikinciVar) DenetimSurucu.Pump(view, () => view.LoadedPath == ikinci, 8);
+            GorunumKanit.Bekle(view, () => view.Navigation, 10);
+            DenetimSurucu.Pump(view, () => view.IsPlaying, 3);
+            var acilan = view.LoadedPath;
+            var oynuyor = view.IsPlaying;
+            body.AppendLine($"Space sonrasi: acilan {Path.GetFileName(acilan)}, oynuyor {oynuyor}, konum {view.CurrentPosition():0.00}");
+            body.AppendLine("iz: " + string.Join(" | ", view.Trace));
+            view.Close();
+            window.Close();
+            return (body.ToString(), acilan, oynuyor);
+        });
+        return (s.Item1, s.acilan, ilk, ikinci, s.oynuyor);
+    }
+
+    [Fact]
+    public void SondaykenOynatSonrakiDosyaVarsaOnuAcar()
+    {
+        var sonuc = SondanOynat(true);
+        Kanit("sondan-oynat-sonraki.txt", sonuc.rapor);
+        Assert.Contains("sonda: dosya sonu True, oynuyor False", sonuc.rapor);
+        Assert.Contains("end -> b-ikinci.mp4", sonuc.rapor);
+        Assert.Equal(sonuc.ikinci, sonuc.acilan);
+        Assert.True(sonuc.oynuyor, sonuc.rapor);
+        Kapat("sondan-oynat-sonraki.txt");
+    }
+
+    [Fact]
+    public void SondaykenOynatSonrakiYoksaBastanOynar()
+    {
+        var sonuc = SondanOynat(false);
+        Kanit("sondan-oynat-tek.txt", sonuc.rapor);
+        Assert.Contains("sonda: dosya sonu True, oynuyor False", sonuc.rapor);
+        Assert.Contains("end -> tostart", sonuc.rapor);
+        Assert.Equal(sonuc.ilk, sonuc.acilan);
+        Assert.True(sonuc.oynuyor, sonuc.rapor);
+        Kapat("sondan-oynat-tek.txt");
+    }
+
     [Fact]
     public void HamSurukleBirakDosyayiAcarKlasorVeSilinenDosyaAcmaz()
     {

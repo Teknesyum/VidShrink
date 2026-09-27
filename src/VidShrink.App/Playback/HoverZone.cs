@@ -42,8 +42,8 @@ internal sealed class DispatcherHoverClock : IHoverClock
 /// <summary>
 /// Panelin alt bölgesindeki fare durumunu ve şeridin görünürlüğünü tutar.
 ///
-/// Bölge yüksekliği piksel değil oran: <see cref="Share"/> panelin yüksekliğiyle çarpılır,
-/// böylece panel terfi edip program boyuna çıktığında bölge de büyür.
+/// Bölge yüksekliği sabit pikselle verilirse o sayıdır (panelden büyükse panelin boyu);
+/// verilmezse oran: <see cref="Share"/> panelin yüksekliğiyle çarpılır.
 ///
 /// Kaybolma gecikmesi bir kuşak sayacıyla korunuyor. Zamanlayıcı tik attığında kendi
 /// kuşağını taşıyıp taşımadığına bakıyor; araya yeni bir gösterme girdiyse eski tik
@@ -67,6 +67,7 @@ internal sealed class HoverZone
     private readonly Func<TimeSpan> _hideDelay;
     private readonly Action<bool> _apply;
     private readonly double _share;
+    private readonly double _pixels;
 
     private IHoverClock _clock = new DispatcherHoverClock();
     private int _generation;
@@ -74,9 +75,10 @@ internal sealed class HoverZone
     private bool _held;
     private bool _visible;
 
-    internal HoverZone(double share, Func<TimeSpan> showDelay, Func<TimeSpan> hideDelay, Action<bool> apply)
+    internal HoverZone(double share, Func<TimeSpan> showDelay, Func<TimeSpan> hideDelay, Action<bool> apply, double pixels = 0)
     {
         _share = Math.Clamp(share, 0, 1);
+        _pixels = Math.Max(pixels, 0);
         _showDelay = showDelay;
         _hideDelay = hideDelay;
         _apply = apply;
@@ -116,7 +118,8 @@ internal sealed class HoverZone
     /// P14: bölgenin piksel derinliği. Alt şerit bunu panelin alt kenarından, üst bar
     /// pencerenin üst kenarından ölçer; iki bar aynı mesafede açılır.
     /// </summary>
-    internal double Band(double panelHeight) => panelHeight > 0 ? panelHeight * _share : 0;
+    internal double Band(double panelHeight)
+        => panelHeight <= 0 ? 0 : _pixels > 0 ? Math.Min(_pixels, panelHeight) : panelHeight * _share;
 
     internal void PointerAt(double y, double panelHeight) => SetPointer(Covers(y, panelHeight));
 

@@ -98,7 +98,8 @@ internal partial class PlayerView
             share: Resource("PlaybackHoverZoneShare"),
             showDelay: () => Span("PlaybackStripShowDelay"),
             hideDelay: () => Span("PlaybackStripHideDelay"),
-            apply: RevealSerit);
+            apply: RevealSerit,
+            pixels: Resource("PlaybackHoverZoneHeight"));
 
         StripBar.Transitions = HoverZone.MotionReduced
             ? null
@@ -175,6 +176,7 @@ internal partial class PlayerView
         if (shown && StripBar.Opacity < 0.001) SpreadSerit();
         StripBar.Opacity = shown ? 1 : 0;
         StripBar.IsHitTestVisible = shown;
+        if (!shown) HideThumbnail();
     }
 
     /// <summary>

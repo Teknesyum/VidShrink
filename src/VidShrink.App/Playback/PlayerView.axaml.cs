@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -47,6 +48,8 @@ internal partial class PlayerView : UserControl
     private double PauseGlyphOpacity => this.FindResource("PauseGlyphOpacity") is double d ? d : 0.5;
 
     private TimeSpan PauseGlyphHold => this.FindResource("PauseGlyphHold") is TimeSpan t ? t : TimeSpan.FromMilliseconds(500);
+
+    private TimeSpan MotionInstant => this.FindResource("MotionInstant") is TimeSpan t ? t : TimeSpan.FromMilliseconds(40);
 
     private TimeSpan MotionFast => this.FindResource("MotionFast") is TimeSpan t ? t : TimeSpan.FromMilliseconds(160);
 
@@ -520,6 +523,7 @@ internal partial class PlayerView : UserControl
 
     internal void TogglePlay()
     {
+        if (!_playing && _engine is { EndReached: true } && PlayFromEnd()) return;
         _playing = !_playing;
         _trackPaused = false;
         if (_engine is not { } engine) return;
@@ -540,7 +544,7 @@ internal partial class PlayerView : UserControl
 
     /// <summary>
     /// Duraklatinca sahnenin ortasinda kisa bir duraklatma simgesi belirir: girisi ve
-    /// cikisi <c>MotionFast</c>, ekranda toplam kalisi giris ve cikis dahil
+    /// cikisi <c>MotionFast</c> (giris <c>MotionInstant</c>, iki kat hizli), ekranda toplam kalisi giris ve cikis dahil
     /// <c>PauseGlyphHold</c> (tarif: 0,5 sn). Oynatmada karsiligi yok — orada goruntunun
     /// onune konan her sey icerigi kapatir. Ust uste duraklatmada eski cikisin gizlemesi
     /// yeni simgeyi kapatmasin diye her parlama bir sira numarasi tasir.
@@ -552,6 +556,7 @@ internal partial class PlayerView : UserControl
         _pauseFlashSira++;
 
         PauseGlyph.IsVisible = true;
+        GlyphMotion(MotionInstant);
         PauseGlyph.Opacity = PauseGlyphOpacity;
         PauseGlyph.RenderTransform = TransformOperations.Parse("scale(1)");
 
@@ -564,9 +569,17 @@ internal partial class PlayerView : UserControl
 
     private int _pauseFlashSira;
 
+    private void GlyphMotion(TimeSpan duration)
+    {
+        if (PauseGlyph.Transitions is not { } list) return;
+        foreach (var transition in list)
+            if (transition is TransitionBase timed) timed.Duration = duration;
+    }
+
     private void OnPauseFlashDone(object? sender, EventArgs e)
     {
         _pauseFlash?.Stop();
+        GlyphMotion(MotionFast);
         PauseGlyph.Opacity = 0;
         PauseGlyph.RenderTransform = TransformOperations.Parse("scale(0.8)");
 
