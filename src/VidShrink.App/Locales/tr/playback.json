@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Paneli büyüt",
   "playback.panel.fullscreen": "Tam ekran",
   "playback.zoom.out": "Uzaklaştır",
-  "playback.zoom.in": "Yakınlaştır"
+  "playback.zoom.in": "Yakınlaştır",
+  "player.menu.reveal": "Dosya konumunu aç",
+  "player.menu.view": "Görüntü",
+  "player.menu.playback": "Oynatma",
+  "player.menu.loop": "Tekrar ve yer imleri"
 }

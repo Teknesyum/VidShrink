@@ -53,5 +53,9 @@
   "playback.panel.maximize": "பலகத்தை பெரிதாக்கவும்",
   "playback.panel.fullscreen": "முழுத்திரை",
   "playback.zoom.out": "சிறிதாக்கு",
-  "playback.zoom.in": "பெரிதாக்கு"
+  "playback.zoom.in": "பெரிதாக்கு",
+  "player.menu.reveal": "கோப்பு இருப்பிடத்தைத் திற",
+  "player.menu.view": "படம்",
+  "player.menu.playback": "இயக்கம்",
+  "player.menu.loop": "மீண்டும் இயக்கல் மற்றும் புத்தகக்குறிகள்"
 }

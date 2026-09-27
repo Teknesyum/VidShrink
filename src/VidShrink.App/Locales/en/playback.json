@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Maximize panel",
   "playback.panel.fullscreen": "Full screen",
   "playback.zoom.out": "Zoom out",
-  "playback.zoom.in": "Zoom in"
+  "playback.zoom.in": "Zoom in",
+  "player.menu.reveal": "Open file location",
+  "player.menu.view": "Video",
+  "player.menu.playback": "Playback",
+  "player.menu.loop": "Loop and bookmarks"
 }

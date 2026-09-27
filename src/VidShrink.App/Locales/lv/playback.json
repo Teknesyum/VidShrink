@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Palielināt paneli",
   "playback.panel.fullscreen": "Pilnekrāns",
   "playback.zoom.out": "Samazināt tālummaiņu",
-  "playback.zoom.in": "Palielināt tālummaiņu"
+  "playback.zoom.in": "Palielināt tālummaiņu",
+  "player.menu.reveal": "Atvērt faila atrašanās vietu",
+  "player.menu.view": "Attēls",
+  "player.menu.playback": "Atskaņošana",
+  "player.menu.loop": "Atkārtošana un grāmatzīmes"
 }

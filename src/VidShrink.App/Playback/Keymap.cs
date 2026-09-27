@@ -36,10 +36,8 @@ internal readonly record struct PlayerInput(
         => new(PlayerInputKind.Press, Key.None, null, button, KeyModifiers.None);
 }
 
-internal sealed record PlayerAction(PlayerCommandKind Command, double Amount, string LabelKey, int MenuGroup)
+internal sealed record PlayerAction(PlayerCommandKind Command, double Amount, string LabelKey)
 {
-    internal bool InMenu => MenuGroup > 0;
-
     internal PlayerCommand ToCommand(double scale = 1) => new(Command, Amount * scale);
 }
 
@@ -56,41 +54,41 @@ internal static class Keymap
     internal const double SeekLarge = 300;
     internal const double SeekFine = 1;
 
-    internal static readonly PlayerAction Settings = new(PlayerCommandKind.OpenSettings, 0, "main.player.menu.settings", 1);
-    internal static readonly PlayerAction PlayPause = new(PlayerCommandKind.TogglePlay, 0, "main.player.menu.playpause", 1);
-    internal static readonly PlayerAction Stop = new(PlayerCommandKind.Stop, 0, "main.player.menu.stop", 1);
-    internal static readonly PlayerAction GoToStart = new(PlayerCommandKind.GoToStart, 0, "main.player.menu.tostart", 1);
-    internal static readonly PlayerAction Fullscreen = new(PlayerCommandKind.ToggleFullscreen, 0, "main.player.menu.fullscreen", 1);
-    internal static readonly PlayerAction ResetZoom = new(PlayerCommandKind.ResetZoom, 0, "main.player.menu.reset", 1);
-    internal static readonly PlayerAction AspectCycle = new(PlayerCommandKind.AspectCycle, 0, "player.view.aspect", 7);
-    internal static readonly PlayerAction Rotate = new(PlayerCommandKind.Rotate, 90, "player.view.rotate", 7);
-    internal static readonly PlayerAction Mirror = new(PlayerCommandKind.Mirror, 0, "player.view.mirror", 7);
-    internal static readonly PlayerAction Topmost = new(PlayerCommandKind.ToggleTopmost, 0, "player.view.topmost", 7);
-    internal static readonly PlayerAction Info = new(PlayerCommandKind.ToggleInfo, 0, "player.view.info", 7);
-    internal static readonly PlayerAction Screenshot = new(PlayerCommandKind.Screenshot, 0, "player.view.screenshot", 7);
-    internal static readonly PlayerAction PreviousFile = new(PlayerCommandKind.FileStep, -1, "player.list.previous", 8);
-    internal static readonly PlayerAction NextFile = new(PlayerCommandKind.FileStep, 1, "player.list.next", 8);
-    internal static readonly PlayerAction Shuffle = new(PlayerCommandKind.ToggleShuffle, 0, "player.list.shuffle", 8);
-    internal static readonly PlayerAction RepeatCycle = new(PlayerCommandKind.RepeatCycle, 0, "player.list.repeat", 8);
-    internal static readonly PlayerAction Mute = new(PlayerCommandKind.ToggleMute, 0, "main.player.menu.mute", 2);
-    internal static readonly PlayerAction Faster = new(PlayerCommandKind.Speed, SpeedStep, "main.player.menu.faster", 3);
-    internal static readonly PlayerAction Slower = new(PlayerCommandKind.Speed, -SpeedStep, "main.player.menu.slower", 3);
-    internal static readonly PlayerAction NormalSpeed = new(PlayerCommandKind.SpeedReset, 0, "main.player.menu.normalspeed", 3);
-    internal static readonly PlayerAction NextFrame = new(PlayerCommandKind.FrameStep, 1, "main.player.menu.nextframe", 4);
-    internal static readonly PlayerAction PreviousFrame = new(PlayerCommandKind.FrameStep, -1, "main.player.menu.prevframe", 4);
-    internal static readonly PlayerAction LoopStart = new(PlayerCommandKind.LoopStart, 0, "main.player.menu.loopstart", 5);
-    internal static readonly PlayerAction LoopEnd = new(PlayerCommandKind.LoopEnd, 0, "main.player.menu.loopend", 5);
-    internal static readonly PlayerAction LoopClear = new(PlayerCommandKind.LoopClear, 0, "main.player.menu.loopclear", 5);
-    internal static readonly PlayerAction BookmarkAdd = new(PlayerCommandKind.BookmarkAdd, 0, "main.player.menu.bookmarkadd", 6);
-    internal static readonly PlayerAction BookmarkNext = new(PlayerCommandKind.BookmarkNext, 1, "main.player.menu.bookmarknext", 6);
-    internal static readonly PlayerAction BookmarkPrevious = new(PlayerCommandKind.BookmarkNext, -1, "main.player.menu.bookmarkprev", 6);
-    internal static readonly PlayerAction OpenMenu = new(PlayerCommandKind.ContextMenu, 0, "main.player.menu.open", 0);
-    internal static readonly PlayerAction LeaveFullscreen = new(PlayerCommandKind.LeaveFullscreen, 0, "main.player.menu.leavefullscreen", 0);
-    internal static readonly PlayerAction Zoom = new(PlayerCommandKind.Zoom, 1, "main.player.menu.zoom", 0);
+    internal static readonly PlayerAction Settings = new(PlayerCommandKind.OpenSettings, 0, "main.player.menu.settings");
+    internal static readonly PlayerAction PlayPause = new(PlayerCommandKind.TogglePlay, 0, "main.player.menu.playpause");
+    internal static readonly PlayerAction Stop = new(PlayerCommandKind.Stop, 0, "main.player.menu.stop");
+    internal static readonly PlayerAction GoToStart = new(PlayerCommandKind.GoToStart, 0, "main.player.menu.tostart");
+    internal static readonly PlayerAction Fullscreen = new(PlayerCommandKind.ToggleFullscreen, 0, "main.player.menu.fullscreen");
+    internal static readonly PlayerAction ResetZoom = new(PlayerCommandKind.ResetZoom, 0, "main.player.menu.reset");
+    internal static readonly PlayerAction AspectCycle = new(PlayerCommandKind.AspectCycle, 0, "player.view.aspect");
+    internal static readonly PlayerAction Rotate = new(PlayerCommandKind.Rotate, 90, "player.view.rotate");
+    internal static readonly PlayerAction Mirror = new(PlayerCommandKind.Mirror, 0, "player.view.mirror");
+    internal static readonly PlayerAction Topmost = new(PlayerCommandKind.ToggleTopmost, 0, "player.view.topmost");
+    internal static readonly PlayerAction Info = new(PlayerCommandKind.ToggleInfo, 0, "player.view.info");
+    internal static readonly PlayerAction Screenshot = new(PlayerCommandKind.Screenshot, 0, "player.view.screenshot");
+    internal static readonly PlayerAction PreviousFile = new(PlayerCommandKind.FileStep, -1, "player.list.previous");
+    internal static readonly PlayerAction NextFile = new(PlayerCommandKind.FileStep, 1, "player.list.next");
+    internal static readonly PlayerAction Shuffle = new(PlayerCommandKind.ToggleShuffle, 0, "player.list.shuffle");
+    internal static readonly PlayerAction RepeatCycle = new(PlayerCommandKind.RepeatCycle, 0, "player.list.repeat");
+    internal static readonly PlayerAction Mute = new(PlayerCommandKind.ToggleMute, 0, "main.player.menu.mute");
+    internal static readonly PlayerAction Faster = new(PlayerCommandKind.Speed, SpeedStep, "main.player.menu.faster");
+    internal static readonly PlayerAction Slower = new(PlayerCommandKind.Speed, -SpeedStep, "main.player.menu.slower");
+    internal static readonly PlayerAction NormalSpeed = new(PlayerCommandKind.SpeedReset, 0, "main.player.menu.normalspeed");
+    internal static readonly PlayerAction NextFrame = new(PlayerCommandKind.FrameStep, 1, "main.player.menu.nextframe");
+    internal static readonly PlayerAction PreviousFrame = new(PlayerCommandKind.FrameStep, -1, "main.player.menu.prevframe");
+    internal static readonly PlayerAction LoopStart = new(PlayerCommandKind.LoopStart, 0, "main.player.menu.loopstart");
+    internal static readonly PlayerAction LoopEnd = new(PlayerCommandKind.LoopEnd, 0, "main.player.menu.loopend");
+    internal static readonly PlayerAction LoopClear = new(PlayerCommandKind.LoopClear, 0, "main.player.menu.loopclear");
+    internal static readonly PlayerAction BookmarkAdd = new(PlayerCommandKind.BookmarkAdd, 0, "main.player.menu.bookmarkadd");
+    internal static readonly PlayerAction BookmarkNext = new(PlayerCommandKind.BookmarkNext, 1, "main.player.menu.bookmarknext");
+    internal static readonly PlayerAction BookmarkPrevious = new(PlayerCommandKind.BookmarkNext, -1, "main.player.menu.bookmarkprev");
+    internal static readonly PlayerAction OpenMenu = new(PlayerCommandKind.ContextMenu, 0, "main.player.menu.open");
+    internal static readonly PlayerAction LeaveFullscreen = new(PlayerCommandKind.LeaveFullscreen, 0, "main.player.menu.leavefullscreen");
+    internal static readonly PlayerAction Zoom = new(PlayerCommandKind.Zoom, 1, "main.player.menu.zoom");
 
-    private static PlayerAction Seek(double seconds) => new(PlayerCommandKind.Seek, seconds, "main.player.menu.seek", 0);
+    private static PlayerAction Seek(double seconds) => new(PlayerCommandKind.Seek, seconds, "main.player.menu.seek");
 
-    private static PlayerAction Volume(double step) => new(PlayerCommandKind.Volume, step, "main.player.menu.volume", 0);
+    private static PlayerAction Volume(double step) => new(PlayerCommandKind.Volume, step, "main.player.menu.volume");
 
     internal static readonly IReadOnlyList<KeymapRow> Rows = new KeymapRow[]
     {
@@ -163,17 +161,31 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.U, KeyModifiers.Control), ToolsOptions.OpenUrl)
     };
 
-    internal static readonly IReadOnlyList<PlayerAction> MenuActions = new[]
+    internal static readonly IReadOnlyList<PlayerAction> MenuTop = new[] { PlayPause, Fullscreen };
+
+    internal static readonly IReadOnlyList<PlayerAction?> ViewMenu = new[]
     {
-        Settings, PlayPause, Stop, GoToStart, Fullscreen, ResetZoom,
-        Mute,
-        Faster, Slower, NormalSpeed,
-        NextFrame, PreviousFrame,
-        AspectCycle, Rotate, Mirror, Topmost, Info, Screenshot,
-        PreviousFile, NextFile, Shuffle, RepeatCycle,
-        LoopStart, LoopEnd, LoopClear,
+        AspectCycle, Rotate, Mirror, ResetZoom, null, Topmost
+    };
+
+    internal static readonly IReadOnlyList<PlayerAction?> PlaybackMenu = new[]
+    {
+        Faster, Slower, NormalSpeed, null,
+        NextFrame, PreviousFrame, null,
+        PreviousFile, NextFile, Shuffle, RepeatCycle
+    };
+
+    internal static readonly IReadOnlyList<PlayerAction?> LoopMenu = new[]
+    {
+        LoopStart, LoopEnd, LoopClear, null,
         BookmarkAdd, BookmarkNext, BookmarkPrevious
     };
+
+    internal static readonly IReadOnlyList<PlayerAction> MenuActions = MenuTop
+        .Concat(ViewMenu).Concat(PlaybackMenu).Concat(LoopMenu)
+        .OfType<PlayerAction>()
+        .Append(Screenshot).Append(Info).Append(Settings)
+        .ToList();
 
     internal static PlayerCommand ForWheel(double notches, KeyModifiers modifiers)
     {

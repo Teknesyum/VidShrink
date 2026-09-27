@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Μεγέθυνση πίνακα",
   "playback.panel.fullscreen": "Πλήρης οθόνη",
   "playback.zoom.out": "Σμίκρυνση",
-  "playback.zoom.in": "Μεγέθυνση"
+  "playback.zoom.in": "Μεγέθυνση",
+  "player.menu.reveal": "Άνοιγμα θέσης αρχείου",
+  "player.menu.view": "Εικόνα",
+  "player.menu.playback": "Αναπαραγωγή",
+  "player.menu.loop": "Επανάληψη και σελιδοδείκτες"
 }

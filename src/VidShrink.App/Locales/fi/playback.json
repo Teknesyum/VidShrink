@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Suurenna paneeli",
   "playback.panel.fullscreen": "Koko näyttö",
   "playback.zoom.out": "Loitonna",
-  "playback.zoom.in": "Lähennä"
+  "playback.zoom.in": "Lähennä",
+  "player.menu.reveal": "Avaa tiedoston sijainti",
+  "player.menu.view": "Kuva",
+  "player.menu.playback": "Toisto",
+  "player.menu.loop": "Silmukka ja kirjanmerkit"
 }

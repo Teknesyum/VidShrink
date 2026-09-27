@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Suurenda paneeli",
   "playback.panel.fullscreen": "Täisekraan",
   "playback.zoom.out": "Vähenda suumi",
-  "playback.zoom.in": "Suurenda suumi"
+  "playback.zoom.in": "Suurenda suumi",
+  "player.menu.reveal": "Ava faili asukoht",
+  "player.menu.view": "Pilt",
+  "player.menu.playback": "Taasesitus",
+  "player.menu.loop": "Kordus ja järjehoidjad"
 }

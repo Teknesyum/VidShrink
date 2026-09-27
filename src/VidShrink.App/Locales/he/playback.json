@@ -53,5 +53,9 @@
   "playback.panel.maximize": "הגדל את הלוח",
   "playback.panel.fullscreen": "מסך מלא",
   "playback.zoom.out": "הקטן תצוגה",
-  "playback.zoom.in": "הגדל תצוגה"
+  "playback.zoom.in": "הגדל תצוגה",
+  "player.menu.reveal": "פתח את מיקום הקובץ",
+  "player.menu.view": "תמונה",
+  "player.menu.playback": "הפעלה",
+  "player.menu.loop": "חזרה וסימניות"
 }

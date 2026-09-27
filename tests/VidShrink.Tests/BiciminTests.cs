@@ -1181,6 +1181,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-26, kapanista guncelleme: <c>main.update.ready-on-exit</c> 2 dilde kola giriyor (en hu); yeniden yazilan
     /// <c>settings.update.auto-effect</c> 3 dilde koldan cikiyor (bn hi ur; eski metin kolda, yenisi degil, eski Locales ile kosularak olculdu):
     /// 2672 + 2 - 3 = 2671, en 248, tr 91; bolge kaydi birlesmesinin tr eksigiyle 2670, en 248, tr 90.</para>
+    /// <para>2026-09-27, oynatici sag menusu: <c>player.menu.loop</c> 5 dilde kola giriyor (cs en sk sl tr), <c>player.menu.reveal</c>
+    /// yalniz pt'de; <c>player.menu.view</c> ve <c>player.menu.playback</c> kolun disinda: 2670 + 6 = 2676, en 249, tr 91.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1206,9 +1208,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2670, toplam);
-        Assert.Equal(248, dilBasina["en"]);
-        Assert.Equal(90, dilBasina["tr"]);
+        Assert.Equal(2676, toplam);
+        Assert.Equal(249, dilBasina["en"]);
+        Assert.Equal(91, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1371,6 +1373,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-25, Indir ve Yukle: dil basina <c>main.action.downloadinstall</c>: 1107 + 1 = 1108, 43 x 1108 = 47644.</para>
     /// <para>2026-09-26, paylasim QR'i: dil basina iki anahtar (<c>main.share.qr</c>, <c>main.share.qr-hint</c>): 1108 + 2 = 1110, 43 x 1110 = 47730.</para>
     /// <para>2026-09-26, kapanista guncelleme: dil basina <c>main.update.ready-on-exit</c>: 1110 + 1 = 1111, 43 x 1111 = 47773.</para>
+    /// <para>2026-09-27, oynatici sag menusu: dil basina dort anahtar (<c>player.menu.reveal</c>, <c>-view</c>, <c>-playback</c>,
+    /// <c>-loop</c>): pimli 47816 = 43 x 1112 uzerine 1112 + 4 = 1116, 43 x 1116 = 47988.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1398,7 +1402,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(47816, gezilen);
+        Assert.Equal(47988, gezilen);
         Assert.Empty(kayip);
     }
 

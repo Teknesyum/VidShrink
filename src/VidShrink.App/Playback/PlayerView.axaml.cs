@@ -393,38 +393,6 @@ internal partial class PlayerView : UserControl
 
     internal bool MenuOpen => _menu?.IsOpen ?? false;
 
-    internal MenuFlyout BuildMenu()
-    {
-        var flyout = new MenuFlyout();
-        var group = 0;
-        foreach (var action in Keymap.MenuActions)
-        {
-            if (group != 0 && action.MenuGroup != group) flyout.Items.Add(new Separator());
-            group = action.MenuGroup;
-
-            var item = new MenuItem { Header = Strings.Get(action.LabelKey), Tag = action };
-            if (ReferenceEquals(action, Keymap.Settings))
-            {
-                foreach (var child in SettingsItems()) item.Items.Add(child);
-                flyout.Items.Add(item);
-                continue;
-            }
-
-            if (Keymap.FirstKeyRow(action) is { } row)
-            {
-                item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
-                ToolTip.SetTip(item, Strings.Get(action.LabelKey) + " (" + Keymap.Gesture(row.Input) + ")");
-            }
-            item.Click += OnMenuRow;
-            flyout.Items.Add(item);
-        }
-
-        AddTrackMenus(flyout);
-        AppendWindowMenu(flyout);
-        AppendToolsMenu(flyout);
-        return flyout;
-    }
-
     internal List<Control> SettingsItems()
     {
         var items = new List<Control>();
