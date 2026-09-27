@@ -1,0 +1,16 @@
+{
+  "editor.split": "Dela",
+  "editor.delete": "Ta bort",
+  "editor.delete-range": "Ta bort intervall",
+  "editor.mark-in": "Ange startpunkt",
+  "editor.mark-out": "Ange slutpunkt",
+  "editor.speed": "Hastighet",
+  "editor.reverse": "Vänd",
+  "editor.undo": "Ångra",
+  "editor.redo": "Gör om",
+  "editor.zoom-in": "Zooma in",
+  "editor.zoom-out": "Zooma ut",
+  "editor.export": "Exportera",
+  "editor.timeline": "Tidslinje",
+  "editor.playhead": "Uppspelningshuvud"
+}

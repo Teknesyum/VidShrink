@@ -1,0 +1,16 @@
+{
+  "editor.split": "Teilen",
+  "editor.delete": "Löschen",
+  "editor.delete-range": "Bereich löschen",
+  "editor.mark-in": "In-Punkt setzen",
+  "editor.mark-out": "Out-Punkt setzen",
+  "editor.speed": "Tempo",
+  "editor.reverse": "Umkehren",
+  "editor.undo": "Rückgängig",
+  "editor.redo": "Wiederholen",
+  "editor.zoom-in": "Vergrößern",
+  "editor.zoom-out": "Verkleinern",
+  "editor.export": "Exportieren",
+  "editor.timeline": "Zeitleiste",
+  "editor.playhead": "Abspielkopf"
+}

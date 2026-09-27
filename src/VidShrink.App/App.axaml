@@ -13,6 +13,9 @@
         <!-- T39: oynatıcıya ait belirteçler. Theme.axaml'dan sonra gelir, çünkü
              değerlerini oradaki belirteçlerden alır. -->
         <ResourceInclude Source="avares://VidShrink.App/Themes/Playback.axaml"/>
+        <!-- D3 (028): düzenleyici çizelgesinin belirteçleri. Playback.axaml'dan sonra
+             gelir, çünkü değerlerini oradaki ve Theme.axaml'daki belirteçlerden alır. -->
+        <ResourceInclude Source="avares://VidShrink.App/Themes/Editor.axaml"/>
         <!-- 8b: kaydediciye ait belirteçler. Theme.axaml'dan sonra gelir, çünkü
              değerlerini oradaki belirteçlerden alır. -->
         <ResourceInclude Source="avares://VidShrink.App/Themes/Recorder.axaml"/>

@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "لا يوجد ffmpeg ومعه ffprobe في هذا المسار؛ يُستخدم ffmpeg التلقائي بدلاً منه.",
 
   "main.tab.player": "المشغّل",
+  "main.tab.editor": "المحرر",
   "main.player.menu.playpause": "تشغيل / إيقاف مؤقت",
   "main.player.menu.fullscreen": "ملء الشاشة",
   "main.player.menu.reset": "إعادة ضبط التكبير",

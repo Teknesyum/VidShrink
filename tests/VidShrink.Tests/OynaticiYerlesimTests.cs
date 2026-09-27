@@ -148,7 +148,7 @@ public sealed class OynaticiYerlesimTests
                 return host.Margin;
             }
 
-            return (Oku(pencere.PlayerTabIndex), Oku(pencere.PlayerTabIndex + 1));
+            return (Oku(pencere.PlayerTabIndex), Oku(pencere.ShrinkTabIndex));
         });
 
         var calisma = (Thickness)Belirtec("WorkspaceMargin")!;
@@ -193,7 +193,7 @@ public sealed class OynaticiYerlesimTests
                 return (Grid.GetRow(katman), Grid.GetRow(host), Grid.GetRowSpan(host), katman.VerticalAlignment);
             }
 
-            return (Oku(pencere.PlayerTabIndex), Oku(pencere.PlayerTabIndex + 1));
+            return (Oku(pencere.PlayerTabIndex), Oku(pencere.ShrinkTabIndex));
         });
 
         Assert.Equal(2, oynatici.Kapsam);

@@ -1,0 +1,16 @@
+{
+  "editor.split": "Poolita",
+  "editor.delete": "Kustuta",
+  "editor.delete-range": "Kustuta vahemik",
+  "editor.mark-in": "Määra algus",
+  "editor.mark-out": "Määra lõpp",
+  "editor.speed": "Kiirus",
+  "editor.reverse": "Pööra ümber",
+  "editor.undo": "Võta tagasi",
+  "editor.redo": "Tee uuesti",
+  "editor.zoom-in": "Suurenda",
+  "editor.zoom-out": "Vähenda",
+  "editor.export": "Ekspordi",
+  "editor.timeline": "Ajatelg",
+  "editor.playhead": "Esituspea"
+}

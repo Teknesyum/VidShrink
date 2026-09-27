@@ -1,0 +1,16 @@
+{
+  "editor.split": "分割",
+  "editor.delete": "删除",
+  "editor.delete-range": "删除范围",
+  "editor.mark-in": "设置入点",
+  "editor.mark-out": "设置出点",
+  "editor.speed": "速度",
+  "editor.reverse": "倒放",
+  "editor.undo": "撤销",
+  "editor.redo": "重做",
+  "editor.zoom-in": "放大",
+  "editor.zoom-out": "缩小",
+  "editor.export": "导出",
+  "editor.timeline": "时间线",
+  "editor.playhead": "播放头"
+}

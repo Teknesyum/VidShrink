@@ -691,6 +691,13 @@ internal partial class PlayerView : UserControl
 
     internal event Action<string>? Opened;
 
+    internal void RefreshDuration()
+    {
+        if (_engine is not { } engine) return;
+        _seek.Duration = engine.DurationSeconds > 0 ? engine.DurationSeconds : double.PositiveInfinity;
+        RefreshState();
+    }
+
     private void SaveHistory(bool finished)
     {
         if (_path is not { } path || HistoryPath?.Invoke() is not { } file) return;

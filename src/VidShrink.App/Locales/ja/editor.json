@@ -1,0 +1,16 @@
+{
+  "editor.split": "分割",
+  "editor.delete": "削除",
+  "editor.delete-range": "範囲を削除",
+  "editor.mark-in": "イン点を設定",
+  "editor.mark-out": "アウト点を設定",
+  "editor.speed": "速度",
+  "editor.reverse": "反転",
+  "editor.undo": "元に戻す",
+  "editor.redo": "やり直し",
+  "editor.zoom-in": "拡大",
+  "editor.zoom-out": "縮小",
+  "editor.export": "書き出し",
+  "editor.timeline": "タイムライン",
+  "editor.playhead": "再生ヘッド"
+}

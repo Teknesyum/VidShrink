@@ -1,0 +1,16 @@
+{
+  "editor.split": "Couper",
+  "editor.delete": "Supprimer",
+  "editor.delete-range": "Supprimer la plage",
+  "editor.mark-in": "Définir le point d'entrée",
+  "editor.mark-out": "Définir le point de sortie",
+  "editor.speed": "Vitesse",
+  "editor.reverse": "Inverser",
+  "editor.undo": "Annuler l'action",
+  "editor.redo": "Rétablir",
+  "editor.zoom-in": "Zoom avant",
+  "editor.zoom-out": "Zoom arrière",
+  "editor.export": "Exporter",
+  "editor.timeline": "Chronologie",
+  "editor.playhead": "Tête de lecture"
+}

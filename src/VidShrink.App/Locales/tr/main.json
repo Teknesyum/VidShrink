@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Bu yolda yanında ffprobe olan bir ffmpeg yok; yerine otomatik ffmpeg kullanılıyor.",
 
   "main.tab.player": "Oynatıcı",
+  "main.tab.editor": "Düzenleyici",
   "main.player.menu.playpause": "Oynat / duraklat",
   "main.player.menu.fullscreen": "Tam ekran",
   "main.player.menu.reset": "Yakınlaştırmayı sıfırla",

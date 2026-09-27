@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Šiame kelyje nėra ffmpeg su šalia esančiu ffprobe; vietoj jo naudojamas automatinis ffmpeg.",
 
   "main.tab.player": "Grotuvas",
+  "main.tab.editor": "Redaktorius",
   "main.player.menu.playpause": "Groti / pristabdyti",
   "main.player.menu.fullscreen": "Visas ekranas",
   "main.player.menu.reset": "Atstatyti mastelį",

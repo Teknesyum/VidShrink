@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Pod tą ścieżką nie ma ffmpeg z ffprobe obok; zamiast niego używany jest automatyczny ffmpeg.",
 
   "main.tab.player": "Odtwarzacz",
+  "main.tab.editor": "Edytor",
   "main.player.menu.playpause": "Odtwórz / pauza",
   "main.player.menu.fullscreen": "Pełny ekran",
   "main.player.menu.reset": "Resetuj zoom",

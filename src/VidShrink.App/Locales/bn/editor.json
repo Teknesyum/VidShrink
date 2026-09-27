@@ -1,0 +1,16 @@
+{
+  "editor.split": "বিভক্ত করুন",
+  "editor.delete": "মুছুন",
+  "editor.delete-range": "পরিসর মুছুন",
+  "editor.mark-in": "শুরুর বিন্দু",
+  "editor.mark-out": "শেষের বিন্দু",
+  "editor.speed": "গতি",
+  "editor.reverse": "উল্টান",
+  "editor.undo": "পূর্বাবস্থায় ফেরান",
+  "editor.redo": "আবার করুন",
+  "editor.zoom-in": "জুম ইন",
+  "editor.zoom-out": "জুম আউট",
+  "editor.export": "রপ্তানি করুন",
+  "editor.timeline": "টাইমলাইন",
+  "editor.playhead": "প্লেহেড"
+}

@@ -1,0 +1,16 @@
+{
+  "editor.split": "تقسیم کریں",
+  "editor.delete": "حذف کریں",
+  "editor.delete-range": "حد حذف کریں",
+  "editor.mark-in": "آغاز کا نقطہ",
+  "editor.mark-out": "اختتام کا نقطہ",
+  "editor.speed": "رفتار",
+  "editor.reverse": "الٹا کریں",
+  "editor.undo": "کالعدم کریں",
+  "editor.redo": "دوبارہ کریں",
+  "editor.zoom-in": "زوم ان",
+  "editor.zoom-out": "زوم آؤٹ",
+  "editor.export": "برآمد کریں",
+  "editor.timeline": "ٹائم لائن",
+  "editor.playhead": "پلے ہیڈ"
+}

@@ -1,0 +1,16 @@
+{
+  "editor.split": "Razdeli",
+  "editor.delete": "Izbriši",
+  "editor.delete-range": "Izbriši obseg",
+  "editor.mark-in": "Nastavi začetek",
+  "editor.mark-out": "Nastavi konec",
+  "editor.speed": "Hitrost",
+  "editor.reverse": "Obrni",
+  "editor.undo": "Razveljavi",
+  "editor.redo": "Uveljavi",
+  "editor.zoom-in": "Povečaj",
+  "editor.zoom-out": "Pomanjšaj",
+  "editor.export": "Izvozi",
+  "editor.timeline": "Časovnica",
+  "editor.playhead": "Predvajalna glava"
+}

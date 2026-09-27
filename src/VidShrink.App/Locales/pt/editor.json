@@ -1,0 +1,16 @@
+{
+  "editor.split": "Dividir",
+  "editor.delete": "Excluir",
+  "editor.delete-range": "Excluir intervalo",
+  "editor.mark-in": "Marcar entrada",
+  "editor.mark-out": "Marcar saída",
+  "editor.speed": "Velocidade",
+  "editor.reverse": "Inverter",
+  "editor.undo": "Desfazer",
+  "editor.redo": "Refazer",
+  "editor.zoom-in": "Ampliar",
+  "editor.zoom-out": "Reduzir",
+  "editor.export": "Exportar",
+  "editor.timeline": "Linha do tempo",
+  "editor.playhead": "Cursor de reprodução"
+}

@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Na ovoj putanji nema ffmpeg-a sa ffprobe-om pored njega; umesto njega koristi se automatski ffmpeg.",
 
   "main.tab.player": "Plejer",
+  "main.tab.editor": "Uređivač",
   "main.player.menu.playpause": "Pusti / pauziraj",
   "main.player.menu.fullscreen": "Ceo ekran",
   "main.player.menu.reset": "Resetuj zum",

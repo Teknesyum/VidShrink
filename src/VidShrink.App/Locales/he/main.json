@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "בנתיב זה אין ffmpeg ולצידו ffprobe; במקומו נעשה שימוש ב-ffmpeg האוטומטי.",
 
   "main.tab.player": "נגן",
+  "main.tab.editor": "עורך",
   "main.player.menu.playpause": "נגן / השהה",
   "main.player.menu.fullscreen": "מסך מלא",
   "main.player.menu.reset": "אפס זום",

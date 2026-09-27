@@ -1,0 +1,16 @@
+{
+  "editor.split": "Taie",
+  "editor.delete": "Șterge",
+  "editor.delete-range": "Șterge intervalul",
+  "editor.mark-in": "Setează începutul",
+  "editor.mark-out": "Setează sfârșitul",
+  "editor.speed": "Viteză",
+  "editor.reverse": "Inversează",
+  "editor.undo": "Anulează acțiunea",
+  "editor.redo": "Refă",
+  "editor.zoom-in": "Mărește",
+  "editor.zoom-out": "Micșorează",
+  "editor.export": "Exportă",
+  "editor.timeline": "Cronologie",
+  "editor.playhead": "Cap de redare"
+}

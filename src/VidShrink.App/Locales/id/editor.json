@@ -1,0 +1,16 @@
+{
+  "editor.split": "Pisah",
+  "editor.delete": "Hapus",
+  "editor.delete-range": "Hapus rentang",
+  "editor.mark-in": "Tetapkan titik awal",
+  "editor.mark-out": "Tetapkan titik akhir",
+  "editor.speed": "Kecepatan",
+  "editor.reverse": "Balikkan",
+  "editor.undo": "Urungkan",
+  "editor.redo": "Ulangi",
+  "editor.zoom-in": "Perbesar",
+  "editor.zoom-out": "Perkecil",
+  "editor.export": "Ekspor",
+  "editor.timeline": "Linimasa",
+  "editor.playhead": "Penanda putar"
+}

@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Tiada ffmpeg dengan ffprobe di sebelahnya pada laluan ini; ffmpeg automatik digunakan sebagai ganti.",
 
   "main.tab.player": "Pemain",
+  "main.tab.editor": "Penyunting",
   "main.player.menu.playpause": "Main / jeda",
   "main.player.menu.fullscreen": "Skrin penuh",
   "main.player.menu.reset": "Set semula zum",

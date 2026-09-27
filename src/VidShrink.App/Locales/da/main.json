@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Der er ingen ffmpeg med ffprobe ved siden af på denne sti; den automatiske ffmpeg bruges i stedet.",
 
   "main.tab.player": "Afspiller",
+  "main.tab.editor": "Editor",
   "main.player.menu.playpause": "Afspil / pause",
   "main.player.menu.fullscreen": "Fuld skærm",
   "main.player.menu.reset": "Nulstil zoom",

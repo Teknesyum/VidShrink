@@ -1,0 +1,113 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--
+    D3 (028): düzenleyici çizelgesinin ölçüleri. Burada yeni sayı yok; her belirteç
+    Theme.axaml ya da Playback.axaml'daki bir belirtecin değerini alır. Renk de yok:
+    çizelge palet fırçalarını (NeonBlueFill, NeonPink, NeonPurple...) doğrudan çağırır.
+
+    İz ve cetvel
+
+      EditorVideoTrackHeight     <- DropIconSize (48). İki dokunma ölçüsü üst üste; klip
+                                    içinde rozet ve tutamak sığar.
+      EditorAudioTrackHeight     <- TargetMinSize (24). Ses izi görüntü izinin aynası,
+                                    dalga formu yok; dokunma ölçüsü yeter.
+      EditorTrackGap             <- SpaceXs (4). İzler arası tek çizgi payı.
+      EditorTrackHeaderWidth     <- FieldWidthSm (120). İz adı sütunu.
+      EditorRulerHeight          <- TargetMinSize (24). Cetvel tıklanabilir, oynatma
+                                    başını taşır.
+      EditorRulerMajorTick       <- SpaceSm (8). Büyük çentik.
+      EditorRulerMinorTick       <- SpaceXs (4). Küçük çentik.
+      EditorRulerLabelMinSpacing <- NumberBoxWidth (96). Mono zaman etiketinin genişliği;
+                                    etiket aralığı bunun altına inince 1-2-5-10
+                                    merdiveninde bir üst basamağa çıkılır.
+
+    Klip
+
+      EditorClipRadius           <- RadiusChip (4). Şerit parçası, PlaybackTrack'le aynı köşe.
+      EditorClipBorder           <- BorderThin (1). Klip çerçevesi.
+      EditorClipSelectedBorder   <- FocusRingThickness (2). Seçim kalınlıkla da okunur.
+      EditorClipPadding          <- SpaceXs (4). Rozet kenara yapışmaz.
+      EditorClipMinWidth         <- TargetMinSize (24). Bunun altındaki klip çizilir ama
+                                    rozetsizdir.
+      EditorEdgeGripWidth        <- SpaceSm (8). Kenar tutamağı; D3'te yalnız imleç biçimi.
+
+    Oynatma başı ve etkileşim
+
+      EditorPlayheadWidth        <- PlaybackCursorWidth (2). Oynatıcının imleciyle aynı.
+      EditorPlayheadHandle       <- SliderThumbSize (20). Cetveldeki tutamaç.
+      EditorSnapThresholdPx      <- SpaceSm (8). Piksel tanımlanır, tick saklanır; eşik
+                                    tick her zoom değişiminde yeniden hesaplanır.
+      EditorDragThresholdPx      <- SpaceXs (4). Altındaki hareket tıklamadır.
+      EditorAutoScrollMargin     <- PlaybackThumbnailWidth (128). Sürüklerken kenara bu
+                                    kadar yaklaşınca görünüm kayar.
+
+    Yakınlaştırma
+
+      EditorZoomMax              <- TargetMinSize (24). Bir kaynak karesi 24 px olunca durur.
+      EditorZoomMin              <- sayı değil kural: çizelgenin tamamı görünüme sığar.
+      EditorZoomStep             <- PlaybackHoverZoom (2). Ctrl+tekerlek ×2 / ÷2.
+      EditorMotionSelect         <- MotionFast. Seçim ve fare üstü geçişi.
+      Kaydırma anında olur, geçişi yok; o yüzden ayrı bir süre belirteci de yok.
+
+    Kalıplar
+
+      EditorClip klibin gövdesidir: PlaybackTrack'in fırçaları, fare üstünde NeonBlueHover,
+      seçilince NeonBlueActive + NeonBlueBorderStrong + GlowBlue ve kalın kenar.
+      EditorBadgeText hız rozetinin yazısıdır: PlaybackBadgeText kalıbı, TextBody rengiyle
+      (perde üstü yazı 7:1 ölçülü). Rozetin kendisi PlaybackBadge kalıbını kullanır.
+  -->
+
+  <StaticResource x:Key="EditorVideoTrackHeight" ResourceKey="DropIconSize"/>
+  <StaticResource x:Key="EditorAudioTrackHeight" ResourceKey="TargetMinSize"/>
+  <StaticResource x:Key="EditorTrackGap" ResourceKey="SpaceXs"/>
+  <StaticResource x:Key="EditorTrackHeaderWidth" ResourceKey="FieldWidthSm"/>
+  <StaticResource x:Key="EditorRulerHeight" ResourceKey="TargetMinSize"/>
+  <StaticResource x:Key="EditorRulerMajorTick" ResourceKey="SpaceSm"/>
+  <StaticResource x:Key="EditorRulerMinorTick" ResourceKey="SpaceXs"/>
+  <StaticResource x:Key="EditorRulerLabelMinSpacing" ResourceKey="NumberBoxWidth"/>
+
+  <StaticResource x:Key="EditorClipRadius" ResourceKey="RadiusChip"/>
+  <StaticResource x:Key="EditorClipBorder" ResourceKey="BorderThin"/>
+  <StaticResource x:Key="EditorClipSelectedBorder" ResourceKey="FocusRingThickness"/>
+  <StaticResource x:Key="EditorClipPadding" ResourceKey="SpaceXs"/>
+  <StaticResource x:Key="EditorClipMinWidth" ResourceKey="TargetMinSize"/>
+  <StaticResource x:Key="EditorEdgeGripWidth" ResourceKey="SpaceSm"/>
+
+  <StaticResource x:Key="EditorPlayheadWidth" ResourceKey="PlaybackCursorWidth"/>
+  <StaticResource x:Key="EditorPlayheadHandle" ResourceKey="SliderThumbSize"/>
+  <StaticResource x:Key="EditorSnapThresholdPx" ResourceKey="SpaceSm"/>
+  <StaticResource x:Key="EditorDragThresholdPx" ResourceKey="SpaceXs"/>
+  <StaticResource x:Key="EditorAutoScrollMargin" ResourceKey="PlaybackThumbnailWidth"/>
+
+  <StaticResource x:Key="EditorZoomMax" ResourceKey="TargetMinSize"/>
+  <StaticResource x:Key="EditorZoomStep" ResourceKey="PlaybackHoverZoom"/>
+  <StaticResource x:Key="EditorMotionSelect" ResourceKey="MotionFast"/>
+
+  <ControlTheme x:Key="EditorClip" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource EditorClipBorder}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource EditorClipRadius}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Background" Duration="{StaticResource EditorMotionSelect}"/>
+      </Transitions>
+    </Setter>
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="{StaticResource NeonBlueHover}"/>
+    </Style>
+    <Style Selector="^.selected">
+      <Setter Property="Background" Value="{StaticResource NeonBlueActive}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource EditorClipSelectedBorder}"/>
+      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="EditorBadgeText" TargetType="TextBlock" BasedOn="{StaticResource PlaybackBadgeText}">
+    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+  </ControlTheme>
+
+</ResourceDictionary>

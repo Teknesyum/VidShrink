@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Op dit pad staat geen ffmpeg met ffprobe ernaast; in plaats daarvan wordt de automatische ffmpeg gebruikt.",
 
   "main.tab.player": "Speler",
+  "main.tab.editor": "Editor",
   "main.player.menu.playpause": "Afspelen / pauze",
   "main.player.menu.fullscreen": "Volledig scherm",
   "main.player.menu.reset": "Zoom resetten",

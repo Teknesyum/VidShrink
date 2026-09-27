@@ -1,0 +1,16 @@
+{
+  "editor.split": "Opdel",
+  "editor.delete": "Slet",
+  "editor.delete-range": "Slet område",
+  "editor.mark-in": "Sæt startpunkt",
+  "editor.mark-out": "Sæt slutpunkt",
+  "editor.speed": "Hastighed",
+  "editor.reverse": "Vend om",
+  "editor.undo": "Fortryd",
+  "editor.redo": "Gentag",
+  "editor.zoom-in": "Zoom ind",
+  "editor.zoom-out": "Zoom ud",
+  "editor.export": "Eksportér",
+  "editor.timeline": "Tidslinje",
+  "editor.playhead": "Afspilningshoved"
+}

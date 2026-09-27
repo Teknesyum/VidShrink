@@ -231,7 +231,7 @@ public sealed class LanguageTests : IDisposable
         "IconVolume", "IconVolumeMute", "IconSpeed", "IconFullScreen",
         "IconChevronDown", "IconChevronUp", "IconStop", "IconRestart",
         "IconClose", "IconMaximize", "IconMinimize", "IconRestore",
-        "IconCoffee", "IconWarning"
+        "IconCoffee", "IconWarning", "IconEditor"
     };
 
     private static readonly Regex KeyAttribute = new(

@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "در این مسیر ffmpeg همراه با ffprobe کنارش نیست؛ به‌جای آن ffmpeg خودکار به کار می‌رود.",
 
   "main.tab.player": "پخش‌کننده",
+  "main.tab.editor": "ویرایشگر",
   "main.player.menu.playpause": "پخش / مکث",
   "main.player.menu.fullscreen": "تمام‌صفحه",
   "main.player.menu.reset": "بازنشانی بزرگ‌نمایی",

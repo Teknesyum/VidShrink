@@ -1,0 +1,16 @@
+{
+  "editor.split": "Splitsen",
+  "editor.delete": "Verwijderen",
+  "editor.delete-range": "Bereik verwijderen",
+  "editor.mark-in": "Beginpunt instellen",
+  "editor.mark-out": "Eindpunt instellen",
+  "editor.speed": "Snelheid",
+  "editor.reverse": "Omkeren",
+  "editor.undo": "Ongedaan maken",
+  "editor.redo": "Opnieuw",
+  "editor.zoom-in": "Inzoomen",
+  "editor.zoom-out": "Uitzoomen",
+  "editor.export": "Exporteren",
+  "editor.timeline": "Tijdlijn",
+  "editor.playhead": "Afspeelkop"
+}

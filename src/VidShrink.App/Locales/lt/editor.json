@@ -1,0 +1,16 @@
+{
+  "editor.split": "Padalyti",
+  "editor.delete": "Ištrinti",
+  "editor.delete-range": "Ištrinti intervalą",
+  "editor.mark-in": "Nustatyti pradžią",
+  "editor.mark-out": "Nustatyti pabaigą",
+  "editor.speed": "Greitis",
+  "editor.reverse": "Apversti",
+  "editor.undo": "Anuliuoti",
+  "editor.redo": "Pakartoti",
+  "editor.zoom-in": "Priartinti",
+  "editor.zoom-out": "Nutolinti",
+  "editor.export": "Eksportuoti",
+  "editor.timeline": "Laiko juosta",
+  "editor.playhead": "Atkūrimo žymeklis"
+}

@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "ไม่มี ffmpeg ที่มี ffprobe อยู่ข้างกันในเส้นทางนี้ จึงใช้ ffmpeg อัตโนมัติแทน",
 
   "main.tab.player": "ตัวเล่น",
+  "main.tab.editor": "ตัวแก้ไข",
   "main.player.menu.playpause": "เล่น / หยุด",
   "main.player.menu.fullscreen": "เต็มจอ",
   "main.player.menu.reset": "รีเซ็ตซูม",

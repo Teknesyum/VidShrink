@@ -11,7 +11,7 @@ Sayı hiçbir yerde sabit yazılı değil. `docs/danisma/2026-09-17-fable-kararl
 diyor; o, 13 Eylül ölçümünün sayısıdır. Takım Fluent'e taşınırken `IconRestore` eklenmiş (27),
 ardından kullanılmayan iki geometri düşürülmüştü; 18 Eylül 2026'da uyarı durumu için
 `IconWarning` eklendi (26); 27 Eylül 2026'da Teknesyum düğmesi simgesiz kalınca `IconCode`
-düştü — bugün depoda **25** yol var. `IconsTests` bu
+düştü; 27 Eylül 2026'da düzenleyici sekmesi için `IconEditor` eklendi — bugün depoda **26** yol var. `IconsTests` bu
 tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan düşen her anahtar
 ölçüyü kırar.
 
@@ -42,6 +42,7 @@ tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan d
 | 23 | IconRestore | `Square Multiple` | `ic_fluent_square_multiple_24_filled.svg` | Filled / 24 px | Pencere geri al |
 | 24 | IconCoffee | `Drink Coffee` | `ic_fluent_drink_coffee_24_filled.svg` | Filled / 24 px | Bağış bağlantısı |
 | 25 | IconWarning | `Warning` | `ic_fluent_warning_24_filled.svg` | Filled / 24 px | Uyarı durumu (`StatusWarning`) |
+| 26 | IconEditor | `Cut` | `ic_fluent_cut_24_filled.svg` | Filled / 24 px | Düzenleyici sekmesi |
 
 ## Ölçülen Sınır Kutuları
 

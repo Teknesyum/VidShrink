@@ -1,0 +1,16 @@
+{
+  "editor.split": "פיצול",
+  "editor.delete": "מחיקה",
+  "editor.delete-range": "מחיקת טווח",
+  "editor.mark-in": "קביעת נקודת התחלה",
+  "editor.mark-out": "קביעת נקודת סיום",
+  "editor.speed": "מהירות",
+  "editor.reverse": "היפוך",
+  "editor.undo": "ביטול פעולה",
+  "editor.redo": "ביצוע חוזר",
+  "editor.zoom-in": "הגדלה",
+  "editor.zoom-out": "הקטנה",
+  "editor.export": "ייצוא",
+  "editor.timeline": "ציר זמן",
+  "editor.playhead": "ראש ההפעלה"
+}
