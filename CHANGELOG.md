@@ -7,6 +7,15 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-09-28
+
+### Added
+
+- Editor tab: a timeline beside the player. Cut, trim, reorder, change speed or reverse clips, with undo and redo; the preview plays the cut list seamlessly through mpv's `edl://`.
+- Editor export in three modes: Fast (lossless, snaps to keyframes), Smart (default; copies the body and re-encodes only the edge GOPs, for h264/hevc with aac) and Full (one re-encode). A reversed clip over the memory limit warns before export.
+- Editor shortcuts shared by the common NLEs: J/K/L shuttle, I/O, M marker, Space, arrow keys by one frame, Ctrl+A, Ctrl+Z; listed in the menu, the tooltips and a shortcuts panel. The other tabs keep their own keys.
+- Player: right-click opens the menu and, mirrored on the other side, the folder's playlist.
+
 ### Changed
 
 - Program icon: lower and wider (about 16:10), with sharper bracket corners and the play triangle centred between the two arrows.
