@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using VidShrink.App.Editing;
 using VidShrink.App.Recorder;
 
 namespace VidShrink.App;
@@ -7,6 +8,7 @@ namespace VidShrink.App;
 public partial class MainWindow
 {
     private RecorderView? _recorderPane;
+    private EditorView? _editorPane;
 
     /// <summary>
     /// Kaydedici sekmesinin icerigi ilk secildiginde kuruluyor. XAML'in icinde dururken
@@ -39,5 +41,32 @@ public partial class MainWindow
     private void KaydediciSekmesiSecildi()
     {
         if (Tabs.SelectedItem is TabItem secili && ReferenceEquals(secili, TabRecorder)) _ = RecorderPane;
+    }
+
+    private EditorView EditorPane
+    {
+        get
+        {
+            if (_editorPane is not null) return _editorPane;
+
+            _editorPane = new EditorView();
+            PageEditor.Content = _editorPane;
+            return _editorPane;
+        }
+    }
+
+    internal EditorView EditorPaneForTest => EditorPane;
+
+    internal int EditorTabIndex => Tabs.Items.IndexOf(TabEditor);
+
+    private void DuzenleyiciSekmesiSecildi()
+    {
+        if (Tabs.SelectedItem is TabItem secili && ReferenceEquals(secili, TabEditor))
+        {
+            EditorPane.Activate(Media.Path);
+            return;
+        }
+
+        _editorPane?.Deactivate();
     }
 }

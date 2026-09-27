@@ -1,0 +1,16 @@
+{
+  "editor.split": "Split",
+  "editor.delete": "Delete",
+  "editor.delete-range": "Delete range",
+  "editor.mark-in": "Set in point",
+  "editor.mark-out": "Set out point",
+  "editor.speed": "Speed",
+  "editor.reverse": "Reverse",
+  "editor.undo": "Undo",
+  "editor.redo": "Redo",
+  "editor.zoom-in": "Zoom in",
+  "editor.zoom-out": "Zoom out",
+  "editor.export": "Export",
+  "editor.timeline": "Timeline",
+  "editor.playhead": "Playhead"
+}

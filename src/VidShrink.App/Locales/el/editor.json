@@ -1,0 +1,16 @@
+{
+  "editor.split": "Διαίρεση",
+  "editor.delete": "Διαγραφή",
+  "editor.delete-range": "Διαγραφή εύρους",
+  "editor.mark-in": "Ορισμός αρχής",
+  "editor.mark-out": "Ορισμός τέλους",
+  "editor.speed": "Ταχύτητα",
+  "editor.reverse": "Αντιστροφή",
+  "editor.undo": "Αναίρεση",
+  "editor.redo": "Επανάληψη",
+  "editor.zoom-in": "Μεγέθυνση",
+  "editor.zoom-out": "Σμίκρυνση",
+  "editor.export": "Εξαγωγή",
+  "editor.timeline": "Χρονολόγιο",
+  "editor.playhead": "Κεφαλή αναπαραγωγής"
+}

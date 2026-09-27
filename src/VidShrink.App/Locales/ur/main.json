@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "اس راستے پر ساتھ ffprobe والا کوئی ffmpeg نہیں؛ اس کی جگہ خودکار ffmpeg استعمال ہو رہا ہے۔",
 
   "main.tab.player": "پلیئر",
+  "main.tab.editor": "ایڈیٹر",
   "main.player.menu.playpause": "چلائیں / روکیں",
   "main.player.menu.fullscreen": "پوری سکرین",
   "main.player.menu.reset": "زوم ری سیٹ",

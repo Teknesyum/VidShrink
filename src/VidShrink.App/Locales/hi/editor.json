@@ -1,0 +1,16 @@
+{
+  "editor.split": "विभाजित करें",
+  "editor.delete": "हटाएँ",
+  "editor.delete-range": "सीमा हटाएँ",
+  "editor.mark-in": "आरंभ बिंदु",
+  "editor.mark-out": "अंत बिंदु",
+  "editor.speed": "गति",
+  "editor.reverse": "उल्टा करें",
+  "editor.undo": "पूर्ववत करें",
+  "editor.redo": "फिर से करें",
+  "editor.zoom-in": "ज़ूम इन",
+  "editor.zoom-out": "ज़ूम आउट",
+  "editor.export": "निर्यात करें",
+  "editor.timeline": "टाइमलाइन",
+  "editor.playhead": "प्लेहेड"
+}

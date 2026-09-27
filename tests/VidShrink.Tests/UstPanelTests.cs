@@ -104,7 +104,7 @@ public sealed class UstPanelTests
             var boy = (double)window.FindResource("PlaybackTopScrimHeight")!;
             var tetik = (double)window.FindResource("PlaybackTopRevealZone")!;
 
-            window.Tabs.SelectedIndex = 1;
+            window.Tabs.SelectedIndex = window.ShrinkTabIndex;
             Yenile(window);
             var baskaSekmede = Gorunur(scrim);
 

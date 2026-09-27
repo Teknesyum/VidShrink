@@ -54,7 +54,7 @@ public sealed class GorselGozTests
 
     public static TheoryData<string> Diller() => new() { "tr", "en", "de", "ar" };
 
-    private static readonly string[] SekmeAdlari = { "oynatici", "kucult", "donustur", "kaydedici", "gelismis", "ayarlar" };
+    private static readonly string[] SekmeAdlari = { "oynatici", "duzenleyici", "kucult", "donustur", "kaydedici", "gelismis", "ayarlar" };
 
     [GorselGozTheory]
     [MemberData(nameof(AnaKollar))]

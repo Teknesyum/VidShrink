@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "此路径下没有旁边带 ffprobe 的 ffmpeg；已改用自动 ffmpeg。",
 
   "main.tab.player": "播放器",
+  "main.tab.editor": "编辑器",
   "main.player.menu.playpause": "播放 / 暂停",
   "main.player.menu.fullscreen": "全屏",
   "main.player.menu.reset": "重置缩放",

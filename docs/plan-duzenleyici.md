@@ -129,6 +129,33 @@ küçük resim şeridi, cetvel) tek `DrawingContext`. Cap'in kuralı: **yalnız 
 zemini). Ölçü `Themes/Theme.axaml`'a, renk 26 palet dosyasının hepsine girer. Sayı
 uydurmuyorum; belirteç adları ve değerleri dalga başlarken ayrıca sorulacak.
 
+**Karar verildi:** [028](netlestirme/028-duzenleyici-cizelge-belirtecleri.md). Yeni palet rengi
+yok, fırçalar var olanlardan; ölçüler yeni `Themes/Editor.axaml`'da, her biri var olan bir
+belirteçten türetilmiş.
+
+**Uygulama planı:**
+
+1. `Themes/Editor.axaml` — 028'in eşlemesi, her satır `X <- Y (değer)` yorumlu; `App.axaml`
+   onu `Playback.axaml`'dan sonra merge eder.
+2. `IconEditor` — Fluent `Cut` 24 Filled; eşleme belgesi ve imza pini.
+3. `main.tab.editor` ve araç çubuğu metinleri 42 dilde; sayım pinleri (`BaslikKapsamiTests`).
+4. `App/Editing/EditorTimeline` — klipler `Control`, cetvel ve oynatma başı `DrawingContext`,
+   yalnız görünen aralık; yakalama pikselde, değer tick'te; zoom Ctrl+teker imleç altında.
+5. `App/Editing/PlayheadAutomationPeer` — Slider rolü.
+6. `App/Editing/EditorView` — üstte ikinci `PlayerView` (kendi motoru, `EdlPreviewDriver`),
+   `GridSplitter`, altta araç çubuğu + çizelge; kaynak `CurrentMedia` ya da bırakılan dosya.
+7. `MainWindow` — `TabEditor` `TabPlayer`'dan sonra, tembel kurulur; arka plana geçince önizleme
+   duraklar. Sabit sekme indisleri kayar.
+8. `EdlPreviewDriver.SeekAsync` — sürüklerken Keyframe, bırakınca Exact.
+9. Testler `DuzenleyiciCizelgeTests.cs`: yakalama, görünür klip ≤12, 10 işlem/Undo/Redo,
+   peer rolü, sabit renk/ölçü taraması; `KontrastTests.Ekranlar()`'a düzenleyici.
+
+**Uygulamada çıkanlar:** yedi sekmeyle 1024 px'te sekiz dil kolu şerit taşması verdi; kusur
+denetçinin iki geçişiydi (şerit simgesiz kademeye yerleşim sırasında geçiyor, ölçü bayat
+kalıyordu), yerleşim denetçisi ağacı artık üç kez ölçer. Uygulama koduna dokunulmadı.
+Çizelgenin tam boy iki katmanı (iz zemini, oynatma başı) kardeş çakışmasından muaf. Araç
+çubuğu ve çizelge `Panel` zemininde: pencere zemininin parıltısı üstünde yazı 7:1 tutmadı.
+
 ## D4 — Teslim
 
 Üç kip (fable sorusu 2) ffmpeg'e çevrilir: kayıpsız parçalar concat demuxer'la, kenar

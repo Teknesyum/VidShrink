@@ -363,11 +363,15 @@ internal partial class PlayerView
         e.Handled = true;
     }
 
+    internal Action<string>? FileDropped { get; set; }
+
     private void OnFileDrop(object? sender, DragEventArgs e)
     {
         var file = DroppedFile(e);
         e.Handled = true;
-        if (file is not null) OpenDropped(file);
+        if (file is null) return;
+        if (FileDropped is { } hook) hook(file);
+        else OpenDropped(file);
     }
 
     private static string? DroppedFile(DragEventArgs e)

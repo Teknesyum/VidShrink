@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Aucun ffmpeg accompagné de ffprobe à ce chemin ; le ffmpeg automatique est utilisé à la place.",
 
   "main.tab.player": "Lecteur",
+  "main.tab.editor": "Éditeur",
   "main.player.menu.playpause": "Lecture / pause",
   "main.player.menu.fullscreen": "Plein écran",
   "main.player.menu.reset": "Réinitialiser le zoom",

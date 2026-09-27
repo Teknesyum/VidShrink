@@ -1,0 +1,342 @@
+using System;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using VidShrink.App.Localization;
+using VidShrink.App.Playback;
+using VidShrink.Core;
+using VidShrink.Core.Editing;
+using VidShrink.Player;
+
+namespace VidShrink.App.Editing;
+
+internal partial class EditorView : UserControl
+{
+    private static readonly decimal[] SpeedPresets = { 0.5m, 1m, 2m };
+
+    private readonly DispatcherTimer _clock;
+    private EditTimeline? _model;
+    private string? _source;
+    private EdlPreviewDriver? _driver;
+    private int _reloads;
+
+    public EditorView()
+    {
+        InitializeComponent();
+        _clock = new DispatcherTimer { Interval = EdlPreviewDriver.DefaultInterval };
+        _clock.Tick += (_, _) => Follow();
+
+        Preview.FileDropped = path => _ = OpenSourceAsync(path);
+        DragDrop.SetAllowDrop(this, true);
+        AddHandler(DragDrop.DragOverEvent, OnDragOver);
+        AddHandler(DragDrop.DropEvent, OnDrop);
+
+        Timeline.Seek += OnSeek;
+        Timeline.MoveRequested += (from, to) => Apply(model => model.Move(from, to), to);
+        Timeline.SelectionChanged += RefreshToolbar;
+
+        BtnSplit.Click += (_, _) => Split();
+        BtnDelete.Click += (_, _) => DeleteSelected();
+        BtnUndo.Click += (_, _) => Undo();
+        BtnRedo.Click += (_, _) => Redo();
+        BtnZoomIn.Click += (_, _) => Timeline.ZoomCentered(true);
+        BtnZoomOut.Click += (_, _) => Timeline.ZoomCentered(false);
+        TxtSpeed.KeyDown += OnSpeedKey;
+
+        MnuSplit.Click += (_, _) => Split();
+        MnuDelete.Click += (_, _) => DeleteSelected();
+        MnuMarkIn.Click += (_, _) => MarkIn();
+        MnuMarkOut.Click += (_, _) => MarkOut();
+        MnuDeleteRange.Click += (_, _) => DeleteRange();
+        MnuReverse.Click += (_, _) => Reverse();
+        TimelineMenu.Opening += (_, _) => BuildSpeedMenu();
+
+        RefreshToolbar();
+    }
+
+    internal EditTimeline? Model => _model;
+
+    internal string? SourcePath => _source;
+
+    internal EdlPreviewDriver? Driver => _driver;
+
+    internal PlayerView Player => Preview;
+
+    internal EditorTimeline TimelineView => Timeline;
+
+    internal int Reloads => _reloads;
+
+    internal void Activate(string? path)
+    {
+        _clock.Start();
+        if (path is not null && !CurrentMedia.SamePath(path, _source)) _ = OpenSourceAsync(path);
+    }
+
+    internal void Deactivate()
+    {
+        _clock.Stop();
+        if (Preview.IsPlaying) Preview.TogglePlay();
+        _driver?.Pause();
+    }
+
+    internal async Task OpenSourceAsync(string path)
+    {
+        CloseDriver();
+        _source = path;
+        _model = null;
+        Timeline.Show(null);
+        RefreshToolbar();
+
+        try
+        {
+            await Preview.OpenAsync(path).ConfigureAwait(true);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or PlaybackEngineUnavailableException or UnauthorizedAccessException)
+        {
+            return;
+        }
+
+        if (!CurrentMedia.SamePath(path, _source) || Preview.Engine is not { } engine || !(engine.DurationSeconds > 0)) return;
+        ShowTimeline(EditTimeline.FromSource(EditTime.FromSeconds(engine.DurationSeconds)), engine.FramesPerSecond);
+        await ReloadAsync(0).ConfigureAwait(true);
+    }
+
+    internal void ShowTimeline(EditTimeline model, double fps)
+    {
+        _model = model;
+        Timeline.Fps = fps;
+        Timeline.Show(model);
+        RefreshToolbar();
+    }
+
+    internal bool Split()
+    {
+        var at = Timeline.Playhead;
+        return Apply(model => at > 0 && at < model.Duration && model.Split(at), -1);
+    }
+
+    internal bool DeleteSelected()
+    {
+        var selected = Timeline.SelectedIndex;
+        return Apply(model =>
+        {
+            if (selected < 0 || selected >= model.Clips.Count || model.Clips.Count < 2) return false;
+            model.Delete(selected);
+            return true;
+        }, Math.Max(0, selected - 1));
+    }
+
+    internal bool DeleteRange()
+    {
+        if (Timeline.MarkIn is not { } start || Timeline.MarkOut is not { } end) return false;
+        var done = Apply(model => end > start && end - start < model.Duration && model.DeleteRange(start, end), -1);
+        if (!done) return false;
+        Timeline.SetMarks(null, null);
+        Timeline.Playhead = start;
+        return true;
+    }
+
+    internal bool SetSpeed(decimal speed)
+    {
+        var selected = Timeline.SelectedIndex;
+        return Apply(model =>
+        {
+            if (selected < 0 || selected >= model.Clips.Count || speed == 0) return false;
+            var magnitude = decimal.Round(Math.Abs(speed), 2, MidpointRounding.AwayFromZero);
+            if (magnitude < EditClip.MinSpeed || magnitude > EditClip.MaxSpeed) return false;
+            return model.SetSpeed(selected, speed);
+        }, selected);
+    }
+
+    internal bool Reverse()
+    {
+        var selected = Timeline.SelectedIndex;
+        if (_model is not { } model || selected < 0 || selected >= model.Clips.Count) return false;
+        var clip = model.Clips[selected];
+        return SetSpeed(clip.Reversed ? clip.Speed : -clip.Speed);
+    }
+
+    internal bool Undo() => Apply(model => model.Undo(), Timeline.SelectedIndex);
+
+    internal bool Redo() => Apply(model => model.Redo(), Timeline.SelectedIndex);
+
+    internal void MarkIn() => Timeline.SetMarks(Timeline.Playhead, Timeline.MarkOut is { } end && end > Timeline.Playhead ? end : null);
+
+    internal void MarkOut() => Timeline.SetMarks(Timeline.MarkIn is { } start && start < Timeline.Playhead ? start : null, Timeline.Playhead);
+
+    internal bool HandleKey(Key key, KeyModifiers modifiers)
+    {
+        if (_model is null) return false;
+        if (key == Key.Delete && modifiers == KeyModifiers.None)
+        {
+            DeleteSelected();
+            return true;
+        }
+
+        if (modifiers != KeyModifiers.Control) return false;
+        if (key == Key.Z) Undo();
+        else if (key == Key.Y) Redo();
+        else return false;
+        return true;
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        if (TopLevel.GetTopLevel(this) is { } top) top.AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        if (TopLevel.GetTopLevel(this) is { } top) top.RemoveHandler(KeyDownEvent, OnKey);
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void OnKey(object? sender, KeyEventArgs e)
+    {
+        if (e.Handled || !IsEffectivelyVisible || e.Source is TextBox) return;
+        if (HandleKey(e.Key, e.KeyModifiers)) e.Handled = true;
+    }
+
+    private bool Apply(Func<EditTimeline, bool> edit, int select)
+    {
+        if (_model is not { } model) return false;
+        if (!edit(model)) return false;
+
+        var at = Math.Min(Timeline.Playhead, model.Duration);
+        Timeline.Refresh();
+        if (select >= 0) Timeline.SelectedIndex = Math.Min(select, model.Clips.Count - 1);
+        Timeline.Playhead = at;
+        RefreshToolbar();
+        _ = ReloadAsync(at);
+        return true;
+    }
+
+    private async Task ReloadAsync(long at)
+    {
+        if (_model is not { } model || _source is not { } source || Preview.Engine is not { } engine) return;
+        var playing = Preview.IsPlaying;
+        _driver?.Dispose();
+        var driver = new EdlPreviewDriver(engine, new EdlPreview(source, model));
+        _driver = driver;
+        _reloads++;
+        try
+        {
+            await driver.OpenAsync().ConfigureAwait(true);
+            if (!ReferenceEquals(_driver, driver)) return;
+            Preview.RefreshDuration();
+            await driver.SeekAsync(Math.Clamp(at, 0, model.Duration)).ConfigureAwait(true);
+            if (playing) driver.Play();
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or ObjectDisposedException)
+        {
+        }
+    }
+
+    private void Follow()
+    {
+        if (_driver is not { } driver) return;
+        if (Preview.IsPlaying && !driver.Playing) driver.Play();
+        else if (!Preview.IsPlaying && driver.Playing) driver.Pause();
+        if (!Timeline.Scrubbing) Timeline.Playhead = driver.TimelinePosition;
+    }
+
+    private void OnSeek(long time, bool final)
+    {
+        if (_driver is not { } driver) return;
+        _ = driver.SeekAsync(time, final ? SeekPrecision.Exact : SeekPrecision.Keyframe);
+    }
+
+    private void OnSpeedKey(object? sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter) return;
+        if (decimal.TryParse(TxtSpeed.Text, NumberStyles.Number, Strings.Culture, out var speed)
+            || decimal.TryParse(TxtSpeed.Text, NumberStyles.Number, CultureInfo.InvariantCulture, out speed))
+            SetSpeed(speed);
+        RefreshToolbar();
+        e.Handled = true;
+    }
+
+    private void BuildSpeedMenu()
+    {
+        MnuSpeed.Items.Clear();
+        foreach (var preset in SpeedPresets)
+        {
+            var value = preset;
+            var item = new MenuItem { Header = Bicim.Kat((double)value, Strings.Culture) + "×" };
+            item.Click += (_, _) => SetSpeed(Reversed() ? -value : value);
+            MnuSpeed.Items.Add(item);
+        }
+
+        var hasClip = Timeline.SelectedIndex >= 0;
+        MnuSpeed.IsEnabled = hasClip;
+        MnuReverse.IsEnabled = hasClip;
+        MnuDelete.IsEnabled = BtnDelete.IsEnabled;
+        MnuSplit.IsEnabled = BtnSplit.IsEnabled;
+        MnuDeleteRange.IsEnabled = Timeline.MarkIn is { } a && Timeline.MarkOut is { } b && b > a;
+    }
+
+    private bool Reversed()
+    {
+        var selected = Timeline.SelectedIndex;
+        return _model is { } model && selected >= 0 && selected < model.Clips.Count && model.Clips[selected].Reversed;
+    }
+
+    private void RefreshToolbar()
+    {
+        var model = _model;
+        var selected = Timeline.SelectedIndex;
+        var hasClip = model is not null && selected >= 0 && selected < model.Clips.Count;
+        BtnSplit.IsEnabled = model is not null;
+        BtnDelete.IsEnabled = hasClip && model!.Clips.Count > 1;
+        BtnUndo.IsEnabled = model?.CanUndo ?? false;
+        BtnRedo.IsEnabled = model?.CanRedo ?? false;
+        BtnZoomIn.IsEnabled = model is not null;
+        BtnZoomOut.IsEnabled = model is not null;
+        TxtSpeed.IsEnabled = hasClip;
+        if (hasClip)
+        {
+            var clip = model!.Clips[selected];
+            var speed = clip.Reversed ? -clip.Speed : clip.Speed;
+            TxtSpeed.Text = Bicim.Kat((double)speed, Strings.Culture);
+        }
+        else
+        {
+            TxtSpeed.Text = string.Empty;
+        }
+    }
+
+    private void OnDragOver(object? sender, DragEventArgs e)
+    {
+        e.DragEffects = DroppedFile(e) is not null ? DragDropEffects.Copy : DragDropEffects.None;
+        e.Handled = true;
+    }
+
+    private void OnDrop(object? sender, DragEventArgs e)
+    {
+        var file = DroppedFile(e);
+        e.Handled = true;
+        if (file is not null) _ = OpenSourceAsync(file);
+    }
+
+    private static string? DroppedFile(DragEventArgs e)
+    {
+        var items = e.DataTransfer.TryGetFiles()?.ToList();
+        if (items is null || items.Count != 1 || items[0] is IStorageFolder) return null;
+        var path = items[0].TryGetLocalPath();
+        return path is not null && File.Exists(path) ? path : null;
+    }
+
+    private void CloseDriver()
+    {
+        _driver?.Dispose();
+        _driver = null;
+    }
+}

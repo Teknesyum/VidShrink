@@ -129,9 +129,19 @@ public sealed class KontrastTests
         return adlar;
     }
 
+    private static VidShrink.Core.Editing.EditTimeline DuzenleyiciOrnegi()
+    {
+        var model = VidShrink.Core.Editing.EditTimeline.FromSource(VidShrink.Core.Editing.EditTime.FromSeconds(60));
+        model.Split(VidShrink.Core.Editing.EditTime.FromSeconds(20));
+        model.Split(VidShrink.Core.Editing.EditTime.FromSeconds(40));
+        model.SetSpeed(1, 2m);
+        model.SetSpeed(2, -1m);
+        return model;
+    }
+
     private static IEnumerable<(string, Func<Window>)> Ekranlar()
     {
-        string[] sekmeler = { "oynatici", "kucult", "donustur", "kaydedici", "gelismis", "ayarlar" };
+        string[] sekmeler = { "oynatici", "duzenleyici", "kucult", "donustur", "kaydedici", "gelismis", "ayarlar" };
         for (var i = 0; i < sekmeler.Length; i++)
         {
             var sira = i;
@@ -145,6 +155,7 @@ public sealed class KontrastTests
                 var adv = w.FindControl<TabItem>("TabAdvanced");
                 if (adv != null) adv.IsVisible = true;
                 tabs.SelectedIndex = sira;
+                if (sira == w.EditorTabIndex) w.EditorPaneForTest.ShowTimeline(DuzenleyiciOrnegi(), 30);
                 w.FindControl<VidShrink.App.Playback.ComparisonPanel>("Preview")?.Controls.SetEncodeProgress(0.22, 1, 2, 2);
                 Dispatcher.UIThread.RunJobs();
                 return w;

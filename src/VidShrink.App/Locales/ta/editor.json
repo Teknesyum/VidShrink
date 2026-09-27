@@ -1,0 +1,16 @@
+{
+  "editor.split": "பிரி",
+  "editor.delete": "நீக்கு",
+  "editor.delete-range": "வரம்பை நீக்கு",
+  "editor.mark-in": "தொடக்கப் புள்ளி",
+  "editor.mark-out": "முடிவுப் புள்ளி",
+  "editor.speed": "வேகம்",
+  "editor.reverse": "தலைகீழாக்கு",
+  "editor.undo": "செயல்தவிர்",
+  "editor.redo": "மீண்டும் செய்",
+  "editor.zoom-in": "பெரிதாக்கு",
+  "editor.zoom-out": "சிறிதாக்கு",
+  "editor.export": "ஏற்றுமதி",
+  "editor.timeline": "காலவரிசை",
+  "editor.playhead": "இயக்கக் குறி"
+}

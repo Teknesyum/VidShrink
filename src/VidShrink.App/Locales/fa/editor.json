@@ -1,0 +1,16 @@
+{
+  "editor.split": "برش",
+  "editor.delete": "حذف",
+  "editor.delete-range": "حذف بازه",
+  "editor.mark-in": "تنظیم نقطه شروع",
+  "editor.mark-out": "تنظیم نقطه پایان",
+  "editor.speed": "سرعت",
+  "editor.reverse": "معکوس",
+  "editor.undo": "واگرد",
+  "editor.redo": "ازنو",
+  "editor.zoom-in": "بزرگ‌نمایی",
+  "editor.zoom-out": "کوچک‌نمایی",
+  "editor.export": "خروجی",
+  "editor.timeline": "خط زمانی",
+  "editor.playhead": "نشانگر پخش"
+}

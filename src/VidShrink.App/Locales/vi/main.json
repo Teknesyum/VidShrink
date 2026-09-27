@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Đường dẫn này không có ffmpeg kèm ffprobe bên cạnh; ffmpeg tự động được dùng thay thế.",
 
   "main.tab.player": "Trình phát",
+  "main.tab.editor": "Trình chỉnh sửa",
   "main.player.menu.playpause": "Phát / tạm dừng",
   "main.player.menu.fullscreen": "Toàn màn hình",
   "main.player.menu.reset": "Đặt lại thu phóng",

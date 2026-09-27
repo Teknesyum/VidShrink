@@ -1,0 +1,16 @@
+{
+  "editor.split": "تقسيم",
+  "editor.delete": "حذف",
+  "editor.delete-range": "حذف النطاق",
+  "editor.mark-in": "تعيين نقطة البداية",
+  "editor.mark-out": "تعيين نقطة النهاية",
+  "editor.speed": "السرعة",
+  "editor.reverse": "عكس",
+  "editor.undo": "تراجع",
+  "editor.redo": "إعادة",
+  "editor.zoom-in": "تكبير",
+  "editor.zoom-out": "تصغير",
+  "editor.export": "تصدير",
+  "editor.timeline": "المخطط الزمني",
+  "editor.playhead": "مؤشر التشغيل"
+}

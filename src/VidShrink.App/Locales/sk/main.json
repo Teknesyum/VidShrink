@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Na tejto ceste nie je ffmpeg s ffprobe vedľa neho; namiesto neho sa použije automatický ffmpeg.",
 
   "main.tab.player": "Prehrávač",
+  "main.tab.editor": "Editor",
   "main.player.menu.playpause": "Prehrať / pozastaviť",
   "main.player.menu.fullscreen": "Celá obrazovka",
   "main.player.menu.reset": "Obnoviť priblíženie",

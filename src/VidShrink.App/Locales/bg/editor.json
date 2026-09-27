@@ -1,0 +1,16 @@
+{
+  "editor.split": "Разделяне",
+  "editor.delete": "Изтриване",
+  "editor.delete-range": "Изтриване на диапазон",
+  "editor.mark-in": "Начална точка",
+  "editor.mark-out": "Крайна точка",
+  "editor.speed": "Скорост",
+  "editor.reverse": "Обръщане",
+  "editor.undo": "Отмяна на действие",
+  "editor.redo": "Повторение",
+  "editor.zoom-in": "Приближаване",
+  "editor.zoom-out": "Отдалечаване",
+  "editor.export": "Експортиране",
+  "editor.timeline": "Времева линия",
+  "editor.playhead": "Позиция на възпроизвеждане"
+}

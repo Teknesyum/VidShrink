@@ -1,0 +1,16 @@
+{
+  "editor.split": "Tách",
+  "editor.delete": "Xóa",
+  "editor.delete-range": "Xóa khoảng",
+  "editor.mark-in": "Đặt điểm đầu",
+  "editor.mark-out": "Đặt điểm cuối",
+  "editor.speed": "Tốc độ",
+  "editor.reverse": "Đảo ngược",
+  "editor.undo": "Hoàn tác",
+  "editor.redo": "Làm lại",
+  "editor.zoom-in": "Phóng to",
+  "editor.zoom-out": "Thu nhỏ",
+  "editor.export": "Xuất",
+  "editor.timeline": "Dòng thời gian",
+  "editor.playhead": "Đầu phát"
+}

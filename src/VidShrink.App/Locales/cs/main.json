@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Na této cestě není ffmpeg s ffprobe vedle sebe; místo něj se použije automatický ffmpeg.",
 
   "main.tab.player": "Přehrávač",
+  "main.tab.editor": "Editor",
   "main.player.menu.playpause": "Přehrát / pozastavit",
   "main.player.menu.fullscreen": "Celá obrazovka",
   "main.player.menu.reset": "Obnovit zvětšení",

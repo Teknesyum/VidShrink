@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Na tej poti ni ffmpeg z ffprobe poleg njega; namesto njega se uporablja samodejni ffmpeg.",
 
   "main.tab.player": "Predvajalnik",
+  "main.tab.editor": "Urejevalnik",
   "main.player.menu.playpause": "Predvajaj / premor",
   "main.player.menu.fullscreen": "Celoten zaslon",
   "main.player.menu.reset": "Ponastavi povečavo",

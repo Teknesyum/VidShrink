@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Šajā ceļā nav ffmpeg ar blakus esošu ffprobe; tā vietā tiek izmantots automātiskais ffmpeg.",
 
   "main.tab.player": "Atskaņotājs",
+  "main.tab.editor": "Redaktors",
   "main.player.menu.playpause": "Atskaņot / pauze",
   "main.player.menu.fullscreen": "Pilnekrāns",
   "main.player.menu.reset": "Atiestatīt tālummaiņu",

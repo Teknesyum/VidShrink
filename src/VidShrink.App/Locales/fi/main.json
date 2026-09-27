@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Tässä polussa ei ole ffmpeg:tä, jonka vieressä on ffprobe; sen sijaan käytetään automaattista ffmpeg:tä.",
 
   "main.tab.player": "Soitin",
+  "main.tab.editor": "Muokkain",
   "main.player.menu.playpause": "Toista / tauko",
   "main.player.menu.fullscreen": "Koko näyttö",
   "main.player.menu.reset": "Nollaa zoomaus",

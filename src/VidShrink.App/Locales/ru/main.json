@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "По этому пути нет ffmpeg с ffprobe рядом; вместо него используется автоматический ffmpeg.",
 
   "main.tab.player": "Плеер",
+  "main.tab.editor": "Редактор",
   "main.player.menu.playpause": "Воспроизведение / пауза",
   "main.player.menu.fullscreen": "На весь экран",
   "main.player.menu.reset": "Сбросить масштаб",

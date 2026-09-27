@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Hakuna ffmpeg yenye ffprobe kando yake kwenye njia hii; ffmpeg ya kiotomatiki inatumika badala yake.",
 
   "main.tab.player": "Kichezaji",
+  "main.tab.editor": "Kihariri",
   "main.player.menu.playpause": "Cheza / sitisha",
   "main.player.menu.fullscreen": "Skrini nzima",
   "main.player.menu.reset": "Weka upya kuza",

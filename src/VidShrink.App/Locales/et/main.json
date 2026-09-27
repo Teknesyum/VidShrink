@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Selles teel pole ffmpegi, mille kõrval oleks ffprobe; selle asemel kasutatakse automaatset ffmpegi.",
 
   "main.tab.player": "Mängija",
+  "main.tab.editor": "Redaktor",
   "main.player.menu.playpause": "Esita / paus",
   "main.player.menu.fullscreen": "Täisekraan",
   "main.player.menu.reset": "Lähtesta suum",

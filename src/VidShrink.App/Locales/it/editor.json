@@ -1,0 +1,16 @@
+{
+  "editor.split": "Dividi",
+  "editor.delete": "Elimina",
+  "editor.delete-range": "Elimina intervallo",
+  "editor.mark-in": "Imposta punto di attacco",
+  "editor.mark-out": "Imposta punto di stacco",
+  "editor.speed": "Velocità",
+  "editor.reverse": "Inverti",
+  "editor.undo": "Annulla azione",
+  "editor.redo": "Ripeti",
+  "editor.zoom-in": "Ingrandisci",
+  "editor.zoom-out": "Riduci",
+  "editor.export": "Esporta",
+  "editor.timeline": "Timeline",
+  "editor.playhead": "Indicatore di riproduzione"
+}

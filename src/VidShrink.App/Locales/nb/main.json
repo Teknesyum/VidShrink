@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Det finnes ingen ffmpeg med ffprobe ved siden av på denne banen; den automatiske ffmpeg-en brukes i stedet.",
 
   "main.tab.player": "Spiller",
+  "main.tab.editor": "Redigering",
   "main.player.menu.playpause": "Spill av / pause",
   "main.player.menu.fullscreen": "Fullskjerm",
   "main.player.menu.reset": "Nullstill zoom",

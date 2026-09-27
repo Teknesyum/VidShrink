@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "このパスにはffprobeが隣にあるffmpegがありません。代わりに自動のffmpegを使います。",
 
   "main.tab.player": "プレーヤー",
+  "main.tab.editor": "エディター",
   "main.player.menu.playpause": "再生 / 一時停止",
   "main.player.menu.fullscreen": "全画面",
   "main.player.menu.reset": "ズームをリセット",

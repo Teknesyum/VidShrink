@@ -57,7 +57,10 @@ public sealed class EdlPreviewDriver : IDisposable
         _engine.Pause();
     }
 
-    public async Task SeekAsync(long timelineTime, CancellationToken ct = default)
+    public Task SeekAsync(long timelineTime, CancellationToken ct = default) =>
+        SeekAsync(timelineTime, SeekPrecision.Exact, ct);
+
+    public async Task SeekAsync(long timelineTime, SeekPrecision precision, CancellationToken ct = default)
     {
         await _gate.WaitAsync(ct).ConfigureAwait(false);
         try
@@ -66,7 +69,7 @@ public sealed class EdlPreviewDriver : IDisposable
             var edl = _preview.ToEdl(timelineTime);
             var part = _preview.PartAtEdl(edl);
             ApplySpeed(part);
-            await _engine.SeekAsync(EditTime.ToSeconds(edl), SeekPrecision.Exact, ct).ConfigureAwait(false);
+            await _engine.SeekAsync(EditTime.ToSeconds(edl), precision, ct).ConfigureAwait(false);
             if (part.Clip.Reversed) EnterReverse(part, edl);
             else if (_playing) _engine.Play();
         }

@@ -166,7 +166,7 @@ public sealed class AcilirGirisTests
             pencere.Show();
             try
             {
-                pencere.Tabs.SelectedIndex = 1;
+                pencere.Tabs.SelectedIndex = pencere.ShrinkTabIndex;
                 Dispatcher.UIThread.RunJobs();
                 var ev = pencere.GetVisualDescendants().OfType<TransitioningContentControl>().First(d => d.Name == "SelectedContentHost");
                 List<Avalonia.Controls.Presenters.ContentPresenter> Gorunenler() => ev.GetVisualDescendants().OfType<Avalonia.Controls.Presenters.ContentPresenter>()
@@ -190,7 +190,7 @@ public sealed class AcilirGirisTests
                 }
                 using var saydamlik = Avalonia.Visual.OpacityProperty.Changed.AddClassHandler<Avalonia.Controls.Presenters.ContentPresenter>(Degisti);
                 olcuyor = true;
-                pencere.Tabs.SelectedIndex = 5;
+                pencere.Tabs.SelectedIndex = pencere.Tabs.Items.IndexOf(pencere.TabSettings);
                 Dispatcher.UIThread.RunJobs();
                 Gor();
                 var saat = Stopwatch.StartNew();

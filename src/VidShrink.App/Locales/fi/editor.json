@@ -1,0 +1,16 @@
+{
+  "editor.split": "Jaa",
+  "editor.delete": "Poista",
+  "editor.delete-range": "Poista alue",
+  "editor.mark-in": "Aseta alkukohta",
+  "editor.mark-out": "Aseta loppukohta",
+  "editor.speed": "Nopeus",
+  "editor.reverse": "Käännä",
+  "editor.undo": "Kumoa",
+  "editor.redo": "Tee uudelleen",
+  "editor.zoom-in": "Lähennä",
+  "editor.zoom-out": "Loitonna",
+  "editor.export": "Vie",
+  "editor.timeline": "Aikajana",
+  "editor.playhead": "Toistokohta"
+}

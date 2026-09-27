@@ -1,0 +1,16 @@
+{
+  "editor.split": "Vágás",
+  "editor.delete": "Törlés",
+  "editor.delete-range": "Tartomány törlése",
+  "editor.mark-in": "Kezdőpont",
+  "editor.mark-out": "Végpont",
+  "editor.speed": "Sebesség",
+  "editor.reverse": "Megfordítás",
+  "editor.undo": "Visszavonás",
+  "editor.redo": "Újra",
+  "editor.zoom-in": "Nagyítás",
+  "editor.zoom-out": "Kicsinyítés",
+  "editor.export": "Exportálás",
+  "editor.timeline": "Idővonal",
+  "editor.playhead": "Lejátszófej"
+}

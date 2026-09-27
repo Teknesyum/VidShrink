@@ -232,6 +232,7 @@ public partial class MainWindow : Window
         SetupShellMenu();
         Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
         Tabs.SelectionChanged += (_, _) => KaydediciSekmesiSecildi();
+        Tabs.SelectionChanged += (_, _) => DuzenleyiciSekmesiSecildi();
 
         if (OperatingSystem.IsMacOS())
         {
@@ -2972,7 +2973,7 @@ public partial class MainWindow : Window
     {
         TabAdvanced.IsVisible = false;
         _developerUnlock.Reset();
-        if (ReferenceEquals(Tabs.SelectedItem, TabAdvanced)) Tabs.SelectedIndex = 1;
+        if (ReferenceEquals(Tabs.SelectedItem, TabAdvanced)) Tabs.SelectedIndex = ShrinkTabIndex;
     }
 
     private void OnDismissUpdateNotice(object? sender, RoutedEventArgs e)

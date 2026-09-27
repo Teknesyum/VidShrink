@@ -1,0 +1,16 @@
+{
+  "editor.split": "Böl",
+  "editor.delete": "Sil",
+  "editor.delete-range": "Aralığı sil",
+  "editor.mark-in": "Giriş noktası koy",
+  "editor.mark-out": "Çıkış noktası koy",
+  "editor.speed": "Hız",
+  "editor.reverse": "Ters çevir",
+  "editor.undo": "Geri al",
+  "editor.redo": "Yinele",
+  "editor.zoom-in": "Yakınlaştır",
+  "editor.zoom-out": "Uzaklaştır",
+  "editor.export": "Dışa aktar",
+  "editor.timeline": "Zaman çizelgesi",
+  "editor.playhead": "Oynatma başı"
+}

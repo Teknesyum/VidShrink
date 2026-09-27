@@ -1,0 +1,16 @@
+{
+  "editor.split": "Rozdeliť",
+  "editor.delete": "Odstrániť",
+  "editor.delete-range": "Odstrániť rozsah",
+  "editor.mark-in": "Nastaviť začiatok",
+  "editor.mark-out": "Nastaviť koniec",
+  "editor.speed": "Rýchlosť",
+  "editor.reverse": "Obrátiť",
+  "editor.undo": "Späť",
+  "editor.redo": "Znova",
+  "editor.zoom-in": "Priblížiť",
+  "editor.zoom-out": "Oddialiť",
+  "editor.export": "Exportovať",
+  "editor.timeline": "Časová os",
+  "editor.playhead": "Prehrávacia hlava"
+}

@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:VidShrink.App.Localization"
+             xmlns:playback="using:VidShrink.App.Playback"
+             xmlns:editing="using:VidShrink.App.Editing"
+             x:Class="VidShrink.App.Editing.EditorView">
+  <Grid RowDefinitions="*,Auto,Auto">
+    <playback:PlayerView x:Name="Preview"/>
+    <GridSplitter Grid.Row="1" Theme="{StaticResource PlanSplitter}" ResizeDirection="Rows"/>
+    <Border Grid.Row="2" Theme="{StaticResource Panel}" Margin="{StaticResource PageMargin}">
+      <StackPanel Spacing="{StaticResource SpaceSm}">
+        <WrapPanel x:Name="Toolbar" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+          <Button x:Name="BtnSplit" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.split}"/>
+          <Button x:Name="BtnDelete" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.delete}"/>
+          <TextBlock Theme="{StaticResource Label}" Text="{loc:Text editor.speed}"/>
+          <TextBox x:Name="TxtSpeed" Width="{StaticResource NumberBoxWidth}"/>
+          <Button x:Name="BtnUndo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.undo}"/>
+          <Button x:Name="BtnRedo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.redo}"/>
+          <Button x:Name="BtnZoomOut" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-out}"/>
+          <Button x:Name="BtnZoomIn" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-in}"/>
+          <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.export}" IsEnabled="False"/>
+        </WrapPanel>
+        <editing:EditorTimeline x:Name="Timeline" AutomationProperties.Name="{loc:Text editor.timeline}">
+          <editing:EditorTimeline.ContextMenu>
+            <ContextMenu x:Name="TimelineMenu">
+              <MenuItem x:Name="MnuSplit" Header="{loc:Text editor.split}"/>
+              <MenuItem x:Name="MnuDelete" Header="{loc:Text editor.delete}"/>
+              <Separator/>
+              <MenuItem x:Name="MnuMarkIn" Header="{loc:Text editor.mark-in}"/>
+              <MenuItem x:Name="MnuMarkOut" Header="{loc:Text editor.mark-out}"/>
+              <MenuItem x:Name="MnuDeleteRange" Header="{loc:Text editor.delete-range}"/>
+              <Separator/>
+              <MenuItem x:Name="MnuSpeed" Header="{loc:Text editor.speed}"/>
+              <MenuItem x:Name="MnuReverse" Header="{loc:Text editor.reverse}"/>
+            </ContextMenu>
+          </editing:EditorTimeline.ContextMenu>
+        </editing:EditorTimeline>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

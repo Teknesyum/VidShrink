@@ -786,6 +786,10 @@ public sealed class YerlesimDenetimiTests
     /// <c>Auto</c> sütun 0 genişlikte kalır ve çubuk içerikle çakışır (it 1136x720 Dönüştür,
     /// 5x666). Gerçek pencerede düzen yöneticisi bir sonraki geçişte bunu düzeltir; ikinci
     /// geçiş aynı şeyi yapar. Geçersizleme kaldırılınca 10/18 kol kırmızı döner (ölçüldü).
+    /// <para>Üçüncü geçiş (2026-09-27, düzenleyici D3): <c>UpdateLayout</c> pencerenin kendi
+    /// boyutunda koşup üst şerit kademesini geniş haliyle kuruyor, zorlanan boyuttaki ilk geçiş
+    /// kademeyi (yedi sekmeli şerit simgesiz dizilir) yerleşim sırasında düzeltiyor; iki geçişte
+    /// sekme şeridi eski dolguyla yerleşmiş ve ölçüsü geçersiz kalıyordu (1024'te 8 dil kırmızı).</para>
     /// </summary>
     private static void Yerlestir(MainWindow pencere, Size boyut)
     {
@@ -798,7 +802,7 @@ public sealed class YerlesimDenetimiTests
         pencere.SettleFades();
 
         var kok = (Layoutable)pencere.GetVisualChildren().Single();
-        for (var tur = 0; tur < 2; tur++)
+        for (var tur = 0; tur < 3; tur++)
         {
             foreach (var dugum in pencere.GetVisualDescendants().OfType<Layoutable>()) dugum.InvalidateMeasure();
             kok.InvalidateMeasure();
@@ -841,7 +845,7 @@ public sealed class YerlesimDenetimiTests
             Yerlestir(pencere, boyut);
 
             var baslik = MainWindow.TabHeaderText(oge);
-            if (sira == 1 || oge == pencere.TabSettings)
+            if (sira == pencere.ShrinkTabIndex || oge == pencere.TabSettings)
                 Assert.Equal(LanguageCatalog.Display(Strings.Get(oge == pencere.TabSettings ? "main.tab.settings" : "main.tab.shrink")), baslik);
 
             denetim.Sekme++;
@@ -1007,6 +1011,9 @@ public sealed class YerlesimDenetimiTests
         return r1 < s2 && s1 < r2 && c1 < d2 && d1 < c2;
     }
 
+    /// <summary>Düzenleyici çizelgesinin iki tam boy katmanı (cetvel tuvali, oynatma başı) kliplerin altında ve üstünde bilerek durur (028); klip ile klip çakışması yine ölçülür.</summary>
+    private static bool CizelgeKatmani(Control c) => c is VidShrink.App.Editing.EditorTrackCanvas or VidShrink.App.Editing.EditorPlayhead;
+
     private static void Kardesler(Window pencere, string sekme, Denetim denetim)
     {
         foreach (var panel in pencere.GetVisualDescendants().OfType<Panel>())
@@ -1023,6 +1030,7 @@ public sealed class YerlesimDenetimiTests
                     var a = cocuklar[i];
                     var b = cocuklar[j];
                     if (panel is Grid && AyniGoz(a, b)) continue;
+                    if (panel is VidShrink.App.Editing.EditorTimeline && (CizelgeKatmani(a) || CizelgeKatmani(b))) continue;
                     var kesisim = a.Bounds.Intersect(b.Bounds);
                     if (kesisim.Width <= 1 || kesisim.Height <= 1) continue;
                     denetim.Ekle(new Kusur("çakışma", sekme, $"{Ad(a)} ∩ {Ad(b)}",

@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Σε αυτή τη διαδρομή δεν υπάρχει ffmpeg με ffprobe δίπλα του· χρησιμοποιείται αντί αυτού το αυτόματο ffmpeg.",
 
   "main.tab.player": "Αναπαραγωγή",
+  "main.tab.editor": "Επεξεργασία",
   "main.player.menu.playpause": "Αναπαραγωγή / παύση",
   "main.player.menu.fullscreen": "Πλήρης οθόνη",
   "main.player.menu.reset": "Επαναφορά ζουμ",

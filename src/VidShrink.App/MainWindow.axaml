@@ -84,7 +84,7 @@
               BorderThickness="0,0,0,1"/>
 
 
-        <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="1" izi:AcilisIsareti.Ad="xaml-sekmeler">
+        <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="2" izi:AcilisIsareti.Ad="xaml-sekmeler">
         <TabControl.Tag>
         <StackPanel>
           <Border x:Name="AppliedNotice" Classes="reveal-panel"
@@ -205,6 +205,10 @@
         </TabControl.Tag>
         <TabItem x:Name="TabPlayer" izi:AcilisIsareti.Ad="xaml-oynatici" Header="{loc:Text main.tab.player}" Tag="{StaticResource IconPlayer}" Theme="{StaticResource NeonTabItem}">
           <playback:PlayerView x:Name="Player"/>
+        </TabItem>
+
+        <TabItem x:Name="TabEditor" izi:AcilisIsareti.Ad="xaml-duzenleyici" Header="{loc:Text main.tab.editor}" Tag="{StaticResource IconEditor}" Theme="{StaticResource NeonTabItem}">
+          <ContentControl x:Name="PageEditor"/>
         </TabItem>
 
 

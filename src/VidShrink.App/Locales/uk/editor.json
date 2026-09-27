@@ -1,0 +1,16 @@
+{
+  "editor.split": "Розрізати",
+  "editor.delete": "Видалити",
+  "editor.delete-range": "Видалити діапазон",
+  "editor.mark-in": "Точка входу",
+  "editor.mark-out": "Точка виходу",
+  "editor.speed": "Швидкість",
+  "editor.reverse": "Обернути",
+  "editor.undo": "Скасувати дію",
+  "editor.redo": "Повторити",
+  "editor.zoom-in": "Наблизити",
+  "editor.zoom-out": "Віддалити",
+  "editor.export": "Експорт",
+  "editor.timeline": "Шкала часу",
+  "editor.playhead": "Покажчик відтворення"
+}

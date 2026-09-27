@@ -1,0 +1,16 @@
+{
+  "editor.split": "Sadalīt",
+  "editor.delete": "Dzēst",
+  "editor.delete-range": "Dzēst diapazonu",
+  "editor.mark-in": "Iestatīt sākumu",
+  "editor.mark-out": "Iestatīt beigas",
+  "editor.speed": "Ātrums",
+  "editor.reverse": "Apgriezt",
+  "editor.undo": "Atsaukt",
+  "editor.redo": "Atkārtot",
+  "editor.zoom-in": "Tuvināt",
+  "editor.zoom-out": "Tālināt",
+  "editor.export": "Eksportēt",
+  "editor.timeline": "Laika josla",
+  "editor.playhead": "Atskaņošanas galviņa"
+}

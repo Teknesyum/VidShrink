@@ -1,0 +1,16 @@
+{
+  "editor.split": "Podziel",
+  "editor.delete": "Usuń",
+  "editor.delete-range": "Usuń zakres",
+  "editor.mark-in": "Ustaw punkt początkowy",
+  "editor.mark-out": "Ustaw punkt końcowy",
+  "editor.speed": "Prędkość",
+  "editor.reverse": "Odwróć",
+  "editor.undo": "Cofnij",
+  "editor.redo": "Ponów",
+  "editor.zoom-in": "Powiększ",
+  "editor.zoom-out": "Pomniejsz",
+  "editor.export": "Eksportuj",
+  "editor.timeline": "Oś czasu",
+  "editor.playhead": "Głowica odtwarzania"
+}

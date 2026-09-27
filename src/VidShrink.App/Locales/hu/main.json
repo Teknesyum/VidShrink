@@ -573,6 +573,7 @@
   "settings-tab.ffmpeg-path.error": "Ezen az útvonalon nincs ffmpeg mellette ffprobe-bal; helyette az automatikus ffmpeg fut.",
 
   "main.tab.player": "Lejátszó",
+  "main.tab.editor": "Szerkesztő",
   "main.player.menu.playpause": "Lejátszás / szünet",
   "main.player.menu.fullscreen": "Teljes képernyő",
   "main.player.menu.reset": "Nagyítás visszaállítása",

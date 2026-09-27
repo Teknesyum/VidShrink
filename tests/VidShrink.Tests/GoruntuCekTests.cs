@@ -40,7 +40,7 @@ public sealed class GoruntuCekTests
             window.Measure(new Size(1200, 800));
             window.FindControl<Border>("UpdateNotice")!.IsVisible = true;
             window.FindControl<TextBlock>("TxtNoticeVersion")!.Text = "0.4.3";
-            window.FindControl<TabControl>("Tabs")!.SelectedIndex = 3;
+            window.FindControl<TabControl>("Tabs")!.SelectedIndex = window.RecorderTabIndex;
             var kok = (Control)window.GetVisualChildren().Single();
 
             var ilerleme = new InstallProgress();

@@ -1,0 +1,16 @@
+{
+  "editor.split": "แยก",
+  "editor.delete": "ลบ",
+  "editor.delete-range": "ลบช่วง",
+  "editor.mark-in": "ตั้งจุดเริ่ม",
+  "editor.mark-out": "ตั้งจุดสิ้นสุด",
+  "editor.speed": "ความเร็ว",
+  "editor.reverse": "ย้อนกลับ",
+  "editor.undo": "เลิกทำ",
+  "editor.redo": "ทำซ้ำ",
+  "editor.zoom-in": "ขยาย",
+  "editor.zoom-out": "ย่อ",
+  "editor.export": "ส่งออก",
+  "editor.timeline": "ไทม์ไลน์",
+  "editor.playhead": "หัวเล่น"
+}
