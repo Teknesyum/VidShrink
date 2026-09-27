@@ -75,6 +75,7 @@ internal partial class PlayerView : UserControl
         InitWindow();
         InitTools();
         InitFare();
+        InitPlaylist();
 
         RefreshState();
     }
@@ -357,7 +358,11 @@ internal partial class PlayerView : UserControl
             return;
         }
 
-        if (button == PlayerButton.Right) MenuAtPointer = true;
+        if (button == PlayerButton.Right)
+        {
+            MenuAtPointer = true;
+            _menuPointer = TopLevel.GetTopLevel(this) is null ? null : this.PointToScreen(point.Position);
+        }
         FeedPress(button);
         e.Handled = true;
     }
@@ -450,6 +455,12 @@ internal partial class PlayerView : UserControl
         var flyout = BuildMenu();
         _menu = flyout;
         MenuAnchor = MenuAtPointer ? "pointer" : "surface";
+        var pointer = MenuAtPointer ? _menuPointer : null;
+        flyout.Opened += (_, _) => OpenPlaylist(flyout, pointer);
+        flyout.Closed += (_, _) =>
+        {
+            if (ReferenceEquals(_menu, flyout) || _menu is null) ClosePlaylist();
+        };
         try
         {
             flyout.ShowAt(Surface, MenuAtPointer);
