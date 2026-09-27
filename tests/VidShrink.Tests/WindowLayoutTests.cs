@@ -372,11 +372,20 @@ public sealed class WindowLayoutTests
     /// <summary>Pencerenin istediği boyut; <c>Theme.axaml</c>'de yazılı.</summary>
     private static Size DesignSize() => new(Token("WindowPreferredWidth"), Token("WindowPreferredHeight"));
 
-    private static Size MinimumSize() =>
-        Fresh(window =>
-        {
-            return new Size(window.MinWidth, window.MinHeight);
-        });
+    /// <summary>
+    /// Pencerenin tabanı; <c>MainWindow.axaml</c>'de yazılı. Açık pencerenin <c>MinWidth</c>'i
+    /// okunmaz: <c>ApplyStartupSize</c> onu koşturan makinenin çalışma alanına indiriyor (T59),
+    /// CI'nın küçük ekranında dar kol 1260/1478 verdi, bu makinede 1197/1212.
+    /// </summary>
+    private static Size MinimumSize()
+    {
+        var markup = File.ReadAllText(TipSources.WindowXamlPath);
+        var declared = Regex.Match(markup, @"MinWidth=""(?<w>\d+)""\s+MinHeight=""(?<h>\d+)""");
+        Assert.True(declared.Success, "Biçimlemede pencere tabanı bulunamadı.");
+        return new Size(
+            double.Parse(declared.Groups["w"].Value, CultureInfo.InvariantCulture),
+            double.Parse(declared.Groups["h"].Value, CultureInfo.InvariantCulture));
+    }
 
     private static string Describe(Size size, bool loaded, IEnumerable<Overflow> overflowing) =>
         $"{(loaded ? "Dolu" : "Boş")} pencerede {size.Width:0}x{size.Height:0}: "
@@ -559,7 +568,7 @@ public sealed class WindowLayoutTests
     /// <b>dolu/dar</b> 1006-1106 → 1093-1193 (ölçülen 1143). Tasarım boyu değişmedi.
     /// Nedeni ölçüldü: <c>KaydiriciSatiri</c> hep tek satır kalınca iki dar kol eski
     /// aralıklarında geçiyor.</para>
-    /// <para>Uç 2 fs-2 (2026-09-27): hiçbir yazı 16 pikselin altında değil (<c>FontSizeSm</c> 14 → 16).
+    /// <para>Uç 3 fs-2 (2026-09-27): hiçbir yazı 16 pikselin altında değil (<c>FontSizeSm</c> 14 → 16).
     /// Dar pencerede satırlar uzadı: <b>boş/dar</b> 1079-1179 → 1147-1247 (ölçülen 1197), <b>dolu/dar</b>
     /// 1093-1193 → 1162-1262 (ölçülen 1212). Tasarım boyundaki iki kol eski aralıklarında geçiyor.</para>
     /// </summary>
@@ -663,7 +672,7 @@ public sealed class WindowLayoutTests
     /// <para>S20: katlanmış bölüm özetleri başlığın altında kendi satırına indi (dar pencerede
     /// üçnoktayla 10 piksele düşüyordu). <b>Boş</b> 899-989 → 975-1065 (ölçülen <b>1020</b>);
     /// dolu aralık değişmedi.</para>
-    /// <para>Uç 2 fs-2 (2026-09-27): <c>FontSizeSm</c> 14 → 16. <b>Boş</b> 975-1065 → 1031-1121 (ölçülen
+    /// <para>Uç 3 fs-2 (2026-09-27): <c>FontSizeSm</c> 14 → 16. <b>Boş</b> 975-1065 → 1031-1121 (ölçülen
     /// <b>1076</b>), <b>dolu</b> 903-993 → 955-1045 (ölçülen <b>1000</b>). Genişlik yine 90 piksel.</para>
     /// </summary>
     [Theory]
@@ -745,7 +754,7 @@ public sealed class WindowLayoutTests
     /// orta 906, sağ 502. Orta sütunun boyu değişmedi; sol sütun 4 piksel kısaldı. Sütunların
     /// dış boşluğu artık <c>PageMargin</c> (sağda kaydırma çubuğuna yer açan pay), sayfa içeriği
     /// en uzun sütun ile onun dikey payının toplamı.</para>
-    /// <para>Uç 2 fs-2 (2026-09-27): dolu sayfayı yeniden sol sütun tutuyor — ölçülen sol 930, orta 922,
+    /// <para>Uç 3 fs-2 (2026-09-27): dolu sayfayı yeniden sol sütun tutuyor — ölçülen sol 930, orta 922,
     /// sağ 514. Yazı 16 piksele çıkınca ayar sütununun etiketleri ve özetleri orta sütundan çok uzadı.</para>
     /// </summary>
     [Theory]
