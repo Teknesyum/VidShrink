@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Powiększ panel",
   "playback.panel.fullscreen": "Pełny ekran",
   "playback.zoom.out": "Pomniejsz",
-  "playback.zoom.in": "Powiększ"
+  "playback.zoom.in": "Powiększ",
+  "player.menu.reveal": "Otwórz lokalizację pliku",
+  "player.menu.view": "Obraz",
+  "player.menu.playback": "Odtwarzanie",
+  "player.menu.loop": "Powtarzanie i zakładki"
 }

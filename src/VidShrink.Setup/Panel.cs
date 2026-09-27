@@ -45,14 +45,14 @@ internal sealed class Panel
     private const uint Background = 0xFF000000;
     private const uint Glass = 0xE60F1117;
     private const uint Text = 0xFFFFFFFF;
-    private const uint Cyan = 0xFF6FB7FF;
-    private const uint Purple = 0xFFC3A3FF;
-    private const uint Pink = 0xFFCBA7D2;
+    private const uint Cyan = 0xFF4DA6FF;
+    private const uint Purple = 0xFFB68FFF;
+    private const uint Pink = 0xFFDE7EF1;
     private const uint PinkText = 0xFFFA8CFF;
     private const uint Success = 0xFF66F09A;
     private const uint Muted = 0xFF8A8F9A;
-    private const uint Edge = 0xB36FB7FF;
-    private const uint Hairline = 0x336FB7FF;
+    private const uint Edge = 0xB34DA6FF;
+    private const uint Hairline = 0x334DA6FF;
 
     private static Panel? current;
 

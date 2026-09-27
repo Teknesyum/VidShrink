@@ -53,5 +53,9 @@
   "playback.panel.maximize": "パネルを最大化",
   "playback.panel.fullscreen": "フルスクリーン",
   "playback.zoom.out": "ズームアウト",
-  "playback.zoom.in": "ズームイン"
+  "playback.zoom.in": "ズームイン",
+  "player.menu.reveal": "ファイルの場所を開く",
+  "player.menu.view": "映像",
+  "player.menu.playback": "再生",
+  "player.menu.loop": "リピートとブックマーク"
 }

@@ -1,31 +1,24 @@
-# Plan: Tek Paketli Güncelleme, Uc'nin Tamamı
+# Oynatıcı Panelleri Ve Sağ Menü
 
-2026-09-27. İstek: "update kısmında panel açılıyor dosyalar tek tek iniyor; tek bir update dosyası
-inip PC'de açılıp update yapılmalı. Kullanıcı dosyaları yalnız yüklenirken ya da ilk kurulumda
-görmeli, indirmede yalnız ilerleme çubuğu. Çok kısaysa kurulum sürecini göstermeyebilirsin."
-Ve: "uc ne diyorsa yap, son halini göreyim, gerekirse geri alırım."
+Kaynak: kullanıcı istekleri (2026-09-27), danışma `docs/danisma/015-fable-oynatici-menu-panel.md`.
 
-## Başlangıç Ölçümü
+## Dalga A — Sağ Menü (ajan, kendi dalı)
+- `Keymap.cs`, `PlayerView.axaml.cs BuildMenu`, `PlayerView.Tracks/Window/Tools.cs`
+- 12 üst düzey satır: Oynat/Duraklat, Tam ekran, Dosya konumunu aç, —, Ses, Altyazı, Görüntü ▸, Oynatma ▸, Tekrar ve yer imleri ▸, —, Ekran görüntüsü, Araçlar ▸, Son dosyalar ▸, Ayarlar ▸
+- "Dosya konumunu aç": `explorer /select,<yol>`; Windows dışı klasörü açar.
 
-- Kurulu uygulama eski renklerle açılıyor: `%APPDATA%\VidShrink\settings.json` `"theme": "Neon"`.
-  0.10.0 planının "kayıtlı seçim korunur" kararı varsayılan değişikliğini kurulu kullanıcıya
-  ulaştırmadı. UI eklentisine raporlandı.
-- Uc 2 raporunun açıkları: 43 yazı 14 px (düzen en az 16), düğme parıltısı kırpılıyor,
-  eski paletlerde AyuLight 1,65, Monokai/Solarized PinkText, 15 vurgu dolgusu, 8 düşürülmüş taban.
-- Kısayol simgeleri güncellenmedi.
+## Dalga B — Üst Panel (ajan, kendi dalı)
+- `MainWindow.axaml(.cs)`, `Themes/Controls.axaml`, `Themes/Icons.axaml`
+- Oynatıcı sekmesinde tek üst katman, tek görünürlük bağı; opak gradyan ve mavi alt çizgi yerine alt scrim'in aynası.
+- Başlık düğmeleri anahatsız: hover'da renk-2 yazı, ortadan açılan alt çizgi; seçili sekme gövde renginde sabit çizgi.
+- Teknesyum düğmesinden `IconCode` kalkar.
+- Tetik bölgesi sabit piksel belirteci (üst 48), scrim 96.
 
-## Karar
+## Dalga C — Alt Şerit ve Oynatma (T0)
+- `Themes/Playback.axaml`, `PlayerView.axaml`, `PlayerView.Serit.cs`
+- Kart/kenarlık/dış boşluk kalkar, kontroller scrim üstüne; arama çubuğu ince, düğme satırı 36.
+- Fare çıkınca 0 ms kapanış; ThumbChip şeritle kapanır. Tetik 96, scrim 144.
+- Duraklatma simgesi girişi `MotionInstant` (40 ms, 2x), çıkış `MotionFast`.
+- Sondayken Oynat: sonraki dosya varsa ona, yoksa baştan.
 
-- "Kayıtlı seçim korunur" geri alınır: tek seferlik göç, eski varsayılan `Neon` kayıtlıysa
-  `Teknesyum` olur. Kullanıcı sonra elle seçerse seçimi kalır.
-- Uc'nin sahibe bıraktığı her açık uygulanır; sahip son hâli görüp gerekirse geri alır.
-- Güncelleme tek arşiv olarak iner, yerelde açılır, yerinde takasla kurulur.
-
-## İşler
-
-| # | İş | Sahip | Bağımlılık |
-|---|---|---|---|
-| 1 | Tek paketli güncelleme | ajan (opus) | — |
-| 4 | Uc'nin tamamı | ajan (opus) | — |
-| 5 | Kısayol simgeleri | T0 | 6 |
-| 6 | Birleşim, CI, sürüm | T0 | 1, 4 |
+Ölçü: dokunulan alanın testleri yerelde yeşil, sonra main CI yeşil, 0.13.0.

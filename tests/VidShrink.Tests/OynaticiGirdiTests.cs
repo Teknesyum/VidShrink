@@ -289,13 +289,13 @@ public sealed class OynaticiGirdiTests
             {
                 Strings.Use(dil);
                 var menu = view.BuildMenu();
-                var satirlar = menu.Items.OfType<MenuItem>().ToList();
-                var basliklar = satirlar.Where(item => item.Tag is PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
-                var ekler = satirlar.Where(item => item.Tag is not PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
+                var eylemSatirlari = OynaticiGirdiTestsMenuSatirlari.EylemSatirlari(menu).ToList();
+                var basliklar = eylemSatirlari.Select(item => item.Header?.ToString() ?? "").ToList();
+                var ekler = menu.Items.OfType<MenuItem>().Where(item => item.Tag is not PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
                 body.AppendLine($"{dil}: {string.Join(" | ", basliklar)} || {string.Join(" | ", ekler)}");
-                Assert.Equal(Keymap.MenuActions.Count, basliklar.Count);
+                Assert.Equal(Keymap.MenuActions, eylemSatirlari.Select(item => (PlayerAction)item.Tag!));
                 Assert.All(basliklar, baslik => Assert.False(string.IsNullOrWhiteSpace(baslik)));
-                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.tools.menu") }, ekler);
+                Assert.Equal(OynaticiGirdiTestsMenuSatirlari.EkBasliklar(), ekler);
             }
 
             Strings.Use("en");
@@ -481,8 +481,166 @@ public sealed class FfmpegAvailableFactAttribute : FactAttribute
 
 public sealed class OynaticiGirdiTestsMenuSatirlari
 {
+    internal static IEnumerable<MenuItem> Hepsi(IEnumerable<object?> ogeler)
+        => ogeler.OfType<MenuItem>().SelectMany(item => (ReferenceEquals(item.Tag, Keymap.Settings) ? Enumerable.Empty<MenuItem>() : Hepsi(item.Items)).Prepend(item));
+
+    internal static IEnumerable<MenuItem> EylemSatirlari(MenuFlyout menu)
+        => Hepsi(menu.Items).Where(item => item.Tag is PlayerAction eylem && Keymap.MenuActions.Contains(eylem));
+
+    internal static string[] EkBasliklar() => new[]
+    {
+        Strings.Get("player.menu.reveal"),
+        Strings.Get("player.tracks.audio"),
+        Strings.Get("player.subtitle.menu"),
+        Strings.Get("player.menu.view"),
+        Strings.Get("player.menu.playback"),
+        Strings.Get("player.menu.loop"),
+        Strings.Get("player.tools.menu"),
+        Strings.Get("player.list.recent")
+    };
+
+    internal static string[] UstSatirlar() => new[]
+    {
+        Strings.Get(Keymap.PlayPause.LabelKey),
+        Strings.Get(Keymap.Fullscreen.LabelKey),
+        Strings.Get("player.menu.reveal"),
+        "-",
+        Strings.Get("player.tracks.audio"),
+        Strings.Get("player.subtitle.menu"),
+        Strings.Get("player.menu.view"),
+        Strings.Get("player.menu.playback"),
+        Strings.Get("player.menu.loop"),
+        "-",
+        Strings.Get(Keymap.Screenshot.LabelKey),
+        Strings.Get("player.tools.menu"),
+        Strings.Get("player.list.recent"),
+        Strings.Get(Keymap.Settings.LabelKey)
+    };
+
     private static MenuItem Satir(PlayerView view, PlayerAction eylem)
-        => view.BuildMenu().Items.OfType<MenuItem>().First(item => ReferenceEquals(item.Tag, eylem));
+        => Hepsi(view.BuildMenu().Items).First(item => ReferenceEquals(item.Tag, eylem));
+
+    [Fact]
+    public void UstMenuOnIkiSatirVeIkiAyiriciTasir()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var view = new PlayerView();
+            var window = new Window { Width = 640, Height = 480, Content = view };
+            var body = new StringBuilder();
+
+            foreach (var dil in new[] { "en", "tr" })
+            {
+                Strings.Use(dil);
+                var menu = view.BuildMenu();
+                var ust = menu.Items.Select(item => item is Separator ? "-" : (item as MenuItem)?.Header?.ToString() ?? "").ToList();
+                body.AppendLine($"[{dil}] {string.Join(" | ", ust)}");
+                Assert.Equal(UstSatirlar(), ust);
+                Assert.Equal(12, menu.Items.OfType<MenuItem>().Count());
+                Assert.Equal(2, menu.Items.OfType<Separator>().Count());
+                var tumu = Hepsi(menu.Items).ToList();
+                Assert.DoesNotContain(tumu, item => ReferenceEquals(item.Tag, Keymap.Stop));
+                Assert.DoesNotContain(tumu, item => ReferenceEquals(item.Tag, Keymap.GoToStart));
+                Assert.DoesNotContain(tumu, item => ReferenceEquals(item.Tag, Keymap.Mute));
+                Assert.Single(tumu, item => ReferenceEquals(item.Tag, Keymap.NormalSpeed));
+            }
+
+            Strings.Use("en");
+            window.Close();
+            return body.ToString();
+        });
+
+        GirdiKanit.Write("k9-menu-ust.txt", rapor);
+        GirdiKanit.Kapat("k9-menu-ust.txt");
+    }
+
+    [Fact]
+    public void DosyaKonumunuAcWindowsdaDosyayiSeciliAcar()
+    {
+        var yol = Path.Combine(Path.GetTempPath(), "vidshrink konum.mp4");
+        var windows = PlayerView.RevealStart(yol, windows: true, mac: false);
+        Assert.Equal("explorer.exe", windows.FileName);
+        Assert.False(windows.UseShellExecute);
+        Assert.Equal(new[] { "/select,", yol }, windows.ArgumentList);
+
+        var mac = PlayerView.RevealStart(yol, windows: false, mac: true);
+        Assert.Equal("open", mac.FileName);
+        Assert.Equal(new[] { Path.GetDirectoryName(yol) }, mac.ArgumentList);
+
+        var linux = PlayerView.RevealStart(yol, windows: false, mac: false);
+        Assert.Equal("xdg-open", linux.FileName);
+        Assert.Equal(new[] { Path.GetDirectoryName(yol) }, linux.ArgumentList);
+    }
+
+    [Fact]
+    public void DosyaKonumunuAcDosyaYokkenKapaliVarkenCalisir()
+    {
+        var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "menu-konum");
+        Directory.CreateDirectory(klasor);
+        var dosya = Path.Combine(klasor, "konum.mp4");
+        File.WriteAllBytes(dosya, new byte[] { 0 });
+        try
+        {
+            var sonuc = AppHost.Run(() =>
+            {
+                var view = new PlayerView();
+                var window = new Window { Width = 640, Height = 480, Content = view };
+                var cagrilar = new List<ProcessStartInfo>();
+                view.RevealLauncher = start => cagrilar.Add(start);
+                MenuItem Konum() => view.BuildMenu().Items.OfType<MenuItem>().Single(item => (string?)item.Header == Strings.Get("player.menu.reveal"));
+                var alan = typeof(PlayerView).GetField("_path", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+
+                var bos = Konum().IsEnabled;
+                var bosCagri = view.RevealFile();
+                alan.SetValue(view, Path.Combine(klasor, "yok.mp4"));
+                var yokKapali = Konum().IsEnabled;
+                alan.SetValue(view, dosya);
+                var satir = Konum();
+                var acik = satir.IsEnabled;
+                satir.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent) { Source = satir });
+
+                window.Close();
+                return (bos, bosCagri, yokKapali, acik, cagrilar);
+            });
+
+            Assert.False(sonuc.bos);
+            Assert.False(sonuc.bosCagri);
+            Assert.False(sonuc.yokKapali);
+            Assert.True(sonuc.acik);
+            var cagri = Assert.Single(sonuc.cagrilar);
+            if (OperatingSystem.IsWindows())
+            {
+                Assert.Equal("explorer.exe", cagri.FileName);
+                Assert.Equal(new[] { "/select,", Path.GetFullPath(dosya) }, cagri.ArgumentList);
+            }
+            else Assert.Equal(new[] { Path.GetFullPath(klasor) }, cagri.ArgumentList);
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
+    }
+
+    [Fact]
+    public void YeniMenuAnahtarlariHerDildeCevrilmis()
+    {
+        var anahtarlar = new[] { "player.menu.reveal", "player.menu.view", "player.menu.playback", "player.menu.loop" };
+        var kok = Path.Combine(GirdiKanit.Root, "src", "VidShrink.App", "Locales");
+        var diller = Directory.GetDirectories(kok).Where(d => File.Exists(Path.Combine(d, "playback.json"))).ToList();
+        var ingilizce = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(kok, "en", "playback.json"))).RootElement;
+        Assert.True(diller.Count > 40, $"dil sayisi {diller.Count}");
+        foreach (var klasor in diller)
+        {
+            var dil = Path.GetFileName(klasor);
+            using var belge = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(klasor, "playback.json")));
+            foreach (var anahtar in anahtarlar)
+            {
+                Assert.True(belge.RootElement.TryGetProperty(anahtar, out var deger), $"{dil}: {anahtar} yok");
+                Assert.False(string.IsNullOrWhiteSpace(deger.GetString()), $"{dil}: {anahtar} bos");
+                if (dil != "en") Assert.NotEqual(ingilizce.GetProperty(anahtar).GetString(), deger.GetString());
+            }
+        }
+    }
 
     private static void Tikla(MenuItem item)
         => item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent) { Source = item });
@@ -594,12 +752,12 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var window = new Window { Width = 640, Height = 480, Content = view };
             var menu = view.BuildMenu();
             var ogeler = menu.Items.OfType<MenuItem>().ToList();
-            var satirlar = ogeler.Where(item => item.Tag is PlayerAction).ToList();
+            var satirlar = EylemSatirlari(menu).ToList();
             var ekler = ogeler.Where(item => item.Tag is not PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
-            Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.tools.menu") }, ekler);
+            Assert.Equal(EkBasliklar(), ekler);
             var parcaSatirlari = ogeler.Where(item => item.Tag is null)
                 .SelectMany(altMenu => altMenu.Items.OfType<MenuItem>())
-                .Where(item => item.Tag is PlayerAction)
+                .Where(item => item.Tag is PlayerAction eylem && !Keymap.MenuActions.Contains(eylem))
                 .ToList();
             Assert.Equal(
                 Keymap.Rows.Count(row => row.Action.Command
@@ -1025,7 +1183,8 @@ public sealed class OynaticiFareTests
 
             Assert.Equal("pointer", sagTik);
             Assert.Equal("surface", dugme);
-            Assert.Equal(Strings.Get("main.player.menu.settings"), basliklar[0]);
+            Assert.Equal(Strings.Get("main.player.menu.playpause"), basliklar[0]);
+            Assert.Equal(Strings.Get("main.player.menu.settings"), basliklar[^1]);
 
             window.Close();
             return body.Metin;
@@ -1044,7 +1203,8 @@ public sealed class OynaticiFareTests
             var acilan = 0;
             view.OpenSettings = () => acilan++;
 
-            var ayarlar = view.BuildMenu().Items.OfType<MenuItem>().First();
+            var ayarlar = view.BuildMenu().Items.OfType<MenuItem>().Last();
+            Assert.Same(Keymap.Settings, ayarlar.Tag);
             IEnumerable<MenuItem> Hepsi(MenuItem m) => m.Items.OfType<MenuItem>().SelectMany(c => Hepsi(c).Prepend(c));
             var sekmeyeGiden = Hepsi(ayarlar).Count(child => ReferenceEquals(child.Tag, Keymap.Settings));
             view.Apply(Keymap.Settings.ToCommand());

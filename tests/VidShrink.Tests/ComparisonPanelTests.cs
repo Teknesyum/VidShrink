@@ -290,13 +290,13 @@ public sealed class ComparisonPanelTests
     }
 
     /// <summary>
-    /// T70/K5: denetim şeridi değişmedi. Gösterme beklemez — sayaç kurulmadan şerit açılır;
-    /// gizleme kendi belirtecinin söylediği 360 ms'yi bekler.
+    /// T70/K5: gösterme beklemez — sayaç kurulmadan şerit açılır. İnce şerit isteği: gizleme
+    /// de beklemez, fare çıkınca şerit anında kapanır; sayaç hiç kurulmaz.
     /// </summary>
     [Fact]
-    public void Serit_gostermede_beklemez_gizlemede_bekler()
+    public void Serit_gostermede_ve_gizlemede_beklemez()
     {
-        var (shown, armedOnShow, heldOpen, hideDelay, hidden) = Read((host, panel) =>
+        var (shown, armedOnShow, armedOnHide, hidden) = Read((host, panel) =>
         {
             var zone = panel.Controls.Zone;
             zone.Reset(false);
@@ -309,18 +309,13 @@ public sealed class ComparisonPanelTests
             var pendingOnShow = clock.Pending;
 
             zone.PointerWithin(false);
-            var stillOpen = zone.IsVisible;
-            var asked = clock.Delay;
-
-            clock.Advance(asked);
-            return (open, pendingOnShow, stillOpen, asked, zone.IsVisible);
+            return (open, pendingOnShow, clock.Pending, zone.IsVisible);
         });
 
         Assert.True(shown, "şerit gösterme için bekledi");
         Assert.False(armedOnShow, "gösterme sayaç kurdu");
-        Assert.True(heldOpen, "şerit beklemeden gizlendi");
-        Assert.Equal(TimeSpan.FromMilliseconds(360), hideDelay);
-        Assert.False(hidden, "şerit gecikme dolunca gizlenmedi");
+        Assert.False(armedOnHide, "gizleme sayaç kurdu");
+        Assert.False(hidden, "şerit fare çıkınca anında gizlenmedi");
     }
 
     // ---- T82/K3: maksimize ----------------------------------------------------------
@@ -785,7 +780,7 @@ public sealed class ComparisonPanelTests
 
         Assert.Empty(gone);
         Assert.Equal(TimeSpan.Zero, stripShow);
-        Assert.Equal(TimeSpan.FromMilliseconds(360), stripHide);
+        Assert.Equal(TimeSpan.Zero, stripHide);
     }
 
     // ---- K3: köşe yarıçapı ----------------------------------------------------------

@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Panel vergrößern",
   "playback.panel.fullscreen": "Vollbild",
   "playback.zoom.out": "Verkleinern",
-  "playback.zoom.in": "Vergrößern"
+  "playback.zoom.in": "Vergrößern",
+  "player.menu.reveal": "Dateispeicherort öffnen",
+  "player.menu.view": "Bild",
+  "player.menu.playback": "Wiedergabe",
+  "player.menu.loop": "Wiederholung und Lesezeichen"
 }

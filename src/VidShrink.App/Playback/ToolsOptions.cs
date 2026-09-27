@@ -26,10 +26,10 @@ internal sealed class ToolsOptions
     internal const double MinimumMiniWidth = 240;
     internal const double MaximumMiniWidth = 1280;
 
-    internal static readonly PlayerAction Clip = new(PlayerCommandKind.ClipExport, 0, "player.tools.clip", 0);
-    internal static readonly PlayerAction Gif = new(PlayerCommandKind.GifExport, 0, "player.tools.gif", 0);
-    internal static readonly PlayerAction MiniMode = new(PlayerCommandKind.MiniMode, 0, "player.tools.mini", 0);
-    internal static readonly PlayerAction OpenUrl = new(PlayerCommandKind.OpenUrl, 0, "player.tools.url", 0);
+    internal static readonly PlayerAction Clip = new(PlayerCommandKind.ClipExport, 0, "player.tools.clip");
+    internal static readonly PlayerAction Gif = new(PlayerCommandKind.GifExport, 0, "player.tools.gif");
+    internal static readonly PlayerAction MiniMode = new(PlayerCommandKind.MiniMode, 0, "player.tools.mini");
+    internal static readonly PlayerAction OpenUrl = new(PlayerCommandKind.OpenUrl, 0, "player.tools.url");
 
     internal double ClipSeconds { get; private set; } = DefaultClipSeconds;
 

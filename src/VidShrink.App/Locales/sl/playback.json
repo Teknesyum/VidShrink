@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Povečaj ploščo",
   "playback.panel.fullscreen": "Celozaslonski način",
   "playback.zoom.out": "Pomanjšaj",
-  "playback.zoom.in": "Povečaj"
+  "playback.zoom.in": "Povečaj",
+  "player.menu.reveal": "Odpri mesto datoteke",
+  "player.menu.view": "Slika",
+  "player.menu.playback": "Predvajanje",
+  "player.menu.loop": "Ponavljanje in zaznamki"
 }

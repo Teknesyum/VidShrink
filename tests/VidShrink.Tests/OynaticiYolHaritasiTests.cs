@@ -480,16 +480,16 @@ public sealed class OynaticiYolHaritasiTests
                 if (!ok) hatalar.Add(ad);
             }
 
-            Adim("1 oynatma basladi, gecikme bekliyor", () => view.Apply(Keymap.PlayPause.ToCommand()), true, true);
-            Adim("2 gecikme doldu", () => saat.Ates(), false, false);
+            Adim("1 oynatma basladi, bar aninda gizlendi", () => view.Apply(Keymap.PlayPause.ToCommand()), false, false);
+            Adim("2 bekleyen yok, gizli kaldi", () => saat.Ates(), false, false);
             Adim("3 fare ustte, bar geri geldi", () => Hareket(window, view, new Point(640, 2)), true, false);
-            Adim("4 fare asagida, gecikme bekliyor", () => Hareket(window, view, new Point(640, 420)), true, true);
-            Adim("5 gecikme doldu", () => saat.Ates(), false, false);
+            Adim("4 fare asagida, bar aninda gizlendi", () => Hareket(window, view, new Point(640, 420)), false, false);
+            Adim("5 bekleyen yok, gizli kaldi", () => saat.Ates(), false, false);
             Adim("6 duraklatildi, fare asagida", () => view.Apply(Keymap.PlayPause.ToCommand()), true, false);
             Adim("7 duraklatilmisken fare ust banda girdi", () => Hareket(window, view, new Point(600, 2)), true, false);
             Adim("8 duraklatilmisken fare banttan cikti", () => Hareket(window, view, new Point(600, 500)), true, false);
-            Adim("9 oynatma surdu", () => view.Apply(Keymap.PlayPause.ToCommand()), true, true);
-            Adim("10 gecikme doldu", () => saat.Ates(), false, false);
+            Adim("9 oynatma surdu, bar aninda gizlendi", () => view.Apply(Keymap.PlayPause.ToCommand()), false, false);
+            Adim("10 bekleyen yok, gizli kaldi", () => saat.Ates(), false, false);
             Adim("11 ayarlar sekmesi", () => window.Tabs.SelectedItem = window.TabSettings, true, false);
             Adim("12 ayarlar sekmesinde fare asagida", () => { Hareket(window, view, new Point(600, 520)); saat.Ates(); }, true, false);
 
@@ -509,13 +509,12 @@ public sealed class OynaticiYolHaritasiTests
     }
 
     /// <summary>
-    /// O1: iki barin birbirine esitligi mutasyona olu — <c>HoverZone.Band</c> yariya
-    /// indirilirse iki esik de ayni oranda kuculur ve esitlik korunur. Bu yuzden esik
-    /// mutlak olarak da pimlendi: bant yuzey yuksekliginin dortte biri
-    /// (<c>PlaybackHoverZoneShare</c> = 0,25), iki esik de o sayinin 1 px komsulugunda.
+    /// Ust bar sabit piksel bandinda acilir (<c>PlaybackTopRevealZone</c> = 48, danisma 015
+    /// S3), alt serit de sabit piksel bandinda (<c>PlaybackHoverZoneHeight</c> = 96). Ust esik
+    /// belirtece 1 px komsulukta pimli ve alt bandin altinda; alt esik 96 px komsulugunda.
     /// </summary>
     [Fact]
-    public void P14UstBarVeAltSeritAyniMesafedeAcilir()
+    public void P14UstBarSabitBantAltSeritOranlaAcilir()
     {
         var body = new StringBuilder();
         try
@@ -571,17 +570,16 @@ public sealed class OynaticiYolHaritasiTests
             var ust = Esik("ust bar", d => new Point(640, d), () => window.ChromeShown, ustSaat);
             var altEsik = Esik("alt serit", d => new Point(640, alt - d), () => view.SeritRevealed, altSaat);
             var bant = view.RevealBand;
-            var yuzeyYuksekligi = yuzey.Bounds.Height;
             var baslik = window.TitleBar.Height;
+            var tetik = window.TopRevealZone;
             view.Close();
             window.Close();
 
-            Assert.True(Math.Abs(ust - altEsik) <= 1, $"ust {ust} px, alt {altEsik} px" + Environment.NewLine + body);
-            Assert.True(Math.Abs(ust - bant) <= 1, $"ust {ust} px, bant {YolKanit.N(bant)}");
+            Assert.True(Math.Abs(ust - tetik) <= 1, $"ust {ust} px, tetik {YolKanit.N(tetik)}" + Environment.NewLine + body);
+            Assert.True(ust < bant - 1, $"ust {ust} px oran bandina ({YolKanit.N(bant)}) kaydi");
             Assert.True(ust > baslik + 1, $"ust esik baslik yuksekliginde kaldi: {ust} <= {YolKanit.N(baslik)}");
-            Assert.Equal(yuzeyYuksekligi * 0.25, bant, 1);
-            Assert.InRange(ust, yuzeyYuksekligi * 0.25 - 1, yuzeyYuksekligi * 0.25 + 1);
-            Assert.InRange(altEsik, yuzeyYuksekligi * 0.25 - 1, yuzeyYuksekligi * 0.25 + 1);
+            Assert.Equal(96, bant, 1);
+            Assert.InRange(altEsik, 95, 97);
             return 0;
         });
         }

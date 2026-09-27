@@ -53,5 +53,9 @@
   "playback.panel.maximize": "پینل کو بڑا کریں",
   "playback.panel.fullscreen": "فل اسکرین",
   "playback.zoom.out": "زوم آؤٹ",
-  "playback.zoom.in": "زوم ان"
+  "playback.zoom.in": "زوم ان",
+  "player.menu.reveal": "فائل کا مقام کھولیں",
+  "player.menu.view": "تصویر",
+  "player.menu.playback": "پلے بیک",
+  "player.menu.loop": "دہرائی اور بک مارکس"
 }

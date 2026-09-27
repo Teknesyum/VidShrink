@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Forstørr panelet",
   "playback.panel.fullscreen": "Fullskjerm",
   "playback.zoom.out": "Zoom ut",
-  "playback.zoom.in": "Zoom inn"
+  "playback.zoom.in": "Zoom inn",
+  "player.menu.reveal": "Åpne filplassering",
+  "player.menu.view": "Bilde",
+  "player.menu.playback": "Avspilling",
+  "player.menu.loop": "Gjentakelse og bokmerker"
 }

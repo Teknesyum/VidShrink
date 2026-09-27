@@ -799,8 +799,8 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// Üst şerit yalnız <b>oynatıcı sekmesinde</b> kendiliğinden gizlenir: işaretçi
-    /// pencerenin ilk <c>TitleBarHeight</c> pikseline girdiğinde belirir, şeridi terk
-    /// edince kaybolur. Kural alt şeritle aynı <see cref="HoverZone"/> ve aynı iki belirteç
+    /// pencerenin ilk <c>PlaybackTopRevealZone</c> pikseline (sabit 48, pencere boyuyla
+    /// büyümez) girdiğinde belirir, şeridi terk edince kaybolur. Kural alt şeritle aynı <see cref="HoverZone"/> ve aynı iki belirteç
     /// (<c>PlaybackStripShowDelay</c> / <c>PlaybackStripHideDelay</c>): kaybolma gecikmeli,
     /// duraklatılmışken şerit açık kalır. Şerit içeriğin üstünde bir katman olduğu için
     /// görünüp kaybolurken hiçbir şey yer değiştirmiyor.
@@ -835,11 +835,13 @@ public partial class MainWindow : Window
 
     private TimeSpan ChromeDelay(string key) => this.FindResource(key) is TimeSpan span ? span : TimeSpan.Zero;
 
+    internal double TopRevealZone => this.TryFindResource("PlaybackTopRevealZone", out var bant) && bant is double d ? d : 0;
+
     private void ApplyChromeMode() => ChromeZone.Hold(!ChromeHidesItself || !Player.IsPlaying);
 
     private void OnChromePointerMoved(object? sender, PointerEventArgs e)
     {
-        ChromeZone.PointerWithin(e.GetPosition(this).Y <= Math.Max(TitleBar.Height, Player.RevealBand));
+        ChromeZone.PointerWithin(e.GetPosition(this).Y <= Math.Max(TitleBar.Height, TopRevealZone));
         ApplyChromeMode();
     }
 

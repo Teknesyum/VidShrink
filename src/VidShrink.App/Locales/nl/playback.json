@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Paneel vergroten",
   "playback.panel.fullscreen": "Volledig scherm",
   "playback.zoom.out": "Uitzoomen",
-  "playback.zoom.in": "Inzoomen"
+  "playback.zoom.in": "Inzoomen",
+  "player.menu.reveal": "Bestandslocatie openen",
+  "player.menu.view": "Beeld",
+  "player.menu.playback": "Afspelen",
+  "player.menu.loop": "Herhalen en bladwijzers"
 }

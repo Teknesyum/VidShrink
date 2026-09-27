@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Förstora panelen",
   "playback.panel.fullscreen": "Helskärm",
   "playback.zoom.out": "Zooma ut",
-  "playback.zoom.in": "Zooma in"
+  "playback.zoom.in": "Zooma in",
+  "player.menu.reveal": "Öppna filens plats",
+  "player.menu.view": "Bild",
+  "player.menu.playback": "Uppspelning",
+  "player.menu.loop": "Upprepning och bokmärken"
 }

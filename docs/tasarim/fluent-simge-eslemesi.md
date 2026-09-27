@@ -10,7 +10,8 @@ değil `Fill` ile çiziyor, bu yüzden `IconStroke` belirteci düştü.
 Sayı hiçbir yerde sabit yazılı değil. `docs/danisma/2026-09-17-fable-kararlar.md` §9 "26 yol"
 diyor; o, 13 Eylül ölçümünün sayısıdır. Takım Fluent'e taşınırken `IconRestore` eklenmiş (27),
 ardından kullanılmayan iki geometri düşürülmüştü; 18 Eylül 2026'da uyarı durumu için
-`IconWarning` eklendi — bugün depoda **26** yol var. `IconsTests` bu
+`IconWarning` eklendi (26); 27 Eylül 2026'da Teknesyum düğmesi simgesiz kalınca `IconCode`
+düştü — bugün depoda **25** yol var. `IconsTests` bu
 tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan düşen her anahtar
 ölçüyü kırar.
 
@@ -40,8 +41,7 @@ tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan d
 | 22 | IconMinimize | `Subtract` | `ic_fluent_subtract_24_filled.svg` | Filled / 24 px | Pencere küçült |
 | 23 | IconRestore | `Square Multiple` | `ic_fluent_square_multiple_24_filled.svg` | Filled / 24 px | Pencere geri al |
 | 24 | IconCoffee | `Drink Coffee` | `ic_fluent_drink_coffee_24_filled.svg` | Filled / 24 px | Bağış bağlantısı |
-| 25 | IconCode | `Code` | `ic_fluent_code_24_filled.svg` | Filled / 24 px | Teknesyum bağlantısı (K4) |
-| 26 | IconWarning | `Warning` | `ic_fluent_warning_24_filled.svg` | Filled / 24 px | Uyarı durumu (`StatusWarning`) |
+| 25 | IconWarning | `Warning` | `ic_fluent_warning_24_filled.svg` | Filled / 24 px | Uyarı durumu (`StatusWarning`) |
 
 ## Ölçülen Sınır Kutuları
 
@@ -52,7 +52,7 @@ Sabitleyici çıkarıldıktan sonra `Geometry.Parse(...).Bounds` ile okunan değ
 - `IconSpeed` — gösterge kütlesi merkezin üstünde (cy 11,00).
 - `IconCoffee` — kulp sağda 2 birimlik kenar payını taşıyor (sağ kenar 23,00).
 
-Bu üçü ayrı ayrı, ölçülen kutularıyla pimlendi; kalan 22 simge genel kurala (mürekkep
+Bu üçü ayrı ayrı, ölçülen kutularıyla pimlendi; kalan 21 simge genel kurala (mürekkep
 2–22 aralığında, merkez 12±0,55) uyuyor.
 
 ## Kaldırılan Geometriler (18 Eylül 2026)

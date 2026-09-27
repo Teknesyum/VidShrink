@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Ampliar o painel",
   "playback.panel.fullscreen": "Tela cheia",
   "playback.zoom.out": "Reduzir zoom",
-  "playback.zoom.in": "Aumentar zoom"
+  "playback.zoom.in": "Aumentar zoom",
+  "player.menu.reveal": "Abrir local do arquivo",
+  "player.menu.view": "Imagem",
+  "player.menu.playback": "Reprodução",
+  "player.menu.loop": "Repetição e marcadores"
 }

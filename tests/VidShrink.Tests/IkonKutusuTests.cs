@@ -96,35 +96,34 @@ public sealed class IkonKutusuTests
     }
 
     /// <summary>
-    /// Teknesyum bağlantısının simgesi <c>&lt;/&gt;</c>: uygulamanın yüklediği kaynaktan
-    /// okunan geometri Fluent'in <c>code</c> çizimidir — iki köşeli ayraç ve aralarındaki
-    /// eğik çizgi. Dil kalemden dolguya döndüğü için ölçü <c>FillContains</c> okuyor.
-    ///
-    /// <para>Ölçülen parmak izi: iki ayracın ucu ve karşılıklı iki kolu dolu, eğik çizginin
-    /// ortası dolu, buna karşılık kutunun üst ve alt ortası <b>boş</b>. Dolu bir leke
-    /// (ya da atom simgesi gibi çekirdeği olan bir şekil) son iki koşulu geçemez.</para>
+    /// Teknesyum bağlantısı yalnız yazı: <c>&lt;/&gt;</c> simgesi (<c>IconCode</c>) düğmeden
+    /// ve sözlükten kalktı (danışma 015 S2). Düğmenin içinde yol yok, kaynak artık
+    /// çözülmüyor; simge geri gelirse iki koşuldan biri kırılır.
     /// </summary>
     [Fact]
-    public void TeknesyumSimgesiKoseliAyrac()
+    public void TeknesyumDugmesiSimgesiz()
     {
         AppHost.Ensure();
-        var (dolu, bos, kutu) = AppHost.Run(() =>
+        var (kaynakVar, yolSayisi, yazi) = AppHost.Run(() =>
         {
-            var geo = Avalonia.Application.Current!.TryGetResource("IconCode", null, out var kaynak) ? (Geometry)kaynak! : throw new InvalidOperationException("IconCode yok");
-            var doluNoktalar = new[]
+            var bulundu = Avalonia.Application.Current!.TryGetResource("IconCode", null, out _);
+            var window = new VidShrink.App.MainWindow();
+            try
             {
-                new Avalonia.Point(2.5, 12.5),
-                new Avalonia.Point(21.5, 12.5),
-                new Avalonia.Point(5.5, 8.5),
-                new Avalonia.Point(16.5, 15.5),
-                new Avalonia.Point(12.5, 12.5)
-            };
-            var bosNoktalar = new[] { new Avalonia.Point(12.5, 4.5), new Avalonia.Point(12.5, 19.5) };
-            return (doluNoktalar.All(geo.FillContains), bosNoktalar.All(n => !geo.FillContains(n)), geo.Bounds);
+                var dugme = window.BtnGitHub;
+                var yollar = Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(dugme).OfType<Avalonia.Controls.Shapes.Path>().Count()
+                    + (dugme.Content is Avalonia.Controls.Shapes.Path ? 1 : 0);
+                return (bulundu, yollar, dugme.Content is Avalonia.Controls.TextBlock);
+            }
+            finally
+            {
+                window.Close();
+            }
         });
-        _cikti.WriteLine($"IconCode dolu {dolu} bos {bos} kutu {kutu}");
-        Assert.True(dolu, "Ayracların uçları/kolları ya da eğik çizgi dolu değil.");
-        Assert.True(bos, "Kutunun üst ve alt ortası dolu; simge ayraç değil leke.");
+        _cikti.WriteLine($"IconCode kaynak {kaynakVar}, dugmede yol {yolSayisi}, icerik yazi {yazi}");
+        Assert.False(kaynakVar, "IconCode sözlükte duruyor.");
+        Assert.Equal(0, yolSayisi);
+        Assert.True(yazi, "Teknesyum düğmesinin içeriği yalnız yazı olmalı.");
     }
 
     [Theory]

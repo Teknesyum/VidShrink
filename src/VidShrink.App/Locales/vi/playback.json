@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Phóng to bảng điều khiển",
   "playback.panel.fullscreen": "Toàn màn hình",
   "playback.zoom.out": "Thu nhỏ",
-  "playback.zoom.in": "Phóng to"
+  "playback.zoom.in": "Phóng to",
+  "player.menu.reveal": "Mở vị trí tệp",
+  "player.menu.view": "Hình ảnh",
+  "player.menu.playback": "Phát lại",
+  "player.menu.loop": "Lặp lại và dấu trang"
 }

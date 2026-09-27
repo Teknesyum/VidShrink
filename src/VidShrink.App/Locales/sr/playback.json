@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Uvećaj panel",
   "playback.panel.fullscreen": "Ceo ekran",
   "playback.zoom.out": "Umanji prikaz",
-  "playback.zoom.in": "Uvećaj prikaz"
+  "playback.zoom.in": "Uvećaj prikaz",
+  "player.menu.reveal": "Отвори локацију датотеке",
+  "player.menu.view": "Слика",
+  "player.menu.playback": "Репродукција",
+  "player.menu.loop": "Понављање и обележивачи"
 }

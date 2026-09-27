@@ -53,5 +53,9 @@
   "playback.panel.maximize": "Уголеми панела",
   "playback.panel.fullscreen": "Цял екран",
   "playback.zoom.out": "Намали мащаба",
-  "playback.zoom.in": "Увеличи мащаба"
+  "playback.zoom.in": "Увеличи мащаба",
+  "player.menu.reveal": "Отваряне на местоположението на файла",
+  "player.menu.view": "Видео",
+  "player.menu.playback": "Възпроизвеждане",
+  "player.menu.loop": "Повторение и отметки"
 }

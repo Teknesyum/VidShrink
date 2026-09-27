@@ -63,10 +63,7 @@
     <Style Selector="Window.chrome-hidden Border#TitleBar">
       <Setter Property="IsVisible" Value="False"/>
     </Style>
-    <Style Selector="Window.chrome-hidden Border#TitleBarLayer">
-      <Setter Property="IsVisible" Value="False"/>
-    </Style>
-    <Style Selector="Window.chrome-hidden TabControl#Tabs /template/ ItemsPresenter#PART_ItemsPresenter">
+    <Style Selector="Window.chrome-hidden TabControl#Tabs /template/ Panel#TopOverlay">
       <Setter Property="IsVisible" Value="False"/>
     </Style>
   </Window.Styles>
@@ -1711,72 +1708,69 @@
 
 
 
-      </TabControl>
-
-      <Border x:Name="TitleBarLayer" izi:AcilisIsareti.Ad="xaml-sekmeler-bitti"
-              VerticalAlignment="Top"
-              Height="{StaticResource TitleBarHeight}">
-        <!--
-          Sağda boşluk yok: kapatma düğmesi pencerenin sağ kenarına dayanır. Ekranın köşesi
-          işaretçiyle vurulması en kolay hedeftir ve fare orada durur; araya konan her piksel
-          o kazancı siler. Soldaki 16 px başlık için duruyor.
-        -->
-        <Grid x:Name="TitleBarContent" Margin="{StaticResource TitleBarContentMargin}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
-          <StackPanel Grid.Column="0" x:Name="TitleBrand" IsHitTestVisible="False" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-            <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
-            <TextBlock x:Name="TxtAppName" Theme="{StaticResource AppTitle}" VerticalAlignment="Center">
-              <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
-            </TextBlock>
-          </StackPanel>
-          <StackPanel Grid.Column="2" x:Name="TitleBarRight" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
-            <Button x:Name="BtnUpdateBadge" Theme="{StaticResource TitleBarLinkButton}" IsVisible="False"
-                    auto:AutomationProperties.Name="{loc:Text main.update.badge}"
-                    ToolTip.Tip="{loc:Text main.update.checking}" Click="OnUpdateBadgeClicked">
-              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <Ellipse x:Name="UpdateBadgeDot" Width="{StaticResource BadgeDotSize}" Height="{StaticResource BadgeDotSize}"
-                         VerticalAlignment="Center" Fill="{StaticResource TextDisabled}"/>
-                <TextBlock x:Name="TxtUpdateBadge" VerticalAlignment="Center"/>
-              </StackPanel>
-            </Button>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource WindowButtonMargin}">
-              <StackPanel x:Name="LangSwitch" Orientation="Horizontal"/>
-            </StackPanel>
-            <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="{loc:Etiket sig.support}" ToolTip.Tip="{loc:Etiket sig.supportTitle}" Click="OnOpenSponsor">
-              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
-                      Data="{StaticResource IconCoffee}" Fill="{Binding $parent[Button].Foreground}"/>
-                <TextBlock x:Name="TxtSponsor" Text="{loc:Etiket sig.support}" VerticalAlignment="Center"/>
-              </StackPanel>
-            </Button>
-            <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="{loc:Etiket sig.brand}" ToolTip.Tip="{loc:Etiket sig.brandTitle}" Click="OnOpenGitHub">
-              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
-                      Data="{StaticResource IconCode}" Fill="{Binding $parent[Button].Foreground}"/>
-                <TextBlock x:Name="TxtGitHub" Text="{loc:Etiket sig.brand}" VerticalAlignment="Center"/>
-              </StackPanel>
-            </Button>
+        <izi:UstPanel.Icerik>
+          <Border x:Name="TitleBarLayer" izi:AcilisIsareti.Ad="xaml-sekmeler-bitti"
+                  VerticalAlignment="Top"
+                  Height="{StaticResource TitleBarHeight}">
             <!--
-              Üç düğme Windows'taki gibi bitişik dikdörtgen: aralarında boşluk yok, başlık
-              çubuğu boyunca tam yükseklikte. Soldaki tek boşluk imza bloğundan ayırmak için.
+              Sağda boşluk yok: kapatma düğmesi pencerenin sağ kenarına dayanır. Ekranın köşesi
+              işaretçiyle vurulması en kolay hedeftir ve fare orada durur; araya konan her piksel
+              o kazancı siler. Soldaki 16 px başlık için duruyor.
             -->
-            <StackPanel x:Name="WindowButtons" Orientation="Horizontal" VerticalAlignment="Stretch"
-                        Margin="{StaticResource WindowButtonMargin}">
-              <Button x:Name="BtnMinimize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.minimize}" auto:AutomationProperties.Name="{loc:Text main.window.minimize}" Click="OnMinimize">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconMinimize}" Fill="{Binding $parent[Button].Foreground}"/>
-              </Button>
-              <Button x:Name="BtnMaximize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.maximize}" auto:AutomationProperties.Name="{loc:Text main.window.maximize}" Click="OnMaximizeRestore">
-                <Path x:Name="MaximizeGlyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconMaximize}" Fill="{Binding $parent[Button].Foreground}"/>
-              </Button>
-              <Button x:Name="BtnClose" Theme="{StaticResource CloseWindowButton}" ToolTip.Tip="{loc:Text main.window.close}" auto:AutomationProperties.Name="{loc:Text main.window.close}" Click="OnClose">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconClose}" Fill="{Binding $parent[Button].Foreground}"/>
-              </Button>
-            </StackPanel>
-          </StackPanel>
-        </Grid>
-      </Border>
+            <Grid x:Name="TitleBarContent" Margin="{StaticResource TitleBarContentMargin}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
+              <StackPanel Grid.Column="0" x:Name="TitleBrand" IsHitTestVisible="False" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
+                <TextBlock x:Name="TxtAppName" Theme="{StaticResource AppTitle}" VerticalAlignment="Center">
+                  <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
+                </TextBlock>
+              </StackPanel>
+              <StackPanel Grid.Column="2" x:Name="TitleBarRight" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+                <Button x:Name="BtnUpdateBadge" Theme="{StaticResource TitleBarLinkButton}" IsVisible="False"
+                        auto:AutomationProperties.Name="{loc:Text main.update.badge}"
+                        ToolTip.Tip="{loc:Text main.update.checking}" Click="OnUpdateBadgeClicked">
+                  <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                    <Ellipse x:Name="UpdateBadgeDot" Width="{StaticResource BadgeDotSize}" Height="{StaticResource BadgeDotSize}"
+                             VerticalAlignment="Center" Fill="{StaticResource TextDisabled}"/>
+                    <TextBlock x:Name="TxtUpdateBadge" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Button>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource WindowButtonMargin}">
+                  <StackPanel x:Name="LangSwitch" Orientation="Horizontal"/>
+                </StackPanel>
+                <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="{loc:Etiket sig.support}" ToolTip.Tip="{loc:Etiket sig.supportTitle}" Click="OnOpenSponsor">
+                  <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                    <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
+                          Data="{StaticResource IconCoffee}" Fill="{Binding $parent[Button].Foreground}"/>
+                    <TextBlock x:Name="TxtSponsor" Text="{loc:Etiket sig.support}" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Button>
+                <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="{loc:Etiket sig.brand}" ToolTip.Tip="{loc:Etiket sig.brandTitle}" Click="OnOpenGitHub">
+                  <TextBlock x:Name="TxtGitHub" Text="{loc:Etiket sig.brand}" VerticalAlignment="Center"/>
+                </Button>
+                <!--
+                  Üç düğme Windows'taki gibi bitişik dikdörtgen: aralarında boşluk yok, başlık
+                  çubuğu boyunca tam yükseklikte. Soldaki tek boşluk imza bloğundan ayırmak için.
+                -->
+                <StackPanel x:Name="WindowButtons" Orientation="Horizontal" VerticalAlignment="Stretch"
+                            Margin="{StaticResource WindowButtonMargin}">
+                  <Button x:Name="BtnMinimize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.minimize}" auto:AutomationProperties.Name="{loc:Text main.window.minimize}" Click="OnMinimize">
+                    <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
+                          Data="{StaticResource IconMinimize}" Fill="{Binding $parent[Button].Foreground}"/>
+                  </Button>
+                  <Button x:Name="BtnMaximize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.maximize}" auto:AutomationProperties.Name="{loc:Text main.window.maximize}" Click="OnMaximizeRestore">
+                    <Path x:Name="MaximizeGlyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
+                          Data="{StaticResource IconMaximize}" Fill="{Binding $parent[Button].Foreground}"/>
+                  </Button>
+                  <Button x:Name="BtnClose" Theme="{StaticResource CloseWindowButton}" ToolTip.Tip="{loc:Text main.window.close}" auto:AutomationProperties.Name="{loc:Text main.window.close}" Click="OnClose">
+                    <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
+                          Data="{StaticResource IconClose}" Fill="{Binding $parent[Button].Foreground}"/>
+                  </Button>
+                </StackPanel>
+              </StackPanel>
+            </Grid>
+          </Border>
+        </izi:UstPanel.Icerik>
+      </TabControl>
     </Grid>
   </Border>
 </Window>
