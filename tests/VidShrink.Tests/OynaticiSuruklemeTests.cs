@@ -192,14 +192,14 @@ public sealed class OynaticiSuruklemeTests
                 if (view.WindowDragging) hatalar.Add("ikinci basis bayat surukleme durumunu sifirlamadi");
                 if (view.Fullscreen.IsFullscreen) hatalar.Add("ikinci basis tam ekrana gecti");
 
-                Olay(RawPointerEventType.Move, 90, 60, RawInputModifiers.LeftMouseButton);
-                Olay(RawPointerEventType.Move, 150, 100, RawInputModifiers.LeftMouseButton);
+                Olay(RawPointerEventType.Move, 45, 30, RawInputModifiers.LeftMouseButton);
+                Olay(RawPointerEventType.Move, 60, 40, RawInputModifiers.LeftMouseButton);
                 var son = window.Position;
-                var beklenen = new PixelPoint(tasindi.X + 120, tasindi.Y + 80);
+                var beklenen = new PixelPoint(tasindi.X + 30, tasindi.Y + 20);
                 body.AppendLine($"ikinci basistan sonra basili hareket: konum {son}, beklenen {beklenen}, tam ekran {view.Fullscreen.IsFullscreen}, surukleniyor {view.WindowDragging}");
                 if (son != beklenen) hatalar.Add($"yeni surukleme tutulan noktayi imlecin altinda tutmadi: {son}");
                 if (view.Fullscreen.IsFullscreen) hatalar.Add("basili hareket tam ekrana gecti");
-                Olay(RawPointerEventType.LeftButtonUp, 150, 100, RawInputModifiers.None);
+                Olay(RawPointerEventType.LeftButtonUp, 60, 40, RawInputModifiers.None);
                 body.AppendLine($"birakis: surukleniyor {view.WindowDragging}, konum {window.Position}");
                 if (view.WindowDragging) hatalar.Add("birakistan sonra surukleme surdu");
 

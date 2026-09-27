@@ -608,7 +608,7 @@ public sealed class OynaticiDenetimMotorTests
             var p1 = DenetimSurucu.Konum(view);
             var oynuyor = view.IsPlaying;
 
-            GirdiSurucu.Key(view, Key.F, KeyModifiers.Shift);
+            GirdiSurucu.Key(view, Key.OemComma, KeyModifiers.None, ",");
             DenetimSurucu.Pump(view, () => Math.Abs(DenetimSurucu.Konum(view) - p1) > 1e-4, 3);
             DenetimSurucu.Wait(view, 0.2);
             var p2 = DenetimSurucu.Konum(view);
@@ -814,11 +814,11 @@ public sealed class OynaticiDenetimMotorTests
 
         Assert.Equal(100, rapor[0].Ses, 3);
         Assert.Equal(90, rapor[1].Ses, 3);
-        Assert.Equal(85, rapor[2].Ses, 3);
-        Assert.Equal(90, rapor[3].Ses, 3);
+        Assert.Equal(90, rapor[2].Ses, 3);
+        Assert.Equal(95, rapor[3].Ses, 3);
         Assert.True(rapor[4].Sessiz);
         Assert.False(rapor[5].Sessiz);
-        Assert.Equal(90, rapor[6].Ses, 3);
+        Assert.Equal(95, rapor[6].Ses, 3);
         Assert.Equal(100, rapor[7].Ses, 3);
         DenetimKanit.Kapat("ses.txt");
     }
