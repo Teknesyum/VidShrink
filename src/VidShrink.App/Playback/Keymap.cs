@@ -94,7 +94,7 @@ internal static class Keymap
 
     internal static readonly IReadOnlyList<KeymapRow> Rows = new KeymapRow[]
     {
-        new(PlayerInput.OnWheel(), Seek(SeekSmall)),
+        new(PlayerInput.OnWheel(), Seek(SeekFine)),
         new(PlayerInput.OnWheel(KeyModifiers.Control), Seek(SeekSmall)),
         new(PlayerInput.OnWheel(KeyModifiers.Shift), Seek(SeekMedium)),
         new(PlayerInput.OnWheel(KeyModifiers.Control | KeyModifiers.Shift), Seek(SeekLarge)),

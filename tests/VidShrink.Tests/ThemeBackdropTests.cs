@@ -22,17 +22,8 @@ public sealed class ThemeBackdropTests
     private static readonly XNamespace Ui = "https://github.com/avaloniaui";
     private static readonly XNamespace X = "http://schemas.microsoft.com/winfx/2006/xaml";
 
-    /// <summary>T55 öncesi <c>WorkspaceBackground</c>'un durakları.</summary>
-    private static readonly string[] BaselineWorkspaceStops =
-    {
-        "#FF08090D", "#FF09090E", "#FF0A090F", "#FF0B0910", "#FF0C0A11", "#FF0D0A12"
-    };
-
-    /// <summary>T55 öncesi <c>TitleBarBackground</c>'un durakları.</summary>
-    private static readonly string[] BaselineTitleBarStops =
-    {
-        "#FF101217", "#FF111217", "#FF121217", "#FF121216", "#FF121117", "#FF131117", "#FF141117"
-    };
+    /// <summary>WCAG AAA'nın gövde metni için istediği kontrast; yeşil zemin bunun altına inmez.</summary>
+    private const double BodyTextAaaThreshold = 7.0;
 
     private static readonly string ControlsPath =
         Path.Combine(TipSources.Root, "src", "VidShrink.App", "Themes", "Controls.axaml");
@@ -227,33 +218,33 @@ public sealed class ThemeBackdropTests
         Assert.True(rows <= 4, $"{rows} kor aynı y'de dizilmiş.");
     }
 
-    /// <summary>K1: çalışma alanının en açık noktası bile bugünkünden daha okunaklı.</summary>
+    /// <summary>K1: çalışma alanının en açık noktası bile gövde metnini AAA eşiğinde okutur.</summary>
     [Fact]
     public void WarmingTheWorkspaceDoesNotCostBodyTextContrast()
     {
-        var before = WorstContrast(BaselineWorkspaceStops);
-        var after = WorstContrast(StopColours("WorkspaceGradient"));
+        var worst = WorstContrast(StopColours("WorkspaceGradient"));
 
-        Assert.True(after >= before,
-            $"Çalışma alanı kontrastı {before:F2} → {after:F2} düştü.");
+        Assert.True(worst >= BodyTextAaaThreshold,
+            $"Çalışma alanı kontrastı {worst:F2}, eşik {BodyTextAaaThreshold}.");
     }
 
     /// <summary>K1: başlık çubuğu için de aynı ölçü.</summary>
     [Fact]
     public void WarmingTheTitleBarDoesNotCostBodyTextContrast()
     {
-        var before = WorstContrast(BaselineTitleBarStops);
-        var after = WorstContrast(StopColours("TitleBarBackground"));
+        var worst = WorstContrast(StopColours("TitleBarBackground"));
 
-        Assert.True(after >= before,
-            $"Başlık çubuğu kontrastı {before:F2} → {after:F2} düştü.");
+        Assert.True(worst >= BodyTextAaaThreshold,
+            $"Başlık çubuğu kontrastı {worst:F2}, eşik {BodyTextAaaThreshold}.");
     }
 
-    /// <summary>K1: Neon'un zemini yeşil atmosfere çalıyor — yeşil kanal kırmızıyı geçiyor, maviden geri kalmıyor. Neon'un tasarımı; ölçü varsayılan paleti değil Neon'u okur.</summary>
-    [Fact]
-    public void TheWorkspaceGradientLeansGreen()
+    /// <summary>K1: Neon'un ve Teknesyum'un zemini yeşile çalıyor — yeşil kanal kırmızıyı geçiyor, maviden geri kalmıyor.</summary>
+    [Theory]
+    [InlineData("Neon")]
+    [InlineData("Teknesyum")]
+    public void TheWorkspaceGradientLeansGreen(string palette)
     {
-        foreach (var stop in StopColours("WorkspaceGradient", "Neon"))
+        foreach (var stop in StopColours("WorkspaceGradient", palette))
         {
             var (r, g, b) = Channels(stop);
             Assert.True(g > r, $"{stop} yeşile değil kırmızıya çalıyor.");

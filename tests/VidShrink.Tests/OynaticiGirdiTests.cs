@@ -162,12 +162,12 @@ public sealed class OynaticiGirdiTests
         GirdiKanit.Write("k1-izgara.txt", string.Join(Environment.NewLine, satirlar) + Environment.NewLine);
 
         Assert.Equal(9, satirlar.Count);
-        Assert.Contains("ses 100 -> 100 (konum 0 -> 10 sn)", satirlar[0]);
-        Assert.Contains("konum 10 -> 20 sn", satirlar[1]);
-        Assert.Contains("konum 20 -> 80 sn", satirlar[2]);
-        Assert.Contains("konum 80 -> 380 sn", satirlar[3]);
+        Assert.Contains("ses 100 -> 100 (konum 0 -> 1 sn)", satirlar[0]);
+        Assert.Contains("konum 1 -> 11 sn", satirlar[1]);
+        Assert.Contains("konum 11 -> 71 sn", satirlar[2]);
+        Assert.Contains("konum 71 -> 371 sn", satirlar[3]);
         Assert.Contains("yakinlastirma 1 -> 1.24", satirlar[4]);
-        Assert.Contains("konum 380 -> 380 sn", satirlar[4]);
+        Assert.Contains("konum 371 -> 371 sn", satirlar[4]);
         Assert.Contains("iz menu (oynatma False -> False)", satirlar[5]);
         Assert.Contains("oynatma False -> True", satirlar[6]);
         Assert.Contains("tam ekran False -> True", satirlar[7]);
@@ -178,8 +178,8 @@ public sealed class OynaticiGirdiTests
     [Fact]
     public void TekerlekAdimlariHaritadakiDortSayidir()
     {
-        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 10), Keymap.ForWheel(1, KeyModifiers.None));
-        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, -10), Keymap.ForWheel(-1, KeyModifiers.None));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 1), Keymap.ForWheel(1, KeyModifiers.None));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, -1), Keymap.ForWheel(-1, KeyModifiers.None));
         Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 10), Keymap.ForWheel(1, KeyModifiers.Control));
         Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 60), Keymap.ForWheel(1, KeyModifiers.Shift));
         Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, -300), Keymap.ForWheel(-1, KeyModifiers.Control | KeyModifiers.Shift));

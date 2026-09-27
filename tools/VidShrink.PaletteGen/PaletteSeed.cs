@@ -29,7 +29,8 @@ public sealed record PaletteSeed(
     string Warning,
     string? Danger = null,
     string? Flame = null,
-    string? Atmos = null)
+    string? Atmos = null,
+    double? Ground = null)
 {
     /// <summary>Tohum dosyasındaki alan sırası; yazım bu sırayla yapılır.</summary>
     public static IReadOnlyList<string> Roles { get; } = new[]
@@ -82,9 +83,13 @@ public sealed record PaletteSeed(
     private static PaletteSeed Own(string seedFile, JsonElement element)
     {
         var seed = StandardImport.FromTokens(OwnTokens(seedFile));
-        return element.TryGetProperty("note", out var note) && note.GetString() is { } text
-            ? seed with { Note = text }
-            : seed;
+        if (element.TryGetProperty("note", out var note) && note.GetString() is { } text)
+            seed = seed with { Note = text };
+        if (element.TryGetProperty("atmos", out var atmos) && atmos.GetString() is { } role)
+            seed = seed with { Atmos = seed.Role(role) ?? throw new InvalidDataException($"{seed.Name}: atmos rolü '{role}' boş.") };
+        if (element.TryGetProperty("zemin", out var ground) && ground.TryGetDouble(out var weight))
+            seed = seed with { Ground = weight };
+        return seed;
     }
 
     /// <summary>Tohum dosyasından yukarı yürüyerek projenin <see cref="OwnSource"/> dosyasını bulur.</summary>

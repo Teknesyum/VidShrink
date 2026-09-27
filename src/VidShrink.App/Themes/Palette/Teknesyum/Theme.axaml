@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-  <!-- Teknesyum UI standardının kendi teması: saf siyah zemin üstünde mavi, pembe ve mor üçlü. -->
+  <!-- Teknesyum UI standardının kendi teması: koyu yeşil zemin, mavi, pembe ve mor üçlü. -->
   <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki standart rollerden
        (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
        VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
@@ -28,15 +28,15 @@
   <Color x:Key="NeonEmberColor">#FFCBA7D3</Color>
   <Color x:Key="EmberFlameColor">#FFE5BC90</Color>
   <Color x:Key="EmberBlazeColor">#FFFFD24D</Color>
-  <Color x:Key="AtmosHotColor">#FFFFD24E</Color>
-  <Color x:Key="AtmosMidColor">#FFE5BC91</Color>
-  <Color x:Key="AtmosEdgeColor">#FFCBA7D4</Color>
-  <Color x:Key="EmberDeepColor">#FF030203</Color>
-  <Color x:Key="EmberMidColor">#FF050505</Color>
-  <Color x:Key="EmberEdgeColor">#FF080608</Color>
-  <Color x:Key="EmberBarDeepColor">#FF050405</Color>
-  <Color x:Key="EmberBarMidColor">#FF080609</Color>
-  <Color x:Key="EmberBarEdgeColor">#FF0B090C</Color>
+  <Color x:Key="AtmosHotColor">#FF9CF5BD</Color>
+  <Color x:Key="AtmosMidColor">#FF66F09B</Color>
+  <Color x:Key="AtmosEdgeColor">#FF3D905C</Color>
+  <Color x:Key="EmberDeepColor">#FF050D09</Color>
+  <Color x:Key="EmberMidColor">#FF09170F</Color>
+  <Color x:Key="EmberEdgeColor">#FF0E2115</Color>
+  <Color x:Key="EmberBarDeepColor">#FF09140C</Color>
+  <Color x:Key="EmberBarMidColor">#FF0E2116</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF142E1E</Color>
 
   <Color x:Key="PlaybackScrimColor">#CC000000</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#00000000</Color>
