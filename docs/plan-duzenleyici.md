@@ -107,6 +107,12 @@ Hız ve geri yön burada **yok** (`timeline_part`'ın oran alanı yok). Hızlı 
 özelliği ([MpvEngine.cs:260](../src/VidShrink.Player/MpvEngine.cs:260)) parça sınırında
 yazılır; geri parçada periyodik `seek`.
 
+**Durum: kuruldu.** `Core/Editing/EdlPreview.cs` (`edl://` ve `# mpv EDL v0` metni, yol her zaman
+`%bayt%` önekli, çizelge↔edl tick eşlemesi), `App/Playback/EdlPreviewDriver.cs` (parça sınırında
+`speed`, geri parçada duraklatıp 50 ms'de bir exact `seek`), `MpvEngine.Target` `edl://`'yi olduğu gibi
+geçirir. Testler `DuzenleyiciEdlTests.cs`, `DuzenleyiciEdlCanliTests.cs` (11/11; canlı kol virgüllü
+yolda iki parçalı edl 0,8 sn, kaçışsız olumsuz kontrol "EDL parsing failed").
+
 ## D3 — Çizelge denetimi (App)
 
 FramePFX'in melez yolu: şerit ve klip kutuları Avalonia denetimi, yoğun kısım (dalga formu,
