@@ -227,6 +227,9 @@ public sealed class AyarYuzeyiTests
     /// altındaki satıra alındı (<c>YerlesimDenetimiTests</c> "şerit" bulgusu). Katman turunda
     /// kazanılan 30 piksel geri verildi: görüş alanı 694 → 664, içerik 991 değişmedi,
     /// <b>taşma 327</b>; aralık 322-332, genişliği yine ±5 piksel.</para>
+    ///
+    /// <para>Uç 3: gövde yazısı 14 → 16 (<c>fs-2</c>). Ayar sütunu 1006'ya uzadı, içerik 991 → 1022, görüş
+    /// alanı 664 → 666, <b>taşma 356</b>; aralık 351-361, genişliği yine ±5 piksel.</para>
     /// </summary>
     [Fact]
     public void TabanYukseklikteKucultSekmesininTasmasiBuyumuyor()
@@ -285,7 +288,7 @@ public sealed class AyarYuzeyiTests
             $"Plan sütunu ({withoutSettings:0}) artık görüş alanına ({reading.Item3:0}) sığıyor; "
             + "taşmanın kaynağı ayar sütununa döndü, pim yeniden temellendirilmeli.");
 
-        Assert.InRange(reading.Item2 - reading.Item3, 322d, 332d);
+        Assert.InRange(reading.Item2 - reading.Item3, 351d, 361d);
     }
 
     /// <summary>

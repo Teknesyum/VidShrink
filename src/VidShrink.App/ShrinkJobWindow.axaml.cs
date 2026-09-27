@@ -471,7 +471,7 @@ public partial class ShrinkJobWindow : Window
     private void ShowCountdown()
     {
         CountdownRow.IsVisible = true;
-        TxtCountdown.Text = Say(_whenDone == QueueEndChoice.Sleep ? "main.shrink-job.countdown.sleep" : "main.shrink-job.countdown.power-off", _countdownLeft);
+        TxtCountdown.Text = Core.Bicim.Satir.Bagla(Say(_whenDone == QueueEndChoice.Sleep ? "main.shrink-job.countdown.sleep" : "main.shrink-job.countdown.power-off", _countdownLeft));
     }
 
     private async Task RunOneAsync(ShrinkRequest request)

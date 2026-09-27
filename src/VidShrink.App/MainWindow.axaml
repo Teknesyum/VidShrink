@@ -1724,7 +1724,7 @@
         <Grid x:Name="TitleBarContent" Margin="{StaticResource TitleBarContentMargin}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
           <StackPanel Grid.Column="0" x:Name="TitleBrand" IsHitTestVisible="False" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
             <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
-            <TextBlock x:Name="TxtAppName" Theme="{StaticResource H2}" VerticalAlignment="Center">
+            <TextBlock x:Name="TxtAppName" Theme="{StaticResource AppTitle}" VerticalAlignment="Center">
               <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
             </TextBlock>
           </StackPanel>

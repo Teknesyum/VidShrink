@@ -6,24 +6,24 @@
        (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
        VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
 
-  <Color x:Key="NeonBlueColor">#FF7E9CD8</Color>
+  <Color x:Key="NeonBlueColor">#FFC0CEEB</Color>
   <Color x:Key="NeonPinkColor">#FF7AA89F</Color>
-  <Color x:Key="NeonPurpleColor">#FF957FB8</Color>
-  <Color x:Key="NeonSuccessColor">#FF98BB6C</Color>
+  <Color x:Key="NeonPurpleColor">#FFA28FC1</Color>
+  <Color x:Key="NeonSuccessColor">#FFA1C178</Color>
   <Color x:Key="SurfaceToneColor">#FF2A2A37</Color>
   <Color x:Key="AppBgColor">#FF1F1F28</Color>
-  <Color x:Key="TextBodyColor">#FFDCD7BA</Color>
+  <Color x:Key="TextBodyColor">#FFEEECDE</Color>
   <Color x:Key="TextDisabledColor">#FF938AA9</Color>
   <Color x:Key="OnNeonColor">#FF000000</Color>
   <Color x:Key="PinkTextColor">#FFA6C5BF</Color>
 
-  <Color x:Key="NeonBlueFillColor">#1A7E9CD8</Color>
-  <Color x:Key="NeonBlueHoverColor">#337E9CD8</Color>
-  <Color x:Key="NeonBlueActiveColor">#4D7E9CD8</Color>
-  <Color x:Key="NeonBlueBorderColor">#4D7E9CD9</Color>
-  <Color x:Key="NeonBlueBorderStrongColor">#807E9CD8</Color>
+  <Color x:Key="NeonBlueFillColor">#1AC0CEEB</Color>
+  <Color x:Key="NeonBlueHoverColor">#33C0CEEB</Color>
+  <Color x:Key="NeonBlueActiveColor">#4DC0CEEB</Color>
+  <Color x:Key="NeonBlueBorderColor">#4DC0CEEC</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#80C0CEEB</Color>
   <Color x:Key="NeonPinkFillColor">#1A7AA89F</Color>
-  <Color x:Key="NeonPurpleBorderColor">#80957FB8</Color>
+  <Color x:Key="NeonPurpleBorderColor">#80A28FC1</Color>
 
   <Color x:Key="NeonEmberColor">#FFC34043</Color>
   <Color x:Key="EmberFlameColor">#FFFFA066</Color>
@@ -41,9 +41,9 @@
   <Color x:Key="PlaybackScrimColor">#CC1F1F28</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#001F1F28</Color>
 
-  <BoxShadows x:Key="GlowBlue">0 0 20 0 #407E9CD8</BoxShadows>
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #40C0CEEB</BoxShadows>
   <BoxShadows x:Key="GlowPink">0 0 20 0 #407AA89F</BoxShadows>
-  <BoxShadows x:Key="GlowPurple">0 0 20 0 #40957FB8</BoxShadows>
+  <BoxShadows x:Key="GlowPurple">0 0 20 0 #40A28FC1</BoxShadows>
   <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
 
   <!-- Standardın rol adları. Themes/Theme.axaml fırçaları bu adlara bağlanır;

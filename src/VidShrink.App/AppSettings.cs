@@ -46,6 +46,16 @@ public sealed class AppSettings
     /// <summary>Yürürlükteki paletin adı; boş kalırsa varsayılan palet açılır.</summary>
     public string Theme { get; set; } = "";
 
+    /// <summary>
+    /// Varsayılanın Teknesyum olduğu sürümden sonra yazılmış dosyanın işareti. İşaretsiz dosyada
+    /// kayıtlı <see cref="LegacyDefaultTheme"/> eski varsayılandır, kullanıcının seçimi değil;
+    /// <see cref="Load"/> onu bir kez <see cref="Themes.PaletteCatalog.Default"/>'a çevirip
+    /// işareti yazar. İşaretle yazılmış Neon kullanıcının seçimidir, göç ona dokunmaz.
+    /// </summary>
+    public const string ThemeMigrationMarker = "themeDefaultTeknesyum";
+
+    public const string LegacyDefaultTheme = "Neon";
+
     /// <summary>0 = otomatik, 1 = elle.</summary>
     public int FfmpegPathMode { get; set; }
     public string FfmpegPath { get; set; } = "";
@@ -78,6 +88,7 @@ public sealed class AppSettings
     {
         var file = path ?? UpdateSettings.DefaultPath;
         var settings = new AppSettings();
+        var migrate = false;
         try
         {
             if (!File.Exists(file)) return settings;
@@ -108,12 +119,36 @@ public sealed class AppSettings
             ReadString(root, "ffmpegPath", value => settings.FfmpegPath = value);
             ReadString(root, "openSubtitlesApiKey", value => settings.OpenSubtitlesApiKey = value);
             ReadString(root, "openSubtitlesUser", value => settings.OpenSubtitlesUser = value);
+
+            if (!root.TryGetProperty(ThemeMigrationMarker, out _))
+            {
+                if (string.Equals(settings.Theme, LegacyDefaultTheme, StringComparison.Ordinal))
+                    settings.Theme = Themes.PaletteCatalog.Default;
+                migrate = true;
+            }
         }
         catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
         {
             // Okunamayan ayar varsayılana düşer; açılış hiçbir koşulda durmaz.
         }
+        if (migrate) WriteThemeMigration(file, settings.Theme);
         return settings;
+    }
+
+    private static void WriteThemeMigration(string file, string theme)
+    {
+        try
+        {
+            if (JsonNode.Parse(File.ReadAllText(file)) is not JsonObject root) return;
+            root["theme"] = theme;
+            root[ThemeMigrationMarker] = true;
+            using var stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None);
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
+            root.WriteTo(writer);
+        }
+        catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
+        {
+        }
     }
 
     private static void ReadBool(JsonElement root, string name, Action<bool> apply)
@@ -167,6 +202,7 @@ public sealed class AppSettings
         root["advCodecLock"] = AdvCodecLock;
         root["advKeepTracks"] = AdvKeepTracks;
         root["theme"] = Theme;
+        root[ThemeMigrationMarker] = true;
         root["outputFolderMode"] = OutputFolderMode;
         root["outputFolder"] = OutputFolder;
         root["outputNamePattern"] = OutputNamePattern;

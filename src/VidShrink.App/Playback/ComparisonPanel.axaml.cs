@@ -1006,7 +1006,7 @@ internal partial class ComparisonPanel : UserControl
 
     private uint[] Palette()
     {
-        var keys = new[] { "NeonBlueColor", "NeonPurpleColor", "NeonPinkColor", "NeonSuccessColor" };
+        var keys = new[] { "Renk1Color", "Renk3Color", "Renk2Color", "SuccessColor" };
         var set = new List<uint>();
         foreach (var key in keys)
             if (this.TryFindResource(key, out var value) && value is Color colour)

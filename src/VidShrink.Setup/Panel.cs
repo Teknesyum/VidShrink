@@ -42,17 +42,17 @@ internal sealed class Panel
     private static readonly UIntPtr TimerId = new(1);
     private static readonly string ClassName = "VidShrinkSetupPanel";
 
-    private const uint Background = 0xFF08090A;
-    private const uint Glass = 0xD90A0A0F;
+    private const uint Background = 0xFF000000;
+    private const uint Glass = 0xE60F1117;
     private const uint Text = 0xFFFFFFFF;
-    private const uint Cyan = 0xFF00F3FF;
-    private const uint Purple = 0xFFB026FF;
-    private const uint Pink = 0xFFFF00EA;
-    private const uint PinkText = 0xFFFF54EB;
-    private const uint Success = 0xFF34D399;
-    private const uint Muted = 0xFF71717A;
-    private const uint Edge = 0x9900F3FF;
-    private const uint Hairline = 0x3300F3FF;
+    private const uint Cyan = 0xFF6FB7FF;
+    private const uint Purple = 0xFFC3A3FF;
+    private const uint Pink = 0xFFCBA7D2;
+    private const uint PinkText = 0xFFFA8CFF;
+    private const uint Success = 0xFF66F09A;
+    private const uint Muted = 0xFF8A8F9A;
+    private const uint Edge = 0xB36FB7FF;
+    private const uint Hairline = 0x336FB7FF;
 
     private static Panel? current;
 
@@ -711,7 +711,7 @@ internal sealed class Panel
         }
         else
         {
-            GdipCreateSolidFill(state == SetupStageState.Running ? 0x2600F3FFu : Glass, out var fill);
+            GdipCreateSolidFill(state == SetupStageState.Running ? 0x266FB7FFu : Glass, out var fill);
             GdipFillEllipse(graphics, fill, x, y, size, size);
             GdipDeleteBrush(fill);
             GdipCreatePen1(state == SetupStageState.Skipped ? Hairline : color, Px(state == SetupStageState.Running ? 1.5 : 1), 0, out var ring);

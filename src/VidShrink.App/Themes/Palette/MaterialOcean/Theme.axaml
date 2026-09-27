@@ -6,7 +6,7 @@
        (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
        VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
 
-  <Color x:Key="NeonBlueColor">#FF82AAFF</Color>
+  <Color x:Key="NeonBlueColor">#FFA1BFFF</Color>
   <Color x:Key="NeonPinkColor">#FFC3E88D</Color>
   <Color x:Key="NeonPurpleColor">#FFC792EA</Color>
   <Color x:Key="NeonSuccessColor">#FFC3E88E</Color>
@@ -17,11 +17,11 @@
   <Color x:Key="OnNeonColor">#FF000000</Color>
   <Color x:Key="PinkTextColor">#FFD7F0B3</Color>
 
-  <Color x:Key="NeonBlueFillColor">#1A82AAFF</Color>
-  <Color x:Key="NeonBlueHoverColor">#3382AAFF</Color>
-  <Color x:Key="NeonBlueActiveColor">#4D82AAFF</Color>
-  <Color x:Key="NeonBlueBorderColor">#4D82AAFE</Color>
-  <Color x:Key="NeonBlueBorderStrongColor">#8082AAFF</Color>
+  <Color x:Key="NeonBlueFillColor">#1AA1BFFF</Color>
+  <Color x:Key="NeonBlueHoverColor">#33A1BFFF</Color>
+  <Color x:Key="NeonBlueActiveColor">#4DA1BFFF</Color>
+  <Color x:Key="NeonBlueBorderColor">#4DA1BFFE</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#80A1BFFF</Color>
   <Color x:Key="NeonPinkFillColor">#1AC3E88D</Color>
   <Color x:Key="NeonPurpleBorderColor">#80C792EA</Color>
 
@@ -41,7 +41,7 @@
   <Color x:Key="PlaybackScrimColor">#CC0F111A</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#000F111A</Color>
 
-  <BoxShadows x:Key="GlowBlue">0 0 20 0 #4082AAFF</BoxShadows>
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #40A1BFFF</BoxShadows>
   <BoxShadows x:Key="GlowPink">0 0 20 0 #40C3E88D</BoxShadows>
   <BoxShadows x:Key="GlowPurple">0 0 20 0 #40C792EA</BoxShadows>
   <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>

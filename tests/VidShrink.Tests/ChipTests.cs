@@ -56,7 +56,8 @@ public sealed class ChipTests
 
     /// <summary>
     /// Etiketler kalkınca satır yüksekliği düştü. Sayılar ölçümden: önce 46, sonra 27;
-    /// şerit üç satırdan (162) iki satıra (70) indi. Ölçüm başsız pencerede yapılıyor,
+    /// şerit üç satırdan (162) iki satıra (70) indi. Yazı 16'ya (fs-2) çıkınca satır 29, şerit 74;
+    /// hâlâ iki satır. Ölçüm başsız pencerede yapılıyor,
     /// bu yüzden genişlik ölçüm argümanından gelir ve sabittir.
     /// </summary>
     [Fact]
@@ -69,8 +70,8 @@ public sealed class ChipTests
             return (chips.Max(c => c.Bounds.Height), strip.Bounds.Height);
         });
 
-        Assert.Equal(27, rowHeight);
-        Assert.Equal(70, stripHeight);
+        Assert.Equal(29, rowHeight);
+        Assert.Equal(74, stripHeight);
     }
 
     /// <summary>

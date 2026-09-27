@@ -6,22 +6,22 @@
        (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
        VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
 
-  <Color x:Key="NeonBlueColor">#FF88C0D0</Color>
+  <Color x:Key="NeonBlueColor">#FFC5E0E8</Color>
   <Color x:Key="NeonPinkColor">#FFEBCB8B</Color>
   <Color x:Key="NeonPurpleColor">#FFB48EAD</Color>
-  <Color x:Key="NeonSuccessColor">#FFA3BE8C</Color>
+  <Color x:Key="NeonSuccessColor">#FFB2C99F</Color>
   <Color x:Key="SurfaceToneColor">#FF2E3440</Color>
   <Color x:Key="AppBgColor">#FF242933</Color>
-  <Color x:Key="TextBodyColor">#FFECEFF4</Color>
+  <Color x:Key="TextBodyColor">#FFF3F5F8</Color>
   <Color x:Key="TextDisabledColor">#FF9AA3B5</Color>
   <Color x:Key="OnNeonColor">#FF000000</Color>
   <Color x:Key="PinkTextColor">#FFF2DCB1</Color>
 
-  <Color x:Key="NeonBlueFillColor">#1A88C0D0</Color>
-  <Color x:Key="NeonBlueHoverColor">#3388C0D0</Color>
-  <Color x:Key="NeonBlueActiveColor">#4D88C0D0</Color>
-  <Color x:Key="NeonBlueBorderColor">#4D88C0D1</Color>
-  <Color x:Key="NeonBlueBorderStrongColor">#8088C0D0</Color>
+  <Color x:Key="NeonBlueFillColor">#1AC5E0E8</Color>
+  <Color x:Key="NeonBlueHoverColor">#33C5E0E8</Color>
+  <Color x:Key="NeonBlueActiveColor">#4DC5E0E8</Color>
+  <Color x:Key="NeonBlueBorderColor">#4DC5E0E9</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#80C5E0E8</Color>
   <Color x:Key="NeonPinkFillColor">#1AEBCB8B</Color>
   <Color x:Key="NeonPurpleBorderColor">#80B48EAD</Color>
 
@@ -41,7 +41,7 @@
   <Color x:Key="PlaybackScrimColor">#CC242933</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#00242933</Color>
 
-  <BoxShadows x:Key="GlowBlue">0 0 20 0 #4088C0D0</BoxShadows>
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #40C5E0E8</BoxShadows>
   <BoxShadows x:Key="GlowPink">0 0 20 0 #40EBCB8B</BoxShadows>
   <BoxShadows x:Key="GlowPurple">0 0 20 0 #40B48EAD</BoxShadows>
   <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>

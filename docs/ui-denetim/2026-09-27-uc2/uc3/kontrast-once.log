@@ -1,0 +1,23 @@
+  Geri yüklenecek projeler belirleniyor...
+  C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\tools\VidShrink.Bench\VidShrink.Bench.csproj geri yüklendi (121 ms içinde).
+  C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\tools\VidShrink.PaletteGen\VidShrink.PaletteGen.csproj geri yüklendi (117 ms içinde).
+  C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.Ffmpeg\VidShrink.Ffmpeg.csproj geri yüklendi (121 ms içinde).
+  C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.Core\VidShrink.Core.csproj geri yüklendi (117 ms içinde).
+  C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\tools\VidShrink.Ab\VidShrink.Ab.csproj geri yüklendi (121 ms içinde).
+  C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.Player\VidShrink.Player.csproj geri yüklendi (117 ms içinde).
+  C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.Cli\VidShrink.Cli.csproj geri yüklendi (121 ms içinde).
+  C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.App\VidShrink.App.csproj geri yüklendi (210 ms içinde).
+  C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\tests\VidShrink.Tests\VidShrink.Tests.csproj geri yüklendi (211 ms içinde).
+  VidShrink.Player -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.Player\bin\Debug\net8.0\VidShrink.Player.dll
+  VidShrink.Core -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.Core\bin\Debug\net8.0\VidShrink.Core.dll
+  VidShrink.PaletteGen -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\tools\VidShrink.PaletteGen\bin\Debug\net8.0\vidshrink-palettegen.dll
+  VidShrink.Ffmpeg -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.Ffmpeg\bin\Debug\net8.0\VidShrink.Ffmpeg.dll
+  VidShrink.App -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.App\bin\Debug\net8.0\VidShrink.App.dll
+  VidShrink.Bench -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\tools\VidShrink.Bench\bin\Debug\net8.0\VidShrink.Bench.dll
+  VidShrink.Ab -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\tools\VidShrink.Ab\bin\Debug\net8.0\VidShrink.Ab.dll
+  VidShrink.Cli -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\src\VidShrink.Cli\bin\Debug\net8.0\vidshrink.dll
+  VidShrink.Tests -> C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\tests\VidShrink.Tests\bin\Debug\net8.0\VidShrink.Tests.dll
+C:\Users\Administrator\Desktop\Projeler\VidShrink\.claude\worktrees\agent-a8be9243bc824a6f2\.calisma\worktree-agent-a8be9243bc824a6f2\once\tests\VidShrink.Tests\bin\Debug\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+
+Başarılı!  - Başarısız:     0, Başarılı:    36, Atlanan:     0, Toplam:    36, Süre: 5 m 35 s - VidShrink.Tests.dll (net8.0)

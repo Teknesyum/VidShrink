@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -227,9 +227,10 @@ public sealed class KaydiriciTests
 
     /// <summary>
     /// Vurgu rengi (NeonBlue) zeminden 3:1 ayrılmayan palet. Paletin kendi rengi; kaydırıcıya yeni
-    /// renk uydurulmadı. Palet düzelirse liste boşalır ve bu ölçü haber verir.
+    /// renk uydurulmadı. AyuLight 27 Eylül 2026'da tohumu eşiğe ayarlanınca (<c>Palette/seeds.json</c>) çıktı;
+    /// liste boş, yeni düşen palet adıyla kırmızı verir.
     /// </summary>
-    private static readonly string[] PalettenEksikVurgu = { "AyuLight" };
+    private static readonly string[] PalettenEksikVurgu = { };
 
     [Fact]
     public void BasparmakVeDoluIzHerPalettePlanindanAyrilir()

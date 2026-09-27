@@ -100,9 +100,7 @@ public sealed class KontrastTests
 
         var tekil = olcumler.GroupBy(o => o.Ekran + "|" + o.Durum + "|" + o.Tur + "|" + o.Yol + "|" + o.On + "|" + o.Zemin).Select(g => g.First()).ToList();
         var altinda = tekil.Where(o => o.Durum != "edilgen" && o.Oran < Esik(o.Tur)).ToList();
-        var ertelenen = Ertelenenler.TryGetValue(palet, out var liste) ? liste : new Dictionary<string, double>();
-        var bulgular = altinda.Where(o => !(ertelenen.TryGetValue(o.Anahtar, out var taban) && o.Oran >= taban)).ToList();
-        var kapanan = ertelenen.Keys.Where(k => !altinda.Any(o => o.Anahtar == k)).ToList();
+        var bulgular = altinda;
         if (klasor != null)
         {
             Directory.CreateDirectory(klasor);
@@ -114,40 +112,10 @@ public sealed class KontrastTests
             File.WriteAllText(Path.Combine(klasor, "kontrast-" + asama + "-" + palet + ".tsv"), sb.ToString());
         }
 
-        Assert.True(bulgular.Count == 0 && kapanan.Count == 0,
-            palet + ": " + bulgular.Count + " çift eşiğin altında (" + tekil.Count + " ölçüm)"
-            + (kapanan.Count > 0 ? "; ertelenen listesinde olup artık eşiği geçen: " + string.Join(", ", kapanan) : "") + "\n" +
+        Assert.True(bulgular.Count == 0,
+            palet + ": " + bulgular.Count + " çift eşiğin altında (" + tekil.Count + " ölçüm)\n" +
             string.Join("\n", bulgular.OrderBy(o => o.Oran).Select(o => o.Ekran + " [" + o.Durum + "] " + o.Tur + " " + o.Anahtar + " " + o.Yol + " \"" + o.Metin + "\": bg " + o.Zemin + " fg " + o.On + " " + o.Oran.ToString("0.00", Inv))));
     }
-
-    private static readonly IReadOnlyDictionary<string, Dictionary<string, double>> Ertelenenler = new Dictionary<string, Dictionary<string, double>>
-    {
-        ["Ayu"] = new() { ["TextBody"] = 4.91 },
-        ["AyuLight"] = new() { ["EmberBlaze"] = 1.64, ["NeonBlue"] = 2.40, ["NeonSuccess"] = 2.13, ["PinkText"] = 1.70, ["TextBody"] = 4.28 },
-        ["Catppuccin"] = new() { ["NeonBlue"] = 4.53, ["TextBody"] = 4.79 },
-        ["CatppuccinLatte"] = new() { ["EmberBlaze"] = 1.91, ["NeonBlue"] = 3.52, ["NeonSuccess"] = 2.47, ["OnNeon"] = 4.26, ["PinkText"] = 2.00, ["TextBody"] = 4.41 },
-        ["Cobalt"] = new() { ["NeonBlue"] = 6.74, ["NeonSuccess"] = 5.46, ["TextBody"] = 3.86 },
-        ["Dracula"] = new() { ["NeonBlue"] = 6.73, ["TextBody"] = 5.17 },
-        ["Everforest"] = new() { ["EmberBlaze"] = 6.48, ["NeonBlue"] = 4.33, ["NeonSuccess"] = 6.14, ["TextBody"] = 4.01 },
-        ["Github"] = new() { ["NeonBlue"] = 5.84 },
-        ["GithubLight"] = new() { ["EmberBlaze"] = 3.91, ["NeonBlue"] = 4.19, ["NeonSuccess"] = 4.11, ["OnNeon"] = 5.18, ["PinkText"] = 2.61 },
-        ["Gruvbox"] = new() { ["NeonBlue"] = 3.53, ["NeonSuccess"] = 5.82, ["TextBody"] = 5.26 },
-        ["GruvboxLight"] = new() { ["EmberBlaze"] = 2.64, ["NeonBlue"] = 4.19, ["NeonSuccess"] = 3.37, ["OnNeon"] = 6.59, ["PinkText"] = 1.96, ["TextBody"] = 5.49 },
-        ["Horizon"] = new() { ["NeonBlue"] = 4.64, ["TextBody"] = 6.26 },
-        ["Kanagawa"] = new() { ["NeonBlue"] = 4.37, ["NeonSuccess"] = 6.64, ["TextBody"] = 5.81 },
-        ["MaterialOcean"] = new() { ["NeonBlue"] = 5.76 },
-        ["Monokai"] = new() { ["NeonBlue"] = 5.48, ["NeonSuccess"] = 6.90, ["PinkText"] = 6.53, ["TextBody"] = 5.35 },
-        ["Moonlight"] = new() { ["NeonBlue"] = 4.24, ["TextBody"] = 4.75 },
-        ["NightOwl"] = new() { ["NeonBlue"] = 5.21, ["TextBody"] = 6.06 },
-        ["Nord"] = new() { ["NeonBlue"] = 4.96, ["NeonSuccess"] = 6.27, ["TextBody"] = 5.85 },
-        ["OneDark"] = new() { ["NeonBlue"] = 4.36, ["NeonSuccess"] = 6.51, ["TextBody"] = 4.66 },
-        ["RosePine"] = new() { ["TextBody"] = 5.99 },
-        ["RosePineDawn"] = new() { ["EmberBlaze"] = 1.78, ["NeonBlue"] = 2.77, ["NeonSuccess"] = 4.92, ["OnNeon"] = 6.12, ["PinkText"] = 1.75, ["TextBody"] = 5.09 },
-        ["Solarized"] = new() { ["EmberBlaze"] = 4.10, ["NeonBlue"] = 3.63, ["NeonSuccess"] = 4.15, ["OnNeon"] = 6.64, ["PinkText"] = 6.93, ["TextBody"] = 6.79 },
-        ["SolarizedLight"] = new() { ["EmberBlaze"] = 2.47, ["NeonBlue"] = 2.69, ["NeonSuccess"] = 2.50, ["OnNeon"] = 5.70, ["PinkText"] = 1.87 },
-        ["Synthwave"] = new() { ["TextBody"] = 6.09 },
-        ["TokyoNight"] = new() { ["NeonBlue"] = 4.61, ["TextBody"] = 5.17 }
-    };
 
     private static Dictionary<string, string> RenkAdlari()
     {

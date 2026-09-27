@@ -15,10 +15,10 @@ namespace VidShrink.Tests;
 /// MaterialOcean'da <b>1,38:1</b>. Bu sinif olcuyu yerine koyuyor.
 ///
 /// <para>Renk uydurulmadi: her palette <c>OnNeonColor</c> yalniz siyah ile beyaz arasinda
-/// secildi, hangisi o paletin neon dolgularina daha uzaksa o. Iki palet — CatppuccinLatte ve
-/// GruvboxLight — iki secenekle de 4,5'e ulasamiyor; onlarin dolgusu acik, cozum renk degil
-/// dolgu degisikligi ister. Kalan borc <see cref="EsiginAltindaKalanlarPimli"/> ile adiyla
-/// duruyor, susturulmuyor.</para>
+/// secildi, hangisi o paletin neon dolgularina daha uzaksa o. CatppuccinLatte ve GruvboxLight
+/// iki secenekle de 4,5'e ulasamiyordu; 27 Eylul 2026'da tohumlari esige ayarlandi
+/// (<c>Palette/seeds.json</c>) ve liste bosaldi. Yeni bir borc <see cref="EsiginAltindaKalanlarPimli"/>
+/// ile adiyla gorunur, susturulmaz.</para>
 /// </summary>
 public sealed class PaletKarsitligiTests
 {
@@ -30,7 +30,7 @@ public sealed class PaletKarsitligiTests
         "NeonBlueColor", "NeonPurpleColor", "NeonPinkColor", "NeonBlueActiveColor"
     ];
 
-    private static readonly string[] AaAltindaKalanlar = ["CatppuccinLatte", "GruvboxLight"];
+    private static readonly string[] AaAltindaKalanlar = [];
 
     private readonly ITestOutputHelper _cikti;
 

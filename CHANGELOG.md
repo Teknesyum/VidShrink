@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-09-27
+
 ### Changed
 
 - Updates now download as one package (`vidshrink-update-<rid>.zip`, checked against `checksums-<rid>.txt`) and unpack on the machine; the panel shows only a progress bar with a percentage, and only after the first second, so a short update shows no panel at all. The old per-file archives stay in the release for older clients.
@@ -23,6 +25,15 @@ ship as part of it.
 ### Fixed
 
 - Windows: a VidShrink.App.exe run from a build folder no longer writes file associations or the right-click menu into the registry; writing is allowed only in the installed layout (`app\VidShrink.App.exe` with `VidShrink.exe` one folder up).
+- Settings saved before Teknesyum became the default still named the old default `Neon`, so the new colours never showed. That value now moves to Teknesyum once; choosing Neon again afterwards is kept.
+- Small text (chips, tab headers, update badge, language buttons, output facts, info badges) is now 16 px instead of 14 px.
+- Buttons no longer clip their own glow. Chips and the comparison panel buttons, where a glow could not fit, use a stronger outline instead.
+- The 24 community palettes were tuned so every text reaches 7:1 contrast and every icon 3:1 on the surfaces it is drawn on; hues are kept, only lightness moved.
+- The selected row of a drop-down list is a light tint with a strong outline instead of a solid fill, so its text stays readable on every palette.
+- Keyboard focus rings use the layout's focus width and offset, and the app name in the title bar uses the layout's title style.
+- The installer panel takes its colours from the Teknesyum layout tokens.
+- A pressed ghost button keeps a clear background with a blue outline instead of a tinted fill, so its label keeps 7:1 on every palette.
+- Corners follow the layout's new 4 px radius (was 3 px); focus rings and slider tracks moved with it.
 
 ## [0.11.0] - 2026-09-27
 
