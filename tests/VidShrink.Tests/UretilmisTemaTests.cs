@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
@@ -14,13 +14,15 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class UretilmisTemaTests
 {
-    private sealed record Olcu(double Genislik, bool ProjeSablonu, object? PencereZemini, CornerRadius PencereKosesi, bool OdakSusuYok);
+    private sealed record Olcu(double Genislik, bool ProjeSablonu, object? PencereZemini, CornerRadius PencereKosesi, bool OdakSusuYok, bool DuzenHalkasi);
 
     private static Olcu Olc() => AppHost.Run(() =>
     {
         var dugme = new Button { Content = "x" };
         var icerik = new StackPanel { Height = 4000 };
+        var hayalet = new Button { Content = "y", Theme = (Avalonia.Styling.ControlTheme)Application.Current!.FindResource("GhostButton")! };
         icerik.Children.Add(dugme);
+        icerik.Children.Add(hayalet);
         var kaydirici = new ScrollViewer
         {
             VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
@@ -38,7 +40,8 @@ public sealed class UretilmisTemaTests
             var sunucu = pencere.GetVisualDescendants().OfType<ContentPresenter>()
                 .First(p => p.Name == "PART_ContentPresenter");
             return new Olcu(cubuk.Bounds.Width, ReferenceEquals(cubuk.Template, sablon), sunucu.Background,
-                sunucu.CornerRadius, dugme.FocusAdorner is null);
+                sunucu.CornerRadius, dugme.FocusAdorner is null,
+                ReferenceEquals(hayalet.FocusAdorner, Application.Current!.TryFindResource("DuzenOdakHalkasi", out var h) ? h : null));
         }
         finally { pencere.Close(); }
     });
@@ -61,9 +64,14 @@ public sealed class UretilmisTemaTests
 
     /// <summary>
     /// Üretilmiş temanın odak halkası <c>Selector="Control"</c> ile yazılı; Avalonia'da bu
-    /// tam tür eşleşmesidir, türeyen denetime ulaşmaz. Proje kendi halkasını çizer.
+    /// tam tür eşleşmesidir, türeyen denetime ulaşmaz. Proje aynı geometriyi belirteçlerle
+    /// <c>DuzenOdakHalkasi</c> olarak kurar ve kendi temaları onu taşır.
     /// </summary>
     [Fact]
     public void UretilmisOdakHalkasiTureyenDenetimeUlasmaz()
         => Assert.True(Olc().OdakSusuYok);
+
+    [Fact]
+    public void ProjeTemasiDuzeninOdakHalkasiniTasir()
+        => Assert.True(Olc().DuzenHalkasi);
 }

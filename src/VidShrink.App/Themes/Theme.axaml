@@ -197,14 +197,14 @@
 
   <FontFamily x:Key="FontMono">Consolas,Cascadia Mono,Menlo,DejaVu Sans Mono,Liberation Mono,Courier New</FontFamily>
 
-  <StaticResource x:Key="FontSizeSm" ResourceKey="FontSize1"/>
+  <StaticResource x:Key="FontSizeSm" ResourceKey="FontSize2"/>
   <StaticResource x:Key="FontSizeMd" ResourceKey="FontSize2"/>
   <StaticResource x:Key="FontSizeLg" ResourceKey="FontSize3"/>
   <StaticResource x:Key="FontSizeHero" ResourceKey="FontSize5"/>
 
   <x:Double x:Key="TrackingLg">0</x:Double>
   <x:Double x:Key="TrackingMd">0.32</x:Double>
-  <x:Double x:Key="TrackingLabel">1.12</x:Double>
+  <x:Double x:Key="TrackingLabel">1.28</x:Double>
   <x:Double x:Key="LineHeightBody">25.6</x:Double>
   <x:Double x:Key="TipMaxWidth">420</x:Double>
 
@@ -219,12 +219,13 @@
   <Thickness x:Key="ChipPadding">12,4</Thickness>
   <Thickness x:Key="ChipRemovePadding">6,0</Thickness>
   <Thickness x:Key="HeaderButtonPadding">12,0</Thickness>
+  <Thickness x:Key="NavTabPadding">8,0</Thickness>
   <Thickness x:Key="FieldPadding">12,8</Thickness>
   <Thickness x:Key="TabPadding">24,12</Thickness>
   <Thickness x:Key="TooltipPadding">16,12</Thickness>
   <Thickness x:Key="LabelMargin">0,0,0,8</Thickness>
   <Thickness x:Key="ChipMargin">0,0,8,0</Thickness>
-  <Thickness x:Key="TabMargin">0,0,8,1</Thickness>
+  <Thickness x:Key="TabMargin">0,0,4,1</Thickness>
   <Thickness x:Key="WindowButtonMargin">4,0,0,0</Thickness>
   <Thickness x:Key="TitleBarContentMargin">16,0,0,0</Thickness>
   <Thickness x:Key="NoticeMargin">24,12,24,0</Thickness>
@@ -240,27 +241,31 @@
   <x:Double x:Key="BorderThinScalar">1</x:Double>
   <Thickness x:Key="FocusRingThickness">2</Thickness>
   <StaticResource x:Key="FocusRingScalar" ResourceKey="FocusWidth"/>
+  <Thickness x:Key="FocusRingOutset">-5</Thickness>
+  <Thickness x:Key="FocusRingInnerInset">4</Thickness>
+  <Thickness x:Key="FocusRingOuterInset">2</Thickness>
+  <x:Double x:Key="FocusRingInnerRadius">5</x:Double>
+  <x:Double x:Key="FocusRingOuterRadius">7</x:Double>
   <Thickness x:Key="PopupPadding">4</Thickness>
 
   <StaticResource x:Key="RadiusSquare" ResourceKey="Radius"/>
   <StaticResource x:Key="RadiusChip" ResourceKey="Radius"/>
   <StaticResource x:Key="RadiusCell" ResourceKey="Radius"/>
-  <CornerRadius x:Key="SliderFilledTrackRadius">3,0,0,3</CornerRadius>
-  <CornerRadius x:Key="SliderEmptyTrackRadius">0,3,3,0</CornerRadius>
+  <CornerRadius x:Key="SliderFilledTrackRadius">4,0,0,4</CornerRadius>
+  <CornerRadius x:Key="SliderEmptyTrackRadius">0,4,4,0</CornerRadius>
   <StaticResource x:Key="RadiusControl" ResourceKey="Radius"/>
   <StaticResource x:Key="RadiusPanel" ResourceKey="WindowRadius"/>
-  <x:Double x:Key="RadiusPanelScalar">3</x:Double>
+  <x:Double x:Key="RadiusPanelScalar">4</x:Double>
 
   <StaticResource x:Key="MotionInstant" ResourceKey="TInstant"/>
   <StaticResource x:Key="MotionFast" ResourceKey="TFast"/>
   <StaticResource x:Key="MotionBase" ResourceKey="TBase"/>
   <StaticResource x:Key="MotionSlow" ResourceKey="TSlow"/>
   <sys:TimeSpan x:Key="PauseGlyphHold">00:00:00.5000000</sys:TimeSpan>
-  <x:Double x:Key="MotionStaggerMs">40</x:Double>
-  <x:Int32 x:Key="MotionStaggerCount">6</x:Int32>
 
   <StaticResource x:Key="TargetMinSize" ResourceKey="TargetMin"/>
   <x:Double x:Key="InfoBadgeSize">18</x:Double>
+  <StaticResource x:Key="InfoBadgeGlyphSize" ResourceKey="FontSize1"/>
   <StaticResource x:Key="FieldMinHeight" ResourceKey="InputHeight"/>
   <x:Double x:Key="WindowButtonWidth">42</x:Double>
   <StaticResource x:Key="WindowButtonHeight" ResourceKey="TitleBarHeightMax"/>
@@ -283,10 +288,11 @@
   <StaticResource x:Key="ProgressBarHeight" ResourceKey="Space2"/>
   <StaticResource x:Key="TitleBarHeight" ResourceKey="TitleBarHeightMax"/>
   <x:Double x:Key="TooltipMaxWidth">780</x:Double>
+  <x:Double x:Key="FlyoutMaxWidth">896</x:Double>
   <x:Double x:Key="DropDownMaxHeight">280</x:Double>
   <x:Double x:Key="PanelMinHeight">256</x:Double>
   <x:Double x:Key="PlanPanelMinHeight">320</x:Double>
-  <x:Double x:Key="PlanPanelMaxHeight">560</x:Double>
+  <x:Double x:Key="PlanPanelMaxHeight">576</x:Double>
   <x:Double x:Key="DropZoneMinHeight">144</x:Double>
   <x:Double x:Key="DropIconSize">48</x:Double>
   <x:Double x:Key="PauseGlyphSize">96</x:Double>

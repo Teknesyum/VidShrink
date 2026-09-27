@@ -559,12 +559,15 @@ public sealed class WindowLayoutTests
     /// <b>dolu/dar</b> 1006-1106 → 1093-1193 (ölçülen 1143). Tasarım boyu değişmedi.
     /// Nedeni ölçüldü: <c>KaydiriciSatiri</c> hep tek satır kalınca iki dar kol eski
     /// aralıklarında geçiyor.</para>
+    /// <para>Uç 2 fs-2 (2026-09-27): hiçbir yazı 16 pikselin altında değil (<c>FontSizeSm</c> 14 → 16).
+    /// Dar pencerede satırlar uzadı: <b>boş/dar</b> 1079-1179 → 1147-1247 (ölçülen 1197), <b>dolu/dar</b>
+    /// 1093-1193 → 1162-1262 (ölçülen 1212). Tasarım boyundaki iki kol eski aralıklarında geçiyor.</para>
     /// </summary>
     [Theory]
     [InlineData(false, false, 941, 1041)]
-    [InlineData(false, true, 1079, 1179)]
+    [InlineData(false, true, 1147, 1247)]
     [InlineData(true, false, 906, 1006)]
-    [InlineData(true, true, 1093, 1193)]
+    [InlineData(true, true, 1162, 1262)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
     {
         var size = narrow ? MinimumSize() : DesignSize();
@@ -660,10 +663,12 @@ public sealed class WindowLayoutTests
     /// <para>S20: katlanmış bölüm özetleri başlığın altında kendi satırına indi (dar pencerede
     /// üçnoktayla 10 piksele düşüyordu). <b>Boş</b> 899-989 → 975-1065 (ölçülen <b>1020</b>);
     /// dolu aralık değişmedi.</para>
+    /// <para>Uç 2 fs-2 (2026-09-27): <c>FontSizeSm</c> 14 → 16. <b>Boş</b> 975-1065 → 1031-1121 (ölçülen
+    /// <b>1076</b>), <b>dolu</b> 903-993 → 955-1045 (ölçülen <b>1000</b>). Genişlik yine 90 piksel.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 975, 1065)]
-    [InlineData(true, 903, 993)]
+    [InlineData(false, 1031, 1121)]
+    [InlineData(true, 955, 1045)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
         var width = DesignSize().Width;
@@ -740,10 +745,12 @@ public sealed class WindowLayoutTests
     /// orta 906, sağ 502. Orta sütunun boyu değişmedi; sol sütun 4 piksel kısaldı. Sütunların
     /// dış boşluğu artık <c>PageMargin</c> (sağda kaydırma çubuğuna yer açan pay), sayfa içeriği
     /// en uzun sütun ile onun dikey payının toplamı.</para>
+    /// <para>Uç 2 fs-2 (2026-09-27): dolu sayfayı yeniden sol sütun tutuyor — ölçülen sol 930, orta 922,
+    /// sağ 514. Yazı 16 piksele çıkınca ayar sütununun etiketleri ve özetleri orta sütundan çok uzadı.</para>
     /// </summary>
     [Theory]
     [InlineData(false, 0)]
-    [InlineData(true, 1)]
+    [InlineData(true, 0)]
     public void TheTallestColumnIsWhatHoldsThePage(bool loaded, int holder)
     {
         var (columns, content) = Read(DesignSize(), loaded, window =>

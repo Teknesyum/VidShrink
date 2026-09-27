@@ -139,7 +139,7 @@ internal static class ShareQr
     internal const int QuietModules = 4;
 
     /// <summary>Plaka ve modülün seçildiği palet belirteçleri; hepsi her palette opak.</summary>
-    internal static readonly IReadOnlyList<string> Tokens = new[] { "AppBgColor", "SurfaceToneColor", "TextBodyColor", "OnNeonColor" };
+    internal static readonly IReadOnlyList<string> Tokens = new[] { "AppBgColor", "SurfaceColor", "TextBodyColor", "OnRenk1Color" };
 
     /// <summary>
     /// Bağlantının modül matrisi, sessiz bölge hariç. QRCoder kendi dört modüllük boşluğunu

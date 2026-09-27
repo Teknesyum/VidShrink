@@ -99,9 +99,9 @@ public sealed class OlcuBelirteciTests
         {
             var kutu = new CheckBox { Content = "olcu", Theme = Belirtec<ControlTheme>("CheckStyle") };
             var disHat = (Border)Ciz(kutu, "CheckOutline");
-            var odak = (Border)Bul(kutu, "FocusRing");
+            var hucre = (Control)disHat.GetVisualParent()!;
 
-            return (disHat.Bounds.Width, odak.Bounds.Width,
+            return (disHat.Bounds.Width, hucre.Bounds.Width,
                     Belirtec<double>("TargetMinSize"), Belirtec<double>("CheckGlyphSize"));
         });
 

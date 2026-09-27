@@ -1,81 +1,91 @@
-BorderDecorativeOpacity	0.3	Theme.axaml:13
-PhoenixOpacity	0.08	Theme.axaml:33
-PhoenixGlowInnerOpacity	0.34	Theme.axaml:34
-PhoenixGlowMidOpacity	0.30	Theme.axaml:35
-PhoenixGlowOuterOpacity	0.26	Theme.axaml:36
-PhoenixEmberSparkOpacity	0.85	Theme.axaml:37
-EmberAtmosphereOuterOpacity	0.18	Theme.axaml:38
-EmberAtmosphereCoreOpacity	0.12	Theme.axaml:39
-EmberAtmosphereVeilOpacity	0.13	Theme.axaml:40
-EmberAtmosphereCoalOpacity	0.62	Theme.axaml:41
-PanelSurfaceOpacity	0.90	Theme.axaml:42
-PauseGlyphOpacity	0.5	Theme.axaml:43
-TrackingLg	0	Theme.axaml:205
-TrackingMd	0.32	Theme.axaml:206
-TrackingLabel	1.12	Theme.axaml:207
-LineHeightBody	25.6	Theme.axaml:208
-TipMaxWidth	420	Theme.axaml:209
-DropZonePadding	12	Theme.axaml:217
-ButtonPaddingSm	16,8	Theme.axaml:218
-ChipPadding	12,4	Theme.axaml:219
-ChipRemovePadding	6,0	Theme.axaml:220
-HeaderButtonPadding	12,0	Theme.axaml:221
-FieldPadding	12,8	Theme.axaml:222
-TabPadding	24,12	Theme.axaml:223
-TooltipPadding	16,12	Theme.axaml:224
-LabelMargin	0,0,0,8	Theme.axaml:225
-ChipMargin	0,0,8,0	Theme.axaml:226
-TabMargin	0,0,8,1	Theme.axaml:227
-WindowButtonMargin	4,0,0,0	Theme.axaml:228
-TitleBarContentMargin	16,0,0,0	Theme.axaml:229
-NoticeMargin	24,12,24,0	Theme.axaml:230
-WorkspaceMargin	24,12,24,12	Theme.axaml:231
-CheckMargin	0,0,16,0	Theme.axaml:232
-InfoBadgeMargin	6,0,0,0	Theme.axaml:233
-InfoBadgeLabelMargin	6,0,0,8	Theme.axaml:234
-SectionMargin	0,16,0,0	Theme.axaml:235
-PageMargin	0,16,12,0	Theme.axaml:236
-RowMargin	0,12,0,0	Theme.axaml:237
-BorderStrong	2	Theme.axaml:239
-BorderThinScalar	1	Theme.axaml:240
-FocusRingThickness	2	Theme.axaml:241
-PopupPadding	4	Theme.axaml:243
-SliderFilledTrackRadius	3,0,0,3	Theme.axaml:248
-SliderEmptyTrackRadius	0,3,3,0	Theme.axaml:249
-RadiusPanelScalar	3	Theme.axaml:252
-MotionStaggerMs	40	Theme.axaml:259
-InfoBadgeSize	18	Theme.axaml:263
-WindowButtonWidth	42	Theme.axaml:265
-ScrollBarThickness	10	Theme.axaml:267
-CheckGlyphSize	20	Theme.axaml:268
-RadioDotSize	10	Theme.axaml:269
-IconSizeLg	24	Theme.axaml:273
-ShareQrModuleSize	4	Theme.axaml:274
-SliderTrackHeight	10	Theme.axaml:275
-SliderThumbSize	20	Theme.axaml:276
-SliderThumbStroke	2	Theme.axaml:277
-SliderMinWidth	200	Theme.axaml:278
-NumberBoxWidth	96	Theme.axaml:279
-FieldWidth	280	Theme.axaml:280
-FieldWidthSm	120	Theme.axaml:281
-TabIndicatorHeight	2	Theme.axaml:282
-TooltipMaxWidth	780	Theme.axaml:285
-DropDownMaxHeight	280	Theme.axaml:286
-PanelMinHeight	256	Theme.axaml:287
-PlanPanelMinHeight	320	Theme.axaml:288
-PlanPanelMaxHeight	560	Theme.axaml:289
-DropZoneMinHeight	144	Theme.axaml:290
-DropIconSize	48	Theme.axaml:291
-PauseGlyphSize	96	Theme.axaml:292
-DropOutlineThickness	2	Theme.axaml:293
-DropIconGlowRadius	6	Theme.axaml:294
-PlanFactMinWidth	136	Theme.axaml:295
-WindowPreferredWidth	1560	Theme.axaml:296
-WindowPreferredHeight	1060	Theme.axaml:297
-WindowWorkAreaShare	0.9	Theme.axaml:298
-CheckColumnWidth	24	Theme.axaml:300
-CheckGapWidth	8	Theme.axaml:301
-SliderTrackPadding	10,0	Theme.axaml:303
-ScrollBarThumbMargin	1	Theme.axaml:304
-WrapItemMargin	0,0,24,8	Theme.axaml:306
-PlanBulletMargin	0,0,8,0	Theme.axaml:307
+ad	değer	yer	durum
+BorderDecorativeOpacity	0.3	Theme.axaml:13	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+PhoenixOpacity	0.08	Theme.axaml:33	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+PhoenixGlowInnerOpacity	0.34	Theme.axaml:34	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+PhoenixGlowMidOpacity	0.30	Theme.axaml:35	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+PhoenixGlowOuterOpacity	0.26	Theme.axaml:36	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+PhoenixEmberSparkOpacity	0.85	Theme.axaml:37	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+EmberAtmosphereOuterOpacity	0.18	Theme.axaml:38	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+EmberAtmosphereCoreOpacity	0.12	Theme.axaml:39	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+EmberAtmosphereVeilOpacity	0.13	Theme.axaml:40	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+EmberAtmosphereCoalOpacity	0.62	Theme.axaml:41	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+PanelSurfaceOpacity	0.90	Theme.axaml:42	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+PauseGlyphOpacity	0.5	Theme.axaml:43	standartta saydamlık belirteci yok (renkler alfa ile tanımlı); proje yüzeyinin katman saydamlığı
+TrackingLg	0	Theme.axaml:205	hesapla türetildi: tr-h2 0 em
+TrackingMd	0.32	Theme.axaml:206	hesapla türetildi: tr-h3 0,02 em × fs-2 16
+TrackingLabel	1.28	Theme.axaml:207	hesapla türetildi: tr-label 0,08 em × fs-2 16
+LineHeightBody	25.6	Theme.axaml:208	hesapla türetildi: lh-body 1,6 × fs-2 16
+TipMaxWidth	420	Theme.axaml:209	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+DropZonePadding	12	Theme.axaml:217	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+ButtonPaddingSm	16,8	Theme.axaml:218	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+ChipPadding	12,4	Theme.axaml:219	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+ChipRemovePadding	6,0	Theme.axaml:220	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+HeaderButtonPadding	12,0	Theme.axaml:221	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+NavTabPadding	8,0	Theme.axaml:222	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+FieldPadding	12,8	Theme.axaml:223	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+TabPadding	24,12	Theme.axaml:224	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+TooltipPadding	16,12	Theme.axaml:225	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+LabelMargin	0,0,0,8	Theme.axaml:226	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+ChipMargin	0,0,8,0	Theme.axaml:227	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+TabMargin	0,0,4,1	Theme.axaml:228	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+WindowButtonMargin	4,0,0,0	Theme.axaml:229	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+TitleBarContentMargin	16,0,0,0	Theme.axaml:230	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+NoticeMargin	24,12,24,0	Theme.axaml:231	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+WorkspaceMargin	24,12,24,12	Theme.axaml:232	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+CheckMargin	0,0,16,0	Theme.axaml:233	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+InfoBadgeMargin	6,0,0,0	Theme.axaml:234	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+InfoBadgeLabelMargin	6,0,0,8	Theme.axaml:235	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+SectionMargin	0,16,0,0	Theme.axaml:236	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+PageMargin	0,16,12,0	Theme.axaml:237	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+RowMargin	0,12,0,0	Theme.axaml:238	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+BorderStrong	2	Theme.axaml:240	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+BorderThinScalar	1	Theme.axaml:241	standartta skaler kenar yok: BorderWidth Thickness, x:Double ondan kurulamaz
+FocusRingThickness	2	Theme.axaml:242	FocusWidth 2 ile aynı değer; AVLN3000 (Thickness skalerden kurulamaz)
+FocusRingOutset	-5	Theme.axaml:244	hesapla türetildi: -(FocusWidth 2 + FocusOffset 2 + BorderWidth 1); AVLN3000
+FocusRingInnerInset	4	Theme.axaml:245	hesapla türetildi: FocusWidth 2 + FocusOffset 2; AVLN3000
+FocusRingOuterInset	2	Theme.axaml:246	hesapla türetildi: FocusOffset 2; AVLN3000
+FocusRingInnerRadius	5	Theme.axaml:247	hesapla türetildi: Radius 4 + 1 (halkanın iç kenarı); CornerRadius skalerden kurulamaz
+FocusRingOuterRadius	7	Theme.axaml:248	hesapla türetildi: Radius 4 + FocusOffset 2 + 1; CornerRadius skalerden kurulamaz
+PopupPadding	4	Theme.axaml:249	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+SliderFilledTrackRadius	4,0,0,4	Theme.axaml:254	AVLN3000: standartta yarım köşe yok, CornerRadius skalerden kurulamaz
+SliderEmptyTrackRadius	0,4,4,0	Theme.axaml:255	AVLN3000: standartta yarım köşe yok, CornerRadius skalerden kurulamaz
+RadiusPanelScalar	4	Theme.axaml:258	standartta skaler köşe yok: WindowRadius CornerRadius, x:Double ondan kurulamaz
+PauseGlyphHold	00:00:00.5000000	Theme.axaml:264	süre; standartta tutma süresi belirteci yok
+InfoBadgeSize	18	Theme.axaml:267	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+WindowButtonWidth	42	Theme.axaml:270	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+ScrollBarThickness	10	Theme.axaml:272	bilerek farklı: projenin kaydırma çubuğu şablonu, UretilmisTemaTests.KaydirmaCubuguProjeninSablonuVeKalinligiylaKalir pinliyor
+CheckGlyphSize	20	Theme.axaml:273	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+RadioDotSize	10	Theme.axaml:274	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+IconSizeLg	24	Theme.axaml:278	standartta 24 px simge adımı yok (IconSize3 22, IconSize4 56); bağlamak simgeyi büyütür ya da küçültür
+ShareQrModuleSize	4	Theme.axaml:279	QR modülü; Space1 ile aynı sayı ama aralık değil, bağlamak sahte bağ kurar
+SliderTrackHeight	10	Theme.axaml:280	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+SliderThumbSize	20	Theme.axaml:281	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+SliderThumbStroke	2	Theme.axaml:282	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+SliderMinWidth	200	Theme.axaml:283	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+NumberBoxWidth	96	Theme.axaml:284	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+FieldWidth	280	Theme.axaml:285	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+FieldWidthSm	120	Theme.axaml:286	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+TabIndicatorHeight	2	Theme.axaml:287	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+TooltipMaxWidth	780	Theme.axaml:290	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+FlyoutMaxWidth	896	Theme.axaml:291	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+DropDownMaxHeight	280	Theme.axaml:292	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+PanelMinHeight	256	Theme.axaml:293	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+PlanPanelMinHeight	320	Theme.axaml:294	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+PlanPanelMaxHeight	576	Theme.axaml:295	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+DropZoneMinHeight	144	Theme.axaml:296	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+DropIconSize	48	Theme.axaml:297	standartta 48 px simge adımı yok (IconSize4 56)
+PauseGlyphSize	96	Theme.axaml:298	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+DropOutlineThickness	2	Theme.axaml:299	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+DropIconGlowRadius	6	Theme.axaml:300	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+PlanFactMinWidth	136	Theme.axaml:301	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+WindowPreferredWidth	1560	Theme.axaml:302	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+WindowPreferredHeight	1060	Theme.axaml:303	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+WindowWorkAreaShare	0.9	Theme.axaml:304	standartta belirteç yok: bileşene özgü boyut ya da yerleşim tavanı
+CheckColumnWidth	24	Theme.axaml:306	AVLN3000: GridLength skalerden kurulamaz
+CheckGapWidth	8	Theme.axaml:307	AVLN3000: GridLength skalerden kurulamaz
+SliderTrackPadding	10,0	Theme.axaml:309	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+ScrollBarThumbMargin	1	Theme.axaml:310	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+WrapItemMargin	0,0,24,8	Theme.axaml:312	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+PlanBulletMargin	0,0,8,0	Theme.axaml:313	AVLN3000: standart bileşik kenar payı taşımıyor, Thickness skalerden kurulamaz
+MotionStaggerMs	40	(silindi)	bağlandı: MainWindow.axaml.cs:442 standardın Stagger belirtecinden (0,04 sn) okuyor
+MotionStaggerCount	-	(silindi)	ölü belirteç, hiçbir yerde okunmuyordu

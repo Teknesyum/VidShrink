@@ -439,13 +439,13 @@ public partial class MainWindow : Window
     private void PlayPanelEntrance()
     {
         var entering = _motionReduced ? "enter-flat" : "enter";
-        var step = Scalar("MotionStaggerMs", 40);
+        var step = this.TryFindResource("Stagger", out var stagger) && stagger is TimeSpan span ? span : TimeSpan.FromMilliseconds(40);
         var panels = EntrancePanels();
         for (var index = 0; index < panels.Length; index++)
         {
             var panel = panels[index];
             if (index == 0) panel.Classes.Remove(entering);
-            else DispatcherTimer.RunOnce(() => panel.Classes.Remove(entering), TimeSpan.FromMilliseconds(step * index));
+            else DispatcherTimer.RunOnce(() => panel.Classes.Remove(entering), step * index);
         }
     }
 
