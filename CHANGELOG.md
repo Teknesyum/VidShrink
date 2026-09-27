@@ -12,6 +12,15 @@ ship as part of it.
 ### Changed
 
 - Teknesyum palette: refreshed from the Teknesyum UI layout's new colours; the green background is darker so body text keeps 7:1 contrast against it.
+- Player: the top bar is one semi-transparent panel (tabs and window buttons together) that opens when the mouse reaches the top 48 px, mirroring the bottom strip.
+- Player: the bottom strip is thinner (a single top edge line, no card), its reveal zone is 96 px, and it hides the moment the mouse leaves.
+- Player: title bar buttons and tabs have no outline; hover and press are shown by the background only. The Teknesyum button lost its `<>` icon.
+- Player: the pause/play glyph enters twice as fast. Pressing play at the end of a file opens the next file in the folder, or restarts the same file when there is none.
+- Player: the right-click menu is down to 12 top rows with groups in submenus, and gains "Open file location".
+
+### Added
+
+- Editor groundwork: an edit list model (clips, speed, reverse, undo/redo) for the upcoming editing tab; no visible change yet.
 
 ## [0.12.1] - 2026-09-27
 
