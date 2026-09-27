@@ -7,6 +7,10 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Changed
+
+- Program icon: lower and wider (about 16:10), with sharper bracket corners and the play triangle centred between the two arrows.
+
 ## [0.13.0] - 2026-09-27
 
 ### Changed

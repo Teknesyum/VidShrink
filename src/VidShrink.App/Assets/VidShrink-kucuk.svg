@@ -10,10 +10,10 @@
       <stop offset="0.45" stop-color="#fa8cff"/>
       <stop offset="1" stop-color="#ac7fff"/>
     </linearGradient>
-    <path id="parantez" d="M78 36 C52 36 40 48 40 74 V106 C40 118 34 126 24 128 C34 130 40 138 40 150 V182 C40 208 52 220 78 220" fill="none"/>
-    <path id="govde" d="M40 128 H64" fill="none"/>
-    <path id="bas" d="M60 113 L80 128 L60 143 Z"/>
-    <path id="ucgen" d="M117 102 L117 154 L158 128 Z"/>
+    <path id="parantez" d="M78 68 H54 C45 68 40 73 40 82 V106 C40 118 34 126 24 128 C34 130 40 138 40 150 V174 C40 183 45 188 54 188 H78" fill="none"/>
+    <path id="govde" d="M40 128 H58" fill="none"/>
+    <path id="bas" d="M58 113 L74 128 L58 143 Z"/>
+    <path id="ucgen" d="M110 106 L110 150 L146 128 Z"/>
   </defs>
 
   <g stroke="#000" stroke-linecap="round" stroke-linejoin="round" fill="#000">
