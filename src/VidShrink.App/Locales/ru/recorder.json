@@ -197,5 +197,7 @@
   "recorder.region.title": "Редактор области",
   "recorder.region.start": "Начать запись",
   "recorder.region.settings": "Настройки",
-  "recorder.region.close": "Закрыть область"
+  "recorder.region.close": "Закрыть область",
+  "recorder.region.hide": "Скрыть рамку (F9)",
+  "recorder.region.stop-close": "Остановить запись и закрыть"
 }

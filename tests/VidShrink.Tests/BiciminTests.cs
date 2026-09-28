@@ -1194,6 +1194,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-28, duzenle/kaydet/paylas: <c>editor.export</c> ("Export…", kolun disinda) yerine <c>editor.save</c> ve
     /// <c>editor.save-as</c>; yalniz en <c>editor.save-as</c> ("Save As…") kola giriyor, <c>player.menu.edit</c> ve
     /// <c>recorder.output.to-editor</c> kolun disinda: 2710 + 1 = 2711, en 255, tr 91.</para>
+    /// <para>2026-09-28, bolge dali ile birlikte: recorder.region.hide ve recorder.region.stop-close, 2711 + 5 = 2716, en 256, tr 92.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1219,9 +1220,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2711, toplam);
-        Assert.Equal(255, dilBasina["en"]);
-        Assert.Equal(91, dilBasina["tr"]);
+        Assert.Equal(2716, toplam);
+        Assert.Equal(256, dilBasina["en"]);
+        Assert.Equal(92, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1392,6 +1393,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-28, D4 ile D5 birlikte: 1131 + 7 + 10 = 1148, 43 x 1148 = 49364.</para>
     /// <para>2026-09-28, duzenle/kaydet/paylas: <c>editor.export</c> gitti, <c>editor.save</c>, <c>editor.save-as</c>,
     /// <c>player.menu.edit</c> ve <c>recorder.output.to-editor</c> geldi: 1148 - 1 + 4 = 1151, 43 x 1151 = 49493.</para>
+    /// <para>2026-09-28, bolge dali ile birlikte: 1151 + 2 = 1153, 43 x 1153 = 49579.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1419,7 +1421,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(49493, gezilen);
+        Assert.Equal(49579, gezilen);
         Assert.Empty(kayip);
     }
 

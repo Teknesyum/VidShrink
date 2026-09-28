@@ -197,5 +197,7 @@
   "recorder.region.title": "Kihariri cha eneo",
   "recorder.region.start": "Anza kurekodi",
   "recorder.region.settings": "Mipangilio",
-  "recorder.region.close": "Funga eneo"
+  "recorder.region.close": "Funga eneo",
+  "recorder.region.hide": "Ficha fremu (F9)",
+  "recorder.region.stop-close": "Simamisha kurekodi na ufunge"
 }

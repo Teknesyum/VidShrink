@@ -197,5 +197,7 @@
   "recorder.region.title": "Уређивач области",
   "recorder.region.start": "Покрени снимање",
   "recorder.region.settings": "Подешавања",
-  "recorder.region.close": "Затвори област"
+  "recorder.region.close": "Затвори област",
+  "recorder.region.hide": "Сакриј оквир (F9)",
+  "recorder.region.stop-close": "Заустави снимање и затвори"
 }

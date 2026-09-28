@@ -197,5 +197,7 @@
   "recorder.region.title": "Region editor",
   "recorder.region.start": "Start recording",
   "recorder.region.settings": "Settings",
-  "recorder.region.close": "Close region"
+  "recorder.region.close": "Close region",
+  "recorder.region.hide": "Hide frame (F9)",
+  "recorder.region.stop-close": "Stop recording and close"
 }

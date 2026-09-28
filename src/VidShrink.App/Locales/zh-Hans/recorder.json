@@ -197,5 +197,7 @@
   "recorder.region.title": "区域编辑器",
   "recorder.region.start": "开始录制",
   "recorder.region.settings": "设置",
-  "recorder.region.close": "关闭区域"
+  "recorder.region.close": "关闭区域",
+  "recorder.region.hide": "隐藏边框 (F9)",
+  "recorder.region.stop-close": "停止录制并关闭"
 }

@@ -197,5 +197,7 @@
   "recorder.region.title": "Bölge düzenleyici",
   "recorder.region.start": "Kaydı başlat",
   "recorder.region.settings": "Ayarlar",
-  "recorder.region.close": "Bölgeyi kapat"
+  "recorder.region.close": "Bölgeyi kapat",
+  "recorder.region.hide": "Çerçeveyi gizle (F9)",
+  "recorder.region.stop-close": "Kaydı durdur ve kapat"
 }

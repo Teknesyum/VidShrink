@@ -197,5 +197,7 @@
   "recorder.region.title": "Bereichseditor",
   "recorder.region.start": "Aufnahme starten",
   "recorder.region.settings": "Einstellungen",
-  "recorder.region.close": "Bereich schließen"
+  "recorder.region.close": "Bereich schließen",
+  "recorder.region.hide": "Rahmen ausblenden (F9)",
+  "recorder.region.stop-close": "Aufnahme beenden und schließen"
 }

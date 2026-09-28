@@ -197,5 +197,7 @@
   "recorder.region.title": "範囲エディター",
   "recorder.region.start": "録画を開始",
   "recorder.region.settings": "設定",
-  "recorder.region.close": "範囲を閉じる"
+  "recorder.region.close": "範囲を閉じる",
+  "recorder.region.hide": "枠を隠す (F9)",
+  "recorder.region.stop-close": "録画を停止して閉じる"
 }

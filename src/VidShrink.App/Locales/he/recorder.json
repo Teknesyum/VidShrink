@@ -197,5 +197,7 @@
   "recorder.region.title": "עורך אזור",
   "recorder.region.start": "התחל הקלטה",
   "recorder.region.settings": "הגדרות",
-  "recorder.region.close": "סגור אזור"
+  "recorder.region.close": "סגור אזור",
+  "recorder.region.hide": "הסתר מסגרת (F9)",
+  "recorder.region.stop-close": "עצור הקלטה וסגור"
 }

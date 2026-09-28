@@ -13,6 +13,7 @@ ship as part of it.
 - Recorder: the result panel has an Edit button that opens the finished recording in the editor.
 - Editor: Save writes `<name>-duzenlenmis.<ext>` next to the source in Smart mode without asking, numbering `-2`, `-3`… on collision; Save As… keeps the file picker. The status shows the path with Show in folder.
 - Editor: Share saves first when needed, then uploads through the same share layer as the recorder.
+- Recorder region editor: the edge snaps to windows and screen edges while you drag (hold Alt to turn it off); the toolbar has large square icon buttons, including snapshot (works before and during recording), hide frame (F9 or the tray icon brings it back), pause/resume/stop while recording, and a close button that stops the recording. The edge is dashed while you set it up and solid while recording.
 
 ## [1.0.0] - 2026-09-28
 

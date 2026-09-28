@@ -197,5 +197,7 @@
   "recorder.region.title": "Områderedigering",
   "recorder.region.start": "Start opptak",
   "recorder.region.settings": "Innstillinger",
-  "recorder.region.close": "Lukk område"
+  "recorder.region.close": "Lukk område",
+  "recorder.region.hide": "Skjul ramme (F9)",
+  "recorder.region.stop-close": "Stopp opptak og lukk"
 }

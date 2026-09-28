@@ -197,5 +197,7 @@
   "recorder.region.title": "Edytor obszaru",
   "recorder.region.start": "Rozpocznij nagrywanie",
   "recorder.region.settings": "Ustawienia",
-  "recorder.region.close": "Zamknij obszar"
+  "recorder.region.close": "Zamknij obszar",
+  "recorder.region.hide": "Ukryj ramkę (F9)",
+  "recorder.region.stop-close": "Zatrzymaj nagrywanie i zamknij"
 }

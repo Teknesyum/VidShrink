@@ -94,6 +94,15 @@ internal partial class RecorderView
         return ok;
     }
 
+    internal Func<RecorderRequest, string, Task<bool>> TakeFrame { get; set; } = (request, path) => RecorderSession.CaptureAsync(request, path);
+
+    internal async Task<bool> SnapshotNowAsync()
+    {
+        if (_session is { } session) return await SnapshotAsync(path => session.SnapshotAsync(path));
+        if (CountingDown || BuildRequest() is not { } request) return false;
+        return await SnapshotAsync(path => TakeFrame(request, path));
+    }
+
     /// <summary>
     /// Kaydı başlatır. Başlamayan kaydın sebebi yutulmuyor: ffmpeg eksikse, istek
     /// doğrulamadan geçmiyorsa ya da ilk ilerleme bloğu gelmeden süreç ölüyorsa ekranda
@@ -190,6 +199,7 @@ internal partial class RecorderView
             _session = null;
             _frameRegion = null;
             _stopping = false;
+            FrameHiddenByUser = false;
             RefreshSerit();
         }
     }
@@ -250,6 +260,7 @@ internal partial class RecorderView
             _session = null;
             _frameRegion = null;
             _stopping = false;
+            FrameHiddenByUser = false;
             RefreshSerit();
         }
     }

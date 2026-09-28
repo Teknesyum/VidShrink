@@ -197,5 +197,7 @@
   "recorder.region.title": "Editor area",
   "recorder.region.start": "Avvia registrazione",
   "recorder.region.settings": "Impostazioni",
-  "recorder.region.close": "Chiudi area"
+  "recorder.region.close": "Chiudi area",
+  "recorder.region.hide": "Nascondi cornice (F9)",
+  "recorder.region.stop-close": "Interrompi registrazione e chiudi"
 }

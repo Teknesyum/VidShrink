@@ -197,5 +197,7 @@
   "recorder.region.title": "Uređivač područja",
   "recorder.region.start": "Pokreni snimanje",
   "recorder.region.settings": "Postavke",
-  "recorder.region.close": "Zatvori područje"
+  "recorder.region.close": "Zatvori područje",
+  "recorder.region.hide": "Sakrij okvir (F9)",
+  "recorder.region.stop-close": "Zaustavi snimanje i zatvori"
 }

@@ -197,5 +197,7 @@
   "recorder.region.title": "ตัวแก้ไขพื้นที่",
   "recorder.region.start": "เริ่มบันทึก",
   "recorder.region.settings": "การตั้งค่า",
-  "recorder.region.close": "ปิดพื้นที่"
+  "recorder.region.close": "ปิดพื้นที่",
+  "recorder.region.hide": "ซ่อนกรอบ (F9)",
+  "recorder.region.stop-close": "หยุดบันทึกและปิด"
 }

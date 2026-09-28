@@ -197,5 +197,7 @@
   "recorder.region.title": "Alueen muokkain",
   "recorder.region.start": "Aloita tallennus",
   "recorder.region.settings": "Asetukset",
-  "recorder.region.close": "Sulje alue"
+  "recorder.region.close": "Sulje alue",
+  "recorder.region.hide": "Piilota kehys (F9)",
+  "recorder.region.stop-close": "Lopeta tallennus ja sulje"
 }

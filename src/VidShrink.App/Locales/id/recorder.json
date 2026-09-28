@@ -197,5 +197,7 @@
   "recorder.region.title": "Editor wilayah",
   "recorder.region.start": "Mulai merekam",
   "recorder.region.settings": "Pengaturan",
-  "recorder.region.close": "Tutup wilayah"
+  "recorder.region.close": "Tutup wilayah",
+  "recorder.region.hide": "Sembunyikan bingkai (F9)",
+  "recorder.region.stop-close": "Hentikan rekaman dan tutup"
 }

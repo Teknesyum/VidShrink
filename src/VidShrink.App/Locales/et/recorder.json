@@ -197,5 +197,7 @@
   "recorder.region.title": "Piirkonna redaktor",
   "recorder.region.start": "Alusta salvestamist",
   "recorder.region.settings": "Seaded",
-  "recorder.region.close": "Sulge piirkond"
+  "recorder.region.close": "Sulge piirkond",
+  "recorder.region.hide": "Peida raam (F9)",
+  "recorder.region.stop-close": "Peata salvestus ja sulge"
 }

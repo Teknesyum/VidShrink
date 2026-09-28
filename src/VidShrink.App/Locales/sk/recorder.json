@@ -197,5 +197,7 @@
   "recorder.region.title": "Editor oblasti",
   "recorder.region.start": "Spustiť nahrávanie",
   "recorder.region.settings": "Nastavenia",
-  "recorder.region.close": "Zavrieť oblasť"
+  "recorder.region.close": "Zavrieť oblasť",
+  "recorder.region.hide": "Skryť rámik (F9)",
+  "recorder.region.stop-close": "Zastaviť nahrávanie a zavrieť"
 }

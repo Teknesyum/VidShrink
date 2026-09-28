@@ -197,5 +197,7 @@
   "recorder.region.title": "Apgabala redaktors",
   "recorder.region.start": "Sākt ierakstu",
   "recorder.region.settings": "Iestatījumi",
-  "recorder.region.close": "Aizvērt apgabalu"
+  "recorder.region.close": "Aizvērt apgabalu",
+  "recorder.region.hide": "Paslēpt rāmi (F9)",
+  "recorder.region.stop-close": "Apturēt ierakstu un aizvērt"
 }
