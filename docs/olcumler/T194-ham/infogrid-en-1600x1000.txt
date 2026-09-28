@@ -1,0 +1,17 @@
+ic-dil=en
+Duration: dogal 75 px, cizilen 74 px, hucre 452 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 452 px, satir 1, sigdi, balon tam
+Size: dogal 37 px, cizilen 36,5 px, hucre 452 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 452 px, satir 1, sigdi, balon tam
+Resolution: dogal 93 px, cizilen 92,7 px, hucre 452 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 452 px, satir 1, sigdi, balon tam
+FPS: dogal 33 px, cizilen 32,7 px, hucre 452 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 452 px, satir 1, sigdi, balon tam
+Video Codec: dogal 109 px, cizilen 108,4 px, hucre 452 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 452 px, satir 1, sigdi, balon tam
+Audio: dogal 50 px, cizilen 49,7 px, hucre 452 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 452 px, satir 1, sigdi, balon tam
+Bitrate: dogal 60 px, cizilen 59,4 px, hucre 452 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 452 px, satir 1, sigdi, balon tam
+HDR: dogal 37 px, cizilen 36,5 px, hucre 452 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 452 px, satir 1, sigdi, balon tam

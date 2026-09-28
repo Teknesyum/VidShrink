@@ -19,6 +19,9 @@ Sıra kullanıcının. Biten madde silinmez, `[x]` ile işaretlenir ve nedeni sa
   sonra artıya geçsin. Bu koşullarda ölçülmemiş bir kazanım rapora girmez.
   Paket 3 (yazılım yolu, `docs/olcumler/handbrake-acigi-yazilim.md`): XPSNR'da 6/6 satır önde; VMAF-NEG'de
   `karanlik` kesitinde SVT-AV1 −0,65 ve −0,61 geride. Donanım yolu ölçülmedi.
+  28 Eylül notu: `psy-rd=2:psy-rdoq=1:aq-mode=2` x265 yazılım yoluna 1 Eylül'de girdi (`80925d4d`,
+  `src/VidShrink.Core/FfmpegArguments.cs:720`); yukarıdaki "girmemesinden" cümlesi eskidi. Madde açık, çünkü
+  VMAF-NEG `karanlik` kesitinde hâlâ geride. Kalanların tam listesi: `docs/handbrake/durum-2026-09-23.md` §3.
 
 ## Kararlar
 
