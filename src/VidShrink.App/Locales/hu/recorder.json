@@ -196,5 +196,7 @@
   "recorder.region.title": "Területszerkesztő",
   "recorder.region.start": "Felvétel indítása",
   "recorder.region.settings": "Beállítások",
-  "recorder.region.close": "Terület bezárása"
+  "recorder.region.close": "Terület bezárása",
+  "recorder.region.hide": "Keret elrejtése (F9)",
+  "recorder.region.stop-close": "Felvétel leállítása és bezárás"
 }

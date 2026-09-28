@@ -196,5 +196,7 @@
   "recorder.region.title": "Editor de região",
   "recorder.region.start": "Iniciar gravação",
   "recorder.region.settings": "Configurações",
-  "recorder.region.close": "Fechar região"
+  "recorder.region.close": "Fechar região",
+  "recorder.region.hide": "Ocultar moldura (F9)",
+  "recorder.region.stop-close": "Parar gravação e fechar"
 }

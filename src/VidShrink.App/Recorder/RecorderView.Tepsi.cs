@@ -9,7 +9,7 @@ internal partial class RecorderView
 
     internal IRecorderTrayHost TrayHost
     {
-        get => _trayHost ??= new RecorderTrayHost(RestoreWindow);
+        get => _trayHost ??= new RecorderTrayHost(OnTrayClicked);
         set => _trayHost = value;
     }
 
@@ -46,6 +46,17 @@ internal partial class RecorderView
             ? brush.Color
             : Colors.Transparent;
         TrayHost.Update(phase, color, TrayTip);
+    }
+
+    internal void OnTrayClicked()
+    {
+        if (FrameHiddenByUser && _session is not null)
+        {
+            ToggleFrame();
+            return;
+        }
+
+        RestoreWindow();
     }
 
     private void RestoreWindow()

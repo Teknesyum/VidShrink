@@ -196,5 +196,7 @@
   "recorder.region.title": "অঞ্চল সম্পাদক",
   "recorder.region.start": "রেকর্ডিং শুরু করুন",
   "recorder.region.settings": "সেটিংস",
-  "recorder.region.close": "অঞ্চল বন্ধ করুন"
+  "recorder.region.close": "অঞ্চল বন্ধ করুন",
+  "recorder.region.hide": "ফ্রেম লুকান (F9)",
+  "recorder.region.stop-close": "রেকর্ডিং থামিয়ে বন্ধ করুন"
 }

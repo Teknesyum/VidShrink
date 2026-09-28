@@ -196,5 +196,7 @@
   "recorder.region.title": "பகுதி திருத்தி",
   "recorder.region.start": "பதிவைத் தொடங்கு",
   "recorder.region.settings": "அமைப்புகள்",
-  "recorder.region.close": "பகுதியை மூடு"
+  "recorder.region.close": "பகுதியை மூடு",
+  "recorder.region.hide": "சட்டகத்தை மறை (F9)",
+  "recorder.region.stop-close": "பதிவை நிறுத்தி மூடு"
 }

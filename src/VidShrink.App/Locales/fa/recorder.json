@@ -196,5 +196,7 @@
   "recorder.region.title": "ویرایشگر ناحیه",
   "recorder.region.start": "شروع ضبط",
   "recorder.region.settings": "تنظیمات",
-  "recorder.region.close": "بستن ناحیه"
+  "recorder.region.close": "بستن ناحیه",
+  "recorder.region.hide": "پنهان کردن قاب (F9)",
+  "recorder.region.stop-close": "توقف ضبط و بستن"
 }

@@ -196,5 +196,7 @@
   "recorder.region.title": "Editor de regiune",
   "recorder.region.start": "Pornește înregistrarea",
   "recorder.region.settings": "Setări",
-  "recorder.region.close": "Închide regiunea"
+  "recorder.region.close": "Închide regiunea",
+  "recorder.region.hide": "Ascunde cadrul (F9)",
+  "recorder.region.stop-close": "Oprește înregistrarea și închide"
 }

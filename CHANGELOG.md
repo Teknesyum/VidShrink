@@ -7,6 +7,10 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Recorder region editor: the edge snaps to windows and screen edges while you drag (hold Alt to turn it off); the toolbar has large square icon buttons, including snapshot (works before and during recording), hide frame (F9 or the tray icon brings it back), pause/resume/stop while recording, and a close button that stops the recording. The edge is dashed while you set it up and solid while recording.
+
 ## [0.14.0] - 2026-09-28
 
 ### Added

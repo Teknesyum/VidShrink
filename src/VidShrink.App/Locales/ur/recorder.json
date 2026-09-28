@@ -196,5 +196,7 @@
   "recorder.region.title": "علاقہ ایڈیٹر",
   "recorder.region.start": "ریکارڈنگ شروع کریں",
   "recorder.region.settings": "ترتیبات",
-  "recorder.region.close": "علاقہ بند کریں"
+  "recorder.region.close": "علاقہ بند کریں",
+  "recorder.region.hide": "فریم چھپائیں (F9)",
+  "recorder.region.stop-close": "ریکارڈنگ روکیں اور بند کریں"
 }

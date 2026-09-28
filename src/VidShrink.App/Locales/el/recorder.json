@@ -196,5 +196,7 @@
   "recorder.region.title": "Επεξεργασία περιοχής",
   "recorder.region.start": "Έναρξη εγγραφής",
   "recorder.region.settings": "Ρυθμίσεις",
-  "recorder.region.close": "Κλείσιμο περιοχής"
+  "recorder.region.close": "Κλείσιμο περιοχής",
+  "recorder.region.hide": "Απόκρυψη πλαισίου (F9)",
+  "recorder.region.stop-close": "Διακοπή εγγραφής και κλείσιμο"
 }

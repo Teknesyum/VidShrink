@@ -50,6 +50,8 @@ internal partial class RecorderView
         _regionEditor.PauseRequested += OnEditorPause;
         _regionEditor.ResumeRequested += OnEditorResume;
         _regionEditor.StopRequested += OnEditorStop;
+        _regionEditor.SnapshotRequested += OnEditorSnapshot;
+        _regionEditor.HideRequested += OnEditorHide;
         _regionEditor.Dismissed += OnEditorDismissed;
         _regionEditorWired = true;
     }
@@ -63,6 +65,8 @@ internal partial class RecorderView
         host.PauseRequested -= OnEditorPause;
         host.ResumeRequested -= OnEditorResume;
         host.StopRequested -= OnEditorStop;
+        host.SnapshotRequested -= OnEditorSnapshot;
+        host.HideRequested -= OnEditorHide;
         host.Dismissed -= OnEditorDismissed;
     }
 
@@ -110,7 +114,8 @@ internal partial class RecorderView
     internal void SyncRegionEditor()
     {
         var region = RegionInBoxes();
-        switch (EditorWanted(EditingRegion, SelectedTarget == RecorderTargetKind.Region, region is not null, ReplayRunning))
+        switch (EditorWanted(EditingRegion, SelectedTarget == RecorderTargetKind.Region, region is not null, ReplayRunning,
+                    FrameHiddenByUser && _session is not null))
         {
             case RegionEditorState.Shown:
                 _regionEditor.Show(region!.Value, RegionDraw.Ratio(SelectedAspect),
@@ -126,9 +131,9 @@ internal partial class RecorderView
         }
     }
 
-    internal static RegionEditorState EditorWanted(bool editing, bool targetIsRegion, bool regionReadable, bool busy)
+    internal static RegionEditorState EditorWanted(bool editing, bool targetIsRegion, bool regionReadable, bool busy, bool hidden = false)
         => !editing || !targetIsRegion || !regionReadable ? RegionEditorState.Closed
-            : busy ? RegionEditorState.Hidden
+            : busy || hidden ? RegionEditorState.Hidden
             : RegionEditorState.Shown;
 
     internal static RegionEditorPhase EditorPhase(bool recording, RecorderState state, bool countingDown)
@@ -160,6 +165,10 @@ internal partial class RecorderView
     private async void OnEditorResume(object? sender, EventArgs e) => await ResumeAsync();
 
     private async void OnEditorStop(object? sender, EventArgs e) => await StopAsync();
+
+    private async void OnEditorSnapshot(object? sender, EventArgs e) => await SnapshotNowAsync();
+
+    private void OnEditorHide(object? sender, EventArgs e) => ToggleFrame();
 
     private void OnEditorSettings(object? sender, EventArgs e) => RestoreHostWindow();
 

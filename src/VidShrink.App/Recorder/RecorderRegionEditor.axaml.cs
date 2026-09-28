@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -38,6 +39,8 @@ internal partial class RecorderRegionEditor : Window
     private PixelRect _desktop;
     private PixelRect _toolbar;
     private (RegionGrip Grip, PixelPoint Start, PixelRect Region)? _drag;
+    private IReadOnlyList<PixelRect> _targets = Array.Empty<PixelRect>();
+    private IReadOnlyList<PixelRect> _snapLines = Array.Empty<PixelRect>();
     private bool _closingQuietly;
     private RegionEditorPhase _phase = RegionEditorPhase.Idle;
     private readonly Dictionary<RegionGrip, Cursor> _cursors = new();
@@ -55,6 +58,10 @@ internal partial class RecorderRegionEditor : Window
     internal event EventHandler? ResumeRequested;
 
     internal event EventHandler? StopRequested;
+
+    internal event EventHandler? SnapshotRequested;
+
+    internal event EventHandler? HideRequested;
 
     internal event EventHandler? Dismissed;
 
@@ -87,7 +94,9 @@ internal partial class RecorderRegionEditor : Window
         BtnPause.Click += (_, _) => PauseRequested?.Invoke(this, EventArgs.Empty);
         BtnResume.Click += (_, _) => ResumeRequested?.Invoke(this, EventArgs.Empty);
         BtnStop.Click += (_, _) => StopRequested?.Invoke(this, EventArgs.Empty);
-        BtnClose.Click += (_, _) => Close();
+        BtnSnapshot.Click += (_, _) => SnapshotRequested?.Invoke(this, EventArgs.Empty);
+        BtnHide.Click += (_, _) => HideRequested?.Invoke(this, EventArgs.Empty);
+        BtnClose.Click += (_, _) => CloseFromToolbar();
         ShowPhase();
         ShowSize();
     }
@@ -124,9 +133,24 @@ internal partial class RecorderRegionEditor : Window
         BtnPause.IsVisible = _phase == RegionEditorPhase.Running;
         BtnResume.IsVisible = _phase == RegionEditorPhase.Paused;
         BtnStop.IsVisible = !editable;
+        BtnSnapshot.IsVisible = _phase != RegionEditorPhase.Counting;
+        BtnHide.IsVisible = _phase is RegionEditorPhase.Running or RegionEditorPhase.Paused;
+        var close = LanguageCatalog.Display(Strings.Get(editable ? "recorder.region.close" : "recorder.region.stop-close"));
+        ToolTip.SetTip(BtnClose, close);
+        AutomationProperties.SetName(BtnClose, close);
         Edge.IsVisible = editable;
+        Edge.StrokeDashArray = EdgeDash(editable, Resource("RecorderRegionDash"), Resource("RecorderFrameThickness"));
         foreach (var (_, handle) in HandleControls()) handle.IsVisible = editable;
         if (!editable) Surface.Cursor = CursorOf(RegionGrip.None);
+    }
+
+    internal static AvaloniaList<double>? EdgeDash(bool editable, double dash, double thickness)
+        => editable && dash > 0 && thickness > 0 ? new AvaloniaList<double> { dash / thickness, dash / thickness } : null;
+
+    internal void CloseFromToolbar()
+    {
+        if (!Editable(_phase)) StopRequested?.Invoke(this, EventArgs.Empty);
+        Close();
     }
 
     private void ShowSize()
@@ -189,6 +213,12 @@ internal partial class RecorderRegionEditor : Window
 
     private int HandlePixels => Pixels("RecorderRegionHandle");
 
+    private int SnapPixels => Pixels("RecorderRegionSnap");
+
+    private int SnapLinePixels => Pixels("RecorderRegionSnapLine");
+
+    internal IReadOnlyList<PixelRect> SnapLines => _snapLines;
+
     private PixelPoint ScreenPoint(PointerEventArgs e) => this.PointToScreen(e.GetPosition(this));
 
     private void OnPressed(object? sender, PointerPressedEventArgs e)
@@ -198,6 +228,7 @@ internal partial class RecorderRegionEditor : Window
         var grip = RegionEdit.Hit(point, _region, Band, HandlePixels);
         if (grip == RegionGrip.None) return;
         _drag = (grip, point, _region);
+        _targets = RecorderRegionPicker.SnapTargets(this);
         e.Pointer.Capture(Surface);
         e.Handled = true;
     }
@@ -213,8 +244,11 @@ internal partial class RecorderRegionEditor : Window
         }
 
         var delta = new PixelVector(point.X - drag.Start.X, point.Y - drag.Start.Y);
-        var next = RegionEdit.Drag(drag.Region, drag.Grip, delta, _ratio, _desktop);
-        if (next == _region) return;
+        var snap = RegionSnap.Drag(drag.Region, drag.Grip, delta, _targets, SnapPixels, e.KeyModifiers.HasFlag(KeyModifiers.Alt));
+        var next = RegionEdit.Drag(drag.Region, drag.Grip, snap.Delta, _ratio, _desktop);
+        var lines = RegionSnap.Lines(next, snap.X, snap.Y, SnapLinePixels);
+        if (next == _region && lines.SequenceEqual(_snapLines)) return;
+        _snapLines = lines;
         _region = next;
         Arrange();
         RegionChanged?.Invoke(this, _region);
@@ -224,6 +258,8 @@ internal partial class RecorderRegionEditor : Window
     {
         if (_drag is null) return;
         _drag = null;
+        _snapLines = Array.Empty<PixelRect>();
+        ShowSnapLines();
         e.Pointer.Capture(null);
         RegionCommitted?.Invoke(this, _region);
     }
@@ -263,6 +299,7 @@ internal partial class RecorderRegionEditor : Window
             Canvas.SetTop(handle, center.Y - handle.Height / 2);
         }
 
+        ShowSnapLines();
         ShowSize();
         Toolbar.Measure(Size.Infinity);
         var scaling = RenderScaling;
@@ -278,6 +315,17 @@ internal partial class RecorderRegionEditor : Window
         Canvas.SetTop(Toolbar, client.Y);
 
         ApplyShape();
+    }
+
+    private void ShowSnapLines()
+    {
+        var controls = new Control[] { SnapX, SnapY };
+        for (var i = 0; i < controls.Length; i++)
+        {
+            var show = i < _snapLines.Count && Editable(_phase);
+            controls[i].IsVisible = show;
+            if (show) Place(controls[i], _snapLines[i].Position, _snapLines[i].BottomRight);
+        }
     }
 
     private void MakeShaped()
@@ -359,6 +407,10 @@ internal interface IRegionEditorHost
 
     event EventHandler? StopRequested;
 
+    event EventHandler? SnapshotRequested;
+
+    event EventHandler? HideRequested;
+
     event EventHandler? Dismissed;
 
     void Show(PixelRect region, double? ratio, RegionEditorPhase phase);
@@ -388,6 +440,10 @@ internal sealed class RegionEditorHost : IRegionEditorHost
 
     public event EventHandler? StopRequested;
 
+    public event EventHandler? SnapshotRequested;
+
+    public event EventHandler? HideRequested;
+
     public event EventHandler? Dismissed;
 
     public void Show(PixelRect region, double? ratio, RegionEditorPhase phase)
@@ -402,6 +458,8 @@ internal sealed class RegionEditorHost : IRegionEditorHost
             editor.PauseRequested += (_, _) => PauseRequested?.Invoke(this, EventArgs.Empty);
             editor.ResumeRequested += (_, _) => ResumeRequested?.Invoke(this, EventArgs.Empty);
             editor.StopRequested += (_, _) => StopRequested?.Invoke(this, EventArgs.Empty);
+            editor.SnapshotRequested += (_, _) => SnapshotRequested?.Invoke(this, EventArgs.Empty);
+            editor.HideRequested += (_, _) => HideRequested?.Invoke(this, EventArgs.Empty);
             editor.Dismissed += (_, _) =>
             {
                 if (!ReferenceEquals(_editor, editor)) return;

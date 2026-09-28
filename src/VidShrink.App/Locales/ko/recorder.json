@@ -196,5 +196,7 @@
   "recorder.region.title": "영역 편집기",
   "recorder.region.start": "녹화 시작",
   "recorder.region.settings": "설정",
-  "recorder.region.close": "영역 닫기"
+  "recorder.region.close": "영역 닫기",
+  "recorder.region.hide": "테두리 숨기기 (F9)",
+  "recorder.region.stop-close": "녹화 중지 후 닫기"
 }

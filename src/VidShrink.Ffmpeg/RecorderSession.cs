@@ -219,14 +219,16 @@ public sealed class RecorderSession : IAsyncDisposable
     /// dosyasindan degil ekrandan geliyor: canli ekranin dosyasi yok, dosyadan kare kesen bir
     /// yol buraya uymaz.
     /// </summary>
-    public async Task<bool> SnapshotAsync(string imagePath, CancellationToken ct = default)
+    public Task<bool> SnapshotAsync(string imagePath, CancellationToken ct = default) => CaptureAsync(_request, imagePath, ct);
+
+    public static async Task<bool> CaptureAsync(RecorderRequest request, string imagePath, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(imagePath)) throw new ArgumentException("Image path is required.", nameof(imagePath));
 
         var folder = Path.GetDirectoryName(imagePath);
         if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
 
-        var run = await FfmpegRunner.RunAsync(RecorderArguments.BuildSnapshot(_request, imagePath), ct);
+        var run = await FfmpegRunner.RunAsync(RecorderArguments.BuildSnapshot(request, imagePath), ct);
         return run.Ok && File.Exists(imagePath) && new FileInfo(imagePath).Length > 0;
     }
 

@@ -28,6 +28,7 @@ internal partial class RecorderView
     {
         FrameHiddenByUser = !FrameHiddenByUser;
         SyncFrame();
+        SyncRegionEditor();
     }
 
     private void SyncFrame()

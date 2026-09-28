@@ -196,5 +196,7 @@
   "recorder.region.title": "Områdesredigerare",
   "recorder.region.start": "Starta inspelning",
   "recorder.region.settings": "Inställningar",
-  "recorder.region.close": "Stäng område"
+  "recorder.region.close": "Stäng område",
+  "recorder.region.hide": "Dölj ram (F9)",
+  "recorder.region.stop-close": "Stoppa inspelning och stäng"
 }

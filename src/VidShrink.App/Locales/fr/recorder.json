@@ -196,5 +196,7 @@
   "recorder.region.title": "Éditeur de zone",
   "recorder.region.start": "Démarrer l'enregistrement",
   "recorder.region.settings": "Paramètres",
-  "recorder.region.close": "Fermer la zone"
+  "recorder.region.close": "Fermer la zone",
+  "recorder.region.hide": "Masquer le cadre (F9)",
+  "recorder.region.stop-close": "Arrêter l'enregistrement et fermer"
 }

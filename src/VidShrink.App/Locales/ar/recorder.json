@@ -196,5 +196,7 @@
   "recorder.region.title": "محرر المنطقة",
   "recorder.region.start": "بدء التسجيل",
   "recorder.region.settings": "الإعدادات",
-  "recorder.region.close": "إغلاق المنطقة"
+  "recorder.region.close": "إغلاق المنطقة",
+  "recorder.region.hide": "إخفاء الإطار (F9)",
+  "recorder.region.stop-close": "إيقاف التسجيل والإغلاق"
 }

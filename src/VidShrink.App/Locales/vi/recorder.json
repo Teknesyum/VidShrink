@@ -196,5 +196,7 @@
   "recorder.region.title": "Trình chỉnh vùng",
   "recorder.region.start": "Bắt đầu ghi",
   "recorder.region.settings": "Cài đặt",
-  "recorder.region.close": "Đóng vùng"
+  "recorder.region.close": "Đóng vùng",
+  "recorder.region.hide": "Ẩn khung (F9)",
+  "recorder.region.stop-close": "Dừng ghi và đóng"
 }
