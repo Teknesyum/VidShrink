@@ -1,0 +1,17 @@
+ic-dil=tr
+Süre: dogal 39 px, cizilen 38,7 px, hucre 266 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 266 px, satir 1, sigdi, balon tam
+Boyut: dogal 50 px, cizilen 49,2 px, hucre 266 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 266 px, satir 1, sigdi, balon tam
+Çözünürlük: dogal 97 px, cizilen 96,9 px, hucre 266 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 266 px, satir 1, sigdi, balon tam
+Kare Hızı: dogal 80 px, cizilen 79,7 px, hucre 266 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 266 px, satir 1, sigdi, balon tam
+Video Kodeği: dogal 116 px, cizilen 115,3 px, hucre 266 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 266 px, satir 1, sigdi, balon tam
+Ses: dogal 31 px, cizilen 30,7 px, hucre 266 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 266 px, satir 1, sigdi, balon tam
+Bit Hızı: dogal 66 px, cizilen 65,3 px, hucre 266 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 266 px, satir 1, sigdi, balon tam
+HDR Aralığı: dogal 101 px, cizilen 100,9 px, hucre 266 px, satir 1, sigdi, balon tam
+hevc (Main 10) · 3840x2160: dogal 229 px, cizilen 228,7 px, hucre 266 px, satir 1, sigdi, balon tam

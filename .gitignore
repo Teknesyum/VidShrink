@@ -22,3 +22,4 @@ trash/
 tools/libmpv/
 
 tmp/
+.claude/settings.local.json
