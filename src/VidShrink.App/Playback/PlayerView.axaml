@@ -212,6 +212,7 @@
                   <ColumnDefinition Width="*" MaxWidth="{StaticResource PlaybackSliderWidth}"/>
                   <ColumnDefinition Width="Auto"/>
                   <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="1" x:Name="BtnSeritSpeedReset" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.normalspeed}">
@@ -227,7 +228,12 @@
                 <Border Grid.Column="3" Theme="{StaticResource PlaybackValueChip}">
                   <TextBlock x:Name="TxtSeritSpeed" Theme="{StaticResource PlaybackValueText}"/>
                 </Border>
-                <Button Grid.Column="4" x:Name="BtnSeritFullScreen" Theme="{StaticResource PlaybackBarButton}"
+                <Button Grid.Column="4" x:Name="BtnSeritEdit" Theme="{StaticResource PlaybackBarButton}" IsVisible="False"
+                        auto:AutomationProperties.Name="{loc:Text player.menu.edit}">
+                  <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
+                        Data="{StaticResource IconEditor}" Fill="{Binding $parent[Button].Foreground}"/>
+                </Button>
+                <Button Grid.Column="5" x:Name="BtnSeritFullScreen" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.fullscreen}">
                   <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
                         Data="{StaticResource IconFullScreen}" Fill="{Binding $parent[Button].Foreground}"/>

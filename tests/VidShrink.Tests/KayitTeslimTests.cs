@@ -88,11 +88,20 @@ public sealed class KayitTeslimTests
     [Fact]
     public void KayitPaylasimiAyniKatmandanGeciyor()
     {
-        var code = ShareCode();
-        Assert.Contains("new ShareFlow(", code, System.StringComparison.Ordinal);
-        Assert.Contains("CoreShare.ShareProviderFactory.Create(", code, System.StringComparison.Ordinal);
-        Assert.Contains("flow.ShareAsync(target, path", code, System.StringComparison.Ordinal);
-        Assert.DoesNotContain("HttpRequestMessage", code, System.StringComparison.Ordinal);
+        var session = Read("src", "VidShrink.App", "Share", "ShareSession.cs");
+        Assert.Contains("new ShareFlow(", session, System.StringComparison.Ordinal);
+        Assert.Contains("CoreShare.ShareProviderFactory.Create(", session, System.StringComparison.Ordinal);
+        Assert.Contains("flow.ShareAsync(target, path", session, System.StringComparison.Ordinal);
+        Assert.DoesNotContain("HttpRequestMessage", session, System.StringComparison.Ordinal);
+
+        var recorder = ShareCode();
+        var editor = Read("src", "VidShrink.App", "Editing", "EditorView.Teslim.cs");
+        foreach (var code in new[] { recorder, editor })
+        {
+            Assert.Contains("new ShareSession(", code, System.StringComparison.Ordinal);
+            Assert.DoesNotContain("new ShareFlow(", code, System.StringComparison.Ordinal);
+            Assert.DoesNotContain("HttpRequestMessage", code, System.StringComparison.Ordinal);
+        }
     }
 
     /// <summary>

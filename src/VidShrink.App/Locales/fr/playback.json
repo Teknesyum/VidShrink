@@ -55,6 +55,7 @@
   "playback.zoom.out": "Réduire le zoom",
   "playback.zoom.in": "Augmenter le zoom",
   "player.menu.reveal": "Ouvrir l'emplacement du fichier",
+  "player.menu.edit": "Modifier",
   "player.menu.view": "Image",
   "player.menu.playback": "Lecture",
   "player.menu.loop": "Boucle et signets"

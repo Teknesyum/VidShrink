@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Im Ordner anzeigen",
   "recorder.output.to-shrink": "An Verkleinern senden",
   "recorder.output.to-player": "Im Player öffnen",
+  "recorder.output.to-editor": "Bearbeiten",
   "recorder.output.done": "Aufnahme beendet: {0} MB in {1} Segmenten",
   "recorder.output.partial": "Die Aufnahme wurde nicht sauber geschlossen. Die Datei ist gespeichert und lässt sich abspielen. Die letzten Sekunden fehlen möglicherweise.",
   "recorder.output.partial-broken": "Die Aufnahme wurde nicht sauber geschlossen. Die Datei lässt sich nicht abspielen. Wählen Sie für die nächste Aufnahme MKV.",

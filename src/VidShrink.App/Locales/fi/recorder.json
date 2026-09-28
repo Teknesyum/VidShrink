@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Näytä kansiossa",
   "recorder.output.to-shrink": "Lähetä pakkaukseen",
   "recorder.output.to-player": "Avaa soittimessa",
+  "recorder.output.to-editor": "Muokkaa",
   "recorder.output.done": "Tallennus valmis: {0} MB, {1} segmentissä",
   "recorder.output.partial": "Tallennus ei sulkeutunut siististi. Tiedosto on tallennettu ja se voidaan toistaa. Viimeiset sekunnit voivat puuttua.",
   "recorder.output.partial-broken": "Tallennus ei sulkeutunut siististi. Tiedostoa ei voi toistaa. Valitse seuraavaan tallennukseen MKV.",

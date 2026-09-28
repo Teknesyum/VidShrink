@@ -215,6 +215,13 @@
                   Content="{loc:Text recorder.output.to-player}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.to-player}"
                   Click="OnToPlayer"/>
+          <Button x:Name="BtnToEditor"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsEnabled="{Binding #BtnToPlayer.IsEnabled}"
+                  Content="{loc:Text recorder.output.to-editor}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.to-editor}"
+                  Click="OnToEditor"/>
           <Button x:Name="BtnToMp4"
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"

@@ -18,7 +18,9 @@
           <Button x:Name="BtnRedo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.redo}"/>
           <Button x:Name="BtnZoomOut" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-out}"/>
           <Button x:Name="BtnZoomIn" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-in}"/>
-          <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.export}" IsEnabled="False"/>
+          <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False"/>
+          <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save-as}" AutomationProperties.Name="{loc:Text editor.save-as}" IsEnabled="False"/>
+          <Button x:Name="BtnShare" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.share}" AutomationProperties.Name="{loc:Text main.action.share}" IsEnabled="False"/>
           <ComboBox x:Name="CmbExportMode" Width="{StaticResource FieldWidth}" AutomationProperties.Name="{loc:Text editor.export.mode}" SelectedIndex="1">
             <ComboBoxItem Content="{loc:Text editor.export.fast}"/>
             <ComboBoxItem Content="{loc:Text editor.export.smart}"/>
@@ -33,7 +35,14 @@
             <Button x:Name="BtnExportCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
             <Button x:Name="BtnExportReveal" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.show-in-folder}" IsVisible="False"/>
             <Button x:Name="BtnExportPlay" Theme="{StaticResource GhostButton}" Content="{loc:Text recorder.output.to-player}" IsVisible="False"/>
+            <Button x:Name="BtnShareCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel-upload}" IsVisible="False"/>
           </WrapPanel>
+          <ProgressBar x:Name="ShareProgress" Maximum="1" IsVisible="False"/>
+          <Grid x:Name="ShareLinkRow" IsVisible="False" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+            <TextBox Grid.Column="0" x:Name="TxtShareLink" IsReadOnly="True" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" x:Name="BtnShareCopy" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text main.action.copy}"/>
+          </Grid>
+          <TextBlock x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
         </StackPanel>
         <editing:EditorTimeline x:Name="Timeline" AutomationProperties.Name="{loc:Text editor.timeline}">
           <editing:EditorTimeline.ContextMenu>

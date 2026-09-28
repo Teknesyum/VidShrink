@@ -51,7 +51,8 @@ internal enum PlayerCommandKind
     MiniMode,
     OpenUrl,
     Stop,
-    GoToStart
+    GoToStart,
+    Edit
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)

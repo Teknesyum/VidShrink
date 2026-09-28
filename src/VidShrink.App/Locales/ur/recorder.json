@@ -49,6 +49,7 @@
   "recorder.output.reveal": "فولڈر میں دکھائیں",
   "recorder.output.to-shrink": "سکیڑیں کو بھیجیں",
   "recorder.output.to-player": "پلیئر میں کھولیں",
+  "recorder.output.to-editor": "ترمیم کریں",
   "recorder.output.done": "ریکارڈنگ مکمل ہوئی: {1} حصوں میں {0} MB",
   "recorder.output.partial": "ریکارڈنگ درست طریقے سے بند نہیں ہوئی۔ فائل محفوظ ہو گئی ہے اور چلائی جا سکتی ہے۔ آخری چند سیکنڈ غائب ہو سکتے ہیں۔",
   "recorder.output.partial-broken": "ریکارڈنگ درست طریقے سے بند نہیں ہوئی۔ فائل چلائی نہیں جا سکتی۔ اگلی ریکارڈنگ کے لیے MKV منتخب کریں۔",

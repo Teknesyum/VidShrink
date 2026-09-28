@@ -228,7 +228,7 @@ internal partial class PlayerView : UserControl
                 ShiftAudioDelay(command.Amount);
                 break;
             default:
-                if (!ApplyWindow(command) && !ApplyTools(command)) _trace.Add("none");
+                if (!ApplyWindow(command) && !ApplyTools(command) && !ApplyEdit(command)) _trace.Add("none");
                 break;
         }
 

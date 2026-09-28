@@ -17,7 +17,8 @@
   "editor.redo": "Redo",
   "editor.zoom-in": "Zoom in",
   "editor.zoom-out": "Zoom out",
-  "editor.export": "Export",
+  "editor.save": "Save",
+  "editor.save-as": "Save As…",
   "editor.timeline": "Timeline",
   "editor.playhead": "Playhead",
   "editor.export.mode": "Export mode",
@@ -29,5 +30,5 @@
   "editor.export.failed": "Export failed: {0}",
   "editor.export.reencoded": "Clips {0} change speed or play in reverse and are re-encoded.",
   "editor.export.fallback": "This source can't be cut without re-encoding, so the whole video is re-encoded.",
-  "editor.export.reverse-limit": "Reversed clip {0} is longer than the memory limit ({1}). Press Export again to continue."
+  "editor.export.reverse-limit": "Reversed clip {0} is longer than the memory limit ({1}). Press Save again to continue."
 }

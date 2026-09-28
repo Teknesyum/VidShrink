@@ -18,6 +18,7 @@ internal partial class PlayerView
         var flyout = new MenuFlyout();
         foreach (var action in Keymap.MenuTop) flyout.Items.Add(ActionRow(action));
         flyout.Items.Add(RevealRow());
+        AddEditRow(flyout);
         flyout.Items.Add(new Separator());
         flyout.Items.Add(AudioMenu());
         flyout.Items.Add(SubtitleMenu());

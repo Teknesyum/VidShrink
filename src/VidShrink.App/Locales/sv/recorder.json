@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Visa i mapp",
   "recorder.output.to-shrink": "Skicka till Krymp",
   "recorder.output.to-player": "Öppna i spelaren",
+  "recorder.output.to-editor": "Redigera",
   "recorder.output.done": "Inspelning klar: {0} MB i {1} segment",
   "recorder.output.partial": "Inspelningen stängdes inte korrekt. Filen är sparad och går att spela upp. De sista sekunderna kan saknas.",
   "recorder.output.partial-broken": "Inspelningen stängdes inte korrekt. Filen går inte att spela upp. Välj MKV till nästa inspelning.",

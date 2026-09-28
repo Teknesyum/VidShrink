@@ -49,6 +49,7 @@
   "recorder.output.reveal": "إظهار في المجلد",
   "recorder.output.to-shrink": "أرسل إلى التقليص",
   "recorder.output.to-player": "افتح في المشغّل",
+  "recorder.output.to-editor": "تحرير",
   "recorder.output.done": "انتهى التسجيل: {0} MB في {1} جزءًا",
   "recorder.output.partial": "لم يُغلق التسجيل بشكل سليم. تم حفظ الملف ويمكن تشغيله. قد تكون الثواني الأخيرة مفقودة.",
   "recorder.output.partial-broken": "لم يُغلق التسجيل بشكل سليم. لا يمكن تشغيل الملف. اختر MKV للتسجيل التالي.",

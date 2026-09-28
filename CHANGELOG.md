@@ -7,6 +7,13 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Player: an Edit command (right-click menu, bottom strip, key E) opens the current file in the editor tab at the playhead.
+- Recorder: the result panel has an Edit button that opens the finished recording in the editor.
+- Editor: Save writes `<name>-duzenlenmis.<ext>` next to the source in Smart mode without asking, numbering `-2`, `-3`… on collision; Save As… keeps the file picker. The status shows the path with Show in folder.
+- Editor: Share saves first when needed, then uploads through the same share layer as the recorder.
+
 ## [1.0.0] - 2026-09-28
 
 ### Changed

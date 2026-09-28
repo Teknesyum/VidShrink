@@ -190,6 +190,7 @@ public partial class MainWindow : Window
         Player.CurrentTabIndex = () => Tabs.SelectedIndex;
         Player.SelectTab = index => Tabs.SelectedIndex = index;
         Player.OpenSettings = () => Tabs.SelectedIndex = SettingsTabIndex;
+        Player.EditRequested = OpenInEditorAsync;
         Player.AppSettingsItems = PlayerSettingsItems;
         PlayerAdvancedPanel.Player = Player;
 

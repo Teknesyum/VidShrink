@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Zobrazit ve složce",
   "recorder.output.to-shrink": "Poslat ke zmenšení",
   "recorder.output.to-player": "Otevřít v přehrávači",
+  "recorder.output.to-editor": "Upravit",
   "recorder.output.done": "Nahrávání dokončeno: {0} MB v {1} segmentech",
   "recorder.output.partial": "Nahrávání se neuzavřelo čistě. Soubor je uložen a lze jej přehrát. Poslední sekundy mohou chybět.",
   "recorder.output.partial-broken": "Nahrávání se neuzavřelo čistě. Soubor nelze přehrát. Pro další nahrávání zvolte MKV.",

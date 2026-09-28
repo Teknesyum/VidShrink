@@ -49,6 +49,7 @@
   "recorder.output.reveal": "הצג בתיקייה",
   "recorder.output.to-shrink": "שלח לכיווץ",
   "recorder.output.to-player": "פתח בנגן",
+  "recorder.output.to-editor": "עריכה",
   "recorder.output.done": "ההקלטה הסתיימה: {0} MB ב-{1} מקטעים",
   "recorder.output.partial": "ההקלטה לא נסגרה כראוי. הקובץ נשמר וניתן לנגן אותו. ייתכן שהשניות האחרונות חסרות.",
   "recorder.output.partial-broken": "ההקלטה לא נסגרה כראוי. לא ניתן לנגן את הקובץ. בחר MKV להקלטה הבאה.",
