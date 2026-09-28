@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Näita kaustas",
   "recorder.output.to-shrink": "Saada tihendamisse",
   "recorder.output.to-player": "Ava mängijas",
+  "recorder.output.to-editor": "Muuda",
   "recorder.output.done": "Salvestus lõpetatud: {0} MB {1} segmendis",
   "recorder.output.partial": "Salvestus ei sulgunud korralikult. Fail on salvestatud ja seda saab esitada. Viimased sekundid võivad puududa.",
   "recorder.output.partial-broken": "Salvestus ei sulgunud korralikult. Faili ei saa esitada. Valige järgmiseks salvestuseks MKV.",

@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Hiện trong thư mục",
   "recorder.output.to-shrink": "Gửi tới Nén",
   "recorder.output.to-player": "Mở trong trình phát",
+  "recorder.output.to-editor": "Chỉnh sửa",
   "recorder.output.done": "Ghi hình hoàn tất: {0} MB trong {1} phân đoạn",
   "recorder.output.partial": "Bản ghi không được đóng đúng cách. Tệp đã được lưu và có thể phát. Vài giây cuối có thể bị thiếu.",
   "recorder.output.partial-broken": "Bản ghi không được đóng đúng cách. Không thể phát tệp này. Hãy chọn MKV cho lần ghi tiếp theo.",

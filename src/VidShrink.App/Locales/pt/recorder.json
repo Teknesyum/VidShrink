@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Mostrar na pasta",
   "recorder.output.to-shrink": "Enviar para Reduzir",
   "recorder.output.to-player": "Abrir no player",
+  "recorder.output.to-editor": "Editar",
   "recorder.output.done": "Gravação concluída: {0} MB em {1} segmentos",
   "recorder.output.partial": "A gravação não foi encerrada corretamente. O arquivo foi salvo e pode ser reproduzido. Os últimos segundos podem estar faltando.",
   "recorder.output.partial-broken": "A gravação não foi encerrada corretamente. O arquivo não pode ser reproduzido. Escolha MKV para a próxima gravação.",

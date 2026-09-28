@@ -17,7 +17,8 @@
   "editor.redo": "ازنو",
   "editor.zoom-in": "بزرگ‌نمایی",
   "editor.zoom-out": "کوچک‌نمایی",
-  "editor.export": "خروجی",
+  "editor.save": "ذخیره",
+  "editor.save-as": "ذخیره با نام…",
   "editor.timeline": "خط زمانی",
   "editor.playhead": "نشانگر پخش",
   "editor.export.mode": "حالت خروجی",
@@ -29,5 +30,5 @@
   "editor.export.failed": "خروجی گرفتن ناموفق بود: {0}",
   "editor.export.reencoded": "کلیپ‌های {0} سرعت را تغییر می‌دهند یا وارونه پخش می‌شوند و دوباره رمزگذاری می‌شوند.",
   "editor.export.fallback": "این منبع بدون رمزگذاری دوباره بریده نمی‌شود، پس کل ویدیو دوباره رمزگذاری می‌شود.",
-  "editor.export.reverse-limit": "کلیپ وارونه {0} از حد حافظه ({1}) بلندتر است. برای ادامه دوباره خروجی را بزنید."
+  "editor.export.reverse-limit": "کلیپ وارونه {0} از حد حافظه ({1}) بلندتر است. برای ادامه دوباره ذخیره را بزنید."
 }

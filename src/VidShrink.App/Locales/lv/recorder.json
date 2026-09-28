@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Rādīt mapē",
   "recorder.output.to-shrink": "Sūtīt saspiešanai",
   "recorder.output.to-player": "Atvērt atskaņotājā",
+  "recorder.output.to-editor": "Rediģēt",
   "recorder.output.done": "Ierakstīšana pabeigta: {0} MB, {1} daļās",
   "recorder.output.partial": "Ieraksts netika korekti aizvērts. Fails ir saglabāts, un to var atskaņot. Pēdējās sekundes var trūkt.",
   "recorder.output.partial-broken": "Ieraksts netika korekti aizvērts. Failu nevar atskaņot. Nākamajam ierakstam izvēlieties MKV.",

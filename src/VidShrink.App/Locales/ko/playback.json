@@ -55,6 +55,7 @@
   "playback.zoom.out": "축소",
   "playback.zoom.in": "확대",
   "player.menu.reveal": "파일 위치 열기",
+  "player.menu.edit": "편집",
   "player.menu.view": "화면",
   "player.menu.playback": "재생",
   "player.menu.loop": "반복 및 책갈피"

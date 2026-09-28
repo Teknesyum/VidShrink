@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Tunjuk dalam folder",
   "recorder.output.to-shrink": "Hantar ke Kecilkan",
   "recorder.output.to-player": "Buka dalam pemain",
+  "recorder.output.to-editor": "Sunting",
   "recorder.output.done": "Rakaman selesai: {0} MB dalam {1} segmen",
   "recorder.output.partial": "Rakaman tidak ditutup dengan betul. Fail telah disimpan dan boleh dimainkan. Beberapa saat terakhir mungkin hilang.",
   "recorder.output.partial-broken": "Rakaman tidak ditutup dengan betul. Fail tidak boleh dimainkan. Pilih MKV untuk rakaman seterusnya.",

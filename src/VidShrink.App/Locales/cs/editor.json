@@ -17,7 +17,8 @@
   "editor.redo": "Znovu",
   "editor.zoom-in": "Přiblížit",
   "editor.zoom-out": "Oddálit",
-  "editor.export": "Exportovat",
+  "editor.save": "Uložit",
+  "editor.save-as": "Uložit jako…",
   "editor.timeline": "Časová osa",
   "editor.playhead": "Přehrávací hlava",
   "editor.export.mode": "Režim exportu",
@@ -29,5 +30,5 @@
   "editor.export.failed": "Export se nezdařil: {0}",
   "editor.export.reencoded": "Klipy {0} mění rychlost nebo běží pozpátku a budou překódovány.",
   "editor.export.fallback": "Tento zdroj nelze stříhat bez překódování, proto se překóduje celé video.",
-  "editor.export.reverse-limit": "Obrácený klip {0} je delší než limit paměti ({1}). Pro pokračování znovu klikněte na Exportovat."
+  "editor.export.reverse-limit": "Obrácený klip {0} je delší než limit paměti ({1}). Pro pokračování znovu klikněte na Uložit."
 }

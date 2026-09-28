@@ -17,7 +17,8 @@
   "editor.redo": "Refazer",
   "editor.zoom-in": "Ampliar",
   "editor.zoom-out": "Reduzir",
-  "editor.export": "Exportar",
+  "editor.save": "Salvar",
+  "editor.save-as": "Salvar como…",
   "editor.timeline": "Linha do tempo",
   "editor.playhead": "Cursor de reprodução",
   "editor.export.mode": "Modo de exportação",
@@ -29,5 +30,5 @@
   "editor.export.failed": "Falha na exportação: {0}",
   "editor.export.reencoded": "Os clipes {0} mudam a velocidade ou tocam ao contrário e são recodificados.",
   "editor.export.fallback": "Esta fonte não pode ser cortada sem recodificação, por isso o vídeo inteiro é recodificado.",
-  "editor.export.reverse-limit": "O clipe invertido {0} excede o limite de memória ({1}). Clique em Exportar de novo para continuar."
+  "editor.export.reverse-limit": "O clipe invertido {0} excede o limite de memória ({1}). Clique em Salvar de novo para continuar."
 }

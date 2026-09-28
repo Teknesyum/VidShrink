@@ -17,7 +17,8 @@
   "editor.redo": "Pakartoti",
   "editor.zoom-in": "Priartinti",
   "editor.zoom-out": "Nutolinti",
-  "editor.export": "Eksportuoti",
+  "editor.save": "Išsaugoti",
+  "editor.save-as": "Išsaugoti kaip…",
   "editor.timeline": "Laiko juosta",
   "editor.playhead": "Atkūrimo žymeklis",
   "editor.export.mode": "Eksporto režimas",
@@ -29,5 +30,5 @@
   "editor.export.failed": "Eksportuoti nepavyko: {0}",
   "editor.export.reencoded": "Klipai {0} keičia greitį arba grojami atgal, todėl perkoduojami.",
   "editor.export.fallback": "Šio šaltinio negalima karpyti neperkodavus, todėl perkoduojamas visas vaizdo įrašas.",
-  "editor.export.reverse-limit": "Atbulinis klipas {0} viršija atminties ribą ({1}). Norėdami tęsti, dar kartą spustelėkite Eksportuoti."
+  "editor.export.reverse-limit": "Atbulinis klipas {0} viršija atminties ribą ({1}). Norėdami tęsti, dar kartą spustelėkite Išsaugoti."
 }

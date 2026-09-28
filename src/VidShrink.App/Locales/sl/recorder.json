@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Prikaži v mapi",
   "recorder.output.to-shrink": "Pošlji v Skrči",
   "recorder.output.to-player": "Odpri v predvajalniku",
+  "recorder.output.to-editor": "Uredi",
   "recorder.output.done": "Snemanje končano: {0} MB v {1} delih",
   "recorder.output.partial": "Snemanje se ni pravilno zaprlo. Datoteka je shranjena in jo je mogoče predvajati. Zadnje sekunde morda manjkajo.",
   "recorder.output.partial-broken": "Snemanje se ni pravilno zaprlo. Datoteke ni mogoče predvajati. Za naslednje snemanje izberite MKV.",

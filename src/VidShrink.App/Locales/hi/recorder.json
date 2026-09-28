@@ -49,6 +49,7 @@
   "recorder.output.reveal": "फ़ोल्डर में दिखाएं",
   "recorder.output.to-shrink": "सिकोड़ें में भेजें",
   "recorder.output.to-player": "प्लेयर में खोलें",
+  "recorder.output.to-editor": "संपादित करें",
   "recorder.output.done": "रिकॉर्डिंग समाप्त: {1} खंडों में {0} MB",
   "recorder.output.partial": "रिकॉर्डिंग ठीक से बंद नहीं हुई। फ़ाइल सहेजी गई है और चलाई जा सकती है। अंतिम कुछ सेकंड गायब हो सकते हैं।",
   "recorder.output.partial-broken": "रिकॉर्डिंग ठीक से बंद नहीं हुई। फ़ाइल चलाई नहीं जा सकती। अगली रिकॉर्डिंग के लिए MKV चुनें।",

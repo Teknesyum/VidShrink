@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Megjelenítés a mappában",
   "recorder.output.to-shrink": "Küldés a tömörítéshez",
   "recorder.output.to-player": "Megnyitás a lejátszóban",
+  "recorder.output.to-editor": "Szerkesztés",
   "recorder.output.done": "Felvétel kész: {0} MB {1} szegmensben",
   "recorder.output.partial": "A felvétel nem zárult le megfelelően. A fájl mentve van és lejátszható. Az utolsó másodpercek hiányozhatnak.",
   "recorder.output.partial-broken": "A felvétel nem zárult le megfelelően. A fájl nem játszható le. A következő felvételhez válassza az MKV-t.",

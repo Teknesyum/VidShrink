@@ -30,6 +30,7 @@ public partial class MainWindow
 
             _recorderPane.OpenInShrink = OpenInShrinkAsync;
             _recorderPane.OpenInPlayer = OpenInPlayerAsync;
+            _recorderPane.OpenInEditor = path => OpenInEditorAsync(path);
             _recorderPane.RecordingDelivered = FollowRecordingAsync;
             PageRecorder.Content = _recorderPane;
             return _recorderPane;

@@ -140,6 +140,7 @@ internal partial class PlayerView
         BtnSeritMute.Click += (_, _) => Apply(Keymap.Mute.ToCommand());
         BtnSeritFullScreen.Click += (_, _) => Apply(Keymap.Fullscreen.ToCommand());
         BtnSeritSpeedReset.Click += (_, _) => ToggleSeritSpeed();
+        BtnSeritEdit.Click += (_, _) => Apply(Keymap.Edit.ToCommand());
 
         SliderSeritSpeed.Minimum = Keymap.MinimumSpeed;
         SliderSeritSpeed.Maximum = Keymap.MaximumSpeed;
@@ -267,6 +268,8 @@ internal partial class PlayerView
         SeritLabel(BtnSeritMute, Strings.Get(Keymap.Mute.LabelKey), Keymap.FirstKeyRow(Keymap.Mute));
         SeritLabel(BtnSeritFullScreen, Strings.Get(Keymap.Fullscreen.LabelKey), Keymap.FirstKeyRow(Keymap.Fullscreen));
         SeritLabel(BtnSeritSpeedReset, Strings.Get(Keymap.NormalSpeed.LabelKey), Keymap.FirstKeyRow(Keymap.NormalSpeed));
+        SeritLabel(BtnSeritEdit, Strings.Get(Keymap.Edit.LabelKey), Keymap.FirstKeyRow(Keymap.Edit));
+        RefreshEditButton();
 
         TxtSeritTime.Text = ClockPair(_seek.Target, _seek.Duration);
         TxtSeritVolume.Text = _volume.ToString("0", CultureInfo.InvariantCulture);

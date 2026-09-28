@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Onyesha kwenye folda",
   "recorder.output.to-shrink": "Tuma kwenye Finyaza",
   "recorder.output.to-player": "Fungua kwenye kichezaji",
+  "recorder.output.to-editor": "Hariri",
   "recorder.output.done": "Kurekodi kumekamilika: {0} MB katika sehemu {1}",
   "recorder.output.partial": "Kurekodi hakukufungwa vizuri. Faili imehifadhiwa na inaweza kuchezwa. Sekunde za mwisho zinaweza kukosekana.",
   "recorder.output.partial-broken": "Kurekodi hakukufungwa vizuri. Faili haiwezi kuchezwa. Chagua MKV kwa kurekodi kunakofuata.",

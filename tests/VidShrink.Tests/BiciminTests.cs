@@ -1191,6 +1191,9 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-28, duzenleyici D4: on <c>editor.export.*</c> anahtarindan 7 kol 6 dilde (es pt sw: mode; ro: mode, failed;
     /// fr: failed; lt: fast): 2686 + 7 = 2693, en 251, tr 91.</para>
     /// <para>2026-09-28, D4 ile D5 birlikte: 2686 + 17 + 7 = 2710.</para>
+    /// <para>2026-09-28, duzenle/kaydet/paylas: <c>editor.export</c> ("Export…", kolun disinda) yerine <c>editor.save</c> ve
+    /// <c>editor.save-as</c>; yalniz en <c>editor.save-as</c> ("Save As…") kola giriyor, <c>player.menu.edit</c> ve
+    /// <c>recorder.output.to-editor</c> kolun disinda: 2710 + 1 = 2711, en 255, tr 91.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1216,8 +1219,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2710, toplam);
-        Assert.Equal(254, dilBasina["en"]);
+        Assert.Equal(2711, toplam);
+        Assert.Equal(255, dilBasina["en"]);
         Assert.Equal(91, dilBasina["tr"]);
     }
 
@@ -1387,6 +1390,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-28, duzenleyici D5: yedi <c>editor.*</c> anahtari (mekik, isaretci, tumunu sec, sona git, kisayol listesi): 1131 + 7 = 1138, 43 x 1138 = 48934.</para>
     /// <para>2026-09-28, duzenleyici D4: on <c>editor.export.*</c> anahtari: 1131 + 10 = 1141, 43 x 1141 = 49063.</para>
     /// <para>2026-09-28, D4 ile D5 birlikte: 1131 + 7 + 10 = 1148, 43 x 1148 = 49364.</para>
+    /// <para>2026-09-28, duzenle/kaydet/paylas: <c>editor.export</c> gitti, <c>editor.save</c>, <c>editor.save-as</c>,
+    /// <c>player.menu.edit</c> ve <c>recorder.output.to-editor</c> geldi: 1148 - 1 + 4 = 1151, 43 x 1151 = 49493.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1414,7 +1419,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(49364, gezilen);
+        Assert.Equal(49493, gezilen);
         Assert.Empty(kayip);
     }
 

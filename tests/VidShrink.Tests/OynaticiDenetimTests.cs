@@ -143,7 +143,8 @@ public sealed class KeymapTests
         [PlayerCommandKind.MiniMode] = "mini -> ",
         [PlayerCommandKind.OpenUrl] = "url -> ",
         [PlayerCommandKind.Stop] = "stop -> ",
-        [PlayerCommandKind.GoToStart] = "tostart"
+        [PlayerCommandKind.GoToStart] = "tostart",
+        [PlayerCommandKind.Edit] = "edit -> "
     };
 
     private static string Onek(PlayerAction action)
@@ -383,7 +384,7 @@ public sealed class KeymapTests
             foreach (var dil in new[] { "en", "tr" })
             {
                 Strings.Use(dil);
-                foreach (var ad in new[] { "BtnSeritPlay", "BtnSeritBack", "BtnSeritForward", "BtnSeritMute", "BtnSeritFullScreen" })
+                foreach (var ad in new[] { "BtnSeritPlay", "BtnSeritBack", "BtnSeritForward", "BtnSeritMute", "BtnSeritFullScreen", "BtnSeritEdit" })
                 {
                     var dugmeli = GirdiSurucu.Kur(out var w1);
                     dugmeli.Seek.Duration = 100000;

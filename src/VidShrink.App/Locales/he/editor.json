@@ -17,7 +17,8 @@
   "editor.redo": "ביצוע חוזר",
   "editor.zoom-in": "הגדלה",
   "editor.zoom-out": "הקטנה",
-  "editor.export": "ייצוא",
+  "editor.save": "שמירה",
+  "editor.save-as": "שמירה בשם…",
   "editor.timeline": "ציר זמן",
   "editor.playhead": "ראש ההפעלה",
   "editor.export.mode": "מצב ייצוא",
@@ -29,5 +30,5 @@
   "editor.export.failed": "הייצוא נכשל: {0}",
   "editor.export.reencoded": "הקליפים {0} משנים מהירות או מתנגנים לאחור ולכן מקודדים מחדש.",
   "editor.export.fallback": "אי אפשר לחתוך את המקור הזה בלי קידוד מחדש, ולכן כל הווידאו מקודד מחדש.",
-  "editor.export.reverse-limit": "הקליפ ההפוך {0} חורג ממגבלת הזיכרון ({1}). לחצו שוב על ייצוא כדי להמשיך."
+  "editor.export.reverse-limit": "הקליפ ההפוך {0} חורג ממגבלת הזיכרון ({1}). לחצו שוב על שמירה כדי להמשיך."
 }

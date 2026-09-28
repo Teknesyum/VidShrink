@@ -17,7 +17,8 @@
   "editor.redo": "ทำซ้ำ",
   "editor.zoom-in": "ขยาย",
   "editor.zoom-out": "ย่อ",
-  "editor.export": "ส่งออก",
+  "editor.save": "บันทึก",
+  "editor.save-as": "บันทึกเป็น…",
   "editor.timeline": "ไทม์ไลน์",
   "editor.playhead": "หัวเล่น",
   "editor.export.mode": "โหมดส่งออก",
@@ -29,5 +30,5 @@
   "editor.export.failed": "ส่งออกไม่สำเร็จ: {0}",
   "editor.export.reencoded": "คลิป {0} เปลี่ยนความเร็วหรือเล่นย้อนกลับ จึงถูกเข้ารหัสใหม่",
   "editor.export.fallback": "แหล่งนี้ตัดโดยไม่เข้ารหัสใหม่ไม่ได้ จึงเข้ารหัสวิดีโอใหม่ทั้งหมด",
-  "editor.export.reverse-limit": "คลิปย้อนกลับ {0} ยาวเกินขีดจำกัดหน่วยความจำ ({1}) กดส่งออกอีกครั้งเพื่อดำเนินการต่อ"
+  "editor.export.reverse-limit": "คลิปย้อนกลับ {0} ยาวเกินขีดจำกัดหน่วยความจำ ({1}) กดบันทึกอีกครั้งเพื่อดำเนินการต่อ"
 }

@@ -85,6 +85,7 @@ internal static class Keymap
     internal static readonly PlayerAction OpenMenu = new(PlayerCommandKind.ContextMenu, 0, "main.player.menu.open");
     internal static readonly PlayerAction LeaveFullscreen = new(PlayerCommandKind.LeaveFullscreen, 0, "main.player.menu.leavefullscreen");
     internal static readonly PlayerAction Zoom = new(PlayerCommandKind.Zoom, 1, "main.player.menu.zoom");
+    internal static readonly PlayerAction Edit = new(PlayerCommandKind.Edit, 0, "player.menu.edit");
 
     private static PlayerAction Seek(double seconds) => new(PlayerCommandKind.Seek, seconds, "main.player.menu.seek");
 
@@ -141,6 +142,7 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.T, KeyModifiers.Control), Topmost),
         new(PlayerInput.OnKey(Key.F1, KeyModifiers.Control), Info),
         new(PlayerInput.OnKey(Key.E, KeyModifiers.Control), Screenshot),
+        new(PlayerInput.OnKey(Key.E), Edit),
         new(PlayerInput.OnKey(Key.PageUp), PreviousFile),
         new(PlayerInput.OnKey(Key.PageDown), NextFile),
         new(PlayerInput.OnKey(Key.F, KeyModifiers.Control | KeyModifiers.Alt | KeyModifiers.Shift), Shuffle),

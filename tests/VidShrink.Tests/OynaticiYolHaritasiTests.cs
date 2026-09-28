@@ -51,8 +51,9 @@ internal sealed class YolMotoru : IPlaybackEngine
     private readonly int _w;
     private readonly int _h;
 
-    internal YolMotoru(byte parlaklik = 128, int w = 64, int h = 36)
+    internal YolMotoru(byte parlaklik = 128, int w = 64, int h = 36, double sure = 600)
     {
+        DurationSeconds = sure;
         _w = w;
         _h = h;
         _piksel = new byte[4 * w * h];
@@ -73,7 +74,7 @@ internal sealed class YolMotoru : IPlaybackEngine
 
     public bool IsOpen { get; private set; }
 
-    public double DurationSeconds => 600;
+    public double DurationSeconds { get; }
 
     public bool HasAudio => false;
 

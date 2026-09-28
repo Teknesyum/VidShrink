@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Vis i mappe",
   "recorder.output.to-shrink": "Send til Krymp",
   "recorder.output.to-player": "Åpne i spilleren",
+  "recorder.output.to-editor": "Rediger",
   "recorder.output.done": "Opptak ferdig: {0} MB i {1} segmenter",
   "recorder.output.partial": "Opptaket ble ikke lukket riktig. Filen er lagret og kan spilles av. De siste sekundene kan mangle.",
   "recorder.output.partial-broken": "Opptaket ble ikke lukket riktig. Filen kan ikke spilles av. Velg MKV til neste opptak.",
