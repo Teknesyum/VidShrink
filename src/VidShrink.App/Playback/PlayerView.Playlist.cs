@@ -179,12 +179,13 @@ internal partial class PlayerView
         var listWidth = PlaylistPanel.DesiredSize.Width * top.RenderScaling;
         var listHeight = PlaylistPanel.DesiredSize.Height * top.RenderScaling;
         var shadow = (this.TryFindResource("MenuShadowExtent", out var extent) && extent is double dip ? dip : 0) * top.RenderScaling;
+        var gap = (this.TryFindResource("PlaylistMenuGap", out var space) && space is double gapDip ? gapDip : 0) * top.RenderScaling;
         double? focusLeft = focused is { } target && TopLevel.GetTopLevel(target) is not null ? target.PointToScreen(new Point()).X : null;
         var anchorX = PlaylistPlacement.AnchorX(pointer?.X, focusLeft, menuOrigin.X);
         var probe = new PixelPoint((int)Math.Round(anchorX), menuOrigin.Y);
         var work = top.Screens?.ScreenFromPoint(probe)?.WorkingArea
                    ?? new PixelRect(menuOrigin.X - (int)listWidth, menuOrigin.Y, (int)(listWidth * 2 + menuWidth), (int)Math.Ceiling(listHeight + menuOrigin.Y));
-        var x = PlaylistPlacement.ListX(anchorX, menuOrigin.X, menuWidth, busyLeft, busyRight, listWidth, work.X, work.Right, shadow);
+        var x = PlaylistPlacement.ListX(anchorX, menuOrigin.X, menuWidth, busyLeft, busyRight, listWidth, work.X, work.Right, Math.Max(shadow, gap));
         var y = PlaylistPlacement.ListY(menuOrigin.Y, listHeight, work.Y, work.Bottom, shadow);
 
         var local = this.PointToClient(new PixelPoint((int)Math.Round(x), (int)Math.Round(y)));

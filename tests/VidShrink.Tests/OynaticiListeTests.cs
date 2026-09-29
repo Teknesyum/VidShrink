@@ -248,7 +248,9 @@ public sealed class OynaticiListeTests
                 var menu = Ekranda(Sunucu(view));
                 var liste = Ekranda(view.PlaylistFrame);
                 Assert.InRange(menu.X, imlec.X - 2, imlec.X + 2);
-                var golge = (double)view.FindResource("MenuShadowExtent")! * TopLevel.GetTopLevel(view)!.RenderScaling;
+                var olcek = TopLevel.GetTopLevel(view)!.RenderScaling;
+                var golge = Math.Max((double)view.FindResource("MenuShadowExtent")!, (double)view.FindResource("PlaylistMenuGap")!) * olcek;
+                Assert.True((double)view.FindResource("PlaylistMenuGap")! > (double)view.FindResource("MenuShadowExtent")!, "bosluk golgeden genis degil");
                 Assert.True(golge > 0, "golge belirteci yok");
                 Assert.InRange(liste.Right, imlec.X - golge - 2, imlec.X - golge + 2);
                 Assert.InRange(liste.Y, menu.Y - 2, menu.Y + 2);

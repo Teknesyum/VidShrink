@@ -314,6 +314,7 @@
   <StaticResource x:Key="PlaylistWidth" ResourceKey="FieldWidth"/>
   <StaticResource x:Key="PlaylistMaxHeight" ResourceKey="PlanPanelMaxHeight"/>
   <StaticResource x:Key="MenuShadowExtent" ResourceKey="Space2"/>
+  <StaticResource x:Key="PlaylistMenuGap" ResourceKey="Space4"/>
   <x:Double x:Key="DropZoneMinHeight">144</x:Double>
   <x:Double x:Key="DropIconSize">48</x:Double>
   <x:Double x:Key="PauseGlyphSize">96</x:Double>
