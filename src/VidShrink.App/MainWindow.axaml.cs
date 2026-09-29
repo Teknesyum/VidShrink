@@ -236,6 +236,8 @@ public partial class MainWindow : Window
         Tabs.SelectionChanged += (_, _) => DuzenleyiciSekmesiSecildi();
         Tabs.SelectionChanged += (_, _) => { if (Tabs.SelectedIndex != PlayerTabIndex) Player.RestoreWindowMin(); };
 
+        if (OperatingSystem.IsWindows()) WindowDecorationsTheme = SessizPencereBasligi.Tema;
+
         if (OperatingSystem.IsMacOS())
         {
             WindowDecorations = WindowDecorations.Full;
@@ -845,7 +847,6 @@ public partial class MainWindow : Window
     private void ApplyChromeMode()
     {
         ChromeZone.Hold(!ChromeHidesItself);
-        ChromeZone.Keep(!Player.IsPlaying);
     }
 
     private void OnChromePointerMoved(object? sender, PointerEventArgs e)

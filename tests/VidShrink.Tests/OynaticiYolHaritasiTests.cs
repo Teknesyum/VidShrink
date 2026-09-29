@@ -488,8 +488,8 @@ public sealed class OynaticiYolHaritasiTests
             Adim("5 bekleyen yok, gizli kaldi", () => saat.Ates(), false, false);
             Adim("6 duraklatildi, fare asagida", () => view.Apply(Keymap.PlayPause.ToCommand()), false, false);
             Adim("7 duraklatilmisken fare ust banda girdi", () => Hareket(window, view, new Point(600, 2)), true, false);
-            Adim("8 duraklatilmisken fare banttan cikti", () => Hareket(window, view, new Point(600, 500)), true, false);
-            Adim("9 oynatma surdu, bar aninda gizlendi", () => view.Apply(Keymap.PlayPause.ToCommand()), false, false);
+            Adim("8 duraklatilmisken fare banttan cikti, bar aninda gizlendi", () => Hareket(window, view, new Point(600, 500)), false, false);
+            Adim("9 oynatma surdu, gizli kaldi", () => view.Apply(Keymap.PlayPause.ToCommand()), false, false);
             Adim("10 bekleyen yok, gizli kaldi", () => saat.Ates(), false, false);
             Adim("11 ayarlar sekmesi", () => window.Tabs.SelectedItem = window.TabSettings, true, false);
             Adim("12 ayarlar sekmesinde fare asagida", () => { Hareket(window, view, new Point(600, 520)); saat.Ates(); }, true, false);
@@ -804,14 +804,14 @@ public sealed class OynaticiYolHaritasiTests
         => Math.Sqrt(Math.Pow(a.R - b.R, 2) + Math.Pow(a.G - b.G, 2) + Math.Pow(a.B - b.B, 2));
 
     [Fact]
-    public void P24AltBarinUstAnahattiMedyaUstundeDeSeciliyor()
+    public void P24AltBarinUstundeAnahatYok()
     {
         var body = new StringBuilder();
         try
         {
         AppHost.Run(() =>
         {
-            var sonuc = new Dictionary<string, ((byte R, byte G, byte B) Renk, double Ust)>();
+            var sonuc = new Dictionary<string, (double Yol, double Dogru)>();
 
             foreach (var (ad, parlaklik) in new (string, byte?)[] { ("medyasiz", null), ("koyu-medya", 40), ("orta-medya", 128), ("acik-medya", 230) })
             {
@@ -843,19 +843,15 @@ public sealed class OynaticiYolHaritasiTests
                 var icte = piksel[x, y + 6];
                 var ust = Fark(anahat, ustte);
                 var ic = Fark(anahat, icte);
-                sonuc[ad] = (anahat, ust);
+                sonuc[ad] = (ust + ic, Fark(ustte, icte));
                 body.AppendLine($"{ad}: serit y {y}, ustte {ustte}, anahat {anahat}, icte {icte}, anahat-ust fark {YolKanit.N(ust)}, anahat-ic fark {YolKanit.N(ic)}");
                 view.Close();
             window.Close();
             }
 
-            var taban = sonuc["medyasiz"];
             foreach (var (ad, olcu) in sonuc)
             {
-                if (ad == "medyasiz") continue;
-                var kayma = Fark(olcu.Renk, taban.Renk);
-                body.AppendLine($"{ad}: anahat rengi medyasizdan {YolKanit.N(kayma)} kaydi");
-                Assert.True(kayma <= 24 && olcu.Ust > 24, $"{ad}: anahat medyanin rengini aliyor (kayma {YolKanit.N(kayma)}, ustle fark {YolKanit.N(olcu.Ust)})");
+                Assert.True(olcu.Yol <= olcu.Dogru + 3, $"{ad}: seridin ust kenarinda cizgi var (ustten ice yol {YolKanit.N(olcu.Yol)}, dogru {YolKanit.N(olcu.Dogru)})");
             }
 
             return 0;

@@ -7,6 +7,14 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-09-29
+
+### Fixed
+
+- Player: in full screen, touching the top edge no longer opens a second grey "VidShrink" title band above the tab strip; only the app's own top panel appears.
+- Player: pausing no longer keeps the top panel on screen; it follows the pointer alone while the player tab is selected.
+- Player: the blue line along the top of the bottom control strip is gone; the strip now fades into the video.
+
 ## [1.2.0] - 2026-09-29
 
 ### Added
