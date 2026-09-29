@@ -63,9 +63,9 @@ internal partial class PlayerView
 
     internal IReadOnlyList<string> PlaylistFiles()
     {
-        if (_path is not { } path || !File.Exists(path)) return Array.Empty<string>();
+        if (_path is not { } path || _queue is null && !File.Exists(path)) return Array.Empty<string>();
         EnsureSettings();
-        return FolderNavigator.Order(FolderNavigator.Siblings(path), _settings.Shuffle, _shuffleSeed);
+        return NavigationList(path);
     }
 
     private void InitPlaylist()
@@ -193,7 +193,7 @@ internal partial class PlayerView
         _menu = null;
         menu?.Hide();
         ClosePlaylist();
-        if (!File.Exists(file)) return;
+        if (!File.Exists(file) && !IsAddress(file)) return;
         _trace.Add("playlist -> " + Path.GetFileName(file));
         _navigation = OpenQuietlyAsync(file);
     }

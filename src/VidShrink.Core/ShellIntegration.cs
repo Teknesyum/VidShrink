@@ -28,6 +28,15 @@ public static class ShellIntegration
     public static bool IsAudio(string path)
         => AudioExtensions.Contains(Path.GetExtension(path).TrimStart('.'), StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Oynatıcının kuyruğa açtığı çalma listesi uzantıları (<see cref="PlaylistFile"/>).</summary>
+    public static IReadOnlyList<string> PlaylistExtensions { get; } = new[]
+    {
+        "m3u", "m3u8", "pls", "wpl", "zpl", "asx", "wax", "wvx", "wmx"
+    };
+
+    /// <summary>Yalnız oynatıcının açtığı yol: ses ya da çalma listesi. Küçültme sekmesine gitmez.</summary>
+    public static bool IsPlayerOnly(string path) => IsAudio(path) || PlaylistFile.IsPlaylist(path);
+
     /// <summary>
     /// "VidShrink ile Küçült" alt menüsünün hızlı hedefleri, megabayt cinsinden. Kurulum
     /// betiği kendi dizisinden yazar; iki liste ölçüde karşılaştırılır.

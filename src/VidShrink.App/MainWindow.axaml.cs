@@ -3398,7 +3398,7 @@ public partial class MainWindow : Window
         try { await Player.OpenAsync(path); }
         catch (Exception ex) { ReportPlayerOpenFailure(ex); }
         AcilisIzi.Yaz("motor-acildi");
-        if (!ShellIntegration.IsAudio(path)) await LoadAsync(path);
+        if (!ShellIntegration.IsPlayerOnly(path)) await LoadAsync(path);
         AcilisIzi.Yaz("kucultme-yuklendi");
         _ = CizimiOlcAsync(true);
     }

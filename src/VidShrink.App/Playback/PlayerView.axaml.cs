@@ -621,7 +621,7 @@ internal partial class PlayerView : UserControl
     {
         try
         {
-            await OpenCoreAsync(path, ct).ConfigureAwait(true);
+            await OpenCoreAsync(ResolveQueue(path), ct).ConfigureAwait(true);
         }
         catch (PlaybackEngineUnavailableException ex) when (ex.MessageKey is { } key)
         {

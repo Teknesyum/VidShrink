@@ -26,7 +26,8 @@ Toplam: ~140k token, ~15 dosya, 4 dalga. Her dalga ayrı commit, dokunulan testl
 Kütüphane (albüm/sanatçı dizini), görselleştirici, CD kopyalama/yazma, odak dışı SMTC
 entegrasyonu. WMP'nin bunları vardı; her biri kendi başına büyük iş.
 
-## Doğrulanmamış
+## Karar
 
-mpv'nin .wpl/.asx'i kendi okuyup okumadığı; 3. dalgada önce denenecek, okuyorsa ayrıştırıcı
-yazılmaz.
+Karar (3. dalga): hiçbir liste mpv'ye verilmez; hepsini `Core/PlaylistFile` ayrıştırır, kuyruk
+uygulamada (`PlayerView.Kuyruk`). mpv'nin kendi listesi `_path`'i ve ses kartını güncellemiyordu,
+yani mpv .wpl'yi okusa bile arayüz ilk girdide kalırdı.

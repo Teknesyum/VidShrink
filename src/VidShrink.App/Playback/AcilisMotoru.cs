@@ -1,3 +1,4 @@
+using VidShrink.Core;
 using VidShrink.Player;
 
 namespace VidShrink.App.Playback;
@@ -20,6 +21,13 @@ internal static class AcilisMotoru
 
     internal static void Isit(string yol, Func<IPlaybackEngine> uret)
     {
+        if (PlaylistFile.IsPlaylist(yol))
+        {
+            try { yol = PlaylistFile.ReadPlayable(yol).FirstOrDefault() ?? ""; }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return; }
+            if (yol.Length == 0) return;
+        }
+
         lock (Kilit)
         {
             if (_gorev is not null) return;
