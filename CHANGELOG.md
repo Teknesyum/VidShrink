@@ -15,6 +15,10 @@ ship as part of it.
 
 - Recorder: the replay buffer left the top strip and the first card; it now lives in its own Advanced card (length, start and save), and stays visible while the buffer runs.
 
+### Fixed
+
+- Player: the playlist beside the right-click menu moves clear of an open submenu, anchors to the focused control when the menu opens from the keyboard, and keeps the menu shadow's width from the menu and the screen edge.
+
 ## [1.1.0] - 2026-09-29
 
 ### Added
