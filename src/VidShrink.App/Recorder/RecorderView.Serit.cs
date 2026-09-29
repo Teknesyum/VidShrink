@@ -311,6 +311,8 @@ internal partial class RecorderView
         var counting = CountingDown;
 
         BtnStart.IsVisible = _session is null && !counting && !ReplayRunning;
+        BtnAutoWizard.IsVisible = BtnStart.IsVisible;
+        if (!BtnAutoWizard.IsVisible) CloseWizard();
         SyncReplayButtons(_session is null && !counting);
         BtnCountdownCancel.IsVisible = counting;
         BtnPause.IsVisible = running;

@@ -82,6 +82,13 @@ internal partial class RecorderView
         AutomationProperties.SetName(BtnReplaySave, save);
         BtnReplaySave.IsEnabled = !_replayBusy;
         CmbReplaySeconds.IsEnabled = !running;
+        ApplyReplayVisibility();
+    }
+
+    private void ApplyReplayVisibility()
+    {
+        PanelReplay.IsVisible = AdvancedMode || _replay is not null;
+        KartSutunlari();
     }
 
     private async void OnReplayToggle(object? sender, RoutedEventArgs e)

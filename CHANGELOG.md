@@ -7,6 +7,14 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Recorder: an Auto setup button in the strip asks up to three questions with one-click square answers (what you record, which sound goes in, where the recording goes), then applies the answers on top of the machine measurement and shows a one-line summary. Answers are remembered; next time a "Same settings as last time" shortcut skips the questions.
+
+### Changed
+
+- Recorder: the replay buffer left the top strip and the first card; it now lives in its own Advanced card (length, start and save), and stays visible while the buffer runs.
+
 ## [1.1.0] - 2026-09-29
 
 ### Added

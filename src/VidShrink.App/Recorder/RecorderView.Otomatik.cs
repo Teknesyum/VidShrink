@@ -67,6 +67,7 @@ internal partial class RecorderView
         var advanced = AdvancedMode;
         PanelOptions.IsVisible = advanced;
         PanelAdvanced.IsVisible = advanced;
+        ApplyReplayVisibility();
         KartYerlesimi();
     }
 
@@ -131,7 +132,14 @@ internal partial class RecorderView
 
     private RecorderAutoChoice? _guess;
 
-    internal RecorderAutoChoice PlannedChoice => _autoChoice ?? (_guess ??= RecorderAutoPlan.Candidates(Machine())[0]);
+    internal RecorderAutoChoice PlannedChoice => _autoChoice ?? (_guess ??= AutoCandidates()[0]);
+
+    private IReadOnlyList<RecorderAutoChoice> AutoCandidates()
+    {
+        var machine = Machine();
+        var candidates = RecorderAutoPlan.Candidates(machine);
+        return WizardAnswers is { } answers ? RecorderWizard.Shape(candidates, answers, machine) : candidates;
+    }
 
     /// <summary>Ölçümün kendisi; ölçüm koşmadıysa <c>null</c>.</summary>
     internal RecorderAutoResult? AutoResult => _autoResult;
@@ -247,7 +255,7 @@ internal partial class RecorderView
     {
         if (_session is not null) return;
 
-        var candidates = RecorderAutoPlan.Candidates(Machine());
+        var candidates = AutoCandidates();
         _autoChoice = candidates[0];
         _autoResult = null;
 

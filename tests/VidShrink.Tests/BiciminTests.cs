@@ -1196,6 +1196,7 @@ public sealed class BaslikKapsamiTests
     /// <c>recorder.output.to-editor</c> kolun disinda: 2710 + 1 = 2711, en 255, tr 91.</para>
     /// <para>2026-09-28, bolge dali ile birlikte: recorder.region.hide ve recorder.region.stop-close, 2711 + 5 = 2716, en 256, tr 92.</para>
     /// <para>2026-09-29, arayuz turu: yeni <c>recorder.advanced.encoder-title</c> fr, pt ve sw cevirilerinde islev sozcugu tasiyor (de, do, ya): 2716 + 3 = 2719, en 256, tr 92.</para>
+    /// <para>2026-09-29, kaydedici sihirbazi: 21 yeni <c>recorder.wizard.*</c> ve <c>recorder.replay.seconds</c> anahtari: 2719 + 25 = 2744, en 256 + 5 = 261, tr 92 + 3 = 95.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1221,9 +1222,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2719, toplam);
-        Assert.Equal(256, dilBasina["en"]);
-        Assert.Equal(92, dilBasina["tr"]);
+        Assert.Equal(2744, toplam);
+        Assert.Equal(261, dilBasina["en"]);
+        Assert.Equal(95, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1397,6 +1398,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-28, bolge dali ile birlikte: 1151 + 2 = 1153, 43 x 1153 = 49579.</para>
     /// <para>2026-09-29, arayuz turu: <c>recorder.advanced.encoder-title</c>: 1153 + 1 = 1154, 43 x 1154 = 49622.</para>
     /// <para>2026-09-29, Tümünü Ata: <c>settings.default-app.all</c> ve <c>settings.default-app.all-copied</c>: 1154 + 2 = 1156, 43 x 1156 = 49708.</para>
+    /// <para>2026-09-29, kaydedici sihirbazi: 21 yeni anahtar: 1156 + 21 = 1177, 43 x 1177 = 50611.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1424,7 +1426,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(49708, gezilen);
+        Assert.Equal(50611, gezilen);
         Assert.Empty(kayip);
     }
 

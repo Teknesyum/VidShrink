@@ -37,6 +37,12 @@ internal sealed class RecorderSettings
 
     internal bool AdvancedMode { get; set; }
 
+    internal RecorderWizardContent? WizardContent { get; set; }
+
+    internal RecorderWizardAudio? WizardAudio { get; set; }
+
+    internal RecorderWizardDestination? WizardDestination { get; set; }
+
     internal static readonly int[] CountdownChoices = { 0, 3, 5, 10 };
 
     internal int CountdownSeconds { get; set; }
@@ -252,6 +258,9 @@ internal sealed class RecorderSettings
             if ((int?)root["webcamWidth"] is { } camWidth && RecorderArguments.WebcamWidths.Contains(camWidth)) settings.WebcamWidth = camWidth;
             if (Enum.TryParse<WebcamCorner>((string?)root["webcamCorner"], true, out var corner) && Enum.IsDefined(corner)) settings.WebcamCorner = corner;
             if (Enum.TryParse<WebcamBackground>((string?)root["webcamBackground"], true, out var background) && Enum.IsDefined(background)) settings.WebcamBackground = background;
+            if (Enum.TryParse<RecorderWizardContent>((string?)root["wizardContent"], true, out var wizardContent) && Enum.IsDefined(wizardContent)) settings.WizardContent = wizardContent;
+            if (Enum.TryParse<RecorderWizardAudio>((string?)root["wizardAudio"], true, out var wizardAudio) && Enum.IsDefined(wizardAudio)) settings.WizardAudio = wizardAudio;
+            if (Enum.TryParse<RecorderWizardDestination>((string?)root["wizardDestination"], true, out var wizardDestination) && Enum.IsDefined(wizardDestination)) settings.WizardDestination = wizardDestination;
             if (Enum.TryParse<RecorderContainer>((string?)root["containerFormat"], true, out var format) && Enum.IsDefined(format)) settings.Container = format;
             else if (Enum.TryParse<RecorderContainer>((string?)root["containerChoice"], true, out var choice) && Enum.IsDefined(choice))
                 settings.Container = choice == RecorderContainer.Mkv ? RecorderContainer.Mp4 : choice;
@@ -347,6 +356,12 @@ internal sealed class RecorderSettings
                 writer.WriteNumber("webcamWidth", WebcamWidth);
                 writer.WriteString("webcamCorner", WebcamCorner.ToString());
                 writer.WriteString("webcamBackground", WebcamBackground.ToString());
+                if (WizardContent is { } wizardContent) writer.WriteString("wizardContent", wizardContent.ToString());
+                else writer.WriteNull("wizardContent");
+                if (WizardAudio is { } wizardAudio) writer.WriteString("wizardAudio", wizardAudio.ToString());
+                else writer.WriteNull("wizardAudio");
+                if (WizardDestination is { } wizardDestination) writer.WriteString("wizardDestination", wizardDestination.ToString());
+                else writer.WriteNull("wizardDestination");
                 writer.WriteString("containerFormat", Container.ToString());
                 writer.WriteNumber("screenIndex", ScreenIndex);
                 writer.WriteNumber("scaleWidth", ScaleWidth);

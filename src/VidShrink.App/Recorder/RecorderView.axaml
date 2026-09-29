@@ -102,22 +102,14 @@
                 Click="OnCountdownCancel"/>
 
         <Button Grid.Column="4"
-                x:Name="BtnReplay"
+                x:Name="BtnAutoWizard"
                 Height="{StaticResource RecorderButtonSize}"
+                Padding="{StaticResource ButtonPaddingSm}"
                 Theme="{StaticResource GhostButton}"
-                Content="{loc:Text recorder.replay.start}"
-                ToolTip.Tip="{loc:Text recorder.replay.hint}"
-                IsVisible="False"
-                auto:AutomationProperties.Name="{loc:Text recorder.replay.start}"
-                Click="OnReplayToggle"/>
-
-        <Button Grid.Column="5"
-                x:Name="BtnReplaySave"
-                Height="{StaticResource RecorderButtonSize}"
-                Theme="{StaticResource GhostButton}"
-                IsVisible="False"
-                auto:AutomationProperties.Name="{loc:Text recorder.replay.save}"
-                Click="OnReplaySave"/>
+                Content="{loc:Text recorder.wizard.open}"
+                ToolTip.Tip="{loc:Text recorder.wizard.open-hint}"
+                auto:AutomationProperties.Name="{loc:Text recorder.wizard.open}"
+                Click="OnWizardOpen"/>
 
         <Button Grid.Column="4"
                 x:Name="BtnPause"
@@ -314,6 +306,79 @@
                TextWrapping="Wrap"
                IsVisible="False"/>
 
+    <TextBlock x:Name="TxtWizardSummary"
+               Theme="{StaticResource Hint}"
+               TextWrapping="Wrap"
+               IsVisible="False"/>
+
+    <Border x:Name="PanelWizard"
+            Theme="{StaticResource Panel}"
+            HorizontalAlignment="Left"
+            IsVisible="False"
+            auto:AutomationProperties.Name="{loc:Text recorder.wizard.open}">
+      <StackPanel Spacing="{StaticResource SpaceMd}">
+        <TextBlock x:Name="TxtWizardStep" Theme="{StaticResource Hint}"/>
+        <TextBlock x:Name="TxtWizardQuestion" Theme="{StaticResource H2}" TextWrapping="Wrap"/>
+
+        <WrapPanel x:Name="RowWizardOptions"
+                   ItemSpacing="{StaticResource SpaceMd}"
+                   LineSpacing="{StaticResource SpaceMd}">
+          <Button x:Name="BtnWizardOpt0"
+                  Theme="{StaticResource GhostButton}"
+                  Width="{StaticResource RecorderWizardOptionSize}"
+                  Height="{StaticResource RecorderWizardOptionSize}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  Tag="0"
+                  Click="OnWizardOption">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+          </Button>
+          <Button x:Name="BtnWizardOpt1"
+                  Theme="{StaticResource GhostButton}"
+                  Width="{StaticResource RecorderWizardOptionSize}"
+                  Height="{StaticResource RecorderWizardOptionSize}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  Tag="1"
+                  Click="OnWizardOption">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+          </Button>
+          <Button x:Name="BtnWizardOpt2"
+                  Theme="{StaticResource GhostButton}"
+                  Width="{StaticResource RecorderWizardOptionSize}"
+                  Height="{StaticResource RecorderWizardOptionSize}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  Tag="2"
+                  Click="OnWizardOption">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+          </Button>
+          <Button x:Name="BtnWizardOpt3"
+                  Theme="{StaticResource GhostButton}"
+                  Width="{StaticResource RecorderWizardOptionSize}"
+                  Height="{StaticResource RecorderWizardOptionSize}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  Tag="3"
+                  Click="OnWizardOption">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+          </Button>
+        </WrapPanel>
+
+        <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+          <Button x:Name="BtnWizardSame"
+                  Theme="{StaticResource PrimaryButton}"
+                  IsVisible="False"
+                  Click="OnWizardSame"/>
+          <Button x:Name="BtnWizardCancel"
+                  Theme="{StaticResource GhostButton}"
+                  Content="{loc:Text recorder.wizard.cancel}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.wizard.cancel}"
+                  Click="OnWizardCancel"/>
+        </WrapPanel>
+      </StackPanel>
+    </Border>
+
 
     <izi:KartDuvari x:Name="RecorderCards"
                     MinColumnWidth="{StaticResource FieldWidth}"
@@ -427,14 +492,6 @@
                           HorizontalAlignment="Stretch"
                           ToolTip.Tip="{loc:Text recorder.countdown.hint}"
                           auto:AutomationProperties.Name="{loc:Text recorder.countdown.title}"/>
-              </StackPanel>
-
-              <StackPanel>
-                <TextBlock Text="{loc:Text recorder.replay.label}" Theme="{StaticResource Label}"/>
-                <ComboBox x:Name="CmbReplaySeconds"
-                          HorizontalAlignment="Stretch"
-                          ToolTip.Tip="{loc:Text recorder.replay.hint}"
-                          auto:AutomationProperties.Name="{loc:Text recorder.replay.label}"/>
               </StackPanel>
             </izi:SutunIzgara>
           </StackPanel>
@@ -661,6 +718,38 @@
           </StackPanel>
         </Border>
 
+        <Border x:Name="PanelReplay" Theme="{StaticResource Panel}">
+          <StackPanel Spacing="{StaticResource SpaceMd}">
+            <TextBlock Text="{loc:Text recorder.replay.label}" Theme="{StaticResource H2}"/>
+
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.replay.seconds}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+              <ComboBox x:Name="CmbReplaySeconds"
+                        HorizontalAlignment="Stretch"
+                        ToolTip.Tip="{loc:Text recorder.replay.hint}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.replay.seconds}"/>
+            </StackPanel>
+
+            <WrapPanel>
+              <Button x:Name="BtnReplay"
+                      MinHeight="{StaticResource RecorderButtonSize}"
+                      Margin="{StaticResource WrapItemMargin}"
+                      Theme="{StaticResource GhostButton}"
+                      Content="{loc:Text recorder.replay.start}"
+                      ToolTip.Tip="{loc:Text recorder.replay.hint}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.replay.start}"
+                      Click="OnReplayToggle"/>
+
+              <Button x:Name="BtnReplaySave"
+                      MinHeight="{StaticResource RecorderButtonSize}"
+                      Margin="{StaticResource WrapItemMargin}"
+                      Theme="{StaticResource GhostButton}"
+                      IsVisible="False"
+                      auto:AutomationProperties.Name="{loc:Text recorder.replay.save}"
+                      Click="OnReplaySave"/>
+            </WrapPanel>
+          </StackPanel>
+        </Border>
       </StackPanel>
 
       <StackPanel x:Name="CardsExtra" Spacing="{StaticResource SpaceMd}">
