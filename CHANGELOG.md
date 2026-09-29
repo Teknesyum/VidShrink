@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-29
+
 ### Added
 
 - Player: an Edit command (right-click menu, bottom strip, key E) opens the current file in the editor tab at the playhead.
@@ -14,6 +16,16 @@ ship as part of it.
 - Editor: Save writes `<name>-duzenlenmis.<ext>` next to the source in Smart mode without asking, numbering `-2`, `-3`… on collision; Save As… keeps the file picker. The status shows the path with Show in folder.
 - Editor: Share saves first when needed, then uploads through the same share layer as the recorder.
 - Recorder region editor: the edge snaps to windows and screen edges while you drag (hold Alt to turn it off); the toolbar has large square icon buttons, including snapshot (works before and during recording), hide frame (F9 or the tray icon brings it back), pause/resume/stop while recording, and a close button that stops the recording. The edge is dashed while you set it up and solid while recording.
+
+### Changed
+
+- Interface pass: Shrink, Convert, Recorder and Settings fit a 1920x1080 screen at 100% scale without scrolling (Settings was five screens tall); cards flow into columns instead of leaving empty panels.
+- Recorder: the page is regrouped into compact cards, the encoder details sit under their own heading, and English option labels use Title Case.
+- Editor: Save, Save As… and Share say why they are disabled before a file is loaded.
+
+### Fixed
+
+- Contrast: success text in Everforest and OneDark and warning text in Everforest now clear 7:1 on every surface they appear on.
 
 ## [1.0.0] - 2026-09-28
 
