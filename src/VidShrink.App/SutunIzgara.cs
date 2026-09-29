@@ -23,9 +23,18 @@ public sealed class SutunIzgara : Panel
     public static readonly StyledProperty<double> RowSpacingProperty =
         AvaloniaProperty.Register<SutunIzgara, double>(nameof(RowSpacing));
 
+    public static readonly StyledProperty<bool> FillProperty =
+        AvaloniaProperty.Register<SutunIzgara, bool>(nameof(Fill), true);
+
     static SutunIzgara()
     {
-        AffectsMeasure<SutunIzgara>(MaxColumnsProperty, ColumnSpacingProperty, RowSpacingProperty);
+        AffectsMeasure<SutunIzgara>(MaxColumnsProperty, ColumnSpacingProperty, RowSpacingProperty, FillProperty);
+    }
+
+    public bool Fill
+    {
+        get => GetValue(FillProperty);
+        set => SetValue(FillProperty, value);
     }
 
     public int MaxColumns
@@ -94,6 +103,7 @@ public sealed class SutunIzgara : Panel
             var toplam = genislik.Sum() + (c - 1) * ColumnSpacing;
             if (double.IsInfinity(yer)) return (c, genislik);
             if (toplam > yer) continue;
+            if (!Fill) return (c, genislik);
             var pay = (yer - toplam) / c;
             return (c, genislik.Select(g => g + pay).ToArray());
         }
@@ -123,7 +133,7 @@ public sealed class SutunIzgara : Panel
         }
         yukseklik += (satirlar - 1) * RowSpacing;
 
-        var genislik = double.IsInfinity(availableSize.Width)
+        var genislik = double.IsInfinity(availableSize.Width) || (!Fill && Columns > 1)
             ? _genislikler.Sum() + (Columns - 1) * ColumnSpacing
             : availableSize.Width;
         return new Size(genislik, yukseklik);
@@ -135,7 +145,7 @@ public sealed class SutunIzgara : Panel
         if (hucreler.Count == 0) return finalSize;
 
         var toplam = _genislikler.Sum() + (Columns - 1) * ColumnSpacing;
-        var pay = _genislikler.Length == Columns ? (finalSize.Width - toplam) / Columns : 0;
+        var pay = Fill && _genislikler.Length == Columns ? (finalSize.Width - toplam) / Columns : 0;
         var y = 0.0;
         for (var ilk = 0; ilk < hucreler.Count; ilk += Columns)
         {

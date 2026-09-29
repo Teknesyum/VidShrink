@@ -62,7 +62,13 @@ internal partial class RecorderView
         var advanced = AdvancedMode;
         PanelOptions.IsVisible = advanced;
         PanelAdvanced.IsVisible = advanced;
-        Grid.SetColumnSpan(PanelTarget, advanced ? 1 : 2);
+        var hedef = advanced ? ColLeft : ColRight;
+        if (PanelWebcam.Parent is Panel eski && !ReferenceEquals(eski, hedef))
+        {
+            eski.Children.Remove(PanelWebcam);
+            hedef.Children.Insert(advanced ? hedef.Children.IndexOf(PanelReplay) : 0, PanelWebcam);
+        }
+        ApplyReplayVisibility();
     }
 
     /// <summary>Kullanıcının verdiği hedeften çıkan bütçe; hedef yoksa hükmü <c>NotRequested</c>.</summary>
@@ -93,7 +99,14 @@ internal partial class RecorderView
 
     private RecorderAutoChoice? _guess;
 
-    internal RecorderAutoChoice PlannedChoice => _autoChoice ?? (_guess ??= RecorderAutoPlan.Candidates(Machine())[0]);
+    internal RecorderAutoChoice PlannedChoice => _autoChoice ?? (_guess ??= AutoCandidates()[0]);
+
+    private IReadOnlyList<RecorderAutoChoice> AutoCandidates()
+    {
+        var machine = Machine();
+        var candidates = RecorderAutoPlan.Candidates(machine);
+        return WizardAnswers is { } answers ? RecorderWizard.Shape(candidates, answers, machine) : candidates;
+    }
 
     /// <summary>Ölçümün kendisi; ölçüm koşmadıysa <c>null</c>.</summary>
     internal RecorderAutoResult? AutoResult => _autoResult;
@@ -208,7 +221,7 @@ internal partial class RecorderView
     {
         if (_session is not null) return;
 
-        var candidates = RecorderAutoPlan.Candidates(Machine());
+        var candidates = AutoCandidates();
         _autoChoice = candidates[0];
         _autoResult = null;
 

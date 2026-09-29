@@ -151,7 +151,6 @@ public sealed class GorselDenetimYapiTests
         {
             var panel = Ad<Border>(w, "PanelOptions");
             panel.IsVisible = true;
-            Grid.SetColumnSpan(Ad<Border>(w, "PanelTarget"), 1);
             Yerlestir(w, Dar);
             var sag = Yeri(panel, w).Right - panel.Padding.Right - panel.BorderThickness.Right;
             return new[] { "RadAuto", "RadManual" }.Select(ad =>
@@ -532,6 +531,11 @@ public sealed class GorselDenetimYapiTests
             .Select(s => (ad: s.Item2, bosluk: Pencere(Dar, w =>
             {
                 var kaydirici = Ad<ScrollViewer>(w, s.Item2);
+                if (s.Item1 == 4)
+                {
+                    Ad<RadioButton>(w, "RadAdvanced").IsChecked = true;
+                    Yerlestir(w, Dar);
+                }
                 var icerik = (Control)kaydirici.Content!;
                 var cubuk = kaydirici.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ScrollBar>()
                     .Single(c => c.Orientation == Orientation.Vertical && ReferenceEquals(c.TemplatedParent, kaydirici));

@@ -6,22 +6,14 @@
              xmlns:share="using:VidShrink.App.Share"
              x:Class="VidShrink.App.Recorder.RecorderView">
 
-  <StackPanel Spacing="{StaticResource SpaceLg}">
+  <StackPanel x:Name="RecorderRoot"
+              Spacing="{StaticResource SpaceLg}"
+              MaxWidth="{StaticResource RecorderContentMaxWidth}"
+              auto:AutomationProperties.Name="{loc:Text recorder.pane.title}">
 
-    <TextBlock Text="{loc:Text recorder.pane.title}" Theme="{StaticResource H2}"/>
-
-    <StackPanel x:Name="RowLevel" Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
-      <RadioButton x:Name="RadSimple"
-                   GroupName="RecorderLevel"
-                   Content="{loc:Text recorder.level.simple}"
-                   ToolTip.Tip="{loc:Text recorder.level.simple-hint}"
-                   auto:AutomationProperties.Name="{loc:Text recorder.level.simple}"/>
-      <RadioButton x:Name="RadAdvanced"
-                   GroupName="RecorderLevel"
-                   Content="{loc:Text recorder.level.advanced}"
-                   ToolTip.Tip="{loc:Text recorder.level.advanced-hint}"
-                   auto:AutomationProperties.Name="{loc:Text recorder.level.advanced}"/>
-    </StackPanel>
+    <WrapPanel x:Name="RowTop"
+               ItemSpacing="{StaticResource SpaceLg}"
+               LineSpacing="{StaticResource SpaceMd}">
 
     <!--
       Denetim şeridi. Şeridin okuduğu iki sayı geçen süre ve kare sayısıdır; yazılan
@@ -36,140 +28,160 @@
             Theme="{StaticResource Panel}"
             Padding="{StaticResource RecorderStripPadding}"
             auto:AutomationProperties.Name="{loc:Text recorder.strip.title}">
-      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto,Auto"
-            ColumnSpacing="{StaticResource RecorderStripGap}">
+      <StackPanel Spacing="{StaticResource SpaceSm}">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto,Auto"
+              ColumnSpacing="{StaticResource RecorderStripGap}">
 
-        <Ellipse Grid.Column="0"
-                 x:Name="LiveDot"
-                 Width="{StaticResource RecorderDotSize}"
-                 Height="{StaticResource RecorderDotSize}"
-                 Fill="{StaticResource NeonEmber}"
-                 IsVisible="False"
-                 VerticalAlignment="Center"/>
-
-        <TextBlock Grid.Column="1"
-                   x:Name="TxtState"
-                   Theme="{StaticResource MonoValue}"
+          <Ellipse Grid.Column="0"
+                   x:Name="LiveDot"
+                   Width="{StaticResource RecorderDotSize}"
+                   Height="{StaticResource RecorderDotSize}"
+                   Fill="{StaticResource NeonEmber}"
+                   IsVisible="False"
                    VerticalAlignment="Center"/>
 
-        <izi:SutunIzgara Grid.Column="2"
-              x:Name="StripStats"
-              Margin="{StaticResource RecorderStatsInset}"
-              MaxColumns="3"
-              ColumnSpacing="{StaticResource SpaceXl}"
-              RowSpacing="{StaticResource SpaceSm}"
-              VerticalAlignment="Center"
-              ToolTip.Tip="{loc:Text recorder.strip.size-hint}">
+          <TextBlock Grid.Column="1"
+                     x:Name="TxtState"
+                     Theme="{StaticResource MonoValue}"
+                     VerticalAlignment="Center"/>
 
-          <StackPanel>
-            <TextBlock Text="{loc:Text recorder.strip.elapsed}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
-            <TextBlock x:Name="TxtElapsed" Theme="{StaticResource PlanFactValue}"/>
-          </StackPanel>
+          <izi:SutunIzgara Grid.Column="2"
+                x:Name="StripStats"
+                Margin="{StaticResource RecorderStatsInset}"
+                MaxColumns="3"
+                Fill="False"
+                ColumnSpacing="{StaticResource SpaceXl}"
+                RowSpacing="{StaticResource SpaceSm}"
+                VerticalAlignment="Center"
+                ToolTip.Tip="{loc:Text recorder.strip.size-hint}">
 
-          <StackPanel>
-            <TextBlock Text="{loc:Text recorder.strip.frames}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
-            <TextBlock x:Name="TxtFrames" Theme="{StaticResource PlanFactValue}"/>
-          </StackPanel>
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.strip.elapsed}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
+              <TextBlock x:Name="TxtElapsed" Theme="{StaticResource PlanFactValue}"/>
+            </StackPanel>
 
-          <StackPanel>
-            <TextBlock Text="{loc:Text recorder.strip.dropped}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
-            <TextBlock x:Name="TxtDropped" Theme="{StaticResource PlanFactValue}"/>
-          </StackPanel>
-        </izi:SutunIzgara>
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.strip.frames}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
+              <TextBlock x:Name="TxtFrames" Theme="{StaticResource PlanFactValue}"/>
+            </StackPanel>
 
-        <Button Grid.Column="3"
-                x:Name="BtnStart"
-                Height="{StaticResource RecorderButtonSize}"
-                Padding="{StaticResource ButtonPaddingSm}"
-                Theme="{StaticResource PrimaryButton}"
-                Content="{loc:Text recorder.strip.start}"
-                auto:AutomationProperties.Name="{loc:Text recorder.strip.start}"
-                Click="OnStart"/>
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.strip.dropped}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
+              <TextBlock x:Name="TxtDropped" Theme="{StaticResource PlanFactValue}"/>
+            </StackPanel>
+          </izi:SutunIzgara>
 
-        <Button Grid.Column="3"
-                x:Name="BtnCountdownCancel"
-                Height="{StaticResource RecorderButtonSize}"
-                Theme="{StaticResource GhostButton}"
-                Content="{loc:Text recorder.countdown.cancel}"
-                IsVisible="False"
-                auto:AutomationProperties.Name="{loc:Text recorder.countdown.cancel}"
-                Click="OnCountdownCancel"/>
+          <Button Grid.Column="3"
+                  x:Name="BtnStart"
+                  Height="{StaticResource RecorderButtonSize}"
+                  Padding="{StaticResource ButtonPaddingSm}"
+                  Theme="{StaticResource PrimaryButton}"
+                  Content="{loc:Text recorder.strip.start}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.strip.start}"
+                  Click="OnStart"/>
 
-        <Button Grid.Column="4"
-                x:Name="BtnReplay"
-                Height="{StaticResource RecorderButtonSize}"
-                Theme="{StaticResource GhostButton}"
-                Content="{loc:Text recorder.replay.start}"
-                ToolTip.Tip="{loc:Text recorder.replay.hint}"
-                IsVisible="False"
-                auto:AutomationProperties.Name="{loc:Text recorder.replay.start}"
-                Click="OnReplayToggle"/>
+          <Button Grid.Column="3"
+                  x:Name="BtnCountdownCancel"
+                  Height="{StaticResource RecorderButtonSize}"
+                  Theme="{StaticResource GhostButton}"
+                  Content="{loc:Text recorder.countdown.cancel}"
+                  IsVisible="False"
+                  auto:AutomationProperties.Name="{loc:Text recorder.countdown.cancel}"
+                  Click="OnCountdownCancel"/>
 
-        <Button Grid.Column="5"
-                x:Name="BtnReplaySave"
-                Height="{StaticResource RecorderButtonSize}"
-                Theme="{StaticResource GhostButton}"
-                IsVisible="False"
-                auto:AutomationProperties.Name="{loc:Text recorder.replay.save}"
-                Click="OnReplaySave"/>
+          <Button Grid.Column="4"
+                  x:Name="BtnAutoWizard"
+                  Height="{StaticResource RecorderButtonSize}"
+                  Padding="{StaticResource ButtonPaddingSm}"
+                  Theme="{StaticResource GhostButton}"
+                  Content="{loc:Text recorder.wizard.open}"
+                  ToolTip.Tip="{loc:Text recorder.wizard.open-hint}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.wizard.open}"
+                  Click="OnWizardOpen"/>
 
-        <Button Grid.Column="4"
-                x:Name="BtnPause"
-                Height="{StaticResource RecorderButtonSize}"
-                Theme="{StaticResource GhostButton}"
-                Content="{loc:Text recorder.strip.pause}"
-                IsVisible="False"
-                auto:AutomationProperties.Name="{loc:Text recorder.strip.pause}"
-                Click="OnPause"/>
+          <Button Grid.Column="4"
+                  x:Name="BtnPause"
+                  Height="{StaticResource RecorderButtonSize}"
+                  Theme="{StaticResource GhostButton}"
+                  Content="{loc:Text recorder.strip.pause}"
+                  IsVisible="False"
+                  auto:AutomationProperties.Name="{loc:Text recorder.strip.pause}"
+                  Click="OnPause"/>
 
-        <Button Grid.Column="5"
-                x:Name="BtnResume"
-                Height="{StaticResource RecorderButtonSize}"
-                Theme="{StaticResource GhostButton}"
-                Content="{loc:Text recorder.strip.resume}"
-                IsVisible="False"
-                auto:AutomationProperties.Name="{loc:Text recorder.strip.resume}"
-                Click="OnResume"/>
+          <Button Grid.Column="5"
+                  x:Name="BtnResume"
+                  Height="{StaticResource RecorderButtonSize}"
+                  Theme="{StaticResource GhostButton}"
+                  Content="{loc:Text recorder.strip.resume}"
+                  IsVisible="False"
+                  auto:AutomationProperties.Name="{loc:Text recorder.strip.resume}"
+                  Click="OnResume"/>
 
-        <Button Grid.Column="6"
-                x:Name="BtnSnapshot"
-                Height="{StaticResource RecorderButtonSize}"
-                Theme="{StaticResource GhostButton}"
-                Content="{loc:Text recorder.strip.snapshot}"
-                IsVisible="False"
-                auto:AutomationProperties.Name="{loc:Text recorder.strip.snapshot}"
-                Click="OnSnapshot"/>
+          <Button Grid.Column="6"
+                  x:Name="BtnSnapshot"
+                  Height="{StaticResource RecorderButtonSize}"
+                  Theme="{StaticResource GhostButton}"
+                  Content="{loc:Text recorder.strip.snapshot}"
+                  IsVisible="False"
+                  auto:AutomationProperties.Name="{loc:Text recorder.strip.snapshot}"
+                  Click="OnSnapshot"/>
 
-        <Button Grid.Column="7"
-                x:Name="BtnStop"
-                Height="{StaticResource RecorderButtonSize}"
-                Padding="{StaticResource ButtonPaddingSm}"
-                Theme="{StaticResource PrimaryButton}"
-                Content="{loc:Text recorder.strip.stop}"
-                IsVisible="False"
-                auto:AutomationProperties.Name="{loc:Text recorder.strip.stop}"
-                Click="OnStop"/>
+          <Button Grid.Column="7"
+                  x:Name="BtnStop"
+                  Height="{StaticResource RecorderButtonSize}"
+                  Padding="{StaticResource ButtonPaddingSm}"
+                  Theme="{StaticResource PrimaryButton}"
+                  Content="{loc:Text recorder.strip.stop}"
+                  IsVisible="False"
+                  auto:AutomationProperties.Name="{loc:Text recorder.strip.stop}"
+                  Click="OnStop"/>
 
-        <!-- Geçiş ayar kutusunda değil şeritte: bulunamayan bir kip hiç kullanılmıyor. -->
-        <Button Grid.Column="8"
-                x:Name="BtnMini"
-                Height="{StaticResource RecorderButtonSize}"
-                Padding="{StaticResource ButtonPaddingSm}"
-                Theme="{StaticResource AccentButton}"
-                auto:AutomationProperties.Name="{loc:Text recorder.mini.offer}"
-                ToolTip.Tip="{loc:Text recorder.mini.shrink}">
-          <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-            <Path Width="{StaticResource IconSizeLg}"
-                  Height="{StaticResource IconSizeLg}"
-                  Stretch="Uniform"
-                  VerticalAlignment="Center"
-                  Data="{StaticResource IconRestore}"
-                  Fill="{StaticResource NeonBlue}"/>
-            <TextBlock Text="{loc:Text recorder.mini.offer}" VerticalAlignment="Center"/>
-          </StackPanel>
-        </Button>
-      </Grid>
+          <!-- Geçiş ayar kutusunda değil şeritte: bulunamayan bir kip hiç kullanılmıyor. -->
+          <Button Grid.Column="8"
+                  x:Name="BtnMini"
+                  Height="{StaticResource RecorderButtonSize}"
+                  Padding="{StaticResource ButtonPaddingSm}"
+                  Theme="{StaticResource AccentButton}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.mini.offer}"
+                  ToolTip.Tip="{loc:Text recorder.mini.shrink}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <Path Width="{StaticResource IconSizeLg}"
+                    Height="{StaticResource IconSizeLg}"
+                    Stretch="Uniform"
+                    VerticalAlignment="Center"
+                    Data="{StaticResource IconRestore}"
+                    Fill="{StaticResource NeonBlue}"/>
+              <TextBlock Text="{loc:Text recorder.mini.offer}" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+        </Grid>
+        <TextBlock x:Name="TxtNotice" Classes="reveal"
+                   Theme="{StaticResource StatusSuccess}"
+                   TextWrapping="Wrap"
+                   IsVisible="False"/>
+        <TextBlock x:Name="TxtError" Classes="reveal"
+                   Theme="{StaticResource StatusError}"
+                   TextWrapping="Wrap"
+                   IsVisible="False"/>
+      </StackPanel>
     </Border>
+
+    <StackPanel x:Name="RowLevel"
+                Orientation="Horizontal"
+                Spacing="{StaticResource SpaceLg}"
+                VerticalAlignment="Center">
+      <RadioButton x:Name="RadSimple"
+                   GroupName="RecorderLevel"
+                   Content="{loc:Text recorder.level.simple}"
+                   ToolTip.Tip="{loc:Text recorder.level.simple-hint}"
+                   auto:AutomationProperties.Name="{loc:Text recorder.level.simple}"/>
+      <RadioButton x:Name="RadAdvanced"
+                   GroupName="RecorderLevel"
+                   Content="{loc:Text recorder.level.advanced}"
+                   ToolTip.Tip="{loc:Text recorder.level.advanced-hint}"
+                   auto:AutomationProperties.Name="{loc:Text recorder.level.advanced}"/>
+    </StackPanel>
+    </WrapPanel>
 
     <Image x:Name="ImgPreview"
            Width="{StaticResource RecorderPreviewWidth}"
@@ -291,53 +303,110 @@
       </StackPanel>
     </Border>
 
-    <TextBlock x:Name="TxtError" Classes="reveal"
-               Theme="{StaticResource StatusError}"
+    <TextBlock x:Name="TxtWizardSummary"
+               Theme="{StaticResource Hint}"
                TextWrapping="Wrap"
                IsVisible="False"/>
 
-    <TextBlock x:Name="TxtNotice" Classes="reveal"
-               Theme="{StaticResource StatusSuccess}"
-               TextWrapping="Wrap"
-               IsVisible="False"/>
+    <Border x:Name="PanelWizard"
+            Theme="{StaticResource Panel}"
+            HorizontalAlignment="Left"
+            IsVisible="False"
+            auto:AutomationProperties.Name="{loc:Text recorder.wizard.open}">
+      <StackPanel Spacing="{StaticResource SpaceMd}">
+        <TextBlock x:Name="TxtWizardStep" Theme="{StaticResource Hint}"/>
+        <TextBlock x:Name="TxtWizardQuestion" Theme="{StaticResource H2}" TextWrapping="Wrap"/>
 
-    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceMd}">
+        <WrapPanel x:Name="RowWizardOptions"
+                   ItemSpacing="{StaticResource SpaceMd}"
+                   LineSpacing="{StaticResource SpaceMd}">
+          <Button x:Name="BtnWizardOpt0"
+                  Theme="{StaticResource GhostButton}"
+                  Width="{StaticResource RecorderWizardOptionSize}"
+                  Height="{StaticResource RecorderWizardOptionSize}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  Tag="0"
+                  Click="OnWizardOption">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+          </Button>
+          <Button x:Name="BtnWizardOpt1"
+                  Theme="{StaticResource GhostButton}"
+                  Width="{StaticResource RecorderWizardOptionSize}"
+                  Height="{StaticResource RecorderWizardOptionSize}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  Tag="1"
+                  Click="OnWizardOption">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+          </Button>
+          <Button x:Name="BtnWizardOpt2"
+                  Theme="{StaticResource GhostButton}"
+                  Width="{StaticResource RecorderWizardOptionSize}"
+                  Height="{StaticResource RecorderWizardOptionSize}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  Tag="2"
+                  Click="OnWizardOption">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+          </Button>
+          <Button x:Name="BtnWizardOpt3"
+                  Theme="{StaticResource GhostButton}"
+                  Width="{StaticResource RecorderWizardOptionSize}"
+                  Height="{StaticResource RecorderWizardOptionSize}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  Tag="3"
+                  Click="OnWizardOption">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+          </Button>
+        </WrapPanel>
 
-      <Border x:Name="PanelTarget" Grid.Column="0" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
+        <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+          <Button x:Name="BtnWizardSame"
+                  Theme="{StaticResource PrimaryButton}"
+                  IsVisible="False"
+                  Click="OnWizardSame"/>
+          <Button x:Name="BtnWizardCancel"
+                  Theme="{StaticResource GhostButton}"
+                  Content="{loc:Text recorder.wizard.cancel}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.wizard.cancel}"
+                  Click="OnWizardCancel"/>
+        </WrapPanel>
+      </StackPanel>
+    </Border>
+
+    <Grid x:Name="Body" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceMd}">
+
+      <StackPanel x:Name="ColLeft" Grid.Column="0" Spacing="{StaticResource SpaceMd}">
+
+      <Border x:Name="PanelTarget" Theme="{StaticResource Panel}">
         <StackPanel Spacing="{StaticResource SpaceMd}">
           <TextBlock Text="{loc:Text recorder.target.title}" Theme="{StaticResource H2}"/>
 
-          <WrapPanel ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceMd}">
-            <StackPanel Width="{StaticResource FieldWidth}">
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceMd}">
+            <StackPanel Grid.Column="0">
               <TextBlock Text="{loc:Text recorder.target.what}" Theme="{StaticResource Label}"/>
               <ComboBox x:Name="CmbTarget"
                         HorizontalAlignment="Stretch"
                         auto:AutomationProperties.Name="{loc:Text recorder.target.what}"/>
             </StackPanel>
 
-            <StackPanel x:Name="RowScreen" Width="{StaticResource FieldWidth}" IsVisible="False">
-              <TextBlock Text="{loc:Text recorder.target.screen-pick}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbScreen"
-                        HorizontalAlignment="Stretch"
-                        auto:AutomationProperties.Name="{loc:Text recorder.target.screen-pick}"/>
-            </StackPanel>
-
-            <StackPanel Width="{StaticResource FieldWidth}">
+            <StackPanel Grid.Column="1">
               <TextBlock Text="{loc:Text recorder.countdown.title}" Theme="{StaticResource Label}"/>
               <ComboBox x:Name="CmbCountdown"
                         HorizontalAlignment="Stretch"
                         ToolTip.Tip="{loc:Text recorder.countdown.hint}"
                         auto:AutomationProperties.Name="{loc:Text recorder.countdown.title}"/>
             </StackPanel>
+          </Grid>
 
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.replay.label}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbReplaySeconds"
-                        HorizontalAlignment="Stretch"
-                        ToolTip.Tip="{loc:Text recorder.replay.hint}"
-                        auto:AutomationProperties.Name="{loc:Text recorder.replay.label}"/>
-            </StackPanel>
-          </WrapPanel>
+          <StackPanel x:Name="RowScreen" IsVisible="False">
+            <TextBlock Text="{loc:Text recorder.target.screen-pick}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbScreen"
+                      HorizontalAlignment="Stretch"
+                      auto:AutomationProperties.Name="{loc:Text recorder.target.screen-pick}"/>
+          </StackPanel>
 
           <StackPanel x:Name="RowWindow" IsVisible="False">
             <TextBlock Text="{loc:Text recorder.target.window-pick}" Theme="{StaticResource Label}"/>
@@ -404,11 +473,119 @@
             </StackPanel>
           </WrapPanel>
 
-          <TextBlock Text="{loc:Text recorder.target.region-hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+          <TextBlock Text="{loc:Text recorder.target.region-hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding #RowRegion.IsVisible}"/>
         </StackPanel>
       </Border>
 
-      <Border x:Name="PanelOptions" Grid.Column="1" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
+      <!-- Ses girdisi. Liste ffmpeg'in kendisinden geliyor; cihazsız makinede kutular
+           yalnız "sessiz" öğesiyle açılıyor ve kayıt sessiz sürüyor. -->
+      <Border x:Name="PanelAudio" Theme="{StaticResource Panel}">
+        <StackPanel Spacing="{StaticResource SpaceMd}">
+          <TextBlock Text="{loc:Text recorder.audio.title}" Theme="{StaticResource H2}"/>
+
+          <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="{StaticResource SpaceSm}" ToolTip.Tip="{loc:Text recorder.audio.hint}">
+            <StackPanel Grid.Column="0">
+              <TextBlock Text="{loc:Text recorder.audio.microphone}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbMicrophone"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.audio.microphone}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+              <TextBlock Text="{loc:Text recorder.audio.system}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbSystemAudio"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.audio.system}"/>
+            </StackPanel>
+
+            <Button Grid.Column="2"
+                    x:Name="BtnAudioRefresh"
+                    Theme="{StaticResource GhostButton}"
+                    VerticalAlignment="Bottom"
+                    Content="{loc:Text recorder.audio.refresh}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.audio.refresh}"
+                    Click="OnAudioRefresh"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <Border x:Name="PanelWebcam" Theme="{StaticResource Panel}">
+        <StackPanel Spacing="{StaticResource SpaceMd}">
+          <TextBlock Text="{loc:Text recorder.webcam.title}" Theme="{StaticResource H2}"/>
+
+          <izi:SutunIzgara MaxColumns="4" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.webcam.device}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbWebcam"
+                        ToolTip.Tip="{loc:Text recorder.webcam.hint}"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.webcam.device}"/>
+            </StackPanel>
+
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.webcam.size}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbWebcamSize"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.webcam.size}"/>
+            </StackPanel>
+
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.webcam.corner}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbWebcamCorner"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.webcam.corner}"/>
+            </StackPanel>
+
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.webcam.background.label}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbWebcamBackground"
+                        ToolTip.Tip="{loc:Text recorder.webcam.background.hint}"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.webcam.background.label}"/>
+            </StackPanel>
+          </izi:SutunIzgara>
+        </StackPanel>
+      </Border>
+
+      <Border x:Name="PanelReplay" Theme="{StaticResource Panel}">
+        <StackPanel Spacing="{StaticResource SpaceMd}">
+          <TextBlock Text="{loc:Text recorder.replay.label}" Theme="{StaticResource H2}"/>
+
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+            <StackPanel Grid.Column="0">
+              <TextBlock Text="{loc:Text recorder.replay.seconds}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbReplaySeconds"
+                        HorizontalAlignment="Stretch"
+                        ToolTip.Tip="{loc:Text recorder.replay.hint}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.replay.seconds}"/>
+            </StackPanel>
+
+            <Button Grid.Column="1"
+                    x:Name="BtnReplay"
+                    Height="{StaticResource RecorderButtonSize}"
+                    VerticalAlignment="Bottom"
+                    Theme="{StaticResource GhostButton}"
+                    Content="{loc:Text recorder.replay.start}"
+                    ToolTip.Tip="{loc:Text recorder.replay.hint}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.replay.start}"
+                    Click="OnReplayToggle"/>
+
+            <Button Grid.Column="2"
+                    x:Name="BtnReplaySave"
+                    Height="{StaticResource RecorderButtonSize}"
+                    VerticalAlignment="Bottom"
+                    Theme="{StaticResource GhostButton}"
+                    IsVisible="False"
+                    auto:AutomationProperties.Name="{loc:Text recorder.replay.save}"
+                    Click="OnReplaySave"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+      </StackPanel>
+
+      <StackPanel x:Name="ColRight" Grid.Column="1" Spacing="{StaticResource SpaceMd}">
+
+      <Border x:Name="PanelOptions" Theme="{StaticResource Panel}">
         <StackPanel Spacing="{StaticResource SpaceMd}">
           <TextBlock Text="{loc:Text recorder.option.title}" Theme="{StaticResource H2}"/>
 
@@ -416,7 +593,7 @@
             <TextBlock x:Name="TxtAutoSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
           </StackPanel>
 
-          <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">
+          <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
             <StackPanel Grid.Column="0">
               <TextBlock Text="{loc:Text recorder.budget.seconds}" Theme="{StaticResource Label}"/>
               <TextBox x:Name="TxtTargetSeconds"
@@ -431,16 +608,16 @@
                        ToolTip.Tip="{loc:Text recorder.budget.hint}"
                        auto:AutomationProperties.Name="{loc:Text recorder.budget.megabytes}"/>
             </StackPanel>
+            <Button Grid.Column="2"
+                    x:Name="BtnAutoMeasure"
+                    Theme="{StaticResource GhostButton}"
+                    VerticalAlignment="Bottom"
+                    Content="{loc:Text recorder.auto.measure}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.auto.measure}"
+                    Click="OnAutoMeasure"/>
           </Grid>
 
           <TextBlock x:Name="TxtBudgetNote" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
-
-          <Button x:Name="BtnAutoMeasure"
-                  Theme="{StaticResource GhostButton}"
-                  HorizontalAlignment="Left"
-                  Content="{loc:Text recorder.auto.measure}"
-                  auto:AutomationProperties.Name="{loc:Text recorder.auto.measure}"
-                  Click="OnAutoMeasure"/>
 
           <Grid x:Name="RecorderEncodingChoice" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
             <RadioButton x:Name="RadAuto"
@@ -470,27 +647,28 @@
               </StackPanel>
             </Grid>
 
-            <StackPanel>
-              <TextBlock Text="{loc:Text recorder.option.codec}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbCodec"
-                        HorizontalAlignment="Stretch"
-                        auto:AutomationProperties.Name="{loc:Text recorder.option.codec}"/>
-            </StackPanel>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">
+              <StackPanel Grid.Column="0">
+                <TextBlock Text="{loc:Text recorder.option.codec}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbCodec"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.option.codec}"/>
+              </StackPanel>
 
-            <StackPanel>
-              <TextBlock Text="{loc:Text recorder.option.preset}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbPreset"
-                        HorizontalAlignment="Stretch"
-                        auto:AutomationProperties.Name="{loc:Text recorder.option.preset}"/>
-            </StackPanel>
+              <StackPanel Grid.Column="1">
+                <TextBlock Text="{loc:Text recorder.option.preset}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbPreset"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.option.preset}"/>
+              </StackPanel>
+            </Grid>
           </StackPanel>
 
-          <CheckBox x:Name="ChkCursor"
-                    Theme="{StaticResource CheckStyle}"
-                    Content="{loc:Text recorder.option.cursor}"
-                    auto:AutomationProperties.Name="{loc:Text recorder.option.cursor}"/>
-
           <WrapPanel ItemSpacing="{StaticResource SpaceMd}">
+            <CheckBox x:Name="ChkCursor"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.option.cursor}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.option.cursor}"/>
             <CheckBox x:Name="ChkShowClicks"
                       Theme="{StaticResource CheckStyle}"
                       Content="{loc:Text recorder.option.show-clicks}"
@@ -535,184 +713,113 @@
                     auto:AutomationProperties.Name="{loc:Text recorder.output.open-when-done}"/>
         </StackPanel>
       </Border>
+
+      <Border x:Name="PanelAdvanced" Theme="{StaticResource Panel}">
+        <StackPanel Spacing="{StaticResource SpaceMd}">
+          <TextBlock Text="{loc:Text recorder.advanced.title}" Theme="{StaticResource H2}"/>
+
+          <izi:SutunIzgara MaxColumns="4" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.advanced.container}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbContainer" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.container}"/>
+            </StackPanel>
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.advanced.max-duration}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtMaxDuration" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.max-duration}"/>
+            </StackPanel>
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.advanced.split-seconds}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtSplitSeconds" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.split-seconds}"/>
+            </StackPanel>
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.advanced.split-megabytes}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtSplitMegabytes" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.split-megabytes}"/>
+            </StackPanel>
+          </izi:SutunIzgara>
+
+          <izi:SutunIzgara MaxColumns="2" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.advanced.audio-layout}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbAudioLayout" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.audio-layout}"/>
+            </StackPanel>
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.advanced.audio-gain}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtAudioGain" auto:AutomationProperties.Name="{loc:Text recorder.advanced.audio-gain}"/>
+            </StackPanel>
+          </izi:SutunIzgara>
+
+          <WrapPanel ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+            <CheckBox x:Name="ChkNoiseGate"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.advanced.noise-gate}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.advanced.noise-gate}"/>
+            <CheckBox x:Name="ChkNoiseSuppression"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.advanced.noise-suppression}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.advanced.noise-suppression}"/>
+          </WrapPanel>
+
+          <StackPanel x:Name="PanelAdvancedEncoding" Spacing="{StaticResource SpaceMd}">
+            <izi:SutunIzgara MaxColumns="4" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.scale-width}" Theme="{StaticResource Label}"/>
+                <TextBox x:Name="TxtScaleWidth" PlaceholderText="{loc:Text recorder.advanced.optional}" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-width}"/>
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.scale-height}" Theme="{StaticResource Label}"/>
+                <TextBox x:Name="TxtScaleHeight" PlaceholderText="{loc:Text recorder.advanced.optional}" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-height}"/>
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.keyframe}" Theme="{StaticResource Label}"/>
+                <TextBox x:Name="TxtKeyframe" auto:AutomationProperties.Name="{loc:Text recorder.advanced.keyframe}"/>
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.pixel-format}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbPixelFormat" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.pixel-format}"/>
+              </StackPanel>
+            </izi:SutunIzgara>
+
+            <izi:SutunIzgara MaxColumns="4" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.profile}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbProfile" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.profile}"/>
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.tune}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbTune" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.tune}"/>
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.color-space}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbColorSpace" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-space}"/>
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.color-range}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbColorRange" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-range}"/>
+              </StackPanel>
+            </izi:SutunIzgara>
+
+            <izi:SutunIzgara MaxColumns="4" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.rate}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbRateControl" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.rate}"/>
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.bitrate}" Theme="{StaticResource Label}"/>
+                <TextBox x:Name="TxtBitrate" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.bitrate}"/>
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.max-bitrate}" Theme="{StaticResource Label}"/>
+                <TextBox x:Name="TxtMaxBitrate" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.max-bitrate}"/>
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.buffer}" Theme="{StaticResource Label}"/>
+                <TextBox x:Name="TxtBuffer" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.buffer}"/>
+              </StackPanel>
+            </izi:SutunIzgara>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      </StackPanel>
     </Grid>
-
-    <Border x:Name="PanelAdvanced" Theme="{StaticResource Panel}">
-      <StackPanel Spacing="{StaticResource SpaceMd}">
-        <TextBlock Text="{loc:Text recorder.advanced.title}" Theme="{StaticResource H2}"/>
-
-        <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.advanced.container}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbContainer" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.container}"/>
-          </StackPanel>
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.advanced.max-duration}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtMaxDuration" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.max-duration}"/>
-          </StackPanel>
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.advanced.split-seconds}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtSplitSeconds" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.split-seconds}"/>
-          </StackPanel>
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.advanced.split-megabytes}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtSplitMegabytes" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.split-megabytes}"/>
-          </StackPanel>
-        </WrapPanel>
-
-        <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.advanced.audio-layout}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbAudioLayout" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.audio-layout}"/>
-          </StackPanel>
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.advanced.audio-gain}" Theme="{StaticResource Label}"/>
-            <TextBox x:Name="TxtAudioGain" auto:AutomationProperties.Name="{loc:Text recorder.advanced.audio-gain}"/>
-          </StackPanel>
-          <CheckBox x:Name="ChkNoiseGate"
-                    VerticalAlignment="Bottom"
-                    Theme="{StaticResource CheckStyle}"
-                    Content="{loc:Text recorder.advanced.noise-gate}"
-                    auto:AutomationProperties.Name="{loc:Text recorder.advanced.noise-gate}"/>
-          <CheckBox x:Name="ChkNoiseSuppression"
-                    VerticalAlignment="Bottom"
-                    Theme="{StaticResource CheckStyle}"
-                    Content="{loc:Text recorder.advanced.noise-suppression}"
-                    auto:AutomationProperties.Name="{loc:Text recorder.advanced.noise-suppression}"/>
-        </WrapPanel>
-
-        <StackPanel x:Name="PanelAdvancedEncoding" Spacing="{StaticResource SpaceMd}">
-          <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.scale-width}" Theme="{StaticResource Label}"/>
-              <TextBox x:Name="TxtScaleWidth" PlaceholderText="{loc:Text recorder.advanced.optional}" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-width}"/>
-            </StackPanel>
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.scale-height}" Theme="{StaticResource Label}"/>
-              <TextBox x:Name="TxtScaleHeight" PlaceholderText="{loc:Text recorder.advanced.optional}" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-height}"/>
-            </StackPanel>
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.keyframe}" Theme="{StaticResource Label}"/>
-              <TextBox x:Name="TxtKeyframe" auto:AutomationProperties.Name="{loc:Text recorder.advanced.keyframe}"/>
-            </StackPanel>
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.pixel-format}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbPixelFormat" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.pixel-format}"/>
-            </StackPanel>
-          </WrapPanel>
-
-          <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.profile}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbProfile" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.profile}"/>
-            </StackPanel>
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.tune}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbTune" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.tune}"/>
-            </StackPanel>
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.color-space}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbColorSpace" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-space}"/>
-            </StackPanel>
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.color-range}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbColorRange" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-range}"/>
-            </StackPanel>
-          </WrapPanel>
-
-          <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.rate}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbRateControl" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.rate}"/>
-            </StackPanel>
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.bitrate}" Theme="{StaticResource Label}"/>
-              <TextBox x:Name="TxtBitrate" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.bitrate}"/>
-            </StackPanel>
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.max-bitrate}" Theme="{StaticResource Label}"/>
-              <TextBox x:Name="TxtMaxBitrate" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.max-bitrate}"/>
-            </StackPanel>
-            <StackPanel Width="{StaticResource FieldWidth}">
-              <TextBlock Text="{loc:Text recorder.advanced.buffer}" Theme="{StaticResource Label}"/>
-              <TextBox x:Name="TxtBuffer" PlaceholderText="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.buffer}"/>
-            </StackPanel>
-          </WrapPanel>
-        </StackPanel>
-      </StackPanel>
-    </Border>
-
-    <!-- Ses girdisi. Liste ffmpeg'in kendisinden geliyor; cihazsız makinede kutular
-         yalnız "sessiz" öğesiyle açılıyor ve kayıt sessiz sürüyor. -->
-    <Border Theme="{StaticResource Panel}">
-      <StackPanel Spacing="{StaticResource SpaceMd}">
-        <TextBlock Text="{loc:Text recorder.audio.title}" Theme="{StaticResource H2}"/>
-
-        <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.audio.microphone}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbMicrophone"
-                      HorizontalAlignment="Stretch"
-                      auto:AutomationProperties.Name="{loc:Text recorder.audio.microphone}"/>
-          </StackPanel>
-
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.audio.system}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbSystemAudio"
-                      HorizontalAlignment="Stretch"
-                      auto:AutomationProperties.Name="{loc:Text recorder.audio.system}"/>
-          </StackPanel>
-
-          <Button x:Name="BtnAudioRefresh"
-                  Theme="{StaticResource GhostButton}"
-                  VerticalAlignment="Bottom"
-                  Content="{loc:Text recorder.audio.refresh}"
-                  auto:AutomationProperties.Name="{loc:Text recorder.audio.refresh}"
-                  Click="OnAudioRefresh"/>
-        </WrapPanel>
-
-        <TextBlock Text="{loc:Text recorder.audio.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-      </StackPanel>
-    </Border>
-
-    <Border x:Name="PanelWebcam" Theme="{StaticResource Panel}">
-      <StackPanel Spacing="{StaticResource SpaceMd}">
-        <TextBlock Text="{loc:Text recorder.webcam.title}" Theme="{StaticResource H2}"/>
-
-        <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.webcam.device}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbWebcam"
-                      HorizontalAlignment="Stretch"
-                      auto:AutomationProperties.Name="{loc:Text recorder.webcam.device}"/>
-          </StackPanel>
-
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.webcam.size}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbWebcamSize"
-                      HorizontalAlignment="Stretch"
-                      auto:AutomationProperties.Name="{loc:Text recorder.webcam.size}"/>
-          </StackPanel>
-
-          <StackPanel Width="{StaticResource FieldWidth}">
-            <TextBlock Text="{loc:Text recorder.webcam.corner}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbWebcamCorner"
-                      HorizontalAlignment="Stretch"
-                      auto:AutomationProperties.Name="{loc:Text recorder.webcam.corner}"/>
-          </StackPanel>
-        </WrapPanel>
-
-        <TextBlock Text="{loc:Text recorder.webcam.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-
-        <StackPanel Width="{StaticResource FieldWidth}" HorizontalAlignment="Left">
-          <TextBlock Text="{loc:Text recorder.webcam.background.label}" Theme="{StaticResource Label}"/>
-          <ComboBox x:Name="CmbWebcamBackground"
-                    HorizontalAlignment="Stretch"
-                    auto:AutomationProperties.Name="{loc:Text recorder.webcam.background.label}"/>
-        </StackPanel>
-
-        <TextBlock Text="{loc:Text recorder.webcam.background.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-      </StackPanel>
-    </Border>
   </StackPanel>
 </UserControl>

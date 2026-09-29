@@ -117,6 +117,7 @@ internal partial class RecorderView : UserControl
             RefreshCountdownLabels();
             RefreshReplayLabels();
             RefreshAdvancedLabels();
+            RefreshWizard();
             RefreshSerit();
         });
 
