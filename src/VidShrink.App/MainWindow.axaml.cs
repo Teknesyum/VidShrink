@@ -236,7 +236,6 @@ public partial class MainWindow : Window
         Tabs.SelectionChanged += (_, _) => DuzenleyiciSekmesiSecildi();
         Tabs.SelectionChanged += (_, _) => { if (Tabs.SelectedIndex != PlayerTabIndex) Player.RestoreWindowMin(); };
 
-        if (OperatingSystem.IsWindows()) WindowDecorationsTheme = SessizPencereBasligi.Tema;
 
         if (OperatingSystem.IsMacOS())
         {
@@ -687,6 +686,11 @@ public partial class MainWindow : Window
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
+        if (change.Property == WindowStateProperty && OperatingSystem.IsWindows())
+        {
+            if (WindowState == WindowState.FullScreen) WindowDecorationsTheme = SessizPencereBasligi.Tema;
+            else ClearValue(WindowDecorationsThemeProperty);
+        }
         if (!_controlsReady) return;
         if (change.Property == WindowStateProperty) { UpdateMaximizeGlyph(); ApplyWindowFrame(); }
         else if (change.Property == OffScreenMarginProperty) WindowShell.Margin = OffScreenMargin;
