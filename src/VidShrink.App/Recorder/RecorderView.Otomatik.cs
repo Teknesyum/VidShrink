@@ -51,6 +51,10 @@ internal partial class RecorderView
             {
                 if (e.Property == IsVisibleProperty) KartSutunlari();
             };
+        RecorderCards.PropertyChanged += (_, e) =>
+        {
+            if (e.Property == BoundsProperty && DarDuvar != _darDuvar) KartYerlesimi();
+        };
         ApplyLevel();
     }
 
@@ -71,10 +75,24 @@ internal partial class RecorderView
         KartYerlesimi();
     }
 
+    private bool _darDuvar;
+
+    private bool DarDuvar => RecorderCards.Bounds.Width > 0
+        && RecorderCards.ColumnsFor(RecorderCards.Bounds.Width) < RecorderCards.MaxColumns;
+
     private void KartYerlesimi()
     {
-        Tasi(PanelAudio, AdvancedMode ? CardsLeft : CardsMiddle);
-        Tasi(PanelWebcam, AdvancedMode && AutoMode ? CardsExtra : CardsRight);
+        _darDuvar = DarDuvar;
+        var gelismis = AdvancedMode;
+        var otomatik = gelismis && AutoMode;
+        var ucSutun = _darDuvar && otomatik;
+        Diz(CardsLeft, ucSutun ? new Control[] { PanelTarget, PanelWebcam }
+            : gelismis ? new Control[] { PanelTarget, PanelAudio } : new Control[] { PanelTarget });
+        Diz(CardsMiddle, ucSutun ? new Control[] { PanelOptions, PanelReplay }
+            : gelismis ? new Control[] { PanelOptions } : new Control[] { PanelOptions, PanelAudio });
+        Diz(CardsRight, ucSutun ? new Control[] { PanelAdvanced, PanelAudio }
+            : otomatik ? new Control[] { PanelAdvanced, PanelReplay } : new Control[] { PanelAdvanced, PanelReplay, PanelWebcam });
+        Diz(CardsExtra, otomatik && !ucSutun ? new Control[] { PanelWebcam, PanelEncoding } : new Control[] { PanelEncoding });
         KartSutunlari();
     }
 
@@ -83,13 +101,20 @@ internal partial class RecorderView
     /// olduğu için ses ikinci, kamera üçüncü sütuna geçer ve dördüncü sütun yer tutmaz; Gelişmiş
     /// kipte ses hedefin altına iner, orta iki sütun seçeneklere ve gelişmiş ayarlara kalır,
     /// kamera dördüncü sütuna çıkar. Ayarları elle seçince dördüncü sütunu kodlayıcı kartı alır,
-    /// kamera gelişmiş ayarların altına iner. Görünür kartı olmayan sütun yer tutmaz.
+    /// kamera gelişmiş ayarların altına iner. Görünür kartı olmayan sütun yer tutmaz. Duvar üç
+    /// sütuna düşünce dördüncü sütun ilk üçün en kısasının altına girip 1024 px pencerede
+    /// sayfayı 1319 px'e uzatıyordu (görünen 1008); orada kamera hedefin, tampon seçeneklerin,
+    /// ses gelişmiş ayarların altına iner ve dördüncü sütun boş kalır.
     /// </summary>
-    private static void Tasi(Control kart, StackPanel hedef)
+    private static void Diz(StackPanel sutun, Control[] kartlar)
     {
-        if (ReferenceEquals(kart.Parent, hedef)) return;
-        (kart.Parent as Panel)?.Children.Remove(kart);
-        hedef.Children.Add(kart);
+        for (var i = 0; i < kartlar.Length; i++)
+        {
+            var kart = kartlar[i];
+            if (ReferenceEquals(kart.Parent, sutun) && sutun.Children.IndexOf(kart) == i) continue;
+            (kart.Parent as Panel)?.Children.Remove(kart);
+            sutun.Children.Insert(Math.Min(i, sutun.Children.Count), kart);
+        }
     }
 
     /// <summary>

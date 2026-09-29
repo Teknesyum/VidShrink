@@ -14,6 +14,7 @@ ship as part of it.
 ### Changed
 
 - Recorder: the replay buffer left the top strip and the first card; it now lives in its own Advanced card (length, start and save), and stays visible while the buffer runs.
+- Recorder: the Advanced page no longer scrolls at 1024 px; on three columns the webcam, replay and audio cards move under the other cards instead of a fourth column, and the audio, webcam and duplicate budget hints moved into tooltips.
 
 ## [1.1.0] - 2026-09-29
 

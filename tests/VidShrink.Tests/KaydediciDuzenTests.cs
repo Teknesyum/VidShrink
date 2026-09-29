@@ -18,6 +18,7 @@ public sealed class KaydediciDuzenTests
     [InlineData(1560, 1060, false)]
     [InlineData(1560, 1060, true)]
     [InlineData(1024, 1060, false)]
+    [InlineData(1024, 1060, true)]
     public void SayfaKaydirmadanSigarVeTamponSeritteDegil(int en, int boy, bool gelismis)
     {
         var boyut = new Size(en, boy);
