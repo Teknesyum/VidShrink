@@ -18,3 +18,9 @@ Tarih: 2026-09-29
 Statik: temiz. Davranışsal: düşük/orta birkaç ping, biri yanlış-pozitif. Malware değil.
 VT statiktir — SmartScreen itibarı ve VidShrink.exe→powershell zinciri buraya girmez;
 onlar imzalama ve tasarımla (yönlendirme butonu) çözülür.
+
+## Süre
+
+`Set-FTA` uzantı başına ~0,6 sn (ilk çağrı ~0,96 sn); 60 uzantı ~36 sn. Maliyet pinli
+SFTA.ps1'in içinde (her çağrıda Shell32.dll okuması, hash'in betikte hesabı, çağrı başına
+`SHChangeNotify`); komut bu yüzden `Write-Progress` ile ilerleme gösterir.
