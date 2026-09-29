@@ -15,6 +15,20 @@ public static class ShellIntegration
     };
 
     /// <summary>
+    /// Oynatıcının müzik olarak açtığı ses uzantıları; noktasız, küçük harf. Küçültme sekmesi
+    /// bunları yüklemez (görüntü yok), klasörde sonraki/önceki yalnız aynı türde gezer.
+    /// </summary>
+    public static IReadOnlyList<string> AudioExtensions { get; } = new[]
+    {
+        "mp3", "m4a", "m4b", "aac", "adt", "adts", "flac", "wav", "wma", "ogg", "oga", "opus",
+        "mka", "aif", "aifc", "aiff", "au", "snd", "mp2", "mpa", "ac3", "ape", "wv", "weba"
+    };
+
+    /// <summary>Uzantısı <see cref="AudioExtensions"/>'ta olan yol.</summary>
+    public static bool IsAudio(string path)
+        => AudioExtensions.Contains(Path.GetExtension(path).TrimStart('.'), StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
     /// "VidShrink ile Küçült" alt menüsünün hızlı hedefleri, megabayt cinsinden. Kurulum
     /// betiği kendi dizisinden yazar; iki liste ölçüde karşılaştırılır.
     /// </summary>

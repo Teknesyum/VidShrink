@@ -1,6 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using Avalonia.Controls;
+using VidShrink.App;
 using VidShrink.App.Playback;
+using VidShrink.Core;
 using VidShrink.Ffmpeg;
 using VidShrink.Player;
 using Xunit;
@@ -119,6 +121,97 @@ public sealed class MuzikCalarTests
     public void Motor_gomulu_kapagi_gosterir()
     {
         Assert.Contains(("audio-display", "embedded-first"), MpvEngine.OptionsFor(new PlaybackOptions()));
+    }
+
+    [Fact]
+    public void Klasorde_ses_sesle_video_videoyla_gezilir()
+    {
+        var klasor = Path.Combine(TestPaths.OutputRoot, "muzik-klasor", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        foreach (var ad in new[] { "01 a.mp3", "02 b.flac", "03 c.mp4", "04 d.opus", "05 e.mkv", "kapak.jpg", "liste.m3u" })
+            File.WriteAllBytes(Path.Combine(klasor, ad), new byte[1]);
+
+        var ses = FolderNavigator.Siblings(Path.Combine(klasor, "02 b.flac")).Select(Path.GetFileName).ToArray();
+        var video = FolderNavigator.Siblings(Path.Combine(klasor, "03 c.mp4")).Select(Path.GetFileName).ToArray();
+        var sonraki = FolderNavigator.Step(Path.Combine(klasor, "02 b.flac"), true, RepeatMode.Off, false, 0);
+        Directory.Delete(klasor, true);
+
+        Assert.Equal(new[] { "01 a.mp3", "02 b.flac", "04 d.opus" }, ses);
+        Assert.Equal(new[] { "03 c.mp4", "05 e.mkv" }, video);
+        Assert.Equal("04 d.opus", Path.GetFileName(sonraki));
+    }
+
+    [Fact]
+    public void Ses_uzantilari_videoyla_cakismaz()
+    {
+        Assert.Empty(ShellIntegration.AudioExtensions.Intersect(ShellIntegration.MediaExtensions));
+        Assert.True(ShellIntegration.IsAudio(@"C:\m\Sarki.MP3"));
+        Assert.False(ShellIntegration.IsAudio("film.mp4"));
+        var wmpDisi = new[] { "m4b", "ogg", "oga", "opus", "ac3", "ape", "wv", "weba" };
+        Assert.All(ShellIntegration.AudioExtensions.Except(wmpDisi), e => Assert.Contains(e, ShellIntegration.BulkDefaultExtensions));
+    }
+
+    [Fact]
+    public void Oynaticida_acilan_ses_kucultme_sekmesine_gitmez()
+    {
+        var klasor = Path.Combine(TestPaths.OutputRoot, "muzik-odak", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        var ses = Path.Combine(klasor, "sarki.mp3");
+        var film = Path.Combine(klasor, "film.mp4");
+        File.WriteAllBytes(ses, new byte[1]);
+        File.WriteAllBytes(film, new byte[1]);
+
+        var yuklenen = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            try
+            {
+                var liste = new List<string>();
+                window.FollowShrinkLoader = p => { liste.Add(Path.GetFileName(p)); return Task.CompletedTask; };
+                window.ChkFollowRecording.IsChecked = true;
+                window.PlayerOpenedForTest(ses);
+                window.PlayerOpenedForTest(film);
+                return liste;
+            }
+            finally { window.Close(); }
+        });
+        Directory.Delete(klasor, true);
+
+        Assert.Equal(new[] { "film.mp4" }, yuklenen);
+    }
+
+    [Fact]
+    public void Acilista_verilen_ses_oynaticida_acilir_kucultmeye_yuklenmez()
+    {
+        var klasor = Path.Combine(TestPaths.OutputRoot, "muzik-acilis", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        var ses = Path.Combine(klasor, "sarki.mp3");
+        var film = Path.Combine(klasor, "bozuk.mp4");
+        File.WriteAllBytes(ses, new byte[16]);
+        File.WriteAllBytes(film, new byte[16]);
+
+        (bool Hata, string? Yuklu, string? Calan) Ac(string yol) => AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            try
+            {
+                window.PlayerTab.EngineFactory = () => new SesMotoru(MediaTags.Empty);
+                window.Show();
+                var is1 = window.LoadStartupFileAsync(yol);
+                DenetimSurucu.Pump(window.PlayerTab, () => is1.IsCompleted, 30);
+                return (window.SourceStatusVisible, window.ShrinkLoadedPath, window.PlayerTab.LoadedPath);
+            }
+            finally { window.Close(); }
+        });
+
+        var sesSonuc = Ac(ses);
+        var filmSonuc = Ac(film);
+        Directory.Delete(klasor, true);
+
+        Assert.False(sesSonuc.Hata);
+        Assert.Null(sesSonuc.Yuklu);
+        Assert.Equal(ses, sesSonuc.Calan);
+        Assert.True(filmSonuc.Hata, "negatif kontrol: bozuk video kucultmeye gidip hata vermeliydi");
     }
 
     private static string Uret(string klasor, string ad, params string[] arguman)

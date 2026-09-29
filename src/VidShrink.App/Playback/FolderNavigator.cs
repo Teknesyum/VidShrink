@@ -11,18 +11,22 @@ internal static class FolderNavigator
     private static readonly StringComparer PathComparer =
         OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
-    private static readonly HashSet<string> Extensions =
+    private static readonly HashSet<string> VideoExtensions =
         new(ShellIntegration.MediaExtensions.Select(extension => "." + extension), StringComparer.OrdinalIgnoreCase);
+
+    private static readonly HashSet<string> AudioExtensions =
+        new(ShellIntegration.AudioExtensions.Select(extension => "." + extension), StringComparer.OrdinalIgnoreCase);
 
     internal static IReadOnlyList<string> Siblings(string path)
     {
         var folder = Path.GetDirectoryName(Path.GetFullPath(path));
         if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) return Array.Empty<string>();
+        var kind = ShellIntegration.IsAudio(path) ? AudioExtensions : VideoExtensions;
 
         try
         {
             return Directory.EnumerateFiles(folder)
-                .Where(file => Extensions.Contains(Path.GetExtension(file)))
+                .Where(file => kind.Contains(Path.GetExtension(file)))
                 .OrderBy(file => Path.GetFileName(file), NaturalComparer.Instance)
                 .ToList();
         }
