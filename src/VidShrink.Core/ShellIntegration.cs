@@ -15,6 +15,29 @@ public static class ShellIntegration
     };
 
     /// <summary>
+    /// Oynatıcının müzik olarak açtığı ses uzantıları; noktasız, küçük harf. Küçültme sekmesi
+    /// bunları yüklemez (görüntü yok), klasörde sonraki/önceki yalnız aynı türde gezer.
+    /// </summary>
+    public static IReadOnlyList<string> AudioExtensions { get; } = new[]
+    {
+        "mp3", "m4a", "m4b", "aac", "adt", "adts", "flac", "wav", "wma", "ogg", "oga", "opus",
+        "mka", "aif", "aifc", "aiff", "au", "snd", "mp2", "mpa", "ac3", "ape", "wv", "weba"
+    };
+
+    /// <summary>Uzantısı <see cref="AudioExtensions"/>'ta olan yol.</summary>
+    public static bool IsAudio(string path)
+        => AudioExtensions.Contains(Path.GetExtension(path).TrimStart('.'), StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Oynatıcının kuyruğa açtığı çalma listesi uzantıları (<see cref="PlaylistFile"/>).</summary>
+    public static IReadOnlyList<string> PlaylistExtensions { get; } = new[]
+    {
+        "m3u", "m3u8", "pls", "wpl", "zpl", "asx", "wax", "wvx", "wmx"
+    };
+
+    /// <summary>Yalnız oynatıcının açtığı yol: ses ya da çalma listesi. Küçültme sekmesine gitmez.</summary>
+    public static bool IsPlayerOnly(string path) => IsAudio(path) || PlaylistFile.IsPlaylist(path);
+
+    /// <summary>
     /// "VidShrink ile Küçült" alt menüsünün hızlı hedefleri, megabayt cinsinden. Kurulum
     /// betiği kendi dizisinden yazar; iki liste ölçüde karşılaştırılır.
     /// </summary>
@@ -44,6 +67,25 @@ public static class ShellIntegration
     /// istemek, seçim yapılmış olsa bile önerinin hiç kalkmamasına yol açıyordu.
     /// </summary>
     public static IReadOnlyList<string> DefaultPlayerExtensions { get; } = new[] { "mp4" };
+
+    public static IReadOnlyList<string> DefaultAppExtensions { get; } = new[] { "mp4", "mkv", "mov", "avi", "webm" };
+
+    /// <summary>
+    /// "Tümünü Ata" düğmesinin ele geçirdiği geniş küme: Windows Media Player'ın sahip olduğu
+    /// tüm ses+video türleri ve çalma listeleri, artı VidShrink'in kendi video formatları.
+    /// Yalnız oynatılamayan türler dışarıda: kaplama (.wmz, .wmd, .wms), sanal CD (.cda) ve
+    /// MIDI (.mid, .midi, .rmi) — bunlar VidShrink'e atansa çift tıkta bozulur. Kurucunun
+    /// kaydettiği <see cref="MediaExtensions"/>'tan ayrıdır; bu liste yalnız kullanıcı düğmeye
+    /// basıp komutu kendi kabuğunda çalıştırınca uygulanır.
+    /// </summary>
+    public static IReadOnlyList<string> BulkDefaultExtensions { get; } = new[]
+    {
+        "3g2", "3gp", "3gp2", "3gpp", "aac", "adt", "adts", "aif", "aifc", "aiff", "asf", "asx",
+        "au", "avi", "dav", "divx", "f4v", "flac", "flv", "gif", "m1v", "m2t", "m2ts", "m2v",
+        "m3u", "m4a", "m4v", "mk3d", "mka", "mkv", "mod", "mov", "mp2", "mp2v", "mp3", "mp4",
+        "mp4v", "mpa", "mpe", "mpeg", "mpg", "mpv2", "mts", "mxf", "ogv", "rm", "rmvb", "snd",
+        "ts", "tts", "vob", "wav", "wax", "webm", "wm", "wma", "wmv", "wmx", "wpl", "wvx"
+    };
 
     /// <summary>Hızlı küçültme isteğini uygulamaya taşıyan komut satırı bayrağı.</summary>
     public const string ShrinkFlag = "--kucult";

@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "VidShrink در این سیستم خودش را به‌روز نمی‌کند: فقط وجود نسخهٔ جدید را اعلام می‌کند و فرمان نصب آن را نشان می‌دهد.",
 
   "settings.default-app.suggestion": "VidShrink برنامهٔ پیش‌فرض ویدیوها نیست. می‌توانید آن را در صفحهٔ «برنامه‌های پیش‌فرض» ویندوز انتخاب کنید.",
+  "settings.default-app.all": "تنظیم همه",
+  "settings.default-app.all-copied": "فرمان در کلیپ‌بورد کپی شد. یک پنجرهٔ PowerShell باز کنید و آن را بچسبانید؛ VidShrink برنامهٔ پیش‌فرض همهٔ قالب‌های صوتی و ویدیویی می‌شود.",
   "settings.default-app.open": "برنامه‌های پیش‌فرض",
   "settings.default-app.dismiss": "دیگر نپرس",
   "settings.player-shortcuts.title": "میانبرهای پخش‌کننده",

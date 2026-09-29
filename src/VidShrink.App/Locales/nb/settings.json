@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "På: en ny versjon lastes ned i bakgrunnen og installeres når VidShrink lukkes. Av: en ny versjon varsles i topplinjen og installeres med en knapp.",
   "settings.update.no-self-effect": "VidShrink oppdaterer seg ikke selv på dette systemet: det sier bare fra om at en ny versjon finnes og viser kommandoen som installerer den.",
   "settings.default-app.suggestion": "VidShrink er ikke standardprogram for videoer. Du kan velge det på siden Standardapper i Windows.",
+  "settings.default-app.all": "Angi alle",
+  "settings.default-app.all-copied": "Kommandoen er kopiert til utklippstavlen. Åpne et PowerShell-vindu og lim den inn; VidShrink blir standard for alle lyd- og videoformater.",
   "settings.default-app.open": "Standardapper",
   "settings.default-app.dismiss": "Ikke spør igjen",
   "settings.player-shortcuts.title": "Avspillergenveier",

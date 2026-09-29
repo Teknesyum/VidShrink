@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "VidShrink ei päivitä itseään tässä järjestelmässä: se vain kertoo uudesta versiosta ja näyttää komennon, joka asentaa sen.",
 
   "settings.default-app.suggestion": "VidShrink ei ole videoiden oletusohjelma. Voit valita sen Windowsin Oletussovellukset-sivulta.",
+  "settings.default-app.all": "Aseta kaikki",
+  "settings.default-app.all-copied": "Komento kopioitiin leikepöydälle. Avaa PowerShell-ikkuna ja liitä se; VidShrinkistä tulee kaikkien ääni- ja videomuotojen oletusohjelma.",
   "settings.default-app.open": "Oletussovellukset",
   "settings.default-app.dismiss": "Älä kysy uudelleen",
   "settings.player-shortcuts.title": "Soittimen pikanäppäimet",

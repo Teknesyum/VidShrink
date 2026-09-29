@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "Ikiwashwa, toleo jipya hupakuliwa chinichini na kusakinishwa VidShrink inapofungwa. Ikizimwa, toleo jipya hutangazwa kwenye upau wa juu na kusakinishwa kwa kitufe.",
   "settings.update.no-self-effect": "VidShrink haijisasishi kwenye mfumo huu: inakuambia tu kuwa toleo jipya lipo na kuonyesha amri inayolisakinisha.",
   "settings.default-app.suggestion": "VidShrink si programu chaguomsingi ya video. Unaweza kuichagua kwenye ukurasa wa Programu chaguomsingi wa Windows.",
+  "settings.default-app.all": "Weka Zote",
+  "settings.default-app.all-copied": "Amri imenakiliwa kwenye ubao wa kunakili. Fungua dirisha la PowerShell na uibandike; VidShrink inakuwa chaguo-msingi kwa miundo yote ya sauti na video.",
   "settings.default-app.open": "Programu chaguomsingi",
   "settings.default-app.dismiss": "Usiulize tena",
   "settings.player-shortcuts.title": "Njia za mkato za kichezaji",

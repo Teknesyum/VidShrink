@@ -82,7 +82,7 @@ public partial class MainWindow
     private void OnPlayerOpened(string path)
     {
         if (_following || ChkFollowRecording.IsChecked != true) return;
-        if (!File.Exists(path)) return;
+        if (!File.Exists(path) || ShellIntegration.IsPlayerOnly(path)) return;
         _media.Focus(path);
         if (SamePath(ShrinkLoadedPath, path)) return;
         _ = (FollowShrinkLoader ?? LoadAsync)(path);

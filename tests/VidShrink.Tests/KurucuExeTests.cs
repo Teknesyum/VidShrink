@@ -69,6 +69,51 @@ public sealed class KurucuExeTests : IDisposable
     }
 
     [Fact]
+    public void VarsayilanUygulamaSayfasiYalnizTemelBesUzantiyiListeler()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var install = Path.Combine(_work, "kurulum");
+        Directory.CreateDirectory(install);
+        var launcher = Path.Combine(install, "VidShrink.exe");
+        File.WriteAllText(launcher, "baslatici");
+        var engineRoot = $@"{_testKey}\Eski\Classes";
+        var associations = $@"{engineRoot}\{ShellRegistration.CapabilitiesPath}\FileAssociations";
+
+        using (var stale = Registry.CurrentUser.CreateSubKey(associations))
+            foreach (var extension in ShellIntegration.MediaExtensions)
+                stale.SetValue("." + extension, ShellRegistration.ProgId);
+
+        ShellRegistration.WriteFileAssociation(engineRoot, launcher);
+
+        using var key = Registry.CurrentUser.OpenSubKey(associations);
+        Assert.Equal(new[] { ".avi", ".mkv", ".mov", ".mp4", ".webm" },
+            key!.GetValueNames().OrderBy(name => name, StringComparer.Ordinal));
+        using var openWith = Registry.CurrentUser.OpenSubKey($@"{engineRoot}\.gif\OpenWithProgids");
+        Assert.Contains(ShellRegistration.ProgId, openWith!.GetValueNames());
+    }
+
+    [Fact]
+    public void EskiKurulumunYirmiDortluListesiAcilistaBeseIner()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var classesRoot = $@"{_testKey}\Guncellenen\Classes";
+        var associations = $@"{classesRoot}\{ShellRegistration.CapabilitiesPath}\FileAssociations";
+        Assert.Equal(0, ShellRegistration.TrimDefaultAppList(classesRoot));
+
+        using (var stale = Registry.CurrentUser.CreateSubKey(associations))
+            foreach (var extension in ShellIntegration.MediaExtensions)
+                stale.SetValue("." + extension, ShellRegistration.ProgId);
+
+        Assert.Equal(19, ShellRegistration.TrimDefaultAppList(classesRoot));
+        Assert.Equal(0, ShellRegistration.TrimDefaultAppList(classesRoot));
+        using var key = Registry.CurrentUser.OpenSubKey(associations);
+        Assert.Equal(new[] { ".avi", ".mkv", ".mov", ".mp4", ".webm" },
+            key!.GetValueNames().OrderBy(name => name, StringComparer.Ordinal));
+    }
+
+    [Fact]
     public void TestKonagiGercekKokeYazamaz()
     {
         if (!OperatingSystem.IsWindows()) return;

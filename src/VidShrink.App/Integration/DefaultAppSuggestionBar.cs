@@ -2,16 +2,25 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input.Platform;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using VidShrink.App.Localization;
+using VidShrink.Core;
+using VidShrink.Core.Setup;
 
 namespace VidShrink.App.Integration;
 
 /// <summary>
-/// "VidShrink varsayılan değil" önerisi. Bir cümle ve iki düğme taşır: biri Windows'un
-/// varsayılan uygulamalar sayfasını açar, diğeri öneriyi kalıcı olarak kapatır.
+/// "VidShrink varsayılan değil" önerisi. Bir cümle ve üç düğme taşır: biri sahip
+/// olunabilecek tüm ses+video uzantılarını tek komutla atayan yönlendirmeyi panoya
+/// kopyalar, biri Windows'un varsayılan uygulamalar sayfasını açar, biri öneriyi kalıcı
+/// olarak kapatır.
+///
+/// <para>"Tümünü ata" düğmesi VidShrink içinden PowerShell çalıştırmaz, dosya indirmez:
+/// bütünlüğü sabitlenmiş komutu panoya yazar, kullanıcı kendi kabuğunda çalıştırır. Böylece
+/// imzasız exe hiçbir davranışsal bayrağa dokunmaz (<c>docs/olcumler/varsayilan-atama-av.md</c>).</para>
 ///
 /// <para>Renk ve ölçü <c>Themes/Theme.axaml</c> belirteçlerinden dinamik kaynak olarak
 /// alınır; şeridin kendi sayısı yoktur. Metin dil dosyasından gelir ve dil değişince
@@ -20,19 +29,31 @@ namespace VidShrink.App.Integration;
 internal sealed class DefaultAppSuggestionBar : UserControl
 {
     private const string MessageKey = "settings.default-app.suggestion";
+    private const string AllKey = "settings.default-app.all";
+    private const string AllCopiedKey = "settings.default-app.all-copied";
     private const string OpenKey = "settings.default-app.open";
     private const string DismissKey = "settings.default-app.dismiss";
 
     private readonly string? _settingsPath;
+    private readonly TextBlock _message;
 
     internal DefaultAppSuggestionBar(string? settingsPath = null)
     {
         _settingsPath = settingsPath;
 
-        var message = new TextBlock { TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
-        message.Bind(TextBlock.TextProperty, Text(MessageKey));
-        message.Bind(TextBlock.ForegroundProperty, Token("TextBody"));
-        message.Bind(TextBlock.FontSizeProperty, Token("FontSizeSm"));
+        _message = new TextBlock { TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
+        _message.Bind(TextBlock.TextProperty, Text(MessageKey));
+        _message.Bind(TextBlock.ForegroundProperty, Token("TextBody"));
+        _message.Bind(TextBlock.FontSizeProperty, Token("FontSizeSm"));
+
+        var all = Action(AllKey);
+        all.Click += async (_, _) =>
+        {
+            if (TopLevel.GetTopLevel(this)?.Clipboard is not { } clipboard) return;
+            var command = BulkAssociationCommand.Build(FileAssociation.ProgId, ShellIntegration.BulkDefaultExtensions);
+            await clipboard.SetTextAsync(command).ConfigureAwait(true);
+            _message.Bind(TextBlock.TextProperty, Text(AllCopiedKey));
+        };
 
         var open = Action(OpenKey);
         open.Click += (_, _) =>
@@ -49,13 +70,14 @@ internal sealed class DefaultAppSuggestionBar : UserControl
 
         var actions = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
         actions.Bind(StackPanel.SpacingProperty, Token("SpaceSm"));
+        actions.Children.Add(all);
         actions.Children.Add(open);
         actions.Children.Add(dismiss);
 
         var row = new DockPanel { LastChildFill = true };
         DockPanel.SetDock(actions, Dock.Right);
         row.Children.Add(actions);
-        row.Children.Add(message);
+        row.Children.Add(_message);
 
         var frame = new Border { Child = row };
         frame.Bind(Border.BackgroundProperty, Token("PanelSurface"));

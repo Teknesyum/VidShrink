@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "VidShrink sa na tomto systéme sám neaktualizuje: iba oznámi, že existuje nová verzia, a zobrazí príkaz, ktorý ju nainštaluje.",
 
   "settings.default-app.suggestion": "VidShrink nie je predvolený program pre videá. Môžete ho vybrať na stránke Predvolené aplikácie vo Windows.",
+  "settings.default-app.all": "Nastaviť všetko",
+  "settings.default-app.all-copied": "Príkaz bol skopírovaný do schránky. Otvorte okno PowerShellu a vložte ho; VidShrink sa stane predvoleným programom pre všetky zvukové a video formáty.",
   "settings.default-app.open": "Predvolené aplikácie",
   "settings.default-app.dismiss": "Už sa nepýtať",
   "settings.player-shortcuts.title": "Klávesové skratky prehrávača",

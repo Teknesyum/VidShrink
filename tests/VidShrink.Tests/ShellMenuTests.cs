@@ -152,6 +152,16 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
     }
 
     [Fact]
+    public void Installer_default_app_list_is_the_application_list()
+    {
+        var block = Regex.Match(File.ReadAllText(InstallerScript), @"\$defaultAppExtensions\s*=\s*@\((?<body>[^)]*)\)");
+        Assert.True(block.Success);
+        var script = Regex.Matches(block.Groups["body"].Value, @"'([^']+)'").Select(match => match.Groups[1].Value);
+        Assert.Equal(ShellIntegration.DefaultAppExtensions, script);
+        Assert.All(ShellIntegration.DefaultAppExtensions, extension => Assert.Contains(extension, ShellIntegration.MediaExtensions));
+    }
+
+    [Fact]
     public void Written_extensions_are_the_application_list()
     {
         if (!OperatingSystem.IsWindows()) return;

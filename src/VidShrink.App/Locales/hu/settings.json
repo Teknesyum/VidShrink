@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "A VidShrink ezen a rendszeren nem frissíti magát: csak jelzi, hogy új verzió létezik, és megmutatja a telepítő parancsot.",
 
   "settings.default-app.suggestion": "A VidShrink nem az alapértelmezett videóprogram. A Windows Alapértelmezett alkalmazások oldalán kiválaszthatja.",
+  "settings.default-app.all": "Összes beállítása",
+  "settings.default-app.all-copied": "A parancs a vágólapra került. Nyisson egy PowerShell-ablakot, és illessze be; a VidShrink lesz az alapértelmezett minden hang- és videóformátumhoz.",
   "settings.default-app.open": "Alapértelmezett alkalmazások",
   "settings.default-app.dismiss": "Ne kérdezze újra",
   "settings.player-shortcuts.title": "Lejátszó gyorsbillentyűi",

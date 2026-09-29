@@ -36,6 +36,8 @@ internal static class DefaultApp
 
     private const int Executable = 2;
 
+    private const int ProgIdString = 20;
+
     /// <summary>
     /// <paramref name="extension"/> uzantısını bugün açan programın tam yolu; cevap
     /// alınamazsa <c>null</c>. Uzantı noktasız verilir.
@@ -48,21 +50,32 @@ internal static class DefaultApp
         return result == 0 && buffer.Length > 0 ? buffer.ToString() : null;
     }
 
+    internal static string? HandlerProgId(string extension)
+    {
+        var size = 256u;
+        var buffer = new StringBuilder((int)size);
+        var result = AssocQueryStringW(0, ProgIdString, "." + extension, null, buffer, ref size);
+        return result == 0 && buffer.Length > 0 ? buffer.ToString() : null;
+    }
+
+    internal static bool IsOurs(string? progId, string? handler, string executablePath, string launchTarget)
+    {
+        if (string.Equals(progId, FileAssociation.ProgId, StringComparison.OrdinalIgnoreCase)) return true;
+        if (handler is null) return false;
+        return string.Equals(handler, executablePath, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(handler, launchTarget, StringComparison.OrdinalIgnoreCase);
+    }
+
     /// <summary>
-    /// Verilen uzantıların tamamını <paramref name="executablePath"/> açıyorsa doğru.
-    /// Tek bir uzantı bile başka bir programa gidiyorsa yanlış döner.
+    /// Verilen uzantıların tamamı VidShrink'in ProgID'sine ya da <paramref name="executablePath"/>'e gidiyorsa doğru;
+    /// ProgID karşılaştırması geliştirme ve taşınabilir build'de de tutar. Tek uzantı başka programa gidiyorsa yanlış.
     /// </summary>
     internal static bool IsDefault(string executablePath, IReadOnlyList<string> extensions)
     {
         if (extensions.Count == 0) return false;
         var target = FileAssociation.LaunchTarget(executablePath);
         foreach (var extension in extensions)
-        {
-            var handler = Handler(extension);
-            if (handler is null) return false;
-            if (!string.Equals(handler, executablePath, StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(handler, target, StringComparison.OrdinalIgnoreCase)) return false;
-        }
+            if (!IsOurs(HandlerProgId(extension), Handler(extension), executablePath, target)) return false;
         return true;
     }
 

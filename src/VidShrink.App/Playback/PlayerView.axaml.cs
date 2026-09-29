@@ -592,7 +592,7 @@ internal partial class PlayerView : UserControl
             {
                 var vardi = _shown > 0;
                 RenderLatest();
-                if (!vardi && _shown > 0 && _render is { } saat)
+                if ((!vardi && _shown > 0 || AudioOnly) && _render is { } saat)
                     saat.Interval = TimeSpan.FromMilliseconds(RenderFrameMs);
             };
         }
@@ -607,6 +607,7 @@ internal partial class PlayerView : UserControl
         var drawn = engine.TryCopyLatest(ref _shown, DrawFrame);
         if (drawn && (_playing || _trackPaused)) _seek.Follow(engine.PositionSeconds);
         if (drawn) RefreshState();
+        else if (AudioOnly) FollowAudio(engine);
         if (_playing && engine.EndReached)
         {
             TogglePlay();
@@ -620,7 +621,7 @@ internal partial class PlayerView : UserControl
     {
         try
         {
-            await OpenCoreAsync(path, ct).ConfigureAwait(true);
+            await OpenCoreAsync(ResolveQueue(path), ct).ConfigureAwait(true);
         }
         catch (PlaybackEngineUnavailableException ex) when (ex.MessageKey is { } key)
         {
@@ -691,6 +692,7 @@ internal partial class PlayerView : UserControl
         ApplyTrackOptions(engine);
 
         TxtEmpty.IsVisible = false;
+        ShowAudioCard(path, engine);
         StartWatchdog();
         StartRender();
         var resume = HistoryPath is null ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
@@ -748,7 +750,7 @@ internal partial class PlayerView : UserControl
     internal void PollStall(double nowSeconds)
     {
         var frames = _engine?.FramesRendered ?? 0;
-        var stalled = _stall.Observe(_playing && _engine is { EndReached: false }, frames, nowSeconds);
+        var stalled = _stall.Observe(_playing && _engine is { EndReached: false, HasVideo: true }, frames, nowSeconds);
         TxtStall.IsVisible = stalled;
         if (stalled) TxtStall.Text = Strings.Get("main.player.stalled");
     }
@@ -795,7 +797,9 @@ internal partial class PlayerView : UserControl
             Resize();
         }
         Frame.InvalidateVisual();
-        if (_drawn++ == 0) IlkKareCizildi?.Invoke();
+        _drawn++;
+        IlkGoruntu();
+        if (AudioOnly) RaiseAudioCardOverCover();
         TxtEmpty.IsVisible = false;
         RefreshState();
     }
@@ -856,6 +860,7 @@ internal partial class PlayerView : UserControl
         _watchdog = null;
         _render?.Stop();
         _stall.Reset();
+        HideAudioCard();
         if (_engine is { } engine)
         {
             engine.Faulted -= OnFaulted;

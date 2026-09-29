@@ -667,6 +667,7 @@ public partial class MainWindow : Window
             AcilisIzi.Yaz("varsayilan-oneri");
             if (UpdateCheck.AutoUpdateEnabled(settings)) _ = OtomatikGuncellemeyiBaslatAsync();
             else _ = CheckForUpdateAsync();
+            _ = KisayolSimgesiniTazeleAsync();
             await LoadFfmpegVersionAsync();
             await ProbeHardwareEncodersAsync();
         }
@@ -2847,9 +2848,9 @@ public partial class MainWindow : Window
         _ = CheckForUpdateAsync();
     }
 
-    private async Task CheckForUpdateAsync()
+    private async Task CheckForUpdateAsync(bool yedek = false)
     {
-        if (UpdateCheck.AutoUpdateEnabled())
+        if (!yedek && UpdateCheck.AutoUpdateEnabled())
         {
             await Dispatcher.UIThread.InvokeAsync(() => BtnUpdateBadge.IsVisible = false);
             return;
@@ -2878,7 +2879,11 @@ public partial class MainWindow : Window
         {
             if (_updateBadgeState is UpdateBadgeState.Downloading or UpdateBadgeState.Ready) return;
             SetUpdateBadge(yeniMi ? UpdateBadgeState.NewVersion : UpdateBadgeState.UpToDate);
-            if (!yeniMi) return;
+            if (!yeniMi)
+            {
+                UpdateHealth.RecordSuccess(SettingsPathOverride, DateTimeOffset.UtcNow);
+                return;
+            }
 
             _noticeVersion = version;
             TxtNoticeVersion.Text = version;
@@ -3393,7 +3398,7 @@ public partial class MainWindow : Window
         try { await Player.OpenAsync(path); }
         catch (Exception ex) { ReportPlayerOpenFailure(ex); }
         AcilisIzi.Yaz("motor-acildi");
-        await LoadAsync(path);
+        if (!ShellIntegration.IsPlayerOnly(path)) await LoadAsync(path);
         AcilisIzi.Yaz("kucultme-yuklendi");
         _ = CizimiOlcAsync(true);
     }

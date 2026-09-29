@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "Wenn aktiviert, wird eine neue Version im Hintergrund geladen und beim Schließen von VidShrink installiert. Wenn deaktiviert, wird eine neue Version in der oberen Leiste angekündigt und per Schaltfläche installiert.",
   "settings.update.no-self-effect": "VidShrink aktualisiert sich auf diesem System nicht selbst: Es meldet nur, dass eine neue Version existiert, und zeigt den Befehl, der sie installiert.",
   "settings.default-app.suggestion": "VidShrink ist nicht das Standardprogramm für Videos. Sie können es auf der Windows-Seite „Standard-Apps“ wählen.",
+  "settings.default-app.all": "Alle zuweisen",
+  "settings.default-app.all-copied": "Befehl in die Zwischenablage kopiert. Öffnen Sie ein PowerShell-Fenster und fügen Sie ihn ein; VidShrink wird zum Standard für alle Audio- und Videoformate.",
   "settings.default-app.open": "Standard-Apps",
   "settings.default-app.dismiss": "Nicht mehr fragen",
   "settings.player-shortcuts.title": "Player-Tastenkürzel",

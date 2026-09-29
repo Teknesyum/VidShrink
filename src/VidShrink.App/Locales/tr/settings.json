@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "Açıksa yeni sürüm arka planda iner ve VidShrink kapanınca kurulur.\nKapalıysa yeni sürüm üst çubukta haber verilir, kurulumu düğmeyle olur.",
   "settings.update.no-self-effect": "VidShrink bu sistemde kendini güncellemez.\nYalnızca yeni sürümü ve kuran komutu gösterir.",
   "settings.default-app.suggestion": "VidShrink videolar için varsayılan program değil. Windows'un Varsayılan uygulamalar sayfasından seçebilirsiniz.",
+  "settings.default-app.all": "Tümünü Ata",
+  "settings.default-app.all-copied": "Komut panoya kopyalandı. Bir PowerShell penceresi açıp yapıştırın; VidShrink tüm ses ve video uzantılarına varsayılan olur.",
   "settings.default-app.open": "Varsayılan uygulamalar",
   "settings.default-app.dismiss": "Bir Daha Sorma",
   "settings.player-shortcuts.title": "Oynatıcı kısayolları",
