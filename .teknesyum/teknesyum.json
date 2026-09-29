@@ -1,0 +1,106 @@
+{
+  "icon": ".teknesyum/icon.png",
+  "screenshot": ".teknesyum/shot.jpg",
+  "full": ".teknesyum/full.jpg",
+  "catalog": {
+    "category": "video",
+    "tags": {
+      "tr": [
+        "video",
+        "oynatıcı",
+        "ekran-kaydı",
+        "dönüştürme",
+        "sıkıştırma"
+      ],
+      "en": [
+        "video",
+        "player",
+        "screen-recording",
+        "conversion",
+        "compression"
+      ]
+    },
+    "summary": {
+      "tr": "Video oynatıcı, ekran kaydedici, editör, küçültücü ve dönüştürücüyü tek pencerede toplayan, ücretsiz ve tamamen çevrimdışı çalışan bir medya aracı. Videoları hızlı saran dahili oynatıcıyla izler, ekranı mikrofon ve sistem sesiyle kaydeder, kırpıp keser, istediğin dosya boyutunun hemen altına küçültür, MP4, MKV, WebM, GIF ya da MP3'e dönüştürür ve tek tıkla paylaşım bağlantısı verir. Donanım kodlayıcılarını makinede sınayarak kullanır. Arayüz 42 dil ve 26 renk temasıyla gelir; Windows, macOS ve Linux'ta çalışır.",
+      "en": "A free, fully offline media tool that puts a video player, screen recorder, editor, shrinker and converter in one window. It plays video with fast seeking, records the screen with microphone and system sound, trims and cuts, shrinks a file to land just under the size you ask for, converts to MP4, MKV, WebM, GIF or MP3, and gives you a one-click share link. Hardware encoders are probed on your own machine before use. The interface ships in 42 languages with 26 colour themes, on Windows, macOS and Linux."
+    },
+    "points": {
+      "tr": [
+        "Hızlı ileri-geri saran dahili oynatıcı",
+        "Öncesi-sonrası karşılaştırma paneli",
+        "Ekran kaydı: tüm ekran, tek pencere ya da bölge",
+        "Mikrofon ve sistem sesini adıyla seçerek kaydeder",
+        "Kaydediciyi de otomatik ayarlar",
+        "Kırpma ve zaman aralığı kesme",
+        "Videoyu seçtiğin MB değerinin hemen altına küçültür",
+        "Hazır boyutlar: e-posta 8, WhatsApp 16, Gmail 25 MB",
+        "Kodek, kalite, çözünürlük ve kare hızını kendisi seçer",
+        "Sonuç boyutunu başlamadan önce söyler",
+        "NVENC, Quick Sync, AMF dahil 12 kodlayıcı",
+        "Kodlayıcıları önce senin makinende sınar",
+        "Klasör izleme: gelen videoları kendiliğinden küçültür",
+        "Dönüştürme: MP4, MKV, WebM, MOV, AVI, GIF",
+        "Ses çıkarma: MP3, M4A, WAV",
+        "H.264, H.265, VP9, AV1 ya da akış kopyası",
+        "Tek tıkla paylaşım bağlantısı: storage.to (25 GB), uguu.se",
+        "Paylaşılan video tarayıcıda doğrudan oynar",
+        "Bağlantının ne kadar kalacağını seçip silebilirsin",
+        "Gezgin sağ tık menüsünden \"VidShrink ile aç\"",
+        "Gizli Gelişmiş sekmede tam ffmpeg komutu",
+        "Aynı motoru kullanan komut satırı aracı",
+        "Tamamen çevrimdışı ve ücretsiz",
+        "42 dil ve 26 renk teması",
+        "Windows, macOS ve Linux"
+      ],
+      "en": [
+        "Built-in player with fast seeking",
+        "Before-and-after comparison panel",
+        "Screen recording: full screen, one window or a region",
+        "Records microphone and system sound chosen by name",
+        "Tunes the recorder automatically too",
+        "Trimming and time-range cutting",
+        "Shrinks a video just under the MB you pick",
+        "Preset sizes: e-mail 8, WhatsApp 16, Gmail 25 MB",
+        "Picks codec, quality, resolution and frame rate itself",
+        "Tells you the result size before it starts",
+        "12 encoders including NVENC, Quick Sync, AMF",
+        "Probes encoders on your own machine first",
+        "Watch folder: shrinks incoming videos on its own",
+        "Convert: MP4, MKV, WebM, MOV, AVI, GIF",
+        "Audio extraction: MP3, M4A, WAV",
+        "H.264, H.265, VP9, AV1 or stream copy",
+        "One-click share link: storage.to (25 GB), uguu.se",
+        "Shared videos play straight in the browser",
+        "Choose how long the link lives, and delete it",
+        "\"Open with VidShrink\" in the Explorer right-click menu",
+        "Exact ffmpeg command in the hidden Advanced tab",
+        "Command-line tool on the same engine",
+        "Fully offline and free",
+        "42 languages and 26 colour themes",
+        "Windows, macOS and Linux"
+      ]
+    },
+    "uses": {
+      "tr": [
+        "Videolarını dahili oynatıcıyla izle",
+        "Ekranı sesiyle birlikte kaydet",
+        "Kırp, kes, istediğin aralığı al",
+        "Videoyu istediğin boyuta küçült",
+        "MP4, MKV, GIF, MP3'e dönüştür",
+        "Tek tıkla bağlantıyla paylaş"
+      ],
+      "en": [
+        "Watch videos in the built-in player",
+        "Record the screen with sound",
+        "Trim and cut the part you want",
+        "Shrink a video to any size",
+        "Convert to MP4, MKV, GIF, MP3",
+        "Share with a one-click link"
+      ]
+    },
+    "lead": {
+      "tr": "Video Oynatıcı, Kaydedici, Editör, Küçültücü, Dönüştürücü ve Daha Fazlası",
+      "en": "Video Player, Recorder, Editor, Shrinker, Converter and More"
+    }
+  }
+}
