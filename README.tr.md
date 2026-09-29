@@ -4,105 +4,184 @@
 
 # VidShrink
 
-**Videoyu istediğiniz dosya boyutuna indirin, ekranınızı kaydedin, oynatın ve paylaşın —
-tek bir ücretsiz, çevrimdışı pencereden.**
+**Medya oynatıcı, ekran kaydedici, video düzenleyici, dönüştürücü ve videoyu tam
+istediğiniz dosya boyutuna indiren küçültücü — tek ücretsiz uygulama, tek pencere, reklam
+yok.**
 
-**Ömür boyu ücretsiz · Reklam yok · Hesap yok · Abonelik yok · Telemetri yok · İnternet
-kapalıyken de çalışır · 42 dil · 26 tema · Açık kaynak**
+**Ömür boyu ücretsiz · Reklam yok · Filigran yok · Hesap yok · Abonelik yok · Telemetri yok ·
+İnternet kapalıyken de çalışır · 42 dil · 36 tema · Açık kaynak**
 
 [![Son sürüm](https://img.shields.io/github/v/release/Teknesyum/VidShrink?label=s%C3%BCr%C3%BCm)](https://github.com/Teknesyum/VidShrink/releases/latest)
 [![Lisans AGPL-3.0-or-later](https://img.shields.io/badge/lisans-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#kurulum)
 
-![VidShrink Küçült sekmesi Türkçe: solda Kaynak bırakma alanı, altında hedef boyut yongaları ve kaydırıcısı, ortada kodeki, CRF'i, çözünürlüğü ve kare hızını tek tek yazan Ne Yapacak paneli, sağda boyut kestirimini gösteren Çıktı paneli](docs/gorseller/T191-kucult-tr.png)
+![VidShrink Oynatıcı sekmesi Türkçe: pencereyi dolduran bir video, üstte Oynatıcı, Düzenleyici, Küçült, Dönüştür, Kaydedici ve Ayarlar sekmeleri, altta süre, ses, on saniyelik atlamalar, oynat-duraklat, hız, klip ve tam ekran düğmelerini taşıyan kontrol şeridi](docs/gorseller/T200-oynatici-tr.png)
 
-## Bunların hiçbirini bilmenize gerek yok
+## Beş Uygulama Yerine Tek Uygulama
 
-Videoyu sürükleyin, bir boyuta dokunun, başlat deyin. İşin tamamı bu; gerisini otomatik kip
-yapıyor — kodeki, kalite düzeyini, çözünürlüğü ve kare hızını **sizin** dosyanız için
-seçiyor ve beklenen boyutu daha hiçbir şey koşmadan söylüyor. İstediğiniz sayıdan büyük bir
-dosya asla almıyorsunuz.
+Video işi genelde bir raf dolusu program demek: biri izlemek için, biri ekranı kaydetmek
+için, biri kesmek için, biri dönüştürmek için, biri de dosyayı yükleme sınırının altına
+sıkıştırmak için. Beş kurulum, beş güncelleme uyarısı, beş ayrı reklam ya da "Pro" teklifi —
+ve dosyanız aralarında gidip geliyor.
 
-Ekran kaydedici de aynı şekilde: tek bir kutucuk, ve program kodlayıcıyı, kare hızını ve
-kayıt boyutunu size sormak yerine kendi makinenizde ölçüp buluyor.
+VidShrink rafın tamamı, tek pencerede. Dosyayı bir kez açın, her araç onu görür: izleyin,
+kesin, dönüştürün, sohbet uygulamasının kabul ettiği boyuta küçültün ve bağlantıyı
+gönderin — ikinci program yok, ara kopya yok.
 
-**Pencerenin tamamı 42 dil konuşuyor** — her düğme, her uyarı, her ipucu; Arapçadan
-Vietnamcaya — ve yanında **26 renk teması** geliyor (Catppuccin, Dracula, Gruvbox, Nord,
-Rose Pine, Solarized, Tokyo Night ve yirmi tanesi daha, açık ve koyu). İkisini de Ayarlar'dan
-seçiyorsunuz, hiçbir şey yeniden başlamıyor. Diliniz yok mu, ya da çeviri sizin dilinizde
-kötü mü duruyor? [Issue açın](https://github.com/Teknesyum/VidShrink/issues/new), bir sonraki
-sürüme giriyor — süreç bundan ibaret.
+| İş | Genelde ayrı bir uygulama, örneğin | VidShrink'te |
+|---|---|---|
+| Her şeyi altyazıyla izlemek | GOM Player, VLC, PotPlayer | [Oynatıcı](#oynatici) |
+| Ekranı, bir pencereyi ya da bir bölgeyi kaydetmek | Bandicam, OBS Studio | [Ekran Kaydedici](#ekran-kaydedici) |
+| Kesmek, bölmek, hızlandırmak, tersine çevirmek | Lightworks, Shotcut | [Düzenleyici](#duzenleyici) |
+| Biçimi ya da kodeki değiştirmek | HandBrake, Format Factory | [Dönüştür](#donustur) |
+| Yükleme sınırına tam oturtmak | çevrimiçi sıkıştırıcılar | [Küçült](#tam-boyuta-kucult) |
+| Büyük dosyayı bağlantı olarak göndermek | WeTransfer | [Paylaş](#paylas) |
 
-## Tek pencerede dört araç
+Her araç ücretsiz ve ücretsiz kalıyor: kayıtlarınıza ve çıktılarınıza filigran yok, deneme
+süresi yok, hesap yok, ücretli sürüme saklanmış özellik yok. Siz istemedikçe makinenizden
+hiçbir şey çıkmıyor — bkz. [Gizlilik](#kod-imzalama-politikasi).
 
-**Küçült** — megabayt cinsinden bir hedef, ve onun hemen altına oturan bir video. İnsanların
-gerçekten ihtiyaç duyduğu boyutlar için yongalar (Discord'a 8, WhatsApp'a 16, Gmail'e 25,
-WhatsApp Web'e 180), gerisi için kaydırıcı. On iki kodlayıcı — yazılım, NVENC, Quick Sync,
-AMF — her biri önce [kendi makinenizde yoklanıyor](docs/olcumler/kodek-matris.md).
+<sub>Ürün adları sahiplerine aittir; VidShrink'in hiçbiriyle bağı yoktur.</sub>
 
-**Kaydet** — tüm ekran, tek bir pencere ya da bir bölge; her platformun gerçekten sahip
-olduğu yakalama arka ucuyla: Windows'ta gdigrab, macOS'ta avfoundation, Linux'ta x11grab.
-Mikrofon ve sistem sesi adıyla seçiliyor, böylece sırası değişen bir aygıt listesi
-mikrofonunuzu sessizce değiştiremiyor. Durdurmak dosyayı düzgün kapatıyor; duran kayıt oynuyor.
+<a id="oynatici"></a>
 
-**Oynat** — kaynak pencerede oynuyor; her ileri-geri için ffmpeg başlatmak yerine
-[aramalar arasında açık kalan](docs/olcumler/oynatici-motor-libmpv.md) bir çözücü borusuyla,
-yanında öncesi-sonrası için karşılaştırma paneliyle.
+## Oynatıcı
 
-**Paylaş ve sağ tık** — "Bu videoyu VidShrink ile aç" Explorer menüsünde duruyor, Windows
-11'de birincil menüde, [kullanıcı başına yazılıyor](docs/olcumler/kabuk-menusu.md); yönetici
-hakkı istemiyor ve dosya ilişkilendirmelerinize dokunmuyor. Paylaşım hedefleri ve ölçülmüş
-boyut tavanları [`paylasim-hedefleri.json`](paylasim-hedefleri.json) içinde.
+mpv'nin içindeki motor olan **libmpv** üzerine kurulu; büyük oynatıcıların açtığını açıyor —
+MKV, MP4, WebM, AVI, MOV, TS ve gerisi — istediğinizde donanım çözmeyle. Film oynarken
+kontroller kayboluyor, fare gelince geri geliyor.
 
-Ayrıca bir Dönüştür sekmesi (MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A, WAV; H.264, H.265,
-VP9, AV1 ya da akış kopyası; kırpma ve ses çıkarma) ve tam ffmpeg komutunu tutan gizli bir
-Gelişmiş sekmesi var. Tam tur: [`docs/kullanim.tr.md`](docs/kullanim.tr.md).
+- **Altyazı** — yan dosyalar kendiliğinden yükleniyor, sürüklenen altyazı dosyası doğrudan
+  çalışıyor, zamanlama adım adım kaydırılıyor, yazı zevkinize göre biçimleniyor ve
+  **OpenSubtitles araması ve indirmesi** pencerenin içinde.
+- **Ses** — ses izini seçin, ses gecikmesini kaydırın, 10 bantlı ekolayzerle şekillendirin.
+- **Görüntü** — parlaklık, karşıtlık, doygunluk, gama, renk tonu, keskinlik, kırpma,
+  döndürme, aynalama, en-boy oranı ve yakınlaştırma.
+- **Denetim** — oynatma hızı, kare kare ilerleme, A-B tekrarı, yer imleri, ekran görüntüsü,
+  zaman çizelgesinden doğrudan klip ya da GIF çıkarma.
+- **Kitaplık** — karıştırma ve tekrarlı çalma listesi, klasördeki sonraki ve önceki dosya,
+  son dosyalar ve geçmiş, URL açma.
+- **Pencere** — mini oynatıcı, her zaman üstte, kısayollar paneli ve öncesi-sonrası için
+  yan yana karşılaştırma paneli.
 
-## Her sekme
+<a id="ekran-kaydedici"></a>
+
+## Ekran Kaydedici
+
+![Kaydedici sekmesi otomatik kipte: kaynak seçici, yanında Yeniden Ölç düğmesiyle süre ve boyut alanları, mikrofonu ve sistem sesini adıyla seçen ses bölümü](docs/gorseller/T200-kaydedici-tr.png)
+
+- **Ne** — tüm ekran, tek pencere ya da çizdiğiniz bir bölge; her platformun gerçekten sahip
+  olduğu yakalama arka ucuyla: Windows'ta gdigrab, macOS'ta avfoundation, Linux'ta x11grab.
+- **Ses** — mikrofon ve sistem sesi adıyla seçiliyor, böylece sırası değişen bir aygıt
+  listesi mikrofonunuzu sessizce değiştiremiyor; kazanç, gürültü kapısı ve gürültü bastırma.
+- **Kamera** — kendi boyutu ve köşesi olan bir kamera katmanı, yeşil perde seçeneğiyle.
+- **Anlatım videoları için** — imleç, tıklama halkaları ve tıklama sesi, bastığınız tuşlar
+  ekranda, büyüteç ve canlı önizleme.
+- **Denetim** — Windows'ta F7-F11 genel kısayolları, geri sayım, süre sınırı, süreye ya da
+  boyuta göre bölme, son anları tutan tekrar arabelleği, tepsi ve mini kaydedici kipleri.
+- **Kodlayıcılar** — x264, x265, SVT-AV1 ve VP9, artı ekran kartının kendi kodlayıcıları:
+  NVIDIA NVENC, Intel Quick Sync, AMD AMF. **Otomatik kip** makinenizde her aday için üç
+  gerçek saniye kaydediyor ve kare düşürmeyeni tutuyor — siz bir kutucuk işaretliyorsunuz,
+  ödevi o yapıyor.
+- **Çıktı** — MP4, MKV, MOV ya da GIF; isterseniz hedef boyut ya da süre bütçesi; durdurunca
+  düzgün kapanan bir dosya. Tek tıkla Düzenleyici'ye, Oynatıcı'ya ya da Paylaş'a gidiyor.
+
+<a id="duzenleyici"></a>
+
+## Düzenleyici
+
+![Düzenleyici sekmesi: üstte video, altında Böl, Sil, Hız, Geri Al, Yinele, yakınlaştırma, Kaydet, Farklı Kaydet ve Dosyayı Paylaş düğmeleri, onların altında üç klibe bölünmüş zaman çizelgesi](docs/gorseller/T200-duzenleyici-tr.png)
+
+Herhangi bir sekmeden bir videoyu açın ve zaman çizelgesinde kesin: bölün, bir klibi ya da
+bir aralığı silin, klipleri taşıyın, her klibin hızını 0,01× ile 100× arasında ayarlayın,
+tersine oynatın, geri alın ve yineleyin. Sonra sekmeden çıkmadan **Kaydet**, **Farklı
+Kaydet** ya da **Paylaş** — üç dışa aktarma kipinden biriyle:
+
+- **Hızlı** — anahtar karelerden keser, akışları kopyalar; yeniden kodlama yok, kalite kaybı
+  yok.
+- **Akıllı** — kopyalayabildiğini kopyalar, yalnız kesimlerin gerektirdiğini yeniden kodlar.
+- **Tam** — sonucun tamamını yeniden kodlar.
+
+<a id="tam-boyuta-kucult"></a>
+
+## Tam Boyuta Küçült
+
+![Küçült sekmesi: solda Kaynak bırakma alanı, altında hedef boyut yongaları ve kaydırıcısı, ortada kodeki, CRF'i, çözünürlüğü ve kare hızını tek tek yazan Ne Yapacak paneli, sağda boyut kestirimini gösteren Çıktı paneli](docs/gorseller/T200-kucult-tr.png)
+
+Videoyu sürükleyin, bir boyuta dokunun, başlat deyin. İşin tamamı bu; otomatik kip kodeki,
+kalite düzeyini, çözünürlüğü ve kare hızını **sizin** dosyanız için seçiyor ve beklenen
+boyutu daha hiçbir şey koşmadan söylüyor. Ölçülen 36 durumda hedef **sıfır** kez aşıldı —
+istediğiniz sayıdan büyük bir dosya almıyorsunuz.
+
+İnsanların gerçekten ihtiyaç duyduğu boyutlar için yongalar — katı e-posta geçitlerine 8 MB,
+WhatsApp'a 16, Gmail'e 25, WhatsApp Web'e 180 — gerisi için kaydırıcı. On iki kodlayıcı,
+yazılım ile NVENC, Quick Sync ve AMF; her biri önce
+[kendi makinenizde yoklanıyor](docs/olcumler/kodek-matris.md). Sonuç **VMAF-NEG** ile
+puanlanıyor — ortalama, harmonik ortalama, 10. yüzdelik ve en kötü kare — ve bir klasörün
+tamamı toplu kuyruktan geçebiliyor; kuyruk bitince klasörü açıyor, bilgisayarı uyutuyor ya
+da kapatıyor.
 
 <details>
-<summary>Altı sekmenin, önizlemenin ve gizli Gelişmiş sekmesinin ekran görüntüleri</summary>
+<summary>Önizleme: plan koşmadan önce gerçekte ne üreteceği</summary>
 
-**Oynatıcı** — kaynak pencerede oynuyor, karşılaştırma paneli yanında duruyor.
-
-![Oynatıcı sekmesi: alt şerit, sayısı görünen ses ve hız kaydırıcıları, karşılaştırma paneli](docs/gorseller/T191-oynatici-tr.png)
-
-**Küçült** — solda kaynak, ortada hedef boyut ve kalite, sağda kestirim.
-
-![Küçült sekmesi: kaynak bilgileri, hedef boyut yongaları ve kaydırıcısı, plan paneli, çıktı kestirimi](docs/gorseller/T191-kucult-tr.png)
-
-**Önizleme** — plan koşmadan önce ne üreteceği.
-
-![Planlanan çıktıyı gösteren önizleme paneli](docs/gorseller/T191-onizleme-tr.png)
-
-**Dönüştür** — kap, kodek, kırpma ve ses çıkarma.
-
-![Dönüştür sekmesi: çıktı biçimi, kodek, kırpma alanları, ses çıkarma](docs/gorseller/T191-donustur-tr.png)
-
-**Kaydedici** — otomatik kip işaretli; seçilen kodlayıcı, kare hızı ve kayıt boyutu kutucuğun altında yazıyor.
-
-![Kaydedici sekmesi otomatik kipte, kutucuğun altında gerekçe satırı](docs/gorseller/T191-kaydedici-tr.png)
-
-**Ayarlar** — dil, tema, sağ tık menüsü, güncelleme davranışı.
-
-![Ayarlar sekmesi: dil ve tema seçicileri, sağ tık menüsü anahtarı, güncelleme ayarları](docs/gorseller/T191-ayarlar-tr.png)
-
-**Hakkında** — sürüm, lisans, VidShrink'in üstünde durduğu projeler.
-
-![Hakkında sekmesi: sürüm, lisans ve teşekkürler](docs/gorseller/T191-hakkinda-tr.png)
-
-**Gelişmiş** (açana kadar gizli) — koşacak tam ffmpeg komutu.
-
-![Gizli Gelişmiş sekmesi, tam ffmpeg komut satırını gösteriyor](docs/gorseller/T191-gelismis-tr.png)
+![Planlanan çıktıyı oynatan önizleme paneli](docs/gorseller/T200-onizleme-tr.png)
 
 </details>
+
+<a id="donustur"></a>
+
+## Dönüştür
+
+![Dönüştür sekmesi: kapsayıcı, kodek, kalite kipi, çözünürlük, kare hızı ve kırpma alanları, yanlarında FFmpeg Komutu paneli](docs/gorseller/T200-donustur-tr.png)
+
+MP4, MKV, WebM, MOV, AVI ve GIF; yalnız ses için MP3, M4A, WAV ve FLAC. H.264, H.265, VP9, AV1
+ya da doğrudan akış kopyası, kırpma ve ses çıkarma. **On sekiz hazır hedef** — WhatsApp,
+Discord, Telegram, Gmail, Outlook, Chromecast, Nest Hub, Apple TV ve fazlası — her alanı
+sizin yerinize dolduruyor.
+
+<details>
+<summary>Gizli Gelişmiş sekmesi: koşacak ffmpeg komutunun kendisi</summary>
+
+![Gelişmiş sekmesi: FFmpeg Komutu kutusu ve AI Ayarları kutusu](docs/gorseller/T200-gelismis-tr.png)
+
+</details>
+
+<a id="paylas"></a>
+
+## Paylaş
+
+Küçült'te, Kaydedici'de ya da Düzenleyici'de **Paylaş**'a basın, dosya bağlantı olarak
+yüklensin: 25 GB'a kadar dosyalar için bir ile yedi gün tutan **storage.to**, ya da 128 MB'a
+kadar dosyalar için üç saat tutan **uguu.se**. Bağlantı telefonunuz için bir QR koduyla
+geliyor, yarıda kopan yükleme yeniden denenebiliyor. Paylaşım hedefleri ve ölçülmüş boyut
+tavanları [`paylasim-hedefleri.json`](paylasim-hedefleri.json) içinde.
+
+## Herkes İçin
+
+![Ayarlar sekmesi: dil ve tema seçicileri, sağ tık menüsü anahtarı ve güncelleme ayarları](docs/gorseller/T200-ayarlar-tr.png)
+
+**Pencerenin tamamı 42 dil konuşuyor** — her düğme, her uyarı, her ipucu; Arapçadan
+Vietnamcaya — ve yanında **36 renk teması** geliyor: Catppuccin, Dracula, Gruvbox, Nord, Rose
+Pine, Solarized, Tokyo Night ve yirmi dokuz tane daha, açık ve koyu. İkisini de Ayarlar'dan
+seçiyorsunuz, hiçbir şey yeniden başlamıyor. Diliniz yok mu, ya da çeviri sizin dilinizde
+kötü mü duruyor? [Issue açın](https://github.com/Teknesyum/VidShrink/issues/new), bir sonraki
+sürüme giriyor.
+
+**Sisteminizde neyi değiştirdiği, ve fazlası değil.** Windows'ta kurucu Başlat menüsüne ve
+masaüstüne kısayol, Explorer sağ tık menüsüne "Bu videoyu VidShrink ile aç" girdisi (Windows
+11'de birincil menüde) ve video dosyalarının **Birlikte aç** listesine VidShrink ekliyor —
+[kullanıcı başına yazılıyor](docs/olcumler/kabuk-menusu.md), yönetici hakkı istemiyor ve
+varsayılan oynatıcınız varsayılan kalıyor. Uygulama yeni sürüm için GitHub'a bakıp
+güncellemeyi öneriyor; bu denetim Windows'ta varsayılan açık, Ayarlar'dan kapatılıyor.
+Yukarıdakilerin hepsi tek komutla geri alınıyor — bkz. [Kurulum](#kurulum).
+
+Her sekmenin tam turu: [`docs/kullanim.tr.md`](docs/kullanim.tr.md).
 
 ## Kurulum
 
 Windows'ta [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
-dosyasını indirip çalıştırın (0.8.3'ten itibaren yayında). Kendi başına çalışan küçük bir
-program: PowerShell de yönetici hakkı da gerekmez, aşağıdaki betiğin yaklaşık yarı süresinde
-biter. Betik de çalışmaya devam ediyor ve aynı kurulumu yapıyor.
+dosyasını indirip çalıştırın. Kendi başına çalışan küçük bir program: PowerShell de yönetici
+hakkı da gerekmez. Aşağıdaki betik de aynı kurulumu yapıyor.
 
 ```powershell
 # Windows
@@ -118,8 +197,19 @@ Yönetici hakkı yok, .NET SDK yok. Her sürüm tek bir sürüm numarasından d�
 `win-x64`, `osx-arm64`, `osx-x64`, `linux-x64`. Gerekenler: Windows 10 ya da 11, macOS 14 ve
 üstü, ya da X11/Wayland koşan bir Linux masaüstü, artı `ffmpeg` ve `ffprobe`. FFmpeg ve
 libmpv sürümle birlikte gelmiyor; kurucu bunları Windows'ta pinlenmiş SHA-256 özetlerine
-karşı indiriyor, diğerlerinde paket yöneticinizin komutunu yazıyor. Sağlama doğrulaması,
-sağ tık girdisi, kendi kendini güncelleme akışı ve kaldırma anahtarları
+karşı indiriyor, diğerlerinde paket yöneticinizin komutunu yazıyor. Windows sürümleri,
+sertifika verildiğinde [Kod İmzalama Politikası](#kod-imzalama-politikasi) altında
+imzalanıyor.
+
+**Kaldırma.** `VidShrink-Setup.exe --uninstall` kısayolları, sağ tık girdilerini, Birlikte aç
+kaydını ve kurulum klasörünü siliyor. macOS ve Linux'ta aynı kurucuyu `--uninstall` ile
+çalıştırın:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh -s -- --uninstall
+```
+
+Sağlama doğrulaması, sağ tık girdisi, kendi kendini güncelleme akışı ve bütün anahtarlar
 [`docs/kurulum.tr.md`](docs/kurulum.tr.md) içinde.
 
 ## Komut satırı
@@ -420,6 +510,8 @@ dağıtmaz ve içine GPL kodu bağlamaz ([`docs/kurulum.tr.md`](docs/kurulum.tr.
 Kaynak ağacının içinde dağıtılan üçüncü taraf malzeme — simge takımının kesildiği Fluent UI
 System Icons (MIT) — [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) dosyasında.
 
+<a id="kod-imzalama-politikasi"></a>
+
 ## Kod İmzalama Politikası
 
 Ücretsiz kod imzalama [SignPath.io](https://about.signpath.io) tarafından, sertifika
@@ -429,17 +521,20 @@ onaylanana kadar Windows sürümleri imzasız çıkar.
 - Kod yazan, gözden geçiren ve onaylayan: [Teknesyum](https://github.com/Teknesyum)
 
 Yalnız bu depodan GitHub Actions'ın derlediği dosyalar imzalanır; her imza isteği elle
-onaylanır.
+onaylanır. Ekipteki herkes çok aşamalı doğrulamayla oturum açar.
 
 **Gizlilik.** Bu program, kullanıcı ya da onu kuran veya çalıştıran kişi özellikle
-istemedikçe başka ağ sistemlerine bilgi aktarmaz. Yapabildiği istekler ve her birini
-neyin başlattığı:
+istemedikçe başka ağ sistemlerine bilgi aktarmaz. Yapabildiği istekler, her birini neyin
+başlattığı ve o anda kimin gizlilik politikasının geçerli olduğu:
 
 - **Güncelleme denetimi** — GitHub'a son sürümü sorar. Windows'ta varsayılan açık;
-  Ayarlar'dan kapatılır.
+  Ayarlar'dan kapatılır. [GitHub Gizlilik Bildirimi](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
 - **Kurucu** — FFmpeg ve libmpv'yi GitHub sürümlerinden, SHA-256'ya sabitlenmiş olarak indirir.
+  [GitHub Gizlilik Bildirimi](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
 - **Paylaş** — dosyayı yalnız Paylaş'a bastığınızda, seçtiğiniz sunucuya yükler.
+  [storage.to gizlilik](https://storage.to/privacy) · [uguu.se SSS](https://uguu.se/faq)
 - **OpenSubtitles** — yalnız siz kullandığınızda oturum açar ve arar.
+  [OpenSubtitles gizlilik politikası](https://www.opensubtitles.com/en/privacy/)
 
 ## Tek Satırda Kurulum
 
