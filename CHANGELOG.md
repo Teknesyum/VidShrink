@@ -17,6 +17,8 @@ ship as part of it.
 
 ### Fixed
 
+- Windows: the default-apps suggestion no longer stays up after VidShrink was chosen: the check now accepts VidShrink's own ProgID, so development and portable builds see the choice too.
+- Windows: the VidShrink page under Default apps lists five formats (mp4, mkv, mov, avi, webm) instead of 24; the other formats stay in Open with and the right-click menu. Existing installs trim the list on the next start.
 - Windows: when the silent update fails three times in a row (unreachable, bad download, install on exit fails), the app stops trusting it and runs the manual check, so a newer version shows up in the badge and panel instead of never arriving. The reason is kept in `update-health.json` next to the settings.
 - Windows: the desktop and Start menu shortcut icons are refreshed once per version after startup, so an old icon no longer sticks after an update.
 

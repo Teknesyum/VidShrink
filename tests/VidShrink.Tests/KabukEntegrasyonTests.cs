@@ -180,6 +180,20 @@ public sealed class KabukEntegrasyonTests
             Assert.DoesNotContain(extension, new[] { "mp3", "wav", "flac", "aac", "ogg", "m4a", "jpg", "png" }));
     }
 
+    [Fact]
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    public void ProgIdBizimseGelistirmeBuildiDeVarsayilanSayilir()
+    {
+        const string Installed = @"C:\Programs\VidShrink\app\VidShrink.App.exe";
+        const string Dev = @"D:\kaynak\src\VidShrink.App\bin\Debug\net8.0\VidShrink.App.exe";
+
+        Assert.True(DefaultApp.IsOurs(FileAssociation.ProgId, Installed, Dev, Dev));
+        Assert.True(DefaultApp.IsOurs(null, Installed, Installed, Installed));
+        Assert.False(DefaultApp.IsOurs("VLC.mp4", @"C:\VLC\vlc.exe", Dev, Dev));
+        Assert.False(DefaultApp.IsOurs(null, null, Dev, Dev));
+        Assert.DoesNotContain("gif", ShellIntegration.DefaultAppExtensions);
+    }
+
     /// <summary>
     /// G2: çift tık başlatıcıyı atlıyor. ProgID komutu ve <c>Applications\VidShrink.exe</c>
     /// komutu yanındaki <c>app\VidShrink.App.exe</c>'yi çalıştırıyor; anahtarın adı başlatıcıda

@@ -45,6 +45,8 @@ public static class ShellIntegration
     /// </summary>
     public static IReadOnlyList<string> DefaultPlayerExtensions { get; } = new[] { "mp4" };
 
+    public static IReadOnlyList<string> DefaultAppExtensions { get; } = new[] { "mp4", "mkv", "mov", "avi", "webm" };
+
     /// <summary>Hızlı küçültme isteğini uygulamaya taşıyan komut satırı bayrağı.</summary>
     public const string ShrinkFlag = "--kucult";
 
