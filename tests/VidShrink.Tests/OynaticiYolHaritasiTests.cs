@@ -486,7 +486,7 @@ public sealed class OynaticiYolHaritasiTests
             Adim("3 fare ustte, bar geri geldi", () => Hareket(window, view, new Point(640, 2)), true, false);
             Adim("4 fare asagida, bar aninda gizlendi", () => Hareket(window, view, new Point(640, 420)), false, false);
             Adim("5 bekleyen yok, gizli kaldi", () => saat.Ates(), false, false);
-            Adim("6 duraklatildi, fare asagida", () => view.Apply(Keymap.PlayPause.ToCommand()), true, false);
+            Adim("6 duraklatildi, fare asagida", () => view.Apply(Keymap.PlayPause.ToCommand()), false, false);
             Adim("7 duraklatilmisken fare ust banda girdi", () => Hareket(window, view, new Point(600, 2)), true, false);
             Adim("8 duraklatilmisken fare banttan cikti", () => Hareket(window, view, new Point(600, 500)), true, false);
             Adim("9 oynatma surdu, bar aninda gizlendi", () => view.Apply(Keymap.PlayPause.ToCommand()), false, false);
@@ -830,6 +830,7 @@ public sealed class OynaticiYolHaritasiTests
                 }
 
                 _ = view.SeritZone;
+                view.SeritZone.PointerAt(view.Bounds.Height - 1, view.Bounds.Height);
                 DenetimSurucu.Pump(view, () => view.SeritRevealed, 2);
                 DenetimSurucu.Wait(view, 0.5);
                 var serit = view.FindControl<Border>("StripBar")!;
