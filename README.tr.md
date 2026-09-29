@@ -426,9 +426,7 @@ System Icons (MIT) — [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) dosyas
 [SignPath Foundation](https://signpath.org) tarafından sağlanır. Başvuru değerlendirmede;
 onaylanana kadar Windows sürümleri imzasız çıkar.
 
-- Kod yazanlar ve gözden geçirenler: [Teknesyum](https://github.com/Teknesyum),
-  [srknzl](https://github.com/srknzl)
-- Onaylayanlar: [Teknesyum](https://github.com/Teknesyum)
+- Kod yazan, gözden geçiren ve onaylayan: [Teknesyum](https://github.com/Teknesyum)
 
 Yalnız bu depodan GitHub Actions'ın derlediği dosyalar imzalanır; her imza isteği elle
 onaylanır.

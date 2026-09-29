@@ -421,9 +421,7 @@ Free code signing provided by [SignPath.io](https://about.signpath.io), certific
 [SignPath Foundation](https://signpath.org). The application is pending; until it is
 approved, Windows releases ship unsigned.
 
-- Committers and reviewers: [Teknesyum](https://github.com/Teknesyum),
-  [srknzl](https://github.com/srknzl)
-- Approvers: [Teknesyum](https://github.com/Teknesyum)
+- Committers, reviewers and approvers: [Teknesyum](https://github.com/Teknesyum)
 
 Only artifacts built by GitHub Actions from this repository are signed, and every signing
 request is approved by hand.
