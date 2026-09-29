@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "थीम",
   "settings-tab.theme.hint": "प्रोग्राम का हर रंग बदलता है और अगली बार खोलने पर याद रहता है।",
   "settings-tab.language.hint": "इंटरफ़ेस भाषा बदलता है और अगली बार खोलने पर याद रहता है।",
-  "settings-tab.default-target.label": "डिफ़ॉल्ट लक्ष्य आकार (MB)",
+  "settings-tab.default-target.label": "डिफ़ॉल्ट लक्ष्य आकार",
   "settings-tab.default-target.hint": "सिकोड़ें टैब जिस लक्ष्य आकार से खुलता है, उसे तय करता है।",
   "settings-tab.output-folder.label": "आउटपुट फ़ोल्डर",
   "settings-tab.output-folder.beside-source": "स्रोत फ़ाइल के पास",

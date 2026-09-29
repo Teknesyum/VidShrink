@@ -469,7 +469,7 @@ public sealed class KeymapTests
                 {
                     body.AppendLine($"  {jest} | {etiket}");
                     Assert.Equal(Keymap.Gesture(row.Input), jest);
-                    Assert.Equal(Keymap.Label(row), etiket);
+                    Assert.Equal(VidShrink.Core.Bicim.Satir.Bagla(Keymap.Label(row)), etiket);
                 }
             }
 

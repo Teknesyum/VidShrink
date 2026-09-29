@@ -46,6 +46,11 @@ internal partial class RecorderView
         RadAdvanced.IsChecked = _settings.AdvancedMode;
         RadSimple.IsChecked = !_settings.AdvancedMode;
         RadAdvanced.IsCheckedChanged += OnLevelToggled;
+        foreach (var kart in new Control[] { PanelWebcam, PanelEncoding })
+            kart.PropertyChanged += (_, e) =>
+            {
+                if (e.Property == IsVisibleProperty) KartSutunlari();
+            };
         ApplyLevel();
     }
 
@@ -62,7 +67,40 @@ internal partial class RecorderView
         var advanced = AdvancedMode;
         PanelOptions.IsVisible = advanced;
         PanelAdvanced.IsVisible = advanced;
-        Grid.SetColumnSpan(PanelTarget, advanced ? 1 : 2);
+        KartYerlesimi();
+    }
+
+    private void KartYerlesimi()
+    {
+        Tasi(PanelAudio, AdvancedMode ? CardsLeft : CardsMiddle);
+        Tasi(PanelWebcam, AdvancedMode && AutoMode ? CardsExtra : CardsRight);
+        KartSutunlari();
+    }
+
+    /// <summary>
+    /// Kartlar dört sütunluk duvarda durur. Basit kipte seçenek ve gelişmiş kartları gizli
+    /// olduğu için ses ikinci, kamera üçüncü sütuna geçer ve dördüncü sütun yer tutmaz; Gelişmiş
+    /// kipte ses hedefin altına iner, orta iki sütun seçeneklere ve gelişmiş ayarlara kalır,
+    /// kamera dördüncü sütuna çıkar. Ayarları elle seçince dördüncü sütunu kodlayıcı kartı alır,
+    /// kamera gelişmiş ayarların altına iner. Görünür kartı olmayan sütun yer tutmaz.
+    /// </summary>
+    private static void Tasi(Control kart, StackPanel hedef)
+    {
+        if (ReferenceEquals(kart.Parent, hedef)) return;
+        (kart.Parent as Panel)?.Children.Remove(kart);
+        hedef.Children.Add(kart);
+    }
+
+    /// <summary>
+    /// Boş sütun gizlenir; <see cref="KartDuvari"/> görünen sütunları sırayla dizer. Sütun en az
+    /// bir alan (<c>FieldWidth</c>) genişliğinde: dört eşit sütunda 1136 px pencerede
+    /// "1. ekran — 1920 × 1080" seçimi 165 px isterken kutusunda 162 px, 1024 px'te seçim düğmeleri
+    /// 50 px kalıyordu. Daha dar pencerede sütun sayısı düşer, kartlar en kısa sütunun altına girer.
+    /// </summary>
+    private void KartSutunlari()
+    {
+        foreach (var sutun in new[] { CardsLeft, CardsMiddle, CardsRight, CardsExtra })
+            sutun.IsVisible = sutun.Children.Any(c => c.IsVisible);
     }
 
     /// <summary>Kullanıcının verdiği hedeften çıkan bütçe; hedef yoksa hükmü <c>NotRequested</c>.</summary>
@@ -197,6 +235,7 @@ internal partial class RecorderView
         BtnAutoMeasure.IsVisible = auto;
         TxtTargetSeconds.IsEnabled = auto;
         TxtTargetMegabytes.IsEnabled = auto;
+        KartYerlesimi();
     }
 
     /// <summary>

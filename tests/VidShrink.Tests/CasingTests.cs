@@ -139,6 +139,10 @@ public sealed class CasingTests
     [InlineData("software encoder libx264", "Software Encoder libx264")]
     [InlineData("hardware encoder h264_nvenc", "Hardware Encoder h264_nvenc")]
     [InlineData("hevc_qsv beats libsvtav1 on aac", "hevc_qsv beats libsvtav1 on aac")]
+    [InlineData("Time limit (s)", "Time Limit (s)")]
+    [InlineData("Kayıt süresi (sn):", "Kayıt Süresi (sn):")]
+    [InlineData("Versuch(en) (Test)", "Versuch(en) (Test)")]
+    [InlineData("a(z) próba", "A(z) Próba")]
     public void UnitsAndEncoderNamesKeepTheirSpelling(string text, string expected)
         => Assert.Equal(expected, LanguageCatalog.Title(text, "en"));
 

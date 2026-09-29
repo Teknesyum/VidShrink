@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Menja svaku boju u programu i pamti se pri sledećem pokretanju.",
   "settings-tab.language.hint": "Menja jezik interfejsa i pamti se pri sledećem pokretanju.",
-  "settings-tab.default-target.label": "Podrazumevana ciljna veličina (MB)",
+  "settings-tab.default-target.label": "Podrazumevana ciljna veličina",
   "settings-tab.default-target.hint": "Postavlja ciljnu veličinu sa kojom se otvara kartica Smanji.",
   "settings-tab.output-folder.label": "Izlazna fascikla",
   "settings-tab.output-folder.beside-source": "Pored izvornog fajla",

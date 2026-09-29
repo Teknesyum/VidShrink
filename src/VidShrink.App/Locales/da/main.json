@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Ændrer alle farver i programmet og huskes ved næste start.",
   "settings-tab.language.hint": "Ændrer sproget i brugerfladen og huskes ved næste start.",
-  "settings-tab.default-target.label": "Standardmålstørrelse (MB)",
+  "settings-tab.default-target.label": "Standardmålstørrelse",
   "settings-tab.default-target.hint": "Angiver den målstørrelse, fanen Krymp åbner med.",
   "settings-tab.output-folder.label": "Outputmappe",
   "settings-tab.output-folder.beside-source": "Ved siden af kildefilen",

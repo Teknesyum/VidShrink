@@ -9,7 +9,7 @@
   <Color x:Key="NeonBlueColor">#FFBCDDF8</Color>
   <Color x:Key="NeonPinkColor">#FF98C379</Color>
   <Color x:Key="NeonPurpleColor">#FFC679DD</Color>
-  <Color x:Key="NeonSuccessColor">#FFA4CA88</Color>
+  <Color x:Key="NeonSuccessColor">#FFACCF93</Color>
   <Color x:Key="SurfaceToneColor">#FF2C313A</Color>
   <Color x:Key="AppBgColor">#FF282C34</Color>
   <Color x:Key="TextBodyColor">#FFF9FAFB</Color>

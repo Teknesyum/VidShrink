@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Cambia ogni colore del programma e viene ricordato al prossimo avvio.",
   "settings-tab.language.hint": "Cambia la lingua dell'interfaccia e viene ricordata al prossimo avvio.",
-  "settings-tab.default-target.label": "Dimensione obiettivo predefinita (MB)",
+  "settings-tab.default-target.label": "Dimensione obiettivo predefinita",
   "settings-tab.default-target.hint": "Imposta la dimensione obiettivo con cui si apre la scheda Riduci.",
   "settings-tab.output-folder.label": "Cartella di output",
   "settings-tab.output-folder.beside-source": "Accanto al file sorgente",

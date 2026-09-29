@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Temă",
   "settings-tab.theme.hint": "Schimbă fiecare culoare din program și este reținută la următoarea pornire.",
   "settings-tab.language.hint": "Schimbă limba interfeței și este reținută la următoarea pornire.",
-  "settings-tab.default-target.label": "Mărime țintă implicită (MB)",
+  "settings-tab.default-target.label": "Mărime țintă implicită",
   "settings-tab.default-target.hint": "Stabilește mărimea țintă cu care se deschide fila Micșorare.",
   "settings-tab.output-folder.label": "Dosar de ieșire",
   "settings-tab.output-folder.beside-source": "Lângă fișierul sursă",

@@ -144,11 +144,21 @@
       <!--
         T163/K3: onizleme ile plan paneli arasindaki surukleneblir ayirici. Boy ve renk
         var olan belirteclerden — yeni bir olcu uydurulmadi.
+        Arayuz turu (2026-09-28): ayirici satir araliginin yerini aliyor. Tutma alani SpaceMd,
+        gorunen cizgi SpaceXs; iki yanindaki SpaceMd araligi kalkti, orta sutun 24 px kisaldi
+        ve tam ekranda bildirim seridi acikken Kucult kaydirmasiz sigdi.
       -->
       <ControlTheme x:Key="PlanSplitter" TargetType="GridSplitter">
         <Setter Property="Height" Value="{StaticResource SpaceMd}"/>
         <Setter Property="Background" Value="{StaticResource NeonBlueBorder}"/>
         <Setter Property="Cursor" Value="SizeNorthSouth"/>
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Border Background="Transparent">
+              <Border Height="{StaticResource SpaceXs}" VerticalAlignment="Center" Background="{TemplateBinding Background}"/>
+            </Border>
+          </ControlTemplate>
+        </Setter>
       </ControlTheme>
 
       <ControlTheme x:Key="PanelRule" TargetType="Border">
@@ -1651,6 +1661,14 @@
     <Setter Property="BorderBrush" Value="{x:Null}"/>
     <Setter Property="BorderThickness" Value="0"/>
     <Setter Property="CornerRadius" Value="0"/>
+  </Style>
+
+  <!--
+    Arayuz turu (2026-09-28): kapali dugmenin "neden kapali" balonu. Avalonia kapali denetimde
+    balonu varsayilan gostermiyor; :disabled secicili ToolTip.Tip yazan her dugme bu yuzden sessizdi.
+  -->
+  <Style Selector="Button:disabled">
+    <Setter Property="ToolTip.ShowOnDisabled" Value="True"/>
   </Style>
 
   <Style Selector="MenuFlyoutPresenter, ContextMenu">

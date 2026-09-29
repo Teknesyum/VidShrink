@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Ändrar alla färger i programmet och kommer ihåg valet vid nästa start.",
   "settings-tab.language.hint": "Ändrar gränssnittets språk och kommer ihåg valet vid nästa start.",
-  "settings-tab.default-target.label": "Standardmålstorlek (MB)",
+  "settings-tab.default-target.label": "Standardmålstorlek",
   "settings-tab.default-target.hint": "Anger målstorleken som fliken Krymp öppnas med.",
   "settings-tab.output-folder.label": "Utdatamapp",
   "settings-tab.output-folder.beside-source": "Bredvid källfilen",

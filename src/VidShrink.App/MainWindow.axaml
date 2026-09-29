@@ -238,7 +238,7 @@
                           </Transitions>
                         </Rectangle.Transitions>
                       </Rectangle>
-                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="{StaticResource SpaceSm}" Margin="{StaticResource DropZonePadding}">
+                      <StackPanel VerticalAlignment="Center" Spacing="{StaticResource SpaceSm}" Margin="{StaticResource DropZonePadding}">
                         <Path x:Name="DropIcon"
                               Width="{StaticResource DropIconSize}"
                               Height="{StaticResource DropIconSize}"
@@ -477,10 +477,272 @@
                       </izi:KaydiriciSatiri>
                       <TextBlock x:Name="TxtQualityTargetNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <Border Theme="{StaticResource PanelRule}"/>
+                  </StackPanel>
+                </Border>
 
+              </StackPanel>
+
+              <!--
+                Orta sütun iki katmandır: üstte karşılaştırma paneli, altında yapılacak
+                işlem paneli. Üç sütunlu düzen bozulmuyor — panel kendi sütununu almıyor,
+                ortadaki sütunun başına giriyor (T43/K1).
+              -->
+              <!--
+                T54/K4: artan yer önizlemeye gider. Önizleme esneyen satırdadır, plan
+                paneli varsayılan olarak içeriği kadar büyür — istediği kadarını alır,
+                kalanını önizlemeye bırakır. Eski düzende esneyen satır MaxHeight'lı plan
+                panelindeydi ve artan yer kimseye gitmiyordu.
+
+                T74/K1: "Preview" başlığı ve onu taşıyan Auto satır kaldırıldı. Yan
+                sütunlar panelle başlıyor, orta sütun başlıkla başlıyordu; başlık gidince
+                üç sütunun tepesi de aynı hizaya oturuyor.
+
+                T163/K3: kullanıcının sürüklediği yer artık kalıcı. İkinci satırdaki
+                GridSplitter üçüncü satırın (plan paneli) yüksekliğini değiştirir; hiç
+                sürüklenmemişse satır Auto kalır ve K1/K2'nin ölçtüğü içerik-güdümlü
+                boy geçerli olmaya devam eder — eski ölçüm burada bozulmuyor. Sürüklenince
+                satır piksele döner, taban ve tavan PlanPanelRow üzerinde durur (GridSplitter
+                onlara bakar), konum ApplySplitterSettings/OnSplitterMoved ile diske yazılır.
+              -->
+              <Grid Grid.Column="1" x:Name="PreviewPlanGrid">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="*"/>
+                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="Auto"
+                                 MinHeight="{StaticResource PlanPanelMinHeight}"
+                                 MaxHeight="{StaticResource PlanPanelMaxHeight}"/>
+                </Grid.RowDefinitions>
+
+                <playback:ComparisonPanel Grid.Row="0" x:Name="Preview" VerticalAlignment="Stretch"/>
+
+                <GridSplitter Grid.Row="1" x:Name="PlanSplitter" Theme="{StaticResource PlanSplitter}"
+                              HorizontalAlignment="Stretch" ResizeDirection="Rows"
+                              auto:AutomationProperties.Name="{loc:Text main.plan.splitter}"/>
+
+              <Border x:Name="PlanPanel"
+                      Grid.Row="2"
+                      Theme="{StaticResource Panel}"
+                      MinHeight="{StaticResource PlanPanelMinHeight}"
+                      MaxHeight="{StaticResource PlanPanelMaxHeight}">
+                <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceMd}">
+                  <TextBlock Grid.Row="0" Text="{loc:Text main.plan.title}" Theme="{StaticResource H2}"/>
+                  <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+                    <StackPanel x:Name="PlanBody" Spacing="{StaticResource SpaceMd}">
+                      <TextBlock x:Name="TxtPlanEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.plan.empty}"/>
+                      <izi:CiftIzgara x:Name="PlanFacts" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}"/>
+                      <Border x:Name="PlanRule" Theme="{StaticResource PanelRule}" IsVisible="False"/>
+                      <!--
+                        T46/K6: gerekçeler katlanır. Metin kısalmıyor, yalnız katlanıyor —
+                        panelin varsayılan hâli planın net özeti (olgular), gerekçeler bir
+                        tıkla açılıyor. Ölçüm: gerekçeler açıkken içerik görüş alanını
+                        aşıyordu, katlıyken sığıyor.
+                      -->
+                      <Grid x:Name="PlanReasonsHead"
+                            ColumnDefinitions="*,Auto"
+                            ColumnSpacing="{StaticResource SpaceMd}"
+                            IsVisible="False">
+                        <TextBlock Grid.Column="0"
+                                   x:Name="TxtPlanReasonsHead"
+                                   TextWrapping="Wrap"
+                                   Theme="{StaticResource H3}"
+                                   VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                x:Name="BtnPlanReasons"
+                                Theme="{StaticResource GhostButton}"
+                                VerticalAlignment="Center"
+                                auto:AutomationProperties.Name="{loc:Text main.plan.reasons}"
+                                Click="OnTogglePlanReasons">
+                                  <Path x:Name="GlyphPlanReasons" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+                                </Button>
+                      </Grid>
+                      <StackPanel x:Name="PlanReasons" Classes="disclose" Spacing="{StaticResource SpaceSm}" IsVisible="False"/>
+                    </StackPanel>
+                  </ScrollViewer>
+                </Grid>
+              </Border>
+
+              </Grid>
+
+              <StackPanel Grid.Column="2" Spacing="{StaticResource SpaceLg}">
+
+                <Border x:Name="OutputPanel" Theme="{StaticResource Panel}">
+                  <StackPanel Spacing="{StaticResource SpaceMd}">
+                    <TextBlock Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
+                    <ProgressBar x:Name="Progress" Maximum="1"/>
+                    <StackPanel Spacing="{StaticResource SpaceMd}">
+                    <izi:SutunIzgara x:Name="OutputFacts" MaxColumns="2" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceMd}">
+
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
+                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.stage}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
+                        <TextBlock x:Name="TxtStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource OutFactValue}" TextWrapping="Wrap">
+                          <TextBlock.Transitions>
+                            <Transitions>
+                              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+                            </Transitions>
+                          </TextBlock.Transitions>
+                        </TextBlock>
+                      </StackPanel>
+
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
+                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.current-size}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
+                        <TextBlock x:Name="TxtOutSize" Text="-" Theme="{StaticResource OutFactValue}"/>
+                      </StackPanel>
+
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
+                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.remaining}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
+                        <TextBlock x:Name="TxtRemaining" Text="-" Theme="{StaticResource OutFactValue}"/>
+                      </StackPanel>
+
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Grid.Column="0" x:Name="LblDuration" Text="{loc:Text main.output.estimated-time}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-time}">
+                            <ToolTip.Tip>
+                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-time.tip}"/>
+                            </ToolTip.Tip>
+                          </Button>
+                        </Grid>
+                        <TextBlock x:Name="TxtDurationValue" Text="-" Theme="{StaticResource OutFactValue}">
+                          <TextBlock.Transitions>
+                            <Transitions>
+                              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+                            </Transitions>
+                          </TextBlock.Transitions>
+                        </TextBlock>
+                      </StackPanel>
+                    </izi:SutunIzgara>
+                    <TextBlock x:Name="TxtDurationRange" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Grid.Column="0" x:Name="LblEstimate" Text="{loc:Text main.output.estimated-output}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-output}">
+                            <ToolTip.Tip>
+                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-output.tip}"/>
+                            </ToolTip.Tip>
+                          </Button>
+                        </Grid>
+                        <TextBlock x:Name="TxtEstimateValue" Text="-" Theme="{StaticResource OutFactValue}">
+                          <TextBlock.Transitions>
+                            <Transitions>
+                              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+                            </Transitions>
+                          </TextBlock.Transitions>
+                        </TextBlock>
+                        <TextBlock x:Name="TxtEstimateRange" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                      </StackPanel>
+                    </StackPanel>
+                    <TextBlock x:Name="TxtEstimateNote" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="{Binding #TxtResult.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                      <Path x:Name="ResultWarningGlyph"
+                            IsVisible="False"
+                            Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
+                            Stretch="Uniform" VerticalAlignment="Top"
+                            Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
+                      <TextBlock x:Name="TxtResult" Grid.ColumnSpan="2" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                    </Grid>
+                    <Border x:Name="RetryAskPanel"
+                            IsVisible="False"
+                            Background="{StaticResource NeonPinkFill}"
+                            BorderBrush="{StaticResource NeonPink}"
+                            BorderThickness="{StaticResource BorderThin}"
+                            CornerRadius="{StaticResource RadiusCell}"
+                            Padding="{StaticResource PanelPadding}">
+                      <Border.Styles>
+                        <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
+                          <Setter Property="TextWrapping" Value="Wrap"/>
+                        </Style>
+                      </Border.Styles>
+                      <StackPanel Spacing="{StaticResource SpaceSm}">
+                        <TextBlock Text="{loc:Text main.retry.title}" Theme="{StaticResource H3}" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
+                        <WrapPanel>
+                          <Button x:Name="BtnRetryAgain" Content="{loc:Text main.retry.again}" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
+                          <Button x:Name="BtnRetryTrim" auto:AutomationProperties.Name="{loc:Text main.retry.trim.name}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryTrim"/>
+                          <Button x:Name="BtnRetryAccept" auto:AutomationProperties.Name="{loc:Text main.retry.accept.name}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAccept"/>
+                          <Button x:Name="BtnRetryStop" Content="{loc:Text main.retry.stop}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
+                        </WrapPanel>
+                        <StackPanel x:Name="RetryTrimPanel" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceSm}">
+                          <WrapPanel ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceXs}">
+                            <RadioButton x:Name="RbTrimEnd" GroupName="OvershootTrim" IsChecked="True" Content="{loc:Text main.retry.trim.end}"/>
+                            <RadioButton x:Name="RbTrimStart" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.start}"/>
+                            <RadioButton x:Name="RbTrimBoth" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.both}"/>
+                          </WrapPanel>
+                          <TextBlock x:Name="TxtTrimRange" Theme="{StaticResource PlanFactValue}" TextWrapping="Wrap"/>
+                          <Button x:Name="BtnTrimConfirm" Content="{loc:Text main.retry.trim.confirm}" Theme="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnTrimConfirm"/>
+                        </StackPanel>
+                        <TextBlock x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
+                      </StackPanel>
+                    </Border>
+                    <StackPanel Spacing="{StaticResource SpaceSm}">
+                      <WrapPanel>
+                        <Button x:Name="BtnReveal" Classes="reveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnReveal"/>
+                        <Button x:Name="BtnShare" Classes="reveal" Content="{loc:Text main.action.share}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShare"/>
+                        <Button x:Name="BtnShareCancel" Content="{loc:Text main.action.cancel-upload}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShareCancel"/>
+                        <Button x:Name="BtnShareRetry" auto:AutomationProperties.Name="{loc:Text settings.share.retry}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False"/>
+                      </WrapPanel>
+                      <ProgressBar x:Name="ShareProgress" Maximum="1" IsVisible="False"/>
+                      <Grid x:Name="ShareLinkRow"
+                            IsVisible="False"
+                            ColumnDefinitions="*,Auto"
+                            RowDefinitions="Auto,Auto"
+                            ColumnSpacing="{StaticResource SpaceMd}"
+                            RowSpacing="{StaticResource SpaceMd}">
+                        <TextBox Grid.Column="0"
+                                 x:Name="TxtShareLink"
+                                 IsReadOnly="True"
+                                 FontFamily="{StaticResource FontMono}"
+                                 VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                x:Name="BtnShareCopy"
+                                Content="{loc:Text main.action.copy}"
+                                Theme="{StaticResource GhostButton}"
+                                VerticalAlignment="Center"
+                                Click="OnCopyShareLink"/>
+                        <Grid Grid.Row="1"
+                              Grid.ColumnSpan="2"
+                              RowDefinitions="Auto,Auto"
+                              RowSpacing="{StaticResource SpaceSm}"
+                              IsVisible="{Binding #QrShare.IsVisible}">
+                          <share:ShareQrCode HorizontalAlignment="Left"
+                                             x:Name="QrShare"
+                                             Link="{Binding #TxtShareLink.Text}"
+                                             ModuleSize="{StaticResource ShareQrModuleSize}"
+                                             auto:AutomationProperties.Name="{loc:Text main.share.qr}"
+                                             auto:AutomationProperties.HelpText="{loc:Text main.share.qr-hint}"/>
+                          <TextBlock Grid.Row="1"
+                                     Theme="{StaticResource Hint}"
+                                     Text="{loc:Text main.share.qr-hint}"
+                                     TextWrapping="Wrap"/>
+                        </Grid>
+                      </Grid>
+                      <TextBlock x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+
+
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
+                  <Button x:Name="BtnCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel">
+                    <Button.Styles>
+                      <Style Selector="Button:disabled">
+                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.cancel.disabled-tip}"/>
+                      </Style>
+                    </Button.Styles>
+                  </Button>
+                  <Button x:Name="BtnStart" Content="{loc:Text main.action.shrink}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnStart">
+                    <Button.Styles>
+                      <Style Selector="Button:disabled">
+                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.shrink.disabled-tip}"/>
+                      </Style>
+                    </Button.Styles>
+                  </Button>
+                </StackPanel>
+
+                <Border x:Name="OutcomePanel" Theme="{StaticResource Panel}">
+                  <StackPanel Spacing="{StaticResource SpaceMd}">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock Grid.Column="0" Text="{loc:Text main.section.outcome}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="0" Text="{loc:Text main.section.outcome}" Theme="{StaticResource H2}" Margin="0" VerticalAlignment="Center"/>
                       <TextBlock Grid.Column="1" x:Name="TxtOutcomeSummary" Theme="{StaticResource MonoValue}" VerticalAlignment="Center"/>
                     </Grid>
 
@@ -794,265 +1056,6 @@
                 </Border>
 
               </StackPanel>
-
-              <!--
-                Orta sütun iki katmandır: üstte karşılaştırma paneli, altında yapılacak
-                işlem paneli. Üç sütunlu düzen bozulmuyor — panel kendi sütununu almıyor,
-                ortadaki sütunun başına giriyor (T43/K1).
-              -->
-              <!--
-                T54/K4: artan yer önizlemeye gider. Önizleme esneyen satırdadır, plan
-                paneli varsayılan olarak içeriği kadar büyür — istediği kadarını alır,
-                kalanını önizlemeye bırakır. Eski düzende esneyen satır MaxHeight'lı plan
-                panelindeydi ve artan yer kimseye gitmiyordu.
-
-                T74/K1: "Preview" başlığı ve onu taşıyan Auto satır kaldırıldı. Yan
-                sütunlar panelle başlıyor, orta sütun başlıkla başlıyordu; başlık gidince
-                üç sütunun tepesi de aynı hizaya oturuyor.
-
-                T163/K3: kullanıcının sürüklediği yer artık kalıcı. İkinci satırdaki
-                GridSplitter üçüncü satırın (plan paneli) yüksekliğini değiştirir; hiç
-                sürüklenmemişse satır Auto kalır ve K1/K2'nin ölçtüğü içerik-güdümlü
-                boy geçerli olmaya devam eder — eski ölçüm burada bozulmuyor. Sürüklenince
-                satır piksele döner, taban ve tavan PlanPanelRow üzerinde durur (GridSplitter
-                onlara bakar), konum ApplySplitterSettings/OnSplitterMoved ile diske yazılır.
-              -->
-              <Grid Grid.Column="1" x:Name="PreviewPlanGrid" RowSpacing="{StaticResource SpaceMd}">
-                <Grid.RowDefinitions>
-                  <RowDefinition Height="*"/>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"
-                                 MinHeight="{StaticResource PlanPanelMinHeight}"
-                                 MaxHeight="{StaticResource PlanPanelMaxHeight}"/>
-                </Grid.RowDefinitions>
-
-                <playback:ComparisonPanel Grid.Row="0" x:Name="Preview" VerticalAlignment="Stretch"/>
-
-                <GridSplitter Grid.Row="1" x:Name="PlanSplitter" Theme="{StaticResource PlanSplitter}"
-                              HorizontalAlignment="Stretch" ResizeDirection="Rows"
-                              auto:AutomationProperties.Name="{loc:Text main.plan.splitter}"/>
-
-              <Border x:Name="PlanPanel"
-                      Grid.Row="2"
-                      Theme="{StaticResource Panel}"
-                      MinHeight="{StaticResource PlanPanelMinHeight}"
-                      MaxHeight="{StaticResource PlanPanelMaxHeight}">
-                <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceMd}">
-                  <TextBlock Grid.Row="0" Text="{loc:Text main.plan.title}" Theme="{StaticResource H2}"/>
-                  <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
-                    <StackPanel x:Name="PlanBody" Spacing="{StaticResource SpaceMd}">
-                      <TextBlock x:Name="TxtPlanEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.plan.empty}"/>
-                      <izi:CiftIzgara x:Name="PlanFacts" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}"/>
-                      <Border x:Name="PlanRule" Theme="{StaticResource PanelRule}" IsVisible="False"/>
-                      <!--
-                        T46/K6: gerekçeler katlanır. Metin kısalmıyor, yalnız katlanıyor —
-                        panelin varsayılan hâli planın net özeti (olgular), gerekçeler bir
-                        tıkla açılıyor. Ölçüm: gerekçeler açıkken içerik görüş alanını
-                        aşıyordu, katlıyken sığıyor.
-                      -->
-                      <Grid x:Name="PlanReasonsHead"
-                            ColumnDefinitions="*,Auto"
-                            ColumnSpacing="{StaticResource SpaceMd}"
-                            IsVisible="False">
-                        <TextBlock Grid.Column="0"
-                                   x:Name="TxtPlanReasonsHead"
-                                   TextWrapping="Wrap"
-                                   Theme="{StaticResource H3}"
-                                   VerticalAlignment="Center"/>
-                        <Button Grid.Column="1"
-                                x:Name="BtnPlanReasons"
-                                Theme="{StaticResource GhostButton}"
-                                VerticalAlignment="Center"
-                                auto:AutomationProperties.Name="{loc:Text main.plan.reasons}"
-                                Click="OnTogglePlanReasons">
-                                  <Path x:Name="GlyphPlanReasons" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
-                                </Button>
-                      </Grid>
-                      <StackPanel x:Name="PlanReasons" Classes="disclose" Spacing="{StaticResource SpaceSm}" IsVisible="False"/>
-                    </StackPanel>
-                  </ScrollViewer>
-                </Grid>
-              </Border>
-
-              </Grid>
-
-              <StackPanel Grid.Column="2" Spacing="{StaticResource SpaceLg}">
-
-                <Border x:Name="OutputPanel" Theme="{StaticResource Panel}" MinHeight="{StaticResource PanelMinHeight}">
-                  <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
-                    <ProgressBar x:Name="Progress" Maximum="1"/>
-                    <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <izi:SutunIzgara x:Name="OutputFacts" MaxColumns="2" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceMd}">
-
-                      <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.stage}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
-                        <TextBlock x:Name="TxtStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource OutFactValue}" TextWrapping="Wrap">
-                          <TextBlock.Transitions>
-                            <Transitions>
-                              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
-                            </Transitions>
-                          </TextBlock.Transitions>
-                        </TextBlock>
-                      </StackPanel>
-
-                      <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.current-size}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
-                        <TextBlock x:Name="TxtOutSize" Text="-" Theme="{StaticResource OutFactValue}"/>
-                      </StackPanel>
-
-                      <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.remaining}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
-                        <TextBlock x:Name="TxtRemaining" Text="-" Theme="{StaticResource OutFactValue}"/>
-                      </StackPanel>
-
-                      <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <Grid ColumnDefinitions="*,Auto">
-                          <TextBlock Grid.Column="0" x:Name="LblDuration" Text="{loc:Text main.output.estimated-time}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-time}">
-                            <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-time.tip}"/>
-                            </ToolTip.Tip>
-                          </Button>
-                        </Grid>
-                        <TextBlock x:Name="TxtDurationValue" Text="-" Theme="{StaticResource OutFactValue}">
-                          <TextBlock.Transitions>
-                            <Transitions>
-                              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
-                            </Transitions>
-                          </TextBlock.Transitions>
-                        </TextBlock>
-                      </StackPanel>
-                    </izi:SutunIzgara>
-                    <TextBlock x:Name="TxtDurationRange" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-
-                      <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <Grid ColumnDefinitions="*,Auto">
-                          <TextBlock Grid.Column="0" x:Name="LblEstimate" Text="{loc:Text main.output.estimated-output}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-output}">
-                            <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-output.tip}"/>
-                            </ToolTip.Tip>
-                          </Button>
-                        </Grid>
-                        <TextBlock x:Name="TxtEstimateValue" Text="-" Theme="{StaticResource OutFactValue}">
-                          <TextBlock.Transitions>
-                            <Transitions>
-                              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
-                            </Transitions>
-                          </TextBlock.Transitions>
-                        </TextBlock>
-                        <TextBlock x:Name="TxtEstimateRange" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                      </StackPanel>
-                    </StackPanel>
-                    <TextBlock x:Name="TxtEstimateNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}">
-                      <Path x:Name="ResultWarningGlyph"
-                            IsVisible="False"
-                            Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
-                            Stretch="Uniform" VerticalAlignment="Top"
-                            Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
-                      <TextBlock x:Name="TxtResult" Grid.ColumnSpan="2" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
-                    </Grid>
-                    <Border x:Name="RetryAskPanel"
-                            IsVisible="False"
-                            Background="{StaticResource NeonPinkFill}"
-                            BorderBrush="{StaticResource NeonPink}"
-                            BorderThickness="{StaticResource BorderThin}"
-                            CornerRadius="{StaticResource RadiusCell}"
-                            Padding="{StaticResource PanelPadding}">
-                      <Border.Styles>
-                        <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
-                          <Setter Property="TextWrapping" Value="Wrap"/>
-                        </Style>
-                      </Border.Styles>
-                      <StackPanel Spacing="{StaticResource SpaceSm}">
-                        <TextBlock Text="{loc:Text main.retry.title}" Theme="{StaticResource H3}" TextWrapping="Wrap"/>
-                        <TextBlock x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
-                        <WrapPanel>
-                          <Button x:Name="BtnRetryAgain" Content="{loc:Text main.retry.again}" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
-                          <Button x:Name="BtnRetryTrim" auto:AutomationProperties.Name="{loc:Text main.retry.trim.name}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryTrim"/>
-                          <Button x:Name="BtnRetryAccept" auto:AutomationProperties.Name="{loc:Text main.retry.accept.name}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAccept"/>
-                          <Button x:Name="BtnRetryStop" Content="{loc:Text main.retry.stop}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
-                        </WrapPanel>
-                        <StackPanel x:Name="RetryTrimPanel" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceSm}">
-                          <WrapPanel ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceXs}">
-                            <RadioButton x:Name="RbTrimEnd" GroupName="OvershootTrim" IsChecked="True" Content="{loc:Text main.retry.trim.end}"/>
-                            <RadioButton x:Name="RbTrimStart" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.start}"/>
-                            <RadioButton x:Name="RbTrimBoth" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.both}"/>
-                          </WrapPanel>
-                          <TextBlock x:Name="TxtTrimRange" Theme="{StaticResource PlanFactValue}" TextWrapping="Wrap"/>
-                          <Button x:Name="BtnTrimConfirm" Content="{loc:Text main.retry.trim.confirm}" Theme="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnTrimConfirm"/>
-                        </StackPanel>
-                        <TextBlock x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
-                      </StackPanel>
-                    </Border>
-                    <StackPanel Spacing="{StaticResource SpaceSm}">
-                      <WrapPanel>
-                        <Button x:Name="BtnReveal" Classes="reveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnReveal"/>
-                        <Button x:Name="BtnShare" Classes="reveal" Content="{loc:Text main.action.share}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShare"/>
-                        <Button x:Name="BtnShareCancel" Content="{loc:Text main.action.cancel-upload}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShareCancel"/>
-                        <Button x:Name="BtnShareRetry" auto:AutomationProperties.Name="{loc:Text settings.share.retry}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False"/>
-                      </WrapPanel>
-                      <ProgressBar x:Name="ShareProgress" Maximum="1" IsVisible="False"/>
-                      <Grid x:Name="ShareLinkRow"
-                            IsVisible="False"
-                            ColumnDefinitions="*,Auto"
-                            RowDefinitions="Auto,Auto"
-                            ColumnSpacing="{StaticResource SpaceMd}"
-                            RowSpacing="{StaticResource SpaceMd}">
-                        <TextBox Grid.Column="0"
-                                 x:Name="TxtShareLink"
-                                 IsReadOnly="True"
-                                 FontFamily="{StaticResource FontMono}"
-                                 VerticalAlignment="Center"/>
-                        <Button Grid.Column="1"
-                                x:Name="BtnShareCopy"
-                                Content="{loc:Text main.action.copy}"
-                                Theme="{StaticResource GhostButton}"
-                                VerticalAlignment="Center"
-                                Click="OnCopyShareLink"/>
-                        <Grid Grid.Row="1"
-                              Grid.ColumnSpan="2"
-                              RowDefinitions="Auto,Auto"
-                              RowSpacing="{StaticResource SpaceSm}"
-                              IsVisible="{Binding #QrShare.IsVisible}">
-                          <share:ShareQrCode HorizontalAlignment="Left"
-                                             x:Name="QrShare"
-                                             Link="{Binding #TxtShareLink.Text}"
-                                             ModuleSize="{StaticResource ShareQrModuleSize}"
-                                             auto:AutomationProperties.Name="{loc:Text main.share.qr}"
-                                             auto:AutomationProperties.HelpText="{loc:Text main.share.qr-hint}"/>
-                          <TextBlock Grid.Row="1"
-                                     Theme="{StaticResource Hint}"
-                                     Text="{loc:Text main.share.qr-hint}"
-                                     TextWrapping="Wrap"/>
-                        </Grid>
-                      </Grid>
-                      <TextBlock x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                  </StackPanel>
-                </Border>
-
-
-                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
-                  <Button x:Name="BtnCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel">
-                    <Button.Styles>
-                      <Style Selector="Button:disabled">
-                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.cancel.disabled-tip}"/>
-                      </Style>
-                    </Button.Styles>
-                  </Button>
-                  <Button x:Name="BtnStart" Content="{loc:Text main.action.shrink}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnStart">
-                    <Button.Styles>
-                      <Style Selector="Button:disabled">
-                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.shrink.disabled-tip}"/>
-                      </Style>
-                    </Button.Styles>
-                  </Button>
-                </StackPanel>
-
-              </StackPanel>
             </izi:KucultSutunlari>
           </ScrollViewer>
         </TabItem>
@@ -1320,7 +1323,7 @@
                 <Border Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <TextBlock Text="{loc:Text main.convert.command}" Theme="{StaticResource H2}"/>
-                    <TextBox x:Name="TxtConvertCommand" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="6" MaxLines="6"/>
+                    <TextBox x:Name="TxtConvertCommand" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="2" MaxLines="6"/>
                     <TextBlock x:Name="TxtConvertValidation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </StackPanel>
                 </Border>
@@ -1335,7 +1338,7 @@
                         </Transitions>
                       </TextBlock.Transitions>
                     </TextBlock>
-                    <TextBlock x:Name="TxtConvertResult" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="TxtConvertResult" Theme="{StaticResource Body}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                     <Button x:Name="BtnConvertReveal" Classes="reveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" IsVisible="False" Click="OnReveal"/>
                   </StackPanel>
                 </Border>
@@ -1455,9 +1458,19 @@
 
         <TabItem Header="{loc:Text main.tab.settings}" izi:AcilisIsareti.Ad="xaml-ayarlar" x:Name="TabSettings" Tag="{StaticResource IconSettings}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
-            <StackPanel Margin="{StaticResource PageMargin}" Spacing="{StaticResource SpaceLg}">
+            <!--
+              Kart duvarı: sütun sayısı genişlikten. Tek sütunlu yığında ayarlar 1080p ekranda beş
+              ekran boyundaydı. Dört sütunda her kart kendi sütununda (Sutun), sütunlar ölçülen boylarla
+              dengeli; açılan kart yalnız kendi sütununu uzatır. Daha dar pencerede kartlar sırayla en
+              kısa sütuna.
+            -->
+            <izi:KartDuvari x:Name="SettingsCards"
+                            Margin="{StaticResource PageMargin}"
+                            MinColumnWidth="{StaticResource TipMaxWidth}"
+                            ColumnSpacing="{StaticResource SpaceLg}"
+                            RowSpacing="{StaticResource SpaceLg}">
 
-              <Border x:Name="GeneralSettingsPanel" Theme="{StaticResource Panel}">
+              <Border x:Name="GeneralSettingsPanel" izi:KartDuvari.Sutun="0" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text settings-tab.general.title}" Theme="{StaticResource H2}"/>
 
@@ -1467,31 +1480,42 @@
                   -->
                   <Grid x:Name="LanguageThemeRow" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
                     <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceSm}">
-                      <TextBlock Text="{loc:Text settings-tab.language.label}" Theme="{StaticResource Label}"/>
-                      <ComboBox x:Name="CmbLanguage" Width="{StaticResource FieldWidth}" HorizontalAlignment="Left"/>
-                      <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.language.hint}"/>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                        <TextBlock Text="{loc:Text settings-tab.language.label}" Theme="{StaticResource Label}"/>
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.language.label}">
+                          <ToolTip.Tip>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.language.hint}"/>
+                          </ToolTip.Tip>
+                        </Button>
+                      </Grid>
+                      <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
-                      <TextBlock Text="{loc:Text settings-tab.theme.label}" Theme="{StaticResource Label}"/>
-                      <ComboBox x:Name="CmbTheme" Width="{StaticResource FieldWidth}" HorizontalAlignment="Left"/>
-                      <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.theme.hint}"/>
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                        <TextBlock Text="{loc:Text settings-tab.theme.label}" Theme="{StaticResource Label}"/>
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.theme.label}">
+                          <ToolTip.Tip>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.theme.hint}"/>
+                          </ToolTip.Tip>
+                        </Button>
+                      </Grid>
+                      <ComboBox x:Name="CmbTheme" HorizontalAlignment="Stretch"/>
                     </StackPanel>
                   </Grid>
 
-                  <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
-                    <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceSm}">
-                      <TextBlock Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
-                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                        <TextBox x:Name="TxtDefaultTargetMb" Width="120" TextAlignment="Center"/>
-                        <TextBlock Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                      </StackPanel>
-                      <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                      <TextBox x:Name="TxtDefaultTargetMb" Width="{StaticResource FieldWidthSm}" TextAlignment="Center"/>
+                      <TextBlock Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
-                      <CheckBox x:Name="ChkAdvancedDefaultOpen" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings-tab.advanced-default-open.label}"/>
-                      <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.advanced-default-open.hint}"/>
-                    </StackPanel>
-                  </Grid>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <CheckBox x:Name="ChkAdvancedDefaultOpen" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings-tab.advanced-default-open.label}"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.advanced-default-open.hint}"/>
+                  </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <CheckBox x:Name="ChkFollowRecording" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings-tab.follow-recording.label}"/>
@@ -1499,72 +1523,69 @@
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                      <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}"/>
+                      <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.ffmpeg-path.label}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.ffmpeg-path.hint}"/>
+                        </ToolTip.Tip>
+                      </Button>
+                    </Grid>
+                    <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <RadioButton x:Name="RbFfmpegAuto" GroupName="FfmpegPathMode" IsChecked="True" Content="{loc:Text settings-tab.ffmpeg-path.auto}"/>
+                      <RadioButton x:Name="RbFfmpegManual" GroupName="FfmpegPathMode" Content="{loc:Text settings-tab.ffmpeg-path.manual}"/>
+                    </WrapPanel>
+                    <Grid x:Name="FfmpegPathPickerRow" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}" IsVisible="False">
+                      <TextBox x:Name="TxtFfmpegPath"/>
+                      <Button Grid.Column="1" x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>
+                    </Grid>
+                    <TextBlock x:Name="TxtFfmpegPathError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="DiagnosticLogPanel" izi:KartDuvari.Sutun="0" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceSm}">
+                  <TextBlock Text="{loc:Text settings.log.title}" Theme="{StaticResource H2}"/>
+                  <TextBlock Text="{loc:Text settings.log.hint}" Theme="{StaticResource Caption}" TextWrapping="Wrap"/>
+                  <Button x:Name="BtnOpenLog"
+                          Content="{loc:Text settings.log.open}"
+                          Theme="{StaticResource GhostButton}"
+                          HorizontalAlignment="Left"
+                          Click="OnOpenLog"/>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="OutputSettingsPanel" izi:KartDuvari.Sutun="1" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <TextBlock Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
                     <TextBlock Text="{loc:Text settings-tab.output-folder.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <RadioButton x:Name="RbOutputBesideSource" GroupName="OutputFolderMode" IsChecked="True" Content="{loc:Text settings-tab.output-folder.beside-source}"/>
                       <RadioButton x:Name="RbOutputFixed" GroupName="OutputFolderMode" Content="{loc:Text settings-tab.output-folder.fixed}"/>
                     </WrapPanel>
-                    <StackPanel x:Name="OutputFolderPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
-                      <TextBox x:Name="TxtOutputFolder" Width="360" IsReadOnly="True"/>
-                      <Button x:Name="BtnBrowseOutputFolder" Content="{loc:Text settings-tab.output-folder.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseOutputFolder"/>
-                    </StackPanel>
+                    <Grid x:Name="OutputFolderPickerRow" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}" IsVisible="False">
+                      <TextBox x:Name="TxtOutputFolder" IsReadOnly="True"/>
+                      <Button Grid.Column="1" x:Name="BtnBrowseOutputFolder" Content="{loc:Text settings-tab.output-folder.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseOutputFolder"/>
+                    </Grid>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-folder.hint}"/>
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <TextBlock Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtOutputName" FlowDirection="LeftToRight" Width="360"/>
-                      <Button x:Name="BtnResetOutputName" Content="{loc:Text settings-tab.output-name.reset}" Theme="{StaticResource GhostButton}" Click="OnResetOutputName"/>
-                    </StackPanel>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                      <TextBox x:Name="TxtOutputName" FlowDirection="LeftToRight"/>
+                      <Button Grid.Column="1" x:Name="BtnResetOutputName" Content="{loc:Text settings-tab.output-name.reset}" Theme="{StaticResource GhostButton}" Click="OnResetOutputName"/>
+                    </Grid>
                     <TextBlock x:Name="LblOutputNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-name.hint}"/>
-                  </StackPanel>
-
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                    <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
-                      <RadioButton x:Name="RbFfmpegAuto" GroupName="FfmpegPathMode" IsChecked="True" Content="{loc:Text settings-tab.ffmpeg-path.auto}"/>
-                      <RadioButton x:Name="RbFfmpegManual" GroupName="FfmpegPathMode" Content="{loc:Text settings-tab.ffmpeg-path.manual}"/>
-                    </WrapPanel>
-                    <StackPanel x:Name="FfmpegPathPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
-                      <TextBox x:Name="TxtFfmpegPath" Width="360"/>
-                      <Button x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>
-                    </StackPanel>
-                    <TextBlock x:Name="TxtFfmpegPathError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.ffmpeg-path.hint}"/>
-                  </StackPanel>
-
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.opensubtitles.label}" Theme="{StaticResource Label}" Margin="0"/>
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtOpenSubtitlesKey" Width="360" PasswordChar="*"/>
-                      <Button x:Name="BtnOpenSubtitlesKey" Content="{loc:Text settings-tab.opensubtitles.get}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesKeyPage"/>
-                    </StackPanel>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.hint}"/>
-
-                    <TextBlock Text="{loc:Text settings-tab.opensubtitles.account}" Theme="{StaticResource Label}" Margin="0"/>
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                      <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="{loc:Text settings-tab.opensubtitles.user}" Theme="{StaticResource Label}" Margin="0"/>
-                        <TextBox x:Name="TxtOpenSubtitlesUser" Width="180"
-                                 auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.user}"/>
-                      </StackPanel>
-                      <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="{loc:Text settings-tab.opensubtitles.password}" Theme="{StaticResource Label}" Margin="0"/>
-                        <TextBox x:Name="TxtOpenSubtitlesPassword" Width="180" PasswordChar="*"
-                                 auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.password}"/>
-                      </StackPanel>
-                      <Button x:Name="BtnOpenSubtitlesSignIn" Content="{loc:Text settings-tab.opensubtitles.signin}" Theme="{StaticResource GhostButton}" VerticalAlignment="Bottom" Click="OnOpenSubtitlesSignIn"/>
-                      <Button x:Name="BtnOpenSubtitlesSignOut" Content="{loc:Text settings-tab.opensubtitles.signout}" Theme="{StaticResource GhostButton}" VerticalAlignment="Bottom" Click="OnOpenSubtitlesSignOut"/>
-                    </StackPanel>
-                    <TextBlock x:Name="LblOpenSubtitlesStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.signedout}"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.accounthint}"/>
                   </StackPanel>
                 </StackPanel>
               </Border>
 
-              <Border x:Name="ShellMenuPanel" Theme="{StaticResource Panel}">
+              <Border x:Name="ShellMenuPanel" izi:KartDuvari.Sutun="1" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text settings-tab.shell-menu.title}" Theme="{StaticResource H2}"/>
                   <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -1581,7 +1602,110 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="SharePanel" Theme="{StaticResource Panel}">
+              <playback:PlayerAdvancedPanel x:Name="PlayerAdvancedPanel" izi:KartDuvari.Sutun="1"/>
+
+              <Border x:Name="SubtitleSettingsPanel" izi:KartDuvari.Sutun="2" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <TextBlock Text="{loc:Text main.subtitles.label}" Theme="{StaticResource H2}"/>
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                      <TextBlock Text="{loc:Text settings-tab.opensubtitles.label}" Theme="{StaticResource Label}"/>
+                      <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.label}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.opensubtitles.hint}"/>
+                        </ToolTip.Tip>
+                      </Button>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                      <TextBox x:Name="TxtOpenSubtitlesKey" PasswordChar="*"/>
+                      <Button Grid.Column="1" x:Name="BtnOpenSubtitlesKey" Content="{loc:Text settings-tab.opensubtitles.get}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesKeyPage"/>
+                    </Grid>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                      <TextBlock Text="{loc:Text settings-tab.opensubtitles.account}" Theme="{StaticResource Label}"/>
+                      <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.account}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.opensubtitles.accounthint}"/>
+                        </ToolTip.Tip>
+                      </Button>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
+                        <TextBlock Text="{loc:Text settings-tab.opensubtitles.user}" Theme="{StaticResource Label}" Margin="0"/>
+                        <TextBox x:Name="TxtOpenSubtitlesUser"
+                                 auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.user}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceXs}">
+                        <TextBlock Text="{loc:Text settings-tab.opensubtitles.password}" Theme="{StaticResource Label}" Margin="0"/>
+                        <TextBox x:Name="TxtOpenSubtitlesPassword" PasswordChar="*"
+                                 auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.password}"/>
+                      </StackPanel>
+                    </Grid>
+                    <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+                      <Button x:Name="BtnOpenSubtitlesSignIn" Content="{loc:Text settings-tab.opensubtitles.signin}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignIn"/>
+                      <Button x:Name="BtnOpenSubtitlesSignOut" Content="{loc:Text settings-tab.opensubtitles.signout}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignOut"/>
+                    </WrapPanel>
+                    <TextBlock x:Name="LblOpenSubtitlesStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.signedout}"/>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="UpdatePanel" izi:KartDuvari.Sutun="2" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <TextBlock Text="{loc:Text settings.update.title}" Theme="{StaticResource H2}"/>
+                  <StackPanel x:Name="AutoUpdateRow" Orientation="Horizontal">
+                    <CheckBox x:Name="ChkAutoUpdate" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings.update.auto}"/>
+                  </StackPanel>
+                  <TextBlock x:Name="TxtAutoUpdateEffect"
+                             Theme="{StaticResource Hint}"
+                             TextWrapping="Wrap"
+                             Text="{loc:Text settings.update.auto-effect}"/>
+                </StackPanel>
+              </Border>
+
+              <editing:EditorShortcutsPanel x:Name="EditorShortcutsPanel" izi:KartDuvari.Sutun="2" IsOpen="False"/>
+
+              <playback:PlayerShortcutsPanel x:Name="PlayerShortcutsPanel" izi:KartDuvari.Sutun="2" IsOpen="False"/>
+
+              <Border x:Name="AboutPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <Button x:Name="BtnAboutToggle"
+                          Click="OnAboutToggle"
+                          Theme="{StaticResource PanelHeaderToggle}"
+                          auto:AutomationProperties.Name="{loc:Text main.about.title}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                      <Path x:Name="AboutGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="1" Text="{loc:Text main.about.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    </Grid>
+                  </Button>
+                  <StackPanel x:Name="AboutBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.intro}"/>
+                    <TextBlock Text="{loc:Text main.about.engine.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.engine.body}"/>
+                    <TextBlock Text="{loc:Text main.about.measured.title}" Theme="{StaticResource H3}"/>
+                    <izi:CiftIzgara x:Name="AboutMeasured" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}" loc:Tablo.Text="{loc:Text main.about.measured.table}"/>
+                    <TextBlock Text="{loc:Text main.about.loss.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.loss.body}"/>
+                    <TextBlock Text="{loc:Text main.about.scenario.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.scenario.body}"/>
+                    <TextBlock Text="{loc:Text main.about.ai.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.ai.body}"/>
+                    <TextBlock Text="{loc:Text main.about.codecs.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.codecs.body}"/>
+                  </StackPanel>
+                  <StackPanel x:Name="AboutStatus" Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
+                               Cursor="Hand" PointerPressed="OnSystemStatusTapped"/>
+                    <TextBlock Text="{loc:Text main.about.platforms.title}" Theme="{StaticResource H3}"/>
+                    <TextBlock x:Name="TxtPlatforms" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="SharePanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{loc:Text settings.share.title}" Theme="{StaticResource H2}"/>
@@ -1625,74 +1749,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="UpdatePanel" Theme="{StaticResource Panel}">
-                <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="{loc:Text settings.update.title}" Theme="{StaticResource H2}"/>
-                  <StackPanel x:Name="AutoUpdateRow" Orientation="Horizontal">
-                    <CheckBox x:Name="ChkAutoUpdate" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings.update.auto}"/>
-                  </StackPanel>
-                  <TextBlock x:Name="TxtAutoUpdateEffect"
-                             Theme="{StaticResource Hint}"
-                             TextWrapping="Wrap"
-                             Text="{loc:Text settings.update.auto-effect}"/>
-                </StackPanel>
-              </Border>
-
-              <playback:PlayerShortcutsPanel x:Name="PlayerShortcutsPanel"/>
-
-              <editing:EditorShortcutsPanel x:Name="EditorShortcutsPanel"/>
-
-              <playback:PlayerAdvancedPanel x:Name="PlayerAdvancedPanel"/>
-
-              <Border x:Name="DiagnosticLogPanel" Theme="{StaticResource Panel}">
-                <StackPanel Spacing="{StaticResource SpaceSm}">
-                  <TextBlock Text="{loc:Text settings.log.title}" Theme="{StaticResource H2}"/>
-                  <TextBlock Text="{loc:Text settings.log.hint}" Theme="{StaticResource Caption}" TextWrapping="Wrap"/>
-                  <Button x:Name="BtnOpenLog"
-                          Content="{loc:Text settings.log.open}"
-                          Theme="{StaticResource GhostButton}"
-                          HorizontalAlignment="Left"
-                          Click="OnOpenLog"/>
-                </StackPanel>
-              </Border>
-
-              <Border x:Name="AboutPanel" Theme="{StaticResource Panel}">
-                <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <Button x:Name="BtnAboutToggle"
-                          Click="OnAboutToggle"
-                          Theme="{StaticResource PanelHeaderToggle}"
-                          auto:AutomationProperties.Name="{loc:Text main.about.title}">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-                      <Path x:Name="AboutGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                      <TextBlock Grid.Column="1" Text="{loc:Text main.about.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                    </Grid>
-                  </Button>
-                  <StackPanel x:Name="AboutBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.intro}"/>
-                    <TextBlock Text="{loc:Text main.about.engine.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.engine.body}"/>
-                    <TextBlock Text="{loc:Text main.about.measured.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource MonoValue}" FontWeight="Normal" Text="{loc:Text main.about.measured.table}"/>
-                    <TextBlock Text="{loc:Text main.about.loss.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.loss.body}"/>
-                    <TextBlock Text="{loc:Text main.about.scenario.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.scenario.body}"/>
-                    <TextBlock Text="{loc:Text main.about.ai.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.ai.body}"/>
-                    <TextBlock Text="{loc:Text main.about.codecs.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.codecs.body}"/>
-                  </StackPanel>
-                  <StackPanel x:Name="AboutStatus" Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
-                               Cursor="Hand" PointerPressed="OnSystemStatusTapped"/>
-                    <TextBlock Text="{loc:Text main.about.platforms.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock x:Name="TxtPlatforms" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
-                  </StackPanel>
-                </StackPanel>
-              </Border>
-
-              <Border x:Name="ResetSettingsPanel" Theme="{StaticResource Panel}">
+              <Border x:Name="ResetSettingsPanel" izi:KartDuvari.Sutun="0" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Button x:Name="BtnResetSettings"
                           Content="{loc:Text settings.reset-all}"
@@ -1700,16 +1757,16 @@
                           HorizontalAlignment="Left"
                           Click="OnResetSettings"/>
                   <StackPanel x:Name="ResetSettingsConfirm" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceSm}">
-                    <TextBlock x:Name="TxtResetSettingsConfirm" Text="{loc:Text settings.reset-confirm}" Theme="{StaticResource Body}"/>
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                    <TextBlock x:Name="TxtResetSettingsConfirm" Text="{loc:Text settings.reset-confirm}" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                    <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
                       <Button x:Name="BtnConfirmResetSettings" Content="{loc:Text settings.reset-confirm-button}" Theme="{StaticResource GhostButton}" Click="OnConfirmResetSettings"/>
                       <Button x:Name="BtnCancelResetSettings" Content="{loc:Text settings.reset-cancel}" Theme="{StaticResource GhostButton}" Click="OnCancelResetSettings"/>
-                    </StackPanel>
+                    </WrapPanel>
                   </StackPanel>
                 </StackPanel>
               </Border>
 
-            </StackPanel>
+            </izi:KartDuvari>
           </ScrollViewer>
         </TabItem>
 

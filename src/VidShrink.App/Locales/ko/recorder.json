@@ -124,6 +124,7 @@
   "recorder.tray.live": "VidShrink 레코더 · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "전역 단축키를 다른 애플리케이션이 사용 중입니다: {0}. 이 키는 VidShrink 창이 맨 앞에 있을 때만 작동합니다.",
   "recorder.advanced.title": "고급 인코딩",
+  "recorder.advanced.encoder-title": "인코더 세부 정보",
   "recorder.advanced.container": "컨테이너",
   "recorder.advanced.scale-width": "스케일 너비",
   "recorder.advanced.scale-height": "스케일 높이",

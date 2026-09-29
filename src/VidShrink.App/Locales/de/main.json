@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Design",
   "settings-tab.theme.hint": "Ändert jede Farbe im Programm und wird beim nächsten Start gemerkt.",
   "settings-tab.language.hint": "Ändert die Sprache der Oberfläche und wird beim nächsten Start gemerkt.",
-  "settings-tab.default-target.label": "Standard-Zielgröße (MB)",
+  "settings-tab.default-target.label": "Standard-Zielgröße",
   "settings-tab.default-target.hint": "Legt die Zielgröße fest, mit der der Tab Verkleinern öffnet.",
   "settings-tab.output-folder.label": "Ausgabeordner",
   "settings-tab.output-folder.beside-source": "Neben der Quelldatei",
