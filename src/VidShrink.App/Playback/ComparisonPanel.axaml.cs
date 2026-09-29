@@ -263,6 +263,7 @@ internal partial class ComparisonPanel : UserControl
         EmptyHint.Text = _notice is null
             ? Text("playback.panel.hint")
             : Text(_notice, _noticeArg);
+        ToolTip.SetTip(EmptyHint, _notice is null || string.IsNullOrEmpty(_noticeArg) ? null : _noticeArg);
         PlaceholderText.Text = Text("playback.panel.moved");
         LeftBadgeText.Text = Text("playback.badge.original");
         RightBadgeText.Text = Text("playback.badge.processed");
@@ -270,7 +271,7 @@ internal partial class ComparisonPanel : UserControl
     }
 
     private string Text(string key, params object?[] args)
-        => key.StartsWith("playback.", StringComparison.Ordinal)
+        => key.StartsWith("playback.", StringComparison.Ordinal) || key.StartsWith("main.", StringComparison.Ordinal)
             ? LanguageCatalog.Title(Strings.GetIn(_language, key, args), _language)
             : key;
 

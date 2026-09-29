@@ -12,7 +12,7 @@
         <WrapPanel x:Name="Toolbar" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
           <Button x:Name="BtnSplit" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.split}"/>
           <Button x:Name="BtnDelete" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.delete}"/>
-          <TextBlock Theme="{StaticResource Label}" Text="{loc:Text editor.speed}"/>
+          <TextBlock Theme="{StaticResource Label}" Text="{loc:Text editor.speed}" VerticalAlignment="Center"/>
           <TextBox x:Name="TxtSpeed" Width="{StaticResource NumberBoxWidth}"/>
           <Button x:Name="BtnUndo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.undo}"/>
           <Button x:Name="BtnRedo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.redo}"/>

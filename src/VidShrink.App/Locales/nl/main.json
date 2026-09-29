@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Thema",
   "settings-tab.theme.hint": "Wijzigt elke kleur in het programma en wordt onthouden bij de volgende start.",
   "settings-tab.language.hint": "Wijzigt de taal van de interface en wordt onthouden bij de volgende start.",
-  "settings-tab.default-target.label": "Standaard doelgrootte (MB)",
+  "settings-tab.default-target.label": "Standaard doelgrootte",
   "settings-tab.default-target.hint": "Bepaalt de doelgrootte waarmee het tabblad Verkleinen opent.",
   "settings-tab.output-folder.label": "Uitvoermap",
   "settings-tab.output-folder.beside-source": "Naast het bronbestand",

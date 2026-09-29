@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Thème",
   "settings-tab.theme.hint": "Change toutes les couleurs du programme et est mémorisé au prochain lancement.",
   "settings-tab.language.hint": "Change la langue de l'interface et est mémorisée au prochain lancement.",
-  "settings-tab.default-target.label": "Taille cible par défaut (Mo)",
+  "settings-tab.default-target.label": "Taille cible par défaut",
   "settings-tab.default-target.hint": "Définit la taille cible avec laquelle l'onglet Réduire s'ouvre.",
   "settings-tab.output-folder.label": "Dossier de sortie",
   "settings-tab.output-folder.beside-source": "À côté du fichier source",

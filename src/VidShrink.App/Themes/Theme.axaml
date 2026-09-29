@@ -151,7 +151,7 @@
         <GeometryDrawing Brush="{StaticResource EmberAtmosphereCoal}"
                          Geometry="M -60,120 C 220,40 480,125 660,300 C 790,425 825,585 745,705 C 650,850 390,842 185,735 C 10,642 -95,430 -60,120 Z"/>
         <GeometryDrawing Brush="{StaticResource EmberAtmosphereCoal}"
-                         Geometry="M 910,590 C 1100,470 1370,505 1660,700 L 1660,1040 L 850,1040 C 790,875 805,690 910,590 Z"/>
+                         Geometry="M 910,590 C 1100,470 1370,505 1660,700 C 1640,820 1600,940 1560,1040 L 850,1040 C 790,875 805,690 910,590 Z"/>
         </DrawingGroup.Children>
       </DrawingGroup>
       <DrawingGroup Opacity="{StaticResource PhoenixOpacity}">

@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "ערכת נושא",
   "settings-tab.theme.hint": "משנה כל צבע בתוכנית ונשמר להפעלה הבאה.",
   "settings-tab.language.hint": "משנה את שפת הממשק ונשמר להפעלה הבאה.",
-  "settings-tab.default-target.label": "גודל יעד ברירת מחדל (MB)",
+  "settings-tab.default-target.label": "גודל יעד ברירת מחדל",
   "settings-tab.default-target.hint": "קובע את גודל היעד שלשונית הכיווץ נפתחת איתו.",
   "settings-tab.output-folder.label": "תיקיית פלט",
   "settings-tab.output-folder.beside-source": "ליד קובץ המקור",

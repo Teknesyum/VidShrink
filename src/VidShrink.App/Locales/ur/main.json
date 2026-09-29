@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "تھیم",
   "settings-tab.theme.hint": "پروگرام کا ہر رنگ بدلتا ہے اور اگلے آغاز پر یاد رہتا ہے۔",
   "settings-tab.language.hint": "انٹرفیس کی زبان بدلتا ہے اور اگلے آغاز پر یاد رہتا ہے۔",
-  "settings-tab.default-target.label": "طے شدہ ہدف سائز (MB)",
+  "settings-tab.default-target.label": "طے شدہ ہدف سائز",
   "settings-tab.default-target.hint": "وہ ہدف سائز طے کرتا ہے جس سے سکیڑیں ٹیب کھلتا ہے۔",
   "settings-tab.output-folder.label": "نتیجہ فولڈر",
   "settings-tab.output-folder.beside-source": "ماخذ فائل کے ساتھ",

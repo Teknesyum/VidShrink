@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Giao diện",
   "settings-tab.theme.hint": "Đổi mọi màu trong chương trình và được ghi nhớ ở lần mở sau.",
   "settings-tab.language.hint": "Đổi ngôn ngữ giao diện và được ghi nhớ ở lần mở sau.",
-  "settings-tab.default-target.label": "Dung lượng mục tiêu mặc định (MB)",
+  "settings-tab.default-target.label": "Dung lượng mục tiêu mặc định",
   "settings-tab.default-target.hint": "Đặt dung lượng mục tiêu khi tab Nén mở ra.",
   "settings-tab.output-folder.label": "Thư mục đầu ra",
   "settings-tab.output-folder.beside-source": "Cạnh tệp nguồn",

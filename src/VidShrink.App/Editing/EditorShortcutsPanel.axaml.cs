@@ -28,6 +28,22 @@ internal partial class EditorShortcutsPanel : UserControl
         }
     }
 
+    /// <summary>
+    /// Liste açık mı. Tek başına kurulan panel açık gelir; Ayarlar sayfası kapalı kurar ki
+    /// tuş listesi sayfayı kaydırmaya zorlamasın (oynatıcı listesi tek başına 1817 px).
+    /// </summary>
+    public bool IsOpen
+    {
+        get => Body.IsVisible;
+        set
+        {
+            Body.IsVisible = value;
+            Glyph.Classes.Set("open", value);
+        }
+    }
+
+    private void OnToggle(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => IsOpen = !IsOpen;
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -61,7 +77,7 @@ internal partial class EditorShortcutsPanel : UserControl
             Grid.SetRow(gesture, index);
             Grid.SetColumn(gesture, 0);
 
-            var label = new TextBlock { Text = row.Label, Theme = Find("Body"), TextWrapping = Avalonia.Media.TextWrapping.Wrap };
+            var label = new TextBlock { Text = VidShrink.Core.Bicim.Satir.Bagla(row.Label), Theme = Find("Body"), TextWrapping = Avalonia.Media.TextWrapping.Wrap };
             Grid.SetRow(label, index);
             Grid.SetColumn(label, 1);
 

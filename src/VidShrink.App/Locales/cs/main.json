@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Motiv",
   "settings-tab.theme.hint": "Změní každou barvu v programu a zapamatuje se pro příští spuštění.",
   "settings-tab.language.hint": "Změní jazyk rozhraní a zapamatuje se pro příští spuštění.",
-  "settings-tab.default-target.label": "Výchozí cílová velikost (MB)",
+  "settings-tab.default-target.label": "Výchozí cílová velikost",
   "settings-tab.default-target.hint": "Nastaví cílovou velikost, se kterou se otevře záložka Zmenšit.",
   "settings-tab.output-folder.label": "Výstupní složka",
   "settings-tab.output-folder.beside-source": "Vedle zdrojového souboru",

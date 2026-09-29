@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Тема",
   "settings-tab.theme.hint": "Меняет все цвета программы и запоминается при следующем запуске.",
   "settings-tab.language.hint": "Меняет язык интерфейса и запоминается при следующем запуске.",
-  "settings-tab.default-target.label": "Целевой размер по умолчанию (МБ)",
+  "settings-tab.default-target.label": "Целевой размер по умолчанию",
   "settings-tab.default-target.hint": "Задаёт целевой размер, с которым открывается вкладка «Сжать».",
   "settings-tab.output-folder.label": "Папка результата",
   "settings-tab.output-folder.beside-source": "Рядом с исходным файлом",

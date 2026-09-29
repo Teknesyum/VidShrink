@@ -324,6 +324,7 @@ public partial class MainWindow : Window
             Watch(control, TextBox.TextProperty, SaveSettings);
 
         RefreshQualityTargetAvailability();
+        OzelDonusturAlanlari();
         RefreshChipDerivation();
         RefreshSectionSummaries();
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
@@ -430,7 +431,7 @@ public partial class MainWindow : Window
         return (min, size);
     }
 
-    private Control[] EntrancePanels() => new Control[] { SourcePanel, TargetPanel, PlanPanel, OutputPanel, AiPanel };
+    private Control[] EntrancePanels() => new Control[] { SourcePanel, TargetPanel, PlanPanel, OutputPanel, OutcomePanel, AiPanel };
 
     private void PreparePanelEntrance()
     {
@@ -1313,11 +1314,20 @@ public partial class MainWindow : Window
 
         var fallback = FfmpegPathModeIndex == 1 && ToolLocator.Manual is null;
         TxtSystemStatus.Text = string.Join("\n",
-            fallback ? $"FFmpeg: {ToolLocator.Ffmpeg}\n{Say("settings-tab.ffmpeg-path.error")}" : $"FFmpeg: {ToolLocator.Ffmpeg}",
+            fallback ? $"FFmpeg: {YolSarar(ToolLocator.Ffmpeg)}\n{Say("settings-tab.ffmpeg-path.error")}" : $"FFmpeg: {YolSarar(ToolLocator.Ffmpeg)}",
             $"{Say("main.about.version")}: {_ffmpegVersion ?? Say("main.about.reading")}",
             $".NET: {Environment.Version}",
             $"VidShrink: {AppVersion()}");
     }
+
+    /// <summary>
+    /// Yol, ayraçlarından sonra satır kırılabilir hale gelir (sıfır genişlikli boşluk). WinGet'in
+    /// kurduğu ffmpeg'in yolu Hakkında kartına sığmıyor, Avalonia boşluksuz yolu harf ortasından
+    /// bölüyordu ("WinG|et", "Pac|kages"). Nokta ve alt çizgi de ayraç: paket klasörü
+    /// "Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe" 401 px kartta "8wekyb3d8bb|we" bölünüyordu.
+    /// </summary>
+    internal static string YolSarar(string? yol)
+        => System.Text.RegularExpressions.Regex.Replace(yol ?? string.Empty, @"[\\/._]", "$0​");
 
     /// <summary>
     /// Uygulamanın kendi sürümü. Hakkında kutusu da bildirim şeridi de burayı okur;
@@ -4707,8 +4717,21 @@ public partial class MainWindow : Window
 
     private void OnConvertChanged()
     {
+        OzelDonusturAlanlari();
         if (_syncing) return;
         RefreshConversion();
+    }
+
+    /// <summary>
+    /// Özel boyut ve kare hızı yalnız "Özel" seçiliyken, ses bit hızı yalnız ses kodlanırken açık:
+    /// <see cref="ReadConversionPlan"/> öbür durumda bu kutuları okumuyor, "Kaynak" seçiliyken
+    /// dolu ve seçilebilir görünen 1280x720 ile 25 çıktıya hiçbir şey katmıyordu.
+    /// </summary>
+    private void OzelDonusturAlanlari()
+    {
+        TxtCustomResolution.IsEnabled = SelectedTag(CmbResolution) == "custom";
+        TxtCustomFps.IsEnabled = SelectedTag(CmbConvertFps) == "custom";
+        TxtAudioBitrate.IsEnabled = ReadConversionPlan().AudioCodec is { } ses && ses != "copy";
     }
 
     private void RefreshConversion()

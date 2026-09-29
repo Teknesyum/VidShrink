@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Keičia visas programos spalvas ir įsimenama kitam paleidimui.",
   "settings-tab.language.hint": "Keičia sąsajos kalbą ir įsimenama kitam paleidimui.",
-  "settings-tab.default-target.label": "Numatytasis tikslinis dydis (MB)",
+  "settings-tab.default-target.label": "Numatytasis tikslinis dydis",
   "settings-tab.default-target.hint": "Nustato tikslinį dydį, su kuriuo atsidaro skirtukas Mažinti.",
   "settings-tab.output-folder.label": "Išvesties aplankas",
   "settings-tab.output-folder.beside-source": "Šalia šaltinio failo",

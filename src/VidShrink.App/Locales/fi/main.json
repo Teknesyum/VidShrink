@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Teema",
   "settings-tab.theme.hint": "Muuttaa ohjelman kaikki värit ja muistetaan seuraavalla käynnistyksellä.",
   "settings-tab.language.hint": "Muuttaa käyttöliittymän kielen ja muistetaan seuraavalla käynnistyksellä.",
-  "settings-tab.default-target.label": "Oletuskohdekoko (MB)",
+  "settings-tab.default-target.label": "Oletuskohdekoko",
   "settings-tab.default-target.hint": "Asettaa kohdekoon, jolla Pakkaa-välilehti avautuu.",
   "settings-tab.output-folder.label": "Tulostekansio",
   "settings-tab.output-folder.beside-source": "Lähdetiedoston vieressä",

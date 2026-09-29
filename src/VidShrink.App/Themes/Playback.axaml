@@ -380,8 +380,6 @@
   -->
   <ControlTheme x:Key="PlaybackEncodeChip" TargetType="Border">
     <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
-    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
     <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
     <Setter Property="BoxShadow" Value="{DynamicResource GlowPink}"/>
@@ -432,8 +430,6 @@
 
   <ControlTheme x:Key="PlaybackValueChip" TargetType="Border">
     <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
-    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
     <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
     <Setter Property="VerticalAlignment" Value="Center"/>

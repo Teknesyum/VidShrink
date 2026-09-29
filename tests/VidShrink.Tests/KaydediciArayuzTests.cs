@@ -341,7 +341,7 @@ public sealed class KaydediciArayuzTests
     public void BasitVeGelismisKipSecenekPaneliniSurer()
     {
         var olcu = KaydediciAyarTests.AyarDosyasiyla(
-            ayarYolu => AppHost.Run<(bool, bool, int, bool, bool, int, bool, bool, bool, bool)>(() =>
+            ayarYolu => AppHost.Run<(bool, bool, string?, bool, bool, string?, bool, bool, bool, bool)>(() =>
             {
                 var view = new RecorderView(ayarYolu);
                 T Bul<T>(string ad) where T : Avalonia.Controls.Control
@@ -350,12 +350,12 @@ public sealed class KaydediciArayuzTests
                 Bul<Avalonia.Controls.RadioButton>("RadSimple").IsChecked = true;
                 var basitGelismis = view.AdvancedMode;
                 var basitPanel = Bul<Avalonia.Controls.Border>("PanelOptions").IsVisible;
-                var basitYayilim = Avalonia.Controls.Grid.GetColumnSpan(Bul<Avalonia.Controls.Border>("PanelTarget"));
+                var basitYayilim = Bul<Avalonia.Controls.Border>("PanelAudio").Parent?.Name;
 
                 Bul<Avalonia.Controls.RadioButton>("RadAdvanced").IsChecked = true;
                 Bul<Avalonia.Controls.RadioButton>("RadManual").IsChecked = true;
                 var gelismisPanel = Bul<Avalonia.Controls.Border>("PanelOptions").IsVisible;
-                var gelismisYayilim = Avalonia.Controls.Grid.GetColumnSpan(Bul<Avalonia.Controls.Border>("PanelTarget"));
+                var gelismisYayilim = Bul<Avalonia.Controls.Border>("PanelAudio").Parent?.Name;
                 var gelismisElle = view.ManualMode;
                 var elleKaydi = view.Settings.ManualMode && view.Settings.AdvancedMode;
 
@@ -366,10 +366,10 @@ public sealed class KaydediciArayuzTests
 
         Assert.False(olcu.Item1);
         Assert.False(olcu.Item2);
-        Assert.Equal(2, olcu.Item3);
+        Assert.Equal("CardsMiddle", olcu.Item3);
         Assert.True(olcu.Item4);
         Assert.True(olcu.Item5);
-        Assert.Equal(1, olcu.Item6);
+        Assert.Equal("CardsLeft", olcu.Item6);
         Assert.True(olcu.Item7);
         Assert.False(olcu.Item8);
         Assert.True(olcu.Item9);

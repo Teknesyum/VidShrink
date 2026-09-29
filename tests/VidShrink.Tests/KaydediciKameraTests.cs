@@ -169,6 +169,32 @@ public sealed class KaydediciKameraTests
         Kapat("kamera-ayar.txt");
     }
 
+    /// <summary>
+    /// Kamera seçilmemişken genişlik, köşe ve arka plan kapalı; aygıt seçilince açılır, "Kamera yok"a
+    /// dönünce yine kapanır. Olumsuz kontrol aygıt kutusunun kendisi: o hep açık.
+    /// </summary>
+    [Fact]
+    public void KameraSecilmeyinceKameraAyarlariKapali()
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => new[] { "Kam A" } };
+            var kutular = new[] { "CmbWebcamSize", "CmbWebcamCorner", "CmbWebcamBackground" }.Select(ad => Bul<ComboBox>(view, ad)).ToArray();
+            var aygit = Bul<ComboBox>(view, "CmbWebcam");
+            var bos = kutular.Select(k => k.IsEnabled).ToArray();
+            aygit.SelectedIndex = 1;
+            var secili = kutular.Select(k => k.IsEnabled).ToArray();
+            aygit.SelectedIndex = 0;
+            var geri = kutular.Select(k => k.IsEnabled).ToArray();
+            return (bos, secili, geri, aygitAcik: aygit.IsEnabled);
+        }));
+
+        Assert.All(olcu.bos, acik => Assert.False(acik));
+        Assert.All(olcu.secili, acik => Assert.True(acik));
+        Assert.All(olcu.geri, acik => Assert.False(acik));
+        Assert.True(olcu.aygitAcik);
+    }
+
     [KameraFact]
     public async Task GercekKameraKaydinKosesineBinerKarsiKoseBosKalir()
     {

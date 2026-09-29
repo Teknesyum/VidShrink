@@ -86,6 +86,9 @@ internal partial class EditorView
         BtnSave.IsEnabled = ready;
         BtnExport.IsEnabled = ready;
         BtnShare.IsEnabled = ready && !Sharing;
+        var neden = _model is null || _source is null ? Strings.Get("main.action.shrink.disabled-tip") : null;
+        foreach (var dugme in new Control[] { BtnSave, BtnExport, BtnShare, BtnZoomIn, BtnZoomOut })
+            ToolTip.SetTip(dugme, neden);
     }
 
     private void ForgetSaved()

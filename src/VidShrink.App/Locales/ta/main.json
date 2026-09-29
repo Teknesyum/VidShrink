@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "தீம்",
   "settings-tab.theme.hint": "நிரலின் ஒவ்வொரு நிறத்தையும் மாற்றும், அடுத்த தொடக்கத்தில் நினைவில் இருக்கும்.",
   "settings-tab.language.hint": "இடைமுக மொழியை மாற்றும், அடுத்த தொடக்கத்தில் நினைவில் இருக்கும்.",
-  "settings-tab.default-target.label": "இயல்பு இலக்கு அளவு (MB)",
+  "settings-tab.default-target.label": "இயல்பு இலக்கு அளவு",
   "settings-tab.default-target.hint": "சுருக்கு தாவல் திறக்கும் இலக்கு அளவை அமைக்கும்.",
   "settings-tab.output-folder.label": "வெளியீட்டுக் கோப்புறை",
   "settings-tab.output-folder.beside-source": "மூலக் கோப்பின் அருகில்",
