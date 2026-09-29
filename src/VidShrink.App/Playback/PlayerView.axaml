@@ -114,17 +114,15 @@
         </Border>
 
         <Canvas x:Name="ThumbLayer" IsHitTestVisible="False">
-          <Border x:Name="ThumbChip" Theme="{StaticResource PlaybackBadge}" IsVisible="False">
-            <StackPanel Spacing="{StaticResource PlaybackBadgeGap}">
-              <Image x:Name="ThumbImage"
-                     Width="{StaticResource PlaybackThumbnailWidth}"
-                     Height="{StaticResource PlaybackThumbnailHeight}"
-                     Stretch="Fill"/>
-              <TextBlock x:Name="ThumbTime"
-                         Theme="{StaticResource PlaybackTimeText}"
-                         HorizontalAlignment="Center"/>
-            </StackPanel>
-          </Border>
+          <StackPanel x:Name="ThumbChip" Spacing="{StaticResource SpaceXs}" IsVisible="False">
+            <Image x:Name="ThumbImage"
+                   Width="{StaticResource PlaybackThumbnailWidth}"
+                   Height="{StaticResource PlaybackThumbnailHeight}"
+                   Stretch="Fill"/>
+            <Border Theme="{StaticResource PlaybackThumbTime}" HorizontalAlignment="Center">
+              <TextBlock x:Name="ThumbTime" Theme="{StaticResource PlaybackTimeText}"/>
+            </Border>
+          </StackPanel>
         </Canvas>
 
         <!--

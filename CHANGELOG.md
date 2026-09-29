@@ -14,6 +14,8 @@ ship as part of it.
 ### Changed
 
 - Recorder: the replay buffer left the top strip and the first card; it now lives in its own Advanced card (length, start and save), and stays visible while the buffer runs.
+- Player: the seek preview is just the frame and its time, with no outline around it, and it closes as soon as the pointer leaves the timeline.
+- Player: pausing no longer brings up the top and bottom bars; they appear only when the pointer moves to the top or bottom edge, and stay while paused once shown.
 
 ### Fixed
 

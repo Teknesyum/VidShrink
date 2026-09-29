@@ -73,6 +73,7 @@ internal sealed class HoverZone
     private int _generation;
     private bool _pointerInside;
     private bool _held;
+    private bool _kept;
     private bool _visible;
 
     internal HoverZone(double share, Func<TimeSpan> showDelay, Func<TimeSpan> hideDelay, Action<bool> apply, double pixels = 0)
@@ -141,6 +142,7 @@ internal sealed class HoverZone
         _clock.Stop();
         _pointerInside = false;
         _held = false;
+        _kept = false;
         _visible = visible;
     }
 
@@ -149,7 +151,7 @@ internal sealed class HoverZone
     /// ölçüm de aynı soruyu sorabilsin diye ayrı bir kapı.
     /// </summary>
     internal bool ShouldHide(int generation)
-        => generation == _generation && !_pointerInside && !_held;
+        => generation == _generation && !_pointerInside && !_held && !(_kept && _visible);
 
     /// <summary>Bekleyen gösterme tikinin kararını uygulayıp uygulamayacağı.</summary>
     internal bool ShouldShow(int generation)
@@ -169,6 +171,13 @@ internal sealed class HoverZone
         Evaluate();
     }
 
+    internal void Keep(bool kept)
+    {
+        if (_kept == kept) return;
+        _kept = kept;
+        Evaluate();
+    }
+
     private void SetPointer(bool inside)
     {
         if (_pointerInside == inside) return;
@@ -179,6 +188,7 @@ internal sealed class HoverZone
     private void Evaluate()
     {
         if (_pointerInside || _held) ScheduleShow();
+        else if (_kept && _visible) Cancel();
         else ScheduleHide();
     }
 

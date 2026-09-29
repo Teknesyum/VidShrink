@@ -35,6 +35,7 @@ internal partial class PlayerView
     private WriteableBitmap? _thumbBitmap;
     private long _thumbShown;
     private bool _thumbBusy;
+    private bool _thumbWanted;
     private double _thumbPending = double.NaN;
     private Task _thumbWork = Task.CompletedTask;
     private Task<ClipResult> _lastExport = Task.FromResult(new ClipResult(false, "", "", TimeSpan.Zero));
@@ -167,11 +168,14 @@ internal partial class PlayerView
 
     internal void HideThumbnail()
     {
+        _thumbWanted = false;
+        _thumbPending = double.NaN;
         if (ThumbChip is not null) ThumbChip.IsVisible = false;
     }
 
     internal void QueueThumbnail(double seconds)
     {
+        _thumbWanted = true;
         if (_thumbBusy)
         {
             _thumbPending = seconds;
@@ -188,6 +192,7 @@ internal partial class PlayerView
         while (true)
         {
             await ShowThumbnailAsync(at).ConfigureAwait(true);
+            if (!_thumbWanted) HideThumbnail();
             if (double.IsNaN(_thumbPending))
             {
                 _thumbBusy = false;
