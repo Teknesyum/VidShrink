@@ -575,7 +575,6 @@
               </StackPanel>
             </izi:SutunIzgara>
 
-            <TextBlock Text="{loc:Text recorder.budget.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
             <TextBlock x:Name="TxtBudgetNote" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
 
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
@@ -643,6 +642,7 @@
               <StackPanel>
                 <TextBlock Text="{loc:Text recorder.audio.microphone}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbMicrophone"
+                          ToolTip.Tip="{loc:Text recorder.audio.hint}"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.audio.microphone}"/>
               </StackPanel>
@@ -650,12 +650,12 @@
               <StackPanel>
                 <TextBlock Text="{loc:Text recorder.audio.system}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbSystemAudio"
+                          ToolTip.Tip="{loc:Text recorder.audio.hint}"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.audio.system}"/>
               </StackPanel>
             </izi:SutunIzgara>
 
-            <TextBlock Text="{loc:Text recorder.audio.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
             <Button x:Name="BtnAudioRefresh"
                     HorizontalAlignment="Left"
                     Theme="{StaticResource GhostButton}"
@@ -763,6 +763,7 @@
               <StackPanel>
                 <TextBlock Text="{loc:Text recorder.webcam.device}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbWebcam"
+                          ToolTip.Tip="{loc:Text recorder.webcam.hint}"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.webcam.device}"/>
               </StackPanel>
@@ -784,13 +785,11 @@
               <StackPanel>
                 <TextBlock Text="{loc:Text recorder.webcam.background.label}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbWebcamBackground"
+                          ToolTip.Tip="{loc:Text recorder.webcam.background.hint}"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.webcam.background.label}"/>
               </StackPanel>
             </izi:SutunIzgara>
-
-            <TextBlock Text="{loc:Text recorder.webcam.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-            <TextBlock Text="{loc:Text recorder.webcam.background.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
           </StackPanel>
         </Border>
 

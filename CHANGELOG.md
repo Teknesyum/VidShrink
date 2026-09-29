@@ -20,6 +20,7 @@ ship as part of it.
 - Player: the middle mouse button now leaves full screen into a window covering a third of the screen area, centred on the screen; pressing it again returns to full screen. F and Enter still restore the previous window.
 - Player: the pause mark is drawn in the palette blue.
 - Top tabs: unselected tabs are white and the selected tab is blue, the reverse of before.
+- Recorder: the Advanced page no longer scrolls at 1024 px; on three columns the webcam, replay and audio cards move under the other cards instead of a fourth column, and the audio, webcam and duplicate budget hints moved into tooltips.
 
 ### Fixed
 
