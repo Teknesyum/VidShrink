@@ -570,6 +570,12 @@ public sealed class OluUyeTests
     /// </summary>
     private static readonly PinnedFinding[] Pinned =
     {
+        new("RecorderWizardAudio.Silent", "yalniz-disarida", Legitimate,
+            "Sihirbazin ses sorusunun dorduncu karesi. RecorderView.Sihirbaz.cs:154 secilen karenin sirasini (RecorderWizardAudio)_wizardPicks[1] diye ture ceviriyor; RecorderWizard.cs:64-65 yalniz mikrofon ve sistem kollarini adiyla soruyor, Silent ikisinin de disinda kalan kol."),
+        new("RecorderWizardContent.General", "yalniz-disarida", Legitimate,
+            "Sihirbazin icerik sorusunun son karesi. RecorderView.Sihirbaz.cs:153 siradan ture ceviriyor; RecorderWizard.cs MaxFps ve kalite switch'leri Game ile Lesson'i adiyla yazip gerisini '_' koluna birakiyor."),
+        new("RecorderWizardContent.Meeting", "yalniz-disarida", Legitimate,
+            "Sihirbazin icerik sorusunun ucuncu karesi; General ile ayni yoldan uretilip ayni '_' kolunda tuketiliyor."),
         new("ArchitectureOutcome.Assumed", "varsayilan-kol", Legitimate,
             "Iki uyeli turun olumsuz kolu. VidShrink-Setup.exe motoru (SetupRunner.RuntimeIdentifier) Read kolunu soruyor; Assumed o kosulun else'i ve kullaniciya varsayim mesajini orada yaziyor. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; Read satirinin pimde isi kalmadi."),
         new("ConversionQualityMode.Bitrate", "varsayilan-kol", Legitimate,
