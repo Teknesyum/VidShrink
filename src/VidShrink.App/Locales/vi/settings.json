@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "Khi bật, phiên bản mới được tải về trong nền và cài đặt khi đóng VidShrink. Khi tắt, phiên bản mới được thông báo trên thanh trên cùng và cài đặt bằng một nút.",
   "settings.update.no-self-effect": "VidShrink không tự cập nhật trên hệ thống này: chỉ báo có phiên bản mới và hiện lệnh cài đặt.",
   "settings.default-app.suggestion": "VidShrink không phải chương trình mặc định cho video. Bạn có thể chọn nó ở trang Ứng dụng mặc định của Windows.",
+  "settings.default-app.all": "Đặt tất cả",
+  "settings.default-app.all-copied": "Đã sao chép lệnh vào bảng tạm. Mở cửa sổ PowerShell và dán vào; VidShrink sẽ thành mặc định cho mọi định dạng âm thanh và video.",
   "settings.default-app.open": "Ứng dụng mặc định",
   "settings.default-app.dismiss": "Không hỏi lại",
   "settings.player-shortcuts.title": "Phím tắt trình phát",

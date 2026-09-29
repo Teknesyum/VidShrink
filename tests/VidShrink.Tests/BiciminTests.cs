@@ -1396,6 +1396,7 @@ public sealed class BaslikKapsamiTests
     /// <c>player.menu.edit</c> ve <c>recorder.output.to-editor</c> geldi: 1148 - 1 + 4 = 1151, 43 x 1151 = 49493.</para>
     /// <para>2026-09-28, bolge dali ile birlikte: 1151 + 2 = 1153, 43 x 1153 = 49579.</para>
     /// <para>2026-09-29, arayuz turu: <c>recorder.advanced.encoder-title</c>: 1153 + 1 = 1154, 43 x 1154 = 49622.</para>
+    /// <para>2026-09-29, Tümünü Ata: <c>settings.default-app.all</c> ve <c>settings.default-app.all-copied</c>: 1154 + 2 = 1156, 43 x 1156 = 49708.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1423,7 +1424,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(49622, gezilen);
+        Assert.Equal(49708, gezilen);
         Assert.Empty(kayip);
     }
 

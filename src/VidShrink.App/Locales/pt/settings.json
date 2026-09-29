@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "O VidShrink não se atualiza sozinho neste sistema: só avisa que existe uma nova versão e mostra o comando que a instala.",
 
   "settings.default-app.suggestion": "O VidShrink não é o programa padrão para vídeos. Você pode escolhê-lo na página Aplicativos padrão do Windows.",
+  "settings.default-app.all": "Definir tudo",
+  "settings.default-app.all-copied": "Comando copiado para a área de transferência. Abra uma janela do PowerShell e cole-o; o VidShrink passa a ser o padrão para todos os formatos de áudio e vídeo.",
   "settings.default-app.open": "Aplicativos padrão",
   "settings.default-app.dismiss": "Não perguntar de novo",
   "settings.player-shortcuts.title": "Atalhos do player",

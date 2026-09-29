@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "VidShrink nie aktualizuje się sam w tym systemie: tylko informuje, że istnieje nowa wersja, i pokazuje polecenie, które ją instaluje.",
 
   "settings.default-app.suggestion": "VidShrink nie jest domyślnym programem do wideo. Możesz go wybrać na stronie Aplikacje domyślne w Windows.",
+  "settings.default-app.all": "Ustaw wszystkie",
+  "settings.default-app.all-copied": "Polecenie skopiowano do schowka. Otwórz okno PowerShell i wklej je; VidShrink stanie się domyślnym programem dla wszystkich formatów audio i wideo.",
   "settings.default-app.open": "Aplikacje domyślne",
   "settings.default-app.dismiss": "Nie pytaj ponownie",
   "settings.player-shortcuts.title": "Skróty odtwarzacza",

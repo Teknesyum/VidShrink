@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "Se attivo, la nuova versione si scarica in background e si installa alla chiusura di VidShrink. Se disattivo, la nuova versione viene segnalata nella barra superiore e si installa con un pulsante.",
   "settings.update.no-self-effect": "VidShrink non si aggiorna da solo su questo sistema: segnala soltanto che esiste una nuova versione e mostra il comando che la installa.",
   "settings.default-app.suggestion": "VidShrink non è il programma predefinito per i video. Puoi sceglierlo nella pagina App predefinite di Windows.",
+  "settings.default-app.all": "Imposta tutto",
+  "settings.default-app.all-copied": "Comando copiato negli appunti. Apri una finestra di PowerShell e incollalo; VidShrink diventa il predefinito per tutti i formati audio e video.",
   "settings.default-app.open": "App predefinite",
   "settings.default-app.dismiss": "Non chiedere più",
   "settings.player-shortcuts.title": "Scorciatoie del lettore",

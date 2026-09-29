@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "เมื่อเปิด เวอร์ชันใหม่จะดาวน์โหลดเบื้องหลังและติดตั้งเมื่อปิด VidShrink เมื่อปิด จะแจ้งเวอร์ชันใหม่ที่แถบด้านบนและติดตั้งด้วยปุ่ม",
   "settings.update.no-self-effect": "VidShrink ไม่อัปเดตตัวเองบนระบบนี้: จะแจ้งเพียงว่ามีเวอร์ชันใหม่และแสดงคำสั่งสำหรับติดตั้ง",
   "settings.default-app.suggestion": "VidShrink ไม่ใช่โปรแกรมเริ่มต้นสำหรับวิดีโอ คุณเลือกได้ในหน้าแอปเริ่มต้นของ Windows",
+  "settings.default-app.all": "ตั้งค่าทั้งหมด",
+  "settings.default-app.all-copied": "คัดลอกคำสั่งไปยังคลิปบอร์ดแล้ว เปิดหน้าต่าง PowerShell แล้ววาง VidShrink จะเป็นค่าเริ่มต้นสำหรับไฟล์เสียงและวิดีโอทุกรูปแบบ",
   "settings.default-app.open": "แอปเริ่มต้น",
   "settings.default-app.dismiss": "ไม่ต้องถามอีก",
   "settings.player-shortcuts.title": "ปุ่มลัดตัวเล่น",

@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "В этой системе VidShrink не обновляет себя: он только сообщает о новой версии и показывает команду для её установки.",
 
   "settings.default-app.suggestion": "VidShrink не является программой по умолчанию для видео. Её можно выбрать на странице «Приложения по умолчанию» Windows.",
+  "settings.default-app.all": "Назначить все",
+  "settings.default-app.all-copied": "Команда скопирована в буфер обмена. Откройте окно PowerShell и вставьте её; VidShrink станет программой по умолчанию для всех аудио- и видеоформатов.",
   "settings.default-app.open": "Приложения по умолчанию",
   "settings.default-app.dismiss": "Больше не спрашивать",
   "settings.player-shortcuts.title": "Горячие клавиши плеера",

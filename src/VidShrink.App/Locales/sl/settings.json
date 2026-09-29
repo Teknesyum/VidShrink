@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "VidShrink se na tem sistemu ne posodablja sam: le sporoči, da obstaja nova različica, in pokaže ukaz, ki jo namesti.",
 
   "settings.default-app.suggestion": "VidShrink ni privzeti program za videe. Izberete ga lahko na strani Privzete aplikacije v sistemu Windows.",
+  "settings.default-app.all": "Nastavi vse",
+  "settings.default-app.all-copied": "Ukaz je kopiran v odložišče. Odprite okno PowerShell in ga prilepite; VidShrink postane privzeti program za vse zvočne in video zapise.",
   "settings.default-app.open": "Privzete aplikacije",
   "settings.default-app.dismiss": "Ne sprašuj več",
   "settings.player-shortcuts.title": "Bližnjice predvajalnika",

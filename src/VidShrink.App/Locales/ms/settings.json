@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "Jika dihidupkan, versi baharu dimuat turun di latar belakang dan dipasang apabila VidShrink ditutup. Jika dimatikan, versi baharu diumumkan di bar atas dan dipasang dengan butang.",
   "settings.update.no-self-effect": "VidShrink tidak mengemas kini dirinya pada sistem ini: ia hanya memberitahu versi baharu wujud dan menunjukkan perintah yang memasangnya.",
   "settings.default-app.suggestion": "VidShrink bukan program lalai untuk video. Anda boleh memilihnya di halaman Aplikasi lalai Windows.",
+  "settings.default-app.all": "Tetapkan Semua",
+  "settings.default-app.all-copied": "Arahan disalin ke papan keratan. Buka tetingkap PowerShell dan tampalkannya; VidShrink menjadi lalai untuk semua format audio dan video.",
   "settings.default-app.open": "Aplikasi lalai",
   "settings.default-app.dismiss": "Jangan tanya lagi",
   "settings.player-shortcuts.title": "Pintasan pemain",
