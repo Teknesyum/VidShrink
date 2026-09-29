@@ -47,6 +47,23 @@ public static class ShellIntegration
 
     public static IReadOnlyList<string> DefaultAppExtensions { get; } = new[] { "mp4", "mkv", "mov", "avi", "webm" };
 
+    /// <summary>
+    /// "Tümünü Ata" düğmesinin ele geçirdiği geniş küme: Windows Media Player'ın sahip olduğu
+    /// tüm ses+video türleri ve çalma listeleri, artı VidShrink'in kendi video formatları.
+    /// Yalnız oynatılamayan türler dışarıda: kaplama (.wmz, .wmd, .wms), sanal CD (.cda) ve
+    /// MIDI (.mid, .midi, .rmi) — bunlar VidShrink'e atansa çift tıkta bozulur. Kurucunun
+    /// kaydettiği <see cref="MediaExtensions"/>'tan ayrıdır; bu liste yalnız kullanıcı düğmeye
+    /// basıp komutu kendi kabuğunda çalıştırınca uygulanır.
+    /// </summary>
+    public static IReadOnlyList<string> BulkDefaultExtensions { get; } = new[]
+    {
+        "3g2", "3gp", "3gp2", "3gpp", "aac", "adt", "adts", "aif", "aifc", "aiff", "asf", "asx",
+        "au", "avi", "dav", "divx", "f4v", "flac", "flv", "gif", "m1v", "m2t", "m2ts", "m2v",
+        "m3u", "m4a", "m4v", "mk3d", "mka", "mkv", "mod", "mov", "mp2", "mp2v", "mp3", "mp4",
+        "mp4v", "mpa", "mpe", "mpeg", "mpg", "mpv2", "mts", "mxf", "ogv", "rm", "rmvb", "snd",
+        "ts", "tts", "vob", "wav", "wax", "webm", "wm", "wma", "wmv", "wmx", "wpl", "wvx"
+    };
+
     /// <summary>Hızlı küçültme isteğini uygulamaya taşıyan komut satırı bayrağı.</summary>
     public const string ShrinkFlag = "--kucult";
 

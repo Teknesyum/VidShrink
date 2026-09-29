@@ -23,6 +23,7 @@ public static class BulkAssociationCommand
 
         return string.Join(
             "; ",
+            "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force",
             $"$u='{ScriptUrl}'",
             $"$h='{ScriptSha256}'",
             "$p=Join-Path $env:TEMP 'VidShrink-SFTA.ps1'",
@@ -30,6 +31,8 @@ public static class BulkAssociationCommand
             "Unblock-File $p",
             "if((Get-FileHash -Algorithm SHA256 $p).Hash -ne $h){Write-Error 'VidShrink: dosya butunlugu dogrulanamadi, islem durduruldu'; return}",
             $". $p",
-            $"@({list}) | ForEach-Object {{ Set-FTA '{progId}' $_ }}");
+            $"$e=@({list})",
+            $"for($i=0;$i -lt $e.Count;$i++){{ Write-Progress -Activity 'VidShrink varsayilan atama' -Status $e[$i] -PercentComplete (($i+1)*100/$e.Count); Set-FTA '{progId}' $e[$i] }}",
+            "Write-Progress -Activity 'VidShrink varsayilan atama' -Completed");
     }
 }

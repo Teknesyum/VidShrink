@@ -13,9 +13,10 @@ using VidShrink.Core.Setup;
 namespace VidShrink.App.Integration;
 
 /// <summary>
-/// "VidShrink varsayılan değil" önerisi. Bir cümle ve üç düğme taşır: biri 24 uzantının
-/// tümünü tek komutla atayan yönlendirmeyi panoya kopyalar, biri Windows'un varsayılan
-/// uygulamalar sayfasını açar, biri öneriyi kalıcı olarak kapatır.
+/// "VidShrink varsayılan değil" önerisi. Bir cümle ve üç düğme taşır: biri sahip
+/// olunabilecek tüm ses+video uzantılarını tek komutla atayan yönlendirmeyi panoya
+/// kopyalar, biri Windows'un varsayılan uygulamalar sayfasını açar, biri öneriyi kalıcı
+/// olarak kapatır.
 ///
 /// <para>"Tümünü ata" düğmesi VidShrink içinden PowerShell çalıştırmaz, dosya indirmez:
 /// bütünlüğü sabitlenmiş komutu panoya yazar, kullanıcı kendi kabuğunda çalıştırır. Böylece
@@ -49,7 +50,7 @@ internal sealed class DefaultAppSuggestionBar : UserControl
         all.Click += async (_, _) =>
         {
             if (TopLevel.GetTopLevel(this)?.Clipboard is not { } clipboard) return;
-            var command = BulkAssociationCommand.Build(FileAssociation.ProgId, ShellIntegration.MediaExtensions);
+            var command = BulkAssociationCommand.Build(FileAssociation.ProgId, ShellIntegration.BulkDefaultExtensions);
             await clipboard.SetTextAsync(command).ConfigureAwait(true);
             _message.Bind(TextBlock.TextProperty, Text(AllCopiedKey));
         };
