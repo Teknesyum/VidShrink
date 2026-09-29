@@ -450,10 +450,10 @@ public sealed class KabukEntegrasyonTests
             var bar = new DefaultAppSuggestionBar(file);
             var buttons = bar.GetLogicalDescendants().OfType<Button>().ToList();
 
-            Assert.Equal(2, buttons.Count);
+            Assert.Equal(3, buttons.Count);
             Assert.True(bar.IsVisible);
 
-            buttons[1].RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            buttons[^1].RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 
             Assert.False(bar.IsVisible);
         });
