@@ -18,6 +18,10 @@ ship as part of it.
 - Player: the seek preview is just the frame and its time, with no outline around it, and it closes as soon as the pointer leaves the timeline.
 - Player: pausing no longer brings up the top and bottom bars; they appear only when the pointer moves to the top or bottom edge, and stay while paused once shown.
 
+### Fixed
+
+- Player: the playlist beside the right-click menu moves clear of an open submenu, anchors to the focused control when the menu opens from the keyboard, and keeps the menu shadow's width from the menu and the screen edge.
+
 ## [1.1.0] - 2026-09-29
 
 ### Added

@@ -150,6 +150,60 @@ public sealed class OynaticiListeTests
         Assert.InRange(x, 0, 1920 - 280);
     }
 
+    [Theory]
+    [InlineData(1500, 1200, 1800, 920)]
+    [InlineData(100, 100, 700, 700)]
+    public void YerlesimAcikAltMenuyuSayar(double imlec, double doluSol, double doluSag, double beklenen)
+    {
+        var menuSol = PlaylistPlacement.MenuLeft(imlec, 300, 0, 1920);
+        var x = PlaylistPlacement.ListX(imlec, menuSol, 300, doluSol, doluSag, 280, 0, 1920, 0);
+        Assert.Equal(beklenen, x);
+        Assert.True(x + 280 <= doluSol || x >= doluSag, $"liste {x} alt menuyle cakisiyor [{doluSol}, {doluSag}]");
+        Assert.InRange(x, 0, 1920 - 280);
+    }
+
+    [Fact]
+    public void YerlesimIkiYanaSigmayincaEkrandaKalir()
+    {
+        var x = PlaylistPlacement.ListX(900, 900, 300, 100, 1800, 280, 0, 1920, 8);
+        Assert.InRange(x, 8, 1920 - 280 - 8);
+    }
+
+    [Fact]
+    public void KlavyeCapasiOdakliOgedir()
+    {
+        Assert.Equal(600, PlaylistPlacement.AnchorX(null, 600, 400));
+        Assert.Equal(1000, PlaylistPlacement.AnchorX(1000, 600, 400));
+        Assert.Equal(400, PlaylistPlacement.AnchorX(null, null, 400));
+
+        var anchor = PlaylistPlacement.AnchorX(null, 600, 400);
+        var x = PlaylistPlacement.ListX(anchor, 400, 300, 400, 700, 280, 0, 1920, 0);
+        Assert.Equal(700, x);
+    }
+
+    [Theory]
+    [InlineData(1000, 712)]
+    [InlineData(290, 598)]
+    [InlineData(1640, 1052)]
+    public void YerlesimGolgeyiSayar(double imlec, double beklenen)
+    {
+        const double golge = 8;
+        var menuSol = PlaylistPlacement.MenuLeft(imlec, 300, 0, 1920);
+        var x = PlaylistPlacement.ListX(imlec, menuSol, 300, menuSol, menuSol + 300, 280, 0, 1920, golge);
+        Assert.Equal(beklenen, x);
+        Assert.True(x + 280 + golge <= menuSol || x - golge >= menuSol + 300, $"liste {x} golgesi menuye degiyor [{menuSol}, {menuSol + 300}]");
+        Assert.InRange(x, golge, 1920 - 280 - golge);
+    }
+
+    [Theory]
+    [InlineData(100, 400, 100)]
+    [InlineData(900, 400, 672)]
+    [InlineData(2, 400, 8)]
+    public void YerlesimGolgeyiDikeydeSayar(double menuUst, double liste, double beklenen)
+    {
+        Assert.Equal(beklenen, PlaylistPlacement.ListY(menuUst, liste, 0, 1080, 8));
+    }
+
     [Fact]
     public void SiraKlasordenVeKaristirmaTohumundanGelir()
     {
@@ -194,7 +248,9 @@ public sealed class OynaticiListeTests
                 var menu = Ekranda(Sunucu(view));
                 var liste = Ekranda(view.PlaylistFrame);
                 Assert.InRange(menu.X, imlec.X - 2, imlec.X + 2);
-                Assert.InRange(liste.Right, imlec.X - 2, imlec.X + 2);
+                var golge = (double)view.FindResource("MenuShadowExtent")! * TopLevel.GetTopLevel(view)!.RenderScaling;
+                Assert.True(golge > 0, "golge belirteci yok");
+                Assert.InRange(liste.Right, imlec.X - golge - 2, imlec.X - golge + 2);
                 Assert.InRange(liste.Y, menu.Y - 2, menu.Y + 2);
 
                 Assert.Equal(new[] { "a1.mp4", "a2.mp4", "a3.mp4" },
