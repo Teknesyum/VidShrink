@@ -56,6 +56,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private TaskCompletionSource<bool>? _shot;
     private volatile bool _isOpen;
     private volatile bool _hasAudio;
+    private volatile bool _hasVideo = true;
     private volatile bool _paused = true;
     private volatile bool _eof;
     private double _duration;
@@ -154,7 +155,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         ("osd-bar", "no"),
         ("sub-auto", "no"),
         ("sid", "no"),
-        ("audio-display", "no"),
+        ("audio-display", "embedded-first"),
         ("audio-fallback-to-null", "yes")
     };
 
@@ -169,6 +170,12 @@ public sealed partial class MpvEngine : IPlaybackEngine
     public double DurationSeconds => Volatile.Read(ref _duration);
 
     public bool HasAudio => _hasAudio;
+
+    public bool HasVideo => _hasVideo;
+
+    public MediaTags Tags => _isOpen ? new MediaTags(Tag("title"), Tag("artist"), Tag("album")) : MediaTags.Empty;
+
+    private string? Tag(string key) => GetProperty("metadata/by-key/" + key) is { Length: > 0 } value ? value.Trim() : null;
 
     public bool IsPaused => _paused;
 
@@ -403,7 +410,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
             {
                 var type = GetProperty($"track-list/{i}/type");
                 var selected = GetProperty($"track-list/{i}/selected") == "yes";
-                if (type == "video" && (videoCodec is null || (selected && !videoSelected)))
+                if (type == "video" && GetProperty($"track-list/{i}/albumart") != "yes" && (videoCodec is null || (selected && !videoSelected)))
                 {
                     videoCodec = GetProperty($"track-list/{i}/codec");
                     width = (int)ReadInt($"track-list/{i}/demux-w");
@@ -712,20 +719,28 @@ public sealed partial class MpvEngine : IPlaybackEngine
     {
         var duration = GetDouble("duration");
         Volatile.Write(ref _duration, double.IsFinite(duration) && duration > 0 ? duration : 0);
-        _hasAudio = CountAudioTracks() > 0;
+        var (audio, video) = CountTracks();
+        _hasAudio = audio > 0;
+        _hasVideo = video > 0;
         ReadVideoSize();
         _isOpen = true;
         Interlocked.Exchange(ref _open, null)?.TrySetResult();
     }
 
-    private unsafe int CountAudioTracks()
+    private unsafe (int Audio, int Video) CountTracks()
     {
         long count;
-        if (mpv_get_property(_mpv, "track-list/count", MPV_FORMAT_INT64, &count) < 0) return 0;
+        if (mpv_get_property(_mpv, "track-list/count", MPV_FORMAT_INT64, &count) < 0) return (0, 0);
         var audio = 0;
+        var video = 0;
         for (var i = 0; i < count; i++)
-            if (GetProperty($"track-list/{i}/type") == "audio") audio++;
-        return audio;
+        {
+            var type = GetProperty($"track-list/{i}/type");
+            if (type == "audio") audio++;
+            else if (type == "video" && GetProperty($"track-list/{i}/albumart") != "yes") video++;
+        }
+
+        return (audio, video);
     }
 
     private void OnEnded(MpvEventEndFile end)
