@@ -234,6 +234,7 @@ public partial class MainWindow : Window
         Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
         Tabs.SelectionChanged += (_, _) => KaydediciSekmesiSecildi();
         Tabs.SelectionChanged += (_, _) => DuzenleyiciSekmesiSecildi();
+        Tabs.SelectionChanged += (_, _) => { if (Tabs.SelectedIndex != PlayerTabIndex) Player.RestoreWindowMin(); };
 
         if (OperatingSystem.IsMacOS())
         {

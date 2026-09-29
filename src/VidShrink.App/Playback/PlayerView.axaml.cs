@@ -147,6 +147,10 @@ internal partial class PlayerView : UserControl
                 ToggleFullscreen();
                 _trace.Add("fullscreen -> " + _fullscreen.IsFullscreen);
                 break;
+            case PlayerCommandKind.CompactOrFullscreen:
+                CompactOrFullscreen();
+                _trace.Add("compact -> " + _fullscreen.IsFullscreen);
+                break;
             case PlayerCommandKind.ContextMenu:
                 OpenMenu();
                 _trace.Add("menu");
@@ -493,6 +497,7 @@ internal partial class PlayerView : UserControl
             window.WindowState = (WindowState)next.State;
             if (next.State != (int)WindowState.FullScreen)
             {
+                if (_compactMin is { } min && next.Width >= min.Width && next.Height >= min.Height) RestoreWindowMin();
                 window.Position = new PixelPoint((int)next.X, (int)next.Y);
                 window.Width = next.Width;
                 window.Height = next.Height;
@@ -501,6 +506,55 @@ internal partial class PlayerView : UserControl
 
         SelectTab?.Invoke(next.TabIndex);
         FullscreenChanged?.Invoke(this, next);
+    }
+
+    private Size? _compactMin;
+
+    internal bool IsCompact => _compactMin is not null;
+
+    internal void CompactOrFullscreen()
+    {
+        if (!_fullscreen.IsFullscreen)
+        {
+            ToggleFullscreen();
+            return;
+        }
+
+        _fullscreen.Leave();
+        var window = TopLevel.GetTopLevel(this) as Window;
+        var snapshot = new WindowSnapshot((int)WindowState.Normal, 0, 0, 0, 0, PlayerTabIndex());
+        if (window is not null)
+        {
+            window.WindowState = WindowState.Normal;
+            var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary;
+            if (screen is not null)
+            {
+                var share = this.TryFindResource("WindowCompactAreaShare", out var value) && value is double d ? d : 1;
+                var area = screen.WorkingArea;
+                var rect = CompactWindow.Fit(area.X, area.Y, area.Width, area.Height, share);
+                var width = rect.Width / screen.Scaling;
+                var height = rect.Height / screen.Scaling;
+                _compactMin ??= new Size(window.MinWidth, window.MinHeight);
+                window.MinWidth = Math.Min(_compactMin.Value.Width, width);
+                window.MinHeight = Math.Min(_compactMin.Value.Height, height);
+                window.Width = width;
+                window.Height = height;
+                window.Position = new PixelPoint(rect.X, rect.Y);
+                snapshot = new WindowSnapshot((int)WindowState.Normal, rect.X, rect.Y, width, height, PlayerTabIndex());
+            }
+        }
+
+        SelectTab?.Invoke(PlayerTabIndex());
+        FullscreenChanged?.Invoke(this, snapshot);
+    }
+
+    internal void RestoreWindowMin()
+    {
+        if (_compactMin is not { } min) return;
+        _compactMin = null;
+        if (TopLevel.GetTopLevel(this) is not Window window) return;
+        window.MinWidth = min.Width;
+        window.MinHeight = min.Height;
     }
 
     internal void TogglePlay()

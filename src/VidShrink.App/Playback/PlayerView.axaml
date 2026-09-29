@@ -39,7 +39,7 @@
                 Height="{StaticResource PauseGlyphSize}"
                 Stretch="Uniform"
                 Data="{StaticResource IconPause}"
-                Fill="{StaticResource TextBody}"/>
+                Fill="{StaticResource NeonBlue}"/>
         </Border>
         <TextBlock x:Name="TxtEmpty"
                    Text="{loc:Text main.player.empty}"

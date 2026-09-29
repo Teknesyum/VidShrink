@@ -52,7 +52,8 @@ internal enum PlayerCommandKind
     OpenUrl,
     Stop,
     GoToStart,
-    Edit
+    Edit,
+    CompactOrFullscreen
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)
@@ -187,6 +188,19 @@ internal sealed class FullscreenSwitch
         if (_previous is not { } restore) return null;
         _previous = null;
         return restore;
+    }
+}
+
+internal readonly record struct CompactRect(int X, int Y, int Width, int Height);
+
+internal static class CompactWindow
+{
+    internal static CompactRect Fit(int areaX, int areaY, int areaWidth, int areaHeight, double share)
+    {
+        var k = Math.Sqrt(Math.Clamp(share, 0, 1));
+        var width = (int)Math.Round(areaWidth * k);
+        var height = (int)Math.Round(areaHeight * k);
+        return new CompactRect(areaX + (areaWidth - width) / 2, areaY + (areaHeight - height) / 2, width, height);
     }
 }
 

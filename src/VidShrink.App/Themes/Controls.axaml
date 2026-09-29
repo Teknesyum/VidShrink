@@ -1010,7 +1010,7 @@
 
       <ControlTheme x:Key="NeonTabItem" TargetType="TabItem">
         <Setter Property="FocusAdorner" Value="{StaticResource DuzenOdakHalkasi}"/>
-        <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
         <Setter Property="FontWeight" Value="Bold"/>
@@ -1068,10 +1068,10 @@
           </ControlTemplate>
         </Setter>
         <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         </Style>
         <Style Selector="^:focus-visible">
-          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#TabIndicator">
           <Setter Property="Opacity" Value="1"/>
@@ -1082,7 +1082,7 @@
           <Setter Property="RenderTransform" Value="none"/>
         </Style>
         <Style Selector="^:selected">
-          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         </Style>
         <Style Selector="^:selected /template/ Border#TabIndicator">
           <Setter Property="Opacity" Value="1"/>

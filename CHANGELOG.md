@@ -17,6 +17,9 @@ ship as part of it.
 - Recorder: the replay buffer left the top strip and the first card; it now lives in its own Advanced card (length, start and save), and stays visible while the buffer runs.
 - Player: the seek preview is just the frame and its time, with no outline around it, and it closes as soon as the pointer leaves the timeline.
 - Player: pausing no longer brings up the top and bottom bars; they appear only when the pointer moves to the top or bottom edge, and stay while paused once shown.
+- Player: the middle mouse button now leaves full screen into a window covering a third of the screen area, centred on the screen; pressing it again returns to full screen. F and Enter still restore the previous window.
+- Player: the pause mark is drawn in the palette blue.
+- Top tabs: unselected tabs are white and the selected tab is blue, the reverse of before.
 
 ### Fixed
 

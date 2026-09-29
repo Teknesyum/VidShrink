@@ -186,7 +186,7 @@ public sealed class OynaticiGirdiTests
         Assert.Equal(PlayerCommandKind.Zoom, Keymap.ForWheel(1, KeyModifiers.Alt).Kind);
         Assert.Equal(PlayerCommandKind.TogglePlay, Keymap.ForPress(PlayerButton.Left).Kind);
         Assert.Equal(PlayerCommandKind.ContextMenu, Keymap.ForPress(PlayerButton.Right).Kind);
-        Assert.Equal(PlayerCommandKind.ToggleFullscreen, Keymap.ForPress(PlayerButton.Middle).Kind);
+        Assert.Equal(PlayerCommandKind.CompactOrFullscreen, Keymap.ForPress(PlayerButton.Middle).Kind);
         Assert.Equal(PlayerCommandKind.ToggleFullscreen, Keymap.ForKey(Key.F, KeyModifiers.None, "f").Kind);
         Assert.Equal(PlayerCommandKind.LeaveFullscreen, Keymap.ForKey(Key.Escape, KeyModifiers.None, null).Kind);
         Assert.Equal(PlayerCommandKind.TogglePlay, Keymap.ForKey(Key.Space, KeyModifiers.None, " ").Kind);
@@ -847,7 +847,7 @@ public sealed class OynaticiGirdiTestsPencereYazma
             body.AppendLine(Oku("once     "));
             var once = ((int)window.WindowState, window.Position.X, window.Position.Y, window.Width, window.Height);
 
-            GirdiSurucu.Press(view, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
+            GirdiSurucu.Key(view, Avalonia.Input.Key.F, KeyModifiers.None, "f");
             body.AppendLine(Oku("tam ekran"));
             var tamEkranDurumu = (int)window.WindowState;
 
@@ -857,7 +857,7 @@ public sealed class OynaticiGirdiTestsPencereYazma
             window.Height = 300;
             body.AppendLine(Oku("kaydirildi"));
 
-            GirdiSurucu.Press(view, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
+            GirdiSurucu.Key(view, Avalonia.Input.Key.F, KeyModifiers.None, "f");
             body.AppendLine(Oku("geri     "));
             var geri = ((int)window.WindowState, window.Position.X, window.Position.Y, window.Width, window.Height);
             body.AppendLine($"arka uc: {AppHost.Backend}");

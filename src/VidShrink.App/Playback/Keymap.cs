@@ -59,6 +59,7 @@ internal static class Keymap
     internal static readonly PlayerAction Stop = new(PlayerCommandKind.Stop, 0, "main.player.menu.stop");
     internal static readonly PlayerAction GoToStart = new(PlayerCommandKind.GoToStart, 0, "main.player.menu.tostart");
     internal static readonly PlayerAction Fullscreen = new(PlayerCommandKind.ToggleFullscreen, 0, "main.player.menu.fullscreen");
+    internal static readonly PlayerAction CompactOrFullscreen = new(PlayerCommandKind.CompactOrFullscreen, 0, "main.player.menu.fullscreen");
     internal static readonly PlayerAction ResetZoom = new(PlayerCommandKind.ResetZoom, 0, "main.player.menu.reset");
     internal static readonly PlayerAction AspectCycle = new(PlayerCommandKind.AspectCycle, 0, "player.view.aspect");
     internal static readonly PlayerAction Rotate = new(PlayerCommandKind.Rotate, 90, "player.view.rotate");
@@ -99,7 +100,7 @@ internal static class Keymap
         new(PlayerInput.OnWheel(KeyModifiers.Control | KeyModifiers.Shift), Seek(SeekLarge)),
         new(PlayerInput.OnWheel(KeyModifiers.Alt), Zoom),
         new(PlayerInput.OnPress(PlayerButton.Left), PlayPause),
-        new(PlayerInput.OnPress(PlayerButton.Middle), Fullscreen),
+        new(PlayerInput.OnPress(PlayerButton.Middle), CompactOrFullscreen),
         new(PlayerInput.OnPress(PlayerButton.Right), OpenMenu),
         new(PlayerInput.OnKey(Key.F), Fullscreen),
         new(PlayerInput.OnKey(Key.Space), PlayPause),
