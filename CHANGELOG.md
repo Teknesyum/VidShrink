@@ -9,7 +9,7 @@ ship as part of it.
 
 ### Added
 
-- Windows: the default-apps suggestion has a Set All button that copies an integrity-pinned PowerShell command to the clipboard, making VidShrink the default for all 24 video extensions in one paste. VidShrink itself runs no PowerShell and downloads nothing; the user runs the copied command, so the unsigned build stays clear of behavioral flags.
+- Windows: the default-apps suggestion has a Set All button that copies an integrity-pinned PowerShell command to the clipboard, making VidShrink the default for 60 audio, video and playlist extensions (the Windows Media Player set) in one paste, with a progress bar. VidShrink itself runs no PowerShell and downloads nothing; the user runs the copied command, so the unsigned build stays clear of behavioral flags.
 - Player: an Edit command (right-click menu, bottom strip, key E) opens the current file in the editor tab at the playhead.
 - Recorder: the result panel has an Edit button that opens the finished recording in the editor.
 - Editor: Save writes `<name>-duzenlenmis.<ext>` next to the source in Smart mode without asking, numbering `-2`, `-3`… on collision; Save As… keeps the file picker. The status shows the path with Show in folder.

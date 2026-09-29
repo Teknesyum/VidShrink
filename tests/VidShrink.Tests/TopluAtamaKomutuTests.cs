@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using VidShrink.App.Integration;
 using VidShrink.Core;
 using VidShrink.Core.Setup;
@@ -71,6 +72,49 @@ public sealed class TopluAtamaKomutuTests
         var komut = Komut();
         Assert.DoesNotContain("&&", komut);
         Assert.DoesNotContain("||", komut);
+    }
+
+    [Fact]
+    public void Eski_windowsta_da_indirir()
+    {
+        var komut = Komut();
+        Assert.Contains("SecurityProtocol -bor 3072", komut);
+        Assert.Contains("Invoke-WebRequest -UseBasicParsing", komut);
+    }
+
+    [Fact]
+    public void Komut_ascii_kalir()
+    {
+        Assert.All(Komut(), karakter => Assert.True(karakter < 128, $"ASCII disi: {karakter}"));
+    }
+
+    [Fact]
+    public void Windows_powershell_5_1_hatasiz_ayristirir()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var klasor = Path.Combine(TestPaths.OutputRoot, "toplu-atama", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        var dosya = Path.Combine(klasor, "komut.ps1");
+        File.WriteAllText(dosya, Komut());
+
+        var betik = "$e=$null; [void][System.Management.Automation.Language.Parser]::ParseFile('" + dosya + "', [ref]$null, [ref]$e); $e.Count";
+        var info = new ProcessStartInfo("powershell.exe")
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+        foreach (var arguman in new[] { "-NoProfile", "-NonInteractive", "-Command", betik }) info.ArgumentList.Add(arguman);
+
+        using var surec = Process.Start(info)!;
+        var cikti = surec.StandardOutput.ReadToEnd();
+        var hata = surec.StandardError.ReadToEnd();
+        surec.WaitForExit();
+
+        Assert.True(surec.ExitCode == 0, hata);
+        Assert.Equal("0", cikti.Trim());
     }
 
     [Fact]

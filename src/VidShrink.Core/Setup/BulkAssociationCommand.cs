@@ -24,15 +24,17 @@ public static class BulkAssociationCommand
         return string.Join(
             "; ",
             "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force",
+            "[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor 3072",
             $"$u='{ScriptUrl}'",
             $"$h='{ScriptSha256}'",
             "$p=Join-Path $env:TEMP 'VidShrink-SFTA.ps1'",
-            "Invoke-WebRequest -Uri $u -OutFile $p",
+            "Invoke-WebRequest -UseBasicParsing -Uri $u -OutFile $p",
             "Unblock-File $p",
             "if((Get-FileHash -Algorithm SHA256 $p).Hash -ne $h){Write-Error 'VidShrink: dosya butunlugu dogrulanamadi, islem durduruldu'; return}",
             $". $p",
             $"$e=@({list})",
             $"for($i=0;$i -lt $e.Count;$i++){{ Write-Progress -Activity 'VidShrink varsayilan atama' -Status $e[$i] -PercentComplete (($i+1)*100/$e.Count); Set-FTA '{progId}' $e[$i] }}",
-            "Write-Progress -Activity 'VidShrink varsayilan atama' -Completed");
+            "Write-Progress -Activity 'VidShrink varsayilan atama' -Completed",
+            "Write-Host ('VidShrink: {0} uzanti atandi.' -f $e.Count)");
     }
 }
