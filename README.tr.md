@@ -420,6 +420,27 @@ dağıtmaz ve içine GPL kodu bağlamaz ([`docs/kurulum.tr.md`](docs/kurulum.tr.
 Kaynak ağacının içinde dağıtılan üçüncü taraf malzeme — simge takımının kesildiği Fluent UI
 System Icons (MIT) — [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) dosyasında.
 
+## Kod İmzalama Politikası
+
+Ücretsiz kod imzalama [SignPath.io](https://about.signpath.io) tarafından, sertifika
+[SignPath Foundation](https://signpath.org) tarafından sağlanır. Başvuru değerlendirmede;
+onaylanana kadar Windows sürümleri imzasız çıkar.
+
+- Kod yazan, gözden geçiren ve onaylayan: [Teknesyum](https://github.com/Teknesyum)
+
+Yalnız bu depodan GitHub Actions'ın derlediği dosyalar imzalanır; her imza isteği elle
+onaylanır.
+
+**Gizlilik.** Bu program, kullanıcı ya da onu kuran veya çalıştıran kişi özellikle
+istemedikçe başka ağ sistemlerine bilgi aktarmaz. Yapabildiği istekler ve her birini
+neyin başlattığı:
+
+- **Güncelleme denetimi** — GitHub'a son sürümü sorar. Windows'ta varsayılan açık;
+  Ayarlar'dan kapatılır.
+- **Kurucu** — FFmpeg ve libmpv'yi GitHub sürümlerinden, SHA-256'ya sabitlenmiş olarak indirir.
+- **Paylaş** — dosyayı yalnız Paylaş'a bastığınızda, seçtiğiniz sunucuya yükler.
+- **OpenSubtitles** — yalnız siz kullandığınızda oturum açar ve arar.
+
 ## Tek Satırda Kurulum
 
 Windows 10 ya da 11'de PowerShell'e yapıştırın. Son `VidShrink-Setup.exe`'yi indirip

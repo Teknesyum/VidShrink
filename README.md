@@ -415,6 +415,27 @@ Third-party material that ships inside the source tree — the Fluent UI System 
 the icon set is cut from — is listed in
 [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
 
+## Code Signing Policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by
+[SignPath Foundation](https://signpath.org). The application is pending; until it is
+approved, Windows releases ship unsigned.
+
+- Committers, reviewers and approvers: [Teknesyum](https://github.com/Teknesyum)
+
+Only artifacts built by GitHub Actions from this repository are signed, and every signing
+request is approved by hand.
+
+**Privacy.** This program will not transfer any information to other networked systems
+unless specifically requested by the user or the person installing or operating it. The
+requests it can make, and what starts each one:
+
+- **Update check** — asks GitHub for the latest release. On by default on Windows; switch it off in
+  Settings.
+- **Installer** — downloads FFmpeg and libmpv from GitHub releases, pinned by SHA-256.
+- **Share** — uploads a file only when you press Share, to the host you pick.
+- **OpenSubtitles** — signs in and searches only when you use it.
+
 ## One-line install
 
 Paste into PowerShell on Windows 10 or 11. It downloads the latest `VidShrink-Setup.exe`
