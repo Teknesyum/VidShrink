@@ -125,8 +125,6 @@ public sealed class KaydirmasizSekmeTests
         Assert.True(olculer.Count >= 4, $"yalnız {olculer.Count} sayfa ölçüldü");
         if (olcek == 100) Assert.DoesNotContain(olculer, o => o.Tasiyor);
         Assert.DoesNotContain(olculer, o => o.BosKutular.Count > 0);
-
-        KanitKapanisi.Kapat(klasor, ad);
     }
 
     private static List<Olcu> Olc(MainWindow pencere, Size boyut, string etiket, double olcek)
