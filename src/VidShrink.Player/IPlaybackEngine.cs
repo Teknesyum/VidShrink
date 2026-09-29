@@ -30,6 +30,13 @@ public enum PlaybackTrackKind
 
 public sealed record PlaybackTrack(long Id, PlaybackTrackKind Kind, string? Title, string? Language, bool External, bool Selected);
 
+public sealed record MediaTags(string? Title, string? Artist, string? Album)
+{
+    public static readonly MediaTags Empty = new(null, null, null);
+
+    public bool IsEmpty => Title is null && Artist is null && Album is null;
+}
+
 public readonly record struct SeekResult(SeekOutcome Outcome, double LatencyMs);
 
 public sealed record PlaybackFault(string MessageKey, string? MessageArg = null);
@@ -64,6 +71,10 @@ public interface IPlaybackEngine : IDisposable
     double DurationSeconds { get; }
 
     bool HasAudio { get; }
+
+    bool HasVideo => true;
+
+    MediaTags Tags => MediaTags.Empty;
 
     bool IsPaused { get; }
 

@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "پوسته",
   "settings-tab.theme.hint": "همهٔ رنگ‌های برنامه را تغییر می‌دهد و در اجرای بعدی به خاطر می‌ماند.",
   "settings-tab.language.hint": "زبان رابط را تغییر می‌دهد و در اجرای بعدی به خاطر می‌ماند.",
-  "settings-tab.default-target.label": "اندازهٔ هدف پیش‌فرض (MB)",
+  "settings-tab.default-target.label": "اندازهٔ هدف پیش‌فرض",
   "settings-tab.default-target.hint": "اندازهٔ هدفی را تعیین می‌کند که زبانهٔ فشرده‌سازی با آن باز می‌شود.",
   "settings-tab.output-folder.label": "پوشهٔ خروجی",
   "settings-tab.output-folder.beside-source": "کنار فایل منبع",

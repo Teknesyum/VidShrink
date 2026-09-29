@@ -7,6 +7,48 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Recorder: an Auto setup button in the strip asks up to three questions with one-click square answers (what you record, which sound goes in, where the recording goes), then applies the answers on top of the machine measurement and shows a one-line summary. Answers are remembered; next time a "Same settings as last time" shortcut skips the questions.
+
+### Changed
+
+- Recorder: the replay buffer left the top strip and the first card; it now lives in its own Advanced card (length, start and save), and stays visible while the buffer runs.
+
+## [1.1.0] - 2026-09-29
+
+### Added
+
+- Windows: the default-apps suggestion has a Set All button that copies an integrity-pinned PowerShell command to the clipboard, making VidShrink the default for 60 audio, video and playlist extensions (the Windows Media Player set) in one paste, with a progress bar. VidShrink itself runs no PowerShell and downloads nothing; the user runs the copied command, so the unsigned build stays clear of behavioral flags.
+- Player: music files (mp3, flac, m4a, opus, wma, wav and 18 more) play in an audio view with title, artist and the embedded cover; the seek bar runs from the playback clock and screenshot, clip and preview tools hide. Next/previous in a music folder steps through audio only, and audio never lands on the shrink tab.
+- Player: playlists open (m3u, m3u8, pls, wpl, zpl, asx, wax, wvx, wmx) and play as a queue: next/previous, auto-advance and the playlist dropdown follow the list, missing entries are skipped, and an ANSI list without a BOM is read in the system code page.
+- Player: keyboard media keys (play/pause, stop, next, previous) work while the window has focus.
+- Player: an Edit command (right-click menu, bottom strip, key E) opens the current file in the editor tab at the playhead.
+- Recorder: the result panel has an Edit button that opens the finished recording in the editor.
+- Editor: Save writes `<name>-duzenlenmis.<ext>` next to the source in Smart mode without asking, numbering `-2`, `-3`… on collision; Save As… keeps the file picker. The status shows the path with Show in folder.
+- Editor: Share saves first when needed, then uploads through the same share layer as the recorder.
+- Recorder region editor: the edge snaps to windows and screen edges while you drag (hold Alt to turn it off); the toolbar has large square icon buttons, including snapshot (works before and during recording), hide frame (F9 or the tray icon brings it back), pause/resume/stop while recording, and a close button that stops the recording. The edge is dashed while you set it up and solid while recording.
+
+### Changed
+
+- Interface pass: Shrink, Convert, Recorder and Settings fit a 1920x1080 screen at 100% scale without scrolling (Settings was five screens tall); cards flow into columns instead of leaving empty panels.
+- Recorder: the page is regrouped into compact cards, the encoder details sit under their own heading, and English option labels use Title Case.
+- Editor: Save, Save As… and Share say why they are disabled before a file is loaded.
+
+### Fixed
+
+- Windows: the default-apps suggestion no longer stays up after VidShrink was chosen: the check now accepts VidShrink's own ProgID, so development and portable builds see the choice too.
+- Windows: the VidShrink page under Default apps lists five formats (mp4, mkv, mov, avi, webm) instead of 24; the other formats stay in Open with and the right-click menu. Existing installs trim the list on the next start.
+- Windows: when the silent update fails three times in a row (unreachable, bad download, install on exit fails), the app stops trusting it and runs the manual check, so a newer version shows up in the badge and panel instead of never arriving. The reason is kept in `update-health.json` next to the settings.
+- Windows: the desktop and Start menu shortcut icons are refreshed once per version after startup, so an old icon no longer sticks after an update.
+- Contrast: success text in Everforest and OneDark and warning text in Everforest now clear 7:1 on every surface they appear on.
+
+## [1.0.0] - 2026-09-28
+
+### Changed
+
+- First stable release. Same feature set as 0.14.0: shrink, convert, recorder, player and editor tabs; from here on version numbers follow semantic versioning with a stable 1.x line.
+
 ## [0.14.0] - 2026-09-28
 
 ### Added

@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Zobraziť v priečinku",
   "recorder.output.to-shrink": "Poslať na zmenšenie",
   "recorder.output.to-player": "Otvoriť v prehrávači",
+  "recorder.output.to-editor": "Upraviť",
   "recorder.output.done": "Nahrávanie dokončené: {0} MB v {1} segmentoch",
   "recorder.output.partial": "Nahrávanie sa neuzavrelo správne. Súbor je uložený a dá sa prehrať. Posledné sekundy môžu chýbať.",
   "recorder.output.partial-broken": "Nahrávanie sa neuzavrelo správne. Súbor sa nedá prehrať. Pre ďalšie nahrávanie zvoľte MKV.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Rekordér VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Globálnu klávesovú skratku už používa iná aplikácia: {0}. Tieto klávesy fungujú iba vtedy, keď je okno VidShrink v popredí.",
   "recorder.advanced.title": "Rozšírené kódovanie",
+  "recorder.advanced.encoder-title": "Podrobnosti kodéra",
   "recorder.advanced.container": "Kontajner",
   "recorder.advanced.scale-width": "Šírka škálovania",
   "recorder.advanced.scale-height": "Výška škálovania",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Noise gate",
   "recorder.advanced.noise-suppression": "Potlačenie šumu",
   "recorder.budget.duration-only": "Nahrávanie sa samo zastaví po {0} sekundách.",
-  "recorder.budget.size-only": "Nahrávanie sa samo zastaví po dosiahnutí {0} MB.",
+  "recorder.budget.size-only": "Nahrávanie sa samo zastaví po dosiahnutí {0} MB.",
   "recorder.output.open-when-done": "Otvoriť priečinok po skončení nahrávania",
   "recorder.discarded": "Nahrávanie zrušené, súbor bol vymazaný.",
   "recorder.target.screen-pick": "Obrazovka",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Zrušiť",
   "recorder.wizard.summary": "{0} · {1} · {2} — kvalita {3}.",
   "recorder.wizard.no-device": "Pre {0} sa nenašlo žiadne zariadenie; tento zdroj zostane bez zvuku.",
-  "recorder.replay.seconds": "Dĺžka na uchovanie"
+  "recorder.replay.seconds": "Dĺžka na uchovanie",
+  "recorder.region.hide": "Skryť rámik (F9)",
+  "recorder.region.stop-close": "Zastaviť nahrávanie a zavrieť"
 }

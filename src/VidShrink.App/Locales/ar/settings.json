@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "عند التفعيل، يُنزَّل الإصدار الجديد في الخلفية ويُثبَّت عند إغلاق VidShrink. عند الإيقاف، يُعلَن عن الإصدار الجديد في الشريط العلوي ويُثبَّت بزر.",
   "settings.update.no-self-effect": "لا يحدّث VidShrink نفسه على هذا النظام: يخبرك فقط بوجود إصدار جديد ويعرض الأمر الذي يثبته.",
   "settings.default-app.suggestion": "VidShrink ليس البرنامج الافتراضي للفيديو. يمكنك اختياره في صفحة التطبيقات الافتراضية في Windows.",
+  "settings.default-app.all": "تعيين الكل",
+  "settings.default-app.all-copied": "تم نسخ الأمر إلى الحافظة. افتح نافذة PowerShell والصقه؛ يصبح VidShrink الافتراضي لكل صيغ الصوت والفيديو.",
   "settings.default-app.open": "التطبيقات الافتراضية",
   "settings.default-app.dismiss": "لا تسأل مجدداً",
   "settings.player-shortcuts.title": "اختصارات المشغّل",

@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "ธีม",
   "settings-tab.theme.hint": "เปลี่ยนทุกสีในโปรแกรมและจดจำไว้ในการเปิดครั้งถัดไป",
   "settings-tab.language.hint": "เปลี่ยนภาษาอินเทอร์เฟซและจดจำไว้ในการเปิดครั้งถัดไป",
-  "settings-tab.default-target.label": "ขนาดเป้าหมายเริ่มต้น (MB)",
+  "settings-tab.default-target.label": "ขนาดเป้าหมายเริ่มต้น",
   "settings-tab.default-target.hint": "กำหนดขนาดเป้าหมายที่แท็บย่อเปิดมาพร้อมกัน",
   "settings-tab.output-folder.label": "โฟลเดอร์ผลลัพธ์",
   "settings-tab.output-folder.beside-source": "ข้างไฟล์ต้นฉบับ",

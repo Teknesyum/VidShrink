@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Motyw",
   "settings-tab.theme.hint": "Zmienia każdy kolor w programie i jest zapamiętywany przy następnym uruchomieniu.",
   "settings-tab.language.hint": "Zmienia język interfejsu i jest zapamiętywany przy następnym uruchomieniu.",
-  "settings-tab.default-target.label": "Domyślny rozmiar docelowy (MB)",
+  "settings-tab.default-target.label": "Domyślny rozmiar docelowy",
   "settings-tab.default-target.hint": "Ustala rozmiar docelowy, z którym otwiera się zakładka Zmniejsz.",
   "settings-tab.output-folder.label": "Folder wyjściowy",
   "settings-tab.output-folder.beside-source": "Obok pliku źródłowego",

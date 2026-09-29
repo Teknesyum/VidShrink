@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Pokaż w folderze",
   "recorder.output.to-shrink": "Wyślij do Zmniejsz",
   "recorder.output.to-player": "Otwórz w odtwarzaczu",
+  "recorder.output.to-editor": "Edytuj",
   "recorder.output.done": "Nagrywanie zakończone: {0} MB w {1} segmentach",
   "recorder.output.partial": "Nagranie nie zostało poprawnie zamknięte. Plik jest zapisany i można go odtworzyć. Ostatnich sekund może brakować.",
   "recorder.output.partial-broken": "Nagranie nie zostało poprawnie zamknięte. Pliku nie można odtworzyć. Wybierz MKV do następnego nagrania.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Rejestrator VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Globalny skrót jest zajęty przez inną aplikację: {0}. Te klawisze działają tylko wtedy, gdy okno VidShrink jest aktywne na pierwszym planie.",
   "recorder.advanced.title": "Zaawansowane kodowanie",
+  "recorder.advanced.encoder-title": "Szczegóły kodera",
   "recorder.advanced.container": "Kontener",
   "recorder.advanced.scale-width": "Szerokość skalowania",
   "recorder.advanced.scale-height": "Wysokość skalowania",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Bramka szumów",
   "recorder.advanced.noise-suppression": "Redukcja szumów",
   "recorder.budget.duration-only": "Nagrywanie zatrzyma się samo po {0} sekundach.",
-  "recorder.budget.size-only": "Nagrywanie zatrzyma się samo po osiągnięciu {0} MB.",
+  "recorder.budget.size-only": "Nagrywanie zatrzyma się samo po osiągnięciu {0} MB.",
   "recorder.output.open-when-done": "Otwórz folder po zakończeniu nagrywania",
   "recorder.discarded": "Nagranie odrzucone, plik został usunięty.",
   "recorder.target.screen-pick": "Ekran",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Anuluj",
   "recorder.wizard.summary": "{0} · {1} · {2} — jakość {3}.",
   "recorder.wizard.no-device": "Nie znaleziono urządzenia dla {0}; to źródło pozostaje ciche.",
-  "recorder.replay.seconds": "Długość do zachowania"
+  "recorder.replay.seconds": "Długość do zachowania",
+  "recorder.region.hide": "Ukryj ramkę (F9)",
+  "recorder.region.stop-close": "Zatrzymaj nagrywanie i zamknij"
 }

@@ -187,7 +187,7 @@ internal partial class PlayerView
     private bool PlayFromEnd()
     {
         EnsureSettings();
-        if (_path is { } path && FolderNavigator.Step(path, true, _settings.Repeat, _settings.Shuffle, _shuffleSeed) is { } next)
+        if (_path is { } path && StepFrom(path, true) is { } next)
         {
             _trace.Add("end -> " + Path.GetFileName(next));
             _navigation = OpenQuietlyAsync(next);
@@ -203,7 +203,7 @@ internal partial class PlayerView
     {
         EnsureSettings();
         if (_path is not { } path) return "no";
-        var next = FolderNavigator.Step(path, forward, _settings.Repeat, _settings.Shuffle, _shuffleSeed);
+        var next = StepFrom(path, forward);
         if (next is null)
         {
             _notice = Strings.Get("player.list.end");

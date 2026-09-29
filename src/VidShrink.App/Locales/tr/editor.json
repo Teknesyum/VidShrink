@@ -17,7 +17,8 @@
   "editor.redo": "Yinele",
   "editor.zoom-in": "Yakınlaştır",
   "editor.zoom-out": "Uzaklaştır",
-  "editor.export": "Dışa aktar",
+  "editor.save": "Kaydet",
+  "editor.save-as": "Farklı Kaydet…",
   "editor.timeline": "Zaman çizelgesi",
   "editor.playhead": "Oynatma başı",
   "editor.export.mode": "Dışa aktarma kipi",
@@ -29,5 +30,5 @@
   "editor.export.failed": "Dışa aktarma başarısız: {0}",
   "editor.export.reencoded": "{0} numaralı klipler hız değiştiriyor ya da ters oynuyor, yeniden kodlanır.",
   "editor.export.fallback": "Bu kaynak yeniden kodlanmadan kesilemiyor, bu yüzden videonun tamamı yeniden kodlanır.",
-  "editor.export.reverse-limit": "Ters klip {0} bellek sınırından ({1}) uzun. Sürdürmek için Dışa aktar'a yeniden bas."
+  "editor.export.reverse-limit": "Ters klip {0} bellek sınırından ({1}) uzun. Sürdürmek için Kaydet'e yeniden bas."
 }

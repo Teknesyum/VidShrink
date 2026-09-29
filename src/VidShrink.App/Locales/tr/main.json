@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Programdaki bütün renkleri değiştirir ve bir sonraki açılışta hatırlanır.",
   "settings-tab.language.hint": "Arayüz dilini değiştirir ve bir sonraki açılışta hatırlanır.",
-  "settings-tab.default-target.label": "Varsayılan hedef boyut (MB)",
+  "settings-tab.default-target.label": "Varsayılan hedef boyut",
   "settings-tab.default-target.hint": "Küçült sekmesinin açılışta geleceği hedef boyutu belirler.",
   "settings-tab.output-folder.label": "Çıktı klasörü",
   "settings-tab.output-folder.beside-source": "Kaynağın yanı",

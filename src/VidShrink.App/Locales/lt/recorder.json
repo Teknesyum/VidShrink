@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Rodyti aplanke",
   "recorder.output.to-shrink": "Siųsti mažinti",
   "recorder.output.to-player": "Atverti grotuve",
+  "recorder.output.to-editor": "Redaguoti",
   "recorder.output.done": "Įrašymas baigtas: {0} MB, {1} dalyse",
   "recorder.output.partial": "Įrašas neužsidarė tvarkingai. Failas išsaugotas ir jį galima atkurti. Paskutinių sekundžių gali trūkti.",
   "recorder.output.partial-broken": "Įrašas neužsidarė tvarkingai. Failo atkurti negalima. Kitam įrašui pasirinkite MKV.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink įrašymo įrankis · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Visuotinį trumpinį jau naudoja kita programa: {0}. Šie klavišai veikia tik tada, kai VidShrink langas yra priekyje.",
   "recorder.advanced.title": "Išplėstinis kodavimas",
+  "recorder.advanced.encoder-title": "Kodavimo priemonės informacija",
   "recorder.advanced.container": "Konteineris",
   "recorder.advanced.scale-width": "Mastelio plotis",
   "recorder.advanced.scale-height": "Mastelio aukštis",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Triukšmo vartai",
   "recorder.advanced.noise-suppression": "Triukšmo slopinimas",
   "recorder.budget.duration-only": "Įrašymas savaime sustos po {0} sekundžių.",
-  "recorder.budget.size-only": "Įrašymas savaime sustos pasiekus {0} MB.",
+  "recorder.budget.size-only": "Įrašymas savaime sustos pasiekus {0} MB.",
   "recorder.output.open-when-done": "Atidaryti aplanką pasibaigus įrašymui",
   "recorder.discarded": "Įrašymas atmestas, failas ištrintas.",
   "recorder.target.screen-pick": "Ekranas",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Atšaukti",
   "recorder.wizard.summary": "{0} · {1} · {2} — kokybė {3}.",
   "recorder.wizard.no-device": "{0} įrenginio nerasta; šis šaltinis liks be garso.",
-  "recorder.replay.seconds": "Išsaugotinas ilgis"
+  "recorder.replay.seconds": "Išsaugotinas ilgis",
+  "recorder.region.hide": "Slėpti rėmelį (F9)",
+  "recorder.region.stop-close": "Stabdyti įrašymą ir uždaryti"
 }

@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "テーマ",
   "settings-tab.theme.hint": "プログラム全体の色を変更し、次回起動時にも記憶されます。",
   "settings-tab.language.hint": "インターフェースの言語を変更し、次回起動時にも記憶されます。",
-  "settings-tab.default-target.label": "既定の目標サイズ(MB)",
+  "settings-tab.default-target.label": "既定の目標サイズ",
   "settings-tab.default-target.hint": "圧縮タブを開いたときの目標サイズを設定します。",
   "settings-tab.output-folder.label": "出力フォルダー",
   "settings-tab.output-folder.beside-source": "ソースファイルの隣",

@@ -11,7 +11,7 @@ Sayı hiçbir yerde sabit yazılı değil. `docs/danisma/2026-09-17-fable-kararl
 diyor; o, 13 Eylül ölçümünün sayısıdır. Takım Fluent'e taşınırken `IconRestore` eklenmiş (27),
 ardından kullanılmayan iki geometri düşürülmüştü; 18 Eylül 2026'da uyarı durumu için
 `IconWarning` eklendi (26); 27 Eylül 2026'da Teknesyum düğmesi simgesiz kalınca `IconCode`
-düştü; 27 Eylül 2026'da düzenleyici sekmesi için `IconEditor` eklendi — bugün depoda **26** yol var. `IconsTests` bu
+düştü; 27 Eylül 2026'da düzenleyici sekmesi için `IconEditor` eklendi; 28 Eylül 2026'da bölge düzenleyicinin kare al ve çerçeveyi gizle düğmeleri için `IconCamera` ile `IconEyeOff` eklendi — bugün depoda **28** yol var. `IconsTests` bu
 tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan düşen her anahtar
 ölçüyü kırar.
 
@@ -43,6 +43,8 @@ tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan d
 | 24 | IconCoffee | `Drink Coffee` | `ic_fluent_drink_coffee_24_filled.svg` | Filled / 24 px | Bağış bağlantısı |
 | 25 | IconWarning | `Warning` | `ic_fluent_warning_24_filled.svg` | Filled / 24 px | Uyarı durumu (`StatusWarning`) |
 | 26 | IconEditor | `Cut` | `ic_fluent_cut_24_filled.svg` | Filled / 24 px | Düzenleyici sekmesi |
+| 27 | IconCamera | `Camera` | `ic_fluent_camera_24_filled.svg` | Filled / 24 px | Bölge düzenleyicide kare al |
+| 28 | IconEyeOff | `Eye Off` | `ic_fluent_eye_off_24_filled.svg` | Filled / 24 px | Bölge düzenleyicide çerçeveyi gizle |
 
 ## Ölçülen Sınır Kutuları
 
@@ -53,7 +55,7 @@ Sabitleyici çıkarıldıktan sonra `Geometry.Parse(...).Bounds` ile okunan değ
 - `IconSpeed` — gösterge kütlesi merkezin üstünde (cy 11,00).
 - `IconCoffee` — kulp sağda 2 birimlik kenar payını taşıyor (sağ kenar 23,00).
 
-Bu üçü ayrı ayrı, ölçülen kutularıyla pimlendi; kalan 21 simge genel kurala (mürekkep
+Bu üçü ayrı ayrı, ölçülen kutularıyla pimlendi; kalan 25 simge genel kurala (mürekkep
 2–22 aralığında, merkez 12±0,55) uyuyor.
 
 ## Kaldırılan Geometriler (18 Eylül 2026)
@@ -64,7 +66,7 @@ atıf vardı. İkisi de Fluent'e taşınmadan önce de ölüydü; taşıma onlar
 | Anahtar | Fluent dosyası | Neden kaldırıldı |
 |---|---|---|
 | `IconMenu` | `ic_fluent_more_vertical_24_filled.svg` | Uygulamada taşma menüsü düğmesi yok; oynatıcı menüsü düğmeyle değil bağlam menüsüyle (sağ tık / Apps tuşu) açılıyor. Simgenin asılacağı bir yer yok. |
-| `IconCamera` | `ic_fluent_camera_24_filled.svg` | Kare yakalama işlevi var (`BtnSnapshot`, oynatıcıda Ctrl+E) ama ikisi de **metin** etiketli; kaydedici şeridinin bütün düğmeleri metin. Tek düğmeyi simgeye çevirmek şeridin dilini bozar ve bu turun işi değil. |
+| `IconCamera` | `ic_fluent_camera_24_filled.svg` | Kare yakalama işlevi var (`BtnSnapshot`, oynatıcıda Ctrl+E) ama ikisi de **metin** etiketli; kaydedici şeridinin bütün düğmeleri metin. Tek düğmeyi simgeye çevirmek şeridin dilini bozar ve bu turun işi değil. **Geri geldi (28 Eylül 2026):** bölge düzenleyicisinin simgeli panelindeki kare düğmesi için, tablodaki 27. satır. |
 
 Geri gerekirse: yukarıdaki dosya adı Fluent deposundaki yolu birebir verir, gövde ham olarak
 `Themes/Icons.axaml`'a `F1 M 0,0 M 24,24` sabitleyicisiyle girer ve tabloya bir satır eklenir.

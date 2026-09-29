@@ -147,8 +147,10 @@ public partial class App : Application
             var executable = Environment.ProcessPath;
             if (!string.IsNullOrEmpty(executable))
                 Integration.FileAssociationSetup.Ensure(Integration.FileAssociation.LaunchTarget(executable));
+            if (Integration.RegistryWriteGate.Allows(executable))
+                VidShrink.Core.Setup.ShellRegistration.TrimDefaultAppList(Integration.FileAssociation.ClassesRoot);
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or DllNotFoundException or EntryPointNotFoundException)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or System.Security.SecurityException or DllNotFoundException or EntryPointNotFoundException)
         {
         }
     }

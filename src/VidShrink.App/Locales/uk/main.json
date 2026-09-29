@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Тема",
   "settings-tab.theme.hint": "Змінює кожен колір у програмі й запам'ятовується до наступного запуску.",
   "settings-tab.language.hint": "Змінює мову інтерфейсу й запам'ятовується до наступного запуску.",
-  "settings-tab.default-target.label": "Типовий цільовий розмір (МБ)",
+  "settings-tab.default-target.label": "Типовий цільовий розмір",
   "settings-tab.default-target.hint": "Задає цільовий розмір, з яким відкривається вкладка «Стиснути».",
   "settings-tab.output-folder.label": "Тека результату",
   "settings-tab.output-folder.beside-source": "Поруч із файлом джерела",

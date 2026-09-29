@@ -49,6 +49,7 @@
   "recorder.output.reveal": "فولڈر میں دکھائیں",
   "recorder.output.to-shrink": "سکیڑیں کو بھیجیں",
   "recorder.output.to-player": "پلیئر میں کھولیں",
+  "recorder.output.to-editor": "ترمیم کریں",
   "recorder.output.done": "ریکارڈنگ مکمل ہوئی: {1} حصوں میں {0} MB",
   "recorder.output.partial": "ریکارڈنگ درست طریقے سے بند نہیں ہوئی۔ فائل محفوظ ہو گئی ہے اور چلائی جا سکتی ہے۔ آخری چند سیکنڈ غائب ہو سکتے ہیں۔",
   "recorder.output.partial-broken": "ریکارڈنگ درست طریقے سے بند نہیں ہوئی۔ فائل چلائی نہیں جا سکتی۔ اگلی ریکارڈنگ کے لیے MKV منتخب کریں۔",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink ریکارڈر · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "عالمی شارٹ کٹ کسی اور ایپلیکیشن نے لے رکھا ہے: {0}۔ یہ کیز صرف اسی وقت کام کرتی ہیں جب VidShrink ونڈو سامنے ہو۔",
   "recorder.advanced.title": "ایڈوانسڈ اینکوڈنگ",
+  "recorder.advanced.encoder-title": "انکوڈر کی تفصیلات",
   "recorder.advanced.container": "کنٹینر",
   "recorder.advanced.scale-width": "اسکیل کردہ چوڑائی",
   "recorder.advanced.scale-height": "اسکیل کردہ اونچائی",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "نائز گیٹ",
   "recorder.advanced.noise-suppression": "شور میں کمی",
   "recorder.budget.duration-only": "{0} سیکنڈ بعد ریکارڈنگ خودبخود رک جائے گی۔",
-  "recorder.budget.size-only": "{0} MB تک پہنچتے ہی ریکارڈنگ خودبخود رک جائے گی۔",
+  "recorder.budget.size-only": "{0} MB تک پہنچتے ہی ریکارڈنگ خودبخود رک جائے گی۔",
   "recorder.output.open-when-done": "ریکارڈنگ ختم ہونے پر فولڈر کھولیں",
   "recorder.discarded": "ریکارڈنگ منسوخ کر دی گئی، فائل حذف کر دی گئی۔",
   "recorder.target.screen-pick": "اسکرین",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "منسوخ کریں",
   "recorder.wizard.summary": "{0} · {1} · {2} — کوالٹی {3}۔",
   "recorder.wizard.no-device": "{0} کے لیے کوئی آلہ نہیں ملا؛ وہ ذریعہ خاموش رہے گا۔",
-  "recorder.replay.seconds": "محفوظ رکھی جانے والی مدت"
+  "recorder.replay.seconds": "محفوظ رکھی جانے والی مدت",
+  "recorder.region.hide": "فریم چھپائیں (F9)",
+  "recorder.region.stop-close": "ریکارڈنگ روکیں اور بند کریں"
 }

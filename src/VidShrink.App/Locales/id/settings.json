@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "Jika aktif, versi baru diunduh di latar belakang dan dipasang saat VidShrink ditutup. Jika nonaktif, versi baru diumumkan di bilah atas dan dipasang dengan tombol.",
   "settings.update.no-self-effect": "VidShrink tidak memperbarui diri di sistem ini: hanya memberi tahu ada versi baru dan menampilkan perintah untuk memasangnya.",
   "settings.default-app.suggestion": "VidShrink bukan program bawaan untuk video. Anda dapat memilihnya di halaman Aplikasi default Windows.",
+  "settings.default-app.all": "Atur Semua",
+  "settings.default-app.all-copied": "Perintah disalin ke papan klip. Buka jendela PowerShell dan tempelkan; VidShrink menjadi bawaan untuk semua format audio dan video.",
   "settings.default-app.open": "Aplikasi default",
   "settings.default-app.dismiss": "Jangan tanya lagi",
   "settings.player-shortcuts.title": "Pintasan pemutar",

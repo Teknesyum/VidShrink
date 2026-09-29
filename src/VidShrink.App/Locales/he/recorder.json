@@ -49,6 +49,7 @@
   "recorder.output.reveal": "הצג בתיקייה",
   "recorder.output.to-shrink": "שלח לכיווץ",
   "recorder.output.to-player": "פתח בנגן",
+  "recorder.output.to-editor": "עריכה",
   "recorder.output.done": "ההקלטה הסתיימה: {0} MB ב-{1} מקטעים",
   "recorder.output.partial": "ההקלטה לא נסגרה כראוי. הקובץ נשמר וניתן לנגן אותו. ייתכן שהשניות האחרונות חסרות.",
   "recorder.output.partial-broken": "ההקלטה לא נסגרה כראוי. לא ניתן לנגן את הקובץ. בחר MKV להקלטה הבאה.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "מקליט VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "קיצור הדרך הגלובלי תפוס על ידי אפליקציה אחרת: {0}. המקשים האלה פועלים רק כאשר חלון VidShrink במקדמה.",
   "recorder.advanced.title": "קידוד מתקדם",
+  "recorder.advanced.encoder-title": "פרטי המקודד",
   "recorder.advanced.container": "מכל",
   "recorder.advanced.scale-width": "רוחב קנה מידה",
   "recorder.advanced.scale-height": "גובה קנה מידה",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "שער רעש",
   "recorder.advanced.noise-suppression": "הפחתת רעש",
   "recorder.budget.duration-only": "ההקלטה נעצרת אוטומטית לאחר {0} שניות.",
-  "recorder.budget.size-only": "ההקלטה נעצרת אוטומטית כשהיא מגיעה ל-{0} MB.",
+  "recorder.budget.size-only": "ההקלטה נעצרת אוטומטית כשהיא מגיעה ל-{0} MB.",
   "recorder.output.open-when-done": "פתח את התיקייה בסיום ההקלטה",
   "recorder.discarded": "ההקלטה בוטלה, הקובץ נמחק.",
   "recorder.target.screen-pick": "מסך",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "ביטול",
   "recorder.wizard.summary": "{0} · {1} · {2} — איכות {3}.",
   "recorder.wizard.no-device": "לא נמצא התקן עבור {0}; המקור הזה יישאר ללא קול.",
-  "recorder.replay.seconds": "אורך לשמירה"
+  "recorder.replay.seconds": "אורך לשמירה",
+  "recorder.region.hide": "הסתר מסגרת (F9)",
+  "recorder.region.stop-close": "עצור הקלטה וסגור"
 }

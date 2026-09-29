@@ -1191,6 +1191,12 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-28, duzenleyici D4: on <c>editor.export.*</c> anahtarindan 7 kol 6 dilde (es pt sw: mode; ro: mode, failed;
     /// fr: failed; lt: fast): 2686 + 7 = 2693, en 251, tr 91.</para>
     /// <para>2026-09-28, D4 ile D5 birlikte: 2686 + 17 + 7 = 2710.</para>
+    /// <para>2026-09-28, duzenle/kaydet/paylas: <c>editor.export</c> ("Export…", kolun disinda) yerine <c>editor.save</c> ve
+    /// <c>editor.save-as</c>; yalniz en <c>editor.save-as</c> ("Save As…") kola giriyor, <c>player.menu.edit</c> ve
+    /// <c>recorder.output.to-editor</c> kolun disinda: 2710 + 1 = 2711, en 255, tr 91.</para>
+    /// <para>2026-09-28, bolge dali ile birlikte: recorder.region.hide ve recorder.region.stop-close, 2711 + 5 = 2716, en 256, tr 92.</para>
+    /// <para>2026-09-29, arayuz turu: yeni <c>recorder.advanced.encoder-title</c> fr, pt ve sw cevirilerinde islev sozcugu tasiyor (de, do, ya): 2716 + 3 = 2719, en 256, tr 92.</para>
+    /// <para>2026-09-29, kaydedici sihirbazi: 21 yeni <c>recorder.wizard.*</c> ve <c>recorder.replay.seconds</c> anahtari: 2719 + 25 = 2744, en 256 + 5 = 261, tr 92 + 3 = 95.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1216,9 +1222,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2710, toplam);
-        Assert.Equal(254, dilBasina["en"]);
-        Assert.Equal(91, dilBasina["tr"]);
+        Assert.Equal(2744, toplam);
+        Assert.Equal(261, dilBasina["en"]);
+        Assert.Equal(95, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1387,6 +1393,12 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-28, duzenleyici D5: yedi <c>editor.*</c> anahtari (mekik, isaretci, tumunu sec, sona git, kisayol listesi): 1131 + 7 = 1138, 43 x 1138 = 48934.</para>
     /// <para>2026-09-28, duzenleyici D4: on <c>editor.export.*</c> anahtari: 1131 + 10 = 1141, 43 x 1141 = 49063.</para>
     /// <para>2026-09-28, D4 ile D5 birlikte: 1131 + 7 + 10 = 1148, 43 x 1148 = 49364.</para>
+    /// <para>2026-09-28, duzenle/kaydet/paylas: <c>editor.export</c> gitti, <c>editor.save</c>, <c>editor.save-as</c>,
+    /// <c>player.menu.edit</c> ve <c>recorder.output.to-editor</c> geldi: 1148 - 1 + 4 = 1151, 43 x 1151 = 49493.</para>
+    /// <para>2026-09-28, bolge dali ile birlikte: 1151 + 2 = 1153, 43 x 1153 = 49579.</para>
+    /// <para>2026-09-29, arayuz turu: <c>recorder.advanced.encoder-title</c>: 1153 + 1 = 1154, 43 x 1154 = 49622.</para>
+    /// <para>2026-09-29, Tümünü Ata: <c>settings.default-app.all</c> ve <c>settings.default-app.all-copied</c>: 1154 + 2 = 1156, 43 x 1156 = 49708.</para>
+    /// <para>2026-09-29, kaydedici sihirbazi: 21 yeni anahtar: 1156 + 21 = 1177, 43 x 1177 = 50611.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1414,7 +1426,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(49364, gezilen);
+        Assert.Equal(50611, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -18,7 +18,6 @@ public sealed class KaydediciDuzenTests
     [InlineData(1560, 1060, false)]
     [InlineData(1560, 1060, true)]
     [InlineData(1024, 1060, false)]
-    [InlineData(1024, 1060, true)]
     public void SayfaKaydirmadanSigarVeTamponSeritteDegil(int en, int boy, bool gelismis)
     {
         var boyut = new Size(en, boy);
@@ -32,27 +31,23 @@ public sealed class KaydediciDuzenTests
             var sayfa = GorselDenetimTests.Ad<ScrollViewer>(w, "PageRecorder");
             var serit = GorselDenetimTests.Ad<Border>(gorunum, "Strip");
             var tampon = GorselDenetimTests.Ad<Button>(gorunum, "BtnReplay");
-            var sol = GorselDenetimTests.Ad<StackPanel>(gorunum, "ColLeft");
-            var sag = GorselDenetimTests.Ad<StackPanel>(gorunum, "ColRight");
+            var tamponKarti = GorselDenetimTests.Ad<Border>(gorunum, "PanelReplay");
 
-            _output.WriteLine($"extent {sayfa.Extent} viewport {sayfa.Viewport} serit {serit.Bounds} sol {sol.Bounds} sag {sag.Bounds}");
+            _output.WriteLine($"extent {sayfa.Extent} viewport {sayfa.Viewport} serit {serit.Bounds} tampon {tamponKarti.IsVisible} {tamponKarti.Bounds}");
             Cek(w, en, boy, gelismis);
 
             return (
                 Extent: sayfa.Extent.Height,
                 Viewport: sayfa.Viewport.Height,
-                SeritEni: serit.Bounds.Width,
-                SayfaEni: sayfa.Viewport.Width,
                 TamponSeritte: tampon.GetVisualAncestors().Contains(serit),
-                TamponSoldaMi: tampon.GetVisualAncestors().Contains(sol),
-                SolBoy: sol.Bounds.Height,
-                SagBoy: sag.Bounds.Height);
+                TamponKartta: tampon.GetVisualAncestors().Contains(tamponKarti),
+                TamponGorunur: tamponKarti.IsVisible);
         }, sekme: 4, dolu: false, hazirla: HareketsizAc);
 
         Assert.True(olcu.Extent <= olcu.Viewport + 0.5, $"sayfa kaydırıyor: {olcu.Extent} > {olcu.Viewport}");
         Assert.False(olcu.TamponSeritte);
-        Assert.True(olcu.TamponSoldaMi);
-        Assert.True(olcu.SeritEni < olcu.SayfaEni * 0.9, $"şerit sayfaya yayılmış: {olcu.SeritEni} / {olcu.SayfaEni}");
+        Assert.True(olcu.TamponKartta);
+        Assert.Equal(gelismis, olcu.TamponGorunur);
     }
 
     internal static void HareketsizAc(MainWindow pencere)

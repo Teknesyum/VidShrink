@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Тема",
   "settings-tab.theme.hint": "Променя всеки цвят в програмата и се запомня при следващо стартиране.",
   "settings-tab.language.hint": "Променя езика на интерфейса и се запомня при следващо стартиране.",
-  "settings-tab.default-target.label": "Целеви размер по подразбиране (MB)",
+  "settings-tab.default-target.label": "Целеви размер по подразбиране",
   "settings-tab.default-target.hint": "Задава целевия размер, с който се отваря разделът „Свиване“.",
   "settings-tab.output-folder.label": "Изходна папка",
   "settings-tab.output-folder.beside-source": "До изходния файл",

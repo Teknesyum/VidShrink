@@ -85,7 +85,11 @@ internal partial class RecorderView
         ApplyReplayVisibility();
     }
 
-    private void ApplyReplayVisibility() => PanelReplay.IsVisible = AdvancedMode || _replay is not null;
+    private void ApplyReplayVisibility()
+    {
+        PanelReplay.IsVisible = AdvancedMode || _replay is not null;
+        KartSutunlari();
+    }
 
     private async void OnReplayToggle(object? sender, RoutedEventArgs e)
     {

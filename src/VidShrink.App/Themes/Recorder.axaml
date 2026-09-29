@@ -19,8 +19,6 @@
       RecorderButtonSize      <- FieldMinHeight (40). Şerit düğmesinin dokunma hedefi;
                                  alan yüksekliğiyle aynı sayı, şerit tek satır okunuyor.
       RecorderDotSize         <- SpaceMd (12). Kaydediyor göstergesinin çapı.
-      RecorderContentMaxWidth <- WindowPreferredWidth (1560). Kaydedici sayfasının en geniş
-                                 hali; daha geniş pencerede paneller yayılıp boş alan açmıyor.
       RecorderWizardOptionSize<- DropZoneMinHeight (144). Otomatik ayar sorusunun kare
                                  seçenek düğmesi; tek tıkla seçilen en büyük hedef.
 
@@ -43,10 +41,18 @@
 
     Bölge düzenleyicinin araç paneli. Kaydın üstünde duruyor, ekranda en az yer tutmalı.
 
-      RecorderRegionButtonSize<- TargetMinSize (24). Panelde yalnız simge düğmesi var;
-                                 dokunma hedefinin tabanı, altına inilmiyor.
-      RecorderRegionToolbarPadding <- FocusRingScalar (2). Düğmeler arası boşluk yok;
-                                 kenarda yalnız klavye odak halkasının sığacağı pay.
+      RecorderRegionButtonSize<- FieldMinHeight (40). Panelde yalnız simge düğmesi var;
+                                 kare, alan yüksekliğinde, kayıt sırasında da isabetle basılır.
+      RecorderRegionButtonRadius <- RadiusSquare. Düğmeler yuvarlak değil kare.
+      RecorderRegionIconSize  <- IconSizeMd (22). Düğmenin içindeki vektör simge.
+      RecorderRegionButtonGap <- SpaceXs (4). Kare düğmeler arasındaki boşluk.
+      RecorderRegionSnap      <- SpaceLg (16). Kenar bu uzaklıkta pencereye ya da ekran
+                                 kenarına oturur; Alt basılıyken oturmaz.
+      RecorderRegionSnapLine  <- SpaceXs (4). Oturulan kenarı gösteren vurgu çizgisi.
+      RecorderRegionDash      <- SpaceSm (8). Kurulumda kenar kesik çizgili: 8 DIP çizgi,
+                                 8 DIP boşluk; kayıtta düz.
+      RecorderRegionToolbarPadding <- FocusRingScalar (2). Kenarda yalnız klavye odak
+                                 halkasının sığacağı pay.
   -->
 
   <Thickness x:Key="RecorderStripPadding">16,8</Thickness>
@@ -54,7 +60,6 @@
   <Thickness x:Key="RecorderStatsInset">16,0,0,0</Thickness>
   <x:Double x:Key="RecorderButtonSize">40</x:Double>
   <x:Double x:Key="RecorderDotSize">12</x:Double>
-  <x:Double x:Key="RecorderContentMaxWidth">1560</x:Double>
   <x:Double x:Key="RecorderWizardOptionSize">144</x:Double>
 
   <x:Double x:Key="RecorderMiniHeight">56</x:Double>
@@ -69,7 +74,13 @@
   <x:Double x:Key="RecorderRegionGrip">4</x:Double>
   <x:Double x:Key="RecorderRegionToolbarGap">4</x:Double>
   <Thickness x:Key="RecorderRegionToolbarPadding">2</Thickness>
-  <x:Double x:Key="RecorderRegionButtonSize">24</x:Double>
+  <StaticResource x:Key="RecorderRegionButtonSize" ResourceKey="FieldMinHeight"/>
+  <StaticResource x:Key="RecorderRegionButtonRadius" ResourceKey="RadiusSquare"/>
+  <StaticResource x:Key="RecorderRegionIconSize" ResourceKey="IconSizeMd"/>
+  <StaticResource x:Key="RecorderRegionButtonGap" ResourceKey="SpaceXs"/>
+  <StaticResource x:Key="RecorderRegionSnap" ResourceKey="SpaceLg"/>
+  <StaticResource x:Key="RecorderRegionSnapLine" ResourceKey="SpaceXs"/>
+  <StaticResource x:Key="RecorderRegionDash" ResourceKey="SpaceSm"/>
 
   <x:Double x:Key="RecorderClickRingSize">48</x:Double>
   <x:Double x:Key="RecorderClickRingThickness">4</x:Double>

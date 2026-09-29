@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Klasörde göster",
   "recorder.output.to-shrink": "Küçült'e gönder",
   "recorder.output.to-player": "Oynatıcıda aç",
+  "recorder.output.to-editor": "Düzenle",
   "recorder.output.done": "Kayıt bitti: {1} parçada {0} MB",
   "recorder.output.partial": "Kayıt temiz kapanmadı. Dosya kaydedildi ve oynatılabilir. Son saniyeler eksik olabilir.",
   "recorder.output.partial-broken": "Kayıt temiz kapanmadı. Dosya oynatılamaz. Sonraki kayıt için MKV seçin.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink kaydedici · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Genel kısayol başka bir uygulamada kayıtlı: {0}. Bu tuşlar yalnız VidShrink penceresi öndeyken çalışır.",
   "recorder.advanced.title": "Gelişmiş kodlama",
+  "recorder.advanced.encoder-title": "Kodlayıcı ayrıntıları",
   "recorder.advanced.container": "Kap",
   "recorder.advanced.scale-width": "Ölçek genişliği",
   "recorder.advanced.scale-height": "Ölçek yüksekliği",
@@ -143,7 +145,7 @@
   "recorder.advanced.max-duration": "Süre sınırı (sn)",
   "recorder.advanced.split-seconds": "Bölme süresi (sn)",
   "recorder.advanced.split-megabytes": "Bölme boyutu (MB)",
-  "recorder.advanced.optional": "Boş: kapalı",
+  "recorder.advanced.optional": "Boş bıraktığın kutu kapalı kalır.",
   "recorder.advanced.audio-layout": "Ses izleri",
   "recorder.advanced.audio-mixed": "Tek ize karıştır",
   "recorder.advanced.audio-separate": "Her girdi ayrı iz",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Gürültü kapısı",
   "recorder.advanced.noise-suppression": "Gürültü bastırma",
   "recorder.budget.duration-only": "Kayıt {0} saniye sonra kendiliğinden durur.",
-  "recorder.budget.size-only": "Kayıt {0} MB'a ulaşınca kendiliğinden durur.",
+  "recorder.budget.size-only": "Kayıt {0} MB'a ulaşınca kendiliğinden durur.",
   "recorder.output.open-when-done": "Kayıt bitince klasörü aç",
   "recorder.discarded": "Kayıt iptal edildi, dosya silindi.",
   "recorder.target.screen-pick": "Ekran",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Vazgeç",
   "recorder.wizard.summary": "{0} · {1} · {2} — kalite {3}.",
   "recorder.wizard.no-device": "{0} için aygıt bulunamadı; o kaynak sessiz kalır.",
-  "recorder.replay.seconds": "Tutulacak süre"
+  "recorder.replay.seconds": "Tutulacak süre",
+  "recorder.region.hide": "Çerçeveyi gizle (F9)",
+  "recorder.region.stop-close": "Kaydı durdur ve kapat"
 }

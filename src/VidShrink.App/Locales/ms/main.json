@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Mengubah setiap warna dalam program dan diingati pada pelancaran seterusnya.",
   "settings-tab.language.hint": "Mengubah bahasa antara muka dan diingati pada pelancaran seterusnya.",
-  "settings-tab.default-target.label": "Saiz sasaran lalai (MB)",
+  "settings-tab.default-target.label": "Saiz sasaran lalai",
   "settings-tab.default-target.hint": "Menetapkan saiz sasaran yang tab Kecilkan buka dengannya.",
   "settings-tab.output-folder.label": "Folder output",
   "settings-tab.output-folder.beside-source": "Di sebelah fail sumber",

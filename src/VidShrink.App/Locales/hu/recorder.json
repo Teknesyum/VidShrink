@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Megjelenítés a mappában",
   "recorder.output.to-shrink": "Küldés a tömörítéshez",
   "recorder.output.to-player": "Megnyitás a lejátszóban",
+  "recorder.output.to-editor": "Szerkesztés",
   "recorder.output.done": "Felvétel kész: {0} MB {1} szegmensben",
   "recorder.output.partial": "A felvétel nem zárult le megfelelően. A fájl mentve van és lejátszható. Az utolsó másodpercek hiányozhatnak.",
   "recorder.output.partial-broken": "A felvétel nem zárult le megfelelően. A fájl nem játszható le. A következő felvételhez válassza az MKV-t.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink felvevő · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "A globális billentyűparancsot egy másik alkalmazás foglalja: {0}. Ezek a billentyűk csak akkor működnek, ha a VidShrink ablak van előtérben.",
   "recorder.advanced.title": "Speciális kódolás",
+  "recorder.advanced.encoder-title": "Kódoló részletei",
   "recorder.advanced.container": "Konténer",
   "recorder.advanced.scale-width": "Skálázott szélesség",
   "recorder.advanced.scale-height": "Skálázott magasság",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Zajkapu",
   "recorder.advanced.noise-suppression": "Zajelnyomás",
   "recorder.budget.duration-only": "A felvétel {0} másodperc után magától leáll.",
-  "recorder.budget.size-only": "A felvétel automatikusan leáll, ha eléri a(z) {0} MB-ot.",
+  "recorder.budget.size-only": "A felvétel automatikusan leáll, ha eléri a(z) {0} MB-ot.",
   "recorder.output.open-when-done": "Mappa megnyitása a felvétel végén",
   "recorder.discarded": "A felvétel elvetve, a fájl törölve lett.",
   "recorder.target.screen-pick": "Képernyő",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Mégse",
   "recorder.wizard.summary": "{0} · {1} · {2} — minőség {3}.",
   "recorder.wizard.no-device": "Nem található eszköz ehhez: {0}; az a forrás néma marad.",
-  "recorder.replay.seconds": "Megtartandó hossz"
+  "recorder.replay.seconds": "Megtartandó hossz",
+  "recorder.region.hide": "Keret elrejtése (F9)",
+  "recorder.region.stop-close": "Felvétel leállítása és bezárás"
 }

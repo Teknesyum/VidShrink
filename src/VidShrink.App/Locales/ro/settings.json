@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "VidShrink nu se actualizează singur pe acest sistem: doar te anunță că există o versiune nouă și arată comanda care o instalează.",
 
   "settings.default-app.suggestion": "VidShrink nu este programul implicit pentru videoclipuri. Îl poți alege în pagina Aplicații implicite din Windows.",
+  "settings.default-app.all": "Setează tot",
+  "settings.default-app.all-copied": "Comanda a fost copiată în clipboard. Deschideți o fereastră PowerShell și lipiți-o; VidShrink devine implicit pentru toate formatele audio și video.",
   "settings.default-app.open": "Aplicații implicite",
   "settings.default-app.dismiss": "Nu mai întreba",
   "settings.player-shortcuts.title": "Comenzi rapide player",

@@ -112,10 +112,13 @@ internal partial class PlayerView
         var mini = ToolsRow(ToolsOptions.MiniMode);
         mini.ToggleType = MenuItemToggleType.CheckBox;
         mini.IsChecked = _mini.IsMini;
+        var clip = ToolsRow(ToolsOptions.Clip);
+        var gif = ToolsRow(ToolsOptions.Gif);
+        clip.IsEnabled = gif.IsEnabled = !AudioOnly;
         return Submenu(Strings.Get("player.tools.menu"), new List<Control>
         {
-            ToolsRow(ToolsOptions.Clip),
-            ToolsRow(ToolsOptions.Gif),
+            clip,
+            gif,
             ToolsRow(ToolsOptions.OpenUrl),
             new Separator(),
             ActionRow(Keymap.Info),
@@ -199,6 +202,13 @@ internal partial class PlayerView
     internal async Task<double> ShowThumbnailAsync(double seconds)
     {
         if (_path is not { } media) return double.NaN;
+        ThumbImage.IsVisible = !AudioOnly;
+        if (AudioOnly)
+        {
+            PlaceThumbnail(seconds);
+            return 0;
+        }
+
         var watch = Stopwatch.StartNew();
         IPlaybackEngine? engine;
         try

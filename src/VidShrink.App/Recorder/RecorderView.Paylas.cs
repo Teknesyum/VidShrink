@@ -22,13 +22,13 @@ namespace VidShrink.App.Recorder;
 /// </summary>
 internal partial class RecorderView
 {
-    private ShareFlow? _shareFlow;
-    private CoreShare.ShareTargetTable? _shareTargets;
-    private CoreShare.IHttpTransport? _shareTransport;
+    private ShareSession? _shareSession;
     private ShareRetryBinder? _shareRetry;
 
+    private ShareSession Sharing() => _shareSession ??= new ShareSession(() => CreateShareFlow);
+
     private ShareRetryBinder Retry() => _shareRetry ??= new ShareRetryBinder(
-        BtnRecShareRetry, () => _shareTargets, id => ShareOnce(id));
+        BtnRecShareRetry, () => Sharing().Targets, id => ShareOnce(id));
 
     /// <summary>Yeniden deneme düğmesinin o anki hali; ölçü piksele değil buna bakar.</summary>
     internal ShareRetryPrompt ShareRetryPromptForTest => Retry().Current;
@@ -57,20 +57,7 @@ internal partial class RecorderView
         TxtRecShareStatus.IsVisible = text.Length > 0;
     }
 
-    private CoreShare.ShareTarget? Endpoint()
-    {
-        try { _shareTargets ??= CoreShare.ShareTargetTable.Load(); }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException) { return null; }
-        return _shareTargets.DefaultTarget;
-    }
-
     internal Func<ShareFlow>? CreateShareFlow { get; set; }
-
-    private ShareFlow Share() => _shareFlow ??= CreateShareFlow?.Invoke() ?? new ShareFlow(target =>
-        CoreShare.ShareProviderFactory.Create(
-            target,
-            _shareTransport ??= new CoreShare.HttpClientTransport(),
-            _shareTargets));
 
     private void OnShare(object? sender, RoutedEventArgs e) => ShareOnce(null);
 
@@ -78,22 +65,18 @@ internal partial class RecorderView
     {
         if (Delivered() is not { } path)
         {
-            ShowShareStatus(Say("settings.share.nothing"));
+            ShowShareStatus(ShareSession.Nothing());
             return;
         }
 
-        var target = targetIdOverride is null
-            ? Endpoint()
-            : _shareTargets?.Find(targetIdOverride) ?? Endpoint();
-
-        if (target is null)
+        var session = Sharing();
+        if (session.Target(targetIdOverride) is not { } target)
         {
-            ShowShareStatus(Say("settings.share.targets-missing", CoreShare.ShareTargetTable.FileName));
+            ShowShareStatus(ShareSession.MissingTargets());
             return;
         }
 
-        var flow = Share();
-        if (flow.Running) return;
+        if (session.Running) return;
 
         BtnRecShare.IsEnabled = false;
         BtnRecShareCancel.IsVisible = true;
@@ -102,10 +85,10 @@ internal partial class RecorderView
         RecShareProgress.Value = 0;
         RecShareLinkRow.IsVisible = false;
         TxtRecShareLink.Text = string.Empty;
-        ShowShareStatus(Say("settings.share.uploading"));
+        ShowShareStatus(ShareSession.Uploading());
 
         var progress = new Progress<CoreShare.UploadProgress>(step => RecShareProgress.Value = step.Fraction);
-        var result = await flow.ShareAsync(target, path, target.DefaultRetentionDays, progress);
+        var result = await session.ShareAsync(target, path, progress);
 
         BtnRecShare.IsEnabled = true;
         BtnRecShareCancel.IsVisible = false;
@@ -120,21 +103,17 @@ internal partial class RecorderView
             TxtRecShareLink.Text = link.Url;
             RecShareLinkRow.IsVisible = true;
             Retry().Hide();
-            ShowShareStatus(link.ExpiresAt is { } expires
-                ? Say("settings.share.shared-until", Bicim.Damga(expires, Strings.Culture))
-                : Say("settings.share.shared"));
+            ShowShareStatus(ShareSession.Status(result));
             return;
         }
 
         RecShareLinkRow.IsVisible = false;
         TxtRecShareLink.Text = string.Empty;
         Retry().Show(result);
-        ShowShareStatus(result.Failure == CoreShare.ShareFailure.Cancelled
-            ? Say("settings.share.cancelled")
-            : $"{Say("settings.share.failed")}: {ShareMessage.Of(result)}");
+        ShowShareStatus(ShareSession.Status(result));
     }
 
-    private void OnShareCancel(object? sender, RoutedEventArgs e) => _shareFlow?.Cancel();
+    private void OnShareCancel(object? sender, RoutedEventArgs e) => _shareSession?.Cancel();
 
     private async void OnCopyShareLink(object? sender, RoutedEventArgs e)
     {

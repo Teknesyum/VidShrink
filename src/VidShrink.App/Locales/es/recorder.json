@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Mostrar en la carpeta",
   "recorder.output.to-shrink": "Enviar a Reducir",
   "recorder.output.to-player": "Abrir en el reproductor",
+  "recorder.output.to-editor": "Editar",
   "recorder.output.done": "Grabación terminada: {0} MB en {1} segmentos",
   "recorder.output.partial": "La grabación no se cerró correctamente. El archivo está guardado y se puede reproducir. Es posible que falten los últimos segundos.",
   "recorder.output.partial-broken": "La grabación no se cerró correctamente. El archivo no se puede reproducir. Elija MKV para la próxima grabación.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Grabador de VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "El atajo global está en uso por otra aplicación: {0}. Estas teclas solo funcionan mientras la ventana de VidShrink está en primer plano.",
   "recorder.advanced.title": "Codificación avanzada",
+  "recorder.advanced.encoder-title": "Detalles del codificador",
   "recorder.advanced.container": "Contenedor",
   "recorder.advanced.scale-width": "Ancho de escala",
   "recorder.advanced.scale-height": "Alto de escala",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Puerta de ruido",
   "recorder.advanced.noise-suppression": "Supresión de ruido",
   "recorder.budget.duration-only": "La grabación se detiene automáticamente después de {0} segundos.",
-  "recorder.budget.size-only": "La grabación se detiene automáticamente al alcanzar {0} MB.",
+  "recorder.budget.size-only": "La grabación se detiene automáticamente al alcanzar {0} MB.",
   "recorder.output.open-when-done": "Abrir la carpeta al terminar la grabación",
   "recorder.discarded": "Grabación descartada; el archivo se eliminó.",
   "recorder.target.screen-pick": "Pantalla",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Cancelar",
   "recorder.wizard.summary": "{0} · {1} · {2} — calidad {3}.",
   "recorder.wizard.no-device": "No se encontró ningún dispositivo para {0}; esa fuente queda en silencio.",
-  "recorder.replay.seconds": "Duración a conservar"
+  "recorder.replay.seconds": "Duración a conservar",
+  "recorder.region.hide": "Ocultar marco (F9)",
+  "recorder.region.stop-close": "Detener grabación y cerrar"
 }

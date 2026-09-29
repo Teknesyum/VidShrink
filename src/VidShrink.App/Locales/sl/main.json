@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Spremeni vse barve v programu in se zapomni ob naslednjem zagonu.",
   "settings-tab.language.hint": "Spremeni jezik vmesnika in se zapomni ob naslednjem zagonu.",
-  "settings-tab.default-target.label": "Privzeta ciljna velikost (MB)",
+  "settings-tab.default-target.label": "Privzeta ciljna velikost",
   "settings-tab.default-target.hint": "Določa ciljno velikost, s katero se odpre zavihek Skrči.",
   "settings-tab.output-folder.label": "Izhodna mapa",
   "settings-tab.output-folder.beside-source": "Ob izvorni datoteki",

@@ -49,6 +49,7 @@
   "recorder.output.reveal": "கோப்புறையில் காட்டு",
   "recorder.output.to-shrink": "சுருக்கிற்கு அனுப்பு",
   "recorder.output.to-player": "இயக்கியில் திற",
+  "recorder.output.to-editor": "திருத்து",
   "recorder.output.done": "பதிவு முடிந்தது: {1} பிரிவுகளில் {0} MB",
   "recorder.output.partial": "பதிவு சரியாக மூடப்படவில்லை. கோப்பு சேமிக்கப்பட்டுள்ளது, அதை இயக்க முடியும். கடைசி சில வினாடிகள் இல்லாமல் இருக்கலாம்.",
   "recorder.output.partial-broken": "பதிவு சரியாக மூடப்படவில்லை. கோப்பை இயக்க முடியாது. அடுத்த பதிவுக்கு MKV ஐத் தேர்ந்தெடுக்கவும்.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink ரெக்கார்டர் · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "இந்த ஒட்டுமொத்த குறுக்குவழியை மற்றொரு பயன்பாடு பயன்படுத்துகிறது: {0}. VidShrink சாளரம் முன்னிலையில் இருக்கும்போது மட்டுமே இந்த விசைகள் வேலை செய்யும்.",
   "recorder.advanced.title": "மேம்பட்ட குறியாக்கம்",
+  "recorder.advanced.encoder-title": "குறியாக்கி விவரங்கள்",
   "recorder.advanced.container": "கொள்கலன்",
   "recorder.advanced.scale-width": "அளவிடப்பட்ட அகலம்",
   "recorder.advanced.scale-height": "அளவிடப்பட்ட உயரம்",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "சத்தக் கதவு",
   "recorder.advanced.noise-suppression": "சத்த ஒடுக்கம்",
   "recorder.budget.duration-only": "{0} வினாடிகளுக்குப் பிறகு பதிவு தானாக நிற்கும்.",
-  "recorder.budget.size-only": "{0} MB ஐ அடைந்தவுடன் பதிவு தானாக நிற்கும்.",
+  "recorder.budget.size-only": "{0} MB ஐ அடைந்தவுடன் பதிவு தானாக நிற்கும்.",
   "recorder.output.open-when-done": "பதிவு முடிந்தவுடன் கோப்புறையைத் திற",
   "recorder.discarded": "பதிவு ரத்து செய்யப்பட்டது, கோப்பு நீக்கப்பட்டது.",
   "recorder.target.screen-pick": "திரை",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "ரத்து செய்",
   "recorder.wizard.summary": "{0} · {1} · {2} — தரம் {3}.",
   "recorder.wizard.no-device": "{0}க்கான சாதனம் கிடைக்கவில்லை; அந்த மூலம் ஒலியில்லாமல் இருக்கும்.",
-  "recorder.replay.seconds": "வைத்திருக்க வேண்டிய நீளம்"
+  "recorder.replay.seconds": "வைத்திருக்க வேண்டிய நீளம்",
+  "recorder.region.hide": "சட்டகத்தை மறை (F9)",
+  "recorder.region.stop-close": "பதிவை நிறுத்தி மூடு"
 }

@@ -277,7 +277,7 @@ internal static class LanguageCatalog
             var end = index;
             while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
             var word = text[index..end];
-            builder.Append(IsUnitAfterNumber(word, previous) ? word : CapitaliseWord(word, culture, smallWords, lineStart));
+            builder.Append(IsUnitAfterNumber(word, previous) || IsBracketedUnit(word) ? word : CapitaliseWord(word, culture, smallWords, lineStart));
             lineStart = false;
             previous = word;
             index = end;
@@ -294,6 +294,18 @@ internal static class LanguageCatalog
     internal static bool IsUnitAfterNumber(string word, string? previous)
         => previous is { Length: > 0 } && (IsPlaceholder(previous) || char.IsDigit(previous[0]) && previous.All(c => char.IsDigit(c) || c is '.' or ','))
            && word.Length <= 3 && word.All(char.IsLetter) && !word.Any(char.IsUpper);
+
+    /// <summary>
+    /// Parantez icinde tek basina duran en fazla uc kucuk harf bir etiketin birimidir:
+    /// "Time limit (s)" "(S)"ye donuyordu, ayni ekranda "30 s" yaziyor. "Versuch(en)" ve
+    /// "a(z)" parantezle baslamadigi icin sozcugun parcasi sayilir.
+    /// </summary>
+    internal static bool IsBracketedUnit(string word)
+    {
+        var bare = word.TrimEnd(':', ',', '.', ';');
+        return bare.Length is >= 3 and <= 5 && bare[0] == '(' && bare[^1] == ')'
+               && bare[1..^1].All(c => char.IsLetter(c) && char.IsLower(c));
+    }
 
     private static bool IsPlaceholder(string word)
         => word.Length > 2 && word[0] == '{' && word[^1] == '}' && word[1..^1].All(char.IsDigit);

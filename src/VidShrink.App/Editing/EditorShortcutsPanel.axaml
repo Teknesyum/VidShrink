@@ -1,15 +1,26 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:auto="using:Avalonia.Automation"
              xmlns:loc="using:VidShrink.App.Localization"
              x:Class="VidShrink.App.Editing.EditorShortcutsPanel">
   <Border Theme="{StaticResource Panel}">
     <StackPanel Spacing="{StaticResource SpaceMd}">
-      <TextBlock Text="{loc:Text editor.shortcuts.title}" Theme="{StaticResource H2}"/>
-      <TextBlock Text="{loc:Text editor.shortcuts.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-      <Grid x:Name="Rows"
-            ColumnDefinitions="Auto,*"
-            ColumnSpacing="{StaticResource SpaceLg}"
-            RowSpacing="{StaticResource SpaceXs}"/>
+      <Button x:Name="BtnToggle"
+              Click="OnToggle"
+              Theme="{StaticResource PanelHeaderToggle}"
+              auto:AutomationProperties.Name="{loc:Text editor.shortcuts.title}">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+          <Path x:Name="Glyph" Classes="chevron open" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="1" Text="{loc:Text editor.shortcuts.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        </Grid>
+      </Button>
+      <StackPanel x:Name="Body" Classes="disclose" Spacing="{StaticResource SpaceMd}">
+        <TextBlock Text="{loc:Text editor.shortcuts.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+        <Grid x:Name="Rows"
+              ColumnDefinitions="Auto,*"
+              ColumnSpacing="{StaticResource SpaceLg}"
+              RowSpacing="{StaticResource SpaceXs}"/>
+      </StackPanel>
     </StackPanel>
   </Border>
 </UserControl>

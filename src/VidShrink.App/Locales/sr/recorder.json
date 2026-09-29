@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Prikaži u folderu",
   "recorder.output.to-shrink": "Pošalji na smanjivanje",
   "recorder.output.to-player": "Otvori u plejeru",
+  "recorder.output.to-editor": "Uredi",
   "recorder.output.done": "Snimanje završeno: {0} MB u {1} segmenata",
   "recorder.output.partial": "Snimanje se nije uredno zatvorilo. Fajl je sačuvan i može da se reprodukuje. Poslednje sekunde možda nedostaju.",
   "recorder.output.partial-broken": "Snimanje se nije uredno zatvorilo. Fajl ne može da se reprodukuje. Za sledeće snimanje izaberite MKV.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink снимач · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Општу пречицу користи друга апликација: {0}. Ови тастери раде само док је прозор VidShrink у првом плану.",
   "recorder.advanced.title": "Напредно кодирање",
+  "recorder.advanced.encoder-title": "Детаљи кодера",
   "recorder.advanced.container": "Контејнер",
   "recorder.advanced.scale-width": "Ширина размере",
   "recorder.advanced.scale-height": "Висина размере",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Праг шума",
   "recorder.advanced.noise-suppression": "Потискивање шума",
   "recorder.budget.duration-only": "Snimanje se automatski zaustavlja posle {0} sekundi.",
-  "recorder.budget.size-only": "Snimanje se automatski zaustavlja kada dostigne {0} MB.",
+  "recorder.budget.size-only": "Snimanje se automatski zaustavlja kada dostigne {0} MB.",
   "recorder.output.open-when-done": "Otvori fasciklu kada se snimanje završi",
   "recorder.discarded": "Snimanje je odbačeno, fajl je obrisan.",
   "recorder.target.screen-pick": "Ekran",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Otkaži",
   "recorder.wizard.summary": "{0} · {1} · {2} — kvalitet {3}.",
   "recorder.wizard.no-device": "Nije pronađen uređaj za {0}; taj izvor ostaje bez zvuka.",
-  "recorder.replay.seconds": "Dužina za zadržavanje"
+  "recorder.replay.seconds": "Dužina za zadržavanje",
+  "recorder.region.hide": "Сакриј оквир (F9)",
+  "recorder.region.stop-close": "Заустави снимање и затвори"
 }

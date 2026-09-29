@@ -17,7 +17,8 @@
   "editor.redo": "Ripeti",
   "editor.zoom-in": "Ingrandisci",
   "editor.zoom-out": "Riduci",
-  "editor.export": "Esporta",
+  "editor.save": "Salva",
+  "editor.save-as": "Salva con nome…",
   "editor.timeline": "Timeline",
   "editor.playhead": "Indicatore di riproduzione",
   "editor.export.mode": "Modalità di esportazione",
@@ -29,5 +30,5 @@
   "editor.export.failed": "Esportazione non riuscita: {0}",
   "editor.export.reencoded": "Le clip {0} cambiano velocità o sono al contrario e vengono ricodificate.",
   "editor.export.fallback": "Questa sorgente non si può tagliare senza ricodifica, quindi l'intero video viene ricodificato.",
-  "editor.export.reverse-limit": "La clip invertita {0} supera il limite di memoria ({1}). Premi di nuovo Esporta per continuare."
+  "editor.export.reverse-limit": "La clip invertita {0} supera il limite di memoria ({1}). Premi di nuovo Salva per continuare."
 }

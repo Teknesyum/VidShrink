@@ -571,12 +571,17 @@ public sealed class WindowLayoutTests
     /// <para>Uç 3 fs-2 (2026-09-27): hiçbir yazı 16 pikselin altında değil (<c>FontSizeSm</c> 14 → 16).
     /// Dar pencerede satırlar uzadı: <b>boş/dar</b> 1079-1179 → 1147-1247 (ölçülen 1197), <b>dolu/dar</b>
     /// 1093-1193 → 1162-1262 (ölçülen 1212). Tasarım boyundaki iki kol eski aralıklarında geçiyor.</para>
+    /// <para>Arayüz turu (2026-09-28): "Ne Çıkacak" bölümleri (kalite, ses, kare, gelişmiş) sol sütundan
+    /// sağ sütunda kendi kartına (<c>OutcomePanel</c>) taşındı; plan ayırıcısının iki yanındaki satır
+    /// aralığı kalktı. <b>Boş/tasarım</b> 941-1041 → 810-910 (ölçülen 860), <b>boş/dar</b> 1147-1247 →
+    /// 822-922 (ölçülen 872), <b>dolu/dar</b> 1162-1262 → 1016-1116 (ölçülen 1066). Dolu/tasarım eski
+    /// aralığında geçiyor.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, false, 941, 1041)]
-    [InlineData(false, true, 1147, 1247)]
+    [InlineData(false, false, 810, 910)]
+    [InlineData(false, true, 822, 922)]
     [InlineData(true, false, 906, 1006)]
-    [InlineData(true, true, 1162, 1262)]
+    [InlineData(true, true, 1016, 1116)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
     {
         var size = narrow ? MinimumSize() : DesignSize();
@@ -674,9 +679,11 @@ public sealed class WindowLayoutTests
     /// dolu aralık değişmedi.</para>
     /// <para>Uç 3 fs-2 (2026-09-27): <c>FontSizeSm</c> 14 → 16. <b>Boş</b> 975-1065 → 1031-1121 (ölçülen
     /// <b>1076</b>), <b>dolu</b> 903-993 → 955-1045 (ölçülen <b>1000</b>). Genişlik yine 90 piksel.</para>
+    /// <para>Arayüz turu (2026-09-28): "Ne Çıkacak" bölümleri sağ sütuna taşındı, ayırıcının satır aralığı
+    /// kalktı. <b>Boş</b> 1031-1121 → 871-961 (ölçülen <b>916</b>); dolu kol eski aralığında geçiyor.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 1031, 1121)]
+    [InlineData(false, 871, 961)]
     [InlineData(true, 955, 1045)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
@@ -709,8 +716,7 @@ public sealed class WindowLayoutTests
     }
 
     /// <summary>
-    /// Sayfanın boyunu ne tutuyor: <b>dolu sayfada orta sütun</b> (önizleme ve plan),
-    /// <b>boş sayfada sol sütun</b> (ayarlar).
+    /// Sayfanın boyunu ne tutuyor: <b>iki hâlde de orta sütun</b> (önizleme ve plan).
     ///
     /// <para>Bu ölçüm üç kez yer değiştirdi. T46/K7'de "plan paneli tavanı" iddiası düşüp
     /// yerini sol ayar sütununa bıraktı (sol 802, orta 676, sağ 473). T52'de oynatma
@@ -756,10 +762,14 @@ public sealed class WindowLayoutTests
     /// en uzun sütun ile onun dikey payının toplamı.</para>
     /// <para>Uç 3 fs-2 (2026-09-27): dolu sayfayı yeniden sol sütun tutuyor — ölçülen sol 930, orta 922,
     /// sağ 514. Yazı 16 piksele çıkınca ayar sütununun etiketleri ve özetleri orta sütundan çok uzadı.</para>
+    /// <para>Arayüz turu (2026-09-28): "Ne Çıkacak" bölümleri sol sütundan sağ sütunda kendi kartına
+    /// taşındı; iki hâlde de sayfayı orta sütun tutuyor. Ölçülen boş sayfa sol 672 / orta 844 / sağ 835,
+    /// dolu sayfa sol 596 / orta 898 / sağ 889. Sağ sütun ortaya 9 piksel yakın; kısaltma işi ikisine
+    /// birlikte bakmalı.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 0)]
-    [InlineData(true, 0)]
+    [InlineData(false, 1)]
+    [InlineData(true, 1)]
     public void TheTallestColumnIsWhatHoldsThePage(bool loaded, int holder)
     {
         var (columns, content) = Read(DesignSize(), loaded, window =>
@@ -1552,7 +1562,7 @@ public sealed class WindowLayoutTests
 
                     if (host is not ScrollViewer) continue;
                     var ilk = host.GetVisualDescendants().OfType<Control>()
-                        .Where(b => b.IsShown() && b.Bounds.Height > 0 && (b is TextBlock || (b is Border && ReferenceEquals(b.Theme, panelTema))))
+                        .Where(b => b.IsShown() && b.Bounds.Height > 0 && (b is TextBlock || b is RadioButton || (b is Border && ReferenceEquals(b.Theme, panelTema))))
                         .Select(b => b.TranslatePoint(default, window)?.Y).Where(y => y is not null).Select(y => y!.Value)
                         .DefaultIfEmpty(double.NaN).Min();
                     if (double.IsNaN(ilk)) continue;
@@ -1581,6 +1591,9 @@ public sealed class WindowLayoutTests
     /// metinlerin doğal genişlik toplamı de 40309, ar 37019, tr 33344, en 32978 piksel; de taraması
     /// dar pencerede balonsuz kısalan dosya adını buldu, <c>TxtFileName</c> tam adı balonda taşıyor.
     /// Döküm <c>.calisma/s20/</c>.
+    /// Arayüz turu (2026-09-28): Kaydedici sayfa başlığını bıraktı, ilk satırı Basit/Gelişmiş
+    /// radyosu oldu; radyonun yazısı halkasına ortalandığı için 2 px aşağıda (bosluk 32, öteki
+    /// sekmeler 30). Radyonun kendisi de ilk öğe sayılır.
     /// </para>
     ///
     /// <para>Sarmalanan metnin kör noktası: tarama <c>TextWrapping != NoWrap</c> bloklarını atlıyordu,

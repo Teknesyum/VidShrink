@@ -155,6 +155,8 @@ public sealed class KaydediciBolgeDuzenleyiciTests
         Assert.Equal(RegionEditorState.Closed, RecorderView.EditorWanted(true, false, true, false));
         Assert.Equal(RegionEditorState.Closed, RecorderView.EditorWanted(true, true, false, false));
         Assert.Equal(RegionEditorState.Closed, RecorderView.EditorWanted(false, true, true, false));
+        Assert.Equal(RegionEditorState.Hidden, RecorderView.EditorWanted(true, true, true, false, hidden: true));
+        Assert.Equal(RegionEditorState.Closed, RecorderView.EditorWanted(true, false, true, false, hidden: true));
 
         var serit = File.ReadAllText(Path.Combine(GirdiKanit.Root, "src", "VidShrink.App", "Recorder", "RecorderView.Serit.cs"));
         var yuzey = serit.IndexOf("private void RefreshSerit()", StringComparison.Ordinal);
@@ -257,7 +259,15 @@ public sealed class KaydediciBolgeDuzenleyiciTests
 
         public event EventHandler? StopRequested;
 
+        public event EventHandler? SnapshotRequested;
+
+        public event EventHandler? HideRequested;
+
         public event EventHandler? Dismissed;
+
+        public void KareAl() => SnapshotRequested?.Invoke(this, EventArgs.Empty);
+
+        public void Gizle() => HideRequested?.Invoke(this, EventArgs.Empty);
 
         public void Show(PixelRect region, double? ratio, RegionEditorPhase phase)
         {
@@ -357,5 +367,311 @@ public sealed class KaydediciBolgeDuzenleyiciTests
         Assert.True(olcu.eskiCizildi);
         Assert.False(olcu.eskiAcik);
         Assert.Equal(0, olcu.eskiCagri);
+    }
+
+    private static readonly string Kanit = Path.Combine(GirdiKanit.Root, ".calisma", "bolge-duzenleyici");
+
+    private static string[] Gorunenler(RecorderRegionEditor d)
+        => new (string ad, Button b)[]
+            {
+                ("baslat", d.BtnStart), ("ayarlar", d.BtnSettings), ("duraklat", d.BtnPause), ("surdur", d.BtnResume),
+                ("durdur", d.BtnStop), ("kare", d.BtnSnapshot), ("gizle", d.BtnHide), ("kapat", d.BtnClose)
+            }
+            .Where(x => x.b.IsVisible).Select(x => x.ad).ToArray();
+
+    private static double PanelGenisligi(RecorderRegionEditor d)
+    {
+        d.Toolbar.InvalidateMeasure();
+        d.Toolbar.Measure(Size.Infinity);
+        return d.Toolbar.DesiredSize.Width;
+    }
+
+    [Fact]
+    public void PanelHerEvredeKendiDugmeleriniGosterirKenarBostaKesikKayittaGizli()
+    {
+        var olcu = AppHost.Run(() =>
+        {
+            var d = new RecorderRegionEditor(new PixelRect(0, 0, 640, 360), null);
+            double Deger(string anahtar) => d.TryFindResource(anahtar, out var v) && v is double x ? x : double.NaN;
+            var evreler = new[] { RegionEditorPhase.Idle, RegionEditorPhase.Counting, RegionEditorPhase.Running, RegionEditorPhase.Paused };
+            var satirlar = new List<(RegionEditorPhase evre, string[] dugmeler, double genislik, string? ipucu, double[]? kesik, bool kenar)>();
+            foreach (var evre in evreler.Concat(new[] { RegionEditorPhase.Idle }))
+            {
+                d.SetPhase(evre);
+                satirlar.Add((evre, Gorunenler(d), PanelGenisligi(d), ToolTip.GetTip(d.BtnClose) as string,
+                    d.Edge.StrokeDashArray?.ToArray(), d.Edge.IsVisible));
+            }
+
+            d.TryFindResource("NeonEmber", d.ActualThemeVariant, out var ember);
+            var cerceve = new RecorderFrame();
+            var sonuc = (satirlar, boy: Deger("RecorderRegionButtonSize"), aralik: Deger("RecorderRegionButtonGap"),
+                kesik: Deger("RecorderRegionDash"), kalinlik: Deger("RecorderFrameThickness"),
+                ember, kenar: d.Edge.Stroke, cerceveKenar: cerceve.FrameEdge.BorderBrush,
+                kapat: VidShrink.App.LanguageCatalog.Display(VidShrink.App.Localization.Strings.Get("recorder.region.close")),
+                durdurKapat: VidShrink.App.LanguageCatalog.Display(VidShrink.App.Localization.Strings.Get("recorder.region.stop-close")));
+            cerceve.Close();
+            d.CloseQuietly();
+            return sonuc;
+        });
+
+        var s = olcu.satirlar;
+        Assert.Equal(new[] { "baslat", "ayarlar", "kare", "kapat" }, s[0].dugmeler);
+        Assert.Equal(new[] { "durdur", "kapat" }, s[1].dugmeler);
+        Assert.Equal(new[] { "duraklat", "durdur", "kare", "gizle", "kapat" }, s[2].dugmeler);
+        Assert.Equal(new[] { "surdur", "durdur", "kare", "gizle", "kapat" }, s[3].dugmeler);
+        Assert.Equal(s[0].dugmeler, s[4].dugmeler);
+
+        Assert.Equal(40, olcu.boy);
+        var adim = olcu.boy + olcu.aralik;
+        Assert.Equal(2 * adim, s[0].genislik - s[1].genislik, 3);
+        Assert.Equal(adim, s[2].genislik - s[0].genislik, 3);
+        Assert.Equal(s[2].genislik, s[3].genislik, 3);
+
+        Assert.Equal(olcu.kapat, s[0].ipucu);
+        Assert.All(new[] { s[1], s[2], s[3] }, r => Assert.Equal(olcu.durdurKapat, r.ipucu));
+        Assert.NotEqual(olcu.kapat, olcu.durdurKapat);
+
+        Assert.Equal(new[] { olcu.kesik / olcu.kalinlik, olcu.kesik / olcu.kalinlik }, s[0].kesik);
+        Assert.Equal(new[] { 4.0, 4.0 }, s[0].kesik);
+        Assert.True(s[0].kenar);
+        Assert.All(new[] { s[1], s[2], s[3] }, r => { Assert.Null(r.kesik); Assert.False(r.kenar); });
+        Assert.Equal(s[0].kesik, s[4].kesik);
+
+        Assert.NotNull(olcu.ember);
+        Assert.Same(olcu.ember, olcu.kenar);
+        Assert.Same(olcu.ember, olcu.cerceveKenar);
+    }
+
+    [Fact]
+    public void KenarKesigiBelirtectenGelirKayittaDuzdur()
+    {
+        Assert.Equal(new[] { 4.0, 4.0 }, RecorderRegionEditor.EdgeDash(true, 8, 2)!.ToArray());
+        Assert.Equal(new[] { 2.0, 2.0 }, RecorderRegionEditor.EdgeDash(true, 8, 4)!.ToArray());
+        Assert.Null(RecorderRegionEditor.EdgeDash(false, 8, 2));
+        Assert.Null(RecorderRegionEditor.EdgeDash(true, 0, 2));
+        Assert.Null(RecorderRegionEditor.EdgeDash(true, 8, 0));
+    }
+
+    [Fact]
+    public void CarpiBostaYalnizKapatirKayittaDurdurupKapatir()
+    {
+        var olcu = AppHost.Run(() =>
+        {
+            (int durdur, bool kapandi) Dene(RegionEditorPhase evre)
+            {
+                var d = new RecorderRegionEditor(new PixelRect(100, 100, 320, 240), null);
+                var durdur = 0;
+                var kapandi = false;
+                d.StopRequested += (_, _) => durdur++;
+                d.Closed += (_, _) => kapandi = true;
+                d.SetPhase(evre);
+                d.Show();
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                d.CloseFromToolbar();
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                if (!kapandi) d.CloseQuietly();
+                return (durdur, kapandi);
+            }
+
+            return (bosta: Dene(RegionEditorPhase.Idle), kayitta: Dene(RegionEditorPhase.Running),
+                duraklatildi: Dene(RegionEditorPhase.Paused), sayarken: Dene(RegionEditorPhase.Counting));
+        });
+
+        Assert.Equal((0, true), olcu.bosta);
+        Assert.Equal((1, true), olcu.kayitta);
+        Assert.Equal((1, true), olcu.duraklatildi);
+        Assert.Equal((1, true), olcu.sayarken);
+    }
+
+    [Fact]
+    public void KayitYokkenKameraDugmesiBolgeninKaresiniPngOlarakAlir()
+    {
+        var klasor = Path.Combine(Kanit, "bosta-kare");
+        if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var sahte = new SahteDuzenleyici();
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, RegionEditorEnabled = true, RegionEditor = sahte };
+            Elle(view);
+            Bul<ComboBox>(view, "CmbTarget").SelectedIndex = (int)RecorderTargetKind.Region;
+            Yaz(view, "TxtOutputFolder", klasor);
+            view.DrawRegion = _ => Task.FromResult<PixelRect?>(new PixelRect(100, 50, 320, 240));
+            view.DrawRegionAsync().GetAwaiter().GetResult();
+
+            RecorderRequest? istek = null;
+            string? yol = null;
+            view.TakeFrame = (r, p) =>
+            {
+                istek = r;
+                yol = p;
+                if (!p.StartsWith(klasor, StringComparison.OrdinalIgnoreCase)) return Task.FromResult(false);
+                Directory.CreateDirectory(Path.GetDirectoryName(p)!);
+                File.WriteAllBytes(p, new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A });
+                return Task.FromResult(true);
+            };
+            sahte.KareAl();
+            var saat = System.Diagnostics.Stopwatch.StartNew();
+            while (yol is null && saat.ElapsedMilliseconds < 5000) Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            return (yol, istek, var: yol is not null && File.Exists(yol), not: view.NoticeText, hata: view.ErrorText,
+                oturum: view.HasSession);
+        }));
+
+        try
+        {
+            Assert.NotNull(olcu.yol);
+            Assert.StartsWith(klasor, olcu.yol!, StringComparison.OrdinalIgnoreCase);
+            Assert.StartsWith("kare_", Path.GetFileName(olcu.yol));
+            Assert.EndsWith(".png", olcu.yol);
+            Assert.True(olcu.var);
+            Assert.Contains(olcu.yol!, olcu.not);
+            Assert.Equal(string.Empty, olcu.hata);
+            Assert.False(olcu.oturum);
+            Assert.Equal(RecorderTargetKind.Region, olcu.istek!.Target);
+            Assert.Equal(new RecorderRegion(100, 50, 320, 240), olcu.istek.Region);
+            Assert.Equal(5, RecorderHotkeys.All.Count);
+            Assert.Equal(5, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
+        }
+        finally
+        {
+            if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+        }
+    }
+
+    private sealed class SahteCerceve : IRecorderFrameHost
+    {
+        public List<string> Cagrilar { get; } = new();
+
+        public void Show(PixelRect region) => Cagrilar.Add("goster");
+
+        public void Hide() => Cagrilar.Add("gizle");
+    }
+
+    private static void Pompala(Task gorev, int sinirMs)
+    {
+        var saat = System.Diagnostics.Stopwatch.StartNew();
+        while (!gorev.IsCompleted && saat.ElapsedMilliseconds < sinirMs)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            System.Threading.Thread.Sleep(20);
+        }
+
+        Assert.True(gorev.IsCompleted, "gorev zamaninda bitmedi");
+        gorev.GetAwaiter().GetResult();
+    }
+
+    private static void Bekle(Func<bool> sart, int sinirMs)
+    {
+        var saat = System.Diagnostics.Stopwatch.StartNew();
+        while (!sart() && saat.ElapsedMilliseconds < sinirMs)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            System.Threading.Thread.Sleep(20);
+        }
+    }
+
+    [KayitFact]
+    public void KayitSirasindaPanelDuraklatirKareAlirCerceveyiGizlerVeDurdurur()
+    {
+        var klasor = Path.Combine(Kanit, "canli");
+        if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var sahte = new SahteDuzenleyici();
+            var cerceve = new SahteCerceve();
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, RegionEditorEnabled = true, RegionEditor = sahte, FrameHost = cerceve };
+            Elle(view);
+            Bul<ComboBox>(view, "CmbTarget").SelectedIndex = (int)RecorderTargetKind.Region;
+            Bul<ComboBox>(view, "CmbCountdown").SelectedIndex = 0;
+            Sec(view, "CmbCodec", "libx264");
+            Sec(view, "CmbPreset", "ultrafast");
+            Yaz(view, "TxtOutputFolder", klasor);
+            view.DrawRegion = _ => Task.FromResult<PixelRect?>(new PixelRect(0, 0, 320, 240));
+            view.DrawRegionAsync().GetAwaiter().GetResult();
+            view.TakeFrame = (r, p) => p.StartsWith(klasor, StringComparison.OrdinalIgnoreCase)
+                ? RecorderSession.CaptureAsync(r, p)
+                : Task.FromResult(false);
+
+            var onceKare = view.SnapshotNowAsync();
+            Pompala(onceKare, 30000);
+            var bostaKare = (ok: onceKare.Result, pngler: Directory.Exists(klasor) ? Directory.GetFiles(klasor, "kare_*.png") : Array.Empty<string>());
+
+            try
+            {
+                var baslat = view.StartAsync();
+                Pompala(baslat, 45000);
+                var basladi = (view.HasSession, sahte.Evre, view.ErrorText);
+                Bekle(() => false, 1200);
+
+                sahte.Duraklat();
+                Bekle(() => view.State == RecorderState.Paused, 10000);
+                var duraklatildi = (view.State, sahte.Evre);
+                sahte.Surdur();
+                Bekle(() => view.State == RecorderState.Running, 10000);
+                var surdu = (view.State, sahte.Evre);
+
+                var gizleOnce = sahte.Cagrilar.Count(c => c == "gizle");
+                sahte.Gizle();
+                var gizlendi = (view.FrameHiddenByUser, view.FrameShown, panel: sahte.Cagrilar.Count(c => c == "gizle") - gizleOnce,
+                    cerceve: cerceve.Cagrilar.LastOrDefault(), view.HasSession, view.State);
+                view.OnTrayClicked();
+                var tepsi = (view.FrameHiddenByUser, view.FrameShown, son: sahte.Cagrilar.LastOrDefault());
+                sahte.Gizle();
+                var tus = view.RunHotkeyAsync(HotkeyAction.Frame);
+                Pompala(tus, 5000);
+                var kisayol = (view.FrameHiddenByUser, view.FrameShown);
+
+                sahte.Durdur();
+                Bekle(() => !view.HasSession, 30000);
+                var durdu = (view.HasSession, view.FrameHiddenByUser, sahte.Evre, sonuc: view.ResultPathText, view.ErrorText);
+
+                return (bostaKare, basladi, duraklatildi, surdu, gizlendi, tepsi, kisayol, durdu,
+                    videolar: Directory.Exists(klasor) ? Directory.GetFiles(klasor, "*.mp4") : Array.Empty<string>());
+            }
+            finally
+            {
+                if (view.HasSession)
+                {
+                    var iptal = view.RunHotkeyAsync(HotkeyAction.Discard);
+                    Bekle(() => iptal.IsCompleted, 15000);
+                }
+            }
+        }));
+
+        try
+        {
+            Assert.True(olcu.bostaKare.ok);
+            var png = Assert.Single(olcu.bostaKare.pngler);
+            var imza = File.ReadAllBytes(png).Take(8).ToArray();
+            Assert.Equal(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }, imza);
+
+            Assert.True(olcu.basladi.HasSession, olcu.basladi.ErrorText);
+            Assert.Equal(RegionEditorPhase.Running, olcu.basladi.Evre);
+            Assert.Equal((RecorderState.Paused, (RegionEditorPhase?)RegionEditorPhase.Paused), olcu.duraklatildi);
+            Assert.Equal((RecorderState.Running, (RegionEditorPhase?)RegionEditorPhase.Running), olcu.surdu);
+
+            Assert.True(olcu.gizlendi.FrameHiddenByUser);
+            Assert.False(olcu.gizlendi.FrameShown);
+            Assert.Equal(1, olcu.gizlendi.panel);
+            Assert.Equal("gizle", olcu.gizlendi.cerceve);
+            Assert.True(olcu.gizlendi.HasSession);
+            Assert.Equal(RecorderState.Running, olcu.gizlendi.State);
+
+            Assert.Equal((false, true, "goster"), olcu.tepsi);
+            Assert.Equal((false, true), olcu.kisayol);
+
+            Assert.False(olcu.durdu.HasSession, olcu.durdu.ErrorText);
+            Assert.False(olcu.durdu.FrameHiddenByUser);
+            Assert.Equal(RegionEditorPhase.Idle, olcu.durdu.Evre);
+            var video = Assert.Single(olcu.videolar);
+            Assert.True(new FileInfo(video).Length > 0);
+        }
+        finally
+        {
+            if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+        }
     }
 }

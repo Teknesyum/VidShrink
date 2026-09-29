@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Onyesha kwenye folda",
   "recorder.output.to-shrink": "Tuma kwenye Finyaza",
   "recorder.output.to-player": "Fungua kwenye kichezaji",
+  "recorder.output.to-editor": "Hariri",
   "recorder.output.done": "Kurekodi kumekamilika: {0} MB katika sehemu {1}",
   "recorder.output.partial": "Kurekodi hakukufungwa vizuri. Faili imehifadhiwa na inaweza kuchezwa. Sekunde za mwisho zinaweza kukosekana.",
   "recorder.output.partial-broken": "Kurekodi hakukufungwa vizuri. Faili haiwezi kuchezwa. Chagua MKV kwa kurekodi kunakofuata.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Kinasa cha VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Njia ya mkato ya jumla inatumiwa na programu nyingine: {0}. Vitufe hivi hufanya kazi tu wakati dirisha la VidShrink liko mbele.",
   "recorder.advanced.title": "Usimbaji wa kina",
+  "recorder.advanced.encoder-title": "Maelezo ya kisimbaji",
   "recorder.advanced.container": "Kifuko",
   "recorder.advanced.scale-width": "Upana wa kipimo",
   "recorder.advanced.scale-height": "Urefu wa kipimo",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Lango la kelele",
   "recorder.advanced.noise-suppression": "Uondoaji wa kelele",
   "recorder.budget.duration-only": "Kurekodi kutasimama kiotomatiki baada ya sekunde {0}.",
-  "recorder.budget.size-only": "Kurekodi kutasimama kiotomatiki kikifika {0} MB.",
+  "recorder.budget.size-only": "Kurekodi kutasimama kiotomatiki kikifika {0} MB.",
   "recorder.output.open-when-done": "Fungua folda kurekodi kukiisha",
   "recorder.discarded": "Kurekodi kumeghairiwa, faili limefutwa.",
   "recorder.target.screen-pick": "Skrini",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Ghairi",
   "recorder.wizard.summary": "{0} · {1} · {2} — ubora {3}.",
   "recorder.wizard.no-device": "Hakuna kifaa kilichopatikana kwa {0}; chanzo hicho kitabaki bila sauti.",
-  "recorder.replay.seconds": "Urefu wa kuhifadhi"
+  "recorder.replay.seconds": "Urefu wa kuhifadhi",
+  "recorder.region.hide": "Ficha fremu (F9)",
+  "recorder.region.stop-close": "Simamisha kurekodi na ufunge"
 }

@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "চালু থাকলে নতুন সংস্করণ পটভূমিতে ডাউনলোড হয় এবং VidShrink বন্ধ হলে ইনস্টল হয়। বন্ধ থাকলে নতুন সংস্করণের খবর উপরের বারে দেখানো হয় এবং বোতাম দিয়ে ইনস্টল হয়।",
   "settings.update.no-self-effect": "এই সিস্টেমে VidShrink নিজেকে আপডেট করে না: শুধু নতুন সংস্করণ আছে জানায় এবং ইনস্টল কমান্ডটি দেখায়।",
   "settings.default-app.suggestion": "VidShrink ভিডিওর ডিফল্ট প্রোগ্রাম নয়। Windows-এর ডিফল্ট অ্যাপ পাতায় এটি বেছে নিতে পারেন।",
+  "settings.default-app.all": "সব সেট করুন",
+  "settings.default-app.all-copied": "কমান্ডটি ক্লিপবোর্ডে কপি হয়েছে। একটি PowerShell উইন্ডো খুলে পেস্ট করুন; VidShrink সব অডিও ও ভিডিও ফরম্যাটের ডিফল্ট হয়ে যাবে।",
   "settings.default-app.open": "ডিফল্ট অ্যাপ",
   "settings.default-app.dismiss": "আর জিজ্ঞাসা করবেন না",
   "settings.player-shortcuts.title": "প্লেয়ার শর্টকাট",

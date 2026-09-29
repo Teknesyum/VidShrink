@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Vis i mappe",
   "recorder.output.to-shrink": "Send til Krymp",
   "recorder.output.to-player": "Åpne i spilleren",
+  "recorder.output.to-editor": "Rediger",
   "recorder.output.done": "Opptak ferdig: {0} MB i {1} segmenter",
   "recorder.output.partial": "Opptaket ble ikke lukket riktig. Filen er lagret og kan spilles av. De siste sekundene kan mangle.",
   "recorder.output.partial-broken": "Opptaket ble ikke lukket riktig. Filen kan ikke spilles av. Velg MKV til neste opptak.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink-opptaker · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Global hurtigtast er opptatt av et annet program: {0}. Disse tastene virker bare når VidShrink-vinduet er i forgrunnen.",
   "recorder.advanced.title": "Avansert koding",
+  "recorder.advanced.encoder-title": "Kodekdetaljer",
   "recorder.advanced.container": "Container",
   "recorder.advanced.scale-width": "Skaleringsbredde",
   "recorder.advanced.scale-height": "Skaleringshøyde",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Støysperre",
   "recorder.advanced.noise-suppression": "Støyundertrykking",
   "recorder.budget.duration-only": "Opptaket stopper automatisk etter {0} sekunder.",
-  "recorder.budget.size-only": "Opptaket stopper automatisk når det når {0} MB.",
+  "recorder.budget.size-only": "Opptaket stopper automatisk når det når {0} MB.",
   "recorder.output.open-when-done": "Åpne mappen når opptaket avsluttes",
   "recorder.discarded": "Opptaket ble forkastet, filen ble slettet.",
   "recorder.target.screen-pick": "Skjerm",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Avbryt",
   "recorder.wizard.summary": "{0} · {1} · {2} — kvalitet {3}.",
   "recorder.wizard.no-device": "Fant ingen enhet for {0}; den kilden forblir stille.",
-  "recorder.replay.seconds": "Lengde som skal beholdes"
+  "recorder.replay.seconds": "Lengde som skal beholdes",
+  "recorder.region.hide": "Skjul ramme (F9)",
+  "recorder.region.stop-close": "Stopp opptak og lukk"
 }

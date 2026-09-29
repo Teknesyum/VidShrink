@@ -55,6 +55,7 @@
   "playback.zoom.out": "Alejar",
   "playback.zoom.in": "Acercar",
   "player.menu.reveal": "Abrir ubicación del archivo",
+  "player.menu.edit": "Editar",
   "player.menu.view": "Imagen",
   "player.menu.playback": "Reproducción",
   "player.menu.loop": "Repetición y marcadores"

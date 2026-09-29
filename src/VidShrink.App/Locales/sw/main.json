@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Mandhari",
   "settings-tab.theme.hint": "Hubadilisha kila rangi kwenye programu na hukumbukwa uzinduzi ujao.",
   "settings-tab.language.hint": "Hubadilisha lugha ya kiolesura na hukumbukwa uzinduzi ujao.",
-  "settings-tab.default-target.label": "Ukubwa lengwa chaguomsingi (MB)",
+  "settings-tab.default-target.label": "Ukubwa lengwa chaguomsingi",
   "settings-tab.default-target.hint": "Huweka ukubwa lengwa ambao kichupo cha Finyaza hufunguka nao.",
   "settings-tab.output-folder.label": "Folda ya matokeo",
   "settings-tab.output-folder.beside-source": "Kando ya faili ya chanzo",

@@ -481,15 +481,21 @@ public sealed class GorselDenetimYapiTests
         Assert.Equal(sonuc, ikinci);
     }
 
+    /// <summary>
+    /// Arayüz turu (2026-09-28): ses bölümü sağ sütundaki "Ne Çıkacak" kartına taşındı; 1560 px'te
+    /// Türkçe kutu ile kazanç aynı satıra sığmıyor ve WrapPanel kazancı alta alıyor (fark -73).
+    /// Ortalama ancak aynı satırda sorulabilir, ölçü tam ekran boyunda (1920x1040) koşar.
+    /// </summary>
     [Theory]
     [InlineData("de")]
     [InlineData("tr")]
     public void SesSeviyesiKutusuKazancKutusuylaOrtali(string dil)
     {
-        var (fark, ayniSatir) = Pencere(Genis, w =>
+        var boyut = KaydirmasizSekmeTests.TamEkran;
+        var (fark, ayniSatir) = Pencere(boyut, w =>
         {
             Ad<StackPanel>(w, "AudioBody").IsVisible = true;
-            Yerlestir(w, Genis);
+            Yerlestir(w, boyut);
             var kutu = Ad<CheckBox>(w, "ChkAudioLoudnorm");
             var kombo = Ad<ComboBox>(w, "CmbAudioGain");
             var yazi = kutu.GetVisualDescendants().OfType<Border>().First(b => b.Name == "CheckOutline");
@@ -522,6 +528,10 @@ public sealed class GorselDenetimYapiTests
         Assert.All(farklar, f => Assert.True(Math.Abs(f.Item2) < 1, $"{f.Item1} etiketi denetimden {f.Item2:0.##} px kayık."));
     }
 
+    /// <summary>
+    /// Arayüz turu (2026-09-28): Basit kipteki Kaydedici 1136x720'de kaydırmasız sığıyor, çubuk yok;
+    /// ölçü sayfanın kaydığı Gelişmiş kipte koşar.
+    /// </summary>
     [Theory]
     [InlineData("tr")]
     [InlineData("de")]
@@ -530,12 +540,12 @@ public sealed class GorselDenetimYapiTests
         var bosluklar = new[] { (2, "PageShrink"), (4, "PageRecorder"), (6, "PageSettings") }
             .Select(s => (ad: s.Item2, bosluk: Pencere(Dar, w =>
             {
-                var kaydirici = Ad<ScrollViewer>(w, s.Item2);
-                if (s.Item1 == 4)
+                if (s.Item2 == "PageRecorder")
                 {
-                    Ad<RadioButton>(w, "RadAdvanced").IsChecked = true;
+                    w.RecorderPaneForTest.FindControl<RadioButton>("RadAdvanced")!.IsChecked = true;
                     Yerlestir(w, Dar);
                 }
+                var kaydirici = Ad<ScrollViewer>(w, s.Item2);
                 var icerik = (Control)kaydirici.Content!;
                 var cubuk = kaydirici.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ScrollBar>()
                     .Single(c => c.Orientation == Orientation.Vertical && ReferenceEquals(c.TemplatedParent, kaydirici));
@@ -772,5 +782,103 @@ public sealed class GorselDenetimYapiTests
 
         static double M11(Visual v) => v.RenderTransform?.Value.M11 ?? 1;
         static TimeSpan? Sure(Animatable a) => a.Transitions?.OfType<Avalonia.Animation.TransformOperationsTransition>().FirstOrDefault()?.Duration;
+    }
+
+    /// <summary>
+    /// Arayüz tur 4: boş metin satırı panelde yer tutmaz. Boş TextBlock bir satır boyu ve yığın
+    /// aralığı kaplıyordu; Küçült'ün Çıktı panelinin altında ~95 px, Dönüştür'ün ilerleme
+    /// panelinde bir satır boşluk kalıyordu. Metin gelince satır geri görünür (olumlu kontrol).
+    /// </summary>
+    [Fact]
+    public void BosMetinSatiriYerTutmaz()
+    {
+        var olculer = Pencere(Dar, w =>
+        {
+            var adlar = new[] { "TxtShareStatus", "TxtEstimateRange", "TxtEstimateNote", "TxtConvertResult", "TxtResult" };
+            var bos = new List<(string, bool)>();
+            var dolu = new List<(string, bool)>();
+            foreach (var ad in adlar)
+            {
+                var yazi = w.FindControl<TextBlock>(ad)!;
+                var kap = ad == "TxtResult" ? (Control)yazi.Parent! : yazi;
+                yazi.Text = string.Empty;
+                bos.Add((ad, kap.IsVisible));
+                yazi.Text = "x";
+                dolu.Add((ad, kap.IsVisible));
+            }
+            return (bos, dolu);
+        }, dolu: false);
+
+        foreach (var (ad, gorunur) in olculer.bos) Assert.False(gorunur, $"{ad}: boşken görünür kaldı.");
+        foreach (var (ad, gorunur) in olculer.dolu) Assert.True(gorunur, $"{ad}: metin gelince görünmedi.");
+    }
+
+    /// <summary>
+    /// Görüntü incelemesi tur 3, #12: sütun sayısı tavanın altındayken kart duvarı kartları bildirim
+    /// sırasıyla en kısa sütuna koyuyor; sıfırlama kartı üçüncü bildirildiği için %125'te sağ sütunun
+    /// en üstüne, Çıktı kartının üstüne çıkıyordu. Kart artık son bildirilir ve sütununun en altında durur.
+    /// </summary>
+    [Fact]
+    public void SifirlamaKartiSutunununEnAltinda()
+    {
+        var (sutun, kartlar, altta) = Pencere(Dar, w =>
+        {
+            var duvar = Ad<KartDuvari>(w, "SettingsCards");
+            var sifirla = Ad<Control>(w, "ResetSettingsPanel");
+            var yer = Yeri(sifirla, w);
+            var komsular = duvar.Children.Where(k => k.IsVisible && !ReferenceEquals(k, sifirla))
+                .Select(k => Yeri(k, w)).Where(r => Math.Abs(r.Left - yer.Left) < 1).ToArray();
+            return (duvar.Columns, komsular.Length, komsular.All(r => r.Top < yer.Top));
+        }, sekme: 6);
+
+        _output.WriteLine($"sütun {sutun}, aynı sütunda {kartlar} kart");
+        Assert.True(sutun < 4, $"Ölçü tavan altı sütun sayısında koşmalı, {sutun} sütun.");
+        Assert.True(kartlar > 0, "Sıfırlama kartının sütununda başka kart yok; ölçü boş koşar.");
+        Assert.True(altta, "Sıfırlama kartının altında başka kart var.");
+    }
+
+    /// <summary>
+    /// Arayüz tur 4: pasif düğmenin ipucu görünür. Avalonia 12'de <c>ShowOnDisabled</c>
+    /// varsayılan kapalı; "neden pasif" ipuçları (Dönüştür, Kaydet, İptal) hiç açılmıyordu.
+    /// </summary>
+    [Fact]
+    public void PasifDugmeIpucunuGosterir()
+    {
+        var (pasif, etkin) = Pencere(Dar, w =>
+        {
+            var dugme = w.FindControl<Button>("BtnConvert")!;
+            dugme.IsEnabled = false;
+            Yerlestir(w, Dar);
+            var once = ToolTip.GetShowOnDisabled(dugme);
+            return (once, ToolTip.GetTip(dugme) is not null);
+        }, sekme: 3, dolu: false);
+
+        Assert.True(pasif, "pasif düğmede ShowOnDisabled kapalı.");
+        Assert.True(etkin, "pasif Dönüştür düğmesinin ipucu yok.");
+    }
+
+    /// <summary>
+    /// Arayüz tur 4: karşılaştırma panelinin bildirimi motorun "main." anahtarını ham gösteriyordu
+    /// ("main.error.unusable"). Anahtar dile çözülür, motorun iletisi balona gider; "playback." anahtarı eskisi gibi çözülür (olumlu kontrol).
+    /// </summary>
+    [Fact]
+    public void KarsilastirmaBildirimiHamAnahtarGostermez()
+    {
+        var (motor, oynatma, balon) = AppHost.Run(() =>
+        {
+            var panel = new VidShrink.App.Playback.ComparisonPanel();
+            panel.SetLanguage("tr");
+            panel.SetNotice("main.error.unusable", "libmpv yok");
+            var ipucu = panel.FindControl<TextBlock>("EmptyHint")!;
+            var m = ipucu.Text;
+            var b = ToolTip.GetTip(ipucu) as string;
+            panel.SetNotice("playback.player-failed");
+            return (m, ipucu.Text, b);
+        });
+
+        Assert.DoesNotContain("main.", motor);
+        Assert.False(string.IsNullOrWhiteSpace(motor));
+        Assert.DoesNotContain("playback.", oynatma);
+        Assert.Equal("libmpv yok", balon);
     }
 }

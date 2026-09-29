@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Visa i mapp",
   "recorder.output.to-shrink": "Skicka till Krymp",
   "recorder.output.to-player": "Öppna i spelaren",
+  "recorder.output.to-editor": "Redigera",
   "recorder.output.done": "Inspelning klar: {0} MB i {1} segment",
   "recorder.output.partial": "Inspelningen stängdes inte korrekt. Filen är sparad och går att spela upp. De sista sekunderna kan saknas.",
   "recorder.output.partial-broken": "Inspelningen stängdes inte korrekt. Filen går inte att spela upp. Välj MKV till nästa inspelning.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink-inspelare · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Den globala genvägen används av ett annat program: {0}. Dessa tangenter fungerar bara när VidShrink-fönstret är i förgrunden.",
   "recorder.advanced.title": "Avancerad kodning",
+  "recorder.advanced.encoder-title": "Kodardetaljer",
   "recorder.advanced.container": "Behållare",
   "recorder.advanced.scale-width": "Skalad bredd",
   "recorder.advanced.scale-height": "Skalad höjd",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Brusgrind",
   "recorder.advanced.noise-suppression": "Brusreducering",
   "recorder.budget.duration-only": "Inspelningen stoppar automatiskt efter {0} sekunder.",
-  "recorder.budget.size-only": "Inspelningen stoppar automatiskt när den når {0} MB.",
+  "recorder.budget.size-only": "Inspelningen stoppar automatiskt när den når {0} MB.",
   "recorder.output.open-when-done": "Öppna mappen när inspelningen avslutas",
   "recorder.discarded": "Inspelningen kasserades, filen raderades.",
   "recorder.target.screen-pick": "Skärm",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Avbryt",
   "recorder.wizard.summary": "{0} · {1} · {2} — kvalitet {3}.",
   "recorder.wizard.no-device": "Ingen enhet hittades för {0}; den källan förblir tyst.",
-  "recorder.replay.seconds": "Längd att behålla"
+  "recorder.replay.seconds": "Längd att behålla",
+  "recorder.region.hide": "Dölj ram (F9)",
+  "recorder.region.stop-close": "Stoppa inspelning och stäng"
 }

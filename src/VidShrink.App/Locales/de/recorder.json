@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Im Ordner anzeigen",
   "recorder.output.to-shrink": "An Verkleinern senden",
   "recorder.output.to-player": "Im Player öffnen",
+  "recorder.output.to-editor": "Bearbeiten",
   "recorder.output.done": "Aufnahme beendet: {0} MB in {1} Segmenten",
   "recorder.output.partial": "Die Aufnahme wurde nicht sauber geschlossen. Die Datei ist gespeichert und lässt sich abspielen. Die letzten Sekunden fehlen möglicherweise.",
   "recorder.output.partial-broken": "Die Aufnahme wurde nicht sauber geschlossen. Die Datei lässt sich nicht abspielen. Wählen Sie für die nächste Aufnahme MKV.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink-Rekorder · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Die globale Tastenkombination wird bereits von einer anderen Anwendung verwendet: {0}. Diese Tasten funktionieren nur, solange das VidShrink-Fenster im Vordergrund ist.",
   "recorder.advanced.title": "Erweiterte Kodierung",
+  "recorder.advanced.encoder-title": "Encoder-Details",
   "recorder.advanced.container": "Container",
   "recorder.advanced.scale-width": "Skalierungsbreite",
   "recorder.advanced.scale-height": "Skalierungshöhe",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Noise Gate",
   "recorder.advanced.noise-suppression": "Rauschunterdrückung",
   "recorder.budget.duration-only": "Die Aufnahme stoppt automatisch nach {0} Sekunden.",
-  "recorder.budget.size-only": "Die Aufnahme stoppt automatisch, sobald {0} MB erreicht sind.",
+  "recorder.budget.size-only": "Die Aufnahme stoppt automatisch, sobald {0} MB erreicht sind.",
   "recorder.output.open-when-done": "Ordner öffnen, wenn die Aufnahme endet",
   "recorder.discarded": "Aufnahme verworfen, die Datei wurde gelöscht.",
   "recorder.target.screen-pick": "Bildschirm",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Abbrechen",
   "recorder.wizard.summary": "{0} · {1} · {2} — Qualität {3}.",
   "recorder.wizard.no-device": "Kein Gerät für {0} gefunden; diese Quelle bleibt stumm.",
-  "recorder.replay.seconds": "Zu behaltende Länge"
+  "recorder.replay.seconds": "Zu behaltende Länge",
+  "recorder.region.hide": "Rahmen ausblenden (F9)",
+  "recorder.region.stop-close": "Aufnahme beenden und schließen"
 }

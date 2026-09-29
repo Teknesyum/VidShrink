@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Εμφάνιση στον φάκελο",
   "recorder.output.to-shrink": "Αποστολή στη Σμίκρυνση",
   "recorder.output.to-player": "Άνοιγμα στην αναπαραγωγή",
+  "recorder.output.to-editor": "Επεξεργασία",
   "recorder.output.done": "Η εγγραφή ολοκληρώθηκε: {0} MB σε {1} τμήματα",
   "recorder.output.partial": "Η εγγραφή δεν έκλεισε σωστά. Το αρχείο αποθηκεύτηκε και μπορεί να αναπαραχθεί. Τα τελευταία δευτερόλεπτα μπορεί να λείπουν.",
   "recorder.output.partial-broken": "Η εγγραφή δεν έκλεισε σωστά. Το αρχείο δεν μπορεί να αναπαραχθεί. Επιλέξτε MKV για την επόμενη εγγραφή.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Εγγραφέας VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Η καθολική συντόμευση χρησιμοποιείται από άλλη εφαρμογή: {0}. Αυτά τα πλήκτρα λειτουργούν μόνο όσο το παράθυρο του VidShrink είναι στο προσκήνιο.",
   "recorder.advanced.title": "Προηγμένη κωδικοποίηση",
+  "recorder.advanced.encoder-title": "Λεπτομέρειες κωδικοποιητή",
   "recorder.advanced.container": "Container",
   "recorder.advanced.scale-width": "Πλάτος κλιμάκωσης",
   "recorder.advanced.scale-height": "Ύψος κλιμάκωσης",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Πύλη θορύβου",
   "recorder.advanced.noise-suppression": "Καταστολή θορύβου",
   "recorder.budget.duration-only": "Η εγγραφή σταματά αυτόματα μετά από {0} δευτερόλεπτα.",
-  "recorder.budget.size-only": "Η εγγραφή σταματά αυτόματα όταν φτάσει τα {0} MB.",
+  "recorder.budget.size-only": "Η εγγραφή σταματά αυτόματα όταν φτάσει τα {0} MB.",
   "recorder.output.open-when-done": "Άνοιγμα φακέλου όταν τελειώσει η εγγραφή",
   "recorder.discarded": "Η εγγραφή απορρίφθηκε, το αρχείο διαγράφηκε.",
   "recorder.target.screen-pick": "Οθόνη",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Ακύρωση",
   "recorder.wizard.summary": "{0} · {1} · {2} — ποιότητα {3}.",
   "recorder.wizard.no-device": "Δεν βρέθηκε συσκευή για {0}· αυτή η πηγή παραμένει χωρίς ήχο.",
-  "recorder.replay.seconds": "Διάρκεια προς διατήρηση"
+  "recorder.replay.seconds": "Διάρκεια προς διατήρηση",
+  "recorder.region.hide": "Απόκρυψη πλαισίου (F9)",
+  "recorder.region.stop-close": "Διακοπή εγγραφής και κλείσιμο"
 }

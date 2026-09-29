@@ -12,7 +12,7 @@
         Background="Transparent"
         TransparencyLevelHint="Transparent">
   <Border x:Name="FrameEdge"
-          BorderBrush="{StaticResource NeonEmber}"
+          BorderBrush="{DynamicResource NeonEmber}"
           BorderThickness="{StaticResource RecorderFrameBorder}"
           Background="Transparent"
           IsHitTestVisible="False"/>

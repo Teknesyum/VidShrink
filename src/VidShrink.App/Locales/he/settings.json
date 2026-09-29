@@ -47,6 +47,8 @@
   "settings.update.no-self-effect": "VidShrink אינו מעדכן את עצמו במערכת זו: הוא רק מודיע שקיימת גרסה חדשה ומציג את הפקודה שמתקינה אותה.",
 
   "settings.default-app.suggestion": "VidShrink אינו התוכנית המוגדרת כברירת מחדל לווידאו. אפשר לבחור בו בעמוד יישומי ברירת המחדל של Windows.",
+  "settings.default-app.all": "הגדר הכול",
+  "settings.default-app.all-copied": "הפקודה הועתקה ללוח. פתחו חלון PowerShell והדביקו אותה; VidShrink יהפוך לברירת המחדל לכל תבניות השמע והווידאו.",
   "settings.default-app.open": "יישומי ברירת מחדל",
   "settings.default-app.dismiss": "אל תשאל שוב",
   "settings.player-shortcuts.title": "קיצורי מקלדת של הנגן",

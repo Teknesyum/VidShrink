@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Показати в папці",
   "recorder.output.to-shrink": "Надіслати до Стиснути",
   "recorder.output.to-player": "Відкрити у плеєрі",
+  "recorder.output.to-editor": "Редагувати",
   "recorder.output.done": "Запис завершено: {0} МБ у {1} сегментах",
   "recorder.output.partial": "Запис не закрився належним чином. Файл збережено, його можна відтворити. Останніх секунд може бракувати.",
   "recorder.output.partial-broken": "Запис не закрився належним чином. Файл неможливо відтворити. Для наступного запису виберіть MKV.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Рекордер VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Глобальне сполучення клавіш зайняте іншою програмою: {0}. Ці клавіші працюють лише коли вікно VidShrink активне.",
   "recorder.advanced.title": "Розширене кодування",
+  "recorder.advanced.encoder-title": "Параметри кодувальника",
   "recorder.advanced.container": "Контейнер",
   "recorder.advanced.scale-width": "Ширина масштабування",
   "recorder.advanced.scale-height": "Висота масштабування",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Шумовий гейт",
   "recorder.advanced.noise-suppression": "Придушення шуму",
   "recorder.budget.duration-only": "Запис зупиниться автоматично через {0} секунд.",
-  "recorder.budget.size-only": "Запис зупиниться автоматично, коли досягне {0} МБ.",
+  "recorder.budget.size-only": "Запис зупиниться автоматично, коли досягне {0} МБ.",
   "recorder.output.open-when-done": "Відкривати папку після завершення запису",
   "recorder.discarded": "Запис скасовано, файл видалено.",
   "recorder.target.screen-pick": "Екран",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Скасувати",
   "recorder.wizard.summary": "{0} · {1} · {2} — якість {3}.",
   "recorder.wizard.no-device": "Пристрій для {0} не знайдено; це джерело залишиться без звуку.",
-  "recorder.replay.seconds": "Довжина для збереження"
+  "recorder.replay.seconds": "Довжина для збереження",
+  "recorder.region.hide": "Сховати рамку (F9)",
+  "recorder.region.stop-close": "Зупинити запис і закрити"
 }

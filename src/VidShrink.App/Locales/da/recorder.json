@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Vis i mappe",
   "recorder.output.to-shrink": "Send til Krymp",
   "recorder.output.to-player": "Åbn i afspilleren",
+  "recorder.output.to-editor": "Redigér",
   "recorder.output.done": "Optagelse afsluttet: {0} MB i {1} segmenter",
   "recorder.output.partial": "Optagelsen blev ikke lukket korrekt. Filen er gemt og kan afspilles. De sidste sekunder mangler muligvis.",
   "recorder.output.partial-broken": "Optagelsen blev ikke lukket korrekt. Filen kan ikke afspilles. Vælg MKV til den næste optagelse.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink-optager · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Den globale genvej bruges af et andet program: {0}. Disse taster virker kun, når VidShrink-vinduet er forrest.",
   "recorder.advanced.title": "Avanceret kodning",
+  "recorder.advanced.encoder-title": "Encoderdetaljer",
   "recorder.advanced.container": "Container",
   "recorder.advanced.scale-width": "Skaleringsbredde",
   "recorder.advanced.scale-height": "Skaleringshøjde",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Noise gate",
   "recorder.advanced.noise-suppression": "Støjreduktion",
   "recorder.budget.duration-only": "Optagelsen stopper automatisk efter {0} sekunder.",
-  "recorder.budget.size-only": "Optagelsen stopper automatisk, når den når {0} MB.",
+  "recorder.budget.size-only": "Optagelsen stopper automatisk, når den når {0} MB.",
   "recorder.output.open-when-done": "Åbn mappen, når optagelsen slutter",
   "recorder.discarded": "Optagelsen blev annulleret, filen blev slettet.",
   "recorder.target.screen-pick": "Skærm",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Annuller",
   "recorder.wizard.summary": "{0} · {1} · {2} — kvalitet {3}.",
   "recorder.wizard.no-device": "Ingen enhed fundet til {0}; den kilde forbliver lydløs.",
-  "recorder.replay.seconds": "Længde der skal beholdes"
+  "recorder.replay.seconds": "Længde der skal beholdes",
+  "recorder.region.hide": "Skjul ramme (F9)",
+  "recorder.region.stop-close": "Stop optagelse og luk"
 }

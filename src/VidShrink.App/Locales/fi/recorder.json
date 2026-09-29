@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Näytä kansiossa",
   "recorder.output.to-shrink": "Lähetä pakkaukseen",
   "recorder.output.to-player": "Avaa soittimessa",
+  "recorder.output.to-editor": "Muokkaa",
   "recorder.output.done": "Tallennus valmis: {0} MB, {1} segmentissä",
   "recorder.output.partial": "Tallennus ei sulkeutunut siististi. Tiedosto on tallennettu ja se voidaan toistaa. Viimeiset sekunnit voivat puuttua.",
   "recorder.output.partial-broken": "Tallennus ei sulkeutunut siististi. Tiedostoa ei voi toistaa. Valitse seuraavaan tallennukseen MKV.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink-tallennin · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Globaalin pikanäppäimen on varannut toinen sovellus: {0}. Nämä näppäimet toimivat vain, kun VidShrink-ikkuna on edessä.",
   "recorder.advanced.title": "Lisäasetukset",
+  "recorder.advanced.encoder-title": "Kooderin tiedot",
   "recorder.advanced.container": "Container",
   "recorder.advanced.scale-width": "Skaalattu leveys",
   "recorder.advanced.scale-height": "Skaalattu korkeus",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Kohinaportti",
   "recorder.advanced.noise-suppression": "Kohinanvaimennus",
   "recorder.budget.duration-only": "Tallennus pysähtyy itsestään {0} sekunnin jälkeen.",
-  "recorder.budget.size-only": "Tallennus pysähtyy itsestään, kun se saavuttaa {0} Mt.",
+  "recorder.budget.size-only": "Tallennus pysähtyy itsestään, kun se saavuttaa {0} Mt.",
   "recorder.output.open-when-done": "Avaa kansio, kun tallennus päättyy",
   "recorder.discarded": "Tallennus hylättiin, tiedosto poistettiin.",
   "recorder.target.screen-pick": "Näyttö",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Peruuta",
   "recorder.wizard.summary": "{0} · {1} · {2} — laatu {3}.",
   "recorder.wizard.no-device": "Laitetta ei löytynyt kohteelle {0}; se lähde pysyy hiljaisena.",
-  "recorder.replay.seconds": "Säilytettävä pituus"
+  "recorder.replay.seconds": "Säilytettävä pituus",
+  "recorder.region.hide": "Piilota kehys (F9)",
+  "recorder.region.stop-close": "Lopeta tallennus ja sulje"
 }

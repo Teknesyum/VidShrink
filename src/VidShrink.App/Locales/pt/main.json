@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Muda todas as cores do programa e é lembrado na próxima abertura.",
   "settings-tab.language.hint": "Muda o idioma da interface e é lembrado na próxima abertura.",
-  "settings-tab.default-target.label": "Tamanho alvo padrão (MB)",
+  "settings-tab.default-target.label": "Tamanho alvo padrão",
   "settings-tab.default-target.hint": "Define o tamanho alvo com que a aba Reduzir abre.",
   "settings-tab.output-folder.label": "Pasta de saída",
   "settings-tab.output-folder.beside-source": "Ao lado do arquivo de origem",

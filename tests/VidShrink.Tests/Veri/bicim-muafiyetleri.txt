@@ -2,3 +2,4 @@
 # Her satır: <yol>   # gerekçe
 # Gerekçesiz satır eklenmez; karsılıgı kalmayan satır MuafiyetListesiBayatDegil'i kırar.
 
+src/VidShrink.Core/PlaylistFile.cs   # BOM'suz ANSI calma listesi yazildigi makinenin kod sayfasiyla okunur; arayuz dili degil, sistemin ANSI kod sayfasi gerekir

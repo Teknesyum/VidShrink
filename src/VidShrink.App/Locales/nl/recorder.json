@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Tonen in map",
   "recorder.output.to-shrink": "Naar Verkleinen sturen",
   "recorder.output.to-player": "Openen in de speler",
+  "recorder.output.to-editor": "Bewerken",
   "recorder.output.done": "Opname voltooid: {0} MB in {1} segmenten",
   "recorder.output.partial": "De opname is niet netjes afgesloten. Het bestand is opgeslagen en kan worden afgespeeld. De laatste seconden ontbreken mogelijk.",
   "recorder.output.partial-broken": "De opname is niet netjes afgesloten. Het bestand kan niet worden afgespeeld. Kies MKV voor de volgende opname.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink-recorder · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Globale sneltoets wordt gebruikt door een andere toepassing: {0}. Deze toetsen werken alleen wanneer het VidShrink-venster op de voorgrond staat.",
   "recorder.advanced.title": "Geavanceerde codering",
+  "recorder.advanced.encoder-title": "Encoderdetails",
   "recorder.advanced.container": "Container",
   "recorder.advanced.scale-width": "Schaalbreedte",
   "recorder.advanced.scale-height": "Schaalhoogte",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Noise gate",
   "recorder.advanced.noise-suppression": "Ruisonderdrukking",
   "recorder.budget.duration-only": "De opname stopt vanzelf na {0} seconden.",
-  "recorder.budget.size-only": "De opname stopt vanzelf zodra deze {0} MB bereikt.",
+  "recorder.budget.size-only": "De opname stopt vanzelf zodra deze {0} MB bereikt.",
   "recorder.output.open-when-done": "Map openen wanneer de opname stopt",
   "recorder.discarded": "Opname weggegooid; het bestand is verwijderd.",
   "recorder.target.screen-pick": "Scherm",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Annuleren",
   "recorder.wizard.summary": "{0} · {1} · {2} — kwaliteit {3}.",
   "recorder.wizard.no-device": "Geen apparaat gevonden voor {0}; die bron blijft stil.",
-  "recorder.replay.seconds": "Te behouden lengte"
+  "recorder.replay.seconds": "Te behouden lengte",
+  "recorder.region.hide": "Kader verbergen (F9)",
+  "recorder.region.stop-close": "Opname stoppen en sluiten"
 }

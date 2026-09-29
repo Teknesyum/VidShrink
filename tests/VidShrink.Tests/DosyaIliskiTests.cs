@@ -235,7 +235,7 @@ public sealed class DosyaIliskiTests : IDisposable
 
         using var associations = Open(@"Teknesyum\VidShrink\Capabilities\FileAssociations");
         Assert.NotNull(associations);
-        Assert.Equal(Sorted(ShellIntegration.MediaExtensions.Select(extension => "." + extension)),
+        Assert.Equal(Sorted(ShellIntegration.DefaultAppExtensions.Select(extension => "." + extension)),
             Sorted(associations!.GetValueNames()));
         Assert.All(associations.GetValueNames(), name => Assert.Equal(FileAssociation.ProgId, associations.GetValue(name)));
 

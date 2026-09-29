@@ -87,7 +87,7 @@ internal partial class RecorderView
         _wizardPicks.Clear();
         TxtWizardSummary.IsVisible = false;
         PanelWizard.IsVisible = true;
-        Body.IsVisible = false;
+        RecorderCards.IsVisible = false;
         ShowWizardStep();
     }
 
@@ -96,7 +96,7 @@ internal partial class RecorderView
         if (!PanelWizard.IsVisible) return;
         _wizardPicks.Clear();
         PanelWizard.IsVisible = false;
-        Body.IsVisible = true;
+        RecorderCards.IsVisible = true;
     }
 
     private void RefreshWizard()

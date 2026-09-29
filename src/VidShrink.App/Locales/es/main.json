@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Cambia todos los colores del programa y se recuerda en el próximo inicio.",
   "settings-tab.language.hint": "Cambia el idioma de la interfaz y se recuerda en el próximo inicio.",
-  "settings-tab.default-target.label": "Tamaño de destino por defecto (MB)",
+  "settings-tab.default-target.label": "Tamaño de destino por defecto",
   "settings-tab.default-target.hint": "Fija el tamaño de destino con el que abre la pestaña Reducir.",
   "settings-tab.output-folder.label": "Carpeta de salida",
   "settings-tab.output-folder.beside-source": "Junto al archivo fuente",

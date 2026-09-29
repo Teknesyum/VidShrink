@@ -19,6 +19,8 @@
             BorderThickness="{StaticResource RecorderFrameBorder}"
             IsVisible="False"
             IsHitTestVisible="False"/>
+    <Border x:Name="SnapX" Classes="snap" IsVisible="False" IsHitTestVisible="False"/>
+    <Border x:Name="SnapY" Classes="snap" IsVisible="False" IsHitTestVisible="False"/>
     <Border x:Name="SizeTag"
             Theme="{StaticResource Panel}"
             Padding="{StaticResource RecorderStripPadding}"
@@ -27,4 +29,9 @@
       <TextBlock x:Name="TxtSize" Theme="{StaticResource MonoValue}"/>
     </Border>
   </Canvas>
+  <Window.Styles>
+    <Style Selector="Border.snap">
+      <Setter Property="Background" Value="{DynamicResource NeonBlue}"/>
+    </Style>
+  </Window.Styles>
 </Window>

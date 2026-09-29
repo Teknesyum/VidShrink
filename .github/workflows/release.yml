@@ -535,7 +535,7 @@ jobs:
           gh release create "${{ needs.version.outputs.tag }}" \
             --draft \
             --title "VidShrink ${{ needs.version.outputs.version }}" \
-            --notes "CHANGELOG.md içindeki ${{ needs.version.outputs.version }} bölümüne bakın." \
+            --notes "CHANGELOG.md içindeki ${{ needs.version.outputs.version }} bölümüne bakın. Code signing policy: https://github.com/Teknesyum/VidShrink#code-signing-policy" \
             downloaded/*
 
       # The release is created as a draft so no client sees it half-uploaded, then published

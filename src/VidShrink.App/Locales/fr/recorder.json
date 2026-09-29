@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Afficher dans le dossier",
   "recorder.output.to-shrink": "Envoyer vers Réduire",
   "recorder.output.to-player": "Ouvrir dans le lecteur",
+  "recorder.output.to-editor": "Modifier",
   "recorder.output.done": "Enregistrement terminé : {0} MB en {1} segments",
   "recorder.output.partial": "L'enregistrement ne s'est pas fermé correctement. Le fichier est enregistré et peut être lu. Les dernières secondes peuvent manquer.",
   "recorder.output.partial-broken": "L'enregistrement ne s'est pas fermé correctement. Le fichier ne peut pas être lu. Choisissez MKV pour le prochain enregistrement.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Enregistreur VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Le raccourci global est déjà utilisé par une autre application : {0}. Ces touches ne fonctionnent que lorsque la fenêtre VidShrink est au premier plan.",
   "recorder.advanced.title": "Encodage avancé",
+  "recorder.advanced.encoder-title": "Détails de l’encodeur",
   "recorder.advanced.container": "Conteneur",
   "recorder.advanced.scale-width": "Largeur de mise à l'échelle",
   "recorder.advanced.scale-height": "Hauteur de mise à l'échelle",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Porte de bruit",
   "recorder.advanced.noise-suppression": "Réduction du bruit",
   "recorder.budget.duration-only": "L'enregistrement s'arrête automatiquement après {0} secondes.",
-  "recorder.budget.size-only": "L'enregistrement s'arrête automatiquement dès qu'il atteint {0} Mo.",
+  "recorder.budget.size-only": "L'enregistrement s'arrête automatiquement dès qu'il atteint {0} Mo.",
   "recorder.output.open-when-done": "Ouvrir le dossier à la fin de l'enregistrement",
   "recorder.discarded": "Enregistrement annulé, le fichier a été supprimé.",
   "recorder.target.screen-pick": "Écran",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Annuler",
   "recorder.wizard.summary": "{0} · {1} · {2} — qualité {3}.",
   "recorder.wizard.no-device": "Aucun périphérique trouvé pour {0} ; cette source reste silencieuse.",
-  "recorder.replay.seconds": "Durée à conserver"
+  "recorder.replay.seconds": "Durée à conserver",
+  "recorder.region.hide": "Masquer le cadre (F9)",
+  "recorder.region.stop-close": "Arrêter l'enregistrement et fermer"
 }

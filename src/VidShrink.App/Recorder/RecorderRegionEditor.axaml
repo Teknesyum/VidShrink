@@ -12,10 +12,10 @@
         TransparencyLevelHint="Transparent"
         auto:AutomationProperties.Name="{loc:Text recorder.region.title}">
   <Canvas x:Name="Surface" Background="Transparent">
-    <Border x:Name="Edge"
-            BorderBrush="{StaticResource NeonEmber}"
-            BorderThickness="{StaticResource RecorderFrameBorder}"
-            IsHitTestVisible="False"/>
+    <Rectangle x:Name="Edge"
+               Stroke="{DynamicResource NeonEmber}"
+               StrokeThickness="{StaticResource RecorderFrameThickness}"
+               IsHitTestVisible="False"/>
     <Border x:Name="HandleTopLeft" Classes="grip" IsHitTestVisible="False"/>
     <Border x:Name="HandleTop" Classes="grip" IsHitTestVisible="False"/>
     <Border x:Name="HandleTopRight" Classes="grip" IsHitTestVisible="False"/>
@@ -24,31 +24,33 @@
     <Border x:Name="HandleBottom" Classes="grip" IsHitTestVisible="False"/>
     <Border x:Name="HandleBottomLeft" Classes="grip" IsHitTestVisible="False"/>
     <Border x:Name="HandleLeft" Classes="grip" IsHitTestVisible="False"/>
+    <Border x:Name="SnapX" Classes="snap" IsVisible="False" IsHitTestVisible="False"/>
+    <Border x:Name="SnapY" Classes="snap" IsVisible="False" IsHitTestVisible="False"/>
     <Border x:Name="Toolbar"
             Theme="{StaticResource Panel}"
             Padding="{StaticResource RecorderRegionToolbarPadding}">
-      <StackPanel Orientation="Horizontal">
+      <StackPanel Orientation="Horizontal" Spacing="{StaticResource RecorderRegionButtonGap}">
         <Button x:Name="BtnStart"
                 Classes="tool"
                 Theme="{StaticResource PrimaryButton}"
                 ToolTip.Tip="{loc:Text recorder.region.start}"
                 auto:AutomationProperties.Name="{loc:Text recorder.region.start}">
-          <Path Width="{StaticResource IconSizeSm}"
-                Height="{StaticResource IconSizeSm}"
+          <Path Width="{StaticResource RecorderRegionIconSize}"
+                Height="{StaticResource RecorderRegionIconSize}"
                 Stretch="Uniform"
                 Data="{StaticResource IconRecorder}"
-                Fill="{StaticResource OnNeon}"/>
+                Fill="{DynamicResource OnNeon}"/>
         </Button>
         <Button x:Name="BtnSettings"
                 Classes="tool"
                 Theme="{StaticResource GhostButton}"
                 ToolTip.Tip="{loc:Text recorder.region.settings}"
                 auto:AutomationProperties.Name="{loc:Text recorder.region.settings}">
-          <Path Width="{StaticResource IconSizeSm}"
-                Height="{StaticResource IconSizeSm}"
+          <Path Width="{StaticResource RecorderRegionIconSize}"
+                Height="{StaticResource RecorderRegionIconSize}"
                 Stretch="Uniform"
                 Data="{StaticResource IconSettings}"
-                Fill="{StaticResource TextBody}"/>
+                Fill="{DynamicResource TextBody}"/>
         </Button>
         <Button x:Name="BtnPause"
                 Classes="tool"
@@ -56,11 +58,11 @@
                 IsVisible="False"
                 ToolTip.Tip="{loc:Text recorder.strip.pause}"
                 auto:AutomationProperties.Name="{loc:Text recorder.strip.pause}">
-          <Path Width="{StaticResource IconSizeSm}"
-                Height="{StaticResource IconSizeSm}"
+          <Path Width="{StaticResource RecorderRegionIconSize}"
+                Height="{StaticResource RecorderRegionIconSize}"
                 Stretch="Uniform"
                 Data="{StaticResource IconPause}"
-                Fill="{StaticResource TextBody}"/>
+                Fill="{DynamicResource TextBody}"/>
         </Button>
         <Button x:Name="BtnResume"
                 Classes="tool"
@@ -68,11 +70,11 @@
                 IsVisible="False"
                 ToolTip.Tip="{loc:Text recorder.strip.resume}"
                 auto:AutomationProperties.Name="{loc:Text recorder.strip.resume}">
-          <Path Width="{StaticResource IconSizeSm}"
-                Height="{StaticResource IconSizeSm}"
+          <Path Width="{StaticResource RecorderRegionIconSize}"
+                Height="{StaticResource RecorderRegionIconSize}"
                 Stretch="Uniform"
                 Data="{StaticResource IconPlay}"
-                Fill="{StaticResource TextBody}"/>
+                Fill="{DynamicResource TextBody}"/>
         </Button>
         <Button x:Name="BtnStop"
                 Classes="tool"
@@ -80,22 +82,46 @@
                 IsVisible="False"
                 ToolTip.Tip="{loc:Text recorder.strip.stop}"
                 auto:AutomationProperties.Name="{loc:Text recorder.strip.stop}">
-          <Path Width="{StaticResource IconSizeSm}"
-                Height="{StaticResource IconSizeSm}"
+          <Path Width="{StaticResource RecorderRegionIconSize}"
+                Height="{StaticResource RecorderRegionIconSize}"
                 Stretch="Uniform"
                 Data="{StaticResource IconStop}"
-                Fill="{StaticResource OnNeon}"/>
+                Fill="{DynamicResource OnNeon}"/>
+        </Button>
+        <Button x:Name="BtnSnapshot"
+                Classes="tool"
+                Theme="{StaticResource GhostButton}"
+                IsVisible="False"
+                ToolTip.Tip="{loc:Text recorder.strip.snapshot}"
+                auto:AutomationProperties.Name="{loc:Text recorder.strip.snapshot}">
+          <Path Width="{StaticResource RecorderRegionIconSize}"
+                Height="{StaticResource RecorderRegionIconSize}"
+                Stretch="Uniform"
+                Data="{StaticResource IconCamera}"
+                Fill="{DynamicResource TextBody}"/>
+        </Button>
+        <Button x:Name="BtnHide"
+                Classes="tool"
+                Theme="{StaticResource GhostButton}"
+                IsVisible="False"
+                ToolTip.Tip="{loc:Text recorder.region.hide}"
+                auto:AutomationProperties.Name="{loc:Text recorder.region.hide}">
+          <Path Width="{StaticResource RecorderRegionIconSize}"
+                Height="{StaticResource RecorderRegionIconSize}"
+                Stretch="Uniform"
+                Data="{StaticResource IconEyeOff}"
+                Fill="{DynamicResource TextBody}"/>
         </Button>
         <Button x:Name="BtnClose"
                 Classes="tool"
                 Theme="{StaticResource GhostButton}"
                 ToolTip.Tip="{loc:Text recorder.region.close}"
                 auto:AutomationProperties.Name="{loc:Text recorder.region.close}">
-          <Path Width="{StaticResource IconSizeSm}"
-                Height="{StaticResource IconSizeSm}"
+          <Path Width="{StaticResource RecorderRegionIconSize}"
+                Height="{StaticResource RecorderRegionIconSize}"
                 Stretch="Uniform"
                 Data="{StaticResource IconClose}"
-                Fill="{StaticResource TextBody}"/>
+                Fill="{DynamicResource TextBody}"/>
         </Button>
       </StackPanel>
     </Border>
@@ -107,13 +133,23 @@
       <Setter Property="MinWidth" Value="0"/>
       <Setter Property="MinHeight" Value="0"/>
       <Setter Property="Padding" Value="0"/>
+      <Setter Property="CornerRadius" Value="{StaticResource RecorderRegionButtonRadius}"/>
       <Setter Property="HorizontalContentAlignment" Value="Center"/>
       <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.tool:pointerover">
+      <Setter Property="RenderTransform" Value="none"/>
+    </Style>
+    <Style Selector="Button.tool:pressed">
+      <Setter Property="RenderTransform" Value="none"/>
+    </Style>
+    <Style Selector="Border.snap">
+      <Setter Property="Background" Value="{DynamicResource NeonBlue}"/>
     </Style>
     <Style Selector="Border.grip">
       <Setter Property="Width" Value="{StaticResource RecorderRegionHandle}"/>
       <Setter Property="Height" Value="{StaticResource RecorderRegionHandle}"/>
-      <Setter Property="Background" Value="{StaticResource NeonEmber}"/>
+      <Setter Property="Background" Value="{DynamicResource NeonEmber}"/>
     </Style>
   </Window.Styles>
 </Window>

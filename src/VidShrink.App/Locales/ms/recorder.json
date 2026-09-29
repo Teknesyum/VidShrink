@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Tunjuk dalam folder",
   "recorder.output.to-shrink": "Hantar ke Kecilkan",
   "recorder.output.to-player": "Buka dalam pemain",
+  "recorder.output.to-editor": "Sunting",
   "recorder.output.done": "Rakaman selesai: {0} MB dalam {1} segmen",
   "recorder.output.partial": "Rakaman tidak ditutup dengan betul. Fail telah disimpan dan boleh dimainkan. Beberapa saat terakhir mungkin hilang.",
   "recorder.output.partial-broken": "Rakaman tidak ditutup dengan betul. Fail tidak boleh dimainkan. Pilih MKV untuk rakaman seterusnya.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Perakam VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Pintasan global telah digunakan oleh aplikasi lain: {0}. Kekunci ini hanya berfungsi apabila tetingkap VidShrink berada di hadapan.",
   "recorder.advanced.title": "Pengekodan lanjutan",
+  "recorder.advanced.encoder-title": "Butiran pengekod",
   "recorder.advanced.container": "Bekas (container)",
   "recorder.advanced.scale-width": "Lebar skala",
   "recorder.advanced.scale-height": "Tinggi skala",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Pintu hingar (noise gate)",
   "recorder.advanced.noise-suppression": "Penindasan hingar",
   "recorder.budget.duration-only": "Rakaman berhenti sendiri selepas {0} saat.",
-  "recorder.budget.size-only": "Rakaman berhenti sendiri apabila mencapai {0} MB.",
+  "recorder.budget.size-only": "Rakaman berhenti sendiri apabila mencapai {0} MB.",
   "recorder.output.open-when-done": "Buka folder apabila rakaman tamat",
   "recorder.discarded": "Rakaman dibuang; fail telah dipadam.",
   "recorder.target.screen-pick": "Skrin",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Batal",
   "recorder.wizard.summary": "{0} · {1} · {2} — kualiti {3}.",
   "recorder.wizard.no-device": "Tiada peranti ditemui untuk {0}; sumber itu kekal senyap.",
-  "recorder.replay.seconds": "Tempoh untuk disimpan"
+  "recorder.replay.seconds": "Tempoh untuk disimpan",
+  "recorder.region.hide": "Sembunyikan bingkai (F9)",
+  "recorder.region.stop-close": "Hentikan rakaman dan tutup"
 }

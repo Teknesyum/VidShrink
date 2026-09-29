@@ -17,7 +17,8 @@
   "editor.redo": "Rudia",
   "editor.zoom-in": "Kuza",
   "editor.zoom-out": "Punguza",
-  "editor.export": "Hamisha",
+  "editor.save": "Hifadhi",
+  "editor.save-as": "Hifadhi kama…",
   "editor.timeline": "Mstari wa muda",
   "editor.playhead": "Kielekezi cha uchezaji",
   "editor.export.mode": "Hali ya kuhamisha",
@@ -29,5 +30,5 @@
   "editor.export.failed": "Kuhamisha kumeshindwa: {0}",
   "editor.export.reencoded": "Klipu {0} zinabadilisha kasi au zinacheza kinyume, kwa hivyo zinasimbwa upya.",
   "editor.export.fallback": "Chanzo hiki hakiwezi kukatwa bila kusimbwa upya, kwa hivyo video nzima inasimbwa upya.",
-  "editor.export.reverse-limit": "Klipu ya kinyume {0} inazidi kikomo cha kumbukumbu ({1}). Bofya Hamisha tena ili kuendelea."
+  "editor.export.reverse-limit": "Klipu ya kinyume {0} inazidi kikomo cha kumbukumbu ({1}). Bofya Hifadhi tena ili kuendelea."
 }

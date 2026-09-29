@@ -327,4 +327,127 @@ public sealed class KapanistaGuncellemeTests
             Assert.NotEqual(ana["main.update.ready"], hazir);
         }
     }
+
+    [Fact]
+    public void UcArtArdaSessizDususElleDenetimeDoner()
+    {
+        var sonuc = AppHost.Run(() =>
+        {
+            var p = Pencere();
+            try
+            {
+                var yedek = 0;
+                p.YedekDenetim = () => { yedek++; return Task.CompletedTask; };
+                var izler = new List<string>();
+                for (var i = 0; i < 4; i++)
+                {
+                    p.UpdateReports.Enqueue(new UpdateStageReport(UpdateStagePhase.Unreachable, 0.1, 0.1));
+                    p.SessizIndirmeBitti(Task.FromResult<bool?>(false));
+                    izler.Add($"{UpdateHealth.Load(p.SettingsPathOverride).Failures}:{yedek}");
+                }
+                return string.Join(",", izler);
+            }
+            finally { p.Close(); }
+        });
+
+        Assert.Equal("1:0,2:0,3:1,4:1", sonuc);
+    }
+
+    [Fact]
+    public void HataylaBitenSessizIndirmeSebebiyleSayilir()
+    {
+        var kayit = AppHost.Run(() =>
+        {
+            var p = Pencere();
+            try
+            {
+                p.SessizIndirmeBitti(Task.FromException<bool?>(new InvalidDataException("özet tutmadı")));
+                return UpdateHealth.Load(p.SettingsPathOverride);
+            }
+            finally { p.Close(); }
+        });
+
+        Assert.Equal(1, kayit.Failures);
+        Assert.Equal("InvalidDataException: özet tutmadı", kayit.LastError);
+    }
+
+    [Fact]
+    public void GuncelCikanSessizIndirmeSayaciSifirlarKilitVeIptalDokunmaz()
+    {
+        var sonuc = AppHost.Run(() =>
+        {
+            var p = Pencere();
+            try
+            {
+                UpdateHealth.RecordFailure(p.SettingsPathOverride, DateTimeOffset.UtcNow, "x");
+                UpdateHealth.RecordFailure(p.SettingsPathOverride, DateTimeOffset.UtcNow, "x");
+                p.SessizIndirmeBitti(Task.FromResult<bool?>(null));
+                p.SessizIndirmeBitti(Task.FromCanceled<bool?>(new CancellationToken(true)));
+                var once = UpdateHealth.Load(p.SettingsPathOverride).Failures;
+
+                p.UpdateReports.Enqueue(new UpdateStageReport(UpdateStagePhase.Current, 1, 1));
+                p.SessizIndirmeBitti(Task.FromResult<bool?>(false));
+                return $"{once}|{UpdateHealth.Load(p.SettingsPathOverride).Failures}";
+            }
+            finally { p.Close(); }
+        });
+
+        Assert.Equal("2|0", sonuc);
+    }
+
+    [Fact]
+    public void TakiliKayitlaAcilisElleDenetlerVeSessizYoluDaDener()
+    {
+        var sonuc = AppHost.Run(() =>
+        {
+            var p = Pencere();
+            try
+            {
+                for (var i = 0; i < UpdateHealth.FailureLimit; i++)
+                    UpdateHealth.RecordFailure(p.SettingsPathOverride, DateTimeOffset.UtcNow, "x");
+                var yedek = 0;
+                var indirme = 0;
+                p.AcilisBittiBekle = () => Task.CompletedTask;
+                p.OtomatikGuncellemeAcik = () => true;
+                p.YedekDenetim = () => { yedek++; return Task.CompletedTask; };
+                p.SessizIndirici = () => indirme++;
+
+                var is_ = p.OtomatikGuncellemeyiBaslatAsync();
+                for (var i = 0; i < 5 && !is_.IsCompleted; i++) Dispatcher.UIThread.RunJobs();
+                return $"yedek:{yedek}|indirme:{indirme}";
+            }
+            finally { p.Close(); }
+        });
+
+        Assert.Equal("yedek:1|indirme:1", sonuc);
+    }
+
+    [Fact]
+    public void KapanistaKurulumDuserseDususSayilir()
+    {
+        var sonuc = AppHost.Run(() =>
+        {
+            var p = Pencere();
+            try
+            {
+                p.OtomatikGuncellemeAcik = () => true;
+                p.YerindeTakas = _ => false;
+                p.KapanisBaslaticisi = () => false;
+                p.SahnelenenGuncelleme = Sahne();
+                var sonuc = p.KapanistaGuncelle();
+                var kayit = UpdateHealth.Load(p.SettingsPathOverride);
+                return $"{sonuc}|{kayit.Failures}|{kayit.LastError}";
+            }
+            finally { p.Close(); }
+        });
+
+        Assert.Equal("Dustu|1|kapanista-kurulum-dustu=9.9.9", sonuc);
+    }
+
+    [Fact]
+    public void ElleDenetimYedekKipteOtomatikAyaraTakilmaz()
+    {
+        var govde = KaynakGovdesi(Path.Combine("src", "VidShrink.App", "MainWindow.axaml.cs"), "private async Task CheckForUpdateAsync(");
+        Assert.Contains("if (!yedek && UpdateCheck.AutoUpdateEnabled())", govde);
+    }
 }

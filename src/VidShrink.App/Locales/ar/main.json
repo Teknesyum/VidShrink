@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "السمة",
   "settings-tab.theme.hint": "يغيّر كل لون في البرنامج ويُحفظ للتشغيل التالي.",
   "settings-tab.language.hint": "يغيّر لغة الواجهة ويُحفظ للتشغيل التالي.",
-  "settings-tab.default-target.label": "الحجم المستهدف الافتراضي (م.ب)",
+  "settings-tab.default-target.label": "الحجم المستهدف الافتراضي",
   "settings-tab.default-target.hint": "يحدد الحجم المستهدف الذي يفتح به تبويب التقليص.",
   "settings-tab.output-folder.label": "مجلد الناتج",
   "settings-tab.output-folder.beside-source": "بجانب ملف المصدر",

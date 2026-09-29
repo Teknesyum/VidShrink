@@ -422,6 +422,8 @@ $shellMenuExtensions = @(
     '3gp', 'ogv', 'vob', 'asf', 'rm', 'rmvb', 'divx', 'mxf', 'f4v', 'mts', 'dav', 'gif'
 )
 
+$defaultAppExtensions = @('mp4', 'mkv', 'mov', 'avi', 'webm')
+
 function Test-Windows11 {
     return [Environment]::OSVersion.Version.Build -ge 22000
 }
@@ -668,9 +670,13 @@ function Write-FileAssociation([string]$Root, [string]$Executable) {
     Set-RegistryString $capabilities 'ApplicationName' $fileAssociationName
     Set-RegistryString $capabilities 'ApplicationDescription' $fileAssociationName
 
+    [Microsoft.Win32.Registry]::CurrentUser.DeleteSubKeyTree("$capabilities\FileAssociations", $false)
+    foreach ($extension in $defaultAppExtensions) {
+        Set-RegistryString "$capabilities\FileAssociations" ".$extension" $fileAssociationProgId
+    }
+
     foreach ($extension in $shellMenuExtensions) {
         Set-RegistryString "$application\SupportedTypes" ".$extension" ''
-        Set-RegistryString "$capabilities\FileAssociations" ".$extension" $fileAssociationProgId
 
         $list = Open-CurrentUserKey "$classes\.$extension\OpenWithProgids"
         try { $list.SetValue($fileAssociationProgId, [byte[]]@(), [Microsoft.Win32.RegistryValueKind]::None) }

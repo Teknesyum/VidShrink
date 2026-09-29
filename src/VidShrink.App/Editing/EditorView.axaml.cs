@@ -88,9 +88,25 @@ internal partial class EditorView : UserControl
         _driver?.Pause();
     }
 
-    internal async Task OpenSourceAsync(string path)
+    internal async Task EditAsync(string path, double startSeconds)
+    {
+        var start = double.IsFinite(startSeconds) && startSeconds > 0 ? EditTime.FromSeconds(startSeconds) : 0;
+        if (!CurrentMedia.SamePath(path, _source))
+        {
+            await OpenSourceAsync(path, start).ConfigureAwait(true);
+            return;
+        }
+
+        if (_model is not { } model) return;
+        var at = Math.Clamp(start, 0, model.Duration);
+        Timeline.Playhead = at;
+        if (_driver is { } driver) await driver.SeekAsync(at).ConfigureAwait(true);
+    }
+
+    internal async Task OpenSourceAsync(string path, long start = 0)
     {
         CloseDriver();
+        ForgetSaved();
         _source = path;
         _model = null;
         Timeline.Show(null);
@@ -107,7 +123,9 @@ internal partial class EditorView : UserControl
 
         if (!CurrentMedia.SamePath(path, _source) || Preview.Engine is not { } engine || !(engine.DurationSeconds > 0)) return;
         ShowTimeline(EditTimeline.FromSource(EditTime.FromSeconds(engine.DurationSeconds)), SourceFps(KnownInfo?.Invoke(path)?.Fps, engine.FramesPerSecond));
-        await ReloadAsync(0).ConfigureAwait(true);
+        var at = Math.Clamp(start, 0, _model!.Duration);
+        Timeline.Playhead = at;
+        await ReloadAsync(at).ConfigureAwait(true);
     }
 
     internal void ShowTimeline(EditTimeline model, double fps)

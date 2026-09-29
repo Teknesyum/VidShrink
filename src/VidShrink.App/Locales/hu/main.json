@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Téma",
   "settings-tab.theme.hint": "A program minden színét megváltoztatja, és a következő indításkor megmarad.",
   "settings-tab.language.hint": "Megváltoztatja a felület nyelvét, és a következő indításkor megmarad.",
-  "settings-tab.default-target.label": "Alapértelmezett célméret (MB)",
+  "settings-tab.default-target.label": "Alapértelmezett célméret",
   "settings-tab.default-target.hint": "Beállítja, milyen célmérettel nyílik a Tömörítés lap.",
   "settings-tab.output-folder.label": "Kimeneti mappa",
   "settings-tab.output-folder.beside-source": "A forrásfájl mellé",

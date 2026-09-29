@@ -11,18 +11,22 @@ internal static class FolderNavigator
     private static readonly StringComparer PathComparer =
         OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
-    private static readonly HashSet<string> Extensions =
+    private static readonly HashSet<string> VideoExtensions =
         new(ShellIntegration.MediaExtensions.Select(extension => "." + extension), StringComparer.OrdinalIgnoreCase);
+
+    private static readonly HashSet<string> AudioExtensions =
+        new(ShellIntegration.AudioExtensions.Select(extension => "." + extension), StringComparer.OrdinalIgnoreCase);
 
     internal static IReadOnlyList<string> Siblings(string path)
     {
         var folder = Path.GetDirectoryName(Path.GetFullPath(path));
         if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) return Array.Empty<string>();
+        var kind = ShellIntegration.IsAudio(path) ? AudioExtensions : VideoExtensions;
 
         try
         {
             return Directory.EnumerateFiles(folder)
-                .Where(file => Extensions.Contains(Path.GetExtension(file)))
+                .Where(file => kind.Contains(Path.GetExtension(file)))
                 .OrderBy(file => Path.GetFileName(file), NaturalComparer.Instance)
                 .ToList();
         }
@@ -48,7 +52,7 @@ internal static class FolderNavigator
 
     internal static int IndexOf(IReadOnlyList<string> files, string current)
     {
-        var full = Path.GetFullPath(current);
+        var full = PlayerView.IsAddress(current) ? current : Path.GetFullPath(current);
         var index = -1;
         for (var i = 0; i < files.Count; i++)
             if (PathComparer.Equals(files[i], full)) index = i;
@@ -56,8 +60,10 @@ internal static class FolderNavigator
     }
 
     internal static string? Step(string current, bool forward, RepeatMode repeat, bool shuffle, int seed)
+        => Step(Order(Siblings(current), shuffle, seed), current, forward, repeat);
+
+    internal static string? Step(IReadOnlyList<string> files, string current, bool forward, RepeatMode repeat)
     {
-        var files = Order(Siblings(current), shuffle, seed);
         if (files.Count == 0) return null;
 
         var index = IndexOf(files, current);

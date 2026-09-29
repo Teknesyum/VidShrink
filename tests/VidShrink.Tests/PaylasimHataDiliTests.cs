@@ -250,7 +250,7 @@ public sealed class PaylasimHataDiliTests : IDisposable
     /// </summary>
     [Theory]
     [InlineData("src/VidShrink.App/MainWindow.axaml.cs")]
-    [InlineData("src/VidShrink.App/Recorder/RecorderView.Paylas.cs")]
+    [InlineData("src/VidShrink.App/Share/ShareSession.cs")]
     [InlineData("src/VidShrink.App/ShrinkJobWindow.Paylas.cs")]
     public void GosterimYerleriHamAlaniOkumuyor(string yol)
     {

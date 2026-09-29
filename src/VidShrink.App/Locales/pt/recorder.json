@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Mostrar na pasta",
   "recorder.output.to-shrink": "Enviar para Reduzir",
   "recorder.output.to-player": "Abrir no player",
+  "recorder.output.to-editor": "Editar",
   "recorder.output.done": "Gravação concluída: {0} MB em {1} segmentos",
   "recorder.output.partial": "A gravação não foi encerrada corretamente. O arquivo foi salvo e pode ser reproduzido. Os últimos segundos podem estar faltando.",
   "recorder.output.partial-broken": "A gravação não foi encerrada corretamente. O arquivo não pode ser reproduzido. Escolha MKV para a próxima gravação.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Gravador VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "O atalho global já está em uso por outro aplicativo: {0}. Essas teclas só funcionam enquanto a janela do VidShrink estiver em primeiro plano.",
   "recorder.advanced.title": "Codificação avançada",
+  "recorder.advanced.encoder-title": "Detalhes do codificador",
   "recorder.advanced.container": "Contêiner",
   "recorder.advanced.scale-width": "Largura de escala",
   "recorder.advanced.scale-height": "Altura de escala",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Noise gate",
   "recorder.advanced.noise-suppression": "Supressão de ruído",
   "recorder.budget.duration-only": "A gravação para sozinha após {0} segundos.",
-  "recorder.budget.size-only": "A gravação para sozinha ao atingir {0} MB.",
+  "recorder.budget.size-only": "A gravação para sozinha ao atingir {0} MB.",
   "recorder.output.open-when-done": "Abrir a pasta quando a gravação terminar",
   "recorder.discarded": "Gravação descartada; o ficheiro foi eliminado.",
   "recorder.target.screen-pick": "Ecrã",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Cancelar",
   "recorder.wizard.summary": "{0} · {1} · {2} — qualidade {3}.",
   "recorder.wizard.no-device": "Nenhum dispositivo encontrado para {0}; essa fonte fica em silêncio.",
-  "recorder.replay.seconds": "Duração a manter"
+  "recorder.replay.seconds": "Duração a manter",
+  "recorder.region.hide": "Ocultar moldura (F9)",
+  "recorder.region.stop-close": "Parar gravação e fechar"
 }

@@ -2,6 +2,8 @@ using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
+using Avalonia.Styling;
+using System.Text.RegularExpressions;
 
 namespace VidShrink.App.Localization;
 
@@ -94,4 +96,51 @@ public static class Bullets
     public static void SetText(TextBlock block, string? value) => block.SetValue(TextProperty, value);
 
     public static string? GetText(TextBlock block) => block.GetValue(TextProperty);
+}
+
+/// <summary>
+/// Hizalı boşluklarla yazılmış iki sütunlu dil tablosu (<c>etiket  değer</c>, satır başına bir
+/// çift). Tek eş aralıklı <see cref="TextBlock"/>'ta dar kartta satırlar kutudan taşıyordu;
+/// çiftler <see cref="CiftIzgara"/>'ya iner, sığmayınca alt alta dizilir.
+/// </summary>
+public static class Tablo
+{
+    public static readonly AttachedProperty<string?> TextProperty =
+        AvaloniaProperty.RegisterAttached<CiftIzgara, string?>("Text", typeof(Tablo));
+
+    private static readonly Regex Ayirici = new(@"\s{2,}", RegexOptions.CultureInvariant);
+
+    static Tablo()
+        => TextProperty.Changed.AddClassHandler<CiftIzgara, string?>((izgara, args) =>
+            Doldur(izgara, args.NewValue.GetValueOrDefault() ?? string.Empty));
+
+    public static void SetText(CiftIzgara izgara, string? value) => izgara.SetValue(TextProperty, value);
+
+    public static string? GetText(CiftIzgara izgara) => izgara.GetValue(TextProperty);
+
+    internal static IEnumerable<(string Etiket, string Deger)> Ciftler(string metin)
+    {
+        foreach (var satir in metin.Split('\n'))
+        {
+            var temiz = satir.Trim();
+            if (temiz.Length == 0) continue;
+            var parca = Ayirici.Split(temiz, 2);
+            yield return (parca[0], parca.Length > 1 ? parca[1] : string.Empty);
+        }
+    }
+
+    private static void Doldur(CiftIzgara izgara, string metin)
+    {
+        izgara.Children.Clear();
+        var etiketTema = Tema("PlanFactLabel");
+        var degerTema = Tema("Body");
+        foreach (var (etiket, deger) in Ciftler(metin))
+        {
+            izgara.Children.Add(new TextBlock { Text = LanguageCatalog.Display(etiket), Theme = etiketTema });
+            izgara.Children.Add(new TextBlock { Text = deger, Theme = degerTema, TextWrapping = Avalonia.Media.TextWrapping.Wrap });
+        }
+    }
+
+    private static ControlTheme? Tema(string ad)
+        => Application.Current?.TryFindResource(ad, out var tema) == true ? tema as ControlTheme : null;
 }

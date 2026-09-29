@@ -45,6 +45,8 @@
   "settings.update.auto-effect": "Įjungta: nauja versija atsisiunčiama fone ir įdiegiama uždarant VidShrink. Išjungta: apie naują versiją pranešama viršutinėje juostoje, ji įdiegiama mygtuku.",
   "settings.update.no-self-effect": "Šioje sistemoje VidShrink savęs neatnaujina: tik praneša, kad yra nauja versija, ir parodo ją įdiegiančią komandą.",
   "settings.default-app.suggestion": "VidShrink nėra numatytoji vaizdo įrašų programa. Ją galite pasirinkti Windows numatytųjų programų puslapyje.",
+  "settings.default-app.all": "Nustatyti viską",
+  "settings.default-app.all-copied": "Komanda nukopijuota į iškarpinę. Atverkite PowerShell langą ir įklijuokite ją; VidShrink taps numatytąja programa visiems garso ir vaizdo formatams.",
   "settings.default-app.open": "Numatytosios programos",
   "settings.default-app.dismiss": "Daugiau neklausti",
   "settings.player-shortcuts.title": "Leistuvo spartieji klavišai",

@@ -49,6 +49,7 @@
   "recorder.output.reveal": "ফোল্ডারে দেখান",
   "recorder.output.to-shrink": "সংকোচনে পাঠান",
   "recorder.output.to-player": "প্লেয়ারে খুলুন",
+  "recorder.output.to-editor": "সম্পাদনা",
   "recorder.output.done": "রেকর্ডিং শেষ হয়েছে: {1} খণ্ডে {0} MB",
   "recorder.output.partial": "রেকর্ডিং ঠিকভাবে বন্ধ হয়নি। ফাইলটি সংরক্ষিত হয়েছে এবং চালানো যাবে। শেষ কয়েক সেকেন্ড অনুপস্থিত থাকতে পারে।",
   "recorder.output.partial-broken": "রেকর্ডিং ঠিকভাবে বন্ধ হয়নি। ফাইলটি চালানো যাবে না। পরবর্তী রেকর্ডিংয়ের জন্য MKV বেছে নিন।",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink রেকর্ডার · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "গ্লোবাল শর্টকাটটি অন্য একটি অ্যাপ্লিকেশন দ্বারা ব্যবহৃত হচ্ছে: {0}। VidShrink উইন্ডো সামনে থাকা অবস্থায় এই কীগুলো কাজ করে।",
   "recorder.advanced.title": "উন্নত এনকোডিং",
+  "recorder.advanced.encoder-title": "এনকোডারের বিবরণ",
   "recorder.advanced.container": "কন্টেইনার",
   "recorder.advanced.scale-width": "স্কেল প্রস্থ",
   "recorder.advanced.scale-height": "স্কেল উচ্চতা",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "নয়েজ গেট",
   "recorder.advanced.noise-suppression": "নয়েজ দমন",
   "recorder.budget.duration-only": "{0} সেকেন্ড পর রেকর্ডিং নিজে থেকেই বন্ধ হয়ে যাবে।",
-  "recorder.budget.size-only": "{0} MB-তে পৌঁছালে রেকর্ডিং নিজে থেকেই বন্ধ হয়ে যাবে।",
+  "recorder.budget.size-only": "{0} MB-তে পৌঁছালে রেকর্ডিং নিজে থেকেই বন্ধ হয়ে যাবে।",
   "recorder.output.open-when-done": "রেকর্ডিং শেষ হলে ফোল্ডার খুলুন",
   "recorder.discarded": "রেকর্ডিং বাতিল করা হয়েছে, ফাইল মুছে ফেলা হয়েছে।",
   "recorder.target.screen-pick": "স্ক্রিন",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "বাতিল",
   "recorder.wizard.summary": "{0} · {1} · {2} — মান {3}।",
   "recorder.wizard.no-device": "{0}-এর জন্য কোনো ডিভাইস পাওয়া যায়নি; সেই উৎস নীরব থাকবে।",
-  "recorder.replay.seconds": "রাখার দৈর্ঘ্য"
+  "recorder.replay.seconds": "রাখার দৈর্ঘ্য",
+  "recorder.region.hide": "ফ্রেম লুকান (F9)",
+  "recorder.region.stop-close": "রেকর্ডিং থামিয়ে বন্ধ করুন"
 }

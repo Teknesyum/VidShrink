@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Näita kaustas",
   "recorder.output.to-shrink": "Saada tihendamisse",
   "recorder.output.to-player": "Ava mängijas",
+  "recorder.output.to-editor": "Muuda",
   "recorder.output.done": "Salvestus lõpetatud: {0} MB {1} segmendis",
   "recorder.output.partial": "Salvestus ei sulgunud korralikult. Fail on salvestatud ja seda saab esitada. Viimased sekundid võivad puududa.",
   "recorder.output.partial-broken": "Salvestus ei sulgunud korralikult. Faili ei saa esitada. Valige järgmiseks salvestuseks MKV.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrinki salvesti · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Globaalne otsetee on juba teise rakenduse kasutuses: {0}. Need klahvid töötavad ainult siis, kui VidShrinki aken on esiplaanil.",
   "recorder.advanced.title": "Täpsem kodeerimine",
+  "recorder.advanced.encoder-title": "Kodeerija üksikasjad",
   "recorder.advanced.container": "Konteiner",
   "recorder.advanced.scale-width": "Skaala laius",
   "recorder.advanced.scale-height": "Skaala kõrgus",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Müravärav",
   "recorder.advanced.noise-suppression": "Müra summutamine",
   "recorder.budget.duration-only": "Salvestus peatub automaatselt {0} sekundi pärast.",
-  "recorder.budget.size-only": "Salvestus peatub automaatselt, kui see jõuab {0} MB-ni.",
+  "recorder.budget.size-only": "Salvestus peatub automaatselt, kui see jõuab {0} MB-ni.",
   "recorder.output.open-when-done": "Ava kaust, kui salvestus lõpeb",
   "recorder.discarded": "Salvestus tühistati, fail kustutati.",
   "recorder.target.screen-pick": "Ekraan",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Loobu",
   "recorder.wizard.summary": "{0} · {1} · {2} — kvaliteet {3}.",
   "recorder.wizard.no-device": "{0} jaoks seadet ei leitud; see allikas jääb vaikseks.",
-  "recorder.replay.seconds": "Säilitatav pikkus"
+  "recorder.replay.seconds": "Säilitatav pikkus",
+  "recorder.region.hide": "Peida raam (F9)",
+  "recorder.region.stop-close": "Peata salvestus ja sulge"
 }

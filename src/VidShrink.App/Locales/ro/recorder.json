@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Arată în dosar",
   "recorder.output.to-shrink": "Trimite la Micșorare",
   "recorder.output.to-player": "Deschide în player",
+  "recorder.output.to-editor": "Editează",
   "recorder.output.done": "Înregistrare terminată: {0} MB în {1} segmente",
   "recorder.output.partial": "Înregistrarea nu s-a închis corect. Fișierul este salvat și poate fi redat. Este posibil să lipsească ultimele secunde.",
   "recorder.output.partial-broken": "Înregistrarea nu s-a închis corect. Fișierul nu poate fi redat. Alegeți MKV pentru următoarea înregistrare.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Recorder VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Comanda rapidă globală este folosită de o altă aplicație: {0}. Aceste taste funcționează doar cât timp fereastra VidShrink este în prim-plan.",
   "recorder.advanced.title": "Codificare avansată",
+  "recorder.advanced.encoder-title": "Detalii codificator",
   "recorder.advanced.container": "Container",
   "recorder.advanced.scale-width": "Lățime scalare",
   "recorder.advanced.scale-height": "Înălțime scalare",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Noise gate",
   "recorder.advanced.noise-suppression": "Suprimarea zgomotului",
   "recorder.budget.duration-only": "Înregistrarea se oprește automat după {0} secunde.",
-  "recorder.budget.size-only": "Înregistrarea se oprește automat când ajunge la {0} MB.",
+  "recorder.budget.size-only": "Înregistrarea se oprește automat când ajunge la {0} MB.",
   "recorder.output.open-when-done": "Deschide folderul la finalul înregistrării",
   "recorder.discarded": "Înregistrare anulată; fișierul a fost șters.",
   "recorder.target.screen-pick": "Ecran",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Anulează",
   "recorder.wizard.summary": "{0} · {1} · {2} — calitate {3}.",
   "recorder.wizard.no-device": "Niciun dispozitiv găsit pentru {0}; sursa aceea rămâne fără sunet.",
-  "recorder.replay.seconds": "Durata de păstrat"
+  "recorder.replay.seconds": "Durata de păstrat",
+  "recorder.region.hide": "Ascunde cadrul (F9)",
+  "recorder.region.stop-close": "Oprește înregistrarea și închide"
 }

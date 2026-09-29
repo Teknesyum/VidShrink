@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Rādīt mapē",
   "recorder.output.to-shrink": "Sūtīt saspiešanai",
   "recorder.output.to-player": "Atvērt atskaņotājā",
+  "recorder.output.to-editor": "Rediģēt",
   "recorder.output.done": "Ierakstīšana pabeigta: {0} MB, {1} daļās",
   "recorder.output.partial": "Ieraksts netika korekti aizvērts. Fails ir saglabāts, un to var atskaņot. Pēdējās sekundes var trūkt.",
   "recorder.output.partial-broken": "Ieraksts netika korekti aizvērts. Failu nevar atskaņot. Nākamajam ierakstam izvēlieties MKV.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink ierakstītājs · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Globālo saīsni jau izmanto cita lietotne: {0}. Šie taustiņi darbojas tikai tad, kad VidShrink logs ir priekšplānā.",
   "recorder.advanced.title": "Papildu kodēšana",
+  "recorder.advanced.encoder-title": "Kodētāja iestatījumi",
   "recorder.advanced.container": "Konteiners",
   "recorder.advanced.scale-width": "Mēroga platums",
   "recorder.advanced.scale-height": "Mēroga augstums",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Trokšņa vārti",
   "recorder.advanced.noise-suppression": "Trokšņa slāpēšana",
   "recorder.budget.duration-only": "Ierakstīšana automātiski apstāsies pēc {0} sekundēm.",
-  "recorder.budget.size-only": "Ierakstīšana automātiski apstāsies, sasniedzot {0} MB.",
+  "recorder.budget.size-only": "Ierakstīšana automātiski apstāsies, sasniedzot {0} MB.",
   "recorder.output.open-when-done": "Atvērt mapi, kad ierakstīšana beidzas",
   "recorder.discarded": "Ierakstīšana atcelta, fails izdzēsts.",
   "recorder.target.screen-pick": "Ekrāns",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Atcelt",
   "recorder.wizard.summary": "{0} · {1} · {2} — kvalitāte {3}.",
   "recorder.wizard.no-device": "{0} netika atrasta neviena ierīce; šis avots paliks bez skaņas.",
-  "recorder.replay.seconds": "Saglabājamais garums"
+  "recorder.replay.seconds": "Saglabājamais garums",
+  "recorder.region.hide": "Paslēpt rāmi (F9)",
+  "recorder.region.stop-close": "Apturēt ierakstu un aizvērt"
 }

@@ -49,6 +49,7 @@
   "recorder.output.reveal": "フォルダーで表示",
   "recorder.output.to-shrink": "圧縮へ送る",
   "recorder.output.to-player": "プレーヤーで開く",
+  "recorder.output.to-editor": "編集",
   "recorder.output.done": "録画完了: {1} セグメントで {0} MB",
   "recorder.output.partial": "録画が正しく閉じられませんでした。ファイルは保存されており、再生できます。最後の数秒が欠けている可能性があります。",
   "recorder.output.partial-broken": "録画が正しく閉じられませんでした。ファイルは再生できません。次の録画では MKV を選んでください。",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrinkレコーダー · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "グローバルショートカットは別のアプリが使用しています: {0}。これらのキーはVidShrinkウィンドウが最前面にあるときのみ機能します。",
   "recorder.advanced.title": "詳細エンコード設定",
+  "recorder.advanced.encoder-title": "エンコーダーの詳細",
   "recorder.advanced.container": "コンテナ",
   "recorder.advanced.scale-width": "スケール後の幅",
   "recorder.advanced.scale-height": "スケール後の高さ",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "ノイズゲート",
   "recorder.advanced.noise-suppression": "ノイズ抑制",
   "recorder.budget.duration-only": "録画は{0}秒後に自動的に停止します。",
-  "recorder.budget.size-only": "録画は{0} MBに達すると自動的に停止します。",
+  "recorder.budget.size-only": "録画は{0} MBに達すると自動的に停止します。",
   "recorder.output.open-when-done": "録画終了時にフォルダーを開く",
   "recorder.discarded": "録画は破棄され、ファイルは削除されました。",
   "recorder.target.screen-pick": "画面",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "キャンセル",
   "recorder.wizard.summary": "{0} · {1} · {2} — 画質 {3}",
   "recorder.wizard.no-device": "{0} に対応するデバイスが見つかりません。この音源は無音のままです。",
-  "recorder.replay.seconds": "保持する長さ"
+  "recorder.replay.seconds": "保持する長さ",
+  "recorder.region.hide": "枠を隠す (F9)",
+  "recorder.region.stop-close": "録画を停止して閉じる"
 }

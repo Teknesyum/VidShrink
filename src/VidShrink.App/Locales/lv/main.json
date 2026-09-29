@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tēma",
   "settings-tab.theme.hint": "Maina katru programmas krāsu un tiek atcerēta nākamajā palaišanā.",
   "settings-tab.language.hint": "Maina saskarnes valodu un tiek atcerēta nākamajā palaišanā.",
-  "settings-tab.default-target.label": "Noklusējuma mērķa izmērs (MB)",
+  "settings-tab.default-target.label": "Noklusējuma mērķa izmērs",
   "settings-tab.default-target.hint": "Nosaka mērķa izmēru, ar kuru atveras cilne Saspiest.",
   "settings-tab.output-folder.label": "Izvades mape",
   "settings-tab.output-folder.beside-source": "Blakus avota failam",

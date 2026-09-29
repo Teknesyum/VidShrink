@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +17,9 @@ internal partial class RecorderRegionPicker : Window
     private PixelRect _desktop;
     private PixelPoint? _start;
     private PixelRect _current;
+    private IReadOnlyList<PixelRect> _targets = Array.Empty<PixelRect>();
+    private IReadOnlyList<PixelRect> _snapLines = Array.Empty<PixelRect>();
+    private bool _snapOff;
 
     public RecorderRegionPicker() : this(null)
     {
@@ -75,24 +80,43 @@ internal partial class RecorderRegionPicker : Window
 
     private PixelPoint ScreenPoint(PointerEventArgs e) => this.PointToScreen(e.GetPosition(this));
 
+    private int Pixels(string key)
+        => this.TryFindResource(key, out var value) && value is double d ? Math.Max(1, (int)Math.Ceiling(d * RenderScaling)) : 0;
+
+    internal IReadOnlyList<PixelRect> SnapLines => _snapLines;
+
+    internal static IReadOnlyList<PixelRect> SnapTargets(Window window)
+    {
+        var screens = window.Screens.All.Select(s => (s.Bounds, s.Scaling)).ToList();
+        return RegionSnap.Targets(screens.Select(s => s.Bounds), RecorderWindows.SnapFrames(screens));
+    }
+
+    private bool SnapOff(PointerEventArgs e) => _snapOff = e.KeyModifiers.HasFlag(KeyModifiers.Alt);
+
     private void OnPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
-        _start = ScreenPoint(e);
+        _targets = SnapTargets(this);
+        _start = RegionSnap.Point(ScreenPoint(e), _targets, Pixels("RecorderRegionSnap"), SnapOff(e)).Point;
         e.Pointer.Capture(Surface);
         Draw(_start.Value);
     }
 
     private void OnMoved(object? sender, PointerEventArgs e)
     {
-        if (_start is not null) Draw(ScreenPoint(e));
+        if (_start is null) return;
+        SnapOff(e);
+        Draw(ScreenPoint(e));
     }
 
     private void OnReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (_start is null) return;
+        SnapOff(e);
         Draw(ScreenPoint(e));
         _start = null;
+        _snapLines = Array.Empty<PixelRect>();
+        ShowSnapLines();
         e.Pointer.Capture(null);
         if (!RegionDraw.Usable(_current)) return;
         _done.TrySetResult(_current);
@@ -102,7 +126,10 @@ internal partial class RecorderRegionPicker : Window
     private void Draw(PixelPoint end)
     {
         if (_start is not { } start) return;
-        _current = RegionDraw.FromDrag(start, end, _ratio, _desktop);
+        var snap = RegionSnap.Point(end, _targets, Pixels("RecorderRegionSnap"), _snapOff);
+        _current = RegionDraw.FromDrag(start, snap.Point, _ratio, _desktop);
+        _snapLines = RegionSnap.Lines(_current, snap.X, snap.Y, Pixels("RecorderRegionSnapLine"));
+        ShowSnapLines();
         var topLeft = this.PointToClient(_current.Position);
         var bottomRight = this.PointToClient(_current.BottomRight);
         Canvas.SetLeft(Selection, topLeft.X);
@@ -116,6 +143,23 @@ internal partial class RecorderRegionPicker : Window
         var yer = TagPosition(new Rect(topLeft, bottomRight), SizeTag.DesiredSize, Bounds.Size);
         Canvas.SetLeft(SizeTag, yer.X);
         Canvas.SetTop(SizeTag, yer.Y);
+    }
+
+    private void ShowSnapLines()
+    {
+        var controls = new Control[] { SnapX, SnapY };
+        for (var i = 0; i < controls.Length; i++)
+        {
+            var show = i < _snapLines.Count;
+            controls[i].IsVisible = show;
+            if (!show) continue;
+            var topLeft = this.PointToClient(_snapLines[i].Position);
+            var bottomRight = this.PointToClient(_snapLines[i].BottomRight);
+            Canvas.SetLeft(controls[i], topLeft.X);
+            Canvas.SetTop(controls[i], topLeft.Y);
+            controls[i].Width = Math.Max(0, bottomRight.X - topLeft.X);
+            controls[i].Height = Math.Max(0, bottomRight.Y - topLeft.Y);
+        }
     }
 
     /// <summary>

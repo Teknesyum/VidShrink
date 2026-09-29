@@ -49,6 +49,7 @@
   "recorder.output.reveal": "نمایش در پوشه",
   "recorder.output.to-shrink": "ارسال به فشرده‌سازی",
   "recorder.output.to-player": "باز کردن در پخش‌کننده",
+  "recorder.output.to-editor": "ویرایش",
   "recorder.output.done": "ضبط پایان یافت: {0} MB در {1} بخش",
   "recorder.output.partial": "ضبط به‌درستی بسته نشد. فایل ذخیره شده است و قابل پخش است. ممکن است چند ثانیه پایانی موجود نباشد.",
   "recorder.output.partial-broken": "ضبط به‌درستی بسته نشد. فایل قابل پخش نیست. برای ضبط بعدی MKV را انتخاب کنید.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "ضبط‌کننده VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "میان‌بر سراسری توسط برنامه دیگری استفاده می‌شود: {0}. این کلیدها فقط زمانی کار می‌کنند که پنجره VidShrink در جلو باشد.",
   "recorder.advanced.title": "رمزگذاری پیشرفته",
+  "recorder.advanced.encoder-title": "جزئیات رمزگذار",
   "recorder.advanced.container": "کانتینر",
   "recorder.advanced.scale-width": "عرض مقیاس",
   "recorder.advanced.scale-height": "ارتفاع مقیاس",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "گیت نویز",
   "recorder.advanced.noise-suppression": "کاهش نویز",
   "recorder.budget.duration-only": "ضبط پس از {0} ثانیه به‌طور خودکار متوقف می‌شود.",
-  "recorder.budget.size-only": "ضبط وقتی به {0} مگابایت برسد، به‌طور خودکار متوقف می‌شود.",
+  "recorder.budget.size-only": "ضبط وقتی به {0} مگابایت برسد، به‌طور خودکار متوقف می‌شود.",
   "recorder.output.open-when-done": "باز کردن پوشه پس از پایان ضبط",
   "recorder.discarded": "ضبط لغو شد؛ فایل حذف گردید.",
   "recorder.target.screen-pick": "صفحه‌نمایش",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "لغو",
   "recorder.wizard.summary": "{0} · {1} · {2} — کیفیت {3}.",
   "recorder.wizard.no-device": "دستگاهی برای {0} پیدا نشد؛ آن منبع بدون صدا می‌ماند.",
-  "recorder.replay.seconds": "طول زمانی که باید نگه داشته شود"
+  "recorder.replay.seconds": "طول زمانی که باید نگه داشته شود",
+  "recorder.region.hide": "پنهان کردن قاب (F9)",
+  "recorder.region.stop-close": "توقف ضبط و بستن"
 }

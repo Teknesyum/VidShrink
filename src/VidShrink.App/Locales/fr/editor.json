@@ -17,7 +17,8 @@
   "editor.redo": "Rétablir",
   "editor.zoom-in": "Zoom avant",
   "editor.zoom-out": "Zoom arrière",
-  "editor.export": "Exporter",
+  "editor.save": "Enregistrer",
+  "editor.save-as": "Enregistrer sous…",
   "editor.timeline": "Chronologie",
   "editor.playhead": "Tête de lecture",
   "editor.export.mode": "Mode d'exportation",
@@ -29,5 +30,5 @@
   "editor.export.failed": "Échec de l'exportation : {0}",
   "editor.export.reencoded": "Les clips {0} changent de vitesse ou sont inversés et sont réencodés.",
   "editor.export.fallback": "Cette source ne peut pas être coupée sans réencodage, la vidéo entière est donc réencodée.",
-  "editor.export.reverse-limit": "Le clip inversé {0} dépasse la limite de mémoire ({1}). Appuyez de nouveau sur Exporter pour continuer."
+  "editor.export.reverse-limit": "Le clip inversé {0} dépasse la limite de mémoire ({1}). Appuyez de nouveau sur Enregistrer pour continuer."
 }

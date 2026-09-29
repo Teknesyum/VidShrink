@@ -49,6 +49,7 @@
   "recorder.output.reveal": "Показать в папке",
   "recorder.output.to-shrink": "Отправить в Сжать",
   "recorder.output.to-player": "Открыть в плеере",
+  "recorder.output.to-editor": "Редактировать",
   "recorder.output.done": "Запись завершена: {0} МБ в {1} сегментах",
   "recorder.output.partial": "Запись завершилась некорректно. Файл сохранён, его можно воспроизвести. Последние секунды могут отсутствовать.",
   "recorder.output.partial-broken": "Запись завершилась некорректно. Файл невозможно воспроизвести. Для следующей записи выберите MKV.",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "Рекордер VidShrink · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "Глобальное сочетание клавиш уже занято другим приложением: {0}. Эти клавиши работают только когда окно VidShrink находится на переднем плане.",
   "recorder.advanced.title": "Расширенное кодирование",
+  "recorder.advanced.encoder-title": "Параметры кодировщика",
   "recorder.advanced.container": "Контейнер",
   "recorder.advanced.scale-width": "Ширина масштабирования",
   "recorder.advanced.scale-height": "Высота масштабирования",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "Шумовой гейт",
   "recorder.advanced.noise-suppression": "Подавление шума",
   "recorder.budget.duration-only": "Запись остановится автоматически через {0} секунд.",
-  "recorder.budget.size-only": "Запись остановится автоматически по достижении {0} МБ.",
+  "recorder.budget.size-only": "Запись остановится автоматически по достижении {0} МБ.",
   "recorder.output.open-when-done": "Открывать папку по завершении записи",
   "recorder.discarded": "Запись отменена, файл удалён.",
   "recorder.target.screen-pick": "Экран",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "Отмена",
   "recorder.wizard.summary": "{0} · {1} · {2} — качество {3}.",
   "recorder.wizard.no-device": "Устройство для {0} не найдено; этот источник останется без звука.",
-  "recorder.replay.seconds": "Длина для сохранения"
+  "recorder.replay.seconds": "Длина для сохранения",
+  "recorder.region.hide": "Скрыть рамку (F9)",
+  "recorder.region.stop-close": "Остановить запись и закрыть"
 }

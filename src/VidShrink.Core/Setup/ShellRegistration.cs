@@ -305,11 +305,28 @@ public static class ShellRegistration
 
         SetString(capabilities, "ApplicationName", AssociationName);
         SetString(capabilities, "ApplicationDescription", AssociationName);
-        foreach (var extension in ShellIntegration.MediaExtensions)
+        Registry.CurrentUser.DeleteSubKeyTree(capabilities + @"\FileAssociations", false);
+        foreach (var extension in ShellIntegration.DefaultAppExtensions)
             SetString(capabilities + @"\FileAssociations", "." + extension, ProgId);
 
         SetString(software + @"\RegisteredApplications", AssociationName, capabilities);
         return ShellIntegration.MediaExtensions.Count;
+    }
+
+    [SupportedOSPlatform("windows")]
+    public static int TrimDefaultAppList(string classesRoot)
+    {
+        var path = $@"{SoftwareRoot(classesRoot)}\{CapabilitiesPath}\FileAssociations";
+        using var key = Registry.CurrentUser.OpenSubKey(path, writable: true);
+        if (key is null) return 0;
+        var removed = 0;
+        foreach (var name in key.GetValueNames())
+        {
+            if (ShellIntegration.DefaultAppExtensions.Contains(name.TrimStart('.'), StringComparer.OrdinalIgnoreCase)) continue;
+            key.DeleteValue(name, false);
+            removed++;
+        }
+        return removed;
     }
 
     [SupportedOSPlatform("windows")]

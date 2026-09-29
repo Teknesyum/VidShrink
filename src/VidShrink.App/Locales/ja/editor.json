@@ -17,7 +17,8 @@
   "editor.redo": "やり直し",
   "editor.zoom-in": "拡大",
   "editor.zoom-out": "縮小",
-  "editor.export": "書き出し",
+  "editor.save": "保存",
+  "editor.save-as": "名前を付けて保存…",
   "editor.timeline": "タイムライン",
   "editor.playhead": "再生ヘッド",
   "editor.export.mode": "書き出しモード",
@@ -29,5 +30,5 @@
   "editor.export.failed": "書き出しに失敗しました: {0}",
   "editor.export.reencoded": "クリップ {0} は速度変更または逆再生のため再エンコードされます。",
   "editor.export.fallback": "このソースは再エンコードなしでカットできないため、動画全体を再エンコードします。",
-  "editor.export.reverse-limit": "逆再生クリップ {0} がメモリ上限（{1}）を超えています。続けるにはもう一度「書き出し」を押してください。"
+  "editor.export.reverse-limit": "逆再生クリップ {0} がメモリ上限（{1}）を超えています。続けるにはもう一度「保存」を押してください。"
 }

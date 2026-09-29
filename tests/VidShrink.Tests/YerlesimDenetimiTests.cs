@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -270,6 +270,22 @@ public sealed class YerlesimDenetimiTests
             satir.IsVisible = true;
         kaydedici.TxtBudgetNote.Text = Strings.Get("recorder.output.partial");
     });
+
+    /// <summary>
+    /// Kaydedici Gelişmiş kipte: kip seçimi, seçenek, kodlama ve kamera kartları açık. Sekme
+    /// dolaşımı kaydediciyi Basit kurduğu için bu kartlar hiç taranmıyordu; ayar dosyası
+    /// ölçüden sonra geri konur, yoksa Gelişmiş sonraki sınıflara sızıyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Kollar))]
+    [MemberData(nameof(KalanDilDarKollari))]
+    public void KaydediciGelismisteKesikCakismaTasmaYok(string dil, bool dar) =>
+        KaydirmasizSekmeTests.AyarlariKorurken(() =>
+        {
+            Denetle(dil, dar, "-kaydedici-gelismis", pencere =>
+                pencere.RecorderPaneForTest.FindControl<RadioButton>("RadAdvanced")!.IsChecked = true);
+            return 0;
+        });
 
     /// <summary>
     /// Önizleme ve oynatıcının kodla açılan katmanları: sağ perde metni, yaklaşıklık rozeti,
@@ -1229,7 +1245,7 @@ public sealed class YerlesimDenetimiTests
     /// Rakamla başlayan parça (<c>50.3s</c>, <c>1080p</c>) sözcük değil sayıdır; <see cref="LanguageCatalog.Title"/>
     /// de harfle başlamayanı olduğu gibi bırakıyor.
     /// Sayının hemen ardındaki birim (<c>50,3 sn</c>) de öyle: <see cref="LanguageCatalog.IsUnitAfterNumber"/>
-    /// onu büyütmüyor.
+    /// onu büyütmüyor. Parantezli birim (<c>(s)</c>) de: <see cref="LanguageCatalog.IsBracketedUnit"/>.
     /// </summary>
     internal static string? KucukSozcuk(string metin, string dil)
     {
@@ -1246,7 +1262,7 @@ public sealed class YerlesimDenetimiTests
             var once = onceki;
             onceki = parca;
             if (char.IsDigit(parca[0])) { ilk = false; continue; }
-            if (LanguageCatalog.IsUnitAfterNumber(parca, once)) continue;
+            if (LanguageCatalog.IsUnitAfterNumber(parca, once) || LanguageCatalog.IsBracketedUnit(parca)) continue;
             var bas = 0;
             while (bas < parca.Length && !char.IsLetter(parca[bas])) bas++;
             if (bas == parca.Length) continue;

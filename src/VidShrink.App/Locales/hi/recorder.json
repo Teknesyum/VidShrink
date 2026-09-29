@@ -49,6 +49,7 @@
   "recorder.output.reveal": "फ़ोल्डर में दिखाएं",
   "recorder.output.to-shrink": "सिकोड़ें में भेजें",
   "recorder.output.to-player": "प्लेयर में खोलें",
+  "recorder.output.to-editor": "संपादित करें",
   "recorder.output.done": "रिकॉर्डिंग समाप्त: {1} खंडों में {0} MB",
   "recorder.output.partial": "रिकॉर्डिंग ठीक से बंद नहीं हुई। फ़ाइल सहेजी गई है और चलाई जा सकती है। अंतिम कुछ सेकंड गायब हो सकते हैं।",
   "recorder.output.partial-broken": "रिकॉर्डिंग ठीक से बंद नहीं हुई। फ़ाइल चलाई नहीं जा सकती। अगली रिकॉर्डिंग के लिए MKV चुनें।",
@@ -123,6 +124,7 @@
   "recorder.tray.live": "VidShrink रिकॉर्डर · {0} · {1} · {2} MB",
   "recorder.hotkey.taken": "ग्लोबल शॉर्टकट किसी अन्य ऐप्लिकेशन ने ले रखा है: {0}. ये कुंजियाँ तभी काम करती हैं जब VidShrink विंडो सामने हो।",
   "recorder.advanced.title": "एडवांस्ड एन्कोडिंग",
+  "recorder.advanced.encoder-title": "एनकोडर विवरण",
   "recorder.advanced.container": "कंटेनर",
   "recorder.advanced.scale-width": "स्केल चौड़ाई",
   "recorder.advanced.scale-height": "स्केल ऊँचाई",
@@ -151,7 +153,7 @@
   "recorder.advanced.noise-gate": "नॉइज़ गेट",
   "recorder.advanced.noise-suppression": "नॉइज़ सप्रेशन",
   "recorder.budget.duration-only": "{0} सेकंड बाद रिकॉर्डिंग अपने आप रुक जाएगी।",
-  "recorder.budget.size-only": "{0} MB तक पहुँचते ही रिकॉर्डिंग अपने आप रुक जाएगी।",
+  "recorder.budget.size-only": "{0} MB तक पहुँचते ही रिकॉर्डिंग अपने आप रुक जाएगी।",
   "recorder.output.open-when-done": "रिकॉर्डिंग समाप्त होने पर फ़ोल्डर खोलें",
   "recorder.discarded": "रिकॉर्डिंग रद्द की गई, फ़ाइल हटा दी गई।",
   "recorder.target.screen-pick": "स्क्रीन",
@@ -217,5 +219,7 @@
   "recorder.wizard.cancel": "रद्द करें",
   "recorder.wizard.summary": "{0} · {1} · {2} — गुणवत्ता {3}।",
   "recorder.wizard.no-device": "{0} के लिए कोई डिवाइस नहीं मिला; वह स्रोत मौन रहेगा।",
-  "recorder.replay.seconds": "रखी जाने वाली लंबाई"
+  "recorder.replay.seconds": "रखी जाने वाली लंबाई",
+  "recorder.region.hide": "फ़्रेम छिपाएँ (F9)",
+  "recorder.region.stop-close": "रिकॉर्डिंग रोकें और बंद करें"
 }
