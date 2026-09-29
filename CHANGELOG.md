@@ -10,6 +10,9 @@ ship as part of it.
 ### Added
 
 - Windows: the default-apps suggestion has a Set All button that copies an integrity-pinned PowerShell command to the clipboard, making VidShrink the default for 60 audio, video and playlist extensions (the Windows Media Player set) in one paste, with a progress bar. VidShrink itself runs no PowerShell and downloads nothing; the user runs the copied command, so the unsigned build stays clear of behavioral flags.
+- Player: music files (mp3, flac, m4a, opus, wma, wav and 18 more) play in an audio view with title, artist and the embedded cover; the seek bar runs from the playback clock and screenshot, clip and preview tools hide. Next/previous in a music folder steps through audio only, and audio never lands on the shrink tab.
+- Player: playlists open (m3u, m3u8, pls, wpl, zpl, asx, wax, wvx, wmx) and play as a queue: next/previous, auto-advance and the playlist dropdown follow the list, missing entries are skipped, and an ANSI list without a BOM is read in the system code page.
+- Player: keyboard media keys (play/pause, stop, next, previous) work while the window has focus.
 - Player: an Edit command (right-click menu, bottom strip, key E) opens the current file in the editor tab at the playhead.
 - Recorder: the result panel has an Edit button that opens the finished recording in the editor.
 - Editor: Save writes `<name>-duzenlenmis.<ext>` next to the source in Smart mode without asking, numbering `-2`, `-3`… on collision; Save As… keeps the file picker. The status shows the path with Show in folder.

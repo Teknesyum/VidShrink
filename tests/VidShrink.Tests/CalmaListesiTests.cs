@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using Avalonia.Controls;
+using Avalonia.Input;
 using VidShrink.App;
 using VidShrink.App.Playback;
 using VidShrink.Core;
@@ -165,6 +166,49 @@ public sealed class CalmaListesiTests
         Assert.Equal(Y("b.mp3"), sonuc.disari.LoadedPath);
         Assert.Null(sonuc.disari.Queue);
         Assert.Equal(new[] { Y("a.mp3"), Y("b.mp3"), Y("c.mp3") }, sonuc.disari.Item3);
+    }
+
+    [Fact]
+    public void Medya_tuslari_kuyrukta_gezer_calar_durdurur()
+    {
+        var klasor = Klasor("medya-tus");
+        foreach (var ad in new[] { "a.mp3", "b.mp3", "c.mp3" }) File.WriteAllBytes(Path.Combine(klasor, ad), new byte[16]);
+        var liste = Path.Combine(klasor, "liste.m3u");
+        File.WriteAllText(liste, "c.mp3\na.mp3\n");
+
+        var sonuc = AppHost.Run(() =>
+        {
+            var view = new PlayerView { EngineFactory = () => new SesMotoru(MediaTags.Empty) };
+            var pencere = new Window { Width = 640, Height = 360, Content = view };
+            pencere.Show();
+            try
+            {
+                Bekle(view, view.OpenAsync(liste));
+                var yollar = new List<string?>();
+                foreach (var tus in new[] { Key.MediaNextTrack, Key.MediaPreviousTrack })
+                {
+                    GirdiSurucu.Key(view, tus);
+                    Bekle(view, view.Navigation);
+                    yollar.Add(Path.GetFileName(view.LoadedPath));
+                }
+
+                var once = view.IsPlaying;
+                GirdiSurucu.Key(view, Key.MediaPlayPause);
+                var sonra = view.IsPlaying;
+                GirdiSurucu.Key(view, Key.MediaPlayPause);
+                GirdiSurucu.Key(view, Key.MediaStop);
+                return (yollar, once, sonra, durdu: !view.IsPlaying, iz: view.Trace.TakeLast(3).ToArray());
+            }
+            finally { pencere.Close(); }
+        });
+        Directory.Delete(klasor, true);
+
+        Assert.Equal(new[] { "a.mp3", "c.mp3" }, sonuc.yollar);
+        Assert.NotEqual(sonuc.once, sonuc.sonra);
+        Assert.True(sonuc.durdu);
+        Assert.StartsWith("stop -> ", sonuc.iz[^1]);
+        Assert.All(new[] { Key.MediaPlayPause, Key.MediaStop, Key.MediaNextTrack, Key.MediaPreviousTrack },
+            tus => Assert.DoesNotContain("Media", Keymap.Gesture(PlayerInput.OnKey(tus))));
     }
 
     [Fact]

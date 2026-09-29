@@ -160,7 +160,11 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.K, KeyModifiers.Control), ToolsOptions.Clip),
         new(PlayerInput.OnKey(Key.G, KeyModifiers.Control | KeyModifiers.Shift), ToolsOptions.Gif),
         new(PlayerInput.OnKey(Key.M, KeyModifiers.Control), ToolsOptions.MiniMode),
-        new(PlayerInput.OnKey(Key.U, KeyModifiers.Control), ToolsOptions.OpenUrl)
+        new(PlayerInput.OnKey(Key.U, KeyModifiers.Control), ToolsOptions.OpenUrl),
+        new(PlayerInput.OnKey(Key.MediaPlayPause), PlayPause),
+        new(PlayerInput.OnKey(Key.MediaStop), Stop),
+        new(PlayerInput.OnKey(Key.MediaNextTrack), NextFile),
+        new(PlayerInput.OnKey(Key.MediaPreviousTrack), PreviousFile)
     };
 
     internal static readonly IReadOnlyList<PlayerAction> MenuTop = new[] { PlayPause, Fullscreen };
@@ -270,6 +274,10 @@ internal static class Keymap
             Key.OemPeriod => ".",
             Key.PageUp => "PgUp",
             Key.PageDown => "PgDn",
+            Key.MediaPlayPause => "⏯",
+            Key.MediaStop => "⏹",
+            Key.MediaNextTrack => "⏭",
+            Key.MediaPreviousTrack => "⏮",
             _ => input.Key.ToString()
         };
     }
