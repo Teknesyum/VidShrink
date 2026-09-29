@@ -30,7 +30,7 @@ public static class Program
 {
     private const int Width = 1600;
     private const int Height = 1000;
-    private const string Contract = "T191";
+    private const string Contract = "T200";
 
     private static readonly Size Viewport = new(Width, Height);
 
@@ -133,6 +133,12 @@ public static class Program
                 SelectTab(window, "main.tab.player");
                 Relayout(window);
                 OpenInPlayer(window, clip);
+            }),
+
+            Shot(language, outDir, "duzenleyici", window =>
+            {
+                Relayout(window);
+                OpenInEditor(window, clip);
             })
         };
 
@@ -448,6 +454,52 @@ public static class Program
     /// Ilk kare acilisin kendisinden degil, onun ardindan gelen sar isleminden dogar; o
     /// yuzden goruntu kaynagi dolana kadar ikinci bir bekleme var.
     /// </summary>
+    private static void OpenInEditor(MainWindow window, string clip)
+    {
+        const BindingFlags Any = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+        var open = typeof(MainWindow).GetMethod("OpenInEditorAsync", Any)
+            ?? throw new MissingMethodException(nameof(MainWindow), "OpenInEditorAsync");
+        var task = (Task)open.Invoke(window, new object?[] { clip, 0d })!;
+        Await(() => task.IsCompleted, "Duzenleyici klibi acamadi");
+        task.GetAwaiter().GetResult();
+        SelectTab(window, "main.tab.editor");
+        Relayout(window);
+
+        var editor = typeof(MainWindow).GetProperty("EditorPaneForTest", Any)!.GetValue(window)!;
+        var model = editor.GetType().GetProperty("Model", Any)!.GetValue(editor)
+            ?? throw new InvalidOperationException("Duzenleyici zaman cizelgesi bos.");
+        var duration = (long)model.GetType().GetProperty("Duration")!.GetValue(model)!;
+        var timeline = editor.GetType().GetProperty("TimelineView", Any)!.GetValue(editor)!;
+        var playhead = timeline.GetType().GetProperty("Playhead", Any)!;
+        var split = editor.GetType().GetMethod("Split", Any)!;
+
+        var player = (Control)editor.GetType().GetProperty("Player", Any)!.GetValue(editor)!;
+        var render = player.GetType().GetMethod("RenderLatest", Any)
+            ?? throw new MissingMethodException("PlayerView", "RenderLatest");
+        var frame = player.FindControl<Image>("Frame")
+            ?? throw new MissingFieldException("PlayerView", "Frame");
+
+        Await(() =>
+        {
+            render.Invoke(player, null);
+            return frame.Source is not null;
+        }, "Duzenleyicinin ilk karesi");
+
+        foreach (var part in new[] { 0.3, 0.62 })
+        {
+            playhead.SetValue(timeline, (long)(duration * part));
+            split.Invoke(editor, null);
+        }
+
+        playhead.SetValue(timeline, (long)(duration * 0.45));
+        Pump(() =>
+        {
+            render.Invoke(player, null);
+            return false;
+        }, 3);
+    }
+
     private static void OpenInPlayer(MainWindow window, string clip)
     {
         var player = Named(window, "Player");
@@ -472,6 +524,19 @@ public static class Program
             render.Invoke(player, null);
             return player.GetVisualDescendants().OfType<Image>().Any(image => image.Source is not null);
         }, "Oynaticinin ilk karesi");
+
+        const BindingFlags Any = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+        player.GetType().GetMethod("EnsureSerit", Any)?.Invoke(player, null);
+        ((Control)player).FindControl<Border>("StripBar")!.Transitions = null;
+        player.GetType().GetMethod("RevealSerit", Any)!.Invoke(player, new object[] { true });
+        window.Classes.Add("reduced-motion");
+        foreach (var overlay in window.GetVisualDescendants().OfType<Control>().Where(c => c.Name == "TopOverlay"))
+        {
+            overlay.Classes.Remove("reveal");
+            overlay.Opacity = 1;
+        }
+        typeof(MainWindow).GetMethod("ShowChrome", Any)!.Invoke(window, new object[] { true });
+        Pump(() => { render.Invoke(player, null); return false; }, 2);
     }
 
     /// <summary>

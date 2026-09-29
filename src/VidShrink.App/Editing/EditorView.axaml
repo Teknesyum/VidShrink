@@ -18,9 +18,9 @@
           <Button x:Name="BtnRedo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.redo}"/>
           <Button x:Name="BtnZoomOut" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-out}"/>
           <Button x:Name="BtnZoomIn" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-in}"/>
-          <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False"/>
-          <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save-as}" AutomationProperties.Name="{loc:Text editor.save-as}" IsEnabled="False"/>
-          <Button x:Name="BtnShare" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.share}" AutomationProperties.Name="{loc:Text main.action.share}" IsEnabled="False"/>
+          <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
+          <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save-as}" AutomationProperties.Name="{loc:Text editor.save-as}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
+          <Button x:Name="BtnShare" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.share}" AutomationProperties.Name="{loc:Text main.action.share}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
           <ComboBox x:Name="CmbExportMode" Width="{StaticResource FieldWidth}" AutomationProperties.Name="{loc:Text editor.export.mode}" SelectedIndex="1">
             <ComboBoxItem Content="{loc:Text editor.export.fast}"/>
             <ComboBoxItem Content="{loc:Text editor.export.smart}"/>

@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-29
+
 ### Added
 
 - Windows: the default-apps suggestion has a Set All button that copies an integrity-pinned PowerShell command to the clipboard, making VidShrink the default for 60 audio, video and playlist extensions (the Windows Media Player set) in one paste, with a progress bar. VidShrink itself runs no PowerShell and downloads nothing; the user runs the copied command, so the unsigned build stays clear of behavioral flags.
@@ -19,12 +21,19 @@ ship as part of it.
 - Editor: Share saves first when needed, then uploads through the same share layer as the recorder.
 - Recorder region editor: the edge snaps to windows and screen edges while you drag (hold Alt to turn it off); the toolbar has large square icon buttons, including snapshot (works before and during recording), hide frame (F9 or the tray icon brings it back), pause/resume/stop while recording, and a close button that stops the recording. The edge is dashed while you set it up and solid while recording.
 
+### Changed
+
+- Interface pass: Shrink, Convert, Recorder and Settings fit a 1920x1080 screen at 100% scale without scrolling (Settings was five screens tall); cards flow into columns instead of leaving empty panels.
+- Recorder: the page is regrouped into compact cards, the encoder details sit under their own heading, and English option labels use Title Case.
+- Editor: Save, Save As… and Share say why they are disabled before a file is loaded.
+
 ### Fixed
 
 - Windows: the default-apps suggestion no longer stays up after VidShrink was chosen: the check now accepts VidShrink's own ProgID, so development and portable builds see the choice too.
 - Windows: the VidShrink page under Default apps lists five formats (mp4, mkv, mov, avi, webm) instead of 24; the other formats stay in Open with and the right-click menu. Existing installs trim the list on the next start.
 - Windows: when the silent update fails three times in a row (unreachable, bad download, install on exit fails), the app stops trusting it and runs the manual check, so a newer version shows up in the badge and panel instead of never arriving. The reason is kept in `update-health.json` next to the settings.
 - Windows: the desktop and Start menu shortcut icons are refreshed once per version after startup, so an old icon no longer sticks after an update.
+- Contrast: success text in Everforest and OneDark and warning text in Everforest now clear 7:1 on every surface they appear on.
 
 ## [1.0.0] - 2026-09-28
 

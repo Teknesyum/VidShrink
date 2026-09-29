@@ -15,8 +15,9 @@ açık) kurulur, `MainWindow` 1600x1000 görüş alanında ölçülüp yerleşti
 `RenderTargetBitmap` üzerine çizilir. Ekran kapısı gerekmez, masaüstü ölçeklemesi ve
 pencere yöneticisi sonucu değiştirmez.
 
-Ad kalıbı `docs/gorseller/T191-<konu>-<dil>.png`; diller `en` ve `tr`, konular
-`kucult`, `donustur`, `ayarlar`, `gelismis`, `hakkinda`, `onizleme`, `oynatici`.
+Ad kalıbı `docs/gorseller/T200-<konu>-<dil>.png`; diller `en` ve `tr`, konular
+`kucult`, `donustur`, `kaydedici`, `ayarlar`, `gelismis`, `hakkinda`, `onizleme`,
+`oynatici`, `duzenleyici`.
 Tam pencere kareleri 1600x1000; `onizleme` panelin kendi ölçüsünde (506x512).
 
 ## Elle kalan adım
@@ -24,6 +25,16 @@ Tam pencere kareleri 1600x1000; `onizleme` panelin kendi ölçüsünde (506x512)
 **Yok.** Klip verilmezse ffmpeg'in `testsrc2` deseninden `.calisma/T189/klip.mp4`
 üretilir; oynatıcı ve önizleme kareleri onu sürer. Daha güzel bir kare isteniyorsa
 gerçek bir video ikinci argüman olarak verilir — o zaman kare o videodan gelir.
+
+`onizleme`, `oynatici` ve `duzenleyici` libmpv ister: `VIDSHRINK_LIBMPV` kurulu
+kopyayı göstermeli (`%LOCALAPPDATA%\Programs\VidShrink\tools\libmpv\libmpv-2.dll`),
+yoksa önizleme borusu 60 saniyede düşer. T200 klibi ffmpeg `mandelbrot` + `sine`
+kaynağından 12 sn 1920x1080 üretildi.
+
+Oynatıcı karesinde şerit ve üst çubuk kendiliğinden gizleniyor; `OpenInPlayer`
+`RevealSerit(true)` ve `ShowChrome(true)` çağırır, pencereye `reduced-motion` ekler ve
+`TopOverlay`'in `reveal` sınıfını siler — başsız koşumda açılış animasyonu 0 opaklıkta
+takılı kalıyordu. `duzenleyici` klibi düzenleyicide açar ve iki kesim yapar.
 
 ## Başsız koşumun elle oturttuğu üç geçiş
 

@@ -1,109 +1,176 @@
-﻿<!-- lang -->
+<!-- lang -->
 
-[<img src="docs/gorseller/badge-lang.svg" alt="English selected, switch to Türkçe" width="124" height="44">](README.tr.md)
+[<img src="docs/gorseller/badge-lang.svg" alt="English selected, switch to Türkçe" width="124" height="44">](README.md)
 
 # VidShrink
 
-**Shrink a video to an exact file size, record your screen, play it back and share it —
-from one free, offline window.**
+**A media player, a screen recorder, a video editor, a converter and a shrinker that lands
+on an exact file size — one free app, one window, no ads.**
 
-**Free forever · No ads · No account · No subscription · No telemetry · Works with the
-internet off · 42 languages · 26 themes · Open source**
+**Free forever · No ads · No watermark · No account · No subscription · No telemetry · Works
+with the internet off · 42 languages · 36 themes · Open source**
 
 [![Latest release](https://img.shields.io/github/v/release/Teknesyum/VidShrink?label=release)](https://github.com/Teknesyum/VidShrink/releases/latest)
 [![License AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#install)
 
-![The VidShrink Shrink tab in English: the source drop zone on the left, the target size chips and slider below it, the What It Will Do panel in the middle spelling out codec, CRF, resolution and frame rate, and the Output panel with the size estimate on the right](docs/gorseller/T191-kucult-en.png)
+![The VidShrink Player tab in English: a video filling the window, the tab bar across the top with Player, Editor, Shrink, Convert, Recorder and Settings, and the control strip along the bottom with the time, volume, ten-second jumps, play and pause, speed, clip and full screen](docs/gorseller/T200-oynatici-en.png)
 
-## You Do Not Have To Know Any Of This
+## One App Instead Of Five
 
-Drag a video in, tap a size, press start. That is the whole job, and the automatic mode
-does the rest — it picks the codec, the quality level, the resolution and the frame rate
-for **your** file, and it tells you the expected size before anything runs. You never get a
-file larger than the number you asked for.
+Video usually means a shelf of programs: one to watch, one to record the screen, one to cut,
+one to convert, one to squeeze the file under an upload limit. Five installers, five update
+nags, five sets of ads or "Pro" upsells — and your file hopping between them.
 
-The screen recorder works the same way: one checkbox, and the program works out the
-encoder, the frame rate and the capture size for your machine instead of asking you to.
+VidShrink is the whole shelf in one window. Open a file once and every tool sees it: watch
+it, cut it, convert it, shrink it to the size the chat app takes, and send the link — no
+second program, no intermediate copy.
 
-**The whole window speaks 42 languages** — every button, every warning, every tooltip, from
-Arabic to Vietnamese — and **26 colour themes** ship with it (Catppuccin, Dracula, Gruvbox,
-Nord, Rose Pine, Solarized, Tokyo Night and twenty more, light and dark). Pick both in
-Settings; nothing restarts. Your language missing, or a translation reading badly in yours?
-[Open an issue](https://github.com/Teknesyum/VidShrink/issues/new) and it goes into the next
-release — that is the whole process.
+| The job | Usually a separate app, such as | In VidShrink |
+|---|---|---|
+| Watch anything, with subtitles | GOM Player, VLC, PotPlayer | [Player](#player) |
+| Record the screen, a window or a region | Bandicam, OBS Studio | [Screen Recorder](#screen-recorder) |
+| Cut, split, speed up, reverse | Lightworks, Shotcut | [Editor](#editor) |
+| Change the format or the codec | HandBrake, Format Factory | [Convert](#convert) |
+| Fit an upload limit exactly | online compressors | [Shrink](#shrink-to-an-exact-size) |
+| Send a big file as a link | WeTransfer | [Share](#share) |
 
-## Four Tools, One Window
+Every tool is free and stays free: no watermark on your recordings or exports, no trial
+timer, no account, no feature held back for a paid tier. Nothing leaves your machine unless
+you ask it to — see [Privacy](#code-signing-policy).
 
-**Shrink** — a target size in megabytes, and a video that lands just under it. Chips for
-the sizes people actually need (8 for strict e-mail gateways, 16 for WhatsApp, 25 for Gmail, 180 for
-WhatsApp Web) and a slider for everything else. Twelve encoders — software, NVENC, Quick
-Sync, AMF — each [probed on your own machine](docs/olcumler/kodek-matris.md) first.
+<sub>Product names belong to their owners; VidShrink is not affiliated with any of them.</sub>
 
-**Record** — the whole screen, a single window or a region, through the capture backend
-each platform actually has: gdigrab on Windows, avfoundation on macOS, x11grab on Linux.
-Microphone and system sound chosen by name, so a reordered device list cannot quietly swap
-your microphone. Stopping closes the file properly, so a stopped recording plays back.
+## Player
 
-**Play** — the source plays in the window through a decoder pipe that
-[stays open between seeks](docs/olcumler/oynatici-motor-libmpv.md) instead of launching
-ffmpeg for every scrub, plus a comparison panel for before-and-after.
+Built on **libmpv**, the engine inside mpv, so it opens what the big players open — MKV,
+MP4, WebM, AVI, MOV, TS and the rest — with hardware decoding when you want it. The controls
+fade out while the film plays and come back when the mouse does.
 
-**Share and right-click** — "Open this video with VidShrink" sits in the Windows Explorer
-menu, in the primary menu on Windows 11, [written per user](docs/olcumler/kabuk-menusu.md)
-with no administrator rights and no change to your file associations. Share targets and
-their real size ceilings live in [`paylasim-hedefleri.json`](paylasim-hedefleri.json).
+- **Subtitles** — sidecar files load by themselves, a dropped subtitle file just works,
+  timing shifts in steps, the text is styled to taste, and **OpenSubtitles search and
+  download** sit right in the window.
+- **Sound** — pick the audio track, shift the audio delay, shape it with a 10-band
+  equaliser.
+- **Picture** — brightness, contrast, saturation, gamma, hue, sharpness, crop, rotate,
+  mirror, aspect ratio and zoom.
+- **Control** — playback speed, frame-by-frame steps, A-B loop, bookmarks, screenshots, and
+  clip or GIF export straight from the timeline.
+- **Library** — playlist with shuffle and repeat, next and previous file in the folder,
+  recent files and history, open a URL.
+- **Window** — mini player, always on top, a shortcuts panel, and a side-by-side
+  comparison panel for before and after.
 
-Plus a Convert tab (MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A, WAV; H.264, H.265, VP9, AV1
-or stream copy; trimming and audio extraction) and a hidden Advanced tab holding the exact
-ffmpeg command. Full tour: [`docs/kullanim.md`](docs/kullanim.md).
+## Screen Recorder
 
-## Every Tab
+![The Recorder tab in automatic mode: the source picker, the length and size fields with Measure Again beside them, and the sound section choosing the microphone and system sound by name](docs/gorseller/T200-kaydedici-en.png)
+
+- **What** — the whole screen, one window or a region you draw, through the capture
+  backend each platform really has: gdigrab on Windows, avfoundation on macOS, x11grab on
+  Linux.
+- **Sound** — microphone and system sound chosen by name, so a reordered device list cannot
+  quietly swap your microphone; gain, a noise gate and noise suppression.
+- **Webcam** — an overlay with its own size and corner, and a green-screen option.
+- **For tutorials** — cursor, click rings and click sounds, the keys you press on screen, a
+  magnifier, and a live preview.
+- **Control** — global hotkeys F7 to F11 on Windows, a countdown, a time limit, splitting by
+  time or size, a replay buffer that keeps the last moments, tray and mini-recorder modes.
+- **Encoders** — x264, x265, SVT-AV1 and VP9, plus the graphics card's own: NVIDIA NVENC,
+  Intel Quick Sync, AMD AMF. **Automatic mode** records three real seconds per candidate on
+  your machine and keeps the one that drops no frames — you tick one box, it does the
+  homework.
+- **Output** — MP4, MKV, MOV or GIF, a target size or length budget if you want one, and a
+  file that is closed properly when you stop. One click sends it on to the Editor, the
+  Player or Share.
+
+## Editor
+
+![The Editor tab: the video on top, and below it the toolbar with Split, Delete, Speed, Undo, Redo, zoom, Save, Save As and Share the File, over a timeline split into three clips](docs/gorseller/T200-duzenleyici-en.png)
+
+Open a video from any tab and cut it on a timeline: split, delete a clip or a range, move
+clips, set the speed of each clip anywhere from 0.01× to 100×, play it in reverse, undo and
+redo. Then **Save**, **Save As** or **Share** without leaving the tab, in one of three
+export modes:
+
+- **Fast** — cuts on keyframes and copies the streams; no re-encode, no quality lost.
+- **Smart** — copies what it can and re-encodes only what the cuts need.
+- **Full** — re-encodes the whole result.
+
+## Shrink To An Exact Size
+
+![The Shrink tab: the source drop zone on the left, the target size chips and slider below it, the What It Will Do panel in the middle spelling out codec, CRF, resolution and frame rate, and the Output panel with the size estimate on the right](docs/gorseller/T200-kucult-en.png)
+
+Drag a video in, tap a size, press start. That is the whole job; the automatic mode picks
+the codec, the quality level, the resolution and the frame rate for **your** file and tells
+you the expected size before anything runs. Over 36 measured cases the target was crossed
+**zero** times — you do not get a file larger than the number you asked for.
+
+Chips for the sizes people actually need — 8 MB for strict e-mail gateways, 16 for
+WhatsApp, 25 for Gmail, 180 for WhatsApp Web — and a slider for everything else. Twelve
+encoders, software and NVENC, Quick Sync and AMF, each
+[probed on your own machine](docs/olcumler/kodek-matris.md) first. The result is scored
+with **VMAF-NEG** — mean, harmonic mean, 10th percentile and worst frame — and a whole
+folder can go through the batch queue, which opens the folder, sleeps or shuts the computer
+down when it finishes.
 
 <details>
-<summary>Screenshots of all six tabs, the preview and the hidden Advanced tab</summary>
+<summary>The preview: what the plan will actually produce, before it runs</summary>
 
-**Player** — the source plays in the window; the comparison panel sits beside it.
-
-![The Player tab: transport bar, volume and speed sliders with their numbers, and the comparison panel](docs/gorseller/T191-oynatici-en.png)
-
-**Shrink** — source on the left, target size and quality in the middle, the estimate on the right.
-
-![The Shrink tab: source facts, target size chips and slider, the plan panel and the output estimate](docs/gorseller/T191-kucult-en.png)
-
-**Preview** — what the plan will actually produce, before it runs.
-
-![The preview panel showing the planned output](docs/gorseller/T191-onizleme-en.png)
-
-**Convert** — container, codec, trimming and audio extraction.
-
-![The Convert tab: output format, codec, trim fields and audio extraction](docs/gorseller/T191-donustur-en.png)
-
-**Recorder** — automatic mode ticked; the chosen encoder, frame rate and capture size are written under the checkbox.
-
-![The Recorder tab in automatic mode with the reason line under the checkbox](docs/gorseller/T191-kaydedici-en.png)
-
-**Settings** — language, theme, right-click menu, update behaviour.
-
-![The Settings tab: language and theme pickers, right-click menu switch, update settings](docs/gorseller/T191-ayarlar-en.png)
-
-**About** — version, licence, the projects VidShrink stands on.
-
-![The About tab: version, licence and credits](docs/gorseller/T191-hakkinda-en.png)
-
-**Advanced** (hidden until you unlock it) — the exact ffmpeg command that will run.
-
-![The hidden Advanced tab showing the exact ffmpeg command line](docs/gorseller/T191-gelismis-en.png)
+![The preview panel playing the planned output](docs/gorseller/T200-onizleme-en.png)
 
 </details>
+
+## Convert
+
+![The Convert tab with container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command panel beside them](docs/gorseller/T200-donustur-en.png)
+
+MP4, MKV, WebM, MOV, AVI and GIF; MP3, M4A, WAV and FLAC for sound alone. H.264, H.265,
+VP9, AV1 or a straight stream copy, trimming, and audio extraction. **Eighteen ready-made
+targets** — WhatsApp, Discord, Telegram, Gmail, Outlook, Chromecast, Nest Hub, Apple TV and
+more — set every field for you.
+
+<details>
+<summary>The hidden Advanced tab: the exact ffmpeg command that will run</summary>
+
+![The Advanced tab, holding the FFmpeg command box and the AI settings box](docs/gorseller/T200-gelismis-en.png)
+
+</details>
+
+## Share
+
+Press **Share** in Shrink, the Recorder or the Editor and the file goes up as a link:
+**storage.to** for files up to 25 GB, kept one to seven days, or **uguu.se** for files up to
+128 MB, kept three hours. The link comes with a QR code for your phone, and a dropped
+upload can be retried. Share targets and their measured size ceilings live in
+[`paylasim-hedefleri.json`](paylasim-hedefleri.json).
+
+## Made For Everyone
+
+![The Settings tab: language and theme pickers, the right-click menu switch and the update settings](docs/gorseller/T200-ayarlar-en.png)
+
+**The whole window speaks 42 languages** — every button, every warning, every tooltip, from
+Arabic to Vietnamese — and **36 colour themes** ship with it: Catppuccin, Dracula, Gruvbox,
+Nord, Rose Pine, Solarized, Tokyo Night and twenty-nine more, light and dark. Pick both in
+Settings; nothing restarts. Your language missing, or a translation reading badly in yours?
+[Open an issue](https://github.com/Teknesyum/VidShrink/issues/new) and it goes into the next
+release.
+
+**What it changes on your system, and nothing more.** On Windows the installer adds Start
+menu and desktop shortcuts, an "Open this video with VidShrink" entry in the Explorer
+right-click menu (in the primary menu on Windows 11), and VidShrink in the **Open with**
+list for video files — [written per user](docs/olcumler/kabuk-menusu.md), no administrator
+rights, and your default player stays your default. The app checks GitHub for a new release
+and offers the update; that check is on by default on Windows and switches off in Settings.
+Everything above comes off again with one command — see [Install](#install).
+
+Full tour of every tab: [`docs/kullanim.md`](docs/kullanim.md).
 
 ## Install
 
 On Windows, download and run
-[`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
-(published from 0.8.3 on). It is a small self-contained program: no PowerShell, no
-administrator rights, and about half the time of the script below. The script still works
-and installs exactly the same thing.
+[`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe).
+It is a small self-contained program: no PowerShell, no administrator rights. The script
+below installs exactly the same thing.
 
 ```powershell
 # Windows
@@ -119,9 +186,20 @@ No administrator rights, no .NET SDK. Every release publishes four targets — `
 `osx-arm64`, `osx-x64`, `linux-x64` — from one version number. Requirements: Windows 10 or
 11, macOS 14 or newer, or a Linux desktop on X11 or Wayland, plus `ffmpeg` and `ffprobe`.
 FFmpeg and libmpv never travel in a release; the installer fetches them against pinned
-SHA-256 digests on Windows and prints your package manager's command elsewhere. Checksum
-verification, the right-click entry, the self-update flow and the uninstall switches are
-all in [`docs/kurulum.md`](docs/kurulum.md).
+SHA-256 digests on Windows and prints your package manager's command elsewhere. Windows
+releases are signed under the [Code Signing Policy](#code-signing-policy) once the
+certificate is granted.
+
+**Uninstall.** `VidShrink-Setup.exe --uninstall` removes the shortcuts, the right-click
+entries, the Open With registration and the install folder. On macOS and Linux, run the
+same installer with `--uninstall`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh -s -- --uninstall
+```
+
+Checksum verification, the right-click entry, the self-update flow and every switch are in
+[`docs/kurulum.md`](docs/kurulum.md).
 
 ## Command Line
 
@@ -415,7 +493,31 @@ Third-party material that ships inside the source tree — the Fluent UI System 
 the icon set is cut from — is listed in
 [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
 
-## One-line install
+## Code Signing Policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by
+[SignPath Foundation](https://signpath.org). The application is pending; until it is
+approved, Windows releases ship unsigned.
+
+- Committers, reviewers and approvers: [Teknesyum](https://github.com/Teknesyum)
+
+Only artifacts built by GitHub Actions from this repository are signed, and every signing
+request is approved by hand. Every team member signs in with multi-factor authentication.
+
+**Privacy.** This program will not transfer any information to other networked systems
+unless specifically requested by the user or the person installing or operating it. The
+requests it can make, what starts each one, and whose privacy policy then applies:
+
+- **Update check** — asks GitHub for the latest release. On by default on Windows; switch it
+  off in Settings. [GitHub Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
+- **Installer** — downloads FFmpeg and libmpv from GitHub releases, pinned by SHA-256.
+  [GitHub Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
+- **Share** — uploads a file only when you press Share, to the host you pick.
+  [storage.to privacy](https://storage.to/privacy) · [uguu.se FAQ](https://uguu.se/faq)
+- **OpenSubtitles** — signs in and searches only when you use it.
+  [OpenSubtitles privacy policy](https://www.opensubtitles.com/en/privacy/)
+
+## One-Line Install
 
 Paste into PowerShell on Windows 10 or 11. It downloads the latest `VidShrink-Setup.exe`
 and runs it; no administrator rights.
