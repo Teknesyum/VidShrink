@@ -173,7 +173,7 @@ public partial class MainWindow
 
         var sebep = task.Exception?.GetBaseException() is { } hata
             ? $"{hata.GetType().Name}: {hata.Message}"
-            : $"faz: {_updateLastPhase?.ToString() ?? "yok"}";
+            : $"faz={_updateLastPhase?.ToString() ?? "yok"}";
         if (UpdateHealth.RecordFailure(SettingsPathOverride, DateTimeOffset.UtcNow, sebep).Stuck) YedekDenetimeDon();
     }
 
@@ -212,7 +212,7 @@ public partial class MainWindow
         catch (Exception) { birakildi = false; }
         if (birakildi) return KapanisGuncellemesi.Baslatici;
 
-        UpdateHealth.RecordFailure(SettingsPathOverride, DateTimeOffset.UtcNow, "kapanista kurulum dustu: " + staged.Manifest.Version);
+        UpdateHealth.RecordFailure(SettingsPathOverride, DateTimeOffset.UtcNow, "kapanista-kurulum-dustu=" + staged.Manifest.Version);
         return KapanisGuncellemesi.Dustu;
     }
 

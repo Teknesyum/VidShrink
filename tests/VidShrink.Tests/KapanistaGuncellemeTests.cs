@@ -441,7 +441,7 @@ public sealed class KapanistaGuncellemeTests
             finally { p.Close(); }
         });
 
-        Assert.Equal("Dustu|1|kapanista kurulum dustu: 9.9.9", sonuc);
+        Assert.Equal("Dustu|1|kapanista-kurulum-dustu=9.9.9", sonuc);
     }
 
     [Fact]
