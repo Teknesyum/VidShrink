@@ -135,7 +135,7 @@ public sealed class ElleFfmpegYoluTests
                     var gecersiz = ToolLocator.Ffmpeg;
                     var hataGorunur = window.TxtFfmpegPathError.IsVisible;
                     var hataMetni = window.TxtFfmpegPathError.Text ?? "";
-                    var durum = window.TxtSystemStatus.Text ?? "";
+                    var durum = (window.TxtSystemStatus.Text ?? "").Replace("​", "");
 
                     window.TxtFfmpegPath.Text = ikinci;
                     var degisen = ToolLocator.Ffmpeg;

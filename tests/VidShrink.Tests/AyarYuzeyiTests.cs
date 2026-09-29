@@ -230,6 +230,9 @@ public sealed class AyarYuzeyiTests
     ///
     /// <para>Uç 3: gövde yazısı 14 → 16 (<c>fs-2</c>). Ayar sütunu 1006'ya uzadı, içerik 991 → 1022, görüş
     /// alanı 664 → 666, <b>taşma 356</b>; aralık 351-361, genişliği yine ±5 piksel.</para>
+    ///
+    /// <para>Kaydırmasız arayüz turu (28 Eylül): boş satırlar gizlendi, sonuç paneli yer değiştirdi.
+    /// İçerik 1022 → 860, görüş alanı 666, <b>taşma 194</b>; aralık 189-199, genişliği yine ±5 piksel.</para>
     /// </summary>
     [Fact]
     public void TabanYukseklikteKucultSekmesininTasmasiBuyumuyor()
@@ -288,7 +291,7 @@ public sealed class AyarYuzeyiTests
             $"Plan sütunu ({withoutSettings:0}) artık görüş alanına ({reading.Item3:0}) sığıyor; "
             + "taşmanın kaynağı ayar sütununa döndü, pim yeniden temellendirilmeli.");
 
-        Assert.InRange(reading.Item2 - reading.Item3, 351d, 361d);
+        Assert.InRange(reading.Item2 - reading.Item3, 189d, 199d);
     }
 
     /// <summary>

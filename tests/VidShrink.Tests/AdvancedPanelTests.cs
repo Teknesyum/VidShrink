@@ -275,7 +275,9 @@ public sealed class AdvancedPanelTests
     /// sınır dışı bir istek satırın <c>Height</c> değerinde <b>ham</b> kalıyor. Soru,
     /// yerleşimin onu tutup tutmadığı: satırın gerçekten aldığı yükseklik ölçülür.
     /// <c>RowDefinition.ActualHeight</c> kendisinden önceki <c>RowSpacing</c>'i de
-    /// taşıdığı için o boşluk ölçüden düşülür — belirteç okunur, sayı elle yazılmaz.
+    /// taşıdığı için o boşluk ölçüden düşülür — ızgaranın kendi değeri okunur, sayı elle yazılmaz.
+    /// Arayüz turu (2026-09-28): <c>PreviewPlanGrid</c>'in satır aralığı kalktı (ayırıcının kendi
+    /// tutma alanı aralık), düşülen boşluk artık 0.
     /// </summary>
     [Theory]
     [InlineData(1.0)]
@@ -292,7 +294,7 @@ public sealed class AdvancedPanelTests
             window.SetSplitterHeightForTest(requested);
             Relayout(window, DesignSize());
 
-            var spacing = (double)(window.TryFindResource("SpaceMd", out var gap) ? gap! : 0.0);
+            var spacing = window.GetVisualDescendants().OfType<Grid>().Single(g => g.Name == "PreviewPlanGrid").RowSpacing;
             var stored = window.SplitterHeightForTest;
             var actualRow = window.SplitterRowActualHeightForTest - spacing;
             var panel = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PlanPanel");
@@ -303,7 +305,6 @@ public sealed class AdvancedPanelTests
 
             Xunit.Assert.True(floor > 0 && double.IsFinite(ceiling) && ceiling > floor,
                 $"Sinirlar kalkmis (taban {floor}, tavan {ceiling}); kiyas bosa duserdi.");
-            Xunit.Assert.True(spacing > 0, "SpaceMd belirteci okunamadi; dusum bosa duserdi.");
             Xunit.Assert.Equal(requested, stored, 1);
             Xunit.Assert.InRange(actualRow, floor, ceiling);
             Xunit.Assert.InRange(panel.Bounds.Height, floor, ceiling);
@@ -463,14 +464,14 @@ public sealed class AdvancedPanelTests
         });
     }
 
-    /// <summary>Sayfanın sol ayar sütununun istediği yükseklik. Gelişmiş ayarlar bölümü bu
-    /// sütunda yaşıyor ve tasarım boyutunda sayfanın boyunu bu sütun belirliyor
-    /// (ölçüldü: sol 940, orta 906, sağ 512).</summary>
+    /// <summary>Sayfanın sağ sütununun istediği yükseklik. Arayüz turundan (2026-09-28) beri
+    /// "Ne Çıkacak" kartı (<c>OutcomePanel</c>) ve gelişmiş ayarlar bölümü bu sütunda yaşıyor
+    /// (ölçüldü: dolu sayfa sol 596, orta 898, sağ 889).</summary>
     private static double SettingsColumnHeight(MainWindow window)
     {
         var page = window.GetVisualDescendants().OfType<ScrollViewer>().Single(v => v.Name == "PageShrink");
         var grid = (Control)page.Content!;
-        return grid.GetVisualChildren().OfType<Control>().Single(c => Grid.GetColumn(c) == 0).DesiredSize.Height;
+        return grid.GetVisualChildren().OfType<Control>().Single(c => Grid.GetColumn(c) == 2).DesiredSize.Height;
     }
 
     /// <summary>
@@ -527,10 +528,10 @@ public sealed class AdvancedPanelTests
             return (closed, withIt, withoutAdv, withoutQua, open);
         });
 
-        _output.WriteLine($"sol sutun, dort bolum de kapali: {withSection:0.##} px");
+        _output.WriteLine($"sag sutun, dort bolum de kapali: {withSection:0.##} px");
         _output.WriteLine($"gelismis bolum yerlesimden cikarilmis: {withoutAdvanced:0.##} px");
         _output.WriteLine($"kalite bolumu yerlesimden cikarilmis: {withoutQuality:0.##} px");
-        _output.WriteLine($"sol sutun, gelismis bolum acik: {expanded:0.##} px");
+        _output.WriteLine($"sag sutun, gelismis bolum acik: {expanded:0.##} px");
         _output.WriteLine($"kapali gelismis bolumun bedeli: {withSection - withoutAdvanced:0.##} px");
         _output.WriteLine($"kapali kalite bolumunun bedeli: {withSection - withoutQuality:0.##} px");
 

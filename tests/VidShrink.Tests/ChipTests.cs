@@ -169,23 +169,30 @@ public sealed class ChipTests
     ///
     /// <para>Sayı testte sabitlenmiyor: taban <c>PanelMinHeight</c>'tan türetiliyor, kat
     /// değişirse ölçü de kayar.</para>
+    ///
+    /// <para>Arayüz turu (2026-09-28): "Ne Çıkacak" bölümleri sağ sütuna taşınınca sayfayı orta
+    /// sütun tutmaya başladı; sütunda artan yer yok, panel tabanında (512) ve altında boşluk da
+    /// yok. Yukarı yönü bu yüzden artık "artan yer varsa önizleme alır" diye ölçülüyor: orta
+    /// ızgaranın aldığı boy istediği boydan büyükse panel tabanını aşmak zorunda.</para>
     /// </summary>
     [Fact]
     public void BosPanelTabaninaOturmazAmaAltinaDaInmez()
     {
-        var (height, token, basis) = Read(window =>
+        var (height, token, basis, artan) = Read(window =>
         {
             var shell = Named(window, "Shell");
+            var izgara = Named(window, "PreviewPlanGrid");
             window.TryFindResource("PlaybackIdleMinHeight", out var value);
             window.TryFindResource("PanelMinHeight", out var panel);
-            return (shell.Bounds.Height, (double)value!, (double)panel!);
+            return (shell.Bounds.Height, (double)value!, (double)panel!, izgara.Bounds.Height - izgara.DesiredSize.Height);
         });
 
         Assert.Equal(basis * 2, token);
+        Assert.True(height >= token - 0.5, $"Boş önizleme paneli {height:0.#}; tabanının ({token:0}) altına indi.");
         Assert.True(
-            height > token,
-            $"Boş önizleme paneli {height:0.#}; tabanı ({token:0}) aşmadı. Orta sütunun esneyen "
-            + "satırı önizlemede değilse panel tam tabanında durur ve altında ölü boşluk kalır.");
+            artan <= 0.5 || height > token + 0.5,
+            $"Boş önizleme paneli {height:0.#}; orta sütunda {artan:0.#} px artan yer varken tabanı ({token:0}) aşmadı. "
+            + "Orta sütunun esneyen satırı önizlemede değilse panel tam tabanında durur ve altında ölü boşluk kalır.");
     }
 
     // T52: burada "boş panel yükselirken plan paneli daralmadı" diyen bir ölçü vardı

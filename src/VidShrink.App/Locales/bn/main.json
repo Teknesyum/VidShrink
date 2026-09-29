@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "থিম",
   "settings-tab.theme.hint": "প্রোগ্রামের প্রতিটি রং বদলায় এবং পরের চালুতে মনে রাখা হয়।",
   "settings-tab.language.hint": "ইন্টারফেসের ভাষা বদলায় এবং পরের চালুতে মনে রাখা হয়।",
-  "settings-tab.default-target.label": "ডিফল্ট লক্ষ্য আকার (MB)",
+  "settings-tab.default-target.label": "ডিফল্ট লক্ষ্য আকার",
   "settings-tab.default-target.hint": "সংকোচন ট্যাব যে লক্ষ্য আকারে খোলে তা ঠিক করে।",
   "settings-tab.output-folder.label": "আউটপুট ফোল্ডার",
   "settings-tab.output-folder.beside-source": "উৎস ফাইলের পাশে",

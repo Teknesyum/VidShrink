@@ -503,8 +503,8 @@ public sealed class KaydediciAyarTests
     }
 
     private static (bool Kodlama, bool Elle, bool Kap, bool Imlec, bool Sure) Gorunenler(RecorderView v)
-        => (Bul<StackPanel>(v, "PanelAdvancedEncoding").IsVisible,
-            Bul<StackPanel>(v, "PanelManualOptions").IsVisible,
+        => (Bul<Control>(v, "PanelAdvancedEncoding").IsVisible,
+            Bul<Control>(v, "PanelManualOptions").IsVisible,
             Gorunur(v, Bul<ComboBox>(v, "CmbContainer")),
             Gorunur(v, Bul<CheckBox>(v, "ChkCursor")),
             Gorunur(v, Bul<TextBox>(v, "TxtMaxDuration")));

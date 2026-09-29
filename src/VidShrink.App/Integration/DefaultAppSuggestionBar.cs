@@ -61,8 +61,8 @@ internal sealed class DefaultAppSuggestionBar : UserControl
         frame.Bind(Border.BackgroundProperty, Token("PanelSurface"));
         frame.Bind(Border.BorderBrushProperty, Token("NeonBlueBorder"));
         frame.Bind(Border.BorderThicknessProperty, Token("BorderThin"));
-        frame.Bind(Border.CornerRadiusProperty, Token("RadiusPanel"));
-        frame.Bind(Border.PaddingProperty, Token("PanelPadding"));
+        frame.Bind(Border.CornerRadiusProperty, Token("RadiusControl"));
+        frame.Bind(Border.PaddingProperty, Token("ButtonPaddingSm"));
 
         Content = frame;
         Bind(MarginProperty, Token("NoticeMargin"));

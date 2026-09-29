@@ -35,7 +35,7 @@
       <TextBlock x:Name="TxtTarget"
                  FontSize="{StaticResource FontSizeSm}"
                  TextWrapping="Wrap"
-                 Foreground="{StaticResource TextBody}"/>
+                 Foreground="{StaticResource TextBody}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <ProgressBar x:Name="Progress"
                    Minimum="0" Maximum="1"
@@ -70,7 +70,7 @@
       <TextBlock x:Name="TxtMessage"
                  FontSize="{StaticResource FontSizeSm}"
                  TextWrapping="Wrap"
-                 MaxWidth="{StaticResource TipMaxWidth}"/>
+                 MaxWidth="{StaticResource TipMaxWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <StackPanel x:Name="OvershootPanel" Spacing="{StaticResource SpaceSm}" IsVisible="False">
         <TextBlock Text="{loc:Text main.retry.title}"

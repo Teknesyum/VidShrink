@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "主题",
   "settings-tab.theme.hint": "更改程序中的所有颜色，并在下次启动时保留。",
   "settings-tab.language.hint": "更改界面语言，并在下次启动时保留。",
-  "settings-tab.default-target.label": "默认目标大小 (MB)",
+  "settings-tab.default-target.label": "默认目标大小",
   "settings-tab.default-target.hint": "设置“压缩”标签页打开时的目标大小。",
   "settings-tab.output-folder.label": "输出文件夹",
   "settings-tab.output-folder.beside-source": "源文件旁边",

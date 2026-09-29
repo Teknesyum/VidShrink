@@ -21,7 +21,11 @@ internal partial class RecorderView
 {
     private IReadOnlyList<AudioCaptureDevice> _devices = Array.Empty<AudioCaptureDevice>();
 
-    private void InitSes() => RefreshAudioBoxes();
+    private void InitSes()
+    {
+        CmbWebcam.SelectionChanged += (_, _) => KameraSecenekleri();
+        RefreshAudioBoxes();
+    }
 
     /// <summary>
     /// İki kutuyu o anki cihaz listesi ve o anki dille yeniden üretir. Seçim addan

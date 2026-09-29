@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Tema",
   "settings-tab.theme.hint": "Mengubah semua warna program dan diingat saat dibuka berikutnya.",
   "settings-tab.language.hint": "Mengubah bahasa antarmuka dan diingat saat dibuka berikutnya.",
-  "settings-tab.default-target.label": "Ukuran target bawaan (MB)",
+  "settings-tab.default-target.label": "Ukuran target bawaan",
   "settings-tab.default-target.hint": "Menentukan ukuran target saat tab Perkecil dibuka.",
   "settings-tab.output-folder.label": "Folder keluaran",
   "settings-tab.output-folder.beside-source": "Di samping berkas sumber",

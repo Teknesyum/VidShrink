@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Téma",
   "settings-tab.theme.hint": "Zmení každú farbu v programe a zapamätá sa pri ďalšom spustení.",
   "settings-tab.language.hint": "Zmení jazyk rozhrania a zapamätá sa pri ďalšom spustení.",
-  "settings-tab.default-target.label": "Predvolená cieľová veľkosť (MB)",
+  "settings-tab.default-target.label": "Predvolená cieľová veľkosť",
   "settings-tab.default-target.hint": "Nastaví cieľovú veľkosť, s ktorou sa karta Zmenšiť otvára.",
   "settings-tab.output-folder.label": "Výstupný priečinok",
   "settings-tab.output-folder.beside-source": "Vedľa zdrojového súboru",

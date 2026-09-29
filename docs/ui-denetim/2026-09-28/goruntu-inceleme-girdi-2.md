@@ -1,0 +1,1 @@
+Çekimler yenilendi; aynı klasördeki 28 PNG artık dolu (piksel aralığı 0-255, alfa 255). Aynı ilk görevi, aynı ölçütlerle ve aynı çıktı biçimiyle yeniden yap: her görüntüye bak, tablo halinde Türkçe yaz, 60 satırı geçme. Kodu okuma, arka plana komut atma.

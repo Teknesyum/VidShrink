@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Teema",
   "settings-tab.theme.hint": "Muudab programmi iga värvi ja jäetakse järgmiseks käivituseks meelde.",
   "settings-tab.language.hint": "Muudab liidese keelt ja jäetakse järgmiseks käivituseks meelde.",
-  "settings-tab.default-target.label": "Vaikimisi sihtsuurus (MB)",
+  "settings-tab.default-target.label": "Vaikimisi sihtsuurus",
   "settings-tab.default-target.hint": "Määrab sihtsuuruse, millega Tihenda-vahekaart avaneb.",
   "settings-tab.output-folder.label": "Väljundkaust",
   "settings-tab.output-folder.beside-source": "Lähtefaili kõrval",

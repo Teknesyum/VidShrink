@@ -546,7 +546,7 @@
   "settings-tab.theme.label": "Θέμα",
   "settings-tab.theme.hint": "Αλλάζει κάθε χρώμα του προγράμματος και απομνημονεύεται στην επόμενη εκκίνηση.",
   "settings-tab.language.hint": "Αλλάζει τη γλώσσα της διεπαφής και απομνημονεύεται στην επόμενη εκκίνηση.",
-  "settings-tab.default-target.label": "Προεπιλεγμένο μέγεθος-στόχος (MB)",
+  "settings-tab.default-target.label": "Προεπιλεγμένο μέγεθος-στόχος",
   "settings-tab.default-target.hint": "Ορίζει το μέγεθος-στόχο με το οποίο ανοίγει η καρτέλα Σμίκρυνση.",
   "settings-tab.output-folder.label": "Φάκελος εξόδου",
   "settings-tab.output-folder.beside-source": "Δίπλα στο αρχείο πηγής",

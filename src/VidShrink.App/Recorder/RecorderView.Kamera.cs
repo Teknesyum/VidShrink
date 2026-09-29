@@ -71,6 +71,19 @@ internal partial class RecorderView
         var background = ChosenBackground;
         CmbWebcamBackground.ItemsSource = WebcamBackgrounds.Select(b => Say(BackgroundKey(b))).ToList();
         CmbWebcamBackground.SelectedIndex = Array.IndexOf(WebcamBackgrounds, background);
+        KameraSecenekleri();
+    }
+
+    /// <summary>
+    /// Kamera seçilmemişken genişlik, köşe ve arka plan kapalı: <see cref="ChosenWebcam"/> o durumda
+    /// bindirme kurmuyor, seçilebilir görünen üç kutu kayda hiçbir şey katmıyordu.
+    /// </summary>
+    private void KameraSecenekleri()
+    {
+        var acik = CmbWebcam.SelectedIndex > 0;
+        CmbWebcamSize.IsEnabled = acik;
+        CmbWebcamCorner.IsEnabled = acik;
+        CmbWebcamBackground.IsEnabled = acik;
     }
 
     private static int IndexOf(IReadOnlyList<int> list, int value)
