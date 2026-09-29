@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-29
+
 ### Added
 
 - Recorder: an Auto setup button in the strip asks up to three questions with one-click square answers (what you record, which sound goes in, where the recording goes), then applies the answers on top of the machine measurement and shows a one-line summary. Answers are remembered; next time a "Same settings as last time" shortcut skips the questions.
