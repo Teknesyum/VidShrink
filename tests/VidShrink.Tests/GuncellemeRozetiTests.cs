@@ -68,7 +68,7 @@ public sealed class GuncellemeRozetiTests
     public void AgHatasiSessizceVazgecmez()
     {
         var kod = File.ReadAllText(TipSources.WindowCodePath);
-        var basla = kod.IndexOf("private async Task CheckForUpdateAsync()", StringComparison.Ordinal);
+        var basla = kod.IndexOf("private async Task CheckForUpdateAsync(", StringComparison.Ordinal);
         Assert.True(basla > 0, "denetim gövdesi bulunamadı");
         var govde = kod.Substring(basla, 1600);
 

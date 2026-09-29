@@ -11,6 +11,7 @@ public static class ShortcutIcons
 {
     public const string DirectoryVariable = "VIDSHRINK_SHORTCUT_DIR";
     public const string ShortcutName = "VidShrink.lnk";
+    public const string MarkerName = ".shortcut-icon-version";
 
     public static IReadOnlyList<string> Locations()
     {
@@ -47,6 +48,22 @@ public static class ShortcutIcons
             }
         }
         if (rewritten > 0) notify();
+        return rewritten;
+    }
+
+    public static bool IsStale(string baseDirectory, string version)
+    {
+        try { return File.ReadAllText(Path.Combine(baseDirectory, MarkerName)).Trim() != version; }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { return true; }
+    }
+
+    public static int RefreshIfStale(string baseDirectory, string version, Func<string, int>? refresh = null)
+    {
+        if (!IsStale(baseDirectory, version)) return 0;
+        if (!File.Exists(Path.Combine(baseDirectory, LauncherUpdate.ExecutableName))) return 0;
+        var rewritten = (refresh ?? RefreshInstalled)(baseDirectory);
+        try { File.WriteAllText(Path.Combine(baseDirectory, MarkerName), version); }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { }
         return rewritten;
     }
 

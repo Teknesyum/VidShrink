@@ -168,4 +168,41 @@ public sealed class KisayolSimgesiTests : IDisposable
             foreach (var konum in konumlar) File.Delete(konum);
         }
     }
+
+    [Fact]
+    public void SimgeSurumBasinaBirKezTazelenir()
+    {
+        var kok = Kurulum();
+        var cagri = new List<string>();
+        int Tazele(string k) { cagri.Add(k); return 1; }
+
+        var ilk = ShortcutIcons.RefreshIfStale(kok, "1.0.0", Tazele);
+        var ayni = ShortcutIcons.RefreshIfStale(kok, "1.0.0", Tazele);
+        var yeni = ShortcutIcons.RefreshIfStale(kok, "1.0.1", Tazele);
+
+        Assert.Equal((1, 0, 1), (ilk, ayni, yeni));
+        Assert.Equal(new[] { kok, kok }, cagri);
+        Assert.Equal("1.0.1", File.ReadAllText(Path.Combine(kok, ShortcutIcons.MarkerName)));
+    }
+
+    [Fact]
+    public void BaslaticisizKlasordeSimgeyeDokunulmaz()
+    {
+        var kok = Path.Combine(_root, "baslaticisiz");
+        Directory.CreateDirectory(kok);
+        var cagri = 0;
+
+        var yazilan = ShortcutIcons.RefreshIfStale(kok, "1.0.0", _ => ++cagri);
+
+        Assert.Equal(0, yazilan);
+        Assert.Equal(0, cagri);
+        Assert.False(File.Exists(Path.Combine(kok, ShortcutIcons.MarkerName)));
+    }
+
+    [Fact]
+    public void AcilisKisayolSimgesiniTazeler()
+    {
+        var govde = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.axaml.cs"));
+        Assert.Contains("_ = KisayolSimgesiniTazeleAsync();", govde);
+    }
 }

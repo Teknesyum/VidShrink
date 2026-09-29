@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using Avalonia.Threading;
 using VidShrink.Core;
+using VidShrink.Core.Setup;
 
 namespace VidShrink.App;
 
@@ -42,6 +43,7 @@ public partial class MainWindow
 {
     private Task<bool?>? _sessizIndirme;
     private bool _kapanistaKurulacak;
+    private bool _yedekDenetimYapildi;
 
     /// <summary>Ölçünün açılış sinyali yerine koyduğu bekleme; boşken ilk görüntü ya da 5 sn.</summary>
     internal Func<Task>? AcilisBittiBekle { get; set; }
@@ -57,6 +59,8 @@ public partial class MainWindow
 
     /// <summary>Ölçünün başlatıcı yerine koyduğu iş; boşken başlatıcı kapanış kipinde açılır.</summary>
     internal Func<bool>? KapanisBaslaticisi { get; set; }
+
+    internal Func<Task>? YedekDenetim { get; set; }
 
     /// <summary>Son kapanış denemesinde takasın sürdüğü zaman; ölçüm ve tanı için.</summary>
     internal TimeSpan SonTakasSuresi { get; private set; }
@@ -82,7 +86,28 @@ public partial class MainWindow
 
         await (AcilisBittiBekle ?? AcilisiBekle)();
         if (!OtomatikAcik()) return;
+        if (UpdateHealth.Load(SettingsPathOverride).Stuck) YedekDenetimeDon();
         (SessizIndirici ?? SessizIndirmeyiBaslat)();
+    }
+
+    private void YedekDenetimeDon()
+    {
+        if (_yedekDenetimYapildi) return;
+        _yedekDenetimYapildi = true;
+        _ = (YedekDenetim ?? (() => CheckForUpdateAsync(yedek: true)))();
+    }
+
+    internal static async Task KisayolSimgesiniTazeleAsync()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        await AcilisiBekle();
+        var appDirectory = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+        if (LauncherUpdate.LocateLauncher(appDirectory) is null) return;
+        var baseDirectory = Path.GetDirectoryName(appDirectory);
+        if (string.IsNullOrEmpty(baseDirectory)) return;
+        var surum = UpdateCheck.CurrentVersion();
+        await LowPriorityWork.Run(nameof(KisayolSimgesiniTazeleAsync),
+            () => Task.FromResult(ShortcutIcons.RefreshIfStale(baseDirectory, surum)));
     }
 
     private static Task AcilisiBekle() =>
@@ -127,9 +152,29 @@ public partial class MainWindow
         _sessizIndirme = null;
         DrainUpdateReports();
         var staged = task.Status == TaskStatus.RanToCompletion && task.Result == true && _updateLastPhase == UpdateStagePhase.Staged;
-        if (!staged) return;
+        if (!staged)
+        {
+            SessizSonucuKaydet(task);
+            return;
+        }
         _kapanistaKurulacak = true;
         SetUpdateBadge(UpdateBadgeState.Ready);
+    }
+
+    private void SessizSonucuKaydet(Task<bool?> task)
+    {
+        if (task.IsCanceled) return;
+        if (task.Status == TaskStatus.RanToCompletion && task.Result is null) return;
+        if (task.Status == TaskStatus.RanToCompletion && _updateLastPhase == UpdateStagePhase.Current)
+        {
+            UpdateHealth.RecordSuccess(SettingsPathOverride, DateTimeOffset.UtcNow);
+            return;
+        }
+
+        var sebep = task.Exception?.GetBaseException() is { } hata
+            ? $"{hata.GetType().Name}: {hata.Message}"
+            : $"faz: {_updateLastPhase?.ToString() ?? "yok"}";
+        if (UpdateHealth.RecordFailure(SettingsPathOverride, DateTimeOffset.UtcNow, sebep).Stuck) YedekDenetimeDon();
     }
 
     /// <summary>Rozetin hazır ipucu: sessiz sahnelemeden geldiyse "kapanınca kurulacak".</summary>
@@ -162,8 +207,13 @@ public partial class MainWindow
             return KapanisGuncellemesi.Takas;
         }
 
-        try { return (KapanisBaslaticisi ?? BaslaticiyiKapanistaBirak)() ? KapanisGuncellemesi.Baslatici : KapanisGuncellemesi.Dustu; }
-        catch (Exception) { return KapanisGuncellemesi.Dustu; }
+        bool birakildi;
+        try { birakildi = (KapanisBaslaticisi ?? BaslaticiyiKapanistaBirak)(); }
+        catch (Exception) { birakildi = false; }
+        if (birakildi) return KapanisGuncellemesi.Baslatici;
+
+        UpdateHealth.RecordFailure(SettingsPathOverride, DateTimeOffset.UtcNow, "kapanista kurulum dustu: " + staged.Manifest.Version);
+        return KapanisGuncellemesi.Dustu;
     }
 
     /// <summary>

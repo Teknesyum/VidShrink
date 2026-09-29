@@ -15,6 +15,11 @@ ship as part of it.
 - Editor: Share saves first when needed, then uploads through the same share layer as the recorder.
 - Recorder region editor: the edge snaps to windows and screen edges while you drag (hold Alt to turn it off); the toolbar has large square icon buttons, including snapshot (works before and during recording), hide frame (F9 or the tray icon brings it back), pause/resume/stop while recording, and a close button that stops the recording. The edge is dashed while you set it up and solid while recording.
 
+### Fixed
+
+- Windows: when the silent update fails three times in a row (unreachable, bad download, install on exit fails), the app stops trusting it and runs the manual check, so a newer version shows up in the badge and panel instead of never arriving. The reason is kept in `update-health.json` next to the settings.
+- Windows: the desktop and Start menu shortcut icons are refreshed once per version after startup, so an old icon no longer sticks after an update.
+
 ## [1.0.0] - 2026-09-28
 
 ### Changed
