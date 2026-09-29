@@ -841,7 +841,11 @@ public partial class MainWindow : Window
 
     internal double TopRevealZone => this.TryFindResource("PlaybackTopRevealZone", out var bant) && bant is double d ? d : 0;
 
-    private void ApplyChromeMode() => ChromeZone.Hold(!ChromeHidesItself || !Player.IsPlaying);
+    private void ApplyChromeMode()
+    {
+        ChromeZone.Hold(!ChromeHidesItself);
+        ChromeZone.Keep(!Player.IsPlaying);
+    }
 
     private void OnChromePointerMoved(object? sender, PointerEventArgs e)
     {

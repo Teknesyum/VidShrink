@@ -218,7 +218,11 @@ internal partial class ControlStrip : UserControl
 
     // ---- görünürlük (K1) ------------------------------------------------------------
 
-    private void UpdateHold() => _zone.Hold(_pointerOnBar || _focusInside || !_playing);
+    private void UpdateHold()
+    {
+        _zone.Hold(_pointerOnBar || _focusInside);
+        _zone.Keep(!_playing);
+    }
 
     /// <summary>Odak ve fare göstergesi: yol çerçevesi kalınlaşır, tutamaç parlar.</summary>
     private void LightTimeline(bool lit)

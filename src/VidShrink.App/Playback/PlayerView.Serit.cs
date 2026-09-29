@@ -132,7 +132,11 @@ internal partial class PlayerView
         StripBar.PointerEntered += (_, _) => { _pointerOnSerit = true; HoldSerit(); };
         StripBar.PointerExited += (_, _) => { _pointerOnSerit = false; HoldSerit(); };
         Surface.PointerMoved += OnSeritPointer;
-        Surface.PointerExited += (_, _) => _serit?.PointerGone();
+        Surface.PointerExited += (_, _) =>
+        {
+            _serit?.PointerGone();
+            HideThumbnail();
+        };
 
         BtnSeritPlay.Click += (_, _) => Apply(Keymap.PlayPause.ToCommand());
         BtnSeritBack.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Seek, -Keymap.SeekSmall));
@@ -154,6 +158,7 @@ internal partial class PlayerView
     private void OnSeritPointer(object? sender, PointerEventArgs e)
     {
         _seritPointerX = e.GetPosition(StripBar).X;
+        if (ThumbnailVisible && !SeekBar.IsPointerOver) HideThumbnail();
         _serit?.PointerAt(e.GetPosition(Surface).Y, Surface.Bounds.Height);
     }
 
@@ -161,7 +166,11 @@ internal partial class PlayerView
     /// Seridi acik tutan sebepler: fare seridin uzerinde ya da oynatma duraklamis. Biri
     /// bile dogruyken gecikmeli kaybolma calismaz.
     /// </summary>
-    private void HoldSerit() => _serit?.Hold(_pointerOnSerit || !_playing);
+    private void HoldSerit()
+    {
+        _serit?.Hold(_pointerOnSerit);
+        _serit?.Keep(!_playing);
+    }
 
     internal static KeymapRow? SeekRow(double seconds)
         => Keymap.Rows.FirstOrDefault(r => r.Input.Kind == PlayerInputKind.Key && r.Action.Command == PlayerCommandKind.Seek && r.Action.Amount == seconds);
