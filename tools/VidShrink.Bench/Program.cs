@@ -771,6 +771,12 @@ static async Task<int> ShrinkAsync(string[] args)
 
         foreach (var step in encodeResult.Trace ?? Array.Empty<EncodeAttempt>())
             Console.WriteLine($"  deneme {step.Number}: {step.Branch}, {step.Mode}, {step.VideoBitrateK}k, hedeflenen {step.AimMb:0.###} MB, cikan {step.ActualMb:0.###} MB");
+        if (File.Exists(outputPath))
+        {
+            var anahtar = await KeyframeStampsAsync(outputPath);
+            var araliklar = anahtar.Stamps.Zip(anahtar.Stamps.Skip(1), (x, y) => y - x).ToList();
+            Console.WriteLine($"anahtar kare: adet={anahtar.Stamps.Count} en-uzun-aralik={(araliklar.Count > 0 ? araliklar.Max() : 0):0.###}s ortalama-aralik={(araliklar.Count > 0 ? araliklar.Average() : 0):0.###}s damgalar={string.Join(' ', anahtar.Stamps.Select(s => s.ToString("0.###", CultureInfo.InvariantCulture)))}");
+        }
 
         var measureWatch = Stopwatch.StartNew();
         var vmaf = noMeasure ? VmafPool.Empty : await VmafNegAsync(source, outputPath, info.Width, info.Height);

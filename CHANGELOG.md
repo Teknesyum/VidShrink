@@ -13,6 +13,7 @@ ship as part of it.
 
 ### Changed
 
+- Editor: files written by Shrink and the Recorder stay cuttable without re-encoding. A new test pins that every Shrink encode path (x264, x265, SVT-AV1, VP9, NVENC; two-pass, first pass and CRF) writes a bounded keyframe interval, that the x265/SVT-AV1 `keyint` matches `-g` even when user parameters are merged in, and that the Recorder default writes a 2 s interval on every encoder. `bench shrink` now prints the delivered file's keyframe count and longest interval.
 - Recorder: the replay buffer left the top strip and the first card; it now lives in its own Advanced card (length, start and save), and stays visible while the buffer runs.
 - Player: the seek preview is just the frame and its time, with no outline around it, and it closes as soon as the pointer leaves the timeline.
 - Player: pausing no longer brings up the top and bottom bars; they appear only when the pointer moves to the top or bottom edge, and stay while paused once shown.
