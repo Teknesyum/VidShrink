@@ -27,8 +27,8 @@
 
   <Color x:Key="NeonEmberColor">#FFE67E80</Color>
   <Color x:Key="EmberFlameColor">#FFE69875</Color>
-  <Color x:Key="EmberBlazeColor">#FFDFC48E</Color>
-  <Color x:Key="AtmosHotColor">#FFDFC48F</Color>
+  <Color x:Key="EmberBlazeColor">#FFE0C793</Color>
+  <Color x:Key="AtmosHotColor">#FFE0C794</Color>
   <Color x:Key="AtmosMidColor">#FFE69876</Color>
   <Color x:Key="AtmosEdgeColor">#FFE67E81</Color>
   <Color x:Key="EmberDeepColor">#FF222529</Color>

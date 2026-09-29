@@ -505,12 +505,14 @@
               <StackPanel>
                 <TextBlock Text="{loc:Text recorder.budget.seconds}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtTargetSeconds"
+                         PlaceholderText="{loc:Text recorder.budget.optional}"
                          ToolTip.Tip="{loc:Text recorder.budget.hint}"
                          auto:AutomationProperties.Name="{loc:Text recorder.budget.seconds}"/>
               </StackPanel>
               <StackPanel>
                 <TextBlock Text="{loc:Text recorder.budget.megabytes}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtTargetMegabytes"
+                         PlaceholderText="{loc:Text recorder.budget.optional}"
                          ToolTip.Tip="{loc:Text recorder.budget.hint}"
                          auto:AutomationProperties.Name="{loc:Text recorder.budget.megabytes}"/>
               </StackPanel>
