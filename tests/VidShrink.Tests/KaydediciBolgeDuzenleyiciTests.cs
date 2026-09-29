@@ -599,40 +599,46 @@ public sealed class KaydediciBolgeDuzenleyiciTests
             Pompala(onceKare, 30000);
             var bostaKare = (ok: onceKare.Result, pngler: Directory.Exists(klasor) ? Directory.GetFiles(klasor, "kare_*.png") : Array.Empty<string>());
 
-            var baslat = view.StartAsync();
-            Pompala(baslat, 45000);
-            var basladi = (view.HasSession, sahte.Evre, view.ErrorText);
-            Pompala(Task.Delay(1200), 3000);
-
-            sahte.Duraklat();
-            Bekle(() => view.State == RecorderState.Paused, 10000);
-            var duraklatildi = (view.State, sahte.Evre);
-            sahte.Surdur();
-            Bekle(() => view.State == RecorderState.Running, 10000);
-            var surdu = (view.State, sahte.Evre);
-
-            var gizleOnce = sahte.Cagrilar.Count(c => c == "gizle");
-            sahte.Gizle();
-            var gizlendi = (view.FrameHiddenByUser, view.FrameShown, panel: sahte.Cagrilar.Count(c => c == "gizle") - gizleOnce,
-                cerceve: cerceve.Cagrilar.LastOrDefault(), view.HasSession, view.State);
-            view.OnTrayClicked();
-            var tepsi = (view.FrameHiddenByUser, view.FrameShown, son: sahte.Cagrilar.LastOrDefault());
-            sahte.Gizle();
-            var tus = view.RunHotkeyAsync(HotkeyAction.Frame);
-            Pompala(tus, 5000);
-            var kisayol = (view.FrameHiddenByUser, view.FrameShown);
-
-            sahte.Durdur();
-            Bekle(() => !view.HasSession, 30000);
-            var durdu = (view.HasSession, view.FrameHiddenByUser, sahte.Evre, sonuc: view.ResultPathText, view.ErrorText);
-            if (view.HasSession)
+            try
             {
-                var iptal = view.RunHotkeyAsync(HotkeyAction.Discard);
-                Pompala(iptal, 15000);
-            }
+                var baslat = view.StartAsync();
+                Pompala(baslat, 45000);
+                var basladi = (view.HasSession, sahte.Evre, view.ErrorText);
+                Bekle(() => false, 1200);
 
-            return (bostaKare, basladi, duraklatildi, surdu, gizlendi, tepsi, kisayol, durdu,
-                videolar: Directory.Exists(klasor) ? Directory.GetFiles(klasor, "*.mp4") : Array.Empty<string>());
+                sahte.Duraklat();
+                Bekle(() => view.State == RecorderState.Paused, 10000);
+                var duraklatildi = (view.State, sahte.Evre);
+                sahte.Surdur();
+                Bekle(() => view.State == RecorderState.Running, 10000);
+                var surdu = (view.State, sahte.Evre);
+
+                var gizleOnce = sahte.Cagrilar.Count(c => c == "gizle");
+                sahte.Gizle();
+                var gizlendi = (view.FrameHiddenByUser, view.FrameShown, panel: sahte.Cagrilar.Count(c => c == "gizle") - gizleOnce,
+                    cerceve: cerceve.Cagrilar.LastOrDefault(), view.HasSession, view.State);
+                view.OnTrayClicked();
+                var tepsi = (view.FrameHiddenByUser, view.FrameShown, son: sahte.Cagrilar.LastOrDefault());
+                sahte.Gizle();
+                var tus = view.RunHotkeyAsync(HotkeyAction.Frame);
+                Pompala(tus, 5000);
+                var kisayol = (view.FrameHiddenByUser, view.FrameShown);
+
+                sahte.Durdur();
+                Bekle(() => !view.HasSession, 30000);
+                var durdu = (view.HasSession, view.FrameHiddenByUser, sahte.Evre, sonuc: view.ResultPathText, view.ErrorText);
+
+                return (bostaKare, basladi, duraklatildi, surdu, gizlendi, tepsi, kisayol, durdu,
+                    videolar: Directory.Exists(klasor) ? Directory.GetFiles(klasor, "*.mp4") : Array.Empty<string>());
+            }
+            finally
+            {
+                if (view.HasSession)
+                {
+                    var iptal = view.RunHotkeyAsync(HotkeyAction.Discard);
+                    Bekle(() => iptal.IsCompleted, 15000);
+                }
+            }
         }));
 
         try

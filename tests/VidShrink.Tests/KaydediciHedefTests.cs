@@ -256,6 +256,16 @@ public sealed class KaydediciHedefTests
         gorev.GetAwaiter().GetResult();
     }
 
+    private static void Oyala(int ms)
+    {
+        var saat = System.Diagnostics.Stopwatch.StartNew();
+        while (saat.ElapsedMilliseconds < ms)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(20);
+        }
+    }
+
     private static void KayitKapat(RecorderView view, Task baslat)
     {
         var saat = System.Diagnostics.Stopwatch.StartNew();
@@ -299,7 +309,7 @@ public sealed class KaydediciHedefTests
             {
                 Pompala(baslat, 45000);
                 var basladi = view.HasSession;
-                Pompala(Task.Delay(1500), 3000);
+                Oyala(1500);
                 var iptal = view.RunHotkeyAsync(HotkeyAction.Discard);
                 Pompala(iptal, 15000);
                 return (basladi, hata: view.ErrorText, iptal: iptal.Result, oturum: view.HasSession, not: view.NoticeText,
