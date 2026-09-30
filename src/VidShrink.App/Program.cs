@@ -165,6 +165,7 @@ internal static class Program
             return Build(path, files).StartWithClassicDesktopLifetime(args);
         }
 
+        JitProfili.Baslat(AcilisBitti.Task);
         instance.StartListening(files.Receive);
         StartLauncherMaintenance();
         return Build(path, files).StartWithClassicDesktopLifetime(args);
