@@ -11,6 +11,8 @@ on:
         description: 'ikisi | kurucu | tek-satir'
         required: false
         default: 'ikisi'
+  push:
+    branches: [worktree-agent-ab3ab0b15b53889b4]
   workflow_run:
     workflows: [release]
     types: [completed]
@@ -20,7 +22,7 @@ permissions:
 
 jobs:
   duman:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     strategy:
       fail-fast: false
       matrix:
