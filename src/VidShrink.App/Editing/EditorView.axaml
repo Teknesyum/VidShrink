@@ -88,6 +88,29 @@
               <Border x:Name="TextSwatch" Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" VerticalAlignment="Center" CornerRadius="{StaticResource RadiusChip}" BorderThickness="{StaticResource BorderThin}" BorderBrush="{StaticResource HeaderRestBorder}"/>
             </StackPanel>
           </WrapPanel>
+          <WrapPanel x:Name="ClipPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.clip.panel}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <Button x:Name="BtnClipRotate" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.rotate}" AutomationProperties.Name="{loc:Text editor.clip.rotate}"/>
+              <ToggleButton x:Name="BtnClipFlipH" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.flip-h}" AutomationProperties.Name="{loc:Text editor.clip.flip-h}"/>
+              <ToggleButton x:Name="BtnClipFlipV" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.flip-v}" AutomationProperties.Name="{loc:Text editor.clip.flip-v}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.crop}"/>
+              <ComboBox x:Name="CmbClipCrop" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.crop}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.volume}"/>
+              <TextBox x:Name="TxtClipVolume" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.volume}"/>
+              <ToggleButton x:Name="BtnClipMute" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.mute}" AutomationProperties.Name="{loc:Text editor.clip.mute}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-in}"/>
+              <TextBox x:Name="TxtClipFadeIn" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-in}"/>
+              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-out}"/>
+              <TextBox x:Name="TxtClipFadeOut" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-out}"/>
+            </StackPanel>
+            <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
+          </WrapPanel>
           <StackPanel x:Name="ExportBar" Spacing="{StaticResource SpaceSm}" IsVisible="False">
             <ProgressBar x:Name="ExportProgress" Maximum="1" IsVisible="False"/>
             <TextBlock x:Name="TxtExportNote" Theme="{StaticResource StatusWarning}" TextWrapping="Wrap" IsVisible="False"/>

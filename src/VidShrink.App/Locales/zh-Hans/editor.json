@@ -54,5 +54,17 @@
   "editor.text.size": "大小",
   "editor.text.color": "颜色",
   "editor.text.panel": "文字属性",
-  "editor.export.text-full": "文字图层需要重新编码，已切换到完整模式。"
+  "editor.export.text-full": "文字图层需要重新编码，已切换到完整模式。",
+  "editor.clip.panel": "片段属性",
+  "editor.clip.rotate": "旋转 90°",
+  "editor.clip.flip-h": "水平翻转",
+  "editor.clip.flip-v": "垂直翻转",
+  "editor.clip.crop": "裁剪",
+  "editor.clip.crop.none": "无",
+  "editor.clip.volume": "音量 (dB)",
+  "editor.clip.mute": "静音",
+  "editor.clip.fade-in": "淡入 (秒)",
+  "editor.clip.fade-out": "淡出 (秒)",
+  "editor.clip.reset": "重置",
+  "editor.export.effects-full": "片段设置需要重新编码，已切换到完整模式。"
 }

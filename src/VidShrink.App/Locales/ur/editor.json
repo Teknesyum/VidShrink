@@ -54,5 +54,17 @@
   "editor.text.size": "سائز",
   "editor.text.color": "رنگ",
   "editor.text.panel": "متن کی خصوصیات",
-  "editor.export.text-full": "متن کی تہہ کو دوبارہ انکوڈ کرنا ضروری ہے؛ مکمل موڈ پر منتقل کر دیا گیا۔"
+  "editor.export.text-full": "متن کی تہہ کو دوبارہ انکوڈ کرنا ضروری ہے؛ مکمل موڈ پر منتقل کر دیا گیا۔",
+  "editor.clip.panel": "کلپ کی خصوصیات",
+  "editor.clip.rotate": "90° گھمائیں",
+  "editor.clip.flip-h": "افقی پلٹیں",
+  "editor.clip.flip-v": "عمودی پلٹیں",
+  "editor.clip.crop": "تراشیں",
+  "editor.clip.crop.none": "کوئی نہیں",
+  "editor.clip.volume": "آواز (dB)",
+  "editor.clip.mute": "خاموش",
+  "editor.clip.fade-in": "بتدریج ظاہر (سیکنڈ)",
+  "editor.clip.fade-out": "بتدریج غائب (سیکنڈ)",
+  "editor.clip.reset": "ری سیٹ",
+  "editor.export.effects-full": "کلپ کی ترتیبات کو دوبارہ انکوڈ کرنا ضروری ہے؛ مکمل موڈ پر منتقل کر دیا گیا۔"
 }

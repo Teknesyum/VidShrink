@@ -54,5 +54,17 @@
   "editor.text.size": "Размер",
   "editor.text.color": "Цвет",
   "editor.text.panel": "Свойства текста",
-  "editor.export.text-full": "Текстовый слой требует перекодирования; включён полный режим."
+  "editor.export.text-full": "Текстовый слой требует перекодирования; включён полный режим.",
+  "editor.clip.panel": "Свойства клипа",
+  "editor.clip.rotate": "Повернуть на 90°",
+  "editor.clip.flip-h": "Отразить по горизонтали",
+  "editor.clip.flip-v": "Отразить по вертикали",
+  "editor.clip.crop": "Кадрирование",
+  "editor.clip.crop.none": "Нет",
+  "editor.clip.volume": "Громкость (дБ)",
+  "editor.clip.mute": "Без звука",
+  "editor.clip.fade-in": "Появление (с)",
+  "editor.clip.fade-out": "Затухание (с)",
+  "editor.clip.reset": "Сбросить",
+  "editor.export.effects-full": "Настройки клипа требуют перекодирования; включён полный режим."
 }

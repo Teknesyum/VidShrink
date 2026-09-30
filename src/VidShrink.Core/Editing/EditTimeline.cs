@@ -210,8 +210,8 @@ public sealed class EditTimeline
 
         var before = _clips[index];
         var after = head != before.Reversed
-            ? new EditClip(sourceEdge, before.SourceEnd, before.Speed, before.Reversed)
-            : new EditClip(before.SourceStart, sourceEdge, before.Speed, before.Reversed);
+            ? before.WithRange(sourceEdge, before.SourceEnd)
+            : before.WithRange(before.SourceStart, sourceEdge);
         if (after == before) return false;
 
         Execute(new ReplaceCommand(index, before, after));
@@ -296,6 +296,36 @@ public sealed class EditTimeline
             var after = before.WithMotion(magnitude, speed < 0);
             if (after == before) continue;
             var step = new ReplaceCommand(i, before, after);
+            step.Apply(_clips);
+            steps.Add(step);
+        }
+
+        if (steps.Count == 0) return false;
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
+    public bool HasEffects => _clips.Any(c => !c.Effects.IsNeutral);
+
+    /// <summary>
+    /// Verilen parcalarin ayarlarini <paramref name="change"/> ile yazar; sonuc gecerli araliga
+    /// cekilir. Tek adimda geri alinir. Hicbir parca degismezse <c>false</c> doner.
+    /// </summary>
+    public bool SetEffects(IReadOnlyList<int> indices, Func<ClipEffects, ClipEffects> change)
+    {
+        ArgumentNullException.ThrowIfNull(indices);
+        ArgumentNullException.ThrowIfNull(change);
+        var order = indices.Distinct().OrderBy(i => i).ToList();
+        foreach (var index in order) CheckIndex(index);
+
+        var steps = new List<IEditCommand>();
+        foreach (var index in order)
+        {
+            var before = _clips[index];
+            var effects = change(before.Effects).Normalized();
+            var after = before with { Effects = effects.IsNeutral ? ClipEffects.None : effects };
+            if (after == before) continue;
+            var step = new ReplaceCommand(index, before, after);
             step.Apply(_clips);
             steps.Add(step);
         }

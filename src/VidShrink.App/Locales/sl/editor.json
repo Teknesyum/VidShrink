@@ -54,5 +54,17 @@
   "editor.text.size": "Velikost",
   "editor.text.color": "Barva",
   "editor.text.panel": "Lastnosti besedila",
-  "editor.export.text-full": "Plast besedila zahteva ponovno kodiranje; preklopljeno na polni način."
+  "editor.export.text-full": "Plast besedila zahteva ponovno kodiranje; preklopljeno na polni način.",
+  "editor.clip.panel": "Lastnosti posnetka",
+  "editor.clip.rotate": "Zasukaj za 90°",
+  "editor.clip.flip-h": "Zrcali vodoravno",
+  "editor.clip.flip-v": "Zrcali navpično",
+  "editor.clip.crop": "Obrezovanje",
+  "editor.clip.crop.none": "Brez",
+  "editor.clip.volume": "Glasnost (dB)",
+  "editor.clip.mute": "Utišaj",
+  "editor.clip.fade-in": "Postopno pojavljanje (s)",
+  "editor.clip.fade-out": "Postopno pojemanje (s)",
+  "editor.clip.reset": "Ponastavi",
+  "editor.export.effects-full": "Nastavitve posnetka zahtevajo ponovno kodiranje; preklopljeno na polni način."
 }

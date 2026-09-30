@@ -54,5 +54,17 @@
   "editor.text.size": "Tamaño",
   "editor.text.color": "Color",
   "editor.text.panel": "Propiedades del texto",
-  "editor.export.text-full": "La capa de texto requiere recodificar; se cambió al modo completo."
+  "editor.export.text-full": "La capa de texto requiere recodificar; se cambió al modo completo.",
+  "editor.clip.panel": "Propiedades del clip",
+  "editor.clip.rotate": "Girar 90°",
+  "editor.clip.flip-h": "Voltear horizontal",
+  "editor.clip.flip-v": "Voltear vertical",
+  "editor.clip.crop": "Recorte",
+  "editor.clip.crop.none": "Ninguno",
+  "editor.clip.volume": "Volumen (dB)",
+  "editor.clip.mute": "Silenciar",
+  "editor.clip.fade-in": "Aparición (s)",
+  "editor.clip.fade-out": "Desvanecimiento (s)",
+  "editor.clip.reset": "Restablecer",
+  "editor.export.effects-full": "Los ajustes del clip requieren recodificar; se cambió al modo completo."
 }

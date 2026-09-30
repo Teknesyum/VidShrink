@@ -54,5 +54,17 @@
   "editor.text.size": "Størrelse",
   "editor.text.color": "Farve",
   "editor.text.panel": "Tekstegenskaber",
-  "editor.export.text-full": "Tekstlaget kræver genkodning; der er skiftet til fuld tilstand."
+  "editor.export.text-full": "Tekstlaget kræver genkodning; der er skiftet til fuld tilstand.",
+  "editor.clip.panel": "Klipegenskaber",
+  "editor.clip.rotate": "Roter 90°",
+  "editor.clip.flip-h": "Spejlvend vandret",
+  "editor.clip.flip-v": "Spejlvend lodret",
+  "editor.clip.crop": "Beskær",
+  "editor.clip.crop.none": "Ingen",
+  "editor.clip.volume": "Lydstyrke (dB)",
+  "editor.clip.mute": "Slå lyd fra",
+  "editor.clip.fade-in": "Fade ind (s)",
+  "editor.clip.fade-out": "Fade ud (s)",
+  "editor.clip.reset": "Nulstil",
+  "editor.export.effects-full": "Klipindstillingerne kræver genkodning; der er skiftet til fuld tilstand."
 }

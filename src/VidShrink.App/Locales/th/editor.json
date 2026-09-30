@@ -54,5 +54,17 @@
   "editor.text.size": "ขนาด",
   "editor.text.color": "สี",
   "editor.text.panel": "คุณสมบัติข้อความ",
-  "editor.export.text-full": "เลเยอร์ข้อความต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นโหมดเต็ม"
+  "editor.export.text-full": "เลเยอร์ข้อความต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นโหมดเต็ม",
+  "editor.clip.panel": "คุณสมบัติคลิป",
+  "editor.clip.rotate": "หมุน 90°",
+  "editor.clip.flip-h": "พลิกแนวนอน",
+  "editor.clip.flip-v": "พลิกแนวตั้ง",
+  "editor.clip.crop": "ครอบตัด",
+  "editor.clip.crop.none": "ไม่มี",
+  "editor.clip.volume": "ระดับเสียง (dB)",
+  "editor.clip.mute": "ปิดเสียง",
+  "editor.clip.fade-in": "เฟดเข้า (วิ)",
+  "editor.clip.fade-out": "เฟดออก (วิ)",
+  "editor.clip.reset": "รีเซ็ต",
+  "editor.export.effects-full": "การตั้งค่าคลิปต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นโหมดเต็ม"
 }

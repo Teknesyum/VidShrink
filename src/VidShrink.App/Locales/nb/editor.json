@@ -54,5 +54,17 @@
   "editor.text.size": "Størrelse",
   "editor.text.color": "Farge",
   "editor.text.panel": "Tekstegenskaper",
-  "editor.export.text-full": "Tekstlaget krever omkoding; byttet til full modus."
+  "editor.export.text-full": "Tekstlaget krever omkoding; byttet til full modus.",
+  "editor.clip.panel": "Klippegenskaper",
+  "editor.clip.rotate": "Roter 90°",
+  "editor.clip.flip-h": "Speilvend vannrett",
+  "editor.clip.flip-v": "Speilvend loddrett",
+  "editor.clip.crop": "Beskjær",
+  "editor.clip.crop.none": "Ingen",
+  "editor.clip.volume": "Volum (dB)",
+  "editor.clip.mute": "Demp",
+  "editor.clip.fade-in": "Ton inn (s)",
+  "editor.clip.fade-out": "Ton ut (s)",
+  "editor.clip.reset": "Tilbakestill",
+  "editor.export.effects-full": "Klippinnstillingene krever omkoding; byttet til full modus."
 }

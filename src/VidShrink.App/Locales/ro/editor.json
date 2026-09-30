@@ -54,5 +54,17 @@
   "editor.text.size": "Dimensiune",
   "editor.text.color": "Culoare",
   "editor.text.panel": "Proprietățile textului",
-  "editor.export.text-full": "Stratul de text necesită recodare; s-a trecut la modul complet."
+  "editor.export.text-full": "Stratul de text necesită recodare; s-a trecut la modul complet.",
+  "editor.clip.panel": "Proprietățile clipului",
+  "editor.clip.rotate": "Rotește cu 90°",
+  "editor.clip.flip-h": "Oglindește orizontal",
+  "editor.clip.flip-v": "Oglindește vertical",
+  "editor.clip.crop": "Decupare",
+  "editor.clip.crop.none": "Niciuna",
+  "editor.clip.volume": "Volum (dB)",
+  "editor.clip.mute": "Fără sunet",
+  "editor.clip.fade-in": "Apariție treptată (s)",
+  "editor.clip.fade-out": "Dispariție treptată (s)",
+  "editor.clip.reset": "Resetează",
+  "editor.export.effects-full": "Setările clipului necesită recodare; s-a trecut la modul complet."
 }

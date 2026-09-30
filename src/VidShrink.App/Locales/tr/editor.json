@@ -54,5 +54,17 @@
   "editor.text.size": "Boyut",
   "editor.text.color": "Renk",
   "editor.text.panel": "Metin özellikleri",
-  "editor.export.text-full": "Metin katmanı yeniden kodlama ister; Tam kipine geçildi."
+  "editor.export.text-full": "Metin katmanı yeniden kodlama ister; Tam kipine geçildi.",
+  "editor.clip.panel": "Klip özellikleri",
+  "editor.clip.rotate": "90° döndür",
+  "editor.clip.flip-h": "Yatay çevir",
+  "editor.clip.flip-v": "Dikey çevir",
+  "editor.clip.crop": "Kırp",
+  "editor.clip.crop.none": "Yok",
+  "editor.clip.volume": "Ses (dB)",
+  "editor.clip.mute": "Sessiz",
+  "editor.clip.fade-in": "Giriş solması (sn)",
+  "editor.clip.fade-out": "Çıkış solması (sn)",
+  "editor.clip.reset": "Sıfırla",
+  "editor.export.effects-full": "Klip ayarları yeniden kodlama ister; Tam kipine geçildi."
 }

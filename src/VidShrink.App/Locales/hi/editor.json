@@ -54,5 +54,17 @@
   "editor.text.size": "आकार",
   "editor.text.color": "रंग",
   "editor.text.panel": "टेक्स्ट के गुण",
-  "editor.export.text-full": "टेक्स्ट परत को फिर से एन्कोड करना होता है; पूर्ण मोड पर बदला गया।"
+  "editor.export.text-full": "टेक्स्ट परत को फिर से एन्कोड करना होता है; पूर्ण मोड पर बदला गया।",
+  "editor.clip.panel": "क्लिप के गुण",
+  "editor.clip.rotate": "90° घुमाएँ",
+  "editor.clip.flip-h": "क्षैतिज पलटें",
+  "editor.clip.flip-v": "लंबवत पलटें",
+  "editor.clip.crop": "क्रॉप",
+  "editor.clip.crop.none": "कोई नहीं",
+  "editor.clip.volume": "वॉल्यूम (dB)",
+  "editor.clip.mute": "म्यूट",
+  "editor.clip.fade-in": "फ़ेड इन (से.)",
+  "editor.clip.fade-out": "फ़ेड आउट (से.)",
+  "editor.clip.reset": "रीसेट",
+  "editor.export.effects-full": "क्लिप सेटिंग्स को फिर से एन्कोड करना होता है; पूर्ण मोड पर बदला गया।"
 }

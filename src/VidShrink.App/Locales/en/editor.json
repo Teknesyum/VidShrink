@@ -54,5 +54,17 @@
   "editor.text.size": "Size",
   "editor.text.color": "Color",
   "editor.text.panel": "Text properties",
-  "editor.export.text-full": "The text layer needs a re-encode; switched to Full."
+  "editor.export.text-full": "The text layer needs a re-encode; switched to Full.",
+  "editor.clip.panel": "Clip properties",
+  "editor.clip.rotate": "Rotate 90°",
+  "editor.clip.flip-h": "Flip horizontal",
+  "editor.clip.flip-v": "Flip vertical",
+  "editor.clip.crop": "Crop",
+  "editor.clip.crop.none": "None",
+  "editor.clip.volume": "Volume (dB)",
+  "editor.clip.mute": "Mute",
+  "editor.clip.fade-in": "Fade in (s)",
+  "editor.clip.fade-out": "Fade out (s)",
+  "editor.clip.reset": "Reset",
+  "editor.export.effects-full": "Clip settings need a re-encode; switched to Full."
 }

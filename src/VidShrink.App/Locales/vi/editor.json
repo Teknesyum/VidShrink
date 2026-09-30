@@ -54,5 +54,17 @@
   "editor.text.size": "Cỡ",
   "editor.text.color": "Màu",
   "editor.text.panel": "Thuộc tính chữ",
-  "editor.export.text-full": "Lớp chữ cần mã hóa lại; đã chuyển sang chế độ đầy đủ."
+  "editor.export.text-full": "Lớp chữ cần mã hóa lại; đã chuyển sang chế độ đầy đủ.",
+  "editor.clip.panel": "Thuộc tính clip",
+  "editor.clip.rotate": "Xoay 90°",
+  "editor.clip.flip-h": "Lật ngang",
+  "editor.clip.flip-v": "Lật dọc",
+  "editor.clip.crop": "Cắt khung",
+  "editor.clip.crop.none": "Không",
+  "editor.clip.volume": "Âm lượng (dB)",
+  "editor.clip.mute": "Tắt tiếng",
+  "editor.clip.fade-in": "Hiện dần (giây)",
+  "editor.clip.fade-out": "Mờ dần (giây)",
+  "editor.clip.reset": "Đặt lại",
+  "editor.export.effects-full": "Cài đặt clip cần mã hóa lại; đã chuyển sang chế độ đầy đủ."
 }

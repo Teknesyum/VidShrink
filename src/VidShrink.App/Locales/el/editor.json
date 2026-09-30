@@ -54,5 +54,17 @@
   "editor.text.size": "Μέγεθος",
   "editor.text.color": "Χρώμα",
   "editor.text.panel": "Ιδιότητες κειμένου",
-  "editor.export.text-full": "Το επίπεδο κειμένου απαιτεί επανακωδικοποίηση· έγινε αλλαγή σε πλήρη λειτουργία."
+  "editor.export.text-full": "Το επίπεδο κειμένου απαιτεί επανακωδικοποίηση· έγινε αλλαγή σε πλήρη λειτουργία.",
+  "editor.clip.panel": "Ιδιότητες κλιπ",
+  "editor.clip.rotate": "Περιστροφή 90°",
+  "editor.clip.flip-h": "Οριζόντια αναστροφή",
+  "editor.clip.flip-v": "Κατακόρυφη αναστροφή",
+  "editor.clip.crop": "Περικοπή",
+  "editor.clip.crop.none": "Καμία",
+  "editor.clip.volume": "Ένταση (dB)",
+  "editor.clip.mute": "Σίγαση",
+  "editor.clip.fade-in": "Σταδιακή εμφάνιση (δ)",
+  "editor.clip.fade-out": "Σταδιακή απόκρυψη (δ)",
+  "editor.clip.reset": "Επαναφορά",
+  "editor.export.effects-full": "Οι ρυθμίσεις του κλιπ απαιτούν επανακωδικοποίηση· έγινε αλλαγή σε πλήρη λειτουργία."
 }

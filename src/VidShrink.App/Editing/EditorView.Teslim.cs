@@ -295,6 +295,7 @@ internal partial class EditorView
     {
         var lines = new List<string>();
         if (plan.TextForcedFull) lines.Add(Strings.Get("editor.export.text-full"));
+        else if (plan.EffectsForcedFull) lines.Add(Strings.Get("editor.export.effects-full"));
         else if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
         else if (plan.Effective != ExportMode.Full && plan.MotionClips.Count > 0)
             lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.reencoded"), ClipNumbers(plan.MotionClips)));
@@ -305,7 +306,7 @@ internal partial class EditorView
     private static string ClipNumbers(IEnumerable<int> indexes) => string.Join(", ", indexes.Select(i => (i + 1).ToString(Strings.Culture)));
 
     private static string Fingerprint(EditTimeline model)
-        => string.Join(";", model.Clips.Select(c => $"{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}"))
+        => string.Join(";", model.Clips.Select(c => $"{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}"))
            + "|" + string.Join(";", model.Texts.Select(t => $"{t.Start}-{t.End}-{t.Size}-{t.Color}-{t.Bold}-{t.Italic}-{t.FontName}-{t.FadeIn}-{t.FadeOut}-"
                + string.Join(",", t.Keyframes.Select(k => $"{k.Offset}:{k.X}:{k.Y}")) + "-" + t.Text.Length + ":" + t.Text));
 

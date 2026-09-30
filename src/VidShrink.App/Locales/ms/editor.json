@@ -54,5 +54,17 @@
   "editor.text.size": "Saiz",
   "editor.text.color": "Warna",
   "editor.text.panel": "Sifat teks",
-  "editor.export.text-full": "Lapisan teks memerlukan pengekodan semula; ditukar ke mod penuh."
+  "editor.export.text-full": "Lapisan teks memerlukan pengekodan semula; ditukar ke mod penuh.",
+  "editor.clip.panel": "Sifat klip",
+  "editor.clip.rotate": "Putar 90°",
+  "editor.clip.flip-h": "Balikkan mendatar",
+  "editor.clip.flip-v": "Balikkan menegak",
+  "editor.clip.crop": "Pangkas",
+  "editor.clip.crop.none": "Tiada",
+  "editor.clip.volume": "Kelantangan (dB)",
+  "editor.clip.mute": "Senyap",
+  "editor.clip.fade-in": "Resap masuk (s)",
+  "editor.clip.fade-out": "Resap keluar (s)",
+  "editor.clip.reset": "Tetap semula",
+  "editor.export.effects-full": "Tetapan klip memerlukan pengekodan semula; ditukar ke mod penuh."
 }

@@ -54,5 +54,17 @@
   "editor.text.size": "Veľkosť",
   "editor.text.color": "Farba",
   "editor.text.panel": "Vlastnosti textu",
-  "editor.export.text-full": "Textová vrstva vyžaduje nové kódovanie; prepnuté na úplný režim."
+  "editor.export.text-full": "Textová vrstva vyžaduje nové kódovanie; prepnuté na úplný režim.",
+  "editor.clip.panel": "Vlastnosti klipu",
+  "editor.clip.rotate": "Otočiť o 90°",
+  "editor.clip.flip-h": "Prevrátiť vodorovne",
+  "editor.clip.flip-v": "Prevrátiť zvisle",
+  "editor.clip.crop": "Orezanie",
+  "editor.clip.crop.none": "Žiadne",
+  "editor.clip.volume": "Hlasitosť (dB)",
+  "editor.clip.mute": "Stlmiť",
+  "editor.clip.fade-in": "Roztmievanie (s)",
+  "editor.clip.fade-out": "Stmievanie (s)",
+  "editor.clip.reset": "Obnoviť",
+  "editor.export.effects-full": "Nastavenia klipu vyžadujú nové kódovanie; prepnuté na úplný režim."
 }

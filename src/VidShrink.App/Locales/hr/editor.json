@@ -54,5 +54,17 @@
   "editor.text.size": "Veličina",
   "editor.text.color": "Boja",
   "editor.text.panel": "Svojstva teksta",
-  "editor.export.text-full": "Tekstni sloj zahtijeva ponovno kodiranje; prebačeno na puni način."
+  "editor.export.text-full": "Tekstni sloj zahtijeva ponovno kodiranje; prebačeno na puni način.",
+  "editor.clip.panel": "Svojstva isječka",
+  "editor.clip.rotate": "Zakreni za 90°",
+  "editor.clip.flip-h": "Zrcali vodoravno",
+  "editor.clip.flip-v": "Zrcali okomito",
+  "editor.clip.crop": "Obrezivanje",
+  "editor.clip.crop.none": "Nijedno",
+  "editor.clip.volume": "Glasnoća (dB)",
+  "editor.clip.mute": "Utišaj",
+  "editor.clip.fade-in": "Postupno pojavljivanje (s)",
+  "editor.clip.fade-out": "Postupno nestajanje (s)",
+  "editor.clip.reset": "Poništi",
+  "editor.export.effects-full": "Postavke isječka zahtijevaju ponovno kodiranje; prebačeno na puni način."
 }
