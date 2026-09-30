@@ -545,13 +545,15 @@ public sealed class LanguageTests : IDisposable
     /// karşılık yazmaktansa aynı bırakılır. T163 gelişmiş ayarlar paneliyle son üçünü getirdi.
     /// S9 birim kalıplarını getirdi (<c>MB</c>, <c>kbps</c>, <c>FPS</c>, <c>/100</c>, <c>AI</c>, <c>CRF {0}</c>):
     /// Türkçe arayüz de bunları İngilizcesiyle aynı yazar; başka dil kendi birimini yazar (fr <c>Mo</c>, ru <c>МБ</c>).
+    /// Sağ tık hedef yongaları marka adı ve MB taşır (<c>WhatsApp (16 MB)</c>); Türkçesi de aynı yazılır.
     /// </summary>
     private static readonly string[] SameInEveryLanguage =
     {
         "VidShrink", "FFmpeg", ".NET",
         "CRF", "Stereo", "Mono", "180°",
         "{0} ms",
-        "MB", "{0} MB", "{0} - {1} MB", "{0} kbps", "{0} FPS", "{0}k", "/100", "{0}/100", "AI", "CRF {0}"
+        "MB", "{0} MB", "{0} - {1} MB", "{0} kbps", "{0} FPS", "{0}k", "/100", "{0}/100", "AI", "CRF {0}",
+        "8 MB", "100 MB", "WhatsApp (16 MB)", "Discord (20 MB)", "Gmail (25 MB)", "Discord Nitro Basic (50 MB)"
     };
 
     [Fact]

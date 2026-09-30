@@ -1204,6 +1204,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-30, oynatici kurtarma: <c>main.player.recoveryfailed</c> 42 dilde cumle, koldan cikmiyor (olculen SAYIM toplam 2877, en 269, tr 99): 2877 + 0 = 2877, en 269, tr 99.</para>
     /// <para>2026-09-30, kisayol atama: yedi yeni anahtardan yalniz dinleme metni (shortcuts.listening, cumle yazimli ipucu) en ve tr'de kola girdi: 2877 + 2 = 2879, en 269 + 1 = 270, tr 99 + 1 = 100. Varsayilanlara Don dugmesi Title Case, oteki bes anahtar kola girmedi.</para>
     /// <para>2026-09-30, kurtarma ile kisayol atama birlikte: 2877 + 0 + 2 = 2879, en 270, tr 100.</para>
+    /// <para>2026-09-30, kayit bitince eylemi: dort <c>recorder.finish.*</c> anahtari 27 kol (copy 7, shrink-copy 9, title 5, upload-copy 6); sag tik hedef yongalari ve ddagrab dususu kola girmedi: 2879 + 27 = 2906, en 270 + 4 = 274, tr 100 + 2 = 102.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1229,9 +1230,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2879, toplam);
-        Assert.Equal(270, dilBasina["en"]);
-        Assert.Equal(100, dilBasina["tr"]);
+        Assert.Equal(2906, toplam);
+        Assert.Equal(274, dilBasina["en"]);
+        Assert.Equal(102, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1412,6 +1413,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-30, oynatici kurtarma: bir yeni anahtar (<c>main.player.recoveryfailed</c>): 1203 + 1 = 1204, 43 x 1204 = 51772.</para>
     /// <para>2026-09-30, kisayol atama: yedi yeni anahtar (bes shortcuts.*, iki main.player.input.*): 1203 + 7 = 1210, 43 x 1210 = 52030.</para>
     /// <para>2026-09-30, kurtarma ile kisayol atama birlikte: 1203 + 1 + 7 = 1211, 43 x 1211 = 52073.</para>
+    /// <para>2026-09-30, kayit bitince eylemi 14, sag tik hedef yongalari 6, ddagrab dususu 2 yeni anahtar: 1211 + 22 = 1233, 43 x 1233 = 53019.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1439,7 +1441,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(52073, gezilen);
+        Assert.Equal(53019, gezilen);
         Assert.Empty(kayip);
     }
 

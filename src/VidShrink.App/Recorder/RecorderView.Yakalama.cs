@@ -57,6 +57,7 @@ internal partial class RecorderView
     internal static string FallbackKey(DdagrabFallback reason) => reason switch
     {
         DdagrabFallback.Unavailable or DdagrabFallback.NoOutputs => "recorder.capture.fallback-unavailable",
-        _ => "recorder.capture.fallback-layout"
+        DdagrabFallback.OutsideOneOutput or DdagrabFallback.NoWindowRect => "recorder.capture.fallback-layout",
+        _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
     };
 }

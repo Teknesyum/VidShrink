@@ -498,6 +498,13 @@
                           ToolTip.Tip="{loc:Text recorder.countdown.hint}"
                           auto:AutomationProperties.Name="{loc:Text recorder.countdown.title}"/>
               </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.finish.title}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbFinishAction"
+                          HorizontalAlignment="Stretch"
+                          ToolTip.Tip="{loc:Text recorder.finish.hint}"
+                          auto:AutomationProperties.Name="{loc:Text recorder.finish.title}"/>
+              </StackPanel>
             </izi:SutunIzgara>
           </StackPanel>
         </Border>
@@ -632,14 +639,6 @@
                       Theme="{StaticResource CheckStyle}"
                       Content="{loc:Text recorder.output.open-when-done}"
                       auto:AutomationProperties.Name="{loc:Text recorder.output.open-when-done}"/>
-
-            <StackPanel>
-              <TextBlock Text="{loc:Text recorder.finish.title}" Theme="{StaticResource Label}"/>
-              <ComboBox x:Name="CmbFinishAction"
-                        HorizontalAlignment="Stretch"
-                        ToolTip.Tip="{loc:Text recorder.finish.hint}"
-                        auto:AutomationProperties.Name="{loc:Text recorder.finish.title}"/>
-            </StackPanel>
           </StackPanel>
         </Border>
 
