@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -129,7 +129,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
 
     internal double AudioTop => VideoTop + VideoHeight + Metric("EditorTrackGap");
 
-    internal double AudioHeight => Metric("EditorAudioTrackHeight");
+    internal double AudioHeight => VideoHeight * Metric("EditorAudioTrackShare");
 
     internal double TracksBottom => AudioTop + AudioHeight;
 
@@ -1023,6 +1023,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         var right = Bounds.Width;
         var middle = AudioTop + AudioHeight / 2;
         var half = Math.Max(0, AudioHeight / 2 - border);
+        var loudest = peaks.Loudest;
         var drawn = 0;
         foreach (var live in _live)
         {
@@ -1054,13 +1055,13 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
             {
                 for (var i = first; i <= last; i++)
                 {
-                    var point = new Point(sliceFrom + i * step, middle - Amplitude(slice.Buckets[i].Max) * half);
+                    var point = new Point(sliceFrom + i * step, middle - Amplitude(slice.Buckets[i].Max, loudest) * half);
                     if (i == first) g.BeginFigure(point, true);
                     else g.LineTo(point);
                 }
 
                 for (var i = last; i >= first; i--)
-                    g.LineTo(new Point(sliceFrom + i * step, middle - Amplitude(slice.Buckets[i].Min) * half));
+                    g.LineTo(new Point(sliceFrom + i * step, middle - Amplitude(slice.Buckets[i].Min, loudest) * half));
                 g.EndFigure(true);
             }
 
@@ -1071,7 +1072,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         WaveformBucketsDrawn = drawn;
     }
 
-    private static double Amplitude(short value) => Math.Clamp(value / (double)short.MaxValue, -1, 1);
+    internal static double Amplitude(short value, int loudest) => Math.Clamp(value / (double)(loudest > 0 ? loudest : short.MaxValue), -1, 1);
 
     internal static PeakBucket[] WaveformSlice(AudioPeaks peaks, EditClip clip, double fromOffset, double toOffset, int buckets)
     {
@@ -1100,6 +1101,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
     {
         var pad = Metric("EditorClipPadding");
         var side = Math.Min(height - pad * 2, Metric("TargetMinSize"));
+        if (side <= 0) side = height;
         var textX = pad;
         if (EditorTokens.Find(this, key) is Geometry icon && side > 0 && icon.Bounds.Width > 0 && icon.Bounds.Height > 0)
         {
@@ -1113,8 +1115,13 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         }
 
         var label = new FormattedText(name, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(EditorTokens.Font(this, "FontMono")), Metric("FontSizeSm"), Paint("TextBody"));
-        context.DrawText(label, new Point(textX, top + (height - label.Height) / 2));
+        var fit = HeaderLabelScale(label.Height, height);
+        using (context.PushTransform(Matrix.CreateScale(fit, fit) * Matrix.CreateTranslation(textX, top + (height - label.Height * fit) / 2)))
+            context.DrawText(label, default);
     }
+
+    internal static double HeaderLabelScale(double labelHeight, double rowHeight) =>
+        labelHeight > rowHeight && labelHeight > 0 ? Math.Max(0, rowHeight) / labelHeight : 1;
 
     private readonly record struct WaveSlice(EditClip Clip, double X, PeakBucket[] Buckets);
 

@@ -40,7 +40,7 @@ yanına girer. Her satır "belirteç <- kaynak (değer), gerekçe".
 **İz ve cetvel**
 
 - `EditorVideoTrackHeight <- DropIconSize (48)`: iki `TargetMinSize` üst üste; klip içinde rozet + tutamak sığar.
-- `EditorAudioTrackHeight <- TargetMinSize (24)`: D3'te ses izi aynadır, dalga formu yok; dokunma ölçüsü yeter.
+- `EditorAudioTrackShare <- AudioTrackShare (0,2)`: ses izinin yüksekliği görüntü izinin beşte biri (`VideoHeight × pay`), görüntü izi değişirse oran korunur; dalga kaynağın en yüksek tepesine ölçeklenir (2026-09-30, önceki `EditorAudioTrackHeight`).
 - `EditorTrackGap <- SpaceXs (4)`: izler arası tek çizgi payı.
 - `EditorTrackHeaderWidth <- FieldWidthSm (120)`: iz adı ve sessize alma simgesi için etiket sütunu.
 - `EditorRulerHeight <- TargetMinSize (24)`: cetvel tıklanabilir (oynatma başını taşır), dokunma ölçüsünde olmalı.
