@@ -202,6 +202,31 @@ internal static class CompactWindow
         var height = (int)Math.Round(areaHeight * k);
         return new CompactRect(areaX + (areaWidth - width) / 2, areaY + (areaHeight - height) / 2, width, height);
     }
+
+    internal static CompactRect Fit(int areaX, int areaY, int areaWidth, int areaHeight, double share, double aspect)
+    {
+        if (!(aspect > 0) || double.IsInfinity(aspect) || areaWidth <= 0 || areaHeight <= 0)
+            return Fit(areaX, areaY, areaWidth, areaHeight, share);
+
+        var surface = (double)areaWidth * areaHeight * Math.Clamp(share, 0, 1);
+        var w = Math.Sqrt(surface * aspect);
+        var h = w / aspect;
+        if (w > areaWidth)
+        {
+            w = areaWidth;
+            h = w / aspect;
+        }
+
+        if (h > areaHeight)
+        {
+            h = areaHeight;
+            w = h * aspect;
+        }
+
+        var width = Math.Max(1, (int)Math.Round(w));
+        var height = Math.Max(1, Math.Min(areaHeight, (int)Math.Round(width / aspect)));
+        return new CompactRect(areaX + (areaWidth - width) / 2, areaY + (areaHeight - height) / 2, width, height);
+    }
 }
 
 internal sealed class StallWatch

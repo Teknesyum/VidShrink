@@ -151,7 +151,7 @@ internal sealed class HoverZone
     /// ölçüm de aynı soruyu sorabilsin diye ayrı bir kapı.
     /// </summary>
     internal bool ShouldHide(int generation)
-        => generation == _generation && !_pointerInside && !_held && !(_kept && _visible);
+        => generation == _generation && !_pointerInside && !_held;
 
     /// <summary>Bekleyen gösterme tikinin kararını uygulayıp uygulamayacağı.</summary>
     internal bool ShouldShow(int generation)
@@ -161,8 +161,9 @@ internal sealed class HoverZone
     internal int Generation => _generation;
 
     /// <summary>
-    /// Şeridi açık tutan sebepler: fare şeridin üstünde, klavye odağı şeritte, oynatma
-    /// duraklamış. Biri bile doğruyken gecikmeli kaybolma çalışmaz.
+    /// Şeridi açık tutan sebepler: fare şeridin üstünde, klavye odağı şeritte. Biri bile
+    /// doğruyken gecikmeli kaybolma çalışmaz. Duraklama tutma sebebi değil: üst panel gibi
+    /// fare bölgeden çıkınca şerit de kaybolur (<see cref="Keep"/> kaybolmayı engellemez).
     /// </summary>
     internal void Hold(bool held)
     {
@@ -188,7 +189,6 @@ internal sealed class HoverZone
     private void Evaluate()
     {
         if (_pointerInside || _held) ScheduleShow();
-        else if (_kept && _visible) Cancel();
         else ScheduleHide();
     }
 

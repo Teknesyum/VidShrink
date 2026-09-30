@@ -877,7 +877,8 @@ public partial class MainWindow : Window
             e.Handled = true;
             return;
         }
-        BeginMoveDrag(e);
+        if (EtkilesimliDenetim.Icinde(e.Source as Visual, TitleBar)) return;
+        ZeminBas(e);
     }
 
     /// <summary>
