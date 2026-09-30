@@ -1,16 +1,16 @@
 # Yenilenecek ekran görüntüleri
 
-Tarih: 2026-09-29. Sürüm 1.1.0 README'si yeniden yazılırken tazelendi.
+Tarih: 2026-09-30. Sürüm 1.2.2 (40fd9c50) için tazelendi.
 
-En taze takım **T200**: dokuz ekran × TR/EN, on sekiz kare. T191'e göre yeni olanlar
-düzenleyici karesi (iki kesimli zaman çizelgesi) ve kontrolleri görünen oynatıcı karesi.
-T191 takımı `trash/gorseller-T191/`, T190 takımı `trash/gorseller-T190/` altında.
+En taze takım **T201**: dokuz ekran × TR/EN, on sekiz kare. Oynatıcı, önizleme ve düzenleyici
+kareleri `sunum-prototip.mp4`'ün rastgele anlarından 12 sn'lik kesitlerle çekildi.
+T200 takımı `trash/gorseller-T200/`, T191 takımı `trash/gorseller-T191/` altında.
 
 ## Hiç görüntüsü olmayan yerler
 
 | Eksik | Neden gerekli | Ne çekilmeli |
 |---|---|---|
-| **Oynatıcı karşılaştırma paneli** | `T200-oynatici-*.png` yalnız oynatıcıyı gösteriyor, öncesi-sonrası paneli yok. | Karşılaştırma paneli açık, iki kaynak yüklü hâlde. TR ve EN. |
+| **Oynatıcı karşılaştırma paneli** | `T201-oynatici-*.png` yalnız oynatıcıyı gösteriyor, öncesi-sonrası paneli yok. | Karşılaştırma paneli açık, iki kaynak yüklü hâlde. TR ve EN. |
 | **Sağ tık menüsü** | Windows 11 birincil menüsündeki girdi hiç belgelenmemiş. | Explorer'da bir videoya sağ tık, "Bu videoyu VidShrink ile aç" birincil menüde görünür hâlde. |
 
 ## Çekim kuralları

@@ -30,7 +30,7 @@ public static class Program
 {
     private const int Width = 1600;
     private const int Height = 1000;
-    private const string Contract = "T200";
+    private const string Contract = "T201";
 
     private static readonly Size Viewport = new(Width, Height);
 
