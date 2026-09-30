@@ -584,6 +584,7 @@
   "main.player.state": "poziție {0} s - {1} - zoom {2}%",
   "main.player.stalled": "Redarea a încetat să avanseze; playerul nu produce cadre.",
   "main.player.seekfailed": "Căutarea a eșuat: playerul nu a afișat un cadru la noua poziție.",
+  "main.player.recoveryfailed": "Redarea s-a blocat; ieșirea audio a fost repornită și fișierul redeschis, dar nu a sosit niciun cadru.",
   "main.player.engine.loadfailed": "Playerul a fost dezactivat: libmpv nu a putut fi încărcat. O bibliotecă de sistem lipsește sau este învechită (de obicei vulkan-1.dll al driverului grafic). Reinstalați VidShrink sau actualizați driverul grafic.",
   "main.player.menu.leavefullscreen": "Ieșire din ecran complet",
   "main.player.menu.open": "Deschide meniul playerului",

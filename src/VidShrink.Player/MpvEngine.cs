@@ -24,7 +24,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private const ulong EofId = 1;
     private const ulong TimeId = 2;
     private const ulong PauseId = 3;
-    private const int LogCapacity = 32;
+    private const int LogCapacity = 64;
 
     private static readonly Stopwatch Clock = Stopwatch.StartNew();
     private static readonly IntPtr SwType = Marshal.StringToCoTaskMemUTF8("sw");
@@ -74,6 +74,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private long _newFramesAtIssue;
     private double _newFrameAt;
     private readonly object _handleGate = new();
+    private string? _source;
 
     public unsafe MpvEngine(PlaybackOptions? options = null)
     {
@@ -89,7 +90,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
                 Check(mpv_set_option_string(_mpv, name, value), $"option {name}={value}");
 
             Check(mpv_initialize(_mpv), "mpv_initialize");
-            Check(mpv_request_log_messages(_mpv, "warn"), "mpv_request_log_messages");
+            Check(mpv_request_log_messages(_mpv, "info"), "mpv_request_log_messages");
             Check(mpv_observe_property(_mpv, EofId, "eof-reached", MPV_FORMAT_FLAG), "observe eof-reached");
             Check(mpv_observe_property(_mpv, TimeId, "time-pos", MPV_FORMAT_DOUBLE), "observe time-pos");
             Check(mpv_observe_property(_mpv, PauseId, "pause", MPV_FORMAT_FLAG), "observe pause");
@@ -233,7 +234,9 @@ public sealed partial class MpvEngine : IPlaybackEngine
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
         var open = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         Volatile.Write(ref _open, open);
-        Command(OpenTag, "loadfile", Target(path));
+        var target = Target(path);
+        Volatile.Write(ref _source, target);
+        Command(OpenTag, "loadfile", target);
 
         var timeout = Task.Delay(_options.OpenTimeout, ct);
         var finished = await Task.WhenAny(open.Task, timeout).ConfigureAwait(false);
@@ -526,6 +529,56 @@ public sealed partial class MpvEngine : IPlaybackEngine
     public void Play() => Command(ControlTag, "set", "pause", "no");
 
     public void Pause() => Command(ControlTag, "set", "pause", "yes");
+
+    public bool ReloadAudio()
+    {
+        if (!_isOpen || !_hasAudio) return false;
+        return CommandSync("ao-reload") >= 0;
+    }
+
+    public async Task<bool> ReopenAsync(double atSeconds, bool playing, CancellationToken ct = default)
+    {
+        if (Volatile.Read(ref _disposed) != 0 || Volatile.Read(ref _source) is not { } source) return false;
+
+        var audio = AudioTrack;
+        var subtitle = SubtitleTrack;
+        var external = ExternalSubtitles();
+        if (!TrySet("pause", playing ? "no" : "yes")) return false;
+
+        var open = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Volatile.Write(ref _open, open);
+        var start = "start=" + Number(Math.Max(0, double.IsFinite(atSeconds) ? atSeconds : 0));
+        if (CommandRc(OpenTag, "loadfile", source, "replace", "-1", start) < 0)
+        {
+            Interlocked.CompareExchange(ref _open, null, open);
+            return false;
+        }
+
+        var finished = await Task.WhenAny(open.Task, Task.Delay(_options.OpenTimeout, ct)).ConfigureAwait(false);
+        if (finished != open.Task || open.Task.IsFaulted)
+        {
+            Interlocked.CompareExchange(ref _open, null, open);
+            return false;
+        }
+
+        foreach (var file in external) CommandSync("sub-add", file, "auto");
+        if (audio > 0 && AudioTrack != audio) SetAudioTrack(audio);
+        if (SubtitleTrack != subtitle) SetSubtitleTrack(subtitle);
+        return true;
+    }
+
+    private List<string> ExternalSubtitles()
+    {
+        var files = new List<string>();
+        var count = ReadInt("track-list/count");
+        for (var i = 0; i < count; i++)
+        {
+            if (GetProperty($"track-list/{i}/type") != "sub" || GetProperty($"track-list/{i}/external") != "yes") continue;
+            if (GetProperty($"track-list/{i}/external-filename") is { Length: > 0 } file) files.Add(file);
+        }
+
+        return files;
+    }
 
     public async Task<SeekResult> SeekAsync(double seconds, SeekPrecision precision, CancellationToken ct = default)
     {
@@ -917,9 +970,14 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     private string Describe(string reason)
     {
-        var log = _log.ToArray();
+        var log = _log.Where(IsProblem).ToArray();
         return log.Length == 0 ? reason : reason + " | " + string.Join(" | ", log.TakeLast(4));
     }
+
+    private static bool IsProblem(string line)
+        => line.Contains("/warn:", StringComparison.Ordinal)
+           || line.Contains("/error:", StringComparison.Ordinal)
+           || line.Contains("/fatal:", StringComparison.Ordinal);
 
     private static void Check(int rc, string what)
     {

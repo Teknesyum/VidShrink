@@ -1201,6 +1201,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-30, duzenleyici Premiere uyumu (dalga 1, 2A, 2B/3B): on sekiz yeni <c>editor.*</c> anahtari (araclar, monitor, zaman kodu, sure, yapisma, on kisayol adi) 14 dilde 66 kol: 2743 + 66 = 2809, en 260 + 5 = 265, tr 95 + 2 = 97 (<c>editor.key.snap</c>, <c>editor.key.trim-head</c>).</para>
     /// <para>2026-09-30, oynatma listesi oge menusu: bes yeni <c>player.list.*</c> anahtari (sirala, sonra oynat, kaldir, yolu kopyala, oynat) 13 kol: 2809 + 13 = 2822, en 265 + 2 = 267, tr 97.</para>
     /// <para>2026-09-30, oynatici alt seridi: uc yeni anahtar (sure ipucu, hiz A/B menusu, hiz A/B ipucu) 55 kol: 2822 + 55 = 2877, en 267 + 2 = 269, tr 97 + 2 = 99.</para>
+    /// <para>2026-09-30, oynatici kurtarma: <c>main.player.recoveryfailed</c> 42 dilde cumle, koldan cikmiyor (olculen SAYIM toplam 2877, en 269, tr 99): 2877 + 0 = 2877, en 269, tr 99.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1406,6 +1407,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-30, duzenleyici Premiere uyumu: on sekiz yeni <c>editor.*</c> anahtari, dusen ve degisen yok: 1177 + 18 = 1195, 43 x 1195 = 51385.</para>
     /// <para>2026-09-30, oynatma listesi oge menusu: bes yeni <c>player.list.*</c> anahtari: 1195 + 5 = 1200, 43 x 1200 = 51600.</para>
     /// <para>2026-09-30, oynatici alt seridi: uc yeni anahtar: 1200 + 3 = 1203, 43 x 1203 = 51729.</para>
+    /// <para>2026-09-30, oynatici kurtarma: bir yeni anahtar (<c>main.player.recoveryfailed</c>): 1203 + 1 = 1204, 43 x 1204 = 51772.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1433,7 +1435,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(51729, gezilen);
+        Assert.Equal(51772, gezilen);
         Assert.Empty(kayip);
     }
 

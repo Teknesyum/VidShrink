@@ -584,6 +584,7 @@
   "main.player.state": "posizione {0} s - {1} - zoom {2}%",
   "main.player.stalled": "La riproduzione ha smesso di avanzare; il lettore non produce fotogrammi.",
   "main.player.seekfailed": "Ricerca fallita: il lettore non ha mostrato un fotogramma nella nuova posizione.",
+  "main.player.recoveryfailed": "La riproduzione si è bloccata; l'uscita audio è stata riavviata e il file riaperto, ma non è arrivato alcun fotogramma.",
   "main.player.engine.loadfailed": "Lettore disattivato: impossibile caricare libmpv. Una libreria di sistema manca o è obsoleta (di solito vulkan-1.dll del driver grafico). Reinstalla VidShrink o aggiorna il driver grafico.",
   "main.player.menu.leavefullscreen": "Esci da schermo intero",
   "main.player.menu.open": "Apri il menu del lettore",

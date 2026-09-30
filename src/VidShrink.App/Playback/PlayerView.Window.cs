@@ -432,6 +432,7 @@ internal partial class PlayerView
         if (_engine is null || !double.IsFinite(duration) || duration <= 0) return;
         var at = SeekMarks.SecondsAt(x, SeekBar.Bounds.Width, duration);
         _trackPaused = false;
+        KullaniciIslemi();
         _seek.GoTo(at);
         _trace.Add("seekbar -> " + at.ToString("0.###", CultureInfo.InvariantCulture));
         RefreshState();

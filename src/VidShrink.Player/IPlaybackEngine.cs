@@ -193,6 +193,12 @@ public interface IPlaybackEngine : IDisposable
     void SetSound(SoundAdjust sound) { }
 
     void SetSubtitleStyle(SubtitleStyle style) { }
+
+    IReadOnlyList<string> RecentLog => Array.Empty<string>();
+
+    bool ReloadAudio() => false;
+
+    Task<bool> ReopenAsync(double atSeconds, bool playing, CancellationToken ct = default) => Task.FromResult(false);
 }
 
 public sealed class PlaybackOpenException : Exception

@@ -584,6 +584,7 @@
   "main.player.state": "position {0} s - {1} - zoom {2}%",
   "main.player.stalled": "Afspilningen holdt op med at rykke frem; afspilleren producerer ikke billeder.",
   "main.player.seekfailed": "Søgning mislykkedes: afspilleren viste ikke et billede på den nye position.",
+  "main.player.recoveryfailed": "Afspilningen gik i stå; lydudgangen blev genstartet og filen genåbnet, men der kom intet billede.",
   "main.player.engine.loadfailed": "Afspilleren er slået fra: libmpv kunne ikke indlæses. Et systembibliotek mangler eller er forældet (typisk grafikdriverens vulkan-1.dll). Geninstaller VidShrink, eller opdater grafikdriveren.",
   "main.player.menu.leavefullscreen": "Afslut fuld skærm",
   "main.player.menu.open": "Åbn afspillermenuen",
