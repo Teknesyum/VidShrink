@@ -199,7 +199,10 @@ public sealed class KabukStandardiTests
             var arka = yol + ".cs";
             if (!File.Exists(arka)) { eksikler.Add($"{Kisalt(yol)}: arka kod yok"); continue; }
 
-            var govde = File.ReadAllText(arka);
+            var ad = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(arka));
+            var govde = string.Concat(Directory
+                .GetFiles(Path.GetDirectoryName(arka)!, ad + ".*.cs")
+                .Select(File.ReadAllText));
             if (!govde.Contains("BeginMoveDrag(", StringComparison.Ordinal))
                 eksikler.Add($"{Kisalt(arka)}: BeginMoveDrag yok");
         }
