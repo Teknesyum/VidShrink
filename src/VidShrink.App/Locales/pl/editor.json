@@ -40,5 +40,13 @@
   "editor.export.failed": "Eksport nie powiódł się: {0}",
   "editor.export.reencoded": "Klipy {0} zmieniają prędkość lub są odtwarzane wstecz i zostaną ponownie zakodowane.",
   "editor.export.fallback": "Tego źródła nie da się przyciąć bez ponownego kodowania, więc całe wideo zostanie zakodowane ponownie.",
-  "editor.export.reverse-limit": "Odwrócony klip {0} przekracza limit pamięci ({1}). Kliknij Zapisz ponownie, aby kontynuować."
+  "editor.export.reverse-limit": "Odwrócony klip {0} przekracza limit pamięci ({1}). Kliknij Zapisz ponownie, aby kontynuować.",
+  "editor.tool.selection": "Narzędzie zaznaczania",
+  "editor.tool.razor": "Narzędzie żyletka",
+  "editor.tool.ripple": "Narzędzie edycji kaskadowej",
+  "editor.tools": "Narzędzia",
+  "editor.timecode": "Kod czasowy",
+  "editor.duration": "Czas trwania",
+  "editor.monitor": "Monitor programu",
+  "editor.snap": "Przyciąganie"
 }

@@ -87,8 +87,9 @@ internal partial class EditorView
         BtnExport.IsEnabled = ready;
         BtnShare.IsEnabled = ready && !Sharing;
         var neden = _model is not { Clips.Count: > 0 } || _source is null ? Strings.Get("main.action.shrink.disabled-tip") : null;
-        foreach (var dugme in new Control[] { BtnSave, BtnExport, BtnShare, BtnZoomIn, BtnZoomOut })
-            ToolTip.SetTip(dugme, neden);
+        ToolTip.SetTip(BtnSave, neden ?? Strings.Get("editor.save"));
+        ToolTip.SetTip(BtnExport, neden ?? Tip("editor.save-as", EditorCommand.Export));
+        ToolTip.SetTip(BtnShare, neden ?? Strings.Get("main.action.share"));
     }
 
     private void ForgetSaved()

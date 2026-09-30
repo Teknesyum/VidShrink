@@ -40,5 +40,13 @@
   "editor.export.failed": "Échec de l'exportation : {0}",
   "editor.export.reencoded": "Les clips {0} changent de vitesse ou sont inversés et sont réencodés.",
   "editor.export.fallback": "Cette source ne peut pas être coupée sans réencodage, la vidéo entière est donc réencodée.",
-  "editor.export.reverse-limit": "Le clip inversé {0} dépasse la limite de mémoire ({1}). Appuyez de nouveau sur Enregistrer pour continuer."
+  "editor.export.reverse-limit": "Le clip inversé {0} dépasse la limite de mémoire ({1}). Appuyez de nouveau sur Enregistrer pour continuer.",
+  "editor.tool.selection": "Outil Sélection",
+  "editor.tool.razor": "Outil Cutter",
+  "editor.tool.ripple": "Outil Modification par propagation",
+  "editor.tools": "Outils",
+  "editor.timecode": "Timecode",
+  "editor.duration": "Durée",
+  "editor.monitor": "Moniteur de programme",
+  "editor.snap": "Magnétisme"
 }

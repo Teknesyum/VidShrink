@@ -40,5 +40,13 @@
   "editor.export.failed": "Eksportēšana neizdevās: {0}",
   "editor.export.reencoded": "Klipi {0} maina ātrumu vai tiek atskaņoti atpakaļgaitā, tāpēc tiek pārkodēti.",
   "editor.export.fallback": "Šo avotu nevar griezt bez pārkodēšanas, tāpēc tiek pārkodēts viss video.",
-  "editor.export.reverse-limit": "Apgrieztais klips {0} pārsniedz atmiņas ierobežojumu ({1}). Lai turpinātu, vēlreiz noklikšķiniet uz Saglabāt."
+  "editor.export.reverse-limit": "Apgrieztais klips {0} pārsniedz atmiņas ierobežojumu ({1}). Lai turpinātu, vēlreiz noklikšķiniet uz Saglabāt.",
+  "editor.tool.selection": "Atlases rīks",
+  "editor.tool.razor": "Skuvekļa rīks",
+  "editor.tool.ripple": "Viļņveida rediģēšanas rīks",
+  "editor.tools": "Rīki",
+  "editor.timecode": "Laika kods",
+  "editor.duration": "Ilgums",
+  "editor.monitor": "Programmas monitors",
+  "editor.snap": "Piesaiste"
 }

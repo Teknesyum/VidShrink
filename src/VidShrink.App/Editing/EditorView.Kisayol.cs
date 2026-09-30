@@ -62,9 +62,14 @@ internal partial class EditorView
             case EditorCommand.GoToOut: GoToMark(false); break;
             case EditorCommand.FocusSpeed: FocusSpeed(); break;
             case EditorCommand.Extract: Extract(); break;
+            case EditorCommand.ToolSelection: UseTool(EditorTool.Selection); break;
+            case EditorCommand.ToolRazor: UseTool(EditorTool.Razor); break;
+            case EditorCommand.ToolRipple: UseTool(EditorTool.Ripple); break;
+            case EditorCommand.Export: RequestExport(); break;
             default: return false;
         }
 
+        RefreshMonitor();
         return true;
     }
 
@@ -124,6 +129,7 @@ internal partial class EditorView
     {
         Timeline.Playhead = time;
         if (_driver is { } driver) _ = driver.SeekAsync(Timeline.Playhead);
+        RefreshMonitor();
     }
 
     private void SyncDriver()
@@ -146,9 +152,10 @@ internal partial class EditorView
         MnuMarkIn.InputGesture = Gesture(EditorCommand.MarkIn);
         MnuMarkOut.InputGesture = Gesture(EditorCommand.MarkOut);
         ToolTip.SetTip(BtnSplit, Tip("editor.split", EditorCommand.Split));
-        ToolTip.SetTip(BtnDelete, Tip("editor.delete", EditorCommand.DeleteSelected));
         ToolTip.SetTip(BtnUndo, Tip("editor.undo", EditorCommand.Undo));
         ToolTip.SetTip(BtnRedo, Tip("editor.redo", EditorCommand.Redo));
+        ShowMonitorTips();
+        RefreshExport();
     }
 
     private static KeyGesture? Gesture(EditorCommand command)

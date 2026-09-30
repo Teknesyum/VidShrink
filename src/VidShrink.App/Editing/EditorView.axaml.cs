@@ -43,14 +43,13 @@ internal partial class EditorView : UserControl
         Timeline.MoveRequested += (from, to) => Move(from, to);
         Timeline.SelectionChanged += RefreshToolbar;
 
-        BtnSplit.Click += (_, _) => Split();
-        BtnDelete.Click += (_, _) => DeleteSelected();
         BtnUndo.Click += (_, _) => Undo();
         BtnRedo.Click += (_, _) => Redo();
         BtnZoomIn.Click += (_, _) => Timeline.ZoomCentered(true);
         BtnZoomOut.Click += (_, _) => Timeline.ZoomCentered(false);
         TxtSpeed.KeyDown += OnSpeedKey;
         InitExport();
+        InitMonitor();
 
         MnuSplit.Click += (_, _) => Split();
         MnuDelete.Click += (_, _) => DeleteSelected();
@@ -61,6 +60,7 @@ internal partial class EditorView : UserControl
         TimelineMenu.Opening += (_, _) => BuildSpeedMenu();
 
         RefreshToolbar();
+        ShowGestures();
     }
 
     internal EditTimeline? Model => _model;
@@ -283,6 +283,7 @@ internal partial class EditorView : UserControl
         if (Timeline.Scrubbing) return;
         Timeline.Playhead = driver.TimelinePosition;
         if (driver.Playing) Timeline.FollowPlayhead();
+        RefreshMonitor();
     }
 
     private void OnSeek(long time, bool final)
@@ -315,7 +316,7 @@ internal partial class EditorView : UserControl
         var hasClip = ActiveIndex >= 0;
         MnuSpeed.IsEnabled = hasClip;
         MnuReverse.IsEnabled = hasClip;
-        MnuDelete.IsEnabled = BtnDelete.IsEnabled;
+        MnuDelete.IsEnabled = _canDelete;
         MnuSplit.IsEnabled = BtnSplit.IsEnabled;
         MnuDeleteRange.IsEnabled = Timeline.MarkIn is { } a && Timeline.MarkOut is { } b && b > a;
     }
@@ -335,11 +336,12 @@ internal partial class EditorView : UserControl
         var hasClip = model is not null && selected >= 0 && selected < model.Clips.Count;
         BtnSplit.IsEnabled = model is not null;
         var chosen = Timeline.SelectedIndices.Count;
-        BtnDelete.IsEnabled = model is { Clips.Count: > 0 } && chosen > 0 && (Timeline.AllSelected || chosen < model.Clips.Count);
+        _canDelete = model is { Clips.Count: > 0 } && chosen > 0 && (Timeline.AllSelected || chosen < model.Clips.Count);
         BtnUndo.IsEnabled = model?.CanUndo ?? false;
         BtnRedo.IsEnabled = model?.CanRedo ?? false;
         BtnZoomIn.IsEnabled = model is not null;
         BtnZoomOut.IsEnabled = model is not null;
+        BtnZoomFit.IsEnabled = model is not null;
         TxtSpeed.IsEnabled = hasClip;
         if (hasClip)
         {
@@ -353,6 +355,7 @@ internal partial class EditorView : UserControl
         }
 
         RefreshExport();
+        RefreshMonitor();
     }
 
     private void OnDragOver(object? sender, DragEventArgs e)

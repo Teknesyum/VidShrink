@@ -164,6 +164,8 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
 
     internal bool IsSelected(int index) => _all || _set.Contains(index);
 
+    public EditorTool Tool { get; set; }
+
     internal bool SnapEnabled
     {
         get => _snap;

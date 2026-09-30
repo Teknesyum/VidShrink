@@ -40,5 +40,13 @@
   "editor.export.failed": "एक्सपोर्ट विफल: {0}",
   "editor.export.reencoded": "क्लिप {0} की गति बदली है या वे उल्टी चलती हैं, इसलिए री-एनकोड होंगी।",
   "editor.export.fallback": "इस स्रोत को री-एनकोड किए बिना काटा नहीं जा सकता, इसलिए पूरा वीडियो री-एनकोड होगा।",
-  "editor.export.reverse-limit": "उल्टी क्लिप {0} मेमोरी सीमा ({1}) से लंबी है। जारी रखने के लिए सहेजें फिर से दबाएँ।"
+  "editor.export.reverse-limit": "उल्टी क्लिप {0} मेमोरी सीमा ({1}) से लंबी है। जारी रखने के लिए सहेजें फिर से दबाएँ।",
+  "editor.tool.selection": "चयन टूल",
+  "editor.tool.razor": "रेज़र टूल",
+  "editor.tool.ripple": "रिपल संपादन टूल",
+  "editor.tools": "टूल",
+  "editor.timecode": "टाइमकोड",
+  "editor.duration": "अवधि",
+  "editor.monitor": "प्रोग्राम मॉनिटर",
+  "editor.snap": "स्नैपिंग"
 }

@@ -38,7 +38,11 @@ internal enum EditorCommand
     GoToIn,
     GoToOut,
     FocusSpeed,
-    Extract
+    Extract,
+    ToolSelection,
+    ToolRazor,
+    ToolRipple,
+    Export
 }
 
 internal sealed record EditorKeyRow(Key Key, KeyModifiers Modifiers, EditorCommand Command, string LabelKey, string? Symbol = null)
@@ -83,6 +87,10 @@ internal static class EditorKeymap
         new(Key.OemMinus, KeyModifiers.None, EditorCommand.ZoomOut, "editor.zoom-out", "-"),
         new(Key.Subtract, KeyModifiers.None, EditorCommand.ZoomOut, "editor.zoom-out", "Num -"),
         new(Key.OemPipe, KeyModifiers.None, EditorCommand.ZoomFit, "editor.key.zoom-fit", "\\"),
+        new(Key.V, KeyModifiers.None, EditorCommand.ToolSelection, "editor.tool.selection"),
+        new(Key.C, KeyModifiers.None, EditorCommand.ToolRazor, "editor.tool.razor"),
+        new(Key.B, KeyModifiers.None, EditorCommand.ToolRipple, "editor.tool.ripple"),
+        new(Key.M, KeyModifiers.Control, EditorCommand.Export, "editor.save-as"),
         new(Key.R, KeyModifiers.Control, EditorCommand.FocusSpeed, "editor.speed"),
         new(Key.A, KeyModifiers.Control, EditorCommand.SelectAll, "editor.select-all"),
         new(Key.Z, KeyModifiers.Control, EditorCommand.Undo, "editor.undo"),

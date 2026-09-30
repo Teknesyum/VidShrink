@@ -40,5 +40,13 @@
   "editor.export.failed": "خروجی گرفتن ناموفق بود: {0}",
   "editor.export.reencoded": "کلیپ‌های {0} سرعت را تغییر می‌دهند یا وارونه پخش می‌شوند و دوباره رمزگذاری می‌شوند.",
   "editor.export.fallback": "این منبع بدون رمزگذاری دوباره بریده نمی‌شود، پس کل ویدیو دوباره رمزگذاری می‌شود.",
-  "editor.export.reverse-limit": "کلیپ وارونه {0} از حد حافظه ({1}) بلندتر است. برای ادامه دوباره ذخیره را بزنید."
+  "editor.export.reverse-limit": "کلیپ وارونه {0} از حد حافظه ({1}) بلندتر است. برای ادامه دوباره ذخیره را بزنید.",
+  "editor.tool.selection": "ابزار انتخاب",
+  "editor.tool.razor": "ابزار تیغ",
+  "editor.tool.ripple": "ابزار ویرایش موجی",
+  "editor.tools": "ابزارها",
+  "editor.timecode": "کد زمانی",
+  "editor.duration": "مدت",
+  "editor.monitor": "مانیتور برنامه",
+  "editor.snap": "چسبیدن"
 }

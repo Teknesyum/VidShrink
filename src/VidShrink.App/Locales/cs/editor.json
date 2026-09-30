@@ -40,5 +40,13 @@
   "editor.export.failed": "Export se nezdařil: {0}",
   "editor.export.reencoded": "Klipy {0} mění rychlost nebo běží pozpátku a budou překódovány.",
   "editor.export.fallback": "Tento zdroj nelze stříhat bez překódování, proto se překóduje celé video.",
-  "editor.export.reverse-limit": "Obrácený klip {0} je delší než limit paměti ({1}). Pro pokračování znovu klikněte na Uložit."
+  "editor.export.reverse-limit": "Obrácený klip {0} je delší než limit paměti ({1}). Pro pokračování znovu klikněte na Uložit.",
+  "editor.tool.selection": "Nástroj výběr",
+  "editor.tool.razor": "Nástroj žiletka",
+  "editor.tool.ripple": "Nástroj zvlněné úpravy",
+  "editor.tools": "Nástroje",
+  "editor.timecode": "Časový kód",
+  "editor.duration": "Délka",
+  "editor.monitor": "Programový monitor",
+  "editor.snap": "Přichytávání"
 }

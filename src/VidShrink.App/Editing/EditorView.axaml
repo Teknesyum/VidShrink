@@ -5,61 +5,115 @@
              xmlns:editing="using:VidShrink.App.Editing"
              x:Class="VidShrink.App.Editing.EditorView">
   <Grid RowDefinitions="*,Auto,Auto">
-    <playback:PlayerView x:Name="Preview"/>
+    <playback:PlayerView x:Name="Preview" Grid.Row="0"/>
     <GridSplitter Grid.Row="1" Theme="{StaticResource PlanSplitter}" ResizeDirection="Rows"/>
-    <Border Grid.Row="2" Theme="{StaticResource Panel}" Margin="{StaticResource PageMargin}">
-      <StackPanel Spacing="{StaticResource SpaceSm}">
-        <WrapPanel x:Name="Toolbar" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-          <Button x:Name="BtnSplit" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.split}"/>
-          <Button x:Name="BtnDelete" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.delete}"/>
-          <TextBlock Theme="{StaticResource Label}" Text="{loc:Text editor.speed}" VerticalAlignment="Center"/>
-          <TextBox x:Name="TxtSpeed" Width="{StaticResource NumberBoxWidth}"/>
-          <Button x:Name="BtnUndo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.undo}"/>
-          <Button x:Name="BtnRedo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.redo}"/>
-          <Button x:Name="BtnZoomOut" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-out}"/>
-          <Button x:Name="BtnZoomIn" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-in}"/>
-          <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
-          <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save-as}" AutomationProperties.Name="{loc:Text editor.save-as}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
-          <Button x:Name="BtnShare" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.share}" AutomationProperties.Name="{loc:Text main.action.share}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
-          <ComboBox x:Name="CmbExportMode" Width="{StaticResource FieldWidth}" AutomationProperties.Name="{loc:Text editor.export.mode}" SelectedIndex="1">
-            <ComboBoxItem Content="{loc:Text editor.export.fast}"/>
-            <ComboBoxItem Content="{loc:Text editor.export.smart}"/>
-            <ComboBoxItem Content="{loc:Text editor.export.full}"/>
-          </ComboBox>
-        </WrapPanel>
-        <StackPanel x:Name="ExportBar" Spacing="{StaticResource SpaceSm}" IsVisible="False">
-          <ProgressBar x:Name="ExportProgress" Maximum="1" IsVisible="False"/>
-          <TextBlock x:Name="TxtExportNote" Theme="{StaticResource StatusWarning}" TextWrapping="Wrap" IsVisible="False"/>
-          <TextBlock x:Name="TxtExportStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-          <WrapPanel Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
-            <Button x:Name="BtnExportCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
-            <Button x:Name="BtnExportReveal" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.show-in-folder}" IsVisible="False"/>
-            <Button x:Name="BtnExportPlay" Theme="{StaticResource GhostButton}" Content="{loc:Text recorder.output.to-player}" IsVisible="False"/>
-            <Button x:Name="BtnShareCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel-upload}" IsVisible="False"/>
-          </WrapPanel>
-          <ProgressBar x:Name="ShareProgress" Maximum="1" IsVisible="False"/>
-          <Grid x:Name="ShareLinkRow" IsVisible="False" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-            <TextBox Grid.Column="0" x:Name="TxtShareLink" IsReadOnly="True" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
-            <Button Grid.Column="1" x:Name="BtnShareCopy" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text main.action.copy}"/>
-          </Grid>
-          <TextBlock x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+    <StackPanel Grid.Row="2">
+      <Grid x:Name="MonitorBar" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource EditorTransportGap}" Margin="{StaticResource PageMargin}" AutomationProperties.Name="{loc:Text editor.monitor}">
+        <TextBox x:Name="TxtTimecode" Grid.Column="0" Width="{StaticResource EditorTimecodeWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.timecode}"/>
+        <StackPanel x:Name="Transport" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="{StaticResource EditorTransportGap}">
+          <Button x:Name="BtnMarkIn" Theme="{StaticResource PlaybackBarButton}" AutomationProperties.Name="{loc:Text editor.mark-in}">
+            <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" RenderTransform="rotate(90deg)" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+          </Button>
+          <Button x:Name="BtnMarkOut" Theme="{StaticResource PlaybackBarButton}" AutomationProperties.Name="{loc:Text editor.mark-out}">
+            <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" RenderTransform="rotate(-90deg)" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+          </Button>
+          <Button x:Name="BtnGoIn" Theme="{StaticResource PlaybackBarButton}" AutomationProperties.Name="{loc:Text editor.key.go-in}">
+            <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconRestart}" Fill="{Binding $parent[Button].Foreground}"/>
+          </Button>
+          <Button x:Name="BtnFrameBack" Theme="{StaticResource PlaybackBarButton}" AutomationProperties.Name="{loc:Text main.player.menu.prevframe}">
+            <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconRewind}" Fill="{Binding $parent[Button].Foreground}"/>
+          </Button>
+          <Button x:Name="BtnPlay" Theme="{StaticResource PlaybackPlayButton}" AutomationProperties.Name="{loc:Text main.player.menu.playpause}">
+            <Path x:Name="GlyphPlay" Width="{StaticResource IconSizeLg}" Height="{StaticResource IconSizeLg}" Stretch="Uniform" Data="{StaticResource IconPlay}" Fill="{Binding $parent[Button].Foreground}"/>
+          </Button>
+          <Button x:Name="BtnFrameForward" Theme="{StaticResource PlaybackBarButton}" AutomationProperties.Name="{loc:Text main.player.menu.nextframe}">
+            <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconFastForward}" Fill="{Binding $parent[Button].Foreground}"/>
+          </Button>
+          <Button x:Name="BtnGoOut" Theme="{StaticResource PlaybackBarButton}" AutomationProperties.Name="{loc:Text editor.key.go-out}">
+            <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" RenderTransform="scale(-1,1)" Data="{StaticResource IconRestart}" Fill="{Binding $parent[Button].Foreground}"/>
+          </Button>
+          <Button x:Name="BtnSplit" Theme="{StaticResource PlaybackBarButton}" AutomationProperties.Name="{loc:Text editor.split}">
+            <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconEditor}" Fill="{Binding $parent[Button].Foreground}"/>
+          </Button>
+          <Button x:Name="BtnExtract" Theme="{StaticResource PlaybackBarButton}" AutomationProperties.Name="{loc:Text editor.delete-range}">
+            <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconMinimize}" Fill="{Binding $parent[Button].Foreground}"/>
+          </Button>
         </StackPanel>
-        <editing:EditorTimeline x:Name="Timeline" AutomationProperties.Name="{loc:Text editor.timeline}">
-          <editing:EditorTimeline.ContextMenu>
-            <ContextMenu x:Name="TimelineMenu">
-              <MenuItem x:Name="MnuSplit" Header="{loc:Text editor.split}"/>
-              <MenuItem x:Name="MnuDelete" Header="{loc:Text editor.delete}"/>
-              <Separator/>
-              <MenuItem x:Name="MnuMarkIn" Header="{loc:Text editor.mark-in}"/>
-              <MenuItem x:Name="MnuMarkOut" Header="{loc:Text editor.mark-out}"/>
-              <MenuItem x:Name="MnuDeleteRange" Header="{loc:Text editor.delete-range}"/>
-              <Separator/>
-              <MenuItem x:Name="MnuSpeed" Header="{loc:Text editor.speed}"/>
-              <MenuItem x:Name="MnuReverse" Header="{loc:Text editor.reverse}"/>
-            </ContextMenu>
-          </editing:EditorTimeline.ContextMenu>
-        </editing:EditorTimeline>
-      </StackPanel>
-    </Border>
+        <TextBlock x:Name="TxtDuration" Grid.Column="2" Theme="{StaticResource MonoValue}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.duration}"/>
+      </Grid>
+      <Border Theme="{StaticResource Panel}" Margin="{StaticResource PageMargin}">
+        <StackPanel Spacing="{StaticResource SpaceSm}">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+            <WrapPanel x:Name="Toolbar" Grid.Column="0" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+              <TextBlock Theme="{StaticResource Label}" Text="{loc:Text editor.speed}" VerticalAlignment="Center"/>
+              <TextBox x:Name="TxtSpeed" Width="{StaticResource NumberBoxWidth}"/>
+              <Button x:Name="BtnUndo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.undo}"/>
+              <Button x:Name="BtnRedo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.redo}"/>
+              <Button x:Name="BtnZoomOut" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-out}"/>
+              <Button x:Name="BtnZoomIn" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.zoom-in}"/>
+              <Button x:Name="BtnZoomFit" Theme="{StaticResource GhostButton}" AutomationProperties.Name="{loc:Text editor.key.zoom-fit}">
+                <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconFullScreen}" Fill="{Binding $parent[Button].Foreground}"/>
+              </Button>
+              <ToggleButton x:Name="BtnSnap" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.snap}" AutomationProperties.Name="{loc:Text editor.snap}"/>
+            </WrapPanel>
+            <StackPanel x:Name="DeliveryGroup" Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Top">
+              <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
+              <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save-as}" AutomationProperties.Name="{loc:Text editor.save-as}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
+              <Button x:Name="BtnShare" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.share}" AutomationProperties.Name="{loc:Text main.action.share}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
+              <ComboBox x:Name="CmbExportMode" MinWidth="{StaticResource FieldWidthSm}" AutomationProperties.Name="{loc:Text editor.export.mode}" SelectedIndex="1">
+                <ComboBoxItem Content="{loc:Text editor.export.fast}"/>
+                <ComboBoxItem Content="{loc:Text editor.export.smart}"/>
+                <ComboBoxItem Content="{loc:Text editor.export.full}"/>
+              </ComboBox>
+            </StackPanel>
+          </Grid>
+          <StackPanel x:Name="ExportBar" Spacing="{StaticResource SpaceSm}" IsVisible="False">
+            <ProgressBar x:Name="ExportProgress" Maximum="1" IsVisible="False"/>
+            <TextBlock x:Name="TxtExportNote" Theme="{StaticResource StatusWarning}" TextWrapping="Wrap" IsVisible="False"/>
+            <TextBlock x:Name="TxtExportStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+            <WrapPanel Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+              <Button x:Name="BtnExportCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
+              <Button x:Name="BtnExportReveal" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.show-in-folder}" IsVisible="False"/>
+              <Button x:Name="BtnExportPlay" Theme="{StaticResource GhostButton}" Content="{loc:Text recorder.output.to-player}" IsVisible="False"/>
+              <Button x:Name="BtnShareCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel-upload}" IsVisible="False"/>
+            </WrapPanel>
+            <ProgressBar x:Name="ShareProgress" Maximum="1" IsVisible="False"/>
+            <Grid x:Name="ShareLinkRow" IsVisible="False" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+              <TextBox Grid.Column="0" x:Name="TxtShareLink" IsReadOnly="True" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+              <Button Grid.Column="1" x:Name="BtnShareCopy" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text main.action.copy}"/>
+            </Grid>
+            <TextBlock x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+          </StackPanel>
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+            <StackPanel x:Name="ToolPalette" Grid.Column="0" Orientation="Vertical" Spacing="{StaticResource SpaceXs}" VerticalAlignment="Top" AutomationProperties.Name="{loc:Text editor.tools}">
+              <ToggleButton x:Name="BtnToolSelection" Theme="{StaticResource EditorToolButton}" AutomationProperties.Name="{loc:Text editor.tool.selection}" IsChecked="True">
+                <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" RenderTransform="rotate(-135deg)" Data="{StaticResource IconPlay}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
+              </ToggleButton>
+              <ToggleButton x:Name="BtnToolRazor" Theme="{StaticResource EditorToolButton}" AutomationProperties.Name="{loc:Text editor.tool.razor}">
+                <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconEditor}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
+              </ToggleButton>
+              <ToggleButton x:Name="BtnToolRipple" Theme="{StaticResource EditorToolButton}" AutomationProperties.Name="{loc:Text editor.tool.ripple}">
+                <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconConvert}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
+              </ToggleButton>
+            </StackPanel>
+            <editing:EditorTimeline x:Name="Timeline" Grid.Column="1" AutomationProperties.Name="{loc:Text editor.timeline}">
+              <editing:EditorTimeline.ContextMenu>
+                <ContextMenu x:Name="TimelineMenu">
+                  <MenuItem x:Name="MnuSplit" Header="{loc:Text editor.split}"/>
+                  <MenuItem x:Name="MnuDelete" Header="{loc:Text editor.delete}"/>
+                  <Separator/>
+                  <MenuItem x:Name="MnuMarkIn" Header="{loc:Text editor.mark-in}"/>
+                  <MenuItem x:Name="MnuMarkOut" Header="{loc:Text editor.mark-out}"/>
+                  <MenuItem x:Name="MnuDeleteRange" Header="{loc:Text editor.delete-range}"/>
+                  <Separator/>
+                  <MenuItem x:Name="MnuSpeed" Header="{loc:Text editor.speed}"/>
+                  <MenuItem x:Name="MnuReverse" Header="{loc:Text editor.reverse}"/>
+                </ContextMenu>
+              </editing:EditorTimeline.ContextMenu>
+            </editing:EditorTimeline>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </StackPanel>
   </Grid>
 </UserControl>

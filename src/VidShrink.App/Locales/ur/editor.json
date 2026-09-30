@@ -40,5 +40,13 @@
   "editor.export.failed": "ایکسپورٹ ناکام: {0}",
   "editor.export.reencoded": "کلپس {0} رفتار بدلتے ہیں یا الٹے چلتے ہیں، اس لیے دوبارہ انکوڈ ہوں گے۔",
   "editor.export.fallback": "یہ ماخذ دوبارہ انکوڈنگ کے بغیر نہیں کاٹا جا سکتا، اس لیے پوری ویڈیو دوبارہ انکوڈ ہو گی۔",
-  "editor.export.reverse-limit": "الٹا کلپ {0} میموری کی حد ({1}) سے لمبا ہے۔ جاری رکھنے کے لیے محفوظ کریں دوبارہ دبائیں۔"
+  "editor.export.reverse-limit": "الٹا کلپ {0} میموری کی حد ({1}) سے لمبا ہے۔ جاری رکھنے کے لیے محفوظ کریں دوبارہ دبائیں۔",
+  "editor.tool.selection": "انتخاب ٹول",
+  "editor.tool.razor": "ریزر ٹول",
+  "editor.tool.ripple": "رپل ایڈٹ ٹول",
+  "editor.tools": "ٹولز",
+  "editor.timecode": "ٹائم کوڈ",
+  "editor.duration": "دورانیہ",
+  "editor.monitor": "پروگرام مانیٹر",
+  "editor.snap": "اسنیپنگ"
 }

@@ -40,5 +40,13 @@
   "editor.export.failed": "Izvoz nije uspeo: {0}",
   "editor.export.reencoded": "Isečci {0} menjaju brzinu ili se puštaju unazad pa se ponovo kodiraju.",
   "editor.export.fallback": "Ovaj izvor ne može da se seče bez ponovnog kodiranja pa se ceo video ponovo kodira.",
-  "editor.export.reverse-limit": "Obrnuti isečak {0} prelazi ograničenje memorije ({1}). Za nastavak ponovo kliknite Sačuvaj."
+  "editor.export.reverse-limit": "Obrnuti isečak {0} prelazi ograničenje memorije ({1}). Za nastavak ponovo kliknite Sačuvaj.",
+  "editor.tool.selection": "Alatka za izbor",
+  "editor.tool.razor": "Alatka žilet",
+  "editor.tool.ripple": "Alatka za talasasto uređivanje",
+  "editor.tools": "Alatke",
+  "editor.timecode": "Vremenski kod",
+  "editor.duration": "Trajanje",
+  "editor.monitor": "Programski monitor",
+  "editor.snap": "Prianjanje"
 }

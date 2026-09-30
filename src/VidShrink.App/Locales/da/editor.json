@@ -40,5 +40,13 @@
   "editor.export.failed": "Eksport mislykkedes: {0}",
   "editor.export.reencoded": "Klippene {0} ændrer hastighed eller afspilles baglæns og genkodes.",
   "editor.export.fallback": "Kilden kan ikke klippes uden genkodning, så hele videoen genkodes.",
-  "editor.export.reverse-limit": "Det baglæns klip {0} er længere end hukommelsesgrænsen ({1}). Klik på Gem igen for at fortsætte."
+  "editor.export.reverse-limit": "Det baglæns klip {0} er længere end hukommelsesgrænsen ({1}). Klik på Gem igen for at fortsætte.",
+  "editor.tool.selection": "Markeringsværktøj",
+  "editor.tool.razor": "Barberbladsværktøj",
+  "editor.tool.ripple": "Ringredigeringsværktøj",
+  "editor.tools": "Værktøjer",
+  "editor.timecode": "Tidskode",
+  "editor.duration": "Varighed",
+  "editor.monitor": "Programskærm",
+  "editor.snap": "Fastgørelse"
 }

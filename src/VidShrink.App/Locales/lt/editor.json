@@ -40,5 +40,13 @@
   "editor.export.failed": "Eksportuoti nepavyko: {0}",
   "editor.export.reencoded": "Klipai {0} keičia greitį arba grojami atgal, todėl perkoduojami.",
   "editor.export.fallback": "Šio šaltinio negalima karpyti neperkodavus, todėl perkoduojamas visas vaizdo įrašas.",
-  "editor.export.reverse-limit": "Atbulinis klipas {0} viršija atminties ribą ({1}). Norėdami tęsti, dar kartą spustelėkite Išsaugoti."
+  "editor.export.reverse-limit": "Atbulinis klipas {0} viršija atminties ribą ({1}). Norėdami tęsti, dar kartą spustelėkite Išsaugoti.",
+  "editor.tool.selection": "Žymėjimo įrankis",
+  "editor.tool.razor": "Skustuvo įrankis",
+  "editor.tool.ripple": "Bangavimo redagavimo įrankis",
+  "editor.tools": "Įrankiai",
+  "editor.timecode": "Laiko kodas",
+  "editor.duration": "Trukmė",
+  "editor.monitor": "Programos monitorius",
+  "editor.snap": "Pritraukimas"
 }

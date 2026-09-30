@@ -40,5 +40,13 @@
   "editor.export.failed": "Exporten misslyckades: {0}",
   "editor.export.reencoded": "Klippen {0} ändrar hastighet eller spelas baklänges och kodas om.",
   "editor.export.fallback": "Källan kan inte klippas utan omkodning, så hela videon kodas om.",
-  "editor.export.reverse-limit": "Det bakvända klippet {0} är längre än minnesgränsen ({1}). Klicka på Spara igen för att fortsätta."
+  "editor.export.reverse-limit": "Det bakvända klippet {0} är längre än minnesgränsen ({1}). Klicka på Spara igen för att fortsätta.",
+  "editor.tool.selection": "Markeringsverktyg",
+  "editor.tool.razor": "Rakbladsverktyg",
+  "editor.tool.ripple": "Ringredigeringsverktyg",
+  "editor.tools": "Verktyg",
+  "editor.timecode": "Tidskod",
+  "editor.duration": "Varaktighet",
+  "editor.monitor": "Programmonitor",
+  "editor.snap": "Fästning"
 }

@@ -399,6 +399,12 @@ internal partial class PlayerView : UserControl
 
     internal bool KeyboardEnabled { get; set; } = true;
 
+    internal bool StripVisible
+    {
+        get => StripBar.IsVisible;
+        set => StripBar.IsVisible = value;
+    }
+
     internal bool MenuAtPointer { get; set; }
 
     private MenuFlyout? _menu;
