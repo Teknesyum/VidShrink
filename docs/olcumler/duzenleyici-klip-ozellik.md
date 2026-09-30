@@ -32,3 +32,7 @@ Dört mutasyonun dördü kırmızı.
 - `BaslikKapsamiTests.KolDegistirenAnahtarlarSayilir`: 2907 → 2917, en 274 → 275, tr 102. On iki yeni anahtardan
   10 kol 5 dilde (en fade-in; fr rotate; it fade-in, fade-out, flip-h, flip-v; pt fade-in, fade-out, panel; sv fade-in).
 - `AdVeBirimYazimiCumleOrtasindaDaKorunur`: 53277 → 53793 (43 x 1251), `kayip` 0.
+
+## CI Notu
+
+CI 36784748344 yeniden koşumunda libmpv kolu restyle sonrası eski vf'li kareyi okudu (320x240 beklenirken 240x320). Kare okumaları artık koşul sağlanana dek 5 sn yokluyor; restyle çağrısını kaldırmak yine kırmızı (5 sn, 240x320).

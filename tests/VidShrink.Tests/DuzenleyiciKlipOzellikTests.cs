@@ -415,6 +415,18 @@ public sealed class DuzenleyiciKlipOzellikTests
         KanitKapanisi.Kapat(klasor, adlar);
     }
 
+    private static async Task<(int W, int H, int Parlak, long Gorulen)> KareBekleAsync(MpvEngine motor, long gorulen, Func<(int W, int H, int Parlak), bool> kosul)
+    {
+        var saat = Stopwatch.StartNew();
+        var kare = await KareAsync(motor, gorulen);
+        while (!kosul((kare.W, kare.H, kare.Parlak)) && saat.Elapsed < TimeSpan.FromSeconds(5))
+        {
+            await Task.Delay(20);
+            kare = await KareAsync(motor, -1);
+        }
+        return kare;
+    }
+
     private static async Task<(int W, int H, int Parlak, long Gorulen)> KareAsync(MpvEngine motor, long gorulen)
     {
         var saat = Stopwatch.StartNew();
@@ -462,23 +474,23 @@ public sealed class DuzenleyiciKlipOzellikTests
             motor.Pause();
 
             await surucu.SeekAsync(S(0.3), SeekPrecision.Exact);
-            var once = await KareAsync(motor, 0);
+            var once = await KareBekleAsync(motor, 0, k => (k.W, k.H) == (240, 320) && k.Parlak > 200);
             Assert.Equal((240, 320), (once.W, once.H));
             Assert.True(once.Parlak > 200, $"birinci parca {once.Parlak}");
 
             await surucu.SeekAsync(S(0.6), SeekPrecision.Exact);
-            var solan = await KareAsync(motor, once.Gorulen);
+            var solan = await KareBekleAsync(motor, once.Gorulen, k => k.Parlak < 80);
             Assert.True(solan.Parlak < 80, $"EDL 0.6 sn'de solma yok (kaynak 1.6 sn zamani olurdu): {solan.Parlak}");
 
             await surucu.SeekAsync(S(1.8), SeekPrecision.Exact);
-            var sonra = await KareAsync(motor, solan.Gorulen);
+            var sonra = await KareBekleAsync(motor, solan.Gorulen, k => k.Parlak > 200);
             Assert.True(sonra.Parlak > 200, $"solma penceresi disinda {sonra.Parlak}");
 
             var yalin = EditTimeline.FromSource(S(3));
             Assert.True(yalin.DeleteRange(S(0.5), S(1.5)));
             await surucu.RestyleAsync(new EdlPreview(kaynak, yalin), null);
             await surucu.SeekAsync(S(0.6), SeekPrecision.Exact);
-            var yalinKare = await KareAsync(motor, sonra.Gorulen);
+            var yalinKare = await KareBekleAsync(motor, sonra.Gorulen, k => (k.W, k.H) == (320, 240) && k.Parlak > 200);
             Assert.Equal((320, 240), (yalinKare.W, yalinKare.H));
             Assert.True(yalinKare.Parlak > 200, $"ayarsiz onizlemede solma kaldi {yalinKare.Parlak}");
         }
