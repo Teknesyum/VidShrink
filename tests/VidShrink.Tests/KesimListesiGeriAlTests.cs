@@ -18,6 +18,53 @@ public sealed class KesimListesiGeriAlTests
     }
 
     [Fact]
+    public void YeniIslemlerTekAdimdaGeriVeIleriAlinir()
+    {
+        var operations = new (string Name, Func<EditTimeline, bool> Run)[]
+        {
+            ("bas", t => t.RippleTrimHead(14 * S)),
+            ("son", t => t.RippleTrimTail(14 * S)),
+            ("kenar", t => t.TrimEdge(1, true, 15 * S)),
+            ("kenar-geri", t => t.TrimEdge(2, false, 25 * S)),
+            ("coklu", t => t.DeleteMany(new[] { 0, 2 })),
+            ("hepsi", t => t.DeleteMany(new[] { 0, 1, 2 }))
+        };
+
+        foreach (var (name, run) in operations)
+        {
+            var timeline = new EditTimeline(new[] { new EditClip(0, 10 * S), new EditClip(10 * S, 20 * S), new EditClip(20 * S, 30 * S) }, 30 * S);
+            var before = timeline.Clips.ToArray();
+            var beforeDuration = timeline.Duration;
+
+            Assert.True(run(timeline), name);
+            var after = timeline.Clips.ToArray();
+            Assert.NotEqual(before, after);
+
+            Assert.True(timeline.Undo(), name);
+            Assert.Equal(before, timeline.Clips);
+            Assert.Equal(beforeDuration, timeline.Duration);
+            Assert.False(timeline.CanUndo, name);
+
+            Assert.True(timeline.Redo(), name);
+            Assert.Equal(after, timeline.Clips);
+            Assert.False(timeline.CanRedo, name);
+        }
+    }
+
+    [Fact]
+    public void YeniIslemIleriAlmaYiginiTemizler()
+    {
+        var timeline = EditTimeline.FromSource(30 * S);
+        timeline.Split(10 * S);
+        timeline.Undo();
+        Assert.True(timeline.CanRedo);
+
+        Assert.True(timeline.RippleTrimTail(20 * S));
+
+        Assert.False(timeline.CanRedo);
+    }
+
+    [Fact]
     public void HerIslemZincirdeTekTekGeriVeIleriAlinir()
     {
         var timeline = EditTimeline.FromSource(60 * S);

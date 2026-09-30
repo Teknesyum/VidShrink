@@ -11,19 +11,24 @@ public sealed class EditTimeline
     private readonly Stack<IEditCommand> _undo = new();
     private readonly Stack<IEditCommand> _redo = new();
 
-    public EditTimeline(IEnumerable<EditClip> clips)
+    public EditTimeline(IEnumerable<EditClip> clips, long? sourceDuration = null)
     {
         ArgumentNullException.ThrowIfNull(clips);
         _clips = clips.ToList();
         if (_clips.Any(c => c is null))
             throw new ArgumentException("Listede bos parca var", nameof(clips));
+        if (sourceDuration is <= 0)
+            throw new ArgumentOutOfRangeException(nameof(sourceDuration), sourceDuration, "Kaynak suresi pozitif olmalidir");
         Clips = _clips.AsReadOnly();
+        SourceDuration = sourceDuration;
     }
 
     /// <summary>Kaynagin tamamini ileri yonde, 1x hizla tasiyan tek parcali cizelge.</summary>
-    public static EditTimeline FromSource(long sourceDuration) => new(new[] { new EditClip(0, sourceDuration) });
+    public static EditTimeline FromSource(long sourceDuration) => new(new[] { new EditClip(0, sourceDuration) }, sourceDuration);
 
     public IReadOnlyList<EditClip> Clips { get; }
+
+    public long? SourceDuration { get; }
 
     public long Duration => Clips.Sum(c => c.TimelineLength);
 
@@ -149,6 +154,101 @@ public sealed class EditTimeline
         return true;
     }
 
+    public bool RippleTrimHead(long time)
+    {
+        if (time < 0 || time > Duration)
+            throw new ArgumentOutOfRangeException(nameof(time), time, "An cizelgenin disinda");
+
+        var index = ClipIndexAt(time);
+        if (index < 0) return false;
+        var start = ClipStart(index);
+        return time > start && DeleteRange(start, time);
+    }
+
+    public bool RippleTrimTail(long time)
+    {
+        if (time < 0 || time > Duration)
+            throw new ArgumentOutOfRangeException(nameof(time), time, "An cizelgenin disinda");
+
+        var index = ClipIndexAt(time);
+        if (index < 0) return false;
+        var start = ClipStart(index);
+        return time > start && DeleteRange(time, start + _clips[index].TimelineLength);
+    }
+
+    public (long Min, long Max) TrimEdgeRange(int index, bool head)
+    {
+        CheckIndex(index);
+        var clip = _clips[index];
+        var movesStart = head != clip.Reversed;
+        var neighbor = head ? index - 1 : index + 1;
+        var other = neighbor >= 0 && neighbor < _clips.Count ? _clips[neighbor] : null;
+
+        if (movesStart)
+        {
+            long min = 0;
+            if (other is not null && other.SourceEnd <= clip.SourceStart) min = other.SourceEnd;
+            else if (other is not null && other.SourceStart < clip.SourceEnd) min = clip.SourceStart;
+            return (min, clip.SourceEnd - 1);
+        }
+
+        var max = SourceDuration ?? long.MaxValue;
+        if (other is not null && other.SourceStart >= clip.SourceEnd) max = Math.Min(max, other.SourceStart);
+        else if (other is not null && other.SourceEnd > clip.SourceStart) max = clip.SourceEnd;
+        return (clip.SourceStart + 1, Math.Max(clip.SourceStart + 1, max));
+    }
+
+    public bool TrimEdge(int index, bool head, long sourceEdge)
+    {
+        var (min, max) = TrimEdgeRange(index, head);
+        if (sourceEdge < min || sourceEdge > max)
+            throw new ArgumentOutOfRangeException(nameof(sourceEdge), sourceEdge, "Kenar kaynagin ya da komsu parcanin sinirini asiyor");
+
+        var before = _clips[index];
+        var after = head != before.Reversed
+            ? new EditClip(sourceEdge, before.SourceEnd, before.Speed, before.Reversed)
+            : new EditClip(before.SourceStart, sourceEdge, before.Speed, before.Reversed);
+        if (after == before) return false;
+
+        Execute(new ReplaceCommand(index, before, after));
+        return true;
+    }
+
+    public bool DeleteMany(IReadOnlyList<int> indices)
+    {
+        ArgumentNullException.ThrowIfNull(indices);
+        var order = indices.Distinct().OrderByDescending(i => i).ToList();
+        foreach (var index in order) CheckIndex(index);
+        if (order.Count == 0) return false;
+
+        var steps = new List<IEditCommand>();
+        foreach (var index in order)
+        {
+            var remove = new RemoveCommand(index, _clips[index]);
+            remove.Apply(_clips);
+            steps.Add(remove);
+        }
+
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
+    public IReadOnlyList<long> EditPoints
+    {
+        get
+        {
+            var points = new List<long>(_clips.Count + 1) { 0 };
+            long at = 0;
+            foreach (var clip in _clips)
+            {
+                at += clip.TimelineLength;
+                points.Add(at);
+            }
+
+            return points;
+        }
+    }
+
     /// <summary>
     /// Parcanin hizini yazar. Isaret yonu belirler: eksi deger parcayi geri, arti deger ileri
     /// yapar; mutlak deger 0,01'e yuvarlanip hiz olur. Sifir ve yuvarlandiktan sonra 0,01-100
@@ -251,6 +351,19 @@ public sealed class EditTimeline
 
         boundary = _clips.Count;
         return null;
+    }
+
+    private int ClipIndexAt(long time)
+    {
+        long start = 0;
+        for (var i = 0; i < _clips.Count; i++)
+        {
+            var length = _clips[i].TimelineLength;
+            if (time < start + length) return i;
+            start += length;
+        }
+
+        return -1;
     }
 
     private void CheckIndex(int index)

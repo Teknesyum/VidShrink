@@ -32,6 +32,9 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
     private double _fps = double.NaN;
     private int _selected = -1;
     private bool _all;
+    private readonly SortedSet<int> _set = new();
+    private int _anchor = -1;
+    private bool _snap = true;
     private readonly List<long> _markers = new();
     private long _playhead;
 
@@ -146,12 +149,99 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         {
             var count = _model?.Clips.Count ?? 0;
             var next = value >= 0 && value < count ? value : -1;
-            if (next == _selected && !_all) return;
+            if (next == _selected && !_all && _set.Count == (next >= 0 ? 1 : 0)) return;
             _selected = next;
             _all = false;
-            foreach (var clip in _live) clip.Classes.Set("selected", clip.Index == _selected);
-            SelectionChanged?.Invoke();
+            _set.Clear();
+            if (next >= 0) _set.Add(next);
+            _anchor = next;
+            ApplySelection();
         }
+    }
+
+    internal IReadOnlyList<int> SelectedIndices
+        => _all ? Enumerable.Range(0, _model?.Clips.Count ?? 0).ToArray() : _set.ToArray();
+
+    internal bool IsSelected(int index) => _all || _set.Contains(index);
+
+    internal bool SnapEnabled
+    {
+        get => _snap;
+        set
+        {
+            _snap = value;
+            if (!value) SnapLine = null;
+            _overlay.InvalidateVisual();
+        }
+    }
+
+    internal void ToggleSelection(int index)
+    {
+        var count = _model?.Clips.Count ?? 0;
+        if (index < 0 || index >= count) return;
+        if (_all)
+        {
+            _set.Clear();
+            for (var i = 0; i < count; i++) _set.Add(i);
+            _all = false;
+        }
+
+        if (!_set.Remove(index)) _set.Add(index);
+        _selected = _set.Contains(index) ? index : _set.Count > 0 ? _set.Min : -1;
+        _anchor = index;
+        ApplySelection();
+    }
+
+    internal void SelectRange(int index)
+    {
+        var count = _model?.Clips.Count ?? 0;
+        if (index < 0 || index >= count) return;
+        var from = _anchor >= 0 && _anchor < count ? _anchor : index;
+        _all = false;
+        _set.Clear();
+        for (var i = Math.Min(from, index); i <= Math.Max(from, index); i++) _set.Add(i);
+        _selected = index;
+        _anchor = from;
+        ApplySelection();
+    }
+
+    internal void ZoomToFit()
+    {
+        PixelsPerTick = MinPixelsPerTick;
+        ViewStart = 0;
+    }
+
+    internal long? NextEditPoint()
+    {
+        if (_model is not { } model) return null;
+        foreach (var point in model.EditPoints)
+            if (point > _playhead) return point;
+        return null;
+    }
+
+    internal long? PrevEditPoint()
+    {
+        if (_model is not { } model) return null;
+        var points = model.EditPoints;
+        for (var i = points.Count - 1; i >= 0; i--)
+            if (points[i] < _playhead) return points[i];
+        return null;
+    }
+
+    internal bool FollowPlayhead()
+    {
+        if (_model is null || _ppt <= 0 || TrackWidth <= 0) return false;
+        var span = (long)Math.Floor(TrackWidth / _ppt);
+        var before = _viewStart;
+        if (_playhead > _viewStart + span) ViewStart = _playhead;
+        else if (_playhead < _viewStart) ViewStart = _playhead - span;
+        return _viewStart != before;
+    }
+
+    private void ApplySelection()
+    {
+        foreach (var clip in _live) clip.Classes.Set("selected", IsSelected(clip.Index));
+        SelectionChanged?.Invoke();
     }
 
     internal long Playhead
@@ -172,6 +262,8 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         _model = model;
         _selected = -1;
         _all = false;
+        _set.Clear();
+        _anchor = -1;
         _markers.Clear();
         MarkIn = null;
         MarkOut = null;
@@ -185,7 +277,10 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
     internal void Refresh()
     {
         Rebuild();
-        if (_selected >= (_model?.Clips.Count ?? 0)) _selected = -1;
+        var clipCount = _model?.Clips.Count ?? 0;
+        if (_selected >= clipCount) _selected = -1;
+        _set.RemoveWhere(i => i >= clipCount);
+        if (_anchor >= clipCount) _anchor = -1;
         if (MarkIn is { } a && a > (_model?.Duration ?? 0)) MarkIn = null;
         if (MarkOut is { } b && b > (_model?.Duration ?? 0)) MarkOut = null;
         _markers.RemoveAll(m => m > (_model?.Duration ?? 0));
@@ -207,8 +302,8 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         if (_model is not { Clips.Count: > 0 }) return;
         _selected = -1;
         _all = true;
-        foreach (var clip in _live) clip.Classes.Set("selected", true);
-        SelectionChanged?.Invoke();
+        _set.Clear();
+        ApplySelection();
     }
 
     internal bool AddMarker(long time)
@@ -255,7 +350,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
 
     internal long? SnapTarget(long time, bool playhead = true, int exclude = -1)
     {
-        if (_model is not { } model || _ppt <= 0) return null;
+        if (!_snap || _model is not { } model || _ppt <= 0) return null;
         var limit = Metric("EditorSnapThresholdPx");
         long? best = null;
         var bestDistance = double.PositiveInfinity;
@@ -381,8 +476,24 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         }
 
         _press = position;
-        _pressIndex = position.Y < TracksBottom ? ClipAt(XToTime(position.X)) : -1;
+        var pressed = position.Y < TracksBottom ? ClipAt(XToTime(position.X)) : -1;
         _dragging = false;
+        var mods = e.KeyModifiers;
+        if (pressed >= 0 && (mods.HasFlag(KeyModifiers.Control) || mods.HasFlag(KeyModifiers.Meta)))
+        {
+            _pressIndex = -1;
+            ToggleSelection(pressed);
+            return;
+        }
+
+        if (pressed >= 0 && mods.HasFlag(KeyModifiers.Shift))
+        {
+            _pressIndex = -1;
+            SelectRange(pressed);
+            return;
+        }
+
+        _pressIndex = pressed;
         SelectedIndex = _pressIndex;
     }
 
@@ -488,7 +599,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         _dropIndex = Math.Clamp(to, 0, model.Clips.Count - 1);
 
         GhostValid = _dropIndex != _pressIndex;
-        SnapLine = GhostValid ? boundary : null;
+        SnapLine = GhostValid && _snap ? boundary : null;
         Ghost = new GhostBox(TimeToX(ghostStart), length * _ppt);
         _overlay.InvalidateVisual();
     }
@@ -579,7 +690,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         {
             var index = first + i;
             var clip = shown.Clips[index];
-            _live[i].Show(index, clip, _all || index == _selected, clip.TimelineLength * _ppt < minWidth);
+            _live[i].Show(index, clip, IsSelected(index), clip.TimelineLength * _ppt < minWidth);
         }
     }
 

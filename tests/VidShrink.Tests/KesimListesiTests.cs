@@ -416,6 +416,180 @@ public sealed class KesimListesiTests
         Assert.Equal(before, Sample(timeline));
     }
 
+    [Fact]
+    public void BastanKirpmaParcaninBasindanOynatmaBasinaKadarSilerVeBoslukKapanir()
+    {
+        var timeline = ThreeParts();
+
+        Assert.True(timeline.RippleTrimHead(14 * S));
+
+        Assert.Equal(26 * S, timeline.Duration);
+        Assert.Equal(new[] { new EditClip(0, 10 * S), new EditClip(14 * S, 20 * S), new EditClip(20 * S, 30 * S) }, timeline.Clips);
+        Assert.Equal(14 * S, timeline.ToSource(10 * S));
+    }
+
+    [Fact]
+    public void SondanKirpmaOynatmaBasindanParcaninSonunaKadarSiler()
+    {
+        var timeline = ThreeParts();
+
+        Assert.True(timeline.RippleTrimTail(14 * S));
+
+        Assert.Equal(24 * S, timeline.Duration);
+        Assert.Equal(new[] { new EditClip(0, 10 * S), new EditClip(10 * S, 14 * S), new EditClip(20 * S, 30 * S) }, timeline.Clips);
+        Assert.Equal(20 * S, timeline.ToSource(14 * S));
+    }
+
+    [Fact]
+    public void KirpmaHizliParcadaCizelgeSuresiyleCalisir()
+    {
+        var timeline = EditTimeline.FromSource(20 * S);
+        Assert.True(timeline.SetSpeed(0, 2m));
+
+        Assert.True(timeline.RippleTrimHead(4 * S));
+
+        Assert.Equal(6 * S, timeline.Duration);
+        Assert.Equal(8 * S, timeline.Clips[0].SourceStart);
+    }
+
+    [Theory]
+    [InlineData(0L)]
+    [InlineData(10L)]
+    [InlineData(30L)]
+    public void KenardaKirpilacakBirSeyYok(long seconds)
+    {
+        var timeline = ThreeParts();
+
+        Assert.False(timeline.RippleTrimHead(seconds * S));
+        Assert.False(timeline.RippleTrimTail(seconds * S));
+        Assert.Equal(30 * S, timeline.Duration);
+        Assert.False(timeline.CanUndo);
+    }
+
+    [Theory]
+    [InlineData(-1L)]
+    [InlineData(30 * S + 1)]
+    public void KirpmaCizelgeDisindaReddedilir(long time)
+    {
+        var timeline = ThreeParts();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeline.RippleTrimHead(time));
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeline.RippleTrimTail(time));
+        Assert.Equal(30 * S, timeline.Duration);
+    }
+
+    [Fact]
+    public void KenarKirpmaKaynagiKisaltirVeUzatir()
+    {
+        var timeline = new EditTimeline(new[] { new EditClip(10 * S, 20 * S), new EditClip(40 * S, 50 * S) }, 60 * S);
+
+        Assert.True(timeline.TrimEdge(0, true, 5 * S));
+        Assert.Equal(new EditClip(5 * S, 20 * S), timeline.Clips[0]);
+        Assert.Equal(25 * S, timeline.Duration);
+
+        Assert.True(timeline.TrimEdge(1, false, 45 * S));
+        Assert.Equal(new EditClip(40 * S, 45 * S), timeline.Clips[1]);
+        Assert.Equal(20 * S, timeline.Duration);
+
+        Assert.False(timeline.TrimEdge(1, false, 45 * S));
+    }
+
+    [Fact]
+    public void KenarKirpmaKaynakSiniriniGecemez()
+    {
+        var timeline = EditTimeline.FromSource(30 * S);
+        timeline.Split(10 * S);
+        timeline.Delete(0);
+
+        Assert.Equal((0L, 30 * S - 1), timeline.TrimEdgeRange(0, true));
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeline.TrimEdge(0, true, -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeline.TrimEdge(0, false, 30 * S + 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeline.TrimEdge(0, true, 30 * S));
+        Assert.Equal(new EditClip(10 * S, 30 * S), timeline.Clips[0]);
+    }
+
+    [Fact]
+    public void KenarKirpmaKomsuParcayaTasamaz()
+    {
+        var timeline = EditTimeline.FromSource(30 * S);
+        timeline.Split(10 * S);
+        timeline.Split(20 * S);
+        timeline.Delete(1);
+
+        Assert.Equal(20 * S, timeline.TrimEdgeRange(0, false).Max);
+        Assert.Equal(10 * S, timeline.TrimEdgeRange(1, true).Min);
+        Assert.Equal(30 * S, timeline.TrimEdgeRange(1, false).Max);
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeline.TrimEdge(0, false, 20 * S + 1));
+        Assert.True(timeline.TrimEdge(0, false, 20 * S));
+        Assert.Equal(30 * S, timeline.Duration);
+        Assert.Equal(20 * S, timeline.TrimEdgeRange(1, true).Min);
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeline.TrimEdge(1, true, 20 * S - 1));
+
+        var bitisik = ThreeParts();
+        Assert.Throws<ArgumentOutOfRangeException>(() => bitisik.TrimEdge(1, true, 10 * S - 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => bitisik.TrimEdge(1, false, 20 * S + 1));
+        Assert.True(bitisik.TrimEdge(1, true, 15 * S));
+        Assert.Equal(25 * S, bitisik.Duration);
+    }
+
+    [Fact]
+    public void GeriParcadaBasKenariKaynaginSonunuTasir()
+    {
+        var timeline = new EditTimeline(new[] { new EditClip(10 * S, 20 * S, 1m, true) }, 30 * S);
+
+        Assert.True(timeline.TrimEdge(0, true, 25 * S));
+
+        Assert.Equal(new EditClip(10 * S, 25 * S, 1m, true), timeline.Clips[0]);
+        Assert.Equal(25 * S - 1, timeline.ToSource(0));
+    }
+
+    [Fact]
+    public void CokluSilmeSecilenParcalariKaldirir()
+    {
+        var timeline = ThreeParts();
+
+        Assert.True(timeline.DeleteMany(new[] { 2, 0, 2 }));
+
+        Assert.Equal(new[] { new EditClip(10 * S, 20 * S) }, timeline.Clips);
+        Assert.Equal(10 * S, timeline.Duration);
+        Assert.False(timeline.DeleteMany(Array.Empty<int>()));
+    }
+
+    [Fact]
+    public void CokluSilmeHepsiniSilebilir()
+    {
+        var timeline = ThreeParts();
+
+        Assert.True(timeline.DeleteMany(new[] { 0, 1, 2 }));
+
+        Assert.Empty(timeline.Clips);
+        Assert.Equal(0, timeline.Duration);
+        Assert.Equal(new[] { 0L }, timeline.EditPoints);
+    }
+
+    [Fact]
+    public void CokluSilmeListeDisiSirayiReddederVeDokunmaz()
+    {
+        var timeline = ThreeParts();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeline.DeleteMany(new[] { 0, 3 }));
+        Assert.Throws<ArgumentOutOfRangeException>(() => timeline.DeleteMany(new[] { -1 }));
+        Assert.Equal(3, timeline.Clips.Count);
+        Assert.False(timeline.CanUndo);
+    }
+
+    [Fact]
+    public void DuzenlemeNoktalariParcaSinirlaridir()
+    {
+        var timeline = ThreeParts();
+        timeline.SetSpeed(1, 2m);
+
+        Assert.Equal(new[] { 0L, 10 * S, 15 * S, 25 * S }, timeline.EditPoints);
+        Assert.Equal(timeline.Duration, timeline.EditPoints[^1]);
+        for (var i = 0; i < timeline.Clips.Count; i++)
+            Assert.Equal(timeline.ClipStart(i), timeline.EditPoints[i]);
+    }
+
     private static EditTimeline ThreeParts()
         => new(new[] { new EditClip(0, 10 * S), new EditClip(10 * S, 20 * S), new EditClip(20 * S, 30 * S) });
 

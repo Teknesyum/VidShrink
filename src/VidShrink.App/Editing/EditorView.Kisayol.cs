@@ -48,6 +48,20 @@ internal partial class EditorView
             case EditorCommand.SelectAll: Timeline.SelectAll(); break;
             case EditorCommand.Undo: Undo(); break;
             case EditorCommand.Redo: Redo(); break;
+            case EditorCommand.ToggleSnap: Timeline.SnapEnabled = !Timeline.SnapEnabled; break;
+            case EditorCommand.TrimHead: TrimToPlayhead(true); break;
+            case EditorCommand.TrimTail: TrimToPlayhead(false); break;
+            case EditorCommand.PrevEdit: GoToEdit(false); break;
+            case EditorCommand.NextEdit: GoToEdit(true); break;
+            case EditorCommand.Back5: StepFrame(-5); break;
+            case EditorCommand.Forward5: StepFrame(5); break;
+            case EditorCommand.ZoomIn: Timeline.ZoomCentered(true); break;
+            case EditorCommand.ZoomOut: Timeline.ZoomCentered(false); break;
+            case EditorCommand.ZoomFit: Timeline.ZoomToFit(); break;
+            case EditorCommand.GoToIn: GoToMark(true); break;
+            case EditorCommand.GoToOut: GoToMark(false); break;
+            case EditorCommand.FocusSpeed: FocusSpeed(); break;
+            case EditorCommand.Extract: Extract(); break;
             default: return false;
         }
 
@@ -97,6 +111,13 @@ internal partial class EditorView
     {
         ShuttleStop();
         SeekTo(Timeline.RoundToFrame(Timeline.Playhead + (long)Math.Round(direction * Timeline.FrameTicks)));
+    }
+
+    private void FocusSpeed()
+    {
+        if (!TxtSpeed.IsEnabled) return;
+        TxtSpeed.Focus();
+        TxtSpeed.SelectAll();
     }
 
     private void SeekTo(long time)

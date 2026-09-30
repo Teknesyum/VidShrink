@@ -82,11 +82,11 @@ internal partial class EditorView
 
     private void EnableExport(bool idle)
     {
-        var ready = idle && _model is not null && _source is not null;
+        var ready = idle && _model is { Clips.Count: > 0 } && _source is not null;
         BtnSave.IsEnabled = ready;
         BtnExport.IsEnabled = ready;
         BtnShare.IsEnabled = ready && !Sharing;
-        var neden = _model is null || _source is null ? Strings.Get("main.action.shrink.disabled-tip") : null;
+        var neden = _model is not { Clips.Count: > 0 } || _source is null ? Strings.Get("main.action.shrink.disabled-tip") : null;
         foreach (var dugme in new Control[] { BtnSave, BtnExport, BtnShare, BtnZoomIn, BtnZoomOut })
             ToolTip.SetTip(dugme, neden);
     }
@@ -102,7 +102,7 @@ internal partial class EditorView
 
     internal async Task<bool> SaveAsync()
     {
-        if (_model is not { } model || _source is null || Exporting) return false;
+        if (_model is not { Clips.Count: > 0 } model || _source is null || Exporting) return false;
         if (SavedPath is { } saved)
         {
             Finish(true, Done(saved));
@@ -120,7 +120,7 @@ internal partial class EditorView
 
     private async Task ExportClickedAsync()
     {
-        if (_model is not { } model || _source is null || Exporting) return;
+        if (_model is not { Clips.Count: > 0 } model || _source is null || Exporting) return;
         if (_pendingPlan is { } pending && _pendingKey == SaveKey(model))
         {
             _pendingPlan = null;
@@ -134,7 +134,7 @@ internal partial class EditorView
 
     internal async Task<bool> ExportToAsync(string output, bool confirmReverse = false)
     {
-        if (_model is not { } model || _source is not { } source || Exporting) return false;
+        if (_model is not { Clips.Count: > 0 } model || _source is not { } source || Exporting) return false;
         var snapshot = new EditTimeline(model.Clips.ToArray());
         var key = SaveKey(snapshot);
         _pendingPlan = null;

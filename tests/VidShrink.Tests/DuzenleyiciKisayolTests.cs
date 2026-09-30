@@ -71,7 +71,7 @@ public sealed class DuzenleyiciKisayolTests
                 Assert.Equal(10 * Sn, o.Cizelge.MarkIn);
                 Assert.Equal(20 * Sn, o.Cizelge.MarkOut);
 
-                Assert.True(o.Bas(Key.S));
+                Assert.True(o.Bas(Key.K, KeyModifiers.Control));
                 Assert.Equal(2, o.Model.Clips.Count);
                 o.Cizelge.Playhead = 30 * Sn;
                 Assert.True(o.Bas(Key.K, KeyModifiers.Control));
@@ -182,7 +182,7 @@ public sealed class DuzenleyiciKisayolTests
             try
             {
                 o.Cizelge.Playhead = 30 * Sn;
-                o.Bas(Key.S);
+                o.Bas(Key.K, KeyModifiers.Control);
                 o.Cizelge.SelectedIndex = 1;
                 Assert.Equal(2, o.Model.Clips.Count);
 
@@ -234,11 +234,160 @@ public sealed class DuzenleyiciKisayolTests
                 o.Bas(Key.Z, KeyModifiers.Control, hiz);
 
                 Assert.Single(o.Model.Clips);
+                Assert.True(o.Cizelge.SnapEnabled);
                 Assert.False(o.Model.CanUndo);
                 Assert.False(o.Cizelge.AllSelected);
                 Assert.Null(o.Cizelge.MarkIn);
                 Assert.False(o.Duzenleyici.Player.IsPlaying);
                 Assert.Equal(30 * Sn, o.Cizelge.Playhead);
+            }
+            finally
+            {
+                o.Pencere.Close();
+            }
+        });
+    }
+
+    [Fact]
+    public void PremiereTuslariModeliVeOynatmaBasiniDegistirir()
+    {
+        AppHost.Run(() =>
+        {
+            var o = Kur();
+            try
+            {
+                Assert.True(o.Bas(Key.S));
+                Assert.False(o.Cizelge.SnapEnabled);
+                Assert.True(o.Bas(Key.S));
+                Assert.True(o.Cizelge.SnapEnabled);
+                Assert.False(o.Model.CanUndo);
+
+                o.Cizelge.Playhead = 30 * Sn;
+                o.Bas(Key.K, KeyModifiers.Control);
+                o.Cizelge.Playhead = 60 * Sn;
+                o.Bas(Key.K, KeyModifiers.Control);
+                Assert.Equal(3, o.Model.Clips.Count);
+
+                o.Cizelge.Playhead = 45 * Sn;
+                var gezinti = new List<long>();
+                foreach (var tus in new[] { Key.Down, Key.Down, Key.Down, Key.Up, Key.Up, Key.Up, Key.Up })
+                {
+                    Assert.True(o.Bas(tus));
+                    gezinti.Add(o.Cizelge.Playhead);
+                }
+                Assert.Equal(new[] { 60 * Sn, 120 * Sn, 120 * Sn, 60 * Sn, 30 * Sn, 0, 0 }, gezinti);
+
+                Assert.True(o.Bas(Key.Right, KeyModifiers.Shift));
+                Assert.Equal(5 * Sn / 25, o.Cizelge.Playhead);
+                Assert.True(o.Bas(Key.Right, KeyModifiers.Shift));
+                Assert.True(o.Bas(Key.Left, KeyModifiers.Shift));
+                Assert.Equal(5 * Sn / 25, o.Cizelge.Playhead);
+
+                o.Cizelge.Playhead = 40 * Sn;
+                Assert.True(o.Bas(Key.Q));
+                Assert.Equal(new EditClip(40 * Sn, 60 * Sn), o.Model.Clips[1]);
+                Assert.Equal(110 * Sn, o.Model.Duration);
+                Assert.Equal(30 * Sn, o.Cizelge.Playhead);
+                Assert.True(o.Bas(Key.Z, KeyModifiers.Control));
+                Assert.Equal(120 * Sn, o.Model.Duration);
+
+                o.Cizelge.Playhead = 40 * Sn;
+                Assert.True(o.Bas(Key.W));
+                Assert.Equal(new EditClip(30 * Sn, 40 * Sn), o.Model.Clips[1]);
+                Assert.Equal(100 * Sn, o.Model.Duration);
+                Assert.Equal(40 * Sn, o.Cizelge.Playhead);
+                Assert.True(o.Bas(Key.Z, KeyModifiers.Control));
+                Assert.Equal(120 * Sn, o.Model.Duration);
+
+                o.Cizelge.Playhead = 10 * Sn;
+                o.Bas(Key.I);
+                o.Cizelge.Playhead = 20 * Sn;
+                o.Bas(Key.O);
+                o.Cizelge.Playhead = 90 * Sn;
+                Assert.True(o.Bas(Key.I, KeyModifiers.Shift));
+                Assert.Equal(10 * Sn, o.Cizelge.Playhead);
+                Assert.True(o.Bas(Key.O, KeyModifiers.Shift));
+                Assert.Equal(20 * Sn, o.Cizelge.Playhead);
+                Assert.Equal(10 * Sn, o.Cizelge.MarkIn);
+
+                Assert.True(o.Bas(Key.OemQuotes));
+                Assert.Equal(110 * Sn, o.Model.Duration);
+                Assert.Equal(4, o.Model.Clips.Count);
+                Assert.True(o.Bas(Key.Z, KeyModifiers.Control));
+                Assert.Equal(3, o.Model.Clips.Count);
+
+                o.Cizelge.SelectedIndex = 0;
+                o.Cizelge.ToggleSelection(2);
+                Assert.True(o.Bas(Key.Delete));
+                Assert.Equal(new[] { new EditClip(30 * Sn, 60 * Sn) }, o.Model.Clips);
+                Assert.True(o.Bas(Key.Z, KeyModifiers.Control));
+                Assert.Equal(3, o.Model.Clips.Count);
+
+                Assert.True(o.Bas(Key.A, KeyModifiers.Control));
+                Assert.True(o.Bas(Key.Delete, KeyModifiers.Shift));
+                Assert.Empty(o.Model.Clips);
+                Assert.True(o.Bas(Key.Z, KeyModifiers.Control));
+                Assert.Equal(3, o.Model.Clips.Count);
+                Assert.Equal(120 * Sn, o.Model.Duration);
+
+                var enAz = o.Cizelge.MinPixelsPerTick;
+                foreach (var (tus, buyur) in new[] { (Key.OemPlus, true), (Key.Add, true), (Key.OemMinus, false), (Key.Subtract, false) })
+                {
+                    var once = o.Cizelge.PixelsPerTick;
+                    Assert.True(o.Bas(tus));
+                    if (buyur) Assert.True(o.Cizelge.PixelsPerTick > once, tus.ToString());
+                    else Assert.True(o.Cizelge.PixelsPerTick < once, tus.ToString());
+                }
+                o.Bas(Key.OemPlus);
+                o.Cizelge.ViewStart = 50 * Sn;
+                Assert.True(o.Cizelge.ViewStart > 0);
+                Assert.True(o.Bas(Key.OemPipe));
+                Assert.Equal(enAz, o.Cizelge.PixelsPerTick);
+                Assert.Equal(0, o.Cizelge.ViewStart);
+
+                var hiz = o.Duzenleyici.FindControl<TextBox>("TxtSpeed")!;
+                o.Cizelge.SelectedIndex = 0;
+                Dispatcher.UIThread.RunJobs();
+                Assert.False(hiz.IsFocused);
+                Assert.True(o.Bas(Key.R, KeyModifiers.Control));
+                Dispatcher.UIThread.RunJobs();
+                Assert.True(hiz.IsFocused);
+                var sure = o.Model.Duration;
+                o.Bas(Key.Q, KeyModifiers.None, hiz);
+                Assert.Equal(sure, o.Model.Duration);
+            }
+            finally
+            {
+                o.Pencere.Close();
+            }
+        });
+    }
+
+    [Fact]
+    public void OynarkenCizelgeOynatmaBasiniSayfaSayfaIzler()
+    {
+        AppHost.Run(() =>
+        {
+            var o = Kur();
+            var motor = new EdlMotoru();
+            using var surucu = new EdlPreviewDriver(motor, new EdlPreview("kaynak.mp4", o.Model), TimeSpan.FromHours(1));
+            try
+            {
+                o.Duzenleyici.UseDriver(surucu);
+                o.Cizelge.PixelsPerTick = o.Cizelge.TrackWidth / (10 * Sn);
+                o.Cizelge.ViewStart = 0;
+
+                Assert.True(o.Bas(Key.L));
+                motor.PositionSeconds = 50;
+                o.Duzenleyici.Follow();
+                Assert.Equal(50 * Sn, o.Cizelge.Playhead);
+                Assert.Equal(50 * Sn, o.Cizelge.ViewStart);
+
+                Assert.True(o.Bas(Key.K));
+                motor.PositionSeconds = 90;
+                o.Duzenleyici.Follow();
+                Assert.Equal(90 * Sn, o.Cizelge.Playhead);
+                Assert.Equal(50 * Sn, o.Cizelge.ViewStart);
             }
             finally
             {
@@ -310,7 +459,7 @@ public sealed class DuzenleyiciKisayolTests
             }
         });
 
-        Assert.Equal("S", menu);
+        Assert.Equal("Ctrl+K", menu);
         Assert.Equal("Undo (Ctrl+Z)", ipucu);
         Assert.Equal(EditorKeymap.Rows.Count, liste.Count);
         Assert.Contains(("J", "Play backward, press again for faster"), liste);

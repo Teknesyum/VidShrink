@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
+using Avalonia.Input;
 using VidShrink.App;
 using VidShrink.App.Editing;
 using VidShrink.App.Localization;
@@ -272,5 +273,168 @@ public sealed class DuzenleyiciCizelgeTests
         Assert.Contains("EditorSnapThresholdPx", anahtarlar);
         Assert.Contains("NeonPink", anahtarlar);
         Assert.Empty(cozulmeyen);
+    }
+
+    [Fact]
+    public void YakalamaKapaliykenHedefVeCizgiYok()
+    {
+        var (acik, kapali, geri) = AppHost.Run(() =>
+        {
+            var cizelge = Cizelge(UcKesim());
+            var sinir = S(20);
+            var x = cizelge.TimeToX(sinir) + 3;
+
+            (long? Hedef, long? Cizgi, long Bas) Olc()
+            {
+                var hedef = cizelge.SnapTarget(cizelge.XToTime(x), playhead: false);
+                cizelge.ScrubTo(x, false);
+                var sonuc = (hedef, cizelge.SnapLine, cizelge.Playhead);
+                cizelge.ScrubTo(x, true);
+                return sonuc;
+            }
+
+            var acik = Olc();
+            cizelge.SnapEnabled = false;
+            var kapali = Olc();
+            cizelge.SnapEnabled = true;
+            return (acik, kapali, Olc());
+        });
+
+        Assert.Equal(S(20), acik.Hedef);
+        Assert.Equal(S(20), acik.Cizgi);
+        Assert.Equal(S(20), acik.Bas);
+        Assert.Null(kapali.Hedef);
+        Assert.Null(kapali.Cizgi);
+        Assert.NotEqual(S(20), kapali.Bas);
+        Assert.Equal(acik, geri);
+    }
+
+    [Fact]
+    public void SigdirmaTumCizelgeyiGosterir()
+    {
+        var (ppt, enAz, bas, son, sure) = AppHost.Run(() =>
+        {
+            var cizelge = Cizelge(UcKesim());
+            cizelge.PixelsPerTick = cizelge.MaxPixelsPerTick;
+            cizelge.ViewStart = S(30);
+            Assert.True(cizelge.ViewStart > 0);
+            cizelge.ZoomToFit();
+            return (cizelge.PixelsPerTick, cizelge.MinPixelsPerTick, cizelge.ViewStart, cizelge.ViewEnd, cizelge.Model!.Duration);
+        });
+
+        Assert.Equal(enAz, ppt);
+        Assert.Equal(0, bas);
+        Assert.True(son >= sure);
+    }
+
+    [Fact]
+    public void DuzenlemeNoktalariArasindaGezinir()
+    {
+        var olcum = AppHost.Run(() =>
+        {
+            var cizelge = Cizelge(UcKesim());
+            var sonuc = new List<(long? Onceki, long? Sonraki)>();
+            foreach (var bas in new[] { 0, S(10), S(20), S(59), S(60) })
+            {
+                cizelge.Playhead = bas;
+                sonuc.Add((cizelge.PrevEditPoint(), cizelge.NextEditPoint()));
+            }
+            return sonuc;
+        });
+
+        Assert.Equal(new (long?, long?)[] { (null, S(20)), (0, S(20)), (0, S(40)), (S(40), S(60)), (S(40), null) }, olcum);
+    }
+
+    [Fact]
+    public void OynatmaBasiSayfaSayfaIzlenir()
+    {
+        var olcum = AppHost.Run(() =>
+        {
+            var cizelge = Cizelge(UcKesim());
+            cizelge.PixelsPerTick = cizelge.TrackWidth / S(10);
+            cizelge.ViewStart = 0;
+            var sonuc = new List<(bool Kaydi, long Bas, long Son)>();
+            foreach (var bas in new[] { S(5), S(12), S(15), S(3) })
+            {
+                cizelge.Playhead = bas;
+                sonuc.Add((cizelge.FollowPlayhead(), cizelge.ViewStart, cizelge.ViewEnd));
+            }
+            return sonuc;
+        });
+
+        Assert.Equal((false, 0L), (olcum[0].Kaydi, olcum[0].Bas));
+        Assert.Equal((true, S(12)), (olcum[1].Kaydi, olcum[1].Bas));
+        Assert.Equal((false, S(12)), (olcum[2].Kaydi, olcum[2].Bas));
+        Assert.True(olcum[3].Kaydi);
+        Assert.InRange(S(3), olcum[3].Bas, olcum[3].Son);
+    }
+
+    private static void Tikla(EditorTimeline cizelge, long zaman, KeyModifiers ek)
+    {
+        var nokta = new Point(cizelge.TimeToX(zaman), cizelge.VideoTop + 2);
+        var isaretci = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, true);
+        cizelge.RaiseEvent(new PointerPressedEventArgs(cizelge, isaretci, cizelge, nokta, 0,
+            new PointerPointProperties(RawInputModifiers.LeftMouseButton, PointerUpdateKind.LeftButtonPressed), ek));
+        cizelge.RaiseEvent(new PointerReleasedEventArgs(cizelge, isaretci, cizelge, nokta, 0,
+            new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonReleased), ek, MouseButton.Left));
+    }
+
+    [Fact]
+    public void CtrlVeShiftTikiCokluSecimKurar()
+    {
+        var olcum = AppHost.Run(() =>
+        {
+            var cizelge = new EditorTimeline();
+            var pencere = new Window { Width = Genislik, Height = 400, Content = cizelge };
+            pencere.Show();
+            cizelge.Show(UcKesim());
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var sonuc = new List<(int[] Secili, int[] Boyali)>();
+            foreach (var (zaman, ek) in new[] { (S(10), KeyModifiers.None), (S(50), KeyModifiers.Shift), (S(30), KeyModifiers.Control), (S(30), KeyModifiers.Control), (S(50), KeyModifiers.Control), (S(30), KeyModifiers.None) })
+            {
+                Tikla(cizelge, zaman, ek);
+                sonuc.Add((cizelge.SelectedIndices.ToArray(), cizelge.Realized.Where(c => c.Classes.Contains("selected")).Select(c => c.Index).OrderBy(i => i).ToArray()));
+            }
+            var adet = cizelge.Model!.Clips.Count;
+            pencere.Close();
+            return (sonuc, adet);
+        });
+
+        var beklenen = new[] { new[] { 0 }, new[] { 0, 1, 2 }, new[] { 0, 2 }, new[] { 0, 1, 2 }, new[] { 0, 1 }, new[] { 1 } };
+        Assert.Equal(beklenen, olcum.sonuc.Select(s => s.Secili));
+        Assert.Equal(beklenen, olcum.sonuc.Select(s => s.Boyali));
+        Assert.Equal(3, olcum.adet);
+    }
+
+    [Fact]
+    public void CokluSecimTekAdimdaSilinirHepsiSecilinceCizelgeBosalir()
+    {
+        var (coklu, cokluSure, cokluGeri, bos, bosSure, bosGeri) = AppHost.Run(() =>
+        {
+            var view = new EditorView();
+            view.ShowTimeline(UcKesim(), 30);
+            var t = view.TimelineView;
+            t.SelectedIndex = 0;
+            t.ToggleSelection(2);
+            Assert.True(view.DeleteSelected());
+            var coklu = view.Model!.Clips.ToArray();
+            var cokluSure = view.Model.Duration;
+            Assert.True(view.Undo());
+            var cokluGeri = view.Model.Clips.ToArray();
+
+            t.SelectAll();
+            Assert.True(view.DeleteSelected());
+            var bos = view.Model.Clips.Count;
+            var bosSure = view.Model.Duration;
+            Assert.True(view.Undo());
+            return (coklu, cokluSure, cokluGeri, bos, bosSure, view.Model.Clips.ToArray());
+        });
+
+        Assert.Equal(new[] { new EditClip(S(20), S(40)) }, coklu);
+        Assert.Equal(S(20), cokluSure);
+        Assert.Equal(UcKesim().Clips, cokluGeri);
+        Assert.Equal(0, bos);
+        Assert.Equal(0, bosSure);
+        Assert.Equal(UcKesim().Clips, bosGeri);
     }
 }

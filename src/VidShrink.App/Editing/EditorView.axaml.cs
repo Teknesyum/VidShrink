@@ -144,13 +144,45 @@ internal partial class EditorView : UserControl
 
     internal bool DeleteSelected()
     {
-        var selected = Timeline.SelectedIndex;
+        var all = Timeline.AllSelected;
+        var selected = Timeline.SelectedIndices;
+        if (selected.Count == 0) return false;
         return Apply(model =>
         {
-            if (selected < 0 || selected >= model.Clips.Count || model.Clips.Count < 2) return false;
-            model.Delete(selected);
+            if (selected.Any(i => i < 0 || i >= model.Clips.Count)) return false;
+            if (!all && selected.Count >= model.Clips.Count) return false;
+            return model.DeleteMany(selected);
+        }, Math.Max(0, selected.Min() - 1));
+    }
+
+    internal bool TrimToPlayhead(bool head)
+    {
+        var at = Timeline.Playhead;
+        var index = Timeline.ClipAt(at);
+        return Apply(model =>
+        {
+            if (index < 0 || index >= model.Clips.Count) return false;
+            var start = model.ClipStart(index);
+            if (!(head ? model.RippleTrimHead(at) : model.RippleTrimTail(at))) return false;
+            if (head) Timeline.Playhead = start;
             return true;
-        }, Math.Max(0, selected - 1));
+        }, -1);
+    }
+
+    internal bool Extract() => DeleteRange();
+
+    internal bool GoToMark(bool markIn)
+    {
+        if ((markIn ? Timeline.MarkIn : Timeline.MarkOut) is not { } at) return false;
+        SeekTo(at);
+        return true;
+    }
+
+    internal bool GoToEdit(bool next)
+    {
+        if ((next ? Timeline.NextEditPoint() : Timeline.PrevEditPoint()) is not { } at) return false;
+        SeekTo(at);
+        return true;
     }
 
     internal bool DeleteRange()
@@ -218,6 +250,14 @@ internal partial class EditorView : UserControl
     private async Task ReloadAsync(long at)
     {
         if (_model is not { } model || _source is not { } source || Preview.Engine is not { } engine) return;
+        if (model.Clips.Count == 0)
+        {
+            if (Preview.IsPlaying) Preview.TogglePlay();
+            _driver?.Dispose();
+            _driver = null;
+            return;
+        }
+
         var playing = Preview.IsPlaying;
         _driver?.Dispose();
         var driver = new EdlPreviewDriver(engine, new EdlPreview(source, model));
@@ -236,11 +276,13 @@ internal partial class EditorView : UserControl
         }
     }
 
-    private void Follow()
+    internal void Follow()
     {
         if (_driver is not { } driver) return;
         SyncDriver();
-        if (!Timeline.Scrubbing) Timeline.Playhead = driver.TimelinePosition;
+        if (Timeline.Scrubbing) return;
+        Timeline.Playhead = driver.TimelinePosition;
+        if (driver.Playing) Timeline.FollowPlayhead();
     }
 
     private void OnSeek(long time, bool final)
@@ -292,7 +334,8 @@ internal partial class EditorView : UserControl
         var selected = ActiveIndex;
         var hasClip = model is not null && selected >= 0 && selected < model.Clips.Count;
         BtnSplit.IsEnabled = model is not null;
-        BtnDelete.IsEnabled = hasClip && !Timeline.AllSelected && model!.Clips.Count > 1;
+        var chosen = Timeline.SelectedIndices.Count;
+        BtnDelete.IsEnabled = model is { Clips.Count: > 0 } && chosen > 0 && (Timeline.AllSelected || chosen < model.Clips.Count);
         BtnUndo.IsEnabled = model?.CanUndo ?? false;
         BtnRedo.IsEnabled = model?.CanRedo ?? false;
         BtnZoomIn.IsEnabled = model is not null;
