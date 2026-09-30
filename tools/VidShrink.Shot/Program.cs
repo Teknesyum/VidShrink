@@ -402,10 +402,7 @@ public static class Program
     /// </summary>
     private static void SelectTab(MainWindow window, string headerKey)
     {
-        var tabs = (TabControl)Named(window, "Tabs");
-
-        foreach (var host in tabs.GetVisualDescendants().OfType<TransitioningContentControl>())
-            host.PageTransition = null;
+        var tabs = StillTabs(window);
 
         if (headerKey == "main.tab.player")
         {
@@ -423,6 +420,14 @@ public static class Program
         }
 
         throw new InvalidOperationException($"Sekme bulunamadi: {headerKey} ({wanted}).");
+    }
+
+    private static TabControl StillTabs(MainWindow window)
+    {
+        var tabs = (TabControl)Named(window, "Tabs");
+        foreach (var host in tabs.GetVisualDescendants().OfType<TransitioningContentControl>())
+            host.PageTransition = null;
+        return tabs;
     }
 
     /// <summary>
@@ -460,6 +465,7 @@ public static class Program
 
         var open = typeof(MainWindow).GetMethod("OpenInEditorAsync", Any)
             ?? throw new MissingMethodException(nameof(MainWindow), "OpenInEditorAsync");
+        StillTabs(window);
         var task = (Task)open.Invoke(window, new object?[] { clip, 0d })!;
         Await(() => task.IsCompleted, "Duzenleyici klibi acamadi");
         task.GetAwaiter().GetResult();
