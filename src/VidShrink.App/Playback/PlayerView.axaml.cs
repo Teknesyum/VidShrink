@@ -129,6 +129,7 @@ internal partial class PlayerView : UserControl
 
     internal void Apply(PlayerCommand command)
     {
+        RestoreSpeedMode();
         switch (command.Kind)
         {
             case PlayerCommandKind.Seek:
@@ -577,7 +578,9 @@ internal partial class PlayerView : UserControl
         window.MinHeight = min.Height;
     }
 
-    internal void TogglePlay()
+    internal void TogglePlay() => TogglePlay(true);
+
+    private void TogglePlay(bool feedback)
     {
         if (!_playing && _engine is { EndReached: true } && PlayFromEnd()) return;
         _playing = !_playing;
@@ -588,14 +591,14 @@ internal partial class PlayerView : UserControl
         if (_playing)
         {
             engine.Play();
-            FlashPause(true);
+            if (feedback) FlashPause(true);
         }
         else
         {
             _seek.Follow(engine.PositionSeconds);
             engine.Pause();
             SaveHistory(false);
-            FlashPause(false);
+            if (feedback) FlashPause(false);
         }
     }
 
@@ -689,8 +692,9 @@ internal partial class PlayerView : UserControl
         else if (AudioOnly) FollowAudio(engine);
         if (_playing && engine.EndReached)
         {
-            TogglePlay();
+            TogglePlay(false);
             SaveHistory(true);
+            PlayEndCue();
             AfterEnd();
         }
         return drawn;
@@ -767,6 +771,7 @@ internal partial class PlayerView : UserControl
         ApplyAdvanced(engine);
         if (_volume != 100) engine.SetVolume(_volume);
         if (_muted) engine.SetMuted(true);
+        RestoreSpeedMode();
         if (_speed != 1) engine.SetSpeed(_speed);
         ApplyTrackOptions(engine);
 
@@ -777,7 +782,7 @@ internal partial class PlayerView : UserControl
         var resume = HistoryPath is null ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
         _seek.GoTo(resume);
         if (resume > 0) _trace.Add("resume -> " + Saat.Tani.Konum(resume));
-        if (!_playing) TogglePlay();
+        if (!_playing) TogglePlay(false);
         AfterOpen(path, engine);
         RefreshState();
         Opened?.Invoke(path);

@@ -39,6 +39,7 @@ internal partial class PlayerView
     private bool _seritSliding;
     private bool _seritTimeHover;
     private bool _speedModeB;
+    private PlayerSettings? _speedRestoredFrom;
     private bool _seritPlaying;
     private double _seritPointerX = double.NaN;
     private double _seritSpreadCentre = 0.5;
@@ -374,6 +375,21 @@ internal partial class PlayerView
         _speed = Math.Clamp(_speedModeB ? settings.SpeedB : settings.SpeedA, Keymap.MinimumSpeed, Keymap.MaximumSpeed);
         _engine?.SetSpeed(_speed);
         _trace.Add("speedab -> " + (_speedModeB ? "B " : "A ") + Saat.Tani.Konum(_speed));
+        if (settings.SpeedModeB == _speedModeB) return;
+        settings.SpeedModeB = _speedModeB;
+        SaveSettings();
+    }
+
+    private void RestoreSpeedMode()
+    {
+        var settings = Settings;
+        if (ReferenceEquals(settings, _speedRestoredFrom)) return;
+        _speedRestoredFrom = settings;
+        _speedModeB = settings.SpeedModeB;
+        var speed = Math.Clamp(_speedModeB ? settings.SpeedB : settings.SpeedA, Keymap.MinimumSpeed, Keymap.MaximumSpeed);
+        if (speed == _speed) return;
+        _speed = speed;
+        _engine?.SetSpeed(_speed);
     }
 
     private void RememberSpeed()

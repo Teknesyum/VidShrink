@@ -81,7 +81,7 @@ internal sealed class YolMotoru : IPlaybackEngine
 
     public bool IsPaused { get; private set; } = true;
 
-    public bool EndReached => false;
+    public bool EndReached { get; set; }
 
     public double PositionSeconds { get; private set; }
 
@@ -116,6 +116,7 @@ internal sealed class YolMotoru : IPlaybackEngine
     public Task<SeekResult> SeekAsync(double seconds, SeekPrecision precision, CancellationToken ct = default)
     {
         PositionSeconds = seconds;
+        EndReached = false;
         FramesRendered++;
         return Task.FromResult(new SeekResult(SeekOutcome.Shown, 1));
     }

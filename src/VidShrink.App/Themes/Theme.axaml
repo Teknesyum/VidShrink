@@ -41,6 +41,7 @@
   <x:Double x:Key="EmberAtmosphereCoalOpacity">0.62</x:Double>
   <x:Double x:Key="PanelSurfaceOpacity">0.90</x:Double>
   <x:Double x:Key="PauseGlyphOpacity">0.5</x:Double>
+  <x:Double x:Key="EndCueOpacity">0.8</x:Double>
 
   <SolidColorBrush x:Key="PanelSurface"
                    Color="{StaticResource SurfaceColor}"
@@ -272,6 +273,7 @@
   <StaticResource x:Key="MotionBase" ResourceKey="TBase"/>
   <StaticResource x:Key="MotionSlow" ResourceKey="TSlow"/>
   <sys:TimeSpan x:Key="PauseGlyphHold">00:00:00.5000000</sys:TimeSpan>
+  <sys:TimeSpan x:Key="EndCueDuration">00:00:00.4000000</sys:TimeSpan>
 
   <StaticResource x:Key="TargetMinSize" ResourceKey="TargetMin"/>
   <x:Double x:Key="InfoBadgeSize">18</x:Double>
@@ -318,6 +320,7 @@
   <x:Double x:Key="DropZoneMinHeight">144</x:Double>
   <x:Double x:Key="DropIconSize">48</x:Double>
   <x:Double x:Key="PauseGlyphSize">96</x:Double>
+  <Thickness x:Key="EndCueThickness">2</Thickness>
   <x:Double x:Key="DropOutlineThickness">2</x:Double>
   <x:Double x:Key="DropIconGlowRadius">6</x:Double>
   <x:Double x:Key="PlanFactMinWidth">136</x:Double>

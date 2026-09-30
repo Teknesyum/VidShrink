@@ -151,6 +151,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   Kanıt `.calisma/oynatici-yol-haritasi/`, negatif kontrol betiği aynı klasörde.
   Pencere kapatılmadan önce `view.Close()` çağrılır: `window.Close()` tek başına görsel ağaçtan ayrılmayı
   ertelediği için `player-history.json` `Kapat`'tan sonra doğuyordu (2026-09-18 ölçümü).
+- `OynaticiGeriBildirimTests.cs` — oynatıcı geri bildirimi: ortadaki oynat simgesinin dolgusu `NeonBlueActive` (kare pikseli eski `NeonBlue` dolgusuyla kıyaslanır, olumsuz kontrol aynı karede fırça değiştirilerek), dosya açılınca kendiliğinden oynatma ve dosya sonundaki kendiliğinden duraklama gösterge çıkarmaz (kullanıcı basınca çıkar), dosya sonunda `EndCue` anahattı bir kez `EndCueDuration` içinde yumuşak yanıp söner, yüzeyin kenarını boyar ortasını boyamaz, yeniden oynatmada yine tetiklenir, tek dosya tekrarında ve A-B döngüsünde tetiklenmez; hız A/B kipi `speedMode` olarak ayara yazılır ve açılışta o kipin hızı motora gider (ayar `.calisma/worktree-agent-adb69bc0c379bc481/` altında, test siler). Dört mutasyonun her biri 1/5 kırmızı.
 - `KabukMenusuTests.cs` — sağ tık menüsünün iki tarafı: `ShellMenu.cs` ile `Install-VidShrink.ps1`'in anahtar adları,
   uzantı listesi ve hedef listesi birebir aynı; silme kolu Appx paketini de kaldırıyor; kutu Ayarlar sekmesinde;
   etiket arayüz dilini izliyor; sekiz yeni anahtar 42 dilde. Kayıt defterine yazmaz, kaynak metin okur.
