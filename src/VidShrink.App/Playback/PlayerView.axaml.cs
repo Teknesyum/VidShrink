@@ -592,7 +592,10 @@ internal partial class PlayerView : UserControl
         _pauseFlash.Stop();
         _pauseFlashSira++;
 
-        PauseGlyphIcon.Data = (Geometry)this.FindResource(playing ? "IconPlay" : "IconPause")!;
+        var simge = playing ? "IconPlay" : "IconPause";
+        if ((this.TryFindResource(simge, out var kaynak) || Application.Current?.TryFindResource(simge, out kaynak) == true)
+            && kaynak is Geometry geometri)
+            PauseGlyphIcon.Data = geometri;
         PauseGlyph.IsVisible = true;
         GlyphMotion(MotionInstant);
         PauseGlyph.Opacity = PauseGlyphOpacity;
