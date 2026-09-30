@@ -179,6 +179,15 @@ Her sekmenin tam turu: [`docs/kullanim.tr.md`](docs/kullanim.tr.md).
 
 ## Kurulum
 
+**Windows'ta önerilen: Teknesyum Base.**
+
+1. [`Teknesyum-Base.exe`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe) dosyasını ([`.sha256`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe.sha256)) indirip çalıştırın. Yönetici hakkı gerekmez.
+2. Listeden **VidShrink** uygulamasını bulup kurun. Base sonradan güncellemeyi ve kaldırmayı da yapar.
+
+Base henüz imzalı değil; Windows SmartScreen ilk açılışta uyarabilir: *Ek bilgi*'yi, sonra *Yine de çalıştır*'ı seçin. Ayrıntı: [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
+
+**Diğer platformlar ya da elle:**
+
 Windows'ta [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
 dosyasını indirip çalıştırın. Kendi başına çalışan küçük bir program: PowerShell de yönetici
 hakkı da gerekmez. Aşağıdaki betik de aynı kurulumu yapıyor; PowerShell'e ya da Komut

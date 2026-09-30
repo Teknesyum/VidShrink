@@ -167,6 +167,15 @@ Full tour of every tab: [`docs/kullanim.md`](docs/kullanim.md).
 
 ## Install
 
+**Recommended on Windows: Teknesyum Base.**
+
+1. Download [`Teknesyum-Base.exe`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe) ([`.sha256`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe.sha256)) and run it. No admin rights are needed.
+2. Find **VidShrink** in the list and install it. Base also updates and removes it later.
+
+Base is not code-signed yet, so Windows SmartScreen may warn on first launch: choose *More info*, then *Run anyway*. More: [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
+
+**Other platforms, or manually:**
+
 On Windows, download and run
 [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe).
 It is a small self-contained program: no PowerShell, no administrator rights. The script
