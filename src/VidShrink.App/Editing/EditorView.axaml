@@ -60,8 +60,8 @@
                 <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconFullScreen}" Fill="{Binding $parent[Button].Foreground}"/>
               </Button>
               <ToggleButton x:Name="BtnSnap" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.snap}" AutomationProperties.Name="{loc:Text editor.snap}"/>
-              <Button x:Name="BtnAddText" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.text.add}" AutomationProperties.Name="{loc:Text editor.text.add}"/>
             </StackPanel>
+            <Button x:Name="BtnAddText" Theme="{StaticResource GhostButton}" VerticalAlignment="Top" Content="{loc:Text editor.text.add}" AutomationProperties.Name="{loc:Text editor.text.add}"/>
             <StackPanel x:Name="DeliveryGroup" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Top">
               <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
               <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save-as}" AutomationProperties.Name="{loc:Text editor.save-as}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
