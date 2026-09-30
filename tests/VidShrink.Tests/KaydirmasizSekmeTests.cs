@@ -55,6 +55,7 @@ public sealed class KaydirmasizSekmeTests
         var onceki = yollar.ToDictionary(y => y, y => File.Exists(y) ? File.ReadAllBytes(y) : null);
         try
         {
+            if (VidShrink.App.Recorder.RecorderSettings.FilePath is { } kaydedici && File.Exists(kaydedici)) File.Delete(kaydedici);
             return olc();
         }
         finally
