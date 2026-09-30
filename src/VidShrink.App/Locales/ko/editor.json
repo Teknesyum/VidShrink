@@ -54,5 +54,17 @@
   "editor.text.size": "크기",
   "editor.text.color": "색상",
   "editor.text.panel": "텍스트 속성",
-  "editor.export.text-full": "텍스트 레이어는 다시 인코딩해야 하므로 전체 모드로 전환했습니다."
+  "editor.export.text-full": "텍스트 레이어는 다시 인코딩해야 하므로 전체 모드로 전환했습니다.",
+  "editor.clip.panel": "클립 속성",
+  "editor.clip.rotate": "90° 회전",
+  "editor.clip.flip-h": "좌우 반전",
+  "editor.clip.flip-v": "상하 반전",
+  "editor.clip.crop": "자르기",
+  "editor.clip.crop.none": "없음",
+  "editor.clip.volume": "볼륨 (dB)",
+  "editor.clip.mute": "음소거",
+  "editor.clip.fade-in": "페이드 인 (초)",
+  "editor.clip.fade-out": "페이드 아웃 (초)",
+  "editor.clip.reset": "초기화",
+  "editor.export.effects-full": "클립 설정은 다시 인코딩해야 하므로 전체 모드로 전환했습니다."
 }

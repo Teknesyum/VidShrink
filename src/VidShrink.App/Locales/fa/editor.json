@@ -54,5 +54,17 @@
   "editor.text.size": "اندازه",
   "editor.text.color": "رنگ",
   "editor.text.panel": "ویژگی‌های متن",
-  "editor.export.text-full": "لایهٔ متن به رمزگذاری دوباره نیاز دارد؛ به حالت کامل تغییر کرد."
+  "editor.export.text-full": "لایهٔ متن به رمزگذاری دوباره نیاز دارد؛ به حالت کامل تغییر کرد.",
+  "editor.clip.panel": "ویژگی‌های کلیپ",
+  "editor.clip.rotate": "چرخش ۹۰°",
+  "editor.clip.flip-h": "وارونه‌سازی افقی",
+  "editor.clip.flip-v": "وارونه‌سازی عمودی",
+  "editor.clip.crop": "برش کادر",
+  "editor.clip.crop.none": "هیچ",
+  "editor.clip.volume": "بلندی صدا (dB)",
+  "editor.clip.mute": "بی‌صدا",
+  "editor.clip.fade-in": "ظاهرشدن تدریجی (ث)",
+  "editor.clip.fade-out": "محوشدن تدریجی (ث)",
+  "editor.clip.reset": "بازنشانی",
+  "editor.export.effects-full": "تنظیمات کلیپ به رمزگذاری دوباره نیاز دارد؛ به حالت کامل تغییر کرد."
 }

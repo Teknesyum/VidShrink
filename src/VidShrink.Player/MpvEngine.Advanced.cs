@@ -11,6 +11,13 @@ public sealed partial class MpvEngine
     private const string CropLabel = "vscrop";
     private const string EqualizerLabel = "vseq";
     private const string NormalizeLabel = "vsnorm";
+    private const string ClipGeometryLabel = "vsclipgeo";
+    private const string ClipFadeLabel = "vsclipfade";
+    private const string ClipAudioLabel = "vsclipaudio";
+
+    private string? _editGeometry;
+    private string? _editFades;
+    private string? _editAudio;
 
     private const double HueSpan = 1.8;
     private const double SharpSpan = 0.015;
@@ -136,6 +143,31 @@ public sealed partial class MpvEngine
         }
 
         if (GetProperty("option-info/" + name + "/default-value") is { } fallback) TrySet(name, fallback);
+    }
+
+    public void SetEditGeometry(string? chain)
+    {
+        var wanted = string.IsNullOrEmpty(chain) ? null : chain;
+        if (wanted == _editGeometry) return;
+        _editGeometry = wanted;
+        Swap(ClipGeometryLabel, wanted is null ? null : "lavfi=[" + wanted + "]");
+        _update.Set();
+    }
+
+    public void SetEditTimed(string? video, string? audio)
+    {
+        var wantedVideo = string.IsNullOrEmpty(video) ? null : video;
+        var wantedAudio = string.IsNullOrEmpty(audio) ? null : audio;
+        if (wantedVideo != _editFades)
+        {
+            _editFades = wantedVideo;
+            Swap(ClipFadeLabel, wantedVideo is null ? null : "lavfi=[" + wantedVideo + "]");
+            _update.Set();
+        }
+
+        if (wantedAudio == _editAudio) return;
+        _editAudio = wantedAudio;
+        Swap(ClipAudioLabel, wantedAudio is null ? null : "lavfi=[" + wantedAudio + "]", "af");
     }
 
     private void Swap(string label, string? filter, string property = "vf")

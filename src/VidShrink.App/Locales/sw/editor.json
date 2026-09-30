@@ -54,5 +54,17 @@
   "editor.text.size": "Ukubwa",
   "editor.text.color": "Rangi",
   "editor.text.panel": "Sifa za maandishi",
-  "editor.export.text-full": "Safu ya maandishi inahitaji kusimbwa upya; imebadilishwa kuwa hali kamili."
+  "editor.export.text-full": "Safu ya maandishi inahitaji kusimbwa upya; imebadilishwa kuwa hali kamili.",
+  "editor.clip.panel": "Sifa za klipu",
+  "editor.clip.rotate": "Zungusha 90°",
+  "editor.clip.flip-h": "Geuza mlalo",
+  "editor.clip.flip-v": "Geuza wima",
+  "editor.clip.crop": "Punguza",
+  "editor.clip.crop.none": "Hakuna",
+  "editor.clip.volume": "Sauti (dB)",
+  "editor.clip.mute": "Nyamazisha",
+  "editor.clip.fade-in": "Kuingia taratibu (s)",
+  "editor.clip.fade-out": "Kufifia taratibu (s)",
+  "editor.clip.reset": "Weka upya",
+  "editor.export.effects-full": "Mipangilio ya klipu inahitaji kusimbwa upya; imebadilishwa kuwa hali kamili."
 }

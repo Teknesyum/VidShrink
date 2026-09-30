@@ -54,5 +54,17 @@
   "editor.text.size": "Taille",
   "editor.text.color": "Couleur",
   "editor.text.panel": "Propriétés du texte",
-  "editor.export.text-full": "Le calque de texte exige un réencodage ; passage au mode complet."
+  "editor.export.text-full": "Le calque de texte exige un réencodage ; passage au mode complet.",
+  "editor.clip.panel": "Propriétés du clip",
+  "editor.clip.rotate": "Pivoter de 90°",
+  "editor.clip.flip-h": "Retourner horizontalement",
+  "editor.clip.flip-v": "Retourner verticalement",
+  "editor.clip.crop": "Recadrage",
+  "editor.clip.crop.none": "Aucun",
+  "editor.clip.volume": "Volume (dB)",
+  "editor.clip.mute": "Muet",
+  "editor.clip.fade-in": "Fondu en ouverture (s)",
+  "editor.clip.fade-out": "Fondu en fermeture (s)",
+  "editor.clip.reset": "Réinitialiser",
+  "editor.export.effects-full": "Les réglages du clip exigent un réencodage ; passage au mode complet."
 }

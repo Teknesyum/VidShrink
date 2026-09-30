@@ -186,6 +186,15 @@ public interface IPlaybackEngine : IDisposable
 
     void SetRotation(int degrees) { }
 
+    /// <summary>
+    /// Duzenleyicinin o anki parcaya uyguladigi geometri zinciri (kirp, dondur, cevir, tuval);
+    /// libavfilter dizgesi, <c>null</c> ya da bos kaldirir.
+    /// </summary>
+    void SetEditGeometry(string? chain) { }
+
+    /// <summary>Duzenleyicinin EDL zamaninda <c>enable</c> pencereli solma ve ses zincirleri; <c>null</c> kaldirir.</summary>
+    void SetEditTimed(string? video, string? audio) { }
+
     void SetMirrored(bool mirrored) { }
 
     void SetAspectOverride(string ratio) { }

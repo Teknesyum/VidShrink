@@ -54,5 +54,17 @@
   "editor.text.size": "גודל",
   "editor.text.color": "צבע",
   "editor.text.panel": "מאפייני טקסט",
-  "editor.export.text-full": "שכבת הטקסט דורשת קידוד מחדש; עברנו למצב מלא."
+  "editor.export.text-full": "שכבת הטקסט דורשת קידוד מחדש; עברנו למצב מלא.",
+  "editor.clip.panel": "מאפייני קליפ",
+  "editor.clip.rotate": "סיבוב 90°",
+  "editor.clip.flip-h": "היפוך אופקי",
+  "editor.clip.flip-v": "היפוך אנכי",
+  "editor.clip.crop": "חיתוך",
+  "editor.clip.crop.none": "ללא",
+  "editor.clip.volume": "עוצמת קול (dB)",
+  "editor.clip.mute": "השתקה",
+  "editor.clip.fade-in": "הופעה הדרגתית (ש׳)",
+  "editor.clip.fade-out": "היעלמות הדרגתית (ש׳)",
+  "editor.clip.reset": "איפוס",
+  "editor.export.effects-full": "הגדרות הקליפ דורשות קידוד מחדש; עברנו למצב מלא."
 }

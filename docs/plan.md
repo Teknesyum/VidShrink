@@ -1,3 +1,15 @@
+# Düzenleyici — Klip Özellikleri (Kırpma, Döndürme, Ses, Solma)
+
+Seçili klibe dört özellik: kırpma (oranlı, ortalı), döndürme 90/180/270 + yatay/dikey çevirme,
+ses (dB, sessiz), giriş/çıkış solması (görüntü + ses). Her değişiklik tek geri alma adımı.
+
+| Parça | Dosyalar | İş |
+| --- | --- | --- |
+| Model | `Core/Editing/ClipEffects.cs`, `EditClip.cs`, `EditTimeline.cs` | `ClipEffects` (değer eşitlikli), `EditClip.Effects`; bölme/kırpma/hız etkiyi taşır, solma bölmede kenarında kalır; `SetEffects` birden çok klibe tek adım |
+| Süzgeç | `Core/Editing/ClipFilters.cs`, `EditExport.cs` | kaynak boyutu (SAR düzeltilmiş) → çift pikselli `crop`, `transpose`/`hflip`/`vflip`, ortak tuval `scale+pad`, `fade`/`afade`/`volume`; etkili çizelgede Hızlı/Akıllı Tam'a düşer (`EffectsForcedFull`), etkisiz çizelgenin grafiği bayt bayt aynı |
+| Önizleme | `Player/IPlaybackEngine.cs`, `MpvEngine.Advanced.cs`, `App/Playback/EdlPreviewDriver.cs` | geometri parça başına `@vsclipgeo` (parça değişince), solma ve ses EDL zamanında `enable=` ile sabit `@vsclipfade`/`@vsclipaudio`; yalnız etki değişince EDL yeniden açılmaz |
+| Arayüz | `EditorView.axaml`, `EditorView.Klip.cs`, `EditorView.Teslim.cs`, `Locales/*/editor.json` | klip paneli (metin seçili değilken), Tam'a düşme notu, 42 dil |
+| Test | `DuzenleyiciKlipOzellikTests.cs`, `AGENTS.md`, `docs/olcumler/duzenleyici-klip-ozellik.md` | model/undo, argüman + negatif kontroller, canlı ffmpeg ≤3 sn 320x240, libmpv kolu, sahte motorla arayüz, ≥3 mutasyon |
 # Düzenleyici — Premiere Pro Uyumu (D6)
 
 > "düzenleyici bölümünün işleri öncelikli çok saçma ordaki herşey adobe premiere pro gibi olmalıyız kullanışlı"

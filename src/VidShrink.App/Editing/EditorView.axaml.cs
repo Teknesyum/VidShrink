@@ -55,6 +55,7 @@ internal partial class EditorView : UserControl
         InitExport();
         InitMonitor();
         InitText();
+        InitClip();
 
         MnuSplit.Click += (_, _) => Split();
         MnuDelete.Click += (_, _) => DeleteSelected();
@@ -292,9 +293,15 @@ internal partial class EditorView : UserControl
         if (select >= 0) Timeline.SelectedIndex = Math.Min(select, model.Clips.Count - 1);
         Timeline.Playhead = at;
         ShowTextPanel();
+        ShowClipPanel();
         RefreshToolbar();
-        if (reload || !before.SequenceEqual(model.Clips)) _ = ReloadAsync(at);
-        else RefreshOverlay();
+        if (reload || !SameCuts(before, model.Clips)) _ = ReloadAsync(at);
+        else
+        {
+            if (!before.SequenceEqual(model.Clips)) _ = RestyleAsync();
+            RefreshOverlay();
+        }
+
         return true;
     }
 
@@ -311,7 +318,8 @@ internal partial class EditorView : UserControl
 
         var playing = Preview.IsPlaying;
         _driver?.Dispose();
-        var driver = new EdlPreviewDriver(engine, new EdlPreview(source, model));
+        var preview = new EdlPreview(source, model);
+        var driver = new EdlPreviewDriver(engine, preview, look: LookFor(preview, engine));
         _driver = driver;
         _reloads++;
         try

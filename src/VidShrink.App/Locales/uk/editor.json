@@ -54,5 +54,17 @@
   "editor.text.size": "Розмір",
   "editor.text.color": "Колір",
   "editor.text.panel": "Властивості тексту",
-  "editor.export.text-full": "Текстовий шар потребує перекодування; увімкнено повний режим."
+  "editor.export.text-full": "Текстовий шар потребує перекодування; увімкнено повний режим.",
+  "editor.clip.panel": "Властивості кліпу",
+  "editor.clip.rotate": "Повернути на 90°",
+  "editor.clip.flip-h": "Віддзеркалити горизонтально",
+  "editor.clip.flip-v": "Віддзеркалити вертикально",
+  "editor.clip.crop": "Кадрування",
+  "editor.clip.crop.none": "Немає",
+  "editor.clip.volume": "Гучність (дБ)",
+  "editor.clip.mute": "Без звуку",
+  "editor.clip.fade-in": "Поява (с)",
+  "editor.clip.fade-out": "Згасання (с)",
+  "editor.clip.reset": "Скинути",
+  "editor.export.effects-full": "Налаштування кліпу потребують перекодування; увімкнено повний режим."
 }

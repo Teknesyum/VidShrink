@@ -54,5 +54,17 @@
   "editor.text.size": "Ukuran",
   "editor.text.color": "Warna",
   "editor.text.panel": "Properti teks",
-  "editor.export.text-full": "Lapisan teks memerlukan enkode ulang; beralih ke mode penuh."
+  "editor.export.text-full": "Lapisan teks memerlukan enkode ulang; beralih ke mode penuh.",
+  "editor.clip.panel": "Properti klip",
+  "editor.clip.rotate": "Putar 90°",
+  "editor.clip.flip-h": "Balik horizontal",
+  "editor.clip.flip-v": "Balik vertikal",
+  "editor.clip.crop": "Pangkas",
+  "editor.clip.crop.none": "Tidak ada",
+  "editor.clip.volume": "Volume (dB)",
+  "editor.clip.mute": "Bisukan",
+  "editor.clip.fade-in": "Muncul perlahan (d)",
+  "editor.clip.fade-out": "Hilang perlahan (d)",
+  "editor.clip.reset": "Atur ulang",
+  "editor.export.effects-full": "Pengaturan klip memerlukan enkode ulang; beralih ke mode penuh."
 }

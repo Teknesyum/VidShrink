@@ -54,5 +54,17 @@
   "editor.text.size": "Grootte",
   "editor.text.color": "Kleur",
   "editor.text.panel": "Teksteigenschappen",
-  "editor.export.text-full": "De tekstlaag vereist hercodering; overgeschakeld naar volledige modus."
+  "editor.export.text-full": "De tekstlaag vereist hercodering; overgeschakeld naar volledige modus.",
+  "editor.clip.panel": "Clipeigenschappen",
+  "editor.clip.rotate": "90° draaien",
+  "editor.clip.flip-h": "Horizontaal spiegelen",
+  "editor.clip.flip-v": "Verticaal spiegelen",
+  "editor.clip.crop": "Bijsnijden",
+  "editor.clip.crop.none": "Geen",
+  "editor.clip.volume": "Volume (dB)",
+  "editor.clip.mute": "Dempen",
+  "editor.clip.fade-in": "Infaden (s)",
+  "editor.clip.fade-out": "Uitfaden (s)",
+  "editor.clip.reset": "Herstellen",
+  "editor.export.effects-full": "De clipinstellingen vereisen hercodering; overgeschakeld naar volledige modus."
 }

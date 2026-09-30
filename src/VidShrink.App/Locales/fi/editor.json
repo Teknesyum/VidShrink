@@ -54,5 +54,17 @@
   "editor.text.size": "Koko",
   "editor.text.color": "Väri",
   "editor.text.panel": "Tekstin ominaisuudet",
-  "editor.export.text-full": "Tekstitaso vaatii uudelleenkoodauksen; vaihdettiin täyteen tilaan."
+  "editor.export.text-full": "Tekstitaso vaatii uudelleenkoodauksen; vaihdettiin täyteen tilaan.",
+  "editor.clip.panel": "Leikkeen ominaisuudet",
+  "editor.clip.rotate": "Kierrä 90°",
+  "editor.clip.flip-h": "Käännä vaakasuunnassa",
+  "editor.clip.flip-v": "Käännä pystysuunnassa",
+  "editor.clip.crop": "Rajaa",
+  "editor.clip.crop.none": "Ei mitään",
+  "editor.clip.volume": "Äänenvoimakkuus (dB)",
+  "editor.clip.mute": "Mykistä",
+  "editor.clip.fade-in": "Häivytys sisään (s)",
+  "editor.clip.fade-out": "Häivytys ulos (s)",
+  "editor.clip.reset": "Palauta",
+  "editor.export.effects-full": "Leikkeen asetukset vaativat uudelleenkoodauksen; vaihdettiin täyteen tilaan."
 }

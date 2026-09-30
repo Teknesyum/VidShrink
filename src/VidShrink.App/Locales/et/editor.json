@@ -54,5 +54,17 @@
   "editor.text.size": "Suurus",
   "editor.text.color": "Värv",
   "editor.text.panel": "Teksti omadused",
-  "editor.export.text-full": "Tekstikiht vajab ümberkodeerimist; lülitati täielikule režiimile."
+  "editor.export.text-full": "Tekstikiht vajab ümberkodeerimist; lülitati täielikule režiimile.",
+  "editor.clip.panel": "Klipi omadused",
+  "editor.clip.rotate": "Pööra 90°",
+  "editor.clip.flip-h": "Peegelda horisontaalselt",
+  "editor.clip.flip-v": "Peegelda vertikaalselt",
+  "editor.clip.crop": "Kärbi",
+  "editor.clip.crop.none": "Puudub",
+  "editor.clip.volume": "Helitugevus (dB)",
+  "editor.clip.mute": "Vaigista",
+  "editor.clip.fade-in": "Sissehajutus (s)",
+  "editor.clip.fade-out": "Väljahajutus (s)",
+  "editor.clip.reset": "Lähtesta",
+  "editor.export.effects-full": "Klipi seaded vajavad ümberkodeerimist; lülitati täielikule režiimile."
 }

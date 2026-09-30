@@ -54,5 +54,17 @@
   "editor.text.size": "আকার",
   "editor.text.color": "রং",
   "editor.text.panel": "টেক্সটের বৈশিষ্ট্য",
-  "editor.export.text-full": "টেক্সট স্তরের জন্য পুনরায় এনকোড দরকার; সম্পূর্ণ মোডে বদলানো হয়েছে।"
+  "editor.export.text-full": "টেক্সট স্তরের জন্য পুনরায় এনকোড দরকার; সম্পূর্ণ মোডে বদলানো হয়েছে।",
+  "editor.clip.panel": "ক্লিপের বৈশিষ্ট্য",
+  "editor.clip.rotate": "৯০° ঘোরান",
+  "editor.clip.flip-h": "অনুভূমিকভাবে উল্টান",
+  "editor.clip.flip-v": "উল্লম্বভাবে উল্টান",
+  "editor.clip.crop": "ক্রপ",
+  "editor.clip.crop.none": "নেই",
+  "editor.clip.volume": "ভলিউম (dB)",
+  "editor.clip.mute": "নিঃশব্দ",
+  "editor.clip.fade-in": "ফেড ইন (সে)",
+  "editor.clip.fade-out": "ফেড আউট (সে)",
+  "editor.clip.reset": "রিসেট",
+  "editor.export.effects-full": "ক্লিপের সেটিংসের জন্য পুনরায় এনকোড দরকার; সম্পূর্ণ মোডে বদলানো হয়েছে।"
 }

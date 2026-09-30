@@ -54,5 +54,17 @@
   "editor.text.size": "الحجم",
   "editor.text.color": "اللون",
   "editor.text.panel": "خصائص النص",
-  "editor.export.text-full": "طبقة النص تتطلب إعادة ترميز؛ تم التبديل إلى الوضع الكامل."
+  "editor.export.text-full": "طبقة النص تتطلب إعادة ترميز؛ تم التبديل إلى الوضع الكامل.",
+  "editor.clip.panel": "خصائص المقطع",
+  "editor.clip.rotate": "تدوير 90°",
+  "editor.clip.flip-h": "قلب أفقي",
+  "editor.clip.flip-v": "قلب عمودي",
+  "editor.clip.crop": "اقتصاص",
+  "editor.clip.crop.none": "بلا",
+  "editor.clip.volume": "مستوى الصوت (dB)",
+  "editor.clip.mute": "كتم",
+  "editor.clip.fade-in": "ظهور تدريجي (ث)",
+  "editor.clip.fade-out": "اختفاء تدريجي (ث)",
+  "editor.clip.reset": "إعادة تعيين",
+  "editor.export.effects-full": "إعدادات المقطع تتطلب إعادة ترميز؛ تم التبديل إلى الوضع الكامل."
 }

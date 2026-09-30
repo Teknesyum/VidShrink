@@ -54,5 +54,17 @@
   "editor.text.size": "Izmērs",
   "editor.text.color": "Krāsa",
   "editor.text.panel": "Teksta rekvizīti",
-  "editor.export.text-full": "Teksta slānim nepieciešama pārkodēšana; pārslēgts uz pilno režīmu."
+  "editor.export.text-full": "Teksta slānim nepieciešama pārkodēšana; pārslēgts uz pilno režīmu.",
+  "editor.clip.panel": "Klipa rekvizīti",
+  "editor.clip.rotate": "Pagriezt par 90°",
+  "editor.clip.flip-h": "Apmest horizontāli",
+  "editor.clip.flip-v": "Apmest vertikāli",
+  "editor.clip.crop": "Apgriešana",
+  "editor.clip.crop.none": "Nav",
+  "editor.clip.volume": "Skaļums (dB)",
+  "editor.clip.mute": "Izslēgt skaņu",
+  "editor.clip.fade-in": "Ieplūšana (s)",
+  "editor.clip.fade-out": "Izplūšana (s)",
+  "editor.clip.reset": "Atiestatīt",
+  "editor.export.effects-full": "Klipa iestatījumiem nepieciešama pārkodēšana; pārslēgts uz pilno režīmu."
 }

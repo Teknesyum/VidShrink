@@ -54,5 +54,17 @@
   "editor.text.size": "அளவு",
   "editor.text.color": "நிறம்",
   "editor.text.panel": "உரையின் பண்புகள்",
-  "editor.export.text-full": "உரை அடுக்குக்கு மறுகுறியாக்கம் தேவை; முழு பயன்முறைக்கு மாற்றப்பட்டது."
+  "editor.export.text-full": "உரை அடுக்குக்கு மறுகுறியாக்கம் தேவை; முழு பயன்முறைக்கு மாற்றப்பட்டது.",
+  "editor.clip.panel": "கிளிப்பின் பண்புகள்",
+  "editor.clip.rotate": "90° சுழற்று",
+  "editor.clip.flip-h": "கிடைமட்டமாகப் புரட்டு",
+  "editor.clip.flip-v": "செங்குத்தாகப் புரட்டு",
+  "editor.clip.crop": "செதுக்கு",
+  "editor.clip.crop.none": "ஏதுமில்லை",
+  "editor.clip.volume": "ஒலியளவு (dB)",
+  "editor.clip.mute": "ஒலியடக்கு",
+  "editor.clip.fade-in": "மங்கி தோன்றல் (வி)",
+  "editor.clip.fade-out": "மங்கி மறைதல் (வி)",
+  "editor.clip.reset": "மீட்டமை",
+  "editor.export.effects-full": "கிளிப் அமைப்புகளுக்கு மறுகுறியாக்கம் தேவை; முழு பயன்முறைக்கு மாற்றப்பட்டது."
 }

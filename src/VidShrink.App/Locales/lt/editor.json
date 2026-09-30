@@ -54,5 +54,17 @@
   "editor.text.size": "Dydis",
   "editor.text.color": "Spalva",
   "editor.text.panel": "Teksto savybės",
-  "editor.export.text-full": "Teksto sluoksniui reikia perkoduoti; perjungta į visą režimą."
+  "editor.export.text-full": "Teksto sluoksniui reikia perkoduoti; perjungta į visą režimą.",
+  "editor.clip.panel": "Klipo savybės",
+  "editor.clip.rotate": "Pasukti 90°",
+  "editor.clip.flip-h": "Apversti horizontaliai",
+  "editor.clip.flip-v": "Apversti vertikaliai",
+  "editor.clip.crop": "Apkirpimas",
+  "editor.clip.crop.none": "Nėra",
+  "editor.clip.volume": "Garsumas (dB)",
+  "editor.clip.mute": "Nutildyti",
+  "editor.clip.fade-in": "Įsiliejimas (s)",
+  "editor.clip.fade-out": "Išsiliejimas (s)",
+  "editor.clip.reset": "Atstatyti",
+  "editor.export.effects-full": "Klipo nustatymams reikia perkoduoti; perjungta į visą režimą."
 }

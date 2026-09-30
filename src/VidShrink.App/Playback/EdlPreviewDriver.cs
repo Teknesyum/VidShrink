@@ -9,7 +9,8 @@ public sealed class EdlPreviewDriver : IDisposable
     public static readonly TimeSpan DefaultInterval = TimeSpan.FromMilliseconds(50);
 
     private readonly IPlaybackEngine _engine;
-    private readonly EdlPreview _preview;
+    private EdlPreview _preview;
+    private EditLook? _look;
     private readonly TimeSpan _interval;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private CancellationTokenSource? _loop;
@@ -24,12 +25,13 @@ public sealed class EdlPreviewDriver : IDisposable
 
     public const double MaxRate = 100;
 
-    public EdlPreviewDriver(IPlaybackEngine engine, EdlPreview preview, TimeSpan? interval = null)
+    public EdlPreviewDriver(IPlaybackEngine engine, EdlPreview preview, TimeSpan? interval = null, EditLook? look = null)
     {
         ArgumentNullException.ThrowIfNull(engine);
         ArgumentNullException.ThrowIfNull(preview);
         _engine = engine;
         _preview = preview;
+        _look = look;
         _interval = interval ?? DefaultInterval;
         if (_interval <= TimeSpan.Zero)
             throw new ArgumentOutOfRangeException(nameof(interval), interval, "Aralik pozitif olmalidir");
@@ -51,7 +53,39 @@ public sealed class EdlPreviewDriver : IDisposable
 
     public double Shuttle => _playing ? (_backward ? -_rate : _rate) : 0;
 
-    public Task OpenAsync(CancellationToken ct = default) => _engine.OpenAsync(_preview.Uri, ct);
+    public EditLook? Look => _look;
+
+    public Task OpenAsync(CancellationToken ct = default)
+    {
+        ApplyTimed();
+        ApplyLook(_preview.Parts[0]);
+        return _engine.OpenAsync(_preview.Uri, ct);
+    }
+
+    /// <summary>
+    /// Yalniz klip ayarlari degisen cizelgeyi EDL'yi yeniden acmadan alir. Parca araliklari
+    /// ayni olmalidir; degilse <see cref="ArgumentException"/>.
+    /// </summary>
+    public async Task RestyleAsync(EdlPreview preview, EditLook? look, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(preview);
+        if (preview.Uri != _preview.Uri)
+            throw new ArgumentException("Parca araliklari degisti; onizleme yeniden acilmali", nameof(preview));
+
+        await _gate.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            _preview = preview;
+            _look = look;
+            if (_reverse is { } reversing) _reverse = preview.Parts[reversing.Index];
+            ApplyTimed();
+            ApplyLook(_preview.PartAtTimeline(Math.Clamp(TimelinePosition, 0, _preview.TimelineDuration)));
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
 
     public void SetRate(double rate)
     {
@@ -117,6 +151,7 @@ public sealed class EdlPreviewDriver : IDisposable
             if (_backward)
             {
                 _backCursor = Math.Clamp(timelineTime, 0, _preview.TimelineDuration);
+                ApplyLook(_preview.PartAtTimeline(_backCursor));
                 await _engine.SeekAsync(EditTime.ToSeconds(_preview.ToEdl(_backCursor)), precision, ct).ConfigureAwait(false);
                 return;
             }
@@ -180,6 +215,7 @@ public sealed class EdlPreviewDriver : IDisposable
     {
         _backCursor = Math.Max(0, _backCursor - EditTime.FromSeconds(Math.Max(0, elapsedSeconds) * _rate));
         if (_backCursor == 0) _playing = false;
+        ApplyLook(_preview.PartAtTimeline(_backCursor));
         await _engine.SeekAsync(EditTime.ToSeconds(_preview.ToEdl(_backCursor)), SeekPrecision.Exact, ct).ConfigureAwait(false);
     }
 
@@ -214,13 +250,19 @@ public sealed class EdlPreviewDriver : IDisposable
         _engine.Pause();
         _reverse = part;
         _cursor = Math.Clamp(cursor, part.EdlStart, part.EdlEnd - 1);
+        ApplyLook(part);
     }
 
     private void ApplySpeed(EdlPart part)
     {
         var speed = Math.Clamp((double)part.Clip.Speed * _rate, MinRate, MaxRate);
         if (Math.Abs(_engine.Speed - speed) > 1e-9) _engine.SetSpeed(speed);
+        ApplyLook(part);
     }
+
+    private void ApplyLook(EdlPart part) => _engine.SetEditGeometry(_look?.Geometry(part));
+
+    private void ApplyTimed() => _engine.SetEditTimed(_look?.TimedVideo, _look?.TimedAudio);
 
     private async Task RunAsync(CancellationToken ct)
     {

@@ -54,5 +54,17 @@
   "editor.text.size": "Rozmiar",
   "editor.text.color": "Kolor",
   "editor.text.panel": "Właściwości tekstu",
-  "editor.export.text-full": "Warstwa tekstu wymaga ponownego kodowania; przełączono na tryb pełny."
+  "editor.export.text-full": "Warstwa tekstu wymaga ponownego kodowania; przełączono na tryb pełny.",
+  "editor.clip.panel": "Właściwości klipu",
+  "editor.clip.rotate": "Obróć o 90°",
+  "editor.clip.flip-h": "Odbij w poziomie",
+  "editor.clip.flip-v": "Odbij w pionie",
+  "editor.clip.crop": "Kadrowanie",
+  "editor.clip.crop.none": "Brak",
+  "editor.clip.volume": "Głośność (dB)",
+  "editor.clip.mute": "Wycisz",
+  "editor.clip.fade-in": "Pojawianie się (s)",
+  "editor.clip.fade-out": "Zanikanie (s)",
+  "editor.clip.reset": "Resetuj",
+  "editor.export.effects-full": "Ustawienia klipu wymagają ponownego kodowania; przełączono na tryb pełny."
 }

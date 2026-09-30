@@ -54,5 +54,17 @@
   "editor.text.size": "サイズ",
   "editor.text.color": "色",
   "editor.text.panel": "テキストのプロパティ",
-  "editor.export.text-full": "テキストレイヤーには再エンコードが必要なため、完全モードに切り替えました。"
+  "editor.export.text-full": "テキストレイヤーには再エンコードが必要なため、完全モードに切り替えました。",
+  "editor.clip.panel": "クリップのプロパティ",
+  "editor.clip.rotate": "90°回転",
+  "editor.clip.flip-h": "左右反転",
+  "editor.clip.flip-v": "上下反転",
+  "editor.clip.crop": "トリミング",
+  "editor.clip.crop.none": "なし",
+  "editor.clip.volume": "音量 (dB)",
+  "editor.clip.mute": "ミュート",
+  "editor.clip.fade-in": "フェードイン (秒)",
+  "editor.clip.fade-out": "フェードアウト (秒)",
+  "editor.clip.reset": "リセット",
+  "editor.export.effects-full": "クリップの設定には再エンコードが必要なため、完全モードに切り替えました。"
 }

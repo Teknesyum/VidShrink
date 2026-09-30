@@ -26,6 +26,9 @@ public sealed record ExportPlan(
     /// <summary>Cizelgede metin oldugu icin <c>-c copy</c> yolu birakilip Tam'a gecildi.</summary>
     public bool TextForcedFull { get; init; }
 
+    /// <summary>Klip ayarlari (kirpma, dondurme, ses, solma) yeniden kodlama istedigi icin Tam'a gecildi.</summary>
+    public bool EffectsForcedFull { get; init; }
+
     /// <summary>Metin varsa <c>ass=</c> suzgecinin okudugu belge; kosucu calismadan once BOM'lu yazar.</summary>
     public string? SubtitlePath { get; init; }
 
@@ -149,7 +152,8 @@ public static class EditExport
         if (mode == ExportMode.Fast && anySpecial && !SupportsSegments(info)) effective = ExportMode.Full;
         if (mode != ExportMode.Full && keyframes.Count == 0) effective = ExportMode.Full;
         var textForced = mode != ExportMode.Full && effective != ExportMode.Full && timeline.HasText;
-        if (timeline.HasText) effective = ExportMode.Full;
+        var effectsForced = mode != ExportMode.Full && effective != ExportMode.Full && timeline.HasEffects;
+        if (timeline.HasText || timeline.HasEffects) effective = ExportMode.Full;
 
         var limit = ReverseLimitSeconds(info, memoryBudgetBytes);
         var over = ReverseOverLimit(timeline, info, memoryBudgetBytes);
@@ -161,7 +165,7 @@ public static class EditExport
             ExportMode.Fast when !anySpecial => FastDirect(timeline, info, keyframes, startTime, outputPath, workDirectory, limit, over),
             _ => Segmented(timeline, info, keyframes, mode, effective, outputPath, workDirectory, limit, over)
         };
-        return plan with { MotionClips = motion, TextForcedFull = textForced };
+        return plan with { MotionClips = motion, TextForcedFull = textForced, EffectsForcedFull = effectsForced };
     }
 
     private static ExportPlan Full(
@@ -170,17 +174,22 @@ public static class EditExport
     {
         var graph = new StringBuilder();
         var joins = new StringBuilder();
+        var canvas = ClipFilters.Canvas(timeline, info);
         for (var i = 0; i < timeline.Clips.Count; i++)
         {
             var clip = timeline.Clips[i];
             var start = Number(EditTime.ToSeconds(clip.SourceStart));
             var end = Number(EditTime.ToSeconds(clip.SourceEnd));
             graph.Append("[0:v]trim=start=").Append(start).Append(":end=").Append(end).Append(",setpts=PTS-STARTPTS")
-                .Append(VideoMotion(clip, info)).Append("[v").Append(i).Append("];");
+                .Append(VideoMotion(clip, info))
+                .Append(Link(ClipFilters.Geometry(clip.Effects, info.Width, info.Height, info.ParNum, info.ParDen, canvas)))
+                .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
+                .Append("[v").Append(i).Append("];");
             joins.Append("[v").Append(i).Append(']');
             if (!info.HasAudio) continue;
             graph.Append("[0:a]atrim=start=").Append(start).Append(":end=").Append(end).Append(",asetpts=PTS-STARTPTS")
-                .Append(AudioMotion(clip)).Append("[a").Append(i).Append("];");
+                .Append(AudioMotion(clip)).Append(Link(ClipFilters.Audio(clip.Effects, clip.TimelineLength)))
+                .Append("[a").Append(i).Append("];");
             joins.Append("[a").Append(i).Append(']');
         }
 
@@ -208,7 +217,7 @@ public static class EditExport
             over, limit, output, work)
         {
             SubtitlePath = subtitle,
-            SubtitleContent = subtitle is null ? null : AssWriter.Write(timeline.Texts, info.Width, info.Height),
+            SubtitleContent = subtitle is null ? null : AssWriter.Write(timeline.Texts, canvas?.Width ?? info.Width, canvas?.Height ?? info.Height),
             FontsDirectory = fonts,
             FontFamilies = timeline.Texts.Select(t => t.FontName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
         };
@@ -353,6 +362,8 @@ public static class EditExport
         if (clip.Speed != 1m) text.Append(',').Append(AtempoFilter(clip.Speed));
         return text.ToString();
     }
+
+    private static string Link(string chain) => chain.Length == 0 ? string.Empty : "," + chain;
 
     private static string Segment(string work, List<string> segments)
     {

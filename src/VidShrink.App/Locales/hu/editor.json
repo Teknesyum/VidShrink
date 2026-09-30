@@ -54,5 +54,17 @@
   "editor.text.size": "Méret",
   "editor.text.color": "Szín",
   "editor.text.panel": "Szöveg tulajdonságai",
-  "editor.export.text-full": "A szövegréteg újrakódolást igényel; átváltva teljes módra."
+  "editor.export.text-full": "A szövegréteg újrakódolást igényel; átváltva teljes módra.",
+  "editor.clip.panel": "Klip tulajdonságai",
+  "editor.clip.rotate": "Forgatás 90°-kal",
+  "editor.clip.flip-h": "Vízszintes tükrözés",
+  "editor.clip.flip-v": "Függőleges tükrözés",
+  "editor.clip.crop": "Körbevágás",
+  "editor.clip.crop.none": "Nincs",
+  "editor.clip.volume": "Hangerő (dB)",
+  "editor.clip.mute": "Némítás",
+  "editor.clip.fade-in": "Beúsztatás (mp)",
+  "editor.clip.fade-out": "Kiúsztatás (mp)",
+  "editor.clip.reset": "Visszaállítás",
+  "editor.export.effects-full": "A klip beállításai újrakódolást igényelnek; átváltva teljes módra."
 }

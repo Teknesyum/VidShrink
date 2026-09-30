@@ -51,6 +51,8 @@ public sealed record EditClip
 
     public bool Reversed { get; }
 
+    public ClipEffects Effects { get; init; } = ClipEffects.None;
+
     public long SourceLength => SourceEnd - SourceStart;
 
     public long TimelineLength => CeilDiv(SourceLength * 100, Hundredths);
@@ -82,16 +84,20 @@ public sealed record EditClip
         return Math.Min(CeilDiv(consumed * 100, Hundredths), TimelineLength - 1);
     }
 
-    internal EditClip WithMotion(decimal speed, bool reversed) => new(SourceStart, SourceEnd, speed, reversed);
+    internal EditClip WithMotion(decimal speed, bool reversed) => new(SourceStart, SourceEnd, speed, reversed) { Effects = Effects };
+
+    internal EditClip WithRange(long sourceStart, long sourceEnd) => new(sourceStart, sourceEnd, Speed, Reversed) { Effects = Effects };
 
     internal (EditClip First, EditClip Second)? SplitAt(long offset)
     {
         var consumed = Consumed(offset);
         if (consumed <= 0 || consumed >= SourceLength) return null;
 
+        var head = Effects with { FadeOut = 0 };
+        var tail = Effects with { FadeIn = 0 };
         return Reversed
-            ? (new EditClip(SourceEnd - consumed, SourceEnd, Speed, true), new EditClip(SourceStart, SourceEnd - consumed, Speed, true))
-            : (new EditClip(SourceStart, SourceStart + consumed, Speed, false), new EditClip(SourceStart + consumed, SourceEnd, Speed, false));
+            ? (new EditClip(SourceEnd - consumed, SourceEnd, Speed, true) { Effects = head }, new EditClip(SourceStart, SourceEnd - consumed, Speed, true) { Effects = tail })
+            : (new EditClip(SourceStart, SourceStart + consumed, Speed, false) { Effects = head }, new EditClip(SourceStart + consumed, SourceEnd, Speed, false) { Effects = tail });
     }
 
     private long Consumed(long offset) => offset * Hundredths / 100;

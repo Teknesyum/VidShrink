@@ -54,5 +54,17 @@
   "editor.text.size": "Veličina",
   "editor.text.color": "Boja",
   "editor.text.panel": "Svojstva teksta",
-  "editor.export.text-full": "Tekstualni sloj zahteva ponovno kodiranje; prebačeno na puni režim."
+  "editor.export.text-full": "Tekstualni sloj zahteva ponovno kodiranje; prebačeno na puni režim.",
+  "editor.clip.panel": "Svojstva klipa",
+  "editor.clip.rotate": "Rotiraj za 90°",
+  "editor.clip.flip-h": "Obrni horizontalno",
+  "editor.clip.flip-v": "Obrni vertikalno",
+  "editor.clip.crop": "Isecanje",
+  "editor.clip.crop.none": "Nijedno",
+  "editor.clip.volume": "Jačina zvuka (dB)",
+  "editor.clip.mute": "Isključi zvuk",
+  "editor.clip.fade-in": "Postepeno pojavljivanje (s)",
+  "editor.clip.fade-out": "Postepeno nestajanje (s)",
+  "editor.clip.reset": "Resetuj",
+  "editor.export.effects-full": "Podešavanja klipa zahtevaju ponovno kodiranje; prebačeno na puni režim."
 }

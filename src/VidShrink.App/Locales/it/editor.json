@@ -54,5 +54,17 @@
   "editor.text.size": "Dimensione",
   "editor.text.color": "Colore",
   "editor.text.panel": "Proprietà del testo",
-  "editor.export.text-full": "Il livello di testo richiede una ricodifica; passato alla modalità completa."
+  "editor.export.text-full": "Il livello di testo richiede una ricodifica; passato alla modalità completa.",
+  "editor.clip.panel": "Proprietà della clip",
+  "editor.clip.rotate": "Ruota di 90°",
+  "editor.clip.flip-h": "Capovolgi in orizzontale",
+  "editor.clip.flip-v": "Capovolgi in verticale",
+  "editor.clip.crop": "Ritaglio",
+  "editor.clip.crop.none": "Nessuno",
+  "editor.clip.volume": "Volume (dB)",
+  "editor.clip.mute": "Muto",
+  "editor.clip.fade-in": "Dissolvenza in entrata (s)",
+  "editor.clip.fade-out": "Dissolvenza in uscita (s)",
+  "editor.clip.reset": "Ripristina",
+  "editor.export.effects-full": "Le impostazioni della clip richiedono una ricodifica; passato alla modalità completa."
 }

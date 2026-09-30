@@ -54,5 +54,17 @@
   "editor.text.size": "Storlek",
   "editor.text.color": "Färg",
   "editor.text.panel": "Textegenskaper",
-  "editor.export.text-full": "Textlagret kräver omkodning; bytte till fullt läge."
+  "editor.export.text-full": "Textlagret kräver omkodning; bytte till fullt läge.",
+  "editor.clip.panel": "Klippegenskaper",
+  "editor.clip.rotate": "Rotera 90°",
+  "editor.clip.flip-h": "Vänd vågrätt",
+  "editor.clip.flip-v": "Vänd lodrätt",
+  "editor.clip.crop": "Beskär",
+  "editor.clip.crop.none": "Ingen",
+  "editor.clip.volume": "Volym (dB)",
+  "editor.clip.mute": "Ljud av",
+  "editor.clip.fade-in": "Tona in (s)",
+  "editor.clip.fade-out": "Tona ut (s)",
+  "editor.clip.reset": "Återställ",
+  "editor.export.effects-full": "Klippinställningarna kräver omkodning; bytte till fullt läge."
 }

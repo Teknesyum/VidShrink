@@ -54,5 +54,17 @@
   "editor.text.size": "Größe",
   "editor.text.color": "Farbe",
   "editor.text.panel": "Texteigenschaften",
-  "editor.export.text-full": "Die Textebene erfordert eine Neukodierung; es wurde auf den vollständigen Modus umgestellt."
+  "editor.export.text-full": "Die Textebene erfordert eine Neukodierung; es wurde auf den vollständigen Modus umgestellt.",
+  "editor.clip.panel": "Clip-Eigenschaften",
+  "editor.clip.rotate": "90° drehen",
+  "editor.clip.flip-h": "Horizontal spiegeln",
+  "editor.clip.flip-v": "Vertikal spiegeln",
+  "editor.clip.crop": "Zuschneiden",
+  "editor.clip.crop.none": "Keiner",
+  "editor.clip.volume": "Lautstärke (dB)",
+  "editor.clip.mute": "Stumm",
+  "editor.clip.fade-in": "Einblenden (s)",
+  "editor.clip.fade-out": "Ausblenden (s)",
+  "editor.clip.reset": "Zurücksetzen",
+  "editor.export.effects-full": "Die Clip-Einstellungen erfordern eine Neukodierung; es wurde auf den vollständigen Modus umgestellt."
 }

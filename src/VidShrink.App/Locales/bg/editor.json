@@ -54,5 +54,17 @@
   "editor.text.size": "Размер",
   "editor.text.color": "Цвят",
   "editor.text.panel": "Свойства на текста",
-  "editor.export.text-full": "Текстовият слой изисква прекодиране; превключено към пълен режим."
+  "editor.export.text-full": "Текстовият слой изисква прекодиране; превключено към пълен режим.",
+  "editor.clip.panel": "Свойства на клипа",
+  "editor.clip.rotate": "Завърти на 90°",
+  "editor.clip.flip-h": "Обърни хоризонтално",
+  "editor.clip.flip-v": "Обърни вертикално",
+  "editor.clip.crop": "Изрязване",
+  "editor.clip.crop.none": "Няма",
+  "editor.clip.volume": "Сила на звука (dB)",
+  "editor.clip.mute": "Без звук",
+  "editor.clip.fade-in": "Плавно появяване (с)",
+  "editor.clip.fade-out": "Плавно изчезване (с)",
+  "editor.clip.reset": "Нулиране",
+  "editor.export.effects-full": "Настройките на клипа изискват прекодиране; превключено към пълен режим."
 }
