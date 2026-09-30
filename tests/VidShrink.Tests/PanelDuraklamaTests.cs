@@ -35,13 +35,26 @@ public sealed class PanelDuraklamaTests
     }
 
     [Fact]
-    public void DurakliykenAcikPanelFareGidinceKapanmaz()
+    public void DurakliykenAcikPanelFareGidinceUstPanelGibiKapanir()
+    {
+        var (bolge, gorunum) = Kur();
+        bolge.Keep(true);
+        bolge.PointerAt(95, 100);
+
+        bolge.PointerAt(10, 100);
+
+        Assert.False(bolge.IsVisible);
+        Assert.Equal(new[] { true, false }, gorunum);
+    }
+
+    [Fact]
+    public void DurakliykenFareBandaKalirsaAcikKalir()
     {
         var (bolge, _) = Kur();
         bolge.Keep(true);
         bolge.PointerAt(95, 100);
 
-        bolge.PointerAt(10, 100);
+        bolge.PointerAt(96, 100);
 
         Assert.True(bolge.IsVisible);
     }

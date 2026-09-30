@@ -358,6 +358,7 @@ internal partial class PlayerView : UserControl
 
         if (button == PlayerButton.Left)
         {
+            if (EtkilesimliDenetim.Icinde(e.Source as Visual, this)) return;
             var at = point.Position;
             FarePress(e, at.X, at.Y);
             return;
@@ -538,7 +539,7 @@ internal partial class PlayerView : UserControl
             {
                 var share = this.TryFindResource("WindowCompactAreaShare", out var value) && value is double d ? d : 1;
                 var area = screen.WorkingArea;
-                var rect = CompactWindow.Fit(area.X, area.Y, area.Width, area.Height, share);
+                var rect = CompactWindow.Fit(area.X, area.Y, area.Width, area.Height, share, VideoAspect);
                 var width = rect.Width / screen.Scaling;
                 var height = rect.Height / screen.Scaling;
                 _compactMin ??= new Size(window.MinWidth, window.MinHeight);
@@ -547,6 +548,7 @@ internal partial class PlayerView : UserControl
                 window.Width = width;
                 window.Height = height;
                 window.Position = new PixelPoint(rect.X, rect.Y);
+                CompactBorder(window, true);
                 snapshot = new WindowSnapshot((int)WindowState.Normal, rect.X, rect.Y, width, height, PlayerTabIndex());
             }
         }
@@ -560,6 +562,7 @@ internal partial class PlayerView : UserControl
         if (_compactMin is not { } min) return;
         _compactMin = null;
         if (TopLevel.GetTopLevel(this) is not Window window) return;
+        CompactBorder(window, false);
         window.MinWidth = min.Width;
         window.MinHeight = min.Height;
     }

@@ -539,6 +539,7 @@ internal partial class ComparisonPanel : UserControl
 
         if (!point.Properties.IsLeftButtonPressed) return;
         StagePress(point.Position);
+        _stagePress = EtkilesimliDenetim.Icinde(e.Source as Visual, Stage) ? null : e;
         if (!_gesture.CanPan) return;
         _panning = true;
         e.Pointer.Capture(Stage);
@@ -566,6 +567,7 @@ internal partial class ComparisonPanel : UserControl
         var here = e.GetPosition(Stage);
         Strip.PointerAt(here.Y, Stage.Bounds.Height);
         StageMove(here);
+        if (!_panning && _click.Dragging && _stagePress is { } press) StageMoveWindow(press, e);
 
         if (!_panning) return;
         var now = e.GetPosition(Stage);
@@ -573,8 +575,26 @@ internal partial class ComparisonPanel : UserControl
         _panFrom = now;
     }
 
+    private PointerPressedEventArgs? _stagePress;
+
+    internal int StageWindowMoves { get; private set; }
+
+    internal Action<PointerPressedEventArgs>? StageMoveStarter { get; set; }
+
+    private void StageMoveWindow(PointerPressedEventArgs press, PointerEventArgs e)
+    {
+        _stagePress = null;
+        if (!e.GetCurrentPoint(Stage).Properties.IsLeftButtonPressed) return;
+        if (TopLevel.GetTopLevel(this) is not Window { WindowState: WindowState.Normal } window) return;
+        _click.Cancel();
+        StageWindowMoves++;
+        if (StageMoveStarter is { } start) start(press);
+        else window.BeginMoveDrag(press);
+    }
+
     private void OnStageReleased(object? sender, PointerReleasedEventArgs e)
     {
+        _stagePress = null;
         if (e.InitialPressMouseButton == MouseButton.Left) StageRelease();
         if (!_panning) return;
         _panning = false;
