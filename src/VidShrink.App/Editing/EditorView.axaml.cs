@@ -79,6 +79,18 @@ internal partial class EditorView : UserControl
 
     internal int Reloads => _reloads;
 
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        if (double.IsFinite(availableSize.Height))
+        {
+            var rows = Layout.RowDefinitions;
+            var splitter = double.IsFinite(PreviewSplitter.Height) ? PreviewSplitter.Height : 0;
+            rows[2].MaxHeight = Math.Max(0, availableSize.Height - rows[0].MinHeight - splitter);
+        }
+
+        return base.MeasureOverride(availableSize);
+    }
+
     internal void Activate(string? path)
     {
         _clock.Start();

@@ -54,23 +54,29 @@ public sealed class OynaticiListeMenusuTests
     private static Point BosNokta(PlayerView view, TopLevel kok)
     {
         var cerceve = view.PlaylistFrame;
+        var liste = view.Playlist;
+        var son = liste.ContainerFromIndex(liste.ItemCount - 1)!;
+        DenetimSurucu.Pump(view, () => son.Bounds.Height > 0, 5);
+        var alt = son.TranslatePoint(new Point(0, son.Bounds.Height), liste)!.Value.Y;
+        var bosluk = Math.Ceiling(son.Bounds.Height) * 2;
+        liste.Height = Math.Ceiling(alt + bosluk);
+
+        var yerel = new Point(liste.Width / 2, alt + bosluk / 2);
         Point? bulunan = null;
+        string? sonIsabet = null;
         DenetimSurucu.Pump(view, () =>
         {
-            var boy = cerceve.Bounds.Height;
-            for (var alt = 1.0; alt < boy / 2; alt += 2)
-            {
-                if (cerceve.TranslatePoint(new Point(cerceve.Bounds.Width / 2, boy - alt), kok) is not { } aday) continue;
-                if (kok.InputHitTest(aday) is not Visual isabet) continue;
-                if (!cerceve.IsVisualAncestorOf(isabet) && !ReferenceEquals(cerceve, isabet)) continue;
-                if (isabet is ListBoxItem || isabet.FindAncestorOfType<ListBoxItem>() is not null) continue;
-                bulunan = aday;
-                return true;
-            }
-
-            return false;
+            if (Math.Abs(liste.Bounds.Height - liste.Height) > 0.5) return false;
+            if (liste.TranslatePoint(yerel, kok) is not { } aday) return false;
+            if (aday.Y >= kok.ClientSize.Height || aday.X >= kok.ClientSize.Width) return false;
+            if (kok.InputHitTest(aday) is not Visual isabet) return false;
+            sonIsabet = isabet.GetType().Name;
+            if (!cerceve.IsVisualAncestorOf(isabet) && !ReferenceEquals(cerceve, isabet)) return false;
+            if (isabet is ListBoxItem || isabet.FindAncestorOfType<ListBoxItem>() is not null) return false;
+            bulunan = aday;
+            return true;
         }, 5);
-        Assert.True(bulunan.HasValue, "listede bos nokta bulunamadi");
+        Assert.True(bulunan.HasValue, $"listede bos nokta bulunamadi (liste {liste.Bounds.Height:0.#}/{liste.Height:0.#}, kok {kok.ClientSize.Height:0.#}, isabet {sonIsabet ?? "yok"})");
         return bulunan!.Value;
     }
 
