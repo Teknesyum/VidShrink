@@ -7,7 +7,7 @@ Sekmelerin turu. Kısa hâli [README](../README.tr.md) içinde.
 Dosya yüklendikten sonra her karar, gerekçesiyle birlikte, siz başlamadan önce ekrandadır —
 kodek, CRF, çözünürlük, kare hızı, kestirim ve aralığı.
 
-![Küçült sekmesi dosya yüklüyken: solda kaynak bilgileri, hedef boyut kaydırıcısı ve yongaları ile kalite kaydırıcısı, ortada karşılaştırma paneli ve kodlayıcıyı, iki geçişli bit hızını, çözünürlüğü ve kare hızını tek tek yazan Yapılacak İşlem paneli, sağda boyut kestirimini gösteren Çıktı paneli](gorseller/T201-kucult-tr.png)
+![Küçült sekmesi sunum-prototip.mp4 yüklü ve hedef 0,15 MB iken: solda kaynak bilgileri, hedef ve kalite kaydırıcıları, ortada bölme çizgisinin Orijinal tarafında kaynak, İşlenmiş tarafında planlanan çıktıyla karşılaştırma paneli, altında kodlayıcıyı, iki geçişli bit hızını, çözünürlüğü ve kare hızını yazan Yapılacak İşlem paneli, sağda boyut kestirimini gösteren Çıktı paneli](gorseller/T201-kucult-onizleme-tr.png)
 
 Her hedef yongası bir yerde gerçek bir sınırdır; `?` rozeti hangisi olduğunu söyler.
 

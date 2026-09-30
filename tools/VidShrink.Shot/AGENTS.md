@@ -5,6 +5,7 @@ README görsellerini üreten çekim düzeneği. T189'da kuruldu.
     dotnet run --project tools/VidShrink.Shot                      # docs/gorseller/ altına
     dotnet run --project tools/VidShrink.Shot -- <çıkış klasörü>
     dotnet run --project tools/VidShrink.Shot -- <çıkış klasörü> <klip.mp4>
+    dotnet run --project tools/VidShrink.Shot -- <çıkış klasörü> <klip.mp4> kucult-onizleme,kucult-yakin
     dotnet run --project tools/VidShrink.Shot -- bolge-paneli <çıkış klasörü> <etiket>
 
 `bolge-paneli` kaydedicinin bölge düzenleyicisindeki araç panelini kendi ölçüsünde, her
@@ -16,9 +17,14 @@ açık) kurulur, `MainWindow` 1600x1000 görüş alanında ölçülüp yerleşti
 pencere yöneticisi sonucu değiştirmez.
 
 Ad kalıbı `docs/gorseller/T201-<konu>-<dil>.png`; diller `en` ve `tr`, konular
-`kucult`, `donustur`, `kaydedici`, `ayarlar`, `gelismis`, `hakkinda`, `onizleme`,
-`oynatici`, `duzenleyici`.
-Tam pencere kareleri 1600x1000; `onizleme` panelin kendi ölçüsünde (EN 506x546, TR 482x546).
+`kucult-onizleme`, `kucult-yakin`, `donustur`, `kaydedici`, `ayarlar`, `gelismis`,
+`hakkinda`, `oynatici`, `duzenleyici`. Üçüncü argüman virgüllü konu süzgecidir; verilmezse hepsi.
+Bütün kareler tam pencere, 1600x1000.
+
+Küçült kareleri hedefi 0.15 MB'a çeker (`PreviewTargetMb`); kalitesiz taraf 12 sn'lik kesitte
+ancak böyle gözle görülüyor. `kucult-yakin` karşılaştırma panelinin kendi yakınlaştırmasını
+dört çentik (%196) uygular (`PreviewZoomNotches`). Dosya adını gösteren kareler klibi
+`C:\Videos\<ad>` yoluyla yükler (`LoadShown`); gerçek yol worktree yolunu README'ye taşıyordu.
 
 ## Elle kalan adım
 
@@ -26,7 +32,7 @@ Tam pencere kareleri 1600x1000; `onizleme` panelin kendi ölçüsünde (EN 506x5
 üretilir; oynatıcı ve önizleme kareleri onu sürer. Daha güzel bir kare isteniyorsa
 gerçek bir video ikinci argüman olarak verilir — o zaman kare o videodan gelir.
 
-`onizleme`, `oynatici` ve `duzenleyici` libmpv ister: `VIDSHRINK_LIBMPV` kurulu
+`kucult-onizleme`, `kucult-yakin`, `oynatici` ve `duzenleyici` libmpv ister: `VIDSHRINK_LIBMPV` kurulu
 kopyayı göstermeli (`%LOCALAPPDATA%\Programs\VidShrink\tools\libmpv\libmpv-2.dll`),
 yoksa önizleme borusu 60 saniyede düşer. T200 klibi ffmpeg `mandelbrot` + `sine`
 kaynağından 12 sn 1920x1080 üretildi. T201'de her video ekranı için gerçek videonun rastgele bir anından
