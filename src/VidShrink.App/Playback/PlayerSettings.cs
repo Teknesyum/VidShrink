@@ -38,6 +38,8 @@ internal sealed class PlayerSettings
 
     internal double SpeedB { get; set; } = DefaultSpeedB;
 
+    internal bool SpeedModeB { get; set; }
+
     internal static PlayerSettings Load(string? file)
     {
         var settings = new PlayerSettings();
@@ -53,6 +55,7 @@ internal sealed class PlayerSettings
             settings.ShowRemaining = (bool?)root["showRemaining"] ?? false;
             settings.SpeedA = Speed((double?)root["speedA"], DefaultSpeedA);
             settings.SpeedB = Speed((double?)root["speedB"], DefaultSpeedB);
+            settings.SpeedModeB = string.Equals((string?)root["speedMode"], "B", StringComparison.OrdinalIgnoreCase);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -82,6 +85,7 @@ internal sealed class PlayerSettings
                 writer.WriteBoolean("showRemaining", ShowRemaining);
                 writer.WriteNumber("speedA", SpeedA);
                 writer.WriteNumber("speedB", SpeedB);
+                writer.WriteString("speedMode", SpeedModeB ? "B" : "A");
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);

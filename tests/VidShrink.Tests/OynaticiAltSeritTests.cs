@@ -235,15 +235,20 @@ public sealed class OynaticiAltSeritTests
         Assert.Equal(2, a.SpeedB, 6);
         Kapat(view, window, null);
 
-        var ikinci = Ac(new YolMotoru(), out var window2, klasor);
-        GirdiSurucu.Key(ikinci, Key.V);
-        DenetimSurucu.Wait(ikinci, 0.05);
-        var yeniB = ikinci.SpeedFactor;
+        var ikinciMotor = new YolMotoru();
+        var ikinci = Ac(ikinciMotor, out var window2, klasor);
+        var acilisKipB = ikinci.SpeedModeB;
+        var acilisHiz = ikinciMotor.Hiz;
         GirdiSurucu.Key(ikinci, Key.V);
         DenetimSurucu.Wait(ikinci, 0.05);
         var yeniA = ikinci.SpeedFactor;
-        Assert.Equal(2, yeniB, 6);
+        GirdiSurucu.Key(ikinci, Key.V);
+        DenetimSurucu.Wait(ikinci, 0.05);
+        var yeniB = ikinci.SpeedFactor;
+        Assert.True(acilisKipB);
+        Assert.Equal(2, acilisHiz, 6);
         Assert.Equal(0.5, yeniA, 6);
+        Assert.Equal(2, yeniB, 6);
         Kapat(ikinci, window2, klasor);
         return 0;
     });
