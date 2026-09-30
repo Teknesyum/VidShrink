@@ -29,7 +29,7 @@ internal sealed record ShortcutSlot(ShortcutMap Map, string Id, PlayerInput Defa
 /// </summary>
 internal static class ShortcutBindings
 {
-    internal const string FileName = "shortcuts.json";
+    internal const string FileName = "shortcut-bindings.json";
 
     private static readonly Dictionary<string, string> PlayerOverrides = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, string> EditorOverrides = new(StringComparer.Ordinal);

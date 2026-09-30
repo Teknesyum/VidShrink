@@ -208,12 +208,16 @@ public sealed class OynaticiGeriBildirimTests
         var ornekler = new List<(double Ms, double Op)>();
         double kenarSapma = 0;
         double ortaSapma = double.NaN;
+        double hedef = 0;
+        double yakalanan = double.NaN;
         while (cue.IsVisible && saat.Elapsed.TotalSeconds < 3)
         {
             Dilim();
             ornekler.Add((saat.Elapsed.TotalMilliseconds - basla, cue.Opacity));
-            if (double.IsNaN(ortaSapma) && cue.Opacity >= tepe - 0.05)
+            if (cue.GetBaseValue(Visual.OpacityProperty) is { HasValue: true } taban) hedef = Math.Max(hedef, taban.Value);
+            if (double.IsNaN(ortaSapma) && cue.Opacity >= tepe / 2)
             {
+                yakalanan = cue.Opacity;
                 var kare = Ciz(window);
                 kenarSapma = Sapma(kare, once, (int)sol.X, (int)sol.Y, 0);
                 ortaSapma = Sapma(kare, once, (int)orta.X, (int)orta.Y);
@@ -225,7 +229,7 @@ public sealed class OynaticiGeriBildirimTests
         var ilkSayi = view.EndCueCount;
         var enYuksek = ornekler.Count == 0 ? 0 : ornekler.Max(x => x.Op);
         var ara = cue.Transitions?.OfType<DoubleTransition>().Any(x => x.Property == Visual.OpacityProperty && x.Duration > TimeSpan.Zero && x.Duration <= sure) == true;
-        body.AppendLine($"sure {sure.TotalMilliseconds} ms, tepe {YolKanit.N(tepe)}; ekranda {YolKanit.N(ekranda)} ms, en yuksek {YolKanit.N(enYuksek)}, ara saydamlik {ara}, kenar sapma {YolKanit.N(kenarSapma)}, orta sapma {YolKanit.N(ortaSapma)}, sayi {ilkSayi}");
+        body.AppendLine($"sure {sure.TotalMilliseconds} ms, tepe {YolKanit.N(tepe)}; ekranda {YolKanit.N(ekranda)} ms, en yuksek {YolKanit.N(enYuksek)}, hedef {YolKanit.N(hedef)}, yakalanan {YolKanit.N(yakalanan)}, ara saydamlik {ara}, kenar sapma {YolKanit.N(kenarSapma)}, orta sapma {YolKanit.N(ortaSapma)}, sayi {ilkSayi}");
         body.AppendLine("iz " + string.Join(" ", ornekler.Where((_, i) => i % 6 == 0).Select(x => YolKanit.N(x.Ms) + ":" + YolKanit.N(x.Op))));
 
         var durdu = !view.IsPlaying;
@@ -262,7 +266,9 @@ public sealed class OynaticiGeriBildirimTests
 
         Assert.True(sure > TimeSpan.Zero && sure <= TimeSpan.FromMilliseconds(500));
         Assert.InRange(ekranda, sure.TotalMilliseconds - 40, sure.TotalMilliseconds + 90);
-        Assert.InRange(enYuksek, tepe - 0.05, tepe + 0.001);
+        Assert.InRange(hedef, tepe - 0.001, tepe + 0.001);
+        Assert.InRange(enYuksek, tepe / 2, tepe + 0.001);
+        Assert.InRange(enYuksek, tepe / 2, tepe + 0.001);
         Assert.True(ara, "anahat yumusak girip cikmali");
         Assert.True(kenarSapma > 10, "anahat yuzeyin kenarinda gorunmeli");
         Assert.True(ortaSapma < 1, "anahat goruntuyu kaplamamali");

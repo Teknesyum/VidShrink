@@ -35,7 +35,7 @@ internal sealed class ShortcutKeyButton : Button
     {
         Slot = slot;
         if (theme is not null) Theme = theme;
-        _text = new TextBlock { Theme = textTheme };
+        _text = new TextBlock { Theme = textTheme, TextWrapping = Avalonia.Media.TextWrapping.NoWrap };
         Content = _text;
         Click += (_, _) => Listen();
         Show();
