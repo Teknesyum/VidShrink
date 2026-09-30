@@ -442,6 +442,7 @@ public sealed class LocalizationTests : IDisposable
         }
 
         foreach (var note in Enum.GetValues<VidShrink.Core.StreamNote>()) all.Add(VidShrink.App.MainWindow.StreamNoteKey(note));
+        foreach (var target in VidShrink.Core.ShellIntegration.QuickShrinkMenu) all.Add(target.LabelKey);
 
         return all;
     }

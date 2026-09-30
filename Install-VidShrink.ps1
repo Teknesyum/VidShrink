@@ -451,7 +451,14 @@ $shellMenuKeyName = 'VidShrink'
 $shellShrinkMenuKeyName = 'VidShrinkKucult'
 $shellPackageName = 'Teknesyum.VidShrink.Shell'
 $shellCommandClsid = '7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58'
-$shellShrinkTargets = @(100, 250, 500, 1000, 2000)
+$shellShrinkTargets = @(
+    @{ Key = '01-size-8'; Preset = 'size-8'; Megabytes = 8; Fallback = '8 MB' }
+    @{ Key = '02-whatsapp-chat'; Preset = 'whatsapp-chat'; Megabytes = 16; Fallback = 'WhatsApp (16 MB)' }
+    @{ Key = '03-discord-free'; Preset = 'discord-free'; Megabytes = 20; Fallback = 'Discord (20 MB)' }
+    @{ Key = '04-email-gmail'; Preset = 'email-gmail'; Megabytes = 25; Fallback = 'Gmail (25 MB)' }
+    @{ Key = '05-discord-nitro-basic'; Preset = 'discord-nitro-basic'; Megabytes = 50; Fallback = 'Discord Nitro Basic (50 MB)' }
+    @{ Key = '06-size-100'; Preset = 'size-100'; Megabytes = 100; Fallback = '100 MB' }
+)
 $shellShrinkFlag = '--kucult'
 
 $shellMenuExtensions = @(
@@ -560,9 +567,10 @@ function Get-ShellShrinkMenuLabel([string]$Language, [string]$LocalesFolder) {
     return 'Shrink with VidShrink'
 }
 
-function Get-QuickShrinkLabel([int]$Megabytes) {
-    if ($Megabytes -ge 1000 -and ($Megabytes % 1000) -eq 0) { return "$($Megabytes / 1000) GB" }
-    return "$Megabytes MB"
+function Get-QuickShrinkLabel($Target, [string]$Language, [string]$LocalesFolder) {
+    $metin = Get-LocalizedShellText $Language $LocalesFolder ('shell.menu.target.' + $Target.Preset)
+    if ($metin) { return $metin }
+    return $Target.Fallback
 }
 
 function Remove-ShellMenu([string]$Root) {
@@ -605,7 +613,7 @@ function Write-ShellMenu([string]$Root, [string]$Executable, [string]$Label) {
     return $shellMenuExtensions.Count
 }
 
-function Write-ShellShrinkMenu([string]$Root, [string]$Executable, [string]$Label) {
+function Write-ShellShrinkMenu([string]$Root, [string]$Executable, [string]$Label, [string]$Language, [string]$LocalesFolder) {
     $written = 0
     foreach ($extension in $shellMenuExtensions) {
         $verbKey = Join-Path (Get-ShellMenuAssociationRoot $Root) ".$extension\shell\$shellShrinkMenuKeyName"
@@ -616,14 +624,14 @@ function Write-ShellShrinkMenu([string]$Root, [string]$Executable, [string]$Labe
         Set-ItemProperty -LiteralPath $verbKey -Name 'MultiSelectModel' -Value 'Player' -Type String
 
         foreach ($target in $shellShrinkTargets) {
-            $targetKey = Join-Path $verbKey "shell\$target"
+            $targetKey = Join-Path $verbKey "shell\$($target.Key)"
             New-Item -Path $targetKey -Force | Out-Null
-            Set-ItemProperty -LiteralPath $targetKey -Name 'MUIVerb' -Value (Get-QuickShrinkLabel $target) -Type String
+            Set-ItemProperty -LiteralPath $targetKey -Name 'MUIVerb' -Value (Get-QuickShrinkLabel $target $Language $LocalesFolder) -Type String
             Set-ItemProperty -LiteralPath $targetKey -Name 'MultiSelectModel' -Value 'Player' -Type String
 
             $command = Join-Path $targetKey 'command'
             New-Item -Path $command -Force | Out-Null
-            Set-Item -LiteralPath $command -Value ('"{0}" {1} {2} "%1"' -f $Executable, $shellShrinkFlag, $target)
+            Set-Item -LiteralPath $command -Value ('"{0}" {1} {2} "%1"' -f $Executable, $shellShrinkFlag, $target.Megabytes)
             $written++
         }
     }
@@ -635,7 +643,7 @@ function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language)
     $locales = Join-Path (Join-Path (Split-Path -Parent $Executable) 'app') 'Locales'
     $dil = Resolve-ShellMenuLanguage $Language $locales
     $written = Write-ShellMenu $Root $Executable (Get-ShellMenuLabel $dil $locales)
-    $shrinkWritten = Write-ShellShrinkMenu $Root $Executable (Get-ShellShrinkMenuLabel $dil $locales)
+    $shrinkWritten = Write-ShellShrinkMenu $Root $Executable (Get-ShellShrinkMenuLabel $dil $locales) $dil $locales
     $modern = Write-Windows11ShellMenu $Root (Split-Path -Parent $Executable)
     $path = if ($modern) { 'Windows 11 birincil ve klasik' } else { 'Windows 10 klasik' }
     Write-Host "Sağ tık menüsü $written uzantıya, küçültme alt menüsü $shrinkWritten girdiye yazıldı ($path menü)." -ForegroundColor Green

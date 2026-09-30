@@ -46,17 +46,19 @@ public class KabukMenusuTests
         Assert.Equal(beklenen, bizim);
     }
 
-    /// <summary>Hızlı küçültme hedefleri iki tarafta aynı.</summary>
+    /// <summary>
+    /// Alt menü girdileri betikte ve <see cref="ShellIntegration.QuickShrinkMenu"/>'de aynı
+    /// sırada, aynı anahtar, ön ayar, megabayt ve yedek etiketle duruyor.
+    /// </summary>
     [Fact]
     public void HedefListesiAyni()
     {
-        var script = Regex.Match(Script(), @"\$shellShrinkTargets = @\((?<body>[^)]*)\)").Groups["body"].Value;
-        var beklenen = Regex.Matches(script, @"\d+").Select(m => m.Value).ToArray();
+        var beklenen = KabukKucultAltMenuTests.ScriptTargets();
+        var bizim = ShellIntegration.QuickShrinkMenu
+            .Select(t => (t.Key, t.PresetId, t.Megabytes, t.Fallback)).ToArray();
 
-        var code = Regex.Match(Code(), @"ShrinkTargets = \{(?<body>[^}]*)\}").Groups["body"].Value;
-        var bizim = Regex.Matches(code, @"\d+").Select(m => m.Value).ToArray();
-
-        Assert.Equal(beklenen, bizim);
+        Assert.NotEmpty(beklenen);
+        Assert.Equal(bizim, beklenen);
     }
 
     /// <summary>
@@ -192,7 +194,7 @@ public class KabukMenusuTests
         Assert.Contains("RemovePackage();", removeOpen);
     }
 
-    /// <summary>Sekiz yeni anahtar 42 dilin hepsinde var.</summary>
+    /// <summary>Menü ve alt menü anahtarları 42 dilin hepsinde var.</summary>
     [Theory]
     [InlineData("settings-tab.shell-menu.title")]
     [InlineData("settings-tab.shell-menu.label")]
@@ -202,6 +204,12 @@ public class KabukMenusuTests
     [InlineData("settings-tab.shell-menu.error")]
     [InlineData("shell.menu.open")]
     [InlineData("shell.menu.shrink")]
+    [InlineData("shell.menu.target.size-8")]
+    [InlineData("shell.menu.target.whatsapp-chat")]
+    [InlineData("shell.menu.target.discord-free")]
+    [InlineData("shell.menu.target.email-gmail")]
+    [InlineData("shell.menu.target.discord-nitro-basic")]
+    [InlineData("shell.menu.target.size-100")]
     public void YeniAnahtarlarButunDillerde(string key)
     {
         foreach (var language in Locales.Languages)
@@ -215,36 +223,28 @@ public class KabukMenusuTests
     }
 
     /// <summary>
-    /// Menü etiketi <see cref="Bicim.HedefEtiketi"/>'ne indi. Gerçek hedef listesinde
-    /// 1000 ve 2000 var, yani GB kolu üretimde koşuyor; mutasyon ölçüsü bu kolun hiçbir
-    /// testte pimli olmadığını gösterdi (0 kırmızı). İki yazım tek gövdeden gelmeli:
-    /// kabuk menüsü ile kurulum kaydı aynı etiketi yazmazsa kullanıcı aynı komutu iki
-    /// ayrı adla görür.
+    /// Hedef etiketi <see cref="Bicim.HedefEtiketi"/>'nden gelir; iş penceresi ve eski
+    /// kurulumların kabul edilen hedefleri bunu kullanır. 1000'in katı GB, diğerleri MB.
     /// </summary>
     [Fact]
     public void MenuEtiketiTekGovdedenGeliyor()
     {
-        foreach (var mb in ShellIntegration.QuickShrinkTargetsMegabytes)
-        {
-            Assert.Equal(Bicim.HedefEtiketi(mb), ShellMenu.TargetLabel(mb));
+        foreach (var mb in ShellIntegration.AcceptedShrinkTargetsMegabytes)
             Assert.Equal(Bicim.HedefEtiketi(mb), ShellIntegration.FormatQuickShrinkLabel(mb));
-        }
 
-        Assert.Equal("1 GB", ShellMenu.TargetLabel(1000));
-        Assert.Equal("2 GB", ShellMenu.TargetLabel(2000));
-        Assert.Equal("100 MB", ShellMenu.TargetLabel(100));
+        Assert.Equal("1 GB", ShellIntegration.FormatQuickShrinkLabel(1000));
+        Assert.Equal("2 GB", ShellIntegration.FormatQuickShrinkLabel(2000));
+        Assert.Equal("100 MB", ShellIntegration.FormatQuickShrinkLabel(100));
     }
 
     /// <summary>
-    /// Eski kurulumların kayıt defterinde kalan <c>--kucult 1024</c> girdileri (ondalık
-    /// MB'a geçişten önceki hızlı listeden) çalışmaya devam etmeli: 1024 hâlâ geçerli bir
-    /// hedef, yalnız artık "1 GB" değil dürüst "1024 MB" der — 1024 ondalık 1000'in katı
-    /// değil.
+    /// Eski kurulumların kayıt defterinde kalan <c>--kucult 1024</c> girdileri çalışmaya
+    /// devam etmeli: 1024 hâlâ geçerli bir hedef ve dürüst "1024 MB" der.
     /// </summary>
     [Fact]
     public void EskiBinYirmiDortHedefiDurustEtiketAlir()
     {
-        Assert.Equal("1024 MB", ShellMenu.TargetLabel(1024));
+        Assert.Contains(1024, ShellIntegration.AcceptedShrinkTargetsMegabytes);
         Assert.Equal("1024 MB", ShellIntegration.FormatQuickShrinkLabel(1024));
     }
 }

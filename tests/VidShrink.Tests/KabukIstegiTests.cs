@@ -433,9 +433,9 @@ public sealed class KabukIstegiTests
     }
 
     [Fact]
-    public void HizliListeSozlesmedekiBesDeger()
+    public void HizliListeAltMenununAltiDegeri()
     {
-        Assert.Equal(new[] { 100, 250, 500, 1000, 2000 }, ShellIntegration.QuickShrinkTargetsMegabytes.ToArray());
+        Assert.Equal(new[] { 8, 16, 20, 25, 50, 100 }, ShellIntegration.QuickShrinkTargetsMegabytes.ToArray());
         _output.WriteLine($"hizli liste: {ShrinkProblemText.QuickList()}");
     }
 

@@ -72,7 +72,7 @@ public class KabukMenusuKayitTests
                 using (var command = Registry.CurrentUser.OpenSubKey(Branch(root, ShellMenu.MenuKey) + @"\command"))
                     Assert.Equal($"\"{install.Launcher}\" \"%1\"", command?.GetValue(string.Empty));
 
-                using (var shrink = Registry.CurrentUser.OpenSubKey(Branch(root, ShellMenu.ShrinkMenuKey) + @"\shell\100\command"))
+                using (var shrink = Registry.CurrentUser.OpenSubKey(Branch(root, ShellMenu.ShrinkMenuKey) + @"\shell\06-size-100\command"))
                 {
                     var value = shrink?.GetValue(string.Empty) as string;
                     Assert.StartsWith($"\"{install.Launcher}\" {ShellMenu.ShrinkFlag} 100", value);
