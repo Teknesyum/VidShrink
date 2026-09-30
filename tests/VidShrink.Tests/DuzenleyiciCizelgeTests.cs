@@ -437,4 +437,68 @@ public sealed class DuzenleyiciCizelgeTests
         Assert.Equal(0, bosSure);
         Assert.Equal(UcKesim().Clips, bosGeri);
     }
+
+    private static AudioPeaks Rampa(double saniye)
+    {
+        var ornekler = new short[(int)(AudioPeaks.SampleRate * saniye)];
+        for (var i = 0; i < ornekler.Length; i++)
+        {
+            var genlik = (double)i / ornekler.Length * short.MaxValue;
+            ornekler[i] = (short)(i % 2 == 0 ? genlik : -genlik);
+        }
+
+        return AudioPeaks.FromPcm(ornekler);
+    }
+
+    [Fact]
+    public void DalgaBicimiTepeliVeTepesizCizilir()
+    {
+        var olcum = AppHost.Run(() =>
+        {
+            var model = new EditTimeline(new[]
+            {
+                new EditClip(S(0), S(20)),
+                new EditClip(S(20), S(40), 2m),
+                new EditClip(S(40), S(60), 1m, true)
+            }, S(60));
+            var cizelge = Cizelge(model);
+            using var hedef = new Avalonia.Media.Imaging.RenderTargetBitmap(new PixelSize((int)Genislik, (int)Math.Ceiling(cizelge.DesiredSize.Height)));
+            hedef.Render(cizelge);
+            var tepesiz = cizelge.WaveformBucketsDrawn;
+            cizelge.Peaks = Rampa(60);
+            hedef.Render(cizelge);
+            var tepeli = cizelge.WaveformBucketsDrawn;
+            cizelge.PixelsPerTick = cizelge.MaxPixelsPerTick;
+            cizelge.ViewStart = S(30);
+            cizelge.Measure(new Size(Genislik, double.PositiveInfinity));
+            cizelge.Arrange(new Rect(0, 0, Genislik, cizelge.DesiredSize.Height));
+            hedef.Render(cizelge);
+            var yakin = cizelge.WaveformBucketsDrawn;
+            cizelge.Peaks = AudioPeaks.Empty;
+            hedef.Render(cizelge);
+            var bos = cizelge.WaveformBucketsDrawn;
+            return (tepesiz, tepeli, yakin, bos, cizelge.TrackWidth, cizelge.Realized.Count);
+        });
+
+        Assert.Equal(0, olcum.tepesiz);
+        Assert.InRange(olcum.tepeli, (int)(olcum.TrackWidth * 0.9), (int)olcum.TrackWidth + olcum.Count);
+        Assert.InRange(olcum.yakin, 1, (int)olcum.TrackWidth + olcum.Count);
+        Assert.Equal(0, olcum.bos);
+    }
+
+    [Fact]
+    public void TersKlipDalgasiAynalanirHizliKlipEsnemez()
+    {
+        var tepe = Rampa(30);
+        const int Kova = 100;
+        var duz = EditorTimeline.WaveformSlice(tepe, new EditClip(S(10), S(20)), 0, S(10), Kova);
+        var ters = EditorTimeline.WaveformSlice(tepe, new EditClip(S(10), S(20), 1m, true), 0, S(10), Kova);
+        var hizli = EditorTimeline.WaveformSlice(tepe, new EditClip(S(10), S(20), 2m), 0, S(5), Kova);
+        var yarim = EditorTimeline.WaveformSlice(tepe, new EditClip(S(10), S(20), 1m, true), 0, S(5), Kova);
+
+        Assert.Equal(duz.Reverse(), ters);
+        Assert.NotEqual(duz, ters);
+        Assert.Equal(tepe.Slice(S(10), S(20), false, Kova), hizli);
+        Assert.Equal(tepe.Slice(S(15), S(20), true, Kova), yarim);
+    }
 }

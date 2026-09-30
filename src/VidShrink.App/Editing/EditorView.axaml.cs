@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -13,6 +14,7 @@ using VidShrink.App.Localization;
 using VidShrink.App.Playback;
 using VidShrink.Core;
 using VidShrink.Core.Editing;
+using VidShrink.Ffmpeg;
 using VidShrink.Player;
 
 namespace VidShrink.App.Editing;
@@ -26,6 +28,7 @@ internal partial class EditorView : UserControl
     private string? _source;
     private EdlPreviewDriver? _driver;
     private int _reloads;
+    private CancellationTokenSource? _peaks;
 
     public EditorView()
     {
@@ -42,6 +45,7 @@ internal partial class EditorView : UserControl
         Timeline.Seek += OnSeek;
         Timeline.MoveRequested += (from, to) => Move(from, to);
         Timeline.SelectionChanged += RefreshToolbar;
+        Timeline.Edited += () => Apply(_ => true, Timeline.SelectedIndex);
 
         BtnSplit.Click += (_, _) => Split();
         BtnDelete.Click += (_, _) => DeleteSelected();
@@ -111,6 +115,7 @@ internal partial class EditorView : UserControl
         _model = null;
         Timeline.Show(null);
         RefreshToolbar();
+        LoadPeaks(path);
 
         try
         {
@@ -126,6 +131,33 @@ internal partial class EditorView : UserControl
         var at = Math.Clamp(start, 0, _model!.Duration);
         Timeline.Playhead = at;
         await ReloadAsync(at).ConfigureAwait(true);
+    }
+
+    private void LoadPeaks(string path)
+    {
+        _peaks?.Cancel();
+        _peaks?.Dispose();
+        _peaks = new CancellationTokenSource();
+        Timeline.Peaks = null;
+        _ = LoadPeaksAsync(path, _peaks.Token);
+    }
+
+    private async Task LoadPeaksAsync(string path, CancellationToken ct)
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+        AudioPeaks peaks;
+        try
+        {
+            var ffmpeg = ToolLocator.Ffmpeg;
+            peaks = await Task.Run(() => AudioPeaks.LoadAsync(ffmpeg, path, ct), ct).ConfigureAwait(true);
+        }
+        catch (Exception ex) when (ex is OperationCanceledException or IOException or InvalidOperationException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+        {
+            return;
+        }
+
+        if (ct.IsCancellationRequested || !CurrentMedia.SamePath(path, _source)) return;
+        Timeline.Peaks = peaks;
     }
 
     internal void ShowTimeline(EditTimeline model, double fps)

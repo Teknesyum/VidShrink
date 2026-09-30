@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls.Primitives;
@@ -85,6 +86,19 @@ internal sealed class EditorPlayhead : RangeBase
         var pen = new Pen(brush, EditorTokens.Size(this, "EditorClipSelectedBorder"));
         var radius = EditorTokens.Size(this, "EditorClipRadius");
         context.DrawRectangle(null, pen, new RoundedRect(new Rect(ghost.X, top, ghost.Width, _owner.VideoHeight), radius));
+        if (_owner.TrimLabel is { } text) DrawTrimLabel(context, text, ghost, top, radius);
+    }
+
+    private void DrawTrimLabel(DrawingContext context, string text, GhostBox ghost, double top, double radius)
+    {
+        var pad = EditorTokens.Size(this, "EditorClipPadding");
+        var label = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(EditorTokens.Font(this, "FontMono")), EditorTokens.Size(this, "FontSizeSm"), EditorTokens.Brush(this, "TextBody"));
+        var width = label.Width + pad * 2;
+        var height = label.Height + pad * 2;
+        var x = Math.Clamp(ghost.X + pad, _owner.HeaderWidth, Math.Max(_owner.HeaderWidth, Bounds.Width - width));
+        var box = new Rect(x, top + pad, width, height);
+        context.DrawRectangle(EditorTokens.Brush(this, "AppBg"), new Pen(EditorTokens.Brush(this, "NeonBlueBorder"), EditorTokens.Size(this, "EditorClipBorder")), new RoundedRect(box, radius));
+        context.DrawText(label, new Point(x + pad, top + pad * 2));
     }
 
     private void DrawSnap(DrawingContext context, double bottom)
