@@ -1,0 +1,22 @@
+<Configuration>
+  <VGpu>Disable</VGpu>
+  <Networking>Enable</Networking>
+  <MemoryInMB>4096</MemoryInMB>
+  <ClipboardRedirection>Disable</ClipboardRedirection>
+  <PrinterRedirection>Disable</PrinterRedirection>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>__DUZENEK__</HostFolder>
+      <SandboxFolder>C:\duzenek</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>__SONUC__</HostFolder>
+      <SandboxFolder>C:\sonuc</SandboxFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\duzenek\Temiz-Kos.ps1 -Sonuc C:\sonuc __ARGUMANLAR__</Command>
+  </LogonCommand>
+</Configuration>

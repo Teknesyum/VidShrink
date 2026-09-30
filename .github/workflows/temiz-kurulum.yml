@@ -1,0 +1,51 @@
+name: temiz-kurulum
+
+on:
+  workflow_dispatch:
+    inputs:
+      etiket:
+        description: 'Denenecek sürüm etiketi (boş: son yayın)'
+        required: false
+        default: ''
+      yol:
+        description: 'ikisi | kurucu | tek-satir'
+        required: false
+        default: 'ikisi'
+  workflow_run:
+    workflows: [release]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  duman:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025, windows-11-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/temiz-kurulum
+      - name: Kurulum yollari
+        shell: powershell
+        env:
+          ETIKET: ${{ github.event.inputs.etiket }}
+          YOL: ${{ github.event.inputs.yol || 'ikisi' }}
+        run: |
+          $sonuc = Join-Path $env:RUNNER_TEMP 'sonuc'
+          & .\tools\temiz-kurulum\Temiz-Kos.ps1 -Sonuc $sonuc -Yol $env:YOL -Etiket $env:ETIKET -KurucuEk @('--download-ffmpeg')
+          $kod = $LASTEXITCODE
+          Get-Content -LiteralPath (Join-Path $sonuc 'bitti.json') -Encoding UTF8 -ErrorAction SilentlyContinue
+          exit $kod
+      - name: Sonuclar
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: temiz-kurulum-${{ matrix.os }}
+          path: ${{ runner.temp }}/sonuc
+          if-no-files-found: warn

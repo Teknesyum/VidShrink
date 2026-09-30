@@ -260,6 +260,16 @@ public static class SetupLaunch
 
     public static bool RehearsalRequested(string? value) => !string.IsNullOrWhiteSpace(value);
 
+    public static bool PauseOnError(bool ownConsole, bool consoleVisible, bool inputRedirected) =>
+        ownConsole && consoleVisible && !inputRedirected;
+
+    public static string FailureMessage(Exception exception) => exception switch
+    {
+        AggregateException { InnerExceptions.Count: 1 } aggregate => FailureMessage(aggregate.InnerExceptions[0]),
+        SetupException or IOException or UnauthorizedAccessException or HttpRequestException or ArgumentException => exception.Message,
+        _ => $"{exception.GetType().Name}: {exception.Message}"
+    };
+
     public static SetupOptions ForPanel(SetupOptions options) => options with { NoLaunch = true };
 
     /// <summary>

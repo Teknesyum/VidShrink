@@ -286,4 +286,25 @@ public sealed class KurucuPanelTests
         Assert.True(SetupLaunch.RehearsalRequested("1"));
         Assert.Equal(Path.Combine(scratch, "VidShrink", "kurulum.log"), SetupLaunch.LogPath(scratch));
     }
+
+    [Theory]
+    [InlineData(true, true, false, true)]
+    [InlineData(false, true, false, false)]
+    [InlineData(true, false, false, false)]
+    [InlineData(true, true, true, false)]
+    public void Konsol_hatada_yalniz_gorunur_kendi_penceresinde_bekler(bool ownConsole, bool visible, bool redirected, bool pause)
+    {
+        Assert.Equal(pause, SetupLaunch.PauseOnError(ownConsole, visible, redirected));
+    }
+
+    [Fact]
+    public void Konsol_hata_metni_bilinmeyen_istisnada_turunu_soyler()
+    {
+        Assert.Equal("kirik", SetupLaunch.FailureMessage(new SetupException("kirik")));
+        Assert.Equal("disk", SetupLaunch.FailureMessage(new IOException("disk")));
+        Assert.Equal("InvalidDataException: zip", SetupLaunch.FailureMessage(new InvalidDataException("zip")));
+        Assert.Equal("Win32Exception: tar", SetupLaunch.FailureMessage(new System.ComponentModel.Win32Exception(2, "tar")));
+        Assert.Equal("ag", SetupLaunch.FailureMessage(new AggregateException(new HttpRequestException("ag"))));
+        Assert.Equal("TaskCanceledException: sure", SetupLaunch.FailureMessage(new AggregateException(new TaskCanceledException("sure"))));
+    }
 }
