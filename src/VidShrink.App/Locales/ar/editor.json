@@ -40,5 +40,13 @@
   "editor.export.failed": "فشل التصدير: {0}",
   "editor.export.reencoded": "المقاطع {0} تغيّر السرعة أو تُشغَّل بالعكس، لذا يُعاد ترميزها.",
   "editor.export.fallback": "لا يمكن قص هذا المصدر دون إعادة ترميز، لذا يُعاد ترميز الفيديو كله.",
-  "editor.export.reverse-limit": "المقطع المعكوس {0} يتجاوز حد الذاكرة ({1}). اضغط حفظ مرة أخرى للمتابعة."
+  "editor.export.reverse-limit": "المقطع المعكوس {0} يتجاوز حد الذاكرة ({1}). اضغط حفظ مرة أخرى للمتابعة.",
+  "editor.tool.selection": "أداة التحديد",
+  "editor.tool.razor": "أداة الشفرة",
+  "editor.tool.ripple": "أداة التحرير المتموج",
+  "editor.tools": "الأدوات",
+  "editor.timecode": "الرمز الزمني",
+  "editor.duration": "المدة",
+  "editor.monitor": "شاشة البرنامج",
+  "editor.snap": "الالتقاط"
 }

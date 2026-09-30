@@ -10,8 +10,8 @@
 
       EditorVideoTrackHeight     <- DropIconSize (48). İki dokunma ölçüsü üst üste; klip
                                     içinde rozet ve tutamak sığar.
-      EditorAudioTrackHeight     <- TargetMinSize (24). Ses izi görüntü izinin aynası,
-                                    dalga formu yok; dokunma ölçüsü yeter.
+      EditorAudioTrackHeight     <- DropIconSize (48). Ses izi dalga biçimi taşıyor;
+                                    tepeler görüntü iziyle aynı yükseklikte okunur.
       EditorTrackGap             <- SpaceXs (4). İzler arası tek çizgi payı.
       EditorTrackHeaderWidth     <- FieldWidthSm (120). İz adı sütunu.
       EditorRulerHeight          <- TargetMinSize (24). Cetvel tıklanabilir, oynatma
@@ -50,16 +50,26 @@
       EditorMotionSelect         <- MotionFast. Seçim ve fare üstü geçişi.
       Kaydırma anında olur, geçişi yok; o yüzden ayrı bir süre belirteci de yok.
 
+    Yerleşim (dalga 2A)
+
+      EditorToolButtonSize       <- PlaybackBarButtonSize (32). Araç paletinin kare
+                                    düğmesi; oynatıcı şeridinin düğmesiyle aynı hedef.
+      EditorTransportGap         <- SpaceSm (8). Monitör satırındaki düğmelerin arası.
+      EditorTimecodeWidth        <- FieldWidthSm (120). Mono zaman kodu kutusu;
+                                    "00:00:00:00" ve kutu dolgusu sığar.
+
     Kalıplar
 
       EditorClip klibin gövdesidir: PlaybackTrack'in fırçaları, fare üstünde NeonBlueHover,
       seçilince NeonBlueActive + NeonBlueBorderStrong + GlowBlue ve kalın kenar.
+      EditorToolButton araç paletinin ve mıknatısın aç-kapa düğmesidir: GhostButton yüzü,
+      seçiliyken EditorClip seçiminin fırçaları (NeonBlueActive + NeonBlueBorderStrong).
       EditorBadgeText hız rozetinin yazısıdır: PlaybackBadgeText kalıbı, TextBody rengiyle
       (perde üstü yazı 7:1 ölçülü). Rozetin kendisi PlaybackBadge kalıbını kullanır.
   -->
 
   <StaticResource x:Key="EditorVideoTrackHeight" ResourceKey="DropIconSize"/>
-  <StaticResource x:Key="EditorAudioTrackHeight" ResourceKey="TargetMinSize"/>
+  <StaticResource x:Key="EditorAudioTrackHeight" ResourceKey="DropIconSize"/>
   <StaticResource x:Key="EditorTrackGap" ResourceKey="SpaceXs"/>
   <StaticResource x:Key="EditorTrackHeaderWidth" ResourceKey="FieldWidthSm"/>
   <StaticResource x:Key="EditorRulerHeight" ResourceKey="TargetMinSize"/>
@@ -83,6 +93,22 @@
   <StaticResource x:Key="EditorZoomMax" ResourceKey="TargetMinSize"/>
   <StaticResource x:Key="EditorZoomStep" ResourceKey="PlaybackHoverZoom"/>
   <StaticResource x:Key="EditorMotionSelect" ResourceKey="MotionFast"/>
+
+  <StaticResource x:Key="EditorToolButtonSize" ResourceKey="PlaybackBarButtonSize"/>
+  <StaticResource x:Key="EditorTransportGap" ResourceKey="SpaceSm"/>
+  <StaticResource x:Key="EditorTimecodeWidth" ResourceKey="FieldWidthSm"/>
+
+  <ControlTheme x:Key="EditorToolButton" TargetType="ToggleButton" BasedOn="{StaticResource GhostButton}">
+    <Setter Property="MinWidth" Value="{StaticResource EditorToolButtonSize}"/>
+    <Setter Property="MinHeight" Value="{StaticResource EditorToolButtonSize}"/>
+    <Style Selector="^:checked">
+      <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+    </Style>
+    <Style Selector="^:checked /template/ Border#Root">
+      <Setter Property="Background" Value="{StaticResource NeonBlueActive}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+    </Style>
+  </ControlTheme>
 
   <ControlTheme x:Key="EditorClip" TargetType="Border">
     <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>

@@ -40,5 +40,13 @@
   "editor.export.failed": "Eksport ebaõnnestus: {0}",
   "editor.export.reencoded": "Klipid {0} muudavad kiirust või mängivad tagurpidi ning kodeeritakse ümber.",
   "editor.export.fallback": "Seda allikat ei saa lõigata ümberkodeerimiseta, seega kodeeritakse kogu video ümber.",
-  "editor.export.reverse-limit": "Tagurpidi klipp {0} ületab mälupiirangu ({1}). Jätkamiseks klõpsa uuesti Salvesta."
+  "editor.export.reverse-limit": "Tagurpidi klipp {0} ületab mälupiirangu ({1}). Jätkamiseks klõpsa uuesti Salvesta.",
+  "editor.tool.selection": "Valikutööriist",
+  "editor.tool.razor": "Žiletitööriist",
+  "editor.tool.ripple": "Nihkemuutmise tööriist",
+  "editor.tools": "Tööriistad",
+  "editor.timecode": "Ajakood",
+  "editor.duration": "Kestus",
+  "editor.monitor": "Programmimonitor",
+  "editor.snap": "Haakumine"
 }

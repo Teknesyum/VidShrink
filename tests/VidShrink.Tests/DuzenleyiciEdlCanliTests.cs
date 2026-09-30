@@ -17,7 +17,7 @@ public sealed class DuzenleyiciEdlCanliTests
         return yol;
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task IkiParcaliEdlLibmpvdeKesimSuresiyleAcilir()
     {
         var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "duzenleyici-edl", "a,b;c=d " + Guid.NewGuid().ToString("N")[..6]);

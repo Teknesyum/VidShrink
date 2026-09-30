@@ -40,5 +40,13 @@
   "editor.export.failed": "Eksport gagal: {0}",
   "editor.export.reencoded": "Klip {0} menukar kelajuan atau dimainkan terbalik dan dikod semula.",
   "editor.export.fallback": "Sumber ini tidak boleh dipotong tanpa kod semula, jadi seluruh video dikod semula.",
-  "editor.export.reverse-limit": "Klip terbalik {0} melebihi had memori ({1}). Tekan Simpan sekali lagi untuk meneruskan."
+  "editor.export.reverse-limit": "Klip terbalik {0} melebihi had memori ({1}). Tekan Simpan sekali lagi untuk meneruskan.",
+  "editor.tool.selection": "Alat pilih",
+  "editor.tool.razor": "Alat pisau cukur",
+  "editor.tool.ripple": "Alat suntingan riak",
+  "editor.tools": "Alat",
+  "editor.timecode": "Kod masa",
+  "editor.duration": "Tempoh",
+  "editor.monitor": "Monitor program",
+  "editor.snap": "Lekatan"
 }

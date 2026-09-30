@@ -40,5 +40,13 @@
   "editor.export.failed": "Dışa aktarma başarısız: {0}",
   "editor.export.reencoded": "{0} numaralı klipler hız değiştiriyor ya da ters oynuyor, yeniden kodlanır.",
   "editor.export.fallback": "Bu kaynak yeniden kodlanmadan kesilemiyor, bu yüzden videonun tamamı yeniden kodlanır.",
-  "editor.export.reverse-limit": "Ters klip {0} bellek sınırından ({1}) uzun. Sürdürmek için Kaydet'e yeniden bas."
+  "editor.export.reverse-limit": "Ters klip {0} bellek sınırından ({1}) uzun. Sürdürmek için Kaydet'e yeniden bas.",
+  "editor.tool.selection": "Seçim aracı",
+  "editor.tool.razor": "Jilet aracı",
+  "editor.tool.ripple": "Dalga düzenleme aracı",
+  "editor.tools": "Araçlar",
+  "editor.timecode": "Zaman kodu",
+  "editor.duration": "Süre",
+  "editor.monitor": "Program monitörü",
+  "editor.snap": "Yapışma"
 }

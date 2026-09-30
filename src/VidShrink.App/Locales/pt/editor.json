@@ -40,5 +40,13 @@
   "editor.export.failed": "Falha na exportação: {0}",
   "editor.export.reencoded": "Os clipes {0} mudam a velocidade ou tocam ao contrário e são recodificados.",
   "editor.export.fallback": "Esta fonte não pode ser cortada sem recodificação, por isso o vídeo inteiro é recodificado.",
-  "editor.export.reverse-limit": "O clipe invertido {0} excede o limite de memória ({1}). Clique em Salvar de novo para continuar."
+  "editor.export.reverse-limit": "O clipe invertido {0} excede o limite de memória ({1}). Clique em Salvar de novo para continuar.",
+  "editor.tool.selection": "Ferramenta de seleção",
+  "editor.tool.razor": "Ferramenta lâmina",
+  "editor.tool.ripple": "Ferramenta de edição em cascata",
+  "editor.tools": "Ferramentas",
+  "editor.timecode": "Código de tempo",
+  "editor.duration": "Duração",
+  "editor.monitor": "Monitor do programa",
+  "editor.snap": "Encaixe"
 }

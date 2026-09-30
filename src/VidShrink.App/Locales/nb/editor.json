@@ -40,5 +40,13 @@
   "editor.export.failed": "Eksporten mislyktes: {0}",
   "editor.export.reencoded": "Klippene {0} endrer hastighet eller spilles baklengs og omkodes.",
   "editor.export.fallback": "Kilden kan ikke klippes uten omkoding, så hele videoen omkodes.",
-  "editor.export.reverse-limit": "Det baklengs klippet {0} er lengre enn minnegrensen ({1}). Klikk Lagre igjen for å fortsette."
+  "editor.export.reverse-limit": "Det baklengs klippet {0} er lengre enn minnegrensen ({1}). Klikk Lagre igjen for å fortsette.",
+  "editor.tool.selection": "Markeringsverktøy",
+  "editor.tool.razor": "Barberbladverktøy",
+  "editor.tool.ripple": "Ringvirkningsverktøy",
+  "editor.tools": "Verktøy",
+  "editor.timecode": "Tidskode",
+  "editor.duration": "Varighet",
+  "editor.monitor": "Programskjerm",
+  "editor.snap": "Festing"
 }

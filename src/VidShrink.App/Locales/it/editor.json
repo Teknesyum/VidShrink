@@ -40,5 +40,13 @@
   "editor.export.failed": "Esportazione non riuscita: {0}",
   "editor.export.reencoded": "Le clip {0} cambiano velocità o sono al contrario e vengono ricodificate.",
   "editor.export.fallback": "Questa sorgente non si può tagliare senza ricodifica, quindi l'intero video viene ricodificato.",
-  "editor.export.reverse-limit": "La clip invertita {0} supera il limite di memoria ({1}). Premi di nuovo Salva per continuare."
+  "editor.export.reverse-limit": "La clip invertita {0} supera il limite di memoria ({1}). Premi di nuovo Salva per continuare.",
+  "editor.tool.selection": "Strumento Selezione",
+  "editor.tool.razor": "Strumento Taglierina",
+  "editor.tool.ripple": "Strumento Modifica a effetto domino",
+  "editor.tools": "Strumenti",
+  "editor.timecode": "Timecode",
+  "editor.duration": "Durata",
+  "editor.monitor": "Monitor programma",
+  "editor.snap": "Aggancio"
 }

@@ -40,5 +40,13 @@
   "editor.export.failed": "הייצוא נכשל: {0}",
   "editor.export.reencoded": "הקליפים {0} משנים מהירות או מתנגנים לאחור ולכן מקודדים מחדש.",
   "editor.export.fallback": "אי אפשר לחתוך את המקור הזה בלי קידוד מחדש, ולכן כל הווידאו מקודד מחדש.",
-  "editor.export.reverse-limit": "הקליפ ההפוך {0} חורג ממגבלת הזיכרון ({1}). לחצו שוב על שמירה כדי להמשיך."
+  "editor.export.reverse-limit": "הקליפ ההפוך {0} חורג ממגבלת הזיכרון ({1}). לחצו שוב על שמירה כדי להמשיך.",
+  "editor.tool.selection": "כלי בחירה",
+  "editor.tool.razor": "כלי סכין",
+  "editor.tool.ripple": "כלי עריכת גלים",
+  "editor.tools": "כלים",
+  "editor.timecode": "קוד זמן",
+  "editor.duration": "משך",
+  "editor.monitor": "מוניטור תוכנית",
+  "editor.snap": "הצמדה"
 }

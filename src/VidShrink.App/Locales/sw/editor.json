@@ -40,5 +40,13 @@
   "editor.export.failed": "Kuhamisha kumeshindwa: {0}",
   "editor.export.reencoded": "Klipu {0} zinabadilisha kasi au zinacheza kinyume, kwa hivyo zinasimbwa upya.",
   "editor.export.fallback": "Chanzo hiki hakiwezi kukatwa bila kusimbwa upya, kwa hivyo video nzima inasimbwa upya.",
-  "editor.export.reverse-limit": "Klipu ya kinyume {0} inazidi kikomo cha kumbukumbu ({1}). Bofya Hifadhi tena ili kuendelea."
+  "editor.export.reverse-limit": "Klipu ya kinyume {0} inazidi kikomo cha kumbukumbu ({1}). Bofya Hifadhi tena ili kuendelea.",
+  "editor.tool.selection": "Zana ya kuchagua",
+  "editor.tool.razor": "Zana ya wembe",
+  "editor.tool.ripple": "Zana ya uhariri wa mawimbi",
+  "editor.tools": "Zana",
+  "editor.timecode": "Msimbo wa muda",
+  "editor.duration": "Muda",
+  "editor.monitor": "Kifuatiliaji cha programu",
+  "editor.snap": "Kunasa"
 }

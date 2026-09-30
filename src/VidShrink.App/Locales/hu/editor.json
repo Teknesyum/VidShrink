@@ -40,5 +40,13 @@
   "editor.export.failed": "Az exportálás sikertelen: {0}",
   "editor.export.reencoded": "A(z) {0} klipek sebességet váltanak vagy visszafelé játszódnak, ezért újrakódolódnak.",
   "editor.export.fallback": "Ez a forrás nem vágható újrakódolás nélkül, ezért a teljes videó újrakódolódik.",
-  "editor.export.reverse-limit": "A(z) {0} visszafelé játszott klip hosszabb a memóriakorlátnál ({1}). A folytatáshoz kattints újra a Mentésre."
+  "editor.export.reverse-limit": "A(z) {0} visszafelé játszott klip hosszabb a memóriakorlátnál ({1}). A folytatáshoz kattints újra a Mentésre.",
+  "editor.tool.selection": "Kijelölő eszköz",
+  "editor.tool.razor": "Borotva eszköz",
+  "editor.tool.ripple": "Hullámszerkesztő eszköz",
+  "editor.tools": "Eszközök",
+  "editor.timecode": "Időkód",
+  "editor.duration": "Időtartam",
+  "editor.monitor": "Programmonitor",
+  "editor.snap": "Illesztés"
 }

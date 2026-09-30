@@ -40,5 +40,13 @@
   "editor.export.failed": "書き出しに失敗しました: {0}",
   "editor.export.reencoded": "クリップ {0} は速度変更または逆再生のため再エンコードされます。",
   "editor.export.fallback": "このソースは再エンコードなしでカットできないため、動画全体を再エンコードします。",
-  "editor.export.reverse-limit": "逆再生クリップ {0} がメモリ上限（{1}）を超えています。続けるにはもう一度「保存」を押してください。"
+  "editor.export.reverse-limit": "逆再生クリップ {0} がメモリ上限（{1}）を超えています。続けるにはもう一度「保存」を押してください。",
+  "editor.tool.selection": "選択ツール",
+  "editor.tool.razor": "レーザーツール",
+  "editor.tool.ripple": "リップルツール",
+  "editor.tools": "ツール",
+  "editor.timecode": "タイムコード",
+  "editor.duration": "デュレーション",
+  "editor.monitor": "プログラムモニター",
+  "editor.snap": "スナップ"
 }

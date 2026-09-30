@@ -40,5 +40,13 @@
   "editor.export.failed": "এক্সপোর্ট ব্যর্থ: {0}",
   "editor.export.reencoded": "ক্লিপ {0} গতি বদলায় বা উল্টো চলে, তাই রি-এনকোড হবে।",
   "editor.export.fallback": "এই উৎস রি-এনকোড ছাড়া কাটা যায় না, তাই পুরো ভিডিও রি-এনকোড হবে।",
-  "editor.export.reverse-limit": "উল্টো ক্লিপ {0} মেমরি সীমা ({1}) ছাড়িয়ে যায়। চালিয়ে যেতে আবার সংরক্ষণ চাপুন।"
+  "editor.export.reverse-limit": "উল্টো ক্লিপ {0} মেমরি সীমা ({1}) ছাড়িয়ে যায়। চালিয়ে যেতে আবার সংরক্ষণ চাপুন।",
+  "editor.tool.selection": "নির্বাচন টুল",
+  "editor.tool.razor": "রেজার টুল",
+  "editor.tool.ripple": "রিপল এডিট টুল",
+  "editor.tools": "টুলস",
+  "editor.timecode": "টাইমকোড",
+  "editor.duration": "সময়কাল",
+  "editor.monitor": "প্রোগ্রাম মনিটর",
+  "editor.snap": "স্ন্যাপিং"
 }

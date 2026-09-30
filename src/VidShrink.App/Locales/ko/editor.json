@@ -40,5 +40,13 @@
   "editor.export.failed": "내보내기 실패: {0}",
   "editor.export.reencoded": "클립 {0}은(는) 속도가 바뀌거나 역재생되어 재인코딩됩니다.",
   "editor.export.fallback": "이 소스는 재인코딩 없이 자를 수 없어 동영상 전체를 재인코딩합니다.",
-  "editor.export.reverse-limit": "역재생 클립 {0}이(가) 메모리 한도({1})를 넘습니다. 계속하려면 저장을 다시 누르세요."
+  "editor.export.reverse-limit": "역재생 클립 {0}이(가) 메모리 한도({1})를 넘습니다. 계속하려면 저장을 다시 누르세요.",
+  "editor.tool.selection": "선택 도구",
+  "editor.tool.razor": "자르기 도구",
+  "editor.tool.ripple": "잔물결 편집 도구",
+  "editor.tools": "도구",
+  "editor.timecode": "타임코드",
+  "editor.duration": "지속 시간",
+  "editor.monitor": "프로그램 모니터",
+  "editor.snap": "스냅"
 }
