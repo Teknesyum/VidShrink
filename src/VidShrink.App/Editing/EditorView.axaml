@@ -117,8 +117,8 @@
           <StackPanel x:Name="SilencePanel" Spacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.silence.panel}">
             <WrapPanel Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <CheckBox x:Name="ChkSilenceAudio" Content="{loc:Text editor.silence.audio}" IsChecked="True" VerticalAlignment="Center"/>
-                <CheckBox x:Name="ChkSilenceBlack" Content="{loc:Text editor.silence.black}" VerticalAlignment="Center"/>
+                <CheckBox x:Name="ChkSilenceAudio" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.silence.audio}" IsChecked="True" VerticalAlignment="Center"/>
+                <CheckBox x:Name="ChkSilenceBlack" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.silence.black}" VerticalAlignment="Center"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.threshold}"/>
