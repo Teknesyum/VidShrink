@@ -172,7 +172,9 @@ internal sealed class KisayolOrtam
 
     internal static KisayolOrtam Ac(string clip, string ad)
     {
-        var history = Path.Combine(KisayolKanit.Folder, "gecmis", ad + ".json");
+        var history = Path.Combine(KisayolKanit.Folder, "gecmis", ad, "gecmis.json");
+        var ayar = Path.Combine(Path.GetDirectoryName(history)!, PlayerSettings.FileName);
+        if (File.Exists(ayar)) File.Delete(ayar);
         Directory.CreateDirectory(Path.GetDirectoryName(history)!);
         if (File.Exists(history)) File.Delete(history);
 
@@ -254,7 +256,7 @@ public sealed class OynaticiKisayolTests
 
         KisayolKanit.Write(Path.Combine("tuslar", ad + ".txt"), kayit);
         Assert.True(hata is null, kayit);
-        KisayolKanit.Kapat(Path.Combine("tuslar", ad + ".txt"), Path.Combine("gecmis", ad + ".json"), "goruntu", "klip-" + ad);
+        KisayolKanit.Kapat(Path.Combine("tuslar", ad + ".txt"), Path.Combine("gecmis", ad), "goruntu", "klip-" + ad);
     }
 
     private static string Klip(string ad) => ad switch
@@ -751,7 +753,7 @@ public sealed class OynaticiKisayolTests
 
         KisayolKanit.Write("odak.txt", kayit);
         Assert.True(sonuc, kayit);
-        KisayolKanit.Kapat("odak.txt", Path.Combine("gecmis", "odak.json"));
+        KisayolKanit.Kapat("odak.txt", Path.Combine("gecmis", "odak"));
     }
 
     [Fact]
@@ -793,6 +795,6 @@ public sealed class OynaticiKisayolTests
 
         KisayolKanit.Write("tam-mini.txt", kayit);
         Assert.True(sonuc, kayit);
-        KisayolKanit.Kapat("tam-mini.txt", Path.Combine("gecmis", "tam-mini.json"));
+        KisayolKanit.Kapat("tam-mini.txt", Path.Combine("gecmis", "tam-mini"));
     }
 }

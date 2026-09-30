@@ -186,6 +186,8 @@ public sealed class OynaticiGeriBildirimTests
     [Fact]
     public void DosyaSonundaAnahatBirKezYanipSonerGoruntuyuKaplamaz() => AppHost.Run(() =>
     {
+        var oncekiHareket = HoverZone.MotionReduced;
+        HoverZone.MotionReduced = false;
         var body = new StringBuilder();
         var motor = new YolMotoru();
         var klasor = Klasor("medya");
@@ -256,6 +258,7 @@ public sealed class OynaticiGeriBildirimTests
         Kapat(view, window);
         Directory.Delete(klasor, true);
         YolKanit.Write("geri-bildirim-son.txt", body.ToString());
+        HoverZone.MotionReduced = oncekiHareket;
 
         Assert.True(sure > TimeSpan.Zero && sure <= TimeSpan.FromMilliseconds(500));
         Assert.InRange(ekranda, sure.TotalMilliseconds - 40, sure.TotalMilliseconds + 90);
