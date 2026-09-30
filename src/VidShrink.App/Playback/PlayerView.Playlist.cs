@@ -215,6 +215,7 @@ internal partial class PlayerView
 
     private void ClosePlaylist()
     {
+        CloseItemMenu();
         _playlistDetach?.Invoke();
         _playlistDetach = null;
         if (PlaylistPopup.IsOpen) PlaylistPopup.Close();

@@ -356,6 +356,12 @@ internal partial class PlayerView : UserControl
         else if (point.Properties.IsLeftButtonPressed) button = PlayerButton.Left;
         else return;
 
+        if (MenuPress(e, button))
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (button == PlayerButton.Left)
         {
             var at = point.Position;

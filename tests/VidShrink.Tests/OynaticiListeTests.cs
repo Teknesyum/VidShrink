@@ -25,7 +25,7 @@ public sealed class OynaticiListeTests
 
     private static IInputRoot Kok(TopLevel top) => (IInputRoot)typeof(TopLevel).GetProperty("InputRoot", Her)!.GetValue(top)!;
 
-    private static void Ham(TopLevel top, RawInputEventArgs args)
+    internal static void Ham(TopLevel top, RawInputEventArgs args)
     {
         var impl = Impl(top);
         var giris = (Action<RawInputEventArgs>)impl.GetType().GetInterfaces()
@@ -33,27 +33,27 @@ public sealed class OynaticiListeTests
         giris(args);
     }
 
-    private static void Fareyle(TopLevel top, RawPointerEventType tur, Point nokta, RawInputModifiers tuslar)
+    internal static void Fareyle(TopLevel top, RawPointerEventType tur, Point nokta, RawInputModifiers tuslar)
         => Ham(top, (RawInputEventArgs)Yeni(typeof(RawPointerEventArgs), Fare, (ulong)Environment.TickCount64, Kok(top), tur, nokta, tuslar));
 
-    private static void Tus(TopLevel top, Key key)
+    internal static void Tus(TopLevel top, Key key)
     {
         var klavye = typeof(KeyboardDevice).GetProperty("Instance", Her)!.GetValue(null)!;
         foreach (var tur in new[] { RawKeyEventType.KeyDown, RawKeyEventType.KeyUp })
             Ham(top, (RawInputEventArgs)Yeni(typeof(RawKeyEventArgs), klavye, (ulong)Environment.TickCount64, Kok(top), tur, key, RawInputModifiers.None, PhysicalKey.None, null, KeyDeviceType.Keyboard));
     }
 
-    private static Point Merkez(TopLevel top, Visual control)
+    internal static Point Merkez(TopLevel top, Visual control)
         => control.TranslatePoint(new Point(control.Bounds.Width / 2, control.Bounds.Height / 2), top)!.Value;
 
-    private static void SagTik(Window window, Point nokta)
+    internal static void SagTik(Window window, Point nokta)
     {
         Fareyle(window, RawPointerEventType.Move, nokta, RawInputModifiers.None);
         Fareyle(window, RawPointerEventType.RightButtonDown, nokta, RawInputModifiers.RightMouseButton);
         Fareyle(window, RawPointerEventType.RightButtonUp, nokta, RawInputModifiers.None);
     }
 
-    private static void SolTik(TopLevel top, Point nokta, PlayerView view)
+    internal static void SolTik(TopLevel top, Point nokta, PlayerView view)
     {
         Fareyle(top, RawPointerEventType.Move, nokta, RawInputModifiers.None);
         DenetimSurucu.Wait(view, 0.05);
@@ -62,7 +62,7 @@ public sealed class OynaticiListeTests
         Fareyle(top, RawPointerEventType.LeftButtonUp, nokta, RawInputModifiers.None);
     }
 
-    private static MenuFlyoutPresenter Sunucu(PlayerView view)
+    internal static MenuFlyoutPresenter Sunucu(PlayerView view)
     {
         var menu = (MenuFlyout)typeof(PlayerView).GetField("_menu", Her)!.GetValue(view)!;
         return ((Visual)menu.Items[0]!).FindAncestorOfType<MenuFlyoutPresenter>()!;
@@ -75,7 +75,7 @@ public sealed class OynaticiListeTests
         return new PixelRect(sol, PixelSize.FromSize(control.Bounds.Size, top.RenderScaling));
     }
 
-    private static string Klasor(params string[] adlar)
+    internal static string Klasor(params string[] adlar)
     {
         var klasor = Path.Combine(GirdiKanit.Root, ".calisma", "oynatici-liste", Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(klasor);
@@ -83,7 +83,7 @@ public sealed class OynaticiListeTests
         return klasor;
     }
 
-    private static void Sil(string klasor)
+    internal static void Sil(string klasor)
     {
         try
         {
@@ -94,7 +94,7 @@ public sealed class OynaticiListeTests
         }
     }
 
-    private static PlayerView Ac(string? path, out Window window)
+    internal static PlayerView Ac(string? path, out Window window)
     {
         var motor = new YolMotoru();
         var view = new PlayerView { EngineFactory = () => motor };
@@ -111,7 +111,7 @@ public sealed class OynaticiListeTests
         return view;
     }
 
-    private static void Kapat(PlayerView view, Window window)
+    internal static void Kapat(PlayerView view, Window window)
     {
         view.Close();
         window.Close();
