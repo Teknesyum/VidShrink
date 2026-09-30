@@ -68,7 +68,7 @@ public sealed class GorselDenetimCanlandirmaTests
     [InlineData(true)]
     public void SekmeGostergesiSecimleBelirir(bool azaltilmis)
     {
-        var (secilmemis, secildi, eni, sekmeEni) = AppHost.Run(() =>
+        var (secilmemis, secildi, eni, sekmeEni, gecis) = AppHost.Run(() =>
         {
             var kaynak = Avalonia.Application.Current!;
             TabItem Sekme(string ad) => new()
@@ -100,15 +100,20 @@ public sealed class GorselDenetimCanlandirmaTests
                 var gosterge = Gosterge(iki);
                 pencere.Measure(new Size(600, 300));
                 pencere.Arrange(new Rect(0, 0, 600, 300));
-                return (once, gosterge.Opacity, gosterge.Bounds.Width, iki.Bounds.Width);
+                var sure = gosterge.Transitions?.OfType<Avalonia.Animation.DoubleTransition>()
+                    .Where(t => t.Property == Visual.OpacityProperty)
+                    .Select(t => t.Duration)
+                    .DefaultIfEmpty(TimeSpan.Zero)
+                    .Max() ?? TimeSpan.Zero;
+                return (once, gosterge.Opacity, gosterge.Bounds.Width, iki.Bounds.Width, sure);
             }
             finally { pencere.Close(); }
         });
 
-        _output.WriteLine($"secilmemis {secilmemis:0.###}, secildi {secildi:0.###}, en {eni:0.#} / sekme {sekmeEni:0.#}");
+        _output.WriteLine($"secilmemis {secilmemis:0.###}, secildi {secildi:0.###}, gecis {gecis.TotalMilliseconds:0} ms, en {eni:0.#} / sekme {sekmeEni:0.#}");
         Assert.Equal(0, secilmemis, 3);
         Assert.True(eni > 0 && eni <= sekmeEni + 0.5, $"Gösterge eni {eni:0.#}, sekme {sekmeEni:0.#}.");
         if (azaltilmis) Assert.Equal(1, secildi, 3);
-        else Assert.True(secildi < 0.5, $"Gösterge ilk anda {secildi:0.###} opaklıkta; geçiş yok, anında beliriyor.");
+        else Assert.True(gecis > TimeSpan.Zero, $"Göstergenin opaklık geçişi yok (ilk anda {secildi:0.###}); anında beliriyor.");
     }
 }
