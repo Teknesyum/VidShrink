@@ -72,6 +72,61 @@ public sealed class OynaticiGercekGirdiTests
         DenetimSurucu.Wait(view, 0.15);
     }
 
+    /// <summary>
+    /// Zaman çubuğu tutulup yukarı sürüklenirken fare alt banttan çıkar; şerit yine de açık
+    /// kalmalı, bırakılınca kural fareye döner.
+    /// </summary>
+    [Fact]
+    public void ZamanCubuguSuruklenirkenSeritKapanmaz()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        var rapor = AppHost.Run(() =>
+        {
+            var body = new StringBuilder();
+            var view = DenetimSurucu.Ac(clip, out var window);
+            window.Width = 1280;
+            window.Height = 720;
+            window.Show();
+            DenetimSurucu.Wait(view, 0.3);
+            _ = view.SeritZone;
+            if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
+            DenetimSurucu.Wait(view, 0.2);
+
+            var alt = new Point(view.Bounds.Width / 2, view.Bounds.Height - 10);
+            Gonder(window, RawPointerEventType.Move, new Point(alt.X, 50), RawInputModifiers.None);
+            Gonder(window, RawPointerEventType.Move, alt, RawInputModifiers.None);
+            DenetimSurucu.Pump(view, () => view.SeritRevealed, 5);
+
+            var cubuk = view.FindControl<Panel>("SeekBar")!;
+            var bas = Merkez(window, cubuk);
+            Gonder(window, RawPointerEventType.Move, bas, RawInputModifiers.None);
+            Gonder(window, RawPointerEventType.LeftButtonDown, bas, RawInputModifiers.LeftMouseButton);
+            DenetimSurucu.Wait(view, 0.05);
+            var acikKaldi = true;
+            for (var i = 1; i <= 10; i++)
+            {
+                var p = new Point(bas.X + 30 * i, bas.Y - view.Bounds.Height * 0.08 * i);
+                Gonder(window, RawPointerEventType.Move, p, RawInputModifiers.LeftMouseButton);
+                DenetimSurucu.Wait(view, 0.03);
+                acikKaldi &= view.SeritRevealed;
+            }
+            body.AppendLine($"oynuyor: {view.IsPlaying} surukleme boyunca serit acik: {acikKaldi}");
+            var yukari = new Point(bas.X + 300, bas.Y - view.Bounds.Height * 0.8);
+            Gonder(window, RawPointerEventType.LeftButtonUp, yukari, RawInputModifiers.None);
+            Gonder(window, RawPointerEventType.Move, new Point(yukari.X, yukari.Y + 1), RawInputModifiers.None);
+            DenetimSurucu.Wait(view, 0.3);
+            body.AppendLine($"birakinca serit acik: {view.SeritRevealed}");
+            window.Close();
+            return body.ToString();
+        });
+
+        File.WriteAllText(Kanit("serit-surukleme.txt"), rapor, new UTF8Encoding(false));
+        Assert.Contains("oynuyor: True", rapor);
+        Assert.Contains("surukleme boyunca serit acik: True", rapor);
+        Assert.Contains("birakinca serit acik: False", rapor);
+        Kapat("serit-surukleme.txt");
+    }
+
     [Fact]
     public void SeritDugmeleri_HamFareIle_MotoraUlasiyor()
     {

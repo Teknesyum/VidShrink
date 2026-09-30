@@ -1,6 +1,6 @@
 <!-- lang -->
 
-[<img src="docs/gorseller/badge-lang.svg" alt="English selected, switch to Türkçe" width="124" height="44">](README.md)
+[<img src="docs/gorseller/badge-lang.svg" alt="English selected, switch to Türkçe" width="124" height="44">](README.tr.md)
 
 # VidShrink
 

@@ -115,7 +115,7 @@ public sealed class UstPanelTests
 
         Assert.True(sonuc.oynaticida.IsVisible);
         Assert.NotEqual(sonuc.ust.bas, sonuc.ust.son);
-        Assert.Equal(96, sonuc.boy);
+        Assert.Equal(48, sonuc.boy);
         Assert.Equal(48, sonuc.tetik);
         Assert.Equal(sonuc.tetik, sonuc.penceredeTetik);
         Assert.Equal(sonuc.boy, sonuc.oynaticida.Height, 1);

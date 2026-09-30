@@ -133,7 +133,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   gizleme sınıfı iki parçayı kapatıyor. Kaynak metin okur; gizlenme ve anahat davranışı `OynaticiYolHaritasiTests`'te.
 - `OrtaTusKucukPencereTests.cs` — orta tuş tam ekrandan çalışma alanının üçte biri kadar ortalı pencereye iner (`CompactWindow.Fit`, pay `WindowCompactAreaShare`), ikinci basış tam ekrana döner; en küçük pencere boyutu geçici iner, sekme değişince `RestoreWindowMin` geri koyar. F tuşu önceki dikdörtgene döner (`OynaticiGirdiTestsPencereYazma`). Karekökü kaldıran mutasyon 4/7 kırmızı.
 - `UstPanelTests.cs` — oynatıcının tek üst paneli `TopOverlay`: şerit, başlık düğmeleri ve paravan içinde, `chrome-hidden`
-  üçünü birden kapatır; paravan 96 px, tetik bandı 48 px, alt paravanın aynası, yalnız oynatıcıda. Başlık düğmeleri ve
+  üçünü birden kapatır; paravan 48 px, tetik bandı 48 px, alt paravanın aynası, yalnız oynatıcıda. Başlık düğmeleri ve
   sekmelerde görünür anahat yok; hover/basılı zemin `NeonBlueFill`, yazı `TextBody` (pembe/mavi yazı hiçbir dolguda 36 palette 7:1 tutmuyor). Başsız saat donuk olduğu için `Transitions` kapatılır.
 - `OynaticiKisayolTests.cs` — tarifteki her kısayol gerçek girdi olayıyla PlayerView'a verilir, etkisi motordan geri okunur;
   döndürme karenin piksellerinden. Kanıt `.calisma/oynatici-kisayol/`. `CtrlShiftS` kolu artık

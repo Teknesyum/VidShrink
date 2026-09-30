@@ -653,6 +653,11 @@ public sealed class OynaticiYolHaritasiTests
             var motor = new YolMotoru();
             var view = Ac(motor, out var window);
             var simge = view.FindControl<Border>("PauseGlyph")!;
+            var ikon = view.FindControl<Avalonia.Controls.Shapes.Path>("PauseGlyphIcon")!;
+            var oynatSekli = view.FindResource("IconPlay");
+            var durdurSekli = view.FindResource("IconPause");
+            var oynatmaSimgesi = true;
+            var durdurmaSimgesi = true;
             var yuzey = view.FindControl<Panel>("Surface")!;
             var tutma = Sure(view, "PauseGlyphHold");
             var hizli = Sure(view, "MotionFast");
@@ -661,7 +666,11 @@ public sealed class OynaticiYolHaritasiTests
 
             void Oynat()
             {
-                if (!view.IsPlaying) view.Apply(Keymap.PlayPause.ToCommand());
+                if (!view.IsPlaying)
+                {
+                    view.Apply(Keymap.PlayPause.ToCommand());
+                    oynatmaSimgesi &= simge.IsVisible && ReferenceEquals(ikon.Data, oynatSekli);
+                }
                 Dongu(() => !simge.IsVisible, 2);
             }
 
@@ -672,9 +681,10 @@ public sealed class OynaticiYolHaritasiTests
             {
                 Oynat();
                 DenetimSurucu.Wait(view, 0.1);
-                Assert.False(simge.IsVisible, "oynatmada simge gorunmemeli");
+                Assert.False(simge.IsVisible, "oynatma simgesi sonmeden duraklatma olculmez");
                 var saat = Stopwatch.StartNew();
                 view.Apply(Keymap.PlayPause.ToCommand());
+                durdurmaSimgesi &= ReferenceEquals(ikon.Data, durdurSekli);
                 var ornekler = new List<(double Ms, double Op)>();
                 while (simge.IsVisible && saat.Elapsed.TotalSeconds < 2)
                 {
@@ -708,12 +718,14 @@ public sealed class OynaticiYolHaritasiTests
             body.AppendLine($"simge {YolKanit.N(simge.Bounds.Width)}x{YolKanit.N(simge.Bounds.Height)}, merkez {merkez}, yuzey {yuzey.Bounds.Size}, tik gecirgen {!simge.IsHitTestVisible}");
 
             var enKisa = sureler.Min();
-            body.AppendLine($"en kisa {YolKanit.N(enKisa)} ms, giriste ara saydamlik {girisAra}, cikista ara saydamlik {cikisAra}");
+            body.AppendLine($"en kisa {YolKanit.N(enKisa)} ms, oynatma simgesi {oynatmaSimgesi}, duraklatma simgesi {durdurmaSimgesi}, giriste ara saydamlik {girisAra}, cikista ara saydamlik {cikisAra}");
             view.Close();
             window.Close();
 
             Assert.InRange(enKisa, tutma.TotalMilliseconds - 30, tutma.TotalMilliseconds + 90);
             Assert.True(ikinciGorunur, "eski cikisin gizlemesi yeni simgeyi kapatti");
+            Assert.True(oynatmaSimgesi, "oynatmada ortada oynatma simgesi belirmeli");
+            Assert.True(durdurmaSimgesi, "duraklatmada ortada duraklatma simgesi belirmeli");
             Assert.True(girisAra && cikisAra, "giris ya da cikis animasyonsuz");
             Assert.NotNull(merkez);
             Assert.Equal(yuzey.Bounds.Width / 2, merkez!.Value.X, 0);

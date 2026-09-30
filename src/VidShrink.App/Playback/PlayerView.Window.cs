@@ -89,6 +89,12 @@ internal partial class PlayerView
         SeekBar.AddHandler(PointerPressedEvent, OnSeekPressed);
         SeekBar.AddHandler(PointerMovedEvent, OnSeekMoved);
         SeekBar.AddHandler(PointerReleasedEvent, OnSeekReleased);
+        SeekBar.PointerCaptureLost += (_, _) =>
+        {
+            if (!_seekDragging) return;
+            _seekDragging = false;
+            HoldSerit();
+        };
         SeekBar.SizeChanged += (_, _) =>
         {
             _marksKey = "";
@@ -398,6 +404,7 @@ internal partial class PlayerView
         if (!e.GetCurrentPoint(SeekBar).Properties.IsLeftButtonPressed) return;
         _seekDragging = true;
         e.Pointer.Capture(SeekBar);
+        HoldSerit();
         SeekToPointer(e.GetPosition(SeekBar).X);
         e.Handled = true;
     }
@@ -414,6 +421,7 @@ internal partial class PlayerView
         if (!_seekDragging) return;
         _seekDragging = false;
         e.Pointer.Capture(null);
+        HoldSerit();
         HideThumbnail();
         e.Handled = true;
     }

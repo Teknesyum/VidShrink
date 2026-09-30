@@ -7,6 +7,18 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-09-29
+
+### Changed
+
+- Player: the dark veil behind the top panel is half as tall (48 px); it covers the tab strip and fades right below it instead of darkening a wide band of the video.
+- Player: the centre play/pause glyph now has a pink outline, and pressing play shows a play glyph the same way pausing shows the pause glyph.
+
+### Fixed
+
+- Player: dragging the timeline no longer hides the bottom control strip when the pointer leaves the strip; it stays until the button is released.
+- README: the language badge on the English page now opens the Turkish page.
+
 ## [1.2.1] - 2026-09-29
 
 ### Fixed

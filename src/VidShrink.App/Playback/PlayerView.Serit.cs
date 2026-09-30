@@ -163,12 +163,12 @@ internal partial class PlayerView
     }
 
     /// <summary>
-    /// Seridi acik tutan sebepler: fare seridin uzerinde ya da oynatma duraklamis. Biri
+    /// Seridi acik tutan sebepler: fare seridin uzerinde, zaman cubugu surukleniyor ya da oynatma duraklamis. Biri
     /// bile dogruyken gecikmeli kaybolma calismaz.
     /// </summary>
     private void HoldSerit()
     {
-        _serit?.Hold(_pointerOnSerit);
+        _serit?.Hold(_pointerOnSerit || _seekDragging);
         _serit?.Keep(!_playing);
     }
 

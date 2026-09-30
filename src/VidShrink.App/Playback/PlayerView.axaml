@@ -35,11 +35,13 @@
               <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}"/>
             </Transitions>
           </Border.Transitions>
-          <Path Width="{StaticResource PauseGlyphSize}"
+          <Path x:Name="PauseGlyphIcon" Width="{StaticResource PauseGlyphSize}"
                 Height="{StaticResource PauseGlyphSize}"
                 Stretch="Uniform"
                 Data="{StaticResource IconPause}"
-                Fill="{StaticResource NeonBlue}"/>
+                Fill="{StaticResource NeonBlue}"
+                Stroke="{StaticResource NeonPink}"
+                StrokeThickness="{StaticResource SliderThumbStroke}"/>
         </Border>
         <TextBlock x:Name="TxtEmpty"
                    Text="{loc:Text main.player.empty}"

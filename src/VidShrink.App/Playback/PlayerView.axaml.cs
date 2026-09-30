@@ -9,6 +9,7 @@ using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Media.Transformation;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -568,29 +569,30 @@ internal partial class PlayerView : UserControl
         if (_playing)
         {
             engine.Play();
+            FlashPause(true);
         }
         else
         {
             _seek.Follow(engine.PositionSeconds);
             engine.Pause();
             SaveHistory(false);
-            FlashPause();
+            FlashPause(false);
         }
     }
 
     /// <summary>
-    /// Duraklatinca sahnenin ortasinda kisa bir duraklatma simgesi belirir: girisi ve
+    /// Oynatip duraklatinca sahnenin ortasinda kisa bir oynatma ya da duraklatma simgesi belirir: girisi ve
     /// cikisi <c>MotionFast</c> (giris <c>MotionInstant</c>, iki kat hizli), ekranda toplam kalisi giris ve cikis dahil
-    /// <c>PauseGlyphHold</c> (tarif: 0,5 sn). Oynatmada karsiligi yok — orada goruntunun
-    /// onune konan her sey icerigi kapatir. Ust uste duraklatmada eski cikisin gizlemesi
+    /// <c>PauseGlyphHold</c> (tarif: 0,5 sn). Ust uste basista eski cikisin gizlemesi
     /// yeni simgeyi kapatmasin diye her parlama bir sira numarasi tasir.
     /// </summary>
-    private void FlashPause()
+    private void FlashPause(bool playing)
     {
         _pauseFlash ??= new DispatcherTimer();
         _pauseFlash.Stop();
         _pauseFlashSira++;
 
+        PauseGlyphIcon.Data = (Geometry)this.FindResource(playing ? "IconPlay" : "IconPause")!;
         PauseGlyph.IsVisible = true;
         GlyphMotion(MotionInstant);
         PauseGlyph.Opacity = PauseGlyphOpacity;
