@@ -181,11 +181,12 @@ Her sekmenin tam turu: [`docs/kullanim.tr.md`](docs/kullanim.tr.md).
 
 Windows'ta [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
 dosyasını indirip çalıştırın. Kendi başına çalışan küçük bir program: PowerShell de yönetici
-hakkı da gerekmez. Aşağıdaki betik de aynı kurulumu yapıyor.
+hakkı da gerekmez. Aşağıdaki betik de aynı kurulumu yapıyor; PowerShell'e ya da Komut
+İstemi'ne yapıştırın. WinGet yoksa FFmpeg'i pinlenmiş arşivden indirir.
 
 ```powershell
 # Windows
-irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; iex (irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1)"
 ```
 
 ```bash
@@ -538,11 +539,13 @@ başlattığı ve o anda kimin gizlilik politikasının geçerli olduğu:
 
 ## Tek Satırda Kurulum
 
-Windows 10 ya da 11'de PowerShell'e yapıştırın. Son `VidShrink-Setup.exe`'yi indirip
-çalıştırır; yönetici yetkisi istemez.
+Windows 10 ya da 11'de PowerShell'e ya da Komut İstemi'ne yapıştırın. Son
+`VidShrink-Setup.exe`'yi geçici klasöre indirip çalıştırır; yönetici yetkisi ve WinGet
+istemez. Sürümler imzalanana kadar Akıllı Uygulama Denetimi açık olan bir bilgisayar
+VidShrink'i hangi yolla kurulursa kurulsun engeller.
 
 ```powershell
-irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile "$env:TEMP\VidShrink-Setup.exe"; & "$env:TEMP\VidShrink-Setup.exe"
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
 ```
 
 <!-- signature -->
