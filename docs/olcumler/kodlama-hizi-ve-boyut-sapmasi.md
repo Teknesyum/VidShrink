@@ -40,3 +40,51 @@ fps = kaynak kare (98) / kodlama süresi; süre **tüm denemeleri ve her iki ge�
 
 Makine yüksüzken hız; tek geçiş fps'i; birden fazla klip, içerik (ekran, karanlık) ve hedef (2 MB dışı); 10 sn'e yakın klip; kalibrasyon açıkken
 sapma (`--no-calibrate` kullanıldı); VMAF/XPSNR; 2 çekirdek dışı iş parçacığı sayısında hız; tekrar koşumla varyans.
+
+## Düzeltme Sonrası
+
+Durum: **kod değişti** (`BudgetFill.Bracket`, `EncodeRunner` bütçe doldurma kolu). Yukarı deneme hedefi aşar ve teslim edilen sonuç hedefin
+%97'sinin (`BudgetFill.Floor`) altında kalırsa iki ölçüm hedefi köşeler; motor bir deneme daha ister, bit hızını iki noktadan doğrusal aradeğerle
+`BudgetFill.AimFor` nişanına (0,985) koyar ve aşan denemenin bit hızının en az 1k altında tutar. Bu üçüncü deneme de hedefi aşarsa önceki sonuç
+teslim edilir: tavan gevşemez. Köşeleme yoksa ya da teslim %97 ve üstündeyse ek deneme yok. Kural her kodlayıcıda aynı (`AimFor` planı olan
+yazılım ve NVENC kolları). İkinci denemenin adım boyunu küçültmek ölçülmedi.
+
+### Düzenek
+
+- Klip yeniden kesildi: `-ss 325 -t 1.2 -map 0:v:0 -c copy` (demuxer 322,208 sn'deki anahtar kareye iner), 4,083 sn, 98 kare, 7,881 MB,
+  yalnız görüntü. Sayılar ilk ölçümün klibiyle aynı. Ses taşıyan ilk kesit (8,203 MB) ölçümden çıkarıldı.
+- "Önce" kolu: aynı dal, köşeleme kolu elle kapatılmış (`bracket = false`) Bench derlemesi; "sonra" kolu düzeltmenin kendisi.
+- Komut: `bench shrink klip4.mkv <hedef> --lock-codec <k> --no-calibrate --no-measure --threads 2`, `VIDSHRINK_BENCH_CEKIRDEK=2`, tek süreç, sırayla.
+  Toplam Bench süresi yaklaşık 9 dk.
+
+### Sonuç
+
+| Kol | Kodlayıcı | Hedef MB | Çıkan MB | Sapma % | Deneme | Kodlama sn | Denemeler (MB) |
+|---|---|---|---|---|---|---|---|
+| önce | libsvtav1 | 2 | 1,999 | -0,06 | 2 | 19,8 | 1,838 (bant altı) → 1,999 |
+| önce | libsvtav1 | 3 | 2,939 | -2,04 | 2 | 17,4 | 2,785 → 2,939 |
+| önce | libsvtav1 | 4 | 3,951 | -1,22 | 2 | 22,8 | 3,720 → 3,951 |
+| sonra | libsvtav1 | 1,5 | 1,493 | -0,50 | 2 | 21,2 | 1,394 → 1,493 |
+| sonra | libsvtav1 | 2 | 1,984 | -0,78 | 2 | 18,9 | 1,846 → 1,984 |
+| sonra | libsvtav1 | 2,5 | 2,460 | -1,60 | 2 | 23,8 | 2,312 → 2,460 |
+| sonra | libsvtav1 | 4 | 3,952 | -1,21 | 2 | 20,5 | 3,707 → 3,952 |
+| sonra | libsvtav1 | 5 | 4,933 | -1,34 | 2 | 26,2 | 4,626 → 4,933 |
+| sonra | libx264 | 2 | 1,969 | -1,56 | 2 | 19,2 | 1,920 → 1,969 |
+
+Sapma = Bench `FillPercent` - 100. Hiçbir kolda hedef aşımı yok.
+
+### Okuma
+
+- **Köşeleme bu koşumlarda canlı tetiklenmedi.** Sekiz SVT-AV1 koşumunun hiçbirinde yukarı deneme hedefi aşmadı; ilk ölçümdeki 2,007 MB yeniden
+  çıkmadı. Aynı 3743k istek bir koşumda 1,838 MB, ötekinde 1,846 MB verdi: SVT-AV1 koşumdan koşuma yaklaşık %0,4 oynuyor ve ilk ölçümün
+  aşımı bu oynamanın ucunda. Düzeltmenin etkisi bu yüzden canlı ölçümle değil, sahte kodlayıcılı birim testiyle gösterildi (aşağıda).
+- Canlı koşumlarda en büyük sapma -2,04 (önce, 3 MB); sonra kolundaki beş SVT-AV1 hedefinde en büyük sapma -1,60. Hepsi %3 içinde.
+- x264 2 MB'da -1,56 ve 2 deneme: ilk ölçümdeki -1,49 ile aynı yerde, gerileme yok. Bu koşumda makine yüksüzdü; kodlama 19,2 sn (ilk ölçümde 209,4).
+- Ek deneme maliyeti yalnız köşelemede ödenir: canlı koşumların hepsi 2 denemede kaldı.
+
+### Birim Testi
+
+`BudgetFillBracketTests` (ffmpeg'siz, `EncodeRunner.SahteKodlayici` bit hızından boyut yazar): 3600k → 1,842 MB, eğri üssü 1,3 (SVT-AV1 gibi
+fazla tepki veren kodlayıcı). Yukarı deneme hedefi aşıyor, üçüncü deneme %97–100 arasına iniyor ve teslim ediliyor; üçüncü deneme de aşarsa
+1,842 MB teslim ediliyor ve dosya tavanın altında; x264 kolunda yukarı deneme banda inince üçüncü deneme yok; teslim %97 üstündeyse ya da
+yukarı deneme aşmadıysa `Bracket` plan vermiyor. Mutasyon (köşeleme kolu `false`): 4 testin 2'si kırmızı (iki pozitif kol), iki negatif kontrol yeşil.
