@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "Nastavi Kot Privzeto",
   "settings-tab.default-app.hint": "Odpre stran Privzete aplikacije v sistemu Windows pri VidShrink; izbiro opravite tam.",
   "shell.menu.open": "Odpri ta videoposnetek z VidShrinkom",
-  "shell.menu.shrink": "Pomanjšaj z VidShrinkom",
+  "shell.menu.shrink": "Pomanjšaj z VidShrinkom",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

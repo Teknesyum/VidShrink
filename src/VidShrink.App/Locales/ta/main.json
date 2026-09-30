@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "இயல்புநிலையாக்கு",
   "settings-tab.default-app.hint": "Windows இயல்புநிலை பயன்பாடுகள் பக்கத்தை VidShrink பதிவில் திறக்கிறது; தேர்வு அங்கே செய்யப்படும்.",
   "shell.menu.open": "இந்த வீடியோவை VidShrink மூலம் திற",
-  "shell.menu.shrink": "VidShrink மூலம் சுருக்கு",
+  "shell.menu.shrink": "VidShrink மூலம் சுருக்கு",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "设为默认",
   "settings-tab.default-app.hint": "在 VidShrink 条目处打开 Windows 的默认应用页面；在那里进行选择。",
   "shell.menu.open": "用 VidShrink 打开此视频",
-  "shell.menu.shrink": "用 VidShrink 压缩",
+  "shell.menu.shrink": "用 VidShrink 压缩",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

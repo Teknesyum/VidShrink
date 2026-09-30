@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "Зробити За Замовчуванням",
   "settings-tab.default-app.hint": "Відкриває сторінку «Програми за замовчуванням» Windows на записі VidShrink; вибір робиться там.",
   "shell.menu.open": "Відкрити це відео у VidShrink",
-  "shell.menu.shrink": "Стиснути за допомогою VidShrink",
+  "shell.menu.shrink": "Стиснути за допомогою VidShrink",
   "shell.menu.target.size-8": "8 МБ",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 МБ)",
   "shell.menu.target.discord-free": "Discord (20 МБ)",

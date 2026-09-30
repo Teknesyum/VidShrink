@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "Postavi Kao Zadano",
   "settings-tab.default-app.hint": "Otvara stranicu Zadane aplikacije u sustavu Windows kod VidShrinka; odabir se radi ondje.",
   "shell.menu.open": "Otvori ovaj videozapis u VidShrinku",
-  "shell.menu.shrink": "Smanji pomoću VidShrinka",
+  "shell.menu.shrink": "Smanji pomoću VidShrinka",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

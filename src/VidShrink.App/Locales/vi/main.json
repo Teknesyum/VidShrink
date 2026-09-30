@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "Đặt Làm Mặc Định",
   "settings-tab.default-app.hint": "Mở trang Ứng dụng mặc định của Windows tại mục VidShrink; bạn chọn ở đó.",
   "shell.menu.open": "Mở video này bằng VidShrink",
-  "shell.menu.shrink": "Thu nhỏ bằng VidShrink",
+  "shell.menu.shrink": "Thu nhỏ bằng VidShrink",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

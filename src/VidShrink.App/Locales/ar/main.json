@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "جعله افتراضيًا",
   "settings-tab.default-app.hint": "يفتح صفحة التطبيقات الافتراضية في Windows على إدخال VidShrink؛ تختار هناك.",
   "shell.menu.open": "افتح هذا الفيديو باستخدام VidShrink",
-  "shell.menu.shrink": "صغّر باستخدام VidShrink",
+  "shell.menu.shrink": "صغّر باستخدام VidShrink",
   "shell.menu.target.size-8": "8 م.ب",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 م.ب)",
   "shell.menu.target.discord-free": "Discord (20 م.ب)",

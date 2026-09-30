@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "Imposta Come Predefinita",
   "settings-tab.default-app.hint": "Apre la pagina App predefinite di Windows sulla voce VidShrink; la scelta si fa lì.",
   "shell.menu.open": "Apri questo video con VidShrink",
-  "shell.menu.shrink": "Riduci con VidShrink",
+  "shell.menu.shrink": "Riduci con VidShrink",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

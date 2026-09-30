@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "기본값으로 설정",
   "settings-tab.default-app.hint": "Windows 기본 앱 페이지를 VidShrink 항목에서 엽니다. 선택은 그곳에서 합니다.",
   "shell.menu.open": "이 동영상을 VidShrink로 열기",
-  "shell.menu.shrink": "VidShrink로 줄이기",
+  "shell.menu.shrink": "VidShrink로 줄이기",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

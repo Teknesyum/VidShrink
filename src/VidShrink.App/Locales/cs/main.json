@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "Nastavit Jako Výchozí",
   "settings-tab.default-app.hint": "Otevře stránku Výchozí aplikace ve Windows u položky VidShrink; volbu provedete tam.",
   "shell.menu.open": "Otevřít toto video ve VidShrinku",
-  "shell.menu.shrink": "Zmenšit pomocí VidShrinku",
+  "shell.menu.shrink": "Zmenšit pomocí VidShrinku",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

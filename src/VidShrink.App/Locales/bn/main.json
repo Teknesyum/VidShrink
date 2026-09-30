@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "ডিফল্ট করুন",
   "settings-tab.default-app.hint": "Windows-এর ডিফল্ট অ্যাপ পৃষ্ঠা VidShrink-এর এন্ট্রিতে খোলে; সেখানেই বেছে নিন।",
   "shell.menu.open": "এই ভিডিওটি VidShrink দিয়ে খুলুন",
-  "shell.menu.shrink": "VidShrink দিয়ে ছোট করুন",
+  "shell.menu.shrink": "VidShrink দিয়ে ছোট করুন",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

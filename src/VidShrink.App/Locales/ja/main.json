@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "既定にする",
   "settings-tab.default-app.hint": "Windows の既定のアプリのページを VidShrink の項目で開きます。選択はそこで行います。",
   "shell.menu.open": "この動画を VidShrink で開く",
-  "shell.menu.shrink": "VidShrink で縮小する",
+  "shell.menu.shrink": "VidShrink で縮小する",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

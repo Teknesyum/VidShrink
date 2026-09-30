@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "Постави Као Подразумевано",
   "settings-tab.default-app.hint": "Отвара страницу „Подразумеване апликације“ у Windows-у код VidShrink-а; избор се прави тамо.",
   "shell.menu.open": "Otvori ovaj video u VidShrinku",
-  "shell.menu.shrink": "Smanji pomoću VidShrinka",
+  "shell.menu.shrink": "Smanji pomoću VidShrinka",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

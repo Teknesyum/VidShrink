@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "پیش‌فرض کردن",
   "settings-tab.default-app.hint": "صفحهٔ برنامه‌های پیش‌فرض Windows را روی VidShrink باز می‌کند؛ انتخاب آنجا انجام می‌شود.",
   "shell.menu.open": "این ویدیو را با VidShrink باز کن",
-  "shell.menu.shrink": "با VidShrink کوچک کن",
+  "shell.menu.shrink": "با VidShrink کوچک کن",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

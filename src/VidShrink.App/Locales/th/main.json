@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "ตั้งเป็นค่าเริ่มต้น",
   "settings-tab.default-app.hint": "เปิดหน้าแอปเริ่มต้นของ Windows ที่รายการ VidShrink เลือกได้ที่นั่น",
   "shell.menu.open": "เปิดวิดีโอนี้ด้วย VidShrink",
-  "shell.menu.shrink": "ย่อขนาดด้วย VidShrink",
+  "shell.menu.shrink": "ย่อขนาดด้วย VidShrink",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

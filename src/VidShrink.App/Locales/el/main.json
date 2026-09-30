@@ -541,7 +541,7 @@
   "settings-tab.default-app.button": "Ορισμός Ως Προεπιλογή",
   "settings-tab.default-app.hint": "Ανοίγει τη σελίδα Προεπιλεγμένες εφαρμογές των Windows στην καταχώριση VidShrink· η επιλογή γίνεται εκεί.",
   "shell.menu.open": "Άνοιγμα αυτού του βίντεο με το VidShrink",
-  "shell.menu.shrink": "Σμίκρυνση με το VidShrink",
+  "shell.menu.shrink": "Σμίκρυνση με το VidShrink",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",
