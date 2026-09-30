@@ -7,7 +7,7 @@ A tour of the tabs. The short version is in the [README](../README.md).
 Once a file is loaded, every decision is on screen with the reasoning behind it, before you
 start — the codec, the CRF, the resolution, the frame rate, the estimate and its range.
 
-![The Shrink tab with a file loaded: source details, the target size slider and chips and the quality slider on the left, the comparison panel and the What It Will Do panel in the middle spelling out encoder, two-pass bitrate, resolution and frame rate, and the Output panel with the size estimate on the right](gorseller/T201-kucult-en.png)
+![The Shrink tab with sunum-prototip.mp4 loaded and a 0.15 MB target: source details and the target and quality sliders on the left, the comparison panel in the middle with the source on the Original side of the split line and the planned output on the Processed side, the What It Will Do panel below it spelling out encoder, two-pass bitrate, resolution and frame rate, and the Output panel with the size estimate on the right](gorseller/T201-kucult-onizleme-en.png)
 
 Each target chip is a real limit somewhere, and its `?` badge says which.
 

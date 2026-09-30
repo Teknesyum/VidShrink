@@ -68,6 +68,10 @@ public static class Program
             return 1;
         }
 
+        var only = args.Length > 2
+            ? new HashSet<string>(args[2].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            : null;
+
         var clip = EnsureClip(given);
         Console.WriteLine($"klip\t{clip}");
 
@@ -75,7 +79,7 @@ public static class Program
 
         var written = new List<string>();
         foreach (var language in Languages)
-            written.AddRange(Capture(language, outDir, clip));
+            written.AddRange(Capture(language, outDir, clip, only));
 
         foreach (var path in written)
             Console.WriteLine($"{Path.GetFileName(path)}\t{new FileInfo(path).Length}");
@@ -85,64 +89,82 @@ public static class Program
     }
 
     /// <summary>Bir dilin butun kareleri. Her kare kendi penceresinde cekilir.</summary>
-    private static IReadOnlyList<string> Capture(string language, string outDir, string clip)
+    private static IReadOnlyList<string> Capture(string language, string outDir, string clip, ISet<string>? only)
     {
-        var made = new List<string>
+        var shots = new (string Topic, Func<string> Take)[]
         {
-            Shot(language, outDir, "kucult", window =>
-            {
-                Load(window);
-                SetTarget(window, "24");
-                SelectTab(window, "main.tab.shrink");
-                SettlePlan(window, "kucult");
-            }),
+            ("kucult-onizleme", () => Shot(language, outDir, "kucult-onizleme", window => ShrinkPreview(window, clip, 0))),
+            ("kucult-yakin", () => Shot(language, outDir, "kucult-yakin", window => ShrinkPreview(window, clip, PreviewZoomNotches))),
 
-            Shot(language, outDir, "donustur", window =>
+            ("donustur", () => Shot(language, outDir, "donustur", window =>
             {
-                Load(window);
+                LoadShown(window, clip);
                 SelectTab(window, "main.tab.convert");
                 SettlePlan(window, "donustur");
-            }),
+            })),
 
-            Shot(language, outDir, "kaydedici", window =>
+            ("kaydedici", () => Shot(language, outDir, "kaydedici", window =>
             {
                 SelectTab(window, "main.tab.recorder");
                 AutomaticRecorder(window);
-            }),
-            Shot(language, outDir, "ayarlar", window => SelectTab(window, "main.tab.settings")),
-            Shot(language, outDir, "gelismis", window => SelectTab(window, "main.tab.advanced")),
-            Shot(language, outDir, "hakkinda", window =>
+            })),
+            ("ayarlar", () => Shot(language, outDir, "ayarlar", window => SelectTab(window, "main.tab.settings"))),
+            ("gelismis", () => Shot(language, outDir, "gelismis", window => SelectTab(window, "main.tab.advanced"))),
+            ("hakkinda", () => Shot(language, outDir, "hakkinda", window =>
             {
                 SelectTab(window, "main.tab.settings");
                 Named(window, "AboutBody").IsVisible = true;
                 window.UpdateLayout();
                 ((ScrollViewer)Named(window, "PageSettings")).ScrollToEnd();
                 window.UpdateLayout();
-            }),
+            })),
 
-            Part(language, outDir, "onizleme", "Preview", window =>
-            {
-                LoadClip(window, clip);
-                SelectTab(window, "main.tab.shrink");
-                Relayout(window);
-                FreezePreview(window);
-            }),
-
-            Shot(language, outDir, "oynatici", window =>
+            ("oynatici", () => Shot(language, outDir, "oynatici", window =>
             {
                 SelectTab(window, "main.tab.player");
                 Relayout(window);
                 OpenInPlayer(window, clip);
-            }),
+            })),
 
-            Shot(language, outDir, "duzenleyici", window =>
+            ("duzenleyici", () => Shot(language, outDir, "duzenleyici", window =>
             {
                 Relayout(window);
                 OpenInEditor(window, clip);
-            })
+            }))
         };
 
-        return made;
+        return shots.Where(shot => only is null || only.Contains(shot.Topic)).Select(shot => shot.Take()).ToList();
+    }
+
+    /// <summary>Kucult karesinin hedefi, MB. 12 sn'lik kesitte kalitesiz tarafi gozle gorulur kilan deger.</summary>
+    private const string PreviewTargetMb = "0.15";
+
+    /// <summary>Yakin karede karsilastirma panelinin arti dugmesine kac kez basilir.</summary>
+    private const int PreviewZoomNotches = 4;
+
+    /// <summary>
+    /// Kucult sekmesi gercek klip yukluyken: hedef dusuk tutulur, plan yerlesir, karsilastirma
+    /// paneli donar. <paramref name="zoomNotches"/> sifirdan buyukse panelin kendi yakinlastirmasi
+    /// (<c>ComparisonPanel.Zoom</c>, arti dugmesinin yolu) panonun ortasindan uygulanir.
+    /// </summary>
+    private static void ShrinkPreview(MainWindow window, string clip, int zoomNotches)
+    {
+        LoadClip(window, clip);
+        SetTarget(window, PreviewTargetMb);
+        SelectTab(window, "main.tab.shrink");
+        Relayout(window);
+        SettlePlan(window, "kucult");
+        FreezePreview(window);
+
+        if (zoomNotches <= 0) return;
+
+        var panel = Named(window, "Preview");
+        var surface = (Visual)FieldValue(panel, "Surface")!;
+        var centre = new Point(surface.Bounds.Width / 2, surface.Bounds.Height / 2);
+        for (var notch = 0; notch < zoomNotches; notch++)
+            Call(panel, "Zoom", 1d, centre);
+        Relayout(window);
+        Console.Error.WriteLine($"iz	yakin	olcek={Read(Read(panel, "Gesture"), "Scale")}	kademe={Read(Read(panel, "Gesture"), "Shelter")}");
     }
 
     /// <summary>Panelin ilk karesini beklerken verilen ust sinir.</summary>
@@ -178,10 +200,6 @@ public static class Program
     /// <summary>Tum pencereyi cizer.</summary>
     private static string Shot(string language, string outDir, string topic, Action<MainWindow> arrange)
         => Draw(language, outDir, topic, arrange, window => (Visual)window.GetVisualChildren().Single());
-
-    /// <summary>Pencerenin tek bir adlandirilmis parcasini kendi olcusunde cizer.</summary>
-    private static string Part(string language, string outDir, string topic, string name, Action<MainWindow> arrange)
-        => Draw(language, outDir, topic, arrange, window => Named(window, name));
 
     /// <summary>
     /// Pencereyi kurar, istenen hale getirir ve secilen gorseli dosyaya cizer.
@@ -718,29 +736,34 @@ public static class Program
     }
 
     /// <summary>
-    /// Kaynak yoklamadan yuklenir: kucultme kareleri diskteki hicbir dosyaya ve ffmpeg'e
-    /// bagli degil, dolayisiyla gorsellerdeki sayilar her makinede ayni.
-    /// </summary>
-    private static void Load(MainWindow window)
-        => Invoke(window, "LoadWithoutProbing", SamplePath, Sample());
-
-    /// <summary>
     /// Gercek dosya yukler. Karsilastirma paneli kaynagi diskte bulamazsa kendini kapatiyor
     /// (<c>PanelHost.SetFiles</c>), dolayisiyla onizleme karesi ancak var olan bir dosyayla
     /// cekilebilir.
     /// </summary>
     private static void LoadClip(MainWindow window, string clip)
-        => Invoke(window, "LoadWithoutProbing", clip, ClipInfo(clip));
+        => Invoke(window, "LoadWithoutProbing", clip, ClipInfo(clip, clip));
+
+    /// <summary>
+    /// Dosyayi diskteki yeri yerine notr bir yolla yukler. Donustur karesi FFmpeg komutunu tam
+    /// yoluyla basiyor; gercek yol calisma agacinin yerel yolunu README'ye tasirdi.
+    /// </summary>
+    private static void LoadShown(MainWindow window, string clip)
+    {
+        var shown = Path.Combine(ShownFolder, Path.GetFileName(clip));
+        Invoke(window, "LoadWithoutProbing", shown, ClipInfo(clip, shown));
+    }
+
+    private const string ShownFolder = @"C:\Videos";
 
     private const int ClipSeconds = 12;
 
     /// <summary>Uretilen klibin bilgisi; degerler klibi ureten ffmpeg cagrisiyla ayni.</summary>
-    private static MediaInfo ClipInfo(string clip)
+    private static MediaInfo ClipInfo(string clip, string shown)
     {
         var bytes = new FileInfo(clip).Length;
         return new MediaInfo
         {
-            FilePath = clip,
+            FilePath = shown,
             FileSizeBytes = bytes,
             DurationSeconds = ClipSeconds,
             Width = 1280,
@@ -795,24 +818,6 @@ public static class Program
 
         return path;
     }
-
-    private const string SamplePath = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv";
-
-    private static MediaInfo Sample() => new()
-    {
-        FilePath = SamplePath,
-        FileSizeBytes = 420_000_000L,
-        DurationSeconds = 187.5,
-        Width = 3840,
-        Height = 2160,
-        Fps = 59.94,
-        VideoCodec = "hevc",
-        TotalBitrateBps = 18_800_000,
-        AudioCodec = "aac",
-        AudioBitrateBps = 192_000,
-        AudioChannels = 2,
-        PixelFormat = "yuv420p"
-    };
 
     /// <summary>
     /// <see cref="MainWindow"/> yukleme, dil ve solma yardimcilari <c>internal</c> ya da

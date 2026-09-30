@@ -15,7 +15,7 @@ yok.**
 [![Lisans AGPL-3.0-or-later](https://img.shields.io/badge/lisans-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#kurulum)
 
-![VidShrink Oynatıcı sekmesi Türkçe: pencereyi dolduran bir video, üstte Oynatıcı, Düzenleyici, Küçült, Dönüştür, Kaydedici ve Ayarlar sekmeleri, altta süre, ses, on saniyelik atlamalar, oynat-duraklat, hız, klip ve tam ekran düğmelerini taşıyan kontrol şeridi](docs/gorseller/T201-oynatici-tr.png)
+<a href="docs/gorseller/T201-oynatici-tr.png"><img src="docs/gorseller/T201-oynatici-tr.png" alt="VidShrink Oynatıcı sekmesi Türkçe: pencereyi dolduran bir video, üstte Oynatıcı, Düzenleyici, Küçült, Dönüştür, Kaydedici ve Ayarlar sekmeleri, altta süre, ses, on saniyelik atlamalar, oynat-duraklat, hız, klip ve tam ekran düğmelerini taşıyan kontrol şeridi" width="800"></a>
 
 ## Beş Uygulama Yerine Tek Uygulama
 
@@ -68,7 +68,7 @@ kontroller kayboluyor, fare gelince geri geliyor.
 
 ## Ekran Kaydedici
 
-![Kaydedici sekmesi Gelişmiş düzende, ayarları program seçerken: kaynak, ekran ve geri sayım seçicileri, Yeniden Ölç düğmesiyle tahmini süre ve boyut alanları, mikrofon ve sistem sesi seçicileri, Gelişmiş Kodlama, Kamera ve Kayıt Tamponu panelleri](docs/gorseller/T201-kaydedici-tr.png)
+<a href="docs/gorseller/T201-kaydedici-tr.png"><img src="docs/gorseller/T201-kaydedici-tr.png" alt="Kaydedici sekmesi Gelişmiş düzende, ayarları program seçerken: kaynak, ekran ve geri sayım seçicileri, Yeniden Ölç düğmesiyle tahmini süre ve boyut alanları, mikrofon ve sistem sesi seçicileri, Gelişmiş Kodlama, Kamera ve Kayıt Tamponu panelleri" width="800"></a>
 
 - **Ne** — tüm ekran, tek pencere ya da çizdiğiniz bir bölge; her platformun gerçekten sahip
   olduğu yakalama arka ucuyla: Windows'ta gdigrab, macOS'ta avfoundation, Linux'ta x11grab.
@@ -90,7 +90,7 @@ kontroller kayboluyor, fare gelince geri geliyor.
 
 ## Düzenleyici
 
-![Düzenleyici sekmesi: üstte video, altında Böl, Sil, Hız, Geri Al, Yinele, yakınlaştırma, Kaydet, Farklı Kaydet ve Dosyayı Paylaş düğmeleri, onların altında üç klibe bölünmüş zaman çizelgesi](docs/gorseller/T201-duzenleyici-tr.png)
+<a href="docs/gorseller/T201-duzenleyici-tr.png"><img src="docs/gorseller/T201-duzenleyici-tr.png" alt="Düzenleyici sekmesi: üstte video, altında Böl, Sil, Hız, Geri Al, Yinele, yakınlaştırma, Kaydet, Farklı Kaydet ve Dosyayı Paylaş düğmeleri, onların altında üç klibe bölünmüş zaman çizelgesi" width="800"></a>
 
 Herhangi bir sekmeden bir videoyu açın ve zaman çizelgesinde kesin: bölün, bir klibi ya da
 bir aralığı silin, klipleri taşıyın, her klibin hızını 0,01× ile 100× arasında ayarlayın,
@@ -106,7 +106,12 @@ Kaydet** ya da **Paylaş** — üç dışa aktarma kipinden biriyle:
 
 ## Tam Boyuta Küçült
 
-![Küçült sekmesi dosya yüklüyken: solda kaynak bilgileri, hedef boyut kaydırıcısı ve yongaları ile kalite kaydırıcısı, ortada karşılaştırma paneli ve kodlayıcıyı, iki geçişli bit hızını, çözünürlüğü ve kare hızını tek tek yazan Yapılacak İşlem paneli, sağda boyut kestirimini gösteren Çıktı paneli](docs/gorseller/T201-kucult-tr.png)
+<table>
+<tr>
+<td><a href="docs/gorseller/T201-kucult-onizleme-tr.png"><img src="docs/gorseller/T201-kucult-onizleme-tr.png" alt="Küçült sekmesi sunum-prototip.mp4 yüklü ve hedef 0,15 MB iken: solda kaynak bilgileri, hedef ve kalite kaydırıcıları, ortada mavi bölme çizgisinin Orijinal tarafında kaynak, İşlenmiş tarafında CRF 43'lük planlanan çıktıyla karşılaştırma paneli, altında libsvtav1, 72 kbit/sn iki geçiş, 666x374 ve 30 FPS yazan Yapılacak İşlem paneli, sağda kaliteyi 65,1/100 öngören Çıktı paneli" width="400"></a></td>
+<td><a href="docs/gorseller/T201-kucult-yakin-tr.png"><img src="docs/gorseller/T201-kucult-yakin-tr.png" alt="Aynı Küçült sekmesi, karşılaştırma paneli uygulamanın içinde %196'ya yakınlaştırılmış: bölme çizgisinin solunda kaynak kitap sırtlarının kenarlarını koruyor, sağında 0,15 MB'lık çıktı onları yumuşatıyor" width="400"></a></td>
+</tr>
+</table>
 
 Videoyu sürükleyin, bir boyuta dokunun, başlat deyin. İşin tamamı bu; otomatik kip kodeki,
 kalite düzeyini, çözünürlüğü ve kare hızını **sizin** dosyanız için seçiyor ve beklenen
@@ -121,30 +126,21 @@ puanlanıyor — ortalama, harmonik ortalama, 10. yüzdelik ve en kötü kare �
 tamamı toplu kuyruktan geçebiliyor; kuyruk bitince klasörü açıyor, bilgisayarı uyutuyor ya
 da kapatıyor.
 
-<details>
-<summary>Önizleme: plan koşmadan önce gerçekte ne üreteceği</summary>
-
-![Bir karede duraklatılmış karşılaştırma paneli: bölme çizgisinin solunda orijinal, sağında işlenmiş çıktı, köşede CRF 20, altta oynatma şeridi](docs/gorseller/T201-onizleme-tr.png)
-
-</details>
-
 <a id="donustur"></a>
 
 ## Dönüştür
 
-![Dönüştür sekmesi: kapsayıcı, kodek, kalite kipi, çözünürlük, kare hızı ve kırpma alanları, yanlarında FFmpeg Komutu ve İlerleme panelleri](docs/gorseller/T201-donustur-tr.png)
+<table>
+<tr>
+<td><a href="docs/gorseller/T201-donustur-tr.png"><img src="docs/gorseller/T201-donustur-tr.png" alt="Dönüştür sekmesi sunum-prototip.mp4 yüklüyken: kapsayıcı, kodek, kalite kipi, çözünürlük, kare hızı ve kırpma alanları, yanlarında FFmpeg Komutu ve İlerleme panelleri" width="400"></a></td>
+<td><a href="docs/gorseller/T201-gelismis-tr.png"><img src="docs/gorseller/T201-gelismis-tr.png" alt="Gizli Gelişmiş sekmesi: koşacak komutun kendisini gösteren FFmpeg Komut Satırı kutusu, AI Ayarları kutusu ve Başarım Ölçümü kutusu" width="400"></a></td>
+</tr>
+</table>
 
 MP4, MKV, WebM, MOV, AVI ve GIF; yalnız ses için MP3, M4A, WAV ve FLAC. H.264, H.265, VP9, AV1
 ya da doğrudan akış kopyası, kırpma ve ses çıkarma. **On sekiz hazır hedef** — WhatsApp,
 Discord, Telegram, Gmail, Outlook, Chromecast, Nest Hub, Apple TV ve fazlası — her alanı
 sizin yerinize dolduruyor.
-
-<details>
-<summary>Gizli Gelişmiş sekmesi: koşacak ffmpeg komutunun kendisi</summary>
-
-![Gelişmiş paneli: FFmpeg Komut Satırı kutusu, AI Ayarları kutusu ve Başarım Ölçümü kutusu](docs/gorseller/T201-gelismis-tr.png)
-
-</details>
 
 <a id="paylas"></a>
 
@@ -158,7 +154,7 @@ tavanları [`paylasim-hedefleri.json`](paylasim-hedefleri.json) içinde.
 
 ## Herkes İçin
 
-![Ayarlar sekmesi: dil ve tema seçicileri, sağ tık menüsü girdileri, kendiliğinden güncelleme anahtarı, çıktı, altyazı ve paylaşım ayarları](docs/gorseller/T201-ayarlar-tr.png)
+<a href="docs/gorseller/T201-ayarlar-tr.png"><img src="docs/gorseller/T201-ayarlar-tr.png" alt="Ayarlar sekmesi: dil ve tema seçicileri, sağ tık menüsü girdileri, kendiliğinden güncelleme anahtarı, çıktı, altyazı ve paylaşım ayarları" width="800"></a>
 
 **Pencerenin tamamı 42 dil konuşuyor** — her düğme, her uyarı, her ipucu; Arapçadan
 Vietnamcaya — ve yanında **36 renk teması** geliyor: Catppuccin, Dracula, Gruvbox, Nord, Rose
@@ -177,51 +173,6 @@ Yukarıdakilerin hepsi tek komutla geri alınıyor — bkz. [Kurulum](#kurulum).
 
 Her sekmenin tam turu: [`docs/kullanim.tr.md`](docs/kullanim.tr.md).
 
-## Kurulum
-
-**Windows'ta önerilen: Teknesyum Base.**
-
-1. [`Teknesyum-Base.exe`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe) dosyasını ([`.sha256`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe.sha256)) indirip çalıştırın. Yönetici hakkı gerekmez.
-2. Listeden **VidShrink** uygulamasını bulup kurun. Base sonradan güncellemeyi ve kaldırmayı da yapar.
-
-Base henüz imzalı değil; Windows SmartScreen ilk açılışta uyarabilir: *Ek bilgi*'yi, sonra *Yine de çalıştır*'ı seçin. Ayrıntı: [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
-
-**Diğer platformlar ya da elle:**
-
-Windows'ta [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
-dosyasını indirip çalıştırın. Kendi başına çalışan küçük bir program: PowerShell de yönetici
-hakkı da gerekmez. Aşağıdaki betik de aynı kurulumu yapıyor; PowerShell'e ya da Komut
-İstemi'ne yapıştırın. WinGet yoksa FFmpeg'i pinlenmiş arşivden indirir.
-
-```powershell
-# Windows
-powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; iex (irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1)"
-```
-
-```bash
-# macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
-```
-
-Yönetici hakkı yok, .NET SDK yok. Her sürüm tek bir sürüm numarasından dört hedef üretiyor:
-`win-x64`, `osx-arm64`, `osx-x64`, `linux-x64`. Gerekenler: Windows 10 ya da 11, macOS 14 ve
-üstü, ya da X11/Wayland koşan bir Linux masaüstü, artı `ffmpeg` ve `ffprobe`. FFmpeg ve
-libmpv sürümle birlikte gelmiyor; kurucu bunları Windows'ta pinlenmiş SHA-256 özetlerine
-karşı indiriyor, diğerlerinde paket yöneticinizin komutunu yazıyor. Windows sürümleri,
-sertifika verildiğinde [Kod İmzalama Politikası](#kod-imzalama-politikasi) altında
-imzalanıyor.
-
-**Kaldırma.** `VidShrink-Setup.exe --uninstall` kısayolları, sağ tık girdilerini, Birlikte aç
-kaydını ve kurulum klasörünü siliyor. macOS ve Linux'ta aynı kurucuyu `--uninstall` ile
-çalıştırın:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh -s -- --uninstall
-```
-
-Sağlama doğrulaması, sağ tık girdisi, kendi kendini güncelleme akışı ve bütün anahtarlar
-[`docs/kurulum.tr.md`](docs/kurulum.tr.md) içinde.
-
 ## Komut satırı
 
 Aynı paket, pencerenin yanında başsız bir komut satırı aracı da taşıyor: Windows ve
@@ -234,6 +185,9 @@ vidshrink kucult clip.mp4 --hedef 25MB              # boyuta küçült
 vidshrink kucult clip.mp4 --kalite 80 --kodek av1   # kalite puanına küçült
 vidshrink plan clip.mp4 --hedef 8MB --json          # yalnız plan ve argümanlar, kodlama yok
 ```
+
+<details>
+<summary>Bütün anahtarlar, İngilizce takma adlar ve çıkış kodları</summary>
 
 Anahtarlar: `--kodek auto|h264|hevc|av1`, `--cikti <yol>`, `--json`, `--olcumsuz` (yoklama
 kodlamalarını atlar), `--vmaf` (ffmpeg'de libvmaf varsa sonucu ölçer), `--hizli`. İlerleme
@@ -305,6 +259,8 @@ bunların tek yazımı var.
 saklandı), boy tavanı aşıldığında `3` (en küçük sonuç yine yazılıyor; JSON `output` ve
 `overTarget: true` taşıyor), hatada `1`, yanlış kullanımda `64`, iptalde `130`.
 
+</details>
+
 ### İzlenen klasör
 
 ```bash
@@ -314,6 +270,9 @@ vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB --bir-kez   # klasörü boş
 
 `izle`, klasöre düşen her videoyu küçültüyor. `--cikti` çıktı klasörüdür ve zorunludur;
 izlenen klasörün kendisi olamaz.
+
+<details>
+<summary>Dosya ne zaman alınır, ilerleme nerede tutulur, harf büyüklüğü ve çıkış kodları</summary>
 
 `--aralik <saniye>` tarama aralığını belirliyor (varsayılan 2), `--bir-kez` beklenecek bir
 şey kalmayınca çıkıyor, `kucult`'un öbür anahtarları her dosyaya uygulanıyor. `--json` ile
@@ -361,7 +320,15 @@ yeni dosya olarak görüp küçültüyor.
 ad çakışması yüzünden atlandığında `4`, hatada `1`, yanlış kullanımda `64`, Ctrl+C ile
 durdurulduğunda `130`. `--bir-kez` sonunda kaç dosyanın atlandığı bir özet satırında yazıyor.
 
+</details>
+
 ## Sayılar
+
+Ölçülen 36 vakada hedef boyut bir kez bile aşılmadı — **0/36 aşım** — ve geride kaldığımız iki
+yer de yanında yayımlı.
+
+<details>
+<summary>Tablo, kapılar ve geride kaldığımız yerler</summary>
 
 Burada arama tablosu yok. *Ölç* diyen her adım, karar verilmeden önce ffmpeg'i gerçek
 dosyanıza karşı koşturuyor — iki çözünürlük ve iki CRF'te kısa örnek kodlamalar, bir sahne
@@ -397,12 +364,16 @@ beşi de, tek sert taban ihlali de (6,80 MB tabana karşı 6,68 MB) `libsvtav1`*
 73,5 saniyeye kadar), çünkü aynı girdiye farklı koşumda farklı sayıda düzeltme turu
 koşuluyor. İki tekrar bunu görünür kıldı; tek koşum olsaydı sabit bir sayı sanılacaktı.
 
-**HandBrake algısal kalitede hâlâ önde.** 17 dakikalık 1080p60 HDR kaynakta, teslim edilen
-boyut eşitken (±%2), HandBrake'in x265 preset'i **ortalama 8,79 VMAF-NEG**, **2,60 dB
-XPSNR** ve **0,0299 SSIM** önde
-([`docs/olcumler/handbrake-acigi.md`](docs/olcumler/handbrake-acigi.md)) — psy-rd, psy-rdoq
-ve uyarlamalı nicemleme, ki argümanlarımız bunları henüz taşımıyor. Bu açığı kapatmak yol
-haritasının ilk maddesi.
+**HandBrake: eş boyutta öndeyiz, karanlık bantlaşmada gerideyiz.** HandBrakeCLI 1.11.2'nin
+x265 `slow` ön ayarına karşı, teslim edilen bayt eşitken 8 SDR satırının 8'inde
+([`handbrake-kiyas-b1-sdr.md`](docs/olcumler/handbrake-kiyas-b1-sdr.md)) ve 4 HDR10 satırının
+3'ünde ([`handbrake-kiyas-b4-hdr.md`](docs/olcumler/handbrake-kiyas-b4-hdr.md)) öndeyiz.
+Karanlık sahneler hâlâ daha çok bantlaşıyor: karanlık kesitte AV1 çıktımız CAMBI 9,31 ve
+9,39, HandBrake 6,48 ve 6,49 alıyor; düşük olan iyi
+([`handbrake-kiyas-b7-aciklar.md`](docs/olcumler/handbrake-kiyas-b7-aciklar.md)). Bu açık
+duruyor ve yol haritasının ilk maddesi.
+
+</details>
 
 ## Nasıl ölçüyoruz
 
@@ -410,7 +381,7 @@ Düzenek, yargıladığı özellikten uzun sürdü; çünkü iki kodlamayı ayı
 sonsuza kadar sayı basar ve yanlışlığını kendi söylemez.
 
 <details>
-<summary>Bir sayıya güvenilebilmesi için düzeneğin yaptığı altı şey</summary>
+<summary>Bir sayıya güvenilebilmesi için düzeneğin yaptığı altı şey ve düzeneğin yeri</summary>
 
 - **Cevap vermeyi reddeden bir renk kapısı.** Her çıktının renk uzayı, transferi,
   primaries'i ve piksel biçimi ffprobe ile okunup referansla karşılaştırılıyor. Etiketsiz
@@ -435,8 +406,6 @@ sonsuza kadar sayı basar ve yanlışlığını kendi söylemez.
   puanıyla ayırmak zorunda; ayıramazsa kendini duyarsız işaretliyor. Ölçülen: HandBrake için
   **+39,26**, VidShrink için **+39,85** — eşiğin kırk katı.
 
-</details>
-
 Düzeneğin tamamı: [`docs/olcumler/ab-duzenegi.md`](docs/olcumler/ab-duzenegi.md).
 Kaydedicinin otomatik kipi de aynı yolla ölçülüyor — makineden kurulan bir aday merdiveni,
 sonra [aday başına üç saniyelik gerçek kayıt](src/VidShrink.Ffmpeg/RecorderAutoProbe.cs) ve
@@ -444,6 +413,8 @@ düşen kare sayımı; bugünkü motorla yeniden ölçümü
 [`docs/olcumler/auto-mod-yeni-taban.md`](docs/olcumler/auto-mod-yeni-taban.md) içinde. Yüzü
 aşkın böyle belge [`docs/olcumler/`](docs/olcumler/) altında; buradaki her sayı birinden
 geliyor.
+
+</details>
 
 ## Kaputun altında
 
@@ -491,17 +462,19 @@ bugünkü sınırlar: [`docs/motor.tr.md`](docs/motor.tr.md).
 
 Ölçülmüş, açık, bu sırayla — ayrıntı [`docs/YOL-HARITASI.md`](docs/YOL-HARITASI.md) içinde.
 
-- **HandBrake'i algı tarafında da geçmek.** Hedef boyuta oturtmayı zaten biz kazanıyoruz;
-  yukarıdaki 8,79 VMAF-NEG açığı psy-rd, psy-rdoq ve uyarlamalı nicelemeden geliyor ve bu
-  anahtarlar bizim argümanlarımızda henüz yok. Ölçüt aynı düzenek, aynı kaynak, açık önce
-  sıfıra sonra bizim tarafa — iddia değil, ölçüm.
+- **HandBrake'le kalan son açığı kapatmak: karanlık sahnede bantlaşma.** Eş boyutta SDR'de
+  ve HDR10'da HandBrake'in zaten önündeyiz; karanlık içerikte AV1 çıktımız hâlâ daha çok
+  bantlaşıyor (CAMBI 9,31 ve 9,39'a karşı 6,48 ve 6,49). Ölçüt aynı düzenek, aynı kaynak,
+  açık sıfırda — iddia değil, ölçüm.
 - **AV1 dalının hedef altına düşmesi** — beş bant kaçağının beşi `libsvtav1`, düzeltme
   turları kapatamıyor.
 - **Ölçüm düzeneğinin zamanda hizalanması**, ki kare hızı düşüren planlar ölçülebilsin.
 - **Tepe hızı tavanını açmak**, ki bu küçük hedeflerdeki donanım aşımını da düzeltiyor.
 - **Ölçek ve kare hızı cezalarını ölçülmüş kaliteye göre kalibre etmek**; planlayıcının
   bugün kullandığı sabitlerin yerine.
-- **Klip yerine sahne başına kodlama** — geriye kalan en büyük yapısal kazanç.
+- **Klip yerine sahne başına kodlama** — ölçüldü, ürüne girmedi: bütçeyi sahneye bölmek
+  kalite kapısını geçmedi ve varsayılan AV1 kodlayıcısı sahne başına bölgeleri okumuyor
+  ([`sahne-butcesi.md`](docs/olcumler/sahne-butcesi.md)).
 
 ## Katkı
 
@@ -528,14 +501,19 @@ System Icons (MIT) — [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) dosyas
 [SignPath Foundation](https://signpath.org) tarafından sağlanır. Başvuru değerlendirmede;
 onaylanana kadar Windows sürümleri imzasız çıkar.
 
+**Gizlilik.** Bu program, kullanıcı ya da onu kuran veya çalıştıran kişi özellikle
+istemedikçe başka ağ sistemlerine bilgi aktarmaz.
+
+<details>
+<summary>İmzayı kim onaylar, uygulamanın yapabildiği her istek</summary>
+
 - Kod yazan, gözden geçiren ve onaylayan: [Teknesyum](https://github.com/Teknesyum)
 
 Yalnız bu depodan GitHub Actions'ın derlediği dosyalar imzalanır; her imza isteği elle
 onaylanır. Ekipteki herkes çok aşamalı doğrulamayla oturum açar.
 
-**Gizlilik.** Bu program, kullanıcı ya da onu kuran veya çalıştıran kişi özellikle
-istemedikçe başka ağ sistemlerine bilgi aktarmaz. Yapabildiği istekler, her birini neyin
-başlattığı ve o anda kimin gizlilik politikasının geçerli olduğu:
+Yapabildiği istekler, her birini neyin başlattığı ve o anda kimin gizlilik politikasının
+geçerli olduğu:
 
 - **Güncelleme denetimi** — GitHub'a son sürümü sorar. Windows'ta varsayılan açık;
   Ayarlar'dan kapatılır. [GitHub Gizlilik Bildirimi](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
@@ -546,16 +524,69 @@ başlattığı ve o anda kimin gizlilik politikasının geçerli olduğu:
 - **OpenSubtitles** — yalnız siz kullandığınızda oturum açar ve arar.
   [OpenSubtitles gizlilik politikası](https://www.opensubtitles.com/en/privacy/)
 
-## Tek Satırda Kurulum
+</details>
 
-Windows 10 ya da 11'de PowerShell'e ya da Komut İstemi'ne yapıştırın. Son
-`VidShrink-Setup.exe`'yi geçici klasöre indirip çalıştırır; yönetici yetkisi ve WinGet
-istemez. Sürümler imzalanana kadar Akıllı Uygulama Denetimi açık olan bir bilgisayar
-VidShrink'i hangi yolla kurulursa kurulsun engeller.
+## Kurulum
+
+Windows 10 ya da 11'de üç yol, bu sırayla. Hiçbiri yönetici hakkı istemez.
+
+1. **Teknesyum Base — önerilen yol.**
+   [`Teknesyum-Base.exe`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe)
+   dosyasını ([`.sha256`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe.sha256))
+   indirip çalıştırın, listeden **VidShrink**'i bulup kurun. Base sonradan güncellemeyi ve
+   kaldırmayı da yapar. Base henüz imzalı değil; Windows SmartScreen ilk açılışta uyarabilir:
+   *Ek bilgi*'yi, sonra *Yine de çalıştır*'ı seçin. Ayrıntı: [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
+2. **VidShrink-Setup.exe.**
+   [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
+   dosyasını indirip çalıştırın. Kendi başına çalışan küçük bir program: PowerShell de WinGet
+   de gerekmez.
+3. **Tek satır kod.** PowerShell'e ya da Komut İstemi'ne yapıştırın. Son
+   `VidShrink-Setup.exe`'yi geçici klasöre indirip çalıştırır — 2. yoldaki kurucunun aynısı.
+
+   ```powershell
+   powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
+   ```
+
+Sürümler imzalanana kadar Akıllı Uygulama Denetimi açık olan bir bilgisayar VidShrink'i
+hangi yolla kurulursa kurulsun engeller.
+
+**Kaldırma.** `VidShrink-Setup.exe --uninstall` kısayolları, sağ tık girdilerini, Birlikte aç
+kaydını ve kurulum klasörünü siliyor.
+
+### macOS ve Linux
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
+```
+
+Kaldırmak için aynı kurucuyu `--uninstall` ile çalıştırın:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh -s -- --uninstall
+```
+
+<details>
+<summary>Gerekenler, kurucunun indirdikleri ve PowerShell betiği</summary>
+
+Yönetici hakkı yok, .NET SDK yok. Her sürüm tek bir sürüm numarasından dört hedef üretiyor:
+`win-x64`, `osx-arm64`, `osx-x64`, `linux-x64`. Gerekenler: Windows 10 ya da 11, macOS 14 ve
+üstü, ya da X11/Wayland koşan bir Linux masaüstü, artı `ffmpeg` ve `ffprobe`. FFmpeg ve
+libmpv sürümle birlikte gelmiyor; kurucu bunları Windows'ta pinlenmiş SHA-256 özetlerine
+karşı indiriyor, diğerlerinde paket yöneticinizin komutunu yazıyor. Windows sürümleri,
+sertifika verildiğinde [Kod İmzalama Politikası](#kod-imzalama-politikasi) altında
+imzalanıyor.
+
+Windows'ta `Install-VidShrink.ps1` betiği aynı kurulumu yapar; WinGet yoksa
+FFmpeg'i pinlenmiş arşivden indirir:
 
 ```powershell
-powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; iex (irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1)"
 ```
+
+Sağlama doğrulaması, sağ tık girdisi, kendi kendini güncelleme akışı ve bütün anahtarlar
+[`docs/kurulum.tr.md`](docs/kurulum.tr.md) içinde.
+
+</details>
 
 <!-- signature -->
 <div align="center">

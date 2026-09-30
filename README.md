@@ -14,7 +14,7 @@ with the internet off · 42 languages · 36 themes · Open source**
 [![License AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#install)
 
-![The VidShrink Player tab in English: a video filling the window, the tab bar across the top with Player, Editor, Shrink, Convert, Recorder and Settings, and the control strip along the bottom with the time, volume, ten-second jumps, play and pause, speed, clip and full screen](docs/gorseller/T201-oynatici-en.png)
+<a href="docs/gorseller/T201-oynatici-en.png"><img src="docs/gorseller/T201-oynatici-en.png" alt="The VidShrink Player tab in English: a video filling the window, the tab bar across the top with Player, Editor, Shrink, Convert, Recorder and Settings, and the control strip along the bottom with the time, volume, ten-second jumps, play and pause, speed, clip and full screen" width="800"></a>
 
 ## One App Instead Of Five
 
@@ -63,7 +63,7 @@ fade out while the film plays and come back when the mouse does.
 
 ## Screen Recorder
 
-![The Recorder tab in the Advanced layout with the program picking the settings: the source, screen and countdown pickers, the approximate length and size fields with Measure Again, the microphone and system sound pickers, and the Advanced Encoding, Webcam and Replay Buffer panels](docs/gorseller/T201-kaydedici-en.png)
+<a href="docs/gorseller/T201-kaydedici-en.png"><img src="docs/gorseller/T201-kaydedici-en.png" alt="The Recorder tab in the Advanced layout with the program picking the settings: the source, screen and countdown pickers, the approximate length and size fields with Measure Again, the microphone and system sound pickers, and the Advanced Encoding, Webcam and Replay Buffer panels" width="800"></a>
 
 - **What** — the whole screen, one window or a region you draw, through the capture
   backend each platform really has: gdigrab on Windows, avfoundation on macOS, x11grab on
@@ -85,7 +85,7 @@ fade out while the film plays and come back when the mouse does.
 
 ## Editor
 
-![The Editor tab: the video on top, and below it the toolbar with Split, Delete, Speed, Undo, Redo, zoom, Save, Save As and Share the File, over a timeline split into three clips](docs/gorseller/T201-duzenleyici-en.png)
+<a href="docs/gorseller/T201-duzenleyici-en.png"><img src="docs/gorseller/T201-duzenleyici-en.png" alt="The Editor tab: the video on top, and below it the toolbar with Split, Delete, Speed, Undo, Redo, zoom, Save, Save As and Share the File, over a timeline split into three clips" width="800"></a>
 
 Open a video from any tab and cut it on a timeline: split, delete a clip or a range, move
 clips, set the speed of each clip anywhere from 0.01× to 100×, play it in reverse, undo and
@@ -98,7 +98,12 @@ export modes:
 
 ## Shrink To An Exact Size
 
-![The Shrink tab with a file loaded: source details, the target size slider and chips and the quality slider on the left, the comparison panel and the What It Will Do panel in the middle spelling out encoder, two-pass bitrate, resolution and frame rate, and the Output panel with the size estimate on the right](docs/gorseller/T201-kucult-en.png)
+<table>
+<tr>
+<td><a href="docs/gorseller/T201-kucult-onizleme-en.png"><img src="docs/gorseller/T201-kucult-onizleme-en.png" alt="The Shrink tab with sunum-prototip.mp4 loaded and a 0.15 MB target: source details and the target and quality sliders on the left, the comparison panel in the middle with the source on the Original side of the blue split line and the planned output on the Processed side at CRF 43, the What It Will Do panel below it spelling out libsvtav1, 72 kbit/s two-pass, 666x374 and 30 FPS, and the Output panel on the right predicting quality 65.1/100" width="400"></a></td>
+<td><a href="docs/gorseller/T201-kucult-yakin-en.png"><img src="docs/gorseller/T201-kucult-yakin-en.png" alt="The same Shrink tab with the comparison panel zoomed in to 196% inside the app: left of the split line the source keeps the edges of the book spines, right of it the 0.15 MB output lets them go soft" width="400"></a></td>
+</tr>
+</table>
 
 Drag a video in, tap a size, press start. That is the whole job; the automatic mode picks
 the codec, the quality level, the resolution and the frame rate for **your** file and tells
@@ -113,28 +118,19 @@ with **VMAF-NEG** — mean, harmonic mean, 10th percentile and worst frame — a
 folder can go through the batch queue, which opens the folder, sleeps or shuts the computer
 down when it finishes.
 
-<details>
-<summary>The preview: what the plan will actually produce, before it runs</summary>
-
-![The comparison panel paused on a frame: the original on the left of the split line and the processed output on the right, CRF 20 in the corner and the playback strip below](docs/gorseller/T201-onizleme-en.png)
-
-</details>
-
 ## Convert
 
-![The Convert tab with container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command and progress panels beside them](docs/gorseller/T201-donustur-en.png)
+<table>
+<tr>
+<td><a href="docs/gorseller/T201-donustur-en.png"><img src="docs/gorseller/T201-donustur-en.png" alt="The Convert tab with sunum-prototip.mp4 loaded: container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command and progress panels beside them" width="400"></a></td>
+<td><a href="docs/gorseller/T201-gelismis-en.png"><img src="docs/gorseller/T201-gelismis-en.png" alt="The hidden Advanced tab, holding the FFmpeg command box that shows the exact command that will run, the AI settings box and the Performance Check box" width="400"></a></td>
+</tr>
+</table>
 
 MP4, MKV, WebM, MOV, AVI and GIF; MP3, M4A, WAV and FLAC for sound alone. H.264, H.265,
 VP9, AV1 or a straight stream copy, trimming, and audio extraction. **Eighteen ready-made
 targets** — WhatsApp, Discord, Telegram, Gmail, Outlook, Chromecast, Nest Hub, Apple TV and
 more — set every field for you.
-
-<details>
-<summary>The hidden Advanced tab: the exact ffmpeg command that will run</summary>
-
-![The Advanced panel, holding the FFmpeg command box, the AI settings box and the Performance Check box](docs/gorseller/T201-gelismis-en.png)
-
-</details>
 
 ## Share
 
@@ -146,7 +142,7 @@ upload can be retried. Share targets and their measured size ceilings live in
 
 ## Made For Everyone
 
-![The Settings tab: language and theme pickers, the right-click menu entries, the automatic update switch, and the output, subtitle and share settings](docs/gorseller/T201-ayarlar-en.png)
+<a href="docs/gorseller/T201-ayarlar-en.png"><img src="docs/gorseller/T201-ayarlar-en.png" alt="The Settings tab: language and theme pickers, the right-click menu entries, the automatic update switch, and the output, subtitle and share settings" width="800"></a>
 
 **The whole window speaks 42 languages** — every button, every warning, every tooltip, from
 Arabic to Vietnamese — and **36 colour themes** ship with it: Catppuccin, Dracula, Gruvbox,
@@ -165,52 +161,6 @@ Everything above comes off again with one command — see [Install](#install).
 
 Full tour of every tab: [`docs/kullanim.md`](docs/kullanim.md).
 
-## Install
-
-**Recommended on Windows: Teknesyum Base.**
-
-1. Download [`Teknesyum-Base.exe`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe) ([`.sha256`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe.sha256)) and run it. No admin rights are needed.
-2. Find **VidShrink** in the list and install it. Base also updates and removes it later.
-
-Base is not code-signed yet, so Windows SmartScreen may warn on first launch: choose *More info*, then *Run anyway*. More: [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
-
-**Other platforms, or manually:**
-
-On Windows, download and run
-[`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe).
-It is a small self-contained program: no PowerShell, no administrator rights. The script
-below installs exactly the same thing; paste it into PowerShell or Command Prompt. Without
-WinGet it fetches FFmpeg from a pinned archive instead.
-
-```powershell
-# Windows
-powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; iex (irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1)"
-```
-
-```bash
-# macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
-```
-
-No administrator rights, no .NET SDK. Every release publishes four targets — `win-x64`,
-`osx-arm64`, `osx-x64`, `linux-x64` — from one version number. Requirements: Windows 10 or
-11, macOS 14 or newer, or a Linux desktop on X11 or Wayland, plus `ffmpeg` and `ffprobe`.
-FFmpeg and libmpv never travel in a release; the installer fetches them against pinned
-SHA-256 digests on Windows and prints your package manager's command elsewhere. Windows
-releases are signed under the [Code Signing Policy](#code-signing-policy) once the
-certificate is granted.
-
-**Uninstall.** `VidShrink-Setup.exe --uninstall` removes the shortcuts, the right-click
-entries, the Open With registration and the install folder. On macOS and Linux, run the
-same installer with `--uninstall`:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh -s -- --uninstall
-```
-
-Checksum verification, the right-click entry, the self-update flow and every switch are in
-[`docs/kurulum.md`](docs/kurulum.md).
-
 ## Command Line
 
 The same package carries a headless CLI beside the app: `vidshrink` on Windows and Linux,
@@ -222,6 +172,9 @@ vidshrink kucult clip.mp4 --hedef 25MB              # shrink to a size
 vidshrink kucult clip.mp4 --kalite 80 --kodek av1   # shrink to a quality score
 vidshrink plan clip.mp4 --hedef 8MB --json          # plan and arguments only, no encode
 ```
+
+<details>
+<summary>Every option, the English aliases and the exit codes</summary>
 
 Options: `--kodek auto|h264|hevc|av1`, `--cikti <path>`, `--json`, `--olcumsuz` (skip the
 probe encodes), `--vmaf` (measure the result when ffmpeg has libvmaf), `--hizli`. Progress
@@ -291,6 +244,8 @@ single spelling.
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
 size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled.
 
+</details>
+
 ### Watch Folder
 
 ```bash
@@ -299,7 +254,12 @@ vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB --bir-kez   # drain the fold
 ```
 
 `izle` shrinks every video that lands in the folder. `--cikti` is the output folder and is
-required; it cannot be the watched folder. `--aralik <seconds>` sets the scan interval
+required; it cannot be the watched folder.
+
+<details>
+<summary>When a file is taken, where progress is kept, letter case and exit codes</summary>
+
+`--aralik <seconds>` sets the scan interval
 (default, unmeasured): 2, `--bir-kez` exits once nothing is left to wait for, and the other `kucult`
 options apply to each file. With `--json`, stdout is NDJSON: one compact JSON object per file.
 
@@ -343,7 +303,15 @@ Exit codes: `0` finished, `4` `--bir-kez` finished but at least one file failed 
 skipped for a name collision, `1` error, `64` wrong usage, `130` stopped with Ctrl+C. After
 `--bir-kez` a summary line reports how many files were skipped.
 
+</details>
+
 ## The Numbers
+
+Over 36 measured cases the target size was never crossed — **0/36 over** — and the two places
+where we lose are published beside it.
+
+<details>
+<summary>The table, the gates and where we lose</summary>
 
 Nothing here is a lookup table. Every step that says *measure* runs ffmpeg against your
 actual file first — short sample encodes at two resolutions and two CRFs, a scene map, then
@@ -380,12 +348,16 @@ drift collects (up to 2.484 MB and 73.5 s), because the same input takes a diffe
 of correction rounds on different runs. Two repeats made that visible; one run would have
 read as a stable number.
 
-**HandBrake is still ahead on perceptual quality.** At an equal delivered size (±2%) on a
-17-minute 1080p60 HDR source, HandBrake's x265 preset wins by **8.79 mean VMAF-NEG**,
-**2.60 dB XPSNR** and **0.0299 SSIM**
-([`docs/olcumler/handbrake-acigi.md`](docs/olcumler/handbrake-acigi.md)) — psy-rd, psy-rdoq
-and adaptive quantisation, which our arguments do not carry yet. Closing that is the first
-item on the roadmap.
+**HandBrake: ahead at equal size, behind on dark banding.** Against HandBrakeCLI 1.11.2's
+x265 `slow` preset at the same delivered bytes, we lead all 8 SDR rows
+([`handbrake-kiyas-b1-sdr.md`](docs/olcumler/handbrake-kiyas-b1-sdr.md)) and 3 of 4 HDR10
+rows ([`handbrake-kiyas-b4-hdr.md`](docs/olcumler/handbrake-kiyas-b4-hdr.md)). Dark scenes
+still band more: on the dark cut our AV1 output scores CAMBI 9.31 and 9.39 against
+HandBrake's 6.48 and 6.49, where lower is better
+([`handbrake-kiyas-b7-aciklar.md`](docs/olcumler/handbrake-kiyas-b7-aciklar.md)). That gap is
+open, and it is the first item on the roadmap.
+
+</details>
 
 ## How We Measure
 
@@ -393,7 +365,7 @@ The rig took longer to build than the feature it judges, because a rig that cann
 encodes apart prints numbers forever and never says it is wrong.
 
 <details>
-<summary>The six things the rig does so a number can be trusted</summary>
+<summary>The six things the rig does so a number can be trusted, and where the rig lives</summary>
 
 - **A colour gate that refuses to answer.** Every output's colour space, transfer,
   primaries and pixel format are read with ffprobe and compared to the reference. Untagged
@@ -417,8 +389,6 @@ encodes apart prints numbers forever and never says it is wrong.
   least 1.00 VMAF-NEG point or it marks itself insensitive. Measured: **+39.26** for
   HandBrake, **+39.85** for VidShrink — forty times the threshold.
 
-</details>
-
 Full rig: [`docs/olcumler/ab-duzenegi.md`](docs/olcumler/ab-duzenegi.md). The recorder's
 automatic mode is measured the same way — a candidate ladder built from the machine, then
 [three real seconds of recording per candidate](src/VidShrink.Ffmpeg/RecorderAutoProbe.cs)
@@ -426,6 +396,8 @@ and a dropped-frame count, re-measured against the current engine in
 [`docs/olcumler/auto-mod-yeni-taban.md`](docs/olcumler/auto-mod-yeni-taban.md). Over a
 hundred such documents live in [`docs/olcumler/`](docs/olcumler/); every number here comes
 from one of them.
+
+</details>
 
 ## Under The Hood
 
@@ -473,17 +445,19 @@ perceptual scoring, today's limits: [`docs/motor.md`](docs/motor.md).
 
 Measured, open, in this order — detail in [`docs/YOL-HARITASI.md`](docs/YOL-HARITASI.md).
 
-- **Beating HandBrake on perceptual quality too.** We already win on hitting a target size;
-  the 8.79 VMAF-NEG gap above is psy-rd, psy-rdoq and adaptive quantisation, which our
-  arguments do not carry yet. The bar is the same rig, the same source, the gap at zero and
-  then on our side — not a claim, a measurement.
+- **Closing the last HandBrake gap: dark-scene banding.** At equal size we already lead
+  HandBrake on SDR and HDR10; on dark content our AV1 output still bands more (CAMBI 9.31 and
+  9.39 against 6.48 and 6.49). The bar is the same rig, the same source, the gap at zero —
+  not a claim, a measurement.
 - **The AV1 branch's undershoot** — five band misses out of five are `libsvtav1`, and the
   correction rounds do not close them.
 - **Time-aligning the measurement rig**, so frame-rate-lowering plans can be scored at all.
 - **Opening the peak-rate ceiling**, which also fixes the hardware overshoot at small targets.
 - **Calibrating the scaling and frame-rate penalties against measured quality**, replacing
   the fixed constants the planner uses today.
-- **Encoding by scene instead of by clip** — the largest structural gain left.
+- **Encoding by scene instead of by clip** — measured, not shipped: splitting the budget by
+  scene did not pass the quality gate, and the default AV1 encoder does not read per-scene
+  zones ([`sahne-butcesi.md`](docs/olcumler/sahne-butcesi.md)).
 
 ## Contributing
 
@@ -509,14 +483,18 @@ Free code signing provided by [SignPath.io](https://about.signpath.io), certific
 [SignPath Foundation](https://signpath.org). The application is pending; until it is
 approved, Windows releases ship unsigned.
 
+**Privacy.** This program will not transfer any information to other networked systems
+unless specifically requested by the user or the person installing or operating it.
+
+<details>
+<summary>Who approves the signing, and every request the app can make</summary>
+
 - Committers, reviewers and approvers: [Teknesyum](https://github.com/Teknesyum)
 
 Only artifacts built by GitHub Actions from this repository are signed, and every signing
 request is approved by hand. Every team member signs in with multi-factor authentication.
 
-**Privacy.** This program will not transfer any information to other networked systems
-unless specifically requested by the user or the person installing or operating it. The
-requests it can make, what starts each one, and whose privacy policy then applies:
+The requests it can make, what starts each one, and whose privacy policy then applies:
 
 - **Update check** — asks GitHub for the latest release. On by default on Windows; switch it
   off in Settings. [GitHub Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
@@ -527,15 +505,68 @@ requests it can make, what starts each one, and whose privacy policy then applie
 - **OpenSubtitles** — signs in and searches only when you use it.
   [OpenSubtitles privacy policy](https://www.opensubtitles.com/en/privacy/)
 
-## One-Line Install
+</details>
 
-Paste into PowerShell or Command Prompt on Windows 10 or 11. It downloads the latest
-`VidShrink-Setup.exe` into your temp folder and runs it; no administrator rights, no WinGet.
-Until releases are signed, a PC with Smart App Control turned on blocks VidShrink either way.
+## Install
+
+Three ways on Windows 10 or 11, in this order. None of them needs administrator rights.
+
+1. **Teknesyum Base — the recommended way.** Download
+   [`Teknesyum-Base.exe`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe)
+   ([`.sha256`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe.sha256)),
+   run it, find **VidShrink** in the list and install it. Base also updates and removes it
+   later. Base is not code-signed yet, so Windows SmartScreen may warn on first launch:
+   choose *More info*, then *Run anyway*. More: [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
+2. **VidShrink-Setup.exe.** Download and run
+   [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe).
+   It is a small self-contained program: no PowerShell, no WinGet.
+3. **One line of code.** Paste into PowerShell or Command Prompt. It downloads the latest
+   `VidShrink-Setup.exe` into your temp folder and runs it — the same installer as way 2.
+
+   ```powershell
+   powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
+   ```
+
+Until releases are signed, a PC with Smart App Control turned on blocks VidShrink whichever
+way it is installed.
+
+**Uninstall.** `VidShrink-Setup.exe --uninstall` removes the shortcuts, the right-click
+entries, the Open With registration and the install folder.
+
+### macOS And Linux
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
+```
+
+To remove it, run the same installer with `--uninstall`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh -s -- --uninstall
+```
+
+<details>
+<summary>Requirements, what the installer fetches, and the PowerShell script</summary>
+
+No administrator rights, no .NET SDK. Every release publishes four targets — `win-x64`,
+`osx-arm64`, `osx-x64`, `linux-x64` — from one version number. Requirements: Windows 10 or
+11, macOS 14 or newer, or a Linux desktop on X11 or Wayland, plus `ffmpeg` and `ffprobe`.
+FFmpeg and libmpv never travel in a release; the installer fetches them against pinned
+SHA-256 digests on Windows and prints your package manager's command elsewhere. Windows
+releases are signed under the [Code Signing Policy](#code-signing-policy) once the
+certificate is granted.
+
+On Windows the `Install-VidShrink.ps1` script does the same install; without
+WinGet it fetches FFmpeg from a pinned archive instead:
 
 ```powershell
-powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; iex (irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1)"
 ```
+
+Checksum verification, the right-click entry, the self-update flow and every switch are in
+[`docs/kurulum.md`](docs/kurulum.md).
+
+</details>
 
 <!-- signature -->
 <div align="center">
