@@ -46,7 +46,9 @@ Masaüstünde saniyenin üçte biri süren geçişler başsız koşumda hiç bit
   silinir, `Opacity` 1'e çekilir.
 - `Fade` yavaşlaması posta kuyruğunda bekliyor → `Dispatcher.UIThread.RunJobs()`.
 - Sekme geçişi (`TransitioningContentControl.PageTransition`) eskiyi yeninin altında
-  bırakıyor → geçiş `null`lanır.
+  bırakıyor → geçiş `null`lanır (`StillTabs`). `OpenInEditorAsync` sekmeyi kendisi
+  değiştirdiği için `OpenInEditor` de onu çağırmadan önce boşaltır; sonra boşaltınca Küçült
+  sayfası düzenleyici karesinde sızıyordu (T201).
 
 `MainWindow`'un `LoadWithoutProbing`, `SettleFades`, `UseLanguage`, `EntrancePanels`
 üyeleri `internal`/`private` ve görünürlük yalnız `VidShrink.Tests`'e açık; üretim kodunu

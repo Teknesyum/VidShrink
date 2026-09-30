@@ -15,14 +15,17 @@ public sealed class KaydediciDuzenTests
     public KaydediciDuzenTests(ITestOutputHelper output) => _output = output;
 
     [Theory]
-    [InlineData(1560, 1060, false)]
-    [InlineData(1560, 1060, true)]
-    [InlineData(1024, 1060, false)]
-    [InlineData(1024, 1060, true)]
-    public void SayfaKaydirmadanSigarVeTamponSeritteDegil(int en, int boy, bool gelismis)
+    [InlineData(1560, 1060, false, "tr")]
+    [InlineData(1560, 1060, true, "tr")]
+    [InlineData(1024, 1060, false, "tr")]
+    [InlineData(1024, 1060, true, "tr")]
+    [InlineData(1600, 1000, true, "tr")]
+    [InlineData(1600, 1000, true, "en")]
+    [InlineData(1560, 1060, true, "en")]
+    public void SayfaKaydirmadanSigarVeTamponSeritteDegil(int en, int boy, bool gelismis, string dil)
     {
         var boyut = new Size(en, boy);
-        var olcu = GorselDenetimTests.Pencere(boyut, w =>
+        var olcu = KaydirmasizSekmeTests.AyarlariKorurken(() => GorselDenetimTests.Pencere(boyut, w =>
         {
             var gorunum = w.RecorderPaneForTest;
             GorselDenetimTests.Ad<RadioButton>(gorunum, gelismis ? "RadAdvanced" : "RadSimple").IsChecked = true;
@@ -33,19 +36,32 @@ public sealed class KaydediciDuzenTests
             var serit = GorselDenetimTests.Ad<Border>(gorunum, "Strip");
             var tampon = GorselDenetimTests.Ad<Button>(gorunum, "BtnReplay");
             var tamponKarti = GorselDenetimTests.Ad<Border>(gorunum, "PanelReplay");
+            var sesIzleri = GorselDenetimTests.Ad<ComboBox>(gorunum, "CmbAudioLayout");
+            var kodlama = GorselDenetimTests.Ad<Border>(gorunum, "PanelAdvanced").GetVisualDescendants().OfType<SutunIzgara>().First();
 
-            _output.WriteLine($"extent {sayfa.Extent} viewport {sayfa.Viewport} serit {serit.Bounds} tampon {tamponKarti.IsVisible} {tamponKarti.Bounds}");
+            var tasmalar = new List<string>();
+            for (var secim = 0; secim < Math.Max(1, sesIzleri.ItemCount); secim++)
+            {
+                if (sesIzleri.ItemCount > 0)
+                {
+                    sesIzleri.SelectedIndex = secim;
+                    GorselDenetimTests.Yerlestir(w, boyut);
+                }
+                var satir = $"{sesIzleri.SelectionBoxItem}: extent {sayfa.Extent} viewport {sayfa.Viewport} kodlama {kodlama.Columns} sutun, " +
+                    $"{kodlama.Bounds.Width:0.#} px, iki sutun {kodlama.WidthFor(2):0.#} px, tampon {tamponKarti.Bounds}";
+                _output.WriteLine(satir);
+                if (sayfa.Extent.Height > sayfa.Viewport.Height + 0.5) tasmalar.Add(satir);
+            }
             Cek(w, en, boy, gelismis);
 
             return (
-                Extent: sayfa.Extent.Height,
-                Viewport: sayfa.Viewport.Height,
+                Tasmalar: tasmalar,
                 TamponSeritte: tampon.GetVisualAncestors().Contains(serit),
                 TamponKartta: tampon.GetVisualAncestors().Contains(tamponKarti),
                 TamponGorunur: tamponKarti.IsVisible);
-        }, sekme: 4, dolu: false, hazirla: HareketsizAc);
+        }, sekme: 4, dil: dil, dolu: false, hazirla: HareketsizAc));
 
-        Assert.True(olcu.Extent <= olcu.Viewport + 0.5, $"sayfa kaydırıyor: {olcu.Extent} > {olcu.Viewport}");
+        Assert.True(olcu.Tasmalar.Count == 0, "sayfa kaydırıyor: " + string.Join("; ", olcu.Tasmalar));
         Assert.False(olcu.TamponSeritte);
         Assert.True(olcu.TamponKartta);
         Assert.Equal(gelismis, olcu.TamponGorunur);
