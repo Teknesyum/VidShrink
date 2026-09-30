@@ -372,10 +372,23 @@ public sealed class ZeminTasimaEsikTests
                 {
                     window.Show();
                     DenetimSurucu.Wait(window.Player, 0.3);
-                    var zemin = Bul(window, window.TargetPanel, v => window.ZemindenTasinir(v), 3);
-                    var baslik = Bul(window, window.TitleBar, v => ReferenceEquals(v, window.TitleBar) || window.ZemindenTasinir(v), 3);
+                    var zemin = new List<Point>();
+                    var baslik = new List<Point>();
+                    var saat = System.Diagnostics.Stopwatch.StartNew();
+                    while (true)
+                    {
+                        zemin = Bul(window, window.TargetPanel, v => window.ZemindenTasinir(v), 3);
+                        baslik = Bul(window, window.TitleBar, v => ReferenceEquals(v, window.TitleBar) || window.ZemindenTasinir(v), 3);
+                        if ((zemin.Count >= 3 && baslik.Count >= 3) || saat.Elapsed.TotalSeconds > 5) break;
+                        DenetimSurucu.Wait(window.Player, 0.25);
+                    }
                     var satirlar = new List<string>();
-                    if (zemin.Count < 3 || baslik.Count < 3) return new List<string> { $"nokta bulunamadi: zemin {zemin.Count}, baslik {baslik.Count}" };
+                    if (zemin.Count < 3 || baslik.Count < 3)
+                    {
+                        var orta = window.TargetPanel.TranslatePoint(new Point(window.TargetPanel.Bounds.Width / 2, window.TargetPanel.Bounds.Height / 2), window);
+                        var isabet = orta is { } o ? window.InputHitTest(o) : null;
+                        return new List<string> { $"nokta bulunamadi: zemin {zemin.Count}, baslik {baslik.Count}; durum {window.WindowState}, gorunur {window.IsVisible}, pencere {window.Bounds.Size}, hedef {window.TargetPanel.Bounds}, baslik {window.TitleBar.Bounds}, ortadaki {isabet?.GetType().Name ?? "yok"}" };
+                    }
 
                     foreach (var (ad, n) in new[] { ("zemin", zemin), ("baslik", baslik) })
                     {
