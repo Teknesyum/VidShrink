@@ -10,6 +10,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using VidShrink.App.Localization;
 
 using VidShrink.Core;
@@ -36,7 +37,8 @@ internal partial class PlayerView
     private bool _seritWired;
     private bool _pointerOnSerit;
     private bool _seritSliding;
-    private double _seritOncekiHiz;
+    private bool _seritTimeHover;
+    private bool _speedModeB;
     private bool _seritPlaying;
     private double _seritPointerX = double.NaN;
     private double _seritSpreadCentre = 0.5;
@@ -64,6 +66,18 @@ internal partial class PlayerView
 
     internal string SeritSpeedText => TxtSeritSpeed?.Text ?? "";
 
+    internal bool SpeedModeB => _speedModeB;
+
+    internal bool SeritTimeHover
+    {
+        get => _seritTimeHover;
+        set
+        {
+            _seritTimeHover = value;
+            RefreshSeritTime();
+        }
+    }
+
     /// <summary>
     /// 7b/K2 — sure okumasi: gecen sure ve <b>kalan</b> sure, <c>00:12 / -01:18</c>.
     /// Kalanin onundeki eksi isareti yonu soyluyor; sayilar degismez bicimde yaziliyor,
@@ -76,6 +90,31 @@ internal partial class PlayerView
         var scale = TimeSpan.FromSeconds(durationSeconds);
         var at = TimeSpan.FromSeconds(Math.Clamp(positionSeconds, 0, durationSeconds));
         return ControlStrip.Clock(at, scale) + " / -" + ControlStrip.Clock(scale - at, scale);
+    }
+
+    internal static string ClockPair(double positionSeconds, double durationSeconds, bool remaining)
+    {
+        if (remaining) return ClockPair(positionSeconds, durationSeconds);
+        if (!double.IsFinite(durationSeconds) || durationSeconds <= 0) return "--:-- / --:--";
+        var scale = TimeSpan.FromSeconds(durationSeconds);
+        var at = TimeSpan.FromSeconds(Math.Clamp(positionSeconds, 0, durationSeconds));
+        return ControlStrip.Clock(at, scale) + " / " + ControlStrip.Clock(scale, scale);
+    }
+
+    internal bool SeritShowsRemaining => Settings.ShowRemaining ^ _seritTimeHover;
+
+    internal void ToggleSeritTimeMode()
+    {
+        Settings.ShowRemaining = !Settings.ShowRemaining;
+        SaveSettings();
+        _trace.Add("timemode -> " + (Settings.ShowRemaining ? "remaining" : "total"));
+        RefreshSeritTime();
+    }
+
+    private void RefreshSeritTime()
+    {
+        if (TxtSeritTime is null) return;
+        TxtSeritTime.Text = ClockPair(_seek.Target, _seek.Duration, SeritShowsRemaining);
     }
 
     private void OnSeritLoaded(object? sender, RoutedEventArgs e)
@@ -143,7 +182,15 @@ internal partial class PlayerView
         BtnSeritForward.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Seek, Keymap.SeekSmall));
         BtnSeritMute.Click += (_, _) => Apply(Keymap.Mute.ToCommand());
         BtnSeritFullScreen.Click += (_, _) => Apply(Keymap.Fullscreen.ToCommand());
-        BtnSeritSpeedReset.Click += (_, _) => ToggleSeritSpeed();
+        BtnSeritSpeedAb.Click += (_, _) => Apply(Keymap.SpeedAb.ToCommand());
+        TxtSeritTime.PointerEntered += (_, _) => SeritTimeHover = true;
+        TxtSeritTime.PointerExited += (_, _) => SeritTimeHover = false;
+        TxtSeritTime.PointerPressed += (_, e) =>
+        {
+            if (!e.GetCurrentPoint(TxtSeritTime).Properties.IsLeftButtonPressed) return;
+            ToggleSeritTimeMode();
+            e.Handled = true;
+        };
         BtnSeritEdit.Click += (_, _) => Apply(Keymap.Edit.ToCommand());
 
         SliderSeritSpeed.Minimum = Keymap.MinimumSpeed;
@@ -276,13 +323,16 @@ internal partial class PlayerView
         TxtSeritForward.Text = "+" + Keymap.SeekSmall.ToString(Strings.Culture);
         SeritLabel(BtnSeritMute, Strings.Get(Keymap.Mute.LabelKey), Keymap.FirstKeyRow(Keymap.Mute));
         SeritLabel(BtnSeritFullScreen, Strings.Get(Keymap.Fullscreen.LabelKey), Keymap.FirstKeyRow(Keymap.Fullscreen));
-        SeritLabel(BtnSeritSpeedReset, Strings.Get(Keymap.NormalSpeed.LabelKey), Keymap.FirstKeyRow(Keymap.NormalSpeed));
+        SeritLabel(BtnSeritSpeedAb, Strings.Get("main.player.speedab.tip", SpeedText(Settings.SpeedA), SpeedText(Settings.SpeedB)), Keymap.FirstKeyRow(Keymap.SpeedAb));
+        ToolTip.SetTip(TxtSeritTime, Strings.Get("main.player.time.tip"));
         SeritLabel(BtnSeritEdit, Strings.Get(Keymap.Edit.LabelKey), Keymap.FirstKeyRow(Keymap.Edit));
         RefreshEditButton();
 
-        TxtSeritTime.Text = ClockPair(_seek.Target, _seek.Duration);
-        TxtSeritVolume.Text = _volume.ToString("0", CultureInfo.InvariantCulture);
+        RefreshSeritTime();
+        TxtSeritVolume.Text = _volume.ToString("0.#", CultureInfo.InvariantCulture);
         TxtSeritSpeed.Text = _speed.ToString("0.00", CultureInfo.InvariantCulture) + "×";
+        BtnSeritSpeedAb.IsChecked = _speedModeB;
+        TxtSeritSpeedMode.Text = _speedModeB ? "B" : "A";
 
         _seritSliding = true;
         SliderSeritVolume.Maximum = VolumeCeiling();
@@ -315,24 +365,54 @@ internal partial class PlayerView
         if (Math.Abs(hizFarki) > double.Epsilon) Apply(new PlayerCommand(PlayerCommandKind.Speed, hizFarki));
     }
 
-    /// <summary>
-    /// Hiz simgesi bir dugme: x hizdayken basinca 1'e doner, 1'deyken basinca en son
-    /// kullanilan x hiza geri gider. Komut yolu atlanmiyor — degisim yine
-    /// <see cref="PlayerView.Apply"/>'a fark olarak veriliyor. Bir kez bile x hiza
-    /// gidilmemisse 1'deki basis hicbir sey yapmaz; kod bir hiz uydurmuyor.
-    /// </summary>
-    private void ToggleSeritSpeed()
+    private static string SpeedText(double speed) => speed.ToString("0.00", CultureInfo.InvariantCulture) + "×";
+
+    private void SwitchSpeedMode()
     {
-        if (Math.Abs(_speed - 1) > double.Epsilon)
+        var settings = Settings;
+        _speedModeB = !_speedModeB;
+        _speed = Math.Clamp(_speedModeB ? settings.SpeedB : settings.SpeedA, Keymap.MinimumSpeed, Keymap.MaximumSpeed);
+        _engine?.SetSpeed(_speed);
+        _trace.Add("speedab -> " + (_speedModeB ? "B " : "A ") + Saat.Tani.Konum(_speed));
+    }
+
+    private void RememberSpeed()
+    {
+        var settings = Settings;
+        if (_speedModeB)
         {
-            _seritOncekiHiz = _speed;
-            Apply(Keymap.NormalSpeed.ToCommand());
-            return;
+            if (settings.SpeedB == _speed) return;
+            settings.SpeedB = _speed;
+        }
+        else
+        {
+            if (settings.SpeedA == _speed) return;
+            settings.SpeedA = _speed;
         }
 
-        if (_seritOncekiHiz <= 0) return;
-        Apply(new PlayerCommand(PlayerCommandKind.Speed, _seritOncekiHiz - _speed));
+        SaveSettings();
     }
+
+    private bool WheelOnSerit(PointerWheelEventArgs e, double notches)
+    {
+        if (e.Source is not Visual source) return false;
+        if (Within(source, SliderSeritVolume) || Within(source, ChipSeritVolume))
+        {
+            Apply(Keymap.ForVolumeWheel(notches, e.KeyModifiers));
+            return true;
+        }
+
+        if (Within(source, SliderSeritSpeed) || Within(source, ChipSeritSpeed))
+        {
+            Apply(Keymap.ForSpeedWheel(notches, e.KeyModifiers));
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool Within(Visual source, Visual? zone)
+        => zone is not null && (ReferenceEquals(source, zone) || zone.IsVisualAncestorOf(source));
 
     private Geometry? Icon(string key)
         => this.TryFindResource(key, out var value) ? value as Geometry : null;

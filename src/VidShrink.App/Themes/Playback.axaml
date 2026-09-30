@@ -148,9 +148,13 @@
   <x:Double x:Key="PlaybackSliderWidth">192</x:Double>
   <x:Double x:Key="PlaybackVolumeTick">5</x:Double>
   <x:Double x:Key="PlaybackSpeedTick">0.05</x:Double>
+  <StaticResource x:Key="PlaybackSliderTrackHeight" ResourceKey="ProgressBarHeight"/>
+  <StaticResource x:Key="PlaybackSliderThumbWidth" ResourceKey="SpaceMd"/>
+  <StaticResource x:Key="PlaybackSliderThumbHeight" ResourceKey="SpaceLg"/>
 
   <x:Double x:Key="PlaybackThumbnailWidth">128</x:Double>
   <x:Double x:Key="PlaybackThumbnailHeight">72</x:Double>
+  <x:Double x:Key="PlaybackThumbnailScale">5</x:Double>
 
   <x:Double x:Key="PlaybackMidShare">0.9</x:Double>
 
@@ -420,15 +424,115 @@
     <Setter Property="HorizontalContentAlignment" Value="Center"/>
   </ControlTheme>
 
+  <ControlTheme x:Key="PlaybackToggleButton" TargetType="ToggleButton" BasedOn="{StaticResource ChipButton}">
+    <Setter Property="MinWidth" Value="{StaticResource PlaybackBarButtonSize}"/>
+    <Setter Property="MinHeight" Value="{StaticResource PlaybackBarButtonSize}"/>
+    <Setter Property="Margin" Value="0"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Style Selector="^:checked">
+      <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+    </Style>
+    <Style Selector="^:checked /template/ Border#Root">
+      <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+    </Style>
+  </ControlTheme>
+
   <ControlTheme x:Key="PlaybackPlayButton" TargetType="Button" BasedOn="{StaticResource PlaybackBarButton}">
     <Setter Property="MinWidth" Value="{StaticResource PlaybackPlayButtonWidth}"/>
     <Setter Property="MinHeight" Value="{StaticResource PlaybackPlayButtonSize}"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackSliderFilledTrack" TargetType="RepeatButton" BasedOn="{StaticResource SliderFilledTrack}">
+    <Style Selector="^ /template/ Border#FilledTrack">
+      <Setter Property="Height" Value="{StaticResource PlaybackSliderTrackHeight}"/>
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackSliderEmptyTrack" TargetType="RepeatButton" BasedOn="{StaticResource SliderEmptyTrack}">
+    <Style Selector="^ /template/ Border#RemainingTrack">
+      <Setter Property="Height" Value="{StaticResource PlaybackSliderTrackHeight}"/>
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackSliderThumb" TargetType="Thumb">
+    <Setter Property="FocusAdorner" Value="{x:Null}"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Thumb">
+        <Panel Background="Transparent">
+          <Rectangle Name="Knob"
+                     Width="{StaticResource PlaybackSliderThumbWidth}"
+                     Height="{StaticResource PlaybackSliderThumbHeight}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Fill="{StaticResource AppBg}"
+                     Stroke="{StaticResource NeonBlue}"
+                     StrokeThickness="{StaticResource SliderThumbStroke}"
+                     RenderTransform="none">
+            <Rectangle.Transitions>
+              <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+              </Transitions>
+            </Rectangle.Transitions>
+          </Rectangle>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Rectangle#Knob">
+      <Setter Property="RenderTransform" Value="scale(1.1)"/>
+    </Style>
+    <Style Selector="^.ustunde /template/ Rectangle#Knob">
+      <Setter Property="RenderTransform" Value="scale(1.1)"/>
+    </Style>
+    <Style Selector="^.odak /template/ Rectangle#Knob">
+      <Setter Property="RenderTransform" Value="scale(1.1)"/>
+    </Style>
+    <Style Selector="^:pressed /template/ Rectangle#Knob">
+      <Setter Property="RenderTransform" Value="scale(1.2)"/>
+      <Setter Property="Fill" Value="{StaticResource NeonBlue}"/>
+    </Style>
+    <Style Selector="^.basili /template/ Rectangle#Knob">
+      <Setter Property="RenderTransform" Value="scale(1.2)"/>
+      <Setter Property="Fill" Value="{StaticResource NeonBlue}"/>
+    </Style>
+    <Style Selector="^:disabled /template/ Rectangle#Knob">
+      <Setter Property="RenderTransform" Value="none"/>
+      <Setter Property="Stroke" Value="{StaticResource TextDisabled}"/>
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="PlaybackSlider" TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
     <Setter Property="MaxWidth" Value="{StaticResource PlaybackSliderWidth}"/>
     <Setter Property="Height" Value="{StaticResource PlaybackBarButtonSize}"/>
     <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Slider">
+        <Border Name="Root" Background="Transparent" Padding="{StaticResource SliderTrackPadding}">
+          <Panel>
+            <Track Name="PART_Track"
+                   Minimum="{TemplateBinding Minimum}"
+                   Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value, Mode=TwoWay}"
+                   Orientation="{TemplateBinding Orientation}"
+                   IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
+              <Track.DecreaseButton>
+                <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource PlaybackSliderFilledTrack}" Focusable="False"/>
+              </Track.DecreaseButton>
+              <Track.IncreaseButton>
+                <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource PlaybackSliderEmptyTrack}" Focusable="False"/>
+              </Track.IncreaseButton>
+              <Track.Thumb>
+                <Thumb Name="ThumbVisual"
+                       Theme="{StaticResource PlaybackSliderThumb}"
+                       Width="{StaticResource PlaybackSliderThumbWidth}"/>
+              </Track.Thumb>
+            </Track>
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
   </ControlTheme>
 
   <ControlTheme x:Key="PlaybackValueChip" TargetType="Border">
@@ -448,6 +552,10 @@
 
 
   <!-- Süre okuması. Sayı olduğu için mono; rengi beyaz, kontrastı perdeden alır. -->
+  <ControlTheme x:Key="PlaybackValueTextBright" TargetType="TextBlock" BasedOn="{StaticResource PlaybackValueText}">
+    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+  </ControlTheme>
+
   <ControlTheme x:Key="PlaybackTimeText" TargetType="TextBlock">
     <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
     <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>

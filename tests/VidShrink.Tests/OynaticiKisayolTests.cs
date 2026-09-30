@@ -221,7 +221,7 @@ public sealed class OynaticiKisayolTests
     {
         "Bosluk", "CtrlP", "CtrlBosluk", "Geri", "Enter", "AltEnter", "Esc", "Menu",
         "Sag", "Sol", "CtrlSag", "CtrlSol", "ShiftSag", "ShiftSol", "AltSag", "AltSol",
-        "Yukari", "Asagi", "M", "C", "X", "Z", "CtrlShiftF", "CtrlShiftB", "CtrlShiftN",
+        "Yukari", "Asagi", "M", "C", "X", "Z", "V", "CtrlShiftF", "CtrlShiftB", "CtrlShiftN",
         "F", "ShiftF", "Nokta", "Virgul", "CtrlBuyuktur", "CtrlKucuktur",
         "KoseliAc", "KoseliKapa", "KoseliAcTrQ", "EgikCizgi",
         "A", "S", "Buyuktur", "Kucuktur", "CtrlNokta", "CtrlVirgul",
@@ -332,11 +332,11 @@ public sealed class OynaticiKisayolTests
         return o.Window.WindowState == beklenen ? null : $"WindowState {o.Window.WindowState}";
     }
 
-    private static string? Teker(KisayolOrtam o, KeyModifiers mods, double beklenen)
+    private static string? Teker(KisayolOrtam o, KeyModifiers mods, double beklenen, int centik = 1)
     {
         o.Git(350);
         var once = o.Sayi("time-pos");
-        GirdiSurucu.Wheel(o.View, 1, mods);
+        for (var i = 0; i < centik; i++) GirdiSurucu.Wheel(o.View, 1, mods);
         o.Aramayi();
         o.Bekle(() => Math.Abs(o.Sayi("time-pos") - once - beklenen) < Tolerans, 3);
         var sonra = o.Sayi("time-pos");
@@ -428,6 +428,7 @@ public sealed class OynaticiKisayolTests
             case "C": return Hiz(o, Key.C, KeyModifiers.None, 1.05);
             case "X": return Hiz(o, Key.X, KeyModifiers.None, 0.95);
             case "Z": return Hiz(o, Key.Z, KeyModifiers.None, 1, 1.5);
+            case "V": return Hiz(o, Key.V, KeyModifiers.None, PlayerSettings.DefaultSpeedB);
             case "CtrlShiftF": return Hiz(o, Key.F, KeyModifiers.Control | KeyModifiers.Shift, 1.05);
             case "CtrlShiftB": return Hiz(o, Key.B, KeyModifiers.Control | KeyModifiers.Shift, 0.95);
             case "CtrlShiftN": return Hiz(o, Key.N, KeyModifiers.Control | KeyModifiers.Shift, 1, 1.5);
@@ -655,9 +656,9 @@ public sealed class OynaticiKisayolTests
                 o.Not($"teker: volume {F(o.Sayi("volume"))}, beklenen 50");
                 return arama ?? (Math.Abs(o.Sayi("volume") - 50) < 1e-6 ? null : "teker sesi degistirdi");
             }
-            case "CtrlTeker": return Teker(o, KeyModifiers.Control, 10);
-            case "ShiftTeker": return Teker(o, KeyModifiers.Shift, 60);
-            case "CtrlShiftTeker": return Teker(o, KeyModifiers.Control | KeyModifiers.Shift, 300);
+            case "CtrlTeker": return Teker(o, KeyModifiers.Control, 1, 10);
+            case "ShiftTeker": return Teker(o, KeyModifiers.Shift, 10);
+            case "CtrlShiftTeker": return Teker(o, KeyModifiers.Control | KeyModifiers.Shift, 100);
             case "AltTeker":
             {
                 o.Bekle(0.3);
