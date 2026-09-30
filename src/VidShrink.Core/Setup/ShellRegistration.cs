@@ -94,11 +94,21 @@ public static class ShellRegistration
         Label(language, localesFolder, "shell.menu.shrink");
 
     /// <summary>
+    /// Alt menü girdisinin etiketi. Çeviri okunamazsa girdinin kendi yedeği yazılır; gömülü
+    /// ikili tablo bu anahtarları taşımaz.
+    /// </summary>
+    public static string TargetLabel(QuickShrinkTarget target, string language, string? localesFolder = null) =>
+        Catalog(language, localesFolder, target.LabelKey) ?? target.Fallback;
+
+    /// <summary>
     /// Etiketi yayına kopyalanan <c>main.json</c>'dan okur. Dosya yoksa ya da anahtar
     /// boşsa <see cref="SetupText"/>'in gömülü ikilisine düşer: kurucu yarım bir ağaçta da
     /// menü yazabilmeli, ve gömülü çeviri tek dosyada durmalı.
     /// </summary>
-    private static string Label(string language, string? localesFolder, string key)
+    private static string Label(string language, string? localesFolder, string key) =>
+        Catalog(language, localesFolder, key) ?? SetupText.GetIn(language, key);
+
+    private static string? Catalog(string language, string? localesFolder, string key)
     {
         if (localesFolder is not null)
         {
@@ -119,7 +129,7 @@ public static class ShellRegistration
             }
         }
 
-        return SetupText.GetIn(language, key);
+        return null;
     }
 
     public static string SoftwareRoot(string classesRoot) =>
@@ -140,6 +150,8 @@ public static class ShellRegistration
         var associations = classesRoot.TrimEnd('\\') + @"\SystemFileAssociations";
         var openLabel = OpenLabel(language, localesFolder);
         var shrinkLabel = ShrinkLabel(language, localesFolder);
+        var targetLabels = ShellIntegration.QuickShrinkMenu
+            .Select(target => TargetLabel(target, language, localesFolder)).ToArray();
         var user = Registry.CurrentUser;
 
         foreach (var extension in ShellIntegration.MediaExtensions)
@@ -160,14 +172,15 @@ public static class ShellRegistration
             verb.SetValue("SubCommands", "", RegistryValueKind.String);
             verb.SetValue("MultiSelectModel", "Player", RegistryValueKind.String);
 
-            foreach (var target in ShellIntegration.QuickShrinkTargetsMegabytes)
+            for (var i = 0; i < ShellIntegration.QuickShrinkMenu.Count; i++)
             {
-                var name = target.ToString(CultureInfo.InvariantCulture);
-                using var entry = verb.CreateSubKey($@"shell\{name}");
-                entry.SetValue("MUIVerb", ShellIntegration.FormatQuickShrinkLabel(target), RegistryValueKind.String);
+                var target = ShellIntegration.QuickShrinkMenu[i];
+                var megabytes = target.Megabytes.ToString(CultureInfo.InvariantCulture);
+                using var entry = verb.CreateSubKey($@"shell\{target.Key}");
+                entry.SetValue("MUIVerb", targetLabels[i], RegistryValueKind.String);
                 entry.SetValue("MultiSelectModel", "Player", RegistryValueKind.String);
                 using var command = entry.CreateSubKey("command");
-                command.SetValue("", $"\"{executable}\" {ShellIntegration.ShrinkFlag} {name} \"%1\"", RegistryValueKind.String);
+                command.SetValue("", $"\"{executable}\" {ShellIntegration.ShrinkFlag} {megabytes} \"%1\"", RegistryValueKind.String);
                 written++;
             }
         }

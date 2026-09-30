@@ -316,16 +316,10 @@ public sealed class ShellShrinkMenuTests : IClassFixture<ShellShrinkMenuFixture>
         => values.OrderBy(value => value);
 
     private static IReadOnlyList<int> InstallerTargets()
-    {
-        var source = File.ReadAllText(ShellShrinkMenuFixture.InstallerScript);
-        var matches = Regex.Matches(source, @"\$shellShrinkTargets\s*=\s*@\((?<body>[^)]*)\)");
-        Assert.True(matches.Count == 1,
-            $"Install-VidShrink.ps1 icinde $shellShrinkTargets dizisi {matches.Count} kez bulundu; tam bir kopya bekleniyor.");
+        => KabukKucultAltMenuTests.ScriptTargets().Select(t => t.Megabytes).ToList();
 
-        return Regex.Matches(matches[0].Groups["body"].Value, @"\d+")
-            .Select(match => int.Parse(match.Value))
-            .ToList();
-    }
+    private static QuickShrinkTarget MenuTarget(string key)
+        => ShellIntegration.QuickShrinkMenu.Single(t => t.Key == key);
 
     [Fact]
     public void Installer_run_and_removal_both_succeed()
@@ -385,8 +379,8 @@ public sealed class ShellShrinkMenuTests : IClassFixture<ShellShrinkMenuFixture>
     public void Written_targets_are_the_application_target_list()
     {
         if (Skip) return;
-        var written = _fixture.ShrinkEntries.Select(e => int.Parse(e.Target)).Distinct();
-        Assert.Equal(Sorted(ShellIntegration.QuickShrinkTargetsMegabytes), Sorted(written));
+        var written = _fixture.ShrinkEntries.Select(e => e.Target).Distinct();
+        Assert.Equal(Sorted(ShellIntegration.QuickShrinkMenu.Select(t => t.Key)), Sorted(written));
     }
 
     [Fact]
@@ -395,16 +389,17 @@ public sealed class ShellShrinkMenuTests : IClassFixture<ShellShrinkMenuFixture>
         if (Skip) return;
         Assert.NotEmpty(_fixture.ShrinkEntries);
         Assert.All(_fixture.ShrinkEntries, entry => Assert.Equal(
-            $"\"{_fixture.Executable}\" {ShellIntegration.ShrinkFlag} {entry.Target} \"%1\"",
+            $"\"{_fixture.Executable}\" {ShellIntegration.ShrinkFlag} {MenuTarget(entry.Target).Megabytes} \"%1\"",
             entry.Command));
     }
 
     [Fact]
-    public void Target_labels_come_from_the_shared_formatter()
+    public void Target_labels_fall_back_when_the_install_has_no_locales()
     {
         if (Skip) return;
+        Assert.NotEmpty(_fixture.ShrinkEntries);
         Assert.All(_fixture.ShrinkEntries, entry => Assert.Equal(
-            ShellIntegration.FormatQuickShrinkLabel(int.Parse(entry.Target)),
+            MenuTarget(entry.Target).Fallback,
             entry.TargetLabel));
     }
 

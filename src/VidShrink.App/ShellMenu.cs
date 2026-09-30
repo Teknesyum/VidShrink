@@ -27,8 +27,6 @@ internal static class ShellMenu
 
     internal const string ShrinkFlag = "--kucult";
 
-    internal static readonly int[] ShrinkTargets = { 100, 250, 500, 1000, 2000 };
-
     internal static readonly string[] Extensions =
     {
         "mp4", "mkv", "mov", "avi", "webm", "wmv", "flv", "m4v", "mpg", "mpeg", "ts", "m2ts",
@@ -99,6 +97,7 @@ internal static class ShellMenu
         if (Root is not { } root) return 0;
         RemoveShrink();
         WriteLabel("shrink", label);
+        var entryLabels = EntryLabels();
 
         var written = 0;
         foreach (var extension in Extensions)
@@ -109,17 +108,18 @@ internal static class ShellMenu
             verb.SetValue("SubCommands", string.Empty, RegistryValueKind.String);
             verb.SetValue("MultiSelectModel", "Player", RegistryValueKind.String);
 
-            foreach (var target in ShrinkTargets)
+            for (var i = 0; i < ShellIntegration.QuickShrinkMenu.Count; i++)
             {
-                using var entry = verb.CreateSubKey("shell\\" + target.ToString(CultureInfo.InvariantCulture));
-                entry.SetValue("MUIVerb", TargetLabel(target), RegistryValueKind.String);
+                var target = ShellIntegration.QuickShrinkMenu[i];
+                using var entry = verb.CreateSubKey("shell\\" + target.Key);
+                entry.SetValue("MUIVerb", entryLabels[i], RegistryValueKind.String);
                 entry.SetValue("Icon", executable, RegistryValueKind.String);
                 entry.SetValue("MultiSelectModel", "Player", RegistryValueKind.String);
                 using var command = entry.CreateSubKey("command");
                 command.SetValue(
                     string.Empty,
                     string.Join(" ", $"\"{executable}\"", ShrinkFlag,
-                        target.ToString(CultureInfo.InvariantCulture), "\"%1\""),
+                        target.Megabytes.ToString(CultureInfo.InvariantCulture), "\"%1\""),
                     RegistryValueKind.String);
             }
 
@@ -152,15 +152,54 @@ internal static class ShellMenu
             }
         }
 
+        var entryLabels = menu == ShrinkMenuKey ? EntryLabels() : null;
         foreach (var extension in Extensions)
         {
             using var verb = Registry.CurrentUser.OpenSubKey(root + Branch(extension) + "\\" + menu, writable: true);
-            if (verb is null || verb.GetValue("MUIVerb") as string == label) continue;
+            if (verb is null) continue;
+            if (entryLabels is not null) written += RelabelEntries(verb, entryLabels);
+            if (verb.GetValue("MUIVerb") as string == label) continue;
             verb.SetValue("MUIVerb", label, RegistryValueKind.String);
             written++;
         }
 
         return written;
+    }
+
+    /// <summary>
+    /// Alt menü girdilerinin etiketini yeni dile çevirir. Yalnız <c>MUIVerb</c> yazılır;
+    /// anahtar silinip kurulmaz, girdinin komutu ve simgesi olduğu gibi kalır.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    private static int RelabelEntries(RegistryKey verb, IReadOnlyList<string> entryLabels)
+    {
+        var written = 0;
+        for (var i = 0; i < ShellIntegration.QuickShrinkMenu.Count; i++)
+        {
+            using var entry = verb.OpenSubKey("shell\\" + ShellIntegration.QuickShrinkMenu[i].Key, writable: true);
+            if (entry is null || entry.GetValue("MUIVerb") as string == entryLabels[i]) continue;
+            entry.SetValue("MUIVerb", entryLabels[i], RegistryValueKind.String);
+            written++;
+        }
+
+        return written;
+    }
+
+    /// <summary>
+    /// Alt menü girdisinin arayüz dilindeki etiketi, kurucuların okuduğu
+    /// <c>shell.menu.target.*</c> anahtarından. Anahtar çözülmezse girdinin yedeği yazılır.
+    /// </summary>
+    internal static string EntryLabel(QuickShrinkTarget target)
+    {
+        var text = Localization.Strings.Get(target.LabelKey);
+        return string.IsNullOrWhiteSpace(text) || text == target.LabelKey ? target.Fallback : text;
+    }
+
+    private static string[] EntryLabels()
+    {
+        var labels = new string[ShellIntegration.QuickShrinkMenu.Count];
+        for (var i = 0; i < labels.Length; i++) labels[i] = EntryLabel(ShellIntegration.QuickShrinkMenu[i]);
+        return labels;
     }
 
     [SupportedOSPlatform("windows")]
@@ -234,8 +273,6 @@ internal static class ShellMenu
     }
 
     private const int PackageTimeoutMs = 30_000;
-
-    internal static string TargetLabel(int megabytes) => Bicim.HedefEtiketi(megabytes);
 
     private static string Branch(string extension)
         => "Software\\Classes\\SystemFileAssociations\\." + extension + "\\shell";

@@ -38,20 +38,38 @@ public static class ShellIntegration
     public static bool IsPlayerOnly(string path) => IsAudio(path) || PlaylistFile.IsPlaylist(path);
 
     /// <summary>
-    /// "VidShrink ile Küçült" alt menüsünün hızlı hedefleri, megabayt cinsinden. Kurulum
-    /// betiği kendi dizisinden yazar; iki liste ölçüde karşılaştırılır.
+    /// "VidShrink ile Küçült" alt menüsünün girdileri: ön ayar kütüphanesinin boyut başlıklı
+    /// genel ve platform yongalarından seçilmiş sabit altılı. Liste tek yerde durur; kurucu
+    /// exe ve uygulama buradan, PowerShell kurucusu aynı sıradaki kendi dizisinden yazar ve
+    /// testler üçünü karşılaştırır. Her girdinin megabaytı <see cref="PresetLibrary"/>'deki
+    /// ön ayarın <c>TargetMb</c>'siyle eşit olmak zorunda.
+    /// <para>Alt menü klasik kabuk yoludur (<c>SubCommands</c>): Windows 11'de yalnız
+    /// "Daha fazla seçenek göster" altında görünür, üst düzey Appx menüsü yalnız açma
+    /// girdisini taşır.</para>
     /// </summary>
+    public static IReadOnlyList<QuickShrinkTarget> QuickShrinkMenu { get; } = new QuickShrinkTarget[]
+    {
+        new("01-size-8", "size-8", 8, "8 MB"),
+        new("02-whatsapp-chat", "whatsapp-chat", 16, "WhatsApp (16 MB)"),
+        new("03-discord-free", "discord-free", 20, "Discord (20 MB)"),
+        new("04-email-gmail", "email-gmail", 25, "Gmail (25 MB)"),
+        new("05-discord-nitro-basic", "discord-nitro-basic", 50, "Discord Nitro Basic (50 MB)"),
+        new("06-size-100", "size-100", 100, "100 MB")
+    };
+
+    /// <summary>Alt menü girdilerinin hedefleri, menü sırasıyla, megabayt cinsinden.</summary>
     public static IReadOnlyList<int> QuickShrinkTargetsMegabytes { get; } =
-        new[] { 100, 250, 500, 1000, 2000 };
+        QuickShrinkMenu.Select(t => t.Megabytes).ToArray();
 
     /// <summary>
-    /// Ondalık MB'a geçmeden önceki hızlı listenin ikili hedefleri (1024, 2048). Kayıt
-    /// defterine eski kurulumda yazılmış <c>--kucult 1024</c> gibi çağrılar hâlâ gelir;
-    /// menüde artık gösterilmezler ama <see cref="AcceptedShrinkTargetsMegabytes"/>
-    /// üzerinden kabul edilmeye devam ederler.
+    /// Önceki menülerin hedefleri: ön ayar listesinden önceki ondalık dizi (250, 500, 1000,
+    /// 2000) ve ondalık MB'dan önceki ikili hedefler (1024, 2048). Kayıt defterine eski
+    /// kurulumda yazılmış <c>--kucult 1024</c> gibi çağrılar hâlâ gelir; menüde artık
+    /// gösterilmezler ama <see cref="AcceptedShrinkTargetsMegabytes"/> üzerinden kabul
+    /// edilmeye devam ederler.
     /// </summary>
     public static IReadOnlyList<int> LegacyShrinkTargetsMegabytes { get; } =
-        new[] { 1024, 2048 };
+        new[] { 250, 500, 1000, 2000, 1024, 2048 };
 
     /// <summary>
     /// <c>--kucult</c> argümanının kabul ettiği hedefler: güncel hızlı liste ve eski
@@ -142,4 +160,15 @@ public static class ShellIntegration
         try { return File.Exists(path); }
         catch { return false; }
     }
+}
+
+/// <summary>
+/// Küçültme alt menüsünün bir girdisi. <paramref name="Key"/> kayıt defterindeki alt anahtarın
+/// adıdır; kabuk alt girdileri ada göre dizdiği için sıra numarasıyla başlar.
+/// <paramref name="Fallback"/> çeviri klasörü okunamadığında yazılan etikettir.
+/// </summary>
+public sealed record QuickShrinkTarget(string Key, string PresetId, int Megabytes, string Fallback)
+{
+    /// <summary><c>Locales/&lt;dil&gt;/main.json</c>'daki etiket anahtarı.</summary>
+    public string LabelKey => "shell.menu.target." + PresetId;
 }

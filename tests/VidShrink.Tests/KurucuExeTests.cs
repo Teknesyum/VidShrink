@@ -49,7 +49,7 @@ public sealed class KurucuExeTests : IDisposable
         var written = Script("-ShellMenuOnly", "-MenuLanguage", "tr", "-InstallRoot", install, "-RegistryRoot", $@"HKCU:\{scriptRoot}");
         Assert.True(written.Code == 0, written.Output);
 
-        Assert.Equal(120, ShellRegistration.WriteMenus(engineRoot, launcher, "tr"));
+        Assert.Equal(144, ShellRegistration.WriteMenus(engineRoot, launcher, "tr"));
         Assert.Equal(24, ShellRegistration.WriteFileAssociation(engineRoot, launcher));
 
         var scriptTree = Dump(scriptRoot);
@@ -253,7 +253,7 @@ public sealed class KurucuExeTests : IDisposable
 
         var exe = Path.Combine(root, "VidShrink.exe");
         Assert.Equal(new[] { exe, exe }, shortcuts.Targets.Values);
-        Assert.Equal($"\"{exe}\" --kucult 100 \"%1\"", Value($@"{options.ClassesRoot}\SystemFileAssociations\.mp4\shell\VidShrinkKucult\shell\100\command"));
+        Assert.Equal($"\"{exe}\" --kucult 100 \"%1\"", Value($@"{options.ClassesRoot}\SystemFileAssociations\.mp4\shell\VidShrinkKucult\shell\06-size-100\command"));
         Assert.Equal($"\"{Path.Combine(root, "app", "VidShrink.App.exe")}\" \"%1\"", Value($@"{options.ClassesRoot}\Teknesyum.VidShrink.Video\shell\open\command"));
         Assert.Equal($"{exe},0", Value($@"{options.ClassesRoot}\Teknesyum.VidShrink.Video\DefaultIcon"));
 

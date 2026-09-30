@@ -39,7 +39,7 @@ public sealed class ResolverTests : IDisposable
     [MemberData(nameof(ValidFormats))]
     public void K1_five_argument_formats_resolve_both_target_and_path(string shape)
     {
-        var quickTargets = ShellIntegration.QuickShrinkTargetsMegabytes;
+        var quickTargets = ShellIntegration.AcceptedShrinkTargetsMegabytes;
 
         (IReadOnlyList<string> args, int expectedTarget, string expectedPath) Build()
         {
@@ -85,7 +85,7 @@ public sealed class ResolverTests : IDisposable
     [MemberData(nameof(InvalidFormats))]
     public void K2_invalid_targets_are_rejected_with_a_named_problem(string shape, ShrinkArgumentProblem expected)
     {
-        var quickTargets = ShellIntegration.QuickShrinkTargetsMegabytes;
+        var quickTargets = ShellIntegration.AcceptedShrinkTargetsMegabytes;
         var file = Write("gecerli.mp4");
 
         var args = shape switch
