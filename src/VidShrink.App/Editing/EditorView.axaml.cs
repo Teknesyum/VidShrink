@@ -88,6 +88,7 @@ internal partial class EditorView : UserControl
     internal void Deactivate()
     {
         _clock.Stop();
+        _resumeClock = false;
         if (Preview.IsPlaying) Preview.TogglePlay();
         _driver?.Pause();
     }

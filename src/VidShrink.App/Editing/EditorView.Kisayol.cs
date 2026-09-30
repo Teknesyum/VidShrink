@@ -167,14 +167,19 @@ internal partial class EditorView
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        if (_resumeClock) _clock.Start();
         Strings.Changed -= OnLanguageChanged;
         Strings.Changed += OnLanguageChanged;
         ShowGestures();
         if (TopLevel.GetTopLevel(this) is { } top) top.AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
     }
 
+    private bool _resumeClock;
+
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        _resumeClock = _clock.IsEnabled;
+        _clock.Stop();
         Strings.Changed -= OnLanguageChanged;
         if (TopLevel.GetTopLevel(this) is { } top) top.RemoveHandler(KeyDownEvent, OnKey);
         base.OnDetachedFromVisualTree(e);

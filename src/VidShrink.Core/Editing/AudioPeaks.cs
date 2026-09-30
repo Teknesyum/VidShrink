@@ -40,7 +40,7 @@ public sealed class AudioPeaks
 
     public long Duration => SampleCount * TicksPerSample;
 
-    public long ByteSize => (long)Count * 2 * sizeof(short);
+    internal long ByteSize =>(long)Count * 2 * sizeof(short);
 
     public PeakBucket this[int index] => new(_min[index], _max[index]);
 

@@ -1198,6 +1198,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-29, arayuz turu: yeni <c>recorder.advanced.encoder-title</c> fr, pt ve sw cevirilerinde islev sozcugu tasiyor (de, do, ya): 2716 + 3 = 2719, en 256, tr 92.</para>
     /// <para>2026-09-29, kaydedici sihirbazi: 21 yeni <c>recorder.wizard.*</c> ve <c>recorder.replay.seconds</c> anahtari: 2719 + 25 = 2744, en 256 + 5 = 261, tr 92 + 3 = 95.</para>
     /// <para>2026-09-30, kaydedici EN tasmasi: <c>recorder.advanced.audio-mixed</c> "Mix into one track" yerine "Single track", islev sozcugu dustu ve koldan cikiyor: 2744 - 1 = 2743, en 260, tr 95.</para>
+    /// <para>2026-09-30, duzenleyici Premiere uyumu (dalga 1, 2A, 2B/3B): on sekiz yeni <c>editor.*</c> anahtari (araclar, monitor, zaman kodu, sure, yapisma, on kisayol adi) 14 dilde 66 kol: 2743 + 66 = 2809, en 260 + 5 = 265, tr 95 + 2 = 97 (<c>editor.key.snap</c>, <c>editor.key.trim-head</c>).</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1223,9 +1224,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2743, toplam);
-        Assert.Equal(260, dilBasina["en"]);
-        Assert.Equal(95, dilBasina["tr"]);
+        Assert.Equal(2809, toplam);
+        Assert.Equal(265, dilBasina["en"]);
+        Assert.Equal(97, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1400,6 +1401,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-29, arayuz turu: <c>recorder.advanced.encoder-title</c>: 1153 + 1 = 1154, 43 x 1154 = 49622.</para>
     /// <para>2026-09-29, Tümünü Ata: <c>settings.default-app.all</c> ve <c>settings.default-app.all-copied</c>: 1154 + 2 = 1156, 43 x 1156 = 49708.</para>
     /// <para>2026-09-29, kaydedici sihirbazi: 21 yeni anahtar: 1156 + 21 = 1177, 43 x 1177 = 50611.</para>
+    /// <para>2026-09-30, duzenleyici Premiere uyumu: on sekiz yeni <c>editor.*</c> anahtari, dusen ve degisen yok: 1177 + 18 = 1195, 43 x 1195 = 51385.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1427,7 +1429,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(50611, gezilen);
+        Assert.Equal(51385, gezilen);
         Assert.Empty(kayip);
     }
 

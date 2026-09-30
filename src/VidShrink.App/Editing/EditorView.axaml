@@ -39,7 +39,7 @@
             <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconMinimize}" Fill="{Binding $parent[Button].Foreground}"/>
           </Button>
         </StackPanel>
-        <TextBlock x:Name="TxtDuration" Grid.Column="2" Theme="{StaticResource MonoValue}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.duration}"/>
+        <TextBlock x:Name="TxtDuration" Grid.Column="2" Theme="{StaticResource MonoValue}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.duration}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
       </Grid>
       <Border Theme="{StaticResource Panel}" Margin="{StaticResource PageMargin}">
         <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -60,7 +60,7 @@
               <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
               <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save-as}" AutomationProperties.Name="{loc:Text editor.save-as}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
               <Button x:Name="BtnShare" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.share}" AutomationProperties.Name="{loc:Text main.action.share}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
-              <ComboBox x:Name="CmbExportMode" MinWidth="{StaticResource FieldWidthSm}" AutomationProperties.Name="{loc:Text editor.export.mode}" SelectedIndex="1">
+              <ComboBox x:Name="CmbExportMode" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.mode}" SelectedIndex="1">
                 <ComboBoxItem Content="{loc:Text editor.export.fast}"/>
                 <ComboBoxItem Content="{loc:Text editor.export.smart}"/>
                 <ComboBoxItem Content="{loc:Text editor.export.full}"/>
