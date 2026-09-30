@@ -217,6 +217,7 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
         AddHandler(DragDrop.DropEvent, OnDrop);
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
+        TrackBackgroundDrag();
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
         SizeChanged += (_, _) => AlignTabsToTitle();
         TitleBarRight.SizeChanged += (_, _) => AlignTabsToTitle();

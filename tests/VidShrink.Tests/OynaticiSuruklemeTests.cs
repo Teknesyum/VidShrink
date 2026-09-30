@@ -69,11 +69,22 @@ public sealed class OynaticiHamTikTests
 
 public sealed class OynaticiSuruklemeTests
 {
-    [DllImport("user32.dll")]
-    private static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, ref PlayerView.NativeRect rect);
+    private const uint WmMoving = 0x0216;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeRect
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
 
     [DllImport("user32.dll")]
-    private static extern bool GetWindowRect(IntPtr hWnd, out PlayerView.NativeRect rect);
+    private static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, ref NativeRect rect);
+
+    [DllImport("user32.dll")]
+    private static extern bool GetWindowRect(IntPtr hWnd, out NativeRect rect);
 
     [Fact]
     public void TussuzHareketVeYakalamaKaybiPencereyiTasimaz()
@@ -231,17 +242,8 @@ public sealed class OynaticiSuruklemeTests
                 DenetimSurucu.Wait(view, 0.2);
                 window.Position = new PixelPoint(40, 30);
                 DenetimSurucu.Wait(view, 0.2);
-                body.AppendLine($"varsayilan yerel tasima {view.NativeMoveDrag}, WM_MOVING kancasi {view.MovingHookInstalled}, platform windows {OperatingSystem.IsWindows()}");
-                if (OperatingSystem.IsWindows())
-                {
-                    if (!view.NativeMoveDrag) hatalar.Add("Windows'ta varsayilan yerel tasima kapali");
-                    if (!view.MovingHookInstalled) hatalar.Add("Windows'ta WM_MOVING kancasi kurulu degil");
-                }
-                else
-                {
-                    if (view.NativeMoveDrag) hatalar.Add("Windows disinda varsayilan yerel tasima acik");
-                    if (view.MovingHookInstalled) hatalar.Add("Windows disinda WM_MOVING kancasi kurulu");
-                }
+                body.AppendLine($"varsayilan yerel tasima {view.NativeMoveDrag}, platform windows {OperatingSystem.IsWindows()}");
+                if (OperatingSystem.IsWindows() != view.NativeMoveDrag) hatalar.Add($"varsayilan yerel tasima {view.NativeMoveDrag}, platform windows {OperatingSystem.IsWindows()}");
 
                 var tutma = window.PointToScreen(new Point(view.Bounds.Width / 2, view.Bounds.Height / 2));
                 void Olay(RawPointerEventType tur, int dx, int dy, RawInputModifiers tus)
@@ -293,7 +295,7 @@ public sealed class OynaticiSuruklemeTests
     }
 
     [Fact]
-    public void WindowsYerelTasimaWmMovingDikdortgeniniMerkezeCeker()
+    public void WindowsYerelTasimaWmMovingDikdortgeniniOrtayaCekmez()
     {
         if (!OperatingSystem.IsWindows()) return;
         var body = new StringBuilder();
@@ -306,31 +308,30 @@ public sealed class OynaticiSuruklemeTests
                 var window = new Window { Width = 640, Height = 360, Content = view };
                 window.Show();
                 DenetimSurucu.Wait(view, 0.2);
-                body.AppendLine($"yerel yol {view.NativeMoveDrag}, WM_MOVING kancasi {view.MovingHookInstalled}");
-                if (!view.NativeMoveDrag || !view.MovingHookInstalled) hatalar.Add("windows yerel yol kurulu degil");
+                body.AppendLine($"yerel yol {view.NativeMoveDrag}");
+                if (!view.NativeMoveDrag) hatalar.Add("windows yerel yol kurulu degil");
 
                 var hwnd = window.TryGetPlatformHandle()!.Handle;
                 var ekran = window.Screens.ScreenFromWindow(window)!;
                 GetWindowRect(hwnd, out var gercek);
                 var w = gercek.Right - gercek.Left;
                 var h = gercek.Bottom - gercek.Top;
-                var esikDip = view.FindResource("PlaybackBadgeMargin") is Thickness m ? m.Left : 0;
-                var esikPx = (int)Math.Ceiling(esikDip * ekran.Scaling);
                 var merkez = new PixelPoint(ekran.WorkingArea.X + (ekran.WorkingArea.Width - w) / 2, ekran.WorkingArea.Y + (ekran.WorkingArea.Height - h) / 2);
-                body.AppendLine($"ekran {ekran.WorkingArea} olcek {ekran.Scaling}, pencere {w}x{h}, merkez {merkez}, esik {esikPx} px");
+                body.AppendLine($"ekran {ekran.WorkingArea} olcek {ekran.Scaling}, pencere {w}x{h}, merkez {merkez}");
 
-                foreach (var (ad, oneri, beklenen) in new[]
+                foreach (var (ad, oneri) in new[]
                 {
-                    ("bolgede", new PixelPoint(merkez.X + esikPx, merkez.Y - esikPx), merkez),
-                    ("bolge-disi", new PixelPoint(merkez.X + esikPx + 1, merkez.Y - esikPx - 1), new PixelPoint(merkez.X + esikPx + 1, merkez.Y - esikPx - 1)),
-                    ("tek-eksen", new PixelPoint(merkez.X + 1, merkez.Y + 200), new PixelPoint(merkez.X, merkez.Y + 200))
+                    ("merkeze-1px", new PixelPoint(merkez.X + 1, merkez.Y - 1)),
+                    ("merkeze-8px", new PixelPoint(merkez.X + 8, merkez.Y - 8)),
+                    ("tek-eksen", new PixelPoint(merkez.X + 1, merkez.Y + 200)),
+                    ("uzak", new PixelPoint(merkez.X + 300, merkez.Y - 150))
                 })
                 {
-                    var rect = new PlayerView.NativeRect { Left = oneri.X, Top = oneri.Y, Right = oneri.X + w, Bottom = oneri.Y + h };
-                    SendMessage(hwnd, PlayerView.WmMoving, IntPtr.Zero, ref rect);
-                    var satir = $"WM_MOVING {ad}: oneri {oneri}, donen {rect.Left},{rect.Top} {rect.Right - rect.Left}x{rect.Bottom - rect.Top}, beklenen {beklenen}";
+                    var rect = new NativeRect { Left = oneri.X, Top = oneri.Y, Right = oneri.X + w, Bottom = oneri.Y + h };
+                    SendMessage(hwnd, WmMoving, IntPtr.Zero, ref rect);
+                    var satir = $"WM_MOVING {ad}: oneri {oneri}, donen {rect.Left},{rect.Top} {rect.Right - rect.Left}x{rect.Bottom - rect.Top}";
                     body.AppendLine(satir);
-                    if (rect.Left != beklenen.X || rect.Top != beklenen.Y || rect.Right - rect.Left != w || rect.Bottom - rect.Top != h) hatalar.Add(satir);
+                    if (rect.Left != oneri.X || rect.Top != oneri.Y || rect.Right - rect.Left != w || rect.Bottom - rect.Top != h) hatalar.Add(satir);
                 }
 
                 DenetimSurucu.Wait(view, 0.3);
@@ -353,7 +354,7 @@ public sealed class OynaticiSuruklemeTests
         }
         finally
         {
-            KisayolKanit.Write("surukleme-wm-moving.txt", body.ToString());
+            KisayolKanit.Write("surukleme-wm-moving-serbest.txt", body.ToString());
         }
 
         Assert.True(hatalar.Count == 0, body.ToString());

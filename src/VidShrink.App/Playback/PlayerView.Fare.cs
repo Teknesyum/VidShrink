@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -11,8 +10,6 @@ namespace VidShrink.App.Playback;
 
 internal partial class PlayerView
 {
-    internal const uint WmMoving = 0x0216;
-
     private readonly ClickArbiter _click = new();
 
     private SurfacePan? _pan;
@@ -20,8 +17,6 @@ internal partial class PlayerView
     private TranslateTransform? _shift;
     private Point _lastDrag;
     private string _dragMode = "";
-    private TopLevel? _movingHookTop;
-    private Win32Properties.CustomWndProcHookCallback? _movingHook;
 
     /// <summary>Menunun sol tik ile acilan ayarlar satirinin cagirdigi yol.</summary>
     internal Action? OpenSettings { get; set; }
@@ -37,23 +32,13 @@ internal partial class PlayerView
 
     internal string DragMode => _dragMode;
 
-    /// <summary>
-    /// Pencere tasima yolu. Windows'ta yerel tasima dongusu, miknatis WM_MOVING'de uygulanir;
-    /// obur platformlarda kendi dongumuz. Olculen: varsayilanin platforma bagli oldugu ve
-    /// WM_MOVING kancasinin yalniz Windows'ta kuruldugu (OynaticiSuruklemeTests). Yerel yolun
-    /// Aero Snap davranisini korudugu bassiz kosumda olculemedi; bu satir onu iddia etmiyor.
-    /// </summary>
     internal bool NativeMoveDrag { get; set; } = OperatingSystem.IsWindows();
-
-    internal bool MovingHookInstalled => _movingHook is not null;
 
     private void InitFare()
     {
         AddHandler(PointerMovedEvent, OnFarePointerMoved, Avalonia.Interactivity.RoutingStrategies.Tunnel);
         AddHandler(PointerReleasedEvent, OnFarePointerReleased, Avalonia.Interactivity.RoutingStrategies.Tunnel);
         AddHandler(PointerCaptureLostEvent, (_, e) => { if (ReferenceEquals(e.Source, this)) EndWindowDrag("capturelost"); }, Avalonia.Interactivity.RoutingStrategies.Direct | Avalonia.Interactivity.RoutingStrategies.Bubble, true);
-        AttachedToVisualTree += (_, _) => InstallMovingHook();
-        DetachedFromVisualTree += (_, _) => RemoveMovingHook();
     }
 
     /// <summary>
@@ -206,102 +191,15 @@ internal partial class PlayerView
 
     internal bool WindowDragging => _windowDrag;
 
-    internal readonly record struct ScreenArea(PixelRect Bounds, PixelRect WorkingArea, double Scaling);
-
-    internal static PixelPoint CenterSnap(PixelRect area, PixelSize size, PixelPoint position, int threshold)
-    {
-        var x = area.X + (area.Width - size.Width) / 2;
-        var y = area.Y + (area.Height - size.Height) / 2;
-        return new PixelPoint(
-            Math.Abs(position.X - x) <= threshold ? x : position.X,
-            Math.Abs(position.Y - y) <= threshold ? y : position.Y);
-    }
-
-    /// <summary>
-    /// Pencere dikdortgenini bulundugu ekranin (merkezine en yakin ekran) calisma alani ortasina
-    /// ceker; esik o ekranin olcegiyle piksele cevrilir. WM_MOVING ve kendi dongumuz bunu paylasir.
-    /// </summary>
-    internal static PixelRect SnapRect(PixelRect rect, IReadOnlyList<ScreenArea> screens, double snapDip)
-    {
-        if (screens.Count == 0) return rect;
-        var center = new PixelPoint(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
-        var screen = screens[0];
-        var best = long.MaxValue;
-        foreach (var candidate in screens)
-        {
-            var b = candidate.Bounds;
-            var dx = center.X < b.X ? (long)b.X - center.X : center.X >= b.Right ? (long)center.X - b.Right + 1 : 0;
-            var dy = center.Y < b.Y ? (long)b.Y - center.Y : center.Y >= b.Bottom ? (long)center.Y - b.Bottom + 1 : 0;
-            var distance = dx * dx + dy * dy;
-            if (distance >= best) continue;
-            best = distance;
-            screen = candidate;
-        }
-
-        var threshold = (int)Math.Ceiling(snapDip * screen.Scaling);
-        return new PixelRect(CenterSnap(screen.WorkingArea, rect.Size, rect.Position, threshold), rect.Size);
-    }
-
-    internal static PixelPoint DragPosition(PixelPoint windowStart, PixelPoint pointerStart, PixelPoint pointerNow, Size frameDip, double windowScaling, IReadOnlyList<ScreenArea> screens, double snapDip)
-    {
-        var position = new PixelPoint(windowStart.X + pointerNow.X - pointerStart.X, windowStart.Y + pointerNow.Y - pointerStart.Y);
-        return SnapRect(new PixelRect(position, PixelSize.FromSize(frameDip, windowScaling)), screens, snapDip).Position;
-    }
-
-    private static List<ScreenArea> ScreenAreas(TopLevel top)
-    {
-        var screens = new List<ScreenArea>();
-        if (top.Screens is { } all)
-            foreach (var screen in all.All)
-                screens.Add(new ScreenArea(screen.Bounds, screen.WorkingArea, screen.Scaling));
-        return screens;
-    }
+    internal static PixelPoint DragPosition(PixelPoint windowStart, PixelPoint pointerStart, PixelPoint pointerNow)
+        => new(windowStart.X + pointerNow.X - pointerStart.X, windowStart.Y + pointerNow.Y - pointerStart.Y);
 
     private void DragWindow(Window window, PixelPoint pointer)
     {
-        var target = DragPosition(_dragWindowStart, _dragPointerStart, pointer, window.FrameSize ?? window.ClientSize, window.RenderScaling, ScreenAreas(window), SnapDip());
+        var target = DragPosition(_dragWindowStart, _dragPointerStart, pointer);
         if (target == window.Position) return;
         window.Position = target;
-        var free = new PixelPoint(_dragWindowStart.X + pointer.X - _dragPointerStart.X, _dragWindowStart.Y + pointer.Y - _dragPointerStart.Y);
-        _trace.Add((target == free ? "move -> " : "snap -> ") + FormattableString.Invariant($"{target.X},{target.Y}"));
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct NativeRect
-    {
-        public int Left;
-        public int Top;
-        public int Right;
-        public int Bottom;
-    }
-
-    private void InstallMovingHook()
-    {
-        if (!OperatingSystem.IsWindows() || _movingHook is not null) return;
-        if (TopLevel.GetTopLevel(this) is not Window top) return;
-        _movingHookTop = top;
-        _movingHook = OnMovingMessage;
-        Win32Properties.AddWndProcHookCallback(top, _movingHook);
-    }
-
-    private void RemoveMovingHook()
-    {
-        if (_movingHookTop is { } top && _movingHook is { } hook) Win32Properties.RemoveWndProcHookCallback(top, hook);
-        _movingHookTop = null;
-        _movingHook = null;
-    }
-
-    private IntPtr OnMovingMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-    {
-        if (msg != WmMoving || lParam == IntPtr.Zero || _movingHookTop is not { } top) return IntPtr.Zero;
-        var native = Marshal.PtrToStructure<NativeRect>(lParam);
-        var rect = new PixelRect(native.Left, native.Top, native.Right - native.Left, native.Bottom - native.Top);
-        var snapped = SnapRect(rect, ScreenAreas(top), SnapDip());
-        if (snapped == rect) return IntPtr.Zero;
-        Marshal.StructureToPtr(new NativeRect { Left = snapped.X, Top = snapped.Y, Right = snapped.Right, Bottom = snapped.Bottom }, lParam, false);
-        _trace.Add(FormattableString.Invariant($"moving snap -> {snapped.X},{snapped.Y}"));
-        handled = true;
-        return new IntPtr(1);
+        _trace.Add("move -> " + FormattableString.Invariant($"{target.X},{target.Y}"));
     }
 
     private void OnFarePointerReleased(object? sender, PointerReleasedEventArgs e)
