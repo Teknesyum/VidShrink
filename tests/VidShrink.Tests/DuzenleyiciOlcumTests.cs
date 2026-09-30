@@ -123,6 +123,74 @@ public sealed class DuzenleyiciOlcumTests
         Assert.All(gorunenler, g => Assert.InRange(g, 10, 12));
     }
 
+    [HedefMakineFact]
+    public void DalgaBicimiIkiYuzKesimdeKaynakUzunlugunaBagliDegil()
+    {
+        const int Isinma = 20;
+        const int Tekrar = 150;
+        const int Kesim = 200;
+        var rapor = AppHost.Run(() =>
+        {
+            (EditorTimeline Cizelge, RenderTargetBitmap Hedef) Kur(long kaynakSn)
+            {
+                var klip = kaynakSn * Sn / Kesim;
+                var model = new EditTimeline(Enumerable.Range(0, Kesim).Select(i => new EditClip(i * klip, (i + 1) * klip, 1m, i % 3 == 0)), kaynakSn * Sn);
+                var kova = (int)(kaynakSn * AudioPeaks.BucketsPerSecond);
+                var min = new short[kova];
+                var max = new short[kova];
+                for (var i = 0; i < kova; i++)
+                {
+                    max[i] = (short)(i * 7919 % short.MaxValue);
+                    min[i] = (short)-max[i];
+                }
+
+                var cizelge = new EditorTimeline();
+                cizelge.Measure(new Size(Genislik, double.PositiveInfinity));
+                cizelge.Show(model);
+                cizelge.Fps = 30;
+                cizelge.Peaks = new AudioPeaks(min, max, kaynakSn * AudioPeaks.SampleRate);
+                cizelge.Measure(new Size(Genislik, double.PositiveInfinity));
+                cizelge.Arrange(new Rect(0, 0, Genislik, cizelge.DesiredSize.Height));
+                return (cizelge, new RenderTargetBitmap(new PixelSize((int)Genislik, (int)Math.Ceiling(cizelge.DesiredSize.Height))));
+            }
+
+            var kollar = new (string Ad, long Kaynak)[] { ("1 dk, 200 kesim, tamami gorunur", 60), ("60 dk, 200 kesim, tamami gorunur", 3600) };
+            var kurulu = kollar.Select(k => Kur(k.Kaynak)).ToArray();
+            var sureler = kollar.Select(_ => new List<double>()).ToArray();
+            var kovalar = new int[kollar.Length];
+            var saat = new Stopwatch();
+            for (var i = 0; i < Isinma + Tekrar; i++)
+            {
+                for (var k = 0; k < kurulu.Length; k++)
+                {
+                    var (cizelge, hedef) = kurulu[k];
+                    saat.Restart();
+                    cizelge.Measure(new Size(Genislik, double.PositiveInfinity));
+                    cizelge.Arrange(new Rect(0, 0, Genislik, cizelge.DesiredSize.Height));
+                    hedef.Render(cizelge);
+                    saat.Stop();
+                    if (i >= Isinma) sureler[k].Add(saat.Elapsed.TotalMilliseconds);
+                    kovalar[k] = Math.Max(kovalar[k], cizelge.WaveformBucketsDrawn);
+                }
+            }
+
+            var genislik = kurulu[0].Cizelge.TrackWidth;
+            foreach (var (_, hedef) in kurulu) hedef.Dispose();
+            return (kollar, sureler, kovalar, genislik);
+        });
+
+        var (adlar, olculer, kovalar, iz) = rapor;
+        var taban = Medyan(olculer[0]);
+        var metin = new StringBuilder($"dalga bicimi: {Kesim} kesim, tepeli, RenderTargetBitmap, {Genislik} px, isinma {Isinma}, tekrar {Tekrar}{Environment.NewLine}");
+        for (var k = 0; k < adlar.Length; k++)
+            metin.AppendLine($"{adlar[k].Ad}: medyan {F(Medyan(olculer[k]))} ms, p95 {F(Yuzdelik(olculer[k], 0.95))} ms, en cok kova {kovalar[k]}, oran {F(Medyan(olculer[k]) / taban)}");
+        Yaz("dalga-bicimi-200-kesim.txt", metin.ToString());
+
+        var oran = Medyan(olculer[1]) / taban;
+        Assert.True(oran is >= 0.8 and <= 1.2, metin.ToString());
+        Assert.All(kovalar, k => Assert.InRange(k, 1, (int)iz + Kesim));
+    }
+
     [Fact]
     public void BirakistanSonraOynatmaBasiMotorlaAyniKarede()
     {
