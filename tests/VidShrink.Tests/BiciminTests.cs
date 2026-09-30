@@ -1197,6 +1197,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-28, bolge dali ile birlikte: recorder.region.hide ve recorder.region.stop-close, 2711 + 5 = 2716, en 256, tr 92.</para>
     /// <para>2026-09-29, arayuz turu: yeni <c>recorder.advanced.encoder-title</c> fr, pt ve sw cevirilerinde islev sozcugu tasiyor (de, do, ya): 2716 + 3 = 2719, en 256, tr 92.</para>
     /// <para>2026-09-29, kaydedici sihirbazi: 21 yeni <c>recorder.wizard.*</c> ve <c>recorder.replay.seconds</c> anahtari: 2719 + 25 = 2744, en 256 + 5 = 261, tr 92 + 3 = 95.</para>
+    /// <para>2026-09-30, kaydedici EN tasmasi: <c>recorder.advanced.audio-mixed</c> "Mix into one track" yerine "Single track", islev sozcugu dustu ve koldan cikiyor: 2744 - 1 = 2743, en 260, tr 95.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1222,8 +1223,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2744, toplam);
-        Assert.Equal(261, dilBasina["en"]);
+        Assert.Equal(2743, toplam);
+        Assert.Equal(260, dilBasina["en"]);
         Assert.Equal(95, dilBasina["tr"]);
     }
 
