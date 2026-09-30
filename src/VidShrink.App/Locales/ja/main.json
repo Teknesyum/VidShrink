@@ -611,6 +611,8 @@
   "main.player.input.wheel": "ホイール",
   "main.player.input.left": "左クリック",
   "main.player.input.middle": "中クリック",
+  "main.player.input.back": "戻るボタン",
+  "main.player.input.forward": "進むボタン",
   "main.player.input.right": "右クリック",
   "main.player.input.space": "スペース",
   "main.player.input.enter": "Enter",

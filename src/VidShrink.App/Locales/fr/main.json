@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Molette",
   "main.player.input.left": "Clic gauche",
   "main.player.input.middle": "Clic central",
+  "main.player.input.back": "Bouton précédent",
+  "main.player.input.forward": "Bouton suivant",
   "main.player.input.right": "Clic droit",
   "main.player.input.space": "Espace",
   "main.player.input.enter": "Entrée",

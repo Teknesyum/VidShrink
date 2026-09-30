@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Rotellina",
   "main.player.input.left": "Clic sinistro",
   "main.player.input.middle": "Clic centrale",
+  "main.player.input.back": "Pulsante indietro",
+  "main.player.input.forward": "Pulsante avanti",
   "main.player.input.right": "Clic destro",
   "main.player.input.space": "Spazio",
   "main.player.input.enter": "Invio",

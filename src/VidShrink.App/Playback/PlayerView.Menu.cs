@@ -51,7 +51,7 @@ internal partial class PlayerView
         if (Keymap.FirstKeyRow(action) is { } row)
         {
             item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
-            ToolTip.SetTip(item, Strings.Get(action.LabelKey) + " (" + Keymap.Gesture(row.Input) + ")");
+            ToolTip.SetTip(item, Keymap.Tip(Strings.Get(action.LabelKey), row.Input));
         }
 
         if (ToggleState(action) is { } on)

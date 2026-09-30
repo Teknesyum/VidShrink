@@ -335,9 +335,9 @@ internal partial class PlayerView
 
     private MenuItem Bound(PlayerAction action)
     {
-        var row = Keymap.Rows.First(r => ReferenceEquals(r.Action, action));
-        var item = new MenuItem { Header = Keymap.Label(row), Tag = action };
-        if (row.Input.Symbol is null) item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
+        var row = Keymap.Rows.FirstOrDefault(r => ReferenceEquals(r.Action, action));
+        var item = new MenuItem { Header = Keymap.Label(row ?? Keymap.DefaultRows.First(r => ReferenceEquals(r.Action, action))), Tag = action };
+        if (row is { Input: { Kind: PlayerInputKind.Key, Symbol: null } }) item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
         item.Click += OnTrackRow;
         return item;
     }

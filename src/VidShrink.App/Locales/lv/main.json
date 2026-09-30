@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Ritenītis",
   "main.player.input.left": "Kreisais klikšķis",
   "main.player.input.middle": "Vidējais klikšķis",
+  "main.player.input.back": "Poga Atpakaļ",
+  "main.player.input.forward": "Poga Uz priekšu",
   "main.player.input.right": "Labais klikšķis",
   "main.player.input.space": "Atstarpe",
   "main.player.input.enter": "Enter",

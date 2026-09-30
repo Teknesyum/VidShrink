@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Ratukas",
   "main.player.input.left": "Kairysis paspaudimas",
   "main.player.input.middle": "Vidurinis paspaudimas",
+  "main.player.input.back": "Mygtukas Atgal",
+  "main.player.input.forward": "Mygtukas Pirmyn",
   "main.player.input.right": "Dešinysis paspaudimas",
   "main.player.input.space": "Tarpas",
   "main.player.input.enter": "Enter",

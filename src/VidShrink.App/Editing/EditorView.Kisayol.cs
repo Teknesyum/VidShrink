@@ -159,10 +159,10 @@ internal partial class EditorView
     }
 
     private static KeyGesture? Gesture(EditorCommand command)
-        => EditorKeymap.First(command) is { } row ? new KeyGesture(row.Key, row.Modifiers) : null;
+        => EditorKeymap.FirstKey(command) is { } row ? new KeyGesture(row.Key, row.Modifiers) : null;
 
     internal static string Tip(string labelKey, EditorCommand command)
-        => Strings.Get(labelKey) + " (" + EditorKeymap.Gesture(command) + ")";
+        => Keymap.Tip(Strings.Get(labelKey), EditorKeymap.First(command)?.Input);
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
@@ -170,8 +170,12 @@ internal partial class EditorView
         if (_resumeClock) _clock.Start();
         Strings.Changed -= OnLanguageChanged;
         Strings.Changed += OnLanguageChanged;
+        ShortcutBindings.Changed -= OnLanguageChanged;
+        ShortcutBindings.Changed += OnLanguageChanged;
         ShowGestures();
         if (TopLevel.GetTopLevel(this) is { } top) top.AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
+        RemoveHandler(PointerPressedEvent, OnButtonPress);
+        AddHandler(PointerPressedEvent, OnButtonPress, RoutingStrategies.Tunnel);
     }
 
     private bool _resumeClock;
@@ -181,6 +185,8 @@ internal partial class EditorView
         _resumeClock = _clock.IsEnabled;
         _clock.Stop();
         Strings.Changed -= OnLanguageChanged;
+        ShortcutBindings.Changed -= OnLanguageChanged;
+        RemoveHandler(PointerPressedEvent, OnButtonPress);
         if (TopLevel.GetTopLevel(this) is { } top) top.RemoveHandler(KeyDownEvent, OnKey);
         base.OnDetachedFromVisualTree(e);
     }
@@ -195,5 +201,19 @@ internal partial class EditorView
     {
         if (e.Handled || !IsEffectivelyVisible || e.Source is TextBox) return;
         if (HandleKey(e.Key, e.KeyModifiers)) e.Handled = true;
+    }
+
+    internal static PlayerButton? PressedButton(PointerUpdateKind kind) => kind switch
+    {
+        PointerUpdateKind.MiddleButtonPressed => PlayerButton.Middle,
+        PointerUpdateKind.XButton1Pressed => PlayerButton.Back,
+        PointerUpdateKind.XButton2Pressed => PlayerButton.Forward,
+        _ => null
+    };
+
+    private void OnButtonPress(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.Handled || PressedButton(e.GetCurrentPoint(this).Properties.PointerUpdateKind) is not { } button) return;
+        if (Run(EditorKeymap.ForPress(button))) e.Handled = true;
     }
 }

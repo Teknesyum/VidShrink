@@ -10,8 +10,11 @@
 
       EditorVideoTrackHeight     <- DropIconSize (48). İki dokunma ölçüsü üst üste; klip
                                     içinde rozet ve tutamak sığar.
-      EditorAudioTrackHeight     <- DropIconSize (48). Ses izi dalga biçimi taşıyor;
-                                    tepeler görüntü iziyle aynı yükseklikte okunur.
+      EditorAudioTrackShare      <- AudioTrackShare (0,2). Oran, piksel değil: ses izinin
+                                    yüksekliği EditorVideoTrackHeight × bu pay (48 → 9,6).
+                                    Görüntü izi değişirse ses izi onunla birlikte ölçeklenir.
+                                    Dalga biçimi kaynağın en yüksek tepesine göre ölçeklenir,
+                                    ince izde de tam boy okunur.
       EditorTrackGap             <- SpaceXs (4). İzler arası tek çizgi payı.
       EditorTrackHeaderWidth     <- FieldWidthSm (120). İz adı sütunu.
       EditorRulerHeight          <- TargetMinSize (24). Cetvel tıklanabilir, oynatma
@@ -74,7 +77,7 @@
   -->
 
   <StaticResource x:Key="EditorVideoTrackHeight" ResourceKey="DropIconSize"/>
-  <StaticResource x:Key="EditorAudioTrackHeight" ResourceKey="DropIconSize"/>
+  <StaticResource x:Key="EditorAudioTrackShare" ResourceKey="AudioTrackShare"/>
   <StaticResource x:Key="EditorTrackGap" ResourceKey="SpaceXs"/>
   <StaticResource x:Key="EditorTrackHeaderWidth" ResourceKey="FieldWidthSm"/>
   <StaticResource x:Key="EditorRulerHeight" ResourceKey="TargetMinSize"/>

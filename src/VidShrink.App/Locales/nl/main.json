@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Muiswiel",
   "main.player.input.left": "Linksklik",
   "main.player.input.middle": "Middelklik",
+  "main.player.input.back": "Knop terug",
+  "main.player.input.forward": "Knop vooruit",
   "main.player.input.right": "Rechtsklik",
   "main.player.input.space": "Spatie",
   "main.player.input.enter": "Enter",

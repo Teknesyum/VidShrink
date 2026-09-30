@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Tekerlek",
   "main.player.input.left": "Sol tık",
   "main.player.input.middle": "Orta tık",
+  "main.player.input.back": "Geri düğmesi",
+  "main.player.input.forward": "İleri düğmesi",
   "main.player.input.right": "Sağ tık",
   "main.player.input.space": "Boşluk",
   "main.player.input.enter": "Enter tuşu",

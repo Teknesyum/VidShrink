@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Rueda",
   "main.player.input.left": "Clic izquierdo",
   "main.player.input.middle": "Clic central",
+  "main.player.input.back": "Botón atrás",
+  "main.player.input.forward": "Botón adelante",
   "main.player.input.right": "Clic derecho",
   "main.player.input.space": "Espacio",
   "main.player.input.enter": "Enter",

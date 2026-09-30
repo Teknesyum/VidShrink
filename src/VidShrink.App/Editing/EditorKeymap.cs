@@ -45,9 +45,17 @@ internal enum EditorCommand
     Export
 }
 
-internal sealed record EditorKeyRow(Key Key, KeyModifiers Modifiers, EditorCommand Command, string LabelKey, string? Symbol = null)
+internal sealed record EditorKeyRow(Key Key, KeyModifiers Modifiers, EditorCommand Command, string LabelKey, string? Symbol = null, PlayerButton? Button = null)
 {
-    internal string Gesture => Keymap.Gesture(Symbol is null ? PlayerInput.OnKey(Key, Modifiers) : PlayerInput.OnSymbol(Symbol, Key, Modifiers));
+    internal PlayerInput Input => Button is { } button
+        ? PlayerInput.OnPress(button)
+        : Symbol is null ? PlayerInput.OnKey(Key, Modifiers) : PlayerInput.OnSymbol(Symbol, Key, Modifiers);
+
+    internal string Gesture => Keymap.Gesture(Input);
+
+    internal EditorKeyRow Bound(PlayerInput input) => input.Kind == PlayerInputKind.Press
+        ? this with { Key = Key.None, Modifiers = KeyModifiers.None, Symbol = null, Button = input.Button }
+        : this with { Key = input.Key, Modifiers = input.Modifiers, Symbol = input.Symbol, Button = null };
 
     internal string Label => Strings.Get(LabelKey);
 }
@@ -56,7 +64,52 @@ internal static class EditorKeymap
 {
     internal const double MaxShuttle = 8;
 
-    internal static readonly IReadOnlyList<EditorKeyRow> Rows = new EditorKeyRow[]
+    private static readonly object Gate = new();
+    private static int _version = -1;
+    private static IReadOnlyList<EditorKeyRow> _rows = System.Array.Empty<EditorKeyRow>();
+    private static IReadOnlyList<EditorKeyRow?> _effective = System.Array.Empty<EditorKeyRow?>();
+
+    internal static IReadOnlyList<EditorKeyRow> Rows
+    {
+        get
+        {
+            Refresh();
+            return _rows;
+        }
+    }
+
+    internal static string SlotId(EditorKeyRow row) => ShortcutBindings.Canon(row.Input);
+
+    internal static IReadOnlyList<ShortcutSlot> ShortcutSlots()
+    {
+        Refresh();
+        var slots = new List<ShortcutSlot>(DefaultRows.Count);
+        for (var i = 0; i < DefaultRows.Count; i++)
+            slots.Add(new ShortcutSlot(ShortcutMap.Editor, SlotId(DefaultRows[i]), DefaultRows[i].Input, _effective[i]?.Input, DefaultRows[i].Label));
+        return slots;
+    }
+
+    private static void Refresh()
+    {
+        var version = ShortcutBindings.Version;
+        lock (Gate)
+        {
+            if (version == _version) return;
+            var effective = new EditorKeyRow?[DefaultRows.Count];
+            for (var i = 0; i < DefaultRows.Count; i++)
+            {
+                var row = DefaultRows[i];
+                if (!ShortcutBindings.TryOverride(ShortcutMap.Editor, SlotId(row), out var input)) effective[i] = row;
+                else if (input is { } bound) effective[i] = row.Bound(bound);
+            }
+
+            _effective = effective;
+            _rows = effective.OfType<EditorKeyRow>().ToArray();
+            _version = version;
+        }
+    }
+
+    internal static readonly IReadOnlyList<EditorKeyRow> DefaultRows = new EditorKeyRow[]
     {
         new(Key.Space, KeyModifiers.None, EditorCommand.PlayPause, "main.player.menu.playpause"),
         new(Key.J, KeyModifiers.None, EditorCommand.ShuttleBack, "editor.key.shuttle-back"),
@@ -100,9 +153,17 @@ internal static class EditorKeymap
 
     internal static EditorCommand For(Key key, KeyModifiers modifiers)
     {
-        var clean = modifiers & (KeyModifiers.Control | KeyModifiers.Shift | KeyModifiers.Alt | KeyModifiers.Meta);
-        return Rows.FirstOrDefault(r => r.Key == key && r.Modifiers == clean)?.Command ?? EditorCommand.None;
+        var clean = Clean(modifiers);
+        return Rows.FirstOrDefault(r => r.Button is null && r.Key == key && r.Modifiers == clean)?.Command ?? EditorCommand.None;
     }
+
+    internal static KeyModifiers Clean(KeyModifiers modifiers)
+        => modifiers & (KeyModifiers.Control | KeyModifiers.Shift | KeyModifiers.Alt | KeyModifiers.Meta);
+
+    internal static EditorCommand ForPress(PlayerButton button)
+        => Rows.FirstOrDefault(r => r.Button == button)?.Command ?? EditorCommand.None;
+
+    internal static EditorKeyRow? FirstKey(EditorCommand command) => Rows.FirstOrDefault(r => r.Command == command && r.Button is null);
 
     internal static EditorKeyRow? First(EditorCommand command) => Rows.FirstOrDefault(r => r.Command == command);
 

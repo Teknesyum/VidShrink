@@ -226,7 +226,7 @@ internal partial class PlayerView
     private static void SeritLabel(Control control, string name, KeymapRow? row)
     {
         AutomationProperties.SetName(control, name);
-        ToolTip.SetTip(control, row is null ? name : name + " (" + Keymap.Gesture(row.Input) + ")");
+        ToolTip.SetTip(control, Keymap.Tip(name, row?.Input));
     }
 
     private void RevealSerit(bool shown)

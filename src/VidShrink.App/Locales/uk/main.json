@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Колесо",
   "main.player.input.left": "Клацання лівою кнопкою",
   "main.player.input.middle": "Клацання середньою кнопкою",
+  "main.player.input.back": "Кнопка «Назад»",
+  "main.player.input.forward": "Кнопка «Вперед»",
   "main.player.input.right": "Клацання правою кнопкою",
   "main.player.input.space": "Пробіл",
   "main.player.input.enter": "Enter",

@@ -1202,6 +1202,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-30, oynatma listesi oge menusu: bes yeni <c>player.list.*</c> anahtari (sirala, sonra oynat, kaldir, yolu kopyala, oynat) 13 kol: 2809 + 13 = 2822, en 265 + 2 = 267, tr 97.</para>
     /// <para>2026-09-30, oynatici alt seridi: uc yeni anahtar (sure ipucu, hiz A/B menusu, hiz A/B ipucu) 55 kol: 2822 + 55 = 2877, en 267 + 2 = 269, tr 97 + 2 = 99.</para>
     /// <para>2026-09-30, oynatici kurtarma: <c>main.player.recoveryfailed</c> 42 dilde cumle, koldan cikmiyor (olculen SAYIM toplam 2877, en 269, tr 99): 2877 + 0 = 2877, en 269, tr 99.</para>
+    /// <para>2026-09-30, kisayol atama: yedi yeni anahtardan yalniz dinleme metni (shortcuts.listening, cumle yazimli ipucu) en ve tr'de kola girdi: 2877 + 2 = 2879, en 269 + 1 = 270, tr 99 + 1 = 100. Varsayilanlara Don dugmesi Title Case, oteki bes anahtar kola girmedi.</para>
+    /// <para>2026-09-30, kurtarma ile kisayol atama birlikte: 2877 + 0 + 2 = 2879, en 270, tr 100.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1227,9 +1229,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2877, toplam);
-        Assert.Equal(269, dilBasina["en"]);
-        Assert.Equal(99, dilBasina["tr"]);
+        Assert.Equal(2879, toplam);
+        Assert.Equal(270, dilBasina["en"]);
+        Assert.Equal(100, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1408,6 +1410,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-30, oynatma listesi oge menusu: bes yeni <c>player.list.*</c> anahtari: 1195 + 5 = 1200, 43 x 1200 = 51600.</para>
     /// <para>2026-09-30, oynatici alt seridi: uc yeni anahtar: 1200 + 3 = 1203, 43 x 1203 = 51729.</para>
     /// <para>2026-09-30, oynatici kurtarma: bir yeni anahtar (<c>main.player.recoveryfailed</c>): 1203 + 1 = 1204, 43 x 1204 = 51772.</para>
+    /// <para>2026-09-30, kisayol atama: yedi yeni anahtar (bes shortcuts.*, iki main.player.input.*): 1203 + 7 = 1210, 43 x 1210 = 52030.</para>
+    /// <para>2026-09-30, kurtarma ile kisayol atama birlikte: 1203 + 1 + 7 = 1211, 43 x 1211 = 52073.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1435,7 +1439,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(51772, gezilen);
+        Assert.Equal(52073, gezilen);
         Assert.Empty(kayip);
     }
 

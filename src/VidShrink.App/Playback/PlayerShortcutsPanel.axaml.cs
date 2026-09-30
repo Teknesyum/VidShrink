@@ -10,22 +10,18 @@ namespace VidShrink.App.Playback;
 
 internal partial class PlayerShortcutsPanel : UserControl
 {
+    private readonly ShortcutTable _table;
+
     public PlayerShortcutsPanel()
     {
         InitializeComponent();
+        _table = new ShortcutTable(Rows, TxtNotice, ShortcutMap.Player, Find);
         Build();
     }
 
-    internal IReadOnlyList<(string Gesture, string Label)> Shown
-    {
-        get
-        {
-            var shown = new List<(string, string)>();
-            for (var i = 0; i + 1 < Rows.Children.Count; i += 2)
-                shown.Add((((TextBlock)Rows.Children[i]).Text ?? "", ((TextBlock)Rows.Children[i + 1]).Text ?? ""));
-            return shown;
-        }
-    }
+    internal IReadOnlyList<(string Gesture, string Label)> Shown => _table.Shown;
+
+    internal ShortcutTable Table => _table;
 
     /// <summary>
     /// Liste açık mı. Tek başına kurulan panel açık gelir; Ayarlar sayfası kapalı kurar ki
@@ -43,11 +39,14 @@ internal partial class PlayerShortcutsPanel : UserControl
 
     private void OnToggle(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => IsOpen = !IsOpen;
 
+    private void OnReset(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => _table.Reset();
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         Strings.Changed -= OnLanguageChanged;
         Strings.Changed += OnLanguageChanged;
+        _table.Attach();
         Build();
         Dispatcher.UIThread.Post(() => Root.Classes.Remove("enter"));
     }
@@ -55,42 +54,23 @@ internal partial class PlayerShortcutsPanel : UserControl
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         Strings.Changed -= OnLanguageChanged;
+        _table.Detach();
         base.OnDetachedFromVisualTree(e);
     }
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
-        if (Dispatcher.UIThread.CheckAccess()) Build();
-        else Dispatcher.UIThread.Post(Build);
+        if (Dispatcher.UIThread.CheckAccess()) Relabel();
+        else Dispatcher.UIThread.Post(Relabel);
     }
 
-    internal void Build()
+    private void Relabel()
     {
-        Rows.Children.Clear();
-        Rows.RowDefinitions.Clear();
-        var index = 0;
-        foreach (var row in Keymap.Rows)
-        {
-            Rows.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
-
-            var gesture = new TextBlock { Text = Keymap.Gesture(row.Input), Theme = Find("MonoValue") };
-            Grid.SetRow(gesture, index);
-            Grid.SetColumn(gesture, 0);
-
-            var label = new TextBlock
-            {
-                Text = VidShrink.Core.Bicim.Satir.Bagla(Keymap.Label(row)),
-                Theme = Find("Body"),
-                TextWrapping = Avalonia.Media.TextWrapping.Wrap
-            };
-            Grid.SetRow(label, index);
-            Grid.SetColumn(label, 1);
-
-            Rows.Children.Add(gesture);
-            Rows.Children.Add(label);
-            index++;
-        }
+        _table.Notice = "";
+        Build();
     }
+
+    internal void Build() => _table.Build();
 
     /// <summary>
     /// Kalın mono tuş ile sans açıklamanın ilk satır taban çizgileri. İkisi de satırın tepesine
@@ -103,25 +83,59 @@ internal partial class PlayerShortcutsPanel : UserControl
         return TabanlariHizala(Rows) ? base.MeasureOverride(availableSize) : boyut;
     }
 
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        var boyut = base.ArrangeOverride(finalSize);
+        if (TabanlariHizala(Rows)) Dispatcher.UIThread.Post(InvalidateMeasure, DispatcherPriority.Render);
+        return boyut;
+    }
+
     internal static bool TabanlariHizala(Grid rows)
     {
         var degisti = false;
         for (var i = 0; i + 1 < rows.Children.Count; i += 2)
         {
-            if (rows.Children[i] is not TextBlock tus || rows.Children[i + 1] is not TextBlock aciklama) continue;
-            var fark = Taban(aciklama) - Taban(tus);
+            if (rows.Children[i + 1] is not TextBlock aciklama) continue;
+            double tusTabani;
+            Control tus;
+            switch (rows.Children[i])
+            {
+                case TextBlock blok:
+                    tus = blok;
+                    tusTabani = Taban(blok);
+                    break;
+                case ShortcutKeyButton { Content: TextBlock ic } kutu:
+                    tus = kutu;
+                    tusTabani = IcUst(kutu, ic) + Taban(ic);
+                    break;
+                default:
+                    continue;
+            }
+
+            var fark = Taban(aciklama) - tusTabani;
             degisti |= Kaydir(tus, Math.Max(0, fark));
             degisti |= Kaydir(aciklama, Math.Max(0, -fark));
         }
         return degisti;
     }
 
+    private static double IcUst(Button kutu, TextBlock ic)
+    {
+        if (ic.TranslatePoint(default, kutu) is { } yer && ic.Bounds.Height > 0) return yer.Y;
+        var kenar = kutu.BorderThickness;
+        var dolgu = kutu.Padding;
+        var bos = kutu.DesiredSize.Height - kutu.Margin.Top - kutu.Margin.Bottom - kenar.Top - kenar.Bottom - dolgu.Top - dolgu.Bottom - ic.DesiredSize.Height;
+        return kenar.Top + dolgu.Top + Math.Max(0, bos / 2);
+    }
+
     private static double Taban(TextBlock blok)
         => blok.TextLayout.TextLines.Count > 0 ? blok.TextLayout.TextLines[0].Baseline : 0;
 
-    private static bool Kaydir(TextBlock blok, double ust)
+    private static bool Kaydir(Control blok, double ust)
     {
         if (Math.Abs(blok.Margin.Top - ust) < 0.01) return false;
+        blok.UseLayoutRounding = false;
+        if (blok is ContentControl { Content: Control ic }) ic.UseLayoutRounding = false;
         blok.Margin = new Thickness(0, ust, 0, 0);
         return true;
     }

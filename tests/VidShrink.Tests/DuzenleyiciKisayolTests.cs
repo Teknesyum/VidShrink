@@ -460,10 +460,10 @@ public sealed class DuzenleyiciKisayolTests
         });
 
         Assert.Equal("Ctrl+K", menu);
-        Assert.Equal("Undo (Ctrl+Z)", ipucu);
+        Assert.Equal("Undo <Ctrl+Z>", ipucu);
         Assert.Equal(EditorKeymap.Rows.Count, liste.Count);
-        Assert.Contains(("J", "Play backward, press again for faster"), liste);
-        Assert.Contains(("Ctrl+Shift+Z", "Redo"), liste);
+        Assert.Contains(("<J>", "Play backward, press again for faster"), liste);
+        Assert.Contains(("<Ctrl+Shift+Z>", "Redo"), liste);
     }
 
     [Fact]

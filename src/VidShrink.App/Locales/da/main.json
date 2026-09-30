@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Hjul",
   "main.player.input.left": "Venstreklik",
   "main.player.input.middle": "Midterklik",
+  "main.player.input.back": "Tilbage-knap",
+  "main.player.input.forward": "Frem-knap",
   "main.player.input.right": "Højreklik",
   "main.player.input.space": "Mellemrum",
   "main.player.input.enter": "Enter",

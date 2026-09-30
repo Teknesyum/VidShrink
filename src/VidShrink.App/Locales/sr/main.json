@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Točkić miša",
   "main.player.input.left": "Levi klik",
   "main.player.input.middle": "Srednji klik",
+  "main.player.input.back": "Taster Nazad",
+  "main.player.input.forward": "Taster Napred",
   "main.player.input.right": "Desni klik",
   "main.player.input.space": "Razmak",
   "main.player.input.enter": "Enter",

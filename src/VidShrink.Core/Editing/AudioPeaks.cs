@@ -28,7 +28,13 @@ public sealed class AudioPeaks
         _min = min;
         _max = max;
         SampleCount = sampleCount;
+        var loudest = 0;
+        for (var i = 0; i < min.Length; i++)
+            loudest = Math.Max(loudest, Math.Max(Math.Abs((int)min[i]), Math.Abs((int)max[i])));
+        Loudest = loudest;
     }
+
+    public int Loudest { get; }
 
     public static AudioPeaks Empty { get; } = new(Array.Empty<short>(), Array.Empty<short>(), 0);
 

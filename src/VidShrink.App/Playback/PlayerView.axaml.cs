@@ -360,6 +360,8 @@ internal partial class PlayerView : UserControl
         if (point.Properties.IsRightButtonPressed) button = PlayerButton.Right;
         else if (point.Properties.IsMiddleButtonPressed) button = PlayerButton.Middle;
         else if (point.Properties.IsLeftButtonPressed) button = PlayerButton.Left;
+        else if (point.Properties.IsXButton1Pressed) button = PlayerButton.Back;
+        else if (point.Properties.IsXButton2Pressed) button = PlayerButton.Forward;
         else return;
 
         if (MenuPress(e, button))
@@ -460,7 +462,7 @@ internal partial class PlayerView : UserControl
             }
             else
             {
-                item.Header = Keymap.Label(row) + " (" + Keymap.Gesture(row.Input) + ")";
+                item.Header = Keymap.Tip(Keymap.Label(row), row.Input);
             }
 
             item.Click += OnMenuRow;

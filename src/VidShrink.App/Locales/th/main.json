@@ -611,6 +611,8 @@
   "main.player.input.wheel": "ลูกกลิ้ง",
   "main.player.input.left": "คลิกซ้าย",
   "main.player.input.middle": "คลิกกลาง",
+  "main.player.input.back": "ปุ่มย้อนกลับ",
+  "main.player.input.forward": "ปุ่มไปข้างหน้า",
   "main.player.input.right": "คลิกขวา",
   "main.player.input.space": "Space",
   "main.player.input.enter": "Enter",

@@ -611,6 +611,8 @@
   "main.player.input.wheel": "Rotița mouse-ului",
   "main.player.input.left": "Clic stânga",
   "main.player.input.middle": "Clic pe butonul din mijloc",
+  "main.player.input.back": "Butonul Înapoi",
+  "main.player.input.forward": "Butonul Înainte",
   "main.player.input.right": "Clic dreapta",
   "main.player.input.space": "Spațiu",
   "main.player.input.enter": "Enter",
