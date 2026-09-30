@@ -284,6 +284,10 @@ internal static class Native
     [DllImport("kernel32.dll")]
     public static extern IntPtr GetConsoleWindow();
 
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool IsWindowVisible(IntPtr window);
+
     [DllImport("gdiplus.dll")]
     public static extern int GdiplusStartup(out IntPtr token, ref GdiplusStartupInput input, IntPtr output);
 

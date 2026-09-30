@@ -24,10 +24,11 @@ internal static partial class Program
             Run(parsed.Value.Options, parsed.Value.Uninstall, parsed.Value.Timings).GetAwaiter().GetResult();
             return 0;
         }
-        catch (Exception exception) when (exception is SetupException or IOException or UnauthorizedAccessException or HttpRequestException or ArgumentException)
+        catch (Exception exception)
         {
-            Write(exception.Message, ConsoleColor.Red);
-            if (ownConsole)
+            Write(SetupLaunch.FailureMessage(exception), ConsoleColor.Red);
+            var window = Native.GetConsoleWindow();
+            if (SetupLaunch.PauseOnError(ownConsole, window != IntPtr.Zero && Native.IsWindowVisible(window), Console.IsInputRedirected))
             {
                 Console.WriteLine(SetupText.Get("setup.console.press-enter"));
                 Console.ReadLine();
