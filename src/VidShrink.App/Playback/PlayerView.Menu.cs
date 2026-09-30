@@ -73,9 +73,12 @@ internal partial class PlayerView
 
     private string? RevealTarget() => _path is { } path && File.Exists(path) ? Path.GetFullPath(path) : null;
 
-    internal bool RevealFile()
+    internal bool RevealFile() => RevealTarget() is { } path && RevealPath(path);
+
+    internal bool RevealPath(string path)
     {
-        if (RevealTarget() is not { } path) return false;
+        if (!File.Exists(path)) return false;
+        path = Path.GetFullPath(path);
         try
         {
             RevealLauncher(RevealStart(path, OperatingSystem.IsWindows(), OperatingSystem.IsMacOS()));
