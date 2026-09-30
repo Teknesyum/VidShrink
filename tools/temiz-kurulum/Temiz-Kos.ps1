@@ -236,7 +236,7 @@ function Yol-TekSatir {
     $pencere = [IntPtr]::Zero
     $son = (Get-Date).AddMinutes(10)
     while ((Get-Date) -lt $son -and -not $kabuk.HasExited) {
-        $pencere = [TemizKurulum.Yerel]::FindWindowW('VidShrinkSetupPanel', $null)
+        $pencere = [TemizKurulum.Yerel]::FindWindowW('VidShrinkSetupPanel', [NullString]::Value)
         if ($pencere -ne [IntPtr]::Zero) { break }
         Start-Sleep -Seconds 2
     }
