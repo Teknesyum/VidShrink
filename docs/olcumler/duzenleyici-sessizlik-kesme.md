@@ -39,6 +39,13 @@ Taban: 10/10 yeşil. Her mutasyon tek satır, derlenip yalnız `DuzenleyiciSessi
 | M5 eşik değişimi bayat saymıyor (`SameScan`) | 2/10 | Ayar, Arayüz |
 | M6 dosya başında da pay bırakılıyor | 1/10 | Plan |
 
+## CI'nın Yakaladıkları
+
+| Koşum | Kırmızı | Düzeltme |
+| --- | --- | --- |
+| 36790285304 | Yerleşim denetimi: 1024 px'te "Sessizlik" düğme metni araç çubuğundan taştı (ru, ta, bg, nl) | Düğme simgeli oldu (`IconVolumeMute`), metin ipucuna taşındı |
+| 36791426549 | Kontrast: 11/36 açık palette onay kutusu işareti 1,14–1,36 | İki kutuya `CheckStyle` teması |
+
 ## Bilinen Sınırlar
 
 - Metin katmanları kesimle kaymaz; kesilen aralığın içindeki ya da arkasındaki metin eski zamanında kalır.
