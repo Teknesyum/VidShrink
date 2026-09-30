@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Tona in (s)",
   "editor.clip.fade-out": "Tona ut (s)",
   "editor.clip.reset": "Återställ",
-  "editor.export.effects-full": "Klippinställningarna kräver omkodning; bytte till fullt läge."
+  "editor.export.effects-full": "Klippinställningarna kräver omkodning; bytte till fullt läge.",
+  "editor.silence.open": "Klipp tystnad",
+  "editor.silence.panel": "Klippning av tystnad och svarta bilder",
+  "editor.silence.audio": "Tystnad",
+  "editor.silence.black": "Svarta bilder",
+  "editor.silence.threshold": "Tröskel (dB)",
+  "editor.silence.min": "Kortaste (s)",
+  "editor.silence.padding": "Marginal (s)",
+  "editor.silence.scan": "Skanna",
+  "editor.silence.apply": "Klipp intervaller",
+  "editor.silence.scanning": "Skannar…",
+  "editor.silence.found": "{0} intervall hittades, {1} klipps bort.",
+  "editor.silence.none": "Inga intervall att klippa.",
+  "editor.silence.stale": "Inställningarna har ändrats; skanna igen.",
+  "editor.silence.failed": "Skanningen misslyckades: {0}",
+  "editor.silence.cut": "{0} intervall klipptes."
 }

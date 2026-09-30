@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "เฟดเข้า (วิ)",
   "editor.clip.fade-out": "เฟดออก (วิ)",
   "editor.clip.reset": "รีเซ็ต",
-  "editor.export.effects-full": "การตั้งค่าคลิปต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นโหมดเต็ม"
+  "editor.export.effects-full": "การตั้งค่าคลิปต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นโหมดเต็ม",
+  "editor.silence.open": "ตัดความเงียบ",
+  "editor.silence.panel": "ตัดความเงียบและเฟรมดำ",
+  "editor.silence.audio": "ความเงียบ",
+  "editor.silence.black": "เฟรมดำ",
+  "editor.silence.threshold": "เกณฑ์ (dB)",
+  "editor.silence.min": "สั้นที่สุด (วิ)",
+  "editor.silence.padding": "ขอบเผื่อ (วิ)",
+  "editor.silence.scan": "สแกน",
+  "editor.silence.apply": "ตัดช่วง",
+  "editor.silence.scanning": "กำลังสแกน…",
+  "editor.silence.found": "พบ {0} ช่วง จะตัด {1}",
+  "editor.silence.none": "ไม่มีช่วงที่ต้องตัด",
+  "editor.silence.stale": "การตั้งค่าเปลี่ยนไป โปรดสแกนอีกครั้ง",
+  "editor.silence.failed": "สแกนไม่สำเร็จ: {0}",
+  "editor.silence.cut": "ตัดไปแล้ว {0} ช่วง"
 }

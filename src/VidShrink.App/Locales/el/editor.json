@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Σταδιακή εμφάνιση (δ)",
   "editor.clip.fade-out": "Σταδιακή απόκρυψη (δ)",
   "editor.clip.reset": "Επαναφορά",
-  "editor.export.effects-full": "Οι ρυθμίσεις του κλιπ απαιτούν επανακωδικοποίηση· έγινε αλλαγή σε πλήρη λειτουργία."
+  "editor.export.effects-full": "Οι ρυθμίσεις του κλιπ απαιτούν επανακωδικοποίηση· έγινε αλλαγή σε πλήρη λειτουργία.",
+  "editor.silence.open": "Αποκοπή σιωπής",
+  "editor.silence.panel": "Αποκοπή σιωπής και μαύρων καρέ",
+  "editor.silence.audio": "Σιωπή",
+  "editor.silence.black": "Μαύρα καρέ",
+  "editor.silence.threshold": "Όριο (dB)",
+  "editor.silence.min": "Συντομότερο (δ)",
+  "editor.silence.padding": "Περιθώριο (δ)",
+  "editor.silence.scan": "Σάρωση",
+  "editor.silence.apply": "Αποκοπή διαστημάτων",
+  "editor.silence.scanning": "Σάρωση…",
+  "editor.silence.found": "Βρέθηκαν {0} διαστήματα, θα αποκοπούν {1}.",
+  "editor.silence.none": "Δεν υπάρχουν διαστήματα για αποκοπή.",
+  "editor.silence.stale": "Οι ρυθμίσεις άλλαξαν· σαρώστε ξανά.",
+  "editor.silence.failed": "Η σάρωση απέτυχε: {0}",
+  "editor.silence.cut": "Αποκόπηκαν {0} διαστήματα."
 }

@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Muncul perlahan (d)",
   "editor.clip.fade-out": "Hilang perlahan (d)",
   "editor.clip.reset": "Atur ulang",
-  "editor.export.effects-full": "Pengaturan klip memerlukan enkode ulang; beralih ke mode penuh."
+  "editor.export.effects-full": "Pengaturan klip memerlukan enkode ulang; beralih ke mode penuh.",
+  "editor.silence.open": "Potong keheningan",
+  "editor.silence.panel": "Pemotongan hening dan bingkai hitam",
+  "editor.silence.audio": "Hening",
+  "editor.silence.black": "Bingkai hitam",
+  "editor.silence.threshold": "Ambang (dB)",
+  "editor.silence.min": "Terpendek (d)",
+  "editor.silence.padding": "Bantalan (d)",
+  "editor.silence.scan": "Pindai",
+  "editor.silence.apply": "Potong rentang",
+  "editor.silence.scanning": "Memindai…",
+  "editor.silence.found": "{0} rentang ditemukan, {1} akan dipotong.",
+  "editor.silence.none": "Tidak ada rentang untuk dipotong.",
+  "editor.silence.stale": "Pengaturan berubah; pindai ulang.",
+  "editor.silence.failed": "Pemindaian gagal: {0}",
+  "editor.silence.cut": "{0} rentang dipotong."
 }

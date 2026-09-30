@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "淡入 (秒)",
   "editor.clip.fade-out": "淡出 (秒)",
   "editor.clip.reset": "重置",
-  "editor.export.effects-full": "片段设置需要重新编码，已切换到完整模式。"
+  "editor.export.effects-full": "片段设置需要重新编码，已切换到完整模式。",
+  "editor.silence.open": "剪掉静音",
+  "editor.silence.panel": "静音与黑帧剪切",
+  "editor.silence.audio": "静音",
+  "editor.silence.black": "黑帧",
+  "editor.silence.threshold": "阈值 (dB)",
+  "editor.silence.min": "最短 (秒)",
+  "editor.silence.padding": "边距 (秒)",
+  "editor.silence.scan": "扫描",
+  "editor.silence.apply": "剪掉区间",
+  "editor.silence.scanning": "正在扫描…",
+  "editor.silence.found": "找到 {0} 个区间，将剪掉 {1}。",
+  "editor.silence.none": "没有可剪的区间。",
+  "editor.silence.stale": "设置已更改，请重新扫描。",
+  "editor.silence.failed": "扫描失败: {0}",
+  "editor.silence.cut": "已剪掉 {0} 个区间。"
 }

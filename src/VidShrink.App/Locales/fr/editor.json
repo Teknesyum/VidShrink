@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Fondu en ouverture (s)",
   "editor.clip.fade-out": "Fondu en fermeture (s)",
   "editor.clip.reset": "Réinitialiser",
-  "editor.export.effects-full": "Les réglages du clip exigent un réencodage ; passage au mode complet."
+  "editor.export.effects-full": "Les réglages du clip exigent un réencodage ; passage au mode complet.",
+  "editor.silence.open": "Couper les silences",
+  "editor.silence.panel": "Coupe des silences et images noires",
+  "editor.silence.audio": "Silence",
+  "editor.silence.black": "Images noires",
+  "editor.silence.threshold": "Seuil (dB)",
+  "editor.silence.min": "Plus court (s)",
+  "editor.silence.padding": "Marge (s)",
+  "editor.silence.scan": "Analyser",
+  "editor.silence.apply": "Couper les plages",
+  "editor.silence.scanning": "Analyse en cours…",
+  "editor.silence.found": "{0} plages trouvées, {1} seront coupées.",
+  "editor.silence.none": "Aucune plage à couper.",
+  "editor.silence.stale": "Les réglages ont changé ; relancez l’analyse.",
+  "editor.silence.failed": "Échec de l’analyse : {0}",
+  "editor.silence.cut": "{0} plages coupées."
 }

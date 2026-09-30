@@ -54,6 +54,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
     private long _trimEdge;
     private StandardCursorType _cursorKind = StandardCursorType.Arrow;
 
+    private IReadOnlyList<(long Start, long End)> _cuts = Array.Empty<(long Start, long End)>();
     private AudioPeaks? _peaks;
     private readonly Dictionary<int, WaveSlice> _wave = new();
     private (double Ppt, double Width) _waveState;
@@ -108,6 +109,16 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
     internal long? MarkIn { get; private set; }
 
     internal long? MarkOut { get; private set; }
+
+    internal IReadOnlyList<(long Start, long End)> CutPreview
+    {
+        get => _cuts;
+        set
+        {
+            _cuts = value ?? Array.Empty<(long Start, long End)>();
+            _overlay.InvalidateVisual();
+        }
+    }
 
     internal IReadOnlyList<long> Markers => _markers;
 

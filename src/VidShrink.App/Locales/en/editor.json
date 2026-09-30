@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Fade in (s)",
   "editor.clip.fade-out": "Fade out (s)",
   "editor.clip.reset": "Reset",
-  "editor.export.effects-full": "Clip settings need a re-encode; switched to Full."
+  "editor.export.effects-full": "Clip settings need a re-encode; switched to Full.",
+  "editor.silence.open": "Cut silences",
+  "editor.silence.panel": "Silence and black frame cut",
+  "editor.silence.audio": "Silence",
+  "editor.silence.black": "Black frames",
+  "editor.silence.threshold": "Threshold (dB)",
+  "editor.silence.min": "Shortest (s)",
+  "editor.silence.padding": "Padding (s)",
+  "editor.silence.scan": "Scan",
+  "editor.silence.apply": "Cut ranges",
+  "editor.silence.scanning": "Scanning…",
+  "editor.silence.found": "{0} ranges found, {1} will be cut.",
+  "editor.silence.none": "No ranges to cut.",
+  "editor.silence.stale": "Settings changed; scan again.",
+  "editor.silence.failed": "Scan failed: {0}",
+  "editor.silence.cut": "{0} ranges cut."
 }

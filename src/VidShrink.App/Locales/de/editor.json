@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Einblenden (s)",
   "editor.clip.fade-out": "Ausblenden (s)",
   "editor.clip.reset": "Zurücksetzen",
-  "editor.export.effects-full": "Die Clip-Einstellungen erfordern eine Neukodierung; es wurde auf den vollständigen Modus umgestellt."
+  "editor.export.effects-full": "Die Clip-Einstellungen erfordern eine Neukodierung; es wurde auf den vollständigen Modus umgestellt.",
+  "editor.silence.open": "Stille schneiden",
+  "editor.silence.panel": "Stille und Schwarzbilder schneiden",
+  "editor.silence.audio": "Stille",
+  "editor.silence.black": "Schwarzbilder",
+  "editor.silence.threshold": "Schwellenwert (dB)",
+  "editor.silence.min": "Kürzeste (s)",
+  "editor.silence.padding": "Rand (s)",
+  "editor.silence.scan": "Scannen",
+  "editor.silence.apply": "Bereiche schneiden",
+  "editor.silence.scanning": "Wird gescannt…",
+  "editor.silence.found": "{0} Bereiche gefunden, {1} werden geschnitten.",
+  "editor.silence.none": "Keine Bereiche zum Schneiden.",
+  "editor.silence.stale": "Einstellungen geändert; erneut scannen.",
+  "editor.silence.failed": "Scan fehlgeschlagen: {0}",
+  "editor.silence.cut": "{0} Bereiche geschnitten."
 }

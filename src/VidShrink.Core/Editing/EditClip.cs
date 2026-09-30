@@ -100,6 +100,53 @@ public sealed record EditClip
             : (new EditClip(SourceStart, SourceStart + consumed, Speed, false) { Effects = head }, new EditClip(SourceStart + consumed, SourceEnd, Speed, false) { Effects = tail });
     }
 
+    /// <summary>
+    /// Kaynak [<paramref name="start"/>, <paramref name="end"/>) araliginin parcadaki cizelge
+    /// araligi (parca basina gore). Aralik parcayla kesismiyorsa <c>null</c>.
+    /// </summary>
+    public (long From, long To)? OffsetsOf(long start, long end)
+    {
+        var a = Math.Max(start, SourceStart);
+        var b = Math.Min(end, SourceEnd);
+        if (b <= a) return null;
+        return Reversed
+            ? (OffsetOfConsumed(SourceEnd - b), a <= SourceStart ? TimelineLength : OffsetOfConsumed(SourceEnd - a))
+            : (OffsetOfConsumed(a - SourceStart), b >= SourceEnd ? TimelineLength : OffsetOfConsumed(b - SourceStart));
+    }
+
+    /// <summary>
+    /// Kaynak araliklari cikarildiktan sonra kalan parcalar, oynatma sirasiyla. Solma yalniz
+    /// parcanin kendi kenarinda kalir; hiz, yon ve oteki ayarlar tasinir.
+    /// </summary>
+    internal IReadOnlyList<EditClip> Without(IReadOnlyList<(long Start, long End)> ranges)
+    {
+        var kept = new List<(long Start, long End)>();
+        var cursor = SourceStart;
+        foreach (var (start, end) in ranges.Where(r => r.End > SourceStart && r.Start < SourceEnd).OrderBy(r => r.Start))
+        {
+            if (start > cursor) kept.Add((cursor, Math.Min(start, SourceEnd)));
+            cursor = Math.Max(cursor, end);
+            if (cursor >= SourceEnd) break;
+        }
+
+        if (cursor < SourceEnd) kept.Add((cursor, SourceEnd));
+        if (kept.Count == 1 && kept[0] == (SourceStart, SourceEnd)) return new[] { this };
+        if (Reversed) kept.Reverse();
+
+        var pieces = new EditClip[kept.Count];
+        for (var i = 0; i < kept.Count; i++)
+        {
+            var effects = Effects;
+            if (i > 0) effects = effects with { FadeIn = 0 };
+            if (i < kept.Count - 1) effects = effects with { FadeOut = 0 };
+            pieces[i] = new EditClip(kept[i].Start, kept[i].End, Speed, Reversed) { Effects = effects };
+        }
+
+        return pieces;
+    }
+
+    private long OffsetOfConsumed(long consumed) => Math.Min(CeilDiv(consumed * 100, Hundredths), TimelineLength);
+
     private long Consumed(long offset) => offset * Hundredths / 100;
 
     private static long CeilDiv(long value, long divisor) => (value + divisor - 1) / divisor;

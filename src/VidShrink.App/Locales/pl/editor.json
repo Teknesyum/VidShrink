@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Pojawianie się (s)",
   "editor.clip.fade-out": "Zanikanie (s)",
   "editor.clip.reset": "Resetuj",
-  "editor.export.effects-full": "Ustawienia klipu wymagają ponownego kodowania; przełączono na tryb pełny."
+  "editor.export.effects-full": "Ustawienia klipu wymagają ponownego kodowania; przełączono na tryb pełny.",
+  "editor.silence.open": "Wytnij ciszę",
+  "editor.silence.panel": "Wycinanie ciszy i czarnych klatek",
+  "editor.silence.audio": "Cisza",
+  "editor.silence.black": "Czarne klatki",
+  "editor.silence.threshold": "Próg (dB)",
+  "editor.silence.min": "Najkrótszy (s)",
+  "editor.silence.padding": "Margines (s)",
+  "editor.silence.scan": "Skanuj",
+  "editor.silence.apply": "Wytnij zakresy",
+  "editor.silence.scanning": "Skanowanie…",
+  "editor.silence.found": "Znaleziono zakresów: {0}, zostanie wyciętych: {1}.",
+  "editor.silence.none": "Brak zakresów do wycięcia.",
+  "editor.silence.stale": "Ustawienia zmieniono; skanuj ponownie.",
+  "editor.silence.failed": "Skanowanie nie powiodło się: {0}",
+  "editor.silence.cut": "Wycięto zakresów: {0}."
 }

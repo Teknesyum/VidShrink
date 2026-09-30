@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Появление (с)",
   "editor.clip.fade-out": "Затухание (с)",
   "editor.clip.reset": "Сбросить",
-  "editor.export.effects-full": "Настройки клипа требуют перекодирования; включён полный режим."
+  "editor.export.effects-full": "Настройки клипа требуют перекодирования; включён полный режим.",
+  "editor.silence.open": "Вырезать тишину",
+  "editor.silence.panel": "Вырезание тишины и чёрных кадров",
+  "editor.silence.audio": "Тишина",
+  "editor.silence.black": "Чёрные кадры",
+  "editor.silence.threshold": "Порог (dB)",
+  "editor.silence.min": "Самый короткий (с)",
+  "editor.silence.padding": "Отступ (с)",
+  "editor.silence.scan": "Сканировать",
+  "editor.silence.apply": "Вырезать промежутки",
+  "editor.silence.scanning": "Сканирование…",
+  "editor.silence.found": "Найдено промежутков: {0}, будет вырезано {1}.",
+  "editor.silence.none": "Нет промежутков для вырезания.",
+  "editor.silence.stale": "Настройки изменились; выполните сканирование снова.",
+  "editor.silence.failed": "Ошибка сканирования: {0}",
+  "editor.silence.cut": "Вырезано промежутков: {0}."
 }

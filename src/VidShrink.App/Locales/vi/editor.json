@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Hiện dần (giây)",
   "editor.clip.fade-out": "Mờ dần (giây)",
   "editor.clip.reset": "Đặt lại",
-  "editor.export.effects-full": "Cài đặt clip cần mã hóa lại; đã chuyển sang chế độ đầy đủ."
+  "editor.export.effects-full": "Cài đặt clip cần mã hóa lại; đã chuyển sang chế độ đầy đủ.",
+  "editor.silence.open": "Cắt khoảng lặng",
+  "editor.silence.panel": "Cắt khoảng lặng và khung hình đen",
+  "editor.silence.audio": "Khoảng lặng",
+  "editor.silence.black": "Khung hình đen",
+  "editor.silence.threshold": "Ngưỡng (dB)",
+  "editor.silence.min": "Ngắn nhất (giây)",
+  "editor.silence.padding": "Đệm (giây)",
+  "editor.silence.scan": "Quét",
+  "editor.silence.apply": "Cắt các đoạn",
+  "editor.silence.scanning": "Đang quét…",
+  "editor.silence.found": "Tìm thấy {0} đoạn, sẽ cắt {1}.",
+  "editor.silence.none": "Không có đoạn nào để cắt.",
+  "editor.silence.stale": "Cài đặt đã thay đổi; hãy quét lại.",
+  "editor.silence.failed": "Quét thất bại: {0}",
+  "editor.silence.cut": "Đã cắt {0} đoạn."
 }

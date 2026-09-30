@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "மங்கி தோன்றல் (வி)",
   "editor.clip.fade-out": "மங்கி மறைதல் (வி)",
   "editor.clip.reset": "மீட்டமை",
-  "editor.export.effects-full": "கிளிப் அமைப்புகளுக்கு மறுகுறியாக்கம் தேவை; முழு பயன்முறைக்கு மாற்றப்பட்டது."
+  "editor.export.effects-full": "கிளிப் அமைப்புகளுக்கு மறுகுறியாக்கம் தேவை; முழு பயன்முறைக்கு மாற்றப்பட்டது.",
+  "editor.silence.open": "அமைதியை வெட்டு",
+  "editor.silence.panel": "அமைதி மற்றும் கருப்பு ஃப்ரேம் வெட்டு",
+  "editor.silence.audio": "அமைதி",
+  "editor.silence.black": "கருப்பு ஃப்ரேம்கள்",
+  "editor.silence.threshold": "எல்லை (dB)",
+  "editor.silence.min": "குறைந்தது (வி)",
+  "editor.silence.padding": "ஓரம் (வி)",
+  "editor.silence.scan": "ஸ்கேன்",
+  "editor.silence.apply": "இடைவெளிகளை வெட்டு",
+  "editor.silence.scanning": "ஸ்கேன் செய்கிறது…",
+  "editor.silence.found": "{0} இடைவெளிகள் கிடைத்தன, {1} வெட்டப்படும்.",
+  "editor.silence.none": "வெட்ட இடைவெளிகள் இல்லை.",
+  "editor.silence.stale": "அமைப்புகள் மாறின; மீண்டும் ஸ்கேன் செய்யுங்கள்.",
+  "editor.silence.failed": "ஸ்கேன் தோல்வி: {0}",
+  "editor.silence.cut": "{0} இடைவெளிகள் வெட்டப்பட்டன."
 }

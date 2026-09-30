@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "بتدریج ظاہر (سیکنڈ)",
   "editor.clip.fade-out": "بتدریج غائب (سیکنڈ)",
   "editor.clip.reset": "ری سیٹ",
-  "editor.export.effects-full": "کلپ کی ترتیبات کو دوبارہ انکوڈ کرنا ضروری ہے؛ مکمل موڈ پر منتقل کر دیا گیا۔"
+  "editor.export.effects-full": "کلپ کی ترتیبات کو دوبارہ انکوڈ کرنا ضروری ہے؛ مکمل موڈ پر منتقل کر دیا گیا۔",
+  "editor.silence.open": "خاموشی کاٹیں",
+  "editor.silence.panel": "خاموشی اور سیاہ فریم کاٹنا",
+  "editor.silence.audio": "خاموشی",
+  "editor.silence.black": "سیاہ فریم",
+  "editor.silence.threshold": "حد (dB)",
+  "editor.silence.min": "مختصر ترین (سیکنڈ)",
+  "editor.silence.padding": "حاشیہ (سیکنڈ)",
+  "editor.silence.scan": "اسکین",
+  "editor.silence.apply": "وقفے کاٹیں",
+  "editor.silence.scanning": "اسکین ہو رہا ہے…",
+  "editor.silence.found": "{0} وقفے ملے، {1} کاٹے جائیں گے۔",
+  "editor.silence.none": "کاٹنے کے لیے کوئی وقفہ نہیں۔",
+  "editor.silence.stale": "ترتیبات بدل گئیں؛ دوبارہ اسکین کریں۔",
+  "editor.silence.failed": "اسکین ناکام: {0}",
+  "editor.silence.cut": "{0} وقفے کاٹ دیے گئے۔"
 }

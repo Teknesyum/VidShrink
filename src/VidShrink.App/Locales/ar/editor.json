@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "ظهور تدريجي (ث)",
   "editor.clip.fade-out": "اختفاء تدريجي (ث)",
   "editor.clip.reset": "إعادة تعيين",
-  "editor.export.effects-full": "إعدادات المقطع تتطلب إعادة ترميز؛ تم التبديل إلى الوضع الكامل."
+  "editor.export.effects-full": "إعدادات المقطع تتطلب إعادة ترميز؛ تم التبديل إلى الوضع الكامل.",
+  "editor.silence.open": "قص الصمت",
+  "editor.silence.panel": "قص الصمت والإطارات السوداء",
+  "editor.silence.audio": "الصمت",
+  "editor.silence.black": "إطارات سوداء",
+  "editor.silence.threshold": "العتبة (dB)",
+  "editor.silence.min": "الأقصر (ث)",
+  "editor.silence.padding": "الهامش (ث)",
+  "editor.silence.scan": "فحص",
+  "editor.silence.apply": "قص النطاقات",
+  "editor.silence.scanning": "جارٍ الفحص…",
+  "editor.silence.found": "تم العثور على {0} نطاق، وسيتم قص {1}.",
+  "editor.silence.none": "لا توجد نطاقات للقص.",
+  "editor.silence.stale": "تغيّرت الإعدادات؛ أعد الفحص.",
+  "editor.silence.failed": "فشل الفحص: {0}",
+  "editor.silence.cut": "تم قص {0} نطاق."
 }

@@ -56,6 +56,7 @@ internal partial class EditorView : UserControl
         InitMonitor();
         InitText();
         InitClip();
+        InitSilence();
 
         MnuSplit.Click += (_, _) => Split();
         MnuDelete.Click += (_, _) => DeleteSelected();
@@ -127,6 +128,7 @@ internal partial class EditorView : UserControl
         CloseDriver();
         ForgetOverlay();
         ForgetSaved();
+        ForgetSilence();
         _source = path;
         _model = null;
         Timeline.Show(null);

@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Įsiliejimas (s)",
   "editor.clip.fade-out": "Išsiliejimas (s)",
   "editor.clip.reset": "Atstatyti",
-  "editor.export.effects-full": "Klipo nustatymams reikia perkoduoti; perjungta į visą režimą."
+  "editor.export.effects-full": "Klipo nustatymams reikia perkoduoti; perjungta į visą režimą.",
+  "editor.silence.open": "Iškirpti tylą",
+  "editor.silence.panel": "Tylos ir juodų kadrų iškirpimas",
+  "editor.silence.audio": "Tyla",
+  "editor.silence.black": "Juodi kadrai",
+  "editor.silence.threshold": "Slenkstis (dB)",
+  "editor.silence.min": "Trumpiausia (s)",
+  "editor.silence.padding": "Paraštė (s)",
+  "editor.silence.scan": "Skenuoti",
+  "editor.silence.apply": "Iškirpti intervalus",
+  "editor.silence.scanning": "Skenuojama…",
+  "editor.silence.found": "Rasta intervalų: {0}, bus iškirpta {1}.",
+  "editor.silence.none": "Nėra intervalų iškirpti.",
+  "editor.silence.stale": "Nustatymai pasikeitė; skenuokite iš naujo.",
+  "editor.silence.failed": "Skenavimas nepavyko: {0}",
+  "editor.silence.cut": "Iškirpta intervalų: {0}."
 }

@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Infaden (s)",
   "editor.clip.fade-out": "Uitfaden (s)",
   "editor.clip.reset": "Herstellen",
-  "editor.export.effects-full": "De clipinstellingen vereisen hercodering; overgeschakeld naar volledige modus."
+  "editor.export.effects-full": "De clipinstellingen vereisen hercodering; overgeschakeld naar volledige modus.",
+  "editor.silence.open": "Stilte knippen",
+  "editor.silence.panel": "Stilte en zwarte beelden knippen",
+  "editor.silence.audio": "Stilte",
+  "editor.silence.black": "Zwarte beelden",
+  "editor.silence.threshold": "Drempel (dB)",
+  "editor.silence.min": "Kortste (s)",
+  "editor.silence.padding": "Marge (s)",
+  "editor.silence.scan": "Scannen",
+  "editor.silence.apply": "Bereiken knippen",
+  "editor.silence.scanning": "Scannen…",
+  "editor.silence.found": "{0} bereiken gevonden, {1} worden geknipt.",
+  "editor.silence.none": "Geen bereiken om te knippen.",
+  "editor.silence.stale": "Instellingen gewijzigd; scan opnieuw.",
+  "editor.silence.failed": "Scannen mislukt: {0}",
+  "editor.silence.cut": "{0} bereiken geknipt."
 }
