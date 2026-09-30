@@ -59,6 +59,8 @@
                                     "00:00:00:00" ve kutu dolgusu sığar.
       EditorExportModeWidth      <- FieldWidth (280). Dışa aktarma kipi kutusu; en uzun
                                     Türkçe seçenek ("Tam Yeniden Kodlama") ok sütunuyla sığar.
+      EditorPreviewMinHeight     <- DropZoneMinHeight (144). Önizlemenin en az yüksekliği;
+                                    alt panel bundan fazlasını isterse kaydırılır.
 
     Kalıplar
 
@@ -101,6 +103,7 @@
   <StaticResource x:Key="EditorTransportGap" ResourceKey="SpaceSm"/>
   <StaticResource x:Key="EditorTimecodeWidth" ResourceKey="FieldWidthSm"/>
   <StaticResource x:Key="EditorExportModeWidth" ResourceKey="FieldWidth"/>
+  <StaticResource x:Key="EditorPreviewMinHeight" ResourceKey="DropZoneMinHeight"/>
 
   <ControlTheme x:Key="EditorToolButton" TargetType="ToggleButton" BasedOn="{StaticResource GhostButton}">
     <Setter Property="MinWidth" Value="{StaticResource EditorToolButtonSize}"/>
