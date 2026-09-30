@@ -61,7 +61,9 @@
               </Button>
               <ToggleButton x:Name="BtnSnap" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.snap}" AutomationProperties.Name="{loc:Text editor.snap}"/>
               <Button x:Name="BtnAddText" Theme="{StaticResource GhostButton}" MinWidth="{StaticResource EditorToolButtonSize}" Content="T" AutomationProperties.Name="{loc:Text editor.text.add}"/>
-              <ToggleButton x:Name="BtnSilence" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.silence.open}" AutomationProperties.Name="{loc:Text editor.silence.open}"/>
+              <ToggleButton x:Name="BtnSilence" Theme="{StaticResource EditorToolButton}" AutomationProperties.Name="{loc:Text editor.silence.open}" ToolTip.Tip="{loc:Text editor.silence.open}">
+                <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconVolumeMute}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
+              </ToggleButton>
             </StackPanel>
             <StackPanel x:Name="DeliveryGroup" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Top">
               <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
