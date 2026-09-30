@@ -7,6 +7,27 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-09-30
+
+### Added
+
+- Player and editor: every keyboard shortcut can be reassigned from the shortcuts panel; click a key box and press the new key or mouse button. A key taken from another command is reported, and "Reset" restores the defaults.
+- Editor: Premiere-style timecode, program monitor, tool palette (V/C/B), razor, edge trim, multi-select and an audio waveform on the timeline.
+- Player: the bottom strip shows elapsed or remaining time (click to switch, remembered), wheel steps, an A/B speed pair and a larger hover preview.
+- Player: when playback stalls it reloads audio, then reopens the file at the same position; if that fails a lasting notice explains it.
+
+### Changed
+
+- Editor: the audio track is one fifth of the video track's height.
+- Player: the play glyph uses a lighter fill; the end of a file draws a soft outline once; opening a file no longer flashes a play glyph.
+- Startup: a multi-core JIT profile shortens first frame by about 144 ms and an empty start by about 128 ms.
+- Window: the centre snap is gone; the window moves from any empty area with a left-button drag.
+
+### Fixed
+
+- Player: right-clicking with a menu open no longer opens a second menu; playlist items have their own menu.
+- Installer: a console error names its cause and does not wait in an invisible console.
+
 ## [1.2.2] - 2026-09-29
 
 ### Changed
