@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "{0}க்கான சாதனம் கிடைக்கவில்லை; அந்த மூலம் ஒலியில்லாமல் இருக்கும்.",
   "recorder.replay.seconds": "வைத்திருக்க வேண்டிய நீளம்",
   "recorder.region.hide": "சட்டகத்தை மறை (F9)",
-  "recorder.region.stop-close": "பதிவை நிறுத்தி மூடு"
+  "recorder.region.stop-close": "பதிவை நிறுத்தி மூடு",
+  "recorder.capture.fallback-unavailable": "விரைவுப் பிடிப்பு (Desktop Duplication) தொடங்கவில்லை; GDI பிடிப்பில் பதிவாகிறது, 30 fps-க்கு மேல் சட்டகங்கள் விடுபடலாம்.",
+  "recorder.capture.fallback-layout": "பதிவாகும் பகுதி முதன்மை வரைகலை அட்டையின் ஒரே திரையில் இல்லை; GDI பிடிப்பில் பதிவாகிறது, 30 fps-க்கு மேல் சட்டகங்கள் விடுபடலாம்."
 }

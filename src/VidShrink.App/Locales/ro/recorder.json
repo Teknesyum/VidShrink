@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Niciun dispozitiv găsit pentru {0}; sursa aceea rămâne fără sunet.",
   "recorder.replay.seconds": "Durata de păstrat",
   "recorder.region.hide": "Ascunde cadrul (F9)",
-  "recorder.region.stop-close": "Oprește înregistrarea și închide"
+  "recorder.region.stop-close": "Oprește înregistrarea și închide",
+  "recorder.capture.fallback-unavailable": "Captura rapidă (Desktop Duplication) nu a pornit; se înregistrează cu captura GDI, peste 30 fps pot lipsi cadre.",
+  "recorder.capture.fallback-layout": "Zona înregistrată nu se află pe un singur monitor al plăcii video principale; se înregistrează cu captura GDI, peste 30 fps pot lipsi cadre."
 }

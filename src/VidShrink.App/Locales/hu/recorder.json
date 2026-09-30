@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Nem található eszköz ehhez: {0}; az a forrás néma marad.",
   "recorder.replay.seconds": "Megtartandó hossz",
   "recorder.region.hide": "Keret elrejtése (F9)",
-  "recorder.region.stop-close": "Felvétel leállítása és bezárás"
+  "recorder.region.stop-close": "Felvétel leállítása és bezárás",
+  "recorder.capture.fallback-unavailable": "A gyors rögzítés (Desktop Duplication) nem indult el; GDI-rögzítéssel megy a felvétel, 30 fps felett képkockák eshetnek ki.",
+  "recorder.capture.fallback-layout": "A rögzített terület nem a fő videokártya egyetlen monitorán van; GDI-rögzítéssel megy a felvétel, 30 fps felett képkockák eshetnek ki."
 }

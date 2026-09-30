@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "لم يُعثر على جهاز لـ {0}؛ يبقى هذا المصدر بلا صوت.",
   "recorder.replay.seconds": "المدة المطلوب الاحتفاظ بها",
   "recorder.region.hide": "إخفاء الإطار (F9)",
-  "recorder.region.stop-close": "إيقاف التسجيل والإغلاق"
+  "recorder.region.stop-close": "إيقاف التسجيل والإغلاق",
+  "recorder.capture.fallback-unavailable": "لم يبدأ الالتقاط السريع (Desktop Duplication)؛ يجري التسجيل بالتقاط GDI، وقد تسقط إطارات فوق 30 إطارًا/ث.",
+  "recorder.capture.fallback-layout": "المنطقة المسجلة ليست على شاشة واحدة لبطاقة الرسومات الرئيسية؛ يجري التسجيل بالتقاط GDI، وقد تسقط إطارات فوق 30 إطارًا/ث."
 }

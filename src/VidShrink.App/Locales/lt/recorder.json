@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "{0} įrenginio nerasta; šis šaltinis liks be garso.",
   "recorder.replay.seconds": "Išsaugotinas ilgis",
   "recorder.region.hide": "Slėpti rėmelį (F9)",
-  "recorder.region.stop-close": "Stabdyti įrašymą ir uždaryti"
+  "recorder.region.stop-close": "Stabdyti įrašymą ir uždaryti",
+  "recorder.capture.fallback-unavailable": "Greitas fiksavimas (Desktop Duplication) nepasileido; įrašoma GDI fiksavimu, virš 30 fps gali dingti kadrai.",
+  "recorder.capture.fallback-layout": "Įrašoma sritis nėra viename pagrindinės vaizdo plokštės monitoriuje; įrašoma GDI fiksavimu, virš 30 fps gali dingti kadrai."
 }

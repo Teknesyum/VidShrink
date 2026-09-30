@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "دستگاهی برای {0} پیدا نشد؛ آن منبع بدون صدا می‌ماند.",
   "recorder.replay.seconds": "طول زمانی که باید نگه داشته شود",
   "recorder.region.hide": "پنهان کردن قاب (F9)",
-  "recorder.region.stop-close": "توقف ضبط و بستن"
+  "recorder.region.stop-close": "توقف ضبط و بستن",
+  "recorder.capture.fallback-unavailable": "ضبط سریع (Desktop Duplication) آغاز نشد؛ ضبط با GDI انجام می‌شود و بالای ۳۰ فریم بر ثانیه ممکن است فریم بیفتد.",
+  "recorder.capture.fallback-layout": "ناحیهٔ ضبط روی یک نمایشگرِ کارت گرافیک اصلی نیست؛ ضبط با GDI انجام می‌شود و بالای ۳۰ فریم بر ثانیه ممکن است فریم بیفتد."
 }

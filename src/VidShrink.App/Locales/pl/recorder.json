@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Nie znaleziono urządzenia dla {0}; to źródło pozostaje ciche.",
   "recorder.replay.seconds": "Długość do zachowania",
   "recorder.region.hide": "Ukryj ramkę (F9)",
-  "recorder.region.stop-close": "Zatrzymaj nagrywanie i zamknij"
+  "recorder.region.stop-close": "Zatrzymaj nagrywanie i zamknij",
+  "recorder.capture.fallback-unavailable": "Szybkie przechwytywanie (Desktop Duplication) nie uruchomiło się; nagrywanie przez GDI, powyżej 30 kl./s mogą wypadać klatki.",
+  "recorder.capture.fallback-layout": "Nagrywany obszar nie leży na jednym monitorze głównej karty graficznej; nagrywanie przez GDI, powyżej 30 kl./s mogą wypadać klatki."
 }

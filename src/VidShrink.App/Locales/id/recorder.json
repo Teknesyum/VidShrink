@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Tidak ada perangkat ditemukan untuk {0}; sumber itu tetap senyap.",
   "recorder.replay.seconds": "Panjang yang disimpan",
   "recorder.region.hide": "Sembunyikan bingkai (F9)",
-  "recorder.region.stop-close": "Hentikan rekaman dan tutup"
+  "recorder.region.stop-close": "Hentikan rekaman dan tutup",
+  "recorder.capture.fallback-unavailable": "Tangkapan cepat (Desktop Duplication) tidak dapat dimulai; merekam dengan tangkapan GDI, di atas 30 fps bingkai bisa hilang.",
+  "recorder.capture.fallback-layout": "Area rekaman tidak berada di satu monitor kartu grafis utama; merekam dengan tangkapan GDI, di atas 30 fps bingkai bisa hilang."
 }

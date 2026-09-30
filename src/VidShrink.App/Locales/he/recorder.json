@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "לא נמצא התקן עבור {0}; המקור הזה יישאר ללא קול.",
   "recorder.replay.seconds": "אורך לשמירה",
   "recorder.region.hide": "הסתר מסגרת (F9)",
-  "recorder.region.stop-close": "עצור הקלטה וסגור"
+  "recorder.region.stop-close": "עצור הקלטה וסגור",
+  "recorder.capture.fallback-unavailable": "הלכידה המהירה (Desktop Duplication) לא הופעלה; ההקלטה נעשית בלכידת GDI, ומעל 30 fps עלולות ליפול תמונות.",
+  "recorder.capture.fallback-layout": "האזור המוקלט אינו על מסך אחד של כרטיס המסך הראשי; ההקלטה נעשית בלכידת GDI, ומעל 30 fps עלולות ליפול תמונות."
 }

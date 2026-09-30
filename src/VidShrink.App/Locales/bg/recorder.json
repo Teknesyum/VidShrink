@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Не е намерено устройство за {0}; този източник остава без звук.",
   "recorder.replay.seconds": "Продължителност за запазване",
   "recorder.region.hide": "Скрий рамката (F9)",
-  "recorder.region.stop-close": "Спри записа и затвори"
+  "recorder.region.stop-close": "Спри записа и затвори",
+  "recorder.capture.fallback-unavailable": "Бързото заснемане (Desktop Duplication) не се стартира; записва се с GDI, над 30 fps може да се губят кадри.",
+  "recorder.capture.fallback-layout": "Записваната област не е на един монитор на основната видеокарта; записва се с GDI, над 30 fps може да се губят кадри."
 }

@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "ไม่พบอุปกรณ์สำหรับ {0} แหล่งนั้นจะไม่มีเสียง",
   "recorder.replay.seconds": "ความยาวที่จะเก็บไว้",
   "recorder.region.hide": "ซ่อนกรอบ (F9)",
-  "recorder.region.stop-close": "หยุดบันทึกและปิด"
+  "recorder.region.stop-close": "หยุดบันทึกและปิด",
+  "recorder.capture.fallback-unavailable": "การจับภาพแบบเร็ว (Desktop Duplication) ไม่เริ่มทำงาน กำลังบันทึกด้วย GDI ซึ่งอาจเฟรมตกเมื่อเกิน 30 fps",
+  "recorder.capture.fallback-layout": "พื้นที่ที่บันทึกไม่ได้อยู่บนจอเดียวของการ์ดจอหลัก กำลังบันทึกด้วย GDI ซึ่งอาจเฟรมตกเมื่อเกิน 30 fps"
 }

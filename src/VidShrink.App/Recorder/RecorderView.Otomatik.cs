@@ -280,11 +280,16 @@ internal partial class RecorderView
     {
         if (_session is not null) return;
 
+        var measured = BuildRequest(applyAuto: false) is { } built && ToolLocator.IsAvailable(out _)
+            ? await ChooseCaptureAsync(built, notify: false)
+            : null;
+        _guess = null;
+
         var candidates = AutoCandidates();
         _autoChoice = candidates[0];
         _autoResult = null;
 
-        if (BuildRequest(applyAuto: false) is not { } request || !ToolLocator.IsAvailable(out _))
+        if (measured is not { } request || _session is not null)
         {
             ShowAutoSummary(null);
             return;
@@ -376,6 +381,8 @@ internal partial class RecorderView
     /// <summary>
     /// Otomatik kipin girdisi. Yakalama boyutu seçilen hedeften, yenileme hızı işletim
     /// sisteminden, çalışan donanım kolları yoklamadan geliyor; hiçbiri varsayılmıyor.
+    /// Windows'ta 30 kare tavanı yalnız <c>gdigrab</c> içindir: <c>ddagrab</c> yoklaması
+    /// geçtiyse (<see cref="DdagrabWorks"/>) tavan yok.
     /// </summary>
     internal RecorderMachine Machine()
     {
@@ -386,7 +393,7 @@ internal partial class RecorderView
             ScreenRefresh.PrimaryHz(),
             Environment.ProcessorCount,
             WorkingEncoders(),
-            OperatingSystem.IsWindows() ? RecorderAutoPlan.GdigrabMaxFps : 0);
+            OperatingSystem.IsWindows() && DdagrabWorks != true ? RecorderAutoPlan.GdigrabMaxFps : 0);
     }
 
     private (int Width, int Height) CaptureSize()

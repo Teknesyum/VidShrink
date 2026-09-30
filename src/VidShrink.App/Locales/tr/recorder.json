@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "{0} için aygıt bulunamadı; o kaynak sessiz kalır.",
   "recorder.replay.seconds": "Tutulacak süre",
   "recorder.region.hide": "Çerçeveyi gizle (F9)",
-  "recorder.region.stop-close": "Kaydı durdur ve kapat"
+  "recorder.region.stop-close": "Kaydı durdur ve kapat",
+  "recorder.capture.fallback-unavailable": "Hızlı yakalama (Desktop Duplication) açılamadı; kayıt GDI yakalamayla sürüyor, 30 fps üstünde kare düşebilir.",
+  "recorder.capture.fallback-layout": "Kaydedilen alan ana ekran kartının tek bir monitöründe değil; kayıt GDI yakalamayla sürüyor, 30 fps üstünde kare düşebilir."
 }

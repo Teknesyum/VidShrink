@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "未找到 {0} 对应的设备；该音源将保持静音。",
   "recorder.replay.seconds": "要保留的时长",
   "recorder.region.hide": "隐藏边框 (F9)",
-  "recorder.region.stop-close": "停止录制并关闭"
+  "recorder.region.stop-close": "停止录制并关闭",
+  "recorder.capture.fallback-unavailable": "快速捕获（Desktop Duplication）未能启动；正在使用 GDI 捕获录制，高于 30 fps 时可能丢帧。",
+  "recorder.capture.fallback-layout": "录制区域不在主显卡的单个显示器内；正在使用 GDI 捕获录制，高于 30 fps 时可能丢帧。"
 }

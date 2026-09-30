@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "{0}-এর জন্য কোনো ডিভাইস পাওয়া যায়নি; সেই উৎস নীরব থাকবে।",
   "recorder.replay.seconds": "রাখার দৈর্ঘ্য",
   "recorder.region.hide": "ফ্রেম লুকান (F9)",
-  "recorder.region.stop-close": "রেকর্ডিং থামিয়ে বন্ধ করুন"
+  "recorder.region.stop-close": "রেকর্ডিং থামিয়ে বন্ধ করুন",
+  "recorder.capture.fallback-unavailable": "দ্রুত ক্যাপচার (Desktop Duplication) চালু হয়নি; GDI ক্যাপচারে রেকর্ড হচ্ছে, 30 fps-এর বেশিতে ফ্রেম বাদ পড়তে পারে।",
+  "recorder.capture.fallback-layout": "রেকর্ড করা এলাকা প্রধান গ্রাফিক্স কার্ডের একটি মনিটরে নেই; GDI ক্যাপচারে রেকর্ড হচ্ছে, 30 fps-এর বেশিতে ফ্রেম বাদ পড়তে পারে।"
 }

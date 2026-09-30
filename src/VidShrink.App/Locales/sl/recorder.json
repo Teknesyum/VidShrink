@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Za {0} ni bilo najdene naprave; ta vir ostane brez zvoka.",
   "recorder.replay.seconds": "Dolžina za ohranitev",
   "recorder.region.hide": "Skrij okvir (F9)",
-  "recorder.region.stop-close": "Ustavi snemanje in zapri"
+  "recorder.region.stop-close": "Ustavi snemanje in zapri",
+  "recorder.capture.fallback-unavailable": "Hitri zajem (Desktop Duplication) se ni zagnal; snema se z zajemom GDI, nad 30 fps lahko izpade kakšna sličica.",
+  "recorder.capture.fallback-layout": "Snemano območje ni na enem samem zaslonu glavne grafične kartice; snema se z zajemom GDI, nad 30 fps lahko izpade kakšna sličica."
 }

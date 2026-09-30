@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Không tìm thấy thiết bị cho {0}; nguồn đó sẽ im lặng.",
   "recorder.replay.seconds": "Độ dài cần giữ lại",
   "recorder.region.hide": "Ẩn khung (F9)",
-  "recorder.region.stop-close": "Dừng ghi và đóng"
+  "recorder.region.stop-close": "Dừng ghi và đóng",
+  "recorder.capture.fallback-unavailable": "Chụp nhanh (Desktop Duplication) không khởi động được; đang ghi bằng GDI, trên 30 fps có thể rớt khung hình.",
+  "recorder.capture.fallback-layout": "Vùng ghi không nằm trên một màn hình của card đồ họa chính; đang ghi bằng GDI, trên 30 fps có thể rớt khung hình."
 }

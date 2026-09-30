@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Δεν βρέθηκε συσκευή για {0}· αυτή η πηγή παραμένει χωρίς ήχο.",
   "recorder.replay.seconds": "Διάρκεια προς διατήρηση",
   "recorder.region.hide": "Απόκρυψη πλαισίου (F9)",
-  "recorder.region.stop-close": "Διακοπή εγγραφής και κλείσιμο"
+  "recorder.region.stop-close": "Διακοπή εγγραφής και κλείσιμο",
+  "recorder.capture.fallback-unavailable": "Η γρήγορη λήψη (Desktop Duplication) δεν ξεκίνησε· η εγγραφή γίνεται με λήψη GDI, πάνω από 30 fps μπορεί να χάνονται καρέ.",
+  "recorder.capture.fallback-layout": "Η περιοχή εγγραφής δεν βρίσκεται σε μία οθόνη της κύριας κάρτας γραφικών· η εγγραφή γίνεται με λήψη GDI, πάνω από 30 fps μπορεί να χάνονται καρέ."
 }

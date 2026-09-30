@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Fant ingen enhet for {0}; den kilden forblir stille.",
   "recorder.replay.seconds": "Lengde som skal beholdes",
   "recorder.region.hide": "Skjul ramme (F9)",
-  "recorder.region.stop-close": "Stopp opptak og lukk"
+  "recorder.region.stop-close": "Stopp opptak og lukk",
+  "recorder.capture.fallback-unavailable": "Rask opptak (Desktop Duplication) startet ikke; tar opp med GDI, over 30 fps kan bilder falle ut.",
+  "recorder.capture.fallback-layout": "Opptaksområdet ligger ikke på én skjerm på hovedskjermkortet; tar opp med GDI, over 30 fps kan bilder falle ut."
 }

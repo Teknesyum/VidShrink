@@ -235,5 +235,7 @@
   "recorder.wizard.no-device": "Nije pronađen uređaj za {0}; taj izvor ostaje bez zvuka.",
   "recorder.replay.seconds": "Duljina za zadržavanje",
   "recorder.region.hide": "Sakrij okvir (F9)",
-  "recorder.region.stop-close": "Zaustavi snimanje i zatvori"
+  "recorder.region.stop-close": "Zaustavi snimanje i zatvori",
+  "recorder.capture.fallback-unavailable": "Brzo snimanje (Desktop Duplication) nije pokrenuto; snima se putem GDI-ja, iznad 30 fps mogu ispasti sličice.",
+  "recorder.capture.fallback-layout": "Snimano područje nije na jednom monitoru glavne grafičke kartice; snima se putem GDI-ja, iznad 30 fps mogu ispasti sličice."
 }
