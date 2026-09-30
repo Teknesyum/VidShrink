@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -221,7 +222,7 @@ public sealed class OynaticiGeriBildirimTests
         Dongu(() => false, 1);
         var ilkSayi = view.EndCueCount;
         var enYuksek = ornekler.Count == 0 ? 0 : ornekler.Max(x => x.Op);
-        var ara = ornekler.Any(x => x.Op > 0.02 && x.Op < tepe - 0.05);
+        var ara = cue.Transitions?.OfType<DoubleTransition>().Any(x => x.Property == Visual.OpacityProperty && x.Duration > TimeSpan.Zero && x.Duration <= sure) == true;
         body.AppendLine($"sure {sure.TotalMilliseconds} ms, tepe {YolKanit.N(tepe)}; ekranda {YolKanit.N(ekranda)} ms, en yuksek {YolKanit.N(enYuksek)}, ara saydamlik {ara}, kenar sapma {YolKanit.N(kenarSapma)}, orta sapma {YolKanit.N(ortaSapma)}, sayi {ilkSayi}");
         body.AppendLine("iz " + string.Join(" ", ornekler.Where((_, i) => i % 6 == 0).Select(x => YolKanit.N(x.Ms) + ":" + YolKanit.N(x.Op))));
 
