@@ -182,7 +182,11 @@ internal partial class PlayerView : UserControl
             case PlayerCommandKind.Speed:
                 _speed = Math.Clamp(Math.Round(_speed + command.Amount, 2), Keymap.MinimumSpeed, Keymap.MaximumSpeed);
                 _engine?.SetSpeed(_speed);
+                RememberSpeed();
                 _trace.Add("speed " + Saat.Tani.Konum(command.Amount) + " -> " + Saat.Tani.Konum(_speed));
+                break;
+            case PlayerCommandKind.SpeedAb:
+                SwitchSpeedMode();
                 break;
             case PlayerCommandKind.SpeedReset:
                 _speed = 1;
@@ -342,7 +346,7 @@ internal partial class PlayerView : UserControl
     {
         var notches = e.Delta.Y != 0 ? e.Delta.Y : e.Delta.X;
         if (notches == 0) return;
-        FeedWheel(notches, e.KeyModifiers);
+        if (!WheelOnSerit(e, notches)) FeedWheel(notches, e.KeyModifiers);
         e.Handled = true;
     }
 

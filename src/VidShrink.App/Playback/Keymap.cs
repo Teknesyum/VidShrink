@@ -53,6 +53,10 @@ internal static class Keymap
     internal const double SeekMedium = 60;
     internal const double SeekLarge = 300;
     internal const double SeekFine = 1;
+    internal const double WheelSeekStep = 1;
+    internal const double WheelVolumeStep = 1;
+    internal const double WheelSpeedStep = 0.1;
+    internal const double WheelFactor = 10;
 
     internal static readonly PlayerAction Settings = new(PlayerCommandKind.OpenSettings, 0, "main.player.menu.settings");
     internal static readonly PlayerAction PlayPause = new(PlayerCommandKind.TogglePlay, 0, "main.player.menu.playpause");
@@ -75,6 +79,7 @@ internal static class Keymap
     internal static readonly PlayerAction Faster = new(PlayerCommandKind.Speed, SpeedStep, "main.player.menu.faster");
     internal static readonly PlayerAction Slower = new(PlayerCommandKind.Speed, -SpeedStep, "main.player.menu.slower");
     internal static readonly PlayerAction NormalSpeed = new(PlayerCommandKind.SpeedReset, 0, "main.player.menu.normalspeed");
+    internal static readonly PlayerAction SpeedAb = new(PlayerCommandKind.SpeedAb, 0, "main.player.menu.speedab");
     internal static readonly PlayerAction NextFrame = new(PlayerCommandKind.FrameStep, 1, "main.player.menu.nextframe");
     internal static readonly PlayerAction PreviousFrame = new(PlayerCommandKind.FrameStep, -1, "main.player.menu.prevframe");
     internal static readonly PlayerAction LoopStart = new(PlayerCommandKind.LoopStart, 0, "main.player.menu.loopstart");
@@ -94,10 +99,10 @@ internal static class Keymap
 
     internal static readonly IReadOnlyList<KeymapRow> Rows = new KeymapRow[]
     {
-        new(PlayerInput.OnWheel(), Seek(SeekFine)),
-        new(PlayerInput.OnWheel(KeyModifiers.Control), Seek(SeekSmall)),
-        new(PlayerInput.OnWheel(KeyModifiers.Shift), Seek(SeekMedium)),
-        new(PlayerInput.OnWheel(KeyModifiers.Control | KeyModifiers.Shift), Seek(SeekLarge)),
+        new(PlayerInput.OnWheel(), Seek(WheelSeekStep)),
+        new(PlayerInput.OnWheel(KeyModifiers.Control), Seek(WheelSeekStep * WheelScale(KeyModifiers.Control))),
+        new(PlayerInput.OnWheel(KeyModifiers.Shift), Seek(WheelSeekStep * WheelScale(KeyModifiers.Shift))),
+        new(PlayerInput.OnWheel(KeyModifiers.Control | KeyModifiers.Shift), Seek(WheelSeekStep * WheelScale(KeyModifiers.Control | KeyModifiers.Shift))),
         new(PlayerInput.OnWheel(KeyModifiers.Alt), Zoom),
         new(PlayerInput.OnPress(PlayerButton.Left), PlayPause),
         new(PlayerInput.OnPress(PlayerButton.Middle), CompactOrFullscreen),
@@ -125,6 +130,7 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.C), Faster),
         new(PlayerInput.OnKey(Key.X), Slower),
         new(PlayerInput.OnKey(Key.Z), NormalSpeed),
+        new(PlayerInput.OnKey(Key.V), SpeedAb),
         new(PlayerInput.OnKey(Key.F, KeyModifiers.Control | KeyModifiers.Shift), Faster),
         new(PlayerInput.OnKey(Key.B, KeyModifiers.Control | KeyModifiers.Shift), Slower),
         new(PlayerInput.OnKey(Key.N, KeyModifiers.Control | KeyModifiers.Shift), NormalSpeed),
@@ -199,6 +205,20 @@ internal static class Keymap
         var row = Rows.FirstOrDefault(r => r.Input.Kind == PlayerInputKind.Wheel && r.Input.Modifiers == Clean(modifiers));
         return row is null ? PlayerCommand.None : row.Action.ToCommand(notches);
     }
+
+    internal static double WheelScale(KeyModifiers modifiers) => Clean(modifiers) switch
+    {
+        KeyModifiers.Control => 1 / WheelFactor,
+        KeyModifiers.Shift => WheelFactor,
+        KeyModifiers.Control | KeyModifiers.Shift => WheelFactor * WheelFactor,
+        _ => 1
+    };
+
+    internal static PlayerCommand ForVolumeWheel(double notches, KeyModifiers modifiers)
+        => new(PlayerCommandKind.Volume, notches * WheelVolumeStep * WheelScale(modifiers));
+
+    internal static PlayerCommand ForSpeedWheel(double notches, KeyModifiers modifiers)
+        => new(PlayerCommandKind.Speed, notches * WheelSpeedStep * WheelScale(modifiers));
 
     internal static PlayerCommand ForPress(PlayerButton button)
         => Find(r => r.Input.Kind == PlayerInputKind.Press && r.Input.Button == button);

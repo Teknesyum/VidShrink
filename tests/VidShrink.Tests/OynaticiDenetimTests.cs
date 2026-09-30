@@ -120,6 +120,7 @@ public sealed class KeymapTests
         [PlayerCommandKind.ToggleMute] = "mute -> ",
         [PlayerCommandKind.Speed] = "speed ",
         [PlayerCommandKind.SpeedReset] = "speedreset -> ",
+        [PlayerCommandKind.SpeedAb] = "speedab -> ",
         [PlayerCommandKind.FrameStep] = "frame ",
         [PlayerCommandKind.LoopStart] = "loop a -> ",
         [PlayerCommandKind.LoopEnd] = "loop b -> ",
@@ -206,6 +207,7 @@ public sealed class KeymapTests
         var karisik = view.Settings.Shuffle;
         var tekrar = view.Settings.Repeat;
         var mini = view.IsMiniMode;
+        var hizModu = view.SpeedModeB;
 
         tetik();
 
@@ -219,6 +221,7 @@ public sealed class KeymapTests
             PlayerCommandKind.Volume when Math.Abs(view.VolumeLevel - ses - action.Amount) > 1e-9 => $"ses {ses} -> {view.VolumeLevel}, beklenen fark {action.Amount}",
             PlayerCommandKind.Speed when Math.Abs(view.SpeedFactor - hiz - action.Amount) > 1e-9 => $"hiz {hiz} -> {view.SpeedFactor}, beklenen fark {action.Amount}",
             PlayerCommandKind.SpeedReset when view.SpeedFactor != 1 || hiz == 1 => $"hiz {hiz} -> {view.SpeedFactor}",
+            PlayerCommandKind.SpeedAb when view.SpeedModeB == hizModu => "hiz modu degismedi",
             PlayerCommandKind.ToggleMute when view.IsMuted == sessiz => "sessiz degismedi",
             PlayerCommandKind.TogglePlay when view.IsPlaying == oynatma => "oynatma degismedi",
             PlayerCommandKind.ToggleFullscreen when view.Fullscreen.IsFullscreen == tam => "tam ekran degismedi",
@@ -847,9 +850,9 @@ public sealed class OynaticiDenetimMotorTests
             Adim("sag ok", 12, () => GirdiSurucu.Key(view, Key.Right));
             Adim("sol ok", 2, () => GirdiSurucu.Key(view, Key.Left));
             Adim("alt+sag", 3, () => GirdiSurucu.Key(view, Key.Right, KeyModifiers.Alt));
-            Adim("ctrl+tekerlek", 13, () => GirdiSurucu.Wheel(view, 1, KeyModifiers.Control));
+            Adim("shift+tekerlek", 13, () => GirdiSurucu.Wheel(view, 1, KeyModifiers.Shift));
             Adim("alt+sol", 12, () => GirdiSurucu.Key(view, Key.Left, KeyModifiers.Alt));
-            Adim("ctrl+tekerlek geri", 2, () => GirdiSurucu.Wheel(view, -1, KeyModifiers.Control));
+            Adim("shift+tekerlek geri", 2, () => GirdiSurucu.Wheel(view, -1, KeyModifiers.Shift));
             Adim("ctrl+sol", 0, () => GirdiSurucu.Key(view, Key.Left, KeyModifiers.Control));
 
             view.Close();

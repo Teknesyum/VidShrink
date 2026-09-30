@@ -29,6 +29,15 @@ internal sealed class PlayerSettings
 
     internal bool Shuffle { get; set; }
 
+    internal const double DefaultSpeedA = 1;
+    internal const double DefaultSpeedB = 1.8;
+
+    internal bool ShowRemaining { get; set; }
+
+    internal double SpeedA { get; set; } = DefaultSpeedA;
+
+    internal double SpeedB { get; set; } = DefaultSpeedB;
+
     internal static PlayerSettings Load(string? file)
     {
         var settings = new PlayerSettings();
@@ -41,6 +50,9 @@ internal sealed class PlayerSettings
             if ((string?)root["screenshotPattern"] is { Length: > 0 } pattern) settings.ScreenshotPattern = pattern;
             if (Enum.TryParse<RepeatMode>((string?)root["repeat"], true, out var repeat)) settings.Repeat = repeat;
             settings.Shuffle = (bool?)root["shuffle"] ?? false;
+            settings.ShowRemaining = (bool?)root["showRemaining"] ?? false;
+            settings.SpeedA = Speed((double?)root["speedA"], DefaultSpeedA);
+            settings.SpeedB = Speed((double?)root["speedB"], DefaultSpeedB);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -67,6 +79,9 @@ internal sealed class PlayerSettings
                 writer.WriteString("screenshotPattern", ScreenshotPattern);
                 writer.WriteString("repeat", Repeat.ToString());
                 writer.WriteBoolean("shuffle", Shuffle);
+                writer.WriteBoolean("showRemaining", ShowRemaining);
+                writer.WriteNumber("speedA", SpeedA);
+                writer.WriteNumber("speedB", SpeedB);
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);
@@ -75,6 +90,9 @@ internal sealed class PlayerSettings
         {
         }
     }
+
+    private static double Speed(double? value, double fallback) =>
+        value is { } speed && double.IsFinite(speed) && speed >= Keymap.MinimumSpeed && speed <= Keymap.MaximumSpeed ? speed : fallback;
 
     internal string ResolveFolder(string media)
     {

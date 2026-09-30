@@ -119,7 +119,7 @@ public sealed class OynaticiGirdiTests
             {
                 var before = view.PositionSeconds;
                 GirdiSurucu.Wheel(view, 1, mods);
-                rows.Add($"{ad}\tkonum {before:0.###} -> {view.PositionSeconds:0.###} sn");
+                rows.Add(FormattableString.Invariant($"{ad}\tkonum {before:0.###} -> {view.PositionSeconds:0.###} sn"));
             }
 
             var sesOnce = view.VolumeLevel;
@@ -163,11 +163,11 @@ public sealed class OynaticiGirdiTests
 
         Assert.Equal(9, satirlar.Count);
         Assert.Contains("ses 100 -> 100 (konum 0 -> 1 sn)", satirlar[0]);
-        Assert.Contains("konum 1 -> 11 sn", satirlar[1]);
-        Assert.Contains("konum 11 -> 71 sn", satirlar[2]);
-        Assert.Contains("konum 71 -> 371 sn", satirlar[3]);
+        Assert.Contains("konum 1 -> 1.1 sn", satirlar[1]);
+        Assert.Contains("konum 1.1 -> 11.1 sn", satirlar[2]);
+        Assert.Contains("konum 11.1 -> 111.1 sn", satirlar[3]);
         Assert.Contains("yakinlastirma 1 -> 1.24", satirlar[4]);
-        Assert.Contains("konum 371 -> 371 sn", satirlar[4]);
+        Assert.Contains("konum 111.1 -> 111.1 sn", satirlar[4]);
         Assert.Contains("iz menu (oynatma False -> False)", satirlar[5]);
         Assert.Contains("oynatma False -> True", satirlar[6]);
         Assert.Contains("tam ekran False -> True", satirlar[7]);
@@ -180,9 +180,9 @@ public sealed class OynaticiGirdiTests
     {
         Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 1), Keymap.ForWheel(1, KeyModifiers.None));
         Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, -1), Keymap.ForWheel(-1, KeyModifiers.None));
-        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 10), Keymap.ForWheel(1, KeyModifiers.Control));
-        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 60), Keymap.ForWheel(1, KeyModifiers.Shift));
-        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, -300), Keymap.ForWheel(-1, KeyModifiers.Control | KeyModifiers.Shift));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 0.1), Keymap.ForWheel(1, KeyModifiers.Control));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 10), Keymap.ForWheel(1, KeyModifiers.Shift));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, -100), Keymap.ForWheel(-1, KeyModifiers.Control | KeyModifiers.Shift));
         Assert.Equal(PlayerCommandKind.Zoom, Keymap.ForWheel(1, KeyModifiers.Alt).Kind);
         Assert.Equal(PlayerCommandKind.TogglePlay, Keymap.ForPress(PlayerButton.Left).Kind);
         Assert.Equal(PlayerCommandKind.ContextMenu, Keymap.ForPress(PlayerButton.Right).Kind);
@@ -260,7 +260,7 @@ public sealed class OynaticiGirdiTests
             GirdiSurucu.Key(view, Avalonia.Input.Key.Space);
             body.AppendLine($"tam ekranda ctrl+tekerlek: konum {fsPos:0.###} -> {view.PositionSeconds:0.###} sn, bosluk: oynatma {view.IsPlaying}");
             Assert.True(view.Fullscreen.IsFullscreen);
-            Assert.Equal(fsPos + Keymap.SeekSmall, view.PositionSeconds);
+            Assert.Equal(fsPos + Keymap.WheelSeekStep / Keymap.WheelFactor, view.PositionSeconds, 9);
             Assert.True(view.IsPlaying);
 
             GirdiSurucu.Press(view, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);

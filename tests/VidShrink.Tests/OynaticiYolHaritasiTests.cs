@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
 using Avalonia.Interactivity;
@@ -563,7 +564,7 @@ public sealed class OynaticiYolHaritasiTests
     }
 
     [Fact]
-    public void P18HizSimgesiBireVeSonHizaDoner()
+    public void P18HizSimgesiAVeBArasindaGecer()
     {
         var body = new StringBuilder();
         try
@@ -573,26 +574,21 @@ public sealed class OynaticiYolHaritasiTests
             var motor = new YolMotoru();
             var view = Ac(motor, out var window);
             _ = view.SeritZone;
-            var dugme = view.FindControl<Button>("BtnSeritSpeedReset")!;
+            var dugme = view.FindControl<ToggleButton>("BtnSeritSpeedAb")!;
             var okumalar = new List<string>();
             void Oku(string ad)
             {
-                var satir = $"{ad}: gorunum {YolKanit.N(view.SpeedFactor)}, motor {YolKanit.N(motor.Hiz)}";
-                okumalar.Add(YolKanit.N(view.SpeedFactor) + "/" + YolKanit.N(motor.Hiz));
+                var kip = view.SpeedModeB ? "B" : "A";
+                var satir = $"{ad}: kip {kip}, isaretli {dugme.IsChecked}, gorunum {YolKanit.N(view.SpeedFactor)}, motor {YolKanit.N(motor.Hiz)}";
+                okumalar.Add(kip + (dugme.IsChecked == true ? "+" : "-") + YolKanit.N(view.SpeedFactor) + "/" + YolKanit.N(motor.Hiz));
                 body.AppendLine(satir);
             }
 
             Oku("baslangic");
             Tikla(dugme);
-            Oku("1x iken tik (onceki hiz yok)");
-            view.Apply(new PlayerCommand(PlayerCommandKind.Speed, 0.5));
-            Oku("hiz +0,5");
-            Tikla(dugme);
             Oku("tik");
-            Tikla(dugme);
-            Oku("tik");
-            view.Apply(new PlayerCommand(PlayerCommandKind.Speed, 0.25));
-            Oku("hiz +0,25");
+            view.Apply(new PlayerCommand(PlayerCommandKind.Speed, 0.2));
+            Oku("hiz +0,2");
             Tikla(dugme);
             Oku("tik");
             Tikla(dugme);
@@ -600,7 +596,7 @@ public sealed class OynaticiYolHaritasiTests
 
             view.Close();
             window.Close();
-            Assert.Equal(new[] { "1/1", "1/1", "1.5/1.5", "1/1", "1.5/1.5", "1.75/1.75", "1/1", "1.75/1.75" }, okumalar);
+            Assert.Equal(new[] { "A-1/1", "B+1.8/1.8", "B+2/2", "A-1/1", "B+2/2" }, okumalar);
             return 0;
         });
         }

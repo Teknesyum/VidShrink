@@ -255,8 +255,8 @@ internal partial class PlayerView
             : new MpvEngine(new PlaybackOptions
             {
                 Audio = false,
-                RenderWidth = ThumbnailWidth,
-                RenderHeight = ThumbnailHeight
+                RenderWidth = (int)Math.Round(ThumbnailWidth * ThumbnailScale()),
+                RenderHeight = (int)Math.Round(ThumbnailHeight * ThumbnailScale())
             });
 
         try
@@ -305,6 +305,21 @@ internal partial class PlayerView
         ThumbImage.InvalidateVisual();
     }
 
+    internal Size ThumbnailSize(double availableWidth, double availableHeight)
+    {
+        var width = ThumbnailWidth * ThumbnailScale();
+        if (availableWidth > 0) width = Math.Min(width, availableWidth);
+        if (availableHeight > 0) width = Math.Min(width, availableHeight * ThumbnailWidth / ThumbnailHeight);
+        width = Math.Max(width, Math.Min(ThumbnailWidth, availableWidth > 0 ? availableWidth : ThumbnailWidth));
+        return new Size(width, width * ThumbnailHeight / ThumbnailWidth);
+    }
+
+    private double ThumbnailScale()
+    {
+        var scale = Resource("PlaybackThumbnailScale");
+        return scale > 0 ? scale : 1;
+    }
+
     private void PlaceThumbnail(double seconds)
     {
         if (ThumbChip is null || ThumbTime is null) return;
@@ -315,9 +330,15 @@ internal partial class PlayerView
         var width = Surface.Bounds.Width;
         if (!double.IsFinite(duration) || duration <= 0 || width <= 0) return;
         var share = Math.Clamp(seconds / duration, 0, 1);
-        var chipWidth = ThumbChip.Bounds.Width > 0 ? ThumbChip.Bounds.Width : ThumbnailWidth;
-        var chipHeight = ThumbChip.Bounds.Height > 0 ? ThumbChip.Bounds.Height : ThumbnailHeight;
         var margin = Resource("PlaybackBadgeGap");
+        var imageHeight = ThumbImage.Bounds.Height > 0 ? ThumbImage.Bounds.Height : ThumbImage.Height;
+        var extra = ThumbChip.Bounds.Height > 0 && ThumbImage.IsVisible ? Math.Max(0, ThumbChip.Bounds.Height - imageHeight) : 0;
+        var room = (SeekBar.Bounds.Width > 0 ? SeekBar.TranslatePoint(default, Surface)?.Y ?? Surface.Bounds.Height : Surface.Bounds.Height) - margin - extra;
+        var size = ThumbnailSize(width, room);
+        ThumbImage.Width = size.Width;
+        ThumbImage.Height = size.Height;
+        var chipWidth = ThumbImage.IsVisible ? size.Width : (ThumbChip.Bounds.Width > 0 ? ThumbChip.Bounds.Width : ThumbnailWidth);
+        var chipHeight = ThumbImage.IsVisible ? size.Height + extra : (ThumbChip.Bounds.Height > 0 ? ThumbChip.Bounds.Height : ThumbnailHeight);
 
         // Zaman cubugu artik panonun alt kenarinda degil, seridin icinde duruyor: yonga
         // cubugun kendi kenarlarina gore konumlanmali, panonun tamamina gore degil.
