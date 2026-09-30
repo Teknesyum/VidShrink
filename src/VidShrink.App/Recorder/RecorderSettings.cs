@@ -65,6 +65,8 @@ internal sealed class RecorderSettings
 
     internal bool OpenFolderWhenDone { get; set; }
 
+    internal RecorderFinishAction FinishAction { get; set; } = RecorderFinishAction.Nothing;
+
     internal bool ShowClicks { get; set; }
 
     internal bool ClickSound { get; set; }
@@ -239,6 +241,7 @@ internal sealed class RecorderSettings
             if ((double?)root["quality"] is { } quality) settings.Quality = quality;
             settings.ShowCursor = (bool?)root["showCursor"] ?? true;
             settings.OpenFolderWhenDone = (bool?)root["openFolderWhenDone"] ?? false;
+            if (Enum.TryParse<RecorderFinishAction>((string?)root["finishAction"], true, out var finish) && Enum.IsDefined(finish)) settings.FinishAction = finish;
             settings.ShowClicks = (bool?)root["showClicks"] ?? false;
             settings.ClickSound = (bool?)root["clickSound"] ?? false;
             settings.ShowKeys = (bool?)root["showKeys"] ?? false;
@@ -333,6 +336,7 @@ internal sealed class RecorderSettings
                 writer.WriteNumber("quality", Quality);
                 writer.WriteBoolean("showCursor", ShowCursor);
                 writer.WriteBoolean("openFolderWhenDone", OpenFolderWhenDone);
+                writer.WriteString("finishAction", FinishAction.ToString());
                 writer.WriteBoolean("showClicks", ShowClicks);
                 writer.WriteBoolean("clickSound", ClickSound);
                 writer.WriteBoolean("showKeys", ShowKeys);

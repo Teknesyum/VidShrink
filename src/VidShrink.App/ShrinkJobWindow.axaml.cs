@@ -218,6 +218,9 @@ public partial class ShrinkJobWindow : Window
     /// <summary>Pencerenin gorunur durumu; olcu buna bakar, piksele degil.</summary>
     internal ShrinkJobState State { get; private set; } = ShrinkJobState.Bekliyor;
 
+    /// <summary>Bir dosyanın işi bitti: kaynak yolu ve teslim edilen çıktı; başarısız ya da iptal edilen işte çıktı <c>null</c>.</summary>
+    internal event Action<string, string?>? JobFinished;
+
     /// <summary>Bu pencerenin teslim ettigi cikti yollari, kabul sirasiyla.</summary>
     internal IReadOnlyList<string> Outputs => _outputs;
 
@@ -535,6 +538,7 @@ public partial class ShrinkJobWindow : Window
             _cts = null;
             cts.Dispose();
             HideOvershoot();
+            JobFinished?.Invoke(request.Path, State == ShrinkJobState.Bitti && _outputs.Count > 0 ? _outputs[^1] : null);
         }
     }
 

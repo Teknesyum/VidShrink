@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using VidShrink.App.Editing;
@@ -32,12 +33,28 @@ public partial class MainWindow
             _recorderPane.OpenInPlayer = OpenInPlayerAsync;
             _recorderPane.OpenInEditor = path => OpenInEditorAsync(path);
             _recorderPane.RecordingDelivered = FollowRecordingAsync;
+            _recorderPane.ShrinkForFinish = ShrinkForFinishAsync;
             PageRecorder.Content = _recorderPane;
             return _recorderPane;
         }
     }
 
     internal RecorderView RecorderPaneForTest => RecorderPane;
+
+    /// <summary>
+    /// Kaydedicinin "Küçült ve panoya kopyala" kolu. Kayıt, Küçült sekmesinin seçili hedefiyle
+    /// kuyruk penceresine gider (<see cref="OpenBatch"/>); işin çıktısı döner, iş düşerse ya da
+    /// pencere iş bitmeden kapanırsa <c>null</c>.
+    /// </summary>
+    internal Task<string?> ShrinkForFinishAsync(string path)
+    {
+        var done = new TaskCompletionSource<string?>();
+        var window = OpenBatch(new[] { path });
+        window.JobFinished += (_, output) => done.TrySetResult(output);
+        window.Closed += (_, _) => done.TrySetResult(null);
+        window.Show();
+        return done.Task;
+    }
 
     private void KaydediciSekmesiSecildi()
     {
