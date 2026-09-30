@@ -66,6 +66,7 @@ internal partial class EditorView
             case EditorCommand.ToolRazor: UseTool(EditorTool.Razor); break;
             case EditorCommand.ToolRipple: UseTool(EditorTool.Ripple); break;
             case EditorCommand.Export: RequestExport(); break;
+            case EditorCommand.AddText: AddText(); break;
             default: return false;
         }
 
@@ -154,6 +155,7 @@ internal partial class EditorView
         ToolTip.SetTip(BtnSplit, Tip("editor.split", EditorCommand.Split));
         ToolTip.SetTip(BtnUndo, Tip("editor.undo", EditorCommand.Undo));
         ToolTip.SetTip(BtnRedo, Tip("editor.redo", EditorCommand.Redo));
+        ToolTip.SetTip(BtnAddText, Tip("editor.text.add", EditorCommand.AddText));
         ShowMonitorTips();
         RefreshExport();
     }

@@ -48,5 +48,11 @@
   "editor.timecode": "Código de tiempo",
   "editor.duration": "Duración",
   "editor.monitor": "Monitor de programa",
-  "editor.snap": "Ajuste"
+  "editor.snap": "Ajuste",
+  "editor.text.add": "Añadir texto",
+  "editor.text.content": "Texto",
+  "editor.text.size": "Tamaño",
+  "editor.text.color": "Color",
+  "editor.text.panel": "Propiedades del texto",
+  "editor.export.text-full": "La capa de texto requiere recodificar; se cambió al modo completo."
 }

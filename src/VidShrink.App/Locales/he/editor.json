@@ -48,5 +48,11 @@
   "editor.timecode": "קוד זמן",
   "editor.duration": "משך",
   "editor.monitor": "מוניטור תוכנית",
-  "editor.snap": "הצמדה"
+  "editor.snap": "הצמדה",
+  "editor.text.add": "הוספת טקסט",
+  "editor.text.content": "טקסט",
+  "editor.text.size": "גודל",
+  "editor.text.color": "צבע",
+  "editor.text.panel": "מאפייני טקסט",
+  "editor.export.text-full": "שכבת הטקסט דורשת קידוד מחדש; עברנו למצב מלא."
 }

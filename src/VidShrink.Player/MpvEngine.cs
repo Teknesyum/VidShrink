@@ -341,6 +341,30 @@ public sealed partial class MpvEngine : IPlaybackEngine
         return CommandSync("sub-add", Path.GetFullPath(path), "select") >= 0;
     }
 
+    public long AddOverlay(string path)
+    {
+        if (!_isOpen || !File.Exists(path)) return 0;
+        var full = Path.GetFullPath(path);
+        if (CommandSync("sub-add", full, "select") < 0) return 0;
+        var count = ReadInt("track-list/count");
+        for (var i = count - 1; i >= 0; i--)
+        {
+            if (GetProperty($"track-list/{i}/type") != "sub") continue;
+            if (!string.Equals(GetProperty($"track-list/{i}/external-filename"), full, StringComparison.OrdinalIgnoreCase)) continue;
+            if (long.TryParse(GetProperty($"track-list/{i}/id"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)) return id;
+        }
+
+        return 0;
+    }
+
+    public bool ReloadOverlay(long id)
+        => id > 0 && _isOpen && CommandSync("sub-reload", id.ToString(CultureInfo.InvariantCulture)) >= 0;
+
+    public bool RemoveOverlay(long id)
+        => id > 0 && _isOpen && CommandSync("sub-remove", id.ToString(CultureInfo.InvariantCulture)) >= 0;
+
+    public void SetSubtitleFontsDir(string? directory) => TrySet("sub-fonts-dir", directory ?? string.Empty);
+
     public void SetSubtitleDelay(double seconds) => TrySet("sub-delay", Number(seconds));
 
     public void SetAudioDelay(double seconds) => TrySet("audio-delay", Number(seconds));

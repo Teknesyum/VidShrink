@@ -48,5 +48,11 @@
   "editor.timecode": "ไทม์โค้ด",
   "editor.duration": "ระยะเวลา",
   "editor.monitor": "จอภาพโปรแกรม",
-  "editor.snap": "การสแนป"
+  "editor.snap": "การสแนป",
+  "editor.text.add": "เพิ่มข้อความ",
+  "editor.text.content": "ข้อความ",
+  "editor.text.size": "ขนาด",
+  "editor.text.color": "สี",
+  "editor.text.panel": "คุณสมบัติข้อความ",
+  "editor.export.text-full": "เลเยอร์ข้อความต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นโหมดเต็ม"
 }

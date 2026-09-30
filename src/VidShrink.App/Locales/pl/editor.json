@@ -48,5 +48,11 @@
   "editor.timecode": "Kod czasowy",
   "editor.duration": "Czas trwania",
   "editor.monitor": "Monitor programu",
-  "editor.snap": "Przyciąganie"
+  "editor.snap": "Przyciąganie",
+  "editor.text.add": "Dodaj tekst",
+  "editor.text.content": "Tekst",
+  "editor.text.size": "Rozmiar",
+  "editor.text.color": "Kolor",
+  "editor.text.panel": "Właściwości tekstu",
+  "editor.export.text-full": "Warstwa tekstu wymaga ponownego kodowania; przełączono na tryb pełny."
 }

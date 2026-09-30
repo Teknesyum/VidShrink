@@ -48,5 +48,11 @@
   "editor.timecode": "நேரக்குறியீடு",
   "editor.duration": "கால அளவு",
   "editor.monitor": "நிரல் திரை",
-  "editor.snap": "ஸ்னாப்பிங்"
+  "editor.snap": "ஸ்னாப்பிங்",
+  "editor.text.add": "உரையைச் சேர்",
+  "editor.text.content": "உரை",
+  "editor.text.size": "அளவு",
+  "editor.text.color": "நிறம்",
+  "editor.text.panel": "உரையின் பண்புகள்",
+  "editor.export.text-full": "உரை அடுக்குக்கு மறுகுறியாக்கம் தேவை; முழு பயன்முறைக்கு மாற்றப்பட்டது."
 }

@@ -42,7 +42,8 @@ internal enum EditorCommand
     ToolSelection,
     ToolRazor,
     ToolRipple,
-    Export
+    Export,
+    AddText
 }
 
 internal sealed record EditorKeyRow(Key Key, KeyModifiers Modifiers, EditorCommand Command, string LabelKey, string? Symbol = null, PlayerButton? Button = null)
@@ -144,6 +145,7 @@ internal static class EditorKeymap
         new(Key.C, KeyModifiers.None, EditorCommand.ToolRazor, "editor.tool.razor"),
         new(Key.B, KeyModifiers.None, EditorCommand.ToolRipple, "editor.tool.ripple"),
         new(Key.M, KeyModifiers.Control, EditorCommand.Export, "editor.save-as"),
+        new(Key.T, KeyModifiers.None, EditorCommand.AddText, "editor.text.add"),
         new(Key.R, KeyModifiers.Control, EditorCommand.FocusSpeed, "editor.speed"),
         new(Key.A, KeyModifiers.Control, EditorCommand.SelectAll, "editor.select-all"),
         new(Key.Z, KeyModifiers.Control, EditorCommand.Undo, "editor.undo"),

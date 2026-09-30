@@ -48,5 +48,11 @@
   "editor.timecode": "Časový kód",
   "editor.duration": "Trvanie",
   "editor.monitor": "Programový monitor",
-  "editor.snap": "Prichytávanie"
+  "editor.snap": "Prichytávanie",
+  "editor.text.add": "Pridať text",
+  "editor.text.content": "Text",
+  "editor.text.size": "Veľkosť",
+  "editor.text.color": "Farba",
+  "editor.text.panel": "Vlastnosti textu",
+  "editor.export.text-full": "Textová vrstva vyžaduje nové kódovanie; prepnuté na úplný režim."
 }

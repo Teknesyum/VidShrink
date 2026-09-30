@@ -48,5 +48,11 @@
   "editor.timecode": "کد زمانی",
   "editor.duration": "مدت",
   "editor.monitor": "مانیتور برنامه",
-  "editor.snap": "چسبیدن"
+  "editor.snap": "چسبیدن",
+  "editor.text.add": "افزودن متن",
+  "editor.text.content": "متن",
+  "editor.text.size": "اندازه",
+  "editor.text.color": "رنگ",
+  "editor.text.panel": "ویژگی‌های متن",
+  "editor.export.text-full": "لایهٔ متن به رمزگذاری دوباره نیاز دارد؛ به حالت کامل تغییر کرد."
 }

@@ -308,6 +308,28 @@ public sealed class YerlesimDenetimiTests
     });
 
     /// <summary>
+    /// Düzenleyicinin T1 izi ve metin özellikleri paneli: bir metin eklenip seçili, panel açık.
+    /// Diller Hangul, Urduca (sağdan sola) ve Almanca bileşik sözcükleri kapsıyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(MetinKollari))]
+    public void MetinPanelindeKesikCakismaTasmaYok(string dil, bool dar) => Denetle(dil, dar, "-metin", pencere =>
+    {
+        var editor = pencere.EditorPaneForTest;
+        editor.ShowTimeline(VidShrink.Core.Editing.EditTimeline.FromSource(120 * VidShrink.Core.Editing.EditTime.TicksPerSecond), 30);
+        Assert.True(editor.AddText());
+    }, yukle: false);
+
+    public static TheoryData<string, bool> MetinKollari()
+    {
+        var kollar = new TheoryData<string, bool>();
+        foreach (var dil in new[] { "tr", "en", "ko", "ur", "de" })
+            foreach (var dar in new[] { true, false })
+                kollar.Add(dil, dar);
+        return kollar;
+    }
+
+    /// <summary>
     /// Taban ile tercih boyutu arasındaki ve üstündeki pencereler: sarılan satırlar ve Auto
     /// sütunlar başka genişlikte başka yerden kırılıyor; tam ekran 1080p ve 1440p dahil.
     /// </summary>

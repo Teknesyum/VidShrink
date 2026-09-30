@@ -48,5 +48,11 @@
   "editor.timecode": "타임코드",
   "editor.duration": "지속 시간",
   "editor.monitor": "프로그램 모니터",
-  "editor.snap": "스냅"
+  "editor.snap": "스냅",
+  "editor.text.add": "텍스트 추가",
+  "editor.text.content": "텍스트",
+  "editor.text.size": "크기",
+  "editor.text.color": "색상",
+  "editor.text.panel": "텍스트 속성",
+  "editor.export.text-full": "텍스트 레이어는 다시 인코딩해야 하므로 전체 모드로 전환했습니다."
 }

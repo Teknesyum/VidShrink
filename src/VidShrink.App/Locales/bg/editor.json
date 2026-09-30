@@ -48,5 +48,11 @@
   "editor.timecode": "Времеви код",
   "editor.duration": "Продължителност",
   "editor.monitor": "Програмен монитор",
-  "editor.snap": "Прилепване"
+  "editor.snap": "Прилепване",
+  "editor.text.add": "Добавяне на текст",
+  "editor.text.content": "Текст",
+  "editor.text.size": "Размер",
+  "editor.text.color": "Цвят",
+  "editor.text.panel": "Свойства на текста",
+  "editor.export.text-full": "Текстовият слой изисква прекодиране; превключено към пълен режим."
 }

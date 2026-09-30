@@ -48,5 +48,11 @@
   "editor.timecode": "Тайм-код",
   "editor.duration": "Длительность",
   "editor.monitor": "Программный монитор",
-  "editor.snap": "Привязка"
+  "editor.snap": "Привязка",
+  "editor.text.add": "Добавить текст",
+  "editor.text.content": "Текст",
+  "editor.text.size": "Размер",
+  "editor.text.color": "Цвет",
+  "editor.text.panel": "Свойства текста",
+  "editor.export.text-full": "Текстовый слой требует перекодирования; включён полный режим."
 }

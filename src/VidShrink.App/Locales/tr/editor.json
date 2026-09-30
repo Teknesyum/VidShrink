@@ -48,5 +48,11 @@
   "editor.timecode": "Zaman kodu",
   "editor.duration": "Süre",
   "editor.monitor": "Program monitörü",
-  "editor.snap": "Yapışma"
+  "editor.snap": "Yapışma",
+  "editor.text.add": "Metin ekle",
+  "editor.text.content": "Metin",
+  "editor.text.size": "Boyut",
+  "editor.text.color": "Renk",
+  "editor.text.panel": "Metin özellikleri",
+  "editor.export.text-full": "Metin katmanı yeniden kodlama ister; Tam kipine geçildi."
 }

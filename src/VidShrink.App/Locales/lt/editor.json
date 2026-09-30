@@ -48,5 +48,11 @@
   "editor.timecode": "Laiko kodas",
   "editor.duration": "Trukmė",
   "editor.monitor": "Programos monitorius",
-  "editor.snap": "Pritraukimas"
+  "editor.snap": "Pritraukimas",
+  "editor.text.add": "Pridėti tekstą",
+  "editor.text.content": "Tekstas",
+  "editor.text.size": "Dydis",
+  "editor.text.color": "Spalva",
+  "editor.text.panel": "Teksto savybės",
+  "editor.export.text-full": "Teksto sluoksniui reikia perkoduoti; perjungta į visą režimą."
 }

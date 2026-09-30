@@ -48,5 +48,11 @@
   "editor.timecode": "Ajakood",
   "editor.duration": "Kestus",
   "editor.monitor": "Programmimonitor",
-  "editor.snap": "Haakumine"
+  "editor.snap": "Haakumine",
+  "editor.text.add": "Lisa tekst",
+  "editor.text.content": "Tekst",
+  "editor.text.size": "Suurus",
+  "editor.text.color": "Värv",
+  "editor.text.panel": "Teksti omadused",
+  "editor.export.text-full": "Tekstikiht vajab ümberkodeerimist; lülitati täielikule režiimile."
 }

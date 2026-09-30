@@ -48,5 +48,11 @@
   "editor.timecode": "Laika kods",
   "editor.duration": "Ilgums",
   "editor.monitor": "Programmas monitors",
-  "editor.snap": "Piesaiste"
+  "editor.snap": "Piesaiste",
+  "editor.text.add": "Pievienot tekstu",
+  "editor.text.content": "Teksts",
+  "editor.text.size": "Izmērs",
+  "editor.text.color": "Krāsa",
+  "editor.text.panel": "Teksta rekvizīti",
+  "editor.export.text-full": "Teksta slānim nepieciešama pārkodēšana; pārslēgts uz pilno režīmu."
 }

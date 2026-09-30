@@ -48,5 +48,11 @@
   "editor.timecode": "Cod de timp",
   "editor.duration": "Durată",
   "editor.monitor": "Monitor de program",
-  "editor.snap": "Aliniere"
+  "editor.snap": "Aliniere",
+  "editor.text.add": "Adaugă text",
+  "editor.text.content": "Text",
+  "editor.text.size": "Dimensiune",
+  "editor.text.color": "Culoare",
+  "editor.text.panel": "Proprietățile textului",
+  "editor.export.text-full": "Stratul de text necesită recodare; s-a trecut la modul complet."
 }

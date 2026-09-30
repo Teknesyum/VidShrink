@@ -48,5 +48,11 @@
   "editor.timecode": "Kode waktu",
   "editor.duration": "Durasi",
   "editor.monitor": "Monitor program",
-  "editor.snap": "Snap"
+  "editor.snap": "Snap",
+  "editor.text.add": "Tambah teks",
+  "editor.text.content": "Teks",
+  "editor.text.size": "Ukuran",
+  "editor.text.color": "Warna",
+  "editor.text.panel": "Properti teks",
+  "editor.export.text-full": "Lapisan teks memerlukan enkode ulang; beralih ke mode penuh."
 }

@@ -93,6 +93,38 @@ internal sealed class ReplaceCommand : IEditCommand
     public void Revert(List<EditClip> clips) => clips[_index] = _before;
 }
 
+/// <summary>
+/// T1 izindeki tek degisiklik: <c>before</c> bos ise ekleme, <c>after</c> bos ise silme,
+/// ikisi doluysa yer degistirme. Metin listesini kurucuda yakalar; klip listesine dokunmaz,
+/// boylece metin ve klip degisiklikleri ayni geri al yiginina girer.
+/// </summary>
+internal sealed class TextCommand : IEditCommand
+{
+    private readonly List<TextLayer> _texts;
+    private readonly int _index;
+    private readonly TextLayer? _before;
+    private readonly TextLayer? _after;
+
+    public TextCommand(List<TextLayer> texts, int index, TextLayer? before, TextLayer? after)
+    {
+        _texts = texts;
+        _index = index;
+        _before = before;
+        _after = after;
+    }
+
+    public void Apply(List<EditClip> clips) => Swap(_before, _after);
+
+    public void Revert(List<EditClip> clips) => Swap(_after, _before);
+
+    private void Swap(TextLayer? from, TextLayer? to)
+    {
+        if (from is null) _texts.Insert(_index, to!);
+        else if (to is null) _texts.RemoveAt(_index);
+        else _texts[_index] = to;
+    }
+}
+
 internal sealed class CompositeCommand : IEditCommand
 {
     private readonly IReadOnlyList<IEditCommand> _steps;

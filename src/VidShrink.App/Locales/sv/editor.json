@@ -48,5 +48,11 @@
   "editor.timecode": "Tidskod",
   "editor.duration": "Varaktighet",
   "editor.monitor": "Programmonitor",
-  "editor.snap": "Fästning"
+  "editor.snap": "Fästning",
+  "editor.text.add": "Lägg till text",
+  "editor.text.content": "Text",
+  "editor.text.size": "Storlek",
+  "editor.text.color": "Färg",
+  "editor.text.panel": "Textegenskaper",
+  "editor.export.text-full": "Textlagret kräver omkodning; bytte till fullt läge."
 }

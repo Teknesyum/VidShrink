@@ -48,5 +48,11 @@
   "editor.timecode": "Aikakoodi",
   "editor.duration": "Kesto",
   "editor.monitor": "Ohjelmanäyttö",
-  "editor.snap": "Kohdistus"
+  "editor.snap": "Kohdistus",
+  "editor.text.add": "Lisää teksti",
+  "editor.text.content": "Teksti",
+  "editor.text.size": "Koko",
+  "editor.text.color": "Väri",
+  "editor.text.panel": "Tekstin ominaisuudet",
+  "editor.export.text-full": "Tekstitaso vaatii uudelleenkoodauksen; vaihdettiin täyteen tilaan."
 }

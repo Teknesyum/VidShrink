@@ -23,6 +23,19 @@ public sealed record ExportPlan(
 {
     public IReadOnlyList<int> MotionClips { get; init; } = Array.Empty<int>();
 
+    /// <summary>Cizelgede metin oldugu icin <c>-c copy</c> yolu birakilip Tam'a gecildi.</summary>
+    public bool TextForcedFull { get; init; }
+
+    /// <summary>Metin varsa <c>ass=</c> suzgecinin okudugu belge; kosucu calismadan once BOM'lu yazar.</summary>
+    public string? SubtitlePath { get; init; }
+
+    public string? SubtitleContent { get; init; }
+
+    /// <summary><c>fontsdir</c>; kosucu kurar ve secilen ailelerin dosyalarini koyar.</summary>
+    public string? FontsDirectory { get; init; }
+
+    public IReadOnlyList<string> FontFamilies { get; init; } = Array.Empty<string>();
+
     public bool FellBackToFull => Requested != ExportMode.Full && Effective == ExportMode.Full;
 
     public double TotalWorkSeconds => Steps.Sum(s => s.DurationSeconds);
@@ -37,6 +50,8 @@ public static class EditExport
     public const string FullVideoCodec = "libx264";
     public const string FullCrf = "18";
     public const string AudioCodec = "aac";
+
+    public const string SubtitleFileName = "text.ass";
 
     private const double SeekNudgeSeconds = 0.001;
 
@@ -133,6 +148,8 @@ public static class EditExport
         if (mode == ExportMode.Smart && !SupportsSegments(info)) effective = ExportMode.Full;
         if (mode == ExportMode.Fast && anySpecial && !SupportsSegments(info)) effective = ExportMode.Full;
         if (mode != ExportMode.Full && keyframes.Count == 0) effective = ExportMode.Full;
+        var textForced = mode != ExportMode.Full && effective != ExportMode.Full && timeline.HasText;
+        if (timeline.HasText) effective = ExportMode.Full;
 
         var limit = ReverseLimitSeconds(info, memoryBudgetBytes);
         var over = ReverseOverLimit(timeline, info, memoryBudgetBytes);
@@ -144,7 +161,7 @@ public static class EditExport
             ExportMode.Fast when !anySpecial => FastDirect(timeline, info, keyframes, startTime, outputPath, workDirectory, limit, over),
             _ => Segmented(timeline, info, keyframes, mode, effective, outputPath, workDirectory, limit, over)
         };
-        return plan with { MotionClips = motion };
+        return plan with { MotionClips = motion, TextForcedFull = textForced };
     }
 
     private static ExportPlan Full(
@@ -168,7 +185,16 @@ public static class EditExport
         }
 
         graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=1:a=").Append(info.HasAudio ? 1 : 0)
-            .Append(info.HasAudio ? "[vout][aout]" : "[vout]");
+            .Append(timeline.HasText ? "[vcat]" : "[vout]").Append(info.HasAudio ? "[aout]" : string.Empty);
+
+        string? subtitle = null;
+        string? fonts = null;
+        if (timeline.HasText)
+        {
+            subtitle = Path.Combine(work, SubtitleFileName);
+            fonts = Path.Combine(work, TextFonts.FolderName);
+            graph.Append(";[vcat]").Append(AssFilter(subtitle, fonts)).Append("[vout]");
+        }
 
         var args = new List<string> { "-hide_banner", "-nostdin", "-y", "-i", info.FilePath, "-filter_complex", graph.ToString(), "-map", "[vout]" };
         if (info.HasAudio) args.AddRange(new[] { "-map", "[aout]" });
@@ -179,7 +205,24 @@ public static class EditExport
 
         var expected = EditTime.ToSeconds(timeline.Duration);
         return new ExportPlan(requested, ExportMode.Full, new[] { new ExportStep(args, expected) },
-            over, limit, output, work);
+            over, limit, output, work)
+        {
+            SubtitlePath = subtitle,
+            SubtitleContent = subtitle is null ? null : AssWriter.Write(timeline.Texts, info.Width, info.Height),
+            FontsDirectory = fonts,
+            FontFamilies = timeline.Texts.Select(t => t.FontName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
+        };
+    }
+
+    /// <summary>
+    /// <c>ass=filename='...':fontsdir='...'</c>. Yollar <see cref="VideoFilterChain.FilterPath"/> ile
+    /// kacar: ters bolu duz bolu olur, iki nokta <c>\:</c> olur (<c>C\:/...</c>).
+    /// </summary>
+    public static string AssFilter(string subtitlePath, string? fontsDirectory)
+    {
+        var filter = "ass=filename='" + VideoFilterChain.FilterPath(subtitlePath) + "'";
+        if (fontsDirectory is not null) filter += ":fontsdir='" + VideoFilterChain.FilterPath(fontsDirectory) + "'";
+        return filter;
     }
 
     private static ExportPlan FastDirect(
