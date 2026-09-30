@@ -436,7 +436,7 @@ public sealed class DuzenleyiciKisayolTests
         }
         finally
         {
-            Directory.Delete(klasor, true);
+            OynaticiListeTests.Sil(klasor);
         }
     }
 

@@ -47,6 +47,21 @@ public sealed class TekOrnekTests : IDisposable
         return condition();
     }
 
+    /// <summary>Izi yazan surec dosyayi hala acik tutarken de okur; kilitliyse bos doner, <see cref="Wait"/> yeniden dener.</summary>
+    private static string IzOku(string yol)
+    {
+        try
+        {
+            using var akis = new FileStream(yol, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var okuyucu = new StreamReader(akis, Encoding.UTF8);
+            return okuyucu.ReadToEnd();
+        }
+        catch (IOException)
+        {
+            return "";
+        }
+    }
+
     [Fact]
     public void Ilk_acilan_sahip_oluyor_ikincisi_olmuyor_sahip_kapaninca_kanal_bosaliyor()
     {
@@ -362,9 +377,9 @@ public sealed class TekOrnekTests : IDisposable
             _output.WriteLine($"ikinci süreç pid={second.Id} çıkış kodu={second.ExitCode} süre={clock.ElapsedMilliseconds} ms pencere=0x{second.MainWindowHandle.ToInt64():X}");
             Assert.Equal(0, second.ExitCode);
 
-            Assert.True(Wait(() => File.Exists(trace) && File.ReadAllText(trace, Encoding.UTF8).Contains('\n'), TimeSpan.FromSeconds(30)),
+            Assert.True(Wait(() => File.Exists(trace) && IzOku(trace).Contains('\n'), TimeSpan.FromSeconds(30)),
                 "İlk pencere iletilen dosyayı yüklediğini yazmadı.");
-            var lines = File.ReadAllLines(trace, Encoding.UTF8);
+            var lines = IzOku(trace).Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(l => l.TrimEnd('\r')).ToArray();
             foreach (var line in lines) _output.WriteLine("ilk pencerenin izi: " + line);
 
             first.Refresh();
