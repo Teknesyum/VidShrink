@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "Kein Gerät für {0} gefunden; diese Quelle bleibt stumm.",
   "recorder.replay.seconds": "Zu behaltende Länge",
   "recorder.region.hide": "Rahmen ausblenden (F9)",
-  "recorder.region.stop-close": "Aufnahme beenden und schließen"
+  "recorder.region.stop-close": "Aufnahme beenden und schließen",
+  "recorder.capture.fallback-unavailable": "Schnelle Aufnahme (Desktop Duplication) ließ sich nicht starten; es wird mit GDI aufgenommen, über 30 fps können Bilder fehlen.",
+  "recorder.capture.fallback-layout": "Der Aufnahmebereich liegt nicht auf einem einzigen Monitor der Hauptgrafikkarte; es wird mit GDI aufgenommen, über 30 fps können Bilder fehlen."
 }

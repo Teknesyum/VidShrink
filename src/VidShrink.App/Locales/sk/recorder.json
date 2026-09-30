@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "Pre {0} sa nenašlo žiadne zariadenie; tento zdroj zostane bez zvuku.",
   "recorder.replay.seconds": "Dĺžka na uchovanie",
   "recorder.region.hide": "Skryť rámik (F9)",
-  "recorder.region.stop-close": "Zastaviť nahrávanie a zavrieť"
+  "recorder.region.stop-close": "Zastaviť nahrávanie a zavrieť",
+  "recorder.capture.fallback-unavailable": "Rýchle snímanie (Desktop Duplication) sa nespustilo; nahráva sa cez GDI, nad 30 fps môžu vypadávať snímky.",
+  "recorder.capture.fallback-layout": "Nahrávaná oblasť neleží na jedinom monitore hlavnej grafickej karty; nahráva sa cez GDI, nad 30 fps môžu vypadávať snímky."
 }

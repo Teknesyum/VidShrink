@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "{0} کے لیے کوئی آلہ نہیں ملا؛ وہ ذریعہ خاموش رہے گا۔",
   "recorder.replay.seconds": "محفوظ رکھی جانے والی مدت",
   "recorder.region.hide": "فریم چھپائیں (F9)",
-  "recorder.region.stop-close": "ریکارڈنگ روکیں اور بند کریں"
+  "recorder.region.stop-close": "ریکارڈنگ روکیں اور بند کریں",
+  "recorder.capture.fallback-unavailable": "تیز کیپچر (Desktop Duplication) شروع نہیں ہوا؛ ریکارڈنگ GDI کیپچر سے ہو رہی ہے، 30 fps سے اوپر فریم گر سکتے ہیں۔",
+  "recorder.capture.fallback-layout": "ریکارڈ ہونے والا حصہ مرکزی گرافکس کارڈ کے ایک ہی مانیٹر پر نہیں ہے؛ ریکارڈنگ GDI کیپچر سے ہو رہی ہے، 30 fps سے اوپر فریم گر سکتے ہیں۔"
 }

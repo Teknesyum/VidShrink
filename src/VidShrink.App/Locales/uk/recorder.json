@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "Пристрій для {0} не знайдено; це джерело залишиться без звуку.",
   "recorder.replay.seconds": "Довжина для збереження",
   "recorder.region.hide": "Сховати рамку (F9)",
-  "recorder.region.stop-close": "Зупинити запис і закрити"
+  "recorder.region.stop-close": "Зупинити запис і закрити",
+  "recorder.capture.fallback-unavailable": "Швидке захоплення (Desktop Duplication) не запустилося; запис іде через GDI, понад 30 кадр/с можливі пропуски кадрів.",
+  "recorder.capture.fallback-layout": "Записувана область не на одному моніторі основної відеокарти; запис іде через GDI, понад 30 кадр/с можливі пропуски кадрів."
 }

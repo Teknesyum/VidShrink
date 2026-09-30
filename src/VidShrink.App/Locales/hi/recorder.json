@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "{0} के लिए कोई डिवाइस नहीं मिला; वह स्रोत मौन रहेगा।",
   "recorder.replay.seconds": "रखी जाने वाली लंबाई",
   "recorder.region.hide": "फ़्रेम छिपाएँ (F9)",
-  "recorder.region.stop-close": "रिकॉर्डिंग रोकें और बंद करें"
+  "recorder.region.stop-close": "रिकॉर्डिंग रोकें और बंद करें",
+  "recorder.capture.fallback-unavailable": "तेज़ कैप्चर (Desktop Duplication) शुरू नहीं हुआ; रिकॉर्डिंग GDI कैप्चर से हो रही है, 30 fps से ऊपर फ़्रेम छूट सकते हैं।",
+  "recorder.capture.fallback-layout": "रिकॉर्ड किया जा रहा क्षेत्र मुख्य ग्राफ़िक्स कार्ड के एक ही मॉनिटर पर नहीं है; रिकॉर्डिंग GDI कैप्चर से हो रही है, 30 fps से ऊपर फ़्रेम छूट सकते हैं।"
 }

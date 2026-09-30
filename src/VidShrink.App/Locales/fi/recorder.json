@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "Laitetta ei löytynyt kohteelle {0}; se lähde pysyy hiljaisena.",
   "recorder.replay.seconds": "Säilytettävä pituus",
   "recorder.region.hide": "Piilota kehys (F9)",
-  "recorder.region.stop-close": "Lopeta tallennus ja sulje"
+  "recorder.region.stop-close": "Lopeta tallennus ja sulje",
+  "recorder.capture.fallback-unavailable": "Nopea kaappaus (Desktop Duplication) ei käynnistynyt; tallennetaan GDI-kaappauksella, yli 30 fps:n nopeudella kuvia voi pudota.",
+  "recorder.capture.fallback-layout": "Tallennettava alue ei ole yhdellä päänäytönohjaimen näytöllä; tallennetaan GDI-kaappauksella, yli 30 fps:n nopeudella kuvia voi pudota."
 }

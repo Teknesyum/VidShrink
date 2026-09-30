@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "Nenhum dispositivo encontrado para {0}; essa fonte fica em silêncio.",
   "recorder.replay.seconds": "Duração a manter",
   "recorder.region.hide": "Ocultar moldura (F9)",
-  "recorder.region.stop-close": "Parar gravação e fechar"
+  "recorder.region.stop-close": "Parar gravação e fechar",
+  "recorder.capture.fallback-unavailable": "A captura rápida (Desktop Duplication) não iniciou; gravando com captura GDI, que pode perder quadros acima de 30 fps.",
+  "recorder.capture.fallback-layout": "A área gravada não está em um único monitor da placa de vídeo principal; gravando com captura GDI, que pode perder quadros acima de 30 fps."
 }

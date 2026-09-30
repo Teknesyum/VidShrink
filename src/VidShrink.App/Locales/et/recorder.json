@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "{0} jaoks seadet ei leitud; see allikas jääb vaikseks.",
   "recorder.replay.seconds": "Säilitatav pikkus",
   "recorder.region.hide": "Peida raam (F9)",
-  "recorder.region.stop-close": "Peata salvestus ja sulge"
+  "recorder.region.stop-close": "Peata salvestus ja sulge",
+  "recorder.capture.fallback-unavailable": "Kiire hõive (Desktop Duplication) ei käivitunud; salvestatakse GDI-hõivega, üle 30 fps võib kaadreid kaduma minna.",
+  "recorder.capture.fallback-layout": "Salvestatav ala ei ole põhigraafikakaardi ühel monitoril; salvestatakse GDI-hõivega, üle 30 fps võib kaadreid kaduma minna."
 }

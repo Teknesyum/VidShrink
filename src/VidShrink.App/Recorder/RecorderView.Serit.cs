@@ -130,6 +130,9 @@ internal partial class RecorderView
             return;
         }
 
+        request = await ChooseCaptureAsync(request);
+        if (_session is not null) return;
+
         if (!await CountdownAsync() || _session is not null) return;
 
         try

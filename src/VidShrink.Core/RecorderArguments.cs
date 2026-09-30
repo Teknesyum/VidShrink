@@ -10,7 +10,7 @@ namespace VidShrink.Core;
 /// </summary>
 public enum RecorderPlatform
 {
-    /// <summary><c>gdigrab</c>: butun masaustu, pencere basligi ya da ofsetli bolge.</summary>
+    /// <summary><c>gdigrab</c> ya da <c>ddagrab</c> (<see cref="RecorderCapture"/>): butun masaustu, pencere ya da ofsetli bolge.</summary>
     Windows,
 
     /// <summary><c>avfoundation</c>: ekran ve cihaz indeksi; bolge girdi degil kirpma filtresi.</summary>
@@ -88,6 +88,51 @@ public sealed record RecorderScale(int Width, int Height);
 public sealed record ScreenBounds(int Index, int X, int Y, int Width, int Height);
 
 /// <summary>
+/// Windows'ta kareyi hangi yakalama yolunun verdigi. <c>gdigrab</c> her kareyi masaustunden
+/// <c>BitBlt</c> ile okuyor ve 1280x720'de 60 istenince 41 kare veriyor; <c>ddagrab</c>
+/// (Desktop Duplication) ayni bolgede 59,3 veriyor (<c>docs/olcumler/kaydedici-gdigrab-kare-tavani.md</c>).
+/// Varsayilan <see cref="Gdigrab"/>: <see cref="Ddagrab"/>'i yalniz yoklamasi gecen istek alir.
+/// </summary>
+public enum RecorderCapture
+{
+    /// <summary><c>-f gdigrab</c>: butun masaustu, ofsetli bolge ya da pencere basligi.</summary>
+    Gdigrab,
+
+    /// <summary><c>-f lavfi -i ddagrab=...</c>: tek bir DXGI cikisi, bolge o cikisa gore ofsetli.</summary>
+    Ddagrab
+}
+
+/// <summary>
+/// ffmpeg'in varsayilan D3D11 aygitinin (ilk ekran karti) bir DXGI cikisi. <c>ddagrab</c>
+/// ekrani <see cref="Index"/> ile seciyor (<c>output_idx</c>); bu sira Avalonia'nin ekran
+/// sirasiyla ayni degil, bu yuzden eslesme masaustu koordinatindan yapiliyor. Dondurulmus
+/// cikis listeye girmez.
+/// </summary>
+public sealed record DdaOutput(int Index, int X, int Y, int Width, int Height);
+
+/// <summary>
+/// <c>ddagrab</c> yerine <c>gdigrab</c>'a dusulmesinin sebebi. <see cref="None"/> disindaki
+/// her deger kullaniciya bir satir olarak gosterilir; sessiz dusus yok.
+/// </summary>
+public enum DdagrabFallback
+{
+    /// <summary>Dusus yok: istek <c>ddagrab</c> ile yakalanabilir.</summary>
+    None,
+
+    /// <summary>Yoklama gecmedi: eski surucu, uzak masaustu ya da <c>ddagrab</c>'siz ffmpeg derlemesi.</summary>
+    Unavailable,
+
+    /// <summary>Ilk ekran kartinin masaustune bagli bir cikisi okunamadi.</summary>
+    NoOutputs,
+
+    /// <summary>Pencere hedefinin dikdortgeni okunamadi; <c>ddagrab</c>'da pencere bolge kirpmasidir.</summary>
+    NoWindowRect,
+
+    /// <summary>Yakalanacak alan tek bir cikisin icinde degil (iki monitore yayiliyor ya da ikinci kartta).</summary>
+    OutsideOneOutput
+}
+
+/// <summary>
 /// Kaydin kendiliginden bolunme olcutu. Ikisi birden verilebilir; once dolan boler.
 /// Bolme acikken parcalar <b>birlestirilmez</b>, ayri dosyalar olarak teslim edilir.
 /// </summary>
@@ -142,8 +187,18 @@ public sealed record RecorderRequest
     /// <summary>
     /// macOS'ta pencerenin yakalanan ekran karesindeki piksel dikdortgeni. <c>avfoundation</c>
     /// tek pencere vermiyor; pencere ekran karesinden kirpilir (<see cref="RecorderArguments.WindowCrop"/>).
+    /// Windows'ta <c>ddagrab</c> kolunda pencerenin istemci alani, masaustu pikselinde.
     /// </summary>
     public RecorderRegion? WindowRegion { get; init; }
+
+    /// <summary>
+    /// Windows'ta yakalama yolu. <see cref="RecorderCapture.Ddagrab"/>'da pencere hedefi
+    /// <see cref="WindowRegion"/>'dan (pencerenin istemci alani, masaustu pikselinde) kirpilir.
+    /// </summary>
+    public RecorderCapture Capture { get; init; } = RecorderCapture.Gdigrab;
+
+    /// <summary><c>ddagrab</c>'in secebildigi cikislar. Bossa <see cref="RecorderCapture.Ddagrab"/> kabul edilmez.</summary>
+    public IReadOnlyList<DdaOutput> DdaOutputs { get; init; } = Array.Empty<DdaOutput>();
 
     /// <summary>Bolge kaydinda dikdortgen.</summary>
     public RecorderRegion? Region { get; init; }
@@ -660,6 +715,7 @@ public static class RecorderArguments
             errors.AddRange(WindowErrors(request));
 
         errors.AddRange(ScreenSelectionErrors(request));
+        errors.AddRange(CaptureErrors(request));
 
         return errors;
     }
@@ -933,8 +989,135 @@ public static class RecorderArguments
                      + " is not fully covered by the enumerated monitors; gdigrab records the uncovered part as black.";
     }
 
+    private static IEnumerable<string> CaptureErrors(RecorderRequest request)
+    {
+        if (request.Capture != RecorderCapture.Ddagrab) yield break;
+
+        if (request.Platform != RecorderPlatform.Windows)
+        {
+            yield return "ddagrab (Desktop Duplication) exists only on Windows.";
+            yield break;
+        }
+
+        if (DdagrabBlocker(request) is var blocker and not DdagrabFallback.None)
+            yield return "ddagrab cannot capture this request: " + blocker switch
+            {
+                DdagrabFallback.NoOutputs => "no DXGI output of the first graphics adapter was enumerated.",
+                DdagrabFallback.NoWindowRect => "the window rectangle is unknown.",
+                _ => "the capture area is not inside a single DXGI output."
+            };
+    }
+
+    /// <summary>
+    /// <c>ddagrab</c>'in yakalayacagi alan, masaustu pikselinde: bolge hedefinde bolge, pencere
+    /// hedefinde pencerenin istemci alani, ekran hedefinde secilen monitor. Monitor listesi bos ve
+    /// indeks sifirsa birincil cikis (masaustu koordinati 0,0 olan).
+    /// </summary>
+    public static RecorderRegion? CaptureArea(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return request.Target switch
+        {
+            RecorderTargetKind.Region => request.Region,
+            RecorderTargetKind.Window => request.WindowRegion,
+            _ when request.Screens.Count > 0 => RegionForScreen(request.Screens, request.ScreenIndex),
+            _ when request.ScreenIndex == 0 => request.DdaOutputs.FirstOrDefault(o => o.X == 0 && o.Y == 0) is { } primary
+                ? new RecorderRegion(primary.X, primary.Y, primary.Width - primary.Width % 2, primary.Height - primary.Height % 2)
+                : null,
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// <c>ddagrab</c>'in cikisi ve o cikisin sol ust kosesine gore alan. Alan cikisin tamamen
+    /// icinde olmali: <c>ddagrab</c> tek cikis okuyor, iki monitore yayilan dikdortgeni
+    /// kesmiyor, <c>gdigrab</c>'a dusuluyor. Boyut <c>yuv420p</c> icin asagi ciftlenir.
+    /// </summary>
+    public static (DdaOutput Output, RecorderRegion Local)? DdagrabTarget(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (CaptureArea(request) is not { } area) return null;
+
+        var width = area.Width - area.Width % 2;
+        var height = area.Height - area.Height % 2;
+        if (width < 2 || height < 2) return null;
+
+        foreach (var output in request.DdaOutputs)
+        {
+            var x = area.X - output.X;
+            var y = area.Y - output.Y;
+            if (x < 0 || y < 0 || x + width > output.Width || y + height > output.Height) continue;
+            return (output, new RecorderRegion(x, y, width, height));
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Istegin <c>ddagrab</c> ile yakalanmasini engelleyen yerlesim sebebi. Yoklama sonucunu
+    /// bilmez: ffmpeg'in <c>ddagrab</c>'i acip acamadigini <see cref="BuildDdagrabProbe"/> olcer.
+    /// </summary>
+    public static DdagrabFallback DdagrabBlocker(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.Platform != RecorderPlatform.Windows) return DdagrabFallback.Unavailable;
+        if (request.DdaOutputs.Count == 0) return DdagrabFallback.NoOutputs;
+        if (request.Target == RecorderTargetKind.Window && request.WindowRegion is null) return DdagrabFallback.NoWindowRect;
+        return DdagrabTarget(request) is null ? DdagrabFallback.OutsideOneOutput : DdagrabFallback.None;
+    }
+
+    /// <summary>
+    /// Yakalama yolunun secimi. Yerlesim engeli ya da gecmeyen yoklama <c>gdigrab</c>'a
+    /// dusurur ve sebebi <paramref name="reason"/>'da doner; cagiran bunu kullaniciya gosterir.
+    /// Windows disinda istek degismez ve sebep <see cref="DdagrabFallback.None"/>'dir.
+    /// </summary>
+    public static RecorderRequest ChooseCapture(RecorderRequest request, bool ddagrabWorks, out DdagrabFallback reason)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        reason = DdagrabFallback.None;
+        if (request.Platform != RecorderPlatform.Windows) return request with { Capture = RecorderCapture.Gdigrab };
+
+        reason = DdagrabBlocker(request);
+        if (reason == DdagrabFallback.None && !ddagrabWorks) reason = DdagrabFallback.Unavailable;
+        return request with { Capture = reason == DdagrabFallback.None ? RecorderCapture.Ddagrab : RecorderCapture.Gdigrab };
+    }
+
+    /// <summary>
+    /// <c>ddagrab</c>'in bu istekte acilip acilmadigini olcen kisa kosum: ayni kaynak grafigi,
+    /// tek kare, <c>null</c> cikis. Uzak masaustunde ve eski surucude kaynak acilmiyor,
+    /// <c>ddagrab</c>'siz derlemede filtre bulunmuyor; ucunde de kosum sifir disinda doner.
+    /// </summary>
+    public static IReadOnlyList<string> BuildDdagrabProbe(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (DdagrabBlocker(request) is var blocker and not DdagrabFallback.None)
+            throw new InvalidOperationException($"ddagrab cannot capture this request ({blocker}).");
+
+        var a = new List<string> { "-hide_banner", "-nostdin" };
+        a.AddRange(DdagrabInput(request));
+        a.AddRange(new[] { "-frames:v", "1", "-f", "null", "-" });
+        return a;
+    }
+
+    /// <summary>
+    /// <c>ddagrab</c> girdisi. Kaynak D3D11 yuzeyi veriyor; <c>hwdownload,format=bgra</c> ayni
+    /// grafikte kareyi bellege indiriyor, boylece <c>-vf</c>, kamera bindirmesi, onizleme ve
+    /// her kodlayici <c>gdigrab</c>'daki gibi bgra kare goruyor. NVENC'e dogrudan D3D11 yuzeyi
+    /// vermek olculdu ve birakildi: <c>-pix_fmt</c> ile acilmiyor, onsuz dosya <c>gbr</c>
+    /// renk uzayiyla yanlis etiketleniyor (<c>docs/olcumler/kaydedici-ddagrab.md</c>).
+    /// </summary>
+    private static IReadOnlyList<string> DdagrabInput(RecorderRequest request)
+    {
+        var (output, local) = DdagrabTarget(request)!.Value;
+        var source = $"ddagrab=output_idx={Number(output.Index)}:framerate={Number(request.Fps)}:draw_mouse={Flag(request.ShowCursor)}";
+        if (local.X != 0 || local.Y != 0 || local.Width != output.Width || local.Height != output.Height)
+            source += $":offset_x={Number(local.X)}:offset_y={Number(local.Y)}:video_size={Size(local)}";
+        return new[] { "-f", "lavfi", "-i", source + ",hwdownload,format=bgra" };
+    }
+
     private static IEnumerable<string> WindowErrors(RecorderRequest request) => request.Platform switch
     {
+        RecorderPlatform.Windows when request.Capture == RecorderCapture.Ddagrab => Array.Empty<string>(),
         RecorderPlatform.Windows => string.IsNullOrWhiteSpace(request.WindowTitle)
             ? new[] { "Window capture on gdigrab needs the window title." }
             : Array.Empty<string>(),
@@ -1146,7 +1329,9 @@ public static class RecorderArguments
     /// <summary>
     /// Kayit surerken alinan tek karelik ekran goruntusunun argumanlari. Ayni yakalama
     /// girdisinden okur: canli ekranin bir dosyasi yok, dosyadan kare kesen bir yol burada
-    /// kullanilamaz. Kodlama kolu hic kurulmaz: bir kare, bir resim.
+    /// kullanilamaz. Kodlama kolu hic kurulmaz: bir kare, bir resim. Windows'ta her zaman
+    /// <c>gdigrab</c>: tek karede hiz sorun degil ve kayit suren cikisa ikinci bir Desktop
+    /// Duplication acilmiyor.
     /// </summary>
     public static IReadOnlyList<string> BuildSnapshot(RecorderRequest request, string imagePath)
     {
@@ -1155,6 +1340,7 @@ public static class RecorderArguments
 
         var probe = request with
         {
+            Capture = RecorderCapture.Gdigrab,
             Container = RecorderContainer.Mp4,
             Audio = null,
             Webcam = null,
@@ -1165,7 +1351,7 @@ public static class RecorderArguments
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
 
         var a = new List<string> { "-hide_banner", "-nostdin", "-y" };
-        a.AddRange(Input(request));
+        a.AddRange(Input(probe));
         if (VideoFilter(request) is { } filter) a.AddRange(new[] { "-vf", filter });
         a.AddRange(new[] { "-frames:v", "1", "-an", imagePath });
         return a;
@@ -1240,6 +1426,8 @@ public static class RecorderArguments
 
     private static IReadOnlyList<string> WindowsInput(RecorderRequest request)
     {
+        if (request.Capture == RecorderCapture.Ddagrab) return DdagrabInput(request);
+
         var a = new List<string> { "-f", "gdigrab", "-framerate", Number(request.Fps), "-draw_mouse", Flag(request.ShowCursor) };
 
         var region = request.Target == RecorderTargetKind.Region

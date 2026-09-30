@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "Geen apparaat gevonden voor {0}; die bron blijft stil.",
   "recorder.replay.seconds": "Te behouden lengte",
   "recorder.region.hide": "Kader verbergen (F9)",
-  "recorder.region.stop-close": "Opname stoppen en sluiten"
+  "recorder.region.stop-close": "Opname stoppen en sluiten",
+  "recorder.capture.fallback-unavailable": "Snelle opname (Desktop Duplication) startte niet; er wordt opgenomen met GDI, boven 30 fps kunnen beelden wegvallen.",
+  "recorder.capture.fallback-layout": "Het opnamegebied ligt niet op één monitor van de hoofdvideokaart; er wordt opgenomen met GDI, boven 30 fps kunnen beelden wegvallen."
 }

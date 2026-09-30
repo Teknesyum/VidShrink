@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "Hakuna kifaa kilichopatikana kwa {0}; chanzo hicho kitabaki bila sauti.",
   "recorder.replay.seconds": "Urefu wa kuhifadhi",
   "recorder.region.hide": "Ficha fremu (F9)",
-  "recorder.region.stop-close": "Simamisha kurekodi na ufunge"
+  "recorder.region.stop-close": "Simamisha kurekodi na ufunge",
+  "recorder.capture.fallback-unavailable": "Unaswaji wa haraka (Desktop Duplication) haukuanza; inarekodi kwa unaswaji wa GDI, fremu zinaweza kupotea zaidi ya fps 30.",
+  "recorder.capture.fallback-layout": "Eneo linalorekodiwa haliko kwenye skrini moja ya kadi kuu ya michoro; inarekodi kwa unaswaji wa GDI, fremu zinaweza kupotea zaidi ya fps 30."
 }

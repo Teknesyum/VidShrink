@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "Ingen enhed fundet til {0}; den kilde forbliver lydløs.",
   "recorder.replay.seconds": "Længde der skal beholdes",
   "recorder.region.hide": "Skjul ramme (F9)",
-  "recorder.region.stop-close": "Stop optagelse og luk"
+  "recorder.region.stop-close": "Stop optagelse og luk",
+  "recorder.capture.fallback-unavailable": "Hurtig optagelse (Desktop Duplication) startede ikke; der optages med GDI, over 30 fps kan billeder gå tabt.",
+  "recorder.capture.fallback-layout": "Optagelsesområdet ligger ikke på én skærm på hovedgrafikkortet; der optages med GDI, over 30 fps kan billeder gå tabt."
 }

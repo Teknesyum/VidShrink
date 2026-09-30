@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "Aucun périphérique trouvé pour {0} ; cette source reste silencieuse.",
   "recorder.replay.seconds": "Durée à conserver",
   "recorder.region.hide": "Masquer le cadre (F9)",
-  "recorder.region.stop-close": "Arrêter l'enregistrement et fermer"
+  "recorder.region.stop-close": "Arrêter l'enregistrement et fermer",
+  "recorder.capture.fallback-unavailable": "La capture rapide (Desktop Duplication) n'a pas démarré ; enregistrement avec la capture GDI, des images peuvent manquer au-delà de 30 i/s.",
+  "recorder.capture.fallback-layout": "La zone enregistrée n'est pas sur un seul écran de la carte graphique principale ; enregistrement avec la capture GDI, des images peuvent manquer au-delà de 30 i/s."
 }

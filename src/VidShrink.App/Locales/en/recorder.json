@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "No device found for {0}; that source stays silent.",
   "recorder.replay.seconds": "Length To Keep",
   "recorder.region.hide": "Hide frame (F9)",
-  "recorder.region.stop-close": "Stop recording and close"
+  "recorder.region.stop-close": "Stop recording and close",
+  "recorder.capture.fallback-unavailable": "Fast capture (Desktop Duplication) did not start; recording with GDI capture, which may drop frames above 30 fps.",
+  "recorder.capture.fallback-layout": "The recorded area is not on a single monitor of the main graphics card; recording with GDI capture, which may drop frames above 30 fps."
 }

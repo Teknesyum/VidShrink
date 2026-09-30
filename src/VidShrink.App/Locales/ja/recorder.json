@@ -221,5 +221,7 @@
   "recorder.wizard.no-device": "{0} に対応するデバイスが見つかりません。この音源は無音のままです。",
   "recorder.replay.seconds": "保持する長さ",
   "recorder.region.hide": "枠を隠す (F9)",
-  "recorder.region.stop-close": "録画を停止して閉じる"
+  "recorder.region.stop-close": "録画を停止して閉じる",
+  "recorder.capture.fallback-unavailable": "高速キャプチャ (Desktop Duplication) を開始できませんでした。GDI キャプチャで録画中のため、30 fps を超えるとフレームが落ちることがあります。",
+  "recorder.capture.fallback-layout": "録画範囲がメイン GPU の 1 台のモニターに収まっていません。GDI キャプチャで録画中のため、30 fps を超えるとフレームが落ちることがあります。"
 }
