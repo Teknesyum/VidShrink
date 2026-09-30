@@ -170,11 +170,12 @@ Full tour of every tab: [`docs/kullanim.md`](docs/kullanim.md).
 On Windows, download and run
 [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe).
 It is a small self-contained program: no PowerShell, no administrator rights. The script
-below installs exactly the same thing.
+below installs exactly the same thing; paste it into PowerShell or Command Prompt. Without
+WinGet it fetches FFmpeg from a pinned archive instead.
 
 ```powershell
 # Windows
-irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; iex (irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1)"
 ```
 
 ```bash
@@ -519,11 +520,12 @@ requests it can make, what starts each one, and whose privacy policy then applie
 
 ## One-Line Install
 
-Paste into PowerShell on Windows 10 or 11. It downloads the latest `VidShrink-Setup.exe`
-and runs it; no administrator rights.
+Paste into PowerShell or Command Prompt on Windows 10 or 11. It downloads the latest
+`VidShrink-Setup.exe` into your temp folder and runs it; no administrator rights, no WinGet.
+Until releases are signed, a PC with Smart App Control turned on blocks VidShrink either way.
 
 ```powershell
-irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile "$env:TEMP\VidShrink-Setup.exe"; & "$env:TEMP\VidShrink-Setup.exe"
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
 ```
 
 <!-- signature -->

@@ -33,8 +33,12 @@ function Refresh-ProcessPath {
     $env:Path = "$machine;$user"
 }
 
+function Test-WinGet {
+    return [bool](Get-Command winget.exe -ErrorAction SilentlyContinue)
+}
+
 function Require-WinGet {
-    if (-not (Get-Command winget.exe -ErrorAction SilentlyContinue)) {
+    if (-not (Test-WinGet)) {
         throw 'WinGet bulunamadı. Windows App Installer bileşenini yükleyip komutu yeniden çalıştırın.'
     }
 }
@@ -157,10 +161,28 @@ function Find-Tool([string]$Name) {
     return $null
 }
 
+function Get-LatestReleaseTagFromRedirect {
+    $request = [Net.HttpWebRequest]::Create("https://github.com/$repository/releases/latest")
+    $request.Method = 'HEAD'
+    $request.AllowAutoRedirect = $false
+    $request.UserAgent = 'VidShrink-Installer'
+    $response = $request.GetResponse()
+    try { $location = [string]$response.Headers['Location'] } finally { $response.Close() }
+    $match = [regex]::Match($location, '/releases/tag/([^/?#]+)')
+    if (-not $match.Success) { throw "Son yayın etiketi okunamadı: $location" }
+    return [Uri]::UnescapeDataString($match.Groups[1].Value)
+}
+
 function Get-LatestRelease {
     $headers = @{ 'User-Agent' = 'VidShrink-Installer'; 'Accept' = 'application/vnd.github+json' }
-    $response = Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri "https://api.github.com/repos/$repository/releases/latest"
-    $release = ConvertFrom-Json ([string]$response.Content)
+    try {
+        $response = Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri "https://api.github.com/repos/$repository/releases/latest"
+        $release = ConvertFrom-Json ([string]$response.Content)
+    }
+    catch {
+        Write-Host "GitHub API yanıt vermedi ($($_.Exception.Message)); son yayın yönlendirmeden okunuyor..." -ForegroundColor Yellow
+        $release = [pscustomobject]@{ tag_name = (Get-LatestReleaseTagFromRedirect); assets = $null }
+    }
     if (-not $release.tag_name) { throw 'Yayın bilgisi okunamadı: etiket adı yok.' }
     return $release
 }
@@ -171,7 +193,7 @@ function Get-ReleaseAsset([string]$Tag, [string]$Name, [string]$Destination) {
         Invoke-WebRequest -UseBasicParsing -Uri $uri -OutFile $Destination
     }
     catch {
-        throw "Yayın varlığı indirilemedi: $Name ($uri)"
+        throw "Yayın varlığı indirilemedi: $Name ($uri). $($_.Exception.Message)"
     }
 }
 
@@ -230,6 +252,12 @@ $ffmpegArm64Entries = @(
     @{ Entry = 'ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0/bin/ffprobe.exe'; Name = 'ffprobe.exe'; Sha256 = '6B0B738A2DF0186811F240A7036CD1279C0A08991981ADECCEEFE6A2C2B2236C' }
 )
 
+$ffmpegX64Url = 'https://github.com/GyanD/codexffmpeg/releases/download/9.0/ffmpeg-9.0-full_build.zip'
+$ffmpegX64Entries = @(
+    @{ Entry = 'ffmpeg-9.0-full_build/bin/ffmpeg.exe'; Name = 'ffmpeg.exe'; Sha256 = '05F4251BCE9293C2AB492CB17CA7724A0FFD0D06C881BA2EE83B82A89C2FC740' },
+    @{ Entry = 'ffmpeg-9.0-full_build/bin/ffprobe.exe'; Name = 'ffprobe.exe'; Sha256 = '51E0780CD881F83749B029ED716CBB841C2EAC6289F418050F2F2961B158896B' }
+)
+
 function Use-Arm64Pins {
     $script:libMpvUrl = $libMpvArm64Url
     $script:libMpvFallbackUrl = $libMpvArm64FallbackUrl
@@ -250,20 +278,28 @@ function Get-FileSha256([string]$Path) {
 # koşar ve kodlama hızını düşürür. arm64'te ffmpeg pinli arşivden, sha256'sı dosya dosya
 # doğrulanarak alınıyor.
 function Install-FfmpegArm64([string]$WorkRoot, [string]$Destination) {
+    return Install-FfmpegPinned $ffmpegArm64Url $ffmpegArm64Entries 'winarm64' $WorkRoot $Destination
+}
+
+function Install-FfmpegX64([string]$WorkRoot, [string]$Destination) {
+    return Install-FfmpegPinned $ffmpegX64Url $ffmpegX64Entries 'win64, ~240 MB' $WorkRoot $Destination
+}
+
+function Install-FfmpegPinned([string]$Url, [object[]]$Entries, [string]$Label, [string]$WorkRoot, [string]$Destination) {
     New-Item -ItemType Directory -Path $Destination, $WorkRoot -Force | Out-Null
-    $zip = Join-Path $WorkRoot 'ffmpeg-winarm64.zip'
-    Write-Host 'FFmpeg ve FFprobe indiriliyor (winarm64)...' -ForegroundColor Cyan
+    $zip = Join-Path $WorkRoot 'ffmpeg-pinned.zip'
+    Write-Host "FFmpeg ve FFprobe indiriliyor ($Label)..." -ForegroundColor Cyan
     try {
-        Invoke-WebRequest -UseBasicParsing -Uri $ffmpegArm64Url -OutFile $zip
+        Invoke-WebRequest -UseBasicParsing -Uri $Url -OutFile $zip
     }
     catch {
-        throw "ffmpeg indirilemedi: $ffmpegArm64Url"
+        throw "ffmpeg indirilemedi: $Url. $($_.Exception.Message)"
     }
 
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $archive = [IO.Compression.ZipFile]::OpenRead($zip)
     try {
-        foreach ($item in $ffmpegArm64Entries) {
+        foreach ($item in $Entries) {
             $entry = $archive.GetEntry($item.Entry)
             if (-not $entry) { throw "ffmpeg arşivinde $($item.Entry) yok." }
             $target = Join-Path $Destination $item.Name
@@ -277,6 +313,7 @@ function Install-FfmpegArm64([string]$WorkRoot, [string]$Destination) {
     }
     finally {
         $archive.Dispose()
+        Remove-Item -LiteralPath $zip -Force -ErrorAction SilentlyContinue
     }
 
     return @{
@@ -875,6 +912,10 @@ if ($DepsOnly) {
         $depsFfmpeg = Install-FfmpegArm64 $depsWork (Join-Path $depsRoot 'ffmpeg')
         Write-Host "ffmpeg hazır (sha256 doğrulandı): $($depsFfmpeg.ffmpeg)" -ForegroundColor Green
     }
+    elseif (-not (Test-WinGet)) {
+        $depsFfmpeg = Install-FfmpegX64 $depsWork (Join-Path $depsRoot 'ffmpeg')
+        Write-Host "WinGet yok; ffmpeg pinli arşivden hazır (sha256 doğrulandı): $($depsFfmpeg.ffmpeg)" -ForegroundColor Green
+    }
     else {
         Write-Host 'x64 kolunda ffmpeg winget ile geliyor; bağımlılık kolu yalnız libmpv indirir.' -ForegroundColor Yellow
     }
@@ -898,9 +939,27 @@ if (-not $ffmpeg -or -not $ffprobe) {
     }
     else {
         Write-Host 'FFmpeg ve FFprobe yükleniyor...' -ForegroundColor Cyan
-        Install-WinGetPackage 'Gyan.FFmpeg'
-        $ffmpeg = Find-Tool 'ffmpeg'
-        $ffprobe = Find-Tool 'ffprobe'
+        $wingetFailure = $null
+        if (Test-WinGet) {
+            try {
+                Install-WinGetPackage 'Gyan.FFmpeg'
+                $ffmpeg = Find-Tool 'ffmpeg'
+                $ffprobe = Find-Tool 'ffprobe'
+            }
+            catch {
+                $wingetFailure = $_.Exception.Message
+            }
+        }
+        else {
+            $wingetFailure = 'WinGet bulunamadı'
+        }
+        if (-not $ffmpeg -or -not $ffprobe) {
+            if ($wingetFailure) { Write-Host "$wingetFailure; FFmpeg sabitlenmiş arşivden indirilecek." -ForegroundColor Yellow }
+            $ffmpegWork = Join-Path ([IO.Path]::GetTempPath()) ("vidshrink-ffmpeg-" + [Guid]::NewGuid().ToString('N'))
+            $fetchedFfmpeg = Install-FfmpegX64 $ffmpegWork (Join-Path $ffmpegWork 'bin')
+            $ffmpeg = $fetchedFfmpeg.ffmpeg
+            $ffprobe = $fetchedFfmpeg.ffprobe
+        }
     }
 }
 if (-not $ffmpeg -or -not $ffprobe) { throw 'FFmpeg veya FFprobe kurulumdan sonra bulunamadı.' }
@@ -930,7 +989,7 @@ try {
     # ve otogüncelleme hiç çalışmaz. Kaynaktan derlemeye düşmek yerine burada durulur.
     $assetNames = @($release.assets | ForEach-Object { [string]$_.name })
     foreach ($required in $archiveName, $launcherArchiveName, $checksumsName) {
-        if ($assetNames -notcontains $required) {
+        if ($null -ne $release.assets -and $assetNames -notcontains $required) {
             throw "Yayın $tag bu varlığı taşımıyor: $required. Başlatıcısız kurulum yapılmaz; başlatıcıyı da içeren bir yayın çıkana kadar bekleyin."
         }
     }
@@ -1018,5 +1077,8 @@ try {
 finally {
     if (Test-Path -LiteralPath $workRoot) {
         Remove-Item -LiteralPath $workRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    if ($ffmpegWork -and (Test-Path -LiteralPath $ffmpegWork)) {
+        Remove-Item -LiteralPath $ffmpegWork -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
