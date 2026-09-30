@@ -584,6 +584,7 @@
   "main.player.state": "nafasi {0} s - {1} - kuza {2}%",
   "main.player.stalled": "Uchezaji uliacha kusonga; kichezaji hakitoi fremu.",
   "main.player.seekfailed": "Utafutaji umeshindwa: kichezaji hakionyesha fremu katika nafasi mpya.",
+  "main.player.recoveryfailed": "Uchezaji umekwama; towe la sauti limewashwa upya na faili imefunguliwa tena, lakini hakuna fremu iliyofika.",
   "main.player.engine.loadfailed": "Kicheza kimezimwa: libmpv haikuweza kupakiwa. Maktaba ya mfumo haipo au ni ya zamani (kwa kawaida vulkan-1.dll ya kiendeshi cha michoro). Sakinisha upya VidShrink au sasisha kiendeshi cha michoro.",
   "main.player.menu.leavefullscreen": "Ondoka skrini nzima",
   "main.player.menu.open": "Fungua menyu ya kichezaji",

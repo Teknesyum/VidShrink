@@ -129,6 +129,7 @@ internal partial class PlayerView : UserControl
 
     internal void Apply(PlayerCommand command)
     {
+        KullaniciIslemi();
         switch (command.Kind)
         {
             case PlayerCommandKind.Seek:
@@ -805,8 +806,8 @@ internal partial class PlayerView : UserControl
             if (!ReferenceEquals(sender, _engine)) return;
             var text = Strings.Get(fault.MessageKey);
             if (!string.IsNullOrEmpty(fault.MessageArg)) text += ": " + fault.MessageArg;
-            TxtStall.IsVisible = true;
-            TxtStall.Text = LanguageCatalog.Display(text);
+            _uyari = (LanguageCatalog.Display(text), _engine?.FramesRendered ?? 0);
+            UyariyiGoster();
         });
 
     private void StartWatchdog()
@@ -826,14 +827,6 @@ internal partial class PlayerView : UserControl
         if (_watchdogTicks % HistorySaveTicks == 0) SaveHistory(false);
     }
 
-    internal void PollStall(double nowSeconds)
-    {
-        var frames = _engine?.FramesRendered ?? 0;
-        var stalled = _stall.Observe(_playing && _engine is { EndReached: false, HasVideo: true }, frames, nowSeconds);
-        TxtStall.IsVisible = stalled;
-        if (stalled) TxtStall.Text = Strings.Get("main.player.stalled");
-    }
-
     private async Task RunSeekAsync(double atSeconds)
     {
         var engine = _engine;
@@ -842,12 +835,7 @@ internal partial class PlayerView : UserControl
         var result = await engine.SeekAsync(atSeconds, SeekPrecision.Exact).ConfigureAwait(false);
         if (result.Outcome is not (SeekOutcome.Failed or SeekOutcome.TimedOut)) return;
 
-        void ShowFailure()
-        {
-            if (!ReferenceEquals(engine, _engine)) return;
-            TxtStall.IsVisible = true;
-            TxtStall.Text = Strings.Get("main.player.seekfailed");
-        }
+        void ShowFailure() => SeekFailed(engine, result.Outcome);
 
         if (Dispatcher.UIThread.CheckAccess()) ShowFailure();
         else Dispatcher.UIThread.Post(ShowFailure);
@@ -939,6 +927,7 @@ internal partial class PlayerView : UserControl
         _watchdog = null;
         _render?.Stop();
         _stall.Reset();
+        KurtarmayiSifirla();
         HideAudioCard();
         if (_engine is { } engine)
         {

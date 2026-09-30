@@ -584,6 +584,7 @@
   "main.player.state": "position {0} s - {1} - zoom {2}%",
   "main.player.stalled": "Playback stopped advancing; the player is not producing frames.",
   "main.player.seekfailed": "Seek failed: the player did not show a frame at the new position.",
+  "main.player.recoveryfailed": "Playback stalled; the audio output was restarted and the file reopened, but no frame arrived.",
   "main.player.engine.loadfailed": "Player disabled: libmpv could not be loaded. A system library is missing or outdated (usually the graphics driver's vulkan-1.dll). Reinstall VidShrink or update the graphics driver.",
   "main.player.menu.leavefullscreen": "Leave full screen",
   "main.player.menu.open": "Open the player menu",
