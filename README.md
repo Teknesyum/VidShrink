@@ -14,7 +14,7 @@ with the internet off · 42 languages · 36 themes · Open source**
 [![License AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#install)
 
-![The VidShrink Player tab in English: a video filling the window, the tab bar across the top with Player, Editor, Shrink, Convert, Recorder and Settings, and the control strip along the bottom with the time, volume, ten-second jumps, play and pause, speed, clip and full screen](docs/gorseller/T200-oynatici-en.png)
+![The VidShrink Player tab in English: a video filling the window, the tab bar across the top with Player, Editor, Shrink, Convert, Recorder and Settings, and the control strip along the bottom with the time, volume, ten-second jumps, play and pause, speed, clip and full screen](docs/gorseller/T201-oynatici-en.png)
 
 ## One App Instead Of Five
 
@@ -63,7 +63,7 @@ fade out while the film plays and come back when the mouse does.
 
 ## Screen Recorder
 
-![The Recorder tab in automatic mode: the source picker, the length and size fields with Measure Again beside them, and the sound section choosing the microphone and system sound by name](docs/gorseller/T200-kaydedici-en.png)
+![The Recorder tab in the Advanced layout with the program picking the settings: the source, screen and countdown pickers, the approximate length and size fields with Measure Again, the microphone and system sound pickers, and the Advanced Encoding, Webcam and Replay Buffer panels](docs/gorseller/T201-kaydedici-en.png)
 
 - **What** — the whole screen, one window or a region you draw, through the capture
   backend each platform really has: gdigrab on Windows, avfoundation on macOS, x11grab on
@@ -85,7 +85,7 @@ fade out while the film plays and come back when the mouse does.
 
 ## Editor
 
-![The Editor tab: the video on top, and below it the toolbar with Split, Delete, Speed, Undo, Redo, zoom, Save, Save As and Share the File, over a timeline split into three clips](docs/gorseller/T200-duzenleyici-en.png)
+![The Editor tab: the video on top, and below it the toolbar with Split, Delete, Speed, Undo, Redo, zoom, Save, Save As and Share the File, over a timeline split into three clips](docs/gorseller/T201-duzenleyici-en.png)
 
 Open a video from any tab and cut it on a timeline: split, delete a clip or a range, move
 clips, set the speed of each clip anywhere from 0.01× to 100×, play it in reverse, undo and
@@ -98,7 +98,7 @@ export modes:
 
 ## Shrink To An Exact Size
 
-![The Shrink tab: the source drop zone on the left, the target size chips and slider below it, the What It Will Do panel in the middle spelling out codec, CRF, resolution and frame rate, and the Output panel with the size estimate on the right](docs/gorseller/T200-kucult-en.png)
+![The Shrink tab with a file loaded: source details, the target size slider and chips and the quality slider on the left, the comparison panel and the What It Will Do panel in the middle spelling out encoder, two-pass bitrate, resolution and frame rate, and the Output panel with the size estimate on the right](docs/gorseller/T201-kucult-en.png)
 
 Drag a video in, tap a size, press start. That is the whole job; the automatic mode picks
 the codec, the quality level, the resolution and the frame rate for **your** file and tells
@@ -116,13 +116,13 @@ down when it finishes.
 <details>
 <summary>The preview: what the plan will actually produce, before it runs</summary>
 
-![The preview panel playing the planned output](docs/gorseller/T200-onizleme-en.png)
+![The comparison panel paused on a frame: the original on the left of the split line and the processed output on the right, CRF 20 in the corner and the playback strip below](docs/gorseller/T201-onizleme-en.png)
 
 </details>
 
 ## Convert
 
-![The Convert tab with container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command panel beside them](docs/gorseller/T200-donustur-en.png)
+![The Convert tab with container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command and progress panels beside them](docs/gorseller/T201-donustur-en.png)
 
 MP4, MKV, WebM, MOV, AVI and GIF; MP3, M4A, WAV and FLAC for sound alone. H.264, H.265,
 VP9, AV1 or a straight stream copy, trimming, and audio extraction. **Eighteen ready-made
@@ -132,7 +132,7 @@ more — set every field for you.
 <details>
 <summary>The hidden Advanced tab: the exact ffmpeg command that will run</summary>
 
-![The Advanced tab, holding the FFmpeg command box and the AI settings box](docs/gorseller/T200-gelismis-en.png)
+![The Advanced panel, holding the FFmpeg command box, the AI settings box and the Performance Check box](docs/gorseller/T201-gelismis-en.png)
 
 </details>
 
@@ -146,7 +146,7 @@ upload can be retried. Share targets and their measured size ceilings live in
 
 ## Made For Everyone
 
-![The Settings tab: language and theme pickers, the right-click menu switch and the update settings](docs/gorseller/T200-ayarlar-en.png)
+![The Settings tab: language and theme pickers, the right-click menu entries, the automatic update switch, and the output, subtitle and share settings](docs/gorseller/T201-ayarlar-en.png)
 
 **The whole window speaks 42 languages** — every button, every warning, every tooltip, from
 Arabic to Vietnamese — and **36 colour themes** ship with it: Catppuccin, Dracula, Gruvbox,

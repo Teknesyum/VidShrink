@@ -15,7 +15,7 @@ yok.**
 [![Lisans AGPL-3.0-or-later](https://img.shields.io/badge/lisans-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#kurulum)
 
-![VidShrink Oynatıcı sekmesi Türkçe: pencereyi dolduran bir video, üstte Oynatıcı, Düzenleyici, Küçült, Dönüştür, Kaydedici ve Ayarlar sekmeleri, altta süre, ses, on saniyelik atlamalar, oynat-duraklat, hız, klip ve tam ekran düğmelerini taşıyan kontrol şeridi](docs/gorseller/T200-oynatici-tr.png)
+![VidShrink Oynatıcı sekmesi Türkçe: pencereyi dolduran bir video, üstte Oynatıcı, Düzenleyici, Küçült, Dönüştür, Kaydedici ve Ayarlar sekmeleri, altta süre, ses, on saniyelik atlamalar, oynat-duraklat, hız, klip ve tam ekran düğmelerini taşıyan kontrol şeridi](docs/gorseller/T201-oynatici-tr.png)
 
 ## Beş Uygulama Yerine Tek Uygulama
 
@@ -68,7 +68,7 @@ kontroller kayboluyor, fare gelince geri geliyor.
 
 ## Ekran Kaydedici
 
-![Kaydedici sekmesi otomatik kipte: kaynak seçici, yanında Yeniden Ölç düğmesiyle süre ve boyut alanları, mikrofonu ve sistem sesini adıyla seçen ses bölümü](docs/gorseller/T200-kaydedici-tr.png)
+![Kaydedici sekmesi Gelişmiş düzende, ayarları program seçerken: kaynak, ekran ve geri sayım seçicileri, Yeniden Ölç düğmesiyle tahmini süre ve boyut alanları, mikrofon ve sistem sesi seçicileri, Gelişmiş Kodlama, Kamera ve Kayıt Tamponu panelleri](docs/gorseller/T201-kaydedici-tr.png)
 
 - **Ne** — tüm ekran, tek pencere ya da çizdiğiniz bir bölge; her platformun gerçekten sahip
   olduğu yakalama arka ucuyla: Windows'ta gdigrab, macOS'ta avfoundation, Linux'ta x11grab.
@@ -90,7 +90,7 @@ kontroller kayboluyor, fare gelince geri geliyor.
 
 ## Düzenleyici
 
-![Düzenleyici sekmesi: üstte video, altında Böl, Sil, Hız, Geri Al, Yinele, yakınlaştırma, Kaydet, Farklı Kaydet ve Dosyayı Paylaş düğmeleri, onların altında üç klibe bölünmüş zaman çizelgesi](docs/gorseller/T200-duzenleyici-tr.png)
+![Düzenleyici sekmesi: üstte video, altında Böl, Sil, Hız, Geri Al, Yinele, yakınlaştırma, Kaydet, Farklı Kaydet ve Dosyayı Paylaş düğmeleri, onların altında üç klibe bölünmüş zaman çizelgesi](docs/gorseller/T201-duzenleyici-tr.png)
 
 Herhangi bir sekmeden bir videoyu açın ve zaman çizelgesinde kesin: bölün, bir klibi ya da
 bir aralığı silin, klipleri taşıyın, her klibin hızını 0,01× ile 100× arasında ayarlayın,
@@ -106,7 +106,7 @@ Kaydet** ya da **Paylaş** — üç dışa aktarma kipinden biriyle:
 
 ## Tam Boyuta Küçült
 
-![Küçült sekmesi: solda Kaynak bırakma alanı, altında hedef boyut yongaları ve kaydırıcısı, ortada kodeki, CRF'i, çözünürlüğü ve kare hızını tek tek yazan Ne Yapacak paneli, sağda boyut kestirimini gösteren Çıktı paneli](docs/gorseller/T200-kucult-tr.png)
+![Küçült sekmesi dosya yüklüyken: solda kaynak bilgileri, hedef boyut kaydırıcısı ve yongaları ile kalite kaydırıcısı, ortada karşılaştırma paneli ve kodlayıcıyı, iki geçişli bit hızını, çözünürlüğü ve kare hızını tek tek yazan Yapılacak İşlem paneli, sağda boyut kestirimini gösteren Çıktı paneli](docs/gorseller/T201-kucult-tr.png)
 
 Videoyu sürükleyin, bir boyuta dokunun, başlat deyin. İşin tamamı bu; otomatik kip kodeki,
 kalite düzeyini, çözünürlüğü ve kare hızını **sizin** dosyanız için seçiyor ve beklenen
@@ -124,7 +124,7 @@ da kapatıyor.
 <details>
 <summary>Önizleme: plan koşmadan önce gerçekte ne üreteceği</summary>
 
-![Planlanan çıktıyı oynatan önizleme paneli](docs/gorseller/T200-onizleme-tr.png)
+![Bir karede duraklatılmış karşılaştırma paneli: bölme çizgisinin solunda orijinal, sağında işlenmiş çıktı, köşede CRF 20, altta oynatma şeridi](docs/gorseller/T201-onizleme-tr.png)
 
 </details>
 
@@ -132,7 +132,7 @@ da kapatıyor.
 
 ## Dönüştür
 
-![Dönüştür sekmesi: kapsayıcı, kodek, kalite kipi, çözünürlük, kare hızı ve kırpma alanları, yanlarında FFmpeg Komutu paneli](docs/gorseller/T200-donustur-tr.png)
+![Dönüştür sekmesi: kapsayıcı, kodek, kalite kipi, çözünürlük, kare hızı ve kırpma alanları, yanlarında FFmpeg Komutu ve İlerleme panelleri](docs/gorseller/T201-donustur-tr.png)
 
 MP4, MKV, WebM, MOV, AVI ve GIF; yalnız ses için MP3, M4A, WAV ve FLAC. H.264, H.265, VP9, AV1
 ya da doğrudan akış kopyası, kırpma ve ses çıkarma. **On sekiz hazır hedef** — WhatsApp,
@@ -142,7 +142,7 @@ sizin yerinize dolduruyor.
 <details>
 <summary>Gizli Gelişmiş sekmesi: koşacak ffmpeg komutunun kendisi</summary>
 
-![Gelişmiş sekmesi: FFmpeg Komutu kutusu ve AI Ayarları kutusu](docs/gorseller/T200-gelismis-tr.png)
+![Gelişmiş paneli: FFmpeg Komut Satırı kutusu, AI Ayarları kutusu ve Başarım Ölçümü kutusu](docs/gorseller/T201-gelismis-tr.png)
 
 </details>
 
@@ -158,7 +158,7 @@ tavanları [`paylasim-hedefleri.json`](paylasim-hedefleri.json) içinde.
 
 ## Herkes İçin
 
-![Ayarlar sekmesi: dil ve tema seçicileri, sağ tık menüsü anahtarı ve güncelleme ayarları](docs/gorseller/T200-ayarlar-tr.png)
+![Ayarlar sekmesi: dil ve tema seçicileri, sağ tık menüsü girdileri, kendiliğinden güncelleme anahtarı, çıktı, altyazı ve paylaşım ayarları](docs/gorseller/T201-ayarlar-tr.png)
 
 **Pencerenin tamamı 42 dil konuşuyor** — her düğme, her uyarı, her ipucu; Arapçadan
 Vietnamcaya — ve yanında **36 renk teması** geliyor: Catppuccin, Dracula, Gruvbox, Nord, Rose
