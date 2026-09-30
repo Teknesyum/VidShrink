@@ -12,6 +12,13 @@ if (args.Length == 0)
     return 1;
 }
 
+if (int.TryParse(Environment.GetEnvironmentVariable("VIDSHRINK_BENCH_CEKIRDEK"), out var cekirdek) && cekirdek > 0 && OperatingSystem.IsWindows())
+{
+    using var kendi = Process.GetCurrentProcess();
+    kendi.ProcessorAffinity = (nint)((1L << Math.Min(cekirdek, 62)) - 1);
+    kendi.PriorityClass = ProcessPriorityClass.BelowNormal;
+}
+
 try
 {
     return args[0] switch
@@ -53,7 +60,7 @@ static void PrintUsage()
     Console.WriteLine("  bench container-unit <kaynak,...> [--start 5] [--fps 12,24,30,60] [--out .calisma/kap]");
     Console.WriteLine("  bench search-cost [--runs 5]");
     Console.WriteLine("  bench peak-curve <kaynak> [--codec hevc_nvenc] [--ratios 3,5,8,12] [--peaks 1.02,1.1,1.25,1.5] [--out .calisma/tepe]");
-    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--intent archive|sharing|socialmedia] [--lock-codec hevc_nvenc] [--codec-preference auto|compatible|maxcompression|fast] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
+    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--intent archive|sharing|socialmedia] [--lock-codec hevc_nvenc] [--codec-preference auto|compatible|maxcompression|fast] [--wide-peak] [--threads N] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench bar-burst [tekrar]");
     Console.WriteLine("  bench psy-args <kodlayıcı>");
@@ -586,6 +593,7 @@ static async Task<int> ShrinkAsync(string[] args)
     var noMeasure = false;
     var noPsy = false;
     var measuredQuality = false;
+    var threadLimit = 0;
     (int Width, int Height)? sourceSize = null;
     double? sourceMb = null;
     var filters = VideoFilterOptions.Default;
@@ -653,6 +661,9 @@ static async Task<int> ShrinkAsync(string[] args)
                 break;
             case "--measured-quality":
                 measuredQuality = true;
+                break;
+            case "--threads" when i + 1 < args.Length:
+                threadLimit = int.Parse(args[++i], CultureInfo.InvariantCulture);
                 break;
             case "--source-size" when i + 1 < args.Length:
                 var dimensions = args[++i].Split('x', 'X');
@@ -754,6 +765,15 @@ static async Task<int> ShrinkAsync(string[] args)
         }
         if (noPsy && plan.Codec.Contains("nvenc", StringComparison.OrdinalIgnoreCase))
             plan.ExtraArgs.AddRange(new[] { "-spatial-aq", "0", "-temporal-aq", "0" });
+        if (threadLimit > 0)
+        {
+            var sinir = threadLimit.ToString(CultureInfo.InvariantCulture);
+            plan.ExtraArgs.AddRange(new[] { "-threads", sinir });
+            if (plan.Codec.Equals("libx265", StringComparison.OrdinalIgnoreCase))
+                plan.ExtraArgs.AddRange(new[] { "-x265-params", $"pools={sinir}:frame-threads={sinir}" });
+            if (plan.Codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase))
+                plan.ExtraArgs.AddRange(new[] { "-svtav1-params", $"lp={sinir}" });
+        }
         var band = FillBand.For(targetMb);
 
         var outputPath = Path.Combine(outDir, $"{label}_{targetMb.ToString("0.#", CultureInfo.InvariantCulture)}mb.mp4");
@@ -768,6 +788,8 @@ static async Task<int> ShrinkAsync(string[] args)
         var stopwatch = Stopwatch.StartNew();
         var encodeResult = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None, fillPolicy);
         stopwatch.Stop();
+        var kaynakKare = info.DurationSeconds * info.Fps;
+        Console.WriteLine($"hiz: kaynak-kare={kaynakKare:0} sure={stopwatch.Elapsed.TotalSeconds:0.##}s deneme={encodeResult.Attempts} fps={kaynakKare / stopwatch.Elapsed.TotalSeconds:0.##} gercek-zaman-kati={info.DurationSeconds / stopwatch.Elapsed.TotalSeconds:0.###}");
 
         foreach (var step in encodeResult.Trace ?? Array.Empty<EncodeAttempt>())
             Console.WriteLine($"  deneme {step.Number}: {step.Branch}, {step.Mode}, {step.VideoBitrateK}k, hedeflenen {step.AimMb:0.###} MB, cikan {step.ActualMb:0.###} MB");
