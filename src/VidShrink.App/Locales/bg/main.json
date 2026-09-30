@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Колелце",
   "main.player.input.left": "Ляв клик",
   "main.player.input.middle": "Среден клик",
+  "main.player.input.back": "Бутон Назад",
+  "main.player.input.forward": "Бутон Напред",
   "main.player.input.right": "Десен клик",
   "main.player.input.space": "Интервал",
   "main.player.input.enter": "Enter",

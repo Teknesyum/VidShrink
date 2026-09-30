@@ -610,6 +610,8 @@
   "main.player.input.wheel": "சக்கரம்",
   "main.player.input.left": "இடது கிளிக்",
   "main.player.input.middle": "நடு கிளிக்",
+  "main.player.input.back": "பின் பொத்தான்",
+  "main.player.input.forward": "முன் பொத்தான்",
   "main.player.input.right": "வலது கிளிக்",
   "main.player.input.space": "இடைவெளி",
   "main.player.input.enter": "Enter",

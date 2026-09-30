@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Görgő",
   "main.player.input.left": "Bal kattintás",
   "main.player.input.middle": "Középső kattintás",
+  "main.player.input.back": "Vissza gomb",
+  "main.player.input.forward": "Előre gomb",
   "main.player.input.right": "Jobb kattintás",
   "main.player.input.space": "Szóköz",
   "main.player.input.enter": "Enter",

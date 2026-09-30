@@ -610,6 +610,8 @@
   "main.player.input.wheel": "وہیل",
   "main.player.input.left": "بائیں کلک",
   "main.player.input.middle": "درمیانی کلک",
+  "main.player.input.back": "پیچھے بٹن",
+  "main.player.input.forward": "آگے بٹن",
   "main.player.input.right": "دائیں کلک",
   "main.player.input.space": "اسپیس",
   "main.player.input.enter": "Enter",

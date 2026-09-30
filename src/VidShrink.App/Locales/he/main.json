@@ -610,6 +610,8 @@
   "main.player.input.wheel": "גלגלת",
   "main.player.input.left": "לחיצה שמאלית",
   "main.player.input.middle": "לחיצה אמצעית",
+  "main.player.input.back": "לחצן אחורה",
+  "main.player.input.forward": "לחצן קדימה",
   "main.player.input.right": "לחיצה ימנית",
   "main.player.input.space": "מקש רווח",
   "main.player.input.enter": "Enter",

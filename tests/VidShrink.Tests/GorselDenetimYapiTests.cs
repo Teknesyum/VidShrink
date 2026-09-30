@@ -48,7 +48,8 @@ public sealed class GorselDenetimYapiTests
                 pencere.UpdateLayout();
                 Avalonia.Threading.Dispatcher.UIThread.RunJobs();
                 pencere.UpdateLayout();
-                var satirlar = Ad<Grid>(panel, "Rows").Children.OfType<TextBlock>().ToArray();
+                var satirlar = Ad<Grid>(panel, "Rows").Children
+                    .Select(c => c is Button { Content: TextBlock ic } ? ic : (TextBlock)c).ToArray();
                 return Enumerable.Range(0, satirlar.Length / 2).Select(i =>
                 {
                     var tus = satirlar[2 * i];

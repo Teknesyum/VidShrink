@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Kotačić",
   "main.player.input.left": "Lijevi klik",
   "main.player.input.middle": "Srednji klik",
+  "main.player.input.back": "Tipka Natrag",
+  "main.player.input.forward": "Tipka Naprijed",
   "main.player.input.right": "Desni klik",
   "main.player.input.space": "Razmaknica",
   "main.player.input.enter": "Enter",

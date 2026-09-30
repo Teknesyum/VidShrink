@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Kolečko",
   "main.player.input.left": "Levý klik",
   "main.player.input.middle": "Prostřední klik",
+  "main.player.input.back": "Tlačítko Zpět",
+  "main.player.input.forward": "Tlačítko Vpřed",
   "main.player.input.right": "Klik pravým tlačítkem",
   "main.player.input.space": "Mezerník",
   "main.player.input.enter": "Enter",

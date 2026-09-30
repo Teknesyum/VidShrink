@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Roda do mouse",
   "main.player.input.left": "Clique esquerdo",
   "main.player.input.middle": "Clique do meio",
+  "main.player.input.back": "Botão voltar",
+  "main.player.input.forward": "Botão avançar",
   "main.player.input.right": "Clique direito",
   "main.player.input.space": "Espaço",
   "main.player.input.enter": "Enter",

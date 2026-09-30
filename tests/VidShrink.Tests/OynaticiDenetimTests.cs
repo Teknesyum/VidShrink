@@ -403,8 +403,8 @@ public sealed class KeymapTests
                     var dugmeIzi = string.Join(" | ", dugmeli.Trace.Skip(once));
                     w1.Close();
 
-                    var ac = ipucu.LastIndexOf('(');
-                    var jest = ac < 0 ? "" : ipucu[(ac + 1)..].TrimEnd(')');
+                    var ac = ipucu.LastIndexOf('<');
+                    var jest = ac < 0 ? "" : ipucu[(ac + 1)..].TrimEnd('>');
                     var satir = Keymap.Rows.FirstOrDefault(r => r.Input.Kind == PlayerInputKind.Key && Keymap.Gesture(r.Input) == jest);
                     var tusIzi = "satir yok";
                     if (satir is not null)
@@ -473,7 +473,7 @@ public sealed class KeymapTests
                 foreach (var ((jest, etiket), row) in gorunen.Zip(Keymap.Rows))
                 {
                     body.AppendLine($"  {jest} | {etiket}");
-                    Assert.Equal(Keymap.Gesture(row.Input), jest);
+                    Assert.Equal(Keymap.Boxed(Keymap.Gesture(row.Input)), jest);
                     Assert.Equal(VidShrink.Core.Bicim.Satir.Bagla(Keymap.Label(row)), etiket);
                 }
             }

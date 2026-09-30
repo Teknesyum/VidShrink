@@ -9,7 +9,9 @@ internal enum PlayerButton
 {
     Left,
     Middle,
-    Right
+    Right,
+    Back,
+    Forward
 }
 
 internal enum PlayerCommandKind

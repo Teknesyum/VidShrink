@@ -16,9 +16,11 @@
       </Button>
       <StackPanel x:Name="Body" Classes="disclose" Spacing="{StaticResource SpaceMd}">
         <TextBlock Text="{loc:Text editor.shortcuts.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+        <Button x:Name="BtnReset" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Content="{loc:Text shortcuts.reset}" Click="OnReset"/>
+        <TextBlock x:Name="TxtNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
         <Grid x:Name="Rows"
               ColumnDefinitions="Auto,*"
-              ColumnSpacing="{StaticResource SpaceLg}"
+              ColumnSpacing="{StaticResource SpaceMd}"
               RowSpacing="{StaticResource SpaceXs}"/>
       </StackPanel>
     </StackPanel>

@@ -610,6 +610,8 @@
   "main.player.input.wheel": "چرخ ماوس",
   "main.player.input.left": "کلیک چپ",
   "main.player.input.middle": "کلیک وسط",
+  "main.player.input.back": "دکمهٔ عقب",
+  "main.player.input.forward": "دکمهٔ جلو",
   "main.player.input.right": "کلیک راست",
   "main.player.input.space": "فاصله",
   "main.player.input.enter": "Enter",

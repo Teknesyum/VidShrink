@@ -97,7 +97,7 @@ internal static class Keymap
 
     private static PlayerAction Volume(double step) => new(PlayerCommandKind.Volume, step, "main.player.menu.volume");
 
-    internal static readonly IReadOnlyList<KeymapRow> Rows = new KeymapRow[]
+    internal static readonly IReadOnlyList<KeymapRow> DefaultRows = new KeymapRow[]
     {
         new(PlayerInput.OnWheel(), Seek(WheelSeekStep)),
         new(PlayerInput.OnWheel(KeyModifiers.Control), Seek(WheelSeekStep * WheelScale(KeyModifiers.Control))),
@@ -173,6 +173,56 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.MediaNextTrack), NextFile),
         new(PlayerInput.OnKey(Key.MediaPreviousTrack), PreviousFile)
     };
+
+    private static readonly object Gate = new();
+    private static int _version = -1;
+    private static IReadOnlyList<KeymapRow> _rows = Array.Empty<KeymapRow>();
+    private static IReadOnlyList<KeymapRow?> _effective = Array.Empty<KeymapRow?>();
+
+    internal static IReadOnlyList<KeymapRow> Rows
+    {
+        get
+        {
+            Refresh();
+            return _rows;
+        }
+    }
+
+    internal static string SlotId(KeymapRow row) => ShortcutBindings.Canon(row.Input);
+
+    internal static IReadOnlyList<ShortcutSlot> ShortcutSlots()
+    {
+        Refresh();
+        var slots = new List<ShortcutSlot>(DefaultRows.Count);
+        for (var i = 0; i < DefaultRows.Count; i++)
+            slots.Add(new ShortcutSlot(ShortcutMap.Player, SlotId(DefaultRows[i]), DefaultRows[i].Input, _effective[i]?.Input, Label(DefaultRows[i])));
+        return slots;
+    }
+
+    private static void Refresh()
+    {
+        var version = ShortcutBindings.Version;
+        lock (Gate)
+        {
+            if (version == _version) return;
+            var effective = new KeymapRow?[DefaultRows.Count];
+            for (var i = 0; i < DefaultRows.Count; i++)
+            {
+                var row = DefaultRows[i];
+                if (!ShortcutBindings.TryOverride(ShortcutMap.Player, SlotId(row), out var input)) effective[i] = row;
+                else if (input is { } bound) effective[i] = new KeymapRow(bound, row.Action);
+            }
+
+            _effective = effective;
+            _rows = effective.OfType<KeymapRow>().ToArray();
+            _version = version;
+        }
+    }
+
+    internal static string Boxed(string gesture) => "<" + gesture + ">";
+
+    internal static string Tip(string label, PlayerInput? input)
+        => input is { } bound ? label + " " + Boxed(Gesture(bound)) : label;
 
     internal static readonly IReadOnlyList<PlayerAction> MenuTop = new[] { PlayPause, Fullscreen };
 
@@ -254,6 +304,8 @@ internal static class Keymap
             PlayerInputKind.Wheel => Strings.Get("main.player.input.wheel"),
             PlayerInputKind.Press when input.Button == PlayerButton.Left => Strings.Get("main.player.input.left"),
             PlayerInputKind.Press when input.Button == PlayerButton.Middle => Strings.Get("main.player.input.middle"),
+            PlayerInputKind.Press when input.Button == PlayerButton.Back => Strings.Get("main.player.input.back"),
+            PlayerInputKind.Press when input.Button == PlayerButton.Forward => Strings.Get("main.player.input.forward"),
             PlayerInputKind.Press => Strings.Get("main.player.input.right"),
             _ => KeyName(input)
         });
@@ -303,7 +355,7 @@ internal static class Keymap
         };
     }
 
-    private static KeyModifiers Clean(KeyModifiers modifiers)
+    internal static KeyModifiers Clean(KeyModifiers modifiers)
         => modifiers & (KeyModifiers.Control | KeyModifiers.Shift | KeyModifiers.Alt);
 
     private static PlayerCommand Find(Func<KeymapRow, bool> match)

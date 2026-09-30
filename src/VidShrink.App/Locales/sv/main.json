@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Hjul",
   "main.player.input.left": "Vänsterklick",
   "main.player.input.middle": "Mittklick",
+  "main.player.input.back": "Bakåtknapp",
+  "main.player.input.forward": "Framåtknapp",
   "main.player.input.right": "Högerklick",
   "main.player.input.space": "Mellanslag",
   "main.player.input.enter": "Enter",

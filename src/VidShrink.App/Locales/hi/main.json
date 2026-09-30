@@ -610,6 +610,8 @@
   "main.player.input.wheel": "व्हील",
   "main.player.input.left": "बायाँ क्लिक",
   "main.player.input.middle": "मध्य क्लिक",
+  "main.player.input.back": "पीछे बटन",
+  "main.player.input.forward": "आगे बटन",
   "main.player.input.right": "राइट क्लिक",
   "main.player.input.space": "स्पेस",
   "main.player.input.enter": "Enter",

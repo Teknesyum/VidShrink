@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Kółko myszy",
   "main.player.input.left": "Lewy przycisk",
   "main.player.input.middle": "Środkowy przycisk",
+  "main.player.input.back": "Przycisk Wstecz",
+  "main.player.input.forward": "Przycisk Dalej",
   "main.player.input.right": "Prawy przycisk",
   "main.player.input.space": "Spacja",
   "main.player.input.enter": "Enter",

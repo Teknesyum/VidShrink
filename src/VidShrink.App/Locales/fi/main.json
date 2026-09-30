@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Rulla",
   "main.player.input.left": "Vasen klikkaus",
   "main.player.input.middle": "Keskiklikkaus",
+  "main.player.input.back": "Takaisin-painike",
+  "main.player.input.forward": "Eteenpäin-painike",
   "main.player.input.right": "Oikea klikkaus",
   "main.player.input.space": "Välilyönti",
   "main.player.input.enter": "Enter",

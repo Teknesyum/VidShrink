@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Τροχός",
   "main.player.input.left": "Αριστερό κλικ",
   "main.player.input.middle": "Μεσαίο κλικ",
+  "main.player.input.back": "Κουμπί Πίσω",
+  "main.player.input.forward": "Κουμπί Εμπρός",
   "main.player.input.right": "Δεξί κλικ",
   "main.player.input.space": "Πλήκτρο διαστήματος",
   "main.player.input.enter": "Enter",

@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Hjul",
   "main.player.input.left": "Venstreklikk",
   "main.player.input.middle": "Midtklikk",
+  "main.player.input.back": "Tilbake-knapp",
+  "main.player.input.forward": "Fremover-knapp",
   "main.player.input.right": "Høyreklikk",
   "main.player.input.space": "Mellomrom",
   "main.player.input.enter": "Enter",

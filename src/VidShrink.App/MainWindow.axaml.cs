@@ -1497,6 +1497,7 @@ public partial class MainWindow : Window
         {
             var settingsFile = SettingsPathOverride ?? UpdateSettings.DefaultPath;
             AppDataReset.Run(Path.GetDirectoryName(settingsFile), settingsFile);
+            Playback.ShortcutBindings.Load();
             if (File.Exists(DismissedNoticePath)) File.Delete(DismissedNoticePath);
             var defaults = new UpdateSettings();
             _settingsSyncing = true;

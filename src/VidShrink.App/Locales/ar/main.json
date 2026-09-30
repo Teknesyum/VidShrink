@@ -610,6 +610,8 @@
   "main.player.input.wheel": "العجلة",
   "main.player.input.left": "النقر الأيسر",
   "main.player.input.middle": "النقر الأوسط",
+  "main.player.input.back": "زر الرجوع",
+  "main.player.input.forward": "زر التقدّم",
   "main.player.input.right": "النقر بالزر الأيمن",
   "main.player.input.space": "المسافة",
   "main.player.input.enter": "Enter",

@@ -610,6 +610,8 @@
   "main.player.input.wheel": "Колесо мыши",
   "main.player.input.left": "Левый клик",
   "main.player.input.middle": "Средний клик",
+  "main.player.input.back": "Кнопка «Назад»",
+  "main.player.input.forward": "Кнопка «Вперёд»",
   "main.player.input.right": "Правый клик",
   "main.player.input.space": "Пробел",
   "main.player.input.enter": "Enter",
