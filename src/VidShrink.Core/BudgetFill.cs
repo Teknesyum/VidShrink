@@ -65,4 +65,36 @@ public static class BudgetFill
         topUp.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: deliveredMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factor) };
         return topUp;
     }
+
+    /// <summary>
+    /// Yukari deneme hedefi astiysa ve teslim edilen sonuc <see cref="Floor"/> altinda kaldiysa iki olcum
+    /// hedefi koseler: bir deneme daha iki noktanin arasindan dogrusal aradegerle <see cref="AimFor"/>
+    /// nisanini ister. Istek asan denemenin bit hizinin altinda kalir; o da asarsa onceki sonuc teslim
+    /// edilir, tavan gevsemez. Olcum <c>docs/olcumler/kodlama-hizi-ve-boyut-sapmasi.md</c>.
+    /// </summary>
+    public static EncodePlan? Bracket(EncodePlan delivered, double deliveredMb, EncodePlan over, double overMb, double targetMb, double durationSeconds)
+    {
+        if (AimFor(over.Codec) is not double aim) return null;
+        if (targetMb <= 0 || durationSeconds <= 0 || deliveredMb <= 0 || deliveredMb >= Floor * targetMb || overMb <= targetMb) return null;
+        if (over.ModeEnum != EncodeMode.TwoPass || over.VideoBitrateK <= 0) return null;
+
+        var audioMb = PlanCalculator.NonVideoMb(delivered.NonVideoK, durationSeconds);
+        var twoPass = delivered.ModeEnum == EncodeMode.TwoPass && delivered.VideoBitrateK > 0;
+        double lowK = twoPass ? delivered.VideoBitrateK : PlanCalculator.VideoKbitFor(deliveredMb - audioMb, durationSeconds);
+        var highK = over.VideoBitrateK;
+        if (highK <= lowK) return null;
+
+        var aimMb = aim * targetMb;
+        var interpolated = lowK + (highK - lowK) * (aimMb - deliveredMb) / (overMb - deliveredMb);
+        var k = (int)Math.Floor(Math.Min(interpolated, highK - 1));
+        if (k <= lowK) return null;
+        if (k < PlanCalculator.RunnableVideoBitrateK(delivered.Width, delivered.Height, delivered.Fps)) return null;
+
+        var step = over.Clone();
+        step.VideoBitrateK = k;
+        step.Reason = string.Create(CultureInfo.InvariantCulture,
+            $"retry: budget fill bracket, {lowK:0}k gave {deliveredMb:0.###} MB and {highK}k gave {overMb:0.###} MB against the {targetMb:0.###} MB target, so one more attempt asks for {k}k between them; if it lands over the target the previous result is delivered");
+        step.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: overMb, TargetMb: targetMb, AudioMb: audioMb, Factor: k / Math.Max(1.0, highK)) };
+        return step;
+    }
 }

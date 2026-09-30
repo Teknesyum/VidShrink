@@ -250,21 +250,11 @@ public sealed class EncodeRunner
             fallbackDropped = droppedOptions;
         }
 
-        async Task<EncodeResult> FillUpAsync(EncodeResult delivered)
+        async Task<List<string>?> EncodeFillStepAsync(EncodePlan step, string upPath)
         {
-            if (fillPolicy != FillPolicy.FillTarget || !delivered.Success || delivered.OverTarget || delivered.CeilingExceeded
-                || delivered.Saturated || delivered.Trim is not null || usedDeadYieldStep || delivered.PlanUsed.StopsShortOfBandOnPurpose)
-                return delivered;
-            if (!BudgetFill.Wants(delivered.OutputMb, effectiveTargetMb, attempt, attemptLimit, usedBudgetFill)) return delivered;
-            var step = BudgetFill.Plan(delivered.PlanUsed, delivered.OutputMb, samples, effectiveTargetMb, Sure(delivered.PlanUsed));
-            if (step is null) return delivered;
-
-            usedBudgetFill = true;
             attempt++;
             var fillClock = Stopwatch.StartNew();
-            var upPath = PartialPathFor(outputPath);
             var upDropped = new List<string>();
-            var fillAimMb = (BudgetFill.AimFor(step.Codec) ?? BudgetFill.Aim) * effectiveTargetMb;
             try
             {
                 if (step.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(step.Codec))
@@ -288,22 +278,71 @@ public sealed class EncodeRunner
                 TryDelete(upPath);
                 fillClock.Stop();
                 attemptSeconds = fillClock.Elapsed.TotalSeconds;
-                Iz(new EncodeAttempt(attempt, "budget fill failed, the previous result delivered", fillAimMb, delivered.OutputMb, step.VideoBitrateK, step.Mode));
-                return delivered with { Attempts = attempt, Trace = trace, DeliveredAttempt = delivered.DeliveredAttemptNumber };
+                return null;
             }
 
             fillClock.Stop();
             attemptSeconds = fillClock.Elapsed.TotalSeconds;
+            return upDropped;
+        }
+
+        async Task<EncodeResult> FillUpAsync(EncodeResult delivered)
+        {
+            if (fillPolicy != FillPolicy.FillTarget || !delivered.Success || delivered.OverTarget || delivered.CeilingExceeded
+                || delivered.Saturated || delivered.Trim is not null || usedDeadYieldStep || delivered.PlanUsed.StopsShortOfBandOnPurpose)
+                return delivered;
+            if (!BudgetFill.Wants(delivered.OutputMb, effectiveTargetMb, attempt, attemptLimit, usedBudgetFill)) return delivered;
+            var step = BudgetFill.Plan(delivered.PlanUsed, delivered.OutputMb, samples, effectiveTargetMb, Sure(delivered.PlanUsed));
+            if (step is null) return delivered;
+
+            usedBudgetFill = true;
+            var fillAimMb = (BudgetFill.AimFor(step.Codec) ?? BudgetFill.Aim) * effectiveTargetMb;
+            var upPath = PartialPathFor(outputPath);
+            var upDropped = await EncodeFillStepAsync(step, upPath);
+            if (upDropped is null)
+            {
+                Iz(new EncodeAttempt(attempt, "budget fill failed, the previous result delivered", fillAimMb, delivered.OutputMb, step.VideoBitrateK, step.Mode));
+                return delivered with { Attempts = attempt, Trace = trace, DeliveredAttempt = delivered.DeliveredAttemptNumber };
+            }
+
             var upMb = Megabayt.Oku(new FileInfo(upPath).Length);
             var upEfficiency = PlanCalculator.MeasuredEncoderEfficiency(step, upMb, Sure(step));
             if (!BudgetFill.Keeps(delivered.OutputMb, upMb, effectiveTargetMb))
             {
                 TryDelete(upPath);
-                var branch = upMb > effectiveTargetMb
-                    ? "budget fill over the target, the previous result delivered"
-                    : "budget fill came out smaller, the previous result delivered";
+                var overTarget = upMb > effectiveTargetMb;
+                var bracket = overTarget
+                    ? BudgetFill.Bracket(delivered.PlanUsed, delivered.OutputMb, step, upMb, effectiveTargetMb, Sure(delivered.PlanUsed))
+                    : null;
+                var branch = bracket is not null
+                    ? "budget fill over the target, one more attempt between the two results"
+                    : overTarget
+                        ? "budget fill over the target, the previous result delivered"
+                        : "budget fill came out smaller, the previous result delivered";
                 Iz(new EncodeAttempt(attempt, branch, fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
-                return delivered with { Attempts = attempt, Trace = trace, DeliveredAttempt = delivered.DeliveredAttemptNumber };
+                if (bracket is null)
+                    return delivered with { Attempts = attempt, Trace = trace, DeliveredAttempt = delivered.DeliveredAttemptNumber };
+
+                step = bracket;
+                upPath = PartialPathFor(outputPath);
+                upDropped = await EncodeFillStepAsync(step, upPath);
+                if (upDropped is null)
+                {
+                    Iz(new EncodeAttempt(attempt, "budget fill bracket failed, the previous result delivered", fillAimMb, delivered.OutputMb, step.VideoBitrateK, step.Mode));
+                    return delivered with { Attempts = attempt, Trace = trace, DeliveredAttempt = delivered.DeliveredAttemptNumber };
+                }
+
+                upMb = Megabayt.Oku(new FileInfo(upPath).Length);
+                upEfficiency = PlanCalculator.MeasuredEncoderEfficiency(step, upMb, Sure(step));
+                if (!BudgetFill.Keeps(delivered.OutputMb, upMb, effectiveTargetMb))
+                {
+                    TryDelete(upPath);
+                    var bracketBranch = upMb > effectiveTargetMb
+                        ? "budget fill bracket over the target, the previous result delivered"
+                        : "budget fill bracket came out smaller, the previous result delivered";
+                    Iz(new EncodeAttempt(attempt, bracketBranch, fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
+                    return delivered with { Attempts = attempt, Trace = trace, DeliveredAttempt = delivered.DeliveredAttemptNumber };
+                }
             }
 
             Iz(new EncodeAttempt(attempt, "budget fill, the fuller result delivered", fillAimMb, upMb, step.VideoBitrateK, step.Mode, upEfficiency));
@@ -680,11 +719,19 @@ public sealed class EncodeRunner
         return FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix, availability, scenes);
     }
 
-    private static async Task<EncodeCommandOutcome> RunOneAsync(
+    /// <summary>Testin ffmpeg yerine koydugu kodlayici: plani, cikti yolunu ve gecisi alir, dosyayi kendisi yazar.</summary>
+    internal Func<EncodePlan, string, int, Task>? SahteKodlayici { get; init; }
+
+    private async Task<EncodeCommandOutcome> RunOneAsync(
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
         IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo,
         SceneMap? scenes, CancellationToken ct, Stopwatch attemptClock)
     {
+        if (SahteKodlayici is { } sahte)
+        {
+            await sahte(plan, outputPath, pass);
+            return new EncodeCommandOutcome(0, Array.Empty<string>(), Array.Empty<string>());
+        }
         var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance, scenes);
         return await RunCommandAsync(args, plan.EffectiveDurationSeconds(info.DurationSeconds), progress, stage, spanFrom, spanTo, ct, () => attemptClock.Elapsed);
     }
