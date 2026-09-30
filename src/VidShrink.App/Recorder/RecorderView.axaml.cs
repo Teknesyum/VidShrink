@@ -65,6 +65,7 @@ internal partial class RecorderView : UserControl
         InitSes();
         InitSerit();
         InitGeriSayim();
+        InitBitince();
         InitTampon();
         InitMini();
         RefreshSerit();
@@ -115,6 +116,7 @@ internal partial class RecorderView : UserControl
             RefreshSeciciLabels();
             RefreshAudioBoxes();
             RefreshCountdownLabels();
+            RefreshFinishLabels();
             RefreshReplayLabels();
             RefreshAdvancedLabels();
             RefreshWizard();
@@ -138,6 +140,7 @@ internal partial class RecorderView : UserControl
         WarningRow.IsVisible = false;
         _lastRecording = null;
         ResetShare();
+        HideFinish();
     }
 
     private void ShowError(string message)
@@ -167,6 +170,7 @@ internal partial class RecorderView : UserControl
         BtnTrimIdle.IsVisible = result.Ok && !result.Partial
                                 && VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) != VidShrink.Core.RecorderContainer.Gif;
         ResetShare();
+        HideFinish();
         TxtResult.Text = Say(
             BaslikAnahtari(result),
             Bicim.Boyut.Mb(result.OutputMb, Strings.Culture),

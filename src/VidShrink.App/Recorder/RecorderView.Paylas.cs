@@ -61,22 +61,25 @@ internal partial class RecorderView
 
     private void OnShare(object? sender, RoutedEventArgs e) => ShareOnce(null);
 
-    private async void ShareOnce(string? targetIdOverride)
+    private async void ShareOnce(string? targetIdOverride) => await ShareCoreAsync(targetIdOverride);
+
+    /// <summary>Tek paylaşım; sonucu "bitince" eylemi de okur. Başlamadıysa <c>null</c>, neden paylaşım satırında.</summary>
+    private async System.Threading.Tasks.Task<CoreShare.ShareResult?> ShareCoreAsync(string? targetIdOverride)
     {
         if (Delivered() is not { } path)
         {
             ShowShareStatus(ShareSession.Nothing());
-            return;
+            return null;
         }
 
         var session = Sharing();
         if (session.Target(targetIdOverride) is not { } target)
         {
             ShowShareStatus(ShareSession.MissingTargets());
-            return;
+            return null;
         }
 
-        if (session.Running) return;
+        if (session.Running) return null;
 
         BtnRecShare.IsEnabled = false;
         BtnRecShareCancel.IsVisible = true;
@@ -94,6 +97,7 @@ internal partial class RecorderView
         BtnRecShareCancel.IsVisible = false;
         RecShareProgress.IsVisible = false;
         ShowShareResult(result);
+        return result;
     }
 
     private void ShowShareResult(CoreShare.ShareResult result)
