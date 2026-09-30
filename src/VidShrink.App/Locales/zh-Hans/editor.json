@@ -48,5 +48,11 @@
   "editor.timecode": "时间码",
   "editor.duration": "持续时间",
   "editor.monitor": "节目监视器",
-  "editor.snap": "吸附"
+  "editor.snap": "吸附",
+  "editor.text.add": "添加文字",
+  "editor.text.content": "文字",
+  "editor.text.size": "大小",
+  "editor.text.color": "颜色",
+  "editor.text.panel": "文字属性",
+  "editor.export.text-full": "文字图层需要重新编码，已切换到完整模式。"
 }

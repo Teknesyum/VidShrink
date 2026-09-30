@@ -48,5 +48,11 @@
   "editor.timecode": "Msimbo wa muda",
   "editor.duration": "Muda",
   "editor.monitor": "Kifuatiliaji cha programu",
-  "editor.snap": "Kunasa"
+  "editor.snap": "Kunasa",
+  "editor.text.add": "Ongeza maandishi",
+  "editor.text.content": "Maandishi",
+  "editor.text.size": "Ukubwa",
+  "editor.text.color": "Rangi",
+  "editor.text.panel": "Sifa za maandishi",
+  "editor.export.text-full": "Safu ya maandishi inahitaji kusimbwa upya; imebadilishwa kuwa hali kamili."
 }

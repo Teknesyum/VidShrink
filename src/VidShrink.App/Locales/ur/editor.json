@@ -48,5 +48,11 @@
   "editor.timecode": "ٹائم کوڈ",
   "editor.duration": "دورانیہ",
   "editor.monitor": "پروگرام مانیٹر",
-  "editor.snap": "اسنیپنگ"
+  "editor.snap": "اسنیپنگ",
+  "editor.text.add": "متن شامل کریں",
+  "editor.text.content": "متن",
+  "editor.text.size": "سائز",
+  "editor.text.color": "رنگ",
+  "editor.text.panel": "متن کی خصوصیات",
+  "editor.export.text-full": "متن کی تہہ کو دوبارہ انکوڈ کرنا ضروری ہے؛ مکمل موڈ پر منتقل کر دیا گیا۔"
 }

@@ -48,5 +48,11 @@
   "editor.timecode": "Tidskode",
   "editor.duration": "Varighed",
   "editor.monitor": "Programskærm",
-  "editor.snap": "Fastgørelse"
+  "editor.snap": "Fastgørelse",
+  "editor.text.add": "Tilføj tekst",
+  "editor.text.content": "Tekst",
+  "editor.text.size": "Størrelse",
+  "editor.text.color": "Farve",
+  "editor.text.panel": "Tekstegenskaber",
+  "editor.export.text-full": "Tekstlaget kræver genkodning; der er skiftet til fuld tilstand."
 }

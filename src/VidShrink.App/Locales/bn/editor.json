@@ -48,5 +48,11 @@
   "editor.timecode": "টাইমকোড",
   "editor.duration": "সময়কাল",
   "editor.monitor": "প্রোগ্রাম মনিটর",
-  "editor.snap": "স্ন্যাপিং"
+  "editor.snap": "স্ন্যাপিং",
+  "editor.text.add": "টেক্সট যোগ করুন",
+  "editor.text.content": "টেক্সট",
+  "editor.text.size": "আকার",
+  "editor.text.color": "রং",
+  "editor.text.panel": "টেক্সটের বৈশিষ্ট্য",
+  "editor.export.text-full": "টেক্সট স্তরের জন্য পুনরায় এনকোড দরকার; সম্পূর্ণ মোডে বদলানো হয়েছে।"
 }

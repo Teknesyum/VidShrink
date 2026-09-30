@@ -48,5 +48,11 @@
   "editor.timecode": "Timecode",
   "editor.duration": "Dauer",
   "editor.monitor": "Programmmonitor",
-  "editor.snap": "Einrasten"
+  "editor.snap": "Einrasten",
+  "editor.text.add": "Text hinzufügen",
+  "editor.text.content": "Text",
+  "editor.text.size": "Größe",
+  "editor.text.color": "Farbe",
+  "editor.text.panel": "Texteigenschaften",
+  "editor.export.text-full": "Die Textebene erfordert eine Neukodierung; es wurde auf den vollständigen Modus umgestellt."
 }

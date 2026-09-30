@@ -48,5 +48,11 @@
   "editor.timecode": "Tidskode",
   "editor.duration": "Varighet",
   "editor.monitor": "Programskjerm",
-  "editor.snap": "Festing"
+  "editor.snap": "Festing",
+  "editor.text.add": "Legg til tekst",
+  "editor.text.content": "Tekst",
+  "editor.text.size": "Størrelse",
+  "editor.text.color": "Farge",
+  "editor.text.panel": "Tekstegenskaper",
+  "editor.export.text-full": "Tekstlaget krever omkoding; byttet til full modus."
 }

@@ -48,5 +48,11 @@
   "editor.timecode": "タイムコード",
   "editor.duration": "デュレーション",
   "editor.monitor": "プログラムモニター",
-  "editor.snap": "スナップ"
+  "editor.snap": "スナップ",
+  "editor.text.add": "テキストを追加",
+  "editor.text.content": "テキスト",
+  "editor.text.size": "サイズ",
+  "editor.text.color": "色",
+  "editor.text.panel": "テキストのプロパティ",
+  "editor.export.text-full": "テキストレイヤーには再エンコードが必要なため、完全モードに切り替えました。"
 }

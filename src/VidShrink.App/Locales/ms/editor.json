@@ -48,5 +48,11 @@
   "editor.timecode": "Kod masa",
   "editor.duration": "Tempoh",
   "editor.monitor": "Monitor program",
-  "editor.snap": "Lekatan"
+  "editor.snap": "Lekatan",
+  "editor.text.add": "Tambah teks",
+  "editor.text.content": "Teks",
+  "editor.text.size": "Saiz",
+  "editor.text.color": "Warna",
+  "editor.text.panel": "Sifat teks",
+  "editor.export.text-full": "Lapisan teks memerlukan pengekodan semula; ditukar ke mod penuh."
 }

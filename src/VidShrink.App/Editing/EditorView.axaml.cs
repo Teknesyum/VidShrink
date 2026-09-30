@@ -45,7 +45,7 @@ internal partial class EditorView : UserControl
         Timeline.Seek += OnSeek;
         Timeline.MoveRequested += (from, to) => Move(from, to);
         Timeline.SelectionChanged += RefreshToolbar;
-        Timeline.Edited += () => Apply(_ => true, Timeline.SelectedIndex);
+        Timeline.Edited += () => Apply(_ => true, Timeline.SelectedIndex, reload: true);
 
         BtnUndo.Click += (_, _) => Undo();
         BtnRedo.Click += (_, _) => Redo();
@@ -54,6 +54,7 @@ internal partial class EditorView : UserControl
         TxtSpeed.KeyDown += OnSpeedKey;
         InitExport();
         InitMonitor();
+        InitText();
 
         MnuSplit.Click += (_, _) => Split();
         MnuDelete.Click += (_, _) => DeleteSelected();
@@ -123,6 +124,7 @@ internal partial class EditorView : UserControl
     internal async Task OpenSourceAsync(string path, long start = 0)
     {
         CloseDriver();
+        ForgetOverlay();
         ForgetSaved();
         _source = path;
         _model = null;
@@ -189,6 +191,7 @@ internal partial class EditorView : UserControl
 
     internal bool DeleteSelected()
     {
+        if (Timeline.SelectedText >= 0) return DeleteSelectedText();
         var all = Timeline.AllSelected;
         var selected = Timeline.SelectedIndices;
         if (selected.Count == 0) return false;
@@ -278,17 +281,20 @@ internal partial class EditorView : UserControl
 
     internal void MarkOut() => Timeline.SetMarks(Timeline.MarkIn is { } start && start < Timeline.Playhead ? start : null, Timeline.Playhead);
 
-    private bool Apply(Func<EditTimeline, bool> edit, int select)
+    private bool Apply(Func<EditTimeline, bool> edit, int select, bool reload = false)
     {
         if (_model is not { } model) return false;
+        var before = model.Clips.ToArray();
         if (!edit(model)) return false;
 
         var at = Math.Min(Timeline.Playhead, model.Duration);
         Timeline.Refresh();
         if (select >= 0) Timeline.SelectedIndex = Math.Min(select, model.Clips.Count - 1);
         Timeline.Playhead = at;
+        ShowTextPanel();
         RefreshToolbar();
-        _ = ReloadAsync(at);
+        if (reload || !before.SequenceEqual(model.Clips)) _ = ReloadAsync(at);
+        else RefreshOverlay();
         return true;
     }
 
@@ -312,6 +318,7 @@ internal partial class EditorView : UserControl
         {
             await driver.OpenAsync().ConfigureAwait(true);
             if (!ReferenceEquals(_driver, driver)) return;
+            RefreshOverlay(reopened: true);
             Preview.RefreshDuration();
             await driver.SeekAsync(Math.Clamp(at, 0, model.Duration)).ConfigureAwait(true);
             if (playing) driver.Play();

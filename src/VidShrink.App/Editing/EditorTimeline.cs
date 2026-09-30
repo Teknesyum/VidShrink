@@ -15,7 +15,7 @@ namespace VidShrink.App.Editing;
 
 internal readonly record struct GhostBox(double X, double Width);
 
-internal sealed class EditorTimeline : Panel, ICustomHitTest
+internal sealed partial class EditorTimeline : Panel, ICustomHitTest
 {
     private const double FallbackFps = 30;
     private const string VideoTrackName = "V1";
@@ -123,7 +123,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
 
     internal double RulerHeight => Metric("EditorRulerHeight");
 
-    internal double VideoTop => RulerHeight;
+    internal double VideoTop => TextTop + TextHeight + Metric("EditorTrackGap");
 
     internal double VideoHeight => Metric("EditorVideoTrackHeight");
 
@@ -280,6 +280,13 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
     private void ApplySelection()
     {
         foreach (var clip in _live) clip.Classes.Set("selected", IsSelected(clip.Index));
+        if ((_all || _set.Count > 0) && _textSelected >= 0)
+        {
+            _textSelected = -1;
+            _canvas.InvalidateVisual();
+            TextSelectionChanged?.Invoke();
+        }
+
         SelectionChanged?.Invoke();
     }
 
@@ -299,6 +306,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
     internal void Show(EditTimeline? model)
     {
         _model = model;
+        ResetTexts();
         _selected = -1;
         _all = false;
         _set.Clear();
@@ -327,6 +335,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         if (_model is not { Clips.Count: > 0 }) _all = false;
         Playhead = _playhead;
         PixelsPerTick = _ppt;
+        RefreshTexts();
         SelectionChanged?.Invoke();
     }
 
@@ -471,14 +480,17 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
 
         var ruler = RulerHeight;
         context.DrawRectangle(Paint("AppBg"), null, new Rect(0, 0, width, ruler));
+        context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, TextTop, width, TextHeight));
         context.DrawRectangle(Paint("Surface"), null, new Rect(0, VideoTop, width, VideoHeight));
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, AudioTop, width, AudioHeight));
 
         var line = new Pen(Paint("HeaderRestBorder"), Metric("EditorClipBorder"));
         context.DrawLine(line, new Point(header, 0), new Point(header, TracksBottom));
+        context.DrawLine(line, new Point(0, TextTop), new Point(width, TextTop));
         context.DrawLine(line, new Point(0, VideoTop), new Point(width, VideoTop));
         context.DrawLine(line, new Point(0, AudioTop), new Point(width, AudioTop));
 
+        DrawHeaderIcon(context, null, TextTop, TextHeight, TextTrackName);
         DrawHeaderIcon(context, "IconPlayer", VideoTop, VideoHeight, VideoTrackName);
         DrawHeaderIcon(context, "IconVolume", AudioTop, AudioHeight, AudioTrackName);
 
@@ -486,6 +498,7 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         if (_model is null || _ppt <= 0) return;
         using var clip = context.PushClip(new Rect(header, 0, Math.Max(0, width - header), TracksBottom));
         DrawRuler(context);
+        DrawTexts(context);
         if (_peaks is { IsEmpty: false } peaks) DrawWaveform(context, peaks);
         else DrawAudioMirror(context);
     }
@@ -501,6 +514,12 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
 
         if (point.Properties.IsRightButtonPressed)
         {
+            if (OnTextRow(position))
+            {
+                SelectedText = TextAt(position.X);
+                return;
+            }
+
             var hit = position.Y >= VideoTop && position.Y < TracksBottom ? ClipAt(XToTime(position.X)) : -1;
             if (hit >= 0) SelectedIndex = hit;
             return;
@@ -521,6 +540,13 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         _dragging = false;
         var mods = e.KeyModifiers;
         var plain = (mods & (KeyModifiers.Control | KeyModifiers.Meta | KeyModifiers.Shift)) == 0;
+        if (PressText(position, plain))
+        {
+            _pressIndex = -1;
+            return;
+        }
+
+        SelectedText = -1;
         var onTracks = position.Y >= VideoTop && position.Y < TracksBottom;
         if (Tool == EditorTool.Razor && onTracks)
         {
@@ -571,6 +597,12 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
             return;
         }
 
+        if (_textPress >= 0)
+        {
+            DragText(position.X);
+            return;
+        }
+
         if (_pressIndex < 0)
         {
             UpdateCursor(position);
@@ -603,6 +635,11 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
             TrimTo(position.X);
             CommitTrim();
         }
+        else if (_textPress >= 0)
+        {
+            DragText(position.X);
+            CommitText();
+        }
         else if (_dragging && _pressIndex >= 0 && _dropIndex >= 0 && _dropIndex != _pressIndex)
         {
             var from = _pressIndex;
@@ -620,13 +657,14 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         base.OnPointerCaptureLost(e);
         Scrubbing = false;
         EndTrim();
+        EndText();
         EndDrag();
     }
 
     protected override void OnPointerExited(PointerEventArgs e)
     {
         base.OnPointerExited(e);
-        if (_trimIndex < 0) SetCursor(StandardCursorType.Arrow);
+        if (_trimIndex < 0 && _textPress < 0) SetCursor(StandardCursorType.Arrow);
     }
 
     internal bool EdgeAt(Point position, out int index, out bool head)
@@ -651,6 +689,12 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
 
     private void UpdateCursor(Point position)
     {
+        if (_model is not null && position.X >= HeaderWidth && OnTextRow(position))
+        {
+            SetCursor(TextEdgeAt(position, out _, out _) ? StandardCursorType.SizeWestEast : StandardCursorType.Arrow);
+            return;
+        }
+
         if (_model is null || position.X < HeaderWidth || position.Y < VideoTop || position.Y >= TracksBottom)
         {
             SetCursor(StandardCursorType.Arrow);
@@ -1097,13 +1141,13 @@ internal sealed class EditorTimeline : Panel, ICustomHitTest
         return peaks.Slice(Math.Max(0, start), end, clip.Reversed, Math.Max(1, buckets));
     }
 
-    private void DrawHeaderIcon(DrawingContext context, string key, double top, double height, string name)
+    private void DrawHeaderIcon(DrawingContext context, string? key, double top, double height, string name)
     {
         var pad = Metric("EditorClipPadding");
         var side = Math.Min(height - pad * 2, Metric("TargetMinSize"));
         if (side <= 0) side = height;
         var textX = pad;
-        if (EditorTokens.Find(this, key) is Geometry icon && side > 0 && icon.Bounds.Width > 0 && icon.Bounds.Height > 0)
+        if (key is not null && EditorTokens.Find(this, key) is Geometry icon && side > 0 && icon.Bounds.Width > 0 && icon.Bounds.Height > 0)
         {
             var box = icon.Bounds;
             var scale = side / Math.Max(box.Width, box.Height);

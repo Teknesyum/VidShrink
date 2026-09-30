@@ -48,5 +48,11 @@
   "editor.timecode": "Timecode",
   "editor.duration": "Duration",
   "editor.monitor": "Program monitor",
-  "editor.snap": "Snap"
+  "editor.snap": "Snap",
+  "editor.text.add": "Add text",
+  "editor.text.content": "Text",
+  "editor.text.size": "Size",
+  "editor.text.color": "Color",
+  "editor.text.panel": "Text properties",
+  "editor.export.text-full": "The text layer needs a re-encode; switched to Full."
 }

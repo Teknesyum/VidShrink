@@ -48,5 +48,11 @@
   "editor.timecode": "الرمز الزمني",
   "editor.duration": "المدة",
   "editor.monitor": "شاشة البرنامج",
-  "editor.snap": "الالتقاط"
+  "editor.snap": "الالتقاط",
+  "editor.text.add": "إضافة نص",
+  "editor.text.content": "النص",
+  "editor.text.size": "الحجم",
+  "editor.text.color": "اللون",
+  "editor.text.panel": "خصائص النص",
+  "editor.export.text-full": "طبقة النص تتطلب إعادة ترميز؛ تم التبديل إلى الوضع الكامل."
 }

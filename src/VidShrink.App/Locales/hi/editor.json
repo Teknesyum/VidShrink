@@ -48,5 +48,11 @@
   "editor.timecode": "टाइमकोड",
   "editor.duration": "अवधि",
   "editor.monitor": "प्रोग्राम मॉनिटर",
-  "editor.snap": "स्नैपिंग"
+  "editor.snap": "स्नैपिंग",
+  "editor.text.add": "टेक्स्ट जोड़ें",
+  "editor.text.content": "टेक्स्ट",
+  "editor.text.size": "आकार",
+  "editor.text.color": "रंग",
+  "editor.text.panel": "टेक्स्ट के गुण",
+  "editor.export.text-full": "टेक्स्ट परत को फिर से एन्कोड करना होता है; पूर्ण मोड पर बदला गया।"
 }

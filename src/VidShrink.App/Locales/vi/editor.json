@@ -48,5 +48,11 @@
   "editor.timecode": "Mã thời gian",
   "editor.duration": "Thời lượng",
   "editor.monitor": "Màn hình chương trình",
-  "editor.snap": "Bắt dính"
+  "editor.snap": "Bắt dính",
+  "editor.text.add": "Thêm chữ",
+  "editor.text.content": "Chữ",
+  "editor.text.size": "Cỡ",
+  "editor.text.color": "Màu",
+  "editor.text.panel": "Thuộc tính chữ",
+  "editor.export.text-full": "Lớp chữ cần mã hóa lại; đã chuyển sang chế độ đầy đủ."
 }

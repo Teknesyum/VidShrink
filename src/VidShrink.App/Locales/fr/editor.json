@@ -48,5 +48,11 @@
   "editor.timecode": "Timecode",
   "editor.duration": "Durée",
   "editor.monitor": "Moniteur de programme",
-  "editor.snap": "Magnétisme"
+  "editor.snap": "Magnétisme",
+  "editor.text.add": "Ajouter un texte",
+  "editor.text.content": "Texte",
+  "editor.text.size": "Taille",
+  "editor.text.color": "Couleur",
+  "editor.text.panel": "Propriétés du texte",
+  "editor.export.text-full": "Le calque de texte exige un réencodage ; passage au mode complet."
 }

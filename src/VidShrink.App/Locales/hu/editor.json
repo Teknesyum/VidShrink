@@ -48,5 +48,11 @@
   "editor.timecode": "Időkód",
   "editor.duration": "Időtartam",
   "editor.monitor": "Programmonitor",
-  "editor.snap": "Illesztés"
+  "editor.snap": "Illesztés",
+  "editor.text.add": "Szöveg hozzáadása",
+  "editor.text.content": "Szöveg",
+  "editor.text.size": "Méret",
+  "editor.text.color": "Szín",
+  "editor.text.panel": "Szöveg tulajdonságai",
+  "editor.export.text-full": "A szövegréteg újrakódolást igényel; átváltva teljes módra."
 }

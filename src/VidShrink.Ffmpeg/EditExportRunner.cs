@@ -30,6 +30,7 @@ public static class EditExportRunner
         Directory.CreateDirectory(plan.WorkDirectory);
         try
         {
+            await WriteTextAsync(plan, ct).ConfigureAwait(false);
             double done = 0;
             foreach (var step in plan.Steps)
             {
@@ -47,6 +48,20 @@ public static class EditExportRunner
         {
             await CleanupAsync(partial, plan.WorkDirectory).ConfigureAwait(false);
         }
+    }
+
+    /// <summary>
+    /// Metinli planin <c>.ass</c> belgesini BOM'lu yazar ve yazi tipi klasorunu kurar.
+    /// Klasor, aile bulunamasa da bos olarak kurulur; <c>fontsdir</c> var olan yolu gosterir.
+    /// </summary>
+    public static async Task WriteTextAsync(ExportPlan plan, CancellationToken ct = default)
+    {
+        if (plan.SubtitlePath is not { } path) return;
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
+        await File.WriteAllBytesAsync(path, AssWriter.Bytes(plan.SubtitleContent ?? string.Empty), ct).ConfigureAwait(false);
+        if (plan.FontsDirectory is not { } fonts) return;
+        Directory.CreateDirectory(fonts);
+        TextFonts.Prepare(Path.GetDirectoryName(Path.GetFullPath(fonts))!, plan.FontFamilies);
     }
 
     public static string WorkDirectoryFor(string outputPath)

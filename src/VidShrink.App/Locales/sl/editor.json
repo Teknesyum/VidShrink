@@ -48,5 +48,11 @@
   "editor.timecode": "Časovna koda",
   "editor.duration": "Trajanje",
   "editor.monitor": "Programski monitor",
-  "editor.snap": "Pripenjanje"
+  "editor.snap": "Pripenjanje",
+  "editor.text.add": "Dodaj besedilo",
+  "editor.text.content": "Besedilo",
+  "editor.text.size": "Velikost",
+  "editor.text.color": "Barva",
+  "editor.text.panel": "Lastnosti besedila",
+  "editor.export.text-full": "Plast besedila zahteva ponovno kodiranje; preklopljeno na polni način."
 }

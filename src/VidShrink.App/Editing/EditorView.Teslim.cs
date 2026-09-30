@@ -136,7 +136,7 @@ internal partial class EditorView
     internal async Task<bool> ExportToAsync(string output, bool confirmReverse = false)
     {
         if (_model is not { Clips.Count: > 0 } model || _source is not { } source || Exporting) return false;
-        var snapshot = new EditTimeline(model.Clips.ToArray());
+        var snapshot = new EditTimeline(model.Clips.ToArray(), texts: model.Texts.ToArray());
         var key = SaveKey(snapshot);
         _pendingPlan = null;
         _exported = null;
@@ -294,7 +294,8 @@ internal partial class EditorView
     private static string Notes(ExportPlan plan)
     {
         var lines = new List<string>();
-        if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
+        if (plan.TextForcedFull) lines.Add(Strings.Get("editor.export.text-full"));
+        else if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
         else if (plan.Effective != ExportMode.Full && plan.MotionClips.Count > 0)
             lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.reencoded"), ClipNumbers(plan.MotionClips)));
 
@@ -304,7 +305,9 @@ internal partial class EditorView
     private static string ClipNumbers(IEnumerable<int> indexes) => string.Join(", ", indexes.Select(i => (i + 1).ToString(Strings.Culture)));
 
     private static string Fingerprint(EditTimeline model)
-        => string.Join(";", model.Clips.Select(c => $"{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}"));
+        => string.Join(";", model.Clips.Select(c => $"{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}"))
+           + "|" + string.Join(";", model.Texts.Select(t => $"{t.Start}-{t.End}-{t.Size}-{t.Color}-{t.Bold}-{t.Italic}-{t.FontName}-{t.FadeIn}-{t.FadeOut}-"
+               + string.Join(",", t.Keyframes.Select(k => $"{k.Offset}:{k.X}:{k.Y}")) + "-" + t.Text.Length + ":" + t.Text));
 
     private async Task<string?> PickOutputAsync()
     {

@@ -8,13 +8,17 @@
 public sealed class EditTimeline
 {
     private readonly List<EditClip> _clips;
+    private readonly List<TextLayer> _texts;
     private readonly Stack<IEditCommand> _undo = new();
     private readonly Stack<IEditCommand> _redo = new();
 
-    public EditTimeline(IEnumerable<EditClip> clips, long? sourceDuration = null)
+    public EditTimeline(IEnumerable<EditClip> clips, long? sourceDuration = null, IEnumerable<TextLayer>? texts = null)
     {
         ArgumentNullException.ThrowIfNull(clips);
         _clips = clips.ToList();
+        _texts = texts?.ToList() ?? new List<TextLayer>();
+        foreach (var text in _texts) text.Validate();
+        Texts = _texts.AsReadOnly();
         if (_clips.Any(c => c is null))
             throw new ArgumentException("Listede bos parca var", nameof(clips));
         if (sourceDuration is <= 0)
@@ -301,6 +305,56 @@ public sealed class EditTimeline
         return true;
     }
 
+    /// <summary>
+    /// T1 izinin metin klipleri, eklenme sirasiyla; sonraki klip ustte cizilir. Zamanlari
+    /// cizelge zamanidir, klip silmek ya da kaydirmak metni tasimaz.
+    /// </summary>
+    public IReadOnlyList<TextLayer> Texts { get; }
+
+    public bool HasText => _texts.Count > 0;
+
+    /// <summary>Metni sona ekler ve sirasini dondurur. Tek adimda geri alinir.</summary>
+    public int AddText(TextLayer text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        text.Validate();
+        Execute(new TextCommand(_texts, _texts.Count, null, text));
+        return _texts.Count - 1;
+    }
+
+    /// <summary>Metni yeni baslangica tasir; suresi ve anahtar kareleri katmanla gider.</summary>
+    public bool MoveText(int index, long start)
+    {
+        CheckText(index);
+        if (start < 0) throw new ArgumentOutOfRangeException(nameof(start), start, "Metin cizelgenin basindan once baslayamaz");
+        return ReplaceText(index, _texts[index].MovedTo(start));
+    }
+
+    /// <summary>Metnin bir kenarini kirpar ya da uzatir; diger kenar yerinde kalir.</summary>
+    public bool TrimText(int index, bool head, long edge)
+    {
+        CheckText(index);
+        var before = _texts[index];
+        var (start, end) = head ? (edge, before.End) : (before.Start, edge);
+        if (start < 0 || end <= start)
+            throw new ArgumentOutOfRangeException(nameof(edge), edge, "Kenar metnin obur kenarini asiyor");
+        return ReplaceText(index, before.TrimmedTo(start, end));
+    }
+
+    public void DeleteText(int index)
+    {
+        CheckText(index);
+        Execute(new TextCommand(_texts, index, _texts[index], null));
+    }
+
+    /// <summary>Metnin ozelliklerini yazar (metin, boyut, renk...). Degisiklik yoksa <c>false</c>.</summary>
+    public bool UpdateText(int index, TextLayer after)
+    {
+        CheckText(index);
+        ArgumentNullException.ThrowIfNull(after);
+        return ReplaceText(index, after);
+    }
+
     public bool Undo()
     {
         if (!CanUndo) return false;
@@ -370,6 +424,21 @@ public sealed class EditTimeline
     {
         if (index < 0 || index >= _clips.Count)
             throw new ArgumentOutOfRangeException(nameof(index), index, "Parca sirasi listenin disinda");
+    }
+
+    private bool ReplaceText(int index, TextLayer after)
+    {
+        after.Validate();
+        var before = _texts[index];
+        if (after == before) return false;
+        Execute(new TextCommand(_texts, index, before, after));
+        return true;
+    }
+
+    private void CheckText(int index)
+    {
+        if (index < 0 || index >= _texts.Count)
+            throw new ArgumentOutOfRangeException(nameof(index), index, "Metin sirasi listenin disinda");
     }
 
     private void Execute(IEditCommand command)

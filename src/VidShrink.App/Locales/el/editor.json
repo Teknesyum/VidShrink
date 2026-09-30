@@ -48,5 +48,11 @@
   "editor.timecode": "Χρονοκώδικας",
   "editor.duration": "Διάρκεια",
   "editor.monitor": "Οθόνη προγράμματος",
-  "editor.snap": "Προσκόλληση"
+  "editor.snap": "Προσκόλληση",
+  "editor.text.add": "Προσθήκη κειμένου",
+  "editor.text.content": "Κείμενο",
+  "editor.text.size": "Μέγεθος",
+  "editor.text.color": "Χρώμα",
+  "editor.text.panel": "Ιδιότητες κειμένου",
+  "editor.export.text-full": "Το επίπεδο κειμένου απαιτεί επανακωδικοποίηση· έγινε αλλαγή σε πλήρη λειτουργία."
 }

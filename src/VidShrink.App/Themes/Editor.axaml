@@ -15,6 +15,8 @@
                                     Görüntü izi değişirse ses izi onunla birlikte ölçeklenir.
                                     Dalga biçimi kaynağın en yüksek tepesine göre ölçeklenir,
                                     ince izde de tam boy okunur.
+      EditorTextTrackHeight      <- TargetMinSize (24). Metin izi (T1), video izinin üstünde;
+                                    tek satır etiket ve kenar tutamağı sığar.
       EditorTrackGap             <- SpaceXs (4). İzler arası tek çizgi payı.
       EditorTrackHeaderWidth     <- FieldWidthSm (120). İz adı sütunu.
       EditorRulerHeight          <- TargetMinSize (24). Cetvel tıklanabilir, oynatma
@@ -78,6 +80,7 @@
 
   <StaticResource x:Key="EditorVideoTrackHeight" ResourceKey="DropIconSize"/>
   <StaticResource x:Key="EditorAudioTrackShare" ResourceKey="AudioTrackShare"/>
+  <StaticResource x:Key="EditorTextTrackHeight" ResourceKey="TargetMinSize"/>
   <StaticResource x:Key="EditorTrackGap" ResourceKey="SpaceXs"/>
   <StaticResource x:Key="EditorTrackHeaderWidth" ResourceKey="FieldWidthSm"/>
   <StaticResource x:Key="EditorRulerHeight" ResourceKey="TargetMinSize"/>

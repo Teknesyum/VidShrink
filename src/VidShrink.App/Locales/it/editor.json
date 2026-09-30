@@ -48,5 +48,11 @@
   "editor.timecode": "Timecode",
   "editor.duration": "Durata",
   "editor.monitor": "Monitor programma",
-  "editor.snap": "Aggancio"
+  "editor.snap": "Aggancio",
+  "editor.text.add": "Aggiungi testo",
+  "editor.text.content": "Testo",
+  "editor.text.size": "Dimensione",
+  "editor.text.color": "Colore",
+  "editor.text.panel": "Proprietà del testo",
+  "editor.export.text-full": "Il livello di testo richiede una ricodifica; passato alla modalità completa."
 }

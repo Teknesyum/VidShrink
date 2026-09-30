@@ -148,6 +148,20 @@ public interface IPlaybackEngine : IDisposable
 
     bool AddSubtitle(string path) => false;
 
+    /// <summary>
+    /// Duzenleyicinin metin katmanini (<c>.ass</c>) dis altyazi izi olarak ekler ve secer;
+    /// izin kimligini dondurur, eklenemezse 0.
+    /// </summary>
+    long AddOverlay(string path) => 0;
+
+    /// <summary>Izi dosyadan yeniden okur (<c>sub-reload</c>); dosya yerinde yeniden yazildiktan sonra.</summary>
+    bool ReloadOverlay(long id) => false;
+
+    bool RemoveOverlay(long id) => false;
+
+    /// <summary><c>sub-fonts-dir</c>; <c>null</c> varsayilana dondurur. Iz eklenmeden once verilir.</summary>
+    void SetSubtitleFontsDir(string? directory) { }
+
     void SetSubtitleDelay(double seconds) { }
 
     void SetAudioDelay(double seconds) { }

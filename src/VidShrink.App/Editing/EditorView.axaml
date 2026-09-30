@@ -60,6 +60,7 @@
                 <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconFullScreen}" Fill="{Binding $parent[Button].Foreground}"/>
               </Button>
               <ToggleButton x:Name="BtnSnap" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.snap}" AutomationProperties.Name="{loc:Text editor.snap}"/>
+              <Button x:Name="BtnAddText" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.text.add}" AutomationProperties.Name="{loc:Text editor.text.add}"/>
             </StackPanel>
             <StackPanel x:Name="DeliveryGroup" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Top">
               <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
@@ -70,6 +71,21 @@
                 <ComboBoxItem Content="{loc:Text editor.export.smart}"/>
                 <ComboBoxItem Content="{loc:Text editor.export.full}"/>
               </ComboBox>
+            </StackPanel>
+          </WrapPanel>
+          <WrapPanel x:Name="TextPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.text.panel}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextContent" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.content}"/>
+              <TextBox x:Name="TxtTextContent" Width="{StaticResource FieldWidth}" AcceptsReturn="True" TextWrapping="Wrap" AutomationProperties.Name="{loc:Text editor.text.content}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextSize" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.size}"/>
+              <TextBox x:Name="TxtTextSize" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.size}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextColor" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.color}"/>
+              <TextBox x:Name="TxtTextColor" Width="{StaticResource NumberBoxWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.color}"/>
+              <Border x:Name="TextSwatch" Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" VerticalAlignment="Center" CornerRadius="{StaticResource RadiusChip}" BorderThickness="{StaticResource BorderThin}" BorderBrush="{StaticResource HeaderRestBorder}"/>
             </StackPanel>
           </WrapPanel>
           <StackPanel x:Name="ExportBar" Spacing="{StaticResource SpaceSm}" IsVisible="False">

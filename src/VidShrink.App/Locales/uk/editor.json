@@ -48,5 +48,11 @@
   "editor.timecode": "Тайм-код",
   "editor.duration": "Тривалість",
   "editor.monitor": "Програмний монітор",
-  "editor.snap": "Прилипання"
+  "editor.snap": "Прилипання",
+  "editor.text.add": "Додати текст",
+  "editor.text.content": "Текст",
+  "editor.text.size": "Розмір",
+  "editor.text.color": "Колір",
+  "editor.text.panel": "Властивості тексту",
+  "editor.export.text-full": "Текстовий шар потребує перекодування; увімкнено повний режим."
 }

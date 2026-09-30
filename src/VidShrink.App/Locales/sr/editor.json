@@ -48,5 +48,11 @@
   "editor.timecode": "Vremenski kod",
   "editor.duration": "Trajanje",
   "editor.monitor": "Programski monitor",
-  "editor.snap": "Prianjanje"
+  "editor.snap": "Prianjanje",
+  "editor.text.add": "Dodaj tekst",
+  "editor.text.content": "Tekst",
+  "editor.text.size": "Veličina",
+  "editor.text.color": "Boja",
+  "editor.text.panel": "Svojstva teksta",
+  "editor.export.text-full": "Tekstualni sloj zahteva ponovno kodiranje; prebačeno na puni režim."
 }

@@ -48,5 +48,11 @@
   "editor.timecode": "Tijdcode",
   "editor.duration": "Duur",
   "editor.monitor": "Programmamonitor",
-  "editor.snap": "Magnetisch uitlijnen"
+  "editor.snap": "Magnetisch uitlijnen",
+  "editor.text.add": "Tekst toevoegen",
+  "editor.text.content": "Tekst",
+  "editor.text.size": "Grootte",
+  "editor.text.color": "Kleur",
+  "editor.text.panel": "Teksteigenschappen",
+  "editor.export.text-full": "De tekstlaag vereist hercodering; overgeschakeld naar volledige modus."
 }
