@@ -49,10 +49,25 @@ internal static class KanitKapanisi
         SilYolu(Path.Combine(klasor, ad));
     }
 
+    /// <summary>
+    /// Pencere kapandıktan hemen sonra arka plan işi (ses dalgası, küçük resim) dosyayı bir an
+    /// daha tutabiliyor; CI'da `kayit.mp4` silinemedi. Kilitliyse 2 sn boyunca yeniden dener.
+    /// </summary>
     private static void SilYolu(string yol)
     {
-        if (File.Exists(yol)) File.Delete(yol);
-        else if (Directory.Exists(yol)) Directory.Delete(yol, true);
+        for (var deneme = 0; ; deneme++)
+        {
+            try
+            {
+                if (File.Exists(yol)) File.Delete(yol);
+                else if (Directory.Exists(yol)) Directory.Delete(yol, true);
+                return;
+            }
+            catch (IOException) when (deneme < 20)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+        }
     }
 
     private static readonly char[] Jokerler = ['*', '?'];

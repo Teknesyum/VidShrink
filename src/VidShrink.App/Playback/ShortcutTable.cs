@@ -23,6 +23,7 @@ internal sealed class ShortcutTable
     internal ShortcutTable(Grid rows, TextBlock notice, ShortcutMap map, Func<string, ControlTheme?> find)
     {
         _rows = rows;
+        _rows.UseLayoutRounding = false;
         _notice = notice;
         _map = map;
         _find = find;
