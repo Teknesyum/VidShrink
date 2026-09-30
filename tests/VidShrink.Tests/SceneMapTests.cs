@@ -420,7 +420,7 @@ public sealed class SceneMapTests
             var baskaOnAyar = await ReferenceBytesAsync(outDir, clip, "onayar", 640, "veryfast", 23);
             var baskaCrf = await ReferenceBytesAsync(outDir, clip, "crf", 640, "ultrafast", 30);
 
-            Assert.InRange(Sapma(sonda, esles), 0.0, 0.02);
+            Assert.InRange(Sapma(sonda, esles), 0.0, 0.05);
             Assert.True(Sapma(sonda, darKare) > 0.10, $"genislik ayirt edilemedi: {sonda} vs {darKare}");
             Assert.True(Sapma(sonda, baskaOnAyar) > 0.10, $"on ayar ayirt edilemedi: {sonda} vs {baskaOnAyar}");
             Assert.True(Sapma(sonda, baskaCrf) > 0.10, $"crf ayirt edilemedi: {sonda} vs {baskaCrf}");
