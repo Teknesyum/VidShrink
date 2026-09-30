@@ -148,9 +148,9 @@ public sealed class KaydediciPencereTests
     private static string Metin(string anahtar, params object?[] args)
         => string.Format(Strings.Culture, LanguageCatalog.Display(Strings.Get(anahtar)), args);
 
-    private static RecorderView Pencereli(RecorderPlatform platform, Func<string, DesktopWindow?> bul, params (string, string)[] ortam)
+    private static RecorderView Pencereli(string ayarYolu, RecorderPlatform platform, Func<string, DesktopWindow?> bul, params (string, string)[] ortam)
     {
-        var view = new RecorderView
+        var view = new RecorderView(ayarYolu)
         {
             SkipAutoMeasure = true,
             CapturePlatform = platform,
@@ -173,22 +173,18 @@ public sealed class KaydediciPencereTests
         var xlogo = new DesktopWindow("xlogo", "0x200001", 100, 50, 320, 240);
         var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var linux = Pencereli(RecorderPlatform.Linux, t => t == "xlogo" ? xlogo : null, ("DISPLAY", ":99"));
+            var linux = Pencereli(ayarYolu, RecorderPlatform.Linux, t => t == "xlogo" ? xlogo : null, ("DISPLAY", ":99"));
             var linuxIstek = linux.BuildRequest(applyAuto: false);
             var linuxArgs = RecorderArguments.Build(linuxIstek! with { Container = RecorderContainer.Mkv }, "/tmp/l.mkv");
 
-            var wayland = Pencereli(RecorderPlatform.Linux, _ => xlogo, ("XDG_SESSION_TYPE", "wayland"), ("DISPLAY", ":0"));
+            var wayland = Pencereli(ayarYolu, RecorderPlatform.Linux, _ => xlogo, ("XDG_SESSION_TYPE", "wayland"), ("DISPLAY", ":0"));
             var waylandIstek = wayland.BuildRequest(applyAuto: false);
 
-            var kapanmis = Pencereli(RecorderPlatform.Linux, _ => null, ("DISPLAY", ":99"));
+            var kapanmis = Pencereli(ayarYolu, RecorderPlatform.Linux, _ => null, ("DISPLAY", ":99"));
             var kapanmisIstek = kapanmis.BuildRequest(applyAuto: false);
 
-            var mac = Pencereli(RecorderPlatform.MacOs, _ => xlogo with { Title = "xlogo" });
+            var mac = Pencereli(ayarYolu, RecorderPlatform.MacOs, _ => xlogo with { Title = "xlogo" });
             var macIstek = mac.BuildRequest(applyAuto: false);
-            // Scale = null: olcunun konusu pencere kirpmasi, kalici olcek degil. Gorunum
-            // kurucuda paylasilan recorder-settings.json'u okuyor; baska bir sinif oraya
-            // 1280x720 birakirsa -vf "crop=...,scale=1280:720" oluyor ve bu olcu sira
-            // bagimlisi kiriliyordu (docs/olcumler/aot-dalgasi.md, CI 35291760780).
             var macArgs = RecorderArguments.Build(macIstek! with { Container = RecorderContainer.Mov, Scale = null }, "/tmp/m.mov");
 
             return (linuxIstek, linuxArgs, linuxHata: linux.ErrorText, waylandIstek, waylandHata: wayland.ErrorText,
