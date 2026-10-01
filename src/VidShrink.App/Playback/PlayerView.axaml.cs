@@ -803,7 +803,7 @@ internal partial class PlayerView : UserControl
     private void SaveHistory(bool finished)
     {
         if (_path is not { } path || HistoryPath?.Invoke() is not { } file) return;
-        _history.Remember(path, CurrentPosition(), finished);
+        _history.Remember(path, CurrentPosition(), finished, _seek.Duration);
         _history.Save(file);
     }
 
