@@ -7,6 +7,24 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.4] - 2026-10-01
+
+### Added
+
+- Editor: a text layer; titles show in the preview and are burned into the export.
+- Editor: per-clip crop, rotate, volume and fade in/out.
+- Editor: automatic cut of silent stretches and black frames.
+- Recorder: an action when recording ends (copy to clipboard, shrink, or copy a link).
+- Explorer: the right-click "Shrink with VidShrink" entry has a submenu of six target sizes (8, 16, 20, 25, 50, 100 MB).
+
+### Changed
+
+- Recorder: Windows captures with ddagrab at up to 60 fps and falls back to gdigrab with a notice when it is unavailable.
+
+### Fixed
+
+- SVT-AV1: output no longer lands about 8% under the target size.
+
 ## [1.2.3] - 2026-09-30
 
 ### Added
