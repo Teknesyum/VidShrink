@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Ieplūšana (s)",
   "editor.clip.fade-out": "Izplūšana (s)",
   "editor.clip.reset": "Atiestatīt",
-  "editor.export.effects-full": "Klipa iestatījumiem nepieciešama pārkodēšana; pārslēgts uz pilno režīmu."
+  "editor.export.effects-full": "Klipa iestatījumiem nepieciešama pārkodēšana; pārslēgts uz pilno režīmu.",
+  "editor.silence.open": "Izgriezt klusumu",
+  "editor.silence.panel": "Klusuma un melno kadru izgriešana",
+  "editor.silence.audio": "Klusums",
+  "editor.silence.black": "Melni kadri",
+  "editor.silence.threshold": "Slieksnis (dB)",
+  "editor.silence.min": "Īsākais (s)",
+  "editor.silence.padding": "Mala (s)",
+  "editor.silence.scan": "Skenēt",
+  "editor.silence.apply": "Izgriezt intervālus",
+  "editor.silence.scanning": "Notiek skenēšana…",
+  "editor.silence.found": "Atrasti {0} intervāli, tiks izgriezti {1}.",
+  "editor.silence.none": "Nav izgriežamu intervālu.",
+  "editor.silence.stale": "Iestatījumi mainījušies; skenējiet vēlreiz.",
+  "editor.silence.failed": "Skenēšana neizdevās: {0}",
+  "editor.silence.cut": "Izgriezti {0} intervāli."
 }

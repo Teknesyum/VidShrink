@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Dissolvenza in entrata (s)",
   "editor.clip.fade-out": "Dissolvenza in uscita (s)",
   "editor.clip.reset": "Ripristina",
-  "editor.export.effects-full": "Le impostazioni della clip richiedono una ricodifica; passato alla modalità completa."
+  "editor.export.effects-full": "Le impostazioni della clip richiedono una ricodifica; passato alla modalità completa.",
+  "editor.silence.open": "Taglia i silenzi",
+  "editor.silence.panel": "Taglio di silenzi e fotogrammi neri",
+  "editor.silence.audio": "Silenzio",
+  "editor.silence.black": "Fotogrammi neri",
+  "editor.silence.threshold": "Soglia (dB)",
+  "editor.silence.min": "Più breve (s)",
+  "editor.silence.padding": "Margine (s)",
+  "editor.silence.scan": "Analizza",
+  "editor.silence.apply": "Taglia gli intervalli",
+  "editor.silence.scanning": "Analisi in corso…",
+  "editor.silence.found": "Trovati {0} intervalli, ne verranno tagliati {1}.",
+  "editor.silence.none": "Nessun intervallo da tagliare.",
+  "editor.silence.stale": "Le impostazioni sono cambiate; analizza di nuovo.",
+  "editor.silence.failed": "Analisi non riuscita: {0}",
+  "editor.silence.cut": "{0} intervalli tagliati."
 }

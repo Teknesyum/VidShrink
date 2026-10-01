@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Postupno pojavljivanje (s)",
   "editor.clip.fade-out": "Postupno nestajanje (s)",
   "editor.clip.reset": "Poništi",
-  "editor.export.effects-full": "Postavke isječka zahtijevaju ponovno kodiranje; prebačeno na puni način."
+  "editor.export.effects-full": "Postavke isječka zahtijevaju ponovno kodiranje; prebačeno na puni način.",
+  "editor.silence.open": "Izreži tišinu",
+  "editor.silence.panel": "Izrezivanje tišine i crnih kadrova",
+  "editor.silence.audio": "Tišina",
+  "editor.silence.black": "Crni kadrovi",
+  "editor.silence.threshold": "Prag (dB)",
+  "editor.silence.min": "Najkraće (s)",
+  "editor.silence.padding": "Rub (s)",
+  "editor.silence.scan": "Skeniraj",
+  "editor.silence.apply": "Izreži raspone",
+  "editor.silence.scanning": "Skeniranje…",
+  "editor.silence.found": "Pronađeno raspona: {0}, bit će izrezano {1}.",
+  "editor.silence.none": "Nema raspona za izrezivanje.",
+  "editor.silence.stale": "Postavke su promijenjene; skenirajte ponovno.",
+  "editor.silence.failed": "Skeniranje nije uspjelo: {0}",
+  "editor.silence.cut": "Izrezano raspona: {0}."
 }

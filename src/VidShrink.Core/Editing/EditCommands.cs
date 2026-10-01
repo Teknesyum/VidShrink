@@ -52,6 +52,22 @@ internal sealed class RemoveCommand : IEditCommand
     public void Revert(List<EditClip> clips) => clips.Insert(_index, _clip);
 }
 
+internal sealed class InsertCommand : IEditCommand
+{
+    private readonly int _index;
+    private readonly EditClip _clip;
+
+    public InsertCommand(int index, EditClip clip)
+    {
+        _index = index;
+        _clip = clip;
+    }
+
+    public void Apply(List<EditClip> clips) => clips.Insert(_index, _clip);
+
+    public void Revert(List<EditClip> clips) => clips.RemoveAt(_index);
+}
+
 internal sealed class MoveCommand : IEditCommand
 {
     private readonly int _from;

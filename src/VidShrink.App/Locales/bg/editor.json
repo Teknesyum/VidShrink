@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Плавно появяване (с)",
   "editor.clip.fade-out": "Плавно изчезване (с)",
   "editor.clip.reset": "Нулиране",
-  "editor.export.effects-full": "Настройките на клипа изискват прекодиране; превключено към пълен режим."
+  "editor.export.effects-full": "Настройките на клипа изискват прекодиране; превключено към пълен режим.",
+  "editor.silence.open": "Изрязване на тишината",
+  "editor.silence.panel": "Изрязване на тишина и черни кадри",
+  "editor.silence.audio": "Тишина",
+  "editor.silence.black": "Черни кадри",
+  "editor.silence.threshold": "Праг (dB)",
+  "editor.silence.min": "Най-кратко (с)",
+  "editor.silence.padding": "Отстъп (с)",
+  "editor.silence.scan": "Сканиране",
+  "editor.silence.apply": "Изрежи интервалите",
+  "editor.silence.scanning": "Сканиране…",
+  "editor.silence.found": "Намерени са {0} интервала, ще бъдат изрязани {1}.",
+  "editor.silence.none": "Няма интервали за изрязване.",
+  "editor.silence.stale": "Настройките се промениха; сканирайте отново.",
+  "editor.silence.failed": "Сканирането е неуспешно: {0}",
+  "editor.silence.cut": "Изрязани са {0} интервала."
 }

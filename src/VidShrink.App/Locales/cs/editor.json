@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Roztmívání (s)",
   "editor.clip.fade-out": "Zatmívání (s)",
   "editor.clip.reset": "Obnovit",
-  "editor.export.effects-full": "Nastavení klipu vyžaduje nové kódování; přepnuto na úplný režim."
+  "editor.export.effects-full": "Nastavení klipu vyžaduje nové kódování; přepnuto na úplný režim.",
+  "editor.silence.open": "Vystřihnout ticho",
+  "editor.silence.panel": "Vystřižení ticha a černých snímků",
+  "editor.silence.audio": "Ticho",
+  "editor.silence.black": "Černé snímky",
+  "editor.silence.threshold": "Práh (dB)",
+  "editor.silence.min": "Nejkratší (s)",
+  "editor.silence.padding": "Okraj (s)",
+  "editor.silence.scan": "Prohledat",
+  "editor.silence.apply": "Vystřihnout úseky",
+  "editor.silence.scanning": "Prohledávání…",
+  "editor.silence.found": "Nalezeno úseků: {0}, bude vystřiženo {1}.",
+  "editor.silence.none": "Žádné úseky k vystřižení.",
+  "editor.silence.stale": "Nastavení se změnilo; prohledejte znovu.",
+  "editor.silence.failed": "Prohledání selhalo: {0}",
+  "editor.silence.cut": "Vystřiženo úseků: {0}."
 }

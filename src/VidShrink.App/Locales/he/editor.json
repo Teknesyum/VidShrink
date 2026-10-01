@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "הופעה הדרגתית (ש׳)",
   "editor.clip.fade-out": "היעלמות הדרגתית (ש׳)",
   "editor.clip.reset": "איפוס",
-  "editor.export.effects-full": "הגדרות הקליפ דורשות קידוד מחדש; עברנו למצב מלא."
+  "editor.export.effects-full": "הגדרות הקליפ דורשות קידוד מחדש; עברנו למצב מלא.",
+  "editor.silence.open": "חיתוך שקט",
+  "editor.silence.panel": "חיתוך שקט ופריימים שחורים",
+  "editor.silence.audio": "שקט",
+  "editor.silence.black": "פריימים שחורים",
+  "editor.silence.threshold": "סף (dB)",
+  "editor.silence.min": "הקצר ביותר (ש׳)",
+  "editor.silence.padding": "שוליים (ש׳)",
+  "editor.silence.scan": "סריקה",
+  "editor.silence.apply": "חתוך טווחים",
+  "editor.silence.scanning": "סורק…",
+  "editor.silence.found": "נמצאו {0} טווחים, {1} ייחתכו.",
+  "editor.silence.none": "אין טווחים לחיתוך.",
+  "editor.silence.stale": "ההגדרות השתנו; סרוק שוב.",
+  "editor.silence.failed": "הסריקה נכשלה: {0}",
+  "editor.silence.cut": "{0} טווחים נחתכו."
 }

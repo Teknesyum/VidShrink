@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "ফেড ইন (সে)",
   "editor.clip.fade-out": "ফেড আউট (সে)",
   "editor.clip.reset": "রিসেট",
-  "editor.export.effects-full": "ক্লিপের সেটিংসের জন্য পুনরায় এনকোড দরকার; সম্পূর্ণ মোডে বদলানো হয়েছে।"
+  "editor.export.effects-full": "ক্লিপের সেটিংসের জন্য পুনরায় এনকোড দরকার; সম্পূর্ণ মোডে বদলানো হয়েছে।",
+  "editor.silence.open": "নীরবতা কাটুন",
+  "editor.silence.panel": "নীরবতা ও কালো ফ্রেম কাটা",
+  "editor.silence.audio": "নীরবতা",
+  "editor.silence.black": "কালো ফ্রেম",
+  "editor.silence.threshold": "থ্রেশহোল্ড (dB)",
+  "editor.silence.min": "সবচেয়ে ছোট (সে)",
+  "editor.silence.padding": "প্যাডিং (সে)",
+  "editor.silence.scan": "স্ক্যান",
+  "editor.silence.apply": "পরিসর কাটুন",
+  "editor.silence.scanning": "স্ক্যান হচ্ছে…",
+  "editor.silence.found": "{0}টি পরিসর পাওয়া গেছে, {1} কাটা হবে।",
+  "editor.silence.none": "কাটার মতো কোনো পরিসর নেই।",
+  "editor.silence.stale": "সেটিংস বদলেছে; আবার স্ক্যান করুন।",
+  "editor.silence.failed": "স্ক্যান ব্যর্থ: {0}",
+  "editor.silence.cut": "{0}টি পরিসর কাটা হয়েছে।"
 }

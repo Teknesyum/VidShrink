@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Häivytys sisään (s)",
   "editor.clip.fade-out": "Häivytys ulos (s)",
   "editor.clip.reset": "Palauta",
-  "editor.export.effects-full": "Leikkeen asetukset vaativat uudelleenkoodauksen; vaihdettiin täyteen tilaan."
+  "editor.export.effects-full": "Leikkeen asetukset vaativat uudelleenkoodauksen; vaihdettiin täyteen tilaan.",
+  "editor.silence.open": "Leikkaa hiljaisuus",
+  "editor.silence.panel": "Hiljaisuuden ja mustien ruutujen leikkaus",
+  "editor.silence.audio": "Hiljaisuus",
+  "editor.silence.black": "Mustat ruudut",
+  "editor.silence.threshold": "Kynnys (dB)",
+  "editor.silence.min": "Lyhin (s)",
+  "editor.silence.padding": "Reunavara (s)",
+  "editor.silence.scan": "Skannaa",
+  "editor.silence.apply": "Leikkaa jaksot",
+  "editor.silence.scanning": "Skannataan…",
+  "editor.silence.found": "Löytyi {0} jaksoa, {1} leikataan.",
+  "editor.silence.none": "Ei leikattavia jaksoja.",
+  "editor.silence.stale": "Asetukset muuttuivat; skannaa uudelleen.",
+  "editor.silence.failed": "Skannaus epäonnistui: {0}",
+  "editor.silence.cut": "{0} jaksoa leikattu."
 }

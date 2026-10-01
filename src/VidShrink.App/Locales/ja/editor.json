@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "フェードイン (秒)",
   "editor.clip.fade-out": "フェードアウト (秒)",
   "editor.clip.reset": "リセット",
-  "editor.export.effects-full": "クリップの設定には再エンコードが必要なため、完全モードに切り替えました。"
+  "editor.export.effects-full": "クリップの設定には再エンコードが必要なため、完全モードに切り替えました。",
+  "editor.silence.open": "無音をカット",
+  "editor.silence.panel": "無音と黒フレームのカット",
+  "editor.silence.audio": "無音",
+  "editor.silence.black": "黒フレーム",
+  "editor.silence.threshold": "しきい値 (dB)",
+  "editor.silence.min": "最短 (秒)",
+  "editor.silence.padding": "余白 (秒)",
+  "editor.silence.scan": "スキャン",
+  "editor.silence.apply": "区間をカット",
+  "editor.silence.scanning": "スキャン中…",
+  "editor.silence.found": "{0} 件の区間が見つかりました。{1} がカットされます。",
+  "editor.silence.none": "カットする区間がありません。",
+  "editor.silence.stale": "設定が変更されました。もう一度スキャンしてください。",
+  "editor.silence.failed": "スキャンに失敗しました: {0}",
+  "editor.silence.cut": "{0} 件の区間をカットしました。"
 }

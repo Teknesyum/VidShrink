@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Postepeno pojavljivanje (s)",
   "editor.clip.fade-out": "Postepeno nestajanje (s)",
   "editor.clip.reset": "Resetuj",
-  "editor.export.effects-full": "Podešavanja klipa zahtevaju ponovno kodiranje; prebačeno na puni režim."
+  "editor.export.effects-full": "Podešavanja klipa zahtevaju ponovno kodiranje; prebačeno na puni režim.",
+  "editor.silence.open": "Iseci tišinu",
+  "editor.silence.panel": "Isecanje tišine i crnih kadrova",
+  "editor.silence.audio": "Tišina",
+  "editor.silence.black": "Crni kadrovi",
+  "editor.silence.threshold": "Prag (dB)",
+  "editor.silence.min": "Najkraće (s)",
+  "editor.silence.padding": "Margina (s)",
+  "editor.silence.scan": "Skeniraj",
+  "editor.silence.apply": "Iseci opsege",
+  "editor.silence.scanning": "Skeniranje…",
+  "editor.silence.found": "Pronađeno opsega: {0}, biće isečeno {1}.",
+  "editor.silence.none": "Nema opsega za isecanje.",
+  "editor.silence.stale": "Podešavanja su promenjena; skenirajte ponovo.",
+  "editor.silence.failed": "Skeniranje nije uspelo: {0}",
+  "editor.silence.cut": "Isečeno opsega: {0}."
 }

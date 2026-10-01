@@ -158,6 +158,81 @@ public sealed class EditTimeline
         return true;
     }
 
+    /// <summary>
+    /// Kaynak araliklarini butun parcalardan cikarir: kesen parca bolunur, tamami icinde kalan
+    /// parca silinir, arkasi kayar. Tek adimda geri alinir. Hicbir sey degismezse ya da
+    /// cizelgede parca kalmayacaksa <c>false</c> doner.
+    /// </summary>
+    public bool RemoveSource(IReadOnlyList<(long Start, long End)> ranges)
+    {
+        ArgumentNullException.ThrowIfNull(ranges);
+        if (ranges.Any(r => r.Start < 0 || r.End < r.Start))
+            throw new ArgumentOutOfRangeException(nameof(ranges), "Aralik negatif ya da ters");
+
+        var plans = new List<(int Index, IReadOnlyList<EditClip> Pieces)>();
+        var survivors = 0;
+        for (var i = 0; i < _clips.Count; i++)
+        {
+            var pieces = _clips[i].Without(ranges);
+            survivors += pieces.Count;
+            if (pieces.Count != 1 || !ReferenceEquals(pieces[0], _clips[i])) plans.Add((i, pieces));
+        }
+
+        if (plans.Count == 0 || survivors == 0) return false;
+
+        var steps = new List<IEditCommand>();
+        for (var p = plans.Count - 1; p >= 0; p--)
+        {
+            var (index, pieces) = plans[p];
+            IEditCommand first = pieces.Count == 0
+                ? new RemoveCommand(index, _clips[index])
+                : new ReplaceCommand(index, _clips[index], pieces[0]);
+            first.Apply(_clips);
+            steps.Add(first);
+            for (var k = 1; k < pieces.Count; k++)
+            {
+                var insert = new InsertCommand(index + k, pieces[k]);
+                insert.Apply(_clips);
+                steps.Add(insert);
+            }
+        }
+
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
+    /// <summary>
+    /// Kaynak araliklarinin cizelgede kapladigi yerler, sirali ve birlesik. Hizli, yavas ve ters
+    /// parcada da dogru yere duser; silinmis kaynak cizelgede yer tutmaz.
+    /// </summary>
+    public IReadOnlyList<(long Start, long End)> SourceToTimeline(IReadOnlyList<(long Start, long End)> ranges)
+    {
+        ArgumentNullException.ThrowIfNull(ranges);
+        var spans = new List<(long Start, long End)>();
+        long at = 0;
+        foreach (var clip in _clips)
+        {
+            foreach (var (start, end) in ranges)
+            {
+                if (clip.OffsetsOf(start, end) is { } o && o.To > o.From) spans.Add((at + o.From, at + o.To));
+            }
+
+            at += clip.TimelineLength;
+        }
+
+        spans.Sort();
+        var merged = new List<(long Start, long End)>();
+        foreach (var span in spans)
+        {
+            if (merged.Count > 0 && span.Start <= merged[^1].End)
+                merged[^1] = (merged[^1].Start, Math.Max(merged[^1].End, span.End));
+            else
+                merged.Add(span);
+        }
+
+        return merged;
+    }
+
     public bool RippleTrimHead(long time)
     {
         if (time < 0 || time > Duration)

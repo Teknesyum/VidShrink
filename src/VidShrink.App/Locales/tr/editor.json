@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Giriş solması (sn)",
   "editor.clip.fade-out": "Çıkış solması (sn)",
   "editor.clip.reset": "Sıfırla",
-  "editor.export.effects-full": "Klip ayarları yeniden kodlama ister; Tam kipine geçildi."
+  "editor.export.effects-full": "Klip ayarları yeniden kodlama ister; Tam kipine geçildi.",
+  "editor.silence.open": "Sessizliği kes",
+  "editor.silence.panel": "Sessizlik ve siyah kare kesme",
+  "editor.silence.audio": "Sessizlik",
+  "editor.silence.black": "Siyah kare",
+  "editor.silence.threshold": "Eşik (dB)",
+  "editor.silence.min": "En kısa (sn)",
+  "editor.silence.padding": "Kenar payı (sn)",
+  "editor.silence.scan": "Tara",
+  "editor.silence.apply": "Aralıkları kes",
+  "editor.silence.scanning": "Taranıyor…",
+  "editor.silence.found": "{0} aralık bulundu, {1} kesilecek.",
+  "editor.silence.none": "Kesilecek aralık bulunamadı.",
+  "editor.silence.stale": "Ayar değişti; yeniden tarayın.",
+  "editor.silence.failed": "Tarama başarısız: {0}",
+  "editor.silence.cut": "{0} aralık kesildi."
 }

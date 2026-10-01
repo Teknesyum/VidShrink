@@ -193,7 +193,7 @@ public sealed class AudioPeaks
         return builder.Build();
     }
 
-    private static void Kill(Process process)
+    internal static void Kill(Process process)
     {
         try { if (!process.HasExited) process.Kill(entireProcessTree: true); }
         catch (InvalidOperationException) { }

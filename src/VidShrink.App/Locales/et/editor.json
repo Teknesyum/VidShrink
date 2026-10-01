@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Sissehajutus (s)",
   "editor.clip.fade-out": "Väljahajutus (s)",
   "editor.clip.reset": "Lähtesta",
-  "editor.export.effects-full": "Klipi seaded vajavad ümberkodeerimist; lülitati täielikule režiimile."
+  "editor.export.effects-full": "Klipi seaded vajavad ümberkodeerimist; lülitati täielikule režiimile.",
+  "editor.silence.open": "Lõika vaikus",
+  "editor.silence.panel": "Vaikuse ja mustade kaadrite lõikamine",
+  "editor.silence.audio": "Vaikus",
+  "editor.silence.black": "Mustad kaadrid",
+  "editor.silence.threshold": "Lävi (dB)",
+  "editor.silence.min": "Lühim (s)",
+  "editor.silence.padding": "Varu (s)",
+  "editor.silence.scan": "Skanni",
+  "editor.silence.apply": "Lõika vahemikud",
+  "editor.silence.scanning": "Skannimine…",
+  "editor.silence.found": "Leiti {0} vahemikku, lõigatakse {1}.",
+  "editor.silence.none": "Lõigatavaid vahemikke pole.",
+  "editor.silence.stale": "Seaded muutusid; skanni uuesti.",
+  "editor.silence.failed": "Skannimine ebaõnnestus: {0}",
+  "editor.silence.cut": "Lõigati {0} vahemikku."
 }

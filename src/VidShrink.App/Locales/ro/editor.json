@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Apariție treptată (s)",
   "editor.clip.fade-out": "Dispariție treptată (s)",
   "editor.clip.reset": "Resetează",
-  "editor.export.effects-full": "Setările clipului necesită recodare; s-a trecut la modul complet."
+  "editor.export.effects-full": "Setările clipului necesită recodare; s-a trecut la modul complet.",
+  "editor.silence.open": "Taie liniștea",
+  "editor.silence.panel": "Tăierea liniștii și a cadrelor negre",
+  "editor.silence.audio": "Liniște",
+  "editor.silence.black": "Cadre negre",
+  "editor.silence.threshold": "Prag (dB)",
+  "editor.silence.min": "Cel mai scurt (s)",
+  "editor.silence.padding": "Margine (s)",
+  "editor.silence.scan": "Scanează",
+  "editor.silence.apply": "Taie intervalele",
+  "editor.silence.scanning": "Se scanează…",
+  "editor.silence.found": "{0} intervale găsite, {1} vor fi tăiate.",
+  "editor.silence.none": "Niciun interval de tăiat.",
+  "editor.silence.stale": "Setările s-au schimbat; scanați din nou.",
+  "editor.silence.failed": "Scanarea a eșuat: {0}",
+  "editor.silence.cut": "{0} intervale tăiate."
 }

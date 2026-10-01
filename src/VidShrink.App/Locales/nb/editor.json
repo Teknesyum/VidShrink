@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Ton inn (s)",
   "editor.clip.fade-out": "Ton ut (s)",
   "editor.clip.reset": "Tilbakestill",
-  "editor.export.effects-full": "Klippinnstillingene krever omkoding; byttet til full modus."
+  "editor.export.effects-full": "Klippinnstillingene krever omkoding; byttet til full modus.",
+  "editor.silence.open": "Klipp stillhet",
+  "editor.silence.panel": "Klipping av stillhet og svarte bilder",
+  "editor.silence.audio": "Stillhet",
+  "editor.silence.black": "Svarte bilder",
+  "editor.silence.threshold": "Terskel (dB)",
+  "editor.silence.min": "Korteste (s)",
+  "editor.silence.padding": "Margin (s)",
+  "editor.silence.scan": "Skann",
+  "editor.silence.apply": "Klipp områder",
+  "editor.silence.scanning": "Skanner…",
+  "editor.silence.found": "Fant {0} områder, {1} klippes.",
+  "editor.silence.none": "Ingen områder å klippe.",
+  "editor.silence.stale": "Innstillingene er endret; skann på nytt.",
+  "editor.silence.failed": "Skanning mislyktes: {0}",
+  "editor.silence.cut": "{0} områder klippet."
 }

@@ -34,11 +34,27 @@ internal sealed class EditorPlayhead : RangeBase
         var bottom = _owner.TracksBottom;
         using var clip = context.PushClip(new Rect(left, 0, Bounds.Width - left, Bounds.Height));
 
+        DrawCuts(context, top, bottom);
         DrawRange(context, top, bottom);
         DrawMarkers(context, bottom);
         DrawGhost(context, top);
         DrawSnap(context, bottom);
         DrawHead(context, bottom);
+    }
+
+    private void DrawCuts(DrawingContext context, double top, double bottom)
+    {
+        if (_owner.CutPreview.Count == 0) return;
+        var fill = EditorTokens.Brush(this, "NeonPinkFill");
+        var pen = new Pen(EditorTokens.Brush(this, "NeonPink"), EditorTokens.Size(this, "EditorClipBorder"));
+        var left = _owner.HeaderWidth;
+        foreach (var (start, end) in _owner.CutPreview)
+        {
+            var x0 = Math.Max(left, _owner.TimeToX(start));
+            var x1 = Math.Min(Bounds.Width, _owner.TimeToX(end));
+            if (x1 <= x0) continue;
+            context.DrawRectangle(fill, pen, new Rect(x0, top, x1 - x0, bottom - top));
+        }
     }
 
     private void DrawRange(DrawingContext context, double top, double bottom)

@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "페이드 인 (초)",
   "editor.clip.fade-out": "페이드 아웃 (초)",
   "editor.clip.reset": "초기화",
-  "editor.export.effects-full": "클립 설정은 다시 인코딩해야 하므로 전체 모드로 전환했습니다."
+  "editor.export.effects-full": "클립 설정은 다시 인코딩해야 하므로 전체 모드로 전환했습니다.",
+  "editor.silence.open": "무음 자르기",
+  "editor.silence.panel": "무음 및 검은 프레임 자르기",
+  "editor.silence.audio": "무음",
+  "editor.silence.black": "검은 프레임",
+  "editor.silence.threshold": "임계값 (dB)",
+  "editor.silence.min": "최소 길이 (초)",
+  "editor.silence.padding": "여유 (초)",
+  "editor.silence.scan": "검색",
+  "editor.silence.apply": "구간 자르기",
+  "editor.silence.scanning": "검색 중…",
+  "editor.silence.found": "구간 {0}개를 찾았으며 {1}이(가) 잘립니다.",
+  "editor.silence.none": "자를 구간이 없습니다.",
+  "editor.silence.stale": "설정이 변경되었습니다. 다시 검색하세요.",
+  "editor.silence.failed": "검색 실패: {0}",
+  "editor.silence.cut": "구간 {0}개를 잘랐습니다."
 }

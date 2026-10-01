@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Fade ind (s)",
   "editor.clip.fade-out": "Fade ud (s)",
   "editor.clip.reset": "Nulstil",
-  "editor.export.effects-full": "Klipindstillingerne kræver genkodning; der er skiftet til fuld tilstand."
+  "editor.export.effects-full": "Klipindstillingerne kræver genkodning; der er skiftet til fuld tilstand.",
+  "editor.silence.open": "Klip stilhed",
+  "editor.silence.panel": "Klip stilhed og sorte billeder",
+  "editor.silence.audio": "Stilhed",
+  "editor.silence.black": "Sorte billeder",
+  "editor.silence.threshold": "Tærskel (dB)",
+  "editor.silence.min": "Korteste (s)",
+  "editor.silence.padding": "Margin (s)",
+  "editor.silence.scan": "Scan",
+  "editor.silence.apply": "Klip områder",
+  "editor.silence.scanning": "Scanner…",
+  "editor.silence.found": "{0} områder fundet, {1} klippes.",
+  "editor.silence.none": "Ingen områder at klippe.",
+  "editor.silence.stale": "Indstillingerne er ændret; scan igen.",
+  "editor.silence.failed": "Scanning mislykkedes: {0}",
+  "editor.silence.cut": "{0} områder klippet."
 }

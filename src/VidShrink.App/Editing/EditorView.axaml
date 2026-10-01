@@ -61,6 +61,9 @@
               </Button>
               <ToggleButton x:Name="BtnSnap" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.snap}" AutomationProperties.Name="{loc:Text editor.snap}"/>
               <Button x:Name="BtnAddText" Theme="{StaticResource GhostButton}" MinWidth="{StaticResource EditorToolButtonSize}" Content="T" AutomationProperties.Name="{loc:Text editor.text.add}"/>
+              <ToggleButton x:Name="BtnSilence" Theme="{StaticResource EditorToolButton}" AutomationProperties.Name="{loc:Text editor.silence.open}" ToolTip.Tip="{loc:Text editor.silence.open}">
+                <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconVolumeMute}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
+              </ToggleButton>
             </StackPanel>
             <StackPanel x:Name="DeliveryGroup" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Top">
               <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
@@ -111,6 +114,33 @@
             </StackPanel>
             <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
           </WrapPanel>
+          <StackPanel x:Name="SilencePanel" Spacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.silence.panel}">
+            <WrapPanel Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <CheckBox x:Name="ChkSilenceAudio" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.silence.audio}" IsChecked="True" VerticalAlignment="Center"/>
+                <CheckBox x:Name="ChkSilenceBlack" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.silence.black}" VerticalAlignment="Center"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.threshold}"/>
+                <TextBox x:Name="TxtSilenceThreshold" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.threshold}"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.min}"/>
+                <TextBox x:Name="TxtSilenceMin" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.min}"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.padding}"/>
+                <TextBox x:Name="TxtSilencePadding" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.padding}"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <Button x:Name="BtnSilenceScan" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.silence.scan}" AutomationProperties.Name="{loc:Text editor.silence.scan}"/>
+                <Button x:Name="BtnSilenceCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
+                <Button x:Name="BtnSilenceApply" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.silence.apply}" AutomationProperties.Name="{loc:Text editor.silence.apply}" IsEnabled="False"/>
+              </StackPanel>
+            </WrapPanel>
+            <ProgressBar x:Name="SilenceProgress" Maximum="1" IsVisible="False"/>
+            <TextBlock x:Name="TxtSilenceStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+          </StackPanel>
           <StackPanel x:Name="ExportBar" Spacing="{StaticResource SpaceSm}" IsVisible="False">
             <ProgressBar x:Name="ExportProgress" Maximum="1" IsVisible="False"/>
             <TextBlock x:Name="TxtExportNote" Theme="{StaticResource StatusWarning}" TextWrapping="Wrap" IsVisible="False"/>

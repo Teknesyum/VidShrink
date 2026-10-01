@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Fade de entrada (s)",
   "editor.clip.fade-out": "Fade de saída (s)",
   "editor.clip.reset": "Redefinir",
-  "editor.export.effects-full": "As configurações do clipe exigem recodificação; mudou para o modo completo."
+  "editor.export.effects-full": "As configurações do clipe exigem recodificação; mudou para o modo completo.",
+  "editor.silence.open": "Cortar silêncios",
+  "editor.silence.panel": "Corte de silêncio e quadros pretos",
+  "editor.silence.audio": "Silêncio",
+  "editor.silence.black": "Quadros pretos",
+  "editor.silence.threshold": "Limite (dB)",
+  "editor.silence.min": "Mais curto (s)",
+  "editor.silence.padding": "Margem (s)",
+  "editor.silence.scan": "Analisar",
+  "editor.silence.apply": "Cortar intervalos",
+  "editor.silence.scanning": "Analisando…",
+  "editor.silence.found": "{0} intervalos encontrados, {1} serão cortados.",
+  "editor.silence.none": "Nenhum intervalo para cortar.",
+  "editor.silence.stale": "As configurações mudaram; analise novamente.",
+  "editor.silence.failed": "Falha na análise: {0}",
+  "editor.silence.cut": "{0} intervalos cortados."
 }

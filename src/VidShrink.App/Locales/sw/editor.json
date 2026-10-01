@@ -66,5 +66,20 @@
   "editor.clip.fade-in": "Kuingia taratibu (s)",
   "editor.clip.fade-out": "Kufifia taratibu (s)",
   "editor.clip.reset": "Weka upya",
-  "editor.export.effects-full": "Mipangilio ya klipu inahitaji kusimbwa upya; imebadilishwa kuwa hali kamili."
+  "editor.export.effects-full": "Mipangilio ya klipu inahitaji kusimbwa upya; imebadilishwa kuwa hali kamili.",
+  "editor.silence.open": "Kata ukimya",
+  "editor.silence.panel": "Kukata ukimya na fremu nyeusi",
+  "editor.silence.audio": "Ukimya",
+  "editor.silence.black": "Fremu nyeusi",
+  "editor.silence.threshold": "Kizingiti (dB)",
+  "editor.silence.min": "Fupi zaidi (s)",
+  "editor.silence.padding": "Nafasi ya pembeni (s)",
+  "editor.silence.scan": "Changanua",
+  "editor.silence.apply": "Kata vipindi",
+  "editor.silence.scanning": "Inachanganua…",
+  "editor.silence.found": "Vipindi {0} vimepatikana, {1} vitakatwa.",
+  "editor.silence.none": "Hakuna vipindi vya kukata.",
+  "editor.silence.stale": "Mipangilio imebadilika; changanua tena.",
+  "editor.silence.failed": "Uchanganuzi umeshindwa: {0}",
+  "editor.silence.cut": "Vipindi {0} vimekatwa."
 }
