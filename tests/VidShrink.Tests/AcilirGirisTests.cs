@@ -152,12 +152,23 @@ public sealed class AcilirGirisTests
         if (azalt) Assert.Equal(1, saydamlik);
     }
 
+    /// <summary>
+    /// Sekme değişince canlandırmalı pencerede eski ve yeni sayfa bir süre birlikte görünür
+    /// (CrossFade), hareketi azaltılmışta yalnız yeni sayfa. Görünen sayfalar seçimin hemen
+    /// ardından ve animasyon saatinin her vuruşunda (<see cref="KareSayaci"/>) sayılır;
+    /// canlandırmalı kol iki sayfa görülüp tek tam görünür sayfa kalana dek, azaltılmış kol
+    /// sabit sayıda vuruş pompalar. Seçimden sonra <c>RunJobs</c> çağrılmaz: Ayarlar sayfasının
+    /// yerleşimi 125 ms'lik geçişten uzun sürünce geçiş bir sonraki vuruşta bitiyor ve
+    /// <c>RunJobs</c> yerleşimi, iki vuruşu ve eski sayfanın gizlenmesini tek çağrıda koşup
+    /// ilk sayımdan önce bitiriyordu. Azaltılmış kolda eski sayfa seçimin içinde eşzamanlı
+    /// gizlendiği için hiçbir sayım iki sayfa görmez.
+    /// </summary>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void SekmeGecisindeEskiSayfa(bool azalt)
     {
-        var (gorunen, saydamlik) = AppHost.Run(() =>
+        var (gorunen, saydamlik, durum) = AppHost.Run(() =>
         {
             Strings.Use("en");
             var pencere = new MainWindow();
@@ -172,6 +183,7 @@ public sealed class AcilirGirisTests
                 List<Avalonia.Controls.Presenters.ContentPresenter> Gorunenler() => ev.GetVisualDescendants().OfType<Avalonia.Controls.Presenters.ContentPresenter>()
                     .Where(s => s.TemplatedParent == ev && s.IsVisible && s.Content is not null)
                     .ToList();
+                KareSayaci.Pompala(pencere, k => k >= 2 && Gorunenler() is [{ Opacity: >= 0.9995 }]);
                 var enCok = 0;
                 var enAz = 1.0;
                 var olcuyor = false;
@@ -191,22 +203,18 @@ public sealed class AcilirGirisTests
                 using var saydamlik = Avalonia.Visual.OpacityProperty.Changed.AddClassHandler<Avalonia.Controls.Presenters.ContentPresenter>(Degisti);
                 olcuyor = true;
                 pencere.Tabs.SelectedIndex = pencere.Tabs.Items.IndexOf(pencere.TabSettings);
-                Dispatcher.UIThread.RunJobs();
                 Gor();
-                var saat = Stopwatch.StartNew();
-                while (saat.Elapsed.TotalMilliseconds < 400)
-                {
-                    using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
-                    Dispatcher.UIThread.MainLoop(dilim.Token);
-                    Gor();
-                }
+                var kare = azalt
+                    ? KareSayaci.Pompala(pencere, k => k >= BelirisCanlandirmaTests.OlumsuzKare, Gor)
+                    : KareSayaci.Pompala(pencere, _ => Math.Max(enCok, kararan.Count) >= 2 && Gorunenler() is [{ Opacity: >= 0.9995 }], Gor);
                 olcuyor = false;
-                return (Math.Max(enCok, kararan.Count), enAz);
+                var durum = $"{kare} kare, en çok {enCok} görünür, {kararan.Count} ara saydamlıkta, son: {string.Join("/", Gorunenler().Select(s => s.Opacity.ToString("0.###")))}";
+                return (Math.Max(enCok, kararan.Count), enAz, durum);
             }
             finally { pencere.Close(); }
         });
 
-        Assert.Equal(azalt ? 1 : 2, gorunen);
+        Assert.True((azalt ? 1 : 2) == gorunen, $"azalt={azalt}: {gorunen} sayfa görüldü, beklenen {(azalt ? 1 : 2)}; {durum}.");
         if (azalt) Assert.Equal(1, saydamlik);
     }
 }
