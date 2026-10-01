@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
@@ -14,10 +13,12 @@ namespace VidShrink.Tests;
 /// <summary>
 /// Durum değişince beliren yüzeyler (bildirim şeritleri, hata ve durum satırları, sonuç
 /// paneli ve düğmeleri) saydamdan süzülerek gelir; ilerleme çubuğu değerine kayarak varır.
-/// Her kol 400 ms boyunca 2 ms dilimlerle örneklenir: tek <c>RunJobs</c> okuması Win32'de
-/// render tikinden önce kalıyor. Saydamlığın en düşüğü ayrıca <c>OpacityProperty</c>
-/// değişim olayından tutulur; CI yükünde örnekleme geçişi kaçırabiliyor.
-/// <c>reduced-motion</c> sınıflı pencerede ara değer görülmez.
+/// Ölçü gerçek saate değil animasyon saatinin vuruşlarına bağlı (<see cref="KareSayaci"/>):
+/// canlandırmalı kol ara değer görülüp yüzey tam görünür olana dek pompalar, hareketi
+/// azaltılmış kol <see cref="OlumsuzKare"/> vuruş bekler. Eski 400 ms pencere CI yükünde
+/// saatin ilk vuruşundan önce kapanıyordu; canlandırma hiç yayınlanmadığı için olay
+/// kaydı da ara değeri göremiyordu. Saydamlığın en düşüğü <c>OpacityProperty</c>
+/// değişim olayından tutulur. <c>reduced-motion</c> sınıflı pencerede ara değer görülmez.
 /// </summary>
 public sealed class BelirisCanlandirmaTests
 {
@@ -43,16 +44,11 @@ public sealed class BelirisCanlandirmaTests
         return kollar;
     }
 
-    private static void Ornekle(Action oku)
-    {
-        var saat = Stopwatch.StartNew();
-        while (saat.Elapsed.TotalMilliseconds < 400)
-        {
-            using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
-            Dispatcher.UIThread.MainLoop(dilim.Token);
-            oku();
-        }
-    }
+    /// <summary>
+    /// Hareketi azaltılmış kolda beklenen saat vuruşu. Canlandırma ilk vuruşunda ilerleme 0'ı
+    /// yayınlar; bu kadar vuruşta ara değer görülmediyse canlandırma kurulmamıştır.
+    /// </summary>
+    internal const int OlumsuzKare = 5;
 
     private static Control Bul(MainWindow pencere, string ad)
     {
@@ -74,7 +70,7 @@ public sealed class BelirisCanlandirmaTests
     [MemberData(nameof(Yuzeyler))]
     public void BelirenYuzeySaydamdanGelir(string ad, string sinif, bool azalt)
     {
-        var (sinifli, enAz, son) = AppHost.Run(() =>
+        var (sinifli, enAz, son, kare) = AppHost.Run(() =>
         {
             Strings.Use("en");
             var pencere = new MainWindow();
@@ -92,7 +88,7 @@ public sealed class BelirisCanlandirmaTests
                 for (var ata = yuzey.Parent as Control; ata is not null && ata is not TabItem; ata = ata.Parent as Control) ata.IsVisible = true;
                 yuzey.IsVisible = false;
                 Dispatcher.UIThread.RunJobs();
-                Ornekle(() => { });
+                KareSayaci.Pompala(pencere, k => k >= 2);
                 var enAz = 1.0;
                 yuzey.PropertyChanged += (_, e) =>
                 {
@@ -100,17 +96,20 @@ public sealed class BelirisCanlandirmaTests
                 };
                 yuzey.IsVisible = true;
                 enAz = Math.Min(enAz, yuzey.Opacity);
-                Ornekle(() => enAz = Math.Min(enAz, yuzey.Opacity));
-                return (yuzey.Classes.Contains(sinif), enAz, yuzey.Opacity);
+                void Oku() => enAz = Math.Min(enAz, yuzey.Opacity);
+                var kare = azalt
+                    ? KareSayaci.Pompala(pencere, k => k >= OlumsuzKare, Oku)
+                    : KareSayaci.Pompala(pencere, _ => enAz < 0.99 && yuzey.Opacity >= 0.9995, Oku);
+                return (yuzey.Classes.Contains(sinif), enAz, yuzey.Opacity, kare);
             }
             finally { pencere.Close(); }
         });
 
-        _output.WriteLine($"{ad} azalt={azalt} en az {enAz:0.###}, son {son:0.###}");
+        _output.WriteLine($"{ad} azalt={azalt} en az {enAz:0.###}, son {son:0.###}, {kare} kare");
         Assert.True(sinifli, $"{ad} '{sinif}' sınıfını taşımıyor.");
         Assert.Equal(1, son, 3);
         if (azalt) Assert.Equal(1, enAz, 3);
-        else Assert.True(enAz < 0.99,$"{ad} en az {enAz:0.###} saydamlıkta; geçiş yok, anında beliriyor.");
+        else Assert.True(enAz < 0.99, $"{ad} en az {enAz:0.###} saydamlıkta ({kare} kare); geçiş yok, anında beliriyor.");
     }
 
     /// <summary>
@@ -157,10 +156,12 @@ public sealed class BelirisCanlandirmaTests
                 var cubuk = pencere.FindControl<ProgressBar>("Progress")!;
                 cubuk.Value = 0;
                 Dispatcher.UIThread.RunJobs();
-                Ornekle(() => { });
+                KareSayaci.Pompala(pencere, k => k >= 2);
                 cubuk.Value = 1;
                 var ara = 0;
-                Ornekle(() => { if (cubuk.Value > 0.01 && cubuk.Value < 0.99) ara++; });
+                void Oku() { if (cubuk.Value > 0.01 && cubuk.Value < 0.99) ara++; }
+                if (azalt) KareSayaci.Pompala(pencere, k => k >= OlumsuzKare, Oku);
+                else KareSayaci.Pompala(pencere, _ => ara > 0 && cubuk.Value >= 0.9995, Oku);
                 return (ara, cubuk.Value);
             }
             finally { pencere.Close(); }

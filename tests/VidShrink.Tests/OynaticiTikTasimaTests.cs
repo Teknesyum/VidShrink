@@ -358,6 +358,12 @@ public sealed class ZeminTasimaEsikTests
         return (window.ZeminIz.Skip(once).ToList(), baslatma, window.ZeminBekliyor);
     }
 
+    /// <summary>
+    /// Zeminde ve başlıkta tık ile 3 px oynama taşıma başlatmaz, 5 px başlatır. Noktalar
+    /// <c>InputHitTest</c> ile aranır; isabet çizim iş parçacığının son karesinin geri
+    /// okumasından geldiği için arama, sahne çizildikten sonra (<see cref="KareSayaci.SahneCizilsin"/>)
+    /// yapılır. Eski 0,3 sn bekleme CI yükünde çizimden önce kalıp "zemin 0, baslik 0" verdi.
+    /// </summary>
     [Fact]
     public void ZeminVeBaslikEsikGecilmedenTasimaz()
     {
@@ -371,23 +377,15 @@ public sealed class ZeminTasimaEsikTests
                 try
                 {
                     window.Show();
-                    DenetimSurucu.Wait(window.Player, 0.3);
-                    var zemin = new List<Point>();
-                    var baslik = new List<Point>();
-                    var saat = System.Diagnostics.Stopwatch.StartNew();
-                    while (true)
-                    {
-                        zemin = Bul(window, window.TargetPanel, v => window.ZemindenTasinir(v), 3);
-                        baslik = Bul(window, window.TitleBar, v => ReferenceEquals(v, window.TitleBar) || window.ZemindenTasinir(v), 3);
-                        if ((zemin.Count >= 3 && baslik.Count >= 3) || saat.Elapsed.TotalSeconds > 5) break;
-                        DenetimSurucu.Wait(window.Player, 0.25);
-                    }
+                    var cizildi = KareSayaci.SahneCizilsin(window);
+                    var zemin = Bul(window, window.TargetPanel, v => window.ZemindenTasinir(v), 3);
+                    var baslik = Bul(window, window.TitleBar, v => ReferenceEquals(v, window.TitleBar) || window.ZemindenTasinir(v), 3);
                     var satirlar = new List<string>();
                     if (zemin.Count < 3 || baslik.Count < 3)
                     {
                         var orta = window.TargetPanel.TranslatePoint(new Point(window.TargetPanel.Bounds.Width / 2, window.TargetPanel.Bounds.Height / 2), window);
                         var isabet = orta is { } o ? window.InputHitTest(o) : null;
-                        return new List<string> { $"nokta bulunamadi: zemin {zemin.Count}, baslik {baslik.Count}; durum {window.WindowState}, gorunur {window.IsVisible}, pencere {window.Bounds.Size}, hedef {window.TargetPanel.Bounds}, baslik {window.TitleBar.Bounds}, ortadaki {isabet?.GetType().Name ?? "yok"}" };
+                        return new List<string> { $"nokta bulunamadi: zemin {zemin.Count}, baslik {baslik.Count}; cizildi {cizildi}, durum {window.WindowState}, gorunur {window.IsVisible}, pencere {window.Bounds.Size}, hedef {window.TargetPanel.Bounds}, baslik {window.TitleBar.Bounds}, ortadaki {isabet?.GetType().Name ?? "yok"}" };
                     }
 
                     foreach (var (ad, n) in new[] { ("zemin", zemin), ("baslik", baslik) })
