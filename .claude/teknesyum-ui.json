@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "plugin": "0.26.0",
+  "plugin": "0.34.0",
   "template": "benim",
   "off": false,
   "targets": [
@@ -27,7 +27,7 @@
     "sponsor": "https://github.com/sponsors/Teknesyum"
   },
   "note": "",
-  "duzen": "a0eaf97ec84216aa",
+  "duzen": "920c61ba2837ca0d",
   "installedAt": "2026-09-27T03:51:43.068Z",
   "ignore": [
     {
@@ -134,9 +134,10 @@
     }
   ],
   "uc": {
-    "surum": "0.26.0",
-    "duzen": "a0eaf97ec84216aa",
-    "commit": "1f04c7fd499b720fc783f5adc08348fa648a2524",
-    "tarih": "2026-09-27"
-  }
+    "surum": "0.34.0",
+    "duzen": "920c61ba2837ca0d",
+    "commit": "01e8422d73286191ce3d55802dc45f01d55274a0",
+    "tarih": "2026-10-02"
+  },
+  "pencere": "maximize"
 }

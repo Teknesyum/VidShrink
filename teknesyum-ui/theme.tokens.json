@@ -78,6 +78,12 @@
       "ref": "renk-1",
       "rationale": "Label and h3 colour; bound to renk-1, not a copy of it."
     },
+    "text-muted": {
+      "ref": "text",
+      "alpha": 0.65,
+      "over": "surface",
+      "rationale": "The one quiet grey: the version text only. Body text at 65 % over the surface stays above 7:1; no other secondary text uses it."
+    },
     "disabled": {
       "value": "#8a8f9a",
       "rationale": "The only colour exempt from 7:1 (SKILL §2); never used alone — title/ToolTip is mandatory, plus a cursor and, where possible, an icon."
@@ -308,6 +314,7 @@
     "support": { "tr": "Destek Ol", "en": "Buy me a coffee", "hint-tr": "Projeyi desteklemek için tıkla", "hint-en": "Click to support the project", "ref": "renk-3-text", "fs": "fs-1", "weight": "fw-semi", "rationale": "Support chip; renk-3-text as in the titlebar support chip." },
     "site": { "tr": "teknesyum.com", "en": "teknesyum.com", "hint-tr": "Teknesyum sitesini aç", "hint-en": "Open the Teknesyum site", "ref": "renk-1", "fs": "fs-1", "weight": "fw-semi", "rationale": "Site chip beside the support chip." },
     "update": { "tr": "Güncelleme", "en": "Update", "download-tr": "Yeni sürüm var, indirmek için tıklayın", "download-en": "New version available, click to download", "install-tr": "İndirildi, kurmak için tıklayın", "install-en": "Downloaded, click to install", "ref": "text", "fs": "fs-1", "weight": "fw-semi", "rationale": "Two-step update badge: the label and the hint for each step." },
+    "version": { "current-tr": "Güncel sürümdesiniz", "current-en": "You are up to date", "check-tr": "Güncellemeleri denetle", "check-en": "Check for updates", "confirm-tr": "Güncellemeden önce onay iste", "confirm-en": "Ask before updating", "error-tr": "Güncelleme denetlenemedi", "error-en": "Could not check for updates", "ref": "text-muted", "fs": "fs-1", "weight": "fw-body", "rationale": "Version text as a button: quiet grey (text-muted), smallest step; hover and focus turn renk-1. The words are the check button name, the up-to-date toast, the confirm setting and the error toast." },
     "sync": { "tr": "Eşitlendi", "en": "Synced", "offline-tr": "Çevrimdışı", "offline-en": "Offline", "hint-tr": "Şimdi eşitle", "hint-en": "Sync now", "ref": "text", "fs": "fs-1", "weight": "fw-semi", "rationale": "Sync badge states; the state colour comes from the role tokens." },
     "title": { "tr": "Uygulama adı", "en": "Application name", "ref": "text", "accent-ref": "renk-2-text", "fs": "fs-3", "weight": "fw-semi", "rationale": "Window title: the app name, its accent part and their look." }
   }

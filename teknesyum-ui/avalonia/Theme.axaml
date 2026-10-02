@@ -52,6 +52,7 @@
 
     <SolidColorBrush x:Key="TextBody"  Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="TextLabel" Color="#FF4DA6FF"/>
+    <SolidColorBrush x:Key="TextMuted" Color="#FFA6A6A6"/>
     <!-- A disabled control is exempt from 7:1 (SKILL §2) and there is a price: a
          colour-blind user cannot see the grey. This brush is never used alone;
          every disabled control carries a marker in addition to the grey:
@@ -223,6 +224,9 @@
     <SolidColorBrush x:Key="LabelUpdateBrush" Color="#FFFFFFFF"/>
     <sys:Double x:Key="LabelUpdateSize">14</sys:Double>
     <FontWeight x:Key="LabelUpdateWeight">SemiBold</FontWeight>
+    <SolidColorBrush x:Key="LabelVersionBrush" Color="#FFA6A6A6"/>
+    <sys:Double x:Key="LabelVersionSize">14</sys:Double>
+    <FontWeight x:Key="LabelVersionWeight">Normal</FontWeight>
     <SolidColorBrush x:Key="LabelSyncBrush" Color="#FFFFFFFF"/>
     <sys:Double x:Key="LabelSyncSize">14</sys:Double>
     <FontWeight x:Key="LabelSyncWeight">SemiBold</FontWeight>
