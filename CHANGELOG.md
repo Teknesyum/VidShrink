@@ -7,6 +7,16 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.5] - 2026-10-02
+
+### Changed
+
+- The player resumes where you left off only for the five most recently played videos, and
+  only when the file is the same one: byte size, modified time and duration must match. A
+  file that merely has the same name now starts from the beginning.
+- Interface resources follow teknesyum-ui 0.34.0: a muted text brush, version label styles
+  and new update panel labels.
+
 ## [1.2.4] - 2026-10-01
 
 ### Added
