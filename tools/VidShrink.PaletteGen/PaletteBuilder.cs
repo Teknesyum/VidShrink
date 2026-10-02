@@ -128,6 +128,7 @@ public static class PaletteBuilder
             "",
             $"  <Color x:Key=\"PlaybackScrimColor\">{Alpha(bg, 0xCC)}</Color>",
             $"  <Color x:Key=\"PlaybackScrimEdgeColor\">{Alpha(bg, 0x00)}</Color>",
+            $"  <Color x:Key=\"PlaybackTitleScrimColor\">{Alpha(bg, 0xE6)}</Color>",
             $"  <Color x:Key=\"PauseGlossColor\">{Solid(Luminance(seed.Text) >= Luminance(bg) ? seed.Text : bg)}</Color>",
             $"  <Color x:Key=\"PauseGlossFadeColor\">{Alpha(Luminance(seed.Text) >= Luminance(bg) ? seed.Text : bg, 0x00)}</Color>",
             "",
