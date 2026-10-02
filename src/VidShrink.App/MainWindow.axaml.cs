@@ -891,7 +891,7 @@ public partial class MainWindow : Window
     private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
-        if (e.ClickCount == 2)
+        if (e.ClickCount % 2 == 0)
         {
             PencereDongusu();
             e.Handled = true;

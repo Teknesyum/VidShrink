@@ -11,7 +11,8 @@ namespace VidShrink.App;
 /// Pencerenin normal → tam ekran → küçük → tam ekran döngüsü. Orta tuş her sekmede, üst panelde
 /// çift tık ve oynatıcının kendi orta tuşu buraya iner; sekme seçimine dokunmaz. Küçük kip
 /// çalışma alanının <c>WindowCompactAreaShare</c> payı kadar, ortalı ve verilen en-boy oranında
-/// (0 ise ekranın oranında) bir dikdörtgendir; en küçük pencere boyutu o süre geçici iner ve
+/// (0 ise ekranın oranında) bir dikdörtgendir; en küçük pencere boyutu o süre kalkar (hedefe eşit taban
+/// konursa Windows'un genişletilmiş istemci alanında boy 7 px büyük çıkar) ve
 /// DWM kenarlık rengi kaldırılır. Esc tam ekrandan önceki boyuta, küçükten döngü başlamadan
 /// önceki normal dikdörtgene döner.
 /// </summary>
@@ -98,8 +99,8 @@ internal sealed class PencereKipi
                 var en = r.Width / ekran.Scaling;
                 var boy = r.Height / ekran.Scaling;
                 _min ??= new Size(pencere.MinWidth, pencere.MinHeight);
-                pencere.MinWidth = Math.Min(_min.Value.Width, en);
-                pencere.MinHeight = Math.Min(_min.Value.Height, boy);
+                pencere.MinWidth = 0;
+                pencere.MinHeight = 0;
                 pencere.Width = en;
                 pencere.Height = boy;
                 pencere.Position = new PixelPoint(r.X, r.Y);
