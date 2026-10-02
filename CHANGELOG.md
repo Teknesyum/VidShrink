@@ -7,6 +7,27 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.6] - 2026-10-02
+
+### Added
+
+- The playing file's name appears just below the player's top panel while the panel is
+  visible. Right-click it to copy the name or path, open the file's folder or show media
+  info.
+- Speed and volume changes show their new value in the player's top-left corner.
+
+### Changed
+
+- Middle-click and a double-click on the top panel work in every tab: normal → fullscreen →
+  compact → fullscreen, without switching tabs. Esc steps back out. Dragging the window from
+  empty space works in every tab, and every tab's content fits the compact window.
+- The speed indicator is a gauge icon instead of an A/B letter: the faster mode gets the
+  needle to the right with an orange tip, the slower one the needle to the left. If you
+  change the speeds so the order flips, the icons swap.
+- The play/pause badge in the middle of the player is matte with a small white gloss on top.
+- Text colours in eleven dark palettes and the Teknesyum background veil were adjusted so
+  every label keeps 7:1 contrast.
+
 ## [1.2.5] - 2026-10-02
 
 ### Changed
