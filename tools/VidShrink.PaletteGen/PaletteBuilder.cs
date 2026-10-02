@@ -124,6 +124,7 @@ public static class PaletteBuilder
             $"  <Color x:Key=\"EmberBarDeepColor\">{Solid(Warm(seed.Surface, 0.03))}</Color>",
             $"  <Color x:Key=\"EmberBarMidColor\">{Solid(Warm(seed.Surface, 0.05))}</Color>",
             $"  <Color x:Key=\"EmberBarEdgeColor\">{Solid(Warm(seed.Surface, 0.07))}</Color>",
+            $"  <Color x:Key=\"EmberFlameGlyphColor\">{Solid(FlameGlyph(seed, flame, blaze))}</Color>",
             "",
             $"  <Color x:Key=\"PlaybackScrimColor\">{Alpha(bg, 0xCC)}</Color>",
             $"  <Color x:Key=\"PlaybackScrimEdgeColor\">{Alpha(bg, 0x00)}</Color>",
@@ -177,6 +178,29 @@ public static class PaletteBuilder
             return (Math.Max(text, tone) + 0.05) / (Math.Min(text, tone) + 0.05);
         });
         return Worst(0) >= Worst(1) ? "#FF000000" : "#FFFFFFFF";
+    }
+
+    /// <summary>
+    /// Hızlı ibrenin ucu alevin rengini taşır ama oynatıcı şeridinin düğme zeminlerinde simge
+    /// eşiğini geçmelidir: alev, en kötü zemine karşı 4,5:1'i tutana dek uyarı rengine karışır.
+    /// Ölçü: <c>KontrastTests.HerYaziVeSimgeEsigiGeciyor</c>.
+    /// </summary>
+    public static string FlameGlyph(PaletteSeed seed, string flame, string blaze)
+    {
+        var active = 0x4D / 255.0;
+        var grounds = new[] { seed.Black, seed.Surface, Mix(seed.Black, seed.Renk1, active), Mix(seed.Surface, seed.Renk1, active) };
+        double Worst(string tone) => grounds.Min(ground =>
+        {
+            var a = Luminance(tone);
+            var b = Luminance(ground);
+            return (Math.Max(a, b) + 0.05) / (Math.Min(a, b) + 0.05);
+        });
+        for (var step = 0; step <= 20; step++)
+        {
+            var tone = Mix(flame, blaze, step / 20.0);
+            if (Worst(tone) >= 4.5) return tone;
+        }
+        return blaze;
     }
 
     private static (int R, int G, int B) Parse(string hex)

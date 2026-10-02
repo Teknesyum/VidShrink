@@ -31,7 +31,7 @@ tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan d
 | 12 | IconVolume | `Speaker 2` | `ic_fluent_speaker_2_24_filled.svg` | Filled / 24 px | Ses açık |
 | 13 | IconVolumeMute | `Speaker Mute` | `ic_fluent_speaker_mute_24_filled.svg` | Filled / 24 px | Ses kapalı |
 | 14 | IconSpeedFast | `Top Speed` | `ic_fluent_top_speed_24_filled.svg` | Filled / 24 px | Hızlı kip (kadran Fluent, ibre türetildi: sağa 60°) |
-| 15 | IconSpeedFastTip | `Top Speed` | `ic_fluent_top_speed_24_filled.svg` | Filled / 24 px | Hızlı ibrenin turuncu ucu (`EmberFlame`), IconSpeedFast üstüne bindirilir |
+| 15 | IconSpeedFastTip | `Top Speed` | `ic_fluent_top_speed_24_filled.svg` | Filled / 24 px | Hızlı ibrenin turuncu ucu (`EmberFlameGlyph`: alev, şerit zeminlerinde 4,5:1 tutana dek uyarı rengine karışır), IconSpeedFast üstüne bindirilir |
 | 16 | IconSpeedSlow | `Top Speed` | `ic_fluent_top_speed_24_filled.svg` | Filled / 24 px | Yavaş kip (kadran Fluent, ibre türetildi: sola 60°) |
 | 17 | IconFullScreen | `Full Screen Maximize` | `ic_fluent_full_screen_maximize_24_filled.svg` | Filled / 24 px | Tam ekran |
 | 18 | IconChevronDown | `Chevron Down` | `ic_fluent_chevron_down_24_filled.svg` | Filled / 24 px | Açılır başlık (kapalı) |

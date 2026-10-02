@@ -26,6 +26,7 @@
   <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource DangerColor}"/>
   <SolidColorBrush x:Key="EmberBlaze" Color="{StaticResource WarningColor}"/>
   <SolidColorBrush x:Key="EmberFlame" Color="{StaticResource EmberFlameColor}"/>
+  <SolidColorBrush x:Key="EmberFlameGlyph" Color="{StaticResource EmberFlameGlyphColor}"/>
   <LinearGradientBrush x:Key="AccentGradient" StartPoint="0%,50%" EndPoint="100%,50%">
     <GradientStop Color="{StaticResource Renk1Color}" Offset="0"/>
     <GradientStop Color="{StaticResource Renk3Color}" Offset="1"/>
@@ -38,7 +39,7 @@
   <x:Double x:Key="PhoenixEmberSparkOpacity">0.85</x:Double>
   <x:Double x:Key="EmberAtmosphereOuterOpacity">0.18</x:Double>
   <x:Double x:Key="EmberAtmosphereCoreOpacity">0.12</x:Double>
-  <x:Double x:Key="EmberAtmosphereVeilOpacity">0.13</x:Double>
+  <x:Double x:Key="EmberAtmosphereVeilOpacity">0.08</x:Double>
   <x:Double x:Key="EmberAtmosphereCoalOpacity">0.62</x:Double>
   <x:Double x:Key="PanelSurfaceOpacity">0.90</x:Double>
   <x:Double x:Key="PauseGlyphOpacity">0.5</x:Double>
