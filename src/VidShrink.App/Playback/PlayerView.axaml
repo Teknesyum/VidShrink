@@ -97,6 +97,20 @@
                     VerticalAlignment="Top"
                     Margin="{StaticResource PlaybackBadgeMargin}"
                     Spacing="{StaticResource PlaybackBadgeGap}">
+          <Border x:Name="OsdBadge"
+                  Theme="{StaticResource PlaybackBadge}"
+                  HorizontalAlignment="Left"
+                  IsVisible="False"
+                  IsHitTestVisible="False"
+                  Opacity="0"
+                  auto:AutomationProperties.LiveSetting="Polite">
+            <Border.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}"/>
+              </Transitions>
+            </Border.Transitions>
+            <TextBlock x:Name="TxtOsd" Theme="{StaticResource PlaybackTimeText}"/>
+          </Border>
           <Border x:Name="InfoPanel" Theme="{StaticResource PlaybackBadge}" IsVisible="False">
             <TextBlock x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
           </Border>

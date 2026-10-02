@@ -273,6 +273,7 @@
   <StaticResource x:Key="MotionBase" ResourceKey="TBase"/>
   <StaticResource x:Key="MotionSlow" ResourceKey="TSlow"/>
   <sys:TimeSpan x:Key="PauseGlyphHold">00:00:00.5000000</sys:TimeSpan>
+  <sys:TimeSpan x:Key="PlaybackOsdHold">00:00:01.2000000</sys:TimeSpan>
   <sys:TimeSpan x:Key="EndCueDuration">00:00:00.4000000</sys:TimeSpan>
 
   <StaticResource x:Key="TargetMinSize" ResourceKey="TargetMin"/>
