@@ -63,5 +63,6 @@
   "player.menu.edit": "Редагувати",
   "player.menu.view": "Зображення",
   "player.menu.playback": "Відтворення",
-  "player.menu.loop": "Повтор і закладки"
+  "player.menu.loop": "Повтор і закладки",
+  "player.title.copy-name": "Копіювати назву"
 }

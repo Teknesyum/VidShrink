@@ -63,5 +63,6 @@
   "player.menu.edit": "Upravit",
   "player.menu.view": "Obraz",
   "player.menu.playback": "Přehrávání",
-  "player.menu.loop": "Opakování a záložky"
+  "player.menu.loop": "Opakování a záložky",
+  "player.title.copy-name": "Kopírovat název"
 }

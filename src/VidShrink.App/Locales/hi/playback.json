@@ -63,5 +63,6 @@
   "player.menu.edit": "संपादित करें",
   "player.menu.view": "चित्र",
   "player.menu.playback": "प्लेबैक",
-  "player.menu.loop": "दोहराव और बुकमार्क"
+  "player.menu.loop": "दोहराव और बुकमार्क",
+  "player.title.copy-name": "नाम कॉपी करें"
 }

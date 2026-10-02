@@ -63,5 +63,6 @@
   "player.menu.edit": "Uredi",
   "player.menu.view": "Slika",
   "player.menu.playback": "Predvajanje",
-  "player.menu.loop": "Ponavljanje in zaznamki"
+  "player.menu.loop": "Ponavljanje in zaznamki",
+  "player.title.copy-name": "Kopiraj ime"
 }

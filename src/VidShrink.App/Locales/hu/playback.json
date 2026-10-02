@@ -63,5 +63,6 @@
   "player.menu.edit": "Szerkesztés",
   "player.menu.view": "Kép",
   "player.menu.playback": "Lejátszás",
-  "player.menu.loop": "Ismétlés és könyvjelzők"
+  "player.menu.loop": "Ismétlés és könyvjelzők",
+  "player.title.copy-name": "Név másolása"
 }

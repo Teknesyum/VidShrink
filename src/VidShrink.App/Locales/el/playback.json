@@ -63,5 +63,6 @@
   "player.menu.edit": "Επεξεργασία",
   "player.menu.view": "Εικόνα",
   "player.menu.playback": "Αναπαραγωγή",
-  "player.menu.loop": "Επανάληψη και σελιδοδείκτες"
+  "player.menu.loop": "Επανάληψη και σελιδοδείκτες",
+  "player.title.copy-name": "Αντιγραφή ονόματος"
 }

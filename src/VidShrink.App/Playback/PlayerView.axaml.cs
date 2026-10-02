@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -378,6 +378,12 @@ internal partial class PlayerView : UserControl
             return;
         }
 
+        if (TitlePress(e, button))
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (button == PlayerButton.Left)
         {
             if (EtkilesimliDenetim.Icinde(e.Source as Visual, this)) return;
@@ -714,6 +720,7 @@ internal partial class PlayerView : UserControl
 
         TxtEmpty.IsVisible = false;
         ShowAudioCard(path, engine);
+        ShowMediaTitle(path);
         StartWatchdog();
         StartRender();
         var resume = HistoryPath is null ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
@@ -870,6 +877,7 @@ internal partial class PlayerView : UserControl
         _stall.Reset();
         KurtarmayiSifirla();
         HideAudioCard();
+        HideMediaTitle();
         if (_engine is { } engine)
         {
             engine.Faulted -= OnFaulted;

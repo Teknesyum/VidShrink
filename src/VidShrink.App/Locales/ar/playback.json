@@ -63,5 +63,6 @@
   "player.menu.edit": "تحرير",
   "player.menu.view": "الفيديو",
   "player.menu.playback": "التشغيل",
-  "player.menu.loop": "التكرار والإشارات المرجعية"
+  "player.menu.loop": "التكرار والإشارات المرجعية",
+  "player.title.copy-name": "نسخ الاسم"
 }

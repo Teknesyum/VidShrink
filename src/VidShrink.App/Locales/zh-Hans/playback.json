@@ -63,5 +63,6 @@
   "player.menu.edit": "编辑",
   "player.menu.view": "画面",
   "player.menu.playback": "播放",
-  "player.menu.loop": "循环与书签"
+  "player.menu.loop": "循环与书签",
+  "player.title.copy-name": "复制名称"
 }

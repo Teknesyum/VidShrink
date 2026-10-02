@@ -63,5 +63,6 @@
   "player.menu.edit": "Rediģēt",
   "player.menu.view": "Attēls",
   "player.menu.playback": "Atskaņošana",
-  "player.menu.loop": "Atkārtošana un grāmatzīmes"
+  "player.menu.loop": "Atkārtošana un grāmatzīmes",
+  "player.title.copy-name": "Kopēt nosaukumu"
 }

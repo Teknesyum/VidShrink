@@ -63,5 +63,6 @@
   "player.menu.edit": "Modifier",
   "player.menu.view": "Image",
   "player.menu.playback": "Lecture",
-  "player.menu.loop": "Boucle et signets"
+  "player.menu.loop": "Boucle et signets",
+  "player.title.copy-name": "Copier le nom"
 }

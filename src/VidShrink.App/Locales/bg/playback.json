@@ -63,5 +63,6 @@
   "player.menu.edit": "Редактиране",
   "player.menu.view": "Видео",
   "player.menu.playback": "Възпроизвеждане",
-  "player.menu.loop": "Повторение и отметки"
+  "player.menu.loop": "Повторение и отметки",
+  "player.title.copy-name": "Копиране на името"
 }

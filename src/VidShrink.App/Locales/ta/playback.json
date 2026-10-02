@@ -63,5 +63,6 @@
   "player.menu.edit": "திருத்து",
   "player.menu.view": "படம்",
   "player.menu.playback": "இயக்கம்",
-  "player.menu.loop": "மீண்டும் இயக்கல் மற்றும் புத்தகக்குறிகள்"
+  "player.menu.loop": "மீண்டும் இயக்கல் மற்றும் புத்தகக்குறிகள்",
+  "player.title.copy-name": "பெயரை நகலெடு"
 }

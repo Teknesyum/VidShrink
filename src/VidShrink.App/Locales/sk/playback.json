@@ -63,5 +63,6 @@
   "player.menu.edit": "Upraviť",
   "player.menu.view": "Obraz",
   "player.menu.playback": "Prehrávanie",
-  "player.menu.loop": "Opakovanie a záložky"
+  "player.menu.loop": "Opakovanie a záložky",
+  "player.title.copy-name": "Kopírovať názov"
 }

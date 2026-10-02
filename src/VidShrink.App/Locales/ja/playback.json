@@ -63,5 +63,6 @@
   "player.menu.edit": "編集",
   "player.menu.view": "映像",
   "player.menu.playback": "再生",
-  "player.menu.loop": "リピートとブックマーク"
+  "player.menu.loop": "リピートとブックマーク",
+  "player.title.copy-name": "名前をコピー"
 }

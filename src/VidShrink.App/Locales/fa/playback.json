@@ -63,5 +63,6 @@
   "player.menu.edit": "ویرایش",
   "player.menu.view": "تصویر",
   "player.menu.playback": "پخش",
-  "player.menu.loop": "تکرار و نشانک‌ها"
+  "player.menu.loop": "تکرار و نشانک‌ها",
+  "player.title.copy-name": "کپی نام"
 }

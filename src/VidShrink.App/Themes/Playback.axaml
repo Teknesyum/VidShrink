@@ -251,6 +251,47 @@
     <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
   </ControlTheme>
 
+  <Thickness x:Key="PlaybackMediaTitleMargin">24,44,24,0</Thickness>
+  <x:Double x:Key="PlaybackMediaTitleMaxWidth">640</x:Double>
+
+  <ControlTheme x:Key="PlaybackMediaTitle" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+    <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
+    <Setter Property="Margin" Value="{StaticResource PlaybackMediaTitleMargin}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource PlaybackMediaTitleMaxWidth}"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Top"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+        <BoxShadowsTransition Property="BoxShadow" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+      </Transitions>
+    </Setter>
+    <Style Selector="^:pointerover">
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
+      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
+    </Style>
+    <Style Selector="^.menude">
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
+      <Setter Property="BoxShadow" Value="{DynamicResource GlowBlue}"/>
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackMediaTitleText" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeLg}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="LetterSpacing" Value="{StaticResource TrackingMd}"/>
+    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="TextAlignment" Value="Center"/>
+  </ControlTheme>
+
   <ControlTheme x:Key="PlaybackThumbTime" TargetType="Border">
     <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>

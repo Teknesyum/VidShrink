@@ -63,5 +63,6 @@
   "player.menu.edit": "Edit",
   "player.menu.view": "Gambar",
   "player.menu.playback": "Pemutaran",
-  "player.menu.loop": "Pengulangan dan penanda"
+  "player.menu.loop": "Pengulangan dan penanda",
+  "player.title.copy-name": "Salin nama"
 }

@@ -63,5 +63,6 @@
   "player.menu.edit": "แก้ไข",
   "player.menu.view": "ภาพ",
   "player.menu.playback": "การเล่น",
-  "player.menu.loop": "เล่นซ้ำและบุ๊กมาร์ก"
+  "player.menu.loop": "เล่นซ้ำและบุ๊กมาร์ก",
+  "player.title.copy-name": "คัดลอกชื่อ"
 }

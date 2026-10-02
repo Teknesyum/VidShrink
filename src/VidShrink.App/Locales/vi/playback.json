@@ -63,5 +63,6 @@
   "player.menu.edit": "Chỉnh sửa",
   "player.menu.view": "Hình ảnh",
   "player.menu.playback": "Phát lại",
-  "player.menu.loop": "Lặp lại và dấu trang"
+  "player.menu.loop": "Lặp lại và dấu trang",
+  "player.title.copy-name": "Sao chép tên"
 }

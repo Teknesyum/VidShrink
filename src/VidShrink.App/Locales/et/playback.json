@@ -63,5 +63,6 @@
   "player.menu.edit": "Muuda",
   "player.menu.view": "Pilt",
   "player.menu.playback": "Taasesitus",
-  "player.menu.loop": "Kordus ja järjehoidjad"
+  "player.menu.loop": "Kordus ja järjehoidjad",
+  "player.title.copy-name": "Kopeeri nimi"
 }
