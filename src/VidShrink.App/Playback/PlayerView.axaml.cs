@@ -175,25 +175,30 @@ internal partial class PlayerView : UserControl
                 _volume = Math.Clamp(_volume + command.Amount, 0, VolumeCeiling());
                 _engine?.SetVolume(_volume);
                 _trace.Add("volume " + Saat.Tani.Konum(command.Amount) + " -> " + Saat.Tani.Konum(_volume));
+                ShowSoundOsd(false);
                 break;
             case PlayerCommandKind.ToggleMute:
                 _muted = !_muted;
                 _engine?.SetMuted(_muted);
                 _trace.Add("mute -> " + _muted);
+                ShowSoundOsd(true);
                 break;
             case PlayerCommandKind.Speed:
                 _speed = Math.Clamp(Math.Round(_speed + command.Amount, 2), Keymap.MinimumSpeed, Keymap.MaximumSpeed);
                 _engine?.SetSpeed(_speed);
                 RememberSpeed();
                 _trace.Add("speed " + Saat.Tani.Konum(command.Amount) + " -> " + Saat.Tani.Konum(_speed));
+                ShowSpeedOsd();
                 break;
             case PlayerCommandKind.SpeedAb:
                 SwitchSpeedMode();
+                ShowSpeedOsd();
                 break;
             case PlayerCommandKind.SpeedReset:
                 _speed = 1;
                 _engine?.SetSpeed(_speed);
                 _trace.Add("speedreset -> " + Saat.Tani.Konum(_speed));
+                ShowSpeedOsd();
                 break;
             case PlayerCommandKind.FrameStep:
                 StepFrame(command.Amount < 0);
