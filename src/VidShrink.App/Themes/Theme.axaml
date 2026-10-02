@@ -25,6 +25,7 @@
   <SolidColorBrush x:Key="OnNeon" Color="{StaticResource OnRenk1Color}"/>
   <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource DangerColor}"/>
   <SolidColorBrush x:Key="EmberBlaze" Color="{StaticResource WarningColor}"/>
+  <SolidColorBrush x:Key="EmberFlame" Color="{StaticResource EmberFlameColor}"/>
   <LinearGradientBrush x:Key="AccentGradient" StartPoint="0%,50%" EndPoint="100%,50%">
     <GradientStop Color="{StaticResource Renk1Color}" Offset="0"/>
     <GradientStop Color="{StaticResource Renk3Color}" Offset="1"/>

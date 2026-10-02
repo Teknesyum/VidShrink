@@ -114,7 +114,16 @@
                 <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}"/>
               </Transitions>
             </Border.Transitions>
-            <TextBlock x:Name="TxtOsd" Theme="{StaticResource PlaybackTimeText}"/>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
+              <Grid x:Name="OsdSpeedGlyph" Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}"
+                    VerticalAlignment="Center" IsVisible="False">
+                <Path x:Name="GlyphOsdSpeed" Stretch="Uniform"
+                      Data="{StaticResource IconSpeedSlow}" Fill="{Binding #TxtOsd.Foreground}"/>
+                <Path x:Name="GlyphOsdSpeedTip" Stretch="Uniform" IsVisible="False"
+                      Data="{StaticResource IconSpeedFastTip}" Fill="{StaticResource EmberFlame}"/>
+              </Grid>
+              <TextBlock x:Name="TxtOsd" Theme="{StaticResource PlaybackTimeText}" VerticalAlignment="Center"/>
+            </StackPanel>
           </Border>
           <Border x:Name="InfoPanel" Theme="{StaticResource PlaybackBadge}" IsVisible="False">
             <TextBlock x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
@@ -267,13 +276,13 @@
                 </Grid.ColumnDefinitions>
                 <ToggleButton Grid.Column="1" x:Name="BtnSeritSpeedAb" Theme="{StaticResource PlaybackToggleButton}"
                               auto:AutomationProperties.Name="{loc:Text main.player.menu.speedab}">
-                  <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
-                    <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
-                          VerticalAlignment="Center"
-                          Data="{StaticResource IconSpeed}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
-                    <TextBlock x:Name="TxtSeritSpeedMode" Theme="{StaticResource PlaybackValueText}"
-                               Foreground="{Binding $parent[ToggleButton].Foreground}" VerticalAlignment="Center"/>
-                  </StackPanel>
+                  <Grid x:Name="SeritSpeedGlyph" Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}"
+                        VerticalAlignment="Center">
+                    <Path x:Name="GlyphSeritSpeed" Stretch="Uniform"
+                          Data="{StaticResource IconSpeedSlow}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
+                    <Path x:Name="GlyphSeritSpeedTip" Stretch="Uniform" IsVisible="False"
+                          Data="{StaticResource IconSpeedFastTip}" Fill="{StaticResource EmberFlame}"/>
+                  </Grid>
                 </ToggleButton>
                 <Slider Grid.Column="2" x:Name="SliderSeritSpeed"
                         Theme="{StaticResource PlaybackSlider}"

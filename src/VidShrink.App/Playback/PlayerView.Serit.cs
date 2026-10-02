@@ -325,7 +325,8 @@ internal partial class PlayerView
         TxtSeritForward.Text = "+" + Keymap.SeekSmall.ToString(Strings.Culture);
         SeritLabel(BtnSeritMute, Strings.Get(Keymap.Mute.LabelKey), Keymap.FirstKeyRow(Keymap.Mute));
         SeritLabel(BtnSeritFullScreen, Strings.Get(Keymap.Fullscreen.LabelKey), Keymap.FirstKeyRow(Keymap.Fullscreen));
-        SeritLabel(BtnSeritSpeedAb, Strings.Get("main.player.speedab.tip", SpeedText(Settings.SpeedA), SpeedText(Settings.SpeedB)), Keymap.FirstKeyRow(Keymap.SpeedAb));
+        var hizliKip = SpeedFast;
+        SeritLabel(BtnSeritSpeedAb, Strings.Get("main.player.speedab.tip", SpeedText(hizliKip ? _speed : OtherModeSpeed), SpeedText(hizliKip ? OtherModeSpeed : _speed)), Keymap.FirstKeyRow(Keymap.SpeedAb));
         ToolTip.SetTip(TxtSeritTime, Strings.Get("main.player.time.tip"));
         SeritLabel(BtnSeritEdit, Strings.Get(Keymap.Edit.LabelKey), Keymap.FirstKeyRow(Keymap.Edit));
         RefreshEditButton();
@@ -333,8 +334,8 @@ internal partial class PlayerView
         RefreshSeritTime();
         TxtSeritVolume.Text = _volume.ToString("0.#", CultureInfo.InvariantCulture);
         TxtSeritSpeed.Text = _speed.ToString("0.00", CultureInfo.InvariantCulture) + "×";
-        BtnSeritSpeedAb.IsChecked = _speedModeB;
-        TxtSeritSpeedMode.Text = _speedModeB ? "B" : "A";
+        BtnSeritSpeedAb.IsChecked = hizliKip;
+        ApplySpeedGlyph(SeritSpeedGlyph, GlyphSeritSpeed, GlyphSeritSpeedTip);
 
         _seritSliding = true;
         SliderSeritVolume.Maximum = VolumeCeiling();
