@@ -330,7 +330,7 @@ public sealed class DuzenleyiciSessizlikTests
         }
         finally
         {
-            if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+            try { Directory.Delete(klasor, true); } catch (IOException) { }
             KanitKapanisi.Kapat(Kanit);
         }
     }
