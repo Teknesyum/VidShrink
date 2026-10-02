@@ -23,7 +23,7 @@ internal sealed class PencereKipi
 
     private readonly Func<Window?> _pencere;
     private readonly FullscreenSwitch _tam = new();
-    private readonly List<string> _iz = new();
+    private readonly List<string> _trace = new();
     private Size? _min;
     private WindowSnapshot? _normal;
 
@@ -43,13 +43,11 @@ internal sealed class PencereKipi
 
     internal bool Kucuk => _min is not null;
 
-    internal IReadOnlyList<string> Iz => _iz.ToArray();
+    internal IReadOnlyList<string> Iz => _trace.ToArray();
 
     internal uint? BorderColorRequest { get; private set; }
 
     internal int BorderColorWrites { get; private set; }
-
-    private void Yaz(string satir) => _iz.Add(satir);
 
     private static WindowSnapshot Anlik(Window? pencere)
         => pencere is null
@@ -74,7 +72,7 @@ internal sealed class PencereKipi
             }
         }
 
-        Yaz("tam -> " + _tam.IsFullscreen);
+        _trace.Add("tam -> " + _tam.IsFullscreen);
         Degisti?.Invoke();
     }
 
@@ -109,7 +107,7 @@ internal sealed class PencereKipi
             }
         }
 
-        Yaz("kucuk -> " + Kucuk);
+        _trace.Add("kucuk -> " + Kucuk);
         Degisti?.Invoke();
     }
 
@@ -136,7 +134,7 @@ internal sealed class PencereKipi
             tam.WindowState = WindowState.Maximized;
         }
 
-        Yaz("birak -> normal");
+        _trace.Add("birak -> normal");
         return true;
     }
 
@@ -159,7 +157,7 @@ internal sealed class PencereKipi
         var renk = kucuk ? DwmColorNone : DwmColorDefault;
         BorderColorRequest = renk;
         var satir = "border -> " + (kucuk ? "none" : "default");
-        Yaz(satir);
+        _trace.Add(satir);
         Yansit?.Invoke(satir);
         if (!OperatingSystem.IsWindows()) return;
         if (pencere.TryGetPlatformHandle() is not { } tutamak || tutamak.Handle == IntPtr.Zero) return;
