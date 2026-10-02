@@ -127,6 +127,7 @@ public static class PaletteBuilder
             "",
             $"  <Color x:Key=\"PlaybackScrimColor\">{Alpha(bg, 0xCC)}</Color>",
             $"  <Color x:Key=\"PlaybackScrimEdgeColor\">{Alpha(bg, 0x00)}</Color>",
+            $"  <Color x:Key=\"PauseGlossColor\">{Solid(Luminance(seed.Text) >= Luminance(bg) ? seed.Text : bg)}</Color>",
             "",
             $"  <BoxShadows x:Key=\"GlowBlue\">0 0 20 0 {Alpha(seed.Renk1, 0x40)}</BoxShadows>",
             $"  <BoxShadows x:Key=\"GlowPink\">0 0 20 0 {Alpha(seed.Renk2, 0x40)}</BoxShadows>",

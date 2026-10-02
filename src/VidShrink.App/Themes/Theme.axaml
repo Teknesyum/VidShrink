@@ -41,8 +41,14 @@
   <x:Double x:Key="EmberAtmosphereCoalOpacity">0.62</x:Double>
   <x:Double x:Key="PanelSurfaceOpacity">0.90</x:Double>
   <x:Double x:Key="PauseGlyphOpacity">0.5</x:Double>
+  <x:Double x:Key="PauseGlyphGlossOpacity">0.65</x:Double>
+  <x:Double x:Key="PauseGlyphGlossReach">0.5</x:Double>
   <x:Double x:Key="EndCueOpacity">0.8</x:Double>
 
+  <LinearGradientBrush x:Key="PauseGlyphGloss" StartPoint="50%,0%" EndPoint="50%,100%" Opacity="{StaticResource PauseGlyphGlossOpacity}">
+    <GradientStop Color="{StaticResource PauseGlossColor}" Offset="0"/>
+    <GradientStop Color="Transparent" Offset="{StaticResource PauseGlyphGlossReach}"/>
+  </LinearGradientBrush>
   <SolidColorBrush x:Key="PanelSurface"
                    Color="{StaticResource SurfaceColor}"
                    Opacity="{StaticResource PanelSurfaceOpacity}"/>
