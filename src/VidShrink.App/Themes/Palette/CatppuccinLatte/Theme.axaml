@@ -37,6 +37,7 @@
   <Color x:Key="EmberBarDeepColor">#FFEBE8EF</Color>
   <Color x:Key="EmberBarMidColor">#FFEBE5EC</Color>
   <Color x:Key="EmberBarEdgeColor">#FFEBE2E8</Color>
+  <Color x:Key="EmberFlameGlyphColor">#FF5E3C0E</Color>
 
   <Color x:Key="PlaybackScrimColor">#CCEFF1F5</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#00EFF1F5</Color>

@@ -1208,6 +1208,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-30, metin katmani (dalga 1): alti yeni anahtardan (<c>editor.text.add</c>, <c>-content</c>, <c>-size</c>, <c>-color</c>, <c>-panel</c>, <c>editor.export.text-full</c>) yalniz pt <c>editor.text.panel</c> ("Propriedades do texto") kola giriyor; gerekce notu noktali cumle, tek sozcukler duz yazi okunmuyor: 2906 + 1 = 2907, en 274, tr 102.</para>
     /// <para>2026-10-01, klip ozellikleri: on iki yeni anahtardan (on bir <c>editor.clip.*</c>, <c>editor.export.effects-full</c>) 10 kol 5 dilde (en: fade-in; fr: rotate; it: fade-in, fade-out, flip-h, flip-v; pt: fade-in, fade-out, panel; sv: fade-in), tr haric: 2907 + 10 = 2917, en 274 + 1 = 275, tr 102.</para>
     /// <para>2026-10-01, sessizlik kesme: on bes yeni <c>editor.silence.*</c> anahtarindan 13 kol 12 dilde (panel: cs, en, es, pt, ro, sk, sl, tr; failed: fr, hu, ro; scanning: it; padding: sw): 2917 + 13 = 2930, en 275 + 1 = 276, tr 102 + 1 = 103.</para>
+    /// <para>2026-10-02, hiz ibresi: <c>main.player.speedab.tip</c> "Speed A {0} · B {1}" yerine "Fast {0} · Slow {1}" oldu, 43 dilde koldan cikiyor; yeni hiz, OSD ve medya adi anahtarlari kola girmiyor (25405768 tabaniyla KOL dokumu karsilastirilarak olculdu): 2930 - 43 = 2887, en 276 - 1 = 275, tr 103 - 1 = 102.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1233,9 +1234,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2930, toplam);
-        Assert.Equal(276, dilBasina["en"]);
-        Assert.Equal(103, dilBasina["tr"]);
+        Assert.Equal(2887, toplam);
+        Assert.Equal(275, dilBasina["en"]);
+        Assert.Equal(102, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1420,6 +1421,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-09-30, metin katmani (dalga 1): alti yeni anahtar (bes <c>editor.text.*</c>, <c>editor.export.text-full</c>), dusen yok: 1233 + 6 = 1239, 43 x 1239 = 53277. <c>kayip</c> 0.</para>
     /// <para>2026-10-01, klip ozellikleri: on iki yeni anahtar (on bir <c>editor.clip.*</c>, <c>editor.export.effects-full</c>), dusen yok: 1239 + 12 = 1251, 43 x 1251 = 53793. <c>kayip</c> 0.</para>
     /// <para>2026-10-01, sessizlik kesme: on bes yeni anahtar (<c>editor.silence.*</c>), dusen yok: 1251 + 15 = 1266, 43 x 1266 = 54438. <c>kayip</c> 0.</para>
+    /// <para>2026-10-02, oynatici hiz ibresi, OSD ve medya adi: yedi yeni anahtar (<c>main.player.speed.fast</c>, <c>main.player.speed.slow</c>, <c>main.player.osd.speed</c>, <c>main.player.osd.volume</c>, <c>main.player.osd.muted</c>, <c>main.player.osd.mutedvolume</c>, <c>player.title.copy-name</c>), dusen yok: 1266 + 7 = 1273, 43 x 1273 = 54739. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1447,7 +1449,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(54438, gezilen);
+        Assert.Equal(54739, gezilen);
         Assert.Empty(kayip);
     }
 

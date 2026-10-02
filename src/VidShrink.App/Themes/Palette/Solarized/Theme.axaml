@@ -9,7 +9,7 @@
   <Color x:Key="NeonBlueColor">#FF93E3DD</Color>
   <Color x:Key="NeonPinkColor">#FFBE9000</Color>
   <Color x:Key="NeonPurpleColor">#FF8C91D9</Color>
-  <Color x:Key="NeonSuccessColor">#FFB0CB00</Color>
+  <Color x:Key="NeonSuccessColor">#FFB7D017</Color>
   <Color x:Key="SurfaceToneColor">#FF073642</Color>
   <Color x:Key="AppBgColor">#FF002B36</Color>
   <Color x:Key="TextBodyColor">#FFF2EEE0</Color>
@@ -37,6 +37,7 @@
   <Color x:Key="EmberBarDeepColor">#FF0A2A33</Color>
   <Color x:Key="EmberBarMidColor">#FF0E2A33</Color>
   <Color x:Key="EmberBarEdgeColor">#FF112A33</Color>
+  <Color x:Key="EmberFlameGlyphColor">#FFF1B602</Color>
 
   <Color x:Key="PlaybackScrimColor">#CC002B36</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#00002B36</Color>

@@ -132,7 +132,7 @@
                 <Path x:Name="GlyphOsdSpeed" Stretch="Uniform"
                       Data="{StaticResource IconSpeedSlow}" Fill="{Binding #TxtOsd.Foreground}"/>
                 <Path x:Name="GlyphOsdSpeedTip" Stretch="Uniform" IsVisible="False"
-                      Data="{StaticResource IconSpeedFastTip}" Fill="{StaticResource EmberFlame}"/>
+                      Data="{StaticResource IconSpeedFastTip}" Fill="{StaticResource EmberFlameGlyph}"/>
               </Grid>
               <TextBlock x:Name="TxtOsd" Theme="{StaticResource PlaybackTimeText}" VerticalAlignment="Center"/>
             </StackPanel>
@@ -297,7 +297,7 @@
                     <Path x:Name="GlyphSeritSpeed" Stretch="Uniform"
                           Data="{StaticResource IconSpeedSlow}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
                     <Path x:Name="GlyphSeritSpeedTip" Stretch="Uniform" IsVisible="False"
-                          Data="{StaticResource IconSpeedFastTip}" Fill="{StaticResource EmberFlame}"/>
+                          Data="{StaticResource IconSpeedFastTip}" Fill="{StaticResource EmberFlameGlyph}"/>
                   </Grid>
                 </ToggleButton>
                 <Slider Grid.Column="2" x:Name="SliderSeritSpeed"

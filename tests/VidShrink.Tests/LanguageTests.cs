@@ -220,7 +220,7 @@ public sealed class LanguageTests : IDisposable
         "NeonBlueBorderColor", "NeonBlueBorderStrongColor", "NeonPinkFillColor",
         "NeonPurpleBorderColor", "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor", "AtmosHotColor", "AtmosMidColor", "AtmosEdgeColor",
         "EmberDeepColor", "EmberMidColor", "EmberEdgeColor",
-        "EmberBarDeepColor", "EmberBarMidColor", "EmberBarEdgeColor",
+        "EmberBarDeepColor", "EmberBarMidColor", "EmberBarEdgeColor", "EmberFlameGlyphColor",
         "FontMono",
         "GlowBlue", "GlowPink", "GlowPurple",
         "LinkGitHub", "LinkRepo", "LinkSponsor", "AppIconUri",
