@@ -35,13 +35,18 @@
               <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}"/>
             </Transitions>
           </Border.Transitions>
-          <Path x:Name="PauseGlyphIcon" Width="{StaticResource PauseGlyphSize}"
-                Height="{StaticResource PauseGlyphSize}"
-                Stretch="Uniform"
-                Data="{StaticResource IconPause}"
-                Fill="{StaticResource NeonBlueActive}"
-                Stroke="{StaticResource NeonPink}"
-                StrokeThickness="{StaticResource SliderThumbStroke}"/>
+          <Panel>
+            <Path x:Name="PauseGlyphIcon" Width="{StaticResource PauseGlyphSize}"
+                  Height="{StaticResource PauseGlyphSize}"
+                  Stretch="Uniform"
+                  Data="{StaticResource IconPause}"
+                  Fill="{StaticResource NeonBlue}"/>
+            <Path x:Name="PauseGlyphGloss" Width="{StaticResource PauseGlyphSize}"
+                  Height="{StaticResource PauseGlyphSize}"
+                  Stretch="Uniform"
+                  Data="{Binding #PauseGlyphIcon.Data}"
+                  Fill="{StaticResource PauseGlyphGloss}"/>
+          </Panel>
         </Border>
         <Border x:Name="EndCue"
                 IsVisible="False"

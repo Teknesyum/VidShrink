@@ -11,6 +11,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using VidShrink.App;
 using VidShrink.App.Playback;
+using VidShrink.App.Themes;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -106,8 +107,50 @@ public sealed class OynaticiGeriBildirimTests
         return toplam / sayi;
     }
 
+    private static (int X, int Ust, int Alt) GovdeSutunu((int W, int H, byte[] Px) simdiki, (int W, int H, byte[] Px) zemin, Rect govde)
+    {
+        var sutunlar = new List<(int X, int Ilk, int Son)>();
+        for (var x = (int)govde.X; x < (int)govde.Right; x++)
+        {
+            var ilk = -1;
+            var son = -1;
+            for (var y = (int)govde.Y; y < (int)govde.Bottom; y++)
+            {
+                if (Sapma(simdiki, zemin, x, y, 0) <= 20) continue;
+                if (ilk < 0) ilk = y;
+                son = y;
+            }
+
+            if (ilk >= 0) sutunlar.Add((x, ilk, son));
+        }
+
+        if (sutunlar.Count == 0) return (-1, 0, 0);
+        var enBoy = sutunlar.Max(s => s.Son - s.Ilk);
+        var secilen = sutunlar.First(s => s.Son - s.Ilk >= enBoy * 0.9);
+        var boy = secilen.Son - secilen.Ilk;
+        return (secilen.X + 3, secilen.Ilk + (int)(boy * 0.12), secilen.Ilk + (int)(boy * 0.85));
+    }
+
+    private static double Parla((int W, int H, byte[] Px) a, int x, int y)
+    {
+        var i = (y * a.W + x) * 4;
+        return (a.Px[i] + a.Px[i + 1] + a.Px[i + 2]) / 3.0;
+    }
+
+    private static void Kaydet(Window window, string ad)
+    {
+        var klasor = Environment.GetEnvironmentVariable("VIDSHRINK_ROZET_PNG");
+        if (string.IsNullOrEmpty(klasor)) return;
+        Directory.CreateDirectory(klasor);
+        var w = (int)window.Bounds.Width;
+        var h = (int)window.Bounds.Height;
+        using var kare = new RenderTargetBitmap(new PixelSize(w * 2, h * 2), new Vector(192, 192));
+        kare.Render(window);
+        kare.Save(Path.Combine(klasor, ad + ".png"), PngBitmapEncoderOptions.Default);
+    }
+
     [Fact]
-    public void OynatSimgesininMaviDolgusuEskisindenHafifCizilir() => AppHost.Run(() =>
+    public void OynatSimgesiMatDolguVeUstteUfakBeyazParlamaTasir() => AppHost.Run(() =>
     {
         var body = new StringBuilder();
         var motor = new YolMotoru();
@@ -115,36 +158,111 @@ public sealed class OynaticiGeriBildirimTests
         var view = Ac(motor, out var window, klasor, false);
         var simge = view.FindControl<Border>("PauseGlyph")!;
         var ikon = view.FindControl<Avalonia.Controls.Shapes.Path>("PauseGlyphIcon")!;
+        var parlama = view.FindControl<Avalonia.Controls.Shapes.Path>("PauseGlyphGloss")!;
         var hedef = view.FindResource("PauseGlyphOpacity") is double o ? o : double.NaN;
-        var hafif = view.FindResource("NeonBlueActive");
-        var eski = view.FindResource("NeonBlue");
+        var mat = view.FindResource("NeonBlue");
+        var firca = view.FindResource("PauseGlyphGloss") as LinearGradientBrush;
+        var parlamaRengi = view.FindResource("PauseGlossColor") is Color c ? c : default;
+        var ilkDurak = firca?.GradientStops[0].Color;
+        var sonDurak = firca?.GradientStops[1];
 
-        view.Apply(Keymap.PlayPause.ToCommand());
-        Dongu(() => !simge.IsVisible, 2);
-        var zemin = Ciz(window);
-        view.Apply(Keymap.PlayPause.ToCommand());
-        Dongu(() => simge.IsVisible && simge.Opacity >= hedef - 0.01, 1);
-        var merkez = simge.TranslatePoint(new Point(simge.Bounds.Width / 2, simge.Bounds.Height / 2), window)!.Value;
-        var x = (int)merkez.X;
-        var y = (int)merkez.Y;
-        var simdiki = Ciz(window);
-        var simdikiFirca = ikon.Fill;
-        ikon.Fill = (IBrush)eski!;
-        var eskiKare = Ciz(window);
-        ikon.Fill = simdikiFirca;
+        (int W, int H, byte[] Px) Bos()
+        {
+            Dongu(() => !simge.IsVisible, 2);
+            return Ciz(window);
+        }
 
-        var yeniSapma = Sapma(simdiki, zemin, x, y);
-        var eskiSapma = Sapma(eskiKare, zemin, x, y);
-        body.AppendLine($"merkez {x},{y}; saydamlik {YolKanit.N(simge.Opacity)}; sapma hafif {YolKanit.N(yeniSapma)}, eski NeonBlue {YolKanit.N(eskiSapma)}");
+        void Goster()
+        {
+            view.Apply(Keymap.PlayPause.ToCommand());
+            Dongu(() => simge.IsVisible && simge.Opacity >= hedef - 0.01, 1);
+        }
+
+        (int X, int Ust, int Alt) Olc(Rect govde, (int W, int H, byte[] Px) bos, out double fark, out double altFark)
+        {
+            (int W, int H, byte[] Px) var = default, yok = default;
+            for (var deneme = 0; deneme < 8; deneme++)
+            {
+                Goster();
+                var = Ciz(window);
+                parlama.IsVisible = false;
+                yok = Ciz(window);
+                parlama.IsVisible = true;
+                if (simge.IsVisible && simge.Opacity >= hedef - 0.01) break;
+            }
+
+            var kol = GovdeSutunu(var, bos, govde);
+            fark = kol.X < 0 ? 0 : Parla(var, kol.X, kol.Ust) - Parla(yok, kol.X, kol.Ust);
+            altFark = kol.X < 0 ? 0 : Math.Abs(Parla(var, kol.X, kol.Alt) - Parla(yok, kol.X, kol.Alt));
+            return kol;
+        }
+
+        var zemin = Bos();
+        Goster();
+        var govde = new Rect(simge.TranslatePoint(new Point(), window)!.Value, simge.Bounds.Size);
+        var parlamaGorunur = parlama.IsVisible;
+        var parlamaVeri = parlama.Data;
+        var ikonVeri = ikon.Data;
+        Bos();
+        var sutun = Olc(govde, zemin, out var ustFark, out var altFark);
+        body.AppendLine($"govde sutunu {sutun.X}, ust y {sutun.Ust}, alt y {sutun.Alt}; parlama ust farki {YolKanit.N(ustFark)}, alt farki {YolKanit.N(altFark)}; parlama rengi {parlamaRengi}");
+        Kaydet(window, "sonra-" + PaletteCatalog.Default);
+
+        var oncekiFirca = ikon.Fill;
+        var oncekiKenar = ikon.Stroke;
+        var oncekiKalinlik = ikon.StrokeThickness;
+        ikon.Fill = (IBrush)view.FindResource("NeonBlueActive")!;
+        ikon.Stroke = (IBrush)view.FindResource("NeonPink")!;
+        ikon.StrokeThickness = view.FindResource("SliderThumbStroke") is double k ? k : 2;
+        parlama.IsVisible = false;
+        Bos();
+        Goster();
+        Kaydet(window, "once-" + PaletteCatalog.Default);
+        ikon.Fill = oncekiFirca;
+        ikon.Stroke = oncekiKenar;
+        ikon.StrokeThickness = oncekiKalinlik;
+        parlama.IsVisible = true;
+
+        var paletler = new List<string>();
+        var baslangic = PaletteCatalog.Use(PaletteCatalog.Default);
+        try
+        {
+            foreach (var ad in new[] { "Kar", "Dracula", "Neon", "Keskin" })
+            {
+                PaletteCatalog.Use(ad);
+                var bos = Bos();
+                var palettenSutun = Olc(govde, bos, out var fark, out _);
+                body.AppendLine($"{ad}: parlama ust farki {YolKanit.N(fark)}");
+                paletler.Add($"{ad}:{(fark > 3 ? "ok" : "yok")}");
+                Bos();
+                Goster();
+                Kaydet(window, "sonra-" + ad);
+            }
+        }
+        finally
+        {
+            PaletteCatalog.Use(baslangic);
+        }
+
         Kapat(view, window);
         Directory.Delete(klasor, true);
-        YolKanit.Write("geri-bildirim-dolgu.txt", body.ToString());
+        YolKanit.Write("geri-bildirim-mat-parlama.txt", body.ToString());
 
-        Assert.Same(hafif, simdikiFirca);
-        Assert.True(eskiSapma > 10, "olumsuz kontrol: eski dolgu zeminden ayrilmali, olcu kor");
-        Assert.True(yeniSapma > 1, "dolgu hic cizilmiyor");
-        Assert.True(yeniSapma < eskiSapma * 0.6, $"dolgu hafiflemedi: {yeniSapma} / {eskiSapma}");
-        YolKanit.Kapat("geri-bildirim-dolgu.txt");
+        Assert.Same(mat, ikon.Fill);
+        Assert.Null(ikon.Stroke);
+        Assert.NotNull(firca);
+        Assert.Same(firca, parlama.Fill);
+        Assert.Equal(parlamaRengi, ilkDurak);
+        Assert.Equal(Colors.Transparent.A, sonDurak!.Color.A);
+        Assert.True(sonDurak.Offset <= 0.5, "parlama govdenin ust yarisindan asagi inmemeli");
+        Assert.True(firca!.Opacity > 0 && firca.Opacity <= 0.7, $"parlama ince olmali: {firca.Opacity}");
+        Assert.True(parlamaGorunur);
+        Assert.Same(ikonVeri, parlamaVeri);
+        Assert.True(sutun.X >= 0, "govdede ust ve alt noktasi birlikte dolu bir sutun bulunamadi");
+        Assert.True(ustFark > 3, $"ustte parlama yok: {ustFark}");
+        Assert.True(altFark < 1, $"parlama altta da var, ufak degil: {altFark}");
+        Assert.All(paletler, p => Assert.EndsWith(":ok", p));
+        YolKanit.Kapat("geri-bildirim-mat-parlama.txt");
         return 0;
     });
 

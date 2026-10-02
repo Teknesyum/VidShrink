@@ -174,6 +174,7 @@ public sealed class PaletteApplyTests
                 }
                 finally
                 {
+                    PaletteCatalog.Use(PaletteCatalog.Default);
                     merged.Remove(kurulmamis);
                 }
             }
