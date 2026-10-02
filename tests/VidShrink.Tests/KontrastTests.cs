@@ -49,53 +49,27 @@ public sealed class KontrastTests
         var asama = Environment.GetEnvironmentVariable("UC_ASAMA") ?? "olcum";
         var cekilecek = (Environment.GetEnvironmentVariable("UC_CEK") ?? PaletteCatalog.Default).Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         var cek = klasor != null && (cekilecek.Contains(palet) || cekilecek.Contains("*"));
-        var ayarKlasoru = Path.Combine(TestPaths.OutputRoot, "kontrast", palet);
-        var olcumler = AppHost.Run(() =>
+        var olcumler = PaletteIcinde(palet, hepsi =>
         {
-            var hepsi = new List<Olcum>();
-            var kultur = CultureInfo.CurrentUICulture;
-            var ayar = Environment.GetEnvironmentVariable(TestAyarYolu.Degisken);
-            Directory.CreateDirectory(ayarKlasoru);
-            File.WriteAllText(Path.Combine(ayarKlasoru, "settings.json"), "{\"theme\":\"" + palet + "\",\"language\":\"tr\"}");
-            Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, Path.Combine(ayarKlasoru, "settings.json"));
-            CultureInfo.CurrentUICulture = new CultureInfo("tr");
-            Strings.Use("tr");
-            try
+            foreach (var (ekran, kur) in Ekranlar())
             {
-                Assert.Equal(palet, PaletteCatalog.Use(palet));
-                var adlar = RenkAdlari();
-                foreach (var (ekran, kur) in Ekranlar())
+                var pencere = kur();
+                try
                 {
-                    var pencere = kur();
-                    try
-                    {
-                        Assert.Equal(palet, PaletteCatalog.Current);
-                        var kok = Yerlestir(pencere);
-                        if (cek) Cek(pencere, kok, palet + "-" + ekran, asama, klasor!);
-                        Tara(ekran, "dinlenik", pencere, pencere, hepsi);
-                        ZorlaGoster(pencere);
-                        Yerlestir(pencere);
-                        Tara(ekran, "dinlenik", pencere, pencere, hepsi);
-                        Durumlari(ekran, pencere, hepsi);
-                    }
-                    finally
-                    {
-                        pencere.Close();
-                    }
+                    Assert.Equal(palet, PaletteCatalog.Current);
+                    var kok = Yerlestir(pencere);
+                    if (cek) Cek(pencere, kok, palet + "-" + ekran, asama, klasor!);
+                    Tara(ekran, "dinlenik", pencere, pencere, hepsi);
+                    ZorlaGoster(pencere);
+                    Yerlestir(pencere);
+                    Tara(ekran, "dinlenik", pencere, pencere, hepsi);
+                    Durumlari(ekran, pencere, hepsi);
                 }
-                foreach (var o in hepsi) o.Anahtar = adlar.TryGetValue(o.On, out var ad) ? ad : o.On;
+                finally
+                {
+                    pencere.Close();
+                }
             }
-            finally
-            {
-                Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, ayar);
-                PaletteCatalog.Use(PaletteCatalog.Default);
-                CultureInfo.CurrentUICulture = kultur;
-                Strings.Use("en");
-                try { Directory.Delete(ayarKlasoru, true); }
-                catch (IOException) { }
-                catch (UnauthorizedAccessException) { }
-            }
-            return hepsi;
         });
 
         var tekil = olcumler.GroupBy(o => o.Ekran + "|" + o.Durum + "|" + o.Tur + "|" + o.Yol + "|" + o.On + "|" + o.Zemin).Select(g => g.First()).ToList();
@@ -115,6 +89,84 @@ public sealed class KontrastTests
         Assert.True(bulgular.Count == 0,
             palet + ": " + bulgular.Count + " çift eşiğin altında (" + tekil.Count + " ölçüm)\n" +
             string.Join("\n", bulgular.OrderBy(o => o.Oran).Select(o => o.Ekran + " [" + o.Durum + "] " + o.Tur + " " + o.Anahtar + " " + o.Yol + " \"" + o.Metin + "\": bg " + o.Zemin + " fg " + o.On + " " + o.Oran.ToString("0.00", Inv))));
+    }
+
+    [Theory]
+    [MemberData(nameof(Paletler))]
+    public void MedyaAdiVideoUstundeEsigiGeciyor(string palet)
+    {
+        var olcumler = PaletteIcinde(palet, hepsi =>
+        {
+            var (ekran, kur) = Ekranlar().First();
+            var pencere = kur();
+            try
+            {
+                Yerlestir(pencere);
+                ZorlaGoster(pencere);
+                Yerlestir(pencere);
+                var basliklar = pencere.GetVisualDescendants().OfType<Border>().Where(b => b.Name == "MediaTitle").ToList();
+                Assert.NotEmpty(basliklar);
+                foreach (var baslik in basliklar)
+                {
+                    var sahne = baslik.GetVisualAncestors().OfType<Border>().First(b => b.Name == "Stage");
+                    var yazi = baslik.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "TxtMediaTitle");
+                    var sozde = (IPseudoClasses)baslik.Classes;
+                    foreach (var durum in new[] { "dinlenik", "pointerover", "menude" })
+                    {
+                        if (durum == "pointerover") sozde.Set(":pointerover", true);
+                        if (durum == "menude") baslik.Classes.Add("menude");
+                        Dispatcher.UIThread.RunJobs();
+                        Olc(ekran + "-medyali", durum, yazi, hepsi, false, sahne);
+                        sozde.Set(":pointerover", false);
+                        baslik.Classes.Remove("menude");
+                    }
+                }
+            }
+            finally
+            {
+                pencere.Close();
+            }
+        });
+
+        Assert.NotEmpty(olcumler);
+        var altinda = olcumler.Where(o => o.Oran < YaziEsigi).ToList();
+        Assert.True(altinda.Count == 0,
+            palet + ": medya adı video üstünde eşiğin altında\n" +
+            string.Join("\n", altinda.Select(o => "[" + o.Durum + "] " + o.Anahtar + " " + o.Yol + ": bg " + o.Zemin + " fg " + o.On + " " + o.Oran.ToString("0.00", Inv))));
+    }
+
+    private static List<Olcum> PaletteIcinde(string palet, Action<List<Olcum>> govde)
+    {
+        var ayarKlasoru = Path.Combine(TestPaths.OutputRoot, "kontrast", palet);
+        return AppHost.Run(() =>
+        {
+            var hepsi = new List<Olcum>();
+            var kultur = CultureInfo.CurrentUICulture;
+            var ayar = Environment.GetEnvironmentVariable(TestAyarYolu.Degisken);
+            Directory.CreateDirectory(ayarKlasoru);
+            File.WriteAllText(Path.Combine(ayarKlasoru, "settings.json"), "{\"theme\":\"" + palet + "\",\"language\":\"tr\"}");
+            Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, Path.Combine(ayarKlasoru, "settings.json"));
+            CultureInfo.CurrentUICulture = new CultureInfo("tr");
+            Strings.Use("tr");
+            try
+            {
+                Assert.Equal(palet, PaletteCatalog.Use(palet));
+                var adlar = RenkAdlari();
+                govde(hepsi);
+                foreach (var o in hepsi) o.Anahtar = adlar.TryGetValue(o.On, out var ad) ? ad : o.On;
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, ayar);
+                PaletteCatalog.Use(PaletteCatalog.Default);
+                CultureInfo.CurrentUICulture = kultur;
+                Strings.Use("en");
+                try { Directory.Delete(ayarKlasoru, true); }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
+            }
+            return hepsi;
+        });
     }
 
     private static Dictionary<string, string> RenkAdlari()
@@ -322,7 +374,7 @@ public sealed class KontrastTests
             Olc(ekran, durum, d, hepsi, edilgen);
     }
 
-    private static void Olc(string ekran, string durum, Visual d, List<Olcum> hepsi, bool edilgen)
+    private static void Olc(string ekran, string durum, Visual d, List<Olcum> hepsi, bool edilgen, Visual? video = null)
     {
         if (!Gorunur(d)) return;
         if (!edilgen && d is InputElement ie && !ie.IsEffectivelyEnabled) return;
@@ -361,7 +413,7 @@ public sealed class KontrastTests
         if (on is not ISolidColorBrush fg) return;
         if (Saydamlik(d) < 0.05) return;
         var zincir = new List<Visual>();
-        for (var n = d; n != null; n = n.GetVisualParent()) zincir.Insert(0, n);
+        for (var n = d; n != null && n != video; n = n.GetVisualParent()) zincir.Insert(0, n);
         var dolgular = new List<List<double[]>>();
         foreach (var n in zincir)
         {

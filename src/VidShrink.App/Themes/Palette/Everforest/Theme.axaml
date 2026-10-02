@@ -41,6 +41,7 @@
 
   <Color x:Key="PlaybackScrimColor">#CC272E33</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#00272E33</Color>
+  <Color x:Key="PlaybackTitleScrimColor">#E6272E33</Color>
   <Color x:Key="PauseGlossColor">#FFFAF9F7</Color>
   <Color x:Key="PauseGlossFadeColor">#00FAF9F6</Color>
 

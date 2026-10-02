@@ -15,6 +15,9 @@
       PlaybackBadgeMargin      <- SpaceMd (12)
       PlaybackScrimColor       <- AppBgColor (#050507), %80 örtücülük
       PlaybackScrimEdgeColor   <- aynı renk, sıfır örtücülük: paravanın sönen ucu.
+      PlaybackTitleScrimColor  <- aynı renk, %90 örtücülük: medya adının zemini. Altında video
+                                  karesi durur; %80 en kötü karede (beyaz/siyah) RosePineDawn'da
+                                  5,88:1 veriyordu, %90 36 palette metni 7:1 üstünde tutar.
       PlaybackScrimEdge        <- PlaybackHoverZoneShare (SpaceXs / SpaceLg = 0,25).
                                   T79: paravan artık düz bir örtü değil — alt kenarından
                                   yukarı doğru son çeyreğinde sönüyor. Yeni bir oran
@@ -187,6 +190,7 @@
 
   <x:Double x:Key="PlaybackScrimEdge">0.25</x:Double>
   <SolidColorBrush x:Key="PlaybackScrim" Color="{StaticResource PlaybackScrimColor}"/>
+  <SolidColorBrush x:Key="PlaybackTitleScrim" Color="{StaticResource PlaybackTitleScrimColor}"/>
 
   <!--
     T79/K5: paravanın biçimi. Yonga ve düğme düz perdede kalıyor — oradaki kontrast oranı
@@ -255,7 +259,7 @@
   <x:Double x:Key="PlaybackMediaTitleMaxWidth">640</x:Double>
 
   <ControlTheme x:Key="PlaybackMediaTitle" TargetType="Border">
-    <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
+    <Setter Property="Background" Value="{StaticResource PlaybackTitleScrim}"/>
     <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
