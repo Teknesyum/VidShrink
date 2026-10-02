@@ -26,7 +26,7 @@ internal partial class PlayerView : UserControl
     internal const int HistorySaveTicks = 10;
 
     private readonly ZoomGesture _zoom = new();
-    private readonly FullscreenSwitch _fullscreen = new();
+    private PencereKipi? _kip;
     private readonly StallWatch _stall = new();
     private readonly SeekCoalescer _seek;
     private readonly List<string> _trace = new();
@@ -81,13 +81,21 @@ internal partial class PlayerView : UserControl
         RefreshState();
     }
 
-    internal event EventHandler<WindowSnapshot>? FullscreenChanged;
-
     internal SeekCoalescer Seek => _seek;
 
     internal ZoomGesture Zoom => _zoom;
 
-    internal FullscreenSwitch Fullscreen => _fullscreen;
+    internal PencereKipi Kip
+    {
+        get => _kip ??= new PencereKipi(() => TopLevel.GetTopLevel(this) as Window, _trace.Add);
+        set
+        {
+            _kip = value;
+            value.Yansit ??= _trace.Add;
+        }
+    }
+
+    internal FullscreenSwitch Fullscreen => Kip.Tam;
 
     internal StallWatch Stall => _stall;
 
@@ -148,11 +156,11 @@ internal partial class PlayerView : UserControl
                 break;
             case PlayerCommandKind.ToggleFullscreen:
                 ToggleFullscreen();
-                _trace.Add("fullscreen -> " + _fullscreen.IsFullscreen);
+                _trace.Add("fullscreen -> " + Kip.TamEkran);
                 break;
             case PlayerCommandKind.CompactOrFullscreen:
                 CompactOrFullscreen();
-                _trace.Add("compact -> " + _fullscreen.IsFullscreen);
+                _trace.Add("compact -> " + Kip.TamEkran);
                 break;
             case PlayerCommandKind.ContextMenu:
                 OpenMenu();
@@ -168,8 +176,8 @@ internal partial class PlayerView : UserControl
                 _trace.Add("zoomreset -> " + Saat.Tani.Konum(_zoom.PanelScale));
                 break;
             case PlayerCommandKind.LeaveFullscreen:
-                if (_fullscreen.IsFullscreen) ToggleFullscreen();
-                _trace.Add("leavefullscreen -> " + _fullscreen.IsFullscreen);
+                Kip.Birak();
+                _trace.Add("leavefullscreen -> " + Kip.TamEkran);
                 break;
             case PlayerCommandKind.Volume:
                 _volume = Math.Clamp(_volume + command.Amount, 0, VolumeCeiling());
@@ -499,87 +507,13 @@ internal partial class PlayerView : UserControl
         MenuAtPointer = false;
     }
 
-    internal void ToggleFullscreen()
-    {
-        var window = TopLevel.GetTopLevel(this) as Window;
-        var current = window is null
-            ? new WindowSnapshot(0, 0, 0, 0, 0, CurrentTabIndex())
-            : new WindowSnapshot(
-                (int)window.WindowState,
-                window.Position.X,
-                window.Position.Y,
-                window.Width,
-                window.Height,
-                CurrentTabIndex());
+    internal void ToggleFullscreen() => Kip.TamEkranDegistir();
 
-        var next = _fullscreen.Toggle(current, (int)WindowState.FullScreen, PlayerTabIndex());
+    internal bool IsCompact => Kip.Kucuk;
 
-        if (window is not null)
-        {
-            window.WindowState = (WindowState)next.State;
-            if (next.State != (int)WindowState.FullScreen)
-            {
-                if (_compactMin is { } min && next.Width >= min.Width && next.Height >= min.Height) RestoreWindowMin();
-                window.Position = new PixelPoint((int)next.X, (int)next.Y);
-                window.Width = next.Width;
-                window.Height = next.Height;
-            }
-        }
+    internal void CompactOrFullscreen() => Kip.KucukVeyaTamEkran(VideoAspect);
 
-        SelectTab?.Invoke(next.TabIndex);
-        FullscreenChanged?.Invoke(this, next);
-    }
-
-    private Size? _compactMin;
-
-    internal bool IsCompact => _compactMin is not null;
-
-    internal void CompactOrFullscreen()
-    {
-        if (!_fullscreen.IsFullscreen)
-        {
-            ToggleFullscreen();
-            return;
-        }
-
-        _fullscreen.Leave();
-        var window = TopLevel.GetTopLevel(this) as Window;
-        var snapshot = new WindowSnapshot((int)WindowState.Normal, 0, 0, 0, 0, PlayerTabIndex());
-        if (window is not null)
-        {
-            window.WindowState = WindowState.Normal;
-            var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary;
-            if (screen is not null)
-            {
-                var share = this.TryFindResource("WindowCompactAreaShare", out var value) && value is double d ? d : 1;
-                var area = screen.WorkingArea;
-                var rect = CompactWindow.Fit(area.X, area.Y, area.Width, area.Height, share, VideoAspect);
-                var width = rect.Width / screen.Scaling;
-                var height = rect.Height / screen.Scaling;
-                _compactMin ??= new Size(window.MinWidth, window.MinHeight);
-                window.MinWidth = Math.Min(_compactMin.Value.Width, width);
-                window.MinHeight = Math.Min(_compactMin.Value.Height, height);
-                window.Width = width;
-                window.Height = height;
-                window.Position = new PixelPoint(rect.X, rect.Y);
-                CompactBorder(window, true);
-                snapshot = new WindowSnapshot((int)WindowState.Normal, rect.X, rect.Y, width, height, PlayerTabIndex());
-            }
-        }
-
-        SelectTab?.Invoke(PlayerTabIndex());
-        FullscreenChanged?.Invoke(this, snapshot);
-    }
-
-    internal void RestoreWindowMin()
-    {
-        if (_compactMin is not { } min) return;
-        _compactMin = null;
-        if (TopLevel.GetTopLevel(this) is not Window window) return;
-        CompactBorder(window, false);
-        window.MinWidth = min.Width;
-        window.MinHeight = min.Height;
-    }
+    internal void RestoreWindowMin() => Kip.KucukBitir();
 
     internal void TogglePlay() => TogglePlay(true);
 

@@ -89,6 +89,7 @@ internal partial class EditorView : UserControl
             var rows = Layout.RowDefinitions;
             var splitter = double.IsFinite(PreviewSplitter.Height) ? PreviewSplitter.Height : 0;
             rows[2].MaxHeight = Math.Max(0, availableSize.Height - rows[0].MinHeight - splitter);
+            LowerScroll.MaxHeight = rows[2].MaxHeight;
         }
 
         return base.MeasureOverride(availableSize);

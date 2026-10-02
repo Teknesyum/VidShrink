@@ -50,7 +50,7 @@
       <Border Theme="{StaticResource Panel}" Margin="{StaticResource PageMargin}">
         <StackPanel Spacing="{StaticResource SpaceSm}">
           <WrapPanel x:Name="Strip" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-            <StackPanel x:Name="Toolbar" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+            <WrapPanel x:Name="Toolbar" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
               <TextBox x:Name="TxtSpeed" Width="{StaticResource NumberBoxWidth}" AutomationProperties.Name="{loc:Text editor.speed}"/>
               <Button x:Name="BtnUndo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.undo}"/>
               <Button x:Name="BtnRedo" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.redo}"/>
@@ -64,8 +64,8 @@
               <ToggleButton x:Name="BtnSilence" Theme="{StaticResource EditorToolButton}" AutomationProperties.Name="{loc:Text editor.silence.open}" ToolTip.Tip="{loc:Text editor.silence.open}">
                 <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconVolumeMute}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
               </ToggleButton>
-            </StackPanel>
-            <StackPanel x:Name="DeliveryGroup" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Top">
+            </WrapPanel>
+            <WrapPanel x:Name="DeliveryGroup" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}" VerticalAlignment="Top">
               <Button x:Name="BtnSave" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save}" AutomationProperties.Name="{loc:Text editor.save}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
               <Button x:Name="BtnExport" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.save-as}" AutomationProperties.Name="{loc:Text editor.save-as}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
               <Button x:Name="BtnShare" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.share}" AutomationProperties.Name="{loc:Text main.action.share}" IsEnabled="False" ToolTip.Tip="{loc:Text main.action.shrink.disabled-tip}"/>
@@ -74,7 +74,7 @@
                 <ComboBoxItem Content="{loc:Text editor.export.smart}"/>
                 <ComboBoxItem Content="{loc:Text editor.export.full}"/>
               </ComboBox>
-            </StackPanel>
+            </WrapPanel>
           </WrapPanel>
           <WrapPanel x:Name="TextPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.text.panel}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">

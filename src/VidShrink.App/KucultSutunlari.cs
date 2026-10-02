@@ -29,8 +29,58 @@ public sealed class KucultSutunlari : Grid
 
     public SutunIzgara? Olcut { get; set; }
 
+    /// <summary>Sütunların alt alta dizili olup olmadığı (<c>CompactBreakpointWidth</c> altında).</summary>
+    internal bool Yigili => _sutunlar is not null;
+
+    private int[]? _sutunlar;
+    private double _ortaMin;
+
+    /// <summary>
+    /// Küçük kipte (çalışma alanının üçte biri) üç sütun 200 px'in altına iniyor, başlıklar sözcük
+    /// ortasından bölünüyordu. Yer <c>CompactBreakpointWidth</c>'in altındaysa sütunlar sırasıyla
+    /// alt alta dizilir; orta sütun (önizleme ve plan) görünür yüksekliği en az boy olarak alır.
+    /// </summary>
+    private void Diz(double yer)
+    {
+        var esik = this.TryFindResource("CompactBreakpointWidth", out var deger) && deger is double d ? d : 0;
+        var dar = !double.IsInfinity(yer) && yer < esik;
+        if (dar == Yigili) return;
+
+        if (dar)
+        {
+            _sutunlar = Children.Select(GetColumn).ToArray();
+            ColumnDefinitions = new ColumnDefinitions("*");
+            RowDefinitions = new RowDefinitions(string.Join(",", Children.Select(_ => "Auto")));
+            RowSpacing = ColumnSpacing;
+            for (var i = 0; i < Children.Count; i++)
+            {
+                SetRow(Children[i], _sutunlar[i]);
+                SetColumn(Children[i], 0);
+            }
+            if (Orta is { } orta) _ortaMin = orta.MinHeight;
+            return;
+        }
+
+        var eski = _sutunlar!;
+        _sutunlar = null;
+        RowDefinitions = new RowDefinitions();
+        ColumnDefinitions = new ColumnDefinitions("*,*,*");
+        for (var i = 0; i < Children.Count && i < eski.Length; i++)
+        {
+            SetRow(Children[i], 0);
+            SetColumn(Children[i], eski[i]);
+        }
+        if (Orta is { } ortaSutun) ortaSutun.MinHeight = _ortaMin;
+    }
+
+    private Control? Orta => _sutunlar is { } s ? Children.Where((_, i) => i < s.Length && s[i] == 1).FirstOrDefault()
+        : Children.FirstOrDefault(c => GetColumn(c) == 1);
+
     protected override Size MeasureOverride(Size availableSize)
     {
+        Diz(availableSize.Width);
+        if (Yigili && Orta is { } orta && _kaydirici is { Viewport.Height: > 0 } kaydirici)
+            orta.MinHeight = Math.Max(_ortaMin, kaydirici.Viewport.Height - Margin.Top - Margin.Bottom);
         if (TopLevel.GetTopLevel(this) is Window { Content: Layoutable { Bounds.Width: > 0 } govde } && Bounds.Width > 0)
             _disKabuk = govde.Bounds.Width - Bounds.Width;
         if (ColumnDefinitions.Count == 3)
@@ -63,6 +113,7 @@ public sealed class KucultSutunlari : Grid
     {
         if (e.Property == ScrollViewer.OffsetProperty || e.Property == ScrollViewer.ViewportProperty)
             InvalidateArrange();
+        if (Yigili && e.Property == ScrollViewer.ViewportProperty) InvalidateMeasure();
     }
 
     protected override Size ArrangeOverride(Size finalSize)

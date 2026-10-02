@@ -122,7 +122,7 @@ internal partial class PlayerView
         => this.TryFindResource("PlaybackBadgeMargin", out var value) && value is Thickness edge ? edge.Left : 0;
 
     private bool WindowIsNormal()
-        => !_fullscreen.IsFullscreen
+        => !Kip.TamEkran
            && (TopLevel.GetTopLevel(this) is not Window window || window.WindowState == WindowState.Normal);
 
     private void OnFarePointerMoved(object? sender, PointerEventArgs e)

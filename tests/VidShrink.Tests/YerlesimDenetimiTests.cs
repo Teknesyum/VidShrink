@@ -338,6 +338,34 @@ public sealed class YerlesimDenetimiTests
     public void AraVeBuyukBoyuttaKesikCakismaTasmaYok(string dil, int en, int boy) =>
         Denetle(dil, false, $"-{en}x{boy}", null, zorla: new Size(en, boy));
 
+    /// <summary>
+    /// Orta tuşun küçük kipi (2 Ekim 2026): 1920x1040 çalışma alanının <c>WindowCompactAreaShare</c>
+    /// payı, ekran oranında (<see cref="CompactWindow.Fit(int,int,int,int,double,double)"/>, oynatıcı
+    /// dışındaki sekmeler oransız iner). %100'de 1109x600, %150'de 739x400 mantıksal piksel; pencerenin
+    /// en küçük boyutu küçük kipte olduğu gibi o boyuta indirilir.
+    /// </summary>
+    [Theory]
+    [InlineData("tr", 1.0)]
+    [InlineData("en", 1.0)]
+    [InlineData("tr", 1.5)]
+    [InlineData("en", 1.5)]
+    public void KucukKipteKesikCakismaTasmaYok(string dil, double olcek)
+    {
+        var boyut = KucukKipBoyutu(olcek);
+        Denetle(dil, false, FormattableString.Invariant($"-kucuk-{olcek:0.0#}"), pencere =>
+        {
+            pencere.MinWidth = boyut.Width;
+            pencere.MinHeight = boyut.Height;
+        }, zorla: boyut);
+    }
+
+    internal static Size KucukKipBoyutu(double olcek)
+    {
+        var pay = AppHost.Run(() => (double)Application.Current!.FindResource("WindowCompactAreaShare")!);
+        var r = VidShrink.App.Playback.CompactWindow.Fit(0, 0, 1920, 1040, pay, 0);
+        return new Size(Math.Floor(r.Width / olcek), Math.Floor(r.Height / olcek));
+    }
+
     public static TheoryData<string, int, int> BoyutKollari()
     {
         var kollar = new TheoryData<string, int, int>();

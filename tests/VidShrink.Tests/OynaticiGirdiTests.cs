@@ -704,7 +704,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             Assert.False(once);
             Assert.True(acik);
             Assert.False(kapali);
-            Assert.Equal(new[] { 5, 2 }, secilen);
+            Assert.Empty(secilen);
 
             window.Close();
             return body;
