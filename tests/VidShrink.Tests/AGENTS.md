@@ -140,6 +140,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
 - `UstPanelTests.cs` — oynatıcının tek üst paneli `TopOverlay`: şerit, başlık düğmeleri ve paravan içinde, `chrome-hidden`
   üçünü birden kapatır; paravan 48 px, tetik bandı 48 px, alt paravanın aynası, yalnız oynatıcıda. Başlık düğmeleri ve
   sekmelerde görünür anahat yok; hover/basılı zemin `NeonBlueFill`, yazı `TextBody` (pembe/mavi yazı hiçbir dolguda 36 palette 7:1 tutmuyor). Başsız saat donuk olduğu için `Transitions` kapatılır.
+- `OynaticiMedyaAdiTests.cs` — üst panelin altındaki medya adı (`MediaTitle`): açılınca ad ve ipucunda tam yol, `chrome-hidden` ile gizlenir, dosyasız ve kapanınca yok; ham sağ tık ad menüsünü açar, "Adı kopyala" sahte panoya adı yazar, "Medya bilgisi" panoyu açar; ham sol tık oynatmayı ve `LeftClicks`'i değiştirmez (boş zeminde değiştirir). Ad yazımını silmek 5/7, başlık basış kapısını kapatmak 2/7, `chrome-hidden` stilini kaldırmak 1/7 kırmızı.
 - `OynaticiKisayolTests.cs` — tarifteki her kısayol gerçek girdi olayıyla PlayerView'a verilir, etkisi motordan geri okunur;
   döndürme karenin piksellerinden. Kanıt `.calisma/oynatici-kisayol/`. `CtrlShiftS` kolu artık
   **iddia ettiği koşulun tamamını** bekliyor (açı + genişlik + yükseklik + renk konumu); eskiden

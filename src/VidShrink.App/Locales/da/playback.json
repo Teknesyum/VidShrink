@@ -63,5 +63,6 @@
   "player.menu.edit": "Redigér",
   "player.menu.view": "Billede",
   "player.menu.playback": "Afspilning",
-  "player.menu.loop": "Gentagelse og bogmærker"
+  "player.menu.loop": "Gentagelse og bogmærker",
+  "player.title.copy-name": "Kopiér navn"
 }

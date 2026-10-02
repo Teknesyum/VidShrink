@@ -63,5 +63,6 @@
   "player.menu.edit": "Muokkaa",
   "player.menu.view": "Kuva",
   "player.menu.playback": "Toisto",
-  "player.menu.loop": "Silmukka ja kirjanmerkit"
+  "player.menu.loop": "Silmukka ja kirjanmerkit",
+  "player.title.copy-name": "Kopioi nimi"
 }

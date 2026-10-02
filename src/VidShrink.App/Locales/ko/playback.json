@@ -63,5 +63,6 @@
   "player.menu.edit": "편집",
   "player.menu.view": "화면",
   "player.menu.playback": "재생",
-  "player.menu.loop": "반복 및 책갈피"
+  "player.menu.loop": "반복 및 책갈피",
+  "player.title.copy-name": "이름 복사"
 }

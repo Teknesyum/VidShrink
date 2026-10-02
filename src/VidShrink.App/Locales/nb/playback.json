@@ -63,5 +63,6 @@
   "player.menu.edit": "Rediger",
   "player.menu.view": "Bilde",
   "player.menu.playback": "Avspilling",
-  "player.menu.loop": "Gjentakelse og bokmerker"
+  "player.menu.loop": "Gjentakelse og bokmerker",
+  "player.title.copy-name": "Kopier navn"
 }

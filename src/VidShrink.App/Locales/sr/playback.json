@@ -63,5 +63,6 @@
   "player.menu.edit": "Uredi",
   "player.menu.view": "Слика",
   "player.menu.playback": "Репродукција",
-  "player.menu.loop": "Понављање и обележивачи"
+  "player.menu.loop": "Понављање и обележивачи",
+  "player.title.copy-name": "Копирај назив"
 }

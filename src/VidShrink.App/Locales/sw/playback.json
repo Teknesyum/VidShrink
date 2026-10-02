@@ -63,5 +63,6 @@
   "player.menu.edit": "Hariri",
   "player.menu.view": "Picha",
   "player.menu.playback": "Uchezaji",
-  "player.menu.loop": "Kurudia na alamisho"
+  "player.menu.loop": "Kurudia na alamisho",
+  "player.title.copy-name": "Nakili jina"
 }

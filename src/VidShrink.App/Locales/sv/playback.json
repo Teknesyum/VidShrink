@@ -63,5 +63,6 @@
   "player.menu.edit": "Redigera",
   "player.menu.view": "Bild",
   "player.menu.playback": "Uppspelning",
-  "player.menu.loop": "Upprepning och bokmärken"
+  "player.menu.loop": "Upprepning och bokmärken",
+  "player.title.copy-name": "Kopiera namn"
 }

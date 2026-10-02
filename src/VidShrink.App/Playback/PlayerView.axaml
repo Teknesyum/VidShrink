@@ -7,6 +7,18 @@
              Focusable="True"
              Loaded="OnSeritLoaded">
 
+  <UserControl.Styles>
+    <Style Selector="Border#MediaTitle">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+    <Style Selector="Border#MediaTitle.dolu">
+      <Setter Property="IsVisible" Value="True"/>
+    </Style>
+    <Style Selector="Window.chrome-hidden Border#MediaTitle">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+  </UserControl.Styles>
+
   <!--
     Kesit B: sayfanin tek satiri kaldi. Baslik, ses/altyazi parcasi dugmeleri ve uc nokta
     kalkti; ucunun de karsiligi sag klik menusunde duruyor. Zaman cubugu, denetim seridi ve
@@ -150,6 +162,10 @@
                      TextWrapping="Wrap"
                      IsVisible="False"
                      Foreground="{StaticResource EmberBlaze}"/>
+        </Border>
+
+        <Border x:Name="MediaTitle" Theme="{StaticResource PlaybackMediaTitle}" Classes="reveal">
+          <TextBlock x:Name="TxtMediaTitle" Theme="{StaticResource PlaybackMediaTitleText}"/>
         </Border>
 
         <Canvas x:Name="ThumbLayer" IsHitTestVisible="False">

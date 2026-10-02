@@ -63,5 +63,6 @@
   "player.menu.edit": "Editează",
   "player.menu.view": "Imagine",
   "player.menu.playback": "Redare",
-  "player.menu.loop": "Repetare și marcaje"
+  "player.menu.loop": "Repetare și marcaje",
+  "player.title.copy-name": "Copiază numele"
 }

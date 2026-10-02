@@ -63,5 +63,6 @@
   "player.menu.edit": "Editar",
   "player.menu.view": "Imagen",
   "player.menu.playback": "Reproducción",
-  "player.menu.loop": "Repetición y marcadores"
+  "player.menu.loop": "Repetición y marcadores",
+  "player.title.copy-name": "Copiar nombre"
 }

@@ -63,5 +63,6 @@
   "player.menu.edit": "Bearbeiten",
   "player.menu.view": "Bild",
   "player.menu.playback": "Wiedergabe",
-  "player.menu.loop": "Wiederholung und Lesezeichen"
+  "player.menu.loop": "Wiederholung und Lesezeichen",
+  "player.title.copy-name": "Namen kopieren"
 }

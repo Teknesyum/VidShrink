@@ -63,5 +63,6 @@
   "player.menu.edit": "Redaguoti",
   "player.menu.view": "Vaizdas",
   "player.menu.playback": "Atkūrimas",
-  "player.menu.loop": "Kartojimas ir žymės"
+  "player.menu.loop": "Kartojimas ir žymės",
+  "player.title.copy-name": "Kopijuoti pavadinimą"
 }

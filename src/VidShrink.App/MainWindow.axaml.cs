@@ -846,6 +846,7 @@ public partial class MainWindow : Window
         PointerExited += (_, _) => ChromeZone.PointerGone();
         Tabs.SelectionChanged += (_, _) => ApplyChromeMode();
         Player.PlayingChanged += (_, _) => ApplyChromeMode();
+        Player.MediaTitleMenuChanged += ApplyChromeMode;
         ApplyChromeMode();
     }
 
@@ -870,12 +871,12 @@ public partial class MainWindow : Window
 
     private void ApplyChromeMode()
     {
-        ChromeZone.Hold(!ChromeHidesItself);
+        ChromeZone.Hold(!ChromeHidesItself || Player.MediaTitleMenuOpen);
     }
 
     private void OnChromePointerMoved(object? sender, PointerEventArgs e)
     {
-        ChromeZone.PointerWithin(e.GetPosition(this).Y <= Math.Max(TitleBar.Height, TopRevealZone));
+        ChromeZone.PointerWithin(e.GetPosition(this).Y <= Math.Max(TitleBar.Height, TopRevealZone) || Player.OverMediaTitle(e));
         ApplyChromeMode();
     }
 

@@ -63,5 +63,6 @@
   "player.menu.edit": "עריכה",
   "player.menu.view": "תמונה",
   "player.menu.playback": "הפעלה",
-  "player.menu.loop": "חזרה וסימניות"
+  "player.menu.loop": "חזרה וסימניות",
+  "player.title.copy-name": "העתק שם"
 }

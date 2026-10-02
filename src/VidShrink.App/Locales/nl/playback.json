@@ -63,5 +63,6 @@
   "player.menu.edit": "Bewerken",
   "player.menu.view": "Beeld",
   "player.menu.playback": "Afspelen",
-  "player.menu.loop": "Herhalen en bladwijzers"
+  "player.menu.loop": "Herhalen en bladwijzers",
+  "player.title.copy-name": "Naam kopiëren"
 }
