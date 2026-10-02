@@ -1,5 +1,6 @@
 using Avalonia.Animation;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -137,15 +138,17 @@ public sealed class BelirisCanlandirmaTests
     }
 
     /// <summary>
-    /// İlerleme çubuğu yeni değerine kayarak varır: canlandırmalı pencerede 0 ile 1 arasında
-    /// ara değer okunur, hareketi azaltılmış pencerede değer tek adımda hedefte.
+    /// İlerleme çubuğu yeni değerine kayarak varır: canlandırmalı pencerede 1 atandıktan sonra
+    /// hedefin altında bir değer yayınlanır (ilk vuruş başlangıç değerini yayınlar; yüklü
+    /// koşucuda ikinci vuruş doğrudan sona düşebildiği için 0 da sayılır), hareketi
+    /// azaltılmış pencerede değer tek adımda hedefte kalır.
     /// </summary>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void IlerlemeCubuguDegereKayar(bool azalt)
     {
-        var (ara, son) = AppHost.Run(() =>
+        var (ara, son, ilk) = AppHost.Run(() =>
         {
             Strings.Use("en");
             var pencere = new MainWindow();
@@ -157,17 +160,24 @@ public sealed class BelirisCanlandirmaTests
                 cubuk.Value = 0;
                 Dispatcher.UIThread.RunJobs();
                 KareSayaci.Pompala(pencere, k => k >= 2);
-                cubuk.Value = 1;
                 var ara = 0;
-                void Oku() { if (cubuk.Value > 0.01 && cubuk.Value < 0.99) ara++; }
+                var atandi = false;
+                cubuk.PropertyChanged += (_, e) =>
+                {
+                    if (atandi && e.Property == RangeBase.ValueProperty && cubuk.Value < 0.99) ara++;
+                };
+                cubuk.Value = 1;
+                var ilk = cubuk.Value;
+                atandi = true;
+                void Oku() { if (cubuk.Value < 0.99) ara++; }
                 if (azalt) KareSayaci.Pompala(pencere, k => k >= OlumsuzKare, Oku);
                 else KareSayaci.Pompala(pencere, _ => ara > 0 && cubuk.Value >= 0.9995, Oku);
-                return (ara, cubuk.Value);
+                return (ara, cubuk.Value, ilk);
             }
             finally { pencere.Close(); }
         });
 
-        _output.WriteLine($"azalt={azalt} ara örnek {ara}, son {son:0.###}");
+        _output.WriteLine($"azalt={azalt} ilk {ilk:0.###}, ara örnek {ara}, son {son:0.###}");
         Assert.Equal(1, son, 3);
         if (azalt) Assert.Equal(0, ara);
         else Assert.True(ara > 0, "Çubuk ara değer göstermeden hedefe atladı.");
