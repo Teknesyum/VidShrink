@@ -51,19 +51,22 @@ public sealed class IkonKutusuTests
     private static readonly string[] OptikKaydirilan = ["IconPlay"];
 
     /// <summary>
-    /// Genel kurala girmeyen iki Fluent cizimi. Bu iki ad icin kural gevsetilmiyor,
-    /// <b>sikilastiriliyor</b>: ikisi de kendi olculen sinir kutusuyla 0.02 icinde pimleniyor,
-    /// yani kaydirilan ya da baska bir dosyadan gelen bir govde bu ikisinde de kirmizi doner.
+    /// Genel kurala girmeyen Fluent cizimleri. Bu adlar icin kural gevsetilmiyor,
+    /// <b>sikilastiriliyor</b>: hepsi kendi olculen sinir kutusuyla 0.02 icinde pimleniyor,
+    /// yani kaydirilan ya da baska bir dosyadan gelen bir govde bunlarda kirmizi doner.
     /// Cumle yalniz bu tabloyu anlatir; genel kenar payi kuralinin toleransi ayri bir konu ve
     /// o gercekten gevsedi — sinif aciklamasindaki olcume bak.
     /// <list type="bullet">
-    /// <item><c>IconSpeed</c> — gosterge kutlesi merkezin ustunde (cy 11.00).</item>
+    /// <item><c>IconSpeedFast</c>, <c>IconSpeedSlow</c> — Fluent Top Speed kadrani, gosterge kutlesi merkezin ustunde (cy 11.00); ibre turetildi.</item>
+    /// <item><c>IconSpeedFastTip</c> — hizli ibrenin turuncu ucu, yalniz IconSpeedFast'in ustune bindirilir; kendi basina ortalanmaz.</item>
     /// <item><c>IconCoffee</c> — kulp sagda 2 birimlik kenar payini tasiyor (sag kenar 23.00).</item>
     /// </list>
     /// </summary>
     private static readonly Dictionary<string, (double Left, double Top, double Right, double Bottom)> Istisna = new()
     {
-        ["IconSpeed"] = (2.00, 2.00, 22.00, 20.00),
+        ["IconSpeedFast"] = (2.00, 2.00, 22.00, 20.00),
+        ["IconSpeedFastTip"] = (14.37, 7.80, 18.47, 11.39),
+        ["IconSpeedSlow"] = (2.00, 2.00, 22.00, 20.00),
         ["IconCoffee"] = (3.00, 2.00, 23.00, 22.00)
     };
 

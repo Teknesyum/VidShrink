@@ -11,7 +11,7 @@ Sayı hiçbir yerde sabit yazılı değil. `docs/danisma/2026-09-17-fable-kararl
 diyor; o, 13 Eylül ölçümünün sayısıdır. Takım Fluent'e taşınırken `IconRestore` eklenmiş (27),
 ardından kullanılmayan iki geometri düşürülmüştü; 18 Eylül 2026'da uyarı durumu için
 `IconWarning` eklendi (26); 27 Eylül 2026'da Teknesyum düğmesi simgesiz kalınca `IconCode`
-düştü; 27 Eylül 2026'da düzenleyici sekmesi için `IconEditor` eklendi; 28 Eylül 2026'da bölge düzenleyicinin kare al ve çerçeveyi gizle düğmeleri için `IconCamera` ile `IconEyeOff` eklendi — bugün depoda **28** yol var. `IconsTests` bu
+düştü; 27 Eylül 2026'da düzenleyici sekmesi için `IconEditor` eklendi; 28 Eylül 2026'da bölge düzenleyicinin kare al ve çerçeveyi gizle düğmeleri için `IconCamera` ile `IconEyeOff` eklendi; 2 Ekim 2026'da oynatıcının hız A/B harfi göstergeye dönünce `IconSpeed` yerini `IconSpeedFast`, `IconSpeedFastTip` ve `IconSpeedSlow`'a bıraktı (kadran Fluent Top Speed, ibre türetildi; kadranın sol üst çentiği yavaş ibreye çarpmasın diye düştü) — bugün depoda **30** yol var. `IconsTests` bu
 tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan düşen her anahtar
 ölçüyü kırar.
 
@@ -30,32 +30,35 @@ tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan d
 | 11 | IconFastForward | `Fast Forward` | `ic_fluent_fast_forward_24_filled.svg` | Filled / 24 px | İleri sar |
 | 12 | IconVolume | `Speaker 2` | `ic_fluent_speaker_2_24_filled.svg` | Filled / 24 px | Ses açık |
 | 13 | IconVolumeMute | `Speaker Mute` | `ic_fluent_speaker_mute_24_filled.svg` | Filled / 24 px | Ses kapalı |
-| 14 | IconSpeed | `Top Speed` | `ic_fluent_top_speed_24_filled.svg` | Filled / 24 px | Hız |
-| 15 | IconFullScreen | `Full Screen Maximize` | `ic_fluent_full_screen_maximize_24_filled.svg` | Filled / 24 px | Tam ekran |
-| 16 | IconChevronDown | `Chevron Down` | `ic_fluent_chevron_down_24_filled.svg` | Filled / 24 px | Açılır başlık (kapalı) |
-| 17 | IconChevronUp | `Chevron Up` | `ic_fluent_chevron_up_24_filled.svg` | Filled / 24 px | Açılır başlık (açık) |
-| 18 | IconStop | `Stop` | `ic_fluent_stop_24_filled.svg` | Filled / 24 px | Kaydı durdur |
-| 19 | IconRestart | `Previous` | `ic_fluent_previous_24_filled.svg` | Filled / 24 px | Başa dön |
-| 20 | IconClose | `Dismiss` | `ic_fluent_dismiss_24_filled.svg` | Filled / 24 px | Pencere kapat |
-| 21 | IconMaximize | `Maximize` | `ic_fluent_maximize_24_filled.svg` | Filled / 24 px | Pencere büyüt |
-| 22 | IconMinimize | `Subtract` | `ic_fluent_subtract_24_filled.svg` | Filled / 24 px | Pencere küçült |
-| 23 | IconRestore | `Square Multiple` | `ic_fluent_square_multiple_24_filled.svg` | Filled / 24 px | Pencere geri al |
-| 24 | IconCoffee | `Drink Coffee` | `ic_fluent_drink_coffee_24_filled.svg` | Filled / 24 px | Bağış bağlantısı |
-| 25 | IconWarning | `Warning` | `ic_fluent_warning_24_filled.svg` | Filled / 24 px | Uyarı durumu (`StatusWarning`) |
-| 26 | IconEditor | `Cut` | `ic_fluent_cut_24_filled.svg` | Filled / 24 px | Düzenleyici sekmesi |
-| 27 | IconCamera | `Camera` | `ic_fluent_camera_24_filled.svg` | Filled / 24 px | Bölge düzenleyicide kare al |
-| 28 | IconEyeOff | `Eye Off` | `ic_fluent_eye_off_24_filled.svg` | Filled / 24 px | Bölge düzenleyicide çerçeveyi gizle |
+| 14 | IconSpeedFast | `Top Speed` | `ic_fluent_top_speed_24_filled.svg` | Filled / 24 px | Hızlı kip (kadran Fluent, ibre türetildi: sağa 60°) |
+| 15 | IconSpeedFastTip | `Top Speed` | `ic_fluent_top_speed_24_filled.svg` | Filled / 24 px | Hızlı ibrenin turuncu ucu (`EmberFlame`), IconSpeedFast üstüne bindirilir |
+| 16 | IconSpeedSlow | `Top Speed` | `ic_fluent_top_speed_24_filled.svg` | Filled / 24 px | Yavaş kip (kadran Fluent, ibre türetildi: sola 60°) |
+| 17 | IconFullScreen | `Full Screen Maximize` | `ic_fluent_full_screen_maximize_24_filled.svg` | Filled / 24 px | Tam ekran |
+| 18 | IconChevronDown | `Chevron Down` | `ic_fluent_chevron_down_24_filled.svg` | Filled / 24 px | Açılır başlık (kapalı) |
+| 19 | IconChevronUp | `Chevron Up` | `ic_fluent_chevron_up_24_filled.svg` | Filled / 24 px | Açılır başlık (açık) |
+| 20 | IconStop | `Stop` | `ic_fluent_stop_24_filled.svg` | Filled / 24 px | Kaydı durdur |
+| 21 | IconRestart | `Previous` | `ic_fluent_previous_24_filled.svg` | Filled / 24 px | Başa dön |
+| 22 | IconClose | `Dismiss` | `ic_fluent_dismiss_24_filled.svg` | Filled / 24 px | Pencere kapat |
+| 23 | IconMaximize | `Maximize` | `ic_fluent_maximize_24_filled.svg` | Filled / 24 px | Pencere büyüt |
+| 24 | IconMinimize | `Subtract` | `ic_fluent_subtract_24_filled.svg` | Filled / 24 px | Pencere küçült |
+| 25 | IconRestore | `Square Multiple` | `ic_fluent_square_multiple_24_filled.svg` | Filled / 24 px | Pencere geri al |
+| 26 | IconCoffee | `Drink Coffee` | `ic_fluent_drink_coffee_24_filled.svg` | Filled / 24 px | Bağış bağlantısı |
+| 27 | IconWarning | `Warning` | `ic_fluent_warning_24_filled.svg` | Filled / 24 px | Uyarı durumu (`StatusWarning`) |
+| 28 | IconEditor | `Cut` | `ic_fluent_cut_24_filled.svg` | Filled / 24 px | Düzenleyici sekmesi |
+| 29 | IconCamera | `Camera` | `ic_fluent_camera_24_filled.svg` | Filled / 24 px | Bölge düzenleyicide kare al |
+| 30 | IconEyeOff | `Eye Off` | `ic_fluent_eye_off_24_filled.svg` | Filled / 24 px | Bölge düzenleyicide çerçeveyi gizle |
 
 ## Ölçülen Sınır Kutuları
 
 Sabitleyici çıkarıldıktan sonra `Geometry.Parse(...).Bounds` ile okunan değerler
-`IkonKutusuTests` içinde pimli. Fluent'in kendi çiziminden gelen üç istisna var:
+`IkonKutusuTests` içinde pimli. Fluent'in kendi çiziminden gelen ya da ondan türetilen beş istisna var:
 
 - `IconPlay` — üçgen optik olarak sağa kaydırılmış (cx 13,43).
-- `IconSpeed` — gösterge kütlesi merkezin üstünde (cy 11,00).
+- `IconSpeedFast`, `IconSpeedSlow` — gösterge kütlesi merkezin üstünde (cy 11,00).
+- `IconSpeedFastTip` — yalnız hızlı ibrenin ucu (x 14,37–18,47, y 7,80–11,39); tek başına çizilmez, `IconSpeedFast`'in üstüne bindirilir.
 - `IconCoffee` — kulp sağda 2 birimlik kenar payını taşıyor (sağ kenar 23,00).
 
-Bu üçü ayrı ayrı, ölçülen kutularıyla pimlendi; kalan 25 simge genel kurala (mürekkep
+Bu beşi ayrı ayrı, ölçülen kutularıyla pimlendi; kalan 25 simge genel kurala (mürekkep
 2–22 aralığında, merkez 12±0,55) uyuyor.
 
 ## Kaldırılan Geometriler (18 Eylül 2026)

@@ -229,7 +229,7 @@ public sealed class LanguageTests : IDisposable
         "IconPlayer", "IconShrink", "IconConvert", "IconRecorder", "IconAdvanced",
         "IconAbout", "IconSettings",
         "IconPlay", "IconPause", "IconRewind", "IconFastForward",
-        "IconVolume", "IconVolumeMute", "IconSpeed", "IconFullScreen",
+        "IconVolume", "IconVolumeMute", "IconSpeedFast", "IconSpeedFastTip", "IconSpeedSlow", "IconFullScreen",
         "IconChevronDown", "IconChevronUp", "IconStop", "IconRestart",
         "IconClose", "IconMaximize", "IconMinimize", "IconRestore",
         "IconCoffee", "IconWarning", "IconEditor", "IconCamera", "IconEyeOff"

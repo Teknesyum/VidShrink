@@ -232,4 +232,182 @@ public sealed class OynaticiGostergeTests
         Assert.True(sol < genislik / 4.0, $"rozet solda degil: x {sol}");
         Assert.True(ust < 100, $"rozet ustte degil: y {ust}");
     }
+
+    private sealed record HizSimgesi(bool Hizli, bool UcGorunur, string Ad, bool SeritHizli, bool SeritUc, bool? Isaretli, bool GlifGorunur, string Metin);
+
+    private static HizSimgesi Oku(PlayerView view)
+    {
+        var hizliVeri = view.FindResource("IconSpeedFast");
+        var yavasVeri = view.FindResource("IconSpeedSlow");
+        var govde = view.FindControl<Avalonia.Controls.Shapes.Path>("GlyphOsdSpeed")!;
+        var seritGovde = view.FindControl<Avalonia.Controls.Shapes.Path>("GlyphSeritSpeed")!;
+        Assert.True(ReferenceEquals(govde.Data, hizliVeri) || ReferenceEquals(govde.Data, yavasVeri), "rozet hiz simgesi tanidik degil");
+        Assert.True(ReferenceEquals(seritGovde.Data, hizliVeri) || ReferenceEquals(seritGovde.Data, yavasVeri), "serit hiz simgesi tanidik degil");
+        return new HizSimgesi(
+            ReferenceEquals(govde.Data, hizliVeri),
+            view.FindControl<Avalonia.Controls.Shapes.Path>("GlyphOsdSpeedTip")!.IsVisible,
+            AutomationProperties.GetName(view.FindControl<Grid>("OsdSpeedGlyph")!) ?? "",
+            ReferenceEquals(seritGovde.Data, hizliVeri),
+            view.FindControl<Avalonia.Controls.Shapes.Path>("GlyphSeritSpeedTip")!.IsVisible,
+            view.FindControl<Avalonia.Controls.Primitives.ToggleButton>("BtnSeritSpeedAb")!.IsChecked,
+            view.FindControl<Grid>("OsdSpeedGlyph")!.IsVisible,
+            view.OsdText ?? "");
+    }
+
+    private static void AKipineDon(PlayerView view)
+    {
+        view.Settings.SpeedA = PlayerSettings.DefaultSpeedA;
+        view.Settings.SpeedB = PlayerSettings.DefaultSpeedB;
+        if (view.SpeedModeB) view.Apply(new PlayerCommand(PlayerCommandKind.SpeedAb, 0));
+        view.Apply(new PlayerCommand(PlayerCommandKind.SpeedReset, 0));
+    }
+
+    [Fact]
+    public void HizliKipHizliSimgeYavasKipYavasSimgeGosterir()
+    {
+        var (yavas, hizli) = AppHost.Run(() =>
+        {
+            var (view, window) = Ac("tr");
+            AKipineDon(view);
+            KareSayaci.Pompala(window, k => k >= 1);
+            var a = Oku(view);
+            view.Apply(new PlayerCommand(PlayerCommandKind.SpeedAb, 0));
+            KareSayaci.Pompala(window, k => k >= 1);
+            var b = Oku(view);
+            Kapat(view, window);
+            return (a, b);
+        });
+
+        Assert.Equal(new HizSimgesi(false, false, "Yavaş", false, false, false, true, "Hız 1×"), yavas);
+        Assert.Equal(new HizSimgesi(true, true, "Hızlı", true, true, true, true, "Hız 1,8×"), hizli);
+    }
+
+    [Fact]
+    public void HizliYavasiGecinceSimgelerinSahibiDegisir()
+    {
+        var (aYavas, aHizli, bYavas, bHizli) = AppHost.Run(() =>
+        {
+            var (view, window) = Ac("tr");
+            AKipineDon(view);
+            var ilk = Oku(view);
+            view.Apply(new PlayerCommand(PlayerCommandKind.Speed, 1.0));
+            var gecti = Oku(view);
+            view.Apply(new PlayerCommand(PlayerCommandKind.SpeedAb, 0));
+            var bYavasKip = Oku(view);
+            view.Apply(new PlayerCommand(PlayerCommandKind.Speed, 0.5));
+            var bGecti = Oku(view);
+            Kapat(view, window);
+            return (ilk, gecti, bYavasKip, bGecti);
+        });
+
+        Assert.False(aYavas.Hizli);
+        Assert.Equal("Hız 1×", aYavas.Metin);
+        Assert.True(aHizli.Hizli, "A kipi 2× olunca B'nin 1,8×'ini gecti, hizli simge onda olmali");
+        Assert.True(aHizli.UcGorunur);
+        Assert.Equal("Hız 2×", aHizli.Metin);
+        Assert.False(bYavas.Hizli, "B kipi 1,8× iken A 2×: B yavas simgeyi almali");
+        Assert.False(bYavas.UcGorunur);
+        Assert.False(bYavas.SeritHizli);
+        Assert.False(bYavas.Isaretli);
+        Assert.Equal("Hız 1,8×", bYavas.Metin);
+        Assert.True(bHizli.Hizli, "B kipi 2,3× olunca A'nin 2×'ini gecti");
+        Assert.True(bHizli.Isaretli);
+        Assert.Equal("Hız 2,3×", bHizli.Metin);
+    }
+
+    [Theory]
+    [InlineData(1.8, 1.0, true)]
+    [InlineData(1.0, 1.8, false)]
+    [InlineData(1.5, 1.5, true)]
+    [InlineData(1.0, 1.0, false)]
+    [InlineData(0.75, 0.75, false)]
+    public void EsitlikteBireGoreKararVerilir(double etkin, double diger, bool beklenen)
+        => Assert.Equal(beklenen, PlayerView.HizliMi(etkin, diger));
+
+    [Fact]
+    public void HizGostergesindeAyaBHarfiYok()
+    {
+        var yazilar = AppHost.Run(() =>
+        {
+            var (view, window) = Ac("tr");
+            var liste = new List<string>();
+            foreach (var adim in new[] { 0, 1 })
+            {
+                view.Apply(new PlayerCommand(PlayerCommandKind.SpeedAb, 0));
+                KareSayaci.Pompala(window, k => k >= 1);
+                foreach (var kok in new Control[] { Rozet(view), view.FindControl<Control>("BtnSeritSpeedAb")! })
+                    liste.AddRange(Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(kok).OfType<TextBlock>()
+                        .Where(t => t.IsEffectivelyVisible).Select(t => t.Text ?? ""));
+            }
+
+            Kapat(view, window);
+            return liste;
+        });
+
+        Assert.Contains("Hız 1,8×", yazilar);
+        Assert.DoesNotContain(yazilar, t => t.Trim() is "A" or "B");
+    }
+
+    [Fact]
+    public void HizliIbreninUcuTuruncuCizilir()
+    {
+        var (beklenen, hizliUc, yavasAyniYer) = AppHost.Run(() =>
+        {
+            var (view, window) = Ac("tr");
+            AKipineDon(view);
+            var renk = view.FindResource("EmberFlameColor") is Avalonia.Media.Color c ? c : throw new InvalidOperationException("EmberFlameColor yok");
+            var klasor = Path.Combine(TipSources.Root, ".calisma", "worktree-agent-a4c1b6704a933cfea");
+            Directory.CreateDirectory(klasor);
+
+            view.Apply(new PlayerCommand(PlayerCommandKind.SpeedAb, 0));
+            KareSayaci.Pompala(window, _ => Rozet(view).Opacity >= 0.999);
+            Kaydet(window, Path.Combine(klasor, "osd-hiz-hizli.png"));
+            var hizli = UcPikseli(view, Path.Combine(klasor, "osd-hiz-hizli-glif.png"));
+
+            view.Apply(new PlayerCommand(PlayerCommandKind.SpeedAb, 0));
+            KareSayaci.Pompala(window, _ => Rozet(view).Opacity >= 0.999);
+            Kaydet(window, Path.Combine(klasor, "osd-hiz-yavas.png"));
+            var yavas = UcPikseli(view, Path.Combine(klasor, "osd-hiz-yavas-glif.png"));
+
+            Kapat(view, window);
+            return (renk, hizli, yavas);
+        });
+
+        Assert.True(Yakin(beklenen, hizliUc), $"hizli ibrenin ucu {hizliUc}, beklenen EmberFlameColor {beklenen}");
+        Assert.False(Yakin(beklenen, yavasAyniYer), $"yavas kipte ayni yerde turuncu var: {yavasAyniYer}");
+    }
+
+    private static bool Yakin(Avalonia.Media.Color a, Avalonia.Media.Color b)
+        => b.A >= 250 && Math.Abs(a.R - b.R) <= 8 && Math.Abs(a.G - b.G) <= 8 && Math.Abs(a.B - b.B) <= 8;
+
+    private static void Kaydet(Window window, string dosya)
+    {
+        using var kare = new RenderTargetBitmap(new PixelSize((int)window.Bounds.Width, (int)window.Bounds.Height), new Vector(96, 96));
+        kare.Render(window);
+        kare.Save(dosya, PngBitmapEncoderOptions.Default);
+    }
+
+    private static Avalonia.Media.Color UcPikseli(PlayerView view, string dosya)
+    {
+        const int Olcek = 4;
+        var glif = view.FindControl<Grid>("OsdSpeedGlyph")!;
+        var w = (int)Math.Ceiling(glif.Bounds.Width * Olcek);
+        var h = (int)Math.Ceiling(glif.Bounds.Height * Olcek);
+        var pikseller = new byte[w * h * 4];
+        using (var kare = new RenderTargetBitmap(new PixelSize(w, h), new Vector(96 * Olcek, 96 * Olcek)))
+        {
+            kare.Render(glif);
+            kare.Save(dosya, PngBitmapEncoderOptions.Default);
+            var tutamak = System.Runtime.InteropServices.GCHandle.Alloc(pikseller, System.Runtime.InteropServices.GCHandleType.Pinned);
+            try { kare.CopyPixels(new PixelRect(0, 0, w, h), tutamak.AddrOfPinnedObject(), pikseller.Length, w * 4); }
+            finally { tutamak.Free(); }
+        }
+
+        var k = glif.Bounds.Width / 24 * Olcek;
+        var aci = 60 * Math.PI / 180;
+        var x = (int)Math.Round((12 + 5.2 * Math.Sin(aci)) * k);
+        var y = (int)Math.Round((12 - 5.2 * Math.Cos(aci)) * k);
+        var i = (y * w + x) * 4;
+        return Avalonia.Media.Color.FromArgb(pikseller[i + 3], pikseller[i + 2], pikseller[i + 1], pikseller[i]);
+    }
 }
