@@ -99,7 +99,8 @@ public sealed class ThemeTokenTests
         {
             "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor",
             "EmberDeepColor", "EmberMidColor", "EmberEdgeColor",
-            "EmberBarDeepColor", "EmberBarMidColor", "EmberBarEdgeColor"
+            "EmberBarDeepColor", "EmberBarMidColor", "EmberBarEdgeColor",
+            "EmberFlameGlyphColor"
         };
 
         Assert.Empty(emberTokens.Except(known));

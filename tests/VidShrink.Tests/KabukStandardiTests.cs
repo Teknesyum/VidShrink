@@ -208,7 +208,7 @@ public sealed class KabukStandardiTests
         }
 
         var ana = File.ReadAllText(Path.Combine(AppRoot, "MainWindow.axaml.cs"));
-        var ciftTik = ana.IndexOf("e.ClickCount == 2", StringComparison.Ordinal);
+        var ciftTik = ana.IndexOf("e.ClickCount % 2 == 0", StringComparison.Ordinal);
         if (ciftTik < 0) eksikler.Add("MainWindow.axaml.cs: cift tik kolu yok");
         else if (ana.IndexOf("ToggleMaximizeRestore()", ciftTik, StringComparison.Ordinal) < 0)
             eksikler.Add("MainWindow.axaml.cs: cift tik buyutme/geri alma cagirmiyor");
