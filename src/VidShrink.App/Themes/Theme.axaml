@@ -47,7 +47,7 @@
 
   <LinearGradientBrush x:Key="PauseGlyphGloss" StartPoint="50%,0%" EndPoint="50%,100%" Opacity="{StaticResource PauseGlyphGlossOpacity}">
     <GradientStop Color="{StaticResource PauseGlossColor}" Offset="0"/>
-    <GradientStop Color="Transparent" Offset="{StaticResource PauseGlyphGlossReach}"/>
+    <GradientStop Color="{StaticResource PauseGlossFadeColor}" Offset="{StaticResource PauseGlyphGlossReach}"/>
   </LinearGradientBrush>
   <SolidColorBrush x:Key="PanelSurface"
                    Color="{StaticResource SurfaceColor}"

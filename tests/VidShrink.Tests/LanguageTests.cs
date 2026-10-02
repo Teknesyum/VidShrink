@@ -225,7 +225,7 @@ public sealed class LanguageTests : IDisposable
         "GlowBlue", "GlowPink", "GlowPurple",
         "LinkGitHub", "LinkRepo", "LinkSponsor", "AppIconUri",
         "PlaybackMaximizeIcon", "PlaybackFullScreenIcon",
-        "PlaybackScrimColor", "PlaybackScrimEdgeColor", "PauseGlossColor",
+        "PlaybackScrimColor", "PlaybackScrimEdgeColor", "PauseGlossColor", "PauseGlossFadeColor",
         "IconPlayer", "IconShrink", "IconConvert", "IconRecorder", "IconAdvanced",
         "IconAbout", "IconSettings",
         "IconPlay", "IconPause", "IconRewind", "IconFastForward",

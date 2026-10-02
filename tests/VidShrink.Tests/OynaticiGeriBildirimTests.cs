@@ -180,12 +180,18 @@ public sealed class OynaticiGeriBildirimTests
 
         (int X, int Ust, int Alt) Olc(Rect govde, (int W, int H, byte[] Px) bos, out double fark, out double altFark)
         {
-            Goster();
-            var var = Ciz(window);
+            (int W, int H, byte[] Px) var = default, yok = default;
+            for (var deneme = 0; deneme < 8; deneme++)
+            {
+                Goster();
+                var = Ciz(window);
+                parlama.IsVisible = false;
+                yok = Ciz(window);
+                parlama.IsVisible = true;
+                if (simge.IsVisible && simge.Opacity >= hedef - 0.01) break;
+            }
+
             var kol = GovdeSutunu(var, bos, govde);
-            parlama.IsVisible = false;
-            var yok = Ciz(window);
-            parlama.IsVisible = true;
             fark = kol.X < 0 ? 0 : Parla(var, kol.X, kol.Ust) - Parla(yok, kol.X, kol.Ust);
             altFark = kol.X < 0 ? 0 : Math.Abs(Parla(var, kol.X, kol.Alt) - Parla(yok, kol.X, kol.Alt));
             return kol;

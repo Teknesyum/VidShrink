@@ -41,6 +41,7 @@
   <Color x:Key="PlaybackScrimColor">#CC1C1E26</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#001C1E26</Color>
   <Color x:Key="PauseGlossColor">#FFE4E6E8</Color>
+  <Color x:Key="PauseGlossFadeColor">#00E4E6E7</Color>
 
   <BoxShadows x:Key="GlowBlue">0 0 20 0 #4068D8E1</BoxShadows>
   <BoxShadows x:Key="GlowPink">0 0 20 0 #40FAB795</BoxShadows>
