@@ -1323,7 +1323,7 @@
                 <Border Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <TextBlock Text="{loc:Text main.convert.command}" Theme="{StaticResource H2}"/>
-                    <TextBox x:Name="TxtConvertCommand" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="2" MaxLines="6"/>
+                    <TextBox x:Name="TxtConvertCommand" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="2"/>
                     <TextBlock x:Name="TxtConvertValidation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </StackPanel>
                 </Border>

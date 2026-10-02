@@ -169,6 +169,7 @@ internal partial class PlayerView
             if (e.Property == SeritSpreadProperty) ApplySeritMask();
         };
 
+        StripRow.SizeChanged += (_, e) => { if (e.WidthChanged) SeritDuzeni(e.NewSize.Width); };
         StripBar.PointerEntered += (_, _) => { _pointerOnSerit = true; HoldSerit(); };
         StripBar.PointerExited += (_, _) => { _pointerOnSerit = false; HoldSerit(); };
         Surface.PointerMoved += OnSeritPointer;

@@ -218,6 +218,7 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, OnDrop);
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         TrackBackgroundDrag();
+        TrackWindowMode();
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
         SizeChanged += (_, _) => AlignTabsToTitle();
         TitleBarRight.SizeChanged += (_, _) => AlignTabsToTitle();
@@ -235,7 +236,6 @@ public partial class MainWindow : Window
         Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
         Tabs.SelectionChanged += (_, _) => KaydediciSekmesiSecildi();
         Tabs.SelectionChanged += (_, _) => DuzenleyiciSekmesiSecildi();
-        Tabs.SelectionChanged += (_, _) => { if (Tabs.SelectedIndex != PlayerTabIndex) Player.RestoreWindowMin(); };
 
 
         if (OperatingSystem.IsMacOS())
@@ -693,7 +693,12 @@ public partial class MainWindow : Window
             else ClearValue(WindowDecorationsThemeProperty);
         }
         if (!_controlsReady) return;
-        if (change.Property == WindowStateProperty) { UpdateMaximizeGlyph(); ApplyWindowFrame(); }
+        if (change.Property == WindowStateProperty)
+        {
+            if (WindowState == WindowState.Maximized) Kip.KucukBitir();
+            UpdateMaximizeGlyph();
+            ApplyWindowFrame();
+        }
         else if (change.Property == OffScreenMarginProperty) WindowShell.Margin = OffScreenMargin;
     }
 
@@ -727,6 +732,9 @@ public partial class MainWindow : Window
     /// <c>SizeChanged</c> cagrisi sinifi yeni, genisligi eski haliyle okuyordu; simgesiz
     /// genislik simgeli sanilinca kademe 3'e dusuyor, sonraki cagri 4'e geri aliyordu.
     /// 1024 ekranli CI kosucusunda el 1152'de son sekme sag gruba 7 px kaliyordu.</para>
+    /// <para>Simgesiz sekmeler de sigmazsa (kucuk kip, 1920 alanin ucte biri %150'de 738 px)
+    /// marka yazisi cekilir ve sekmeler sol kenara yaslanir (kademe 5). Marka genisligi her
+    /// turda gizliyken de olculur, yoksa gizlenen marka sol payi sifirlayip kademeyi geri aliyordu.</para>
     /// <para>Son sekme ile sag grup arasinda en az <c>SpaceLg</c> kalir; hesap yalniz
     /// ortusmeyi onluyordu ve el 1136'da son sekme pencere dugmelerine yaklasik 10 px
     /// yaklasiyordu.</para>
@@ -738,23 +746,33 @@ public partial class MainWindow : Window
         try
         {
             var gap = TitleBarContent.ColumnSpacing;
-            var sol = TitleBarContent.Margin.Left + TitleBrand.Bounds.Width + gap;
-            Tabs.Padding = new Thickness(sol, 0, 0, 0);
+            TitleBrand.IsVisible = true;
+            TitleBrand.Measure(Size.Infinity);
+            var marka = TitleBrand.DesiredSize.Width + gap;
+            var sol = TitleBarContent.Margin.Left + marka;
 
             var serit = Tabs.GetVisualDescendants().OfType<ItemsPresenter>().FirstOrDefault()?.Bounds.Width ?? 0;
-            if (serit <= 0 || TitleBarLayer.Bounds.Width <= 0) return;
+            if (serit <= 0 || TitleBarLayer.Bounds.Width <= 0)
+            {
+                Tabs.Padding = new Thickness(sol, 0, 0, 0);
+                return;
+            }
 
             var enAz = this.TryFindResource("SpaceLg", out var pay) && pay is double d ? d : 0;
             var ikon = this.TryFindResource("IconSizeSm", out var boy) && boy is double b ? b : 0;
             var ara = this.TryFindResource("SpaceSm", out var bosluk) && bosluk is double a ? a : 0;
-            var tamSerit = serit + Tabs.Items.OfType<TabItem>().Count(t => t.IsVisible && SimgesizDizildi(t, ikon)) * (ikon + ara);
+            var sekmeler = Tabs.Items.OfType<TabItem>().Where(t => t.IsVisible).ToList();
+            var tamSerit = serit + sekmeler.Count(t => SimgesizDizildi(t, ikon)) * (ikon + ara);
             var bos = TitleBarLayer.Bounds.Width - sol - tamSerit - TitleBarContent.Margin.Right - enAz;
-            var kademe = TitleBarStage(bos);
+            var kademe = TitleBarStage(bos, out var sagEnAz);
+            if (kademe > 3 && sagEnAz > bos + sekmeler.Count * (ikon + ara)) kademe = 5;
             BtnSponsor.IsVisible = kademe < 1;
             BtnGitHub.IsVisible = kademe < 1;
             TxtUpdateBadge.IsVisible = kademe < 2;
             LangSwitch.IsVisible = kademe < 3;
             Tabs.Classes.Set("compact", kademe > 3);
+            TitleBrand.IsVisible = kademe < 5;
+            Tabs.Padding = new Thickness(kademe < 5 ? sol : TitleBarContent.Margin.Left, 0, 0, 0);
             InvalidateTitleBarRight();
         }
         finally
@@ -777,9 +795,9 @@ public partial class MainWindow : Window
     /// <summary>
     /// Sag grubun kacinci kademede sigdigi: 0 hepsi, 1 baglar cekilmis, 2 rozet yazisi da,
     /// 3 dil dugmeleri de, 4 o da yetmiyor ve sekmeler simgesiz. Parcalar olcum icin gecici olarak aciliyor; ayni cagride geri
-    /// kapandigi icin ekrana hic cizilmiyorlar.
+    /// kapandigi icin ekrana hic cizilmiyorlar. <paramref name="enAz"/> her sey cekilmisken sag grubun genisligi.
     /// </summary>
-    private int TitleBarStage(double bos)
+    private int TitleBarStage(double bos, out double enAz)
     {
         BtnSponsor.IsVisible = true;
         BtnGitHub.IsVisible = true;
@@ -794,6 +812,7 @@ public partial class MainWindow : Window
             ? TxtUpdateBadge.DesiredSize.Width + ((TxtUpdateBadge.Parent as StackPanel)?.Spacing ?? 0)
             : 0;
         var dil = LangSwitch.DesiredSize.Width;
+        enAz = tam - baglar - rozet - dil;
 
         if (tam <= bos) return 0;
         if (tam - baglar <= bos) return 1;
@@ -873,7 +892,7 @@ public partial class MainWindow : Window
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         if (e.ClickCount == 2)
         {
-            ToggleMaximizeRestore();
+            PencereDongusu();
             e.Handled = true;
             return;
         }
@@ -882,20 +901,20 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Tam ekranda ve oynatıcı sekmesinde kabuk kenarlığını kaldırır. Windows kendi pencerelerinde
-    /// de böyle yapar ve sebebi süs değil: 1 piksellik kenarlık kalırsa ekranın sağ üst pikseli
+    /// Tam ekranda, küçük kipte ve oynatıcı sekmesinde kabuk kenarlığını kaldırır; kural her
+    /// sekmede aynı. Windows kendi pencerelerinde de böyle yapar ve sebebi süs değil: 1 piksellik kenarlık kalırsa ekranın sağ üst pikseli
     /// kapatma düğmesinin değil kenarlığın üstüne düşer, köşenin kolay hedef olma kazancı gider.
     /// Normal boyutta kenarlık ve yuvarlama belirteçlerden geri gelir.
     /// </summary>
     private void ApplyWindowFrame()
     {
-        var maximized = WindowState == WindowState.Maximized;
-        WindowShell.BorderThickness = maximized || Tabs.SelectedIndex == PlayerTabIndex
+        var ekraniDolduruyor = WindowState is WindowState.Maximized or WindowState.FullScreen;
+        WindowShell.BorderThickness = ekraniDolduruyor || Kip.Kucuk || Tabs.SelectedIndex == PlayerTabIndex
             ? new Thickness(0)
             : this.TryFindResource("BorderThin", out var border) && border is Thickness thickness
                 ? thickness
                 : new Thickness(1);
-        WindowShell.CornerRadius = maximized
+        WindowShell.CornerRadius = ekraniDolduruyor
             ? new CornerRadius(0)
             : this.TryFindResource("RadiusControl", out var radius) && radius is CornerRadius corner
                 ? corner

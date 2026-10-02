@@ -219,10 +219,10 @@ public sealed class OynaticiTikTasimaTests
         Assert.True(sonuc.kucuk.IsCompact, sonuc.iz);
         Assert.Equal(WindowState.Normal, sonuc.kucuk.WindowState);
         Assert.InRange(Math.Abs(sonuc.kucuk.boy - sonuc.kucuk.en / sonuc.oran), 0, 1);
-        Assert.Equal(PlayerView.DwmColorNone, sonuc.kucuk.istek);
+        Assert.Equal(PencereKipi.DwmColorNone, sonuc.kucuk.istek);
         Assert.Contains("border -> none", sonuc.iz);
         if (OperatingSystem.IsWindows() && Environment.OSVersion.Version.Build >= 22000) Assert.True(sonuc.kucuk.yazim >= 1, sonuc.iz);
-        Assert.Equal(PlayerView.DwmColorDefault, sonuc.geri);
+        Assert.Equal(PencereKipi.DwmColorDefault, sonuc.geri);
     }
 
     [Theory]
@@ -260,7 +260,7 @@ public sealed class OynaticiTikTasimaTests
             try
             {
                 var hwnd = window.TryGetPlatformHandle()!.Handle;
-                return (yok: PlayerView.WriteBorderColor(hwnd, PlayerView.DwmColorNone), varsayilan: PlayerView.WriteBorderColor(hwnd, PlayerView.DwmColorDefault), bos: PlayerView.WriteBorderColor(IntPtr.Zero, PlayerView.DwmColorNone));
+                return (yok: PencereKipi.WriteBorderColor(hwnd, PencereKipi.DwmColorNone), varsayilan: PencereKipi.WriteBorderColor(hwnd, PencereKipi.DwmColorDefault), bos: PencereKipi.WriteBorderColor(IntPtr.Zero, PencereKipi.DwmColorNone));
             }
             finally
             {
@@ -452,7 +452,7 @@ public sealed class ZeminTasimaEsikTests
             Assert.True(sonuc.IsCompact);
             Assert.Equal(WindowState.Normal, sonuc.WindowState);
             Assert.Equal(new Thickness(0), sonuc.BorderThickness);
-            Assert.Equal(PlayerView.DwmColorNone, sonuc.BorderColorRequest);
+            Assert.Equal(PencereKipi.DwmColorNone, sonuc.BorderColorRequest);
         }
         finally
         {

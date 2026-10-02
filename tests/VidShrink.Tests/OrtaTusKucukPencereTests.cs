@@ -65,7 +65,7 @@ public sealed class OrtaTusKucukPencereTests
 
         Assert.False(sonuc.kucuk.IsFullscreen);
         Assert.Equal(WindowState.Normal, sonuc.kucuk.WindowState);
-        Assert.Equal(new[] { 5, 5, 5 }, sonuc.secilen);
+        Assert.Empty(sonuc.secilen);
         Assert.Contains("compact -> False", sonuc.iz);
         if (sonuc.kucuk.WorkingArea is { } alan && sonuc.kucuk.Scaling is { } olcek)
         {
