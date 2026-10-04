@@ -139,6 +139,12 @@ public sealed class PlanOptions
 
     /// <summary>B1c: ciktiya iz olarak eklenen dis metin altyazi dosyalari.</summary>
     public IReadOnlyList<ExternalSubtitle> ExternalSubtitles { get; set; } = Array.Empty<ExternalSubtitle>();
+
+    /// <summary>
+    /// Kaynagin kap duzeyindeki etiketleri (baslik, yorum, tarih) ciktiya tasinmaz. Iz dili ve
+    /// iz adi kalir: onlar oynaticinin iz secimini tasir, kimlik bilgisi degil.
+    /// </summary>
+    public bool DropMetadata { get; set; }
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -535,7 +541,8 @@ public static class PlanCalculator
 
         var streamRequest = new StreamRequest(options.KeepAllTracks, options.PlatformDelivery, options.PreferredLanguage,
             options.AudioLoudnorm, options.AudioGainDb, options.ExternalSubtitles, options.Filters?.BurnSubtitle,
-            ExplicitAudioCodec: options.AudioCodec != AudioCodecChoice.Auto);
+            ExplicitAudioCodec: options.AudioCodec != AudioCodecChoice.Auto,
+            DropMetadata: options.DropMetadata);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
         var container = options.DeliveredContainer is { } teslim && (teslim != OutputContainer.WebM || CodecModel.FitsWebM(codec))
             ? teslim
@@ -565,7 +572,8 @@ public static class PlanCalculator
             AudioCodec = options.AudioCodec,
             AudioLoudnorm = options.AudioLoudnorm,
             AudioGainDb = options.AudioGainDb,
-            ExternalSubtitles = options.ExternalSubtitles
+            ExternalSubtitles = options.ExternalSubtitles,
+            DropMetadata = options.DropMetadata
         };
 
         var (best, sourceFpsViable) = SearchLayout(info, effective, complexity, codec, videoK, regime);
@@ -965,7 +973,8 @@ public static class PlanCalculator
         || options.AudioChannels != AudioChannelOverride.Auto
         || options.AudioLoudnorm
         || options.AudioGainDb is { } gain && gain != 0
-        || options.ExternalSubtitles.Count > 0;
+        || options.ExternalSubtitles.Count > 0
+        || options.DropMetadata;
 
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {
@@ -1205,7 +1214,8 @@ public static class PlanCalculator
         EncoderPath = options.EncoderPath,
         AudioLoudnorm = options.AudioLoudnorm,
         AudioGainDb = options.AudioGainDb,
-        ExternalSubtitles = options.ExternalSubtitles
+        ExternalSubtitles = options.ExternalSubtitles,
+        DropMetadata = options.DropMetadata
     };
 
     /// <summary>

@@ -122,6 +122,9 @@ public sealed record CliRequest
     /// <summary><c>--yak</c>: kaynagin bu altyazisi (1 tabanli) goruntuye yakilir.</summary>
     public int? BurnSubtitle { get; init; }
 
+    /// <summary><c>--meta-yok</c>: kaynagin kap etiketleri ciktiya tasinmaz.</summary>
+    public bool DropMetadata { get; init; }
+
     /// <summary>
     /// <see cref="SubtitleFiles"/> ve <see cref="SidecarSubtitles"/>'in diskten cozulmus hali;
     /// <see cref="ResolvedSubtitles"/> doldurur.
@@ -238,6 +241,7 @@ public sealed record CliRequest
         options.AudioLoudnorm = AudioLoudnorm;
         options.AudioGainDb = AudioGainDb;
         options.ExternalSubtitles = ExternalSubtitles;
+        options.DropMetadata = DropMetadata;
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
         if (Codec == CliCodec.Vp9) options.LockedCodec = "libvpx-vp9";
         options.LockedCrf = Crf;
@@ -273,7 +277,7 @@ public static class CliParser
         "--azami-sure", "--max-duration",
         "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm",
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
-        "--yak", "--burn",
+        "--yak", "--burn", "--meta-yok", "--no-metadata",
     };
 
     public static CliParseResult Parse(IReadOnlyList<string> args)
@@ -462,6 +466,9 @@ public static class CliParser
                     if (!int.TryParse(yak, NumberStyles.Integer, CultureInfo.InvariantCulture, out var yakNo) || yakNo < 1)
                         return Fail("error.bad-burn", yak);
                     request = request with { BurnSubtitle = yakNo };
+                    break;
+                case "--meta-yok" or "--no-metadata" when command != CliCommand.Watch:
+                    request = request with { DropMetadata = true };
                     break;
                 case "--json":
                     request = request with { Json = true };

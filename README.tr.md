@@ -251,6 +251,7 @@ bunların tek yazımı var.
 | `--altyazi` | `--subtitle` |
 | `--yan-altyazi` | `--sidecar-subtitles` |
 | `--yak` | `--burn` |
+| `--meta-yok` | `--no-metadata` |
 | `--profiller` | `--presets` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
