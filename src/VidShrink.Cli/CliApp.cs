@@ -175,11 +175,12 @@ public static class CliApp
             return new FileRun(ExitCodes.InBand, null, null);
         }
 
-        var baslikSoruluyor = request.Title is not null || request.MainFeature || request.MinDurationSeconds is not null;
+        var baslikSoruluyor = request.Title is not null || request.MainFeature || request.MinDurationSeconds is not null
+            || request.MaxDurationSeconds is not null;
         if (info.Titles.Count > 0 || baslikSoruluyor)
         {
             if (SourceTitles.Sec(info.Titles, request.Title, request.MainFeature,
-                    request.MinDurationSeconds, out var baslik) is { } baslikHatasi)
+                    request.MinDurationSeconds, out var baslik, request.MaxDurationSeconds) is { } baslikHatasi)
             {
                 var ileti = text.Format(baslikHatasi, request.Title?.ToString(CultureInfo.InvariantCulture));
                 stderr.WriteLine(ileti);
@@ -244,7 +245,7 @@ public static class CliApp
     /// </summary>
     private static string TaramaMetni(MediaInfo info, CliRequest request, CliText text)
     {
-        var basliklar = SourceTitles.Ele(info.Titles, request.MinDurationSeconds);
+        var basliklar = SourceTitles.Ele(info.Titles, request.MinDurationSeconds, request.MaxDurationSeconds);
         var sb = new StringBuilder();
         sb.AppendLine(text.Format("scan.titles", basliklar.Count.ToString(CultureInfo.InvariantCulture)));
         foreach (var b in basliklar)
@@ -265,7 +266,7 @@ public static class CliApp
         {
             writer.WriteString("command", "scan");
             writer.WriteStartArray("titles");
-            foreach (var b in SourceTitles.Ele(info.Titles, request.MinDurationSeconds))
+            foreach (var b in SourceTitles.Ele(info.Titles, request.MinDurationSeconds, request.MaxDurationSeconds))
             {
                 writer.WriteStartObject();
                 writer.WriteNumber("number", b.Number);

@@ -240,6 +240,7 @@ bunların tek yazımı var.
 | `--baslik` | `--title` |
 | `--ana-icerik` | `--main-feature` |
 | `--asgari-sure` | `--min-duration` |
+| `--azami-sure` | `--max-duration` |
 | `--suzgec` | `--filters` |
 | `--kirp` | `--crop` |
 | `--profil` | `--profile` |

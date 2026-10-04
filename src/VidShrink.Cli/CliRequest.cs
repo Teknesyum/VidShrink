@@ -70,6 +70,9 @@ public sealed record CliRequest
     /// <summary><c>--asgari-sure</c>: bu sureden kisa basliklar envanterden duser.</summary>
     public double? MinDurationSeconds { get; init; }
 
+    /// <summary><c>--azami-sure</c>: bu sureden uzun basliklar envanterden duser.</summary>
+    public double? MaxDurationSeconds { get; init; }
+
     /// <summary>
     /// <c>--suzgec</c>: cozumlenmis suzgec secenekleri. Ayristirma komut satiri okunurken yapilir,
     /// bozuk dizge komutu daha kosum baslamadan durdurur. <c>null</c> ise motor bugunku
@@ -267,6 +270,7 @@ public static class CliParser
         "--crf", "--on-ayar", "--preset", "--modul", "--modulus", "--kes", "--cut", "--bolum", "--chapters",
         "--profil", "--profile", "--profil-dosyasi", "--preset-file", "--kirp", "--crop", "--tarama", "--scan",
         "--baslik", "--title", "--ana-icerik", "--main-feature", "--asgari-sure", "--min-duration",
+        "--azami-sure", "--max-duration",
         "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm",
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
         "--yak", "--burn",
@@ -403,6 +407,12 @@ public static class CliParser
                         return Fail("error.bad-min-duration", asgari);
                     request = request with { MinDurationSeconds = asgariSn };
                     break;
+                case "--azami-sure" or "--max-duration" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var azami)) return Fail("error.missing-value", arg);
+                    if (!TryParseNumber(azami, out var azamiSn) || azamiSn <= 0 || azamiSn > 86400)
+                        return Fail("error.bad-max-duration", azami);
+                    request = request with { MaxDurationSeconds = azamiSn };
+                    break;
                 case "--suzgec" or "--filters" when command != CliCommand.Watch:
                     if (!TryValue(args, ref i, out var suzgec)) return Fail("error.missing-value", arg);
                     VideoFilterOptions cozulen;
@@ -474,6 +484,8 @@ public static class CliParser
             }
         }
 
+        if (request.MinDurationSeconds is { } enAz && request.MaxDurationSeconds is { } enCok && enCok < enAz)
+            return Fail("error.bad-max-duration", enCok.ToString(CultureInfo.InvariantCulture));
         if (request.Input is null) return Fail(command == CliCommand.Watch ? "error.watch-no-folder" : "error.no-input", null);
         if (command == CliCommand.Watch && request.Output is null) return Fail("error.watch-no-output", null);
         if (request.TargetMb is not null && request.Quality is not null) return Fail("error.target-or-quality", null);
