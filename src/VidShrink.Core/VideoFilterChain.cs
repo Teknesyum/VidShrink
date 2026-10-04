@@ -11,6 +11,8 @@ public enum FilterStrength { Light, Medium, Strong }
 
 public enum SharpenMode { Off, Light, Medium, Strong }
 
+public enum ChromaSmoothMode { Off, Light, Medium, Strong }
+
 public enum TransposeMode { None, Clockwise, CounterClockwise, UpsideDown, FlipHorizontal, FlipVertical }
 
 public enum ColorMatrixTarget { Keep, Bt709, Bt601 }
@@ -56,6 +58,7 @@ public sealed record VideoFilterOptions
     public DenoiseFilter Denoise { get; init; } = DenoiseFilter.Off;
     public FilterStrength DenoiseStrength { get; init; } = FilterStrength.Medium;
     public SharpenMode Sharpen { get; init; } = SharpenMode.Off;
+    public ChromaSmoothMode ChromaSmooth { get; init; } = ChromaSmoothMode.Off;
     public bool Deblock { get; init; }
     public TransposeMode Transpose { get; init; } = TransposeMode.None;
     public PadBorders? Pad { get; init; }
@@ -76,6 +79,7 @@ public sealed record VideoFilterOptions
         || Detelecine
         || Denoise != DenoiseFilter.Off
         || Sharpen != SharpenMode.Off
+        || ChromaSmooth != ChromaSmoothMode.Off
         || Deblock
         || Transpose != TransposeMode.None
         || Pad is not null
@@ -232,6 +236,7 @@ public static class VideoFilterChain
         if (plan.Width != source.Width || plan.Height != source.Height)
             filters.Add($"scale={plan.Width}:{plan.Height}:flags=lanczos");
         if (info.IsAnamorphic) filters.Add(SquarePixelFilter);
+        if (ChromaSmoothText(options.ChromaSmooth) is string chroma) filters.Add(chroma);
         if (SharpenText(options.Sharpen) is string sharpen) filters.Add(sharpen);
         if (!string.IsNullOrEmpty(plan.HdrVideoFilter))
             filters.Add(plan.HdrVideoFilter);
@@ -273,6 +278,14 @@ public static class VideoFilterChain
             FilterStrength.Strong => "hqdn3d=7:7:5:5",
             _ => null
         },
+        _ => null
+    };
+
+    public static string? ChromaSmoothText(ChromaSmoothMode mode) => mode switch
+    {
+        ChromaSmoothMode.Light => "unsharp=lx=3:ly=3:la=0:cx=3:cy=3:ca=-0.5",
+        ChromaSmoothMode.Medium => "unsharp=lx=3:ly=3:la=0:cx=5:cy=5:ca=-1.0",
+        ChromaSmoothMode.Strong => "unsharp=lx=3:ly=3:la=0:cx=7:cy=7:ca=-1.5",
         _ => null
     };
 
@@ -337,6 +350,13 @@ public static class VideoFilterChain
                 SharpenMode.Medium => "medium",
                 _ => "strong"
             });
+        if (options.ChromaSmooth != ChromaSmoothMode.Off)
+            parts.Add("chroma-smooth=" + options.ChromaSmooth switch
+            {
+                ChromaSmoothMode.Light => "light",
+                ChromaSmoothMode.Medium => "medium",
+                _ => "strong"
+            });
         if (options.Deblock) parts.Add("deblock");
         if (options.Deband) parts.Add("deband");
         if (options.Grayscale) parts.Add("gray");
@@ -390,6 +410,13 @@ public static class VideoFilterChain
                     "light" => SharpenMode.Light,
                     "medium" => SharpenMode.Medium,
                     "strong" => SharpenMode.Strong,
+                    _ => throw Bad(raw)
+                } },
+                "chroma-smooth" => options with { ChromaSmooth = value switch
+                {
+                    "light" => ChromaSmoothMode.Light,
+                    "medium" => ChromaSmoothMode.Medium,
+                    "strong" => ChromaSmoothMode.Strong,
                     _ => throw Bad(raw)
                 } },
                 "deblock" => options with { Deblock = true },
