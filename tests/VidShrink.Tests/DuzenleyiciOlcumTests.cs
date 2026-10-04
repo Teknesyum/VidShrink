@@ -39,6 +39,14 @@ public sealed class DuzenleyiciOlcumTests
         Assert.True(kod == 0, $"ffmpeg dustu: {hata[Math.Max(0, hata.Length - 400)..]}");
     }
 
+    private static string? Gercek(string degisken)
+    {
+        var yol = Environment.GetEnvironmentVariable(degisken);
+        if (string.IsNullOrWhiteSpace(yol)) return null;
+        Assert.True(File.Exists(yol), $"{degisken} dosyasi yok: {yol}");
+        return yol;
+    }
+
     private static string F(double v) => v.ToString("0.###", CultureInfo.InvariantCulture);
 
     private static double Medyan(IReadOnlyList<double> dizi)
@@ -194,14 +202,15 @@ public sealed class DuzenleyiciOlcumTests
     [Fact]
     public void BirakistanSonraOynatmaBasiMotorlaAyniKarede()
     {
-        const double Fps = 30;
         var klasor = Klasor("kabul-4-" + Guid.NewGuid().ToString("N")[..6]);
-        var kaynak = Path.Combine(klasor, "kaynak.mp4");
-        Ffmpeg("-y", "-hide_banner", "-f", "lavfi", "-i", "testsrc2=size=640x360:rate=30", "-t", "20", "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "ultrafast", "-g", "30", "-threads", "2", kaynak);
+        var gercek = Gercek("VIDSHRINK_D3_KISA_KAYNAK");
+        var kaynak = gercek ?? Path.Combine(klasor, "kaynak.mp4");
+        if (gercek is null)
+            Ffmpeg("-y", "-hide_banner", "-f", "lavfi", "-i", "testsrc2=size=640x360:rate=30", "-t", "20", "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "ultrafast", "-g", "30", "-threads", "2", kaynak);
 
         try
         {
-            var satirlar = AppHost.Run(() =>
+            var (satirlar, fps) = AppHost.Run(() =>
             {
                 var view = new EditorView();
                 var pencere = new Window { Width = Genislik, Height = 720, Content = view };
@@ -224,6 +233,7 @@ public sealed class DuzenleyiciOlcumTests
                     DenetimSurucu.Pump(view.Player, () => false, 1.5);
 
                     var cizelge = view.TimelineView;
+                    var kareHizi = cizelge.Fps;
                     var sonuc = new List<(double Hedef, double Motor, double Kare)>();
                     foreach (var oran in new[] { 0.13, 0.37, 0.52, 0.71, 0.94 })
                     {
@@ -247,11 +257,11 @@ public sealed class DuzenleyiciOlcumTests
                             }
                         }
 
-                        var fark = Math.Abs(hedef - son) / (Sn / Fps);
+                        var fark = Math.Abs(hedef - son) / (Sn / kareHizi);
                         sonuc.Add((EditTime.ToSeconds(hedef), EditTime.ToSeconds(son), fark));
                     }
 
-                    return sonuc;
+                    return (sonuc, kareHizi);
                 }
                 finally
                 {
@@ -260,10 +270,11 @@ public sealed class DuzenleyiciOlcumTests
                 }
             });
 
-            var metin = new StringBuilder($"kabul 4: 20 sn 640x360 30 fps, iki kesim + orta parca silindi, gercek libmpv{Environment.NewLine}");
+            var tanim = gercek is null ? "20 sn 640x360 testsrc2" : $"gercek kaynak {Path.GetFileName(gercek)}";
+            var metin = new StringBuilder($"kabul 4: {tanim}, {F(fps)} fps, iki kesim + orta parca silindi, gercek libmpv{Environment.NewLine}");
             foreach (var (hedef, motor, kare) in satirlar)
                 metin.AppendLine($"birakis {F(hedef)} sn, motor {F(motor)} sn, fark {F(kare)} kare");
-            Yaz("kabul-4-birakis.txt", metin.ToString());
+            Yaz(gercek is null ? "kabul-4-birakis.txt" : $"kabul-4-birakis-{Path.GetFileNameWithoutExtension(gercek)}.txt", metin.ToString());
 
             Assert.Equal(5, satirlar.Count);
             Assert.All(satirlar, s => Assert.True(s.Kare <= 1, metin.ToString()));
@@ -280,14 +291,18 @@ public sealed class DuzenleyiciOlcumTests
         var klasor = Klasor("kabul-5-" + Guid.NewGuid().ToString("N")[..6]);
         var parca = Path.Combine(klasor, "parca.mp4");
         var liste = Path.Combine(klasor, "liste.txt");
-        var kaynak = Path.Combine(klasor, "kaynak-10dk-1080p.mp4");
-        Ffmpeg("-y", "-hide_banner", "-f", "lavfi", "-i", "testsrc2=size=1920x1080:rate=30", "-t", "10", "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "ultrafast", "-crf", "30", "-g", "60", "-threads", "2", parca);
-        File.WriteAllLines(liste, Enumerable.Repeat("file 'parca.mp4'", 60));
-        Ffmpeg("-y", "-hide_banner", "-f", "concat", "-safe", "0", "-i", liste, "-c", "copy", kaynak);
+        var gercek = Gercek("VIDSHRINK_D3_UZUN_KAYNAK");
+        var kaynak = gercek ?? Path.Combine(klasor, "kaynak-10dk-1080p.mp4");
+        if (gercek is null)
+        {
+            Ffmpeg("-y", "-hide_banner", "-f", "lavfi", "-i", "testsrc2=size=1920x1080:rate=30", "-t", "10", "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "ultrafast", "-crf", "30", "-g", "60", "-threads", "2", parca);
+            File.WriteAllLines(liste, Enumerable.Repeat("file 'parca.mp4'", 60));
+            Ffmpeg("-y", "-hide_banner", "-f", "concat", "-safe", "0", "-i", liste, "-c", "copy", kaynak);
+        }
 
         try
         {
-            var (olcum, sure) = AppHost.Run(() =>
+            var (olcum, sure, ilkSure, kareHizi) = AppHost.Run(() =>
             {
                 var view = new EditorView();
                 var pencere = new Window { Width = Genislik, Height = 720, Content = view };
@@ -301,6 +316,8 @@ public sealed class DuzenleyiciOlcumTests
                     Assert.NotNull(view.Model);
                     view.Run(EditorCommand.ShuttleStop);
                     DenetimSurucu.Pump(view.Player, () => false, 1);
+                    var baslangic = EditTime.ToSeconds(view.Model!.Duration);
+                    var fps = view.TimelineView.Fps;
 
                     var islemler = new Dictionary<string, List<double>> { ["bol"] = new(), ["tasi"] = new(), ["hiz"] = new(), ["sil"] = new() };
 
@@ -338,7 +355,7 @@ public sealed class DuzenleyiciOlcumTests
                         });
                     }
 
-                    return (islemler, EditTime.ToSeconds(view.Model!.Duration));
+                    return (islemler, EditTime.ToSeconds(view.Model!.Duration), baslangic, fps);
                 }
                 finally
                 {
@@ -347,11 +364,12 @@ public sealed class DuzenleyiciOlcumTests
                 }
             });
 
-            var metin = new StringBuilder($"kabul 5: 10 dk 1920x1080 30 fps h264 (10 sn parca x 60, -c copy), gercek libmpv, islem cagrisindan PlayerView.DrawnFrames artisina{Environment.NewLine}");
+            var tanim = gercek is null ? "10 dk 1920x1080 h264 testsrc2 (10 sn parca x 60, -c copy)" : $"gercek kaynak {Path.GetFileName(gercek)}";
+            var metin = new StringBuilder($"kabul 5: {tanim}, {F(kareHizi)} fps, ilk cizelge suresi {F(ilkSure)} sn, gercek libmpv, islem cagrisindan PlayerView.DrawnFrames artisina{Environment.NewLine}");
             foreach (var (ad, dizi) in olcum)
                 metin.AppendLine($"{ad}: medyan {F(Medyan(dizi))} ms, en cok {F(dizi.Max())} ms, tekrarlar {string.Join(" ", dizi.Select(F))}");
             metin.AppendLine($"son cizelge suresi {F(sure)} sn");
-            Yaz("kabul-5-ilk-kare.txt", metin.ToString());
+            Yaz(gercek is null ? "kabul-5-ilk-kare.txt" : $"kabul-5-ilk-kare-{Path.GetFileNameWithoutExtension(gercek)}.txt", metin.ToString());
 
             Assert.All(olcum, o => Assert.True(Medyan(o.Value) <= 1000, metin.ToString()));
         }
