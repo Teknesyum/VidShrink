@@ -1086,7 +1086,8 @@ public sealed class ManualOverrideTests
         "AudioLoudnorm", "AudioGainDb", "ExternalSubtitles",
         // O3: DeliveredContainer on ayarin teslim kabi (MOV, MKV ...). Kapali sabit degil, istegin
         // kendisi; bos kalinca kap plandan turer ve bugunku davranis o.
-        "DeliveredContainer"
+        "DeliveredContainer",
+        "DropMetadata", "SubtitleLanguages", "FirstSubtitleOnly"
     };
 
     [Fact]

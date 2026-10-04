@@ -49,14 +49,18 @@ public sealed record DiscSource(int Title, int? Angle)
 public static class SourceTitles
 {
     /// <summary>
-    /// Asgari sureyi uygulayarak envanteri daraltir. Sure verilmezse liste oldugu gibi doner;
-    /// esik **dahil** degerlendirilir, tam esikteki baslik elenmez.
+    /// Asgari ve azami sureyi uygulayarak envanteri daraltir. Sure verilmezse liste oldugu gibi
+    /// doner; iki esik de **dahil** degerlendirilir, tam esikteki baslik elenmez.
     /// </summary>
-    public static IReadOnlyList<SourceTitle> Ele(IReadOnlyList<SourceTitle> basliklar, double? asgariSure)
+    public static IReadOnlyList<SourceTitle> Ele(IReadOnlyList<SourceTitle> basliklar, double? asgariSure, double? azamiSure = null)
     {
         if (basliklar is null || basliklar.Count == 0) return Array.Empty<SourceTitle>();
-        if (asgariSure is not { } esik || esik <= 0) return basliklar;
-        return basliklar.Where(b => b.DurationSeconds >= esik).ToArray();
+        var alt = asgariSure is { } esik && esik > 0 ? esik : (double?)null;
+        var ust = azamiSure is { } tavan && tavan > 0 ? tavan : (double?)null;
+        if (alt is null && ust is null) return basliklar;
+        return basliklar
+            .Where(b => (alt is not { } a || b.DurationSeconds >= a) && (ust is not { } u || b.DurationSeconds <= u))
+            .ToArray();
     }
 
     /// <summary>
@@ -82,12 +86,13 @@ public static class SourceTitles
         int? numara,
         bool anaIcerik,
         double? asgariSure,
-        out SourceTitle? secilen)
+        out SourceTitle? secilen,
+        double? azamiSure = null)
     {
         secilen = null;
         if (basliklar is null || basliklar.Count == 0) return "error.no-titles";
 
-        var kalan = Ele(basliklar, asgariSure);
+        var kalan = Ele(basliklar, asgariSure, azamiSure);
         if (kalan.Count == 0) return "error.no-titles-after-min";
 
         if (numara is { } istenen)

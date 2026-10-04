@@ -70,6 +70,9 @@ public sealed record CliRequest
     /// <summary><c>--asgari-sure</c>: bu sureden kisa basliklar envanterden duser.</summary>
     public double? MinDurationSeconds { get; init; }
 
+    /// <summary><c>--azami-sure</c>: bu sureden uzun basliklar envanterden duser.</summary>
+    public double? MaxDurationSeconds { get; init; }
+
     /// <summary>
     /// <c>--suzgec</c>: cozumlenmis suzgec secenekleri. Ayristirma komut satiri okunurken yapilir,
     /// bozuk dizge komutu daha kosum baslamadan durdurur. <c>null</c> ise motor bugunku
@@ -118,6 +121,15 @@ public sealed record CliRequest
 
     /// <summary><c>--yak</c>: kaynagin bu altyazisi (1 tabanli) goruntuye yakilir.</summary>
     public int? BurnSubtitle { get; init; }
+
+    /// <summary><c>--meta-yok</c>: kaynagin kap etiketleri ciktiya tasinmaz.</summary>
+    public bool DropMetadata { get; init; }
+
+    /// <summary><c>--altyazi-dil</c>: yalniz bu dillerdeki kaynak altyazilari tasinir.</summary>
+    public IReadOnlyList<string> SubtitleLanguages { get; init; } = Array.Empty<string>();
+
+    /// <summary><c>--ilk-altyazi</c>: kaynagin yalniz ilk altyazisi tasinir.</summary>
+    public bool FirstSubtitleOnly { get; init; }
 
     /// <summary>
     /// <see cref="SubtitleFiles"/> ve <see cref="SidecarSubtitles"/>'in diskten cozulmus hali;
@@ -235,6 +247,9 @@ public sealed record CliRequest
         options.AudioLoudnorm = AudioLoudnorm;
         options.AudioGainDb = AudioGainDb;
         options.ExternalSubtitles = ExternalSubtitles;
+        options.DropMetadata = DropMetadata;
+        options.SubtitleLanguages = SubtitleLanguages;
+        options.FirstSubtitleOnly = FirstSubtitleOnly;
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
         if (Codec == CliCodec.Vp9) options.LockedCodec = "libvpx-vp9";
         options.LockedCrf = Crf;
@@ -267,9 +282,11 @@ public static class CliParser
         "--crf", "--on-ayar", "--preset", "--modul", "--modulus", "--kes", "--cut", "--bolum", "--chapters",
         "--profil", "--profile", "--profil-dosyasi", "--preset-file", "--kirp", "--crop", "--tarama", "--scan",
         "--baslik", "--title", "--ana-icerik", "--main-feature", "--asgari-sure", "--min-duration",
+        "--azami-sure", "--max-duration",
         "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm",
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
-        "--yak", "--burn",
+        "--yak", "--burn", "--meta-yok", "--no-metadata",
+        "--altyazi-dil", "--subtitle-lang", "--ilk-altyazi", "--first-subtitle",
     };
 
     public static CliParseResult Parse(IReadOnlyList<string> args)
@@ -403,6 +420,12 @@ public static class CliParser
                         return Fail("error.bad-min-duration", asgari);
                     request = request with { MinDurationSeconds = asgariSn };
                     break;
+                case "--azami-sure" or "--max-duration" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var azami)) return Fail("error.missing-value", arg);
+                    if (!TryParseNumber(azami, out var azamiSn) || azamiSn <= 0 || azamiSn > 86400)
+                        return Fail("error.bad-max-duration", azami);
+                    request = request with { MaxDurationSeconds = azamiSn };
+                    break;
                 case "--suzgec" or "--filters" when command != CliCommand.Watch:
                     if (!TryValue(args, ref i, out var suzgec)) return Fail("error.missing-value", arg);
                     VideoFilterOptions cozulen;
@@ -453,6 +476,19 @@ public static class CliParser
                         return Fail("error.bad-burn", yak);
                     request = request with { BurnSubtitle = yakNo };
                     break;
+                case "--meta-yok" or "--no-metadata" when command != CliCommand.Watch:
+                    request = request with { DropMetadata = true };
+                    break;
+                case "--altyazi-dil" or "--subtitle-lang" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var altyaziDil)) return Fail("error.missing-value", arg);
+                    var diller = altyaziDil.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    if (diller.Length == 0 || diller.Any(dil => dil.Length is < 2 or > 3 || !dil.All(char.IsAsciiLetter)))
+                        return Fail("error.bad-subtitle-lang", altyaziDil);
+                    request = request with { SubtitleLanguages = diller.Select(dil => dil.ToLowerInvariant()).ToList() };
+                    break;
+                case "--ilk-altyazi" or "--first-subtitle" when command != CliCommand.Watch:
+                    request = request with { FirstSubtitleOnly = true };
+                    break;
                 case "--json":
                     request = request with { Json = true };
                     break;
@@ -474,6 +510,8 @@ public static class CliParser
             }
         }
 
+        if (request.MinDurationSeconds is { } enAz && request.MaxDurationSeconds is { } enCok && enCok < enAz)
+            return Fail("error.bad-max-duration", enCok.ToString(CultureInfo.InvariantCulture));
         if (request.Input is null) return Fail(command == CliCommand.Watch ? "error.watch-no-folder" : "error.no-input", null);
         if (command == CliCommand.Watch && request.Output is null) return Fail("error.watch-no-output", null);
         if (request.TargetMb is not null && request.Quality is not null) return Fail("error.target-or-quality", null);

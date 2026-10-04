@@ -226,6 +226,7 @@ single spelling.
 | `--baslik` | `--title` |
 | `--ana-icerik` | `--main-feature` |
 | `--asgari-sure` | `--min-duration` |
+| `--azami-sure` | `--max-duration` |
 | `--suzgec` | `--filters` |
 | `--kirp` | `--crop` |
 | `--profil` | `--profile` |
@@ -236,6 +237,9 @@ single spelling.
 | `--altyazi` | `--subtitle` |
 | `--yan-altyazi` | `--sidecar-subtitles` |
 | `--yak` | `--burn` |
+| `--meta-yok` | `--no-metadata` |
+| `--altyazi-dil` | `--subtitle-lang` |
+| `--ilk-altyazi` | `--first-subtitle` |
 | `--profiller` | `--presets` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |

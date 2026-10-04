@@ -294,6 +294,39 @@ public sealed class BaslikTaramaTests
         }
     }
 
+    [Fact]
+    public void AzamiSureUzunBasligiEliyorSinirGeciyor()
+    {
+        Assert.Equal(new[] { 1 }, SourceTitles.Ele(Ornek(), null, 4).Select(b => b.Number).ToArray());
+        Assert.Equal(new[] { 1, 2 }, SourceTitles.Ele(Ornek(), null, 5).Select(b => b.Number).ToArray());
+        Assert.Equal(new[] { 1, 2 }, SourceTitles.Ele(Ornek(), null, null).Select(b => b.Number).ToArray());
+        Assert.Equal(new[] { 2 }, SourceTitles.Ele(Ornek(), 4, 5).Select(b => b.Number).ToArray());
+        Assert.Equal("error.no-titles-after-min", SourceTitles.Sec(Ornek(), null, false, null, out _, 2));
+        Assert.Equal("error.bad-title", SourceTitles.Sec(Ornek(), 2, false, null, out _, 4));
+        Assert.Null(SourceTitles.Sec(Ornek(), null, anaIcerik: true, null, out var secilen, 4));
+        Assert.Equal(1, secilen!.Number);
+    }
+
+    [Fact]
+    public void AzamiSureBayragiIkiYazimlaAyrisiyor()
+    {
+        var tr = CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25MB", "--azami-sure", "90" });
+        Assert.Equal(90, tr.Request!.MaxDurationSeconds);
+        var en = CliParser.Parse(new[] { "plan", "a.mp4", "--hedef", "25MB", "--max-duration", "1.5" });
+        Assert.Equal(1.5, en.Request!.MaxDurationSeconds);
+        Assert.Null(CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25MB" }).Request!.MaxDurationSeconds);
+
+        foreach (var bozuk in new[] { "0", "-3", "abc", "90000" })
+            Assert.Equal("error.bad-max-duration",
+                CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25MB", "--azami-sure", bozuk }).ErrorKey);
+        Assert.Equal("error.bad-max-duration",
+            CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25MB", "--asgari-sure", "60", "--azami-sure", "30" }).ErrorKey);
+        Assert.Null(
+            CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25MB", "--asgari-sure", "30", "--azami-sure", "30" }).ErrorKey);
+        Assert.Equal("error.not-in-watch",
+            CliParser.Parse(new[] { "izle", "k", "--cikti", "c", "--hedef", "25MB", "--azami-sure", "30" }).ErrorKey);
+    }
+
     /// <summary><c>--asgari-sure</c> taramada da eliyor: kisa baslik listeye hic girmiyor.</summary>
     [Fact]
     public async Task TaramaAsgariSureyiUyguluyor()
