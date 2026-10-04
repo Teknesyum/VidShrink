@@ -25,17 +25,17 @@
   <Color x:Key="NeonPinkFillColor">#1A95E6CB</Color>
   <Color x:Key="NeonPurpleBorderColor">#80D2A6FF</Color>
 
-  <Color x:Key="NeonEmberColor">#FFF07178</Color>
+  <Color x:Key="NeonEmberColor">#FFE66C73</Color>
   <Color x:Key="EmberFlameColor">#FFFF8F40</Color>
   <Color x:Key="EmberBlazeColor">#FFE6B450</Color>
   <Color x:Key="AtmosHotColor">#FFE6B451</Color>
   <Color x:Key="AtmosMidColor">#FFFF8F41</Color>
-  <Color x:Key="AtmosEdgeColor">#FFF07179</Color>
+  <Color x:Key="AtmosEdgeColor">#FFE66C74</Color>
   <Color x:Key="EmberDeepColor">#FF0C0C11</Color>
-  <Color x:Key="EmberMidColor">#FF0F0D13</Color>
+  <Color x:Key="EmberMidColor">#FF0F0D12</Color>
   <Color x:Key="EmberEdgeColor">#FF110F14</Color>
-  <Color x:Key="EmberBarDeepColor">#FF14141C</Color>
-  <Color x:Key="EmberBarMidColor">#FF17161D</Color>
+  <Color x:Key="EmberBarDeepColor">#FF14141B</Color>
+  <Color x:Key="EmberBarMidColor">#FF17151D</Color>
   <Color x:Key="EmberBarEdgeColor">#FF1B171E</Color>
   <Color x:Key="EmberFlameGlyphColor">#FFECAB4C</Color>
 

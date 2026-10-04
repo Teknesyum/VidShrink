@@ -60,7 +60,9 @@ yüzden birebir kaldı.
 5. **Standardın "yalnız koyu tema" kuralı uygulanmadı.** Projede açık zeminli 6 palet vardı ve
    silinmiyor; standardın açık temaları da (Buz, Kağıt, Kar, Keskin, Kırık) alındı. Sıra:
    varsayılan, koyu paletler, açık paletler; iki grupta önce projenin, sonra standardın.
-6. **Kontrast gediği kapatılmadı.** AyuLight'ın 2,65:1'lik gediğine dokunulmadı.
+6. **Kontrast gediği bu turda kapatılmadı.** AyuLight'ın 2,65:1'lik gediğine dokunulmadı; yazı
+   gediği `docs/ui-denetim/2026-09-27-uc2.md` turunda tohumla, tehlike renginin 3:1 altı kalan çizgi ve
+   noktası 5 Ekim 2026'da üreticinin kuralıyla (`PaletteBuilder.Danger`) kapandı.
 
 ## Bulgu
 
