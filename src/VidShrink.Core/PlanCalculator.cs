@@ -145,6 +145,12 @@ public sealed class PlanOptions
     /// iz adi kalir: onlar oynaticinin iz secimini tasir, kimlik bilgisi degil.
     /// </summary>
     public bool DropMetadata { get; set; }
+
+    /// <summary>Yalniz bu dillerdeki kaynak altyazilari tasinir; bos liste hepsini tasir.</summary>
+    public IReadOnlyList<string> SubtitleLanguages { get; set; } = Array.Empty<string>();
+
+    /// <summary>Kaynagin (dil suzgecinden gecen) yalniz ilk altyazisi tasinir.</summary>
+    public bool FirstSubtitleOnly { get; set; }
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -542,7 +548,9 @@ public static class PlanCalculator
         var streamRequest = new StreamRequest(options.KeepAllTracks, options.PlatformDelivery, options.PreferredLanguage,
             options.AudioLoudnorm, options.AudioGainDb, options.ExternalSubtitles, options.Filters?.BurnSubtitle,
             ExplicitAudioCodec: options.AudioCodec != AudioCodecChoice.Auto,
-            DropMetadata: options.DropMetadata);
+            DropMetadata: options.DropMetadata,
+            SubtitleLanguages: options.SubtitleLanguages,
+            FirstSubtitleOnly: options.FirstSubtitleOnly);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
         var container = options.DeliveredContainer is { } teslim && (teslim != OutputContainer.WebM || CodecModel.FitsWebM(codec))
             ? teslim
@@ -573,7 +581,9 @@ public static class PlanCalculator
             AudioLoudnorm = options.AudioLoudnorm,
             AudioGainDb = options.AudioGainDb,
             ExternalSubtitles = options.ExternalSubtitles,
-            DropMetadata = options.DropMetadata
+            DropMetadata = options.DropMetadata,
+            SubtitleLanguages = options.SubtitleLanguages,
+            FirstSubtitleOnly = options.FirstSubtitleOnly
         };
 
         var (best, sourceFpsViable) = SearchLayout(info, effective, complexity, codec, videoK, regime);
@@ -974,7 +984,9 @@ public static class PlanCalculator
         || options.AudioLoudnorm
         || options.AudioGainDb is { } gain && gain != 0
         || options.ExternalSubtitles.Count > 0
-        || options.DropMetadata;
+        || options.DropMetadata
+        || options.SubtitleLanguages.Count > 0
+        || options.FirstSubtitleOnly;
 
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {
@@ -1215,7 +1227,9 @@ public static class PlanCalculator
         AudioLoudnorm = options.AudioLoudnorm,
         AudioGainDb = options.AudioGainDb,
         ExternalSubtitles = options.ExternalSubtitles,
-        DropMetadata = options.DropMetadata
+        DropMetadata = options.DropMetadata,
+        SubtitleLanguages = options.SubtitleLanguages,
+        FirstSubtitleOnly = options.FirstSubtitleOnly
     };
 
     /// <summary>

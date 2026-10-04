@@ -141,7 +141,9 @@ public sealed record StreamRequest(
     IReadOnlyList<ExternalSubtitle>? ExternalSubtitles = null,
     int? BurnedSubtitle = null,
     bool ExplicitAudioCodec = false,
-    bool DropMetadata = false)
+    bool DropMetadata = false,
+    IReadOnlyList<string>? SubtitleLanguages = null,
+    bool FirstSubtitleOnly = false)
 {
     public static StreamRequest Default { get; } = new();
 
@@ -598,10 +600,15 @@ public static class StreamMapping
 
         var subtitles = new List<SubtitleTrack>();
         var subtitleOrdinal = -1;
+        var subtitleChosen = false;
         foreach (var source in info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle))
         {
             subtitleOrdinal++;
             if (request.BurnedSubtitle == subtitleOrdinal) continue;
+            if (request.SubtitleLanguages is { Count: > 0 } wanted
+                && !wanted.Any(language => LanguageMatches(source.Language, language))) continue;
+            if (request.FirstSubtitleOnly && subtitleChosen) continue;
+            subtitleChosen = true;
             if (request.PlatformDelivery)
             {
                 notes.Add(StreamNote.SubtitleDroppedForPlatform);

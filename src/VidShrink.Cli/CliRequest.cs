@@ -125,6 +125,12 @@ public sealed record CliRequest
     /// <summary><c>--meta-yok</c>: kaynagin kap etiketleri ciktiya tasinmaz.</summary>
     public bool DropMetadata { get; init; }
 
+    /// <summary><c>--altyazi-dil</c>: yalniz bu dillerdeki kaynak altyazilari tasinir.</summary>
+    public IReadOnlyList<string> SubtitleLanguages { get; init; } = Array.Empty<string>();
+
+    /// <summary><c>--ilk-altyazi</c>: kaynagin yalniz ilk altyazisi tasinir.</summary>
+    public bool FirstSubtitleOnly { get; init; }
+
     /// <summary>
     /// <see cref="SubtitleFiles"/> ve <see cref="SidecarSubtitles"/>'in diskten cozulmus hali;
     /// <see cref="ResolvedSubtitles"/> doldurur.
@@ -242,6 +248,8 @@ public sealed record CliRequest
         options.AudioGainDb = AudioGainDb;
         options.ExternalSubtitles = ExternalSubtitles;
         options.DropMetadata = DropMetadata;
+        options.SubtitleLanguages = SubtitleLanguages;
+        options.FirstSubtitleOnly = FirstSubtitleOnly;
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
         if (Codec == CliCodec.Vp9) options.LockedCodec = "libvpx-vp9";
         options.LockedCrf = Crf;
@@ -278,6 +286,7 @@ public static class CliParser
         "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm",
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
         "--yak", "--burn", "--meta-yok", "--no-metadata",
+        "--altyazi-dil", "--subtitle-lang", "--ilk-altyazi", "--first-subtitle",
     };
 
     public static CliParseResult Parse(IReadOnlyList<string> args)
@@ -469,6 +478,16 @@ public static class CliParser
                     break;
                 case "--meta-yok" or "--no-metadata" when command != CliCommand.Watch:
                     request = request with { DropMetadata = true };
+                    break;
+                case "--altyazi-dil" or "--subtitle-lang" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var altyaziDil)) return Fail("error.missing-value", arg);
+                    var diller = altyaziDil.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    if (diller.Length == 0 || diller.Any(dil => dil.Length is < 2 or > 3 || !dil.All(char.IsAsciiLetter)))
+                        return Fail("error.bad-subtitle-lang", altyaziDil);
+                    request = request with { SubtitleLanguages = diller.Select(dil => dil.ToLowerInvariant()).ToList() };
+                    break;
+                case "--ilk-altyazi" or "--first-subtitle" when command != CliCommand.Watch:
+                    request = request with { FirstSubtitleOnly = true };
                     break;
                 case "--json":
                     request = request with { Json = true };
