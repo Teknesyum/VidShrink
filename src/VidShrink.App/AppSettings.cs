@@ -43,6 +43,14 @@ public sealed class AppSettings
 
     public bool FollowRecording { get; set; }
 
+    /// <summary>
+    /// Kuyruk penceresinin izleme klasörü. İkisini <see cref="Save"/> yazmaz: ana pencere
+    /// ayarı denetimlerinden yeniden kurup kaydettiği için orada bu alanlar hep boş gelir ve
+    /// kullanıcının seçimini silerdi. Yazan tek yer <see cref="SaveWatch"/>.
+    /// </summary>
+    public bool WatchEnabled { get; set; }
+    public string WatchDirectory { get; set; } = "";
+
     /// <summary>Yürürlükteki paletin adı; boş kalırsa varsayılan palet açılır.</summary>
     public string Theme { get; set; } = "";
 
@@ -115,6 +123,8 @@ public sealed class AppSettings
             ReadString(root, "theme", value => settings.Theme = value);
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
+            ReadBool(root, "watchEnabled", value => settings.WatchEnabled = value);
+            ReadString(root, "watchFolder", value => settings.WatchDirectory = value);
             ReadInt(root, "ffmpegPathMode", value => settings.FfmpegPathMode = value);
             ReadString(root, "ffmpegPath", value => settings.FfmpegPath = value);
             ReadString(root, "openSubtitlesApiKey", value => settings.OpenSubtitlesApiKey = value);
@@ -173,20 +183,7 @@ public sealed class AppSettings
     public void Save(string? path = null)
     {
         var file = path ?? UpdateSettings.DefaultPath;
-        var folder = Path.GetDirectoryName(file);
-        if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
-
-        JsonObject root;
-        try
-        {
-            root = File.Exists(file) && JsonNode.Parse(File.ReadAllText(file)) is JsonObject existing
-                ? existing
-                : new JsonObject();
-        }
-        catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
-        {
-            root = new JsonObject();
-        }
+        var root = ReadRoot(file);
 
         root["advMode"] = AdvMode;
         root["advCrf"] = AdvCrf;
@@ -213,6 +210,37 @@ public sealed class AppSettings
         root["openSubtitlesApiKey"] = OpenSubtitlesApiKey;
         root["openSubtitlesUser"] = OpenSubtitlesUser;
 
+        WriteRoot(file, root);
+    }
+
+    /// <summary>İzleme seçimini dosyadaki öteki anahtarlara dokunmadan yazar.</summary>
+    public static void SaveWatch(bool enabled, string directory, string? path = null)
+    {
+        var file = path ?? UpdateSettings.DefaultPath;
+        var root = ReadRoot(file);
+        root["watchEnabled"] = enabled;
+        root["watchFolder"] = directory;
+        WriteRoot(file, root);
+    }
+
+    private static JsonObject ReadRoot(string file)
+    {
+        var folder = Path.GetDirectoryName(file);
+        if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+        try
+        {
+            return File.Exists(file) && JsonNode.Parse(File.ReadAllText(file)) is JsonObject existing
+                ? existing
+                : new JsonObject();
+        }
+        catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
+        {
+            return new JsonObject();
+        }
+    }
+
+    private static void WriteRoot(string file, JsonObject root)
+    {
         using var stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None);
         using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
         root.WriteTo(writer);

@@ -4439,6 +4439,7 @@ public partial class MainWindow : Window
         if (_info is null || ActivePlan is null || _cts is not null) return;
 
         var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", ShrinkExtension(ActivePlan), ActivePlan);
+        QueueWatch.MarkOwn(output);
         if (FixedFolderUnusable)
             TxtResult.Text = Say("settings-tab.output-folder.unusable", TxtOutputFolder.Text ?? "");
         var targetMb = ParseTargetMb();
@@ -4803,6 +4804,7 @@ public partial class MainWindow : Window
 
         var plan = ReadConversionPlan();
         var output = BuildUniqueOutputPath(_info.FilePath, "converted", plan.Container);
+        QueueWatch.MarkOwn(output);
         var cts = new CancellationTokenSource();
         _cts = cts;
         try

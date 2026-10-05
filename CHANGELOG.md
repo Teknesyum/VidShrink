@@ -11,6 +11,8 @@ ship as part of it.
 
 - Convert: animated WebP and animated AVIF output. Both loop forever and drop the sound
   track, as GIF does; the existing quality control sets how hard they are compressed.
+- Shrink queue: watch a folder. Videos dropped into the chosen folder join the queue on
+  their own once they have finished copying, and are shrunk with the current settings.
 - Player: jump to the next or previous chapter with Ctrl+PgDn / Ctrl+PgUp, or from the
   Playback submenu of the right-click menu. The rows are disabled when the file has no
   chapters.
