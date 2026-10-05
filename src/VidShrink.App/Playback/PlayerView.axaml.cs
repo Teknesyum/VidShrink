@@ -474,6 +474,7 @@ internal partial class PlayerView : UserControl
         var folder = new MenuItem { Header = Strings.Get("player.view.screenshot-folder") };
         folder.Click += OnPickScreenshotFolder;
         items.Add(folder);
+        items.Add(Switch(Strings.Get("player.view.screenshot-jpg"), Settings.ScreenshotFormat == ScreenshotFormat.Jpg, ToggleScreenshotJpg));
         items.Add(AdvancedMenu());
         items.Add(ShortcutsMenu());
         return items;

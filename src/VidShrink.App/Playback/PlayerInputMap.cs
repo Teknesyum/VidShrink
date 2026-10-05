@@ -57,7 +57,8 @@ internal enum PlayerCommandKind
     Edit,
     CompactOrFullscreen,
     SpeedAb,
-    ChapterStep
+    ChapterStep,
+    CopyFrame
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)

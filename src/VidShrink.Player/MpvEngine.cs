@@ -21,6 +21,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private const string MirrorFilter = "@vsmirror:hflip";
     private const string RotateLabel = "vsrotate";
     private static readonly TimeSpan ScreenshotTimeout = TimeSpan.FromSeconds(10);
+    internal const int ScreenshotJpegQuality = 92;
     private const ulong EofId = 1;
     private const ulong TimeId = 2;
     private const ulong PauseId = 3;
@@ -515,6 +516,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         var target = Path.GetFullPath(path);
         var done = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         Interlocked.Exchange(ref _shot, done)?.TrySetResult(false);
+        TrySet("screenshot-jpeg-quality", ScreenshotJpegQuality.ToString(CultureInfo.InvariantCulture));
 
         if (CommandRc(ShotTag, "screenshot-to-file", target, "video") < 0)
         {
