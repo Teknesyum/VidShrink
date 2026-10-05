@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Player: "Save playlist…" in the playlist's right-click menu writes the current list, in
+  the order shown, to an `.m3u8` file. Files in or below the list's folder are stored as
+  relative paths, so the folder can be moved together with its list.
+
 - Editor: the cut list is saved automatically after every edit and comes back when the
   same video is opened again; Undo returns to the untouched source. If the video has
   changed since, the saved edit is not loaded and the editor says so. "Save Project" and

@@ -5,11 +5,15 @@ using System.Text.RegularExpressions;
 
 namespace VidShrink.Core;
 
+/// <summary>Yazılacak liste girdisi: yol ya da adres, biliniyorsa süre (sn) ve başlık.</summary>
+public sealed record PlaylistEntry(string Path, double? Seconds = null, string? Title = null);
+
 /// <summary>
 /// Çalma listesi dosyasını girdi listesine çevirir: m3u/m3u8 satırları, pls <c>FileN=</c>
 /// anahtarları, wpl <c>&lt;media src&gt;</c> ve asx/wax/wvx/wmx <c>&lt;ref href&gt;</c> öğeleri.
 /// Göreli yol listenin klasörüne göre çözülür, <c>file://</c> yerel yola döner, uzak adres
 /// olduğu gibi kalır. Yerel girdinin diskte olup olmadığına bakmaz; bunu çağıran eler.
+/// Yazma yalnız m3u8 biçimindedir (<see cref="Write"/>).
 /// </summary>
 public static partial class PlaylistFile
 {
@@ -46,6 +50,70 @@ public static partial class PlaylistFile
 
         return entries;
     }
+
+    /// <summary>
+    /// Listeyi m3u8 olarak yazar: BOM'suz UTF-8, <c>#EXTM3U</c>, bilinen her girdiye
+    /// <c>#EXTINF</c>. Önce aynı klasörde geçici dosyaya yazılır, sonra hedefin yerine taşınır;
+    /// yarıda kalan yazma eski listeyi bozmaz. Hata çağırana çıkar, geçici dosya kalmaz.
+    /// </summary>
+    public static void Write(string path, IReadOnlyList<PlaylistEntry> entries)
+    {
+        var full = Path.GetFullPath(path);
+        var folder = Path.GetDirectoryName(full) ?? "";
+        var bytes = new UTF8Encoding(false).GetBytes(Format(entries, folder));
+        var temp = full + "." + Guid.NewGuid().ToString("N")[..8] + ".tmp";
+        try
+        {
+            File.WriteAllBytes(temp, bytes);
+            File.Move(temp, full, overwrite: true);
+        }
+        catch
+        {
+            try { File.Delete(temp); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// <see cref="Parse"/>'ın geri okuyacağı m3u8 metni. Listenin klasöründeki ya da altındaki
+    /// dosya göreli ve <c>/</c> ile yazılır (klasör taşınınca liste çalışır kalır), dışındaki
+    /// mutlak, uzak adres olduğu gibi. Okuyucunun yorum ya da adres sanacağı göreli ad
+    /// <c>./</c> ile başlar.
+    /// </summary>
+    public static string Format(IReadOnlyList<PlaylistEntry> entries, string folder)
+    {
+        var text = new StringBuilder("#EXTM3U\n");
+        foreach (var entry in entries)
+        {
+            var remote = IsRemote(entry.Path);
+            var title = OneLine(entry.Title ?? (remote ? "" : Path.GetFileNameWithoutExtension(entry.Path)));
+            if (title.Length > 0 || entry.Seconds is > 0)
+            {
+                var seconds = entry.Seconds is > 0 and var known ? (long)Math.Round(known) : -1;
+                text.Append("#EXTINF:").Append(seconds.ToString(CultureInfo.InvariantCulture)).Append(',').Append(title).Append('\n');
+            }
+
+            text.Append(remote ? entry.Path : Local(entry.Path, folder)).Append('\n');
+        }
+
+        return text.ToString();
+    }
+
+    private static string Local(string path, string folder)
+    {
+        if (folder.Length == 0 || !Path.IsPathFullyQualified(path)) return path;
+        var relative = Path.GetRelativePath(folder, path);
+        if (Path.IsPathRooted(relative) || relative == "." || relative == ".." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal)) return path;
+        relative = relative.Replace(Path.DirectorySeparatorChar, '/');
+        return relative.StartsWith('#') || char.IsWhiteSpace(relative[0]) || HasScheme(relative) ? "./" + relative : relative;
+    }
+
+    private static bool IsRemote(string entry) => HasScheme(entry) && !new Uri(entry).IsFile;
+
+    private static bool HasScheme(string entry) => Uri.TryCreate(entry, UriKind.Absolute, out var uri) && uri.Scheme.Length > 1;
+
+    private static string OneLine(string text) => text.Replace('\r', ' ').Replace('\n', ' ').Trim();
 
     internal static string Decode(byte[] bytes)
     {
@@ -90,7 +158,7 @@ public static partial class PlaylistFile
         if (Uri.TryCreate(entry, UriKind.Absolute, out var uri) && uri.Scheme.Length > 1)
         {
             if (!uri.IsFile) return entry;
-            entry = uri.LocalPath;
+            if (entry.StartsWith("file:", StringComparison.OrdinalIgnoreCase)) entry = uri.LocalPath;
         }
 
         if (!OperatingSystem.IsWindows()) entry = entry.Replace('\\', '/');
