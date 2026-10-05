@@ -34,6 +34,7 @@ internal partial class RecorderView
             if (_regionEditorWired) Unwire(_regionEditor);
             _regionEditor = value;
             _regionEditorWired = false;
+            _regionEditor.HideKey = HotkeyName(HotkeyAction.Frame);
             WireRegionEditor();
         }
     }

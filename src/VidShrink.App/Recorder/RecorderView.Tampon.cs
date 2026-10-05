@@ -126,7 +126,7 @@ internal partial class RecorderView
         try
         {
             _replay = await ReplayStarter(replayRequest, ReplayFolder(), seconds);
-            ShowNotice(Say("recorder.replay.running", seconds));
+            ShowNotice(Say("recorder.replay.running", seconds, HotkeyName(HotkeyAction.ReplaySave)));
             return true;
         }
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)

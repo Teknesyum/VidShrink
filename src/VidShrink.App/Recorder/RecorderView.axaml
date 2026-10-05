@@ -25,6 +25,19 @@
                    Content="{loc:Text recorder.level.advanced}"
                    ToolTip.Tip="{loc:Text recorder.level.advanced-hint}"
                    auto:AutomationProperties.Name="{loc:Text recorder.level.advanced}"/>
+      <Button x:Name="BtnHotkeys"
+              VerticalAlignment="Center"
+              Theme="{StaticResource GhostButton}"
+              Padding="{StaticResource HeaderButtonPadding}"
+              IsVisible="{Binding #RadAdvanced.IsChecked}"
+              Content="{loc:Text recorder.hotkeys.title}"
+              auto:AutomationProperties.Name="{loc:Text recorder.hotkeys.title}">
+        <Button.Styles>
+          <Style Selector="Button#BtnHotkeys:pointerover">
+            <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+          </Style>
+        </Button.Styles>
+      </Button>
     </StackPanel>
 
     <!--
@@ -738,7 +751,6 @@
               <TextBlock Text="{loc:Text recorder.replay.seconds}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
               <ComboBox x:Name="CmbReplaySeconds"
                         HorizontalAlignment="Stretch"
-                        ToolTip.Tip="{loc:Text recorder.replay.hint}"
                         auto:AutomationProperties.Name="{loc:Text recorder.replay.seconds}"/>
             </StackPanel>
 
@@ -748,7 +760,6 @@
                       Margin="{StaticResource WrapItemMargin}"
                       Theme="{StaticResource GhostButton}"
                       Content="{loc:Text recorder.replay.start}"
-                      ToolTip.Tip="{loc:Text recorder.replay.hint}"
                       auto:AutomationProperties.Name="{loc:Text recorder.replay.start}"
                       Click="OnReplayToggle"/>
 

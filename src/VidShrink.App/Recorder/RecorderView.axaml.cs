@@ -61,6 +61,7 @@ internal partial class RecorderView : UserControl
         InitSecici();
         InitDuzenleyici();
         InitGelismis();
+        InitKisayol();
         InitOtomatik();
         InitSes();
         InitSerit();
@@ -119,6 +120,7 @@ internal partial class RecorderView : UserControl
             RefreshFinishLabels();
             RefreshReplayLabels();
             RefreshAdvancedLabels();
+            RefreshHotkeyLabels();
             RefreshWizard();
             RefreshSerit();
         });

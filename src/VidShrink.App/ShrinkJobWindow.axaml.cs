@@ -141,6 +141,7 @@ public partial class ShrinkJobWindow : Window
         BtnCountdownCancel.Click += (_, _) => CancelCountdown();
         BtnOvershootAccept.Click += (_, _) => AnswerOvershoot(true);
         BtnOvershootStop.Click += (_, _) => AnswerOvershoot(false);
+        WireWatch();
         CmbWhenDone.ItemsSource = new[]
         {
             Say("main.shrink-job.done.nothing"),
@@ -274,6 +275,7 @@ public partial class ShrinkJobWindow : Window
         }
 
         foreach (var request in _startup.Items) Accept(request);
+        RestoreWatch();
 
         if (_queue is null) return;
         try
@@ -491,6 +493,7 @@ public partial class ShrinkJobWindow : Window
 
         var cts = new CancellationTokenSource();
         _cts = cts;
+        _running = request.Path;
         try
         {
             var info = await FfprobeClient.ProbeAsync(request.Path, cts.Token);
@@ -499,6 +502,7 @@ public partial class ShrinkJobWindow : Window
             TxtTarget.Text = Say("main.shrink-job.target", TargetLabel(targetMb), _finished + 1, _accepted);
             var plan = PlanCalculator.Build(info, options);
             var output = UniqueOutputPath(request.Path, _appSettings, plan, targetMb, ExtensionFor(plan));
+            QueueWatch.MarkOwn(output);
 
             var progress = new Progress<EncodeProgress>(ShowProgress);
 
@@ -507,6 +511,7 @@ public partial class ShrinkJobWindow : Window
 
             if (result.Success)
             {
+                QueueWatch.MarkOwn(result.OutputPath);
                 _outputs.Add(result.OutputPath);
                 State = ShrinkJobState.Bitti;
                 Progress.Value = 1;
@@ -535,6 +540,7 @@ public partial class ShrinkJobWindow : Window
         finally
         {
             _finished++;
+            _running = null;
             _cts = null;
             cts.Dispose();
             HideOvershoot();
@@ -623,7 +629,7 @@ public partial class ShrinkJobWindow : Window
         _closeTimer = new DispatcherTimer { Interval = Linger };
         _closeTimer.Tick += (_, _) =>
         {
-            if ((_shareFlow?.Running ?? false) || _countdownLeft is not null) return;
+            if ((_shareFlow?.Running ?? false) || _countdownLeft is not null || Watching) return;
             _closeTimer?.Stop();
             if (_pending.Count == 0 && !_busy) Close();
         };
@@ -658,6 +664,7 @@ public partial class ShrinkJobWindow : Window
     {
         _closeTimer?.Stop();
         _countdown?.Stop();
+        StopWatch();
         _cts?.Cancel();
         _shareFlow?.Cancel();
         _queue?.Dispose();
