@@ -25,18 +25,18 @@
   <Color x:Key="NeonPinkFillColor">#1ABE9000</Color>
   <Color x:Key="NeonPurpleBorderColor">#808C91D9</Color>
 
-  <Color x:Key="NeonEmberColor">#FFDC322F</Color>
+  <Color x:Key="NeonEmberColor">#FFDF4442</Color>
   <Color x:Key="EmberFlameColor">#FFCB4B16</Color>
   <Color x:Key="EmberBlazeColor">#FFF1B600</Color>
   <Color x:Key="AtmosHotColor">#FFF1B601</Color>
   <Color x:Key="AtmosMidColor">#FFCB4B17</Color>
-  <Color x:Key="AtmosEdgeColor">#FFDC3230</Color>
+  <Color x:Key="AtmosEdgeColor">#FFDF4443</Color>
   <Color x:Key="EmberDeepColor">#FF03222A</Color>
   <Color x:Key="EmberMidColor">#FF06222A</Color>
-  <Color x:Key="EmberEdgeColor">#FF09222A</Color>
+  <Color x:Key="EmberEdgeColor">#FF09222B</Color>
   <Color x:Key="EmberBarDeepColor">#FF0A2A33</Color>
-  <Color x:Key="EmberBarMidColor">#FF0E2A33</Color>
-  <Color x:Key="EmberBarEdgeColor">#FF112A33</Color>
+  <Color x:Key="EmberBarMidColor">#FF0E2B33</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF112B33</Color>
   <Color x:Key="EmberFlameGlyphColor">#FFF1B602</Color>
 
   <Color x:Key="PlaybackScrimColor">#CC002B36</Color>

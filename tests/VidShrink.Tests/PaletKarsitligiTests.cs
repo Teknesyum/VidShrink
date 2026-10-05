@@ -124,6 +124,46 @@ public sealed class PaletKarsitligiTests
         Assert.Equal(AaAltindaKalanlar.OrderBy(p => p, StringComparer.Ordinal), altta);
     }
 
+    private static readonly string[] TehlikeZeminleri = ["AppBgColor", "SurfaceToneColor"];
+
+    [Theory]
+    [MemberData(nameof(Paletler))]
+    public void TehlikeRengiHerZemindeUcuGeciyor(string palet)
+    {
+        var xaml = File.ReadAllText(Path.Combine(PaletKoku, palet, "Theme.axaml"));
+        var tehlike = Renk(xaml, "NeonEmberColor");
+        Assert.True(tehlike is not null, $"{palet}: NeonEmberColor yok.");
+        var zeminler = TehlikeZeminleri.Select(a => (Ad: a, Deger: Renk(xaml, a)!))
+            .Append((Ad: "beyaz", Deger: "#FFFFFFFF"))
+            .Append((Ad: "siyah", Deger: "#FF000000"));
+        foreach (var (ad, deger) in zeminler)
+        {
+            var oran = Karsitlik(tehlike!, deger);
+            _cikti.WriteLine($"TEHLIKE\t{palet}\t{tehlike}\t{ad}\t{oran:0.00}");
+            Assert.True(oran >= TabanEsik, $"{palet}: NeonEmber {tehlike}, {ad} ustunde {oran:0.00}:1 — taban {TabanEsik:0.0}.");
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(Paletler))]
+    public void OdakHalkasiZemindenAyriliyor(string palet)
+    {
+        var denetimler = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "Themes", "Controls.axaml"));
+        var sablon = Regex.Match(denetimler, "<FocusAdornerTemplate x:Key=\"DuzenOdakHalkasi\">(.*?)</FocusAdornerTemplate>", RegexOptions.Singleline);
+        Assert.True(sablon.Success, "DuzenOdakHalkasi sablonu yok.");
+        var cizgiler = Regex.Matches(sablon.Groups[1].Value, "Stroke=\"\\{StaticResource (\\w+)\\}\"").Select(m => m.Groups[1].Value).ToArray();
+        Assert.Equal(new[] { "AppBg", "NeonBlue" }, cizgiler);
+
+        var xaml = File.ReadAllText(Path.Combine(PaletKoku, palet, "Theme.axaml"));
+        var halka = Renk(xaml, cizgiler[1] + "Color")!;
+        foreach (var ad in TehlikeZeminleri)
+        {
+            var oran = Karsitlik(halka, Renk(xaml, ad)!);
+            _cikti.WriteLine($"ODAK\t{palet}\t{halka}\t{ad}\t{oran:0.00}");
+            Assert.True(oran >= TabanEsik, $"{palet}: odak halkasi {halka}, {ad} ustunde {oran:0.00}:1 — taban {TabanEsik:0.0}.");
+        }
+    }
+
     private const double StandartEsik = 7.0;
 
     private static readonly string[] MetinAnahtarlari =

@@ -36,7 +36,7 @@ Vurgu gradyanı `AccentGradient` (accent1 → accent3) paletten değil `Theme.ax
 | `renk-2-text` | `PinkText` | Hata yazısı |
 | `success` | `NeonSuccess` | "Bitti" yeşili |
 | `warning` | `EmberBlaze` | Uyarı, ateşin parlak ucu |
-| `danger` (yoksa `renk-2`) | `NeonEmber` | Ateşin koyu ucu |
+| `danger` (yoksa `renk-2`) | `NeonEmber` | Ateşin koyu ucu; beyaza, siyaha, zemine ve yüzeye karşı 3:1'i tutana dek en küçük adımla koyulaşır ya da açılır |
 | `flame` (yoksa danger ile warning'in ortası) | `EmberFlame` | Ateşin ortası |
 | `text` | `TextBody` | Ana yazı |
 | `disabled` | `TextDisabled` | Sönük yazı, ipucu, devre dışı |

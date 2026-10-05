@@ -43,8 +43,44 @@ public static class PaletteBuilder
         ("WarningColor", "EmberBlazeColor"),
     ];
 
-    /// <summary><c>danger</c> verilmemişse standardın kuralı: <c>danger</c> <c>renk-2</c>'nin değerini izler.</summary>
-    public static string Danger(PaletteSeed seed) => seed.Danger ?? seed.Renk2;
+    /// <summary>
+    /// <c>danger</c> verilmemişse standardın kuralı: <c>danger</c> <c>renk-2</c>'nin değerini izler.
+    /// Tehlike rengi yazı taşımaz, çizgi ve nokta çizer: kayıt çerçevesi ve bölge tutamakları masaüstünün
+    /// üstünde, canlı nokta yüzeyin üstünde durur. Bu yüzden beyaza, siyaha, zemine ve yüzeye karşı 3:1'i
+    /// tutana dek en küçük adımla siyaha ya da beyaza karışır; tutan tohum olduğu gibi kalır.
+    /// Ölçü: <c>KontrastTests.HerYaziVeSimgeEsigiGeciyor</c>, <c>PaletKarsitligiTests.TehlikeRengiHerZemindeUcuGeciyor</c>.
+    /// </summary>
+    public static string Danger(PaletteSeed seed)
+    {
+        var tone = seed.Danger ?? seed.Renk2;
+        var grounds = new[] { "#FFFFFF", "#000000", seed.Black, seed.Surface };
+        double Worst(string candidate) => grounds.Min(ground => Contrast(candidate, ground));
+        if (Worst(tone) >= DangerContrast) return tone;
+
+        var best = tone;
+        for (var step = 1; step <= 100; step++)
+        {
+            var darker = Mix(tone, "#000000", step / 100.0);
+            var lighter = Mix(tone, "#FFFFFF", step / 100.0);
+            var pick = Worst(darker) >= Worst(lighter) ? darker : lighter;
+            if (Worst(pick) > Worst(best)) best = pick;
+            if (Worst(pick) >= DangerContrast) return pick;
+        }
+        return best;
+    }
+
+    /// <summary>
+    /// Metin olmayan öğenin eşiği 3:1 (WCAG 1.4.11); pay, ateş şeridiyle ısınan yüzey içindir:
+    /// 3,0 hedefiyle Kanagawa, OneDark ve Solarized'ın canlı noktası şeritte 2,98-2,99 ölçüldü.
+    /// </summary>
+    public const double DangerContrast = 3.1;
+
+    public static double Contrast(string first, string second)
+    {
+        var a = Luminance(first);
+        var b = Luminance(second);
+        return (Math.Max(a, b) + 0.05) / (Math.Min(a, b) + 0.05);
+    }
 
     /// <summary><c>flame</c> verilmemişse ateşin ortası, tehlike ile uyarının tam ortası.</summary>
     public static string Flame(PaletteSeed seed) => seed.Flame ?? Mix(Danger(seed), seed.Warning, 0.5);

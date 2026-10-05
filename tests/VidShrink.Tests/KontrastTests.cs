@@ -27,6 +27,18 @@ public sealed class KontrastTests
     private static readonly string[] Durumlar = { ":pointerover", ":pressed", ":focus-visible", ":selected", ":checked", ":open" };
     private static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
 
+    [ThreadStatic] private static HashSet<string>? _vurgu;
+
+    private static readonly string[] VurguAnahtarlari =
+    {
+        "NeonBlue", "NeonPink", "NeonPurple", "NeonSuccess", "NeonEmber", "EmberBlaze", "EmberFlame", "EmberFlameGlyph", "PinkText"
+    };
+
+    private static readonly string[] SaydamKatmanlar =
+    {
+        "NeonBlueFill", "NeonBlueHover", "NeonBlueActive", "NeonBlueBorder", "NeonBlueBorderStrong", "NeonPinkFill", "NeonPurpleBorder"
+    };
+
     private sealed record Olcum(string Ekran, string Durum, string Tur, string Yol, string Metin, string Zemin, string On, double Oran)
     {
         public string Anahtar { get; set; } = "";
@@ -39,7 +51,7 @@ public sealed class KontrastTests
         return veri;
     }
 
-    private static double Esik(string tur) => tur == "simge" ? SimgeEsigi : YaziEsigi;
+    private static double Esik(string tur) => tur == "yazi" ? YaziEsigi : SimgeEsigi;
 
     [Theory]
     [MemberData(nameof(Paletler))]
@@ -73,7 +85,7 @@ public sealed class KontrastTests
         });
 
         var tekil = olcumler.GroupBy(o => o.Ekran + "|" + o.Durum + "|" + o.Tur + "|" + o.Yol + "|" + o.On + "|" + o.Zemin).Select(g => g.First()).ToList();
-        var altinda = tekil.Where(o => o.Durum != "edilgen" && o.Oran < Esik(o.Tur)).ToList();
+        var altinda = tekil.Where(o => o.Durum != "edilgen" && o.Oran < Esik(o.Tur) && !(o.Tur is "kenar" or "dolgu" or "sekil" && SaydamKatmanlar.Contains(o.Anahtar))).ToList();
         var bulgular = altinda;
         if (klasor != null)
         {
@@ -152,11 +164,15 @@ public sealed class KontrastTests
             {
                 Assert.Equal(palet, PaletteCatalog.Use(palet));
                 var adlar = RenkAdlari();
+                var dokum = Environment.GetEnvironmentVariable("UC_KLASOR") != null;
+                _vurgu = adlar.Where(a => VurguAnahtarlari.Contains(a.Value) || (dokum && SaydamKatmanlar.Contains(a.Value)))
+                    .Select(a => a.Key).ToHashSet(StringComparer.Ordinal);
                 govde(hepsi);
                 foreach (var o in hepsi) o.Anahtar = adlar.TryGetValue(o.On, out var ad) ? ad : o.On;
             }
             finally
             {
+                _vurgu = null;
                 Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, ayar);
                 PaletteCatalog.Use(PaletteCatalog.Default);
                 CultureInfo.CurrentUICulture = kultur;
@@ -378,73 +394,103 @@ public sealed class KontrastTests
     {
         if (!Gorunur(d)) return;
         if (!edilgen && d is InputElement ie && !ie.IsEffectivelyEnabled) return;
-        IBrush? on = null;
-        string? metin = null;
-        var tur = "yazi";
+        if (Saydamlik(d) < 0.05) return;
+        foreach (var (on, metin, tur) in Adaylar(d))
+        {
+            if (string.IsNullOrWhiteSpace(metin)) continue;
+            var disaridan = tur is "kenar" or "dolgu";
+            var onler = new List<(Color Renk, double[] Deger)>();
+            if (on is ISolidColorBrush fg) onler.Add((fg.Color, Renk(fg.Color, fg.Opacity)));
+            else if (on is IGradientBrush gfg) onler.AddRange(gfg.GradientStops.Select(st => (st.Color, Renk(st.Color, gfg.Opacity))));
+            if (onler.Count == 0) continue;
+            if (tur is "kenar" or "dolgu" or "sekil")
+            {
+                onler = onler.Where(o => _vurgu != null && _vurgu.Contains(Hex(o.Renk))).ToList();
+                if (onler.Count == 0 || d.Bounds.Width <= 0 || d.Bounds.Height <= 0) continue;
+            }
+            var zincir = new List<Visual>();
+            for (var n = disaridan ? Disi(d) : d; n != null && n != video; n = n.GetVisualParent()) zincir.Insert(0, n);
+            if (zincir.Count == 0) continue;
+            var dolgular = new List<List<double[]>>();
+            foreach (var n in zincir)
+            {
+                var b = Dolgu(n);
+                if (b == null) dolgular.Add(new() { new double[] { 0, 0, 0, 0 } });
+                else if (b is ISolidColorBrush sb) dolgular.Add(new() { Renk(sb.Color, sb.Opacity) });
+                else if (b is IGradientBrush gb) dolgular.Add(gb.GradientStops.Select(st => Renk(st.Color, gb.Opacity)).ToList());
+                else dolgular.Add(Ornekle(b, n, d));
+            }
+            var secimler = new List<int[]> { new int[zincir.Count] };
+            for (var i = 0; i < zincir.Count; i++)
+            {
+                if (dolgular[i].Count < 2) continue;
+                secimler = secimler.SelectMany(sec => Enumerable.Range(0, dolgular[i].Count).Select(j => { var k = (int[])sec.Clone(); k[i] = j; return k; })).Take(64).ToList();
+            }
+            foreach (var (renk, deger) in onler)
+            {
+                var onRenk = disaridan ? new[] { deger[0], deger[1], deger[2], deger[3] * d.Opacity } : deger;
+                double enKotu = double.MaxValue;
+                double[] enKotuZemin = { 0, 0, 0, 1 };
+                foreach (var taban in new[] { new double[] { 255, 255, 255, 1 }, new double[] { 0, 0, 0, 1 } })
+                    foreach (var sec in secimler)
+                    {
+                        var yazi = Ciz(zincir, dolgular, sec, 0, taban, onRenk);
+                        var zemin = Ciz(zincir, dolgular, sec, 0, taban, null);
+                        var oran = Oran(yazi, zemin);
+                        if (oran < enKotu)
+                        {
+                            enKotu = oran;
+                            enKotuZemin = zemin;
+                        }
+                    }
+                hepsi.Add(new Olcum(ekran, edilgen ? "edilgen" : durum, tur, Yol(d), Kisalt(metin!), Hex(enKotuZemin), Hex(renk), Math.Round(enKotu, 2)));
+            }
+        }
+    }
+
+    private static IEnumerable<(IBrush? On, string? Metin, string Tur)> Adaylar(Visual d)
+    {
+        var ad = d is Control c && !string.IsNullOrEmpty(c.Name) ? c.Name : d.GetType().Name;
         if (d is TextBlock tb)
         {
-            on = tb.Foreground;
-            metin = tb.Text;
+            var metin = tb.Text;
             if (string.IsNullOrWhiteSpace(metin) && tb.Inlines is { Count: > 0 }) metin = string.Concat(tb.Inlines.OfType<Avalonia.Controls.Documents.Run>().Select(r => r.Text));
+            yield return (tb.Foreground, metin, "yazi");
         }
-        else if (d is ContentPresenter cp && cp.Content is string s && !cp.GetVisualChildren().Any())
-        {
-            on = cp.Foreground;
-            metin = s;
-        }
+        else if (d is ContentPresenter cp && cp.Content is string s && !cp.GetVisualChildren().Any()) yield return (cp.Foreground, s, "yazi");
         else if (d is TextPresenter tp)
         {
-            on = tp.Foreground;
-            metin = tp.Text;
+            yield return (tp.Foreground, tp.Text, "yazi");
+            if (tp.CaretBrush != null) yield return (tp.CaretBrush, "imlec", "sekil");
         }
-        else if (d is PathIcon pi)
-        {
-            on = pi.Foreground;
-            metin = pi.Name ?? "PathIcon";
-            tur = "simge";
-        }
+        else if (d is PathIcon pi) yield return (pi.Foreground, pi.Name ?? "PathIcon", "simge");
         else if (d is Sekil.Path p && p.GetVisualAncestors().Any(a => a is Button || a is TabItem || a is ToggleButton || a is MenuItem))
+            yield return (p.Fill ?? p.Stroke, p.Name ?? "Path", "simge");
+        else if (d is Sekil.Shape sk)
         {
-            on = p.Fill ?? p.Stroke;
-            metin = p.Name ?? "Path";
-            tur = "simge";
+            if (sk.Fill != null) yield return (sk.Fill, ad, "sekil");
+            if (sk.Stroke != null && sk.StrokeThickness > 0) yield return (sk.Stroke, ad, "sekil");
         }
-        if (string.IsNullOrWhiteSpace(metin)) return;
-        if (on is not ISolidColorBrush fg) return;
-        if (Saydamlik(d) < 0.05) return;
-        var zincir = new List<Visual>();
-        for (var n = d; n != null && n != video; n = n.GetVisualParent()) zincir.Insert(0, n);
-        var dolgular = new List<List<double[]>>();
-        foreach (var n in zincir)
+
+        if (d is Border kb)
         {
-            var b = Dolgu(n);
-            if (b == null) dolgular.Add(new() { new double[] { 0, 0, 0, 0 } });
-            else if (b is ISolidColorBrush sb) dolgular.Add(new() { Renk(sb.Color, sb.Opacity) });
-            else if (b is IGradientBrush gb) dolgular.Add(gb.GradientStops.Select(st => Renk(st.Color, gb.Opacity)).ToList());
-            else dolgular.Add(Ornekle(b, n, d));
+            if (kb.BorderBrush != null && kb.BorderThickness != default) yield return (kb.BorderBrush, ad, "kenar");
+            if (kb.Background != null) yield return (kb.Background, ad, "dolgu");
         }
-        var onRenk = Renk(fg.Color, fg.Opacity);
-        var secimler = new List<int[]> { new int[zincir.Count] };
-        for (var i = 0; i < zincir.Count; i++)
+        else if (d is ContentPresenter kcp)
         {
-            if (dolgular[i].Count < 2) continue;
-            secimler = secimler.SelectMany(sec => Enumerable.Range(0, dolgular[i].Count).Select(j => { var k = (int[])sec.Clone(); k[i] = j; return k; })).Take(64).ToList();
+            if (kcp.BorderBrush != null && kcp.BorderThickness != default) yield return (kcp.BorderBrush, ad, "kenar");
+            if (kcp.Background != null) yield return (kcp.Background, ad, "dolgu");
         }
-        double enKotu = double.MaxValue;
-        double[] enKotuZemin = { 0, 0, 0, 1 };
-        foreach (var taban in new[] { new double[] { 255, 255, 255, 1 }, new double[] { 0, 0, 0, 1 } })
-            foreach (var sec in secimler)
-            {
-                var yazi = Ciz(zincir, dolgular, sec, 0, taban, onRenk);
-                var zemin = Ciz(zincir, dolgular, sec, 0, taban, null);
-                var oran = Oran(yazi, zemin);
-                if (oran < enKotu)
-                {
-                    enKotu = oran;
-                    enKotuZemin = zemin;
-                }
-            }
-        hepsi.Add(new Olcum(ekran, edilgen ? "edilgen" : durum, tur, Yol(d), Kisalt(metin), Hex(enKotuZemin), Hex(fg.Color), Math.Round(enKotu, 2)));
+        else if (d is Panel pn && pn.Background != null) yield return (pn.Background, ad, "dolgu");
+    }
+
+    private static Visual? Disi(Visual d)
+    {
+        var ust = d.GetVisualParent();
+        if (d is StyledElement se && se.TemplatedParent is TemplatedControl tc && Equals(tc.Background, Dolgu(d)))
+            ust = tc.GetVisualParent();
+        return ust;
     }
 
     private static double[] Ciz(List<Visual> zincir, List<List<double[]>> dolgular, int[] sec, int i, double[] alt, double[]? yazi)
