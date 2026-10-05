@@ -34,6 +34,8 @@ internal partial class PlayerView
         flyout.Items.Add(ItemRow("copy-path", "player.list.item.copy-path", true, () => _ = PathCopier(TopLevel.GetTopLevel(this), file)));
         flyout.Items.Add(new Separator());
         flyout.Items.Add(ItemRow("remove", "player.list.item.remove", !current, () => AfterEdit(RemoveFromList(file))));
+        flyout.Items.Add(new Separator());
+        flyout.Items.Add(SavePlaylistRow());
         return flyout;
     }
 
