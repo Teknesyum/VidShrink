@@ -1211,6 +1211,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-02, hiz ibresi: <c>main.player.speedab.tip</c> "Speed A {0} · B {1}" yerine "Fast {0} · Slow {1}" oldu, 43 dilde koldan cikiyor; yeni hiz, OSD ve medya adi anahtarlari kola girmiyor (25405768 tabaniyla KOL dokumu karsilastirilarak olculdu): 2930 - 43 = 2887, en 276 - 1 = 275, tr 103 - 1 = 102.</para>
     /// <para>2026-10-05, oynatici bolum atlama: iki yeni anahtardan (<c>main.player.menu.chapternext</c>, <c>main.player.menu.chapterprev</c>) 5 kol 3 dilde (en ve pl ikisi, hu yalniz chapternext), yanlarindaki yer imi anahtarlariyla ayni dagilim, tr haric: 2887 + 5 = 2892, en 275 + 2 = 277, tr 102.</para>
     /// <para>2026-10-05, kuyruk izleme klasoru: bes yeni <c>main.shrink-job.watch*</c> anahtarindan 16 kol 11 dilde (hint: cs, de, en, es, hu, it, nl, pl, sk, sl; lost: en, es, hr, hu, nl, pt): 2892 + 16 = 2908, en 277 + 2 = 279, tr 102.</para>
+    /// <para>2026-10-05, kareyi panoya kopyalama ve JPG ekran goruntusu: dort yeni <c>player.view.screenshot-*</c> anahtarindan 21 kol 8 dilde (copy ve copied: cs, de, en, hu, pl, pt, sk; copy-failed: en, hu, ro; jpg: en, es, pt, ro), tr haric: 2908 + 21 = 2929, en 279 + 4 = 283, tr 102.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1236,8 +1237,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2908, toplam);
-        Assert.Equal(279, dilBasina["en"]);
+        Assert.Equal(2929, toplam);
+        Assert.Equal(283, dilBasina["en"]);
         Assert.Equal(102, dilBasina["tr"]);
     }
 
@@ -1426,6 +1427,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-02, oynatici hiz ibresi, OSD ve medya adi: yedi yeni anahtar (<c>main.player.speed.fast</c>, <c>main.player.speed.slow</c>, <c>main.player.osd.speed</c>, <c>main.player.osd.volume</c>, <c>main.player.osd.muted</c>, <c>main.player.osd.mutedvolume</c>, <c>player.title.copy-name</c>), dusen yok: 1266 + 7 = 1273, 43 x 1273 = 54739. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, oynatici bolum atlama: iki yeni anahtar (<c>main.player.menu.chapternext</c>, <c>main.player.menu.chapterprev</c>), dusen yok: 1273 + 2 = 1275, 43 x 1275 = 54825. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, kuyruk izleme klasoru: bes yeni anahtar (<c>main.shrink-job.watch</c>, <c>.choose</c>, <c>.none</c>, <c>.hint</c>, <c>.lost</c>), dusen yok: 1275 + 5 = 1280, 43 x 1280 = 55040. <c>kayip</c> 0.</para>
+    /// <para>2026-10-05, kareyi panoya kopyalama ve JPG ekran goruntusu: dort yeni anahtar (<c>player.view.screenshot-copy</c>, <c>-copied</c>, <c>-copy-failed</c>, <c>player.view.screenshot-jpg</c>), dusen yok: 1280 + 4 = 1284, 43 x 1284 = 55212. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1453,7 +1455,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(55040, gezilen);
+        Assert.Equal(55212, gezilen);
         Assert.Empty(kayip);
     }
 

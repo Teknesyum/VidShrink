@@ -16,6 +16,9 @@ ship as part of it.
 - Player: jump to the next or previous chapter with Ctrl+PgDn / Ctrl+PgUp, or from the
   Playback submenu of the right-click menu. The rows are disabled when the file has no
   chapters.
+- Player: copy the current frame to the clipboard with Ctrl+Shift+E or from the right-click
+  menu, and save screenshots as JPG instead of PNG (Settings submenu and the Advanced player
+  panel; PNG stays the default).
 
 ## [1.2.6] - 2026-10-02
 

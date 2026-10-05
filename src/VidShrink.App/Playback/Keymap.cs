@@ -71,6 +71,7 @@ internal static class Keymap
     internal static readonly PlayerAction Topmost = new(PlayerCommandKind.ToggleTopmost, 0, "player.view.topmost");
     internal static readonly PlayerAction Info = new(PlayerCommandKind.ToggleInfo, 0, "player.view.info");
     internal static readonly PlayerAction Screenshot = new(PlayerCommandKind.Screenshot, 0, "player.view.screenshot");
+    internal static readonly PlayerAction CopyFrame = new(PlayerCommandKind.CopyFrame, 0, "player.view.screenshot-copy");
     internal static readonly PlayerAction PreviousFile = new(PlayerCommandKind.FileStep, -1, "player.list.previous");
     internal static readonly PlayerAction NextFile = new(PlayerCommandKind.FileStep, 1, "player.list.next");
     internal static readonly PlayerAction Shuffle = new(PlayerCommandKind.ToggleShuffle, 0, "player.list.shuffle");
@@ -151,6 +152,7 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.T, KeyModifiers.Control), Topmost),
         new(PlayerInput.OnKey(Key.F1, KeyModifiers.Control), Info),
         new(PlayerInput.OnKey(Key.E, KeyModifiers.Control), Screenshot),
+        new(PlayerInput.OnKey(Key.E, KeyModifiers.Control | KeyModifiers.Shift), CopyFrame),
         new(PlayerInput.OnKey(Key.E), Edit),
         new(PlayerInput.OnKey(Key.PageUp), PreviousFile),
         new(PlayerInput.OnKey(Key.PageDown), NextFile),
@@ -252,7 +254,7 @@ internal static class Keymap
     internal static readonly IReadOnlyList<PlayerAction> MenuActions = MenuTop
         .Concat(ViewMenu).Concat(PlaybackMenu).Concat(LoopMenu)
         .OfType<PlayerAction>()
-        .Append(Screenshot).Append(Info).Append(Settings)
+        .Append(Screenshot).Append(CopyFrame).Append(Info).Append(Settings)
         .ToList();
 
     internal static PlayerCommand ForWheel(double notches, KeyModifiers modifiers)
