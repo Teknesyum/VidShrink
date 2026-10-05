@@ -26,7 +26,8 @@ public sealed class KaydediciAyarGidisDonusTests
         ["PixelFormat"] = "yuv444p10le",
         ["Codec"] = "libx265",
         ["Preset"] = "slow",
-        ["ColorRange"] = "jpeg"
+        ["ColorRange"] = "jpeg",
+        ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5"
     };
 
     internal static IReadOnlyList<PropertyInfo> Ozellikler() => typeof(RecorderSettings)

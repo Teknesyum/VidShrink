@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Threading;
+using VidShrink.App.Playback;
 
 namespace VidShrink.App.Recorder;
 
@@ -18,7 +20,7 @@ internal enum HotkeyAction
     ReplaySave
 }
 
-internal sealed record HotkeyBinding(HotkeyAction Action, Key Key, uint VirtualKey);
+internal sealed record HotkeyBinding(HotkeyAction Action, Key Key, uint VirtualKey, KeyModifiers Modifiers = KeyModifiers.None);
 
 internal interface IGlobalHotkeys
 {
@@ -38,13 +40,84 @@ internal static class RecorderHotkeys
         new(HotkeyAction.ReplaySave, Key.F11, 0x7A)
     ];
 
-    internal static HotkeyAction? ActionOf(Key key, KeyModifiers modifiers)
-        => modifiers == KeyModifiers.None && All.FirstOrDefault(b => b.Key == key) is { } binding
-            ? binding.Action
-            : null;
+    internal static HotkeyAction? ActionOf(Key key, KeyModifiers modifiers) => ActionOf(All, key, modifiers);
+
+    internal static HotkeyAction? ActionOf(IReadOnlyList<HotkeyBinding> bindings, Key key, KeyModifiers modifiers)
+        => bindings.FirstOrDefault(b => b.Key == key && b.Modifiers == Clean(modifiers))?.Action;
+
+    internal static HotkeyBinding Of(IReadOnlyList<HotkeyBinding> bindings, HotkeyAction action)
+        => bindings.First(b => b.Action == action);
+
+    internal static KeyModifiers Clean(KeyModifiers modifiers)
+        => modifiers & (KeyModifiers.Control | KeyModifiers.Shift | KeyModifiers.Alt);
+
+    internal static bool Same(HotkeyBinding a, HotkeyBinding b) => a.Key == b.Key && a.Modifiers == b.Modifiers;
+
+    /// <summary>
+    /// Genel kısayola çevrilebilen tuşların sanal tuş kodu. Küme kapalı: işlev tuşları, harfler,
+    /// rakamlar, sayı takımı ve birkaç gezinme tuşu. Dışında kalan tuş atanamaz.
+    /// </summary>
+    internal static uint? VirtualKeyOf(Key key) => key switch
+    {
+        >= Key.F1 and <= Key.F24 => 0x70 + (uint)(key - Key.F1),
+        >= Key.A and <= Key.Z => 0x41 + (uint)(key - Key.A),
+        >= Key.D0 and <= Key.D9 => 0x30 + (uint)(key - Key.D0),
+        >= Key.NumPad0 and <= Key.NumPad9 => 0x60 + (uint)(key - Key.NumPad0),
+        Key.PageUp => 0x21,
+        Key.PageDown => 0x22,
+        Key.End => 0x23,
+        Key.Home => 0x24,
+        Key.Insert => 0x2D,
+        Key.Pause => 0x13,
+        _ => null
+    };
+
+    /// <summary>
+    /// Atanabilir bağ. İşlev tuşu tek başına olur; öbür tuşlar Ctrl ya da Alt ister, çünkü
+    /// genel kısayol o tuşu her uygulamada yutar ve düz harf yazı yazmayı keser.
+    /// </summary>
+    internal static HotkeyBinding? Bind(HotkeyAction action, Key key, KeyModifiers modifiers)
+    {
+        var clean = Clean(modifiers);
+        if (VirtualKeyOf(key) is not { } code) return null;
+        var bare = key is >= Key.F1 and <= Key.F24;
+        return bare || (clean & (KeyModifiers.Control | KeyModifiers.Alt)) != 0 ? new HotkeyBinding(action, key, code, clean) : null;
+    }
+
+    internal static string Gesture(HotkeyBinding binding) => Keymap.Gesture(PlayerInput.OnKey(binding.Key, binding.Modifiers));
 
     internal static string Names(IEnumerable<HotkeyBinding> bindings)
-        => string.Join(", ", bindings.Select(b => b.Key.ToString()));
+        => string.Join(", ", bindings.Select(Gesture));
+
+    internal static string Write(IReadOnlyList<HotkeyBinding> bindings)
+        => string.Join(",", All.Select(d => Of(bindings, d.Action))
+            .Select(b => ((int)b.Modifiers).ToString(CultureInfo.InvariantCulture) + ":" + b.Key));
+
+    /// <summary>
+    /// Ayardaki yazımı bağlara çevirir. Eksik, tanınmayan ya da iki eyleme aynı tuşu veren yazım
+    /// <c>null</c> döner; çağıran varsayılana düşer.
+    /// </summary>
+    internal static IReadOnlyList<HotkeyBinding>? Read(string? text)
+    {
+        var parts = (text ?? string.Empty).Split(',');
+        if (parts.Length != All.Count) return null;
+
+        var bindings = new List<HotkeyBinding>();
+        for (var i = 0; i < parts.Length; i++)
+        {
+            var pair = parts[i].Split(':', 2);
+            if (pair.Length != 2
+                || !int.TryParse(pair[0], NumberStyles.None, CultureInfo.InvariantCulture, out var modifiers)
+                || !Enum.TryParse<Key>(pair[1], false, out var key) || !Enum.IsDefined(key)
+                || Bind(All[i].Action, key, (KeyModifiers)modifiers) is not { } binding
+                || (int)binding.Modifiers != modifiers
+                || bindings.Any(b => Same(b, binding)))
+                return null;
+            bindings.Add(binding);
+        }
+
+        return bindings;
+    }
 }
 
 internal sealed class NoGlobalHotkeys : IGlobalHotkeys
@@ -61,6 +134,9 @@ internal sealed class Win32GlobalHotkeys : IGlobalHotkeys
     private const uint WmHotkey = 0x0312;
     private const uint WmQuit = 0x0012;
     private const uint ModNoRepeat = 0x4000;
+    private const uint ModAlt = 0x0001;
+    private const uint ModControl = 0x0002;
+    private const uint ModShift = 0x0004;
 
     private Thread? _thread;
     private uint _threadId;
@@ -92,7 +168,7 @@ internal sealed class Win32GlobalHotkeys : IGlobalHotkeys
         var registered = new List<int>();
         for (var i = 0; i < bindings.Count; i++)
         {
-            if (RegisterHotKey(0, i + 1, ModNoRepeat, bindings[i].VirtualKey)) registered.Add(i + 1);
+            if (RegisterHotKey(0, i + 1, ModNoRepeat | Flags(bindings[i].Modifiers), bindings[i].VirtualKey)) registered.Add(i + 1);
             else failed.Add(bindings[i]);
         }
 
@@ -109,6 +185,11 @@ internal sealed class Win32GlobalHotkeys : IGlobalHotkeys
 
         foreach (var id in registered) UnregisterHotKey(0, id);
     }
+
+    internal static uint Flags(KeyModifiers modifiers)
+        => ((modifiers & KeyModifiers.Alt) != 0 ? ModAlt : 0)
+           | ((modifiers & KeyModifiers.Control) != 0 ? ModControl : 0)
+           | ((modifiers & KeyModifiers.Shift) != 0 ? ModShift : 0);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct Msg
