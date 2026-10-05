@@ -120,6 +120,35 @@
                     MaxDropDownHeight="{StaticResource DropDownMaxHeight}"
                     HorizontalAlignment="Stretch"/>
         </StackPanel>
+        <StackPanel x:Name="WatchPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
+          <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceXs}">
+            <CheckBox x:Name="ChkWatch" Theme="{StaticResource CheckStyle}"
+                      IsChecked="False"
+                      VerticalAlignment="Center"
+                      Content="{loc:Text main.shrink-job.watch}"
+                      ToolTip.Tip="{loc:Text main.shrink-job.watch.hint}"/>
+            <Button Theme="{StaticResource GhostButton}" x:Name="BtnWatchFolder"
+                    Content="{loc:Text main.shrink-job.watch.choose}"
+                    Padding="{StaticResource ButtonPaddingSm}"
+                    VerticalAlignment="Center"/>
+          </WrapPanel>
+          <TextBlock x:Name="TxtWatchFolder"
+                     FontSize="{StaticResource FontSizeSm}"
+                     Foreground="{StaticResource TextBody}"
+                     TextTrimming="CharacterEllipsis"/>
+          <Grid x:Name="WatchWarning"
+                ColumnDefinitions="Auto,*"
+                ColumnSpacing="{StaticResource SpaceXs}"
+                IsVisible="False">
+            <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
+                  Stretch="Uniform" VerticalAlignment="Top"
+                  Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
+            <TextBlock Grid.Column="1" x:Name="TxtWatchWarning"
+                       Theme="{StaticResource StatusWarning}"
+                       FontSize="{StaticResource FontSizeSm}"
+                       Text="{loc:Text main.shrink-job.watch.lost}"/>
+          </Grid>
+        </StackPanel>
       </StackPanel>
 
       <TextBlock x:Name="TxtPaused"
