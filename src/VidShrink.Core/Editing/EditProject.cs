@@ -351,15 +351,7 @@ public sealed class EditProjectStore
     public EditProject? Load(string source)
     {
         if (EditProject.Read(PathFor(source)) is not { } project) return null;
-        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-        try
-        {
-            return string.Equals(Path.GetFullPath(project.Source.Path), Path.GetFullPath(source), comparison) ? project : null;
-        }
-        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException)
-        {
-            return null;
-        }
+        return PathEquality.Same(project.Source.Path, source) ? project : null;
     }
 
     /// <summary>En yeni <see cref="Cap"/> kaydin gerisini siler; silinen dosya sayisi doner.</summary>
