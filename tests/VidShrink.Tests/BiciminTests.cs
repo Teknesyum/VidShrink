@@ -1220,9 +1220,11 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-05, proje kaydi, kare panosu ve ikincil altyazi birlikte: 2919 + 9 + 21 + 1 = 2950, en 288, tr 103.</para>
     /// <para>2026-10-05, oynatici liste kaydi: dort yeni <c>player.list.*</c> anahtarindan (<c>save</c>, <c>saved</c>, <c>save-failed</c>, <c>files</c>) 22 kol 7 dilde (es, fr, pt, ro, sw dordu de; en ve hu yalniz save-failed), KOL dokumunden sayildi, tr girmiyor. Kare panosuyla birlikte: 2949 + 22 = 2971, en 288 + 1 = 289, tr 103.</para>
     /// <para>2026-10-05, ikincil altyazi ve liste kaydi birlikte: 2950 + 22 = 2972, en 288 + 1 = 289.</para>
+    /// <para>2026-10-05, is bitince haber: alti yeni anahtardan (<c>main.notify.*</c> dort, <c>settings-tab.notify-done.*</c> iki) iki kol, biri en'de, SAYIM dokumunden okundu, tr girmiyor. Liste kaydiyla birlikte: 2972 + 2 = 2974, en 289 + 1 = 290, tr 103.</para>
     /// <para>2026-10-05, oynatici bilgi panelinde HDR alani ve canli istatistik: dokuz yeni <c>player.info.*</c> anahtarindan dordu 14 kol 8 dilde (decoderdropped: en, hu, nl, ro; livebitrate: ms, pt, ro, sw; livefps: es, ms, pt, ro, sw; range: sw), KOL dokumunden sayildi, tr girmiyor: 2949 + 14 = 2963, en 288 + 1 = 289, tr 103.</para>
     /// <para>2026-10-05, liste kaydi ve bilgi paneli birlikte: 2972 + 14 = 2986, en 289 + 1 = 290.</para>
-    /// <para>2026-10-05, meta veriyi sil kutusu: iki yeni anahtardan yalniz <c>main.advanced.drop-metadata.tip</c> 5 dilde kola giriyor (bn, hi, ja, th, ur), KOL dokumunden sayildi, en ve tr girmiyor: 2986 + 5 = 2991, en 290, tr 103.</para>
+    /// <para>2026-10-05, liste kaydi, bilgi paneli ve is bitince haber birlikte: 2986 + 2 = 2988, en 290 + 1 = 291.</para>
+    /// <para>2026-10-05, meta veriyi sil kutusu: iki yeni anahtardan yalniz <c>main.advanced.drop-metadata.tip</c> 5 dilde kola giriyor (bn, hi, ja, th, ur), KOL dokumunden sayildi, en ve tr girmiyor: 2988 + 5 = 2993, en 291, tr 103.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1248,8 +1250,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2991, toplam);
-        Assert.Equal(290, dilBasina["en"]);
+        Assert.Equal(2993, toplam);
+        Assert.Equal(291, dilBasina["en"]);
         Assert.Equal(103, dilBasina["tr"]);
     }
 
@@ -1448,9 +1450,11 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-05, kare panosu ve ikincil altyazi birlikte: 1300 + 1 = 1301, 43 x 1301 = 55943.</para>
     /// <para>2026-10-05, oynatici liste kaydi: dort yeni anahtar (<c>player.list.save</c>, <c>-saved</c>, <c>-save-failed</c>, <c>-files</c>), dusen yok. Kare panosuyla birlikte: 1300 + 4 = 1304, 43 x 1304 = 56072. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, ikincil altyazi ve liste kaydi birlikte: 1301 + 4 = 1305, 43 x 1305 = 56115.</para>
+    /// <para>2026-10-05, is bitince haber: alti yeni anahtar (<c>main.notify.*</c> dort, <c>settings-tab.notify-done.*</c> iki), dusen yok. Liste kaydiyla birlikte: 1305 + 6 = 1311, 43 x 1311 = 56373. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, oynatici bilgi panelinde HDR alani ve canli istatistik: dokuz yeni anahtar (<c>player.info.range</c>, <c>.color</c>, <c>.decoder</c>, <c>.software</c>, <c>.hardware</c>, <c>.dropped</c>, <c>.decoderdropped</c>, <c>.livebitrate</c>, <c>.livefps</c>), dusen yok: 1300 + 9 = 1309, 43 x 1309 = 56287. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, liste kaydi ve bilgi paneli birlikte: 1305 + 9 = 1314, 43 x 1314 = 56502.</para>
-    /// <para>2026-10-05, meta veriyi sil kutusu: iki yeni anahtar (<c>main.advanced.drop-metadata.label</c>, <c>-tip</c>), dusen yok: 1314 + 2 = 1316, 43 x 1316 = 56588. <c>kayip</c> 0.</para>
+    /// <para>2026-10-05, liste kaydi, bilgi paneli ve is bitince haber birlikte: 1314 + 6 = 1320, 43 x 1320 = 56760.</para>
+    /// <para>2026-10-05, meta veriyi sil kutusu: iki yeni anahtar (<c>main.advanced.drop-metadata.label</c>, <c>-tip</c>), dusen yok: 1320 + 2 = 1322, 43 x 1322 = 56846. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1478,7 +1482,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(56588, gezilen);
+        Assert.Equal(56846, gezilen);
         Assert.Empty(kayip);
     }
 

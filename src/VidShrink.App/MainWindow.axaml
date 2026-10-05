@@ -1530,6 +1530,11 @@
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <CheckBox x:Name="ChkNotifyWhenDone" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text settings-tab.notify-done.label}"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.notify-done.hint}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                       <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.ffmpeg-path.label}">
@@ -1756,7 +1761,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="ResetSettingsPanel" izi:KartDuvari.Sutun="0" Theme="{StaticResource Panel}">
+              <Border x:Name="ResetSettingsPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Button x:Name="BtnResetSettings"
                           Content="{loc:Text settings.reset-all}"

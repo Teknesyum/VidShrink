@@ -15,6 +15,9 @@ ship as part of it.
 - Shrink: "Remove metadata" checkbox in the Advanced panel's audio section, the same switch
   as the CLI's `--meta-yok`. Title, author, date, GPS location and device tags are left out
   of the output; track languages are kept. The choice is remembered.
+- A shrink, a conversion or a whole queue that finishes while the window is in the background
+  flashes the taskbar button and shows a notification on Windows; a failure gets its own
+  wording, a cancelled job stays silent. "Notify When a Job Finishes" in Settings turns it off.
 - Player: the media info panel (Ctrl+F1) shows the dynamic range (SDR, HDR10, HLG or Dolby
   Vision) and a color line with primaries, transfer curve and bit depth. While the panel is
   open it also shows live figures: the decoder in use (software or the hardware decoder's

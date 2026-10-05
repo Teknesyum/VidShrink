@@ -300,6 +300,7 @@ public partial class MainWindow : Window
         Watch(TxtOutputName, TextBox.TextProperty, OnOutputNameChanged);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkNotifyWhenDone, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Player.Opened += OnPlayerOpened;
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkAdvDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
@@ -1599,6 +1600,7 @@ public partial class MainWindow : Window
             OutputNamePattern = TxtOutputName.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
             FollowRecording = ChkFollowRecording.IsChecked == true,
+            NotifyWhenDone = ChkNotifyWhenDone.IsChecked == true,
             FfmpegPathMode = FfmpegPathModeIndex,
             FfmpegPath = TxtFfmpegPath.Text ?? "",
             OpenSubtitlesApiKey = (TxtOpenSubtitlesKey.Text ?? "").Trim(),
@@ -1647,6 +1649,7 @@ public partial class MainWindow : Window
             ChkAdvancedDefaultOpen.IsChecked = settings.AdvancedDefaultOpen;
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
             ChkFollowRecording.IsChecked = settings.FollowRecording;
+            ChkNotifyWhenDone.IsChecked = settings.NotifyWhenDone;
 
             FfmpegPathModeIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
             TxtFfmpegPath.Text = settings.FfmpegPath;
@@ -4457,6 +4460,7 @@ public partial class MainWindow : Window
         _probeCts?.Cancel();
         var cts = new CancellationTokenSource();
         _cts = cts;
+        var biten = new BitenIs(_info.FilePath, IsSonucu.Hatali);
         try
         {
             SetRunning(true);
@@ -4504,9 +4508,11 @@ public partial class MainWindow : Window
 
             BtnReveal.IsVisible = result.Success;
             ResetShare(result.Success);
+            if (result.Success) biten = biten with { Sonuc = IsSonucu.Basarili };
         }
         catch (OperationCanceledException)
         {
+            biten = biten with { Sonuc = IsSonucu.Iptal };
             TxtResult.Text = Say("main.run.cancelled");
         }
         catch (Exception ex)
@@ -4521,6 +4527,7 @@ public partial class MainWindow : Window
             SetRunning(false);
             RefreshConversion();
             FlushPendingMacFile();
+            IsBittiHaberi(biten);
         }
     }
 
@@ -4811,6 +4818,7 @@ public partial class MainWindow : Window
         QueueWatch.MarkOwn(output);
         var cts = new CancellationTokenSource();
         _cts = cts;
+        var biten = new BitenIs(_info.FilePath, IsSonucu.Hatali);
         try
         {
             SetRunning(true);
@@ -4827,9 +4835,11 @@ public partial class MainWindow : Window
             RefreshPreviewSource();
             TxtConvertResult.Text = Say("main.run.converted", Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"));
             BtnConvertReveal.IsVisible = true;
+            biten = biten with { Sonuc = IsSonucu.Basarili };
         }
         catch (OperationCanceledException)
         {
+            biten = biten with { Sonuc = IsSonucu.Iptal };
             TxtConvertResult.Text = Say("main.run.cancelled");
         }
         catch (Exception ex)
@@ -4843,7 +4853,31 @@ public partial class MainWindow : Window
             SetRunning(false);
             RefreshConversion();
             FlushPendingMacFile();
+            IsBittiHaberi(biten);
         }
+    }
+
+    private Func<bool>? _pencereEtkin;
+
+    /// <summary>İş bitti haberinin sistem yüzü; testler sahtesini verir.</summary>
+    internal IIsBildirimYuzu Bildirim { get; set; } = IsBittiBildirimi.Varsayilan();
+
+    /// <summary>Pencere şu an kullanıcının önünde mi; testler kendi cevabını verir.</summary>
+    internal Func<bool> PencereEtkin
+    {
+        get => _pencereEtkin ??= () => IsActive;
+        set => _pencereEtkin = value;
+    }
+
+    /// <summary>
+    /// Küçültme ya da dönüştürme bittiğinde tek haber. Karar <see cref="IsBittiBildirimi.Karar"/>'da;
+    /// ayar Ayarlar sekmesindeki kutudan okunur.
+    /// </summary>
+    internal void IsBittiHaberi(BitenIs biten)
+    {
+        var karar = IsBittiBildirimi.Karar(new[] { biten }, PencereEtkin(), ChkNotifyWhenDone.IsChecked == true,
+            (key, args) => string.Format(Strings.Culture, Say(key), args));
+        if (karar is not null) Bildirim.Bildir(this, karar);
     }
 
     private string DescribeFailure(Exception ex)

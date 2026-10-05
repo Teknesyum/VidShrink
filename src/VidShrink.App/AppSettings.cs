@@ -46,6 +46,9 @@ public sealed class AppSettings
 
     public bool FollowRecording { get; set; }
 
+    /// <summary>İş bitince, pencere önde değilse haber ver. Alanı olmayan eski dosya açık okunur.</summary>
+    public bool NotifyWhenDone { get; set; } = true;
+
     /// <summary>
     /// Kuyruk penceresinin izleme klasörü. İkisini <see cref="Save"/> yazmaz: ana pencere
     /// ayarı denetimlerinden yeniden kurup kaydettiği için orada bu alanlar hep boş gelir ve
@@ -127,6 +130,7 @@ public sealed class AppSettings
             ReadString(root, "theme", value => settings.Theme = value);
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
+            ReadBool(root, "notifyWhenDone", value => settings.NotifyWhenDone = value);
             ReadBool(root, "watchEnabled", value => settings.WatchEnabled = value);
             ReadString(root, "watchFolder", value => settings.WatchDirectory = value);
             ReadInt(root, "ffmpegPathMode", value => settings.FfmpegPathMode = value);
@@ -210,6 +214,7 @@ public sealed class AppSettings
         root["outputNamePattern"] = OutputNamePattern;
         root["advancedDefaultOpen"] = AdvancedDefaultOpen;
         root["followRecording"] = FollowRecording;
+        root["notifyWhenDone"] = NotifyWhenDone;
         root["ffmpegPathMode"] = FfmpegPathMode;
         root["ffmpegPath"] = FfmpegPath;
         root["openSubtitlesApiKey"] = OpenSubtitlesApiKey;
