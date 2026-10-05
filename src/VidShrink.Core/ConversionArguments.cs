@@ -4,6 +4,9 @@ namespace VidShrink.Core;
 
 public static class ConversionArguments
 {
+    public const string AnimatedWebpEncoder = "libwebp_anim";
+    public const string AnimatedAvifEncoder = "libsvtav1";
+
     public static IReadOnlyList<string> Validate(MediaInfo info, ConversionPlan plan)
     {
         var errors = new List<string>();
@@ -16,12 +19,12 @@ public static class ConversionArguments
         if (plan.Fps is <= 0) errors.Add("Frame rate must be greater than zero.");
         if (plan.VideoCodec == "copy" && (plan.Height is not null || plan.Width is not null || plan.Fps is not null)) errors.Add("Stream copy cannot change resolution or frame rate.");
         if (plan.VideoCodec == "copy" && plan.Container == "gif") errors.Add("GIF requires video encoding and cannot use stream copy.");
-        if (plan.AudioCodec == "copy" && !info.HasAudio) errors.Add("The source has no audio stream to copy.");
+        if (!plan.AnimatedImage && plan.AudioCodec == "copy" && !info.HasAudio) errors.Add("The source has no audio stream to copy.");
         if (plan.AudioOnly && !info.HasAudio) errors.Add("The source has no audio stream to extract.");
 
-        if (!plan.AudioOnly && !plan.Gif && plan.VideoCodec != "copy" && !VideoEncodeCompatible(plan.Container, plan.VideoCodec))
+        if (!plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && plan.VideoCodec != "copy" && !VideoEncodeCompatible(plan.Container, plan.VideoCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {plan.VideoCodec} video encoder.");
-        if (!plan.Gif && plan.AudioCodec is { } audioCodec && audioCodec != "copy" && !AudioEncodeCompatible(plan.Container, audioCodec))
+        if (!plan.Gif && !plan.AnimatedImage && plan.AudioCodec is { } audioCodec && audioCodec != "copy" && !AudioEncodeCompatible(plan.Container, audioCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {audioCodec} audio encoder.");
 
         var source = info.VideoCodec.ToLowerInvariant();
@@ -29,7 +32,7 @@ public static class ConversionArguments
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {source} video stream.");
         if (plan.Start is { } trimStart && plan.End is { } trimEnd && trimEnd <= trimStart)
             errors.Add("The trim end must come after the trim start.");
-        if (plan.AudioCodec == "copy" && !AudioCopyCompatible(plan.Container, info.AudioCodec))
+        if (!plan.AnimatedImage && plan.AudioCodec == "copy" && !AudioCopyCompatible(plan.Container, info.AudioCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {info.AudioCodec} audio stream.");
         return errors;
     }
@@ -72,6 +75,14 @@ public static class ConversionArguments
             return a;
         }
 
+        if (plan.AnimatedImage)
+        {
+            if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
+            a.AddRange(AnimatedImageArgs(plan));
+            a.Add(outputPath);
+            return a;
+        }
+
         if (plan.VideoCodec == "copy")
         {
             if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
@@ -98,6 +109,36 @@ public static class ConversionArguments
         if (plan.Container is "mp4" or "mov" or "m4a") a.AddRange(new[] { "-movflags", "+faststart" });
         if (dolbyVision && plan.Container is "mp4" or "mov") a.AddRange(HdrResolver.Mp4DolbyVisionArgs);
         a.Add(outputPath);
+        return a;
+    }
+
+    /// <summary>
+    /// Hareketli WebP ve AVIF: ses düşer, döngü sonsuzdur. Kalite, seçili video kodeğinin CRF
+    /// aralığındaki konumdan çevrilir: WebP'de 100 (en iyi) ile 0 arası <c>-quality</c>, AVIF'te
+    /// SVT-AV1'in kendi CRF aralığı. WebP'nin bit hızı kipi yok; o kipte libwebp varsayılanı kalır.
+    /// </summary>
+    private static IReadOnlyList<string> AnimatedImageArgs(ConversionPlan plan)
+    {
+        var a = new List<string>();
+        var (min, max) = CodecModel.CrfRange(plan.VideoCodec);
+        var share = Math.Clamp((plan.Crf - min) / (double)(max - min), 0, 1);
+        if (plan.Container == "webp")
+        {
+            a.AddRange(new[] { "-c:v", AnimatedWebpEncoder });
+            if (plan.QualityMode == ConversionQualityMode.Crf)
+                a.AddRange(new[] { "-quality", Math.Round(100 - share * 100).ToString("0", CultureInfo.InvariantCulture) });
+        }
+        else
+        {
+            var (avifMin, avifMax) = CodecModel.CrfRange(AnimatedAvifEncoder);
+            a.AddRange(new[] { "-c:v", AnimatedAvifEncoder });
+            a.AddRange(FfmpegArguments.SpeedArgs(AnimatedAvifEncoder, FfmpegArguments.DefaultPreset(AnimatedAvifEncoder)));
+            a.AddRange(plan.QualityMode == ConversionQualityMode.Crf
+                ? CodecModel.QualityArgs(AnimatedAvifEncoder, Math.Round(avifMin + share * (avifMax - avifMin)))
+                : new[] { "-b:v", $"{plan.VideoBitrateK}k" });
+            a.AddRange(new[] { "-pix_fmt", "yuv420p" });
+        }
+        a.AddRange(new[] { "-an", "-loop", "0", "-f", plan.Container });
         return a;
     }
 

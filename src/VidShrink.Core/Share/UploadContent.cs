@@ -69,6 +69,8 @@ public static class MediaTypes
         ".webm" => "video/webm",
         ".avi" => "video/x-msvideo",
         ".gif" => "image/gif",
+        ".webp" => "image/webp",
+        ".avif" => "image/avif",
         _ => "application/octet-stream"
     };
 }

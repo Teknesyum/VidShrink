@@ -137,7 +137,8 @@ da kapatıyor.
 </tr>
 </table>
 
-MP4, MKV, WebM, MOV, AVI ve GIF; yalnız ses için MP3, M4A, WAV ve FLAC. H.264, H.265, VP9, AV1
+MP4, MKV, WebM, MOV, AVI, GIF, hareketli WebP ve hareketli AVIF; yalnız ses için MP3, M4A,
+WAV ve FLAC. H.264, H.265, VP9, AV1
 ya da doğrudan akış kopyası, kırpma ve ses çıkarma. **On sekiz hazır hedef** — WhatsApp,
 Discord, Telegram, Gmail, Outlook, Chromecast, Nest Hub, Apple TV ve fazlası — her alanı
 sizin yerinize dolduruyor.

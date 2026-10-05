@@ -127,7 +127,8 @@ down when it finishes.
 </tr>
 </table>
 
-MP4, MKV, WebM, MOV, AVI and GIF; MP3, M4A, WAV and FLAC for sound alone. H.264, H.265,
+MP4, MKV, WebM, MOV, AVI, GIF, animated WebP and animated AVIF; MP3, M4A, WAV and FLAC for
+sound alone. H.264, H.265,
 VP9, AV1 or a straight stream copy, trimming, and audio extraction. **Eighteen ready-made
 targets** — WhatsApp, Discord, Telegram, Gmail, Outlook, Chromecast, Nest Hub, Apple TV and
 more — set every field for you.

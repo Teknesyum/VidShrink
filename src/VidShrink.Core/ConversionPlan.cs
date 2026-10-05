@@ -19,4 +19,5 @@ public sealed class ConversionPlan
     public HdrPolicy HdrPolicy { get; init; } = HdrPolicy.Preserve;
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac";
     public bool Gif => Container == "gif";
+    public bool AnimatedImage => Container is "webp" or "avif";
 }
