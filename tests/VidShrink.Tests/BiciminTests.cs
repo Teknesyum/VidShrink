@@ -1218,6 +1218,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-05, proje kaydi ve kare panosu birlikte: 2919 + 9 + 21 = 2949, en 282 + 2 + 4 = 288.</para>
     /// <para>2026-10-05, ikincil altyazi: tek yeni anahtar <c>player.subtitle.secondary</c> yalniz sw'de kola giriyor ("Manukuu ya pili", <c>ya</c> islev sozcugu), SAYIM dokumunden okundu: 2928 + 1 = 2929, en 284, tr 103.</para>
     /// <para>2026-10-05, proje kaydi, kare panosu ve ikincil altyazi birlikte: 2919 + 9 + 21 + 1 = 2950, en 288, tr 103.</para>
+    /// <para>2026-10-05, is bitince haber: alti yeni anahtardan ikisi kola giriyor (en etiketi ve sw), SAYIM dokumunden okundu: 2950 + 2 = 2952, en 289, tr 103.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1243,8 +1244,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2950, toplam);
-        Assert.Equal(288, dilBasina["en"]);
+        Assert.Equal(2952, toplam);
+        Assert.Equal(289, dilBasina["en"]);
         Assert.Equal(103, dilBasina["tr"]);
     }
 
@@ -1441,6 +1442,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-05, proje kaydi, donanim cozme ve kare panosu birlikte: 1288 + 7 + 1 + 4 = 1300, 43 x 1300 = 55900.</para>
     /// <para>2026-10-05, ikincil altyazi: bir yeni anahtar (<c>player.subtitle.secondary</c>), dusen yok. Donanim cozmeyle birlikte: 1296 + 1 = 1297, 43 x 1297 = 55771. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, kare panosu ve ikincil altyazi birlikte: 1300 + 1 = 1301, 43 x 1301 = 55943.</para>
+    /// <para>2026-10-05, is bitince haber: alti yeni anahtar, dusen yok: 1301 + 6 = 1307, 43 x 1307 = 56201. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1468,7 +1470,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(55943, gezilen);
+        Assert.Equal(56201, gezilen);
         Assert.Empty(kayip);
     }
 
