@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- Player: a Hardware Decoding switch in the advanced panel. It is off by default, as before;
+  turning it on hands decoding to the graphics card in copy mode (`hwdec=auto-copy`), applies
+  to the file that is playing and is remembered.
 - Convert: animated WebP and animated AVIF output. Both loop forever and drop the sound
   track, as GIF does; the existing quality control sets how hard they are compressed.
 - Shrink queue: watch a folder. Videos dropped into the chosen folder join the queue on

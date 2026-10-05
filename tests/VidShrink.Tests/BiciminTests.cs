@@ -1430,6 +1430,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-05, kuyruk izleme klasoru: bes yeni anahtar (<c>main.shrink-job.watch</c>, <c>.choose</c>, <c>.none</c>, <c>.hint</c>, <c>.lost</c>), dusen yok: 1275 + 5 = 1280, 43 x 1280 = 55040. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, kaydedici kisayol atama: sekiz yeni anahtar (<c>recorder.hotkeys.title</c>, <c>-frame</c>, <c>-discard</c>, <c>-replay-save</c>, <c>-reset</c>, <c>-duplicate</c>, <c>-rejected</c>, <c>-unsupported</c>), dusen yok: 1273 + 8 = 1281, 43 x 1281 = 55083. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, uc is birlikte: 1273 + 2 + 5 + 8 = 1288, 43 x 1288 = 55384.</para>
+    /// <para>2026-10-05, oynatici donanim cozme: bir yeni anahtar (<c>player.advanced.hardware</c>), dusen yok: 1288 + 1 = 1289, 43 x 1289 = 55427. <c>kayip</c> 0; kol degistiren sayimi (2919, en 282) degismedi.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1457,7 +1458,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(55384, gezilen);
+        Assert.Equal(55427, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -118,6 +118,7 @@ internal partial class PlayerAdvancedPanel : UserControl
         }
 
         Switches.Children.Add(Toggle("player.advanced.deinterlace", player.Advanced.Picture.Deinterlace, player.ToggleDeinterlace));
+        Switches.Children.Add(Toggle("player.advanced.hardware", player.HardwareDecodingOn, player.ToggleHardwareDecoding));
         Switches.Children.Add(Toggle("player.advanced.normalize", player.Advanced.Sound.Normalize, player.ToggleNormalize));
         Switches.Children.Add(Toggle("player.advanced.boost", player.Advanced.Sound.Boost, player.ToggleBoost));
 

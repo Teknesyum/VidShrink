@@ -13,6 +13,7 @@
   "player.advanced.more": "Increase",
   "player.advanced.less": "Decrease",
   "player.advanced.deinterlace": "Deinterlace",
+  "player.advanced.hardware": "Hardware Decoding",
   "player.advanced.picture-reset": "Reset picture",
   "player.advanced.sound": "Sound",
   "player.advanced.equalizer-flat": "Flat",

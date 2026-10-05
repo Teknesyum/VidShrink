@@ -128,6 +128,29 @@ internal partial class PlayerView
         Settle("deinterlace -> " + _advanced.Picture.Deinterlace);
     }
 
+    internal bool HardwareDecodingOn => Settings.Hardware != HardwareDecoding.Off;
+
+    internal void ToggleHardwareDecoding()
+        => UseHardwareDecoding(HardwareDecodingOn ? HardwareDecoding.Off : HardwareDecoding.AutoCopy);
+
+    private void UseHardwareDecoding(HardwareDecoding mode)
+    {
+        Settings.Hardware = mode;
+        SaveSettings();
+        _engine?.SetHardwareDecoding(mode);
+        _trace.Add("hwdec -> " + MpvEngine.HardwareValue(mode));
+        AdvancedChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Kapaliyken motora yazilmaz: motor zaten <c>hwdec=no</c> ile kurulur ve varsayilan acilis
+    /// yolu bir ozellik yazimi daha tasimaz.
+    /// </summary>
+    private void ApplyHardwareDecoding(IPlaybackEngine engine)
+    {
+        if (HardwareDecodingOn) engine.SetHardwareDecoding(Settings.Hardware);
+    }
+
     internal void ResetPicture()
     {
         EnsureAdvanced();
@@ -244,6 +267,7 @@ internal partial class PlayerView
             _engine?.SetVolume(_volume);
         }
 
+        if (HardwareDecodingOn) UseHardwareDecoding(HardwareDecoding.Off);
         Settle("advanced" + ResetTrace);
     }
 
