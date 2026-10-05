@@ -103,9 +103,7 @@
         <Button x:Name="BtnHide"
                 Classes="tool"
                 Theme="{StaticResource GhostButton}"
-                IsVisible="False"
-                ToolTip.Tip="{loc:Text recorder.region.hide}"
-                auto:AutomationProperties.Name="{loc:Text recorder.region.hide}">
+                IsVisible="False">
           <Path Width="{StaticResource RecorderRegionIconSize}"
                 Height="{StaticResource RecorderRegionIconSize}"
                 Stretch="Uniform"

@@ -79,6 +79,12 @@ internal sealed class RecorderSettings
 
     internal int ReplaySeconds { get; set; } = ReplayBuffer.DefaultSeconds;
 
+    /// <summary>
+    /// Genel kısayolların ataması, <see cref="RecorderHotkeys.Write"/> yazımıyla. Anahtarı
+    /// taşımayan eski dosya ve okunamayan yazım varsayılan F7–F11 ile açılır.
+    /// </summary>
+    internal string Hotkeys { get; set; } = RecorderHotkeys.Write(RecorderHotkeys.All);
+
     internal RecorderTargetKind Target { get; set; } = RecorderTargetKind.Screen;
 
     internal string? WindowTitle { get; set; }
@@ -248,6 +254,7 @@ internal sealed class RecorderSettings
             settings.ShowMagnifier = (bool?)root["showMagnifier"] ?? false;
             settings.LivePreview = (bool?)root["livePreview"] ?? false;
             if ((int?)root["replaySeconds"] is { } replay && Array.IndexOf(ReplayBuffer.SecondsChoices, replay) >= 0) settings.ReplaySeconds = replay;
+            if (RecorderHotkeys.Read((string?)root["hotkeys"]) is { } hotkeys) settings.Hotkeys = RecorderHotkeys.Write(hotkeys);
             if (Enum.TryParse<RecorderTargetKind>((string?)root["target"], true, out var target)) settings.Target = target;
             settings.WindowTitle = (string?)root["windowTitle"];
             settings.RegionX = (int?)root["regionX"] ?? 0;
@@ -343,6 +350,7 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("showMagnifier", ShowMagnifier);
                 writer.WriteBoolean("livePreview", LivePreview);
                 writer.WriteNumber("replaySeconds", ReplaySeconds);
+                writer.WriteString("hotkeys", Hotkeys);
                 writer.WriteString("target", Target.ToString());
                 if (WindowTitle is null) writer.WriteNull("windowTitle");
                 else writer.WriteString("windowTitle", WindowTitle);

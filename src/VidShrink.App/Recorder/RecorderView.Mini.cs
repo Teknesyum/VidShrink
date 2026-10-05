@@ -37,7 +37,7 @@ internal partial class RecorderView
 
     private async void OnHotkey(object? sender, KeyEventArgs e)
     {
-        if (RecorderHotkeys.ActionOf(e.Key, e.KeyModifiers) is not { } action || !CanRun(action)) return;
+        if (RecorderHotkeys.ActionOf(_hotkeys, e.Key, e.KeyModifiers) is not { } action || !CanRun(action)) return;
         e.Handled = true;
         await RunHotkeyAsync(action);
     }
