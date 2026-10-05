@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using VidShrink.App;
 using VidShrink.App.Editing;
 using VidShrink.App.Localization;
@@ -316,7 +319,14 @@ public sealed class DuzenleyiciProjeTests
 
         internal bool Bekle(Func<bool> kosul)
         {
-            DenetimSurucu.Pump(View.Player, kosul, 10);
+            var saat = Stopwatch.StartNew();
+            while (!kosul() && saat.Elapsed.TotalSeconds < 30)
+            {
+                using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+                Dispatcher.UIThread.MainLoop(dilim.Token);
+                View.Player.RenderLatest();
+            }
+
             return kosul();
         }
 
