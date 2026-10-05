@@ -582,10 +582,11 @@ internal partial class PlayerView
     private void RefreshInfo()
     {
         if (TxtInfo is null || !_infoVisible) return;
-        TxtInfo.Text = Describe(_engine?.Details);
+        var text = Describe(_engine?.Details, _engine?.Stats);
+        if (TxtInfo.Text != text) TxtInfo.Text = text;
     }
 
-    internal static string Describe(MediaDetails? details)
+    internal static string Describe(MediaDetails? details, PlaybackStats? stats = null)
     {
         if (details is null) return Strings.Get("player.info.none");
         var unknown = Strings.Get("player.info.unknown");
@@ -605,10 +606,34 @@ internal partial class PlayerView
             Strings.Get("player.info.resolution", size),
             Strings.Get("player.info.framerate", fps),
             Strings.Get("player.info.bitrate", rate),
+            Strings.Get("player.info.range", details.DynamicRange ?? unknown),
+            Strings.Get("player.info.color", details.ColorParts.Count > 0 ? string.Join(", ", details.ColorParts) : unknown),
             details.AudioCodec is null
                 ? Strings.Get("player.info.noaudio")
                 : Strings.Get("player.info.audio", details.AudioCodec, details.AudioChannels, details.AudioSampleRate)
         };
+        if (stats is not null) lines.AddRange(DescribeLive(stats, unknown));
         return string.Join(Environment.NewLine, lines);
+    }
+
+    private static IEnumerable<string> DescribeLive(PlaybackStats stats, string unknown)
+    {
+        var decoder = !stats.DecoderKnown
+            ? unknown
+            : stats.HardwareDecoded
+                ? Strings.Get("player.info.hardware", stats.Decoder)
+                : Strings.Get("player.info.software");
+        var rate = double.IsFinite(stats.VideoBitsPerSecond) && stats.VideoBitsPerSecond > 0
+            ? Strings.BitHizi(Bicim.BitHizi.BpsToKbps((long)Math.Round(stats.VideoBitsPerSecond)))
+            : unknown;
+        var fps = double.IsFinite(stats.DisplayedFramesPerSecond) && stats.DisplayedFramesPerSecond > 0
+            ? Bicim.Kare(stats.DisplayedFramesPerSecond, Strings.Culture)
+            : unknown;
+
+        yield return Strings.Get("player.info.decoder", decoder);
+        yield return Strings.Get("player.info.dropped", Math.Max(0, stats.DroppedFrames).ToString(Strings.Culture));
+        yield return Strings.Get("player.info.decoderdropped", Math.Max(0, stats.DecoderDroppedFrames).ToString(Strings.Culture));
+        yield return Strings.Get("player.info.livebitrate", rate);
+        yield return Strings.Get("player.info.livefps", fps);
     }
 }

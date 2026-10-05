@@ -15,6 +15,11 @@ ship as part of it.
 - A shrink, a conversion or a whole queue that finishes while the window is in the background
   flashes the taskbar button and shows a notification on Windows; a failure gets its own
   wording, a cancelled job stays silent. "Notify When a Job Finishes" in Settings turns it off.
+- Player: the media info panel (Ctrl+F1) shows the dynamic range (SDR, HDR10, HLG or Dolby
+  Vision) and a color line with primaries, transfer curve and bit depth. While the panel is
+  open it also shows live figures: the decoder in use (software or the hardware decoder's
+  name), dropped frames, the current bitrate and the displayed frame rate. Nothing is read
+  from the engine while the panel is closed.
 
 ## [1.2.7] - 2026-10-05
 
