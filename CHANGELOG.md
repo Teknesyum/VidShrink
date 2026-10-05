@@ -29,6 +29,9 @@ ship as part of it.
   already used by another action, a key the system refuses to register and a bare
   modifier are rejected on that row and the previous key stays; Esc cancels the capture.
   Tooltips, the region panel, the mini strip and the tray read the assigned key.
+- Player: copy the current frame to the clipboard with Ctrl+Shift+E or from the right-click
+  menu, and save screenshots as JPG instead of PNG (Settings submenu and the Advanced player
+  panel; PNG stays the default).
 
 ## [1.2.6] - 2026-10-02
 
