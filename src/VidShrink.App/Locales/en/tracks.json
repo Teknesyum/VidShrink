@@ -7,6 +7,7 @@
   "player.tracks.item": "Track {0}",
   "player.subtitle.menu": "Subtitles",
   "player.subtitle.off": "Off",
+  "player.subtitle.secondary": "Secondary subtitle",
   "player.subtitle.load": "Load subtitle file…",
   "player.subtitle.files": "Subtitle files",
   "player.subtitle.cycle": "Next subtitle",

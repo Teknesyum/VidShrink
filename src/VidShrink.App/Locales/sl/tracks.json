@@ -7,6 +7,7 @@
   "player.tracks.item": "Sled {0}",
   "player.subtitle.menu": "Podnapisi",
   "player.subtitle.off": "Izklopljeno",
+  "player.subtitle.secondary": "Drugi podnapis",
   "player.subtitle.load": "Naloži datoteko s podnapisi…",
   "player.subtitle.files": "Datoteke s podnapisi",
   "player.subtitle.cycle": "Naslednji podnapis",

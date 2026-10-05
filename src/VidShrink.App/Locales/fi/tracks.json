@@ -7,6 +7,7 @@
   "player.tracks.item": "Raita {0}",
   "player.subtitle.menu": "Tekstitykset",
   "player.subtitle.off": "Pois",
+  "player.subtitle.secondary": "Toinen tekstitys",
   "player.subtitle.load": "Lataa tekstitystiedosto…",
   "player.subtitle.files": "Tekstitystiedostot",
   "player.subtitle.cycle": "Seuraava tekstitys",

@@ -7,6 +7,7 @@
   "player.tracks.item": "Ścieżka {0}",
   "player.subtitle.menu": "Napisy",
   "player.subtitle.off": "Wyłączone",
+  "player.subtitle.secondary": "Drugie napisy",
   "player.subtitle.load": "Wczytaj plik z napisami…",
   "player.subtitle.files": "Pliki napisów",
   "player.subtitle.cycle": "Następne napisy",

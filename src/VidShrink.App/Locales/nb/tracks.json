@@ -7,6 +7,7 @@
   "player.tracks.item": "Spor {0}",
   "player.subtitle.menu": "Undertekster",
   "player.subtitle.off": "Av",
+  "player.subtitle.secondary": "Sekundær undertekst",
   "player.subtitle.load": "Last inn undertekstfil…",
   "player.subtitle.files": "Undertekstfiler",
   "player.subtitle.cycle": "Neste undertekst",

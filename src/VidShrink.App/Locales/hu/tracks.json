@@ -7,6 +7,7 @@
   "player.tracks.item": "Sáv {0}",
   "player.subtitle.menu": "Feliratok",
   "player.subtitle.off": "Ki",
+  "player.subtitle.secondary": "Második felirat",
   "player.subtitle.load": "Feliratfájl betöltése…",
   "player.subtitle.files": "Feliratfájlok",
   "player.subtitle.cycle": "Következő felirat",

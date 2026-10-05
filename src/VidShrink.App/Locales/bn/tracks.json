@@ -7,6 +7,7 @@
   "player.tracks.item": "ট্র্যাক {0}",
   "player.subtitle.menu": "সাবটাইটেল",
   "player.subtitle.off": "বন্ধ",
+  "player.subtitle.secondary": "দ্বিতীয় সাবটাইটেল",
   "player.subtitle.load": "সাবটাইটেল ফাইল লোড করুন…",
   "player.subtitle.files": "সাবটাইটেল ফাইল",
   "player.subtitle.cycle": "পরবর্তী সাবটাইটেল",

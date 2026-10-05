@@ -7,6 +7,7 @@
   "player.tracks.item": "轨道 {0}",
   "player.subtitle.menu": "字幕",
   "player.subtitle.off": "关闭",
+  "player.subtitle.secondary": "第二字幕",
   "player.subtitle.load": "加载字幕文件…",
   "player.subtitle.files": "字幕文件",
   "player.subtitle.cycle": "下一个字幕",

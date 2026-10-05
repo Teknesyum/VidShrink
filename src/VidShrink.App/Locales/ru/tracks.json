@@ -7,6 +7,7 @@
   "player.tracks.item": "Дорожка {0}",
   "player.subtitle.menu": "Субтитры",
   "player.subtitle.off": "Выключено",
+  "player.subtitle.secondary": "Вторые субтитры",
   "player.subtitle.load": "Загрузить файл субтитров…",
   "player.subtitle.files": "Файлы субтитров",
   "player.subtitle.cycle": "Следующие субтитры",

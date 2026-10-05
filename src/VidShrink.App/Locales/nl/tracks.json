@@ -7,6 +7,7 @@
   "player.tracks.item": "Spoor {0}",
   "player.subtitle.menu": "Ondertitels",
   "player.subtitle.off": "Uit",
+  "player.subtitle.secondary": "Tweede ondertiteling",
   "player.subtitle.load": "Ondertitelbestand laden…",
   "player.subtitle.files": "Ondertitelbestanden",
   "player.subtitle.cycle": "Volgende ondertiteling",

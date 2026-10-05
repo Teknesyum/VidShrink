@@ -132,6 +132,9 @@ public interface IPlaybackEngine : IDisposable
 
     long SubtitleTrack => 0;
 
+    /// <summary>Birincille ayni anda cizilen ikinci altyazi izi (<c>secondary-sid</c>); kapaliyken 0.</summary>
+    long SecondarySubtitleTrack => 0;
+
     double SubtitleDelaySeconds => 0;
 
     double AudioDelaySeconds => 0;
@@ -145,6 +148,8 @@ public interface IPlaybackEngine : IDisposable
     void SetAudioTrack(long id) { }
 
     void SetSubtitleTrack(long id) { }
+
+    void SetSecondarySubtitleTrack(long id) { }
 
     bool AddSubtitle(string path) => false;
 

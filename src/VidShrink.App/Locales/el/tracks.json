@@ -7,6 +7,7 @@
   "player.tracks.item": "Κομμάτι {0}",
   "player.subtitle.menu": "Υπότιτλοι",
   "player.subtitle.off": "Ανενεργοί",
+  "player.subtitle.secondary": "Δεύτερος υπότιτλος",
   "player.subtitle.load": "Φόρτωση αρχείου υποτίτλων…",
   "player.subtitle.files": "Αρχεία υποτίτλων",
   "player.subtitle.cycle": "Επόμενος υπότιτλος",

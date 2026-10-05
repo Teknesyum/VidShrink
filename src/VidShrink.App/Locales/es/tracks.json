@@ -7,6 +7,7 @@
   "player.tracks.item": "Pista {0}",
   "player.subtitle.menu": "Subtítulos",
   "player.subtitle.off": "Desactivados",
+  "player.subtitle.secondary": "Subtítulo secundario",
   "player.subtitle.load": "Cargar archivo de subtítulos…",
   "player.subtitle.files": "Archivos de subtítulos",
   "player.subtitle.cycle": "Siguiente subtítulo",

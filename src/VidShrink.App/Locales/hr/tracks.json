@@ -7,6 +7,7 @@
   "player.tracks.item": "Zapis {0}",
   "player.subtitle.menu": "Titlovi",
   "player.subtitle.off": "Isključeno",
+  "player.subtitle.secondary": "Drugi titl",
   "player.subtitle.load": "Učitaj datoteku titlova…",
   "player.subtitle.files": "Datoteke titlova",
   "player.subtitle.cycle": "Sljedeći titl",

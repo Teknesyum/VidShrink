@@ -20,6 +20,10 @@ ship as part of it.
 - Player: jump to the next or previous chapter with Ctrl+PgDn / Ctrl+PgUp, or from the
   Playback submenu of the right-click menu. The rows are disabled when the file has no
   chapters.
+- Player: a second subtitle track can be shown together with the first, at the top of the
+  picture. "Secondary Subtitle" in the Subtitles submenu lists Off and the tracks; the
+  track already shown as the primary one is disabled there, and the list is disabled when
+  the file has fewer than two subtitle tracks. A new file starts with it off.
 - The recorder's global shortcuts (start/pause, stop, show or hide the frame, discard,
   save the replay buffer) can be reassigned. In Advanced mode, "Shortcuts" next to the
   Simple/Advanced switch lists each action with a key box and a reset button. A key

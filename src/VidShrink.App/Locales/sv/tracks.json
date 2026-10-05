@@ -7,6 +7,7 @@
   "player.tracks.item": "Spår {0}",
   "player.subtitle.menu": "Undertexter",
   "player.subtitle.off": "Av",
+  "player.subtitle.secondary": "Sekundär undertext",
   "player.subtitle.load": "Läs in undertextfil…",
   "player.subtitle.files": "Undertextfiler",
   "player.subtitle.cycle": "Nästa undertext",
