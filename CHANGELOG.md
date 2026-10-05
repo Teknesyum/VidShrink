@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Player: "Save playlist…" in the playlist's right-click menu writes the current list, in
+  the order shown, to an `.m3u8` file. Files in or below the list's folder are stored as
+  relative paths, so the folder can be moved together with its list.
+
 ## [1.2.7] - 2026-10-05
 
 ### Added
