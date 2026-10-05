@@ -15,6 +15,11 @@ ship as part of it.
 - Shrink: "Remove metadata" checkbox in the Advanced panel's audio section, the same switch
   as the CLI's `--meta-yok`. Title, author, date, GPS location and device tags are left out
   of the output; track languages are kept. The choice is remembered.
+- Player: the media info panel (Ctrl+F1) shows the dynamic range (SDR, HDR10, HLG or Dolby
+  Vision) and a color line with primaries, transfer curve and bit depth. While the panel is
+  open it also shows live figures: the decoder in use (software or the hardware decoder's
+  name), dropped frames, the current bitrate and the displayed frame rate. Nothing is read
+  from the engine while the panel is closed.
 
 ## [1.2.7] - 2026-10-05
 

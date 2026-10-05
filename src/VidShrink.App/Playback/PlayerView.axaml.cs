@@ -791,9 +791,10 @@ internal partial class PlayerView : UserControl
         _watchdog.Start();
     }
 
-    private void OnWatchdog()
+    internal void OnWatchdog()
     {
         PollStall(Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency);
+        RefreshInfo();
         if (!_playing) return;
         _watchdogTicks++;
         if (_watchdogTicks % HistorySaveTicks == 0) SaveHistory(false);
