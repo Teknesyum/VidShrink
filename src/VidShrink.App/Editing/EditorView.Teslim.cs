@@ -287,6 +287,7 @@ internal partial class EditorView
     {
         if (this.TryFindResource(theme, out var found) && found is ControlTheme controlTheme) TxtExportStatus.Theme = controlTheme;
         TxtExportStatus.Text = text;
+        _projectNotice = false;
     }
 
     private static string Done(string path) => string.Format(Strings.Culture, Strings.Get("editor.export.done"), path);

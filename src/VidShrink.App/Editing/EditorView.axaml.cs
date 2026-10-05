@@ -57,6 +57,7 @@ internal partial class EditorView : UserControl
         InitText();
         InitClip();
         InitSilence();
+        InitProject();
 
         MnuSplit.Click += (_, _) => Split();
         MnuDelete.Click += (_, _) => DeleteSelected();
@@ -107,6 +108,7 @@ internal partial class EditorView : UserControl
         _resumeClock = false;
         if (Preview.IsPlaying) Preview.TogglePlay();
         _driver?.Pause();
+        FlushProject();
     }
 
     internal async Task EditAsync(string path, double startSeconds)
@@ -124,8 +126,11 @@ internal partial class EditorView : UserControl
         if (_driver is { } driver) await driver.SeekAsync(at).ConfigureAwait(true);
     }
 
-    internal async Task OpenSourceAsync(string path, long start = 0)
+    internal Task OpenSourceAsync(string path, long start = 0) => OpenSourceAsync(path, start, null);
+
+    private async Task OpenSourceAsync(string path, long start, EditProject? project)
     {
+        ForgetProject();
         CloseDriver();
         ForgetOverlay();
         ForgetSaved();
@@ -146,7 +151,7 @@ internal partial class EditorView : UserControl
         }
 
         if (!CurrentMedia.SamePath(path, _source) || Preview.Engine is not { } engine || !(engine.DurationSeconds > 0)) return;
-        ShowTimeline(EditTimeline.FromSource(EditTime.FromSeconds(engine.DurationSeconds)), SourceFps(KnownInfo?.Invoke(path)?.Fps, engine.FramesPerSecond));
+        ShowTimeline(OpenedTimeline(path, EditTime.FromSeconds(engine.DurationSeconds), project), SourceFps(KnownInfo?.Invoke(path)?.Fps, engine.FramesPerSecond));
         var at = Math.Clamp(start, 0, _model!.Duration);
         Timeline.Playhead = at;
         await ReloadAsync(at).ConfigureAwait(true);
@@ -305,6 +310,7 @@ internal partial class EditorView : UserControl
             RefreshOverlay();
         }
 
+        MarkEdited();
         return true;
     }
 

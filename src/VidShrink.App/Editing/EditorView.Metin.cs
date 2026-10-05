@@ -137,6 +137,7 @@ internal partial class EditorView
         ShowTextPanel();
         RefreshToolbar();
         RefreshOverlay();
+        MarkEdited();
     }
 
     private void ShowTextPanel()

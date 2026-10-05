@@ -65,6 +65,27 @@ internal static class AppDataReset
         }
 
         removed.AddRange(GunlugeSil(folder));
+        removed.AddRange(ProjeleriSil(folder));
+        return removed;
+    }
+
+    /// <summary>
+    /// Duzenleyicinin otomatik proje kayitlari da kullanicinin verisidir: sifirlama hepsini siler,
+    /// klasoru bos kalirsa klasor de gider. Klasore elle konmus baska dosyaya dokunulmaz.
+    /// </summary>
+    private static IReadOnlyList<string> ProjeleriSil(string folder)
+    {
+        var removed = new List<string>();
+        var klasor = Path.Combine(folder, Core.Editing.EditProjectStore.FolderName);
+        if (!Directory.Exists(klasor)) return removed;
+
+        foreach (var path in Directory.EnumerateFiles(klasor, "*" + Core.Editing.EditProject.Extension).ToList())
+        {
+            File.Delete(path);
+            removed.Add(path);
+        }
+
+        if (!Directory.EnumerateFileSystemEntries(klasor).Any()) Directory.Delete(klasor);
         return removed;
     }
 
