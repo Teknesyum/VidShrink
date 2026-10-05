@@ -32,6 +32,11 @@ ship as part of it.
 - Player: copy the current frame to the clipboard with Ctrl+Shift+E or from the right-click
   menu, and save screenshots as JPG instead of PNG (Settings submenu and the Advanced player
   panel; PNG stays the default).
+- Player: the media info panel (Ctrl+F1) shows the dynamic range (SDR, HDR10, HLG or Dolby
+  Vision) and a color line with primaries, transfer curve and bit depth. While the panel is
+  open it also shows live figures: the decoder in use (software or the hardware decoder's
+  name), dropped frames, the current bitrate and the displayed frame rate. Nothing is read
+  from the engine while the panel is closed.
 
 ## [1.2.6] - 2026-10-02
 

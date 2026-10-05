@@ -16,7 +16,8 @@ Oynatıcı sekmesinin ve karşılaştırma panelinin motoru. `IPlaybackEngine` m
   `TryCopyLatest(.., out frameSeconds)` karenin `time-pos` damgası. Varsayılan `hwdec=no`, `sid=no`; Gelişmiş paneldeki anahtar `SetHardwareDecoding` ile `auto-copy` yazar (SW render: yalnız kopyalı kip). `loadfile` hedefi: uzak şema (http/https/rtsp/rtmp/srt/udp) ve `edl://` olduğu gibi, yerel yol tam yola çevrilir.
 - Parçalar: `Tracks`, `aid`/`sid`, `sub-add`, gecikme, `sub-scale`/`sub-pos`; `sub-codepage` değişince dış
   altyazılar `sub-reload` ile yeniden okunur. Görüntü: `vf @vsrotate:lavfi=[transpose=..]` (yazılım çiziminde `video-rotate` yok sayılıyor), `vf @vsmirror:hflip`,
-  `video-aspect-override`; ekran görüntüsü `screenshot-to-file .. video`, bilgi `track-list` + `file-size`.
+  `video-aspect-override`; ekran görüntüsü `screenshot-to-file .. video`, bilgi `track-list` + `file-size` + `video-params` (`primaries`, `gamma`, `pixelformat`; ilk kareden önce boş) ve iz başına `dolby-vision-profile`.
+  Canlı ölçüm `Stats` (`PlaybackStats`): `frame-drop-count`, `decoder-frame-drop-count`, `hwdec-current` (`no` = yazılım), `video-bitrate`, `estimated-vf-fps`; zamanlayıcısı yok, çağıran sorar.
   Arayüze yalnız varsayılan gövdeli üyeler eklenir.
 - Gelişmiş (`MpvEngine.Advanced.cs`): renk, ton, keskinlik, kırpma, ekolayzer ve normalleştirme etiketli `vf`/`af`
   halkaları (`@vscolor`…); altyazı biçimi ve `volume-max` özellikten. Geri okumada mpv'nin `%uzunluk%` kaçışı ayıklanır.

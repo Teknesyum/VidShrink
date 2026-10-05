@@ -1216,6 +1216,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-05, duzenleyici proje kaydi: yedi yeni anahtardan ikisi (<c>editor.project.failed</c>, <c>editor.project.unreadable</c>) 9 kol 6 dilde (en, hu, ro ikisi; es, fr, pt yalniz unreadable), KOL dokumunden sayildi, tr girmiyor: 2919 + 9 = 2928, en 282 + 2 = 284, tr 103.</para>
     /// <para>2026-10-05, kareyi panoya kopyalama ve JPG ekran goruntusu: dort yeni <c>player.view.screenshot-*</c> anahtarindan 21 kol 8 dilde (copy ve copied: cs, de, en, hu, pl, pt, sk; copy-failed: en, hu, ro; jpg: en, es, pt, ro), tr haric: 2919 + 21 = 2940, en 282 + 4 = 286, tr 103.</para>
     /// <para>2026-10-05, proje kaydi ve kare panosu birlikte: 2919 + 9 + 21 = 2949, en 282 + 2 + 4 = 288.</para>
+    /// <para>2026-10-05, oynatici bilgi panelinde HDR alani ve canli istatistik: dokuz yeni <c>player.info.*</c> anahtarindan dordu 14 kol 8 dilde (decoderdropped: en, hu, nl, ro; livebitrate: ms, pt, ro, sw; livefps: es, ms, pt, ro, sw; range: sw), KOL dokumunden sayildi, tr girmiyor: 2949 + 14 = 2963, en 288 + 1 = 289, tr 103.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1241,8 +1242,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(2949, toplam);
-        Assert.Equal(288, dilBasina["en"]);
+        Assert.Equal(2963, toplam);
+        Assert.Equal(289, dilBasina["en"]);
         Assert.Equal(103, dilBasina["tr"]);
     }
 
@@ -1437,6 +1438,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-05, oynatici donanim cozme: bir yeni anahtar (<c>player.advanced.hardware</c>), dusen yok. Proje kaydiyla birlikte: 1295 + 1 = 1296, 43 x 1296 = 55728. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, kareyi panoya kopyalama ve JPG ekran goruntusu: dort yeni anahtar (<c>player.view.screenshot-copy</c>, <c>-copied</c>, <c>-copy-failed</c>, <c>player.view.screenshot-jpg</c>), dusen yok: 1288 + 4 = 1292, 43 x 1292 = 55556. <c>kayip</c> 0.</para>
     /// <para>2026-10-05, proje kaydi, donanim cozme ve kare panosu birlikte: 1288 + 7 + 1 + 4 = 1300, 43 x 1300 = 55900.</para>
+    /// <para>2026-10-05, oynatici bilgi panelinde HDR alani ve canli istatistik: dokuz yeni anahtar (<c>player.info.range</c>, <c>.color</c>, <c>.decoder</c>, <c>.software</c>, <c>.hardware</c>, <c>.dropped</c>, <c>.decoderdropped</c>, <c>.livebitrate</c>, <c>.livefps</c>), dusen yok: 1300 + 9 = 1309, 43 x 1309 = 56287. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1464,7 +1466,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(55900, gezilen);
+        Assert.Equal(56287, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -450,6 +450,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
             var fps = double.NaN;
             var channels = 0;
             var sampleRate = 0;
+            var profile = 0;
             var videoSelected = false;
             var audioSelected = false;
 
@@ -464,6 +465,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
                     width = (int)ReadInt($"track-list/{i}/demux-w");
                     height = (int)ReadInt($"track-list/{i}/demux-h");
                     fps = GetDouble($"track-list/{i}/demux-fps");
+                    profile = (int)ReadInt($"track-list/{i}/dolby-vision-profile");
                     videoSelected = selected;
                 }
                 else if (type == "audio" && (audioCodec is null || (selected && !audioSelected)))
@@ -479,9 +481,23 @@ public sealed partial class MpvEngine : IPlaybackEngine
             var size = ReadInt("file-size");
             var duration = DurationSeconds;
             var bits = size > 0 && duration > 0 ? size * 8.0 / duration : GetDouble("video-bitrate");
-            return new MediaDetails(videoCodec, width, height, fps, bits, audioCodec, channels, sampleRate);
+            return new MediaDetails(videoCodec, width, height, fps, bits, audioCodec, channels, sampleRate,
+                GetProperty("video-params/primaries"),
+                GetProperty("video-params/gamma"),
+                MediaDetails.BitDepthOf(GetProperty("video-params/pixelformat")),
+                profile);
         }
     }
+
+    public PlaybackStats? Stats
+        => _isOpen
+            ? new PlaybackStats(
+                ReadInt("frame-drop-count"),
+                ReadInt("decoder-frame-drop-count"),
+                GetProperty("hwdec-current"),
+                GetDouble("video-bitrate"),
+                GetDouble("estimated-vf-fps"))
+            : null;
 
     public void SetRotation(int degrees)
     {
