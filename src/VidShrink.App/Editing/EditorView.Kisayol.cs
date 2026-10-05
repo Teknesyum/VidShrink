@@ -175,6 +175,7 @@ internal partial class EditorView
         ShortcutBindings.Changed -= OnLanguageChanged;
         ShortcutBindings.Changed += OnLanguageChanged;
         ShowGestures();
+        AttachProject();
         if (TopLevel.GetTopLevel(this) is { } top) top.AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
         RemoveHandler(PointerPressedEvent, OnButtonPress);
         AddHandler(PointerPressedEvent, OnButtonPress, RoutingStrategies.Tunnel);
@@ -186,6 +187,8 @@ internal partial class EditorView
     {
         _resumeClock = _clock.IsEnabled;
         _clock.Stop();
+        FlushProject();
+        DetachProject();
         Strings.Changed -= OnLanguageChanged;
         ShortcutBindings.Changed -= OnLanguageChanged;
         RemoveHandler(PointerPressedEvent, OnButtonPress);

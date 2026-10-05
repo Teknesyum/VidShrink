@@ -182,6 +182,9 @@
                   <Separator/>
                   <MenuItem x:Name="MnuSpeed" Header="{loc:Text editor.speed}"/>
                   <MenuItem x:Name="MnuReverse" Header="{loc:Text editor.reverse}"/>
+                  <Separator/>
+                  <MenuItem x:Name="MnuProjectSave" Header="{loc:Text editor.project.save}"/>
+                  <MenuItem x:Name="MnuProjectOpen" Header="{loc:Text editor.project.open}"/>
                 </ContextMenu>
               </editing:EditorTimeline.ContextMenu>
             </editing:EditorTimeline>

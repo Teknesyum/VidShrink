@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Editor: the cut list is saved automatically after every edit and comes back when the
+  same video is opened again; Undo returns to the untouched source. If the video has
+  changed since, the saved edit is not loaded and the editor says so. "Save Project" and
+  "Open Project" in the timeline's right-click menu write and read a `.vsproj.json` file.
 - Convert: animated WebP and animated AVIF output. Both loop forever and drop the sound
   track, as GIF does; the existing quality control sets how hard they are compressed.
 - Player: jump to the next or previous chapter with Ctrl+PgDn / Ctrl+PgUp, or from the

@@ -460,6 +460,25 @@ public sealed class EditTimeline
         return ReplaceText(index, after);
     }
 
+    /// <summary>
+    /// Kayitli bir durumu tek geri alma adimi olarak yukler: parcalar ve metinler birlikte
+    /// degisir, geri al yukleme oncesine doner. Durum zaten ayniysa <c>false</c>.
+    /// </summary>
+    public bool Restore(IEnumerable<EditClip> clips, IEnumerable<TextLayer> texts)
+    {
+        ArgumentNullException.ThrowIfNull(clips);
+        ArgumentNullException.ThrowIfNull(texts);
+        var nextClips = clips.ToArray();
+        var nextTexts = texts.ToArray();
+        if (nextClips.Any(c => c is null))
+            throw new ArgumentException("Listede bos parca var", nameof(clips));
+        foreach (var text in nextTexts) text.Validate();
+        if (nextClips.SequenceEqual(_clips) && nextTexts.SequenceEqual(_texts)) return false;
+
+        Execute(new RestoreCommand(_texts, _clips.ToArray(), _texts.ToArray(), nextClips, nextTexts));
+        return true;
+    }
+
     public bool Undo()
     {
         if (!CanUndo) return false;

@@ -141,6 +141,36 @@ internal sealed class TextCommand : IEditCommand
     }
 }
 
+internal sealed class RestoreCommand : IEditCommand
+{
+    private readonly List<TextLayer> _texts;
+    private readonly EditClip[] _beforeClips;
+    private readonly TextLayer[] _beforeTexts;
+    private readonly EditClip[] _afterClips;
+    private readonly TextLayer[] _afterTexts;
+
+    public RestoreCommand(List<TextLayer> texts, EditClip[] beforeClips, TextLayer[] beforeTexts, EditClip[] afterClips, TextLayer[] afterTexts)
+    {
+        _texts = texts;
+        _beforeClips = beforeClips;
+        _beforeTexts = beforeTexts;
+        _afterClips = afterClips;
+        _afterTexts = afterTexts;
+    }
+
+    public void Apply(List<EditClip> clips) => Set(clips, _afterClips, _afterTexts);
+
+    public void Revert(List<EditClip> clips) => Set(clips, _beforeClips, _beforeTexts);
+
+    private void Set(List<EditClip> clips, EditClip[] nextClips, TextLayer[] nextTexts)
+    {
+        clips.Clear();
+        clips.AddRange(nextClips);
+        _texts.Clear();
+        _texts.AddRange(nextTexts);
+    }
+}
+
 internal sealed class CompositeCommand : IEditCommand
 {
     private readonly IReadOnlyList<IEditCommand> _steps;
