@@ -317,7 +317,7 @@ public sealed class OynaticiGelismisTests
             var body = new StringBuilder();
             body.AppendLine($"satirlar: {string.Join(" | ", panel.Shown)}");
             body.AppendLine("ozet: " + panel.Summary);
-            Assert.Equal(PlayerView.Knobs.Count + 3, panel.Shown.Count);
+            Assert.Equal(PlayerView.Knobs.Count + 4, panel.Shown.Count);
             Assert.False(panel.IsOpen);
             Assert.Equal(Strings.Get("player.advanced.state-off"), panel.Summary);
 

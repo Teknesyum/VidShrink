@@ -209,6 +209,11 @@ public interface IPlaybackEngine : IDisposable
 
     void SetRepeatFile(bool repeat) { }
 
+    HardwareDecoding Hardware => HardwareDecoding.Off;
+
+    /// <summary>Donanim cozmeyi calan dosyada da degistirir; motor desteklemiyorsa yok sayilir.</summary>
+    void SetHardwareDecoding(HardwareDecoding mode) { }
+
     Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default) => Task.FromResult(false);
 
     PictureAdjust Picture => PictureAdjust.Neutral;

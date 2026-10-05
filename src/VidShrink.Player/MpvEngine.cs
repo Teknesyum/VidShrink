@@ -141,10 +141,16 @@ public sealed partial class MpvEngine : IPlaybackEngine
         return list;
     }
 
+    /// <summary>
+    /// <c>hwdec</c> degeri. Cizim yazilimda (<c>vo=libmpv</c>, SW render) oldugu icin donanim
+    /// cozme yalniz kopyali kipte calisir; kopyasiz kip kareyi bellege indirmez.
+    /// </summary>
+    public static string HardwareValue(HardwareDecoding mode) => mode == HardwareDecoding.AutoCopy ? "auto-copy" : "no";
+
     private static (string Name, string Value)[] BaseOptions(PlaybackOptions options) => new[]
     {
         ("vo", "libmpv"),
-        ("hwdec", options.Hardware == HardwareDecoding.AutoCopy ? "auto-copy" : "no"),
+        ("hwdec", HardwareValue(options.Hardware)),
         ("keep-open", "yes"),
         ("idle", "yes"),
         ("pause", "yes"),
@@ -413,6 +419,11 @@ public sealed partial class MpvEngine : IPlaybackEngine
     public double AspectOverride => Finite(GetDouble("video-aspect-override"), -1);
 
     public bool RepeatFile => GetProperty("loop-file") is "inf" or "yes";
+
+    public HardwareDecoding Hardware
+        => GetProperty("hwdec") == HardwareValue(HardwareDecoding.AutoCopy) ? HardwareDecoding.AutoCopy : HardwareDecoding.Off;
+
+    public void SetHardwareDecoding(HardwareDecoding mode) => TrySet("hwdec", HardwareValue(mode));
 
     public IReadOnlyList<double> ChapterTimes
     {

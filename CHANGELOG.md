@@ -13,6 +13,9 @@ ship as part of it.
   same video is opened again; Undo returns to the untouched source. If the video has
   changed since, the saved edit is not loaded and the editor says so. "Save Project" and
   "Open Project" in the timeline's right-click menu write and read a `.vsproj.json` file.
+- Player: a Hardware Decoding switch in the advanced panel. It is off by default, as before;
+  turning it on hands decoding to the graphics card in copy mode (`hwdec=auto-copy`), applies
+  to the file that is playing and is remembered.
 - Convert: animated WebP and animated AVIF output. Both loop forever and drop the sound
   track, as GIF does; the existing quality control sets how hard they are compressed.
 - Shrink queue: watch a folder. Videos dropped into the chosen folder join the queue on
