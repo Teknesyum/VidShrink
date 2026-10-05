@@ -133,7 +133,7 @@ public class MiniKipTests
         Assert.Contains("new(HotkeyAction.Toggle, Key.F7, 0x76)", tanim);
         Assert.Contains("new(HotkeyAction.Stop, Key.F8, 0x77)", tanim);
         Assert.Contains("new(HotkeyAction.Frame, Key.F9, 0x78)", tanim);
-        Assert.Contains("RecorderHotkeys.ActionOf(e.Key, e.KeyModifiers)", bag);
+        Assert.Contains("RecorderHotkeys.ActionOf(_hotkeys, e.Key, e.KeyModifiers)", bag);
         Assert.DoesNotContain("case Key.", bag);
         Assert.Contains("_mini.AddHandler(KeyDownEvent, OnHotkey", bag);
     }

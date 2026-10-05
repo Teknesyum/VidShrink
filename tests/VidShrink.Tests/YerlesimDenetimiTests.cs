@@ -593,7 +593,7 @@ public sealed class YerlesimDenetimiTests
 
     /// <summary>
     /// Açılır pencereler ana ağaçta çizilmiyor: ön ayar kaydetme (en uzun bildirim ve 60
-    /// harflik ad dolu) ve kaydedicinin seçenekleri. İçerik kendi <see cref="FlyoutPresenter"/>
+    /// harflik ad dolu), kaydedicinin seçenekleri ve kısayol satırları (iki ret satırı açık). İçerik kendi <see cref="FlyoutPresenter"/>
     /// temasıyla, içeriğe göre boyutlanan bir pencerede taranır; genişliği temanın sınırı belirler.
     /// </summary>
     [Theory]
@@ -614,6 +614,10 @@ public sealed class YerlesimDenetimiTests
                 ana.TxtPresetNotice.IsVisible = true;
                 AcilirTara((Flyout)ana.ChipAddPreset.Flyout!, "onayar-kaydet", d);
                 AcilirTara((Flyout)mini.BtnOptions.Flyout!, "kaydedici-secenek", d);
+                var kaydedici = ana.RecorderPaneForTest;
+                kaydedici.AssignHotkey(VidShrink.App.Recorder.HotkeyAction.Stop, Avalonia.Input.Key.F7, Avalonia.Input.KeyModifiers.None);
+                kaydedici.AssignHotkey(VidShrink.App.Recorder.HotkeyAction.Frame, Avalonia.Input.Key.Space, Avalonia.Input.KeyModifiers.None);
+                AcilirTara((Flyout)kaydedici.BtnHotkeys.Flyout!, "kaydedici-kisayol", d);
                 return d;
             }
             finally

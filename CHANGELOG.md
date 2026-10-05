@@ -16,6 +16,12 @@ ship as part of it.
 - Player: jump to the next or previous chapter with Ctrl+PgDn / Ctrl+PgUp, or from the
   Playback submenu of the right-click menu. The rows are disabled when the file has no
   chapters.
+- The recorder's global shortcuts (start/pause, stop, show or hide the frame, discard,
+  save the replay buffer) can be reassigned. In Advanced mode, "Shortcuts" next to the
+  Simple/Advanced switch lists each action with a key box and a reset button. A key
+  already used by another action, a key the system refuses to register and a bare
+  modifier are rejected on that row and the previous key stays; Esc cancels the capture.
+  Tooltips, the region panel, the mini strip and the tray read the assigned key.
 
 ## [1.2.6] - 2026-10-02
 

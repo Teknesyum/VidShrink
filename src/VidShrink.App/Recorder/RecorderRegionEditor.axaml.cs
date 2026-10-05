@@ -43,6 +43,7 @@ internal partial class RecorderRegionEditor : Window
     private IReadOnlyList<PixelRect> _snapLines = Array.Empty<PixelRect>();
     private bool _closingQuietly;
     private RegionEditorPhase _phase = RegionEditorPhase.Idle;
+    private string _hideKey = RecorderHotkeys.Gesture(RecorderHotkeys.Of(RecorderHotkeys.All, HotkeyAction.Frame));
     private readonly Dictionary<RegionGrip, Cursor> _cursors = new();
 
     internal event EventHandler<PixelRect>? RegionChanged;
@@ -116,6 +117,15 @@ internal partial class RecorderRegionEditor : Window
 
     internal static bool Editable(RegionEditorPhase phase) => phase == RegionEditorPhase.Idle;
 
+    /// <summary>Gizleme düğmesinin ipucundaki tuş adı; kaydedicinin atamasından gelir.</summary>
+    internal string HideText => ToolTip.GetTip(BtnHide) as string ?? string.Empty;
+
+    internal void SetHideKey(string key)
+    {
+        _hideKey = key;
+        ShowPhase();
+    }
+
     internal void SetPhase(RegionEditorPhase phase)
     {
         if (phase == _phase) return;
@@ -138,6 +148,9 @@ internal partial class RecorderRegionEditor : Window
         var close = LanguageCatalog.Display(Strings.Get(editable ? "recorder.region.close" : "recorder.region.stop-close"));
         ToolTip.SetTip(BtnClose, close);
         AutomationProperties.SetName(BtnClose, close);
+        var hide = string.Format(Strings.Culture, LanguageCatalog.Display(Strings.Get("recorder.region.hide")), _hideKey);
+        ToolTip.SetTip(BtnHide, hide);
+        AutomationProperties.SetName(BtnHide, hide);
         Edge.IsVisible = editable;
         Edge.StrokeDashArray = EdgeDash(editable, Resource("RecorderRegionDash"), Resource("RecorderFrameThickness"));
         foreach (var (_, handle) in HandleControls()) handle.IsVisible = editable;
@@ -393,6 +406,8 @@ internal interface IRegionEditorHost
 {
     bool IsOpen { get; }
 
+    string HideKey { set { } }
+
     event EventHandler<PixelRect>? Changed;
 
     event EventHandler<PixelRect>? Committed;
@@ -424,7 +439,18 @@ internal sealed class RegionEditorHost : IRegionEditorHost
 {
     private RecorderRegionEditor? _editor;
 
+    private string _hideKey = RecorderHotkeys.Gesture(RecorderHotkeys.Of(RecorderHotkeys.All, HotkeyAction.Frame));
+
     public bool IsOpen => _editor is not null;
+
+    public string HideKey
+    {
+        set
+        {
+            _hideKey = value;
+            _editor?.SetHideKey(value);
+        }
+    }
 
     public event EventHandler<PixelRect>? Changed;
 
@@ -467,6 +493,7 @@ internal sealed class RegionEditorHost : IRegionEditorHost
                 Dismissed?.Invoke(this, EventArgs.Empty);
             };
             _editor = editor;
+            editor.SetHideKey(_hideKey);
             editor.SetPhase(phase);
             editor.Show();
             if (RecorderRegionEditor.Editable(phase)) editor.Activate();
