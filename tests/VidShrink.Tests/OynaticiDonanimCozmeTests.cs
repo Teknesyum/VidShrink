@@ -233,7 +233,18 @@ public sealed class OynaticiDonanimCozmeTests
         var klasor = Path.Combine(DonanimKanit.Folder, "ayar-" + Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(klasor);
         var dosya = Path.Combine(klasor, PlayerSettings.FileName);
+        try
+        {
+            AyarGidisDonusu(dosya);
+        }
+        finally
+        {
+            DonanimKanit.Kapat(Path.GetFileName(klasor));
+        }
+    }
 
+    private static void AyarGidisDonusu(string dosya)
+    {
         new PlayerSettings { Hardware = HardwareDecoding.AutoCopy, Shuffle = true }.Save(dosya);
         Assert.Contains("\"hardwareDecoding\": \"AutoCopy\"", File.ReadAllText(dosya), StringComparison.Ordinal);
         var acik = PlayerSettings.Load(dosya);
@@ -262,8 +273,6 @@ public sealed class OynaticiDonanimCozmeTests
 
         File.WriteAllText(dosya, "{ \"hardwareDecoding\": \"autocopy\" }", new UTF8Encoding(false));
         Assert.Equal(HardwareDecoding.AutoCopy, PlayerSettings.Load(dosya).Hardware);
-
-        DonanimKanit.Kapat(Path.GetFileName(klasor));
     }
 
     [Fact]
