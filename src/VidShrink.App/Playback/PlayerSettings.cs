@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using VidShrink.Core;
+using VidShrink.Player;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -40,6 +41,8 @@ internal sealed class PlayerSettings
 
     internal bool SpeedModeB { get; set; }
 
+    internal HardwareDecoding Hardware { get; set; }
+
     internal static PlayerSettings Load(string? file)
     {
         var settings = new PlayerSettings();
@@ -56,6 +59,8 @@ internal sealed class PlayerSettings
             settings.SpeedA = Speed((double?)root["speedA"], DefaultSpeedA);
             settings.SpeedB = Speed((double?)root["speedB"], DefaultSpeedB);
             settings.SpeedModeB = string.Equals((string?)root["speedMode"], "B", StringComparison.OrdinalIgnoreCase);
+            if (Enum.TryParse<HardwareDecoding>((string?)root["hardwareDecoding"], true, out var hardware) && Enum.IsDefined(hardware))
+                settings.Hardware = hardware;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -86,6 +91,7 @@ internal sealed class PlayerSettings
                 writer.WriteNumber("speedA", SpeedA);
                 writer.WriteNumber("speedB", SpeedB);
                 writer.WriteString("speedMode", SpeedModeB ? "B" : "A");
+                writer.WriteString("hardwareDecoding", Hardware.ToString());
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);
