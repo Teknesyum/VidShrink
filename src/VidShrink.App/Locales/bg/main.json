@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Аудио цел (kbit/s)",
   "main.advanced.audio-channels.label": "Аудио канали",
   "main.advanced.keep-tracks.label": "Запази всички писти (MKV)",
+  "main.advanced.drop-metadata.label": "Премахни метаданните",
+  "main.advanced.drop-metadata.tip": "• Премахва етикетите на контейнера от изходния файл: заглавие, автор, дата, GPS местоположение и данни за устройството.\n• Езиците на пистите се запазват.\n• Видеото се кодира отново, дори вече да се побира в целта.",
   "main.audio.level.label": "Ниво на звука",
   "main.audio.loudnorm": "Изравняване на силата на звука (EBU R128)",
   "main.audio.gain": "Усилване",

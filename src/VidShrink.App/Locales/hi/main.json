@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "ऑडियो लक्ष्य (kbit/s)",
   "main.advanced.audio-channels.label": "ऑडियो चैनल",
   "main.advanced.keep-tracks.label": "सभी ट्रैक रखें (MKV)",
+  "main.advanced.drop-metadata.label": "मेटाडेटा हटाएँ",
+  "main.advanced.drop-metadata.tip": "• आउटपुट से कंटेनर टैग हटाता है: शीर्षक, लेखक, तारीख, GPS स्थान और डिवाइस की जानकारी।\n• ट्रैक की भाषाएँ बनी रहती हैं।\n• वीडियो लक्ष्य में पहले से समाता हो तब भी दोबारा एन्कोड होता है।",
   "main.audio.level.label": "ऑडियो स्तर",
   "main.audio.loudnorm": "लाउडनेस को समान करें (EBU R128)",
   "main.audio.gain": "गेन",

@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Cíl zvuku (kbit/s)",
   "main.advanced.audio-channels.label": "Zvukové kanály",
   "main.advanced.keep-tracks.label": "Zachovat všechny stopy (MKV)",
+  "main.advanced.drop-metadata.label": "Odstranit metadata",
+  "main.advanced.drop-metadata.tip": "• Odstraní z výstupu značky kontejneru: název, autora, datum, polohu GPS a údaje o zařízení.\n• Jazyky stop zůstanou zachovány.\n• Video se znovu zakóduje, i když se do cíle už vejde.",
   "main.audio.level.label": "Úroveň zvuku",
   "main.audio.loudnorm": "Normalizovat hlasitost (EBU R128)",
   "main.audio.gain": "Zisk",

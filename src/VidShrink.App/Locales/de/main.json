@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Audio-Ziel (kbit/s)",
   "main.advanced.audio-channels.label": "Audiokanäle",
   "main.advanced.keep-tracks.label": "Alle Spuren behalten (MKV)",
+  "main.advanced.drop-metadata.label": "Metadaten entfernen",
+  "main.advanced.drop-metadata.tip": "• Entfernt die Container-Tags aus der Ausgabe: Titel, Autor, Datum, GPS-Standort und Geräteinformationen.\n• Die Sprachen der Spuren bleiben erhalten.\n• Das Video wird neu kodiert, auch wenn es bereits ins Ziel passt.",
   "main.audio.level.label": "Lautstärkepegel",
   "main.audio.loudnorm": "Lautheit normalisieren (EBU R128)",
   "main.audio.gain": "Verstärkung",

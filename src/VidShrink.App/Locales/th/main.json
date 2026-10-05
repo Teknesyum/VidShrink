@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "เป้าหมายเสียง (kbit/s)",
   "main.advanced.audio-channels.label": "ช่องเสียง",
   "main.advanced.keep-tracks.label": "เก็บทุกแทร็ก (MKV)",
+  "main.advanced.drop-metadata.label": "ลบเมตาดาตา",
+  "main.advanced.drop-metadata.tip": "• ลบแท็กของคอนเทนเนอร์ออกจากไฟล์ผลลัพธ์: ชื่อเรื่อง ผู้สร้าง วันที่ ตำแหน่ง GPS และข้อมูลอุปกรณ์\n• ภาษาของแทร็กยังคงอยู่\n• วิดีโอจะถูกเข้ารหัสใหม่แม้จะพอดีกับเป้าหมายอยู่แล้ว",
   "main.audio.level.label": "ระดับเสียง",
   "main.audio.loudnorm": "ปรับความดังให้เท่ากัน (EBU R128)",
   "main.audio.gain": "เกน",

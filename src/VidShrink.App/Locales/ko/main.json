@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "오디오 목표 (kbit/s)",
   "main.advanced.audio-channels.label": "오디오 채널",
   "main.advanced.keep-tracks.label": "모든 트랙 유지 (MKV)",
+  "main.advanced.drop-metadata.label": "메타데이터 제거",
+  "main.advanced.drop-metadata.tip": "• 출력에서 컨테이너 태그를 제거합니다: 제목, 작성자, 날짜, GPS 위치, 기기 정보.\n• 트랙 언어는 유지됩니다.\n• 영상이 이미 목표에 맞아도 다시 인코딩됩니다.",
   "main.audio.level.label": "오디오 레벨",
   "main.audio.loudnorm": "음량 정규화 (EBU R128)",
   "main.audio.gain": "게인",

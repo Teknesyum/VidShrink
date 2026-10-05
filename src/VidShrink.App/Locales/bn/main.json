@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "অডিও লক্ষ্য (kbit/s)",
   "main.advanced.audio-channels.label": "অডিও চ্যানেল",
   "main.advanced.keep-tracks.label": "সব ট্র্যাক রাখুন (MKV)",
+  "main.advanced.drop-metadata.label": "মেটাডেটা মুছুন",
+  "main.advanced.drop-metadata.tip": "• আউটপুট থেকে কন্টেইনার ট্যাগ মুছে দেয়: শিরোনাম, লেখক, তারিখ, GPS অবস্থান ও ডিভাইসের তথ্য।\n• ট্র্যাকের ভাষা রাখা হয়।\n• ভিডিও লক্ষ্যের মধ্যে থাকলেও আবার এনকোড করা হয়।",
   "main.audio.level.label": "অডিও লেভেল",
   "main.audio.loudnorm": "শব্দের মাত্রা সমান করুন (EBU R128)",
   "main.audio.gain": "গেইন",

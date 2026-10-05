@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "音声目標(kbit/s)",
   "main.advanced.audio-channels.label": "音声チャンネル",
   "main.advanced.keep-tracks.label": "すべてのトラックを保持 (MKV)",
+  "main.advanced.drop-metadata.label": "メタデータを削除",
+  "main.advanced.drop-metadata.tip": "• 出力からコンテナのタグを削除します: タイトル、作成者、日付、GPS 位置情報、デバイス情報。\n• トラックの言語は保持されます。\n• 動画がすでに目標に収まっていても再エンコードされます。",
   "main.audio.level.label": "音声レベル",
   "main.audio.loudnorm": "ラウドネスを正規化 (EBU R128)",
   "main.audio.gain": "ゲイン",

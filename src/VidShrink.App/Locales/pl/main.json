@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Cel dźwięku (kbit/s)",
   "main.advanced.audio-channels.label": "Kanały dźwięku",
   "main.advanced.keep-tracks.label": "Zachowaj wszystkie ścieżki (MKV)",
+  "main.advanced.drop-metadata.label": "Usuń metadane",
+  "main.advanced.drop-metadata.tip": "• Usuwa z wyniku znaczniki kontenera: tytuł, autora, datę, lokalizację GPS i informacje o urządzeniu.\n• Języki ścieżek zostają zachowane.\n• Wideo jest kodowane ponownie, nawet jeśli już mieści się w celu.",
   "main.audio.level.label": "Poziom dźwięku",
   "main.audio.loudnorm": "Normalizuj głośność (EBU R128)",
   "main.audio.gain": "Wzmocnienie",

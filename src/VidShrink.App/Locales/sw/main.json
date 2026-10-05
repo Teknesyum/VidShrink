@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Lengo la sauti (kbit/s)",
   "main.advanced.audio-channels.label": "Chaneli za sauti",
   "main.advanced.keep-tracks.label": "Hifadhi nyimbo zote (MKV)",
+  "main.advanced.drop-metadata.label": "Ondoa metadata",
+  "main.advanced.drop-metadata.tip": "• Huondoa lebo za kontena kwenye towe: kichwa, mwandishi, tarehe, eneo la GPS na taarifa za kifaa.\n• Lugha za nyimbo hubaki.\n• Video husimbwa upya hata kama tayari inatosha kwenye lengo.",
   "main.audio.level.label": "Kiwango cha sauti",
   "main.audio.loudnorm": "Sawazisha kiwango cha sauti (EBU R128)",
   "main.audio.gain": "Ongezeko (Gain)",

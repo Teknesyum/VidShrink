@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Ціль звуку (кбіт/с)",
   "main.advanced.audio-channels.label": "Канали звуку",
   "main.advanced.keep-tracks.label": "Зберегти всі доріжки (MKV)",
+  "main.advanced.drop-metadata.label": "Вилучити метадані",
+  "main.advanced.drop-metadata.tip": "• Вилучає з результату теги контейнера: назву, автора, дату, GPS-координати та відомості про пристрій.\n• Мови доріжок зберігаються.\n• Відео перекодовується, навіть якщо вже вкладається в ціль.",
   "main.audio.level.label": "Рівень звуку",
   "main.audio.loudnorm": "Нормалізувати голосність (EBU R128)",
   "main.audio.gain": "Посилення",

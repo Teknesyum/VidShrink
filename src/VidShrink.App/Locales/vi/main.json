@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Mục tiêu âm thanh (kbit/s)",
   "main.advanced.audio-channels.label": "Kênh âm thanh",
   "main.advanced.keep-tracks.label": "Giữ mọi rãnh (MKV)",
+  "main.advanced.drop-metadata.label": "Xóa siêu dữ liệu",
+  "main.advanced.drop-metadata.tip": "• Xóa các thẻ của vùng chứa khỏi tệp đầu ra: tiêu đề, tác giả, ngày, vị trí GPS và thông tin thiết bị.\n• Ngôn ngữ của các rãnh được giữ lại.\n• Video vẫn được mã hóa lại dù đã vừa với mục tiêu.",
   "main.audio.level.label": "Mức âm thanh",
   "main.audio.loudnorm": "Chuẩn hóa âm lượng (EBU R128)",
   "main.audio.gain": "Độ lợi (Gain)",

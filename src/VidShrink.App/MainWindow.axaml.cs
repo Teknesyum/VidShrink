@@ -251,7 +251,7 @@ public partial class MainWindow : Window
         Watch(TxtQualityTarget, TextBox.TextProperty, OnQualityTargetTextChanged);
         foreach (var toggle in ShrinkChoiceToggles())
             Watch(toggle, ToggleButton.IsCheckedProperty, OnOptionChanged);
-        foreach (var check in new ToggleButton[] { ChkResolution, ChkFps, ChkFastGpu, ChkAdvKeepTracks })
+        foreach (var check in new ToggleButton[] { ChkResolution, ChkFps, ChkFastGpu, ChkAdvKeepTracks, ChkAdvDropMetadata })
             Watch(check, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(ChkFastGpu, ToggleButton.IsCheckedProperty, OnFastGpuChanged);
         foreach (var toggle in new ToggleButton[] { ChkResolution, ChkWhatsAppCompatible })
@@ -302,6 +302,7 @@ public partial class MainWindow : Window
         Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Player.Opened += OnPlayerOpened;
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkAdvDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
         Watch(TxtOpenSubtitlesKey, TextBox.TextProperty, SaveAppSettings);
@@ -1592,6 +1593,7 @@ public partial class MainWindow : Window
             AdvEncoderPath = AdvEncoderPathIndex,
             AdvCodecLock = CmbAdvCodecLock.SelectedIndex,
             AdvKeepTracks = ChkAdvKeepTracks.IsChecked == true,
+            AdvDropMetadata = ChkAdvDropMetadata.IsChecked == true,
             OutputFolderMode = OutputFolderModeIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
             OutputNamePattern = TxtOutputName.Text ?? "",
@@ -1629,6 +1631,7 @@ public partial class MainWindow : Window
             foreach (var (box, index) in restore)
                 if (index >= 0 && index < box.ItemCount) box.SelectedIndex = index;
             ChkAdvKeepTracks.IsChecked = settings.AdvKeepTracks;
+            ChkAdvDropMetadata.IsChecked = settings.AdvDropMetadata;
 
             OutputFolderModeIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
             TxtOutputFolder.Text = settings.OutputFolder;
@@ -2393,6 +2396,7 @@ public partial class MainWindow : Window
         };
 
         options.KeepAllTracks = ChkAdvKeepTracks.IsChecked == true;
+        options.DropMetadata = ChkAdvDropMetadata.IsChecked == true;
         options.PlatformDelivery = _platformChip;
         options.PreferredLanguage = Strings.Language;
 

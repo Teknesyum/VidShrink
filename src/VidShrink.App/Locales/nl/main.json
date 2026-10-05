@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Audiodoel (kbit/s)",
   "main.advanced.audio-channels.label": "Audiokanalen",
   "main.advanced.keep-tracks.label": "Alle sporen behouden (MKV)",
+  "main.advanced.drop-metadata.label": "Metadata verwijderen",
+  "main.advanced.drop-metadata.tip": "• Verwijdert de containertags uit de uitvoer: titel, auteur, datum, gps-locatie en apparaatgegevens.\n• De talen van de sporen blijven behouden.\n• De video wordt opnieuw gecodeerd, ook als die al binnen het doel past.",
   "main.audio.level.label": "Audioniveau",
   "main.audio.loudnorm": "Luidheid normaliseren (EBU R128)",
   "main.audio.gain": "Versterking",

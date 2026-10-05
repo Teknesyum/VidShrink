@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Ses hedefi (kbit/sn)",
   "main.advanced.audio-channels.label": "Ses kanalı",
   "main.advanced.keep-tracks.label": "İzleri koru (MKV)",
+  "main.advanced.drop-metadata.label": "Meta veriyi sil",
+  "main.advanced.drop-metadata.tip": "• Çıktıdan kap etiketlerini siler: başlık, yazar, tarih, GPS konumu ve cihaz bilgisi.\n• İz dilleri korunur.\n• Video hedefe zaten sığsa bile yeniden kodlanır.",
   "main.audio.level.label": "Ses seviyesi",
   "main.audio.loudnorm": "Ses yüksekliğini eşitle (EBU R128)",
   "main.audio.gain": "Kazanç",

@@ -12,6 +12,9 @@ ship as part of it.
 - Player: "Save playlist…" in the playlist's right-click menu writes the current list, in
   the order shown, to an `.m3u8` file. Files in or below the list's folder are stored as
   relative paths, so the folder can be moved together with its list.
+- Shrink: "Remove metadata" checkbox in the Advanced panel's audio section, the same switch
+  as the CLI's `--meta-yok`. Title, author, date, GPS location and device tags are left out
+  of the output; track languages are kept. The choice is remembered.
 
 ## [1.2.7] - 2026-10-05
 

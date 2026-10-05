@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Cilj zvoka (kbit/s)",
   "main.advanced.audio-channels.label": "Zvočni kanali",
   "main.advanced.keep-tracks.label": "Ohrani vse sledi (MKV)",
+  "main.advanced.drop-metadata.label": "Odstrani metapodatke",
+  "main.advanced.drop-metadata.tip": "• Iz izhoda odstrani oznake vsebnika: naslov, avtorja, datum, lokacijo GPS in podatke o napravi.\n• Jeziki sledi se ohranijo.\n• Video se znova kodira, tudi če že ustreza cilju.",
   "main.audio.level.label": "Raven zvoka",
   "main.audio.loudnorm": "Normaliziraj glasnost (EBU R128)",
   "main.audio.gain": "Ojačanje",

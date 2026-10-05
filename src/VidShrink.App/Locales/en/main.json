@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Audio target (kbit/s)",
   "main.advanced.audio-channels.label": "Audio channels",
   "main.advanced.keep-tracks.label": "Keep all tracks (MKV)",
+  "main.advanced.drop-metadata.label": "Remove metadata",
+  "main.advanced.drop-metadata.tip": "• Removes container tags from the output: title, author, date, GPS location and device information.\n• Track languages are kept.\n• The video is re-encoded even when it already fits the target.",
   "main.audio.level.label": "Audio level",
   "main.audio.loudnorm": "Normalize loudness (EBU R128)",
   "main.audio.gain": "Gain",
