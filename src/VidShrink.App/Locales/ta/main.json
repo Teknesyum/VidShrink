@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "ஒலி இலக்கு (kbit/s)",
   "main.advanced.audio-channels.label": "ஒலி சேனல்கள்",
   "main.advanced.keep-tracks.label": "எல்லா தடங்களையும் வைத்திரு (MKV)",
+  "main.advanced.drop-metadata.label": "மெட்டாடேட்டாவை அகற்று",
+  "main.advanced.drop-metadata.tip": "• வெளியீட்டிலிருந்து கொள்கலன் குறிச்சொற்களை அகற்றும்: தலைப்பு, ஆசிரியர், தேதி, GPS இருப்பிடம், சாதனத் தகவல்.\n• தடங்களின் மொழிகள் தக்கவைக்கப்படும்.\n• வீடியோ ஏற்கனவே இலக்கில் அடங்கினாலும் மீண்டும் குறியாக்கப்படும்.",
   "main.audio.level.label": "ஒலி நிலை",
   "main.audio.loudnorm": "ஒலி அளவை சமன்படுத்து (EBU R128)",
   "main.audio.gain": "கெயின்",

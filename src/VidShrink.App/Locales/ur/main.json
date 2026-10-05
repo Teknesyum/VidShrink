@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "آڈیو ہدف (kbit/s)",
   "main.advanced.audio-channels.label": "آڈیو چینل",
   "main.advanced.keep-tracks.label": "تمام ٹریکس رکھیں (MKV)",
+  "main.advanced.drop-metadata.label": "میٹا ڈیٹا ہٹائیں",
+  "main.advanced.drop-metadata.tip": "• آؤٹ پٹ سے کنٹینر ٹیگز ہٹاتا ہے: عنوان، مصنف، تاریخ، GPS مقام اور آلے کی معلومات۔\n• ٹریکس کی زبانیں برقرار رہتی ہیں۔\n• ویڈیو ہدف میں پہلے سے سماتی ہو تب بھی دوبارہ انکوڈ ہوتی ہے۔",
   "main.audio.level.label": "آڈیو لیول",
   "main.audio.loudnorm": "بلندی کو یکساں کریں (EBU R128)",
   "main.audio.gain": "گین",

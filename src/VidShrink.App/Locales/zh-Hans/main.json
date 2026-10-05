@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "音频目标 (kbit/s)",
   "main.advanced.audio-channels.label": "音频声道",
   "main.advanced.keep-tracks.label": "保留所有轨道 (MKV)",
+  "main.advanced.drop-metadata.label": "移除元数据",
+  "main.advanced.drop-metadata.tip": "• 从输出中移除容器标签：标题、作者、日期、GPS 位置和设备信息。\n• 轨道语言会保留。\n• 即使视频已符合目标大小，也会重新编码。",
   "main.audio.level.label": "音频音量",
   "main.audio.loudnorm": "均衡响度 (EBU R128)",
   "main.audio.gain": "增益",

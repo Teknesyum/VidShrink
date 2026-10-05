@@ -32,6 +32,9 @@ public sealed class AppSettings
     public int AdvCodecLock { get; set; }
     public bool AdvKeepTracks { get; set; }
 
+    /// <summary>Kap etiketlerini silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
+    public bool AdvDropMetadata { get; set; }
+
     /// <summary>0 = kaynağın yanı, 1 = sabit klasör.</summary>
     public int OutputFolderMode { get; set; }
     public string OutputFolder { get; set; } = "";
@@ -120,6 +123,7 @@ public sealed class AppSettings
             ReadInt(root, "advEncoderPath", value => settings.AdvEncoderPath = value);
             ReadInt(root, "advCodecLock", value => settings.AdvCodecLock = value);
             ReadBool(root, "advKeepTracks", value => settings.AdvKeepTracks = value);
+            ReadBool(root, "advDropMetadata", value => settings.AdvDropMetadata = value);
             ReadInt(root, "outputFolderMode", value => settings.OutputFolderMode = value);
             ReadString(root, "outputFolder", value => settings.OutputFolder = value);
             ReadString(root, "outputNamePattern", value => settings.OutputNamePattern = value);
@@ -202,6 +206,7 @@ public sealed class AppSettings
         root["advEncoderPath"] = AdvEncoderPath;
         root["advCodecLock"] = AdvCodecLock;
         root["advKeepTracks"] = AdvKeepTracks;
+        root["advDropMetadata"] = AdvDropMetadata;
         root["theme"] = Theme;
         root[ThemeMigrationMarker] = true;
         root["outputFolderMode"] = OutputFolderMode;

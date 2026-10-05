@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "יעד שמע (קילוביט/שנייה)",
   "main.advanced.audio-channels.label": "ערוצי שמע",
   "main.advanced.keep-tracks.label": "שמירת כל הרצועות (MKV)",
+  "main.advanced.drop-metadata.label": "הסרת מטא־נתונים",
+  "main.advanced.drop-metadata.tip": "• מסיר מהפלט את תגי המכל: כותרת, יוצר, תאריך, מיקום GPS ופרטי המכשיר.\n• שפות הרצועות נשמרות.\n• הווידאו מקודד מחדש גם אם הוא כבר עומד ביעד.",
   "main.audio.level.label": "עוצמת שמע",
   "main.audio.loudnorm": "איזון עוצמת קול (EBU R128)",
   "main.audio.gain": "הגברה",

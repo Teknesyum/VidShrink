@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Țintă audio (kbit/s)",
   "main.advanced.audio-channels.label": "Canale audio",
   "main.advanced.keep-tracks.label": "Păstrează toate pistele (MKV)",
+  "main.advanced.drop-metadata.label": "Elimină metadatele",
+  "main.advanced.drop-metadata.tip": "• Elimină din rezultat etichetele containerului: titlu, autor, dată, locație GPS și informații despre dispozitiv.\n• Limbile pistelor se păstrează.\n• Videoclipul este recodificat chiar dacă se încadrează deja în țintă.",
   "main.audio.level.label": "Nivel audio",
   "main.audio.loudnorm": "Normalizează volumul (EBU R128)",
   "main.audio.gain": "Câștig (Gain)",

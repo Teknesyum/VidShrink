@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Audio mērķis (kbit/s)",
   "main.advanced.audio-channels.label": "Audio kanāli",
   "main.advanced.keep-tracks.label": "Saglabāt visus celiņus (MKV)",
+  "main.advanced.drop-metadata.label": "Noņemt metadatus",
+  "main.advanced.drop-metadata.tip": "• Noņem no izvades konteinera birkas: nosaukumu, autoru, datumu, GPS atrašanās vietu un ierīces informāciju.\n• Celiņu valodas tiek saglabātas.\n• Video tiek kodēts atkārtoti, pat ja tas jau iekļaujas mērķī.",
   "main.audio.level.label": "Audio līmenis",
   "main.audio.loudnorm": "Normalizēt skaļumu (EBU R128)",
   "main.audio.gain": "Pieaugums (Gain)",

@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Garso tikslas (kbit/s)",
   "main.advanced.audio-channels.label": "Garso kanalai",
   "main.advanced.keep-tracks.label": "Išsaugoti visus takelius (MKV)",
+  "main.advanced.drop-metadata.label": "Pašalinti metaduomenis",
+  "main.advanced.drop-metadata.tip": "• Pašalina iš išvesties konteinerio žymas: pavadinimą, autorių, datą, GPS vietą ir įrenginio informaciją.\n• Takelių kalbos išsaugomos.\n• Vaizdo įrašas koduojamas iš naujo, net jei jau telpa į tikslą.",
   "main.audio.level.label": "Garso lygis",
   "main.audio.loudnorm": "Normalizuoti garsumą (EBU R128)",
   "main.audio.gain": "Stiprinimas",

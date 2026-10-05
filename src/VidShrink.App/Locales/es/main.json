@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Audio de destino (kbit/s)",
   "main.advanced.audio-channels.label": "Canales de audio",
   "main.advanced.keep-tracks.label": "Conservar todas las pistas (MKV)",
+  "main.advanced.drop-metadata.label": "Quitar metadatos",
+  "main.advanced.drop-metadata.tip": "• Quita las etiquetas del contenedor en la salida: título, autor, fecha, ubicación GPS e información del dispositivo.\n• Los idiomas de las pistas se conservan.\n• El vídeo se vuelve a codificar aunque ya quepa en el objetivo.",
   "main.audio.level.label": "Nivel de audio",
   "main.audio.loudnorm": "Normalizar volumen (EBU R128)",
   "main.audio.gain": "Ganancia",

@@ -851,6 +851,11 @@
                           </WrapPanel>
                         </Grid>
                         <CheckBox x:Name="ChkAdvKeepTracks" Theme="{StaticResource CheckStyle}" IsChecked="False" Content="{loc:Text main.advanced.keep-tracks.label}"/>
+                        <CheckBox x:Name="ChkAdvDropMetadata" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.advanced.drop-metadata.label}">
+                          <ToolTip.Tip>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.advanced.drop-metadata.tip}"/>
+                          </ToolTip.Tip>
+                        </CheckBox>
                         <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <TextBlock Text="{loc:Text main.subtitles.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
