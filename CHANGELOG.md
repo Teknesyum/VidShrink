@@ -12,6 +12,11 @@ ship as part of it.
 - Player: "Save playlist…" in the playlist's right-click menu writes the current list, in
   the order shown, to an `.m3u8` file. Files in or below the list's folder are stored as
   relative paths, so the folder can be moved together with its list.
+- Player: the media info panel (Ctrl+F1) shows the dynamic range (SDR, HDR10, HLG or Dolby
+  Vision) and a color line with primaries, transfer curve and bit depth. While the panel is
+  open it also shows live figures: the decoder in use (software or the hardware decoder's
+  name), dropped frames, the current bitrate and the displayed frame rate. Nothing is read
+  from the engine while the panel is closed.
 
 ## [1.2.7] - 2026-10-05
 

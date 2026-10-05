@@ -187,6 +187,9 @@ public interface IPlaybackEngine : IDisposable
 
     MediaDetails? Details => null;
 
+    /// <summary>Dusen kare, etkin cozucu, anlik bit hizi ve gosterilen kare hizi; motor olcmuyorsa <c>null</c>.</summary>
+    PlaybackStats? Stats => null;
+
     IReadOnlyList<double> ChapterTimes => Array.Empty<double>();
 
     /// <summary>Bir sonraki ya da onceki bolume atlar; bolum yoksa ya da son bolumden ileri gidilemiyorsa <c>false</c>.</summary>
