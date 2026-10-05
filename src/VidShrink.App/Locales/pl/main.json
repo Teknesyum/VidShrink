@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Dodaj zakładkę",
   "main.player.menu.bookmarknext": "Przejdź do następnej zakładki",
   "main.player.menu.bookmarkprev": "Przejdź do poprzedniej zakładki",
+  "main.player.menu.chapternext": "Przejdź do następnego rozdziału",
+  "main.player.menu.chapterprev": "Przejdź do poprzedniego rozdziału",
   "main.player.menu.stop": "Zatrzymaj",
   "main.player.menu.tostart": "Przejdź na początek",
   "main.player.input.wheel": "Kółko myszy",

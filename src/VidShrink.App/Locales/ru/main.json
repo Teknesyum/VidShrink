@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Добавить закладку",
   "main.player.menu.bookmarknext": "Перейти к следующей закладке",
   "main.player.menu.bookmarkprev": "Перейти к предыдущей закладке",
+  "main.player.menu.chapternext": "Перейти к следующей главе",
+  "main.player.menu.chapterprev": "Перейти к предыдущей главе",
   "main.player.menu.stop": "Стоп",
   "main.player.menu.tostart": "Перейти в начало",
   "main.player.input.wheel": "Колесо мыши",

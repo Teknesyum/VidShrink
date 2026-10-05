@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "বুকমার্ক যুক্ত করুন",
   "main.player.menu.bookmarknext": "পরবর্তী বুকমার্কে যান",
   "main.player.menu.bookmarkprev": "আগের বুকমার্কে যান",
+  "main.player.menu.chapternext": "পরবর্তী অধ্যায়ে যান",
+  "main.player.menu.chapterprev": "আগের অধ্যায়ে যান",
   "main.player.menu.stop": "বন্ধ করুন",
   "main.player.menu.tostart": "শুরুতে যান",
   "main.player.input.wheel": "হুইল",

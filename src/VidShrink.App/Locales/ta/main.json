@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "புத்தகக்குறி சேர்",
   "main.player.menu.bookmarknext": "அடுத்த புத்தகக்குறிக்குச் செல்",
   "main.player.menu.bookmarkprev": "முந்தைய புத்தகக்குறிக்குச் செல்",
+  "main.player.menu.chapternext": "அடுத்த அத்தியாயத்திற்குச் செல்",
+  "main.player.menu.chapterprev": "முந்தைய அத்தியாயத்திற்குச் செல்",
   "main.player.menu.stop": "நிறுத்து",
   "main.player.menu.tostart": "தொடக்கத்திற்குச் செல்",
   "main.player.input.wheel": "சக்கரம்",

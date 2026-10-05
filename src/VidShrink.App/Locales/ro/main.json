@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Adaugă marcaj",
   "main.player.menu.bookmarknext": "Du-te la marcajul următor",
   "main.player.menu.bookmarkprev": "Du-te la marcajul anterior",
+  "main.player.menu.chapternext": "Du-te la capitolul următor",
+  "main.player.menu.chapterprev": "Du-te la capitolul anterior",
   "main.player.menu.stop": "Oprește",
   "main.player.menu.tostart": "Du-te la început",
   "main.player.input.wheel": "Rotița mouse-ului",

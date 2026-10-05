@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Añadir marcador",
   "main.player.menu.bookmarknext": "Ir al siguiente marcador",
   "main.player.menu.bookmarkprev": "Ir al marcador anterior",
+  "main.player.menu.chapternext": "Ir al capítulo siguiente",
+  "main.player.menu.chapterprev": "Ir al capítulo anterior",
   "main.player.menu.stop": "Detener",
   "main.player.menu.tostart": "Ir al inicio",
   "main.player.input.wheel": "Rueda",

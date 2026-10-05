@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Player: jump to the next or previous chapter with Ctrl+PgDn / Ctrl+PgUp, or from the
+  Playback submenu of the right-click menu. The rows are disabled when the file has no
+  chapters.
+
 ## [1.2.6] - 2026-10-02
 
 ### Added

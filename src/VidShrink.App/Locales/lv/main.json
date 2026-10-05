@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Pievienot grāmatzīmi",
   "main.player.menu.bookmarknext": "Uz nākamo grāmatzīmi",
   "main.player.menu.bookmarkprev": "Uz iepriekšējo grāmatzīmi",
+  "main.player.menu.chapternext": "Uz nākamo nodaļu",
+  "main.player.menu.chapterprev": "Uz iepriekšējo nodaļu",
   "main.player.menu.stop": "Apturēt",
   "main.player.menu.tostart": "Uz sākumu",
   "main.player.input.wheel": "Ritenītis",

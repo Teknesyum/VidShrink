@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Add bookmark",
   "main.player.menu.bookmarknext": "Go to next bookmark",
   "main.player.menu.bookmarkprev": "Go to previous bookmark",
+  "main.player.menu.chapternext": "Go to next chapter",
+  "main.player.menu.chapterprev": "Go to previous chapter",
   "main.player.menu.stop": "Stop",
   "main.player.menu.tostart": "Go to start",
   "main.player.input.wheel": "Wheel",

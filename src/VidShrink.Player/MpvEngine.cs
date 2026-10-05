@@ -281,6 +281,15 @@ public sealed partial class MpvEngine : IPlaybackEngine
         CommandRc(ControlTag, backward ? "frame-back-step" : "frame-step");
     }
 
+    public bool StepChapter(bool backward)
+    {
+        if (!_isOpen) return false;
+        var count = ReadInt("chapter-list/count");
+        if (count <= 0) return false;
+        if (!backward && ReadInt("chapter") >= count - 1) return false;
+        return CommandRc(ControlTag, "add", "chapter", backward ? "-1" : "1") >= 0;
+    }
+
     public void SetLoop(double startSeconds, double endSeconds)
     {
         TrySet("ab-loop-a", double.IsFinite(startSeconds) ? Number(Math.Max(0, startSeconds)) : "no");

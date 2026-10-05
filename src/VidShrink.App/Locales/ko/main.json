@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "북마크 추가",
   "main.player.menu.bookmarknext": "다음 북마크로 이동",
   "main.player.menu.bookmarkprev": "이전 북마크로 이동",
+  "main.player.menu.chapternext": "다음 챕터로 이동",
+  "main.player.menu.chapterprev": "이전 챕터로 이동",
   "main.player.menu.stop": "정지",
   "main.player.menu.tostart": "처음으로 이동",
   "main.player.input.wheel": "휠",
