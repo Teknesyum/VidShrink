@@ -17,11 +17,14 @@ public sealed class MetaSilArayuzTests
 {
     private static readonly string Klasor = Path.Combine(TestPaths.OutputRoot, "meta-sil-arayuz");
 
+    /// <summary>
+    /// Her çağrı klasördeki eski ayar dosyalarını süpürür: gösterilmeden kapatılan pencere
+    /// sonraki pencere kurulurken kendi dosyasını yeniden yazıyor, <c>finally</c> onu yakalamıyor.
+    /// </summary>
     private static string AyarDosyasi()
     {
         Directory.CreateDirectory(Klasor);
-        foreach (var eski in Directory.GetFiles(Klasor, "settings-*.json"))
-            if (File.GetLastWriteTimeUtc(eski) < DateTime.UtcNow.AddHours(-1)) File.Delete(eski);
+        foreach (var eski in Directory.GetFiles(Klasor, "settings-*.json")) File.Delete(eski);
         return Path.Combine(Klasor, "settings-" + Guid.NewGuid().ToString("N") + ".json");
     }
 
