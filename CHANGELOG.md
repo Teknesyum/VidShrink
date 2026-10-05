@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.7] - 2026-10-05
+
 ### Added
 
 - Editor: the cut list is saved automatically after every edit and comes back when the
@@ -36,6 +38,15 @@ ship as part of it.
 - Player: copy the current frame to the clipboard with Ctrl+Shift+E or from the right-click
   menu, and save screenshots as JPG instead of PNG (Settings submenu and the Advanced player
   panel; PNG stays the default).
+- Command line: `--azami-sure` / `--max-duration` drops long titles from a disc scan,
+  `--meta-yok` / `--no-metadata` leaves container tags out (track language stays),
+  `--altyazi-dil` and `--ilk-altyazi` pick which source subtitles are kept, and
+  `--suzgec chroma-smooth` softens the colour planes without touching brightness.
+
+### Changed
+
+- Themes: the danger colour now clears 3:1 against its background in 36 palettes, and the
+  media title in the player sits on a 90% opaque backing that clears 7:1 in the same 36.
 
 ## [1.2.6] - 2026-10-02
 
