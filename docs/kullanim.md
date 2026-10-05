@@ -35,7 +35,8 @@ malformed or stale.
 The Convert tab is the manual side: container, video codec, CRF or bitrate, resolution,
 frame rate, audio codec and bitrate, and a start and end time. Stream copy uses real
 `-c:v copy` and `-c:a copy`, and incompatible container and source-codec pairs are blocked
-before execution. GIF conversion goes through `palettegen` then `paletteuse`.
+before execution. GIF conversion goes through `palettegen` then `paletteuse`. Animated
+WebP (`libwebp_anim`) and animated AVIF (`libsvtav1`) loop forever and carry no sound.
 
 ![The Convert tab with container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command and progress panels beside them](gorseller/T201-donustur-en.png)
 

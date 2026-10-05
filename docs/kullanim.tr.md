@@ -36,7 +36,8 @@ Dönüştür sekmesi işin elle yapılan tarafı: kapsayıcı, video kodeği, CR
 çözünürlük, kare hızı, ses kodeği ve bit hızı, bir de başlangıç ve bitiş zamanı. Akış
 kopyası gerçek `-c:v copy` ve `-c:a copy` kullanır; uyumsuz kapsayıcı ve kaynak kodek
 eşleşmeleri koşumdan önce engellenir. GIF dönüşümü `palettegen` ardından `paletteuse` ile
-yapılır.
+yapılır. Hareketli WebP (`libwebp_anim`) ve hareketli AVIF (`libsvtav1`) sonsuz döner, ses
+taşımaz.
 
 ![Dönüştür sekmesi: kapsayıcı, kodek, kalite kipi, çözünürlük, kare hızı ve kırpma alanları, yanlarında FFmpeg Komutu ve İlerleme panelleri](gorseller/T201-donustur-tr.png)
 

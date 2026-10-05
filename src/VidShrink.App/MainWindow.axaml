@@ -1101,6 +1101,8 @@
                         <ComboBoxItem Content="M4A" Tag="m4a"/>
                         <ComboBoxItem Content="WAV" Tag="wav"/>
                         <ComboBoxItem Content="FLAC" Tag="flac"/>
+                        <ComboBoxItem Content="WebP" Tag="webp"/>
+                        <ComboBoxItem Content="AVIF" Tag="avif"/>
                       </ComboBox>
                     </Grid>
 

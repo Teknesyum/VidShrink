@@ -82,6 +82,8 @@ internal static class LanguageCatalog
             ["avi"] = "AVI",
             ["gif"] = "GIF",
             ["webm"] = "WebM",
+            ["webp"] = "WebP",
+            ["avif"] = "AVIF",
             ["pcm"] = "PCM",
             ["crf"] = "CRF",
             ["json"] = "JSON",
