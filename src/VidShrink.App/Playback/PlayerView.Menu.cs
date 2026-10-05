@@ -29,6 +29,9 @@ internal partial class PlayerView
         var shot = ActionRow(Keymap.Screenshot);
         shot.IsEnabled = !AudioOnly;
         flyout.Items.Add(shot);
+        var copy = ActionRow(Keymap.CopyFrame);
+        copy.IsEnabled = !AudioOnly;
+        flyout.Items.Add(copy);
         flyout.Items.Add(ToolsMenu());
         flyout.Items.Add(RecentMenu());
         flyout.Items.Add(SettingsMenu());

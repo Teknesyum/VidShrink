@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using VidShrink.Core;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
 using VidShrink.App.Localization;
@@ -37,6 +40,8 @@ internal partial class PlayerView
     private IReadOnlyList<SeekMark> _marks = Array.Empty<SeekMark>();
     private string _marksKey = "";
     private Task<string?> _lastShot = Task.FromResult<string?>(null);
+    private Task<bool> _lastCopy = Task.FromResult(false);
+    private Bitmap? _copiedFrame;
     private Task _navigation = Task.CompletedTask;
 
     internal PlayerSettings Settings
@@ -72,6 +77,12 @@ internal partial class PlayerView
     internal IReadOnlyList<SeekMark> Marks => _marks;
 
     internal Task<string?> LastScreenshot => _lastShot;
+
+    internal Task<bool> LastFrameCopy => _lastCopy;
+
+    internal Func<TopLevel?, Bitmap, Task<bool>> FrameCopier { get; set; } = CopyToClipboard;
+
+    internal string? FrameScratchFolder { get; set; }
 
     internal Task Navigation => _navigation;
 
@@ -134,6 +145,9 @@ internal partial class PlayerView
                 return true;
             case PlayerCommandKind.Screenshot:
                 _trace.Add("screenshot -> " + TakeScreenshot());
+                return true;
+            case PlayerCommandKind.CopyFrame:
+                _trace.Add("copyframe -> " + CopyFrame());
                 return true;
             case PlayerCommandKind.FileStep:
                 _trace.Add("file " + command.Amount.ToString("0", CultureInfo.InvariantCulture) + " -> " + StepFile(command.Amount > 0));
@@ -270,6 +284,65 @@ internal partial class PlayerView
         _notice = saved ? Strings.Get("player.view.screenshot-saved", target) : Strings.Get("player.view.screenshot-failed");
         RefreshState();
         return saved ? target : null;
+    }
+
+    private string CopyFrame()
+    {
+        if (_engine is not { IsOpen: true } engine || _path is null) return "no";
+        _lastCopy = CopyFrameAsync(engine);
+        return "ok";
+    }
+
+    private async Task<bool> CopyFrameAsync(IPlaybackEngine engine)
+    {
+        var copied = false;
+        var folder = FrameScratchFolder ?? Path.Combine(Path.GetTempPath(), "VidShrink");
+        var scratch = Path.Combine(folder, "frame-" + Guid.NewGuid().ToString("N") + PlayerSettings.PngExtension);
+        try
+        {
+            Directory.CreateDirectory(folder);
+            if (await engine.SaveScreenshotAsync(scratch).ConfigureAwait(true))
+            {
+                Bitmap frame;
+                using (var stream = File.OpenRead(scratch)) frame = new Bitmap(stream);
+                _copiedFrame?.Dispose();
+                _copiedFrame = frame;
+                copied = await FrameCopier(TopLevel.GetTopLevel(this), frame).ConfigureAwait(true);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ObjectDisposedException or InvalidOperationException or ArgumentException or TimeoutException or ExternalException)
+        {
+        }
+        finally
+        {
+            try
+            {
+                File.Delete(scratch);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+            }
+        }
+
+        _notice = Strings.Get(copied ? "player.view.screenshot-copied" : "player.view.screenshot-copy-failed");
+        RefreshState();
+        return copied;
+    }
+
+    private static async Task<bool> CopyToClipboard(TopLevel? top, Bitmap frame)
+    {
+        if (top?.Clipboard is not { } clipboard) return false;
+        await clipboard.SetBitmapAsync(frame).ConfigureAwait(true);
+        return true;
+    }
+
+    internal void ToggleScreenshotJpg()
+    {
+        EnsureSettings();
+        _settings.ScreenshotFormat = _settings.ScreenshotFormat == ScreenshotFormat.Jpg ? ScreenshotFormat.Png : ScreenshotFormat.Jpg;
+        SaveSettings();
+        _trace.Add("screenshotformat -> " + _settings.ScreenshotFormat);
+        AdvancedChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void EnsureSettings()
