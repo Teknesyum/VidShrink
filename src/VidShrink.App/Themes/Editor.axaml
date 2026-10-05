@@ -27,6 +27,14 @@
                                     etiket aralığı bunun altına inince 1-2-5-10
                                     merdiveninde bir üst basamağa çıkılır.
 
+    Anahtar kare ve küçük resim şeridi
+
+      EditorKeyframeTick         <- SpaceSm (8). Anahtar kare çentiği; görüntü izinin alt
+                                    kenarında, klibin üstüne çizilir.
+      EditorKeyframeMinSpacing   <- SpaceXs (4). İki çentik bundan yakınsa sonraki çizilmez.
+      EditorThumbnailStripHeight <- PlaybackBarButtonSize (32). Ses izinin altındaki şerit;
+                                    kare genişliği kaynağın en/boy oranından çıkar.
+
     Klip
 
       EditorClipRadius           <- RadiusChip (4). Şerit parçası, PlaybackTrack'le aynı köşe.
@@ -87,6 +95,10 @@
   <StaticResource x:Key="EditorRulerMajorTick" ResourceKey="SpaceSm"/>
   <StaticResource x:Key="EditorRulerMinorTick" ResourceKey="SpaceXs"/>
   <StaticResource x:Key="EditorRulerLabelMinSpacing" ResourceKey="NumberBoxWidth"/>
+
+  <StaticResource x:Key="EditorKeyframeTick" ResourceKey="SpaceSm"/>
+  <StaticResource x:Key="EditorKeyframeMinSpacing" ResourceKey="SpaceXs"/>
+  <StaticResource x:Key="EditorThumbnailStripHeight" ResourceKey="PlaybackBarButtonSize"/>
 
   <StaticResource x:Key="EditorClipRadius" ResourceKey="RadiusChip"/>
   <StaticResource x:Key="EditorClipBorder" ResourceKey="BorderThin"/>

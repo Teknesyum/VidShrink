@@ -13,6 +13,7 @@ internal static class TestAyarYolu
     internal static void Bagla()
     {
         VidShrink.Core.Editing.EditProjectStore.Disabled = true;
+        VidShrink.App.Editing.EditorView.StripDisabled = true;
         if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(VidShrink.Core.Setup.ShortcutIcons.DirectoryVariable)))
             Environment.SetEnvironmentVariable(VidShrink.Core.Setup.ShortcutIcons.DirectoryVariable,
                 Path.Combine(TestPaths.OutputRoot, "kisayol", Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
