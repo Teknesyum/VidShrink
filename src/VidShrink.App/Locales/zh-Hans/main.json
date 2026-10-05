@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "添加书签",
   "main.player.menu.bookmarknext": "转到下一个书签",
   "main.player.menu.bookmarkprev": "转到上一个书签",
+  "main.player.menu.chapternext": "转到下一章节",
+  "main.player.menu.chapterprev": "转到上一章节",
   "main.player.menu.stop": "停止",
   "main.player.menu.tostart": "转到开头",
   "main.player.input.wheel": "滚轮",

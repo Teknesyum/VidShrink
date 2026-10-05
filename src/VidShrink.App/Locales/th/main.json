@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "เพิ่มบุ๊กมาร์ก",
   "main.player.menu.bookmarknext": "ไปยังบุ๊กมาร์กถัดไป",
   "main.player.menu.bookmarkprev": "ไปยังบุ๊กมาร์กก่อนหน้า",
+  "main.player.menu.chapternext": "ไปยังตอนถัดไป",
+  "main.player.menu.chapterprev": "ไปยังตอนก่อนหน้า",
   "main.player.menu.stop": "หยุด",
   "main.player.menu.tostart": "ไปที่จุดเริ่มต้น",
   "main.player.input.wheel": "ลูกกลิ้ง",

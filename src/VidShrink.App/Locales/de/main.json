@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Lesezeichen hinzufügen",
   "main.player.menu.bookmarknext": "Zum nächsten Lesezeichen",
   "main.player.menu.bookmarkprev": "Zum vorherigen Lesezeichen",
+  "main.player.menu.chapternext": "Zum nächsten Kapitel",
+  "main.player.menu.chapterprev": "Zum vorherigen Kapitel",
   "main.player.menu.stop": "Stopp",
   "main.player.menu.tostart": "Zum Anfang",
   "main.player.input.wheel": "Mausrad",

@@ -60,6 +60,7 @@ internal partial class PlayerView
             item.IsChecked = on;
         }
 
+        if (action.Command == PlayerCommandKind.ChapterStep) item.IsEnabled = _chapters.Count > 0;
         item.Click += OnMenuRow;
         return item;
     }

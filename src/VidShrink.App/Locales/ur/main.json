@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "بک مارک شامل کریں",
   "main.player.menu.bookmarknext": "اگلے بک مارک پر جائیں",
   "main.player.menu.bookmarkprev": "پچھلے بک مارک پر جائیں",
+  "main.player.menu.chapternext": "اگلے باب پر جائیں",
+  "main.player.menu.chapterprev": "پچھلے باب پر جائیں",
   "main.player.menu.stop": "روکیں",
   "main.player.menu.tostart": "شروع پر جائیں",
   "main.player.input.wheel": "وہیل",

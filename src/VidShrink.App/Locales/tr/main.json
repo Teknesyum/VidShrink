@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Yer imi ekle",
   "main.player.menu.bookmarknext": "Sonraki yer imine git",
   "main.player.menu.bookmarkprev": "Önceki yer imine git",
+  "main.player.menu.chapternext": "Sonraki bölüme git",
+  "main.player.menu.chapterprev": "Önceki bölüme git",
   "main.player.menu.stop": "Durdur",
   "main.player.menu.tostart": "Başa git",
   "main.player.input.wheel": "Tekerlek",

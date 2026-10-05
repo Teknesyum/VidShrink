@@ -88,6 +88,8 @@ internal static class Keymap
     internal static readonly PlayerAction BookmarkAdd = new(PlayerCommandKind.BookmarkAdd, 0, "main.player.menu.bookmarkadd");
     internal static readonly PlayerAction BookmarkNext = new(PlayerCommandKind.BookmarkNext, 1, "main.player.menu.bookmarknext");
     internal static readonly PlayerAction BookmarkPrevious = new(PlayerCommandKind.BookmarkNext, -1, "main.player.menu.bookmarkprev");
+    internal static readonly PlayerAction NextChapter = new(PlayerCommandKind.ChapterStep, 1, "main.player.menu.chapternext");
+    internal static readonly PlayerAction PreviousChapter = new(PlayerCommandKind.ChapterStep, -1, "main.player.menu.chapterprev");
     internal static readonly PlayerAction OpenMenu = new(PlayerCommandKind.ContextMenu, 0, "main.player.menu.open");
     internal static readonly PlayerAction LeaveFullscreen = new(PlayerCommandKind.LeaveFullscreen, 0, "main.player.menu.leavefullscreen");
     internal static readonly PlayerAction Zoom = new(PlayerCommandKind.Zoom, 1, "main.player.menu.zoom");
@@ -158,6 +160,8 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.B), BookmarkNext),
         new(PlayerInput.OnKey(Key.PageDown, KeyModifiers.Shift), BookmarkNext),
         new(PlayerInput.OnKey(Key.PageUp, KeyModifiers.Shift), BookmarkPrevious),
+        new(PlayerInput.OnKey(Key.PageDown, KeyModifiers.Control), NextChapter),
+        new(PlayerInput.OnKey(Key.PageUp, KeyModifiers.Control), PreviousChapter),
         new(PlayerInput.OnKey(Key.A), SubtitleOptions.AudioCycle),
         new(PlayerInput.OnKey(Key.S), SubtitleOptions.SubtitleCycle),
         new(PlayerInput.OnSymbol(">", Key.OemPeriod, KeyModifiers.Shift), SubtitleOptions.SubtitleLater),
@@ -235,6 +239,7 @@ internal static class Keymap
     {
         Faster, Slower, NormalSpeed, null,
         NextFrame, PreviousFrame, null,
+        NextChapter, PreviousChapter, null,
         PreviousFile, NextFile, Shuffle, RepeatCycle
     };
 

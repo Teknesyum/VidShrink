@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Προσθήκη σελιδοδείκτη",
   "main.player.menu.bookmarknext": "Μετάβαση στον επόμενο σελιδοδείκτη",
   "main.player.menu.bookmarkprev": "Μετάβαση στον προηγούμενο σελιδοδείκτη",
+  "main.player.menu.chapternext": "Μετάβαση στο επόμενο κεφάλαιο",
+  "main.player.menu.chapterprev": "Μετάβαση στο προηγούμενο κεφάλαιο",
   "main.player.menu.stop": "Διακοπή",
   "main.player.menu.tostart": "Μετάβαση στην αρχή",
   "main.player.input.wheel": "Τροχός",

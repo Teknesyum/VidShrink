@@ -11,6 +11,9 @@ ship as part of it.
 
 - Convert: animated WebP and animated AVIF output. Both loop forever and drop the sound
   track, as GIF does; the existing quality control sets how hard they are compressed.
+- Player: jump to the next or previous chapter with Ctrl+PgDn / Ctrl+PgUp, or from the
+  Playback submenu of the right-click menu. The rows are disabled when the file has no
+  chapters.
 
 ## [1.2.6] - 2026-10-02
 

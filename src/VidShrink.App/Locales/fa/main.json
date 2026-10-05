@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "افزودن نشانک",
   "main.player.menu.bookmarknext": "رفتن به نشانک بعدی",
   "main.player.menu.bookmarkprev": "رفتن به نشانک قبلی",
+  "main.player.menu.chapternext": "رفتن به فصل بعدی",
+  "main.player.menu.chapterprev": "رفتن به فصل قبلی",
   "main.player.menu.stop": "توقف",
   "main.player.menu.tostart": "رفتن به ابتدا",
   "main.player.input.wheel": "چرخ ماوس",

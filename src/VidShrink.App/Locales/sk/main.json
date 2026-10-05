@@ -614,6 +614,8 @@
   "main.player.menu.bookmarkadd": "Pridať záložku",
   "main.player.menu.bookmarknext": "Prejsť na ďalšiu záložku",
   "main.player.menu.bookmarkprev": "Prejsť na predchádzajúcu záložku",
+  "main.player.menu.chapternext": "Prejsť na ďalšiu kapitolu",
+  "main.player.menu.chapterprev": "Prejsť na predchádzajúcu kapitolu",
   "main.player.menu.stop": "Zastaviť",
   "main.player.menu.tostart": "Prejsť na začiatok",
   "main.player.input.wheel": "Koliesko myši",
