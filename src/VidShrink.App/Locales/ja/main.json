@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "ブックマークを追加",
   "main.player.menu.bookmarknext": "次のブックマークへ移動",
   "main.player.menu.bookmarkprev": "前のブックマークへ移動",
+  "main.player.menu.chapternext": "次のチャプターへ移動",
+  "main.player.menu.chapterprev": "前のチャプターへ移動",
   "main.player.menu.stop": "停止",
   "main.player.menu.tostart": "先頭へ移動",
   "main.player.input.wheel": "ホイール",

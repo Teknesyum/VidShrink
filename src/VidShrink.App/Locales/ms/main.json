@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Tambah penanda buku",
   "main.player.menu.bookmarknext": "Pergi ke penanda buku seterusnya",
   "main.player.menu.bookmarkprev": "Pergi ke penanda buku sebelumnya",
+  "main.player.menu.chapternext": "Pergi ke bab seterusnya",
+  "main.player.menu.chapterprev": "Pergi ke bab sebelumnya",
   "main.player.menu.stop": "Henti",
   "main.player.menu.tostart": "Pergi ke permulaan",
   "main.player.input.wheel": "Roda",

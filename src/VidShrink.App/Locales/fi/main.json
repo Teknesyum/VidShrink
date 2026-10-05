@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Lisää kirjanmerkki",
   "main.player.menu.bookmarknext": "Siirry seuraavaan kirjanmerkkiin",
   "main.player.menu.bookmarkprev": "Siirry edelliseen kirjanmerkkiin",
+  "main.player.menu.chapternext": "Siirry seuraavaan lukuun",
+  "main.player.menu.chapterprev": "Siirry edelliseen lukuun",
   "main.player.menu.stop": "Pysäytä",
   "main.player.menu.tostart": "Siirry alkuun",
   "main.player.input.wheel": "Rulla",

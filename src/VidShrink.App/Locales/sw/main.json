@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Ongeza alama",
   "main.player.menu.bookmarknext": "Enda kwenye alama inayofuata",
   "main.player.menu.bookmarkprev": "Enda kwenye alama iliyotangulia",
+  "main.player.menu.chapternext": "Enda kwenye sura inayofuata",
+  "main.player.menu.chapterprev": "Enda kwenye sura iliyotangulia",
   "main.player.menu.stop": "Simamisha",
   "main.player.menu.tostart": "Enda mwanzo",
   "main.player.input.wheel": "Gurudumu",

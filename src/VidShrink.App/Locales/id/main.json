@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Tambah markah",
   "main.player.menu.bookmarknext": "Ke markah berikutnya",
   "main.player.menu.bookmarkprev": "Ke markah sebelumnya",
+  "main.player.menu.chapternext": "Ke bab berikutnya",
+  "main.player.menu.chapterprev": "Ke bab sebelumnya",
   "main.player.menu.stop": "Hentikan",
   "main.player.menu.tostart": "Ke awal",
   "main.player.input.wheel": "Roda",

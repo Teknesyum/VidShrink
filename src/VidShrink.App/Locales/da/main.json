@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Tilføj bogmærke",
   "main.player.menu.bookmarknext": "Gå til næste bogmærke",
   "main.player.menu.bookmarkprev": "Gå til forrige bogmærke",
+  "main.player.menu.chapternext": "Gå til næste kapitel",
+  "main.player.menu.chapterprev": "Gå til forrige kapitel",
   "main.player.menu.stop": "Stop",
   "main.player.menu.tostart": "Gå til starten",
   "main.player.input.wheel": "Hjul",

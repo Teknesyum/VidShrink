@@ -230,6 +230,9 @@ internal partial class PlayerView : UserControl
             case PlayerCommandKind.BookmarkNext:
                 StepBookmark(command.Amount < 0);
                 break;
+            case PlayerCommandKind.ChapterStep:
+                StepChapter(command.Amount < 0);
+                break;
             case PlayerCommandKind.Stop:
                 if (_playing) TogglePlay();
                 _seek.GoTo(0);
@@ -355,6 +358,20 @@ internal partial class PlayerView : UserControl
         _trackPaused = false;
         _seek.GoTo(next);
         _trace.Add(name + Saat.Tani.Konum(next));
+    }
+
+    private void StepChapter(bool backward)
+    {
+        var name = backward ? "chapter -1 -> " : "chapter 1 -> ";
+        if (_engine is not { } engine || _chapters.Count == 0 || !engine.StepChapter(backward))
+        {
+            _trace.Add(name + "no");
+            return;
+        }
+
+        _trackPaused = true;
+        _stall.Reset();
+        _trace.Add(name + "ok");
     }
 
     private void OnWheel(object? sender, PointerWheelEventArgs e)

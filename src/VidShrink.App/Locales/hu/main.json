@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Könyvjelző hozzáadása",
   "main.player.menu.bookmarknext": "Ugrás a következő könyvjelzőre",
   "main.player.menu.bookmarkprev": "Ugrás az előző könyvjelzőre",
+  "main.player.menu.chapternext": "Ugrás a következő fejezetre",
+  "main.player.menu.chapterprev": "Ugrás az előző fejezetre",
   "main.player.menu.stop": "Leállítás",
   "main.player.menu.tostart": "Ugrás az elejére",
   "main.player.input.wheel": "Görgő",

@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "הוספת סימנייה",
   "main.player.menu.bookmarknext": "מעבר לסימנייה הבאה",
   "main.player.menu.bookmarkprev": "מעבר לסימנייה הקודמת",
+  "main.player.menu.chapternext": "מעבר לפרק הבא",
+  "main.player.menu.chapterprev": "מעבר לפרק הקודם",
   "main.player.menu.stop": "עצירה",
   "main.player.menu.tostart": "מעבר להתחלה",
   "main.player.input.wheel": "גלגלת",

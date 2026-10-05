@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Bladwijzer toevoegen",
   "main.player.menu.bookmarknext": "Naar volgende bladwijzer",
   "main.player.menu.bookmarkprev": "Naar vorige bladwijzer",
+  "main.player.menu.chapternext": "Naar volgend hoofdstuk",
+  "main.player.menu.chapterprev": "Naar vorig hoofdstuk",
   "main.player.menu.stop": "Stoppen",
   "main.player.menu.tostart": "Naar het begin",
   "main.player.input.wheel": "Muiswiel",

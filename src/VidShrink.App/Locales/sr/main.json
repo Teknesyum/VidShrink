@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Dodaj obeleživač",
   "main.player.menu.bookmarknext": "Idi na sledeći obeleživač",
   "main.player.menu.bookmarkprev": "Idi na prethodni obeleživač",
+  "main.player.menu.chapternext": "Idi na sledeće poglavlje",
+  "main.player.menu.chapterprev": "Idi na prethodno poglavlje",
   "main.player.menu.stop": "Zaustavi",
   "main.player.menu.tostart": "Idi na početak",
   "main.player.input.wheel": "Točkić miša",

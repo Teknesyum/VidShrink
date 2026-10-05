@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Добави отметка",
   "main.player.menu.bookmarknext": "Към следващата отметка",
   "main.player.menu.bookmarkprev": "Към предишната отметка",
+  "main.player.menu.chapternext": "Към следващата глава",
+  "main.player.menu.chapterprev": "Към предишната глава",
   "main.player.menu.stop": "Стоп",
   "main.player.menu.tostart": "Към началото",
   "main.player.input.wheel": "Колелце",

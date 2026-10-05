@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Додати закладку",
   "main.player.menu.bookmarknext": "Перейти до наступної закладки",
   "main.player.menu.bookmarkprev": "Перейти до попередньої закладки",
+  "main.player.menu.chapternext": "Перейти до наступного розділу",
+  "main.player.menu.chapterprev": "Перейти до попереднього розділу",
   "main.player.menu.stop": "Стоп",
   "main.player.menu.tostart": "Перейти на початок",
   "main.player.input.wheel": "Колесо",

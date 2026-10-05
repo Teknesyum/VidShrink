@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "बुकमार्क जोड़ें",
   "main.player.menu.bookmarknext": "अगले बुकमार्क पर जाएं",
   "main.player.menu.bookmarkprev": "पिछले बुकमार्क पर जाएं",
+  "main.player.menu.chapternext": "अगले अध्याय पर जाएं",
+  "main.player.menu.chapterprev": "पिछले अध्याय पर जाएं",
   "main.player.menu.stop": "रोकें",
   "main.player.menu.tostart": "शुरुआत पर जाएं",
   "main.player.input.wheel": "व्हील",

@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Thêm đánh dấu",
   "main.player.menu.bookmarknext": "Đến đánh dấu kế tiếp",
   "main.player.menu.bookmarkprev": "Đến đánh dấu trước đó",
+  "main.player.menu.chapternext": "Đến chương kế tiếp",
+  "main.player.menu.chapterprev": "Đến chương trước đó",
   "main.player.menu.stop": "Dừng",
   "main.player.menu.tostart": "Về đầu",
   "main.player.input.wheel": "Con lăn",

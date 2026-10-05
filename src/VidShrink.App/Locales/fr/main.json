@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Ajouter un signet",
   "main.player.menu.bookmarknext": "Aller au signet suivant",
   "main.player.menu.bookmarkprev": "Aller au signet précédent",
+  "main.player.menu.chapternext": "Aller au chapitre suivant",
+  "main.player.menu.chapterprev": "Aller au chapitre précédent",
   "main.player.menu.stop": "Arrêter",
   "main.player.menu.tostart": "Aller au début",
   "main.player.input.wheel": "Molette",

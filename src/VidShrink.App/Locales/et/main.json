@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Lisa järjehoidja",
   "main.player.menu.bookmarknext": "Liigu järgmisele järjehoidjale",
   "main.player.menu.bookmarkprev": "Liigu eelmisele järjehoidjale",
+  "main.player.menu.chapternext": "Liigu järgmisele peatükile",
+  "main.player.menu.chapterprev": "Liigu eelmisele peatükile",
   "main.player.menu.stop": "Peata",
   "main.player.menu.tostart": "Liigu algusesse",
   "main.player.input.wheel": "Ratas",

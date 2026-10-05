@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Pridėti žymę",
   "main.player.menu.bookmarknext": "Eiti į kitą žymę",
   "main.player.menu.bookmarkprev": "Eiti į ankstesnę žymę",
+  "main.player.menu.chapternext": "Eiti į kitą skyrių",
+  "main.player.menu.chapterprev": "Eiti į ankstesnį skyrių",
   "main.player.menu.stop": "Stabdyti",
   "main.player.menu.tostart": "Eiti į pradžią",
   "main.player.input.wheel": "Ratukas",

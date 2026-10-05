@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Aggiungi segnalibro",
   "main.player.menu.bookmarknext": "Vai al segnalibro successivo",
   "main.player.menu.bookmarkprev": "Vai al segnalibro precedente",
+  "main.player.menu.chapternext": "Vai al capitolo successivo",
+  "main.player.menu.chapterprev": "Vai al capitolo precedente",
   "main.player.menu.stop": "Interrompi",
   "main.player.menu.tostart": "Vai all'inizio",
   "main.player.input.wheel": "Rotellina",

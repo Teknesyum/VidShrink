@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "Dodaj zaznamek",
   "main.player.menu.bookmarknext": "Pojdi na naslednji zaznamek",
   "main.player.menu.bookmarkprev": "Pojdi na prejšnji zaznamek",
+  "main.player.menu.chapternext": "Pojdi na naslednje poglavje",
+  "main.player.menu.chapterprev": "Pojdi na prejšnje poglavje",
   "main.player.menu.stop": "Ustavi",
   "main.player.menu.tostart": "Pojdi na začetek",
   "main.player.input.wheel": "Kolešček miške",

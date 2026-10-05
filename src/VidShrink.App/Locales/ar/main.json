@@ -619,6 +619,8 @@
   "main.player.menu.bookmarkadd": "إضافة علامة",
   "main.player.menu.bookmarknext": "الانتقال إلى العلامة التالية",
   "main.player.menu.bookmarkprev": "الانتقال إلى العلامة السابقة",
+  "main.player.menu.chapternext": "الانتقال إلى الفصل التالي",
+  "main.player.menu.chapterprev": "الانتقال إلى الفصل السابق",
   "main.player.menu.stop": "إيقاف",
   "main.player.menu.tostart": "الانتقال إلى البداية",
   "main.player.input.wheel": "العجلة",
