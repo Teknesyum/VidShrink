@@ -337,6 +337,8 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     public long SubtitleTrack => TrackId("current-tracks/sub/id");
 
+    public long SecondarySubtitleTrack => TrackId("current-tracks/sub2/id");
+
     public double SubtitleDelaySeconds => Finite(GetDouble("sub-delay"), 0);
 
     public double AudioDelaySeconds => Finite(GetDouble("audio-delay"), 0);
@@ -350,6 +352,8 @@ public sealed partial class MpvEngine : IPlaybackEngine
     public void SetAudioTrack(long id) => TrySet("aid", TrackValue(id));
 
     public void SetSubtitleTrack(long id) => TrySet("sid", TrackValue(id));
+
+    public void SetSecondarySubtitleTrack(long id) => TrySet("secondary-sid", TrackValue(id));
 
     public bool AddSubtitle(string path)
     {
@@ -588,6 +592,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
         var audio = AudioTrack;
         var subtitle = SubtitleTrack;
+        var secondary = SecondarySubtitleTrack;
         var external = ExternalSubtitles();
         if (!TrySet("pause", playing ? "no" : "yes")) return false;
 
@@ -610,6 +615,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         foreach (var file in external) CommandSync("sub-add", file, "auto");
         if (audio > 0 && AudioTrack != audio) SetAudioTrack(audio);
         if (SubtitleTrack != subtitle) SetSubtitleTrack(subtitle);
+        if (SecondarySubtitleTrack != secondary) SetSecondarySubtitleTrack(secondary);
         return true;
     }
 

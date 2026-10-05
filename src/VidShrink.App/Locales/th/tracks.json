@@ -7,6 +7,7 @@
   "player.tracks.item": "แทร็ก {0}",
   "player.subtitle.menu": "คำบรรยาย",
   "player.subtitle.off": "ปิด",
+  "player.subtitle.secondary": "คำบรรยายที่สอง",
   "player.subtitle.load": "โหลดไฟล์คำบรรยาย…",
   "player.subtitle.files": "ไฟล์คำบรรยาย",
   "player.subtitle.cycle": "คำบรรยายถัดไป",

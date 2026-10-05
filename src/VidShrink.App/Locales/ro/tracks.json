@@ -7,6 +7,7 @@
   "player.tracks.item": "Pista {0}",
   "player.subtitle.menu": "Subtitrări",
   "player.subtitle.off": "Dezactivat",
+  "player.subtitle.secondary": "Subtitrare secundară",
   "player.subtitle.load": "Încarcă fișier de subtitrare…",
   "player.subtitle.files": "Fișiere de subtitrare",
   "player.subtitle.cycle": "Subtitrarea următoare",

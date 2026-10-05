@@ -7,6 +7,7 @@
   "player.tracks.item": "قطعه {0}",
   "player.subtitle.menu": "زیرنویس‌ها",
   "player.subtitle.off": "خاموش",
+  "player.subtitle.secondary": "زیرنویس دوم",
   "player.subtitle.load": "بارگذاری فایل زیرنویس…",
   "player.subtitle.files": "فایل‌های زیرنویس",
   "player.subtitle.cycle": "زیرنویس بعدی",

@@ -7,6 +7,7 @@
   "player.tracks.item": "Trek {0}",
   "player.subtitle.menu": "Subtitel",
   "player.subtitle.off": "Nonaktif",
+  "player.subtitle.secondary": "Subtitel kedua",
   "player.subtitle.load": "Muat berkas subtitel…",
   "player.subtitle.files": "Berkas subtitel",
   "player.subtitle.cycle": "Subtitel berikutnya",

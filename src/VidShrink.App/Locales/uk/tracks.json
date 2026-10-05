@@ -7,6 +7,7 @@
   "player.tracks.item": "Доріжка {0}",
   "player.subtitle.menu": "Субтитри",
   "player.subtitle.off": "Вимкнено",
+  "player.subtitle.secondary": "Другі субтитри",
   "player.subtitle.load": "Завантажити файл субтитрів…",
   "player.subtitle.files": "Файли субтитрів",
   "player.subtitle.cycle": "Наступні субтитри",

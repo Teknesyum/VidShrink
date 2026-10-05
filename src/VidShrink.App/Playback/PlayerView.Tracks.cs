@@ -41,6 +41,7 @@ internal partial class PlayerView
         _trackNotice = null;
         _trackNoticeArgs = Array.Empty<object?>();
         _subtitles.ApplyTo(engine);
+        engine.SetSecondarySubtitleTrack(0);
         LoadSidecarSubtitles(engine);
     }
 
@@ -80,8 +81,17 @@ internal partial class PlayerView
         }
 
         var next = SubtitleOptions.Next(TrackIds(PlaybackTrackKind.Subtitle), engine.SubtitleTrack, true);
-        engine.SetSubtitleTrack(next);
+        SetPrimarySubtitle(engine, next);
         _trace.Add("subtitle -> " + SubtitleName(next));
+    }
+
+    /// <summary>
+    /// libmpv ayni izi iki siraya birden vermez; ikincilde duran iz birincile alinirken ikincil kapanir.
+    /// </summary>
+    private static void SetPrimarySubtitle(IPlaybackEngine engine, long id)
+    {
+        if (id > 0 && id == engine.SecondarySubtitleTrack) engine.SetSecondarySubtitleTrack(0);
+        engine.SetSubtitleTrack(id);
     }
 
     private void ShiftSubtitleDelay(double seconds)
@@ -107,8 +117,16 @@ internal partial class PlayerView
 
     internal void SelectSubtitle(long id)
     {
-        _engine?.SetSubtitleTrack(id);
+        if (_engine is { } engine) SetPrimarySubtitle(engine, id);
         _trace.Add("subtitle -> " + SubtitleName(id));
+        RefreshState();
+    }
+
+    internal void SelectSecondarySubtitle(long id)
+    {
+        if (_engine is not { } engine || (id > 0 && id == engine.SubtitleTrack)) return;
+        engine.SetSecondarySubtitleTrack(id);
+        _trace.Add("subtitle2 -> " + SubtitleName(id));
         RefreshState();
     }
 
@@ -272,6 +290,7 @@ internal partial class PlayerView
             items.Add(Choice(TrackName(track), id == current, () => SelectSubtitle(id)));
         }
 
+        items.Add(SecondarySubtitleMenu(tracks, current));
         items.Add(new Separator());
         items.Add(SubtitleDownloadReady
             ? Plain(Strings.Get("player.subtitle.download"), () => _ = DownloadSubtitleAsync())
@@ -298,6 +317,23 @@ internal partial class PlayerView
             .Select(codepage => (Control)Choice(CodepageName(codepage), codepage.Value == _subtitles.Codepage, () => UseCodepage(codepage.Value)))
             .ToList()));
         return items;
+    }
+
+    private MenuItem SecondarySubtitleMenu(List<PlaybackTrack> tracks, long primary)
+    {
+        var secondary = _engine?.SecondarySubtitleTrack ?? 0;
+        var rows = new List<Control> { Choice(Strings.Get("player.subtitle.off"), secondary == 0, () => SelectSecondarySubtitle(0)) };
+        foreach (var track in tracks)
+        {
+            var id = track.Id;
+            var row = Choice(TrackName(track), id == secondary, () => SelectSecondarySubtitle(id));
+            row.IsEnabled = id != primary;
+            rows.Add(row);
+        }
+
+        var menu = Submenu(Strings.Get("player.subtitle.secondary"), rows);
+        menu.IsEnabled = tracks.Count >= 2;
+        return menu;
     }
 
     internal static string TrackName(PlaybackTrack track)

@@ -7,6 +7,7 @@
   "player.tracks.item": "Stopa {0}",
   "player.subtitle.menu": "Titulky",
   "player.subtitle.off": "Vypnuté",
+  "player.subtitle.secondary": "Druhé titulky",
   "player.subtitle.load": "Načítať súbor s titulkami…",
   "player.subtitle.files": "Súbory s titulkami",
   "player.subtitle.cycle": "Ďalšie titulky",

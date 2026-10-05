@@ -14,7 +14,7 @@ Oynatıcı sekmesinin ve karşılaştırma panelinin motoru. `IPlaybackEngine` m
   Dönüşte `time-pos` iner; `time-pos` özellik olayı yalnız tetik, konum olay işlenirken okunarak yazılır.
 - `PlaybackOptions`: `RenderWidth/Height`, `Audio=false` → `aid=no`, `Video=false` → `vid=no`, `Loop` → `loop-file=inf`.
   `TryCopyLatest(.., out frameSeconds)` karenin `time-pos` damgası. Varsayılan `hwdec=no`, `sid=no`; Gelişmiş paneldeki anahtar `SetHardwareDecoding` ile `auto-copy` yazar (SW render: yalnız kopyalı kip). `loadfile` hedefi: uzak şema (http/https/rtsp/rtmp/srt/udp) ve `edl://` olduğu gibi, yerel yol tam yola çevrilir.
-- Parçalar: `Tracks`, `aid`/`sid`, `sub-add`, gecikme, `sub-scale`/`sub-pos`; `sub-codepage` değişince dış
+- Parçalar: `Tracks`, `aid`/`sid`, `secondary-sid` (ikincil altyazı; `sid`'deki izi kabul etmez), `sub-add`, gecikme, `sub-scale`/`sub-pos`; `sub-codepage` değişince dış
   altyazılar `sub-reload` ile yeniden okunur. Görüntü: `vf @vsrotate:lavfi=[transpose=..]` (yazılım çiziminde `video-rotate` yok sayılıyor), `vf @vsmirror:hflip`,
   `video-aspect-override`; ekran görüntüsü `screenshot-to-file .. video`, bilgi `track-list` + `file-size`.
   Arayüze yalnız varsayılan gövdeli üyeler eklenir.

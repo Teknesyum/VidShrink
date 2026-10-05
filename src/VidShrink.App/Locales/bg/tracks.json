@@ -7,6 +7,7 @@
   "player.tracks.item": "Пътечка {0}",
   "player.subtitle.menu": "Субтитри",
   "player.subtitle.off": "Изключени",
+  "player.subtitle.secondary": "Втори субтитри",
   "player.subtitle.load": "Зареждане на файл със субтитри…",
   "player.subtitle.files": "Файлове със субтитри",
   "player.subtitle.cycle": "Следващи субтитри",
