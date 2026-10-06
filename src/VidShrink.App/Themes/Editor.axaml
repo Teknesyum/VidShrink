@@ -27,6 +27,14 @@
                                     etiket aralığı bunun altına inince 1-2-5-10
                                     merdiveninde bir üst basamağa çıkılır.
 
+    Anahtar kare ve küçük resim şeridi
+
+      EditorKeyframeTick         <- SpaceSm (8). Anahtar kare çentiği; görüntü izinin alt
+                                    kenarında, klibin üstüne çizilir.
+      EditorKeyframeMinSpacing   <- SpaceXs (4). İki çentik bundan yakınsa sonraki çizilmez.
+      EditorThumbnailStripHeight <- PlaybackBarButtonSize (32). Ses izinin altındaki şerit;
+                                    kare genişliği kaynağın en/boy oranından çıkar.
+
     Klip
 
       EditorClipRadius           <- RadiusChip (4). Şerit parçası, PlaybackTrack'le aynı köşe.
@@ -73,7 +81,9 @@
       seçilince NeonBlueActive + NeonBlueBorderStrong + GlowBlue ve kalın kenar.
       EditorToolButton araç paletinin ve mıknatısın aç-kapa düğmesidir: GhostButton yüzü,
       seçiliyken NeonBlueFill zemin + NeonBlueBorderStrong kenar, yazı TextBody (NeonBlueActive
-      zeminde ne NeonBlue ne TextBody yazı 7:1 tutuyor; 36 palette ölçüldü).
+      zeminde ne NeonBlue ne TextBody yazı 7:1 tutuyor; 36 palette ölçüldü). Araç şeridinin
+      paneli opak Surface zeminlidir: PanelSurface'in geçirdiği atmosfer ışıması seçili düğmenin
+      zeminini konuma göre açıyordu, Cobalt'ta yazı 7.35'ten 6.96'ya düştü; opakta 7.21 sabit.
       EditorBadgeText hız rozetinin yazısıdır: PlaybackBadgeText kalıbı, TextBody rengiyle
       (perde üstü yazı 7:1 ölçülü). Rozetin kendisi PlaybackBadge kalıbını kullanır.
   -->
@@ -87,6 +97,10 @@
   <StaticResource x:Key="EditorRulerMajorTick" ResourceKey="SpaceSm"/>
   <StaticResource x:Key="EditorRulerMinorTick" ResourceKey="SpaceXs"/>
   <StaticResource x:Key="EditorRulerLabelMinSpacing" ResourceKey="NumberBoxWidth"/>
+
+  <StaticResource x:Key="EditorKeyframeTick" ResourceKey="SpaceSm"/>
+  <StaticResource x:Key="EditorKeyframeMinSpacing" ResourceKey="SpaceXs"/>
+  <StaticResource x:Key="EditorThumbnailStripHeight" ResourceKey="PlaybackBarButtonSize"/>
 
   <StaticResource x:Key="EditorClipRadius" ResourceKey="RadiusChip"/>
   <StaticResource x:Key="EditorClipBorder" ResourceKey="BorderThin"/>

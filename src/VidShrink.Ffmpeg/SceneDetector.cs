@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using VidShrink.Core;
+using VidShrink.Core.Editing;
 
 namespace VidShrink.Ffmpeg;
 
@@ -17,6 +18,7 @@ public static class SceneDetector
     public const int ProbeWidth = 640;
     public const int ProbeCrf = 23;
     public const string ProbePreset = "ultrafast";
+    public const int CutThreads = 2;
 
     public static string[] ScanArgs(string path, string vstatsPath, double baseThreshold = BaseThreshold)
         => new[]
@@ -72,6 +74,90 @@ public static class SceneDetector
         {
             try { File.Delete(vstatsPath); } catch (IOException) { }
         }
+    }
+
+    /// <summary>
+    /// Duzenleyicinin hafif taramasi: kodlama yok, yalniz <see cref="SceneMap.DefaultThreshold"/>
+    /// ustundeki kareler yazilir. Ilk kare her zaman gecer: hic kare secilmezse bos hedefin
+    /// kodlayicisi acilamaz ve ffmpeg -22 ile duser; o kare sonuctan skoruyla elenir. Ikinci
+    /// cikis butun kareleri bos hedefe akitir ki <c>-progress</c> kaynagin suresiyle ilerlesin.
+    /// </summary>
+    public static string[] CutArgs(string path, double threshold = SceneMap.DefaultThreshold)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(path);
+        if (!double.IsFinite(threshold) || threshold <= 0 || threshold >= 1)
+            throw new ArgumentOutOfRangeException(nameof(threshold), threshold, "Esik 0 ile 1 arasinda olmalidir");
+
+        var threads = CutThreads.ToString(CultureInfo.InvariantCulture);
+        return new[]
+        {
+            "-hide_banner", "-nostdin", "-loglevel", "info", "-nostats",
+            "-progress", "pipe:1",
+            "-filter_complex_threads", threads,
+            "-threads", threads,
+            "-i", path,
+            "-filter_complex", FormattableString.Invariant(
+                $"[0:v:0]split=2[a][b];[a]select='gte(scene,{threshold:0.#####})+eq(n,0)',metadata=print[sc]"),
+            "-map", "[sc]", "-an", "-sn", "-dn", "-f", "null", "-",
+            "-map", "[b]", "-an", "-sn", "-dn", "-f", "null", "-"
+        };
+    }
+
+    /// <summary>
+    /// Sahne degisimlerinin kaynak saniyesi, artan sirada. Tek ffmpeg sureci, BelowNormal
+    /// oncelik, <c>-threads 2</c>; iptalde surec oldurulur ve <see cref="OperationCanceledException"/>
+    /// atilir, sifir olmayan cikis <see cref="InvalidOperationException"/> olur.
+    /// </summary>
+    public static async Task<IReadOnlyList<double>> CutsAsync(
+        string path,
+        double durationSeconds,
+        IProgress<double>? progress = null,
+        CancellationToken ct = default,
+        Action<Process>? started = null)
+    {
+        var args = CutArgs(path);
+        ct.ThrowIfCancellationRequested();
+
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+        process.Start();
+        try { process.PriorityClass = ProcessPriorityClass.BelowNormal; }
+        catch (InvalidOperationException) { }
+        catch (System.ComponentModel.Win32Exception) { }
+
+        var stderr = process.StandardError.ReadToEndAsync(CancellationToken.None);
+        using (ct.Register(() => TryKill(process)))
+        {
+            try
+            {
+                started?.Invoke(process);
+                string? line;
+                while ((line = await process.StandardOutput.ReadLineAsync(CancellationToken.None).ConfigureAwait(false)) is not null)
+                {
+                    if (progress is null || !(durationSeconds > 0) || SilenceCut.ParseProgress(line) is not { } done) continue;
+                    progress.Report(Math.Clamp(done / durationSeconds, 0, 1));
+                }
+            }
+            catch (Exception) when (ct.IsCancellationRequested)
+            {
+            }
+            finally
+            {
+                if (ct.IsCancellationRequested) TryKill(process);
+                await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
+            }
+        }
+
+        var log = await stderr.ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
+        if (process.ExitCode != 0)
+            throw new InvalidOperationException($"ffmpeg sahne taramasi basarisiz ({process.ExitCode}): {FfmpegRunner.Tail(log)}");
+
+        progress?.Report(1);
+        return ParseScores(log)
+            .Where(s => s.Score >= SceneMap.DefaultThreshold && s.Time > 0)
+            .Select(s => s.Time)
+            .OrderBy(t => t)
+            .ToArray();
     }
 
     public static IReadOnlyList<SceneScore> ParseScores(string log)

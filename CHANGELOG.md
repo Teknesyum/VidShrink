@@ -12,6 +12,12 @@ ship as part of it.
 - Recorder: a small level bar next to the microphone and system audio pickers shows the
   live level of the selected input, before and during a recording, so a silent input is
   visible before the recording is lost. No bar is shown when no input is selected.
+- Editor: the timeline shows a thumbnail strip under the tracks and thin ticks at the
+  source's keyframes. Both are read in the background after the source opens, one frame at
+  a time, so the timeline is usable at once; ticks thin out when they would crowd.
+- Editor: "Split at scene changes" in the silence panel scans the source in the background
+  and splits the existing clips at every scene cut it finds. Nothing is removed, the scan can
+  be cancelled, and one undo step brings the clips back.
 - Player: "Save playlist…" in the playlist's right-click menu writes the current list, in
   the order shown, to an `.m3u8` file. Files in or below the list's folder are stored as
   relative paths, so the folder can be moved together with its list.

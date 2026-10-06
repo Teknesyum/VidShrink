@@ -91,5 +91,8 @@
   "editor.silence.none": "Nema raspona za izrezivanje.",
   "editor.silence.stale": "Postavke su promijenjene; skenirajte ponovno.",
   "editor.silence.failed": "Skeniranje nije uspjelo: {0}",
-  "editor.silence.cut": "Izrezano raspona: {0}."
+  "editor.silence.cut": "Izrezano raspona: {0}.",
+  "editor.scene.split": "Podijeli na promjenama scene",
+  "editor.scene.none": "Nisu pronađene promjene scene.",
+  "editor.scene.done": "Podijeljeno na promjenama scene: {0}."
 }
