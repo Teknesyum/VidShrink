@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- Shrink: the Browse file picker accepts several files at once. One file loads into the
+  window as before; several videos open the same batch queue as dropping them does. The
+  Convert tab's picker stays single-file.
 - Recorder: a small level bar next to the microphone and system audio pickers shows the
   live level of the selected input, before and during a recording, so a silent input is
   visible before the recording is lost. No bar is shown when no input is selected.

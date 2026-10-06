@@ -3202,28 +3202,64 @@ public partial class MainWindow : Window
     private static string? SelectedTag(SelectingItemsControl box)
         => (box.SelectedItem as Control)?.Tag as string;
 
-    private async void OnBrowse(object? sender, RoutedEventArgs e)
+    private async void OnBrowse(object? sender, RoutedEventArgs e) => await BrowseAsync(true);
+
+    private async void OnBrowseConvert(object? sender, RoutedEventArgs e) => await BrowseAsync(false);
+
+    /// <summary>
+    /// Seçici dikişi; argüman çoklu seçimin açık olup olmadığı. Ölçüm sahte yol listesini buraya
+    /// takar; üretimde sistemin dosya seçicisi.
+    /// </summary>
+    internal Func<bool, Task<IReadOnlyList<string>>>? SourcePicker { get; set; }
+
+    /// <summary>
+    /// Kuyruk dikişi. Ölçüm kuyruğa giden yolları buradan okur, pencere açılmaz ve kodlama başlamaz;
+    /// üretimde <see cref="OpenBatch"/> penceresi gösterilir.
+    /// </summary>
+    internal Action<IReadOnlyList<string>>? BatchOpener { get; set; }
+
+    /// <summary>
+    /// "Gözat": Küçült sekmesinde seçici çoklu seçime açık, Dönüştür sekmesinde tek seçimli (orada
+    /// kuyruk yok). Tek dosya eskisi gibi süzülmeden bu pencereye yüklenir; birden çok dosya bırakmanın
+    /// süzgecinden (<see cref="DroppedMedia.Collect(IEnumerable{string})"/>) geçip bırakmayla aynı
+    /// kola (<see cref="OpenSourcesAsync"/>) gider. İş koşarken seçici açılmaz.
+    /// </summary>
+    internal async Task BrowseAsync(bool multiple)
     {
         if (_cts is not null) return;
         try
         {
-            var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-            {
-                AllowMultiple = false,
-                FileTypeFilter = new[]
-                {
-                    new FilePickerFileType("Media") { Patterns = ShellIntegration.MediaExtensions.Select(extension => "*." + extension).ToArray() },
-                    FilePickerFileTypes.All
-                }
-            });
-
-            var path = files.Count > 0 ? files[0].TryGetLocalPath() : null;
-            if (path is not null) await LoadAsync(path);
+            var paths = await (SourcePicker ?? PickSourcesAsync)(multiple);
+            await OpenSourcesAsync(paths.Count == 1 ? paths[0] : null, DroppedMedia.Collect(paths));
         }
         catch (Exception ex)
         {
             ReportSourceError($"{Say("main.error.pick")}: {ex.Message}");
         }
+    }
+
+    private async Task<IReadOnlyList<string>> PickSourcesAsync(bool multiple)
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            AllowMultiple = multiple,
+            FileTypeFilter = new[]
+            {
+                new FilePickerFileType("Media") { Patterns = ShellIntegration.MediaExtensions.Select(extension => "*." + extension).ToArray() },
+                FilePickerFileTypes.All
+            }
+        });
+        return files.Select(file => file.TryGetLocalPath()).OfType<string>().ToList();
+    }
+
+    /// <summary>
+    /// Bırakmanın ve Gözat'ın ortak kolu: tek dosya bu pencereye yüklenir, birden çok video kuyruk
+    /// penceresine gider. Süzgeçten bir ya da sıfır video çıkan çoklu seçim hiçbir şey açmaz.
+    /// </summary>
+    internal async Task OpenSourcesAsync(string? file, IReadOnlyList<string> batch)
+    {
+        if (file is not null) await LoadAsync(file);
+        else if (batch.Count > 1) (BatchOpener ?? (paths => OpenBatch(paths).Show()))(batch);
     }
 
     private void OnDragOver(object? sender, DragEventArgs e)
@@ -3252,8 +3288,7 @@ public partial class MainWindow : Window
         SetDropVisual(DropVisual.Idle);
         if (_cts is not null) return;
         if (_info is not null && DroppedSubtitles(e) is { Count: > 0 } subtitles) AddSubtitleFiles(subtitles);
-        else if (file is not null) await LoadAsync(file);
-        else if (batch.Count > 1) OpenBatch(batch).Show();
+        else await OpenSourcesAsync(file, batch);
     }
 
     /// <summary>
