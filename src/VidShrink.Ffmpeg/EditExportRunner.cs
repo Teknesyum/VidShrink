@@ -22,9 +22,10 @@ public static class EditExportRunner
     public static async Task<ExportPlan> PrepareAsync(
         string source, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes, CancellationToken ct = default)
     {
-        var (info, keyframes, startTime) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
+        var (info, keyframes, startTime, cuts) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
         var work = WorkDirectoryFor(outputPath);
-        return EditExport.Build(timeline, info, keyframes, startTime, mode, EncodeRunner.PartialPathFor(outputPath), work, memoryBudgetBytes)
+        return EditExport.Build(timeline, info, keyframes, startTime, mode, EncodeRunner.PartialPathFor(outputPath), work, memoryBudgetBytes,
+                cuts, EncoderCapabilities.Instance.HasEncoder)
             with { OutputPath = outputPath };
     }
 
@@ -36,11 +37,12 @@ public static class EditExportRunner
         string source, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
         Func<string, bool>? exists = null, CancellationToken ct = default)
     {
-        var (info, keyframes, startTime) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
+        var (info, keyframes, startTime, cuts) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
         var outputs = EditOutputName.Segments(outputPath, timeline.Clips.Count, exists);
         var partials = outputs.Select(EncodeRunner.PartialPathFor).ToArray();
         var works = outputs.Select(WorkDirectoryFor).ToArray();
-        return EditExport.BuildSegments(timeline, info, keyframes, startTime, mode, partials, works, memoryBudgetBytes)
+        return EditExport.BuildSegments(timeline, info, keyframes, startTime, mode, partials, works, memoryBudgetBytes,
+                cuts, EncoderCapabilities.Instance.HasEncoder)
             .Select((plan, i) => plan with { OutputPath = outputs[i] })
             .ToArray();
     }
@@ -73,15 +75,19 @@ public static class EditExportRunner
         }
     }
 
-    private static async Task<(MediaInfo Info, IReadOnlyList<double> Keyframes, double StartTime)> ProbeAsync(
+    private static async Task<(MediaInfo Info, IReadOnlyList<double> Keyframes, double StartTime, IReadOnlyList<SmartCutPoint> Cuts)> ProbeAsync(
         string source, ExportMode mode, CancellationToken ct)
     {
         var info = await FfprobeClient.ProbeAsync(source, ct).ConfigureAwait(false);
         IReadOnlyList<double> keyframes = Array.Empty<double>();
+        IReadOnlyList<SmartCutPoint> cuts = Array.Empty<SmartCutPoint>();
         double startTime = 0;
-        if (mode != ExportMode.Full)
-            (keyframes, startTime) = EditExport.ParseKeyframes(await ProbeKeyframesAsync(source, ct).ConfigureAwait(false));
-        return (info, keyframes, startTime);
+        if (mode == ExportMode.Full) return (info, keyframes, startTime, cuts);
+
+        var csv = await ProbeKeyframesAsync(source, ct).ConfigureAwait(false);
+        (keyframes, startTime) = EditExport.ParseKeyframes(csv);
+        if (mode == ExportMode.Smart) cuts = SmartCutCodec.CleanCuts(SmartCutCodec.ParsePackets(csv), startTime);
+        return (info, keyframes, startTime, cuts);
     }
 
     private sealed class SegmentProgress(IProgress<EncodeProgress> inner, double from, double share, Stopwatch clock) : IProgress<EncodeProgress>
@@ -108,6 +114,7 @@ public static class EditExportRunner
             foreach (var step in plan.Steps)
             {
                 if (step.ListPath is { } list) await File.WriteAllTextAsync(list, step.ListContent ?? string.Empty, ct).ConfigureAwait(false);
+                if (step.AudioListPath is { } audio) await File.WriteAllTextAsync(audio, step.AudioListContent ?? string.Empty, ct).ConfigureAwait(false);
                 var from = done / total;
                 done += step.DurationSeconds;
                 await EncodeRunner.RunCommandAsync(step.Args, Math.Max(0.001, step.DurationSeconds), progress, Stage,

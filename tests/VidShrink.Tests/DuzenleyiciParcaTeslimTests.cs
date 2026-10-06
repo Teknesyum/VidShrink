@@ -141,8 +141,9 @@ public sealed class DuzenleyiciParcaTeslimTests
         var metinsiz = new EditTimeline(klipler);
         var kareler = new[] { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0 };
 
-        var planlar = EditExport.BuildSegments(metinli, Bilgi(), kareler, 0, ExportMode.Smart, Yollar("c", 2), Yollar("is", 2), 8 * Gb);
-        var duz = EditExport.BuildSegments(metinsiz, Bilgi(), kareler, 0, ExportMode.Smart, Yollar("c", 2), Yollar("is", 2), 8 * Gb);
+        var sinirlar = DuzenleyiciAkilliKodekTests.Sinirlar(kareler);
+        var planlar = EditExport.BuildSegments(metinli, Bilgi(), kareler, 0, ExportMode.Smart, Yollar("c", 2), Yollar("is", 2), 8 * Gb, sinirlar);
+        var duz = EditExport.BuildSegments(metinsiz, Bilgi(), kareler, 0, ExportMode.Smart, Yollar("c", 2), Yollar("is", 2), 8 * Gb, sinirlar);
 
         Assert.All(duz, p => Assert.Equal(ExportMode.Smart, p.Effective));
         Assert.All(duz, p => Assert.False(p.TextForcedFull));

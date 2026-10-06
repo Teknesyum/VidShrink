@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- Recorder: a small level bar next to the microphone and system audio pickers shows the
+  live level of the selected input, before and during a recording, so a silent input is
+  visible before the recording is lost. No bar is shown when no input is selected.
 - Recorder: a shortcut (F6 by default, reassignable) marks a chapter while recording. When
   the recording ends the marks are written into the file as chapters by a stream copy, with
   no re-encode; paused time is not counted, a split recording gets each mark in its own
@@ -40,6 +43,11 @@ ship as part of it.
   has more than one part. Parts are written one after another with a single progress bar;
   if a part fails the rest are not written and the status line names the part. Sharing
   still uploads one joined file.
+- Editor: Smart export now also keeps the body lossless for AV1 and VP9 sources, and for
+  10-bit H.264, HEVC, AV1 and VP9. Only the edges are re-encoded, with the source's own codec
+  and profile. Sources with B-frames no longer lose or repeat frames at the joins, and an
+  `hvc1` tag is kept. MPEG-4 Part 2, MPEG-2, 4:2:2/4:4:4, interlaced and non-AAC sources, or
+  a missing encoder, fall back to Full as before.
 
 ## [1.2.7] - 2026-10-05
 

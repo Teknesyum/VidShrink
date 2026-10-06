@@ -136,6 +136,7 @@ internal partial class RecorderView
 
         if (!await CountdownAsync() || _session is not null) return;
 
+        PauseLevels();
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? _settings.ResolveFolder());
@@ -150,6 +151,10 @@ internal partial class RecorderView
         {
             _session = null;
             ShowError(Say("recorder.error.start", ex.Message));
+        }
+        finally
+        {
+            ResumeLevels();
         }
 
         RefreshSerit();
@@ -205,6 +210,7 @@ internal partial class RecorderView
             _frameRegion = null;
             _stopping = false;
             FrameHiddenByUser = false;
+            RestartLevels();
             RefreshSerit();
         }
     }
@@ -267,6 +273,7 @@ internal partial class RecorderView
             _frameRegion = null;
             _stopping = false;
             FrameHiddenByUser = false;
+            RestartLevels();
             RefreshSerit();
         }
     }

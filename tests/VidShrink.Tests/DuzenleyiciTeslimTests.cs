@@ -144,34 +144,46 @@ public sealed class DuzenleyiciTeslimTests
             new EditClip(S(2.5), S(3.5)),
             new EditClip(S(8), S(10), 0.5m)
         });
-        var plan = EditExport.Build(model, Bilgi(), new[] { 0.0, 2, 4, 6, 8 }, 0, ExportMode.Smart, "c.mp4", "is", 8 * Gb);
+        var kareler = new[] { 0.0, 2, 4, 6, 8 };
+        var plan = EditExport.Build(model, Bilgi(), kareler, 0, ExportMode.Smart, "c.mp4", "is", 8 * Gb, DuzenleyiciAkilliKodekTests.Sinirlar(kareler));
 
         Assert.Equal(ExportMode.Smart, plan.Effective);
-        Assert.Equal(6, plan.Steps.Count);
+        Assert.Equal(9, plan.Steps.Count);
 
         var bas = plan.Steps[0].Args;
         Assert.Equal("1", Deger(bas, "-ss"));
         Assert.Equal("1", Deger(bas, "-t"));
         Assert.Equal("libx264", Deger(bas, "-c:v"));
         Assert.Equal("mpegts", Deger(bas, "-f"));
+        Assert.Contains("-an", bas);
 
         var govde = plan.Steps[1].Args;
         Assert.Equal("2.001", Deger(govde, "-ss"));
         Assert.Equal("4", Deger(govde, "-t"));
         Assert.Equal("copy", Deger(govde, "-c"));
+        Assert.Equal("120", Deger(govde, "-frames:v"));
 
         var kuyruk = plan.Steps[2].Args;
         Assert.Equal("6", Deger(kuyruk, "-ss"));
         Assert.Equal("1", Deger(kuyruk, "-t"));
 
-        Assert.Equal("1", Deger(plan.Steps[3].Args, "-t"));
-        Assert.Equal("setpts=PTS-STARTPTS,setpts=PTS/0.5,fps=30", Deger(plan.Steps[4].Args, "-vf"));
-        Assert.Equal("asetpts=PTS-STARTPTS,atempo=0.5", Deger(plan.Steps[4].Args, "-af"));
+        var ses = plan.Steps[3].Args;
+        Assert.Equal("1", Deger(ses, "-ss"));
+        Assert.Equal("6", Deger(ses, "-t"));
+        Assert.Equal("copy", Deger(ses, "-c"));
+        Assert.Contains("-vn", ses);
 
-        var son = plan.Steps[5];
+        Assert.Equal("1", Deger(plan.Steps[4].Args, "-t"));
+        Assert.Equal("libx264", Deger(plan.Steps[4].Args, "-c:v"));
+        Assert.Equal("setpts=PTS-STARTPTS,setpts=PTS/0.5,fps=30", Deger(plan.Steps[6].Args, "-vf"));
+        Assert.Equal("asetpts=PTS-STARTPTS,atempo=0.5", Deger(plan.Steps[7].Args, "-af"));
+
+        var son = plan.Steps[8];
         Assert.Equal("concat", Deger(son.Args, "-f"));
         Assert.Equal(5, son.ListContent!.Split('\n').Count(s => s.StartsWith("file ", StringComparison.Ordinal)));
-        Assert.Equal(new[] { "libx264", "copy", "libx264", "libx264", "libx264" }, plan.Steps.Take(5).Select(s => s.Args.Contains("-c:v") ? Deger(s.Args, "-c:v") : Deger(s.Args, "-c")));
+        Assert.Equal(3, son.AudioListContent!.Split('\n').Count(s => s.StartsWith("file ", StringComparison.Ordinal)));
+        Assert.Equal(new[] { "duration 1", "duration 4", "duration 1", "duration 1", "duration 4" },
+            son.ListContent!.Split('\n').Where(s => s.StartsWith("duration ", StringComparison.Ordinal)));
         Assert.Equal(new[] { 2 }, plan.MotionClips);
         Assert.Equal(6 + 1 + 4, Sure(plan), 6);
     }

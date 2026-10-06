@@ -31,13 +31,31 @@ internal partial class RecorderView
     /// İki kutuyu o anki cihaz listesi ve o anki dille yeniden üretir. Seçim addan
     /// korunuyor — indeksten değil, çünkü liste yenilenince sıra kayabiliyor.
     /// </summary>
-    private void RefreshAudioBoxes() => Quietly(() =>
+    internal void RefreshAudioBoxes()
     {
-        _devices = CaptureDevices.Instance.Audio;
-        FillAudioBox(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
-        FillAudioBox(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);
-        RefreshWebcamBoxes();
-    });
+        _fillingAudio = true;
+        try
+        {
+            Quietly(() =>
+            {
+                _devices = ListAudioDevices();
+                FillAudioBox(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
+                FillAudioBox(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);
+                RefreshWebcamBoxes();
+            });
+        }
+        finally
+        {
+            _fillingAudio = false;
+        }
+
+        RefreshLevels();
+    }
+
+    private bool _fillingAudio;
+
+    /// <summary>Ses cihazı listesinin kapısı; ölçüm sabit liste verir.</summary>
+    internal Func<IReadOnlyList<AudioCaptureDevice>> ListAudioDevices { get; set; } = () => CaptureDevices.Instance.Audio;
 
     private void FillAudioBox(ComboBox box, AudioSourceRole role, string? remembered)
     {
@@ -101,5 +119,6 @@ internal partial class RecorderView
     {
         CaptureDevices.Invalidate();
         RefreshAudioBoxes();
+        RestartLevels();
     }
 }

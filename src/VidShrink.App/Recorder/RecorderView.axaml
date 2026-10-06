@@ -665,7 +665,16 @@
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.audio.microphone}" Theme="{StaticResource Label}"/>
+                <Grid ColumnDefinitions="Auto,*">
+                  <TextBlock Text="{loc:Text recorder.audio.microphone}" Theme="{StaticResource Label}"/>
+                  <ProgressBar x:Name="BarMicrophoneLevel" Grid.Column="1"
+                               IsVisible="False"
+                               Minimum="0" Maximum="1"
+                               VerticalAlignment="Center"
+                               Margin="{StaticResource RecorderAudioLevelGap}"
+                               ToolTip.Tip="{loc:Text recorder.audio.level.hint}"
+                               auto:AutomationProperties.Name="{loc:Text recorder.audio.level.microphone}"/>
+                </Grid>
                 <ComboBox x:Name="CmbMicrophone"
                           ToolTip.Tip="{loc:Text recorder.audio.hint}"
                           HorizontalAlignment="Stretch"
@@ -673,7 +682,16 @@
               </StackPanel>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.audio.system}" Theme="{StaticResource Label}"/>
+                <Grid ColumnDefinitions="Auto,*">
+                  <TextBlock Text="{loc:Text recorder.audio.system}" Theme="{StaticResource Label}"/>
+                  <ProgressBar x:Name="BarSystemAudioLevel" Grid.Column="1"
+                               IsVisible="False"
+                               Minimum="0" Maximum="1"
+                               VerticalAlignment="Center"
+                               Margin="{StaticResource RecorderAudioLevelGap}"
+                               ToolTip.Tip="{loc:Text recorder.audio.level.hint}"
+                               auto:AutomationProperties.Name="{loc:Text recorder.audio.level.system}"/>
+                </Grid>
                 <ComboBox x:Name="CmbSystemAudio"
                           ToolTip.Tip="{loc:Text recorder.audio.hint}"
                           HorizontalAlignment="Stretch"
