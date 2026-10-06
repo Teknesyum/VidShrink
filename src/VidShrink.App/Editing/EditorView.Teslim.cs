@@ -20,7 +20,8 @@ namespace VidShrink.App.Editing;
 internal partial class EditorView
 {
     private CancellationTokenSource? _exportCts;
-    private ExportPlan? _pendingPlan;
+    private IReadOnlyList<ExportPlan>? _pendingPlan;
+    private bool _singleOnly;
     private string? _pendingKey;
     private string? _exported;
     private string? _savedKey;
@@ -35,6 +36,10 @@ internal partial class EditorView
     internal Func<ShareFlow>? CreateShareFlow { get; set; }
 
     internal ExportPlan? LastPlan { get; private set; }
+
+    internal IReadOnlyList<ExportPlan> LastPlans { get; private set; } = Array.Empty<ExportPlan>();
+
+    internal IReadOnlyList<string> ExportedPaths { get; private set; } = Array.Empty<string>();
 
     internal int Exports { get; private set; }
 
@@ -57,6 +62,18 @@ internal partial class EditorView
     internal string? SavedPath
         => _exported is { } path && _model is { } model && _savedKey == SaveKey(model) && File.Exists(path) ? path : null;
 
+    /// <summary>
+    /// Teslim her parcayi ayri dosyaya yazar mi. Tek parcada secenek dugmesi pasiftir, kutu isaretli kalsa da etkisizdir;
+    /// paylasim tek dosya ister, o yolda da kapalidir.
+    /// </summary>
+    internal bool ExportSeparately
+    {
+        get => !_singleOnly && ChkExportSeparate.IsChecked == true && _model is { Clips.Count: > 1 };
+        set => ChkExportSeparate.IsChecked = value;
+    }
+
+    internal bool ExportSeparatelyEnabled => BtnExportOptions.IsEnabled;
+
     internal ExportMode SelectedExportMode
     {
         get => CmbExportMode.SelectedIndex switch { 0 => ExportMode.Fast, 2 => ExportMode.Full, _ => ExportMode.Smart };
@@ -76,6 +93,7 @@ internal partial class EditorView
         BtnExportReveal.Click += (_, _) => { if (_exported is { } path) RevealFolder(path); };
         BtnExportPlay.Click += (_, _) => { if (_exported is { } path && OpenInPlayer is { } open) _ = open(path); };
         CmbExportMode.SelectionChanged += (_, _) => _pendingPlan = null;
+        ChkExportSeparate.IsCheckedChanged += (_, _) => _pendingPlan = null;
     }
 
     private void RefreshExport() => EnableExport(!Exporting);
@@ -86,6 +104,7 @@ internal partial class EditorView
         BtnSave.IsEnabled = ready;
         BtnExport.IsEnabled = ready;
         BtnShare.IsEnabled = ready && !Sharing;
+        BtnExportOptions.IsEnabled = ready && _model is { Clips.Count: > 1 };
         var neden = _model is not { Clips.Count: > 0 } || _source is null ? Strings.Get("main.action.shrink.disabled-tip") : null;
         ToolTip.SetTip(BtnSave, neden ?? Strings.Get("editor.save"));
         ToolTip.SetTip(BtnExport, neden ?? Tip("editor.save-as", EditorCommand.Export));
@@ -99,14 +118,14 @@ internal partial class EditorView
         _pendingPlan = null;
     }
 
-    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode;
+    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts" : string.Empty);
 
     internal async Task<bool> SaveAsync()
     {
         if (_model is not { Clips.Count: > 0 } model || _source is null || Exporting) return false;
         if (SavedPath is { } saved)
         {
-            Finish(true, Done(saved));
+            Finish(true, ExportSeparately ? Done(ExportedPaths) : Done(saved));
             return true;
         }
 
@@ -116,7 +135,8 @@ internal partial class EditorView
             return await RunExportAsync(pending, _pendingKey).ConfigureAwait(true);
         }
 
-        return DefaultOutput() is { } output && await ExportToAsync(output).ConfigureAwait(true);
+        var output = ExportSeparately ? EditOutputName.For(_source, _ => false) : DefaultOutput();
+        return output is not null && await ExportToAsync(output).ConfigureAwait(true);
     }
 
     private async Task ExportClickedAsync()
@@ -144,10 +164,12 @@ internal partial class EditorView
         ShowExportBar(running: true);
         TxtExportStatus.Text = string.Empty;
 
-        ExportPlan plan;
+        IReadOnlyList<ExportPlan> plans;
         try
         {
-            plan = await EditExportRunner.PrepareAsync(source, snapshot, SelectedExportMode, output, ExportMemoryBudget()).ConfigureAwait(true);
+            plans = ExportSeparately
+                ? await EditExportRunner.PrepareSegmentsAsync(source, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists).ConfigureAwait(true)
+                : new[] { await EditExportRunner.PrepareAsync(source, snapshot, SelectedExportMode, output, ExportMemoryBudget()).ConfigureAwait(true) };
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.Text.Json.JsonException or System.ComponentModel.Win32Exception)
         {
@@ -155,24 +177,26 @@ internal partial class EditorView
             return false;
         }
 
-        LastPlan = plan;
-        TxtExportNote.Text = Notes(plan);
+        LastPlan = plans[0];
+        LastPlans = plans;
+        TxtExportNote.Text = Notes(plans);
         TxtExportNote.IsVisible = TxtExportNote.Text.Length > 0;
 
-        if (plan.ReverseOverLimit.Count > 0 && !confirmReverse)
+        var over = plans.SelectMany(p => p.ReverseOverLimit).Distinct().OrderBy(i => i).ToArray();
+        if (over.Length > 0 && !confirmReverse)
         {
-            _pendingPlan = plan;
+            _pendingPlan = plans;
             _pendingKey = key;
             ShowExportBar(running: false);
             SetStatus("StatusWarning", string.Format(Strings.Culture, Strings.Get("editor.export.reverse-limit"),
-                ClipNumbers(plan.ReverseOverLimit), Saat.Ekran(TimeSpan.FromSeconds(Math.Min(plan.ReverseLimitSeconds, TimeSpan.MaxValue.TotalSeconds / 2)))));
+                ClipNumbers(over), Saat.Ekran(TimeSpan.FromSeconds(Math.Min(plans[0].ReverseLimitSeconds, TimeSpan.MaxValue.TotalSeconds / 2)))));
             return false;
         }
 
-        return await RunExportAsync(plan, key).ConfigureAwait(true);
+        return await RunExportAsync(plans, key).ConfigureAwait(true);
     }
 
-    private async Task<bool> RunExportAsync(ExportPlan plan, string? key)
+    private async Task<bool> RunExportAsync(IReadOnlyList<ExportPlan> plans, string? key)
     {
         using var cts = new CancellationTokenSource();
         _exportCts = cts;
@@ -182,16 +206,23 @@ internal partial class EditorView
         var progress = new Progress<EncodeProgress>(p => ExportProgress.Value = p.Fraction);
         try
         {
-            await EditExportRunner.RunAsync(plan, progress, cts.Token).ConfigureAwait(true);
-            _exported = plan.OutputPath;
+            if (plans.Count == 1) await EditExportRunner.RunAsync(plans[0], progress, cts.Token).ConfigureAwait(true);
+            else await EditExportRunner.RunSegmentsAsync(plans, progress, cts.Token).ConfigureAwait(true);
+            ExportedPaths = plans.Select(p => p.OutputPath).ToArray();
+            _exported = plans[0].OutputPath;
             _savedKey = key;
             Exports++;
-            Finish(true, Done(plan.OutputPath));
+            Finish(true, plans.Count > 1 ? Done(ExportedPaths) : Done(plans[0].OutputPath));
             return true;
         }
         catch (OperationCanceledException)
         {
             Finish(false, Strings.Get("main.run.cancelled"));
+            return false;
+        }
+        catch (EditSegmentException ex)
+        {
+            Finish(false, string.Format(Strings.Culture, Strings.Get("editor.export.segment-failed"), ex.Index + 1, ex.Message));
             return false;
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
@@ -209,8 +240,18 @@ internal partial class EditorView
     internal async Task<bool> ShareAsync()
     {
         if (Exporting || Sharing) return false;
-        var path = SavedPath;
-        if (path is null && await SaveAsync().ConfigureAwait(true)) path = SavedPath;
+        string? path;
+        _singleOnly = true;
+        try
+        {
+            path = SavedPath;
+            if (path is null && await SaveAsync().ConfigureAwait(true)) path = SavedPath;
+        }
+        finally
+        {
+            _singleOnly = false;
+        }
+
         if (path is null) return false;
 
         var session = _shareSession ??= new ShareSession(() => CreateShareFlow);
@@ -292,14 +333,20 @@ internal partial class EditorView
 
     private static string Done(string path) => string.Format(Strings.Culture, Strings.Get("editor.export.done"), path);
 
-    private static string Notes(ExportPlan plan)
+    private static string Done(IReadOnlyList<string> paths)
+        => string.Format(Strings.Culture, Strings.Get("editor.export.segments-done"), paths.Count,
+            Path.GetDirectoryName(paths[0]) ?? paths[0]);
+
+    private static string Notes(IReadOnlyList<ExportPlan> plans)
     {
+        var plan = plans[0];
+        var motion = plans.SelectMany(p => p.MotionClips).Distinct().OrderBy(i => i).ToArray();
         var lines = new List<string>();
         if (plan.TextForcedFull) lines.Add(Strings.Get("editor.export.text-full"));
         else if (plan.EffectsForcedFull) lines.Add(Strings.Get("editor.export.effects-full"));
         else if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
-        else if (plan.Effective != ExportMode.Full && plan.MotionClips.Count > 0)
-            lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.reencoded"), ClipNumbers(plan.MotionClips)));
+        else if (plans.Any(p => p.Effective != ExportMode.Full) && motion.Length > 0)
+            lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.reencoded"), ClipNumbers(motion)));
 
         return string.Join(Environment.NewLine, lines);
     }

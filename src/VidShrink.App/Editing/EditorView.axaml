@@ -74,6 +74,14 @@
                 <ComboBoxItem Content="{loc:Text editor.export.smart}"/>
                 <ComboBoxItem Content="{loc:Text editor.export.full}"/>
               </ComboBox>
+              <Button x:Name="BtnExportOptions" Theme="{StaticResource GhostButton}" AutomationProperties.Name="{loc:Text editor.export.separate}" IsEnabled="False" ToolTip.Tip="{loc:Text editor.export.separate}">
+                <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+                <Button.Flyout>
+                  <Flyout>
+                    <CheckBox x:Name="ChkExportSeparate" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.export.separate}"/>
+                  </Flyout>
+                </Button.Flyout>
+              </Button>
             </WrapPanel>
           </WrapPanel>
           <WrapPanel x:Name="TextPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.text.panel}">

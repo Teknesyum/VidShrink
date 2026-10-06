@@ -168,6 +168,60 @@ public static class EditExport
         return plan with { MotionClips = motion, TextForcedFull = textForced, EffectsForcedFull = effectsForced };
     }
 
+    /// <summary>
+    /// Her parcayi ayri dosyaya yazan planlar; parca basina bir plan, cizelge sirasinda. Kol butun
+    /// cizelge icin secilen koldur (<see cref="Build"/>), yani tek dosyada ne kosacaksa parcada da o
+    /// kosar. Metin katmani parcanin araligina kirpilip parcanin basina gore kaydirilir. Plandaki
+    /// parca numaralari (<see cref="ExportPlan.MotionClips"/>, <see cref="ExportPlan.ReverseOverLimit"/>)
+    /// cizelgedeki siradir.
+    /// </summary>
+    public static IReadOnlyList<ExportPlan> BuildSegments(
+        EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes, double startTime,
+        ExportMode mode, IReadOnlyList<string> outputPaths, IReadOnlyList<string> workDirectories, long memoryBudgetBytes)
+    {
+        if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
+        if (outputPaths.Count != timeline.Clips.Count)
+            throw new ArgumentException("Her parcaya bir cikti yolu gerekir", nameof(outputPaths));
+        if (workDirectories.Count != timeline.Clips.Count)
+            throw new ArgumentException("Her parcaya bir is klasoru gerekir", nameof(workDirectories));
+
+        var whole = Build(timeline, info, keyframes, startTime, mode, outputPaths[0], workDirectories[0], memoryBudgetBytes);
+        var plans = new List<ExportPlan>(timeline.Clips.Count);
+        for (var i = 0; i < timeline.Clips.Count; i++)
+        {
+            var index = i;
+            var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i));
+            var plan = Build(piece, info, keyframes, startTime, whole.Effective, outputPaths[i], workDirectories[i], memoryBudgetBytes);
+            plans.Add(plan with
+            {
+                Requested = mode,
+                TextForcedFull = whole.TextForcedFull,
+                EffectsForcedFull = whole.EffectsForcedFull,
+                MotionClips = plan.MotionClips.Select(_ => index).ToArray(),
+                ReverseOverLimit = plan.ReverseOverLimit.Select(_ => index).ToArray()
+            });
+        }
+
+        return plans;
+    }
+
+    private static IReadOnlyList<TextLayer> SegmentTexts(EditTimeline timeline, int index)
+    {
+        var from = timeline.ClipStart(index);
+        var to = timeline.ClipStart(index + 1);
+        var texts = new List<TextLayer>();
+        foreach (var text in timeline.Texts)
+        {
+            var start = Math.Max(text.Start, from);
+            var end = Math.Min(text.End, to);
+            if (end <= start) continue;
+            var cut = start == text.Start && end == text.End ? text : text.TrimmedTo(start, end);
+            texts.Add(cut.MovedTo(start - from));
+        }
+
+        return texts;
+    }
+
     private static ExportPlan Full(
         EditTimeline timeline, MediaInfo info, ExportMode requested, string output, string work,
         double limit, IReadOnlyList<int> over)
