@@ -140,6 +140,7 @@ internal partial class EditorView : UserControl
         Timeline.Show(null);
         RefreshToolbar();
         LoadPeaks(path);
+        LoadStrip(path);
 
         try
         {

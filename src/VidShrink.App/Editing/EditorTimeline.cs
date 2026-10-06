@@ -182,6 +182,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             var max = Math.Max(0, (_model?.Duration ?? 0) - span);
             _viewStart = Math.Clamp(value, 0, max);
             Realize();
+            RefreshStrip();
             InvalidateArrange();
             _canvas.InvalidateVisual();
             _overlay.InvalidateVisual();
@@ -460,7 +461,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         }
 
         foreach (var child in Children) child.Measure(availableSize);
-        return new Size(double.IsFinite(availableSize.Width) ? availableSize.Width : 0, TracksBottom);
+        return new Size(double.IsFinite(availableSize.Width) ? availableSize.Width : 0, StripBottom);
     }
 
     protected override Size ArrangeOverride(Size finalSize)
@@ -494,10 +495,12 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, TextTop, width, TextHeight));
         context.DrawRectangle(Paint("Surface"), null, new Rect(0, VideoTop, width, VideoHeight));
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, AudioTop, width, AudioHeight));
+        context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, StripTop, width, StripHeight));
 
         var line = new Pen(Paint("HeaderRestBorder"), Metric("EditorClipBorder"));
-        context.DrawLine(line, new Point(header, 0), new Point(header, TracksBottom));
+        context.DrawLine(line, new Point(header, 0), new Point(header, StripBottom));
         context.DrawLine(line, new Point(0, TextTop), new Point(width, TextTop));
+        context.DrawLine(line, new Point(0, StripTop), new Point(width, StripTop));
         context.DrawLine(line, new Point(0, VideoTop), new Point(width, VideoTop));
         context.DrawLine(line, new Point(0, AudioTop), new Point(width, AudioTop));
 
@@ -507,7 +510,8 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
 
         WaveformBucketsDrawn = 0;
         if (_model is null || _ppt <= 0) return;
-        using var clip = context.PushClip(new Rect(header, 0, Math.Max(0, width - header), TracksBottom));
+        using var clip = context.PushClip(new Rect(header, 0, Math.Max(0, width - header), StripBottom));
+        DrawStrip(context);
         DrawRuler(context);
         DrawTexts(context);
         if (_peaks is { IsEmpty: false } peaks) DrawWaveform(context, peaks);

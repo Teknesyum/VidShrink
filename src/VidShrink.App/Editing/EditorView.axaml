@@ -47,7 +47,7 @@
         </StackPanel>
         <TextBlock x:Name="TxtDuration" Grid.Column="2" Theme="{StaticResource MonoValue}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.duration}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
       </Grid>
-      <Border Theme="{StaticResource Panel}" Margin="{StaticResource PageMargin}">
+      <Border Theme="{StaticResource Panel}" Background="{StaticResource Surface}" Margin="{StaticResource PageMargin}">
         <StackPanel Spacing="{StaticResource SpaceSm}">
           <WrapPanel x:Name="Strip" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
             <WrapPanel x:Name="Toolbar" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
