@@ -88,5 +88,8 @@
   "editor.silence.none": "Nėra intervalų iškirpti.",
   "editor.silence.stale": "Nustatymai pasikeitė; skenuokite iš naujo.",
   "editor.silence.failed": "Skenavimas nepavyko: {0}",
-  "editor.silence.cut": "Iškirpta intervalų: {0}."
+  "editor.silence.cut": "Iškirpta intervalų: {0}.",
+  "editor.scene.split": "Skaidyti ties scenų pasikeitimais",
+  "editor.scene.none": "Scenų pasikeitimų nerasta.",
+  "editor.scene.done": "Suskaidyta ties scenų pasikeitimais: {0}."
 }

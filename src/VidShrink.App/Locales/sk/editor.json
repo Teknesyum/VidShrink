@@ -88,5 +88,8 @@
   "editor.silence.none": "Žiadne úseky na vystrihnutie.",
   "editor.silence.stale": "Nastavenia sa zmenili; skenujte znova.",
   "editor.silence.failed": "Skenovanie zlyhalo: {0}",
-  "editor.silence.cut": "Vystrihnuté úseky: {0}."
+  "editor.silence.cut": "Vystrihnuté úseky: {0}.",
+  "editor.scene.split": "Rozdeliť pri zmenách scény",
+  "editor.scene.none": "Nenašli sa žiadne zmeny scény.",
+  "editor.scene.done": "Rozdelené pri zmenách scény: {0}."
 }

@@ -88,5 +88,8 @@
   "editor.silence.none": "没有可剪的区间。",
   "editor.silence.stale": "设置已更改，请重新扫描。",
   "editor.silence.failed": "扫描失败: {0}",
-  "editor.silence.cut": "已剪掉 {0} 个区间。"
+  "editor.silence.cut": "已剪掉 {0} 个区间。",
+  "editor.scene.split": "在场景切换处分割",
+  "editor.scene.none": "未找到场景切换。",
+  "editor.scene.done": "已在 {0} 处场景切换分割。"
 }

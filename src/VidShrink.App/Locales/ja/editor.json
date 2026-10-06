@@ -88,5 +88,8 @@
   "editor.silence.none": "カットする区間がありません。",
   "editor.silence.stale": "設定が変更されました。もう一度スキャンしてください。",
   "editor.silence.failed": "スキャンに失敗しました: {0}",
-  "editor.silence.cut": "{0} 件の区間をカットしました。"
+  "editor.silence.cut": "{0} 件の区間をカットしました。",
+  "editor.scene.split": "シーンの切り替わりで分割",
+  "editor.scene.none": "シーンの切り替わりが見つかりません。",
+  "editor.scene.done": "{0} 件のシーンの切り替わりで分割しました。"
 }

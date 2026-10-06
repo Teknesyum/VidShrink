@@ -88,5 +88,8 @@
   "editor.silence.none": "No hay intervalos que cortar.",
   "editor.silence.stale": "Los ajustes cambiaron; vuelve a analizar.",
   "editor.silence.failed": "Error al analizar: {0}",
-  "editor.silence.cut": "Se cortaron {0} intervalos."
+  "editor.silence.cut": "Se cortaron {0} intervalos.",
+  "editor.scene.split": "Dividir en los cambios de escena",
+  "editor.scene.none": "No se encontraron cambios de escena.",
+  "editor.scene.done": "Se dividió en {0} cambios de escena."
 }

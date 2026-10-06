@@ -88,5 +88,8 @@
   "editor.silence.none": "ไม่มีช่วงที่ต้องตัด",
   "editor.silence.stale": "การตั้งค่าเปลี่ยนไป โปรดสแกนอีกครั้ง",
   "editor.silence.failed": "สแกนไม่สำเร็จ: {0}",
-  "editor.silence.cut": "ตัดไปแล้ว {0} ช่วง"
+  "editor.silence.cut": "ตัดไปแล้ว {0} ช่วง",
+  "editor.scene.split": "แบ่งตรงจุดเปลี่ยนฉาก",
+  "editor.scene.none": "ไม่พบจุดเปลี่ยนฉาก",
+  "editor.scene.done": "แบ่งที่จุดเปลี่ยนฉาก {0} จุดแล้ว"
 }

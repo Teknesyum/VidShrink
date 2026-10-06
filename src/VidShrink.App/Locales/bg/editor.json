@@ -88,5 +88,8 @@
   "editor.silence.none": "Няма интервали за изрязване.",
   "editor.silence.stale": "Настройките се промениха; сканирайте отново.",
   "editor.silence.failed": "Сканирането е неуспешно: {0}",
-  "editor.silence.cut": "Изрязани са {0} интервала."
+  "editor.silence.cut": "Изрязани са {0} интервала.",
+  "editor.scene.split": "Разделяне при смяна на сцена",
+  "editor.scene.none": "Не са открити смени на сцена.",
+  "editor.scene.done": "Разделено при {0} смени на сцена."
 }

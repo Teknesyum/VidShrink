@@ -88,5 +88,8 @@
   "editor.silence.none": "Keine Bereiche zum Schneiden.",
   "editor.silence.stale": "Einstellungen geändert; erneut scannen.",
   "editor.silence.failed": "Scan fehlgeschlagen: {0}",
-  "editor.silence.cut": "{0} Bereiche geschnitten."
+  "editor.silence.cut": "{0} Bereiche geschnitten.",
+  "editor.scene.split": "An Szenenwechseln teilen",
+  "editor.scene.none": "Keine Szenenwechsel gefunden.",
+  "editor.scene.done": "An {0} Szenenwechseln geteilt."
 }

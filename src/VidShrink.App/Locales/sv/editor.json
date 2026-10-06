@@ -88,5 +88,8 @@
   "editor.silence.none": "Inga intervall att klippa.",
   "editor.silence.stale": "Inställningarna har ändrats; skanna igen.",
   "editor.silence.failed": "Skanningen misslyckades: {0}",
-  "editor.silence.cut": "{0} intervall klipptes."
+  "editor.silence.cut": "{0} intervall klipptes.",
+  "editor.scene.split": "Dela vid scenbyten",
+  "editor.scene.none": "Inga scenbyten hittades.",
+  "editor.scene.done": "Delat vid {0} scenbyten."
 }

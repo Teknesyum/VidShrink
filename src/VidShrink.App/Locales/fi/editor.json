@@ -88,5 +88,8 @@
   "editor.silence.none": "Ei leikattavia jaksoja.",
   "editor.silence.stale": "Asetukset muuttuivat; skannaa uudelleen.",
   "editor.silence.failed": "Skannaus epäonnistui: {0}",
-  "editor.silence.cut": "{0} jaksoa leikattu."
+  "editor.silence.cut": "{0} jaksoa leikattu.",
+  "editor.scene.split": "Jaa kohtausvaihdoksista",
+  "editor.scene.none": "Kohtausvaihdoksia ei löytynyt.",
+  "editor.scene.done": "Jaettu {0} kohtausvaihdoksen kohdalta."
 }

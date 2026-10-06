@@ -88,5 +88,8 @@
   "editor.silence.none": "Lõigatavaid vahemikke pole.",
   "editor.silence.stale": "Seaded muutusid; skanni uuesti.",
   "editor.silence.failed": "Skannimine ebaõnnestus: {0}",
-  "editor.silence.cut": "Lõigati {0} vahemikku."
+  "editor.silence.cut": "Lõigati {0} vahemikku.",
+  "editor.scene.split": "Tükelda stseenivahetustel",
+  "editor.scene.none": "Stseenivahetusi ei leitud.",
+  "editor.scene.done": "Tükeldati {0} stseenivahetusel."
 }

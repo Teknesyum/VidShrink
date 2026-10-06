@@ -88,5 +88,8 @@
   "editor.silence.none": "Нет промежутков для вырезания.",
   "editor.silence.stale": "Настройки изменились; выполните сканирование снова.",
   "editor.silence.failed": "Ошибка сканирования: {0}",
-  "editor.silence.cut": "Вырезано промежутков: {0}."
+  "editor.silence.cut": "Вырезано промежутков: {0}.",
+  "editor.scene.split": "Разделить по сменам сцен",
+  "editor.scene.none": "Смены сцен не найдены.",
+  "editor.scene.done": "Разделено по сменам сцен: {0}."
 }

@@ -88,5 +88,8 @@
   "editor.silence.none": "کاٹنے کے لیے کوئی وقفہ نہیں۔",
   "editor.silence.stale": "ترتیبات بدل گئیں؛ دوبارہ اسکین کریں۔",
   "editor.silence.failed": "اسکین ناکام: {0}",
-  "editor.silence.cut": "{0} وقفے کاٹ دیے گئے۔"
+  "editor.silence.cut": "{0} وقفے کاٹ دیے گئے۔",
+  "editor.scene.split": "منظر کی تبدیلیوں پر تقسیم کریں",
+  "editor.scene.none": "منظر کی کوئی تبدیلی نہیں ملی۔",
+  "editor.scene.done": "منظر کی {0} تبدیلیوں پر تقسیم کیا گیا۔"
 }

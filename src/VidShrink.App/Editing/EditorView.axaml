@@ -137,6 +137,7 @@
                 <Button x:Name="BtnSilenceCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
                 <Button x:Name="BtnSilenceApply" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.silence.apply}" AutomationProperties.Name="{loc:Text editor.silence.apply}" IsEnabled="False"/>
               </StackPanel>
+              <Button x:Name="BtnSceneSplit" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.scene.split}" AutomationProperties.Name="{loc:Text editor.scene.split}" IsEnabled="False"/>
             </WrapPanel>
             <ProgressBar x:Name="SilenceProgress" Maximum="1" IsVisible="False"/>
             <TextBlock x:Name="TxtSilenceStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>

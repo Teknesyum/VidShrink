@@ -88,5 +88,8 @@
   "editor.silence.none": "Nav izgriežamu intervālu.",
   "editor.silence.stale": "Iestatījumi mainījušies; skenējiet vēlreiz.",
   "editor.silence.failed": "Skenēšana neizdevās: {0}",
-  "editor.silence.cut": "Izgriezti {0} intervāli."
+  "editor.silence.cut": "Izgriezti {0} intervāli.",
+  "editor.scene.split": "Sadalīt pie ainu maiņām",
+  "editor.scene.none": "Ainu maiņas nav atrastas.",
+  "editor.scene.done": "Sadalīts pie {0} ainu maiņām."
 }

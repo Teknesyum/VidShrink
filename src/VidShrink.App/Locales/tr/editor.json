@@ -88,5 +88,8 @@
   "editor.silence.none": "Kesilecek aralık bulunamadı.",
   "editor.silence.stale": "Ayar değişti; yeniden tarayın.",
   "editor.silence.failed": "Tarama başarısız: {0}",
-  "editor.silence.cut": "{0} aralık kesildi."
+  "editor.silence.cut": "{0} aralık kesildi.",
+  "editor.scene.split": "Sahne değişimlerinden böl",
+  "editor.scene.none": "Sahne değişimi bulunamadı.",
+  "editor.scene.done": "{0} sahne sınırında bölündü."
 }

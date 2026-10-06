@@ -88,5 +88,8 @@
   "editor.silence.none": "Немає проміжків для вирізання.",
   "editor.silence.stale": "Налаштування змінилися; скануйте ще раз.",
   "editor.silence.failed": "Помилка сканування: {0}",
-  "editor.silence.cut": "Вирізано проміжків: {0}."
+  "editor.silence.cut": "Вирізано проміжків: {0}.",
+  "editor.scene.split": "Розділити за змінами сцен",
+  "editor.scene.none": "Змін сцен не знайдено.",
+  "editor.scene.done": "Розділено за змінами сцен: {0}."
 }

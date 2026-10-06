@@ -88,5 +88,8 @@
   "editor.silence.none": "Tiada julat untuk dipotong.",
   "editor.silence.stale": "Tetapan berubah; imbas semula.",
   "editor.silence.failed": "Pengimbasan gagal: {0}",
-  "editor.silence.cut": "{0} julat dipotong."
+  "editor.silence.cut": "{0} julat dipotong.",
+  "editor.scene.split": "Pisahkan pada pertukaran babak",
+  "editor.scene.none": "Tiada pertukaran babak ditemui.",
+  "editor.scene.done": "Dipisahkan pada {0} pertukaran babak."
 }

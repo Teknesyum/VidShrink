@@ -88,5 +88,8 @@
   "editor.silence.none": "Nema opsega za isecanje.",
   "editor.silence.stale": "Podešavanja su promenjena; skenirajte ponovo.",
   "editor.silence.failed": "Skeniranje nije uspelo: {0}",
-  "editor.silence.cut": "Isečeno opsega: {0}."
+  "editor.silence.cut": "Isečeno opsega: {0}.",
+  "editor.scene.split": "Podeli na promenama scene",
+  "editor.scene.none": "Nisu pronađene promene scene.",
+  "editor.scene.done": "Podeljeno na promenama scene: {0}."
 }

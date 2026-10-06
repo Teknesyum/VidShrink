@@ -88,5 +88,8 @@
   "editor.silence.none": "Δεν υπάρχουν διαστήματα για αποκοπή.",
   "editor.silence.stale": "Οι ρυθμίσεις άλλαξαν· σαρώστε ξανά.",
   "editor.silence.failed": "Η σάρωση απέτυχε: {0}",
-  "editor.silence.cut": "Αποκόπηκαν {0} διαστήματα."
+  "editor.silence.cut": "Αποκόπηκαν {0} διαστήματα.",
+  "editor.scene.split": "Διαχωρισμός στις αλλαγές σκηνής",
+  "editor.scene.none": "Δεν βρέθηκαν αλλαγές σκηνής.",
+  "editor.scene.done": "Έγινε διαχωρισμός σε {0} αλλαγές σκηνής."
 }
