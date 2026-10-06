@@ -81,7 +81,9 @@
       seçilince NeonBlueActive + NeonBlueBorderStrong + GlowBlue ve kalın kenar.
       EditorToolButton araç paletinin ve mıknatısın aç-kapa düğmesidir: GhostButton yüzü,
       seçiliyken NeonBlueFill zemin + NeonBlueBorderStrong kenar, yazı TextBody (NeonBlueActive
-      zeminde ne NeonBlue ne TextBody yazı 7:1 tutuyor; 36 palette ölçüldü).
+      zeminde ne NeonBlue ne TextBody yazı 7:1 tutuyor; 36 palette ölçüldü). Araç şeridinin
+      paneli opak Surface zeminlidir: PanelSurface'in geçirdiği atmosfer ışıması seçili düğmenin
+      zeminini konuma göre açıyordu, Cobalt'ta yazı 7.35'ten 6.96'ya düştü; opakta 7.21 sabit.
       EditorBadgeText hız rozetinin yazısıdır: PlaybackBadgeText kalıbı, TextBody rengiyle
       (perde üstü yazı 7:1 ölçülü). Rozetin kendisi PlaybackBadge kalıbını kullanır.
   -->
