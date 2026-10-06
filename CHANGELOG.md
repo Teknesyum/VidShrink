@@ -9,6 +9,14 @@ ship as part of it.
 
 ### Added
 
+- CLI: burn an external subtitle file into the picture. `--yak-srt` / `--srt-burn FILE` takes a
+  `.srt`, `--yak-ass` / `--ssa-burn FILE` takes an `.ass` or `.ssa` and keeps its styles. Both use
+  the same `subtitles` filter as `--yak`, drawn after the crop and before scaling, in both passes;
+  the copy path is closed and the file is not added as a subtitle track. Paths with spaces,
+  Turkish letters, brackets, commas, semicolons and apostrophes are escaped for the filter. Only
+  one of `--yak`, `--yak-srt` and `--yak-ass` can be given. A missing file, a wrong extension, a
+  second burn option and an ffmpeg build without the `subtitles` filter (no libass) each stop
+  with their own message.
 - CLI: frame rate mode. `--sabit-kare` / `--cfr` writes a constant frame rate (`-r` plus
   `-fps_mode cfr`), `--tavan-kare` / `--pfr` keeps the source's variable timing and drops only
   the frames that come faster than `--kare-hizi` / `--fps N` (`-enc_time_base 1/N` plus
