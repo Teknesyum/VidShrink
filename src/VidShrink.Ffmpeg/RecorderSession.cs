@@ -64,6 +64,12 @@ public enum RecorderState
 /// Yarim dosya ffprobe ile yoklandi: <c>true</c> en az bir video paketi okundu, <c>false</c> okunamadi,
 /// <c>null</c> yoklanmadi ya da ffprobe calismadi.
 /// </param>
+/// <param name="MarksWritten">Dosyaya bolum olarak yazilan isaret sayisi.</param>
+/// <param name="MarksLost">
+/// Konup da dosyaya yazilamayan isaret sayisi: kap bolum tasimiyor, kayit yarim kaldi ya da
+/// yeniden paketleme dustu. Sifirdan buyukse cagiran bunu kullaniciya soyler.
+/// </param>
+/// <param name="ChaptersUnsupported">Isaretler kap bolum tasimadigi icin yazilmadi.</param>
 public sealed record RecordResult(
     bool Ok,
     string OutputPath,
@@ -76,7 +82,10 @@ public sealed record RecordResult(
     IReadOnlyList<string>? Files = null,
     string? DeliveryError = null,
     string? MissingGif = null,
-    bool? Playable = null)
+    bool? Playable = null,
+    int MarksWritten = 0,
+    int MarksLost = 0,
+    bool ChaptersUnsupported = false)
 {
     /// <summary>Kayitta verilen ayarlardan en az biri dusurulmus.</summary>
     public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
@@ -127,6 +136,8 @@ public sealed class RecorderSession : IAsyncDisposable
     private readonly string _outputPath;
     private readonly IProgress<RecordProgress>? _progress;
     private readonly List<string> _segments = new();
+    private readonly Dictionary<string, TimeSpan> _durations = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<RecorderMark> _marks = new();
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly EncodeRunner.StderrWatch _watch = new();
     private readonly SemaphoreSlim _turn = new(1, 1);
@@ -232,6 +243,39 @@ public sealed class RecorderSession : IAsyncDisposable
         return run.Ok && File.Exists(imagePath) && new FileInfo(imagePath).Length > 0;
     }
 
+    /// <summary>Dosyaya yazilan bolum adinin kalibi; <c>{0}</c> bolumun sirasi.</summary>
+    public string ChapterTitle { get; set; } = "Chapter {0}";
+
+    /// <summary>
+    /// O ana bolum isareti koyar. Zaman cikti zaman cizgisinden okunur
+    /// (<see cref="RecorderChapters.Position"/>), yani duraklatilan sure sayilmaz. Donen sayi
+    /// isaretin actigi bolumun dosyadaki sirasi; kayit kosmuyorsa ya da basis bir oncekine
+    /// <see cref="RecorderChapters.MinGapSeconds"/>'tan yakinsa isaret konmaz ve <c>null</c> doner.
+    /// </summary>
+    public int? Mark()
+    {
+        if (State != RecorderState.Running || _segments.Count == 0) return null;
+        return Mark(RecorderChapters.Position(Splits, _segments.Count - 1, _capturedBefore, _capturedNow));
+    }
+
+    internal int? Mark(RecorderMark mark)
+    {
+        lock (_marks)
+        {
+            if (!RecorderChapters.Accepts(_marks, mark)) return null;
+            _marks.Add(mark);
+            return _marks.Count(m => m.Part == mark.Part) + 1;
+        }
+    }
+
+    /// <summary>Konan isaretleri birakir; iptal edilen kayit bolum yazmak icin yeniden paketlenmez.</summary>
+    public void DropMarks()
+    {
+        lock (_marks) _marks.Clear();
+    }
+
+    private bool Splits => _request.Split is { IsSet: true };
+
     /// <summary>
     /// O anki parcayi nazikce kapatir. Dosya kapali ve oynatilabilir kalir; devam etmek
     /// <see cref="ResumeAsync"/> ile yeni bir parca acar.
@@ -278,8 +322,63 @@ public sealed class RecorderSession : IAsyncDisposable
         finally { _turn.Release(); }
 
         var result = await AssembleAsync(ct);
-        if (_remuxExtension is not null) return await RemuxAsync(result, ct);
-        return _gifPath is null ? result : await ConvertToGifAsync(result, ct);
+        if (_remuxExtension is not null) result = await RemuxAsync(result, ct);
+        else if (_gifPath is not null) result = await ConvertToGifAsync(result, ct);
+        return await WriteChaptersAsync(result, ct);
+    }
+
+    /// <summary>
+    /// Isaretleri teslim edilen dosyalara bolum olarak yazar: akislari kopyalayan bir yeniden
+    /// paketleme, yeniden kodlama yok. Isaret yoksa dosyaya dokunulmaz. Yazilamayan isaret
+    /// sessizce atilmaz, <see cref="RecordResult.MarksLost"/> ile bildirilir; dosyanin yanina
+    /// ayri bir isaret dosyasi birakilmaz.
+    /// </summary>
+    private async Task<RecordResult> WriteChaptersAsync(RecordResult result, CancellationToken ct)
+    {
+        RecorderMark[] marks;
+        lock (_marks) marks = _marks.ToArray();
+        if (marks.Length == 0) return result;
+
+        if (!result.Ok || result.Partial) return result with { MarksLost = marks.Length };
+        if (!RecorderChapters.Carries(RecorderArguments.ContainerOf(result.OutputPath)))
+            return result with { MarksLost = marks.Length, ChaptersUnsupported = true };
+
+        var files = result.Files ?? new[] { result.OutputPath };
+        var durations = RecorderChapters.PartDurations(
+            Splits, _segments.Select(segment => _durations.GetValueOrDefault(segment)).ToList());
+        var written = 0;
+        for (var part = 0; part < files.Count && part < durations.Count; part++)
+        {
+            var chapters = RecorderChapters.ForPart(marks, part, durations[part], ChapterTitle);
+            if (chapters.Count > 0 && await WriteChaptersAsync(files[part], chapters, ct)) written += chapters.Count - 1;
+        }
+
+        return result with { OutputMb = files.Sum(SizeMb), MarksWritten = written, MarksLost = marks.Length - written };
+    }
+
+    private static async Task<bool> WriteChaptersAsync(string file, IReadOnlyList<RecorderChapter> chapters, CancellationToken ct)
+    {
+        var metadata = file + ".bolumler.txt";
+        var marked = Path.Combine(
+            Path.GetDirectoryName(file) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(file) + ".isaretli" + Path.GetExtension(file));
+        try
+        {
+            File.WriteAllText(metadata, RecorderChapters.Metadata(chapters));
+            var run = await FfmpegRunner.RunAsync(RecorderChapters.BuildRemux(file, metadata, marked), ct);
+            if (!run.Ok || !File.Exists(marked) || new FileInfo(marked).Length == 0) return false;
+            File.Move(marked, file, overwrite: true);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+        finally
+        {
+            TryDelete(metadata);
+            TryDelete(marked);
+        }
     }
 
     private string? _remuxExtension;
@@ -395,6 +494,7 @@ public sealed class RecorderSession : IAsyncDisposable
 
         await FinishSegmentAsync(0, CancellationToken.None);
         _segments.Remove(path);
+        _durations.Remove(path);
         State = RecorderState.Stopped;
         throw new InvalidOperationException(
             $"ffmpeg kaydi baslatamadi ({_lastExitCode}): {FfmpegRunner.Tail(string.Join('\n', _watch.Close(_lastExitCode).Tail))}");
@@ -462,6 +562,7 @@ public sealed class RecorderSession : IAsyncDisposable
         try { _lastExitCode = process.ExitCode; } catch { _lastExitCode = -1; }
         if (_lastExitCode != 0) _partial = true;
 
+        if (_segments.Count > 0) _durations[_segments[^1]] = _capturedNow;
         _capturedBefore += _capturedNow;
         _capturedNow = TimeSpan.Zero;
         _framesBefore = _frames;

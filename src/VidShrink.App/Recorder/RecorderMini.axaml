@@ -38,14 +38,23 @@
                VerticalAlignment="Center"/>
 
       <!-- Sayacın kendisi tutamak: ayrı bir tutamak sütunu yer alırdı, sayaç zaten orada. -->
-      <TextBlock Grid.Column="1"
-                 x:Name="TxtElapsed"
-                 Theme="{StaticResource MonoValue}"
-                 MinWidth="{StaticResource RecorderMiniReadoutWidth}"
-                 Cursor="SizeAll"
-                 VerticalAlignment="Center"
-                 PointerPressed="OnDrag"
-                 ToolTip.Tip="{loc:Text recorder.mini.drag-hint}"/>
+      <StackPanel Grid.Column="1"
+                  Orientation="Horizontal"
+                  Spacing="{StaticResource RecorderStripGap}"
+                  VerticalAlignment="Center">
+        <TextBlock x:Name="TxtElapsed"
+                   Theme="{StaticResource MonoValue}"
+                   MinWidth="{StaticResource RecorderMiniReadoutWidth}"
+                   Cursor="SizeAll"
+                   VerticalAlignment="Center"
+                   PointerPressed="OnDrag"
+                   ToolTip.Tip="{loc:Text recorder.mini.drag-hint}"/>
+        <!-- Bölüm işaretinin bildirimi; işaret konana kadar yer tutmaz. -->
+        <TextBlock x:Name="TxtChapter"
+                   Theme="{StaticResource Hint}"
+                   IsVisible="False"
+                   VerticalAlignment="Center"/>
+      </StackPanel>
 
       <Button Grid.Column="3"
               x:Name="BtnRegion"

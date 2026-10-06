@@ -9,6 +9,11 @@ ship as part of it.
 
 ### Added
 
+- Recorder: a shortcut (F6 by default, reassignable) marks a chapter while recording. When
+  the recording ends the marks are written into the file as chapters by a stream copy, with
+  no re-encode; paused time is not counted, a split recording gets each mark in its own
+  part, and two presses within a second count as one. GIF cannot carry chapters, so the
+  result says the marks were not written instead of dropping them silently.
 - Editor: the timeline shows a thumbnail strip under the tracks and thin ticks at the
   source's keyframes. Both are read in the background after the source opens, one frame at
   a time, so the timeline is usable at once; ticks thin out when they would crowd.

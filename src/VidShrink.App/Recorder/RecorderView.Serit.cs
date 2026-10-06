@@ -113,6 +113,7 @@ internal partial class RecorderView
         if (_session is not null || CountingDown || ReplayRunning) return;
 
         ClearMessages();
+        _chapterText = string.Empty;
 
         if (!ToolLocator.IsAvailable(out var missing))
         {
@@ -141,6 +142,7 @@ internal partial class RecorderView
             PreparePreview(request.PreviewPath);
             _session = await RecorderSession.StartAsync(
                 request, path, new Progress<RecordProgress>(ShowProgress));
+            _session.ChapterTitle = LanguageCatalog.Display(Strings.Get("recorder.chapter.title"));
             _frameRegion = RegionOf(request);
             _ = FollowEndAsync(_session.Ended, _session);
         }
@@ -247,6 +249,7 @@ internal partial class RecorderView
         _stopping = true;
         try
         {
+            session.DropMarks();
             var kalan = DeleteRecording(await session.StopAsync());
             ClearMessages();
             ExpandFromMini();

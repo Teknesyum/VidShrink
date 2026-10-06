@@ -17,7 +17,8 @@ internal enum HotkeyAction
     Stop,
     Frame,
     Discard,
-    ReplaySave
+    ReplaySave,
+    Chapter
 }
 
 internal sealed record HotkeyBinding(HotkeyAction Action, Key Key, uint VirtualKey, KeyModifiers Modifiers = KeyModifiers.None);
@@ -37,8 +38,12 @@ internal static class RecorderHotkeys
         new(HotkeyAction.Stop, Key.F8, 0x77),
         new(HotkeyAction.Frame, Key.F9, 0x78),
         new(HotkeyAction.Discard, Key.F10, 0x79),
-        new(HotkeyAction.ReplaySave, Key.F11, 0x7A)
+        new(HotkeyAction.ReplaySave, Key.F11, 0x7A),
+        new(HotkeyAction.Chapter, Key.F6, 0x75)
     ];
+
+    /// <summary>Bölüm işareti eklenmeden önceki ayarın taşıdığı eylem sayısı.</summary>
+    internal const int LegacyCount = 5;
 
     internal static HotkeyAction? ActionOf(Key key, KeyModifiers modifiers) => ActionOf(All, key, modifiers);
 
@@ -95,12 +100,14 @@ internal static class RecorderHotkeys
 
     /// <summary>
     /// Ayardaki yazımı bağlara çevirir. Eksik, tanınmayan ya da iki eyleme aynı tuşu veren yazım
-    /// <c>null</c> döner; çağıran varsayılana düşer.
+    /// <c>null</c> döner; çağıran varsayılana düşer. Eski sürümün <see cref="LegacyCount"/> eylemli
+    /// yazımı geçerlidir: atamalar korunur, sonradan eklenen eylem varsayılan tuşunu alır; o tuş
+    /// eski atamalardan birindeyse yazım yine <c>null</c> döner.
     /// </summary>
     internal static IReadOnlyList<HotkeyBinding>? Read(string? text)
     {
         var parts = (text ?? string.Empty).Split(',');
-        if (parts.Length != All.Count) return null;
+        if (parts.Length != All.Count && parts.Length != LegacyCount) return null;
 
         var bindings = new List<HotkeyBinding>();
         for (var i = 0; i < parts.Length; i++)
@@ -114,6 +121,12 @@ internal static class RecorderHotkeys
                 || bindings.Any(b => Same(b, binding)))
                 return null;
             bindings.Add(binding);
+        }
+
+        foreach (var added in All.Skip(bindings.Count))
+        {
+            if (bindings.Any(b => Same(b, added))) return null;
+            bindings.Add(added);
         }
 
         return bindings;

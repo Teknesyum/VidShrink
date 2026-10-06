@@ -531,8 +531,8 @@ public sealed class KaydediciBolgeDuzenleyiciTests
             Assert.False(olcu.oturum);
             Assert.Equal(RecorderTargetKind.Region, olcu.istek!.Target);
             Assert.Equal(new RecorderRegion(100, 50, 320, 240), olcu.istek.Region);
-            Assert.Equal(5, RecorderHotkeys.All.Count);
-            Assert.Equal(5, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
+            Assert.Equal(6, RecorderHotkeys.All.Count);
+            Assert.Equal(6, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
         }
         finally
         {

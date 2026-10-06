@@ -182,6 +182,7 @@ internal partial class RecorderView
         HotkeyAction.Stop => Say("recorder.strip.stop"),
         HotkeyAction.Frame => Say("recorder.hotkeys.frame"),
         HotkeyAction.Discard => Say("recorder.hotkeys.discard"),
+        HotkeyAction.Chapter => Say("recorder.hotkeys.chapter"),
         _ => Say("recorder.hotkeys.replay-save")
     };
 
@@ -256,10 +257,12 @@ internal partial class RecorderView
     private static double HotkeyToken(string key)
         => Application.Current?.TryFindResource(key, out var value) == true && value is double number ? number : 0;
 
-    private bool CanRun(HotkeyAction action)
-        => action == HotkeyAction.ReplaySave
-            ? ReplayRunning
-            : action is not (HotkeyAction.Stop or HotkeyAction.Discard) || HasSession || CountingDown;
+    private bool CanRun(HotkeyAction action) => action switch
+    {
+        HotkeyAction.ReplaySave => ReplayRunning,
+        HotkeyAction.Chapter => CanMarkChapter,
+        _ => action is not (HotkeyAction.Stop or HotkeyAction.Discard) || HasSession || CountingDown
+    };
 
     internal async Task<bool> RunHotkeyAsync(HotkeyAction action)
     {
@@ -272,6 +275,7 @@ internal partial class RecorderView
             case HotkeyAction.Frame: ToggleFrame(); break;
             case HotkeyAction.Discard: await DiscardAsync(); break;
             case HotkeyAction.ReplaySave: await SaveReplayAsync(); break;
+            case HotkeyAction.Chapter: MarkChapter(); break;
         }
 
         return true;

@@ -857,8 +857,9 @@ public sealed class KaydediciArayuzTests
         Assert.Equal(HotkeyAction.Discard, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F10, Avalonia.Input.KeyModifiers.None));
         Assert.Equal(HotkeyAction.ReplaySave, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F11, Avalonia.Input.KeyModifiers.None));
         Assert.Null(RecorderHotkeys.ActionOf(Avalonia.Input.Key.F7, Avalonia.Input.KeyModifiers.Control));
-        Assert.Null(RecorderHotkeys.ActionOf(Avalonia.Input.Key.F6, Avalonia.Input.KeyModifiers.None));
-        Assert.Equal(5, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
+        Assert.Equal(HotkeyAction.Chapter, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F6, Avalonia.Input.KeyModifiers.None));
+        Assert.Null(RecorderHotkeys.ActionOf(Avalonia.Input.Key.F5, Avalonia.Input.KeyModifiers.None));
+        Assert.Equal(6, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
         Assert.Equal(Enum.GetValues<HotkeyAction>().Length, RecorderHotkeys.All.Select(b => b.Action).Distinct().Count());
     }
 
