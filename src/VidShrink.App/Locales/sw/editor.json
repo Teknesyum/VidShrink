@@ -91,5 +91,8 @@
   "editor.silence.none": "Hakuna vipindi vya kukata.",
   "editor.silence.stale": "Mipangilio imebadilika; changanua tena.",
   "editor.silence.failed": "Uchanganuzi umeshindwa: {0}",
-  "editor.silence.cut": "Vipindi {0} vimekatwa."
+  "editor.silence.cut": "Vipindi {0} vimekatwa.",
+  "editor.scene.split": "Gawa kwenye mabadiliko ya onyesho",
+  "editor.scene.none": "Hakuna mabadiliko ya onyesho yaliyopatikana.",
+  "editor.scene.done": "Imegawanywa kwenye mabadiliko {0} ya onyesho."
 }

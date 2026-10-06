@@ -91,5 +91,8 @@
   "editor.silence.none": "No ranges to cut.",
   "editor.silence.stale": "Settings changed; scan again.",
   "editor.silence.failed": "Scan failed: {0}",
-  "editor.silence.cut": "{0} ranges cut."
+  "editor.silence.cut": "{0} ranges cut.",
+  "editor.scene.split": "Split at scene changes",
+  "editor.scene.none": "No scene changes found.",
+  "editor.scene.done": "Split at {0} scene changes."
 }

@@ -91,5 +91,8 @@
   "editor.silence.none": "Nincs kivágandó szakasz.",
   "editor.silence.stale": "A beállítások megváltoztak; vizsgálja újra.",
   "editor.silence.failed": "A vizsgálat sikertelen: {0}",
-  "editor.silence.cut": "{0} szakasz kivágva."
+  "editor.silence.cut": "{0} szakasz kivágva.",
+  "editor.scene.split": "Felosztás jelenetváltásoknál",
+  "editor.scene.none": "Nem található jelenetváltás.",
+  "editor.scene.done": "Felosztva {0} jelenetváltásnál."
 }

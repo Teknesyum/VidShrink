@@ -91,5 +91,8 @@
   "editor.silence.none": "Ingen områder å klippe.",
   "editor.silence.stale": "Innstillingene er endret; skann på nytt.",
   "editor.silence.failed": "Skanning mislyktes: {0}",
-  "editor.silence.cut": "{0} områder klippet."
+  "editor.silence.cut": "{0} områder klippet.",
+  "editor.scene.split": "Del ved sceneskift",
+  "editor.scene.none": "Fant ingen sceneskift.",
+  "editor.scene.done": "Delt ved {0} sceneskift."
 }

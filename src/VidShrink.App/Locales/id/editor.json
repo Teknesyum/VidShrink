@@ -91,5 +91,8 @@
   "editor.silence.none": "Tidak ada rentang untuk dipotong.",
   "editor.silence.stale": "Pengaturan berubah; pindai ulang.",
   "editor.silence.failed": "Pemindaian gagal: {0}",
-  "editor.silence.cut": "{0} rentang dipotong."
+  "editor.silence.cut": "{0} rentang dipotong.",
+  "editor.scene.split": "Pisahkan di pergantian adegan",
+  "editor.scene.none": "Pergantian adegan tidak ditemukan.",
+  "editor.scene.done": "Dipisahkan di {0} pergantian adegan."
 }

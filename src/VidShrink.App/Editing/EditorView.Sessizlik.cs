@@ -42,6 +42,7 @@ internal partial class EditorView
         BtnSilenceScan.Click += (_, _) => _ = ScanSilenceAsync();
         BtnSilenceCancel.Click += (_, _) => _silenceCts?.Cancel();
         BtnSilenceApply.Click += (_, _) => ApplySilence();
+        BtnSceneSplit.Click += (_, _) => _ = SplitScenesAsync();
         ChkSilenceAudio.IsCheckedChanged += (_, _) => RefreshSilence();
         ChkSilenceBlack.IsCheckedChanged += (_, _) => RefreshSilence();
         TxtSilenceThreshold.TextChanged += (_, _) => RefreshSilence();
@@ -147,6 +148,7 @@ internal partial class EditorView
         _silenceCuts = Array.Empty<(long Start, long End)>();
         var options = ReadSilenceOptions();
         BtnSilenceScan.IsEnabled = _model is { SourceDuration: not null } && options is not null && !SilenceScanning;
+        BtnSceneSplit.IsEnabled = _model is { SourceDuration: not null } && !SilenceScanning;
         if (SilenceScanning) return;
 
         var scan = _silenceScan;
@@ -188,6 +190,7 @@ internal partial class EditorView
         SilenceProgress.IsVisible = busy;
         BtnSilenceCancel.IsVisible = busy;
         BtnSilenceScan.IsEnabled = !busy;
+        BtnSceneSplit.IsEnabled = !busy;
         BtnSilenceApply.IsEnabled = false;
     }
 

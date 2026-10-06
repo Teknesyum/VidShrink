@@ -91,5 +91,8 @@
   "editor.silence.none": "Nessun intervallo da tagliare.",
   "editor.silence.stale": "Le impostazioni sono cambiate; analizza di nuovo.",
   "editor.silence.failed": "Analisi non riuscita: {0}",
-  "editor.silence.cut": "{0} intervalli tagliati."
+  "editor.silence.cut": "{0} intervalli tagliati.",
+  "editor.scene.split": "Dividi ai cambi di scena",
+  "editor.scene.none": "Nessun cambio di scena trovato.",
+  "editor.scene.done": "Diviso in {0} cambi di scena."
 }

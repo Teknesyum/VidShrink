@@ -91,5 +91,8 @@
   "editor.silence.none": "Aucune plage à couper.",
   "editor.silence.stale": "Les réglages ont changé ; relancez l’analyse.",
   "editor.silence.failed": "Échec de l’analyse : {0}",
-  "editor.silence.cut": "{0} plages coupées."
+  "editor.silence.cut": "{0} plages coupées.",
+  "editor.scene.split": "Scinder aux changements de scène",
+  "editor.scene.none": "Aucun changement de scène trouvé.",
+  "editor.scene.done": "Scindé à {0} changements de scène."
 }
