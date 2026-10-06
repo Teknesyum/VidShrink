@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Hangcél (kbit/s)",
   "main.advanced.audio-channels.label": "Hangcsatornák",
   "main.advanced.keep-tracks.label": "Minden sáv megtartása (MKV)",
+  "main.advanced.drop-metadata.label": "Metaadatok eltávolítása",
+  "main.advanced.drop-metadata.tip": "• Eltávolítja a konténer címkéit a kimenetből: címet, szerzőt, dátumot, GPS-helyet és eszközadatokat.\n• A sávok nyelve megmarad.\n• A videó akkor is újrakódolódik, ha már belefér a célba.",
   "main.audio.level.label": "Hangszint",
   "main.audio.loudnorm": "Hangerő kiegyenlítése (EBU R128)",
   "main.audio.gain": "Erősítés",

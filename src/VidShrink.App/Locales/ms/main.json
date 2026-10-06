@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Sasaran audio (kbit/s)",
   "main.advanced.audio-channels.label": "Saluran audio",
   "main.advanced.keep-tracks.label": "Kekalkan semua trek (MKV)",
+  "main.advanced.drop-metadata.label": "Buang metadata",
+  "main.advanced.drop-metadata.tip": "• Membuang tag bekas daripada output: tajuk, pengarang, tarikh, lokasi GPS dan maklumat peranti.\n• Bahasa trek dikekalkan.\n• Video dikodkan semula walaupun sudah muat dalam sasaran.",
   "main.audio.level.label": "Tahap audio",
   "main.audio.loudnorm": "Seragamkan kelantangan (EBU R128)",
   "main.audio.gain": "Gandaan",

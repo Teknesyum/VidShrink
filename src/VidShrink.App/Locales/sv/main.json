@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Ljudmål (kbit/s)",
   "main.advanced.audio-channels.label": "Ljudkanaler",
   "main.advanced.keep-tracks.label": "Behåll alla spår (MKV)",
+  "main.advanced.drop-metadata.label": "Ta bort metadata",
+  "main.advanced.drop-metadata.tip": "• Tar bort behållarens taggar från utdata: titel, författare, datum, GPS-position och enhetsinformation.\n• Spårens språk behålls.\n• Videon kodas om även om den redan ryms i målet.",
   "main.audio.level.label": "Ljudnivå",
   "main.audio.loudnorm": "Normalisera ljudstyrka (EBU R128)",
   "main.audio.gain": "Förstärkning",

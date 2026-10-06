@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Στόχος ήχου (kbit/s)",
   "main.advanced.audio-channels.label": "Κανάλια ήχου",
   "main.advanced.keep-tracks.label": "Διατήρηση όλων των κομματιών (MKV)",
+  "main.advanced.drop-metadata.label": "Αφαίρεση μεταδεδομένων",
+  "main.advanced.drop-metadata.tip": "• Αφαιρεί τις ετικέτες του περιέκτη από το αποτέλεσμα: τίτλο, δημιουργό, ημερομηνία, τοποθεσία GPS και πληροφορίες συσκευής.\n• Οι γλώσσες των κομματιών διατηρούνται.\n• Το βίντεο κωδικοποιείται ξανά, ακόμη κι αν χωρά ήδη στον στόχο.",
   "main.audio.level.label": "Επίπεδο ήχου",
   "main.audio.loudnorm": "Κανονικοποίηση έντασης (EBU R128)",
   "main.audio.gain": "Ενίσχυση",

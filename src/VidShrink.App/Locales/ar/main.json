@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "هدف الصوت (كيلوبت/ث)",
   "main.advanced.audio-channels.label": "قنوات الصوت",
   "main.advanced.keep-tracks.label": "الاحتفاظ بكل المسارات (MKV)",
+  "main.advanced.drop-metadata.label": "إزالة البيانات الوصفية",
+  "main.advanced.drop-metadata.tip": "• يزيل وسوم الحاوية من الملف الناتج: العنوان والمؤلف والتاريخ وموقع GPS ومعلومات الجهاز.\n• تبقى لغات المسارات كما هي.\n• يُعاد ترميز الفيديو حتى لو كان ضمن الحجم المستهدف.",
   "main.audio.level.label": "مستوى الصوت",
   "main.audio.loudnorm": "توحيد مستوى الصوت (EBU R128)",
   "main.audio.gain": "الكسب",

@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "هدف صدا (کیلوبیت بر ثانیه)",
   "main.advanced.audio-channels.label": "کانال‌های صدا",
   "main.advanced.keep-tracks.label": "حفظ همه ترک‌ها (MKV)",
+  "main.advanced.drop-metadata.label": "حذف فراداده",
+  "main.advanced.drop-metadata.tip": "• برچسب‌های محفظه را از خروجی حذف می‌کند: عنوان، نویسنده، تاریخ، موقعیت GPS و اطلاعات دستگاه.\n• زبان ترک‌ها حفظ می‌شود.\n• ویدیو حتی اگر در اندازهٔ هدف جا شود دوباره رمزگذاری می‌شود.",
   "main.audio.level.label": "سطح صدا",
   "main.audio.loudnorm": "یکسان‌سازی بلندی صدا (EBU R128)",
   "main.audio.gain": "افزایش (گین)",

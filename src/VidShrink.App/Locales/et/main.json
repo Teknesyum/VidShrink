@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Heli siht (kbit/s)",
   "main.advanced.audio-channels.label": "Helikanalid",
   "main.advanced.keep-tracks.label": "Säilita kõik rajad (MKV)",
+  "main.advanced.drop-metadata.label": "Eemalda metaandmed",
+  "main.advanced.drop-metadata.tip": "• Eemaldab väljundist konteineri sildid: pealkirja, autori, kuupäeva, GPS-asukoha ja seadme andmed.\n• Radade keeled säilivad.\n• Video kodeeritakse uuesti ka siis, kui see juba mahub sihtmärki.",
   "main.audio.level.label": "Helitase",
   "main.audio.loudnorm": "Ühtlusta valjus (EBU R128)",
   "main.audio.gain": "Võimendus",

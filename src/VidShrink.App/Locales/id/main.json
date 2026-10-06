@@ -157,6 +157,8 @@
   "main.advanced.audio-kbps.label": "Target audio (kbit/s)",
   "main.advanced.audio-channels.label": "Kanal audio",
   "main.advanced.keep-tracks.label": "Pertahankan semua trek (MKV)",
+  "main.advanced.drop-metadata.label": "Hapus metadata",
+  "main.advanced.drop-metadata.tip": "• Menghapus tag kontainer dari keluaran: judul, pembuat, tanggal, lokasi GPS, dan informasi perangkat.\n• Bahasa trek tetap dipertahankan.\n• Video dienkode ulang meskipun sudah muat dalam target.",
   "main.audio.level.label": "Level audio",
   "main.audio.loudnorm": "Normalisasi volume (EBU R128)",
   "main.audio.gain": "Gain",
