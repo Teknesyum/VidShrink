@@ -93,6 +93,23 @@ public sealed class KaydiriciTests
         Assert.Equal((1d, 5d), (kucuk, buyuk));
     }
 
+    /// <summary>
+    /// Vuruş testi çizicinin sahnesinden okur; sahne ilk çizim vuruşundan önce boştur. Sabit süre
+    /// beklemek yüklü koşucuda vuruşu kaçırıyor ve liste boş dönüyordu (main 37512461266, 37529955403).
+    /// Burada ilk dolu liste beklenir, süre yalnız tavandır.
+    /// </summary>
+    private static List<Visual> CizilinceVurulan(Window p, Point nokta)
+    {
+        var saat = System.Diagnostics.Stopwatch.StartNew();
+        while (true)
+        {
+            var vurulan = p.GetVisualsAt(nokta, v => v.IsVisible)
+                .Where(v => v is not Window && v is IInputElement { IsHitTestVisible: true }).ToList();
+            if (vurulan.Count > 0 || saat.ElapsedMilliseconds > 10_000) return vurulan;
+            Pompala(20);
+        }
+    }
+
     private static Visual Iz(Slider k) => k.GetVisualDescendants().OfType<Track>().Single();
 
     [Theory]
@@ -103,13 +120,11 @@ public sealed class KaydiriciTests
     {
         var (yakalayan, yukseklik) = Olc((p, k) =>
         {
-            Pompala(200);
             p.UpdateLayout();
             var iz = (Track)Iz(k);
             var merkez = iz.TranslatePoint(new Point(iz.Bounds.Width * 0.8, iz.Bounds.Height / 2), p)!.Value;
             var nokta = merkez + new Point(0, sapma);
-            var vurulan = p.GetVisualsAt(nokta, v => v.IsVisible)
-                .Where(v => v is not Window && v is IInputElement { IsHitTestVisible: true }).ToList();
+            var vurulan = CizilinceVurulan(p, nokta);
             var dugme = vurulan.SelectMany(v => v.GetSelfAndVisualAncestors()).OfType<RepeatButton>().FirstOrDefault();
             _output.WriteLine($"nokta {nokta}, iz {iz.Bounds}, vurulan: {string.Join(" > ", vurulan.Select(v => v.GetType().Name))}");
             return (dugme?.Name, k.Bounds.Height);
