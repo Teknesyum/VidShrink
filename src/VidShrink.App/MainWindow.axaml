@@ -1073,7 +1073,7 @@
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text main.convert.title}" Theme="{StaticResource H2}"/>
                   <TextBlock x:Name="TxtConvertSource" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
-                  <Button Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowse"/>
+                  <Button x:Name="BtnBrowseConvert" Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowseConvert"/>
                   <Grid x:Name="ConvertForm" Grid.IsSharedSizeScope="True" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
                         RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
                     <Grid.Styles>

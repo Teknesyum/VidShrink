@@ -3202,12 +3202,15 @@ public partial class MainWindow : Window
     private static string? SelectedTag(SelectingItemsControl box)
         => (box.SelectedItem as Control)?.Tag as string;
 
-    private async void OnBrowse(object? sender, RoutedEventArgs e) => await BrowseAsync();
+    private async void OnBrowse(object? sender, RoutedEventArgs e) => await BrowseAsync(true);
+
+    private async void OnBrowseConvert(object? sender, RoutedEventArgs e) => await BrowseAsync(false);
 
     /// <summary>
-    /// Seçici dikişi. Ölçüm sahte yol listesini buraya takar; üretimde sistemin dosya seçicisi.
+    /// Seçici dikişi; argüman çoklu seçimin açık olup olmadığı. Ölçüm sahte yol listesini buraya
+    /// takar; üretimde sistemin dosya seçicisi.
     /// </summary>
-    internal Func<Task<IReadOnlyList<string>>>? SourcePicker { get; set; }
+    internal Func<bool, Task<IReadOnlyList<string>>>? SourcePicker { get; set; }
 
     /// <summary>
     /// Kuyruk dikişi. Ölçüm kuyruğa giden yolları buradan okur, pencere açılmaz ve kodlama başlamaz;
@@ -3216,16 +3219,17 @@ public partial class MainWindow : Window
     internal Action<IReadOnlyList<string>>? BatchOpener { get; set; }
 
     /// <summary>
-    /// "Gözat": seçici çoklu seçime açık. Tek dosya eskisi gibi süzülmeden bu pencereye yüklenir;
-    /// birden çok dosya bırakmanın süzgecinden (<see cref="DroppedMedia.Collect(IEnumerable{string})"/>)
-    /// geçip bırakmayla aynı kola (<see cref="OpenSourcesAsync"/>) gider. İş koşarken seçici açılmaz.
+    /// "Gözat": Küçült sekmesinde seçici çoklu seçime açık, Dönüştür sekmesinde tek seçimli (orada
+    /// kuyruk yok). Tek dosya eskisi gibi süzülmeden bu pencereye yüklenir; birden çok dosya bırakmanın
+    /// süzgecinden (<see cref="DroppedMedia.Collect(IEnumerable{string})"/>) geçip bırakmayla aynı
+    /// kola (<see cref="OpenSourcesAsync"/>) gider. İş koşarken seçici açılmaz.
     /// </summary>
-    internal async Task BrowseAsync()
+    internal async Task BrowseAsync(bool multiple)
     {
         if (_cts is not null) return;
         try
         {
-            var paths = await (SourcePicker ?? PickSourcesAsync)();
+            var paths = await (SourcePicker ?? PickSourcesAsync)(multiple);
             await OpenSourcesAsync(paths.Count == 1 ? paths[0] : null, DroppedMedia.Collect(paths));
         }
         catch (Exception ex)
@@ -3234,11 +3238,11 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task<IReadOnlyList<string>> PickSourcesAsync()
+    private async Task<IReadOnlyList<string>> PickSourcesAsync(bool multiple)
     {
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            AllowMultiple = true,
+            AllowMultiple = multiple,
             FileTypeFilter = new[]
             {
                 new FilePickerFileType("Media") { Patterns = ShellIntegration.MediaExtensions.Select(extension => "*." + extension).ToArray() },

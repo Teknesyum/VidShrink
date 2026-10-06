@@ -47,7 +47,7 @@ public sealed class GozatCokluSecimTests : IDisposable
         }
     }
 
-    private sealed record Olcu(int SeciciAcildi, string[] Yuklenen, string[][] Kuyruklar);
+    private sealed record Olcu(int SeciciAcildi, string[] Yuklenen, string[][] Kuyruklar, bool[] Coklu);
 
     /// <summary>
     /// Pencereyi üç dikişle kurar, <paramref name="eylem"/>i koşturur. Yoklayıcı yolu yazıp düşer:
@@ -63,9 +63,10 @@ public sealed class GozatCokluSecimTests : IDisposable
             var acildi = 0;
             var yuklenen = new List<string>();
             var kuyruklar = new List<string[]>();
+            var kipler = new List<bool>();
             try
             {
-                window.SourcePicker = () => { acildi++; return Task.FromResult(secilen); };
+                window.SourcePicker = coklu => { acildi++; kipler.Add(coklu); return Task.FromResult(secilen); };
                 window.BatchOpener = yollar => kuyruklar.Add(yollar.ToArray());
                 window.Prober = (yol, _) => { yuklenen.Add(yol); return Task.FromException<MediaInfo>(new IOException("sahte yoklama")); };
                 if (isKosuyor) window.BeginEncodingForTest();
@@ -74,7 +75,7 @@ public sealed class GozatCokluSecimTests : IDisposable
                 if (is_ is not null) Dongu(() => is_.IsCompleted, 30);
                 else Dongu(() => false, 0.2);
                 if (is_ is { IsFaulted: true }) is_.GetAwaiter().GetResult();
-                return new Olcu(acildi, yuklenen.ToArray(), kuyruklar.ToArray());
+                return new Olcu(acildi, yuklenen.ToArray(), kuyruklar.ToArray(), kipler.ToArray());
             }
             finally
             {
@@ -97,7 +98,7 @@ public sealed class GozatCokluSecimTests : IDisposable
     public void TekSecimSuzulmedenBuPencereyeYuklenir()
     {
         var metin = Dosya("tek.txt");
-        var olcu = Kos(new[] { metin }, window => window.BrowseAsync());
+        var olcu = Kos(new[] { metin }, window => window.BrowseAsync(true));
 
         Assert.Equal(1, olcu.SeciciAcildi);
         Assert.Equal(new[] { metin }, olcu.Yuklenen);
@@ -111,7 +112,7 @@ public sealed class GozatCokluSecimTests : IDisposable
         var b = Dosya("b.mkv");
         var metin = Dosya("notlar.txt");
         var a = Dosya("a.mp4");
-        var olcu = Kos(new[] { b, metin, a }, window => window.BrowseAsync());
+        var olcu = Kos(new[] { b, metin, a }, window => window.BrowseAsync(true));
 
         Assert.Equal(new[] { a, b }, Assert.Single(olcu.Kuyruklar));
         Assert.Empty(olcu.Yuklenen);
@@ -128,9 +129,9 @@ public sealed class GozatCokluSecimTests : IDisposable
         var metin = Dosya("notlar.txt");
         var belge = Dosya("belge.pdf");
 
-        var tek = Kos(new[] { a, metin }, window => window.BrowseAsync());
-        var hic = Kos(new[] { metin, belge }, window => window.BrowseAsync());
-        var bos = Kos(Array.Empty<string>(), window => window.BrowseAsync());
+        var tek = Kos(new[] { a, metin }, window => window.BrowseAsync(true));
+        var hic = Kos(new[] { metin, belge }, window => window.BrowseAsync(true));
+        var bos = Kos(Array.Empty<string>(), window => window.BrowseAsync(true));
 
         foreach (var olcu in new[] { tek, hic, bos })
         {
@@ -147,8 +148,8 @@ public sealed class GozatCokluSecimTests : IDisposable
         var a = Dosya("a.mp4");
         var b = Dosya("b.mp4");
 
-        var kosarken = Kos(new[] { a, b }, window => window.BrowseAsync(), isKosuyor: true);
-        var bosta = Kos(new[] { a, b }, window => window.BrowseAsync());
+        var kosarken = Kos(new[] { a, b }, window => window.BrowseAsync(true), isKosuyor: true);
+        var bosta = Kos(new[] { a, b }, window => window.BrowseAsync(true));
 
         Assert.Equal(0, kosarken.SeciciAcildi);
         Assert.Empty(kosarken.Kuyruklar);
@@ -157,20 +158,31 @@ public sealed class GozatCokluSecimTests : IDisposable
         Assert.Single(bosta.Kuyruklar);
     }
 
-    /// <summary>Gözat düğmesinin tıklaması aynı yoldan geçer; düğme seçiciye bağlı.</summary>
+    /// <summary>
+    /// Küçült sekmesinin Gözat düğmesi seçiciyi çoklu seçimle açar ve aynı yoldan geçer. Dönüştür
+    /// sekmesinin düğmesi tek seçimli kalır (orada kuyruk yok) ve tek dosyayı eskisi gibi yükler.
+    /// </summary>
     [Fact]
-    public void DugmeTiklamasiSeciciyiAcar()
+    public void KucultDugmesiCokluDonusturDugmesiTekSecimle()
     {
         var a = Dosya("a.mp4");
         var b = Dosya("b.mp4");
-        var olcu = Kos(new[] { a, b }, window =>
+        var kucult = Kos(new[] { a, b }, window =>
         {
             window.BtnBrowseEmpty.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             return null;
         });
+        var donustur = Kos(new[] { a }, window =>
+        {
+            window.BtnBrowseConvert.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            return null;
+        });
 
-        Assert.Equal(1, olcu.SeciciAcildi);
-        Assert.Equal(new[] { a, b }, Assert.Single(olcu.Kuyruklar));
+        Assert.Equal(new[] { true }, kucult.Coklu);
+        Assert.Equal(new[] { a, b }, Assert.Single(kucult.Kuyruklar));
+        Assert.Equal(new[] { false }, donustur.Coklu);
+        Assert.Equal(new[] { a }, donustur.Yuklenen);
+        Assert.Empty(donustur.Kuyruklar);
     }
 
     /// <summary>
@@ -184,7 +196,7 @@ public sealed class GozatCokluSecimTests : IDisposable
         var metin = Dosya("notlar.txt");
         var a = Dosya("a.mp4");
 
-        var gozat = Kos(new[] { b, metin, a }, window => window.BrowseAsync());
+        var gozat = Kos(new[] { b, metin, a }, window => window.BrowseAsync(true));
         var birakma = Kos(Array.Empty<string>(), window => Birak(window, b, metin, a));
         var tekBirakma = Kos(Array.Empty<string>(), window => Birak(window, a));
 
@@ -204,9 +216,9 @@ public sealed class GozatCokluSecimTests : IDisposable
     {
         var kaynak = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.axaml.cs"));
 
-        var secici = Regex.Match(kaynak, @"Task<IReadOnlyList<string>> PickSourcesAsync\(\)\s*\{(?<body>.*?)\n    \}", RegexOptions.Singleline);
+        var secici = Regex.Match(kaynak, @"Task<IReadOnlyList<string>> PickSourcesAsync\(bool multiple\)\s*\{(?<body>.*?)\n    \}", RegexOptions.Singleline);
         Assert.True(secici.Success);
-        Assert.Contains("AllowMultiple = true", secici.Groups["body"].Value, StringComparison.Ordinal);
+        Assert.Contains("AllowMultiple = multiple", secici.Groups["body"].Value, StringComparison.Ordinal);
 
         var birakma = Regex.Match(kaynak, @"void OnDrop\(object\? sender, DragEventArgs e\)\s*\{(?<body>.*?)\n    \}", RegexOptions.Singleline);
         Assert.True(birakma.Success);
