@@ -60,6 +60,9 @@ ship as part of it.
 - Recorder: the one-frame Desktop Duplication probe no longer outlives the app. When the
   desktop delivers no frame the probe never finishes on its own; it is now tied to the app
   process, so closing the app inside the five-second timeout ends it too.
+- Shrink: the quick target chips break into the same two rows in every language (four chips,
+  then the size chips and "+"). The row break used to follow the width of the translated
+  chip labels, so the strip looked different from one language to the next.
 
 ## [1.2.7] - 2026-10-05
 
