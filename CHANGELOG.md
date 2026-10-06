@@ -26,6 +26,12 @@ ship as part of it.
   open it also shows live figures: the decoder in use (software or the hardware decoder's
   name), dropped frames, the current bitrate and the displayed frame rate. Nothing is read
   from the engine while the panel is closed.
+- Editor: "Write Parts to Separate Files" saves every kept part of the timeline as its own
+  file (`<name>-01`, `-02`, …) instead of one joined file. The box sits behind the small
+  arrow button at the end of the delivery strip, which stays disabled until the timeline
+  has more than one part. Parts are written one after another with a single progress bar;
+  if a part fails the rest are not written and the status line names the part. Sharing
+  still uploads one joined file.
 
 ## [1.2.7] - 2026-10-05
 

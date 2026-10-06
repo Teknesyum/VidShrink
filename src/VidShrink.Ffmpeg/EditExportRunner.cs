@@ -4,6 +4,17 @@ using VidShrink.Core.Editing;
 
 namespace VidShrink.Ffmpeg;
 
+/// <summary>
+/// Parcalari ayri yazan teslimde dusen parca. <see cref="Index"/> cizelgedeki sifir tabanli siradir.
+/// </summary>
+public sealed class EditSegmentException(int index, int count, Exception inner)
+    : InvalidOperationException(inner.Message, inner)
+{
+    public int Index { get; } = index;
+
+    public int Count { get; } = count;
+}
+
 public static class EditExportRunner
 {
     public const string Stage = "export";
@@ -11,15 +22,77 @@ public static class EditExportRunner
     public static async Task<ExportPlan> PrepareAsync(
         string source, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes, CancellationToken ct = default)
     {
+        var (info, keyframes, startTime) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
+        var work = WorkDirectoryFor(outputPath);
+        return EditExport.Build(timeline, info, keyframes, startTime, mode, EncodeRunner.PartialPathFor(outputPath), work, memoryBudgetBytes)
+            with { OutputPath = outputPath };
+    }
+
+    /// <summary>
+    /// Her parcayi ayri dosyaya yazan planlar. Adlar <see cref="EditOutputName.Segments"/> ile
+    /// <paramref name="outputPath"/>'ten turer; her parcanin kendi yarim dosyasi ve is klasoru olur.
+    /// </summary>
+    public static async Task<IReadOnlyList<ExportPlan>> PrepareSegmentsAsync(
+        string source, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
+        Func<string, bool>? exists = null, CancellationToken ct = default)
+    {
+        var (info, keyframes, startTime) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
+        var outputs = EditOutputName.Segments(outputPath, timeline.Clips.Count, exists);
+        var partials = outputs.Select(EncodeRunner.PartialPathFor).ToArray();
+        var works = outputs.Select(WorkDirectoryFor).ToArray();
+        return EditExport.BuildSegments(timeline, info, keyframes, startTime, mode, partials, works, memoryBudgetBytes)
+            .Select((plan, i) => plan with { OutputPath = outputs[i] })
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Planlari sirayla, tek surecle kosar; ilerleme toplam is suresi uzerinden tek cubuga iner.
+    /// Bir parca duserse kalanlar yazilmaz ve <see cref="EditSegmentException"/> dusen parcayi soyler;
+    /// o ana dek tamamlanan dosyalar yerinde kalir, yarim dosya kalmaz. Iptal oldugu gibi yukari cikar.
+    /// </summary>
+    public static async Task RunSegmentsAsync(IReadOnlyList<ExportPlan> plans, IProgress<EncodeProgress>? progress, CancellationToken ct = default)
+    {
+        var total = Math.Max(0.001, plans.Sum(p => Math.Max(0.001, p.TotalWorkSeconds)));
+        var clock = Stopwatch.StartNew();
+        double done = 0;
+        for (var i = 0; i < plans.Count; i++)
+        {
+            ct.ThrowIfCancellationRequested();
+            var share = Math.Max(0.001, plans[i].TotalWorkSeconds) / total;
+            var scaled = progress is null ? null : new SegmentProgress(progress, done, share, clock);
+            try
+            {
+                await RunAsync(plans[i], scaled, ct).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+            {
+                throw new EditSegmentException(i, plans.Count, ex);
+            }
+
+            done += share;
+        }
+    }
+
+    private static async Task<(MediaInfo Info, IReadOnlyList<double> Keyframes, double StartTime)> ProbeAsync(
+        string source, ExportMode mode, CancellationToken ct)
+    {
         var info = await FfprobeClient.ProbeAsync(source, ct).ConfigureAwait(false);
         IReadOnlyList<double> keyframes = Array.Empty<double>();
         double startTime = 0;
         if (mode != ExportMode.Full)
             (keyframes, startTime) = EditExport.ParseKeyframes(await ProbeKeyframesAsync(source, ct).ConfigureAwait(false));
+        return (info, keyframes, startTime);
+    }
 
-        var work = WorkDirectoryFor(outputPath);
-        return EditExport.Build(timeline, info, keyframes, startTime, mode, EncodeRunner.PartialPathFor(outputPath), work, memoryBudgetBytes)
-            with { OutputPath = outputPath };
+    private sealed class SegmentProgress(IProgress<EncodeProgress> inner, double from, double share, Stopwatch clock) : IProgress<EncodeProgress>
+    {
+        public void Report(EncodeProgress value)
+        {
+            var fraction = Math.Clamp(from + Math.Clamp(value.Fraction, 0, 1) * share, 0, 1);
+            var elapsed = clock.Elapsed;
+            TimeSpan? remaining = fraction is > 0 and < 1 ? TimeSpan.FromSeconds(elapsed.TotalSeconds * (1 - fraction) / fraction) : null;
+            inner.Report(value with { Fraction = fraction, Elapsed = elapsed, Remaining = fraction >= 1 ? TimeSpan.Zero : remaining });
+        }
     }
 
     public static async Task RunAsync(ExportPlan plan, IProgress<EncodeProgress>? progress, CancellationToken ct = default)
