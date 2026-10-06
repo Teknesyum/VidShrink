@@ -533,8 +533,7 @@ public sealed class DuzenleyiciMetinTests
         }
         finally
         {
-            if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
-            KanitKapanisi.Kapat(Kanit);
+            KanitKapanisi.Kapat(Kanit, "metin-arayuz");
         }
     }
 }
