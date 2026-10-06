@@ -40,6 +40,18 @@ public sealed record MediaInfo
 
     public bool IsInterlaced { get; init; }
     public string? FieldOrder { get; init; }
+
+    /// <summary>ffprobe'un <c>profile</c> alani ("High", "Main 10", "Profile 0"); okunamazsa <c>null</c>.</summary>
+    public string? VideoProfile { get; init; }
+
+    /// <summary>Kabin video etiketi (<c>codec_tag_string</c>): "avc1", "hvc1", "hev1".</summary>
+    public string? VideoCodecTag { get; init; }
+
+    /// <summary>ffprobe'un <c>has_b_frames</c> alani: yeniden siralama gecikmesi, kare olarak.</summary>
+    public int VideoDelayFrames { get; init; }
+
+    /// <summary>ffprobe'un <c>format_name</c> alani ("mov,mp4,m4a,3gp,3g2,mj2", "matroska,webm").</summary>
+    public string? FormatName { get; init; }
     public IReadOnlyList<SourceStream> Streams { get; init; } = Array.Empty<SourceStream>();
 
     /// <summary>

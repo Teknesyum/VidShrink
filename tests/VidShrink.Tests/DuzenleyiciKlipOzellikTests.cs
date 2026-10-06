@@ -239,13 +239,14 @@ public sealed class DuzenleyiciKlipOzellikTests
     [InlineData(ExportMode.Smart)]
     public void AyarVarsaTamaDuserYoksaKipKalir(ExportMode kip)
     {
-        var yalin = EditExport.Build(EditTimeline.FromSource(S(10)), Bilgi(), Anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb);
+        var sinirlar = DuzenleyiciAkilliKodekTests.Sinirlar(Anahtarlar);
+        var yalin = EditExport.Build(EditTimeline.FromSource(S(10)), Bilgi(), Anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb, sinirlar);
         Assert.Equal(kip, yalin.Effective);
         Assert.False(yalin.EffectsForcedFull);
 
         var c = EditTimeline.FromSource(S(10));
         c.SetEffects(new[] { 0 }, e => e with { FadeIn = S(1) });
-        var plan = EditExport.Build(c, Bilgi(), Anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb);
+        var plan = EditExport.Build(c, Bilgi(), Anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb, sinirlar);
         Assert.Equal(ExportMode.Full, plan.Effective);
         Assert.True(plan.EffectsForcedFull);
         Assert.Contains("fade=t=in:st=0:d=1", Deger(plan.Steps[0].Args, "-filter_complex"));
@@ -255,7 +256,7 @@ public sealed class DuzenleyiciKlipOzellikTests
 
         c.SetEffects(new[] { 0 }, _ => ClipEffects.None);
         Assert.False(c.HasEffects);
-        Assert.Equal(kip, EditExport.Build(c, Bilgi(), Anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb).Effective);
+        Assert.Equal(kip, EditExport.Build(c, Bilgi(), Anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb, sinirlar).Effective);
     }
 
     [Fact]

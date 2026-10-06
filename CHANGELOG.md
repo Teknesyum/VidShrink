@@ -35,6 +35,11 @@ ship as part of it.
   has more than one part. Parts are written one after another with a single progress bar;
   if a part fails the rest are not written and the status line names the part. Sharing
   still uploads one joined file.
+- Editor: Smart export now also keeps the body lossless for AV1 and VP9 sources, and for
+  10-bit H.264, HEVC, AV1 and VP9. Only the edges are re-encoded, with the source's own codec
+  and profile. Sources with B-frames no longer lose or repeat frames at the joins, and an
+  `hvc1` tag is kept. MPEG-4 Part 2, MPEG-2, 4:2:2/4:4:4, interlaced and non-AAC sources, or
+  a missing encoder, fall back to Full as before.
 
 ## [1.2.7] - 2026-10-05
 

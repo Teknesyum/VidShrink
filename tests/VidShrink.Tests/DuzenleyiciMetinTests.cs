@@ -251,7 +251,8 @@ public sealed class DuzenleyiciMetinTests
     {
         var anahtarlar = new double[] { 0, 2, 4, 6, 8 };
         var yalin = EditTimeline.FromSource(S(10));
-        var yalinPlan = EditExport.Build(yalin, Bilgi(), anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb);
+        var sinirlar = DuzenleyiciAkilliKodekTests.Sinirlar(anahtarlar);
+        var yalinPlan = EditExport.Build(yalin, Bilgi(), anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb, sinirlar);
         Assert.Equal(kip, yalinPlan.Effective);
         Assert.False(yalinPlan.TextForcedFull);
         Assert.Null(yalinPlan.SubtitlePath);
@@ -259,7 +260,7 @@ public sealed class DuzenleyiciMetinTests
 
         var metinli = EditTimeline.FromSource(S(10));
         metinli.AddText(new TextLayer("Merhaba", S(1), S(3)));
-        var plan = EditExport.Build(metinli, Bilgi(), anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb);
+        var plan = EditExport.Build(metinli, Bilgi(), anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb, sinirlar);
         Assert.Equal(ExportMode.Full, plan.Effective);
         Assert.True(plan.TextForcedFull);
         Assert.True(plan.FellBackToFull);
