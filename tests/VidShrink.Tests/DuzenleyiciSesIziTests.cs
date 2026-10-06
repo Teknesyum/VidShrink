@@ -62,7 +62,7 @@ public sealed class DuzenleyiciSesIziTests
             var (cizelge, pencere) = Kur(UcKesim());
             var video = cizelge.VideoHeight;
             var ses = cizelge.AudioHeight;
-            var alt = cizelge.TracksBottom;
+            var alt = cizelge.StripBottom;
             var istenen = cizelge.DesiredSize.Height;
 
             cizelge.Resources["EditorVideoTrackHeight"] = video * 2.5;
@@ -71,7 +71,7 @@ public sealed class DuzenleyiciSesIziTests
             var buyukVideo = cizelge.VideoHeight;
             var buyukSes = cizelge.AudioHeight;
             var buyukIstenen = cizelge.DesiredSize.Height;
-            var buyukAlt = cizelge.TracksBottom;
+            var buyukAlt = cizelge.StripBottom;
             pencere.Close();
             return (video, ses, alt, istenen, buyukVideo, buyukSes, buyukIstenen, buyukAlt);
         });

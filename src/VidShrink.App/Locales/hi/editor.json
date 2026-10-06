@@ -91,5 +91,8 @@
   "editor.silence.none": "काटने के लिए कोई अंतराल नहीं।",
   "editor.silence.stale": "सेटिंग्स बदल गईं; फिर से स्कैन करें।",
   "editor.silence.failed": "स्कैन विफल: {0}",
-  "editor.silence.cut": "{0} अंतराल काटे गए।"
+  "editor.silence.cut": "{0} अंतराल काटे गए।",
+  "editor.scene.split": "दृश्य बदलावों पर विभाजित करें",
+  "editor.scene.none": "कोई दृश्य बदलाव नहीं मिला।",
+  "editor.scene.done": "{0} दृश्य बदलावों पर विभाजित किया गया।"
 }

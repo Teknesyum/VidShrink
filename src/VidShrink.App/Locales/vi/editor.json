@@ -91,5 +91,8 @@
   "editor.silence.none": "Không có đoạn nào để cắt.",
   "editor.silence.stale": "Cài đặt đã thay đổi; hãy quét lại.",
   "editor.silence.failed": "Quét thất bại: {0}",
-  "editor.silence.cut": "Đã cắt {0} đoạn."
+  "editor.silence.cut": "Đã cắt {0} đoạn.",
+  "editor.scene.split": "Tách tại các điểm chuyển cảnh",
+  "editor.scene.none": "Không tìm thấy điểm chuyển cảnh nào.",
+  "editor.scene.done": "Đã tách tại {0} điểm chuyển cảnh."
 }

@@ -91,5 +91,8 @@
   "editor.silence.none": "Geen bereiken om te knippen.",
   "editor.silence.stale": "Instellingen gewijzigd; scan opnieuw.",
   "editor.silence.failed": "Scannen mislukt: {0}",
-  "editor.silence.cut": "{0} bereiken geknipt."
+  "editor.silence.cut": "{0} bereiken geknipt.",
+  "editor.scene.split": "Splitsen bij scènewissels",
+  "editor.scene.none": "Geen scènewissels gevonden.",
+  "editor.scene.done": "Gesplitst bij {0} scènewissels."
 }

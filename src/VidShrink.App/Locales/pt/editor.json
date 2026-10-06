@@ -91,5 +91,8 @@
   "editor.silence.none": "Nenhum intervalo para cortar.",
   "editor.silence.stale": "As configurações mudaram; analise novamente.",
   "editor.silence.failed": "Falha na análise: {0}",
-  "editor.silence.cut": "{0} intervalos cortados."
+  "editor.silence.cut": "{0} intervalos cortados.",
+  "editor.scene.split": "Dividir nas mudanças de cena",
+  "editor.scene.none": "Nenhuma mudança de cena encontrada.",
+  "editor.scene.done": "Dividido em {0} mudanças de cena."
 }

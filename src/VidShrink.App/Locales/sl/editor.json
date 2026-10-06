@@ -91,5 +91,8 @@
   "editor.silence.none": "Ni obsegov za izrez.",
   "editor.silence.stale": "Nastavitve so se spremenile; skenirajte znova.",
   "editor.silence.failed": "Skeniranje ni uspelo: {0}",
-  "editor.silence.cut": "Izrezanih obsegov: {0}."
+  "editor.silence.cut": "Izrezanih obsegov: {0}.",
+  "editor.scene.split": "Razdeli ob menjavah prizora",
+  "editor.scene.none": "Ni najdenih menjav prizora.",
+  "editor.scene.done": "Razdeljeno ob menjavah prizora: {0}."
 }

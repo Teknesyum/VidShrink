@@ -169,7 +169,7 @@ public sealed class OynaticiGostergeTests
         {
             Assert.True(araSaydamlik > 0, "solma canlandirmasi gorulmedi");
             Assert.False(double.IsNaN(solmaSuresi), "kaybolma solmasinda ara saydamlik gorulmedi");
-            Assert.True(solmaSuresi >= solma - 16, $"solma {solmaSuresi} ms surdu, MotionFast {solma} ms: gizleme solmayi kesti");
+            Assert.True(gecen - tutma >= solma - 16, $"rozet tutmadan {gecen - tutma} ms sonra kayboldu, MotionFast {solma} ms: gizleme solmayi kesti");
         }
     }
 

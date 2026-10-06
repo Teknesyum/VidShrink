@@ -91,5 +91,8 @@
   "editor.silence.none": "אין טווחים לחיתוך.",
   "editor.silence.stale": "ההגדרות השתנו; סרוק שוב.",
   "editor.silence.failed": "הסריקה נכשלה: {0}",
-  "editor.silence.cut": "{0} טווחים נחתכו."
+  "editor.silence.cut": "{0} טווחים נחתכו.",
+  "editor.scene.split": "פיצול בחילופי סצנות",
+  "editor.scene.none": "לא נמצאו חילופי סצנות.",
+  "editor.scene.done": "פוצל ב-{0} חילופי סצנות."
 }

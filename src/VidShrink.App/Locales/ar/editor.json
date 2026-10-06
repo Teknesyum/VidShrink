@@ -91,5 +91,8 @@
   "editor.silence.none": "لا توجد نطاقات للقص.",
   "editor.silence.stale": "تغيّرت الإعدادات؛ أعد الفحص.",
   "editor.silence.failed": "فشل الفحص: {0}",
-  "editor.silence.cut": "تم قص {0} نطاق."
+  "editor.silence.cut": "تم قص {0} نطاق.",
+  "editor.scene.split": "تقسيم عند تغيّر المشاهد",
+  "editor.scene.none": "لم يُعثر على تغيّر في المشاهد.",
+  "editor.scene.done": "تم التقسيم عند {0} من تغيّرات المشاهد."
 }

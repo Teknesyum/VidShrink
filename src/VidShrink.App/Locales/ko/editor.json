@@ -91,5 +91,8 @@
   "editor.silence.none": "자를 구간이 없습니다.",
   "editor.silence.stale": "설정이 변경되었습니다. 다시 검색하세요.",
   "editor.silence.failed": "검색 실패: {0}",
-  "editor.silence.cut": "구간 {0}개를 잘랐습니다."
+  "editor.silence.cut": "구간 {0}개를 잘랐습니다.",
+  "editor.scene.split": "장면 전환에서 분할",
+  "editor.scene.none": "장면 전환을 찾지 못했습니다.",
+  "editor.scene.done": "장면 전환 {0}곳에서 분할했습니다."
 }

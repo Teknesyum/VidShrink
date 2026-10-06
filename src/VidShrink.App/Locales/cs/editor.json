@@ -91,5 +91,8 @@
   "editor.silence.none": "Žádné úseky k vystřižení.",
   "editor.silence.stale": "Nastavení se změnilo; prohledejte znovu.",
   "editor.silence.failed": "Prohledání selhalo: {0}",
-  "editor.silence.cut": "Vystřiženo úseků: {0}."
+  "editor.silence.cut": "Vystřiženo úseků: {0}.",
+  "editor.scene.split": "Rozdělit při změnách scény",
+  "editor.scene.none": "Nenalezeny žádné změny scény.",
+  "editor.scene.done": "Rozděleno při změnách scény: {0}."
 }

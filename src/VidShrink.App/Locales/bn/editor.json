@@ -91,5 +91,8 @@
   "editor.silence.none": "কাটার মতো কোনো পরিসর নেই।",
   "editor.silence.stale": "সেটিংস বদলেছে; আবার স্ক্যান করুন।",
   "editor.silence.failed": "স্ক্যান ব্যর্থ: {0}",
-  "editor.silence.cut": "{0}টি পরিসর কাটা হয়েছে।"
+  "editor.silence.cut": "{0}টি পরিসর কাটা হয়েছে।",
+  "editor.scene.split": "দৃশ্য পরিবর্তনে ভাগ করুন",
+  "editor.scene.none": "কোনো দৃশ্য পরিবর্তন পাওয়া যায়নি।",
+  "editor.scene.done": "{0}টি দৃশ্য পরিবর্তনে ভাগ করা হয়েছে।"
 }

@@ -202,6 +202,45 @@ public sealed class EditTimeline
     }
 
     /// <summary>
+    /// Butun parcalari kaynak sinirlarinda boler (<see cref="SceneSplit.Pieces"/>); hicbir parca
+    /// silinmez, sure degismez. Tek adimda geri alinir. Bolunen parca sayisi doner; hicbir sinir
+    /// kabul edilmezse 0 doner ve gecmise adim yazilmaz.
+    /// </summary>
+    public int SplitSource(IReadOnlyList<long> boundaries, long minPiece)
+    {
+        ArgumentNullException.ThrowIfNull(boundaries);
+
+        var plans = new List<(int Index, IReadOnlyList<EditClip> Pieces)>();
+        for (var i = 0; i < _clips.Count; i++)
+        {
+            var pieces = SceneSplit.Pieces(_clips[i], boundaries, minPiece);
+            if (pieces.Count > 1) plans.Add((i, pieces));
+        }
+
+        if (plans.Count == 0) return 0;
+
+        var steps = new List<IEditCommand>();
+        var added = 0;
+        for (var p = plans.Count - 1; p >= 0; p--)
+        {
+            var (index, pieces) = plans[p];
+            var first = new ReplaceCommand(index, _clips[index], pieces[0]);
+            first.Apply(_clips);
+            steps.Add(first);
+            for (var k = 1; k < pieces.Count; k++)
+            {
+                var insert = new InsertCommand(index + k, pieces[k]);
+                insert.Apply(_clips);
+                steps.Add(insert);
+                added++;
+            }
+        }
+
+        Record(new CompositeCommand(steps));
+        return added;
+    }
+
+    /// <summary>
     /// Kaynak araliklarinin cizelgede kapladigi yerler, sirali ve birlesik. Hizli, yavas ve ters
     /// parcada da dogru yere duser; silinmis kaynak cizelgede yer tutmaz.
     /// </summary>

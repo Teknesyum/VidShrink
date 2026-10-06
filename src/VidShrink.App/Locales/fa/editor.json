@@ -91,5 +91,8 @@
   "editor.silence.none": "بازه‌ای برای برش نیست.",
   "editor.silence.stale": "تنظیمات تغییر کرد؛ دوباره پویش کنید.",
   "editor.silence.failed": "پویش ناموفق بود: {0}",
-  "editor.silence.cut": "{0} بازه بریده شد."
+  "editor.silence.cut": "{0} بازه بریده شد.",
+  "editor.scene.split": "تقسیم در تغییر صحنه‌ها",
+  "editor.scene.none": "تغییر صحنه‌ای پیدا نشد.",
+  "editor.scene.done": "در {0} تغییر صحنه تقسیم شد."
 }
