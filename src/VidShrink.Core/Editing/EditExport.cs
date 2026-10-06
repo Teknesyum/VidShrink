@@ -10,7 +10,13 @@ public enum ExportMode
     Full
 }
 
-public sealed record ExportStep(IReadOnlyList<string> Args, double DurationSeconds, string? ListPath = null, string? ListContent = null);
+public sealed record ExportStep(IReadOnlyList<string> Args, double DurationSeconds, string? ListPath = null, string? ListContent = null)
+{
+    /// <summary>Akilli kesimin birlesiminde sesin ayri concat listesi; kosucu video listesiyle birlikte yazar.</summary>
+    public string? AudioListPath { get; init; }
+
+    public string? AudioListContent { get; init; }
+}
 
 public sealed record ExportPlan(
     ExportMode Requested,
@@ -56,6 +62,9 @@ public static class EditExport
 
     public const string SubtitleFileName = "text.ass";
 
+    public const string VideoListName = "list.ffconcat";
+    public const string AudioListName = "audio.ffconcat";
+
     private const double SeekNudgeSeconds = 0.001;
 
     private static readonly IReadOnlyDictionary<string, string> MatchingEncoders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -67,8 +76,18 @@ public static class EditExport
     public static bool NeedsReencode(EditClip clip) => clip.Speed != 1m || clip.Reversed;
 
     public static bool SupportsSegments(MediaInfo info)
-        => MatchingEncoders.ContainsKey(info.VideoCodec)
-           && (!info.HasAudio || string.Equals(info.AudioCodec, AudioCodec, StringComparison.OrdinalIgnoreCase));
+        => MatchingEncoders.ContainsKey(info.VideoCodec) && AudioCopies(info);
+
+    /// <summary>
+    /// Akilli kipin kapisi: ses kopyalanabilmeli, kesim noktalari okunmus olmali ve
+    /// <see cref="SmartCutCodec.Resolve"/> kaynaga bir kodlayici esleyebilmeli. Biri tutmazsa <c>null</c>.
+    /// </summary>
+    public static SmartCutEncoding? SmartEncoding(
+        MediaInfo info, IReadOnlyList<SmartCutPoint>? cuts, Func<string, bool>? hasEncoder = null)
+        => cuts is { Count: > 0 } && AudioCopies(info) ? SmartCutCodec.Resolve(info, hasEncoder) : null;
+
+    private static bool AudioCopies(MediaInfo info)
+        => !info.HasAudio || string.Equals(info.AudioCodec, AudioCodec, StringComparison.OrdinalIgnoreCase);
 
     public static IReadOnlyList<double> AtempoChain(decimal speed)
     {
@@ -142,13 +161,15 @@ public static class EditExport
 
     public static ExportPlan Build(
         EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes, double startTime,
-        ExportMode mode, string outputPath, string workDirectory, long memoryBudgetBytes)
+        ExportMode mode, string outputPath, string workDirectory, long memoryBudgetBytes,
+        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
 
         var effective = mode;
         var anySpecial = timeline.Clips.Any(NeedsReencode);
-        if (mode == ExportMode.Smart && !SupportsSegments(info)) effective = ExportMode.Full;
+        var smart = mode == ExportMode.Smart ? SmartEncoding(info, cuts, hasEncoder) : null;
+        if (mode == ExportMode.Smart && smart is null) effective = ExportMode.Full;
         if (mode == ExportMode.Fast && anySpecial && !SupportsSegments(info)) effective = ExportMode.Full;
         if (mode != ExportMode.Full && keyframes.Count == 0) effective = ExportMode.Full;
         var textForced = mode != ExportMode.Full && effective != ExportMode.Full && timeline.HasText;
@@ -162,8 +183,9 @@ public static class EditExport
         var plan = effective switch
         {
             ExportMode.Full => Full(timeline, info, mode, outputPath, workDirectory, limit, over),
+            ExportMode.Smart => SmartSegmented(timeline, info, smart!, cuts!, keyframes, outputPath, workDirectory, limit, over),
             ExportMode.Fast when !anySpecial => FastDirect(timeline, info, keyframes, startTime, outputPath, workDirectory, limit, over),
-            _ => Segmented(timeline, info, keyframes, mode, effective, outputPath, workDirectory, limit, over)
+            _ => Segmented(timeline, info, keyframes, outputPath, workDirectory, limit, over)
         };
         return plan with { MotionClips = motion, TextForcedFull = textForced, EffectsForcedFull = effectsForced };
     }
@@ -177,7 +199,8 @@ public static class EditExport
     /// </summary>
     public static IReadOnlyList<ExportPlan> BuildSegments(
         EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes, double startTime,
-        ExportMode mode, IReadOnlyList<string> outputPaths, IReadOnlyList<string> workDirectories, long memoryBudgetBytes)
+        ExportMode mode, IReadOnlyList<string> outputPaths, IReadOnlyList<string> workDirectories, long memoryBudgetBytes,
+        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         if (outputPaths.Count != timeline.Clips.Count)
@@ -185,13 +208,13 @@ public static class EditExport
         if (workDirectories.Count != timeline.Clips.Count)
             throw new ArgumentException("Her parcaya bir is klasoru gerekir", nameof(workDirectories));
 
-        var whole = Build(timeline, info, keyframes, startTime, mode, outputPaths[0], workDirectories[0], memoryBudgetBytes);
+        var whole = Build(timeline, info, keyframes, startTime, mode, outputPaths[0], workDirectories[0], memoryBudgetBytes, cuts, hasEncoder);
         var plans = new List<ExportPlan>(timeline.Clips.Count);
         for (var i = 0; i < timeline.Clips.Count; i++)
         {
             var index = i;
             var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i));
-            var plan = Build(piece, info, keyframes, startTime, whole.Effective, outputPaths[i], workDirectories[i], memoryBudgetBytes);
+            var plan = Build(piece, info, keyframes, startTime, whole.Effective, outputPaths[i], workDirectories[i], memoryBudgetBytes, cuts, hasEncoder);
             plans.Add(plan with
             {
                 Requested = mode,
@@ -305,7 +328,7 @@ public static class EditExport
             list.Append("outpoint ").Append(Number(end + startTime)).Append('\n');
         }
 
-        var listPath = Path.Combine(work, "list.ffconcat");
+        var listPath = Path.Combine(work, VideoListName);
         var args = new List<string> { "-hide_banner", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", listPath, "-map", "0:v:0" };
         if (info.HasAudio) args.AddRange(new[] { "-map", "0:a:0" });
         args.AddRange(new[] { "-c", "copy" });
@@ -317,16 +340,15 @@ public static class EditExport
     }
 
     private static ExportPlan Segmented(
-        EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes, ExportMode requested, ExportMode effective,
+        EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes,
         string output, string work, double limit, IReadOnlyList<int> over)
     {
         var steps = new List<ExportStep>();
         var segments = new List<string>();
         double expected = 0;
 
-        for (var i = 0; i < timeline.Clips.Count; i++)
+        foreach (var clip in timeline.Clips)
         {
-            var clip = timeline.Clips[i];
             var start = EditTime.ToSeconds(clip.SourceStart);
             var end = EditTime.ToSeconds(clip.SourceEnd);
 
@@ -338,32 +360,14 @@ public static class EditExport
                 continue;
             }
 
-            if (effective == ExportMode.Fast)
-            {
-                var inpoint = KeyframeAtOrBefore(keyframes, start);
-                steps.Add(Copy(info, inpoint, end - inpoint, Segment(work, segments)));
-                expected += end - inpoint;
-                continue;
-            }
-
-            var bodyStart = KeyframeAtOrAfter(keyframes, start);
-            var bodyEnd = KeyframeAtOrBefore(keyframes, end);
-            if (bodyStart is not { } a || bodyEnd <= a)
-            {
-                steps.Add(Encode(info, start, end - start, string.Empty, string.Empty, Segment(work, segments)));
-                expected += end - start;
-                continue;
-            }
-
-            if (a > start) steps.Add(Encode(info, start, a - start, string.Empty, string.Empty, Segment(work, segments)));
-            steps.Add(Copy(info, a, bodyEnd - a, Segment(work, segments)));
-            if (end > bodyEnd) steps.Add(Encode(info, bodyEnd, end - bodyEnd, string.Empty, string.Empty, Segment(work, segments)));
-            expected += end - start;
+            var inpoint = KeyframeAtOrBefore(keyframes, start);
+            steps.Add(Copy(info, inpoint, end - inpoint, Segment(work, segments)));
+            expected += end - inpoint;
         }
 
         var list = new StringBuilder("ffconcat version 1.0\n");
         foreach (var segment in segments) list.Append("file ").Append(Quote(segment)).Append('\n');
-        var listPath = Path.Combine(work, "list.ffconcat");
+        var listPath = Path.Combine(work, VideoListName);
         var join = new List<string> { "-hide_banner", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", listPath, "-map", "0:v:0" };
         if (info.HasAudio) join.AddRange(new[] { "-map", "0:a:0" });
         join.AddRange(new[] { "-c", "copy" });
@@ -371,7 +375,160 @@ public static class EditExport
         join.Add(output);
         steps.Add(new ExportStep(join, expected, listPath, list.ToString()));
 
-        return new ExportPlan(requested, effective, steps, over, limit, output, work);
+        return new ExportPlan(ExportMode.Fast, ExportMode.Fast, steps, over, limit, output, work);
+    }
+
+    /// <summary>
+    /// Akilli kesim. Goruntu ve ses ayri parcalara yazilir, iki concat listesiyle birlestirilir:
+    /// govde <c>-c copy</c> ile kare sayisina gore kesilir (<c>-t</c> kopyada DTS'e bakar ve B kareli
+    /// akista fazladan paket birakir), kenarlar kaynagin kodegiyle kodlanir, ses klip basina tek
+    /// parca kopyalanir. Her parcanin suresi listede yazilir; yoksa concat suresi paketten tahmin eder.
+    /// Temiz sinir bulunamayan klip butunuyle kodlanir.
+    /// </summary>
+    private static ExportPlan SmartSegmented(
+        EditTimeline timeline, MediaInfo info, SmartCutEncoding encoding, IReadOnlyList<SmartCutPoint> cuts,
+        IReadOnlyList<double> keyframes, string output, string work, double limit, IReadOnlyList<int> over)
+    {
+        var steps = new List<ExportStep>();
+        var video = new StringBuilder("ffconcat version 1.0\n");
+        var audio = new StringBuilder("ffconcat version 1.0\n");
+        var videoParts = 0;
+        var audioParts = 0;
+        var nudge = SmartCutCodec.CopySeekNudge(info);
+        double expected = 0;
+
+        string VideoPart(double length)
+        {
+            var path = Path.Combine(work, "v" + (videoParts++).ToString("D4", CultureInfo.InvariantCulture) + encoding.Extension);
+            video.Append("file ").Append(Quote(path)).Append("\nduration ").Append(Number(length)).Append('\n');
+            return path;
+        }
+
+        string AudioPart(double length)
+        {
+            var path = Path.Combine(work, "a" + (audioParts++).ToString("D4", CultureInfo.InvariantCulture) + ".ts");
+            audio.Append("file ").Append(Quote(path)).Append("\nduration ").Append(Number(length)).Append('\n');
+            return path;
+        }
+
+        foreach (var clip in timeline.Clips)
+        {
+            var start = EditTime.ToSeconds(clip.SourceStart);
+            var end = EditTime.ToSeconds(clip.SourceEnd);
+
+            if (NeedsReencode(clip))
+            {
+                var length = EditTime.ToSeconds(clip.TimelineLength);
+                steps.Add(SmartEncode(info, encoding, start, end - start, VideoMotion(clip, info), VideoPart(length)));
+                if (info.HasAudio) steps.Add(AudioEncode(info, start, end - start, AudioMotion(clip), AudioPart(length)));
+                expected += length;
+                continue;
+            }
+
+            if (SmartBody(cuts, keyframes, start, end, nudge) is var (a, b))
+            {
+                if (a.Time > start + 1e-6) steps.Add(SmartEncode(info, encoding, start, a.Time - start, string.Empty, VideoPart(a.Time - start)));
+                steps.Add(SmartCopy(info, encoding, a.Time + nudge, b.Time - a.Time, b.Packet - a.Packet, VideoPart(b.Time - a.Time)));
+                if (end > b.Time + 1e-6) steps.Add(SmartEncode(info, encoding, b.Time, end - b.Time, string.Empty, VideoPart(end - b.Time)));
+            }
+            else
+            {
+                steps.Add(SmartEncode(info, encoding, start, end - start, string.Empty, VideoPart(end - start)));
+            }
+
+            if (info.HasAudio) steps.Add(AudioCopy(info, start, end - start, AudioPart(end - start)));
+            expected += end - start;
+        }
+
+        var videoList = Path.Combine(work, VideoListName);
+        var audioList = Path.Combine(work, AudioListName);
+        var join = new List<string> { "-hide_banner", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", videoList };
+        if (info.HasAudio) join.AddRange(new[] { "-f", "concat", "-safe", "0", "-i", audioList });
+        join.AddRange(new[] { "-map", "0:v:0" });
+        if (info.HasAudio) join.AddRange(new[] { "-map", "1:a:0" });
+        join.AddRange(new[] { "-c", "copy" });
+        if (encoding.OutputTag is { } tag && IsMp4Family(output)) join.AddRange(new[] { "-tag:v", tag });
+        join.AddRange(Faststart(output));
+        join.Add(output);
+        steps.Add(new ExportStep(join, expected, videoList, video.ToString())
+        {
+            AudioListPath = info.HasAudio ? audioList : null,
+            AudioListContent = info.HasAudio ? audio.ToString() : null
+        });
+
+        return new ExportPlan(ExportMode.Smart, ExportMode.Smart, steps, over, limit, output, work);
+    }
+
+    /// <summary>
+    /// Klibin icine dusen ilk ve son temiz sinir. Arama payi bir sonraki anahtar kareyi asiyorsa
+    /// kopya yanlis GOP'tan baslar; o klipte govde yok sayilir.
+    /// </summary>
+    private static (SmartCutPoint Start, SmartCutPoint End)? SmartBody(
+        IReadOnlyList<SmartCutPoint> cuts, IReadOnlyList<double> keyframes, double start, double end, double nudge)
+    {
+        SmartCutPoint? first = null;
+        SmartCutPoint? last = null;
+        foreach (var cut in cuts)
+        {
+            if (cut.Time < start - 1e-6 || cut.Time > end + 1e-6) continue;
+            first ??= cut;
+            last = cut;
+        }
+
+        if (first is not { } a || last is not { } b || b.Time <= a.Time + 1e-6 || b.Packet <= a.Packet) return null;
+        if (keyframes.Any(k => k > a.Time + 1e-6 && k <= a.Time + nudge + SeekNudgeSeconds)) return null;
+        return (a, b);
+    }
+
+    private static ExportStep SmartEncode(MediaInfo info, SmartCutEncoding encoding, double start, double length, string motion, string target)
+    {
+        var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
+        if (start > 0) args.AddRange(new[] { "-ss", Number(start) });
+        args.AddRange(new[] { "-t", Number(length), "-i", info.FilePath, "-map", "0:v:0", "-an", "-vf", "setpts=PTS-STARTPTS" + motion });
+        args.AddRange(encoding.VideoArgs);
+        args.AddRange(Intermediate(encoding, target));
+        return new ExportStep(args, length);
+    }
+
+    private static ExportStep SmartCopy(MediaInfo info, SmartCutEncoding encoding, double seek, double length, int frames, string target)
+    {
+        var args = new List<string>
+        {
+            "-hide_banner", "-nostdin", "-y", "-ss", Number(seek), "-i", info.FilePath, "-t", Number(length),
+            "-map", "0:v:0", "-an", "-c", "copy", "-frames:v", frames.ToString(CultureInfo.InvariantCulture),
+            "-avoid_negative_ts", "make_zero"
+        };
+        args.AddRange(Intermediate(encoding, target));
+        return new ExportStep(args, length);
+    }
+
+    private static IEnumerable<string> Intermediate(SmartCutEncoding encoding, string target)
+        => encoding.Container == SmartCutCodec.Mp4
+            ? new[] { "-video_track_timescale", SmartCutCodec.IntermediateTimescale, "-f", encoding.Container, target }
+            : new[] { "-f", encoding.Container, target };
+
+    private static ExportStep AudioCopy(MediaInfo info, double start, double length, string target)
+    {
+        var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
+        if (start > 0) args.AddRange(new[] { "-ss", Number(start) });
+        args.AddRange(new[]
+        {
+            "-i", info.FilePath, "-ss", "0", "-t", Number(length), "-map", "0:a:0", "-vn", "-c", "copy",
+            "-avoid_negative_ts", "make_zero", "-f", SmartCutCodec.TransportStream, target
+        });
+        return new ExportStep(args, length);
+    }
+
+    private static ExportStep AudioEncode(MediaInfo info, double start, double length, string motion, string target)
+    {
+        var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
+        if (start > 0) args.AddRange(new[] { "-ss", Number(start) });
+        args.AddRange(new[]
+        {
+            "-t", Number(length), "-i", info.FilePath, "-map", "0:a:0", "-vn", "-af", "asetpts=PTS-STARTPTS" + motion,
+            "-c:a", AudioCodec, "-b:a", "192k", "-f", SmartCutCodec.TransportStream, target
+        });
+        return new ExportStep(args, length);
     }
 
     private static ExportStep Copy(MediaInfo info, double start, double length, string target)
@@ -438,18 +595,11 @@ public static class EditExport
         return best;
     }
 
-    private static double? KeyframeAtOrAfter(IReadOnlyList<double> keyframes, double at)
-    {
-        foreach (var k in keyframes)
-            if (k >= at - 1e-6) return k;
-        return null;
-    }
-
     private static IEnumerable<string> Faststart(string output)
-    {
-        var ext = Path.GetExtension(output).ToLowerInvariant();
-        return ext is ".mp4" or ".m4v" or ".mov" ? new[] { "-movflags", "+faststart" } : Array.Empty<string>();
-    }
+        => IsMp4Family(output) ? new[] { "-movflags", "+faststart" } : Array.Empty<string>();
+
+    private static bool IsMp4Family(string output)
+        => Path.GetExtension(output).ToLowerInvariant() is ".mp4" or ".m4v" or ".mov";
 
     private static string Quote(string path) => "'" + path.Replace('\\', '/').Replace("'", "'\\''") + "'";
 
