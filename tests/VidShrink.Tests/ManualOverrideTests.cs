@@ -1087,7 +1087,8 @@ public sealed class ManualOverrideTests
         // O3: DeliveredContainer on ayarin teslim kabi (MOV, MKV ...). Kapali sabit degil, istegin
         // kendisi; bos kalinca kap plandan turer ve bugunku davranis o.
         "DeliveredContainer",
-        "DropMetadata", "SubtitleLanguages", "FirstSubtitleOnly"
+        "DropMetadata", "SubtitleLanguages", "FirstSubtitleOnly",
+        "FrameRate", "MaxFps"
     };
 
     [Fact]

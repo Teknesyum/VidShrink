@@ -9,6 +9,11 @@ ship as part of it.
 
 ### Added
 
+- CLI: frame rate mode. `--sabit-kare` / `--cfr` writes a constant frame rate (`-r` plus
+  `-fps_mode cfr`), `--tavan-kare` / `--pfr` keeps the source's variable timing and drops only
+  the frames that come faster than `--kare-hizi` / `--fps N` (`-enc_time_base 1/N` plus
+  `-fps_mode vfr`). `--fps` alone means `--pfr`; both modes together, or `--pfr` without a
+  ceiling, are rejected. Any of the three forces a re-encode. Not available in `izle`.
 - Shrink: the Browse file picker accepts several files at once. One file loads into the
   window as before; several videos open the same batch queue as dropping them does. The
   Convert tab's picker stays single-file.

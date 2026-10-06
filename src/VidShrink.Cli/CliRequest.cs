@@ -131,6 +131,18 @@ public sealed record CliRequest
     /// <summary><c>--ilk-altyazi</c>: kaynagin yalniz ilk altyazisi tasinir.</summary>
     public bool FirstSubtitleOnly { get; init; }
 
+    /// <summary><c>--sabit-kare</c> (HandBrake <c>--cfr</c>): cikti sabit kare hizinda yazilir.</summary>
+    public bool ConstantFrameRate { get; init; }
+
+    /// <summary><c>--tavan-kare</c> (HandBrake <c>--pfr</c>): degisken hiz korunur, <see cref="FrameRate"/> tavandir.</summary>
+    public bool PeakFrameRate { get; init; }
+
+    /// <summary>
+    /// <c>--kare-hizi</c> (HandBrake <c>--rate</c>): kare hizi tavani. Kip verilmezse HandBrake'teki
+    /// gibi tavanli degisken hiz sayilir.
+    /// </summary>
+    public double? FrameRate { get; init; }
+
     /// <summary>
     /// <see cref="SubtitleFiles"/> ve <see cref="SidecarSubtitles"/>'in diskten cozulmus hali;
     /// <see cref="ResolvedSubtitles"/> doldurur.
@@ -250,6 +262,10 @@ public sealed record CliRequest
         options.DropMetadata = DropMetadata;
         options.SubtitleLanguages = SubtitleLanguages;
         options.FirstSubtitleOnly = FirstSubtitleOnly;
+        options.MaxFps = FrameRate;
+        options.FrameRate = ConstantFrameRate ? FrameRateMode.Constant
+            : PeakFrameRate || FrameRate is not null ? FrameRateMode.Peak
+            : FrameRateMode.Auto;
         if (Codec == CliCodec.Hevc) options.LockedCodec = "libx265";
         if (Codec == CliCodec.Vp9) options.LockedCodec = "libvpx-vp9";
         options.LockedCrf = Crf;
@@ -271,6 +287,8 @@ public static class CliParser
     public const double MaxQuality = 100;
     public const double MinCrf = 0;
     public const double MaxCrf = 63;
+    public const double MinFrameRate = 1;
+    public const double MaxFrameRate = 240;
 
     /// <summary>Motorun yazabildigi kaplar; <c>--cikti</c> baska bir uzanti tasiyorsa komut durur.</summary>
     public static readonly IReadOnlySet<string> OutputExtensions =
@@ -287,6 +305,7 @@ public static class CliParser
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
         "--yak", "--burn", "--meta-yok", "--no-metadata",
         "--altyazi-dil", "--subtitle-lang", "--ilk-altyazi", "--first-subtitle",
+        "--sabit-kare", "--cfr", "--tavan-kare", "--pfr", "--kare-hizi", "--fps",
     };
 
     public static CliParseResult Parse(IReadOnlyList<string> args)
@@ -489,6 +508,18 @@ public static class CliParser
                 case "--ilk-altyazi" or "--first-subtitle" when command != CliCommand.Watch:
                     request = request with { FirstSubtitleOnly = true };
                     break;
+                case "--sabit-kare" or "--cfr" when command != CliCommand.Watch:
+                    request = request with { ConstantFrameRate = true };
+                    break;
+                case "--tavan-kare" or "--pfr" when command != CliCommand.Watch:
+                    request = request with { PeakFrameRate = true };
+                    break;
+                case "--kare-hizi" or "--fps" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var kareHizi)) return Fail("error.missing-value", arg);
+                    if (!TryParseNumber(kareHizi, out var hiz) || hiz < MinFrameRate || hiz > MaxFrameRate)
+                        return Fail("error.bad-fps", kareHizi);
+                    request = request with { FrameRate = hiz };
+                    break;
                 case "--json":
                     request = request with { Json = true };
                     break;
@@ -512,6 +543,8 @@ public static class CliParser
 
         if (request.MinDurationSeconds is { } enAz && request.MaxDurationSeconds is { } enCok && enCok < enAz)
             return Fail("error.bad-max-duration", enCok.ToString(CultureInfo.InvariantCulture));
+        if (request.ConstantFrameRate && request.PeakFrameRate) return Fail("error.cfr-and-pfr", null);
+        if (request.PeakFrameRate && request.FrameRate is null) return Fail("error.pfr-needs-fps", null);
         if (request.Input is null) return Fail(command == CliCommand.Watch ? "error.watch-no-folder" : "error.no-input", null);
         if (command == CliCommand.Watch && request.Output is null) return Fail("error.watch-no-output", null);
         if (request.TargetMb is not null && request.Quality is not null) return Fail("error.target-or-quality", null);

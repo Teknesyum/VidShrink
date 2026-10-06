@@ -151,6 +151,15 @@ public sealed class PlanOptions
 
     /// <summary>Kaynagin (dil suzgecinden gecen) yalniz ilk altyazisi tasinir.</summary>
     public bool FirstSubtitleOnly { get; set; }
+
+    /// <summary>Ciktinin kare zamanlamasi; <see cref="FrameRateMode.Auto"/> disindaki her deger kopyalama yolunu kapatir.</summary>
+    public FrameRateMode FrameRate { get; set; }
+
+    /// <summary>
+    /// Kare hizi tavani. Plan kaynagin hizi yerine bunu gorur (kaynak daha yavassa etkisiz); motor
+    /// butce icin altina inebilir, ustune cikmaz.
+    /// </summary>
+    public double? MaxFps { get; set; }
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -306,8 +315,12 @@ public static class PlanCalculator
         var probe = new ProbeState();
         var filters = options.Filters ?? VideoFilterOptions.Default;
         var trimmed = options.Trim is { } trim ? trim.Apply(info) : info;
-        var result = BuildDetailedCore(VideoFilterChain.PlannedSource(trimmed, filters), options, profile, availability, probe);
+        var planned = VideoFilterChain.PlannedSource(trimmed, filters);
+        if (options.MaxFps is double tavan && tavan > 0 && tavan < planned.Fps) planned = planned with { Fps = tavan };
+        var result = BuildDetailedCore(planned, options, profile, availability, probe);
         result.Plan.Trim = options.Trim;
+        result.Plan.FrameRate = options.FrameRate;
+        result.Plan.FrameRateCeiling = options.MaxFps;
         result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
         result.Plan.Filters = filters;
         result.Plan.SuggestedCrop = filters.Crop is null ? options.DetectedCrop : null;
@@ -986,7 +999,9 @@ public static class PlanCalculator
         || options.ExternalSubtitles.Count > 0
         || options.DropMetadata
         || options.SubtitleLanguages.Count > 0
-        || options.FirstSubtitleOnly;
+        || options.FirstSubtitleOnly
+        || options.FrameRate != FrameRateMode.Auto
+        || options.MaxFps is not null;
 
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {
@@ -1229,7 +1244,9 @@ public static class PlanCalculator
         ExternalSubtitles = options.ExternalSubtitles,
         DropMetadata = options.DropMetadata,
         SubtitleLanguages = options.SubtitleLanguages,
-        FirstSubtitleOnly = options.FirstSubtitleOnly
+        FirstSubtitleOnly = options.FirstSubtitleOnly,
+        FrameRate = options.FrameRate,
+        MaxFps = options.MaxFps
     };
 
     /// <summary>

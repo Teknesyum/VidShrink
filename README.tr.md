@@ -255,6 +255,9 @@ bunların tek yazımı var.
 | `--meta-yok` | `--no-metadata` |
 | `--altyazi-dil` | `--subtitle-lang` |
 | `--ilk-altyazi` | `--first-subtitle` |
+| `--sabit-kare` | `--cfr` |
+| `--tavan-kare` | `--pfr` |
+| `--kare-hizi` | `--fps` |
 | `--profiller` | `--presets` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |

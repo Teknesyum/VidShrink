@@ -552,6 +552,7 @@ public static class FfmpegArguments
         var filters = VideoFilterChain.Filters(info, plan);
         if (filters.Count > 0)
             a.AddRange(new[] { cover ? "-filter:v:0" : "-vf", string.Join(',', filters) });
+        a.AddRange(VideoFilterChain.FrameRateArgs(info, plan, cover ? ":v:0" : ""));
 
         a.AddRange(new[] { cover ? "-c:v:0" : "-c:v", plan.Codec });
         a.AddRange(SpeedArgs(plan.Codec, pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset));
