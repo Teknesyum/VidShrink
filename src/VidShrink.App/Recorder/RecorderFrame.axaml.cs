@@ -47,8 +47,6 @@ internal partial class RecorderFrame : Window
         return screens.Any(s => s.Contains(outer)) ? outer : region;
     }
 
-    internal const uint ExcludeFromCaptureAffinity = 0x11;
-
     internal bool ExcludeFromCapture { get; init; } = true;
 
     internal bool CaptureExcluded { get; private set; }
@@ -123,7 +121,7 @@ internal partial class RecorderFrame : Window
         if (!OperatingSystem.IsWindows() || TryGetPlatformHandle() is not { } handle) return;
         var current = GetWindowLongPtr(handle.Handle, GwlExStyle).ToInt64();
         SetWindowLongPtr(handle.Handle, GwlExStyle, new IntPtr(ClickThroughStyle(current)));
-        if (ExcludeFromCapture) CaptureExcluded = SetWindowDisplayAffinity(handle.Handle, ExcludeFromCaptureAffinity);
+        if (ExcludeFromCapture) CaptureExcluded = CaptureAffinity.Exclude(handle.Handle);
         ApplyShape();
     }
 
@@ -165,9 +163,6 @@ internal partial class RecorderFrame : Window
 
     [DllImport("user32.dll")]
     private static extern bool ClientToScreen(IntPtr hwnd, ref NativePoint point);
-
-    [DllImport("user32.dll")]
-    private static extern bool SetWindowDisplayAffinity(IntPtr hwnd, uint affinity);
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
     private static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int index);
