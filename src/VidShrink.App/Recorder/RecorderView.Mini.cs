@@ -157,6 +157,7 @@ internal partial class RecorderView
     {
         if (_mini is null) return;
         _mini.Follow(State, TxtElapsed.Text ?? string.Empty, CountdownLeft);
+        _mini.ShowChapter(ChapterText);
         _mini.ShowOptions(
             ChkShowClicks.IsChecked ?? false,
             ChkClickSound.IsChecked ?? false,

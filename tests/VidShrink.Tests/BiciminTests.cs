@@ -1228,6 +1228,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-06, parcalari ayri dosyalara yazma: uc yeni <c>editor.export.*</c> anahtarindan (<c>separate</c>, <c>segments-done</c>, <c>segment-failed</c>) 15 kol 10 dilde (separate: cs, en, pl, sk; segments-done: cs, en, it, pl, sk; segment-failed: en, fr, hr, nl, ro, sl), KOL dokumunden sayildi, tr girmiyor. Meta veri kutusuyla birlikte: 2993 + 15 = 3008, en 291 + 3 = 294, tr 103.</para>
     /// <para>2026-10-06, sahne degisimlerinden bolme: uc yeni <c>editor.scene.*</c> anahtarindan yalniz <c>editor.scene.split</c> 7 dilde kola giriyor (de, en, es, fr, pt, ro, sw), KOL dokumunden sayildi, tr girmiyor: Parcalari ayri yazmayla birlikte: 3008 + 7 = 3015, en 294 + 1 = 295, tr 103.</para>
     /// <para>2026-10-06, kaydedici ses seviyesi gostergesi: uc yeni <c>recorder.audio.level.*</c> anahtarindan ikisi 4 kol 3 dilde (microphone: pt; system: pt, ro, sw), KOL dokumunden sayildi, en ve tr girmiyor. Sahne bolmeyle birlikte: 3015 + 4 = 3019, en 295, tr 103.</para>
+    /// <para>2026-10-06, kayitta bolum isareti: bes yeni anahtardan (<c>recorder.hotkeys.chapter</c>, <c>recorder.chapter.marked</c>, <c>.title</c>, <c>.unsupported</c>, <c>.failed</c>) yalniz <c>recorder.hotkeys.chapter</c> 2 dilde kola giriyor (en, sw), KOL dokumunden sayildi, tr girmiyor. Ses gostergesiyle birlikte: 3019 + 2 = 3021, en 295 + 1 = 296, tr 103.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1253,8 +1254,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3019, toplam);
-        Assert.Equal(295, dilBasina["en"]);
+        Assert.Equal(3021, toplam);
+        Assert.Equal(296, dilBasina["en"]);
         Assert.Equal(103, dilBasina["tr"]);
     }
 
@@ -1461,6 +1462,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-06, parcalari ayri dosyalara yazma: uc yeni anahtar (<c>editor.export.separate</c>, <c>.segments-done</c>, <c>.segment-failed</c>), dusen yok. Meta veri kutusuyla birlikte: 1322 + 3 = 1325, 43 x 1325 = 56975. <c>kayip</c> 0.</para>
     /// <para>2026-10-06, sahne degisimlerinden bolme: uc yeni anahtar (<c>editor.scene.split</c>, <c>-none</c>, <c>-done</c>), dusen yok. Parcalari ayri yazmayla birlikte: 1325 + 3 = 1328, 43 x 1328 = 57104. <c>kayip</c> 0.</para>
     /// <para>2026-10-06, kaydedici ses seviyesi gostergesi: uc yeni anahtar (<c>recorder.audio.level.microphone</c>, <c>.system</c>, <c>.hint</c>), dusen yok. Sahne bolmeyle birlikte: 1328 + 3 = 1331, 43 x 1331 = 57233. <c>kayip</c> 0.</para>
+    /// <para>2026-10-06, kayitta bolum isareti: bes yeni anahtar (<c>recorder.hotkeys.chapter</c>, <c>recorder.chapter.marked</c>, <c>.title</c>, <c>.unsupported</c>, <c>.failed</c>), dusen yok. Ses gostergesiyle birlikte: 1331 + 5 = 1336, 43 x 1336 = 57448. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1488,7 +1490,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(57233, gezilen);
+        Assert.Equal(57448, gezilen);
         Assert.Empty(kayip);
     }
 

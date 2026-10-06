@@ -184,6 +184,7 @@ internal partial class RecorderView : UserControl
         BtnToPlayer.IsEnabled = !result.Partial || result.Playable != false;
         BtnToShrink.IsEnabled = !result.Partial || result.Playable != false;
         var exitCode = result.ExitCode.ToString(CultureInfo.InvariantCulture);
+        var warned = true;
 
         if (result.Partial)
         {
@@ -206,6 +207,12 @@ internal partial class RecorderView : UserControl
             TxtWarning.Text = Say("recorder.output.not-moved", neden);
             DurumuGoster(uyari: true);
         }
+        else
+        {
+            warned = false;
+        }
+
+        ShowLostChapters(result, warned);
     }
 
     /// <summary>

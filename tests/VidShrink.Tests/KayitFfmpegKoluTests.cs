@@ -1167,7 +1167,7 @@ public sealed class KayitFfmpegKoluTests
         Assert.Contains("RecorderArguments.CaptureRequest(request)", kaynak);
         Assert.Contains("GifPalette.Build(capture.OutputPath, gifPath, fps)", kaynak);
         Assert.Contains("ConvertToGifAsync(capture, _gifPath, _request.Fps, ct)", kaynak);
-        Assert.Contains("return _gifPath is null ? result : await ConvertToGifAsync(result, ct);", kaynak);
+        Assert.Contains("else if (_gifPath is not null) result = await ConvertToGifAsync(result, ct);", kaynak);
     }
 
     [Fact]

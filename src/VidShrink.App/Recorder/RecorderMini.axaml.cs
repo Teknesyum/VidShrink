@@ -138,6 +138,18 @@ internal partial class RecorderMini : Window
     }
 
     /// <summary>
+    /// Son bölüm işaretinin bildirimi sayacın yanında durur; boş metin satırı kaldırır. Yeni bir
+    /// yüzey açılmaz: şerit zaten kadrajın dışında duruyor.
+    /// </summary>
+    internal void ShowChapter(string text)
+    {
+        TxtChapter.Text = text;
+        TxtChapter.IsVisible = text.Length > 0;
+    }
+
+    internal string ChapterText => TxtChapter.IsVisible ? TxtChapter.Text ?? string.Empty : string.Empty;
+
+    /// <summary>
     /// Şeridi kayıt alanının dışına koyuyor: önce altına, ekranda yer kalmadıysa üstüne.
     /// Bölge verilmemişse pencere çalışma alanının sağ alt köşesine oturuyor.
     /// </summary>
