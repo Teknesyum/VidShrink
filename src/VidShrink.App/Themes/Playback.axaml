@@ -480,7 +480,7 @@
     </Style>
     <Style Selector="^:checked /template/ Border#Root">
       <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
-      <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
     </Style>
   </ControlTheme>
 

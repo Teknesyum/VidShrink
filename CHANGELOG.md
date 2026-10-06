@@ -55,6 +55,14 @@ ship as part of it.
   `hvc1` tag is kept. MPEG-4 Part 2, MPEG-2, 4:2:2/4:4:4, interlaced and non-AAC sources, or
   a missing encoder, fall back to Full as before.
 
+### Changed
+
+- Accessibility: outlined buttons draw a stronger resting border, so a button reads as a
+  button before you hover it. 23 of the 36 palettes now meet the 3:1 contrast threshold
+  (none did); the other 13 improve but stay below it. The selected
+  state of toggle buttons and the listening state of a shortcut box use the solid accent
+  border to stay distinct.
+
 ## [1.2.7] - 2026-10-05
 
 ### Added

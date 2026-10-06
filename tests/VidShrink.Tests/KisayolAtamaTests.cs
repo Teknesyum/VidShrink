@@ -509,7 +509,7 @@ public sealed class KisayolAtamaTests
                 Dispatcher.UIThread.RunJobs();
                 var sonra = (kok.Background as ISolidColorBrush)?.Color;
                 var dolgu = pencere.TryFindResource("NeonBlueFill", out var f) ? (f as ISolidColorBrush)?.Color : null;
-                var kenar = pencere.TryFindResource("NeonBlueBorderStrong", out var k) ? (k as ISolidColorBrush)?.Color : null;
+                var kenar = pencere.TryFindResource("NeonBlue", out var k) ? (k as ISolidColorBrush)?.Color : null;
                 return (once, dinlerken, cerceve, sonra, dolgu, kenar);
             }
             finally
