@@ -122,6 +122,12 @@ public sealed record CliRequest
     /// <summary><c>--yak</c>: kaynagin bu altyazisi (1 tabanli) goruntuye yakilir.</summary>
     public int? BurnSubtitle { get; init; }
 
+    /// <summary>
+    /// <c>--yak-srt</c> (HandBrake <c>--srt-burn</c>) ya da <c>--yak-ass</c> (<c>--ssa-burn</c>):
+    /// goruntuye yakilacak dis altyazi dosyasi. <see cref="ResolvedSubtitles"/> tam yola cevirir.
+    /// </summary>
+    public string? BurnFile { get; init; }
+
     /// <summary><c>--meta-yok</c>: kaynagin kap etiketleri ciktiya tasinmaz.</summary>
     public bool DropMetadata { get; init; }
 
@@ -180,7 +186,17 @@ public sealed record CliRequest
                 return "error.bad-burn";
             }
         }
-        resolved = this with { ExternalSubtitles = list };
+        var burnFile = BurnFile;
+        if (burnFile is not null)
+        {
+            if (!File.Exists(burnFile))
+            {
+                argument = burnFile;
+                return "error.burn-file-missing";
+            }
+            burnFile = Path.GetFullPath(burnFile);
+        }
+        resolved = this with { ExternalSubtitles = list, BurnFile = burnFile };
         return null;
     }
 
@@ -255,6 +271,7 @@ public sealed record CliRequest
 
         if (Filters is { } suzgecler) options.Filters = suzgecler;
         if (BurnSubtitle is int yak) options.Filters = (options.Filters ?? VideoFilterOptions.Default) with { BurnSubtitle = yak - 1 };
+        if (BurnFile is { } yakDosya) options.Filters = (options.Filters ?? VideoFilterOptions.Default) with { BurnFile = yakDosya };
         if (AudioCodec is { } sesKodek) options.AudioCodec = sesKodek;
         options.AudioLoudnorm = AudioLoudnorm;
         options.AudioGainDb = AudioGainDb;
@@ -303,7 +320,7 @@ public static class CliParser
         "--azami-sure", "--max-duration",
         "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm",
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
-        "--yak", "--burn", "--meta-yok", "--no-metadata",
+        "--yak", "--burn", "--yak-srt", "--srt-burn", "--yak-ass", "--ssa-burn", "--meta-yok", "--no-metadata",
         "--altyazi-dil", "--subtitle-lang", "--ilk-altyazi", "--first-subtitle",
         "--sabit-kare", "--cfr", "--tavan-kare", "--pfr", "--kare-hizi", "--fps",
     };
@@ -495,6 +512,20 @@ public static class CliParser
                         return Fail("error.bad-burn", yak);
                     request = request with { BurnSubtitle = yakNo };
                     break;
+                case "--yak-srt" or "--srt-burn" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var yakSrt)) return Fail("error.missing-value", arg);
+                    if (request.BurnFile is not null) return Fail("error.burn-conflict", null);
+                    if (!Path.GetExtension(yakSrt).Equals(".srt", StringComparison.OrdinalIgnoreCase))
+                        return Fail("error.bad-burn-file", yakSrt);
+                    request = request with { BurnFile = yakSrt };
+                    break;
+                case "--yak-ass" or "--ssa-burn" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var yakAss)) return Fail("error.missing-value", arg);
+                    if (request.BurnFile is not null) return Fail("error.burn-conflict", null);
+                    if (Path.GetExtension(yakAss).ToLowerInvariant() is not (".ass" or ".ssa"))
+                        return Fail("error.bad-burn-file", yakAss);
+                    request = request with { BurnFile = yakAss };
+                    break;
                 case "--meta-yok" or "--no-metadata" when command != CliCommand.Watch:
                     request = request with { DropMetadata = true };
                     break;
@@ -543,6 +574,7 @@ public static class CliParser
 
         if (request.MinDurationSeconds is { } enAz && request.MaxDurationSeconds is { } enCok && enCok < enAz)
             return Fail("error.bad-max-duration", enCok.ToString(CultureInfo.InvariantCulture));
+        if (request.BurnSubtitle is not null && request.BurnFile is not null) return Fail("error.burn-conflict", null);
         if (request.ConstantFrameRate && request.PeakFrameRate) return Fail("error.cfr-and-pfr", null);
         if (request.PeakFrameRate && request.FrameRate is null) return Fail("error.pfr-needs-fps", null);
         if (request.Input is null) return Fail(command == CliCommand.Watch ? "error.watch-no-folder" : "error.no-input", null);

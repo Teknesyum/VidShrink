@@ -74,6 +74,13 @@ public sealed record VideoFilterOptions
     /// </summary>
     public int? BurnSubtitle { get; init; }
 
+    /// <summary>
+    /// Goruntuye yakilacak dis altyazi dosyasinin tam yolu (<c>.srt</c>, <c>.ass</c>, <c>.ssa</c>;
+    /// HandBrake <c>--srt-burn</c>, <c>--ssa-burn</c>). <see cref="BurnSubtitle"/> ile birlikte
+    /// verilemez: zincirde tek <c>subtitles</c> suzgeci var.
+    /// </summary>
+    public string? BurnFile { get; init; }
+
     public bool ChangesPicture =>
         Deinterlace == DeinterlaceMode.On
         || Detelecine
@@ -87,7 +94,8 @@ public sealed record VideoFilterOptions
         || ColorMatrix != ColorMatrixTarget.Keep
         || Deband
         || Crop is not null
-        || BurnSubtitle is not null;
+        || BurnSubtitle is not null
+        || BurnFile is not null;
 
     public bool ChangesPictureFor(MediaInfo info) => ChangesPicture || VideoFilterChain.Deinterlaces(info, this);
 
@@ -192,21 +200,39 @@ public static class VideoFilterChain
             if (burn < 0 || burn >= subtitles.Count) problems.Add("burn: the source has no such subtitle");
             else if (!StreamMapping.IsTextSubtitle(subtitles[burn].Codec)) problems.Add("burn: image subtitles need an overlay and are not supported");
         }
+        if (options.BurnFile is { } file)
+        {
+            if (options.BurnSubtitle is not null) problems.Add("burn: only one subtitle can be burned");
+            if (!BurnFileExtensions.Contains(Path.GetExtension(file).ToLowerInvariant())) problems.Add("burn: the file is not .srt, .ass or .ssa");
+        }
         return problems;
     }
 
+    /// <summary>ffmpeg'in libass ile derlenince tasidigi suzgec; yakmanin iki yolu da onu yazar.</summary>
+    public const string BurnFilterName = "subtitles";
+
+    /// <summary>Yakilabilen dis altyazi uzantilari; <c>subtitles</c> suzgeci ucunu de libass ile cizer.</summary>
+    public static readonly IReadOnlyList<string> BurnFileExtensions = new[] { ".srt", ".ass", ".ssa" };
+
     /// <summary>
     /// B1f: metin altyaziyi goruntuye yakan <c>subtitles</c> suzgeci. Dosya kaynagin kendisi,
-    /// iz <c>si</c> ile secilir. Kesitte girdi <c>-ss</c> ile arandigi icin karelerin damgasi
+    /// iz <c>si</c> ile secilir; <see cref="VideoFilterOptions.BurnFile"/> doluysa dosya odur ve
+    /// <c>si</c> yazilmaz. Kesitte girdi <c>-ss</c> ile arandigi icin karelerin damgasi
     /// kesitin basindan sayilir; libass ise altyaziyi dosyanin saatiyle okur — suzgec o yuzden
     /// iki <c>setpts</c> arasina oturur. Goruntu altyazi ya da olmayan iz <c>null</c> verir.
     /// </summary>
     public static string? BurnFilter(MediaInfo info, VideoFilterOptions options, double leadSeconds)
     {
+        if (options.BurnFile is { Length: > 0 } file)
+            return Shifted(BurnFilterName + "=filename='" + FilterPath(file) + "'", leadSeconds);
         if (options.BurnSubtitle is not int burn) return null;
         var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
         if (burn < 0 || burn >= subtitles.Count || !StreamMapping.IsTextSubtitle(subtitles[burn].Codec)) return null;
-        var filter = "subtitles=filename='" + FilterPath(info.FilePath) + "':si=" + burn.ToString(CultureInfo.InvariantCulture);
+        return Shifted(BurnFilterName + "=filename='" + FilterPath(info.FilePath) + "':si=" + burn.ToString(CultureInfo.InvariantCulture), leadSeconds);
+    }
+
+    private static string Shifted(string filter, double leadSeconds)
+    {
         if (leadSeconds <= 0) return filter;
         var lead = leadSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         return $"setpts=PTS+{lead}/TB,{filter},setpts=PTS-{lead}/TB";

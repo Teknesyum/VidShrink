@@ -238,6 +238,8 @@ single spelling.
 | `--altyazi` | `--subtitle` |
 | `--yan-altyazi` | `--sidecar-subtitles` |
 | `--yak` | `--burn` |
+| `--yak-srt` | `--srt-burn` |
+| `--yak-ass` | `--ssa-burn` |
 | `--meta-yok` | `--no-metadata` |
 | `--altyazi-dil` | `--subtitle-lang` |
 | `--ilk-altyazi` | `--first-subtitle` |

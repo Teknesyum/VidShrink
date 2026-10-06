@@ -15,6 +15,12 @@ public sealed class CliServices
     public Func<string, CancellationToken, Task<MediaInfo>> Probe { get; init; } = FfprobeClient.ProbeAsync;
     public Func<IEncoderAvailability?> Availability { get; init; } = () => EncoderCapabilities.Instance;
     public Func<MediaInfo, CancellationToken, Task<CropDetection>> DetectCrop { get; init; } = CropProbe.RunAsync;
+
+    /// <summary>
+    /// ffmpeg derlemesinde bu suzgec var mi. Yoklama okunamadiysa "var" sayilir: bilinmeyen,
+    /// yok demek degildir ve kodlama kendi hatasini verir.
+    /// </summary>
+    public Func<string, bool> HasFilter { get; init; } = name => !EncoderCapabilities.Instance.Loaded || EncoderCapabilities.Instance.HasFilter(name);
     public Func<IReadOnlyList<PresetProfile>> UserPresets { get; init; } = () =>
     {
         try { return PresetLibrary.LoadUser(PresetLibrary.DefaultUserPath); }
@@ -202,6 +208,12 @@ public static class CliApp
             var altyaziIletisi = text.Format(altyaziHatasi, altyaziArgumani);
             stderr.WriteLine(altyaziIletisi);
             return new FileRun(ExitCodes.Usage, null, altyaziIletisi);
+        }
+        if ((request.BurnFile is not null || request.BurnSubtitle is not null) && !services.HasFilter(VideoFilterChain.BurnFilterName))
+        {
+            var yakmaIletisi = text["error.no-libass"];
+            stderr.WriteLine(yakmaIletisi);
+            return new FileRun(ExitCodes.Error, null, yakmaIletisi);
         }
         if (request.AutoCrop && request.Filters?.Crop is null)
         {
