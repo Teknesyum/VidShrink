@@ -80,7 +80,8 @@
       EditorClip klibin gövdesidir: PlaybackTrack'in fırçaları, fare üstünde NeonBlueHover,
       seçilince NeonBlueActive + NeonBlueBorderStrong + GlowBlue ve kalın kenar.
       EditorToolButton araç paletinin ve mıknatısın aç-kapa düğmesidir: GhostButton yüzü,
-      seçiliyken NeonBlueFill zemin + NeonBlueBorderStrong kenar, yazı TextBody (NeonBlueActive
+      seçiliyken NeonBlueFill zemin + NeonBlue kenar (dinlenme kenarı NeonBlueBorderStrong
+      olduğundan seçili kenar opak vurguyla ayrılır), yazı TextBody (NeonBlueActive
       zeminde ne NeonBlue ne TextBody yazı 7:1 tutuyor; 36 palette ölçüldü). Araç şeridinin
       paneli opak Surface zeminlidir: PanelSurface'in geçirdiği atmosfer ışıması seçili düğmenin
       zeminini konuma göre açıyordu, Cobalt'ta yazı 7.35'ten 6.96'ya düştü; opakta 7.21 sabit.
@@ -133,7 +134,7 @@
     </Style>
     <Style Selector="^:checked /template/ Border#Root">
       <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
-      <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
     </Style>
   </ControlTheme>
 

@@ -252,7 +252,7 @@
         <Setter Property="Padding" Value="{StaticResource ButtonPaddingSm}"/>
         <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="{StaticResource HeaderRestBorder}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -336,7 +336,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Style Selector="^.listening /template/ Border#Root">
           <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
-          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+          <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
         </Style>
       </ControlTheme>
 
