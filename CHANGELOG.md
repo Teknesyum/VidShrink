@@ -55,6 +55,12 @@ ship as part of it.
   `hvc1` tag is kept. MPEG-4 Part 2, MPEG-2, 4:2:2/4:4:4, interlaced and non-AAC sources, or
   a missing encoder, fall back to Full as before.
 
+### Fixed
+
+- Recorder: the one-frame Desktop Duplication probe no longer outlives the app. When the
+  desktop delivers no frame the probe never finishes on its own; it is now tied to the app
+  process, so closing the app inside the five-second timeout ends it too.
+
 ## [1.2.7] - 2026-10-05
 
 ### Added

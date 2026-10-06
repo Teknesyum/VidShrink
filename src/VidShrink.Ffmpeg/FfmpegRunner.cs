@@ -84,7 +84,14 @@ public static class FfmpegRunner
     /// <summary>Hata metninde tutulan son satir sayisi.</summary>
     public const int ErrorTailLines = 8;
 
-    public static async Task<FfmpegRun> RunAsync(IReadOnlyList<string> arguments, CancellationToken ct = default)
+    public static Task<FfmpegRun> RunAsync(IReadOnlyList<string> arguments, CancellationToken ct = default)
+        => RunAsync(arguments, false, ct);
+
+    /// <summary>
+    /// <paramref name="tieToParent"/> dogruyken surec <see cref="ChildJob.Shared"/>'a baglanir:
+    /// bu surec zaman asimini beklemeden olurse cocuk da olur.
+    /// </summary>
+    internal static async Task<FfmpegRun> RunAsync(IReadOnlyList<string> arguments, bool tieToParent, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(arguments);
         ct.ThrowIfCancellationRequested();
@@ -96,6 +103,7 @@ public static class FfmpegRunner
             process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, arguments) };
             process.StartInfo.RedirectStandardInput = true;
             process.Start();
+            if (tieToParent) ChildJob.Shared.Attach(process);
         }
         catch (Exception ex)
         {

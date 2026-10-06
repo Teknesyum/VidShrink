@@ -25,7 +25,7 @@ public sealed class DdagrabFactAttribute : FactAttribute
         var cikislar = DdaOutputs.Enumerate();
         var istek = KaydediciDdagrabTests.Bolge(0, 0, 640, 480, cikislar) with { Fps = 60, Preset = "ultrafast" };
         if (RecorderArguments.DdagrabBlocker(istek) != DdagrabFallback.None) return null;
-        return DdagrabProbe.WorksAsync(istek).GetAwaiter().GetResult()
+        return DdagrabProbe.ProbeAsync(istek).GetAwaiter().GetResult()
             ? istek with { Capture = RecorderCapture.Ddagrab }
             : null;
     });
