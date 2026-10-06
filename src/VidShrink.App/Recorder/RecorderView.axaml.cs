@@ -64,6 +64,7 @@ internal partial class RecorderView : UserControl
         InitKisayol();
         InitOtomatik();
         InitSes();
+        InitSesSeviyesi();
         InitSerit();
         InitGeriSayim();
         InitBitince();
@@ -91,6 +92,7 @@ internal partial class RecorderView : UserControl
         RefreshScreens();
         ActivateTray();
         ActivateHotkeys();
+        ActivateLevels();
         _ = MeasureOnOpenAsync(Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime);
     }
 
@@ -99,6 +101,7 @@ internal partial class RecorderView : UserControl
         Strings.Changed -= OnLanguageChanged;
         DeactivateTray();
         DeactivateHotkeys();
+        DeactivateLevels();
         CloseRegionEditor();
         base.OnDetachedFromVisualTree(e);
     }

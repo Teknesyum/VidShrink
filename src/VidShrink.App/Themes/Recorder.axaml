@@ -19,6 +19,10 @@
       RecorderButtonSize      <- FieldMinHeight (40). Şerit düğmesinin dokunma hedefi;
                                  alan yüksekliğiyle aynı sayı, şerit tek satır okunuyor.
       RecorderDotSize         <- SpaceMd (12). Kaydediyor göstergesinin çapı.
+      RecorderAudioLevelGap   <- SpaceSm (8) soldan, LabelMargin'in alt payı (8) alttan. Ses
+                                 seviyesi çubuğu cihaz etiketinin satırında, yazının sağında ve
+                                 onunla ortalı durur; sayfaya yükseklik eklemez. Yüksekliği
+                                 ProgressBar temasının ProgressBarHeight'ı, rengi temanın fırçaları.
       RecorderWizardOptionSize<- DropZoneMinHeight (144). Otomatik ayar sorusunun kare
                                  seçenek düğmesi; tek tıkla seçilen en büyük hedef.
 
@@ -60,6 +64,7 @@
   <Thickness x:Key="RecorderStatsInset">16,0,0,0</Thickness>
   <x:Double x:Key="RecorderButtonSize">40</x:Double>
   <x:Double x:Key="RecorderDotSize">12</x:Double>
+  <Thickness x:Key="RecorderAudioLevelGap">8,0,0,8</Thickness>
   <x:Double x:Key="RecorderWizardOptionSize">144</x:Double>
 
   <x:Double x:Key="RecorderMiniHeight">56</x:Double>

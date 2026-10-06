@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- Recorder: a small level bar next to the microphone and system audio pickers shows the
+  live level of the selected input, before and during a recording, so a silent input is
+  visible before the recording is lost. No bar is shown when no input is selected.
 - Player: "Save playlist…" in the playlist's right-click menu writes the current list, in
   the order shown, to an `.m3u8` file. Files in or below the list's folder are stored as
   relative paths, so the folder can be moved together with its list.
