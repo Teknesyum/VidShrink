@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- Recorder: a small level bar next to the microphone and system audio pickers shows the
+  live level of the selected input, before and during a recording, so a silent input is
+  visible before the recording is lost. No bar is shown when no input is selected.
 - Editor: the timeline shows a thumbnail strip under the tracks and thin ticks at the
   source's keyframes. Both are read in the background after the source opens, one frame at
   a time, so the timeline is usable at once; ticks thin out when they would crowd.
