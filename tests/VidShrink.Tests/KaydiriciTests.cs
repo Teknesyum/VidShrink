@@ -103,13 +103,15 @@ public sealed class KaydiriciTests
     {
         var (yakalayan, yukseklik) = Olc((p, k) =>
         {
+            Pompala(200);
+            p.UpdateLayout();
             var iz = (Track)Iz(k);
             var merkez = iz.TranslatePoint(new Point(iz.Bounds.Width * 0.8, iz.Bounds.Height / 2), p)!.Value;
             var nokta = merkez + new Point(0, sapma);
-            Pompala(200);
-            var dugme = p.GetVisualsAt(nokta, v => v.IsVisible)
-                .Where(v => v is not Window && v is IInputElement { IsHitTestVisible: true })
-                .SelectMany(v => v.GetSelfAndVisualAncestors()).OfType<RepeatButton>().FirstOrDefault();
+            var vurulan = p.GetVisualsAt(nokta, v => v.IsVisible)
+                .Where(v => v is not Window && v is IInputElement { IsHitTestVisible: true }).ToList();
+            var dugme = vurulan.SelectMany(v => v.GetSelfAndVisualAncestors()).OfType<RepeatButton>().FirstOrDefault();
+            _output.WriteLine($"nokta {nokta}, iz {iz.Bounds}, vurulan: {string.Join(" > ", vurulan.Select(v => v.GetType().Name))}");
             return (dugme?.Name, k.Bounds.Height);
         });
         _output.WriteLine($"{sapma}px: {yakalayan ?? "(yok)"}, kaydırıcı {yukseklik}");
