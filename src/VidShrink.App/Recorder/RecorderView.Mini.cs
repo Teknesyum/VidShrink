@@ -26,8 +26,13 @@ internal partial class RecorderView
     /// <summary>Mini kip açık mı. Ölçüm kendi gördüğünü okuyabilsin diye açık.</summary>
     internal bool MiniOpen => _mini is not null;
 
-    /// <summary>Kadrajın içine düşeceği bildirilen kayıt var mı; tam ekran kaydında doğru.</summary>
+    /// <summary>
+    /// Şerit kayda girecek mi: kadrajda dışarısı yok (tam ekran ya da pencere kaydı) ve şerit
+    /// yakalamadan çıkarılamadı. Çıkarıldıysa dışarısı olmasa da yanlış.
+    /// </summary>
     internal bool MiniInFrame { get; private set; }
+
+    internal static bool InFrame(PixelRect? region, bool captureExcluded) => region is null && !captureExcluded;
 
     private void InitMini()
     {
@@ -67,7 +72,8 @@ internal partial class RecorderView
 
     /// <summary>
     /// Mini kipi açar ve ana pencereyi gizler. Şerit kadrajın dışına konumlanıyor;
-    /// bölge tam ekransa dışarısı yok ve kullanıcıya şeridin kayda gireceği söyleniyor.
+    /// bölge tam ekransa dışarısı yok ve şerit yakalamadan da çıkarılamadıysa kullanıcıya
+    /// şeridin kayda gireceği söyleniyor.
     /// </summary>
     internal void ShrinkToMini()
     {
@@ -87,7 +93,7 @@ internal partial class RecorderView
         _mini.Show();
 
         var region = FrameRegion();
-        MiniInFrame = region is null;
+        MiniInFrame = InFrame(region, _mini.CaptureExcluded);
         if (MiniInFrame) ShowError(Say("recorder.mini.in-frame"));
 
         _mini.PlaceOutside(region);
@@ -113,7 +119,7 @@ internal partial class RecorderView
             {
                 mini.Show();
                 var region = FrameRegion();
-                MiniInFrame = region is null;
+                MiniInFrame = InFrame(region, mini.CaptureExcluded);
                 mini.PlaceOutside(region);
             }
         }

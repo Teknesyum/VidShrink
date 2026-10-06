@@ -344,7 +344,7 @@ internal partial class RecorderRegionEditor : Window
     private void MakeShaped()
     {
         if (!OperatingSystem.IsWindows() || TryGetPlatformHandle() is not { } handle) return;
-        CaptureExcluded = SetWindowDisplayAffinity(handle.Handle, RecorderFrame.ExcludeFromCaptureAffinity);
+        CaptureExcluded = CaptureAffinity.Exclude(handle.Handle);
     }
 
     private void ApplyShape()
@@ -397,9 +397,6 @@ internal partial class RecorderRegionEditor : Window
 
     [DllImport("user32.dll")]
     private static extern int SetWindowRgn(IntPtr hwnd, IntPtr region, bool redraw);
-
-    [DllImport("user32.dll")]
-    private static extern bool SetWindowDisplayAffinity(IntPtr hwnd, uint affinity);
 }
 
 internal interface IRegionEditorHost

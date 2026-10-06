@@ -33,10 +33,14 @@ internal readonly record struct MiniOption(MiniOptionKind Kind, bool Value);
 /// pencere kayıt yokken yoldan çekilmiyor. Avalonia karşılığı <see cref="Window.Topmost"/>
 /// ve <see cref="Follow"/> her hal değişiminde onu tazeliyor.</para>
 ///
-/// <para><b>Kadrajın dışında duruyor.</b> gdigrab bölgeyi yakalarken bu pencere kadrajın
-/// içine düşerse kayda karışır; <see cref="PlaceOutside"/> pencereyi seçili bölgenin
-/// altına, yer yoksa üstüne koyuyor. Bölge tam ekransa dışarısı yok — o durumda
-/// çağıran taraf kullanıcıyı uyarıyor.</para>
+/// <para><b>Kadrajın dışında duruyor.</b> <see cref="PlaceOutside"/> pencereyi seçili bölgenin
+/// altına, yer yoksa üstüne koyuyor; şerit kaydedilen şeyin önünü kapatmıyor.</para>
+///
+/// <para><b>Kayda girmiyor.</b> Bölge tam ekransa dışarısı yok ve kullanıcı şeridi kadrajın
+/// içine de sürükleyebiliyor. Windows 10 2004 ve sonrasında şerit ve seçenek açılırı
+/// <see cref="CaptureAffinity"/> ile yakalamadan çıkıyor; sonuç <see cref="CaptureExcluded"/>
+/// ve <see cref="OptionsCaptureExcluded"/>'da. Çağrı yapılmadıysa ya da düştüyse şerit yine
+/// çalışıyor, kadrajda dışarısı yoksa çağıran taraf kullanıcıyı uyarıyor.</para>
 /// </summary>
 internal partial class RecorderMini : Window
 {
@@ -55,9 +59,23 @@ internal partial class RecorderMini : Window
 
     private bool _showingOptions;
 
+    internal bool ExcludeFromCapture { get; init; } = true;
+
+    /// <summary>Şerit penceresi yakalamadan çıkarıldı mı; çağrı yapılmadıysa ya da düştüyse yanlış.</summary>
+    internal bool CaptureExcluded { get; private set; }
+
+    /// <summary>Seçenek açılırı ayrı bir pencere; açıldığında o da yakalamadan çıkarıldı mı.</summary>
+    internal bool OptionsCaptureExcluded { get; private set; }
+
+    private bool KeepOutOfCapture(TopLevel? surface)
+        => ExcludeFromCapture && CaptureAffinity.Supported
+           && surface?.TryGetPlatformHandle() is { } handle && CaptureAffinity.Exclude(handle.Handle);
+
     public RecorderMini()
     {
         InitializeComponent();
+        Opened += (_, _) => CaptureExcluded = KeepOutOfCapture(this);
+        PanelOptions.AttachedToVisualTree += (_, _) => OptionsCaptureExcluded = KeepOutOfCapture(TopLevel.GetTopLevel(PanelOptions));
         if (Playback.HoverZone.MotionReduced) Classes.Add("reduced-motion");
         foreach (var (box, option) in OptionBoxes())
             box.IsCheckedChanged += (_, _) =>
