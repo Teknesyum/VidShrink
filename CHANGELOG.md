@@ -63,6 +63,12 @@ ship as part of it.
   state of toggle buttons and the listening state of a shortcut box use the solid accent
   border to stay distinct.
 
+### Fixed
+
+- Recorder: the one-frame Desktop Duplication probe no longer outlives the app. When the
+  desktop delivers no frame the probe never finishes on its own; it is now tied to the app
+  process, so closing the app inside the five-second timeout ends it too.
+
 ## [1.2.7] - 2026-10-05
 
 ### Added

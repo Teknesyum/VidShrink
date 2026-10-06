@@ -14,6 +14,7 @@ internal static class TestAyarYolu
     {
         VidShrink.Core.Editing.EditProjectStore.Disabled = true;
         VidShrink.Ffmpeg.AudioLevelSource.Disabled = true;
+        VidShrink.Ffmpeg.DdagrabProbe.Disabled = true;
         VidShrink.App.Editing.EditorView.StripDisabled = true;
         if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(VidShrink.Core.Setup.ShortcutIcons.DirectoryVariable)))
             Environment.SetEnvironmentVariable(VidShrink.Core.Setup.ShortcutIcons.DirectoryVariable,
