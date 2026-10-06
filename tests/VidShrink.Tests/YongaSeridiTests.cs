@@ -40,23 +40,46 @@ public sealed class YongaSeridiTests : IDisposable
         return (serit, kutular);
     }
 
-    /// <summary>Öncekiler sığıyorsa bildirilen çocuk yeni satırı başlatır; bildirimsiz eşi tek satırda kalır.</summary>
+    /// <summary>Düz sarma da iki satır tutuyorsa bildirilen çocuk yeni satırı başlatır; bildirimsiz eşi 3+1 kırılır.</summary>
     [Fact]
     public void BildirilenCocukYeniSatiriBaslatir()
     {
         var (satirlar, ikinciUst, boy, bildirimsiz) = AppHost.Run(() =>
         {
             var (serit, kutular) = Serit(2, 50, 50, 50, 50);
-            Yerlestir(serit, new Size(400, 200));
+            Yerlestir(serit, new Size(160, 200));
             var (duz, _) = Serit(-1, 50, 50, 50, 50);
-            Yerlestir(duz, new Size(400, 200));
+            Yerlestir(duz, new Size(160, 200));
             return (serit.Satirlar.ToList(), kutular[2].Bounds.Y, serit.DesiredSize.Height, duz.Satirlar.ToList());
         });
 
         Assert.Equal([2, 2], satirlar);
         Assert.Equal(20, ikinciUst);
         Assert.Equal(40, boy);
-        Assert.Equal([4], bildirimsiz);
+        Assert.Equal([3, 1], bildirimsiz);
+    }
+
+    /// <summary>
+    /// Bildirim satır sayısını düz sarmanın üstüne çıkarıyorsa yok sayılır: hepsi tek satıra
+    /// sığarken ve bildirimden sonrası bir satır daha taşarken şerit düz sarmayla aynı dizilir.
+    /// </summary>
+    [Fact]
+    public void SatirEkleyenBildirimYokSayilir()
+    {
+        var (tek, tasan, tasanDuz) = AppHost.Run(() =>
+        {
+            var (genis, _) = Serit(2, 50, 50, 50, 50);
+            Yerlestir(genis, new Size(400, 200));
+            var (serit, _) = Serit(2, 50, 50, 50, 50, 50, 50);
+            Yerlestir(serit, new Size(160, 400));
+            var (duz, _) = Serit(-1, 50, 50, 50, 50, 50, 50);
+            Yerlestir(duz, new Size(160, 400));
+            return (genis.Satirlar.ToList(), serit.Satirlar.ToList(), duz.Satirlar.ToList());
+        });
+
+        Assert.Equal([4], tek);
+        Assert.Equal([3, 3], tasanDuz);
+        Assert.Equal(tasanDuz, tasan);
     }
 
     /// <summary>
@@ -85,13 +108,13 @@ public sealed class YongaSeridiTests : IDisposable
     {
         var satirlar = AppHost.Run(() =>
         {
-            var (serit, kutular) = Serit(2, 50, 50, 50, 50, 50, 50, 50);
+            var (serit, kutular) = Serit(2, 50, 50, 50, 50, 50, 50, 50, 50);
             kutular[3].IsVisible = false;
             Yerlestir(serit, new Size(160, 400));
             return serit.Satirlar.ToList();
         });
 
-        Assert.Equal([2, 3, 1], satirlar);
+        Assert.Equal([2, 3, 2], satirlar);
     }
 
     private MainWindow Pencere() => new()
@@ -157,44 +180,70 @@ public sealed class YongaSeridiTests : IDisposable
         Assert.True(sapanlar.Count == 0, "Kırılımı 4+5 olmayan kol:" + Environment.NewLine + string.Join(Environment.NewLine, sapanlar));
     }
 
+    private static List<int> DuzSarma(MainWindow pencere, Size boyut)
+    {
+        YongaSeridi.SetSatirBasi(pencere.Chip25, false);
+        try
+        {
+            Yerlestir(pencere, boyut);
+            return pencere.ChipStrip.Satirlar.ToList();
+        }
+        finally
+        {
+            YongaSeridi.SetSatirBasi(pencere.Chip25, true);
+            Yerlestir(pencere, boyut);
+        }
+    }
+
     /// <summary>
-    /// Kullanıcı yongası ilk satırı değiştirmez: "+"nın önüne, ikinci satıra girer; sığmayan alt
-    /// satıra iner ve hiçbiri şeridin dışına çıkmaz. 1920x1040'ta ilk yonga ikinci satıra sığar
-    /// (4+7), 1600x1000'de "+" üçüncü satıra iner (4+6+1). Hepsi silinince 4+5 döner.
+    /// Kullanıcı yongası şeridi düz sarmadakinden uzun yapmaz: her adımda aynı pencere bildirimsiz
+    /// yerleştirilip satır sayısı karşılaştırılır. 1920x1040'ta ilk yonga ikinci satıra sığar ve
+    /// ilk satır dört yongada kalır; 1600x1000'de bildirim bir satır ekleyeceği için düz sarmaya
+    /// düşülür. Hepsi silinince 4+5 döner.
     /// </summary>
     [Fact]
-    public void KullaniciYongasiIlkSatiraDokunmaz()
+    public void KullaniciYongasiSeridiUzatmaz()
     {
-        var (genis, orta, cok, tasan, sonra) = AppHost.Run(() =>
+        var (genis, orta, ortaDuz, adimlar, tasan, sonra) = AppHost.Run(() =>
         {
             var pencere = Pencere();
             try
             {
-                var boyut = new Size(1920, 1040);
-                Yerlestir(pencere, boyut);
+                var buyuk = new Size(1920, 1040);
+                var kucuk = new Size(1600, 1000);
+                Yerlestir(pencere, buyuk);
                 pencere.InitUserPresets();
                 pencere.SavePreset("Bir");
-                Yerlestir(pencere, boyut);
+                Yerlestir(pencere, buyuk);
                 var genis = pencere.ChipStrip.Satirlar.ToList();
-                Yerlestir(pencere, new Size(1600, 1000));
+                Yerlestir(pencere, kucuk);
                 var orta = pencere.ChipStrip.Satirlar.ToList();
-                foreach (var ad in new[] { "İki", "Üç", "Dört", "Beş", "Altı", "Yedi", "Sekiz" }) pencere.SavePreset(ad);
-                Yerlestir(pencere, boyut);
-                var serit = pencere.ChipStrip;
-                var cok = serit.Satirlar.ToList();
-                var tasan = serit.Children.Where(c => c.IsVisible).Count(c => c.Bounds.Right > serit.Bounds.Width + 0.5);
+                var ortaDuz = DuzSarma(pencere, kucuk);
+                var adimlar = new List<(int Bildirimli, int Duz)>();
+                var tasan = 0;
+                foreach (var ad in new[] { "İki", "Üç", "Dört", "Beş", "Altı", "Yedi", "Sekiz" })
+                {
+                    pencere.SavePreset(ad);
+                    foreach (var boyut in new[] { kucuk, buyuk })
+                    {
+                        Yerlestir(pencere, boyut);
+                        var serit = pencere.ChipStrip;
+                        tasan += serit.Children.Where(c => c.IsVisible).Count(c => c.Bounds.Right > serit.Bounds.Width + 0.5);
+                        adimlar.Add((serit.Satirlar.Count, DuzSarma(pencere, boyut).Count));
+                    }
+                }
                 foreach (var onAyar in pencere.UserPresets.ToList()) pencere.DeletePreset(onAyar);
-                Yerlestir(pencere, boyut);
-                return (genis, orta, cok, tasan, pencere.ChipStrip.Satirlar.ToList());
+                Yerlestir(pencere, kucuk);
+                return (genis, orta, ortaDuz, adimlar, tasan, pencere.ChipStrip.Satirlar.ToList());
             }
             finally { pencere.Close(); }
         });
 
         Assert.Equal([4, 7], genis);
-        Assert.Equal([4, 6, 1], orta);
-        Assert.Equal(4, cok[0]);
-        Assert.True(cok.Count >= 3, $"sekiz kullanıcı yongası üçüncü satıra inmedi: {string.Join("+", cok)}");
-        Assert.Equal(8 + 1 + 8 + 1, cok.Sum());
+        Assert.Equal(ortaDuz, orta);
+        Assert.Equal(2, orta.Count);
+        Assert.All(adimlar, adim => Assert.True(adim.Bildirimli <= adim.Duz, $"bildirimli {adim.Bildirimli} satır, düz sarma {adim.Duz}"));
+        Assert.Contains(adimlar, adim => adim.Duz >= 3);
         Assert.Equal(0, tasan);
         Assert.Equal([4, 5], sonra);
     }

@@ -6,10 +6,10 @@ namespace VidShrink.App;
 /// <summary>
 /// Hızlı hedef yongalarının şeridi. Düz <see cref="WrapPanel"/> satırı yonga yazısının genişliğine
 /// göre kırıyordu: 1600x1000'de 42 dilin 37'si 5+4, beşi 6+3; 1920x1040'ta 24'ü 7+2, 18'i 6+3.
-/// <see cref="SatirBasiProperty"/> taşıyan çocuk, kendinden öncekiler tek satıra sığdıysa yeni
-/// satırı başlatır; kırılım dile bağlı kalmaz. Öncekiler sığmayıp şerit zaten sarıldıysa bildirim
-/// yok sayılır, yoksa dar pencerede fazladan bir satır açılırdı. Sonraki çocuklar sığdıkça dizilir,
-/// sığmayan alt satıra iner.
+/// <see cref="SatirBasiProperty"/> taşıyan çocuk yeni satırı başlatır; kırılım dile bağlı kalmaz.
+/// Bildirim iki durumda yok sayılır: öncekiler sığmayıp şerit zaten sarıldıysa ve satır sayısını
+/// düz sarmanın üstüne çıkarıyorsa. Dar pencerede ve kullanıcının kendi yongaları eklendiğinde
+/// şerit eskisinden uzun olmaz. Sonraki çocuklar sığdıkça dizilir, sığmayan alt satıra iner.
 /// </summary>
 public sealed class YongaSeridi : WrapPanel
 {
@@ -30,6 +30,14 @@ public sealed class YongaSeridi : WrapPanel
 
     private List<List<Control>> Diz(double genislik)
     {
+        var bildirimli = Diz(genislik, true);
+        if (!Children.Any(y => y.IsVisible && GetSatirBasi(y))) return bildirimli;
+        var duz = Diz(genislik, false);
+        return bildirimli.Count > duz.Count ? duz : bildirimli;
+    }
+
+    private List<List<Control>> Diz(double genislik, bool bildirimler)
+    {
         var satirlar = new List<List<Control>>();
         var satir = new List<Control>();
         var x = 0.0;
@@ -38,7 +46,7 @@ public sealed class YongaSeridi : WrapPanel
         {
             if (!yonga.IsVisible) continue;
             var en = yonga.DesiredSize.Width;
-            var bildirilen = GetSatirBasi(yonga) && !sarildi;
+            var bildirilen = bildirimler && !sarildi && GetSatirBasi(yonga);
             var sigmiyor = x + en > genislik + 0.01;
             if (satir.Count > 0 && (bildirilen || sigmiyor))
             {
