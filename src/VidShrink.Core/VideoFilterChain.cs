@@ -246,9 +246,39 @@ public static class VideoFilterChain
         if (options.Pad is { } pad)
             filters.Add(string.Create(CultureInfo.InvariantCulture,
                 $"pad=w=iw+{pad.Left + pad.Right}:h=ih+{pad.Top + pad.Bottom}:x={pad.Left}:y={pad.Top}:color=black"));
-        if (plan.Fps < source.Fps - 0.01)
+        if (plan.FrameRate != FrameRateMode.Peak && plan.Fps < source.Fps - 0.01)
             filters.Add($"fps={plan.Fps.ToString("0.###", CultureInfo.InvariantCulture)}");
         return filters;
+    }
+
+    /// <summary>
+    /// Tavanli kipte ciktinin kare izgarasi: kullanicinin tavani, motor butce icin onun da altina
+    /// indiyse planin hizi.
+    /// </summary>
+    public static double PeakCeiling(MediaInfo info, EncodePlan plan)
+    {
+        var source = PlannedSource(info, plan.Filters ?? VideoFilterOptions.Default).Fps;
+        var ceiling = plan.FrameRateCeiling is double value && value > 0 ? value : source;
+        return plan.Fps < Math.Min(source, ceiling) - 0.01 ? plan.Fps : ceiling;
+    }
+
+    /// <summary>
+    /// Kare zamanlamasinin cikti secenekleri; iki gecise de ayni yazilir, yoksa ilk gecis baska
+    /// kare sayar. Sabit kip <c>-r</c> ister: degisken kaynakta <c>-fps_mode cfr</c> tek basina
+    /// kaynagin en sik araligini hiz sayip kare cogaltiyor. Tavanli kipte <c>-fpsmax</c> ve
+    /// <c>-r</c> <c>vfr</c> ile birlikte reddediliyor, <c>fps</c> suzgeci sabit hiz veriyor; kodlayici
+    /// zaman tabani <c>1/tavan</c> olunca ayni tike dusen kareler atiliyor, seyrek kareler kaliyor.
+    /// Olcum: <c>docs/olcumler/kare-hizi-kipi.md</c>.
+    /// </summary>
+    public static IReadOnlyList<string> FrameRateArgs(MediaInfo info, EncodePlan plan, string specifier = "")
+    {
+        static string Number(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+        return plan.FrameRate switch
+        {
+            FrameRateMode.Constant => new[] { "-r" + specifier, Number(plan.Fps), "-fps_mode" + specifier, "cfr" },
+            FrameRateMode.Peak => new[] { "-enc_time_base" + specifier, "1/" + Number(PeakCeiling(info, plan)), "-fps_mode" + specifier, "vfr" },
+            _ => Array.Empty<string>()
+        };
     }
 
     public static IReadOnlyList<string> ColorArgs(EncodePlan plan)

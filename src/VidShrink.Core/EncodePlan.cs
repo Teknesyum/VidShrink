@@ -103,6 +103,14 @@ public sealed record ReasonNote(
     string? ManualOverrideValue = null,
     string? EngineWouldHaveChosen = null);
 
+/// <summary>
+/// Ciktinin kare zamanlamasi. <see cref="Auto"/> bugunku davranis (ffmpeg kaba gore secer);
+/// <see cref="Constant"/> her kareyi esit araliga oturtur (HandBrake <c>--cfr</c>);
+/// <see cref="Peak"/> kaynagin degisken araligini korur, yalniz tavandan sik gelen kareleri
+/// dusurur (HandBrake <c>--pfr</c>).
+/// </summary>
+public enum FrameRateMode { Auto, Constant, Peak }
+
 public sealed class EncodePlan
 {
     [JsonPropertyName("codec")] public string Codec { get; set; } = "libx264";
@@ -137,6 +145,10 @@ public sealed class EncodePlan
     [JsonIgnore] public string? Hdr10PlusMetadataPath { get; set; }
     [JsonIgnore] public VideoFilterOptions Filters { get; set; } = VideoFilterOptions.Default;
     [JsonIgnore] public CropRect? SuggestedCrop { get; set; }
+    [JsonIgnore] public FrameRateMode FrameRate { get; set; }
+
+    /// <summary>Kullanicinin verdigi kare hizi tavani; <see cref="VideoFilterChain.FrameRateArgs"/> okur.</summary>
+    [JsonIgnore] public double? FrameRateCeiling { get; set; }
     [JsonPropertyName("extraArgs")] public List<string> ExtraArgs { get; set; } = new();
     [JsonPropertyName("reason")] public string Reason { get; set; } = "";
     [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();
