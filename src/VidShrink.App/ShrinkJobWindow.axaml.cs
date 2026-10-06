@@ -100,6 +100,34 @@ public partial class ShrinkJobWindow : Window
     /// <summary>Kuyruk sonu eyleminin sistem yüzü; testler sahtesini verir.</summary>
     internal IQueueEndActions Actions { get; set; } = SystemQueueEndActions.Instance;
 
+    private readonly List<BitenIs> _bitenler = new();
+    private Func<bool>? _pencereEtkin;
+
+    /// <summary>İş bitti haberinin sistem yüzü; testler sahtesini verir.</summary>
+    internal IIsBildirimYuzu Bildirim { get; set; } = IsBittiBildirimi.Varsayilan();
+
+    /// <summary>Pencere şu an kullanıcının önünde mi; testler kendi cevabını verir.</summary>
+    internal Func<bool> PencereEtkin
+    {
+        get => _pencereEtkin ??= () => IsActive;
+        set => _pencereEtkin = value;
+    }
+
+    /// <summary>Bir işin sonucunu sıra sonundaki habere yazar.</summary>
+    internal void IsBitti(string yol, IsSonucu sonuc) => _bitenler.Add(new BitenIs(yol, sonuc));
+
+    /// <summary>
+    /// Sıra boşaldığında, son haberden beri biten işler için tek haber. Karar
+    /// <see cref="IsBittiBildirimi.Karar"/>'da; burası yalnız sonucu sistem yüzüne taşır.
+    /// </summary>
+    internal void HaberVer()
+    {
+        var karar = IsBittiBildirimi.Karar(_bitenler.ToList(), PencereEtkin(), _appSettings.NotifyWhenDone,
+            (key, args) => string.Format(Strings.CultureOf(_language), Say(key), args));
+        _bitenler.Clear();
+        if (karar is not null) Bildirim.Bildir(this, karar);
+    }
+
     public ShrinkJobWindow() : this(new ShellShrinkStartup(null, ShrinkArgumentProblem.NoTarget, null), null)
     {
     }
@@ -414,7 +442,11 @@ public partial class ShrinkJobWindow : Window
             _busy = false;
         }
 
-        if (_pending.Count == 0 && !_paused && _finished > 0) QueueDrained();
+        if (_pending.Count == 0 && !_paused && _finished > 0)
+        {
+            HaberVer();
+            QueueDrained();
+        }
     }
 
     /// <summary>
@@ -494,6 +526,7 @@ public partial class ShrinkJobWindow : Window
         var cts = new CancellationTokenSource();
         _cts = cts;
         _running = request.Path;
+        var sonuc = IsSonucu.Hatali;
         try
         {
             var info = await FfprobeClient.ProbeAsync(request.Path, cts.Token);
@@ -514,6 +547,7 @@ public partial class ShrinkJobWindow : Window
                 QueueWatch.MarkOwn(result.OutputPath);
                 _outputs.Add(result.OutputPath);
                 State = ShrinkJobState.Bitti;
+                sonuc = IsSonucu.Basarili;
                 Progress.Value = 1;
                 TxtMessage.Text = BittiSatiri(result, targetMb, plan);
                 BtnReveal.IsVisible = true;
@@ -529,6 +563,7 @@ public partial class ShrinkJobWindow : Window
         catch (OperationCanceledException)
         {
             State = ShrinkJobState.Hata;
+            sonuc = IsSonucu.Iptal;
             TxtMessage.Text = Say("main.run.cancelled");
         }
         catch (Exception ex)
@@ -540,6 +575,7 @@ public partial class ShrinkJobWindow : Window
         finally
         {
             _finished++;
+            IsBitti(request.Path, sonuc);
             _running = null;
             _cts = null;
             cts.Dispose();

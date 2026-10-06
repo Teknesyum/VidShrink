@@ -851,6 +851,11 @@
                           </WrapPanel>
                         </Grid>
                         <CheckBox x:Name="ChkAdvKeepTracks" Theme="{StaticResource CheckStyle}" IsChecked="False" Content="{loc:Text main.advanced.keep-tracks.label}"/>
+                        <CheckBox x:Name="ChkAdvDropMetadata" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.advanced.drop-metadata.label}">
+                          <ToolTip.Tip>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.advanced.drop-metadata.tip}"/>
+                          </ToolTip.Tip>
+                        </CheckBox>
                         <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <TextBlock Text="{loc:Text main.subtitles.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
@@ -1525,6 +1530,11 @@
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <CheckBox x:Name="ChkNotifyWhenDone" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text settings-tab.notify-done.label}"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.notify-done.hint}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                       <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.ffmpeg-path.label}">
@@ -1751,7 +1761,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="ResetSettingsPanel" izi:KartDuvari.Sutun="0" Theme="{StaticResource Panel}">
+              <Border x:Name="ResetSettingsPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Button x:Name="BtnResetSettings"
                           Content="{loc:Text settings.reset-all}"
