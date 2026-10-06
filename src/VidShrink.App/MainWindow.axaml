@@ -347,7 +347,7 @@
                     <TextBlock x:Name="TxtTargetCrfLockedNotice"
                                Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                Text="{loc:Text main.target.crf-locked}"/>
-                    <WrapPanel x:Name="ChipStrip">
+                    <izi:YongaSeridi x:Name="ChipStrip">
                       <Button x:Name="ChipArchive" Content="{loc:Text main.intent.archive}" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetArchive">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -379,7 +379,7 @@
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button x:Name="Chip25" Content="25" Tag="25" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                      <Button x:Name="Chip25" Content="25" Tag="25" izi:YongaSeridi.SatirBasi="True" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.25.tip}"/>
@@ -449,7 +449,7 @@
                           </Flyout>
                         </Button.Flyout>
                       </Button>
-                    </WrapPanel>
+                    </izi:YongaSeridi>
                     <TextBlock x:Name="TxtChipDerivation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <!--
                       Silme onay penceresi istemiyor: yonga kalkıyor, bu satır beliriyor ve
