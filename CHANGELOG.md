@@ -12,6 +12,9 @@ ship as part of it.
 - Recorder: a small level bar next to the microphone and system audio pickers shows the
   live level of the selected input, before and during a recording, so a silent input is
   visible before the recording is lost. No bar is shown when no input is selected.
+- Recorder: the mini bar and its options popup stay out of the recording on Windows 10
+  2004 and later, so a full-screen capture no longer shows the recorder's own controls.
+  Where the bar cannot be hidden, the existing "will appear in the recording" notice stays.
 - Editor: the timeline shows a thumbnail strip under the tracks and thin ticks at the
   source's keyframes. Both are read in the background after the source opens, one frame at
   a time, so the timeline is usable at once; ticks thin out when they would crowd.

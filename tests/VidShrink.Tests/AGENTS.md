@@ -73,6 +73,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   içe, gerçek pencerenin istemci alanı, affinity 0x11 gerçek pencerede (negatif kontrol affinity'siz). Kayıtta bölge
   geçirgen: çerçeve yalnız kenar şeridi (`Ring`), `WindowFromPoint` bölge içi ve şeritte alttakini, panelde bizimkini bulur;
   kayıt evresinde panel `WS_EX_NOACTIVATE`. Otomatik kipte Windows tavanı 30 kare (`GdigrabMaxFps`, `KayitOtomatikKipTests`); ddagrab yoklaması geçince kalkar.
+- `KaydediciMiniYakalamaTests.cs` — mini şerit ve seçenek açılırı kayda girmez: `CaptureExcluded`/`OptionsCaptureExcluded` ve `GetWindowDisplayAffinity` 0x11 (negatif kontrol `ExcludeFromCapture=false`, 0), gizle/göster sonrası da; çıkarılan şerit için tam ekranda "kayda girecek" uyarısı verilmez (`RecorderView.InFrame`); çerçeve ve düzenleyici ortak `CaptureAffinity.Exclude`'dan geçer, P/Invoke tek dosyada. Yakalama başlatmaz, piksel ölçmez; dosya bırakmaz.
 - `KaydediciGirdiTests.cs` — paket 2, tıklama halkası, tıklama sesi, tuş gösterimi: `KeyText`/`KeyTracker`, bellek
   WAV'ı, bindirme yeri; sahte `IInputHooks`/`IInputOverlay`/`IClickSound` ile kutu → json → kanca, kapalı kutu kanca
   kurmaz; gerçek halka ve tuş penceresi açılıp süresinde kapanır. Gerçek düşük seviye kanca testte kurulmaz.
