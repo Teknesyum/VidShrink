@@ -341,7 +341,7 @@ public sealed class KayitBolumIsaretiTests
         try
         {
             var oturum = await RecorderSession.StartAsync(Istek(RecorderContainer.Mkv), Path.Combine(klasor, "kayit.mkv"));
-            oturum.ChapterTitle = "Kısım {0}";
+            oturum.TitleChapters("Kısım {0}");
 
             var ilk = await IsaretKoy(oturum);
             var hemen = oturum.Mark();
@@ -359,7 +359,6 @@ public sealed class KayitBolumIsaretiTests
             Assert.Null(duraklamada);
             Assert.Equal(3, ikinci);
             Assert.Equal(2, sonuc.Segments);
-            Assert.Equal(2, sonuc.MarksWritten);
             Assert.Equal(0, sonuc.MarksLost);
             Assert.False(sonuc.ChaptersUnsupported);
 
@@ -395,7 +394,6 @@ public sealed class KayitBolumIsaretiTests
             Assert.True(sonuc.Ok, sonuc.StandardError);
             Assert.DoesNotContain(0, konan);
             Assert.True(sonuc.Files is { Count: >= 2 }, "kayit bolunmedi");
-            Assert.Equal(konan.Count, sonuc.MarksWritten);
             Assert.Equal(0, sonuc.MarksLost);
 
             var ilk = await Bolumler(sonuc.Files![0]);
@@ -423,7 +421,6 @@ public sealed class KayitBolumIsaretiTests
             Assert.Equal(2, konan);
             Assert.True(sonuc.Ok, sonuc.StandardError);
             Assert.EndsWith(".gif", sonuc.OutputPath, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal(0, sonuc.MarksWritten);
             Assert.Equal(1, sonuc.MarksLost);
             Assert.True(sonuc.ChaptersUnsupported);
             Assert.Equal(new[] { sonuc.OutputPath }, Directory.GetFiles(klasor));
@@ -444,7 +441,6 @@ public sealed class KayitBolumIsaretiTests
 
             Assert.Equal(2, konan);
             Assert.True(sonuc.Ok, sonuc.StandardError);
-            Assert.Equal(0, sonuc.MarksWritten);
             Assert.Equal(0, sonuc.MarksLost);
             Assert.Empty(await Bolumler(sonuc.OutputPath));
         }
@@ -519,7 +515,7 @@ public sealed class KayitBolumIsaretiTests
 
             var temiz = new RecordResult(true, "kayit.mkv", 1, false, 0, string.Empty, 1);
             return (
-                yok: Goster(temiz with { MarksWritten = 2 }),
+                yok: Goster(temiz),
                 tasimaz: Goster(temiz with { OutputPath = "kayit.gif", MarksLost = 2, ChaptersUnsupported = true }),
                 dustu: Goster(temiz with { MarksLost = 1 }),
                 yarim: Goster(temiz with { Ok = false, Partial = true, Playable = true, MarksLost = 1 }),

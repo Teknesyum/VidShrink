@@ -64,7 +64,6 @@ public enum RecorderState
 /// Yarim dosya ffprobe ile yoklandi: <c>true</c> en az bir video paketi okundu, <c>false</c> okunamadi,
 /// <c>null</c> yoklanmadi ya da ffprobe calismadi.
 /// </param>
-/// <param name="MarksWritten">Dosyaya bolum olarak yazilan isaret sayisi.</param>
 /// <param name="MarksLost">
 /// Konup da dosyaya yazilamayan isaret sayisi: kap bolum tasimiyor, kayit yarim kaldi ya da
 /// yeniden paketleme dustu. Sifirdan buyukse cagiran bunu kullaniciya soyler.
@@ -83,7 +82,6 @@ public sealed record RecordResult(
     string? DeliveryError = null,
     string? MissingGif = null,
     bool? Playable = null,
-    int MarksWritten = 0,
     int MarksLost = 0,
     bool ChaptersUnsupported = false)
 {
@@ -244,7 +242,9 @@ public sealed class RecorderSession : IAsyncDisposable
     }
 
     /// <summary>Dosyaya yazilan bolum adinin kalibi; <c>{0}</c> bolumun sirasi.</summary>
-    public string ChapterTitle { get; set; } = "Chapter {0}";
+    public void TitleChapters(string format) => _chapterTitle = format;
+
+    private string _chapterTitle = "Chapter {0}";
 
     /// <summary>
     /// O ana bolum isareti koyar. Zaman cikti zaman cizgisinden okunur
@@ -349,11 +349,11 @@ public sealed class RecorderSession : IAsyncDisposable
         var written = 0;
         for (var part = 0; part < files.Count && part < durations.Count; part++)
         {
-            var chapters = RecorderChapters.ForPart(marks, part, durations[part], ChapterTitle);
+            var chapters = RecorderChapters.ForPart(marks, part, durations[part], _chapterTitle);
             if (chapters.Count > 0 && await WriteChaptersAsync(files[part], chapters, ct)) written += chapters.Count - 1;
         }
 
-        return result with { OutputMb = files.Sum(SizeMb), MarksWritten = written, MarksLost = marks.Length - written };
+        return result with { OutputMb = files.Sum(SizeMb), MarksLost = marks.Length - written };
     }
 
     private static async Task<bool> WriteChaptersAsync(string file, IReadOnlyList<RecorderChapter> chapters, CancellationToken ct)

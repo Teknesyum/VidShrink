@@ -143,7 +143,7 @@ internal partial class RecorderView
             PreparePreview(request.PreviewPath);
             _session = await RecorderSession.StartAsync(
                 request, path, new Progress<RecordProgress>(ShowProgress));
-            _session.ChapterTitle = LanguageCatalog.Display(Strings.Get("recorder.chapter.title"));
+            _session.TitleChapters(LanguageCatalog.Display(Strings.Get("recorder.chapter.title")));
             _frameRegion = RegionOf(request);
             _ = FollowEndAsync(_session.Ended, _session);
         }
