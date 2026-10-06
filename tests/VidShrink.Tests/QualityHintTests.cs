@@ -50,9 +50,9 @@ public sealed class QualityHintTests
     {
         var xaml = File.ReadAllText(TipSources.WindowXamlPath);
         var anchor = xaml.IndexOf("x:Name=\"ChipWhatsApp\"", StringComparison.Ordinal);
-        var start = anchor < 0 ? -1 : xaml.LastIndexOf("<WrapPanel", anchor, StringComparison.Ordinal);
-        var end = start < 0 ? -1 : xaml.IndexOf("</WrapPanel>", start, StringComparison.Ordinal);
-        Assert.True(start >= 0 && end > start, "Hedef yongalarının WrapPanel'i bulunamadı.");
+        var start = anchor < 0 ? -1 : xaml.LastIndexOf("<izi:YongaSeridi", anchor, StringComparison.Ordinal);
+        var end = start < 0 ? -1 : xaml.IndexOf("</izi:YongaSeridi>", start, StringComparison.Ordinal);
+        Assert.True(start >= 0 && end > start, "Hedef yongalarının şeridi bulunamadı.");
 
         var block = xaml[start..end];
         var chips = Regex.Matches(block, "x:Name=\"(Chip\\w+)\"[^>]*?Theme=\"\\{StaticResource ChipButton\\}\"")
