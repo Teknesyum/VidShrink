@@ -214,7 +214,8 @@ video" list, which offers text and image subtitles alike.
 the foreign-language parts of a film. A track flagged as forced wins; otherwise subtitle packets
 are counted and the one track holding at most 10% of the fullest same-language track is burned
 in. When the answer is not clear-cut nothing is burned and a line says why. It cannot be combined
-with `--yak`.
+with `--yak`. In the app the "Find foreign-language subtitle" button next to the "Burn into video"
+list does the same and selects the track it finds.
 
 Cover art is kept in MP4 and MKV output (png and jpeg in MKV, as an attachment). MOV cannot
 carry it; the plan says so.

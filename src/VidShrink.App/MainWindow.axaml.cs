@@ -277,8 +277,8 @@ public partial class MainWindow : Window
         Watch(TxtAdvFilters, TextBox.TextProperty, OnFilterTextChanged);
         Watch(ChkFltAutoCrop, ToggleButton.IsCheckedProperty, OnAutoCropChanged);
         Watch(ChkAudioLoudnorm, ToggleButton.IsCheckedProperty, OnOptionChanged);
-        foreach (var box in new[] { CmbAudioGain, CmbBurnSubtitle })
-            Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
+        Watch(CmbAudioGain, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
+        Watch(CmbBurnSubtitle, SelectingItemsControl.SelectedIndexProperty, OnBurnChoiceChanged);
 
         Watch(SliderQuality, RangeBase.ValueProperty, OnQualitySliderChanged);
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);

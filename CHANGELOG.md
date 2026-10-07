@@ -12,6 +12,13 @@ ship as part of it.
 - The app's "Burn into video" list now offers image subtitles (PGS, VOBSUB, DVB) next to text
   ones. Picking one burns it in through the same overlay path as the CLI's `--yak N`. Not tried
   in a real window on real disc subtitles; the argument line is pinned by tests.
+- The app has the CLI's foreign audio search: a "Find foreign-language subtitle" button next to
+  the "Burn into video" list. It takes the same decision path as `--altyazi-tara` (a forced
+  track first, otherwise a packet count) and selects the track it finds in the list; when it
+  picks nothing, a line under the row says why. The count runs in the background and the button
+  turns into Cancel while it does. A new source, a title change or a manual pick drops the scan.
+  The eight new texts are in all 42 languages. Not tried in a real window or on a real film; the
+  count is faked in tests.
 
 ### Changed
 

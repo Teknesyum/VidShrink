@@ -873,8 +873,16 @@
                                 </ComboBox.ItemTemplate>
                               </ComboBox>
                             </StackPanel>
+                            <Button x:Name="BtnScanSubtitle" Theme="{StaticResource GhostButton}" Click="OnScanSubtitle" VerticalAlignment="Bottom"
+                                    MinHeight="{StaticResource FieldMinHeight}" IsEnabled="False"
+                                    Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.scan}"
+                                    auto:AutomationProperties.Name="{loc:Text main.subtitles.scan}"/>
                           </WrapPanel>
-                          <StackPanel x:Name="SubtitleList" Grid.Row="2" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
+                          <StackPanel Grid.Row="2" Spacing="{StaticResource SpaceXs}">
+                            <TextBlock x:Name="TxtSubtitleScan" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
+                                       auto:AutomationProperties.LiveSetting="Polite"/>
+                            <StackPanel x:Name="SubtitleList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
+                          </StackPanel>
                         </Grid>
                       </StackPanel>
                     </StackPanel>

@@ -228,7 +228,8 @@ liste metin ve resim altyazıyı birlikte sunuyor.
 konuşulan yerlerini çeviren altyazıyı. Zorunlu (forced) bayraklı iz varsa o; yoksa altyazı
 paketleri sayılıyor ve aynı dildeki en dolu izin en çok %10'u kadar paket taşıyan tek iz
 yakılıyor. Sonuç açık değilse hiçbir şey yakılmıyor ve nedeni bir satırla söyleniyor. `--yak`
-ile birlikte verilemiyor.
+ile birlikte verilemiyor. Uygulamada "Görüntüye yak" listesinin yanındaki "Yabancı dil
+altyazısını bul" düğmesi aynı işi yapıyor ve bulduğu izi listede seçiyor.
 
 Kapak resmi MP4 ve MKV çıktıda korunuyor (MKV'de png ve jpeg, ek olarak). MOV taşıyamıyor;
 plan bunu söylüyor.

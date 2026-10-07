@@ -1,3 +1,7 @@
+using Avalonia.Automation;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
 using VidShrink.App;
 using VidShrink.Core;
 using Xunit;
@@ -314,6 +318,242 @@ public sealed class IzPaneliTests : IDisposable
     [InlineData("a.mkv", false)]
     [InlineData("a.txt", false)]
     public void AltyaziDosyasiTanima(string yol, bool beklenen) => Assert.Equal(beklenen, MainWindow.IsSubtitleFile(yol));
+
+    private static MediaInfo TaramaKaynagi(string yol, params SourceStream[] altyazilar) => Kaynak(yol) with
+    {
+        Streams = new[]
+        {
+            new SourceStream(0, StreamKind.Video, "h264"),
+            new SourceStream(1, StreamKind.Audio, "aac", "eng", Channels: 2)
+        }.Concat(altyazilar).ToArray()
+    };
+
+    private static SourceStream Metin(int index, string dil = "eng", bool zorunlu = false)
+        => new(index, StreamKind.Subtitle, "subrip", dil, IsForced: zorunlu);
+
+    private static void Tikla(Button dugme) => dugme.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+    /// <summary>
+    /// Zorunlu bayraklı iz paket sayılmadan seçilir ve plana iner: düğme CLI'daki <c>--altyazi-tara</c>
+    /// ile aynı ilk adımı koşar. Sayaç hiç çağrılmaz (olumsuz kontrol: bayraksız eşinde çağrılır).
+    /// </summary>
+    [Fact]
+    public void TaramaBayrakliIziSayimsizSecer()
+    {
+        var (secim, plandaki, sayim, durum, bayraksizSayim) = Pencerede(window =>
+        {
+            var sayac = 0;
+            window.CountSubtitlePackets = (_, _) =>
+            {
+                sayac++;
+                return Task.FromResult<IReadOnlyDictionary<int, int>?>(null);
+            };
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", TaramaKaynagi("C:\\ornek\\film.mkv", Metin(2), Metin(3, "tur"), Metin(4, zorunlu: true)));
+            Tikla(window.BtnScanSubtitle);
+            var sonuc = (window.BurnChoice, window.PlanOptionsForTest().Filters.BurnSubtitle, sayac, window.SubtitleScanStatus);
+            window.LoadWithoutProbing("C:\\ornek\\duz.mkv", TaramaKaynagi("C:\\ornek\\duz.mkv", Metin(2), Metin(3, "tur"), Metin(4)));
+            Tikla(window.BtnScanSubtitle);
+            return (sonuc.Item1, sonuc.Item2, sonuc.Item3, sonuc.Item4, sayac);
+        });
+
+        Assert.Equal(2, secim);
+        Assert.Equal(2, plandaki);
+        Assert.Equal(0, sayim);
+        Assert.Equal("Picked #3: it carries the forced flag.", durum);
+        Assert.Equal(1, bayraksizSayim);
+    }
+
+    /// <summary>
+    /// Bayrak yokken sayım koşar; aynı dilde en dolu izin onda birini geçmeyen iz listede seçilir.
+    /// Sayaca yüklü kaynak gider; resim altyazı listede yer tuttuğu için seçim sırası kaymaz.
+    /// </summary>
+    [Fact]
+    public void TaramaSeyrekIziSayimlaSecer()
+    {
+        var kaynak = TaramaKaynagi("C:\\ornek\\film.mkv",
+            new SourceStream(2, StreamKind.Subtitle, "eia_608", "eng"), Metin(3), Metin(4), new SourceStream(5, StreamKind.Subtitle, "hdmv_pgs_subtitle", "eng"));
+        var (secim, satir, plandaki, sayilan, durum, calisiyor, dugme) = Pencerede(window =>
+        {
+            string? yol = null;
+            window.CountSubtitlePackets = (info, _) =>
+            {
+                yol = info.FilePath;
+                return Task.FromResult<IReadOnlyDictionary<int, int>?>(new Dictionary<int, int> { [3] = 100, [4] = 5, [5] = 40 });
+            };
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", kaynak);
+            Tikla(window.BtnScanSubtitle);
+            return (window.BurnChoice, window.CmbBurnSubtitle.SelectedIndex, window.PlanOptionsForTest().Filters.BurnSubtitle, yol,
+                window.SubtitleScanStatus, window.SubtitleScanRunning, window.BtnScanSubtitle.Content as string);
+        });
+
+        Assert.Equal(2, secim);
+        Assert.Equal(2, satir);
+        Assert.Equal(2, plandaki);
+        Assert.Equal("C:\\ornek\\film.mkv", sayilan);
+        Assert.Equal("Picked #3: 5 packets against 100 in the fullest track of the same language.", durum);
+        Assert.False(calisiyor);
+        Assert.Equal("Find Foreign-language Subtitle", dugme);
+    }
+
+    /// <summary>
+    /// İz seçilmeyen dört sonuç kendi cümlesini yazar ve elle yapılmış seçime dokunmaz: sayılamadı
+    /// (sayaç <c>null</c> döner ya da atar), aday yok, belirsiz.
+    /// </summary>
+    [Theory]
+    [InlineData("null", "The subtitle packets could not be counted; no track is picked.")]
+    [InlineData("hata", "The subtitle packets could not be counted; no track is picked.")]
+    [InlineData("100,100,0", "No sparse track stands next to a full one in the same language; no track is picked.")]
+    [InlineData("100,5,5", "More than one track looks like a foreign-language subtitle; no track is picked. Choose one from the list.")]
+    public void TaramaSecemeyinceSoyler(string sayim, string beklenen)
+    {
+        var (secim, durum) = Pencerede(window =>
+        {
+            window.CountSubtitlePackets = (_, _) => sayim switch
+            {
+                "null" => Task.FromResult<IReadOnlyDictionary<int, int>?>(null),
+                "hata" => Task.FromException<IReadOnlyDictionary<int, int>?>(new InvalidOperationException("ffprobe yok")),
+                _ => Task.FromResult<IReadOnlyDictionary<int, int>?>(sayim.Split(',').Select(int.Parse).Select((adet, i) => (i, adet))
+                    .Where(x => x.adet > 0).ToDictionary(x => x.i + 2, x => x.adet))
+            };
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", TaramaKaynagi("C:\\ornek\\film.mkv", Metin(2), Metin(3), Metin(4)));
+            window.CmbBurnSubtitle.SelectedIndex = 1;
+            Tikla(window.BtnScanSubtitle);
+            return (window.BurnChoice, window.SubtitleScanStatus);
+        });
+
+        Assert.Equal(0, secim);
+        Assert.Equal(beklenen, durum);
+    }
+
+    /// <summary>
+    /// Yakılabilir altyazı yoksa düğme kapalıdır ve karar yolu sayım açmadan "altyazı yok" der;
+    /// altyazılı kaynakta düğme açık ve erişilebilir adı taşır (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void TaramaDugmesiAltyazisizKaynaktaKapali()
+    {
+        var (bosta, kapali, sayim, durum, acik, ad) = Pencerede(window =>
+        {
+            var sayac = 0;
+            window.CountSubtitlePackets = (_, _) =>
+            {
+                sayac++;
+                return Task.FromResult<IReadOnlyDictionary<int, int>?>(null);
+            };
+            var ilk = window.BtnScanSubtitle.IsEnabled;
+            window.LoadWithoutProbing("C:\\ornek\\duz.mkv", TaramaKaynagi("C:\\ornek\\duz.mkv", new SourceStream(2, StreamKind.Subtitle, "eia_608", "eng")));
+            var k = window.BtnScanSubtitle.IsEnabled;
+            window.ScanSubtitlesAsync().GetAwaiter().GetResult();
+            var d = window.SubtitleScanStatus;
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", Kaynak());
+            return (ilk, k, sayac, d, window.BtnScanSubtitle.IsEnabled, AutomationProperties.GetName(window.BtnScanSubtitle));
+        });
+
+        Assert.False(bosta);
+        Assert.False(kapali);
+        Assert.Equal(0, sayim);
+        Assert.Equal("The source has no subtitle that can be burned.", durum);
+        Assert.True(acik);
+        Assert.Equal("Find Foreign-language Subtitle", ad);
+    }
+
+    /// <summary>
+    /// Sayım sürerken düğme iptale döner ve arayüz beklemez; ikinci basış sayacın jetonunu iptal eder.
+    /// Geç gelen sayım sonucu seçimi de durumu da yazmaz.
+    /// </summary>
+    [Fact]
+    public void TaramaIptalEdilir()
+    {
+        var (surerken, sonra, gec) = Pencerede(window =>
+        {
+            var is_ = new TaskCompletionSource<IReadOnlyDictionary<int, int>?>();
+            var jeton = CancellationToken.None;
+            window.CountSubtitlePackets = (_, ct) =>
+            {
+                jeton = ct;
+                return is_.Task;
+            };
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", TaramaKaynagi("C:\\ornek\\film.mkv", Metin(2), Metin(3)));
+            Tikla(window.BtnScanSubtitle);
+            var a = (window.SubtitleScanRunning, window.SubtitleScanStatus, window.BtnScanSubtitle.Content as string,
+                AutomationProperties.GetName(window.BtnScanSubtitle), jeton.IsCancellationRequested);
+            Tikla(window.BtnScanSubtitle);
+            var b = (window.SubtitleScanRunning, window.SubtitleScanStatus, window.BtnScanSubtitle.Content as string, jeton.IsCancellationRequested);
+            is_.SetResult(new Dictionary<int, int> { [2] = 100, [3] = 5 });
+            Dispatcher.UIThread.RunJobs();
+            return (a, b, (window.BurnChoice, window.SubtitleScanStatus, window.SubtitleScanRunning));
+        });
+
+        Assert.Equal((true, "Counting subtitle packets...", "Cancel", "Cancel", false), surerken);
+        Assert.Equal((false, null, "Find Foreign-language Subtitle", true), sonra);
+        Assert.Equal((null, null, false), gec);
+    }
+
+    /// <summary>
+    /// Yeni kaynak süren taramayı düşürür ve biten taramanın durumunu siler; eski kaynağın geç gelen
+    /// sayımı yeni kaynakta iz seçmez. Elle seçim de durumu siler.
+    /// </summary>
+    [Fact]
+    public void YeniKaynakTaramayiSifirlar()
+    {
+        var (iptal, gec, bitince, yeniKaynakta, elleSecince) = Pencerede(window =>
+        {
+            var is_ = new TaskCompletionSource<IReadOnlyDictionary<int, int>?>();
+            var jeton = CancellationToken.None;
+            window.CountSubtitlePackets = (_, ct) =>
+            {
+                jeton = ct;
+                return is_.Task;
+            };
+            var ilk = TaramaKaynagi("C:\\ornek\\film.mkv", Metin(2), Metin(3));
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", ilk);
+            Tikla(window.BtnScanSubtitle);
+            window.LoadWithoutProbing("C:\\ornek\\ikinci.mkv", TaramaKaynagi("C:\\ornek\\ikinci.mkv", Metin(2), Metin(3)));
+            var i = (jeton.IsCancellationRequested, window.SubtitleScanRunning, window.SubtitleScanStatus);
+            is_.SetResult(new Dictionary<int, int> { [2] = 100, [3] = 5 });
+            Dispatcher.UIThread.RunJobs();
+            var g = (window.BurnChoice, window.SubtitleScanStatus);
+
+            window.CountSubtitlePackets = (_, _) => Task.FromResult<IReadOnlyDictionary<int, int>?>(new Dictionary<int, int> { [2] = 100, [3] = 5 });
+            Tikla(window.BtnScanSubtitle);
+            var b = (window.BurnChoice, window.SubtitleScanStatus is not null);
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", ilk);
+            var y = (window.BurnChoice, window.SubtitleScanStatus);
+            Tikla(window.BtnScanSubtitle);
+            window.CmbBurnSubtitle.SelectedIndex = 1;
+            return (i, g, b, y, (window.BurnChoice, window.SubtitleScanStatus));
+        });
+
+        Assert.Equal((true, false, null), iptal);
+        Assert.Equal((null, null), gec);
+        Assert.Equal((1, true), bitince);
+        Assert.Equal((null, null), yeniKaynakta);
+        Assert.Equal((0, null), elleSecince);
+    }
+
+    /// <summary>
+    /// Taramanın sekiz anahtarı 42 dilde dolu; sayı taşıyan iki cümle yer tutucularını korur, öbürleri
+    /// yer tutucu taşımaz. CLI'ın altı sonucunun her birinin arayüzde bir cümlesi var.
+    /// </summary>
+    [Fact]
+    public void TaramaAnahtarlariButunDillerde()
+    {
+        var sonuclar = Enum.GetValues<ForeignAudioOutcome>().Select(sonuc => "main.subtitles.scan." + new ForeignAudioPick(sonuc).Slug).ToList();
+        Assert.Equal(6, sonuclar.Distinct().Count());
+        Assert.Equal(42, Locales.Languages.Count);
+        foreach (var language in Locales.Languages)
+        {
+            var values = Locales.Values(language);
+            foreach (var key in sonuclar.Append("main.subtitles.scan").Append("main.subtitles.scan.running"))
+            {
+                Assert.True(values.TryGetValue(key, out var metin) && metin.Length > 0, $"{language}: {key}");
+                var beklenen = key.EndsWith(".flagged", StringComparison.Ordinal) ? 1 : key.EndsWith(".sparse", StringComparison.Ordinal) ? 3 : 0;
+                for (var i = 0; i < 3; i++)
+                    Assert.True(metin.Contains("{" + i + "}", StringComparison.Ordinal) == i < beklenen, $"{language}: {key} {{{i}}}");
+            }
+            Assert.Equal(8, values.Keys.Count(key => key.StartsWith("main.subtitles.scan", StringComparison.Ordinal)));
+        }
+    }
 
     /// <summary>On anahtar 42 dilde dolu.</summary>
     [Fact]
