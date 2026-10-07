@@ -23,6 +23,8 @@ public partial class MainWindow
     internal Func<MediaInfo, CancellationToken, Task<IReadOnlyDictionary<int, int>?>> CountSubtitlePackets { get; set; }
         = (info, ct) => FfprobeClient.CountSubtitlePacketsAsync(info.FilePath, ct);
 
+    internal static string SubtitleScanKey(ForeignAudioPick karar) => "main.subtitles.scan." + karar.Slug;
+
     internal bool SubtitleScanRunning => _taramaCts is not null;
 
     internal string? SubtitleScanStatus => TxtSubtitleScan.IsVisible ? TxtSubtitleScan.Text : null;
@@ -78,7 +80,7 @@ public partial class MainWindow
 
         var sira = karar.Number is int numara ? _burnChoices.IndexOf(numara - 1) : -1;
         if (sira >= 0) CmbBurnSubtitle.SelectedIndex = sira + 1;
-        TaramaDurumu(Say("main.subtitles.scan." + karar.Slug, karar.Number, karar.Packets, karar.FullestPackets));
+        TaramaDurumu(Say(SubtitleScanKey(karar),karar.Number, karar.Packets, karar.FullestPackets));
     }
 
     private void OnBurnChoiceChanged()
