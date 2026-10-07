@@ -10,6 +10,7 @@ public partial class MainWindow
 {
     private RecorderView? _recorderPane;
     private EditorView? _editorPane;
+    private bool _editorDropMetadata;
 
     /// <summary>
     /// Kaydedici sekmesinin icerigi ilk secildiginde kuruluyor. XAML'in icinde dururken
@@ -68,6 +69,12 @@ public partial class MainWindow
             if (_editorPane is not null) return _editorPane;
 
             _editorPane = new EditorView { KnownInfo = Media.InfoFor, OpenInPlayer = OpenInPlayerAsync };
+            _editorPane.DropMetadata = _editorDropMetadata;
+            _editorPane.DropMetadataChanged = value =>
+            {
+                _editorDropMetadata = value;
+                SaveAppSettings();
+            };
             PageEditor.Content = _editorPane;
             return _editorPane;
         }

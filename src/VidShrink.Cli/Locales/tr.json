@@ -76,6 +76,8 @@
   "plan.target": "Hedef:     {0} MB",
   "plan.quality-target": "Kalite:    {0} istendi, {1} MB türetildi ({2})",
   "plan.video": "Görüntü:   {0} {1}, {2}x{3} {4} fps, {5} kbit/sn",
+  "plan.frame-rate.constant": "Kare hızı: sabit, {0} fps",
+  "plan.frame-rate.peak": "Kare hızı: en çok {0} fps, değişken",
   "plan.audio": "Ses:       {0} {1} kbit/sn",
   "plan.estimate": "Tahmin:    {0} MB ({1}-{2} MB)",
   "plan.quality": "Öngörü:    {0} ({1})",

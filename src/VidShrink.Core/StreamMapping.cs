@@ -295,17 +295,11 @@ public sealed record StreamPlan(
             a.AddRange(new[] { "-disposition:s:" + index, Subtitles[i].Disposition });
         }
 
-        if (Request.DropMetadata)
-        {
-            for (var i = 0; i < Audio.Count; i++)
-                if (!string.IsNullOrWhiteSpace(Audio[i].Language))
-                    a.AddRange(new[] { "-metadata:s:a:" + i.ToString(CultureInfo.InvariantCulture), "language=" + Audio[i].Language });
-            for (var i = 0; i < Subtitles.Count; i++)
-                if (Subtitles[i].InputPath is null && !string.IsNullOrWhiteSpace(Subtitles[i].Language))
-                    a.AddRange(new[] { "-metadata:s:s:" + i.ToString(CultureInfo.InvariantCulture), "language=" + Subtitles[i].Language });
-        }
-
-        a.AddRange(new[] { "-map_metadata", Request.DropMetadata ? "-1" : "0", "-map_chapters", dropChapters ? "-1" : "0" });
+        a.AddRange(StreamMapping.MetadataArguments(
+            Request.DropMetadata,
+            Audio.Select(track => track.Language).ToArray(),
+            Subtitles.Select(track => track.InputPath is null ? track.Language : null).ToArray()));
+        a.AddRange(new[] { "-map_chapters", dropChapters ? "-1" : "0" });
         return a;
     }
 
@@ -335,6 +329,26 @@ public static class StreamMapping
     /// Yalniz sesin yeniden kodlandigi izde islenir; kopyalanan izde suzgec kurulamaz.
     /// </summary>
     public const string SesHizalama = "aresample=async=1:first_pts=0";
+
+    /// <summary>
+    /// Meta veriyi silmenin tek kaynagi; kucultme, Donustur ve duzenleyici teslimi ayni diziyi yazar.
+    /// <c>-map_metadata -1</c> kap ve akis etiketlerini siler, bolumlere dokunmaz; iz dili ayni komutta
+    /// acikca geri yazilir. Dili bos olan iz atlanir, sira cikti akisinin sirasidir.
+    /// </summary>
+    public static IReadOnlyList<string> MetadataArguments(
+        bool drop, IReadOnlyList<string?> audioLanguages, IReadOnlyList<string?> subtitleLanguages)
+    {
+        if (!drop) return new[] { "-map_metadata", "0" };
+        var a = new List<string>();
+        for (var i = 0; i < audioLanguages.Count; i++)
+            if (!string.IsNullOrWhiteSpace(audioLanguages[i]))
+                a.AddRange(new[] { "-metadata:s:a:" + i.ToString(CultureInfo.InvariantCulture), "language=" + audioLanguages[i] });
+        for (var i = 0; i < subtitleLanguages.Count; i++)
+            if (!string.IsNullOrWhiteSpace(subtitleLanguages[i]))
+                a.AddRange(new[] { "-metadata:s:s:" + i.ToString(CultureInfo.InvariantCulture), "language=" + subtitleLanguages[i] });
+        a.AddRange(new[] { "-map_metadata", "-1" });
+        return a;
+    }
 
     /// <summary>
     /// ffmpeg'in <c>loudnorm</c> varsayilanlari acik yazili: I=-24 LUFS, LRA=7, TP=-2 dBTP.

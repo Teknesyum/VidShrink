@@ -501,6 +501,7 @@ public static class CliApp
             builder.AppendLine(text.Format("plan.target", Num(decision.TargetMb, "0.##", text)));
         builder.AppendLine(text.Format("plan.video", plan.Codec, plan.Mode, plan.Width, plan.Height, Num(plan.Fps, "0.##", text), plan.VideoBitrateK));
         foreach (var note in EncoderNotes(plan, text)) builder.AppendLine(note);
+        if (FrameRateText(info, plan, text) is { } kare) builder.AppendLine(kare);
         if (plan.AudioCodec is not null)
             builder.AppendLine(text.Format("plan.audio", plan.AudioCodec, plan.AudioBitrateK));
         foreach (var note in AudioOptionNotes(decision, text)) builder.AppendLine(note);
@@ -519,6 +520,12 @@ public static class CliApp
         builder.AppendLine(FfmpegArguments.ToCommandLine(decision.Arguments));
         return builder.ToString();
     }
+
+    /// <summary>Uygulanan kare hizi kipinin plan satiri; otomatik kipte ve kopyalanan planda yoktur.</summary>
+    public static string? FrameRateText(MediaInfo info, EncodePlan plan, CliText text)
+        => VideoFilterChain.FrameRateNote(info, plan) is { } note
+            ? text.Format(note.Mode == FrameRateMode.Constant ? "plan.frame-rate.constant" : "plan.frame-rate.peak", Num(note.Fps, "0.##", text))
+            : null;
 
     public static string PlanJson(CliRequest request, CliDecision decision)
         => Json(!request.JsonLines, writer =>

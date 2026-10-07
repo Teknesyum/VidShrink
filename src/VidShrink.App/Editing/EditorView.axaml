@@ -78,7 +78,14 @@
                 <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                 <Button.Flyout>
                   <Flyout>
-                    <CheckBox x:Name="ChkExportSeparate" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.export.separate}"/>
+                    <StackPanel Spacing="{StaticResource SpaceSm}">
+                      <CheckBox x:Name="ChkExportSeparate" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.export.separate}"/>
+                      <CheckBox x:Name="ChkExportDropMetadata" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.drop-metadata.label}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
+                        </ToolTip.Tip>
+                      </CheckBox>
+                    </StackPanel>
                   </Flyout>
                 </Button.Flyout>
               </Button>

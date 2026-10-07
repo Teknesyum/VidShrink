@@ -286,6 +286,7 @@ public partial class MainWindow : Window
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnQualityRangeChanged);
         foreach (var box in new[] { CmbContainer, CmbResolution, CmbConvertFps, CmbConvertAudio })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
+        Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, OnConvertChanged);
         foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
 
@@ -304,6 +305,7 @@ public partial class MainWindow : Window
         Player.Opened += OnPlayerOpened;
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkAdvDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
         Watch(TxtOpenSubtitlesKey, TextBox.TextProperty, SaveAppSettings);
@@ -1596,6 +1598,8 @@ public partial class MainWindow : Window
             AdvCodecLock = CmbAdvCodecLock.SelectedIndex,
             AdvKeepTracks = ChkAdvKeepTracks.IsChecked == true,
             AdvDropMetadata = ChkAdvDropMetadata.IsChecked == true,
+            ConvertDropMetadata = ChkConvertDropMetadata.IsChecked == true,
+            EditorDropMetadata = _editorPane?.DropMetadata ?? _editorDropMetadata,
             OutputFolderMode = OutputFolderModeIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
             OutputNamePattern = TxtOutputName.Text ?? "",
@@ -1635,6 +1639,9 @@ public partial class MainWindow : Window
                 if (index >= 0 && index < box.ItemCount) box.SelectedIndex = index;
             ChkAdvKeepTracks.IsChecked = settings.AdvKeepTracks;
             ChkAdvDropMetadata.IsChecked = settings.AdvDropMetadata;
+            ChkConvertDropMetadata.IsChecked = settings.ConvertDropMetadata;
+            _editorDropMetadata = settings.EditorDropMetadata;
+            if (_editorPane is not null) _editorPane.DropMetadata = settings.EditorDropMetadata;
 
             OutputFolderModeIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
             TxtOutputFolder.Text = settings.OutputFolder;
@@ -4746,7 +4753,8 @@ public partial class MainWindow : Window
             AudioBitrateK = audioK > 0 ? audioK : ConversionDefaults.AudioBitrateK,
             Start = ParseTime(TxtTrimStart.Text),
             End = ParseTime(TxtTrimEnd.Text),
-            HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve
+            HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
+            DropMetadata = ChkConvertDropMetadata.IsChecked == true
         };
     }
 

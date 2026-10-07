@@ -19,6 +19,9 @@ public sealed class ConversionPlan
     public TimeSpan? Start { get; init; }
     public TimeSpan? End { get; init; }
     public HdrPolicy HdrPolicy { get; init; } = HdrPolicy.Preserve;
+
+    /// <summary>Kap ve akış etiketleri silinir, iz dili açıkça geri yazılır. GIF'te okunmaz.</summary>
+    public bool DropMetadata { get; init; }
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac";
     public bool Gif => Container == "gif";
     public bool AnimatedImage => Container is "webp" or "avif";
