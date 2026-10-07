@@ -149,6 +149,12 @@ public sealed record CliRequest
     /// </summary>
     public double? FrameRate { get; init; }
 
+    /// <summary><c>--ses-hizi</c> (HandBrake <c>--arate</c>): yeniden kodlanan sesin ornekleme hizi, Hz; <c>auto</c> ise <c>null</c>.</summary>
+    public int? AudioSampleRate { get; init; }
+
+    /// <summary><c>--ses-drc</c> (HandBrake <c>--drc</c>): AC-3/E-AC-3 kaynagin cozucusune DRC olcegi.</summary>
+    public double? AudioDrcScale { get; init; }
+
     /// <summary>
     /// <see cref="SubtitleFiles"/> ve <see cref="SidecarSubtitles"/>'in diskten cozulmus hali;
     /// <see cref="ResolvedSubtitles"/> doldurur.
@@ -275,6 +281,8 @@ public sealed record CliRequest
         if (AudioCodec is { } sesKodek) options.AudioCodec = sesKodek;
         options.AudioLoudnorm = AudioLoudnorm;
         options.AudioGainDb = AudioGainDb;
+        options.AudioSampleRate = AudioSampleRate;
+        options.AudioDrcScale = AudioDrcScale;
         options.ExternalSubtitles = ExternalSubtitles;
         options.DropMetadata = DropMetadata;
         options.SubtitleLanguages = SubtitleLanguages;
@@ -323,6 +331,7 @@ public static class CliParser
         "--yak", "--burn", "--yak-srt", "--srt-burn", "--yak-ass", "--ssa-burn", "--meta-yok", "--no-metadata",
         "--altyazi-dil", "--subtitle-lang", "--ilk-altyazi", "--first-subtitle",
         "--sabit-kare", "--cfr", "--tavan-kare", "--pfr", "--kare-hizi", "--fps",
+        "--ses-hizi", "--arate", "--ses-drc", "--drc",
     };
 
     public static CliParseResult Parse(IReadOnlyList<string> args)
@@ -496,6 +505,24 @@ public static class CliParser
                     if (!TryParseNumber(kazanc, out var db) || db < StreamMapping.MinGainDb || db > StreamMapping.MaxGainDb)
                         return Fail("error.bad-gain", kazanc);
                     request = request with { AudioGainDb = db };
+                    break;
+                case "--ses-hizi" or "--arate" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var sesHizi)) return Fail("error.missing-value", arg);
+                    if (sesHizi.Equals("auto", StringComparison.OrdinalIgnoreCase))
+                    {
+                        request = request with { AudioSampleRate = null };
+                        break;
+                    }
+                    if (!TryParseNumber(sesHizi, out var khz)) return Fail("error.bad-arate", sesHizi);
+                    var hz = (int)Math.Round(khz < 1000 ? khz * 1000 : khz);
+                    if (!StreamMapping.SampleRates.Contains(hz)) return Fail("error.bad-arate", sesHizi);
+                    request = request with { AudioSampleRate = hz };
+                    break;
+                case "--ses-drc" or "--drc" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var sesDrc)) return Fail("error.missing-value", arg);
+                    if (!TryParseNumber(sesDrc, out var drc) || drc < StreamMapping.MinDrcScale || drc > StreamMapping.MaxDrcScale)
+                        return Fail("error.bad-drc", sesDrc);
+                    request = request with { AudioDrcScale = drc };
                     break;
                 case "--altyazi" or "--subtitle" when command != CliCommand.Watch:
                     if (!TryValue(args, ref i, out var altyazi)) return Fail("error.missing-value", arg);

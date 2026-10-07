@@ -131,6 +131,9 @@ public sealed record ExternalSubtitle(string Path, string Codec, string? Languag
 /// <see cref="BurnedSubtitle"/> kaynagin altyazi sirasi (0 tabanli, ffmpeg'in <c>si</c>'si).
 /// <see cref="ExplicitAudioCodec"/> ses kodeginin kullanicidan geldigini soyler: motorun kendi
 /// <c>aac</c>'si Matroska'da Opus'a doner, kullanicinin sectigi AAC donmez.
+/// <see cref="AudioSampleRate"/> (Hz) yeniden kodlanan izin ornekleme hizi; kaynak zaten o hizdaysa
+/// iz kopyalanabilir. <see cref="AudioDrcScale"/> yalniz AC-3 ve E-AC-3 kaynagin cozucusune gider
+/// (ffmpeg <c>-drc_scale</c>); baska kodekte hicbir ize yazilmaz.
 /// </summary>
 public sealed record StreamRequest(
     bool KeepAllTracks = false,
@@ -143,17 +146,27 @@ public sealed record StreamRequest(
     bool ExplicitAudioCodec = false,
     bool DropMetadata = false,
     IReadOnlyList<string>? SubtitleLanguages = null,
-    bool FirstSubtitleOnly = false)
+    bool FirstSubtitleOnly = false,
+    int? AudioSampleRate = null,
+    double? AudioDrcScale = null)
 {
     public static StreamRequest Default { get; } = new();
+
+    /// <summary>Bu kaynak izi kopyalanirsa istenen ornekleme hizi ya da DRC olcegi uygulanmamis olur.</summary>
+    public bool ReencodesFor(SourceStream source)
+        => AudioSampleRate is int rate && source.SampleRate != rate
+           || AudioDrcScale is not null && StreamMapping.IsDolby(source.Codec);
 
     public bool FiltersAudio => AudioLoudnorm || AudioGainDb is { } gain && gain != 0;
 }
 
 public sealed record AudioTrack(string Map, TrackAction Action, string Codec, int BitrateK, int? Channels, string? Language, string? Title = null,
-    string? Filter = null)
+    string? Filter = null, int? SampleRate = null, double? DrcScale = null)
 {
     public bool Copies => Action == TrackAction.Copy;
+
+    /// <summary>Kaynak izin girdi tarafindaki akis belirteci: <c>0:3</c> → <c>3</c>, <c>0:a:0?</c> → <c>a:0</c>.</summary>
+    public string InputSpecifier => Map[(Map.IndexOf(':') + 1)..].TrimEnd('?');
 }
 
 public sealed record SubtitleTrack(string Map, string Codec, bool Image, string? Language, long Bytes,
@@ -191,6 +204,29 @@ public sealed record StreamPlan(
     /// Esleme <c>1:0</c>, <c>2:0</c>... bu siradan turer.
     /// </summary>
     public IReadOnlyList<string> ExtraInputs => Subtitles.Where(track => track.InputPath is not null).Select(track => track.InputPath!).ToList();
+
+    /// <summary>
+    /// Ana girdinin <c>-i</c>'sinden once yazilan cozucu secenekleri. <c>-drc_scale</c> yalniz
+    /// yeniden kodlanan AC-3/E-AC-3 izinin akis belirteciyle verilir: belirtecsiz yazilinca baska
+    /// kodekteki kaynakta ffmpeg "has not been used for any stream" uyarisi basiyor
+    /// (<c>docs/olcumler/ses-ornekleme-drc.md</c>).
+    /// </summary>
+    public IReadOnlyList<string> InputArguments()
+    {
+        var a = new List<string>();
+        foreach (var track in Audio)
+            if (!track.Copies && track.DrcScale is double scale)
+                a.AddRange(new[] { "-drc_scale:" + track.InputSpecifier, scale.ToString("0.##", CultureInfo.InvariantCulture) });
+        return a;
+    }
+
+    /// <summary>
+    /// Kodlayicisinin yazamadigi ornekleme hizi istenen ilk iz; yoksa <c>null</c>. ffmpeg bu
+    /// birlesimde kodlayiciyi acmiyor, o yuzden kodlamadan once sorulur.
+    /// </summary>
+    public AudioTrack? RejectedSampleRate()
+        => Audio.FirstOrDefault(track => !track.Copies && track.SampleRate is int rate
+            && StreamMapping.SampleRatesFor(track.Codec) is { } valid && !valid.Contains(rate));
 
     public IReadOnlyList<string> OutputArguments(bool dropChapters = false)
     {
@@ -259,6 +295,7 @@ public sealed record StreamPlan(
         else
             a.AddRange(new[] { "-b:a" + suffix, track.BitrateK.ToString(CultureInfo.InvariantCulture) + "k" });
         a.AddRange(new[] { "-filter:a" + suffix, track.Filter ?? StreamMapping.SesHizalama });
+        if (track.SampleRate is int rate) a.AddRange(new[] { suffix.Length == 0 ? "-ar" : "-ar:a" + suffix, rate.ToString(CultureInfo.InvariantCulture) });
         if (track.Channels is > 0) a.AddRange(new[] { suffix.Length == 0 ? "-ac" : "-ac:a" + suffix, track.Channels.Value.ToString(CultureInfo.InvariantCulture) });
         return a;
     }
@@ -284,6 +321,59 @@ public static class StreamMapping
     public const double MinGainDb = -20;
     public const double MaxGainDb = 20;
     public const int DefaultSampleRate = 48000;
+
+    public const double MinDrcScale = 0;
+    public const double MaxDrcScale = 4;
+
+    /// <summary>HandBrake <c>--arate</c>'in kabul ettigi hizlar, Hz.</summary>
+    public static readonly int[] SampleRates = { 8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000 };
+
+    private static readonly int[] DolbySampleRates = { 32000, 44100, 48000 };
+    private static readonly int[] OpusSampleRates = { 48000 };
+
+    private static readonly (int Rate, int MonoK, int StereoK)[] AacCeilings =
+    {
+        (8000, 37, 42), (11025, 52, 58), (12000, 56, 63), (16000, 75, 84), (22050, 102, 114), (24000, 111, 125)
+    };
+
+    /// <summary>
+    /// Kodlayicinin yazabildigi ornekleme hizlari; <c>null</c> kisit yok demek (aac ve flac
+    /// <see cref="SampleRates"/>'in hepsini aliyor). Olculdu, <c>docs/olcumler/ses-ornekleme-drc.md</c>:
+    /// ac3 ve eac3 yalniz 32/44,1/48 kHz'de aciliyor. libopus 8/12/16/24 kHz'i girdi olarak kabul
+    /// ediyor ama dosyaya her zaman 48 kHz yaziyor; istenen hiz teslim edilmedigi icin burada
+    /// yalniz 48 kHz gecerli.
+    /// </summary>
+    public static IReadOnlyList<int>? SampleRatesFor(string codec)
+        => IsDolby(codec) ? DolbySampleRates
+            : codec.Equals("libopus", StringComparison.OrdinalIgnoreCase) ? OpusSampleRates
+            : null;
+
+    /// <summary>
+    /// ffmpeg'in aac kodlayicisi dusuk ornekleme hizinda istenen bit hizina cikamiyor: 8 kHz stereo
+    /// beyaz gurultude 128k da 256k da istense 41,7 kbit/sn yaziyor. Tablo o olcumun yukari
+    /// yuvarlanmis tavani; butce teslim edilmeyecek biti sese ayirmasin diye iz buna kelepcelenir.
+    /// Iki kanaldan genisi ve 32 kHz ustu olculmedi, kelepce yok.
+    /// </summary>
+    public static int? AacCeilingK(int sampleRate, int channels)
+    {
+        if (channels > 2) return null;
+        foreach (var (rate, monoK, stereoK) in AacCeilings)
+            if (rate == sampleRate) return channels == 1 ? monoK : stereoK;
+        return null;
+    }
+
+    /// <summary>
+    /// Ses istegi kaynagin en az bir izini degistiriyor mu: degistirmiyorsa (hiz zaten o, kaynak
+    /// AC-3 degil) tam kopya yolu acik kalir, istek yuzunden dosya bosuna yeniden kodlanmaz.
+    /// </summary>
+    public static bool AudioRequestChanges(MediaInfo info, int? sampleRate, double? drcScale)
+    {
+        if (!info.HasAudio || sampleRate is null && drcScale is null) return false;
+        var request = new StreamRequest(AudioSampleRate: sampleRate, AudioDrcScale: drcScale);
+        var audio = info.Streams.Where(stream => stream.Kind == StreamKind.Audio).ToList();
+        if (audio.Count == 0) audio.Add(new SourceStream(-1, StreamKind.Audio, info.AudioCodec ?? ""));
+        return audio.Any(request.ReencodesFor);
+    }
 
     /// <summary>flac'in butceye giren tavani: 16 bit PCM. <c>-sample_fmt s16</c> ile yazilir.</summary>
     public const int FlacBitsPerSample = 16;
@@ -397,6 +487,7 @@ public static class StreamMapping
     public static string AudioFilter(StreamRequest request, int sampleRate)
     {
         if (!request.FiltersAudio) return SesHizalama;
+        if (request.AudioSampleRate is int wanted) sampleRate = wanted;
         var chain = new List<string> { SesHizalama };
         if (request.AudioGainDb is { } gain && gain != 0)
             chain.Add("volume=" + gain.ToString("0.##", CultureInfo.InvariantCulture) + "dB");
@@ -509,7 +600,8 @@ public static class StreamMapping
                 {
                     notes.Add(StreamNote.WebmAudioOpus);
                     audio.Add(new AudioTrack(map, TrackAction.Encode, "libopus", audioK, audioChannels, source.Language, source.Title,
-                        request.FiltersAudio ? AudioFilter(request, source.SampleRate) : null));
+                        request.FiltersAudio ? AudioFilter(request, source.SampleRate) : null,
+                        request.AudioSampleRate, IsDolby(source.Codec) ? request.AudioDrcScale : null));
                     continue;
                 }
                 if (audioCodec == "copy")
@@ -523,6 +615,7 @@ public static class StreamMapping
                 if (lossless && allowPassthrough) notes.Add(StreamNote.LosslessAudioNotPassedThrough);
                 var copyable = allowPassthrough
                     && !request.FiltersAudio
+                    && !request.ReencodesFor(source)
                     && inventory
                     && !lossless
                     && CopyableAudio[container].Contains(source.Codec, StringComparer.OrdinalIgnoreCase)
@@ -573,7 +666,7 @@ public static class StreamMapping
                 }
                 else if (IsFlac(codec))
                 {
-                    var ceiling = FlacCeilingK(source.SampleRate, channels ?? (source.Channels > 0 ? source.Channels : 2));
+                    var ceiling = FlacCeilingK(request.AudioSampleRate ?? source.SampleRate, channels ?? (source.Channels > 0 ? source.Channels : 2));
                     if (!CopyableAudio[container].Contains(codec, StringComparer.OrdinalIgnoreCase)
                         || passedK + ceiling > passthroughBudgetK)
                     {
@@ -593,8 +686,13 @@ public static class StreamMapping
                 }
                 else if (!IsMp4Family(container) && codec == "aac" && !request.ExplicitAudioCodec) codec = "libopus";
 
+                if (codec == "aac" && request.AudioSampleRate is int rate
+                    && AacCeilingK(rate, channels ?? (source.Channels > 0 ? source.Channels : 2)) is int aacCeiling)
+                    trackK = Math.Min(trackK, aacCeiling);
+
                 audio.Add(new AudioTrack(map, TrackAction.Encode, codec, trackK, channels, source.Language, source.Title,
-                    request.FiltersAudio ? AudioFilter(request, source.SampleRate) : null));
+                    request.FiltersAudio ? AudioFilter(request, source.SampleRate) : null,
+                    request.AudioSampleRate, IsDolby(source.Codec) ? request.AudioDrcScale : null));
             }
         }
 

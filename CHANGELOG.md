@@ -9,6 +9,16 @@ ship as part of it.
 
 ### Added
 
+- CLI: audio sample rate and Dolby dynamic range. `--ses-hizi` / `--arate N` sets the sample rate
+  of the re-encoded audio (HandBrake's values: 8, 11.025, 12, 16, 22.05, 24, 32, 44.1, 48 kHz, or
+  `auto`); `--ses-drc` / `--drc N` (0–4) passes `-drc_scale` to the AC-3 / E-AC-3 decoder of the
+  source track. A track that could be copied is re-encoded only when the request really changes
+  it (a different rate, or DRC on a Dolby source); otherwise the copy stays. A rate the encoder
+  cannot write (AC-3 and E-AC-3 below 32 kHz, Opus at anything but 48 kHz) stops with a message
+  that lists the valid rates. At low rates the AAC encoder cannot reach the requested bitrate, so
+  the track is capped at the measured ceiling and the difference goes to the video; the plan text
+  says so. `--ses-drc` on a source that is not AC-3 / E-AC-3 is reported as not applied. Not
+  available in `izle`.
 - CLI: burn an external subtitle file into the picture. `--yak-srt` / `--srt-burn FILE` takes a
   `.srt`, `--yak-ass` / `--ssa-burn FILE` takes an `.ass` or `.ssa` and keeps its styles. Both use
   the same `subtitles` filter as `--yak`, drawn after the crop and before scaling, in both passes;
