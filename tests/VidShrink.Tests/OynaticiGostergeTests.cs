@@ -118,6 +118,12 @@ public sealed class OynaticiGostergeTests
         Assert.False(isabet, "rozet fare girdisini engellememeli");
     }
 
+    /// <summary>
+    /// DispatcherTimer bitisini tam milisaniyeye yuvarlar; kronometreye gore bir milisaniyeye kadar
+    /// erken vurabilir (CI'da 1199,88 ms olculdu, kosum 37563993030).
+    /// </summary>
+    private const double ZamanlayiciPayiMs = 1;
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -158,7 +164,7 @@ public sealed class OynaticiGostergeTests
         });
 
         Assert.True(gizlendi, "rozet tutma suresinden sonra gizlenmedi");
-        Assert.True(gecen >= tutma, $"rozet {gecen} ms'de kayboldu, tutma {tutma} ms");
+        Assert.True(gecen >= tutma - ZamanlayiciPayiMs, $"rozet {gecen} ms'de kayboldu, tutma {tutma} ms");
         if (azalt)
         {
             Assert.Equal(1, ilkSaydamlik);
