@@ -373,4 +373,50 @@ public sealed class AyarKaliciligiTests
         }
         finally { if (File.Exists(file)) File.Delete(file); }
     }
+
+    /// <summary>
+    /// Kapanan pencere ayar dosyasını yeniden yazmaz: ne sonraki pencere kurulurken (yeni
+    /// pencerenin XAML'i kendi seçim düğmesini işaretleyince kapalı pencereninki düşüyordu),
+    /// ne de kapalı pencerenin denetimi doğrudan değişince. Açık pencerede aynı değişiklik
+    /// dosyayı yazar (olumlu kontrol).
+    /// </summary>
+    [Fact]
+    public void KapananPencereAyarDosyasiniYenidenYazmaz()
+    {
+        var ilkDosya = SettingsFile();
+        var ikinciDosya = SettingsFile();
+        try
+        {
+            var (acikken, kurulunca, dokununca) = AppHost.Run(() =>
+            {
+                var ilk = new MainWindow { SettingsPathOverride = ilkDosya };
+                bool yazdi;
+                try
+                {
+                    ilk.RbCodecCompatible.IsChecked = true;
+                    yazdi = File.Exists(ilkDosya);
+                }
+                finally { ilk.Close(); }
+                File.Delete(ilkDosya);
+
+                var ikinci = new MainWindow { SettingsPathOverride = ikinciDosya };
+                try
+                {
+                    var sonraki = File.Exists(ilkDosya);
+                    ilk.RbCodecSmallest.IsChecked = true;
+                    return (yazdi, sonraki, File.Exists(ilkDosya));
+                }
+                finally { ikinci.Close(); }
+            });
+
+            Assert.True(acikken);
+            Assert.False(kurulunca);
+            Assert.False(dokununca);
+        }
+        finally
+        {
+            if (File.Exists(ilkDosya)) File.Delete(ilkDosya);
+            if (File.Exists(ikinciDosya)) File.Delete(ikinciDosya);
+        }
+    }
 }

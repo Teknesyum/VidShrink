@@ -131,6 +131,7 @@ public partial class MainWindow : Window
     private bool _controlsReady;
     private bool _updateUiSyncing;
     private bool _settingsSyncing;
+    private bool _kapandi;
     private string? _noticeVersion;
     private readonly DeveloperUnlock _developerUnlock = new();
     private AppliedUpdateNotice? _appliedNotice;
@@ -712,6 +713,12 @@ public partial class MainWindow : Window
         // Kaynak burada kapanır: pencere kapanırken öksüz ffmpeg kalmaz.
         _preview?.Dispose();
         base.OnClosing(e);
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _kapandi = true;
+        base.OnClosed(e);
     }
 
     /// <summary>
@@ -1456,9 +1463,15 @@ public partial class MainWindow : Window
         ShareRetention = CmbShareRetention.SelectedIndex
     };
 
+    /// <summary>
+    /// Kapanan pencere ayar yazmaz. Kapalı pencerenin seçim düğmeleri Avalonia'nın grup
+    /// yöneticisinde kalıyor; aynı süreçte kurulan ikinci pencerenin XAML'i kendi düğmesini
+    /// işaretleyince kapalı pencereninki düşüyor ve <see cref="Watch"/> kapalı pencerenin
+    /// dosyasını yeniden yazıyordu (<c>docs/olcumler/kapanan-pencere-ayar-yaziyor.md</c>).
+    /// </summary>
     private void SaveSettings()
     {
-        if (_settingsSyncing || _syncing) return;
+        if (_settingsSyncing || _syncing || _kapandi) return;
         try
         {
             CaptureSettings().Save(SettingsPathOverride);
@@ -1472,7 +1485,7 @@ public partial class MainWindow : Window
 
     private void SaveAppSettings()
     {
-        if (_settingsSyncing || _syncing) return;
+        if (_settingsSyncing || _syncing || _kapandi) return;
         try { CaptureAppSettings().Save(SettingsPathOverride); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
