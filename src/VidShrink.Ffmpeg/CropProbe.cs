@@ -57,6 +57,33 @@ public static class CropProbe
         return mode;
     }
 
+    /// <summary>
+    /// Temkinli karar: orneklerin birlesim dikdortgeni. Tek bir ornegin goruntu saydigi piksel
+    /// kirpilmaz; <see cref="Decide"/> ise cogunlugun dikdortgenini alir ve azinlikta kalan
+    /// ornegin goruntusunu keser. Tek sayili kenar kaynak izin veriyorsa disari, vermiyorsa
+    /// iceri cifte yuvarlanir. Olcum <c>docs/olcumler/kirpma-kipi.md</c>.
+    /// </summary>
+    public static CropRect? DecideConservative(IReadOnlyList<CropRect> samples, int sourceWidth, int sourceHeight)
+    {
+        var valid = samples.Where(r => r.Width > 0 && r.Height > 0).ToList();
+        if (valid.Count == 0) return null;
+        var (x, width) = EvenSpan(valid.Min(r => r.X), valid.Max(r => r.X + r.Width), sourceWidth);
+        var (y, height) = EvenSpan(valid.Min(r => r.Y), valid.Max(r => r.Y + r.Height), sourceHeight);
+        if (width <= 0 || height <= 0) return null;
+        if (width >= sourceWidth && height >= sourceHeight) return null;
+        return new CropRect(width, height, x, y);
+    }
+
+    private static (int Start, int Length) EvenSpan(int start, int end, int source)
+    {
+        start = Math.Max(0, start);
+        end = Math.Min(source, end);
+        if ((end - start) % 2 == 0) return (start, end - start);
+        if (end < source) return (start, end + 1 - start);
+        if (start > 0) return (start - 1, end - start + 1);
+        return (start, end - start - 1);
+    }
+
     public static async Task<CropDetection> RunAsync(MediaInfo info, CancellationToken ct = default)
     {
         var clock = Stopwatch.StartNew();

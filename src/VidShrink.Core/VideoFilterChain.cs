@@ -23,6 +23,13 @@ public readonly record struct CropRect(int Width, int Height, int X, int Y)
         => string.Create(CultureInfo.InvariantCulture, $"{Width}:{Height}:{X}:{Y}");
 }
 
+/// <summary>
+/// HandBrake <c>--crop-mode</c>: <see cref="Auto"/> orneklerin cogunlugunun dikdortgenini,
+/// <see cref="Conservative"/> hicbir ornegin goruntu saymadigi kenari kirpar, <see cref="None"/>
+/// kirpmaz, <see cref="Custom"/> yalniz elle verilen dikdortgeni kullanir.
+/// </summary>
+public enum CropMode { Auto, Conservative, None, Custom }
+
 public readonly record struct PadBorders(int Top, int Bottom, int Left, int Right);
 
 public readonly record struct IdetCounts(int Tff, int Bff, int Progressive, int Undetermined)

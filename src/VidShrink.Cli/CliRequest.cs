@@ -87,6 +87,15 @@ public sealed record CliRequest
     public bool AutoCrop { get; init; }
 
     /// <summary>
+    /// <c>--kirpma-kipi</c> (HandBrake <c>--crop-mode</c>); verilmediyse <c>null</c>.
+    /// <see cref="CropMode.Auto"/> ve <see cref="CropMode.Conservative"/> yoklamayi kendileri acar.
+    /// </summary>
+    public CropMode? CropMode { get; init; }
+
+    /// <summary>Siyah bant yoklamasi kosacak mi: <c>--kirp</c> ya da yoklayan bir kirpma kipi.</summary>
+    public bool ProbesCrop => AutoCrop || CropMode is Core.CropMode.Auto or Core.CropMode.Conservative;
+
+    /// <summary>
     /// <c>--profil</c>: on ayar kutuphanesindeki bir profilin kimligi. Profil plan
     /// secenegine taban olur; elle verilen her bayrak onun ustune yazar.
     /// </summary>
@@ -323,7 +332,7 @@ public static class CliParser
     public static readonly IReadOnlySet<string> NotInWatch = new HashSet<string>(StringComparer.Ordinal)
     {
         "--crf", "--on-ayar", "--preset", "--modul", "--modulus", "--kes", "--cut", "--bolum", "--chapters",
-        "--profil", "--profile", "--profil-dosyasi", "--preset-file", "--kirp", "--crop", "--tarama", "--scan",
+        "--profil", "--profile", "--profil-dosyasi", "--preset-file", "--kirp", "--crop", "--kirpma-kipi", "--crop-mode", "--tarama", "--scan",
         "--baslik", "--title", "--ana-icerik", "--main-feature", "--asgari-sure", "--min-duration",
         "--azami-sure", "--max-duration",
         "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm",
@@ -443,6 +452,11 @@ public static class CliParser
                     break;
                 case "--kirp" or "--crop" when command != CliCommand.Watch:
                     request = request with { AutoCrop = true };
+                    break;
+                case "--kirpma-kipi" or "--crop-mode" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var kirpmaKipi)) return Fail("error.missing-value", arg);
+                    if (!TryParseCropMode(kirpmaKipi, out var kip)) return Fail("error.bad-crop-mode", kirpmaKipi);
+                    request = request with { CropMode = kip };
                     break;
                 case "--tarama" or "--scan" when command != CliCommand.Watch:
                     request = request with { Scan = true };
@@ -602,6 +616,7 @@ public static class CliParser
         if (request.MinDurationSeconds is { } enAz && request.MaxDurationSeconds is { } enCok && enCok < enAz)
             return Fail("error.bad-max-duration", enCok.ToString(CultureInfo.InvariantCulture));
         if (request.BurnSubtitle is not null && request.BurnFile is not null) return Fail("error.burn-conflict", null);
+        if (CropModeConflict(request) is { } kirpmaHatasi) return Fail(kirpmaHatasi, CropModeText(request.CropMode!.Value));
         if (request.ConstantFrameRate && request.PeakFrameRate) return Fail("error.cfr-and-pfr", null);
         if (request.PeakFrameRate && request.FrameRate is null) return Fail("error.pfr-needs-fps", null);
         if (request.Input is null) return Fail(command == CliCommand.Watch ? "error.watch-no-folder" : "error.no-input", null);
@@ -636,6 +651,42 @@ public static class CliParser
             case "vp9" or "libvpx-vp9": codec = CliCodec.Vp9; return true;
             default: codec = CliCodec.Auto; return false;
         }
+    }
+
+    /// <summary>Kirpma kipinin HandBrake yazimi; hata iletisi ve README ayni adlari kullanir.</summary>
+    public static readonly IReadOnlyList<string> CropModes = new[] { "auto", "conservative", "none", "custom" };
+
+    public static string CropModeText(CropMode mode) => CropModes[(int)mode];
+
+    public static bool TryParseCropMode(string text, out CropMode mode)
+    {
+        var index = text.Trim().ToLowerInvariant() switch
+        {
+            "otomatik" => 0,
+            "temkinli" => 1,
+            "yok" => 2,
+            "elle" => 3,
+            var value => CropModes.ToList().IndexOf(value)
+        };
+        mode = index < 0 ? CropMode.Auto : (CropMode)index;
+        return index >= 0;
+    }
+
+    /// <summary>
+    /// Kip ile obur kirpma bayraklarinin celiskisi. Elle dikdortgen yalniz <see cref="CropMode.Custom"/>
+    /// ile yasar; <see cref="CropMode.None"/> yoklamayi da dikdortgeni de reddeder. Donen deger hata anahtaridir.
+    /// </summary>
+    private static string? CropModeConflict(CliRequest request)
+    {
+        var manual = request.Filters?.Crop is not null;
+        return request.CropMode switch
+        {
+            CropMode.None => manual || request.AutoCrop ? "error.crop-mode-none-conflict" : null,
+            CropMode.Custom => request.AutoCrop ? "error.crop-mode-custom-conflict"
+                : manual ? null : "error.crop-mode-needs-crop",
+            null => null,
+            _ => manual ? "error.crop-mode-manual-conflict" : null
+        };
     }
 
     private static bool TryParseNumber(string text, out double value)

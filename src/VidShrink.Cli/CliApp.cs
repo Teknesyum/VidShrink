@@ -215,16 +215,20 @@ public static class CliApp
             stderr.WriteLine(yakmaIletisi);
             return new FileRun(ExitCodes.Error, null, yakmaIletisi);
         }
-        if (request.AutoCrop && request.Filters?.Crop is null)
+        if (request.ProbesCrop && request.Filters?.Crop is null)
         {
             stderr.WriteLine(text["progress.crop"]);
             var detection = await services.DetectCrop(info, ct);
-            if (detection.Rect is { } rect)
+            var conservative = request.CropMode == CropMode.Conservative;
+            var found = conservative
+                ? CropProbe.DecideConservative(detection.Samples, info.Width, info.Height)
+                : detection.Rect;
+            if (found is { } rect)
             {
                 request = request with { Filters = (request.Filters ?? new VideoFilterOptions()).WithCrop(rect) };
-                stderr.WriteLine(text.Format("result.crop", rect.ToString()));
+                stderr.WriteLine(text.Format(conservative ? "result.crop-conservative" : "result.crop", rect.ToString()));
             }
-            else stderr.WriteLine(text["result.crop-none"]);
+            else stderr.WriteLine(text[conservative && detection.Rect is not null ? "result.crop-conservative-none" : "result.crop-none"]);
         }
 
         var availability = services.Availability();
