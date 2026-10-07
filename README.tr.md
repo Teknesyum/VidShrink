@@ -218,6 +218,11 @@ Uçlardan biri saat yerine kare numarası olabilir: `--kes 300f-900f` 300. kared
 çevirim kaynağın kare hızıyla. `--bolum 2` ve `--bolum 2-4` aynı pencereyi kaynağın bölüm
 işaretlerinden kurar; iki seçenek birlikte verilemez.
 
+`--yak N` (`--burn N`) kaynağın N. altyazısını görüntüye yakıyor. Metin altyazıyı libass
+çiziyor; resim altyazı (PGS, VOBSUB, DVB) karenin üstüne bindiriliyor, kare genişliğine
+ölçekli ve alta hizalı. MP4 resim altyazı taşıyamıyor; `--yak` verilmezse düşüyor ve plan
+bunu seçeneğin adını vererek söylüyor.
+
 Aşağıdaki uzun anahtarların her birinin bir de İngilizce takma adı var; iki yazım aynı
 anahtar, betik hangisini isterse onu kullanabiliyor. Tek istisna `--crf` ve `--json` ve `--vmaf`:
 bunların tek yazımı var.

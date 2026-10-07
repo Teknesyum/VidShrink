@@ -9,6 +9,12 @@ ship as part of it.
 
 ### Added
 
+- CLI: image subtitles can be burned in. `--yak N` / `--burn N` used to refuse a PGS, VOBSUB or
+  DVB track; it now lays it over the picture with an `overlay` graph (`-filter_complex` instead
+  of `-vf`), after crop and rotation and before scaling, in both passes. The subtitle canvas is
+  scaled to the frame width and bottom-aligned; a source above 8 bits stays 10-bit 4:2:0. No
+  libass is needed for this path. The note for image subtitles dropped from MP4 now names
+  `--yak N`; nothing is burned unless asked. The app's burn list still offers text tracks only.
 - CLI: crop mode. `--kirpma-kipi` / `--crop-mode` takes HandBrake's four values. `auto` crops the
   rectangle most probe samples agree on (the same as `--kirp`); `conservative` crops only the
   edges that no sample counted as picture, so a scene with shorter bars is never cut; `none`

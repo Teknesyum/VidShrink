@@ -551,8 +551,12 @@ public static class FfmpegArguments
             foreach (var extra in extraInputs) a.AddRange(new[] { "-i", extra });
         }
 
+        var overlay = VideoFilterChain.OverlayGraph(info, plan, streams.VideoMap);
+        if (overlay is not null) streams = streams with { VideoMap = VideoFilterChain.OverlayOutput };
         var filters = VideoFilterChain.Filters(info, plan);
-        if (filters.Count > 0)
+        if (overlay is not null)
+            a.AddRange(new[] { "-filter_complex", overlay });
+        else if (filters.Count > 0)
             a.AddRange(new[] { cover ? "-filter:v:0" : "-vf", string.Join(',', filters) });
         a.AddRange(VideoFilterChain.FrameRateArgs(info, plan, cover ? ":v:0" : ""));
 
