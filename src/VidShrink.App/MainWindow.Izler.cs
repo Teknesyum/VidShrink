@@ -63,6 +63,7 @@ public partial class MainWindow
         var at = chosen is int c ? _burnChoices.IndexOf(c) : -1;
         CmbBurnSubtitle.SelectedIndex = at + 1;
         CmbBurnSubtitle.IsEnabled = _burnChoices.Count > 0;
+        TaramayiSifirla();
     }
 
     /// <summary>Seçilen yakma izi, kaynağın altyazıları içinde 0 tabanlı sıra; seçim yoksa <c>null</c>.</summary>

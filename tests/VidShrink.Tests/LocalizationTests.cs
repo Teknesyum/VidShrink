@@ -423,7 +423,8 @@ public sealed class LocalizationTests : IDisposable
     /// anahtarla söylüyor. Ölü anahtar sayımı bu yüzden sevkiyattaki bütün derlemelerin
     /// dizgelerine bakar; yalnız arayüze bakan bir sayım motorun kullandığı anahtarı ölü sanır.
     /// İz notu anahtarları dizge olarak durmaz, not adından üretilir; sayıma üreten
-    /// fonksiyonun kendisinden (<c>MainWindow.StreamNoteKey</c>) girer.
+    /// fonksiyonun kendisinden (<c>MainWindow.StreamNoteKey</c>) girer; altyazı taramasının sonuç
+    /// anahtarları da öyle (<c>MainWindow.SubtitleScanKey</c>).
     /// </summary>
     private static IReadOnlyCollection<string> ShippedLiterals()
     {
@@ -442,6 +443,7 @@ public sealed class LocalizationTests : IDisposable
         }
 
         foreach (var note in Enum.GetValues<VidShrink.Core.StreamNote>()) all.Add(VidShrink.App.MainWindow.StreamNoteKey(note));
+        foreach (var outcome in Enum.GetValues<VidShrink.Core.ForeignAudioOutcome>()) all.Add(VidShrink.App.MainWindow.SubtitleScanKey(new VidShrink.Core.ForeignAudioPick(outcome)));
         foreach (var target in VidShrink.Core.ShellIntegration.QuickShrinkMenu) all.Add(target.LabelKey);
 
         return all;

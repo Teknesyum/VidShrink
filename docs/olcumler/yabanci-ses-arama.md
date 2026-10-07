@@ -85,4 +85,6 @@ altında kalamıyor. Satır kaynaktan kaldırıldı.
 - Gerçek film, gerçek zorunlu altyazı; yalnız sentetik klip.
 - Resim altyazıda (PGS, VOBSUB) paket sayısının satır sayısına oranı.
 - Büyük dosyada sayımın süresi; ffprobe bütün kabı okur.
-- Arayüz: tarama yalnız CLI'da.
+- Arayüz: "Yabancı dil altyazısını bul" düğmesi aynı `Flagged`/`Decide` yolunu çağırır
+  (`MainWindow.AltyaziTarama.cs`, `IzPaneliTests`); gerçek pencerede ve gerçek sayımla denenmedi,
+  testte sayaç sahte.
