@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.8] - 2026-10-07
+
 ### Added
 
 - CLI: foreign audio search. `--altyazi-tara` / `--subtitle-scan` finds the subtitle that only
