@@ -47,6 +47,7 @@
   "editor.export.failed": "Exporten misslyckades: {0}",
   "editor.export.reencoded": "Klippen {0} ändrar hastighet eller spelas baklänges och kodas om.",
   "editor.export.fallback": "Källan kan inte klippas utan omkodning, så hela videon kodas om.",
+  "editor.export.audio-full": "Ljudspåret kan inte kopieras som det är, så hela videon kodas om.",
   "editor.export.reverse-limit": "Det bakvända klippet {0} är längre än minnesgränsen ({1}). Klicka på Spara igen för att fortsätta.",
   "editor.export.separate": "Exportera klipp som separata filer",
   "editor.export.segments-done": "{0} klipp exporterade till: {1}",

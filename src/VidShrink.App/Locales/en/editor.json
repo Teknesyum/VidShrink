@@ -47,6 +47,7 @@
   "editor.export.failed": "Export failed: {0}",
   "editor.export.reencoded": "Clips {0} change speed or play in reverse and are re-encoded.",
   "editor.export.fallback": "This source can't be cut without re-encoding, so the whole video is re-encoded.",
+  "editor.export.audio-full": "The audio track can't be copied as it is, so the whole video is re-encoded.",
   "editor.export.reverse-limit": "Reversed clip {0} is longer than the memory limit ({1}). Press Save again to continue.",
   "editor.export.separate": "Export Clips as Separate Files",
   "editor.export.segments-done": "Exported {0} clips to: {1}",

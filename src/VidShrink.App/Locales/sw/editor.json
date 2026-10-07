@@ -47,6 +47,7 @@
   "editor.export.failed": "Kuhamisha kumeshindwa: {0}",
   "editor.export.reencoded": "Klipu {0} zinabadilisha kasi au zinacheza kinyume, kwa hivyo zinasimbwa upya.",
   "editor.export.fallback": "Chanzo hiki hakiwezi kukatwa bila kusimbwa upya, kwa hivyo video nzima inasimbwa upya.",
+  "editor.export.audio-full": "Wimbo wa sauti hauwezi kunakiliwa jinsi ulivyo, kwa hivyo video nzima inasimbwa upya.",
   "editor.export.reverse-limit": "Klipu ya kinyume {0} inazidi kikomo cha kumbukumbu ({1}). Bofya Hifadhi tena ili kuendelea.",
   "editor.export.separate": "Hamisha klipu kama faili tofauti",
   "editor.export.segments-done": "Klipu {0} zimehamishwa hadi: {1}",

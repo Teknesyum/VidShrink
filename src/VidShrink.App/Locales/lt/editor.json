@@ -47,6 +47,7 @@
   "editor.export.failed": "Eksportuoti nepavyko: {0}",
   "editor.export.reencoded": "Klipai {0} keičia greitį arba grojami atgal, todėl perkoduojami.",
   "editor.export.fallback": "Šio šaltinio negalima karpyti neperkodavus, todėl perkoduojamas visas vaizdo įrašas.",
+  "editor.export.audio-full": "Garso takelio negalima nukopijuoti nepakeisto, todėl perkoduojamas visas vaizdo įrašas.",
   "editor.export.reverse-limit": "Atbulinis klipas {0} viršija atminties ribą ({1}). Norėdami tęsti, dar kartą spustelėkite Išsaugoti.",
   "editor.export.separate": "Eksportuoti klipus kaip atskirus failus",
   "editor.export.segments-done": "Eksportuota klipų: {0}, į: {1}",

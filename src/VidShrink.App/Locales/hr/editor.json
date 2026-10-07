@@ -47,6 +47,7 @@
   "editor.export.failed": "Izvoz nije uspio: {0}",
   "editor.export.reencoded": "Isječci {0} mijenjaju brzinu ili se reproduciraju unatrag pa se ponovno kodiraju.",
   "editor.export.fallback": "Ovaj izvor ne može se rezati bez ponovnog kodiranja pa se cijeli videozapis ponovno kodira.",
+  "editor.export.audio-full": "Zvučni zapis ne može se kopirati kakav jest pa se cijeli videozapis ponovno kodira.",
   "editor.export.reverse-limit": "Obrnuti isječak {0} prelazi ograničenje memorije ({1}). Za nastavak ponovno kliknite Spremi.",
   "editor.export.separate": "Izvezi isječke kao zasebne datoteke",
   "editor.export.segments-done": "Izvezeno isječaka: {0}, u: {1}",

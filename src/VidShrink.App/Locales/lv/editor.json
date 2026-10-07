@@ -47,6 +47,7 @@
   "editor.export.failed": "Eksportēšana neizdevās: {0}",
   "editor.export.reencoded": "Klipi {0} maina ātrumu vai tiek atskaņoti atpakaļgaitā, tāpēc tiek pārkodēti.",
   "editor.export.fallback": "Šo avotu nevar griezt bez pārkodēšanas, tāpēc tiek pārkodēts viss video.",
+  "editor.export.audio-full": "Audio celiņu nevar kopēt nemainītu, tāpēc tiek pārkodēts viss video.",
   "editor.export.reverse-limit": "Apgrieztais klips {0} pārsniedz atmiņas ierobežojumu ({1}). Lai turpinātu, vēlreiz noklikšķiniet uz Saglabāt.",
   "editor.export.separate": "Eksportēt klipus kā atsevišķus failus",
   "editor.export.segments-done": "Eksportēti klipi: {0}, uz: {1}",

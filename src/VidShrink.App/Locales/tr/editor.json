@@ -47,6 +47,7 @@
   "editor.export.failed": "Dışa aktarma başarısız: {0}",
   "editor.export.reencoded": "{0} numaralı klipler hız değiştiriyor ya da ters oynuyor, yeniden kodlanır.",
   "editor.export.fallback": "Bu kaynak yeniden kodlanmadan kesilemiyor, bu yüzden videonun tamamı yeniden kodlanır.",
+  "editor.export.audio-full": "Ses izi olduğu gibi kopyalanamıyor, bu yüzden videonun tamamı yeniden kodlanır.",
   "editor.export.reverse-limit": "Ters klip {0} bellek sınırından ({1}) uzun. Sürdürmek için Kaydet'e yeniden bas.",
   "editor.export.separate": "Parçaları Ayrı Dosyalara Yaz",
   "editor.export.segments-done": "{0} parça dışa aktarıldı: {1}",

@@ -362,6 +362,7 @@ internal partial class EditorView
         var lines = new List<string>();
         if (plan.TextForcedFull) lines.Add(Strings.Get("editor.export.text-full"));
         else if (plan.EffectsForcedFull) lines.Add(Strings.Get("editor.export.effects-full"));
+        else if (plan.AudioForcedFull) lines.Add(Strings.Get("editor.export.audio-full"));
         else if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
         else if (plans.Any(p => p.Effective != ExportMode.Full) && motion.Length > 0)
             lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.reencoded"), ClipNumbers(motion)));

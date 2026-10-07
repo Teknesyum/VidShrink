@@ -47,6 +47,7 @@
   "editor.export.failed": "Export se nezdařil: {0}",
   "editor.export.reencoded": "Klipy {0} mění rychlost nebo běží pozpátku a budou překódovány.",
   "editor.export.fallback": "Tento zdroj nelze stříhat bez překódování, proto se překóduje celé video.",
+  "editor.export.audio-full": "Zvukovou stopu nelze zkopírovat beze změny, proto se překóduje celé video.",
   "editor.export.reverse-limit": "Obrácený klip {0} je delší než limit paměti ({1}). Pro pokračování znovu klikněte na Uložit.",
   "editor.export.separate": "Exportovat klipy do samostatných souborů",
   "editor.export.segments-done": "Exportováno klipů: {0}, do: {1}",
