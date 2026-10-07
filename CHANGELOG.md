@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Fixed
+
+- Text from ffprobe and ffmpeg is now read as UTF-8. On Windows it was decoded with the console
+  code page, so chapter titles, tags and file names with non-ASCII characters ("Giriş",
+  "Bölüm Üç", Japanese titles) arrived garbled even though the file itself held the right name.
+
 ## [1.2.8] - 2026-10-07
 
 ### Added
