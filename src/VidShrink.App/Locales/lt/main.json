@@ -464,6 +464,7 @@
   "main.reason.stream.audio-filter-on-copy": "garsumo normalizavimo ir stiprinimo negalima taikyti kopijuojamam garso takeliui, todėl takelis nukopijuotas nepakeistas",
   "main.reason.stream.webm-audio-opus": "WebM talpina tik Opus arba Vorbis garsą, todėl takelis užkoduotas į Opus",
   "main.reason.stream.webm-stream-dropped": "WebM negali talpinti vaizdinių subtitrų, viršelio ar priedų, todėl jie atmesti",
+  "main.reason.stream.cover-dropped": "Ši išvestis negali talpinti viršelio, todėl jis atmestas",
   "main.reason.stream.lossless-not-passed": "nuostolingo glaudinimo neturintis TrueHD/DTS takelis niekada nekopijuojamas; jis perkoduojamas",
   "main.reason.fill-crf-lowered": "tikslo užpildymo politika sumažino CRF iki {0} užuot sustojusi ties skaidrumo riba, nusileisdama prie {1} MB juostos centro {2}-{3} MB juostoje",
   "main.reason.fill-band-center": "CRF apatinė riba {0} pasiekta prieš užpildymo juostą, todėl dviejų etapų VBR tiesiogiai siekia {1} MB juostos centro",

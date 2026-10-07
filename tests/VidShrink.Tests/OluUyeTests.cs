@@ -555,6 +555,8 @@ public sealed class OluUyeTests
     /// Kumeyi 34'ten 37'ye cikaran dalga 1c, akis eslemesi: <c>StreamKind.Data</c>,
     /// <c>StreamNote.LosslessAudioNotPassedThrough</c> ve <c>TrackAction.Encode</c> ucu de
     /// kardesleri adiyla okunan turun varsayilan kolu.
+    /// Kumeyi bir satir buyuten yabanci ses aramasi (<c>--altyazi-tara</c>):
+    /// <c>ForeignAudioOutcome.NoCandidate</c> <c>ForeignAudioPick.Slug</c>'in '_' kolu, bes kardesi adiyla okunuyor.
     /// Kumeyi 35'ten 36'ya cikaran Paket 2b, kamera arka plani: <c>WebcamBackground.Keep</c>
     /// <c>RecorderArguments.WebcamKey</c> ve <c>RecorderView.BackgroundKey</c>'de '_' kolu, iki kardesi adiyla okunuyor.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
@@ -633,7 +635,9 @@ public sealed class OluUyeTests
         new("PresetSourceStatus.Code", "varsayilan-kol", Legitimate,
             "Iki degerli kaynak durumunun olumsuz kolu. PresetLibrary.Validate 'Status == PresetSourceStatus.Official' diye sorup resmi kaynaga adres sartini koyuyor; Code o kosulun else'i, adresi olmayabilir."),
         new("EncoderPathOverride.Software", "varsayilan-kol", Legitimate,
-            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli.")
+            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli."),
+        new("ForeignAudioOutcome.NoCandidate", "varsayilan-kol", Legitimate,
+            "Yabanci ses aramasinin 'seyrek iz yok' hali. ForeignAudioPick.Slug bes sonucu adiyla yazip '_' koluna 'no-candidate' veriyor (StreamNotes.Slug ile ayni kalip); CLI sonucu yalniz Slug uzerinden okuyor, ayri bir kol ayni degeri verirdi.")
     };
 
     private readonly ITestOutputHelper _output;

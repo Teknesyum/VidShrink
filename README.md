@@ -209,6 +209,15 @@ drawn by libass; an image subtitle (PGS, VOBSUB, DVB) is laid over the frame, sc
 width and bottom-aligned. MP4 cannot carry image subtitles, so without `--yak` they are
 dropped and the plan says so, naming the option.
 
+`--altyazi-tara` (`--subtitle-scan`) picks that track for you: the subtitle that only translates
+the foreign-language parts of a film. A track flagged as forced wins; otherwise subtitle packets
+are counted and the one track holding at most 10% of the fullest same-language track is burned
+in. When the answer is not clear-cut nothing is burned and a line says why. It cannot be combined
+with `--yak`.
+
+Cover art is kept in MP4 and MKV output (png and jpeg in MKV, as an attachment). MOV cannot
+carry it; the plan says so.
+
 The long options below each answer to an English alias; the two spellings are the same
 option, and a script may use either. `--crf` and `--json` and `--vmaf` are the exceptions: they have a
 single spelling.
@@ -249,6 +258,7 @@ single spelling.
 | `--meta-yok` | `--no-metadata` |
 | `--altyazi-dil` | `--subtitle-lang` |
 | `--ilk-altyazi` | `--first-subtitle` |
+| `--altyazi-tara` | `--subtitle-scan` |
 | `--sabit-kare` | `--cfr` |
 | `--tavan-kare` | `--pfr` |
 | `--kare-hizi` | `--fps` |

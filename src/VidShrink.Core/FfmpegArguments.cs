@@ -619,6 +619,7 @@ public static class FfmpegArguments
             a.AddRange(new[] { "-movflags", "+faststart" });
         if (dolbyVision && StreamMapping.IsMp4Family(streams.Container))
             a.AddRange(HdrResolver.Mp4DolbyVisionArgs);
+        a.AddRange(streams.CoverAttachArguments(plan.CoverAttachmentPath));
         a.AddRange(cover ? plan.ExtraArgs.Select(arg => arg is "-level" or "-level:v" ? "-level:v:0" : arg) : plan.ExtraArgs);
         a.Add(outputPath);
         return MergeEncoderParams(a);

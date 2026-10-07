@@ -28,7 +28,8 @@ public enum StreamNote
     ExtraAudioDroppedByContainer,
     Vp9FellBackToMp4,
     ImageSubtitleDroppedByContainer,
-    Vp9FellBack
+    Vp9FellBack,
+    CoverDropped
 }
 
 public static class StreamNotes
@@ -57,6 +58,7 @@ public static class StreamNotes
         StreamNote.Vp9FellBackToMp4 => "vp9-fell-back-to-mp4",
         StreamNote.ImageSubtitleDroppedByContainer => "image-subtitle-dropped-by-container",
         StreamNote.Vp9FellBack => "vp9-fell-back",
+        StreamNote.CoverDropped => "cover-dropped",
         _ => "lossless-not-passed"
     };
 }
@@ -186,6 +188,16 @@ public sealed record SubtitleTrack(string Map, string Codec, bool Image, string?
     };
 }
 
+/// <summary>
+/// Matroska'ya ek olarak yazilacak kapak resmi. Kosucu <see cref="Map"/> akisini kodlamadan once
+/// bir dosyaya cikarir, komut onu <c>-attach</c> ile verir; <see cref="MimeType"/> yazilmazsa
+/// Matroska muxer'i basligi yazamiyor (<c>docs/olcumler/kapak-mkv-mov.md</c>).
+/// </summary>
+public sealed record CoverAttachment(string Map, string Extension, string MimeType, long Bytes)
+{
+    public string FileName => "cover." + Extension;
+}
+
 public sealed record StreamPlan(
     OutputContainer Container,
     string VideoMap,
@@ -195,7 +207,8 @@ public sealed record StreamPlan(
     IReadOnlyList<StreamNote> Notes,
     double SideK,
     StreamRequest Request,
-    string? CoverMap = null)
+    string? CoverMap = null,
+    CoverAttachment? CoverAttachment = null)
 {
     public string Extension => StreamMapping.ExtensionOf(Container);
 
@@ -227,6 +240,17 @@ public sealed record StreamPlan(
     public AudioTrack? RejectedSampleRate()
         => Audio.FirstOrDefault(track => !track.Copies && track.SampleRate is int rate
             && StreamMapping.SampleRatesFor(track.Codec) is { } valid && !valid.Contains(rate));
+
+    /// <summary>
+    /// Cikarilmis kapak dosyasini Matroska eki olarak yazan argumanlar. Ek akisi, kaynaktan
+    /// kopyalanan eklerden sonra gelir; o yuzden belirtec <c>s:t:&lt;kopyalanan ek sayisi&gt;</c>.
+    /// </summary>
+    public IReadOnlyList<string> CoverAttachArguments(string? coverPath)
+    {
+        if (CoverAttachment is not { } cover || string.IsNullOrEmpty(coverPath)) return Array.Empty<string>();
+        var stream = "-metadata:s:t:" + Attachments.Count.ToString(CultureInfo.InvariantCulture);
+        return new[] { "-attach", coverPath, stream, "mimetype=" + cover.MimeType, stream, "filename=" + cover.FileName };
+    }
 
     public IReadOnlyList<string> OutputArguments(bool dropChapters = false)
     {
@@ -511,11 +535,25 @@ public static class StreamMapping
     }
 
     /// <summary>
-    /// Kapak resmi (<c>attached_pic</c>) yalniz MP4'te tasinir. Olculdu
-    /// (<c>docs/olcumler/b1-kalan-mutasyonlar.md</c>): ffmpeg 9.0'da MOV muxer'i resmi sessizce
-    /// dusuruyor, Matroska muxer'i onu kapak degil tek kareli duz bir video izi olarak yaziyor.
+    /// Kapak resmi video izi (<c>attached_pic</c>) olarak yalniz MP4'te tasinir. Olculdu
+    /// (<c>docs/olcumler/kapak-mkv-mov.md</c>): ffmpeg 9.0'da MOV muxer'i resmi sessizce dusuruyor,
+    /// Matroska muxer'i esleneni kapak degil tek kareli duz bir video izi olarak yaziyor. Matroska
+    /// kapagi ek olarak tasir, bkz. <see cref="CoverAttachmentFor"/>.
     /// </summary>
     public static bool CarriesCover(OutputContainer container) => container == OutputContainer.Mp4;
+
+    /// <summary>
+    /// Matroska'da kapak <c>-attach</c> ile yazilan ektir ve yalniz png ile jpeg kapak sayilir:
+    /// <c>image/bmp</c> eki ffprobe'ta <c>attached_pic</c> degil duz ek olarak okunuyor.
+    /// </summary>
+    public static CoverAttachment? CoverAttachmentFor(OutputContainer container, SourceStream cover)
+    {
+        if (container != OutputContainer.Mkv) return null;
+        var map = Map(cover);
+        if (cover.Codec.Equals("png", StringComparison.OrdinalIgnoreCase)) return new CoverAttachment(map, "png", "image/png", cover.Bytes);
+        if (cover.Codec.Equals("mjpeg", StringComparison.OrdinalIgnoreCase)) return new CoverAttachment(map, "jpg", "image/jpeg", cover.Bytes);
+        return null;
+    }
 
     public static bool IsDolby(string? codec)
         => codec is not null
@@ -766,6 +804,14 @@ public static class StreamMapping
             coverMap = Map(cover);
             coverBytes = cover.Bytes;
         }
+        CoverAttachment? coverAttachment = null;
+        if (coverMap is null && container != OutputContainer.WebM && !request.PlatformDelivery
+            && info.Streams.FirstOrDefault(stream => stream.IsAttachedPicture) is { } picture)
+        {
+            coverAttachment = CoverAttachmentFor(container, picture);
+            if (coverAttachment is null) notes.Add(StreamNote.CoverDropped);
+            else coverBytes = coverAttachment.Bytes;
+        }
         if (container == OutputContainer.WebM && !request.PlatformDelivery
             && info.Streams.Any(stream => stream.IsAttachedPicture || stream.Kind == StreamKind.Attachment))
             notes.Add(StreamNote.WebmStreamDropped);
@@ -782,14 +828,14 @@ public static class StreamMapping
         var subtitleBytes = subtitles.Sum(track => track.Bytes);
         var sideK = audio.Sum(track => (double)track.BitrateK) + (subtitleBytes + attachmentBytes + coverBytes) * 8.0 / 1000.0 / duration;
 
-        return new StreamPlan(container, videoMap, audio, subtitles, attachments, notes.Distinct().ToList(), sideK, request, coverMap);
+        return new StreamPlan(container, videoMap, audio, subtitles, attachments, notes.Distinct().ToList(), sideK, request, coverMap, coverAttachment);
     }
 
     /// <summary>
     /// Ciktida hic varsayilan altyazi yoksa zorunlu (forced) bayrakli iz varsayilan olur:
     /// once tercih edilen dilde, sonra tutulan sesin dilinde, yoksa ilki. Varsayilan zaten
-    /// varsa ya da zorunlu iz yoksa liste degismez. HandBrake'in "Foreign Audio Search"'u degil;
-    /// yalniz kaynagin kendi bayragini okur.
+    /// varsa ya da zorunlu iz yoksa liste degismez. Yalniz kaynagin kendi bayragini okur; paket
+    /// sayan arama <see cref="ForeignAudioSearch"/>'te.
     /// </summary>
     public static List<SubtitleTrack> DefaultForced(List<SubtitleTrack> subtitles, string? preferredLanguage, string? audioLanguage)
     {

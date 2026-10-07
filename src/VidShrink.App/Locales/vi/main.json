@@ -464,6 +464,7 @@
   "main.reason.stream.audio-filter-on-copy": "không thể áp dụng chuẩn hóa âm lượng và khuếch đại cho rãnh âm thanh được sao chép, nên rãnh được sao chép nguyên vẹn",
   "main.reason.stream.webm-audio-opus": "WebM chỉ chứa âm thanh Opus hoặc Vorbis, nên bản âm thanh đã được mã hóa sang Opus",
   "main.reason.stream.webm-stream-dropped": "WebM không chứa được phụ đề hình ảnh, ảnh bìa hay tệp đính kèm, nên chúng đã bị bỏ",
+  "main.reason.stream.cover-dropped": "Đầu ra này không chứa được ảnh bìa, nên ảnh đã bị bỏ",
   "main.reason.stream.lossless-not-passed": "rãnh TrueHD/DTS không mất dữ liệu không bao giờ được sao chép; nó được mã hóa lại",
   "main.reason.fill-crf-lowered": "chính sách lấp đầy mục tiêu hạ CRF xuống {0} thay vì dừng ở trần trong suốt, rơi gần tâm dải {1} MB trong dải {2}-{3} MB",
   "main.reason.fill-band-center": "sàn CRF {0} đạt trước dải lấp đầy, nên VBR hai lượt nhắm thẳng tâm dải {1} MB",

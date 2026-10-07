@@ -223,6 +223,15 @@ işaretlerinden kurar; iki seçenek birlikte verilemez.
 ölçekli ve alta hizalı. MP4 resim altyazı taşıyamıyor; `--yak` verilmezse düşüyor ve plan
 bunu seçeneğin adını vererek söylüyor.
 
+`--altyazi-tara` (`--subtitle-scan`) o izi sizin yerinize seçiyor: filmin yalnız yabancı dilde
+konuşulan yerlerini çeviren altyazıyı. Zorunlu (forced) bayraklı iz varsa o; yoksa altyazı
+paketleri sayılıyor ve aynı dildeki en dolu izin en çok %10'u kadar paket taşıyan tek iz
+yakılıyor. Sonuç açık değilse hiçbir şey yakılmıyor ve nedeni bir satırla söyleniyor. `--yak`
+ile birlikte verilemiyor.
+
+Kapak resmi MP4 ve MKV çıktıda korunuyor (MKV'de png ve jpeg, ek olarak). MOV taşıyamıyor;
+plan bunu söylüyor.
+
 Aşağıdaki uzun anahtarların her birinin bir de İngilizce takma adı var; iki yazım aynı
 anahtar, betik hangisini isterse onu kullanabiliyor. Tek istisna `--crf` ve `--json` ve `--vmaf`:
 bunların tek yazımı var.
@@ -263,6 +272,7 @@ bunların tek yazımı var.
 | `--meta-yok` | `--no-metadata` |
 | `--altyazi-dil` | `--subtitle-lang` |
 | `--ilk-altyazi` | `--first-subtitle` |
+| `--altyazi-tara` | `--subtitle-scan` |
 | `--sabit-kare` | `--cfr` |
 | `--tavan-kare` | `--pfr` |
 | `--kare-hizi` | `--fps` |

@@ -191,7 +191,26 @@ public static class FfprobeClient
             .ToList();
     }
 
+    /// <summary>
+    /// Altyazi akislarinin paket sayisi, akis indeksine gore. Dosya bastan sona okunur ama hicbir
+    /// sey cozulmez; hic paketi olmayan iz sozlukte yer almaz. ffprobe dusarse <c>null</c>.
+    /// </summary>
+    public static async Task<IReadOnlyDictionary<int, int>?> CountSubtitlePacketsAsync(string filePath, CancellationToken ct = default)
+    {
+        var rows = await PacketRowsAsync(filePath, "s", null, ct);
+        return rows?.GroupBy(row => row.Index).ToDictionary(group => group.Key, group => group.Count());
+    }
+
     private static async Task<Dictionary<int, long>?> PacketTotalsAsync(string filePath, string select, string? readIntervals, CancellationToken ct)
+    {
+        var rows = await PacketRowsAsync(filePath, select, readIntervals, ct);
+        if (rows is null) return null;
+        var totals = new Dictionary<int, long>();
+        foreach (var (index, size) in rows) totals[index] = totals.GetValueOrDefault(index) + size;
+        return totals;
+    }
+
+    private static async Task<List<(int Index, long Size)>?> PacketRowsAsync(string filePath, string select, string? readIntervals, CancellationToken ct)
     {
         var args = new List<string> { "-hide_banner", "-v", "error", "-select_streams", select };
         if (readIntervals is not null) args.AddRange(new[] { "-read_intervals", readIntervals });
@@ -207,16 +226,16 @@ public static class FfprobeClient
             await process.WaitForExitAsync(ct);
             if (process.ExitCode != 0) return null;
 
-            var totals = new Dictionary<int, long>();
+            var rows = new List<(int Index, long Size)>();
             foreach (var line in stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
                 var parts = line.Split(',');
                 if (parts.Length < 2) continue;
                 if (!int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var index)) continue;
                 if (!long.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var size)) continue;
-                totals[index] = totals.GetValueOrDefault(index) + size;
+                rows.Add((index, size));
             }
-            return totals;
+            return rows;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

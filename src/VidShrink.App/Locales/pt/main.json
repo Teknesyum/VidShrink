@@ -464,6 +464,7 @@
   "main.reason.stream.audio-filter-on-copy": "a normalização de volume e o ganho não se aplicam a uma faixa de áudio copiada, a faixa foi copiada sem alterações",
   "main.reason.stream.webm-audio-opus": "O WebM só transporta áudio Opus ou Vorbis, por isso a faixa foi codificada em Opus",
   "main.reason.stream.webm-stream-dropped": "O WebM não transporta legendas de imagem, capa nem anexos, por isso foram descartados",
+  "main.reason.stream.cover-dropped": "Esta saída não transporta a capa, por isso foi descartada",
   "main.reason.stream.lossless-not-passed": "uma faixa TrueHD/DTS sem perdas nunca é copiada; ela é recodificada",
   "main.reason.fill-crf-lowered": "a política de preencher o alvo baixou o CRF para {0} em vez de parar no teto de transparência, ficando perto do centro de {1} MB dentro da faixa de {2}-{3} MB",
   "main.reason.fill-band-center": "o piso de CRF {0} foi alcançado antes da faixa de preenchimento, então o VBR em duas passagens mira diretamente o centro de {1} MB",

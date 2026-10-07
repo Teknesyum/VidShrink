@@ -464,6 +464,7 @@
   "main.reason.stream.audio-filter-on-copy": "コピーする音声トラックにはラウドネス正規化とゲインを適用できないため、トラックはそのままコピーされました",
   "main.reason.stream.webm-audio-opus": "WebM は Opus か Vorbis の音声しか格納できないため、トラックを Opus にエンコードしました",
   "main.reason.stream.webm-stream-dropped": "WebM は画像字幕・カバー画像・添付ファイルを格納できないため、それらを除外しました",
+  "main.reason.stream.cover-dropped": "この出力はカバー画像を格納できないため、除外しました",
   "main.reason.stream.lossless-not-passed": "ロスレスのTrueHD/DTSトラックはコピーされず、再エンコードされます",
   "main.reason.fill-crf-lowered": "目標まで使うポリシーにより、透明性上限で止めずCRFを{0}に下げ、{2}-{3} MBの帯域内の中心{1} MB付近に収めました",
   "main.reason.fill-band-center": "帯域に達する前にCRF下限{0}に到達したため、2パスVBRが帯域中心{1} MBを直接狙います",

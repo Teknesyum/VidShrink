@@ -464,6 +464,7 @@
   "main.reason.stream.audio-filter-on-copy": "לא ניתן להחיל נרמול עוצמה והגברה על רצועת שמע מועתקת, ולכן הרצועה הועתקה ללא שינוי",
   "main.reason.stream.webm-audio-opus": "WebM נושא רק שמע Opus או Vorbis, ולכן הרצועה קודדה ל-Opus",
   "main.reason.stream.webm-stream-dropped": "WebM אינו יכול לשאת כתוביות תמונה, תמונת עטיפה או קבצים מצורפים, ולכן הם הושמטו",
+  "main.reason.stream.cover-dropped": "פלט זה אינו יכול לשאת את תמונת העטיפה, ולכן היא הושמטה",
   "main.reason.stream.lossless-not-passed": "רצועת TrueHD/DTS ללא אובדן לעולם אינה מועתקת; היא מקודדת מחדש",
   "main.reason.fill-crf-lowered": "מדיניות מילוי היעד הורידה את CRF ל-{0} במקום לעצור בתקרת השקיפות, ונחתה ליד מרכז הרצועה {1} MB בתוך רצועת {2}-{3} MB",
   "main.reason.fill-band-center": "רצפת CRF {0} הושגה לפני רצועת המילוי, ולכן VBR בשני מעברים מכוון ישירות למרכז הרצועה {1} MB",

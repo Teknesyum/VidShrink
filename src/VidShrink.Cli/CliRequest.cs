@@ -137,6 +137,12 @@ public sealed record CliRequest
     /// </summary>
     public string? BurnFile { get; init; }
 
+    /// <summary>
+    /// <c>--altyazi-tara</c> (HandBrake <c>--subtitle scan</c>): yabanci ses altyazisi aranir ve
+    /// bulunursa <see cref="BurnSubtitle"/> olarak yakilir; karar <see cref="ForeignAudioSearch"/>'te.
+    /// </summary>
+    public bool SubtitleScan { get; init; }
+
     /// <summary><c>--meta-yok</c>: kaynagin kap etiketleri ciktiya tasinmaz.</summary>
     public bool DropMetadata { get; init; }
 
@@ -337,7 +343,8 @@ public static class CliParser
         "--azami-sure", "--max-duration",
         "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm",
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
-        "--yak", "--burn", "--yak-srt", "--srt-burn", "--yak-ass", "--ssa-burn", "--meta-yok", "--no-metadata",
+        "--yak", "--burn", "--yak-srt", "--srt-burn", "--yak-ass", "--ssa-burn", "--altyazi-tara", "--subtitle-scan",
+        "--meta-yok", "--no-metadata",
         "--altyazi-dil", "--subtitle-lang", "--ilk-altyazi", "--first-subtitle",
         "--sabit-kare", "--cfr", "--tavan-kare", "--pfr", "--kare-hizi", "--fps",
         "--ses-hizi", "--arate", "--ses-drc", "--drc",
@@ -567,6 +574,9 @@ public static class CliParser
                         return Fail("error.bad-burn-file", yakAss);
                     request = request with { BurnFile = yakAss };
                     break;
+                case "--altyazi-tara" or "--subtitle-scan" when command != CliCommand.Watch:
+                    request = request with { SubtitleScan = true };
+                    break;
                 case "--meta-yok" or "--no-metadata" when command != CliCommand.Watch:
                     request = request with { DropMetadata = true };
                     break;
@@ -616,6 +626,7 @@ public static class CliParser
         if (request.MinDurationSeconds is { } enAz && request.MaxDurationSeconds is { } enCok && enCok < enAz)
             return Fail("error.bad-max-duration", enCok.ToString(CultureInfo.InvariantCulture));
         if (request.BurnSubtitle is not null && request.BurnFile is not null) return Fail("error.burn-conflict", null);
+        if (request.SubtitleScan && (request.BurnSubtitle is not null || request.BurnFile is not null)) return Fail("error.scan-burn-conflict", null);
         if (CropModeConflict(request) is { } kirpmaHatasi) return Fail(kirpmaHatasi, CropModeText(request.CropMode!.Value));
         if (request.ConstantFrameRate && request.PeakFrameRate) return Fail("error.cfr-and-pfr", null);
         if (request.PeakFrameRate && request.FrameRate is null) return Fail("error.pfr-needs-fps", null);

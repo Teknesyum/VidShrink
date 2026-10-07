@@ -464,6 +464,7 @@
   "main.reason.stream.audio-filter-on-copy": "ujednačavanje glasnoće i pojačanje ne mogu se primijeniti na kopirani audiozapis, pa je zapis kopiran nepromijenjen",
   "main.reason.stream.webm-audio-opus": "WebM nosi samo Opus ili Vorbis zvuk, pa je zapis kodiran u Opus",
   "main.reason.stream.webm-stream-dropped": "WebM ne može nositi slikovne titlove, naslovnicu ni privitke, pa su izostavljeni",
+  "main.reason.stream.cover-dropped": "Ovaj izlaz ne može nositi naslovnicu, pa je izostavljena",
   "main.reason.stream.lossless-not-passed": "TrueHD/DTS zapis bez gubitaka nikad se ne kopira; ponovno se kodira",
   "main.reason.fill-crf-lowered": "pravilo popunjavanja cilja spustilo je CRF na {0} umjesto zaustavljanja na granici prozirnosti, slijećući blizu središta pojasa od {1} MB unutar pojasa {2}-{3} MB",
   "main.reason.fill-band-center": "donja granica CRF {0} dosegnuta je prije pojasa popunjavanja, pa dvoprolazni VBR izravno cilja središte pojasa od {1} MB",
