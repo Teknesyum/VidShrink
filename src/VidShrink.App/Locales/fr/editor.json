@@ -47,6 +47,7 @@
   "editor.export.failed": "Échec de l'exportation : {0}",
   "editor.export.reencoded": "Les clips {0} changent de vitesse ou sont inversés et sont réencodés.",
   "editor.export.fallback": "Cette source ne peut pas être coupée sans réencodage, la vidéo entière est donc réencodée.",
+  "editor.export.audio-full": "La piste audio ne peut pas être copiée telle quelle, la vidéo entière est donc réencodée.",
   "editor.export.reverse-limit": "Le clip inversé {0} dépasse la limite de mémoire ({1}). Appuyez de nouveau sur Enregistrer pour continuer.",
   "editor.export.separate": "Exporter les clips dans des fichiers séparés",
   "editor.export.segments-done": "{0} clips exportés vers : {1}",

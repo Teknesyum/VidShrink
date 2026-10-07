@@ -124,4 +124,5 @@ Taban 47/47 yeşil. Her satırda üretim kodu bozuldu, kırmızı görüldü, el
 - `hvc1` etiketli çıktının Apple oynatıcılarındaki davranışı; bant içi dizi başlığı taşımayan AV1.
 - ffmpeg 9.0'dan eski sürümler; `.ts` kaynakta arama sezgisi.
 - Ses dikişinde AAC paket çözünürlüğü kadar (yaklaşık 21 ms) kayma.
-- Opus sesli VP9/AV1 (WebM) kaynak: ses kapısı AAC'de kaldığı için Tam kipe düşer, ölçülmedi.
+- Opus sesli VP9 (WebM) kaynak 2026-10-07'de ölçüldü ve düz kesimde Akıllı kipe alındı:
+  `akilli-kesme-opus.md`. AV1 + Opus canlı ölçülmedi.

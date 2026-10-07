@@ -35,6 +35,9 @@ public sealed record ExportPlan(
     /// <summary>Klip ayarlari (kirpma, dondurme, ses, solma) yeniden kodlama istedigi icin Tam'a gecildi.</summary>
     public bool EffectsForcedFull { get; init; }
 
+    /// <summary>Goruntu Akilli kipe uyuyordu, ses izi aynen kopyalanamadigi icin Tam'a gecildi.</summary>
+    public bool AudioForcedFull { get; init; }
+
     /// <summary>Metin varsa <c>ass=</c> suzgecinin okudugu belge; kosucu calismadan once BOM'lu yazar.</summary>
     public string? SubtitlePath { get; init; }
 
@@ -60,6 +63,14 @@ public static class EditExport
     public const string FullCrf = "18";
     public const string AudioCodec = "aac";
 
+    /// <summary>
+    /// Akilli kesimde yalniz aynen kopyalanan ses kodegi (<c>docs/olcumler/akilli-kesme-opus.md</c>):
+    /// kodlanan parca fazladan bir paket tasiyor ve birlesimde DTS geri gidiyor.
+    /// </summary>
+    public const string CopyOnlyAudioCodec = "opus";
+
+    private static readonly string[] CopyOnlyAudioContainers = { ".mkv", ".mp4" };
+
     public const string SubtitleFileName = "text.ass";
 
     public const string VideoListName = "list.ffconcat";
@@ -79,12 +90,24 @@ public static class EditExport
         => MatchingEncoders.ContainsKey(info.VideoCodec) && AudioCopies(info);
 
     /// <summary>
-    /// Akilli kipin kapisi: ses kopyalanabilmeli, kesim noktalari okunmus olmali ve
-    /// <see cref="SmartCutCodec.Resolve"/> kaynaga bir kodlayici esleyebilmeli. Biri tutmazsa <c>null</c>.
+    /// Akilli kipin goruntu kapisi: kesim noktalari okunmus olmali ve <see cref="SmartCutCodec.Resolve"/>
+    /// kaynaga bir kodlayici esleyebilmeli. Biri tutmazsa <c>null</c>. Ses ayri sorulur
+    /// (<see cref="SmartAudioCopies"/>).
     /// </summary>
     public static SmartCutEncoding? SmartEncoding(
         MediaInfo info, IReadOnlyList<SmartCutPoint>? cuts, Func<string, bool>? hasEncoder = null)
-        => cuts is { Count: > 0 } && AudioCopies(info) ? SmartCutCodec.Resolve(info, hasEncoder) : null;
+        => cuts is { Count: > 0 } ? SmartCutCodec.Resolve(info, hasEncoder) : null;
+
+    /// <summary>
+    /// Akilli kipin ses kapisi. Sessiz kaynak ve AAC her zaman gecer. Opus yalniz butun klipler duz
+    /// kopyalaniyorsa (hiz ya da ters klip yok) ve cikti kabi onu tasiyorsa (mkv, mp4) gecer.
+    /// </summary>
+    public static bool SmartAudioCopies(MediaInfo info, bool motion, string outputPath)
+    {
+        if (AudioCopies(info)) return true;
+        if (!string.Equals(info.AudioCodec, CopyOnlyAudioCodec, StringComparison.OrdinalIgnoreCase)) return false;
+        return !motion && CopyOnlyAudioContainers.Contains(Path.GetExtension(outputPath), StringComparer.OrdinalIgnoreCase);
+    }
 
     private static bool AudioCopies(MediaInfo info)
         => !info.HasAudio || string.Equals(info.AudioCodec, AudioCodec, StringComparison.OrdinalIgnoreCase);
@@ -169,6 +192,8 @@ public static class EditExport
         var effective = mode;
         var anySpecial = timeline.Clips.Any(NeedsReencode);
         var smart = mode == ExportMode.Smart ? SmartEncoding(info, cuts, hasEncoder) : null;
+        var audioForced = smart is not null && keyframes.Count > 0 && !SmartAudioCopies(info, anySpecial, outputPath);
+        if (audioForced) smart = null;
         if (mode == ExportMode.Smart && smart is null) effective = ExportMode.Full;
         if (mode == ExportMode.Fast && anySpecial && !SupportsSegments(info)) effective = ExportMode.Full;
         if (mode != ExportMode.Full && keyframes.Count == 0) effective = ExportMode.Full;
@@ -188,7 +213,13 @@ public static class EditExport
             _ => Segmented(timeline, info, keyframes, outputPath, workDirectory, limit, over)
         };
         if (dropMetadata) plan = plan with { Steps = WithoutMetadata(plan.Steps, info) };
-        return plan with { MotionClips = motion, TextForcedFull = textForced, EffectsForcedFull = effectsForced };
+        return plan with
+        {
+            MotionClips = motion,
+            TextForcedFull = textForced,
+            EffectsForcedFull = effectsForced,
+            AudioForcedFull = audioForced
+        };
     }
 
     /// <summary>
@@ -238,6 +269,7 @@ public static class EditExport
                 Requested = mode,
                 TextForcedFull = whole.TextForcedFull,
                 EffectsForcedFull = whole.EffectsForcedFull,
+                AudioForcedFull = whole.AudioForcedFull,
                 MotionClips = plan.MotionClips.Select(_ => index).ToArray(),
                 ReverseOverLimit = plan.ReverseOverLimit.Select(_ => index).ToArray()
             });

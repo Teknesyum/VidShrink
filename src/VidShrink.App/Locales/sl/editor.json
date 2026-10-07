@@ -47,6 +47,7 @@
   "editor.export.failed": "Izvoz ni uspel: {0}",
   "editor.export.reencoded": "Posnetki {0} spreminjajo hitrost ali se predvajajo vzvratno, zato se ponovno kodirajo.",
   "editor.export.fallback": "Tega vira ni mogoče rezati brez ponovnega kodiranja, zato se ponovno kodira celoten videoposnetek.",
+  "editor.export.audio-full": "Zvočne sledi ni mogoče kopirati takšne, kot je, zato se ponovno kodira celoten videoposnetek.",
   "editor.export.reverse-limit": "Obrnjeni posnetek {0} presega omejitev pomnilnika ({1}). Za nadaljevanje znova kliknite Shrani.",
   "editor.export.separate": "Izvozi posnetke kot ločene datoteke",
   "editor.export.segments-done": "Izvoženih posnetkov: {0}, v: {1}",

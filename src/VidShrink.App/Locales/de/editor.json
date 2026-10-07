@@ -47,6 +47,7 @@
   "editor.export.failed": "Export fehlgeschlagen: {0}",
   "editor.export.reencoded": "Die Clips {0} ändern die Geschwindigkeit oder laufen rückwärts und werden neu kodiert.",
   "editor.export.fallback": "Diese Quelle lässt sich nicht ohne Neukodierung schneiden, daher wird das ganze Video neu kodiert.",
+  "editor.export.audio-full": "Die Tonspur lässt sich nicht unverändert kopieren, daher wird das ganze Video neu kodiert.",
   "editor.export.reverse-limit": "Der rückwärts laufende Clip {0} ist länger als das Speicherlimit ({1}). Zum Fortfahren erneut auf Speichern klicken.",
   "editor.export.separate": "Clips als einzelne Dateien exportieren",
   "editor.export.segments-done": "{0} Clips exportiert nach: {1}",

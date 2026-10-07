@@ -47,6 +47,7 @@
   "editor.export.failed": "Eksport nie powiódł się: {0}",
   "editor.export.reencoded": "Klipy {0} zmieniają prędkość lub są odtwarzane wstecz i zostaną ponownie zakodowane.",
   "editor.export.fallback": "Tego źródła nie da się przyciąć bez ponownego kodowania, więc całe wideo zostanie zakodowane ponownie.",
+  "editor.export.audio-full": "Ścieżki dźwiękowej nie da się skopiować bez zmian, więc całe wideo zostanie zakodowane ponownie.",
   "editor.export.reverse-limit": "Odwrócony klip {0} przekracza limit pamięci ({1}). Kliknij Zapisz ponownie, aby kontynuować.",
   "editor.export.separate": "Eksportuj klipy do osobnych plików",
   "editor.export.segments-done": "Wyeksportowano klipy ({0}) do: {1}",

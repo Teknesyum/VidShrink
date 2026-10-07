@@ -47,6 +47,7 @@
   "editor.export.failed": "書き出しに失敗しました: {0}",
   "editor.export.reencoded": "クリップ {0} は速度変更または逆再生のため再エンコードされます。",
   "editor.export.fallback": "このソースは再エンコードなしでカットできないため、動画全体を再エンコードします。",
+  "editor.export.audio-full": "音声トラックをそのままコピーできないため、動画全体を再エンコードします。",
   "editor.export.reverse-limit": "逆再生クリップ {0} がメモリ上限（{1}）を超えています。続けるにはもう一度「保存」を押してください。",
   "editor.export.separate": "クリップを別々のファイルに書き出す",
   "editor.export.segments-done": "{0} 個のクリップを書き出しました: {1}",

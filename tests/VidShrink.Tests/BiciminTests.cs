@@ -1471,6 +1471,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-07, arayuzde yabanci dil altyazisi taramasi: sekiz yeni anahtar (<c>main.subtitles.scan</c>, <c>.running</c> ve alti sonuc), dusen yok: 1337 + 8 = 1345, 43 x 1345 = 57835. <c>kayip</c> 0.</para>
     /// <para>2026-10-07, WebP bit hizi notu: tek yeni anahtar (<c>main.convert.note.webp-bitrate-ignored</c>), dusen yok: 1345 + 1 = 1346, 43 x 1346 = 57878. <c>kayip</c> 0.</para>
     /// <para>2026-10-07, Donustur ve duzenleyicide meta veriyi sil, kare hizi kipi gerekcesi: uc yeni anahtar (<c>main.convert.drop-metadata.tip</c>, <c>main.reason.frame-rate-constant</c>, <c>main.reason.frame-rate-peak</c>), dusen yok: 1346 + 3 = 1349, 43 x 1349 = 58007. <c>kayip</c> 0.</para>
+    /// <para>2026-10-07, akilli kesimde ses nedeni: tek yeni anahtar (<c>editor.export.audio-full</c>), dusen yok: 1349 + 1 = 1350, 43 x 1350 = 58050. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1498,7 +1499,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(58007, gezilen);
+        Assert.Equal(58050, gezilen);
         Assert.Empty(kayip);
     }
 

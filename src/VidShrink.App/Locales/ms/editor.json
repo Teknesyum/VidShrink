@@ -47,6 +47,7 @@
   "editor.export.failed": "Eksport gagal: {0}",
   "editor.export.reencoded": "Klip {0} menukar kelajuan atau dimainkan terbalik dan dikod semula.",
   "editor.export.fallback": "Sumber ini tidak boleh dipotong tanpa kod semula, jadi seluruh video dikod semula.",
+  "editor.export.audio-full": "Trek audio tidak boleh disalin seadanya, jadi seluruh video dikod semula.",
   "editor.export.reverse-limit": "Klip terbalik {0} melebihi had memori ({1}). Tekan Simpan sekali lagi untuk meneruskan.",
   "editor.export.separate": "Eksport klip sebagai fail berasingan",
   "editor.export.segments-done": "{0} klip dieksport ke: {1}",

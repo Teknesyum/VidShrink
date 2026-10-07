@@ -9,6 +9,12 @@ ship as part of it.
 
 ### Added
 
+- Smart cut in the editor now works on sources with Opus audio (typical VP9/AV1 WebM): the audio
+  is copied as it is when the export goes to `.mkv` or `.mp4` and no clip is sped up or reversed.
+  Before, any audio other than AAC sent the whole export to Full mode without saying why. When
+  the audio still forces Full mode (other codecs, Opus with a speed or reverse clip, Opus into
+  `.mov`/`.m4v`), the export notes now say that the audio track is the reason. Measured on short
+  VP9 + Opus clips; AV1 + Opus was not run live.
 - "Remove metadata" is now in the Convert tab and in the editor's export options, next to the
   one Shrink already had. Both write the same arguments as Shrink (`-map_metadata -1`, then the
   carried audio track's language) and remember the choice. In Convert the chapter marks stay and

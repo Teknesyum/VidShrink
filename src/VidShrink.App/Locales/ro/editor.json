@@ -47,6 +47,7 @@
   "editor.export.failed": "Exportul a eșuat: {0}",
   "editor.export.reencoded": "Clipurile {0} schimbă viteza sau rulează invers și sunt recodate.",
   "editor.export.fallback": "Această sursă nu poate fi tăiată fără recodare, așa că întregul videoclip este recodat.",
+  "editor.export.audio-full": "Pista audio nu poate fi copiată așa cum este, așa că întregul videoclip este recodat.",
   "editor.export.reverse-limit": "Clipul inversat {0} depășește limita de memorie ({1}). Apasă din nou Salvează pentru a continua.",
   "editor.export.separate": "Exportă clipurile ca fișiere separate",
   "editor.export.segments-done": "{0} clipuri exportate în: {1}",

@@ -47,6 +47,7 @@
   "editor.export.failed": "Az exportálás sikertelen: {0}",
   "editor.export.reencoded": "A(z) {0} klipek sebességet váltanak vagy visszafelé játszódnak, ezért újrakódolódnak.",
   "editor.export.fallback": "Ez a forrás nem vágható újrakódolás nélkül, ezért a teljes videó újrakódolódik.",
+  "editor.export.audio-full": "A hangsáv nem másolható változatlanul, ezért a teljes videó újrakódolódik.",
   "editor.export.reverse-limit": "A(z) {0} visszafelé játszott klip hosszabb a memóriakorlátnál ({1}). A folytatáshoz kattints újra a Mentésre.",
   "editor.export.separate": "Klipek exportálása külön fájlokba",
   "editor.export.segments-done": "{0} klip exportálva ide: {1}",

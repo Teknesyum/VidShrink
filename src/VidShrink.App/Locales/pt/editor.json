@@ -47,6 +47,7 @@
   "editor.export.failed": "Falha na exportação: {0}",
   "editor.export.reencoded": "Os clipes {0} mudam a velocidade ou tocam ao contrário e são recodificados.",
   "editor.export.fallback": "Esta fonte não pode ser cortada sem recodificação, por isso o vídeo inteiro é recodificado.",
+  "editor.export.audio-full": "A faixa de áudio não pode ser copiada como está, por isso o vídeo inteiro é recodificado.",
   "editor.export.reverse-limit": "O clipe invertido {0} excede o limite de memória ({1}). Clique em Salvar de novo para continuar.",
   "editor.export.separate": "Exportar clipes como arquivos separados",
   "editor.export.segments-done": "{0} clipes exportados para: {1}",
