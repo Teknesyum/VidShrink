@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Fixed
+
+- A recording set to GIF whose GIF conversion fails keeps its MKV, and that MKV now carries the
+  chapter marks set with F6. Before, the marks were reported as lost. Measured with a real
+  failed conversion on a short generated clip, not with a live screen recording.
+
 ## [1.2.9] - 2026-10-07
 
 ### Added

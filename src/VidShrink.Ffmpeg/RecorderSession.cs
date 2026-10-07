@@ -332,28 +332,40 @@ public sealed class RecorderSession : IAsyncDisposable
     /// paketleme, yeniden kodlama yok. Isaret yoksa dosyaya dokunulmaz. Yazilamayan isaret
     /// sessizce atilmaz, <see cref="RecordResult.MarksLost"/> ile bildirilir; dosyanin yanina
     /// ayri bir isaret dosyasi birakilmaz.
+    /// <para>
+    /// GIF'e cevrilemeyip korunan yakalama dosyasi (<see cref="RecordResult.MissingGif"/>) saglam bir
+    /// Matroska'dir ve basarisiz sonuc sayilmasina ragmen bolumlerini alir; yarim kalan ya da
+    /// baska sebeple dusen kayit almaz.
+    /// </para>
     /// </summary>
-    private async Task<RecordResult> WriteChaptersAsync(RecordResult result, CancellationToken ct)
+    private Task<RecordResult> WriteChaptersAsync(RecordResult result, CancellationToken ct)
     {
         RecorderMark[] marks;
         lock (_marks) marks = _marks.ToArray();
-        if (marks.Length == 0) return result;
+        return WriteChaptersAsync(
+            result, marks, Splits, _segments.Select(segment => _durations.GetValueOrDefault(segment)).ToList(), _chapterTitle, ct);
+    }
 
-        if (!result.Ok || result.Partial) return result with { MarksLost = marks.Length };
+    internal static async Task<RecordResult> WriteChaptersAsync(
+        RecordResult result, IReadOnlyList<RecorderMark> marks, bool split, IReadOnlyList<TimeSpan> segments,
+        string title, CancellationToken ct)
+    {
+        if (marks.Count == 0) return result;
+
+        if (result.Partial || (!result.Ok && result.MissingGif is null)) return result with { MarksLost = marks.Count };
         if (!RecorderChapters.Carries(RecorderArguments.ContainerOf(result.OutputPath)))
-            return result with { MarksLost = marks.Length, ChaptersUnsupported = true };
+            return result with { MarksLost = marks.Count, ChaptersUnsupported = true };
 
         var files = result.Files ?? new[] { result.OutputPath };
-        var durations = RecorderChapters.PartDurations(
-            Splits, _segments.Select(segment => _durations.GetValueOrDefault(segment)).ToList());
+        var durations = RecorderChapters.PartDurations(split, segments);
         var written = 0;
         for (var part = 0; part < files.Count && part < durations.Count; part++)
         {
-            var chapters = RecorderChapters.ForPart(marks, part, durations[part], _chapterTitle);
+            var chapters = RecorderChapters.ForPart(marks, part, durations[part], title);
             if (chapters.Count > 0 && await WriteChaptersAsync(files[part], chapters, ct)) written += chapters.Count - 1;
         }
 
-        return result with { OutputMb = files.Sum(SizeMb), MarksLost = marks.Length - written };
+        return result with { OutputMb = files.Sum(SizeMb), MarksLost = marks.Count - written };
     }
 
     private static async Task<bool> WriteChaptersAsync(string file, IReadOnlyList<RecorderChapter> chapters, CancellationToken ct)
