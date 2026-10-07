@@ -72,10 +72,10 @@ public sealed class KuyrukIzlemeTests : IDisposable
         }
     }
 
-    private static bool Bekle(Func<bool> kosul, Action? pompa = null)
+    private static bool Bekle(Func<bool> kosul, Action? pompa = null, int saniye = 30)
     {
         var saat = Stopwatch.StartNew();
-        while (saat.Elapsed < TimeSpan.FromSeconds(30))
+        while (saat.Elapsed < TimeSpan.FromSeconds(saniye))
         {
             pompa?.Invoke();
             if (kosul()) return true;
@@ -84,7 +84,8 @@ public sealed class KuyrukIzlemeTests : IDisposable
         return false;
     }
 
-    private T Pencerede<T>(Func<ShrinkJobWindow, T> govde, bool arkaPlan = false, string? secilecek = null)
+    private T Pencerede<T>(Func<ShrinkJobWindow, T> govde, bool arkaPlan = false, string? secilecek = null,
+        PlanOptions? sablon = null)
         => AppHost.Run(() =>
         {
             var eskiAyar = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
@@ -94,16 +95,19 @@ public sealed class KuyrukIzlemeTests : IDisposable
             ShrinkJobWindow? window = null;
             try
             {
-                window = new ShrinkJobWindow(new[] { Path.Combine(_kok, "elle-a.mp4"), Path.Combine(_kok, "elle-b.mp4") },
-                    new PlanOptions { TargetMb = 25 }, false, null)
+                var elle = sablon is null
+                    ? new[] { Path.Combine(_kok, "elle-a.mp4"), Path.Combine(_kok, "elle-b.mp4") }
+                    : Array.Empty<string>();
+                window = new ShrinkJobWindow(elle, sablon ?? new PlanOptions { TargetMb = 25 }, false, null)
                 {
                     Actions = new SahteEylem(),
+                    PencereEtkin = () => true,
                     WatchInBackground = arkaPlan,
                     WatchPollInterval = TimeSpan.FromMilliseconds(20),
                     WatchStableFor = TimeSpan.Zero,
                     PickWatchFolder = () => Task.FromResult(secilecek)
                 };
-                window.SetPaused(true);
+                window.SetPaused(sablon is null);
                 window.Begin();
                 return govde(window);
             }
@@ -499,6 +503,80 @@ public sealed class KuyrukIzlemeTests : IDisposable
         Assert.Equal(new[] { "elle-a.mp4", "elle-b.mp4", "canli.mp4" }, sonuc.Item2);
         Assert.True(sonuc.Watching);
         Assert.False(kapanan!.Watching);
+    }
+
+    /// <summary>
+    /// Uçtan uca, gerçek kodlamayla: izlenen klasöre yazılan klip yazımı bitmeden sıraya girmez,
+    /// bitince bir kez girer ve kodlanır; çıktı aynı klasöre düşer ve ne ara dosyası ne kendisi
+    /// yeniden sıraya girer. Tarama kodlama sürerken de yürür, ara dosya o sırada klasörde durur.
+    /// </summary>
+    [FfmpegFact]
+    public async Task GercekKodlamadaCiktiYenidenSirayaGirmez()
+    {
+        var kaynak = Path.Combine(_kok, "kaynak.mp4");
+        var uret = await FfmpegRunner.RunAsync(new[]
+        {
+            "-hide_banner", "-y", "-nostdin", "-f", "lavfi", "-i", "testsrc2=size=640x360:rate=30:duration=1",
+            "-threads", "2", "-c:v", "libx264", "-preset", "ultrafast", "-crf", "4", "-pix_fmt", "yuv420p", kaynak
+        });
+        Assert.True(uret.Ok, uret.StandardError);
+        var bayt = File.ReadAllBytes(kaynak);
+        var yari = bayt.Length / 2;
+        var dusen = Path.Combine(_izlenen, "dusen.mp4");
+
+        var o = Pencerede(window =>
+        {
+            var biten = new List<(string Kaynak, string? Cikti)>();
+            window.JobFinished += (yol, cikti) => biten.Add((yol, cikti));
+            Assert.True(window.SetWatchAsync(true).IsCompleted);
+
+            int yarimken;
+            using (var akis = new FileStream(dusen, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            {
+                akis.Write(bayt, 0, yari);
+                akis.Flush(true);
+                Adimla(window, HazirAdim * 2);
+                yarimken = window.AcceptedCount;
+                akis.Write(bayt, yari, bayt.Length - yari);
+            }
+
+            var araDosya = false;
+            void Tur()
+            {
+                window.WatchStep();
+                Dispatcher.UIThread.RunJobs();
+                araDosya |= Directory.EnumerateFiles(_izlenen, QueueWatch.PartialPrefix + "*").Any();
+            }
+
+            var bitti = Bekle(() => biten.Count > 0, Tur, 180);
+            for (var i = 0; i < HazirAdim * 4; i++)
+            {
+                Tur();
+                Thread.Sleep(20);
+            }
+            var durdu = Bekle(() => window.State != ShrinkJobState.Kosuyor && window.Pending.Count == 0, Tur, 180);
+            return (yarimken, bitti, durdu, araDosya, biten: biten.ToArray(), window.AcceptedCount, bekleyen: window.Pending.Count,
+                ciktilar: window.Outputs.ToArray(), window.State, window.MessageText, window.Watching);
+        }, secilecek: _izlenen, sablon: new PlanOptions { TargetMb = Megabayt.Oku(bayt.Length) / 2 });
+
+        Assert.Equal(0, o.yarimken);
+        Assert.True(o.bitti, "iş bitmedi");
+        Assert.True(o.durdu, "kuyruk durmadı");
+        Assert.True(o.State == ShrinkJobState.Bitti, o.MessageText);
+        Assert.True(o.Watching);
+        Assert.Equal(1, o.AcceptedCount);
+        Assert.Equal(0, o.bekleyen);
+        var is_ = Assert.Single(o.biten);
+        var cikti = Assert.Single(o.ciktilar);
+        Assert.Equal(dusen, is_.Kaynak);
+        Assert.Equal(cikti, is_.Cikti);
+        Assert.Equal(_izlenen, Path.GetDirectoryName(cikti));
+        Assert.True(o.araDosya, "tarama kodlama sürerken ara dosyayı görmedi");
+        Assert.Equal(new[] { dusen, cikti }.Order(), Directory.GetFiles(_izlenen).Where(WatchFolder.IsCandidate).Order());
+        Assert.InRange(new FileInfo(cikti).Length, 1, bayt.Length - 1);
+        var okunan = await FfprobeClient.ProbeAsync(cikti);
+        Assert.InRange(okunan.DurationSeconds, 0.8, 1.3);
+        Assert.True(QueueWatch.IsOwn(cikti));
     }
 
     /// <summary>İzleme yalnız bırakılan kuyrukta: kabuk menüsünün hızlı küçültme penceresinde panel yok.</summary>

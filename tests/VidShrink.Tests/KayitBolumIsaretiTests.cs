@@ -310,6 +310,69 @@ public sealed class KayitBolumIsaretiTests
         finally { Sil(klasor); }
     }
 
+    /// <summary>
+    /// GIF'e çevrilemeyen kayıtta yakalama dosyası korunur ve işaretler ona bölüm olarak yazılır.
+    /// Çevirme gerçek ffmpeg'le düşürülür (hedef klasör yok); yarım kalan ve başka sebeple düşen
+    /// kayıt olumsuz kontroldür, dosyaya dokunulmaz.
+    /// </summary>
+    [FfmpegFact]
+    public async Task GifeCevrilemeyenKaydinKorunanMkvsiBolumleriAlir()
+    {
+        var klasor = Klasor();
+        try
+        {
+            var yakalama = RecorderArguments.CapturePath(Path.Combine(klasor, "kayit.gif"), RecorderContainer.Gif);
+            var uret = await FfmpegRunner.RunAsync(new[]
+            {
+                "-hide_banner", "-y", "-nostdin", "-f", "lavfi", "-i", "testsrc=size=160x90:rate=15:duration=2",
+                "-threads", "2", "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p", yakalama
+            });
+            Assert.True(uret.Ok, uret.StandardError);
+
+            var gif = Path.Combine(klasor, "yok", "kayit.gif");
+            var sureler = new[] { Sn(await Sure(yakalama)) };
+            var isaretler = new[] { new RecorderMark(0, Sn(1.2)) };
+            var yakalanan = new RecordResult(true, yakalama, 1, false, 0, string.Empty, 1, Files: new[] { yakalama });
+            Task<RecordResult> Yaz(RecordResult sonuc)
+                => RecorderSession.WriteChaptersAsync(sonuc, isaretler, false, sureler, "Bölüm {0}", CancellationToken.None);
+
+            var dusen = await Yaz(yakalanan with { Ok = false, ExitCode = 1 });
+            var yarim = await Yaz(yakalanan with { Ok = false, Partial = true });
+            var dokunulmamis = await Bolumler(yakalama);
+
+            var cevrilmeyen = await RecorderSession.ConvertToGifAsync(yakalanan, gif, 10, CancellationToken.None);
+            var sonuc = await Yaz(cevrilmeyen);
+            var bolumler = await Bolumler(yakalama);
+
+            Assert.Equal(RecorderContainer.Mkv, RecorderArguments.ContainerOf(yakalama));
+            Assert.Equal(1, dusen.MarksLost);
+            Assert.Equal(1, yarim.MarksLost);
+            Assert.Empty(dokunulmamis);
+
+            Assert.False(cevrilmeyen.Ok);
+            Assert.Equal(gif, cevrilmeyen.MissingGif);
+            Assert.Equal(yakalama, cevrilmeyen.OutputPath);
+            Assert.False(File.Exists(gif));
+
+            Assert.Equal(0, sonuc.MarksLost);
+            Assert.False(sonuc.ChaptersUnsupported);
+            Assert.False(sonuc.Ok);
+            Assert.Equal(gif, sonuc.MissingGif);
+            Assert.Equal(yakalama, sonuc.OutputPath);
+            Assert.Equal(new[] { "Bölüm 1", "Bölüm 2" }, bolumler.Select(b => b.Title));
+            Assert.Equal(0, bolumler[0].StartSeconds, 3);
+            Assert.Equal(1.2, bolumler[1].StartSeconds, 2);
+            Assert.InRange(await Sure(yakalama), 1.8, 2.2);
+            Assert.Empty(Artiklar(klasor));
+
+            var kaynak = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Ffmpeg", "RecorderSession.cs"));
+            var cevirme = kaynak.IndexOf("result = await ConvertToGifAsync(result, ct);", StringComparison.Ordinal);
+            var yazma = kaynak.IndexOf("return await WriteChaptersAsync(result, ct);", StringComparison.Ordinal);
+            Assert.True(cevirme > 0 && yazma > cevirme, "bölümler GIF çevirmesinden sonra yazılmıyor");
+        }
+        finally { Sil(klasor); }
+    }
+
     private static RecorderRequest Istek(RecorderContainer kap) => new()
     {
         Platform = RecorderPlatform.Windows,

@@ -55,6 +55,9 @@ ship as part of it.
   combinations yet; they now simply reach whatever listens above.
 - Converting to GIF with the audio set to "copy" no longer fails validation. GIF carries no
   audio, so the audio choice is not checked for it.
+- A recording set to GIF whose GIF conversion fails keeps its MKV, and that MKV now carries the
+  chapter marks set with F6. Before, the marks were reported as lost. Measured with a real
+  failed conversion on a short generated clip, not with a live screen recording.
 
 ## [1.2.8] - 2026-10-07
 
