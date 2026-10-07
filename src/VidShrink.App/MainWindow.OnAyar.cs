@@ -131,6 +131,7 @@ public partial class MainWindow
     /// yoksa en yakın basamağa, eşitlikte yukarıdakine iner. Kap çıktı uzantısını seçer
     /// (<see cref="ShrinkExtension"/>); gömülü yonga ya da boyut tavanına dönüş onu bırakır.
     /// Kodek kilidi (HandBrake'in VP9'u) Gelişmiş paneldeki kodek kilidi kutusunda seçilir.
+    /// Meta veriyi sil kutusu ön ayarı izler; alanı taşımayan eski ön ayar kutuyu kapatır.
     /// </summary>
     internal void ApplyUserPreset(PresetProfile preset)
     {
@@ -172,6 +173,8 @@ public partial class MainWindow
             if (at > 0) CmbAdvCodecLock.SelectedIndex = at;
         }
 
+        ChkAdvDropMetadata.IsChecked = preset.DropMetadata;
+
         RefreshChipDerivation();
         RefreshSectionSummaries();
     }
@@ -193,7 +196,8 @@ public partial class MainWindow
         MaxShortEdge = FixedResolutionShortSide,
         AudioKbps = CmbAdvAudioKbps.SelectedIndex > 0 ? AdvancedAudioKbpsCandidates[CmbAdvAudioKbps.SelectedIndex - 1] : null,
         Container = _presetContainer,
-        LockedCodec = AdvancedText(CmbAdvCodecLock) is { } locked && PlanCalculator.IsLockableCodec(locked) ? locked : null
+        LockedCodec = AdvancedText(CmbAdvCodecLock) is { } locked && PlanCalculator.IsLockableCodec(locked) ? locked : null,
+        DropMetadata = ChkAdvDropMetadata.IsChecked == true
     };
 
     private void OnPresetSave(object? sender, RoutedEventArgs e) => SavePreset(TxtPresetName.Text ?? string.Empty);

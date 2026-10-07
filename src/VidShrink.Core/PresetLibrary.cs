@@ -38,6 +38,12 @@ public sealed record PresetProfile
     /// HandBrake'in VP9/WebM on ayarindan <c>libvpx-vp9</c> gelir; bos kalirsa motor secer.
     /// </summary>
     public string? LockedCodec { get; init; }
+
+    /// <summary>
+    /// Meta veriyi sil secimi (<see cref="PlanOptions.DropMetadata"/>). Alani tasimayan eski
+    /// on ayar dosyasi kapali okunur.
+    /// </summary>
+    public bool DropMetadata { get; init; }
     public PresetSource Source { get; init; } = new();
 
     public PlanOptions ToPlanOptions(double fallbackTargetMb = 25) => new()
@@ -48,7 +54,8 @@ public sealed record PresetProfile
         FillPolicy = Fill,
         FixedResolution = MaxShortEdge,
         LockedAudioKbps = AudioKbps,
-        LockedCodec = LockedCodec
+        LockedCodec = LockedCodec,
+        DropMetadata = DropMetadata
     };
 }
 

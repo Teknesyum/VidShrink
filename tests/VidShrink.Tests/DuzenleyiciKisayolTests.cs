@@ -56,6 +56,37 @@ public sealed class DuzenleyiciKisayolTests
         return ortam;
     }
 
+    [Theory]
+    [InlineData(Key.PageUp)]
+    [InlineData(Key.PageDown)]
+    public void CizelgedeYalnizDegistiricisizSayfaTusuTuketilir(Key tus)
+    {
+        AppHost.Run(() =>
+        {
+            var o = Kur();
+            try
+            {
+                var ulasan = new List<KeyModifiers>();
+                o.Pencere.AddHandler(InputElement.KeyDownEvent, (_, e) =>
+                {
+                    if (e.Key == tus && !e.Handled) ulasan.Add(e.KeyModifiers);
+                }, Avalonia.Interactivity.RoutingStrategies.Bubble, handledEventsToo: true);
+                o.Cizelge.Focus();
+
+                Assert.True(o.Bas(tus));
+                Assert.Empty(ulasan);
+
+                var ekler = new[]
+                {
+                    KeyModifiers.Control, KeyModifiers.Shift, KeyModifiers.Alt, KeyModifiers.Control | KeyModifiers.Shift,
+                };
+                foreach (var ek in ekler) Assert.False(o.Bas(tus, ek), ek.ToString());
+                Assert.Equal(ekler, ulasan);
+            }
+            finally { o.Pencere.Close(); }
+        });
+    }
+
     [Fact]
     public void DuzenleyiciEtkinkenTuslarModeliDegistirir()
     {
