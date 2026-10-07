@@ -7,8 +7,8 @@ namespace VidShrink.Tests;
 /// <summary>
 /// B1f metin altyazi yakma: <c>--yak N</c> (1 tabanli) kaynagin N. altyazisini <c>subtitles</c>
 /// suzgeciyle goruntuye yakar; suzgec dondurmeden sonra, olceklemeden once durur, yakilan iz
-/// ciktiya ayrica eslenmez. Kesitte <c>setpts</c> ile sarilir. Goruntu altyazi (PGS) overlay
-/// ister, desteklenmez ve dogrulamada reddedilir.
+/// ciktiya ayrica eslenmez. Kesitte <c>setpts</c> ile sarilir. Goruntu altyazi (PGS) bu suzgece
+/// girmez; onu <c>overlay</c> grafigi yakar (<see cref="ResimAltyaziYakmaTests"/>).
 /// </summary>
 public sealed class AltyaziYakmaTests
 {
@@ -35,16 +35,16 @@ public sealed class AltyaziYakmaTests
     public void YolKacisi()
         => Assert.Equal("C\\:/a b/it'\\\\\\''s.mkv", VideoFilterChain.FilterPath("C:\\a b\\it's.mkv"));
 
-    /// <summary>Olumsuz kontrol: PGS ve olmayan iz suzgec kurmaz, dogrulama ikisini ayri sebeple reddeder.</summary>
+    /// <summary>Olumsuz kontrol: PGS ve olmayan iz <c>subtitles</c> suzgeci kurmaz; dogrulama yalniz olmayan izi reddeder.</summary>
     [Fact]
-    public void GoruntuVeOlmayanIzReddediliyor()
+    public void GoruntuSuzgecKurmazOlmayanIzReddediliyor()
     {
         var pgs = new VideoFilterOptions { BurnSubtitle = 1 };
         var yok = new VideoFilterOptions { BurnSubtitle = 5 };
 
         Assert.Null(VideoFilterChain.BurnFilter(Info(), pgs, 0));
         Assert.Null(VideoFilterChain.BurnFilter(Info(), yok, 0));
-        Assert.Contains("burn: image subtitles need an overlay and are not supported", VideoFilterChain.Validate(Info(), pgs));
+        Assert.Empty(VideoFilterChain.Validate(Info(), pgs));
         Assert.Contains("burn: the source has no such subtitle", VideoFilterChain.Validate(Info(), yok));
         Assert.Empty(VideoFilterChain.Validate(Info(), new VideoFilterOptions { BurnSubtitle = 0 }));
     }
@@ -84,10 +84,11 @@ public sealed class AltyaziYakmaTests
         Assert.False(sifir.Ok);
         Assert.Equal("error.bad-burn", sifir.ErrorKey);
 
-        var parsed = CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25", "--burn", "2" });
+        var parsed = CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25", "--burn", "3" });
         Assert.True(parsed.Ok, parsed.ErrorKey);
         Assert.Equal("error.bad-burn", parsed.Request!.ResolvedSubtitles(Info(), out _, out var arguman));
-        Assert.Equal("2", arguman);
+        Assert.Equal("3", arguman);
+        Assert.Null(CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25", "--burn", "2" }).Request!.ResolvedSubtitles(Info(), out _, out _));
         Assert.Null(CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25", "--yak", "1" }).Request!.ResolvedSubtitles(Info(), out _, out _));
         Assert.Equal(0, CliParser.Parse(new[] { "kucult", "a.mp4", "--hedef", "25", "--yak", "1" }).Request!.ToPlanOptions(10).Filters.BurnSubtitle);
     }

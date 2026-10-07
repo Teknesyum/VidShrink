@@ -204,6 +204,11 @@ Either end may be a frame number instead of a clock: `--kes 300f-900f` is frames
 converted with the source frame rate. `--bolum 2` and `--bolum 2-4` build the same window from the
 source's chapter marks; the two options cannot be given together.
 
+`--yak N` (`--burn N`) burns the source's Nth subtitle into the picture. A text subtitle is
+drawn by libass; an image subtitle (PGS, VOBSUB, DVB) is laid over the frame, scaled to its
+width and bottom-aligned. MP4 cannot carry image subtitles, so without `--yak` they are
+dropped and the plan says so, naming the option.
+
 The long options below each answer to an English alias; the two spellings are the same
 option, and a script may use either. `--crf` and `--json` and `--vmaf` are the exceptions: they have a
 single spelling.

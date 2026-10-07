@@ -76,8 +76,9 @@ public sealed record VideoFilterOptions
 
     /// <summary>
     /// B1f: kaynagin bu sirali altyazisi (0 tabanli, ffmpeg'in <c>si</c>'si) goruntuye yakilir ve
-    /// yumusak iz olarak cikmaz. Yalniz metin altyazi; goruntu altyazi (PGS) <c>overlay</c> ve
-    /// <c>-filter_complex</c> ister, <see cref="VideoFilterChain.Validate"/> reddeder.
+    /// yumusak iz olarak cikmaz. Metin altyazi <c>subtitles</c> suzgeciyle <c>-vf</c> zincirine,
+    /// resim altyazi (PGS, VOBSUB, DVB) <see cref="VideoFilterChain.OverlayGraph"/> ile
+    /// <c>-filter_complex</c> grafigine girer.
     /// </summary>
     public int? BurnSubtitle { get; init; }
 
@@ -205,7 +206,8 @@ public static class VideoFilterChain
         {
             var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
             if (burn < 0 || burn >= subtitles.Count) problems.Add("burn: the source has no such subtitle");
-            else if (!StreamMapping.IsTextSubtitle(subtitles[burn].Codec)) problems.Add("burn: image subtitles need an overlay and are not supported");
+            else if (!StreamMapping.IsTextSubtitle(subtitles[burn].Codec) && !StreamMapping.IsImageSubtitle(subtitles[burn].Codec))
+                problems.Add("burn: the subtitle is neither text nor image");
         }
         if (options.BurnFile is { } file)
         {
@@ -252,11 +254,60 @@ public static class VideoFilterChain
     public static string FilterPath(string path)
         => path.Replace('\\', '/').Replace(":", "\\:").Replace("'", "'\\\\\\''");
 
+    /// <summary><see cref="OverlayGraph"/> grafiginin cikis etiketi; <c>-map</c> videoyu bununla alir.</summary>
+    public const string OverlayOutput = "[v]";
+
+    /// <summary>Yakilacak iz resim altyaziysa o akis; metin izde, dosya yakmada ve yakma yokken <c>null</c>.</summary>
+    public static SourceStream? ImageBurnStream(MediaInfo info, VideoFilterOptions options)
+    {
+        if (options.BurnFile is { Length: > 0 } || options.BurnSubtitle is not int burn) return null;
+        var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
+        if (burn < 0 || burn >= subtitles.Count) return null;
+        return StreamMapping.IsImageSubtitle(subtitles[burn].Codec) ? subtitles[burn] : null;
+    }
+
+    /// <summary>
+    /// Resim altyaziyi goruntuye yakan <c>-filter_complex</c> grafigi; yakilacak iz resim degilse
+    /// <c>null</c> ve zincir <c>-vf</c> ile yazilir. Altyazi <see cref="Filters"/> zincirinde metin
+    /// yakmanin durdugu yere girer: kirpma ve dondurmeden sonra, olceklemeden once. Altyazi tuvali
+    /// o andaki kare genisligine olceklenir (tuval kareden buyukse olceksiz bindirme kareyi
+    /// iskaliyor), alta ve ortaya oturur. <c>eof_action=pass</c> olmadan <c>overlay</c> dosya
+    /// sonunda bozuk damgali bir kare daha uretiyor; 10 bit kaynakta <c>format</c> verilmezse
+    /// cikis 8 bite iniyor. Olcum: <c>docs/olcumler/resim-altyazi-yakma.md</c>.
+    /// </summary>
+    public static string? OverlayGraph(MediaInfo info, EncodePlan plan, string videoMap)
+    {
+        var options = plan.Filters ?? VideoFilterOptions.Default;
+        if (ImageBurnStream(info, options) is not { } subtitle) return null;
+        var (before, after) = Split(info, plan);
+        var width = PlannedSource(info, options).Width.ToString(CultureInfo.InvariantCulture);
+        var video = "[" + videoMap + "]";
+        var graph = new System.Text.StringBuilder();
+        if (before.Count > 0)
+        {
+            graph.Append(video).Append(string.Join(',', before)).Append("[b];");
+            video = "[b]";
+        }
+        graph.Append("[0:").Append(subtitle.Index.ToString(CultureInfo.InvariantCulture)).Append("]scale=").Append(width).Append(":-1[s];");
+        graph.Append(video).Append("[s]overlay=x=(W-w)/2:y=H-h:eof_action=pass");
+        if (info.BitDepth > 8) graph.Append(":format=yuv420p10");
+        foreach (var filter in after) graph.Append(',').Append(filter);
+        return graph.Append(OverlayOutput).ToString();
+    }
+
     public static IReadOnlyList<string> Filters(MediaInfo info, EncodePlan plan)
+    {
+        var (before, after) = Split(info, plan);
+        before.AddRange(after);
+        return before;
+    }
+
+    private static (List<string> Before, List<string> After) Split(MediaInfo info, EncodePlan plan)
     {
         var options = plan.Filters ?? VideoFilterOptions.Default;
         var source = PlannedSource(info, options);
-        var filters = new List<string>();
+        var before = new List<string>();
+        var filters = before;
 
         if (options.Detelecine) filters.Add(DetelecineChain);
         if (Deinterlaces(info, options)) filters.Add(DeinterlaceChain);
@@ -266,6 +317,7 @@ public static class VideoFilterChain
         if (options.Deband) filters.Add(DebandFilter);
         filters.AddRange(TransposeFilters(options.Transpose));
         if (BurnFilter(info, options, plan.Trim?.LeadSeconds ?? 0) is string burn) filters.Add(burn);
+        filters = new List<string>();
         if (plan.Width != source.Width || plan.Height != source.Height)
             filters.Add($"scale={plan.Width}:{plan.Height}:flags=lanczos");
         if (info.IsAnamorphic) filters.Add(SquarePixelFilter);
@@ -281,7 +333,7 @@ public static class VideoFilterChain
                 $"pad=w=iw+{pad.Left + pad.Right}:h=ih+{pad.Top + pad.Bottom}:x={pad.Left}:y={pad.Top}:color=black"));
         if (plan.FrameRate != FrameRateMode.Peak && plan.Fps < source.Fps - 0.01)
             filters.Add($"fps={plan.Fps.ToString("0.###", CultureInfo.InvariantCulture)}");
-        return filters;
+        return (before, filters);
     }
 
     /// <summary>

@@ -209,7 +209,9 @@ public static class CliApp
             stderr.WriteLine(altyaziIletisi);
             return new FileRun(ExitCodes.Usage, null, altyaziIletisi);
         }
-        if ((request.BurnFile is not null || request.BurnSubtitle is not null) && !services.HasFilter(VideoFilterChain.BurnFilterName))
+        var resimYakma = request.BurnSubtitle is int yakilan
+            && VideoFilterChain.ImageBurnStream(info, new VideoFilterOptions { BurnSubtitle = yakilan - 1 }) is not null;
+        if ((request.BurnFile is not null || request.BurnSubtitle is not null) && !resimYakma && !services.HasFilter(VideoFilterChain.BurnFilterName))
         {
             var yakmaIletisi = text["error.no-libass"];
             stderr.WriteLine(yakmaIletisi);

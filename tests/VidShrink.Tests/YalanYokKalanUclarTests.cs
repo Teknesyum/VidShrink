@@ -152,7 +152,9 @@ public sealed class YalanYokKalanUclarTests
         var slug = StreamNotes.Slug(StreamNote.ImageSubtitleDroppedByContainer);
         foreach (var (dil, metin) in Metinler("main.json", "main.reason.stream." + slug))
             Assert.False(string.IsNullOrWhiteSpace(metin), dil);
-        Assert.DoesNotContain("--", CliText.ForLanguage("tr")["plan.stream." + slug], StringComparison.Ordinal);
+        var cli = CliText.ForLanguage("tr")["plan.stream." + slug];
+        Assert.Contains("--yak N", cli, StringComparison.Ordinal);
+        Assert.DoesNotContain("--", cli.Replace("--yak N", "", StringComparison.Ordinal), StringComparison.Ordinal);
     }
 
     /// <summary>
