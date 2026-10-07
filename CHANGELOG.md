@@ -9,6 +9,12 @@ ship as part of it.
 
 ### Added
 
+- CLI: crop mode. `--kirpma-kipi` / `--crop-mode` takes HandBrake's four values. `auto` crops the
+  rectangle most probe samples agree on (the same as `--kirp`); `conservative` crops only the
+  edges that no sample counted as picture, so a scene with shorter bars is never cut; `none`
+  runs no probe; `custom` uses only `--suzgec crop=` and requires it. A flag that contradicts the
+  mode (`none` with `--kirp` or a rectangle, `auto` with a rectangle) is a usage error. The
+  conservative rule is not HandBrake's exact one. Not available in `izle`.
 - CLI: audio sample rate and Dolby dynamic range. `--ses-hizi` / `--arate N` sets the sample rate
   of the re-encoded audio (HandBrake's values: 8, 11.025, 12, 16, 22.05, 24, 32, 44.1, 48 kHz, or
   `auto`); `--ses-drc` / `--drc N` (0–4) passes `-drc_scale` to the AC-3 / E-AC-3 decoder of the

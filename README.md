@@ -230,6 +230,7 @@ single spelling.
 | `--azami-sure` | `--max-duration` |
 | `--suzgec` | `--filters` |
 | `--kirp` | `--crop` |
+| `--kirpma-kipi` | `--crop-mode` |
 | `--profil` | `--profile` |
 | `--profil-dosyasi` | `--preset-file` |
 | `--ses-kodek` | `--audio-codec` |

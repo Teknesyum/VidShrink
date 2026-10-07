@@ -767,7 +767,6 @@ public sealed class OluUyeTests
         "ComparisonSourceStatus.ReadErrors  yalniz-disarida",
         "ComplexityProfile.EstimateBand  yalniz-disarida",
         "ComplexityProfile.QualityMeasured  yalniz-disarida",
-        "CropDetection.Samples  yalniz-disarida",
         "EdlPreview.Document  yalniz-disarida",
         "EncodeAttempt.MeasuredEfficiency  yalniz-disarida",
         "EncodePlan.BitrateBias  hic-okunmayan-tur",
@@ -843,8 +842,6 @@ public sealed class OluUyeTests
     {
         new("EncodePlan.SuggestedCrop", "hic-okunmayan-tur", Debt,
             "K8: PlanCalculator oneriyi plana yaziyor, uretimde okuyan yok. Tek tik kirpma dugmesi C1'de; motor hazir, kullanici yolu yok. Oneri ile uygulamayi VideoFilterChainTests ayri ayri okuyor."),
-        new("CropDetection.Samples", "yalniz-disarida", Debt,
-            "K8: on ornegin ham listesi, mod kararinin kaniti. Uretimde okuyan yok; orneklerin modunu alan test ve canli cropdetect olcusu okuyor."),
         new("EdlPreview.Document", "yalniz-disarida", Debt,
             "K19 D2: edl:// onizlemenin dosya bicimi (# mpv EDL v0 basligi). D2 motora Uri ile veriyor; .edl dosyasina yazan yol D3'te. Bugun yalniz DuzenleyiciEdlTests okuyor."),
         new("WatchEntry.ProcessedUtc", "yalniz-disarida", Debt,
