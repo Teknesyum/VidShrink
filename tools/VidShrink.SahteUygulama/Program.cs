@@ -52,14 +52,19 @@ internal static class Program
     /// <summary>
     /// Uygulamanın "Yükle"sini taklit eder: arka plan başlatıcısı sahneyi indirip kapıda
     /// beklemeye geçene kadar bekler, sonra hızlı yolu dener; olmazsa uygulamanın yaptığı
-    /// gibi başlatıcıyı <c>--update-now</c> ile açıp çıkar.
+    /// gibi başlatıcıyı <c>--update-now</c> ile açıp çıkar. Bekleme bekleyen yuvasını yoklamaz:
+    /// <see cref="Tutuluyor"/> boş muteksi alıp bırakır ve arka plan bekleyeni yuvayı sıfır
+    /// bekleme payıyla ister; yoklama o ana denk gelirse bekleyen "yuva dolu" görüp çekilir
+    /// (main CI 37254025970, <c>docs/olcumler/bekleyen-yuvasi-yoklama-yarisi.md</c>). Sahne
+    /// mührü ancak bekleyen yuvayı tutarken yazılır; mühür var ve güncelleme kilidi boşsa
+    /// bekleyen kapıdadır.
     /// </summary>
     private static void Yukle(string appDirectory)
     {
         var baseDirectory = Path.GetDirectoryName(appDirectory)!;
         var muhur = Path.Combine(baseDirectory, UpdateStaging.StageDirectoryName, StageSeal.FileName);
         var bitis = DateTime.UtcNow.AddSeconds(20);
-        while (DateTime.UtcNow < bitis && !(Tutuluyor(KurulumBekleyeni.Ad(appDirectory)) && File.Exists(muhur) && !Tutuluyor(UpdateStaging.MutexName)))
+        while (DateTime.UtcNow < bitis && !(File.Exists(muhur) && !Tutuluyor(UpdateStaging.MutexName)))
             Thread.Sleep(20);
         Thread.Sleep(300);
 
