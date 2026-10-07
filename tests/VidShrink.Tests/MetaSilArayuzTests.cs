@@ -1,5 +1,8 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using Avalonia.Threading;
 using VidShrink.App;
 using VidShrink.Cli;
 using VidShrink.Core;
@@ -210,6 +213,183 @@ public sealed class MetaSilArayuzTests
             Assert.False(kutu);
         }
         finally { Sil(dosya); }
+    }
+
+    private static void Dongu(Func<bool> bitti, double saniye)
+    {
+        var saat = Stopwatch.StartNew();
+        while (!bitti() && saat.Elapsed.TotalSeconds < saniye)
+        {
+            using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(2));
+            Dispatcher.UIThread.MainLoop(dilim.Token);
+        }
+    }
+
+    /// <summary>
+    /// Kutu değişince plan kendiliğinden yenilenir: <c>RecalculateForTest</c> çağrılmaz, komut
+    /// gecikmeli yeniden hesapla değişir. Değişimin hemen ardından komut eskidir (yenileme
+    /// zamanlayıcıdan gelir); dokunulmayan kutuda aynı bekleme komutu değiştirmez (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void KutuDegisincePlanKendiligindenYenileniyor()
+    {
+        var dosya = AyarDosyasi();
+        try
+        {
+            var (once, hemen, acik, kapali, dokunulmadan) = AppHost.Run(() =>
+            {
+                var window = new MainWindow { SettingsPathOverride = dosya };
+                try
+                {
+                    var info = Ornek();
+                    window.LoadWithoutProbing(info.FilePath, info);
+                    window.TxtTarget.Text = "25";
+                    window.RecalculateForTest();
+                    Dongu(() => false, 0.6);
+                    var ilk = window.TxtCommand.Text ?? "";
+
+                    window.ChkAdvDropMetadata.IsChecked = true;
+                    var ara = window.TxtCommand.Text ?? "";
+                    Dongu(() => (window.TxtCommand.Text ?? "").Contains("-map_metadata -1", StringComparison.Ordinal), 10);
+                    var acilan = window.TxtCommand.Text ?? "";
+
+                    window.ChkAdvDropMetadata.IsChecked = false;
+                    Dongu(() => (window.TxtCommand.Text ?? "").Contains("-map_metadata 0", StringComparison.Ordinal), 10);
+                    var kapanan = window.TxtCommand.Text ?? "";
+
+                    Dongu(() => false, 0.6);
+                    return (ilk, ara, acilan, kapanan, window.TxtCommand.Text ?? "");
+                }
+                finally { window.Close(); }
+            });
+
+            Assert.Contains("-map_metadata 0", once, StringComparison.Ordinal);
+            Assert.Equal(once, hemen);
+            Assert.Contains("-map_metadata -1", acik, StringComparison.Ordinal);
+            Assert.Contains("-metadata:s:a:0 language=tur", acik, StringComparison.Ordinal);
+            Assert.Equal(once, kapali);
+            Assert.Equal(once, dokunulmadan);
+        }
+        finally { Sil(dosya); }
+    }
+
+    private static string OnAyarDosyasi()
+    {
+        Directory.CreateDirectory(Klasor);
+        return Path.Combine(Klasor, "presets-" + Guid.NewGuid().ToString("N") + ".json");
+    }
+
+    /// <summary>
+    /// Kutu ön ayara yazılır ve ön ayar uygulanınca geri gelir: açık kaydedilen ön ayar kapalı
+    /// kutuyu açar ve seçenek plana geçer, kapalı kaydedilen açık kutuyu kapatır (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void OnAyarKutuyuTasiyor()
+    {
+        var dosya = AyarDosyasi();
+        var onAyar = OnAyarDosyasi();
+        try
+        {
+            var (kayitli, acan, secenek, kapatan) = AppHost.Run(() =>
+            {
+                var window = new MainWindow { SettingsPathOverride = dosya, PresetPathOverride = onAyar };
+                try
+                {
+                    window.InitUserPresets();
+                    window.ChkAdvDropMetadata.IsChecked = true;
+                    Assert.True(window.SavePreset("Temiz"));
+                    window.ChkAdvDropMetadata.IsChecked = false;
+                    Assert.True(window.SavePreset("Etiketli"));
+                    var okunan = PresetLibrary.LoadUser(onAyar);
+
+                    window.ApplyUserPreset(okunan.Single(p => p.Id == "Temiz"));
+                    var acildi = window.ChkAdvDropMetadata.IsChecked == true;
+                    var plana = window.PlanOptionsForTest().DropMetadata;
+                    window.ApplyUserPreset(okunan.Single(p => p.Id == "Etiketli"));
+                    return (okunan, acildi, plana, window.ChkAdvDropMetadata.IsChecked == true);
+                }
+                finally { window.Close(); }
+            });
+
+            Assert.True(kayitli.Single(p => p.Id == "Temiz").DropMetadata);
+            Assert.False(kayitli.Single(p => p.Id == "Etiketli").DropMetadata);
+            using var doc = JsonDocument.Parse(File.ReadAllText(onAyar));
+            var yazilan = doc.RootElement.GetProperty("presets").EnumerateArray()
+                .ToDictionary(p => p.GetProperty("id").GetString()!, p => p.GetProperty("dropMetadata").GetBoolean());
+            Assert.True(yazilan["Temiz"]);
+            Assert.False(yazilan["Etiketli"]);
+            Assert.True(acan);
+            Assert.True(secenek);
+            Assert.False(kapatan);
+        }
+        finally
+        {
+            Sil(dosya);
+            Sil(onAyar);
+        }
+    }
+
+    /// <summary>
+    /// Alanı taşımayan eski ön ayar dosyası bozulmadan okunur ve kutuyu kapalı sayar; aynı dosyanın
+    /// alanlı eşi açık okunur (olumlu kontrol).
+    /// </summary>
+    [Fact]
+    public void EskiOnAyarDosyasiKapaliOkunuyor()
+    {
+        var dosya = AyarDosyasi();
+        var onAyar = OnAyarDosyasi();
+        try
+        {
+            var yeni = PresetLibrary.Serialize(new[]
+            {
+                new PresetProfile { Id = "Eski", Name = "Eski", Kind = PresetKind.User, TargetMb = 42, AudioKbps = 160, DropMetadata = true }
+            });
+            Assert.True(Assert.Single(PresetLibrary.Parse(yeni)).DropMetadata);
+
+            var kok = JsonNode.Parse(yeni)!;
+            Assert.True(kok["presets"]![0]!.AsObject().Remove("dropMetadata"));
+            var eski = kok.ToJsonString();
+            Assert.DoesNotContain("dropMetadata", eski, StringComparison.OrdinalIgnoreCase);
+            File.WriteAllText(onAyar, eski);
+
+            var okunan = Assert.Single(PresetLibrary.LoadUser(onAyar));
+            Assert.Equal("Eski", okunan.Id);
+            Assert.Equal(42, okunan.TargetMb);
+            Assert.Equal(160, okunan.AudioKbps);
+            Assert.False(okunan.DropMetadata);
+
+            var kutu = AppHost.Run(() =>
+            {
+                var window = new MainWindow { SettingsPathOverride = dosya, PresetPathOverride = onAyar };
+                try
+                {
+                    window.ChkAdvDropMetadata.IsChecked = true;
+                    window.ApplyUserPreset(okunan);
+                    return window.ChkAdvDropMetadata.IsChecked == true;
+                }
+                finally { window.Close(); }
+            });
+            Assert.False(kutu);
+        }
+        finally
+        {
+            Sil(dosya);
+            Sil(onAyar);
+        }
+    }
+
+    /// <summary>CLI <c>--profil</c> ön ayarın seçimini plana taşır; seçimsiz ön ayar ve bayraksız koşum taşımaz.</summary>
+    [Fact]
+    public void CliProfiliSecimiPlanaTasiyor()
+    {
+        var istek = CliParser.Parse(new[] { "plan", @"C:\Kayitlar\gezi.mp4", "--hedef", "25MB" }).Request!;
+        var temiz = new PresetProfile { Id = "Temiz", Kind = PresetKind.User, DropMetadata = true };
+
+        Assert.False(istek.ToPlanOptions(25).DropMetadata);
+        Assert.False((istek with { Profile = temiz with { DropMetadata = false } }).ToPlanOptions(25).DropMetadata);
+        Assert.True((istek with { Profile = temiz }).ToPlanOptions(25).DropMetadata);
+        Assert.True((istek with { DropMetadata = true }).ToPlanOptions(25).DropMetadata);
+        Assert.True(temiz.ToPlanOptions().DropMetadata);
     }
 
     /// <summary>"Ayarları sıfırla" kutuyu kapatır.</summary>

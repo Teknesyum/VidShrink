@@ -12,7 +12,7 @@
     </Grid.RowDefinitions>
     <playback:PlayerView x:Name="Preview" Grid.Row="0"/>
     <GridSplitter x:Name="PreviewSplitter" Grid.Row="1" Theme="{StaticResource PlanSplitter}" ResizeDirection="Rows"/>
-    <ScrollViewer x:Name="LowerScroll" Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <editing:EditorScrollViewer x:Name="LowerScroll" Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel>
       <Grid x:Name="MonitorBar" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource EditorTransportGap}" Margin="{StaticResource PageMargin}" AutomationProperties.Name="{loc:Text editor.monitor}">
         <TextBox x:Name="TxtTimecode" Grid.Column="0" Width="{StaticResource EditorTimecodeWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.timecode}"/>
@@ -201,6 +201,6 @@
         </StackPanel>
       </Border>
     </StackPanel>
-    </ScrollViewer>
+    </editing:EditorScrollViewer>
   </Grid>
 </UserControl>

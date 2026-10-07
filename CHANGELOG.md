@@ -12,6 +12,8 @@ ship as part of it.
 - The app's "Burn into video" list now offers image subtitles (PGS, VOBSUB, DVB) next to text
   ones. Picking one burns it in through the same overlay path as the CLI's `--yak N`. Not tried
   in a real window on real disc subtitles; the argument line is pinned by tests.
+- Saved presets now remember the "Remove metadata" box. Applying a preset sets the box, and the
+  CLI's `--profil` honours it too. Preset files written before this read as "box off".
 
 ### Changed
 
@@ -25,6 +27,9 @@ ship as part of it.
 - Text from ffprobe and ffmpeg is now read as UTF-8. On Windows it was decoded with the console
   code page, so chapter titles, tags and file names with non-ASCII characters ("Giriş",
   "Bölüm Üç", Japanese titles) arrived garbled even though the file itself held the right name.
+- In the editor, PgUp/PgDn with Ctrl, Shift or Alt held is no longer swallowed by the scroll area
+  under the preview. Plain PgUp/PgDn still scrolls it. The editor has no command on those
+  combinations yet; they now simply reach whatever listens above.
 
 ## [1.2.8] - 2026-10-07
 

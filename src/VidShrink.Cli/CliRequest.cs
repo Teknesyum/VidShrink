@@ -299,7 +299,7 @@ public sealed record CliRequest
         options.AudioSampleRate = AudioSampleRate;
         options.AudioDrcScale = AudioDrcScale;
         options.ExternalSubtitles = ExternalSubtitles;
-        options.DropMetadata = DropMetadata;
+        options.DropMetadata = DropMetadata || Profile is { DropMetadata: true };
         options.SubtitleLanguages = SubtitleLanguages;
         options.FirstSubtitleOnly = FirstSubtitleOnly;
         options.MaxFps = FrameRate;
