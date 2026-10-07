@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg-kommando",
   "main.convert.progress": "Förlopp",
   "main.convert.ready": "Klar.",
+  "main.convert.note.webp-bitrate-ignored": "WebP har inget bithastighetsläge: bithastighetsvärdet ignoreras och kodarens standardkvalitet används.",
 
   "main.stage.encoding": "Kodar",
   "main.stage.converting": "Konverterar",

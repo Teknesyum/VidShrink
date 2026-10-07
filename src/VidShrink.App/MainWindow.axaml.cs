@@ -1398,6 +1398,7 @@ public partial class MainWindow : Window
             CmbQualityMode.SelectedIndex = settings.QualityMode;
             TxtQuality.Text = settings.QualityValue.ToString(CultureInfo.InvariantCulture);
             CmbContainer.SelectedIndex = settings.Container;
+            KapSecenekleriniYokla();
             CmbConvertCodec.SelectedIndex = settings.ConvertCodec;
             CmbResolution.SelectedIndex = settings.Resolution;
             TxtCustomResolution.Text = settings.CustomResolution;
@@ -4828,7 +4829,9 @@ public partial class MainWindow : Window
             errors.Add(LanguageCatalog.Validation(LanguageCatalog.TrimFormatError));
 
         var output = BuildUniqueOutputPath(_info.FilePath, "converted", plan.Container);
-        TxtConvertValidation.Text = errors.Count == 0 ? Say("main.convert.ready") : string.Join("\n", errors);
+        TxtConvertValidation.Text = errors.Count == 0
+            ? string.Join("\n", ConversionArguments.Notes(plan).Select(note => Say(ConversionNoteKey(note))).Prepend(Say("main.convert.ready")))
+            : string.Join("\n", errors);
         BtnConvert.IsEnabled = errors.Count == 0 && _cts is null;
 
         try

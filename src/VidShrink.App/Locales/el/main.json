@@ -364,6 +364,7 @@
   "main.convert.command": "Εντολή FFmpeg",
   "main.convert.progress": "Πρόοδος",
   "main.convert.ready": "Έτοιμο.",
+  "main.convert.note.webp-bitrate-ignored": "Το WebP δεν έχει λειτουργία ρυθμού bit: η τιμή του ρυθμού bit αγνοείται και χρησιμοποιείται η προεπιλεγμένη ποιότητα του κωδικοποιητή.",
 
   "main.stage.encoding": "Κωδικοποίηση",
   "main.stage.converting": "Μετατροπή",

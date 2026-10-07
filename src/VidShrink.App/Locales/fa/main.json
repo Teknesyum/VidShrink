@@ -364,6 +364,7 @@
   "main.convert.command": "فرمان FFmpeg",
   "main.convert.progress": "پیشرفت",
   "main.convert.ready": "آماده.",
+  "main.convert.note.webp-bitrate-ignored": "WebP حالت نرخ بیت ندارد: مقدار نرخ بیت نادیده گرفته می‌شود و کیفیت پیش‌فرض رمزگذار به کار می‌رود.",
 
   "main.stage.encoding": "رمزگذاری",
   "main.stage.converting": "تبدیل",

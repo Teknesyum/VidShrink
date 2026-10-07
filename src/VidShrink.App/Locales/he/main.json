@@ -364,6 +364,7 @@
   "main.convert.command": "פקודת FFmpeg",
   "main.convert.progress": "התקדמות",
   "main.convert.ready": "מוכן.",
+  "main.convert.note.webp-bitrate-ignored": "ל-WebP אין מצב קצב סיביות: ערך קצב הסיביות נזנח ונעשה שימוש באיכות ברירת המחדל של המקודד.",
 
   "main.stage.encoding": "מקודד",
   "main.stage.converting": "ממיר",

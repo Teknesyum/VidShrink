@@ -389,6 +389,7 @@ public partial class MainWindow
         _syncing = wasSyncing;
 
         ApplyFastGpuTip();
+        KapSecenekleriniYokla();
         Recalculate();
     }
 

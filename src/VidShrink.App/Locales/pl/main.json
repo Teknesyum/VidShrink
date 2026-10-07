@@ -364,6 +364,7 @@
   "main.convert.command": "Polecenie FFmpeg",
   "main.convert.progress": "Postęp",
   "main.convert.ready": "Gotowe.",
+  "main.convert.note.webp-bitrate-ignored": "WebP nie ma trybu przepływności: wartość przepływności jest pomijana i używana jest domyślna jakość kodera.",
 
   "main.stage.encoding": "Kodowanie",
   "main.stage.converting": "Konwersja",

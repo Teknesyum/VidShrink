@@ -364,6 +364,7 @@
   "main.convert.command": "Commande FFmpeg",
   "main.convert.progress": "Progression",
   "main.convert.ready": "Prêt.",
+  "main.convert.note.webp-bitrate-ignored": "WebP n'a pas de mode débit : la valeur de débit est ignorée et la qualité par défaut de l'encodeur est utilisée.",
 
   "main.stage.encoding": "Encodage",
   "main.stage.converting": "Conversion",

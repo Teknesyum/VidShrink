@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg komutu",
   "main.convert.progress": "İlerleme",
   "main.convert.ready": "Hazır.",
+  "main.convert.note.webp-bitrate-ignored": "WebP'de bit hızı kipi yok: bit hızı değeri yok sayılır, kodlayıcının varsayılan kalitesi kullanılır.",
 
   "main.stage.encoding": "Kodlama",
   "main.stage.converting": "Dönüştürme",

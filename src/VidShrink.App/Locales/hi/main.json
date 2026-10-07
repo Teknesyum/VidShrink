@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg कमांड",
   "main.convert.progress": "प्रगति",
   "main.convert.ready": "तैयार।",
+  "main.convert.note.webp-bitrate-ignored": "WebP में बिटरेट मोड नहीं है: बिटरेट मान को अनदेखा किया जाता है और एन्कोडर की डिफ़ॉल्ट गुणवत्ता उपयोग होती है।",
 
   "main.stage.encoding": "एन्कोडिंग",
   "main.stage.converting": "रूपांतरण",

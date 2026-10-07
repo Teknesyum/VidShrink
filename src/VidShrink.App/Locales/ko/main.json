@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg 명령",
   "main.convert.progress": "진행",
   "main.convert.ready": "준비됨.",
+  "main.convert.note.webp-bitrate-ignored": "WebP에는 비트레이트 모드가 없습니다. 비트레이트 값은 무시되고 인코더의 기본 품질이 사용됩니다.",
 
   "main.stage.encoding": "인코딩",
   "main.stage.converting": "변환 중",

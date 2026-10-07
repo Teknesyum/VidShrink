@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -557,6 +557,9 @@ public sealed class OluUyeTests
     /// kardesleri adiyla okunan turun varsayilan kolu.
     /// Kumeyi bir satir buyuten yabanci ses aramasi (<c>--altyazi-tara</c>):
     /// <c>ForeignAudioOutcome.NoCandidate</c> <c>ForeignAudioPick.Slug</c>'in '_' kolu, bes kardesi adiyla okunuyor.
+    /// Kumeyi bir satir kuculten WebP bit hizi notu: <c>ConversionArguments.Notes</c>
+    /// <c>plan.QualityMode == ConversionQualityMode.Bitrate</c> diye soruyor, uye artik adiyla
+    /// okunuyor ve pimden dustu; yukarida ona "ayni kalip" diye yapilan atif o gunun halidir.
     /// Kumeyi 35'ten 36'ya cikaran Paket 2b, kamera arka plani: <c>WebcamBackground.Keep</c>
     /// <c>RecorderArguments.WebcamKey</c> ve <c>RecorderView.BackgroundKey</c>'de '_' kolu, iki kardesi adiyla okunuyor.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
@@ -580,8 +583,6 @@ public sealed class OluUyeTests
             "Sihirbazin icerik sorusunun ucuncu karesi; General ile ayni yoldan uretilip ayni '_' kolunda tuketiliyor."),
         new("ArchitectureOutcome.Assumed", "varsayilan-kol", Legitimate,
             "Iki uyeli turun olumsuz kolu. VidShrink-Setup.exe motoru (SetupRunner.RuntimeIdentifier) Read kolunu soruyor; Assumed o kosulun else'i ve kullaniciya varsayim mesajini orada yaziyor. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; Read satirinin pimde isi kalmadi."),
-        new("ConversionQualityMode.Bitrate", "varsayilan-kol", Legitimate,
-            "Iki degerli kipin olumsuz kolu. Tek okuyan ConversionArguments.cs:86 'QualityMode == ConversionQualityMode.Crf' diye soruyor; Bitrate o kosulun else'i, ayrica adlandirilmasi ayni dali ikiye bolerdi."),
         new("FillPolicy.QualityCeiling", "varsayilan-kol", Legitimate,
             "Iki degerli siyasetin olumsuz kolu. Uc okuyan da (PlanCalculator.cs:342, MainWindow.axaml.cs:2284, EncodeRunner.cs:140) 'fillPolicy == FillPolicy.FillTarget' soruyor; tavan kolu o kosulun else'i."),
         new("PreviewQuality.Yaklasik", "varsayilan-kol", Legitimate,

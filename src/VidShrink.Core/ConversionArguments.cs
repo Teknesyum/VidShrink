@@ -19,12 +19,12 @@ public static class ConversionArguments
         if (plan.Fps is <= 0) errors.Add("Frame rate must be greater than zero.");
         if (plan.VideoCodec == "copy" && (plan.Height is not null || plan.Width is not null || plan.Fps is not null)) errors.Add("Stream copy cannot change resolution or frame rate.");
         if (plan.VideoCodec == "copy" && plan.Container == "gif") errors.Add("GIF requires video encoding and cannot use stream copy.");
-        if (!plan.AnimatedImage && plan.AudioCodec == "copy" && !info.HasAudio) errors.Add("The source has no audio stream to copy.");
+        if (plan.CarriesAudio && plan.AudioCodec == "copy" && !info.HasAudio) errors.Add("The source has no audio stream to copy.");
         if (plan.AudioOnly && !info.HasAudio) errors.Add("The source has no audio stream to extract.");
 
         if (!plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && plan.VideoCodec != "copy" && !VideoEncodeCompatible(plan.Container, plan.VideoCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {plan.VideoCodec} video encoder.");
-        if (!plan.Gif && !plan.AnimatedImage && plan.AudioCodec is { } audioCodec && audioCodec != "copy" && !AudioEncodeCompatible(plan.Container, audioCodec))
+        if (plan.CarriesAudio && plan.AudioCodec is { } audioCodec && audioCodec != "copy" && !AudioEncodeCompatible(plan.Container, audioCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {audioCodec} audio encoder.");
 
         var source = info.VideoCodec.ToLowerInvariant();
@@ -32,9 +32,39 @@ public static class ConversionArguments
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {source} video stream.");
         if (plan.Start is { } trimStart && plan.End is { } trimEnd && trimEnd <= trimStart)
             errors.Add("The trim end must come after the trim start.");
-        if (!plan.AnimatedImage && plan.AudioCodec == "copy" && !AudioCopyCompatible(plan.Container, info.AudioCodec))
+        if (plan.CarriesAudio && plan.AudioCodec == "copy" && !AudioCopyCompatible(plan.Container, info.AudioCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {info.AudioCodec} audio stream.");
         return errors;
+    }
+
+    /// <summary>
+    /// Kabın istediği kodlayıcı; yalnız seçilen video kodeğinden bağımsız, sabit kodlayıcıyla yazılan
+    /// kaplar için ad döner. Öteki kaplarda <c>null</c>.
+    /// </summary>
+    public static string? RequiredEncoder(string container) => container switch
+    {
+        "webp" => AnimatedWebpEncoder,
+        "avif" => AnimatedAvifEncoder,
+        _ => null
+    };
+
+    /// <summary>
+    /// Kap bu ffmpeg derlemesinde yazılabiliyor mu. Yoklama henüz yoksa (<c>null</c>) kap sunulur:
+    /// bilinmeyen "yok" sayılmaz.
+    /// </summary>
+    public static bool ContainerAvailable(string container, IEncoderAvailability? encoders)
+        => encoders is null || RequiredEncoder(container) is not { } encoder || encoders.HasEncoder(encoder);
+
+    /// <summary>
+    /// Planın sessizce yok saydığı seçimler. Ölçüm <c>docs/olcumler/webp-bit-hizi.md</c>:
+    /// <c>libwebp_anim</c> <c>-b:v</c> değerini okumuyor, çıktı bayt bayt aynı kalıyor.
+    /// </summary>
+    public static IReadOnlyList<ConversionNote> Notes(ConversionPlan plan)
+    {
+        var notes = new List<ConversionNote>();
+        if (plan.Container == "webp" && plan.QualityMode == ConversionQualityMode.Bitrate)
+            notes.Add(ConversionNote.WebpBitrateIgnored);
+        return notes;
     }
 
     public static IReadOnlyList<string> Build(MediaInfo info, ConversionPlan plan, string outputPath, string? palettePath = null, IEncoderAvailability? availability = null)
@@ -115,7 +145,7 @@ public static class ConversionArguments
     /// <summary>
     /// Hareketli WebP ve AVIF: ses düşer, döngü sonsuzdur. Kalite, seçili video kodeğinin CRF
     /// aralığındaki konumdan çevrilir: WebP'de 100 (en iyi) ile 0 arası <c>-quality</c>, AVIF'te
-    /// SVT-AV1'in kendi CRF aralığı. WebP'nin bit hızı kipi yok; o kipte libwebp varsayılanı kalır.
+    /// SVT-AV1'in kendi CRF aralığı. WebP'nin bit hızı kipi yok; o kipte libwebp varsayılanı kalır ve <see cref="Notes"/> bunu söyler.
     /// </summary>
     private static IReadOnlyList<string> AnimatedImageArgs(ConversionPlan plan)
     {

@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg கட்டளை",
   "main.convert.progress": "முன்னேற்றம்",
   "main.convert.ready": "தயார்.",
+  "main.convert.note.webp-bitrate-ignored": "WebP-இல் பிட்ரேட் பயன்முறை இல்லை: பிட்ரேட் மதிப்பு புறக்கணிக்கப்படும், குறியாக்கியின் இயல்புநிலைத் தரம் பயன்படுத்தப்படும்.",
 
   "main.stage.encoding": "குறியாக்கம்",
   "main.stage.converting": "மாற்றுகிறது",

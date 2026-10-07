@@ -364,6 +364,7 @@
   "main.convert.command": "Příkaz FFmpeg",
   "main.convert.progress": "Průběh",
   "main.convert.ready": "Připraveno.",
+  "main.convert.note.webp-bitrate-ignored": "WebP nemá režim datového toku: hodnota datového toku se ignoruje a použije se výchozí kvalita kodéru.",
 
   "main.stage.encoding": "Kódování",
   "main.stage.converting": "Převod",

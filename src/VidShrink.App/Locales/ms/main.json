@@ -364,6 +364,7 @@
   "main.convert.command": "Perintah FFmpeg",
   "main.convert.progress": "Kemajuan",
   "main.convert.ready": "Sedia.",
+  "main.convert.note.webp-bitrate-ignored": "WebP tiada mod kadar bit: nilai kadar bit diabaikan dan kualiti lalai pengekod digunakan.",
 
   "main.stage.encoding": "Mengekod",
   "main.stage.converting": "Menukar",

@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg komanda",
   "main.convert.progress": "Eiga",
   "main.convert.ready": "Paruošta.",
+  "main.convert.note.webp-bitrate-ignored": "WebP neturi bitų spartos režimo: bitų spartos reikšmė ignoruojama ir naudojama numatytoji kodavimo priemonės kokybė.",
 
   "main.stage.encoding": "Koduojama",
   "main.stage.converting": "Konvertuojama",

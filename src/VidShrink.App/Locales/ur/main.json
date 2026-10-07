@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg کمانڈ",
   "main.convert.progress": "پیش رفت",
   "main.convert.ready": "تیار۔",
+  "main.convert.note.webp-bitrate-ignored": "WebP میں بٹ ریٹ موڈ نہیں ہے: بٹ ریٹ کی قدر نظر انداز کی جاتی ہے اور انکوڈر کا طے شدہ معیار استعمال ہوتا ہے۔",
 
   "main.stage.encoding": "انکوڈنگ",
   "main.stage.converting": "تبدیل ہو رہا ہے",

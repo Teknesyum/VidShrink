@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg-opdracht",
   "main.convert.progress": "Voortgang",
   "main.convert.ready": "Gereed.",
+  "main.convert.note.webp-bitrate-ignored": "WebP heeft geen bitratemodus: de bitratewaarde wordt genegeerd en de standaardkwaliteit van de encoder wordt gebruikt.",
 
   "main.stage.encoding": "Coderen",
   "main.stage.converting": "Converteren",

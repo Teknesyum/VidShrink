@@ -364,6 +364,7 @@
   "main.convert.command": "คำสั่ง FFmpeg",
   "main.convert.progress": "ความคืบหน้า",
   "main.convert.ready": "พร้อม",
+  "main.convert.note.webp-bitrate-ignored": "WebP ไม่มีโหมดบิตเรต: ค่าบิตเรตจะถูกละเว้นและใช้คุณภาพเริ่มต้นของตัวเข้ารหัส",
 
   "main.stage.encoding": "กำลังเข้ารหัส",
   "main.stage.converting": "กำลังแปลง",

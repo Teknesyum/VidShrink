@@ -364,6 +364,7 @@
   "main.convert.command": "أمر FFmpeg",
   "main.convert.progress": "التقدم",
   "main.convert.ready": "جاهز.",
+  "main.convert.note.webp-bitrate-ignored": "لا يدعم WebP وضع معدل البت: يتم تجاهل قيمة معدل البت وتُستخدم الجودة الافتراضية للمرمّز.",
 
   "main.stage.encoding": "جارٍ الترميز",
   "main.stage.converting": "جارٍ التحويل",
