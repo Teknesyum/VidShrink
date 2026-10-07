@@ -130,6 +130,10 @@ public static class ToolLocator
         return null;
     }
 
+    /// <summary>
+    /// ffmpeg ve ffprobe metni her platformda UTF-8 yazar; kodlama verilmezse .NET Windows'ta
+    /// konsolun kod sayfasiyla cozer ve ASCII disi bolum adi, etiket, dosya yolu bozuk gelir.
+    /// </summary>
     internal static ProcessStartInfo StartInfo(string fileName, IEnumerable<string> args)
     {
         var psi = new ProcessStartInfo
@@ -137,6 +141,8 @@ public static class ToolLocator
             FileName = fileName,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            StandardOutputEncoding = System.Text.Encoding.UTF8,
+            StandardErrorEncoding = System.Text.Encoding.UTF8,
             UseShellExecute = false,
             CreateNoWindow = true
         };
