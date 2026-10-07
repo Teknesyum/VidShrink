@@ -120,6 +120,9 @@ public sealed class EncodeRunner
     /// <summary>Cozme gecisinin ilerleme satirindaki asama adi; arayuz onu kendi dilinde yazar.</summary>
     public const string Hdr10PlusStage = "HDR10+ metadata";
 
+    /// <summary>Kapak eki planlanmis ama kaynaktan cikarilamamissa sonuca dusen uyari satiri.</summary>
+    public const string CoverLostWarning = "cover art could not be extracted from the source, so the output has no cover";
+
     public async Task<EncodeResult> RunAsync(
         MediaInfo info,
         EncodePlan plan,
@@ -134,16 +137,62 @@ public sealed class EncodeRunner
     {
         var bridge = new Hdr10PlusSource();
         var result = await RunEncodeAsync(info, plan, outputPath, targetMb, progress, ct, fillPolicy, profile, askBeforeRetry, scenes, bridge);
+        if (bridge.CoverLost && result.Success)
+            result = result with { DroppedOptions = (result.DroppedOptions ?? Array.Empty<string>()).Append(CoverLostWarning).ToList() };
         if (bridge.Frames is not int sourceFrames || !result.Success || !File.Exists(result.OutputPath)) return result;
         var outputFrames = await FfprobeClient.CountHdr10PlusAsync(result.OutputPath, ct);
         return result with { Hdr10Plus = new Hdr10PlusCount(sourceFrames, outputFrames) };
     }
 
-    /// <summary>Cozme gecisinin kaynakta saydigi HDR10+ kare; gecis kosmadiysa <c>null</c>.</summary>
+    /// <summary>
+    /// Cozme gecisinin kaynakta saydigi HDR10+ kare; gecis kosmadiysa <c>null</c>. Kapak eki
+    /// planlanip cikarilamadiysa <see cref="CoverLost"/> dolar.
+    /// </summary>
     private sealed class Hdr10PlusSource
     {
         internal int? Frames;
+        internal bool CoverLost;
     }
+
+    /// <summary>
+    /// Matroska ciktinin kapagini kaynaktan bayt bayt cikarir ve yolunu plana yazar; dosya
+    /// <see cref="CleanupPassLogs"/> ile silinir. Cikarma duserse kodlama kapaksiz surer ve
+    /// sonuc <see cref="CoverLostWarning"/> satirini tasir.
+    /// </summary>
+    private static async Task<EncodePlan> ExtractCoverAsync(MediaInfo info, EncodePlan plan, CoverAttachment cover,
+        string passLogPrefix, Hdr10PlusSource bridge, CancellationToken ct)
+    {
+        var path = passLogPrefix + "_cover." + cover.Extension;
+        var extracted = false;
+        try
+        {
+            var outcome = await RunCommandAsync(CoverExtractArguments(info.FilePath, cover, path), 1, null, "cover", 0, 0, ct);
+            extracted = outcome.ExitCode == 0 && File.Exists(path) && new FileInfo(path).Length > 0;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch
+        {
+        }
+        if (!extracted)
+        {
+            TryDelete(path);
+            bridge.CoverLost = true;
+            return plan;
+        }
+        var covered = plan.Clone();
+        covered.CoverAttachmentPath = path;
+        return covered;
+    }
+
+    public static IReadOnlyList<string> CoverExtractArguments(string sourcePath, CoverAttachment cover, string coverPath)
+        => new[]
+        {
+            "-hide_banner", "-y", "-i", sourcePath, "-map", cover.Map, "-c", "copy",
+            "-frames:v", "1", "-update", "1", "-f", "image2", coverPath
+        };
 
     /// <summary>
     /// Kaynagin HDR10+ verisini cozup x265 JSON'unu isin gecici onekine yazar; dosya
@@ -364,6 +413,8 @@ public sealed class EncodeRunner
         {
             if (current.Hdr10PlusBridge)
                 current = await ExtractHdr10PlusAsync(info, current, passLogPrefix, progress, bridge, ct);
+            if (SahteKodlayici is null && StreamMapping.ForOutput(info, current, outputPath).CoverAttachment is { } coverAttachment)
+                current = await ExtractCoverAsync(info, current, coverAttachment, passLogPrefix, bridge, ct);
 
             while (attempt < attemptLimit)
             {

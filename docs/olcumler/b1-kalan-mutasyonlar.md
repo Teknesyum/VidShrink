@@ -32,3 +32,7 @@ derledi, yalnız ilgili sınıfı koştu ve dosyayı bayt bayt geri yazdı.
 Kapak yalnız MP4'te taşınıyor. Deneme ffmpeg koşumunda MOV çıktısı `attached_pic` izini sessizce düşürdü;
 MKV aynı eşlemeyle kapak yerine tek karelik düz bir video izi yazdı. İkisi de kapak sayılmadığından
 `CarriesCover` yalnız MP4'e açık; `KapakTasinmayanYerler` ve canlı kolun MKV tarafı bunu pimliyor.
+
+2026-10-07: MKV artık kapağı iz olarak değil ek olarak (`-attach`) taşıyor, MOV ve bmp kapak plan notu
+düşürüyor. Yukarıdaki iki gözlem hâlâ doğru (eşleme yolu için); yeni ölçüm ve mutasyonlar
+`docs/olcumler/kapak-mkv-mov.md`'de. `KapakResmiTests` 4 koldan 13 kola çıktı.

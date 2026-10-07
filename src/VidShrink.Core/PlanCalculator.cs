@@ -1895,6 +1895,7 @@ public static class PlanCalculator
                 StreamNote.AudioFilterSkippedOnCopy => "loudness and gain cannot be applied to a copied audio track; the track is copied unchanged",
                 StreamNote.WebmAudioOpus => "WebM carries only Opus or Vorbis audio, so the track is encoded to Opus",
                 StreamNote.WebmStreamDropped => "WebM cannot carry image subtitles, cover art or attachments, so those streams are dropped",
+                StreamNote.CoverDropped => "the cover art cannot be carried in this output, so it is dropped",
                 _ => "a lossless TrueHD/DTS track is never copied; it is re-encoded"
             });
     }

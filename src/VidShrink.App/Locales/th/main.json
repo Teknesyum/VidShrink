@@ -464,6 +464,7 @@
   "main.reason.stream.audio-filter-on-copy": "ปรับระดับความดังและเกนกับแทร็กเสียงที่คัดลอกไม่ได้ จึงคัดลอกแทร็กโดยไม่เปลี่ยนแปลง",
   "main.reason.stream.webm-audio-opus": "WebM รองรับเสียง Opus หรือ Vorbis เท่านั้น จึงเข้ารหัสแทร็กเป็น Opus",
   "main.reason.stream.webm-stream-dropped": "WebM ไม่รองรับคำบรรยายแบบภาพ ภาพปก หรือไฟล์แนบ จึงตัดออก",
+  "main.reason.stream.cover-dropped": "เอาต์พุตนี้ไม่รองรับภาพปก จึงตัดออก",
   "main.reason.stream.lossless-not-passed": "แทร็ก TrueHD/DTS แบบไม่สูญเสียจะไม่ถูกคัดลอก แต่จะเข้ารหัสใหม่",
   "main.reason.fill-crf-lowered": "นโยบายเติมให้ถึงเป้าหมายลด CRF เป็น {0} แทนการหยุดที่เพดานความโปร่งใส ตกใกล้กลางแถบ {1} MB ภายในแถบ {2}-{3} MB",
   "main.reason.fill-band-center": "ถึงพื้น CRF {0} ก่อนถึงแถบเติม สองรอบ VBR จึงเล็งกลางแถบ {1} MB โดยตรง",

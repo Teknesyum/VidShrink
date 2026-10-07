@@ -143,6 +143,12 @@ public sealed class EncodePlan
     /// gecise de ayni yol verilir. Plan hesabinda hep <c>null</c>.
     /// </summary>
     [JsonIgnore] public string? Hdr10PlusMetadataPath { get; set; }
+
+    /// <summary>
+    /// Kosucunun kaynaktan cikardigi kapak resminin yolu; Matroska ciktida <c>-attach</c> ile
+    /// verilir. Plan hesabinda hep <c>null</c>, o yuzden gosterilen komutta ek gorunmez.
+    /// </summary>
+    [JsonIgnore] public string? CoverAttachmentPath { get; set; }
     [JsonIgnore] public VideoFilterOptions Filters { get; set; } = VideoFilterOptions.Default;
     [JsonIgnore] public CropRect? SuggestedCrop { get; set; }
     [JsonIgnore] public FrameRateMode FrameRate { get; set; }

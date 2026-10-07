@@ -464,6 +464,7 @@
   "main.reason.stream.audio-filter-on-copy": "normalisasi kenyaringan dan penguatan tidak dapat diterapkan pada trek audio yang disalin, jadi trek disalin tanpa perubahan",
   "main.reason.stream.webm-audio-opus": "WebM hanya membawa audio Opus atau Vorbis, jadi trek dienkode ke Opus",
   "main.reason.stream.webm-stream-dropped": "WebM tidak dapat membawa subtitel gambar, gambar sampul, atau lampiran, jadi semuanya dibuang",
+  "main.reason.stream.cover-dropped": "Keluaran ini tidak dapat membawa gambar sampul, jadi gambar itu dibuang",
   "main.reason.stream.lossless-not-passed": "trek TrueHD/DTS lossless tidak pernah disalin; trek itu dienkode ulang",
   "main.reason.fill-crf-lowered": "kebijakan isi target menurunkan CRF ke {0} alih-alih berhenti di batas transparansi, mendarat dekat pusat pita {1} MB di dalam pita {2}-{3} MB",
   "main.reason.fill-band-center": "batas bawah CRF {0} tercapai sebelum pita isi, jadi VBR dua lintasan langsung menargetkan pusat pita {1} MB",

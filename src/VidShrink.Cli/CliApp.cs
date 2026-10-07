@@ -21,6 +21,10 @@ public sealed class CliServices
     /// yok demek degildir ve kodlama kendi hatasini verir.
     /// </summary>
     public Func<string, bool> HasFilter { get; init; } = name => !EncoderCapabilities.Instance.Loaded || EncoderCapabilities.Instance.HasFilter(name);
+
+    /// <summary><c>--altyazi-tara</c>'nin paket sayimi; yalniz kaynakta zorunlu bayrakli altyazi yokken cagrilir.</summary>
+    public Func<MediaInfo, CancellationToken, Task<IReadOnlyDictionary<int, int>?>> CountSubtitlePackets { get; init; }
+        = (info, ct) => FfprobeClient.CountSubtitlePacketsAsync(info.FilePath, ct);
     public Func<IReadOnlyList<PresetProfile>> UserPresets { get; init; } = () =>
     {
         try { return PresetLibrary.LoadUser(PresetLibrary.DefaultUserPath); }
@@ -208,6 +212,18 @@ public static class CliApp
             var altyaziIletisi = text.Format(altyaziHatasi, altyaziArgumani);
             stderr.WriteLine(altyaziIletisi);
             return new FileRun(ExitCodes.Usage, null, altyaziIletisi);
+        }
+        if (request.SubtitleScan)
+        {
+            var bulunan = ForeignAudioSearch.Flagged(info, request.PreferredLanguage);
+            if (bulunan is null && ForeignAudioSearch.Decide(info, null, request.PreferredLanguage).Outcome == ForeignAudioOutcome.NotMeasured)
+            {
+                stderr.WriteLine(text["progress.subtitle-scan"]);
+                bulunan = ForeignAudioSearch.Decide(info, await services.CountSubtitlePackets(info, ct), request.PreferredLanguage);
+            }
+            bulunan ??= new ForeignAudioPick(ForeignAudioOutcome.NoSubtitles);
+            stderr.WriteLine(text.Format("result.subtitle-scan." + bulunan.Slug, bulunan.Number, bulunan.Packets, bulunan.FullestPackets));
+            if (bulunan.Number is int taranan) request = request with { BurnSubtitle = taranan };
         }
         var resimYakma = request.BurnSubtitle is int yakilan
             && VideoFilterChain.ImageBurnStream(info, new VideoFilterOptions { BurnSubtitle = yakilan - 1 }) is not null;

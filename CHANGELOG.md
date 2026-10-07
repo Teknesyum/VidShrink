@@ -9,6 +9,18 @@ ship as part of it.
 
 ### Added
 
+- CLI: foreign audio search. `--altyazi-tara` / `--subtitle-scan` finds the subtitle that only
+  translates the foreign-language parts of a film and burns it in, through the same path as
+  `--yak N`. A track the source flags as forced wins. Without a flag the subtitle packets are
+  counted (no decoding): among tracks of the same language and kind, the single one holding at
+  most 10% of the fullest track's packets is picked. When that is not clear-cut (one track only,
+  an empty track, two sparse tracks) nothing is picked and a line says why. It cannot be combined
+  with `--yak`, `--yak-srt` or `--yak-ass`. The 10% threshold is pinned on synthetic counts and
+  was not measured on real films. CLI only; the app has no such switch.
+- Cover art survives in MKV output. The cover is extracted from the source byte for byte and
+  written as a Matroska attachment (`-attach` with its mimetype and file name), png and jpeg
+  only. MOV output and a bmp cover cannot carry it, and the plan now says so instead of dropping
+  it silently. If extraction fails the encode still finishes and reports the missing cover.
 - CLI: image subtitles can be burned in. `--yak N` / `--burn N` used to refuse a PGS, VOBSUB or
   DVB track; it now lays it over the picture with an `overlay` graph (`-filter_complex` instead
   of `-vf`), after crop and rotation and before scaling, in both passes. The subtitle canvas is

@@ -464,6 +464,7 @@
   "main.reason.stream.audio-filter-on-copy": "luidheidsnormalisatie en versterking kunnen niet op een gekopieerde audiotrack worden toegepast, de track is ongewijzigd gekopieerd",
   "main.reason.stream.webm-audio-opus": "WebM bevat alleen Opus- of Vorbis-audio, dus het spoor is naar Opus gecodeerd",
   "main.reason.stream.webm-stream-dropped": "WebM kan geen beeldondertitels, hoesafbeelding of bijlagen bevatten, dus die zijn weggelaten",
+  "main.reason.stream.cover-dropped": "Deze uitvoer kan de hoesafbeelding niet bevatten, dus die is weggelaten",
   "main.reason.stream.lossless-not-passed": "een lossless TrueHD/DTS-spoor wordt nooit gekopieerd; het wordt opnieuw gecodeerd",
   "main.reason.fill-crf-lowered": "het vulbeleid verlaagde CRF naar {0} in plaats van bij de transparantielimiet te stoppen, en landt bij het bandcentrum van {1} MB binnen de band van {2}-{3} MB",
   "main.reason.fill-band-center": "CRF-ondergrens {0} is bereikt vóór de vulband, dus VBR met twee doorgangen mikt direct op het bandcentrum van {1} MB",

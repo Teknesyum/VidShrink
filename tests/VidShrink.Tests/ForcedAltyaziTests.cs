@@ -6,7 +6,8 @@ namespace VidShrink.Tests;
 /// <summary>
 /// B1e forced altyazinin kendiliginden varsayilan olmasi: ciktida varsayilan altyazi yoksa
 /// zorunlu bayrakli iz varsayilan yapilir — once tercih edilen dilde, sonra tutulan sesin
-/// dilinde, yoksa ilki. HandBrake'in "Foreign Audio Search"u degil; yalniz kaynagin bayragi okunur.
+/// dilinde, yoksa ilki. Burada yalniz kaynagin bayragi okunur; paket sayan arama
+/// (<c>--altyazi-tara</c>) <see cref="AltyaziTaramaTests"/>'te.
 /// </summary>
 public sealed class ForcedAltyaziTests
 {
