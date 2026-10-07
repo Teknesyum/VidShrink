@@ -364,6 +364,7 @@
   "main.convert.command": "Comandă FFmpeg",
   "main.convert.progress": "Progres",
   "main.convert.ready": "Gata.",
+  "main.convert.note.webp-bitrate-ignored": "WebP nu are mod de rată de biți: valoarea ratei de biți este ignorată și se folosește calitatea implicită a codorului.",
 
   "main.stage.encoding": "Se codează",
   "main.stage.converting": "Se convertește",

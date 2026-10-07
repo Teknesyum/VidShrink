@@ -1231,6 +1231,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-06, kayitta bolum isareti: bes yeni anahtardan (<c>recorder.hotkeys.chapter</c>, <c>recorder.chapter.marked</c>, <c>.title</c>, <c>.unsupported</c>, <c>.failed</c>) yalniz <c>recorder.hotkeys.chapter</c> 2 dilde kola giriyor (en, sw), KOL dokumunden sayildi, tr girmiyor. Ses gostergesiyle birlikte: 3019 + 2 = 3021, en 295 + 1 = 296, tr 103.</para>
     /// <para>2026-10-07, kapak notu: tek yeni anahtar <c>main.reason.stream.cover-dropped</c> 11 dilde kola giriyor (en, fr, hr, hu, nl, pl, pt, ro, sl, sw, tr), KOL dokumunden sayildi: 3021 + 11 = 3032, en 296 + 1 = 297, tr 103 + 1 = 104.</para>
     /// <para>2026-10-07, arayuzde yabanci dil altyazisi taramasi: sekiz yeni <c>main.subtitles.scan*</c> anahtarindan 12 kol 8 dilde (dugme <c>scan</c>: es, nb, pl, pt, sw; <c>flagged</c> ve <c>sparse</c>: bn, hi, ur; <c>sparse</c>: th), KOL dokumunden sayildi, en ve tr girmiyor: 3032 + 12 = 3044, en 297, tr 104.</para>
+    /// <para>2026-10-07, WebP bit hizi notu: tek yeni anahtar <c>main.convert.note.webp-bitrate-ignored</c> 3 dilde kola giriyor (bn, hi, ur), KOL dokumunden sayildi, en ve tr girmiyor: 3044 + 3 = 3047, en 297, tr 104.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1256,7 +1257,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3044, toplam);
+        Assert.Equal(3047, toplam);
         Assert.Equal(297, dilBasina["en"]);
         Assert.Equal(104, dilBasina["tr"]);
     }
@@ -1467,6 +1468,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-06, kayitta bolum isareti: bes yeni anahtar (<c>recorder.hotkeys.chapter</c>, <c>recorder.chapter.marked</c>, <c>.title</c>, <c>.unsupported</c>, <c>.failed</c>), dusen yok. Ses gostergesiyle birlikte: 1331 + 5 = 1336, 43 x 1336 = 57448. <c>kayip</c> 0.</para>
     /// <para>2026-10-07, kapak notu: tek yeni anahtar (<c>main.reason.stream.cover-dropped</c>), dusen yok: 1336 + 1 = 1337, 43 x 1337 = 57491. <c>kayip</c> 0.</para>
     /// <para>2026-10-07, arayuzde yabanci dil altyazisi taramasi: sekiz yeni anahtar (<c>main.subtitles.scan</c>, <c>.running</c> ve alti sonuc), dusen yok: 1337 + 8 = 1345, 43 x 1345 = 57835. <c>kayip</c> 0.</para>
+    /// <para>2026-10-07, WebP bit hizi notu: tek yeni anahtar (<c>main.convert.note.webp-bitrate-ignored</c>), dusen yok: 1345 + 1 = 1346, 43 x 1346 = 57878. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1494,7 +1496,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(57835, gezilen);
+        Assert.Equal(57878, gezilen);
         Assert.Empty(kayip);
     }
 

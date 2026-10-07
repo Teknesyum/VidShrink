@@ -28,6 +28,13 @@ ship as part of it.
   all 42 languages, using each language's own label for it.
 - The filter list in the advanced panel shows the overlay step when an image subtitle is burned
   in. It was missing because that step lives in the filter graph, not in the `-vf` chain.
+- The Convert tab no longer offers animated WebP or AVIF when the ffmpeg build has no encoder
+  for it. If the hidden one was selected, the selection falls back to MP4. If the encoder list
+  could not be read, both stay available. Not tried against a real ffmpeg build
+  without these encoders; the probe is faked in tests.
+- Picking WebP with the bitrate mode now says, under "Ready.", that the bitrate value is
+  ignored. ffmpeg's WebP encoder has no bitrate option: three different `-b:v` values gave the
+  same file byte for byte. The text is in all 42 languages.
 
 ### Fixed
 
@@ -37,6 +44,8 @@ ship as part of it.
 - In the editor, PgUp/PgDn with Ctrl, Shift or Alt held is no longer swallowed by the scroll area
   under the preview. Plain PgUp/PgDn still scrolls it. The editor has no command on those
   combinations yet; they now simply reach whatever listens above.
+- Converting to GIF with the audio set to "copy" no longer fails validation. GIF carries no
+  audio, so the audio choice is not checked for it.
 
 ## [1.2.8] - 2026-10-07
 

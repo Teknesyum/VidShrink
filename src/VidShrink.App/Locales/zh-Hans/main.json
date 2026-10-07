@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg 命令",
   "main.convert.progress": "进度",
   "main.convert.ready": "就绪。",
+  "main.convert.note.webp-bitrate-ignored": "WebP 没有码率模式：码率值会被忽略，使用编码器的默认质量。",
 
   "main.stage.encoding": "编码中",
   "main.stage.converting": "转换中",

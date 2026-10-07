@@ -364,6 +364,7 @@
   "main.convert.command": "Команда на FFmpeg",
   "main.convert.progress": "Напредък",
   "main.convert.ready": "Готово.",
+  "main.convert.note.webp-bitrate-ignored": "WebP няма режим на битрейт: стойността на битрейта се пренебрегва и се използва качеството по подразбиране на кодера.",
 
   "main.stage.encoding": "Кодиране",
   "main.stage.converting": "Конвертиране",

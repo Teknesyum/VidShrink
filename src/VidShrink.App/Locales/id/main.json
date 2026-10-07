@@ -364,6 +364,7 @@
   "main.convert.command": "Perintah FFmpeg",
   "main.convert.progress": "Kemajuan",
   "main.convert.ready": "Siap.",
+  "main.convert.note.webp-bitrate-ignored": "WebP tidak memiliki mode bitrate: nilai bitrate diabaikan dan kualitas bawaan encoder digunakan.",
 
   "main.stage.encoding": "Encoding",
   "main.stage.converting": "Mengonversi",

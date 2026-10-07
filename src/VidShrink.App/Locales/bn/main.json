@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg কমান্ড",
   "main.convert.progress": "অগ্রগতি",
   "main.convert.ready": "প্রস্তুত।",
+  "main.convert.note.webp-bitrate-ignored": "WebP-এ বিটরেট মোড নেই: বিটরেটের মান উপেক্ষা করা হয় এবং এনকোডারের ডিফল্ট মান ব্যবহৃত হয়।",
 
   "main.stage.encoding": "এনকোড হচ্ছে",
   "main.stage.converting": "রূপান্তর হচ্ছে",

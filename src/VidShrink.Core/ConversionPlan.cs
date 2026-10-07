@@ -2,6 +2,8 @@
 
 public enum ConversionQualityMode { Crf, Bitrate }
 
+public enum ConversionNote { WebpBitrateIgnored }
+
 public sealed class ConversionPlan
 {
     public string Container { get; init; } = "mp4";
@@ -20,4 +22,7 @@ public sealed class ConversionPlan
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac";
     public bool Gif => Container == "gif";
     public bool AnimatedImage => Container is "webp" or "avif";
+
+    /// <summary>Çıktı ses akışı taşıyor mu. GIF ve hareketli görsel taşımaz; ses seçimi orada okunmaz.</summary>
+    public bool CarriesAudio => !Gif && !AnimatedImage;
 }

@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg käsk",
   "main.convert.progress": "Edenemine",
   "main.convert.ready": "Valmis.",
+  "main.convert.note.webp-bitrate-ignored": "WebP-l pole bitikiiruse režiimi: bitikiiruse väärtust eiratakse ja kasutatakse kodeerija vaikekvaliteeti.",
 
   "main.stage.encoding": "Kodeerimine",
   "main.stage.converting": "Teisendamine",

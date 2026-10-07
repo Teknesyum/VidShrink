@@ -364,6 +364,7 @@
   "main.convert.command": "Amri ya FFmpeg",
   "main.convert.progress": "Maendeleo",
   "main.convert.ready": "Tayari.",
+  "main.convert.note.webp-bitrate-ignored": "WebP haina hali ya kasi ya biti: thamani ya kasi ya biti hupuuzwa na ubora chaguomsingi wa kisimbaji hutumika.",
 
   "main.stage.encoding": "Inasimba",
   "main.stage.converting": "Inageuza",

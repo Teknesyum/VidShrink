@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg-komento",
   "main.convert.progress": "Edistyminen",
   "main.convert.ready": "Valmis.",
+  "main.convert.note.webp-bitrate-ignored": "WebP:ssä ei ole bittinopeustilaa: bittinopeuden arvo ohitetaan ja käytetään kooderin oletuslaatua.",
 
   "main.stage.encoding": "Koodataan",
   "main.stage.converting": "Muunnetaan",

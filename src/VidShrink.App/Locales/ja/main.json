@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpegコマンド",
   "main.convert.progress": "進行状況",
   "main.convert.ready": "準備完了。",
+  "main.convert.note.webp-bitrate-ignored": "WebP にはビットレートモードがありません。ビットレートの値は無視され、エンコーダーの既定の品質が使われます。",
 
   "main.stage.encoding": "エンコード中",
   "main.stage.converting": "変換中",

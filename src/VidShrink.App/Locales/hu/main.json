@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg parancs",
   "main.convert.progress": "Folyamat",
   "main.convert.ready": "Kész.",
+  "main.convert.note.webp-bitrate-ignored": "A WebP-nek nincs bitráta módja: a bitráta értékét figyelmen kívül hagyja, és a kódoló alapértelmezett minőségét használja.",
 
   "main.stage.encoding": "Kódolás",
   "main.stage.converting": "Konvertálás",

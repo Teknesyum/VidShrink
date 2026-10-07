@@ -364,6 +364,7 @@
   "main.convert.command": "Lệnh FFmpeg",
   "main.convert.progress": "Tiến trình",
   "main.convert.ready": "Sẵn sàng.",
+  "main.convert.note.webp-bitrate-ignored": "WebP không có chế độ bitrate: giá trị bitrate bị bỏ qua và chất lượng mặc định của bộ mã hóa được dùng.",
 
   "main.stage.encoding": "Đang mã hóa",
   "main.stage.converting": "Đang chuyển đổi",

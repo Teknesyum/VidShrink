@@ -364,6 +364,7 @@
   "main.convert.command": "FFmpeg naredba",
   "main.convert.progress": "Napredak",
   "main.convert.ready": "Spremno.",
+  "main.convert.note.webp-bitrate-ignored": "WebP nema način brzine prijenosa: vrijednost brzine prijenosa se zanemaruje i koristi se zadana kvaliteta kodera.",
 
   "main.stage.encoding": "Kodiranje",
   "main.stage.converting": "Pretvorba",

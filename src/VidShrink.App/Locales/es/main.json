@@ -364,6 +364,7 @@
   "main.convert.command": "Comando FFmpeg",
   "main.convert.progress": "Progreso",
   "main.convert.ready": "Listo.",
+  "main.convert.note.webp-bitrate-ignored": "WebP no tiene modo de tasa de bits: el valor de tasa de bits se ignora y se usa la calidad predeterminada del codificador.",
 
   "main.stage.encoding": "Codificando",
   "main.stage.converting": "Convirtiendo",
