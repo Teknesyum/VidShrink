@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.9] - 2026-10-07
+
 ### Added
 
 - "Remove metadata" is now in the Convert tab and in the editor's export options, next to the
