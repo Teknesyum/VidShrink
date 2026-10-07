@@ -87,7 +87,8 @@ kullanıcının kararı, yakma da geri alınamıyor.
 - Gerçek bir Blu-ray ya da DVD altyazısı ölçülmedi: çok renkli palet, yarı saydamlık, birden çok
   pencere, olay içinde konum değişimi. Kaynak tek renkli tek kutu.
 - `overlay` süzgecinin ffmpeg derlemesinde bulunduğu yoklanmıyor (libass gibi isteğe bağlı değil).
-- Arayüzde yakma listesi hâlâ yalnız metin altyazı gösteriyor.
+- Arayüzün yakma listesi 7 Ekim'de resim altyazıları da aldı ve aynı bindirme yolunu kullanıyor
+  (`IzPaneliTests`); gerçek pencerede, gerçek dosyayla denenmedi.
 
 ## Mutasyonlar
 

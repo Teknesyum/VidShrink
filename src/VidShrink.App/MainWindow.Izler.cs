@@ -15,7 +15,7 @@ namespace VidShrink.App;
 
 /// <summary>
 /// C1-6: B1'in yalnız CLI'da duran yüzeyi arayüze iner — ses yüksekliği (<c>loudnorm</c>),
-/// sabit kazanç, dış altyazı dosyaları ve kaynağın metin altyazısını yakma. Dış altyazı ve
+/// sabit kazanç, dış altyazı dosyaları ve kaynağın metin ya da görüntü altyazısını yakma. Dış altyazı ve
 /// yakma o videoya aittir: yeni kaynak açılınca sıfırlanır, kuyruk penceresine taşınmaz.
 /// </summary>
 public partial class MainWindow
@@ -38,7 +38,11 @@ public partial class MainWindow
         RefreshSubtitleList();
     }
 
-    /// <summary>Kaynağın metin altyazıları yakma listesine girer; görüntü altyazı (PGS) yakılamaz, listede yok.</summary>
+    /// <summary>
+    /// Kaynağın metin ve görüntü altyazıları (PGS, VOBSUB, DVB) yakma listesine girer. Metin izi
+    /// <c>subtitles</c> süzgeciyle, görüntü izi <see cref="VideoFilterChain.OverlayGraph"/> ile yakılır;
+    /// yolu plan seçer, liste yalnız izi söyler.
+    /// </summary>
     private void RefreshBurnChoices()
     {
         var chosen = BurnChoice;
@@ -49,7 +53,7 @@ public partial class MainWindow
             var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
             for (var i = 0; i < subtitles.Count; i++)
             {
-                if (!StreamMapping.IsTextSubtitle(subtitles[i].Codec)) continue;
+                if (!StreamMapping.IsTextSubtitle(subtitles[i].Codec) && !StreamMapping.IsImageSubtitle(subtitles[i].Codec)) continue;
                 _burnChoices.Add(i);
                 var label = subtitles[i].Title ?? subtitles[i].Language;
                 items.Add(label is null ? $"#{i + 1}" : $"#{i + 1} {label}");

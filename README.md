@@ -207,7 +207,8 @@ source's chapter marks; the two options cannot be given together.
 `--yak N` (`--burn N`) burns the source's Nth subtitle into the picture. A text subtitle is
 drawn by libass; an image subtitle (PGS, VOBSUB, DVB) is laid over the frame, scaled to its
 width and bottom-aligned. MP4 cannot carry image subtitles, so without `--yak` they are
-dropped and the plan says so, naming the option.
+dropped and the plan says so, naming the option. The app does the same from its "Burn into
+video" list, which offers text and image subtitles alike.
 
 `--altyazi-tara` (`--subtitle-scan`) picks that track for you: the subtitle that only translates
 the foreign-language parts of a film. A track flagged as forced wins; otherwise subtitle packets

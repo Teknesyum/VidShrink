@@ -232,7 +232,7 @@ public sealed class YerlesimDenetimiTests
                 }
             });
             pencere.AddSubtitleFiles(dosyalar);
-            pencere.CmbBurnSubtitle.SelectedIndex = 1;
+            pencere.CmbBurnSubtitle.SelectedIndex = 2;
             pencere.ChkAudioLoudnorm.IsChecked = true;
         });
     }

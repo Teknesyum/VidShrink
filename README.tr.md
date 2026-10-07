@@ -221,7 +221,8 @@ işaretlerinden kurar; iki seçenek birlikte verilemez.
 `--yak N` (`--burn N`) kaynağın N. altyazısını görüntüye yakıyor. Metin altyazıyı libass
 çiziyor; resim altyazı (PGS, VOBSUB, DVB) karenin üstüne bindiriliyor, kare genişliğine
 ölçekli ve alta hizalı. MP4 resim altyazı taşıyamıyor; `--yak` verilmezse düşüyor ve plan
-bunu seçeneğin adını vererek söylüyor.
+bunu seçeneğin adını vererek söylüyor. Arayüz aynısını "Görüntüye yak" listesinden yapıyor;
+liste metin ve resim altyazıyı birlikte sunuyor.
 
 `--altyazi-tara` (`--subtitle-scan`) o izi sizin yerinize seçiyor: filmin yalnız yabancı dilde
 konuşulan yerlerini çeviren altyazıyı. Zorunlu (forced) bayraklı iz varsa o; yoksa altyazı

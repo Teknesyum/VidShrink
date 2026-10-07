@@ -119,25 +119,126 @@ public sealed class IzPaneliTests : IDisposable
         Assert.True(gorunur);
     }
 
-    /// <summary>Yakma listesi yalnız metin altyazıları sunar; seçim altyazılar içindeki sıraya iner. PGS listede yok.</summary>
+    private static string? Sonraki(IReadOnlyList<string> args, string bayrak)
+        => args.ToList().IndexOf(bayrak) is var i and >= 0 ? args[i + 1] : null;
+
+    /// <summary>
+    /// Yakma listesi metin ve resim altyazıları sunar; seçim altyazılar içindeki sıraya iner. Resim izi
+    /// (PGS) seçilince argüman CLI'daki <c>--yak N</c> ile aynı yoldan, <c>-filter_complex</c> bindirmesiyle
+    /// kurulur; metin izi <c>-vf subtitles</c> yolunda kalır (olumsuz kontrol). Yakılamayan kodek listede yok.
+    /// </summary>
     [Fact]
-    public void YakmaYalnizMetinAltyazisi()
+    public void YakmaListesiMetinVeResimAltyazisi()
     {
-        var (adet, acik, secim, suzgec, secimsiz) = Pencerede(window =>
+        var kaynak = Kaynak();
+        kaynak = kaynak with { Streams = kaynak.Streams.Append(new SourceStream(5, StreamKind.Subtitle, "eia_608", "eng")).ToArray() };
+        var (adet, acik, resimSecim, resim, metinSecim, metin, secimsiz) = Pencerede(window =>
         {
             var basta = window.PlanOptionsForTest().Filters.BurnSubtitle;
-            window.LoadWithoutProbing("C:\\ornek\\film.mkv", Kaynak());
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", kaynak);
             var n = window.CmbBurnSubtitle.ItemCount;
             var a = window.CmbBurnSubtitle.IsEnabled;
             window.CmbBurnSubtitle.SelectedIndex = 1;
-            return (n, a, window.BurnChoice, window.PlanOptionsForTest().Filters.BurnSubtitle, basta);
+            var rs = window.BurnChoice;
+            var r = window.PlanOptionsForTest();
+            window.CmbBurnSubtitle.SelectedIndex = 2;
+            return (n, a, rs, r, window.BurnChoice, window.PlanOptionsForTest(), basta);
         });
 
-        Assert.Equal(3, adet);
+        Assert.Equal(4, adet);
         Assert.True(acik);
-        Assert.Equal(1, secim);
-        Assert.Equal(1, suzgec);
+        Assert.Equal(0, resimSecim);
+        Assert.Equal(0, resim.Filters.BurnSubtitle);
+        Assert.Equal(1, metinSecim);
+        Assert.Equal(1, metin.Filters.BurnSubtitle);
         Assert.Null(secimsiz);
+
+        var resimArg = FfmpegArguments.Build(kaynak, PlanCalculator.Build(kaynak, resim), "cikti.mp4", 0, null);
+        var graf = Sonraki(resimArg, "-filter_complex");
+        Assert.NotNull(graf);
+        Assert.StartsWith("[0:2]scale=1280:-1[s];", graf, StringComparison.Ordinal);
+        Assert.Contains("[s]overlay=x=(W-w)/2:y=H-h:eof_action=pass", graf, StringComparison.Ordinal);
+        Assert.Contains(VideoFilterChain.OverlayOutput, Enumerable.Range(0, resimArg.Count - 1).Where(i => resimArg[i] == "-map").Select(i => resimArg[i + 1]));
+        Assert.DoesNotContain("-vf", resimArg);
+
+        var metinArg = FfmpegArguments.Build(kaynak, PlanCalculator.Build(kaynak, metin), "cikti.mp4", 0, null);
+        Assert.DoesNotContain("-filter_complex", metinArg);
+        Assert.Contains(VideoFilterChain.BurnFilterName + "=", Sonraki(metinArg, "-vf") ?? "", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Süzgeç dökümü resim altyazı yakmada bindirme adımını gösterir: <c>-vf</c> zinciri onu taşımıyor,
+    /// grafiğe geçiyor. Metin izde dökümde <c>subtitles</c> var, bindirme yok (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void SuzgecDokumuBindirmeyiGosterir()
+    {
+        var (bos, resim, metin) = Pencerede(window =>
+        {
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", Kaynak());
+            window.RecalculateForTest();
+            var b = window.TxtAdvFiltersNow.Text;
+            window.CmbBurnSubtitle.SelectedIndex = 1;
+            window.RecalculateForTest();
+            var r = window.TxtAdvFiltersNow.Text;
+            window.CmbBurnSubtitle.SelectedIndex = 2;
+            window.RecalculateForTest();
+            return (b, r, window.TxtAdvFiltersNow.Text);
+        });
+
+        Assert.False(string.IsNullOrEmpty(bos));
+        Assert.DoesNotContain("overlay=", bos, StringComparison.Ordinal);
+        Assert.Contains("overlay=x=(W-w)/2:y=H-h:eof_action=pass", resim, StringComparison.Ordinal);
+        Assert.DoesNotContain(VideoFilterChain.BurnFilterName + "=", resim, StringComparison.Ordinal);
+        Assert.Contains(VideoFilterChain.BurnFilterName + "=", metin, StringComparison.Ordinal);
+        Assert.DoesNotContain("overlay=", metin, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Döküm grafikteki sırayı verir: bindirme kırpmadan sonra, ölçeklemeden önce; 10 bit kaynakta
+    /// <c>format</c> eki dökümde de var. Yakma yokken döküm <c>-vf</c> zinciriyle aynı (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void DokumGrafiginSirasiniTasir()
+    {
+        var kaynak = Kaynak() with { Width = 1920, Height = 1080 };
+        var kirp = new VideoFilterOptions { BurnSubtitle = 0, Crop = new CropRect(1920, 800, 0, 140) };
+        var plan = PlanCalculator.Build(kaynak, new PlanOptions { TargetMb = 2, Filters = kirp });
+        var dokum = VideoFilterChain.Steps(kaynak, plan).ToList();
+        var zincir = VideoFilterChain.Filters(kaynak, plan).ToList();
+        var bindirme = dokum.FindIndex(adim => adim.StartsWith("overlay=", StringComparison.Ordinal));
+
+        Assert.Equal(zincir.Count + 1, dokum.Count);
+        Assert.Equal(dokum.IndexOf("crop=1920:800:0:140") + 1, bindirme);
+        Assert.True(bindirme < dokum.FindIndex(adim => adim.StartsWith("scale=", StringComparison.Ordinal)));
+        Assert.Equal(zincir, dokum.Where((_, i) => i != bindirme));
+        Assert.Contains("[s]" + string.Join(',', dokum.Skip(bindirme)) + "[v]", VideoFilterChain.OverlayGraph(kaynak, plan, "0:0"), StringComparison.Ordinal);
+
+        var onBit = kaynak with { PixelFormat = "yuv420p10le", BitDepth = 10 };
+        var onBitPlan = PlanCalculator.Build(onBit, new PlanOptions { TargetMb = 2, Filters = kirp });
+        Assert.Contains(VideoFilterChain.Steps(onBit, onBitPlan), adim => adim.EndsWith(":format=yuv420p10", StringComparison.Ordinal));
+
+        var yakmasiz = PlanCalculator.Build(kaynak, new PlanOptions { TargetMb = 2, Filters = kirp with { BurnSubtitle = null } });
+        Assert.Equal(VideoFilterChain.Filters(kaynak, yakmasiz), VideoFilterChain.Steps(kaynak, yakmasiz));
+    }
+
+    /// <summary>
+    /// Düşürülen resim altyazı notu 42 dilde yakma seçeneğini o dilin kendi etiketiyle
+    /// (<c>main.subtitles.burn</c>) gösterir; komşu ses notu göstermez (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void DusurmeNotuYakmaSeceneginiGosterir()
+    {
+        Assert.Equal(42, Locales.Languages.Count);
+        foreach (var language in Locales.Languages)
+        {
+            var values = Locales.Values(language);
+            var etiket = values["main.subtitles.burn"];
+            Assert.True(etiket.Length > 0, language);
+            foreach (var key in new[] { "main.reason.stream.image-subtitle-dropped", "main.reason.stream.image-subtitle-dropped-by-container" })
+                Assert.True(values[key].Contains(etiket, StringComparison.Ordinal), $"{language}: {key}");
+            Assert.False(values["main.reason.stream.extra-audio-dropped"].Contains(etiket, StringComparison.Ordinal), language);
+        }
     }
 
     /// <summary>Altyazısız kaynakta yakma kutusu kapalı ve tek "kapalı" satırı var.</summary>
@@ -163,7 +264,7 @@ public sealed class IzPaneliTests : IDisposable
         {
             window.LoadWithoutProbing("C:\\ornek\\film.mkv", Kaynak());
             window.AddSubtitleFiles(yollar);
-            window.CmbBurnSubtitle.SelectedIndex = 2;
+            window.CmbBurnSubtitle.SelectedIndex = 3;
             window.ChkAudioLoudnorm.IsChecked = true;
             var ilk = window.PlanOptionsForTest();
             window.LoadWithoutProbing("C:\\ornek\\ikinci.mkv", Kaynak("C:\\ornek\\ikinci.mkv"));
