@@ -2477,7 +2477,7 @@ public partial class MainWindow : Window
         TxtAdvFiltersNow.Text = suzgecHata is not null
             ? Say("main.advanced.filters.bad")
             : has && _info is { } kaynak
-                ? SimdiSatiri(string.Join(", ", VideoFilterChain.Filters(kaynak, plan!)) is { Length: > 0 } zincir ? zincir : "-")
+                ? SimdiSatiri(string.Join(", ", VideoFilterChain.Steps(kaynak, plan!)) is { Length: > 0 } zincir ? zincir : "-")
                 : "";
 
         TxtTargetCrfLockedNotice.IsVisible = has && plan!.ReasonCodes.Any(note => note.Code == ReasonCode.ManualCrfOverride);

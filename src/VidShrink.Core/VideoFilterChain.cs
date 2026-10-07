@@ -289,15 +289,31 @@ public static class VideoFilterChain
             video = "[b]";
         }
         graph.Append("[0:").Append(subtitle.Index.ToString(CultureInfo.InvariantCulture)).Append("]scale=").Append(width).Append(":-1[s];");
-        graph.Append(video).Append("[s]overlay=x=(W-w)/2:y=H-h:eof_action=pass");
-        if (info.BitDepth > 8) graph.Append(":format=yuv420p10");
+        graph.Append(video).Append("[s]").Append(OverlayStep(info));
         foreach (var filter in after) graph.Append(',').Append(filter);
         return graph.Append(OverlayOutput).ToString();
     }
 
+    private static string OverlayStep(MediaInfo info)
+        => "overlay=x=(W-w)/2:y=H-h:eof_action=pass" + (info.BitDepth > 8 ? ":format=yuv420p10" : "");
+
     public static IReadOnlyList<string> Filters(MediaInfo info, EncodePlan plan)
     {
         var (before, after) = Split(info, plan);
+        before.AddRange(after);
+        return before;
+    }
+
+    /// <summary>
+    /// Goruntuye uygulanan adimlarin sirali dokumu; arayuzun gosterdigi liste.
+    /// <see cref="Filters"/> yalniz <c>-vf</c> parcalarini verir, resim altyazi yakmada bindirme
+    /// <see cref="OverlayGraph"/> grafigine gectigi icin o listede yok; burada grafikte durdugu
+    /// yerde, kirpma ve dondurmeden sonra, olceklemeden once gorunur.
+    /// </summary>
+    public static IReadOnlyList<string> Steps(MediaInfo info, EncodePlan plan)
+    {
+        var (before, after) = Split(info, plan);
+        if (ImageBurnStream(info, plan.Filters ?? VideoFilterOptions.Default) is not null) before.Add(OverlayStep(info));
         before.AddRange(after);
         return before;
     }

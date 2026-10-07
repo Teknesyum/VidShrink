@@ -7,6 +7,19 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- The app's "Burn into video" list now offers image subtitles (PGS, VOBSUB, DVB) next to text
+  ones. Picking one burns it in through the same overlay path as the CLI's `--yak N`. Not tried
+  in a real window on real disc subtitles; the argument line is pinned by tests.
+
+### Changed
+
+- The note shown when image subtitles are dropped now points at the "Burn into video" list, in
+  all 42 languages, using each language's own label for it.
+- The filter list in the advanced panel shows the overlay step when an image subtitle is burned
+  in. It was missing because that step lives in the filter graph, not in the `-vf` chain.
+
 ## [1.2.8] - 2026-10-07
 
 ### Added
