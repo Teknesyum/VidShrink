@@ -533,6 +533,7 @@ public static class FfmpegArguments
         {
             if (trim.LeadSeconds > 0) a.AddRange(new[] { "-ss", Seconds(trim.LeadSeconds) });
             if (plan.Disc is { } disk) a.AddRange(disk.InputArguments());
+            a.AddRange(streams.InputArguments());
             a.AddRange(new[] { "-i", info.FilePath });
             foreach (var extra in extraInputs)
             {
@@ -545,6 +546,7 @@ public static class FfmpegArguments
         else
         {
             if (plan.Disc is { } kaynak) a.AddRange(kaynak.InputArguments());
+            a.AddRange(streams.InputArguments());
             a.AddRange(new[] { "-i", info.FilePath });
             foreach (var extra in extraInputs) a.AddRange(new[] { "-i", extra });
         }

@@ -1088,7 +1088,7 @@ public sealed class ManualOverrideTests
         // kendisi; bos kalinca kap plandan turer ve bugunku davranis o.
         "DeliveredContainer",
         "DropMetadata", "SubtitleLanguages", "FirstSubtitleOnly",
-        "FrameRate", "MaxFps"
+        "FrameRate", "MaxFps", "AudioSampleRate", "AudioDrcScale"
     };
 
     [Fact]

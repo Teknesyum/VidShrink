@@ -160,6 +160,18 @@ public sealed class PlanOptions
     /// butce icin altina inebilir, ustune cikmaz.
     /// </summary>
     public double? MaxFps { get; set; }
+
+    /// <summary>
+    /// Yeniden kodlanan sesin ornekleme hizi, Hz (<see cref="StreamMapping.SampleRates"/>). Kaynak
+    /// zaten bu hizdaysa hicbir seyi degistirmez ve kopyalama yolunu kapatmaz.
+    /// </summary>
+    public int? AudioSampleRate { get; set; }
+
+    /// <summary>
+    /// AC-3/E-AC-3 kaynagin cozucusune verilen dinamik aralik sikistirma olcegi,
+    /// <see cref="StreamMapping.MinDrcScale"/>..<see cref="StreamMapping.MaxDrcScale"/>. Baska kodekte etkisiz.
+    /// </summary>
+    public double? AudioDrcScale { get; set; }
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -563,7 +575,9 @@ public static class PlanCalculator
             ExplicitAudioCodec: options.AudioCodec != AudioCodecChoice.Auto,
             DropMetadata: options.DropMetadata,
             SubtitleLanguages: options.SubtitleLanguages,
-            FirstSubtitleOnly: options.FirstSubtitleOnly);
+            FirstSubtitleOnly: options.FirstSubtitleOnly,
+            AudioSampleRate: options.AudioSampleRate,
+            AudioDrcScale: options.AudioDrcScale);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
         var container = options.DeliveredContainer is { } teslim && (teslim != OutputContainer.WebM || CodecModel.FitsWebM(codec))
             ? teslim
@@ -1006,6 +1020,7 @@ public static class PlanCalculator
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {
         if (HasReencodeOverride(options)) return false;
+        if (StreamMapping.AudioRequestChanges(info, options.AudioSampleRate, options.AudioDrcScale)) return false;
         if ((options.Filters ?? VideoFilterOptions.Default).ChangesPictureFor(info)) return false;
         if (info.FileSizeMb <= 0 || info.FileSizeMb > options.TargetMb) return false;
         if (hdr.PolicyChanged) return false;
@@ -1246,7 +1261,9 @@ public static class PlanCalculator
         SubtitleLanguages = options.SubtitleLanguages,
         FirstSubtitleOnly = options.FirstSubtitleOnly,
         FrameRate = options.FrameRate,
-        MaxFps = options.MaxFps
+        MaxFps = options.MaxFps,
+        AudioSampleRate = options.AudioSampleRate,
+        AudioDrcScale = options.AudioDrcScale
     };
 
     /// <summary>

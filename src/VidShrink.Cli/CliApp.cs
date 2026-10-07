@@ -241,6 +241,15 @@ public static class CliApp
         if (request.Output is { } istenen && !PathEquals(Path.GetFullPath(istenen), decision.OutputPath))
             stderr.WriteLine(text.Format("output.not-webm", decision.Plan.Codec, Path.GetExtension(decision.OutputPath)));
 
+        if (decision.Plan.ModeEnum != EncodeMode.PassThrough
+            && StreamMapping.ForOutput(decision.Info, decision.Plan, decision.OutputPath).RejectedSampleRate() is { } reddedilen)
+        {
+            var hizIletisi = text.Format("error.arate-codec", reddedilen.Codec, reddedilen.SampleRate,
+                string.Join(", ", StreamMapping.SampleRatesFor(reddedilen.Codec)!));
+            stderr.WriteLine(hizIletisi);
+            return new FileRun(ExitCodes.Usage, null, hizIletisi);
+        }
+
         if (request.Command == CliCommand.Plan)
         {
             stdout.Write(request.Json ? PlanJson(request, decision) : PlanText(request, decision, text));
@@ -472,6 +481,7 @@ public static class CliApp
         foreach (var note in EncoderNotes(plan, text)) builder.AppendLine(note);
         if (plan.AudioCodec is not null)
             builder.AppendLine(text.Format("plan.audio", plan.AudioCodec, plan.AudioBitrateK));
+        foreach (var note in AudioOptionNotes(decision, text)) builder.AppendLine(note);
         builder.AppendLine(text.Format("plan.estimate", Num(estimate.ExpectedMb, "0.0", text), Num(estimate.LowMb, "0.0", text), Num(estimate.HighMb, "0.0", text)));
         builder.AppendLine(text.Format("plan.quality", Num(decision.Result.PredictedQuality, "0.0", text), Basis(estimate.Measured, text)));
         if (plan.ReasonCodes.Count > 0)
@@ -588,6 +598,7 @@ public static class CliApp
             : text.Format("result.attempts-delivered", result.Attempts, result.DeliveredAttemptNumber));
         builder.AppendLine(text.Format("result.encoder", result.PlanUsed.Codec));
         foreach (var note in EncoderNotes(decision.Plan, text)) builder.AppendLine(note);
+        foreach (var note in AudioOptionNotes(decision, text)) builder.AppendLine(note);
         if (result.Success && PassThroughNote(decision, text) is { } kept) builder.AppendLine(kept);
         builder.AppendLine(vmaf?.VmafNegMean is { } score
             ? text.Format("result.vmaf", Num(score, "0.0", text))
@@ -616,6 +627,38 @@ public static class CliApp
                 EncoderFallbackCause.NotMeasured => "note.encoder-fallback-not-measured",
                 _ => "note.encoder-fallback-not-working"
             }, note.RequestedCodec, note.FallbackCodec)));
+
+    /// <summary>
+    /// <c>--ses-hizi</c> ve <c>--ses-drc</c> istenip de ciktida karsiligi olmayan her durum bir satir:
+    /// ses izi yok, kaynak AC-3 degil, ya da aac dusuk hizda istenen bit hizini yazamadigi icin iz
+    /// kelepcelendi. Kaynak zaten istenen hizdaysa not yok, cunku cikti istenen hizda.
+    /// </summary>
+    internal static IEnumerable<string> AudioOptionNotes(CliDecision decision, CliText text)
+    {
+        var options = decision.Options;
+        if (options.AudioSampleRate is null && options.AudioDrcScale is null) yield break;
+        var plan = decision.Plan;
+        var copied = plan.ModeEnum == EncodeMode.PassThrough;
+        var tracks = copied
+            ? Array.Empty<AudioTrack>()
+            : StreamMapping.ForOutput(decision.Info, plan, decision.OutputPath).Audio;
+        var silent = !decision.Info.HasAudio || !copied && tracks.Count == 0;
+
+        if (options.AudioSampleRate is int rate)
+        {
+            if (silent) yield return text.Format("note.line", text["note.arate-no-audio"]);
+            else if (tracks.FirstOrDefault(track => !track.Copies && track.Codec == "aac" && track.BitrateK < plan.AudioBitrateK
+                         && StreamMapping.AacCeilingK(rate, track.Channels ?? decision.Info.AudioChannels) == track.BitrateK) is { } capped)
+                yield return text.Format("note.line", text.Format("note.arate-bitrate-capped", rate, capped.BitrateK));
+        }
+
+        if (options.AudioDrcScale is not null)
+        {
+            if (silent) yield return text.Format("note.line", text["note.drc-no-audio"]);
+            else if (!tracks.Any(track => !track.Copies && track.DrcScale is not null))
+                yield return text.Format("note.line", text.Format("note.drc-not-dolby", decision.Info.AudioCodec));
+        }
+    }
 
     /// <summary>
     /// Kopyalama kolu kaynagin kabinda kalir (<see cref="EncodeRunner.PassThroughPath"/>); istenen

@@ -260,6 +260,8 @@ bunların tek yazımı var.
 | `--sabit-kare` | `--cfr` |
 | `--tavan-kare` | `--pfr` |
 | `--kare-hizi` | `--fps` |
+| `--ses-hizi` | `--arate` |
+| `--ses-drc` | `--drc` |
 | `--profiller` | `--presets` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
