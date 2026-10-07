@@ -382,6 +382,18 @@ public static class VideoFilterChain
         };
     }
 
+    /// <summary>
+    /// Plana uygulanan kare hizi kipi ve ciktinin hizi; gerekce satirlari bunu okur. Otomatik kipte ve
+    /// dokunulmadan kopyalanan planda yoktur. Hiz <see cref="FrameRateArgs"/> ile ayni sayidir.
+    /// </summary>
+    public static (FrameRateMode Mode, double Fps)? FrameRateNote(MediaInfo info, EncodePlan plan)
+    {
+        if (plan.ModeEnum == EncodeMode.PassThrough) return null;
+        if (plan.FrameRate == FrameRateMode.Constant) return (FrameRateMode.Constant, plan.Fps);
+        if (plan.FrameRate == FrameRateMode.Peak) return (FrameRateMode.Peak, PeakCeiling(info, plan));
+        return null;
+    }
+
     public static IReadOnlyList<string> ColorArgs(EncodePlan plan)
     {
         if (!string.IsNullOrEmpty(plan.HdrVideoFilter) || plan.HdrColorArgs.Count > 0) return Array.Empty<string>();

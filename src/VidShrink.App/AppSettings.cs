@@ -35,6 +35,12 @@ public sealed class AppSettings
     /// <summary>Kap etiketlerini silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
     public bool AdvDropMetadata { get; set; }
 
+    /// <summary>Dönüştür sekmesindeki meta silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
+    public bool ConvertDropMetadata { get; set; }
+
+    /// <summary>Düzenleyici teslimindeki meta silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
+    public bool EditorDropMetadata { get; set; }
+
     /// <summary>0 = kaynağın yanı, 1 = sabit klasör.</summary>
     public int OutputFolderMode { get; set; }
     public string OutputFolder { get; set; } = "";
@@ -124,6 +130,8 @@ public sealed class AppSettings
             ReadInt(root, "advCodecLock", value => settings.AdvCodecLock = value);
             ReadBool(root, "advKeepTracks", value => settings.AdvKeepTracks = value);
             ReadBool(root, "advDropMetadata", value => settings.AdvDropMetadata = value);
+            ReadBool(root, "convertDropMetadata", value => settings.ConvertDropMetadata = value);
+            ReadBool(root, "editorDropMetadata", value => settings.EditorDropMetadata = value);
             ReadInt(root, "outputFolderMode", value => settings.OutputFolderMode = value);
             ReadString(root, "outputFolder", value => settings.OutputFolder = value);
             ReadString(root, "outputNamePattern", value => settings.OutputNamePattern = value);
@@ -207,6 +215,8 @@ public sealed class AppSettings
         root["advCodecLock"] = AdvCodecLock;
         root["advKeepTracks"] = AdvKeepTracks;
         root["advDropMetadata"] = AdvDropMetadata;
+        root["convertDropMetadata"] = ConvertDropMetadata;
+        root["editorDropMetadata"] = EditorDropMetadata;
         root["theme"] = Theme;
         root[ThemeMigrationMarker] = true;
         root["outputFolderMode"] = OutputFolderMode;

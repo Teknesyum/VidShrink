@@ -162,7 +162,7 @@ public static class EditExport
     public static ExportPlan Build(
         EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes, double startTime,
         ExportMode mode, string outputPath, string workDirectory, long memoryBudgetBytes,
-        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null)
+        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null, bool dropMetadata = false)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
 
@@ -187,7 +187,25 @@ public static class EditExport
             ExportMode.Fast when !anySpecial => FastDirect(timeline, info, keyframes, startTime, outputPath, workDirectory, limit, over),
             _ => Segmented(timeline, info, keyframes, outputPath, workDirectory, limit, over)
         };
+        if (dropMetadata) plan = plan with { Steps = WithoutMetadata(plan.Steps, info) };
         return plan with { MotionClips = motion, TextForcedFull = textForced, EffectsForcedFull = effectsForced };
+    }
+
+    /// <summary>
+    /// Teslim dosyasini yazan son adima meta silme argumanlarini ekler; ara parcalara dokunmaz. Dizi
+    /// kucultmeyle ayni kaynaktan (<see cref="StreamMapping.MetadataArguments"/>). Teslim hep kaynagin
+    /// ilk ses izini tasidigi icin dil ondan yazilir. Duzenleyici kendi basina etiket ya da bolum yazmaz.
+    /// </summary>
+    private static IReadOnlyList<ExportStep> WithoutMetadata(IReadOnlyList<ExportStep> steps, MediaInfo info)
+    {
+        var last = steps[^1];
+        var language = info.Streams.FirstOrDefault(stream => stream.Kind == StreamKind.Audio)?.Language;
+        var audio = info.HasAudio ? new[] { language } : Array.Empty<string?>();
+        var args = last.Args.Take(last.Args.Count - 1)
+            .Concat(StreamMapping.MetadataArguments(true, audio, Array.Empty<string?>()))
+            .Append(last.Args[^1])
+            .ToArray();
+        return steps.Take(steps.Count - 1).Append(last with { Args = args }).ToArray();
     }
 
     /// <summary>
@@ -200,7 +218,7 @@ public static class EditExport
     public static IReadOnlyList<ExportPlan> BuildSegments(
         EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes, double startTime,
         ExportMode mode, IReadOnlyList<string> outputPaths, IReadOnlyList<string> workDirectories, long memoryBudgetBytes,
-        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null)
+        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null, bool dropMetadata = false)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         if (outputPaths.Count != timeline.Clips.Count)
@@ -214,7 +232,7 @@ public static class EditExport
         {
             var index = i;
             var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i));
-            var plan = Build(piece, info, keyframes, startTime, whole.Effective, outputPaths[i], workDirectories[i], memoryBudgetBytes, cuts, hasEncoder);
+            var plan = Build(piece, info, keyframes, startTime, whole.Effective, outputPaths[i], workDirectories[i], memoryBudgetBytes, cuts, hasEncoder, dropMetadata);
             plans.Add(plan with
             {
                 Requested = mode,

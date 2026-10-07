@@ -159,6 +159,7 @@ public partial class MainWindow
         }
 
         if (KirpmaGerekcesi(plan) is { } kirpma) parts.Add(kirpma);
+        if (KareHiziGerekcesi(plan) is { } kare) parts.Add(kare);
 
         if (plan.Streams is { } streams)
             foreach (var note in streams.Notes) parts.Add(Say(StreamNoteKey(note)));
@@ -167,6 +168,19 @@ public partial class MainWindow
     }
 
     internal static string StreamNoteKey(StreamNote note) => "main.reason.stream." + StreamNotes.Slug(note);
+
+    /// <summary>Uygulanan kare hizi kipinin gerekce anahtari; otomatik kipte satir yoktur.</summary>
+    internal static string? FrameRateNoteKey(FrameRateMode mode) => mode switch
+    {
+        FrameRateMode.Constant => "main.reason.frame-rate-constant",
+        FrameRateMode.Peak => "main.reason.frame-rate-peak",
+        _ => null
+    };
+
+    private string? KareHiziGerekcesi(EncodePlan plan)
+        => _info is { } kaynak && VideoFilterChain.FrameRateNote(kaynak, plan) is { } kip && FrameRateNoteKey(kip.Mode) is { } anahtar
+            ? Say(anahtar, Bicim.Kare(kip.Fps, Strings.Culture))
+            : null;
 
     private List<string> StrategyLines()
     {

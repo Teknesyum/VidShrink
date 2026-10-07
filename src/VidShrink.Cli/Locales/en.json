@@ -76,6 +76,8 @@
   "plan.target": "Target:    {0} MB",
   "plan.quality-target": "Quality:   {0} requested, {1} MB derived ({2})",
   "plan.video": "Video:     {0} {1}, {2}x{3} {4} fps, {5} kbit/s",
+  "plan.frame-rate.constant": "Timing:    constant frame rate, {0} fps",
+  "plan.frame-rate.peak": "Timing:    frame rate capped at {0} fps, variable",
   "plan.audio": "Audio:     {0} {1} kbit/s",
   "plan.estimate": "Estimate:  {0} MB ({1}-{2} MB)",
   "plan.quality": "Predicted: {0} ({1})",

@@ -84,6 +84,7 @@ public static class ConversionArguments
         {
             a.Add("-vn");
             AddAudio(a, plan);
+            a.AddRange(MetadataArgs(info, plan));
             a.Add(outputPath);
             return a;
         }
@@ -109,6 +110,7 @@ public static class ConversionArguments
         {
             if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
             a.AddRange(AnimatedImageArgs(plan));
+            a.AddRange(MetadataArgs(info, plan));
             a.Add(outputPath);
             return a;
         }
@@ -138,6 +140,7 @@ public static class ConversionArguments
         AddAudio(a, plan);
         if (plan.Container is "mp4" or "mov" or "m4a") a.AddRange(new[] { "-movflags", "+faststart" });
         if (dolbyVision && plan.Container is "mp4" or "mov") a.AddRange(HdrResolver.Mp4DolbyVisionArgs);
+        a.AddRange(MetadataArgs(info, plan));
         a.Add(outputPath);
         return a;
     }
@@ -170,6 +173,45 @@ public static class ConversionArguments
         }
         a.AddRange(new[] { "-an", "-loop", "0", "-f", plan.Container });
         return a;
+    }
+
+    /// <summary>
+    /// Meta silme argümanları küçültmeyle aynı kaynaktan (<see cref="StreamMapping.MetadataArguments"/>).
+    /// Dönüştür akış eşlemez; çıktıya giren sesi ffmpeg seçer (<see cref="AutoAudio"/>) ve dili ondan
+    /// yazılır. Altyazı dili yalnız kaynakta tek altyazı izi varken yazılır: birden çok izde hangisinin
+    /// seçildiği kaba göre değişir. Kapalıyken hiçbir argüman eklenmez.
+    /// </summary>
+    private static IReadOnlyList<string> MetadataArgs(MediaInfo info, ConversionPlan plan)
+    {
+        if (!plan.DropMetadata) return Array.Empty<string>();
+        var audio = plan.CarriesAudio && plan.AudioCodec is not null
+            ? new[] { AutoAudio(info)?.Language }
+            : Array.Empty<string?>();
+        var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToArray();
+        var subtitle = !plan.AudioOnly && !plan.AnimatedImage && subtitles.Length == 1
+            ? new[] { subtitles[0].Language }
+            : Array.Empty<string?>();
+        return StreamMapping.MetadataArguments(true, audio, subtitle);
+    }
+
+    /// <summary>
+    /// <c>-map</c> verilmeyince ffmpeg'in seçtiği ses izi: varsayılan işaretli iz, yoksa en çok kanallı,
+    /// eşitlikte ilk. Ölçüm <c>docs/olcumler/meta-sil-donustur-duzenleyici.md</c>.
+    /// </summary>
+    public static SourceStream? AutoAudio(MediaInfo info)
+    {
+        SourceStream? best = null;
+        long bestScore = -1;
+        foreach (var stream in info.Streams)
+        {
+            if (stream.Kind != StreamKind.Audio) continue;
+            var score = stream.Channels + (stream.IsDefault ? 5_000_000L : 0);
+            if (score <= bestScore) continue;
+            best = stream;
+            bestScore = score;
+        }
+
+        return best;
     }
 
     private static List<string> VideoFilters(MediaInfo info, ConversionPlan plan)

@@ -20,12 +20,13 @@ public static class EditExportRunner
     public const string Stage = "export";
 
     public static async Task<ExportPlan> PrepareAsync(
-        string source, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes, CancellationToken ct = default)
+        string source, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
+        bool dropMetadata = false, CancellationToken ct = default)
     {
         var (info, keyframes, startTime, cuts) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
         var work = WorkDirectoryFor(outputPath);
         return EditExport.Build(timeline, info, keyframes, startTime, mode, EncodeRunner.PartialPathFor(outputPath), work, memoryBudgetBytes,
-                cuts, EncoderCapabilities.Instance.HasEncoder)
+                cuts, EncoderCapabilities.Instance.HasEncoder, dropMetadata)
             with { OutputPath = outputPath };
     }
 
@@ -35,14 +36,14 @@ public static class EditExportRunner
     /// </summary>
     public static async Task<IReadOnlyList<ExportPlan>> PrepareSegmentsAsync(
         string source, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
-        Func<string, bool>? exists = null, CancellationToken ct = default)
+        Func<string, bool>? exists = null, bool dropMetadata = false, CancellationToken ct = default)
     {
         var (info, keyframes, startTime, cuts) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
         var outputs = EditOutputName.Segments(outputPath, timeline.Clips.Count, exists);
         var partials = outputs.Select(EncodeRunner.PartialPathFor).ToArray();
         var works = outputs.Select(WorkDirectoryFor).ToArray();
         return EditExport.BuildSegments(timeline, info, keyframes, startTime, mode, partials, works, memoryBudgetBytes,
-                cuts, EncoderCapabilities.Instance.HasEncoder)
+                cuts, EncoderCapabilities.Instance.HasEncoder, dropMetadata)
             .Select((plan, i) => plan with { OutputPath = outputs[i] })
             .ToArray();
     }

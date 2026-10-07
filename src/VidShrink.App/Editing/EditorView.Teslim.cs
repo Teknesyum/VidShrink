@@ -72,7 +72,19 @@ internal partial class EditorView
         set => ChkExportSeparate.IsChecked = value;
     }
 
-    internal bool ExportSeparatelyEnabled => BtnExportOptions.IsEnabled;
+    internal bool ExportSeparatelyEnabled => BtnExportOptions.IsEnabled && ChkExportSeparate.IsEnabled;
+
+    /// <summary>
+    /// Teslim dosyasindan kap etiketleri silinir mi; paylasim teslimi de ayni kutuyu okur. Secim ana pencerenin
+    /// ayarinda saklanir, degisimi <see cref="DropMetadataChanged"/> bildirir.
+    /// </summary>
+    internal bool DropMetadata
+    {
+        get => ChkExportDropMetadata.IsChecked == true;
+        set => ChkExportDropMetadata.IsChecked = value;
+    }
+
+    internal Action<bool>? DropMetadataChanged { get; set; }
 
     internal ExportMode SelectedExportMode
     {
@@ -94,6 +106,11 @@ internal partial class EditorView
         BtnExportPlay.Click += (_, _) => { if (_exported is { } path && OpenInPlayer is { } open) _ = open(path); };
         CmbExportMode.SelectionChanged += (_, _) => _pendingPlan = null;
         ChkExportSeparate.IsCheckedChanged += (_, _) => _pendingPlan = null;
+        ChkExportDropMetadata.IsCheckedChanged += (_, _) =>
+        {
+            _pendingPlan = null;
+            DropMetadataChanged?.Invoke(DropMetadata);
+        };
     }
 
     private void RefreshExport() => EnableExport(!Exporting);
@@ -104,7 +121,8 @@ internal partial class EditorView
         BtnSave.IsEnabled = ready;
         BtnExport.IsEnabled = ready;
         BtnShare.IsEnabled = ready && !Sharing;
-        BtnExportOptions.IsEnabled = ready && _model is { Clips.Count: > 1 };
+        BtnExportOptions.IsEnabled = ready;
+        ChkExportSeparate.IsEnabled = _model is { Clips.Count: > 1 };
         var neden = _model is not { Clips.Count: > 0 } || _source is null ? Strings.Get("main.action.shrink.disabled-tip") : null;
         ToolTip.SetTip(BtnSave, neden ?? Strings.Get("editor.save"));
         ToolTip.SetTip(BtnExport, neden ?? Tip("editor.save-as", EditorCommand.Export));
@@ -118,7 +136,7 @@ internal partial class EditorView
         _pendingPlan = null;
     }
 
-    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts" : string.Empty);
+    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts" : string.Empty) + (DropMetadata ? "|meta" : string.Empty);
 
     internal async Task<bool> SaveAsync()
     {
@@ -168,8 +186,8 @@ internal partial class EditorView
         try
         {
             plans = ExportSeparately
-                ? await EditExportRunner.PrepareSegmentsAsync(source, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists).ConfigureAwait(true)
-                : new[] { await EditExportRunner.PrepareAsync(source, snapshot, SelectedExportMode, output, ExportMemoryBudget()).ConfigureAwait(true) };
+                ? await EditExportRunner.PrepareSegmentsAsync(source, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata).ConfigureAwait(true)
+                : new[] { await EditExportRunner.PrepareAsync(source, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata).ConfigureAwait(true) };
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.Text.Json.JsonException or System.ComponentModel.Win32Exception)
         {

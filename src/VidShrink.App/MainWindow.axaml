@@ -1083,7 +1083,7 @@
                   <TextBlock x:Name="TxtConvertSource" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                   <Button x:Name="BtnBrowseConvert" Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowseConvert"/>
                   <Grid x:Name="ConvertForm" Grid.IsSharedSizeScope="True" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
-                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                     <Grid.Styles>
                       <Style Selector="Grid#ConvertForm > Grid">
                         <Setter Property="VerticalAlignment" Value="Top"/>
@@ -1329,6 +1329,12 @@
                       </Grid>
                       <TextBox Grid.Row="1" x:Name="TxtTrimEnd"/>
                     </Grid>
+
+                    <CheckBox x:Name="ChkConvertDropMetadata" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.advanced.drop-metadata.label}">
+                      <ToolTip.Tip>
+                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
+                      </ToolTip.Tip>
+                    </CheckBox>
 
                   </Grid>
                 </StackPanel>

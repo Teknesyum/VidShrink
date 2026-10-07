@@ -9,6 +9,15 @@ ship as part of it.
 
 ### Added
 
+- "Remove metadata" is now in the Convert tab and in the editor's export options, next to the
+  one Shrink already had. Both write the same arguments as Shrink (`-map_metadata -1`, then the
+  carried audio track's language) and remember the choice. In Convert the chapter marks stay and
+  their names go. In the editor the visible effect is in Full mode: Fast and Smart exports
+  already left the container title behind. Measured on short clips, not tried by hand in a window.
+- The plan now says which frame rate mode applies: `--cfr` prints "constant frame rate, N fps"
+  and `--pfr --fps N` prints "frame rate capped at N fps, variable" in the CLI plan, and the
+  app's reason lines carry the same sentence. Nothing about the encode changed. The app has no
+  control for the mode yet, so its line shows only for plans that already carry one.
 - The app's "Burn into video" list now offers image subtitles (PGS, VOBSUB, DVB) next to text
   ones. Picking one burns it in through the same overlay path as the CLI's `--yak N`. Not tried
   in a real window on real disc subtitles; the argument line is pinned by tests.
