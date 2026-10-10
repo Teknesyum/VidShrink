@@ -476,7 +476,7 @@ public sealed class CliTests
     private const int BeklenenTakmaAdSayisi = 43;
 
     /// <summary>
-    /// <para>Ingilizce takma adlar iki READMEde de yaziliydi diye degil, <b>kaynaktan
+    /// <para>Ingilizce takma adlar iki CLI belgesinde (<c>docs/cli.md</c>, <c>docs/cli.tr.md</c>) yaziliydi diye degil, <b>kaynaktan
     /// sayilarak</b> pimleniyor: liste testte tekrarlanmaz, <c>CliParser.Parse</c>'in switch
     /// kollarindan cikarilir.</para>
     /// <para><b>Turetme kurali istisnasiz</b>: bir kolun <i>uzun</i> yazimlari (<c>--</c> ile
@@ -488,7 +488,7 @@ public sealed class CliTests
     /// <para>Sayinin kendisi de pimli (<see cref="BeklenenTakmaAdSayisi"/>), boylece kaynaga
     /// eklenen yeni bir takma ad belgesiz kalamaz. Sayim tutmazsa hata iletisi <b>her kolu ve
     /// elenme sebebini</b> yazar.</para>
-    /// <para>READMElerin "hepsi" demesi de veriyle pimli: takma adi olmayan uzun anahtarlar
+    /// <para>Belgelerin "hepsi" demesi de veriyle pimli: takma adi olmayan uzun anahtarlar
     /// (<c>--json</c>, <c>--vmaf</c>) kaynaktan cikarilip cumlede istisna olarak araniyor.</para>
     /// </summary>
     [Fact]
@@ -499,8 +499,8 @@ public sealed class CliTests
             adlar.Count == BeklenenTakmaAdSayisi,
             $"CliRequest.cs'te {adlar.Count} takma ad cifti bulundu, beklenen {BeklenenTakmaAdSayisi}.\nKol dokumu:\n{rapor}");
 
-        var ingilizce = Belge("README.md");
-        var turkce = Belge("README.tr.md");
+        var ingilizce = Belge("docs/cli.md");
+        var turkce = Belge("docs/cli.tr.md");
 
         foreach (var (kanonik, takma) in adlar)
         {

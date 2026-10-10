@@ -1,7 +1,7 @@
 # The Engine
 
 How VidShrink decides what to encode, and what that decision has been measured to be worth.
-This is the long version of the *Under The Hood* section of the [README](../README.md).
+This is the long version of the *Measured Results* section of the [README](../README.md).
 
 ## How it works
 
