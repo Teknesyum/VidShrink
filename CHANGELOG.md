@@ -7,8 +7,6 @@ ship as part of it.
 
 ## [Unreleased]
 
-## [1.2.14] - 2026-10-10
-
 ### Added
 
 - ProRes and DNxHR output in the Convert tab, and VideoToolbox and VAAPI as hardware encoders
@@ -25,6 +23,11 @@ ship as part of it.
   pattern; VAAPI and VideoToolbox could not run on the Windows development machine, so their
   arguments are pinned by tests only and no real encode was made; VAAPI always uploads `nv12`
   (8-bit) surfaces. Measurement: `docs/olcumler/k12-ara-kodekler.md`.
+
+## [1.2.14] - 2026-10-10
+
+### Added
+
 - The recorder can capture the sound playing on the PC without a "Stereo Mix" device (Windows
   only). The "System audio" list gains a last entry, "Sound playing on this PC", which reads the
   default output device through WASAPI loopback; the app captures the samples itself and hands
