@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.13] - 2026-10-10
+
 ### Added
 
 - The editor can join several files into one output. "Add Source" in the editor toolbar and the
