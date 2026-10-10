@@ -4,10 +4,11 @@
 
 # VidShrink
 
-**Free, open-source app to compress a video to a target file size, convert formats, record
-the screen, play and trim video — offline, on Windows, macOS and Linux.**
+**Free, open-source video player built on libmpv, with a target-size compressor, a format
+converter, a screen recorder and a timeline editor in the same window — offline, on
+Windows, macOS and Linux.**
 
-**0 of 36 measured cases went over the target size · 42 languages · 36 themes · No ads · No
+**42 languages · 36 themes · 0 of 36 measured cases went over the target size · No ads · No
 watermark · No account · No subscription · No telemetry**
 
 [![Latest release](https://img.shields.io/github/v/release/Teknesyum/VidShrink?label=release)](https://github.com/Teknesyum/VidShrink/releases/latest)
@@ -16,10 +17,13 @@ watermark · No account · No subscription · No telemetry**
 
 <a href="docs/gorseller/T201-oynatici-en.png"><img src="docs/gorseller/T201-oynatici-en.png" alt="The VidShrink Player tab in English: a video filling the window, the tab bar across the top with Player, Editor, Shrink, Convert, Recorder and Settings, and the control strip along the bottom with the time, volume, ten-second jumps, play and pause, speed, clip and full screen" width="800"></a>
 
-It is for anyone who has to get a video under an upload limit — Discord, WhatsApp, Gmail —
-and would rather not keep a player, a recorder, a cutter and a converter installed beside
-it. One window does all of it, and nothing leaves your machine unless you ask — see
-[Privacy](#code-signing-policy).
+It started as a tool to compress a video to a target file size. Today it is a media player
+first: the mpv engine with subtitles, playlists and network streams, behind a window you
+drive with the mouse.
+
+The other tabs take over when a video needs work. Shrink it under an upload limit, convert
+it, record the screen, or cut it on a timeline. Nothing leaves your machine unless you
+ask — see [Privacy](#code-signing-policy).
 
 ## Install
 
@@ -85,7 +89,42 @@ Checksum verification, the right-click entry, the self-update flow and every swi
 
 </details>
 
-## Compress A Video To An Exact File Size
+## Video Player With Subtitles, Playlists And Network Streams
+
+The Player tab is built on **libmpv**, the engine inside mpv. It opens MKV, MP4, WebM, AVI,
+MOV, TS and the rest, and plays music files with a cover card.
+
+Open a file by dragging it in, from the Explorer right-click menu on Windows, or from the
+command line. Playback resumes where you stopped, for the last five videos you watched.
+
+- **Subtitles** — sidecar files load by themselves and a dropped subtitle file just works.
+  Shift the timing in steps, show a second subtitle beside the first, and set the font,
+  colour, outline, shadow and background. **OpenSubtitles search and download** sit in the
+  window, with your own account.
+- **Sound** — audio track and audio delay, a 10-band equaliser with ready presets, loudness
+  levelling, and volume up to 200% when you allow it.
+- **Picture** — brightness, contrast, saturation, gamma, hue, sharpness, deinterlace, crop,
+  rotate, mirror, aspect ratio and zoom. Hardware decoding is a switch.
+- **Seeking** — jumps of 1, 10, 60 and 300 seconds, frame-by-frame steps, chapters,
+  bookmarks, an A-B loop, and a thumbnail that follows the pointer along the seek bar.
+- **Speed** — 0.25× to 4× in steps of 0.05, and one key that flips between two speeds you
+  set.
+- **Playlists** — opens M3U, PLS, WPL and ASX, saves the queue as M3U8, shuffles and
+  repeats. Next and previous file in the folder, recent files, and the keyboard's media
+  keys.
+- **Network streams** — paste, drag or type an address: http, https, rtsp, rtmp, srt or
+  udp. It plays a direct media address; it does not resolve a page link such as a
+  YouTube URL.
+- **Capture** — a screenshot as PNG or JPG, the current frame to the clipboard, and a clip
+  or a GIF cut straight from what is playing.
+- **Information** — a panel with the codec, bit depth and SDR, HDR10, HLG or Dolby Vision,
+  plus live figures such as dropped frames.
+- **Window** — full screen, mini mode, always on top, and a control strip that hides
+  itself. Keyboard shortcuts can be reassigned.
+
+One key sends the playing file to the Editor at the same position.
+
+## Compress A Video To A Target File Size
 
 <table>
 <tr>
@@ -103,8 +142,8 @@ before anything runs. Over 36 measured cases the target was crossed **zero** tim
   menu has "Shrink with VidShrink" with six sizes: 8, 16, 20, 25, 50 and 100 MB.
 - **Before and after** — a split panel shows the source beside the planned output, with
   zoom, before you commit to the encode.
-- **Encoders** — twelve, software and NVENC, Quick Sync and AMF, each
-  [probed on your own machine](docs/olcumler/kodek-matris.md) first.
+- **Encoders** — software, plus NVENC, Quick Sync and AMF, each probed on your own machine
+  first.
 - **Quality score** — the result is scored with **VMAF-NEG**: mean, harmonic mean, 10th
   percentile and worst frame.
 - **Batch** — a whole folder goes through the queue, which opens the folder, sleeps or
@@ -138,29 +177,15 @@ command that will run is on screen.
 - **Webcam** — an overlay with its own size and corner, and a green-screen option.
 - **For tutorials** — cursor, click rings and click sounds, the keys you press on screen, a
   magnifier, and a live preview.
-- **Control** — global hotkeys F7 to F11 on Windows, a countdown, a time limit, splitting by
-  time or size, a replay buffer that keeps the last moments, tray and mini-recorder modes.
+- **Control** — global hotkeys F7 to F11 on Windows, with F6 dropping a chapter mark; a
+  countdown, a time limit, splitting by time or size, a replay buffer that keeps the last
+  moments, tray and mini-recorder modes.
 - **Encoders** — x264, x265, SVT-AV1 and VP9, plus NVIDIA NVENC, Intel Quick Sync and AMD
   AMF. **Automatic mode** records three real seconds per candidate on your machine, reads
   ffmpeg's dropped-frame counter and keeps the one that drops none.
 - **Output** — MP4, MKV, MOV or GIF, a target size or length budget if you want one, and a
   file that is closed properly when you stop. One click sends it on to the Editor, the
   Player or Share.
-
-## Play Video With Subtitles
-
-Built on **libmpv**, the engine inside mpv, so it opens MKV, MP4, WebM, AVI, MOV, TS and the
-rest, with hardware decoding when you want it.
-
-- **Subtitles** — sidecar files load by themselves, a dropped subtitle file just works,
-  timing shifts in steps, and **OpenSubtitles search and download** sit in the window.
-- **Sound and picture** — audio track, audio delay, a 10-band equaliser; brightness,
-  contrast, saturation, gamma, hue, sharpness, crop, rotate, mirror, aspect ratio and zoom.
-- **Control** — playback speed, frame-by-frame steps, A-B loop, bookmarks, screenshots, and
-  clip or GIF export straight from the timeline.
-- **Library and window** — playlist with shuffle and repeat, next and previous file in the
-  folder, recent files, open a URL, mini player, always on top, and a side-by-side
-  comparison panel for before and after.
 
 ## Trim And Edit Video
 
@@ -173,14 +198,6 @@ redo. Then **Save**, **Save As** or **Share** in one of three export modes:
 - **Fast** — cuts on keyframes and copies the streams; no re-encode, no quality lost.
 - **Smart** — copies what it can and re-encodes only what the cuts need.
 - **Full** — re-encodes the whole result.
-
-## Share A Large File As A Link
-
-Press **Share** in Shrink, the Recorder or the Editor and the file goes up as a link:
-**storage.to** for files up to 25 GB, kept one to seven days, or **uguu.se** for files up to
-128 MB, kept three hours. The link comes with a QR code for your phone, and a dropped
-upload can be retried. Share targets and their measured size ceilings live in
-[`paylasim-hedefleri.json`](paylasim-hedefleri.json).
 
 ## Command Line
 
@@ -209,13 +226,22 @@ vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB --bir-kez   # drain the fold
 required; it cannot be the watched folder. When a file is taken, where progress is kept,
 letter case and exit codes: [`docs/cli.md`](docs/cli.md#watch-folder).
 
-## How It Compares To HandBrake, OBS, LosslessCut And mpv
+## Share A Large File As A Link
+
+Press **Share** in Shrink, the Recorder or the Editor and the file goes up as a link:
+**storage.to** for files up to 25 GB, kept one to seven days, or **uguu.se** for files up to
+128 MB, kept three hours. The link comes with a QR code for your phone, and a dropped
+upload can be retried. Share targets and their measured size ceilings live in
+[`paylasim-hedefleri.json`](paylasim-hedefleri.json).
+
+## How It Compares To mpv, HandBrake, OBS And LosslessCut
 
 Each of these does its one job with more depth than this app does. The rows are from a
 written survey of the versions named ([`tarama-2026-10-05.md`](docs/piyasa/tarama-2026-10-05.md)).
 
 | Job | Here | Elsewhere |
 |---|---|---|
+| Playback | libmpv with the controls above | mpv 0.41.0 adds HDR tone mapping, shaders, interpolation, scripts and yt-dlp |
 | Target size in MB | Yes; never crossed in 36 measured cases | HandBrake 1.11.2 has no target-size field. Shutter Encoder 20.4 and FFmpeg Batch have one; Shutter says it does not guarantee the size |
 | Preview before encoding | Split before/after panel | HandBrake encodes a sample to preview |
 | Quality at equal bytes | Ahead of HandBrake x265 `slow` on 8 of 8 SDR rows and 3 of 4 HDR10 rows | HandBrake bands less in dark scenes |
@@ -224,18 +250,20 @@ written survey of the versions named ([`tarama-2026-10-05.md`](docs/piyasa/taram
 | Several encodes at once | No, one job at a time | HandBrake, FFmpeg Batch |
 | Screen recording | Screen, window, region, webcam | OBS 32.2.2 adds game capture, real desktop-audio capture, scenes and streaming |
 | Cutting without re-encoding | Fast and Smart export | LosslessCut 3.69.0 adds merge, track management and EDL/CSV; it calls its own smart cut experimental |
-| Playback | libmpv with the controls above | mpv 0.41.0 adds HDR tone mapping, shaders, interpolation, scripts and yt-dlp |
 
 <sub>Product names belong to their owners; VidShrink is not affiliated with any of them.</sub>
 
 ## What It Does Not Do
 
+- The player has no HDR tone mapping controls, shaders, frame interpolation or scripts.
+- No downloading from a URL. The player opens a direct media address, and does not resolve
+  page links; there is no yt-dlp.
+- No casting to Chromecast from the player, and no automatic captions.
 - No stabilisation, LUTs or watermarking, and no ProRes, DNxHR or FFV1 output.
-- No file merging, image sequences or downloading from a URL.
+- No file merging or image sequences.
 - No live streaming, scenes or game capture. Window capture crops the window's rectangle
   out of the screen, and system sound is found by device name, not by a real loopback.
 - No screenshots tool, scrolling capture, OCR or annotation.
-- No casting to Chromecast from the player, and no automatic captions.
 - On macOS and Linux the recorder captures, but has no webcam overlay, global hotkeys or
   click and key display.
 
@@ -320,8 +348,21 @@ menu and desktop shortcuts, an "Open this video with VidShrink" entry in the Exp
 right-click menu (in the primary menu on Windows 11), and VidShrink in the **Open with**
 list for video files — [written per user](docs/olcumler/kabuk-menusu.md), no administrator
 rights, and your default player stays your default. The app checks GitHub for a new release
-and offers the update; that check is on by default on Windows and switches off in Settings.
-All of it comes off again with one command — see [Install](#install).
+and offers the update with two buttons, Update and Later; that check is on by default on
+Windows and switches off in Settings. All of it comes off again with one command — see
+[Install](#install).
+
+## Build From Source
+
+Building from a clone needs the .NET 8 SDK, plus `ffmpeg`, `ffprobe` and libmpv on the
+machine to run what you built.
+
+```bash
+dotnet build VidShrink.sln -c Release
+dotnet test VidShrink.sln
+```
+
+The project layout and the design rules are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Documentation
 
@@ -386,6 +427,7 @@ The requests it can make, what triggers each, and whose privacy policy applies:
   [storage.to privacy](https://storage.to/privacy) · [uguu.se FAQ](https://uguu.se/faq)
 - **OpenSubtitles** — signs in and searches only when you use it.
   [OpenSubtitles privacy policy](https://www.opensubtitles.com/en/privacy/)
+- **Network streams** — the player connects to an address only when you open one.
 
 </details>
 
