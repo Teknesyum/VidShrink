@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIGINAL",
-  "playback.badge.processed": "PROCESAT",
+  "playback.badge.original": "Original",
+  "playback.badge.processed": "Procesat",
   "playback.player-failed": "Playerul de comparație nu a putut porni",
   "playback.sample-failed": "Mostra de previzualizare nu a putut fi codată",
   "playback.zoom-readout": "{0}%",

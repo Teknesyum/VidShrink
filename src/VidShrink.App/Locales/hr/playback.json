@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "IZVORNIK",
-  "playback.badge.processed": "OBRAĐENO",
+  "playback.badge.original": "Izvornik",
+  "playback.badge.processed": "Obrađeno",
   "playback.player-failed": "Usporedni preglednik nije se mogao pokrenuti",
   "playback.sample-failed": "Uzorak za pregled nije se mogao kodirati",
   "playback.zoom-readout": "{0}%",

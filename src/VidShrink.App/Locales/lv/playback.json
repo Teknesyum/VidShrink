@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIĢINĀLS",
-  "playback.badge.processed": "APSTRĀDĀTS",
+  "playback.badge.original": "Oriģināls",
+  "playback.badge.processed": "Apstrādāts",
   "playback.player-failed": "Salīdzināšanas atskaņotāju neizdevās palaist",
   "playback.sample-failed": "Priekšskatījuma paraugu neizdevās kodēt",
   "playback.zoom-readout": "{0}%",

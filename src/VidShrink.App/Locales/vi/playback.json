@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "GỐC",
-  "playback.badge.processed": "ĐÃ XỬ LÝ",
+  "playback.badge.original": "Gốc",
+  "playback.badge.processed": "Đã xử lý",
   "playback.player-failed": "Không khởi động được trình phát so sánh",
   "playback.sample-failed": "Không mã hóa được mẫu xem trước",
   "playback.zoom-readout": "{0}%",

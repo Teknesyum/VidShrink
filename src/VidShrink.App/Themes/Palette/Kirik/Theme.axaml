@@ -21,7 +21,7 @@
   <Color x:Key="NeonBlueHoverColor">#330F3390</Color>
   <Color x:Key="NeonBlueActiveColor">#4D0F3390</Color>
   <Color x:Key="NeonBlueBorderColor">#4D0F3391</Color>
-  <Color x:Key="NeonBlueBorderStrongColor">#800F3390</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#880F3390</Color>
   <Color x:Key="NeonPinkFillColor">#1ABD2CCC</Color>
   <Color x:Key="NeonPurpleBorderColor">#807A3BE6</Color>
 

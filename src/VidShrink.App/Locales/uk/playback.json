@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ОРИГІНАЛ",
-  "playback.badge.processed": "ОБРОБЛЕНО",
+  "playback.badge.original": "Оригінал",
+  "playback.badge.processed": "Оброблено",
   "playback.player-failed": "Не вдалося запустити плеєр порівняння",
   "playback.sample-failed": "Не вдалося закодувати зразок перегляду",
   "playback.zoom-readout": "{0}%",

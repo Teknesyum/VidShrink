@@ -16,7 +16,23 @@ ship as part of it.
   `.mov`/`.m4v`), the export notes now say that the audio track is the reason. Measured on short
   VP9 + Opus clips; AV1 + Opus was not run live.
 
+### Changed
+
+- The comparison panel labels read "Original" / "Processed" instead of all capitals, in the 31
+  languages whose script has letter case; the other 11 are unchanged. The badges already used
+  the same weight as the other labels, so the weight did not change.
+
 ### Fixed
+
+- Button borders now reach 3:1 contrast against the window, surface and panel backgrounds in all
+  36 palettes. In the 13 palettes that fell short (2.50 to 3.00), only the alpha of the strong
+  border brush was raised, to the smallest value that passes; its colour and the other 23
+  palettes are untouched.
+- Text boxes and the empty slider track use the same strong border, so their resting edge also
+  reaches 3:1 (it was 1.60 to 2.46 in every palette). The slider's hover and focus edge moved to
+  the solid accent so it still differs from the resting edge. The hover edge of buttons is still
+  close in brightness to the resting edge in some palettes (down to 1.00); fixing that needs a
+  colour decision and was left alone.
 
 - A recording set to GIF whose GIF conversion fails keeps its MKV, and that MKV now carries the
   chapter marks set with F6. Before, the marks were reported as lost. Measured with a real

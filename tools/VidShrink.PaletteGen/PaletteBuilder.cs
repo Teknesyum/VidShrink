@@ -82,6 +82,46 @@ public static class PaletteBuilder
         return (Math.Max(a, b) + 0.05) / (Math.Min(a, b) + 0.05);
     }
 
+    /// <summary>
+    /// Güçlü kenar (<c>NeonBlueBorderStrong</c>) düğmenin dinlenme kenarını çizer; metin olmayan öğe
+    /// zeminden 3:1 ayrılmalı (WCAG 1.4.11). Standardın alfası %50'dir; pencere zemini, yüzey ve
+    /// panel yüzeyinden (yüzey, <see cref="PanelSurfaceOpacity"/> ile zeminin üstünde) birinde
+    /// eşiği tutmayan palette alfa, üçünde de tutan en küçük değere çıkar. Renk değişmez.
+    /// Harman ölçünün harmanıdır: kanal kesirli harmanlanır, sonra 8 bite yuvarlanır.
+    /// Ölçü: <c>DugmeKenariKarsitligiTests</c>.
+    /// </summary>
+    public static int BorderStrongAlpha(PaletteSeed seed)
+    {
+        var line = Channels(seed.Renk1);
+        var bg = Channels(seed.Black);
+        var surface = Channels(seed.Surface);
+        (double R, double G, double B)[] grounds = [bg, surface, Blend(surface, PanelSurfaceOpacity, bg)];
+        for (var alpha = BorderStrongBaseAlpha; alpha < 0xFF; alpha++)
+        {
+            var share = alpha / 255.0;
+            if (grounds.Min(ground => Contrast(Hex(Blend(line, share, ground)), Hex(ground))) >= BorderContrast) return alpha;
+        }
+        return 0xFF;
+    }
+
+    public const int BorderStrongBaseAlpha = 0x80;
+    public const double BorderContrast = 3.0;
+
+    /// <summary><c>Themes/Theme.axaml</c> içindeki <c>PanelSurfaceOpacity</c> belirtecinin değeri.</summary>
+    public const double PanelSurfaceOpacity = 0.90;
+
+    private static (double R, double G, double B) Channels(string hex)
+    {
+        var (r, g, b) = Parse(hex);
+        return (r, g, b);
+    }
+
+    private static (double R, double G, double B) Blend((double R, double G, double B) top, double share, (double R, double G, double B) under) =>
+        ((top.R * share) + (under.R * (1 - share)), (top.G * share) + (under.G * (1 - share)), (top.B * share) + (under.B * (1 - share)));
+
+    private static string Hex((double R, double G, double B) tone) =>
+        $"#{(int)Math.Round(tone.R):X2}{(int)Math.Round(tone.G):X2}{(int)Math.Round(tone.B):X2}";
+
     /// <summary><c>flame</c> verilmemişse ateşin ortası, tehlike ile uyarının tam ortası.</summary>
     public static string Flame(PaletteSeed seed) => seed.Flame ?? Mix(Danger(seed), seed.Warning, 0.5);
 
@@ -144,7 +184,7 @@ public static class PaletteBuilder
             $"  <Color x:Key=\"NeonBlueHoverColor\">{Alpha(seed.Renk1, 0x33)}</Color>",
             $"  <Color x:Key=\"NeonBlueActiveColor\">{Alpha(seed.Renk1, 0x4D)}</Color>",
             $"  <Color x:Key=\"NeonBlueBorderColor\">{Alpha(seed.Renk1, 0x4D)}</Color>",
-            $"  <Color x:Key=\"NeonBlueBorderStrongColor\">{Alpha(seed.Renk1, 0x80)}</Color>",
+            $"  <Color x:Key=\"NeonBlueBorderStrongColor\">{Alpha(seed.Renk1, BorderStrongAlpha(seed))}</Color>",
             $"  <Color x:Key=\"NeonPinkFillColor\">{Alpha(seed.Renk2, 0x1A)}</Color>",
             $"  <Color x:Key=\"NeonPurpleBorderColor\">{Alpha(seed.Renk3, 0x80)}</Color>",
             "",

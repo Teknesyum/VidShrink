@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIGINAL",
-  "playback.badge.processed": "OBRAĐENO",
+  "playback.badge.original": "Original",
+  "playback.badge.processed": "Obrađeno",
   "playback.player-failed": "Plejer za poređenje nije mogao da se pokrene",
   "playback.sample-failed": "Uzorak za pregled nije mogao da se kodira",
   "playback.zoom-readout": "{0}%",

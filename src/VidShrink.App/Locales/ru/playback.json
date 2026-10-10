@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ОРИГИНАЛ",
-  "playback.badge.processed": "РЕЗУЛЬТАТ",
+  "playback.badge.original": "Оригинал",
+  "playback.badge.processed": "Результат",
   "playback.player-failed": "Плеер сравнения не запустился",
   "playback.sample-failed": "Не удалось закодировать образец предпросмотра",
   "playback.zoom-readout": "{0}%",

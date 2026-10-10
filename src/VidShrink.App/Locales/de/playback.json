@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIGINAL",
-  "playback.badge.processed": "VERARBEITET",
+  "playback.badge.original": "Original",
+  "playback.badge.processed": "Verarbeitet",
   "playback.player-failed": "Der Vergleichsplayer konnte nicht starten",
   "playback.sample-failed": "Die Vorschauprobe konnte nicht kodiert werden",
   "playback.zoom-readout": "{0}%",

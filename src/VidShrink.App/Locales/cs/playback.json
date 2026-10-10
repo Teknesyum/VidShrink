@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIGINÁL",
-  "playback.badge.processed": "ZPRACOVÁNO",
+  "playback.badge.original": "Originál",
+  "playback.badge.processed": "Zpracováno",
   "playback.player-failed": "Srovnávací přehrávač se nepodařilo spustit",
   "playback.sample-failed": "Ukázku náhledu se nepodařilo zakódovat",
   "playback.zoom-readout": "{0}%",

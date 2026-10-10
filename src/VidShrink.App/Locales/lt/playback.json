@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIGINALAS",
-  "playback.badge.processed": "APDOROTAS",
+  "playback.badge.original": "Originalas",
+  "playback.badge.processed": "Apdorotas",
   "playback.player-failed": "Palyginimo grotuvo nepavyko paleisti",
   "playback.sample-failed": "Peržiūros pavyzdžio nepavyko užkoduoti",
   "playback.zoom-readout": "{0}%",

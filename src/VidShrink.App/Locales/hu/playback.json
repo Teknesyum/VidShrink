@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "EREDETI",
-  "playback.badge.processed": "FELDOLGOZOTT",
+  "playback.badge.original": "Eredeti",
+  "playback.badge.processed": "Feldolgozott",
   "playback.player-failed": "Az összehasonlító lejátszó nem tudott elindulni",
   "playback.sample-failed": "Az előnézeti mintát nem sikerült kódolni",
   "playback.zoom-readout": "{0}%",

@@ -58,7 +58,7 @@
 
       <!--
         Kullanıcı 09-07: taraf adları görüntünün üstünde değil panelin üstünde durur —
-        ORİJİNAL solda, İŞLENMİŞ sağda. Görüntünün içinde yalnız CRF rozeti kalır.
+        Orijinal solda, İşlenmiş sağda. Görüntünün içinde yalnız CRF rozeti kalır.
       -->
       <Grid x:Name="LabelRow" Grid.Row="0">
         <Border x:Name="LeftBadge"

@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ALKUPERÄINEN",
-  "playback.badge.processed": "KÄSITELTY",
+  "playback.badge.original": "Alkuperäinen",
+  "playback.badge.processed": "Käsitelty",
   "playback.player-failed": "Vertailusoitin ei käynnistynyt",
   "playback.sample-failed": "Esikatselunäytettä ei voitu koodata",
   "playback.zoom-readout": "{0}%",

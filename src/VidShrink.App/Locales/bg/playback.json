@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ОРИГИНАЛ",
-  "playback.badge.processed": "ОБРАБОТЕН",
+  "playback.badge.original": "Оригинал",
+  "playback.badge.processed": "Обработен",
   "playback.player-failed": "Плейърът за сравнение не можа да стартира",
   "playback.sample-failed": "Пробата за преглед не можа да се кодира",
   "playback.zoom-readout": "{0}%",
