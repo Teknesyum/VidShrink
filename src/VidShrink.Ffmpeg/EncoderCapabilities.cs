@@ -255,16 +255,17 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
     /// Yoklamanin ffmpeg argumanlari. Media Foundation uretimde kosacagi bicimde yoklanir:
     /// <c>-hw_encoding 1</c> olmadan ffmpeg yazilim MFT'sine duser ve h264_mf orada "calisir"
     /// gorunur, <c>nv12</c> olmadan donanim MFT'si bicim uzlasmasinda duser. Ikisi de yoklamayi
-    /// uretimden ayirirdi.
+    /// uretimden ayirirdi. VAAPI de ayni kuralla: aygit acilir ve kare yuzeye yuklenir, yoksa
+    /// yoklama surucuyu degil bicim uzlasmasini olcerdi.
     /// </summary>
     internal static string[] ProbeArguments(string codec)
     {
-        var args = new List<string>
-        {
-            "-hide_banner", "-loglevel", "error",
-            "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1",
-            "-c:v", codec
-        };
+        var args = new List<string> { "-hide_banner", "-loglevel", "error" };
+        args.AddRange(CodecModel.DeviceArgs(codec));
+        args.AddRange(new[] { "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1" });
+        var upload = CodecModel.UploadFilters(codec, CodecModel.OutputPixelFormat(codec, "yuv420p"));
+        if (upload.Count > 0) args.AddRange(new[] { "-vf", string.Join(',', upload) });
+        args.AddRange(new[] { "-c:v", codec });
         if (CodecModel.Vendor(codec) == EncoderVendor.MediaFoundation)
         {
             args.AddRange(FfmpegArguments.MediaFoundationDeviceArgs);

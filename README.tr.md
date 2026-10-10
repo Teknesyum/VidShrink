@@ -145,7 +145,8 @@ Videoyu sürükleyin, bir boyuta dokunun, başlat deyin. Otomatik kip kodeki, ka
 - **Öncesi ve sonrası** — bölmeli panel, kodlamaya başlamadan önce kaynağı planlanan
   çıktının yanında, yakınlaştırmayla gösteriyor.
 - **Kodlayıcılar** — yazılım ile NVENC, Quick Sync ve AMF; her biri önce kendi makinenizde
-  yoklanıyor.
+  yoklanıyor. macOS'ta VideoToolbox ve Linux'ta VAAPI kodek kilidiyle seçilebiliyor; otomatik
+  sırada değiller.
 - **Kalite puanı** — sonuç **VMAF-NEG** ile puanlanıyor: ortalama, harmonik ortalama, 10.
   yüzdelik ve en kötü kare.
 - **Toplu iş** — bir klasörün tamamı kuyruktan geçiyor; kuyruk bitince klasörü açıyor,
@@ -160,8 +161,10 @@ Videoyu sürükleyin, bir boyuta dokunun, başlat deyin. Otomatik kip kodeki, ka
 </tr>
 </table>
 
-MP4, MKV, WebM, MOV, AVI, GIF, hareketli WebP ve hareketli AVIF; yalnız ses için MP3, M4A,
-WAV ve FLAC. H.264, H.265, VP9, AV1 ya da doğrudan akış kopyası, kırpma ve ses çıkarma. **On
+MP4, MKV, WebM, MOV, MXF, AVI, GIF, hareketli WebP ve hareketli AVIF; yalnız ses için MP3,
+M4A, WAV ve FLAC. H.264, H.265, VP9, AV1 ya da doğrudan akış kopyası, kırpma ve ses çıkarma.
+Kurgu için ara kodekler de var: ProRes (Proxy, LT, 422, HQ, 4444) MOV'a, DNxHR (LB, SQ, HQ,
+HQX, 444) MOV ya da MXF'e ([`k12-ara-kodekler.md`](docs/olcumler/k12-ara-kodekler.md)). **On
 sekiz hazır hedef** — WhatsApp, Discord, Telegram, Gmail, Outlook, Chromecast, Nest Hub,
 Apple TV ve fazlası — her alanı sizin yerinize dolduruyor; koşacak FFmpeg komutunun kendisi
 de ekranda.
@@ -250,7 +253,7 @@ sürümlerin yazılı bir taramasından ([`tarama-2026-10-05.md`](docs/piyasa/ta
 | Kodlamadan önce önizleme | Bölmeli öncesi/sonrası paneli | HandBrake önizleme için bir örnek kodluyor |
 | Eş boyutta kalite | 8 SDR satırının 8'inde ve 4 HDR10 satırının 3'ünde HandBrake x265 `slow`'un önünde | HandBrake karanlık sahnede daha az bantlaşıyor |
 | Kodlama hızı | 8 satırın 8'inde daha yavaş; toplam süre HandBrake'in 1,64 ile 3,73 katı | HandBrake |
-| Donanım kodlayıcıları | NVENC, Quick Sync, AMF; VAAPI yok | HandBrake'te VideoToolbox ve VAAPI de var |
+| Donanım kodlayıcıları | NVENC, Quick Sync, AMF; VideoToolbox (macOS) ve VAAPI (Linux) yalnız kodek kilidiyle, VAAPI burada gerçek donanımda henüz kodlamadı | HandBrake VideoToolbox ve VAAPI'yi olağan kodlayıcı listesinde sunuyor |
 | Aynı anda birkaç kodlama | Yok, tek iş | HandBrake, FFmpeg Batch |
 | Ekran kaydı | Ekran, pencere, bölge, kamera | OBS 32.2.2'de oyun yakalama, gerçek masaüstü sesi yakalama, sahneler ve yayın da var |
 | Yeniden kodlamadan kesme | Hızlı ve Akıllı dışa aktarma | LosslessCut 3.69.0'da birleştirme, iz yönetimi ve EDL/CSV de var; kendi akıllı kesimine deneysel diyor |
@@ -263,7 +266,8 @@ sürümlerin yazılı bir taramasından ([`tarama-2026-10-05.md`](docs/piyasa/ta
 - URL'den indirme yok. Oynatıcı doğrudan medya adresini açıyor, sayfa bağlantılarını
   çözmüyor; yt-dlp yok.
 - Oynatıcıdan Chromecast'e gönderme yok, otomatik altyazı üretimi yok.
-- Sabitleme, LUT ya da filigran yok; ProRes, DNxHR ya da FFV1 çıktısı yok.
+- Sabitleme, LUT ya da filigran yok; FFV1 çıktısı yok. ProRes ve DNxHR yalnız Dönüştür
+  sekmesinde; hedef boyuta sürülemiyorlar.
 - Dosya birleştirme ya da resim dizisi yok.
 - Canlı yayın, sahne ya da oyun yakalama yok. Pencere yakalama pencerenin dikdörtgenini
   ekrandan kırpıyor; sistem sesi gerçek bir geri döngüyle değil aygıt adıyla bulunuyor.

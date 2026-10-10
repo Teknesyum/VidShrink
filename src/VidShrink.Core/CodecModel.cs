@@ -2,7 +2,10 @@
 
 namespace VidShrink.Core;
 
-public enum EncoderVendor { Software, Nvenc, Qsv, Amf, VideoToolbox, MediaFoundation }
+public enum EncoderVendor { Software, Nvenc, Qsv, Amf, VideoToolbox, MediaFoundation, Vaapi }
+
+/// <summary>Kodlayici listesinin baktigi platform. Cerceveye bagli kodlayicilar yalniz kendi platformunda onerilir.</summary>
+public enum HostPlatform { Windows, Linux, MacOS }
 
 public static class CodecModel
 {
@@ -72,9 +75,9 @@ public static class CodecModel
     /// <summary>
     /// The lowest video bitrate the encoder will actually deliver at this layout, in kbit/s.
     /// Zero for every encoder off the hardware path: libx264 and its siblings follow -b:v all the
-    /// way down, and VideoToolbox reads zero too because <see cref="IsHardware"/> keeps it out,
-    /// not because its floor was measured.
-    /// Only av1_nvenc was measured; QSV and AMF carry the same line, which is not measured.
+    /// way down.
+    /// Only av1_nvenc was measured; QSV, AMF, Media Foundation, VideoToolbox and VAAPI carry the
+    /// same line, which is not measured on them.
     /// </summary>
     public static int MinBitrateK(string codec, int width, int height, double fps)
     {
@@ -152,53 +155,94 @@ public static class CodecModel
         if (c.Contains("amf")) return EncoderVendor.Amf;
         if (c.Contains("videotoolbox")) return EncoderVendor.VideoToolbox;
         if (c.EndsWith("_mf", StringComparison.Ordinal)) return EncoderVendor.MediaFoundation;
+        if (c.EndsWith("_vaapi", StringComparison.Ordinal)) return EncoderVendor.Vaapi;
         return EncoderVendor.Software;
     }
 
     /// <summary>
-    /// Kodlayicinin bu platformda onerilip onerilmedigi. Media Foundation yalniz Windows'un
-    /// kendi cercevesidir: baska platformda ffmpeg onu derlemez, derlese de arkasinda MFT yok.
-    /// Liste, kilit ve plan cozumleyici bu kapidan gecer; platform parametre olarak verilir ki
-    /// Windows'ta kosan test de Windows disi kolu olcebilsin.
+    /// Kodlayicinin onerildigi tek platform; her platformda onerilen kodlayicida <c>null</c>.
+    /// Uc cerceve tek platforma baglidir: Media Foundation Windows'a, VideoToolbox macOS'a,
+    /// VAAPI Linux'a. Baska platformda ffmpeg onlari derlemez, derlese de arkasinda surucu yok
+    /// (Windows ffmpeg'i <c>h264_vaapi</c>'yi listeliyor ama aygit acilamiyor, olcum
+    /// <c>docs/olcumler/k12-ara-kodekler.md</c>).
     /// </summary>
-    public static bool IsOfferedOn(string codec, bool windows)
-        => windows || Vendor(codec) != EncoderVendor.MediaFoundation;
-
-    public static bool IsOffered(string codec) => IsOfferedOn(codec, OperatingSystem.IsWindows());
+    public static HostPlatform? OnlyPlatform(string codec) => Vendor(codec) switch
+    {
+        EncoderVendor.MediaFoundation => HostPlatform.Windows,
+        EncoderVendor.VideoToolbox => HostPlatform.MacOS,
+        EncoderVendor.Vaapi => HostPlatform.Linux,
+        _ => null
+    };
 
     /// <summary>
-    /// Kodlayicinin olculmus bir kalite olcegi var mi. VideoToolbox'in <c>-q:v</c>'si ve Media
-    /// Foundation'in <c>-rate_control quality -quality N</c>'si bu depoda bir CRF karsiligina
-    /// baglanmadi (<c>docs/olcumler/hb15-media-foundation.md</c>: <c>-quality</c> olcegi gercek
-    /// ama CRF'ten ona cevirinin dayanagi yok); ikisi de hedef boyutu bit hiziyla tutar.
+    /// Kodlayicinin bu platformda onerilip onerilmedigi. Liste, kilit ve plan cozumleyici bu
+    /// kapidan gecer; platform parametre olarak verilir ki Windows'ta kosan test de oteki
+    /// kollari olcebilsin.
+    /// </summary>
+    public static bool IsOfferedOn(string codec, HostPlatform platform)
+        => OnlyPlatform(codec) is not { } only || only == platform;
+
+    public static HostPlatform CurrentPlatform
+        => OperatingSystem.IsWindows() ? HostPlatform.Windows
+            : OperatingSystem.IsMacOS() ? HostPlatform.MacOS
+            : HostPlatform.Linux;
+
+    /// <summary>
+    /// Kodlayicinin olculmus bir kalite olcegi var mi. VideoToolbox'in <c>-q:v</c>'si, Media
+    /// Foundation'in <c>-rate_control quality -quality N</c>'si ve VAAPI'nin
+    /// <c>-global_quality</c>'si bu depoda bir CRF karsiligina baglanmadi
+    /// (<c>docs/olcumler/hb15-media-foundation.md</c>: <c>-quality</c> olcegi gercek ama CRF'ten
+    /// ona cevirinin dayanagi yok); ucu de hedef boyutu bit hiziyla tutar.
     /// </summary>
     public static bool HasQualityScale(string codec)
-        => Vendor(codec) is not (EncoderVendor.VideoToolbox or EncoderVendor.MediaFoundation);
+        => Vendor(codec) is not (EncoderVendor.VideoToolbox or EncoderVendor.MediaFoundation or EncoderVendor.Vaapi);
 
     /// <summary>
     /// Whether the encoder is sent down the hardware path. Everything behind this gate - the
     /// floor factor, the delivered-bitrate yield, the delivery reserve, the peak ceiling and the
     /// lower quality ceiling - was measured on NVENC, so the gate names the vendors those numbers
     /// are carried to instead of asking whether the vendor is a chip.
-    /// VideoToolbox is a chip and is still false here: nothing behind this gate has been measured
-    /// on it. docs/olcumler/videotoolbox.md gives one bitrate per arm on one Apple M1, which is not
-    /// enough for any of them. Opening this gate for VideoToolbox is a measurement, not an edit.
     /// Media Foundation is carried through the gate like QSV and AMF: on the measuring machine it
     /// resolves to the NVIDIA MFT and overshoots a single-pass request by 1.02-1.12
     /// (docs/olcumler/hb15-media-foundation.md), the same side as NVENC, so the reserve and the
     /// tight peak point the right way; the numbers themselves are still NVENC's.
+    /// VideoToolbox and VAAPI are carried through by the K12 decision, not by a measurement:
+    /// nothing behind this gate was measured on either. docs/olcumler/videotoolbox.md gives one
+    /// bitrate per arm on one Apple M1, and VAAPI has never run in this repository. Both are
+    /// reached only by an explicit choice (codec lock or a pasted plan); the automatic fast order
+    /// does not name them, because that wiring was measured on VideoToolbox and failed its gate
+    /// (docs/olcumler/videotoolbox-hizli.md).
     /// </summary>
-    public static bool IsHardware(string codec) => Vendor(codec) switch
-    {
-        EncoderVendor.Nvenc or EncoderVendor.Qsv or EncoderVendor.Amf or EncoderVendor.MediaFoundation => true,
-        _ => false
-    };
+    public static bool IsHardware(string codec) => Vendor(codec) != EncoderVendor.Software;
 
-    public static bool SinglePassRateControl(string codec)
-        => IsHardware(codec) || Vendor(codec) == EncoderVendor.VideoToolbox;
+    /// <summary>
+    /// VAAPI kareleri donanim yuzeyinde ister ve aygiti girdiden once acar.
+    /// <c>ffmpeg -h encoder=h264_vaapi</c> tek piksel bicimi listeliyor: <c>vaapi</c>.
+    /// </summary>
+    public const string VaapiDevice = "/dev/dri/renderD128";
+
+    /// <summary>Kodlayicinin girdiden once istedigi aygit argumanlari; cogu kodlayicida bos.</summary>
+    public static IReadOnlyList<string> DeviceArgs(string codec)
+        => Vendor(codec) == EncoderVendor.Vaapi ? new[] { "-vaapi_device", VaapiDevice } : Array.Empty<string>();
+
+    /// <summary>
+    /// Kodlayicinin suzgec zincirinin sonuna istedigi adimlar: VAAPI'de kare once verilen
+    /// bicime cevrilir, sonra yuzeye yuklenir. Oteki kodlayicilarda bos.
+    /// </summary>
+    public static IReadOnlyList<string> UploadFilters(string codec, string pixelFormat)
+        => Vendor(codec) == EncoderVendor.Vaapi ? new[] { "format=" + pixelFormat, "hwupload" } : Array.Empty<string>();
+
+    /// <summary>
+    /// Piksel bicimi <c>-pix_fmt</c> ile mi verilir. Yuzeye yukleyen kodlayicida bicimi
+    /// <see cref="UploadFilters"/> verir; <c>-pix_fmt</c> yazilirsa ffmpeg yuzeyden geri
+    /// cevirmeye calisir.
+    /// </summary>
+    public static bool TakesPixelFormatFlag(string codec) => Vendor(codec) != EncoderVendor.Vaapi;
+
+    public static bool SinglePassRateControl(string codec) => IsHardware(codec);
 
     public static bool TakesPreset(string codec)
-        => Vendor(codec) is not (EncoderVendor.VideoToolbox or EncoderVendor.MediaFoundation) && !IsVp9(codec);
+        => Vendor(codec) is not (EncoderVendor.VideoToolbox or EncoderVendor.MediaFoundation or EncoderVendor.Vaapi) && !IsVp9(codec);
 
     /// <summary>
     /// libvpx-vp9 <c>-preset</c> tanimaz; hiz <c>-deadline good -cpu-used N</c> ile verilir ve
@@ -222,9 +266,13 @@ public static class CodecModel
     /// <c>docs/olcumler/hb15-media-foundation.md</c>). <c>ffmpeg -h encoder=hevc_mf</c> 10 bit bir
     /// bicim listelemiyor, yani 10 bit bir kaynak da <c>nv12</c>'ye iner.
     /// </para>
+    /// <para>
+    /// VAAPI de <c>nv12</c>'ye iner: 10 bit yuzey (<c>p010</c>) surucuye bagli ve bu depoda hic
+    /// kosmadi; olculmemis bir bicim yerine her surucunun actigi bicim secildi.
+    /// </para>
     public static string OutputPixelFormat(string codec, string resolved)
     {
-        if (Vendor(codec) == EncoderVendor.MediaFoundation) return "nv12";
+        if (Vendor(codec) is EncoderVendor.MediaFoundation or EncoderVendor.Vaapi) return "nv12";
         return resolved == "yuv420p" && codec.Equals("hevc_videotoolbox", StringComparison.OrdinalIgnoreCase) ? "p010le" : resolved;
     }
 
@@ -311,9 +359,9 @@ public static class CodecModel
     /// VideoToolbox o kola dusemez: <c>-crf</c> kabul etmiyor, kendi olcegi <c>-q:v</c> ise bu
     /// depoda olculmedi — <c>docs/olcumler/videotoolbox.md</c> bir Apple M1'de kol basina tek
     /// bir bit hizi veriyor, bir olcek cikarmaya yetmiyor. Olculmemis bir olcek yazmak yerine
-    /// kol acikca patliyor: bugun <c>PlanParser.AllowedCodecs</c> videotoolbox kodeklerini
-    /// gecirmedigi icin buraya ulasan yok, ama kapiyi acan sozlesme sessiz bir gecersiz bayrak
-    /// yerine bu istisnayi gorur.
+    /// kol acikca patliyor. VAAPI ayni durumda: <c>-global_quality</c> olcegi hic olculmedi.
+    /// <c>PlanParser</c> ve <c>PlanCalculator</c> bu kodlayicilari bit hizi kipinde tuttugu icin
+    /// buraya ulasan yok; ulasan olursa sessiz bir gecersiz bayrak yerine bu istisnayi gorur.
     /// </para>
     /// </summary>
     public static IReadOnlyList<string> QualityArgs(string codec, double quality)
@@ -324,7 +372,10 @@ public static class CodecModel
         {
             EncoderVendor.VideoToolbox => throw new NotSupportedException(
                 $"VideoToolbox hiz kontrolu olculmedi ({codec}): -crf kabul edilmiyor ve -q:v olceginin "
-                + "bu depoda dayanagi yok. Kapiyi acan sozlesme olcegi olcup bu kolu yazar."),
+                + "bu depoda dayanagi yok. Plan bu kodlayicida bit hizi kipinde kalir."),
+            EncoderVendor.Vaapi => throw new NotSupportedException(
+                $"VAAPI kalite olcegi olculmedi ({codec}): -crf kabul edilmiyor, -global_quality olceginin "
+                + "CRF karsiligi yok. Plan bu kodlayicida bit hizi kipinde kalir."),
             EncoderVendor.MediaFoundation => throw new NotSupportedException(
                 $"Media Foundation kalite olcegi CRF'e baglanmadi ({codec}): -crf kabul edilmiyor, "
                 + "-quality olceginin CRF karsiligi olculmedi. Plan bu kodlayicida bit hizi kipinde kalir."),
@@ -346,6 +397,7 @@ public static class CodecModel
             ? new[] { "-look_ahead", "1" }
             : Array.Empty<string>(),
         EncoderVendor.MediaFoundation => new[] { "-rate_control", "pc_vbr" },
+        EncoderVendor.Vaapi => new[] { "-rc_mode", "VBR" },
         _ => Array.Empty<string>()
     };
 

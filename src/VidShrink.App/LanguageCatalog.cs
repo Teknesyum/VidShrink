@@ -123,6 +123,9 @@ internal static class LanguageCatalog
             "h264_qsv", "hevc_qsv", "av1_qsv",
             "h264_amf", "hevc_amf", "av1_amf",
             "h264_mf", "hevc_mf", "av1_mf",
+            "h264_videotoolbox", "hevc_videotoolbox",
+            "h264_vaapi", "hevc_vaapi", "av1_vaapi",
+            "prores_ks", "dnxhd",
             "aac", "opus"
         };
 

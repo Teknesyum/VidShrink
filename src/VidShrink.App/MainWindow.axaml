@@ -1123,6 +1123,7 @@
                         <ComboBoxItem Content="FLAC" Tag="flac"/>
                         <ComboBoxItem Content="WebP" Tag="webp"/>
                         <ComboBoxItem Content="AVIF" Tag="avif"/>
+                        <ComboBoxItem Content="MXF" Tag="mxf"/>
                       </ComboBox>
                     </Grid>
 
@@ -1145,6 +1146,16 @@
                         <ComboBoxItem Content="VP9" Tag="libvpx-vp9"/>
                         <ComboBoxItem Content="AV1" Tag="libsvtav1"/>
                         <ComboBoxItem Content="{loc:Text main.convert.copy}" Tag="copy"/>
+                        <ComboBoxItem Content="ProRes 422 Proxy" Tag="prores_ks:proxy"/>
+                        <ComboBoxItem Content="ProRes 422 LT" Tag="prores_ks:lt"/>
+                        <ComboBoxItem Content="ProRes 422" Tag="prores_ks:standard"/>
+                        <ComboBoxItem Content="ProRes 422 HQ" Tag="prores_ks:hq"/>
+                        <ComboBoxItem Content="ProRes 4444" Tag="prores_ks:4444"/>
+                        <ComboBoxItem Content="DNxHR LB" Tag="dnxhd:dnxhr_lb"/>
+                        <ComboBoxItem Content="DNxHR SQ" Tag="dnxhd:dnxhr_sq"/>
+                        <ComboBoxItem Content="DNxHR HQ" Tag="dnxhd:dnxhr_hq"/>
+                        <ComboBoxItem Content="DNxHR HQX" Tag="dnxhd:dnxhr_hqx"/>
+                        <ComboBoxItem Content="DNxHR 444" Tag="dnxhd:dnxhr_444"/>
                       </ComboBox>
                     </Grid>
 

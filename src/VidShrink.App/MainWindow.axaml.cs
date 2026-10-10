@@ -2065,7 +2065,7 @@ public partial class MainWindow : Window
         CmbAdvMinFps.ItemsSource = new[] { automatic }.Concat(AdvancedMinFpsCandidates.Select(c => c.ToString("0.##", CultureInfo.InvariantCulture))).ToList();
         CmbAdvMinFps.SelectedIndex = 0;
 
-        CmbAdvCodecLock.ItemsSource = new[] { automatic }.Concat(FfmpegArguments.OfferedCodecs(OperatingSystem.IsWindows()).OrderBy(c => c, StringComparer.OrdinalIgnoreCase)).ToList();
+        CmbAdvCodecLock.ItemsSource = new[] { automatic }.Concat(FfmpegArguments.OfferedCodecs(CodecModel.CurrentPlatform).OrderBy(c => c, StringComparer.OrdinalIgnoreCase)).ToList();
         CmbAdvCodecLock.SelectedIndex = 0;
 
         InitializeFilterUi(automatic);
@@ -4727,7 +4727,9 @@ public partial class MainWindow : Window
     private ConversionPlan ReadConversionPlan()
     {
         var container = SelectedTag(CmbContainer) ?? ConversionDefaults.Container;
-        var codec = SelectedTag(CmbConvertCodec) ?? ConversionDefaults.VideoCodec;
+        var codecTag = SelectedTag(CmbConvertCodec) ?? ConversionDefaults.VideoCodec;
+        var intermediate = IntermediateCodecs.FromId(codecTag);
+        var codec = intermediate?.Encoder ?? codecTag;
         int.TryParse(TxtQuality.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var quality);
         int.TryParse(TxtAudioBitrate.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var audioK);
 
@@ -4761,6 +4763,7 @@ public partial class MainWindow : Window
         {
             Container = container,
             VideoCodec = codec,
+            VideoProfile = intermediate?.Profile,
             QualityMode = CmbQualityMode.SelectedIndex == 1 ? ConversionQualityMode.Bitrate : ConversionQualityMode.Crf,
             Crf = quality > 0 ? quality : ConversionDefaults.Crf,
             VideoBitrateK = quality > 0 ? quality : ConversionDefaults.VideoBitrateK,
@@ -4790,7 +4793,7 @@ public partial class MainWindow : Window
             : TimeSpan.TryParse(text, CultureInfo.InvariantCulture, out var value) ? value : TimeSpan.MinValue;
 
     private (int Min, int Max) CrfLimits()
-        => CodecModel.CrfRange(SelectedTag(CmbConvertCodec) ?? ConversionDefaults.VideoCodec);
+        => CodecModel.CrfRange(ReadConversionPlan().VideoCodec);
 
     private void OnQualitySliderChanged()
     {
@@ -4810,6 +4813,7 @@ public partial class MainWindow : Window
 
     private void OnQualityRangeChanged()
     {
+        OzelDonusturAlanlari();
         if (_syncing) return;
         ApplyQualityRange();
         RefreshConversion();
@@ -4843,7 +4847,10 @@ public partial class MainWindow : Window
     {
         TxtCustomResolution.IsEnabled = SelectedTag(CmbResolution) == "custom";
         TxtCustomFps.IsEnabled = SelectedTag(CmbConvertFps) == "custom";
-        TxtAudioBitrate.IsEnabled = ReadConversionPlan().AudioCodec is { } ses && ses != "copy";
+        var plan = ReadConversionPlan();
+        TxtAudioBitrate.IsEnabled = plan.AudioCodec is { } ses && ses != "copy";
+        var kaliteOkunur = !IntermediateCodecs.IsIntermediate(plan.VideoCodec);
+        CmbQualityMode.IsEnabled = SliderQuality.IsEnabled = TxtQuality.IsEnabled = kaliteOkunur;
     }
 
     private void RefreshConversion()

@@ -9,6 +9,20 @@ ship as part of it.
 
 ### Added
 
+- ProRes and DNxHR output in the Convert tab, and VideoToolbox and VAAPI as hardware encoders
+  (K12). The codec list gains ten intermediate-codec entries: ProRes 422 Proxy, LT, 422, HQ and
+  4444 (`prores_ks`, MOV only) and DNxHR LB, SQ, HQ, HQX and 444 (`dnxhd`, MOV or the new MXF
+  container). The profile sets the bitrate, so the quality fields are disabled and no preset,
+  CRF or bitrate is written; MXF takes PCM audio only and is written at 48 kHz. The target-size
+  path rejects both codecs with an explicit error instead of falling back to another codec.
+  `h264_videotoolbox` and `hevc_videotoolbox` (macOS) and `h264_vaapi`, `hevc_vaapi` and
+  `av1_vaapi` (Linux) join the hardware class with the same probe, the same fallback to the
+  family's software encoder and the same two-job hardware slot in the queue. They are offered
+  by platform, chosen with the codec lock or a pasted plan, and are not in the automatic
+  hardware order. Known gaps: ProRes and DNxHR were each encoded once on a 2-second test
+  pattern; VAAPI and VideoToolbox could not run on the Windows development machine, so their
+  arguments are pinned by tests only and no real encode was made; VAAPI always uploads `nv12`
+  (8-bit) surfaces. Measurement: `docs/olcumler/k12-ara-kodekler.md`.
 - The recorder can capture the sound playing on the PC without a "Stereo Mix" device (Windows
   only). The "System audio" list gains a last entry, "Sound playing on this PC", which reads the
   default output device through WASAPI loopback; the app captures the samples itself and hands

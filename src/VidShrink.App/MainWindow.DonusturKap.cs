@@ -9,6 +9,7 @@ namespace VidShrink.App;
 /// Dönüştür sekmesinin kap listesi ffmpeg derlemesini izler: kodlayıcısı olmayan kap (hareketli WebP,
 /// AVIF) listede görünmez. Liste öğesi silinmez, gizlenir: ayar kabı sıra numarasıyla saklıyor.
 /// Yoklama okunamadıysa (<see cref="EncoderCapabilities.Loaded"/> false) kap açık kalır.
+/// Ara kodek profilleri (ProRes, DNxHR) kodek listesinde hep durur; kodlayıcısı yoksa yalnız kapanır.
 /// </summary>
 public partial class MainWindow
 {
@@ -38,6 +39,10 @@ public partial class MainWindow
             item.IsVisible = available;
             item.IsEnabled = available;
         }
+
+        foreach (var item in CmbConvertCodec.Items.OfType<ComboBoxItem>())
+            if (IntermediateCodecs.FromId(item.Tag as string) is { } profile)
+                item.IsEnabled = encoders is null || encoders.HasEncoder(profile.Encoder);
 
         if (CmbContainer.SelectedItem is not ComboBoxItem { IsVisible: false }) return;
         var wasSyncing = _syncing;

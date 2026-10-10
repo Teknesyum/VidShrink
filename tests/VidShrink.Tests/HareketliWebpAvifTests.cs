@@ -143,7 +143,7 @@ public sealed class HareketliWebpAvifTests
         kutu = kutu[..kutu.IndexOf("</ComboBox>", StringComparison.Ordinal)];
         var etiketler = System.Text.RegularExpressions.Regex.Matches(kutu, "Tag=\"([^\"]+)\"").Select(m => m.Groups[1].Value).ToArray();
         Assert.Equal(
-            new[] { "mp4", "mkv", "webm", "mov", "avi", "gif", "mp3", "m4a", "wav", "flac", "webp", "avif" },
+            new[] { "mp4", "mkv", "webm", "mov", "avi", "gif", "mp3", "m4a", "wav", "flac", "webp", "avif", "mxf" },
             etiketler);
     }
 

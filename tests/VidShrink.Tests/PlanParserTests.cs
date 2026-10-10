@@ -60,15 +60,15 @@ public sealed class PlanParserTests
     [Theory]
     [InlineData("hevc_videotoolbox")]
     [InlineData("h264_videotoolbox")]
-    public void ParserStillRejectsVideoToolboxEncoders(string codec)
+    public void ParserRejectsVideoToolboxEncodersOffMacOs(string codec)
     {
         var json = ValidPlan(Array.Empty<string>(), codec: codec);
 
-        var result = PlanParser.Parse(json, Source, new PlanOptions());
+        var result = PlanParser.Parse(json, Source, new PlanOptions(), HostPlatform.Windows);
 
         Assert.False(result.Ok);
         Assert.Contains(result.Errors, error =>
-            error.Contains("Unsupported codec", StringComparison.Ordinal)
+            error.Contains("only available on macOS", StringComparison.Ordinal)
             && error.Contains(codec, StringComparison.Ordinal));
     }
 

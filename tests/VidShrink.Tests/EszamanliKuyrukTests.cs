@@ -132,6 +132,13 @@ public sealed class EszamanliKuyrukTests
         Assert.True(ParallelJobs.NeedsHardwareSlot("h264_nvenc"));
         Assert.True(ParallelJobs.NeedsHardwareSlot("hevc_qsv"));
         Assert.True(ParallelJobs.NeedsHardwareSlot("av1_amf"));
+        Assert.True(ParallelJobs.NeedsHardwareSlot("h264_videotoolbox"));
+        Assert.True(ParallelJobs.NeedsHardwareSlot("hevc_videotoolbox"));
+        Assert.True(ParallelJobs.NeedsHardwareSlot("h264_vaapi"));
+        Assert.True(ParallelJobs.NeedsHardwareSlot("hevc_vaapi"));
+        Assert.True(ParallelJobs.NeedsHardwareSlot("av1_vaapi"));
+        Assert.False(ParallelJobs.NeedsHardwareSlot(IntermediateCodecs.ProRes));
+        Assert.False(ParallelJobs.NeedsHardwareSlot(IntermediateCodecs.DnxHr));
         Assert.False(ParallelJobs.NeedsHardwareSlot("libx264"));
         Assert.False(ParallelJobs.NeedsHardwareSlot("libsvtav1"));
         Assert.False(ParallelJobs.NeedsHardwareSlot(null));

@@ -301,6 +301,12 @@ public static class PlanCalculator
     // path keeps the bitrates it has today.
     private static int DeliveryReserveK(string codec) => CodecModel.IsHardware(codec) ? HardwareDeliveryReserveK : 0;
 
+    /// <summary>
+    /// Hizli yolun otomatik aday sirasi. VideoToolbox ve VAAPI donanim sinifinda olsalar da
+    /// burada adlari gecmez: VideoToolbox'in bu siraya baglanmasi olculdu ve kapidan gecmedi
+    /// (<c>docs/olcumler/videotoolbox-hizli.md</c>), VAAPI hic olculmedi. Ikisi kodek kilidi ve
+    /// yapistirilan planla secilir.
+    /// </summary>
     private static readonly string[] FastHardwareOrder =
     {
         "av1_nvenc", "hevc_nvenc", "av1_qsv", "hevc_qsv", "av1_amf", "hevc_amf", "h264_nvenc"
@@ -1660,6 +1666,8 @@ public static class PlanCalculator
         "h264_qsv", "hevc_qsv", "av1_qsv",
         "h264_amf", "hevc_amf", "av1_amf",
         "h264_mf", "hevc_mf", "av1_mf",
+        "h264_videotoolbox", "hevc_videotoolbox",
+        "h264_vaapi", "hevc_vaapi", "av1_vaapi",
         "libvpx-vp9"
     };
 
@@ -1667,12 +1675,12 @@ public static class PlanCalculator
     /// Kilit olarak verilebilecek kodlayici mi; buyuk kucuk harf ayirmaz. Platformun onermedigi
     /// kodlayici (<see cref="CodecModel.IsOfferedOn"/>) kilitlenemez.
     /// </summary>
-    public static bool IsLockableCodec(string? codec) => IsLockableCodecOn(codec, OperatingSystem.IsWindows());
+    public static bool IsLockableCodec(string? codec) => IsLockableCodecOn(codec, CodecModel.CurrentPlatform);
 
-    internal static bool IsLockableCodecOn(string? codec, bool windows)
+    internal static bool IsLockableCodecOn(string? codec, HostPlatform platform)
         => codec is not null
            && KnownLockableCodecs.Contains(codec.Trim(), StringComparer.OrdinalIgnoreCase)
-           && CodecModel.IsOfferedOn(codec.Trim(), windows);
+           && CodecModel.IsOfferedOn(codec.Trim(), platform);
 
     /// <summary>
     /// Bos/bosluk kilidi "secim yok" sayar; dolu kilit tanidik kodlayicilardan biri degilse

@@ -152,7 +152,12 @@ VAAPI ve VideoToolbox plan yolu.
   Sessizlikte iz sessizlikle dolar, cihaz değişince kayıt sürer ve durum satırı söyler. Gerçek cihazla
   yalnız yakalama bir kez denendi; durdurmada son ~0,3 sn ses eksik. Plan `docs/plan-k2-sistem-sesi.md`,
   ölçüm `docs/olcumler/sistem-sesi-loopback.md`.
-- [ ] K12
+- [x] K12 — ProRes, DNxHR, VAAPI ve VideoToolbox. ProRes (beş profil, MOV) ve DNxHR (beş profil, MOV
+  ya da MXF) yalnız Dönüştür'de; hedef boyut yolu ikisini açık hatayla reddeder. VideoToolbox (macOS)
+  ve VAAPI (Linux) donanım sınıfında: aynı yoklama, aynı yazılıma düşüş, K6'nın donanım yuvası; kodek
+  kilidi ve yapıştırılan planla seçilir, otomatik sırada yok. ProRes ve DNxHR birer kez gerçekten
+  kodlandı; VAAPI ve VideoToolbox bu Windows makinesinde koşturulamadı, yalnız argümanları pimli.
+  Plan `docs/plan-k12-kodekler.md`, ölçüm `docs/olcumler/k12-ara-kodekler.md`.
 
 Rafa kalkanlar (karar geri açılana dek iş açılmaz): **K3** pencereyi WGC ile yakalama,
 **K8** stabilizasyon, LUT ve filigran.

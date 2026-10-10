@@ -8,6 +8,13 @@ public sealed class ConversionPlan
 {
     public string Container { get; init; } = "mp4";
     public string VideoCodec { get; init; } = "libx264";
+
+    /// <summary>
+    /// Ara kodegin profili (<see cref="IntermediateCodecs"/>). Ara kodekte zorunludur ve
+    /// <see cref="QualityMode"/>, <see cref="Crf"/>, <see cref="VideoBitrateK"/> okunmaz: bit
+    /// hizini profil belirler. Oteki kodeklerde okunmaz.
+    /// </summary>
+    public string? VideoProfile { get; init; }
     public ConversionQualityMode QualityMode { get; init; } = ConversionQualityMode.Crf;
     public int Crf { get; init; } = 23;
     public int VideoBitrateK { get; init; } = 2500;
