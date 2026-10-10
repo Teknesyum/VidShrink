@@ -96,6 +96,13 @@
         </WrapPanel>
       </StackPanel>
 
+      <ScrollViewer x:Name="ActivePanel"
+                    MaxHeight="{StaticResource DropDownMaxHeight}"
+                    HorizontalScrollBarVisibility="Disabled"
+                    IsVisible="False">
+        <StackPanel x:Name="ActiveList" Spacing="{StaticResource SpaceSm}"/>
+      </ScrollViewer>
+
       <StackPanel x:Name="PendingPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
         <TextBlock x:Name="TxtPending"
                    FontSize="{StaticResource FontSizeSm}"

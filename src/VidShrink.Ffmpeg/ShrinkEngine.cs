@@ -82,7 +82,7 @@ public static class ShrinkEngine
     /// söyler; sessizce kaynağın yanına düşmek ayarı yalan yapar.
     /// </param>
     public static string UniqueOutputPath(string inputPath, string suffix = "shrunk", string extension = "mp4",
-        string? outputDirectory = null, string? baseName = null)
+        string? outputDirectory = null, string? baseName = null, Func<string, bool>? taken = null)
     {
         var dir = string.IsNullOrWhiteSpace(outputDirectory)
             ? Path.GetDirectoryName(inputPath)!
@@ -102,7 +102,7 @@ public static class ShrinkEngine
         }
 
         var candidate = Path.Combine(dir, $"{stem}.{extension}");
-        for (var index = firstIndex; PathEquals(candidate, inputPath) || File.Exists(candidate); index++)
+        for (var index = firstIndex; PathEquals(candidate, inputPath) || File.Exists(candidate) || (taken?.Invoke(candidate) ?? false); index++)
             candidate = Path.Combine(dir, $"{stem}_{index}.{extension}");
         return candidate;
     }

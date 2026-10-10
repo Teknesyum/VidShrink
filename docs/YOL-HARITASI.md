@@ -129,3 +129,27 @@ yazımı ile yaygın `×8192` yazımı arasında %2,4 fark var, biz OBS'in yazı
 HandBrake'in "hedef boyut kötü fikirdir" tezi biliniyor ve bilerek reddediliyor: VidShrink'in
 varlık sebebi hedef boyuta oturtmak. Ama tez raporda duruyor, çünkü hedef boyut kolunun neden
 iki geçiş ya da tavanlı CRF gerektirdiğini o açıklıyor.
+
+### Piyasa Taramasının K Kalemleri: Sıra, Raf Ve Yapılmayacaklar (10 Ekim 2026)
+
+Sahibin kararı, 2026-10-10. Kalemlerin tanımı `docs/piyasa/tarama-2026-10-05.md`
+"Sahibin Kararını Bekleyenler" tablosunda.
+
+Yapılacaklar, bu sırayla: **K6** eşzamanlı kodlama → **K7** düzenleyicide çok kaynak ve
+birleştirme → **K2** gerçek sistem sesi yakalama (WASAPI loopback) → **K12** ProRes, DNxHR,
+VAAPI ve VideoToolbox plan yolu.
+
+- [x] K6 — kuyrukta eşzamanlı kodlama. Varsayılan 1, yani bugünkü davranış; ayar Ayarlar'da
+  "Aynı anda kodlanan iş sayısı". Üst sınır `ParallelJobs.Max`: mantıksal çekirdek / 2, en
+  çok 4; donanım kodlayıcısında aynı anda 2 iş (`src/VidShrink.Core/ParallelJobs.cs`).
+  Tavan 4 ve iki donanım yuvası yük altında ölçülmedi: kullanıcının makinesinde yük testi yok.
+- [ ] K7
+- [ ] K2
+- [ ] K12
+
+Rafa kalkanlar (karar geri açılana dek iş açılmaz): **K3** pencereyi WGC ile yakalama,
+**K8** stabilizasyon, LUT ve filigran.
+
+Yapılmayacaklar: **K1** URL'den indirme (yt-dlp), **K4** oynatıcıda GPU çizim yolu,
+**K5** otomatik altyazı, **K9** ekran görüntüsü aracı, **K10** Chromecast ve DLNA,
+**K11** canlı yayın ve sahne bileşimi.
