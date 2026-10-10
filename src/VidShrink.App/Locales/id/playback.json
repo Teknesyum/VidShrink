@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ASLI",
-  "playback.badge.processed": "DIPROSES",
+  "playback.badge.original": "Asli",
+  "playback.badge.processed": "Diproses",
   "playback.player-failed": "Pemutar perbandingan tidak dapat dimulai",
   "playback.sample-failed": "Sampel pratinjau tidak dapat di-encode",
   "playback.zoom-readout": "{0}%",

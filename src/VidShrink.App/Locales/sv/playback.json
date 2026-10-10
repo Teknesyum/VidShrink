@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIGINAL",
-  "playback.badge.processed": "BEHANDLAD",
+  "playback.badge.original": "Original",
+  "playback.badge.processed": "Behandlad",
   "playback.player-failed": "Jämförelsespelaren kunde inte startas",
   "playback.sample-failed": "Förhandsprovet kunde inte kodas",
   "playback.zoom-readout": "{0}%",

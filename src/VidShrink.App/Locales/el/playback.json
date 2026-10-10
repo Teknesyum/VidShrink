@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ΠΡΩΤΟΤΥΠΟ",
-  "playback.badge.processed": "ΕΠΕΞΕΡΓΑΣΜΕΝΟ",
+  "playback.badge.original": "Πρωτότυπο",
+  "playback.badge.processed": "Επεξεργασμένο",
   "playback.player-failed": "Ο συγκριτικός αναπαραγωγέας δεν ξεκίνησε",
   "playback.sample-failed": "Το δείγμα προεπισκόπησης δεν κωδικοποιήθηκε",
   "playback.zoom-readout": "{0}%",

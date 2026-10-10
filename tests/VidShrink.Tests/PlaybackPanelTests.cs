@@ -220,10 +220,10 @@ public sealed class PlaybackPanelTests : IClassFixture<PlaybackPanelTests.SesliK
     [Fact]
     public void Rozet_metinleri_iki_dilde_de_sozlukten()
     {
-        Assert.Equal("ORIGINAL", Locales.Values("en")["playback.badge.original"]);
-        Assert.Equal("PROCESSED", Locales.Values("en")["playback.badge.processed"]);
-        Assert.Equal("OR\u0130J\u0130NAL", Locales.Values("tr")["playback.badge.original"]);
-        Assert.Equal("\u0130\u015eLENM\u0130\u015e", Locales.Values("tr")["playback.badge.processed"]);
+        Assert.Equal("Original", Locales.Values("en")["playback.badge.original"]);
+        Assert.Equal("Processed", Locales.Values("en")["playback.badge.processed"]);
+        Assert.Equal("Orijinal", Locales.Values("tr")["playback.badge.original"]);
+        Assert.Equal("\u0130\u015flenmi\u015f", Locales.Values("tr")["playback.badge.processed"]);
     }
 
     /// <summary>

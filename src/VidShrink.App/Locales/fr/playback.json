@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIGINAL",
-  "playback.badge.processed": "TRAITÉ",
+  "playback.badge.original": "Original",
+  "playback.badge.processed": "Traité",
   "playback.player-failed": "Le lecteur de comparaison n'a pas pu démarrer",
   "playback.sample-failed": "L'échantillon d'aperçu n'a pas pu être encodé",
   "playback.zoom-readout": "{0}%",

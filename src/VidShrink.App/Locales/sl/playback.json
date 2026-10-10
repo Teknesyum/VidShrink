@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "IZVIRNIK",
-  "playback.badge.processed": "OBDELANO",
+  "playback.badge.original": "Izvirnik",
+  "playback.badge.processed": "Obdelano",
   "playback.player-failed": "Primerjalnega predvajalnika ni bilo mogoče zagnati",
   "playback.sample-failed": "Vzorca predogleda ni bilo mogoče kodirati",
   "playback.zoom-readout": "{0} %",

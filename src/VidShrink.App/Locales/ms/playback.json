@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ASAL",
-  "playback.badge.processed": "DIPROSES",
+  "playback.badge.original": "Asal",
+  "playback.badge.processed": "Diproses",
   "playback.player-failed": "Pemain perbandingan tidak dapat dimulakan",
   "playback.sample-failed": "Sampel pratonton tidak dapat dikodkan",
   "playback.zoom-readout": "{0}%",

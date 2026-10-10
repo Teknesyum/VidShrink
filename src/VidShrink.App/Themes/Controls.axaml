@@ -1288,7 +1288,7 @@
         <Setter Property="MinHeight" Value="{StaticResource FieldMinHeight}"/>
         <Setter Property="Background" Value="{StaticResource Surface}"/>
         <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
         <Setter Property="Padding" Value="{StaticResource FieldPadding}"/>
@@ -1377,17 +1377,17 @@
                       Height="{StaticResource SliderTrackHeight}"
                       VerticalAlignment="Center"
                       Background="{StaticResource NeonBlueFill}"
-                      BorderBrush="{StaticResource NeonBlueBorder}"
+                      BorderBrush="{StaticResource NeonBlueBorderStrong}"
                       BorderThickness="{StaticResource BorderThin}"
                       CornerRadius="{StaticResource SliderEmptyTrackRadius}"/>
             </Panel>
           </ControlTemplate>
         </Setter>
         <Style Selector="^.ustunde /template/ Border#RemainingTrack">
-          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+          <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
         </Style>
         <Style Selector="^.odak /template/ Border#RemainingTrack">
-          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+          <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
         </Style>
         <Style Selector="^:disabled /template/ Border#RemainingTrack">
           <Setter Property="Background" Value="Transparent"/>

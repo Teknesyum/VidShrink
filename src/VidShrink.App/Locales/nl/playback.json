@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIGINEEL",
-  "playback.badge.processed": "VERWERKT",
+  "playback.badge.original": "Origineel",
+  "playback.badge.processed": "Verwerkt",
   "playback.player-failed": "De vergelijkingsspeler kon niet starten",
   "playback.sample-failed": "Het voorbeeldfragment kon niet worden gecodeerd",
   "playback.zoom-readout": "{0}%",

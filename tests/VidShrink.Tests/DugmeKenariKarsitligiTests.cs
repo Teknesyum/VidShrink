@@ -15,10 +15,12 @@ namespace VidShrink.Tests;
 /// <summary>
 /// Dugmenin dinlenme kenari zeminden 3:1 ayrilir (WCAG 1.4.11). 6 Ekim 2026'ya kadar kenarli
 /// dugmelerin ortak tabani (<c>GhostButton</c>) kenarini <c>HeaderRestBorder</c> ile ciziyordu:
-/// 36 paletin 36'sinda 1,24-1,85. Kenar <c>NeonBlueBorderStrong</c>'a alindi; palet rengi
-/// uydurulmadi, o yuzden esigi tutmayan paletler <see cref="EsiginAltindaKalanlar"/> icinde
-/// olculen oranla yazili. Olcu sayi tasimaz: dugme temalarini, kenar fircasini ve kalinligini
-/// tema dosyalarindan, rengi palet dosyasindan okur, yari saydam kenari zemine harmanlar.
+/// 36 paletin 36'sinda 1,24-1,85. Kenar <c>NeonBlueBorderStrong</c>'a alindi; %50 alfayla 13
+/// palet esigin altinda kaliyordu. 10 Ekim 2026'da o 13 palette yalniz bu fircanin alfasi, uc
+/// zeminde esigi tutan en kucuk degere cikti (<c>PaletteBuilder.BorderStrongAlpha</c>); renk
+/// degismedi. Artik muaf palet yok. Giris kutusunun ve kaydiricinin bos izinin kenari da ayni
+/// fircadan cizilir. Olcu sayi tasimaz: temalari, kenar fircasini ve kalinligini tema
+/// dosyalarindan, rengi palet dosyasindan okur, yari saydam kenari zemine harmanlar.
 /// Sayilar <c>docs/olcumler/dugme-kenari-karsitlik.md</c>'de.
 /// </summary>
 public sealed class DugmeKenariKarsitligiTests
@@ -29,14 +31,12 @@ public sealed class DugmeKenariKarsitligiTests
     private static readonly string[] DugmeTurleri = ["Button", "ToggleButton"];
     private static readonly string[] Zeminler = ["AppBg", "Surface", "PanelSurface"];
 
-    private static readonly string[] EsiginAltindaKalanlar =
-    [
-        "AyuLight:2.530", "Buz:2.853", "CatppuccinLatte:2.637", "Gece:2.996", "GithubLight:2.578",
-        "GruvboxLight:2.596", "Kagit:2.788", "Kar:2.651", "Keskin:2.716", "Kirik:2.786",
-        "RosePineDawn:2.497", "SolarizedLight:2.557", "Teknesyum:2.634"
-    ];
+    private const string GucluKenar = "NeonBlueBorderStrong";
+    private const string GirisKutusu = "{x:Type TextBox}";
+    private const string BosIz = "SliderEmptyTrack";
 
     private static readonly Regex Basvuru = new(@"^\{(?:StaticResource|DynamicResource)\s+(\w+)\}$", RegexOptions.Compiled);
+    private static readonly Regex GirdiSecici = new(@"^\^(:pointerover|:focus|\.ustunde|\.odak) /template/ Border#\w+$", RegexOptions.Compiled);
     private static readonly Regex DurumSecici = new(@"^\^(:pointerover|:pressed|:checked|\.listening) /template/ Border#\w+$", RegexOptions.Compiled);
     private static readonly XNamespace X = "http://schemas.microsoft.com/winfx/2006/xaml";
     private static readonly ConcurrentDictionary<string, Dictionary<string, XElement>> Sozlukler = new();
@@ -193,6 +193,41 @@ public sealed class DugmeKenariKarsitligiTests
         return PaletKarsitligiTests.Karsitlik(Cizilen(palet, firca, alt).Onalti, alt.Onalti);
     }
 
+    private static double OranAlfayla(string palet, string firca, int alfa, string zemin)
+    {
+        var alt = Zemin(palet, zemin);
+        var (renk, saydamlik) = Firca(palet, firca);
+        var cizilen = Harmanla("#" + alfa.ToString("X2", CultureInfo.InvariantCulture) + renk[3..], saydamlik, alt);
+        return PaletKarsitligiTests.Karsitlik(cizilen.Onalti, alt.Onalti);
+    }
+
+    private static (string Dinlenme, List<(string Durum, string Firca)> Haller) GirdiKenari(string tema)
+    {
+        var oge = Temalar()[tema].Oge;
+        var dinlenme = oge.Elements()
+            .Where(e => e.Name.LocalName == "Setter" && (string?)e.Attribute("Property") == "BorderBrush")
+            .Select(e => Anahtar((string?)e.Attribute("Value")))
+            .FirstOrDefault(a => a is not null)
+            ?? oge.Descendants()
+                .Where(e => e.Name.LocalName == "Border" && e.Attribute("BorderBrush") is not null)
+                .Select(e => Anahtar((string?)e.Attribute("BorderBrush")))
+                .FirstOrDefault(a => a is not null);
+        Assert.True(dinlenme is not null, $"{tema}: dinlenme kenari bulunamadi.");
+
+        var haller = new List<(string, string)>();
+        foreach (var stil in oge.Elements().Where(e => e.Name.LocalName == "Style"))
+        {
+            var secici = GirdiSecici.Match((string?)stil.Attribute("Selector") ?? string.Empty);
+            if (!secici.Success) continue;
+            var firca = stil.Elements()
+                .Where(e => e.Name.LocalName == "Setter" && (string?)e.Attribute("Property") == "BorderBrush")
+                .Select(e => Anahtar((string?)e.Attribute("Value")))
+                .FirstOrDefault(a => a is not null);
+            if (firca is not null) haller.Add((secici.Groups[1].Value, firca));
+        }
+        return (dinlenme!, haller);
+    }
+
     private static string Yaz(double oran) => oran.ToString("0.00", CultureInfo.InvariantCulture);
 
     private static double EnDusuk(string palet, IEnumerable<string> fircalar) =>
@@ -200,7 +235,7 @@ public sealed class DugmeKenariKarsitligiTests
 
     /// <summary>
     /// Kenarli her dugme temasinin dinlenme kenari uc zeminde (pencere, yuzey, panel) 3:1'i gecer.
-    /// Tutmayan paletler burada susmaz, <see cref="EsiginAltindaKalanlarPimli"/> ile adiyla durur.
+    /// Muaf palet yok.
     /// </summary>
     [Theory]
     [MemberData(nameof(Paletler))]
@@ -218,29 +253,102 @@ public sealed class DugmeKenariKarsitligiTests
                 if (oran < Esik) dusuk.Add($"{grup.Key}/{zemin} {Yaz(oran)}");
             }
 
-        var pimli = EsiginAltindaKalanlar.Any(p => p.StartsWith(palet + ":", StringComparison.Ordinal));
-        Assert.True(pimli || dusuk.Count == 0, $"{palet}: dugme kenari {Esik:0.0}:1 altinda — " + string.Join(", ", dusuk));
+        Assert.True(dusuk.Count == 0, $"{palet}: dugme kenari {Esik:0.0}:1 altinda — " + string.Join(", ", dusuk));
     }
 
     /// <summary>
-    /// Esigi tutmayan paletler en dusuk oraniyla yazili. Listeye yeni bir ad dusmesi de, listedeki
-    /// bir paletin duzelmesi ya da oraninin kaymasi da kirmizi verir: palet rengi sahibin karari,
-    /// borc ne buyur ne de sessizce kapanir.
+    /// Katalogdaki her palet olculur ve hicbiri esigin altinda kalmaz: palet klasorleri katalogla
+    /// ayni kumedir, en dusuk oran palet basina dokulur.
     /// </summary>
     [Fact]
-    public void EsiginAltindaKalanlarPimli()
+    public void KatalogdakiHerPaletEsigiGeciyor()
     {
         var fircalar = Dugmeler().Kenarli.Select(k => k.Firca).Distinct().ToArray();
-        var altta = Paletler()
-            .Select(o => (string)o[0])
-            .Select(p => (Palet: p, Oran: EnDusuk(p, fircalar)))
-            .Where(o => o.Oran < Esik)
-            .Select(o => $"{o.Palet}:{o.Oran.ToString("0.000", CultureInfo.InvariantCulture)}")
-            .OrderBy(s => s, StringComparer.Ordinal)
-            .ToArray();
+        Assert.Contains(GucluKenar, fircalar);
 
-        _cikti.WriteLine("3:1 altinda: " + (altta.Length == 0 ? "yok" : string.Join(", ", altta)));
-        Assert.Equal(EsiginAltindaKalanlar.OrderBy(s => s, StringComparer.Ordinal), altta);
+        var olculen = Paletler().Select(o => (string)o[0]).ToArray();
+        Assert.Equal(PaletteCatalog.Names.OrderBy(ad => ad, StringComparer.Ordinal), olculen.OrderBy(ad => ad, StringComparer.Ordinal));
+
+        var altta = new List<string>();
+        foreach (var palet in olculen)
+        {
+            var oran = EnDusuk(palet, fircalar);
+            _cikti.WriteLine($"ENDUSUK\t{palet}\t{oran.ToString("0.000", CultureInfo.InvariantCulture)}");
+            if (oran < Esik) altta.Add($"{palet}:{oran.ToString("0.000", CultureInfo.InvariantCulture)}");
+        }
+
+        Assert.True(altta.Count == 0, "3:1 altinda: " + string.Join(", ", altta));
+    }
+
+    /// <summary>
+    /// Guclu kenarin alfasi standardin %50'sinin altina inmez ve gereginden fazla da artmaz: alfasi
+    /// yukselen palette bir alt deger en kotu zeminde esigin altindadir, yukselmeyen palet %50'de
+    /// esigi zaten tutar. Uretecin panel saydamligi tema belirteciyle aynidir.
+    /// </summary>
+    [Fact]
+    public void GucluKenarAlfasiEsigiTutanEnKucukDeger()
+    {
+        Assert.Equal(VidShrink.PaletteGen.PaletteBuilder.PanelSurfaceOpacity,
+            double.Parse(ThemeSources.Token("PanelSurfaceOpacity"), CultureInfo.InvariantCulture));
+
+        var taban = VidShrink.PaletteGen.PaletteBuilder.BorderStrongBaseAlpha;
+        var yukselen = 0;
+        var yerinde = 0;
+        foreach (var palet in Paletler().Select(o => (string)o[0]))
+        {
+            var alfa = Convert.ToInt32(Firca(palet, GucluKenar).Argb.Substring(1, 2), 16);
+            double EnKotu(int a) => Zeminler.Min(z => OranAlfayla(palet, GucluKenar, a, z));
+            _cikti.WriteLine(string.Create(CultureInfo.InvariantCulture,
+                $"ALFA\t{palet}\t{taban:X2}\t{EnKotu(taban):0.000}\t{alfa:X2}\t{EnKotu(alfa):0.000}"));
+
+            Assert.True(alfa >= taban, $"{palet}: guclu kenar alfasi {alfa:X2}, taban {taban:X2}.");
+            Assert.True(EnKotu(alfa) >= Esik, $"{palet}: alfa {alfa:X2} ile en kotu oran {EnKotu(alfa):0.000}.");
+            if (alfa == taban) { yerinde++; continue; }
+
+            yukselen++;
+            Assert.True(EnKotu(alfa - 1) < Esik,
+                $"{palet}: alfa {alfa:X2} gereginden buyuk, {alfa - 1:X2} de {EnKotu(alfa - 1):0.000} veriyor.");
+        }
+
+        Assert.True(yukselen > 0, "alfasi yukselen palet yok: olcu en kucuk degeri sinamadi.");
+        Assert.True(yerinde > 0, "her paletin alfasi yukselmis: taban degeri sinanmadi.");
+    }
+
+    /// <summary>
+    /// Giris kutusunun ve kaydiricinin bos izinin dinlenme kenari da uc zeminde 3:1'i gecer;
+    /// uzerinde ve odak kenari zeminden 3:1 ayrilir ve dinlenme kenariyla ayni renge cizilmez.
+    /// Ince kenar (<c>NeonBlueBorder</c>) ayni hesapta esigin altinda okunur (olumsuz kontrol).
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Paletler))]
+    public void GirdiKenariZemindenAyriliyor(string palet)
+    {
+        var kusur = new List<string>();
+        foreach (var tema in new[] { GirisKutusu, BosIz })
+        {
+            var (dinlenme, haller) = GirdiKenari(tema);
+            Assert.NotEmpty(haller);
+            foreach (var zemin in Zeminler)
+            {
+                var alt = Zemin(palet, zemin);
+                var oran = Oran(palet, dinlenme, zemin);
+                _cikti.WriteLine($"GIRDI\t{palet}\t{tema}\t{dinlenme}\t{zemin}\t{Yaz(oran)}\t{Yaz(Oran(palet, "NeonBlueBorder", zemin))}");
+                if (oran < Esik) kusur.Add($"{tema} {dinlenme}/{zemin} {Yaz(oran)}");
+
+                foreach (var (durum, firca) in haller)
+                {
+                    var hal = Cizilen(palet, firca, alt).Onalti;
+                    var zemine = PaletKarsitligiTests.Karsitlik(hal, alt.Onalti);
+                    var dinlenmeye = PaletKarsitligiTests.Karsitlik(hal, Cizilen(palet, dinlenme, alt).Onalti);
+                    _cikti.WriteLine($"GIRDIHAL\t{palet}\t{tema}\t{durum}\t{firca}\t{zemin}\t{Yaz(zemine)}\t{Yaz(dinlenmeye)}");
+                    if (zemine < Esik) kusur.Add($"{tema}{durum} {firca}/{zemin} zemine {Yaz(zemine)}");
+                    if (hal == Cizilen(palet, dinlenme, alt).Onalti) kusur.Add($"{tema}{durum} {firca}/{zemin} dinlenme kenariyla ayni");
+                }
+            }
+        }
+
+        Assert.True(Zeminler.All(z => Oran(palet, "NeonBlueBorder", z) < Esik), $"{palet}: ince kenar esigi tutuyor, olumsuz kontrol kor.");
+        Assert.True(kusur.Count == 0, $"{palet}: " + string.Join("; ", kusur));
     }
 
     /// <summary>

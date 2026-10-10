@@ -1,6 +1,6 @@
 {
-  "playback.badge.original": "ORIGINAAL",
-  "playback.badge.processed": "TÖÖDELDUD",
+  "playback.badge.original": "Originaal",
+  "playback.badge.processed": "Töödeldud",
   "playback.player-failed": "Võrdlusmängijat ei saanud käivitada",
   "playback.sample-failed": "Eelvaate näidist ei saanud kodeerida",
   "playback.zoom-readout": "{0}%",
