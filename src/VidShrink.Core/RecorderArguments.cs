@@ -717,6 +717,9 @@ public static class RecorderArguments
         errors.AddRange(ScreenSelectionErrors(request));
         errors.AddRange(CaptureErrors(request));
 
+        if (request.Platform != RecorderPlatform.Windows && LoopbackAudio.Uses(request.Audio?.Inputs))
+            errors.Add("System audio loopback capture is only available on Windows.");
+
         return errors;
     }
 

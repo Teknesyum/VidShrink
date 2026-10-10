@@ -162,6 +162,12 @@ internal partial class RecorderView : UserControl
         TxtNotice.IsVisible = true;
     }
 
+    private void HideNotice()
+    {
+        TxtNotice.IsVisible = false;
+        TxtNotice.Text = string.Empty;
+    }
+
     /// <summary>
     /// Biten kaydın teslimi. Yol her koşulda görünür oluyor — yarım dosyada bile — çünkü
     /// kullanıcının aradığı ilk şey dosyanın nereye yazıldığı.

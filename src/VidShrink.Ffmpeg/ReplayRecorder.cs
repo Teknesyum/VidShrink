@@ -23,10 +23,12 @@ public sealed class ReplayRecorder : IReplayBuffer
     private readonly Process _process;
     private readonly string _folder;
     private readonly Task<string> _stderr;
+    private readonly LoopbackFeed? _feed;
     private bool _stopped;
 
-    private ReplayRecorder(Process process, string folder, int seconds, Task<string> stderr)
+    private ReplayRecorder(Process process, string folder, int seconds, Task<string> stderr, LoopbackFeed? feed)
     {
+        _feed = feed;
         _process = process;
         _folder = folder;
         Seconds = seconds;
@@ -49,13 +51,24 @@ public sealed class ReplayRecorder : IReplayBuffer
         Directory.CreateDirectory(folder);
 
         var list = args.ToList();
+        var feed = LoopbackFeed.Bind(list, SystemAudioCapture.Open);
         var info = ToolLocator.StartInfo(ToolLocator.Ffmpeg, list);
         info.RedirectStandardInput = true;
         var process = new Process { StartInfo = info };
-        process.Start();
+        try
+        {
+            process.Start();
+        }
+        catch
+        {
+            feed?.Dispose();
+            process.Dispose();
+            throw;
+        }
+
         _ = process.StandardOutput.ReadToEndAsync(CancellationToken.None);
         var stderr = process.StandardError.ReadToEndAsync(CancellationToken.None);
-        var recorder = new ReplayRecorder(process, folder, seconds, stderr);
+        var recorder = new ReplayRecorder(process, folder, seconds, stderr, feed);
 
         var clock = Stopwatch.StartNew();
         while (clock.ElapsedMilliseconds < StartTimeoutMs)
@@ -63,6 +76,7 @@ public sealed class ReplayRecorder : IReplayBuffer
             if (process.HasExited)
             {
                 var error = FfmpegRunner.Tail(await stderr);
+                feed?.Dispose();
                 TryDelete(folder);
                 throw new InvalidOperationException($"ffmpeg kayit tamponunu baslatamadi ({process.ExitCode}): {error}");
             }
@@ -158,6 +172,12 @@ public sealed class ReplayRecorder : IReplayBuffer
         }
         finally
         {
+            if (_feed is not null)
+            {
+                _feed.Dispose();
+                await _feed.Completion;
+            }
+
             _process.Dispose();
             TryDelete(_folder);
         }

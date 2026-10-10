@@ -29,7 +29,9 @@ internal partial class RecorderView
 
     /// <summary>
     /// İki kutuyu o anki cihaz listesi ve o anki dille yeniden üretir. Seçim addan
-    /// korunuyor — indeksten değil, çünkü liste yenilenince sıra kayabiliyor.
+    /// korunuyor — indeksten değil, çünkü liste yenilenince sıra kayabiliyor. Ad cihazın
+    /// kendi adıdır, kutuda görünen etiket değil: uygulamanın yakaladığı sistem sesi
+    /// (<see cref="LoopbackAudio.LoopbackName"/>) her dilde başka yazılır.
     /// </summary>
     internal void RefreshAudioBoxes()
     {
@@ -59,18 +61,21 @@ internal partial class RecorderView
 
     private void FillAudioBox(ComboBox box, AudioSourceRole role, string? remembered)
     {
-        var wanted = box.SelectedIndex > 0 ? box.SelectedItem as string : remembered;
+        var wanted = SelectedName(box) ?? remembered;
 
+        var names = new List<string> { string.Empty };
+        names.AddRange(_devices.Where(d => d.Role == role).Select(d => d.Name));
         var items = new List<string> { Say("recorder.audio.none") };
-        items.AddRange(_devices.Where(d => d.Role == role).Select(d => d.Name));
+        items.AddRange(names.Skip(1).Select(AudioLabel));
+        box.Tag = names;
         box.ItemsSource = items;
 
         var index = 0;
         if (!string.IsNullOrEmpty(wanted))
         {
-            for (var i = 1; i < items.Count; i++)
+            for (var i = 1; i < names.Count; i++)
             {
-                if (!string.Equals(items[i], wanted, StringComparison.OrdinalIgnoreCase)) continue;
+                if (!string.Equals(names[i], wanted, StringComparison.OrdinalIgnoreCase)) continue;
                 index = i;
                 break;
             }
@@ -79,15 +84,49 @@ internal partial class RecorderView
         box.SelectedIndex = index;
     }
 
+    /// <summary>Kutuda görünen yazı: uygulamanın yakaladığı sistem sesi çevrilir, cihaz adları olduğu gibi kalır.</summary>
+    internal static string AudioLabel(string name)
+        => string.Equals(name, LoopbackAudio.LoopbackName, StringComparison.Ordinal) ? Say("recorder.audio.loopback") : name;
+
+    private static string? SelectedName(ComboBox box)
+        => box.SelectedIndex > 0 && box.Tag is IReadOnlyList<string> names && box.SelectedIndex < names.Count
+            ? names[box.SelectedIndex]
+            : null;
+
     /// <summary>Kutudan seçilen cihaz; ilk öğe "sessiz" olduğu için indeks 0 seçimsizlik.</summary>
     internal AudioCaptureDevice? Chosen(AudioSourceRole role)
     {
         var box = role == AudioSourceRole.Microphone ? CmbMicrophone : CmbSystemAudio;
-        if (box.SelectedIndex <= 0) return null;
+        if (SelectedName(box) is not { } name) return null;
 
         return _devices.FirstOrDefault(d => d.Role == role
-            && string.Equals(d.Name, box.SelectedItem as string, StringComparison.Ordinal));
+            && string.Equals(d.Name, name, StringComparison.Ordinal));
     }
+
+    private SystemAudioState? _audioShown;
+
+    /// <summary>
+    /// Sistem sesi kaynağının halini bildirim satırına yazar; yalnız hal değişince. Çıkış
+    /// cihazı değişse ya da kaybolsa da kayıt sürüyor, kullanıcı ses izinde ne olduğunu
+    /// buradan öğreniyor. Kaynak ilk cihazına dönünce kendi yazdığı satırı kaldırır.
+    /// </summary>
+    internal void ShowSystemAudio(SystemAudioState? state)
+    {
+        if (state is null || state == _audioShown) return;
+
+        var before = _audioShown is { } shown ? AudioStateKey(shown) : null;
+        _audioShown = state;
+        if (AudioStateKey(state.Value) is { } key) ShowNotice(Say(key));
+        else if (before is not null && NoticeText == Say(before)) HideNotice();
+    }
+
+    internal static string? AudioStateKey(SystemAudioState state) => state switch
+    {
+        SystemAudioState.Capturing => null,
+        SystemAudioState.Switched => "recorder.audio.loopback.switched",
+        SystemAudioState.Unavailable => "recorder.audio.loopback.lost",
+        _ => throw new ArgumentOutOfRangeException(nameof(state), state, null)
+    };
 
     internal AudioCaptureSelection Selection =>
         new(Chosen(AudioSourceRole.Microphone), Chosen(AudioSourceRole.SystemAudio));

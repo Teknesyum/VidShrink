@@ -5,9 +5,10 @@ namespace VidShrink.Core;
 /// <summary>
 /// Cihaz listesini hangi ffmpeg girdi katmanindan okundugu. Arguman uretimi buna gore
 /// dallanir: ayni cihaz adi dshow'da <c>audio=&lt;ad&gt;</c>, avfoundation'da
-/// <c>:&lt;sira&gt;</c>, pulse'ta kaynak adidir.
+/// <c>:&lt;sira&gt;</c>, pulse'ta kaynak adidir. <see cref="WasapiLoopback"/> ffmpeg katmani degil:
+/// sesi uygulama yakalar ve ham PCM olarak borudan verir (<see cref="LoopbackAudio"/>).
 /// </summary>
-public enum CaptureBackend { DirectShow, AvFoundation, PulseAudio }
+public enum CaptureBackend { DirectShow, AvFoundation, PulseAudio, WasapiLoopback }
 
 /// <summary>
 /// Ses girdisinin iki rolu. Rol cihaz adindan siniflandirilir ve <b>secimde dogrulanir</b>:
@@ -331,6 +332,13 @@ public static class AudioCaptureArguments
             CaptureBackend.DirectShow => new[] { "-f", "dshow", "-i", $"audio={EscapeDirectShow(device.Reference)}" },
             CaptureBackend.AvFoundation => new[] { "-f", "avfoundation", "-i", $":{device.Reference}" },
             CaptureBackend.PulseAudio => new[] { "-f", "pulse", "-i", device.Reference },
+            CaptureBackend.WasapiLoopback => new[]
+            {
+                "-f", "s16le",
+                "-ar", LoopbackAudio.SampleRate.ToString(CultureInfo.InvariantCulture),
+                "-ac", LoopbackAudio.Channels.ToString(CultureInfo.InvariantCulture),
+                "-i", device.Reference
+            },
             _ => throw new UnknownCaptureDeviceException($"tanimsiz girdi katmani: {device.Backend}.", device.Name)
         };
     }

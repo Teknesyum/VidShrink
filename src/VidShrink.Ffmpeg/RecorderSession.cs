@@ -141,6 +141,8 @@ public sealed class RecorderSession : IAsyncDisposable
     private readonly SemaphoreSlim _turn = new(1, 1);
 
     private Process? _process;
+    private LoopbackFeed? _feed;
+    private Func<ISystemAudioCapture?> _openSystemAudio = SystemAudioCapture.Open;
     private Task? _stdoutPump;
     private Task? _stderrPump;
     private long _frames;
@@ -184,10 +186,15 @@ public sealed class RecorderSession : IAsyncDisposable
     /// Kaydi baslatir ve ilk ilerleme blogunu bekler. Surec o blogu uretmeden olurse
     /// sebep yutulmaz: ffmpeg'in son satirlariyla <see cref="InvalidOperationException"/>
     /// atilir (olculen ornek: olmayan pencere adi).
+    /// <para>
+    /// <paramref name="systemAudio"/> sistem sesi kaynaginin kapisidir; verilmezse gercek cihaz
+    /// acilir. Yalniz istek loopback girdisi tasiyorsa cagrilir, her parca icin bir kez.
+    /// </para>
     /// </summary>
     public static async Task<RecorderSession> StartAsync(
         RecorderRequest request, string outputPath,
-        IProgress<RecordProgress>? progress = null, CancellationToken ct = default)
+        IProgress<RecordProgress>? progress = null, CancellationToken ct = default,
+        Func<ISystemAudioCapture?>? systemAudio = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(outputPath)) throw new ArgumentException("Output path is required.", nameof(outputPath));
@@ -218,9 +225,16 @@ public sealed class RecorderSession : IAsyncDisposable
             session = new RecorderSession(request, outputPath, progress);
         }
 
+        if (systemAudio is not null) session._openSystemAudio = systemAudio;
         await session.StartSegmentAsync(ct);
         return session;
     }
+
+    /// <summary>
+    /// Sistem sesi kaynaginin hali; kayit loopback girdisi tasimiyorsa ya da o an acik parca
+    /// yoksa <c>null</c>.
+    /// </summary>
+    public SystemAudioState? SystemAudio => _feed?.State;
 
     /// <summary>
     /// Kayit surerken tek karelik bir ekran goruntusu alir. Kaydi kesmiyor: yakalama
@@ -467,11 +481,23 @@ public sealed class RecorderSession : IAsyncDisposable
         };
         args.AddRange(RecorderArguments.Build(segment, path));
 
+        var feed = LoopbackFeed.Bind(args, _openSystemAudio);
         var startInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args);
         startInfo.RedirectStandardInput = true;
 
         var process = new Process { StartInfo = startInfo };
-        process.Start();
+        try
+        {
+            process.Start();
+        }
+        catch
+        {
+            feed?.Dispose();
+            process.Dispose();
+            throw;
+        }
+
+        _feed = feed;
         _process = process;
         _segments.Add(path);
 
@@ -481,7 +507,10 @@ public sealed class RecorderSession : IAsyncDisposable
         {
             string? line;
             while ((line = await process.StandardError.ReadLineAsync()) is not null)
+            {
+                feed?.Anchor(line);
                 _watch.Line(line);
+            }
         }, CancellationToken.None);
 
         var kazanan = await Task.WhenAny(firstBlock.Task, process.WaitForExitAsync(ct), Task.Delay(StartTimeoutMs, ct));
@@ -570,6 +599,13 @@ public sealed class RecorderSession : IAsyncDisposable
 
         if (_stdoutPump is not null) await _stdoutPump;
         if (_stderrPump is not null) await _stderrPump;
+
+        if (_feed is { } feed)
+        {
+            feed.Dispose();
+            await feed.Completion;
+            _feed = null;
+        }
 
         try { _lastExitCode = process.ExitCode; } catch { _lastExitCode = -1; }
         if (_lastExitCode != 0) _partial = true;
