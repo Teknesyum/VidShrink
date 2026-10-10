@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Εγκατάσταση",
-  "main.action.download": "Λήψη",
-  "main.action.downloadinstall": "Λήψη και εγκατάσταση",
+  "main.action.update": "Ενημέρωση",
+  "main.action.later": "Αργότερα",
 
   "main.action.browse": "Αναζήτηση",
   "main.action.cancel": "Ακύρωση",

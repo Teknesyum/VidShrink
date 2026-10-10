@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Cài đặt",
-  "main.action.download": "Tải xuống",
-  "main.action.downloadinstall": "Tải xuống và cài đặt",
+  "main.action.update": "Cập nhật",
+  "main.action.later": "Để sau",
 
   "main.action.browse": "Duyệt",
   "main.action.cancel": "Hủy",

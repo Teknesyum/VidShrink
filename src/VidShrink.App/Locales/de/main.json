@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Installieren",
-  "main.action.download": "Herunterladen",
-  "main.action.downloadinstall": "Herunterladen und installieren",
+  "main.action.update": "Aktualisieren",
+  "main.action.later": "Später",
 
   "main.action.browse": "Durchsuchen",
   "main.action.cancel": "Abbrechen",

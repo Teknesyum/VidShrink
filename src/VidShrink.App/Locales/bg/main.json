@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Инсталирай",
-  "main.action.download": "Изтегли",
-  "main.action.downloadinstall": "Изтегли и инсталирай",
+  "main.action.update": "Обнови",
+  "main.action.later": "По-късно",
 
   "main.action.browse": "Избери",
   "main.action.cancel": "Отказ",

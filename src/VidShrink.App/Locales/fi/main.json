@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Asenna",
-  "main.action.download": "Lataa",
-  "main.action.downloadinstall": "Lataa ja asenna",
+  "main.action.update": "Päivitä",
+  "main.action.later": "Myöhemmin",
 
   "main.action.browse": "Selaa",
   "main.action.cancel": "Peruuta",

@@ -97,7 +97,7 @@ public sealed class GuncellemeRozetiTests
             "main.update.offline", "main.update.starting",
             "main.update.badge", "main.update.downloading", "main.update.ready", "main.update.failed",
             "main.update.log.manifest", "main.update.log.found", "main.update.log.current",
-            "main.update.log.unreachable", "main.action.download", "main.action.downloadinstall"
+            "main.update.log.unreachable", "main.action.install", "main.action.update", "main.action.later"
         };
 
         var diller = Directory.GetDirectories(kok);

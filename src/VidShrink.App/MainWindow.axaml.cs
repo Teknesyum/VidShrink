@@ -2955,8 +2955,8 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Panelin birincil düğmesi. Sahne inmediyse "İndir" olarak indirmeyi başlatır
-    /// (<see cref="StartUpdateDownload"/>); indikten sonra "Yükle" olur ve aşağıdaki kurulum
+    /// Panelin indirme başladıktan sonraki tek düğmesi: inerken "İptal" olarak indirmeyi keser
+    /// (<see cref="CancelUpdateDownload"/>); indikten sonra "Yükle" olur ve aşağıdaki kurulum
     /// akışı yalnız o zaman koşar. Önce hızlı yol denenir (<see cref="YerindeGuncelleme"/>):
     /// değişen dosyalar koşan süreç altında yeniden adlandırılıp yerine konur, yeni sürüm
     /// açılır, bu süreç kapanır. Hızlı yol kilit bulamaz ya da bir dosya taşınamazsa hiçbir

@@ -32,6 +32,10 @@ ship as part of it.
   always intended (it was drawn at 10). On every slider the track is a full pill at both ends and
   the filled and empty parts meet under the handle instead of being cut flat at its edges, so no
   square corner shows at 0% or 100%. Before and after: `docs/olcumler/kaydirici-uclari/`.
+- The update notice has two buttons instead of three: "Update" downloads the new version,
+  installs it and restarts; "Later" closes the notice and leaves the badge in the title bar.
+  The separate "Download" button is gone. While a download runs the two buttons give way to a
+  single "Cancel", then "Install". All 42 languages. Layout standard moved to teknesyum-ui 0.35.0.
 
 ## [1.2.10] - 2026-10-10
 
