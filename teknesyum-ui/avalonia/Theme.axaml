@@ -368,7 +368,7 @@
          <Setter Property="RenderTransform"><ScaleTransform .../></Setter>. -->
     <ControlTheme x:Key="PrimaryButton" TargetType="Button">
       <Setter Property="Background" Value="{StaticResource Renk1}"/>
-      <Setter Property="Foreground" Value="Black"/>
+      <Setter Property="Foreground" Value="{StaticResource OnRenk1}"/>
       <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
       <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
       <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>

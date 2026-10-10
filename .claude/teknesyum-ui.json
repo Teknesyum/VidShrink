@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "plugin": "0.35.0",
+  "plugin": "0.36.0",
   "template": "benim",
   "off": false,
   "targets": [
@@ -134,9 +134,9 @@
     }
   ],
   "uc": {
-    "surum": "0.35.0",
+    "surum": "0.36.0",
     "duzen": "920c61ba2837ca0d",
-    "commit": "cd0c98f680f41d2993f1fd531363d34d4cca5ac6",
+    "commit": "b512fbea99d9da21ff1f2c311492a4f53c9dbd48",
     "tarih": "2026-10-10"
   },
   "pencere": "maximize"
