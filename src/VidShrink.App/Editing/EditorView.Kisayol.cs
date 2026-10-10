@@ -177,6 +177,7 @@ internal partial class EditorView
         ShowGestures();
         AttachProject();
         Timeline.ResumeStrip();
+        WatchClose(TopLevel.GetTopLevel(this));
         if (TopLevel.GetTopLevel(this) is { } top) top.AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
         RemoveHandler(PointerPressedEvent, OnButtonPress);
         AddHandler(PointerPressedEvent, OnButtonPress, RoutingStrategies.Tunnel);

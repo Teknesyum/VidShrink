@@ -266,7 +266,7 @@ public sealed class DuzenleyiciOlcumTests
                 finally
                 {
                     view.Player.Close();
-                    pencere.Close();
+                    DuzenleyiciKapanis.Kapat(pencere, view);
                 }
             });
 
@@ -360,7 +360,7 @@ public sealed class DuzenleyiciOlcumTests
                 finally
                 {
                     view.Player.Close();
-                    pencere.Close();
+                    DuzenleyiciKapanis.Kapat(pencere, view);
                 }
             });
 

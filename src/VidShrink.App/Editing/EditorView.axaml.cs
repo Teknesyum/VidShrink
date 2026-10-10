@@ -29,6 +29,11 @@ internal partial class EditorView : UserControl
     private EdlPreviewDriver? _driver;
     private int _reloads;
     private CancellationTokenSource? _peaks;
+    private TopLevel? _closingRoot;
+
+    internal Func<string, CancellationToken, Task<AudioPeaks>>? PeakReader { get; set; }
+
+    internal Task PeakLoad { get; private set; } = Task.CompletedTask;
 
     public EditorView()
     {
@@ -164,17 +169,38 @@ internal partial class EditorView : UserControl
         _peaks?.Dispose();
         _peaks = new CancellationTokenSource();
         Timeline.Peaks = null;
-        _ = LoadPeaksAsync(path, _peaks.Token);
+        PeakLoad = LoadPeaksAsync(path, _peaks.Token);
+    }
+
+    private void WatchClose(TopLevel? root)
+    {
+        if (ReferenceEquals(root, _closingRoot)) return;
+        if (_closingRoot is { } old) old.Closed -= OnRootClosed;
+        _closingRoot = root;
+        if (root is not null) root.Closed += OnRootClosed;
+    }
+
+    private void OnRootClosed(object? sender, EventArgs e)
+    {
+        WatchClose(null);
+        _peaks?.Cancel();
+        _keyframes?.Cancel();
     }
 
     private async Task LoadPeaksAsync(string path, CancellationToken ct)
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
+        var reader = PeakReader;
+        if (reader is null)
+        {
+            if (!ToolLocator.IsAvailable(out _)) return;
+            var ffmpeg = ToolLocator.Ffmpeg;
+            reader = (source, token) => AudioPeaks.LoadAsync(ffmpeg, source, token);
+        }
+
         AudioPeaks peaks;
         try
         {
-            var ffmpeg = ToolLocator.Ffmpeg;
-            peaks = await Task.Run(() => AudioPeaks.LoadAsync(ffmpeg, path, ct), ct).ConfigureAwait(true);
+            peaks = await Task.Run(() => reader(path, ct), ct).ConfigureAwait(true);
         }
         catch (Exception ex) when (ex is OperationCanceledException or IOException or InvalidOperationException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
         {

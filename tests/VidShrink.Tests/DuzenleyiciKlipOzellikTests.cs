@@ -582,7 +582,7 @@ public sealed class DuzenleyiciKlipOzellikTests
                 }
                 finally
                 {
-                    pencere.Close();
+                    DuzenleyiciKapanis.Kapat(pencere, view);
                 }
             });
         }
