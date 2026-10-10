@@ -1,7 +1,7 @@
 # Motor
 
 VidShrink neyin nasıl kodlanacağına nasıl karar veriyor ve o kararın ölçülmüş değeri ne.
-Bu, [README](../README.tr.md) içindeki *Kaputun altında* bölümünün uzun hâli.
+Bu, [README](../README.tr.md) içindeki *Ölçülmüş Sonuçlar* bölümünün uzun hâli.
 
 ## Nasıl çalışıyor
 

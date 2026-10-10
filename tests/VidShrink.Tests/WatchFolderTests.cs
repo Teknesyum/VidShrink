@@ -301,7 +301,7 @@ public sealed class WatchFolderTests
     [Fact]
     public void HarfDuyarsizAdTablosuIkiBelgedeDeYaziyor()
     {
-        var ingilizce = Belge("README.md");
+        var ingilizce = Belge("docs/cli.md");
         Assert.Contains("Exactly two comparisons follow the rule of the running system", ingilizce, StringComparison.Ordinal);
         Assert.Contains("`Ordinal` on Linux and `OrdinalIgnoreCase` on Windows and macOS.", ingilizce, StringComparison.Ordinal);
         Assert.Contains("default APFS volume, which is case-insensitive but case-preserving", ingilizce, StringComparison.Ordinal);
@@ -312,7 +312,7 @@ public sealed class WatchFolderTests
         Assert.Contains("Rename the skipped file and the watcher picks it up as a new file.", ingilizce, StringComparison.Ordinal);
         Assert.Contains("or was skipped for a name collision", ingilizce, StringComparison.Ordinal);
 
-        var turkce = Belge("README.tr.md");
+        var turkce = Belge("docs/cli.tr.md");
         Assert.Contains("Koşan sistemin kuralına uyan tam iki kıyas var", turkce, StringComparison.Ordinal);
         Assert.Contains("Linux'ta `Ordinal`, Windows ile macOS'ta `OrdinalIgnoreCase`.", turkce, StringComparison.Ordinal);
         Assert.Contains("o bölüm harf duyarsız ama harf koruyordur", turkce, StringComparison.Ordinal);
@@ -331,20 +331,20 @@ public sealed class WatchFolderTests
     [Fact]
     public void IzleBelgesiDurumDosyasiVeCikisKodlariniSabitlerdenPimliyor()
     {
-        foreach (var ad in new[] { "README.md", "README.tr.md" })
+        foreach (var ad in new[] { "docs/cli.md", "docs/cli.tr.md" })
         {
             var belge = Belge(ad);
             Assert.Contains($"`{WatchFolder.StateFileName}`", belge, StringComparison.Ordinal);
             Assert.Contains($"`.vidshrink-izle-", belge, StringComparison.Ordinal);
         }
 
-        var ingilizce = Belge("README.md");
+        var ingilizce = Belge("docs/cli.md");
         Assert.Contains($"`{ExitCodes.InBand}` in band, `{ExitCodes.UnderBand}` under the band", ingilizce, StringComparison.Ordinal);
         Assert.Contains($"`{ExitCodes.CeilingExceeded}` size ceiling exceeded", ingilizce, StringComparison.Ordinal);
         Assert.Contains($"`{ExitCodes.Error}` error, `{ExitCodes.Usage}` wrong usage, `{ExitCodes.Cancelled}` cancelled.", ingilizce, StringComparison.Ordinal);
         Assert.Contains($"Exit codes: `{ExitCodes.InBand}` finished, `{ExitCodes.WatchFailures}` `--bir-kez` finished but at least one file failed or was skipped for a name collision, `{ExitCodes.Error}` error, `{ExitCodes.Usage}` wrong usage, `{ExitCodes.Cancelled}` stopped with Ctrl+C.", ingilizce, StringComparison.Ordinal);
 
-        var turkce = Belge("README.tr.md");
+        var turkce = Belge("docs/cli.tr.md");
         Assert.Contains($"bantta `{ExitCodes.InBand}`, bandın altında `{ExitCodes.UnderBand}`", turkce, StringComparison.Ordinal);
         Assert.Contains($"boy tavanı aşıldığında `{ExitCodes.CeilingExceeded}`", turkce, StringComparison.Ordinal);
         Assert.Contains($"hatada `{ExitCodes.Error}`, yanlış kullanımda `{ExitCodes.Usage}`, iptalde `{ExitCodes.Cancelled}`.", turkce, StringComparison.Ordinal);
@@ -355,7 +355,7 @@ public sealed class WatchFolderTests
     /// <para>A3 denetim borcu: durum dosyasinin adindaki <c>&lt;hash&gt;</c> de isletim
     /// sisteminin harf kuralina bagliydi ama hicbir belgede yazmiyordu — kullanici ayni
     /// klasorun neden bazen tek bazen iki durum dosyasi actigini okuyacagi bir yer yoktu.
-    /// Kural artik iki READMEde yazili ve <b>burada kuralin kendisine</b> bagli: belge
+    /// Kural artik iki CLI belgesinde (<c>docs/cli.md</c>, <c>docs/cli.tr.md</c>) yazili ve <b>burada kuralin kendisine</b> bagli: belge
     /// uzunlugu sabitten okur, ucu de <see cref="WatchFolder.StateKey(string, StringComparison)"/>
     /// ile uc isletim sistemi kolunda olculur.</para>
     /// <para>Ozet kolu <c>StateKey</c>'in <b>kendi</b> asiri yuklemesinden alinir, boylece
@@ -387,13 +387,13 @@ public sealed class WatchFolderTests
                 [..WatchFolder.StateKeyHexLength].ToLowerInvariant(),
             ozet);
 
-        var ingilizce = Belge("README.md");
+        var ingilizce = Belge("docs/cli.md");
         Assert.Contains($"`<hash>` is the first {WatchFolder.StateKeyHexLength} hex characters, lowercase, of the SHA-256", ingilizce, StringComparison.Ordinal);
         Assert.Contains("upper-cased first where the running system ignores case (Windows and macOS), taken as it stands on Linux.", ingilizce, StringComparison.Ordinal);
         Assert.Contains("one shared state file on Windows and macOS and two separate ones on Linux", ingilizce, StringComparison.Ordinal);
         Assert.Contains("`izle-<hash>.json`", ingilizce, StringComparison.Ordinal);
 
-        var turkce = Belge("README.tr.md");
+        var turkce = Belge("docs/cli.tr.md");
         Assert.Contains($"SHA-256'sının ilk {WatchFolder.StateKeyHexLength} onaltılık karakteri, küçük harfle.", turkce, StringComparison.Ordinal);
         Assert.Contains("(Windows ve macOS) önce büyük harfe çevriliyor, Linux'ta olduğu gibi alınıyor.", turkce, StringComparison.Ordinal);
         Assert.Contains("Windows ve macOS'ta tek bir durum dosyasını paylaşıyor, Linux'ta iki ayrı dosya", turkce, StringComparison.Ordinal);
@@ -432,7 +432,7 @@ public sealed class WatchFolderTests
     }
 
     /// <summary>
-    /// README metni <see cref="MetinPimi.Duz"/>'den gecirilerek okunur: iddianin kelimeleri ve
+    /// Belge metni <see cref="MetinPimi.Duz"/>'den gecirilerek okunur: iddianin kelimeleri ve
     /// sirasi pimli kalir, satir sarma konumu pimin parcasi olmaz. Paragraf yeniden sarilinca
     /// davranis degismeden kirmizi veren pimler bu yuzden bosluk normallestirmesine gecti.
     /// </summary>
@@ -771,7 +771,7 @@ public sealed class WatchFolderTests
             Assert.Equal(4, ExitCodes.WatchFailures);
             Assert.Contains($"  {ExitCodes.WatchFailures}   izle --bir-kez", strings["help"], StringComparison.Ordinal);
             Assert.Contains(WatchFolder.StateFileName, strings["help"], StringComparison.Ordinal);
-            var belge = File.ReadAllText(Path.Combine(TipSources.Root, "README.md"));
+            var belge = File.ReadAllText(Path.Combine(TipSources.Root, "docs", "cli.md"));
             Assert.Contains($"`{ExitCodes.WatchFailures}` `--bir-kez` finished but at least one file failed", belge, StringComparison.Ordinal);
         }
     }
