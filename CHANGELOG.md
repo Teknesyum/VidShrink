@@ -7,6 +7,14 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Fixed
+
+- Three buttons that start disabled now say why when hovered: "Cut ranges" and "Split at scene
+  changes" in the editor's silence panel, and "Find foreign-language subtitle" in the Shrink tab.
+  The recorder wizard's four answer buttons, its "same as last time" button and the region
+  editor's hide button carry their accessible name from the markup, not only after the first
+  refresh.
+
 ## [1.2.15] - 2026-10-10
 
 ### Added

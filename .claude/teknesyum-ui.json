@@ -131,6 +131,21 @@
       "rule": "kabuk/sablon-imzasiz",
       "file": "src/VidShrink.Core/UpdateBadge.cs",
       "reason": "Arayüzsüz, 54 satırlık saf mantık (Core katmanı); tarayıcı yalnız adından yakalıyor. scaffold.js durum şablonu bir görünüm üretir ve Core'a giremez; ayrıca 3 durum biliyor (projede 7), sürünen ilerleme, canlı günlük ve indirme sırasında kilitli kapatma yok."
+    },
+    {
+      "rule": "forms/unmeasured-label",
+      "file": "docs/cli.md",
+      "reason": "Bayrak başvurusu: \"The default is 2\" `--modul` bayrağının program varsayılanı, ölçüm iddiası değil; Olcek.cs `VarsayilanModul = 2` ile aynı. Satır numarası yazılmıyor: belge her yeni bayrakla kayıyor ve içindeki her \"default\" bir program varsayılanı."
+    },
+    {
+      "rule": "forms/unmeasured-label",
+      "file": "tools/ikon/README.md",
+      "reason": "\"default\" sözcüğü Edge'in `--default-background-color=00000000` bayrağının adından geliyor; satırda varsayılan ya da ölçüm iddiası yok."
+    },
+    {
+      "rule": "core/component-without-motion",
+      "file": "src/VidShrink.App/Editing/EditorShortcutsPanel.axaml",
+      "reason": "Gövde `Classes=\"disclose\"` taşıyor; giriş canlandırması pencere genelinde MainWindow.axaml'daki `StackPanel.disclose[IsVisible=True]` stilinden geliyor, dosyada ayrıca yazılmıyor."
     }
   ],
   "uc": {

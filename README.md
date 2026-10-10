@@ -250,7 +250,7 @@ written survey of the versions named ([`tarama-2026-10-05.md`](docs/piyasa/taram
 | Quality at equal bytes | Ahead of HandBrake x265 `slow` on 8 of 8 SDR rows and 3 of 4 HDR10 rows | HandBrake bands less in dark scenes |
 | Encoding speed | Slower on 8 of 8 rows; total time 1.64 to 3.73 times HandBrake's | HandBrake |
 | Hardware encoders | NVENC, Quick Sync, AMF; VideoToolbox (macOS) and VAAPI (Linux) by codec lock only, and VAAPI has not yet encoded on real hardware here | HandBrake offers VideoToolbox and VAAPI in its normal encoder list |
-| Several encodes at once | Up to 4, off by default (one job at a time); at most 2 on hardware encoders | HandBrake, FFmpeg Batch |
+| Several encodes at once | Up to 4, off until turned on (one job at a time); at most 2 on hardware encoders | HandBrake, FFmpeg Batch |
 | Screen recording | Screen, window, region, webcam; system audio on Windows | OBS 32.2.2 adds game capture, scenes and streaming |
 | Cutting without re-encoding | Fast and Smart export | LosslessCut 3.69.0 adds merge, track management and EDL/CSV; it calls its own smart cut experimental |
 

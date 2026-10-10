@@ -15,6 +15,11 @@
   <StackPanel Spacing="{StaticResource SpaceMd}">
 
     <StackPanel x:Name="RowLevel" Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
+      <StackPanel.Styles>
+        <Style Selector="Button#BtnHotkeys:pointerover">
+          <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+        </Style>
+      </StackPanel.Styles>
       <RadioButton x:Name="RadSimple"
                    GroupName="RecorderLevel"
                    Content="{loc:Text recorder.level.simple}"
@@ -31,13 +36,7 @@
               Padding="{StaticResource HeaderButtonPadding}"
               IsVisible="{Binding #RadAdvanced.IsChecked}"
               Content="{loc:Text recorder.hotkeys.title}"
-              auto:AutomationProperties.Name="{loc:Text recorder.hotkeys.title}">
-        <Button.Styles>
-          <Style Selector="Button#BtnHotkeys:pointerover">
-            <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
-          </Style>
-        </Button.Styles>
-      </Button>
+              auto:AutomationProperties.Name="{loc:Text recorder.hotkeys.title}"/>
     </StackPanel>
 
     <!--
@@ -348,8 +347,9 @@
                   HorizontalContentAlignment="Center"
                   VerticalContentAlignment="Center"
                   Tag="0"
-                  Click="OnWizardOption">
-            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+                  Click="OnWizardOption"
+                  auto:AutomationProperties.Name="{Binding #TxtWizardOpt0.Text}">
+            <TextBlock x:Name="TxtWizardOpt0" TextWrapping="Wrap" TextAlignment="Center"/>
           </Button>
           <Button x:Name="BtnWizardOpt1"
                   Theme="{StaticResource GhostButton}"
@@ -358,8 +358,9 @@
                   HorizontalContentAlignment="Center"
                   VerticalContentAlignment="Center"
                   Tag="1"
-                  Click="OnWizardOption">
-            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+                  Click="OnWizardOption"
+                  auto:AutomationProperties.Name="{Binding #TxtWizardOpt1.Text}">
+            <TextBlock x:Name="TxtWizardOpt1" TextWrapping="Wrap" TextAlignment="Center"/>
           </Button>
           <Button x:Name="BtnWizardOpt2"
                   Theme="{StaticResource GhostButton}"
@@ -368,8 +369,9 @@
                   HorizontalContentAlignment="Center"
                   VerticalContentAlignment="Center"
                   Tag="2"
-                  Click="OnWizardOption">
-            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+                  Click="OnWizardOption"
+                  auto:AutomationProperties.Name="{Binding #TxtWizardOpt2.Text}">
+            <TextBlock x:Name="TxtWizardOpt2" TextWrapping="Wrap" TextAlignment="Center"/>
           </Button>
           <Button x:Name="BtnWizardOpt3"
                   Theme="{StaticResource GhostButton}"
@@ -378,8 +380,9 @@
                   HorizontalContentAlignment="Center"
                   VerticalContentAlignment="Center"
                   Tag="3"
-                  Click="OnWizardOption">
-            <TextBlock TextWrapping="Wrap" TextAlignment="Center"/>
+                  Click="OnWizardOption"
+                  auto:AutomationProperties.Name="{Binding #TxtWizardOpt3.Text}">
+            <TextBlock x:Name="TxtWizardOpt3" TextWrapping="Wrap" TextAlignment="Center"/>
           </Button>
         </WrapPanel>
 
@@ -387,7 +390,8 @@
           <Button x:Name="BtnWizardSame"
                   Theme="{StaticResource PrimaryButton}"
                   IsVisible="False"
-                  Click="OnWizardSame"/>
+                  Click="OnWizardSame"
+                  auto:AutomationProperties.Name="{loc:Text recorder.wizard.same}"/>
           <Button x:Name="BtnWizardCancel"
                   Theme="{StaticResource GhostButton}"
                   Content="{loc:Text recorder.wizard.cancel}"
