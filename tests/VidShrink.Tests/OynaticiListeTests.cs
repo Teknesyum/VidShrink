@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -6,6 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using VidShrink.App.Playback;
 using Xunit;
@@ -46,8 +48,29 @@ public sealed class OynaticiListeTests
     internal static Point Merkez(TopLevel top, Visual control)
         => control.TranslatePoint(new Point(control.Bounds.Width / 2, control.Bounds.Height / 2), top)!.Value;
 
+    internal static bool Vurur(TopLevel top, Point nokta, Visual? hedef = null)
+        => top.InputHitTest(nokta) is Visual vurulan && (hedef is null || ReferenceEquals(vurulan, hedef) || hedef.IsVisualAncestorOf(vurulan));
+
+    private static void Cizilsin(TopLevel top, Point nokta)
+    {
+        var saat = Stopwatch.StartNew();
+        while (!Vurur(top, nokta) && saat.Elapsed.TotalSeconds < 10)
+        {
+            Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(5);
+        }
+    }
+
+    internal static void Vurulur(TopLevel top, Point nokta, Visual hedef, PlayerView view)
+    {
+        DenetimSurucu.Pump(view, () => Vurur(top, nokta, hedef), 10);
+        var vurulan = top.InputHitTest(nokta);
+        Assert.True(Vurur(top, nokta, hedef), $"{nokta.X:0.#},{nokta.Y:0.#} noktasi {hedef.GetType().Name} yerine {vurulan?.GetType().Name ?? "hicbir seye"} vuruyor");
+    }
+
     internal static void SagTik(Window window, Point nokta)
     {
+        Cizilsin(window, nokta);
         Fareyle(window, RawPointerEventType.Move, nokta, RawInputModifiers.None);
         Fareyle(window, RawPointerEventType.RightButtonDown, nokta, RawInputModifiers.RightMouseButton);
         Fareyle(window, RawPointerEventType.RightButtonUp, nokta, RawInputModifiers.None);
@@ -55,6 +78,7 @@ public sealed class OynaticiListeTests
 
     internal static void SolTik(TopLevel top, Point nokta, PlayerView view)
     {
+        Cizilsin(top, nokta);
         Fareyle(top, RawPointerEventType.Move, nokta, RawInputModifiers.None);
         DenetimSurucu.Wait(view, 0.05);
         Fareyle(top, RawPointerEventType.LeftButtonDown, nokta, RawInputModifiers.LeftMouseButton);

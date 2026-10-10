@@ -157,7 +157,9 @@ public sealed class OynaticiMedyaAdiTests
             var oynuyor = view.IsPlaying;
             var tik = view.LeftClicks;
 
-            L.SolTik(window, L.Merkez(window, baslik), view);
+            var ad = L.Merkez(window, baslik);
+            L.Vurulur(window, ad, baslik, view);
+            L.SolTik(window, ad, view);
             DenetimSurucu.Wait(view, 0.4);
             Assert.Equal(oynuyor, view.IsPlaying);
             Assert.Equal(tik, view.LeftClicks);
@@ -165,6 +167,7 @@ public sealed class OynaticiMedyaAdiTests
 
             var surface = view.FindControl<Panel>("Surface")!;
             var bos = surface.TranslatePoint(new Point(surface.Bounds.Width / 2, surface.Bounds.Height / 2), window)!.Value;
+            L.Vurulur(window, bos, surface, view);
             L.SolTik(window, bos, view);
             DenetimSurucu.Pump(view, () => view.IsPlaying != oynuyor, 2);
             Assert.NotEqual(oynuyor, view.IsPlaying);
