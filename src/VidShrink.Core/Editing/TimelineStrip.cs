@@ -1,6 +1,6 @@
 namespace VidShrink.Core.Editing;
 
-public readonly record struct StripTile(long Time, long SourceTime);
+public readonly record struct StripTile(long Time, long SourceTime, int Source = 0);
 
 /// <summary>
 /// Duzenleyici cizelgesinin anahtar kare centikleri ve kucuk resim seridi icin saf hesap:
@@ -22,8 +22,9 @@ public static class TimelineStrip
     /// <summary>
     /// Sirali kaynak tick'lerinden gorunen araliga dusenlerin cizelge anlari, artan sirada. Silinmis
     /// kaynaktaki kare cizelgede yoktur; ayni kaynagi iki kez gosteren cizelgede kare iki kez gorunur.
+    /// Yalniz <paramref name="sourceIndex"/> sirali kaynagin parcalari sayilir.
     /// </summary>
-    public static IReadOnlyList<long> Keyframes(EditTimeline timeline, IReadOnlyList<long> source, long viewStart, long viewEnd)
+    public static IReadOnlyList<long> Keyframes(EditTimeline timeline, IReadOnlyList<long> source, long viewStart, long viewEnd, int sourceIndex = 0)
     {
         ArgumentNullException.ThrowIfNull(timeline);
         ArgumentNullException.ThrowIfNull(source);
@@ -36,7 +37,7 @@ public static class TimelineStrip
             var length = clip.TimelineLength;
             var end = start + length;
             if (start > viewEnd) break;
-            if (end > viewStart)
+            if (end > viewStart && clip.Source == sourceIndex)
             {
                 var near = clip.ToSource(Math.Clamp(viewStart - start, 0, length - 1));
                 var far = clip.ToSource(Math.Clamp(viewEnd - start, 0, length - 1));
@@ -104,7 +105,7 @@ public static class TimelineStrip
             }
 
             if (clip >= clips.Count) break;
-            tiles.Add(new StripTile(time, clips[clip].ToSource(time - start)));
+            tiles.Add(new StripTile(time, clips[clip].ToSource(time - start), clips[clip].Source));
         }
 
         return tiles;

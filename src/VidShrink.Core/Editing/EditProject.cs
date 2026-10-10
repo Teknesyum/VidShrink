@@ -26,21 +26,28 @@ public sealed record SourceStamp(string Path, long Size, long ModifiedUtcTicks)
     public bool Matches(SourceStamp other) => Size == other.Size && ModifiedUtcTicks == other.ModifiedUtcTicks;
 }
 
+/// <summary>Sonradan eklenen kaynagin kimligi ve suresi; sirasi listedeki yerinin bir fazlasidir.</summary>
+public sealed record ExtraSource(SourceStamp Stamp, long Duration);
+
 /// <summary>
 /// Duzenleyicinin diske yazilan durumu: kaynak kimligi, kesim listesi, klip ayarlari ve metin
 /// katmani. Geri al / ileri al yigini yazilmaz. Okuma hicbir kosulda firlatmaz: bozuk dosya,
 /// eksik alan, gecersiz deger ve <see cref="CurrentVersion"/>'dan buyuk surum <c>null</c> doner.
+/// Tek kaynakli proje surum 1 olarak yazilir ve eski surumle ayni baytlari tasir; ek kaynak varsa
+/// surum 2 yazilir (<c>sources</c> dizisi ve parca basina <c>source</c>).
 /// </summary>
 public sealed class EditProject
 {
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     public const string Extension = ".vsproj.json";
 
     private static readonly UTF8Encoding Utf8 = new(false);
 
-    private EditProject(SourceStamp source, long sourceDuration, IReadOnlyList<EditClip> clips, IReadOnlyList<TextLayer> texts, string? exportMode)
+    private EditProject(SourceStamp source, long sourceDuration, IReadOnlyList<EditClip> clips, IReadOnlyList<TextLayer> texts, string? exportMode,
+        IReadOnlyList<ExtraSource> extraSources)
     {
+        ExtraSources = extraSources;
         Source = source;
         SourceDuration = sourceDuration;
         Clips = clips;
@@ -58,16 +65,31 @@ public sealed class EditProject
 
     public string? ExportMode { get; }
 
-    public static EditProject From(SourceStamp source, EditTimeline timeline, string? exportMode = null)
+    public IReadOnlyList<ExtraSource> ExtraSources { get; }
+
+    /// <summary>
+    /// <paramref name="extraSources"/> cizelgenin ek kaynaklariyla ayni sirada ve ayni sayida olmalidir.
+    /// </summary>
+    public static EditProject From(SourceStamp source, EditTimeline timeline, string? exportMode = null, IReadOnlyList<SourceStamp>? extraSources = null)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(timeline);
-        var duration = timeline.SourceDuration ?? timeline.Clips.Select(c => c.SourceEnd).DefaultIfEmpty(1).Max();
-        return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode);
+        var stamps = extraSources ?? Array.Empty<SourceStamp>();
+        if (stamps.Count != timeline.ExtraSources.Count)
+            throw new ArgumentException("Her ek kaynaga bir kimlik gerekir", nameof(extraSources));
+        var duration = timeline.SourceDuration ?? timeline.Clips.Where(c => c.Source == 0).Select(c => c.SourceEnd).DefaultIfEmpty(1).Max();
+        var extras = stamps.Select((stamp, i) => new ExtraSource(stamp, timeline.ExtraSources[i])).ToArray();
+        return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode, extras);
     }
 
-    /// <summary>Kayitli her parca <paramref name="sourceDuration"/> icinde kaliyorsa <c>true</c>.</summary>
-    public bool FitsIn(long sourceDuration) => Clips.All(c => c.SourceEnd <= sourceDuration);
+    /// <summary>
+    /// Ilk kaynagin parcalari <paramref name="sourceDuration"/> icinde, ek kaynaklarin parcalari kendi
+    /// kayitli surelerinin icinde kaliyorsa <c>true</c>.
+    /// </summary>
+    public bool FitsIn(long sourceDuration)
+        => Clips.All(c => c.Source == 0
+            ? c.SourceEnd <= sourceDuration
+            : c.Source <= ExtraSources.Count && c.SourceEnd <= ExtraSources[c.Source - 1].Duration);
 
     public string ToJson()
     {
@@ -75,13 +97,29 @@ public sealed class EditProject
         using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true }))
         {
             writer.WriteStartObject();
-            writer.WriteNumber("version", CurrentVersion);
+            writer.WriteNumber("version", ExtraSources.Count == 0 ? 1 : CurrentVersion);
             writer.WriteStartObject("source");
             writer.WriteString("path", Source.Path);
             writer.WriteNumber("size", Source.Size);
             writer.WriteNumber("modifiedUtcTicks", Source.ModifiedUtcTicks);
             writer.WriteEndObject();
             writer.WriteNumber("sourceDuration", SourceDuration);
+            if (ExtraSources.Count > 0)
+            {
+                writer.WriteStartArray("sources");
+                foreach (var extra in ExtraSources)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteString("path", extra.Stamp.Path);
+                    writer.WriteNumber("size", extra.Stamp.Size);
+                    writer.WriteNumber("modifiedUtcTicks", extra.Stamp.ModifiedUtcTicks);
+                    writer.WriteNumber("duration", extra.Duration);
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+            }
+
             if (ExportMode is { Length: > 0 } mode) writer.WriteString("exportMode", mode);
 
             writer.WriteStartArray("clips");
@@ -117,14 +155,27 @@ public sealed class EditProject
             var texts = root.TryGetProperty("texts", out var layers) ? layers.EnumerateArray().Select(ReadText).ToArray() : Array.Empty<TextLayer>();
             var mode = root.TryGetProperty("exportMode", out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
 
-            _ = new EditTimeline(clips, duration, texts);
-            var project = new EditProject(stamp, duration, clips, texts, mode);
+            var extras = version >= 2 && root.TryGetProperty("sources", out var list)
+                ? list.EnumerateArray().Select(ReadExtra).ToArray()
+                : Array.Empty<ExtraSource>();
+
+            _ = new EditTimeline(clips, duration, texts, extras.Select(e => e.Duration));
+            var project = new EditProject(stamp, duration, clips, texts, mode, extras);
             return project.FitsIn(duration) ? project : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or FormatException or ArgumentException or OverflowException)
         {
             return null;
         }
+    }
+
+    private static ExtraSource ReadExtra(JsonElement item)
+    {
+        var path = item.GetProperty("path").GetString();
+        if (string.IsNullOrWhiteSpace(path)) throw new FormatException("Kaynak yolu bos");
+        return new ExtraSource(
+            new SourceStamp(path, item.GetProperty("size").GetInt64(), item.GetProperty("modifiedUtcTicks").GetInt64()),
+            item.GetProperty("duration").GetInt64());
     }
 
     public static EditProject? Read(string path)
@@ -208,6 +259,7 @@ public sealed class EditProject
         writer.WriteNumber("end", clip.SourceEnd);
         writer.WriteNumber("speed", clip.Speed);
         writer.WriteBoolean("reversed", clip.Reversed);
+        if (clip.Source != 0) writer.WriteNumber("source", clip.Source);
         var effects = clip.Effects;
         if (!effects.IsNeutral)
         {
@@ -232,7 +284,10 @@ public sealed class EditProject
     private static EditClip ReadClip(JsonElement item)
     {
         var clip = new EditClip(item.GetProperty("start").GetInt64(), item.GetProperty("end").GetInt64(),
-            item.GetProperty("speed").GetDecimal(), item.GetProperty("reversed").GetBoolean());
+            item.GetProperty("speed").GetDecimal(), item.GetProperty("reversed").GetBoolean())
+        {
+            Source = item.TryGetProperty("source", out var source) ? source.GetInt32() : 0
+        };
         if (!item.TryGetProperty("effects", out var e)) return clip;
 
         var effects = new ClipEffects

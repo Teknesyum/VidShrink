@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} plages coupées.",
   "editor.scene.split": "Scinder aux changements de scène",
   "editor.scene.none": "Aucun changement de scène trouvé.",
-  "editor.scene.done": "Scindé à {0} changements de scène."
+  "editor.scene.done": "Scindé à {0} changements de scène.",
+  "editor.source.add": "Ajouter une source",
+  "editor.source.failed": "Impossible d'ajouter {0} : pas de vidéo ou fichier illisible.",
+  "editor.export.merge-full": "Plusieurs sources sont fusionnées, la vidéo entière est donc réencodée."
 }

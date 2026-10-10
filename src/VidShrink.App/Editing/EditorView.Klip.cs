@@ -190,7 +190,7 @@ internal partial class EditorView
         if (_model is not { } model || _source is not { } source || _driver is not { } driver || Preview.Engine is not { } engine) return;
         try
         {
-            var preview = new EdlPreview(source, model);
+            var preview = new EdlPreview(SourcePaths, model);
             await driver.RestyleAsync(preview, LookFor(preview, engine)).ConfigureAwait(true);
             _restyles++;
         }

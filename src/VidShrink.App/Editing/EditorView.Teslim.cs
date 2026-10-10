@@ -173,7 +173,8 @@ internal partial class EditorView
 
     internal async Task<bool> ExportToAsync(string output, bool confirmReverse = false)
     {
-        if (_model is not { Clips.Count: > 0 } model || _source is not { } source || Exporting) return false;
+        if (_model is not { Clips.Count: > 0 } model || _source is null || Exporting) return false;
+        var sources = SourcePaths;
         var snapshot = new EditTimeline(model.Clips.ToArray(), texts: model.Texts.ToArray());
         var key = SaveKey(snapshot);
         _pendingPlan = null;
@@ -186,8 +187,8 @@ internal partial class EditorView
         try
         {
             plans = ExportSeparately
-                ? await EditExportRunner.PrepareSegmentsAsync(source, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata).ConfigureAwait(true)
-                : new[] { await EditExportRunner.PrepareAsync(source, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata).ConfigureAwait(true) };
+                ? await EditExportRunner.PrepareSegmentsAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata).ConfigureAwait(true)
+                : new[] { await EditExportRunner.PrepareAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata).ConfigureAwait(true) };
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.Text.Json.JsonException or System.ComponentModel.Win32Exception)
         {
@@ -360,7 +361,8 @@ internal partial class EditorView
         var plan = plans[0];
         var motion = plans.SelectMany(p => p.MotionClips).Distinct().OrderBy(i => i).ToArray();
         var lines = new List<string>();
-        if (plan.TextForcedFull) lines.Add(Strings.Get("editor.export.text-full"));
+        if (plan.MergeForcedFull) lines.Add(Strings.Get("editor.export.merge-full"));
+        else if (plan.TextForcedFull) lines.Add(Strings.Get("editor.export.text-full"));
         else if (plan.EffectsForcedFull) lines.Add(Strings.Get("editor.export.effects-full"));
         else if (plan.AudioForcedFull) lines.Add(Strings.Get("editor.export.audio-full"));
         else if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
@@ -373,7 +375,7 @@ internal partial class EditorView
     private static string ClipNumbers(IEnumerable<int> indexes) => string.Join(", ", indexes.Select(i => (i + 1).ToString(Strings.Culture)));
 
     private static string Fingerprint(EditTimeline model)
-        => string.Join(";", model.Clips.Select(c => $"{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}"))
+        => string.Join(";", model.Clips.Select(c => $"{c.Source}:{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}"))
            + "|" + string.Join(";", model.Texts.Select(t => $"{t.Start}-{t.End}-{t.Size}-{t.Color}-{t.Bold}-{t.Italic}-{t.FontName}-{t.FadeIn}-{t.FadeOut}-"
                + string.Join(",", t.Keyframes.Select(k => $"{k.Offset}:{k.X}:{k.Y}")) + "-" + t.Text.Length + ":" + t.Text));
 

@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} Bereiche geschnitten.",
   "editor.scene.split": "An Szenenwechseln teilen",
   "editor.scene.none": "Keine Szenenwechsel gefunden.",
-  "editor.scene.done": "An {0} Szenenwechseln geteilt."
+  "editor.scene.done": "An {0} Szenenwechseln geteilt.",
+  "editor.source.add": "Quelle hinzufügen",
+  "editor.source.failed": "{0} ließ sich nicht hinzufügen: kein Video oder nicht lesbar.",
+  "editor.export.merge-full": "Mehrere Quellen werden zusammengefügt, daher wird das ganze Video neu kodiert."
 }

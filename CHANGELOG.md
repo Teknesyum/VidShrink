@@ -7,6 +7,20 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- The editor can join several files into one output. "Add Source" in the editor toolbar and the
+  timeline menu, or dropping files onto an open timeline, appends each file to the end of the
+  timeline as one clip; dropping several files on an empty editor opens the first and appends
+  the rest. Sources may differ in resolution, frame rate and codec: a timeline that uses more
+  than one source is always re-encoded in a single pass to the first source's frame size and
+  frame rate, whatever export mode is selected, and the status line says so. A source without
+  audio contributes silence. A timeline that uses only one source exports exactly as before.
+  Project files with extra sources are written as version 2; single-source projects are still
+  written as version 1 and old project files open unchanged. Not in this change: transitions,
+  more than one track, audio mixing. Silence and scene detection still scan only the first
+  source, and preview playback across sources of different codecs was not measured.
+
 ## [1.2.12] - 2026-10-10
 
 ### Added

@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} intervalli tagliati.",
   "editor.scene.split": "Dividi ai cambi di scena",
   "editor.scene.none": "Nessun cambio di scena trovato.",
-  "editor.scene.done": "Diviso in {0} cambi di scena."
+  "editor.scene.done": "Diviso in {0} cambi di scena.",
+  "editor.source.add": "Aggiungi sorgente",
+  "editor.source.failed": "Impossibile aggiungere {0}: non contiene video o non è leggibile.",
+  "editor.export.merge-full": "Vengono unite più sorgenti, quindi l'intero video viene ricodificato."
 }

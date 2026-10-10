@@ -95,5 +95,8 @@
   "editor.silence.cut": "已剪掉 {0} 个区间。",
   "editor.scene.split": "在场景切换处分割",
   "editor.scene.none": "未找到场景切换。",
-  "editor.scene.done": "已在 {0} 处场景切换分割。"
+  "editor.scene.done": "已在 {0} 处场景切换分割。",
+  "editor.source.add": "添加来源",
+  "editor.source.failed": "无法添加 {0}：没有视频或无法读取。",
+  "editor.export.merge-full": "正在合并多个来源，因此将重新编码整个视频。"
 }

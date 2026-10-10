@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} טווחים נחתכו.",
   "editor.scene.split": "פיצול בחילופי סצנות",
   "editor.scene.none": "לא נמצאו חילופי סצנות.",
-  "editor.scene.done": "פוצל ב-{0} חילופי סצנות."
+  "editor.scene.done": "פוצל ב-{0} חילופי סצנות.",
+  "editor.source.add": "הוספת מקור",
+  "editor.source.failed": "לא ניתן להוסיף את {0}: אין בו וידאו או שלא ניתן לקרוא אותו.",
+  "editor.export.merge-full": "כמה מקורות ממוזגים, ולכן כל הסרטון מקודד מחדש."
 }

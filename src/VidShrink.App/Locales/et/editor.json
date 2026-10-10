@@ -95,5 +95,8 @@
   "editor.silence.cut": "Lõigati {0} vahemikku.",
   "editor.scene.split": "Tükelda stseenivahetustel",
   "editor.scene.none": "Stseenivahetusi ei leitud.",
-  "editor.scene.done": "Tükeldati {0} stseenivahetusel."
+  "editor.scene.done": "Tükeldati {0} stseenivahetusel.",
+  "editor.source.add": "Lisa allikas",
+  "editor.source.failed": "{0} lisamine ebaõnnestus: selles pole videot või seda ei saa lugeda.",
+  "editor.export.merge-full": "Ühendatakse mitu allikat, seetõttu kodeeritakse kogu video uuesti."
 }

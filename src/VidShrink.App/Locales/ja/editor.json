@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} 件の区間をカットしました。",
   "editor.scene.split": "シーンの切り替わりで分割",
   "editor.scene.none": "シーンの切り替わりが見つかりません。",
-  "editor.scene.done": "{0} 件のシーンの切り替わりで分割しました。"
+  "editor.scene.done": "{0} 件のシーンの切り替わりで分割しました。",
+  "editor.source.add": "ソースを追加",
+  "editor.source.failed": "{0} を追加できませんでした。映像がないか、読み込めません。",
+  "editor.export.merge-full": "複数のソースを結合するため、動画全体を再エンコードします。"
 }

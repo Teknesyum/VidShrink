@@ -342,12 +342,12 @@ public sealed class DuzenleyiciMetinTests
 
         var metinli = EditTimeline.FromSource(S(2));
         metinli.AddText(new TextLayer("HH", 0, S(2)) { Size = 20 });
-        var plan = await EditExportRunner.PrepareAsync(kaynak, metinli, ExportMode.Fast, Path.Combine(klasor, "metinli.mp4"), 8 * Gb);
+        var plan = await EditExportRunner.PrepareAsync(new[] { kaynak }, metinli, ExportMode.Fast, Path.Combine(klasor, "metinli.mp4"), 8 * Gb);
         Assert.Equal(ExportMode.Full, plan.Effective);
         Assert.True(plan.TextForcedFull);
         await EditExportRunner.RunAsync(IkiIsParcacigi(plan), null);
 
-        var yalinPlan = await EditExportRunner.PrepareAsync(kaynak, EditTimeline.FromSource(S(2)), ExportMode.Full, Path.Combine(klasor, "yalin.mp4"), 8 * Gb);
+        var yalinPlan = await EditExportRunner.PrepareAsync(new[] { kaynak }, EditTimeline.FromSource(S(2)), ExportMode.Full, Path.Combine(klasor, "yalin.mp4"), 8 * Gb);
         Assert.Null(yalinPlan.SubtitlePath);
         await EditExportRunner.RunAsync(IkiIsParcacigi(yalinPlan), null);
 

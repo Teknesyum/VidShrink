@@ -95,5 +95,8 @@
   "editor.silence.cut": "Wycięto zakresów: {0}.",
   "editor.scene.split": "Podziel na zmianach sceny",
   "editor.scene.none": "Nie znaleziono zmian sceny.",
-  "editor.scene.done": "Podzielono na zmianach sceny: {0}."
+  "editor.scene.done": "Podzielono na zmianach sceny: {0}.",
+  "editor.source.add": "Dodaj źródło",
+  "editor.source.failed": "Nie udało się dodać {0}: brak obrazu lub pliku nie można odczytać.",
+  "editor.export.merge-full": "Łączonych jest kilka źródeł, więc cały film jest kodowany ponownie."
 }

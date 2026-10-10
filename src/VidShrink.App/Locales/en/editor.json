@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} ranges cut.",
   "editor.scene.split": "Split at scene changes",
   "editor.scene.none": "No scene changes found.",
-  "editor.scene.done": "Split at {0} scene changes."
+  "editor.scene.done": "Split at {0} scene changes.",
+  "editor.source.add": "Add source",
+  "editor.source.failed": "Couldn't add {0}: it has no video or can't be read.",
+  "editor.export.merge-full": "More than one source is merged, so the whole video is re-encoded."
 }

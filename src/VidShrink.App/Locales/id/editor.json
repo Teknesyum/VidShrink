@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} rentang dipotong.",
   "editor.scene.split": "Pisahkan di pergantian adegan",
   "editor.scene.none": "Pergantian adegan tidak ditemukan.",
-  "editor.scene.done": "Dipisahkan di {0} pergantian adegan."
+  "editor.scene.done": "Dipisahkan di {0} pergantian adegan.",
+  "editor.source.add": "Tambah sumber",
+  "editor.source.failed": "{0} tidak dapat ditambahkan: tidak ada video atau tidak dapat dibaca.",
+  "editor.export.merge-full": "Beberapa sumber digabung, jadi seluruh video dienkode ulang."
 }

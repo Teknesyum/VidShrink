@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
@@ -92,7 +93,9 @@ internal partial class EditorView
     }
 
     private EditProject? CurrentProject()
-        => _model is { } model && _stamp is { } stamp ? EditProject.From(stamp, model, SelectedExportMode.ToString()) : null;
+        => _model is { } model && _stamp is { } stamp && ExtraStamps() is { } extras
+            ? EditProject.From(stamp, model, SelectedExportMode.ToString(), extras)
+            : null;
 
     private EditTimeline OpenedTimeline(string path, long sourceDuration, EditProject? given)
     {
@@ -105,6 +108,17 @@ internal partial class EditorView
         {
             ShowProjectStatus("StatusWarning", Strings.Get("editor.project.stale"));
             return model;
+        }
+
+        if (project.ExtraSources.Count > 0)
+        {
+            if (!AdoptSources(project.ExtraSources))
+            {
+                ShowProjectStatus("StatusWarning", Strings.Get("editor.project.stale"));
+                return model;
+            }
+
+            model = new EditTimeline(model.Clips, sourceDuration, extraSources: project.ExtraSources.Select(extra => extra.Duration));
         }
 
         if (!model.Restore(project.Clips, project.Texts)) return model;
@@ -151,7 +165,7 @@ internal partial class EditorView
             return false;
         }
 
-        if (CurrentMedia.SamePath(source, _source) && _model is { } model)
+        if (CurrentMedia.SamePath(source, _source) && _model is { } model && project.ExtraSources.Count == 0)
         {
             if (!project.FitsIn(model.SourceDuration ?? project.SourceDuration))
             {

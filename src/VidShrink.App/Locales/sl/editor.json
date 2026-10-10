@@ -95,5 +95,8 @@
   "editor.silence.cut": "Izrezanih obsegov: {0}.",
   "editor.scene.split": "Razdeli ob menjavah prizora",
   "editor.scene.none": "Ni najdenih menjav prizora.",
-  "editor.scene.done": "Razdeljeno ob menjavah prizora: {0}."
+  "editor.scene.done": "Razdeljeno ob menjavah prizora: {0}.",
+  "editor.source.add": "Dodaj vir",
+  "editor.source.failed": "{0} ni bilo mogoče dodati: nima videa ali ga ni mogoče prebrati.",
+  "editor.export.merge-full": "Združuje se več virov, zato se celoten video znova kodira."
 }

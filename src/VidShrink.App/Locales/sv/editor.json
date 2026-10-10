@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} intervall klipptes.",
   "editor.scene.split": "Dela vid scenbyten",
   "editor.scene.none": "Inga scenbyten hittades.",
-  "editor.scene.done": "Delat vid {0} scenbyten."
+  "editor.scene.done": "Delat vid {0} scenbyten.",
+  "editor.source.add": "Lägg till källa",
+  "editor.source.failed": "Det gick inte att lägga till {0}: den saknar video eller kan inte läsas.",
+  "editor.export.merge-full": "Flera källor slås ihop, så hela videon kodas om."
 }

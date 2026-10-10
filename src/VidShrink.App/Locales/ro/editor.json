@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} intervale tăiate.",
   "editor.scene.split": "Împarte la schimbările de scenă",
   "editor.scene.none": "Nu s-au găsit schimbări de scenă.",
-  "editor.scene.done": "Împărțit la {0} schimbări de scenă."
+  "editor.scene.done": "Împărțit la {0} schimbări de scenă.",
+  "editor.source.add": "Adaugă sursă",
+  "editor.source.failed": "{0} nu a putut fi adăugat: nu are video sau nu poate fi citit.",
+  "editor.export.merge-full": "Se unesc mai multe surse, așa că întregul video este recodat."
 }

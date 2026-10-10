@@ -95,5 +95,8 @@
   "editor.silence.cut": "Vystrihnuté úseky: {0}.",
   "editor.scene.split": "Rozdeliť pri zmenách scény",
   "editor.scene.none": "Nenašli sa žiadne zmeny scény.",
-  "editor.scene.done": "Rozdelené pri zmenách scény: {0}."
+  "editor.scene.done": "Rozdelené pri zmenách scény: {0}.",
+  "editor.source.add": "Pridať zdroj",
+  "editor.source.failed": "{0} sa nepodarilo pridať: nemá obraz alebo sa nedá prečítať.",
+  "editor.export.merge-full": "Spája sa viac zdrojov, preto sa celé video kóduje znova."
 }

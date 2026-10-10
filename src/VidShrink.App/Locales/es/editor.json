@@ -95,5 +95,8 @@
   "editor.silence.cut": "Se cortaron {0} intervalos.",
   "editor.scene.split": "Dividir en los cambios de escena",
   "editor.scene.none": "No se encontraron cambios de escena.",
-  "editor.scene.done": "Se dividió en {0} cambios de escena."
+  "editor.scene.done": "Se dividió en {0} cambios de escena.",
+  "editor.source.add": "Añadir fuente",
+  "editor.source.failed": "No se pudo añadir {0}: no tiene vídeo o no se puede leer.",
+  "editor.export.merge-full": "Se unen varias fuentes, por eso se recodifica todo el vídeo."
 }

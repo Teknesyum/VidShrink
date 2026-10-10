@@ -95,5 +95,8 @@
   "editor.silence.cut": "تم قص {0} نطاق.",
   "editor.scene.split": "تقسيم عند تغيّر المشاهد",
   "editor.scene.none": "لم يُعثر على تغيّر في المشاهد.",
-  "editor.scene.done": "تم التقسيم عند {0} من تغيّرات المشاهد."
+  "editor.scene.done": "تم التقسيم عند {0} من تغيّرات المشاهد.",
+  "editor.source.add": "إضافة مصدر",
+  "editor.source.failed": "تعذّرت إضافة {0}: لا يحتوي على فيديو أو لا يمكن قراءته.",
+  "editor.export.merge-full": "يُدمج أكثر من مصدر، لذلك يُعاد ترميز الفيديو كاملًا."
 }

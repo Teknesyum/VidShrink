@@ -21,13 +21,23 @@ public sealed class EdlPreview
     public const string Header = "# mpv EDL v0";
 
     public EdlPreview(string sourcePath, EditTimeline timeline)
+        : this(new[] { sourcePath }, timeline)
     {
-        ArgumentException.ThrowIfNullOrEmpty(sourcePath);
+    }
+
+    /// <summary>Cok kaynakli onizleme: her parca kendi kaynaginin yolundan okunur; yollar kaynak sirasiyla verilir.</summary>
+    public EdlPreview(IReadOnlyList<string> sourcePaths, EditTimeline timeline)
+    {
+        ArgumentNullException.ThrowIfNull(sourcePaths);
         ArgumentNullException.ThrowIfNull(timeline);
+        if (sourcePaths.Count == 0 || sourcePaths.Any(string.IsNullOrEmpty))
+            throw new ArgumentException("Kaynak yolu bos", nameof(sourcePaths));
         if (timeline.Clips.Count == 0)
             throw new ArgumentException("Cizelgede parca yok", nameof(timeline));
+        if (timeline.Clips.Any(c => c.Source >= sourcePaths.Count))
+            throw new ArgumentException("Parcanin kaynagi yol listesinde yok", nameof(timeline));
 
-        SourcePath = sourcePath;
+        SourcePaths = sourcePaths.ToArray();
         var parts = new List<EdlPart>(timeline.Clips.Count);
         long timelineStart = 0;
         long edlStart = 0;
@@ -44,7 +54,7 @@ public sealed class EdlPreview
         EdlDuration = edlStart;
     }
 
-    public string SourcePath { get; }
+    public IReadOnlyList<string> SourcePaths { get; }
 
     public IReadOnlyList<EdlPart> Parts { get; }
 
@@ -110,5 +120,5 @@ public sealed class EdlPreview
     }
 
     private string Entry(EdlPart part)
-        => Escape(SourcePath) + "," + Seconds(part.Clip.SourceStart) + "," + Seconds(part.EdlLength);
+        => Escape(SourcePaths[part.Clip.Source]) + "," + Seconds(part.Clip.SourceStart) + "," + Seconds(part.EdlLength);
 }

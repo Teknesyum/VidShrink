@@ -1,7 +1,7 @@
 ﻿namespace VidShrink.Core.Editing;
 
 /// <summary>
-/// Tek kaynagin sirali kesim listesi. Her degisiklik bir komuttur ve geri al / ileri al
+/// Bir ya da birden cok kaynagin sirali kesim listesi; her parca kaynaginin sirasini tasir. Her degisiklik bir komuttur ve geri al / ileri al
 /// komutun kendisini tersine ya da yeniden uygular; liste kopyalanmaz. Zamanlar
 /// <see cref="EditTime"/> tick'idir. Surec acmaz, dosya okumaz.
 /// </summary>
@@ -9,10 +9,11 @@ public sealed class EditTimeline
 {
     private readonly List<EditClip> _clips;
     private readonly List<TextLayer> _texts;
+    private readonly List<long> _extraSources;
     private readonly Stack<IEditCommand> _undo = new();
     private readonly Stack<IEditCommand> _redo = new();
 
-    public EditTimeline(IEnumerable<EditClip> clips, long? sourceDuration = null, IEnumerable<TextLayer>? texts = null)
+    public EditTimeline(IEnumerable<EditClip> clips, long? sourceDuration = null, IEnumerable<TextLayer>? texts = null, IEnumerable<long>? extraSources = null)
     {
         ArgumentNullException.ThrowIfNull(clips);
         _clips = clips.ToList();
@@ -23,8 +24,12 @@ public sealed class EditTimeline
             throw new ArgumentException("Listede bos parca var", nameof(clips));
         if (sourceDuration is <= 0)
             throw new ArgumentOutOfRangeException(nameof(sourceDuration), sourceDuration, "Kaynak suresi pozitif olmalidir");
+        _extraSources = extraSources?.ToList() ?? new List<long>();
+        if (_extraSources.Any(d => d <= 0))
+            throw new ArgumentOutOfRangeException(nameof(extraSources), "Kaynak suresi pozitif olmalidir");
         Clips = _clips.AsReadOnly();
         SourceDuration = sourceDuration;
+        ExtraSources = _extraSources.AsReadOnly();
     }
 
     /// <summary>Kaynagin tamamini ileri yonde, 1x hizla tasiyan tek parcali cizelge.</summary>
@@ -33,6 +38,27 @@ public sealed class EditTimeline
     public IReadOnlyList<EditClip> Clips { get; }
 
     public long? SourceDuration { get; }
+
+    /// <summary>Sonradan eklenen kaynaklarin sureleri; sirasi 1'den baslar. Liste yalniz buyur, geri al kaynagi listeden dusurmez.</summary>
+    public IReadOnlyList<long> ExtraSources { get; }
+
+    /// <summary>Kaynagin suresi; ilk kaynagin suresi bilinmiyorsa ya da sira listede yoksa <c>null</c>.</summary>
+    public long? DurationOf(int source)
+        => source == 0 ? SourceDuration : source > 0 && source <= _extraSources.Count ? _extraSources[source - 1] : null;
+
+    /// <summary>
+    /// Yeni bir kaynagi kaydeder ve tamamini cizelgenin sonuna tek parca olarak ekler. Parcanin
+    /// eklenmesi tek adimda geri alinir. Kaynagin sirasi doner.
+    /// </summary>
+    public int AddSource(long duration)
+    {
+        if (duration <= 0)
+            throw new ArgumentOutOfRangeException(nameof(duration), duration, "Kaynak suresi pozitif olmalidir");
+        _extraSources.Add(duration);
+        var source = _extraSources.Count;
+        Execute(new InsertCommand(_clips.Count, new EditClip(0, duration) { Source = source }));
+        return source;
+    }
 
     public long Duration => Clips.Sum(c => c.TimelineLength);
 
@@ -69,12 +95,12 @@ public sealed class EditTimeline
     }
 
     /// <summary>Kaynak tick'inin cizelgede ilk gorundugu an; silinmis kaynakta <c>null</c>.</summary>
-    public long? ToTimeline(long source)
+    public long? ToTimeline(long source, int sourceIndex = 0)
     {
         long start = 0;
         foreach (var clip in _clips)
         {
-            if (clip.Contains(source)) return start + clip.ToOffset(source);
+            if (clip.Source == sourceIndex && clip.Contains(source)) return start + clip.ToOffset(source);
             start += clip.TimelineLength;
         }
 
@@ -163,7 +189,7 @@ public sealed class EditTimeline
     /// parca silinir, arkasi kayar. Tek adimda geri alinir. Hicbir sey degismezse ya da
     /// cizelgede parca kalmayacaksa <c>false</c> doner.
     /// </summary>
-    public bool RemoveSource(IReadOnlyList<(long Start, long End)> ranges)
+    public bool RemoveSource(IReadOnlyList<(long Start, long End)> ranges, int sourceIndex = 0)
     {
         ArgumentNullException.ThrowIfNull(ranges);
         if (ranges.Any(r => r.Start < 0 || r.End < r.Start))
@@ -173,7 +199,7 @@ public sealed class EditTimeline
         var survivors = 0;
         for (var i = 0; i < _clips.Count; i++)
         {
-            var pieces = _clips[i].Without(ranges);
+            var pieces = _clips[i].Source == sourceIndex ? _clips[i].Without(ranges) : new[] { _clips[i] };
             survivors += pieces.Count;
             if (pieces.Count != 1 || !ReferenceEquals(pieces[0], _clips[i])) plans.Add((i, pieces));
         }
@@ -206,13 +232,14 @@ public sealed class EditTimeline
     /// silinmez, sure degismez. Tek adimda geri alinir. Bolunen parca sayisi doner; hicbir sinir
     /// kabul edilmezse 0 doner ve gecmise adim yazilmaz.
     /// </summary>
-    public int SplitSource(IReadOnlyList<long> boundaries, long minPiece)
+    public int SplitSource(IReadOnlyList<long> boundaries, long minPiece, int sourceIndex = 0)
     {
         ArgumentNullException.ThrowIfNull(boundaries);
 
         var plans = new List<(int Index, IReadOnlyList<EditClip> Pieces)>();
         for (var i = 0; i < _clips.Count; i++)
         {
+            if (_clips[i].Source != sourceIndex) continue;
             var pieces = SceneSplit.Pieces(_clips[i], boundaries, minPiece);
             if (pieces.Count > 1) plans.Add((i, pieces));
         }
@@ -244,7 +271,7 @@ public sealed class EditTimeline
     /// Kaynak araliklarinin cizelgede kapladigi yerler, sirali ve birlesik. Hizli, yavas ve ters
     /// parcada da dogru yere duser; silinmis kaynak cizelgede yer tutmaz.
     /// </summary>
-    public IReadOnlyList<(long Start, long End)> SourceToTimeline(IReadOnlyList<(long Start, long End)> ranges)
+    public IReadOnlyList<(long Start, long End)> SourceToTimeline(IReadOnlyList<(long Start, long End)> ranges, int sourceIndex = 0)
     {
         ArgumentNullException.ThrowIfNull(ranges);
         var spans = new List<(long Start, long End)>();
@@ -253,7 +280,7 @@ public sealed class EditTimeline
         {
             foreach (var (start, end) in ranges)
             {
-                if (clip.OffsetsOf(start, end) is { } o && o.To > o.From) spans.Add((at + o.From, at + o.To));
+                if (clip.Source == sourceIndex && clip.OffsetsOf(start, end) is { } o && o.To > o.From) spans.Add((at + o.From, at + o.To));
             }
 
             at += clip.TimelineLength;
@@ -300,7 +327,7 @@ public sealed class EditTimeline
         var clip = _clips[index];
         var movesStart = head != clip.Reversed;
         var neighbor = head ? index - 1 : index + 1;
-        var other = neighbor >= 0 && neighbor < _clips.Count ? _clips[neighbor] : null;
+        var other = neighbor >= 0 && neighbor < _clips.Count && _clips[neighbor].Source == clip.Source ? _clips[neighbor] : null;
 
         if (movesStart)
         {
@@ -310,7 +337,7 @@ public sealed class EditTimeline
             return (min, clip.SourceEnd - 1);
         }
 
-        var max = SourceDuration ?? long.MaxValue;
+        var max = DurationOf(clip.Source) ?? long.MaxValue;
         if (other is not null && other.SourceStart >= clip.SourceEnd) max = Math.Min(max, other.SourceStart);
         else if (other is not null && other.SourceEnd > clip.SourceStart) max = clip.SourceEnd;
         return (clip.SourceStart + 1, Math.Max(clip.SourceStart + 1, max));

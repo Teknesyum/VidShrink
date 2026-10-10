@@ -95,5 +95,8 @@
   "editor.silence.cut": "Vipindi {0} vimekatwa.",
   "editor.scene.split": "Gawa kwenye mabadiliko ya onyesho",
   "editor.scene.none": "Hakuna mabadiliko ya onyesho yaliyopatikana.",
-  "editor.scene.done": "Imegawanywa kwenye mabadiliko {0} ya onyesho."
+  "editor.scene.done": "Imegawanywa kwenye mabadiliko {0} ya onyesho.",
+  "editor.source.add": "Ongeza chanzo",
+  "editor.source.failed": "{0} haikuweza kuongezwa: haina video au haisomeki.",
+  "editor.export.merge-full": "Vyanzo kadhaa vinaunganishwa, kwa hiyo video nzima inasimbwa upya."
 }

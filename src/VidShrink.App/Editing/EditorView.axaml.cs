@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -42,7 +43,7 @@ internal partial class EditorView : UserControl
         _clock = new DispatcherTimer { Interval = EdlPreviewDriver.DefaultInterval };
         _clock.Tick += (_, _) => Follow();
 
-        Preview.FileDropped = path => _ = OpenSourceAsync(path);
+        Preview.FileDropped = path => _ = TakeFilesAsync(new[] { path });
         DragDrop.SetAllowDrop(this, true);
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
         AddHandler(DragDrop.DropEvent, OnDrop);
@@ -63,6 +64,7 @@ internal partial class EditorView : UserControl
         InitClip();
         InitSilence();
         InitProject();
+        InitSources();
 
         MnuSplit.Click += (_, _) => Split();
         MnuDelete.Click += (_, _) => DeleteSelected();
@@ -140,6 +142,7 @@ internal partial class EditorView : UserControl
         ForgetOverlay();
         ForgetSaved();
         ForgetSilence();
+        ForgetSources();
         _source = path;
         _model = null;
         Timeline.Show(null);
@@ -169,7 +172,7 @@ internal partial class EditorView : UserControl
         _peaks?.Dispose();
         _peaks = new CancellationTokenSource();
         Timeline.Peaks = null;
-        PeakLoad = LoadPeaksAsync(path, _peaks.Token);
+        PeakLoad = LoadPeaksAsync(path, 0, _peaks.Token);
     }
 
     private void WatchClose(TopLevel? root)
@@ -185,9 +188,10 @@ internal partial class EditorView : UserControl
         WatchClose(null);
         _peaks?.Cancel();
         _keyframes?.Cancel();
+        foreach (var scan in _extraScans) scan.Cancel();
     }
 
-    private async Task LoadPeaksAsync(string path, CancellationToken ct)
+    private async Task LoadPeaksAsync(string path, int index, CancellationToken ct)
     {
         var reader = PeakReader;
         if (reader is null)
@@ -207,8 +211,8 @@ internal partial class EditorView : UserControl
             return;
         }
 
-        if (ct.IsCancellationRequested || !CurrentMedia.SamePath(path, _source)) return;
-        Timeline.Peaks = peaks;
+        if (ct.IsCancellationRequested || !IsSource(index, path)) return;
+        Timeline.SetPeaks(index, peaks);
     }
 
     internal void ShowTimeline(EditTimeline model, double fps)
@@ -343,7 +347,7 @@ internal partial class EditorView : UserControl
 
     private async Task ReloadAsync(long at)
     {
-        if (_model is not { } model || _source is not { } source || Preview.Engine is not { } engine) return;
+        if (_model is not { } model || _source is null || Preview.Engine is not { } engine) return;
         if (model.Clips.Count == 0)
         {
             if (Preview.IsPlaying) Preview.TogglePlay();
@@ -354,7 +358,7 @@ internal partial class EditorView : UserControl
 
         var playing = Preview.IsPlaying;
         _driver?.Dispose();
-        var preview = new EdlPreview(source, model);
+        var preview = new EdlPreview(SourcePaths, model);
         var driver = new EdlPreviewDriver(engine, preview, look: LookFor(preview, engine));
         _driver = driver;
         _reloads++;
@@ -414,6 +418,7 @@ internal partial class EditorView : UserControl
         MnuReverse.IsEnabled = hasClip;
         MnuDelete.IsEnabled = _canDelete;
         MnuSplit.IsEnabled = BtnSplit.IsEnabled;
+        MnuAddSource.IsEnabled = BtnAddSource.IsEnabled;
         MnuDeleteRange.IsEnabled = Timeline.MarkIn is { } a && Timeline.MarkOut is { } b && b > a;
     }
 
@@ -431,6 +436,7 @@ internal partial class EditorView : UserControl
         var selected = ActiveIndex;
         var hasClip = model is not null && selected >= 0 && selected < model.Clips.Count;
         BtnSplit.IsEnabled = model is not null;
+        BtnAddSource.IsEnabled = model is not null && !Exporting;
         var chosen = Timeline.SelectedIndices.Count;
         _canDelete = model is { Clips.Count: > 0 } && chosen > 0 && (Timeline.AllSelected || chosen < model.Clips.Count);
         BtnUndo.IsEnabled = model?.CanUndo ?? false;
@@ -456,23 +462,23 @@ internal partial class EditorView : UserControl
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        e.DragEffects = DroppedFile(e) is not null ? DragDropEffects.Copy : DragDropEffects.None;
+        e.DragEffects = DroppedFiles(e).Count > 0 ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
     }
 
     private void OnDrop(object? sender, DragEventArgs e)
     {
-        var file = DroppedFile(e);
+        var files = DroppedFiles(e);
         e.Handled = true;
-        if (file is not null) _ = OpenSourceAsync(file);
+        if (files.Count > 0) _ = TakeFilesAsync(files);
     }
 
-    private static string? DroppedFile(DragEventArgs e)
+    private static IReadOnlyList<string> DroppedFiles(DragEventArgs e)
     {
         var items = e.DataTransfer.TryGetFiles()?.ToList();
-        if (items is null || items.Count != 1 || items[0] is IStorageFolder) return null;
-        var path = items[0].TryGetLocalPath();
-        return path is not null && File.Exists(path) ? path : null;
+        if (items is null || items.Count == 0 || items.Any(item => item is IStorageFolder)) return Array.Empty<string>();
+        var paths = items.Select(item => item.TryGetLocalPath()).ToArray();
+        return paths.All(path => path is not null && File.Exists(path)) ? paths!.ToArray<string>() : Array.Empty<string>();
     }
 
     private void CloseDriver()

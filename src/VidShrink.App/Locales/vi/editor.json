@@ -95,5 +95,8 @@
   "editor.silence.cut": "Đã cắt {0} đoạn.",
   "editor.scene.split": "Tách tại các điểm chuyển cảnh",
   "editor.scene.none": "Không tìm thấy điểm chuyển cảnh nào.",
-  "editor.scene.done": "Đã tách tại {0} điểm chuyển cảnh."
+  "editor.scene.done": "Đã tách tại {0} điểm chuyển cảnh.",
+  "editor.source.add": "Thêm nguồn",
+  "editor.source.failed": "Không thể thêm {0}: không có video hoặc không đọc được tệp.",
+  "editor.export.merge-full": "Nhiều nguồn được ghép lại nên toàn bộ video được mã hóa lại."
 }

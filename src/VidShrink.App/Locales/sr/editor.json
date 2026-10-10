@@ -95,5 +95,8 @@
   "editor.silence.cut": "Isečeno opsega: {0}.",
   "editor.scene.split": "Podeli na promenama scene",
   "editor.scene.none": "Nisu pronađene promene scene.",
-  "editor.scene.done": "Podeljeno na promenama scene: {0}."
+  "editor.scene.done": "Podeljeno na promenama scene: {0}.",
+  "editor.source.add": "Dodaj izvor",
+  "editor.source.failed": "{0} nije dodat: nema video ili ne može da se pročita.",
+  "editor.export.merge-full": "Spaja se više izvora pa se ceo video ponovo kodira."
 }
