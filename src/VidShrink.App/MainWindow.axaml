@@ -883,7 +883,13 @@
                             <Button x:Name="BtnScanSubtitle" Theme="{StaticResource GhostButton}" Click="OnScanSubtitle" VerticalAlignment="Bottom"
                                     MinHeight="{StaticResource FieldMinHeight}" IsEnabled="False"
                                     Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.scan}"
-                                    auto:AutomationProperties.Name="{loc:Text main.subtitles.scan}"/>
+                                    auto:AutomationProperties.Name="{loc:Text main.subtitles.scan}">
+                              <Button.Styles>
+                                <Style Selector="Button:disabled">
+                                  <Setter Property="ToolTip.Tip" Value="{loc:Text main.subtitles.scan.no-subtitles}"/>
+                                </Style>
+                              </Button.Styles>
+                            </Button>
                           </WrapPanel>
                           <StackPanel Grid.Row="2" Spacing="{StaticResource SpaceXs}">
                             <TextBlock x:Name="TxtSubtitleScan" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"

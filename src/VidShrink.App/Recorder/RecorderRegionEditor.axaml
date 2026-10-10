@@ -102,6 +102,7 @@
         </Button>
         <Button x:Name="BtnHide"
                 Classes="tool"
+                auto:AutomationProperties.Name="{Binding $self.(ToolTip.Tip)}"
                 Theme="{StaticResource GhostButton}"
                 IsVisible="False">
           <Path Width="{StaticResource RecorderRegionIconSize}"

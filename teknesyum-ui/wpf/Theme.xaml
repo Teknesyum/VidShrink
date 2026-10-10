@@ -282,7 +282,7 @@
     <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
     <Setter Property="LineHeight" Value="30"/>
     <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
-    <Setter Property="Foreground" Value="{StaticResource Renk1}"/>
+    <Setter Property="Foreground" Value="{DynamicResource Renk1}"/>
   </Style>
 
   <Style x:Key="H3" TargetType="TextBlock">
@@ -291,7 +291,7 @@
     <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
     <Setter Property="LineHeight" Value="25"/>
     <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
-    <Setter Property="Foreground" Value="{StaticResource TextLabel}"/>
+    <Setter Property="Foreground" Value="{DynamicResource TextLabel}"/>
   </Style>
 
   <Style x:Key="Label" TargetType="TextBlock">
@@ -300,7 +300,7 @@
     <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
     <Setter Property="LineHeight" Value="17.5"/>
     <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
-    <Setter Property="Foreground" Value="{StaticResource TextLabel}"/>
+    <Setter Property="Foreground" Value="{DynamicResource TextLabel}"/>
   </Style>
 
   <Style x:Key="Body" TargetType="TextBlock">
@@ -309,7 +309,7 @@
     <Setter Property="LineHeight" Value="25.6"/>
     <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
     <Setter Property="Typography.NumeralAlignment" Value="Tabular"/>
-    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+    <Setter Property="Foreground" Value="{DynamicResource TextBody}"/>
   </Style>
 
   <!-- Help / hint text. CSS counterpart .tk-hint. -->
@@ -320,7 +320,7 @@
     <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
     <Setter Property="Typography.NumeralAlignment" Value="Tabular"/>
     <Setter Property="TextWrapping" Value="Wrap"/>
-    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+    <Setter Property="Foreground" Value="{DynamicResource TextBody}"/>
   </Style>
 
   <Style x:Key="Hero" TargetType="TextBlock">
@@ -329,8 +329,8 @@
     <Setter Property="FontWeight" Value="{StaticResource WeightHero}"/>
     <Setter Property="LineHeight" Value="40"/>
     <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
-    <Setter Property="Foreground" Value="{StaticResource Renk1}"/>
-    <Setter Property="Effect" Value="{StaticResource HeroGlow}"/>
+    <Setter Property="Foreground" Value="{DynamicResource Renk1}"/>
+    <Setter Property="Effect" Value="{DynamicResource HeroGlow}"/>
   </Style>
 
   <Style x:Key="MonoValue" TargetType="TextBlock">
@@ -339,12 +339,12 @@
     <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
     <Setter Property="LineHeight" Value="24"/>
     <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
-    <Setter Property="Foreground" Value="{StaticResource Renk2Text}"/>
+    <Setter Property="Foreground" Value="{DynamicResource Renk2Text}"/>
   </Style>
 
   <Style x:Key="Panel" TargetType="Border">
-    <Setter Property="Background" Value="{StaticResource Surface}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource BorderDefault}"/>
+    <Setter Property="Background" Value="{DynamicResource Surface}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderDefault}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
     <Setter Property="CornerRadius" Value="{StaticResource Radius}"/>
     <Setter Property="Padding" Value="{StaticResource PanelPadding}"/>
@@ -355,26 +355,26 @@
        background stays `Surface` because an amber fill is banned. Put an icon or
        the word "Warning" inside the box in addition to colour. -->
   <Style x:Key="WarningPanel" TargetType="Border" BasedOn="{StaticResource Panel}">
-    <Setter Property="BorderBrush" Value="{StaticResource Warning50}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource Warning50}"/>
   </Style>
 
   <!-- Warning text. No glow: text is never given a glow (SKILL §2), the sole
        exception being hero. -->
   <Style x:Key="WarningBody" TargetType="TextBlock" BasedOn="{StaticResource Body}">
-    <Setter Property="Foreground" Value="{StaticResource Warning}"/>
+    <Setter Property="Foreground" Value="{DynamicResource Warning}"/>
   </Style>
 
   <!-- Error text writes the text renk-2, not the fill renk-2 — the 7:1 threshold. -->
   <Style x:Key="DangerBody" TargetType="TextBlock" BasedOn="{StaticResource Body}">
-    <Setter Property="Foreground" Value="{StaticResource DangerText}"/>
+    <Setter Property="Foreground" Value="{DynamicResource DangerText}"/>
   </Style>
 
   <!-- Window shell: edge (shape.window-edge), AppBackground, the overlay layer, then content. -->
   <Style x:Key="TkWindow" TargetType="Window">
     <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
     <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
-    <Setter Property="Background" Value="{StaticResource AppBackground}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource WindowEdge}"/>
+    <Setter Property="Background" Value="{DynamicResource AppBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource WindowEdge}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
     <Setter Property="Template">
       <Setter.Value>
@@ -382,7 +382,7 @@
           <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                   CornerRadius="{StaticResource WindowRadius}" Background="{TemplateBinding Background}">
             <Grid ClipToBounds="True">
-              <Border Background="{StaticResource AppBackgroundOverlay}" IsHitTestVisible="False"/>
+              <Border Background="{DynamicResource AppBackgroundOverlay}" IsHitTestVisible="False"/>
               <AdornerDecorator>
                 <ContentPresenter/>
               </AdornerDecorator>
@@ -394,7 +394,7 @@
   </Style>
 
   <Style x:Key="TkScrollThumb" TargetType="Thumb">
-    <Setter Property="Background" Value="{StaticResource ScrollbarThumb}"/>
+    <Setter Property="Background" Value="{DynamicResource ScrollbarThumb}"/>
     <Setter Property="Margin" Value="{StaticResource ScrollbarThumbInset}"/>
     <Setter Property="Template">
       <Setter.Value>
@@ -402,10 +402,10 @@
           <Border x:Name="th" Background="{TemplateBinding Background}" CornerRadius="{StaticResource ScrollbarThumbRadius}"/>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="th" Property="Background" Value="{StaticResource ScrollbarThumbHover}"/>
+              <Setter TargetName="th" Property="Background" Value="{DynamicResource ScrollbarThumbHover}"/>
             </Trigger>
             <Trigger Property="IsDragging" Value="True">
-              <Setter TargetName="th" Property="Background" Value="{StaticResource ScrollbarThumbHover}"/>
+              <Setter TargetName="th" Property="Background" Value="{DynamicResource ScrollbarThumbHover}"/>
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -447,7 +447,7 @@
 
   <!-- metric.scrollbar-style fade: one implicit style per orientation. -->
   <Style TargetType="ScrollBar">
-    <Setter Property="Background" Value="{StaticResource ScrollbarTrack}"/>
+    <Setter Property="Background" Value="{DynamicResource ScrollbarTrack}"/>
     <Setter Property="MinWidth" Value="0"/>
     <Setter Property="MinHeight" Value="0"/>
     <Setter Property="Width" Value="{StaticResource ScrollbarThickness}"/>
@@ -462,8 +462,8 @@
   </Style>
 
   <Style x:Key="PrimaryButton" TargetType="Button">
-    <Setter Property="Background" Value="{StaticResource Renk1}"/>
-    <Setter Property="Foreground" Value="Black"/>
+    <Setter Property="Background" Value="{DynamicResource Renk1}"/>
+    <Setter Property="Foreground" Value="{DynamicResource OnRenk1}"/>
     <Setter Property="FontWeight" Value="{StaticResource WeightSemi}"/>
     <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
     <Setter Property="FontSize" Value="{StaticResource FontSize2}"/>
@@ -533,10 +533,10 @@
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter TargetName="bd" Property="Background" Value="Transparent"/>
-              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Disabled}"/>
+              <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource Disabled}"/>
               <Setter TargetName="bd" Property="BorderThickness" Value="{StaticResource BorderWidth}"/>
               <Setter TargetName="bd" Property="Effect" Value="{x:Null}"/>
-              <Setter Property="Foreground" Value="{StaticResource Disabled}"/>
+              <Setter Property="Foreground" Value="{DynamicResource Disabled}"/>
               <Setter Property="Cursor" Value="No"/>
             </Trigger>
           </ControlTemplate.Triggers>
@@ -546,8 +546,8 @@
   </Style>
 
   <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
-    <Setter Property="Background" Value="{StaticResource DangerText}"/>
-    <Setter Property="Foreground" Value="{StaticResource OnDangerText}"/>
+    <Setter Property="Background" Value="{DynamicResource DangerText}"/>
+    <Setter Property="Foreground" Value="{DynamicResource OnDangerText}"/>
   </Style>
 
 </ResourceDictionary>
