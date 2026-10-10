@@ -1353,6 +1353,7 @@
             <Panel Background="Transparent">
               <Border Name="FilledTrack"
                       Height="{StaticResource SliderTrackHeight}"
+                      Margin="{StaticResource SliderFilledTrackOverlap}"
                       VerticalAlignment="Center"
                       Background="{StaticResource NeonBlue}"
                       BorderBrush="{StaticResource NeonBlue}"
@@ -1375,6 +1376,7 @@
             <Panel Background="Transparent">
               <Border Name="RemainingTrack"
                       Height="{StaticResource SliderTrackHeight}"
+                      Margin="{StaticResource SliderEmptyTrackOverlap}"
                       VerticalAlignment="Center"
                       Background="{StaticResource NeonBlueFill}"
                       BorderBrush="{StaticResource NeonBlueBorderStrong}"

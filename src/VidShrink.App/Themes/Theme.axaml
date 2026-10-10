@@ -270,8 +270,8 @@
   <StaticResource x:Key="RadiusSquare" ResourceKey="Radius"/>
   <StaticResource x:Key="RadiusChip" ResourceKey="Radius"/>
   <StaticResource x:Key="RadiusCell" ResourceKey="Radius"/>
-  <CornerRadius x:Key="SliderFilledTrackRadius">4,0,0,4</CornerRadius>
-  <CornerRadius x:Key="SliderEmptyTrackRadius">0,4,4,0</CornerRadius>
+  <CornerRadius x:Key="SliderFilledTrackRadius">5,0,0,5</CornerRadius>
+  <CornerRadius x:Key="SliderEmptyTrackRadius">0,5,5,0</CornerRadius>
   <StaticResource x:Key="RadiusControl" ResourceKey="Radius"/>
   <StaticResource x:Key="RadiusPanel" ResourceKey="WindowRadius"/>
   <x:Double x:Key="RadiusPanelScalar">4</x:Double>
@@ -344,6 +344,8 @@
   <GridLength x:Key="CheckGapWidth">8</GridLength>
 
   <Thickness x:Key="SliderTrackPadding">10,0</Thickness>
+  <Thickness x:Key="SliderFilledTrackOverlap">0,0,-10,0</Thickness>
+  <Thickness x:Key="SliderEmptyTrackOverlap">-10,0,0,0</Thickness>
   <Thickness x:Key="ScrollBarThumbMargin">1</Thickness>
 
   <Thickness x:Key="WrapItemMargin">0,0,24,8</Thickness>

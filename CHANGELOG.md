@@ -25,6 +25,14 @@ ship as part of it.
   shows only the time instead of opening a second connection. Measured against a local test
   server only; https, HLS and slow or stalled servers were not measured.
 
+### Changed
+
+- Sliders have soft ends. The volume and speed sliders in the player had a rectangular 12x16
+  handle; it is now a 16 px circle like the other sliders, and their track is 8 px as the theme
+  always intended (it was drawn at 10). On every slider the track is a full pill at both ends and
+  the filled and empty parts meet under the handle instead of being cut flat at its edges, so no
+  square corner shows at 0% or 100%. Before and after: `docs/olcumler/kaydirici-uclari/`.
+
 ## [1.2.10] - 2026-10-10
 
 ### Added
