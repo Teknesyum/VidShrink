@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.12] - 2026-10-10
+
 ### Added
 
 - The Shrink queue can encode several files at the same time. Settings has a new "Jobs Encoded
@@ -19,6 +21,11 @@ ship as part of it.
   "job finished" notice and the end-of-queue action fire once, after the last job. Two jobs
   never pick the same output name. The limit of 4 and the two hardware slots were not measured
   under load. The CLI has no `--jobs`: `izle` still encodes one file at a time.
+
+### Fixed
+
+- Closing the editor window now stops the waveform and keyframe scans. Before, the ffmpeg
+  process kept reading the source after the window was gone and held the file open.
 
 ## [1.2.11] - 2026-10-10
 
