@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.14] - 2026-10-10
+
 ### Added
 
 - ProRes and DNxHR output in the Convert tab, and VideoToolbox and VAAPI as hardware encoders
