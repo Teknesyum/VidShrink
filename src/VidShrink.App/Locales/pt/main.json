@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Avisar quando um trabalho terminar",
   "settings-tab.notify-done.hint": "Se uma redução, uma conversão ou a fila terminarem com a janela em segundo plano, o botão da barra de tarefas pisca e aparece uma notificação. Trabalhos cancelados não avisam.",
   "settings-tab.parallel-jobs.label": "Trabalhos codificados ao mesmo tempo",
-  "settings-tab.parallel-jobs.hint": "A fila codifica este número de ficheiros em conjunto. 1 processa-os um após o outro. Mais termina a fila mais cedo, mas mantém o processador ocupado. Os codificadores por hardware executam no máximo dois trabalhos de cada vez.",
+  "settings-tab.parallel-jobs.hint": "• A fila codifica este número de ficheiros em conjunto.\n• 1 processa-os um após o outro.\n• Mais termina a fila mais cedo, mas mantém o processador ocupado.\n• Os codificadores por hardware executam no máximo dois trabalhos de cada vez.",
   "settings-tab.ffmpeg-path.label": "Caminho do ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automático",
   "settings-tab.ffmpeg-path.manual": "Manual",

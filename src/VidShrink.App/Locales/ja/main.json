@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "ジョブの完了時に通知する",
   "settings-tab.notify-done.hint": "ウィンドウが背面にあるときに縮小、変換、またはキューが終わると、タスクバーのボタンが点滅し、通知が表示されます。キャンセルしたジョブは通知されません。",
   "settings-tab.parallel-jobs.label": "同時にエンコードするジョブ数",
-  "settings-tab.parallel-jobs.hint": "キューはこの数のファイルを同時にエンコードします。1 では順番に処理します。増やすとキューは早く終わりますが、プロセッサが占有されます。ハードウェアエンコーダーは同時に最大 2 件です。",
+  "settings-tab.parallel-jobs.hint": "• キューはこの数のファイルを同時にエンコードします。\n• 1 では順番に処理します。\n• 増やすとキューは早く終わりますが、プロセッサが占有されます。\n• ハードウェアエンコーダーは同時に最大 2 件です。",
   "settings-tab.ffmpeg-path.label": "ffmpegのパス",
   "settings-tab.ffmpeg-path.auto": "自動",
   "settings-tab.ffmpeg-path.manual": "手動",

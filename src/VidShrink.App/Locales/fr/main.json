@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Prévenir quand une tâche se termine",
   "settings-tab.notify-done.hint": "Si une réduction, une conversion ou la file se termine alors que la fenêtre est en arrière-plan, le bouton de la barre des tâches clignote et une notification apparaît. Les tâches annulées restent silencieuses.",
   "settings-tab.parallel-jobs.label": "Tâches encodées en même temps",
-  "settings-tab.parallel-jobs.hint": "La file encode ce nombre de fichiers ensemble. 1 les traite l'un après l'autre. Davantage termine la file plus tôt mais occupe le processeur. Les encodeurs matériels traitent au plus deux tâches à la fois.",
+  "settings-tab.parallel-jobs.hint": "• La file encode ce nombre de fichiers ensemble.\n• 1 les traite l'un après l'autre.\n• Davantage termine la file plus tôt mais occupe le processeur.\n• Les encodeurs matériels traitent au plus deux tâches à la fois.",
   "settings-tab.ffmpeg-path.label": "Chemin de ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automatique",
   "settings-tab.ffmpeg-path.manual": "Manuel",

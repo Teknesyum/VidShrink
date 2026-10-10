@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Upozorniť na dokončenie úlohy",
   "settings-tab.notify-done.hint": "Keď sa zmenšenie, prevod alebo rad skončia a okno je na pozadí, tlačidlo na paneli úloh zabliká a zobrazí sa oznámenie. Zrušené úlohy sa neoznamujú.",
   "settings-tab.parallel-jobs.label": "Úlohy kódované súčasne",
-  "settings-tab.parallel-jobs.hint": "Rad kóduje toľko súborov naraz. 1 ich spracuje jeden po druhom. Viac dokončí rad skôr, ale zamestná procesor. Hardvérové kodéry spúšťajú najviac dve úlohy súčasne.",
+  "settings-tab.parallel-jobs.hint": "• Rad kóduje toľko súborov naraz.\n• 1 ich spracuje jeden po druhom.\n• Viac dokončí rad skôr, ale zamestná procesor.\n• Hardvérové kodéry spúšťajú najviac dve úlohy súčasne.",
   "settings-tab.ffmpeg-path.label": "Cesta k ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automaticky",
   "settings-tab.ffmpeg-path.manual": "Ručne",

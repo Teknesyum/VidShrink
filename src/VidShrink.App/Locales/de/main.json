@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Benachrichtigen, wenn ein Auftrag fertig ist",
   "settings-tab.notify-done.hint": "Endet ein Verkleinern, eine Umwandlung oder die Warteschlange, während das Fenster im Hintergrund ist, blinkt die Schaltfläche in der Taskleiste und eine Benachrichtigung erscheint. Abgebrochene Aufträge bleiben still.",
   "settings-tab.parallel-jobs.label": "Gleichzeitig kodierte Aufträge",
-  "settings-tab.parallel-jobs.hint": "Die Warteschlange kodiert so viele Dateien gleichzeitig. 1 arbeitet sie nacheinander ab. Mehr beendet die Warteschlange früher, lastet aber den Prozessor aus. Hardware-Encoder führen höchstens zwei Aufträge gleichzeitig aus.",
+  "settings-tab.parallel-jobs.hint": "• Die Warteschlange kodiert so viele Dateien gleichzeitig.\n• 1 arbeitet sie nacheinander ab.\n• Mehr beendet die Warteschlange früher, lastet aber den Prozessor aus.\n• Hardware-Encoder führen höchstens zwei Aufträge gleichzeitig aus.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-Pfad",
   "settings-tab.ffmpeg-path.auto": "Automatisch",
   "settings-tab.ffmpeg-path.manual": "Manuell",

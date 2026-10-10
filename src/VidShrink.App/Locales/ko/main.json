@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "작업이 끝나면 알림",
   "settings-tab.notify-done.hint": "창이 뒤에 있을 때 축소, 변환 또는 대기열이 끝나면 작업 표시줄 단추가 깜박이고 알림이 나타납니다. 취소한 작업은 알리지 않습니다.",
   "settings-tab.parallel-jobs.label": "동시에 인코딩하는 작업 수",
-  "settings-tab.parallel-jobs.hint": "대기열이 이 개수만큼 파일을 함께 인코딩합니다. 1이면 차례로 실행합니다. 늘리면 대기열이 더 빨리 끝나지만 프로세서를 많이 씁니다. 하드웨어 인코더는 동시에 최대 두 작업을 실행합니다.",
+  "settings-tab.parallel-jobs.hint": "• 대기열이 이 개수만큼 파일을 함께 인코딩합니다.\n• 1이면 차례로 실행합니다.\n• 늘리면 대기열이 더 빨리 끝나지만 프로세서를 많이 씁니다.\n• 하드웨어 인코더는 동시에 최대 두 작업을 실행합니다.",
   "settings-tab.ffmpeg-path.label": "ffmpeg 경로",
   "settings-tab.ffmpeg-path.auto": "자동",
   "settings-tab.ffmpeg-path.manual": "수동",

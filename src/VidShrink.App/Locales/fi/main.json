@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Ilmoita, kun työ valmistuu",
   "settings-tab.notify-done.hint": "Jos pienennys, muunnos tai jono valmistuu ikkunan ollessa taustalla, tehtäväpalkin painike vilkkuu ja ilmoitus tulee näkyviin. Perutuista töistä ei ilmoiteta.",
   "settings-tab.parallel-jobs.label": "Samanaikaisesti koodattavat työt",
-  "settings-tab.parallel-jobs.hint": "Jono koodaa näin monta tiedostoa yhtä aikaa. 1 käsittelee ne peräkkäin. Suurempi määrä saa jonon valmiiksi aiemmin mutta pitää suorittimen varattuna. Laitteistokooderit ajavat enintään kaksi työtä kerrallaan.",
+  "settings-tab.parallel-jobs.hint": "• Jono koodaa näin monta tiedostoa yhtä aikaa.\n• 1 käsittelee ne peräkkäin.\n• Suurempi määrä saa jonon valmiiksi aiemmin mutta pitää suorittimen varattuna.\n• Laitteistokooderit ajavat enintään kaksi työtä kerrallaan.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-polku",
   "settings-tab.ffmpeg-path.auto": "Automaattinen",
   "settings-tab.ffmpeg-path.manual": "Manuaalinen",

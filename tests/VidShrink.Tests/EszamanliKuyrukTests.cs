@@ -292,7 +292,6 @@ public sealed class EszamanliKuyrukTests
         var kapi = new EncoderSlots();
         var bir = await kapi.EnterAsync("h264_nvenc");
         var iki = await kapi.EnterAsync("hevc_nvenc");
-        Assert.Equal(0, kapi.FreeHardwareSlots);
 
         var uc = kapi.EnterAsync("av1_nvenc");
         var yazilim = kapi.EnterAsync("libx264");
@@ -302,17 +301,46 @@ public sealed class EszamanliKuyrukTests
         bir.Dispose();
         bir.Dispose();
         var ucuncu = await uc.WaitAsync(TimeSpan.FromSeconds(10));
-        Assert.Equal(0, kapi.FreeHardwareSlots);
 
         using var iptal = new CancellationTokenSource();
         var dort = kapi.EnterAsync("h264_qsv", iptal.Token);
+        Assert.False(dort.IsCompleted);
         iptal.Cancel();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => dort);
 
         iki.Dispose();
         ucuncu.Dispose();
         (await yazilim).Dispose();
-        Assert.Equal(ParallelJobs.HardwareSlots, kapi.FreeHardwareSlots);
+
+        var bes = kapi.EnterAsync("h264_amf");
+        var alti = kapi.EnterAsync("hevc_amf");
+        var yedi = kapi.EnterAsync("av1_amf");
+        Assert.True(bes.IsCompletedSuccessfully);
+        Assert.True(alti.IsCompletedSuccessfully);
+        Assert.False(yedi.IsCompleted);
+        (await bes).Dispose();
+        (await yedi.WaitAsync(TimeSpan.FromSeconds(10))).Dispose();
+        (await alti).Dispose();
+    }
+
+    [Theory]
+    [InlineData(1, 1)]
+    [InlineData(2, 1)]
+    [InlineData(4, 2)]
+    [InlineData(8, 4)]
+    [InlineData(64, 4)]
+    public void AyarListesiHerMakinedeTavanKadarSecenekTasirFazlasiPasif(int cekirdek, int acik)
+    {
+        var (toplam, etkin, ilkler) = AppHost.Run(() =>
+        {
+            var secenekler = MainWindow.ParallelJobChoices(cekirdek);
+            return (secenekler.Length, secenekler.Count(s => s.IsEnabled),
+                secenekler.TakeWhile(s => s.IsEnabled).Count());
+        });
+
+        Assert.Equal(ParallelJobs.Ceiling, toplam);
+        Assert.Equal(acik, etkin);
+        Assert.Equal(acik, ilkler);
     }
 
     [Fact]

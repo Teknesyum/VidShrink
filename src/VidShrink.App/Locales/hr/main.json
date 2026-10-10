@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Obavijesti kad posao završi",
   "settings-tab.notify-done.hint": "Ako smanjivanje, pretvorba ili red završe dok je prozor u pozadini, gumb na programskoj traci treperi i pojavljuje se obavijest. Otkazani poslovi ne obavještavaju.",
   "settings-tab.parallel-jobs.label": "Poslovi kodirani istodobno",
-  "settings-tab.parallel-jobs.hint": "Red kodira ovoliko datoteka odjednom. 1 ih obrađuje jednu za drugom. Više završava red ranije, ali zauzima procesor. Hardverski koderi izvode najviše dva posla odjednom.",
+  "settings-tab.parallel-jobs.hint": "• Red kodira ovoliko datoteka odjednom.\n• 1 ih obrađuje jednu za drugom.\n• Više završava red ranije, ali zauzima procesor.\n• Hardverski koderi izvode najviše dva posla odjednom.",
   "settings-tab.ffmpeg-path.label": "Putanja ffmpeg-a",
   "settings-tab.ffmpeg-path.auto": "Automatski",
   "settings-tab.ffmpeg-path.manual": "Ručno",

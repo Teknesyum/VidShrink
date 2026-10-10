@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Paziņot, kad darbs ir pabeigts",
   "settings-tab.notify-done.hint": "Ja samazināšana, pārveidošana vai rinda beidzas, kamēr logs ir fonā, uzdevumjoslas poga mirgo un parādās paziņojums. Par atceltiem darbiem netiek paziņots.",
   "settings-tab.parallel-jobs.label": "Vienlaikus kodētie darbi",
-  "settings-tab.parallel-jobs.hint": "Rinda vienlaikus kodē tik daudz failu. 1 tos apstrādā citu pēc cita. Vairāk pabeidz rindu ātrāk, bet noslogo procesoru. Aparatūras kodētāji vienlaikus izpilda ne vairāk kā divus darbus.",
+  "settings-tab.parallel-jobs.hint": "• Rinda vienlaikus kodē tik daudz failu.\n• 1 tos apstrādā citu pēc cita.\n• Vairāk pabeidz rindu ātrāk, bet noslogo procesoru.\n• Aparatūras kodētāji vienlaikus izpilda ne vairāk kā divus darbus.",
   "settings-tab.ffmpeg-path.label": "ffmpeg ceļš",
   "settings-tab.ffmpeg-path.auto": "Automātiski",
   "settings-tab.ffmpeg-path.manual": "Manuāli",

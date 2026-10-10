@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "İş bitince haber ver",
   "settings-tab.notify-done.hint": "Küçültme, dönüştürme ya da kuyruk pencere arkadayken biterse görev çubuğu düğmesi yanıp söner ve bir bildirim çıkar. İptal edilen işte haber verilmez.",
   "settings-tab.parallel-jobs.label": "Aynı anda kodlanan iş sayısı",
-  "settings-tab.parallel-jobs.hint": "Kuyruk bu kadar dosyayı birlikte kodlar. 1 sırayla koşturur. Fazlası kuyruğu erken bitirir ama işlemciyi meşgul eder. Donanım kodlayıcıları aynı anda en çok iki iş koşturur.",
+  "settings-tab.parallel-jobs.hint": "• Kuyruk bu kadar dosyayı birlikte kodlar.\n• 1 sırayla koşturur.\n• Fazlası kuyruğu erken bitirir ama işlemciyi meşgul eder.\n• Donanım kodlayıcıları aynı anda en çok iki iş koşturur.",
   "settings-tab.ffmpeg-path.label": "ffmpeg yolu",
   "settings-tab.ffmpeg-path.auto": "Otomatik",
   "settings-tab.ffmpeg-path.manual": "Elle",

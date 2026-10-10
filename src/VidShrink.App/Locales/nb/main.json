@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Varsle når en jobb er ferdig",
   "settings-tab.notify-done.hint": "Hvis en krymping, en konvertering eller køen blir ferdig mens vinduet er i bakgrunnen, blinker knappen på oppgavelinjen og et varsel vises. Avbrutte jobber varsles ikke.",
   "settings-tab.parallel-jobs.label": "Jobber som kodes samtidig",
-  "settings-tab.parallel-jobs.hint": "Køen koder så mange filer samtidig. 1 kjører dem etter hverandre. Flere gjør køen ferdig tidligere, men holder prosessoren opptatt. Maskinvarekodere kjører høyst to jobber om gangen.",
+  "settings-tab.parallel-jobs.hint": "• Køen koder så mange filer samtidig.\n• 1 kjører dem etter hverandre.\n• Flere gjør køen ferdig tidligere, men holder prosessoren opptatt.\n• Maskinvarekodere kjører høyst to jobber om gangen.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-bane",
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuell",

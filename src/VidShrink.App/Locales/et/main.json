@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Teavita, kui töö saab valmis",
   "settings-tab.notify-done.hint": "Kui vähendamine, teisendamine või järjekord lõpeb ajal, mil aken on taustal, vilgub tegumiriba nupp ja ilmub teavitus. Tühistatud töödest ei teavitata.",
   "settings-tab.parallel-jobs.label": "Korraga kodeeritavad tööd",
-  "settings-tab.parallel-jobs.hint": "Järjekord kodeerib nii palju faile korraga. 1 töötleb neid üksteise järel. Rohkem lõpetab järjekorra varem, kuid hoiab protsessori hõivatud. Riistvarakodeerijad käitavad korraga kõige rohkem kahte tööd.",
+  "settings-tab.parallel-jobs.hint": "• Järjekord kodeerib nii palju faile korraga.\n• 1 töötleb neid üksteise järel.\n• Rohkem lõpetab järjekorra varem, kuid hoiab protsessori hõivatud.\n• Riistvarakodeerijad käitavad korraga kõige rohkem kahte tööd.",
   "settings-tab.ffmpeg-path.label": "ffmpegi tee",
   "settings-tab.ffmpeg-path.auto": "Automaatne",
   "settings-tab.ffmpeg-path.manual": "Käsitsi",

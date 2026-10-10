@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Melden wanneer een taak klaar is",
   "settings-tab.notify-done.hint": "Als een verkleining, een conversie of de wachtrij eindigt terwijl het venster op de achtergrond staat, knippert de taakbalkknop en verschijnt er een melding. Geannuleerde taken blijven stil.",
   "settings-tab.parallel-jobs.label": "Taken die tegelijk worden gecodeerd",
-  "settings-tab.parallel-jobs.hint": "De wachtrij codeert zoveel bestanden tegelijk. 1 verwerkt ze na elkaar. Meer maakt de wachtrij eerder af, maar houdt de processor bezig. Hardware-encoders voeren hooguit twee taken tegelijk uit.",
+  "settings-tab.parallel-jobs.hint": "• De wachtrij codeert zoveel bestanden tegelijk.\n• 1 verwerkt ze na elkaar.\n• Meer maakt de wachtrij eerder af, maar houdt de processor bezig.\n• Hardware-encoders voeren hooguit twee taken tegelijk uit.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-pad",
   "settings-tab.ffmpeg-path.auto": "Automatisch",
   "settings-tab.ffmpeg-path.manual": "Handmatig",

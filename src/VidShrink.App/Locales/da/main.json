@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Giv besked, når et job er færdigt",
   "settings-tab.notify-done.hint": "Hvis en formindskelse, en konvertering eller køen bliver færdig, mens vinduet er i baggrunden, blinker knappen på proceslinjen, og der vises en meddelelse. Annullerede job giver ingen besked.",
   "settings-tab.parallel-jobs.label": "Job, der kodes samtidig",
-  "settings-tab.parallel-jobs.hint": "Køen koder så mange filer samtidig. 1 kører dem efter hinanden. Flere gør køen færdig tidligere, men holder processoren optaget. Hardwarekodere kører højst to job ad gangen.",
+  "settings-tab.parallel-jobs.hint": "• Køen koder så mange filer samtidig.\n• 1 kører dem efter hinanden.\n• Flere gør køen færdig tidligere, men holder processoren optaget.\n• Hardwarekodere kører højst to job ad gangen.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-sti",
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuel",

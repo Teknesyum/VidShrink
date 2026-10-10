@@ -46,8 +46,6 @@ public sealed class EncoderSlots
     /// <summary>Süreç genelindeki kapı: ekran kartı tek, pencere sayısı kaç olursa olsun.</summary>
     public static EncoderSlots Shared { get; } = new();
 
-    public int FreeHardwareSlots => _hardware.CurrentCount;
-
     public async Task<IDisposable> EnterAsync(string? codec, CancellationToken ct = default)
     {
         if (!ParallelJobs.NeedsHardwareSlot(codec)) return new Yuva(null);

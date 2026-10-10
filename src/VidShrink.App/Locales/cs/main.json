@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Upozornit na dokončení úlohy",
   "settings-tab.notify-done.hint": "Když zmenšení, převod nebo fronta skončí a okno je na pozadí, tlačítko na hlavním panelu zabliká a zobrazí se oznámení. Zrušené úlohy se neoznamují.",
   "settings-tab.parallel-jobs.label": "Úlohy kódované současně",
-  "settings-tab.parallel-jobs.hint": "Fronta kóduje tolik souborů najednou. 1 je zpracuje jeden po druhém. Více dokončí frontu dříve, ale zaměstná procesor. Hardwarové kodéry spouštějí nejvýše dvě úlohy současně.",
+  "settings-tab.parallel-jobs.hint": "• Fronta kóduje tolik souborů najednou.\n• 1 je zpracuje jeden po druhém.\n• Více dokončí frontu dříve, ale zaměstná procesor.\n• Hardwarové kodéry spouštějí nejvýše dvě úlohy současně.",
   "settings-tab.ffmpeg-path.label": "Cesta k ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automaticky",
   "settings-tab.ffmpeg-path.manual": "Ručně",

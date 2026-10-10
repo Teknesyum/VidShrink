@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Beri tahu saat pekerjaan selesai",
   "settings-tab.notify-done.hint": "Jika pengecilan, konversi, atau antrean selesai saat jendela berada di latar belakang, tombol bilah tugas berkedip dan notifikasi muncul. Pekerjaan yang dibatalkan tidak diberitahukan.",
   "settings-tab.parallel-jobs.label": "Pekerjaan yang dikodekan bersamaan",
-  "settings-tab.parallel-jobs.hint": "Antrean mengodekan sebanyak ini berkas sekaligus. 1 menjalankannya satu per satu. Lebih banyak menyelesaikan antrean lebih cepat tetapi menyibukkan prosesor. Pengode perangkat keras menjalankan paling banyak dua pekerjaan sekaligus.",
+  "settings-tab.parallel-jobs.hint": "• Antrean mengodekan sebanyak ini berkas sekaligus.\n• 1 menjalankannya satu per satu.\n• Lebih banyak menyelesaikan antrean lebih cepat tetapi menyibukkan prosesor.\n• Pengode perangkat keras menjalankan paling banyak dua pekerjaan sekaligus.",
   "settings-tab.ffmpeg-path.label": "Jalur ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Otomatis",
   "settings-tab.ffmpeg-path.manual": "Manual",

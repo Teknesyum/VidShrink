@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Arifu kazi inapokamilika",
   "settings-tab.notify-done.hint": "Ikiwa upunguzaji, ubadilishaji au foleni itakamilika wakati dirisha liko nyuma, kitufe cha upau wa kazi humweka na arifa huonekana. Kazi zilizoghairiwa haziarifiwi.",
   "settings-tab.parallel-jobs.label": "Kazi zinazosimbwa kwa wakati mmoja",
-  "settings-tab.parallel-jobs.hint": "Foleni husimba faili nyingi hivi kwa pamoja. 1 huziendesha moja baada ya nyingine. Zaidi humaliza foleni mapema lakini hushughulisha kichakataji. Visimbaji vya maunzi huendesha kazi mbili tu kwa wakati mmoja.",
+  "settings-tab.parallel-jobs.hint": "• Foleni husimba faili nyingi hivi kwa pamoja.\n• 1 huziendesha moja baada ya nyingine.\n• Zaidi humaliza foleni mapema lakini hushughulisha kichakataji.\n• Visimbaji vya maunzi huendesha kazi mbili tu kwa wakati mmoja.",
   "settings-tab.ffmpeg-path.label": "Njia ya ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Otomatiki",
   "settings-tab.ffmpeg-path.manual": "Kwa mkono",

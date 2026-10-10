@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Powiadamiaj o zakończeniu zadania",
   "settings-tab.notify-done.hint": "Gdy zmniejszanie, konwersja albo kolejka kończą się, a okno jest w tle, przycisk na pasku zadań miga i pojawia się powiadomienie. Anulowane zadania nie powiadamiają.",
   "settings-tab.parallel-jobs.label": "Zadania kodowane jednocześnie",
-  "settings-tab.parallel-jobs.hint": "Kolejka koduje tyle plików naraz. 1 przetwarza je po kolei. Więcej kończy kolejkę wcześniej, ale zajmuje procesor. Kodery sprzętowe wykonują najwyżej dwa zadania jednocześnie.",
+  "settings-tab.parallel-jobs.hint": "• Kolejka koduje tyle plików naraz.\n• 1 przetwarza je po kolei.\n• Więcej kończy kolejkę wcześniej, ale zajmuje procesor.\n• Kodery sprzętowe wykonują najwyżej dwa zadania jednocześnie.",
   "settings-tab.ffmpeg-path.label": "Ścieżka ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automatycznie",
   "settings-tab.ffmpeg-path.manual": "Ręcznie",

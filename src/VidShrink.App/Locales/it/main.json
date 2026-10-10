@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Avvisa quando un lavoro finisce",
   "settings-tab.notify-done.hint": "Se una riduzione, una conversione o la coda finiscono mentre la finestra è in secondo piano, il pulsante sulla barra delle applicazioni lampeggia e compare una notifica. I lavori annullati non avvisano.",
   "settings-tab.parallel-jobs.label": "Lavori codificati contemporaneamente",
-  "settings-tab.parallel-jobs.hint": "La coda codifica questo numero di file insieme. 1 li elabora uno dopo l'altro. Un numero maggiore finisce prima la coda ma tiene occupato il processore. I codificatori hardware eseguono al massimo due lavori alla volta.",
+  "settings-tab.parallel-jobs.hint": "• La coda codifica questo numero di file insieme.\n• 1 li elabora uno dopo l'altro.\n• Un numero maggiore finisce prima la coda ma tiene occupato il processore.\n• I codificatori hardware eseguono al massimo due lavori alla volta.",
   "settings-tab.ffmpeg-path.label": "Percorso ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automatico",
   "settings-tab.ffmpeg-path.manual": "Manuale",

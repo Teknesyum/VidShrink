@@ -303,8 +303,7 @@ public partial class MainWindow : Window
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkNotifyWhenDone, ToggleButton.IsCheckedProperty, SaveAppSettings);
-        CmbParallelJobs.ItemsSource = Enumerable.Range(1, ParallelJobs.Max(Environment.ProcessorCount))
-            .Select(n => n.ToString(CultureInfo.InvariantCulture)).ToArray();
+        CmbParallelJobs.ItemsSource = ParallelJobChoices(Environment.ProcessorCount);
         CmbParallelJobs.SelectedIndex = 0;
         Watch(CmbParallelJobs, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
         Player.Opened += OnPlayerOpened;

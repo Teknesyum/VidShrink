@@ -12,6 +12,15 @@ namespace VidShrink.App;
 /// </summary>
 public partial class MainWindow
 {
+    internal static ComboBoxItem[] ParallelJobChoices(int logicalProcessors) =>
+        Enumerable.Range(1, ParallelJobs.Ceiling)
+            .Select(n => new ComboBoxItem
+            {
+                Content = n.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                IsEnabled = n <= ParallelJobs.Max(logicalProcessors)
+            })
+            .ToArray();
+
     internal static string ConversionNoteKey(ConversionNote note) => note switch
     {
         ConversionNote.WebpBitrateIgnored => "main.convert.note.webp-bitrate-ignored",

@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Értesítés, ha egy feladat elkészül",
   "settings-tab.notify-done.hint": "Ha egy kicsinyítés, átalakítás vagy a sor akkor fejeződik be, amikor az ablak a háttérben van, a tálcagomb villog, és értesítés jelenik meg. A megszakított feladatokról nincs értesítés.",
   "settings-tab.parallel-jobs.label": "Egyszerre kódolt feladatok",
-  "settings-tab.parallel-jobs.hint": "A sor ennyi fájlt kódol egyszerre. 1 esetén egymás után futnak. A nagyobb érték hamarabb befejezi a sort, de leterheli a processzort. A hardveres kódolók egyszerre legfeljebb két feladatot futtatnak.",
+  "settings-tab.parallel-jobs.hint": "• A sor ennyi fájlt kódol egyszerre.\n• 1 esetén egymás után futnak.\n• A nagyobb érték hamarabb befejezi a sort, de leterheli a processzort.\n• A hardveres kódolók egyszerre legfeljebb két feladatot futtatnak.",
   "settings-tab.ffmpeg-path.label": "ffmpeg útvonal",
   "settings-tab.ffmpeg-path.auto": "Automatikus",
   "settings-tab.ffmpeg-path.manual": "Kézi",

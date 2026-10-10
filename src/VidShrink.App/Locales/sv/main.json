@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Meddela när ett jobb är klart",
   "settings-tab.notify-done.hint": "Om en krympning, en konvertering eller kön blir klar medan fönstret ligger i bakgrunden blinkar knappen i aktivitetsfältet och en avisering visas. Avbrutna jobb meddelas inte.",
   "settings-tab.parallel-jobs.label": "Jobb som kodas samtidigt",
-  "settings-tab.parallel-jobs.hint": "Kön kodar så här många filer samtidigt. 1 kör dem en efter en. Fler gör kön klar tidigare men håller processorn upptagen. Hårdvarukodare kör högst två jobb åt gången.",
+  "settings-tab.parallel-jobs.hint": "• Kön kodar så här många filer samtidigt.\n• 1 kör dem en efter en.\n• Fler gör kön klar tidigare men håller processorn upptagen.\n• Hårdvarukodare kör högst två jobb åt gången.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-sökväg",
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuell",

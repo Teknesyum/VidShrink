@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Maklumkan apabila kerja selesai",
   "settings-tab.notify-done.hint": "Jika pengecilan, penukaran atau baris gilir selesai semasa tetingkap berada di latar belakang, butang bar tugas berkelip dan pemberitahuan muncul. Kerja yang dibatalkan tidak dimaklumkan.",
   "settings-tab.parallel-jobs.label": "Kerja yang dikodkan serentak",
-  "settings-tab.parallel-jobs.hint": "Baris gilir mengekod sebanyak ini fail serentak. 1 menjalankannya satu demi satu. Lebih banyak menyiapkan baris gilir lebih awal tetapi menyibukkan pemproses. Pengekod perkakasan menjalankan paling banyak dua kerja serentak.",
+  "settings-tab.parallel-jobs.hint": "• Baris gilir mengekod sebanyak ini fail serentak.\n• 1 menjalankannya satu demi satu.\n• Lebih banyak menyiapkan baris gilir lebih awal tetapi menyibukkan pemproses.\n• Pengekod perkakasan menjalankan paling banyak dua kerja serentak.",
   "settings-tab.ffmpeg-path.label": "Laluan ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automatik",
   "settings-tab.ffmpeg-path.manual": "Manual",

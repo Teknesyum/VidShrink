@@ -599,7 +599,7 @@
   "settings-tab.notify-done.label": "Anunță când se termină o sarcină",
   "settings-tab.notify-done.hint": "Dacă o micșorare, o conversie sau coada se termină cât timp fereastra este în fundal, butonul din bara de activități clipește și apare o notificare. Sarcinile anulate nu anunță.",
   "settings-tab.parallel-jobs.label": "Sarcini codificate simultan",
-  "settings-tab.parallel-jobs.hint": "Coada codifică atâtea fișiere deodată. 1 le procesează pe rând. Mai multe termină coada mai devreme, dar țin procesorul ocupat. Codificatoarele hardware rulează cel mult două sarcini simultan.",
+  "settings-tab.parallel-jobs.hint": "• Coada codifică atâtea fișiere deodată.\n• 1 le procesează pe rând.\n• Mai multe termină coada mai devreme, dar țin procesorul ocupat.\n• Codificatoarele hardware rulează cel mult două sarcini simultan.",
   "settings-tab.ffmpeg-path.label": "Cale ffmpeg",
   "settings-tab.ffmpeg-path.auto": "Automat",
   "settings-tab.ffmpeg-path.manual": "Manual",
