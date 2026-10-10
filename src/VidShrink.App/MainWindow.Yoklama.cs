@@ -390,6 +390,12 @@ public partial class MainWindow
 
         ApplyFastGpuTip();
         KapSecenekleriniYokla();
+        var textBurn = TextBurnAvailable;
+        if (textBurn != _textBurnOffered)
+        {
+            _textBurnOffered = textBurn;
+            RefreshBurnChoices();
+        }
         Recalculate();
     }
 

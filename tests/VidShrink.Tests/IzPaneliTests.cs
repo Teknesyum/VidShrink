@@ -171,6 +171,43 @@ public sealed class IzPaneliTests : IDisposable
     }
 
     /// <summary>
+    /// libass'sız ffmpeg'de (<c>subtitles</c> süzgeci yoklamada yok) metin izi yakma listesine girmez,
+    /// seçiliyse seçim düşer; resim izi bindirmeyle yakıldığı için kalır. Süzgeç gelince ve yoklama
+    /// okunamadıysa liste tamdır (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void LibasssizFfmpegdeMetinIziYakmaListesindeYok()
+    {
+        var (tam, secili, eksik, dusen, plan, resim, geri, yoklamasiz) = Pencerede(window =>
+        {
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", Kaynak());
+            var t = window.CmbBurnSubtitle.ItemCount;
+            window.CmbBurnSubtitle.SelectedIndex = 2;
+            var s = window.BurnChoice;
+            window.ApplyHardwareVerdict(AltyaziYakmaKodlamaYolTests.Yoklama(libass: false), false, HardwareVerdict.NotProbed);
+            var e = window.CmbBurnSubtitle.ItemCount;
+            var d = window.BurnChoice;
+            var p = window.PlanOptionsForTest().Filters.BurnSubtitle;
+            window.CmbBurnSubtitle.SelectedIndex = 1;
+            var r = window.BurnChoice;
+            window.ApplyHardwareVerdict(AltyaziYakmaKodlamaYolTests.Yoklama(libass: true), false, HardwareVerdict.NotProbed);
+            var g = (window.CmbBurnSubtitle.ItemCount, window.BurnChoice);
+            window.ApplyHardwareVerdict(AltyaziYakmaKodlamaYolTests.Yoklama(libass: false), false, HardwareVerdict.NotProbed);
+            window.ApplyHardwareVerdict(null, false, HardwareVerdict.NotProbed);
+            return (t, s, e, d, p, r, g, window.CmbBurnSubtitle.ItemCount);
+        });
+
+        Assert.Equal(4, tam);
+        Assert.Equal(1, secili);
+        Assert.Equal(2, eksik);
+        Assert.Null(dusen);
+        Assert.Null(plan);
+        Assert.Equal(0, resim);
+        Assert.Equal((4, 0), geri);
+        Assert.Equal(4, yoklamasiz);
+    }
+
+    /// <summary>
     /// Süzgeç dökümü resim altyazı yakmada bindirme adımını gösterir: <c>-vf</c> zinciri onu taşımıyor,
     /// grafiğe geçiyor. Metin izde dökümde <c>subtitles</c> var, bindirme yok (olumsuz kontrol).
     /// </summary>

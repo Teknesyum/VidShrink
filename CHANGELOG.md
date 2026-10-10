@@ -21,6 +21,14 @@ ship as part of it.
 - A recording set to GIF whose GIF conversion fails keeps its MKV, and that MKV now carries the
   chapter marks set with F6. Before, the marks were reported as lost. Measured with a real
   failed conversion on a short generated clip, not with a live screen recording.
+- CLI: burning a subtitle file (`--yak-srt`, `--yak-ass`) that is not UTF-8 no longer fails with
+  ffmpeg's raw "Invalid UTF-8" error. A Windows-125x or UTF-16 file is read, burned from a
+  temporary UTF-8 copy, and the assumed encoding is printed; a file whose encoding cannot be
+  worked out is refused before the job starts. The single-byte code page is taken from the
+  system's regional setting, so it is a guess; there is no flag to name the encoding yet.
+- The burn list in the Shrink tab no longer offers text subtitle tracks when the ffmpeg build
+  has no `subtitles` filter (built without libass). Before, picking one failed with ffmpeg's own
+  error. Picture subtitles stay available. Measured with a faked probe, not a real libass-less build.
 
 ## [1.2.9] - 2026-10-07
 

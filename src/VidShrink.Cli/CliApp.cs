@@ -22,6 +22,12 @@ public sealed class CliServices
     /// </summary>
     public Func<string, bool> HasFilter { get; init; } = name => !EncoderCapabilities.Instance.Loaded || EncoderCapabilities.Instance.HasFilter(name);
 
+    /// <summary>UTF-8 olmayan yakma altyazisinin BOM'suz tek baytli halinde varsayilan kod sayfasi.</summary>
+    public Func<int> AnsiCodePage { get; init; } = () => SubtitleCharset.SystemAnsiCodePage;
+
+    /// <summary>UTF-8'e cevrilen yakma altyazisinin yazildigi klasor; dosya is bitince silinir.</summary>
+    public Func<string> BurnScratchFolder { get; init; } = Path.GetTempPath;
+
     /// <summary><c>--altyazi-tara</c>'nin paket sayimi; yalniz kaynakta zorunlu bayrakli altyazi yokken cagrilir.</summary>
     public Func<MediaInfo, CancellationToken, Task<IReadOnlyDictionary<int, int>?>> CountSubtitlePackets { get; init; }
         = (info, ct) => FfprobeClient.CountSubtitlePacketsAsync(info.FilePath, ct);
@@ -169,6 +175,48 @@ public static class CliApp
     private static async Task<FileRun> ProcessFileAsync(CliRequest request, CliServices services, TextWriter stdout,
         TextWriter stderr, CliText text, CancellationToken ct)
     {
+        var scratch = new List<string>();
+        try
+        {
+            return await ProcessFileAsync(request, services, stdout, stderr, text, scratch, ct);
+        }
+        finally
+        {
+            foreach (var file in scratch)
+            {
+                try { File.Delete(file); }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Yakilacak dis altyazi UTF-8 degilse UTF-8 kopyasini yazar ve istegi ona cevirir; kopya
+    /// <paramref name="scratch"/> listesine girer. Kodlama cikarilamazsa hata anahtari doner.
+    /// </summary>
+    public static string? PrepareBurnFile(ref CliRequest request, CliServices services, List<string> scratch, out string? encoding)
+    {
+        encoding = null;
+        if (request.BurnFile is not { } file) return null;
+        var read = SubtitleCharset.Read(File.ReadAllBytes(file), services.AnsiCodePage());
+        if (read.Kind == SubtitleCharsetKind.Utf8) return null;
+        if (read.Kind == SubtitleCharsetKind.Unknown || read.Kind != SubtitleCharsetKind.Converted) return BurnEncodingError;
+        var folder = services.BurnScratchFolder();
+        Directory.CreateDirectory(folder);
+        var copy = Path.Combine(folder, "vidshrink_altyazi_" + Guid.NewGuid().ToString("N") + Path.GetExtension(file).ToLowerInvariant());
+        scratch.Add(copy);
+        File.WriteAllText(copy, read.Text, new UTF8Encoding(false));
+        request = request with { BurnFile = copy };
+        encoding = read.Name;
+        return null;
+    }
+
+    internal const string BurnEncodingError = "error.burn-file-encoding";
+    internal const string BurnEncodingNote = "result.burn-charset";
+
+    private static async Task<FileRun> ProcessFileAsync(CliRequest request, CliServices services, TextWriter stdout,
+        TextWriter stderr, CliText text, List<string> scratch, CancellationToken ct)
+    {
         var input = Path.GetFullPath(request.Input!);
         if (!File.Exists(input))
         {
@@ -233,6 +281,14 @@ public static class CliApp
             stderr.WriteLine(yakmaIletisi);
             return new FileRun(ExitCodes.Error, null, yakmaIletisi);
         }
+        var yakilanDosya = request.BurnFile;
+        if (PrepareBurnFile(ref request, services, scratch, out var okunanKodlama) is { } kodlamaHatasi)
+        {
+            var kodlamaIletisi = text.Format(kodlamaHatasi, yakilanDosya);
+            stderr.WriteLine(kodlamaIletisi);
+            return new FileRun(ExitCodes.Usage, null, kodlamaIletisi);
+        }
+        if (okunanKodlama is not null) stderr.WriteLine(text.Format(BurnEncodingNote, okunanKodlama));
         if (request.ProbesCrop && request.Filters?.Crop is null)
         {
             stderr.WriteLine(text["progress.crop"]);
