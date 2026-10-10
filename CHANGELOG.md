@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.11] - 2026-10-10
+
 ### Added
 
 - The player opens a network address from more places. "Open address… (Ctrl+U)" was already
