@@ -185,18 +185,25 @@ public static class KaydiriciHareketi
             if (Math.Abs(dx) < 0.5) return;
             var sure = Kaydirici.TryFindResource("MotionFast", out var s) && s is TimeSpan t ? t : TimeSpan.Zero;
             Oynat(basparmak, $"translateX({Sayi(dx)}px)", sure);
-            if (Iz.DecreaseButton is { } dolu && dolu.Bounds.Width > 0.5)
+            if (Iz.DecreaseButton is { } dolu && Tasma(dolu) is var doluTasma && dolu.Bounds.Width + doluTasma > 0.5)
             {
                 dolu.RenderTransformOrigin = new RelativePoint(0, 0.5, RelativeUnit.Relative);
-                Oynat(dolu, $"scaleX({Sayi(Dolu.Width / dolu.Bounds.Width)})", sure);
+                Oynat(dolu, $"scaleX({Sayi((Dolu.Width + doluTasma) / (dolu.Bounds.Width + doluTasma))})", sure);
             }
-            if (Iz.IncreaseButton is { } bos && bos.Bounds.Width > 0.5)
+            if (Iz.IncreaseButton is { } bos && Tasma(bos) is var bosTasma && bos.Bounds.Width + bosTasma > 0.5)
             {
                 bos.RenderTransformOrigin = new RelativePoint(1, 0.5, RelativeUnit.Relative);
-                Oynat(bos, $"scaleX({Sayi(Bos.Width / bos.Bounds.Width)})", sure);
+                Oynat(bos, $"scaleX({Sayi((Bos.Width + bosTasma) / (bos.Bounds.Width + bosTasma))})", sure);
             }
         }
     }
+
+    /// <summary>
+    /// İz parçasının çizgisi başparmağın altına ne kadar uzanıyor (eksi kenar boşluğu): ölçek
+    /// düğmenin değil çizilen çizginin eski boyundan hesaplanır, yoksa uç başparmağın merkezinden kayar.
+    /// </summary>
+    internal static double Tasma(Control parca)
+        => parca.GetVisualDescendants().OfType<Border>().Select(b => -(b.Margin.Left + b.Margin.Right)).FirstOrDefault(t => t > 0);
 
     private static string Sayi(double x) => x.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
 

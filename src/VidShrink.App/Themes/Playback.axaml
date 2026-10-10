@@ -152,8 +152,11 @@
   <x:Double x:Key="PlaybackVolumeTick">5</x:Double>
   <x:Double x:Key="PlaybackSpeedTick">0.05</x:Double>
   <StaticResource x:Key="PlaybackSliderTrackHeight" ResourceKey="ProgressBarHeight"/>
-  <StaticResource x:Key="PlaybackSliderThumbWidth" ResourceKey="SpaceMd"/>
-  <StaticResource x:Key="PlaybackSliderThumbHeight" ResourceKey="SpaceLg"/>
+  <StaticResource x:Key="PlaybackSliderThumbSize" ResourceKey="SpaceLg"/>
+  <CornerRadius x:Key="PlaybackSliderFilledTrackRadius">4,0,0,4</CornerRadius>
+  <CornerRadius x:Key="PlaybackSliderEmptyTrackRadius">0,4,4,0</CornerRadius>
+  <Thickness x:Key="PlaybackSliderFilledTrackOverlap">0,0,-8,0</Thickness>
+  <Thickness x:Key="PlaybackSliderEmptyTrackOverlap">-8,0,0,0</Thickness>
 
   <x:Double x:Key="PlaybackThumbnailWidth">128</x:Double>
   <x:Double x:Key="PlaybackThumbnailHeight">72</x:Double>
@@ -490,15 +493,37 @@
   </ControlTheme>
 
   <ControlTheme x:Key="PlaybackSliderFilledTrack" TargetType="RepeatButton" BasedOn="{StaticResource SliderFilledTrack}">
-    <Style Selector="^ /template/ Border#FilledTrack">
-      <Setter Property="Height" Value="{StaticResource PlaybackSliderTrackHeight}"/>
-    </Style>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="RepeatButton">
+        <Panel Background="Transparent">
+          <Border Name="FilledTrack"
+                  Height="{StaticResource PlaybackSliderTrackHeight}"
+                  Margin="{StaticResource PlaybackSliderFilledTrackOverlap}"
+                  VerticalAlignment="Center"
+                  Background="{StaticResource NeonBlue}"
+                  BorderBrush="{StaticResource NeonBlue}"
+                  BorderThickness="{StaticResource BorderThin}"
+                  CornerRadius="{StaticResource PlaybackSliderFilledTrackRadius}"/>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
   </ControlTheme>
 
   <ControlTheme x:Key="PlaybackSliderEmptyTrack" TargetType="RepeatButton" BasedOn="{StaticResource SliderEmptyTrack}">
-    <Style Selector="^ /template/ Border#RemainingTrack">
-      <Setter Property="Height" Value="{StaticResource PlaybackSliderTrackHeight}"/>
-    </Style>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="RepeatButton">
+        <Panel Background="Transparent">
+          <Border Name="RemainingTrack"
+                  Height="{StaticResource PlaybackSliderTrackHeight}"
+                  Margin="{StaticResource PlaybackSliderEmptyTrackOverlap}"
+                  VerticalAlignment="Center"
+                  Background="{StaticResource NeonBlueFill}"
+                  BorderBrush="{StaticResource NeonBlueBorderStrong}"
+                  BorderThickness="{StaticResource BorderThin}"
+                  CornerRadius="{StaticResource PlaybackSliderEmptyTrackRadius}"/>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
   </ControlTheme>
 
   <ControlTheme x:Key="PlaybackSliderThumb" TargetType="Thumb">
@@ -507,42 +532,42 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="Thumb">
         <Panel Background="Transparent">
-          <Rectangle Name="Knob"
-                     Width="{StaticResource PlaybackSliderThumbWidth}"
-                     Height="{StaticResource PlaybackSliderThumbHeight}"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     Fill="{StaticResource AppBg}"
-                     Stroke="{StaticResource NeonBlue}"
-                     StrokeThickness="{StaticResource SliderThumbStroke}"
-                     RenderTransform="none">
-            <Rectangle.Transitions>
+          <Ellipse Name="Knob"
+                   Width="{StaticResource PlaybackSliderThumbSize}"
+                   Height="{StaticResource PlaybackSliderThumbSize}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Fill="{StaticResource AppBg}"
+                   Stroke="{StaticResource NeonBlue}"
+                   StrokeThickness="{StaticResource SliderThumbStroke}"
+                   RenderTransform="none">
+            <Ellipse.Transitions>
               <Transitions>
                 <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
               </Transitions>
-            </Rectangle.Transitions>
-          </Rectangle>
+            </Ellipse.Transitions>
+          </Ellipse>
         </Panel>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:pointerover /template/ Rectangle#Knob">
+    <Style Selector="^:pointerover /template/ Ellipse#Knob">
       <Setter Property="RenderTransform" Value="scale(1.1)"/>
     </Style>
-    <Style Selector="^.ustunde /template/ Rectangle#Knob">
+    <Style Selector="^.ustunde /template/ Ellipse#Knob">
       <Setter Property="RenderTransform" Value="scale(1.1)"/>
     </Style>
-    <Style Selector="^.odak /template/ Rectangle#Knob">
+    <Style Selector="^.odak /template/ Ellipse#Knob">
       <Setter Property="RenderTransform" Value="scale(1.1)"/>
     </Style>
-    <Style Selector="^:pressed /template/ Rectangle#Knob">
+    <Style Selector="^:pressed /template/ Ellipse#Knob">
       <Setter Property="RenderTransform" Value="scale(1.2)"/>
       <Setter Property="Fill" Value="{StaticResource NeonBlue}"/>
     </Style>
-    <Style Selector="^.basili /template/ Rectangle#Knob">
+    <Style Selector="^.basili /template/ Ellipse#Knob">
       <Setter Property="RenderTransform" Value="scale(1.2)"/>
       <Setter Property="Fill" Value="{StaticResource NeonBlue}"/>
     </Style>
-    <Style Selector="^:disabled /template/ Rectangle#Knob">
+    <Style Selector="^:disabled /template/ Ellipse#Knob">
       <Setter Property="RenderTransform" Value="none"/>
       <Setter Property="Stroke" Value="{StaticResource TextDisabled}"/>
     </Style>
@@ -571,7 +596,7 @@
               <Track.Thumb>
                 <Thumb Name="ThumbVisual"
                        Theme="{StaticResource PlaybackSliderThumb}"
-                       Width="{StaticResource PlaybackSliderThumbWidth}"/>
+                       Width="{StaticResource PlaybackSliderThumbSize}"/>
               </Track.Thumb>
             </Track>
           </Panel>

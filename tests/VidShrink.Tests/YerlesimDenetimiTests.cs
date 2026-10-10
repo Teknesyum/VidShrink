@@ -1121,6 +1121,8 @@ public sealed class YerlesimDenetimiTests
             var b = cocuk.Bounds;
             var yatay = Math.Max(-b.X, b.Right - ebeveyn.Bounds.Width);
             var dikey = Math.Max(-b.Y, b.Bottom - ebeveyn.Bounds.Height);
+            if (cocuk.Name is "FilledTrack" or "RemainingTrack" && cocuk.FindAncestorOfType<Track>() is not null)
+                yatay = Math.Max(-b.X + Math.Min(0, cocuk.Margin.Left), b.Right - ebeveyn.Bounds.Width + Math.Min(0, cocuk.Margin.Right));
 
             if (ebeveyn is ScrollContentPresenter sunucu)
             {

@@ -18,6 +18,11 @@ ship as part of it.
 
 ### Changed
 
+- Sliders have soft ends. The volume and speed sliders in the player had a rectangular 12x16
+  handle; it is now a 16 px circle like the other sliders, and their track is 8 px as the theme
+  always intended (it was drawn at 10). On every slider the track is a full pill at both ends and
+  the filled and empty parts meet under the handle instead of being cut flat at its edges, so no
+  square corner shows at 0% or 100%. Before and after: `docs/olcumler/kaydirici-uclari/`.
 - The comparison panel labels read "Original" / "Processed" instead of all capitals, in the 31
   languages whose script has letter case; the other 11 are unchanged. The badges already used
   the same weight as the other labels, so the weight did not change.
