@@ -579,7 +579,11 @@ public sealed class DuzenleyiciSeritTests
 
         internal void Pompala(Func<bool> kosul) => DenetimSurucu.Pump(View.Player, kosul, 20);
 
-        public void Dispose() => _pencere.Close();
+        public void Dispose()
+        {
+            _pencere.Close();
+            DuzenleyiciKapanis.Birakti(View, 30);
+        }
     }
 
     private static string Kaynak(string klasor, string ad)

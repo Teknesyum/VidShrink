@@ -308,13 +308,13 @@ public sealed class DuzenleyiciSahneBolmeTests
                 }
                 finally
                 {
-                    pencere.Close();
+                    DuzenleyiciKapanis.Kapat(pencere, view);
                 }
             });
         }
         finally
         {
-            try { Directory.Delete(klasor, true); } catch (IOException) { }
+            if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
             KanitKapanisi.Kapat(Kanit);
         }
     }
