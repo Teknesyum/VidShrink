@@ -10,5 +10,8 @@
   "player.tools.cancel": "Отмена",
   "player.tools.saved": "Сохранено: {0}",
   "player.tools.failed": "Не удалось создать файл",
-  "player.tools.novideo": "Сначала откройте видео"
+  "player.tools.novideo": "Сначала откройте видео",
+  "player.tools.paste": "Вставить адрес",
+  "player.tools.paste-none": "В буфере обмена нет адреса",
+  "player.address.unsupported": "Недоступно для видео, открытого по адресу"
 }

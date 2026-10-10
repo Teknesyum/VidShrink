@@ -10,5 +10,8 @@
   "player.tools.cancel": "Peruuta",
   "player.tools.saved": "Tallennettu: {0}",
   "player.tools.failed": "Tiedostoa ei voitu luoda",
-  "player.tools.novideo": "Avaa ensin video"
+  "player.tools.novideo": "Avaa ensin video",
+  "player.tools.paste": "Liitä osoite",
+  "player.tools.paste-none": "Leikepöydällä ei ole osoitetta",
+  "player.address.unsupported": "Ei käytettävissä osoitteesta avatulle videolle"
 }

@@ -5,6 +5,7 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.VisualTree;
+using VidShrink.Core;
 
 namespace VidShrink.App.Playback;
 
@@ -27,12 +28,14 @@ internal partial class PlayerView
 
     private void ShowMediaTitle(string path)
     {
-        var name = Path.GetFileName(path);
+        var name = MediaName(path);
         TxtMediaTitle.Text = name;
-        ToolTip.SetTip(MediaTitle, path);
+        ToolTip.SetTip(MediaTitle, MediaAddress.WithoutQuery(path));
         AutomationProperties.SetName(MediaTitle, name);
         MediaTitle.Classes.Set(TitleFilled, name.Length > 0);
     }
+
+    internal static string MediaName(string path) => MediaAddress.IsAddress(path) ? MediaAddress.Name(path) : Path.GetFileName(path);
 
     private void HideMediaTitle()
     {
@@ -61,8 +64,8 @@ internal partial class PlayerView
     internal MenuFlyout BuildTitleMenu(string path)
     {
         var flyout = new MenuFlyout();
-        flyout.Items.Add(ItemRow("copy-name", "player.title.copy-name", true, () => _ = PathCopier(TopLevel.GetTopLevel(this), Path.GetFileName(path))));
-        flyout.Items.Add(ItemRow("copy-path", "player.list.item.copy-path", true, () => _ = PathCopier(TopLevel.GetTopLevel(this), Path.GetFullPath(path))));
+        flyout.Items.Add(ItemRow("copy-name", "player.title.copy-name", true, () => _ = PathCopier(TopLevel.GetTopLevel(this), MediaName(path))));
+        flyout.Items.Add(ItemRow("copy-path", "player.list.item.copy-path", true, () => _ = PathCopier(TopLevel.GetTopLevel(this), IsAddress(path) ? path : Path.GetFullPath(path))));
         flyout.Items.Add(new Separator());
         flyout.Items.Add(RevealRow());
         flyout.Items.Add(ActionRow(Keymap.Info));

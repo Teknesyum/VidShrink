@@ -148,14 +148,17 @@ internal static class Program
         return BuildShrink(startup, queue).StartWithClassicDesktopLifetime(args);
     }
 
+    /// <summary>Açılış hedefi: var olan dosya, yoksa komut satırındaki ilk ağ adresi.</summary>
+    internal static string? StartupTarget(string[] args) => ShellIntegration.ResolveStartupPath(args) ?? MediaAddress.FromArguments(args);
+
     private static int RunMain(string[] args)
     {
         AcilisIzi.Yaz("main");
-        var path = ShellIntegration.ResolveStartupPath(args);
+        var path = StartupTarget(args);
         using var instance = new SingleInstanceChannel(SingleInstanceChannel.DefaultChannel());
         var files = new Integration.ForwardedFiles();
         AcilisIzi.Yaz("tek-ornek");
-        if (path is not null) WarmStartupFile(path);
+        if (path is not null && !MediaAddress.IsAddress(path)) WarmStartupFile(path);
 
         if (!instance.IsOwner)
         {

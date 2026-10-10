@@ -10,5 +10,8 @@
   "player.tools.cancel": "Cancelar",
   "player.tools.saved": "Guardado: {0}",
   "player.tools.failed": "No se pudo crear el archivo",
-  "player.tools.novideo": "Abre un vídeo primero"
+  "player.tools.novideo": "Abre un vídeo primero",
+  "player.tools.paste": "Pegar dirección",
+  "player.tools.paste-none": "No hay ninguna dirección en el portapapeles",
+  "player.address.unsupported": "No disponible para un vídeo abierto desde una dirección"
 }

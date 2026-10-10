@@ -10,5 +10,8 @@
   "player.tools.cancel": "لغو",
   "player.tools.saved": "ذخیره شد: {0}",
   "player.tools.failed": "فایل ایجاد نشد",
-  "player.tools.novideo": "ابتدا یک ویدیو باز کنید"
+  "player.tools.novideo": "ابتدا یک ویدیو باز کنید",
+  "player.tools.paste": "چسباندن نشانی",
+  "player.tools.paste-none": "نشانی‌ای در کلیپ‌بورد نیست",
+  "player.address.unsupported": "برای ویدیویی که از نشانی باز شده در دسترس نیست"
 }

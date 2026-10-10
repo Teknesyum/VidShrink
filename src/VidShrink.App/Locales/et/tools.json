@@ -10,5 +10,8 @@
   "player.tools.cancel": "Loobu",
   "player.tools.saved": "Salvestatud: {0}",
   "player.tools.failed": "Faili ei õnnestunud luua",
-  "player.tools.novideo": "Ava kõigepealt video"
+  "player.tools.novideo": "Ava kõigepealt video",
+  "player.tools.paste": "Kleebi aadress",
+  "player.tools.paste-none": "Lõikelaual pole aadressi",
+  "player.address.unsupported": "Pole saadaval aadressilt avatud video puhul"
 }

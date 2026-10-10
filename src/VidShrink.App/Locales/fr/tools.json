@@ -10,5 +10,8 @@
   "player.tools.cancel": "Annuler",
   "player.tools.saved": "Enregistré : {0}",
   "player.tools.failed": "Impossible de créer le fichier",
-  "player.tools.novideo": "Ouvrez d'abord une vidéo"
+  "player.tools.novideo": "Ouvrez d'abord une vidéo",
+  "player.tools.paste": "Coller l’adresse",
+  "player.tools.paste-none": "Aucune adresse dans le presse-papiers",
+  "player.address.unsupported": "Indisponible pour une vidéo ouverte depuis une adresse"
 }

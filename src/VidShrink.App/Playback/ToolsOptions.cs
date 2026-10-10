@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using VidShrink.Core;
 
 namespace VidShrink.App.Playback;
 
@@ -30,6 +31,7 @@ internal sealed class ToolsOptions
     internal static readonly PlayerAction Gif = new(PlayerCommandKind.GifExport, 0, "player.tools.gif");
     internal static readonly PlayerAction MiniMode = new(PlayerCommandKind.MiniMode, 0, "player.tools.mini");
     internal static readonly PlayerAction OpenUrl = new(PlayerCommandKind.OpenUrl, 0, "player.tools.url");
+    internal static readonly PlayerAction PasteUrl = new(PlayerCommandKind.PasteUrl, 0, "player.tools.paste");
 
     internal double ClipSeconds { get; private set; } = DefaultClipSeconds;
 
@@ -56,7 +58,7 @@ internal sealed class ToolsOptions
         MiniHeight = double.IsFinite(height) && height > 0 ? height : DefaultMiniHeight;
     }
 
-    internal void UseUrl(string? url) => LastUrl = string.IsNullOrWhiteSpace(url) ? "" : url.Trim();
+    internal void UseUrl(string? url) => LastUrl = string.IsNullOrWhiteSpace(url) ? "" : MediaAddress.WithoutQuery(url.Trim());
 
     internal void Reset()
     {

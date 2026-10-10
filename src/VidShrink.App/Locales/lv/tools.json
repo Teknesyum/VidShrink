@@ -10,5 +10,8 @@
   "player.tools.cancel": "Atcelt",
   "player.tools.saved": "Saglabāts: {0}",
   "player.tools.failed": "Failu nevarēja izveidot",
-  "player.tools.novideo": "Vispirms atveriet video"
+  "player.tools.novideo": "Vispirms atveriet video",
+  "player.tools.paste": "Ielīmēt adresi",
+  "player.tools.paste-none": "Starpliktuvē nav adreses",
+  "player.address.unsupported": "Nav pieejams video, kas atvērts no adreses"
 }

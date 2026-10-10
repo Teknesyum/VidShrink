@@ -10,5 +10,8 @@
   "player.tools.cancel": "Atšaukti",
   "player.tools.saved": "Įrašyta: {0}",
   "player.tools.failed": "Nepavyko sukurti failo",
-  "player.tools.novideo": "Pirmiausia atverkite vaizdo įrašą"
+  "player.tools.novideo": "Pirmiausia atverkite vaizdo įrašą",
+  "player.tools.paste": "Įklijuoti adresą",
+  "player.tools.paste-none": "Iškarpinėje nėra adreso",
+  "player.address.unsupported": "Nepasiekiama vaizdo įrašui, atidarytam iš adreso"
 }

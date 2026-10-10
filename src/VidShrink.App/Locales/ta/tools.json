@@ -10,5 +10,8 @@
   "player.tools.cancel": "ரத்து",
   "player.tools.saved": "சேமிக்கப்பட்டது: {0}",
   "player.tools.failed": "கோப்பை உருவாக்க முடியவில்லை",
-  "player.tools.novideo": "முதலில் ஒரு வீடியோவைத் திறக்கவும்"
+  "player.tools.novideo": "முதலில் ஒரு வீடியோவைத் திறக்கவும்",
+  "player.tools.paste": "முகவரியை ஒட்டு",
+  "player.tools.paste-none": "கிளிப்போர்டில் முகவரி இல்லை",
+  "player.address.unsupported": "முகவரியிலிருந்து திறந்த வீடியோவுக்குக் கிடைக்காது"
 }

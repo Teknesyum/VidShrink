@@ -10,5 +10,8 @@
   "player.tools.cancel": "Zrušit",
   "player.tools.saved": "Uloženo: {0}",
   "player.tools.failed": "Soubor se nepodařilo vytvořit",
-  "player.tools.novideo": "Nejprve otevřete video"
+  "player.tools.novideo": "Nejprve otevřete video",
+  "player.tools.paste": "Vložit adresu",
+  "player.tools.paste-none": "Ve schránce není žádná adresa",
+  "player.address.unsupported": "Není k dispozici u videa otevřeného z adresy"
 }

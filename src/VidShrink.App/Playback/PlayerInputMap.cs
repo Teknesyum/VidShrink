@@ -52,6 +52,7 @@ internal enum PlayerCommandKind
     GifExport,
     MiniMode,
     OpenUrl,
+    PasteUrl,
     Stop,
     GoToStart,
     Edit,

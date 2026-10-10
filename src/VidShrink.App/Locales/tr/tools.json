@@ -10,5 +10,8 @@
   "player.tools.cancel": "Vazgeç",
   "player.tools.saved": "Kaydedildi: {0}",
   "player.tools.failed": "Dosya oluşturulamadı",
-  "player.tools.novideo": "Önce bir video açın"
+  "player.tools.novideo": "Önce bir video açın",
+  "player.tools.paste": "Adresi yapıştır",
+  "player.tools.paste-none": "Panoda adres yok",
+  "player.address.unsupported": "Adresten açılan videoda kullanılamaz"
 }

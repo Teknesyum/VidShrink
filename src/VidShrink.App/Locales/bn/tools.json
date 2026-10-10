@@ -10,5 +10,8 @@
   "player.tools.cancel": "বাতিল",
   "player.tools.saved": "সংরক্ষিত হয়েছে: {0}",
   "player.tools.failed": "ফাইলটি তৈরি করা যায়নি",
-  "player.tools.novideo": "প্রথমে একটি ভিডিও খুলুন"
+  "player.tools.novideo": "প্রথমে একটি ভিডিও খুলুন",
+  "player.tools.paste": "ঠিকানা পেস্ট করুন",
+  "player.tools.paste-none": "ক্লিপবোর্ডে কোনো ঠিকানা নেই",
+  "player.address.unsupported": "ঠিকানা থেকে খোলা ভিডিওতে উপলব্ধ নয়"
 }

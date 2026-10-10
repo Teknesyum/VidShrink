@@ -10,5 +10,8 @@
   "player.tools.cancel": "Odustani",
   "player.tools.saved": "Spremljeno: {0}",
   "player.tools.failed": "Datoteku nije bilo moguće izraditi",
-  "player.tools.novideo": "Najprije otvorite videozapis"
+  "player.tools.novideo": "Najprije otvorite videozapis",
+  "player.tools.paste": "Zalijepi adresu",
+  "player.tools.paste-none": "U međuspremniku nema adrese",
+  "player.address.unsupported": "Nije dostupno za video otvoren s adrese"
 }

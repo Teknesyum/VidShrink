@@ -122,6 +122,7 @@ internal sealed class PlayerSettings
         if (!string.IsNullOrWhiteSpace(ScreenshotFolder)) return ScreenshotFolder!;
         var pictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
         if (!string.IsNullOrEmpty(pictures)) return Path.Combine(pictures, "VidShrink");
+        if (MediaAddress.IsAddress(media)) return Environment.CurrentDirectory;
         return Path.GetDirectoryName(Path.GetFullPath(media)) ?? Environment.CurrentDirectory;
     }
 
@@ -141,7 +142,7 @@ internal sealed class PlayerSettings
         var time = Saat.DosyaAdi(at);
         var pattern = string.IsNullOrWhiteSpace(ScreenshotPattern) ? DefaultPattern : ScreenshotPattern;
         var stem = pattern
-            .Replace("{name}", Path.GetFileNameWithoutExtension(media), StringComparison.Ordinal)
+            .Replace("{name}", Path.GetFileNameWithoutExtension(MediaAddress.IsAddress(media) ? MediaAddress.Name(media) : media), StringComparison.Ordinal)
             .Replace("{time}", time, StringComparison.Ordinal);
         var invalid = Path.GetInvalidFileNameChars();
         var clean = new string(stem.Select(c => invalid.Contains(c) ? '_' : c).ToArray()).Trim();

@@ -131,7 +131,7 @@ public sealed class WatchFolder
     }
 
     /// <summary>
-    /// Durum dosyasinin adindaki <c>&lt;hash&gt;</c>. Kural iki READMEde yazili ve
+    /// Durum dosyasinin adindaki <c>&lt;hash&gt;</c>. Kural <c>docs/cli.md</c> ile <c>docs/cli.tr.md</c>de yazili ve
     /// <c>WatchFolderTests.IzleBelgesiOzetAnahtariniKuraldanPimliyor</c> ile pimli:
     /// yol once <see cref="Normalize"/>'dan gecer, isletim sisteminin kurali harf duyarsizsa
     /// (Windows, macOS) buyuk harfe cevrilir, SHA-256'nin ilk

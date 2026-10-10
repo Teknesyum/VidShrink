@@ -10,5 +10,8 @@
   "player.tools.cancel": "Cancelar",
   "player.tools.saved": "Salvo: {0}",
   "player.tools.failed": "Não foi possível criar o arquivo",
-  "player.tools.novideo": "Abra um vídeo primeiro"
+  "player.tools.novideo": "Abra um vídeo primeiro",
+  "player.tools.paste": "Colar endereço",
+  "player.tools.paste-none": "Nenhum endereço na área de transferência",
+  "player.address.unsupported": "Indisponível para um vídeo aberto a partir de um endereço"
 }

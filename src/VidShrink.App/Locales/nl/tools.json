@@ -10,5 +10,8 @@
   "player.tools.cancel": "Annuleren",
   "player.tools.saved": "Opgeslagen: {0}",
   "player.tools.failed": "Het bestand kon niet worden gemaakt",
-  "player.tools.novideo": "Open eerst een video"
+  "player.tools.novideo": "Open eerst een video",
+  "player.tools.paste": "Adres plakken",
+  "player.tools.paste-none": "Geen adres op het klembord",
+  "player.address.unsupported": "Niet beschikbaar voor een video die vanaf een adres is geopend"
 }

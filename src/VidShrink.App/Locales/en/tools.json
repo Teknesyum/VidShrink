@@ -10,5 +10,8 @@
   "player.tools.cancel": "Cancel",
   "player.tools.saved": "Saved: {0}",
   "player.tools.failed": "The file could not be created",
-  "player.tools.novideo": "Open a video first"
+  "player.tools.novideo": "Open a video first",
+  "player.tools.paste": "Paste address",
+  "player.tools.paste-none": "No address on the clipboard",
+  "player.address.unsupported": "Not available for a video opened from an address"
 }

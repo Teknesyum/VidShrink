@@ -10,5 +10,8 @@
   "player.tools.cancel": "Hủy",
   "player.tools.saved": "Đã lưu: {0}",
   "player.tools.failed": "Không thể tạo tệp",
-  "player.tools.novideo": "Hãy mở video trước"
+  "player.tools.novideo": "Hãy mở video trước",
+  "player.tools.paste": "Dán địa chỉ",
+  "player.tools.paste-none": "Không có địa chỉ trong bộ nhớ tạm",
+  "player.address.unsupported": "Không dùng được với video mở từ địa chỉ"
 }

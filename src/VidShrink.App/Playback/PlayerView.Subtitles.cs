@@ -107,6 +107,13 @@ internal partial class PlayerView
             return;
         }
 
+        if (IsAddress(path))
+        {
+            Notice(AddressUnsupportedKey);
+            _trace.Add("subdl -> address");
+            return;
+        }
+
         var provider = Provider();
         if (!provider.IsConfigured)
         {

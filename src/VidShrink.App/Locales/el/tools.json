@@ -10,5 +10,8 @@
   "player.tools.cancel": "Ακύρωση",
   "player.tools.saved": "Αποθηκεύτηκε: {0}",
   "player.tools.failed": "Δεν ήταν δυνατή η δημιουργία του αρχείου",
-  "player.tools.novideo": "Ανοίξτε πρώτα ένα βίντεο"
+  "player.tools.novideo": "Ανοίξτε πρώτα ένα βίντεο",
+  "player.tools.paste": "Επικόλληση διεύθυνσης",
+  "player.tools.paste-none": "Δεν υπάρχει διεύθυνση στο πρόχειρο",
+  "player.address.unsupported": "Δεν διατίθεται για βίντεο που ανοίχτηκε από διεύθυνση"
 }

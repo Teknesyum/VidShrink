@@ -23,6 +23,7 @@ internal partial class PlayerView
 {
     internal const int ThumbnailWidth = 128;
     internal const int ThumbnailHeight = 72;
+    internal const string AddressUnsupportedKey = "player.address.unsupported";
 
     private readonly MiniModeSwitch _mini = new();
     private readonly List<double> _thumbnailMs = new();
@@ -40,6 +41,7 @@ internal partial class PlayerView
     private Task _thumbWork = Task.CompletedTask;
     private Task<ClipResult> _lastExport = Task.FromResult(new ClipResult(false, "", "", TimeSpan.Zero));
     private Task<bool> _lastAddress = Task.FromResult(false);
+    private Task<bool> _lastPaste = Task.FromResult(false);
 
     internal ToolsOptions Tools
     {
@@ -61,6 +63,12 @@ internal partial class PlayerView
     internal Task<ClipResult> LastExport => _lastExport;
 
     internal Task<bool> LastAddress => _lastAddress;
+
+    internal Task<bool> LastPaste => _lastPaste;
+
+    internal Func<TopLevel?, Task<string?>> AddressReader { get; set; } = ReadClipboardText;
+
+    internal bool OnAddress => MediaAddress.IsAddress(_path);
 
     internal bool ThumbnailVisible => ThumbChip?.IsVisible ?? false;
 
@@ -91,6 +99,10 @@ internal partial class PlayerView
             case PlayerCommandKind.OpenUrl:
                 _trace.Add("url -> " + PromptAddress());
                 return true;
+            case PlayerCommandKind.PasteUrl:
+                _lastPaste = PasteAddressAsync();
+                _trace.Add("paste -> clipboard");
+                return true;
             default:
                 return false;
         }
@@ -116,11 +128,18 @@ internal partial class PlayerView
         var clip = ToolsRow(ToolsOptions.Clip);
         var gif = ToolsRow(ToolsOptions.Gif);
         clip.IsEnabled = gif.IsEnabled = !AudioOnly;
+        if (OnAddress)
+        {
+            ExplainAddress(clip);
+            ExplainAddress(gif);
+        }
+
         return Submenu(Strings.Get("player.tools.menu"), new List<Control>
         {
             clip,
             gif,
             ToolsRow(ToolsOptions.OpenUrl),
+            ToolsRow(ToolsOptions.PasteUrl),
             new Separator(),
             ActionRow(Keymap.Info),
             mini
@@ -134,6 +153,13 @@ internal partial class PlayerView
             item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
         item.Click += OnToolsRow;
         return item;
+    }
+
+    private static void ExplainAddress(MenuItem item)
+    {
+        item.IsEnabled = false;
+        ToolTip.SetTip(item, Strings.Get(AddressUnsupportedKey));
+        ToolTip.SetShowOnDisabled(item, true);
     }
 
     private void OnToolsRow(object? sender, RoutedEventArgs e)
@@ -207,8 +233,9 @@ internal partial class PlayerView
     internal async Task<double> ShowThumbnailAsync(double seconds)
     {
         if (_path is not { } media) return double.NaN;
-        ThumbImage.IsVisible = !AudioOnly;
-        if (AudioOnly)
+        var timeOnly = AudioOnly || MediaAddress.IsAddress(media);
+        ThumbImage.IsVisible = !timeOnly;
+        if (timeOnly)
         {
             PlaceThumbnail(seconds);
             return 0;
@@ -363,7 +390,7 @@ internal partial class PlayerView
     {
         if (_path is not { } media || IsAddress(media))
         {
-            _notice = Strings.Get("player.tools.novideo");
+            _notice = Strings.Get(OnAddress ? AddressUnsupportedKey : "player.tools.novideo");
             RefreshState();
             return "no";
         }
@@ -454,12 +481,11 @@ internal partial class PlayerView
 
     /// <summary>
     /// Adres acma. libmpv http/https/rtsp gibi semalari kendi acar; yerel dosya yolu
-    /// buraya girmez. yt-dlp PATH'teyse mpv'nin kendi kancasi devreye girer.
+    /// buraya girmez. Site baglantisi cozulmez: motorda <c>ytdl=no</c>, betik yuklenmez.
+    /// Kayda giden adres sorgusuzdur (<see cref="MediaAddress.WithoutQuery"/>); motora
+    /// giden adres oldugu gibidir.
     /// </summary>
-    internal static bool IsAddress(string? value)
-        => !string.IsNullOrWhiteSpace(value)
-           && Uri.TryCreate(value.Trim(), UriKind.Absolute, out var uri)
-           && MpvEngine.RemoteSchemes.Any(scheme => string.Equals(scheme, uri.Scheme, StringComparison.OrdinalIgnoreCase));
+    internal static bool IsAddress(string? value) => MediaAddress.IsAddress(value);
 
     internal bool OpenAddress(string? value)
     {
@@ -477,6 +503,30 @@ internal partial class PlayerView
         _notice = null;
         _navigation = OpenQuietlyAsync(address);
         return true;
+    }
+
+    private async Task<bool> PasteAddressAsync()
+    {
+        string? text = null;
+        try
+        {
+            text = await AddressReader(TopLevel.GetTopLevel(this)).ConfigureAwait(true);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or TimeoutException or System.Runtime.InteropServices.ExternalException)
+        {
+        }
+
+        if (MediaAddress.FromText(text) is { } address) return OpenAddress(address);
+        _notice = Strings.Get("player.tools.paste-none");
+        RefreshState();
+        return false;
+    }
+
+    private static async Task<string?> ReadClipboardText(TopLevel? top)
+    {
+        if (top?.Clipboard is not { } clipboard) return null;
+        using var data = await clipboard.TryGetDataAsync().ConfigureAwait(true);
+        return data is null ? null : await data.TryGetTextAsync().ConfigureAwait(true);
     }
 
     private string PromptAddress()

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using VidShrink.Core;
 using System.Text.Json.Nodes;
 
 namespace VidShrink.App.Playback;
@@ -188,6 +189,7 @@ internal sealed class PlaybackHistory
     private static string Normalize(string media)
     {
         if (string.IsNullOrEmpty(media)) return "";
+        if (MediaAddress.IsAddress(media)) return MediaAddress.WithoutQuery(media);
         try { return Path.GetFullPath(media); }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException) { return media; }
     }

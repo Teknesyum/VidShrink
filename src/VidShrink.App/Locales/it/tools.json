@@ -10,5 +10,8 @@
   "player.tools.cancel": "Annulla",
   "player.tools.saved": "Salvato: {0}",
   "player.tools.failed": "Impossibile creare il file",
-  "player.tools.novideo": "Apri prima un video"
+  "player.tools.novideo": "Apri prima un video",
+  "player.tools.paste": "Incolla indirizzo",
+  "player.tools.paste-none": "Nessun indirizzo negli appunti",
+  "player.address.unsupported": "Non disponibile per un video aperto da un indirizzo"
 }

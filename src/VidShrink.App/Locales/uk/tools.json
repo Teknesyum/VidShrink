@@ -10,5 +10,8 @@
   "player.tools.cancel": "Скасувати",
   "player.tools.saved": "Збережено: {0}",
   "player.tools.failed": "Не вдалося створити файл",
-  "player.tools.novideo": "Спочатку відкрийте відео"
+  "player.tools.novideo": "Спочатку відкрийте відео",
+  "player.tools.paste": "Вставити адресу",
+  "player.tools.paste-none": "У буфері обміну немає адреси",
+  "player.address.unsupported": "Недоступно для відео, відкритого за адресою"
 }
