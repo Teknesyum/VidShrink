@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Namesti",
-  "main.action.download": "Prenesi",
-  "main.action.downloadinstall": "Prenesi in namesti",
+  "main.action.update": "Posodobi",
+  "main.action.later": "Pozneje",
 
   "main.action.browse": "Prebrskaj",
   "main.action.cancel": "Prekliči",

@@ -45,8 +45,8 @@
 
 
   "main.action.install": "ติดตั้ง",
-  "main.action.download": "ดาวน์โหลด",
-  "main.action.downloadinstall": "ดาวน์โหลดและติดตั้ง",
+  "main.action.update": "อัปเดต",
+  "main.action.later": "ภายหลัง",
 
   "main.action.browse": "เรียกดู",
   "main.action.cancel": "ยกเลิก",

@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Install",
-  "main.action.download": "Download",
-  "main.action.downloadinstall": "Download and Install",
+  "main.action.update": "Update",
+  "main.action.later": "Later",
 
   "main.action.browse": "Browse",
   "main.action.cancel": "Cancel",

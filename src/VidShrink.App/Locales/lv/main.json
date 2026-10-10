@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Instalēt",
-  "main.action.download": "Lejupielādēt",
-  "main.action.downloadinstall": "Lejupielādēt un instalēt",
+  "main.action.update": "Atjaunināt",
+  "main.action.later": "Vēlāk",
 
   "main.action.browse": "Pārlūkot",
   "main.action.cancel": "Atcelt",

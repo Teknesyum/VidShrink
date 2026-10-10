@@ -10,8 +10,9 @@ using VidShrink.Core;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// Güncelleme bildiriminin iki davranışı. "İndir ve yükle": indirme bitince kurulum
-/// kullanıcı bir daha basmadan koşar, iptal ve hatada bayrak düşer. "Yeni sürüme geçildi":
+/// Güncelleme bildiriminin iki davranışı. Panel iki düğmelidir: "Güncelle" indirir ve indirme
+/// bitince kurulum kullanıcı bir daha basmadan koşar, iptal ve hatada bayrak düşer; "Sonra"
+/// paneli kapatır, hiçbir şey indirmez. "Yeni sürüme geçildi":
 /// şerit <see cref="MainWindow.AppliedNoticeSeconds"/> saniye sonra kendiliğinden kapanır,
 /// fare ya da odak sayacı durdurur. Ağa çıkmaz, gerçek kurulum yapmaz: indirme ve kurulum
 /// yerine sahte iş, sayaca sahte saat verilir.
@@ -19,10 +20,10 @@ namespace VidShrink.Tests;
 public sealed class GuncellemeIndirYukleTests
 {
     private static string Durum(MainWindow p) =>
-        $"birincil:{Anahtar(p.BtnNoticeInstall.Content)}|ikinci:{p.BtnNoticeDownloadInstall.IsVisible}|bayrak:{p.InstallAfterDownload}";
+        $"tek:{(p.BtnNoticeInstall.IsVisible ? Anahtar(p.BtnNoticeInstall.Content) : "gizli")}|guncelle:{p.BtnNoticeUpdate.IsVisible}|sonra:{p.BtnNoticeLater.IsVisible}|bayrak:{p.InstallAfterDownload}";
 
     private static string Anahtar(object? icerik) =>
-        new[] { "download", "cancel", "install" }
+        new[] { "cancel", "install" }
             .FirstOrDefault(k => Equals(icerik, LanguageCatalog.Display(Strings.Get("main.action." + k)))) ?? $"?{icerik}";
 
     private static void SahteIndirme(MainWindow p, List<string> kurulum)
@@ -56,9 +57,9 @@ public sealed class GuncellemeIndirYukleTests
                 var goruldu = new List<string>();
 
                 p.SetUpdateBadge(UpdateBadgeState.NewVersion);
-                goruldu.Add("bosta " + Durum(p) + $"|birincil-gorunur:{p.BtnNoticeInstall.IsVisible}");
+                goruldu.Add("bosta " + Durum(p) + $"|guncelle-yazisi:{Equals(p.BtnNoticeUpdate.Content, LanguageCatalog.Display(Strings.Get("main.action.update")))}");
 
-                Tikla(p.BtnNoticeDownloadInstall);
+                Tikla(p.BtnNoticeUpdate);
                 goruldu.Add("inerken " + Durum(p));
 
                 Sahnelendi(p);
@@ -70,13 +71,13 @@ public sealed class GuncellemeIndirYukleTests
 
         Assert.Equal(new[]
         {
-            "bosta birincil:download|ikinci:True|bayrak:False|birincil-gorunur:True",
-            "inerken birincil:cancel|ikinci:False|bayrak:True",
-            "hazir birincil:install|ikinci:False|bayrak:False|kurulum:1"
+            "bosta tek:gizli|guncelle:True|sonra:True|bayrak:False|guncelle-yazisi:True",
+            "inerken tek:cancel|guncelle:False|sonra:False|bayrak:True",
+            "hazir tek:install|guncelle:False|sonra:False|bayrak:False|kurulum:1"
         }, sonuc);
     }
 
-    /// <summary>Olumsuz kontrol: rozetten ya da "İndir"den başlayan indirme bitince kurmaz, "Yükle"yi bekler.</summary>
+    /// <summary>Olumsuz kontrol: rozetten başlayan indirme bitince kurmaz, "Yükle"yi bekler.</summary>
     [Fact]
     public void DuzIndirmeBitinceKurmaz()
     {
@@ -95,7 +96,7 @@ public sealed class GuncellemeIndirYukleTests
             finally { p.Close(); }
         });
 
-        Assert.Equal("birincil:install|ikinci:False|bayrak:False|kurulum:0", sonuc);
+        Assert.Equal("tek:install|guncelle:False|sonra:False|bayrak:False|kurulum:0", sonuc);
     }
 
     public static TheoryData<string> DusenSonlar => new() { "iptal", "hata", "kilit" };
@@ -112,7 +113,7 @@ public sealed class GuncellemeIndirYukleTests
                 var kurulum = new List<string>();
                 SahteIndirme(p, kurulum);
                 p.SetUpdateBadge(UpdateBadgeState.NewVersion);
-                Tikla(p.BtnNoticeDownloadInstall);
+                Tikla(p.BtnNoticeUpdate);
                 var once = Durum(p);
 
                 p.OnUpdateDownloadFinished(son switch
@@ -130,7 +131,7 @@ public sealed class GuncellemeIndirYukleTests
         });
 
         Assert.Equal(
-            "birincil:cancel|ikinci:False|bayrak:True => birincil:download|ikinci:True|bayrak:False => sonraki-indirme-kurulum:0",
+            "tek:cancel|guncelle:False|sonra:False|bayrak:True => tek:gizli|guncelle:True|sonra:True|bayrak:False => sonraki-indirme-kurulum:0",
             sonuc);
     }
 
@@ -145,13 +146,41 @@ public sealed class GuncellemeIndirYukleTests
                 p.UpdateDownloadStarter = () => { };
                 p.StagedUpdateInstaller = () => { };
                 p.SetUpdateBadge(UpdateBadgeState.NewVersion);
-                Tikla(p.BtnNoticeDownloadInstall);
+                Tikla(p.BtnNoticeUpdate);
                 return Durum(p);
             }
             finally { p.Close(); }
         });
 
-        Assert.Equal("birincil:download|ikinci:True|bayrak:False", sonuc);
+        Assert.Equal("tek:gizli|guncelle:True|sonra:True|bayrak:False", sonuc);
+    }
+
+    /// <summary>"Sonra" paneli kapatır, indirme başlatmaz; aynı düzenekte "Güncelle" başlatır (olumlu kontrol).</summary>
+    [Fact]
+    public void SonraPaneliKapatirIndirmez()
+    {
+        var sonuc = AppHost.Run(() =>
+        {
+            var p = new MainWindow();
+            try
+            {
+                var basladi = 0;
+                p.UpdateDownloadStarter = () => basladi++;
+                p.StagedUpdateInstaller = () => { };
+                p.SetUpdateBadge(UpdateBadgeState.NewVersion);
+                p.UpdateNotice.IsVisible = true;
+
+                Tikla(p.BtnNoticeLater);
+                var sonra = $"panel:{p.UpdateNotice.IsVisible}|indirme:{basladi}|{Durum(p)}";
+
+                p.UpdateNotice.IsVisible = true;
+                Tikla(p.BtnNoticeUpdate);
+                return $"{sonra} => indirme:{basladi}";
+            }
+            finally { p.Close(); }
+        });
+
+        Assert.Equal("panel:False|indirme:0|tek:gizli|guncelle:True|sonra:True|bayrak:False => indirme:1", sonuc);
     }
 
     [Fact]

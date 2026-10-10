@@ -1233,6 +1233,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-07, arayuzde yabanci dil altyazisi taramasi: sekiz yeni <c>main.subtitles.scan*</c> anahtarindan 12 kol 8 dilde (dugme <c>scan</c>: es, nb, pl, pt, sw; <c>flagged</c> ve <c>sparse</c>: bn, hi, ur; <c>sparse</c>: th), KOL dokumunden sayildi, en ve tr girmiyor: 3032 + 12 = 3044, en 297, tr 104.</para>
     /// <para>2026-10-07, WebP bit hizi notu: tek yeni anahtar <c>main.convert.note.webp-bitrate-ignored</c> 3 dilde kola giriyor (bn, hi, ur), KOL dokumunden sayildi, en ve tr girmiyor: 3044 + 3 = 3047, en 297, tr 104.</para>
     /// <para>2026-10-07, Donustur ve duzenleyicide meta veriyi sil, kare hizi kipi gerekcesi: uc yeni anahtardan 20 kol 15 dilde (<c>main.convert.drop-metadata.tip</c>: bn, hi, ja, th, ur; <c>main.reason.frame-rate-constant</c>: fr, ms, pt, ro, sw; <c>main.reason.frame-rate-peak</c>: da, en, es, hu, it, ms, pl, pt, ro, sw), KOL dokumunden sayildi, tr girmiyor: 3047 + 20 = 3067, en 297 + 1 = 298, tr 104.</para>
+    /// <para>2026-10-10, iki dugmeli guncelleme paneli (teknesyum-ui 0.35.0): <c>main.action.download</c> ve <c>main.action.downloadinstall</c> kalkti, yerlerine <c>main.action.update</c> ve <c>main.action.later</c> geldi. Kalkan <c>downloadinstall</c> 5 dilde koldaydi (cs en sk sl tr); yeni iki anahtar hicbir dilde kola girmiyor, KOL dokumunden sayildi: 3067 - 5 = 3062, en 298 - 1 = 297, tr 104 - 1 = 103.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1258,9 +1259,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3067, toplam);
-        Assert.Equal(298, dilBasina["en"]);
-        Assert.Equal(104, dilBasina["tr"]);
+        Assert.Equal(3062, toplam);
+        Assert.Equal(297, dilBasina["en"]);
+        Assert.Equal(103, dilBasina["tr"]);
     }
 
     /// <summary>

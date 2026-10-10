@@ -55,7 +55,7 @@ public partial class MainWindow
     internal ConcurrentQueue<UpdateStageReport> UpdateReports => _updateReports;
 
     /// <summary>
-    /// "İndir ve yükle" basıldı, indirme sürüyor: sahne hazır olunca <see cref="OnInstallUpdate"/>
+    /// "Güncelle" basıldı, indirme sürüyor: sahne hazır olunca <see cref="OnInstallUpdate"/>
     /// kullanıcı bir daha basmadan koşar. İptalde ve düşen indirmede sıfırlanır.
     /// </summary>
     internal bool InstallAfterDownload => _installAfterDownload;
@@ -67,8 +67,8 @@ public partial class MainWindow
     internal Action? StagedUpdateInstaller { get; set; }
 
     /// <summary>
-    /// Panelin ikinci düğmesi: indirmeyi başlatır ve bitince kurulumu kendiliğinden sürer.
-    /// İndirme başlamazsa bayrak düşer; başlatıcısı olmayan kurulumda "İndir" gibi yayın
+    /// Panelin "Güncelle" düğmesi: indirmeyi başlatır ve bitince kurulumu kendiliğinden sürer.
+    /// İndirme başlamazsa bayrak düşer; başlatıcısı olmayan kurulumda yayın
     /// sayfasını açar.
     /// </summary>
     private void OnDownloadAndInstallUpdate(object? sender, RoutedEventArgs e)
@@ -169,20 +169,18 @@ public partial class MainWindow
     }
 
     /// <summary>
-    /// Panelin öncü cümlesi ve birincil düğmesi rozetin durumunu izler: inmemişken "İndir",
-    /// inerken kapalı, indikten sonra "Yükle". İkinci düğme "İndir ve yükle" yalnız indirme
-    /// başlamadan görünür.
+    /// Panel iki düğmelidir: indirme başlamadan "Güncelle" (indirir, kurar) ve "Sonra" (paneli
+    /// kapatır, rozet kalır). İndirme başlayınca ikisi gider, yerlerine tek düğme gelir:
+    /// inerken "İptal", indikten sonra "Yükle". Ayrı bir "İndir" düğmesi yok.
     /// </summary>
     private void RefreshUpdateNoticeButton()
     {
         var state = _updateBadgeState;
-        BtnNoticeInstall.Content = Say(state switch
-        {
-            UpdateBadgeState.Ready => "main.action.install",
-            UpdateBadgeState.Downloading => "main.action.cancel",
-            _ => "main.action.download"
-        });
-        BtnNoticeDownloadInstall.IsVisible = state is not (UpdateBadgeState.Downloading or UpdateBadgeState.Ready or UpdateBadgeState.Installing);
+        var suruyor = state is UpdateBadgeState.Downloading or UpdateBadgeState.Ready or UpdateBadgeState.Installing;
+        BtnNoticeInstall.Content = Say(state == UpdateBadgeState.Downloading ? "main.action.cancel" : "main.action.install");
+        BtnNoticeInstall.IsVisible = suruyor;
+        BtnNoticeUpdate.IsVisible = !suruyor;
+        BtnNoticeLater.IsVisible = !suruyor;
         BtnNoticeInstall.IsEnabled = state switch
         {
             UpdateBadgeState.Installing => false,

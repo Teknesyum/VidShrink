@@ -149,14 +149,21 @@
                              VerticalAlignment="Center"/>
                 </WrapPanel>
                 <Button Grid.Column="2"
+                        x:Name="BtnNoticeLater"
+                        Content="{loc:Text main.action.later}"
+                        Theme="{StaticResource GhostButton}"
+                        VerticalAlignment="Center"
+                        Click="OnDismissUpdateNotice"/>
+                <Button Grid.Column="3"
                         x:Name="BtnNoticeInstall"
-                        Content="{loc:Text main.action.download}"
+                        IsVisible="False"
+                        Content="{loc:Text main.action.install}"
                         Theme="{StaticResource PrimaryButton}"
                         VerticalAlignment="Center"
                         Click="OnInstallUpdate"/>
                 <Button Grid.Column="3"
-                        x:Name="BtnNoticeDownloadInstall"
-                        Content="{loc:Text main.action.downloadinstall}"
+                        x:Name="BtnNoticeUpdate"
+                        Content="{loc:Text main.action.update}"
                         Theme="{StaticResource PrimaryButton}"
                         VerticalAlignment="Center"
                         Click="OnDownloadAndInstallUpdate"/>

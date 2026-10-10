@@ -45,8 +45,8 @@
 
 
   "main.action.install": "התקן",
-  "main.action.download": "הורדה",
-  "main.action.downloadinstall": "הורדה והתקנה",
+  "main.action.update": "עדכן",
+  "main.action.later": "מאוחר יותר",
 
   "main.action.browse": "עיון",
   "main.action.cancel": "ביטול",

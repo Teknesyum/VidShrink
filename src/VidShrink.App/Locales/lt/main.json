@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Įdiegti",
-  "main.action.download": "Atsisiųsti",
-  "main.action.downloadinstall": "Atsisiųsti ir įdiegti",
+  "main.action.update": "Atnaujinti",
+  "main.action.later": "Vėliau",
 
   "main.action.browse": "Naršyti",
   "main.action.cancel": "Atšaukti",

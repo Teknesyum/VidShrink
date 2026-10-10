@@ -21,6 +21,10 @@ ship as part of it.
 - The comparison panel labels read "Original" / "Processed" instead of all capitals, in the 31
   languages whose script has letter case; the other 11 are unchanged. The badges already used
   the same weight as the other labels, so the weight did not change.
+- The update notice has two buttons instead of three: "Update" downloads the new version,
+  installs it and restarts; "Later" closes the notice and leaves the badge in the title bar.
+  The separate "Download" button is gone. While a download runs the two buttons give way to a
+  single "Cancel", then "Install". All 42 languages. Layout standard moved to teknesyum-ui 0.35.0.
 
 ### Fixed
 

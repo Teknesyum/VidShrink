@@ -45,8 +45,8 @@
 
 
   "main.action.install": "Pasang",
-  "main.action.download": "Muat turun",
-  "main.action.downloadinstall": "Muat turun dan pasang",
+  "main.action.update": "Kemas kini",
+  "main.action.later": "Nanti",
 
   "main.action.browse": "Layari",
   "main.action.cancel": "Batal",
