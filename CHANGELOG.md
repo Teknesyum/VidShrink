@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.10] - 2026-10-10
+
 ### Added
 
 - Smart cut in the editor now works on sources with Opus audio (typical VP9/AV1 WebM): the audio
