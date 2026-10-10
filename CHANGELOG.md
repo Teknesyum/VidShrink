@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.14] - 2026-10-10
+
 ### Added
 
 - The recorder can capture the sound playing on the PC without a "Stereo Mix" device (Windows
