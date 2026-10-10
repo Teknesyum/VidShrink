@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.12] - 2026-10-10
+
 ### Added
 
 - The Shrink queue can encode several files at the same time. Settings has a new "Jobs Encoded
@@ -30,6 +32,11 @@ ship as part of it.
   written as version 1 and old project files open unchanged. Not in this change: transitions,
   more than one track, audio mixing. Silence and scene detection still scan only the first
   source, and preview playback across sources of different codecs was not measured.
+
+### Fixed
+
+- Closing the editor window now stops the waveform and keyframe scans. Before, the ffmpeg
+  process kept reading the source after the window was gone and held the file open.
 
 ## [1.2.11] - 2026-10-10
 
