@@ -237,7 +237,7 @@ public sealed class SistemSesiTests
 
         Assert.Equal(new[] { LoopbackAudio.Device }, bos.Audio);
         Assert.Equal(new[] { Mik, Miks, LoopbackAudio.Device }, dolu.Audio);
-        Assert.Single(dolu.Audio, d => d.Name == LoopbackAudio.DeviceName);
+        Assert.Single(dolu.Audio, d => d.Name == LoopbackAudio.LoopbackName);
     }
 
     [Fact]
@@ -646,7 +646,7 @@ public sealed class SistemSesiTests
         Assert.Equal(2, o.Secili);
         Assert.Same(LoopbackAudio.Device, o.Cihaz);
         Assert.DoesNotContain(o.EnBeklenen, o.Mikrofon);
-        Assert.Equal(LoopbackAudio.DeviceName, RecorderView.AudioLabel(LoopbackAudio.DeviceName) == o.EnBeklenen ? LoopbackAudio.Device.Name : null);
+        Assert.Equal(LoopbackAudio.LoopbackName, RecorderView.AudioLabel(LoopbackAudio.LoopbackName) == o.EnBeklenen ? LoopbackAudio.Device.Name : null);
         Assert.Equal("Stereo Mix", RecorderView.AudioLabel("Stereo Mix"));
     }
 

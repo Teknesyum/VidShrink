@@ -9,7 +9,7 @@ namespace VidShrink.Core;
 public static class LoopbackAudio
 {
     /// <summary>Ayarda saklanan sabit cihaz adi; ekranda yerellestirilmis etiket gosterilir.</summary>
-    public const string DeviceName = "WASAPI loopback";
+    public const string LoopbackName = "WASAPI loopback";
 
     /// <summary>Argumanda boru adinin yerini tutan deger.</summary>
     public const string PipeToken = @"\\.\pipe\vidshrink-loopback";
@@ -22,7 +22,7 @@ public static class LoopbackAudio
 
     /// <summary>Windows cihaz listesinin sonuna eklenen secenek.</summary>
     public static AudioCaptureDevice Device { get; } =
-        new(DeviceName, CaptureBackend.WasapiLoopback, AudioSourceRole.SystemAudio, PipeToken);
+        new(LoopbackName, CaptureBackend.WasapiLoopback, AudioSourceRole.SystemAudio, PipeToken);
 
     /// <summary>Ses izinin basina eklenebilecek en uzun sessizlik; ustu bozuk damga sayilir.</summary>
     public static readonly TimeSpan MaxLead = TimeSpan.FromSeconds(3);

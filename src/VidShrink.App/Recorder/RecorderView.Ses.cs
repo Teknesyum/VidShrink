@@ -31,7 +31,7 @@ internal partial class RecorderView
     /// İki kutuyu o anki cihaz listesi ve o anki dille yeniden üretir. Seçim addan
     /// korunuyor — indeksten değil, çünkü liste yenilenince sıra kayabiliyor. Ad cihazın
     /// kendi adıdır, kutuda görünen etiket değil: uygulamanın yakaladığı sistem sesi
-    /// (<see cref="LoopbackAudio.DeviceName"/>) her dilde başka yazılır.
+    /// (<see cref="LoopbackAudio.LoopbackName"/>) her dilde başka yazılır.
     /// </summary>
     internal void RefreshAudioBoxes()
     {
@@ -86,7 +86,7 @@ internal partial class RecorderView
 
     /// <summary>Kutuda görünen yazı: uygulamanın yakaladığı sistem sesi çevrilir, cihaz adları olduğu gibi kalır.</summary>
     internal static string AudioLabel(string name)
-        => string.Equals(name, LoopbackAudio.DeviceName, StringComparison.Ordinal) ? Say("recorder.audio.loopback") : name;
+        => string.Equals(name, LoopbackAudio.LoopbackName, StringComparison.Ordinal) ? Say("recorder.audio.loopback") : name;
 
     private static string? SelectedName(ComboBox box)
         => box.SelectedIndex > 0 && box.Tag is IReadOnlyList<string> names && box.SelectedIndex < names.Count
